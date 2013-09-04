@@ -1,0 +1,17 @@
+!------------------------------------------------------------------------
+!       Brief installation procedure
+!------------------------------------------------------------------------
+!
+The easiest way to install Calypso is the following:
+
+1. Configuration
+    ./configure [--prefix=/path]
+2. Compile
+    make
+3. Install
+    make install
+4. Clean up objects
+    make clean
+
+For details of the configuration, type
+./configure --help

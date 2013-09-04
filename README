@@ -1,0 +1,26 @@
+Calypso is a simulation programs for MHD dynamo simulation in a rotating spherical shell using spherical harmonics expansion methods.
+Calypso consists of the following files and directories.
+
+% ls
+CMakeLists.txt    Makefile.in    configure       doxygen           work
+INSTALL           README         configure.in    examples
+LICENSE           bin            doc             src
+
+INSTALL: Brief installation procedure
+LICENSE: License
+README:  This file
+
+configure.in:     Input file for autoconf
+Makefile.in:      Template for Makefile used by configure
+configure:        Configuration script
+CMakeLists.txt:   Configuration file for CMake
+
+bin:      Directory for programs
+doc:      Direcory for documentation
+doxygen:  Directory for Source documentation 
+examples: Directory for examples
+src:      Directory for source files
+work:     Work directory
+
+
+For installation, prease read document in doc directory or INSTALL.

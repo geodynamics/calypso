@@ -1,0 +1,103 @@
+#
+#  Makefile for Calypso geoynamo platform
+#    Written by H. Matsui
+#
+SHELL           = @SHELL@
+#
+#  directories of Calypso
+#
+SRCDIR = @abs_top_srcdir@
+INSTDIR= @prefix@
+#
+MHDDIR = $(SRCDIR)/src
+MAKEDIR= $(SRCDIR)/work
+BUILDDIR= $(SRCDIR)/bin
+#
+# MPI settings
+#
+MPICHDIR =    @MPIDIR@
+MPICHLIBDIR = $(MPICHDIR)/lib
+MPICHBINDIR = $(MPICHDIR)/bin
+MPICHINCDIR = @MPIINCDIR@
+MPILIBS =     @MPILIBS@
+#
+#    compilers
+#
+
+F90_LOCAL = @FC@
+MPIF90 = @MPIFC@
+
+AR = @ar_bin@
+RANLIB = @RANLIB@
+
+#
+#  optimization flags
+#
+F90OPTFLAGS= @FCFLAGS@   @OPENMP_FCFLAGS@
+#
+#    FFTW3 settings
+#
+FFTW3_CFLAGS= @FFTW3_CFLAGS@
+FFTW3_LIBS=   @FFTW3_LIBS@
+#
+#    HDF5 fortran wrapper settings
+#
+HDF5_FFLAGS=    @HDF5_FFLAGS@
+HDF5_LDFLAGS=   @HDF5_LDFLAGS@
+HDF5_FLIBS=     @HDF5_PFLIBS@
+#
+#  --- Please do not chenge the following ---
+#
+MAKE_MOD_DEP= $(BUILDDIR)/make_f90depends
+#
+
+all: makemake
+	cd $(MAKEDIR); make
+
+$(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
+	if [ ! -d $(BUILDDIR) ]; then \
+		mkdir $(BUILDDIR); \
+	fi
+	$(F90_LOCAL) -c -o $(MAKEDIR)/make_module_dependency.o $<
+	$(F90_LOCAL) -o $@ $(MAKEDIR)/make_module_dependency.o
+
+makemake: $(MAKE_MOD_DEP)
+	echo "# Construct Makefile"; \
+	cd $(MHDDIR) ; \
+		make \
+		MAKEDIR="$(MAKEDIR)" \
+		BUILDDIR="$(BUILDDIR)" \
+		INSTDIR="$(INSTDIR)" \
+		MHDDIR="$(MHDDIR)" \
+		MPICHDIR="$(MPICHDIR)" \
+		MPICHLIBDIR="$(MPICHLIBDIR)" \
+		MPILIBS="$(MPILIBS)" \
+		MPICHBINDIR="$(MPICHBINDIR)" \
+		MPICHINCDIR="$(MPICHINCDIR)" \
+		FFTW3_CFLAGS="$(FFTW3_CFLAGS)" \
+		FFTW3_LIBS="$(FFTW3_LIBS)" \
+		HDF5_FFLAGS="$(HDF5_FFLAGS)" \
+		HDF5_LDFLAGS="$(HDF5_LDFLAGS)" \
+		HDF5_FLIBS="$(HDF5_FLIBS)" \
+		FC_NAME_MANGLE="$(FC_NAME_MANGLE)" \
+		OPTFLAGS="$(OPTFLAGS)" \
+		F90OPTFLAGS="$(F90OPTFLAGS)" \
+		F90LIB="$(F90LIB)" \
+		MPIF90="$(MPIF90)" \
+		AR="$(AR)" \
+		RANLIB="$(RANLIB)" \
+		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
+		makemake
+
+
+install:
+	cd $(MAKEDIR) ; \
+		make install
+
+clean:
+	for dir in $(MAKEDIR) $(MHDDIR) ; do \
+	echo "# cleaning $${dir} directory..."; \
+		( cd $${dir}; \
+		make clean )\
+	done; \
+	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
