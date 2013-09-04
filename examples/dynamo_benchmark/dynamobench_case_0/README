@@ -17,10 +17,10 @@ field:              Directory for field data files
 The simulation procedure is the following
 
 1: Run index generation program as
-[dynamobench_case_1]$ [CALYPSO_DIR]/bin/gen_sph_grids
+[dynamobench_case_0]$ [CALYPSO_DIR]/bin/gen_sph_grids
 
 2. Run simulation program
-[dynamobench_case_1]$ mpirun -np 4 [CALYPSO_DIR]/bin/sph_mhd
+[dynamobench_case_0]$ mpirun -np 4 [CALYPSO_DIR]/bin/sph_mhd
 
 3. To continue the simulation change rst_ctl in control_MHD from
       rst_ctl                dynamo_benchmark_0
@@ -29,6 +29,6 @@ The simulation procedure is the following
    And, start simulation again by 2.
 
 4. To check the required results for dynamo benchmark, run 
-[dynamobench_case_1]$ mpirun -np 4 [CALYPSO_DIR]/bin/sph_dynamobench
+[dynamobench_case_0]$ mpirun -np 4 [CALYPSO_DIR]/bin/sph_dynamobench
 
 

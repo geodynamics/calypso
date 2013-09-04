@@ -20,7 +20,7 @@ begin MHD_control
     debug_flag_ctl            'OFF'
 !
     num_subdomain_ctl            4
-    num_smp_ctl                  1
+    num_smp_ctl                  8
 !
     sph_file_prefix             'sph_lm31r48c_4_ic/in'
     coriolis_int_file_name      'sph_lm31r48c_4_ic/rot_int.dat'
@@ -227,11 +227,11 @@ begin MHD_control
    begin time_step_ctl
       elapsed_time_ctl      80000.
       i_step_init_ctl           0
-      i_step_finish_ctl    120000
+      i_step_finish_ctl     20000
 !
       i_step_check_ctl        100
-      i_step_rst_ctl        20000
-      i_step_field_ctl       4000
+      i_step_rst_ctl         5000
+      i_step_field_ctl      10000
 !
       dt_ctl              5.0e-5
       time_init_ctl       0.0e-8

@@ -20,7 +20,7 @@ begin assemble_control
 !!!!!  information for time integration
     begin time_step_ctl
       i_step_init_ctl       1
-      i_step_finish_ctl     2
+      i_step_finish_ctl     4
       i_step_rst_ctl        1
     end time_step_ctl
   end control
