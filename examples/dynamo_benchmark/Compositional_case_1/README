@@ -1,0 +1,30 @@
+!-----------------------------------------------------------------------
+!     Example using dynamo benchmark test Case 1
+!      using compositional variation instead of temperature
+!       Please see Christensen et.al. (2001) for the model description
+!-----------------------------------------------------------------------
+!
+ Here is the input files for the dynamo benchmark case 1.
+This example consists of the following files and directories
+
+control_sph_shell:  control file for gen_sph_grids
+control_MHD:        control file for simulation
+control_snapshot:   control file for data analysis
+
+sph_lm31r48c_4:     Directory for spherical harmonics index table
+rst_4:              Directory for restart files
+field:              Directory for field data files
+
+The simulation procedure is the following
+
+1: Run index generation program as
+[dynamobench_case_1]$ [CALYPSO_DIR]/bin/gen_sph_grids
+
+2. Run simulation program
+[dynamobench_case_1]$ mpirun -np 4 [CALYPSO_DIR]/bin/sph_mhd
+
+3. To continue the simulation change rst_ctl in control_MHD from
+      rst_ctl                dynamo_benchmark_1
+   to
+      rst_ctl                start_from_rst_file
+   And, start simulation again by 2.

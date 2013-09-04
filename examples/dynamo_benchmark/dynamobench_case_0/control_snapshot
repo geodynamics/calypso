@@ -1,0 +1,230 @@
+begin MHD_control
+!!!!! Define for files !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!  num_subdomain_ctl: number of subdomains
+!  num_smp_ctl:       number of smp processes
+!
+!  sph_file_prefix:     prefix of spherical transfoem grid
+!  restart_file_prefix: prefix of restart file
+!                            (Default: restart/rst.step#.domain#)
+!  field_file_prefix:   prefix for snapshot field data 
+!                            (Default: out.step#.domain#.udt)
+!
+!    mesh_file_fmt_ctl:    data format for mesh file
+!    restart_file_fmt_ctl: data format for restart files
+!    udt_files_fmt_ctl:    data format for udt files
+!                            (ascii, binary, or gzip, Dafault is 'ascii')
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+  begin data_files_def
+    debug_flag_ctl            'OFF'
+!
+    num_subdomain_ctl           4
+    num_smp_ctl                 2
+!
+    sph_file_prefix             'sph_lm31r48c_4/in'
+    coriolis_int_file_name      'sph_lm31r48c_4/rot_int.dat'
+!
+    restart_file_prefix         'rst_4/rst'
+    field_file_prefix           'field/out'
+!
+    field_file_fmt_ctl          'merged_VTK'
+  end data_files_def
+!
+  begin model
+!!!!!  physical values!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! available valuables 
+!   velocity, temperature, pressure, vorticity
+!   vector_potential, magnetic_field, current_density, magnetic_potential
+!   composition, perturbation_temp
+!
+!   buoyancy_flux, Lorentz_work, mag_tension_work
+!   magnetic_ene_generation
+!   temp_generation, part_temp_gen
+!   vis_ene_diffuse, mag_ene_diffuse
+!
+!   thermal_diffusion, viscous_diffusion, magnetic_diffusion
+!   Coriolis_force, buoyancy
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin phys_values_ctl
+      array nod_value_ctl    4
+        nod_value_ctl  velocity                Viz_On   Monitor_On
+        nod_value_ctl  temperature             Viz_On   Monitor_On
+        nod_value_ctl  pressure                Viz_On   Monitor_On
+        nod_value_ctl  vorticity               Viz_On   Monitor_On
+      end array nod_value_ctl
+    end phys_values_ctl
+!
+!!!!!  physical values for time evolution !!!!!!!!!!!!!!!!!!
+! aviable valuables: velocity, temperature, magnetic_field
+!                    vector_potential, composition
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin time_evolution_ctl
+      array time_evo_ctl   2
+        time_evo_ctl  temperature
+        time_evo_ctl  velocity
+      end array time_evo_ctl
+    end time_evolution_ctl
+!
+!!!!!  setting for boundary condition
+!
+    begin boundary_condition
+      array bc_temperature  2
+        bc_temperature  fixed ICB  1.000
+        bc_temperature  fixed CMB  0.000
+      end array bc_temperature
+!
+      array bc_velocity    2
+        bc_velocity  non_slip_sph    ICB   0.000
+        bc_velocity  non_slip_sph    CMB   0.000
+      end array bc_velocity
+   end boundary_condition
+!
+!!!!!  define of forces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  available forces
+!     gravity, Coriolis, Lorentz
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin forces_define
+      array force_ctl      2
+        force_ctl   gravity
+        force_ctl   Coriolis
+      end array force_ctl
+    end forces_define
+!
+!!!!!  dimensionless numbers !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  available numbers
+!     Prandtl_number, magnetic_Prandtl_number
+!     Rayleigh_number, modified_Rayleigh_number
+!     Reynords_number
+!     Taylor_number, Ekman_number
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin dimensionless_ctl
+      array dimless_ctl 3
+        dimless_ctl  Prandtl_number                   1.0e-0
+        dimless_ctl  modified_Rayleigh_number         1.0e+2
+        dimless_ctl  Ekman_number                     1.0e-3
+      end array dimless_ctl
+    end dimensionless_ctl
+!
+!!!!! Normalization settings  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!    define
+!     coef_4_termal_ctl:      time integration and advection of temp
+!     coef_4_velocity_ctl:    time integration and advection of temperature
+!     coef_4_magnetic_ctl:    time integration and advection of magnetic f.
+!     coef_4_t_diffuse_ctl:   coefficients for thermal diffusion
+!     coef_4_v_diffuse_ctl:   coefficients for viscous diffusion
+!     coef_4_m_diffuse_ctl:   coefficients for magnetic diffusion
+!     coef_4_buoyancy_ctl:    coefficients for buoyancy
+!     coef_4_Coriolis_ctl:    coefficients for Coriolis force
+!     coef_4_Lorentz_ctl:     coefficients for Lorantz force
+!     coef_4_composit_buoyancy_ctl: 
+!                             coefficients for compositional buoyancy
+!     coef_4_induction_ctl:   coefficients for magnetic induction
+!
+!     One:  1, Zero (Ignore), Two:  2,   Radial_parameter: (1-ri/ro)
+!     Radial_35: (1-0.35)
+!
+!     Real number.... Power of each numbers
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+    begin coefficients_ctl
+      begin thermal
+        array coef_4_termal_ctl     1
+          coef_4_termal_ctl            One                        1.0
+        end array coef_4_termal_ctl
+!
+        array coef_4_t_diffuse_ctl  1
+          coef_4_t_diffuse_ctl         Prandtl_number            -1.0
+        end array coef_4_t_diffuse_ctl
+      end thermal
+!
+      begin momentum
+        array coef_4_velocity_ctl   1
+          coef_4_velocity_ctl          One                        1.0
+        end array coef_4_velocity_ctl
+!
+        array coef_4_press_ctl      1
+          coef_4_press_ctl             Ekman_number              -1.0
+        end array coef_4_press_ctl
+!
+        array coef_4_v_diffuse_ctl  1
+          coef_4_v_diffuse_ctl         One                        1.0
+        end array coef_4_v_diffuse_ctl
+!
+        array coef_4_buoyancy_ctl   3
+          coef_4_buoyancy_ctl          Radial_35                  1.0
+          coef_4_buoyancy_ctl          modified_Rayleigh_number   1.0
+          coef_4_buoyancy_ctl          Ekman_number              -1.0
+        end array coef_4_buoyancy_ctl
+!
+        array coef_4_Coriolis_ctl   2
+          coef_4_Coriolis_ctl          Two                        1.0
+          coef_4_Coriolis_ctl          Ekman_number              -1.0
+        end array coef_4_Coriolis_ctl
+!
+        array coef_4_Lorentz_ctl    2
+          coef_4_Lorentz_ctl           magnetic_Prandtl_number   -1.0
+          coef_4_Lorentz_ctl           Ekman_number              -1.0
+        end array coef_4_Lorentz_ctl
+      end momentum
+!
+    end coefficients_ctl
+!
+!!!!!!!!! model for hydrostatic !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!    ref_temperature_ctl: none           (No reference of temperature)
+!                         spherical_shell ( for spherical shell model)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    begin temperature_define
+!      ref_temp_ctl     none
+      ref_temp_ctl              spherical_shell
+!
+      begin low_temp_ctl
+        depth         1.5384615384615384
+        temperature   0.0d0
+      end low_temp_ctl
+!
+      begin high_temp_ctl
+        depth         0.5384615384615384
+        temperature   1.0d0
+      end high_temp_ctl
+    end temperature_define
+!
+  end model
+!
+!
+!
+  begin control
+!!!!!  information for sime integration
+   begin time_step_ctl
+      elapsed_time_ctl      42500.
+      i_step_init_ctl       0
+      i_step_finish_ctl     12
+!
+      i_step_check_ctl       1
+      i_step_rst_ctl          1
+      i_step_field_ctl        1
+!
+      dt_ctl              5.0e-5
+      time_init_ctl       0.0e-8
+    end time_step_ctl
+!!!!!  control for restart data
+    begin restart_file_ctl
+       rst_ctl                dynamo_benchmark_0
+    end restart_file_ctl
+!!!!!!   method for time evolution
+!
+    begin time_loop_ctl
+      coef_imp_v_ctl          6.0e-1
+      coef_imp_t_ctl          6.0e-1
+      coef_imp_b_ctl          6.0e-1
+      coef_imp_d_ctl          6.0e-1
+      scheme_ctl              Crank_Nicolson
+    end time_loop_ctl
+  end control
+end MHD_control

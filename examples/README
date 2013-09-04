@@ -1,0 +1,12 @@
+Calypso examples consists of the following three parts.
+1. spherical_shell:  Examples to generate varius spherical shell model.
+      Chebyshev_points:   Simulation domain with Chebyshev collocation points in outer core
+      equidistance:       Simulation domain with equaidistance grids in outer core
+      explicitly_defined: Simulation domain with explicitly defined grids
+      with_inner_core:    Simulation domain including inner core and external of the fluid shell
+      
+ To test the program run [CALIPSO_DIR]/bin/gen_sph_grid in each directory.
+      
+2. dynamo_benchmark: Examples of dynamo benchmark by Christensen et. al.(2001)
+
+3. assemble_sph: Example to conversion spctr data between data with differenct number of parallelization.

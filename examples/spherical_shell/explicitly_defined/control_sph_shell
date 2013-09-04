@@ -1,0 +1,88 @@
+begin spherical_shell_ctl
+  begin data_files_def
+    num_subdomain_ctl    2
+    sph_file_prefix             'in'
+    coriolis_int_file_name      'rot_int.dat'
+  end data_files_def
+!
+  begin num_domain_ctl
+    array num_domain_sph_grid  2
+      num_domain_sph_grid   radial         1     end
+      num_domain_sph_grid   meridional     2     end
+    end array num_domain_sph_grid
+!
+    array num_domain_legendre   2
+      num_domain_legendre   radial         1     end
+      num_domain_legendre   zonal          2     end
+    end array num_domain_legendre
+!
+    array num_domain_spectr     1
+      num_domain_spectr      modes         2    end
+    end array num_domain_spectr
+  end num_domain_ctl
+!
+  begin num_grid_sph
+    truncation_level_ctl      31
+    ngrid_meridonal_ctl      48
+    ngrid_zonal_ctl          96
+!
+    raidal_grid_type_ctl   explicit
+    array r_layer     49
+      r_layer        1   5.384615384615384E-001
+      r_layer        2   5.395320768422367E-001
+      r_layer        3   5.427391077746332E-001
+      r_layer        4   5.480688982599232E-001
+      r_layer        5   5.554986253170042E-001
+      r_layer        6   5.649964737139855E-001
+      r_layer        7   5.765217722058951E-001
+      r_layer        8   5.900251676951942E-001
+      r_layer        9   6.054488365693190E-001
+      r_layer       10   6.227267323102658E-001
+      r_layer       11   6.417848683159209E-001
+      r_layer       12   6.625416347220497E-001
+      r_layer       13   6.849081478682646E-001
+      r_layer       14   7.087886309115039E-001
+      r_layer       15   7.340808239571780E-001
+      r_layer       16   7.606764219517372E-001
+      r_layer       17   7.884615384615383E-001
+      r_layer       18   8.173171933520378E-001
+      r_layer       19   8.471198222789935E-001
+      r_layer       20   8.777418058099575E-001
+      r_layer       21   9.090520159102780E-001
+      r_layer       22   9.409163774534742E-001
+      r_layer       23   9.731984423515125E-001
+      r_layer       24   1.005759973846467E+000
+      r_layer       25   1.038461538461538E+000
+      r_layer       26   1.071163103076610E+000
+      r_layer       27   1.103724634571564E+000
+      r_layer       28   1.136006699469602E+000
+      r_layer       29   1.167871061012799E+000
+      r_layer       30   1.199181271113119E+000
+      r_layer       31   1.229803254644083E+000
+      r_layer       32   1.259605883571039E+000
+      r_layer       33   1.288461538461538E+000
+      r_layer       34   1.316246654971339E+000
+      r_layer       35   1.342842252965899E+000
+      r_layer       36   1.368134446011573E+000
+      r_layer       37   1.392014929054812E+000
+      r_layer       38   1.414381442201027E+000
+      r_layer       39   1.435138208607156E+000
+      r_layer       40   1.454196344612811E+000
+      r_layer       41   1.471474240353758E+000
+      r_layer       42   1.486897909227882E+000
+      r_layer       43   1.500401304717182E+000
+      r_layer       44   1.511926603209091E+000
+      r_layer       45   1.521424451606072E+000
+      r_layer       46   1.528854178663154E+000
+      r_layer       47   1.534183969148444E+000
+      r_layer       48   1.537391000080840E+000
+      r_layer       49   1.538461538461538E+000
+    end array r_layer
+!
+    array  boundaries_ctl   3
+      boundaries_ctl  to_Center      1
+      boundaries_ctl  ICB            1
+      boundaries_ctl  CMB           49
+    end array boundaries_ctl
+  end num_grid_sph
+end spherical_shell_ctl
