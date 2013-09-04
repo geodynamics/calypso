@@ -50,8 +50,8 @@
 !>     coefficient for time electric potentia
       real  (kind=kreal) :: coef_mag_p
 !>     coefficient for time evolution of composition and composition flux
-      real  (kind=kreal) :: coef_scalar
-!>     coefficient for composition flux (-coef_scalar)
+      real  (kind=kreal) :: coef_light
+!>     coefficient for composition flux (-coef_light)
       real  (kind=kreal) :: coef_nega_c
 !
 !>     1 / coef_press

@@ -184,6 +184,19 @@
       end do
 !$omp end parallel do
 !
+!   search address for (l = m = 0)
+      jj = find_local_sph_mode_address(0, 0)
+!
+!   set reference temperature if (l = m = 0) mode is there
+!
+      if (jj .gt. 0) then
+        do k = 1, nidx_rj(1)
+          inod = local_sph_data_address(k,jj)
+          d_rj(inod,ipol%i_light) = (ar_1d_rj(k,1) * 20.d0/13.0d0       &
+     &                              - 1.0d0 ) * 7.0d0 / 13.0d0
+        end do
+      end if
+!
 !
 !    Find local addrtess for (l,m) = (4,4)
       jj =  find_local_sph_mode_address(4, 4)

@@ -63,7 +63,7 @@
       end if
 !
       if( (irtp%i_c_flux*iflag_t_evo_4_composit) .gt. 0) then
-        call rtp_vec_scalar_prod_w_coef(coef_scalar,                    &
+        call rtp_vec_scalar_prod_w_coef(coef_light,                     &
      &     irtp%i_velo, irtp%i_light, irtp%i_c_flux)
       end if
 !

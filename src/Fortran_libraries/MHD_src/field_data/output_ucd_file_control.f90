@@ -30,7 +30,7 @@
       use m_ucd_data
       use parallel_ucd_IO_select
       use copy_time_steps_4_restart
-      use range_data_IO
+!      use range_data_IO
 !
 !
       if(i_step_output_ucd .eq. 0) return
@@ -40,7 +40,7 @@
 !
       call copy_time_steps_to_restart
       call sel_write_parallel_ucd_file(ucd_step)
-      call output_range_data
+!      call output_range_data
 !
       end subroutine s_output_ucd_file_control
 !
