@@ -1,0 +1,4 @@
+ADD_SUBDIRECTORY (SPH_MHD)
+ADD_SUBDIRECTORY (data_utilities)
+ADD_SUBDIRECTORY (mesh_utilities)
+

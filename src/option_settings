@@ -1,0 +1,338 @@
+Settings for Makefiles
+
+#
+# -------------------------------------------------------------------------------
+# Intel mac with gfortran-openmpi with self compiled FFTW3
+# -------------------------------------------------------------------------------
+#
+# ./configure --prefix='/Users/matsui/local' FCFLAGS='-O -Wall -g' \
+# PKG_CONFIG_PATH='/Users/matsui/local/lib/pkgconfig:/usr/local/lib/pkgconfig' \
+# --enable-fftw3 --with-hdf5='/Users/matsui/local/bin/h5pcc'
+#
+#
+#  Makefile for geoynamo platform CALIPSO
+#    Written by H. Matsui
+#
+SHELL           = /bin/sh
+#
+#  directories of GeoFEM
+#
+SRCDIR = /Users/matsui/src_release
+INSTDIR= /Users/matsui/local
+#
+MHDDIR = $(SRCDIR)/src
+MAKEDIR= $(SRCDIR)/work
+BUILDDIR= $(SRCDIR)/bin
+#
+# MPI settings
+#
+MPICHDIR =    
+MPICHLIBDIR = $(MPICHDIR)/lib
+MPICHBINDIR = $(MPICHDIR)/bin
+MPICHINCDIR = 
+MPILIBS =      
+#
+[Kemo-MacBook-Pro:~/src_release] matsui% more Makefile
+#
+#  Makefile for geoynamo platform CALYPSO
+#    Written by H. Matsui
+#
+SHELL           = /bin/sh
+#
+#  directories of GeoFEM
+#
+SRCDIR = /Users/matsui/src_release
+INSTDIR= /Users/matsui/local
+#
+MHDDIR = $(SRCDIR)/src
+MAKEDIR= $(SRCDIR)/work
+BUILDDIR= $(SRCDIR)/bin
+#
+# MPI settings
+#
+MPICHDIR =    
+MPICHLIBDIR = $(MPICHDIR)/lib
+MPICHBINDIR = $(MPICHDIR)/bin
+MPICHINCDIR = 
+MPILIBS =      
+#
+#    compilers
+#
+
+F90_LOCAL = gfortran
+MPIF90 = mpif90
+
+AR = ar
+RANLIB = ranlib
+
+#
+#  optimization flags
+#
+F90OPTFLAGS= -O -Wall -g   -fopenmp
+#
+#    FFTW3 settings
+#
+FFTW3_CFLAGS= -I/Users/matsui/local/include  
+FFTW3_LIBS=   -L/Users/matsui/local/lib -lfftw3 -lm  
+#
+#
+#    HDF5 fortran wrapper settings
+#
+HDF5_FFLAGS=    -I/Users/matsui/local/lib -L/Users/matsui/local/lib -I/Users/matsui/local/include 
+HDF5_LDFLAGS=   -L/Users/matsui/local/lib 
+HDF5_FLIBS=     -L/Users/matsui/local/lib /Users/matsui/local/lib/libhdf5hl_fortran.a /Users/matsui/local/lib/libhdf5_hl.a /Users/matsui/local/lib/libhdf5_fortran.a /Users/matsui/local/lib/libhdf5.a -L/Users/matsui/local/lib -lmpi -lz -ldl -lm
+#
+#
+
+
+
+# -------------------------------------------------------------------------------
+# Intel mac with gfortran4.7-openmpi with FFTW3(Macport)
+# -------------------------------------------------------------------------------
+#
+# setenv PKG_CONFIG_PATH /Users/matsui/local/lib/pkgconfig:/usr/lib/pkgconfig:/opt/local/lib/pkgconfig
+#
+#./configure --prefix='/Users/matsui/local' FC=gfortran-mp-4.7 \
+#  MPICC=openmpicc MPIFC=openmpif90 \
+#  CFLAGS='-O -Wall -g'  FCFLAGS='-O -Wall -g' --enable-fftw3
+#
+#
+#  Makefile for geoynamo platform CALIPSO
+#    Written by H. Matsui
+#
+SHELL           = /bin/sh
+#
+#  directories of GeoFEM
+#
+SRCDIR = /Users/matsui/src_release
+INSTDIR= /Users/matsui/local
+#
+MHDDIR = $(SRCDIR)/src
+MAKEDIR= $(SRCDIR)/work
+BUILDDIR= $(SRCDIR)/bin
+#
+# MPI settings
+#
+MPICHDIR =    
+MPICHLIBDIR = $(MPICHDIR)/lib
+MPICHBINDIR = $(MPICHDIR)/bin
+MPICHINCDIR = 
+MPILIBS =      
+#
+#    compilers
+#
+
+F90_LOCAL = gfortran-mp-4.7
+MPIF90 = openmpif90
+
+AR = ar
+RANLIB = ranlib
+
+#
+#  optimization flags
+#
+F90OPTFLAGS= -O -Wall -g   -fopenmp
+#
+#    FFTW3 settings
+#
+FFTW3_CFLAGS= -I/opt/local/include  
+FFTW3_LIBS=   -L/opt/local/lib -lfftw3 -lm
+#
+#
+# -------------------------------------------------------------------------------
+# Intel XEON cluster with Myrinet (Sirens.berkeley.edu)
+# -------------------------------------------------------------------------------
+#
+# setenv PKG_CONFIG_PATH /home/matsui/local/lib/pkgconfig:/usr/lib/pkgconfig:/usr/local/lib/pkgconfig
+#
+#./configure  --prefix='/home/matsui/local' CC=icc FC=ifort CXX=icc AR=ar \
+#  MPICC=mpicc MPIFC=mpif90 PKG_CONFIG=/usr/bin/pkg-config \
+#  PKG_CONFIG_PATH='/usr/lib/pkgconfig:/usr/local/lib/pkgconfig' \
+#  CFLAGS='-O3  -Wall -g' FCFLAGS='-O3 -warn all -g' \
+#  --enable-fftw3
+#
+#  Makefile for geoynamo platform CALIPSO
+#    Written by H. Matsui
+#
+SHELL           = /bin/sh
+#
+#  directories of GeoFEM
+#
+SRCDIR = /home/matsui/src_release
+INSTDIR= /home/matsui/local
+#
+MHDDIR = $(SRCDIR)/src
+MAKEDIR= $(SRCDIR)/work
+BUILDDIR= $(SRCDIR)/bin
+#
+# MPI settings
+#
+MPICHDIR =    
+MPICHLIBDIR = $(MPICHDIR)/lib
+MPICHBINDIR = $(MPICHDIR)/bin
+MPICHINCDIR = 
+MPILIBS =      
+#
+#    compilers
+#
+
+F90_LOCAL = ifort
+MPIF90 = mpif90
+
+AR = ar
+RANLIB = ranlib
+
+#
+#  optimization flags
+#
+F90OPTFLAGS= -O3 -warn all -g   -fopenmp
+#
+#    FFTW3 settings
+#
+FFTW3_CFLAGS= -I/usr/local/include  
+FFTW3_LIBS=   -L/usr/local/lib -lfftw3 -lm  
+#
+
+# -------------------------------------------------------------------------------
+# Intel XEON cluster in Texas (stampede)
+# -------------------------------------------------------------------------------
+#
+#./configure  --prefix='/home1/02179/matsui/local' CC=icc FC=ifort CXX=icc AR=xiar \
+#  MPICC=mpicc MPIFC=mpif90 PKG_CONFIG=/usr/bin/pkg-config \
+#  CFLAGS='-O3  -Wall -g' FCFLAGS='-O3 -warn all -g' \
+#  --enable-fftw3
+#
+#
+# -------------------------------------------------------------------------------
+# SR16000 without FFTW3 (NIPR:sr1)
+# -------------------------------------------------------------------------------
+#
+# setenv PKG_CONFIG_PATH /home0/matsui/local/lib/pkgconfig
+#
+# ./configure --prefix='/home0/matsui/local' CC=cc FC=mpif90_r AR="ar -X64" RANLIB="ranlib -X64"\
+#  FCFLAGS="-64 -Oss -noifswpl -omp -pardiag=2 -autoinline=2 -model=L1" \
+#  MPICC=mpcc_r MPIFC=mpif90_r
+#
+#  Makefile for geoynamo platform CALIPSO
+#    Written by H. Matsui
+#
+SHELL           = /bin/sh
+#
+#  directories of GeoFEM
+#
+SRCDIR = /GPFS/matsui/src_release
+INSTDIR= /home0/matsui/local
+#
+MHDDIR = $(SRCDIR)/src
+MAKEDIR= $(SRCDIR)/work
+BUILDDIR= $(SRCDIR)/bin
+#
+# MPI settings
+#
+MPICHDIR =    
+MPICHLIBDIR = $(MPICHDIR)/lib
+MPICHBINDIR = $(MPICHDIR)/bin
+MPICHINCDIR = 
+MPILIBS =      
+#
+#    compilers
+#
+
+F90_LOCAL = mpif90_r
+MPIF90 = mpif90_r
+
+AR = ar -X64
+RANLIB = ranlib -X64
+
+#
+#  optimization flags
+#
+F90OPTFLAGS= -64 -Oss -noifswpl -omp -pardiag=2 -autoinline=2 -model=L1   -fopenmp
+#
+#    FFTW3 settings
+#
+FFTW3_CFLAGS= 
+FFTW3_LIBS=   
+#
+# -------------------------------------------------------------------------------
+# SX-9 (ISAS)
+# -------------------------------------------------------------------------------
+#
+#./configure CC=sxmpicc FC=sxmpif90 AR=sxar RANLIB=true \
+#  CFLAGS="-h multi,vector" \
+#  FCFLAGS="-Popenmp -pi line=200 nest=3 incdir -R5 -ftrace -Wf,'-pvctl loopcnt=500000'" \
+#   MPICC=sxmpicc MPIFC=sxmpif90 \
+#  --disable-cocoa --disable-gl --disable-glui --disable-gtk --disable-libpng \
+#  --with-mpi=/SX/usr --with-zlib=/home/m/m361/local --without-opengl  --without-pgplot
+#
+#
+#  SX-9 in ISAS
+#
+MPICHDIR = /SX/usr
+MPICHLIBDIR = $(MPICHDIR)/lib
+MPILIBS = -lfmpi  -lmpi
+MPICHBINDIR = $(MPICHDIR)/bin
+MPICHINCDIR = $(MPICHDIR)/include
+#
+F90 = $(MPICHBINDIR)/sxmpif90
+CC =  $(MPICHBINDIR)/sxmpicc
+CXX =
+
+MPIF90 = $(MPICHBINDIR)/sxmpif90
+MPICC = $(MPICHBINDIR)/sxmpicc
+
+AR = $(MPICHBINDIR)/sxar
+RANLIB = true
+#
+F90OPTFLAGS= -Popenmp -pi line=200 nest=3 incdir -R5 -ftrace -Wf,''-pvctl loopcnt=500000 nomatmul''
+OPTFLAGS = -h multi,vector
+CXXFLAGS =
+
+# -------------------------------------------------------------------------------
+# PowerBook G4 with IBM XL fortran with FFTW3
+# -------------------------------------------------------------------------------
+#
+# ./configure --prefix=/Users/matsui/local CC=cc FC=f90 FCFLAGS='-O3 -qsuffix=f=f90:cpp=F90'
+#
+#
+#  Makefile for geoynamo platform CALIPSO
+#    Written by H. Matsui
+#
+SHELL           = /bin/sh
+#
+#  directories of GeoFEM
+#
+SRCDIR = /Users/matsui/src_release
+INSTDIR= /Users/matsui/local
+#
+MHDDIR = $(SRCDIR)/src
+MAKEDIR= $(SRCDIR)/work
+BUILDDIR= $(SRCDIR)/bin
+#
+# MPI settings
+#
+MPICHDIR =    
+MPICHLIBDIR = $(MPICHDIR)/lib
+MPICHBINDIR = $(MPICHDIR)/bin
+MPICHINCDIR = 
+MPILIBS =     
+#
+#    compilers
+#
+
+F90_LOCAL = f90
+MPIF90 = mpif90
+
+AR = ar
+RANLIB = ranlib
+
+#
+#  optimization flags
+#
+F90OPTFLAGS= -O3 -qsuffix=f=f90:cpp=F90   
+#
+#    FFTW3 settings
+#
+FFTW3_CFLAGS= 
+FFTW3_LIBS=   
+#

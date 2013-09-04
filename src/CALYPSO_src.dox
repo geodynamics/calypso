@@ -1,0 +1,19 @@
+/**
+@image html  fieldline.pdf
+@image latex fieldline.pdf width=10cm
+@mainpage
+*/
+
+/**
+@dir src
+    Top directory for source files
+*/
+/**
+@dir Fortran_libraries
+    Source directory for libraries
+*/
+/**
+@dir programs
+    Source directory for programs
+*/
+
