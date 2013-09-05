@@ -55,6 +55,9 @@ all: makemake
 	cd $(MAKEDIR); make
 
 $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
+	if [ ! -d $(MAKEDIR) ]; then \
+		mkdir $(MAKEDIR); \
+	fi
 	if [ ! -d $(BUILDDIR) ]; then \
 		mkdir $(BUILDDIR); \
 	fi
