@@ -10,36 +10,12 @@ Settings for Makefiles
 # --enable-fftw3 --with-hdf5='/Users/matsui/local/bin/h5pcc'
 #
 #
-#  Makefile for geoynamo platform CALIPSO
-#    Written by H. Matsui
-#
-SHELL           = /bin/sh
-#
-#  directories of GeoFEM
-#
-SRCDIR = /Users/matsui/src_release
-INSTDIR= /Users/matsui/local
-#
-MHDDIR = $(SRCDIR)/src
-MAKEDIR= $(SRCDIR)/work
-BUILDDIR= $(SRCDIR)/bin
-#
-# MPI settings
-#
-MPICHDIR =    
-MPICHLIBDIR = $(MPICHDIR)/lib
-MPICHBINDIR = $(MPICHDIR)/bin
-MPICHINCDIR = 
-MPILIBS =      
-#
-[Kemo-MacBook-Pro:~/src_release] matsui% more Makefile
-#
 #  Makefile for geoynamo platform CALYPSO
 #    Written by H. Matsui
 #
 SHELL           = /bin/sh
 #
-#  directories of GeoFEM
+#  directories
 #
 SRCDIR = /Users/matsui/src_release
 INSTDIR= /Users/matsui/local
@@ -102,7 +78,7 @@ HDF5_FLIBS=     -L/Users/matsui/local/lib /Users/matsui/local/lib/libhdf5hl_fort
 #
 SHELL           = /bin/sh
 #
-#  directories of GeoFEM
+#  directories
 #
 SRCDIR = /Users/matsui/src_release
 INSTDIR= /Users/matsui/local
@@ -156,7 +132,7 @@ FFTW3_LIBS=   -L/opt/local/lib -lfftw3 -lm
 #
 SHELL           = /bin/sh
 #
-#  directories of GeoFEM
+#  directories
 #
 SRCDIR = /home/matsui/src_release
 INSTDIR= /home/matsui/local
@@ -218,7 +194,7 @@ FFTW3_LIBS=   -L/usr/local/lib -lfftw3 -lm
 #
 SHELL           = /bin/sh
 #
-#  directories of GeoFEM
+#  directories
 #
 SRCDIR = /GPFS/matsui/src_release
 INSTDIR= /home0/matsui/local
@@ -300,7 +276,7 @@ CXXFLAGS =
 #
 SHELL           = /bin/sh
 #
-#  directories of GeoFEM
+#  directories
 #
 SRCDIR = /Users/matsui/src_release
 INSTDIR= /Users/matsui/local
