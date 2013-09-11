@@ -152,6 +152,7 @@ FFTW3_LIBS=   -L/opt/local/lib -lfftw3 -lm
 #  --enable-fftw3
 #
 #  Makefile for geoynamo platform CALIPSO
+#
 #    Written by H. Matsui
 #
 SHELL           = /bin/sh
