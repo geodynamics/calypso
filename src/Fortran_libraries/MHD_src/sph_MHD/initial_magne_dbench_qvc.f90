@@ -80,10 +80,10 @@
         do k = nlayer_ICB, nlayer_CMB
           it = jt + (k-1)*nidx_rj(2)
           rr = radius_1d_rj_r(k)
-          d_rj(it,itor%i_magne) = (ten/three) * rr * sin(pi*(rr-r_ICB))
+          d_rj(it,itor%i_magne) = (ten/eight) * rr * sin(pi*(rr-r_ICB))
           d_rj(it,ipol%i_current) =  d_rj(it,itor%i_magne)
           d_rj(it,idpdr%i_current)                                      &
-     &             = (ten / three) * (sin(pi*(rr-r_ICB))    &
+     &             = (ten / three) * (sin(pi*(rr-r_ICB))                &
      &              + pi * rr * cos(pi*(rr-r_ICB)) )
         end do
       end if
