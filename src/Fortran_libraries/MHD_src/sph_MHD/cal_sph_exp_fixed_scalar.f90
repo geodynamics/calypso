@@ -263,7 +263,7 @@
      &           + coef_fdm_fix_in_2( 1,3) * d_rj(i_p1,is_fld)          &
      &           + coef_fdm_fix_in_2( 2,3) * d_rj(i_p2,is_fld)
 !
-        d_rj(inod,is_fld) = coef_d * fix_ICB(j)
+        d_rj(inod,is_fld) = fix_ICB(j)
         d_rj(inod,is_diffuse)                                           &
      &         = coef_d * (d2t_dr2 + two*ar_1d_rj(kr_in,1)*d1t_dr1      &
      &                       - g_sph_rj(j,3)*ar_1d_rj(kr_in,2)          &
@@ -374,7 +374,7 @@
      &           + coef_fdm_fix_out_2(1,3) * d_rj(i_n1,is_fld)          &
      &           + coef_fdm_fix_out_2(0,3) * fix_CMB(j)
 !
-        d_rj(inod,is_fld) = coef_d * fix_CMB(j)
+        d_rj(inod,is_fld) = fix_CMB(j)
         d_rj(inod,is_diffuse)                                           &
      &          =  coef_d * (d2t_dr2 + two*ar_1d_rj(kr_out,1) * d1t_dr1 &
      &                       - g_sph_rj(j,3)*ar_1d_rj(kr_out,2)         &
