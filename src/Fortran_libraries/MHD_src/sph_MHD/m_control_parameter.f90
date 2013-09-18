@@ -173,8 +173,11 @@
       integer (kind=kint), parameter :: id_SGS_3D_EZ_FILTERING =     11
       integer (kind=kint), parameter :: id_SGS_3D_SMP_FILTERING =    21
       integer (kind=kint), parameter :: id_SGS_3D_EZ_SMP_FILTERING = 31
+!
       integer (kind=kint), parameter :: id_SGS_LINE_FILTERING =       2
       integer (kind=kint), parameter :: id_SGS_PLANE_FILTERING =      3
+      integer (kind=kint), parameter :: id_SGS_IDEAL_SPH_LOWPASS =    4
+!
       integer (kind=kint) :: iflag_SGS_filter = id_SGS_3D_FILTERING
       integer (kind=kint) :: iset_DIFF_model_coefs =  0
       integer (kind=kint) :: iset_SGS_nagetive_clip = 0

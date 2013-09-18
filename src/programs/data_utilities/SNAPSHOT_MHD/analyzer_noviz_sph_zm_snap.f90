@@ -1,12 +1,15 @@
-!analyzer_noviz_sph_zm_snap.f90
-!      module analyzer_noviz_sph_zm_snap
-!..................................................
+!>@file   analyzer_noviz_sph_zm_snap.f90
+!!@brief  module analyzer_noviz_sph_zm_snap
+!!
+!!@author H. Matsui
+!!@date   Programmed  H. Matsui in Apr., 2010
 !
-!      Written by H. Matsui
-!      modified by H. Matsui on June, 2005 
-!
-!      subroutine initialization
-!      subroutine evolution
+!>@brief  Main loop to evaluate zonal mean field
+!!
+!!@verbatim
+!!      subroutine initialize_noviz_sph_zm_snap
+!!      subroutine evolution_voviz_sph_zm_snap
+!!@endverbatim
 !
       module analyzer_noviz_sph_zm_snap
 !
@@ -33,7 +36,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine initialization
+      subroutine initialize_noviz_sph_zm_snap
 !
       use set_control_sph_mhd
       use set_control_SPH_to_FEM
@@ -78,11 +81,11 @@
 !
       call end_eleps_time(2)
 !
-      end subroutine initialization
+      end subroutine initialize_noviz_sph_zm_snap
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine evolution
+      subroutine evolution_voviz_sph_zm_snap
 !
       integer(kind = kint) :: visval
       integer(kind = kint) :: istep_psf, istep_iso
@@ -146,7 +149,7 @@
       call time_prog_barrier
       if (iflag_debug.eq.1) write(*,*) 'exit evolution'
 !
-      end subroutine evolution
+      end subroutine evolution_voviz_sph_zm_snap
 !
 ! ----------------------------------------------------------------------
 !

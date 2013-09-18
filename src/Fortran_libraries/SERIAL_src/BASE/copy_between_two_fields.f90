@@ -149,7 +149,7 @@
       integer(kind = kint) :: inod, num, nd
 !
       num = min(nnod_org, nnod_dst)
-!$omp parallel private(nd)
+!$omp parallel private(inod)
       do nd = 1, numdir
 !$omp do
         do inod = 1, num
@@ -250,9 +250,9 @@
       integer(kind = kint), intent(in) :: numnod, ntot_dst_phys
       real(kind=kreal), intent(inout) :: d_dst(numnod,ntot_dst_phys)
 !
-      integer(kind = kint) :: inod
+      integer(kind = kint) :: inod, nd
 !
-!$omp parallel private(nd)
+!$omp parallel private(inod)
       do nd = 1, numdir
 !$omp do
         do inod = ist_fill+1, numnod

@@ -46,7 +46,7 @@
 !!   method_4_velo_ctl:    method for Crank Nicolson Scheme
 !!   precond_4_crank_ctl:  preconditioning method for Crank Nicolson Scheme
 !!
-!!   Legendre_trans_loop_ctl: spherical transfer loop type
+!!   Legendre_trans_loop_ctl: Legendre_transform loop type
 !!                   ('inner_radial_loop' 'outer_radial_loop' 'long_loop')
 !!   FFT_library_ctl:  Selection of FFT librarry  ('FFTW3' or 'FFTPACK')
 !!

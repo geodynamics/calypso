@@ -28,6 +28,7 @@
 !
       subroutine s_lead_fields_4_sph_mhd
 !
+      use m_control_parameter
       use m_t_step_parameter
       use output_viz_file_control
 !
@@ -37,7 +38,9 @@
       call set_lead_physical_values_flag(iflag)
 !
       if ( (iflag*mod(istep_max_dt,i_step_output_rst)) .eq.0 ) then
-         call pressure_4_sph_mhd
+        if(iflag_t_evo_4_velo .gt. id_no_evolution) then
+          call pressure_4_sph_mhd
+        end if
       end if
 !
       if(iflag .eq. 0) call enegy_fluxes_4_sph_mhd

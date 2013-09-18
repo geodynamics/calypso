@@ -79,6 +79,10 @@
 !>     coefficient for chemical buoyancy
       real  (kind=kreal) :: coef_comp_buo
 !
+!>     coefficient for heat source term
+      real  (kind=kreal) :: coef_h_src
+!>     coefficient for compositional source term
+      real  (kind=kreal) :: coef_c_src
 !
 !>     Parameter for stratified layer (amplitude)
       real  (kind=kreal) :: stratified_sigma

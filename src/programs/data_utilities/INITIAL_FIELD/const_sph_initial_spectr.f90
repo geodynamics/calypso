@@ -27,6 +27,9 @@
 !!       Poloidal magnetic field :: d_rj(:,ipol%i_magne)
 !!       Toroidal magnetic field :: d_rj(:,itor%i_magne)
 !!
+!!       Heat source ::          d_rj(:,ipol%i_heat_source)
+!!       Light element source :: d_rj(:,ipol%i_light_source)
+!!
 !!       nidx_rj(1) :: Number of radial grids
 !!       nlayer_ICB :: radial ID for ICB
 !!       nlayer_CMB :: radial ID for CMB
@@ -82,6 +85,14 @@
 !  Set initial magnetic field if magnetic field is exist
       if(ipol%i_magne .gt. izero) call set_initial_magne_sph
 !
+!  Set heat source if  heat source is exist
+      if(ipol%i_heat_source .gt. izero) then
+        call set_initial_heat_source_sph
+      end if
+!  Set light element source if light element is exist
+      if(ipol%i_light_source .gt. izero) then
+        call set_initial_light_source_sph
+      end if
 !
 !  Copy initial field to restart IO data
       call set_sph_restart_num_to_IO
@@ -281,6 +292,71 @@
       end if
 !
       end subroutine set_initial_magne_sph
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine set_initial_heat_source_sph
+!
+      use m_control_params_sph_MHD
+      use m_sph_spectr_data
+!
+      real (kind = kreal) :: rr
+      integer(kind = kint) :: ii, k, jj
+!
+!
+!$omp parallel do
+      do ii = 1, nnod_rj
+        d_rj(ii,ipol%i_heat_source) = zero
+      end do
+!$omp end parallel do
+!
+!
+!    Find address for l = m = 0
+      jj =  find_local_sph_mode_address(izero, izero)
+!
+      if (jj .gt. 0) then
+        do k = nlayer_ICB, nlayer_CMB
+          ii = local_sph_data_address(k,jj)
+          rr = radius_1d_rj_r(k)
+!   Substitute initial heat source
+          d_rj(ii,ipol%i_heat_source) = two / rr
+        end do
+      end if
+!
+      end subroutine set_initial_heat_source_sph
+!
+!-----------------------------------------------------------------------
+!
+      subroutine set_initial_light_source_sph
+!
+      use m_control_params_sph_MHD
+      use m_sph_spectr_data
+!
+!      real (kind = kreal) :: rr
+      integer(kind = kint) :: ii, k, jj
+!
+!
+!$omp parallel do
+      do ii = 1, nnod_rj
+        d_rj(ii,ipol%i_light_source) = zero
+      end do
+!$omp end parallel do
+!
+!
+!    Find address for l = m = 0
+      jj =  find_local_sph_mode_address(izero, izero)
+!
+      if (jj .gt. 0) then
+        do k = nlayer_ICB, nlayer_CMB
+          ii = local_sph_data_address(k,jj)
+!          rr = radius_1d_rj_r(k)
+!   Substitute initial heat source
+          d_rj(ii,ipol%i_light_source) = one
+        end do
+      end if
+!
+      end subroutine set_initial_light_source_sph
 !
 !-----------------------------------------------------------------------
 !

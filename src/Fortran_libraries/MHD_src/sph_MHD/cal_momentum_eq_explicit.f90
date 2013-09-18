@@ -69,10 +69,10 @@
         call cal_diff_induction_MHD_adams
       end if
       if(iflag_t_evo_4_temp .gt.     id_no_evolution) then
-        call cal_heat_diff_advect_adams
+        call sel_heat_diff_adv_src_adams
       end if
       if(iflag_t_evo_4_composit .gt. id_no_evolution) then
-        call cal_scalar_diff_advect_adams
+        call sel_light_diff_adv_src_adams
       end if
 !$omp end parallel
 !
@@ -97,27 +97,27 @@
       end if
 !
       if(iflag_t_evo_4_temp .gt.     id_no_evolution) then
-        call cal_heat_diff_advect_euler
+        call sel_heat_diff_adv_src_euler
       end if
       if(iflag_t_evo_4_magne .gt.    id_no_evolution) then
         call cal_diff_induction_MHD_euler
       end if
       if(iflag_t_evo_4_composit .gt. id_no_evolution) then
-        call cal_scalar_diff_advect_euler
+        call sel_light_diff_adv_src_euler
       end if
 !
       if (i_step .eq. 1) then
         if(iflag_t_evo_4_velo .gt.     id_no_evolution) then
-          call set_adams_advect_4_ini
+          call set_ini_adams_advect
         end if
         if(iflag_t_evo_4_temp .gt.     id_no_evolution) then
-          call set_adams_heat_ini
+          call sel_ini_adams_heat_w_src
         end if
         if(iflag_t_evo_4_magne .gt.    id_no_evolution) then
-          call set_adams_mag_induct_ini
+          call set_ini_adams_mag_induct
         end if
         if(iflag_t_evo_4_composit .gt. id_no_evolution) then
-          call set_adams_dscalar_ini
+          call sel_ini_adams_light_w_src
         end if
       end if
 !$omp end parallel
