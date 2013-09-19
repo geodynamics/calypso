@@ -154,17 +154,17 @@
       if(iflag_volume_rms_spec .eq. 0 .or. my_rank .ne. 0) return
 !
       write(fname_rms, '(a,a6)') trim(fhead_rms_vol), '_l.dat'
-      write(mode_label,'(a)') 'degree, '
+      write(mode_label,'(a)') 'degree'
       call open_sph_vol_rms_file                                        &
      &      (id_file_rms_l, fname_rms, mode_label)
 !
       write(fname_rms, '(a,a6)') trim(fhead_rms_vol), '_m.dat'
-      write(mode_label,'(a)') 'order, '
+      write(mode_label,'(a)') 'order'
       call open_sph_vol_rms_file                                        &
      &      (id_file_rms_m, fname_rms, mode_label)
 !
       write(fname_rms,'(a,a7)') trim(fhead_rms_vol), '_lm.dat'
-      write(mode_label,'(a)') 'diff_deg_order, '
+      write(mode_label,'(a)') 'diff_deg_order'
       call open_sph_vol_rms_file                                        &
      &      (id_file_rms_lm, fname_rms, mode_label)
 !
@@ -201,7 +201,7 @@
       if(iflag_layer_rms_spec.eq.0 .or. my_rank .ne. 0) return
 !
       write(fname_rms,   '(a,a4)') trim(fhead_rms_layer), '.dat'
-      write(mode_label,'(a)') 'radial_id, '
+      write(mode_label,'(a)') 'radial_id'
       call open_sph_vol_rms_file(id_file_rms, fname_rms, mode_label)
 !
       do kg = 1, nidx_global_rj(1)
@@ -214,15 +214,15 @@
 !
 !
       write(fname_rms, '(a,a6)') trim(fhead_rms_layer), '_l.dat'
-      write(mode_label,'(a)') 'radial_id    degree    '
+      write(mode_label,'(a)') 'radial_id    degree'
       call open_sph_vol_rms_file(id_file_rms_l, fname_rms, mode_label)
 !
       write(fname_rms, '(a,a6)') trim(fhead_rms_layer), '_m.dat'
-      write(mode_label,'(a)') 'radial_id    order    '
+      write(mode_label,'(a)') 'radial_id    order'
       call open_sph_vol_rms_file(id_file_rms_m, fname_rms, mode_label)
 !
       write(fname_rms,'(a,a7)') trim(fhead_rms_layer), '_lm.dat'
-      write(mode_label,'(a)') 'radial_id    diff_deg_order    '
+      write(mode_label,'(a)') 'radial_id    diff_deg_order'
       call open_sph_vol_rms_file(id_file_rms_lm, fname_rms, mode_label)
 !
       do kg = 1, nidx_global_rj(1)
@@ -291,7 +291,7 @@
 !
       write(id_file,'(a)',advance='no')    't_step    time    '
       if(mode_label .ne. 'EMPTY') then
-        write(id_file,'(a)',advance='no') trim(mode_label)
+        write(id_file,'(a,a4)',advance='no') trim(mode_label), '    '
       end if
 !
       do i = 1, num_rms_rj
