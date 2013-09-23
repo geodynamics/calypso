@@ -17,7 +17,6 @@ ADD_DEFINITIONS(-cpp)
 FIND_PACKAGE(MPI)
 ADD_DEFINITIONS(${MPI_Fortran_COMPILE_FLAGS})
 INCLUDE_DIRECTORIES(${MPI_Fortran_INCLUDE_PATH})
-# TODO: add MPI linker flags?
 
 # Look for OpenMP and use it if available
 FIND_PACKAGE(OpenMP_Fortran)
