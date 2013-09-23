@@ -1,4 +1,6 @@
-Calypso is a set of programs for MHD dynamo simulation in a rotating spherical shell using spherical harmonics expansion methods.
+Calypso is a set of programs for MHD dynamo simulation in a rotating spherical
+shell using spherical harmonics expansion methods.
+
 The Calypso distribution consists of the following files and directories.
 
 % ls
@@ -20,5 +22,5 @@ examples: Directory for examples
 src:      Directory for source files
 work:     Work directory (created by make)
 
-
 For installation instructions, please read the documentation in the manual or INSTALL.
+
