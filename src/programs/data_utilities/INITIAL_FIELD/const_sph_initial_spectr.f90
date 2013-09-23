@@ -169,7 +169,7 @@
 !    set initial temperature
           xr = two * rr - one * (r_CMB+r_ICB) / shell
           d_rj(inod,ipol%i_temp) = (one-three*xr**2+three*xr**4-xr**6)  &
-     &                            * A_temp * six / (sqrt(pi))
+     &                            * A_temp * three / (two*sqrt(pi))
         end do
       end if
 !
@@ -217,7 +217,7 @@
           inod = local_sph_data_address(k,jj)
           xr = two * radius_1d_rj_r(k) - one * (r_CMB+r_ICB) / shell
           d_rj(inod,ipol%i_light) = (one-three*xr**2+three*xr**4-xr**6) &
-     &                       * A_light * six / (sqrt(pi))
+     &                            * A_light * three / (two*sqrt(pi))
         end do
       end if
 !
