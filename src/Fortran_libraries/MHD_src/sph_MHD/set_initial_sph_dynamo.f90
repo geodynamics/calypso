@@ -23,7 +23,7 @@
       implicit none
 !
       private :: set_initial_temp_sph, set_initial_magne_sph
-      private :: set_initial_scalar_sph, set_initial_velo_sph
+      private :: set_initial_light_sph, set_initial_velo_sph
       private :: set_ini_reference_temp_sph
 !
 !-----------------------------------------------------------------------
@@ -64,7 +64,7 @@
           call set_initial_temp_sph(isig)
         end if
         if(ipol%i_light .gt. 0) then
-          call set_initial_scalar_sph(isig, ipol%i_light)
+          call set_initial_light_sph(isig, ipol%i_light)
         end if
 !
         if(iflag_restart .eq. i_rst_dbench1) then
@@ -211,7 +211,7 @@
           inod = jj + (k-1)*nidx_rj(2)
 !
           d_rj(inod,ipol%i_temp) = (one-three*xr**2+three*xr**4-xr**6)  &
-     &                            * 0.1d0 * six / (sqrt(pi))
+     &                            * 0.1d0 * three / (two*sqrt(pi))
         end do
       end if
 !
@@ -219,7 +219,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_initial_scalar_sph(isig, is_fld)
+      subroutine set_initial_light_sph(isig, is_fld)
 !
       use m_spheric_parameter
       use m_sph_spectr_data
@@ -257,11 +257,11 @@
           xr = two * radius_1d_rj_r(k) - one * (r_CMB+r_ICB) / shell
           inod = jj + (k-1)*nidx_rj(2)
           d_rj(inod,is_fld) = (one-three*xr**2+three*xr**4-xr**6)      &
-     &                       * 0.1d0 * six / (sqrt(pi))
+     &                            * 0.1d0 * three / (two*sqrt(pi))
         end do
       end if
 !
-      end subroutine set_initial_scalar_sph
+      end subroutine set_initial_light_sph
 !
 !-----------------------------------------------------------------------
 !
