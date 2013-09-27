@@ -53,7 +53,6 @@
       integer (kind = kint) :: i_flag
 !
 !
-      call time_prog_barrier
       call set_output_flag(i_flag, istep_max_dt, i_step_check)
 !
       if (i_flag .ne. 0) return

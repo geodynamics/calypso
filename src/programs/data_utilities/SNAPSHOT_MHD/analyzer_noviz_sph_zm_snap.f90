@@ -14,6 +14,7 @@
       module analyzer_noviz_sph_zm_snap
 !
       use m_precision
+      use calypso_mpi
 !
       use m_machine_parameter
       use m_parallel_var_dof
@@ -69,7 +70,6 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize'
       call FEM_initialize
-      call time_prog_barrier
 !
 !        Initialize spherical transform dynamo
 !
@@ -77,7 +77,7 @@
       call SPH_init_sph_snap
       if(iflag_debug .gt. 0) write(*,*) 'SPH_to_FEM_init_MHD'
       call SPH_to_FEM_init_MHD
-      call time_prog_barrier
+      call calypso_MPI_barrier(ierr)
 !
       call end_eleps_time(2)
 !
@@ -146,7 +146,7 @@
 !
       call output_elapsed_times
 !
-      call time_prog_barrier
+      call calypso_MPI_barrier(ierr)
       if (iflag_debug.eq.1) write(*,*) 'exit evolution'
 !
       end subroutine evolution_voviz_sph_zm_snap

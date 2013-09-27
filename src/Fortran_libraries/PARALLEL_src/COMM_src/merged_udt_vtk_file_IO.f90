@@ -21,6 +21,7 @@
       use m_parallel_var_dof
       use m_ucd_data
       use m_field_file_format
+      use m_merged_ucd_data
       use set_ucd_file_names
 !
       implicit none
@@ -176,11 +177,13 @@
       end if
 !
       call write_merged_vtk_mesh(ucd_file_code, nnod_ucd,               &
-     &    nele_ucd, nnod_4_ele_ucd, xx_ucd, ie_ucd)
+     &    nele_ucd, nnod_4_ele_ucd, xx_ucd, ie_ucd,                     &
+     &    istack_nod_ucd_list, istack_internod_ucd_list,                &
+     &    istack_ele_ucd_list)
 !
       call write_merged_vtk_fields(ucd_file_code, nnod_ucd,             &
      &    num_field_ucd, ntot_comp_ucd, num_comp_ucd, phys_name_ucd,    &
-     &    d_nod_ucd)
+     &    d_nod_ucd, istack_nod_ucd_list, istack_internod_ucd_list)
 !
       if(my_rank .eq. 0) close(ucd_file_code)
 !
@@ -208,7 +211,7 @@
 !
       call write_merged_vtk_fields(ucd_file_code, nnod_ucd,             &
      &    num_field_ucd, ntot_comp_ucd, num_comp_ucd, phys_name_ucd,    &
-     &    d_nod_ucd)
+     &    d_nod_ucd, istack_nod_ucd_list, istack_internod_ucd_list)
 !
       if(my_rank .eq. 0) close(ucd_file_code)
 !
@@ -233,7 +236,9 @@
       end if
 !
       call write_merged_vtk_mesh(ucd_file_code, nnod_ucd,               &
-     &    nele_ucd, nnod_4_ele_ucd, xx_ucd, ie_ucd)
+     &    nele_ucd, nnod_4_ele_ucd, xx_ucd, ie_ucd,                     &
+     &    istack_nod_ucd_list, istack_internod_ucd_list,                &
+     &    istack_ele_ucd_list)
 !
       if(my_rank .eq. 0) close(ucd_file_code)
 !

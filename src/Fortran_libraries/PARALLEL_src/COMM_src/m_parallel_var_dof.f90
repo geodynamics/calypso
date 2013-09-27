@@ -82,15 +82,6 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine time_prog_barrier
-!
-!
-      call MPI_BARRIER(SOLVER_COMM, ierr)
-!
-       end subroutine time_prog_barrier
-!
-!  ---------------------------------------------------------------------
-!
        subroutine parallel_abort(code, message)
 !
       integer,       intent(in)  ::  code

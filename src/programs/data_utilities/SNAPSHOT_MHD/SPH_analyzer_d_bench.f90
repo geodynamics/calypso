@@ -89,7 +89,6 @@
 !
       if (iflag_debug.gt.0) write(*,*) 'const_2nd_fdm_coefs'
       call const_2nd_fdm_coefs
-      call time_prog_barrier
 !
 !* -----  set integrals for coriolis term -----------------
 !*
@@ -98,15 +97,11 @@
         call init_sum_coriolis_sph
       end if
 !
-      call time_prog_barrier
-!
 ! --------- set reference temperature 
 !
       call allocate_reft_rj_data
       call s_set_ref_temp_sph_mhd
 !      call check_reference_temp(my_rank)
-!
-      call time_prog_barrier
 !
 ! ---------------------------------
 !
@@ -118,19 +113,15 @@
       if (iflag_debug.eq.1) write(*,*) 'set_material_property'
       call set_material_property
 !
-      call time_prog_barrier
-!
 !  -------------------------------
 !
       if (iflag_debug.eq.1) write(*,*) 's_set_bc_sph_mhd'
       call s_set_bc_sph_mhd
-      call time_prog_barrier
 !
 !  -------------------------------
 !
       if (iflag_debug.eq.1) write(*,*) 's_const_radial_mat_4_sph'
       call s_const_radial_mat_4_sph
-      call time_prog_barrier
 !
 !     --------------------- 
 !  set original spectr mesh data for extension of B

@@ -69,8 +69,6 @@
       call input_mesh(my_rank)
       call end_eleps_time(4)
 !
-      call time_prog_barrier
-!
 ! ---------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'set_local_node_id_4_monitor'
@@ -83,11 +81,9 @@
 !
       call deallocate_surface_geometry
       call deallocate_edge_geometry
-      call time_prog_barrier
 !
       if (iflag_debug.gt.0 ) write(*,*) 'allocate_iccgN_matrix'
       call allocate_iccgN_matrix(isix, numnod)
-      call time_prog_barrier
 !
       if(iflag_debug.gt.0) write(*,*)' init_send_recv'
       call init_send_recv
