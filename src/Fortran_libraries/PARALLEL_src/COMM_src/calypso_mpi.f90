@@ -9,8 +9,8 @@
 !!
 !!@verbatim
 !!      subroutine calypso_MPI_init(ierr)
-!!      subroutine calypso_MPI_finalize(ierr)
-!!      subroutine calypso_MPI_abort(code, message, ierr)
+!!      subroutine calypso_MPI_finalize
+!!      subroutine calypso_MPI_abort(code, message)
 !!
 !!      subroutine calypso_MPI_barrier(ierr)
 !!@endverbatim
@@ -78,9 +78,9 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine calypso_MPI_finalize(ierr)
+      subroutine calypso_MPI_finalize
 !
-      integer(kind=kint), intent(inout) :: ierr
+      integer(kind=kint) :: ierr
 !
 !
       call  MPI_FINALIZE(ierr)
@@ -89,11 +89,11 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine calypso_MPI_abort(code, message, ierr)
+      subroutine calypso_MPI_abort(code, message)
 !
       integer,       intent(in)  ::  code
       character*(*), intent(in)  ::  message
-      integer(kind=kint), intent(inout) :: ierr
+      integer(kind=kint) :: ierr
 !
 !
       write(*,*) ' ///// abnormal termination ///// ', code,            &

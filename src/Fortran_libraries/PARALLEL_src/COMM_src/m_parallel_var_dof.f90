@@ -9,7 +9,6 @@
 !> @brief  Basic parameters for MPI parallelization
 !
 !      subroutine parallel_cal_init
-!      subroutine parallel_cal_fin
 !
 !      subroutine parallel_abort(code , message)
 !      subroutine time_prog_barrier
@@ -69,15 +68,6 @@
       iflag_debug = i_debug
 !
       end subroutine parallel_cal_init
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine parallel_cal_fin
-!
-!
-      call  MPI_FINALIZE(ierr)
-!
-      end subroutine parallel_cal_fin
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
