@@ -53,6 +53,7 @@
      &          name_dimless, num_coef, coef_name, coef_power,          &
      &          r_low_t, r_high_t)
 !
+      use calypso_mpi
       use m_parallel_var_dof
 !
       integer (kind = kint), intent(in) :: num_dimless
@@ -90,7 +91,7 @@
            end do
            if (iflag .eq. 0) then
              write(*,*) 'there is missing dimensionless number'
-             call parallel_abort(1000, 'normalization problem')
+             call calypso_MPI_abort(1000, 'normalization problem')
            end if
          end if
        end do

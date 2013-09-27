@@ -72,9 +72,10 @@
       use m_precision
 !
       use m_constants
-      use m_machine_parameter
       use m_parallel_var_dof
+      use m_machine_parameter
       use m_read_control_elements
+      use calypso_mpi
       use skip_comment_f
 !
       implicit  none
@@ -223,7 +224,7 @@
 !
         call find_control_array_flag(hd_gravity_vect, num_g_vect_ctl)
         if(num_g_vect_ctl.gt.0 .and. i_gravity_vect.eq.0) then
-          if(num_g_vect_ctl .gt. 3) call parallel_abort(10,             &
+          if(num_g_vect_ctl .gt. 3) call calypso_MPI_abort(10,          &
      &          'gravity vector should be 3 components')
           call read_control_array_vect_list(hd_gravity_vect,            &
      &        num_g_vect_ctl, i_gravity_vect,                           &
@@ -253,7 +254,7 @@
         call find_control_array_flag(hd_rotation_vec,                   &
      &      num_angular_vect_ctl)
         if(num_angular_vect_ctl.gt.0 .and. i_rotation_vec.eq.0) then
-          if(num_angular_vect_ctl .gt. 3) call parallel_abort(10,       &
+          if(num_angular_vect_ctl .gt. 3) call calypso_MPI_abort(10,    &
      &          'rotation vector should be 3 components')
           call read_control_array_vect_list(hd_rotation_vec,            &
      &        num_angular_vect_ctl, i_rotation_vec,                     &
@@ -283,7 +284,7 @@
 !
         call find_control_array_flag(hd_magne_vect, num_magne_vect_ctl)
         if(num_magne_vect_ctl.gt.0 .and. i_magne_vect.eq.0) then
-          if(num_magne_vect_ctl .ne. 3) call parallel_abort(10,         &
+          if(num_magne_vect_ctl .ne. 3) call calypso_MPI_abort(10,      &
      &          'external magnetic field should be 3 components')
           call read_control_array_vect_list(hd_magne_vect,              &
      &        num_magne_vect_ctl, i_magne_vect,                         &

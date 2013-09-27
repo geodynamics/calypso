@@ -16,8 +16,9 @@
 !
       use m_precision
 !
-      use m_machine_parameter
+      use calypso_mpi
       use m_parallel_var_dof
+      use m_machine_parameter
       use m_control_parameter
       use m_ctl_data_4_time_steps
       use m_t_step_parameter
@@ -56,7 +57,7 @@
 !
         if (i_dt.eq.0) then
           e_message = 'Set delta t'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           dt = dt_ctl
           ddt = 1.0d0 / dt
@@ -66,28 +67,28 @@
         if(iflag_flexible_step .eq. iflag_flex_step) then
           if (i_min_delta_t.eq.0) then
             e_message = 'Set maximum delta t'
-            call parallel_abort(90, e_message)
+            call calypso_MPI_abort(90, e_message)
           else
             dt_min = min_delta_t_ctl
           end if
 !
           if (i_max_delta_t.eq.0) then
             e_message = 'Set maximum delta t'
-            call parallel_abort(90, e_message)
+            call calypso_MPI_abort(90, e_message)
           else
             dt_max = max_delta_t_ctl
           end if
 !
           if (i_max_eps_to_shrink.eq.0) then
             e_message = 'Set maximum error to shrink delta t'
-            call parallel_abort(90, e_message)
+            call calypso_MPI_abort(90, e_message)
           else
             max_eps_to_shrink_dt = max_eps_to_shrink_ctl
           end if
 !
           if (i_min_eps_to_expand.eq.0) then
             e_message = 'Set minimum error to expand delta t'
-            call parallel_abort(90, e_message)
+            call calypso_MPI_abort(90, e_message)
           else
             min_eps_to_expand_dt = min_eps_to_expand_ctl
           end if
@@ -118,7 +119,7 @@
         if (i_elapsed_time.eq.0) then
           e_message                                                     &
      &      = 'Set elapsed time to finish (second)'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           elapsed_time  = elapsed_time_ctl
         end if
@@ -147,7 +148,7 @@
       integer(kind = kint) :: ierr
 !
       call s_set_fixed_time_step_params(ierr, e_message)
-      if(ierr .gt. 0) call parallel_abort(ierr, e_message)
+      if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message)
 !
       i_step_sgs_coefs = 1
       if (iflag_dynamic_SGS .ne. id_SGS_DYNAMIC_OFF) then
@@ -180,7 +181,7 @@
 !
       if (i_end_rst_step .eq. 0) then
         e_message = 'Set time to finish'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
       else
         istep_rst_end = end_rst_step_ctl
       end if
@@ -238,7 +239,7 @@
         if (i_elapsed_time.eq.0) then
           e_message                                                     &
      &      = 'Set elapsed time to finish (second)'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           elapsed_time  = elapsed_time_ctl
         end if
@@ -257,7 +258,7 @@
 !
         if (i_rst_flag.eq.0.0d0) then
           e_message  = 'Set initial condition'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           if(     restart_flag_ctl .eq. '0'                             &
      &       .or. restart_flag_ctl .eq. 'no_data'                       &
@@ -320,7 +321,7 @@
         if (iflag_restart .eq. i_rst_no_file) then
           if (i_dt .eq. 0) then
             e_message  = 'Set initial time'
-            call parallel_abort(90, e_message)
+            call calypso_MPI_abort(90, e_message)
           else
             time_init = time_init_ctl
           end if

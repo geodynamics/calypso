@@ -28,9 +28,10 @@
 !
       subroutine check_dependencies(num_nod_phys, phys_nod_name)
 !
+      use calypso_mpi
+      use m_parallel_var_dof
       use m_control_parameter
       use m_phys_labels
-      use m_parallel_var_dof
 !
       use check_field_dependency
 !
@@ -445,8 +446,8 @@
 !
       if (iflag_t_evo_4_vect_p .gt. id_no_evolution                     &
      &      .and. iflag_t_evo_4_magne .gt. id_no_evolution) then
-         call parallel_abort(402,'You should choose vector potential OR &
-     &  magnetic field for time evolution')
+         call calypso_MPI_abort(402,'You should choose vector potential &
+     &  OR magnetic field for time evolution')
       end if
 !
       if (iflag_t_evo_4_velo .gt. id_no_evolution) then
@@ -616,19 +617,19 @@
       if(iflag_SGS_gravity .gt. id_SGS_none) then
         if(iflag_4_gravity .eq. id_turn_OFF                             &
      &     .and. iflag_4_composit_buo .eq. id_turn_OFF) then
-          call parallel_abort(100, 'set one of buoyancy sources')
+          call calypso_MPI_abort(100, 'set one of buoyancy sources')
         end if
         if(iflag_4_gravity .gt. id_turn_OFF) then
           if(iflag_SGS_inertia.eq.id_SGS_none                           &
      &       .or. iflag_SGS_heat.eq.id_SGS_none) then
-            call parallel_abort(100,                                    &
+            call calypso_MPI_abort(100,                                 &
      &          'Turn on SGS momentum flux and heat flux')
           end if
         end if
         if(iflag_4_composit_buo .gt. id_turn_OFF) then
           if(iflag_SGS_inertia.eq.id_SGS_none                           &
      &       .or. iflag_SGS_comp_flux.eq.id_SGS_none) then
-              call parallel_abort(100,                                  &
+              call calypso_MPI_abort(100,                               &
      &          'Turn on SGS momentum flux and composition flux')
           end if
         end if

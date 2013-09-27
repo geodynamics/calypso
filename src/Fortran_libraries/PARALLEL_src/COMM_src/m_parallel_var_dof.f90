@@ -10,9 +10,6 @@
 !
 !      subroutine parallel_cal_init
 !
-!      subroutine parallel_abort(code , message)
-!      subroutine time_prog_barrier
-!
 !      subroutine verify_iccgN_matrix(NB, numnod)
 !      subroutine allocate_iccgN_matrix(NB, numnod)
 !      subroutine deallocate_iccgN_matrix
@@ -68,22 +65,6 @@
       iflag_debug = i_debug
 !
       end subroutine parallel_cal_init
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-       subroutine parallel_abort(code, message)
-!
-      integer,       intent(in)  ::  code
-      character*(*), intent(in)  ::  message
-!
-      write(*,*) ' ///// abnormal termination ///// ', code,            &
-     &                                            ' ', message
-!
-      call  MPI_ABORT (SOLVER_COMM, ierr)
-!
-      stop
-      end subroutine  parallel_abort
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------

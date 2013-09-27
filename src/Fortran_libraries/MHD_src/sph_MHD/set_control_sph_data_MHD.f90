@@ -27,6 +27,7 @@
 !
       subroutine s_set_control_sph_data_MHD
 !
+      use calypso_mpi
       use m_parallel_var_dof
       use m_machine_parameter
       use m_node_phys_data
@@ -59,7 +60,7 @@
 !   set physical values
 !
       if(i_num_nod_phys.eq.0) then
-        call parallel_abort(90, 'Set field for simulation')
+        call calypso_MPI_abort(90, 'Set field for simulation')
       end if
       if (iflag_debug.eq.1) write(*,*)                                  &
      &    'original number of field ', num_nod_phys_ctl

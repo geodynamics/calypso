@@ -15,6 +15,7 @@
       use m_machine_parameter
       use m_parallel_var_dof
       use m_ctl_data_4_platforms
+      use calypso_mpi
 !
       implicit  none
 !
@@ -32,7 +33,7 @@
         if( nprocs .ne. num_subdomain_ctl) then
           write(e_message,'(a)')                                        &
      &              'Number of processes should be num. of mesh'
-          call parallel_abort(ione, e_message)
+          call calypso_MPI_abort(ione, e_message)
         end if
       end if
 !
