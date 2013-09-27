@@ -37,6 +37,8 @@
         end if
       end if
 !
+      if(my_rank .eq. 0) iflag_debug = i_debug
+!
       end subroutine check_control_num_domains
 !
 ! ----------------------------------------------------------------------

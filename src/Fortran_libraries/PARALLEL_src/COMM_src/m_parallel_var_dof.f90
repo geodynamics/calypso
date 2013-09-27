@@ -10,13 +10,6 @@
 !
 !      subroutine parallel_cal_init
 !
-!      subroutine verify_iccgN_matrix(NB, numnod)
-!      subroutine allocate_iccgN_matrix(NB, numnod)
-!      subroutine deallocate_iccgN_matrix
-!
-!      subroutine allocate_iccg_int_matrix(numnod)
-!      subroutine deallocate_iccg_int_matrix
-!
       module   m_parallel_var_dof
 !
       use calypso_mpi
@@ -33,15 +26,6 @@
       integer(kind=kint) :: my_rank
 !>      error flag
       integer(kind=kint) :: ierr
-!
-!>    file type parameter (0: ascii, 1: binary)
-      integer(kind = kint) :: ifile_type = 0
-!
-      real(kind=kreal), allocatable :: x_vec(:)
-      real(kind=kreal), allocatable :: bb(:)
-      integer(kind = kint) :: isize_solver_vect = -1
-! 
-      integer(kind=kint), allocatable :: ix_vec(:)
 !
       real(kind=kreal) :: START_TIME, END_TIME, COMMtime
 ! 
@@ -61,78 +45,7 @@
       call  MPI_COMM_SIZE(SOLVER_COMM, nprocs, ierr)
       call  MPI_COMM_RANK(SOLVER_COMM, my_rank  , ierr)
 !
-      if(my_rank .gt. 0) return
-      iflag_debug = i_debug
-!
       end subroutine parallel_cal_init
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-       subroutine verify_iccgN_matrix(NB, numnod)
-!
-       integer(kind = kint), intent(in) :: NB, numnod
-       integer(kind = kint) :: ncomp
-!
-!
-       ncomp = NB*numnod
-       if (isize_solver_vect .lt. 0) then
-         call allocate_iccgN_matrix(NB,numnod)
-       else
-         if (isize_solver_vect .lt. ncomp) then
-           call deallocate_iccgN_matrix
-           call allocate_iccgN_matrix(NB,numnod)
-         end if
-       end if
-!
-       end subroutine verify_iccgN_matrix
-!
-!  ---------------------------------------------------------------------
-!
-       subroutine allocate_iccgN_matrix(NB, numnod)
-!
-       integer(kind = kint), intent(in) :: NB, numnod
-!
-!
-       allocate(x_vec(NB*numnod))
-       allocate(bb(NB*numnod))
-       x_vec  =0.0d00
-       bb  =0.0d00
-!
-       isize_solver_vect = NB*numnod
-!
-       end subroutine allocate_iccgN_matrix
-!
-!  ---------------------------------------------------------------------
-!
-       subroutine deallocate_iccgN_matrix
-!
-!
-       deallocate(x_vec, bb)
-!
-       isize_solver_vect = 0
-!
-       end subroutine deallocate_iccgN_matrix
-!
-!  ---------------------------------------------------------------------
-!
-       subroutine allocate_iccg_int_matrix(numnod)
-!
-       integer(kind = kint), intent(in) :: numnod
-!
-!
-       allocate(ix_vec(numnod))
-       ix_vec  = 0
-!
-       end subroutine allocate_iccg_int_matrix
-!
-!  ---------------------------------------------------------------------
-!
-       subroutine deallocate_iccg_int_matrix
-!
-       deallocate(ix_vec)
-!
-       end subroutine deallocate_iccg_int_matrix
 !
 !  ---------------------------------------------------------------------
 !

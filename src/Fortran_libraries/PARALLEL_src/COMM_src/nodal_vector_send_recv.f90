@@ -43,6 +43,7 @@
 !
       subroutine nod_scalar_send_recv(scl_nod)
 !
+      use m_array_for_send_recv
       use solver_SR
 !
       real(kind = kreal), intent(inout) :: scl_nod(numnod)

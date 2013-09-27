@@ -43,6 +43,7 @@
 !
       subroutine FEM_initialize
 !
+      use m_array_for_send_recv
       use m_geometry_parameter
       use m_t_step_parameter
       use m_surface_geometry_data
@@ -82,8 +83,8 @@
       call deallocate_surface_geometry
       call deallocate_edge_geometry
 !
-      if (iflag_debug.gt.0 ) write(*,*) 'allocate_iccgN_matrix'
-      call allocate_iccgN_matrix(isix, numnod)
+      if (iflag_debug.gt.0 ) write(*,*) 'allocate_vector_for_solver'
+      call allocate_vector_for_solver(isix, numnod)
 !
       if(iflag_debug.gt.0) write(*,*)' init_send_recv'
       call init_send_recv
