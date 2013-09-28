@@ -168,6 +168,7 @@
 !
       subroutine sum_sph_layerd_rms
 !
+      use calypso_mpi
       use m_parallel_var_dof
       use m_spheric_parameter
       use m_rms_4_sph_spectr

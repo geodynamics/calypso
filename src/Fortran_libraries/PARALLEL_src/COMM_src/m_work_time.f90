@@ -120,6 +120,7 @@
 !
       subroutine output_elapsed_times
 !
+      use calypso_mpi
       use m_parallel_var_dof
 !
       integer(kind = kint) :: i

@@ -17,6 +17,7 @@
 !
       use m_precision
       use m_constants
+      use calypso_mpi
       use m_parallel_var_dof
 !
       implicit none
@@ -197,10 +198,10 @@
 !
       call solver_send_recv_i(nnod_ucd_local, NEIBPETOT, NEIBPE,        &
      &            STACK_IMPORT, NOD_IMPORT, STACK_EXPORT, NOD_EXPORT,   &
-     &            inod_local_ucd, SOLVER_COMM, my_rank)
+     &            inod_local_ucd)
       call solver_send_recv_i(nnod_ucd_local, NEIBPETOT, NEIBPE,        &
      &            STACK_IMPORT, NOD_IMPORT, STACK_EXPORT, NOD_EXPORT,   &
-     &            ihome_pe_ucd, SOLVER_COMM, my_rank)
+     &            ihome_pe_ucd)
 !
       end subroutine set_node_double_address
 !

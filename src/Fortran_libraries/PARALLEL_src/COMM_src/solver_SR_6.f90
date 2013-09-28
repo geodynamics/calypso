@@ -10,9 +10,8 @@
 !!
 !!@verbatim
 !!      subroutine  SOLVER_SEND_RECV_6                                  &
-!!     &                (N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,&
-!!     &                                       STACK_EXPORT, NOD_EXPORT,&
-!!     &                 X, SOLVER_COMM,my_rank)
+!!     &          ( N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,     &
+!!     &                                  STACK_EXPORT, NOD_EXPORT, X)
 !!@endverbatim
 !!
 !!@n @param  N     Number of data points
@@ -29,9 +28,6 @@
 !!                    local node ID to copy in export buffer
 !!
 !!@n @param  X(6*N)   field data with 6 components
-!!
-!!@n @param  SOLVER_COMM      MPI communicator
-!!@n @param  my_rank          own process rank
 !
       module solver_SR_6
 !
@@ -47,9 +43,8 @@
 ! ----------------------------------------------------------------------
 !C
       subroutine  SOLVER_SEND_RECV_6                                    &
-     &                ( N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT, &
-     &                                        STACK_EXPORT, NOD_EXPORT, &
-     &                  X, SOLVER_COMM,my_rank)
+     &          ( N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,       &
+     &                                  STACK_EXPORT, NOD_EXPORT, X)
 !
       use calypso_mpi
       use m_solver_SR
@@ -72,10 +67,6 @@
      &        :: NOD_EXPORT
 !>       communicated result vector
       real   (kind=kreal), dimension(6*N), intent(inout):: X
-!>       communicator for mpi
-      integer                            , intent(in)   ::SOLVER_COMM
-!>       Process ID
-      integer                            , intent(in)   :: my_rank
 !
       integer (kind = kint) :: neib, istart, inum, ierr, k, ii
 !
@@ -98,8 +89,8 @@
            WS(6*k-1)= X(ii-1)
            WS(6*k  )= X(ii  )
         enddo
-        call MPI_ISEND (WS(6*istart+1), 6*inum,MPI_DOUBLE_PRECISION,    &
-     &                  NEIBPE(neib), 0, SOLVER_COMM, req1(neib), ierr)
+        call MPI_ISEND(WS(6*istart+1), 6*inum,MPI_DOUBLE_PRECISION,     &
+     &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib), ierr)
       enddo
 
 !C
@@ -107,8 +98,8 @@
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1)
         inum  = STACK_IMPORT(neib  ) - istart
-        call MPI_IRECV (WR(6*istart+1), 6*inum, MPI_DOUBLE_PRECISION,   &
-     &                  NEIBPE(neib), 0, SOLVER_COMM, req2(neib), ierr)
+        call MPI_IRECV(WR(6*istart+1), 6*inum, MPI_DOUBLE_PRECISION,    &
+     &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib), ierr)
       enddo
 
       call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr)
