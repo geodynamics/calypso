@@ -31,6 +31,7 @@
 !
       use m_precision
 !
+      use calypso_mpi
       use m_parallel_var_dof
       use m_comm_tbl_sph_coriolis
 !
@@ -68,16 +69,16 @@
       do i = 1, nneib_send_cor
         ist = nri*istack_send_cor(i-1) + 1
         num = nri*(istack_send_cor(i) - istack_send_cor(i-1))
-        call MPI_ISEND(send_sph_cor(ist), num, MPI_DOUBLE_PRECISION,    &
-     &      ip_send_cor(i), 0, SOLVER_COMM, req1_cor(i), ierr)
+        call MPI_ISEND(send_sph_cor(ist), num, CALYPSO_REAL,            &
+     &      ip_send_cor(i), 0, CALYPSO_COMM, req1_cor(i), ierr)
       end do
 !C
 !C-- RECEIVE
       do i= 1, nneib_recv_cor
         ist = nri*istack_recv_cor(i-1) + 1
         num = nri*(istack_recv_cor(i) - istack_recv_cor(i-1))
-        call MPI_IRECV(recv_sph_cor(ist), num, MPI_DOUBLE_PRECISION,    &
-     &      ip_recv_cor(i), 0, SOLVER_COMM, req2_cor(i), ierr)
+        call MPI_IRECV(recv_sph_cor(ist), num, CALYPSO_REAL,            &
+     &      ip_recv_cor(i), 0, CALYPSO_COMM, req2_cor(i), ierr)
       end do
 !
       call MPI_WAITALL (nneib_recv_cor, req2_cor, sta2_cor,  ierr)
@@ -132,16 +133,16 @@
       do i = 1, nneib_send_cor
         ist = 3*nri*istack_send_cor(i-1) + 1
         num = 3*nri*(istack_send_cor(i) - istack_send_cor(i-1))
-        call MPI_ISEND(send_sph_cor(ist), num, MPI_DOUBLE_PRECISION,    &
-     &      ip_send_cor(i), 0, SOLVER_COMM, req1_cor(i), ierr)
+        call MPI_ISEND(send_sph_cor(ist), num, CALYPSO_REAL,            &
+     &      ip_send_cor(i), 0, CALYPSO_COMM, req1_cor(i), ierr)
       end do
 !C
 !C-- RECEIVE
       do i= 1, nneib_recv_cor
         ist = 3*nri*istack_recv_cor(i-1) + 1
         num = 3*nri*(istack_recv_cor(i) - istack_recv_cor(i-1))
-        call MPI_IRECV(recv_sph_cor(ist), num, MPI_DOUBLE_PRECISION,    &
-     &      ip_recv_cor(i), 0, SOLVER_COMM, req2_cor(i), ierr)
+        call MPI_IRECV(recv_sph_cor(ist), num, CALYPSO_REAL,            &
+     &      ip_recv_cor(i), 0, CALYPSO_COMM, req2_cor(i), ierr)
       end do
 !
       call MPI_WAITALL (nneib_recv_cor, req2_cor, sta2_cor,  ierr)
@@ -202,16 +203,16 @@
       do i = 1, nneib_send_cor
         ist = 5*nri*istack_send_cor(i-1) + 1
         num = 5*nri*(istack_send_cor(i) - istack_send_cor(i-1))
-        call MPI_ISEND(send_sph_cor(ist), num, MPI_DOUBLE_PRECISION,    &
-     &      ip_send_cor(i), 0, SOLVER_COMM, req1_cor(i), ierr)
+        call MPI_ISEND(send_sph_cor(ist), num, CALYPSO_REAL,            &
+     &      ip_send_cor(i), 0, CALYPSO_COMM, req1_cor(i), ierr)
       end do
 !C
 !C-- RECEIVE
       do i= 1, nneib_recv_cor
         ist = 5*nri*istack_recv_cor(i-1) + 1
         num = 5*nri*(istack_recv_cor(i) - istack_recv_cor(i-1))
-        call MPI_IRECV(recv_sph_cor(ist), num, MPI_DOUBLE_PRECISION,    &
-     &      ip_recv_cor(i), 0, SOLVER_COMM, req2_cor(i), ierr)
+        call MPI_IRECV(recv_sph_cor(ist), num, CALYPSO_REAL,            &
+     &      ip_recv_cor(i), 0, CALYPSO_COMM, req2_cor(i), ierr)
       end do
 !
       call MPI_WAITALL (nneib_recv_cor, req2_cor, sta2_cor,  ierr)
@@ -268,16 +269,16 @@
       do i = 1, nneib_send_cor
         ist = istack_send_cor(i-1) + 1
         num = istack_send_cor(i) - istack_send_cor(i-1)
-        call MPI_ISEND(isend_sph_cor(ist), num, MPI_INTEGER,            &
-     &      ip_send_cor(i), 0, SOLVER_COMM, req1_cor(i),  ierr)
+        call MPI_ISEND(isend_sph_cor(ist), num, CALYPSO_INTEGER,        &
+     &      ip_send_cor(i), 0, CALYPSO_COMM, req1_cor(i),  ierr)
       end do
 !C
 !C-- RECEIVE
       do i= 1, nneib_recv_cor
         ist = istack_recv_cor(i-1) + 1
         num = istack_recv_cor(i) - istack_recv_cor(i-1)
-        call MPI_IRECV(irecv_sph_cor(ist), num, MPI_INTEGER,            &
-     &      ip_recv_cor(i), 0, SOLVER_COMM, req2_cor(i), ierr)
+        call MPI_IRECV(irecv_sph_cor(ist), num, CALYPSO_INTEGER,        &
+     &      ip_recv_cor(i), 0, CALYPSO_COMM, req2_cor(i), ierr)
       end do
 !
       call MPI_WAITALL (nneib_recv_cor, req2_cor, sta2_cor,  ierr)

@@ -157,6 +157,7 @@
 !
       subroutine select_legendre_transform
 !
+      use calypso_mpi
       use m_parallel_var_dof
       use m_machine_parameter
       use m_work_4_sph_trans
@@ -184,7 +185,7 @@
       etime(id_legendre_transfer) = MPI_WTIME() - stime
 !
       call MPI_allREDUCE (etime, etime_trans, ifour,                    &
-     &    MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
 !
       id_legendre_transfer = iflag_leg_orginal_loop
       etime_shortest =       etime_trans(iflag_leg_orginal_loop)

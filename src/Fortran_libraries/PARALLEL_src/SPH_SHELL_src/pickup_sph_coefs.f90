@@ -1,10 +1,15 @@
-!pickup_sph_coefs.f90
-!      module pickup_sph_coefs
+!>@file   pickup_sph_coefs.f90
+!!@brief      module pickup_sph_coefs
+!!
+!!@author H. Matsui and H. Okuda
+!!@date Programmed in  Dec., 2012
 !
-!        programmed by H.Matsui on Dec., 2012
-!
-!      subroutine init_sph_spec_4_monitor
-!      subroutine pickup_sph_spec_4_monitor
+!> @brief choose spectr data to output
+!!
+!!@verbatim
+!!      subroutine init_sph_spec_4_monitor
+!!      subroutine pickup_sph_spec_4_monitor
+!!@endverbatim
 !
       module pickup_sph_coefs
 !
@@ -71,6 +76,7 @@
 !
       subroutine pickup_sph_spec_4_monitor
 !
+      use calypso_mpi
       use m_parallel_var_dof
 !
       integer(kind = kint) :: inum, knum, j, k, nd,icou, i_fld
@@ -120,7 +126,7 @@
 !
       num = ncomp_pick_sph_coef*num_pick_layer*num_pick_sph_mode
       call MPI_allREDUCE(d_rj_pick_sph_lc(1,1), d_rj_pick_sph_gl(1,1),  &
-     &    num, MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
 !
       end subroutine pickup_sph_spec_4_monitor
 !

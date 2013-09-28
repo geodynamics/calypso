@@ -94,6 +94,8 @@
 !
       subroutine test_fourier_trans_vector(ncomp, Nstacksmp, etime_fft)
 !
+      use calypso_mpi
+!
       integer(kind = kint), intent(in) :: ncomp
       integer(kind = kint), intent(in) :: Nstacksmp(0:np_smp)
       real(kind = kreal), intent(inout) :: etime_fft
@@ -114,7 +116,7 @@
       call finalize_FFT_select(np_smp)
 !
       call MPI_allREDUCE (etime, etime_fft, ione,                       &
-     &    MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
 !
       end subroutine test_fourier_trans_vector
 !

@@ -188,6 +188,7 @@
 !
       subroutine set_sph_range_coriolis
 !
+      use calypso_mpi
       use m_constants
       use m_spheric_parameter
       use m_comm_tbl_sph_coriolis
@@ -234,10 +235,10 @@
 !
 !
       do ip = 1, nprocs
-        call MPI_Bcast(jminmax_gl(1,ip), itwo, MPI_INTEGER, (ip-1),     &
-     &      SOLVER_COMM, ierr)
-        call MPI_Bcast(jminmax_coriolis(1,ip), itwo, MPI_INTEGER,       &
-     &      (ip-1), SOLVER_COMM, ierr)
+        call MPI_Bcast(jminmax_gl(1,ip), itwo, CALYPSO_INTEGER, (ip-1), &
+     &      CALYPSO_COMM, ierr)
+        call MPI_Bcast(jminmax_coriolis(1,ip), itwo, CALYPSO_INTEGER,   &
+     &      (ip-1), CALYPSO_COMM, ierr)
       end do
 !
       end subroutine set_sph_range_coriolis

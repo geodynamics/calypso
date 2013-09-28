@@ -1,13 +1,18 @@
-!cal_rms_fields_by_sph.f90
-!      module cal_rms_fields_by_sph
+!>@file   cal_rms_fields_by_sph.f90
+!!@brief      module cal_rms_fields_by_sph
+!!
+!!@author H. Matsui and H. Okuda
+!!@date Programmed in  Dec., 2012
 !
-!     Written by H. Matsui on Feb., 2008
-!
-!      subroutine init_rms_4_sph_spectr
-!
-!      subroutine cal_rms_sph_spec_rms_whole
-!      subroutine cal_rms_sph_outer_core
-!      subroutine cal_rms_sph_inner_core
+!> @brief evaluate mean square data from spectr data
+!!
+!!@verbatim
+!!      subroutine init_rms_4_sph_spectr
+!!
+!!      subroutine cal_rms_sph_spec_rms_whole
+!!      subroutine cal_rms_sph_outer_core
+!!      subroutine cal_rms_sph_inner_core
+!!@endverbatim
 !
       module cal_rms_fields_by_sph
 !
@@ -106,6 +111,7 @@
 !
       subroutine cal_rms_sph_spec_local
 !
+      use calypso_mpi
       use m_parallel_var_dof
       use m_spheric_parameter
       use m_phys_constants
@@ -147,7 +153,7 @@
 !
       num = ntot_rms_rj * nidx_rj(1)
       call MPI_allREDUCE (ave_sph_lc(1,1), ave_sph(1,1), num,           &
-     &  MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
 !
       call sum_sph_layerd_rms
 !

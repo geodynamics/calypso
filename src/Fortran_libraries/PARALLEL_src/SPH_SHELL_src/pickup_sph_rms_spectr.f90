@@ -1,12 +1,17 @@
-!pickup_sph_rms_spectr.f90
-!      module pickup_sph_rms_spectr
+!>@file   pickup_sph_rms_spectr.f90
+!!@brief      module pickup_sph_rms_spectr
+!!
+!!@author H. Matsui and H. Okuda
+!!@date Programmed in  Dec., 2012
 !
-!        programmed by H.Matsui on Dec., 2012
-!
-!      subroutine init_sph_rms_4_monitor
-!
-!      subroutine pickup_sph_rms_4_monitor
-!      subroutine pickup_sph_rms_vol_monitor
+!> @brief choose mean square data to output
+!!
+!!@verbatim
+!!      subroutine init_sph_rms_4_monitor
+!!
+!!      subroutine pickup_sph_rms_4_monitor
+!!      subroutine pickup_sph_rms_vol_monitor
+!!@endverbatim
 !
       module pickup_sph_rms_spectr
 !
@@ -79,6 +84,7 @@
 !
       subroutine pickup_sph_rms_4_monitor
 !
+      use calypso_mpi
       use m_parallel_var_dof
 !
       integer(kind = kint) :: inum, knum, j, k, nd
@@ -111,8 +117,8 @@
 !
       num = ntot_rms_rj*num_pick_rms_layer*num_pick_sph_rms_mode
       call MPI_allREDUCE(d_rms_pick_sph_lc(1,1),                        &
-     &    d_rms_pick_sph_gl(1,1), num, MPI_DOUBLE_PRECISION, MPI_SUM,   &
-     &    SOLVER_COMM, ierr)
+     &    d_rms_pick_sph_gl(1,1), num, CALYPSO_REAL, MPI_SUM,           &
+     &    CALYPSO_COMM, ierr)
 !
       end subroutine pickup_sph_rms_4_monitor
 !
@@ -120,6 +126,7 @@
 !
       subroutine pickup_sph_rms_vol_monitor
 !
+      use calypso_mpi
       use m_parallel_var_dof
 !
       integer(kind = kint) :: inum, j, nd, num
@@ -146,8 +153,8 @@
 !
       num = ntot_rms_rj*num_pick_sph_rms_mode
       call MPI_allREDUCE(d_rms_pick_sph_lc(1,1),                        &
-     &    d_rms_pick_sph_gl(1,1), num, MPI_DOUBLE_PRECISION, MPI_SUM,   &
-     &    SOLVER_COMM, ierr)
+     &    d_rms_pick_sph_gl(1,1), num, CALYPSO_REAL, MPI_SUM,           &
+     &    CALYPSO_COMM, ierr)
 !
       end subroutine pickup_sph_rms_vol_monitor
 !

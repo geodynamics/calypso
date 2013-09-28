@@ -113,7 +113,7 @@
 !        write(*,*) 'start vals: ', local_node_elem_count(1), &
 !        local_node_elem_count(2)
       call mpi_scan(local_node_elem_count, start_node_elem,             &
-     &    2, MPI_INTEGER, MPI_SUM, SOLVER_COMM, mpi_err)
+     &    2, CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, mpi_err)
       total_node_elem(1) = istack_internod_ucd_list(nprocs)
       total_node_elem(2) = istack_ele_ucd_list(nprocs)
 !
@@ -129,7 +129,7 @@
 ! Setup file access property list with parallel I/O access.
 !
       call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, hdferr)
-      call h5pset_fapl_mpio_f(plist_id, SOLVER_COMM, info, hdferr)
+      call h5pset_fapl_mpio_f(plist_id, CALYPSO_COMM, info, hdferr)
 !
 ! Create new file collectively.
 !
@@ -306,7 +306,7 @@
       local_node_count = istack_internod_ucd_list(my_rank+1)            &
      &                  - istack_internod_ucd_list(my_rank)
       call mpi_scan(local_node_count, start_node,                       &
-     &        1, MPI_INTEGER, MPI_SUM, SOLVER_COMM, mpi_err)
+     &        1, CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, mpi_err)
       total_node = istack_internod_ucd_list(nprocs)
 !
 ! Remove our own counts from the offset
@@ -318,7 +318,7 @@
 ! Setup file access property list with parallel I/O access.
 !
       call h5pcreate_f(H5P_FILE_ACCESS_F, plist_id, hdferr)
-      call h5pset_fapl_mpio_f(plist_id, SOLVER_COMM, info, hdferr)
+      call h5pset_fapl_mpio_f(plist_id, CALYPSO_COMM, info, hdferr)
 !
 ! Create new file collectively.
 !

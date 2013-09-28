@@ -1,17 +1,23 @@
+!>@file  m_work_time.f90
+!!       module m_work_time
+!!
+!!@author H. Matsui
+!!@date   Programmed by H. Matsui in 2001
 !
-!      module m_work_time
-!.......................................................................
-!
-!      Written by H. Matsui on 2001
-!
-!      subroutine allocate_elapsed_times
-!      subroutine deallocate_elapsed_times
-!
-!      subroutine start_eleps_time(iflag_elps)
-!      subroutine end_eleps_time(iflag_elps)
-!      subroutine copy_COMM_TIME_to_eleps(iflag_elps)
-!
-!      subroutine output_elapsed_times
+!> @brief routines to count elapsed time
+!!
+!!@verbatim
+!!      subroutine allocate_elapsed_times
+!!      subroutine deallocate_elapsed_times
+!!
+!!      subroutine start_eleps_time(iflag_elps)
+!!      subroutine end_eleps_time(iflag_elps)
+!!      subroutine copy_COMM_TIME_to_eleps(iflag_elps)
+!!
+!!      subroutine output_elapsed_times
+!!@endverbatim
+!!
+!!@params  timer ID
 !
       module m_work_time
 !
@@ -78,6 +84,7 @@
 !
       subroutine start_eleps_time(iflag_elps)
 !
+      use calypso_mpi
       use m_parallel_var_dof
 !
       integer(kind = kint), intent(in) :: iflag_elps
@@ -91,6 +98,7 @@
 !
       subroutine end_eleps_time(iflag_elps)
 !
+      use calypso_mpi
       use m_parallel_var_dof
 !
       integer(kind = kint), intent(in) :: iflag_elps
@@ -127,11 +135,11 @@
 !
 !
       call MPI_allREDUCE(elapsed, elapsed_total, num_elapsed,           &
-     &    MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
       call MPI_allREDUCE(elapsed, elapsed_min, num_elapsed,             &
-     &    MPI_DOUBLE_PRECISION, MPI_MIN, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_MIN, CALYPSO_COMM, ierr)
       call MPI_allREDUCE(elapsed, elapsed_max, num_elapsed,             &
-     &    MPI_DOUBLE_PRECISION, MPI_MAX, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_MAX, CALYPSO_COMM, ierr)
 !
       if (my_rank.eq.0) then
 !

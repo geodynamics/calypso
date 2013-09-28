@@ -1,11 +1,15 @@
+!>@file   cal_max_indices.f90
+!!@brief  module cal_max_indices
+!!
+!!@author H. Matsui
+!!@date Programmed by H.Matsui and H.Okuda in July 2000
+!!@n     Modified by H. Matsui on Aug., 2007
 !
-!      module cal_max_indices
-!
-!        programmed by H.Matsui and H.Okuda
-!                                    on July 2000 (ver 1.1)
-!        Modified by H. Matsui on Aug., 2007
-!
-!      subroutine s_cal_max_indices
+!>@brief  Find node positions of maximum values
+!!
+!!@verbatim
+!!      subroutine s_cal_max_indices
+!!@endverbatim
 !
       module cal_max_indices
 !
@@ -21,6 +25,7 @@
 !
       subroutine s_cal_max_indices
 !
+      use calypso_mpi
       use m_parallel_var_dof
       use m_cal_max_indices
       use m_geometry_parameter
@@ -50,17 +55,17 @@
        end do
 !
        do nd = 1, num_tot_nod_phys_vis
-        phys_max_local(nd) = d_nod(node_max(nd),nd)
-        phys_min_local(nd) = d_nod(node_min(nd),nd)
+         phys_max_local(nd) = d_nod(node_max(nd),nd)
+         phys_min_local(nd) = d_nod(node_min(nd),nd)
        end do
 !
         call MPI_allREDUCE (phys_max_local(1), phys_max(1),             &
-     &       num_tot_nod_phys_vis, MPI_DOUBLE_PRECISION, MPI_MAX,       &
-     &       SOLVER_COMM, ierr)
+     &      num_tot_nod_phys_vis, CALYPSO_REAL, MPI_MAX,                &
+     &      CALYPSO_COMM, ierr)
 !
         call MPI_allREDUCE (phys_min_local(1), phys_min(1),             &
-     &        num_tot_nod_phys_vis, MPI_DOUBLE_PRECISION, MPI_MIN,      &
-     &        SOLVER_COMM, ierr)
+     &      num_tot_nod_phys_vis, CALYPSO_REAL, MPI_MIN,                &
+     &      CALYPSO_COMM, ierr)
 !
         node_max_local = 0
         node_min_local = 0
@@ -77,12 +82,12 @@
        end do
 !
         call MPI_allREDUCE (node_max_local(1), node_max(1),             &
-     &        num_tot_nod_phys_vis, MPI_INTEGER, MPI_SUM,               &
-     &        SOLVER_COMM, ierr)
+     &      num_tot_nod_phys_vis, CALYPSO_INTEGER, MPI_SUM,             &
+     &      CALYPSO_COMM, ierr)
 !
         call MPI_allREDUCE (node_min_local(1), node_min(1),             &
-     &        num_tot_nod_phys_vis, MPI_INTEGER, MPI_SUM,               &
-     &        SOLVER_COMM, ierr)
+     &      num_tot_nod_phys_vis, CALYPSO_INTEGER, MPI_SUM,             &
+     &      CALYPSO_COMM, ierr)
 !
 !
       end subroutine s_cal_max_indices

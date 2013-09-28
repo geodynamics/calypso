@@ -1,12 +1,17 @@
+!>@file  merged_ucd_data_IO.f90
+!!       module merged_ucd_data_IO
+!!
+!!@author H. Matsui
+!!@date   Programmed by H. Matsui in Feb., 2013
 !
-!      module merged_ucd_data_IO
-!
-!      Written by H. Matsui on Feb., 2007
-!
-!      subroutine write_merged_ucd_fields(id_ucd, nnod, num_field,      &
-!     &          ntot_comp, ncomp_field, field_name, d_nod)
-!      subroutine write_merged_ucd_mesh(id_ucd, nnod, nele, nnod_ele,   &
-!     &           xx, ie, ntot_comp)
+!> @brief Output routine for merged UCD data segments
+!!
+!!@verbatim
+!!      subroutine write_merged_ucd_fields(id_ucd, nnod, num_field,     &
+!!     &          ntot_comp, ncomp_field, field_name, d_nod)
+!!      subroutine write_merged_ucd_mesh(id_ucd, nnod, nele, nnod_ele,  &
+!!     &           xx, ie, ntot_comp)
+!!@endverbatim
 !
       module merged_ucd_data_IO
 !
@@ -107,16 +112,16 @@
 !C-- SEND
         if(my_rank .eq. isend_rank ) then
         num = nele*nnod_ele
-        call MPI_ISEND(ie(1,1), num, MPI_INTEGER,                       &
-     &      izero, 0, SOLVER_COMM, req1, ierr)
+        call MPI_ISEND(ie(1,1), num, CALYPSO_INTEGER,                   &
+     &      izero, 0, CALYPSO_REAL, req1, ierr)
         end if
 !
 !C
 !C-- RECV
         if(my_rank .eq. 0) then
           num = nele_ucd_list(ip)*nnod_ele
-          call MPI_IRECV(ie_single_ucd(1), num, MPI_INTEGER,            &
-     &        (ip-1), 0, SOLVER_COMM, req2, ierr)
+          call MPI_IRECV(ie_single_ucd(1), num, CALYPSO_INTEGER,        &
+     &        (ip-1), 0, CALYPSO_REAL, req2, ierr)
 !
           call MPI_WAITALL (ione, req2, sta2, ierr)
 !
@@ -165,15 +170,15 @@
 !C-- SEND
         if(my_rank .eq. isend_rank) then
           num = nnod*ncomp_field
-          call MPI_ISEND(d_nod(1,1), num, MPI_DOUBLE_PRECISION,         &
-     &      izero, 0, SOLVER_COMM, req1, ierr)
+          call MPI_ISEND(d_nod(1,1), num, CALYPSO_REAL,                 &
+     &      izero, 0, CALYPSO_REAL, req1, ierr)
         end if
 !C
 !C-- RECV
         if(my_rank .eq. 0) then
           num = nnod_ucd_list(ip)*ncomp_field
-          call MPI_IRECV(d_single_ucd(1), num, MPI_DOUBLE_PRECISION,    &
-     &        (ip-1), 0, SOLVER_COMM, req2, ierr)
+          call MPI_IRECV(d_single_ucd(1), num, CALYPSO_REAL,            &
+     &        (ip-1), 0, CALYPSO_REAL, req2, ierr)
 !
           call MPI_WAITALL (ione, req2, sta2, ierr)
 !

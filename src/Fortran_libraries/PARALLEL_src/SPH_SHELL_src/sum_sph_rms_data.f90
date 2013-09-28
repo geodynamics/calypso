@@ -1,11 +1,16 @@
+!>@file   sum_sph_rms_data.f90
+!!@brief      module sum_sph_rms_data
+!!
+!!@author H. Matsui
+!!@date Programmed in 2009
 !
-!      module sum_sph_rms_data
-!
-!      subroutine deallocate_rms_sph_local_data
-!
-!      subroutine set_sum_table_4_sph_spectr
-!
-!      subroutine sum_sph_layerd_rms
+!> @brief  Evaluate mean square by spherical hermonics coefficients
+!!
+!!@verbatim
+!!      subroutine deallocate_rms_sph_local_data
+!!      subroutine set_sum_table_4_sph_spectr
+!!      subroutine sum_sph_layerd_rms
+!!@endverbatim
 !
       module sum_sph_rms_data
 !
@@ -189,11 +194,11 @@
 !
       num = ntot_rms_rj * nidx_rj(1) * (l_truncation + 1)
       call MPI_allREDUCE (rms_sph_l_local(1,0,1), rms_sph_l(1,0,1),     &
-     &    num, MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
       call MPI_allREDUCE (rms_sph_m_local(1,0,1), rms_sph_m(1,0,1),     &
-     &    num, MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
       call MPI_allREDUCE (rms_sph_lm_local(1,0,1), rms_sph_lm(1,0,1),   &
-     &    num, MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
 !
       if(my_rank .gt. 0) return
 !

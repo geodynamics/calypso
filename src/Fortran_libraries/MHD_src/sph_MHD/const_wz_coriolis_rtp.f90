@@ -172,6 +172,7 @@
 !
       subroutine subtract_sphere_ave_coriolis
 !
+      use calypso_mpi
       use m_parallel_var_dof
       use m_sph_phys_address
       use m_work_4_sph_trans
@@ -190,7 +191,7 @@
       call clear_rj_degree0_scalar_smp(ipol%i_coriolis)
 !
       call MPI_Allreduce(sphere_ave_coriolis_l, sphere_ave_coriolis_g,  &
-     &    nidx_rj(1), MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    nidx_rj(1), CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
 !
 !
 !$omp do private(mphi,l_rtp,kr,k_gl,inod)

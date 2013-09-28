@@ -76,6 +76,7 @@
 !
       subroutine nod_vector_send_recv(vec_nod)
 !
+      use m_array_for_send_recv
       use solver_SR_3
 !
       real(kind = kreal), intent(inout) :: vec_nod(numnod,3)
@@ -93,7 +94,8 @@
       START_TIME= MPI_WTIME()
       call SOLVER_SEND_RECV_3(numnod, num_neib, id_neib,                &
      &                        istack_import, item_import,               &
-     &                        istack_export, item_export, x_vec(1) )
+     &                        istack_export, item_export,               &
+     &                        x_vec(1) )
       END_TIME= MPI_WTIME()
       COMMtime = COMMtime + END_TIME - START_TIME
 !
@@ -111,6 +113,7 @@
 !
       subroutine nod_tensor_send_recv(tsr_nod)
 !
+      use m_array_for_send_recv
       use solver_SR_6
 !
       real(kind = kreal), intent(inout) :: tsr_nod(numnod,6)
@@ -131,8 +134,7 @@
       START_TIME= MPI_WTIME()
       call SOLVER_SEND_RECV_6(numnod, num_neib, id_neib,                &
      &                        istack_import, item_import,               &
-     &                        istack_export, item_export,               &
-     &                        x_vec(1))
+     &                        istack_export, item_export, x_vec(1) )
       END_TIME= MPI_WTIME()
       COMMtime = COMMtime + END_TIME - START_TIME
 !

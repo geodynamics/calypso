@@ -17,6 +17,7 @@
       module merged_vtk_data_IO
 !
       use m_precision
+!
       use calypso_mpi
       use m_constants
       use m_parallel_var_dof
@@ -132,15 +133,15 @@
 !
         if(my_rank .eq. isend_rank) then
           num = nele*nnod_ele
-          call MPI_ISEND(ie(1,1), num, MPI_INTEGER,                     &
-     &        izero, 0, SOLVER_COMM, req1, ierr)
+          call MPI_ISEND(ie(1,1), num, CALYPSO_INTEGER,                 &
+     &        izero, 0, CALYPSO_COMM, req1, ierr)
         end if
 !C
 !C-- RECV
         if(my_rank .eq. 0) then
           num = (istack_numele(ip) - istack_numele(ip-1)) * nnod_ele
-          call MPI_IRECV(ie_single_ucd(1), num, MPI_INTEGER,            &
-     &        isend_rank, 0, SOLVER_COMM, req2, ierr)
+          call MPI_IRECV(ie_single_ucd(1), num, CALYPSO_INTEGER,        &
+     &        isend_rank, 0, CALYPSO_COMM, req2, ierr)
 !
           call MPI_WAITALL (ione, req2, sta2, ierr)
 !
@@ -189,15 +190,15 @@
 !C-- SEND
         if(my_rank .eq. isend_rank ) then
           num = numnod*ncomp_field
-          call MPI_ISEND(d_nod(1,1), num, MPI_DOUBLE_PRECISION,         &
-     &        izero, 0, SOLVER_COMM, req1, ierr)
+          call MPI_ISEND(d_nod(1,1), num, CALYPSO_REAL,                 &
+     &        izero, 0, CALYPSO_COMM, req1, ierr)
         end if
 !C
 !C-- RECV
         if(my_rank .eq. 0) then
           num = (istack_numnod(ip) - istack_numnod(ip-1)) * ncomp_field
-          call MPI_IRECV(d_single_ucd(1), num, MPI_DOUBLE_PRECISION,    &
-     &        isend_rank, 0, SOLVER_COMM, req2, ierr)
+          call MPI_IRECV(d_single_ucd(1), num, CALYPSO_REAL,            &
+     &        isend_rank, 0, CALYPSO_COMM, req2, ierr)
 !
           call MPI_WAITALL (ione, req2, sta2, ierr)
 !

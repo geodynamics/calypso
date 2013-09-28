@@ -8,7 +8,7 @@
 !> @brief MPI wrapper for Calypso
 !!
 !!@verbatim
-!!      subroutine calypso_MPI_init(ierr)
+!!      subroutine calypso_MPI_init
 !!      subroutine calypso_MPI_finalize
 !!      subroutine calypso_MPI_abort(code, message)
 !!
@@ -35,6 +35,11 @@
       integer :: CALYPSO_INTEGER
 !>     real size for MPI
       integer :: CALYPSO_REAL
+!>     character size for MPI
+      integer :: CALYPSO_CHARACTER
+!
+!>      total number of processes
+      integer(kind=kint) :: nprocs
 !
 ! ----------------------------------------------------------------------
 !
@@ -42,15 +47,16 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine calypso_MPI_init(ierr)
+      subroutine calypso_MPI_init
 !
-      use m_machine_parameter
-!
-      integer(kind=kint), intent(inout) :: ierr
+      integer(kind=kint) :: ierr
 !
 !
       call  MPI_INIT(ierr)
       call  MPI_COMM_DUP (MPI_COMM_WORLD, CALYPSO_COMM, ierr)
+      call  MPI_COMM_SIZE(CALYPSO_COMM, nprocs, ierr)
+!
+      CALYPSO_CHARACTER = MPI_CHARACTER
 !
       if(kint .eq. 4) then
         CALYPSO_INTEGER = MPI_INTEGER

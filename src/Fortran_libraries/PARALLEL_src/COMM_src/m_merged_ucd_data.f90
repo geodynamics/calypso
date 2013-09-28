@@ -17,7 +17,6 @@
 !
       use m_precision
       use m_constants
-      use calypso_mpi
       use m_parallel_var_dof
 !
       implicit none
@@ -144,16 +143,18 @@
 !
       subroutine count_merged_ucd(nnod, internal_node, nele)
 !
+      use calypso_mpi
+!
       integer(kind = kint), intent(in) :: nnod, internal_node, nele
 !
       integer(kind = kint) :: ip
 !
-      call MPI_Allgather(nnod, ione, MPI_INTEGER,                       &
-     &    nnod_ucd_list, ione, MPI_INTEGER, SOLVER_COMM, ierr)
-      call MPI_Allgather(nele, ione, MPI_INTEGER,                       &
-     &    nele_ucd_list, ione, MPI_INTEGER, SOLVER_COMM, ierr)
-      call MPI_Allgather(internal_node, ione, MPI_INTEGER,              &
-     &    internod_ucd_list, ione, MPI_INTEGER, SOLVER_COMM, ierr)
+      call MPI_Allgather(nnod, ione, CALYPSO_INTEGER,                   &
+     &    nnod_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr)
+      call MPI_Allgather(nele, ione, CALYPSO_INTEGER,                   &
+     &    nele_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr)
+      call MPI_Allgather(internal_node, ione, CALYPSO_INTEGER,          &
+     &    internod_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr)
 !
       do ip = 1,  nprocs
         istack_nod_ucd_list(ip) = istack_nod_ucd_list(ip-1)             &

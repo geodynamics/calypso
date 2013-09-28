@@ -1,10 +1,15 @@
-!pickup_gauss_coefficients.f90
-!      module pickup_gauss_coefficients
+!>@file   pickup_gauss_coefficients.f90
+!!@brief      module pickup_gauss_coefficients
+!!
+!!@author H. Matsui and H. Okuda
+!!@date Programmed in  Dec., 2012
 !
-!        programmed by H.Matsui on Dec., 2012
-!
+!> @brief choose Gauss coefficients to output
+!!
+!!@verbatim
 !      subroutine init_gauss_coefs_4_monitor
 !      subroutine cal_gauss_coefficients
+!!@endverbatim
 !
       module pickup_gauss_coefficients
 !
@@ -62,6 +67,7 @@
 !
       subroutine cal_gauss_coefficients
 !
+      use calypso_mpi
       use m_parallel_var_dof
       use m_sph_spectr_data
       use m_sph_phys_address
@@ -93,8 +99,8 @@
 !$omp end parallel do
 !
       call MPI_allREDUCE(gauss_coef_lc(1), gauss_coef_gl(1),            &
-     &    num_pick_gauss_mode, MPI_DOUBLE_PRECISION, MPI_SUM,           &
-     &    SOLVER_COMM, ierr)
+     &    num_pick_gauss_mode, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM,     &
+     &    ierr)
 !
       end subroutine cal_gauss_coefficients
 !
