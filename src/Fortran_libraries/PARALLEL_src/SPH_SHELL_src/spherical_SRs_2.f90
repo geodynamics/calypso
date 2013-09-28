@@ -31,7 +31,6 @@
       use m_precision
 !
       use m_constants
-      use m_parallel_var_dof
       use m_spheric_parameter
       use m_sph_trans_comm_table
 !
@@ -46,6 +45,9 @@
 ! ----------------------------------------------------------------------
 !
       subroutine init_sph_send_recv_2(X_rtp, X_rtm, X_rlm, X_rj)
+!
+      use calypso_mpi
+      use m_parallel_var_dof
 !
       use m_spheric_parameter
       use m_sph_trans_comm_table
@@ -98,7 +100,7 @@
 !
       etime = MPI_WTIME() - stime
       call MPI_allREDUCE (etime, etime_item_import, ione,               &
-     &    MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    MPI_DOUBLE_PRECISION, MPI_SUM, CALYPSO_COMM, ierr)
 !
       iflag_sph_SR2 = iflag_import_rev
       stime = MPI_WTIME()
@@ -109,7 +111,7 @@
 !
       etime = MPI_WTIME() - stime
       call MPI_allREDUCE (etime, etime_irev_import, ione,               &
-     &    MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    MPI_DOUBLE_PRECISION, MPI_SUM, CALYPSO_COMM, ierr)
 !
       if(etime_irev_import .le. etime_item_import) then
         iflag_sph_SR2 = iflag_import_rev
@@ -140,7 +142,7 @@
      &              id_domain_rtp, istack_sr_rtp, item_sr_rtp,          &
      &              nneib_domain_rtm, iflag_self_rtm, ntot_item_sr_rtm, &
      &              id_domain_rtm, istack_sr_rtm, item_sr_rtm,          &
-     &              irev_sr_rtm, X_rtp, X_rtm, SOLVER_COMM)
+     &              irev_sr_rtm, X_rtp, X_rtm)
 !
       end subroutine send_recv_rtp_2_rtm_2
 !
@@ -160,7 +162,7 @@
      &              id_domain_rtm, istack_sr_rtm, item_sr_rtm,          &
      &              nneib_domain_rtp, iflag_self_rtp, ntot_item_sr_rtp, &
      &              id_domain_rtp, istack_sr_rtp, item_sr_rtp,          &
-     &              irev_sr_rtp, X_rtm, X_rtp, SOLVER_COMM)
+     &              irev_sr_rtp, X_rtm, X_rtp)
 !
       end subroutine send_recv_rtm_2_rtp_2
 !
@@ -180,7 +182,7 @@
      &              id_domain_rj, istack_sr_rj, item_sr_rj,             &
      &              nneib_domain_rlm, iflag_self_rlm, ntot_item_sr_rlm, &
      &              id_domain_rlm, istack_sr_rlm, item_sr_rlm,          &
-     &              irev_sr_rlm, X_rj, X_rlm, SOLVER_COMM)
+     &              irev_sr_rlm, X_rj, X_rlm)
 !
       end subroutine send_recv_rj_2_rlm_2
 !
@@ -200,7 +202,7 @@
      &              id_domain_rlm, istack_sr_rlm, item_sr_rlm,          &
      &              nneib_domain_rj, iflag_self_rj, ntot_item_sr_rj,    &
      &              id_domain_rj, istack_sr_rj, item_sr_rj,             &
-     &              irev_sr_rj, X_rlm, X_rj, SOLVER_COMM)
+     &              irev_sr_rj, X_rlm, X_rj)
 !
       end subroutine send_recv_rlm_2_rj_2
 !

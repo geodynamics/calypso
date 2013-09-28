@@ -13,7 +13,7 @@
 !!     &                           id_pe_send, istack_send, inod_export,&
 !!     &                           npe_recv, irecv_self, nnod_recv,     &
 !!     &                           id_pe_recv, istack_recv, irev_import,&
-!!     &                           X_org, X_new, SOLVER_COMM)
+!!     &                           X_org, X_new)
 !!@endverbatim
 !!
 !!@n @param  nnod_org    Number of data points for origin
@@ -39,8 +39,6 @@
 !!@n
 !!@n @param  X_org(6*nnod_org)   Send data
 !!@n @param  X_new(6*nnod_new)   Received data
-!!@n
-!!@n @param  SOLVER_COMM          MPI communicator
 !
       module spherical_SR_rev_6
 !
@@ -60,12 +58,10 @@
      &                           id_pe_send, istack_send, inod_export,  &
      &                           npe_recv, irecv_self, nnod_recv,       &
      &                           id_pe_recv, istack_recv, irev_import,  &
-     &                           X_org, X_new, SOLVER_COMM)
+     &                           X_org, X_new)
 !
       use calypso_mpi
       use m_solver_SR
-!
-      integer, intent(in)   :: SOLVER_COMM
 !
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
@@ -116,7 +112,7 @@
         ist= isix * istack_send(neib-1) + 1
         inum  = isix * (istack_send(neib  ) - istack_send(neib-1))
         call MPI_ISEND(WS(ist), inum, MPI_DOUBLE_PRECISION,             &
-     &      id_pe_send(neib), 0, SOLVER_COMM, req1(neib), ierr)
+     &      id_pe_send(neib), 0, CALYPSO_COMM, req1(neib), ierr)
       end do
 !C
 !C-- RECEIVE
@@ -125,7 +121,7 @@
           ist= isix * istack_recv(neib-1) + 1
           inum  = isix * (istack_recv(neib  ) - istack_recv(neib-1))
           call MPI_IRECV(WR(ist), inum, MPI_DOUBLE_PRECISION,           &
-     &      id_pe_recv(neib), 0, SOLVER_COMM, req2(neib), ierr)
+     &      id_pe_recv(neib), 0, CALYPSO_COMM, req2(neib), ierr)
         end do
 !
         call MPI_WAITALL (ncomm_recv, req2, sta2, ierr)

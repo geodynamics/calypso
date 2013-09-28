@@ -17,35 +17,35 @@
 !!     &                         id_pe_send, istack_send, inod_export,  &
 !!     &                         npe_recv, irecv_self, nnod_recv,       &
 !!     &                         id_pe_recv, istack_recv, inod_import,  &
-!!     &                         irev_import, X_org, X_new, SOLVER_COMM)
+!!     &                         irev_import, X_org, X_new)
 !!
 !!      subroutine sel_sph_send_recv_6(nnod_org, nnod_new,              &
 !!     &                         npe_send, isend_self, nnod_send,       &
 !!     &                         id_pe_send, istack_send, inod_export,  &
 !!     &                         npe_recv, irecv_self, nnod_recv,       &
 !!     &                         id_pe_recv, istack_recv, inod_import,  &
-!!     &                         irev_import, X_org, X_new, SOLVER_COMM)
+!!     &                         irev_import, X_org, X_new)
 !!
 !!      subroutine sel_sph_send_recv_3(nnod_org, nnod_new,              &
 !!     &                         npe_send, isend_self, nnod_send,       &
 !!     &                         id_pe_send, istack_send, inod_export,  &
 !!     &                         npe_recv, irecv_self, nnod_recv,       &
 !!     &                         id_pe_recv, istack_recv, inod_import,  &
-!!     &                         irev_import, X_org, X_new, SOLVER_COMM)
+!!     &                         irev_import, X_org, X_new)
 !!
 !!      subroutine sel_sph_send_recv_2(nnod_org, nnod_new,              &
 !!     &                         npe_send, isend_self, nnod_send,       &
 !!     &                         id_pe_send, istack_send, inod_export,  &
 !!     &                         npe_recv, irecv_self, nnod_recv,       &
 !!     &                         id_pe_recv, istack_recv, inod_import,  &
-!!     &                         irev_import, X_org, X_new, SOLVER_COMM)
+!!     &                         irev_import, X_org, X_new)
 !!
 !!      subroutine sel_sph_send_recv(nnod_org, nnod_new,                &
 !!     &                         npe_send, isend_self, nnod_send,       &
 !!     &                         id_pe_send, istack_send, inod_export,  &
 !!     &                         npe_recv, irecv_self, nnod_recv,       &
 !!     &                         id_pe_recv, istack_recv, inod_import,  &
-!!     &                         irev_import, X_org, X_new, SOLVER_COMM)
+!!     &                         irev_import, X_org, X_new)
 !!
 !!
 !!      subroutine sel_sph_send_recv_int(nnod_org, nnod_new,            &
@@ -97,8 +97,6 @@
 !!@n
 !!@n @param  iX_org(nnod_org)   Integer send data
 !!@n @param  iX_new(nnod_recv)  Integer received data
-!!@n
-!!@n @param  SOLVER_COMM          MPI communicator
 !
       module select_spherical_SR
 !
@@ -137,12 +135,10 @@
      &                         id_pe_send, istack_send, inod_export,    &
      &                         npe_recv, irecv_self, nnod_recv,         &
      &                         id_pe_recv, istack_recv, inod_import,    &
-     &                         irev_import, X_org, X_new, SOLVER_COMM)
+     &                         irev_import, X_org, X_new)
 !
       use spherical_SR_N
       use spherical_SR_rev_N
-!
-      integer, intent(in)   :: SOLVER_COMM
 !
       integer(kind = kint), intent(in) :: NB
 !
@@ -173,14 +169,14 @@
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, irev_import,      &
-     &                       X_org, X_new, SOLVER_COMM)
+     &                       X_org, X_new)
       else
         call sph_send_recv_N(NB, nnod_org, nnod_new,                    &
      &                       npe_send, isend_self, nnod_send,           &
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, inod_import,      &
-     &                       X_org, X_new, SOLVER_COMM)
+     &                       X_org, X_new)
       end if
 !
       end subroutine sel_sph_send_recv_N
@@ -192,12 +188,10 @@
      &                         id_pe_send, istack_send, inod_export,    &
      &                         npe_recv, irecv_self, nnod_recv,         &
      &                         id_pe_recv, istack_recv, inod_import,    &
-     &                         irev_import, X_org, X_new, SOLVER_COMM)
+     &                         irev_import, X_org, X_new)
 !
       use spherical_SR_6
       use spherical_SR_rev_6
-!
-      integer, intent(in)   :: SOLVER_COMM
 !
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
@@ -226,14 +220,14 @@
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, irev_import,      &
-     &                       X_org, X_new, SOLVER_COMM)
+     &                       X_org, X_new)
       else
         call sph_send_recv_6(nnod_org, nnod_new,                        &
      &                       npe_send, isend_self, nnod_send,           &
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, inod_import,      &
-     &                       X_org, X_new, SOLVER_COMM)
+     &                       X_org, X_new)
       end if
 !
       end subroutine sel_sph_send_recv_6
@@ -245,12 +239,10 @@
      &                         id_pe_send, istack_send, inod_export,    &
      &                         npe_recv, irecv_self, nnod_recv,         &
      &                         id_pe_recv, istack_recv, inod_import,    &
-     &                         irev_import, X_org, X_new, SOLVER_COMM)
+     &                         irev_import, X_org, X_new)
 !
       use spherical_SR_3
       use spherical_SR_rev_3
-!
-      integer, intent(in)   :: SOLVER_COMM
 !
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
@@ -279,14 +271,14 @@
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, irev_import,      &
-     &                       X_org, X_new, SOLVER_COMM)
+     &                       X_org, X_new)
       else
         call sph_send_recv_3(nnod_org, nnod_new,                        &
      &                       npe_send, isend_self, nnod_send,           &
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, inod_import,      &
-     &                       X_org, X_new, SOLVER_COMM)
+     &                       X_org, X_new)
       end if
 !
       end subroutine sel_sph_send_recv_3
@@ -298,12 +290,10 @@
      &                         id_pe_send, istack_send, inod_export,    &
      &                         npe_recv, irecv_self, nnod_recv,         &
      &                         id_pe_recv, istack_recv, inod_import,    &
-     &                         irev_import, X_org, X_new, SOLVER_COMM)
+     &                         irev_import, X_org, X_new)
 !
       use spherical_SR_2
       use spherical_SR_rev_2
-!
-      integer, intent(in)   :: SOLVER_COMM
 !
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
@@ -332,14 +322,14 @@
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, irev_import,      &
-     &                       X_org, X_new, SOLVER_COMM)
+     &                       X_org, X_new)
       else
         call sph_send_recv_2(nnod_org, nnod_new,                        &
      &                       npe_send, isend_self, nnod_send,           &
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, inod_import,      &
-     &                       X_org, X_new, SOLVER_COMM)
+     &                       X_org, X_new)
       end if
 !
       end subroutine sel_sph_send_recv_2
@@ -351,12 +341,10 @@
      &                         id_pe_send, istack_send, inod_export,    &
      &                         npe_recv, irecv_self, nnod_recv,         &
      &                         id_pe_recv, istack_recv, inod_import,    &
-     &                         irev_import, X_org, X_new, SOLVER_COMM)
+     &                         irev_import, X_org, X_new)
 !
       use spherical_SR
       use spherical_SR_rev
-!
-      integer, intent(in)   :: SOLVER_COMM
 !
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
@@ -385,14 +373,14 @@
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, irev_import,      &
-     &                       X_org, X_new, SOLVER_COMM)
+     &                       X_org, X_new)
       else
         call sph_send_recv(nnod_org, nnod_new,                          &
      &                       npe_send, isend_self, nnod_send,           &
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, inod_import,      &
-     &                       X_org, X_new, SOLVER_COMM)
+     &                       X_org, X_new)
       end if
 !
       end subroutine sel_sph_send_recv
@@ -405,12 +393,10 @@
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, inod_import,      &
-     &                       irev_import, iX_org, iX_new, SOLVER_COMM)
+     &                       irev_import, iX_org, iX_new)
 !
       use spherical_SR_int
       use spherical_SR_rev_int
-!
-      integer, intent(in)   :: SOLVER_COMM
 !
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
@@ -439,14 +425,14 @@
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, irev_import,      &
-     &                       iX_org, iX_new, SOLVER_COMM)
+     &                       iX_org, iX_new)
       else
         call sph_send_recv_int(nnod_org, nnod_new,                      &
      &                       npe_send, isend_self, nnod_send,           &
      &                       id_pe_send, istack_send, inod_export,      &
      &                       npe_recv, irecv_self, nnod_recv,           &
      &                       id_pe_recv, istack_recv, inod_import,      &
-     &                       iX_org, iX_new, SOLVER_COMM)
+     &                       iX_org, iX_new)
       end if
 !
       end subroutine sel_sph_send_recv_int
