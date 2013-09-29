@@ -126,7 +126,7 @@
 !
       num = ncomp_pick_sph_coef*num_pick_layer*num_pick_sph_mode
       call MPI_allREDUCE(d_rj_pick_sph_lc(1,1), d_rj_pick_sph_gl(1,1),  &
-     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine pickup_sph_spec_4_monitor
 !

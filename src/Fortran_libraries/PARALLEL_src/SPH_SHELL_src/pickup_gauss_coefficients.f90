@@ -68,7 +68,6 @@
       subroutine cal_gauss_coefficients
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_sph_spectr_data
       use m_sph_phys_address
 !
@@ -100,7 +99,7 @@
 !
       call MPI_allREDUCE(gauss_coef_lc(1), gauss_coef_gl(1),            &
      &    num_pick_gauss_mode, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM,     &
-     &    ierr)
+     &    ierr_MPI)
 !
       end subroutine cal_gauss_coefficients
 !

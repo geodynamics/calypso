@@ -113,7 +113,7 @@
         if(my_rank .eq. isend_rank ) then
         num = nele*nnod_ele
         call MPI_ISEND(ie(1,1), num, CALYPSO_INTEGER,                   &
-     &      izero, 0, CALYPSO_REAL, req1, ierr)
+     &      izero, 0, CALYPSO_REAL, req1, ierr_MPI)
         end if
 !
 !C
@@ -121,9 +121,9 @@
         if(my_rank .eq. 0) then
           num = nele_ucd_list(ip)*nnod_ele
           call MPI_IRECV(ie_single_ucd(1), num, CALYPSO_INTEGER,        &
-     &        (ip-1), 0, CALYPSO_REAL, req2, ierr)
+     &        (ip-1), 0, CALYPSO_REAL, req2, ierr_MPI)
 !
-          call MPI_WAITALL (ione, req2, sta2, ierr)
+          call MPI_WAITALL (ione, req2, sta2, ierr_MPI)
 !
           do iele = 1, nele_ucd_list(ip)
             iele_single_ucd(iele) = iele + istack_ele_ucd_list(ip-1)
@@ -134,10 +134,10 @@
       end if
 !
         if(my_rank .eq. isend_rank ) then
-          call MPI_WAITALL (ione, req1, sta1, ierr)
+          call MPI_WAITALL (ione, req1, sta1, ierr_MPI)
         end if
       end do 
-      call  calypso_MPI_barrier(ierr)
+      call  calypso_MPI_barrier
 !
       end subroutine write_merged_ucd_connect
 !
@@ -171,16 +171,16 @@
         if(my_rank .eq. isend_rank) then
           num = nnod*ncomp_field
           call MPI_ISEND(d_nod(1,1), num, CALYPSO_REAL,                 &
-     &      izero, 0, CALYPSO_REAL, req1, ierr)
+     &      izero, 0, CALYPSO_REAL, req1, ierr_MPI)
         end if
 !C
 !C-- RECV
         if(my_rank .eq. 0) then
           num = nnod_ucd_list(ip)*ncomp_field
           call MPI_IRECV(d_single_ucd(1), num, CALYPSO_REAL,            &
-     &        (ip-1), 0, CALYPSO_REAL, req2, ierr)
+     &        (ip-1), 0, CALYPSO_REAL, req2, ierr_MPI)
 !
-          call MPI_WAITALL (ione, req2, sta2, ierr)
+          call MPI_WAITALL (ione, req2, sta2, ierr_MPI)
 !
           do inod = 1, internod_ucd_list(ip)
             inod_single_ucd(inod) = inod + istack_nod_ucd_list(ip-1)
@@ -192,11 +192,11 @@
         end if
 !
         if(my_rank .eq. isend_rank ) then
-          call MPI_WAITALL (ione, req1, sta1, ierr)
+          call MPI_WAITALL (ione, req1, sta1, ierr_MPI)
         end if
 !
       end do 
-      call  calypso_MPI_barrier(ierr)
+      call  calypso_MPI_barrier
 !
       end subroutine write_merged_udt_field
 !

@@ -118,7 +118,7 @@
       num = ntot_rms_rj*num_pick_rms_layer*num_pick_sph_rms_mode
       call MPI_allREDUCE(d_rms_pick_sph_lc(1,1),                        &
      &    d_rms_pick_sph_gl(1,1), num, CALYPSO_REAL, MPI_SUM,           &
-     &    CALYPSO_COMM, ierr)
+     &    CALYPSO_COMM, ierr_MPI)
 !
       end subroutine pickup_sph_rms_4_monitor
 !
@@ -154,7 +154,7 @@
       num = ntot_rms_rj*num_pick_sph_rms_mode
       call MPI_allREDUCE(d_rms_pick_sph_lc(1,1),                        &
      &    d_rms_pick_sph_gl(1,1), num, CALYPSO_REAL, MPI_SUM,           &
-     &    CALYPSO_COMM, ierr)
+     &    CALYPSO_COMM, ierr_MPI)
 !
       end subroutine pickup_sph_rms_vol_monitor
 !

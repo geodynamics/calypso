@@ -191,7 +191,7 @@
       call clear_rj_degree0_scalar_smp(ipol%i_coriolis)
 !
       call MPI_Allreduce(sphere_ave_coriolis_l, sphere_ave_coriolis_g,  &
-     &    nidx_rj(1), CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    nidx_rj(1), CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
 !
 !$omp do private(mphi,l_rtp,kr,k_gl,inod)

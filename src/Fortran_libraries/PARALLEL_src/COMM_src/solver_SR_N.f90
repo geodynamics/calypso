@@ -10,12 +10,11 @@
 !!
 !!@verbatim
 !!      subroutine  SOLVER_SEND_RECV_N                                  &
-!!     &            (N, NB, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,&
-!!     &                                       STACK_EXPORT, NOD_EXPORT,&
-!!     &             X)
+!!     &          (N, NB, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,  &
+!!     &                                     STACK_EXPORT, NOD_EXPORT, X)
 !!      subroutine  SOLVER_SEND_RECV_Nx3                                &
-!!     &            (N, NB, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,&
-!!     &                                       STACK_EXPORT, NOD_EXPORT,&
+!!     &          (N, NB, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,  &
+!!     &                                     STACK_EXPORT, NOD_EXPORT,  &
 !!     &             X1, X2, X3)
 !!@endverbatim
 !!
@@ -77,7 +76,7 @@
       real   (kind=kreal), intent(inout):: X(NB*N)
 !
       integer (kind = kint) :: neib, istart, inum, iend
-      integer (kind = kint) :: ierr, k, ii, ix, nd
+      integer (kind = kint) :: k, ii, ix, nd
 !
 !
       call resize_work_4_SR(NB, NEIBPETOT,                              &
@@ -100,7 +99,8 @@
         istart= NB *  STACK_EXPORT(neib-1) + 1
         inum  = NB * (STACK_EXPORT(neib  ) - STACK_EXPORT(neib-1) )
         call MPI_ISEND(WS(istart), inum, CALYPSO_REAL,                  &
-     &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib), ierr)
+     &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib),       &
+     &                 ierr_MPI)
       end do
 
 !C
@@ -109,10 +109,11 @@
         istart= NB *  STACK_IMPORT(neib-1) + 1
         inum  = NB * (STACK_IMPORT(neib  ) - STACK_IMPORT(neib-1) )
         call MPI_IRECV(WR(istart), inum, CALYPSO_REAL,                  &
-     &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib), ierr)
+     &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib),       &
+     &                 ierr_MPI)
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr)
+      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr_MPI)
    
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1) + 1
@@ -126,7 +127,7 @@
         enddo
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr)
+      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr_MPI)
 
       end subroutine solver_send_recv_N
 !
@@ -158,7 +159,7 @@
       real   (kind=kreal), intent(inout):: X3(NB*N)
 !
       integer (kind = kint) :: neib, istart, inum, iend
-      integer (kind = kint) :: ierr, k, ii, ix, nd, NB3
+      integer (kind = kint) :: k, ii, ix, nd, NB3
 !
 !
       NB3 = 3 * NB
@@ -184,7 +185,8 @@
         istart= 3*NB *  STACK_EXPORT(neib-1) + 1
         inum  = 3*NB * (STACK_EXPORT(neib  ) - STACK_EXPORT(neib-1) )
         call MPI_ISEND(WS(istart), inum, CALYPSO_REAL,                  &
-     &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib), ierr)
+     &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib),       &
+     &                 ierr_MPI)
       end do
 
 !C
@@ -193,10 +195,11 @@
         istart= 3*NB *  STACK_IMPORT(neib-1) + 1
         inum  = 3*NB * (STACK_IMPORT(neib  ) - STACK_IMPORT(neib-1) )
         call MPI_IRECV(WR(istart), inum, CALYPSO_REAL,                  &
-     &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib), ierr)
+     &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib),       &
+     &                 ierr_MPI)
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr)
+      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr_MPI)
    
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1) + 1
@@ -212,7 +215,7 @@
         enddo
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr)
+      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr_MPI)
 
       end subroutine solver_send_recv_Nx3
 !

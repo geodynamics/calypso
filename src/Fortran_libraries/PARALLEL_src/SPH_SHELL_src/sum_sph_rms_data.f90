@@ -194,11 +194,11 @@
 !
       num = ntot_rms_rj * nidx_rj(1) * (l_truncation + 1)
       call MPI_allREDUCE (rms_sph_l_local(1,0,1), rms_sph_l(1,0,1),     &
-     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       call MPI_allREDUCE (rms_sph_m_local(1,0,1), rms_sph_m(1,0,1),     &
-     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       call MPI_allREDUCE (rms_sph_lm_local(1,0,1), rms_sph_lm(1,0,1),   &
-     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       if(my_rank .gt. 0) return
 !

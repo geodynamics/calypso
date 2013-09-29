@@ -68,7 +68,7 @@
       integer (kind=kint), dimension(N)  , intent(inout):: iX
 !C
 !
-      integer (kind = kint) :: neib, istart, inum, ierr, k
+      integer (kind = kint) :: neib, istart, inum, k
 !
 !
       call resize_iwork_4_SR(NEIBPETOT,                                 &
@@ -85,7 +85,7 @@
         enddo
         call MPI_ISEND (iWS(istart+1), inum, CALYPSO_INTEGER,           &
      &                  NEIBPE(neib), 0, CALYPSO_COMM,                  &
-     &                  req1(neib), ierr)
+     &                  req1(neib), ierr_MPI)
       enddo
 
 !C
@@ -96,10 +96,10 @@
         inum  = STACK_IMPORT(neib  ) - istart
         call MPI_IRECV (iWR(istart+1), inum, CALYPSO_INTEGER,           &
      &                  NEIBPE(neib), 0, CALYPSO_COMM,                  &
-     &                  req2(neib), ierr)
+     &                  req2(neib), ierr_MPI)
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr)
+      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr_MPI)
    
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1)
@@ -109,7 +109,7 @@
       enddo
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr)
+      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr_MPI)
 
       end subroutine solver_send_recv_i
 !

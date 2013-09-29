@@ -109,7 +109,7 @@
       if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_local',   &
      &     my_rank, iflag_shell_local, internal_node, nnod_rtp
       call MPI_allreduce(iflag_shell_local, iflag_shell_mode, ione,     &
-     &    CALYPSO_INTEGER, MPI_MAX, CALYPSO_COMM, ierr)
+     &    CALYPSO_INTEGER, MPI_MAX, CALYPSO_COMM, ierr_MPI)
       if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_mode',    &
      &     my_rank, iflag_shell_mode
 !
@@ -135,9 +135,9 @@
 !
       ncomp = nb*nidx_rj(1)
       call MPI_allreduce(v_np_local, v_n_pole, ncomp,                   &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       call MPI_allreduce(v_sp_local, v_s_pole, ncomp,                   &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine sum_b_trans_pole_scalar
 !
@@ -155,9 +155,9 @@
 !
       ncomp = n_vector*nb*nidx_rj(1)
       call MPI_allreduce(v_np_local, v_n_pole, ncomp,                   &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       call MPI_allreduce(v_sp_local, v_s_pole, ncomp,                   &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine sum_b_trans_pole_vect
 !
@@ -172,7 +172,7 @@
       v_center =   zero
 !
       call MPI_allreduce(v_ct_local, v_center, nb,                      &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine sum_b_trans_center_scalar
 !
@@ -189,7 +189,7 @@
 !
       ncomp = n_vector*nb
       call MPI_allreduce(v_ct_local, v_center, ncomp,                   &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine sum_b_trans_center_vect
 !

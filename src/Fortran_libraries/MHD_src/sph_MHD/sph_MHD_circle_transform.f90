@@ -155,7 +155,7 @@
       num = d_circle%ntot_phys * (nidx_global_rj(2) + 1)
       if(my_rank .eq. 0) d_rj_circle =   zero
       call MPI_Reduce(d_rj_circ_lc(0,1), d_rj_circle(0,1), num,         &
-     &    CALYPSO_REAL, MPI_SUM, izero, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine collect_spectr_for_circle
 !

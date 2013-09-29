@@ -50,6 +50,7 @@
       use add_nodal_fields_4_MHD
       use add_sph_MHD_fields_2_ctl
 !
+      integer(kind = kint) :: ierr
 !
 !   overwrite restart header for magnetic field extension
 !

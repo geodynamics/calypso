@@ -185,7 +185,7 @@
       etime(id_legendre_transfer) = MPI_WTIME() - stime
 !
       call MPI_allREDUCE (etime, etime_trans, ifour,                    &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       id_legendre_transfer = iflag_leg_orginal_loop
       etime_shortest =       etime_trans(iflag_leg_orginal_loop)

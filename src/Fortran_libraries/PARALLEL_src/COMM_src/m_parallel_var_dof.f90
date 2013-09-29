@@ -17,9 +17,6 @@
 !
       implicit  none
 !
-!>      error flag
-      integer(kind=kint) :: ierr
-!
       real(kind=kreal) :: START_TIME, END_TIME, COMMtime
 ! 
 ! ----------------------------------------------------------------------
@@ -34,7 +31,6 @@
 !
 !
       call calypso_MPI_init
-      call  MPI_COMM_RANK(CALYPSO_COMM, my_rank  , ierr)
 !
       end subroutine parallel_cal_init
 !

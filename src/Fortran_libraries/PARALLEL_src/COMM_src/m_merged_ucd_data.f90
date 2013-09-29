@@ -150,11 +150,12 @@
       integer(kind = kint) :: ip
 !
       call MPI_Allgather(nnod, ione, CALYPSO_INTEGER,                   &
-     &    nnod_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr)
+     &    nnod_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
       call MPI_Allgather(nele, ione, CALYPSO_INTEGER,                   &
-     &    nele_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr)
+     &    nele_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
       call MPI_Allgather(internal_node, ione, CALYPSO_INTEGER,          &
-     &    internod_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr)
+     &    internod_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM,       &
+     &    ierr_MPI)
 !
       do ip = 1,  nprocs
         istack_nod_ucd_list(ip) = istack_nod_ucd_list(ip-1)             &

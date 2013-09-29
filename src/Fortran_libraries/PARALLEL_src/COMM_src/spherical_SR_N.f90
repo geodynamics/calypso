@@ -88,7 +88,7 @@
       real (kind=kreal) :: elaps3(3)
 !
       real(kind = kreal) :: s1time, s2time
-      integer (kind = kint) :: neib, istart, inum, iend, ierr
+      integer (kind = kint) :: neib, istart, inum, iend
       integer (kind = kint) :: i, j, k, nd, jj, kk
       integer (kind = kint) :: ncomm_send, ncomm_recv
       integer (kind = kint) :: ist_send, ist_recv
@@ -126,7 +126,7 @@
         istart= NB * istack_send(neib-1) + 1
         inum  = NB * (istack_send(neib  ) - istack_send(neib-1))
         call MPI_ISEND(WS(istart), inum, CALYPSO_REAL,                  &
-     &      id_pe_send(neib), 0, CALYPSO_COMM, req1(neib), ierr)
+     &      id_pe_send(neib), 0, CALYPSO_COMM, req1(neib), ierr_MPI)
       end do
 !C
 !C-- RECEIVE
@@ -135,10 +135,10 @@
           istart= NB * istack_recv(neib-1) + 1
           inum  = NB * (istack_recv(neib  ) - istack_recv(neib-1))
           call MPI_IRECV(WR(istart), inum, CALYPSO_REAL,                &
-     &        id_pe_recv(neib), 0, CALYPSO_COMM, req2(neib), ierr)
+     &        id_pe_recv(neib), 0, CALYPSO_COMM, req2(neib), ierr_MPI)
         end do
 !
-        call MPI_WAITALL (ncomm_recv, req2, sta2, ierr)
+        call MPI_WAITALL (ncomm_recv, req2, sta2, ierr_MPI)
       end if
 !
       if (isend_self .eq. 1) then
@@ -173,7 +173,7 @@
       elaps3(2) = elaps3(2) + MPI_WTIME() - s2time
 !
       if(ncomm_send .gt. 0) then
-        call MPI_WAITALL (ncomm_send, req1, sta1, ierr)
+        call MPI_WAITALL (ncomm_send, req1, sta1, ierr_MPI)
       end if
       elaps3(3) = elaps3(3) + MPI_WTIME() - s1time
 !

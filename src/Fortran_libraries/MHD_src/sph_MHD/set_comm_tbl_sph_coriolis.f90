@@ -236,9 +236,9 @@
 !
       do ip = 1, nprocs
         call MPI_Bcast(jminmax_gl(1,ip), itwo, CALYPSO_INTEGER, (ip-1), &
-     &      CALYPSO_COMM, ierr)
+     &      CALYPSO_COMM, ierr_MPI)
         call MPI_Bcast(jminmax_coriolis(1,ip), itwo, CALYPSO_INTEGER,   &
-     &      (ip-1), CALYPSO_COMM, ierr)
+     &      (ip-1), CALYPSO_COMM, ierr_MPI)
       end do
 !
       end subroutine set_sph_range_coriolis

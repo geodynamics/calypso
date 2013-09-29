@@ -135,11 +135,11 @@
 !
 !
       call MPI_allREDUCE(elapsed, elapsed_total, num_elapsed,           &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       call MPI_allREDUCE(elapsed, elapsed_min, num_elapsed,             &
-     &    CALYPSO_REAL, MPI_MIN, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_MIN, CALYPSO_COMM, ierr_MPI)
       call MPI_allREDUCE(elapsed, elapsed_max, num_elapsed,             &
-     &    CALYPSO_REAL, MPI_MAX, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_MAX, CALYPSO_COMM, ierr_MPI)
 !
       if (my_rank.eq.0) then
 !

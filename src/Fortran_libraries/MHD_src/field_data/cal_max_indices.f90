@@ -61,11 +61,11 @@
 !
         call MPI_allREDUCE (phys_max_local(1), phys_max(1),             &
      &      num_tot_nod_phys_vis, CALYPSO_REAL, MPI_MAX,                &
-     &      CALYPSO_COMM, ierr)
+     &      CALYPSO_COMM, ierr_MPI)
 !
         call MPI_allREDUCE (phys_min_local(1), phys_min(1),             &
      &      num_tot_nod_phys_vis, CALYPSO_REAL, MPI_MIN,                &
-     &      CALYPSO_COMM, ierr)
+     &      CALYPSO_COMM, ierr_MPI)
 !
         node_max_local = 0
         node_min_local = 0
@@ -83,11 +83,11 @@
 !
         call MPI_allREDUCE (node_max_local(1), node_max(1),             &
      &      num_tot_nod_phys_vis, CALYPSO_INTEGER, MPI_SUM,             &
-     &      CALYPSO_COMM, ierr)
+     &      CALYPSO_COMM, ierr_MPI)
 !
         call MPI_allREDUCE (node_min_local(1), node_min(1),             &
      &      num_tot_nod_phys_vis, CALYPSO_INTEGER, MPI_SUM,             &
-     &      CALYPSO_COMM, ierr)
+     &      CALYPSO_COMM, ierr_MPI)
 !
 !
       end subroutine s_cal_max_indices

@@ -98,7 +98,7 @@
 !
       etime = MPI_WTIME() - stime
       call MPI_allREDUCE (etime, etime_item_import, ione,               &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       iflag_sph_SR6 = iflag_import_rev
       stime = MPI_WTIME()
@@ -109,7 +109,7 @@
 !
       etime = MPI_WTIME() - stime
       call MPI_allREDUCE (etime, etime_irev_import, ione,               &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       if(etime_irev_import .le. etime_item_import) then
         iflag_sph_SR6 = iflag_import_rev

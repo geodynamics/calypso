@@ -77,7 +77,7 @@
       call SPH_init_sph_snap
       if(iflag_debug .gt. 0) write(*,*) 'SPH_to_FEM_init_MHD'
       call SPH_to_FEM_init_MHD
-      call calypso_MPI_barrier(ierr)
+      call calypso_MPI_barrier
 !
       call end_eleps_time(2)
 !
@@ -146,7 +146,7 @@
 !
       call output_elapsed_times
 !
-      call calypso_MPI_barrier(ierr)
+      call calypso_MPI_barrier
       if (iflag_debug.eq.1) write(*,*) 'exit evolution'
 !
       end subroutine evolution_voviz_sph_zm_snap

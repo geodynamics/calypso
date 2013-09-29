@@ -16,7 +16,6 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_parallel_var_dof
       use m_t_int_parameter
       use m_spheric_param_smp
       use m_spheric_parameter
@@ -43,7 +42,7 @@
       use mat_product_3band_mul
 !
       integer(kind = kint) :: ip, jst, jed, j
-!      integer(kind = kint) :: k
+      integer(kind = kint) :: ierr
 !
 !
 !$omp parallel
@@ -137,6 +136,7 @@
       use set_sph_magne_mat_bc
 !
       integer(kind = kint) :: kr_in, ip, jst, jed, j
+      integer(kind = kint) :: ierr
 !
 !
       if(iflag_icb_magne .eq. iflag_sph_fill_center) then

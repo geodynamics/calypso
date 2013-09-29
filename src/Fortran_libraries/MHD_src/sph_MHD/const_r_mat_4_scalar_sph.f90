@@ -14,7 +14,6 @@
 !
       use m_precision
 !
-      use m_parallel_var_dof
       use m_constants
       use m_machine_parameter
       use m_control_params_sph_MHD
@@ -38,6 +37,7 @@
       subroutine const_radial_mat_4_temp_sph
 !
       integer(kind = kint) :: ip, jst, jed, j
+      integer(kind = kint) :: ierr
 !
 !
 !$omp parallel
@@ -81,6 +81,7 @@
       subroutine const_radial_mat_4_composit_sph
 !
       integer(kind = kint) :: ip, jst, jed, j
+      integer(kind = kint) :: ierr
 !
 !
 !$omp parallel

@@ -116,7 +116,7 @@
       call finalize_FFT_select(np_smp)
 !
       call MPI_allREDUCE (etime, etime_fft, ione,                       &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine test_fourier_trans_vector
 !

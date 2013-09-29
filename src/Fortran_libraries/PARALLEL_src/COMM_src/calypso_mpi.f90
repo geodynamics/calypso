@@ -12,10 +12,9 @@
 !!      subroutine calypso_MPI_finalize
 !!      subroutine calypso_MPI_abort(code, message)
 !!
-!!      subroutine calypso_MPI_barrier(ierr)
+!!      subroutine calypso_MPI_barrier
 !!@endverbatim
 !!
-!!@n @param  ierr       error flag
 !!@n @param  code       error code
 !!@n @param  message    message to output
 !
@@ -43,6 +42,9 @@
 !>      total number of processes
       integer(kind=kint) :: nprocs
 !
+!>      error flag for MPI
+      integer(kind=kint) :: ierr_MPI
+!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -51,12 +53,11 @@
 !
       subroutine calypso_MPI_init
 !
-      integer(kind=kint) :: ierr
 !
-!
-      call  MPI_INIT(ierr)
-      call  MPI_COMM_DUP (MPI_COMM_WORLD, CALYPSO_COMM, ierr)
-      call  MPI_COMM_SIZE(CALYPSO_COMM, nprocs, ierr)
+      call  MPI_INIT(ierr_MPI)
+      call  MPI_COMM_DUP (MPI_COMM_WORLD, CALYPSO_COMM, ierr_MPI)
+      call  MPI_COMM_SIZE(CALYPSO_COMM, nprocs,  ierr_MPI)
+      call  MPI_COMM_RANK(CALYPSO_COMM, my_rank, ierr_MPI)
 !
       CALYPSO_CHARACTER = MPI_CHARACTER
 !
@@ -88,10 +89,8 @@
 !
       subroutine calypso_MPI_finalize
 !
-      integer(kind=kint) :: ierr
 !
-!
-      call  MPI_FINALIZE(ierr)
+      call  MPI_FINALIZE(ierr_MPI)
 !
       end subroutine calypso_MPI_finalize
 !
@@ -101,13 +100,12 @@
 !
       integer,       intent(in)  ::  code
       character*(*), intent(in)  ::  message
-      integer(kind=kint) :: ierr
 !
 !
       write(*,*) ' ///// abnormal termination ///// ', code,            &
      &                                            ' ', message
 !
-      call  MPI_ABORT(CALYPSO_COMM, ierr)
+      call  MPI_ABORT(CALYPSO_COMM, ierr_MPI)
 !
       stop
       end subroutine  calypso_MPI_abort
@@ -115,12 +113,10 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine calypso_MPI_barrier(ierr)
-!
-      integer(kind=kint), intent(inout) :: ierr
+      subroutine calypso_MPI_barrier
 !
 !
-      call MPI_BARRIER(CALYPSO_COMM, ierr)
+      call MPI_BARRIER(CALYPSO_COMM, ierr_MPI)
 !
       end subroutine  calypso_MPI_barrier
 !
