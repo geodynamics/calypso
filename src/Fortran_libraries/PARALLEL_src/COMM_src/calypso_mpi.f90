@@ -38,6 +38,8 @@
 !>     character size for MPI
       integer :: CALYPSO_CHARACTER
 !
+!>      process ID (start from 0)
+      integer(kind=kint) :: my_rank
 !>      total number of processes
       integer(kind=kint) :: nprocs
 !
