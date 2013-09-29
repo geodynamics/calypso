@@ -38,6 +38,8 @@
       real (kind=kreal), allocatable :: start_times(:)
       character (len=kchara), allocatable :: elapse_labels(:)
 !
+      real(kind=kreal) :: START_SRtime, END_SRtime, SendRecvtime
+!
       private :: start_times!, elapsed
       private :: elapsed_total, elapsed_min, elapsed_max
 !
@@ -102,9 +104,8 @@
       integer(kind = kint), intent(in) :: iflag_elps
 !
 !
-      end_time = MPI_WTIME()
-      elapsed(iflag_elps) = elapsed(iflag_elps)                         &
-     &                           + end_time - start_times(iflag_elps)
+      elapsed(iflag_elps) = MPI_WTIME() - start_times(iflag_elps)       &
+     &                     + elapsed(iflag_elps)
 !
       end subroutine end_eleps_time
 !
@@ -117,7 +118,7 @@
       integer(kind = kint), intent(in) :: iflag_elps
 !
 !
-      elapsed(iflag_elps) = COMMtime
+      elapsed(iflag_elps) = SendRecvtime
 !
       end subroutine copy_COMM_TIME_to_eleps
 !

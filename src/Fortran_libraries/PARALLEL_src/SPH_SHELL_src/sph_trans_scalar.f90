@@ -55,6 +55,8 @@
 !
       subroutine sph_b_trans_scalar(nb)
 !
+      use m_work_time
+!
       integer(kind = kint), intent(in) :: nb
 !
       integer(kind = kint) :: Nstacksmp(0:np_smp)
@@ -67,12 +69,11 @@
       vr_rtp(1:nb*nnod_rtp) = 0.0d0
 !
 !      call check_sp_rj(my_rank, nb)
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call start_eleps_time(18)
       call send_recv_rj_2_rlm_N(nb, sp_rj(1), sp_rlm(1))
       call end_eleps_time(18)
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
 !      call check_sp_rlm(my_rank, nb)
       call start_eleps_time(22)
@@ -86,12 +87,11 @@
       call end_eleps_time(22)
 !
 !      call check_vr_rtm(my_rank, nb)
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call start_eleps_time(19)
       call send_recv_rtm_2_rtp_N(nb, vr_rtm(1), vr_rtp(1))
       call end_eleps_time(19)
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
 !      call check_vr_rtp(my_rank, nb)
       call start_eleps_time(24)
@@ -104,6 +104,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine sph_f_trans_scalar(nb)
+!
+      use m_work_time
 !
       integer(kind = kint), intent(in) :: nb
 !
@@ -125,12 +127,11 @@
       call end_eleps_time(24)
 !      call check_vr_rtp(my_rank, nb)
 !
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call start_eleps_time(20)
       call send_recv_rtp_2_rtm_N(nb, vr_rtp(1), vr_rtm(1))
       call end_eleps_time(20)
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !      call check_vr_rtm(my_rank, nb)
 !
       call start_eleps_time(23)
@@ -144,12 +145,11 @@
       call end_eleps_time(23)
 !      call check_sp_rlm(my_rank, nb)
 !
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call start_eleps_time(21)
       call send_recv_rlm_2_rj_N(nb, sp_rlm(1), sp_rj(1))
       call end_eleps_time(21)
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !      call check_sp_rj(my_rank, nb)
 !
       end subroutine sph_f_trans_scalar

@@ -64,7 +64,7 @@
 !
       subroutine sph_b_trans_vector(nb)
 !
-!      use m_work_time
+      use m_work_time
 !
       integer(kind = kint), intent(in) :: nb
 !
@@ -79,12 +79,11 @@
 !
 !      call check_sp_rj(my_rank, nb3)
 !
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call start_eleps_time(18)
       call send_recv_rj_2_rlm_N(nb3, sp_rj, sp_rlm)
       call end_eleps_time(18)
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
 !      call check_sp_rlm(my_rank, nb3)
 !
@@ -104,12 +103,11 @@
 !
 !      call check_vr_rtm(my_rank, nb3)
 !
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call start_eleps_time(19)
       call send_recv_rtm_2_rtp_N(nb3, vr_rtm, vr_rtp)
       call end_eleps_time(19)
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
 !      call check_vr_rtp(my_rank, nb3 )
 !
@@ -126,6 +124,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine sph_f_trans_vector(nb)
+!
+      use m_work_time
 !
       integer(kind = kint), intent(in) :: nb
 !
@@ -146,12 +146,11 @@
       call end_eleps_time(24)
 !      call check_vr_rtp(my_rank, nb3 )
 !
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call start_eleps_time(20)
       call send_recv_rtp_2_rtm_N(nb3, vr_rtp, vr_rtm)
       call end_eleps_time(20)
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !      call check_vr_rtm(my_rank, nb3)
 !
       call start_eleps_time(23)
@@ -168,12 +167,11 @@
       call end_eleps_time(23)
 !      call check_sp_rlm(my_rank, nb3)
 !
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call start_eleps_time(21)
       call send_recv_rlm_2_rj_N(nb3, sp_rlm, sp_rj)
       call end_eleps_time(21)
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !      call check_sp_rj(my_rank, nb3)
 !
       end subroutine sph_f_trans_vector

@@ -45,8 +45,6 @@
 !>      error flag for MPI
       integer(kind=kint) :: ierr_MPI
 !
-      real(kind=kreal) :: START_TIME, END_TIME, COMMtime
-! 
 ! ----------------------------------------------------------------------
 !
       contains

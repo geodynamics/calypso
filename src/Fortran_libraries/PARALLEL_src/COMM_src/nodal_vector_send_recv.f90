@@ -44,6 +44,7 @@
       subroutine nod_scalar_send_recv(scl_nod)
 !
       use m_array_for_send_recv
+      use m_work_time
       use solver_SR
 !
       real(kind = kreal), intent(inout) :: scl_nod(numnod)
@@ -57,12 +58,11 @@
        end do
 !$omp end parallel do
 !
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call SOLVER_SEND_RECV(numnod, num_neib, id_neib,                  &
      &                      istack_import, item_import,                 &
      &                      istack_export, item_export, x_vec(1) )
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
 !$omp parallel do
       do inod=1, numnod
@@ -77,6 +77,7 @@
       subroutine nod_vector_send_recv(vec_nod)
 !
       use m_array_for_send_recv
+      use m_work_time
       use solver_SR_3
 !
       real(kind = kreal), intent(inout) :: vec_nod(numnod,3)
@@ -91,13 +92,12 @@
       end do
 !$omp end parallel do
 !
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call SOLVER_SEND_RECV_3(numnod, num_neib, id_neib,                &
      &                        istack_import, item_import,               &
      &                        istack_export, item_export,               &
      &                        x_vec(1) )
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
 !$omp parallel do
       do inod=1, numnod
@@ -114,6 +114,7 @@
       subroutine nod_tensor_send_recv(tsr_nod)
 !
       use m_array_for_send_recv
+      use m_work_time
       use solver_SR_6
 !
       real(kind = kreal), intent(inout) :: tsr_nod(numnod,6)
@@ -131,12 +132,11 @@
       end do
 !$omp end parallel do
 !
-      START_TIME= MPI_WTIME()
+      START_SRtime= MPI_WTIME()
       call SOLVER_SEND_RECV_6(numnod, num_neib, id_neib,                &
      &                        istack_import, item_import,               &
      &                        istack_export, item_export, x_vec(1) )
-      END_TIME= MPI_WTIME()
-      COMMtime = COMMtime + END_TIME - START_TIME
+      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
 !$omp parallel do
       do inod=1, numnod
