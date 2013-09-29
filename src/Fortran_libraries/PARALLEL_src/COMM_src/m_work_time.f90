@@ -85,7 +85,6 @@
       subroutine start_eleps_time(iflag_elps)
 !
       use calypso_mpi
-      use m_parallel_var_dof
 !
       integer(kind = kint), intent(in) :: iflag_elps
 !
@@ -99,7 +98,6 @@
       subroutine end_eleps_time(iflag_elps)
 !
       use calypso_mpi
-      use m_parallel_var_dof
 !
       integer(kind = kint), intent(in) :: iflag_elps
 !
@@ -114,7 +112,7 @@
 !
       subroutine copy_COMM_TIME_to_eleps(iflag_elps)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
 !
       integer(kind = kint), intent(in) :: iflag_elps
 !
@@ -129,7 +127,6 @@
       subroutine output_elapsed_times
 !
       use calypso_mpi
-      use m_parallel_var_dof
 !
       integer(kind = kint) :: i
 !

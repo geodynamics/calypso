@@ -77,7 +77,6 @@
       subroutine pickup_sph_spec_4_monitor
 !
       use calypso_mpi
-      use m_parallel_var_dof
 !
       integer(kind = kint) :: inum, knum, j, k, nd,icou, i_fld
       integer(kind = kint) :: inod, ipick, num, ist_comp, ncomp

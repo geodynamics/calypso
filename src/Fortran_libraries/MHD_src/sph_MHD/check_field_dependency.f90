@@ -34,7 +34,6 @@
      &          target_name, phys_nod_name, phys_check_name)
 !
       use calypso_mpi
-      use m_parallel_var_dof
 !
       integer(kind=kint) :: num_nod_phys, num_check
       character(len=kchara) :: target_name

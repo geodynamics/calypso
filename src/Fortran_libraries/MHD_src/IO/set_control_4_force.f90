@@ -26,7 +26,6 @@
       subroutine s_set_control_4_force
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_machine_parameter
       use m_control_parameter
       use m_ctl_data_mhd_forces

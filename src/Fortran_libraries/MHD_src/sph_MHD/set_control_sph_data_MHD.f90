@@ -28,7 +28,6 @@
       subroutine s_set_control_sph_data_MHD
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_machine_parameter
       use m_node_phys_data
       use m_ctl_data_4_platforms

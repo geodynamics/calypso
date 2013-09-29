@@ -85,7 +85,6 @@
       subroutine pickup_sph_rms_4_monitor
 !
       use calypso_mpi
-      use m_parallel_var_dof
 !
       integer(kind = kint) :: inum, knum, j, k, nd
       integer(kind = kint) :: inod, ipick, num
@@ -127,7 +126,6 @@
       subroutine pickup_sph_rms_vol_monitor
 !
       use calypso_mpi
-      use m_parallel_var_dof
 !
       integer(kind = kint) :: inum, j, nd, num
 !

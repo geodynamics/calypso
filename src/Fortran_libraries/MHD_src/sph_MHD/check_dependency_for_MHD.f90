@@ -29,7 +29,6 @@
       subroutine check_dependencies(num_nod_phys, phys_nod_name)
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_control_parameter
       use m_phys_labels
 !

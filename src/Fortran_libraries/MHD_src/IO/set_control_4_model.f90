@@ -33,7 +33,6 @@
       subroutine s_set_control_4_model
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_t_step_parameter
       use m_phys_labels
       use m_physical_property

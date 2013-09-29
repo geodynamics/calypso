@@ -47,7 +47,6 @@
       subroutine init_sph_send_recv_2(X_rtp, X_rtm, X_rlm, X_rj)
 !
       use calypso_mpi
-      use m_parallel_var_dof
 !
       use m_spheric_parameter
       use m_sph_trans_comm_table

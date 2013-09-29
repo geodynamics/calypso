@@ -26,7 +26,6 @@
       subroutine s_cal_max_indices
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_cal_max_indices
       use m_geometry_parameter
       use m_geometry_data

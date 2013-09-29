@@ -72,7 +72,6 @@
       use m_constants
       use m_machine_parameter
       use m_spheric_parameter
-      use m_parallel_var_dof
       use m_phys_constants
 !
       use m_work_pole_sph_trans

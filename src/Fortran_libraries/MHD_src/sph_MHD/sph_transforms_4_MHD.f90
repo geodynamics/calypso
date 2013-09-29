@@ -158,7 +158,6 @@
       subroutine select_legendre_transform
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_machine_parameter
       use m_work_4_sph_trans
 !

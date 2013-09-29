@@ -54,7 +54,6 @@
      &          r_low_t, r_high_t)
 !
       use calypso_mpi
-      use m_parallel_var_dof
 !
       integer (kind = kint), intent(in) :: num_dimless
       character(len=kchara), intent(in) :: name_dimless(num_dimless)

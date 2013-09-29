@@ -17,7 +17,8 @@
 !
       use m_precision
       use m_constants
-      use m_parallel_var_dof
+!
+      use calypso_mpi
 !
       implicit none
 !
@@ -142,8 +143,6 @@
 ! -----------------------------------------------------------------------
 !
       subroutine count_merged_ucd(nnod, internal_node, nele)
-!
-      use calypso_mpi
 !
       integer(kind = kint), intent(in) :: nnod, internal_node, nele
 !

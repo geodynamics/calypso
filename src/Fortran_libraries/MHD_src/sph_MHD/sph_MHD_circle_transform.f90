@@ -116,7 +116,6 @@
       subroutine collect_spectr_for_circle
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_sph_spectr_data
       use m_sph_phys_address
 !

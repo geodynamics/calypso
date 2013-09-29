@@ -13,15 +13,12 @@
       module   m_parallel_var_dof
 !
       use calypso_mpi
-      use m_precision
 !
       implicit  none
 !
-      real(kind=kreal) :: START_TIME, END_TIME, COMMtime
-! 
 ! ----------------------------------------------------------------------
 !
-      contains
+!      contains
 !
 ! ----------------------------------------------------------------------
 !

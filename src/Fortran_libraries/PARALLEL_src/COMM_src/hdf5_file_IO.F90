@@ -26,7 +26,6 @@
       use calypso_mpi
       use m_constants
       use m_ucd_data
-      use m_parallel_var_dof
       use m_phys_constants
       use m_merged_ucd_data
       use set_ucd_data

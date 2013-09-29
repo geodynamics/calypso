@@ -14,7 +14,7 @@
 !
       use m_precision
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_work_time
       use m_machine_parameter
       use m_spheric_parameter
@@ -93,8 +93,6 @@
 ! -----------------------------------------------------------------------
 !
       subroutine test_fourier_trans_vector(ncomp, Nstacksmp, etime_fft)
-!
-      use calypso_mpi
 !
       integer(kind = kint), intent(in) :: ncomp
       integer(kind = kint), intent(in) :: Nstacksmp(0:np_smp)

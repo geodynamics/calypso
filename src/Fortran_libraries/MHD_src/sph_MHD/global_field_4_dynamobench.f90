@@ -88,7 +88,6 @@
       subroutine pick_inner_core_rotation
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_spheric_parameter
       use m_sph_spectr_data
       use m_sph_phys_address
@@ -117,7 +116,6 @@
       subroutine pick_mag_torque_inner_core
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_spheric_parameter
       use m_sph_spectr_data
       use m_sph_phys_address

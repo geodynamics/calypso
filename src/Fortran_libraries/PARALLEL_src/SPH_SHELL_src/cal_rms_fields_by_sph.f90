@@ -112,7 +112,6 @@
       subroutine cal_rms_sph_spec_local
 !
       use calypso_mpi
-      use m_parallel_var_dof
       use m_spheric_parameter
       use m_phys_constants
       use m_sph_spectr_data
@@ -163,7 +162,7 @@
 !
       subroutine r_int_sph_rms_data(kg_st, kg_ed)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
       use m_phys_constants
       use m_sph_spectr_data
@@ -207,7 +206,7 @@
 !
       subroutine cal_average_for_sph_rms(kg_st, kg_ed)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
       use m_phys_constants
       use m_sph_spectr_data

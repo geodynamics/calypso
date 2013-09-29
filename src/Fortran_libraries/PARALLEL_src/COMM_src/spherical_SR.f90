@@ -61,7 +61,6 @@
      &                         X_org, X_new)
 !
       use calypso_mpi
-!
       use m_solver_SR
 !
       integer(kind = kint), intent(in) :: nnod_org

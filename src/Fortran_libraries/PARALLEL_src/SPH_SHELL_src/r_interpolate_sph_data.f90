@@ -21,7 +21,7 @@
       use m_precision
 !
       use m_constants
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
 !
       implicit  none
@@ -253,7 +253,6 @@
 !
       subroutine copy_original_sph_rj_from_IO
 !
-      use calypso_mpi
       use m_node_id_spherical_IO
       use m_comm_data_IO
       use m_group_data_sph_specr_IO
