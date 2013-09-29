@@ -25,15 +25,4 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine parallel_cal_init
-!
-      use m_machine_parameter
-!
-!
-      call calypso_MPI_init
-!
-      end subroutine parallel_cal_init
-!
-!  ---------------------------------------------------------------------
-!
       end module   m_parallel_var_dof
