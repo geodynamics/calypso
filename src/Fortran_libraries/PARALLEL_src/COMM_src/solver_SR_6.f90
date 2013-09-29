@@ -89,7 +89,7 @@
            WS(6*k-1)= X(ii-1)
            WS(6*k  )= X(ii  )
         enddo
-        call MPI_ISEND(WS(6*istart+1), 6*inum,MPI_DOUBLE_PRECISION,     &
+        call MPI_ISEND(WS(6*istart+1), 6*inum,CALYPSO_REAL,             &
      &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib), ierr)
       enddo
 
@@ -98,7 +98,7 @@
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1)
         inum  = STACK_IMPORT(neib  ) - istart
-        call MPI_IRECV(WR(6*istart+1), 6*inum, MPI_DOUBLE_PRECISION,    &
+        call MPI_IRECV(WR(6*istart+1), 6*inum, CALYPSO_REAL,            &
      &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib), ierr)
       enddo
 

@@ -105,7 +105,7 @@
       do neib = 1, ncomm_send
         ist= istack_send(neib-1) + 1
         inum  = istack_send(neib  ) - istack_send(neib-1)
-        call MPI_ISEND(iWS(ist), inum, MPI_INTEGER,                     &
+        call MPI_ISEND(iWS(ist), inum, CALYPSO_INTEGER,                 &
      &      id_pe_send(neib), 0, CALYPSO_COMM, req1(neib), ierr)
       end do
 !C
@@ -114,7 +114,7 @@
         do neib= 1, ncomm_recv
           ist= istack_recv(neib-1) + 1
           inum  = istack_recv(neib  ) - istack_recv(neib-1)
-          call MPI_IRECV(iWR(ist), inum, MPI_INTEGER,                   &
+          call MPI_IRECV(iWR(ist), inum, CALYPSO_INTEGER,               &
      &        id_pe_recv(neib), 0, CALYPSO_COMM, req2(neib), ierr)
         end do
 !

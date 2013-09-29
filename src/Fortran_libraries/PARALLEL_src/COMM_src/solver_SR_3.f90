@@ -99,7 +99,7 @@
         enddo
         istart= 3 * STACK_EXPORT(neib-1) + 1
         inum  = 3 * ( STACK_EXPORT(neib  ) - STACK_EXPORT(neib-1) )
-        call MPI_ISEND(WS(istart), inum, MPI_DOUBLE_PRECISION,          &
+        call MPI_ISEND(WS(istart), inum, CALYPSO_REAL,                  &
      &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib), ierr)
       enddo
 
@@ -108,7 +108,7 @@
       do neib= 1, NEIBPETOT
         istart= 3 * STACK_IMPORT(neib-1) + 1
         inum  = 3 * ( STACK_IMPORT(neib  ) - STACK_IMPORT(neib-1) )
-        call MPI_IRECV(WR(istart), inum, MPI_DOUBLE_PRECISION,          &
+        call MPI_IRECV(WR(istart), inum, CALYPSO_REAL,                  &
      &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib), ierr)
       enddo
 
@@ -178,7 +178,7 @@
         enddo
         istart= 9 * STACK_EXPORT(neib-1) + 1
         inum  = 9 * (STACK_EXPORT(neib  ) - STACK_EXPORT(neib-1))
-        call MPI_ISEND(WS(istart), inum, MPI_DOUBLE_PRECISION,          &
+        call MPI_ISEND(WS(istart), inum, CALYPSO_REAL,                  &
      &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib), ierr)
       enddo
 
@@ -187,7 +187,7 @@
       do neib= 1, NEIBPETOT
         istart= 9 * STACK_IMPORT(neib-1) + 1
         inum  = 9 * ( STACK_IMPORT(neib  ) - STACK_IMPORT(neib-1) )
-        call MPI_IRECV(WR(istart), inum, MPI_DOUBLE_PRECISION,          &
+        call MPI_IRECV(WR(istart), inum, CALYPSO_REAL,                  &
      &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib), ierr)
       enddo
 

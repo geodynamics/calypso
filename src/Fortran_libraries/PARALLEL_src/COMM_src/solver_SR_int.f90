@@ -83,7 +83,7 @@
         do k= istart+1, istart+inum
            iWS(k)= iX(NOD_EXPORT(k))
         enddo
-        call MPI_ISEND (iWS(istart+1), inum, MPI_INTEGER,               &
+        call MPI_ISEND (iWS(istart+1), inum, CALYPSO_INTEGER,           &
      &                  NEIBPE(neib), 0, CALYPSO_COMM,                  &
      &                  req1(neib), ierr)
       enddo
@@ -94,7 +94,7 @@
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1)
         inum  = STACK_IMPORT(neib  ) - istart
-        call MPI_IRECV (iWR(istart+1), inum, MPI_INTEGER,               &
+        call MPI_IRECV (iWR(istart+1), inum, CALYPSO_INTEGER,           &
      &                  NEIBPE(neib), 0, CALYPSO_COMM,                  &
      &                  req2(neib), ierr)
       enddo
