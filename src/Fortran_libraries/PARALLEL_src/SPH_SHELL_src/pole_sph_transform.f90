@@ -11,7 +11,7 @@
 !
       use m_precision
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_phys_constants
       use m_spheric_constants
       use m_spheric_parameter
@@ -41,6 +41,7 @@
 !
       subroutine pole_b_trans_scalar(nb)
 !
+      use spherical_SRs_N
       use schmidt_b_trans_at_pole
       use schmidt_b_trans_at_center
       use sum_b_trans_at_pole
@@ -51,7 +52,10 @@
       if     (iflag_shell_mode.eq.iflag_no_FEMMESH                      &
         .or.  iflag_shell_mode.eq.iflag_MESH_same) return
 !
-      if (iflag_debug.gt.0)  write(*,*) 'sph_b_trans_scalar', nb
+      if (iflag_debug.gt.0)  write(*,*) 'send_recv_rj_2_rlm_N', nb
+      call send_recv_rj_2_rlm_N(nb, sp_rj, sp_rlm)
+!
+      if (iflag_debug.gt.0)  write(*,*) 'sum_b_trans_pole_scalar', nb
       call schmidt_b_trans_pole_scalar(nb)
       call sum_b_trans_pole_scalar(nb)
 !
@@ -66,17 +70,23 @@
 !
       subroutine pole_b_trans_vector(nb)
 !
+      use spherical_SRs_N
       use schmidt_b_trans_at_pole
       use schmidt_b_trans_at_center
       use sum_b_trans_at_pole
 !
       integer(kind = kint), intent(in) :: nb
+      integer(kind = kint) :: nb3
 !
 !
       if     (iflag_shell_mode.eq.iflag_no_FEMMESH                      &
         .or.  iflag_shell_mode.eq.iflag_MESH_same) return
 !
-      if (iflag_debug.gt.0)  write(*,*) 'sph_b_trans_vector', nb
+      nb3 = 3*nb
+      if (iflag_debug.gt.0)  write(*,*) 'send_recv_rj_2_rlm_N', nb3
+      call send_recv_rj_2_rlm_N(nb3, sp_rj, sp_rlm)
+!
+      if (iflag_debug.gt.0)  write(*,*) 'sum_b_trans_pole_vect', nb
       call schmidt_b_trans_pole_vect(nb)
       call sum_b_trans_pole_vect(nb)
 !
@@ -91,6 +101,7 @@
 !
       subroutine pole_b_trans_tensor(nb)
 !
+      use spherical_SRs_N
       use schmidt_b_trans_at_pole
       use schmidt_b_trans_at_center
       use sum_b_trans_at_pole
@@ -103,6 +114,8 @@
         .or.  iflag_shell_mode.eq.iflag_MESH_same) return
 !
       num = n_sym_tensor * nb
+!
+      call send_recv_rj_2_rlm_N(num, sp_rj, sp_rlm)
 !
       if (iflag_debug.gt.0) write(*,*) 'sph_b_trans_tensor', nb
       call schmidt_b_trans_pole_scalar(num)
@@ -118,4 +131,3 @@
 ! -----------------------------------------------------------------------
 !
       end module pole_sph_transform
-
