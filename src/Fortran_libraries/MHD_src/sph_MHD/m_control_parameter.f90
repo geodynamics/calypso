@@ -138,8 +138,15 @@
 !
 !>      ID for using SUPG by mangeitc field
       integer (kind=kint), parameter :: id_magnetic_SUPG =  2
-!>      SUPG flag
-       integer (kind=kint) :: iflag_4_supg = id_turn_OFF
+!
+!>      SUPG flag for velocity
+      integer (kind=kint) :: iflag_velo_supg = id_turn_OFF
+!>      SUPG flag for temperature
+      integer (kind=kint) :: iflag_temp_supg = id_turn_OFF
+!>      SUPG flag for magnetic field
+      integer (kind=kint) :: iflag_mag_supg = id_turn_OFF
+!>      SUPG flag for light element
+      integer (kind=kint) :: iflag_comp_supg = id_turn_OFF
 !
 !
 !>      Maximum CG iteration count for Poisson equation

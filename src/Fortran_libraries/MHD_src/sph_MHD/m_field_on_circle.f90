@@ -87,7 +87,7 @@
 !
       subroutine allocate_circle_field
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
       use m_sph_spectr_data
       use m_circle_transform
@@ -123,7 +123,7 @@
 !
       subroutine deallocate_circle_field
 !
-      use m_parallel_var_dof
+      use calypso_mpi
 !
 !
       deallocate(vrtm_mag, vrtm_phase)
@@ -140,7 +140,7 @@
 !
       subroutine write_field_data_on_circle(i_step, time)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_circle_transform
 !
       integer(kind = kint), intent(in) :: i_step
@@ -216,7 +216,7 @@
 !
       subroutine open_field_data_on_circle
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_phys_constants
       use m_circle_transform
       use sel_comp_labels_by_coord
@@ -362,7 +362,7 @@
 !
       subroutine close_field_data_on_circle
 !
-      use m_parallel_var_dof
+      use calypso_mpi
 !
 !
       if(my_rank .gt. 0) return

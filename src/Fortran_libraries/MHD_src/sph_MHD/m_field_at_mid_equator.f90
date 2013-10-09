@@ -55,7 +55,7 @@
 !
       subroutine mid_eq_transfer_dynamobench
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_sph_phys_address
 !
       use m_field_on_circle
@@ -119,7 +119,7 @@
 !
       subroutine cal_field_4_dynamobench
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
       use m_sph_spectr_data
       use m_sph_phys_address

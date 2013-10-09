@@ -16,7 +16,7 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_radial_matrices_sph
 !
       implicit none

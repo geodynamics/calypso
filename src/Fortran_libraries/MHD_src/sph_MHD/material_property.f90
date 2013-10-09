@@ -27,7 +27,7 @@
 !
       subroutine set_material_property
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
       use m_normalize_parameter
       use m_geometry_parameter

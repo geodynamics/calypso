@@ -51,19 +51,19 @@
 !
 !   Load parameter file
 !
-      call start_eleps_time(1)
-      call start_eleps_time(4)
-      if (iflag_debug.eq.1) write(*,*) 'read_control_4_MHD_noviz'
+!      call start_eleps_time(1)
+!      call start_eleps_time(4)
+!      if (iflag_debug.eq.1) write(*,*) 'read_control_4_MHD_noviz'
       call read_control_4_MHD_noviz
-      if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
+!      if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
       call set_control_4_sph_mhd
       call set_control_4_SPH_to_FEM
 !
 !    IO elapsed end
 !    precondition elaps start
 !
-      call end_eleps_time(4)
-      call start_eleps_time(2)
+!      call end_eleps_time(4)
+!      call start_eleps_time(2)
 !
 !        Initialize FEM mesh data for field data IO
 !
@@ -78,7 +78,7 @@
       call SPH_to_FEM_init_MHD
       call calypso_MPI_barrier
 !
-      call end_eleps_time(2)
+!      call end_eleps_time(2)
 !
       end subroutine initialize_sph_MHD
 !
@@ -92,7 +92,7 @@
 !
 !     ---------------------
 !
-      call start_eleps_time(3)
+!      call start_eleps_time(3)
 !
 !*  -----------  set initial step data --------------
 !*
@@ -114,13 +114,13 @@
 !*
 !*  -----------  output field data --------------
 !*
-        call start_eleps_time(4)
-        if (iflag_debug.eq.1) write(*,*) 'SPH_to_FEM_bridge_MHD'
+!        call start_eleps_time(4)
+!        if (iflag_debug.eq.1) write(*,*) 'SPH_to_FEM_bridge_MHD'
         call SPH_to_FEM_bridge_MHD
-        if (iflag_debug.eq.1) write(*,*) 'FEM_analyze'
+!        if (iflag_debug.eq.1) write(*,*) 'FEM_analyze'
         call FEM_analyze(i_step_MHD, istep_psf, istep_iso,              &
      &      istep_pvr, istep_fline, visval)
-        call end_eleps_time(4)
+!        call end_eleps_time(4)
 !
 !*  -----------  exit loop --------------
 !*
@@ -137,13 +137,13 @@
 !      if (iflag_debug.eq.1) write(*,*) 'SPH_finalize_MHD'
 !      call SPH_finalize_MHD
 !
-      call copy_COMM_TIME_to_eleps(num_elapsed)
-      call end_eleps_time(1)
+!      call copy_COMM_TIME_to_eleps(num_elapsed)
+!      call end_eleps_time(1)
 !
-      call output_elapsed_times
+!      call output_elapsed_times
 !
       call calypso_MPI_barrier
-      if (iflag_debug.eq.1) write(*,*) 'exit evolution'
+!      if (iflag_debug.eq.1) write(*,*) 'exit evolution'
 !
       end subroutine evolution_sph_MHD
 !

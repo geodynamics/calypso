@@ -116,7 +116,7 @@
 !
       subroutine alloc_comm_work_sph_coriolis(nri)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
 !
       integer(kind = kint), intent(in) :: nri
 !

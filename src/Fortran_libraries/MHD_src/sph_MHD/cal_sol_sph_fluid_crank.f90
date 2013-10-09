@@ -31,7 +31,7 @@
 !
       use m_precision
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_machine_parameter
       use m_control_params_sph_MHD
       use m_spheric_parameter

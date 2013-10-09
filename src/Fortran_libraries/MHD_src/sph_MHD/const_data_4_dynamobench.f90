@@ -28,7 +28,7 @@
       subroutine s_const_data_4_dynamobench
 !
       use m_control_params_sph_MHD
-      use m_parallel_var_dof
+      use calypso_mpi
       use cal_rms_fields_by_sph
       use global_field_4_dynamobench
       use m_field_at_mid_equator

@@ -27,7 +27,7 @@
       subroutine s_set_control_4_velo
 !
       use m_machine_parameter
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
       use m_ctl_data_node_boundary
       use m_ctl_data_surf_boundary

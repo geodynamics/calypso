@@ -32,7 +32,7 @@
 !
       subroutine cal_rot_of_forces_sph_2
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_sph_spectr_data
       use const_sph_radial_grad
       use const_sph_rotation
@@ -85,7 +85,7 @@
 !
       subroutine cal_rot_of_induction_sph
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use const_sph_radial_grad
       use const_sph_rotation
       use m_sph_spectr_data
@@ -102,7 +102,7 @@
 !
       subroutine cal_div_of_fluxes_sph
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use const_sph_divergence
       use m_sph_spectr_data
 !

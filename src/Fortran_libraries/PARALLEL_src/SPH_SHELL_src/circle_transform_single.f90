@@ -43,7 +43,7 @@
 !
       subroutine initialize_circle_transform(ltr, s_circ, z_circ)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_schmidt_polynomial
       use m_circle_transform
 !

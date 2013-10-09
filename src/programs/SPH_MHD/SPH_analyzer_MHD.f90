@@ -21,7 +21,7 @@
       subroutine SPH_initialize_MHD
 !
       use m_constants
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_machine_parameter
       use m_control_parameter
 !
@@ -55,10 +55,10 @@
 !
 !   Load spherical harmonics data
 !
-      if (iflag_debug.eq.1) write(*,*) 'input_sph_trans_grids'
-      call start_eleps_time(4)
+!      if (iflag_debug.eq.1) write(*,*) 'input_sph_trans_grids'
+!      call start_eleps_time(4)
       call input_sph_trans_grids(my_rank)
-      call end_eleps_time(4)
+!      call end_eleps_time(4)
 !
 !   Allocate spectr field data
 !
@@ -75,24 +75,24 @@
 !
 ! ---------------------------------
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_radius_rot_reft_dat_4_sph'
+!      if (iflag_debug.gt.0) write(*,*) 'set_radius_rot_reft_dat_4_sph'
       call set_radius_rot_reft_dat_4_sph(depth_high_t, depth_low_t,     &
      &    high_temp, low_temp, angular)
 !
-      if (iflag_debug.gt.0) write(*,*) 'const_2nd_fdm_matrices'
+!      if (iflag_debug.gt.0) write(*,*) 'const_2nd_fdm_matrices'
       call const_2nd_fdm_matrices
 !
-      if (iflag_debug.gt.0) write(*,*) 's_cal_sph_bc_fdm_matrices'
+!      if (iflag_debug.gt.0) write(*,*) 's_cal_sph_bc_fdm_matrices'
       call s_cal_sph_bc_fdm_matrices
 !
-      if (iflag_debug.gt.0) write(*,*) 'const_2nd_fdm_coefs'
+!      if (iflag_debug.gt.0) write(*,*) 'const_2nd_fdm_coefs'
       call const_2nd_fdm_coefs
 !
 !*
 !* -----  set integrals for coriolis term -----------------
 !*
       if(iflag_4_coriolis .gt. id_turn_OFF) then
-        if ( iflag_debug.gt.0 ) write(*,*) 'init_sum_coriolis_sph'
+!        if ( iflag_debug.gt.0 ) write(*,*) 'init_sum_coriolis_sph'
         call init_sum_coriolis_sph
       end if
 !
@@ -104,48 +104,48 @@
 !
 ! ---------------------------------
 !
-      if (iflag_debug.gt.0) write(*,*) 'init_sph_transform_MHD'
+!      if (iflag_debug.gt.0) write(*,*) 'init_sph_transform_MHD'
       call init_sph_transform_MHD
 !
 ! ---------------------------------
 !
-      if(iflag_debug.gt.0) write(*,*)' set_material_property'
+!      if(iflag_debug.gt.0) write(*,*)' set_material_property'
       call set_material_property
 !
 !  -------------------------------
 !
-      if(iflag_debug.gt.0) write(*,*)' sph_initial_data_control'
+!      if(iflag_debug.gt.0) write(*,*)' sph_initial_data_control'
       call sph_initial_data_control
 !
-      if(iflag_debug.gt.0) write(*,*)' sync_temp_by_per_temp_sph'
-      call sync_temp_by_per_temp_sph
+!      if(iflag_debug.gt.0) write(*,*)' sync_temp_by_per_temp_sph'
+!      call sync_temp_by_per_temp_sph
 !
 !  -------------------------------
 !
-      if(iflag_debug.gt.0) write(*,*) 's_set_bc_sph_mhd'
+!      if(iflag_debug.gt.0) write(*,*) 's_set_bc_sph_mhd'
       call s_set_bc_sph_mhd
 !
 !  -------------------------------
 !
-      if(iflag_debug.gt.0) write(*,*)' s_const_radial_mat_4_sph'
+!      if(iflag_debug.gt.0) write(*,*)' s_const_radial_mat_4_sph'
       call s_const_radial_mat_4_sph
 !*
 !* obtain linear terms for starting
 !*
-       if(iflag_debug .gt. 0) write(*,*) 'set_sph_field_to_start'
+!       if(iflag_debug .gt. 0) write(*,*) 'set_sph_field_to_start'
        call set_sph_field_to_start
 !
 !* obtain nonlinear terms for starting
 !*
        if(iflag_debug .gt. 0) write(*,*) 'first nonlinear'
-       call start_eleps_time(12)
+!       call start_eleps_time(12)
        call nonlinear
-       call end_eleps_time(12)
+!       call end_eleps_time(12)
 !
 !* -----  Open Volume integration data files -----------------
 !*
        if(iflag_debug .gt. 0) write(*,*) 'open_sph_vol_rms_file_mhd'
-       call start_eleps_time(4)
+!       call start_eleps_time(4)
        call open_sph_vol_rms_file_mhd
        call end_eleps_time(4)
 !
@@ -186,26 +186,26 @@
 !*
 !*  ----------------lead nonlinear term ... ----------
 !*
-      call start_eleps_time(12)
+!      call start_eleps_time(12)
       call nonlinear
-      call end_eleps_time(12)
+!      call end_eleps_time(12)
 !
 !* ----  Update fields after time evolution ------------------------=
 !*
-      call start_eleps_time(4)
-      call start_eleps_time(7)
+!      call start_eleps_time(4)
+!      call start_eleps_time(7)
 !
-      if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
-      call trans_per_temp_to_temp_sph
+!      if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
+!      call trans_per_temp_to_temp_sph
 !*
-      if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
+!      if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
       call s_lead_fields_4_sph_mhd
-      call end_eleps_time(7)
+!      call end_eleps_time(7)
 !
 !*  -----------  output restart data --------------
 !*
 
-      call start_eleps_time(8)
+!      call start_eleps_time(8)
       if(iflag_debug.gt.0) write(*,*) 'output_sph_restart_control'
       call output_sph_restart_control
 !
@@ -215,23 +215,23 @@
         call output_sph_rst_by_elaps
         iflag_finish = 1
       end if
-      call end_eleps_time(8)
+!      call end_eleps_time(8)
 !
 !
 !*  -----------  lead energy data --------------
 !*
-      call start_eleps_time(10)
-      if(iflag_debug.gt.0)  write(*,*) 'output_rms_sph_mhd_control'
+!      call start_eleps_time(10)
+!      if(iflag_debug.gt.0)  write(*,*) 'output_rms_sph_mhd_control'
       call output_rms_sph_mhd_control
-      call end_eleps_time(10)
+!      call end_eleps_time(10)
 !
-      if(iflag_debug.gt.0) write(*,*) 'sync_temp_by_per_temp_sph'
+!      if(iflag_debug.gt.0) write(*,*) 'sync_temp_by_per_temp_sph'
       call sync_temp_by_per_temp_sph
 !
       if(i_step .ge. i_step_number .and. i_step_number.gt.0) then
         iflag_finish = 1
       end if
-      call end_eleps_time(4)
+!      call end_eleps_time(4)
 !
       end subroutine SPH_analyze_MHD
 !

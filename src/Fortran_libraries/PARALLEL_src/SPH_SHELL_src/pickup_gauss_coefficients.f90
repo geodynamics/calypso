@@ -7,8 +7,8 @@
 !> @brief choose Gauss coefficients to output
 !!
 !!@verbatim
-!      subroutine init_gauss_coefs_4_monitor
-!      subroutine cal_gauss_coefficients
+!!      subroutine init_gauss_coefs_4_monitor
+!!      subroutine cal_gauss_coefficients
 !!@endverbatim
 !
       module pickup_gauss_coefficients

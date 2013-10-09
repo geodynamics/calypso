@@ -24,7 +24,7 @@
       use m_precision
 !
       use m_machine_parameter
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
       use m_t_step_parameter
       use m_file_format_switch

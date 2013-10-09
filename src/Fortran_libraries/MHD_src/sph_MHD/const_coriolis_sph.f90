@@ -123,7 +123,7 @@
 !
       subroutine set_tri_int_sph_coriolis
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
       use m_integrals_4_sph_coriolis
       use set_integral_sph_coriolis

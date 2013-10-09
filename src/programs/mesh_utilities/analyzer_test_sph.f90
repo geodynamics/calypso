@@ -26,7 +26,7 @@
 !
       subroutine init_analyzer
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_read_ctl_gen_sph_shell
       use set_control_platform_data
       use load_data_for_sph_IO
@@ -52,7 +52,7 @@
 !
       subroutine analyze
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use cmp_trans_sph_indices
       use set_parallel_file_name
 !

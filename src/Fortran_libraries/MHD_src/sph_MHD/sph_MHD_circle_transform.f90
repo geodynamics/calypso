@@ -33,7 +33,7 @@
       subroutine sph_transfer_on_circle
 !
       use m_phys_constants
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_sph_phys_address
       use m_circle_transform
 !

@@ -80,7 +80,7 @@
 !
       subroutine output_range_data
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_node_phys_data
       use m_cal_max_indices
       use m_t_step_parameter
@@ -112,7 +112,7 @@
 !
       subroutine skip_range_data
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_node_phys_data
       use m_t_step_parameter
 !

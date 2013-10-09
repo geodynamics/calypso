@@ -11,7 +11,7 @@
       module output_parallel_ucd_file
 !
       use m_precision
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_field_file_format
 !
       implicit none

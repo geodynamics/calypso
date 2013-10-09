@@ -59,7 +59,7 @@
 !
       subroutine sph_indices_transfer
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
       use spherical_SRs_int
 !

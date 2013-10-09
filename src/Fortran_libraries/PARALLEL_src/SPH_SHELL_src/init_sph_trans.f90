@@ -28,7 +28,7 @@
 !
       subroutine initialize_sph_trans
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_machine_parameter
       use m_spheric_parameter
       use m_spheric_param_smp
@@ -68,7 +68,7 @@
 !
       subroutine set_mdx_rlm_rtm
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
       use m_work_4_sph_trans
 !

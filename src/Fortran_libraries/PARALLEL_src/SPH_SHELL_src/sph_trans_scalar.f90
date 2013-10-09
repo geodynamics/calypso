@@ -30,7 +30,7 @@
 !
       use m_precision
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_work_time
       use m_phys_constants
       use m_machine_parameter
@@ -42,7 +42,7 @@
       use legendre_transform_krin
       use legendre_transform_spin
       use spherical_SRs_N
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_schmidt_poly_on_rtm
 !
       implicit none

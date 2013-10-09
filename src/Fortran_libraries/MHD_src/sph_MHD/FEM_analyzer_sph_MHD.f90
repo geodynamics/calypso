@@ -30,7 +30,7 @@
       use m_precision
       use m_constants
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_work_time
 !
       implicit none

@@ -24,7 +24,7 @@
 !
       subroutine s_output_ucd_file_control
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
       use m_t_step_parameter
       use m_ucd_data

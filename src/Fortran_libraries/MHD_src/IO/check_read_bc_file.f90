@@ -21,7 +21,7 @@
 !
       subroutine check_read_boundary_files
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
       use m_bc_data_list
       use m_surf_data_list

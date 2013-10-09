@@ -32,7 +32,7 @@
 !
       use m_control_params_sph_MHD
       use cal_explicit_terms
-      use m_parallel_var_dof
+      use calypso_mpi
       use cal_sph_field_by_rotation
       use cal_nonlinear_sph_MHD
 !

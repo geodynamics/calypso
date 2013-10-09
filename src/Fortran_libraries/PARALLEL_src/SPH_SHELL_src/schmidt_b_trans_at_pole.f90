@@ -110,7 +110,7 @@
 !
       subroutine schmidt_b_trans_pole_vect(nb)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
 !
       integer(kind = kint), intent(in) :: nb
 !
