@@ -43,10 +43,10 @@
 !
       if (iflag_t_evo_4_velo .eq. id_no_evolution) then
         num_bc_v = 0
-        num_bc_tq = 0
+        torque_surf%num_bc = 0
       else
         num_bc_v =  num_bc_v_ctl
-        num_bc_tq = num_bc_torque_ctl
+        torque_surf%num_bc = num_bc_torque_ctl
       end if
 !
 !  set boundary conditions for velocity
@@ -118,34 +118,35 @@
 !
 !
       if(iflag_debug .eq. iflag_full_msg)                               &
-     &            write(*,*) 'num_bc_tq', num_bc_tq
-      if(num_bc_tq .gt. 0) then
+     &            write(*,*) 'torque_surf%num_bc', torque_surf%num_bc
+      if(torque_surf%num_bc .gt. 0) then
 !
         call allocate_velo_surf_ctl
 !
-        bc_tq_name      =  bc_torque_name_ctl
-        bc_tq_magnitude =  bc_torque_magnitude_ctl
+        torque_surf%bc_name =      bc_torque_name_ctl
+        torque_surf%bc_magnitude = bc_torque_magnitude_ctl
 !
-        do i = 1, num_bc_tq
+        do i = 1, torque_surf%num_bc
           call set_surf_group_types_vector(bc_torque_type_ctl(i),       &
-     &       ibc_tq_type(i) )
+     &       torque_surf%ibc_type(i) )
           call set_stress_free_group_types(bc_torque_type_ctl(i),       &
-     &       ibc_tq_type(i) )
+     &       torque_surf%ibc_type(i) )
 !
           if      (bc_torque_type_ctl(i) .eq. 'free_slip_sph' ) then
-            ibc_tq_type(i) = iflag_free_sph
+            torque_surf%ibc_type(i) = iflag_free_sph
           else if (bc_torque_type_ctl(i) .eq. 'non_slip_sph' ) then
-            ibc_tq_type(i) = iflag_non_slip_sph
+            torque_surf%ibc_type(i) = iflag_non_slip_sph
           else if (bc_torque_type_ctl(i) .eq. 'rot_inner_core' ) then
-            ibc_tq_type(i) = iflag_rotatable_icore
+            torque_surf%ibc_type(i) = iflag_rotatable_icore
           end if
         end do
 !
         if (iflag_debug .eq. iflag_full_msg) then
-          write(*,*) 'i, ibc_tq_type, bc_tq_magnitude, bc_tq_name'
-          do i = 1, num_bc_tq
-            write(*,*)  i, ibc_tq_type(i), bc_tq_magnitude(i),          &
-     &                 trim(bc_tq_name(i))
+          write(*,*) 'i, torque_surf'
+          do i = 1, torque_surf%num_bc
+            write(*,*)  i, torque_surf%ibc_type(i),                     &
+     &                 torque_surf%bc_magnitude(i),                     &
+     &                 trim(torque_surf%bc_name(i))
           end do
         end if
       end if

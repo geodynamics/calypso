@@ -43,10 +43,10 @@
       if (iflag_t_evo_4_magne .eq. id_no_evolution                      &
      &       .and.  iflag_t_evo_4_vect_p .eq. id_no_evolution) then
         num_bc_b = 0
-        num_bc_bs = 0
+        magne_surf%num_bc = 0
       else
         num_bc_b = num_bc_b_ctl
-        num_bc_bs = num_bc_grad_b_ctl
+        magne_surf%num_bc = num_bc_grad_b_ctl
       end if
 !
 !   set boundary_conditons for magnetic field
@@ -103,32 +103,32 @@
 !
 !
       if (iflag_debug .ge. iflag_routine_msg)                           &
-     &           write(*,*) 'num_bc_bs ',num_bc_bs
-      if (num_bc_bs .gt. 0) then
+     &           write(*,*) 'magne_surf%num_bc ',magne_surf%num_bc
+      if (magne_surf%num_bc .gt. 0) then
 !
         call allocate_magne_surf_ctl
 !
-        bc_bs_name     =   bc_grad_b_name_ctl
-        bc_bs_magnitude =  bc_grad_b_magnitude_ctl
+        magne_surf%bc_name =       bc_grad_b_name_ctl
+        magne_surf%bc_magnitude =  bc_grad_b_magnitude_ctl
 !
-        do i = 1, num_bc_bs
+        do i = 1, magne_surf%num_bc
           call set_surf_group_types_vector(bc_grad_b_type_ctl(i),       &
-     &       ibc_bs_type(i))
+     &        magne_surf%ibc_type(i))
 !
           if (bc_grad_b_type_ctl(i) .eq. 'insulator' ) then
-            ibc_bs_type(i) = iflag_insulator
+            magne_surf%ibc_type(i) = iflag_insulator
           else if (bc_grad_b_type_ctl(i) .eq. 'sph_to_center' ) then
-            ibc_bs_type(i) = iflag_sph_2_center
+            magne_surf%ibc_type(i) = iflag_sph_2_center
           else if (bc_grad_b_type_ctl(i) .eq. 'pseudo_vacuum' ) then
-            ibc_bs_type(i) = iflag_pseudo_vacuum
+            magne_surf%ibc_type(i) = iflag_pseudo_vacuum
           end if
         end do
 !
         if (iflag_debug .ge. iflag_routine_msg) then
-          write(*,*) 'i, ibc_bs_type, bc_bs_magnitude, bc_bs_name'
-          do i = 1, num_bc_bs
-            write(*,*) i, ibc_bs_type(i), bc_bs_magnitude(i),           &
-     &                 trim(bc_bs_name(i))
+          write(*,*) 'i, magne_surf'
+          do i = 1, magne_surf%num_bc
+            write(*,*) i, magne_surf%ibc_type(i),                       &
+     &         magne_surf%bc_magnitude(i), trim(magne_surf%bc_name(i))
           end do
         end if
       end if

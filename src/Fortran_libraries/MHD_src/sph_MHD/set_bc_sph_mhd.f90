@@ -81,22 +81,22 @@
       call allocate_temp_bc_array( nidx_rj(2) )
 !
       if(iflag_debug .gt. 0) then
-        write(*,*) 'num_bc_h_flux', num_bc_h_flux
-        write(*,*) 'ibc_h_flux_type', ibc_h_flux_type
-        write(*,*) 'bc_h_flux_magnitude', bc_h_flux_magnitude
+        write(*,*) 'h_flux_surf%num_bc',       h_flux_surf%num_bc
+        write(*,*) 'h_flux_surf%ibc_type',     h_flux_surf%ibc_type
+        write(*,*) 'h_flux_surf%bc_magnitude', h_flux_surf%bc_magnitude
       end if
 !
-      do i = 1, num_bc_h_flux
-        if ( ibc_h_flux_type(i)  .eq. iflag_fixed_grad_s) then
+      do i = 1, h_flux_surf%num_bc
+        if ( h_flux_surf%ibc_type(i)  .eq. iflag_surf_fix_s) then
           call set_homogenious_grad_bc                                  &
      &       (ICB_nod_grp_name, ICB_sf_grp_name,                        &
-     &        bc_h_flux_name(i), bc_h_flux_magnitude(i),                &
+     &        h_flux_surf%bc_name(i), h_flux_surf%bc_magnitude(i),      &
      &        nidx_rj(2), h_flux_ICB_bc, iflag_icb_temp)
           call set_homogenious_grad_bc                                  &
      &       (CMB_nod_grp_name, CMB_sf_grp_name,                        &
-     &        bc_h_flux_name(i), bc_h_flux_magnitude(i),                &
+     &        h_flux_surf%bc_name(i), h_flux_surf%bc_magnitude(i),      &
      &        nidx_rj(2), h_flux_CMB_bc, iflag_cmb_temp)
-        else if (ibc_h_flux_type(i)  .eq. -iflag_fixed_grad_s) then
+        else if (h_flux_surf%ibc_type(i)  .eq. -iflag_surf_fix_s) then
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_temp, ICB_nod_grp_name, ICB_sf_grp_name,              &
      &        nidx_rj(2), h_flux_ICB_bc, iflag_icb_temp)
@@ -210,21 +210,21 @@
       end do
 !
 !
-      do i = 1, num_bc_bs
-        if(bc_bs_name(i) .eq. 'ICB') then
-          if(ibc_bs_type(i) .eq. iflag_pseudo_vacuum) then
+      do i = 1, magne_surf%num_bc
+        if(magne_surf%bc_name(i) .eq. 'ICB') then
+          if(magne_surf%ibc_type(i) .eq. iflag_pseudo_vacuum) then
             iflag_icb_magne =  iflag_radial_magne
           end if
         end if
 !
-        if(bc_bs_name(i) .eq. 'CMB') then
-          if(ibc_bs_type(i) .eq. iflag_pseudo_vacuum) then
+        if(magne_surf%bc_name(i) .eq. 'CMB') then
+          if(magne_surf%ibc_type(i) .eq. iflag_pseudo_vacuum) then
             iflag_cmb_magne =  iflag_radial_magne
           end if
         end if
 !
-        if(bc_bs_name(i) .eq. 'to_Center') then
-          if      (ibc_bs_type(i) .eq. iflag_sph_2_center) then
+        if(magne_surf%bc_name(i) .eq. 'to_Center') then
+          if(magne_surf%ibc_type(i) .eq. iflag_sph_2_center) then
             iflag_icb_magne =  iflag_sph_fill_center
           end if
         end if
@@ -250,17 +250,17 @@
 !
 !      Boundary setting using surface group data
 !
-      do i = 1, num_surf_composition
-        if (isurf_composit_type(i)  .eq. iflag_fixed_grad_s) then
+      do i = 1, light_surf%num_bc
+        if (light_surf%ibc_type(i)  .eq. iflag_surf_fix_s) then
           call set_homogenious_grad_bc                                  &
      &       (ICB_nod_grp_name, ICB_sf_grp_name,                        &
-     &        surf_composit_name(i), surf_composit_magnitude(i),        &
+     &        light_surf%bc_name(i), light_surf%bc_magnitude(i),        &
      &        nidx_rj(2), c_flux_ICB_bc, iflag_icb_composition)
           call set_homogenious_grad_bc                                  &
      &       (CMB_nod_grp_name, CMB_sf_grp_name,                        &
-     &        surf_composit_name(i), surf_composit_magnitude(i),        &
+     &        light_surf%bc_name(i), light_surf%bc_magnitude(i),        &
      &        nidx_rj(2), c_flux_CMB_bc, iflag_cmb_composition)
-        else if (isurf_composit_type(i)  .eq. -iflag_fixed_grad_s)      &
+        else if (light_surf%ibc_type(i)  .eq. -iflag_surf_fix_s)        &
      &         then
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_light, ICB_nod_grp_name, ICB_sf_grp_name,             &

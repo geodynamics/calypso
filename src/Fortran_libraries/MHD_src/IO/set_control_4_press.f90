@@ -43,10 +43,10 @@
 !
       if (iflag_t_evo_4_velo .eq. id_no_evolution) then
         num_bc_p = 0
-        num_bc_wall = 0
+        wall_surf%num_bc = 0
       else
         num_bc_p = num_bc_p_ctl
-        num_bc_wall = num_bc_grad_p_ctl
+        wall_surf%num_bc = num_bc_grad_p_ctl
       end if
 !
 !  set boundary conditions for pressure
@@ -83,19 +83,19 @@
 !
 !
 !
-      if (num_bc_wall .gt. 0) then
+      if (wall_surf%num_bc .gt. 0) then
 !
         call allocate_press_surf_ctl
 !
-        bc_wall_magnitude =  bc_grad_p_magnitude_ctl
-        bc_wall_name      =  bc_grad_p_name_ctl
+        wall_surf%bc_magnitude =  bc_grad_p_magnitude_ctl
+        wall_surf%bc_name =       bc_grad_p_name_ctl
 !
-        do i = 1, num_bc_wall
+        do i = 1, wall_surf%num_bc
           tmpchara = bc_grad_p_type_ctl(i)
           call set_surf_group_types_scalar(bc_grad_p_type_ctl(i),       &
-     &       ibc_wall_type(i) )
+     &        wall_surf%ibc_type(i) )
           call set_surf_wall_group_types(bc_grad_p_type_ctl(i),         &
-     &       ibc_wall_type(i) )
+     &        wall_surf%ibc_type(i) )
         end do
       end if
 !

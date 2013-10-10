@@ -50,11 +50,12 @@
         end if
       end do
 !
-      do i = 1, num_bc_tq
+      do i = 1, torque_surf%num_bc
         if(iflag_icb_velocity .ne. iflag_fixed_velo) exit
-        if    (bc_tq_name(i) .eq. 'ICB_surf'                            &
-     &    .or. bc_tq_name(i) .eq. 'ICB') then 
-          call set_sph_velo_ICB_flag(ibc_tq_type(i), bc_tq_magnitude(i))
+        if    (torque_surf%bc_name(i) .eq. 'ICB_surf'                   &
+     &    .or. torque_surf%bc_name(i) .eq. 'ICB') then
+          call set_sph_velo_ICB_flag(torque_surf%ibc_type(i),           &
+     &        torque_surf%bc_magnitude(i))
         end if
       end do
 !
@@ -67,11 +68,12 @@
         end if
       end do
 !
-      do i = 1, num_bc_tq
+      do i = 1, torque_surf%num_bc
         if(iflag_cmb_velocity .ne. iflag_fixed_velo) exit
-        if(     bc_tq_name(i) .eq. 'CMB_surf'                           &
-     &     .or. bc_tq_name(i) .eq. 'CMB') then 
-          call set_sph_velo_CMB_flag(ibc_tq_type(i), bc_tq_magnitude(i))
+        if(     torque_surf%bc_name(i) .eq. 'CMB_surf'                  &
+     &     .or. torque_surf%bc_name(i) .eq. 'CMB') then 
+          call set_sph_velo_CMB_flag(torque_surf%ibc_type(i),           &
+     &        torque_surf%bc_magnitude(i))
         end if
       end do
 !

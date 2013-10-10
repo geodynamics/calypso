@@ -33,9 +33,9 @@
 !
       if ( iflag_t_evo_4_temp .gt. id_no_evolution) then
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &    num_bc_e, ibc_e_type)
+     &      num_bc_e, ibc_e_type)
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &    num_bc_h_flux, ibc_h_flux_type)
+     &      h_flux_surf%num_bc, h_flux_surf%ibc_type)
       end if
 !
 ! ----  read boundary data for velocity
@@ -44,7 +44,7 @@
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
      &      num_bc_v, ibc_v_type)
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_tq, ibc_tq_type)
+     &      torque_surf%num_bc, torque_surf%ibc_type)
 !
 !  set boundary conditions for pressure
 !
@@ -67,7 +67,7 @@
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
      &      num_bc_b, ibc_b_type)
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_bs, ibc_bs_type)
+     &      magne_surf%num_bc, magne_surf%ibc_type)
 !
 ! ----  read boundary data for magnetic potential
 !
@@ -82,7 +82,7 @@
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
      &      num_bc_vp, ibc_vp_type)
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &     num_bc_vps, ibc_vps_type)
+     &      a_potential_surf%num_bc, a_potential_surf%ibc_type)
 !
 ! ----  read boundary data for magnetic potential
 !
@@ -98,7 +98,7 @@
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
      &      num_bc_j, ibc_j_type)
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_js, ibc_js_type)
+     &      current_surf%num_bc, current_surf%ibc_type)
       end if
 !
       end subroutine check_read_boundary_files

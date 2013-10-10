@@ -41,10 +41,10 @@
 !
       if (iflag_t_evo_4_temp .eq. id_no_evolution) then
         num_bc_e = 0
-        num_bc_h_flux = 0
+        h_flux_surf%num_bc = 0
       else
         num_bc_e =      num_bc_e_ctl
-        num_bc_h_flux = num_bc_h_flux_ctl
+        h_flux_surf%num_bc = num_bc_h_flux_ctl
       end if
 !
 !   set boundary conditions for temperature
@@ -81,16 +81,16 @@
 !
 !   set boundary conditions for heat flux
 !
-      if (num_bc_h_flux .gt. 0) then
+      if (h_flux_surf%num_bc .gt. 0) then
 !
         call allocate_temp_surf_ctl
 !
-        bc_h_flux_magnitude = bc_h_flux_magnitude_ctl
-        bc_h_flux_name     =  bc_h_flux_name_ctl
+        h_flux_surf%bc_magnitude = bc_h_flux_magnitude_ctl
+        h_flux_surf%bc_name =      bc_h_flux_name_ctl
 !
-        do i = 1, num_bc_h_flux
+        do i = 1, h_flux_surf%num_bc
           call set_surf_group_types_scalar(bc_h_flux_type_ctl(i),       &
-     &            ibc_h_flux_type(i))
+     &            h_flux_surf%ibc_type(i))
         end do
       end if
 !

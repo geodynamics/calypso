@@ -40,11 +40,11 @@
 !
 !
       if (iflag_t_evo_4_composit .eq. id_no_evolution) then
-        num_surf_composition = 0
+        light_surf%num_bc = 0
         num_bc_composit =   0
       else
         num_bc_composit = num_bc_composit_ctl
-        num_surf_composition = num_bc_grad_ds_ctl
+        light_surf%num_bc = num_bc_grad_ds_ctl
       end if
 !
 !   set boundary conditions for composition
@@ -83,27 +83,27 @@
 !   set boundary conditions for composition flux
 !
       if (iflag_debug .eq. iflag_full_msg)                              &
-     &       write(*,*) 'num_surf_composition ',num_surf_composition
-      if (num_surf_composition .gt. 0) then
+     &       write(*,*) 'light_surf%num_bc ',light_surf%num_bc
+      if (light_surf%num_bc .gt. 0) then
 !
         call allocate_d_scalar_surf_ctl
 !
-        surf_composit_name      = bc_grad_ds_name_ctl
-        surf_composit_magnitude = bc_grad_ds_magnitude_ctl
-        isurf_composit_type = 0
+        light_surf%bc_name      = bc_grad_ds_name_ctl
+        light_surf%bc_magnitude = bc_grad_ds_magnitude_ctl
+        light_surf%ibc_type = 0
 !
-        do i = 1, num_surf_composition
+        do i = 1, light_surf%num_bc
           call set_surf_group_types_scalar(bc_grad_ds_type_ctl(i),      &
-     &        isurf_composit_type(i) )
+     &        light_surf%ibc_type(i) )
         end do
 !
         call deallocate_sf_dscalar_ctl
 !
         if (iflag_debug .eq. iflag_full_msg) then
           write(*,*)  'i, isurf_c_type, surf_c_magnitude, surf_c_name'
-          do i = 1, num_surf_composition
-            write(*,*)  i, isurf_composit_type(i),                      &
-     &         surf_composit_magnitude(i), trim(surf_composit_name(i))
+          do i = 1, light_surf%num_bc
+            write(*,*)  i, light_surf%ibc_type(i),                      &
+     &         light_surf%bc_magnitude(i), trim(light_surf%bc_name(i))
           end do
         end if
       end if
