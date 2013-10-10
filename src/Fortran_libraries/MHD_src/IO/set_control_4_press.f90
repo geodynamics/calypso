@@ -42,41 +42,41 @@
 !
 !
       if (iflag_t_evo_4_velo .eq. id_no_evolution) then
-        num_bc_p = 0
+        press_nod%num_bc = 0
         wall_surf%num_bc = 0
       else
-        num_bc_p = num_bc_p_ctl
+        press_nod%num_bc = num_bc_p_ctl
         wall_surf%num_bc = num_bc_grad_p_ctl
       end if
 !
 !  set boundary conditions for pressure
 !
       if(iflag_debug.eq.iflag_full_msg)                                 &
-     &    write(*,*) 'num_bc_p ', num_bc_p
-      if(num_bc_p .gt. 0) then
+     &    write(*,*) 'press_nod%num_bc ', press_nod%num_bc
+      if(press_nod%num_bc .gt. 0) then
 !
         call allocate_nod_bc_list_press
 !
-        bc_p_name     = bc_p_name_ctl
-        bc_p_magnitude = bc_p_magnitude_ctl
+        press_nod%bc_name =      bc_p_name_ctl
+        press_nod%bc_magnitude = bc_p_magnitude_ctl
 !
-        do i = 1, num_bc_p
+        do i = 1, press_nod%num_bc
           tmpchara = bc_p_type_ctl(i)
           if ( tmpchara .eq. 'fixed' ) then
-            ibc_p_type(i) =  iflag_bc_fix_s
+            press_nod%ibc_type(i) =  iflag_bc_fix_s
           else if ( tmpchara .eq. 'file' ) then
-            ibc_p_type(i) = -iflag_bc_fix_s
+            press_nod%ibc_type(i) = -iflag_bc_fix_s
           else if ( tmpchara .eq. 'sgs' ) then
-            ibc_p_type(i) =  iflag_bc_sgs_s
+            press_nod%ibc_type(i) =  iflag_bc_sgs_s
           end if
         end do
 !
 !
         if (iflag_debug .eq. iflag_full_msg) then
-          write(*,*) 'i, ibc_p_type, bc_p_magnitude, bc_p_name'
-          do i = 1, num_bc_p
-            write(*,*)  i, ibc_p_type(i), bc_p_magnitude(i),            &
-     &                 trim(bc_p_name(i))
+          write(*,*) 'i, press_nod'
+          do i = 1, press_nod%num_bc
+            write(*,*)  i, press_nod%ibc_type(i),                       &
+     &         press_nod%bc_magnitude(i), trim(press_nod%bc_name(i))
           end do
         end if
       end if

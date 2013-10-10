@@ -40,41 +40,41 @@
 !
 !
       if (iflag_t_evo_4_temp .eq. id_no_evolution) then
-        num_bc_e = 0
+        temp_nod%num_bc =    0
         h_flux_surf%num_bc = 0
       else
-        num_bc_e =      num_bc_e_ctl
+        temp_nod%num_bc =    num_bc_e_ctl
         h_flux_surf%num_bc = num_bc_h_flux_ctl
       end if
 !
 !   set boundary conditions for temperature
 !
       if(iflag_debug .eq. iflag_full_msg)                               &
-     &          write(*,*)  'num_bc_e ',num_bc_e
-      if(num_bc_e .gt. 0) then
+     &          write(*,*)  'temp_nod%num_bc ',temp_nod%num_bc
+      if(temp_nod%num_bc .gt. 0) then
 !
         call allocate_nod_bc_list_temp
 !
-        bc_e_name      =  bc_e_name_ctl
-        bc_e_magnitude = bc_e_magnitude_ctl
+        temp_nod%bc_name =      bc_e_name_ctl
+        temp_nod%bc_magnitude = bc_e_magnitude_ctl
 !
-        do i = 1, num_bc_e
+        do i = 1, temp_nod%num_bc
           if ( bc_e_type_ctl(i) .eq. 'fixed' ) then
-            ibc_e_type(i) =  iflag_bc_fix_s
+            temp_nod%ibc_type(i) =  iflag_bc_fix_s
           else if ( bc_e_type_ctl(i) .eq. 'file' ) then
-            ibc_e_type(i) = -iflag_bc_fix_s
+            temp_nod%ibc_type(i) = -iflag_bc_fix_s
           else if ( bc_e_type_ctl(i) .eq. 'fixed_flux' ) then
-            ibc_e_type(i) =  iflag_bc_fix_flux
+            temp_nod%ibc_type(i) =  iflag_bc_fix_flux
           else if ( bc_e_type_ctl(i) .eq. 'sgs' ) then
-            ibc_e_type(i) =  iflag_bc_sgs_s
+            temp_nod%ibc_type(i) =  iflag_bc_sgs_s
           end if
         end do
 !
         if (iflag_debug .eq. iflag_full_msg) then
-          write(*,*) 'i, ibc_e_type, bc_e_magnitude, bc_e_name'
-          do i = 1, num_bc_e
-            write(*,*)  i, ibc_e_type(i), bc_e_magnitude(i),            &
-     &                 trim(bc_e_name(i))
+          write(*,*) 'i, temp_nod'
+          do i = 1, temp_nod%num_bc
+            write(*,*)  i, temp_nod%ibc_type(i),                        &
+     &         temp_nod%bc_magnitude(i), trim(temp_nod%bc_name(i))
           end do
         end if
       end if

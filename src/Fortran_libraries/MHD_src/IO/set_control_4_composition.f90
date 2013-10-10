@@ -40,41 +40,41 @@
 !
 !
       if (iflag_t_evo_4_composit .eq. id_no_evolution) then
+        light_nod%num_bc =  0
         light_surf%num_bc = 0
-        num_bc_composit =   0
       else
-        num_bc_composit = num_bc_composit_ctl
+        light_nod%num_bc =  num_bc_composit_ctl
         light_surf%num_bc = num_bc_grad_ds_ctl
       end if
 !
 !   set boundary conditions for composition
 !
       if (iflag_debug .eq. iflag_full_msg)                              &
-     &   write(*,*) 'num_bc_composit ',num_bc_composit
+     &   write(*,*) 'light_nod%num_bc ',light_nod%num_bc
 !
-      if (num_bc_composit .gt. 0) then
+      if (light_nod%num_bc .gt. 0) then
 !
         call allocate_nod_bc_list_composit
 !
-        bc_composit_name      = bc_composit_name_ctl
-        bc_composit_magnitude = bc_composit_magnitude_ctl
+        light_nod%bc_name =      bc_composit_name_ctl
+        light_nod%bc_magnitude = bc_composit_magnitude_ctl
 !
-        do i = 1, num_bc_composit
+        do i = 1, light_nod%num_bc
           if(bc_composit_type_ctl(i) .eq. 'fixed') then
-            ibc_composit_type(i) =  iflag_bc_fix_s
+            light_nod%ibc_type(i) =  iflag_bc_fix_s
           else if(bc_composit_type_ctl(i) .eq. 'file') then
-            ibc_composit_type(i) = -iflag_bc_fix_s
+            light_nod%ibc_type(i) = -iflag_bc_fix_s
           else if(bc_composit_type_ctl(i) .eq. 'fixed_flux') then
-            ibc_composit_type(i) =  iflag_bc_fix_flux
+            light_nod%ibc_type(i) =  iflag_bc_fix_flux
           end if
         end do
 !
 !
         if (iflag_debug .eq. iflag_full_msg) then
           write(*,*)  'i, bc_c_type, bc_c_magnitude,  bc_c_name'
-          do i = 1, num_bc_composit
-            write(*,*)  i, ibc_composit_type(i),                        &
-     &         bc_composit_magnitude(i), trim(bc_composit_name(i))
+          do i = 1, light_nod%num_bc
+            write(*,*)  i, light_nod%ibc_type(i),                       &
+     &         light_nod%bc_magnitude(i), trim(light_nod%bc_name(i))
           end do
         end if
       end if

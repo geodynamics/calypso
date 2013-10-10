@@ -42,75 +42,75 @@
 !
 !
       if (iflag_t_evo_4_velo .eq. id_no_evolution) then
-        num_bc_v = 0
+        velo_nod%num_bc =    0
         torque_surf%num_bc = 0
       else
-        num_bc_v =  num_bc_v_ctl
+        velo_nod%num_bc =    num_bc_v_ctl
         torque_surf%num_bc = num_bc_torque_ctl
       end if
 !
 !  set boundary conditions for velocity
 !
       if (iflag_debug .eq. iflag_full_msg)                              &
-     &      write(*,*) 'num_bc_v ',num_bc_v
-      if (num_bc_v .gt. 0) then
+     &      write(*,*) 'velo_nod%num_bc ',velo_nod%num_bc
+      if (velo_nod%num_bc .gt. 0) then
 !
         call allocate_nod_bc_list_velo
 !
-        bc_v_name      = bc_v_name_ctl
-        bc_v_magnitude = bc_v_magnitude_ctl
+        velo_nod%bc_name =      bc_v_name_ctl
+        velo_nod%bc_magnitude = bc_v_magnitude_ctl
 !
         iflag_4_hemi = 0
-        do i = 1, num_bc_v
-          if ( bc_v_name(i)  .eq. 'equator') then
+        do i = 1, velo_nod%num_bc
+          if ( velo_nod%bc_name(i)  .eq. 'equator') then
             iflag_4_hemi = 1
           end if
         end do
 !
-        do i = 1, num_bc_v
+        do i = 1, velo_nod%num_bc
           tmpchara = bc_v_type_ctl(i)
           if ( tmpchara .eq. 'fix_x' ) then
-            ibc_v_type(i) = iflag_bc_fixed + 1
+            velo_nod%ibc_type(i) = iflag_bc_fixed + 1
           else if ( tmpchara .eq. 'fix_y' ) then
-            ibc_v_type(i) = iflag_bc_fixed + 2
+            velo_nod%ibc_type(i) = iflag_bc_fixed + 2
           else if ( tmpchara .eq. 'fix_z' ) then
-            ibc_v_type(i) = iflag_bc_fixed + 3
+            velo_nod%ibc_type(i) = iflag_bc_fixed + 3
           else if ( tmpchara .eq. 'file_x' ) then
-            ibc_v_type(i) = iflag_bc_fixed - 1
+            velo_nod%ibc_type(i) = iflag_bc_fixed - 1
           else if ( tmpchara .eq. 'file_y' ) then
-            ibc_v_type(i) = iflag_bc_fixed - 2
+            velo_nod%ibc_type(i) = iflag_bc_fixed - 2
           else if ( tmpchara .eq. 'file_z' ) then
-            ibc_v_type(i) = iflag_bc_fixed - 3
+            velo_nod%ibc_type(i) = iflag_bc_fixed - 3
           else if ( tmpchara .eq. 'rot_x' ) then
-            ibc_v_type(i) = iflag_bc_rot + 1
+            velo_nod%ibc_type(i) = iflag_bc_rot + 1
           else if ( tmpchara .eq. 'rot_y' ) then
-            ibc_v_type(i) = iflag_bc_rot + 2
+            velo_nod%ibc_type(i) = iflag_bc_rot + 2
           else if ( tmpchara .eq. 'rot_z' ) then
-            ibc_v_type(i) = iflag_bc_rot + 3
+            velo_nod%ibc_type(i) = iflag_bc_rot + 3
           else if ( tmpchara .eq. 'vr_0' ) then
-            ibc_v_type(i) = iflag_no_vr
+            velo_nod%ibc_type(i) = iflag_no_vr
           else if ( tmpchara .eq. 'free_slip_sph' ) then
-            ibc_v_type(i) = iflag_free_sph
+            velo_nod%ibc_type(i) = iflag_free_sph
           else if ( tmpchara .eq. 'non_slip_sph' ) then
-            ibc_v_type(i) = iflag_non_slip_sph
+            velo_nod%ibc_type(i) = iflag_non_slip_sph
           else if ( tmpchara .eq. 'rot_inner_core' ) then
-            ibc_v_type(i) = iflag_rotatable_icore
+            velo_nod%ibc_type(i) = iflag_rotatable_icore
           else if ( tmpchara .eq. 'special' ) then
-            ibc_v_type(i) = iflag_bc_special
+            velo_nod%ibc_type(i) = iflag_bc_special
           else if ( tmpchara .eq. 'sgs_x' ) then
-            ibc_v_type(i) =  iflag_bc_sgs + 1
+            velo_nod%ibc_type(i) =  iflag_bc_sgs + 1
           else if ( tmpchara .eq. 'sgs_y' ) then
-            ibc_v_type(i) =  iflag_bc_sgs + 2
+            velo_nod%ibc_type(i) =  iflag_bc_sgs + 2
           else if ( tmpchara .eq. 'sgs_z' ) then
-            ibc_v_type(i) =  iflag_bc_sgs + 3
+            velo_nod%ibc_type(i) =  iflag_bc_sgs + 3
           end if
         end do
 !
         if (iflag_debug .eq. iflag_full_msg) then
-          write(*,*) 'i, ibc_v_type, bc_v_magnitude, bc_v_name'
-          do i = 1, num_bc_v
-            write(*,*)  i, ibc_v_type(i), bc_v_magnitude(i),            &
-     &                 trim(bc_v_name(i))
+          write(*,*) 'i, velo_nod'
+          do i = 1, velo_nod%num_bc
+            write(*,*)  i, velo_nod%ibc_type(i),                        &
+     &         velo_nod%bc_magnitude(i), trim(velo_nod%bc_name(i))
           end do
         end if
       end if

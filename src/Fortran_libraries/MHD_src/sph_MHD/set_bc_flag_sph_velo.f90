@@ -43,10 +43,11 @@
       call allocate_vsp_bc_array( nidx_rj(2) )
 !
 !
-      do i = 1, num_bc_v
+      do i = 1, velo_nod%num_bc
         if(iflag_icb_velocity .ne. iflag_fixed_velo) exit
-        if(bc_v_name(i) .eq. 'ICB') then 
-          call set_sph_velo_ICB_flag(ibc_v_type(i), bc_v_magnitude(i))
+        if(velo_nod%bc_name(i) .eq. 'ICB') then
+          call set_sph_velo_ICB_flag(velo_nod%ibc_type(i),              &
+     &        velo_nod%bc_magnitude(i))
         end if
       end do
 !
@@ -61,10 +62,11 @@
 !
 !
 !
-      do i = 1, num_bc_v
+      do i = 1, velo_nod%num_bc
         if(iflag_cmb_velocity .ne. iflag_fixed_velo) exit
-        if(bc_v_name(i) .eq. 'CMB') then 
-          call set_sph_velo_CMB_flag(ibc_v_type(i), bc_v_magnitude(i))
+        if(velo_nod%bc_name(i) .eq. 'CMB') then 
+          call set_sph_velo_CMB_flag(velo_nod%ibc_type(i),              &
+     &        velo_nod%bc_magnitude(i))
         end if
       end do
 !

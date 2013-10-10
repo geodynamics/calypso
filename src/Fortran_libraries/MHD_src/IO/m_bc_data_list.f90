@@ -1,25 +1,30 @@
+!>@file   m_bc_data_list.f90
+!!@brief  module m_bc_data_list
+!!
+!!@author H. Matsui
+!!@date Programmed by H. Matsui in 2009
 !
-!      module m_bc_data_list
-!
-!      Written by H. Matsui on Jan., 2009
-!
-!      subroutine allocate_nod_bc_list_temp
-!      subroutine allocate_nod_bc_list_velo
-!      subroutine allocate_nod_bc_list_press
-!      subroutine allocate_nod_bc_list_vecp
-!      subroutine allocate_nod_bc_list_magne
-!      subroutine allocate_nod_bc_list_mag_p
-!      subroutine allocate_nod_bc_list_j
-!      subroutine allocate_nod_bc_list_composit
-!
-!      subroutine deallocate_nod_bc_list_temp
-!      subroutine deallocate_nod_bc_list_velo
-!      subroutine deallocate_nod_bc_list_press
-!      subroutine deallocate_nod_bc_list_vecp
-!      subroutine deallocate_nod_bc_list_magne
-!      subroutine deallocate_nod_bc_list_mag_p
-!      subroutine deallocate_nod_bc_list_j
-!      subroutine deallocate_nod_bc_list_composit
+!>@brief  Boundary condition lists for MHD dynamo model
+!!
+!!@verbatim
+!!      subroutine allocate_nod_bc_list_temp
+!!      subroutine allocate_nod_bc_list_velo
+!!      subroutine allocate_nod_bc_list_press
+!!      subroutine allocate_nod_bc_list_vecp
+!!      subroutine allocate_nod_bc_list_magne
+!!      subroutine allocate_nod_bc_list_mag_p
+!!      subroutine allocate_nod_bc_list_j
+!!      subroutine allocate_nod_bc_list_composit
+!!
+!!      subroutine deallocate_nod_bc_list_temp
+!!      subroutine deallocate_nod_bc_list_velo
+!!      subroutine deallocate_nod_bc_list_press
+!!      subroutine deallocate_nod_bc_list_vecp
+!!      subroutine deallocate_nod_bc_list_magne
+!!      subroutine deallocate_nod_bc_list_mag_p
+!!      subroutine deallocate_nod_bc_list_j
+!!      subroutine deallocate_nod_bc_list_composit
+!!@endverbatim
 !
       module m_bc_data_list
 !
@@ -28,66 +33,79 @@
       implicit  none
 !
 !
-      integer (kind=kint) :: num_bc_e
-      real (kind=kreal),      allocatable :: bc_e_magnitude(:)
-      integer (kind=kint),    allocatable :: ibc_e_type(:)
-      character (len=kchara), allocatable :: bc_e_name(:)
+!>       Structure for surface group data list
+      type nod_bc_list_type
+!>       number of boundary condition list
+        integer (kind=kint) :: num_bc
+!>       Value for the boundary condition
+        real (kind=kreal), pointer :: bc_magnitude(:)
+!>       Type of the boundary condition
+        integer (kind=kint), pointer :: ibc_type(:)
+!>       Name of group to apply the boundary condition
+        character (len=kchara), pointer :: bc_name(:)
+      end type nod_bc_list_type
 !
+!>       Node group data list for velocity
+      type(nod_bc_list_type), save :: velo_nod
+!>       Node group data list for pressure
+      type(nod_bc_list_type), save :: press_nod
 !
-      integer (kind=kint) :: num_bc_v
-      real (kind=kreal),      allocatable :: bc_v_magnitude(:)
-      integer (kind=kint),    allocatable :: ibc_v_type(:)
-      character (len=kchara), allocatable :: bc_v_name(:)
+!>       Node group data list for temperarure
+      type(nod_bc_list_type), save :: temp_nod
+!>       Node group data list for composition
+      type(nod_bc_list_type), save :: light_nod
 !
-      integer (kind=kint) :: num_bc_p
-      real (kind=kreal),      allocatable :: bc_p_magnitude(:)
-      integer (kind=kint),    allocatable :: ibc_p_type(:)
-      character (len=kchara), allocatable :: bc_p_name(:)
-! 
+!>       Node group data list for magnetic field
+      type(nod_bc_list_type), save :: magne_nod
+!>       Node group data list for magnetic vector potential
+      type(nod_bc_list_type), save :: a_potential_nod
+!>       Node group data list for electric scalar potential
+      type(nod_bc_list_type), save :: e_potential_nod
+!>       Node group data list for current density
+      type(nod_bc_list_type), save :: current_nod
 !
-      integer (kind=kint) :: num_bc_vp
-      real (kind=kreal),      allocatable :: bc_vp_magnitude(:)
-      integer (kind=kint),    allocatable :: ibc_vp_type(:)
-      character (len=kchara), allocatable :: bc_vp_name(:)
-!
-      integer (kind=kint) :: num_bc_b
-      real (kind=kreal),      allocatable :: bc_b_magnitude(:)
-      integer (kind=kint),    allocatable :: ibc_b_type(:)
-      character (len=kchara), allocatable :: bc_b_name(:)
-!
-      integer (kind=kint) :: num_bc_j
-      real (kind=kreal),      allocatable :: bc_j_magnitude(:)
-      integer (kind=kint),    allocatable :: ibc_j_type(:)
-      character (len=kchara), allocatable :: bc_j_name(:)
-!
-!
-      integer (kind=kint) :: num_bc_mag_p
-      real (kind=kreal), allocatable :: bc_mag_p_magnitude(:)
-      integer (kind=kint), allocatable :: ibc_mag_p_type(:)
-      character (len=kchara), allocatable :: bc_mag_p_name(:)
-! 
-!
-      integer (kind=kint) :: num_bc_composit
-      real (kind=kreal), allocatable :: bc_composit_magnitude(:)
-      integer (kind=kint), allocatable :: ibc_composit_type(:)
-      character (len=kchara), allocatable :: bc_composit_name(:)
-! 
 ! -----------------------------------------------------------------------
 !
       contains 
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine alloc_bc_type_ctl(nod_bc_list)
+!
+      type(nod_bc_list_type), intent(inout) :: nod_bc_list
+!
+!
+      allocate(nod_bc_list%bc_magnitude(nod_bc_list%num_bc))
+      allocate(nod_bc_list%ibc_type(nod_bc_list%num_bc))
+      allocate(nod_bc_list%bc_name(nod_bc_list%num_bc))
+!
+      if(nod_bc_list%num_bc .gt. 0) then
+        nod_bc_list%ibc_type =     0
+        nod_bc_list%bc_magnitude = 0.0d0
+      end if
+!
+      end subroutine alloc_bc_type_ctl
+!
+!-----------------------------------------------------------------------
+!
+      subroutine dealloc_bc_type_ctl(nod_bc_list)
+!
+      type(nod_bc_list_type), intent(inout) :: nod_bc_list
+!
+!
+      deallocate(nod_bc_list%bc_magnitude)
+      deallocate(nod_bc_list%ibc_type)
+      deallocate(nod_bc_list%bc_name)
+!
+      end subroutine dealloc_bc_type_ctl
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
       subroutine allocate_nod_bc_list_temp
 !
-        allocate(bc_e_name(num_bc_e))
-        allocate(bc_e_magnitude(num_bc_e))
-        allocate(ibc_e_type(num_bc_e))
 !
-        if(num_bc_e .gt. 0) then
-          ibc_e_type = 0
-          bc_e_magnitude = 0.0d0
-        end if
+      call alloc_bc_type_ctl(temp_nod)
 !
       end subroutine allocate_nod_bc_list_temp
 !
@@ -95,14 +113,8 @@
 !
       subroutine allocate_nod_bc_list_velo
 !
-        allocate(bc_v_name(num_bc_v))
-        allocate(bc_v_magnitude(num_bc_v))
-        allocate(ibc_v_type(num_bc_v))
 !
-        if(num_bc_v .gt. 0) then
-          ibc_v_type = 0
-          bc_v_magnitude = 0.0d0
-        end if
+      call alloc_bc_type_ctl(velo_nod)
 !
       end subroutine allocate_nod_bc_list_velo
 !
@@ -110,14 +122,8 @@
 !
       subroutine allocate_nod_bc_list_press
 !
-        allocate(bc_p_name(num_bc_p))
-        allocate(bc_p_magnitude(num_bc_p))
-        allocate(ibc_p_type(num_bc_p))
 !
-        if(num_bc_p .gt. 0) then
-          ibc_p_type = 0
-          bc_p_magnitude = 0.0d0
-        end if
+      call alloc_bc_type_ctl(press_nod)
 !
       end subroutine allocate_nod_bc_list_press
 !
@@ -125,14 +131,8 @@
 !
       subroutine allocate_nod_bc_list_vecp
 !
-        allocate(bc_vp_name(num_bc_vp))
-        allocate(bc_vp_magnitude(num_bc_vp))
-        allocate(ibc_vp_type(num_bc_vp))
 !
-        if(num_bc_vp .gt. 0) then
-          ibc_vp_type = 0
-          bc_vp_magnitude = 0.0d0
-        end if
+      call alloc_bc_type_ctl(a_potential_nod)
 !
       end subroutine allocate_nod_bc_list_vecp
 !
@@ -140,14 +140,8 @@
 !
       subroutine allocate_nod_bc_list_magne
 !
-        allocate(bc_b_name(num_bc_b))
-        allocate(bc_b_magnitude(num_bc_b))
-        allocate(ibc_b_type(num_bc_b))
 !
-        if(num_bc_b .gt. 0) then
-          ibc_b_type = 0
-          bc_b_magnitude = 0.0d0
-        end if
+      call alloc_bc_type_ctl(magne_nod)
 !
       end subroutine allocate_nod_bc_list_magne
 !
@@ -155,14 +149,8 @@
 !
       subroutine allocate_nod_bc_list_j
 !
-        allocate(bc_j_name(num_bc_j))
-        allocate(bc_j_magnitude(num_bc_j))
-        allocate(ibc_j_type(num_bc_j))
 !
-        if(num_bc_j .gt. 0) then
-          ibc_j_type = 0
-          bc_j_magnitude = 0.0d0
-        end if
+      call alloc_bc_type_ctl(current_nod)
 !
       end subroutine allocate_nod_bc_list_j
 !
@@ -170,14 +158,8 @@
 !
       subroutine allocate_nod_bc_list_mag_p
 !
-        allocate(bc_mag_p_name(num_bc_mag_p))
-        allocate(bc_mag_p_magnitude(num_bc_mag_p))
-        allocate(ibc_mag_p_type(num_bc_mag_p))
 !
-        if(num_bc_mag_p .gt. 0) then
-          ibc_mag_p_type = 0
-          bc_mag_p_magnitude = 0.0d0
-        end if
+      call alloc_bc_type_ctl(e_potential_nod)
 !
       end subroutine allocate_nod_bc_list_mag_p
 !
@@ -185,14 +167,8 @@
 !
       subroutine allocate_nod_bc_list_composit
 !
-        allocate(bc_composit_magnitude(num_bc_composit))
-        allocate(ibc_composit_type(num_bc_composit))
-        allocate(bc_composit_name(num_bc_composit))
 !
-        if(num_bc_composit .gt. 0) then
-          ibc_composit_type = 0
-          bc_composit_magnitude = 0.0d0
-        end if
+      call alloc_bc_type_ctl(light_nod)
 !
       end subroutine allocate_nod_bc_list_composit
 !
@@ -201,9 +177,8 @@
 !
       subroutine deallocate_nod_bc_list_temp
 !
-        deallocate(bc_e_name)
-        deallocate(bc_e_magnitude)
-        deallocate(ibc_e_type)
+!
+      call dealloc_bc_type_ctl(temp_nod)
 !
       end subroutine deallocate_nod_bc_list_temp
 !
@@ -211,9 +186,8 @@
 !
       subroutine deallocate_nod_bc_list_velo
 !
-        deallocate(bc_v_name)
-        deallocate(bc_v_magnitude)
-        deallocate(ibc_v_type)
+!
+      call dealloc_bc_type_ctl(velo_nod)
 !
       end subroutine deallocate_nod_bc_list_velo
 !
@@ -221,9 +195,8 @@
 !
       subroutine deallocate_nod_bc_list_press
 !
-        deallocate(bc_p_name)
-        deallocate(bc_p_magnitude)
-        deallocate(ibc_p_type)
+!
+      call dealloc_bc_type_ctl(press_nod)
 !
       end subroutine deallocate_nod_bc_list_press
 !
@@ -231,9 +204,8 @@
 !
       subroutine deallocate_nod_bc_list_vecp
 !
-        deallocate(bc_vp_name)
-        deallocate(bc_vp_magnitude)
-        deallocate(ibc_vp_type)
+!
+      call dealloc_bc_type_ctl(a_potential_nod)
 !
       end subroutine deallocate_nod_bc_list_vecp
 !
@@ -241,9 +213,8 @@
 !
       subroutine deallocate_nod_bc_list_magne
 !
-        deallocate(bc_b_name)
-        deallocate(bc_b_magnitude)
-        deallocate(ibc_b_type)
+!
+      call dealloc_bc_type_ctl(magne_nod)
 !
       end subroutine deallocate_nod_bc_list_magne
 !
@@ -251,9 +222,8 @@
 !
       subroutine deallocate_nod_bc_list_mag_p
 !
-        deallocate(bc_mag_p_name)
-        deallocate(bc_mag_p_magnitude)
-        deallocate(ibc_mag_p_type)
+!
+      call dealloc_bc_type_ctl(e_potential_nod)
 !
       end subroutine deallocate_nod_bc_list_mag_p
 !
@@ -261,9 +231,8 @@
 !
       subroutine deallocate_nod_bc_list_j
 !
-        deallocate(bc_j_name)
-        deallocate(bc_j_magnitude)
-        deallocate(ibc_j_type)
+!
+      call dealloc_bc_type_ctl(current_nod)
 !
       end subroutine deallocate_nod_bc_list_j
 !
@@ -271,9 +240,8 @@
 !
       subroutine deallocate_nod_bc_list_composit
 !
-        deallocate(bc_composit_magnitude)
-        deallocate(ibc_composit_type)
-        deallocate(bc_composit_name)
+!
+      call dealloc_bc_type_ctl(light_nod)
 !
       end subroutine deallocate_nod_bc_list_composit
 !

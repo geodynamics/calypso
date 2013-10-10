@@ -112,18 +112,18 @@
         write(*,*)  h_flux_CMB_bc(1)
       end if
 !
-      do i = 1, num_bc_e
-        if ( ibc_e_type(i)  .eq. iflag_bc_fix_flux) then
+      do i = 1, temp_nod%num_bc
+        if ( temp_nod%ibc_type(i)  .eq. iflag_bc_fix_flux) then
           call set_homogenious_grad_bc                                  &
      &       (ICB_nod_grp_name, ICB_sf_grp_name,                        &
-     &        bc_e_name(i), bc_e_magnitude(i),                          &
+     &        temp_nod%bc_name(i), temp_nod%bc_magnitude(i),            &
      &        nidx_rj(2), h_flux_ICB_bc, iflag_icb_temp)
           call set_homogenious_grad_bc                                  &
      &       (CMB_nod_grp_name, CMB_sf_grp_name,                        &
-     &        bc_e_name(i), bc_e_magnitude(i),                          &
+     &        temp_nod%bc_name(i), temp_nod%bc_magnitude(i),            &
      &        nidx_rj(2), h_flux_CMB_bc, iflag_cmb_temp)
 !
-        else if ( ibc_e_type(i)  .eq. -iflag_bc_fix_flux) then
+        else if ( temp_nod%ibc_type(i)  .eq. -iflag_bc_fix_flux) then
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_h_flux, ICB_nod_grp_name, ICB_sf_grp_name,            &
      &        nidx_rj(2), h_flux_ICB_bc, iflag_icb_temp)
@@ -132,15 +132,15 @@
      &        nidx_rj(2), h_flux_CMB_bc, iflag_cmb_temp)
 !
 !
-        else if ( ibc_e_type(i)  .eq. iflag_bc_fix_s) then
+        else if ( temp_nod%ibc_type(i)  .eq. iflag_bc_fix_s) then
           call set_homogenious_scalar_bc(ICB_nod_grp_name,              &
-     &        bc_e_name(i), bc_e_magnitude(i),                          &
+     &        temp_nod%bc_name(i), temp_nod%bc_magnitude(i),            &
      &        nidx_rj(2), temp_ICB_bc, iflag_icb_temp)
           call set_homogenious_scalar_bc(CMB_nod_grp_name,              &
-     &        bc_e_name(i), bc_e_magnitude(i),                          &
+     &        temp_nod%bc_name(i), temp_nod%bc_magnitude(i),            &
      &        nidx_rj(2), temp_CMB_bc, iflag_cmb_temp)
 !
-        else if ( ibc_e_type(i)  .eq. -iflag_bc_fix_s) then
+        else if ( temp_nod%ibc_type(i)  .eq. -iflag_bc_fix_s) then
           call set_fixed_scalar_bc_by_file(fhd_temp, ICB_nod_grp_name,  &
      &        nidx_rj(2), temp_ICB_bc, iflag_icb_temp)
           call set_fixed_scalar_bc_by_file(fhd_temp, CMB_nod_grp_name,  &
@@ -189,21 +189,21 @@
       iflag_icb_magne = iflag_sph_insulator
       iflag_cmb_magne = iflag_sph_insulator
 !
-      do i = 1, num_bc_b
-        if(bc_b_name(i) .eq. 'ICB') then
-          if(ibc_b_type(i) .eq. iflag_pseudo_vacuum) then
+      do i = 1, magne_nod%num_bc
+        if(magne_nod%bc_name(i) .eq. 'ICB') then
+          if(magne_nod%ibc_type(i) .eq. iflag_pseudo_vacuum) then
             iflag_icb_magne =  iflag_radial_magne
           end if
         end if
 !
-        if(bc_b_name(i) .eq. 'CMB') then
-          if(ibc_b_type(i) .eq. iflag_pseudo_vacuum) then
+        if(magne_nod%bc_name(i) .eq. 'CMB') then
+          if(magne_nod%ibc_type(i) .eq. iflag_pseudo_vacuum) then
             iflag_cmb_magne =  iflag_radial_magne
           end if
         end if
 !
-        if(bc_b_name(i) .eq. 'to_Center') then
-          if      (ibc_b_type(i) .eq. iflag_sph_2_center) then
+        if(magne_nod%bc_name(i) .eq. 'to_Center') then
+          if      (magne_nod%ibc_type(i) .eq. iflag_sph_2_center) then
             iflag_icb_magne =  iflag_sph_fill_center
           end if
         end if
@@ -273,18 +273,18 @@
 !
 !      Boundary setting using boundary group data
 !
-      do i = 1, num_bc_composit
-        if ( ibc_composit_type(i)  .eq. iflag_bc_fix_flux) then
+      do i = 1, light_nod%num_bc
+        if ( light_nod%ibc_type(i)  .eq. iflag_bc_fix_flux) then
           call set_homogenious_grad_bc                                  &
      &       (ICB_nod_grp_name, ICB_sf_grp_name,                        &
-     &        bc_composit_name(i), bc_composit_magnitude(i),            &
+     &        light_nod%bc_name(i), light_nod%bc_magnitude(i),          &
      &        nidx_rj(2), c_flux_ICB_bc, iflag_icb_composition)
           call set_homogenious_grad_bc                                  &
      &       (CMB_nod_grp_name, CMB_sf_grp_name,                        &
-     &        bc_composit_name(i), bc_composit_magnitude(i),            &
+     &        light_nod%bc_name(i), light_nod%bc_magnitude(i),          &
      &        nidx_rj(2), c_flux_CMB_bc, iflag_cmb_composition)
 !
-        else if ( ibc_composit_type(i)  .eq. -iflag_bc_fix_flux) then
+        else if ( light_nod%ibc_type(i)  .eq. -iflag_bc_fix_flux) then
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_c_flux, ICB_nod_grp_name, ICB_sf_grp_name,            &
      &        nidx_rj(2), c_flux_ICB_bc, iflag_icb_composition)
@@ -293,15 +293,15 @@
      &        nidx_rj(2), c_flux_CMB_bc, iflag_cmb_composition)
 !
 !
-        else if ( ibc_composit_type(i)  .eq. iflag_bc_fix_s) then
+        else if ( light_nod%ibc_type(i)  .eq. iflag_bc_fix_s) then
           call set_homogenious_scalar_bc(ICB_nod_grp_name,              &
-     &        bc_composit_name(i), bc_composit_magnitude(i),            &
+     &        light_nod%bc_name(i), light_nod%bc_magnitude(i),          &
      &        nidx_rj(2), composition_ICB_bc, iflag_icb_composition)
           call set_homogenious_scalar_bc(CMB_nod_grp_name,              &
-     &        bc_composit_name(i), bc_composit_magnitude(i),            &
+     &        light_nod%bc_name(i), light_nod%bc_magnitude(i),          &
      &        nidx_rj(2), composition_CMB_bc, iflag_cmb_composition)
 !
-        else if ( ibc_composit_type(i)  .eq. -iflag_bc_fix_s) then
+        else if ( light_nod%ibc_type(i)  .eq. -iflag_bc_fix_s) then
           call set_fixed_scalar_bc_by_file(fhd_light, ICB_nod_grp_name, &
      &        nidx_rj(2), composition_ICB_bc, iflag_icb_composition)
           call set_fixed_scalar_bc_by_file(fhd_light, CMB_nod_grp_name, &

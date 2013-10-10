@@ -15,7 +15,7 @@
 !!      subroutine allocate_magp_surf_ctl
 !!      subroutine allocate_current_surf_ctl
 !!      subroutine allocate_d_scalar_surf_ctl
-!
+!!
 !!      subroutine deallocate_velo_surf_ctl
 !!      subroutine deallocate_press_surf_ctl
 !!      subroutine deallocate_temp_surf_ctl
@@ -47,7 +47,7 @@
 !
 !>       Surface group data list for stresses
       type(surface_bc_list_type), save :: torque_surf
-!>       Surface group data list for walls (special velocity)
+!>       Surface group data list for pressure
       type(surface_bc_list_type), save :: wall_surf
 !
 !>       Surface group data list for temperature
