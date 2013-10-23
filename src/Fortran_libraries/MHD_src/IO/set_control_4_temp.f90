@@ -34,6 +34,7 @@
       use m_node_group
       use m_bc_data_list
       use m_surf_data_list
+      use set_node_group_types
       use set_surface_group_types
 !
       integer(kind = kint) :: i
@@ -59,14 +60,15 @@
         temp_nod%bc_magnitude = bc_e_magnitude_ctl
 !
         do i = 1, temp_nod%num_bc
-          if ( bc_e_type_ctl(i) .eq. 'fixed' ) then
-            temp_nod%ibc_type(i) =  iflag_bc_fix_s
-          else if ( bc_e_type_ctl(i) .eq. 'file' ) then
-            temp_nod%ibc_type(i) = -iflag_bc_fix_s
-          else if ( bc_e_type_ctl(i) .eq. 'fixed_flux' ) then
+          call set_nod_group_types_scalar(bc_e_type_ctl(i),             &
+     &        temp_nod%ibc_type(i))
+          call set_nod_group_types_sgs_scalar(bc_e_type_ctl(i),         &
+     &        temp_nod%ibc_type(i))
+!
+          if ( bc_e_type_ctl(i) .eq. 'fixed_flux' ) then
             temp_nod%ibc_type(i) =  iflag_bc_fix_flux
-          else if ( bc_e_type_ctl(i) .eq. 'sgs' ) then
-            temp_nod%ibc_type(i) =  iflag_bc_sgs_s
+          else if(bc_e_type_ctl(i) .eq. 'sph_to_center') then
+            temp_nod%ibc_type(i) =  iflag_sph_2_center
           end if
         end do
 !
@@ -91,6 +93,10 @@
         do i = 1, h_flux_surf%num_bc
           call set_surf_group_types_scalar(bc_h_flux_type_ctl(i),       &
      &            h_flux_surf%ibc_type(i))
+!
+          if(bc_h_flux_type_ctl(i) .eq. 'sph_to_center') then
+            h_flux_surf%ibc_type(i) =  iflag_sph_2_center
+          end if
         end do
       end if
 !

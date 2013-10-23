@@ -31,7 +31,9 @@
 !>      integer flag for free-slip boundary at inner core
       integer(kind = kint), parameter :: iflag_free_slip =  1
 !>      integer flag for rotatable inner core
-      integer(kind = kint), parameter :: iflag_rotatable_ic = 10
+      integer(kind = kint), parameter :: iflag_rotatable_ic =    10
+!>      integer flag for whole sphere model
+      integer(kind = kint), parameter :: iflag_sph_fill_center = 41
 !
 !>      integer flag for fixed velocity boundary
       integer(kind = kint), parameter :: iflag_fixed_field = 0
@@ -40,8 +42,6 @@
 !
 !>      integer flag for insulated magnetic boundary
       integer(kind = kint), parameter :: iflag_sph_insulator =   0
-!>      integer flag for insulated magnetic boundary
-      integer(kind = kint), parameter :: iflag_sph_fill_center = 1
 !>      integer flag for pseudo vacuum magnetic boundary
       integer(kind = kint), parameter :: iflag_radial_magne =   11
 !

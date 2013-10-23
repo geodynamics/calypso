@@ -58,14 +58,14 @@
 !>      non slip boundary
       integer(kind = kint), parameter :: iflag_non_slip_sph =    200
 !>      eliminate radial flow
-      integer(kind = kint), parameter :: iflag_no_vr =           200
+      integer(kind = kint), parameter :: iflag_no_vr =           201
 !>      rotatable inner core
       integer(kind = kint), parameter :: iflag_rotatable_icore = 301
 !
 !>      insulated magnetic boundary
       integer(kind = kint), parameter :: iflag_insulator =       100
 !>      boundary to connect center field
-      integer(kind = kint), parameter :: iflag_sph_2_center =    200
+      integer(kind = kint), parameter :: iflag_sph_2_center =    501
 !
 !>      pseudo vacuum boundary
       integer(kind = kint), parameter :: iflag_pseudo_vacuum =   400

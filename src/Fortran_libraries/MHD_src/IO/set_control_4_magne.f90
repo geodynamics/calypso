@@ -34,6 +34,7 @@
       use m_node_group
       use m_bc_data_list
       use m_surf_data_list
+      use set_node_group_types
       use set_surface_group_types
 !
       character(len=kchara) :: tmpchara
@@ -61,20 +62,13 @@
         magne_nod%bc_magnitude = bc_b_magnitude_ctl
 !
         do i = 1, magne_nod%num_bc
+         call set_nod_group_types_vector(bc_b_type_ctl(i),              &
+     &       magne_nod%ibc_type(i))
+         call set_nod_group_types_sgs_vect(bc_b_type_ctl(i),            &
+     &       magne_nod%ibc_type(i))
+!
           tmpchara = bc_b_type_ctl(i)
-          if ( tmpchara .eq. 'fix_x' ) then
-            magne_nod%ibc_type(i) = iflag_bc_fixed + 1
-          else if ( tmpchara .eq. 'fix_y' ) then
-            magne_nod%ibc_type(i) = iflag_bc_fixed + 2
-          else if ( tmpchara .eq. 'fix_z' ) then
-            magne_nod%ibc_type(i) = iflag_bc_fixed + 3
-          else if ( tmpchara .eq. 'file_x' ) then
-            magne_nod%ibc_type(i) = iflag_bc_fixed - 1
-          else if ( tmpchara .eq. 'file_y' ) then
-            magne_nod%ibc_type(i) = iflag_bc_fixed - 2
-          else if ( tmpchara .eq. 'file_z' ) then
-            magne_nod%ibc_type(i) = iflag_bc_fixed - 3
-          else if ( tmpchara .eq. 'insulator' ) then
+          if ( tmpchara .eq. 'insulator' ) then
             magne_nod%ibc_type(i) = iflag_insulator
           else if ( tmpchara .eq. 'sph_to_center' ) then
             magne_nod%ibc_type(i) = iflag_sph_2_center
@@ -82,12 +76,6 @@
             magne_nod%ibc_type(i) = iflag_pseudo_vacuum
 !          else if ( tmpchara .eq. 'sph' ) then
 !            magne_nod%ibc_type(i) = 999
-          else if ( tmpchara .eq. 'sgs_x' ) then
-            magne_nod%ibc_type(i) = iflag_bc_sgs + 1
-          else if ( tmpchara .eq. 'sgs_y' ) then
-            magne_nod%ibc_type(i) = iflag_bc_sgs + 2
-          else if ( tmpchara .eq. 'sgs_z' ) then
-            magne_nod%ibc_type(i) = iflag_bc_sgs + 3
           end if
         end do
 !

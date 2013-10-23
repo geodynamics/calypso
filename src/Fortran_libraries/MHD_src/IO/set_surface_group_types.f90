@@ -33,6 +33,7 @@
       character (len=kchara), intent(in) :: bc_type_ctl
       integer(kind = kint), intent(inout) :: ibc_type
 !
+!
       if      ( bc_type_ctl .eq. 'fixed_ctl'                            &
      &    .or.  bc_type_ctl .eq. 'fixed') then
         ibc_type =  iflag_surf_fix_s
@@ -60,6 +61,7 @@
 !
       character (len=kchara), intent(in) :: bc_type_ctl
       integer(kind = kint), intent(inout) :: ibc_type
+!
 !
          if      ( bc_type_ctl .eq. 'fix_ctl_x'                         &
      &        .or. bc_type_ctl .eq. 'fix_x') then
@@ -118,6 +120,7 @@
       character (len=kchara), intent(in) :: bc_type_ctl
       integer(kind = kint), intent(inout) :: ibc_type
 !
+!
          if ( bc_type_ctl .eq. 'free_sph_in' ) then
           ibc_type = iflag_surf_free_sph_in
          else if ( bc_type_ctl .eq. 'free_sph_out' ) then
@@ -151,6 +154,7 @@
       character (len=kchara), intent(in) :: bc_type_ctl
       integer(kind = kint), intent(inout) :: ibc_type
 !
+!
          if ( bc_type_ctl .eq. 'pseudo_vacuum_in' ) then
           ibc_type = iflag_surf_qvc_sph_in
          else if ( bc_type_ctl .eq. 'pseudo_vacuum_out' ) then
@@ -166,9 +170,8 @@
       character (len=kchara), intent(in) :: bc_type_ctl
       integer(kind = kint), intent(inout) :: ibc_type
 !
-      if ( bc_type_ctl .eq. 'infinity' ) then
-       ibc_type = iflag_surf_infty
-      end if
+!
+      if ( bc_type_ctl .eq. 'infinity' ) ibc_type = iflag_surf_infty
 !
       end subroutine set_surf_infty_group_types
 !

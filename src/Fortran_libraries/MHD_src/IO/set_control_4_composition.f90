@@ -34,6 +34,7 @@
       use m_node_group
       use m_bc_data_list
       use m_surf_data_list
+      use set_node_group_types
       use set_surface_group_types
 !
       integer (kind = kint) :: i
@@ -60,12 +61,13 @@
         light_nod%bc_magnitude = bc_composit_magnitude_ctl
 !
         do i = 1, light_nod%num_bc
-          if(bc_composit_type_ctl(i) .eq. 'fixed') then
-            light_nod%ibc_type(i) =  iflag_bc_fix_s
-          else if(bc_composit_type_ctl(i) .eq. 'file') then
-            light_nod%ibc_type(i) = -iflag_bc_fix_s
-          else if(bc_composit_type_ctl(i) .eq. 'fixed_flux') then
+          call set_nod_group_types_scalar(bc_composit_type_ctl(i),      &
+     &        light_nod%ibc_type(i))
+!
+          if(bc_composit_type_ctl(i) .eq. 'fixed_flux') then
             light_nod%ibc_type(i) =  iflag_bc_fix_flux
+          else if(bc_composit_type_ctl(i) .eq. 'sph_to_center') then
+            light_nod%ibc_type(i) =  iflag_sph_2_center
           end if
         end do
 !
@@ -95,6 +97,9 @@
         do i = 1, light_surf%num_bc
           call set_surf_group_types_scalar(bc_grad_ds_type_ctl(i),      &
      &        light_surf%ibc_type(i) )
+!
+          if(bc_grad_ds_type_ctl(i) .eq. 'sph_to_center') then
+            light_surf%ibc_type(i) =  iflag_sph_2_center
         end do
 !
         call deallocate_sf_dscalar_ctl

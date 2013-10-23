@@ -35,9 +35,9 @@
       use m_node_group
       use m_bc_data_list
       use m_surf_data_list
+      use set_node_group_types
       use set_surface_group_types
 !
-      character(len=kchara) :: tmpchara
       integer (kind = kint) :: i, iflag_4_hemi
 !
 !
@@ -57,7 +57,7 @@
 !
         call allocate_nod_bc_list_velo
 !
-        velo_nod%bc_name =      bc_v_name_ctl
+        velo_nod%bc_name = bc_v_name_ctl
         velo_nod%bc_magnitude = bc_v_magnitude_ctl
 !
         iflag_4_hemi = 0
@@ -68,41 +68,25 @@
         end do
 !
         do i = 1, velo_nod%num_bc
-          tmpchara = bc_v_type_ctl(i)
-          if ( tmpchara .eq. 'fix_x' ) then
-            velo_nod%ibc_type(i) = iflag_bc_fixed + 1
-          else if ( tmpchara .eq. 'fix_y' ) then
-            velo_nod%ibc_type(i) = iflag_bc_fixed + 2
-          else if ( tmpchara .eq. 'fix_z' ) then
-            velo_nod%ibc_type(i) = iflag_bc_fixed + 3
-          else if ( tmpchara .eq. 'file_x' ) then
-            velo_nod%ibc_type(i) = iflag_bc_fixed - 1
-          else if ( tmpchara .eq. 'file_y' ) then
-            velo_nod%ibc_type(i) = iflag_bc_fixed - 2
-          else if ( tmpchara .eq. 'file_z' ) then
-            velo_nod%ibc_type(i) = iflag_bc_fixed - 3
-          else if ( tmpchara .eq. 'rot_x' ) then
-            velo_nod%ibc_type(i) = iflag_bc_rot + 1
-          else if ( tmpchara .eq. 'rot_y' ) then
-            velo_nod%ibc_type(i) = iflag_bc_rot + 2
-          else if ( tmpchara .eq. 'rot_z' ) then
-            velo_nod%ibc_type(i) = iflag_bc_rot + 3
-          else if ( tmpchara .eq. 'vr_0' ) then
+         call set_nod_group_types_vector(bc_v_type_ctl(i),              &
+     &       velo_nod%ibc_type(i))
+         call set_nod_group_types_sgs_vect(bc_v_type_ctl(i),            &
+     &       velo_nod%ibc_type(i))
+         call set_nod_group_types_rotatin(bc_v_type_ctl(i),             &
+     &       velo_nod%ibc_type(i))
+!
+          if (bc_v_type_ctl(i) .eq. 'vr_0' ) then
             velo_nod%ibc_type(i) = iflag_no_vr
-          else if ( tmpchara .eq. 'free_slip_sph' ) then
+          else if ( bc_v_type_ctl(i) .eq. 'free_slip_sph' ) then
             velo_nod%ibc_type(i) = iflag_free_sph
-          else if ( tmpchara .eq. 'non_slip_sph' ) then
+          else if ( bc_v_type_ctl(i) .eq. 'non_slip_sph' ) then
             velo_nod%ibc_type(i) = iflag_non_slip_sph
-          else if ( tmpchara .eq. 'rot_inner_core' ) then
+          else if ( bc_v_type_ctl(i) .eq. 'rot_inner_core' ) then
             velo_nod%ibc_type(i) = iflag_rotatable_icore
-          else if ( tmpchara .eq. 'special' ) then
+          else if ( bc_v_type_ctl(i) .eq. 'sph_to_center' ) then
+            velo_nod%ibc_type(i) = iflag_sph_2_center
+          else if ( bc_v_type_ctl(i) .eq. 'special' ) then
             velo_nod%ibc_type(i) = iflag_bc_special
-          else if ( tmpchara .eq. 'sgs_x' ) then
-            velo_nod%ibc_type(i) =  iflag_bc_sgs + 1
-          else if ( tmpchara .eq. 'sgs_y' ) then
-            velo_nod%ibc_type(i) =  iflag_bc_sgs + 2
-          else if ( tmpchara .eq. 'sgs_z' ) then
-            velo_nod%ibc_type(i) =  iflag_bc_sgs + 3
           end if
         end do
 !
@@ -138,6 +122,8 @@
             torque_surf%ibc_type(i) = iflag_non_slip_sph
           else if (bc_torque_type_ctl(i) .eq. 'rot_inner_core' ) then
             torque_surf%ibc_type(i) = iflag_rotatable_icore
+          else if (bc_torque_type_ctl(i) .eq. 'sph_to_center'  ) then
+            torque_surf%ibc_type(i) = iflag_sph_2_center
           end if
         end do
 !

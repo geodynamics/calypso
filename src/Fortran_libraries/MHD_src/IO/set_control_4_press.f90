@@ -35,9 +35,9 @@
       use m_node_group
       use m_bc_data_list
       use m_surf_data_list
+      use set_node_group_types
       use set_surface_group_types
 !
-      character(len=kchara) :: tmpchara
       integer (kind = kint) :: i
 !
 !
@@ -61,14 +61,10 @@
         press_nod%bc_magnitude = bc_p_magnitude_ctl
 !
         do i = 1, press_nod%num_bc
-          tmpchara = bc_p_type_ctl(i)
-          if ( tmpchara .eq. 'fixed' ) then
-            press_nod%ibc_type(i) =  iflag_bc_fix_s
-          else if ( tmpchara .eq. 'file' ) then
-            press_nod%ibc_type(i) = -iflag_bc_fix_s
-          else if ( tmpchara .eq. 'sgs' ) then
-            press_nod%ibc_type(i) =  iflag_bc_sgs_s
-          end if
+          call set_nod_group_types_scalar(bc_p_type_ctl(i),             &
+     &        press_nod%ibc_type(i))
+          call set_nod_group_types_sgs_scalar(bc_p_type_ctl(i),         &
+     &        press_nod%ibc_type(i))
         end do
 !
 !
@@ -76,7 +72,7 @@
           write(*,*) 'i, press_nod'
           do i = 1, press_nod%num_bc
             write(*,*)  i, press_nod%ibc_type(i),                       &
-     &         press_nod%bc_magnitude(i), trim(press_nod%bc_name(i))
+     &        press_nod%bc_magnitude(i), trim(press_nod%bc_name(i))
           end do
         end if
       end if
@@ -91,11 +87,10 @@
         wall_surf%bc_name =       bc_grad_p_name_ctl
 !
         do i = 1, wall_surf%num_bc
-          tmpchara = bc_grad_p_type_ctl(i)
           call set_surf_group_types_scalar(bc_grad_p_type_ctl(i),       &
-     &        wall_surf%ibc_type(i) )
+     &       wall_surf%ibc_type(i) )
           call set_surf_wall_group_types(bc_grad_p_type_ctl(i),         &
-     &        wall_surf%ibc_type(i) )
+     &       wall_surf%ibc_type(i) )
         end do
       end if
 !
