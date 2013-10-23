@@ -1,14 +1,21 @@
+!>@file   skip_comment_f.f90
+!!@brief  module skip_comment_f
+!!
+!!@authorH.Matsui and H.Okuda
+!!@date Programmed  H. Matsui in  Feb. 2001 
 !
-!      module skip_comment_f
-!
-!        programmed by H.Matsui and H.Okuda
-!                                    on Feb. 2001 (ver 1.2)
-!
-!      subroutine skip_comment(character_4_read,id_file)
-!      subroutine count_field_by_comma(id_file, charabuf,               &
-!     &          ncomp, field_name)
-!      subroutine read_stack_array(character_4_read, id_file, num,      &
-!     &          istack_array)
+!> @brief subroutines to find comment lines in data
+!!
+!!@verbatim
+!!      subroutine skip_comment(character_4_read,id_file)
+!!      subroutine count_field_by_comma(id_file, charabuf,              &
+!!     &          ncomp, field_name)
+!!      subroutine read_stack_array(character_4_read, id_file, num,     &
+!!     &          istack_array)
+!!
+!!      subroutine change_2_upper_case(string)
+!!      subroutine change_2_lower_case(string)
+!!@endverbatim
 !
       module skip_comment_f
 !
@@ -115,6 +122,40 @@
         end if
 !
       end subroutine read_stack_array
+!
+!-----------------------------------------------------------------------
+!
+      subroutine change_2_upper_case(string)
+!
+      character(len=kchara), intent(inout) :: string
+      integer(kind = kint) :: i, len
+!
+!
+      len = len_trim(string)
+      do i = 1, len
+        if (string(i:i) .ge. 'a' .and. string(i:i) .le. 'z') then 
+          string(i:i) = char(ichar(string(i:i)) - 32)
+        end if
+      end do
+!
+      end subroutine change_2_upper_case
+!
+!-----------------------------------------------------------------------
+!
+      subroutine change_2_lower_case(string)
+!
+      character(len=kchara), intent(inout) :: string
+      integer(kind = kint) :: i, len
+!
+!
+      len = len_trim(string)
+      do i = 1, len
+        if (string(i:i) .ge. 'A' .and. string(i:i) .le. 'Z') then 
+          string(i:i) = char(ichar(string(i:i)) + 32)
+        end if
+      end do
+!
+      end subroutine change_2_lower_case
 !
 !-----------------------------------------------------------------------
 !
