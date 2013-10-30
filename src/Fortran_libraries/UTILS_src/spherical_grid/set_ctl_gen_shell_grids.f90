@@ -99,17 +99,17 @@
       nidx_global_rtp(3) = 4
       l_truncation = 2
 !
-      if     (raidal_grid_type_ctl .eq. 'explicit'                      &
-     &   .or. raidal_grid_type_ctl .eq. 'Explicit'                      &
-     &   .or. raidal_grid_type_ctl .eq. 'EXPLICIT') then
+      if     (radial_grid_type_ctl .eq. 'explicit'                      &
+     &   .or. radial_grid_type_ctl .eq. 'Explicit'                      &
+     &   .or. radial_grid_type_ctl .eq. 'EXPLICIT') then
        iflag_radial_grid =  igrid_non_euqidist
-      else if(raidal_grid_type_ctl .eq. 'chebyshev'                     &
-     &   .or. raidal_grid_type_ctl .eq. 'Chebyshev'                     &
-     &   .or. raidal_grid_type_ctl .eq. 'CHEBYSHEV') then
+      else if(radial_grid_type_ctl .eq. 'chebyshev'                     &
+     &   .or. radial_grid_type_ctl .eq. 'Chebyshev'                     &
+     &   .or. radial_grid_type_ctl .eq. 'CHEBYSHEV') then
        iflag_radial_grid =  igrid_Chebyshev
-      else if(raidal_grid_type_ctl .eq. 'equi_distance'                 &
-     &   .or. raidal_grid_type_ctl .eq. 'Equi_distance'                 &
-     &   .or. raidal_grid_type_ctl .eq. 'EQUI_DISTANCE') then
+      else if(radial_grid_type_ctl .eq. 'equi_distance'                 &
+     &   .or. radial_grid_type_ctl .eq. 'Equi_distance'                 &
+     &   .or. radial_grid_type_ctl .eq. 'EQUI_DISTANCE') then
        iflag_radial_grid =  igrid_euqidistance
       end if
 !

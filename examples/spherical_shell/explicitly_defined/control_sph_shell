@@ -26,7 +26,7 @@ begin spherical_shell_ctl
     ngrid_meridonal_ctl      48
     ngrid_zonal_ctl          96
 !
-    raidal_grid_type_ctl   explicit
+    radial_grid_type_ctl   explicit
     array r_layer     49
       r_layer        1   5.384615384615384E-001
       r_layer        2   5.395320768422367E-001

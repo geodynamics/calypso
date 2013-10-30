@@ -29,7 +29,7 @@ begin spherical_shell_ctl
     ngrid_meridonal_ctl      48
     ngrid_zonal_ctl          96
 !
-    raidal_grid_type_ctl   Chebyshev
+    radial_grid_type_ctl   Chebyshev
     num_fluid_grid_ctl     48
     fluid_core_size_ctl   1.0
     ICB_to_CMB_ratio_ctl  0.35

@@ -16,7 +16,7 @@
 !!
 !!      subroutine change_2_upper_case(string)
 !!      subroutine change_2_lower_case(string)
-!!      integer function compare_ignore_cases(ref_chara, cmp_chara)
+!!      integer function cmp_no_case(ref_chara, cmp_chara)
 !!          if ref_chara and cmp_chara are same ignoreing case,
 !!          returns 1, othewwise returns 0
 !!@endverbatim
@@ -163,7 +163,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      integer function compare_ignore_cases(ref_chara, cmp_chara)
+      integer function cmp_no_case(ref_chara, cmp_chara)
 !
       character*(*), intent(in) :: ref_chara
       character(len=kchara), intent(in) :: cmp_chara
@@ -173,7 +173,7 @@
 !
       len = len_trim(ref_chara)
       if(len_trim(cmp_chara) .ne. len) then
-        compare_ignore_cases = 0
+        cmp_no_case = 0
         return
       end if
 !
@@ -182,11 +182,11 @@
       call change_2_lower_case(ref_tmp)
       call change_2_lower_case(cmp_tmp)
 !
-      compare_ignore_cases = 0
-      if(ref_tmp .eq. cmp_tmp) compare_ignore_cases = 1
+      cmp_no_case = 0
+      if(ref_tmp .eq. cmp_tmp) cmp_no_case = 1
       return
 !
-      end function compare_ignore_cases
+      end function cmp_no_case
 !
 !-----------------------------------------------------------------------
 !
