@@ -52,7 +52,7 @@
       end if
 !
       do i = 1, h_flux_surf%num_bc
-        if ( h_flux_surf%ibc_type(i)  .eq. iflag_surf_fix_s) then
+        if ( h_flux_surf%ibc_type(i)  .eq. iflag_bc_fix_s) then
           call set_homogenious_grad_bc                                  &
      &       (ICB_nod_grp_name, ICB_sf_grp_name,                        &
      &        h_flux_surf%bc_name(i), h_flux_surf%bc_magnitude(i),      &
@@ -61,7 +61,7 @@
      &       (CMB_nod_grp_name, CMB_sf_grp_name,                        &
      &        h_flux_surf%bc_name(i), h_flux_surf%bc_magnitude(i),      &
      &        nidx_rj(2), h_flux_CMB_bc, iflag_cmb_temp)
-        else if (h_flux_surf%ibc_type(i)  .eq. -iflag_surf_fix_s) then
+        else if (h_flux_surf%ibc_type(i)  .eq. -iflag_bc_fix_s) then
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_temp, ICB_nod_grp_name, ICB_sf_grp_name,              &
      &        nidx_rj(2), h_flux_ICB_bc, iflag_icb_temp)
@@ -168,7 +168,7 @@
 !      Boundary setting using surface group data
 !
       do i = 1, light_surf%num_bc
-        if (light_surf%ibc_type(i)  .eq. iflag_surf_fix_s) then
+        if (light_surf%ibc_type(i)  .eq. iflag_bc_fix_s) then
           call set_homogenious_grad_bc                                  &
      &       (ICB_nod_grp_name, ICB_sf_grp_name,                        &
      &        light_surf%bc_name(i), light_surf%bc_magnitude(i),        &
@@ -177,8 +177,7 @@
      &       (CMB_nod_grp_name, CMB_sf_grp_name,                        &
      &        light_surf%bc_name(i), light_surf%bc_magnitude(i),        &
      &        nidx_rj(2), c_flux_CMB_bc, iflag_cmb_composition)
-        else if (light_surf%ibc_type(i)  .eq. -iflag_surf_fix_s)        &
-     &         then
+        else if (light_surf%ibc_type(i)  .eq. -iflag_bc_fix_s) then
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_light, ICB_nod_grp_name, ICB_sf_grp_name,             &
      &        nidx_rj(2), c_flux_ICB_bc, iflag_icb_composition)

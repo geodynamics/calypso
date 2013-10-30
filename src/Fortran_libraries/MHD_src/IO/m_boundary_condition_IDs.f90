@@ -23,6 +23,8 @@
       integer(kind = kint), parameter :: iflag_bc_fix_y =   2
 !>      fixed z-component defined by control data
       integer(kind = kint), parameter :: iflag_bc_fix_z =   3
+!>      fixed scalar defined by external file
+      integer(kind = kint), parameter :: iflag_bc_file_s = -1
 !>      fixed x-component defined by external file
       integer(kind = kint), parameter :: iflag_bc_file_x = -1
 !>      fixed y-component defined by external file
@@ -66,6 +68,8 @@
       integer(kind = kint), parameter :: iflag_insulator =       100
 !>      boundary to connect center field
       integer(kind = kint), parameter :: iflag_sph_2_center =    501
+!>      boundary to fix center field
+      integer(kind = kint), parameter :: iflag_sph_clip_center = 502
 !
 !>      pseudo vacuum boundary
       integer(kind = kint), parameter :: iflag_pseudo_vacuum =   400
@@ -75,29 +79,21 @@
 !
 !
 !>      base flag for fixed normal gradient
-      integer(kind = kint), parameter :: iflag_fixed_grad =      0
+      integer(kind = kint), parameter :: iflag_fixed_grad =      10
 !>      fixed normal gradient of scalar
-      integer(kind = kint), parameter :: iflag_fixed_grad_s =    1
+      integer(kind = kint), parameter :: iflag_fixed_grad_s =    11
 !>      fixed normal gradient of x-component
-      integer(kind = kint), parameter :: iflag_fixed_grad_x =    1
+      integer(kind = kint), parameter :: iflag_fixed_grad_x =    11
 !>      fixed normal gradient of y-component
-      integer(kind = kint), parameter :: iflag_fixed_grad_y =    2
+      integer(kind = kint), parameter :: iflag_fixed_grad_y =    12
 !>      fixed normal gradient of z-component
-      integer(kind = kint), parameter :: iflag_fixed_grad_z =    3
+      integer(kind = kint), parameter :: iflag_fixed_grad_z =    13
 !
 !>      base flag for fixed normal field
-      integer(kind = kint), parameter :: iflag_fixed_norm =   10
+      integer(kind = kint), parameter :: iflag_fixed_norm =   20
 !
 !>      base flag for fixed field on surface
-      integer(kind = kint), parameter :: iflag_surf_fixed =   10
-!>      fixed scalar on surface
-      integer(kind = kint), parameter :: iflag_surf_fix_s =   11
-!>      fixed x-component on surface
-      integer(kind = kint), parameter :: iflag_surf_fix_x =   11
-!>      fixed y-component on surface
-      integer(kind = kint), parameter :: iflag_surf_fix_y =   12
-!>      fixed z-component on surface
-      integer(kind = kint), parameter :: iflag_surf_fix_z =   13
+      integer(kind = kint), parameter :: iflag_surf_fixed =   0
 !
 !>      base flag for fixed field for commutation error coorection
       integer(kind = kint), parameter :: iflag_bc_sgs_commute =   15

@@ -16,7 +16,7 @@
 !!
 !!      subroutine change_2_upper_case(string)
 !!      subroutine change_2_lower_case(string)
-!!      integer function cmp_no_case(ref_chara, cmp_chara)
+!!      integer function cmp_no_case(cmp_chara, ref_chara)
 !!          if ref_chara and cmp_chara are same ignoreing case,
 !!          returns 1, othewwise returns 0
 !!@endverbatim
@@ -163,7 +163,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      integer function cmp_no_case(ref_chara, cmp_chara)
+      integer function cmp_no_case(cmp_chara, ref_chara)
 !
       character*(*), intent(in) :: ref_chara
       character(len=kchara), intent(in) :: cmp_chara

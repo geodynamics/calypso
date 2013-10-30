@@ -62,16 +62,16 @@
         magne_nod%bc_magnitude = bc_b_magnitude_ctl
 !
         do i = 1, magne_nod%num_bc
-         call set_nod_group_types_vector(bc_b_type_ctl(i),              &
+         call set_bc_group_types_vector(bc_b_type_ctl(i),               &
      &       magne_nod%ibc_type(i))
-         call set_nod_group_types_sgs_vect(bc_b_type_ctl(i),            &
+         call set_bc_group_types_sgs_vect(bc_b_type_ctl(i),             &
+     &       magne_nod%ibc_type(i))
+         call set_bc_group_types_sph_center(bc_b_type_ctl(i),           &
      &       magne_nod%ibc_type(i))
 !
           tmpchara = bc_b_type_ctl(i)
           if ( tmpchara .eq. 'insulator' ) then
             magne_nod%ibc_type(i) = iflag_insulator
-          else if ( tmpchara .eq. 'sph_to_center' ) then
-            magne_nod%ibc_type(i) = iflag_sph_2_center
           else if ( tmpchara .eq. 'pseudo_vacuum' ) then
             magne_nod%ibc_type(i) = iflag_pseudo_vacuum
 !          else if ( tmpchara .eq. 'sph' ) then
@@ -102,11 +102,11 @@
         do i = 1, magne_surf%num_bc
           call set_surf_group_types_vector(bc_grad_b_type_ctl(i),       &
      &        magne_surf%ibc_type(i))
+          call set_bc_group_types_sph_center(bc_grad_b_type_ctl(i),     &
+     &        magne_surf%ibc_type(i))
 !
           if (bc_grad_b_type_ctl(i) .eq. 'insulator' ) then
             magne_surf%ibc_type(i) = iflag_insulator
-          else if (bc_grad_b_type_ctl(i) .eq. 'sph_to_center' ) then
-            magne_surf%ibc_type(i) = iflag_sph_2_center
           else if (bc_grad_b_type_ctl(i) .eq. 'pseudo_vacuum' ) then
             magne_surf%ibc_type(i) = iflag_pseudo_vacuum
           end if

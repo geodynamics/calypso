@@ -60,15 +60,15 @@
         temp_nod%bc_magnitude = bc_e_magnitude_ctl
 !
         do i = 1, temp_nod%num_bc
-          call set_nod_group_types_scalar(bc_e_type_ctl(i),             &
+          call set_bc_group_types_scalar(bc_e_type_ctl(i),              &
      &        temp_nod%ibc_type(i))
-          call set_nod_group_types_sgs_scalar(bc_e_type_ctl(i),         &
+          call set_bc_group_types_sgs_scalar(bc_e_type_ctl(i),          &
+     &        temp_nod%ibc_type(i))
+          call set_bc_group_types_sph_center(bc_e_type_ctl(i),          &
      &        temp_nod%ibc_type(i))
 !
           if ( bc_e_type_ctl(i) .eq. 'fixed_flux' ) then
             temp_nod%ibc_type(i) =  iflag_bc_fix_flux
-          else if(bc_e_type_ctl(i) .eq. 'sph_to_center') then
-            temp_nod%ibc_type(i) =  iflag_sph_2_center
           end if
         end do
 !
@@ -93,10 +93,8 @@
         do i = 1, h_flux_surf%num_bc
           call set_surf_group_types_scalar(bc_h_flux_type_ctl(i),       &
      &            h_flux_surf%ibc_type(i))
-!
-          if(bc_h_flux_type_ctl(i) .eq. 'sph_to_center') then
-            h_flux_surf%ibc_type(i) =  iflag_sph_2_center
-          end if
+          call set_bc_group_types_sph_center(bc_h_flux_type_ctl(i),     &
+     &            h_flux_surf%ibc_type(i))
         end do
       end if
 !

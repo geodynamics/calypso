@@ -29,6 +29,7 @@
       use m_ctl_data_4_sphere_model
       use m_ctl_data_4_divide_sphere
       use set_control_platform_data
+      use skip_comment_f
 !
       integer(kind = kint) :: i, ip
 !
@@ -40,17 +41,14 @@
 !
       iflag_shell_mode = iflag_no_FEMMESH
       if(i_sph_g_type .gt. 0) then
-        if      (sph_grid_type_ctl .eq. 'no_pole'                       &
-     &      .or. sph_grid_type_ctl .eq. 'No_pole'                       &
-     &      .or. sph_grid_type_ctl .eq. 'NO_POLE') then
+        if      (cmp_no_case(sph_grid_type_ctl, 'no_pole') .gt. 0       &
+     &         ) then
           iflag_shell_mode = iflag_MESH_same
-        else if (sph_grid_type_ctl .eq. 'with_pole'                     &
-     &      .or. sph_grid_type_ctl .eq. 'With_pole'                     &
-     &      .or. sph_grid_type_ctl .eq. 'WITH_POLE') then
+        else if (cmp_no_case(sph_grid_type_ctl, 'with_pole') .gt. 0     &
+     &         ) then
           iflag_shell_mode = iflag_MESH_w_pole
-        else if (sph_grid_type_ctl .eq. 'with_center'                   &
-     &      .or. sph_grid_type_ctl .eq. 'With_center'                   &
-     &      .or. sph_grid_type_ctl .eq. 'WITH_CENTER') then
+        else if (cmp_no_case(sph_grid_type_ctl, 'with_center') .gt. 0   &
+     &         ) then
           iflag_shell_mode = iflag_MESH_w_center
         end if
       else
@@ -91,26 +89,24 @@
       nlayer_ICB =       1
       nlayer_CMB =       numlayer_shell_ctl
       nlayer_mid_OC =   -1
-        if(i_bc_sph .gt. 0) then
-          do i = 1, numlayer_bc_ctl
-            if     (bc_bondary_name_ctl(i) .eq. 'ICB'                   &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'icb') then
-              nlayer_ICB = kr_boundary_ctl(i)
-            else if(bc_bondary_name_ctl(i) .eq. 'CMB'                   &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'cmb') then
-              nlayer_CMB = kr_boundary_ctl(i)
-            else if(bc_bondary_name_ctl(i) .eq. 'to_Center'             &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'to_center'             &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'TO_CENTER') then
-              nlayer_2_center = kr_boundary_ctl(i)
-            else if(bc_bondary_name_ctl(i) .eq. 'Mid_Depth'             &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'mid_depth'             &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'MID_DEPTH') then
-              nlayer_mid_OC = kr_boundary_ctl(i)
-            end if
-          end do
-          call deallocate_boundary_layers
-        end if
+      if(i_bc_sph .gt. 0) then
+        do i = 1, numlayer_bc_ctl
+          if     (cmp_no_case(bc_bondary_name_ctl(i), 'ICB') .gt. 0     &
+     &            ) then
+            nlayer_ICB = kr_boundary_ctl(i)
+          else if(cmp_no_case(bc_bondary_name_ctl(i), 'CMB') .gt. 0     &
+     &            ) then
+            nlayer_CMB = kr_boundary_ctl(i)
+          else if(cmp_no_case(bc_bondary_name_ctl(i), 'to_center').gt.0 &
+     &            ) then
+            nlayer_2_center = kr_boundary_ctl(i)
+          else if(cmp_no_case(bc_bondary_name_ctl(i), 'mid_depth').gt.0 &
+     &            ) then
+            nlayer_mid_OC = kr_boundary_ctl(i)
+          end if
+        end do
+        call deallocate_boundary_layers
+      end if
 !
       write(*,*) 'nidx_global_rtp: ', nidx_global_rtp(1:3)
 !

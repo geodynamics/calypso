@@ -68,11 +68,13 @@
         end do
 !
         do i = 1, velo_nod%num_bc
-         call set_nod_group_types_vector(bc_v_type_ctl(i),              &
+         call set_bc_group_types_vector(bc_v_type_ctl(i),               &
      &       velo_nod%ibc_type(i))
-         call set_nod_group_types_sgs_vect(bc_v_type_ctl(i),            &
+         call set_bc_group_types_sgs_vect(bc_v_type_ctl(i),             &
      &       velo_nod%ibc_type(i))
-         call set_nod_group_types_rotatin(bc_v_type_ctl(i),             &
+         call set_bc_group_types_rotation(bc_v_type_ctl(i),             &
+     &       velo_nod%ibc_type(i))
+         call set_bc_group_types_sph_center(bc_v_type_ctl(i),           &
      &       velo_nod%ibc_type(i))
 !
           if (bc_v_type_ctl(i) .eq. 'vr_0' ) then
@@ -83,8 +85,6 @@
             velo_nod%ibc_type(i) = iflag_non_slip_sph
           else if ( bc_v_type_ctl(i) .eq. 'rot_inner_core' ) then
             velo_nod%ibc_type(i) = iflag_rotatable_icore
-          else if ( bc_v_type_ctl(i) .eq. 'sph_to_center' ) then
-            velo_nod%ibc_type(i) = iflag_sph_2_center
           else if ( bc_v_type_ctl(i) .eq. 'special' ) then
             velo_nod%ibc_type(i) = iflag_bc_special
           end if
@@ -115,6 +115,8 @@
      &       torque_surf%ibc_type(i) )
           call set_stress_free_group_types(bc_torque_type_ctl(i),       &
      &       torque_surf%ibc_type(i) )
+          call set_bc_group_types_sph_center(bc_torque_type_ctl(i),     &
+     &       torque_surf%ibc_type(i) )
 !
           if      (bc_torque_type_ctl(i) .eq. 'free_slip_sph' ) then
             torque_surf%ibc_type(i) = iflag_free_sph
@@ -122,8 +124,6 @@
             torque_surf%ibc_type(i) = iflag_non_slip_sph
           else if (bc_torque_type_ctl(i) .eq. 'rot_inner_core' ) then
             torque_surf%ibc_type(i) = iflag_rotatable_icore
-          else if (bc_torque_type_ctl(i) .eq. 'sph_to_center'  ) then
-            torque_surf%ibc_type(i) = iflag_sph_2_center
           end if
         end do
 !
