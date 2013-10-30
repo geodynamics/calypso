@@ -3,6 +3,7 @@
 !!
 !!@authorH.Matsui and H.Okuda
 !!@date Programmed  H. Matsui in  Feb. 2001 
+!!@date Modified   H. Matsui in  Oct. 2013 
 !
 !> @brief subroutines to find comment lines in data
 !!
@@ -15,6 +16,9 @@
 !!
 !!      subroutine change_2_upper_case(string)
 !!      subroutine change_2_lower_case(string)
+!!      integer function compare_ignore_cases(ref_chara, cmp_chara)
+!!          if ref_chara and cmp_chara are same ignoreing case,
+!!          returns 1, othewwise returns 0
 !!@endverbatim
 !
       module skip_comment_f
@@ -156,6 +160,33 @@
       end do
 !
       end subroutine change_2_lower_case
+!
+!-----------------------------------------------------------------------
+!
+      integer function compare_ignore_cases(ref_chara, cmp_chara)
+!
+      character*(*), intent(in) :: ref_chara
+      character(len=kchara), intent(in) :: cmp_chara
+      character(len=kchara)  :: ref_tmp, cmp_tmp
+      integer(kind = kint) :: len
+!
+!
+      len = len_trim(ref_chara)
+      if(len_trim(cmp_chara) .ne. len) then
+        compare_ignore_cases = 0
+        return
+      end if
+!
+      write(ref_tmp,'(a)')  ref_chara
+      write(cmp_tmp,'(a)')  cmp_chara
+      call change_2_lower_case(ref_tmp)
+      call change_2_lower_case(cmp_tmp)
+!
+      compare_ignore_cases = 0
+      if(ref_tmp .eq. cmp_tmp) compare_ignore_cases = 1
+      return
+!
+      end function compare_ignore_cases
 !
 !-----------------------------------------------------------------------
 !
