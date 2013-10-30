@@ -211,7 +211,7 @@
           inod = jj + (k-1)*nidx_rj(2)
 !
           d_rj(inod,ipol%i_temp) = (one-three*xr**2+three*xr**4-xr**6)  &
-     &                            * 0.1d0 * three / (two*sqrt(pi))
+     &                            * 0.1d0 * three / (sqrt(two*pi))
         end do
       end if
 !
@@ -257,7 +257,7 @@
           xr = two * radius_1d_rj_r(k) - one * (r_CMB+r_ICB) / shell
           inod = jj + (k-1)*nidx_rj(2)
           d_rj(inod,is_fld) = (one-three*xr**2+three*xr**4-xr**6)      &
-     &                            * 0.1d0 * three / (two*sqrt(pi))
+     &                            * 0.1d0 * three / (sqrt(two*pi))
         end do
       end if
 !

@@ -35,9 +35,9 @@
 !
       call allocate_surface_data
 !
-      surf_name(1) = 'ICB_surf'
-      surf_name(2) = 'CMB_surf'
-      surf_name(3) = 'to_Center_surf'
+      surf_name(1) = ICB_sf_grp_name
+      surf_name(2) = CMB_sf_grp_name
+      surf_name(3) = CTR_sf_grp_name
 !
       surf_istack(0) = 0
       surf_istack(1) = surf_istack(0)                                   &
@@ -68,9 +68,9 @@
 !
       call allocate_surface_data
 !
-      surf_name(1) = 'ICB_surf'
-      surf_name(2) = 'CMB_surf'
-      surf_name(3) = 'to_Center_surf'
+      surf_name(1) = ICB_sf_grp_name
+      surf_name(2) = CMB_sf_grp_name
+      surf_name(3) = CTR_sf_grp_name
 !
       surf_istack(0) = 0
       surf_istack(1) = surf_istack(0)                                   &

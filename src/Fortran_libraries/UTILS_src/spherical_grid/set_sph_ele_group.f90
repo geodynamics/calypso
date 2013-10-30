@@ -109,7 +109,7 @@
             if(iflag_r(kg1)*iflag_r(kg2) .gt. 0) then
               call count_ele_grp_item_on_sphere(ip_t,                   &
      &            ele_grp%nitem_grp(icou))
-            else if(ele_grp%grp_name(icou) .eq. name_IC                 &
+            else if(ele_grp%grp_name(icou) .eq. IC_ele_grp_name         &
      &           .and. iflag_r(kg1).gt.0) then
               call count_ele_grp_item_on_sphere(ip_t,                   &
      &            ele_grp%nitem_grp(icou))
@@ -167,7 +167,7 @@
             if(iflag_r(kg1)*iflag_r(kg2) .gt. 0) then
               call set_ele_grp_item_on_sphere(ip_r, ip_t, kele,         &
      &            inum, ele_grp)
-            else if(ele_grp%grp_name(icou) .eq. name_IC                 &
+            else if(ele_grp%grp_name(icou) .eq. IC_ele_grp_name         &
      &           .and. iflag_r(kg1).gt.0) then
               call set_ele_grp_item_on_sphere(ip_r, ip_t, kele,         &
      &            inum, ele_grp)

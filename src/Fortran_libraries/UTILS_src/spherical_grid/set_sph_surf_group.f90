@@ -68,8 +68,8 @@
           surf_grp%grp_name(icou) = name_radial_grp_rj(igrp)
 !
           kr = item_radial_grp_rj(knum)
-          if(surf_grp%grp_name(icou) .eq. name_IC                       &
-     &         .or. surf_grp%grp_name(icou) .eq. name_2center) then
+          if(surf_grp%grp_name(icou) .eq. ICB_nod_grp_name              &
+     &         .or. surf_grp%grp_name(icou) .eq. CTR_nod_grp_name) then
             kl1 = irev_sph_r(kr,  ip_r)
             kl2 = irev_sph_r(kr+1,ip_r)
           else
@@ -116,8 +116,8 @@
           inum =  surf_grp%istack_grp(icou-1)
 !
           kr = item_radial_grp_rj(knum)
-          if(surf_grp%grp_name(icou) .eq. name_IC                       &
-     &         .or. surf_grp%grp_name(icou) .eq. name_2center) then
+          if(surf_grp%grp_name(icou) .eq. ICB_nod_grp_name              &
+     &         .or. surf_grp%grp_name(icou) .eq. CTR_nod_grp_name) then
             kl1 = irev_sph_r(kr,  ip_r)
             kl2 = irev_sph_r(kr+1,ip_r)
             isf = ifive

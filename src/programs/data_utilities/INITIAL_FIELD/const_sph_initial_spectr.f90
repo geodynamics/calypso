@@ -154,9 +154,10 @@
 !
 !
 !    Find local addrtess for (l,m) = (4,4)
-      jj =  find_local_sph_mode_address(4, 4)
+!      jj =  find_local_sph_mode_address(4, 4)
+      jj =  find_local_sph_mode_address(5, 5)
 !
-!    If data for (l,m) = (4,4) is there, set initial temperature 
+!    If data for (l,m) = (4,4) is there, set initial temperature
       if (jj .gt. 0) then
 !    Set initial field from ICB to CMB
         do k = nlayer_ICB, nlayer_CMB
@@ -169,7 +170,7 @@
 !    set initial temperature
           xr = two * rr - one * (r_CMB+r_ICB) / shell
           d_rj(inod,ipol%i_temp) = (one-three*xr**2+three*xr**4-xr**6)  &
-     &                            * A_temp * three / (two*sqrt(pi))
+     &                            * A_temp * three / (sqrt(two*pi))
         end do
       end if
 !
@@ -217,7 +218,7 @@
           inod = local_sph_data_address(k,jj)
           xr = two * radius_1d_rj_r(k) - one * (r_CMB+r_ICB) / shell
           d_rj(inod,ipol%i_light) = (one-three*xr**2+three*xr**4-xr**6) &
-     &                            * A_light * three / (two*sqrt(pi))
+     &                            * A_light * three / (sqrt(two*pi))
         end do
       end if
 !
