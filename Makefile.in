@@ -27,6 +27,7 @@ MPILIBS =     @MPILIBS@
 F90_LOCAL = @FC@
 MPIF90 = @MPIFC@
 
+GMAKE = @GMAKE@
 AR = @ar_bin@
 RANLIB = @RANLIB@
 
@@ -67,7 +68,7 @@ $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
 makemake: $(MAKE_MOD_DEP)
 	echo "# Construct Makefile"; \
 	cd $(MHDDIR) ; \
-		make \
+		$(GMAKE) \
 		MAKEDIR="$(MAKEDIR)" \
 		BUILDDIR="$(BUILDDIR)" \
 		INSTDIR="$(INSTDIR)" \
