@@ -336,8 +336,8 @@
      &    nidx_global_rtp(3), mspec_4_ispack, mdx_ispack)
 !
       call set_zonal_wavenum_4_legendre(ndomain_rtm(3),                 &
-     &    l_truncation, nidx_global_rj(2), nidx_global_rtp(2),          &
-     &    nidx_global_rtp(3), jdx_fsph, mdx_4_lgd)
+     &    l_truncation, nidx_global_rtp(2), nidx_global_rtp(3),         &
+     &    jdx_fsph, mdx_4_lgd)
 !
       call set_merged_index_4_sph_trans(ndomain_rtm(3),                 &
      &    l_truncation, nidx_global_rj(2), nidx_global_rtp(3),          &

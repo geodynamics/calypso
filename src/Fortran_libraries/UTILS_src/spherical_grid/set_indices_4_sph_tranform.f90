@@ -20,7 +20,7 @@
 !!     &          mspec_4_ispack, mdx_ispack)
 !!        output: mspec_4_ispack, mdx_ispack
 !!      subroutine set_zonal_wavenum_4_legendre(ndomain_m,              &
-!!     &          ltr, jmax, nth, nph, jdx_fsph, mdx_4_lgd)
+!!     &          ltr, nth, nph, jdx_fsph, mdx_4_lgd)
 !!        output: jdx_fsph, mdx_4_lgd
 !!
 !!      subroutine set_merged_index_4_sph_trans(ndomain_m, ltr, jmax,   &
@@ -273,14 +273,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_zonal_wavenum_4_legendre(ndomain_m,                &
-     &          ltr, jmax, nth, nph, jdx_fsph, mdx_4_lgd)
+     &          ltr, nth, nph, jdx_fsph, mdx_4_lgd)
 !
-      integer(kind = kint), intent(in) :: ltr, jmax
-      integer(kind = kint), intent(in) :: nth, nph, ndomain_m
+      integer(kind = kint), intent(in) :: ltr, nth, nph, ndomain_m
       integer(kind = kint), intent(inout) :: jdx_fsph(-nth:nth)
       integer(kind = kint), intent(inout) :: mdx_4_lgd(0:nph)
 !
-      integer(kind = kint) :: m, ip, mm, m0, imark, ltr_half
+      integer(kind = kint) :: m, ip, mm, imark, ltr_half
 !
 !
       allocate( ip_tmp(-ltr:ltr) )

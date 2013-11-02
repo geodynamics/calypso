@@ -216,8 +216,8 @@
       ndomain_rj(1:2) = 1
       if (ndir_domain_sph_grid .gt. 0) then
         do i = 1, ndir_domain_spectr
-          iflag_t = cmp_no_case(dir_domain_sph_grid_ctl(i), 'modes')    &
-     &       + cmp_no_case(dir_domain_sph_grid_ctl(i), 'degree_order')
+          iflag_t = cmp_no_case(dir_domain_spectr_ctl(i), 'modes')      &
+     &       + cmp_no_case(dir_domain_spectr_ctl(i), 'degree_order')
           if (iflag_t .gt. 0) ndomain_rj(2) = num_domain_spectr_ctl(i)
         end do
 !
