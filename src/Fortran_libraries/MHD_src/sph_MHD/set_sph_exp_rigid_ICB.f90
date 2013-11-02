@@ -84,7 +84,8 @@
       if(idx_rj_degree_zero .gt. 0) then
         do k = 1, nlayer_ICB
           inod = idx_rj_degree_zero + (k-1) * nidx_rj(2)
-          d_rj(inod,is_fld+2) = vt_ICB_bc(j)*ar_1d_rj(k,1)
+          d_rj(inod,is_fld+2)                                           &
+     &             = vt_ICB_bc(idx_rj_degree_zero)*ar_1d_rj(k,1)
         end do
       end if
 !

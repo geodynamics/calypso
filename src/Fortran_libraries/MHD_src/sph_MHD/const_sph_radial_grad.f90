@@ -70,7 +70,6 @@
         call cal_dsdr_sph_icb_fix_scalar_2(nidx_rj(2), temp_ICB_bc,     &
      &      ipol%i_temp, ipol%i_grad_t)
       end if
-      return
 !
       if (iflag_cmb_temp .eq. iflag_fixed_flux) then
         call cal_dsdr_sph_cmb_fix_flux_2(nidx_rj(2), h_flux_CMB_bc,     &

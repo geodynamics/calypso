@@ -82,14 +82,6 @@
         end if
       end do
 !
-!
-      if(iflag_icb_velocity .eq. iflag_sph_fill_center) then
-        kr_rj_fluid_start = nlayer_2_center
-      else
-        kr_rj_fluid_start = nlayer_ICB
-      end if
-      kr_rj_fluid_end = nlayer_CMB
-!
       end subroutine set_sph_bc_velo_sph
 !
 ! -----------------------------------------------------------------------
@@ -109,6 +101,8 @@
         iflag_icb_velocity = iflag_rotatable_ic
       else if (ibc_type .eq. iflag_sph_2_center) then
         iflag_icb_velocity = iflag_sph_fill_center
+      else if (ibc_type .eq. iflag_sph_clip_center) then
+        iflag_icb_velocity = iflag_sph_fix_center
 !
       else if (ibc_type .eq. (iflag_bc_rot+1)) then
         iflag_icb_velocity = iflag_fixed_velo

@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!     subroutine s_set_control_sph_data_MHD
-!!     subroutine set_ctl_params_pick_circle
+!!      subroutine set_ctl_params_pick_circle
 !!     subroutine set_ctl_params_dynamobench
 !!     subroutine check_SPH_MHD_dependencies
 !!@endverbatim
@@ -42,6 +42,7 @@
       use m_file_format_switch
 !
       use m_field_data_IO
+      use m_sph_boundary_input_data
 !
       use set_control_sph_data
       use set_phys_name_4_sph_trans
@@ -131,6 +132,10 @@
       end if
 !
 !
+      if (i_bc_data_file_name .gt. 0) then
+        bc_sph_file_name = bc_data_file_name_ctl
+      end if
+!
       end subroutine s_set_control_sph_data_MHD
 !
 ! -----------------------------------------------------------------------
@@ -155,7 +160,6 @@
         mphi_circle = -1
       end if
 !
-      write(*,*) 'phys_nod_name_ctl', allocated(phys_nod_name_ctl)
       do ifld = 1, num_nod_phys_ctl
         if(phys_nod_name_ctl(ifld) .eq. fhd_temp) ibench_temp = 1
         if(phys_nod_name_ctl(ifld) .eq. fhd_velo) ibench_velo = 1

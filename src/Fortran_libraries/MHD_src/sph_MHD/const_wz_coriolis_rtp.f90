@@ -173,7 +173,6 @@
       subroutine subtract_sphere_ave_coriolis
 !
       use calypso_mpi
-      use calypso_mpi
       use m_sph_phys_address
       use m_work_4_sph_trans
 !

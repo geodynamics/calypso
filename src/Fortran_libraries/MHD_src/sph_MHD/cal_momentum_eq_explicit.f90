@@ -85,8 +85,7 @@
       use m_control_params_sph_MHD
       use cal_explicit_terms
       use cal_vorticity_terms_adams
-      use cal_nonlinear_sph_MHD
-      use cal_vorticity_terms_adams
+!      use cal_nonlinear_sph_MHD
 !
       integer(kind = kint), intent(in) :: i_step
 !
@@ -108,7 +107,7 @@
 !
       if (i_step .eq. 1) then
         if(iflag_t_evo_4_velo .gt.     id_no_evolution) then
-          call set_ini_adams_advect
+          call set_ini_adams_inertia
         end if
         if(iflag_t_evo_4_temp .gt.     id_no_evolution) then
           call sel_ini_adams_heat_w_src

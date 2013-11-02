@@ -33,18 +33,20 @@
       integer(kind = kint), parameter :: iflag_bc_file_z = -3
 !
 !>      flag for fixed flux
-      integer(kind = kint), parameter :: iflag_bc_fix_flux = 11
+      integer(kind = kint), parameter :: iflag_bc_fix_flux =   11
+!>      flag for fixed flux by external file
+      integer(kind = kint), parameter :: iflag_bc_file_flux = -11
 !
 !>      base flag for fixed boundary with SGS model
-      integer(kind = kint), parameter :: iflag_bc_sgs =            4
+      integer(kind = kint), parameter :: iflag_bc_sgs =            5
 !>      fixed scalar defined by control data with SGS model
-      integer(kind = kint), parameter :: iflag_bc_sgs_s =          5
+      integer(kind = kint), parameter :: iflag_bc_sgs_s =          6
 !>      fixed x-component defined by control data with SGS model
-      integer(kind = kint), parameter :: iflag_bc_sgs_x =          5
+      integer(kind = kint), parameter :: iflag_bc_sgs_x =          6
 !>      fixed y-component defined by control data with SGS model
-      integer(kind = kint), parameter :: iflag_bc_sgs_y =          6
+      integer(kind = kint), parameter :: iflag_bc_sgs_y =          7
 !>      fixed z-component defined by control data with SGS model
-      integer(kind = kint), parameter :: iflag_bc_sgs_z =          7
+      integer(kind = kint), parameter :: iflag_bc_sgs_z =          8
 !
 !>      fixed rotation boundary
       integer(kind = kint), parameter :: iflag_bc_rot =   10
@@ -91,20 +93,6 @@
 !
 !>      base flag for fixed normal field
       integer(kind = kint), parameter :: iflag_fixed_norm =   20
-!
-!>      base flag for fixed field on surface
-      integer(kind = kint), parameter :: iflag_surf_fixed =   0
-!
-!>      base flag for fixed field for commutation error coorection
-      integer(kind = kint), parameter :: iflag_bc_sgs_commute =   15
-!>      fixed scalar on surface for commutation error coorection
-      integer(kind = kint), parameter :: iflag_bc_sgs_commute_s=  16
-!>      fixed x-component on surface for commutation error coorection
-      integer(kind = kint), parameter :: iflag_bc_sgs_commute_x=  16
-!>      fixed y-component on surface for commutation error coorection
-      integer(kind = kint), parameter :: iflag_bc_sgs_commute_y=  17
-!>      fixed z-component on surface for commutation error coorection
-      integer(kind = kint), parameter :: iflag_bc_sgs_commute_z=  18
 !
 !>      base flag to evaluate normal gradient
       integer(kind = kint), parameter :: iflag_lead_grad =       100

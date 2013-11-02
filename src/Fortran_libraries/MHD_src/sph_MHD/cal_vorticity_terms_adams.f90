@@ -18,7 +18,7 @@
 !!      subroutine add_buoyancy_to_vort_force(it_rot_buo)
 !!      subroutine add_lorentz_to_vort_force
 !!
-!!      subroutine set_ini_adams_advect
+!!      subroutine set_ini_adams_inertia
 !!@endverbatim
 !
       module cal_vorticity_terms_adams
@@ -206,7 +206,7 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_ini_adams_advect
+      subroutine set_ini_adams_inertia
 !
       integer(kind = kint) :: inod
 !
@@ -218,7 +218,7 @@
       end do
 !$omp end do nowait
 !
-      end subroutine set_ini_adams_advect
+      end subroutine set_ini_adams_inertia
 !
 ! ----------------------------------------------------------------------
 !

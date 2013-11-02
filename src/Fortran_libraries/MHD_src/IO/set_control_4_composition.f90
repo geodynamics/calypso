@@ -68,6 +68,8 @@
 !
           if(bc_composit_type_ctl(i) .eq. 'fixed_flux') then
             light_nod%ibc_type(i) =  iflag_bc_fix_flux
+          else if(bc_composit_type_ctl(i) .eq. 'fixed_flux_file') then
+            light_nod%ibc_type(i) =  iflag_bc_file_flux
           end if
         end do
 !

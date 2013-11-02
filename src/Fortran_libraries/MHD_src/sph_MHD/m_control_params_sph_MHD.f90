@@ -34,6 +34,8 @@
       integer(kind = kint), parameter :: iflag_rotatable_ic =    10
 !>      integer flag for whole sphere model
       integer(kind = kint), parameter :: iflag_sph_fill_center = 41
+!>      integer flag for whole sphere model
+      integer(kind = kint), parameter :: iflag_sph_fix_center =  42
 !
 !>      integer flag for fixed velocity boundary
       integer(kind = kint), parameter :: iflag_fixed_field = 0

@@ -254,7 +254,7 @@
 !
       subroutine write_gz_comment_string(comment)
 !
-      character*(*), intent(in)  ::  comment
+      character(len=*), intent(in)  ::  comment
 !
 !
       write(textbuf,'(a,a1)') comment, char(0)

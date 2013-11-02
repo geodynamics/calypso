@@ -61,7 +61,7 @@
      &       (CMB_nod_grp_name, CMB_sf_grp_name,                        &
      &        h_flux_surf%bc_name(i), h_flux_surf%bc_magnitude(i),      &
      &        nidx_rj(2), h_flux_CMB_bc, iflag_cmb_temp)
-        else if (h_flux_surf%ibc_type(i)  .eq. -iflag_bc_fix_s) then
+        else if (h_flux_surf%ibc_type(i)  .eq. iflag_bc_file_s) then
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_temp, ICB_nod_grp_name, ICB_sf_grp_name,              &
      &        nidx_rj(2), h_flux_ICB_bc, iflag_icb_temp)
@@ -71,14 +71,11 @@
         else if ( h_flux_surf%ibc_type(i) .eq. iflag_sph_2_center       &
      &       .and. h_flux_surf%bc_name(i) .eq. CTR_sf_grp_name) then
          iflag_icb_temp = iflag_sph_fill_center
+        else if ( h_flux_surf%ibc_type(i) .eq. iflag_sph_clip_center    &
+     &       .and. h_flux_surf%bc_name(i) .eq. CTR_sf_grp_name) then
+         iflag_icb_temp = iflag_sph_fix_center
         end if
       end do
-!
-      if(iflag_debug .gt. 0) then
-        write(*,*) 'iflag_icb_temp', iflag_icb_temp
-        write(*,*) 'iflag_cmb_temp', iflag_cmb_temp
-        write(*,*)  h_flux_CMB_bc(1)
-      end if
 !
       do i = 1, temp_nod%num_bc
         if ( temp_nod%ibc_type(i)  .eq. iflag_bc_fix_flux) then
@@ -91,7 +88,7 @@
      &        temp_nod%bc_name(i), temp_nod%bc_magnitude(i),            &
      &        nidx_rj(2), h_flux_CMB_bc, iflag_cmb_temp)
 !
-        else if ( temp_nod%ibc_type(i)  .eq. -iflag_bc_fix_flux) then
+        else if ( temp_nod%ibc_type(i)  .eq. iflag_bc_file_flux) then
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_h_flux, ICB_nod_grp_name, ICB_sf_grp_name,            &
      &        nidx_rj(2), h_flux_ICB_bc, iflag_icb_temp)
@@ -108,7 +105,7 @@
      &        temp_nod%bc_name(i), temp_nod%bc_magnitude(i),            &
      &        nidx_rj(2), temp_CMB_bc, iflag_cmb_temp)
 !
-        else if ( temp_nod%ibc_type(i)  .eq. -iflag_bc_fix_s) then
+        else if ( temp_nod%ibc_type(i)  .eq. iflag_bc_file_s) then
           call set_fixed_scalar_bc_by_file(fhd_temp, ICB_nod_grp_name,  &
      &        nidx_rj(2), temp_ICB_bc, iflag_icb_temp)
           call set_fixed_scalar_bc_by_file(fhd_temp, CMB_nod_grp_name,  &
@@ -117,9 +114,9 @@
         else if ( temp_nod%ibc_type(i) .eq. iflag_sph_2_center          &
      &       .and. temp_nod%bc_name(i) .eq. CTR_sf_grp_name) then
          iflag_icb_temp = iflag_sph_fill_center
-        else if ( temp_nod%ibc_type(i) .eq. iflag_sph_2_center          &
+        else if ( temp_nod%ibc_type(i) .eq. iflag_sph_clip_center       &
      &       .and. temp_nod%bc_name(i) .eq. CTR_nod_grp_name) then
-         iflag_icb_temp = iflag_sph_fill_center
+         iflag_icb_temp = iflag_sph_fix_center
         end if
       end do
 !
@@ -137,15 +134,35 @@
      &   = h_flux_CMB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_CMB,1)
       end if
 !
-      if(iflag_debug .gt. 0 .and. idx_rj_degree_zero .gt. 0) then
-        write(*,*) 'iflag_icb_temp', iflag_icb_temp,                    &
-     &             reftemp_rj(nlayer_ICB,0),                            &
-     &             temp_ICB_bc(idx_rj_degree_zero),                     &
-     &             h_flux_ICB_bc(idx_rj_degree_zero)
-        write(*,*) 'iflag_cmb_temp', iflag_cmb_temp,                    &
-     &             reftemp_rj(nlayer_CMB,0),                            &
-     &             temp_CMB_bc(idx_rj_degree_zero),                     &
-     &             h_flux_CMB_bc(idx_rj_degree_zero)
+      if(i_debug .gt. 1) then
+        write(*,*) 'iflag_icb_temp', iflag_icb_temp
+        if(iflag_icb_temp .eq. iflag_fixed_field) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'temp_ICB', idx_gl_1d_rj_j(i,1:3),               &
+     &                  temp_ICB_bc(i)
+          end do
+        end if
+        if(iflag_icb_temp .eq. iflag_fixed_flux) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'heat_flux_ICB', idx_gl_1d_rj_j(i,1:3),          &
+     &                  h_flux_ICB_bc(i)
+          end do
+        end if
+!
+        write(*,*) 'iflag_cmb_temp', iflag_cmb_temp
+        if(iflag_cmb_temp .eq. iflag_fixed_field) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'temp_CMB', idx_gl_1d_rj_j(i,1:3),               &
+     &                  temp_CMB_bc(i)
+          end do
+        end if
+        if(iflag_cmb_temp .eq. iflag_fixed_flux) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'heat_flux_CMB', idx_gl_1d_rj_j(i,1:3),          &
+     &                  h_flux_CMB_bc(i)
+          end do
+        end if
+!
       end if
 !
       end subroutine set_sph_bc_temp_sph
@@ -177,7 +194,7 @@
      &       (CMB_nod_grp_name, CMB_sf_grp_name,                        &
      &        light_surf%bc_name(i), light_surf%bc_magnitude(i),        &
      &        nidx_rj(2), c_flux_CMB_bc, iflag_cmb_composition)
-        else if (light_surf%ibc_type(i)  .eq. -iflag_bc_fix_s) then
+        else if (light_surf%ibc_type(i)  .eq. iflag_bc_file_s) then
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_light, ICB_nod_grp_name, ICB_sf_grp_name,             &
      &        nidx_rj(2), c_flux_ICB_bc, iflag_icb_composition)
@@ -186,7 +203,10 @@
      &        nidx_rj(2), c_flux_CMB_bc, iflag_cmb_composition)
         else if ( light_surf%ibc_type(i) .eq. iflag_sph_2_center        &
      &       .and. light_surf%bc_name(i) .eq. CTR_sf_grp_name) then
-         iflag_icb_composition = iflag_sph_fill_center
+          iflag_icb_composition = iflag_sph_fill_center
+        else if ( light_surf%ibc_type(i) .eq. iflag_sph_clip_center     &
+     &       .and. light_surf%bc_name(i) .eq. CTR_sf_grp_name) then
+          iflag_icb_composition = iflag_sph_fix_center
         end if
       end do
 !
@@ -203,7 +223,7 @@
      &        light_nod%bc_name(i), light_nod%bc_magnitude(i),          &
      &        nidx_rj(2), c_flux_CMB_bc, iflag_cmb_composition)
 !
-        else if ( light_nod%ibc_type(i)  .eq. -iflag_bc_fix_flux) then
+        else if ( light_nod%ibc_type(i)  .eq. iflag_bc_file_flux) then
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_c_flux, ICB_nod_grp_name, ICB_sf_grp_name,            &
      &        nidx_rj(2), c_flux_ICB_bc, iflag_icb_composition)
@@ -220,7 +240,7 @@
      &        light_nod%bc_name(i), light_nod%bc_magnitude(i),          &
      &        nidx_rj(2), composition_CMB_bc, iflag_cmb_composition)
 !
-        else if ( light_nod%ibc_type(i)  .eq. -iflag_bc_fix_s) then
+        else if ( light_nod%ibc_type(i)  .eq. iflag_bc_file_s) then
           call set_fixed_scalar_bc_by_file(fhd_light, ICB_nod_grp_name, &
      &        nidx_rj(2), composition_ICB_bc, iflag_icb_composition)
           call set_fixed_scalar_bc_by_file(fhd_light, CMB_nod_grp_name, &
@@ -229,13 +249,44 @@
         else if ( light_nod%ibc_type(i) .eq. iflag_sph_2_center         &
      &       .and. light_nod%bc_name(i) .eq. CTR_sf_grp_name) then
          iflag_icb_composition = iflag_sph_fill_center
-        else if ( light_nod%ibc_type(i) .eq. iflag_sph_2_center         &
+        else if ( light_nod%ibc_type(i) .eq. iflag_sph_clip_center      &
      &       .and. light_nod%bc_name(i) .eq. CTR_nod_grp_name) then
-         iflag_icb_composition = iflag_sph_fill_center
+         iflag_icb_composition = iflag_sph_fix_center
         end if
       end do
 !
       c_flux_ICB_bc(1:nidx_rj(2)) = -c_flux_ICB_bc(1:nidx_rj(2))
+!
+      if(i_debug .gt. 1) then
+        write(*,*) 'iflag_icb_composition', iflag_icb_composition
+        if(iflag_icb_composition .eq. iflag_fixed_field) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'comp_ICB', idx_gl_1d_rj_j(i,1:3),               &
+     &                  composition_ICB_bc(i)
+          end do
+        end if
+        if(iflag_icb_composition .eq. iflag_fixed_flux) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'comp_flux_ICB', idx_gl_1d_rj_j(i,1:3),          &
+     &                  c_flux_ICB_bc(i)
+          end do
+        end if
+!
+        write(*,*) 'iflag_cmb_composition', iflag_cmb_composition
+        if(iflag_cmb_composition .eq. iflag_fixed_field) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'comp_CMB', idx_gl_1d_rj_j(i,1:3),               &
+     &                  composition_CMB_bc(i)
+          end do
+        end if
+        if(iflag_cmb_composition .eq. iflag_fixed_flux) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'comp_flux_CMB', idx_gl_1d_rj_j(i,1:3),          &
+     &                  c_flux_CMB_bc(i)
+          end do
+        end if
+!
+      end if
 !
       end subroutine set_sph_bc_composition_sph
 !

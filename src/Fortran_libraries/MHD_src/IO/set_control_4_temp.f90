@@ -69,6 +69,8 @@
 !
           if ( bc_e_type_ctl(i) .eq. 'fixed_flux' ) then
             temp_nod%ibc_type(i) =  iflag_bc_fix_flux
+          else if ( bc_e_type_ctl(i) .eq. 'fixed_flux_file' ) then
+            temp_nod%ibc_type(i) =  iflag_bc_file_flux
           end if
         end do
 !

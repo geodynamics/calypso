@@ -55,28 +55,32 @@
 !
 !
 !
-      if(iflag_icb_velocity .eq. iflag_sph_fill_center) then
+      if      (iflag_icb_velocity .eq. iflag_sph_fill_center            &
+     &    .or. iflag_icb_velocity .eq. iflag_sph_fix_center) then
         kr_rj_fluid_start = nlayer_2_center
       else
         kr_rj_fluid_start = nlayer_ICB
       end if
       kr_rj_fluid_end = nlayer_CMB
 !
-      if(iflag_icb_composition .eq. iflag_sph_fill_center) then
+      if      (iflag_icb_temp .eq. iflag_sph_fill_center                &
+     &    .or. iflag_icb_temp .eq. iflag_sph_fix_center) then
         kr_rj_thermal_start = nlayer_2_center
       else
         kr_rj_thermal_start = nlayer_ICB
       end if
       kr_rj_thermal_end = nlayer_CMB
 !
-      if(iflag_icb_composition .eq. iflag_sph_fill_center) then
+      if      (iflag_icb_composition .eq. iflag_sph_fill_center         &
+     &    .or. iflag_icb_composition .eq. iflag_sph_fix_center) then
         kr_rj_light_start = nlayer_2_center
       else
         kr_rj_light_start = nlayer_ICB
       end if
       kr_rj_conduct_end = nlayer_CMB
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
+      if      (iflag_icb_magne .eq. iflag_sph_fill_center               &
+     &    .or. iflag_icb_magne .eq. iflag_sph_fix_center) then
         kr_rj_conduct_start = nlayer_2_center
       else
         kr_rj_conduct_start = nlayer_ICB
@@ -113,8 +117,11 @@
         end if
 !
         if(magne_nod%bc_name(i) .eq. CTR_nod_grp_name) then
-          if      (magne_nod%ibc_type(i) .eq. iflag_sph_2_center) then
+          if     (magne_nod%ibc_type(i) .eq. iflag_sph_2_center) then
             iflag_icb_magne =  iflag_sph_fill_center
+          else if(magne_nod%ibc_type(i) .eq. iflag_sph_clip_center)     &
+     &        then
+            iflag_icb_magne =  iflag_sph_fix_center
           end if
         end if
       end do
@@ -136,6 +143,9 @@
         if(magne_surf%bc_name(i) .eq. CTR_nod_grp_name) then
           if(magne_surf%ibc_type(i) .eq. iflag_sph_2_center) then
             iflag_icb_magne =  iflag_sph_fill_center
+          else if(magne_surf%ibc_type(i) .eq. iflag_sph_clip_center)    &
+     &        then
+            iflag_icb_magne =  iflag_sph_fix_center
           end if
         end if
       end do

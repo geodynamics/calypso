@@ -43,8 +43,8 @@
 !
       subroutine FEM_initialize
 !
-      use m_array_for_send_recv
       use m_geometry_parameter
+      use m_array_for_send_recv
       use m_t_step_parameter
       use m_surface_geometry_data
       use m_edge_geometry_data
