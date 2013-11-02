@@ -33,9 +33,12 @@
       use m_spheric_parameter
       use m_sph_trans_comm_table
 !
-      use select_spherical_SR
+      use select_calypso_SR
 !
       implicit none
+!
+!>      Data communication mode for vector
+      integer(kind = kint) :: iflag_sph_SR3 = iflag_import_item
 !
 ! ----------------------------------------------------------------------
 !
@@ -135,10 +138,10 @@
       real (kind=kreal), intent(inout):: X_rtm(ithree*nnod_rtm)
 !
 !
-      call sel_sph_send_recv_3(nnod_rtp, nnod_rtm,                      &
-     &              nneib_domain_rtp, iflag_self_rtp, ntot_item_sr_rtp, &
+      call sel_calypso_send_recv_3(iflag_sph_SR3, nnod_rtp, nnod_rtm,   &
+     &              nneib_domain_rtp, iflag_self_rtp,                   &
      &              id_domain_rtp, istack_sr_rtp, item_sr_rtp,          &
-     &              nneib_domain_rtm, iflag_self_rtm, ntot_item_sr_rtm, &
+     &              nneib_domain_rtm, iflag_self_rtm,                   &
      &              id_domain_rtm, istack_sr_rtm, item_sr_rtm,          &
      &              irev_sr_rtm, X_rtp, X_rtm)
 !
@@ -155,10 +158,10 @@
       real (kind=kreal), intent(inout):: X_rtp(ithree*nnod_rtp)
 !
 !
-      call sel_sph_send_recv_3(nnod_rtm, nnod_rtp,                      &
-     &              nneib_domain_rtm, iflag_self_rtm, ntot_item_sr_rtm, &
+      call sel_calypso_send_recv_3(iflag_sph_SR3, nnod_rtm, nnod_rtp,   &
+     &              nneib_domain_rtm, iflag_self_rtm,                   &
      &              id_domain_rtm, istack_sr_rtm, item_sr_rtm,          &
-     &              nneib_domain_rtp, iflag_self_rtp, ntot_item_sr_rtp, &
+     &              nneib_domain_rtp, iflag_self_rtp,                   &
      &              id_domain_rtp, istack_sr_rtp, item_sr_rtp,          &
      &              irev_sr_rtp, X_rtm, X_rtp)
 !
@@ -175,10 +178,10 @@
       real (kind=kreal), intent(inout):: X_rlm(ithree*nnod_rlm)
 !
 !
-      call sel_sph_send_recv_3(nnod_rj, nnod_rlm,                       &
-     &              nneib_domain_rj, iflag_self_rj, ntot_item_sr_rj,    &
+      call sel_calypso_send_recv_3(iflag_sph_SR3, nnod_rj, nnod_rlm,    &
+     &              nneib_domain_rj, iflag_self_rj,                     &
      &              id_domain_rj, istack_sr_rj, item_sr_rj,             &
-     &              nneib_domain_rlm, iflag_self_rlm, ntot_item_sr_rlm, &
+     &              nneib_domain_rlm, iflag_self_rlm,                   &
      &              id_domain_rlm, istack_sr_rlm, item_sr_rlm,          &
      &              irev_sr_rlm, X_rj, X_rlm)
 !
@@ -195,10 +198,10 @@
       real (kind=kreal), intent(inout):: X_rj(ithree*nnod_rj)
 !
 !
-      call sel_sph_send_recv_3(nnod_rlm, nnod_rj,                       &
-     &              nneib_domain_rlm, iflag_self_rlm, ntot_item_sr_rlm, &
+      call sel_calypso_send_recv_3(iflag_sph_SR3, nnod_rlm, nnod_rj,    &
+     &              nneib_domain_rlm, iflag_self_rlm,                   &
      &              id_domain_rlm, istack_sr_rlm, item_sr_rlm,          &
-     &              nneib_domain_rj, iflag_self_rj, ntot_item_sr_rj,    &
+     &              nneib_domain_rj, iflag_self_rj,                     &
      &              id_domain_rj, istack_sr_rj, item_sr_rj,             &
      &              irev_sr_rj, X_rlm, X_rj)
 !

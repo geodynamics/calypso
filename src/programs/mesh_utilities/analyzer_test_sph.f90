@@ -57,7 +57,7 @@
       use cmp_trans_sph_indices
       use set_parallel_file_name
       use cmp_trans_sph_tests
-      use select_spherical_SR
+      use select_calypso_SR
 !
       character(len=kchara) :: fname_tmp, file_name
       integer(kind = kint) :: itype
