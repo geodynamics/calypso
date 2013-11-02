@@ -54,6 +54,7 @@
       call set_sin_theta_rtm
       call set_sin_theta_rtp
 !
+!
       ncomp = 3*nb_sph_trans*nidx_rtp(1)*nidx_rtp(2)
       Nstacksmp(0:np_smp) = 3*nb_sph_trans*irt_rtp_smp_stack(0:np_smp)
       call s_select_fourier_transform(ncomp, Nstacksmp)
