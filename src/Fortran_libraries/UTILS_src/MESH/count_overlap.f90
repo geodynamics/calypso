@@ -1,18 +1,23 @@
+!>@file  count_overlap.f90
+!!       module count_overlap
+!!
+!!@author H. Matsui
+!!@date   Programmed by H. Matsui in Sep., 2006
 !
-!      module count_overlap
-!
-!      Written by H. Matsui on Sep., 2006
-!
-!      subroutine set_overlap_flag(np_smp, inum_smp_stack,              &
-!     &          internal_node, numele, ie, internal_n, interior_flag)
-!      subroutine copy_real_overlap_flag(np_smp, inum_smp_stack,        &
-!     &          numele, interior_flag, e_multi)
-!
-!      subroutine set_original_domiain_by_comm(my_rank, nnod,           &
-!     &          num_neib, ntot_import, id_neib, istack_import,         &
-!     &          item_import, idomain_nod)
-!      subroutine set_original_domiain_by_node(nnod, nele, ie,          &
-!     &          idomain_nod, idomain_ele)
+!> @brief Check overlapped element
+!!
+!!@verbatim
+!!      subroutine set_overlap_flag(np_smp, inum_smp_stack,             &
+!!     &          internal_node, numele, ie, internal_n, interior_flag)
+!!      subroutine copy_real_overlap_flag(np_smp, inum_smp_stack,       &
+!!     &          numele, interior_flag, e_multi)
+!!
+!!      subroutine set_original_domiain_by_comm(my_rank, nnod,          &
+!!     &          num_neib, ntot_import, id_neib, istack_import,        &
+!!     &          item_import, idomain_nod)
+!!      subroutine set_original_domiain_by_node(nnod, nele, ie,         &
+!!     &          idomain_nod, idomain_ele)
+!!@endverbatim
 !
       module count_overlap
 !

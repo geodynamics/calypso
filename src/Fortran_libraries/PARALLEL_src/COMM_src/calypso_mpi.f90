@@ -56,7 +56,7 @@
 !
       call  MPI_INIT(ierr_MPI)
       call  MPI_COMM_DUP (MPI_COMM_WORLD, CALYPSO_COMM, ierr_MPI)
-      call  MPI_COMM_SIZE(CALYPSO_COMM, nprocs,  ierr_MPI)
+      call  MPI_COMM_SIZE(CALYPSO_COMM, nprocs, ierr_MPI)
       call  MPI_COMM_RANK(CALYPSO_COMM, my_rank, ierr_MPI)
 !
       CALYPSO_CHARACTER = MPI_CHARACTER
@@ -108,7 +108,7 @@
       call  MPI_ABORT(CALYPSO_COMM, ierr_MPI)
 !
       stop
-      end subroutine  calypso_MPI_abort
+      end subroutine calypso_MPI_abort
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------

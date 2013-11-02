@@ -21,6 +21,7 @@
 !
 !      subroutine link_new_nod_geometry_type(nod_org, node)
 !      subroutine link_new_ele_connect_type(ele_org, ele)
+!      subroutine unlink_node_geometry_type(node)
 !      subroutine unlink_ele_connect_type(ele)
 !
 !      subroutine check_nod_size_smp_type(node, my_rank)
@@ -372,6 +373,19 @@
 !
 !-----------------------------------------------------------------------
 !
+      subroutine unlink_node_geometry_type(node)
+!
+      type(node_data), intent(inout) :: node
+!
+      nullify(node%inod_global, node%xx)
+!
+      nullify(node%rr, node%a_r, node%ss)
+      nullify(node%a_s, node%phi, node%theta)
+!
+      end subroutine unlink_node_geometry_type
+!
+!  ---------------------------------------------------------------------
+!
       subroutine unlink_ele_connect_type(ele)
 !
       type(element_data), intent(inout) :: ele
@@ -379,6 +393,8 @@
       nullify(ele%iele_global)
       nullify(ele%elmtyp, ele%nodelm)
       nullify(ele%ie)
+!
+      nullify(ele%interior_ele, ele%e_multi)
 !
       end subroutine unlink_ele_connect_type
 !

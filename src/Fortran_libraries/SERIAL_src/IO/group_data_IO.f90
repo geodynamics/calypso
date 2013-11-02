@@ -86,7 +86,7 @@
       integer(kind = kint), intent(inout) :: item_sf(ntot,2)
       character(len = kchara), intent(inout) :: name(ngrp)
 !
-      integer(kind = kint) :: i, j, ist, ied
+      integer(kind = kint) :: j, ist, ied
 !
 !
       if (ngrp .le. 0) return

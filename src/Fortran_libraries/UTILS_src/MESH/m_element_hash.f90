@@ -3,6 +3,13 @@
 !
 !      Written by H. Matsui on March, 2006
 !
+!      subroutine allocate_ele_hash_by_nod(numnod, numele)
+!      subroutine allocate_ele_hash_by_shell(numele)
+!
+!      subroutine deallocate_elment_hash
+!      subroutine deallocate_elment_hash
+!      subroutine deallocate_position_4_hash
+!
       module m_element_hash
 !
       use m_precision
@@ -47,9 +54,9 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine allocate_ele_hash_by_shell(numnod, numele)
+      subroutine allocate_ele_hash_by_shell(numele)
 !
-      integer(kind = kint), intent(in) :: numnod, numele
+      integer(kind = kint), intent(in) :: numele
 !
 !
       nphi_ele_hash = 2*nth_ele_hash

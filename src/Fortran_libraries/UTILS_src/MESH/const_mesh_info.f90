@@ -248,7 +248,7 @@
 !
       if(read_surface .eqv. .false.) then
         if (iflag_debug.gt.0) write(*,*) 'construct_surface_data'
-        call construct_surface_data(my_rank)
+        call construct_surface_data
 !
         call count_surf_size_4_smp
         if (iflag_debug.gt.0) write(*,*) 'count_overlap_surface'

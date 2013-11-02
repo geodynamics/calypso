@@ -76,12 +76,16 @@
 !!                put ".rj" at the end
 !!
 !!      subroutine add_index_after_name(int_id, chara_head, chara_name)
+!!      subroutine int_to_str(int_val, int_string)
+!!      subroutine real_to_str(real_val, real_string)
 !!@endverbatim
 !!
 !!@n @param dir_file_name    file name (header) including directory name
-!!@n @param file_header      file header
-!!@n @param int_id           integer to be added at the end of header
+!!@n @param file_header      file prefix
+!!@n @param int_id           integer to be added at the end of prefix
 !!@n @param file_name        output file name
+!!@n @param int_val          integer to be tranfered to character
+!!@n @param int_string       output character
 !
 
       module set_parallel_file_name
@@ -507,6 +511,7 @@
 !
       end subroutine int_to_str
 !
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine real_to_str(real_val, real_string)

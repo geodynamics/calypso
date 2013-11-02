@@ -25,7 +25,7 @@
 !!    ngrid_meridonal_ctl     12
 !!    ngrid_zonal_ctl         24
 !!
-!!   radial_grid_type_ctl:   Definition for radial grid   
+!!   radial_grid_type_ctl:  Definition for radial grid   
 !!         explicit:        Set each radial grid explicitly
 !!         Chebyshev:       Set Chebyshev collocation points
 !!         equi_distance:   Set equi-diatance grid

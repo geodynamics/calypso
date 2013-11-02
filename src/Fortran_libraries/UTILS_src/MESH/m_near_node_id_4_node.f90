@@ -152,7 +152,7 @@
       subroutine check_near_nod_4_node(my_rank,numnod)
 !
       integer(kind = kint), intent(in) :: my_rank, numnod
-      integer(kind = kint) :: inod, inum, ist, ied
+      integer(kind = kint) :: inod, ist, ied
 !
       write(50+my_rank,*) 'max and min. of near node ID for node ',     &
      &                    nmax_nod_near_nod, nmin_nod_near_nod
@@ -175,7 +175,7 @@
       subroutine check_near_nod_4_nod_sorted(my_rank,numnod)
 !
       integer(kind = kint), intent(in) :: my_rank, numnod
-      integer(kind = kint) :: inod, inum, ist, ied
+      integer(kind = kint) :: inod, ist, ied
 !
       write(50+my_rank,*) 'max and min. of near node ID for node ',     &
      &                    nmax_nod_near_nod, nmin_nod_near_nod

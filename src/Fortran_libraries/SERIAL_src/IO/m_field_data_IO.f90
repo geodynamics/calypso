@@ -44,14 +44,22 @@
       integer(kind = kint) ::  iflag_sph_spec_head =      0
       integer(kind = kint) ::  iflag_org_sph_spec_head =  0
 !
+!>      number of field for IO
       integer(kind = kint) :: num_phys_data_IO
+!>      total number of component for IO
       integer(kind = kint) :: ntot_phys_data_IO
+!>      number of component for each field
       integer(kind = kint), allocatable :: num_phys_comp_IO(:)
+!>      end address of component for each field
       integer(kind = kint), allocatable :: istack_phys_comp_IO(:)
 !
+!>      field name
       character(len=kchara), allocatable :: phys_data_name_IO(:)
 !
+!>      number of data points
       integer(kind = kint) :: numgrid_phys_IO
+!
+!>      field data for IO
       real(kind = kreal), allocatable :: phys_data_IO(:,:)
 !
 ! -------------------------------------------------------------------

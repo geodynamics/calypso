@@ -44,8 +44,6 @@
       integer(kind = kint), intent(inout) :: istack_export(0:num_neib)
       integer(kind = kint), intent(inout) :: ntot_import, ntot_export
 !
-      integer(kind = kint) :: i
-!
 !
       if (num_neib .gt. 0) then
         id_neib(1:num_neib) = id_neib_org(1:num_neib)
@@ -76,8 +74,6 @@
       integer(kind = kint), intent(inout) :: istack_import(0:num_neib)
       integer(kind = kint), intent(inout) :: istack_export(0:num_neib)
       integer(kind = kint), intent(inout) :: ntot_import, ntot_export
-!
-      integer(kind = kint) :: i
 !
 !
       if (num_neib .gt. 0) then

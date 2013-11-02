@@ -145,7 +145,7 @@
           else if ( name_force(i) .eq. 'Lorentz_full' ) then
             iflag_4_lorentz = id_Lorentz_w_Emag
           else if ( name_force(i) .eq. 'Rotation_form' ) then
-            iflag_4_rotate = id_turn_ON
+            iflag_4_rotate =  id_turn_ON
           end if
         end do
       end if

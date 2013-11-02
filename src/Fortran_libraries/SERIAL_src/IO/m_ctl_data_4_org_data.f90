@@ -13,7 +13,7 @@
 !    org_mesh_head_ctl          'mesh_target/in'
 !    org_sph_mode_head_ctl      'sph_org/in_rj'
 !
-!    org_rst_head_ctl           'rst_org/rst'
+!    orginal_restart_prefix      'rst_org/rst'
 !
 !    org_field_file_head_ctl    'field_org/out'
 !    org_spectr_file_head_ctl   'spectr_org/spectr'
@@ -37,7 +37,7 @@
       character(len=kchara) :: org_mesh_head_ctl
       character(len=kchara) :: org_sph_mode_head_ctl
 !
-      character(len=kchara) :: org_rst_head_ctl
+      character(len=kchara) :: orginal_restart_prefix
 !
       character(len=kchara) :: org_udt_head_ctl
       character(len=kchara) :: org_spectr_file_head_ctl
@@ -65,7 +65,7 @@
      &       :: hd_org_sph_mode_head = 'org_sph_mode_head_ctl'
 !
       character(len=kchara), parameter                                  &
-     &       :: hd_org_rst_head =     'org_rst_head_ctl'
+     &       :: hd_org_rst_head =     'orginal_restart_prefix'
 !
       character(len=kchara), parameter                                  &
      &       :: hd_org_udt_head =     'org_field_file_head_ctl'
@@ -134,7 +134,7 @@
      &        i_org_sph_mode_head, org_sph_mode_head_ctl)
 !
         call read_character_ctl_item(hd_org_rst_head,                   &
-     &        i_org_rst_head, org_rst_head_ctl)
+     &        i_org_rst_head, orginal_restart_prefix)
 !
         call read_character_ctl_item(hd_org_udt_head,                   &
      &        i_org_udt_head, org_udt_head_ctl)

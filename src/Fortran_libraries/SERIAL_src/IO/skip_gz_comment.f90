@@ -8,6 +8,7 @@
 !      subroutine skip_gz_comment_real(real_input)
 !      subroutine skip_gz_comment_real2(real_input, real_input2)
 !      subroutine skip_gz_comment_chara(chara_input)
+!      subroutine skip_gz_comment_chara_int(chara_input, int_input)
 !
 !      subroutine read_gz_multi_real(num, real_input)
 !      subroutine read_gz_multi_int(num, int_input)
@@ -100,6 +101,20 @@
 !
       end subroutine skip_gz_comment_chara
 !
+!------------------------------------------------------------------
+!
+      subroutine skip_gz_comment_chara_int(chara_input, int_input)
+!
+      character(len = kchara), intent(inout) :: chara_input
+      integer(kind = kint), intent(inout) :: int_input
+!
+!
+      call skip_gz_comment_get_nword
+      read(textbuf,*) chara_input, int_input
+!
+      end subroutine skip_gz_comment_chara_int
+!
+!------------------------------------------------------------------
 !------------------------------------------------------------------
 !
       subroutine skip_gz_comment_get_nword

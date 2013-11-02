@@ -82,7 +82,7 @@
       subroutine check_next_node_id_4_node(my_rank, numnod)
 !
       integer(kind = kint), intent(in) :: my_rank, numnod
-      integer(kind = kint) :: inod, inum, ist, ied
+      integer(kind = kint) :: inod, ist, ied
 !
       do inod = 1, numnod
         ist = inod_next_stack_4_node(inod-1) + 1

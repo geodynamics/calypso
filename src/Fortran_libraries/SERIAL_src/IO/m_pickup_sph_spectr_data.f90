@@ -214,6 +214,7 @@
 !
       call write_multi_labels(id_pick_mode, ncomp_pick_sph_coef,        &
      &    pick_sph_spec_name)
+
       write(id_pick_mode,'(a)') ''
 !
       end subroutine open_sph_spec_4_monitor
