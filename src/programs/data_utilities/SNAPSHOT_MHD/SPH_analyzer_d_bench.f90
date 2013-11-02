@@ -11,6 +11,7 @@
 !!@verbatim
 !!      subroutine SPH_init_sph_dbench
 !!      subroutine SPH_analyze_dbench(i_step)
+!!      subroutine SPH_finalize_dbench
 !!@endverbatim
 !
       module SPH_analyzer_d_bench
@@ -28,8 +29,8 @@
       subroutine SPH_init_sph_dbench
 !
       use m_constants
-      use calypso_mpi
       use m_array_for_send_recv
+      use calypso_mpi
       use m_machine_parameter
       use m_control_parameter
 !
@@ -38,7 +39,6 @@
       use m_sph_phys_address
       use m_rms_4_sph_spectr
       use m_node_id_spherical_IO
-      use m_field_4_dynamobench
 !
       use set_control_sph_mhd
       use load_data_for_sph_IO
@@ -98,7 +98,7 @@
         call init_sum_coriolis_sph
       end if
 !
-! --------- set reference temperature 
+! --------- set reference temperature
 !
       call allocate_reft_rj_data
       call s_set_ref_temp_sph_mhd
@@ -195,7 +195,6 @@
 ! ----------------------------------------------------------------------
 !
 !      subroutine SPH_finalize_dbench
-!
 !
 !      end subroutine SPH_finalize_dbench
 !

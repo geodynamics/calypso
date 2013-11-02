@@ -30,6 +30,7 @@
       use m_sph_phys_address
       use m_rms_4_sph_spectr
       use m_node_id_spherical_IO
+      use m_sph_boundary_input_data
 !
       use set_control_sph_mhd
       use load_data_for_sph_IO
@@ -52,6 +53,11 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'input_sph_trans_grids'
       call input_sph_trans_grids(my_rank)
+!
+      if (iflag_boundary_file .eq. id_read_boundary_file) then
+        if (iflag_debug.eq.1) write(*,*) 'read_boundary_spectr_file'
+        call read_boundary_spectr_file
+      end if
 !
 !   Allocate spectr field data
 !
@@ -187,7 +193,6 @@
 ! ----------------------------------------------------------------------
 !
 !      subroutine SPH_finalize_snap
-!
 !
 !      end subroutine SPH_finalize_snap
 !

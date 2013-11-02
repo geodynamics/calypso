@@ -40,13 +40,13 @@
       real(kind = kreal), intent(inout) :: f_int(ntot_comp)
 !
 !
-      if( mod( (kg_ed-kg_st),2) .eq. 0) then
-        call radial_int_by_simpson(nri, kg_st, kg_ed, radius,           &
-     &      ntot_comp, f_org, f_int)
-      else
+!      if( mod( (kg_ed-kg_st),2) .eq. 0) then
+!        call radial_int_by_simpson(nri, kg_st, kg_ed, radius,           &
+!     &      ntot_comp, f_org, f_int)
+!      else
         call radial_int_by_trapezoid(nri, kg_st, kg_ed, radius,         &
      &      ntot_comp, f_org, f_int)
-      end if
+!      end if
 !
       end subroutine radial_integration
 !

@@ -14,6 +14,7 @@ MOD_GEN_SPH_GRID_NOSF = \
 generate_sph_grids_nosf.o
 
 MOD_TEST_SPH_GRID = \
+m_read_ctl_gen_sph_shell.o \
 cmp_trans_sph_indices.o \
 cmp_trans_sph_tests.o \
 \

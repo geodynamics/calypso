@@ -85,7 +85,7 @@
 !
 !      if (iflag_debug.gt.0) write(*,*) 'const_2nd_fdm_coefs'
 !      call const_2nd_fdm_coefs
-!*
+!
 !* -----  set integrals for coriolis term -----------------
 !*
 !      if(iflag_4_coriolis .gt. id_turn_OFF) then

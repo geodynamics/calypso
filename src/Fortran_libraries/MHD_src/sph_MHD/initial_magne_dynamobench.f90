@@ -74,7 +74,7 @@
           d_rj(it,itor%i_magne) = (ten/three) * rr * sin(pi*(rr-r_ICB))
           d_rj(it,ipol%i_current) =  d_rj(it,itor%i_magne)
           d_rj(it,idpdr%i_current)                                      &
-     &             = (ten / three) * (sin(pi*(rr-r_ICB))    &
+     &             = (ten / three) * (sin(pi*(rr-r_ICB))                &
      &              + pi * rr * cos(pi*(rr-r_ICB)) )
         end do
       end if

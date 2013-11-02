@@ -60,7 +60,7 @@
       use set_sph_exp_free_CMB
 !
       integer(kind = kint) :: inod
-!      integer(kind = kint) :: k, j
+!       integer(kind = kint) :: k, j
 !
 !
 !$omp parallel do

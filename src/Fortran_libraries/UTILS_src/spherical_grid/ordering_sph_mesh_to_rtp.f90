@@ -32,7 +32,7 @@
       use m_spheric_parameter
       use m_sph_1d_global_index
       use m_sph_mesh_1d_connect
-      use set_sph_local_node
+      use cal_sph_node_addresses
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t
       type(node_data), intent(inout) :: node

@@ -31,7 +31,7 @@
 !>      integer flag for free-slip boundary at inner core
       integer(kind = kint), parameter :: iflag_free_slip =  1
 !>      integer flag for rotatable inner core
-      integer(kind = kint), parameter :: iflag_rotatable_ic =    10
+      integer(kind = kint), parameter :: iflag_rotatable_ic = 10
 !>      integer flag for whole sphere model
       integer(kind = kint), parameter :: iflag_sph_fill_center = 41
 !>      integer flag for whole sphere model
@@ -99,21 +99,21 @@
       integer(kind = kint) :: iflag_sph_coriolis_file = 0
 !
 !>      Start radial address of fluid shell for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_fluid_start =    1
+      integer(kind = kint) :: kr_rj_fluid_start =   1
 !>      End radial address of fluid shell for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_fluid_end =      1
+      integer(kind = kint) :: kr_rj_fluid_end =     1
 !>      Start radial address to solve heat equation for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_thermal_start =  1
+      integer(kind = kint) :: kr_rj_thermal_start = 1
 !>      End radial address to solve heat equation for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_thermal_end =    1
+      integer(kind = kint) :: kr_rj_thermal_end =   1
 !>      Start radial address to solve induction for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_conduct_start =  1
+      integer(kind = kint) :: kr_rj_conduct_start = 1
 !>      End radial address to solve induction for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_conduct_end =    1
+      integer(kind = kint) :: kr_rj_conduct_end =   1
 !>      Start radial address to solve comopsition for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_light_start =    1
+      integer(kind = kint) :: kr_rj_light_start =   1
 !>      End radial address to solve comopsition for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_light_end =      1
+      integer(kind = kint) :: kr_rj_light_end =     1
 !
 !>      Number of grid points in zonal direction for dynamo benchmark
       integer(kind = kint) :: mphi_mid_eq = -1

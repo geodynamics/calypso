@@ -444,7 +444,7 @@
 !   check dependencies for time evolution
 !
       if (iflag_t_evo_4_vect_p .gt. id_no_evolution                     &
-     &      .and. iflag_t_evo_4_magne .gt. id_no_evolution) then
+     &     .and. iflag_t_evo_4_magne .gt. id_no_evolution) then
          call calypso_MPI_abort(402,'You should choose vector potential &
      &  OR magnetic field for time evolution')
       end if

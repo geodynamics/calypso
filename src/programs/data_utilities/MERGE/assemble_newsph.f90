@@ -20,7 +20,6 @@
       implicit    none
 !
       integer (kind = kint) :: istep
-      character(len=kchara) :: chara_inp
 !
 ! ==============================================
 ! * get number of  nodes,elements for whole PES

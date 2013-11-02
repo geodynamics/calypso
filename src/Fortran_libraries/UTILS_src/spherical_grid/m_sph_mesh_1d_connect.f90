@@ -67,6 +67,7 @@
       integer(kind = kint), allocatable :: ie_sph_t(:,:,:)
       integer(kind = kint), allocatable :: ie_sph_p(:,:)
 !
+      integer(kind = kint) :: nele_around_pole
       integer(kind = kint), allocatable :: ie_Spole_t(:,:)
       integer(kind = kint), allocatable :: ie_Npole_t(:,:)
       integer(kind = kint), allocatable :: ie_center_r(:,:)
@@ -128,6 +129,8 @@
       allocate( iflag_center_t(0:num+1) )
       iflag_center_t = 0
 !
+      nele_around_pole = nidx_global_rtp(3) / 2
+!
       end subroutine allocate_nnod_nele_sph_mesh
 !
 ! ----------------------------------------------------------------------
@@ -176,7 +179,7 @@
       num = nidx_global_rtp(3)
       allocate( ie_sph_p(num,2) )
       ie_sph_p = 0
-!
+!!
       end subroutine allocate_iele_sph_mesh
 !
 ! ----------------------------------------------------------------------

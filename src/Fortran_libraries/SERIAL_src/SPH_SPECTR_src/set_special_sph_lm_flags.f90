@@ -1,12 +1,17 @@
-!set_special_sph_lm_flags.f90
-!      module set_special_sph_lm_flags
+!>@file   set_special_sph_lm_flags.f90
+!!@brief  module set_special_sph_lm_flags
+!!
+!!@author H. Matsui
+!!@date Programmed in June, 2012
 !
-!     Written by H. Matsui on June, 2012
-!
-!      subroutine set_special_degree_order_flags(nidx_rj2, nidx_rlm2,   &
-!     &          idx_gl_1d_rj_j, idx_gl_1d_rlm_j, idx_rj_degree_zero,   &
-!     &          idx_rj_degree_one, ist_rtm_order_zero,                 &
-!     &          ist_rtm_order_1s, ist_rtm_order_1c)
+!>@brief  Communication tables for spherical transform
+!!
+!!@verbatim
+!!      subroutine set_special_degree_order_flags(nidx_rj2, nidx_rlm2,  &
+!!     &          idx_gl_1d_rj_j, idx_gl_1d_rlm_j, idx_rj_degree_zero,  &
+!!     &          idx_rj_degree_one, ist_rtm_order_zero,                &
+!!     &          ist_rtm_order_1s, ist_rtm_order_1c)
+!!@endverbatim
 !
       module set_special_sph_lm_flags
 !

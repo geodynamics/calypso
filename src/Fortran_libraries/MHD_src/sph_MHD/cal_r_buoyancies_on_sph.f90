@@ -55,7 +55,7 @@
      &        ipol%i_div_buoyancy)
         end if
 !
-      else if (iflag_4_gravity .gt. id_turn_OFF) then
+      else if ( iflag_4_gravity .gt. id_turn_OFF) then
 !
         if(iflag_4_ref_temp .ne. id_sphere_ref_temp) then
           if (iflag_debug.eq.1) write(*,*) 'cal_r_buoyancy_on_sph'
