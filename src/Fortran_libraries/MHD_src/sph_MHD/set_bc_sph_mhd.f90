@@ -57,35 +57,35 @@
 !
       if      (iflag_icb_velocity .eq. iflag_sph_fill_center            &
      &    .or. iflag_icb_velocity .eq. iflag_sph_fix_center) then
-        kr_rj_fluid_start = nlayer_2_center
+        kr_in_U = nlayer_2_center
       else
-        kr_rj_fluid_start = nlayer_ICB
+        kr_in_U = nlayer_ICB
       end if
-      kr_rj_fluid_end = nlayer_CMB
+      kr_out_U = nlayer_CMB
 !
       if      (iflag_icb_temp .eq. iflag_sph_fill_center                &
      &    .or. iflag_icb_temp .eq. iflag_sph_fix_center) then
-        kr_rj_thermal_start = nlayer_2_center
+        kr_in_T = nlayer_2_center
       else
-        kr_rj_thermal_start = nlayer_ICB
+        kr_in_T = nlayer_ICB
       end if
-      kr_rj_thermal_end = nlayer_CMB
+      kr_out_T = nlayer_CMB
 !
       if      (iflag_icb_composition .eq. iflag_sph_fill_center         &
      &    .or. iflag_icb_composition .eq. iflag_sph_fix_center) then
-        kr_rj_light_start = nlayer_2_center
+        kr_in_C = nlayer_2_center
       else
-        kr_rj_light_start = nlayer_ICB
+        kr_in_C = nlayer_ICB
       end if
-      kr_rj_conduct_end = nlayer_CMB
+      kr_out_C = nlayer_CMB
 !
       if      (iflag_icb_magne .eq. iflag_sph_fill_center               &
      &    .or. iflag_icb_magne .eq. iflag_sph_fix_center) then
-        kr_rj_conduct_start = nlayer_2_center
+        kr_in_B = nlayer_2_center
       else
-        kr_rj_conduct_start = nlayer_ICB
+        kr_in_B = nlayer_ICB
       end if
-      kr_rj_light_end = nlayer_CMB
+      kr_out_B = nlayer_CMB
 !
       end subroutine s_set_bc_sph_mhd
 !

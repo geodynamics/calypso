@@ -99,21 +99,21 @@
       integer(kind = kint) :: iflag_sph_coriolis_file = 0
 !
 !>      Start radial address of fluid shell for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_fluid_start =   1
+      integer(kind = kint) :: kr_in_U =   1
 !>      End radial address of fluid shell for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_fluid_end =     1
+      integer(kind = kint) :: kr_out_U =  1
 !>      Start radial address to solve heat equation for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_thermal_start = 1
+      integer(kind = kint) :: kr_in_T =   1
 !>      End radial address to solve heat equation for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_thermal_end =   1
+      integer(kind = kint) :: kr_out_T =  1
 !>      Start radial address to solve induction for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_conduct_start = 1
+      integer(kind = kint) :: kr_in_B =   1
 !>      End radial address to solve induction for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_conduct_end =   1
+      integer(kind = kint) :: kr_out_B =  1
 !>      Start radial address to solve comopsition for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_light_start =   1
+      integer(kind = kint) :: kr_in_C =   1
 !>      End radial address to solve comopsition for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_rj_light_end =     1
+      integer(kind = kint) :: kr_out_C =  1
 !
 !>      Number of grid points in zonal direction for dynamo benchmark
       integer(kind = kint) :: mphi_mid_eq = -1
