@@ -69,6 +69,7 @@ makemake: $(MAKE_MOD_DEP)
 	echo "# Construct Makefile"; \
 	cd $(MHDDIR) ; \
 		$(GMAKE) \
+		GMAKE="$(GMAKE)" \
 		MAKEDIR="$(MAKEDIR)" \
 		BUILDDIR="$(BUILDDIR)" \
 		INSTDIR="$(INSTDIR)" \

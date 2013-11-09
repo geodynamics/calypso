@@ -24,7 +24,8 @@ dir_list:
 		( \
 		echo 'generate diectory list for ' $$dir ; \
 		cd $${dir};  \
-		make \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
 		dir_list \
 		) \
@@ -37,9 +38,11 @@ lib_name:
 	@for dir in  $(SUBDIRS); do \
 		( cd $${dir};  \
 		echo 'generate library list for ' $$dir ; \
-		make lib_name \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)'; \
+		MAKENAME='$(MAKENAME)' \
+		lib_name; \
 		 ) \
 	done
 
@@ -54,7 +57,8 @@ libtarget:
 lib_archve:
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
-		make \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
 		lib_archve; \
 		) \
@@ -71,7 +75,8 @@ mod_list:
 	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
-		make \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
 		mod_list; \
 		) \
@@ -82,7 +87,8 @@ module:
 	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
-		make \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		MAKE_MOD_DEP='$(MAKE_MOD_DEP)' \
 		MAKENAME='$(MAKENAME)' \
 		module; \
@@ -93,7 +99,8 @@ module:
 clean:
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
-		make \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		clean \
 		) \
 	done

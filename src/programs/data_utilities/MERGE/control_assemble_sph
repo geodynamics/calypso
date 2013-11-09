@@ -5,6 +5,9 @@ begin assemble_control
 
     sph_file_prefix             'sph_lm31t48r96c_2/in'
     restart_file_prefix         'rst_2/rst'
+!
+    sph_file_fmt_ctl            'gzip'
+    restart_file_fmt_ctl        'gzip'
   end data_files_def
 !
   begin new_data_files_def
@@ -13,6 +16,9 @@ begin assemble_control
     new_sph_mode_prefix        'sph_lm31t48r96c_4/in'
     new_restart_prefix         'rst_4/rst'
 !
+    new_sph_files_fmt_ctl      'ascii'
+    new_rst_files_fmt_ctl      'ascii'
+!
     delete_original_data_flag       'YES'
   end new_data_files_def
 !
@@ -20,7 +26,7 @@ begin assemble_control
 !!!!!  information for time integration
     begin time_step_ctl
       i_step_init_ctl       0
-      i_step_finish_ctl     2000
+      i_step_number_ctl     2000
       i_step_rst_ctl        800
     end time_step_ctl
   end control

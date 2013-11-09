@@ -70,7 +70,9 @@ all: fluid
 fluid:
 	echo "# Compiling start"; \
 		cd work;  \
-		make fluid
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		fluid
 
 
 makemake:
@@ -140,9 +142,11 @@ makemake:
 		( \
 		echo 'generate diectory list for ' $$dir ; \
 		cd $${dir};  \
-		make dir_list \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		MAKEDIR='$(MAKEDIR)'          \
 		MAKENAME='$(MAKENAME)'        \
+		dir_list; \
 		 ) \
 	done
 	@echo '#' >> $(MAKENAME)
@@ -160,9 +164,11 @@ makemake:
 		( \
 		echo 'generate target list for ' $$dir ; \
 		cd $${dir};  \
-		make target_list \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		BUILDDIR='$(BUILDDIR)' \
-		MAKENAME='$(MAKENAME)'; \
+		MAKENAME='$(MAKENAME)' \
+		target_list; \
 		 ) \
 	done
 	@echo '#' >> $(MAKENAME)
@@ -175,9 +181,11 @@ makemake:
 		( \
 		echo 'generate library list for ' $$dir ; \
 		cd $${dir};  \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		MAKEDIR='$(MAKEDIR)' \
 		MAKENAME='$(MAKENAME)' \
-		make lib_name; \
+		lib_name; \
 		 ) \
 	done
 	@echo '#' >> $(MAKENAME)
@@ -188,10 +196,12 @@ makemake:
 	@echo 'create object module list...'
 	@for dir in $(SUBDIRS) ; do \
 		( cd $${dir};  \
-		make mod_list \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		FFTW3_LIBS='$(FFTW3_LIBS)'   \
 		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)'; \
+		MAKENAME='$(MAKENAME)' \
+		mod_list; \
 		 ) \
 	done
 	@echo '' >> $(MAKENAME)
@@ -200,7 +210,8 @@ makemake:
 	@echo 'all: $$(PROGRAMS)' >> $(MAKENAME)
 	@for dir in programs ; do \
 		( cd $${dir};  \
-		make \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
 		target_task \
 		) \
@@ -213,9 +224,11 @@ makemake:
 	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS) ; do \
 		( cd $${dir};  \
-		make lib_tasks  \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)'; \
+		MAKENAME='$(MAKENAME)' \
+		lib_tasks; \
 		 ) \
 	done
 	@echo '' >> $(MAKENAME)
@@ -227,9 +240,11 @@ makemake:
 		( \
 		echo 'generate compile commands for ' $$dir ; \
 		cd $${dir};  \
-		make module \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
 		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)'; \
+		MAKENAME='$(MAKENAME)' \
+		module; \
 		) \
 	done
 	@echo '' >> $(MAKENAME)
@@ -319,7 +334,12 @@ install:
 		mkdir $$(INSTDIR)/include; \
 	fi
 	@for dir in geoutil solver MHD surface marge_fluid; do \
-	 (cd $${dir}; make INSTDIR=$$(INSTDIR) RANLIB=$(RANLIB) install) \
+	 (cd $${dir}; \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		INSTDIR=$$(INSTDIR) RANLIB=$(RANLIB) \
+		install; \
+		) \
 	done
 
 clean:
