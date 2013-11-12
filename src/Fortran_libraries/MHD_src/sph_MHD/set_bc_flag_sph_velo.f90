@@ -7,7 +7,7 @@
 !>@brief Set boundary conditions flags for velocity
 !!
 !!@verbatim
-!!      subroutine s_set_bc_sph_mhd
+!!      subroutine set_sph_bc_velo_sph
 !!@endverbatim
 !
       module set_bc_flag_sph_velo

@@ -41,7 +41,6 @@
       use material_property
       use sph_transforms_4_MHD
       use set_radius_func
-      use cal_sph_bc_fdm_matrix
       use const_radial_mat_4_sph
       use cal_rms_fields_by_sph
       use const_coriolis_sph
@@ -87,9 +86,6 @@
       if (iflag_debug.gt.0) write(*,*) 'const_2nd_fdm_matrices'
       call const_2nd_fdm_matrices
 !
-      if (iflag_debug.gt.0) write(*,*) 's_cal_sph_bc_fdm_matrices'
-      call s_cal_sph_bc_fdm_matrices
-!
       if (iflag_debug.gt.0) write(*,*) 'const_2nd_fdm_coefs'
       call const_2nd_fdm_coefs
 !
@@ -101,21 +97,20 @@
         call init_sum_coriolis_sph
       end if
 !
-! --------- set reference temperature
+! ---------------------------------
 !
-      call allocate_reft_rj_data
-      call s_set_ref_temp_sph_mhd
-!      call check_reference_temp(my_rank)
+      if(iflag_debug.gt.0) write(*,*)' set_material_property'
+      call set_material_property
+!
+!  -------------------------------
+!
+      if(iflag_debug.gt.0) write(*,*) 's_set_bc_sph_mhd'
+      call s_set_bc_sph_mhd
 !
 ! ---------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'init_sph_transform_MHD'
       call init_sph_transform_MHD
-!
-! ---------------------------------
-!
-      if(iflag_debug.gt.0) write(*,*)' set_material_property'
-      call set_material_property
 !
 !  -------------------------------
 !
@@ -124,11 +119,6 @@
 !
       if(iflag_debug.gt.0) write(*,*)' sync_temp_by_per_temp_sph'
       call sync_temp_by_per_temp_sph
-!
-!  -------------------------------
-!
-      if(iflag_debug.gt.0) write(*,*) 's_set_bc_sph_mhd'
-      call s_set_bc_sph_mhd
 !
 !  -------------------------------
 !

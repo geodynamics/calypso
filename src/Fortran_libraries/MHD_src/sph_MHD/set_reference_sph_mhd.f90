@@ -9,7 +9,7 @@
 !!@verbatim
 !!      subroutine adjust_by_ave_pressure_on_CMB
 !!
-!!      subroutine s_set_ref_temp_sph_mhd
+!!      subroutine set_ref_temp_sph_mhd
 !!
 !!      subroutine sync_temp_by_per_temp_sph
 !!        d_rj(inod,ipol%i_temp):        T => \Theta = T - T0
@@ -24,6 +24,7 @@
 !!        d_rj(inod,ipol%i_grad_t):      d \Theta / dr   => dT / dr
 !!        d_rj(inod,ipol%i_grad_part_t): d \Theta / dr
 !!
+!!      subroutine adjust_sph_temp_bc_by_reftemp
 !!      subroutine delete_zero_degree_comp(is_fld)
 !!@endverbatim
 !!
@@ -70,7 +71,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_ref_temp_sph_mhd
+      subroutine set_ref_temp_sph_mhd
 !
       integer (kind = kint) :: k
 !
@@ -102,7 +103,7 @@
         depth_low_t =  r_CMB
       end if
 !
-      end subroutine s_set_ref_temp_sph_mhd
+      end subroutine set_ref_temp_sph_mhd
 !
 ! -----------------------------------------------------------------------
 !
@@ -165,6 +166,29 @@
       end if
 !
       end subroutine trans_per_temp_to_temp_sph
+!
+! -----------------------------------------------------------------------
+!
+      subroutine adjust_sph_temp_bc_by_reftemp
+!
+      use m_spheric_parameter
+      use m_sph_spectr_data
+      use m_control_params_sph_MHD
+!
+!
+      if(idx_rj_degree_zero .gt. 0                                      &
+     &      .and. iflag_4_ref_temp .eq. id_sphere_ref_temp) then
+        temp_ICB_bc(idx_rj_degree_zero)                                 &
+     &   = temp_ICB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_ICB,0)
+        temp_CMB_bc(idx_rj_degree_zero)                                 &
+     &   = temp_CMB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_CMB,0)
+        h_flux_ICB_bc(idx_rj_degree_zero)                               &
+     &   = h_flux_ICB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_ICB,1)
+        h_flux_CMB_bc(idx_rj_degree_zero)                               &
+     &   = h_flux_CMB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_CMB,1)
+      end if
+!
+      end subroutine adjust_sph_temp_bc_by_reftemp
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

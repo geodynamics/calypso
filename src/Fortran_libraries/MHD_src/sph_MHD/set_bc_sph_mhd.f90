@@ -35,6 +35,8 @@
 !
       use set_bc_flag_sph_velo
       use set_bc_sph_scalars
+      use set_reference_sph_mhd
+      use cal_sph_bc_fdm_matrix
 !
 !
       if (iflag_t_evo_4_velo .gt.     id_no_evolution) then
@@ -54,40 +56,48 @@
       end if
 !
 !
+      call set_radial_range_by_BC(iflag_icb_velocity,                   &
+     &     kr_in_U, kr_out_U)
+      call set_radial_range_by_BC(iflag_icb_temp, kr_in_T, kr_out_T)
+      call set_radial_range_by_BC(iflag_icb_composition,                &
+     &    kr_in_C, kr_out_C)
+      call set_radial_range_by_BC(iflag_icb_magne, kr_in_B, kr_out_B)
 !
-      if      (iflag_icb_velocity .eq. iflag_sph_fill_center            &
-     &    .or. iflag_icb_velocity .eq. iflag_sph_fix_center) then
-        kr_in_U = nlayer_2_center
-      else
-        kr_in_U = nlayer_ICB
-      end if
-      kr_out_U = nlayer_CMB
+!      Set reference temperature and adjust boundary conditions
 !
-      if      (iflag_icb_temp .eq. iflag_sph_fill_center                &
-     &    .or. iflag_icb_temp .eq. iflag_sph_fix_center) then
-        kr_in_T = nlayer_2_center
-      else
-        kr_in_T = nlayer_ICB
-      end if
-      kr_out_T = nlayer_CMB
+      call allocate_reft_rj_data
+      call set_ref_temp_sph_mhd
+      call adjust_sph_temp_bc_by_reftemp
 !
-      if      (iflag_icb_composition .eq. iflag_sph_fill_center         &
-     &    .or. iflag_icb_composition .eq. iflag_sph_fix_center) then
-        kr_in_C = nlayer_2_center
-      else
-        kr_in_C = nlayer_ICB
-      end if
-      kr_out_C = nlayer_CMB
+!      Det FDM matrices for boundaries
 !
-      if      (iflag_icb_magne .eq. iflag_sph_fill_center               &
-     &    .or. iflag_icb_magne .eq. iflag_sph_fix_center) then
-        kr_in_B = nlayer_2_center
-      else
-        kr_in_B = nlayer_ICB
-      end if
-      kr_out_B = nlayer_CMB
+      if (iflag_debug.gt.0) write(*,*) 's_cal_sph_bc_fdm_matrices'
+      call s_cal_sph_bc_fdm_matrices
+!
+!      Check data
+!
+      if(i_debug .gt. 1) call check_sph_bc_temp_sph
+      if(i_debug .gt. 1) call check_sph_bc_composition_sph
 !
       end subroutine s_set_bc_sph_mhd
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_radial_range_by_BC(iflag_icb_bc, kr_in, kr_out)
+!
+      integer(kind = kint), intent(in) :: iflag_icb_bc
+      integer(kind = kint), intent(inout) :: kr_in, kr_out
+!
+!
+      if      (iflag_icb_bc .eq. iflag_sph_fill_center                  &
+     &    .or. iflag_icb_bc .eq. iflag_sph_fix_center) then
+        kr_in = nlayer_2_center
+      else
+        kr_in = nlayer_ICB
+      end if
+      kr_out =  nlayer_CMB
+!
+      end subroutine set_radial_range_by_BC
 !
 ! -----------------------------------------------------------------------
 !
@@ -151,6 +161,98 @@
       end do
 !
       end subroutine set_sph_bc_magne_sph
+!
+! -----------------------------------------------------------------------
+!
+      subroutine check_sph_bc_temp_sph
+!
+      use m_spheric_parameter
+      use m_bc_data_list
+      use m_surf_data_list
+!
+      integer(kind = kint) :: i
+!
+!
+      if(iflag_debug .gt. 0) then
+        write(*,*) 'h_flux_surf%num_bc',       h_flux_surf%num_bc
+        write(*,*) 'h_flux_surf%ibc_type',     h_flux_surf%ibc_type
+        write(*,*) 'h_flux_surf%bc_magnitude', h_flux_surf%bc_magnitude
+      end if
+!
+      if(i_debug .gt. 1) then
+        write(*,*) 'iflag_icb_temp', iflag_icb_temp
+        if(iflag_icb_temp .eq. iflag_fixed_field) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'temp_ICB', idx_gl_1d_rj_j(i,1:3),               &
+     &                  temp_ICB_bc(i)
+          end do
+        end if
+        if(iflag_icb_temp .eq. iflag_fixed_flux) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'heat_flux_ICB', idx_gl_1d_rj_j(i,1:3),          &
+     &                  h_flux_ICB_bc(i)
+          end do
+        end if
+!
+        write(*,*) 'iflag_cmb_temp', iflag_cmb_temp
+        if(iflag_cmb_temp .eq. iflag_fixed_field) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'temp_CMB', idx_gl_1d_rj_j(i,1:3),               &
+     &                  temp_CMB_bc(i)
+          end do
+        end if
+        if(iflag_cmb_temp .eq. iflag_fixed_flux) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'heat_flux_CMB', idx_gl_1d_rj_j(i,1:3),          &
+     &                  h_flux_CMB_bc(i)
+          end do
+        end if
+!
+      end if
+!
+      end subroutine check_sph_bc_temp_sph
+!
+! -----------------------------------------------------------------------
+!
+      subroutine check_sph_bc_composition_sph
+!
+      use m_spheric_parameter
+!
+      integer(kind = kint) :: i
+!
+!
+      if(i_debug .gt. 1) then
+        write(*,*) 'iflag_icb_composition', iflag_icb_composition
+        if(iflag_icb_composition .eq. iflag_fixed_field) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'comp_ICB', idx_gl_1d_rj_j(i,1:3),               &
+     &                  composition_ICB_bc(i)
+          end do
+        end if
+        if(iflag_icb_composition .eq. iflag_fixed_flux) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'comp_flux_ICB', idx_gl_1d_rj_j(i,1:3),          &
+     &                  c_flux_ICB_bc(i)
+          end do
+        end if
+!
+        write(*,*) 'iflag_cmb_composition', iflag_cmb_composition
+        if(iflag_cmb_composition .eq. iflag_fixed_field) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'comp_CMB', idx_gl_1d_rj_j(i,1:3),               &
+     &                  composition_CMB_bc(i)
+          end do
+        end if
+        if(iflag_cmb_composition .eq. iflag_fixed_flux) then
+          do i = 1, nidx_rj(2)
+            write(*,*) 'comp_flux_CMB', idx_gl_1d_rj_j(i,1:3),          &
+     &                  c_flux_CMB_bc(i)
+          end do
+        end if
+!
+      end if
+!
+      end subroutine check_sph_bc_composition_sph
 !
 ! -----------------------------------------------------------------------
 !

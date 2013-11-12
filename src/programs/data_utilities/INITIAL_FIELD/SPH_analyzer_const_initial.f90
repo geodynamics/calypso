@@ -39,7 +39,6 @@
       use material_property
       use sph_transforms_4_MHD
       use set_radius_func
-      use cal_sph_bc_fdm_matrix
       use const_radial_mat_4_sph
       use cal_rms_fields_by_sph
       use const_coriolis_sph
@@ -76,40 +75,6 @@
       if (iflag_debug.gt.0) write(*,*) 'set_radius_rot_reft_dat_4_sph'
       call set_radius_rot_reft_dat_4_sph(depth_high_t, depth_low_t,     &
      &    high_temp, low_temp, angular)
-!
-!      if (iflag_debug.gt.0) write(*,*) 'const_2nd_fdm_matrices'
-!      call const_2nd_fdm_matrices
-!
-!      if (iflag_debug.gt.0) write(*,*) 's_cal_sph_bc_fdm_matrices'
-!      call s_cal_sph_bc_fdm_matrices
-!
-!      if (iflag_debug.gt.0) write(*,*) 'const_2nd_fdm_coefs'
-!      call const_2nd_fdm_coefs
-!
-!* -----  set integrals for coriolis term -----------------
-!*
-!      if(iflag_4_coriolis .gt. id_turn_OFF) then
-!        if ( iflag_debug.gt.0 ) write(*,*) 'init_sum_coriolis_sph'
-!        call init_sum_coriolis_sph
-!      end if
-!
-! --------- set reference temperature
-!
-!      call allocate_reft_rj_data
-!      call s_set_ref_temp_sph_mhd
-!      call check_reference_temp(my_rank)
-!
-! ---------------------------------
-!
-!      if (iflag_debug.gt.0) write(*,*) 'init_sph_transform_MHD'
-!      call init_sph_transform_MHD
-!
-! ---------------------------------
-!
-!      if(iflag_debug.gt.0) write(*,*)' set_material_property'
-!      call set_material_property
-!
-!  -------------------------------
 !
       if(iflag_debug.gt.0) write(*,*)' sph_initial_spectrum'
       call sph_initial_spectrum

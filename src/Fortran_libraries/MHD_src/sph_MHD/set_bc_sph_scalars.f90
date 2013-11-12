@@ -7,7 +7,9 @@
 !>@brief Set boundary conditions for scalar fields
 !!
 !!@verbatim
-!!      subroutine s_set_bc_sph_mhd
+!!      subroutine set_sph_bc_temp_sph
+!!      subroutine set_sph_bc_composition_sph
+!!      subroutine adjust_sph_temp_bc_by_reftemp
 !!@endverbatim
 !
       module set_bc_sph_scalars
@@ -44,12 +46,6 @@
 !
 !
       call allocate_temp_bc_array( nidx_rj(2) )
-!
-      if(iflag_debug .gt. 0) then
-        write(*,*) 'h_flux_surf%num_bc',       h_flux_surf%num_bc
-        write(*,*) 'h_flux_surf%ibc_type',     h_flux_surf%ibc_type
-        write(*,*) 'h_flux_surf%bc_magnitude', h_flux_surf%bc_magnitude
-      end if
 !
       do i = 1, h_flux_surf%num_bc
         if ( h_flux_surf%ibc_type(i)  .eq. iflag_bc_fix_s) then
@@ -121,49 +117,6 @@
       end do
 !
       h_flux_ICB_bc(1:nidx_rj(2)) = - h_flux_ICB_bc(1:nidx_rj(2))
-!
-      if(idx_rj_degree_zero .gt. 0                                      &
-     &      .and. iflag_4_ref_temp .eq. id_sphere_ref_temp) then
-        temp_ICB_bc(idx_rj_degree_zero)                                 &
-     &   = temp_ICB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_ICB,0)
-        temp_CMB_bc(idx_rj_degree_zero)                                 &
-     &   = temp_CMB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_CMB,0)
-        h_flux_ICB_bc(idx_rj_degree_zero)                               &
-     &   = h_flux_ICB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_ICB,1)
-        h_flux_CMB_bc(idx_rj_degree_zero)                               &
-     &   = h_flux_CMB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_CMB,1)
-      end if
-!
-      if(i_debug .gt. 1) then
-        write(*,*) 'iflag_icb_temp', iflag_icb_temp
-        if(iflag_icb_temp .eq. iflag_fixed_field) then
-          do i = 1, nidx_rj(2)
-            write(*,*) 'temp_ICB', idx_gl_1d_rj_j(i,1:3),               &
-     &                  temp_ICB_bc(i)
-          end do
-        end if
-        if(iflag_icb_temp .eq. iflag_fixed_flux) then
-          do i = 1, nidx_rj(2)
-            write(*,*) 'heat_flux_ICB', idx_gl_1d_rj_j(i,1:3),          &
-     &                  h_flux_ICB_bc(i)
-          end do
-        end if
-!
-        write(*,*) 'iflag_cmb_temp', iflag_cmb_temp
-        if(iflag_cmb_temp .eq. iflag_fixed_field) then
-          do i = 1, nidx_rj(2)
-            write(*,*) 'temp_CMB', idx_gl_1d_rj_j(i,1:3),               &
-     &                  temp_CMB_bc(i)
-          end do
-        end if
-        if(iflag_cmb_temp .eq. iflag_fixed_flux) then
-          do i = 1, nidx_rj(2)
-            write(*,*) 'heat_flux_CMB', idx_gl_1d_rj_j(i,1:3),          &
-     &                  h_flux_CMB_bc(i)
-          end do
-        end if
-!
-      end if
 !
       end subroutine set_sph_bc_temp_sph
 !
@@ -256,37 +209,6 @@
       end do
 !
       c_flux_ICB_bc(1:nidx_rj(2)) = -c_flux_ICB_bc(1:nidx_rj(2))
-!
-      if(i_debug .gt. 1) then
-        write(*,*) 'iflag_icb_composition', iflag_icb_composition
-        if(iflag_icb_composition .eq. iflag_fixed_field) then
-          do i = 1, nidx_rj(2)
-            write(*,*) 'comp_ICB', idx_gl_1d_rj_j(i,1:3),               &
-     &                  composition_ICB_bc(i)
-          end do
-        end if
-        if(iflag_icb_composition .eq. iflag_fixed_flux) then
-          do i = 1, nidx_rj(2)
-            write(*,*) 'comp_flux_ICB', idx_gl_1d_rj_j(i,1:3),          &
-     &                  c_flux_ICB_bc(i)
-          end do
-        end if
-!
-        write(*,*) 'iflag_cmb_composition', iflag_cmb_composition
-        if(iflag_cmb_composition .eq. iflag_fixed_field) then
-          do i = 1, nidx_rj(2)
-            write(*,*) 'comp_CMB', idx_gl_1d_rj_j(i,1:3),               &
-     &                  composition_CMB_bc(i)
-          end do
-        end if
-        if(iflag_cmb_composition .eq. iflag_fixed_flux) then
-          do i = 1, nidx_rj(2)
-            write(*,*) 'comp_flux_CMB', idx_gl_1d_rj_j(i,1:3),          &
-     &                  c_flux_CMB_bc(i)
-          end do
-        end if
-!
-      end if
 !
       end subroutine set_sph_bc_composition_sph
 !

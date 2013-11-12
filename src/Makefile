@@ -200,7 +200,7 @@ makemake:
 		GMAKE='$(GMAKE)' \
 		FFTW3_LIBS='$(FFTW3_LIBS)'   \
 		MAKEDIR='$(MAKEDIR)' \
-		MAKENAME='$(MAKENAME)' \
+		MAKENAME='$(MAKENAME)'\
 		mod_list; \
 		 ) \
 	done
@@ -213,7 +213,7 @@ makemake:
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
-		target_task \
+		target_task; \
 		) \
 	done
 	@echo 'create library construct list...'
