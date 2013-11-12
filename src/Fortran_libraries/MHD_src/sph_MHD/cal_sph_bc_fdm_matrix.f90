@@ -32,13 +32,18 @@
       use m_coef_fdm_free_ICB
       use m_coef_fdm_free_CMB
       use m_coef_fdm_to_center
+      use cal_fdm_coefs_4_boundaries
 !
 !
-      call cal_2nd_nod_ICB_fixed_fdm(radius_1d_rj_r(nlayer_ICB))
-      call cal_2nd_nod_ICB_fix_df_fdm(radius_1d_rj_r(nlayer_ICB))
+      call cal_fdm2_coef_fix_fld_ICB(radius_1d_rj_r(nlayer_ICB),        &
+     &    coef_fdm_fix_ICB_2)
+      call cal_fdm2_coef_fix_df_ICB(radius_1d_rj_r(nlayer_ICB),         &
+     &    coef_fdm_fix_dr_ICB_2)
 !
-      call cal_2nd_nod_CMB_fixed_fdm(radius_1d_rj_r(nlayer_CMB-2))
-      call cal_2nd_nod_CMB_fix_df_fdm(radius_1d_rj_r(nlayer_CMB-1))
+      call cal_fdm2_coef_fix_fld_CMB(radius_1d_rj_r(nlayer_CMB-2),      &
+     &    coef_fdm_fix_CMB_2)
+      call cal_fdm2_coef_fix_df_CMB(radius_1d_rj_r(nlayer_CMB-1),       &
+     &    coef_fdm_fix_dr_CMB_2)
 !
 !
       call cal_2nd_ICB_free_vp_bc_fdm(radius_1d_rj_r(nlayer_ICB))
