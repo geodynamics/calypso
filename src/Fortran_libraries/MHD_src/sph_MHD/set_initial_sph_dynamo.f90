@@ -268,7 +268,7 @@
       subroutine set_initial_magne_sph
 !
       use m_control_params_sph_MHD
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use m_spheric_parameter
       use m_sph_spectr_data
 !
@@ -293,7 +293,7 @@
       end do
 !$omp end parallel do
 !
-      if (iflag_icb_magne .eq. iflag_sph_fill_center) then
+      if (sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
 !
         if (js .gt. 0) then
           do k = nlayer_ICB, nlayer_CMB

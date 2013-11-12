@@ -36,7 +36,7 @@
 !
       subroutine const_radial_mat_4_temp_sph
 !
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
 !
       integer(kind = kint) :: ip, jst, jed, j
       integer(kind = kint) :: ierr
@@ -48,7 +48,7 @@
      &    temp_evo_mat)
 !$omp end parallel
 !
-      if (iflag_icb_temp .eq. iflag_fixed_flux) then
+      if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
         call set_fix_flux_icb_rmat_sph(nidx_rj(1), nidx_rj(2),          &
      &     coef_imp_t, coef_d_temp, temp_evo_mat)
       else
@@ -56,7 +56,7 @@
      &      temp_evo_mat)
       end if
 !
-      if (iflag_cmb_temp .eq. iflag_fixed_flux) then
+      if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
         call set_fix_flux_cmb_rmat_sph(nidx_rj(1), nidx_rj(2),          &
      &     coef_imp_t, coef_d_temp, temp_evo_mat)
       else
@@ -82,7 +82,7 @@
 !
       subroutine const_radial_mat_4_composit_sph
 !
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
 !
       integer(kind = kint) :: ip, jst, jed, j
       integer(kind = kint) :: ierr
@@ -94,7 +94,7 @@
      &    composit_evo_mat)
 !$omp end parallel
 !
-      if (iflag_icb_composition .eq. iflag_fixed_flux) then
+      if (sph_bc_C%iflag_icb .eq. iflag_fixed_flux) then
         call set_fix_flux_icb_rmat_sph(nidx_rj(1), nidx_rj(2),          &
      &     coef_imp_c, coef_d_light, composit_evo_mat)
       else
@@ -102,7 +102,7 @@
      &      composit_evo_mat)
       end if
 !
-      if (iflag_cmb_composition .eq. iflag_fixed_flux) then
+      if (sph_bc_C%iflag_cmb .eq. iflag_fixed_flux) then
         call set_fix_flux_cmb_rmat_sph(nidx_rj(1), nidx_rj(2),          &
      &     coef_imp_c, coef_d_light, composit_evo_mat)
       else

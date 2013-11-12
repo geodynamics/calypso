@@ -34,6 +34,7 @@
       subroutine const_radial_mat_vort_2step
 !
       use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use m_ludcmp_band
       use set_free_slip_sph_mat_bc
       use set_non_slip_sph_mat_bc
@@ -61,7 +62,7 @@
       call set_icb_wt_sph_evo_mat
       call set_icb_p_sph_poisson_mat
 !
-      if(iflag_icb_velocity .eq. iflag_free_slip) then
+      if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call set_free_slip_icb_vt_sph_mat
         call set_free_icb_vp_poisson3_mat
       else
@@ -71,7 +72,7 @@
 !
 !   Overwrite rotation for inner core
 !
-      if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call set_icore_viscous_matrix
       end if
 !
@@ -80,7 +81,7 @@
       call set_cmb_wt_sph_evo_mat
       call set_cmb_p_sph_poisson_mat
 !
-      if(iflag_cmb_velocity .eq. iflag_free_slip) then
+      if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call set_free_slip_cmb_vt_sph_mat
         call set_free_cmb_vp_poisson3_mat
       else
@@ -133,17 +134,17 @@
       subroutine const_radial_mat_4_magne_sph
 !
       use m_control_params_sph_MHD
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use set_sph_magne_mat_bc
 !
       integer(kind = kint) :: kr_in, ip, jst, jed, j
       integer(kind = kint) :: ierr
 !
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         kr_in = ione
         call set_magne_center_rmat_sph
-      else if(iflag_icb_magne .eq. iflag_radial_magne) then
+      else if(sph_bc_B%iflag_icb .eq. iflag_radial_magne) then
         kr_in = nlayer_ICB
         call set_qvacume_magne_icb_rmat_sph
       else
@@ -151,7 +152,7 @@
         call set_ins_magne_icb_rmat_sph
       end if
 !
-      if(iflag_cmb_magne .eq. iflag_radial_magne) then
+      if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
         call set_qvacume_magne_cmb_rmat_sph
       else
         call set_ins_magne_cmb_rmat_sph

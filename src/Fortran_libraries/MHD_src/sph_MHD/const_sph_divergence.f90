@@ -35,7 +35,7 @@
 !
       subroutine const_sph_heat_advect
 !
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use cal_sph_exp_fixed_scalar
       use cal_sph_exp_fixed_flux
 !
@@ -43,7 +43,7 @@
       call cal_sph_nod_vect_div2(nlayer_ICB, nlayer_CMB,                &
      &    ipol%i_h_flux, ipol%i_h_advect)
 !
-      if (iflag_icb_temp .eq. iflag_fixed_flux) then
+      if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
         call cal_div_sph_icb_fix_flux_2(nidx_rj(2), h_flux_ICB_bc,      &
      &      ipol%i_h_flux, ipol%i_h_advect)
       else
@@ -51,7 +51,7 @@
      &      ipol%i_h_flux, ipol%i_h_advect)
       end if
 !
-      if (iflag_cmb_temp .eq. iflag_fixed_flux) then
+      if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
         call cal_div_sph_cmb_fix_flux_2(nidx_rj(2), h_flux_CMB_bc,      &
      &      ipol%i_h_flux, ipol%i_h_advect)
       else
@@ -65,7 +65,7 @@
 !
       subroutine const_sph_scalar_advect
 !
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use cal_sph_exp_fixed_scalar
       use cal_sph_exp_fixed_flux
 !
@@ -73,7 +73,7 @@
       call cal_sph_nod_vect_div2(nlayer_ICB, nlayer_CMB,                &
      &    ipol%i_c_flux, ipol%i_c_advect)
 !
-      if (iflag_icb_temp .eq. iflag_fixed_flux) then
+      if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
         call cal_div_sph_icb_fix_flux_2(nidx_rj(2), c_flux_ICB_bc,      &
      &      ipol%i_c_flux, ipol%i_c_advect)
       else
@@ -81,7 +81,7 @@
      &      ipol%i_c_flux, ipol%i_c_advect)
       end if
 !
-      if (iflag_cmb_temp .eq. iflag_fixed_flux) then
+      if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
         call cal_div_sph_cmb_fix_flux_2(nidx_rj(2), c_flux_CMB_bc,      &
      &      ipol%i_c_flux, ipol%i_c_advect)
       else

@@ -34,6 +34,7 @@
 !
       use calypso_mpi
       use m_sph_spectr_data
+      use m_boundary_params_sph_MHD
       use const_sph_radial_grad
       use const_sph_rotation
       use cal_inner_core_rotation
@@ -48,7 +49,7 @@
         if (iflag_debug .gt. 0) write(*,*) 'take rotation of Lorentz'
         call const_sph_force_rot2(ipol%i_lorentz, ipol%i_rot_Lorentz)
 !
-        if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
+        if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
           call int_icore_toroidal_lorentz
         end if
       end if

@@ -72,6 +72,7 @@
 !
       subroutine sum_coriolis_rj_sph
 !
+      use m_boundary_params_sph_MHD
       use trans_sph_velo_4_coriolis
       use sum_rot_coriolis_rj_sph
       use cal_inner_core_rotation
@@ -82,7 +83,7 @@
 !
       call s_sum_rot_coriolis_rj_sph(coef_cor)
 !
-      if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_icore_coriolis_explicit
       end if
 !

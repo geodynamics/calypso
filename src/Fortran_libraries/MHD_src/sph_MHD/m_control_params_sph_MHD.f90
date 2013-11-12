@@ -38,11 +38,6 @@
 !>      integer flag for pseudo vacuum magnetic boundary
       integer(kind = kint), parameter :: iflag_radial_magne =   11
 !
-!>      boundary condition flag for velocity at ICB
-      integer(kind = kint) :: iflag_icb_velocity = iflag_fixed_velo
-!>      boundary condition flag for velocity at CMB
-      integer(kind = kint) :: iflag_cmb_velocity = iflag_fixed_velo
-!
 !>      Fixed poloidal velocity spectrum for ICB
       real(kind= kreal), allocatable :: vp_ICB_bc(:)
 !>      Fixed toroidal velocity spectrum for ICB
@@ -51,11 +46,6 @@
       real(kind= kreal), allocatable :: vp_CMB_bc(:)
 !>      Fixed toroidal velocity spectrum for CMB
       real(kind= kreal), allocatable :: vt_CMB_bc(:)
-!
-!>      boundary condition flag for tempeture at ICB
-      integer(kind = kint) :: iflag_icb_temp = 0
-!>      boundary condition flag for tempeture at CMB
-      integer(kind = kint) :: iflag_cmb_temp = 0
 !
 !>      Fixed temperature spectrum for ICB
       real(kind= kreal), allocatable :: temp_ICB_bc(:)
@@ -66,11 +56,6 @@
 !>      Fixed heat flux spectrum for CMB
       real(kind= kreal), allocatable :: h_flux_CMB_bc(:)
 !
-!>      boundary condition flag for composition variation at ICB
-      integer(kind = kint) :: iflag_icb_composition = 0
-!>      boundary condition flag for composition variation at CMB
-      integer(kind = kint) :: iflag_cmb_composition = 0
-!
 !>      Fixed composition spectrum for ICB
       real(kind= kreal), allocatable :: composition_ICB_bc(:)
 !>      Fixed composition spectrum for CMB
@@ -79,12 +64,6 @@
       real(kind= kreal), allocatable :: c_flux_ICB_bc(:)
 !>      Fixed composition flux spectrum for CMB
       real(kind= kreal), allocatable :: c_flux_CMB_bc(:)
-!
-!
-!>      boundary condition flag for magnetic field at ICB
-      integer(kind = kint) :: iflag_icb_magne = iflag_sph_insulator
-!>      boundary condition flag for magnetic field at CMB
-      integer(kind = kint) :: iflag_cmb_magne = iflag_sph_insulator
 !
 !
       integer(kind = kint) :: iflag_sph_coriolis_file = 0

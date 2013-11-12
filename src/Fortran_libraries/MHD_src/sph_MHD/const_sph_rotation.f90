@@ -67,6 +67,7 @@
       subroutine const_sph_vorticity
 !
       use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use m_sph_phys_address
       use set_sph_exp_rigid_ICB
       use set_sph_exp_rigid_CMB
@@ -74,15 +75,15 @@
       use set_sph_exp_free_CMB
 !
 !
-      if(iflag_icb_velocity .eq. iflag_free_slip) then
+      if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_rot2(ipol%i_velo, ipol%i_vort)
-      else if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      else if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_sph_nod_icb_rigid_rot2(ipol%i_velo, ipol%i_vort)
       else
         call cal_sph_nod_icb_rigid_rot2(ipol%i_velo, ipol%i_vort)
       end if
 !
-      if(iflag_cmb_velocity .eq. iflag_free_slip) then
+      if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_rot2(ipol%i_velo, ipol%i_vort)
       else
         call cal_sph_nod_cmb_rigid_rot2(ipol%i_velo, ipol%i_vort)
@@ -98,7 +99,7 @@
       subroutine const_sph_current
 !
       use m_control_params_sph_MHD
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use m_sph_phys_address
       use cal_sph_exp_nod_icb_ins
       use cal_sph_exp_nod_cmb_ins
@@ -109,10 +110,10 @@
       integer(kind = kint) :: kr_in
 !
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         kr_in = ione
         call cal_sph_nod_center_rot2(ipol%i_magne, ipol%i_current)
-      else if(iflag_icb_magne .eq. iflag_radial_magne) then
+      else if(sph_bc_B%iflag_icb .eq. iflag_radial_magne) then
         kr_in = nlayer_ICB
         call cal_sph_nod_icb_qvc_rot2(ipol%i_magne, ipol%i_current)
       else
@@ -123,7 +124,7 @@
       call cal_sph_nod_vect_rot2(kr_in, nlayer_CMB,                     &
      &    ipol%i_magne, ipol%i_current)
 !
-      if(iflag_cmb_magne .eq. iflag_radial_magne) then
+      if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
         call cal_sph_nod_cmb_qvc_rot2(ipol%i_magne, ipol%i_current)
       else
         call cal_sph_nod_cmb_ins_rot2(ipol%i_magne, ipol%i_current)
@@ -136,7 +137,7 @@
       subroutine const_sph_rotation_uxb(is_fld, is_rot)
 !
       use m_control_params_sph_MHD
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use m_sph_phys_address
       use cal_sph_exp_nod_icb_ins
       use cal_sph_exp_nod_cmb_ins
@@ -149,10 +150,10 @@
       integer(kind = kint) :: kr_st
 !
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         kr_st = ione
         call cal_sph_nod_center_rot2(is_fld, is_rot)
-      else if(iflag_icb_magne .eq. iflag_radial_magne) then
+      else if(sph_bc_B%iflag_icb .eq. iflag_radial_magne) then
         kr_st = nlayer_ICB
         call cal_sph_nod_icb_qvc_vp_rot2(is_fld, is_rot)
       else
@@ -163,7 +164,7 @@
       call cal_sph_nod_vect_w_div_rot2(kr_st, nlayer_CMB,               &
      &    is_fld, is_rot)
 !
-      if(iflag_cmb_magne .eq. iflag_radial_magne) then
+      if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
         call cal_sph_nod_cmb_qvc_vp_rot2(is_fld, is_rot)
       else
         call cal_sph_nod_cmb_ins_vp_rot2(is_fld, is_rot)
@@ -198,6 +199,7 @@
       subroutine const_sph_force_rot2(is_fld, is_rot)
 !
       use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use set_sph_exp_rigid_ICB
       use set_sph_exp_rigid_CMB
       use set_sph_exp_free_ICB
@@ -206,13 +208,13 @@
       integer(kind = kint), intent(in) :: is_fld, is_rot
 !
 !
-      if(iflag_icb_velocity .eq. iflag_free_slip) then
+      if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_rot2(is_fld, is_rot)
       else
         call cal_sph_nod_icb_rigid_rot2(is_fld, is_rot)
       end if
 !
-      if(iflag_cmb_velocity .eq. iflag_free_slip) then
+      if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_rot2(is_fld, is_rot)
       else
         call cal_sph_nod_cmb_rigid_rot2(is_fld, is_rot)
@@ -229,6 +231,7 @@
       subroutine const_sph_viscous_by_vort2
 !
       use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use m_sph_phys_address
       use m_physical_property
       use set_sph_exp_rigid_ICB
@@ -242,7 +245,7 @@
       call cal_sph_nod_diffuse_by_rot2(nlayer_ICB, nlayer_CMB,          &
      &    coef_d_velo, ipol%i_vort, ipol%i_v_diffuse)
 !
-      if(iflag_icb_velocity .eq. iflag_free_slip) then
+      if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_diffuse2(coef_d_velo,                 &
      &      ipol%i_velo, ipol%i_v_diffuse)
       else
@@ -251,12 +254,12 @@
       end if
       call cal_dsdr_sph_icb_nobc_2(ipol%i_v_diffuse, idpdr%i_v_diffuse)
 !
-      if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_icore_viscous_drag_explicit(coef_d_velo,               &
      &      ipol%i_vort, itor%i_v_diffuse)
       end if
 !
-      if(iflag_cmb_velocity .eq. iflag_free_slip) then
+      if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_diffuse2(coef_d_velo,                 &
      &      ipol%i_velo, ipol%i_v_diffuse)
       else
@@ -273,7 +276,7 @@
       subroutine const_sph_mag_diffuse_by_j
 !
       use m_control_params_sph_MHD
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use m_sph_phys_address
       use m_physical_property
       use cal_sph_exp_fixed_scalar
@@ -287,12 +290,12 @@
       integer(kind = kint) :: kr_in
 !
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         kr_in = ione
         call cal_sph_nod_center_diffuse2(coef_d_magne,                  &
      &      ipol%i_magne, ipol%i_b_diffuse)
         call cal_dsdr_sph_center_2(ipol%i_b_diffuse)
-      else if(iflag_icb_magne .eq. iflag_radial_magne) then
+      else if(sph_bc_B%iflag_icb .eq. iflag_radial_magne) then
         kr_in = nlayer_ICB
         call cal_sph_nod_icb_qvc_diffuse2(coef_d_magne,                 &
      &      ipol%i_magne, ipol%i_b_diffuse)
@@ -309,7 +312,7 @@
       call cal_sph_nod_diffuse_by_rot2(kr_in, nlayer_CMB, coef_d_magne, &
      &    ipol%i_current, ipol%i_b_diffuse)
 !
-      if(iflag_cmb_magne .eq. iflag_radial_magne) then
+      if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
         call cal_sph_nod_cmb_qvc_diffuse2(coef_d_magne,                 &
      &      ipol%i_magne, ipol%i_b_diffuse)
       else

@@ -53,6 +53,7 @@
 !
       subroutine cal_sol_velo_by_vort_sph_crank
 !
+      use m_boundary_params_sph_MHD
       use const_sph_radial_grad
       use set_sph_exp_rigid_ICB
       use set_sph_exp_rigid_CMB
@@ -72,15 +73,15 @@
 !
       call delete_zero_degree_comp(ipol%i_velo)
 !
-      if     (iflag_icb_velocity .eq. iflag_free_slip) then
+      if     (sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_vpol2(ipol%i_velo)
-      else if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      else if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_sph_nod_icb_rotate_velo2(ipol%i_velo)
       else
         call cal_sph_nod_icb_rigid_velo2(ipol%i_velo)
       end if
 !
-      if(iflag_cmb_velocity .eq. iflag_free_slip) then
+      if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_vpol2(ipol%i_velo)
       else
         call cal_sph_nod_cmb_rigid_velo2(ipol%i_velo)
@@ -184,6 +185,7 @@
 !
       subroutine cal_sol_magne_sph_crank
 !
+      use m_boundary_params_sph_MHD
       use const_sph_radial_grad
       use cal_sph_exp_nod_icb_ins
       use cal_sph_exp_nod_cmb_ins
@@ -193,13 +195,13 @@
 !
       call delete_zero_degree_comp(ipol%i_magne)
 !
-      if(iflag_icb_magne .eq. iflag_sph_insulator) then
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_insulator) then
         call cal_sph_nod_icb_ins_mag2(ipol%i_magne)
-      else if(iflag_icb_magne .eq. iflag_radial_magne) then
+      else if(sph_bc_B%iflag_icb .eq. iflag_radial_magne) then
         call cal_sph_nod_icb_qvc_mag2(ipol%i_magne)
       end if
 !
-      if(iflag_cmb_magne .eq. iflag_radial_magne) then
+      if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
         call cal_sph_nod_cmb_qvc_mag2(ipol%i_magne)
       else
         call cal_sph_nod_cmb_ins_mag2(ipol%i_magne)
@@ -221,17 +223,17 @@
 !
       subroutine cal_sol_temperature_sph_crank
 !
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use set_scalar_boundary_sph
       use adjust_fixed_flux_sph
 !
-      if (iflag_icb_temp .eq. iflag_fixed_flux) then
+      if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
         call adjust_icb_fix_h_flux_sph
       else
         call set_icb_fix_temp_sph
       end if
 !
-      if (iflag_cmb_temp .eq. iflag_fixed_flux) then
+      if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
         call adjust_cmb_fix_h_flux_sph
       else
         call set_cmb_fix_temp_sph
@@ -247,18 +249,18 @@
 !
       subroutine cal_sol_composition_sph_crank
 !
-      use t_boundary_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use set_scalar_boundary_sph
       use adjust_fixed_flux_sph
 !
 !
-      if (iflag_icb_composition .eq. iflag_fixed_flux) then
+      if (sph_bc_C%iflag_icb .eq. iflag_fixed_flux) then
         call adjust_icb_fix_c_flux_sph
       else
         call set_icb_fix_composition_sph
       end if
 !
-      if (iflag_cmb_composition .eq. iflag_fixed_flux) then
+      if (sph_bc_C%iflag_cmb .eq. iflag_fixed_flux) then
         call adjust_cmb_fix_c_flux_sph
       else
         call set_cmb_fix_composition_sph
