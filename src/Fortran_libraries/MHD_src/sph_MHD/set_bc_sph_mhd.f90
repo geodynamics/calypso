@@ -167,13 +167,13 @@
         if(sph_bc_T%iflag_icb .eq. iflag_fixed_field) then
           do i = 1, nidx_rj(2)
             write(*,*) 'temp_ICB', idx_gl_1d_rj_j(i,1:3),               &
-     &                  temp_ICB_bc(i)
+     &                  sph_bc_T%ICB_fld(i)
           end do
         end if
         if(sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
           do i = 1, nidx_rj(2)
             write(*,*) 'heat_flux_ICB', idx_gl_1d_rj_j(i,1:3),          &
-     &                  h_flux_ICB_bc(i)
+     &                  sph_bc_T%ICB_flux(i)
           end do
         end if
 !
@@ -181,13 +181,13 @@
         if(sph_bc_T%iflag_cmb .eq. iflag_fixed_field) then
           do i = 1, nidx_rj(2)
             write(*,*) 'temp_CMB', idx_gl_1d_rj_j(i,1:3),               &
-     &                  temp_CMB_bc(i)
+     &                  sph_bc_T%CMB_fld(i)
           end do
         end if
         if(sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
           do i = 1, nidx_rj(2)
             write(*,*) 'heat_flux_CMB', idx_gl_1d_rj_j(i,1:3),          &
-     &                  h_flux_CMB_bc(i)
+     &                  sph_bc_T%CMB_flux(i)
           end do
         end if
 !
@@ -210,13 +210,13 @@
         if(sph_bc_C%iflag_icb .eq. iflag_fixed_field) then
           do i = 1, nidx_rj(2)
             write(*,*) 'comp_ICB', idx_gl_1d_rj_j(i,1:3),               &
-     &                  composition_ICB_bc(i)
+     &                  sph_bc_C%ICB_fld(i)
           end do
         end if
         if(sph_bc_C%iflag_icb .eq. iflag_fixed_flux) then
           do i = 1, nidx_rj(2)
             write(*,*) 'comp_flux_ICB', idx_gl_1d_rj_j(i,1:3),          &
-     &                  c_flux_ICB_bc(i)
+     &                  sph_bc_C%ICB_flux(i)
           end do
         end if
 !
@@ -224,13 +224,13 @@
         if(sph_bc_C%iflag_cmb .eq. iflag_fixed_field) then
           do i = 1, nidx_rj(2)
             write(*,*) 'comp_CMB', idx_gl_1d_rj_j(i,1:3),               &
-     &                  composition_CMB_bc(i)
+     &                  sph_bc_C%CMB_fld(i)
           end do
         end if
         if(sph_bc_C%iflag_cmb .eq. iflag_fixed_flux) then
           do i = 1, nidx_rj(2)
             write(*,*) 'comp_flux_CMB', idx_gl_1d_rj_j(i,1:3),          &
-     &                  c_flux_CMB_bc(i)
+     &                  sph_bc_C%CMB_flux(i)
           end do
         end if
 !

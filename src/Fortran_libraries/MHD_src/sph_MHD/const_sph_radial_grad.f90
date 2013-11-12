@@ -65,19 +65,19 @@
      &    d_rj(1,ipol%i_temp), d_rj(1,ipol%i_grad_t) )
 !
       if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
-        call cal_dsdr_sph_icb_fix_flux_2(nidx_rj(2), h_flux_ICB_bc,     &
+        call cal_dsdr_sph_icb_fix_flux_2(nidx_rj(2), sph_bc_T%ICB_flux, &
      &      ipol%i_temp, ipol%i_grad_t)
       else
-        call cal_dsdr_sph_icb_fix_scalar_2(nidx_rj(2), temp_ICB_bc,     &
-     &      ipol%i_temp, ipol%i_grad_t)
+        call cal_dsdr_sph_icb_fix_scalar_2                              &
+     &     (nidx_rj(2), sph_bc_T%ICB_fld, ipol%i_temp, ipol%i_grad_t)
       end if
 !
       if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
-        call cal_dsdr_sph_cmb_fix_flux_2(nidx_rj(2), h_flux_CMB_bc,     &
+        call cal_dsdr_sph_cmb_fix_flux_2(nidx_rj(2), sph_bc_T%CMB_flux, &
      &      ipol%i_temp, ipol%i_grad_t)
       else
-        call cal_dsdr_sph_cmb_fix_scalar_2(nidx_rj(2), temp_CMB_bc,     &
-     &      ipol%i_temp, ipol%i_grad_t)
+        call cal_dsdr_sph_cmb_fix_scalar_2                              &
+     &     (nidx_rj(2), sph_bc_T%CMB_fld, ipol%i_temp, ipol%i_grad_t)
       end if
 !
       end subroutine const_radial_grad_temp
@@ -96,19 +96,19 @@
      &     d_rj(1,ipol%i_light), d_rj(1,ipol%i_grad_composit) )
 !
       if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
-        call cal_dsdr_sph_icb_fix_flux_2(nidx_rj(2), c_flux_ICB_bc,     &
+        call cal_dsdr_sph_icb_fix_flux_2(nidx_rj(2), sph_bc_C%ICB_flux, &
      &      ipol%i_light, ipol%i_grad_composit)
       else
         call cal_dsdr_sph_icb_fix_scalar_2(nidx_rj(2),                  &
-     &      composition_ICB_bc, ipol%i_light, ipol%i_grad_composit)
+     &      sph_bc_C%ICB_fld, ipol%i_light, ipol%i_grad_composit)
       end if
 !
       if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
-        call cal_dsdr_sph_cmb_fix_flux_2(nidx_rj(2), c_flux_CMB_bc,     &
+        call cal_dsdr_sph_cmb_fix_flux_2(nidx_rj(2), sph_bc_C%CMB_flux, &
      &      ipol%i_light, ipol%i_grad_composit)
       else
         call cal_dsdr_sph_cmb_fix_scalar_2(nidx_rj(2),                  &
-     &       composition_CMB_bc, ipol%i_light, ipol%i_grad_composit)
+     &       sph_bc_C%CMB_fld, ipol%i_light, ipol%i_grad_composit)
       end if
 !
       end subroutine const_radial_grad_composit

@@ -44,18 +44,18 @@
      &    ipol%i_h_flux, ipol%i_h_advect)
 !
       if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
-        call cal_div_sph_icb_fix_flux_2(nidx_rj(2), h_flux_ICB_bc,      &
+        call cal_div_sph_icb_fix_flux_2(nidx_rj(2), sph_bc_T%ICB_flux,  &
      &      ipol%i_h_flux, ipol%i_h_advect)
       else
-        call cal_sph_div_flux_4_icb_fix(nidx_rj(2), temp_ICB_bc,        &
+        call cal_sph_div_flux_4_icb_fix(nidx_rj(2), sph_bc_T%ICB_fld,   &
      &      ipol%i_h_flux, ipol%i_h_advect)
       end if
 !
       if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
-        call cal_div_sph_cmb_fix_flux_2(nidx_rj(2), h_flux_CMB_bc,      &
+        call cal_div_sph_cmb_fix_flux_2(nidx_rj(2), sph_bc_T%CMB_flux,  &
      &      ipol%i_h_flux, ipol%i_h_advect)
       else
-        call cal_sph_div_flux_4_cmb_fix(nidx_rj(2), temp_CMB_bc,        &
+        call cal_sph_div_flux_4_cmb_fix(nidx_rj(2), sph_bc_T%CMB_fld,   &
      &      ipol%i_h_flux, ipol%i_h_advect)
       end if
 !
@@ -74,18 +74,18 @@
      &    ipol%i_c_flux, ipol%i_c_advect)
 !
       if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
-        call cal_div_sph_icb_fix_flux_2(nidx_rj(2), c_flux_ICB_bc,      &
+        call cal_div_sph_icb_fix_flux_2(nidx_rj(2), sph_bc_C%ICB_flux,  &
      &      ipol%i_c_flux, ipol%i_c_advect)
       else
-        call cal_sph_div_flux_4_icb_fix(nidx_rj(2), composition_ICB_bc, &
+        call cal_sph_div_flux_4_icb_fix(nidx_rj(2), sph_bc_C%ICB_fld,   &
      &      ipol%i_c_flux, ipol%i_c_advect)
       end if
 !
       if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
-        call cal_div_sph_cmb_fix_flux_2(nidx_rj(2), c_flux_CMB_bc,      &
+        call cal_div_sph_cmb_fix_flux_2(nidx_rj(2), sph_bc_C%CMB_flux,  &
      &      ipol%i_c_flux, ipol%i_c_advect)
       else
-        call cal_sph_div_flux_4_icb_fix(nidx_rj(2), composition_CMB_bc, &
+        call cal_sph_div_flux_4_icb_fix(nidx_rj(2), sph_bc_C%CMB_fld,   &
      &      ipol%i_c_flux, ipol%i_c_advect)
       end if
 !

@@ -206,19 +206,23 @@
      &    coef_d_temp, ipol%i_temp, ipol%i_t_diffuse)
 !
       if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
-        call cal_sph_icb_fix_flux_diffuse2(nidx_rj(2), h_flux_ICB_bc,   &
-     &      coef_d_temp, ipol%i_temp, ipol%i_t_diffuse)
+        call cal_sph_icb_fix_flux_diffuse2                              &
+     &     (nidx_rj(2), sph_bc_T%ICB_flux, coef_d_temp,                 &
+     &      ipol%i_temp, ipol%i_t_diffuse)
       else
-        call cal_sph_icb_fix_scalar_diffuse2(nidx_rj(2), temp_ICB_bc,   &
-     &      coef_d_temp, ipol%i_temp, ipol%i_t_diffuse)
+        call cal_sph_icb_fix_scalar_diffuse2                            &
+     &     (nidx_rj(2), sph_bc_T%ICB_fld, coef_d_temp,                  &
+     &      ipol%i_temp, ipol%i_t_diffuse)
       end if
 !
       if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
-        call cal_sph_cmb_fix_flux_diffuse2(nidx_rj(2), h_flux_CMB_bc,   &
-     &      coef_d_temp, ipol%i_temp, ipol%i_t_diffuse)
+        call cal_sph_cmb_fix_flux_diffuse2                              &
+     &     (nidx_rj(2), sph_bc_T%CMB_flux, coef_d_temp,                 &
+     &      ipol%i_temp, ipol%i_t_diffuse)
       else
-        call cal_sph_cmb_fix_scalar_diffuse2(nidx_rj(2), temp_CMB_bc,   &
-     &      coef_d_temp, ipol%i_temp, ipol%i_t_diffuse)
+        call cal_sph_cmb_fix_scalar_diffuse2                            &
+     &     (nidx_rj(2), sph_bc_T%CMB_fld, coef_d_temp,                  &
+     &      ipol%i_temp, ipol%i_t_diffuse)
       end if
 !
       end subroutine const_sph_thermal_diffusion
@@ -237,20 +241,22 @@
      &    coef_d_light, ipol%i_light, ipol%i_c_diffuse)
 !
       if (sph_bc_C%iflag_icb .eq. iflag_fixed_flux) then
-        call cal_sph_icb_fix_flux_diffuse2(nidx_rj(2), c_flux_ICB_bc,   &
-     &      coef_d_light, ipol%i_light, ipol%i_c_diffuse)
+        call cal_sph_icb_fix_flux_diffuse2                              &
+     &     (nidx_rj(2), sph_bc_C%ICB_flux, coef_d_light,                &
+     &      ipol%i_light, ipol%i_c_diffuse)
       else
         call cal_sph_icb_fix_scalar_diffuse2(nidx_rj(2),                &
-     &      composition_ICB_bc, coef_d_light,                           &
+     &      sph_bc_C%ICB_fld, coef_d_light,                             &
      &      ipol%i_light, ipol%i_c_diffuse)
       end if
 !
       if (sph_bc_C%iflag_cmb .eq. iflag_fixed_flux) then
-        call cal_sph_cmb_fix_flux_diffuse2(nidx_rj(2), c_flux_CMB_bc,   &
-     &      coef_d_light, ipol%i_light, ipol%i_c_diffuse)
+        call cal_sph_cmb_fix_flux_diffuse2                              &
+     &     (nidx_rj(2), sph_bc_C%CMB_flux, coef_d_light,                &
+     &      ipol%i_light, ipol%i_c_diffuse)
       else
-        call cal_sph_cmb_fix_scalar_diffuse2(nidx_rj(2),                &
-     &      composition_CMB_bc, coef_d_light,                           &
+        call cal_sph_cmb_fix_scalar_diffuse2                            &
+     &     (nidx_rj(2), sph_bc_C%CMB_fld, coef_d_light,                 &
      &      ipol%i_light, ipol%i_c_diffuse)
       end if
 !

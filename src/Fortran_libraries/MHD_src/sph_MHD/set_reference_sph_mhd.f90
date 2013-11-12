@@ -173,19 +173,23 @@
 !
       use m_spheric_parameter
       use m_sph_spectr_data
-      use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
 !
 !
       if(idx_rj_degree_zero .gt. 0                                      &
      &      .and. iflag_4_ref_temp .eq. id_sphere_ref_temp) then
-        temp_ICB_bc(idx_rj_degree_zero)                                 &
-     &   = temp_ICB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_ICB,0)
-        temp_CMB_bc(idx_rj_degree_zero)                                 &
-     &   = temp_CMB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_CMB,0)
-        h_flux_ICB_bc(idx_rj_degree_zero)                               &
-     &   = h_flux_ICB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_ICB,1)
-        h_flux_CMB_bc(idx_rj_degree_zero)                               &
-     &   = h_flux_CMB_bc(idx_rj_degree_zero) - reftemp_rj(nlayer_CMB,1)
+        sph_bc_T%ICB_fld(idx_rj_degree_zero)                            &
+     &   = sph_bc_T%ICB_fld(idx_rj_degree_zero)                         &
+     &    - reftemp_rj(nlayer_ICB,0)
+        sph_bc_T%CMB_fld(idx_rj_degree_zero)                            &
+     &   = sph_bc_T%CMB_fld(idx_rj_degree_zero)                         &
+     &     - reftemp_rj(nlayer_CMB,0)
+        sph_bc_T%ICB_flux(idx_rj_degree_zero)                           &
+     &   = sph_bc_T%ICB_flux(idx_rj_degree_zero)                        &
+     &    - reftemp_rj(nlayer_ICB,1)
+        sph_bc_T%CMB_flux(idx_rj_degree_zero)                           &
+     &   = sph_bc_T%CMB_flux(idx_rj_degree_zero)                        &
+     &    - reftemp_rj(nlayer_CMB,1)
       end if
 !
       end subroutine adjust_sph_temp_bc_by_reftemp

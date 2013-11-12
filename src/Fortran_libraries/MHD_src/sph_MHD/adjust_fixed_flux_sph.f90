@@ -39,10 +39,11 @@
       use m_physical_property
       use m_sph_phys_address
       use m_coef_fdm_fixed_ICB
+      use m_boundary_params_sph_MHD
 !
 !
       call adjust_in_fixed_flux_sph(nidx_rj(2), coef_fdm_fix_dr_ICB_2,  &
-     &    nlayer_ICB, h_flux_ICB_bc, coef_d_temp, coef_imp_t, dt,       &
+     &    nlayer_ICB, sph_bc_T%ICB_flux, coef_d_temp, coef_imp_t, dt,   &
      &    ipol%i_temp)
 !
       end subroutine adjust_icb_fix_h_flux_sph
@@ -56,10 +57,11 @@
       use m_physical_property
       use m_sph_phys_address
       use m_coef_fdm_fixed_CMB
+      use m_boundary_params_sph_MHD
 !
 !
       call adjust_out_fixed_flux_sph(nidx_rj(2), coef_fdm_fix_dr_CMB_2, &
-     &    nlayer_CMB, h_flux_CMB_bc, coef_d_temp, coef_imp_t, dt,       &
+     &    nlayer_CMB, sph_bc_T%CMB_flux, coef_d_temp, coef_imp_t, dt,   &
      &    ipol%i_temp)
 !
       end subroutine adjust_cmb_fix_h_flux_sph
@@ -74,10 +76,11 @@
       use m_physical_property
       use m_sph_phys_address
       use m_coef_fdm_fixed_ICB
+      use m_boundary_params_sph_MHD
 !
 !
       call adjust_in_fixed_flux_sph(nidx_rj(2), coef_fdm_fix_dr_ICB_2,  &
-     &    nlayer_ICB, c_flux_ICB_bc, coef_d_light, coef_imp_c, dt,      &
+     &    nlayer_ICB, sph_bc_C%ICB_flux, coef_d_light, coef_imp_c, dt,  &
      &    ipol%i_light)
 !
       end subroutine adjust_icb_fix_c_flux_sph
@@ -91,10 +94,11 @@
       use m_physical_property
       use m_sph_phys_address
       use m_coef_fdm_fixed_CMB
+      use m_boundary_params_sph_MHD
 !
 !
       call adjust_out_fixed_flux_sph(nidx_rj(2), coef_fdm_fix_dr_CMB_2, &
-     &    nlayer_CMB, c_flux_CMB_bc, coef_d_light, coef_imp_c, dt,      &
+     &    nlayer_CMB, sph_bc_C%CMB_flux, coef_d_light, coef_imp_c, dt,  &
      &    ipol%i_light)
 !
       end subroutine adjust_cmb_fix_c_flux_sph

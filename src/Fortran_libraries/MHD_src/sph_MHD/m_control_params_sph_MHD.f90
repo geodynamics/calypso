@@ -47,25 +47,6 @@
 !>      Fixed toroidal velocity spectrum for CMB
       real(kind= kreal), allocatable :: vt_CMB_bc(:)
 !
-!>      Fixed temperature spectrum for ICB
-      real(kind= kreal), allocatable :: temp_ICB_bc(:)
-!>      Fixed temperature spectrum for CMB
-      real(kind= kreal), allocatable :: temp_CMB_bc(:)
-!>      Fixed heat flux spectrum for ICB
-      real(kind= kreal), allocatable :: h_flux_ICB_bc(:)
-!>      Fixed heat flux spectrum for CMB
-      real(kind= kreal), allocatable :: h_flux_CMB_bc(:)
-!
-!>      Fixed composition spectrum for ICB
-      real(kind= kreal), allocatable :: composition_ICB_bc(:)
-!>      Fixed composition spectrum for CMB
-      real(kind= kreal), allocatable :: composition_CMB_bc(:)
-!>      Fixed composition flux spectrum for ICB
-      real(kind= kreal), allocatable :: c_flux_ICB_bc(:)
-!>      Fixed composition flux spectrum for CMB
-      real(kind= kreal), allocatable :: c_flux_CMB_bc(:)
-!
-!
       integer(kind = kint) :: iflag_sph_coriolis_file = 0
 !
 !>      Number of grid points in zonal direction for dynamo benchmark
@@ -93,40 +74,6 @@
       end subroutine allocate_vsp_bc_array
 !
 ! -----------------------------------------------------------------------
-!
-      subroutine allocate_temp_bc_array(jmax)
-!
-      integer(kind= kint), intent(in) :: jmax
-!
-      allocate(temp_ICB_bc(jmax))
-      allocate(temp_CMB_bc(jmax))
-      allocate(h_flux_ICB_bc(jmax))
-      allocate(h_flux_CMB_bc(jmax))
-      temp_ICB_bc = 0.0d0
-      temp_CMB_bc = 0.0d0
-      h_flux_ICB_bc = 0.0d0
-      h_flux_CMB_bc = 0.0d0
-!
-      end subroutine allocate_temp_bc_array
-!
-! -----------------------------------------------------------------------
-!
-      subroutine allocate_dscalar_bc_array(jmax)
-!
-      integer(kind= kint), intent(in) :: jmax
-!
-      allocate(composition_ICB_bc(jmax))
-      allocate(composition_CMB_bc(jmax))
-      allocate(c_flux_ICB_bc(jmax))
-      allocate(c_flux_CMB_bc(jmax))
-      composition_ICB_bc = 0.0d0
-      composition_CMB_bc = 0.0d0
-      c_flux_ICB_bc = 0.0d0
-      c_flux_CMB_bc = 0.0d0
-!
-      end subroutine allocate_dscalar_bc_array
-!
-! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine deallocate_vsp_bc_array
@@ -135,24 +82,6 @@
       deallocate(vp_CMB_bc, vt_CMB_bc)
 !
       end subroutine deallocate_vsp_bc_array
-!
-! -----------------------------------------------------------------------
-!
-      subroutine deallocate_temp_bc_array
-!
-      deallocate(temp_ICB_bc,   temp_CMB_bc)
-      deallocate(h_flux_ICB_bc, h_flux_CMB_bc)
-!
-      end subroutine deallocate_temp_bc_array
-!
-! -----------------------------------------------------------------------
-!
-      subroutine deallocate_dscalar_bc_array
-!
-      deallocate(composition_ICB_bc, composition_CMB_bc)
-      deallocate(c_flux_ICB_bc,  c_flux_CMB_bc)
-!
-      end subroutine deallocate_dscalar_bc_array
 !
 ! -----------------------------------------------------------------------
 !

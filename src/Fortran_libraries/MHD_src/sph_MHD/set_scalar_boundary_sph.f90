@@ -8,16 +8,22 @@
 !!
 !!@verbatim
 !!      subroutine set_icb_fix_temp_sph
-!!      subroutine set_cmb_fix_temp_sph
 !!      subroutine set_icb_fix_h_flux_sph
 !!      subroutine set_cmb_fix_h_flux_sph
 !!
-!!      subroutine set_icb_fix_composition_sph
-!!      subroutine set_cmb_fix_composition_sph
 !!      subroutine set_icb_fix_c_flux_sph
 !!      subroutine set_cmb_fix_c_flux_sph
+!!
+!!      subroutine set_fixed_scalar_sph(jmax, kr_bc_st, kr_bc_ed,       &
+!!     &          is_fld, fixed_bc)
 !!@endverbatim
-!
+!!
+!!@param  jmax        Number of modes for local spectrum
+!!@param  kr_bc_st    Start radial address to set fixed field
+!!@param  kr_bc_ed    End radial address to set fixed field
+!!@param  is_fld           Field address
+!!@param  fixed_bc(jmax)   Boundary condition spectrum
+!!
       module set_scalar_boundary_sph
 !
       use m_precision
@@ -30,40 +36,18 @@
 !
       implicit none
 !
-      private :: set_fixed_scalar_sph
-!
 ! -----------------------------------------------------------------------
 !
       contains
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_icb_fix_temp_sph
-!
-!
-      call set_fixed_scalar_sph(nidx_rj(2), ione, nlayer_ICB,           &
-     &    ipol%i_temp, temp_ICB_bc)
-!
-      end subroutine set_icb_fix_temp_sph
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_cmb_fix_temp_sph
-!
-!
-      call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),     &
-     &    ipol%i_temp, temp_CMB_bc)
-!
-      end subroutine set_cmb_fix_temp_sph
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
       subroutine set_icb_fix_h_flux_sph
 !
+      use m_boundary_params_sph_MHD
 !
       call set_fixed_scalar_sph(nidx_rj(2), ione, nlayer_ICB,           &
-     &    ipol%i_grad_t, h_flux_ICB_bc)
+     &    ipol%i_grad_t, sph_bc_T%ICB_flux)
 !
       end subroutine set_icb_fix_h_flux_sph
 !
@@ -71,41 +55,22 @@
 !
       subroutine set_cmb_fix_h_flux_sph
 !
+      use m_boundary_params_sph_MHD
 !
       call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),     &
-     &    ipol%i_grad_t, h_flux_CMB_bc)
+     &    ipol%i_grad_t, sph_bc_T%CMB_flux)
 !
       end subroutine set_cmb_fix_h_flux_sph
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_icb_fix_composition_sph
-!
-!
-      call set_fixed_scalar_sph(nidx_rj(2), ione, nlayer_ICB,           &
-     &    ipol%i_light, composition_ICB_bc)
-!
-      end subroutine set_icb_fix_composition_sph
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_cmb_fix_composition_sph
-!
-!
-      call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),     &
-     &    ipol%i_light, composition_CMB_bc)
-!
-      end subroutine set_cmb_fix_composition_sph
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
       subroutine set_icb_fix_c_flux_sph
 !
+      use m_boundary_params_sph_MHD
 !
       call set_fixed_scalar_sph(nidx_rj(2), ione, nlayer_ICB,           &
-     &    ipol%i_grad_composit, c_flux_ICB_bc)
+     &    ipol%i_grad_composit, sph_bc_C%ICB_flux)
 !
       end subroutine set_icb_fix_c_flux_sph
 !
@@ -113,9 +78,10 @@
 !
       subroutine set_cmb_fix_c_flux_sph
 !
+      use m_boundary_params_sph_MHD
 !
       call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),     &
-     &    ipol%i_grad_composit, c_flux_CMB_bc)
+     &    ipol%i_grad_composit, sph_bc_C%CMB_flux)
 !
       end subroutine set_cmb_fix_c_flux_sph
 !

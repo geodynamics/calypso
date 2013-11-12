@@ -230,13 +230,15 @@
       if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
         call adjust_icb_fix_h_flux_sph
       else
-        call set_icb_fix_temp_sph
+        call set_fixed_scalar_sph(nidx_rj(2), ione, nlayer_ICB,         &
+     &      ipol%i_temp, sph_bc_T%ICB_fld)
       end if
 !
       if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
         call adjust_cmb_fix_h_flux_sph
       else
-        call set_cmb_fix_temp_sph
+        call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),   &
+     &      ipol%i_temp, sph_bc_T%CMB_fld)
       end if
 !
       call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &
@@ -257,13 +259,15 @@
       if (sph_bc_C%iflag_icb .eq. iflag_fixed_flux) then
         call adjust_icb_fix_c_flux_sph
       else
-        call set_icb_fix_composition_sph
+        call set_fixed_scalar_sph(nidx_rj(2), ione, nlayer_ICB,         &
+     &      ipol%i_light, sph_bc_C%ICB_fld)
       end if
 !
       if (sph_bc_C%iflag_cmb .eq. iflag_fixed_flux) then
         call adjust_cmb_fix_c_flux_sph
       else
-        call set_cmb_fix_composition_sph
+        call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),   &
+     &      ipol%i_light, sph_bc_C%CMB_fld)
       end if
 !
       call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &
