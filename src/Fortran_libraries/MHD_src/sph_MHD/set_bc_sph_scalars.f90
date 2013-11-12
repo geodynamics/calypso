@@ -35,6 +35,7 @@
       subroutine set_sph_bc_temp_sph
 !
       use m_spheric_parameter
+      use t_boundary_params_sph_MHD
       use m_bc_data_list
       use m_surf_data_list
       use m_constants
@@ -125,6 +126,7 @@
       subroutine set_sph_bc_composition_sph
 !
       use m_spheric_parameter
+      use t_boundary_params_sph_MHD
       use m_bc_data_list
       use m_surf_data_list
       use m_sph_spectr_data
@@ -217,6 +219,7 @@
       subroutine set_homogenious_scalar_bc(reference_grp, bc_name,      &
      &          bc_magnitude,jmax, bc_data, iflag_bc_scalar)
 !
+      use t_boundary_params_sph_MHD
       use m_spheric_parameter
 !
       character(len=kchara), intent(in) :: reference_grp
@@ -241,6 +244,7 @@
       subroutine set_homogenious_grad_bc(ref_nod_grp, ref_sf_grp,       &
      &          bc_name, bc_magnitude, jmax, bc_data, iflag_bc_scalar)
 !
+      use t_boundary_params_sph_MHD
       use m_spheric_parameter
 !
       character(len=kchara), intent(in) :: ref_nod_grp, ref_sf_grp

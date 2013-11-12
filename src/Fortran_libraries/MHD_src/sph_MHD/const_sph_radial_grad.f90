@@ -56,6 +56,7 @@
 !
       subroutine const_radial_grad_temp
 !
+      use t_boundary_params_sph_MHD
       use cal_sph_exp_fixed_scalar
       use cal_sph_exp_fixed_flux
 !
@@ -85,6 +86,7 @@
 !
       subroutine const_radial_grad_composit
 !
+      use t_boundary_params_sph_MHD
       use cal_sph_exp_fixed_scalar
       use cal_sph_exp_fixed_flux
       use cal_sph_exp_rotation
@@ -148,6 +150,7 @@
 !
       subroutine const_grad_bp_and_current
 !
+      use t_boundary_params_sph_MHD
       use cal_sph_exp_nod_icb_ins
       use cal_sph_exp_nod_cmb_ins
       use cal_sph_exp_nod_icb_qvac
@@ -235,6 +238,7 @@
 !
       subroutine const_grad_poloidal_magne
 !
+      use t_boundary_params_sph_MHD
       use cal_sph_exp_nod_icb_ins
       use cal_sph_exp_nod_cmb_ins
       use cal_sph_exp_nod_cmb_qvac

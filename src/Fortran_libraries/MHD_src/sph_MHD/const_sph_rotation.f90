@@ -98,6 +98,7 @@
       subroutine const_sph_current
 !
       use m_control_params_sph_MHD
+      use t_boundary_params_sph_MHD
       use m_sph_phys_address
       use cal_sph_exp_nod_icb_ins
       use cal_sph_exp_nod_cmb_ins
@@ -135,6 +136,7 @@
       subroutine const_sph_rotation_uxb(is_fld, is_rot)
 !
       use m_control_params_sph_MHD
+      use t_boundary_params_sph_MHD
       use m_sph_phys_address
       use cal_sph_exp_nod_icb_ins
       use cal_sph_exp_nod_cmb_ins
@@ -271,6 +273,7 @@
       subroutine const_sph_mag_diffuse_by_j
 !
       use m_control_params_sph_MHD
+      use t_boundary_params_sph_MHD
       use m_sph_phys_address
       use m_physical_property
       use cal_sph_exp_fixed_scalar

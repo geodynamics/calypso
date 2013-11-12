@@ -32,15 +32,6 @@
       integer(kind = kint), parameter :: iflag_free_slip =  1
 !>      integer flag for rotatable inner core
       integer(kind = kint), parameter :: iflag_rotatable_ic = 10
-!>      integer flag for whole sphere model
-      integer(kind = kint), parameter :: iflag_sph_fill_center = 41
-!>      integer flag for whole sphere model
-      integer(kind = kint), parameter :: iflag_sph_fix_center =  42
-!
-!>      integer flag for fixed velocity boundary
-      integer(kind = kint), parameter :: iflag_fixed_field = 0
-!>      integer flag for free-slip boundary
-      integer(kind = kint), parameter :: iflag_fixed_flux =  1
 !
 !>      integer flag for insulated magnetic boundary
       integer(kind = kint), parameter :: iflag_sph_insulator =   0
@@ -62,9 +53,9 @@
       real(kind= kreal), allocatable :: vt_CMB_bc(:)
 !
 !>      boundary condition flag for tempeture at ICB
-      integer(kind = kint) :: iflag_icb_temp = iflag_fixed_field
+      integer(kind = kint) :: iflag_icb_temp = 0
 !>      boundary condition flag for tempeture at CMB
-      integer(kind = kint) :: iflag_cmb_temp = iflag_fixed_field
+      integer(kind = kint) :: iflag_cmb_temp = 0
 !
 !>      Fixed temperature spectrum for ICB
       real(kind= kreal), allocatable :: temp_ICB_bc(:)
@@ -76,9 +67,9 @@
       real(kind= kreal), allocatable :: h_flux_CMB_bc(:)
 !
 !>      boundary condition flag for composition variation at ICB
-      integer(kind = kint) :: iflag_icb_composition = iflag_fixed_field
+      integer(kind = kint) :: iflag_icb_composition = 0
 !>      boundary condition flag for composition variation at CMB
-      integer(kind = kint) :: iflag_cmb_composition = iflag_fixed_field
+      integer(kind = kint) :: iflag_cmb_composition = 0
 !
 !>      Fixed composition spectrum for ICB
       real(kind= kreal), allocatable :: composition_ICB_bc(:)
@@ -97,23 +88,6 @@
 !
 !
       integer(kind = kint) :: iflag_sph_coriolis_file = 0
-!
-!>      Start radial address of fluid shell for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_in_U =   1
-!>      End radial address of fluid shell for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_out_U =  1
-!>      Start radial address to solve heat equation for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_in_T =   1
-!>      End radial address to solve heat equation for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_out_T =  1
-!>      Start radial address to solve induction for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_in_B =   1
-!>      End radial address to solve induction for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_out_B =  1
-!>      Start radial address to solve comopsition for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_in_C =   1
-!>      End radial address to solve comopsition for @f$ f(r,j) @f$
-      integer(kind = kint) :: kr_out_C =  1
 !
 !>      Number of grid points in zonal direction for dynamo benchmark
       integer(kind = kint) :: mphi_mid_eq = -1

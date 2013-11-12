@@ -224,6 +224,7 @@
      &          jmax, bc_data, iflag_bc_scalar)
 !
       use m_control_params_sph_MHD
+      use t_boundary_params_sph_MHD
       use skip_comment_f
 !
       character(len=kchara), intent(in) :: field_name
@@ -254,6 +255,7 @@
      &          iflag_bc_scalar)
 !
       use m_control_params_sph_MHD
+      use t_boundary_params_sph_MHD
       use skip_comment_f
 !
       character(len=kchara), intent(in) :: field_name

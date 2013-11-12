@@ -80,6 +80,7 @@
       subroutine open_dynamobench_monitor_file
 !
       use m_control_params_sph_MHD
+      use t_boundary_params_sph_MHD
       use m_sph_phys_address
 !
 !
@@ -131,6 +132,7 @@
       subroutine output_field_4_dynamobench(i_step, time)
 !
       use m_control_params_sph_MHD
+      use t_boundary_params_sph_MHD
       use m_sph_phys_address
 !
       integer(kind = kint), intent(in) :: i_step

@@ -8,11 +8,7 @@
 !!
 !!
 !!@verbatim
-!!      subroutine alloc_fixed_bc_array(jmax, bc_param)
-!!      subroutine dealloc_fixed_bc_array(bc_param)
-!!
-!!      subroutine cal_fdm_coefs_4_BCs(nri, radius, bc_param)
-!!      subroutine check_fdm_coefs_4_BC2(label, bc_param)
+!!      subroutine set_radial_range_by_BC(iflag_icb_bc, sph_bc)
 !!        type(sph_boundary_type), intent(inout) :: bc_param
 !!@endverbatim
 !!
@@ -43,21 +39,21 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_radial_range_by_BC(iflag_icb_bc, kr_in, kr_out)
+      subroutine set_radial_range_by_BC(iflag_icb_bc, sph_bc)
 !
       use m_spheric_parameter
 !
       integer(kind = kint), intent(in) :: iflag_icb_bc
-      integer(kind = kint), intent(inout) :: kr_in, kr_out
+      type(sph_boundary_type), intent(inout) :: sph_bc
 !
 !
       if      (iflag_icb_bc .eq. iflag_sph_fill_center                  &
      &    .or. iflag_icb_bc .eq. iflag_sph_fix_center) then
-        kr_in = nlayer_2_center
+        sph_bc%kr_in = nlayer_2_center
       else
-        kr_in = nlayer_ICB
+        sph_bc%kr_in = nlayer_ICB
       end if
-      kr_out =  nlayer_CMB
+      sph_bc%kr_out =  nlayer_CMB
 !
       end subroutine set_radial_range_by_BC
 !

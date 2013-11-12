@@ -47,6 +47,7 @@
 !
       subroutine const_sph_viscous_diffusion
 !
+      use m_boundary_params_sph_MHD
       use set_sph_exp_rigid_ICB
       use set_sph_exp_rigid_CMB
       use set_sph_exp_free_ICB
@@ -56,9 +57,9 @@
       use cal_inner_core_rotation
 !
 !
-      call cal_sph_nod_vect_diffuse2(kr_in_U, kr_out_U, coef_d_velo,    &
-     &    ipol%i_velo, ipol%i_v_diffuse)
-      call cal_sph_nod_vect_dr_2(kr_in_U, kr_out_U,                     &
+      call cal_sph_nod_vect_diffuse2(sph_bc_U%kr_in, sph_bc_U%kr_out,   &
+     &    coef_d_velo, ipol%i_velo, ipol%i_v_diffuse)
+      call cal_sph_nod_vect_dr_2(sph_bc_U%kr_in, sph_bc_U%kr_out,       &
      &    d_rj(1,ipol%i_v_diffuse), d_rj(1,idpdr%i_v_diffuse) )
 !
       if(iflag_icb_velocity .eq. iflag_sph_fill_center) then
@@ -95,6 +96,7 @@
 !
       subroutine const_sph_vorticirty_diffusion
 !
+      use m_boundary_params_sph_MHD
       use set_sph_exp_rigid_ICB
       use set_sph_exp_rigid_CMB
       use set_sph_exp_free_ICB
@@ -104,9 +106,9 @@
       use cal_inner_core_rotation
 !
 !
-      call cal_sph_nod_vect_diffuse2(kr_in_U, kr_out_U, coef_d_velo,    &
-     &    ipol%i_vort, ipol%i_w_diffuse)
-      call cal_sph_nod_vect_dr_2(kr_in_U, kr_out_U,                     &
+      call cal_sph_nod_vect_diffuse2(sph_bc_U%kr_in, sph_bc_U%kr_out,   &
+     &    coef_d_velo, ipol%i_vort, ipol%i_w_diffuse)
+      call cal_sph_nod_vect_dr_2(sph_bc_U%kr_in, sph_bc_U%kr_out,       &
      &    d_rj(1,ipol%i_w_diffuse), d_rj(1,idpdr%i_w_diffuse) )
 !
 !
@@ -146,6 +148,7 @@
 !
       subroutine const_sph_magnetic_diffusion
 !
+      use m_boundary_params_sph_MHD
       use cal_sph_exp_nod_icb_ins
       use cal_sph_exp_nod_cmb_ins
       use cal_sph_exp_nod_icb_qvac
@@ -171,9 +174,9 @@
       end if
 !
 !
-      call cal_sph_nod_vect_diffuse2(kr_in_B, kr_out_B, coef_d_magne,   &
-     &    ipol%i_magne, ipol%i_b_diffuse)
-      call cal_sph_nod_vect_dr_2(kr_in_B, kr_out_B,                     &
+      call cal_sph_nod_vect_diffuse2(sph_bc_B%kr_in, sph_bc_B%kr_out,   &
+     &     coef_d_magne, ipol%i_magne, ipol%i_b_diffuse)
+      call cal_sph_nod_vect_dr_2(sph_bc_B%kr_in, sph_bc_B%kr_out,       &
      &    d_rj(1,ipol%i_b_diffuse), d_rj(1,idpdr%i_b_diffuse) )
 !
       if(iflag_cmb_magne .eq. iflag_radial_magne) then
@@ -194,12 +197,13 @@
 !
       use m_machine_parameter
       use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use cal_sph_exp_fixed_scalar
       use cal_sph_exp_fixed_flux
 !
 !
-      call cal_sph_nod_scalar_diffuse2(kr_in_T, kr_out_T, coef_d_temp,  &
-     &    ipol%i_temp, ipol%i_t_diffuse)
+      call cal_sph_nod_scalar_diffuse2(sph_bc_T%kr_in, sph_bc_T%kr_out, &
+     &    coef_d_temp, ipol%i_temp, ipol%i_t_diffuse)
 !
       if (iflag_icb_temp .eq. iflag_fixed_flux) then
         call cal_sph_icb_fix_flux_diffuse2(nidx_rj(2), h_flux_ICB_bc,   &
@@ -224,11 +228,12 @@
       subroutine const_sph_composit_diffusion
 !
       use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use cal_sph_exp_fixed_scalar
       use cal_sph_exp_fixed_flux
 !
 !
-      call cal_sph_nod_scalar_diffuse2(kr_in_C, kr_out_C,               &
+      call cal_sph_nod_scalar_diffuse2(sph_bc_C%kr_in, sph_bc_C%kr_out, &
      &    coef_d_light, ipol%i_light, ipol%i_c_diffuse)
 !
       if (iflag_icb_composition .eq. iflag_fixed_flux) then

@@ -268,6 +268,7 @@
       subroutine set_initial_magne_sph
 !
       use m_control_params_sph_MHD
+      use t_boundary_params_sph_MHD
       use m_spheric_parameter
       use m_sph_spectr_data
 !

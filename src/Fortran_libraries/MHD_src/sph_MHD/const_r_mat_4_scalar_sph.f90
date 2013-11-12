@@ -36,6 +36,8 @@
 !
       subroutine const_radial_mat_4_temp_sph
 !
+      use t_boundary_params_sph_MHD
+!
       integer(kind = kint) :: ip, jst, jed, j
       integer(kind = kint) :: ierr
 !
@@ -79,6 +81,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_radial_mat_4_composit_sph
+!
+      use t_boundary_params_sph_MHD
 !
       integer(kind = kint) :: ip, jst, jed, j
       integer(kind = kint) :: ierr

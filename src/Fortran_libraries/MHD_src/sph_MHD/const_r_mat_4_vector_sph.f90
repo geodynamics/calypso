@@ -133,6 +133,7 @@
       subroutine const_radial_mat_4_magne_sph
 !
       use m_control_params_sph_MHD
+      use t_boundary_params_sph_MHD
       use set_sph_magne_mat_bc
 !
       integer(kind = kint) :: kr_in, ip, jst, jed, j

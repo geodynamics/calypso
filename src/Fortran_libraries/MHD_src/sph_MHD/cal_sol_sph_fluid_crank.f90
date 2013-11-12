@@ -221,6 +221,7 @@
 !
       subroutine cal_sol_temperature_sph_crank
 !
+      use t_boundary_params_sph_MHD
       use set_scalar_boundary_sph
       use adjust_fixed_flux_sph
 !
@@ -246,6 +247,7 @@
 !
       subroutine cal_sol_composition_sph_crank
 !
+      use t_boundary_params_sph_MHD
       use set_scalar_boundary_sph
       use adjust_fixed_flux_sph
 !

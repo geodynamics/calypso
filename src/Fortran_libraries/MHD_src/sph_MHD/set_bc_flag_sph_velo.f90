@@ -89,6 +89,8 @@
 !
       subroutine set_sph_velo_ICB_flag(ibc_type, bc_mag)
 !
+      use t_boundary_params_sph_MHD
+!
       integer(kind = kint), intent(in) :: ibc_type
       real(kind = kreal), intent(in) :: bc_mag
 !

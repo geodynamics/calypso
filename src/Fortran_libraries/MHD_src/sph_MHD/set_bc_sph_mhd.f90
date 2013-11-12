@@ -33,6 +33,7 @@
 !
       subroutine s_set_bc_sph_mhd
 !
+      use m_boundary_params_sph_MHD
       use set_bc_flag_sph_velo
       use set_bc_sph_scalars
       use set_reference_sph_mhd
@@ -56,12 +57,10 @@
       end if
 !
 !
-      call set_radial_range_by_BC(iflag_icb_velocity,                   &
-     &     kr_in_U, kr_out_U)
-      call set_radial_range_by_BC(iflag_icb_temp, kr_in_T, kr_out_T)
-      call set_radial_range_by_BC(iflag_icb_composition,                &
-     &    kr_in_C, kr_out_C)
-      call set_radial_range_by_BC(iflag_icb_magne, kr_in_B, kr_out_B)
+      call set_radial_range_by_BC(iflag_icb_velocity, sph_bc_U)
+      call set_radial_range_by_BC(iflag_icb_temp, sph_bc_T)
+      call set_radial_range_by_BC(iflag_icb_composition, sph_bc_C)
+      call set_radial_range_by_BC(iflag_icb_magne, sph_bc_B)
 !
 !      Set reference temperature and adjust boundary conditions
 !
@@ -83,26 +82,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_radial_range_by_BC(iflag_icb_bc, kr_in, kr_out)
-!
-      integer(kind = kint), intent(in) :: iflag_icb_bc
-      integer(kind = kint), intent(inout) :: kr_in, kr_out
-!
-!
-      if      (iflag_icb_bc .eq. iflag_sph_fill_center                  &
-     &    .or. iflag_icb_bc .eq. iflag_sph_fix_center) then
-        kr_in = nlayer_2_center
-      else
-        kr_in = nlayer_ICB
-      end if
-      kr_out =  nlayer_CMB
-!
-      end subroutine set_radial_range_by_BC
-!
-! -----------------------------------------------------------------------
-!
       subroutine set_sph_bc_magne_sph
 !
+      use t_boundary_params_sph_MHD
       use m_bc_data_list
       use m_surf_data_list
 !
@@ -166,6 +148,7 @@
 !
       subroutine check_sph_bc_temp_sph
 !
+      use t_boundary_params_sph_MHD
       use m_spheric_parameter
       use m_bc_data_list
       use m_surf_data_list
@@ -216,6 +199,7 @@
 !
       subroutine check_sph_bc_composition_sph
 !
+      use t_boundary_params_sph_MHD
       use m_spheric_parameter
 !
       integer(kind = kint) :: i

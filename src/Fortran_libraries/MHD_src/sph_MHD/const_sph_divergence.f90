@@ -35,6 +35,7 @@
 !
       subroutine const_sph_heat_advect
 !
+      use t_boundary_params_sph_MHD
       use cal_sph_exp_fixed_scalar
       use cal_sph_exp_fixed_flux
 !
@@ -64,6 +65,7 @@
 !
       subroutine const_sph_scalar_advect
 !
+      use t_boundary_params_sph_MHD
       use cal_sph_exp_fixed_scalar
       use cal_sph_exp_fixed_flux
 !

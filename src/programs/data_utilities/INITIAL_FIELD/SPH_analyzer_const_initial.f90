@@ -76,6 +76,11 @@
       call set_radius_rot_reft_dat_4_sph(depth_high_t, depth_low_t,     &
      &    high_temp, low_temp, angular)
 !
+      if(iflag_debug.gt.0) write(*,*) 's_set_bc_sph_mhd'
+      call s_set_bc_sph_mhd
+!
+! ---------------------------------
+!
       if(iflag_debug.gt.0) write(*,*)' sph_initial_spectrum'
       call sph_initial_spectrum
 !
