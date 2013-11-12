@@ -24,6 +24,19 @@
       implicit none
 !
 !
+!>      integer flag for fixed velocity boundary at inner core
+      integer(kind = kint), parameter :: iflag_fixed_velo = 0
+!>      integer flag for free-slip boundary at inner core
+      integer(kind = kint), parameter :: iflag_free_slip =  1
+!>      integer flag for rotatable inner core
+      integer(kind = kint), parameter :: iflag_rotatable_ic = 10
+!
+!>      integer flag for insulated magnetic boundary
+      integer(kind = kint), parameter :: iflag_sph_insulator =   0
+!>      integer flag for pseudo vacuum magnetic boundary
+      integer(kind = kint), parameter :: iflag_radial_magne =   11
+!
+!
 !>      Structure for basic velocity boundary condition parameters
       type(sph_boundary_type), save :: sph_bc_U
 !>      Structure for basic magnetic boundary condition parameters
@@ -33,22 +46,59 @@
 !>      Structure for basic compositional boundary condition parameters
       type(sph_boundary_type), save :: sph_bc_C
 !
+!
+!>      Fixed poloidal velocity spectrum for ICB
+      real(kind= kreal), allocatable :: vp_ICB_bc(:)
+!>      Fixed toroidal velocity spectrum for ICB
+      real(kind= kreal), allocatable :: vt_ICB_bc(:)
+!>      Fixed poloidal velocity spectrum for CMB
+      real(kind= kreal), allocatable :: vp_CMB_bc(:)
+!>      Fixed toroidal velocity spectrum for CMB
+      real(kind= kreal), allocatable :: vt_CMB_bc(:)
+!
 ! -----------------------------------------------------------------------
 !
       contains
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_radial_range_by_BC(iflag_icb_bc, sph_bc)
+      subroutine allocate_vsp_bc_array(jmax)
+!
+      integer(kind= kint), intent(in) :: jmax
+!
+      allocate(vp_ICB_bc(jmax))
+      allocate(vt_ICB_bc(jmax))
+      allocate(vp_CMB_bc(jmax))
+      allocate(vt_CMB_bc(jmax))
+      vp_ICB_bc = 0.0d0
+      vt_ICB_bc = 0.0d0
+      vp_CMB_bc = 0.0d0
+      vt_CMB_bc = 0.0d0
+!
+      end subroutine allocate_vsp_bc_array
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine deallocate_vsp_bc_array
+!
+      deallocate(vp_ICB_bc, vt_ICB_bc)
+      deallocate(vp_CMB_bc, vt_CMB_bc)
+!
+      end subroutine deallocate_vsp_bc_array
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_radial_range_by_BC(sph_bc)
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: iflag_icb_bc
       type(sph_boundary_type), intent(inout) :: sph_bc
 !
 !
-      if      (iflag_icb_bc .eq. iflag_sph_fill_center                  &
-     &    .or. iflag_icb_bc .eq. iflag_sph_fix_center) then
+      if      (sph_bc%iflag_icb .eq. iflag_sph_fill_center              &
+     &    .or. sph_bc%iflag_icb .eq. iflag_sph_fix_center) then
         sph_bc%kr_in = nlayer_2_center
       else
         sph_bc%kr_in = nlayer_ICB

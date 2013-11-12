@@ -223,7 +223,6 @@
       subroutine set_fixed_scalar_bc_by_file(field_name, ref_nod_grp,   &
      &          jmax, bc_data, iflag_bc_scalar)
 !
-      use m_control_params_sph_MHD
       use t_boundary_params_sph_MHD
       use skip_comment_f
 !
@@ -254,7 +253,6 @@
      &          ref_nod_grp, ref_sf_grp, jmax, bc_data,                 &
      &          iflag_bc_scalar)
 !
-      use m_control_params_sph_MHD
       use t_boundary_params_sph_MHD
       use skip_comment_f
 !

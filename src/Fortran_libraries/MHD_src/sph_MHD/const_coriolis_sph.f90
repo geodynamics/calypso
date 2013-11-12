@@ -19,7 +19,6 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_control_params_sph_MHD
       use m_physical_property
       use m_spherical_harmonics
       use m_int_4_sph_coriolis_IO
@@ -27,6 +26,9 @@
       use spherical_harmonics
 !
       implicit none
+!
+!>     Integer flag to read integration data file
+      integer(kind = kint) :: iflag_sph_coriolis_file = 0
 !
       integer(kind = kint), allocatable, private  :: idx_gl(:,:)
       private :: set_global_sph_index_4_cor, dealloc_gl_sph_index_cor

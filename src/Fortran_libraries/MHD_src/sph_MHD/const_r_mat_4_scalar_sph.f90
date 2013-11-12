@@ -16,7 +16,6 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_control_params_sph_MHD
       use m_t_int_parameter
       use m_spheric_param_smp
       use m_spheric_parameter

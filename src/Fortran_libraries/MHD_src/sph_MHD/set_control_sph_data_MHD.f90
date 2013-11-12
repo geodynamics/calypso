@@ -36,10 +36,10 @@
       use m_ctl_data_mhd_evo_scheme
       use m_int_4_sph_coriolis_IO
       use m_node_id_spherical_IO
-      use m_control_params_sph_MHD
       use m_physical_property
       use m_work_4_sph_trans
       use m_file_format_switch
+      use const_coriolis_sph
 !
       use m_field_data_IO
       use m_sph_boundary_input_data

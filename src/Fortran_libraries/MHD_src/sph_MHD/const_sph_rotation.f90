@@ -66,7 +66,6 @@
 !
       subroutine const_sph_vorticity
 !
-      use m_control_params_sph_MHD
       use m_boundary_params_sph_MHD
       use m_sph_phys_address
       use set_sph_exp_rigid_ICB
@@ -98,7 +97,6 @@
 !
       subroutine const_sph_current
 !
-      use m_control_params_sph_MHD
       use m_boundary_params_sph_MHD
       use m_sph_phys_address
       use cal_sph_exp_nod_icb_ins
@@ -136,7 +134,6 @@
 !
       subroutine const_sph_rotation_uxb(is_fld, is_rot)
 !
-      use m_control_params_sph_MHD
       use m_boundary_params_sph_MHD
       use m_sph_phys_address
       use cal_sph_exp_nod_icb_ins
@@ -198,7 +195,6 @@
 !
       subroutine const_sph_force_rot2(is_fld, is_rot)
 !
-      use m_control_params_sph_MHD
       use m_boundary_params_sph_MHD
       use set_sph_exp_rigid_ICB
       use set_sph_exp_rigid_CMB
@@ -230,7 +226,6 @@
 !
       subroutine const_sph_viscous_by_vort2
 !
-      use m_control_params_sph_MHD
       use m_boundary_params_sph_MHD
       use m_sph_phys_address
       use m_physical_property
@@ -275,7 +270,6 @@
 !
       subroutine const_sph_mag_diffuse_by_j
 !
-      use m_control_params_sph_MHD
       use m_boundary_params_sph_MHD
       use m_sph_phys_address
       use m_physical_property

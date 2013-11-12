@@ -228,7 +228,6 @@
 !
       subroutine set_initial_magne_sph
 !
-      use m_control_params_sph_MHD
       use m_sph_spectr_data
 !
       real (kind = kreal) :: pi, rr
@@ -299,7 +298,6 @@
 !
       subroutine set_initial_heat_source_sph
 !
-      use m_control_params_sph_MHD
       use m_sph_spectr_data
 !
       real (kind = kreal) :: rr
@@ -331,7 +329,6 @@
 !
       subroutine set_initial_light_source_sph
 !
-      use m_control_params_sph_MHD
       use m_sph_spectr_data
 !
 !      real (kind = kreal) :: rr

@@ -30,7 +30,6 @@
 !
       subroutine cal_momentum_eq_exp_sph
 !
-      use m_control_params_sph_MHD
       use cal_explicit_terms
       use calypso_mpi
       use cal_sph_field_by_rotation
@@ -54,7 +53,6 @@
 !
       subroutine cal_expricit_sph_adams
 !
-      use m_control_params_sph_MHD
       use cal_explicit_terms
       use cal_vorticity_terms_adams
       use cal_nonlinear_sph_MHD
@@ -82,10 +80,8 @@
 !
       subroutine cal_expricit_sph_euler(i_step)
 !
-      use m_control_params_sph_MHD
       use cal_explicit_terms
       use cal_vorticity_terms_adams
-!      use cal_nonlinear_sph_MHD
 !
       integer(kind = kint), intent(in) :: i_step
 !

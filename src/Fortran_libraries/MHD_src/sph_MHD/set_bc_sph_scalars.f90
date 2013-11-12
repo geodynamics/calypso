@@ -18,7 +18,6 @@
 !
       use m_machine_parameter
       use m_control_parameter
-      use m_control_params_sph_MHD
       use m_boundary_condition_IDs
       use m_phys_labels
 !

@@ -35,7 +35,6 @@
       subroutine adjust_icb_fix_h_flux_sph
 !
       use m_t_int_parameter
-      use m_control_params_sph_MHD
       use m_physical_property
       use m_sph_phys_address
       use m_coef_fdm_fixed_ICB
@@ -53,7 +52,6 @@
       subroutine adjust_cmb_fix_h_flux_sph
 !
       use m_t_int_parameter
-      use m_control_params_sph_MHD
       use m_physical_property
       use m_sph_phys_address
       use m_coef_fdm_fixed_CMB
@@ -72,7 +70,6 @@
       subroutine adjust_icb_fix_c_flux_sph
 !
       use m_t_int_parameter
-      use m_control_params_sph_MHD
       use m_physical_property
       use m_sph_phys_address
       use m_coef_fdm_fixed_ICB
@@ -90,7 +87,6 @@
       subroutine adjust_cmb_fix_c_flux_sph
 !
       use m_t_int_parameter
-      use m_control_params_sph_MHD
       use m_physical_property
       use m_sph_phys_address
       use m_coef_fdm_fixed_CMB

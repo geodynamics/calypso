@@ -29,7 +29,6 @@
 !
       subroutine initial_b_dynamobench_1
 !
-      use m_control_params_sph_MHD
       use m_spheric_parameter
       use m_sph_spectr_data
 !
@@ -85,7 +84,6 @@
 !
       subroutine initial_b_dynamobench_2
 !
-      use m_control_params_sph_MHD
       use m_spheric_parameter
       use m_sph_spectr_data
 !

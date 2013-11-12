@@ -33,7 +33,6 @@
 !
       subroutine const_radial_mat_vort_2step
 !
-      use m_control_params_sph_MHD
       use m_boundary_params_sph_MHD
       use m_ludcmp_band
       use set_free_slip_sph_mat_bc
@@ -133,7 +132,6 @@
 !
       subroutine const_radial_mat_4_magne_sph
 !
-      use m_control_params_sph_MHD
       use m_boundary_params_sph_MHD
       use set_sph_magne_mat_bc
 !

@@ -21,7 +21,6 @@
       use calypso_mpi
       use m_work_time
       use m_control_parameter
-      use m_control_params_sph_MHD
       use m_t_int_parameter
       use m_t_step_parameter
 !

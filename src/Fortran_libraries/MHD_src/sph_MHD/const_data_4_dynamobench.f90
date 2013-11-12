@@ -28,7 +28,6 @@
       subroutine s_const_data_4_dynamobench
 !
       use m_boundary_params_sph_MHD
-      use m_control_params_sph_MHD
       use calypso_mpi
       use cal_rms_fields_by_sph
       use global_field_4_dynamobench

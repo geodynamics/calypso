@@ -33,7 +33,6 @@
       use m_sph_spectr_data
       use m_sph_phys_address
       use m_physical_property
-      use m_control_params_sph_MHD
       use cal_sph_exp_diffusion
       use cal_sph_exp_1st_diff
 !
@@ -196,7 +195,6 @@
       subroutine const_sph_thermal_diffusion
 !
       use m_machine_parameter
-      use m_control_params_sph_MHD
       use m_boundary_params_sph_MHD
       use cal_sph_exp_fixed_scalar
       use cal_sph_exp_fixed_flux
@@ -231,7 +229,6 @@
 !
       subroutine const_sph_composit_diffusion
 !
-      use m_control_params_sph_MHD
       use m_boundary_params_sph_MHD
       use cal_sph_exp_fixed_scalar
       use cal_sph_exp_fixed_flux
