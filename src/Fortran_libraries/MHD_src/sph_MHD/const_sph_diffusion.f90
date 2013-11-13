@@ -161,12 +161,15 @@
      &      ipol%i_magne, ipol%i_b_diffuse)
         call cal_dsdr_sph_center_2(ipol%i_b_diffuse)
       else if(sph_bc_B%iflag_icb .eq. iflag_radial_magne) then
-        call cal_sph_nod_icb_qvc_diffuse2(coef_d_magne,                 &
-     &      ipol%i_magne, ipol%i_b_diffuse)
+        call cal_sph_nod_icb_qvc_diffuse2                               &
+     &     (nidx_rj(2), sph_bc_B%kr_in, sph_bc_B%r_ICB,                 &
+     &      sph_bc_B%fdm2_fix_fld_ICB, sph_bc_B%fdm2_fix_dr_ICB,        &
+     &      coef_d_magne, ipol%i_magne, ipol%i_b_diffuse)
         call cal_dsdr_sph_icb_nobc_2(ipol%i_b_diffuse,                  &
      &      idpdr%i_b_diffuse)
       else
-        call cal_sph_nod_icb_ins_diffuse2(nidx_rj(2), sph_bc_B%kr_in,   &
+        call cal_sph_nod_icb_ins_diffuse2                               &
+     &     (nidx_rj(2), sph_bc_B%kr_in, sph_bc_B%r_ICB,                 &
      &      sph_bc_B%fdm2_fix_fld_ICB, sph_bc_B%fdm2_fix_dr_ICB,        &
      &      coef_d_magne, ipol%i_magne, ipol%i_b_diffuse)
         call cal_dsdr_sph_icb_nobc_2(ipol%i_b_diffuse,                  &
@@ -180,10 +183,13 @@
      &    d_rj(1,ipol%i_b_diffuse), d_rj(1,idpdr%i_b_diffuse) )
 !
       if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
-        call cal_sph_nod_cmb_qvc_diffuse2(coef_d_magne,                 &
-     &      ipol%i_magne, ipol%i_b_diffuse)
+        call cal_sph_nod_cmb_qvc_diffuse2                               &
+     &     (nidx_rj(2), sph_bc_B%kr_out, sph_bc_B%r_CMB,                &
+     &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
+     &      coef_d_magne, ipol%i_magne, ipol%i_b_diffuse)
       else
-        call cal_sph_nod_cmb_ins_diffuse2(nidx_rj(2), sph_bc_B%kr_out,  &
+        call cal_sph_nod_cmb_ins_diffuse2                               &
+     &     (nidx_rj(2), sph_bc_B%kr_out, sph_bc_B%r_CMB,                &
      &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
      &      coef_d_magne, ipol%i_magne, ipol%i_b_diffuse)
       end if

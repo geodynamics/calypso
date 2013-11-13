@@ -167,18 +167,26 @@
         call cal_sph_nod_center_b_and_j(ipol%i_magne, ipol%i_current)
       else if(sph_bc_B%iflag_icb .eq. iflag_radial_magne) then
         kr_in = nlayer_ICB
-        call cal_sph_nod_icb_qvc_b_and_j(ipol%i_magne, ipol%i_current)
+        call cal_sph_nod_icb_qvc_b_and_j                                &
+     &     (nidx_rj(2), sph_bc_B%kr_in, sph_bc_B%r_ICB,                 &
+     &      sph_bc_B%fdm2_fix_fld_ICB, sph_bc_B%fdm2_fix_dr_ICB,        &
+     &      ipol%i_magne, ipol%i_current)
       else
         kr_in = nlayer_ICB
-        call cal_sph_nod_icb_ins_b_and_j(nidx_rj(2), sph_bc_B%kr_in,    &
+        call cal_sph_nod_icb_ins_b_and_j                                &
+     &     (nidx_rj(2), sph_bc_B%kr_in, sph_bc_B%r_ICB,                 &
      &      sph_bc_B%fdm2_fix_fld_ICB, sph_bc_B%fdm2_fix_dr_ICB,        &
      &      ipol%i_magne, ipol%i_current)
       end if
 !
       if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
-        call cal_sph_nod_cmb_qvc_b_and_j(ipol%i_magne, ipol%i_current)
+        call cal_sph_nod_cmb_qvc_b_and_j                                &
+     &     (nidx_rj(2), sph_bc_B%kr_out, sph_bc_B%r_CMB,                &
+     &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
+     &      ipol%i_magne, ipol%i_current)
       else
-        call cal_sph_nod_cmb_ins_b_and_j(nidx_rj(2), sph_bc_B%kr_out,   &
+        call cal_sph_nod_cmb_ins_b_and_j                                &
+     &     (nidx_rj(2), sph_bc_B%kr_out, sph_bc_B%r_CMB,                &
      &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
      &      ipol%i_magne, ipol%i_current)
       end if
@@ -260,18 +268,20 @@
         call cal_dsdr_sph_center_2(ipol%i_magne)
       else if(sph_bc_B%iflag_icb .eq. iflag_radial_magne) then
         kr_in = nlayer_ICB
-        call cal_sph_nod_icb_qvc_mag2(ipol%i_magne)
+        call cal_sph_nod_icb_qvc_mag2(nidx_rj(2), sph_bc_B%kr_in,       &
+     &      ipol%i_magne)
       else
         kr_in = nlayer_ICB
         call cal_sph_nod_icb_ins_mag2(nidx_rj(2), sph_bc_B%kr_in,       &
-     &      ipol%i_magne)
+     &      sph_bc_B%r_ICB, ipol%i_magne)
       end if
 !
       if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
-        call cal_sph_nod_cmb_qvc_mag2(ipol%i_magne)
+        call cal_sph_nod_cmb_qvc_mag2(nidx_rj(2), sph_bc_B%kr_out,      &
+     &      ipol%i_magne)
       else
         call cal_sph_nod_cmb_ins_mag2(nidx_rj(2), sph_bc_B%kr_out,      &
-     &      ipol%i_magne)
+     &      sph_bc_B%r_CMB, ipol%i_magne)
       end if
 !
 !

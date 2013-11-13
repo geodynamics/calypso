@@ -51,14 +51,21 @@
 !>        End radial address of fluid shell for @f$ f(r,j) @f$
         integer(kind = kint) :: kr_out =  1
 !
+!>        Radius at ICB
+!!         (r(0) = r_ICB, r(1) = 1/r_ICB, and r(2) = 1/r_ICB^2)
+        real(kind= kreal) :: r_ICB(0:2)
+!>        radius at CMB
+!!         (r(0) = r_CMB, r(1) = 1/r_CMB, and r(2) = 1/r_ICB^2)
+        real(kind= kreal) :: r_CMB(0:2)
+!
 !>        Fixed composition spectrum for ICB
-        real(kind= kreal), allocatable :: ICB_fld(:)
+        real(kind= kreal), pointer :: ICB_fld(:)
 !>        Fixed composition flux spectrum for ICB
-        real(kind= kreal), allocatable :: ICB_flux(:)
+        real(kind= kreal), pointer :: ICB_flux(:)
 !>        Fixed composition spectrum for CMB
-        real(kind= kreal), allocatable :: CMB_fld(:)
+        real(kind= kreal), pointer :: CMB_fld(:)
 !>        Fixed composition flux spectrum for CMB
-        real(kind= kreal), allocatable :: CMB_flux(:)
+        real(kind= kreal), pointer :: CMB_flux(:)
 !
 !>        Matrix to evaluate radial derivative at ICB with fiexed field
         real(kind = kreal) :: fdm2_fix_fld_ICB(0:2,3)
