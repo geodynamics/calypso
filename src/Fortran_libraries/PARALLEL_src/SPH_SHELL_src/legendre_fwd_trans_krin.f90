@@ -111,7 +111,7 @@
 !
 !
       nb_nri = nb*nidx_rlm(1)
-!$omp parallel do private(j_rlm,kr_nd,ip_rtm_1,mst,med,l_rtm)
+!$omp parallel do private(j_rlm,kr_nd,ip_rtm_1,mst,med,l_rtm,pwt_tmp)
       do mp_rlm = 1, nidx_rtm(3)
         mst = lstack_rlm(mp_rlm-1)+1
         med = lstack_rlm(mp_rlm)
