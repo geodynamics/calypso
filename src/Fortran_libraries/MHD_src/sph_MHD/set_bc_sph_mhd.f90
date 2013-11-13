@@ -37,7 +37,13 @@
       use set_bc_flag_sph_velo
       use set_bc_sph_scalars
       use set_reference_sph_mhd
-      use cal_sph_bc_fdm_matrix
+!
+      use m_coef_fdm_fixed_ICB
+      use m_coef_fdm_fixed_CMB
+      use m_coef_fdm_free_ICB
+      use m_coef_fdm_free_CMB
+      use m_coef_fdm_to_center
+      use cal_fdm_coefs_4_boundaries
 !
 !
       if (iflag_t_evo_4_velo .gt.     id_no_evolution) then
@@ -57,10 +63,40 @@
       end if
 !
 !
+!      Set FDM matrices for boundaries
+!
       call set_radial_range_by_BC(sph_bc_U)
+      call set_radial_range_by_BC(sph_bc_B)
       call set_radial_range_by_BC(sph_bc_T)
       call set_radial_range_by_BC(sph_bc_C)
-      call set_radial_range_by_BC(sph_bc_B)
+!
+!      Set FDM matrices for boundaries
+!
+      call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_U)
+      call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_B)
+      call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_T)
+      call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_C)
+!
+      call cal_fdm2_coef_fix_fld_ICB(radius_1d_rj_r(nlayer_ICB),        &
+     &    coef_fdm_fix_ICB_2)
+      call cal_fdm2_coef_fix_df_ICB(radius_1d_rj_r(nlayer_ICB),         &
+     &    coef_fdm_fix_dr_ICB_2)
+!
+      call cal_fdm2_coef_fix_fld_CMB(radius_1d_rj_r(nlayer_CMB-2),      &
+     &    coef_fdm_fix_CMB_2)
+      call cal_fdm2_coef_fix_df_CMB(radius_1d_rj_r(nlayer_CMB-1),       &
+     &    coef_fdm_fix_dr_CMB_2)
+!
+!
+      call cal_2nd_ICB_free_vp_bc_fdm(radius_1d_rj_r(nlayer_ICB))
+      call cal_2nd_ICB_free_vt_bc_fdm(radius_1d_rj_r(nlayer_ICB))
+!
+      call cal_2nd_CMB_free_vp_bc_fdm(radius_1d_rj_r(nlayer_CMB-1))
+      call cal_2nd_CMB_free_vt_bc_fdm(radius_1d_rj_r(nlayer_CMB-1))
+!
+      call cal_2nd_to_center_fixed_fdm(radius_1d_rj_r(1))
+      call cal_2nd_to_center_fix_df_fdm(radius_1d_rj_r(1))
+!
 !
 !      Set reference temperature and adjust boundary conditions
 !
@@ -68,20 +104,28 @@
       call set_ref_temp_sph_mhd
       call adjust_sph_temp_bc_by_reftemp
 !
-!      Det FDM matrices for boundaries
-!
-      if (iflag_debug.gt.0) write(*,*) 's_cal_sph_bc_fdm_matrices'
-      call s_cal_sph_bc_fdm_matrices
-!
 !      Check data
 !
       if(i_debug .gt. 1) then
-        call check_sph_boundary_spectra(fhd_temp,                       &
-     &      nidx_rj(2), idx_gl_1d_rj_j, sph_bc_T)
+        if (iflag_t_evo_4_temp .gt.     id_no_evolution) then
+          call check_sph_boundary_spectra(fhd_temp,                     &
+     &        nidx_rj(2), idx_gl_1d_rj_j, sph_bc_T)
+        end if
+        if (iflag_t_evo_4_composit .gt. id_no_evolution) then
+          call check_sph_boundary_spectra(fhd_light,                    &
+     &        nidx_rj(2), idx_gl_1d_rj_j, sph_bc_C)
+        end if
       end if
-      if(i_debug .gt. 1) then
-        call check_sph_boundary_spectra(fhd_light,                      &
-     &      nidx_rj(2), idx_gl_1d_rj_j, sph_bc_C)
+!
+      if (iflag_debug .eq. iflag_full_msg) then
+        call check_fdm_coefs_4_BC2(fhd_velo,  sph_bc_U)
+        call check_fdm_coefs_4_BC2(fhd_magne, sph_bc_B)
+        call check_fdm_coefs_4_BC2(fhd_temp,  sph_bc_T)
+        call check_fdm_coefs_4_BC2(fhd_light, sph_bc_C)
+        call check_coef_fdm_fix_dr_CMB
+        call check_coef_fdm_free_ICB
+        call check_coef_fdm_free_CMB
+        call check_coef_fdm_fix_dr_2ctr
       end if
 !
       end subroutine s_set_bc_sph_mhd

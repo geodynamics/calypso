@@ -195,7 +195,8 @@
       call delete_zero_degree_comp(ipol%i_magne)
 !
       if(sph_bc_B%iflag_icb .eq. iflag_sph_insulator) then
-        call cal_sph_nod_icb_ins_mag2(ipol%i_magne)
+        call cal_sph_nod_icb_ins_mag2(nidx_rj(2), sph_bc_B%kr_in,       &
+     &      ipol%i_magne)
       else if(sph_bc_B%iflag_icb .eq. iflag_radial_magne) then
         call cal_sph_nod_icb_qvc_mag2(ipol%i_magne)
       end if
@@ -203,7 +204,8 @@
       if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
         call cal_sph_nod_cmb_qvc_mag2(ipol%i_magne)
       else
-        call cal_sph_nod_cmb_ins_mag2(ipol%i_magne)
+        call cal_sph_nod_cmb_ins_mag2(nidx_rj(2), sph_bc_B%kr_out,     &
+     &      ipol%i_magne)
       end if
 !
       call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &

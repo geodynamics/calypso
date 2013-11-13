@@ -116,7 +116,9 @@
         call cal_sph_nod_icb_qvc_rot2(ipol%i_magne, ipol%i_current)
       else
         kr_in = nlayer_ICB
-        call cal_sph_nod_icb_ins_rot2(ipol%i_magne, ipol%i_current)
+        call cal_sph_nod_icb_ins_rot2(nidx_rj(2), sph_bc_B%kr_in,       &
+     &      sph_bc_B%fdm2_fix_fld_ICB, sph_bc_B%fdm2_fix_dr_ICB,        &
+     &      ipol%i_magne, ipol%i_current)
       end if
 !
       call cal_sph_nod_vect_rot2(kr_in, nlayer_CMB,                     &
@@ -125,7 +127,9 @@
       if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
         call cal_sph_nod_cmb_qvc_rot2(ipol%i_magne, ipol%i_current)
       else
-        call cal_sph_nod_cmb_ins_rot2(ipol%i_magne, ipol%i_current)
+        call cal_sph_nod_cmb_ins_rot2(nidx_rj(2), sph_bc_B%kr_out,      &
+     &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
+     &      ipol%i_magne, ipol%i_current)
       end if
 !
       end subroutine const_sph_current
@@ -155,7 +159,8 @@
         call cal_sph_nod_icb_qvc_vp_rot2(is_fld, is_rot)
       else
         kr_st = nlayer_ICB
-        call cal_sph_nod_icb_ins_vp_rot2(is_fld, is_rot)
+        call cal_sph_nod_icb_ins_vp_rot2(nidx_rj(2), sph_bc_B%kr_in,    &
+     &      is_fld, is_rot)
       end if
 !
       call cal_sph_nod_vect_w_div_rot2(kr_st, nlayer_CMB,               &
@@ -164,7 +169,8 @@
       if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
         call cal_sph_nod_cmb_qvc_vp_rot2(is_fld, is_rot)
       else
-        call cal_sph_nod_cmb_ins_vp_rot2(is_fld, is_rot)
+        call cal_sph_nod_cmb_ins_vp_rot2(nidx_rj(2), sph_bc_B%kr_out,   &
+     &      is_fld, is_rot)
       end if
 !
       end subroutine const_sph_rotation_uxb
@@ -297,8 +303,9 @@
      &      idpdr%i_b_diffuse)
       else
         kr_in = nlayer_ICB
-        call cal_sph_nod_icb_ins_diffuse2(coef_d_magne,                 &
-     &      ipol%i_magne, ipol%i_b_diffuse)
+        call cal_sph_nod_icb_ins_diffuse2(nidx_rj(2), sph_bc_B%kr_in,   &
+     &      sph_bc_B%fdm2_fix_fld_ICB, sph_bc_B%fdm2_fix_dr_ICB,        &
+     &      coef_d_magne, ipol%i_magne, ipol%i_b_diffuse)
         call cal_dsdr_sph_icb_nobc_2(ipol%i_b_diffuse,                  &
      &      idpdr%i_b_diffuse)
       end if
@@ -310,8 +317,9 @@
         call cal_sph_nod_cmb_qvc_diffuse2(coef_d_magne,                 &
      &      ipol%i_magne, ipol%i_b_diffuse)
       else
-        call cal_sph_nod_cmb_ins_diffuse2(coef_d_magne,                 &
-     &      ipol%i_magne, ipol%i_b_diffuse)
+        call cal_sph_nod_cmb_ins_diffuse2(nidx_rj(2), sph_bc_B%kr_out,  &
+     &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
+     &      coef_d_magne, ipol%i_magne, ipol%i_b_diffuse)
       end if
       call cal_dsdr_sph_cmb_nobc_2(ipol%i_b_diffuse, idpdr%i_b_diffuse)
 !

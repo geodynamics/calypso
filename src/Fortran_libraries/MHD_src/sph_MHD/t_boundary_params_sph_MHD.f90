@@ -122,9 +122,9 @@
      &     sph_bc%fdm2_fix_dr_ICB)
 !
       call cal_fdm2_coef_fix_fld_CMB(radius(sph_bc%kr_out-2),           &
-     &     sph_bc%fdm2_fix_fld_ICB)
+     &     sph_bc%fdm2_fix_fld_CMB)
       call cal_fdm2_coef_fix_df_CMB(radius(sph_bc%kr_out-1),            &
-     &     sph_bc%fdm2_fix_dr_ICB)
+     &     sph_bc%fdm2_fix_dr_CMB)
 !
       end subroutine cal_fdm_coefs_4_BCs
 !

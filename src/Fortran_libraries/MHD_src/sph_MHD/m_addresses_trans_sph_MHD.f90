@@ -72,13 +72,13 @@
         b_trns%i_current = nvector_rj_2_rtp
       end if
 !
-!   gradient of temperature flag
+!   temperature flag
       if(iflag_t_evo_4_temp .gt. id_no_evolution) then
         nscalar_rj_2_rtp = nscalar_rj_2_rtp + 1
         b_trns%i_temp = nscalar_rj_2_rtp
       end if
 !
-!   gradient of dummy scalar flag
+!   composition flag
       if(iflag_t_evo_4_composit .gt. id_no_evolution) then
         nscalar_rj_2_rtp = nscalar_rj_2_rtp + 1
         b_trns%i_light = nscalar_rj_2_rtp
