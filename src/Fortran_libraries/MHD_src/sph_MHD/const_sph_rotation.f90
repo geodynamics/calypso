@@ -263,7 +263,9 @@
         call cal_sph_nod_icb_rigid_diffuse2(coef_d_velo,                &
      &      ipol%i_velo, ipol%i_v_diffuse)
       end if
-      call cal_dsdr_sph_icb_nobc_2(ipol%i_v_diffuse, idpdr%i_v_diffuse)
+      call cal_dsdr_sph_no_bc_in_2(nidx_rj(2),                          &
+     &    sph_bc_U%kr_in, sph_bc_U%fdm2_fix_fld_ICB,                    &
+     &    ipol%i_v_diffuse, idpdr%i_v_diffuse)
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_icore_viscous_drag_explicit(coef_d_velo,               &
@@ -277,7 +279,9 @@
         call cal_sph_nod_cmb_rigid_diffuse2(coef_d_velo, ipol%i_velo,   &
      &      ipol%i_v_diffuse)
       end if
-      call cal_dsdr_sph_cmb_nobc_2(ipol%i_v_diffuse, idpdr%i_v_diffuse)
+      call cal_dsdr_sph_no_bc_out_2(nidx_rj(2),                         &
+     &    sph_bc_U%kr_out, sph_bc_U%fdm2_fix_fld_CMB,                   &
+     &    ipol%i_v_diffuse, idpdr%i_v_diffuse)
 !
       end subroutine const_sph_viscous_by_vort2
 !
@@ -311,16 +315,18 @@
      &     (nidx_rj(2), sph_bc_B%kr_in, sph_bc_B%r_ICB,                 &
      &      sph_bc_B%fdm2_fix_fld_ICB, sph_bc_B%fdm2_fix_dr_ICB,        &
      &      coef_d_magne, ipol%i_magne, ipol%i_b_diffuse)
-        call cal_dsdr_sph_icb_nobc_2(ipol%i_b_diffuse,                  &
-     &      idpdr%i_b_diffuse)
+        call cal_dsdr_sph_no_bc_in_2(nidx_rj(2),                        &
+     &      sph_bc_B%kr_in, sph_bc_B%fdm2_fix_fld_ICB,                  &
+     &      ipol%i_b_diffuse, idpdr%i_b_diffuse)
       else
         kr_in = nlayer_ICB
         call cal_sph_nod_icb_ins_diffuse2                               &
      &     (nidx_rj(2), sph_bc_B%kr_in, sph_bc_B%r_ICB,                 &
      &      sph_bc_B%fdm2_fix_fld_ICB, sph_bc_B%fdm2_fix_dr_ICB,        &
      &      coef_d_magne, ipol%i_magne, ipol%i_b_diffuse)
-        call cal_dsdr_sph_icb_nobc_2(ipol%i_b_diffuse,                  &
-     &      idpdr%i_b_diffuse)
+        call cal_dsdr_sph_no_bc_in_2(nidx_rj(2),                        &
+     &      sph_bc_B%kr_in, sph_bc_B%fdm2_fix_fld_ICB,                  &
+     &      ipol%i_b_diffuse, idpdr%i_b_diffuse)
       end if
 !
       call cal_sph_nod_diffuse_by_rot2(kr_in, nlayer_CMB, coef_d_magne, &
@@ -337,7 +343,9 @@
      &      sph_bc_B%fdm2_fix_fld_CMB, sph_bc_B%fdm2_fix_dr_CMB,        &
      &      coef_d_magne, ipol%i_magne, ipol%i_b_diffuse)
       end if
-      call cal_dsdr_sph_cmb_nobc_2(ipol%i_b_diffuse, idpdr%i_b_diffuse)
+      call cal_dsdr_sph_no_bc_out_2(nidx_rj(2),                         &
+     &    sph_bc_B%kr_out, sph_bc_B%fdm2_fix_fld_CMB,                   &
+     &    ipol%i_b_diffuse, idpdr%i_b_diffuse)
 !
       end subroutine const_sph_mag_diffuse_by_j
 !

@@ -93,5 +93,25 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine full_norm_legendre
+!
+      use schmidt
+!
+!
+!*   ++++++++++  lead adjoint Legendre Polynomial  ++++++
+!*
+      call schmidt_polynomial(nth, dth, p, df)
+!
+!*   ++++++++++  lead difference of Legendre Polynomial  ++++++
+!*
+      call diff_schmidt_polynomial(nth, p, dp)
+!
+!*   ++++++++++  Full normalizationl  ++++++
+!*
+      call full_normalize_by_smdt(nth, p, dp)
+!
+      end subroutine full_norm_legendre
+!
+! -----------------------------------------------------------------------
+!
       end module m_schmidt_polynomial
-

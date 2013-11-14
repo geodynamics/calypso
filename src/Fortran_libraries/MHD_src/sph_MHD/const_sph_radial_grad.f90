@@ -64,19 +64,25 @@
      &    d_rj(1,ipol%i_temp), d_rj(1,ipol%i_grad_t) )
 !
       if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
-        call cal_dsdr_sph_icb_fix_flux_2(nidx_rj(2), sph_bc_T%ICB_flux, &
+        call cal_dsdr_sph_in_fix_flux_2(idx_rj_degree_zero, nidx_rj(2), &
+     &      sph_bc_T%kr_in, sph_bc_T%r_ICB, sph_bc_T%ICB_flux,          &
      &      ipol%i_temp, ipol%i_grad_t)
       else
-        call cal_dsdr_sph_icb_fix_scalar_2                              &
-     &     (nidx_rj(2), sph_bc_T%ICB_fld, ipol%i_temp, ipol%i_grad_t)
+        call cal_dsdr_sph_fix_scalar_in_2                               &
+     &     (idx_rj_degree_zero, nidx_rj(2),                             &
+     &      sph_bc_T%kr_in, sph_bc_T%r_ICB, sph_bc_T%fdm2_fix_fld_ICB,  &
+     &      sph_bc_T%ICB_fld, ipol%i_temp, ipol%i_grad_t)
       end if
 !
       if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
-        call cal_dsdr_sph_cmb_fix_flux_2(nidx_rj(2), sph_bc_T%CMB_flux, &
-     &      ipol%i_temp, ipol%i_grad_t)
+        call cal_dsdr_sph_out_fix_flux_2(idx_rj_degree_zero,            &
+     &      nidx_rj(2), sph_bc_T%kr_out, sph_bc_T%r_CMB,                &
+     &      sph_bc_T%CMB_flux, ipol%i_temp, ipol%i_grad_t)
       else
-        call cal_dsdr_sph_cmb_fix_scalar_2                              &
-     &     (nidx_rj(2), sph_bc_T%CMB_fld, ipol%i_temp, ipol%i_grad_t)
+        call cal_dsdr_sph_fix_scalar_out_2                              &
+     &     (idx_rj_degree_zero, nidx_rj(2), sph_bc_T%kr_out,            &
+     &      sph_bc_T%r_CMB, sph_bc_T%fdm2_fix_fld_CMB,                  &
+     &      sph_bc_T%CMB_fld, ipol%i_temp, ipol%i_grad_t)
       end if
 !
       end subroutine const_radial_grad_temp
@@ -94,20 +100,26 @@
       call cal_sph_nod_gradient_2(nlayer_ICB, nlayer_CMB,               &
      &     d_rj(1,ipol%i_light), d_rj(1,ipol%i_grad_composit) )
 !
-      if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
-        call cal_dsdr_sph_icb_fix_flux_2(nidx_rj(2), sph_bc_C%ICB_flux, &
+      if (sph_bc_C%iflag_icb .eq. iflag_fixed_flux) then
+        call cal_dsdr_sph_in_fix_flux_2(idx_rj_degree_zero, nidx_rj(2), &
+     &      sph_bc_C%kr_in, sph_bc_C%r_ICB, sph_bc_C%ICB_flux,          &
      &      ipol%i_light, ipol%i_grad_composit)
       else
-        call cal_dsdr_sph_icb_fix_scalar_2(nidx_rj(2),                  &
+        call cal_dsdr_sph_fix_scalar_in_2                               &
+     &     (idx_rj_degree_zero, nidx_rj(2),                             &
+     &      sph_bc_C%kr_in, sph_bc_C%r_ICB, sph_bc_C%fdm2_fix_fld_ICB,  &
      &      sph_bc_C%ICB_fld, ipol%i_light, ipol%i_grad_composit)
       end if
 !
-      if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
-        call cal_dsdr_sph_cmb_fix_flux_2(nidx_rj(2), sph_bc_C%CMB_flux, &
-     &      ipol%i_light, ipol%i_grad_composit)
+      if (sph_bc_C%iflag_cmb .eq. iflag_fixed_flux) then
+        call cal_dsdr_sph_out_fix_flux_2(idx_rj_degree_zero,            &
+     &      nidx_rj(2), sph_bc_C%kr_out,  sph_bc_C%r_CMB,               &
+     &      sph_bc_C%CMB_flux, ipol%i_light, ipol%i_grad_composit)
       else
-        call cal_dsdr_sph_cmb_fix_scalar_2(nidx_rj(2),                  &
-     &       sph_bc_C%CMB_fld, ipol%i_light, ipol%i_grad_composit)
+        call cal_dsdr_sph_fix_scalar_out_2                              &
+     &     (idx_rj_degree_zero, nidx_rj(2), sph_bc_C%kr_out,            &
+     &      sph_bc_C%r_CMB, sph_bc_C%fdm2_fix_fld_CMB,                  &
+     &      sph_bc_C%CMB_fld, ipol%i_light, ipol%i_grad_composit)
       end if
 !
       end subroutine const_radial_grad_composit

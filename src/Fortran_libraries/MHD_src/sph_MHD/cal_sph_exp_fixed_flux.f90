@@ -7,18 +7,19 @@
 !>@brief  Evaluate scalar fields using fixed flux condition
 !!
 !!@verbatim
-!!      subroutine cal_dsdr_sph_icb_fix_flux_2(jmax, flux_ICB,          &
-!!     &          is_fld, is_grd)
-!!      subroutine cal_div_sph_icb_fix_flux_2(jmax, flux_ICB,           &
-!!     &          is_fld, is_div)
-!!      subroutine cal_sph_icb_fix_flux_diffuse2(jmax, flux_ICB,        &
-!!     &          is_fld, is_diffuse)
-!!      subroutine cal_dsdr_sph_cmb_fix_flux_2(jmax, flux_CMB,          &
-!!     &          is_fld, is_grd)
-!!      subroutine cal_div_sph_cmb_fix_flux_2(jmax, flux_CMB,           &
-!!     &          is_fld, is_div)
-!!      subroutine cal_sph_cmb_fix_flux_diffuse2(jmax, flux_CMB,        &
-!!     &          coef_d, is_fld, is_diffuse)
+!!      subroutine cal_dsdr_sph_in_fix_flux_2(idx_rj_degree_zero,       &
+!!     &          jmax, kr_in, r_ICB, flux_ICB, is_fld, is_grd)
+!!      subroutine cal_div_sph_in_fix_flux_2(jmax, kr_in, r_ICB,        &
+!!     &          flux_ICB, is_fld, is_div)
+!!      subroutine cal_sph_in_fix_flux_diffuse2(jmax, kr_in, r_ICB,     &
+!!     &          fdm2_fix_dr_ICB, flux_IN, coef_d, is_fld, is_diffuse)
+!!
+!!      subroutine cal_dsdr_sph_out_fix_flux_2(idx_rj_degree_zero,      &
+!!     &          jmax, kr_out, r_CMB, flux_CMB, is_fld, is_grd)
+!!      subroutine cal_div_sph_out_fix_flux_2(jmax, kr_out, r_CMB,      &
+!!     &          flux_CMB, is_fld, is_div)
+!!      subroutine cal_sph_out_fix_flux_diffuse2(jmax, kr_out, r_CMB,   &
+!!     &          fdm2_fix_dr_CMB, flux_OUT, coef_d, is_fld, is_diffuse)
 !!@endverbatim
 !!
 !!@n @param jmax  Number of modes for spherical harmonics @f$L*(L+2)@f$
@@ -39,16 +40,10 @@
       use m_precision
 !
       use m_constants
-      use m_spheric_parameter
       use m_schmidt_poly_on_rtm
       use m_sph_spectr_data
 !
       implicit none
-!
-      private :: cal_dsdr_sph_in_fix_flux_2, cal_div_sph_in_fix_flux_2
-      private :: cal_sph_in_fix_flux_diffuse2
-      private :: cal_dsdr_sph_out_fix_flux_2, cal_div_sph_out_fix_flux_2
-      private :: cal_sph_out_fix_flux_diffuse2
 !
 ! -----------------------------------------------------------------------
 !
@@ -56,110 +51,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_dsdr_sph_icb_fix_flux_2(jmax, flux_ICB,            &
-     &          is_fld, is_grd)
+      subroutine cal_dsdr_sph_in_fix_flux_2(idx_rj_degree_zero,         &
+     &          jmax, kr_in, r_ICB, flux_ICB, is_fld, is_grd)
 !
-      integer(kind = kint), intent(in) :: jmax
-      integer(kind = kint), intent(in) :: is_fld, is_grd
-      real(kind = kreal), intent(in) :: flux_ICB(jmax)
-!
-!
-      call cal_dsdr_sph_in_fix_flux_2(jmax, nlayer_ICB, flux_ICB,       &
-     &    is_fld, is_grd)
-!
-      end subroutine cal_dsdr_sph_icb_fix_flux_2
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cal_div_sph_icb_fix_flux_2(jmax, flux_ICB,             &
-     &          is_fld, is_div)
-!
-      integer(kind = kint), intent(in) :: jmax
-      integer(kind = kint), intent(in) :: is_fld, is_div
-      real(kind = kreal), intent(in) :: flux_ICB(jmax)
-!
-!
-      call cal_div_sph_in_fix_flux_2(jmax, nlayer_ICB, flux_ICB,        &
-     &    is_fld, is_div)
-!
-      end subroutine cal_div_sph_icb_fix_flux_2
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cal_sph_icb_fix_flux_diffuse2(jmax, flux_ICB,          &
-     &          coef_d, is_fld, is_diffuse)
-!
-      use m_coef_fdm_fixed_ICB
-!
-      integer(kind = kint), intent(in) :: jmax
-      integer(kind = kint), intent(in) :: is_fld, is_diffuse
-      real(kind = kreal), intent(in) :: flux_ICB(jmax)
-      real(kind = kreal), intent(in) :: coef_d
-!
-!
-      call cal_sph_in_fix_flux_diffuse2(jmax, nlayer_ICB, flux_ICB,     &
-     &    coef_fdm_fix_dr_ICB_2, coef_d, is_fld, is_diffuse)
-!
-      end subroutine cal_sph_icb_fix_flux_diffuse2
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine cal_dsdr_sph_cmb_fix_flux_2(jmax, flux_CMB,            &
-     &          is_fld, is_grd)
-!
-      integer(kind = kint), intent(in) :: jmax
-      integer(kind = kint), intent(in) :: is_fld, is_grd
-      real(kind = kreal), intent(in) :: flux_CMB(jmax)
-!
-!
-      call cal_dsdr_sph_out_fix_flux_2(jmax, nlayer_CMB, flux_CMB,      &
-     &    is_fld, is_grd)
-!
-      end subroutine cal_dsdr_sph_cmb_fix_flux_2
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cal_div_sph_cmb_fix_flux_2(jmax, flux_CMB,             &
-     &          is_fld, is_div)
-!
-      integer(kind = kint), intent(in) :: jmax
-      integer(kind = kint), intent(in) :: is_fld, is_div
-      real(kind = kreal), intent(in) :: flux_CMB(jmax)
-!
-!
-      call cal_div_sph_out_fix_flux_2(jmax, nlayer_CMB, flux_CMB,       &
-     &    is_fld, is_div)
-!
-      end subroutine cal_div_sph_cmb_fix_flux_2
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cal_sph_cmb_fix_flux_diffuse2(jmax, flux_CMB,          &
-     &          coef_d, is_fld, is_diffuse)
-!
-      use m_coef_fdm_fixed_CMB
-!
-      integer(kind = kint), intent(in) :: jmax
-      integer(kind = kint), intent(in) :: is_fld, is_diffuse
-      real(kind = kreal), intent(in) :: flux_CMB(jmax)
-      real(kind = kreal), intent(in) :: coef_d
-!
-!
-      call cal_sph_out_fix_flux_diffuse2(jmax, nlayer_CMB, flux_CMB,    &
-     &    coef_fdm_fix_dr_CMB_2, coef_d, is_fld, is_diffuse)
-!
-      end subroutine cal_sph_cmb_fix_flux_diffuse2
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine cal_dsdr_sph_in_fix_flux_2(jmax, kr_in, flux_ICB,      &
-     &          is_fld, is_grd)
-!
+      integer(kind = kint), intent(in) :: idx_rj_degree_zero
       integer(kind = kint), intent(in) :: jmax, kr_in
       integer(kind = kint), intent(in) :: is_fld, is_grd
       real(kind = kreal), intent(in) :: flux_ICB(jmax)
+      real(kind = kreal), intent(in) :: r_ICB(0:2)
 !
       integer(kind = kint) :: inod, j
 !
@@ -167,28 +66,27 @@
 !$omp parallel do private(inod)
       do j = 1, jmax
         inod = j + (kr_in-1) * jmax
-        d_rj(inod,is_grd  ) = flux_ICB(j) * g_sph_rj(j,13)              &
-     &                       * radius_1d_rj_r(kr_in)**2
-        d_rj(inod,is_grd+1) = d_rj(inod,is_fld  )
+        d_rj(inod,is_grd  ) = flux_ICB(j) * g_sph_rj(j,13)*r_ICB(0)**2
+        d_rj(inod,is_grd+1) = d_rj(inod,is_fld)
         d_rj(inod,is_grd+2) = zero
       end do
 !$omp end parallel do
 !
       if(idx_rj_degree_zero .eq. 0) return
       inod = idx_rj_degree_zero + (kr_in-1) * jmax
-      d_rj(inod,is_grd  ) = flux_ICB(idx_rj_degree_zero)                &
-     &                     * radius_1d_rj_r(kr_in)**2
+      d_rj(inod,is_grd  ) = flux_ICB(idx_rj_degree_zero)*r_ICB(0)**2
 !
       end subroutine cal_dsdr_sph_in_fix_flux_2
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_div_sph_in_fix_flux_2(jmax, kr_in, flux_ICB,      &
-     &          is_fld, is_div)
+      subroutine cal_div_sph_in_fix_flux_2(jmax, kr_in, r_ICB,          &
+     &          flux_ICB, is_fld, is_div)
 !
       integer(kind = kint), intent(in) :: jmax, kr_in
       integer(kind = kint), intent(in) :: is_fld, is_div
       real(kind = kreal), intent(in) :: flux_ICB(jmax)
+      real(kind = kreal), intent(in) :: r_ICB(0:2)
 !
       integer(kind = kint) :: inod, j
 !
@@ -197,7 +95,7 @@
       do j = 1, jmax
         inod = j + (kr_in-1) * jmax
         d_rj(inod,is_div) =  (flux_ICB(j) - d_rj(inod,is_fld+1) )       &
-     &                   * max(g_sph_rj(j,3),half) * ar_1d_rj(kr_in,2)
+     &                     * max(g_sph_rj(j,3),half) * r_ICB(2)
       end do
 !$omp end parallel do
 !
@@ -205,14 +103,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sph_in_fix_flux_diffuse2(jmax, kr_in, flux_IN,     &
-     &          coef_fdm_fix_dr_in_2, coef_d, is_fld, is_diffuse)
+      subroutine cal_sph_in_fix_flux_diffuse2(jmax, kr_in, r_ICB,       &
+     &          fdm2_fix_dr_ICB, flux_IN, coef_d, is_fld, is_diffuse)
 !
       integer(kind = kint), intent(in) :: jmax, kr_in
       integer(kind = kint), intent(in) :: is_fld, is_diffuse
-      real(kind = kreal), intent(in) :: flux_IN(jmax)
-      real(kind = kreal), intent(in) :: coef_fdm_fix_dr_in_2(-1:1,3)
       real(kind = kreal), intent(in) :: coef_d
+      real(kind = kreal), intent(in) :: flux_IN(jmax)
+      real(kind = kreal), intent(in) :: r_ICB(0:2)
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_ICB(-1:1,3)
 !
       real(kind = kreal) :: d2t_dr2
       integer(kind = kint) :: inod, i_p1, j
@@ -223,14 +122,13 @@
         inod = j + (kr_in-1) * jmax
         i_p1 = inod + jmax
 !
-        d2t_dr2 =  coef_fdm_fix_dr_in_2(-1,3) * flux_IN(j)              &
-     &           + coef_fdm_fix_dr_in_2( 0,3) * d_rj(inod,is_fld)       &
-     &           + coef_fdm_fix_dr_in_2( 1,3) * d_rj(i_p1,is_fld)
+        d2t_dr2 =  fdm2_fix_dr_ICB(-1,3) * flux_IN(j)                   &
+     &           + fdm2_fix_dr_ICB( 0,3) * d_rj(inod,is_fld)            &
+     &           + fdm2_fix_dr_ICB( 1,3) * d_rj(i_p1,is_fld)
 !
         d_rj(inod,is_diffuse) = coef_d * (d2t_dr2                       &
-     &                    + two*ar_1d_rj(kr_in,1) * flux_IN(j)          &
-     &                    - g_sph_rj(j,3)*ar_1d_rj(kr_in,2)             &
-     &                     * d_rj(inod,is_fld) )
+     &                    + two*r_ICB(1) * flux_IN(j)                   &
+     &                    - g_sph_rj(j,3)*r_ICB(2) * d_rj(inod,is_fld))
 !
       end do
 !$omp end parallel do
@@ -240,11 +138,13 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_dsdr_sph_out_fix_flux_2(jmax, kr_out, flux_CMB,    &
-     &          is_fld, is_grd)
+      subroutine cal_dsdr_sph_out_fix_flux_2(idx_rj_degree_zero,        &
+     &          jmax, kr_out, r_CMB, flux_CMB, is_fld, is_grd)
 !
+      integer(kind = kint), intent(in) :: idx_rj_degree_zero
       integer(kind = kint), intent(in) :: jmax, kr_out
       integer(kind = kint), intent(in) :: is_fld, is_grd
+      real(kind = kreal), intent(in) :: r_CMB(0:2)
       real(kind = kreal), intent(in) :: flux_CMB(jmax)
 !
       integer(kind = kint) :: inod, j
@@ -253,8 +153,7 @@
 !$omp parallel do private(inod)
       do j = 1, jmax
         inod = j + (kr_out-1) * jmax
-        d_rj(inod,is_grd  ) = flux_CMB(j) * g_sph_rj(j,13)              &
-     &                       * radius_1d_rj_r(kr_out)**2
+        d_rj(inod,is_grd  ) = flux_CMB(j)*g_sph_rj(j,13) * r_CMB(0)**2
         d_rj(inod,is_grd+1) = d_rj(inod,is_fld  )
         d_rj(inod,is_grd+2) = zero
       end do
@@ -262,18 +161,18 @@
 !
       if(idx_rj_degree_zero .eq. 0) return
       inod = idx_rj_degree_zero + (kr_out-1) * jmax
-      d_rj(inod,is_grd  ) = flux_CMB(idx_rj_degree_zero)                &
-     &                     * radius_1d_rj_r(kr_out)**2
+      d_rj(inod,is_grd  ) = flux_CMB(idx_rj_degree_zero) * r_CMB(0)**2
 !
       end subroutine cal_dsdr_sph_out_fix_flux_2
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_div_sph_out_fix_flux_2(jmax, kr_out, flux_CMB,    &
-     &          is_fld, is_div)
+      subroutine cal_div_sph_out_fix_flux_2(jmax, kr_out, r_CMB,        &
+     &          flux_CMB, is_fld, is_div)
 !
       integer(kind = kint), intent(in) :: jmax, kr_out
       integer(kind = kint), intent(in) :: is_fld, is_div
+      real(kind = kreal), intent(in) :: r_CMB(0:2)
       real(kind = kreal), intent(in) :: flux_CMB(jmax)
 !
       integer(kind = kint) :: inod, j
@@ -283,7 +182,7 @@
       do j = 1, jmax
         inod = j + (kr_out-1) * jmax
         d_rj(inod,is_div) =  (flux_CMB(j) - d_rj(inod,is_fld+1) )       &
-     &                  * max(g_sph_rj(j,3),half) * ar_1d_rj(kr_out,2)
+     &                      * max(g_sph_rj(j,3),half) * r_CMB(2)
       end do
 !$omp end parallel do
 !
@@ -291,12 +190,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sph_out_fix_flux_diffuse2(jmax, kr_out, flux_OUT,  &
-     &          coef_fdm_fix_dr_out_2, coef_d, is_fld, is_diffuse)
+      subroutine cal_sph_out_fix_flux_diffuse2(jmax, kr_out, r_CMB,     &
+     &          fdm2_fix_dr_CMB, flux_OUT, coef_d, is_fld, is_diffuse)
 !
       integer(kind = kint), intent(in) :: jmax, kr_out
       integer(kind = kint), intent(in) :: is_fld, is_diffuse
-      real(kind = kreal), intent(in) :: coef_fdm_fix_dr_out_2(-1:1,3)
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_CMB(-1:1,3)
+      real(kind = kreal), intent(in) :: r_CMB(0:2)
       real(kind = kreal), intent(in) :: flux_OUT(jmax)
       real(kind = kreal), intent(in) :: coef_d
 !
@@ -309,14 +209,13 @@
         inod = j + (kr_out-1) * jmax
         i_n1 = inod - jmax
 !
-        d2t_dr2 =  coef_fdm_fix_dr_out_2(-1,3) * d_rj(i_n1,is_fld)      &
-     &           + coef_fdm_fix_dr_out_2( 0,3) * d_rj(inod,is_fld)      &
-     &           + coef_fdm_fix_dr_out_2( 1,3) * flux_OUT(j)
+        d2t_dr2 =  fdm2_fix_dr_CMB(-1,3) * d_rj(i_n1,is_fld)            &
+     &           + fdm2_fix_dr_CMB( 0,3) * d_rj(inod,is_fld)            &
+     &           + fdm2_fix_dr_CMB( 1,3) * flux_OUT(j)
 !
         d_rj(inod,is_diffuse) = coef_d * (d2t_dr2                       &
-     &                    + two*ar_1d_rj(kr_out,1) * flux_OUT(j)        &
-     &                    - g_sph_rj(j,3)*ar_1d_rj(kr_out,2)            &
-     &                     * d_rj(inod,is_fld) )
+     &                    + two*r_CMB(1) * flux_OUT(j)                  &
+     &                    - g_sph_rj(j,3)*r_CMB(2) * d_rj(inod,is_fld))
 !
       end do
 !$omp end parallel do

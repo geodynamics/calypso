@@ -32,6 +32,8 @@
 !!@n*
 !!@n*************************************************************
 !!@n
+!!@n      subroutine full_normalize_by_smdt(nth, p, dp)
+!!@n
 !!@n @param nth       Truncation level for the polynomial
 !!@n @param theta     Input degree ( \f$ 0 \le \theta \le \pi \f$)
 !!@n @param p(m,l)    Schmidt Polynomial  \f$ P_{l}^{m} \f$
@@ -144,6 +146,37 @@
       end do
 !*
       end subroutine diff_schmidt_polynomial
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine full_normalize_by_smdt(nth, p, dp)
+!*
+      integer(kind = kint), intent(in) :: nth
+      real(kind = kreal), intent(inout) :: p(0:nth,0:nth)
+      real(kind = kreal), intent(inout) :: dp(0:nth,0:nth)
+!
+      integer(kind = kint) :: l, m
+      real(kind = kreal) :: pi, asqrt2pi, cl
+!
+!
+      pi = 4.0d0*atan(1.0d0)
+      asqrt2pi = 1.0d0 / sqrt(2.0d0*pi)
+!
+!
+      do l = 0, nth
+        p(0,l) =  sqrt(2.0d0) * p(0,l)
+        dp(0,l) = sqrt(2.0d0) * dp(0,l)
+      end do
+!
+      do l = 0, nth
+        cl = sqrt(dble(2*l+1)) / 2.0d0
+        do m = 0 ,l
+          p(m,l) =  (-1.0d0)**m * (asqrt2pi*cl) * p(m,l)
+          dp(m,l) = (-1.0d0)**m * (asqrt2pi*cl) * dp(m,l)
+        end do
+      end do
+!
+      end subroutine full_normalize_by_smdt
 !
 !  ---------------------------------------------------------------------
 !
