@@ -47,6 +47,8 @@
       subroutine const_sph_viscous_diffusion
 !
       use m_boundary_params_sph_MHD
+      use m_coef_fdm_free_ICB
+      use m_coef_fdm_free_CMB
       use set_sph_exp_rigid_ICB
       use set_sph_exp_rigid_CMB
       use set_sph_exp_free_ICB
@@ -66,8 +68,10 @@
      &      ipol%i_velo, ipol%i_v_diffuse)
         call cal_dsdr_sph_center_2(ipol%i_v_diffuse)
       else if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
-        call cal_sph_nod_icb_free_diffuse2(coef_d_velo,                 &
-     &      ipol%i_velo, ipol%i_v_diffuse)
+        call cal_sph_nod_icb_free_diffuse2                              &
+     &     (nidx_rj(2), sph_bc_U%kr_in, sph_bc_U%r_ICB,                 &
+     &      coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,               &
+     &      coef_d_velo, ipol%i_velo, ipol%i_v_diffuse)
       else
         call cal_sph_nod_icb_rigid_diffuse2                             &
      &     (nidx_rj(2), sph_bc_U%kr_in, sph_bc_U%r_ICB,                 &
@@ -85,8 +89,10 @@
       end if
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
-        call cal_sph_nod_cmb_free_diffuse2(coef_d_velo,                 &
-     &      ipol%i_velo, ipol%i_v_diffuse)
+        call cal_sph_nod_cmb_free_diffuse2                              &
+     &     (nidx_rj(2), sph_bc_U%kr_out, sph_bc_U%r_CMB,                &
+     &      coef_fdm_free_CMB_vp2, coef_fdm_free_CMB_vt2,               &
+     &      coef_d_velo, ipol%i_velo, ipol%i_v_diffuse)
       else
         call cal_sph_nod_cmb_rigid_diffuse2                             &
      &     (nidx_rj(2), sph_bc_U%kr_out, sph_bc_U%r_CMB,                &
@@ -104,6 +110,8 @@
       subroutine const_sph_vorticirty_diffusion
 !
       use m_boundary_params_sph_MHD
+      use m_coef_fdm_free_ICB
+      use m_coef_fdm_free_CMB
       use set_sph_exp_rigid_ICB
       use set_sph_exp_rigid_CMB
       use set_sph_exp_free_ICB
@@ -124,8 +132,10 @@
      &      ipol%i_vort, ipol%i_w_diffuse)
         call cal_dsdr_sph_center_2(ipol%i_w_diffuse)
       else if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
-        call cal_sph_nod_icb_free_w_diffuse2(coef_d_velo,               &
-     &      ipol%i_vort, ipol%i_w_diffuse)
+        call cal_sph_nod_icb_free_w_diffuse2                            &
+     &     (nidx_rj(2), sph_bc_U%kr_in, sph_bc_U%r_ICB,                 &
+     &      sph_bc_U%fdm2_fix_fld_ICB, coef_fdm_free_ICB_vt2,           &
+     &      coef_d_velo, ipol%i_vort, ipol%i_w_diffuse)
       else
         call cal_sph_nod_icb_rgd_w_diffuse2(nidx_rj(2),                 &
      &      sph_bc_U%kr_in, sph_bc_U%r_ICB, sph_bc_U%fdm2_fix_fld_ICB,  &
@@ -142,8 +152,10 @@
      &    ipol%i_w_diffuse, idpdr%i_w_diffuse)
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
-        call cal_sph_nod_cmb_free_w_diffuse2(coef_d_velo,               &
-     &      ipol%i_vort, ipol%i_w_diffuse)
+        call cal_sph_nod_cmb_free_w_diffuse2                            &
+     &     (nidx_rj(2), sph_bc_U%kr_out, sph_bc_U%r_CMB,                &
+     &      sph_bc_U%fdm2_fix_fld_CMB, coef_fdm_free_CMB_vt2,           &
+     &      coef_d_velo, ipol%i_vort, ipol%i_w_diffuse)
       else
         call cal_sph_nod_cmb_rgd_w_diffuse2(nidx_rj(2),                 &
      &      sph_bc_U%kr_out, sph_bc_U%r_CMB, sph_bc_U%fdm2_fix_fld_CMB, &

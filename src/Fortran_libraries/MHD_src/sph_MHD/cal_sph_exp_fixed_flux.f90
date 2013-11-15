@@ -12,7 +12,7 @@
 !!      subroutine cal_div_sph_in_fix_flux_2(jmax, kr_in, r_ICB,        &
 !!     &          flux_ICB, is_fld, is_div)
 !!      subroutine cal_sph_in_fix_flux_diffuse2(jmax, kr_in, r_ICB,     &
-!!     &          fdm2_fix_dr_ICB, flux_IN, coef_d, is_fld, is_diffuse)
+!!     &         fdm2_fix_dr_ICB, flux_ICB, coef_d, is_fld, is_diffuse)
 !!
 !!      subroutine cal_dsdr_sph_out_fix_flux_2(idx_rj_degree_zero,      &
 !!     &          jmax, kr_out, r_CMB, flux_CMB, is_fld, is_grd)
@@ -22,9 +22,19 @@
 !!     &          fdm2_fix_dr_CMB, flux_OUT, coef_d, is_fld, is_diffuse)
 !!@endverbatim
 !!
+!!@n @param idx_rj_degree_zero    Local address for degree 0
 !!@n @param jmax  Number of modes for spherical harmonics @f$L*(L+2)@f$
+!!@n @param kr_in       Radial ID for inner boundary
+!!@n @param kr_out       Radial ID for outer boundary
+!!@n @param r_ICB(0:2)   Radius at ICB
+!!@n @param r_CMB(0:2)   Radius at CMB
 !!@n @param flux_ICB(jamx)  Spectrum of fixed flux at ICB
 !!@n @param flux_CMB(jamx)  Spectrum of fixed flux at CMB
+!!@n @param fdm2_fix_dr_ICB(-1:1,3)
+!!         Matrix to evaluate field at ICB with fiexed radial derivative
+!!@n @param fdm2_fix_dr_CMB(-1:1,3)
+!!         Matrix to evaluate field at CMB with fiexed radial derivative
+!!
 !!@n @param coef_d        Coefficient for diffusion term
 !!
 !!@n @param is_fld      Address of spectrum data d_rj
@@ -104,12 +114,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_sph_in_fix_flux_diffuse2(jmax, kr_in, r_ICB,       &
-     &          fdm2_fix_dr_ICB, flux_IN, coef_d, is_fld, is_diffuse)
+     &          fdm2_fix_dr_ICB, flux_ICB, coef_d, is_fld, is_diffuse)
 !
       integer(kind = kint), intent(in) :: jmax, kr_in
       integer(kind = kint), intent(in) :: is_fld, is_diffuse
       real(kind = kreal), intent(in) :: coef_d
-      real(kind = kreal), intent(in) :: flux_IN(jmax)
+      real(kind = kreal), intent(in) :: flux_ICB(jmax)
       real(kind = kreal), intent(in) :: r_ICB(0:2)
       real(kind = kreal), intent(in) :: fdm2_fix_dr_ICB(-1:1,3)
 !
@@ -122,12 +132,12 @@
         inod = j + (kr_in-1) * jmax
         i_p1 = inod + jmax
 !
-        d2t_dr2 =  fdm2_fix_dr_ICB(-1,3) * flux_IN(j)                   &
+        d2t_dr2 =  fdm2_fix_dr_ICB(-1,3) * flux_ICB(j)                  &
      &           + fdm2_fix_dr_ICB( 0,3) * d_rj(inod,is_fld)            &
      &           + fdm2_fix_dr_ICB( 1,3) * d_rj(i_p1,is_fld)
 !
         d_rj(inod,is_diffuse) = coef_d * (d2t_dr2                       &
-     &                    + two*r_ICB(1) * flux_IN(j)                   &
+     &                    + two*r_ICB(1) * flux_ICB(j)                  &
      &                    - g_sph_rj(j,3)*r_ICB(2) * d_rj(inod,is_fld))
 !
       end do

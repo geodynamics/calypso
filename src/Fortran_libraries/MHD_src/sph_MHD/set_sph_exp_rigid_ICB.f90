@@ -20,6 +20,18 @@
 !!     &          fdm2_fix_fld_ICB, coef_d, is_fld, is_diffuse)
 !!@endverbatim
 !!
+!!@n @param idx_rj_degree_zero    Local address for degree 0
+!!@n @param idx_rj_degree_one(-1:1)    Local address for degree 1
+!!@n @param jmax  Number of modes for spherical harmonics @f$L*(L+2)@f$
+!!@n @param kr_in       Radial ID for inner boundary
+!!@n @param r_ICB(0:2)   Radius at ICB
+!!@n @param Vt_ICB(jmax) Spectr data for toroidal velocity ICB
+!!
+!!@n @param fdm2_fix_fld_ICB(0:2,3)
+!!         Matrix to evaluate radial derivative at ICB with fiexed field
+!!@n @param fdm2_fix_dr_ICB(-1:1,3)
+!!         Matrix to evaluate field at ICB with fiexed radial derivative
+!!
 !!@n @param coef_d     Coefficient for diffusion term
 !!@n @param is_fld     Address of poloidal velocity in d_rj
 !!@n @param is_rot     Address of poloidal vorticity in d_rj
