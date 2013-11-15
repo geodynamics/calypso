@@ -75,15 +75,19 @@
       if     (sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_vpol2(ipol%i_velo)
       else if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        call cal_sph_nod_icb_rotate_velo2(ipol%i_velo)
+        call cal_sph_nod_icb_rotate_velo2                               &
+     &     (idx_rj_degree_zero, idx_rj_degree_one, nidx_rj(2),          &
+     &      sph_bc_U%kr_in, sph_bc_U%r_ICB, vt_ICB_bc, ipol%i_velo)
       else
-        call cal_sph_nod_icb_rigid_velo2(ipol%i_velo)
+        call cal_sph_nod_icb_rigid_velo2(nidx_rj(2),                    &
+     &      sph_bc_U%kr_in, sph_bc_U%r_ICB, vt_ICB_bc, ipol%i_velo)
       end if
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_vpol2(ipol%i_velo)
       else
-        call cal_sph_nod_cmb_rigid_velo2(ipol%i_velo)
+        call cal_sph_nod_cmb_rigid_velo2(nidx_rj(2),                    &
+     &      sph_bc_U%kr_out, sph_bc_U%r_CMB, vt_CMB_bc, ipol%i_velo)
       end if
 !
 !      write(my_rank+70,*) 'k, j, inod, vp_rhs, vt_rhs'
