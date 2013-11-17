@@ -21,6 +21,15 @@
 !!     &          fdm2_fix_fld_CMB, coef_d, is_fld, is_diffuse)
 !!@endverbatim
 !!
+!!@n @param jmax  Number of modes for spherical harmonics @f$L*(L+2)@f$
+!!@n @param kr_out       Radial ID for outer boundary
+!!@n @param r_CMB(0:2)   Radius at CMB
+!!
+!!@n @param fdm2_fix_fld_CMB(0:2,3)
+!!         Matrix to evaluate radial derivative at CMB with fiexed field
+!!@n @param fdm2_fix_dr_CMB(-1:1,3)
+!!         Matrix to evaluate field at CMB with fiexed radial derivative
+!!
 !!@n @param coef_d     Coefficient for diffusion term
 !!@n @param is_fld     Address of poloidal velocity in d_rj
 !!@n @param is_rot     Address of poloidal vorticity in d_rj

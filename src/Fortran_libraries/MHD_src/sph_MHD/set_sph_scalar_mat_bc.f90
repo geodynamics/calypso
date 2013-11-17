@@ -7,21 +7,29 @@
 !>@brief  Construct matrix for scalar fields at boundaries
 !!
 !!@verbatim
-!!      subroutine set_fix_scalar_icb_rmat_sph(nri, jmax, evo_mat)
-!!      subroutine set_fix_flux_icb_rmat_sph(nri, jmax,                 &
-!!     &          coef_imp, coef_d, evo_mat)
+!!      subroutine set_fix_scalar_icb_rmat_sph(nri, jmax, kr_in,        &
+!!     &          evo_mat)
+!!      subroutine set_fix_flux_icb_rmat_sph(nri, jmax, kr_in, r_ICB,   &
+!!     &          fdm2_fix_dr_ICB, coef_imp, coef_d, evo_mat)
 !!
-!!      subroutine set_fix_scalar_cmb_rmat_sph(nri, jmax, evo_mat)
-!!      subroutine set_fix_flux_cmb_rmat_sph(nri, jmax,                 &
-!!     &          coef_imp, coef_d, evo_mat)
+!!      subroutine set_fix_scalar_cmb_rmat_sph(nri, jmax, kr_out,       &
+!!     &          evo_mat)
+!!      subroutine set_fix_flux_cmb_rmat_sph(nri, jmax, kr_out, r_CMB,  &
+!!     &          fdm2_fix_dr_CMB, coef_imp, coef_d, evo_mat)
 !!@endverbatim
 !!
 !!@n @param nri     Number of radial points
 !!@n @param jmax    Number of spherical harmonics modes
-!!@n @param kr_st   Start radial address to construct matrix
-!!@n @param kr_ed   End radial address to construct matrix
+!!@n @param kr_in       Radial ID for inner boundary
+!!@n @param kr_out       Radial ID for outer boundary
+!!@n @param r_ICB(0:2)   Radius at ICB
+!!@n @param r_CMB(0:2)   Radius at CMB
 !!@n @param coef_imp   Coefficient for contribution of implicit term
 !!@n @param coef_d     Coefficient of diffusiotn term
+!!@n @param fdm2_fix_dr_ICB(-1:1,3)
+!!         Matrix to evaluate field at ICB with fiexed radial derivative
+!!@n @param fdm2_fix_dr_CMB(-1:1,3)
+!!         Matrix to evaluate field at CMB with fiexed radial derivative
 !!
 !!@n @param evo_mat(3,nri,jmax)  Band matrix for time evolution
 !
@@ -43,30 +51,31 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_fix_scalar_icb_rmat_sph(nri, jmax, evo_mat)
+      subroutine set_fix_scalar_icb_rmat_sph(nri, jmax, kr_in,          &
+     &          evo_mat)
 !
-      integer(kind = kint), intent(in) :: jmax, nri
+      integer(kind = kint), intent(in) :: jmax, nri, kr_in
       real(kind = kreal), intent(inout) :: evo_mat(3,nri,jmax)
 !
       integer(kind = kint) :: j
 !
 !
       do j = 1, jmax
-        evo_mat(2,nlayer_ICB,  j) = one
-        evo_mat(1,nlayer_ICB+1,j) = zero
+        evo_mat(2,kr_in,  j) = one
+        evo_mat(1,kr_in+1,j) = zero
       end do
 !
       end subroutine set_fix_scalar_icb_rmat_sph
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_fix_flux_icb_rmat_sph(nri, jmax,                   &
-     &          coef_imp, coef_d, evo_mat)
+      subroutine set_fix_flux_icb_rmat_sph(nri, jmax, kr_in, r_ICB,     &
+     &          fdm2_fix_dr_ICB, coef_imp, coef_d, evo_mat)
 !
-      use m_coef_fdm_fixed_ICB
-!
-      integer(kind = kint), intent(in) :: jmax, nri
+      integer(kind = kint), intent(in) :: jmax, nri, kr_in
       real(kind = kreal), intent(in) :: coef_imp, coef_d
+      real(kind = kreal), intent(in) :: r_ICB(0:2)
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_ICB(-1:1,3)
 !
       real(kind = kreal), intent(inout) :: evo_mat(3,nri,jmax)
 !
@@ -74,11 +83,11 @@
 !
 !
       do j = 1, jmax
-          evo_mat(2,nlayer_ICB,  j) = one + coef_imp*dt*coef_d          &
-     &                         * ( -coef_fdm_fix_dr_ICB_2( 0,3)         &
-     &                          + g_sph_rj(j,3)*ar_1d_rj(nlayer_ICB,2))
-          evo_mat(1,nlayer_ICB+1,j) =     - coef_imp*dt*coef_d          &
-     &                         *    coef_fdm_fix_dr_ICB_2( 1,3)
+          evo_mat(2,kr_in,  j) = one + coef_imp*dt*coef_d               &
+     &                         * ( -fdm2_fix_dr_ICB( 0,3)               &
+     &                          + g_sph_rj(j,3)*r_ICB(2))
+          evo_mat(1,kr_in+1,j) =     - coef_imp*dt*coef_d               &
+     &                         *    fdm2_fix_dr_ICB( 1,3)
       end do
 !
       end subroutine set_fix_flux_icb_rmat_sph
@@ -86,30 +95,31 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_fix_scalar_cmb_rmat_sph(nri, jmax, evo_mat)
+      subroutine set_fix_scalar_cmb_rmat_sph(nri, jmax, kr_out,         &
+     &          evo_mat)
 !
-      integer(kind = kint), intent(in) :: jmax, nri
+      integer(kind = kint), intent(in) :: jmax, nri, kr_out
       real(kind = kreal), intent(inout) :: evo_mat(3,nri,jmax)
 !
       integer(kind = kint) :: j
 !
 !
       do j = 1, jmax
-        evo_mat(3,nlayer_CMB-1,j) = zero
-        evo_mat(2,nlayer_CMB,  j) = one
+        evo_mat(3,kr_out-1,j) = zero
+        evo_mat(2,kr_out,  j) = one
       end do
 !
       end subroutine set_fix_scalar_cmb_rmat_sph
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_fix_flux_cmb_rmat_sph(nri, jmax,                   &
-     &          coef_imp, coef_d, evo_mat)
+      subroutine set_fix_flux_cmb_rmat_sph(nri, jmax, kr_out, r_CMB,    &
+     &          fdm2_fix_dr_CMB, coef_imp, coef_d, evo_mat)
 !
-      use m_coef_fdm_fixed_CMB
-!
-      integer(kind = kint), intent(in) :: jmax, nri
+      integer(kind = kint), intent(in) :: jmax, nri, kr_out
       real(kind = kreal), intent(in) :: coef_imp, coef_d
+      real(kind = kreal), intent(in) :: r_CMB(0:2)
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_CMB(-1:1,3)
 !
       real(kind = kreal), intent(inout) :: evo_mat(3,nri,jmax)
 !
@@ -117,11 +127,11 @@
 !
 !
       do j = 1, jmax
-          evo_mat(3,nlayer_CMB-1,j) =     - coef_imp*dt*coef_d          &
-     &                         *    coef_fdm_fix_dr_CMB_2(-1,3)
-          evo_mat(2,nlayer_CMB,  j) = one + coef_imp*dt*coef_d          &
-     &                         * ( -coef_fdm_fix_dr_CMB_2( 0,3)         &
-     &                          + g_sph_rj(j,3)*ar_1d_rj(nlayer_CMB,2))
+          evo_mat(3,kr_out-1,j) =     - coef_imp*dt*coef_d          &
+     &                         *    fdm2_fix_dr_CMB(-1,3)
+          evo_mat(2,kr_out,  j) = one + coef_imp*dt*coef_d          &
+     &                         * ( -fdm2_fix_dr_CMB( 0,3)           &
+     &                          + g_sph_rj(j,3)*r_CMB(2))
       end do
 !
       end subroutine set_fix_flux_cmb_rmat_sph

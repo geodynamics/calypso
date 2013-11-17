@@ -49,18 +49,20 @@
 !
       if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
         call set_fix_flux_icb_rmat_sph(nidx_rj(1), nidx_rj(2),          &
+     &      sph_bc_T%kr_in, sph_bc_T%r_ICB, sph_bc_T%fdm2_fix_dr_ICB,   &
      &     coef_imp_t, coef_d_temp, temp_evo_mat)
       else
         call set_fix_scalar_icb_rmat_sph(nidx_rj(1), nidx_rj(2),        &
-     &      temp_evo_mat)
+     &      sph_bc_T%kr_in, temp_evo_mat)
       end if
 !
       if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
         call set_fix_flux_cmb_rmat_sph(nidx_rj(1), nidx_rj(2),          &
-     &     coef_imp_t, coef_d_temp, temp_evo_mat)
+     &      sph_bc_T%kr_out, sph_bc_T%r_CMB, sph_bc_T%fdm2_fix_dr_CMB,  &
+     &      coef_imp_t, coef_d_temp, temp_evo_mat)
       else
         call set_fix_scalar_cmb_rmat_sph(nidx_rj(1), nidx_rj(2),        &
-     &      temp_evo_mat)
+     &      sph_bc_C%kr_out, temp_evo_mat)
       end if
 !
 !$omp parallel do private(jst,jed,j)
@@ -95,18 +97,20 @@
 !
       if (sph_bc_C%iflag_icb .eq. iflag_fixed_flux) then
         call set_fix_flux_icb_rmat_sph(nidx_rj(1), nidx_rj(2),          &
-     &     coef_imp_c, coef_d_light, composit_evo_mat)
+     &      sph_bc_C%kr_in, sph_bc_C%r_ICB, sph_bc_C%fdm2_fix_dr_ICB,   &
+     &      coef_imp_c, coef_d_light, composit_evo_mat)
       else
         call set_fix_scalar_icb_rmat_sph(nidx_rj(1), nidx_rj(2),        &
-     &      composit_evo_mat)
+     &      sph_bc_C%kr_in, composit_evo_mat)
       end if
 !
       if (sph_bc_C%iflag_cmb .eq. iflag_fixed_flux) then
         call set_fix_flux_cmb_rmat_sph(nidx_rj(1), nidx_rj(2),          &
-     &     coef_imp_c, coef_d_light, composit_evo_mat)
+     &      sph_bc_C%kr_out, sph_bc_C%r_CMB, sph_bc_C%fdm2_fix_dr_CMB,  &
+     &      coef_imp_c, coef_d_light, composit_evo_mat)
       else
         call set_fix_scalar_cmb_rmat_sph(nidx_rj(1), nidx_rj(2),        &
-     &      composit_evo_mat)
+     &      sph_bc_C%kr_out, composit_evo_mat)
       end if
 !
 !$omp parallel do private(jst,jed,j)
