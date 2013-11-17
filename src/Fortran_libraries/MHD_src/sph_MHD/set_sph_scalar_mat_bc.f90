@@ -121,7 +121,7 @@
      &                         *    coef_fdm_fix_dr_CMB_2(-1,3)
           evo_mat(2,nlayer_CMB,  j) = one + coef_imp*dt*coef_d          &
      &                         * ( -coef_fdm_fix_dr_CMB_2( 0,3)         &
-     &                          + g_sph_rj(j,3)*ar_1d_rj(nlayer_ICB,2))
+     &                          + g_sph_rj(j,3)*ar_1d_rj(nlayer_CMB,2))
       end do
 !
       end subroutine set_fix_flux_cmb_rmat_sph
