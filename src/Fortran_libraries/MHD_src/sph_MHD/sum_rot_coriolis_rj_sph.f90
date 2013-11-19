@@ -10,7 +10,7 @@
 !!@verbatim
 !!************************************************
 !!
-!!      subroutine s_sum_rot_coriolis_rj_sph(coef_cor)
+!!      subroutine s_sum_rot_coriolis_rj_sph(kr_in, kr_out, coef_cor)
 !!
 !!      subroutine sum_rot_coriolis_rj_10(coef_cor)
 !!      subroutine sum_rot_coriolis_rj_xy(coef_cor)
@@ -85,28 +85,30 @@
 !
 !   ------------------------------------------------------------------
 !
-      subroutine s_sum_rot_coriolis_rj_sph(coef_cor)
+      subroutine s_sum_rot_coriolis_rj_sph(kt_in, kr_out, coef_cor)
 !
+      integer(kind = kint), intent(in) :: kt_in, kr_out
       real(kind = kreal), intent(in) :: coef_cor
 !
 !
       if (iflag_debug.eq.1) write(*,*)                                &
      &        'sum_rot_coriolis_rj_10', omega_rj(1,2,1:3)
-      call sum_rot_coriolis_rj_10(coef_cor)
+      call sum_rot_coriolis_rj_10(kt_in, kr_out, coef_cor)
 !
       if( omega_rj(1,2,1).ne.zero .or. omega_rj(1,2,3).ne.zero) then
         if (iflag_debug.eq.1) write(*,*) 'sum_rot_coriolis_rj_xy'
-        call sum_rot_coriolis_rj_xy(coef_cor)
+        call sum_rot_coriolis_rj_xy(kt_in, kr_out, coef_cor)
       end if
 !
       end subroutine s_sum_rot_coriolis_rj_sph
 !
 !*   ------------------------------------------------------------------
 !*
-      subroutine sum_rot_coriolis_rj_10(coef_cor)
+      subroutine sum_rot_coriolis_rj_10(kt_in, kr_out, coef_cor)
 !
       use m_coriolis_coefs_tri_sph
 !
+      integer(kind = kint), intent(in) :: kt_in, kr_out
       real(kind = kreal), intent(in) :: coef_cor
 !
       integer(kind = kint) :: k, j, j30
@@ -115,7 +117,7 @@
 !
 !cdir select(concur)
 !$omp parallel do private(k,j,j30,inod,i11,i21,i12)
-      do k = nlayer_ICB, nlayer_CMB
+      do k = kt_in, kr_out
         do j = idx_rj_degree_zero + 1, nidx_rj(2)
           j30 = idx_gl_1d_rj_j(j,1)
 !
@@ -157,10 +159,11 @@
 !*
 ! -----------------------------------------------------------------------
 !*
-      subroutine sum_rot_coriolis_rj_xy(coef_cor)
+      subroutine sum_rot_coriolis_rj_xy(kt_in, kr_out, coef_cor)
 !
       use m_coriolis_coefs_tri_sph
 !
+      integer(kind = kint), intent(in) :: kt_in, kr_out
       real(kind = kreal), intent(in) :: coef_cor
 !
       integer(kind = kint) :: k, j, j30, inod
@@ -172,7 +175,7 @@
 !cdir select(concur)
 !$omp parallel do private(k,j,j30,inod,i11,i21,i31,i41,   &
 !$omp&           i12,i22,l11,l21,l31,l41,l12,l22,cs1,ct1,cs3,ct3)
-      do k = nlayer_ICB, nlayer_CMB
+      do k = kt_in, kr_out
         do j = idx_rj_degree_zero + 1, nidx_rj(2)
           j30 = idx_gl_1d_rj_j(j,1)
 !

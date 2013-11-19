@@ -70,7 +70,7 @@
       else if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_diffuse2                              &
      &     (nidx_rj(2), sph_bc_U%kr_in, sph_bc_U%r_ICB,                 &
-     &      coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,               &
+     &      fdm2_free_vp_ICB, fdm2_free_vt_ICB,                         &
      &      coef_d_velo, ipol%i_velo, ipol%i_v_diffuse)
       else
         call cal_sph_nod_icb_rigid_diffuse2                             &
@@ -84,14 +84,14 @@
 !
 !   Ovewrite rotatable inner core 
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        call cal_icore_viscous_drag_explicit(coef_d_velo,               &
-     &      itor%i_velo, itor%i_v_diffuse)
+        call cal_icore_viscous_drag_explicit(sph_bc_U%kr_in,            &
+     &      coef_d_velo, itor%i_velo, itor%i_v_diffuse)
       end if
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_diffuse2                              &
      &     (nidx_rj(2), sph_bc_U%kr_out, sph_bc_U%r_CMB,                &
-     &      coef_fdm_free_CMB_vp2, coef_fdm_free_CMB_vt2,               &
+     &      fdm2_free_vp_CMB, fdm2_free_vt_CMB,                         &
      &      coef_d_velo, ipol%i_velo, ipol%i_v_diffuse)
       else
         call cal_sph_nod_cmb_rigid_diffuse2                             &
@@ -134,7 +134,7 @@
       else if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_w_diffuse2                            &
      &     (nidx_rj(2), sph_bc_U%kr_in, sph_bc_U%r_ICB,                 &
-     &      sph_bc_U%fdm2_fix_fld_ICB, coef_fdm_free_ICB_vt2,           &
+     &      sph_bc_U%fdm2_fix_fld_ICB, fdm2_free_vt_ICB,                &
      &      coef_d_velo, ipol%i_vort, ipol%i_w_diffuse)
       else
         call cal_sph_nod_icb_rgd_w_diffuse2(nidx_rj(2),                 &
@@ -143,8 +143,8 @@
       end if
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        call cal_icore_viscous_drag_explicit(coef_d_velo,               &
-     &      ipol%i_vort, ipol%i_w_diffuse)
+        call cal_icore_viscous_drag_explicit(sph_bc_U%kr_in,            &
+     &      coef_d_velo, ipol%i_vort, ipol%i_w_diffuse)
       end if
 !
       call cal_dsdr_sph_no_bc_in_2(nidx_rj(2),                          &
@@ -154,7 +154,7 @@
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_w_diffuse2                            &
      &     (nidx_rj(2), sph_bc_U%kr_out, sph_bc_U%r_CMB,                &
-     &      sph_bc_U%fdm2_fix_fld_CMB, coef_fdm_free_CMB_vt2,           &
+     &      sph_bc_U%fdm2_fix_fld_CMB, fdm2_free_vt_CMB,                &
      &      coef_d_velo, ipol%i_vort, ipol%i_w_diffuse)
       else
         call cal_sph_nod_cmb_rgd_w_diffuse2(nidx_rj(2),                 &

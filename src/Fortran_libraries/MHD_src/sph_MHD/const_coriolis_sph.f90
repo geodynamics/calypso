@@ -83,10 +83,11 @@
       if (iflag_debug.eq.1) write(*,*) 's_trans_sph_velo_4_coriolis'
       call s_trans_sph_velo_4_coriolis
 !
-      call s_sum_rot_coriolis_rj_sph(coef_cor)
+      call s_sum_rot_coriolis_rj_sph(sph_bc_U%kr_in, sph_bc_U%kr_out,   &
+     &    coef_cor)
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        call cal_icore_coriolis_explicit
+        call cal_icore_coriolis_explicit(sph_bc_U%kr_in)
       end if
 !
       end subroutine sum_coriolis_rj_sph

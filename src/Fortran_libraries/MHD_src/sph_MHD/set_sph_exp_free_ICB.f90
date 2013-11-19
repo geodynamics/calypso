@@ -8,18 +8,16 @@
 !!
 !!@verbatim
 !!      subroutine cal_sph_nod_icb_free_v_and_w(jmax, kr_in,            &
-!!     &          coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,         &
-!!     &          is_fld, is_rot)
+!!     &          fdm2_free_vp_ICB, fdm2_free_vt_ICB, is_fld, is_rot)
 !!      subroutine cal_sph_nod_icb_free_vpol2(jmax, kr_in,              &
-!!     &          coef_fdm_free_ICB_vp2, is_fld)
+!!     &          fdm2_free_vp_ICB, is_fld)
 !!      subroutine cal_sph_nod_icb_free_rot2(jmax, kr_in, r_ICB,        &
-!!     &          coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,         &
-!!     &          is_fld, is_rot)
+!!     &          fdm2_free_vp_ICB, fdm2_free_vt_ICB, is_fld, is_rot)
 !!      subroutine cal_sph_nod_icb_free_diffuse2(jmax, kr_in, r_ICB,    &
-!!     &          coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,         &
+!!     &          fdm2_free_vp_ICB, fdm2_free_vt_ICB,                   &
 !!     &          coef_d, is_fld, is_diffuse)
 !!      subroutine cal_sph_nod_icb_free_w_diffuse2(jmax, kr_in, r_ICB,  &
-!!     &          fdm2_fix_fld_ICB, coef_fdm_free_ICB_vt2,              &
+!!     &          fdm2_fix_fld_ICB, fdm2_free_vt_ICB,                   &
 !!     &          coef_d, is_fld, is_diffuse)
 !!@endverbatim
 !!
@@ -31,10 +29,10 @@
 !!
 !!@n @param fdm2_fix_fld_ICB(0:2,3)
 !!         Matrix to evaluate radial derivative at ICB with fiexed field
-!!@n @param coef_fdm_free_ICB_vp2(0:1,3)
+!!@n @param fdm2_free_vp_ICB(0:1,3)
 !!         Matrix to evaluate poloidal velocity
 !!         with free slip boundary at ICB
-!!@n @param coef_fdm_free_ICB_vt2(0:1,3)
+!!@n @param fdm2_free_vt_ICB(0:1,3)
 !!         Matrix to evaluate toroidal velocity
 !!         with free slip boundary at ICB
 !!
@@ -60,13 +58,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_sph_nod_icb_free_v_and_w(jmax, kr_in,              &
-     &          coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,           &
-     &          is_fld, is_rot)
+     &          fdm2_free_vp_ICB, fdm2_free_vt_ICB, is_fld, is_rot)
 !
       integer(kind = kint), intent(in) :: jmax, kr_in
       integer(kind = kint), intent(in) :: is_fld, is_rot
-      real(kind = kreal), intent(in) :: coef_fdm_free_ICB_vp2(0:1,3)
-      real(kind = kreal), intent(in) :: coef_fdm_free_ICB_vt2(0:1,3)
+      real(kind = kreal), intent(in) :: fdm2_free_vp_ICB(0:1,3)
+      real(kind = kreal), intent(in) :: fdm2_free_vt_ICB(0:1,3)
 !
       real(kind = kreal) :: d1s_dr1, d2s_dr2, d1t_dr1
       integer(kind = kint) :: inod, j, i_p1, i_p2
@@ -78,9 +75,9 @@
         i_p1 = inod + jmax
         i_p2 = i_p1 + jmax
 !
-        d1s_dr1 =  coef_fdm_free_ICB_vp2( 1,2) * d_rj(i_p1,is_fld  )
-        d2s_dr2 =  coef_fdm_free_ICB_vp2( 1,3) * d_rj(i_p1,is_fld  )
-        d1t_dr1 =  coef_fdm_free_ICB_vt2( 0,2) * d_rj(inod,is_fld+2)
+        d1s_dr1 =  fdm2_free_vp_ICB( 1,2) * d_rj(i_p1,is_fld  )
+        d2s_dr2 =  fdm2_free_vp_ICB( 1,3) * d_rj(i_p1,is_fld  )
+        d1t_dr1 =  fdm2_free_vt_ICB( 0,2) * d_rj(inod,is_fld+2)
 !
         d_rj(inod,is_fld  ) =  zero
         d_rj(inod,is_fld+1) =  d1s_dr1
@@ -95,11 +92,11 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_sph_nod_icb_free_vpol2(jmax, kr_in,                &
-     &          coef_fdm_free_ICB_vp2, is_fld)
+     &          fdm2_free_vp_ICB, is_fld)
 !
       integer(kind = kint), intent(in) :: jmax, kr_in
       integer(kind = kint), intent(in) :: is_fld
-      real(kind = kreal), intent(in) :: coef_fdm_free_ICB_vp2(0:1,3)
+      real(kind = kreal), intent(in) :: fdm2_free_vp_ICB(0:1,3)
 !
 !
       real(kind = kreal) :: d1s_dr1
@@ -111,8 +108,8 @@
         inod = j + (kr_in-1) * jmax
         i_p1 = inod + jmax
 !
-        d1s_dr1 =  coef_fdm_free_ICB_vp2( 0,2) * d_rj(inod,is_fld  )    &
-     &           + coef_fdm_free_ICB_vp2( 1,2) * d_rj(i_p1,is_fld  )
+        d1s_dr1 =  fdm2_free_vp_ICB( 0,2) * d_rj(inod,is_fld  )         &
+     &           + fdm2_free_vp_ICB( 1,2) * d_rj(i_p1,is_fld  )
 !
         d_rj(inod,is_fld  ) = zero
         d_rj(inod,is_fld+1) = d1s_dr1
@@ -124,14 +121,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_sph_nod_icb_free_rot2(jmax, kr_in, r_ICB,          &
-     &          coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,           &
-     &          is_fld, is_rot)
+     &          fdm2_free_vp_ICB, fdm2_free_vt_ICB, is_fld, is_rot)
 !
       integer(kind = kint), intent(in) :: jmax, kr_in
       integer(kind = kint), intent(in) :: is_fld, is_rot
       real(kind = kreal), intent(in) :: r_ICB(0:2)
-      real(kind = kreal), intent(in) :: coef_fdm_free_ICB_vp2(0:1,3)
-      real(kind = kreal), intent(in) :: coef_fdm_free_ICB_vt2(0:1,3)
+      real(kind = kreal), intent(in) :: fdm2_free_vp_ICB(0:1,3)
+      real(kind = kreal), intent(in) :: fdm2_free_vt_ICB(0:1,3)
 !
 !
       real(kind = kreal) :: d2s_dr2, d1t_dr1
@@ -144,9 +140,9 @@
         i_p1 = inod + jmax
         i_p2 = i_p1 + jmax
 !
-        d2s_dr2 =  coef_fdm_free_ICB_vp2( 0,3) * d_rj(inod,is_fld  )    &
-     &           + coef_fdm_free_ICB_vp2( 1,3) * d_rj(i_p1,is_fld  )
-        d1t_dr1 =  coef_fdm_free_ICB_vt2( 0,2) * d_rj(inod,is_fld+2)
+        d2s_dr2 =  fdm2_free_vp_ICB( 0,3) * d_rj(inod,is_fld  )         &
+     &           + fdm2_free_vp_ICB( 1,3) * d_rj(i_p1,is_fld  )
+        d1t_dr1 =  fdm2_free_vt_ICB( 0,2) * d_rj(inod,is_fld+2)
 !
         d_rj(inod,is_rot  ) =  d_rj(inod,is_fld+2)
         d_rj(inod,is_rot+1) =  d1t_dr1
@@ -160,15 +156,15 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_sph_nod_icb_free_diffuse2(jmax, kr_in, r_ICB,      &
-     &          coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,           &
+     &          fdm2_free_vp_ICB, fdm2_free_vt_ICB,                     &
      &          coef_d, is_fld, is_diffuse)
 !
       integer(kind = kint), intent(in) :: jmax, kr_in
       integer(kind = kint), intent(in) :: is_fld, is_diffuse
       real(kind = kreal), intent(in) :: coef_d
       real(kind = kreal), intent(in) :: r_ICB(0:2)
-      real(kind = kreal), intent(in) :: coef_fdm_free_ICB_vp2(0:1,3)
-      real(kind = kreal), intent(in) :: coef_fdm_free_ICB_vt2(0:1,3)
+      real(kind = kreal), intent(in) :: fdm2_free_vp_ICB(0:1,3)
+      real(kind = kreal), intent(in) :: fdm2_free_vt_ICB(0:1,3)
 !
       real(kind = kreal) :: d2s_dr2, d2t_dr2
       integer(kind = kint) :: inod, j, i_p1
@@ -179,10 +175,10 @@
         inod = j + (kr_in-1) * jmax
         i_p1 = inod + jmax
 !
-        d2s_dr2 =  coef_fdm_free_ICB_vp2( 0,3) * d_rj(inod,is_fld  )    &
-     &           + coef_fdm_free_ICB_vp2( 1,3) * d_rj(i_p1,is_fld  )
-        d2t_dr2 =  coef_fdm_free_ICB_vt2( 0,3) * d_rj(inod,is_fld+2)    &
-     &           + coef_fdm_free_ICB_vt2( 1,3) * d_rj(i_p1,is_fld+2)
+        d2s_dr2 =  fdm2_free_vp_ICB( 0,3) * d_rj(inod,is_fld  )         &
+     &           + fdm2_free_vp_ICB( 1,3) * d_rj(i_p1,is_fld  )
+        d2t_dr2 =  fdm2_free_vt_ICB( 0,3) * d_rj(inod,is_fld+2)         &
+     &           + fdm2_free_vt_ICB( 1,3) * d_rj(i_p1,is_fld+2)
 !
         d_rj(inod,is_diffuse  ) =  coef_d * (d2s_dr2                    &
      &               - g_sph_rj(j,3)*r_ICB(2) * d_rj(inod,is_fld  ) )
@@ -196,7 +192,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_sph_nod_icb_free_w_diffuse2(jmax, kr_in, r_ICB,    &
-     &          fdm2_fix_fld_ICB, coef_fdm_free_ICB_vt2,                &
+     &          fdm2_fix_fld_ICB, fdm2_free_vt_ICB,                     &
      &          coef_d, is_fld, is_diffuse)
 !
       integer(kind = kint), intent(in) :: jmax, kr_in
@@ -204,7 +200,7 @@
       real(kind = kreal), intent(in) :: coef_d
       real(kind = kreal), intent(in) :: r_ICB(0:2)
       real(kind = kreal), intent(in) :: fdm2_fix_fld_ICB(0:2,3)
-      real(kind = kreal), intent(in) :: coef_fdm_free_ICB_vt2(0:1,3)
+      real(kind = kreal), intent(in) :: fdm2_free_vt_ICB(0:1,3)
 !
       integer(kind = kint) :: inod, j, i_p1, i_p2
       real(kind = kreal) :: d2s_dr2,d2t_dr2
@@ -216,8 +212,8 @@
         i_p1 = inod + jmax
         i_p2 = i_p1 + jmax
 !
-        d2s_dr2 =  coef_fdm_free_ICB_vt2( 0,3) * d_rj(inod,is_fld  )    &
-     &           + coef_fdm_free_ICB_vt2( 1,3) * d_rj(i_p1,is_fld  )
+        d2s_dr2 =  fdm2_free_vt_ICB( 0,3) * d_rj(inod,is_fld  )         &
+     &           + fdm2_free_vt_ICB( 1,3) * d_rj(i_p1,is_fld  )
         d2t_dr2 =  fdm2_fix_fld_ICB( 0,3) * d_rj(inod,is_fld+2)         &
      &           + fdm2_fix_fld_ICB( 1,3) * d_rj(i_p1,is_fld+2)         &
      &           + fdm2_fix_fld_ICB( 2,3) * d_rj(i_p2,is_fld+2)

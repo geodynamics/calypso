@@ -79,7 +79,7 @@
       if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_rot2                                  &
      &     (nidx_rj(2), sph_bc_U%kr_in, sph_bc_U%r_ICB,                 &
-     &      coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,               &
+     &      fdm2_free_vp_ICB, fdm2_free_vt_ICB,                         &
      &      ipol%i_velo, ipol%i_vort)
       else if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_sph_nod_icb_rigid_rot2                                 &
@@ -96,7 +96,7 @@
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_rot2                                  &
      &     (nidx_rj(2), sph_bc_U%kr_out, sph_bc_U%r_CMB,                &
-     &      coef_fdm_free_CMB_vp2, coef_fdm_free_CMB_vt2,               &
+     &      fdm2_free_vp_CMB, fdm2_free_vt_CMB,                         &
      &      ipol%i_velo, ipol%i_vort)
       else
         call cal_sph_nod_cmb_rigid_rot2                                 &
@@ -204,23 +204,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_sph_rotation_no_bc(kr_inside, kr_outside,        &
-     &          coef_fdm_fix_in_2, coef_fdm_fix_out_2, is_fld, is_rot)
+      subroutine const_sph_rotation_no_bc(kr_in, kr_out, r_ICB, r_CMB,  &
+     &          fdm2_fix_fld_ICB, fdm2_fix_fld_CMB, is_fld, is_rot)
 !
       use cal_sph_exp_nod_none_bc
 !
-      integer(kind = kint), intent(in) :: kr_inside, kr_outside
+      integer(kind = kint), intent(in) :: kr_in, kr_out
       integer(kind = kint), intent(in) :: is_fld, is_rot
-      real(kind = kreal), intent(in) :: coef_fdm_fix_in_2(0:2,3)
-      real(kind = kreal), intent(in) :: coef_fdm_fix_out_2(0:2,3)
+      real(kind = kreal), intent(in) :: r_ICB(0:2), r_CMB(0:2)
+      real(kind = kreal), intent(in) :: fdm2_fix_fld_ICB(0:2,3)
+      real(kind = kreal), intent(in) :: fdm2_fix_fld_CMB(0:2,3)
 !
 !
-      call cal_sph_nod_nobc_in_rot2(coef_fdm_fix_in_2, kr_inside,       &
-     &    is_fld, is_rot)
-      call cal_sph_nod_nobc_out_rot2(coef_fdm_fix_out_2, kr_outside,    &
-     &    is_fld, is_rot)
+      call cal_sph_nod_nobc_in_rot2(nidx_rj(2), kr_in, r_ICB,           &
+     &    fdm2_fix_fld_ICB, is_fld, is_rot)
+      call cal_sph_nod_nobc_out_rot2(nidx_rj(2), kr_out, r_CMB,         &
+     &    fdm2_fix_fld_CMB, is_fld, is_rot)
 !
-      call cal_sph_nod_vect_rot2(kr_inside, kr_outside, is_fld, is_rot)
+      call cal_sph_nod_vect_rot2(kr_in, kr_out, is_fld, is_rot)
 !
       end subroutine const_sph_rotation_no_bc
 !
@@ -242,8 +243,7 @@
       if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_rot2                                  &
      &     (nidx_rj(2), sph_bc_U%kr_in, sph_bc_U%r_ICB,                 &
-     &      coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,               &
-     &      is_fld, is_rot)
+     &      fdm2_free_vp_ICB, fdm2_free_vt_ICB, is_fld, is_rot)
       else
         call cal_sph_nod_icb_rigid_rot2                                 &
      &     (nidx_rj(2), sph_bc_U%kr_in, sph_bc_U%r_ICB,                 &
@@ -254,8 +254,7 @@
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_rot2                                  &
      &     (nidx_rj(2), sph_bc_U%kr_out, sph_bc_U%r_CMB,                &
-     &      coef_fdm_free_CMB_vp2, coef_fdm_free_CMB_vt2,               &
-     &      is_fld, is_rot)
+     &      fdm2_free_vp_CMB, fdm2_free_vt_CMB, is_fld, is_rot)
       else
         call cal_sph_nod_cmb_rigid_rot2                                 &
      &     (nidx_rj(2), sph_bc_U%kr_out, sph_bc_U%r_CMB,                &
@@ -292,7 +291,7 @@
       if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_diffuse2                              &
      &     (nidx_rj(2), sph_bc_U%kr_in, sph_bc_U%r_ICB,                 &
-     &      coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,               &
+     &      fdm2_free_vp_ICB, fdm2_free_vt_ICB,                         &
      &      coef_d_velo, ipol%i_velo, ipol%i_v_diffuse)
       else
         call cal_sph_nod_icb_rigid_diffuse2                             &
@@ -305,15 +304,15 @@
      &    ipol%i_v_diffuse, idpdr%i_v_diffuse)
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        call cal_icore_viscous_drag_explicit(coef_d_velo,               &
-     &      ipol%i_vort, itor%i_v_diffuse)
+        call cal_icore_viscous_drag_explicit(sph_bc_U%kr_in,            &
+     &      coef_d_velo, ipol%i_vort, itor%i_v_diffuse)
       end if
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_diffuse2                              &
      &     (nidx_rj(2), sph_bc_U%kr_out, sph_bc_U%r_CMB,                &
-     &      coef_fdm_free_CMB_vp2, coef_fdm_free_CMB_vt2,               &
-     &      coef_d_velo, ipol%i_velo, ipol%i_v_diffuse)
+     &      fdm2_free_vp_CMB, fdm2_free_vt_CMB, coef_d_velo,            &
+     &      ipol%i_velo, ipol%i_v_diffuse)
       else
         call cal_sph_nod_cmb_rigid_diffuse2                             &
      &     (nidx_rj(2), sph_bc_U%kr_out, sph_bc_U%r_CMB,                &

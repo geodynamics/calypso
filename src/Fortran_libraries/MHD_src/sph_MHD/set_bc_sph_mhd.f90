@@ -38,8 +38,6 @@
       use set_bc_sph_scalars
       use set_reference_sph_mhd
 !
-      use m_coef_fdm_fixed_ICB
-      use m_coef_fdm_fixed_CMB
       use m_coef_fdm_free_ICB
       use m_coef_fdm_free_CMB
       use m_coef_fdm_to_center
@@ -77,17 +75,6 @@
       call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_T)
       call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_C)
 !
-      call cal_fdm2_coef_fix_fld_ICB(radius_1d_rj_r(nlayer_ICB),        &
-     &    coef_fdm_fix_ICB_2)
-      call cal_fdm2_coef_fix_df_ICB(radius_1d_rj_r(nlayer_ICB),         &
-     &    coef_fdm_fix_dr_ICB_2)
-!
-      call cal_fdm2_coef_fix_fld_CMB(radius_1d_rj_r(nlayer_CMB-2),      &
-     &    coef_fdm_fix_CMB_2)
-      call cal_fdm2_coef_fix_df_CMB(radius_1d_rj_r(nlayer_CMB-1),       &
-     &    coef_fdm_fix_dr_CMB_2)
-!
-!
       call cal_2nd_ICB_free_vp_bc_fdm(radius_1d_rj_r(nlayer_ICB))
       call cal_2nd_ICB_free_vt_bc_fdm(radius_1d_rj_r(nlayer_ICB))
 !
@@ -122,7 +109,6 @@
         call check_fdm_coefs_4_BC2(fhd_magne, sph_bc_B)
         call check_fdm_coefs_4_BC2(fhd_temp,  sph_bc_T)
         call check_fdm_coefs_4_BC2(fhd_light, sph_bc_C)
-        call check_coef_fdm_fix_dr_CMB
         call check_coef_fdm_free_ICB
         call check_coef_fdm_free_CMB
         call check_coef_fdm_fix_dr_2ctr

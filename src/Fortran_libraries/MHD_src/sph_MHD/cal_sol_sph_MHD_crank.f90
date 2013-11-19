@@ -43,6 +43,7 @@
 !
       subroutine s_cal_sol_sph_MHD_crank
 !
+      use m_boundary_params_sph_MHD
       use cal_rot_buoyancies_sph_MHD
       use cal_sol_sph_fluid_crank
 !
@@ -84,7 +85,7 @@
 !
       if(iflag_t_evo_4_velo .gt. id_no_evolution) then
         call update_after_vorticity_sph
-        call cal_rot_radial_self_gravity
+        call cal_rot_radial_self_gravity(sph_bc_U)
       end if
 !
       if(iflag_t_evo_4_temp .gt.     id_no_evolution) then
@@ -104,6 +105,7 @@
 !
       subroutine set_sph_field_to_start
 !
+      use m_boundary_params_sph_MHD
       use const_sph_radial_grad
       use cal_rot_buoyancies_sph_MHD
 !
@@ -115,7 +117,7 @@
       if(iflag_debug.gt.0) write(*,*) 'update_after_vorticity_sph'
       call update_after_vorticity_sph
       if(iflag_debug.gt.0) write(*,*) 'cal_rot_radial_self_gravity'
-      call cal_rot_radial_self_gravity
+      call cal_rot_radial_self_gravity(sph_bc_U)
 !
       if(iflag_debug.gt.0) write(*,*) 'update_after_heat_sph'
       call update_after_heat_sph
@@ -144,7 +146,7 @@
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic                     &
      &  .and. idx_rj_degree_one(1) .gt. 0) then
-        call set_inner_core_rotation
+        call set_inner_core_rotation(sph_bc_U%kr_in)
       end if
 !
 !       Input: ipol%i_vort, itor%i_vort

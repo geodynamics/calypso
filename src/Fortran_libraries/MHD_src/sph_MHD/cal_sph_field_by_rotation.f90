@@ -50,7 +50,7 @@
         call const_sph_force_rot2(ipol%i_lorentz, ipol%i_rot_Lorentz)
 !
         if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-          call int_icore_toroidal_lorentz
+          call int_icore_toroidal_lorentz(sph_bc_U%kr_in)
         end if
       end if
 !
@@ -61,23 +61,28 @@
       subroutine cal_div_of_forces_sph_2
 !
       use m_physical_property
+      use m_boundary_params_sph_MHD
 !      use sum_div_coriolis_rj_sph
       use cal_div_buoyancies_sph_MHD
       use const_sph_divergence
 !
 !
-      call const_sph_div_force(ipol%i_m_advect, ipol%i_div_inertia)
+      call const_sph_div_force                                          &
+     &    (sph_bc_U, ipol%i_m_advect, ipol%i_div_inertia)
 !
       if(iflag_4_lorentz .gt. id_turn_OFF) then
-        call const_sph_div_force(ipol%i_lorentz, ipol%i_div_Lorentz)
+        call const_sph_div_force                                        &
+     &      (sph_bc_U, ipol%i_lorentz, ipol%i_div_Lorentz)
       end if
 !
       if(iflag_4_coriolis .gt. id_turn_OFF) then
-        call const_sph_div_force(ipol%i_coriolis, ipol%i_div_Coriolis)
-!        call s_sum_div_coriolis_rj_sph(coef_cor, ipol%i_div_Coriolis)
+        call const_sph_div_force                                        &
+     &      (sph_bc_U, ipol%i_coriolis, ipol%i_div_Coriolis)
+!        call s_sum_div_coriolis_rj_sph(sph_bc_U%kr_in, sph_bc_U%kr_out,&
+!     &      coef_cor, ipol%i_div_Coriolis)
       end if
 !
-      call s_cal_div_buoyancies_sph_MHD
+      call sel_div_buoyancies_sph_MHD(sph_bc_U)
 !
       end subroutine cal_div_of_forces_sph_2
 !

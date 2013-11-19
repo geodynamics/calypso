@@ -76,7 +76,7 @@
 !
       if     (sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_vpol2(nidx_rj(2), sph_bc_U%kr_in,     &
-     &      coef_fdm_free_ICB_vp2, ipol%i_velo)
+     &      fdm2_free_vp_ICB, ipol%i_velo)
       else if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_sph_nod_icb_rotate_velo2                               &
      &     (idx_rj_degree_zero, idx_rj_degree_one, nidx_rj(2),          &
@@ -88,7 +88,7 @@
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_vpol2(nidx_rj(2), sph_bc_U%kr_out,    &
-     &     coef_fdm_free_CMB_vp2, ipol%i_velo)
+     &      fdm2_free_vp_CMB, ipol%i_velo)
       else
         call cal_sph_nod_cmb_rigid_velo2(nidx_rj(2),                    &
      &      sph_bc_U%kr_out, sph_bc_U%r_CMB, vt_CMB_bc, ipol%i_velo)
@@ -234,9 +234,10 @@
 !
       subroutine cal_sol_temperature_sph_crank
 !
+      use m_t_int_parameter
+      use m_physical_property
       use m_boundary_params_sph_MHD
       use set_scalar_boundary_sph
-      use adjust_fixed_flux_sph
 !
       if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
         call adjust_in_fixed_flux_sph(nidx_rj(2),                       &
@@ -253,7 +254,6 @@
      &      sph_bc_T%kr_out, sph_bc_T%r_CMB, sph_bc_T%fdm2_fix_dr_CMB,  &
      &      sph_bc_T%CMB_flux, coef_d_temp, coef_imp_t, dt,             &
      &      ipol%i_temp)
-        call adjust_cmb_fix_h_flux_sph
       else
         call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),   &
      &      ipol%i_temp, sph_bc_T%CMB_fld)
@@ -269,9 +269,10 @@
 !
       subroutine cal_sol_composition_sph_crank
 !
+      use m_t_int_parameter
+      use m_physical_property
       use m_boundary_params_sph_MHD
       use set_scalar_boundary_sph
-      use adjust_fixed_flux_sph
 !
 !
       if (sph_bc_C%iflag_icb .eq. iflag_fixed_flux) then
@@ -289,7 +290,6 @@
      &      sph_bc_C%kr_out, sph_bc_C%r_CMB, sph_bc_C%fdm2_fix_dr_CMB,  &
      &      sph_bc_C%CMB_flux, coef_d_light, coef_imp_c, dt,            &
      &      ipol%i_light)
-        call adjust_cmb_fix_c_flux_sph
       else
         call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),   &
      &      ipol%i_light, sph_bc_C%CMB_fld)

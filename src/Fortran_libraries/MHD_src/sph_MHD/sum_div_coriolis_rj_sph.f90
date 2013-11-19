@@ -7,10 +7,12 @@
 !>@brief  Evaluate derivatives with no boundary conditions
 !!
 !!@verbatim
-!!      subroutine s_sum_div_coriolis_rj_sph(coef_cor)
+!!      subroutine s_sum_div_coriolis_rj_sph(kr_in, kr_out, coef_cor)
 !!
-!!      subroutine sum_div_coriolis_rj_10(coef_cor, angular)
-!!      subroutine sum_div_coriolis_rj_xy(coef_cor, anglar)
+!!      subroutine sum_div_coriolis_rj_10(kr_in, kr_out,               &
+!!     &          coef_cor, angular)
+!!      subroutine sum_div_coriolis_rj_xy(kr_in, kr_out,               &
+!!     &          coef_cor, anglar)
 !!
 !!
 !!*************************************************
@@ -58,8 +60,10 @@
 !!*************************************************
 !!@endverbatim
 !!
-!!@n @param coef_cor  Coefficient for Coriolis term
-!!@n @param is_div_f  Poloidal address of divergence of Coriolis force
+!!@param kr_in     Radial ID for inner boundary
+!!@param kr_out    Radial ID for outer boundary
+!!@param coef_cor  Coefficient for Coriolis term
+!!@param is_div_f  Poloidal address of divergence of Coriolis force
 !
       module sum_div_coriolis_rj_sph
 !
@@ -82,30 +86,34 @@
 !*
 !*   ------------------------------------------------------------------
 !
-      subroutine s_sum_div_coriolis_rj_sph(coef_cor, is_div_f)
+      subroutine s_sum_div_coriolis_rj_sph(kr_in, kr_out,               &
+     &          coef_cor, is_div_f)
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
       integer(kind = kint), intent(in) :: is_div_f
       real(kind = kreal), intent(in) :: coef_cor
 !
 !
-      if (iflag_debug.eq.1) write(*,*)                                &
+      if (iflag_debug.eq.1) write(*,*)                                  &
      &        'sum_div_coriolis_rj_10', omega_rj(1,2,1:3)
-      call sum_div_coriolis_rj_10(coef_cor, is_div_f)
+      call sum_div_coriolis_rj_10(kr_in, kr_out, coef_cor, is_div_f)
 !
       if( omega_rj(1,2,1).ne.zero .or. omega_rj(1,2,3).ne.zero) then
         if (iflag_debug.eq.1) write(*,*) 'sum_div_coriolis_rj_xy'
-        call sum_div_coriolis_rj_xy(coef_cor, is_div_f)
+        call sum_div_coriolis_rj_xy(kr_in, kr_out, coef_cor, is_div_f)
       end if
 !
       end subroutine s_sum_div_coriolis_rj_sph
 !
 !*   ------------------------------------------------------------------
 !*
-      subroutine sum_div_coriolis_rj_10(coef_cor, is_div_f)
+      subroutine sum_div_coriolis_rj_10(kr_in, kr_out,                  &
+     &          coef_cor, is_div_f)
 !
       use m_schmidt_poly_on_rtm
       use m_coriolis_coefs_tri_sph
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
       integer(kind = kint), intent(in) :: is_div_f
       real(kind = kreal), intent(in) :: coef_cor
 !
@@ -115,7 +123,7 @@
 !
 !cdir select(concur)
 !$omp parallel do private(k,j,j30,inod,i11,i21,i12)
-      do k = nlayer_ICB, nlayer_CMB
+      do k = kr_in, kr_out
         do j = idx_rj_degree_zero + 1, nidx_rj(2)
           j30 = idx_gl_1d_rj_j(j,1)
 !
@@ -138,9 +146,9 @@
           inod = idx_rj_degree_zero + (k-1)*nidx_rj(2)
           i11 = idx_rj_degree_one(0) + (k-1)*nidx_rj(2)
 !
-!          d_rj(inod,is_div_f)                                           &
-!     &       =  four*(two/three) * half * d_rj(i11,ipol%i_vort)         &
-!     &        + four*(two/three) * omega_rj(k,1,2)                      &
+!          d_rj(inod,is_div_f)                                          &
+!     &       =  four*(two/three) * half * d_rj(i11,ipol%i_vort)        &
+!     &        + four*(two/three) * omega_rj(k,1,2)                     &
 !     &          * d_rj(i11,idpdr%i_vort)
         end if
 !
@@ -156,11 +164,13 @@
 !*
 !*   ------------------------------------------------------------------
 !*
-      subroutine sum_div_coriolis_rj_xy(coef_cor, is_div_f)
+      subroutine sum_div_coriolis_rj_xy(kr_in, kr_out,                  &
+     &          coef_cor, is_div_f)
 !
       use m_schmidt_poly_on_rtm
       use m_coriolis_coefs_tri_sph
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
       integer(kind = kint), intent(in) :: is_div_f
       real(kind = kreal), intent(in) :: coef_cor
 !
@@ -173,7 +183,7 @@
 !cdir select(concur)
 !$omp parallel do private(k,j,j30,inod,i11,i21,i31,i41,   &
 !$omp&           i12,i22,l11,l21,l31,l41,l12,l22,ct1,ct3)
-      do k = nlayer_ICB, nlayer_CMB
+      do k = kr_in, kr_out
         do j = idx_rj_degree_zero + 1, nidx_rj(2)
           j30 = idx_gl_1d_rj_j(j,1)
 !

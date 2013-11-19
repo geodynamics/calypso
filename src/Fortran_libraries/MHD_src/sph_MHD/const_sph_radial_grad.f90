@@ -141,7 +141,7 @@
 !
       if     (sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_v_and_w(nidx_rj(2), sph_bc_U%kr_in,   &
-     &          coef_fdm_free_ICB_vp2, coef_fdm_free_ICB_vt2,           &
+     &      fdm2_free_vp_ICB, fdm2_free_vt_ICB,                         &
      &      ipol%i_velo, ipol%i_vort)
       else if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_sph_nod_icb_rotate_velo2                               &
@@ -162,7 +162,7 @@
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_v_and_w(nidx_rj(2), sph_bc_U%kr_out,  &
-     &      coef_fdm_free_CMB_vp2, coef_fdm_free_CMB_vt2,               &
+     &      fdm2_free_vp_CMB, fdm2_free_vt_CMB,                         &
      &      ipol%i_velo, ipol%i_vort)
       else
         call cal_sph_nod_cmb_rigid_v_and_w                              &
@@ -254,7 +254,7 @@
 !
       if     (sph_bc_U%iflag_icb .eq. iflag_free_slip) then
         call cal_sph_nod_icb_free_vpol2(nidx_rj(2), sph_bc_U%kr_in,     &
-     &      coef_fdm_free_ICB_vp2, i_field)
+     &      fdm2_free_vp_ICB, i_field)
       else if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_sph_nod_icb_rotate_velo2                               &
      &     (idx_rj_degree_zero, idx_rj_degree_one, nidx_rj(2),          &
@@ -266,7 +266,7 @@
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
         call cal_sph_nod_cmb_free_vpol2(nidx_rj(2), sph_bc_U%kr_out,    &
-     &      coef_fdm_free_CMB_vp2, i_field)
+     &      fdm2_free_vp_CMB, i_field)
       else
         call cal_sph_nod_cmb_rigid_velo2(nidx_rj(2),                    &
      &      sph_bc_U%kr_out, sph_bc_U%r_CMB, vt_CMB_bc, i_field)
@@ -347,8 +347,10 @@
       call cal_sph_nod_gradient_2(nlayer_ICB, nlayer_CMB,               &
      &    d_rj(1,ipol%i_press), d_rj(1,ipol%i_press_grad) )
 !
-      call delete_bc_rj_vector(nlayer_ICB, ipol%i_press_grad)
-      call delete_bc_rj_vector(nlayer_CMB, ipol%i_press_grad)
+      call delete_bc_rj_vector(nidx_rj(2), nlayer_ICB,                  &
+     &    ipol%i_press_grad)
+      call delete_bc_rj_vector(nidx_rj(2), nlayer_CMB,                  &
+     &    ipol%i_press_grad)
 !
 !$omp parallel
       call ovwrt_rj_coef_prod_vect_smp( (-coef_press),                  &

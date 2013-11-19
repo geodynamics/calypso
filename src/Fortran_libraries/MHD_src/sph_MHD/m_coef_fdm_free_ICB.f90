@@ -15,16 +15,16 @@
 !!
 !!    Matrix to evaluate radial derivative of poloidal velocity
 !!    at ICB with free slip boundary
-!!      dfdr =    coef_fdm_free_ICB_vp2( 0,2) * d_rj(ICB  )
-!!              + coef_fdm_free_ICB_vp2( 1,2) * d_rj(ICB+1)
-!!      d2fdr2 =  coef_fdm_free_ICB_vp2( 0,3) * d_rj(ICB  )
-!!              + coef_fdm_free_ICB_vp2( 1,3) * d_rj(ICB+1)
+!!      dfdr =    fdm2_free_vp_ICB( 0,2) * d_rj(ICB  )
+!!              + fdm2_free_vp_ICB( 1,2) * d_rj(ICB+1)
+!!      d2fdr2 =  fdm2_free_vp_ICB( 0,3) * d_rj(ICB  )
+!!              + fdm2_free_vp_ICB( 1,3) * d_rj(ICB+1)
 !!
 !!    Matrix to evaluate radial derivative of toroidal vorticity
 !!    at ICB with free slip boundary
-!!      dfdr =    coef_fdm_free_ICB_vt2( 0,2) * d_rj(ICB  )
-!!      d2fdr2 =  coef_fdm_free_ICB_vt2( 0,3) * d_rj(ICB  )
-!!              + coef_fdm_free_ICB_vt2( 1,3) * d_rj(ICB+1)
+!!      dfdr =    fdm2_free_vt_ICB( 0,2) * d_rj(ICB  )
+!!      d2fdr2 =  fdm2_free_vt_ICB( 0,3) * d_rj(ICB  )
+!!              + fdm2_free_vt_ICB( 1,3) * d_rj(ICB+1)
 !!
 !!    Taylor expansion of free slip boundary at CMB
 !!      dfdr =    mat_fdm_2(2,1) * d_rj(CMB  )
@@ -50,13 +50,13 @@
 !
 !>      Matrix to evaluate radial derivative of poloidal velocity
 !!      at ICB with free slip boundary
-      real(kind = kreal) :: coef_fdm_free_ICB_vp2(0:1,3)
+      real(kind = kreal) :: fdm2_free_vp_ICB(0:1,3)
 !>      Matrix to evaluate radial derivative of toroidal vorticity
 !!      at ICB with free slip boundary
-      real(kind = kreal) :: coef_fdm_free_ICB_vt2(0:1,3)
+      real(kind = kreal) :: fdm2_free_vt_ICB(0:1,3)
 !
 !
-!>      Work matrix to evaluate coef_fdm_free_ICB_vp2(0:1,3)
+!>      Work matrix to evaluate fdm2_free_vp_ICB(0:1,3)
 !!@verbatim
 !!      dfdr =    mat_fdm_ICB_free_vp(2,1) * d_rj(ICB  )
 !!              + mat_fdm_ICB_free_vp(2,3) * d_rj(ICB+1)
@@ -65,7 +65,7 @@
 !!@endverbatim
       real(kind = kreal) :: mat_fdm_ICB_free_vp(3,3)
 !
-!>      Work matrix to evaluate coef_fdm_free_ICB_vt2(0:1,3)
+!>      Work matrix to evaluate fdm2_free_vt_ICB(0:1,3)
 !!@verbatim
 !!      dfdr =    mat_fdm_ICB_free_vt(2,1) * d_rj(ICB  )
 !!              + mat_fdm_ICB_free_vt(2,3) * d_rj(ICB+1)
@@ -114,12 +114,12 @@
      &             r_from_ICB(0)
       end if
 !
-      coef_fdm_free_ICB_vp2(0,1) = one
-      coef_fdm_free_ICB_vp2(1,1) = zero
-      coef_fdm_free_ICB_vp2(0,2) = mat_fdm_ICB_free_vp(2,1)
-      coef_fdm_free_ICB_vp2(1,2) = mat_fdm_ICB_free_vp(2,3)
-      coef_fdm_free_ICB_vp2(0,3) = mat_fdm_ICB_free_vp(3,1)
-      coef_fdm_free_ICB_vp2(1,3) = mat_fdm_ICB_free_vp(3,3)
+      fdm2_free_vp_ICB(0,1) = one
+      fdm2_free_vp_ICB(1,1) = zero
+      fdm2_free_vp_ICB(0,2) = mat_fdm_ICB_free_vp(2,1)
+      fdm2_free_vp_ICB(1,2) = mat_fdm_ICB_free_vp(2,3)
+      fdm2_free_vp_ICB(0,3) = mat_fdm_ICB_free_vp(3,1)
+      fdm2_free_vp_ICB(1,3) = mat_fdm_ICB_free_vp(3,3)
 !
       end subroutine cal_2nd_ICB_free_vp_bc_fdm
 !
@@ -157,12 +157,12 @@
      &             r_from_ICB(0)
       end if
 !
-      coef_fdm_free_ICB_vt2(0,1) = one
-      coef_fdm_free_ICB_vt2(1,1) = zero
-      coef_fdm_free_ICB_vt2(0,2) = mat_fdm_ICB_free_vt(2,1)
-      coef_fdm_free_ICB_vt2(1,2) = zero
-      coef_fdm_free_ICB_vt2(0,3) = mat_fdm_ICB_free_vt(3,1)
-      coef_fdm_free_ICB_vt2(1,3) = mat_fdm_ICB_free_vt(3,3)
+      fdm2_free_vt_ICB(0,1) = one
+      fdm2_free_vt_ICB(1,1) = zero
+      fdm2_free_vt_ICB(0,2) = mat_fdm_ICB_free_vt(2,1)
+      fdm2_free_vt_ICB(1,2) = zero
+      fdm2_free_vt_ICB(0,3) = mat_fdm_ICB_free_vt(3,1)
+      fdm2_free_vt_ICB(1,3) = mat_fdm_ICB_free_vt(3,3)
 !
       end subroutine cal_2nd_ICB_free_vt_bc_fdm
 !
@@ -171,21 +171,21 @@
       subroutine check_coef_fdm_free_ICB
 !
 !
-      write(50,*) ' coef_fdm_free_ICB_vp2'
+      write(50,*) ' fdm2_free_vp_ICB'
       write(50,*) ' mat_fdm11,  mat_fdm12'
-      write(50,'(1p9E25.15e3)') coef_fdm_free_ICB_vp2(0:1,1)
+      write(50,'(1p9E25.15e3)') fdm2_free_vp_ICB(0:1,1)
       write(50,*) ' mat_fdm21,  mat_fdm22'
-      write(50,'(1p9E25.15e3)') coef_fdm_free_ICB_vp2(0:1,2)
+      write(50,'(1p9E25.15e3)') fdm2_free_vp_ICB(0:1,2)
       write(50,*) ' mat_fdm31,  mat_fdm32'
-      write(50,'(1p9E25.15e3)') coef_fdm_free_ICB_vp2(0:1,3)
+      write(50,'(1p9E25.15e3)') fdm2_free_vp_ICB(0:1,3)
 !
-      write(50,*) ' coef_fdm_free_ICB_vt2'
+      write(50,*) ' fdm2_free_vt_ICB'
       write(50,*) ' mat_fdm11,  mat_fdm12'
-      write(50,'(1p9E25.15e3)') coef_fdm_free_ICB_vt2(0:1,1)
+      write(50,'(1p9E25.15e3)') fdm2_free_vt_ICB(0:1,1)
       write(50,*) ' mat_fdm21,  mat_fdm22'
-      write(50,'(1p9E25.15e3)') coef_fdm_free_ICB_vt2(0:1,2)
+      write(50,'(1p9E25.15e3)') fdm2_free_vt_ICB(0:1,2)
       write(50,*) ' mat_fdm31,  mat_fdm32'
-      write(50,'(1p9E25.15e3)') coef_fdm_free_ICB_vt2(0:1,3)
+      write(50,'(1p9E25.15e3)') fdm2_free_vt_ICB(0:1,3)
 !
       end subroutine check_coef_fdm_free_ICB
 !

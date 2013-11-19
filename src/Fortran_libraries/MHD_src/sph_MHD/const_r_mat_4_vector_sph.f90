@@ -34,6 +34,8 @@
       subroutine const_radial_mat_vort_2step
 !
       use m_boundary_params_sph_MHD
+      use m_coef_fdm_free_ICB
+      use m_coef_fdm_free_CMB
       use m_ludcmp_band
       use set_free_slip_sph_mat_bc
       use set_non_slip_sph_mat_bc
@@ -66,17 +68,24 @@
      &    p_poisson_mat)
 !
       if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
-        call set_free_slip_icb_vt_sph_mat
-        call set_free_icb_vp_poisson3_mat
+        call free_slip_icb_vt_sph_mat(nidx_rj(1), nidx_rj(2),           &
+     &      sph_bc_U%kr_in, sph_bc_U%r_ICB, fdm2_free_vt_ICB,           &
+     &      vt_evo_mat)
+        call free_icb_vp_poisson3_mat(nidx_rj(1), nidx_rj(2),           &
+     &      sph_bc_U%kr_in, sph_bc_U%r_ICB, fdm2_free_vp_ICB,           &
+     &      vs_poisson_mat)
       else
-        call set_non_slip_icb_vt_sph_mat
-        call set_rgd_icb_vp_poisson3_mat
+        call set_non_slip_icb_vt_sph_mat(nidx_rj(1), nidx_rj(2),        &
+     &      sph_bc_U%kr_in, vt_evo_mat)
+        call set_rgd_icb_vp_poisson3_mat(nidx_rj(1), nidx_rj(2),        &
+     &      sph_bc_U%kr_in, sph_bc_U%r_ICB, sph_bc_U%fdm2_fix_dr_ICB,   &
+     &      vs_poisson_mat)
       end if
 !
 !   Overwrite rotation for inner core
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        call set_icore_viscous_matrix
+        call set_icore_viscous_matrix(sph_bc_U%kr_in)
       end if
 !
 !   Boundary condition for CMB
@@ -89,11 +98,18 @@
      &    p_poisson_mat)
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
-        call set_free_slip_cmb_vt_sph_mat
-        call set_free_cmb_vp_poisson3_mat
+        call free_slip_cmb_vt_sph_mat(nidx_rj(1), nidx_rj(2),           &
+     &      sph_bc_U%kr_out, sph_bc_U%r_CMB, fdm2_free_vt_CMB,          &
+     &      vt_evo_mat)
+        call free_cmb_vp_poisson3_mat(nidx_rj(1), nidx_rj(2),           &
+     &      sph_bc_U%kr_out, sph_bc_U%r_CMB, fdm2_free_vp_CMB,          &
+     &      vs_poisson_mat)
       else
-        call set_non_slip_cmb_vt_sph_mat
-        call set_rgd_cmb_vp_poisson3_mat
+        call set_non_slip_cmb_vt_sph_mat(nidx_rj(1), nidx_rj(2),        &
+     &      sph_bc_U%kr_out, vt_evo_mat)
+        call set_rgd_cmb_vp_poisson3_mat(nidx_rj(1), nidx_rj(2),        &
+     &      sph_bc_U%kr_out, sph_bc_U%r_CMB, sph_bc_U%fdm2_fix_dr_CMB,  &
+     &      vs_poisson_mat)
       end if
 !
 !

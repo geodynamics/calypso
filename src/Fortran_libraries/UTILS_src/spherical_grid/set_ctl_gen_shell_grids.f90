@@ -247,6 +247,17 @@
         stop
       end if
 !
+      if(ndomain_rtm(1) .ne. ndomain_rtp(1)) then
+        write(*,*) 'Set same number of radial subdomains'
+        write(*,*) 'for Legendre transform and spherical grids'
+        stop
+      end if
+!
+      if(mod(nidx_global_rtp(3),2) .ne. 0) then
+        write(*,*) 'Set even number for the number of zonal grids'
+        stop
+      end if
+!
       end subroutine s_set_control_4_gen_shell_grids
 !
 !  ---------------------------------------------------------------------
