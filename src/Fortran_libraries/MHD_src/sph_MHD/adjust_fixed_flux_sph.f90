@@ -20,11 +20,8 @@
       use m_precision
 !
       use m_constants
-      use m_spheric_parameter
 !
       implicit none
-!
-       private :: adjust_in_fixed_flux_sph, adjust_out_fixed_flux_sph
 !
 ! -----------------------------------------------------------------------
 !
@@ -32,78 +29,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine adjust_icb_fix_h_flux_sph
-!
-      use m_t_int_parameter
-      use m_physical_property
-      use m_sph_phys_address
-      use m_coef_fdm_fixed_ICB
-      use m_boundary_params_sph_MHD
-!
-!
-      call adjust_in_fixed_flux_sph(nidx_rj(2), coef_fdm_fix_dr_ICB_2,  &
-     &    nlayer_ICB, sph_bc_T%ICB_flux, coef_d_temp, coef_imp_t, dt,   &
-     &    ipol%i_temp)
-!
-      end subroutine adjust_icb_fix_h_flux_sph
-!
-! -----------------------------------------------------------------------
-!
-      subroutine adjust_cmb_fix_h_flux_sph
-!
-      use m_t_int_parameter
-      use m_physical_property
-      use m_sph_phys_address
-      use m_coef_fdm_fixed_CMB
-      use m_boundary_params_sph_MHD
-!
-!
-      call adjust_out_fixed_flux_sph(nidx_rj(2), coef_fdm_fix_dr_CMB_2, &
-     &    nlayer_CMB, sph_bc_T%CMB_flux, coef_d_temp, coef_imp_t, dt,   &
-     &    ipol%i_temp)
-!
-      end subroutine adjust_cmb_fix_h_flux_sph
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine adjust_icb_fix_c_flux_sph
-!
-      use m_t_int_parameter
-      use m_physical_property
-      use m_sph_phys_address
-      use m_coef_fdm_fixed_ICB
-      use m_boundary_params_sph_MHD
-!
-!
-      call adjust_in_fixed_flux_sph(nidx_rj(2), coef_fdm_fix_dr_ICB_2,  &
-     &    nlayer_ICB, sph_bc_C%ICB_flux, coef_d_light, coef_imp_c, dt,  &
-     &    ipol%i_light)
-!
-      end subroutine adjust_icb_fix_c_flux_sph
-!
-! -----------------------------------------------------------------------
-!
-      subroutine adjust_cmb_fix_c_flux_sph
-!
-      use m_t_int_parameter
-      use m_physical_property
-      use m_sph_phys_address
-      use m_coef_fdm_fixed_CMB
-      use m_boundary_params_sph_MHD
-!
-!
-      call adjust_out_fixed_flux_sph(nidx_rj(2), coef_fdm_fix_dr_CMB_2, &
-     &    nlayer_CMB, sph_bc_C%CMB_flux, coef_d_light, coef_imp_c, dt,  &
-     &    ipol%i_light)
-!
-      end subroutine adjust_cmb_fix_c_flux_sph
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine adjust_in_fixed_flux_sph(jmax, coef_fdm_fix_dr_in_2,   &
-     &          kr_in, flux_IN, coef_diffusion, coef_imp, dt, is_fld)
+      subroutine adjust_in_fixed_flux_sph(jmax, kr_in, r_ICB,           &
+     &          fdm2_fix_dr_ICB, flux_IN, coef_diffusion,               &
+     &          coef_imp, dt, is_fld)
 !
       use m_sph_spectr_data
 !
@@ -111,19 +39,20 @@
       integer(kind = kint), intent(in) :: is_fld
       real(kind = kreal), intent(in) :: coef_diffusion, coef_imp, dt
       real(kind = kreal), intent(in) :: flux_IN(jmax)
-      real(kind = kreal), intent(in) :: coef_fdm_fix_dr_in_2(-1:1,3)
+      real(kind = kreal), intent(in) :: r_ICB(0:2)
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_ICB(-1:1,3)
 !
       integer(kind = kint) :: inod, j
 !
 !
 !$omp parallel do private(inod)
-      do j = 1, nidx_rj(2)
-        inod = j + (kr_in-1) * nidx_rj(2)
+      do j = 1, jmax
+        inod = j + (kr_in-1) * jmax
 !
         d_rj(inod,is_fld) =  d_rj(inod,is_fld)                          &
      &                     + dt * coef_imp * coef_diffusion             &
-     &                      * ( coef_fdm_fix_dr_in_2(-1,3)              &
-     &                       + two*ar_1d_rj(kr_in,1) ) * flux_IN(j)
+     &                      * ( fdm2_fix_dr_ICB(-1,3)                   &
+     &                       + two*r_ICB(1) ) * flux_IN(j)
 !
       end do
 !$omp end parallel do
@@ -132,28 +61,30 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine adjust_out_fixed_flux_sph(jmax, coef_fdm_fix_dr_out_2, &
-     &          kr_out, flux_OUT, coef_diffusion, coef_imp, dt, is_fld)
+      subroutine adjust_out_fixed_flux_sph(jmax, kr_out, r_CMB,         &
+     &          fdm2_fix_dr_CMB, flux_OUT, coef_diffusion,              &
+     &          coef_imp,  dt, is_fld)
 !
       use m_sph_spectr_data
 !
       integer(kind = kint), intent(in) :: jmax, kr_out
       integer(kind = kint), intent(in) :: is_fld
       real(kind = kreal), intent(in) :: coef_diffusion, coef_imp, dt
-      real(kind = kreal), intent(in) :: coef_fdm_fix_dr_out_2(-1:1,3)
       real(kind = kreal), intent(in) :: flux_OUT(jmax)
+      real(kind = kreal), intent(in) :: r_CMB(0:2)
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_CMB(-1:1,3)
 !
       integer(kind = kint) :: inod, j
 !
 !
 !$omp parallel do private(inod)
-      do j = 1, nidx_rj(2)
-        inod = j + (kr_out-1) * nidx_rj(2)
+      do j = 1, jmax
+        inod = j + (kr_out-1) * jmax
 !
         d_rj(inod,is_fld) = d_rj(inod,is_fld)                           &
      &                     + dt * coef_imp * coef_diffusion             &
-     &                      * (coef_fdm_fix_dr_out_2( 1,3)              &
-     &                       + two*ar_1d_rj(kr_out,1) ) * flux_OUT(j)
+     &                      * (fdm2_fix_dr_CMB( 1,3)                    &
+     &                       + two*r_CMB(1) ) * flux_OUT(j)
 !
       end do
 !$omp end parallel do

@@ -239,13 +239,20 @@
       use adjust_fixed_flux_sph
 !
       if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
-        call adjust_icb_fix_h_flux_sph
+        call adjust_in_fixed_flux_sph(nidx_rj(2),                       &
+     &      sph_bc_T%kr_in, sph_bc_T%r_ICB, sph_bc_T%fdm2_fix_dr_ICB,   &
+     &      sph_bc_T%ICB_flux, coef_d_temp, coef_imp_t, dt,             &
+     &      ipol%i_temp)
       else
         call set_fixed_scalar_sph(nidx_rj(2), ione, nlayer_ICB,         &
      &      ipol%i_temp, sph_bc_T%ICB_fld)
       end if
 !
       if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
+        call adjust_out_fixed_flux_sph(nidx_rj(2),                      &
+     &      sph_bc_T%kr_out, sph_bc_T%r_CMB, sph_bc_T%fdm2_fix_dr_CMB,  &
+     &      sph_bc_T%CMB_flux, coef_d_temp, coef_imp_t, dt,             &
+     &      ipol%i_temp)
         call adjust_cmb_fix_h_flux_sph
       else
         call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),   &
@@ -268,13 +275,20 @@
 !
 !
       if (sph_bc_C%iflag_icb .eq. iflag_fixed_flux) then
-        call adjust_icb_fix_c_flux_sph
+        call adjust_in_fixed_flux_sph(nidx_rj(2),                       &
+     &      sph_bc_C%kr_in, sph_bc_C%r_ICB, sph_bc_C%fdm2_fix_dr_ICB,   &
+     &      sph_bc_C%ICB_flux, coef_d_light, coef_imp_c, dt,            &
+     &      ipol%i_light)
       else
         call set_fixed_scalar_sph(nidx_rj(2), ione, nlayer_ICB,         &
      &      ipol%i_light, sph_bc_C%ICB_fld)
       end if
 !
       if (sph_bc_C%iflag_cmb .eq. iflag_fixed_flux) then
+        call adjust_out_fixed_flux_sph(nidx_rj(2),                      &
+     &      sph_bc_C%kr_out, sph_bc_C%r_CMB, sph_bc_C%fdm2_fix_dr_CMB,  &
+     &      sph_bc_C%CMB_flux, coef_d_light, coef_imp_c, dt,            &
+     &      ipol%i_light)
         call adjust_cmb_fix_c_flux_sph
       else
         call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),   &
