@@ -51,6 +51,8 @@
 !
       subroutine pressure_4_sph_mhd
 !
+      use m_sph_phys_address
+      use m_boundary_params_sph_MHD
       use cal_sol_sph_fluid_crank
 !
       use cal_sph_field_by_rotation
@@ -71,7 +73,8 @@
 !
       if(ipol%i_press_grad .gt. 0) then
         if (iflag_debug.eq.1) write(*,*) 'const_pressure_gradient'
-        call const_pressure_gradient
+        call const_pressure_gradient                                    &
+     &     (sph_bc_U, ipol%i_press, ipol%i_press_grad)
       end if
 !
       end subroutine pressure_4_sph_mhd

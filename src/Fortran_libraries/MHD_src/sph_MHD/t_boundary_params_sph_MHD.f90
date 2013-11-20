@@ -39,6 +39,19 @@
       integer(kind = kint), parameter :: iflag_sph_fix_center =  42
 !
 !
+!>      integer flag for fixed velocity boundary at inner core
+      integer(kind = kint), parameter :: iflag_fixed_velo = 0
+!>      integer flag for free-slip boundary at inner core
+      integer(kind = kint), parameter :: iflag_free_slip =  1
+!>      integer flag for rotatable inner core
+      integer(kind = kint), parameter :: iflag_rotatable_ic = 10
+!
+!>      integer flag for insulated magnetic boundary
+      integer(kind = kint), parameter :: iflag_sph_insulator =   0
+!>      integer flag for pseudo vacuum magnetic boundary
+      integer(kind = kint), parameter :: iflag_radial_magne =   11
+!
+!
 !>      Structure for basic boundary condition parameters
       type sph_boundary_type
 !>        boundary condition flag at ICB

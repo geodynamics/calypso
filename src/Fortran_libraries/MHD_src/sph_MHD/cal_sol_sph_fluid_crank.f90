@@ -97,7 +97,7 @@
 !      write(my_rank+70,*) 'k, j, inod, vp_rhs, vt_rhs'
 !      do j = 1, nidx_rj(2)
 !        j = 3
-!        do k = 1, nlayer_CMB
+!        do k = 1, sph_bc_U%kr_out
 !          inod = (k-1)*nidx_rj(2) + j
 !          write(my_rank+70,*) k, j, inod,                              &
 !     &                 d_rj(inod,ipol%i_velo), d_rj(inod,itor%i_velo)
@@ -112,12 +112,12 @@
      &    nidx_rj(2), nidx_rj(1), vt_evo_lu,                            &
      &    i_vt_pivot, d_rj(1,itor%i_velo) )
 !
-      call const_grad_vp_and_vorticity
+      call const_grad_vp_and_vorticity(ipol%i_velo, ipol%i_vort)
 !
 !      write(my_rank+170,*) 'k, j, vt2, wp2, dwp2'
 !      do j = 1, nidx_rj(2)
 !         j = 6
-!        do k = 1, nlayer_CMB
+!        do k = 1, sph_bc_U%kr_out
 !            inod = (k-1)*nidx_rj(2) + j
 !            write(my_rank+170,'(2i10,1p8E25.15e3)') k, j,              &
 !     &              d_rj(inod,ipol%i_velo),d_rj(inod,itor%i_velo)
@@ -132,6 +132,7 @@
 !
       subroutine cal_sol_pressure_by_div_v
 !
+      use m_boundary_params_sph_MHD
       use set_reference_sph_mhd
 !
 !      integer(kind = kint) :: k, inod, icmb
@@ -139,7 +140,7 @@
 !
 !      if (idx_rj_degree_zero .gt. 0) then
 !        write(170,*) 'k, j=0, inod, div_v'
-!        do k = 1, nlayer_CMB
+!        do k = 1, sph_bc_U%kr_out
 !            inod = (k-1)*nidx_rj(2) + idx_rj_degree_zero
 !            write(170,'(2i10,1p3E25.15e3)') k,                         &
 !     &              idx_rj_degree_zero, d_rj(inod,ipol%i_press)
@@ -147,7 +148,7 @@
 !      end if
 !      if (idx_rj_degree_one(0).gt.0) then
 !        write(171,*) 'k, j=2, inod, div_v'
-!        do k = 1, nlayer_CMB
+!        do k = 1, sph_bc_U%kr_out
 !            inod = (k-1)*nidx_rj(2) + idx_rj_degree_one(0)
 !            write(171,'(2i10,1p3E25.15e3)') k,                         &
 !     &              idx_rj_degree_one(0), d_rj(inod,ipol%i_press)
@@ -161,8 +162,8 @@
       call adjust_by_ave_pressure_on_CMB
 !
 !      if (idx_rj_degree_zero .gt. 0) then
-!        icmb = (nlayer_CMB-1)*nidx_rj(2) + idx_rj_degree_zero
-!        do k = 1, nlayer_CMB
+!        icmb = (sph_bc_U%kr_out-1)*nidx_rj(2) + idx_rj_degree_zero
+!        do k = 1, sph_bc_U%kr_out
 !          inod = (k-1)*nidx_rj(2) + idx_rj_degree_zero
 !          d_rj(inod,ipol%i_press) = d_rj(inod,ipol%i_press)            &
 !     &                         - d_rj(icmb,ipol%i_press)
@@ -171,7 +172,7 @@
 !
 !      if (idx_rj_degree_zero .gt. 0) then
 !        write(170,*) 'k, j=0, inod, press'
-!        do k = 1, nlayer_CMB
+!        do k = 1, sph_bc_U%kr_out
 !            inod = (k-1)*nidx_rj(2) + idx_rj_degree_zero
 !            write(170,'(2i10,1p3E25.15e3)') k,                         &
 !     &              idx_rj_degree_zero, d_rj(inod,ipol%i_press)
@@ -179,7 +180,7 @@
 !      end if
 !      if (idx_rj_degree_one(0).gt.0) then
 !        write(171,*) 'k, j=2, inod, press'
-!        do k = 1, nlayer_CMB
+!        do k = 1, sph_bc_U%kr_out
 !            inod = (k-1)*nidx_rj(2) + idx_rj_degree_one(0)
 !            write(171,'(2i10,1p3E25.15e3)') k,                         &
 !     &              idx_rj_degree_one(0), d_rj(inod,ipol%i_press)
@@ -226,7 +227,8 @@
      &    nidx_rj(2), nidx_rj(1), bt_evo_lu, i_bt_pivot,                &
      &    d_rj(1,itor%i_magne) )
 !
-      call const_grad_bp_and_current
+      call const_grad_bp_and_current                                    &
+     &   (sph_bc_B, ipol%i_magne, ipol%i_current)
 !
       end subroutine cal_sol_magne_sph_crank
 !
