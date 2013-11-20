@@ -81,7 +81,7 @@
 !
 !
       if (iflag_debug.eq.1) write(*,*) 's_trans_sph_velo_4_coriolis'
-      call s_trans_sph_velo_4_coriolis
+      call s_trans_sph_velo_4_coriolis(sph_bc_U%kr_in, sph_bc_U%kr_out)
 !
       call s_sum_rot_coriolis_rj_sph(sph_bc_U%kr_in, sph_bc_U%kr_out,   &
      &    coef_cor)

@@ -7,8 +7,11 @@
 !>@brief  Data transfer to evaluate Coriolis term
 !!
 !!@verbatim
-!!      subroutine s_trans_sph_velo_4_coriolis
+!!      subroutine s_trans_sph_velo_4_coriolis(kr_in, kr_out)
 !!@endverbatim
+!!
+!!@n @param kr_in       Radial ID for inner boundary
+!!@n @param kr_out      Radial ID for outer boundary
 !
       module trans_sph_velo_4_coriolis
 !
@@ -30,12 +33,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_trans_sph_velo_4_coriolis
+      subroutine s_trans_sph_velo_4_coriolis(kr_in, kr_out)
 !
       use solver_sph_coriolis_sr
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
-      call copy_sph_diff_velocties
+!
+      call copy_sph_diff_velocties(kr_in, kr_out)
 !
       call solver_sph_coriolis_sr_5(nshift_j_cor,                       &
      &     nidx_rj(2), nidx_rj(1), d_rj_cor(1,1),                       &
@@ -46,15 +51,16 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_sph_diff_velocties
+      subroutine copy_sph_diff_velocties(kr_in, kr_out)
 !
       use m_schmidt_poly_on_rtm
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
       integer(kind = kint) :: ist, ied, i, k, j
 !
 !
-      ist = (nlayer_ICB-1)*nidx_rj(2) + 1
-      ied = nlayer_CMB * nidx_rj(2)
+      ist = (kr_in-1)*nidx_rj(2) + 1
+      ied = kr_out * nidx_rj(2)
 !$omp parallel do private(k,j)
       do i = ist, ied
         j = mod((i-1),nidx_rj(2)) + 1

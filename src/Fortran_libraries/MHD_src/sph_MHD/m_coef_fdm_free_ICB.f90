@@ -8,8 +8,8 @@
 !!       at CMB with free slip boundary
 !!
 !!@verbatim
-!!      subroutine cal_2nd_ICB_free_vp_bc_fdm(r_from_ICB)
-!!      subroutine cal_2nd_ICB_free_vt_bc_fdm(r_from_ICB)
+!!      subroutine cal_fdm2_ICB_free_vp(r_from_ICB)
+!!      subroutine cal_fdm2_ICB_free_vt(r_from_ICB)
 !!
 !!      subroutine check_coef_fdm_free_ICB
 !!
@@ -82,7 +82,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_2nd_ICB_free_vp_bc_fdm(r_from_ICB)
+      subroutine cal_fdm2_ICB_free_vp(r_from_ICB)
 !
       real(kind = kreal), intent(in) :: r_from_ICB(0:1)
 !
@@ -121,11 +121,11 @@
       fdm2_free_vp_ICB(0,3) = mat_fdm_ICB_free_vp(3,1)
       fdm2_free_vp_ICB(1,3) = mat_fdm_ICB_free_vp(3,3)
 !
-      end subroutine cal_2nd_ICB_free_vp_bc_fdm
+      end subroutine cal_fdm2_ICB_free_vp
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_2nd_ICB_free_vt_bc_fdm(r_from_ICB)
+      subroutine cal_fdm2_ICB_free_vt(r_from_ICB)
 !
       real(kind = kreal), intent(in) :: r_from_ICB(0:1)
 !
@@ -164,7 +164,7 @@
       fdm2_free_vt_ICB(0,3) = mat_fdm_ICB_free_vt(3,1)
       fdm2_free_vt_ICB(1,3) = mat_fdm_ICB_free_vt(3,3)
 !
-      end subroutine cal_2nd_ICB_free_vt_bc_fdm
+      end subroutine cal_fdm2_ICB_free_vt
 !
 ! -----------------------------------------------------------------------
 !

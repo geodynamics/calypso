@@ -172,16 +172,6 @@
       vt_evo_mat(2,1:nri,1:jmax) = 1.0d0
       wt_evo_mat(2,1:nri,1:jmax) = 1.0d0
 !
-      if(nlayer_ICB .gt. 1) then
-        p_poisson_mat(2,1:nlayer_ICB-1,1:jmax) =  1.0d0
-        vs_poisson_mat(2,1:nlayer_ICB-1,1:jmax) = 1.0d0
-      end if
-!
-      if(nlayer_CMB .lt. nri) then
-        p_poisson_mat(2,nlayer_CMB+1:nri,1:jmax) =  1.0d0
-        vs_poisson_mat(2,nlayer_CMB+1:nri,1:jmax) = 1.0d0
-      end if
-!
       end subroutine allocate_velo_mat_sph
 !
 ! -----------------------------------------------------------------------

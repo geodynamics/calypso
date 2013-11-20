@@ -8,8 +8,8 @@
 !!       at CMB with free slip boundary
 !!
 !!@verbatim
-!!      subroutine cal_2nd_CMB_free_vp_bc_fdm(r_from_CMB)
-!!      subroutine cal_2nd_CMB_free_vt_bc_fdm(r_from_CMB)
+!!      subroutine cal_fdm2_CMB_free_vp(r_from_CMB)
+!!      subroutine cal_fdm2_CMB_free_vt(r_from_CMB)
 !!
 !!      subroutine check_coef_fdm_free_CMB
 !!
@@ -82,7 +82,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_2nd_CMB_free_vp_bc_fdm(r_from_CMB)
+      subroutine cal_fdm2_CMB_free_vp(r_from_CMB)
 !
       real(kind = kreal) :: r_from_CMB(-1:0)
 !
@@ -122,11 +122,11 @@
       fdm2_free_vp_CMB(0, 3) = mat_fdm_CMB_free_vp(3,1)
       fdm2_free_vp_CMB(-1,3) = mat_fdm_CMB_free_vp(3,3)
 !
-      end subroutine cal_2nd_CMB_free_vp_bc_fdm
+      end subroutine cal_fdm2_CMB_free_vp
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_2nd_CMB_free_vt_bc_fdm(r_from_CMB)
+      subroutine cal_fdm2_CMB_free_vt(r_from_CMB)
 !
       real(kind = kreal) :: r_from_CMB(-1:0)
 !
@@ -166,7 +166,7 @@
       fdm2_free_vt_CMB(0, 3) = mat_fdm_CMB_free_vt(3,1)
       fdm2_free_vt_CMB(-1,3) = mat_fdm_CMB_free_vt(3,3)
 !
-      end subroutine cal_2nd_CMB_free_vt_bc_fdm
+      end subroutine cal_fdm2_CMB_free_vt
 !
 ! -----------------------------------------------------------------------
 !

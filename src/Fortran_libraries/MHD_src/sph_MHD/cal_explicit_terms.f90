@@ -11,16 +11,19 @@
 !!      subroutine cal_diff_induction_wSGS_adams
 !!      subroutine cal_diff_induction_MHD_euler
 !!
-!!      subroutine sel_heat_diff_adv_src_adams
-!!      subroutine sel_heat_diff_adv_src_euler
+!!      subroutine sel_heat_diff_adv_src_adams(kr_in, kr_out)
+!!      subroutine sel_heat_diff_adv_src_euler(kr_in, kr_out)
 !!
-!!      subroutine sel_light_diff_adv_src_adams
-!!      subroutine sel_light_diff_adv_src_euler
+!!      subroutine sel_light_diff_adv_src_adams(kr_in, kr_out)
+!!      subroutine sel_light_diff_adv_src_euler(kr_in, kr_out)
 !!
 !!      subroutine set_ini_adams_mag_induct
-!!      subroutine sel_ini_adams_heat_w_src
-!!      subroutine sel_ini_adams_light_w_src
+!!      subroutine sel_ini_adams_heat_w_src(kr_in, kr_out)
+!!      subroutine sel_ini_adams_light_w_src(kr_in, kr_out)
 !!@endverbatim
+!!
+!!@n @param kr_in       Radial ID for inner boundary
+!!@n @param kr_out      Radial ID for outer boundary
 !
       module cal_explicit_terms
 !
@@ -137,13 +140,15 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine sel_heat_diff_adv_src_adams
+      subroutine sel_heat_diff_adv_src_adams(kr_in, kr_out)
 !
       use m_physical_property
       use cal_diff_adv_src_explicit
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
-      call sel_scalar_diff_adv_src_adams(nlayer_ICB, nlayer_CMB,        &
+!
+      call sel_scalar_diff_adv_src_adams(kr_in, kr_out,                 &
      &    ipol%i_t_diffuse, ipol%i_h_advect, ipol%i_heat_source,        &
      &    ipol%i_temp, ipol%i_pre_heat, coef_exp_t, coef_h_src)
 !
@@ -151,13 +156,15 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine sel_heat_diff_adv_src_euler
+      subroutine sel_heat_diff_adv_src_euler(kr_in, kr_out)
 !
       use m_physical_property
       use cal_diff_adv_src_explicit
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
-      call sel_scalar_diff_adv_src_euler(nlayer_ICB, nlayer_CMB,        &
+!
+      call sel_scalar_diff_adv_src_euler(kr_in, kr_out,                 &
      &    ipol%i_t_diffuse, ipol%i_h_advect, ipol%i_heat_source,        &
      &    ipol%i_temp, coef_exp_t, coef_h_src)
 !
@@ -166,13 +173,15 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine sel_light_diff_adv_src_adams
+      subroutine sel_light_diff_adv_src_adams(kr_in, kr_out)
 !
       use m_physical_property
       use cal_diff_adv_src_explicit
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
-      call sel_scalar_diff_adv_src_adams(nlayer_ICB, nlayer_CMB,        &
+!
+      call sel_scalar_diff_adv_src_adams(kr_in, kr_out,                 &
      &    ipol%i_c_diffuse, ipol%i_c_advect, ipol%i_light_source,       &
      &    ipol%i_light, ipol%i_pre_composit, coef_exp_c, coef_c_src)
 !
@@ -180,13 +189,15 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine sel_light_diff_adv_src_euler
+      subroutine sel_light_diff_adv_src_euler(kr_in, kr_out)
 !
       use m_physical_property
       use cal_diff_adv_src_explicit
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
-      call sel_scalar_diff_adv_src_euler(nlayer_ICB, nlayer_CMB,        &
+!
+      call sel_scalar_diff_adv_src_euler(kr_in, kr_out,                 &
      &    ipol%i_c_diffuse, ipol%i_c_advect, ipol%i_light_source,       &
      &    ipol%i_light, coef_exp_c, coef_c_src)
 !
@@ -211,13 +222,15 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine sel_ini_adams_heat_w_src
+      subroutine sel_ini_adams_heat_w_src(kr_in, kr_out)
 !
       use m_physical_property
       use cal_diff_adv_src_explicit
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
-      call sel_ini_adams_scalar_w_src(nlayer_ICB, nlayer_CMB,           &
+!
+      call sel_ini_adams_scalar_w_src(kr_in, kr_out,                    &
      &    ipol%i_h_advect, ipol%i_heat_source, ipol%i_pre_heat,         &
      &    coef_h_src)
 !
@@ -225,13 +238,15 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine sel_ini_adams_light_w_src
+      subroutine sel_ini_adams_light_w_src(kr_in, kr_out)
 !
       use m_physical_property
       use cal_diff_adv_src_explicit
 !
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
-      call sel_ini_adams_scalar_w_src(nlayer_ICB, nlayer_CMB,           &
+!
+      call sel_ini_adams_scalar_w_src(kr_in, kr_out,                    &
      &    ipol%i_c_advect, ipol%i_light_source, ipol%i_pre_composit,    &
      &    coef_c_src)
 !

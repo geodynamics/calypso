@@ -43,7 +43,7 @@
 !
 !$omp parallel
       call set_radial_scalar_evo_mat_sph(nidx_rj(1), nidx_rj(2),        &
-     &    nlayer_ICB, nlayer_CMB, coef_imp_t, coef_d_temp,              &
+     &    sph_bc_T%kr_in, sph_bc_T%kr_out, coef_imp_t, coef_d_temp,     &
      &    temp_evo_mat)
 !$omp end parallel
 !
@@ -91,7 +91,7 @@
 !
 !$omp parallel
       call set_radial_scalar_evo_mat_sph(nidx_rj(1), nidx_rj(2),        &
-     &    nlayer_ICB, nlayer_CMB, coef_imp_c, coef_d_light,             &
+     &    sph_bc_C%kr_in, sph_bc_C%kr_out, coef_imp_c, coef_d_light,    &
      &    composit_evo_mat)
 !$omp end parallel
 !

@@ -75,11 +75,11 @@
       call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_T)
       call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_C)
 !
-      call cal_2nd_ICB_free_vp_bc_fdm(radius_1d_rj_r(nlayer_ICB))
-      call cal_2nd_ICB_free_vt_bc_fdm(radius_1d_rj_r(nlayer_ICB))
+      call cal_fdm2_ICB_free_vp(radius_1d_rj_r(sph_bc_U%kr_in))
+      call cal_fdm2_ICB_free_vt(radius_1d_rj_r(sph_bc_U%kr_in))
 !
-      call cal_2nd_CMB_free_vp_bc_fdm(radius_1d_rj_r(nlayer_CMB-1))
-      call cal_2nd_CMB_free_vt_bc_fdm(radius_1d_rj_r(nlayer_CMB-1))
+      call cal_fdm2_CMB_free_vp(radius_1d_rj_r(sph_bc_U%kr_out-1))
+      call cal_fdm2_CMB_free_vt(radius_1d_rj_r(sph_bc_U%kr_out-1))
 !
       call cal_2nd_to_center_fixed_fdm(radius_1d_rj_r(1))
       call cal_2nd_to_center_fix_df_fdm(radius_1d_rj_r(1))
@@ -88,8 +88,8 @@
 !      Set reference temperature and adjust boundary conditions
 !
       call allocate_reft_rj_data
-      call set_ref_temp_sph_mhd
-      call adjust_sph_temp_bc_by_reftemp
+      call set_ref_temp_sph_mhd(sph_bc_T)
+      call adjust_sph_temp_bc_by_reftemp(sph_bc_T)
 !
 !      Check data
 !

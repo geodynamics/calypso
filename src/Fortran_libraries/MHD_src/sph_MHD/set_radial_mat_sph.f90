@@ -17,6 +17,9 @@
 !!      subroutine set_radial_press_mat_sph(nri, jmax, kr_in, kr_out,   &
 !!     &          coef_p, poisson_mat)
 !!
+!!      subroutine set_unit_umat_4_poisson(nri, jmax,                   &
+!!     &          kr_in, kr_out, poisson_mat)
+!!
 !!    Format of band matrix
 !!               | a(2,1)  a(1,2)  ........     0         0     |
 !!               | a(3,1)  a(2,2)  ........     .         .     |
@@ -189,6 +192,39 @@
 !$omp end do nowait
 !
       end subroutine set_radial_press_mat_sph
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_unit_umat_4_poisson(nri, jmax,                     &
+     &          kr_in, kr_out, poisson_mat)
+!
+      integer(kind = kint), intent(in) :: jmax, nri
+      integer(kind = kint), intent(in) :: kr_in, kr_out
+!
+      real(kind = kreal), intent(inout) :: poisson_mat(3,nri,jmax)
+!
+      integer(kind = kint) :: k, j
+!
+!
+!$omp do private (k,j)
+      do j = 1, jmax
+        do k = 1, nri
+          poisson_mat(3,k,j) = zero
+          poisson_mat(1,k,j) = zero
+        end do
+        do k = 1, kr_in-1
+          poisson_mat(2,k,j) = one
+        end do
+        do k = kr_in, kr_out
+          poisson_mat(2,k,j) = zero
+        end do
+        do k = kr_out+1, nri
+          poisson_mat(2,k,j) = one
+        end do
+      end do
+!$omp end do nowait
+!
+      end subroutine set_unit_umat_4_poisson
 !
 ! -----------------------------------------------------------------------
 !

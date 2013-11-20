@@ -48,14 +48,23 @@
 !
 !
 !$omp parallel
+      call set_unit_umat_4_poisson(nidx_rj(1), nidx_rj(2),              &
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, vs_poisson_mat)
+      call set_unit_umat_4_poisson(nidx_rj(1), nidx_rj(2),              &
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, p_poisson_mat)
+!$omp end parallel
+!
+!$omp parallel
       call set_radial_vect_evo_mat_sph(nidx_rj(1), nidx_rj(2),          &
-     &    nlayer_ICB, nlayer_CMB, coef_imp_v, coef_d_velo, vt_evo_mat)
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, coef_imp_v, coef_d_velo,     &
+     &    vt_evo_mat)
       call set_radial_vect_evo_mat_sph(nidx_rj(1), nidx_rj(2),          &
-     &    nlayer_ICB, nlayer_CMB, coef_imp_v, coef_d_velo, wt_evo_mat)
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, coef_imp_v, coef_d_velo,     &
+     &    wt_evo_mat)
       call set_radial_vp3_mat_sph(nidx_rj(1), nidx_rj(2),               &
-     &    nlayer_ICB, nlayer_CMB, vs_poisson_mat)
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, vs_poisson_mat)
       call set_radial_press_mat_sph(nidx_rj(1), nidx_rj(2),             &
-     &    nlayer_ICB, nlayer_CMB, coef_press, p_poisson_mat)
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, coef_press, p_poisson_mat)
 !$omp end parallel
 !
 !   Boundary condition for ICB
@@ -114,7 +123,7 @@
 !
 !
       call cal_mat_product_3band_mul(nidx_rj(1), nidx_rj(2),            &
-     &    nlayer_ICB, nlayer_CMB, wt_evo_mat, vs_poisson_mat,           &
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, wt_evo_mat, vs_poisson_mat,  &
      &    vp_evo_mat)
 !
       if(i_debug .eq. iflag_full_msg)                                   &

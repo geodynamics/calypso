@@ -159,7 +159,7 @@
      &    nidx_rj(2), nidx_rj(1), p_poisson_lu, i_p_pivot,              &
      &    d_rj(1,ipol%i_press) )
 !
-      call adjust_by_ave_pressure_on_CMB
+      call adjust_by_ave_pressure_on_CMB(sph_bc_U%kr_out)
 !
 !      if (idx_rj_degree_zero .gt. 0) then
 !        icmb = (sph_bc_U%kr_out-1)*nidx_rj(2) + idx_rj_degree_zero
@@ -247,7 +247,7 @@
      &      sph_bc_T%ICB_flux, coef_d_temp, coef_imp_t, dt,             &
      &      ipol%i_temp)
       else
-        call set_fixed_scalar_sph(nidx_rj(2), ione, nlayer_ICB,         &
+        call set_fixed_scalar_sph(nidx_rj(2), ione, sph_bc_T%kr_in,     &
      &      ipol%i_temp, sph_bc_T%ICB_fld)
       end if
 !
@@ -257,8 +257,9 @@
      &      sph_bc_T%CMB_flux, coef_d_temp, coef_imp_t, dt,             &
      &      ipol%i_temp)
       else
-        call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),   &
-     &      ipol%i_temp, sph_bc_T%CMB_fld)
+        call set_fixed_scalar_sph                                       &
+     &     (nidx_rj(2), sph_bc_T%kr_out, nidx_rj(1),                    &
+     &     ipol%i_temp, sph_bc_T%CMB_fld)
       end if
 !
       call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &
@@ -283,7 +284,7 @@
      &      sph_bc_C%ICB_flux, coef_d_light, coef_imp_c, dt,            &
      &      ipol%i_light)
       else
-        call set_fixed_scalar_sph(nidx_rj(2), ione, nlayer_ICB,         &
+        call set_fixed_scalar_sph(nidx_rj(2), ione, sph_bc_C%kr_in,     &
      &      ipol%i_light, sph_bc_C%ICB_fld)
       end if
 !
@@ -293,7 +294,8 @@
      &      sph_bc_C%CMB_flux, coef_d_light, coef_imp_c, dt,            &
      &      ipol%i_light)
       else
-        call set_fixed_scalar_sph(nidx_rj(2), nlayer_CMB, nidx_rj(1),   &
+        call set_fixed_scalar_sph                                       &
+     &     (nidx_rj(2), sph_bc_C%kr_out, nidx_rj(1),                    &
      &      ipol%i_light, sph_bc_C%CMB_fld)
       end if
 !

@@ -7,8 +7,8 @@
 !>@brief Evoluve the vorticity equation by explicit scheme 
 !!
 !!@verbatim
-!!      subroutine cal_vorticity_eq_adams
-!!      subroutine cal_vorticity_eq_euler
+!!      subroutine cal_vorticity_eq_adams(kr_in, kr_out)
+!!      subroutine cal_vorticity_eq_euler(kr_in, kr_out)
 !!
 !!      subroutine set_MHD_terms_to_force(it_rot_buo)
 !!      subroutine set_rot_cv_terms_to_force(it_rot_buo)
@@ -20,6 +20,12 @@
 !!
 !!      subroutine set_ini_adams_inertia
 !!@endverbatim
+!!
+!!@n @param kr_in       Radial ID for inner boundary
+!!@n @param kr_out      Radial ID for outer boundary
+!!
+!!@n @param it_rot_buo  Spectr field address
+!!                       for toroidal curl of buodyancy
 !
       module cal_vorticity_terms_adams
 !
@@ -38,15 +44,17 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_vorticity_eq_adams
+      subroutine cal_vorticity_eq_adams(kr_in, kr_out)
 !
       use m_physical_property
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
       integer(kind = kint) :: inod, ist, ied
 !
 !
-      ist = (nlayer_ICB-1)*nidx_rj(2) + 1
-      ied = nlayer_CMB * nidx_rj(2)
+      ist = (kr_in-1)*nidx_rj(2) + 1
+      ied = kr_out * nidx_rj(2)
 !$omp do private (inod)
       do inod = ist, ied
         d_rj(inod,ipol%i_vort) = d_rj(inod,ipol%i_vort)                 &
@@ -67,15 +75,17 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_vorticity_eq_euler
+      subroutine cal_vorticity_eq_euler(kr_in, kr_out)
 !
       use m_physical_property
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
       integer(kind = kint) :: inod, ist, ied
 !
 !
-      ist = (nlayer_ICB-1)*nidx_rj(2) + 1
-      ied = nlayer_CMB * nidx_rj(2)
+      ist = (kr_in-1)*nidx_rj(2) + 1
+      ied = kr_out * nidx_rj(2)
 !$omp do private (inod)
       do inod = ist, ied
         d_rj(inod,ipol%i_vort) = d_rj(inod,ipol%i_vort)                 &

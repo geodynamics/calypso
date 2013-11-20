@@ -33,6 +33,7 @@
       subroutine nonlinear
 !
       use m_sph_phys_address
+      use m_boundary_params_sph_MHD
       use cal_vorticity_terms_adams
       use const_coriolis_sph
 !
@@ -47,7 +48,8 @@
       call nonlinear_by_pseudo_sph
 !
       if (iflag_4_ref_temp .eq. id_sphere_ref_temp) then
-        call add_reftemp_advect_sph_MHD
+        call add_reftemp_advect_sph_MHD                                 &
+     &     (sph_bc_T%kr_in, sph_bc_T%kr_out)
       end if
 !
 !*  ----  set coriolis term
@@ -137,6 +139,7 @@
       subroutine licv_exp
 !
       use m_sph_phys_address
+      use m_boundary_params_sph_MHD
       use cal_nonlinear_sph_MHD
       use cal_vorticity_terms_adams
       use const_coriolis_sph
@@ -159,7 +162,8 @@
 !$omp end parallel do
 !
       if (iflag_4_ref_temp .eq. id_sphere_ref_temp) then
-        call add_reftemp_advect_sph_MHD
+        call add_reftemp_advect_sph_MHD                                 &
+     &     (sph_bc_T%kr_in, sph_bc_T%kr_out)
       end if
 !
 !$omp parallel

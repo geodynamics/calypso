@@ -8,8 +8,11 @@
 !!
 !!@verbatim
 !!      subroutine s_cal_nonlinear_sph_MHD
-!!      subroutine add_reftemp_advect_sph_MHD
+!!      subroutine add_reftemp_advect_sph_MHD(kr_in, kr_out)
 !!@endverbatim
+!!
+!!@n @param kr_in       Radial ID for inner boundary
+!!@n @param kr_out      Radial ID for outer boundary
 !
       module cal_nonlinear_sph_MHD
 !
@@ -77,15 +80,17 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine add_reftemp_advect_sph_MHD
+      subroutine add_reftemp_advect_sph_MHD(kr_in, kr_out)
 !
       use m_schmidt_poly_on_rtm
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
       integer(kind= kint) :: ist, ied, inod, j, k
 !
 !
-      ist = (nlayer_ICB-1)*nidx_rj(2) + 1
-      ied = nlayer_CMB * nidx_rj(2)
+      ist = (kr_in-1)*nidx_rj(2) + 1
+      ied = kr_out * nidx_rj(2)
 !$omp parallel do private (inod,j,k)
       do inod = ist, ied
         j = mod((inod-1),nidx_rj(2)) + 1
