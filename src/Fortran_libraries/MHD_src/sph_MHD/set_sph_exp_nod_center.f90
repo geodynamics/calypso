@@ -7,7 +7,7 @@
 !>@brief  Evaluate field approaching to center
 !!
 !!@verbatim
-!!      subroutine cal_sph_nod_center_b_and_j(is_fld, is_rot)
+!!      subroutine sph_center_fld_and_curl(is_fld, is_rot)
 !!      subroutine cal_dsdr_sph_center_2(is_fld)
 !!      subroutine cal_sph_nod_center_rot2(is_fld, is_rot)
 !!      subroutine cal_sph_nod_center_diffuse2(coef_d,                  &
@@ -40,7 +40,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sph_nod_center_b_and_j(is_fld, is_rot)
+      subroutine sph_center_fld_and_curl(is_fld, is_rot)
 !
       integer(kind = kint), intent(in) :: is_fld
       integer(kind = kint), intent(in) :: is_rot
@@ -69,7 +69,7 @@
       end do
 !$omp end parallel do
 !
-      end subroutine cal_sph_nod_center_b_and_j
+      end subroutine sph_center_fld_and_curl
 !
 ! -----------------------------------------------------------------------
 !

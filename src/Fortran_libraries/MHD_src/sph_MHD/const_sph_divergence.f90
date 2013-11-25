@@ -35,10 +35,10 @@
 !
       use m_spheric_parameter
       use m_sph_spectr_data
+      use m_coef_fdm_to_center
       use t_boundary_params_sph_MHD
       use cal_sph_exp_rotation
-      use cal_sph_exp_fixed_scalar
-      use cal_sph_exp_fixed_flux
+      use select_exp_scalar_bc
 !
       type(sph_boundary_type), intent(in) :: sph_bc
       integer(kind = kint), intent(in) :: is_flux, is_advect
@@ -46,24 +46,7 @@
 !
       call cal_sph_nod_vect_div2(sph_bc%kr_in, sph_bc%kr_out,           &
      &    is_flux, is_advect)
-!
-      if (sph_bc%iflag_icb .eq. iflag_fixed_flux) then
-        call cal_div_sph_in_fix_flux_2(nidx_rj(2), sph_bc%kr_in,        &
-     &      sph_bc%r_ICB, sph_bc%ICB_flux, is_flux, is_advect)
-      else
-        call cal_sph_div_flux_4_fix_in(nidx_rj(2),                      &
-     &      sph_bc%kr_in, sph_bc%r_ICB, sph_bc%fdm2_fix_fld_ICB,        &
-     &      sph_bc%ICB_fld, is_flux, is_advect)
-      end if
-!
-      if (sph_bc%iflag_cmb .eq. iflag_fixed_flux) then
-        call cal_div_sph_out_fix_flux_2(nidx_rj(2), sph_bc%kr_out,      &
-     &      sph_bc%r_CMB, sph_bc%CMB_flux, is_flux, is_advect)
-      else
-        call cal_sph_div_flux_4_fix_out(nidx_rj(2),                     &
-     &      sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_fld_CMB,       &
-     &      sph_bc%CMB_fld, is_flux, is_advect)
-      end if
+      call sel_bc_sph_scalar_advect(sph_bc, is_flux, is_advect)
 !
       end subroutine const_sph_scalar_advect
 !

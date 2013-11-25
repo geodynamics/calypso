@@ -50,13 +50,13 @@
 !
 !>      Matrix to evaluate radial derivative of poloidal velocity
 !!      at CMB with free slip boundary
-      real(kind = kreal) :: fdm2_free_vp_CMB(-1:0,3)
+      real(kind = kreal) :: fdm2_free_vp_CMB(-1:1,3)
 !>      Matrix to evaluate radial derivative of toroidal vorticity
 !!      at CMB with free slip boundary
-      real(kind = kreal) :: fdm2_free_vt_CMB(-1:0,3)
+      real(kind = kreal) :: fdm2_free_vt_CMB(-1:1,3)
 !
 !
-!>      Work matrix to evaluate fdm2_free_vp_CMB(-1:0,3)
+!>      Work matrix to evaluate fdm2_free_vp_CMB(-1:1,3)
 !!@verbatim
 !!      dsdr =    mat_fdm_CMB_free_vp(2,1) * d_rj(ICB  )
 !!              + mat_fdm_CMB_free_vp(2,3) * d_rj(ICB+1)
@@ -65,7 +65,7 @@
 !!@endverbatim
       real(kind = kreal) :: mat_fdm_CMB_free_vp(3,3)
 !
-!>      Work matrix to evaluate fdm2_free_vt_CMB(-1:0,3)
+!>      Work matrix to evaluate fdm2_free_vt_CMB(-1:1,3)
 !!@verbatim
 !!      dtdr =    mat_fdm_CMB_free_vt(2,1) * d_rj(ICB  )
 !!              + mat_fdm_CMB_free_vt(2,3) * d_rj(ICB+1)
@@ -115,10 +115,13 @@
      &            r_from_CMB(0)
       end if
 !
+      fdm2_free_vp_CMB(1, 1) = zero
       fdm2_free_vp_CMB(0, 1) = one
       fdm2_free_vp_CMB(-1,1) = zero
+      fdm2_free_vp_CMB(1, 2) = zero
       fdm2_free_vp_CMB(0, 2) = mat_fdm_CMB_free_vp(2,1)
       fdm2_free_vp_CMB(-1,2) = mat_fdm_CMB_free_vp(2,3)
+      fdm2_free_vp_CMB(1, 3) = zero
       fdm2_free_vp_CMB(0, 3) = mat_fdm_CMB_free_vp(3,1)
       fdm2_free_vp_CMB(-1,3) = mat_fdm_CMB_free_vp(3,3)
 !
@@ -159,10 +162,13 @@
      &            r_from_CMB(0)
       end if
 !
+      fdm2_free_vt_CMB(1, 1) = one
       fdm2_free_vt_CMB(0, 1) = one
       fdm2_free_vt_CMB(-1,1) = zero
+      fdm2_free_vt_CMB(1, 2) = one
       fdm2_free_vt_CMB(0, 2) = mat_fdm_CMB_free_vt(2,1)
       fdm2_free_vt_CMB(-1,2) = zero
+      fdm2_free_vt_CMB(1, 3) = one
       fdm2_free_vt_CMB(0, 3) = mat_fdm_CMB_free_vt(3,1)
       fdm2_free_vt_CMB(-1,3) = mat_fdm_CMB_free_vt(3,3)
 !

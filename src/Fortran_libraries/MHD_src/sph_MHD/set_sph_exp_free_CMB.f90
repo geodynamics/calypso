@@ -27,10 +27,10 @@
 !!
 !!@n @param fdm2_fix_fld_CMB(0:2,3)
 !!         Matrix to evaluate radial derivative at CMB with fiexed field
-!!@n @param fdm2_free_vp_CMB(-1:0,3)
+!!@n @param fdm2_free_vp_CMB(-1:1,3)
 !!         Matrix to evaluate poloidal velocity
 !!         with free slip boundary at CMB
-!!@n @param fdm2_free_vt_CMB(-1:0,3)
+!!@n @param fdm2_free_vt_CMB(-1:1,3)
 !!         Matrix to evaluate toroidal velocity
 !!         with free slip boundary at CMB
 !!
@@ -61,8 +61,8 @@
       integer(kind = kint), intent(in) :: jmax, kr_out
       integer(kind = kint), intent(in) :: is_fld, is_rot
 !
-      real(kind = kreal), intent(in)  :: fdm2_free_vp_CMB(-1:0,3)
-      real(kind = kreal), intent(in)  :: fdm2_free_vt_CMB(-1:0,3)
+      real(kind = kreal), intent(in)  :: fdm2_free_vp_CMB(-1:1,3)
+      real(kind = kreal), intent(in)  :: fdm2_free_vt_CMB(-1:1,3)
 !
       real(kind = kreal) :: d1s_dr1, d2s_dr2, d1t_dr1
       integer(kind = kint) :: inod, j, i_n1, i_n2
@@ -96,7 +96,7 @@
 !
       integer(kind = kint), intent(in) :: jmax, kr_out
       integer(kind = kint), intent(in) :: is_fld
-      real(kind = kreal), intent(in)  :: fdm2_free_vp_CMB(-1:0,3)
+      real(kind = kreal), intent(in)  :: fdm2_free_vp_CMB(-1:1,3)
 !
       real(kind = kreal) :: d1s_dr1
       integer(kind = kint) :: inod, j, i_n1
@@ -126,8 +126,8 @@
       integer(kind = kint), intent(in) :: is_fld, is_rot
       real(kind = kreal), intent(in) :: r_CMB(0:2)
 !
-      real(kind = kreal), intent(in)  :: fdm2_free_vp_CMB(-1:0,3)
-      real(kind = kreal), intent(in)  :: fdm2_free_vt_CMB(-1:0,3)
+      real(kind = kreal), intent(in)  :: fdm2_free_vp_CMB(-1:1,3)
+      real(kind = kreal), intent(in)  :: fdm2_free_vt_CMB(-1:1,3)
 !
       real(kind = kreal) :: d2s_dr2, d1t_dr1
       integer(kind = kint) :: inod, j, i_n1, i_n2
@@ -164,8 +164,8 @@
       real(kind = kreal), intent(in) :: r_CMB(0:2)
       real(kind = kreal), intent(in) :: coef_d
 !
-      real(kind = kreal), intent(in)  :: fdm2_free_vp_CMB(-1:0,3)
-      real(kind = kreal), intent(in)  :: fdm2_free_vt_CMB(-1:0,3)
+      real(kind = kreal), intent(in)  :: fdm2_free_vp_CMB(-1:1,3)
+      real(kind = kreal), intent(in)  :: fdm2_free_vt_CMB(-1:1,3)
 !
       real(kind = kreal) :: d2s_dr2, d2t_dr2
       integer(kind = kint) :: inod, j, i_n1
@@ -201,7 +201,7 @@
       integer(kind = kint), intent(in) :: is_fld, is_diffuse
       real(kind = kreal), intent(in) :: r_CMB(0:2)
       real(kind = kreal), intent(in) :: coef_d
-      real(kind = kreal), intent(in)  :: fdm2_free_vt_CMB(-1:0,3)
+      real(kind = kreal), intent(in)  :: fdm2_free_vt_CMB(-1:1,3)
       real(kind = kreal), intent(in)  :: fdm2_fix_fld_CMB(0:2,3)
 !
       integer(kind = kint) :: inod, j, i_n1, i_n2

@@ -50,13 +50,13 @@
 !
 !>      Matrix to evaluate radial derivative of poloidal velocity
 !!      at ICB with free slip boundary
-      real(kind = kreal) :: fdm2_free_vp_ICB(0:1,3)
+      real(kind = kreal) :: fdm2_free_vp_ICB(-1:1,3)
 !>      Matrix to evaluate radial derivative of toroidal vorticity
 !!      at ICB with free slip boundary
-      real(kind = kreal) :: fdm2_free_vt_ICB(0:1,3)
+      real(kind = kreal) :: fdm2_free_vt_ICB(-1:1,3)
 !
 !
-!>      Work matrix to evaluate fdm2_free_vp_ICB(0:1,3)
+!>      Work matrix to evaluate fdm2_free_vp_ICB(-1:1,3)
 !!@verbatim
 !!      dfdr =    mat_fdm_ICB_free_vp(2,1) * d_rj(ICB  )
 !!              + mat_fdm_ICB_free_vp(2,3) * d_rj(ICB+1)
@@ -65,7 +65,7 @@
 !!@endverbatim
       real(kind = kreal) :: mat_fdm_ICB_free_vp(3,3)
 !
-!>      Work matrix to evaluate fdm2_free_vt_ICB(0:1,3)
+!>      Work matrix to evaluate fdm2_free_vt_ICB(-1:1,3)
 !!@verbatim
 !!      dfdr =    mat_fdm_ICB_free_vt(2,1) * d_rj(ICB  )
 !!              + mat_fdm_ICB_free_vt(2,3) * d_rj(ICB+1)
@@ -114,12 +114,15 @@
      &             r_from_ICB(0)
       end if
 !
-      fdm2_free_vp_ICB(0,1) = one
-      fdm2_free_vp_ICB(1,1) = zero
-      fdm2_free_vp_ICB(0,2) = mat_fdm_ICB_free_vp(2,1)
-      fdm2_free_vp_ICB(1,2) = mat_fdm_ICB_free_vp(2,3)
-      fdm2_free_vp_ICB(0,3) = mat_fdm_ICB_free_vp(3,1)
-      fdm2_free_vp_ICB(1,3) = mat_fdm_ICB_free_vp(3,3)
+      fdm2_free_vp_ICB(-1,1) = zero
+      fdm2_free_vp_ICB( 0,1) = one
+      fdm2_free_vp_ICB( 1,1) = zero
+      fdm2_free_vp_ICB(-1,2) = zero
+      fdm2_free_vp_ICB( 0,2) = mat_fdm_ICB_free_vp(2,1)
+      fdm2_free_vp_ICB( 1,2) = mat_fdm_ICB_free_vp(2,3)
+      fdm2_free_vp_ICB(-1,3) = zero
+      fdm2_free_vp_ICB( 0,3) = mat_fdm_ICB_free_vp(3,1)
+      fdm2_free_vp_ICB( 1,3) = mat_fdm_ICB_free_vp(3,3)
 !
       end subroutine cal_fdm2_ICB_free_vp
 !
@@ -157,12 +160,15 @@
      &             r_from_ICB(0)
       end if
 !
-      fdm2_free_vt_ICB(0,1) = one
-      fdm2_free_vt_ICB(1,1) = zero
-      fdm2_free_vt_ICB(0,2) = mat_fdm_ICB_free_vt(2,1)
-      fdm2_free_vt_ICB(1,2) = zero
-      fdm2_free_vt_ICB(0,3) = mat_fdm_ICB_free_vt(3,1)
-      fdm2_free_vt_ICB(1,3) = mat_fdm_ICB_free_vt(3,3)
+      fdm2_free_vt_ICB(-1,1) = zero
+      fdm2_free_vt_ICB( 0,1) = one
+      fdm2_free_vt_ICB( 1,1) = zero
+      fdm2_free_vt_ICB(-1,2) = zero
+      fdm2_free_vt_ICB( 0,2) = mat_fdm_ICB_free_vt(2,1)
+      fdm2_free_vt_ICB( 1,2) = zero
+      fdm2_free_vt_ICB(-1,3) = zero
+      fdm2_free_vt_ICB( 0,3) = mat_fdm_ICB_free_vt(3,1)
+      fdm2_free_vt_ICB( 1,3) = mat_fdm_ICB_free_vt(3,3)
 !
       end subroutine cal_fdm2_ICB_free_vt
 !
