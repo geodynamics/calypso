@@ -22,7 +22,7 @@
 !
       implicit none
 !
-      private :: nonlinear_by_pseudo_sph
+      private :: nonlinear_by_pseudo_sph, add_explicit_terms_sph_mhd
 !
 !*   ------------------------------------------------------------------
 !*
@@ -58,6 +58,18 @@
       if (iflag_debug.eq.1) write(*,*) 'sum_coriolis_rj_sph'
       if(iflag_4_coriolis .gt. id_turn_OFF) call sum_coriolis_rj_sph
       call end_eleps_time(13)
+!
+      call add_explicit_terms_sph_mhd
+!
+      end subroutine nonlinear
+!*
+!*   ------------------------------------------------------------------
+!*
+      subroutine add_explicit_terms_sph_mhd
+!
+      use m_sph_phys_address
+      use m_boundary_params_sph_MHD
+      use cal_vorticity_terms_adams
 !
 !$omp parallel
       if(      iflag_4_gravity  .ne. id_turn_OFF                        &
@@ -96,7 +108,7 @@
       end if
 !$omp end parallel
 !
-      end subroutine nonlinear
+      end subroutine add_explicit_terms_sph_mhd
 !*
 !*   ------------------------------------------------------------------
 !

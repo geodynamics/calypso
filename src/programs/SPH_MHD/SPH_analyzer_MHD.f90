@@ -114,6 +114,11 @@
 !
 !  -------------------------------
 !
+      if (iflag_debug.gt.0) write(*,*) 'init_sum_coriolis_rlm'
+      call init_sum_coriolis_rlm
+!
+!  -------------------------------
+!
       if(iflag_debug.gt.0) write(*,*)' sph_initial_data_control'
       call sph_initial_data_control
 !

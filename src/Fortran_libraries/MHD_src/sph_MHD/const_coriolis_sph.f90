@@ -40,6 +40,33 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine init_sum_coriolis_rlm
+!
+      use m_spheric_parameter
+      use m_gaunt_coriolis_rlm
+      use m_coriolis_coefs_tri_rlm
+      use m_coriolis_terms_rlm
+!      use check_coriolis_tris_rlm
+!
+      call alloacte_gaunt_coriolis_rlm(nidx_rlm(1), nidx_rlm(2))
+      call alloc_coriolis_coef_tri_rlm(nidx_rlm(2))
+      call allocate_d_coriolis_rlm
+!
+      if(iflag_debug.eq.1) write(*,*) 'cal_gaunt_coriolis_rlm'
+      call cal_gaunt_coriolis_rlm(l_truncation,                         &
+     &    nidx_rlm(1), nidx_rlm(2), idx_gl_1d_rlm_j, radius_1d_rlm_r)
+!
+      if(iflag_debug.eq.1) write(*,*) 'interact_rot_coriolis_rlm'
+      call interact_rot_coriolis_rlm(nidx_rlm(2))
+!
+!      call check_gaunt_coriolis_rlm(iflag_sph_coriolis_file,            &
+!     &    l_truncation, nidx_rlm(2), idx_gl_1d_rlm_j)
+!      call check_interact_coriolis_rlm(nidx_rlm(2), idx_gl_1d_rlm_j)
+!
+      end subroutine init_sum_coriolis_rlm
+!
+! -----------------------------------------------------------------------
+!
       subroutine init_sum_coriolis_sph
 !
       use m_spheric_parameter
@@ -74,21 +101,47 @@
 !
       subroutine sum_coriolis_rj_sph
 !
+      use calypso_mpi
       use m_boundary_params_sph_MHD
       use trans_sph_velo_4_coriolis
       use sum_rot_coriolis_rj_sph
+      use sum_div_coriolis_rj_sph
       use cal_inner_core_rotation
 !
+      integer(kind = kint) :: inod, kr, j
+!
+!
+      do j = 1, nidx_rj(2)
+        do kr = 1, nidx_rj(1)
+          inod = j + (kr-1) * nidx_rj(2)
+          write(50+my_rank,*) idx_global_rj(inod,1:2),                  &
+     &               d_rj(inod,ipol%i_rot_Coriolis),                    &
+     &               d_rj(inod,itor%i_rot_Coriolis),                    &
+     &               d_rj(inod,itor%i_div_Coriolis)
+        end do
+      end do
 !
       if (iflag_debug.eq.1) write(*,*) 's_trans_sph_velo_4_coriolis'
       call s_trans_sph_velo_4_coriolis(sph_bc_U%kr_in, sph_bc_U%kr_out)
 !
       call s_sum_rot_coriolis_rj_sph(sph_bc_U%kr_in, sph_bc_U%kr_out,   &
      &    coef_cor)
+      call s_sum_div_coriolis_rj_sph(sph_bc_U%kr_in, sph_bc_U%kr_out,   &
+     &    coef_cor, ipol%i_div_Coriolis)
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_icore_coriolis_explicit(sph_bc_U%kr_in)
       end if
+!
+      do j = 1, nidx_rj(2)
+       do kr = 1, nidx_rj(1)
+          inod = j + (kr-1) * nidx_rj(2)
+          write(70+my_rank,*) idx_global_rj(inod,1:2),                  &
+     &               d_rj(inod,ipol%i_rot_Coriolis),                    &
+     &               d_rj(inod,itor%i_rot_Coriolis),                    &
+     &               d_rj(inod,itor%i_div_Coriolis)
+        end do
+      end do
 !
       end subroutine sum_coriolis_rj_sph
 !

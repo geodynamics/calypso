@@ -112,8 +112,6 @@
 !!        omega(kr,2,3) ... d^2 Omaga_y / dr^2
 !!@endverbatim
       real(kind = kreal), allocatable :: omega_rj(:,:,:)
-!>     rotation spectr in @f$ f(r,l,m) @f$
-      real(kind = kreal), allocatable :: omega_rlm(:,:,:)
 !
 !>    reference temerature spectr @f$ f(r,j) @f$
 !!@verbatim
@@ -195,10 +193,7 @@
 !
       num = nidx_rj(1)
       allocate( omega_rj(num,0:2,3) )
-      num = nidx_rlm(1)
-      allocate( omega_rlm(num,0:2,3) )
       omega_rj =  0.0d0
-      omega_rlm = 0.0d0
 !
       end subroutine allocate_rot_rj_data
 !

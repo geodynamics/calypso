@@ -111,6 +111,11 @@
 !
 ! ---------------------------------
 !
+      if (iflag_debug.gt.0) write(*,*) 'init_sum_coriolis_rlm'
+      call init_sum_coriolis_rlm
+!
+!  -------------------------------
+!
       if (iflag_debug.eq.1) write(*,*) 's_const_radial_mat_4_sph'
       call s_const_radial_mat_4_sph
 !

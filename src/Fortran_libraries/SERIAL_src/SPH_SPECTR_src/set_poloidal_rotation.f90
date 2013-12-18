@@ -63,8 +63,6 @@
 !
       call set_3dir_rot_earth_4_sph(nidx_rj(1), radius_1d_rj_r,         &
      &    rotate, omega_rj)
-      call set_3dir_rot_earth_4_sph(nidx_rlm(1), radius_1d_rlm_r,       &
-     &    rotate, omega_rlm)
 !
       end subroutine set_rot_earth_4_sph
 !

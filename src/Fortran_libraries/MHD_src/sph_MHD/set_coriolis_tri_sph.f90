@@ -64,56 +64,56 @@
 !
 !$omp parallel do private(j3)
       do j3 = 1 ,jmax_tri_sph
-        sw(1,1,j3) = ( two-g(j3,4)-g(j3,3) )                            &
+        sw_rj(1,1,j3) = ( two-g(j3,4)-g(j3,3) )                         &
      &               * gk_cor(j3,1,2) * g(j3,17)
-        sw(2,1,j3) = ( two-g(j3,5)-g(j3,3) )                            &
+        sw_rj(2,1,j3) = ( two-g(j3,5)-g(j3,3) )                         &
      &               * gk_cor(j3,2,2) * g(j3,17) 
 !*
-        sw(1,2,j3) = g(j3,4)*( two-g(j3,4)+g(j3,3) )                    &
+        sw_rj(1,2,j3) = g(j3,4)*( two-g(j3,4)+g(j3,3) )                 &
      &               * gk_cor(j3,1,2) * g(j3,17) * half
-        sw(2,2,j3) =  g(j3,5)*( two-g(j3,5)+g(j3,3) )                   &
+        sw_rj(2,2,j3) =  g(j3,5)*( two-g(j3,5)+g(j3,3) )                &
      &               * gk_cor(j3,2,2) * g(j3,17) * half
 !*
-        sw(1,3,j3) =  two * el_cor(j3,1,2) * g(j3,17)
-        sw(2,3,j3) =  zero
+        sw_rj(1,3,j3) =  two * el_cor(j3,1,2) * g(j3,17)
+        sw_rj(2,3,j3) =  zero
 !*
-        tw(1,3,j3) =-( g(j3,3)*( two+g(j3,4)-g(j3,3) )                  &
+        tw_rj(1,3,j3) =-( g(j3,3)*( two+g(j3,4)-g(j3,3) )               &
      &               + two*( -two+g(j3,4)+g(j3,3) ) )                   &
      &               * gk_cor(j3,1,2) * g(j3,17) * half
-        tw(2,3,j3) =-( g(j3,3)*( two+g(j3,5)-g(j3,3) )                  &
+        tw_rj(2,3,j3) =-( g(j3,3)*( two+g(j3,5)-g(j3,3) )               &
      &               + two*( -two+g(j3,5)+g(j3,3) ) )                   &
      &               * gk_cor(j3,2,2) * g(j3,17) * half 
 !*
-        tw(1,4,j3) =-( -two+g(j3,4)+g(j3,3) )                           &
+        tw_rj(1,4,j3) =-( -two+g(j3,4)+g(j3,3) )                        &
      &               * gk_cor(j3,1,2) * g(j3,17)
-        tw(2,4,j3) =-( -two+g(j3,5)+g(j3,3) )                           &
+        tw_rj(2,4,j3) =-( -two+g(j3,5)+g(j3,3) )                        &
      &               * gk_cor(j3,2,2) * g(j3,17)
 !*
-        tw(1,1,j3) =-two * el_cor(j3,1,2) * g(j3,17)
-        tw(2,1,j3) = zero
-        tw(1,2,j3) =-g(j3,3) * el_cor(j3,1,2) * g(j3,17)
-        tw(2,2,j3) = zero
+        tw_rj(1,1,j3) =-two * el_cor(j3,1,2) * g(j3,17)
+        tw_rj(2,1,j3) = zero
+        tw_rj(1,2,j3) =-g(j3,3) * el_cor(j3,1,2) * g(j3,17)
+        tw_rj(2,2,j3) = zero
 !
 !
-        sd(1,1,j3) = g(j3,4) * gk_cor(j3,1,2) * g(j3,17)
-        sd(2,1,j3) = g(j3,5) * gk_cor(j3,2,2) * g(j3,17)
+        sd_rj(1,1,j3) = g(j3,4) * gk_cor(j3,1,2) * g(j3,17)
+        sd_rj(2,1,j3) = g(j3,5) * gk_cor(j3,2,2) * g(j3,17)
 !*
-        sd(1,2,j3) = ( two+g(j3,4)-g(j3,3) )                            &
+        sd_rj(1,2,j3) = ( two+g(j3,4)-g(j3,3) )                         &
      &               * gk_cor(j3,1,2) * g(j3,17) * half
-        sd(2,2,j3) = ( two-g(j3,5)+g(j3,3) )                            &
+        sd_rj(2,2,j3) = ( two-g(j3,5)+g(j3,3) )                         &
      &               * gk_cor(j3,2,2) * g(j3,17) * half
 !*
-        td(1,j3) = el_cor(j3,1,2) * g(j3,17)
-        td(2,j3) = zero
+        td_rj(1,j3) = el_cor(j3,1,2) * g(j3,17)
+        td_rj(2,j3) = zero
 !*
 !
-        tr(1,j3) = -( two+g(j3,4)-g(j3,3) )                             &
+        tr_rj(1,j3) = -( two+g(j3,4)-g(j3,3) )                          &
      &               * gk_cor(j3,1,2) * g(j3,17) * half
-        tr(2,j3) = -( two-g(j3,5)+g(j3,3) )                             &
+        tr_rj(2,j3) = -( two-g(j3,5)+g(j3,3) )                          &
      &               * gk_cor(j3,2,2) * g(j3,17) * half
 !*
-        sr(1,j3) = el_cor(j3,1,2) * g(j3,17)
-        sr(2,j3) = zero
+        sr_rj(1,j3) = el_cor(j3,1,2) * g(j3,17)
+        sr_rj(2,j3) = zero
       end do
 !$omp end parallel do
 !*
@@ -127,98 +127,97 @@
 !
 !*  -------  lead non-liner coefs ---------
 !*
-!cdir select(concur)
 !$omp parallel do private(j3)
       do j3 = 1 ,jmax_tri_sph
-        sw1(1,1,j3) = ( two-g(j3,4)-g(j3,3) )                           &
+        sw1_rj(1,1,j3) = ( two-g(j3,4)-g(j3,3) )                        &
      &               * gk_cor(j3,1,1) * g(j3,17)
-        sw1(2,1,j3) = ( two-g(j3,4)-g(j3,3) )                           &
+        sw1_rj(2,1,j3) = ( two-g(j3,4)-g(j3,3) )                        &
      &               * gk_cor(j3,2,1) * g(j3,17)
-        sw1(3,1,j3) = ( two-g(j3,5)-g(j3,3) )                           &
+        sw1_rj(3,1,j3) = ( two-g(j3,5)-g(j3,3) )                        &
      &               * gk_cor(j3,3,1) * g(j3,17)
-        sw1(4,1,j3) = ( two-g(j3,5)-g(j3,3) )                           &
+        sw1_rj(4,1,j3) = ( two-g(j3,5)-g(j3,3) )                        &
      &               * gk_cor(j3,4,1) * g(j3,17)
 !*
-        sw1(1,2,j3) = g(j3,4)*( two-g(j3,4)+g(j3,3) )                   &
+        sw1_rj(1,2,j3) = g(j3,4)*( two-g(j3,4)+g(j3,3) )                &
      &               * gk_cor(j3,1,1) * g(j3,17) * half
-        sw1(2,2,j3) = g(j3,4)*( two-g(j3,4)+g(j3,3) )                   &
+        sw1_rj(2,2,j3) = g(j3,4)*( two-g(j3,4)+g(j3,3) )                &
      &               * gk_cor(j3,2,1) * g(j3,17) * half
-        sw1(3,2,j3) =  g(j3,5)*( two-g(j3,5)+g(j3,3) )                  &
+        sw1_rj(3,2,j3) =  g(j3,5)*( two-g(j3,5)+g(j3,3) )               &
      &               * gk_cor(j3,3,1) * g(j3,17) * half
-        sw1(4,2,j3) =  g(j3,5)*( two-g(j3,5)+g(j3,3) )                  &
+        sw1_rj(4,2,j3) =  g(j3,5)*( two-g(j3,5)+g(j3,3) )               &
      &               * gk_cor(j3,4,1) * g(j3,17) * half
 !*
-        sw1(1,3,j3) =  two * el_cor(j3,1,1) * g(j3,17)
-        sw1(2,3,j3) =  two * el_cor(j3,2,1) * g(j3,17)
-        sw1(3,3,j3) = zero
-        sw1(4,3,j3) = zero
+        sw1_rj(1,3,j3) =  two * el_cor(j3,1,1) * g(j3,17)
+        sw1_rj(2,3,j3) =  two * el_cor(j3,2,1) * g(j3,17)
+        sw1_rj(3,3,j3) = zero
+        sw1_rj(4,3,j3) = zero
 !*
-        tw1(1,3,j3) =-( g(j3,3)*( two+g(j3,4)-g(j3,3) )                 &
+        tw1_rj(1,3,j3) =-( g(j3,3)*( two+g(j3,4)-g(j3,3) )              &
      &               + two*( -two+g(j3,4)+g(j3,3) ) )                   &
      &               * gk_cor(j3,1,1) * g(j3,17) * half
-        tw1(2,3,j3) =-( g(j3,3)*( two+g(j3,4)-g(j3,3) )                 &
+        tw1_rj(2,3,j3) =-( g(j3,3)*( two+g(j3,4)-g(j3,3) )              &
      &               + two*( -two+g(j3,4)+g(j3,3) ) )                   &
      &               * gk_cor(j3,2,1) * g(j3,17) * half
-        tw1(3,3,j3) =-( g(j3,3)*( two+g(j3,5)-g(j3,3) )                 &
+        tw1_rj(3,3,j3) =-( g(j3,3)*( two+g(j3,5)-g(j3,3) )              &
      &               + two*( -two+g(j3,5)+g(j3,3) ) )                   &
      &               * gk_cor(j3,3,1) * g(j3,17) * half
-        tw1(4,3,j3) =-( g(j3,3)*( two+g(j3,5)-g(j3,3) )                 &
+        tw1_rj(4,3,j3) =-( g(j3,3)*( two+g(j3,5)-g(j3,3) )              &
      &               + two*( -two+g(j3,5)+g(j3,3) ) )                   &
      &               * gk_cor(j3,4,1) * g(j3,17) * half
 !*
-        tw1(1,4,j3) =-( -two+g(j3,4)+g(j3,3) )                          &
+        tw1_rj(1,4,j3) =-( -two+g(j3,4)+g(j3,3) )                       &
      &               * gk_cor(j3,1,1) * g(j3,17)
-        tw1(2,4,j3) =-( -two+g(j3,4)+g(j3,3) )                          &
+        tw1_rj(2,4,j3) =-( -two+g(j3,4)+g(j3,3) )                       &
      &               * gk_cor(j3,2,1) * g(j3,17)
-        tw1(3,4,j3) =-( -two+g(j3,5)+g(j3,3) )                          &
+        tw1_rj(3,4,j3) =-( -two+g(j3,5)+g(j3,3) )                       &
      &               * gk_cor(j3,3,1) * g(j3,17)
-        tw1(4,4,j3) =-( -two+g(j3,5)+g(j3,3) )                          &
+        tw1_rj(4,4,j3) =-( -two+g(j3,5)+g(j3,3) )                       &
      &               * gk_cor(j3,4,1) * g(j3,17)
 !*
-        tw1(1,1,j3) =-two * el_cor(j3,1,1) * g(j3,17)
-        tw1(2,1,j3) =-two * el_cor(j3,2,1) * g(j3,17)
-        tw1(3,1,j3) = zero
-        tw1(4,1,j3) = zero
+        tw1_rj(1,1,j3) =-two * el_cor(j3,1,1) * g(j3,17)
+        tw1_rj(2,1,j3) =-two * el_cor(j3,2,1) * g(j3,17)
+        tw1_rj(3,1,j3) = zero
+        tw1_rj(4,1,j3) = zero
 !
-        tw1(1,2,j3) =-g(j3,3) * el_cor(j3,1,1) * g(j3,17)
-        tw1(2,2,j3) =-g(j3,3) * el_cor(j3,2,1) * g(j3,17)
-        tw1(3,2,j3) = zero
-        tw1(4,2,j3) = zero
+        tw1_rj(1,2,j3) =-g(j3,3) * el_cor(j3,1,1) * g(j3,17)
+        tw1_rj(2,2,j3) =-g(j3,3) * el_cor(j3,2,1) * g(j3,17)
+        tw1_rj(3,2,j3) = zero
+        tw1_rj(4,2,j3) = zero
 !
 !
-        sd1(1,1,j3) = g(j3,4) * gk_cor(j3,1,1) * g(j3,17)
-        sd1(2,1,j3) = g(j3,4) * gk_cor(j3,2,1) * g(j3,17)
-        sd1(3,1,j3) = g(j3,5) * gk_cor(j3,3,1) * g(j3,17)
-        sd1(4,1,j3) = g(j3,5) * gk_cor(j3,4,1) * g(j3,17)
+        sd1_rj(1,1,j3) = g(j3,4) * gk_cor(j3,1,1) * g(j3,17)
+        sd1_rj(2,1,j3) = g(j3,4) * gk_cor(j3,2,1) * g(j3,17)
+        sd1_rj(3,1,j3) = g(j3,5) * gk_cor(j3,3,1) * g(j3,17)
+        sd1_rj(4,1,j3) = g(j3,5) * gk_cor(j3,4,1) * g(j3,17)
 !*
-        sd1(1,2,j3) = ( two-g(j3,4)+g(j3,3) )                           &
+        sd1_rj(1,2,j3) = ( two-g(j3,4)+g(j3,3) )                        &
      &               * gk_cor(j3,1,1) * g(j3,17) * half
-        sd1(2,2,j3) = ( two-g(j3,4)+g(j3,3) )                           &
+        sd1_rj(2,2,j3) = ( two-g(j3,4)+g(j3,3) )                        &
      &               * gk_cor(j3,2,1) * g(j3,17) * half
-        sd1(3,2,j3) = ( two-g(j3,5)+g(j3,3) )                           &
+        sd1_rj(3,2,j3) = ( two-g(j3,5)+g(j3,3) )                        &
      &               * gk_cor(j3,3,1) * g(j3,17) * half
-        sd1(4,2,j3) = ( two-g(j3,5)+g(j3,3) )                           &
+        sd1_rj(4,2,j3) = ( two-g(j3,5)+g(j3,3) )                        &
      &               * gk_cor(j3,4,1) * g(j3,17) * half
 !*
-        td1(1,j3) = el_cor(j3,1,1) * g(j3,17)
-        td1(2,j3) = el_cor(j3,2,1) * g(j3,17)
-        td1(3,j3) = zero
-        td1(4,j3) = zero
+        td1_rj(1,j3) = el_cor(j3,1,1) * g(j3,17)
+        td1_rj(2,j3) = el_cor(j3,2,1) * g(j3,17)
+        td1_rj(3,j3) = zero
+        td1_rj(4,j3) = zero
 !
 !
-        sr1(1,j3) = -( two-g(j3,4)+g(j3,3) )                            &
+        sr1_rj(1,j3) = -( two-g(j3,4)+g(j3,3) )                         &
      &               * gk_cor(j3,1,1) * g(j3,17) * half
-        sr1(2,j3) = -( two-g(j3,4)+g(j3,3) )                            &
+        sr1_rj(2,j3) = -( two-g(j3,4)+g(j3,3) )                         &
      &               * gk_cor(j3,2,1) * g(j3,17) * half
-        sr1(3,j3) = -( two-g(j3,5)+g(j3,3) )                            &
+        sr1_rj(3,j3) = -( two-g(j3,5)+g(j3,3) )                         &
      &               * gk_cor(j3,3,1) * g(j3,17) * half
-        sr1(4,j3) = -( two-g(j3,5)+g(j3,3) )                            &
+        sr1_rj(4,j3) = -( two-g(j3,5)+g(j3,3) )                         &
      &               * gk_cor(j3,4,1) * g(j3,17) * half
 !*
-        tr1(1,j3) = el_cor(j3,1,1) * g(j3,17)
-        tr1(2,j3) = el_cor(j3,2,1) * g(j3,17)
-        tr1(3,j3) = zero
-        tr1(4,j3) = zero
+        tr1_rj(1,j3) = el_cor(j3,1,1) * g(j3,17)
+        tr1_rj(2,j3) = el_cor(j3,2,1) * g(j3,17)
+        tr1_rj(3,j3) = zero
+        tr1_rj(4,j3) = zero
       end do
 !$omp end parallel do
 !
@@ -230,98 +229,97 @@
 !
       integer(kind = kint) :: j3
 !
-!cdir select(concur)
 !$omp parallel do private(j3)
       do j3 = 1 ,jmax_tri_sph
-        sw3(1,1,j3) = ( two-g(j3,4)-g(j3,3) )                           &
+        sw3_rj(1,1,j3) = ( two-g(j3,4)-g(j3,3) )                        &
      &               * gk_cor(j3,1,3) * g(j3,17)
-        sw3(2,1,j3) = ( two-g(j3,4)-g(j3,3) )                           &
+        sw3_rj(2,1,j3) = ( two-g(j3,4)-g(j3,3) )                        &
      &               * gk_cor(j3,2,3) * g(j3,17)
-        sw3(3,1,j3) = ( two-g(j3,5)-g(j3,3) )                           &
+        sw3_rj(3,1,j3) = ( two-g(j3,5)-g(j3,3) )                        &
      &               * gk_cor(j3,3,3) * g(j3,17) 
-        sw3(4,1,j3) = ( two-g(j3,5)-g(j3,3) )                           &
+        sw3_rj(4,1,j3) = ( two-g(j3,5)-g(j3,3) )                        &
      &               * gk_cor(j3,4,3) * g(j3,17) 
 !*
-        sw3(1,2,j3) = g(j3,4)*( two-g(j3,4)+g(j3,3) )                   &
+        sw3_rj(1,2,j3) = g(j3,4)*( two-g(j3,4)+g(j3,3) )                &
      &               * gk_cor(j3,1,3) * g(j3,17) * half
-        sw3(2,2,j3) = g(j3,4)*( two-g(j3,4)+g(j3,3) )                   &
+        sw3_rj(2,2,j3) = g(j3,4)*( two-g(j3,4)+g(j3,3) )                &
      &               * gk_cor(j3,2,3) * g(j3,17) * half
-        sw3(3,2,j3) =  g(j3,5)*( two-g(j3,5)+g(j3,3) )                  &
+        sw3_rj(3,2,j3) =  g(j3,5)*( two-g(j3,5)+g(j3,3) )               &
      &               * gk_cor(j3,3,3) * g(j3,17) * half
-        sw3(4,2,j3) =  g(j3,5)*( two-g(j3,5)+g(j3,3) )                  &
+        sw3_rj(4,2,j3) =  g(j3,5)*( two-g(j3,5)+g(j3,3) )               &
      &               * gk_cor(j3,4,3) * g(j3,17) * half
 !*
-        sw3(1,3,j3) =  two * el_cor(j3,1,3) * g(j3,17)
-        sw3(2,3,j3) =  two * el_cor(j3,2,3) * g(j3,17)
-        sw3(3,3,j3) = zero
-        sw3(4,3,j3) = zero
+        sw3_rj(1,3,j3) =  two * el_cor(j3,1,3) * g(j3,17)
+        sw3_rj(2,3,j3) =  two * el_cor(j3,2,3) * g(j3,17)
+        sw3_rj(3,3,j3) = zero
+        sw3_rj(4,3,j3) = zero
 !*
-        tw3(1,3,j3) =-( g(j3,3)*( two+g(j3,4)-g(j3,3) )                 &
+        tw3_rj(1,3,j3) =-( g(j3,3)*( two+g(j3,4)-g(j3,3) )              &
      &               + two*( -two+g(j3,4)+g(j3,3) ) )                   &
      &               * gk_cor(j3,1,3) * g(j3,17) * half
-        tw3(2,3,j3) =-( g(j3,3)*( two+g(j3,4)-g(j3,3) )                 &
+        tw3_rj(2,3,j3) =-( g(j3,3)*( two+g(j3,4)-g(j3,3) )              &
      &               + two*( -two+g(j3,4)+g(j3,3) ) )                   &
      &               * gk_cor(j3,2,3) * g(j3,17) * half
-        tw3(3,3,j3) =-( g(j3,3)*( two+g(j3,5)-g(j3,3) )                 &
+        tw3_rj(3,3,j3) =-( g(j3,3)*( two+g(j3,5)-g(j3,3) )              &
      &               + two*( -two+g(j3,5)+g(j3,3) ) )                   &
      &               * gk_cor(j3,3,3) * g(j3,17) * half 
-        tw3(4,3,j3) =-( g(j3,3)*( two+g(j3,5)-g(j3,3) )                 &
+        tw3_rj(4,3,j3) =-( g(j3,3)*( two+g(j3,5)-g(j3,3) )              &
      &               + two*( -two+g(j3,5)+g(j3,3) ) )                   &
      &               * gk_cor(j3,4,3) * g(j3,17) * half 
 !*
-        tw3(1,4,j3) =-( -two+g(j3,4)+g(j3,3) )                          &
+        tw3_rj(1,4,j3) =-( -two+g(j3,4)+g(j3,3) )                       &
      &               * gk_cor(j3,1,3) * g(j3,17)
-        tw3(2,4,j3) =-( -two+g(j3,4)+g(j3,3) )                          &
+        tw3_rj(2,4,j3) =-( -two+g(j3,4)+g(j3,3) )                       &
      &               * gk_cor(j3,2,3) * g(j3,17)
-        tw3(3,4,j3) =-( -two+g(j3,5)+g(j3,3) )                          &
+        tw3_rj(3,4,j3) =-( -two+g(j3,5)+g(j3,3) )                       &
      &               * gk_cor(j3,3,3) * g(j3,17)
-        tw3(4,4,j3) =-( -two+g(j3,5)+g(j3,3) )                          &
+        tw3_rj(4,4,j3) =-( -two+g(j3,5)+g(j3,3) )                       &
      &               * gk_cor(j3,4,3) * g(j3,17)
 !*
-        tw3(1,1,j3) =-two * el_cor(j3,1,3) * g(j3,17)
-        tw3(2,1,j3) =-two * el_cor(j3,2,3) * g(j3,17)
-        tw3(3,1,j3) = zero
-        tw3(4,1,j3) = zero
+        tw3_rj(1,1,j3) =-two * el_cor(j3,1,3) * g(j3,17)
+        tw3_rj(2,1,j3) =-two * el_cor(j3,2,3) * g(j3,17)
+        tw3_rj(3,1,j3) = zero
+        tw3_rj(4,1,j3) = zero
 !
-        tw3(1,2,j3) =-g(j3,4) * el_cor(j3,1,3) * g(j3,17)
-        tw3(2,2,j3) =-g(j3,5) * el_cor(j3,2,3) * g(j3,17)
-        tw3(3,2,j3) = zero
-        tw3(4,2,j3) = zero
+        tw3_rj(1,2,j3) =-g(j3,4) * el_cor(j3,1,3) * g(j3,17)
+        tw3_rj(2,2,j3) =-g(j3,5) * el_cor(j3,2,3) * g(j3,17)
+        tw3_rj(3,2,j3) = zero
+        tw3_rj(4,2,j3) = zero
 !
 !
-        sd3(1,1,j3) = g(j3,4) * gk_cor(j3,1,3) * g(j3,17)
-        sd3(2,1,j3) = g(j3,4) * gk_cor(j3,2,3) * g(j3,17)
-        sd3(3,1,j3) = g(j3,5) * gk_cor(j3,3,3) * g(j3,17)
-        sd3(4,1,j3) = g(j3,5) * gk_cor(j3,4,3) * g(j3,17)
+        sd3_rj(1,1,j3) = g(j3,4) * gk_cor(j3,1,3) * g(j3,17)
+        sd3_rj(2,1,j3) = g(j3,4) * gk_cor(j3,2,3) * g(j3,17)
+        sd3_rj(3,1,j3) = g(j3,5) * gk_cor(j3,3,3) * g(j3,17)
+        sd3_rj(4,1,j3) = g(j3,5) * gk_cor(j3,4,3) * g(j3,17)
 !*
-        sd3(1,2,j3) =  ( two-g(j3,4)+g(j3,3) )                          &
+        sd3_rj(1,2,j3) =  ( two-g(j3,4)+g(j3,3) )                       &
      &               * gk_cor(j3,1,3) * g(j3,17) * half
-        sd3(2,2,j3) =  ( two-g(j3,4)+g(j3,3) )                          &
+        sd3_rj(2,2,j3) =  ( two-g(j3,4)+g(j3,3) )                       &
      &               * gk_cor(j3,2,3) * g(j3,17) * half
-        sd3(3,2,j3) =  ( two-g(j3,5)+g(j3,3) )                          &
+        sd3_rj(3,2,j3) =  ( two-g(j3,5)+g(j3,3) )                       &
      &               * gk_cor(j3,3,3) * g(j3,17) * half
-        sd3(4,2,j3) =  ( two-g(j3,5)+g(j3,3) )                          &
+        sd3_rj(4,2,j3) =  ( two-g(j3,5)+g(j3,3) )                       &
      &               * gk_cor(j3,4,3) * g(j3,17) * half
 !*
-        td3(1,j3) = el_cor(j3,1,3) * g(j3,17)
-        td3(2,j3) = el_cor(j3,2,3) * g(j3,17)
-        td3(3,j3) = zero
-        td3(4,j3) = zero
+        td3_rj(1,j3) = el_cor(j3,1,3) * g(j3,17)
+        td3_rj(2,j3) = el_cor(j3,2,3) * g(j3,17)
+        td3_rj(3,j3) = zero
+        td3_rj(4,j3) = zero
 !
 !
-        sr3(1,j3) = -( two-g(j3,4)+g(j3,3) )                          &
+        sr3_rj(1,j3) = -( two-g(j3,4)+g(j3,3) )                         &
      &               * gk_cor(j3,1,3) * g(j3,17) * half
-        sr3(2,j3) = -( two-g(j3,4)+g(j3,3) )                          &
+        sr3_rj(2,j3) = -( two-g(j3,4)+g(j3,3) )                         &
      &               * gk_cor(j3,2,3) * g(j3,17) * half
-        sr3(3,j3) = -( two-g(j3,5)+g(j3,3) )                          &
+        sr3_rj(3,j3) = -( two-g(j3,5)+g(j3,3) )                         &
      &               * gk_cor(j3,3,3) * g(j3,17) * half
-        sr3(4,j3) = -( two-g(j3,5)+g(j3,3) )                          &
+        sr3_rj(4,j3) = -( two-g(j3,5)+g(j3,3) )                         &
      &               * gk_cor(j3,4,3) * g(j3,17) * half
 !*
-        tr3(1,j3) = el_cor(j3,1,3) * g(j3,17)
-        tr3(2,j3) = el_cor(j3,2,3) * g(j3,17)
-        tr3(3,j3) = zero
-        tr3(4,j3) = zero
+        tr3_rj(1,j3) = el_cor(j3,1,3) * g(j3,17)
+        tr3_rj(2,j3) = el_cor(j3,2,3) * g(j3,17)
+        tr3_rj(3,j3) = zero
+        tr3_rj(4,j3) = zero
       end do
 !$omp end parallel do
 !

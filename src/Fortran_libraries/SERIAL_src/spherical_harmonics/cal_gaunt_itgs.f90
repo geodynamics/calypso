@@ -103,15 +103,15 @@
             mm1 = abs(m1)
 !
             if (mm1 .eq. mm2+mm3) then
-              gi = gs(mm1,l1,mm2,l2,mm3,l3)
+              gi = gs_select(mm1,l1,mm2,l2,mm3,l3)
               leadki = normki(gi, m1, m2, m3)
 !*
             else if (mm2 .eq. mm1+mm3) then
-              gi = gs(mm2,l2,mm1,l1,mm3,l3)
+              gi = gs_select(mm2,l2,mm1,l1,mm3,l3)
               leadki = normki(gi, m2, m1, m3)
 !*
             else if (mm3 .eq. mm2+mm1) then
-              gi = gs(mm3,l3,mm2,l2,mm1,l1)
+              gi = gs_select(mm3,l3,mm2,l2,mm1,l1)
               leadki = normki(gi, m3, m2, m1)
             endif
 !*

@@ -39,20 +39,20 @@
 !!
 !!*************************************************
 !!
-!!     wss(jc,1,j3) = sw(jc,1,j3)
-!!     wss(jc,2,j3) = sw(jc,2,j3)
-!!     wts(jc,j3)   = sw(jc,3,j3)
-!!     wst(jc,1,j3) = tw(jc,1,j3)
-!!     wst(jc,2,j3) = tw(jc,2,j3)
-!!     wtt(jc,1,j3) = tw(jc,3,j3)
-!!     wtt(jc,2,j3) = tw(jc,4,j3)
+!!     wss(jc,1,j3) = sw_rj(jc,1,j3)
+!!     wss(jc,2,j3) = sw_rj(jc,2,j3)
+!!     wts(jc,j3)   = sw_rj(jc,3,j3)
+!!     wst(jc,1,j3) = tw_rj(jc,1,j3)
+!!     wst(jc,2,j3) = tw_rj(jc,2,j3)
+!!     wtt(jc,1,j3) = tw_rj(jc,3,j3)
+!!     wtt(jc,2,j3) = tw_rj(jc,4,j3)
 !!
-!!     wsd(jc,1,j3) = sd(jc,1,j3)
-!!     wsd(jc,2,j3) = sd(jc,2,j3)
-!!     wtd(jc,j3)   = td(jc,j3)
+!!     wsd(jc,1,j3) = sd_rj(jc,1,j3)
+!!     wsd(jc,2,j3) = sd_rj(jc,2,j3)
+!!     wtd(jc,j3)   = td_rj(jc,j3)
 !!
-!!     wsr(jc,j3) =   sr(jc,j3)
-!!     wtr(jc,j3) =   tr(jc,j3)
+!!     wsr(jc,j3) =   sr_rj(jc,j3)
+!!     wtr(jc,j3) =   tr_rj(jc,j3)
 !!
 !!*************************************************
 !!@endverbatim
@@ -124,9 +124,9 @@
         i12 = jlc_lcor(j30,1,2) + (kr-1)*nidx_j_cor
 !
         d_rj(inod,is_rot_f)                                             &
-     &       =  sr(1,j30) * omega_rj(kr,1,2) * d_sph_cor(i12,ic_dvp)    &
-     &        + tr(1,j30) * omega_rj(kr,1,2) * d_sph_cor(i11,ic_vt)     &
-     &        + tr(2,j30) * omega_rj(kr,1,2) * d_sph_cor(i21,ic_vt)
+     &       =  sr_rj(1,j30) * omega_rj(kr,1,2) * d_sph_cor(i12,ic_dvp) &
+     &        + tr_rj(1,j30) * omega_rj(kr,1,2) * d_sph_cor(i11,ic_vt)  &
+     &        + tr_rj(2,j30) * omega_rj(kr,1,2) * d_sph_cor(i21,ic_vt)
       end do
 !
       do j = 1, idx_rj_degree_zero
@@ -181,20 +181,20 @@
         l12 = jlc_lcor(j30,1,3) + (kr-1)*nidx_j_cor
         l22 = jlc_lcor(j30,2,3) + (kr-1)*nidx_j_cor
 !
-        ct1 =  sr1(1,j30) * omega_rj(kr,1,1) * d_sph_cor(i12,ic_dvp)    &
-     &       + sr1(2,j30) * omega_rj(kr,1,1) * d_sph_cor(i22,ic_dvp)    &
-     &       + sr1(1,j30) * omega_rj(kr,1,1) * d_sph_cor(i11,ic_vt)     &
-     &       + sr1(2,j30) * omega_rj(kr,1,1) * d_sph_cor(i21,ic_vt)     &
-     &       + sr1(3,j30) * omega_rj(kr,1,1) * d_sph_cor(i31,ic_vt)     &
-     &       + sr1(4,j30) * omega_rj(kr,1,1) * d_sph_cor(i41,ic_vt)
+        ct1 =  sr1_rj(1,j30) * omega_rj(kr,1,1) * d_sph_cor(i12,ic_dvp) &
+     &       + sr1_rj(2,j30) * omega_rj(kr,1,1) * d_sph_cor(i22,ic_dvp) &
+     &       + sr1_rj(1,j30) * omega_rj(kr,1,1) * d_sph_cor(i11,ic_vt)  &
+     &       + sr1_rj(2,j30) * omega_rj(kr,1,1) * d_sph_cor(i21,ic_vt)  &
+     &       + sr1_rj(3,j30) * omega_rj(kr,1,1) * d_sph_cor(i31,ic_vt)  &
+     &       + sr1_rj(4,j30) * omega_rj(kr,1,1) * d_sph_cor(i41,ic_vt)
 !
 !
-        ct3 =  sr3(1,j30) * omega_rj(kr,1,3) * d_sph_cor(l12,ic_dvp)    &
-     &       + sr3(2,j30) * omega_rj(kr,1,3) * d_sph_cor(l22,ic_dvp)    &
-     &       + sr3(1,j30) * omega_rj(kr,1,3) * d_sph_cor(l11,ic_vt)     &
-     &       + sr3(2,j30) * omega_rj(kr,1,3) * d_sph_cor(l21,ic_vt)     &
-     &       + sr3(3,j30) * omega_rj(kr,1,3) * d_sph_cor(l31,ic_vt)     &
-     &       + sr3(4,j30) * omega_rj(kr,1,3) * d_sph_cor(l41,ic_vt)
+        ct3 =  sr3_rj(1,j30) * omega_rj(kr,1,3) * d_sph_cor(l12,ic_dvp) &
+     &       + sr3_rj(2,j30) * omega_rj(kr,1,3) * d_sph_cor(l22,ic_dvp) &
+     &       + sr3_rj(1,j30) * omega_rj(kr,1,3) * d_sph_cor(l11,ic_vt)  &
+     &       + sr3_rj(2,j30) * omega_rj(kr,1,3) * d_sph_cor(l21,ic_vt)  &
+     &       + sr3_rj(3,j30) * omega_rj(kr,1,3) * d_sph_cor(l31,ic_vt)  &
+     &       + sr3_rj(4,j30) * omega_rj(kr,1,3) * d_sph_cor(l41,ic_vt)
 !
         d_rj(inod,is_rot_f) = d_rj(inod,is_rot_f)                       &
      &                    - coef_cor*ar_1d_rj(kr,2) * (ct1 + ct3)

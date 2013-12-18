@@ -58,17 +58,16 @@
       use copy_MHD_4_pole_trans
 !
 !
-      if(nvector_rj_2_rtp .gt. 0) then
-        call copy_mhd_vec_spec_to_trans
-        call pole_b_trans_vector(nvector_rj_2_rtp)
-        call copy_mhd_vec_from_pole_trans
+      if(ncomp_rj_2_rtp .gt. 0) call copy_mhd_sph_spec_to_trans
+!
+      if((nscalar_rj_2_rtp+nvector_rj_2_rtp) .gt. 0) then
+        call pole_b_trans_vector(nvector_rj_2_rtp,                      &
+     &      nscalar_rj_2_rtp, izero)
       end if
 !
-      if(nscalar_rj_2_rtp .gt. 0) then
-        call copy_mhd_scl_spec_to_trans
-        call pole_b_trans_scalar(nscalar_rj_2_rtp)
-        call copy_mhd_scl_from_pole_trans
-      end if
+      if(nvector_rj_2_rtp .gt. 0) call copy_mhd_vec_from_pole_trans
+      if(nscalar_rj_2_rtp .gt. 0) call copy_mhd_scl_from_pole_trans
+!
 !
       end subroutine pole_back_trans_4_MHD
 !
@@ -83,14 +82,18 @@
 !
 !
 !   transform for vectors
-      call copy_snap_vec_spec_to_trans
-      call pole_b_trans_vector(nvector_snap_rj_2_rtp)
-      call copy_snap_vec_from_pole_trans
+      if(nvector_snap_rj_2_rtp .gt. 0) call copy_snap_vec_spec_to_trans
+      if(nscalar_snap_rj_2_rtp .gt. 0) call copy_snap_scl_spec_to_trans
 !
-!   transform for scalars
-      call copy_snap_scl_spec_to_trans
-      call pole_b_trans_scalar(nscalar_snap_rj_2_rtp)
-      call copy_snap_scl_from_pole_trans
+      call pole_b_trans_vector(nvector_snap_rj_2_rtp,                   &
+     &    nscalar_snap_rj_2_rtp, izero)
+!
+      if(nvector_snap_rj_2_rtp .gt. 0) then
+        call copy_snap_vec_from_pole_trans
+      end if
+      if(nscalar_snap_rj_2_rtp .gt. 0) then
+        call copy_snap_scl_from_pole_trans
+      end if
 !
       end subroutine pole_back_trans_snapshot_MHD
 !
