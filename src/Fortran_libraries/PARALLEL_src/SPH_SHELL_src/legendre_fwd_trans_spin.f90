@@ -9,15 +9,15 @@
 !!       (innermost loop is spherical harmonics)
 !!
 !!@verbatim
-!!      subroutine legendre_f_trans_vector_spin(nb)
+!!      subroutine legendre_f_trans_vector_spin(nfld)
 !!        Input:  vr_rtm_spin   (Order: radius,theta,phi)
 !!        Output: sp_rlm_spin   (Order: poloidal,diff_poloidal,toroidal)
-!!      subroutine legendre_f_trans_scalar_spin(nb)
+!!      subroutine legendre_f_trans_scalar_spin(nfld)
 !!        Input:  vr_rtm_spin
 !!        Output: sp_rlm_spin
 !!@endverbatim
 !!
-!!@n @param  nb  number of fields to be transformed
+!!@n @param  nfld  number of fields to be transformed
 !
       module legendre_fwd_trans_spin
 !
@@ -38,22 +38,22 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_f_trans_vector_spin(nb)
+      subroutine legendre_f_trans_vector_spin(nfld)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: nfld
 !
       integer(kind = kint) :: j_rlm, mp_rlm, mn_rlm, mst, med, l_rtm
       integer(kind = kint) :: nb_nri, kr_nd
       real(kind = kreal) :: pwt_tmp, dpwt_tmp, pgwt_tmp
 !
 !
-      nb_nri = nb*nidx_rlm(1)
+      nb_nri = nfld*nidx_rlm(1)
 !$omp parallel do private(j_rlm,l_rtm,mp_rlm,mn_rlm,                    &
 !$omp&               mst,med,pwt_tmp,dpwt_tmp,pgwt_tmp)
 !cdir nodep
       do kr_nd = 1, nb_nri
 !      do k_rlm = 1, nidx_rlm(1)
-!        do nd = 1, nb
+!        do nd = 1, nfld
 !
         do mp_rlm = 1, nidx_rtm(3)
           mn_rlm = nidx_rtm(3) - mp_rlm + 1
@@ -87,7 +87,7 @@
 !$omp parallel do private(j_rlm)
       do kr_nd = 1, nb_nri
 !      do k_rlm = 1, nidx_rlm(1)
-!        do nd = 1, nb
+!        do nd = 1, nfld
 !cdir nodep
           do j_rlm = 1, nidx_rlm(2)
             sp_rlm_spin(j_rlm,kr_nd,1) = sp_rlm_spin(j_rlm,kr_nd,1)     &
@@ -104,21 +104,21 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_f_trans_scalar_spin(nb)
+      subroutine legendre_f_trans_scalar_spin(nfld)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: nfld
 !
       integer(kind = kint) :: j_rlm, l_rtm, mp_rlm, mst, med
       integer(kind = kint) :: nb_nri, kr_nd
       real(kind = kreal) :: pwt_tmp
 !
 !
-      nb_nri = nb*nidx_rlm(1)
+      nb_nri = nfld*nidx_rlm(1)
 !$omp parallel do private(j_rlm,l_rtm,pwt_tmp,mp_rlm,mst,med)
 !cdir nodep
       do kr_nd = 1, nb_nri
 !      do k_rlm = 1, nidx_rlm(1)
-!        do nd = 1, nb
+!        do nd = 1, nfld
 !
         do mp_rlm = 1, nidx_rtm(3)
           mst = lstack_rlm(mp_rlm-1)+1
@@ -139,7 +139,7 @@
 !$omp parallel do private(j_rlm)
       do kr_nd = 1, nb_nri
 !      do k_rlm = 1, nidx_rlm(1)
-!        do nd = 1, nb
+!        do nd = 1, nfld
 !cdir nodep
           do j_rlm = 1, nidx_rlm(2)
             sp_rlm_spin(j_rlm,kr_nd,1) = sp_rlm_spin(j_rlm,kr_nd,1)     &

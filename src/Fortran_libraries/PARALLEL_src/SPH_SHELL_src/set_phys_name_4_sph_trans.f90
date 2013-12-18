@@ -34,6 +34,21 @@
       call allocate_phys_rtp_name
 !
       i0 = 0
+      istart_vector_rtp = 1
+      num_vector_rtp = 0
+      do i = 1, num_phys_rj
+        if (num_phys_comp_rj(i) .eq. n_vector) then
+          i0 = i0 + 1
+          num_vector_rtp = num_vector_rtp + 1
+          num_phys_comp_rtp(i0) =    num_phys_comp_rj(i)
+          istack_phys_comp_rtp(i0) = istack_phys_comp_rtp(i0-1)         &
+     &                              + num_phys_comp_rtp(i0)
+          phys_name_rtp(i0) =        phys_name_rj(i)
+          iflag_monitor_rtp(i0) =    iflag_monitor_rj(i)
+        end if
+      end do
+      istart_scalar_rtp = istart_vector_rtp + num_vector_rtp
+!
       num_scalar_rtp = 0
       istack_phys_comp_rtp(0) = 0
       do i = 1, num_phys_rj
@@ -47,21 +62,7 @@
           iflag_monitor_rtp(i0) =    iflag_monitor_rj(i)
         end if
       end do
-      istart_scalar_rtp = 1
-!
-      num_vector_rtp = 0
-      do i = 1, num_phys_rj
-        if (num_phys_comp_rj(i) .eq. n_vector) then
-          i0 = i0 + 1
-          num_vector_rtp = num_vector_rtp + 1
-          num_phys_comp_rtp(i0) =    num_phys_comp_rj(i)
-          istack_phys_comp_rtp(i0) = istack_phys_comp_rtp(i0-1)         &
-     &                              + num_phys_comp_rtp(i0)
-          phys_name_rtp(i0) =        phys_name_rj(i)
-          iflag_monitor_rtp(i0) =    iflag_monitor_rj(i)
-        end if
-      end do
-      istart_vector_rtp = istart_scalar_rtp + num_scalar_rtp
+      istart_tensor_rtp = istart_scalar_rtp + num_scalar_rtp
 !
       num_tensor_rtp = 0
       do i = 1, num_phys_rj
@@ -75,13 +76,15 @@
           iflag_monitor_rtp(i0) =    iflag_monitor_rj(i)
         end if
       end do
-      istart_tensor_rtp = istart_vector_rtp + num_vector_rtp
 !
       ntot_phys_rtp = istack_phys_comp_rtp(i0)
 !
       nb_sph_trans = itwo * num_tensor_rtp
       nb_sph_trans = max(num_scalar_rtp,nb_sph_trans)
       nb_sph_trans = max(num_vector_rtp,nb_sph_trans)
+!
+      ncomp_sph_trans = num_scalar_rtp + 3*num_vector_rtp               &
+     &                 + 6*num_tensor_rtp
 !
       if (iflag_debug .eq. 1) then
 !        write(*,*) 'num_phys_rj', num_phys_rj

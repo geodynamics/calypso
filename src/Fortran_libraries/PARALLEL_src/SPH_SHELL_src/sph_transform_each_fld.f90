@@ -47,13 +47,13 @@
       if( (is_fld*irtp_fld) .gt. 0) return
 !
 !$omp parallel
-      call copy_vec_spec_to_trans(ione, is_fld, ione)
+      call copy_vec_spec_to_trans(n_vector, is_fld, ione)
 !$omp end parallel
 !
-      call sph_b_trans_vector(ione)
+      call sph_b_trans_vector(ione, izero, izero)
 !
 !$omp parallel
-      call copy_vec_fld_from_trans(ione, irtp_fld, ione)
+      call copy_vec_fld_from_trans(n_vector, irtp_fld, ione)
 !$omp end parallel
 !
       end subroutine sph_back_trans_4_vector
@@ -63,7 +63,7 @@
       subroutine sph_back_trans_4_scalar(is_fld, irtp_fld)
 !
       use copy_spectr_4_sph_trans
-      use sph_trans_scalar
+      use sph_trans_vector
       use copy_sph_field_4_sph_trans
 !
       integer(kind = kint), intent(in)  :: is_fld, irtp_fld
@@ -75,7 +75,7 @@
       call copy_scalar_spec_to_trans(ione, is_fld, ione)
 !$omp end parallel
 !
-      call sph_b_trans_scalar(ione)
+      call sph_b_trans_vector(izero, ione, izero)
 !
 !$omp parallel
       call copy_scalar_fld_from_trans(ione, irtp_fld, ione)
@@ -98,13 +98,13 @@
       if( (is_fld*irtp_fld) .gt. 0) return
 !
 !$omp parallel
-      call copy_vec_fld_to_trans(ione, irtp_fld, ione)
+      call copy_vec_fld_to_trans(n_vector, irtp_fld, ione)
 !$omp end parallel
 !
-      call sph_f_trans_vector(ione)
+      call sph_f_trans_vector(ione, izero, izero)
 !
 !$omp parallel
-      call copy_vec_spec_from_trans(ione, is_fld, ione)
+      call copy_vec_spec_from_trans(n_vector, is_fld, ione)
 !$omp end parallel
 !
       end subroutine sph_forward_trans_4_vector
@@ -114,7 +114,7 @@
       subroutine sph_forward_trans_4_scalar(irtp_fld, is_fld)
 !
       use copy_spectr_4_sph_trans
-      use sph_trans_scalar
+      use sph_trans_vector
       use copy_sph_field_4_sph_trans
 !
       integer(kind = kint), intent(in) :: is_fld, irtp_fld
@@ -126,7 +126,7 @@
       call copy_scalar_fld_to_trans(ione, irtp_fld, ione)
 !$omp end parallel
 !
-      call sph_f_trans_scalar(ione)
+      call sph_f_trans_vector(izero, ione, izero)
 !
 !$omp parallel
       call copy_scalar_spec_from_trans(ione, is_fld, ione)

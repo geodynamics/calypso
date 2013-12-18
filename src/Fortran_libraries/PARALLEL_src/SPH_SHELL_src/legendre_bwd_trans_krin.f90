@@ -9,15 +9,15 @@
 !!       (innermost loop is field and radius)
 !!
 !!@verbatim
-!!      subroutine legendre_b_trans_vector_krin(nb)
+!!      subroutine legendre_b_trans_vector_krin(nfld)
 !!        Input:  vr_rtm_krin   (Order: radius,theta,phi)
 !!        Output: sp_rlm_krin   (Order: poloidal,diff_poloidal,toroidal)
-!!      subroutine legendre_b_trans_scalar_krin(nb)
+!!      subroutine legendre_b_trans_scalar_krin(nfld)
 !!        Input:  vr_rtm_krin
 !!        Output: sp_rlm_krin
 !!@endverbatim
 !!
-!!@n @param  nb  number of fields to be transformed
+!!@n @param  nfld  number of fields to be transformed
 !
       module legendre_bwd_trans_krin
 !
@@ -38,9 +38,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_vector_krin(nb)
+      subroutine legendre_b_trans_vector_krin(nfld)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: nfld
 !
       integer(kind = kint) :: j_rlm, mp_rlm, mn_rlm
       integer(kind = kint) :: l_rtm, mst, med
@@ -49,7 +49,7 @@
       real(kind = kreal) :: pg_tmp, dp_tmp
 !
 !
-      nb_nri = nb*nidx_rtm(1)
+      nb_nri = nfld*nidx_rtm(1)
 !$omp parallel do private(mp_rlm,j_rlm,kr_nd,ip_rtm_1,mst,med,          &
 !$omp&                    in_rtm_1,pg_tmp,dp_tmp,l_rtm)
       do mp_rlm = 1, nidx_rtm(3)
@@ -63,7 +63,7 @@
             pg_tmp = P_rtm(l_rtm,j_rlm) * g_sph_rlm(j_rlm,3)
             dp_tmp = dPdt_rtm(l_rtm,j_rlm)
 !          do k_rtm = 1, nidx_rtm(1)
-!            do nd = 1, nb
+!            do nd = 1, nfld
 !cdir nodep
             do kr_nd = 1, nb_nri
               vr_rtm_krin(kr_nd,ip_rtm_1,1)                             &
@@ -96,7 +96,7 @@
      &              * dble( -idx_gl_1d_rlm_j(j_rlm,3) )
 !
 !          do k_rtm = 1, nidx_rtm(1)
-!            do nd = 1, nb
+!            do nd = 1, nfld
 !cdir nodep
             do kr_nd = 1, nb_nri
 !
@@ -117,16 +117,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_scalar_krin(nb)
+      subroutine legendre_b_trans_scalar_krin(nfld)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: nfld
 !
       integer(kind = kint) :: j_rlm, l_rtm, mst, med, mp_rlm
       integer(kind = kint) :: ip_rtm_1
       integer(kind = kint) :: nb_nri, kr_nd
 !
 !
-      nb_nri = nb*nidx_rtm(1)
+      nb_nri = nfld*nidx_rtm(1)
 !$omp parallel do private(j_rlm,kr_nd,ip_rtm_1,mst,med,l_rtm)
       do mp_rlm = 1, nidx_rtm(3)
         mst = lstack_rlm(mp_rlm-1)+1
@@ -136,7 +136,7 @@
           do l_rtm = 1, nidx_rtm(2)
             ip_rtm_1 = l_rtm + (mp_rlm-1) * nidx_rtm(2)
 !          do k_rtm = 1, nidx_rtm(1)
-!            do nd = 1, nb
+!            do nd = 1, nfld
 !cdir nodep
             do kr_nd = 1, nb_nri
               vr_rtm_krin(kr_nd,ip_rtm_1,1)                             &

@@ -8,14 +8,17 @@
 !>@brief Clear data for Legendre transform
 !!
 !!@verbatim
-!!      subroutine clear_b_trans_vector(nb)
-!!      subroutine clear_b_trans_scalar(nb)
+!!      subroutine clear_b_trans_vector(ncomp, nvector)
+!!      subroutine clear_b_trans_scalar(ncomp, nvector, nscalar)
 !!
-!!      subroutine clear_f_trans_vector(nb)
-!!      subroutine clear_f_trans_scalar(nb)
+!!      subroutine clear_f_trans_vector(ncomp, nvector)
+!!      subroutine clear_f_trans_scalar(ncomp, nvector, nscalar)
 !!@endverbatim
 !!
-!!@n @param  nb  number of fields to be transformed
+!!@param   ncomp    Total number of components for spherical transform
+!!@param   nvector  Number of vector for spherical transform
+!!@param   nscalar  Number of scalar (including tensor components)
+!!                  for spherical transform
 !
       module clear_schmidt_trans
 !
@@ -36,21 +39,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine clear_b_trans_vector(nb)
+      subroutine clear_b_trans_vector(ncomp, nvector)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: ncomp, nvector
 !
-      integer(kind = kint) :: ip, ist, ied, i_rtm
+      integer(kind = kint) :: ip, ist, ied, i_rtm, ip_rtm, nd
 !
 !
-!$omp parallel do private(ip,i_rtm,ist,ied)
+!$omp parallel do private(ip,i_rtm,ip_rtm,ist,ied,nd)
       do ip = 1, np_smp
-        ist = nb*inod_rtm_smp_stack(ip-1) + 1
-        ied = nb*inod_rtm_smp_stack(ip)
-        do i_rtm = ist, ied
-            vr_rtm(3*i_rtm-2) = zero
-            vr_rtm(3*i_rtm-1) = zero
-            vr_rtm(3*i_rtm  ) = zero
+        ist = inod_rtm_smp_stack(ip-1) + 1
+        ied = inod_rtm_smp_stack(ip)
+        do nd = 1, nvector
+          do i_rtm = ist, ied
+            ip_rtm = 3*nd + (i_rtm-1) * ncomp
+            vr_rtm(ip_rtm-2) = zero
+            vr_rtm(ip_rtm-1) = zero
+            vr_rtm(ip_rtm  ) = zero
+          end do
         end do
       end do
 !$omp end parallel do
@@ -59,19 +65,22 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine clear_b_trans_scalar(nb)
+      subroutine clear_b_trans_scalar(ncomp, nvector, nscalar)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
 !
-      integer(kind = kint) :: ip, ist, ied, i_rtm
+      integer(kind = kint) :: ip, ist, ied, i_rtm, ip_rtm, nd
 !
 !
-!$omp parallel do private(ip,i_rtm,ist,ied)
+!$omp parallel do private(ip,i_rtm,ip_rtm,ist,ied,nd)
       do ip = 1, np_smp
-        ist = nb*inod_rtm_smp_stack(ip-1) + 1
-        ied = nb*inod_rtm_smp_stack(ip)
-        do i_rtm = ist, ied
-            vr_rtm(i_rtm) = zero
+        ist = inod_rtm_smp_stack(ip-1) + 1
+        ied = inod_rtm_smp_stack(ip)
+        do nd = 1, nscalar
+          do i_rtm = ist, ied
+            ip_rtm = nd + 3*nvector + (i_rtm-1) * ncomp
+            vr_rtm(ip_rtm) = zero
+          end do
         end do
       end do
 !$omp end parallel do
@@ -81,21 +90,24 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine clear_f_trans_vector(nb)
+      subroutine clear_f_trans_vector(ncomp, nvector)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: ncomp, nvector
 !
-      integer(kind = kint) :: ip, ist, ied, i_rlm
+      integer(kind = kint) :: ip, ist, ied, i_rlm, ip_rlm, nd
 !
 !
-!$omp parallel do private(ip,i_rlm,ist,ied)
+!$omp parallel do private(ip,i_rlm,ip_rlm,ist,ied,nd)
       do ip = 1, np_smp
-        ist = nb*inod_rlm_smp_stack(ip-1) + 1
-        ied = nb*inod_rlm_smp_stack(ip)
-        do i_rlm = ist, ied
-            sp_rlm(3*i_rlm-2) = zero
-            sp_rlm(3*i_rlm-1) = zero
-            sp_rlm(3*i_rlm  ) = zero
+        ist = inod_rlm_smp_stack(ip-1) + 1
+        ied = inod_rlm_smp_stack(ip)
+        do nd = 1, nvector
+          do i_rlm = ist, ied
+            ip_rlm = 3*nd + (i_rlm-1) * ncomp
+            sp_rlm(ip_rlm-2) = zero
+            sp_rlm(ip_rlm-1) = zero
+            sp_rlm(ip_rlm  ) = zero
+          end do
         end do
       end do
 !$omp end parallel do
@@ -104,25 +116,29 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine clear_f_trans_scalar(nb)
+      subroutine clear_f_trans_scalar(ncomp, nvector, nscalar)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
 !
-      integer(kind = kint) :: ip, ist, ied, i_rlm
+      integer(kind = kint) :: ip, ist, ied, i_rlm, ip_rlm, nd
 !
 !
-!$omp parallel do private(ip,i_rlm,ist,ied)
+!$omp parallel do private(ip,i_rlm,ip_rlm,ist,ied,nd)
       do ip = 1, np_smp
-        ist = nb*inod_rlm_smp_stack(ip-1) + 1
-        ied = nb*inod_rlm_smp_stack(ip)
-        do i_rlm = ist, ied
+        ist = inod_rlm_smp_stack(ip-1) + 1
+        ied = inod_rlm_smp_stack(ip)
+        do nd = 1, nscalar
+          do i_rlm = ist, ied
+            ip_rlm = nd + 3*nvector + (i_rlm-1) * ncomp
             sp_rlm(i_rlm) = zero
+          end do
         end do
       end do
 !$omp end parallel do
 !
       end subroutine clear_f_trans_scalar
 !
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       end module clear_schmidt_trans

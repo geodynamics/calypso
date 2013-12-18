@@ -9,15 +9,15 @@
 !!       (innermost loop is spherical harmonics)
 !!
 !!@verbatim
-!!      subroutine legendre_b_trans_vector_spin(nb)
+!!      subroutine legendre_b_trans_vector_spin(nfld)
 !!        Input:  vr_rtm_spin   (Order: radius,theta,phi)
 !!        Output: sp_rlm_spin   (Order: poloidal,diff_poloidal,toroidal)
-!!      subroutine legendre_b_trans_scalar_spin(nb)
+!!      subroutine legendre_b_trans_scalar_spin(nfld)
 !!        Input:  vr_rtm_spin
 !!        Output: sp_rlm_spin
 !!@endverbatim
 !!
-!!@n @param  nb  number of fields to be transformed
+!!@n @param  nfld  number of fields to be transformed
 !
       module legendre_bwd_trans_spin
 !
@@ -38,21 +38,21 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_vector_spin(nb)
+      subroutine legendre_b_trans_vector_spin(nfld)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: nfld
 !
       integer(kind = kint) :: j_rlm, mp_rlm, mn_rlm, mst, med, l_rtm
       integer(kind = kint) :: nb_nri, kr_nd
       real(kind = kreal) :: pg_tmp, dp_tmp
 !
 !
-      nb_nri = nb*nidx_rtm(1)
+      nb_nri = nfld*nidx_rtm(1)
 !$omp parallel do private(j_rlm,l_rtm,mp_rlm,mn_rlm,                    &
 !$omp&               mst,med,pg_tmp,dp_tmp)
       do kr_nd = 1, nb_nri
 !      do k_rtm = 1,  nidx_rtm(1)
-!        do nd = 1, nb
+!        do nd = 1, nfld
 !
         do mp_rlm = 1, nidx_rtm(3)
           mn_rlm = nidx_rtm(3) - mp_rlm + 1
@@ -102,19 +102,19 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_scalar_spin(nb)
+      subroutine legendre_b_trans_scalar_spin(nfld)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: nfld
 !
       integer(kind = kint) :: j_rlm, l_rtm, mp_rlm, mst, med
       integer(kind = kint) :: nb_nri, kr_nd
 !
 !
-      nb_nri = nb*nidx_rtm(1)
+      nb_nri = nfld*nidx_rtm(1)
 !$omp parallel do private(j_rlm,l_rtm,mp_rlm,mst,med)
       do kr_nd = 1, nb_nri
 !      do k_rtm = 1,  nidx_rtm(1)
-!        do nd = 1, nb
+!        do nd = 1, nfld
 !
         do mp_rlm = 1, nidx_rtm(3)
           mst = lstack_rlm(mp_rlm-1)+1
