@@ -2,7 +2,6 @@ begin spherical_shell_ctl
   begin data_files_def
     num_subdomain_ctl    4
     sph_file_prefix             'in'
-    coriolis_int_file_name      'rot_int.dat'
   end data_files_def
 !
   begin num_domain_ctl

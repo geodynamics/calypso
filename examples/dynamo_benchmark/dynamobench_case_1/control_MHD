@@ -23,7 +23,6 @@ begin MHD_control
     num_smp_ctl                  8
 !
     sph_file_prefix             'sph_lm31r48c_4/in'
-    coriolis_int_file_name      'sph_lm31r48c_4/rot_int.dat'
 !
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
@@ -46,6 +45,7 @@ begin MHD_control
 !   thermal_diffusion, viscous_diffusion, magnetic_diffusion
 !   Coriolis_force, buoyancy
 !
+!   heat_source, composition_source
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
       array nod_value_ctl     8

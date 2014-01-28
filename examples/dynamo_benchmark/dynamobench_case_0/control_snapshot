@@ -24,7 +24,6 @@ begin MHD_control
 !
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
-    coriolis_int_file_name      'sph_lm31r48c_4/rot_int.dat'
 !
     field_file_fmt_ctl          'VTK'
   end data_files_def
@@ -37,6 +36,8 @@ begin MHD_control
 !   composition
 !
 !   magnetic_ene_generation
+!
+!   heat_source, composition_source
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
       array nod_value_ctl    4

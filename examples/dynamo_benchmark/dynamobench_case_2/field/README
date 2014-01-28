@@ -1,0 +1,7 @@
+!-----------------------------------------------------------------------
+!     Example using dynamo benchmark test Case 2
+!       Please see Christensen et.al. (2001) for the model description
+!-----------------------------------------------------------------------
+!
+ Here is the directory for field files for visualization.
+ Files named "out.[field step #].vtk" are saved in this directory.
