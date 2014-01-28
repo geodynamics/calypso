@@ -31,18 +31,16 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, is_fld, ir_fld
+      integer(kind = kint) :: i, j, j0, nd
 !
 !
       do j = 1, num_scalar_rtp
         j0 = j + istart_scalar_rtp - 1
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            is_fld = istack_phys_comp_rj(i-1) + 1
-            ir_fld = istack_phys_comp_rtp(j0-1) + 1
+            nd = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_scalar_spec_to_trans                              &
-     &         (ntot_phys_rtp, is_fld, ir_fld)
+            call copy_scalar_spec_to_trans(num_scalar_rtp, nd, j)
 !$omp end parallel
             exit
           end if
@@ -57,18 +55,16 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, is_fld, ir_fld
+      integer(kind = kint) :: i, j, j0, nd
 !
 !
       do j = 1, num_scalar_rtp
         j0 = j + istart_scalar_rtp - 1
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            is_fld = istack_phys_comp_rj(i-1) + 1
-            ir_fld = istack_phys_comp_rtp(j0-1) + 1
+            nd = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_scalar_spec_from_trans                            &
-     &         (ntot_phys_rtp, is_fld, ir_fld)
+            call copy_scalar_spec_from_trans(num_scalar_rtp, nd, j)
 !$omp end parallel
             exit
           end if
@@ -84,19 +80,16 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, is_fld, ir_fld
+      integer(kind = kint) :: i, j, j0, nd
 !
 !
       do j = 1, num_vector_rtp
         j0 = j + istart_vector_rtp - 1
-        is_fld = istack_phys_comp_rtp(j-1) + 1
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            is_fld = istack_phys_comp_rj(i-1) + 1
-            ir_fld = istack_phys_comp_rtp(j0-1) + 1
+            nd = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_vec_spec_to_trans                                 &
-     &         (ntot_phys_rtp, is_fld, ir_fld)
+            call copy_vec_spec_to_trans(3*num_vector_rtp, nd, 3*j-2)
 !$omp end parallel
             exit
           end if
@@ -111,18 +104,16 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, is_fld, ir_fld
+      integer(kind = kint) :: i, j, j0, nd
 !
 !
       do j = 1, num_vector_rtp
         j0 = j + istart_vector_rtp - 1
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            is_fld = istack_phys_comp_rj(i-1) + 1
-            ir_fld = istack_phys_comp_rtp(j0-1) + 1
+            nd = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_vec_spec_from_trans                               &
-     &         (ntot_phys_rtp, is_fld, ir_fld)
+            call copy_vec_spec_from_trans(3*num_vector_rtp, nd, 3*j-2)
 !$omp end parallel
             exit
           end if
@@ -138,18 +129,16 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, is_fld, ir_fld
+      integer(kind = kint) :: i, j, j0, nd
 !
 !
       do j = 1, num_tensor_rtp
         j0 = j + istart_tensor_rtp - 1
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            is_fld = istack_phys_comp_rj(i-1) + 1
-            ir_fld = istack_phys_comp_rtp(j0-1) + 1
+            nd = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_tensor_spec_to_trans                              &
-     &         (ntot_phys_rtp, is_fld, ir_fld)
+            call copy_tsr_spec_to_trans(6*num_tensor_rtp, nd, 6*j-5)
 !$omp end parallel
             exit
           end if
@@ -164,18 +153,16 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, is_fld, ir_fld
+      integer(kind = kint) :: i, j, j0, nd
 !
 !
       do j = 1, num_tensor_rtp
         j0 = j + istart_tensor_rtp - 1
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            is_fld = istack_phys_comp_rj(i-1) + 1
-            ir_fld = istack_phys_comp_rtp(j0-1) + 1
+            nd = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_tensor_spec_from_trans                            &
-     &         (ntot_phys_rtp, is_fld, ir_fld)
+            call copy_tsr_spec_from_trans(6*num_tensor_rtp, nd, 6*j-5)
 !$omp end parallel
             exit
           end if

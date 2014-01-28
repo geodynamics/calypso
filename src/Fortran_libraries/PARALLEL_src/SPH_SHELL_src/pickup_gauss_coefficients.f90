@@ -47,7 +47,8 @@
       call allocate_iflag_pick_sph(l_truncation)
 !
       if (ipol%i_magne .gt. 0) then
-        call set_picked_sph_adrress(l_truncation, ist_rj(2), ied_rj(2), &
+      call set_picked_sph_adrress                                       &
+     &   (l_truncation, nidx_rj(2), idx_gl_1d_rj_j(1,1),                &
      &    num_pick_gauss_coefs, num_pick_gauss_l, num_pick_gauss_m,     &
      &    idx_pick_gauss_mode, idx_pick_gauss_l, idx_pick_gauss_m,      &
      &    ntot_pick_gauss_mode, num_pick_gauss_mode,                    &

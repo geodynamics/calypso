@@ -108,6 +108,7 @@
         write(id_dynamobench,'(a)', advance='NO') 'omega_ic_z    '
       end if
 !
+      write(*,*) 'sph_bc_U%iflag_icb', sph_bc_U%iflag_icb
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center                  &
      &  .and. sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         write(id_dynamobench,'(a)', advance='NO') 'MAG_torque_ic_z    '

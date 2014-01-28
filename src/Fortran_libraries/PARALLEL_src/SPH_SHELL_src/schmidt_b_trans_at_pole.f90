@@ -85,10 +85,9 @@
       v_np_local = zero
       v_sp_local = zero
 !
-      write(50+my_rank,*) 'ist_rtm_order_zero', ist_rtm_order_zero
       if(ist_rtm_order_zero .le. 0) return
 !!$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
-      do k_rlm = 1, nidx_rtm(1)
+      do k_rlm = 1, nidx_rlm(1)
         do nd = 1, nb
           kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * nb
 !
@@ -101,9 +100,6 @@
      &                        + sp_rlm(i_rlm) * P_pole_rtm(1,j_rlm)
             v_sp_local(kr_nd) = v_sp_local(kr_nd)                       &
      &                        + sp_rlm(i_rlm) * P_pole_rtm(2,j_rlm)
-            if(nd.eq.1 .and. idx_gl_1d_rlm_j(j_rlm,1).eq.0)   &
-     &    write(50+my_rank,*) nd,j_rlm, k_rlm,  idx_gl_1d_rtm_r(k_rlm), &
-     &    sp_rlm(i_rlm),  v_np_local(kr_nd),  v_sp_local(kr_nd)
           end do
         end do
       end do
@@ -130,7 +126,7 @@
 !
       if(ist_rtm_order_zero .gt. 0) then
 !$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
-        do k_rlm = 1, nidx_rtm(1)
+        do k_rlm = 1, nidx_rlm(1)
           do nd = 1, nb
             kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * nb
 !
@@ -155,7 +151,7 @@
 !
       if(ist_rtm_order_1s .gt. 0) then
 !$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
-        do k_rlm = 1, nidx_rtm(1)
+        do k_rlm = 1, nidx_rlm(1)
           do nd = 1, nb
             kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * nb
 !
@@ -185,7 +181,7 @@
 !
       if(ist_rtm_order_1c .gt. 0) then
 !$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
-        do k_rlm = 1, nidx_rtm(1)
+        do k_rlm = 1, nidx_rlm(1)
           do nd = 1, nb
             kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * nb
 !
@@ -215,21 +211,21 @@
 !
       iflag = ist_rtm_order_zero+ist_rtm_order_1s+ist_rtm_order_1c
       if(iflag .gt. 0) then
-        do k_rlm = 1, nidx_rtm(1)
+        do k_rlm = 1, nidx_rlm(1)
           do nd = 1, nb
             kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * nb
             v_np_local(3*kr_nd-2) = v_np_local(3*kr_nd-2)               &
-     &                      * a_r_1d_rtm_r(k_rlm)*a_r_1d_rtm_r(k_rlm)
+     &                      * a_r_1d_rlm_r(k_rlm)*a_r_1d_rlm_r(k_rlm)
             v_np_local(3*kr_nd-1) = v_np_local(3*kr_nd-1)               &
-     &                      * a_r_1d_rtm_r(k_rlm)
+     &                      * a_r_1d_rlm_r(k_rlm)
             v_np_local(3*kr_nd  ) = v_np_local(3*kr_nd  )               &
-     &                      * a_r_1d_rtm_r(k_rlm)
+     &                      * a_r_1d_rlm_r(k_rlm)
             v_sp_local(3*kr_nd-2) = v_sp_local(3*kr_nd-2)               &
-     &                      * a_r_1d_rtm_r(k_rlm)*a_r_1d_rtm_r(k_rlm)
+     &                      * a_r_1d_rlm_r(k_rlm)*a_r_1d_rlm_r(k_rlm)
             v_sp_local(3*kr_nd-1) = v_sp_local(3*kr_nd-1)               &
-     &                      * a_r_1d_rtm_r(k_rlm)
+     &                      * a_r_1d_rlm_r(k_rlm)
             v_sp_local(3*kr_nd  ) = v_sp_local(3*kr_nd  )               &
-     &                      * a_r_1d_rtm_r(k_rlm)
+     &                      * a_r_1d_rlm_r(k_rlm)
           end do
         end do
       end if
@@ -252,7 +248,7 @@
 !
       if(ist_rtm_order_zero .gt. 0) then
 !$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
-        do k_rlm = 1, nidx_rtm(1)
+        do k_rlm = 1, nidx_rlm(1)
           do nd = 1, nb
             kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * nb
 !
@@ -275,7 +271,7 @@
 !
       if(ist_rtm_order_1s .gt. 0) then
 !$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
-        do k_rlm = 1, nidx_rtm(1)
+        do k_rlm = 1, nidx_rlm(1)
           do nd = 1, nb
             kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * nb
 !
@@ -299,7 +295,7 @@
 !
       if(ist_rtm_order_1c .gt. 0) then
 !$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
-        do k_rlm = 1, nidx_rtm(1)
+        do k_rlm = 1, nidx_rlm(1)
           do nd = 1, nb
             kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * nb
 !
@@ -323,17 +319,17 @@
 !
       iflag = ist_rtm_order_zero+ist_rtm_order_1s+ist_rtm_order_1c
       if(iflag .gt. 0) then
-        do k_rlm = 1, nidx_rtm(1)
+        do k_rlm = 1, nidx_rlm(1)
           do nd = 1, nb
             kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * nb
             v_np_local(3*kr_nd-1) = v_np_local(3*kr_nd-1)               &
-     &                      * a_r_1d_rtm_r(k_rlm)
+     &                      * a_r_1d_rlm_r(k_rlm)
             v_np_local(3*kr_nd  ) = v_np_local(3*kr_nd  )               &
-     &                      * a_r_1d_rtm_r(k_rlm)
+     &                      * a_r_1d_rlm_r(k_rlm)
             v_sp_local(3*kr_nd-1) = v_sp_local(3*kr_nd-1)               &
-     &                      * a_r_1d_rtm_r(k_rlm)
+     &                      * a_r_1d_rlm_r(k_rlm)
             v_sp_local(3*kr_nd  ) = v_sp_local(3*kr_nd  )               &
-     &                      * a_r_1d_rtm_r(k_rlm)
+     &                      * a_r_1d_rlm_r(k_rlm)
           end do
         end do
       end if

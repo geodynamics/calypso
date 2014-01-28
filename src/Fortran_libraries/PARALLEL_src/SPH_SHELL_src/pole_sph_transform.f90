@@ -2,20 +2,17 @@
 !!@brief  module pole_sph_transform
 !!
 !!@author H. Matsui
-!!@date Programmed in Aug., 2007
-!!@n    Modified in Apr. 2013
+!!@date Programmed in June, 2012
 !
-!>@brief Spherical harmonics transdorm at poles and center
+!>@brief  Spherical transform for poles
 !!
 !!@verbatim
-!!      subroutine init_pole_transform
-!!      subroutine pole_b_trans_vector(nvector, nscalar, ntensor)
+!!      subroutine pole_b_trans_scalar(ncomp_trans)
+!!      subroutine pole_b_trans_vector(ncomp_trans)
+!!      subroutine pole_b_trans_tensor(ncomp_trans)
 !!@endverbatim
 !!
-!!@param   ncomp    Total number of components for spherical transform
-!!@param   nvector  Number of vector for spherical transform
-!!@param   nscalar  Number of scalar (including tensor components)
-!!                  for spherical transform
+!!@param ncomp_trans Number of components for transform
 !
       module pole_sph_transform
 !
@@ -49,50 +46,92 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine pole_b_trans_vector(nvector, nscalar, ntensor)
+      subroutine pole_b_trans_scalar(ncomp_trans)
 !
       use spherical_SRs_N
-      use legendre_bwd_trans_pole
-      use legendre_bwd_trans_center
+      use schmidt_b_trans_at_pole
+      use schmidt_b_trans_at_center
       use sum_b_trans_at_pole
 !
-      integer(kind = kint), intent(in) :: nvector, nscalar, ntensor
-      integer(kind = kint) :: nfld, ncomp
+      integer(kind = kint), intent(in) :: ncomp_trans
 !
 !
       if     (iflag_shell_mode.eq.iflag_no_FEMMESH                      &
         .or.  iflag_shell_mode.eq.iflag_MESH_same) return
 !
-      nfld = nscalar + n_sym_tensor*ntensor
-      ncomp = 3*nvector + nfld
-      if (iflag_debug.gt.0)  write(*,*) 'send_recv_rj_2_rlm_N', ncomp
-      call send_recv_rj_2_rlm_N(ncomp, sp_rj, sp_rlm)
+      call send_recv_rj_2_rlm_N(ncomp_trans, sp_rj, sp_rlm)
 !
-      if(nvector .gt. 0) then
-        if (iflag_debug.gt.0)                                           &
-     &          write(*,*) 'leg_b_trans_pole_vector', nvector
-        call leg_b_trans_pole_vector(ncomp, nvector)
-      end if
-      if(nfld .gt. 0) then
-        if (iflag_debug.gt.0)                                           &
-     &          write(*,*) 'leg_b_trans_pole_scalar', nfld
-        call leg_b_trans_pole_scalar(ncomp, nvector, nfld)
-      end if
-!
-      call sum_b_trans_pole_vect(ncomp)
+      if (iflag_debug.gt.0)  write(*,*) 'sum_b_trans_pole_scalar',      &
+     &                                 ncomp_trans
+      call schmidt_b_trans_pole_scalar(ncomp_trans)
+      call sum_b_trans_pole_scalar(ncomp_trans)
 !
       if(iflag_shell_mode .eq. iflag_MESH_w_center) then
-        if(nvector .gt. 0) then
-          call leg_b_trans_center_vector(ncomp, nvector)
-        end if
-        if(nfld .gt. 0) then
-          call leg_b_trans_center_scalar(ncomp, nvector, nfld)
-        end if
+        call schmidt_b_trans_center_scalar(ncomp_trans)
+        call sum_b_trans_center_scalar(ncomp_trans)
+      end if
 !
-        call sum_b_trans_center_vector(ncomp)
+      end subroutine pole_b_trans_scalar
+!
+! -----------------------------------------------------------------------
+!
+      subroutine pole_b_trans_vector(ncomp_trans)
+!
+      use spherical_SRs_N
+      use schmidt_b_trans_at_pole
+      use schmidt_b_trans_at_center
+      use sum_b_trans_at_pole
+!
+      integer(kind = kint), intent(in) :: ncomp_trans
+      integer(kind = kint) :: nb
+!
+!
+      if     (iflag_shell_mode.eq.iflag_no_FEMMESH                      &
+        .or.  iflag_shell_mode.eq.iflag_MESH_same) return
+!
+      nb = ncomp_trans / 3
+      call send_recv_rj_2_rlm_N(ncomp_trans, sp_rj, sp_rlm)
+!
+      if (iflag_debug.gt.0)  write(*,*) 'sum_b_trans_pole_vect',        &
+     &                     ncomp_trans
+      call schmidt_b_trans_pole_vect(nb)
+      call sum_b_trans_pole_vect(nb)
+!
+      if(iflag_shell_mode .eq. iflag_MESH_w_center) then
+        call schmidt_b_trans_center_vect(nb)
+        call sum_b_trans_center_vect(nb)
       end if
 !
       end subroutine pole_b_trans_vector
+!
+! -----------------------------------------------------------------------
+!
+      subroutine pole_b_trans_tensor(ncomp_trans)
+!
+      use spherical_SRs_N
+      use schmidt_b_trans_at_pole
+      use schmidt_b_trans_at_center
+      use sum_b_trans_at_pole
+!
+      integer(kind = kint), intent(in) :: ncomp_trans
+!
+!
+      if     (iflag_shell_mode.eq.iflag_no_FEMMESH                      &
+        .or.  iflag_shell_mode.eq.iflag_MESH_same) return
+!
+      call send_recv_rj_2_rlm_N(ncomp_trans, sp_rj, sp_rlm)
+!
+      if(iflag_debug.gt.0) write(*,*) 'schmidt_b_trans_pole_scalar',    &
+     &                               ncomp_trans
+      call schmidt_b_trans_pole_scalar(ncomp_trans)
+      call sum_b_trans_pole_scalar(ncomp_trans)
+!
+      if(iflag_shell_mode .eq. iflag_MESH_w_center) then
+        call schmidt_b_trans_center_scalar(ncomp_trans)
+        call sum_b_trans_center_scalar(ncomp_trans)
+      end if
+!
+      end subroutine pole_b_trans_tensor
 !
 ! -----------------------------------------------------------------------
 !

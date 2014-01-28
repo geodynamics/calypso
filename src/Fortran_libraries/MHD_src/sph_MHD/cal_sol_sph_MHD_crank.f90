@@ -143,8 +143,7 @@
       use cal_inner_core_rotation
 !
 !
-      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic                     &
-     &  .and. idx_rj_degree_one(1) .gt. 0) then
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call set_inner_core_rotation(sph_bc_U%kr_in)
       end if
 !

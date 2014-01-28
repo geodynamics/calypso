@@ -45,49 +45,21 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
 !
       integer(kind = kint) :: i_rlm, k_rlm, j_rlm
-      integer(kind = kint) :: k_rtm, l_rtm, m_rtm
+      integer(kind = kint) :: l_rtm
       integer(kind = kint) :: ip_rtm, in_rtm
       integer(kind = kint) :: nd
       real(kind = kreal) :: pwt_tmp, dpwt_tmp, pgwt_tmp
 !
 !
-!$omp parallel do private(m_rtm,k_rtm,nd,l_rtm,ip_rtm)
-      do m_rtm = 1, nidx_rtm(3)
-        do k_rtm = 1,  nidx_rtm(1)
-          do l_rtm = 1, nidx_rtm(2)
-            do nd = 1, nvector
-              ip_rtm = 3*nd + (l_rtm-1) * ncomp                         &
-     &                      + (k_rtm-1) * ncomp*nidx_rtm(2)             &
-     &                      + (m_rtm-1) * ncomp*nidx_rtm(1)*nidx_rtm(2)
-!
-              vr_rtm(ip_rtm-2) = vr_rtm(ip_rtm-2)                       &
-     &                * radius_1d_rtp_r(k_rtm)*radius_1d_rtp_r(k_rtm)
-              vr_rtm(ip_rtm-1) = vr_rtm(ip_rtm-1)                       &
-     &                * radius_1d_rtp_r(k_rtm)
-              vr_rtm(ip_rtm  ) = vr_rtm(ip_rtm  )                       &
-     &                * radius_1d_rtp_r(k_rtm)
-            end do
-          end do
-        end do
-      end do
-!$omp end parallel do
-!
-!$omp parallel do private(j_rlm,k_rlm,nd,i_rlm,ip_rtm,in_rtm,           &
+!$omp parallel do private(l_rtm,j_rlm,k_rlm,nd,i_rlm,ip_rtm,in_rtm,     &
 !$omp&               pwt_tmp,dpwt_tmp,pgwt_tmp)
-      do l_rtm = 1, nidx_rtm(2)
+      do j_rlm = 1, nidx_rlm(2)
+        do k_rlm = 1, nidx_rlm(1)
+          do nd = 1, nvector
+            i_rlm = 3*nd + (j_rlm-1) * ncomp                            &
+     &                 + (k_rlm-1) * ncomp*nidx_rlm(2)
 !
-        do j_rlm = 1, nidx_rlm(2)
-          pwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
-          dpwt_tmp = dPdt_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
-          pgwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)             &
-     &                 * dble( idx_gl_1d_rlm_j(j_rlm,3) )               &
-     &                 * asin_theta_1d_rtm(l_rtm)
-!
-          do k_rlm = 1, nidx_rlm(1)
-!cdir nodep
-            do nd = 1, nvector
-              i_rlm = 3*nd + (j_rlm-1) * ncomp                          &
-     &                     + (k_rlm-1) * ncomp*nidx_rlm(2)
+            do l_rtm = 1, nidx_rtm(2)
               ip_rtm = 3*nd + (l_rtm-1)  * ncomp                        &
      &                 + (k_rlm-1)  * ncomp * nidx_rtm(2)               &
      &                 + (mdx_p_rlm_rtm(j_rlm)-1)                       &
@@ -96,6 +68,12 @@
      &                 + (k_rlm-1)  * ncomp * nidx_rtm(2)               &
      &                 + (mdx_n_rlm_rtm(j_rlm)-1)                       &
      &                  * ncomp * nidx_rtm(1) * nidx_rtm(2)
+!
+              pwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
+              dpwt_tmp = dPdt_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
+              pgwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)         &
+     &                  * dble( idx_gl_1d_rlm_j(j_rlm,3) )              &
+     &                  * asin_theta_1d_rtm(l_rtm)
 !
               sp_rlm(i_rlm-2) = sp_rlm(i_rlm-2)                         &
      &                     + vr_rtm(ip_rtm-2) * pwt_tmp
@@ -108,18 +86,6 @@
      &                 - ( vr_rtm(in_rtm-1) * pgwt_tmp                  &
      &                   + vr_rtm(ip_rtm  ) * dpwt_tmp )
             end do
-          end do
-        end do
-      end do
-!$omp end parallel do
-!
-!$omp parallel do private(k_rlm,nd,i_rlm)
-      do j_rlm = 1, nidx_rlm(2)
-        do k_rlm = 1, nidx_rlm(1)
-!cdir nodep
-          do nd = 1, nvector
-            i_rlm = 3*nd + (j_rlm-1) * ncomp                            &
-     &                   + (k_rlm-1) * ncomp*nidx_rlm(2)
 !
             sp_rlm(i_rlm-2) = sp_rlm(i_rlm-2) * g_sph_rlm(j_rlm,7)
             sp_rlm(i_rlm-1) = sp_rlm(i_rlm-1) * g_sph_rlm(j_rlm,7)
@@ -144,37 +110,24 @@
       real(kind = kreal) :: pwt_tmp
 !
 !
-!$omp parallel do private(j_rlm,k_rlm,nd,i_rlm,ip_rtm,pwt_tmp)
-      do l_rtm = 1, nidx_rtm(2)
+!$omp parallel do private(j_rlm,k_rlm,nd,i_rlm,ip_rtm,l_rtm,pwt_tmp)
+      do j_rlm = 1, nidx_rlm(2)
 !
-        do j_rlm = 1, nidx_rlm(2)
-          pwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
+        do k_rlm = 1, nidx_rlm(1)
+          do nd = 1, nscalar
+            i_rlm = nd + 3*nvector + (j_rlm-1) * ncomp                  &
+     &                             + (k_rlm-1) * ncomp*nidx_rlm(2)
 !
-          do k_rlm = 1, nidx_rlm(1)
-!cdir nodep
-            do nd = 1, nscalar
-              i_rlm = nd + 3*nvector + (j_rlm-1) * ncomp                &
-     &                     + (k_rlm-1) * ncomp*nidx_rlm(2)
+            do l_rtm = 1, nidx_rtm(2)
+              pwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
               ip_rtm = nd + 3*nvector + (l_rtm-1)  * ncomp              &
-     &                 + (k_rlm-1)  * ncomp * nidx_rtm(2)               &
-     &                 + (mdx_p_rlm_rtm(j_rlm)-1)                       &
+     &                + (k_rlm-1)  * ncomp * nidx_rtm(2)                &
+     &                + (mdx_p_rlm_rtm(j_rlm)-1)                        &
      &                  * ncomp * nidx_rtm(1) * nidx_rtm(2)
 !
 !              sp_rlm(i_rlm) = sp_rlm(i_rlm)                            &
               sp_rlm(i_rlm) = sp_rlm(i_rlm) + vr_rtm(ip_rtm) * pwt_tmp
             end do
-          end do
-        end do
-      end do
-!$omp end parallel do
-!
-!$omp parallel do private(k_rlm,nd,i_rlm)
-      do j_rlm = 1, nidx_rlm(2)
-        do k_rlm = 1, nidx_rlm(1)
-!cdir nodep
-          do nd = 1, nscalar
-            i_rlm = nd + 3*nvector + (j_rlm-1) * ncomp                  &
-     &                     + (k_rlm-1) * ncomp*nidx_rlm(2)
 !
             sp_rlm(i_rlm) = sp_rlm(i_rlm) * g_sph_rlm(j_rlm,6)
           end do

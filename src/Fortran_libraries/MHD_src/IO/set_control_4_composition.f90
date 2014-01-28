@@ -65,12 +65,8 @@
      &        light_nod%ibc_type(i))
           call set_bc_group_types_sph_center(bc_composit_type_ctl(i),   &
      &        light_nod%ibc_type(i))
-!
-          if(bc_composit_type_ctl(i) .eq. 'fixed_flux') then
-            light_nod%ibc_type(i) =  iflag_bc_fix_flux
-          else if(bc_composit_type_ctl(i) .eq. 'fixed_flux_file') then
-            light_nod%ibc_type(i) =  iflag_bc_file_flux
-          end if
+          call set_bc_group_types_fluxes(bc_composit_type_ctl(i),       &
+     &        light_nod%ibc_type(i))
         end do
 !
 !

@@ -6,13 +6,13 @@
 !      subroutine allocate_iflag_pick_sph(l_truncation)
 !      subroutine deallocate_iflag_pick_sph
 !
-!      subroutine count_picked_sph_adrress(l_truncation,                &
-!     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,          &
-!     &          idx_pick_sph_l, idx_pick_sph_m, ntot_pickup)
-!      subroutine set_picked_sph_adrress(l_truncation, ist_rj, ied_rj,  &
-!     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,          &
-!     &          idx_pick_sph, idx_pick_sph_l, idx_pick_sph_m,          &
-!     &          ntot_pickup, num_pickup, idx_pick_gl, idx_pick_lc)
+!!      subroutine count_picked_sph_adrress(l_truncation,               &
+!!     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,         &
+!!     &          idx_pick_sph_l, idx_pick_sph_m, ntot_pickup)
+!!      subroutine set_picked_sph_adrress(l_truncation, jmax, idx_gl_j, &
+!!     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,         &
+!!     &          idx_pick_sph, idx_pick_sph_l, idx_pick_sph_m,         &
+!!     &          ntot_pickup, num_pickup, idx_pick_gl, idx_pick_lc)
 !
       module pickup_sph_spectr
 !
@@ -87,13 +87,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_picked_sph_adrress(l_truncation, ist_rj, ied_rj,   &
+      subroutine set_picked_sph_adrress(l_truncation, jmax, idx_gl_j,   &
      &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,           &
      &          idx_pick_sph, idx_pick_sph_l, idx_pick_sph_m,           &
      &          ntot_pickup, num_pickup, idx_pick_gl, idx_pick_lc)
 !
-      integer(kind = kint), intent(in) :: l_truncation
-      integer(kind = kint), intent(in) :: ist_rj, ied_rj
+      integer(kind = kint), intent(in) :: l_truncation, jmax
+      integer(kind = kint), intent(in) :: idx_gl_j(jmax)
 !
       integer(kind = kint), intent(in) :: num_pick_sph
       integer(kind = kint), intent(in) :: num_pick_sph_l
@@ -152,12 +152,13 @@
       num_pickup = icou
 !
       do inum = 1, num_pickup
-        j = idx_pick_gl(inum)
-        if(j.ge.ist_rj .and. j.le.ied_rj) then
-          idx_pick_lc(inum) = j - ist_rj + 1
-        else
-          idx_pick_lc(inum) = 0
-        end if
+        idx_pick_lc(inum) = 0
+        do j = 1, jmax
+          if (idx_gl_j(j) .eq. idx_pick_gl(inum)) then
+            idx_pick_lc(inum) = j
+            exit
+          end if
+        end do
       end do
 !
       end subroutine set_picked_sph_adrress

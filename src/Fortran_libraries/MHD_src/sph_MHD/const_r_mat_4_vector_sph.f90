@@ -64,6 +64,7 @@
         call set_unit_mat_4_time_evo(nidx_rj(1), nidx_rj(2),            &
      &      wt_evo_mat)
       end if
+!
       call set_unit_mat_4_poisson(nidx_rj(1), nidx_rj(2),               &
      &    sph_bc_U%kr_in, sph_bc_U%kr_out, vs_poisson_mat)
       call set_unit_mat_4_poisson(nidx_rj(1), nidx_rj(2),               &

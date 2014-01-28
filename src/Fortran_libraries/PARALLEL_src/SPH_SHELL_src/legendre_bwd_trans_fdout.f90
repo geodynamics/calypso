@@ -9,15 +9,17 @@
 !!       (Original version)
 !!
 !!@verbatim
-!!      subroutine legendre_b_trans_vector_fdout(nb)
-!!        Input:  vr_rtm   (Order: radius,theta,phi)
+!!      subroutine legendre_b_trans_vector_fdout(nvector)
+!!        Input:  vr_rtm_fdout   (Order: radius,theta,phi)
 !!        Output: sp_rlm_fdout   (Order: poloidal,diff_poloidal,toroidal)
-!!      subroutine legendre_b_trans_scalar_fdout(nb)
-!!        Input:  vr_rtm
+!!      subroutine legendre_b_trans_scalar_fdout(nscalar)
+!!        Input:  vr_rtm_fdout
 !!        Output: sp_rlm_fdout
 !!@endverbatim
 !!
-!!@n @param  nb  number of fields to be transformed
+!!@param   nvector  Number of vector for spherical transform
+!!@param   nscalar  Number of scalar (including tensor components)
+!!                  for spherical transform
 !
       module legendre_bwd_trans_fdout
 !
@@ -28,7 +30,7 @@
       use m_spheric_param_smp
       use m_schmidt_poly_on_rtm
       use m_work_4_sph_trans
-      use m_work_4_sph_trans_fldout
+      use m_work_4_sph_trans_fdout
 !
       implicit none
 !
@@ -38,104 +40,96 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_vector_fdout(nb)
+      subroutine legendre_b_trans_vector_fdout(nvector)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: nvector
 !
       integer(kind = kint) :: i_rlm, j_rlm
-      integer(kind = kint) :: k_rtm, l_rtm
+      integer(kind = kint) :: k_rlm, l_rtm
       integer(kind = kint) :: ip_rtm, in_rtm
-      integer(kind = kint) :: nd, nd_kr
+      integer(kind = kint) :: inum, nd
       real(kind = kreal) :: pg_tmp, dp_tmp
 !
 !
-!$omp parallel do private(nd_kr,k_rtm,j_rlm,l_rtm,nd,                   &
-!$omp&                    ip_rtm,in_rtm,i_rlm,pg_tmp,dp_tmp)
-      do nd_kr = 1, nb*nidx_rtm(1)
-        k_rtm = mod(nd_kr-1,nidx_rtm(1)) + 1
-        nd = (nd_kr - k_rtm) / nidx_rtm(1) + 1
-        do j_rlm = 1, nidx_rlm(2)
+!$omp parallel
+      do nd = 1, nvector
+!$omp do private(inum,j_rlm,k_rlm,l_rtm,ip_rtm,in_rtm,i_rlm,            &
+!$omp&           pg_tmp,dp_tmp)
+        do l_rtm = 1, nidx_rtm(2)
+          do inum = 1, nnod_rlm
+            k_rlm = 1 + mod( (inum-1),nidx_rlm(1))
+            j_rlm = 1 + (inum - k_rlm) / nidx_rlm(1)
 !
-          do l_rtm = 1, nidx_rtm(2)
+            i_rlm = j_rlm + (k_rlm-1) * nidx_rlm(2)
+!
             pg_tmp = P_rtm(l_rtm,j_rlm) * g_sph_rlm(j_rlm,3)
             dp_tmp = dPdt_rtm(l_rtm,j_rlm)
+            ip_rtm = l_rtm + (k_rlm-1) * nidx_rtm(2)                    &
+     &                       + (mdx_p_rlm_rtm(j_rlm)-1)                 &
+     &                       * nidx_rtm(1)*nidx_rtm(2)
 !
-            ip_rtm = l_rtm + (k_rtm-1) * nidx_rtm(2)                    &
-     &                    + (mdx_p_rlm_rtm(j_rlm)-1)                    &
-     &                     * nidx_rtm(1)*nidx_rtm(2)
-!
-            i_rlm = j_rlm + (k_rtm-1) * nidx_rlm(2)
 !
             vr_rtm_fdout(ip_rtm,3*nd-2) = vr_rtm_fdout(ip_rtm,3*nd-2)   &
      &                     + sp_rlm_fdout(i_rlm,3*nd-2) * pg_tmp
-!
-!              vt_rtm(ip_rtm) = vt_rtm(ip_rtm)                          &
             vr_rtm_fdout(ip_rtm,3*nd-1) = vr_rtm_fdout(ip_rtm,3*nd-1)   &
      &                     + sp_rlm_fdout(i_rlm,3*nd-1) * dp_tmp
-!
-!              vp_rtm(ip_rtm) = vp_rtm(ip_rtm)                          &
             vr_rtm_fdout(ip_rtm,3*nd  ) = vr_rtm_fdout(ip_rtm,3*nd  )   &
      &                     - sp_rlm_fdout(i_rlm,3*nd  ) * dp_tmp
 !
-          end do
 !
-          do l_rtm = 1, nidx_rtm(2)
             pg_tmp = P_rtm(l_rtm,j_rlm) * asin_theta_1d_rtm(l_rtm)      &
      &              * dble( -idx_gl_1d_rlm_j(j_rlm,3) )
-            in_rtm = l_rtm-1 + (k_rtm-1) * nidx_rtm(2)                  &
-     &                    + (mdx_n_rlm_rtm(j_rlm)-1)                    &
-     &                     * nidx_rtm(1)*nidx_rtm(2)
+            in_rtm = l_rtm + (k_rlm-1) * nidx_rtm(2)                    &
+     &                       + (mdx_n_rlm_rtm(j_rlm)-1)                 &
+     &                       * nidx_rtm(1)*nidx_rtm(2)
 !
-            i_rlm = j_rlm + (k_rtm-1) * nidx_rlm(2)
-!
-!            vt_rtm(in_rtm) = vt_rtm(in_rtm)                            &
             vr_rtm_fdout(in_rtm,3*nd-1) = vr_rtm_fdout(in_rtm,3*nd-1)   &
      &                       + sp_rlm_fdout(i_rlm,3*nd  ) * pg_tmp
-!
-!            vp_rtm(in_rtm) = vp_rtm(in_rtm)                            &
             vr_rtm_fdout(in_rtm,3*nd  ) = vr_rtm_fdout(in_rtm,3*nd  )   &
      &                       + sp_rlm_fdout(i_rlm,3*nd-1) * pg_tmp
-!
           end do
         end do
-!
+!$omp end do nowait
       end do
-!$omp end parallel do
+!$omp end parallel
 !
       end subroutine legendre_b_trans_vector_fdout
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_scalar_fdout(nb)
+      subroutine legendre_b_trans_scalar_fdout(nscalar)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: nscalar
 !
       integer(kind = kint) :: i_rlm, j_rlm
-      integer(kind = kint) :: k_rtm, l_rtm
+      integer(kind = kint) :: k_rlm, l_rtm
       integer(kind = kint) :: ip_rtm, in_rtm
-      integer(kind = kint) :: nd, nd_kr
+      integer(kind = kint) :: nd, inum
 !
 !
-!$omp parallel do private(nd_kr,k_rtm,nd,j_rlm,l_rtm,ip_rtm,in_rtm,i_rlm)
-      do nd_kr = 1, nb*nidx_rtm(1)
-        k_rtm = mod(nd_kr-1,nidx_rtm(1)) + 1
-        nd = (nd_kr - k_rtm) / nidx_rtm(1) + 1
-        do j_rlm = 1, nidx_rlm(2)
+!$omp parallel
+     do nd = 1, nscalar
+!$omp do private(inum,j_rlm,l_rtm,k_rlm,ip_rtm,in_rtm,i_rlm)
+        do l_rtm = 1, nidx_rtm(2)
+          do inum = 1, nnod_rlm
+            k_rlm = 1 + mod( (inum-1),nidx_rlm(1))
+            j_rlm = 1 + (inum - k_rlm) / nidx_rlm(1)
 !
-          do l_rtm = 1, nidx_rtm(2)
-            ip_rtm = l_rtm + (k_rtm-1) * nidx_rtm(2)                    &
+            ip_rtm = l_rtm + (k_rlm-1) * nidx_rtm(2)                    &
      &                    + (mdx_p_rlm_rtm(j_rlm)-1)                    &
      &                     * nidx_rtm(1)*nidx_rtm(2)
 !
-            i_rlm = j_rlm + (k_rtm-1) * nidx_rlm(2)
+            i_rlm = j_rlm + (k_rlm-1) * nidx_rlm(2)
 !
             vr_rtm_fdout(ip_rtm,nd) = vr_rtm_fdout(ip_rtm,nd)           &
      &                  + sp_rlm_fdout(i_rlm,nd) * P_rtm(l_rtm,j_rlm)
 !
-            end do
           end do
+!
+        end do
+!$omp end do nowait
       end do
-!$omp end parallel do
+!$omp end parallel
 !
       end subroutine legendre_b_trans_scalar_fdout
 !

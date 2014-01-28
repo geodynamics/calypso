@@ -1,18 +1,26 @@
+!>@file   cal_rms_by_sph_spectr.f90
+!!@brief  module cal_rms_by_sph_spectr
+!!
+!!@author H. Matsui
+!!@date Programmed in Feb., 2008
 !
-!      module cal_rms_by_sph_spectr
-!
-!     Written by H. Matsui on Feb., 2008
-!
-!      subroutine cal_rms_each_scalar_sph_spec(icomp, icou)
-!      subroutine cal_rms_each_vector_sph_spec(icomp, icou)
-!        (1/4\pi) \int (\bf{u}_{l}^{m})^2 sin \theta d\theta d\phi
-!          = r^{-2} [ l(l+1) / (2l+1) 
-!           ( l(l+1)/r^2 (S_{l}^{m})^2 + (dS_{l}^{m}/dr)^2)
-!            + (T_{l}^{m})^2 ) ]
-!      subroutine set_sph_energies_by_rms(icou)
-!
-!      subroutine cal_ave_scalar_sph_spectr(icomp, icou)
-!      subroutine cal_ave_vector_sph_spectr(icou)
+!>@brief  Evaluate mean square data for each spherical harmonics mode
+!!
+!!@verbatim
+!!      subroutine cal_rms_each_scalar_sph_spec(icomp, icou)
+!!      subroutine cal_rms_each_vector_sph_spec(icomp, icou)
+!!        (1/4\pi) \int (\bf{u}_{l}^{m})^2 sin \theta d\theta d\phi
+!!          = r^{-2} [ l(l+1) / (2l+1) 
+!!           ( l(l+1)/r^2 (S_{l}^{m})^2 + (dS_{l}^{m}/dr)^2)
+!!            + (T_{l}^{m})^2 ) ]
+!!      subroutine set_sph_energies_by_rms(icou)
+!!
+!!      subroutine cal_ave_scalar_sph_spectr(icomp, icou)
+!!      subroutine cal_ave_vector_sph_spectr(icou)
+!!@endverbatim
+!!
+!!@n @param  icomp   Address of spectrum data
+!!@n @param  icou    Address of mean square data
 !
       module cal_rms_by_sph_spectr
 !

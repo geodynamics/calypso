@@ -131,41 +131,41 @@
 !
 !>      Coefficients for curl of Coriolis force
 !!       by Y_{1}^{1s} for poloidal vorticity
-      real(kind = kreal), allocatable :: sw1_rj(:,:,:)
+      real(kind = kreal), allocatable :: sw1(:,:,:)
 !>      Coefficients for curl of Coriolis force
 !!       by Y_{1}^{1s}for toroidal vorticity
-      real(kind = kreal), allocatable :: tw1_rj(:,:,:)
+      real(kind = kreal), allocatable :: tw1(:,:,:)
 !>      Coefficients for divergence of Coriolis force 
 !!       by Y_{1}^{1s} for poloidal vorticity by poloidal velocity
-      real(kind = kreal), allocatable :: sd1_rj(:,:,:)
+      real(kind = kreal), allocatable :: sd1(:,:,:)
 !>      Coefficients for divergence of Coriolis force 
 !!       by Y_{1}^{1s} for poloidal vorticity by Toroidal velocity
-      real(kind = kreal), allocatable :: td1_rj(:,:)
+      real(kind = kreal), allocatable :: td1(:,:)
 !>      Coefficients for radial compoonent of Coriolis force 
 !!       by Y_{1}^{1s} for poloidal vorticity by poloidal velocity
-      real(kind = kreal), allocatable :: sr1_rj(:,:)
+      real(kind = kreal), allocatable :: sr1(:,:)
 !>      Coefficients for radial compoennt of Coriolis force 
 !!       by Y_{1}^{1s} for poloidal vorticity by Toroidal velocity
-      real(kind = kreal), allocatable :: tr1_rj(:,:)
+      real(kind = kreal), allocatable :: tr1(:,:)
 !
 !>      Coefficients for curl of Coriolis force
 !!        by Y_{1}^{1c} for poloidal vorticity
-      real(kind = kreal), allocatable :: sw3_rj(:,:,:)
+      real(kind = kreal), allocatable :: sw3(:,:,:)
 !>      Coefficients for curl of Coriolis force
 !!       by Y_{1}^{1c} for toroidal vorticity
-      real(kind = kreal), allocatable :: tw3_rj(:,:,:)
+      real(kind = kreal), allocatable :: tw3(:,:,:)
 !>      Coefficients for divergence of Coriolis force 
 !!       by Y_{1}^{1c} for poloidal vorticity by poloidal velocity
-      real(kind = kreal), allocatable :: sd3_rj(:,:,:)
+      real(kind = kreal), allocatable :: sd3(:,:,:)
 !>      Coefficients for divergence of Coriolis force 
 !!       by Y_{1}^{1c} for poloidal vorticity by Toroidal velocity
-      real(kind = kreal), allocatable :: td3_rj(:,:)
+      real(kind = kreal), allocatable :: td3(:,:)
 !>      Coefficients for radial compoonent of Coriolis force
 !!       by Y_{1}^{1c} for poloidal vorticity by poloidal velocity
-      real(kind = kreal), allocatable :: sr3_rj(:,:)
+      real(kind = kreal), allocatable :: sr3(:,:)
 !>      Coefficients for radial compoennt of Coriolis force
 !!       by Y_{1}^{1c} for poloidal vorticity by Toroidal velocity
-      real(kind = kreal), allocatable :: tr3_rj(:,:)
+      real(kind = kreal), allocatable :: tr3(:,:)
 !
 !*   ------------------------------------------------------------------
 !*
@@ -199,29 +199,29 @@
 !
       subroutine alloc_g0_xy
 !
-      allocate(sw1_rj(4,3,0:jmax_tri_sph), sw3_rj(4,3,0:jmax_tri_sph))
-      allocate(tw1_rj(4,4,0:jmax_tri_sph), tw3_rj(4,4,0:jmax_tri_sph))
+      allocate( sw1(4,3,jmax_tri_sph), sw3(4,3,jmax_tri_sph) )
+      allocate( tw1(4,4,jmax_tri_sph), tw3(4,4,jmax_tri_sph) )
 !
-      allocate(sd1_rj(4,2,0:jmax_tri_sph), sd3_rj(4,2,0:jmax_tri_sph))
-      allocate(td1_rj(4,0:jmax_tri_sph), td3_rj(4,0:jmax_tri_sph) )
+      allocate( sd1(4,2,jmax_tri_sph), sd3(4,2,jmax_tri_sph) )
+      allocate( td1(4,jmax_tri_sph), td3(4,jmax_tri_sph) )
 !
-      allocate(sr1_rj(4,0:jmax_tri_sph), sr3_rj(4,0:jmax_tri_sph) )
-      allocate(tr1_rj(4,0:jmax_tri_sph), tr3_rj(4,0:jmax_tri_sph) )
+      allocate( sr1(4,jmax_tri_sph), sr3(4,jmax_tri_sph) )
+      allocate( tr1(4,jmax_tri_sph), tr3(4,jmax_tri_sph) )
 !
-      sw1_rj = zero
-      tw1_rj = zero
-      sw3_rj = zero
-      tw3_rj = zero
+      sw1 = zero
+      tw1 = zero
+      sw3 = zero
+      tw3 = zero
 !
-      sd1_rj = zero
-      td1_rj = zero
-      sd3_rj = zero
-      td3_rj = zero
+      sd1 = zero
+      td1 = zero
+      sd3 = zero
+      td3 = zero
 !
-      sr1_rj = zero
-      tr1_rj = zero
-      sr3_rj = zero
-      tr3_rj = zero
+      sr1 = zero
+      tr1 = zero
+      sr3 = zero
+      tr3 = zero
 !
       end subroutine alloc_g0_xy
 !
@@ -240,9 +240,9 @@
 !
       subroutine dealloc_g0_xy
 !
-      deallocate( sw1_rj, tw1_rj, sw3_rj, tw3_rj )
-      deallocate( sd1_rj, td1_rj, sd3_rj, td3_rj )
-      deallocate( sr1_rj, tr1_rj, sr3_rj, tr3_rj )
+      deallocate( sw1, tw1, sw3, tw3 )
+      deallocate( sd1, td1, sd3, td3 )
+      deallocate( sr1, tr1, sr3, tr3 )
 !
       end subroutine dealloc_g0_xy
 !

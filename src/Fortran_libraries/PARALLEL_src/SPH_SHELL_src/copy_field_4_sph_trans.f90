@@ -84,7 +84,7 @@
       end subroutine copy_scalar_to_trans
 !
 !-----------------------------------------------------------------------
-! -------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
       subroutine copy_vector_from_trans(ncomp_trans, i_trns,            &
      &          nnod, dnod_sph)
@@ -168,7 +168,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_tensor_to_trans(ncomp_trans, i_trns,              &
+      subroutine copy_tensor_to_trans(ncomp_trans, i_trns,            &
      &          nnod, dnod_sph)
 !
       integer(kind = kint), intent(in) :: ncomp_trans, i_trns, nnod

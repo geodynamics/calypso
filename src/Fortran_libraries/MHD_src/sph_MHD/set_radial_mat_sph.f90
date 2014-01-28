@@ -7,6 +7,7 @@
 !>@brief  Construct matrix for spherical shell dynamo model
 !!
 !!@verbatim
+!!      subroutine set_unit_mat5_4_time_evo(nri, jmax, mat5)
 !!      subroutine set_unit_mat_4_time_evo(nri, jmax, mat3)
 !!      subroutine set_unit_mat_4_poisson(nri, jmax, kr_in, kr_out,     &
 !!     &          mat3)
@@ -50,6 +51,7 @@
 !!@n @param coef_d     Coefficient of diffusiotn term
 !!@n @param coef_p     Coefficient of pressure gradient
 !!
+!!@n @param mat5(5,nri,jmax)  Band matrix
 !!@n @param mat3(3,nri,jmax)  Band matrix
 !
       module set_radial_mat_sph
@@ -70,6 +72,39 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine set_unit_mat5_4_time_evo(nri, jmax, mat5)
+!
+      integer(kind = kint), intent(in) :: jmax, nri
+!
+      real(kind = kreal), intent(inout) :: mat5(5,nri,jmax)
+!
+      integer(kind = kint) :: k, j
+!
+!
+!$omp parallel do private (k,j)
+      do j = 1, jmax
+        do k = 3, nri
+          mat5(5,k-2,j) = zero
+        end do
+        do k = 2, nri
+          mat5(4,k-1,j) = zero
+        end do
+        do k = 1, nri
+          mat5(3,k,  j) = one
+        end do
+        do k = 1, nri-1
+          mat5(2,k+1,j) = zero
+        end do
+        do k = 1, nri-2
+          mat5(1,k+2,j) = zero
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine set_unit_mat5_4_time_evo
+!
+! -----------------------------------------------------------------------
+!
       subroutine set_unit_mat_4_time_evo(nri, jmax, mat3)
 !
       integer(kind = kint), intent(in) :: jmax, nri
@@ -80,10 +115,14 @@
 !
 !
 !$omp parallel do private (k,j)
-      do k = 1, nri
-        do j = 1, jmax
+      do j = 1, jmax
+        do k = 2, nri
           mat3(3,k-1,j) = zero
+        end do
+        do k = 1, nri
           mat3(2,k,  j) = one
+        end do
+        do k = 1, nri-1
           mat3(1,k+1,j) = zero
         end do
       end do

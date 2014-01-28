@@ -64,7 +64,7 @@
 !
 !
 !$omp parallel
-      call copy_scalar_from_trans(ncomp_trans, i_trns,                &
+      call copy_scalar_from_trans(ncomp_trans, i_trns,                  &
      &    numnod, d_nod(1,i_field))
 !$omp end parallel
 !
@@ -167,7 +167,7 @@
 !
 !
 !$omp parallel
-      call copy_scalar_from_trans(ncomp_trans, i_trns,                 &
+      call copy_scalar_from_trans(ncomp_trans, i_trns,                  &
      &    numnod, d_nod(1,i_field))
 !$omp end parallel
 !
@@ -195,7 +195,7 @@
 !
 !
 !$omp parallel
-      call copy_vector_from_trans(ncomp_trans, i_trns,                  &
+      call copy_vector_from_trans(ncomp_trans, i_trns,                &
      &    numnod, d_nod(1,i_field))
 !$omp end parallel
 !

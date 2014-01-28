@@ -15,10 +15,8 @@
 !!      subroutine copy_vec_spec_to_trans(ncomp_trans, is_spec, i_trns)
 !!      subroutine copy_vec_spec_from_trans(ncomp_trans, is_spec, i_trns)
 !!
-!!      subroutine copy_tensor_spec_to_trans(ncomp_trans,               &
-!!     &          is_spec, i_trns)
-!!      subroutine copy_tensor_spec_from_trans(ncomp_trans,             &
-!!     &          is_spec, i_trns)
+!!      subroutine copy_tsr_spec_to_trans(ncomp_trans, is_spec, i_trns)
+!!      subroutine copy_tsr_spec_from_trans(ncomp_trans, is_spec, i_trns)
 !!@endverbatim
 !
       module copy_spectr_4_sph_trans
@@ -143,8 +141,7 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine copy_tensor_spec_to_trans(ncomp_trans,                 &
-     &          is_spec, i_trns)
+      subroutine copy_tsr_spec_to_trans(ncomp_trans, is_spec, i_trns)
 !
       integer(kind = kint), intent(in) :: ncomp_trans
       integer(kind = kint), intent(in) :: is_spec, i_trns
@@ -169,12 +166,11 @@
       end do
 !$omp end do nowait
 !
-      end subroutine copy_tensor_spec_to_trans
+      end subroutine copy_tsr_spec_to_trans
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_tensor_spec_from_trans(ncomp_trans,               &
-     &          is_spec, i_trns)
+      subroutine copy_tsr_spec_from_trans(ncomp_trans, is_spec, i_trns)
 !
       integer(kind = kint), intent(in) :: ncomp_trans
       integer(kind = kint), intent(in) :: is_spec, i_trns
@@ -199,7 +195,7 @@
       end do
 !$omp end do nowait
 !
-      end subroutine copy_tensor_spec_from_trans
+      end subroutine copy_tsr_spec_from_trans
 !
 !-----------------------------------------------------------------------
 !

@@ -22,7 +22,7 @@
 !
       implicit none
 !
-      private :: nonlinear_by_pseudo_sph, add_explicit_terms_sph_mhd
+      private :: nonlinear_by_pseudo_sph
 !
 !*   ------------------------------------------------------------------
 !*
@@ -34,8 +34,7 @@
 !
       use m_sph_phys_address
       use m_boundary_params_sph_MHD
-      use cal_vorticity_terms_adams
-      use const_coriolis_sph
+      use cal_inner_core_rotation
 !
       use cal_nonlinear_sph_MHD
 !
@@ -52,24 +51,24 @@
      &     (sph_bc_T%kr_in, sph_bc_T%kr_out)
       end if
 !
-!*  ----  set coriolis term
+!*  ----  copy coriolis term for inner core rotation
 !*
       call start_eleps_time(13)
-      if (iflag_debug.eq.1) write(*,*) 'sum_coriolis_rj_sph'
-      if(iflag_4_coriolis .gt. id_turn_OFF) call sum_coriolis_rj_sph
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
+        call copy_icore_rot_to_tor_coriolis(sph_bc_U%kr_in)
+      end if
       call end_eleps_time(13)
 !
-      call add_explicit_terms_sph_mhd
+      call sum_forces_by_explicit
 !
       end subroutine nonlinear
 !*
 !*   ------------------------------------------------------------------
-!*
-      subroutine add_explicit_terms_sph_mhd
 !
-      use m_sph_phys_address
-      use m_boundary_params_sph_MHD
+      subroutine sum_forces_by_explicit
+!
       use cal_vorticity_terms_adams
+!
 !
 !$omp parallel
       if(      iflag_4_gravity  .ne. id_turn_OFF                        &
@@ -108,8 +107,8 @@
       end if
 !$omp end parallel
 !
-      end subroutine add_explicit_terms_sph_mhd
-!*
+      end subroutine sum_forces_by_explicit
+!
 !*   ------------------------------------------------------------------
 !
       subroutine nonlinear_by_pseudo_sph
@@ -152,16 +151,16 @@
 !
       use m_sph_phys_address
       use m_boundary_params_sph_MHD
+      use sph_transforms_4_MHD
       use cal_nonlinear_sph_MHD
       use cal_vorticity_terms_adams
-      use const_coriolis_sph
 !
       integer(kind = kint) :: inod
 !
 !*  ----  copy velocity for coriolis term ------------------
 !*
-      if (iflag_debug.eq.1) write(*,*) 'sum_coriolis_rj_sph'
-      if(iflag_4_coriolis .ne. id_turn_OFF) call sum_coriolis_rj_sph
+      if (iflag_debug.eq.1) write(*,*) 'sph_transform_4_licv'
+      if(iflag_4_coriolis .ne. id_turn_OFF) call sph_transform_4_licv
 !
 !   ----  lead nonlinear terms by phesdo spectrum
 !

@@ -45,13 +45,13 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
 !
       integer(kind = kint) :: i_rlm, j_rlm
-      integer(kind = kint) :: k_rtm, l_rtm, m_rtm
+      integer(kind = kint) :: k_rtm, l_rtm
       integer(kind = kint) :: ip_rtm, in_rtm
       integer(kind = kint) :: nd
       real(kind = kreal) :: pg_tmp, dp_tmp
 !
 !
-!$omp parallel do private(j_rlm,l_rtm,nd,ip_rtm,in_rtm,i_rlm,m_rtm,     &
+!$omp parallel do private(j_rlm,l_rtm,nd,ip_rtm,in_rtm,i_rlm,           &
 !$omp&               pg_tmp,dp_tmp)
       do k_rtm = 1,  nidx_rtm(1)
         do j_rlm = 1, nidx_rlm(2)
@@ -102,21 +102,6 @@
           end do
 !
         end do
-!
-        do m_rtm = 1, nidx_rtm(3)
-          do l_rtm = 1, nidx_rtm(2)
-            do nd = 1, nvector
-              ip_rtm = 3*nd + (l_rtm-1) * ncomp                         &
-     &                      + (k_rtm-1) * ncomp*nidx_rtm(2)             &
-     &                      + (m_rtm-1) * ncomp*nidx_rtm(1)*nidx_rtm(2)
-!
-              vr_rtm(ip_rtm-2) = vr_rtm(ip_rtm-2)                       &
-     &                        * a_r_1d_rtm_r(k_rtm)*a_r_1d_rtm_r(k_rtm)
-              vr_rtm(ip_rtm-1) = vr_rtm(ip_rtm-1) * a_r_1d_rtm_r(k_rtm)
-              vr_rtm(ip_rtm  ) = vr_rtm(ip_rtm  ) * a_r_1d_rtm_r(k_rtm)
-            end do
-          end do
-        end do
       end do
 !$omp end parallel do
 !
@@ -141,17 +126,18 @@
           do l_rtm = 1, nidx_rtm(2)
 !cdir nodep
             do nd = 1, nscalar
-              ip_rtm = nd  + 3*nvector + (l_rtm-1) * ncomp              &
+              ip_rtm = nd + 3*nvector + (l_rtm-1) * ncomp               &
      &                    + (k_rtm-1) * ncomp*nidx_rtm(2)               &
      &                    + (mdx_p_rlm_rtm(j_rlm)-1) * ncomp            &
      &                     * nidx_rtm(1)*nidx_rtm(2)
 !
-              i_rlm = nd + 3*nvector                                    &
-     &               + (j_rlm-1) * ncomp                                &
-     &               + (k_rtm-1) * ncomp * nidx_rlm(2)
+              i_rlm = nd + 3*nvector + (j_rlm-1) * ncomp                &
+     &                               + (k_rtm-1) * ncomp * nidx_rlm(2)
 !
+!              vr_rtm(ip_rtm) = vr_rtm(ip_rtm)                          &
               vr_rtm(ip_rtm) = vr_rtm(ip_rtm)                           &
      &                        + sp_rlm(i_rlm) * P_rtm(l_rtm,j_rlm)
+!
             end do
           end do
 !

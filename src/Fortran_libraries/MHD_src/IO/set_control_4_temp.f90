@@ -66,12 +66,8 @@
      &        temp_nod%ibc_type(i))
           call set_bc_group_types_sph_center(bc_e_type_ctl(i),          &
      &        temp_nod%ibc_type(i))
-!
-          if ( bc_e_type_ctl(i) .eq. 'fixed_flux' ) then
-            temp_nod%ibc_type(i) =  iflag_bc_fix_flux
-          else if ( bc_e_type_ctl(i) .eq. 'fixed_flux_file' ) then
-            temp_nod%ibc_type(i) =  iflag_bc_file_flux
-          end if
+          call set_bc_group_types_fluxes(bc_e_type_ctl(i),              &
+     &        temp_nod%ibc_type(i))
         end do
 !
         if (iflag_debug .eq. iflag_full_msg) then

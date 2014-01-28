@@ -30,6 +30,8 @@
 !
 !
 !>      integer flag for fixed velocity boundary
+      integer(kind = kint), parameter :: iflag_undefined_bc = -1
+!>      integer flag for fixed velocity boundary
       integer(kind = kint), parameter :: iflag_fixed_field = 0
 !>      integer flag for free-slip boundary
       integer(kind = kint), parameter :: iflag_fixed_flux =  1
@@ -55,9 +57,9 @@
 !>      Structure for basic boundary condition parameters
       type sph_boundary_type
 !>        boundary condition flag at ICB
-        integer(kind = kint) :: iflag_icb = iflag_fixed_field
+        integer(kind = kint) :: iflag_icb = iflag_undefined_bc
 !>        boundary condition flag at CMB
-        integer(kind = kint) :: iflag_cmb = iflag_fixed_field
+        integer(kind = kint) :: iflag_cmb = iflag_undefined_bc
 !
 !>        Start radial address of fluid shell for @f$ f(r,j) @f$
         integer(kind = kint) :: kr_in =   1

@@ -91,5 +91,4 @@
 !>     Parameter for stratified layer (radius)
       real  (kind=kreal) :: stratified_outer_r
 !
-!
       end module m_physical_property

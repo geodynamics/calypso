@@ -64,7 +64,6 @@
 !
       use m_physical_property
       use m_boundary_params_sph_MHD
-!      use sum_div_coriolis_rj_sph
       use cal_div_buoyancies_sph_MHD
       use const_sph_divergence
 !
@@ -80,8 +79,6 @@
       if(iflag_4_coriolis .gt. id_turn_OFF) then
         call const_sph_div_force                                        &
      &      (sph_bc_U, ipol%i_coriolis, ipol%i_div_Coriolis)
-!        call s_sum_div_coriolis_rj_sph(sph_bc_U%kr_in, sph_bc_U%kr_out,&
-!     &      coef_cor, ipol%i_div_Coriolis)
       end if
 !
       call sel_div_buoyancies_sph_MHD(sph_bc_U)

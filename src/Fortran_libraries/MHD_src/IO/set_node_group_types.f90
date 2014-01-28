@@ -13,6 +13,7 @@
 !!      subroutine set_bc_group_types_sgs_vect(bc_type_ctl, ibc_type)
 !!      subroutine set_bc_group_types_rotation(bc_type_ctl, ibc_type)
 !!      subroutine set_bc_group_types_sph_center(bc_type_ctl, ibc_type)
+!!      subroutine set_bc_group_types_fluxes(bc_type_ctl, ibc_type)
 !!@endverbatim
 !
       module set_node_group_types
@@ -80,7 +81,14 @@
       character(len = kchara), parameter                                &
      &               :: fix_sph_center = 'fix_at_center'
 !
+!>      control name for fixed flux by control
+      character(len = kchara), parameter :: flux_bc = 'fixed_flux'
+!>      control name for fixed flux by external file
+      character(len = kchara), parameter                                &
+     &               :: flux_file_bc = 'fixed_flux_file'
+!
       private :: fixed_bc, fixed_ctl_bc, fixed_file, fixed_file_bc
+      private :: flux_bc, flux_file_bc
       private :: fixed_SGS
       private :: fixed_x, fix_ctl_x, bc_file_x, fix_file_x
       private :: fixed_y, fix_ctl_y, bc_file_y, fix_file_y
@@ -207,6 +215,23 @@
       end if
 !
       end subroutine set_bc_group_types_sph_center
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine set_bc_group_types_fluxes(bc_type_ctl, ibc_type)
+!
+      character (len=kchara), intent(in) :: bc_type_ctl
+      integer(kind = kint), intent(inout) :: ibc_type
+!
+!
+      if      (cmp_no_case(bc_type_ctl, flux_bc) .gt. 0) then
+        ibc_type = iflag_bc_fix_flux
+      else if (cmp_no_case(bc_type_ctl, flux_file_bc) .gt. 0) then
+        ibc_type = iflag_bc_file_flux
+      end if
+!
+      end subroutine set_bc_group_types_fluxes
 !
 !-----------------------------------------------------------------------
 !

@@ -230,7 +230,7 @@
       integer(kind = kint) :: lst, led
 !
 !
-!$omp parallel do private(lm,lst,led,k,j,kg)
+!$omp parallel do private(lm,lst,led,k,j,kg,l0)
       do k = 1, nidx_r
         kg = idx_gl_1d_rj_r(k)
         rms_sph_lc(1:ntot_rms,0:ltr,kg) = 0.0d0

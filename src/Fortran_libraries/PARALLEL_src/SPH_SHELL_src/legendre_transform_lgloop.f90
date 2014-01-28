@@ -1,4 +1,4 @@
-!>@file   legendre_transform_krin.f90
+!>@file   legendre_transform_lgloop.f90
 !!@brief  module legendre_transform_lgloop
 !!
 !!@author H. Matsui
@@ -10,7 +10,6 @@
 !!
 !!
 !!@verbatim
-!!    Backward transforms
 !!      subroutine leg_bwd_trans_vector_long(ncomp, nvector)
 !!      subroutine leg_bwd_trans_scalar_long(ncomp, nvector, nscalar)
 !!        Input:  sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
@@ -23,12 +22,14 @@
 !!        Output: sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!@endverbatim
 !!
-!!@n @param  nb  number of fields to be transformed
+!!@param   ncomp    Total number of components for spherical transform
+!!@param   nvector  Number of vector for spherical transform
+!!@param   nscalar  Number of scalar (including tensor components)
+!!                  for spherical transform
 !
       module legendre_transform_lgloop
 !
       use m_precision
-      use m_work_4_sph_trans_lgloop
 !
       implicit none
 !
@@ -41,17 +42,14 @@
       subroutine leg_bwd_trans_vector_long(ncomp, nvector)
 !
       use legendre_bwd_trans_lgloop
-      use copy_4_schmidt_trans_long
+      use merge_polidal_toroidal_v
 !
       integer(kind = kint), intent(in) :: ncomp, nvector
 !
 !
-      call copy_b_trans_vector_long(ncomp, nvector)
-      call clear_b_trans_vector_long(nvector)
-!
-      call legendre_b_trans_vector_long(nvector)
-!
-      call back_b_trans_vector_long(ncomp, nvector)
+      call clear_bwd_legendre_trans(ncomp)
+      call legendre_b_trans_vector_long(ncomp, nvector)
+      call const_vect_sph_b_trans(ncomp, nvector)
 !
       end subroutine leg_bwd_trans_vector_long
 !
@@ -60,17 +58,13 @@
       subroutine leg_bwd_trans_scalar_long(ncomp, nvector, nscalar)
 !
       use legendre_bwd_trans_lgloop
-      use copy_4_schmidt_trans_long
+      use merge_polidal_toroidal_v
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
 !
 !
-      call copy_b_trans_scalar_long(ncomp, nvector, nscalar)
-      call clear_b_trans_scalar_long(nscalar)
-!
-      call legendre_b_trans_scalar_long(nscalar)
-!
-      call back_b_trans_scalar_long(ncomp, nvector, nscalar)
+      call clear_bwd_legendre_trans(ncomp)
+      call legendre_b_trans_scalar_long(ncomp, nvector, nscalar)
 !
       end subroutine leg_bwd_trans_scalar_long
 !
@@ -80,17 +74,15 @@
       subroutine leg_fwd_trans_vector_long(ncomp, nvector)
 !
       use legendre_fwd_trans_lgloop
-      use copy_4_schmidt_trans_long
+      use merge_polidal_toroidal_v
 !
       integer(kind = kint), intent(in) :: ncomp, nvector
 !
 !
-      call copy_f_trans_vector_long(ncomp, nvector)
-      call clear_f_trans_vector_long(nvector)
+      call prod_r_vect_sph_f_trans(ncomp, nvector)
 !
-      call legendre_f_trans_vector_long(nvector)
-!
-      call back_f_trans_vector_long(ncomp, nvector)
+      call clear_fwd_legendre_trans(ncomp)
+      call legendre_f_trans_vector_long(ncomp, nvector)
 !
       end subroutine leg_fwd_trans_vector_long
 !
@@ -99,20 +91,17 @@
       subroutine leg_fwd_trans_scalar_long(ncomp, nvector, nscalar)
 !
       use legendre_fwd_trans_lgloop
-      use copy_4_schmidt_trans_long
+      use merge_polidal_toroidal_v
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
 !
 !
-      call copy_f_trans_scalar_long(ncomp, nvector, nscalar)
-      call clear_f_trans_scalar_long(nscalar)
-!
-      call legendre_f_trans_scalar_long(nscalar)
-!
-      call back_f_trans_scalar_long(ncomp, nvector, nscalar)
+      call clear_fwd_legendre_trans(ncomp)
+      call legendre_f_trans_scalar_long(ncomp, nvector, nscalar)
 !
       end subroutine leg_fwd_trans_scalar_long
 !
 ! -----------------------------------------------------------------------
 !
       end module legendre_transform_lgloop
+

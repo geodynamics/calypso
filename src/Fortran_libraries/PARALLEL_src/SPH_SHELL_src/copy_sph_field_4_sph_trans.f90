@@ -5,8 +5,7 @@
 !     &          is_spec, i_trns)
 !      subroutine copy_scalar_fld_from_trans(ncomp_trans,               &
 !     &          is_spec, i_trns)
-!      subroutine copy_vec_fld_from_trans(ncomp_trans,                  &
-!     &          is_spec, i_trns)
+!      subroutine copy_vec_fld_from_trans(ncomp_trans, is_spec, i_trns)
 !      subroutine copy_vec_fld_to_trans(ncomp_trans, is_spec, i_trns)
 !
 !      subroutine copy_tensor_fld_from_trans(ncomp_trans,               &
@@ -63,10 +62,9 @@
       end subroutine copy_scalar_fld_from_trans
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
+! -------------------------------------------------------------------
 !
-      subroutine copy_vec_fld_from_trans(ncomp_trans,                   &
-     &          is_spec, i_trns)
+      subroutine copy_vec_fld_from_trans(ncomp_trans, is_spec, i_trns)
 !
       integer(kind = kint), intent(in) :: ncomp_trans
       integer(kind = kint), intent(in) :: is_spec, i_trns
@@ -94,7 +92,7 @@
       end subroutine copy_vec_fld_to_trans
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
+! -------------------------------------------------------------------
 !
       subroutine copy_tensor_fld_from_trans(ncomp_trans,                &
      &          is_spec, i_trns)

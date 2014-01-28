@@ -9,8 +9,10 @@
 !!@verbatim
 !!      subroutine set_pole_flag_4_sph_trans(numnod, internal_node)
 !!
-!!      subroutine sum_b_trans_pole_vect(ncomp)
-!!      subroutine sum_b_trans_center_vector(ncomp)
+!!      subroutine sum_b_trans_pole_scalar(nb)
+!!      subroutine sum_b_trans_pole_vect(nb)
+!!      subroutine sum_b_trans_center_scalar(nb)
+!!      subroutine sum_b_trans_center_vect(nb)
 !!
 !!------------------------------------------------------------------
 !!
@@ -58,10 +60,9 @@
 !!------------------------------------------------------------------
 !!@verbatim
 !!
-!!@param  numnod           number of node for FEM mesh
-!!@param  internal_node    number of internal node for FEM mesh
-!!@param  nb               number of field
-!!@param  ncomp    Total number of components for spherical transform
+!! @param  numnod           number of node for FEM mesh
+!! @param  internal_node    number of internal node for FEM mesh
+!! @param  nb               number of field
 !
       module sum_b_trans_at_pole
 !
@@ -120,46 +121,86 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine sum_b_trans_pole_vect(ncomp)
+      subroutine sum_b_trans_pole_scalar(nb)
 !
-      integer(kind = kint), intent(in) :: ncomp
+      integer(kind = kint), intent(in) :: nb
 !
-      integer(kind = kint) :: ncomp_pole
+      integer(kind = kint) :: ncomp
+!      integer(kind = kint) ::  i, nd, k
+!
 !
 !
       v_n_pole =   zero
       v_s_pole =   zero
 !
-      ncomp_pole = ncomp*nidx_rj(1)
-      call MPI_allreduce(v_np_local, v_n_pole, ncomp_pole,              &
+      ncomp = nb*nidx_rj(1)
+      call MPI_allreduce(v_np_local, v_n_pole, ncomp,                   &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
-      call MPI_allreduce(v_sp_local, v_s_pole, ncomp_pole,              &
+      call MPI_allreduce(v_sp_local, v_s_pole, ncomp,                   &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
 !      k = 0
 !      do i = 1, nidx_rj(1)
-!       do nd = 1, ncomp_pole
-!       k = k+1
-!       write(my_rank+50,*) nd, i, v_np_local(k), v_n_pole(k),          &
+!        do nd = 1, nb
+!          k = k+1
+!          write(my_rank+50,*) nd, i, v_np_local(k), v_n_pole(k), &
 !     &                     v_sp_local(k), v_s_pole(k)
 !        end do
 !      end do
 !
-      end subroutine sum_b_trans_pole_vect
+      end subroutine sum_b_trans_pole_scalar
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sum_b_trans_center_vector(ncomp)
+      subroutine sum_b_trans_pole_vect(nb)
 !
-      integer(kind = kint), intent(in) :: ncomp
+      integer(kind = kint), intent(in) :: nb
+!
+      integer(kind = kint) :: ncomp
+!
+!
+      v_n_pole =   zero
+      v_s_pole =   zero
+!
+      ncomp = n_vector*nb*nidx_rj(1)
+      call MPI_allreduce(v_np_local, v_n_pole, ncomp,                   &
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call MPI_allreduce(v_sp_local, v_s_pole, ncomp,                   &
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+!
+      end subroutine sum_b_trans_pole_vect
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine sum_b_trans_center_scalar(nb)
+!
+      integer(kind = kint), intent(in) :: nb
 !
 !
       v_center =   zero
 !
+      call MPI_allreduce(v_ct_local, v_center, nb,                      &
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+!
+      end subroutine sum_b_trans_center_scalar
+!
+! -----------------------------------------------------------------------
+!
+      subroutine sum_b_trans_center_vect(nb)
+!
+      integer(kind = kint), intent(in) :: nb
+!
+      integer(kind = kint) :: ncomp
+!
+!
+      v_center =   zero
+!
+      ncomp = n_vector*nb
       call MPI_allreduce(v_ct_local, v_center, ncomp,                   &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
-      end subroutine sum_b_trans_center_vector
+      end subroutine sum_b_trans_center_vect
 !
 ! -----------------------------------------------------------------------
 !

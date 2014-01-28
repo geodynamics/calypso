@@ -85,9 +85,9 @@
       use m_spheric_parameter
 !
 !
-!      call cal_rms_sph_spec_local
+      call cal_rms_sph_spec_local
 !
-      call r_int_sph_rms_data(ione, nlayer_ICB)
+      call r_int_sph_rms_data(izero, nlayer_ICB)
       call cal_average_for_sph_rms(izero, nlayer_ICB)
 !
       end subroutine cal_rms_sph_inner_core

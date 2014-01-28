@@ -55,11 +55,11 @@
       call set_sin_theta_rtp
 !
 !
-      ncomp = ncomp_sph_trans*nidx_rtp(1)*nidx_rtp(2)
-      Nstacksmp(0:np_smp) = ncomp_sph_trans*irt_rtp_smp_stack(0:np_smp)
+      ncomp = 3*nb_sph_trans*nidx_rtp(1)*nidx_rtp(2)
+      Nstacksmp(0:np_smp) = 3*nb_sph_trans*irt_rtp_smp_stack(0:np_smp)
       call s_select_fourier_transform(ncomp, Nstacksmp)
 !
-      ncomp = ncomp_sph_trans
+      ncomp = 3*nb_sph_trans
       call init_sph_send_recv_N(ncomp, vr_rtp, vr_rtm, sp_rlm, sp_rj)
 !
       end subroutine initialize_sph_trans
@@ -154,6 +154,7 @@
 !
       a_r_1d_rtp_r(1:nidx_rtp(1)) = one/radius_1d_rtp_r(1:nidx_rtp(1))
       a_r_1d_rtm_r(1:nidx_rtm(1)) = one/radius_1d_rtm_r(1:nidx_rtm(1))
+      a_r_1d_rlm_r(1:nidx_rlm(1)) = one/radius_1d_rlm_r(1:nidx_rlm(1))
       a_r_1d_rj_r(1:nidx_rj(1)) =   one/radius_1d_rj_r(1:nidx_rj(1))
 !
       end subroutine radial_4_sph_trans

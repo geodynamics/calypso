@@ -18,7 +18,7 @@
 !!
 !!    Forward transforms
 !!      subroutine leg_fwd_trans_vector_spin(ncomp, nvector)
-!!      subroutine leg_fwd_trans_scalar_spin(ncomp, nvector, nscalar)
+!!      subroutine leg_fwd_trans_scalar_spin(ncomp, nvector,nscalar)
 !!        Input:  vr_rtm   (Order: radius,theta,phi)
 !!        Output: sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!@endverbatim

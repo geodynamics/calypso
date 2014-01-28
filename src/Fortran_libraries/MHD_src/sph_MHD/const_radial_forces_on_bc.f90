@@ -38,16 +38,8 @@
       use m_sph_phys_address
       use m_physical_property
       use m_boundary_params_sph_MHD
-!      use sum_r_coriolis_tri_sph
       use cal_r_buoyancies_on_sph
 !
-!
-!      if( iflag_4_coriolis .gt. id_turn_OFF) then
-!        call s_sum_r_coriolis_tri_sph(sph_bc_U%kr_in, coef_cor,        &
-!     &      ipol%i_div_Coriolis)
-!        call s_sum_r_coriolis_tri_sph(sph_bc_U%kr_out, coef_cor,       &
-!     &      ipol%i_div_Coriolis)
-!      end if
 !
       call s_cal_r_buoyancies_on_sph(sph_bc_U%kr_in)
       call s_cal_r_buoyancies_on_sph(sph_bc_U%kr_out)

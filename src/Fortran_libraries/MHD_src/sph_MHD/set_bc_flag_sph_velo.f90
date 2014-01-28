@@ -45,7 +45,7 @@
 !
 !
       do i = 1, velo_nod%num_bc
-        if(sph_bc_U%iflag_icb .ne. iflag_fixed_velo) exit
+        if(sph_bc_U%iflag_icb .ne. iflag_undefined_bc) exit
         if(velo_nod%bc_name(i) .eq. ICB_nod_grp_name                    &
      &    .or. velo_nod%bc_name(i) .eq. CTR_nod_grp_name) then
           call set_sph_velo_ICB_flag(velo_nod%ibc_type(i),              &
@@ -54,7 +54,7 @@
       end do
 !
       do i = 1, torque_surf%num_bc
-        if(sph_bc_U%iflag_icb .ne. iflag_fixed_velo) exit
+        if(sph_bc_U%iflag_icb .ne. iflag_undefined_bc) exit
         if    (torque_surf%bc_name(i) .eq. ICB_sf_grp_name              &
      &    .or. torque_surf%bc_name(i) .eq. ICB_nod_grp_name             &
      &    .or. torque_surf%bc_name(i) .eq. CTR_sf_grp_name              &
@@ -65,9 +65,8 @@
       end do
 !
 !
-!
       do i = 1, velo_nod%num_bc
-        if(sph_bc_U%iflag_cmb .ne. iflag_fixed_velo) exit
+        if(sph_bc_U%iflag_cmb .ne. iflag_undefined_bc) exit
         if(velo_nod%bc_name(i) .eq. CMB_nod_grp_name) then
           call set_sph_velo_CMB_flag(velo_nod%ibc_type(i),              &
      &        velo_nod%bc_magnitude(i))
@@ -75,7 +74,7 @@
       end do
 !
       do i = 1, torque_surf%num_bc
-        if(sph_bc_U%iflag_cmb .ne. iflag_fixed_velo) exit
+        if(sph_bc_U%iflag_cmb .ne. iflag_undefined_bc) exit
         if(     torque_surf%bc_name(i) .eq. CMB_sf_grp_name             &
      &     .or. torque_surf%bc_name(i) .eq. CMB_nod_grp_name) then
           call set_sph_velo_CMB_flag(torque_surf%ibc_type(i),           &

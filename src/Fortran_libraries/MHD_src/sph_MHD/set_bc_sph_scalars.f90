@@ -15,6 +15,7 @@
       module set_bc_sph_scalars
 !
       use m_precision
+      use calypso_mpi
 !
       use m_machine_parameter
       use m_control_parameter
@@ -64,6 +65,7 @@
           call set_fixed_gradient_bc_by_file                            &
      &       (fhd_temp, CMB_nod_grp_name, CMB_sf_grp_name,              &
      &        nidx_rj(2), sph_bc_T%CMB_flux, sph_bc_T%iflag_cmb)
+!
         else if ( h_flux_surf%ibc_type(i) .eq. iflag_sph_2_center       &
      &       .and. h_flux_surf%bc_name(i) .eq. CTR_sf_grp_name) then
          sph_bc_T%iflag_icb = iflag_sph_fill_center
@@ -116,6 +118,22 @@
         end if
       end do
 !
+      if(sph_bc_T%iflag_icb .eq. iflag_undefined_bc) then
+        if(my_rank .eq. 0) write(*,'(a)')                               &
+     &   'Thermal boundary condition for ICB is not defined correctly.'
+        if(my_rank .eq. 0) write(*,'(2a)')                              &
+     &   'Check control_MHD and ', trim(bc_sph_file_name)
+        call calypso_MPI_abort(2, 'Check boundary conditions')
+      end if
+!
+      if(sph_bc_T%iflag_cmb .eq. iflag_undefined_bc) then
+        if(my_rank .eq. 0) write(*,'(a)')                               &
+     &   'Thermal boundary condition for CMB is not defined correctly.'
+        if(my_rank .eq. 0) write(*,'(2a)')                              &
+     &   'Check control_MHD and ', trim(bc_sph_file_name)
+        call calypso_MPI_abort(2, 'Check boundary conditions')
+      end if
+
       sph_bc_T%ICB_flux(1:nidx_rj(2))                                   &
      &      = -sph_bc_T%ICB_flux(1:nidx_rj(2))
 !
@@ -210,6 +228,24 @@
         end if
       end do
 !
+      if(sph_bc_T%iflag_icb .eq. iflag_undefined_bc) then
+        if(my_rank .eq. 0) write(*,'(2a)')                              &
+     &   'Compositional  boundary condition for ICB ',                  &
+     &   'is not defined correctly.'
+        if(my_rank .eq. 0) write(*,'(2a)')                              &
+     &   'Check control_MHD and ', trim(bc_sph_file_name)
+        call calypso_MPI_abort(2, 'Check boundary conditions')
+      end if
+!
+      if(sph_bc_T%iflag_cmb .eq. iflag_undefined_bc) then
+        if(my_rank .eq. 0) write(*,'(2a)')                              &
+     &   'Compositional  boundary condition for CMB ',                  &
+     &   'is not defined correctly.'
+        if(my_rank .eq. 0) write(*,'(2a)')                              &
+     &   'Check control_MHD and ', trim(bc_sph_file_name)
+        call calypso_MPI_abort(2, 'Check boundary conditions')
+      end if
+
       sph_bc_C%ICB_flux(1:nidx_rj(2))                                   &
      &      = -sph_bc_C%ICB_flux(1:nidx_rj(2))
 !

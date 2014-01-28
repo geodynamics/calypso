@@ -46,33 +46,10 @@
 !
       implicit none
 !
-!
-!>      integer flag to run elpse time check for legendre transform
-      integer(kind = kint), parameter :: iflag_leg_undefined = -1
-!>      integer flag to perform Legendre transform 
-!@n     using original array order
-      integer(kind = kint), parameter :: iflag_leg_orginal_loop = 1
-!>      integer flag to perform Legendre transform 
-!!@n    using longer loop for original array order 
-      integer(kind = kint), parameter :: iflag_leg_krloop_inner = 2
-!>      integer flag to perform Legendre transform 
-!@n     with inneromst Legendre polynomial loop
-      integer(kind = kint), parameter :: iflag_leg_krloop_outer = 3
-!>      integer flag to perform Legendre transform 
-!@n     with longest loop
-      integer(kind = kint), parameter :: iflag_leg_krloop_long =  4
-!>      integer flag to perform Legendre transform 
-!@n     with outermost field loop
-      integer(kind = kint), parameter :: iflag_leg_fldloop_outer = 5
-!
-!>      Integer flag for Legendre transform
-      integer(kind = kint)                                              &
-     &              :: id_legendre_transfer = iflag_leg_undefined
-!
 !>      maximum number of fields for Legendre transform
       integer(kind = kint) :: nb_sph_trans
 !>      total number of components for spherical harmonics transform
-      integer(kind = kint) :: ncomp_sph_trans
+      integer(kind = kint) :: ntot_comp_sph_trans
 !
 !>      field data including pole and center  @f$ f(r,\theta,\phi) @f$ 
       real(kind = kreal), allocatable :: d_nod_rtp(:,:)
@@ -121,8 +98,6 @@
 !
       if (nb_sph_trans .gt. iflag_sph_trans) then
         call deallocate_work_4_sph_trans
-        call allocate_work_4_sph_trans
-        return
       end if
 !
       if (iflag_sph_trans .le. 0)  call allocate_work_4_sph_trans
@@ -143,12 +118,12 @@
       allocate(mdx_n_rlm_rtm(nidx_rlm(2)))
       allocate(asin_theta_1d_rtm(nidx_rtm(2)))
 !
-      allocate(sp_rlm(ncomp_sph_trans*nnod_rlm))
-      allocate(vr_rtp(ncomp_sph_trans*nnod_rtp))
+      allocate(sp_rlm(3*nb_sph_trans*nnod_rlm))
+      allocate(vr_rtp(3*nb_sph_trans*nnod_rtp))
 !
-      allocate(sp_rj(ncomp_sph_trans*nnod_rj))
+      allocate(sp_rj(3*nb_sph_trans*nnod_rj))
 !
-      allocate(vr_rtm(ncomp_sph_trans*nnod_rtm))
+      allocate(vr_rtm(3*nb_sph_trans*nnod_rtm))
 !
       allocate(cos_theta_1d_rtp(nidx_rtp(2)))
       allocate(sin_theta_1d_rtp(nidx_rtp(2)))
@@ -194,7 +169,7 @@
 !
       use m_spheric_parameter
 !
-      allocate(vr_rtp(ncomp_sph_trans*nnod_rtp))
+      allocate(vr_rtp(3*nb_sph_trans*nnod_rtp))
       vr_rtp = 0.0d0
 !
       iflag_sph_trans = nb_sph_trans
