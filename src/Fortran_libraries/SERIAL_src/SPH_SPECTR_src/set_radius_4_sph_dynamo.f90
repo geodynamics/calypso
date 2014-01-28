@@ -34,6 +34,7 @@
 !
       use m_group_data_sph_specr
       use set_radial_grid_sph_shell
+      use skip_comment_f
 !
       integer(kind = kint) :: k, kk
 !
@@ -41,14 +42,16 @@
 !* --------  radius  --------------
 !
       do k = 1, num_radial_grp_rj
-        if(     name_radial_grp_rj(k) .eq. 'ICB'                        &
-     &     .or. name_radial_grp_rj(k) .eq. 'icb'   ) then
+        if(     cmp_no_case(name_radial_grp_rj(k), 'ICB') .gt. 0) then
           kk = istack_radial_grp_rj(k-1) + 1
           nlayer_ICB = item_radial_grp_rj(kk)
-        else if(name_radial_grp_rj(k) .eq. 'CMB'                        &
-     &     .or. name_radial_grp_rj(k) .eq. 'cmb') then
+        else if(cmp_no_case(name_radial_grp_rj(k), 'CMB') .gt. 0) then
           kk = istack_radial_grp_rj(k-1) + 1
           nlayer_CMB = item_radial_grp_rj(kk)
+        else if(cmp_no_case(name_radial_grp_rj(k), 'to_Center') .gt. 0) &
+     &      then
+          kk = istack_radial_grp_rj(k-1) + 1
+          nlayer_2_center = item_radial_grp_rj(kk)
         end if
       end do
 !

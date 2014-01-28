@@ -13,6 +13,7 @@
       implicit  none
 !
       private :: ordering_sph_field_by_viz
+      private :: ordering_sph_field_by_viz_comp
 !
 ! -----------------------------------------------------------------------
 !

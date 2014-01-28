@@ -70,7 +70,7 @@
       call allocate_schmidt_p_rtm_pole
       call set_lagender_pole_rlm
 !
-!      call deallocate_index_4_sph
+      call deallocate_index_4_sph
       call deallocate_schmidt_polynomial
 !
       end subroutine s_cal_schmidt_poly_rtm
@@ -112,7 +112,6 @@
 !
       integer(kind = kint) :: j, jj
 !
-!$omp parallel do private(jj)
       do j = 1, nidx_rlm(2)
         jj = idx_gl_1d_rlm_j(j,1)
         g_sph_rlm(j,1) =  g(jj,1)
@@ -135,7 +134,6 @@
 !
         if(jj .eq. 0) g_sph_rlm(j,3) = half
       end do
-!$omp end parallel do
 !
       end subroutine copy_sph_normalization_2_rlm
 !
@@ -149,7 +147,6 @@
 !
       integer(kind = kint) :: j, jj
 !
-!$omp parallel do private(jj)
       do j = 1, nidx_rj(2)
         jj = idx_gl_1d_rj_j(j,1)
         g_sph_rj(j,1) =  g(jj,1)
@@ -165,12 +162,7 @@
         g_sph_rj(j,11) = g(jj,11)
         g_sph_rj(j,12) = g(jj,12)
         g_sph_rj(j,13) = g(jj,13)
-        g_sph_rj(j,14) = g(jj,14)
-        g_sph_rj(j,15) = g(jj,15)
-        g_sph_rj(j,16) = g(jj,16)
-        g_sph_rj(j,17) = g(jj,17)
       end do
-!$omp end parallel do
 !
       end subroutine copy_sph_normalization_2_rj
 !

@@ -123,16 +123,6 @@
           idx_lc(j,3) = m
         end do
       end do
-      nshift_j_cor = 0
-!
-      nidx_j_cor = jmax
-      call allocate_sph_coriolis_data( ione, jmax )
-!
-      do j1 = 1 ,jmax
-        idx_gl_cor_j(j1,1) = idx_lc(j1,1)
-        idx_gl_cor_j(j1,2) = idx_lc(j1,2)
-        idx_gl_cor_j(j1,3) = idx_lc(j1,3)
-      end do
 !
 ! ------ evaluate of Gaunt integral with hermmonics ------
 !
@@ -144,9 +134,6 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 's_set_integral_sph_coriolis'
       call s_set_integral_sph_coriolis(ltr, jmax, idx_lc(1,1) )
-!
-      if(iflag_debug .gt. 0) write(*,*) 'set_local_sph_coriolis_address'
-      call set_local_sph_coriolis_address(jmax)
 !
 !* ------ write data ------
 !

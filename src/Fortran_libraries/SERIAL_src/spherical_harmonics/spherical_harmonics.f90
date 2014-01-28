@@ -1,80 +1,70 @@
-!!spherical_harmonics.f90
-!!      module spherical_harmonics
-!!
-!!     Written by H. Matsui in 1995
-!!     modified by H. Matsui on June, 2006
-!>@file   spherical_harmonics.f90
-!!@brief  module spherical_harmonics
-!!
-!!@author H. Matsui
-!!@date Programmed in 1995
-!!@n     modified by H. Matsui on June, 2006
+!spherical_harmonics.f90
+!      module spherical_harmonics
 !
-!>@brief Make constants for spherical harmonics
-!!
-!!@verbatim
-!!
-!!      subroutine idx28
-!!
-!!***********************************************************************
-!!    subroutine for make indices for spherical harmonics
-!!                                     97,12,19
-!!***********************************************************************
-!!
-!!***********************************************************************
-!!
-!!   g(j,1) , idx(j,1) : index l
-!!   g(j,2) , idx(j,2) : index m
-!!   g(j,3)            : l*(l+1)
-!!   g(j,4)            : (l-1)*l
-!!   g(j,5)            : (l+1)*(l+2)
-!!   g(j,6)            : (2*l+1) / 4
-!!            g(j,6)   : (2*l+1) / 2                    (m = 0)
-!!   g(j,7)            : (2*l+1) / ( 4*l*(l+1) )
-!!            g(j,7)   : (2*l+1) / ( 2*l*(l+1) )        (m = 0)
-!!            g(j,7)   : 1                              (l=m=0)
-!!   g(j,8)            : ( 4*pi*l*(l+1) ) / (2*l+1)
-!!   g(j,9)            : (2*l+1) / ( 4*pi*l*(l+1) )
-!!            g(j,9)   : 1 / 4*pi                       (l=m=0)
-!!   g(j,10)           : ( 4*pi ) / (2*l+1)
-!!   g(j,11)           :  1 / (2*l+1)
-!!   g(j,12)           :  l*(l+1) / (2*l+1)
-!!   g(j,13)           :  1 / (l*(l+1))
-!!
-!!   g(j,16)           : (2*l+1) / 4
-!!   g(j,17)           : (2*l+1) / ( 4*l*(l+1) )
-!!            g(j,17)  : 0                              (l=m=0)
-!!
-!!
-!!   Note: g(0,3) = 1/2 for spherical harmonics transform
-!!    (See g_sph_rlm in schmidt_poly_on_rtm_grid.f90)
-!!
-!!
-!!***********************************************************************
-!!
-!!      subroutine spheric
-!!*************************************************************
-!!     lead spherical harmonics
-!!         and differential of spherical harmonics
-!!*************************************************************
-!!
-!!*************************************************************
-!!
-!!     required subroutine
-!!         dschmidt.f
-!!
-!!*************************************************************
-!!
-!!*************************************************************
-!!*
-!!*      p(m,l,0)  : Schmidt Polynomial
-!!*      dp(m,l,1) : diffrential of Schmidt Polynomial  dp/dtheta
-!!*        dth      :  input degree theta ( 0 =< dth <= pi )
-!!*        dph      :  input degree phi ( 0 =< phi <= 2*pi )
-!!*       work  :   work area
-!!*
-!!*************************************************************
-!!@endverbatim
+!     Written by H. Matsui in 1995
+!     modified by H. Matsui on June, 2006
+!
+!      subroutine idx28
+!
+!***********************************************************************
+!*    subroutine for make indices for spherical harmonics
+!*                                     97,12,19
+!***********************************************************************
+!*
+!***********************************************************************
+!*
+!*   g(j,1) , idx(j,1) : index l
+!*   g(j,2) , idx(j,2) : index m
+!*   g(j,3)            : l*(l+1)
+!*   g(j,4)            : (l-1)*l
+!*   g(j,5)            : (l+1)*(l+2)
+!*   g(j,6)            : (2*l+1) / 4
+!*            g(j,6)   : (2*l+1) / 2                    (m = 0)
+!*   g(j,7)            : (2*l+1) / ( 4*l*(l+1) )
+!*            g(j,7)   : (2*l+1) / ( 2*l*(l+1) )        (m = 0)
+!*            g(j,7)   : 1                              (l=m=0)
+!*   g(j,8)            : ( 4*pi*l*(l+1) ) / (2*l+1)
+!*   g(j,9)            : (2*l+1) / ( 4*pi*l*(l+1) )
+!*            g(j,9)   : 1 / 4*pi                       (l=m=0)
+!*   g(j,10)           : ( 4*pi ) / (2*l+1)
+!*   g(j,11)           :  1 / (2*l+1)
+!*   g(j,12)           :  l*(l+1) / (2*l+1)
+!*   g(j,13)           :  1 / (l*(l+1))
+!
+!*   g(j,16)           : (2*l+1) / 4
+!*   g(j,17)           : (2*l+1) / ( 4*l*(l+1) )
+!*            g(j,17)  : 0                              (l=m=0)
+!
+!
+!   Note: g(0,3) = 1/2 for spherical harmonics transform
+!    (See g_sph_rlm in schmidt_poly_on_rtm_grid.f90)
+!
+!*
+!***********************************************************************
+!*
+!      subroutine spheric
+!*************************************************************
+!*     lead spherical harmonics
+!*         and differential of spherical harmonics
+!*************************************************************
+!*
+!*************************************************************
+!*
+!*     required subroutine
+!*         dschmidt.f
+!*
+!*************************************************************
+!*
+!*************************************************************
+!*
+!*      p(m,l,0)  : Schmidt Polynomial
+!*      dp(m,l,1) : diffrential of Schmidt Polynomial  dp/dtheta
+!*        dth      :  input degree theta ( 0 =< dth <= pi )
+!*        dph      :  input degree phi ( 0 =< phi <= 2*pi )
+!*       work  :   work area
+!*
+!*************************************************************
+!*
       module spherical_harmonics
 !
       use m_precision

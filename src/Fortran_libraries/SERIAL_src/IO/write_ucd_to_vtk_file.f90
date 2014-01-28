@@ -40,9 +40,6 @@
 !>      file ID for VTK file
       integer(kind = kint), parameter, private :: id_vtk_file = 16
 !
-!>      Structure for temporal read array
-      type(ucd_data), private :: tmp
-!
       private :: read_ucd_mesh_by_vtk, read_ucd_field_by_vtk
 !
 !-----------------------------------------------------------------------

@@ -13,14 +13,10 @@
 !!
 !!      subroutine allocate_phys_rtp_data
 !!      subroutine allocate_phys_rj_data
-!!
-!!      subroutine allocate_rot_rj_data
 !!      subroutine allocate_reft_rj_data
 !!
 !!      subroutine deallocate_phys_rtp_data
 !!      subroutine deallocate_phys_rj_data
-!!
-!!      subroutine deallocate_rot_rj_data
 !!      subroutine deallocate_reft_rj_data
 !!
 !!      subroutine check_rtp_phys_data(my_rank)
@@ -99,20 +95,6 @@
 !>      Number of fields of tensor fields @f$ f(r,\theta,\phi) @f$
       integer (kind=kint) :: num_tensor_rtp
 !
-!>     rotation spectr in @f$ f(r,j) @f$
-!!@verbatim
-!!        omega(kr,0,1) ... Omaga_x
-!!        omega(kr,1,1) ... d Omaga_x / dr
-!!        omega(kr,2,1) ... d^2 Omaga_x / dr^2
-!!        omega(kr,0,2) ... Omaga_z
-!!        omega(kr,1,2) ... d Omaga_z / dr
-!!        omega(kr,2,2) ... d^2 Omaga_z / dr^2
-!!        omega(kr,0,3) ... Omaga_y
-!!        omega(kr,1,3) ... d Omaga_y / dr
-!!        omega(kr,2,3) ... d^2 Omaga_y / dr^2
-!!@endverbatim
-      real(kind = kreal), allocatable :: omega_rj(:,:,:)
-!
 !>    reference temerature spectr @f$ f(r,j) @f$
 !!@verbatim
 !!        reftemp_rj(kr,0) ... T_0
@@ -185,20 +167,6 @@
 !
 !  --------------------------------------------------------------------
 !
-      subroutine allocate_rot_rj_data
-!
-      use m_spheric_parameter
-!
-      integer(kind = kint) :: num
-!
-      num = nidx_rj(1)
-      allocate( omega_rj(num,0:2,3) )
-      omega_rj =  0.0d0
-!
-      end subroutine allocate_rot_rj_data
-!
-!  --------------------------------------------------------------------
-!
       subroutine allocate_reft_rj_data
 !
       use m_spheric_parameter
@@ -235,14 +203,6 @@
       deallocate( d_rj )
 !
       end subroutine deallocate_phys_rj_data
-!
-!  --------------------------------------------------------------------
-!
-      subroutine deallocate_rot_rj_data
-!
-      deallocate(omega_rj)
-!
-      end subroutine deallocate_rot_rj_data
 !
 !  --------------------------------------------------------------------
 !

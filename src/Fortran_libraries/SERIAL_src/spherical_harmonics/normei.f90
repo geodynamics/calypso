@@ -1,69 +1,59 @@
-!>@file   normei.f90
-!!@brief  module normei
-!!
-!!@author H. Matsui
-!!@date Programmed in 1993
-!!@n    Modified in Apr. 2009
 !
-!>@brief Select Evaluation of Elsasser integrals
-!!
-!!@verbatim
-!!***************************************************
-!!*
-!!*      subroutine for lead elsasser integral
-!!*         switched the index
-!!*                                '98, 3, 9
-!!*
-!!***************************************************
-!!
-!!      double precision function setei(l1, m1, l2, m2, l3, m3)
-!!
-!!**********************************************************************
-!!*                                                                    *
-!!*   normarised Elsasser integrals                                    *
-!!*                                     (m3)         (m2)              *
-!!*  (m1,m2,m3)   /  1 (m1)     (m2)  dP(l3)       dP(l2)    (m3)      *
-!!* Es          = |   P   *[m2*P    *------- - m3*-------- *P    ] dx  *
-!!*  (l1,l2,l3)   / -1 (l1)     (l2)   dx            dx      (l3)      *
-!!*                                                                    *
-!!*     1                         1                             1      *
-!!*  = --- *[ {(l2+m2)*(l3-m3)}**--- *{ [(l2+m2-1)*(l3+m3+1)]**---     *
-!!*     2                         2                             2      *
-!!*                                                                    *
-!!*     (m1,m2-1,m3+1)                     1    (m1, m2 ,m3)           *
-!!*  *Gs              + [(l3-m3)*(l2-m2)]**- *Gs             }         *
-!!*     (l1,l2-1,l3)                       2    (l1,l2-1,l3)           *
-!!*                                                                    *
-!!*                          1                             1           *
-!!*  - [ {(l3+m3)*(l2-m2)}**--- *{ [(l3+m3-1)*(l2+m2+1)]**---          *
-!!*                          2                             2           *
-!!*                                                                    *
-!!*     (m1,m2+1,m3-1)                     1    (m1,m2,m3)             *
-!!*  *Gs              + [(l2-m2)*(l3-m3)]**- *Gs            }]         *
-!!*     (l1, l2 ,l3-1)                     2    (l1,l2,l3-1)           *
-!!*                                                                    *
-!!*      Gs : quasi normalised Gaunt integrals                         *
-!!*                                                                    *
-!!*              (m1,m2-1,m3+1)             (m1, m2 ,m3)               *
-!!*       g1 : Gs                    g2 : Gs                           *
-!!*              (l1,l2-1,l3)               (l1,l2-1,l3)               *
-!!*                                                                    *
-!!*              (m1,m2+1,m3-1)             (m1,m2,m3)                 *
-!!*       g3 : Gs                    g4 : Gs                           *
-!!*              (l1, l2 ,l3-1)             (l1,l2,l3-1)               *
-!!*                                                                    *
-!!**********************************************************************
-!!*
-!!***************************************************
-!!*
-!!*  ....   condition 
-!!
-!!*  m1 = m2 + m3
-!!*
-!!***************************************************
-!!*
-!!@endverbatim
+!      module normei
 !
+!***************************************************
+!*
+!*      subroutine for lead elsasser integral
+!*         switched the index
+!*                                '98, 3, 9
+!*
+!***************************************************
+!
+!      double precision function setei(l1, m1, l2, m2, l3, m3)
+!
+!**********************************************************************
+!*                                                                    *
+!*   normarised Elsasser integrals                                    *
+!*                                     (m3)         (m2)              *
+!*  (m1,m2,m3)   /  1 (m1)     (m2)  dP(l3)       dP(l2)    (m3)      *
+!* Es          = |   P   *[m2*P    *------- - m3*-------- *P    ] dx  *
+!*  (l1,l2,l3)   / -1 (l1)     (l2)   dx            dx      (l3)      *
+!*                                                                    *
+!*     1                         1                             1      *
+!*  = --- *[ {(l2+m2)*(l3-m3)}**--- *{ [(l2+m2-1)*(l3+m3+1)]**---     *
+!*     2                         2                             2      *
+!*                                                                    *
+!*     (m1,m2-1,m3+1)                     1    (m1, m2 ,m3)           *
+!*  *Gs              + [(l3-m3)*(l2-m2)]**- *Gs             }         *
+!*     (l1,l2-1,l3)                       2    (l1,l2-1,l3)           *
+!*                                                                    *
+!*                          1                             1           *
+!*  - [ {(l3+m3)*(l2-m2)}**--- *{ [(l3+m3-1)*(l2+m2+1)]**---          *
+!*                          2                             2           *
+!*                                                                    *
+!*     (m1,m2+1,m3-1)                     1    (m1,m2,m3)             *
+!*  *Gs              + [(l2-m2)*(l3-m3)]**- *Gs            }]         *
+!*     (l1, l2 ,l3-1)                     2    (l1,l2,l3-1)           *
+!*                                                                    *
+!*      Gs : quasi normalised Gaunt integrals                         *
+!*                                                                    *
+!*              (m1,m2-1,m3+1)             (m1, m2 ,m3)               *
+!*       g1 : Gs                    g2 : Gs                           *
+!*              (l1,l2-1,l3)               (l1,l2-1,l3)               *
+!*                                                                    *
+!*              (m1,m2+1,m3-1)             (m1,m2,m3)                 *
+!*       g3 : Gs                    g4 : Gs                           *
+!*              (l1, l2 ,l3-1)             (l1,l2,l3-1)               *
+!*                                                                    *
+!**********************************************************************
+!*
+!***************************************************
+!*
+!*  ....   condition !!
+!*  m1 = m2 + m3
+!*
+!***************************************************
+!*
       module normei
 !
       use m_precision
@@ -96,29 +86,29 @@
         if ( m3+1.gt.l3 .or. abs(m2-1).gt.l2-1 )then
           gg(1) = zero
         else if (m2 .eq. 0 ) then
-          gg(1) =-gs_select(m3+1,l3,1,l2-1,m1,l1)
+          gg(1) =-gs(m3+1,l3,1,l2-1,m1,l1)
         else
-          gg(1) = gs_select(m1,l1,m2-1,l2-1,m3+1,l3)
+          gg(1) = gs(m1,l1,m2-1,l2-1,m3+1,l3)
         end if
 !*
         if ( m2 .gt.l2-1 )then
           gg(2) = zero
         else
-          gg(2) = gs_select(m1,l1,m2,l2-1,m3,l3)
+          gg(2) = gs(m1,l1,m2,l2-1,m3,l3)
         end if
 !*
         if ( m2+1 .gt.l2 .or. abs(m3-1).gt.l3-1 )then
           gg(3) = zero
         else if ( m3 .eq. 0) then
-          gg(3) = -gs_select(m2+1,l2,1,l3-1,m1,l1)
+          gg(3) = -gs(m2+1,l2,1,l3-1,m1,l1)
         else
-          gg(3) = gs_select(m1,l1,m2+1,l2,m3-1,l3-1)
+          gg(3) = gs(m1,l1,m2+1,l2,m3-1,l3-1)
         end if
 !*
         if ( m3 .gt.l3-1  )then
           gg(4) = zero
         else
-          gg(4) = gs_select(m1,l1,m2,l2,m3,l3-1)
+          gg(4) = gs(m1,l1,m2,l2,m3,l3-1)
         end if
 !*
         setei = leades(m2,l2,m3,l3,gg)

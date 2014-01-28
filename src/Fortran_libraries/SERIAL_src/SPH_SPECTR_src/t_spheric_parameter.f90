@@ -195,6 +195,8 @@
 !
 !>        1d radius data for @f$ f(r,l,m) @f$
         real(kind = kreal), pointer :: radius_1d_rlm_r(:)
+!>        1 / radius_1d_rlm_r
+        real(kind = kreal), pointer :: a_r_1d_rlm_r(:)
       end type sph_rlm_grid
 !
 !
@@ -212,6 +214,7 @@
 !!@n      idx_rj_degree_zero = 0.
         integer (kind=kint) :: idx_rj_degree_zero
 !>        local spectr index for @f$ l = 1@f$ and  @f$ m = -1, 0, 1@f$.
+!!        for @f$ f(r,j) @f$
 !!@n        If spectr data do not exist in subdomain,
 !!@n        idx_rj_degree_one(m) = 0.
         integer (kind=kint) :: idx_rj_degree_one(-1:1)
@@ -465,6 +468,7 @@
       num = rlm%nidx_rlm(1)
       allocate(rlm%idx_gl_1d_rlm_r(num))
       allocate(rlm%radius_1d_rlm_r(num))
+      allocate(rlm%a_r_1d_rlm_r(num))
       num = rlm%nidx_rlm(2)
       allocate(rlm%idx_gl_1d_rlm_j(num,3))
 !
@@ -472,6 +476,7 @@
       if(rlm%nidx_rlm(1) .gt. 0) then
         rlm%idx_gl_1d_rlm_r = 0
         rlm%radius_1d_rlm_r = 0.0d0
+        rlm%a_r_1d_rlm_r    = 0.0d0
       end if
 !
       end subroutine alloc_type_sph_1d_index_rlm
@@ -602,6 +607,7 @@
 !
 !
       deallocate(rlm%radius_1d_rlm_r)
+      deallocate(rlm%a_r_1d_rlm_r   )
       deallocate(rlm%idx_gl_1d_rlm_r)
       deallocate(rlm%idx_gl_1d_rlm_j)
 !

@@ -330,7 +330,7 @@
 !>        Field label for composion source
 !!         @f$ q_{C} @f$
       character(len=kchara), parameter                                  &
-     &              :: fhd_light_source =  'compositoin_source'
+     &              :: fhd_light_source =  'composition_source'
 !>        Field label for entropysource
 !!         @f$ q_{S} @f$
       character(len=kchara), parameter                                  &
