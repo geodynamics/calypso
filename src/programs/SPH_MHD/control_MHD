@@ -125,8 +125,8 @@ begin MHD_control
 !  available type:  fixed, file
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       array bc_temperature   2
-        bc_temperature  fixed ICB  1.000
-        bc_temperature  fixed CMB  0.000
+        bc_temperature  file ICB  1.000
+        bc_temperature  file CMB  0.000
       end array
 !!!!!  boundary condition for velocity  !!!!!!!!!!!!!!!!!!!!!!!!
 !  available type

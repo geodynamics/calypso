@@ -9,7 +9,7 @@
 !!      subroutine count_picked_sph_adrress(l_truncation,               &
 !!     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,         &
 !!     &          idx_pick_sph_l, idx_pick_sph_m, ntot_pickup)
-!!      subroutine set_picked_sph_adrress(l_truncation, jmax, idx_gl_j, &
+!!      subroutine set_picked_sph_address(l_truncation, jmax, idx_gl_j, &
 !!     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,         &
 !!     &          idx_pick_sph, idx_pick_sph_l, idx_pick_sph_m,         &
 !!     &          ntot_pickup, num_pickup, idx_pick_gl, idx_pick_lc)
@@ -87,7 +87,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_picked_sph_adrress(l_truncation, jmax, idx_gl_j,   &
+      subroutine set_picked_sph_address(l_truncation, jmax, idx_gl_j,   &
      &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,           &
      &          idx_pick_sph, idx_pick_sph_l, idx_pick_sph_m,           &
      &          ntot_pickup, num_pickup, idx_pick_gl, idx_pick_lc)
@@ -161,7 +161,7 @@
         end do
       end do
 !
-      end subroutine set_picked_sph_adrress
+      end subroutine set_picked_sph_address
 !
 ! -----------------------------------------------------------------------
 !

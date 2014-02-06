@@ -7,7 +7,7 @@
 !> @brief Convert temperature data using reference temperature
 !!
 !!@verbatim
-!!      subroutine adjust_by_ave_pressure_on_CMB(kr_out)
+!!      subroutine adjust_by_ave_pressure_on_CMB(kr_in, kr_out)
 !!
 !!      subroutine set_ref_temp_sph_mhd(sph_bc_T)
 !!      subroutine adjust_sph_temp_bc_by_reftemp(sph_bc_T)
@@ -50,11 +50,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine adjust_by_ave_pressure_on_CMB(kr_out)
+      subroutine adjust_by_ave_pressure_on_CMB(kr_in, kr_out)
 !
       use m_sph_phys_address
 !
-      integer(kind = kint), intent(in) :: kr_out
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
       integer(kind = kint) :: k, inod
       real(kind = kreal) :: ref_p
@@ -65,7 +65,7 @@
       inod = idx_rj_degree_zero + (kr_out-1)*nidx_rj(2)
       ref_p = d_rj(inod,ipol%i_press)
 !
-      do k = 1, nidx_rj(1)
+      do k = kr_in, kr_out
         inod = idx_rj_degree_zero + (k-1)*nidx_rj(2)
         d_rj(inod,ipol%i_press) = d_rj(inod,ipol%i_press) - ref_p
       end do
@@ -121,7 +121,7 @@
       use m_sph_spectr_data
       use t_boundary_params_sph_MHD
 !
-      type(sph_boundary_type), intent(in) :: sph_bc_T
+      type(sph_boundary_type), intent(inout) :: sph_bc_T
 !
 !
       if(idx_rj_degree_zero .gt. 0                                      &
@@ -167,8 +167,9 @@
 !
 !$omp parallel do
       do inod = 1, nnod_rj
-        d_rj(inod,ipol%i_par_temp) =    d_rj(inod,ipol%i_temp)
-        d_rj(inod,ipol%i_grad_part_t) = d_rj(inod,ipol%i_grad_t)
+        d_rj(inod,ipol%i_par_temp) =     d_rj(inod,ipol%i_temp)
+        d_rj(inod,ipol%i_grad_part_t) =  d_rj(inod,ipol%i_grad_t)
+        d_rj(inod,idpdr%i_grad_part_t) = d_rj(inod,ipol%i_temp)
       end do
 !$omp end parallel do
 !

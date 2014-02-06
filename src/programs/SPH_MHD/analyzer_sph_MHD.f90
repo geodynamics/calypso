@@ -23,8 +23,6 @@
       use m_t_int_parameter
       use m_t_step_parameter
 !
-      use const_coriolis_sph
-!
       use FEM_analyzer_sph_MHD
       use SPH_analyzer_MHD
 !
@@ -115,7 +113,7 @@
 !*
         call start_eleps_time(4)
 !
-        if (iflag_debug.eq.1) write(*,*) 'SPH_to_FEM_bridge_MHD'
+!        if (iflag_debug.eq.1) write(*,*) 'SPH_to_FEM_bridge_MHD'
         call SPH_to_FEM_bridge_MHD
         if (iflag_debug.eq.1) write(*,*) 'FEM_analyze'
         call FEM_analyze(i_step_MHD, istep_psf, istep_iso,              &

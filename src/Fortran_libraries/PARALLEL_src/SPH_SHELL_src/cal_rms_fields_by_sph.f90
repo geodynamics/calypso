@@ -35,24 +35,25 @@
       use m_rms_4_sph_spectr
       use sum_sph_rms_data
 !
-      integer(kind = kint) :: i, icou
+      integer(kind = kint) :: i_fld, j_fld
 !
 !
       num_rms_rj = 0
-      do i = 1, num_phys_rj
-        num_rms_rj = num_rms_rj + iflag_monitor_rj(i)
+      do i_fld = 1, num_phys_rj
+        num_rms_rj = num_rms_rj + iflag_monitor_rj(i_fld)
       end do
 !
       call allocate_rms_name_sph_spec
 !
-      icou = 0
-      do i = 1, num_phys_rj
-        if(iflag_monitor_rj(i) .gt. 0) then
-          icou = icou + 1
-          num_rms_comp_rj(icou) = num_phys_comp_rj(i)
-          istack_rms_comp_rj(icou) = istack_rms_comp_rj(icou-1)         &
-     &                              + num_phys_comp_rj(i)
-          rms_name_rj(icou) =     phys_name_rj(i)
+      j_fld = 0
+      do i_fld = 1, num_phys_rj
+        if(iflag_monitor_rj(i_fld) .gt. 0) then
+          j_fld = j_fld + 1
+          ifield_rms_rj(j_fld) =   i_fld
+          num_rms_comp_rj(j_fld) = num_phys_comp_rj(i_fld)
+          istack_rms_comp_rj(j_fld) = istack_rms_comp_rj(j_fld-1)       &
+     &                              + num_phys_comp_rj(i_fld)
+          rms_name_rj(j_fld) =     phys_name_rj(i_fld)
         end if
       end do
       ntot_rms_rj = istack_rms_comp_rj(num_rms_rj)
@@ -73,8 +74,8 @@
 !
       call cal_rms_sph_spec_local
 !
-      call r_int_sph_rms_data(ione, nidx_global_rj(1))
-      call cal_average_for_sph_rms(ione, nidx_global_rj(1))
+      call r_int_sph_rms_data(ione, nidx_rj(1))
+      call cal_average_for_sph_rms(ione, nidx_rj(1))
 !
       end subroutine cal_rms_sph_spec_rms_whole
 !
@@ -121,32 +122,30 @@
       use cal_ave_4_rms_vector_sph
       use sum_sph_rms_data
 !
-      integer(kind = kint) :: i, icomp_st, icou
+      integer(kind = kint) :: i_fld, j_fld, icomp_st, jcomp_st
       integer(kind = kint) :: num
 !
 !
       call clear_rms_sph_spectr
 !
-      icou = 1
-      do i = 1, num_phys_rj
-        if(iflag_monitor_rj(i) .gt. 0) then
-          icomp_st = istack_phys_comp_rj(i-1) + 1
-          if (num_phys_comp_rj(i) .eq. n_scalar) then
-            call cal_ave_scalar_sph_spectr(icomp_st, icou)
-            call cal_rms_each_scalar_sph_spec(icomp_st, icou)
-          else if (num_phys_comp_rj(i) .eq. n_vector) then
-            call cal_ave_vector_sph_spectr(icomp_st, icou)
-            call cal_rms_each_vector_sph_spec(icomp_st, icou)
+      do j_fld = 1, num_rms_rj
+        i_fld = ifield_rms_rj(j_fld)
+        icomp_st = istack_phys_comp_rj(i_fld-1) + 1
+        jcomp_st = istack_rms_comp_rj(j_fld-1) +  1
+        if (num_phys_comp_rj(i_fld) .eq. n_scalar) then
+          call cal_ave_scalar_sph_spectr(icomp_st, jcomp_st)
+          call cal_rms_each_scalar_sph_spec(icomp_st, jcomp_st)
+        else if (num_phys_comp_rj(i_fld) .eq. n_vector) then
+          call cal_ave_vector_sph_spectr(icomp_st, jcomp_st)
+          call cal_rms_each_vector_sph_spec(icomp_st, jcomp_st)
 !
-            if (   icomp_st .eq. ipol%i_velo                            &
-     &        .or. icomp_st .eq. ipol%i_magne                           &
-     &        .or. icomp_st .eq. ipol%i_filter_velo                     &
-     &        .or. icomp_st .eq. ipol%i_filter_magne) then
-              call set_sph_energies_by_rms(icou)
-            end if
-!
+          if (   icomp_st .eq. ipol%i_velo                              &
+     &      .or. icomp_st .eq. ipol%i_magne                             &
+     &      .or. icomp_st .eq. ipol%i_filter_velo                       &
+     &      .or. icomp_st .eq. ipol%i_filter_magne) then
+            call set_sph_energies_by_rms(jcomp_st)
           end if
-          icou = icou + num_phys_comp_rj(i)
+!
         end if
       end do
 !
@@ -173,31 +172,30 @@
       use sum_sph_rms_data
 !
       integer(kind = kint), intent(in) :: kg_st, kg_ed
-      integer(kind = kint) :: ntot_comp
+integer(kind = kint) :: ltr1
 !
 !
-      ntot_comp = ntot_rms_rj * nidx_rj(2)
-      call radial_integration(nidx_rj(1), kg_st, kg_ed, radius_1d_rj_r, &
-     &    ntot_comp, rms_sph_dat(1,1), rms_sph_vol_dat(1,1) )
+      call radial_integration(nidx_rj(2), nidx_rj(1), kg_st, kg_ed,     &
+     &    radius_1d_rj_r, ntot_rms_rj, rms_sph_dat, rms_sph_vol_dat)
 !
       if(my_rank .gt. 0) return
 !
-      call radial_integration(nidx_rj(1), kg_st, kg_ed, radius_1d_rj_r, &
-     &    ntot_rms_rj, ave_sph(1,1), ave_sph_vol(1) )
+      call radial_integration(ione, nidx_rj(1), kg_st, kg_ed,           &
+     &    radius_1d_rj_r, ntot_rms_rj, ave_sph(1,1), ave_sph_vol(1) )
 !
-!
-      ntot_comp = ntot_rms_rj * (l_truncation+1)
-      call radial_integration(nidx_rj(1), kg_st, kg_ed, radius_1d_rj_r, &
-     &    ntot_comp, rms_sph_l(1,0,1), rms_sph_vol_l(1,0) )
-!
-      call radial_integration(nidx_rj(1), kg_st, kg_ed, radius_1d_rj_r, &
-     &    ntot_comp, rms_sph_m(1,0,1), rms_sph_vol_m(1,0) )
-!
-      call radial_integration(nidx_rj(1), kg_st, kg_ed, radius_1d_rj_r, &
-     &    ntot_comp, rms_sph_lm(1,0,1), rms_sph_vol_lm(1,0) )
+      ltr1 = l_truncation + 1
+      call radial_integration(ltr1, nidx_rj(1), kg_st, kg_ed,           &
+     &    radius_1d_rj_r, ntot_rms_rj, rms_sph_l(0,1,1),                &
+     &    rms_sph_vol_l(0,1) )
+      call radial_integration(ltr1, nidx_rj(1), kg_st, kg_ed,           &
+     &    radius_1d_rj_r, ntot_rms_rj, rms_sph_m(0,1,1),                &
+     &    rms_sph_vol_m(0,1) )
+      call radial_integration(ltr1, nidx_rj(1), kg_st, kg_ed,           &
+     &    radius_1d_rj_r, ntot_rms_rj, rms_sph_lm(0,1,1),               &
+     &    rms_sph_vol_lm(0,1) )
 !
       call sum_sph_rms_all_modes(l_truncation, ione, ntot_rms_rj,       &
-     &    rms_sph_vol_l(1,0), rms_sph_vol(1) )
+     &    rms_sph_vol_l(0,1), rms_sph_vol(1) )
 !
 !
       end subroutine r_int_sph_rms_data

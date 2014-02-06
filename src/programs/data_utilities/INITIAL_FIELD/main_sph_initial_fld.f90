@@ -14,7 +14,7 @@
       use m_precision
 !
       use calypso_mpi
-      use analyzer_sph_initial_fld
+      use SPH_analyzer_const_initial
 !
       implicit none
 !

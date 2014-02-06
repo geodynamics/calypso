@@ -10,18 +10,18 @@
 !
 !  begin org_data_files_def
 !    num_org_domain_ctl           2
-!    org_mesh_head_ctl          'mesh_target/in'
-!    org_sph_mode_head_ctl      'sph_org/in_rj'
+!    org_mesh_head_ctl           'mesh_target/in'
+!    orginal_sph_file_prefix     'sph_org/in_rj'
 !
 !    orginal_restart_prefix      'rst_org/rst'
 !
-!    org_field_file_head_ctl    'field_org/out'
-!    org_spectr_file_head_ctl   'spectr_org/spectr'
+!    org_field_file_head_ctl     'field_org/out'
+!    org_spectr_file_head_ctl    'spectr_org/spectr'
 !
 !    org_mesh_file_fmt_ctl           'ascii'
-!    org_rst_files_fmt_ctl           'ascii'
-!    org_field_files_fmt_ctl         'ascii'
-!    org_sph_files_fmt_ctl           'ascii'
+!    org_restart_file_fmt_ctl        'ascii'
+!    org_field_file_fmt_ctl          'ascii'
+!    org_sph_file_fmt_ctl            'ascii'
 !  end org_data_files_def
 !
 !  ---------------------------------------------------------------------
@@ -42,10 +42,10 @@
       character(len=kchara) :: org_udt_head_ctl
       character(len=kchara) :: org_spectr_file_head_ctl
 !
-      character(len=kchara) :: org_mesh_file_fmt_ctl = 'ascii'
-      character(len=kchara) :: org_sph_file_fmt_ctl =  'ascii'
-      character(len=kchara) :: org_rst_files_fmt_ctl = 'ascii'
-      character(len=kchara) :: org_udt_file_fmt_ctl =  'ascii'
+      character(len=kchara) :: org_mesh_file_fmt_ctl =    'ascii'
+      character(len=kchara) :: org_sph_file_fmt_ctl =     'ascii'
+      character(len=kchara) :: org_restart_file_fmt_ctl = 'ascii'
+      character(len=kchara) :: org_udt_file_fmt_ctl =     'ascii'
 !
 !  label for group entry
 !
@@ -62,7 +62,7 @@
       character(len=kchara), parameter                                  &
      &       :: hd_org_mesh_head =     'org_mesh_head_ctl'
       character(len=kchara), parameter                                  &
-     &       :: hd_org_sph_mode_head = 'org_sph_mode_head_ctl'
+     &       :: hd_org_sph_mode_head = 'orginal_sph_file_prefix'
 !
       character(len=kchara), parameter                                  &
      &       :: hd_org_rst_head =     'orginal_restart_prefix'
@@ -75,11 +75,11 @@
       character(len=kchara), parameter                                  &
      &       :: hd_org_mesh_file_fmt = 'org_mesh_file_fmt_ctl'
       character(len=kchara), parameter                                  &
-     &       :: hd_org_rst_files_fmt = 'org_rst_files_fmt_ctl'
+     &       :: hd_org_rst_files_fmt = 'org_restart_file_fmt_ctl'
       character(len=kchara), parameter                                  &
-     &       :: hd_org_udt_files_fmt = 'org_field_files_fmt_ctl'
+     &       :: hd_org_udt_files_fmt = 'org_field_file_fmt_ctl'
       character(len=kchara), parameter                                  &
-     &       :: hd_org_sph_files_fmt = 'org_sph_files_fmt_ctl'
+     &       :: hd_org_sph_files_fmt = 'org_sph_file_fmt_ctl'
 !
       integer(kind = kint) :: i_num_org_domain = 0
       integer(kind = kint) :: i_org_mesh_head =  0
@@ -144,7 +144,7 @@
         call read_character_ctl_item(hd_org_mesh_file_fmt,              &
      &        i_org_mesh_file_fmt, org_mesh_file_fmt_ctl)
         call read_character_ctl_item(hd_org_rst_files_fmt,              &
-     &        i_org_rst_files_fmt, org_rst_files_fmt_ctl)
+     &        i_org_rst_files_fmt, org_restart_file_fmt_ctl)
         call read_character_ctl_item(hd_org_udt_files_fmt,              &
      &        i_org_udt_files_fmt, org_udt_file_fmt_ctl)
         call read_character_ctl_item(hd_org_sph_files_fmt,              &

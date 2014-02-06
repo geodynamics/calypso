@@ -1,18 +1,16 @@
-!>@file   SPH_analyzer_const_initial.f90
-!!@brief  module SPH_analyzer_const_initial
+!!@brief  module SPH_analyzer_add_initial
 !!
 !!@author H. Matsui
-!!@date   Programmed  H. Matsui in Apr., 2010
+!!@date   Programmed  H. Matsui in Jan.., 2014
 !
-!>@brief  Main loop to generate initial field
-!!@n       Define initial field at const_sph_initial_spectr.f90
+!>@brief  Main spectrum method loop to generate initial field
+!!@n      Initial field definision is in  const_sph_initial_spectr.f90
 !!
 !!@verbatim
-!!      subroutine initialize_const_sph_initial
+!!      subroutine initialize_add_sph_initial
 !!@endverbatim
 !
-!
-      module SPH_analyzer_const_initial
+      module SPH_analyzer_add_initial
 !
       use m_precision
       use m_constants
@@ -24,12 +22,9 @@
       use m_t_int_parameter
       use m_t_step_parameter
 !
-!
-      use SPH_analyzer_MHD
-!
       implicit none
 !
-      private :: SPH_const_initial_field
+      private :: SPH_add_initial_field
 !
 ! ----------------------------------------------------------------------
 !
@@ -37,7 +32,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine initialize_const_sph_initial
+      subroutine initialize_add_sph_initial
 !
       use set_control_sph_mhd
       use m_ctl_data_noviz_MHD
@@ -66,16 +61,16 @@
 !        Initialize spherical transform dynamo
 !
       if(iflag_debug .gt. 0) write(*,*) 'SPH_initialize_MHD'
-      call SPH_const_initial_field
+      call SPH_add_initial_field
 !
       call end_eleps_time(2)
 !
-      end subroutine initialize_const_sph_initial
+      end subroutine initialize_add_sph_initial
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine SPH_const_initial_field
+      subroutine SPH_add_initial_field
 !
       use m_geometry_parameter
       use m_spheric_parameter
@@ -93,6 +88,8 @@
       use set_radius_func
       use const_radial_mat_4_sph
       use set_initial_sph_dynamo
+      use sph_mhd_rst_IO_control
+!
 !
 !
 !   Load spherical harmonics data
@@ -120,11 +117,14 @@
 !
 ! ---------------------------------
 !
-      if(iflag_debug.gt.0) write(*,*)' sph_initial_spectrum'
-      call sph_initial_spectrum
+     if(iflag_debug.gt.0) write(*,*)' sph_initial_spectrum'
+     call read_alloc_sph_restart_data
 !
-      end subroutine SPH_const_initial_field
+     if(iflag_debug.gt.0) write(*,*)' sph_initial_spectrum'
+     call sph_initial_spectrum
+!
+      end subroutine SPH_add_initial_field
 !
 ! ----------------------------------------------------------------------
 !
-      end module SPH_analyzer_const_initial
+      end module SPH_analyzer_add_initial

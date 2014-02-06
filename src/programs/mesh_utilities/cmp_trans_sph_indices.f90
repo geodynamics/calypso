@@ -188,7 +188,7 @@
 !
       write(id_check,*) 'No commnication data in rtm => rtp'
       write(id_check,*)                                                 &
-     &         'local_id, global_id, global_r, global_t, global_m'
+     &   'local_id, global_id, global_r, global_t, global_p, global_m'
       do mphi = 1, nidx_rtp(3)
         do lth = 1, nidx_rtp(2)
           do kr = 1, nidx_rtp(1)

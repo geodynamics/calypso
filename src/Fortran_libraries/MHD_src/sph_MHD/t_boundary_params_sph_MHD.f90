@@ -90,6 +90,13 @@
         real(kind = kreal) :: fdm2_fix_fld_CMB(0:2,3)
 !>        Matrix to evaluate field at CMB with fiexed radial derivative
         real(kind = kreal) :: fdm2_fix_dr_CMB(-1:1,3)
+!
+!>        Matrix to evaluate radial derivative at ICB with fiexed field
+!!        with first order accuracy
+        real(kind = kreal) :: fdm1_fix_fld_ICB(0:1,2)
+!>        Matrix to evaluate radial derivative at CMB with fiexed field
+!!        with first order accuracy
+        real(kind = kreal) :: fdm1_fix_fld_CMB(0:1,2)
       end type sph_boundary_type
 !
 ! -----------------------------------------------------------------------
@@ -138,10 +145,17 @@
       type(sph_boundary_type), intent(inout) :: sph_bc
 !
 !
+      call cal_fdm1_coef_fix_fld_ICB(radius(sph_bc%kr_in),              &
+     &     sph_bc%fdm1_fix_fld_ICB)
+!
       call cal_fdm2_coef_fix_fld_ICB(radius(sph_bc%kr_in),              &
      &     sph_bc%fdm2_fix_fld_ICB)
       call cal_fdm2_coef_fix_df_ICB(radius(sph_bc%kr_in),               &
      &     sph_bc%fdm2_fix_dr_ICB)
+!
+!
+      call cal_fdm1_coef_fix_fld_CMB(radius(sph_bc%kr_out-1),           &
+     &     sph_bc%fdm1_fix_fld_CMB)
 !
       call cal_fdm2_coef_fix_fld_CMB(radius(sph_bc%kr_out-2),           &
      &     sph_bc%fdm2_fix_fld_CMB)
@@ -160,6 +174,10 @@
 !
       write(50,*) ' Boundary condition matrix for ', trim(label)
 !
+      write(50,*) ' fdm1_fix_fld_ICB'
+      write(50,*) ' mat_fdm21,  mat_fdm22'
+      write(50,'(1p9E25.15e3)') sph_bc%fdm1_fix_fld_ICB(0:1,2)
+!
       write(50,*) ' fdm2_fix_fld_ICB'
       write(50,*) ' mat_fdm21,  mat_fdm22,  mat_fdm23'
       write(50,'(1p9E25.15e3)') sph_bc%fdm2_fix_fld_ICB(0:2,2)
@@ -172,6 +190,10 @@
       write(50,*) ' mat_fdm31,  mat_fdm32,  mat_fdm33'
       write(50,'(1p9E25.15e3)') sph_bc%fdm2_fix_dr_ICB(-1:1,3)
 !
+!
+      write(50,*) ' fdm1_fix_fld_CMB'
+      write(50,*) ' mat_fdm21,  mat_fdm22'
+      write(50,'(1p9E25.15e3)') sph_bc%fdm1_fix_fld_CMB(0:1,2)
 !
       write(50,*) ' fdm2_fix_fld_CMB'
       write(50,*) ' mat_fdm21,  mat_fdm22,  mat_fdm23'

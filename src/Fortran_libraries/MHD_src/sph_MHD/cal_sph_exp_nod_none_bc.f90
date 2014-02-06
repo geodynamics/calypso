@@ -214,9 +214,9 @@
         i_n1 = inod - jmax
         i_n2 = i_n1 - jmax
 !
-        d1s_dr1 =  fdm2_fix_fld_CMB(2,2) * d_rj(i_n2,is_fld+2)          &
-     &           + fdm2_fix_fld_CMB(1,2) * d_rj(i_n1,is_fld+2)          &
-     &           + fdm2_fix_fld_CMB(0,2) * d_rj(inod,is_fld+2)
+        d1s_dr1 =  fdm2_fix_fld_CMB(2,2) * d_rj(i_n2,is_fld  )          &
+     &           + fdm2_fix_fld_CMB(1,2) * d_rj(i_n1,is_fld  )          &
+     &           + fdm2_fix_fld_CMB(0,2) * d_rj(inod,is_fld  )
 !
         d_rj(inod,is_div) =  (d1s_dr1 - d_rj(inod,is_fld+1) )           &
      &                  * max(g_sph_rj(j,3),half) * r_CMB(2)

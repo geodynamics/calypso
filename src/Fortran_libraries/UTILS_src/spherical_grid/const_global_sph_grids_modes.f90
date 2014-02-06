@@ -44,8 +44,8 @@
       private :: nidx_local_rlm_r, nidx_local_rlm_j
       private :: nidx_local_rj_r, nidx_local_rj_j
 !
-      private :: const_global_sph_grids_rtp, const_global_sph_grids_rtm
-      private :: const_global_sph_modes_rj,  const_global_sph_modes_rlm
+      private :: const_global_rtp_grids, const_global_rtm_grids
+      private :: const_global_rj_modes_by_rlm, const_global_rlm_modes
       private :: const_sph_transfer_tables
       private :: allocate_nidx_local, deallocate_nidx_local
 !
@@ -72,17 +72,17 @@
 !
       call set_global_sph_resolution
 !
-      if(iflag_debug .gt. 0) write(*,*) 'const_global_sph_grids_rtp'
-      call const_global_sph_grids_rtp
+      if(iflag_debug .gt. 0) write(*,*) 'const_global_rtp_grids'
+      call const_global_rtp_grids
 !
-      if(iflag_debug .gt. 0) write(*,*) 'const_global_sph_grids_rtm'
-      call const_global_sph_grids_rtm
+      if(iflag_debug .gt. 0) write(*,*) 'const_global_rtm_grids'
+      call const_global_rtm_grids
 !
-      if(iflag_debug .gt. 0) write(*,*) 'const_global_sph_modes_rj'
-      call const_global_sph_modes_rj
+      if(iflag_debug .gt. 0) write(*,*) 'const_global_rlm_modes'
+      call const_global_rlm_modes
 !
-      if(iflag_debug .gt. 0) write(*,*) 'const_global_sph_modes_rlm'
-      call const_global_sph_modes_rlm
+      if(iflag_debug .gt. 0) write(*,*) 'const_global_rj_modes_by_rlm'
+      call const_global_rj_modes_by_rlm
 !
       if(iflag_debug .gt. 0) write(*,*) 'const_sph_transfer_tables'
       call const_sph_transfer_tables
@@ -192,7 +192,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_global_sph_grids_rtp
+      subroutine const_global_rtp_grids
 !
       use m_spheric_global_ranks
       use m_sph_global_parameter
@@ -237,11 +237,11 @@
      &    iglobal_rank_rtp, nidx_local_rtp_r, nidx_local_rtp_t,         &
      &    nidx_local_rtp_p, nidx_local_rtp, nnod_local_rtp)
 !
-      end subroutine const_global_sph_grids_rtp
+      end subroutine const_global_rtp_grids
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_global_sph_grids_rtm
+      subroutine const_global_rtm_grids
 !
       use m_spheric_global_ranks
       use m_sph_global_parameter
@@ -286,39 +286,44 @@
 !
 !      call check_sph_gl_bc_param(izero)
 !
-      end subroutine const_global_sph_grids_rtm
+      end subroutine const_global_rtm_grids
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_global_sph_modes_rj
+      subroutine const_global_rj_modes_by_rlm
 !
       use m_spheric_global_ranks
       use m_sph_global_parameter
       use m_sph_1d_global_index
+      use m_2d_sph_trans_table
+      use set_sph_tranform_ordering
 !
 !
       call set_gl_rank_2d(ndomain_sph, ndomain_rj,  iglobal_rank_rj)
 !
       call cal_local_nums(ndomain_rj(1), ione, nidx_global_rj(1),       &
      &    nidx_local_rj_r, istack_idx_local_rj_r)
-      call cal_local_nums(ndomain_rj(2),  izero, nidx_global_rj(2),     &
-     &    nidx_local_rj_j, istack_idx_local_rj_j)
+! 
+      call set_merged_index_4_sph_rj(ndomain_rtm(1), ndomain_rtm(3),   &
+     &    ndomain_rj(2), nidx_global_rj(2), istack_idx_local_rlm_j,    &
+     &    jtbl_fsph, nidx_local_rj_j, istack_idx_local_rj_j, jtbl_rj)
 !
       call set_gl_nnod_spheric_rj(ndomain_sph,                          &
      &    ndomain_rj(1), ndomain_rj(2),                                 &
      &    iglobal_rank_rj, nidx_local_rj_r, nidx_local_rj_j,            &
      &    nidx_local_rj, nnod_local_rj)
 !
-      end subroutine const_global_sph_modes_rj
+      end subroutine const_global_rj_modes_by_rlm
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_global_sph_modes_rlm
+      subroutine const_global_rlm_modes
 !
       use m_spheric_global_ranks
       use m_sph_global_parameter
       use m_sph_1d_global_index
       use m_2d_sph_trans_table
+      use set_sph_tranform_ordering
 !
 !
       call allocate_2d_sph_trans_table(nidx_global_rtp(2),              &
@@ -350,7 +355,7 @@
      &    iglobal_rank_rlm, nidx_local_rlm_r, nidx_local_rlm_j,         &
      &    nidx_local_rlm, nnod_local_rlm)
 !
-      end subroutine const_global_sph_modes_rlm
+      end subroutine const_global_rlm_modes
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -358,6 +363,7 @@
       subroutine const_sph_transfer_tables
 !
       use m_2d_sph_trans_table
+      use set_sph_tranform_ordering
 !
 !
       call set_trans_table_fft_2_lgd(l_truncation,                      &

@@ -249,9 +249,6 @@
 !>        1d @f$1 / r @f$ for @f$ f(r,j) @f$
         real(kind = kreal), pointer :: a_r_1d_rj_r(:)
 !
-!>        1d @f$ \Delta r @f$ for @f$ f(r,j) @f$
-!!@n@see  set_radius_func_cheby or set_radius_func_cheby
-        real(kind = kreal), pointer :: dr_1d_rj(:,:)
 !>        1d @f$1 / r @f$ for @f$ f(r,j) @f$
 !!@n@see  set_radius_func_cheby or set_radius_func_cheby
         real(kind = kreal), pointer :: ar_1d_rj(:,:)
@@ -493,7 +490,6 @@
       allocate(rj%radius_1d_rj_r(num))
       allocate(rj%a_r_1d_rj_r(num))
 !
-      allocate(rj%dr_1d_rj(num,0:2))
       allocate(rj%ar_1d_rj(num,3))
       allocate(rj%r_ele_rj(num))
       allocate(rj%ar_ele_rj(num,3))
@@ -510,7 +506,6 @@
         rj%radius_1d_rj_r = 0.0d0
         rj%a_r_1d_rj_r = 0.0d0
 !
-        rj%dr_1d_rj =  0.0d0
         rj%ar_1d_rj = 0.0d0
         rj%r_ele_rj = 0.0d0
         rj%ar_ele_rj = 0.0d0
@@ -621,7 +616,7 @@
 !
 !
       deallocate(rj%radius_1d_rj_r, rj%a_r_1d_rj_r)
-      deallocate(rj%dr_1d_rj, rj%ar_1d_rj, rj%r_ele_rj, rj%ar_ele_rj)
+      deallocate(rj%ar_1d_rj, rj%r_ele_rj, rj%ar_ele_rj)
       deallocate(rj%idx_gl_1d_rj_r, rj%idx_gl_1d_rj_j)
 !
       end subroutine dealloc_type_sph_1d_index_rj

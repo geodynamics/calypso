@@ -54,7 +54,7 @@
       call allocate_pick_sph_rms
       call allocate_iflag_pick_sph(l_truncation)
 !
-      call set_picked_sph_adrress                                       &
+      call set_picked_sph_address                                       &
      &   (l_truncation, nidx_rj(2), idx_gl_1d_rj_j(1,1),                &
      &    num_pick_sph, num_pick_sph_l, num_pick_sph_m,                 &
      &    idx_pick_sph_mode, idx_pick_sph_l, idx_pick_sph_m,            &
@@ -88,7 +88,7 @@
       use calypso_mpi
 !
       integer(kind = kint) :: inum, knum, j, k, nd
-      integer(kind = kint) :: inod, ipick, num
+      integer(kind = kint) :: ipick, num
 !
 !
 !$omp parallel do
@@ -101,13 +101,12 @@
       do inum = 1, num_pick_sph_rms_mode
         j = idx_pick_sph_rms_lc(inum)
         if(j .gt. izero) then
-!$omp do private(knum,k,inod,ipick,nd)
+!$omp do private(knum,k,ipick,nd)
           do knum = 1, num_pick_rms_layer
             k = id_pick_rms_layer(knum)
-            inod =  j +    (k-1) * nidx_rj(2)
             ipick = knum + (inum-1) * num_pick_rms_layer
             do nd = 1, ntot_rms_rj
-              d_rms_pick_sph_lc(nd,ipick) = rms_sph_dat(nd,inod)
+              d_rms_pick_sph_lc(nd,ipick) = rms_sph_dat(j,k,nd)
             end do
           end do
 !$omp end do nowait
@@ -143,7 +142,7 @@
         if(j .gt. izero) then
 !$omp do private(nd)
             do nd = 1, ntot_rms_rj
-              d_rms_pick_sph_lc(nd,inum) = rms_sph_vol_dat(nd,j)
+              d_rms_pick_sph_lc(nd,inum) = rms_sph_vol_dat(j,nd)
             end do
 !$omp end do nowait
         end if

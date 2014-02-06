@@ -38,7 +38,6 @@
 !!      subroutine check_spheric_param_rtm(my_rank)
 !!      subroutine check_spheric_param_rlm(my_rank)
 !!      subroutine check_spheric_param_rj(my_rank)
-!!      subroutine check_radial_fung_rj
 !!@endverbatim
 !!
 !!@n @param  my_rank     Running rank ID
@@ -274,9 +273,6 @@
 !>      1d @f$1 / r @f$ for @f$ f(r,j) @f$
       real(kind = kreal), allocatable :: a_r_1d_rj_r(:)
 !
-!>      1d @f$ \Delta r @f$ for @f$ f(r,j) @f$
-!!@n@see  set_radius_func_cheby or set_radius_func_cheby
-      real(kind = kreal), allocatable :: dr_1d_rj(:,:)
 !>      1d @f$1 / r @f$ for @f$ f(r,j) @f$
 !!@n@see  set_radius_func_cheby or set_radius_func_cheby
       real(kind = kreal), allocatable :: ar_1d_rj(:,:)
@@ -465,7 +461,6 @@
       allocate(radius_1d_rj_r(num))
       allocate(a_r_1d_rj_r(num))
 !
-      allocate(dr_1d_rj(num,0:2))
       allocate(ar_1d_rj(num,3))
       allocate(r_ele_rj(num))
       allocate(ar_ele_rj(num,3))
@@ -479,7 +474,6 @@
         radius_1d_rj_r = 0.0d0
         a_r_1d_rj_r = 0.0d0
 !
-        dr_1d_rj =  0.0d0
         ar_1d_rj = 0.0d0
         r_ele_rj = 0.0d0
         ar_ele_rj = 0.0d0
@@ -575,7 +569,7 @@
       deallocate(radius_1d_rj_r)
       deallocate(a_r_1d_rj_r)
 !
-      deallocate(dr_1d_rj, ar_1d_rj, r_ele_rj, ar_ele_rj)
+      deallocate(ar_1d_rj, r_ele_rj, ar_ele_rj)
 !
       deallocate(idx_gl_1d_rj_r)
       deallocate(idx_gl_1d_rj_j)
@@ -689,22 +683,6 @@
       end do
 !
       end subroutine check_spheric_param_rj
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine check_radial_fung_rj
-!
-      integer(kind = kint) :: k
-!
-!
-      write(*,*) 'k, r, dr_1d_rj(0:2)'
-      do k = 1, nidx_rj(1)
-        write(*,'(i8, 1p4e20.12)') k, radius_1d_rj_r(k),                &
-     &                                  dr_1d_rj(k,0:2)
-      end do
-!
-      end subroutine check_radial_fung_rj
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

@@ -70,8 +70,15 @@
 !>      Local spherical harmonics ID to evaluate  monitoring spectrum
       integer(kind = kint), allocatable :: idx_pick_sph_lc(:)
 !
-!>      number of component for monitoring spectrum
-      integer(kind = kint) :: ncomp_pick_sph_coef =  0
+!>      Number of fields for monitoring output
+!!       @f$ f(r,\theta,\phi) @f$
+      integer (kind=kint) ::  num_fld_pick_sph =    0
+!>      Total number of component for monitoring spectrum
+      integer(kind = kint) :: ntot_comp_pick_sph =  0
+!>      Number of component for monitoring spectrum
+      integer (kind=kint), allocatable :: istack_comp_pick_sph(:)
+!>       Field  address for monitoring of @f$ f(r,j) @f$
+      integer (kind=kint), allocatable :: ifield_monitor_rj(:)
 !>      monitoring spectrum
       real(kind = kreal), allocatable :: d_rj_pick_sph_gl(:,:)
 !>      Localy evaluated  monitoring spectrum
@@ -139,10 +146,16 @@
 !
       allocate( idx_pick_sph_gl(ntot_pick_sph_mode) )
       allocate( idx_pick_sph_lc(ntot_pick_sph_mode) )
-      allocate( d_rj_pick_sph_lc(ncomp_pick_sph_coef,num) )
-      allocate( d_rj_pick_sph_gl(ncomp_pick_sph_coef,num) )
-      allocate( pick_sph_spec_name(ncomp_pick_sph_coef) )
+      allocate( d_rj_pick_sph_lc(ntot_comp_pick_sph,num) )
+      allocate( d_rj_pick_sph_gl(ntot_comp_pick_sph,num) )
+      allocate( pick_sph_spec_name(ntot_comp_pick_sph) )
+      allocate( istack_comp_pick_sph(0:num_fld_pick_sph) )
+      allocate( ifield_monitor_rj(num_fld_pick_sph) )
 !
+      if(num_fld_pick_sph .gt. 0) then
+        ifield_monitor_rj = 0
+        istack_comp_pick_sph = 0
+      end if
       if(num .gt. 0) then
         idx_pick_sph_gl = -1
         idx_pick_sph_lc =  0
@@ -179,6 +192,7 @@
       deallocate(idx_pick_sph_gl, d_rj_pick_sph_gl)
       deallocate(idx_pick_sph_lc, d_rj_pick_sph_lc)
       deallocate(pick_sph_spec_name)
+      deallocate(istack_comp_pick_sph, ifield_monitor_rj)
 !
       end subroutine deallocate_pick_sph_monitor
 !
@@ -206,13 +220,13 @@
       write(id_pick_mode,'(a)')    '# num_layers, num_spectr'
       write(id_pick_mode,'(2i10)') num_pick_layer, num_pick_sph_mode
       write(id_pick_mode,'(a)')    '# number of component'
-      write(id_pick_mode,'(i10)') ncomp_pick_sph_coef
+      write(id_pick_mode,'(i10)') ntot_comp_pick_sph
 !
       write(id_pick_mode,'(a)',advance='NO')    't_step    time    '
       write(id_pick_mode,'(a)',advance='NO')    'radius_ID    radius    '
       write(id_pick_mode,'(a)',advance='NO')    'degree    order    '
 !
-      call write_multi_labels(id_pick_mode, ncomp_pick_sph_coef,        &
+      call write_multi_labels(id_pick_mode, ntot_comp_pick_sph,         &
      &    pick_sph_spec_name)
 
       write(id_pick_mode,'(a)') ''
@@ -246,7 +260,7 @@
      &               i_step, time
           write(id_pick_mode,'(i10,1pe23.14e3,2i10)', advance='NO')     &
      &               id_pick_layer(knum), r_pick_layer(knum), l, m
-          do i_fld = 1, ncomp_pick_sph_coef
+          do i_fld = 1, ntot_comp_pick_sph
             write(id_pick_mode,'(1pe23.14e3)', advance='NO')            &
      &              d_rj_pick_sph_gl(i_fld,ipick)
           end do
@@ -279,14 +293,14 @@
       call skip_comment(tmpchara,id_pick)
       read(tmpchara,*) num_pick_layer, num_pick_sph_mode
       call skip_comment(tmpchara,id_pick)
-      read(tmpchara,*) ncomp_pick_sph_coef
+      read(tmpchara,*) ntot_comp_pick_sph
 !
       ntot_pick_sph_mode = num_pick_sph_mode
       call allocate_num_pick_layer
       call allocate_pick_sph_monitor
 !
       read(id_pick,*) (tmpchara,i=1,6),                                 &
-     &                 pick_sph_spec_name(1:ncomp_pick_sph_coef)
+     &                 pick_sph_spec_name(1:ntot_comp_pick_sph)
 !
       end subroutine open_sph_spec_read_monitor
 !
@@ -307,7 +321,7 @@
           ipick = knum + (inum-1) * num_pick_layer
           read(id_pick,*,err=99,end=99) i_step, time,                   &
      &               id_pick_layer(knum), r_pick_layer(knum), l, m,     &
-     &               d_rj_pick_sph_gl(1:ncomp_pick_sph_coef,ipick)
+     &               d_rj_pick_sph_gl(1:ntot_comp_pick_sph,ipick)
           idx_pick_sph_gl(inum) = l*(l+1) + m
         end do
       end do

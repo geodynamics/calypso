@@ -8,9 +8,9 @@
 !!
 !!@verbatim
 !!      subroutine set_inner_core_rotation(kr_in)
-!!      subroutine set_icore_viscous_matrix(kr_in)
-!!      subroutine cal_icore_viscous_drag_explicit(kr_in, coef_d,       &
-!!     &          it_velo, it_viscous)
+!!      subroutine set_icore_viscous_matrix(kr_in, fdm1_fix_fld_ICB)
+!!      subroutine cal_icore_viscous_drag_explicit(kr_in,               &
+!!     &          fdm1_fix_fld_ICB, coef_d, it_velo, it_viscous)
 !!      subroutine copy_icore_rot_to_tor_coriolis(kr_in)
 !!      subroutine inner_core_coriolis_rj(kr_in)
 !!      subroutine int_icore_toroidal_lorentz(kr_in)
@@ -54,39 +54,41 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_icore_viscous_matrix(kr_in)
+      subroutine set_icore_viscous_matrix(kr_in, fdm1_fix_fld_ICB)
 !
       use m_t_int_parameter
       use m_physical_property
 !
       integer(kind = kint), intent(in) :: kr_in
+      real(kind = kreal), intent(in) :: fdm1_fix_fld_ICB(0:1,2)
 !
 !
       call set_rotate_icb_vt_sph_mat(idx_rj_degree_one(-1), kr_in,      &
-     &     coef_imp_v, coef_d_velo)
+     &    fdm1_fix_fld_ICB, coef_imp_v, coef_d_velo)
       call set_rotate_icb_vt_sph_mat(idx_rj_degree_one( 0), kr_in,      &
-     &     coef_imp_v, coef_d_velo)
+     &    fdm1_fix_fld_ICB, coef_imp_v, coef_d_velo)
       call set_rotate_icb_vt_sph_mat(idx_rj_degree_one( 1), kr_in,      &
-     &     coef_imp_v, coef_d_velo)
+     &    fdm1_fix_fld_ICB, coef_imp_v, coef_d_velo)
 !!
       end subroutine set_icore_viscous_matrix
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_icore_viscous_drag_explicit(kr_in, coef_d,         &
-     &          it_velo, it_viscous)
+      subroutine cal_icore_viscous_drag_explicit(kr_in,                 &
+     &          fdm1_fix_fld_ICB, coef_d, it_velo, it_viscous)
 !
       integer(kind = kint), intent(in) :: kr_in
       integer(kind = kint), intent(in) :: it_velo, it_viscous
       real(kind = kreal), intent(in) :: coef_d
+      real(kind = kreal), intent(in) :: fdm1_fix_fld_ICB(0:1,2)
 !
 !
       call cal_icore_viscous_drag_l1(idx_rj_degree_one(-1), kr_in,      &
-     &    coef_d, it_velo, it_viscous)
+     &    fdm1_fix_fld_ICB, coef_d, it_velo, it_viscous)
       call cal_icore_viscous_drag_l1(idx_rj_degree_one( 0), kr_in,      &
-     &    coef_d, it_velo, it_viscous)
+     &    fdm1_fix_fld_ICB, coef_d, it_velo, it_viscous)
       call cal_icore_viscous_drag_l1(idx_rj_degree_one( 1), kr_in,      &
-     &    coef_d, it_velo, it_viscous)
+     &    fdm1_fix_fld_ICB, coef_d, it_velo, it_viscous)
 !
       end subroutine cal_icore_viscous_drag_explicit
 !
@@ -167,7 +169,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine set_rotate_icb_vt_sph_mat(idx_rj_l0, kr_in,            &
-     &          coef_imp, coef_d)
+     &          fdm1_fix_fld_ICB, coef_imp, coef_d)
 !
       use m_t_int_parameter
       use m_schmidt_poly_on_rtm
@@ -175,6 +177,7 @@
       use m_fdm_coefs
 !
       integer(kind = kint), intent(in) :: kr_in, idx_rj_l0
+      real(kind = kreal), intent(in) :: fdm1_fix_fld_ICB(0:1,2)
       real(kind = kreal), intent(in) :: coef_imp, coef_d
 !
 !
@@ -182,25 +185,12 @@
 !
 !       vt_evo_mat(3,kr_in-1,idx_rj_l0) = zero
         vt_evo_mat(2,kr_in,  idx_rj_l0)                                 &
-     &          = one + coef_imp*dt*coef_d * five                       &
-     &           * (+ dr_1d_rj(kr_in, 2)                                &
-     &              + two*ar_1d_rj(kr_in,1) )                           &
+     &          = one - coef_imp*dt*coef_d * five                       &
+     &           * (fdm1_fix_fld_ICB(0,2) - two*ar_1d_rj(kr_in,1) )     &
      &           * a_r_1d_rj_r(kr_in)
         vt_evo_mat(1,kr_in+1,idx_rj_l0)                                 &
-     &          = - coef_imp*dt*coef_d * five                           &
-     &             * dr_1d_rj(kr_in, 2)                                 &
-     &             * a_r_1d_rj_r(kr_in)
-!
-!        vt_evo_mat(2,kr_in,  idx_rj_l0)                                &
-!     &          = one + coef_imp*dt*coef_d * five                      &
-!     &           * ( -d1nod_mat_fdm_2(kr_in,-1)                        &
-!     &                * radius_1d_rj_r(kr_in-1)**2                     &
-!     &                * ar_1d_rj(kr_in,2)                              &
-!     &              - d1nod_mat_fdm_2(kr_in, 0)                        &
-!     &              + two*ar_1d_rj(kr_in,1) )
-!        vt_evo_mat(1,kr_in+1,idx_rj_l0)                                &
-!     &          = - coef_imp*dt*coef_d * five                          &
-!     &             * d1nod_mat_fdm_2(kr_in, 1)
+     &          = - coef_imp*dt*coef_d * five * a_r_1d_rj_r(kr_in)      &
+     &             * fdm1_fix_fld_ICB(1,2)
 !
       end subroutine set_rotate_icb_vt_sph_mat
 !
@@ -239,12 +229,13 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_icore_viscous_drag_l1(idx_rj_l0, kr_in, coef_d,    &
-     &          it_velo, it_viscous)
+      subroutine cal_icore_viscous_drag_l1(idx_rj_l0, kr_in,            &
+     &          fdm1_fix_fld_ICB, coef_d, it_velo, it_viscous)
 !
       use m_fdm_coefs
 !
       real(kind = kreal), intent(in) :: coef_d
+      real(kind = kreal), intent(in) :: fdm1_fix_fld_ICB(0:1,2)
       integer(kind = kint), intent(in) :: kr_in, idx_rj_l0
       integer(kind = kint), intent(in) :: it_velo, it_viscous
 !
@@ -257,13 +248,8 @@
       i10c_ri = idx_rj_l0 + (kr_in-1)*nidx_rj(2)
       i10c_r1 = idx_rj_l0 +  kr_in * nidx_rj(2)
 !
-!      mat_0 = d1nod_mat_fdm_2(kr_in,-1)                                &
-!     &       * radius_1d_rj_r(kr_in-1)**2 * ar_1d_rj(kr_in,2)          &
-!     &      + d1nod_mat_fdm_2(kr_in, 0) - two*ar_1d_rj(kr_in,1)
-!      mat_1 = d1nod_mat_fdm_2(kr_in, 1)
-!
-      mat_0 = - dr_1d_rj(kr_in, 2) - two*ar_1d_rj(kr_in,1)
-      mat_1 =   dr_1d_rj(kr_in, 2)
+      mat_0 = fdm1_fix_fld_ICB(0,2) - two*ar_1d_rj(kr_in,1)
+      mat_1 = fdm1_fix_fld_ICB(1,2)
 !
       d_rj(i10c_ri,it_viscous)                                          &
      &                   =  five  * coef_d * a_r_1d_rj_r(kr_in)         &
@@ -286,8 +272,7 @@
       if(idx_rj_l0 .le. 0) return
 !
       i10c_o = idx_rj_l0
-      sk_10c = d_rj(i10c_o,itor%i_lorentz)                              &
-     &          * radius_1d_rj_r(1)*radius_1d_rj_r(1) * dr_1d_rj(1,0)
+      sk_10c = d_rj(i10c_o,itor%i_lorentz) * radius_1d_rj_r(1)**3
 !
 !$omp parallel do reduction(+:sk_10c) private(i10c_i,i10c_o)
       do k = 1, kr_in-1
@@ -297,7 +282,7 @@
         sk_10c = sk_10c                                                 &
      &        + (d_rj(i10c_i,itor%i_lorentz) * radius_1d_rj_r(k  )**2   &
      &         + d_rj(i10c_o,itor%i_lorentz) * radius_1d_rj_r(k+1)**2)  &
-     &        * dr_1d_rj(k,0)
+     &        * (radius_1d_rj_r(k+1) - radius_1d_rj_r(k))
       end do
 !$omp end parallel do
 !

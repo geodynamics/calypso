@@ -119,7 +119,8 @@
 !   Overwrite rotation for inner core
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        call set_icore_viscous_matrix(sph_bc_U%kr_in)
+        call set_icore_viscous_matrix                                   &
+     &     (sph_bc_U%kr_in, sph_bc_U%fdm1_fix_fld_ICB)
       end if
 !
 !   Boundary condition for CMB

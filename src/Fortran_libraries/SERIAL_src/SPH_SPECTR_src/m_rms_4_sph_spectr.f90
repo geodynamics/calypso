@@ -3,11 +3,11 @@
 !
 !     Written by H. Matsui on Feb., 2008
 !
-!      subroutine allocate_rms_name_sph_spec
-!      subroutine allocate_rms_4_sph_spectr
-!      subroutine deallocate_rms_4_sph_spectr
-!
-!      subroutine clear_rms_sph_spectr
+!!      subroutine allocate_rms_name_sph_spec
+!!      subroutine allocate_rms_4_sph_spectr
+!!      subroutine deallocate_rms_4_sph_spectr
+!!
+!!      subroutine clear_rms_sph_spectr
 !
       module m_rms_4_sph_spectr
 !
@@ -18,11 +18,12 @@
 !
       integer (kind=kint) :: num_rms_rj
       integer (kind=kint) :: ntot_rms_rj
+      integer (kind=kint), allocatable :: ifield_rms_rj(:)
       integer (kind=kint), allocatable :: num_rms_comp_rj(:)
       integer (kind=kint), allocatable :: istack_rms_comp_rj(:)
       character (len=kchara), allocatable :: rms_name_rj(:)
 !
-      real(kind = kreal), allocatable :: rms_sph_dat(:,:)
+      real(kind = kreal), allocatable :: rms_sph_dat(:,:,:)
       real(kind = kreal), allocatable :: rms_sph_vol_dat(:,:)
 !
       real(kind = kreal), allocatable :: rms_sph_l(:,:,:)
@@ -60,11 +61,15 @@
 !
       subroutine allocate_rms_name_sph_spec
 !
+      allocate(ifield_rms_rj(num_rms_rj))
       allocate(num_rms_comp_rj(num_rms_rj))
       allocate(istack_rms_comp_rj(0:num_rms_rj))
       allocate(rms_name_rj(num_rms_rj))
 !
-      if (num_rms_rj .gt. 0) num_rms_comp_rj = 0
+      if (num_rms_rj .gt. 0) then
+        num_rms_comp_rj = 0
+        ifield_rms_rj =   0
+      end if
       istack_rms_comp_rj = 0
 !
       end subroutine allocate_rms_name_sph_spec
@@ -75,26 +80,25 @@
 !
       use m_spheric_parameter
 !
-      integer(kind = kint) :: num
+      integer(kind = kint) :: nri, jmax
 !
 !
-      num = nidx_rj(1) * nidx_rj(2)
-      allocate( rms_sph_dat(ntot_rms_rj,num) )
-      num = nidx_rj(2)
-      allocate( rms_sph_vol_dat(ntot_rms_rj,num) )
+      nri =  nidx_rj(1)
+      jmax = nidx_rj(2)
+      allocate( rms_sph_dat(jmax,nri,ntot_rms_rj) )
+      allocate( rms_sph_vol_dat(jmax,ntot_rms_rj) )
 !
-      num = nidx_global_rj(1)
-      allocate( rms_sph_l(ntot_rms_rj,0:l_truncation,num) )
-      allocate( rms_sph_m(ntot_rms_rj,0:l_truncation,num) )
-      allocate( rms_sph_lm(ntot_rms_rj,0:l_truncation,num) )
-      allocate( rms_sph(ntot_rms_rj,num) )
+      allocate( rms_sph_l(0:l_truncation,nri,ntot_rms_rj) )
+      allocate( rms_sph_m(0:l_truncation,nri,ntot_rms_rj) )
+      allocate( rms_sph_lm(0:l_truncation,nri,ntot_rms_rj) )
+      allocate( rms_sph(nri,ntot_rms_rj) )
 !
-      allocate( ave_sph(ntot_rms_rj,num) )
-      allocate( ave_sph_lc(ntot_rms_rj,num) )
+      allocate( ave_sph(nri,ntot_rms_rj) )
+      allocate( ave_sph_lc(nri,ntot_rms_rj) )
 !
-      allocate( rms_sph_vol_l(ntot_rms_rj,0:l_truncation) )
-      allocate( rms_sph_vol_m(ntot_rms_rj,0:l_truncation) )
-      allocate( rms_sph_vol_lm(ntot_rms_rj,0:l_truncation) )
+      allocate( rms_sph_vol_l(0:l_truncation,ntot_rms_rj) )
+      allocate( rms_sph_vol_m(0:l_truncation,ntot_rms_rj) )
+      allocate( rms_sph_vol_lm(0:l_truncation,ntot_rms_rj) )
 !
       allocate( rms_sph_vol(ntot_rms_rj) )
       allocate( ave_sph_vol(ntot_rms_rj) )
@@ -121,9 +125,8 @@
       deallocate( ave_sph, ave_sph_lc )
       deallocate( ave_sph_vol )
 !
-      deallocate(num_rms_comp_rj)
-      deallocate(istack_rms_comp_rj)
-      deallocate(rms_name_rj)
+      deallocate(num_rms_comp_rj, istack_rms_comp_rj)
+      deallocate(rms_name_rj, ifield_rms_rj)
 !
       end subroutine deallocate_rms_4_sph_spectr
 !

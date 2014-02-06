@@ -136,23 +136,16 @@
       use m_boundary_params_sph_MHD
       use set_reference_sph_mhd
 !
-!      integer(kind = kint) :: k, inod, icmb
+      integer(kind = kint) :: k, inod, icmb, j
 !
 !
-!      if (idx_rj_degree_zero .gt. 0) then
-!        write(170,*) 'k, j=0, inod, div_v'
+!      j = find_local_sph_mode_address(14, -9)
+!      if (j .gt.0 ) then
+!        write(171,*) 'k, l=14,m=-9, inod, div_v'
 !        do k = 1, sph_bc_U%kr_out
-!            inod = (k-1)*nidx_rj(2) + idx_rj_degree_zero
-!            write(170,'(2i10,1p3E25.15e3)') k,                         &
-!     &              idx_rj_degree_zero, d_rj(inod,ipol%i_press)
-!        end do
-!      end if
-!      if (idx_rj_degree_one(0).gt.0) then
-!        write(171,*) 'k, j=2, inod, div_v'
-!        do k = 1, sph_bc_U%kr_out
-!            inod = (k-1)*nidx_rj(2) + idx_rj_degree_one(0)
-!            write(171,'(2i10,1p3E25.15e3)') k,                         &
-!     &              idx_rj_degree_one(0), d_rj(inod,ipol%i_press)
+!            inod = (k-1)*nidx_rj(2) + j
+!            write(171,'(2i10,1p9E25.15e3)') k,                         &
+!     &              j, d_rj(inod,ipol%i_press)
 !        end do
 !      end if
 !
@@ -160,7 +153,8 @@
      &    nidx_rj(2), nidx_rj(1), p_poisson_lu, i_p_pivot,              &
      &    d_rj(1,ipol%i_press) )
 !
-      call adjust_by_ave_pressure_on_CMB(sph_bc_U%kr_out)
+      call adjust_by_ave_pressure_on_CMB                                &
+     &   (sph_bc_U%kr_in, sph_bc_U%kr_out)
 !
 !      if (idx_rj_degree_zero .gt. 0) then
 !        icmb = (sph_bc_U%kr_out-1)*nidx_rj(2) + idx_rj_degree_zero
@@ -168,23 +162,6 @@
 !          inod = (k-1)*nidx_rj(2) + idx_rj_degree_zero
 !          d_rj(inod,ipol%i_press) = d_rj(inod,ipol%i_press)            &
 !     &                         - d_rj(icmb,ipol%i_press)
-!        end do
-!      end if
-!
-!      if (idx_rj_degree_zero .gt. 0) then
-!        write(170,*) 'k, j=0, inod, press'
-!        do k = 1, sph_bc_U%kr_out
-!            inod = (k-1)*nidx_rj(2) + idx_rj_degree_zero
-!            write(170,'(2i10,1p3E25.15e3)') k,                         &
-!     &              idx_rj_degree_zero, d_rj(inod,ipol%i_press)
-!        end do
-!      end if
-!      if (idx_rj_degree_one(0).gt.0) then
-!        write(171,*) 'k, j=2, inod, press'
-!        do k = 1, sph_bc_U%kr_out
-!            inod = (k-1)*nidx_rj(2) + idx_rj_degree_one(0)
-!            write(171,'(2i10,1p3E25.15e3)') k,                         &
-!     &              idx_rj_degree_one(0), d_rj(inod,ipol%i_press)
 !        end do
 !      end if
 !

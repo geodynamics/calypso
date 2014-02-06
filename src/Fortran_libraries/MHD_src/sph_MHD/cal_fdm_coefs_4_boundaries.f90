@@ -8,11 +8,16 @@
 !>@brief Obtain FDM matrix for basic boundary conditions  at boundaries
 !!
 !!@verbatim
+!!      subroutine cal_fdm1_coef_fix_fld_ICB(r_from_ICB,                &
+!!     &          fdm1_fix_fld_ICB)
+!!
 !!      subroutine cal_fdm2_coef_fix_fld_ICB(r_from_ICB,                &
 !!     &          fdm2_fix_fld_ICB)
 !!      subroutine cal_fdm2_coef_fix_df_ICB(r_from_ICB,                 &
 !!     &          fdm2_fix_dr_ICB)
 !!
+!!      subroutine cal_fdm1_coef_fix_fld_CMB(r_from_CMB1,               &
+!!     &          fdm1_fix_fld_CMB)
 !!      subroutine cal_fdm2_coef_fix_fld_CMB(r_from_CMB2,               &
 !!     &          fdm2_fix_fld_CMB)
 !!      subroutine cal_fdm2_coef_fix_df_CMB(r_from_CMB1,                &
@@ -20,6 +25,9 @@
 !!
 !!   Matrix for derivatives with fixed field
 !!    at inner boundary of the shell
+!!      dfdr =      fdm1_fix_fld_ICB( 0,2) * d_rj(ICB  )
+!!                + fdm1_fix_fld_ICB( 1,2) * d_rj(ICB+1)
+!!
 !!      dfdr =      fdm2_fix_fld_ICB( 0,2) * d_rj(ICB  )
 !!                + fdm2_fix_fld_ICB( 1,2) * d_rj(ICB+1)
 !!                + fdm2_fix_fld_ICB( 2,2) * d_rj(ICB+2)
@@ -38,6 +46,9 @@
 !!
 !!   Matrix for derivatives with fixed field
 !!    at outer boundary of the shell
+!!      dfdr =      fdm1_fix_fld_CMB( 1,2) * d_rj(CMB-1)
+!!                + fdm1_fix_fld_CMB( 0,2) * d_rj(CMB  )
+!!
 !!      dfdr =      fdm2_fix_fld_CMB( 2,2) * d_rj(CMB-2)
 !!                + fdm2_fix_fld_CMB( 1,2) * d_rj(CMB-1)
 !!                + fdm2_fix_fld_CMB( 0,2) * d_rj(CMB  )
@@ -64,7 +75,6 @@
       use m_precision
 !
       use m_constants
-!      use m_spheric_parameter
       use cal_inverse_small_matrix
 !
       implicit none
@@ -119,6 +129,26 @@
 ! -----------------------------------------------------------------------
 !
       contains
+!
+! -----------------------------------------------------------------------
+!
+      subroutine cal_fdm1_coef_fix_fld_ICB(r_from_ICB,                  &
+     &          fdm1_fix_fld_ICB)
+!
+      real(kind = kreal), intent(in) :: r_from_ICB(0:1)
+      real(kind = kreal), intent(inout) :: fdm1_fix_fld_ICB(0:1,2)
+!
+      real(kind = kreal) :: dr_p1
+!
+!
+      dr_p1 = r_from_ICB(1) - r_from_ICB(0)
+!
+      fdm1_fix_fld_ICB(0,1) =  one
+      fdm1_fix_fld_ICB(1,1) =  zero
+      fdm1_fix_fld_ICB(0,2) = -one / dr_p1
+      fdm1_fix_fld_ICB(1,2) =  one / dr_p1
+!
+      end subroutine cal_fdm1_coef_fix_fld_ICB
 !
 ! -----------------------------------------------------------------------
 !
@@ -201,6 +231,26 @@
       end subroutine cal_fdm2_coef_fix_df_ICB
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine cal_fdm1_coef_fix_fld_CMB(r_from_CMB1,                 &
+     &          fdm1_fix_fld_CMB)
+!
+      real(kind = kreal), intent(in) :: r_from_CMB1(-1:0)
+      real(kind = kreal), intent(inout) :: fdm1_fix_fld_CMB(0:1,2)
+!
+      real(kind = kreal) :: dr_n1
+!
+!
+      dr_n1 = r_from_CMB1(0) - r_from_CMB1(-1)
+!
+      fdm1_fix_fld_CMB(1,1) = zero
+      fdm1_fix_fld_CMB(0,1) = one
+      fdm1_fix_fld_CMB(1,2) = - one / dr_n1
+      fdm1_fix_fld_CMB(0,2) =   one / dr_n1
+!
+      end subroutine cal_fdm1_coef_fix_fld_CMB
+!
 ! -----------------------------------------------------------------------
 !
       subroutine cal_fdm2_coef_fix_fld_CMB(r_from_CMB2,                 &

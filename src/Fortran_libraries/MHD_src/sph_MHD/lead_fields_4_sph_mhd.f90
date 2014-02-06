@@ -66,7 +66,7 @@
 !
       call s_const_radial_forces_on_bc
 !
-      call s_cal_div_of_forces
+      call sum_div_of_forces
 !
       if (iflag_debug.eq.1) write(*,*) 'cal_sol_pressure_by_div_v'
       call cal_sol_pressure_by_div_v

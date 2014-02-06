@@ -1,10 +1,17 @@
-!merge_sph_step_spectr.f90
-!      module merge_sph_step_spectr
+!>@file   merge_sph_step_spectr.f90
+!!@brief  module merge_sph_step_spectr
+!!
+!!@author H. Matsui
+!!@date Programmed in Oct., 2007
 !
-!      Written by H. Matsui on Oct., 2007
-!
-!      subroutine set_sph_rj_mesh_4_merge
-!      subroutine s_assenble_sph_step_spectr(istep)
+!>@brief Construct spectrum data for new spectrum domain
+!!
+!!@verbatim
+!!      subroutine set_sph_rj_mesh_4_merge
+!!      subroutine s_assenble_sph_step_spectr(istep)
+!!@endverbatim
+!!
+!!@param   istep  TIme step number
 !
       module merge_sph_step_spectr
 !
@@ -34,6 +41,7 @@
       use m_node_id_spherical_IO
       use field_IO_select
       use copy_rj_phys_data_4_IO
+      use r_interpolate_marged_sph
 !
       integer(kind = kint) :: ip, my_rank
 !
@@ -64,6 +72,9 @@
 !
       call set_global_sph_grid_4_merge
 !
+      call sph_radial_interpolation_coef                                &
+     &     (org_sph_mesh(1)%sph_mesh%sph_rj%nidx_rj(1),                 &
+     &      org_sph_mesh(1)%sph_mesh%sph_rj%radius_1d_rj_r)
 !
       phys_file_head = org_sph_fst_head
       call sel_read_alloc_step_SPH_file(izero, istep_start)
@@ -77,15 +88,19 @@
 !
       subroutine s_assenble_sph_step_spectr(istep)
 !
+      use m_machine_parameter
       use m_control_param_newsph
       use m_merge_spheric_mesh
       use field_IO_select
       use copy_rj_phys_data_4_IO
+      use r_interpolate_marged_sph
 !
       integer(kind = kint), intent(in) :: istep
 !
       integer(kind = kint) :: ip, my_rank
 !
+!
+      call clear_merged_spectr
 !
       phys_file_head = org_sph_fst_head
 !
@@ -94,9 +109,18 @@
         call sel_read_alloc_step_SPH_file(my_rank, istep)
         call deallocate_phys_data_name_IO
 !
-        call copy_rj_merged_phys_from_IO                                &
-     &      (org_sph_mesh(ip)%sph_mesh%sph_rj%nnod_rj,                  &
-     &       org_sph_mesh(ip)%sph_mesh%sph_rj%inod_global_rj)
+        if(iflag_same_rgrid .eq. 0) then
+          call itp_rj_merged_phys_from_IO                               &
+     &       (org_sph_mesh(ip)%sph_mesh%sph_rj%nnod_rj,                 &
+     &        org_sph_mesh(ip)%sph_mesh%sph_rj%nidx_rj(2),              &
+     &        org_sph_mesh(ip)%sph_mesh%sph_rj%idx_gl_1d_rj_j,          &
+     &        phys_data_IO)
+          call extend_potential_magne
+        else
+          call copy_rj_merged_phys_from_IO                              &
+     &      (org_sph_mesh(ip)%sph_mesh%sph_rj%nidx_rj(2),               &
+     &       org_sph_mesh(ip)%sph_mesh%sph_rj%idx_gl_1d_rj_j)
+        end if
 !
         call deallocate_phys_data_IO
       end do
@@ -117,8 +141,8 @@
         call allocate_phys_data_IO
 !
         call copy_rj_merged_phys_to_IO                                  &
-     &      (new_sph_mesh(ip)%sph_mesh%sph_rj%nnod_rj,                  &
-     &       new_sph_mesh(ip)%sph_mesh%sph_rj%inod_global_rj)
+     &      (new_sph_mesh(ip)%sph_mesh%sph_rj%nidx_rj(2),               &
+     &       new_sph_mesh(ip)%sph_mesh%sph_rj%idx_gl_1d_rj_j)
 !
         call sel_write_step_SPH_field_file(my_rank, istep)
         call deallocate_phys_data_IO
@@ -129,6 +153,28 @@
       end subroutine s_assenble_sph_step_spectr
 !
 ! -------------------------------------------------------------------
+! -------------------------------------------------------------------
+!
+      subroutine clear_merged_spectr
+!
+      use m_spheric_parameter
+      use m_sph_spectr_data
+!
+      integer(kind = kint) :: nd, inod
+!
+!
+!$omp parallel
+      do nd = 1, ntot_phys_rj
+!$omp do
+        do inod = 1, nnod_rj
+          d_rj(inod,nd) = 0.0d0
+        end do
+!$omp end do nowait
+      end do
+!$omp end parallel
+!
+      end subroutine clear_merged_spectr
+!
 ! -------------------------------------------------------------------
 !
       subroutine set_global_sph_grid_4_merge
@@ -163,65 +209,79 @@
         idx_gl_1d_rj_r(k) = k
         radius_1d_rj_r(k)                                               &
      &             = new_sph_mesh(1)%sph_mesh%sph_rj%radius_1d_rj_r(k)
+        a_r_1d_rj_r(k) = 1.0d0 / radius_1d_rj_r(k)
       end do
 !
-      inod = 0
-      do ip = 1, np_sph_new
-        do j = 1, new_sph_mesh(ip)%sph_mesh%sph_rj%nidx_rj(2)
-          inod = inod + 1
-          idx_gl_1d_rj_j(inod,1:3)                                      &
-     &         = new_sph_mesh(1)%sph_mesh%sph_rj%idx_gl_1d_rj_j(j,1:3)
-        end do
+      idx_gl_1d_rj_j(0,1:3) = 0
+      do j = 2, nidx_rj(2)
+        idx_gl_1d_rj_j(j,1) = j - 1
+        idx_gl_1d_rj_j(j,2) = aint(sqrt(real(idx_gl_1d_rj_j(j,1))))
+        idx_gl_1d_rj_j(j,3) =idx_gl_1d_rj_j(j,1)                        &
+     &                  - idx_gl_1d_rj_j(j,2)*(idx_gl_1d_rj_j(j,2)+1)
       end do
 !
       end subroutine set_global_sph_grid_4_merge
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_rj_merged_phys_from_IO(nnod_rj_org,               &
-     &          inod_gl_rj_org)
+      subroutine copy_rj_merged_phys_from_IO(jmax_org,                  &
+     &          idx_gl_1d_j_org)
 !
+      use m_spheric_parameter
       use m_sph_spectr_data
 !
-      integer(kind = kint), intent(in) :: nnod_rj_org
-      integer(kind = kint), intent(in) :: inod_gl_rj_org(nnod_rj_org)
-      integer(kind = kint) :: nd, i, ist, ied, inod, inod_gl
+      integer(kind = kint), intent(in) :: jmax_org
+      integer(kind = kint), intent(in) :: idx_gl_1d_j_org(jmax_org,3)
+!
+      integer(kind = kint) :: nd, inod, inod_gl, kr, j, j_gl
 !
 !
-      do i = 1, num_phys_rj
-        ist = istack_phys_comp_rj(i-1)
-        ied = istack_phys_comp_rj(i  )
-        do nd = ist+1, ied
-          do inod = 1, nnod_rj_org
-            inod_gl = inod_gl_rj_org(inod)
+!$omp parallel
+      do nd = 1, ntot_phys_rj
+!$omp do private(j,j_gl,kr,inod,inod_gl)
+        do j = 1, jmax_org
+          j_gl = idx_gl_1d_j_org(j,1)
+          if(j_gl .ge. nidx_rj(2)) cycle
+!
+          do kr = 1, nidx_rj(1)
+            inod = j + (kr - 1) * jmax_org
+            inod_gl = 1 + j_gl + (kr - 1) * nidx_rj(2)
             d_rj(inod_gl,nd) = phys_data_IO(inod,nd)
           end do
         end do
+!$omp end do
       end do
+!$omp end parallel
 !
       end subroutine copy_rj_merged_phys_from_IO
 !
 ! -------------------------------------------------------------------
 !
-      subroutine copy_rj_merged_phys_to_IO(nnod_rj_new, inod_gl_rj_new)
+      subroutine copy_rj_merged_phys_to_IO(jmax_new, idx_gl_1d_j_new)
 !
+      use m_spheric_parameter
       use m_sph_spectr_data
 !
-      integer(kind = kint), intent(in) :: nnod_rj_new
-      integer(kind = kint), intent(in) :: inod_gl_rj_new(nnod_rj_new)
-      integer(kind = kint) :: nd, i, ist, ied, inod, inod_gl
+      integer(kind = kint), intent(in) :: jmax_new
+      integer(kind = kint), intent(in) :: idx_gl_1d_j_new(jmax_new,3)
+!
+      integer(kind = kint) :: nd, inod, inod_gl, kr, j, j_gl
 !
 !
-      do i = 1, num_phys_rj
-        ist = istack_phys_comp_rj(i-1)
-        ied = istack_phys_comp_rj(i  )
-        do nd = ist+1, ied
-           do inod = 1, nnod_rj_new
-            inod_gl = inod_gl_rj_new(inod)
+!$omp parallel
+      do nd = 1, ntot_phys_rj
+!$omp do private(j,j_gl,kr,inod,inod_gl)
+        do j = 1, jmax_new
+          j_gl = idx_gl_1d_j_new(j,1)
+          do kr = 1, nidx_rj(1)
+            inod = j + (kr - 1) * jmax_new
+            inod_gl = 1 + j_gl + (kr - 1) * nidx_rj(2)
             phys_data_IO(inod,nd) = d_rj(inod_gl,nd)
           end do
         end do
+!$omp end do
       end do
+!$omp end parallel
 !
       end subroutine copy_rj_merged_phys_to_IO
 !

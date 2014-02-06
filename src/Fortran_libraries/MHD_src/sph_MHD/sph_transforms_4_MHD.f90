@@ -35,6 +35,7 @@
 !
       subroutine init_sph_transform_MHD
 !
+      use calypso_mpi
       use m_machine_parameter
       use m_addresses_trans_sph_MHD
       use m_addresses_trans_sph_snap
@@ -193,8 +194,8 @@
       use m_work_4_sph_trans
       use legendre_transform_select
 !
-      real(kind = kreal) :: stime, etime(5), etime_shortest
-      real(kind = kreal) :: etime_trans(5)
+      real(kind = kreal) :: stime, etime_shortest
+      real(kind = kreal) :: etime(5), etime_trans(5)
 !
       integer(kind = kint) :: iloop_type
 !
@@ -211,9 +212,9 @@
         call sel_dealloc_legendre_trans
       end do
 !
-!
       call MPI_allREDUCE (etime, etime_trans, ifive,                    &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      etime_trans(1:5) = etime_trans(1:5) / dble(nprocs)
 !
       id_legendre_transfer = iflag_leg_orginal_loop
       etime_shortest =       etime_trans(iflag_leg_orginal_loop)

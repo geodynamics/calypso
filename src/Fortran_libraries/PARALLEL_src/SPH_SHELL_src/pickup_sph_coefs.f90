@@ -60,7 +60,7 @@
       call allocate_pick_sph_monitor
       call allocate_iflag_pick_sph(l_truncation)
 !
-      call set_picked_sph_adrress                                       &
+      call set_picked_sph_address                                       &
      &   (l_truncation, nidx_rj(2), idx_gl_1d_rj_j(1,1),                &
      &    num_pick_sph, num_pick_sph_l, num_pick_sph_m,                 &
      &    idx_pick_sph_mode, idx_pick_sph_l, idx_pick_sph_m,            &
@@ -79,52 +79,48 @@
 !
       use calypso_mpi
 !
-      integer(kind = kint) :: inum, knum, j, k, nd,icou, i_fld
-      integer(kind = kint) :: inod, ipick, num, ist_comp, ncomp
+      integer(kind = kint) :: inum, knum, j, k, nd, i_fld, j_fld
+      integer(kind = kint) :: inod, ipick, num, icou, jcou
 !
 !
       if(num_pick_sph_mode*num_pick_layer .eq. 0) return
 !
 !$omp parallel do
       do inum = 1, num_pick_sph_mode*num_pick_layer
-        d_rj_pick_sph_lc(1:ncomp_pick_sph_coef,inum) = zero
+        d_rj_pick_sph_lc(1:ntot_comp_pick_sph,inum) = zero
       end do
 !$omp end parallel do
 !
-!$omp parallel private(j)
+!!$omp parallel private(j)
       do inum = 1, num_pick_sph_mode
         j = idx_pick_sph_lc(inum)
         if(j .gt. izero) then
-!$omp do private(knum,k,inod,ipick,i_fld,icou,nd,ist_comp,ncomp)
+!!$omp do private(knum,k,inod,ipick,j_fld,i_fld,icou,jcou,nd)
           do knum = 1, num_pick_layer
             k = id_pick_layer(knum)
             inod =  j +    (k-1) * nidx_rj(2)
             ipick = knum + (inum-1) * num_pick_layer
-            icou = 0
-            do i_fld = 1, num_phys_rj
-              if(iflag_monitor_rj(i_fld) .gt. 0) then
-                ist_comp = istack_phys_comp_rj(i_fld-1)
-                ncomp = num_phys_comp_rj(i_fld)
-                if(num_phys_comp_rj(i_fld) .eq. 3) then
-                  d_rj_pick_sph_lc(icou+1,ipick)= d_rj(inod,ist_comp+1)
-                  d_rj_pick_sph_lc(icou+2,ipick)= d_rj(inod,ist_comp+3)
-                  d_rj_pick_sph_lc(icou+3,ipick)= d_rj(inod,ist_comp+2)
-                else
-                  do nd = 1, num_phys_comp_rj(i_fld)
-                    d_rj_pick_sph_lc(icou+nd,ipick)                     &
-     &                          = d_rj(inod,ist_comp+nd)
-                  end do
-                end if
-                icou = icou + num_phys_comp_rj(i_fld)
+            do j_fld = 1, num_fld_pick_sph
+              i_fld = ifield_monitor_rj(j_fld)
+              icou = istack_phys_comp_rj(i_fld-1)
+              jcou = istack_comp_pick_sph(j_fld-1)
+              if(num_phys_comp_rj(i_fld) .eq. 3) then
+                d_rj_pick_sph_lc(jcou+1,ipick)= d_rj(inod,icou+1)
+                d_rj_pick_sph_lc(jcou+2,ipick)= d_rj(inod,icou+3)
+                d_rj_pick_sph_lc(jcou+3,ipick)= d_rj(inod,icou+2)
+              else
+                do nd = 1, num_phys_comp_rj(i_fld)
+                  d_rj_pick_sph_lc(jcou+nd,ipick) = d_rj(inod,icou+nd)
+                end do
               end if
             end do
           end do
-!$omp end do nowait
+!!$omp end do nowait
         end if
       end do
-!$omp end parallel
+!!$omp end parallel
 !
-      num = ncomp_pick_sph_coef*num_pick_layer*num_pick_sph_mode
+      num = ntot_comp_pick_sph*num_pick_layer*num_pick_sph_mode
       call MPI_allREDUCE(d_rj_pick_sph_lc(1,1), d_rj_pick_sph_gl(1,1),  &
      &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
@@ -140,11 +136,13 @@
       integer(kind = kint) :: i_fld
 !
 !
-      ncomp_pick_sph_coef = 0
+      num_fld_pick_sph = 0
+      ntot_comp_pick_sph =   0
       do i_fld = 1, num_phys_rj
         if(iflag_monitor_rj(i_fld) .gt. 0) then
-          ncomp_pick_sph_coef = ncomp_pick_sph_coef                     &
-     &                         + num_phys_comp_rj(i_fld)
+          num_fld_pick_sph = num_fld_pick_sph + 1
+          ntot_comp_pick_sph = ntot_comp_pick_sph                       &
+     &                        + num_phys_comp_rj(i_fld)
         end if
       end do
 !
@@ -157,29 +155,33 @@
       use m_phys_labels
       use add_direction_labels
 !
-      integer(kind = kint) :: i_fld, ist
+      integer(kind = kint) :: i_fld, j_fld, jcou
 !
 !
-      ist = 0
+      j_fld = 0
+      istack_comp_pick_sph(0) = 0
       do i_fld = 1, num_phys_rj
         if(iflag_monitor_rj(i_fld) .gt. 0) then
+          j_fld = j_fld + 1
+          jcou = istack_comp_pick_sph(j_fld-1)
+          istack_comp_pick_sph(j_fld) = jcou + num_phys_comp_rj(i_fld)
+          ifield_monitor_rj(j_fld) = i_fld
+!
           if(num_phys_comp_rj(i_fld) .eq. 1) then
-            write(pick_sph_spec_name(ist+1),'(a)')                      &
+            write(pick_sph_spec_name(jcou+1),'(a)')                     &
      &                      trim(phys_name_rj(i_fld))
           else if(num_phys_comp_rj(i_fld) .eq. 3) then
             call add_vector_sph_spectr_label(phys_name_rj(i_fld),       &
-     &          pick_sph_spec_name(ist+1), pick_sph_spec_name(ist+2),   &
-     &          pick_sph_spec_name(ist+3))
+     &          pick_sph_spec_name(jcou+1), pick_sph_spec_name(jcou+2), &
+     &          pick_sph_spec_name(jcou+3))
           else if(num_phys_comp_rj(i_fld) .eq. 6) then
             call add_tensor_direction_label_rtp(phys_name_rj(i_fld),    &
-     &          pick_sph_spec_name(ist+1), pick_sph_spec_name(ist+2),   &
-     &          pick_sph_spec_name(ist+3), pick_sph_spec_name(ist+4),   &
-     &          pick_sph_spec_name(ist+5), pick_sph_spec_name(ist+6))
+     &          pick_sph_spec_name(jcou+1), pick_sph_spec_name(jcou+2), &
+     &          pick_sph_spec_name(jcou+3), pick_sph_spec_name(jcou+4), &
+     &          pick_sph_spec_name(jcou+5), pick_sph_spec_name(jcou+6))
           end if
-          ist = ist + num_phys_comp_rj(i_fld)
         end if
       end do
-      ncomp_pick_sph_coef = ist
 !
       end subroutine set_sph_labels_4_monitor
 !

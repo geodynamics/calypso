@@ -44,17 +44,19 @@
       integer(kind = kint) :: j, kg, idx, icou
 !
 !
-!$omp parallel do private(j,kg,idx,icou)
-      do kg = 1, nidx_global_rj(1)
-        do j = 1, nidx_rj(2)
-          do icou = 1, ntot_rms_rj
+!$omp parallel private(icou)
+      do icou = 1, ntot_rms_rj
+!$omp do private(j,kg,idx)
+        do kg = 1, nidx_rj(1)
+          do j = 1, nidx_rj(2)
             idx = j + (kg-1) * nidx_rj(2)
-            rms_sph_dat(icou,idx) =  rms_sph_dat(icou,idx)              &
+            rms_sph_dat(j,kg,icou) =  rms_sph_dat(j,kg,icou)            &
      &                              * a_r_1d_rj_r(kg)**2
           end do
         end do
+!$omp end do nowait
       end do
-!$omp end parallel do
+!$omp end parallel
 !
       end subroutine surf_ave_4_each_sph_rms
 !
@@ -67,9 +69,9 @@
 !
 !
 !$omp parallel do private(j,icou)
-      do j = 1, nidx_rj(2)
-        do icou = 1, ntot_rms_rj
-          rms_sph_vol_dat(icou,j) = avol * rms_sph_vol_dat(icou,j)
+      do icou = 1, ntot_rms_rj
+        do j = 1, nidx_rj(2)
+          rms_sph_vol_dat(j,icou) = avol * rms_sph_vol_dat(j,icou)
         end do
       end do
 !$omp end parallel do
@@ -85,21 +87,19 @@
 !
 !
 !$omp parallel do private(kg,lm,icou)
-      do kg = 1, nidx_global_rj(1)
-        do lm = 0, l_truncation
-          do icou = 1, ntot_rms_rj
-            rms_sph_l(icou,lm,kg) =  rms_sph_l(icou,lm,kg)              &
+      do icou = 1, ntot_rms_rj
+        do kg = 1, nidx_rj(1)
+          do lm = 0, l_truncation
+            rms_sph_l(lm,kg,icou) =  rms_sph_l(lm,kg,icou)              &
      &                              * a_r_1d_rj_r(kg)**2
-            rms_sph_m(icou,lm,kg) =  rms_sph_m(icou,lm,kg)              &
+            rms_sph_m(lm,kg,icou) =  rms_sph_m(lm,kg,icou)              &
      &                              * a_r_1d_rj_r(kg)**2
-            rms_sph_lm(icou,lm,kg) = rms_sph_lm(icou,lm,kg)             &
+            rms_sph_lm(lm,kg,icou) = rms_sph_lm(lm,kg,icou)             &
      &                              * a_r_1d_rj_r(kg)**2
           end do
-        end do
 !
-        do icou = 1, ntot_rms_rj
-          ave_sph(icou,kg) = ave_sph(icou,kg) * a_r_1d_rj_r(kg)**2
-          rms_sph(icou,kg) = rms_sph(icou,kg) * a_r_1d_rj_r(kg)**2
+          ave_sph(kg,icou) = ave_sph(kg,icou) * a_r_1d_rj_r(kg)**2
+          rms_sph(kg,icou) = rms_sph(kg,icou) * a_r_1d_rj_r(kg)**2
         end do
       end do
 !$omp end parallel do
@@ -121,12 +121,12 @@
       end do
 !$omp end parallel do
 !
-!$omp parallel do private(icou)
-      do lm = 0, l_truncation
-        do icou = 1, ntot_rms_rj
-          rms_sph_vol_l(icou,lm) =  avol * rms_sph_vol_l(icou,lm)
-          rms_sph_vol_m(icou,lm) =  avol * rms_sph_vol_m(icou,lm)
-          rms_sph_vol_lm(icou,lm) = avol * rms_sph_vol_lm(icou,lm)
+!$omp parallel do private(icou,lm)
+      do icou = 1, ntot_rms_rj
+        do lm = 0, l_truncation
+          rms_sph_vol_l(lm,icou) =  avol * rms_sph_vol_l(lm,icou)
+          rms_sph_vol_m(lm,icou) =  avol * rms_sph_vol_m(lm,icou)
+          rms_sph_vol_lm(lm,icou) = avol * rms_sph_vol_lm(lm,icou)
         end do
       end do
 !$omp end parallel do

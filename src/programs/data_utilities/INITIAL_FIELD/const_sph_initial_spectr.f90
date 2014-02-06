@@ -19,6 +19,10 @@
 !!       inod = local_sph_data_address(k, j_lc)
 !!         Return address of sphectrum data
 !!
+!!       nidx_rj(1) :: Number of radial grids
+!!       rr = radius_1d_rj_r(k)
+!!         Return radius at global grid address k
+!!
 !!       Temperature :: d_rj(:,ipol%i_temp)
 !!       Composition :: d_rj(:,ipol%i_light)
 !!
@@ -77,22 +81,22 @@
       if(ipol%i_velo .gt. izero) call  set_initial_velocity
 !
 !  Set initial temperature if temperature is exist
-      if(ipol%i_temp .gt. izero) call  set_initial_temperature
+!      if(ipol%i_temp .gt. izero) call  set_initial_temperature
 !
 !  Set initial composition if composition is exist
-      if(ipol%i_light .gt. izero) call set_initial_composition
+!      if(ipol%i_light .gt. izero) call set_initial_composition
 !
 !  Set initial magnetic field if magnetic field is exist
-      if(ipol%i_magne .gt. izero) call set_initial_magne_sph
+!      if(ipol%i_magne .gt. izero) call set_initial_magne_sph
 !
 !  Set heat source if  heat source is exist
-      if(ipol%i_heat_source .gt. izero) then
-        call set_initial_heat_source_sph
-      end if
+!      if(ipol%i_heat_source .gt. izero) then
+!        call set_initial_heat_source_sph
+!      end if
 !  Set light element source if light element is exist
-      if(ipol%i_light_source .gt. izero) then
-        call set_initial_light_source_sph
-      end if
+!      if(ipol%i_light_source .gt. izero) then
+!        call set_initial_light_source_sph
+!      end if
 !
 !  Copy initial field to restart IO data
       call set_sph_restart_num_to_IO
@@ -108,7 +112,8 @@
 !
       use m_sph_spectr_data
 !
-      integer ( kind = kint) :: inod
+      integer ( kind = kint) :: inod, jj, k
+      real (kind = kreal) :: rr
 !
 !
 !$omp parallel do
@@ -117,6 +122,15 @@
         d_rj(inod,itor%i_velo) = zero
       end do
 !$omp end parallel do
+!
+      jj = find_local_sph_mode_address(1, 0)
+      if (jj .gt. 0) then
+        do k = nlayer_ICB+1, nlayer_CMB
+          rr = radius_1d_rj_r(k)
+          inod = local_sph_data_address(k,jj)
+          d_rj(inod,itor%i_velo) = half * rr*rr
+        end do
+      end if
 !
       end subroutine set_initial_velocity
 !

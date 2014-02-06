@@ -176,7 +176,7 @@
       call cvt_xyz_from_sph_vec_sph_data
       call cvt_sph_to_xyz_tensor_data
 !
-      call phys_send_recv_4_viz
+      call phys_send_recv_all
 !
       end subroutine SPH_to_FEM_bridge_MHD
 !

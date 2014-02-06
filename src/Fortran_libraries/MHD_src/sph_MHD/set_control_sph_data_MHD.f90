@@ -52,7 +52,6 @@
       use add_sph_MHD_fields_2_ctl
 !
       integer(kind = kint) :: ierr
-      character(len = kchara) :: tmpchara
 !
 !   overwrite restart header for magnetic field extension
 !

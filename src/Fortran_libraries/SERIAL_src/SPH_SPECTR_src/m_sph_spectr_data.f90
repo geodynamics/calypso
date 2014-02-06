@@ -61,7 +61,7 @@
       integer (kind=kint), allocatable :: num_phys_comp_rtp(:)
 !>      Number of components for each field @f$ f(r,j) @f$
       integer (kind=kint), allocatable :: num_phys_comp_rj(:)
-! 
+!
 !>      End address of d_rtp for each field @f$ f(r,\theta,\phi) @f$
       integer (kind=kint), allocatable :: istack_phys_comp_rtp(:)
 !>      End address of d_rj for each field @f$ f(r,j) @f$

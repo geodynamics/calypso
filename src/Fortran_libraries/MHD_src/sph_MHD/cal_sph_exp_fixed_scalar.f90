@@ -133,6 +133,7 @@
 !
 !
       if(idx_rj_degree_zero .eq. 0) return
+!
         inod = idx_rj_degree_zero + (kr_in-1) * jmax
         i_p1 = inod + jmax
         i_p2 = i_p1 + jmax
@@ -260,6 +261,8 @@
       real(kind = kreal) :: d1t_dr1
       integer(kind = kint) :: inod, i_n1, i_n2
 !
+!
+      if(idx_rj_degree_zero .le. 0) return
 !
       inod = idx_rj_degree_zero + (kr_out-1) * jmax
       i_n1 = inod - jmax

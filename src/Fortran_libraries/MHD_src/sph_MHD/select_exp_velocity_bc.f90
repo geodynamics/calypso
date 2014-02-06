@@ -231,7 +231,8 @@
 !   Ovewrite rotatable inner core 
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_icore_viscous_drag_explicit(sph_bc_U%kr_in,            &
-     &      coef_diffuse, it_velo, it_diffuse)
+     &      sph_bc_U%fdm1_fix_fld_ICB, coef_diffuse,                    &
+     &      it_velo, it_diffuse)
       end if
 !
       if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
@@ -283,7 +284,8 @@
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call cal_icore_viscous_drag_explicit(sph_bc_U%kr_in,            &
-     &      coef_diffuse, is_vort, is_w_diffuse)
+     &      sph_bc_U%fdm1_fix_fld_ICB, coef_diffuse,                    &
+     &      is_vort, is_w_diffuse)
       end if
 !
       call cal_dsdr_sph_no_bc_in_2(nidx_rj(2),                          &

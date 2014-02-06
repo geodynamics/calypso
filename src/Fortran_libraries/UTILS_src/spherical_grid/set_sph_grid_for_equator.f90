@@ -37,6 +37,7 @@
 !
       use m_2d_sph_trans_table
       use set_indices_4_sph_tranform
+      use set_sph_tranform_ordering
 !
       integer(kind= kint) :: i, kp, kr, inod, np, np2
 !

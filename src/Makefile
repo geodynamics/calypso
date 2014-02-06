@@ -262,7 +262,6 @@ makemake:
 	@echo '		mkdir $$(INSTDIR)/include; \'        >> $(MAKENAME)
 	@echo '	fi'                                     >> $(MAKENAME)
 	@echo '	cp $(BUILDDIR)/*  $$(INSTDIR)/bin' >> $(MAKENAME)
-	@echo '	cp *.a  $$(INSTDIR)/lib'           >> $(MAKENAME)
 	@echo ''       >> $(MAKENAME)
 	@echo 'clean:' >> $(MAKENAME)
 	@echo '	@rm -f m_*.o ;'     >> $(MAKENAME)

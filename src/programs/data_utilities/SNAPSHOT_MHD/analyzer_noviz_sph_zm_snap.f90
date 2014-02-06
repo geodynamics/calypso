@@ -22,8 +22,6 @@
       use m_t_int_parameter
       use m_t_step_parameter
 !
-      use const_coriolis_sph
-!
       use FEM_analyzer_sph_MHD
       use SPH_analyzer_zm_snap
 !

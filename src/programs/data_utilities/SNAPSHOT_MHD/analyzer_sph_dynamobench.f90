@@ -23,8 +23,6 @@
       use m_t_int_parameter
       use m_t_step_parameter
 !
-      use const_coriolis_sph
-!
       use SPH_analyzer_d_bench
 !
       implicit none
