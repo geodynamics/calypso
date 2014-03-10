@@ -31,7 +31,7 @@
       module legendre_transform_krin
 !
       use m_precision
-      use m_work_4_sph_trans_spin
+      use m_work_4_sph_trans_krin
 !
       implicit none
 !
@@ -49,12 +49,13 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
 !
 !
-      call order_b_trans_vector_krin(ncomp, nvector)
-      call clear_b_trans_vector_krin(nvector)
+      call order_b_trans_vector_krin(ncomp, nvector, sp_rlm_krin(1,1))
+      call clear_b_trans_krin(ione, 3*nvector)
 !
-      call legendre_b_trans_vector_krin(nvector)
+      call legendre_b_trans_vector_krin(nvector,                        &
+     &    sp_rlm_krin(1,1), vr_rtm_krin(1,1))
 !
-      call back_b_trans_vector_krin(ncomp, nvector)
+      call back_b_trans_vector_krin(ncomp, nvector, vr_rtm_krin(1,1))
 !
       end subroutine leg_bwd_trans_vector_krin
 !
@@ -66,14 +67,19 @@
       use ordering_schmidt_trans_krin
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      integer(kind = kint) :: ist_fld
 !
 !
-      call order_b_trans_scalar_krin(ncomp, nvector, nscalar)
-      call clear_b_trans_scalar_krin(nscalar)
+      ist_fld = 3*nvector+1
+      call order_b_trans_scalar_krin(ncomp, nvector, nscalar,           &
+     &    sp_rlm_krin(1,ist_fld))
+      call clear_b_trans_krin(ist_fld,3*nvector+nscalar)
 !
-      call legendre_b_trans_scalar_krin(nscalar)
+      call legendre_b_trans_scalar_krin(nscalar,                        &
+     &    sp_rlm_krin(1,ist_fld), vr_rtm_krin(1,ist_fld))
 !
-      call back_b_trans_scalar_krin(ncomp, nvector, nscalar)
+      call back_b_trans_scalar_krin(ncomp, nvector, nscalar,            &
+     &    vr_rtm_krin(1,ist_fld))
 !
       end subroutine leg_bwd_trans_scalar_krin
 !
@@ -88,12 +94,13 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
 !
 !
-      call order_f_trans_vector_krin(ncomp, nvector)
-      call clear_f_trans_vector_krin(nvector)
+      call order_f_trans_vector_krin(ncomp, nvector, vr_rtm_krin(1,1))
+      call clear_f_trans_krin(ione, 3*nvector)
 !
-      call legendre_f_trans_vector_krin(nvector)
+      call legendre_f_trans_vector_krin(nvector,                        &
+     &    vr_rtm_krin(1,1), sp_rlm_krin(1,1))
 !
-      call back_f_trans_vector_krin(ncomp, nvector)
+      call back_f_trans_vector_krin(ncomp, nvector, sp_rlm_krin(1,1))
 !
       end subroutine leg_fwd_trans_vector_krin
 !
@@ -105,14 +112,19 @@
       use ordering_schmidt_trans_krin
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      integer(kind = kint) :: ist_fld
 !
 !
-      call order_f_trans_scalar_krin(ncomp, nvector, nscalar)
-      call clear_f_trans_scalar_krin(nscalar)
+      ist_fld = 3*nvector+1
+      call order_f_trans_scalar_krin(ncomp, nvector, nscalar,           &
+     &    vr_rtm_krin(1,ist_fld))
+      call clear_f_trans_krin(ist_fld, 3*nvector+nscalar)
 !
-      call legendre_f_trans_scalar_krin(nscalar)
+      call legendre_f_trans_scalar_krin(nscalar,                        &
+     &    vr_rtm_krin(1,ist_fld), sp_rlm_krin(1,ist_fld))
 !
-      call back_f_trans_scalar_krin(ncomp, nvector, nscalar)
+      call back_f_trans_scalar_krin(ncomp, nvector, nscalar,            &
+     &    sp_rlm_krin(1,ist_fld))
 !
       end subroutine leg_fwd_trans_scalar_krin
 !

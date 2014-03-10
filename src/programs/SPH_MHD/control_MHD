@@ -24,7 +24,6 @@ begin MHD_control
 !
     sph_file_prefix             'sph_grid/in'
 !
-    coriolis_int_file_name      'sph_shell/rot_int.dat'
     boundary_data_file_name     'bc_spec.dat'
 !
     restart_file_prefix         'restart/rst'
@@ -34,7 +33,6 @@ begin MHD_control
     sph_file_fmt_ctl            'ascii'
     restart_file_fmt_ctl        'ascii'
     field_file_fmt_ctl          'ascii'
-    coriolis_file_fmt_ctl       'ascii'
   end data_files_def
 !
   begin model

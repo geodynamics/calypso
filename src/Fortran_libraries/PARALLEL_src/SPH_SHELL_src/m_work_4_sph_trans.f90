@@ -49,7 +49,7 @@
 !>      maximum number of fields for Legendre transform
       integer(kind = kint) :: nb_sph_trans
 !>      total number of components for spherical harmonics transform
-      integer(kind = kint) :: ntot_comp_sph_trans
+      integer(kind = kint) :: ncomp_sph_trans
 !
 !>      field data including pole and center  @f$ f(r,\theta,\phi) @f$ 
       real(kind = kreal), allocatable :: d_nod_rtp(:,:)

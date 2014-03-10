@@ -8,14 +8,11 @@
 !!       (innermost loop is spherical harmonics)
 !!
 !!@verbatim
-!!      subroutine allocate_work_sph_trans_spin(nb_sph_trans)
+!!      subroutine allocate_work_sph_trans_spin(ncomp)
 !!      subroutine deallocate_work_sph_trans_spin
 !!
-!!      subroutine clear_b_trans_vector_spin(nb)
-!!      subroutine clear_b_trans_scalar_spin(nb)
-!!
-!!      subroutine clear_f_trans_vector_spin(nb)
-!!      subroutine clear_f_trans_scalar_spin(nb)
+!!      subroutine clear_b_trans_spin(icomp_st, icomp_ed)
+!!      subroutine clear_f_trans_spin(icomp_st, icomp_ed)
 !!
 !!
 !!    Data for single vector field
@@ -34,9 +31,9 @@
 !!
 !!@endverbatim
 !!
-!!@n @param  nb_sph_trans
-!!             maximum number of fields for Legendre transform
-!!@n @param  nb  number of fields to be transformed
+!!@n @param  ncomp  number of components for Legendre transform
+!!@n @param  icomp_st  start component to clear
+!!@n @param  icomp_ed  end component to clear
 !
       module m_work_4_sph_trans_spin
 !
@@ -47,14 +44,14 @@
 !
 !
 !>     field data for Legendre transform
-!!@n       original layout: vr_rtm_spin(l_rtm,m_rtm,k_rtm,i_fld,nb,3)
-!!@n       size: vr_rtm_spin(nidx_rtm(2),nidx_rtm(3),nidx_rtm(1)*nb,3)
-      real(kind = kreal), allocatable :: vr_rtm_spin(:,:,:,:)
+!!@n       original layout: vr_rtm_spin(l_rtm,m_rtm,k_rtm,icomp)
+!!@n       size: vr_rtm_spin(nidx_rtm(2),nidx_rtm(3)*nidx_rtm(1),ncomp)
+      real(kind = kreal), allocatable :: vr_rtm_spin(:,:)
 !
 !>     spectr data for Legendre transform
-!!@n      original layout: sp_rlm_spin(j_rlm,k_rtm,i_fld,nb,3)
-!!@n        size: sp_rlm_spin(nidx_rlm(2),nidx_rtm(1)*nb,3)
-      real(kind = kreal), allocatable :: sp_rlm_spin(:,:,:)
+!!@n      original layout: sp_rlm_spin(j_rlm,k_rtm,icomp)
+!!@n        size: sp_rlm_spin(nidx_rlm(2),nidx_rtm(1)*ncomp)
+      real(kind = kreal), allocatable :: sp_rlm_spin(:,:)
 !
 ! ----------------------------------------------------------------------
 !
@@ -62,20 +59,17 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine allocate_work_sph_trans_spin(nb_sph_trans)
+      subroutine allocate_work_sph_trans_spin(ncomp)
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: nb_sph_trans
-      integer(kind = kint) :: num1
+      integer(kind = kint), intent(in) :: ncomp
 !
 !
-      num1 = nb_sph_trans*nidx_rlm(1)
-      allocate(sp_rlm_spin(nidx_rlm(2),num1,3))
+      allocate(sp_rlm_spin(nnod_rlm,ncomp))
+      allocate(vr_rtm_spin(nnod_rtm,ncomp))
+!
       sp_rlm_spin = 0.0d0
-!
-      num1 = nb_sph_trans*nidx_rlm(1)
-      allocate(vr_rtm_spin(nidx_rtm(2),nidx_rtm(3),num1,3))
       vr_rtm_spin = 0.0d0
 !
       end subroutine allocate_work_sph_trans_spin
@@ -91,92 +85,48 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine clear_b_trans_vector_spin(nb)
+      subroutine clear_b_trans_spin(icomp_st, icomp_ed)
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: nb
-      integer(kind = kint) :: k_rtm, l_rtm, m_rtm
+      integer(kind = kint), intent(in) :: icomp_st, icomp_ed
+      integer(kind = kint) :: nd, inod
 !
 !
-!$omp parallel do private(k_rtm,l_rtm)
-      do m_rtm = 1, nidx_rtm(3)
-        do l_rtm = 1, nidx_rtm(2)
-          do k_rtm = 1, nidx_rtm(1)*nb
-            vr_rtm_spin(l_rtm,m_rtm,k_rtm,1) = zero
-            vr_rtm_spin(l_rtm,m_rtm,k_rtm,2) = zero
-            vr_rtm_spin(l_rtm,m_rtm,k_rtm,3) = zero
-          end do
+!$omp parallel private(nd)
+      do nd = icomp_st, icomp_ed
+!$omp do private(inod)
+        do inod = 1, nnod_rtm
+          vr_rtm_spin(inod,nd) = zero
         end do
+!$omp end do nowait
       end do
-!$omp end parallel do
+!$omp end parallel
 !
-      end subroutine clear_b_trans_vector_spin
-!
-! -----------------------------------------------------------------------
-!
-      subroutine clear_b_trans_scalar_spin(nb)
-!
-      use m_spheric_parameter
-!
-      integer(kind = kint), intent(in) :: nb
-      integer(kind = kint) :: k_rtm, l_rtm, m_rtm
-!
-!
-!$omp parallel do private(m_rtm,l_rtm)
-      do k_rtm = 1, nidx_rtm(1)*nb
-        do m_rtm = 1, nidx_rtm(3)
-          do l_rtm = 1, nidx_rtm(2)
-            vr_rtm_spin(l_rtm,m_rtm,k_rtm,1) = zero
-          end do
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine clear_b_trans_scalar_spin
+      end subroutine clear_b_trans_spin
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine clear_f_trans_vector_spin(nb)
+      subroutine clear_f_trans_spin(icomp_st, icomp_ed)
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: nb
-      integer(kind = kint) :: j_rlm, k_rtm
+      integer(kind = kint), intent(in) :: icomp_st, icomp_ed
+      integer(kind = kint) :: nd, inod
 !
 !
-!$omp parallel do private(j_rlm)
-      do k_rtm = 1, nidx_rtm(1)*nb
-          do j_rlm = 1, nidx_rlm(2)
-            sp_rlm_spin(j_rlm,k_rtm,1) = zero
-            sp_rlm_spin(j_rlm,k_rtm,2) = zero
-            sp_rlm_spin(j_rlm,k_rtm,3) = zero
+!$omp parallel private(nd)
+      do nd = icomp_st, icomp_ed
+!$omp do private(inod)
+        do inod = 1, nnod_rlm
+          sp_rlm_spin(inod,nd) = zero
         end do
+!$omp end do nowait
       end do
-!$omp end parallel do
+!$omp end parallel
 !
-      end subroutine clear_f_trans_vector_spin
-!
-! -----------------------------------------------------------------------
-!
-      subroutine clear_f_trans_scalar_spin(nb)
-!
-      use m_spheric_parameter
-!
-      integer(kind = kint), intent(in) :: nb
-      integer(kind = kint) :: j_rlm, k_rtm
-!
-!
-!$omp parallel do private(j_rlm)
-      do k_rtm = 1, nidx_rtm(1)*nb
-          do j_rlm = 1, nidx_rlm(2)
-            sp_rlm_spin(j_rlm,k_rtm,1) = zero
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine clear_f_trans_scalar_spin
+      end subroutine clear_f_trans_spin
 !
 ! -----------------------------------------------------------------------
 !

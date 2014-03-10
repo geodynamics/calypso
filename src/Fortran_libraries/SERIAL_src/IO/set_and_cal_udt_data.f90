@@ -23,11 +23,11 @@
 !!     &          d_nod, ucd)
 !!
 !!      subroutine set_field_by_udt_data(nnod, num_fld, ntot_cmp,       &
-!!     &          phys_name, d_nod, ucd)
+!!     &          istack_comp, phys_name, d_nod, ucd)
 !!      subroutine add_field_by_udt_data(nnod, num_fld, ntot_cmp,       &
-!!     &          phys_name, d_nod, ucd)
+!!     &          istack_comp, phys_name, d_nod, ucd)
 !!      subroutine subtract_field_by_udt_data(nnod, num_fld, ntot_cmp,  &
-!!     &          phys_name, d_nod, ucd)
+!!     &          istack_comp, phys_name, d_nod, ucd)
 !!
 !!      subroutine find_field_id_in_ucd(ucd, field_name)
 !!@endverbatim
@@ -203,11 +203,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_field_by_udt_data(nnod, num_fld, ntot_cmp,         &
-     &          phys_name, d_nod, ucd)
+     &          istack_comp, phys_name, d_nod, ucd)
 !
       type(ucd_data), intent(in) :: ucd
 !
       integer(kind=kint), intent(in)  :: nnod, num_fld, ntot_cmp
+      integer(kind=kint), intent(in)  :: istack_comp(0:num_fld)
       character (len=kchara), intent(in) :: phys_name(num_fld)
       real(kind = kreal), intent(inout) :: d_nod(nnod,ntot_cmp)
 !
@@ -215,8 +216,8 @@
       integer (kind = kint) :: j, i_fld, j_fld, ncomp
 !
 !
-      j_fld = 0
       do j = 1, num_fld
+        j_fld = istack_comp(j-1) + 1
         call find_field_id_in_ucd(ucd, phys_name(j), i_fld, ncomp)
         if(i_fld .gt. 0) then
           do nd = 0, ncomp-1
@@ -234,11 +235,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine add_field_by_udt_data(nnod, num_fld, ntot_cmp,         &
-     &          phys_name, d_nod, ucd)
+     &          istack_comp, phys_name, d_nod, ucd)
 !
       type(ucd_data), intent(in) :: ucd
 !
       integer(kind=kint), intent(in)  :: nnod, num_fld, ntot_cmp
+      integer(kind=kint), intent(in)  :: istack_comp(0:num_fld)
       character (len=kchara), intent(in) :: phys_name(num_fld)
       real(kind = kreal), intent(inout) :: d_nod(nnod,ntot_cmp)
 !
@@ -246,8 +248,8 @@
       integer (kind = kint) :: j, i_fld, j_fld, ncomp
 !
 !
-      j_fld = 0
       do j = 1, num_fld
+        j_fld = istack_comp(j-1) + 1
         call find_field_id_in_ucd(ucd, phys_name(j), i_fld, ncomp)
         if(i_fld .gt. 0) then
           do nd = 0, ncomp-1
@@ -266,11 +268,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine subtract_field_by_udt_data(nnod, num_fld, ntot_cmp,    &
-     &          phys_name, d_nod, ucd)
+     &          istack_comp, phys_name, d_nod, ucd)
 !
       type(ucd_data), intent(in) :: ucd
 !
       integer(kind=kint), intent(in)  :: nnod, num_fld, ntot_cmp
+      integer(kind=kint), intent(in)  :: istack_comp(0:num_fld)
       character (len=kchara), intent(in) :: phys_name(num_fld)
       real(kind = kreal), intent(inout) :: d_nod(nnod,ntot_cmp)
 !
@@ -278,8 +281,8 @@
       integer (kind = kint) :: j, i_fld, j_fld, ncomp
 !
 !
-      j_fld = 0
       do j = 1, num_fld
+        j_fld = istack_comp(j-1) + 1
         call find_field_id_in_ucd(ucd, phys_name(j), i_fld, ncomp)
         if(i_fld .gt. 0) then
           do nd = 0, ncomp-1

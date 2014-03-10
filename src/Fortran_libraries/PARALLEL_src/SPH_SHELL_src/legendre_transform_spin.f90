@@ -31,6 +31,7 @@
       module legendre_transform_spin
 !
       use m_precision
+      use m_work_time
       use m_work_4_sph_trans_spin
 !
       implicit none
@@ -49,12 +50,21 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
 !
 !
-      call order_b_trans_vector_spin(ncomp, nvector)
-      call clear_b_trans_vector_spin(nvector)
+      call start_eleps_time(25)
+      call order_b_trans_vector_spin(ncomp, nvector, sp_rlm_spin(1,1))
+      call end_eleps_time(25)
+      call start_eleps_time(26)
+      call clear_b_trans_spin(ione, 3*nvector)
+      call end_eleps_time(26)
 !
-      call legendre_b_trans_vector_spin(nvector)
+      call start_eleps_time(27)
+      call legendre_b_trans_vector_spin(ncomp, nvector,                 &
+     &    sp_rlm_spin(1,1), vr_rtm_spin(1,1))
+      call end_eleps_time(27)
 !
-      call back_b_trans_vector_spin(ncomp, nvector)
+      call start_eleps_time(28)
+      call back_b_trans_vector_spin(ncomp, nvector, vr_rtm_spin(1,1))
+      call end_eleps_time(28)
 !
       end subroutine leg_bwd_trans_vector_spin
 !
@@ -68,12 +78,15 @@
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
 !
 !
-      call order_b_trans_scalar_spin(ncomp, nvector, nscalar)
-      call clear_b_trans_scalar_spin(nscalar)
+      call order_b_trans_scalar_spin(ncomp, nvector, nscalar,           &
+     &    sp_rlm_spin(1,1))
+      call clear_b_trans_spin(3*nvector+1, 3*nvector+nscalar)
 !
-      call legendre_b_trans_scalar_spin(nscalar)
+      call legendre_b_trans_scalar_spin(ncomp, nscalar, nvector,        &
+     &    sp_rlm_spin(1,1), vr_rtm_spin(1,1))
 !
-      call back_b_trans_scalar_spin(ncomp, nvector, nscalar)
+      call back_b_trans_scalar_spin(ncomp, nvector, nscalar,            &
+     &    vr_rtm_spin(1,1))
 !
       end subroutine leg_bwd_trans_scalar_spin
 !
@@ -88,12 +101,21 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
 !
 !
-      call order_f_trans_vector_spin(ncomp, nvector)
-      call clear_f_trans_vector_spin(nvector)
+      call start_eleps_time(29)
+      call order_f_trans_vector_spin(ncomp, nvector, vr_rtm_spin(1,1))
+      call end_eleps_time(29)
+      call start_eleps_time(30)
+      call clear_f_trans_spin(ione, 3*nvector)
+      call end_eleps_time(30)
 !
-      call legendre_f_trans_vector_spin(nvector)
+      call start_eleps_time(31)
+      call legendre_f_trans_vector_spin(ncomp, nvector,                 &
+     &    vr_rtm_spin(1,1), sp_rlm_spin(1,1))
+      call end_eleps_time(31)
 !
-      call back_f_trans_vector_spin(ncomp, nvector)
+      call start_eleps_time(32)
+      call back_f_trans_vector_spin(ncomp, nvector, sp_rlm_spin(1,1))
+      call end_eleps_time(32)
 !
       end subroutine leg_fwd_trans_vector_spin
 !
@@ -107,12 +129,15 @@
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
 !
 !
-      call order_f_trans_scalar_spin(ncomp, nvector, nscalar)
-      call clear_f_trans_scalar_spin(nscalar)
+      call order_f_trans_scalar_spin(ncomp, nvector, nscalar,           &
+     &    vr_rtm_spin(1,1))
+      call clear_f_trans_spin(3*nvector+1, 3*nvector+nscalar)
 !
-      call legendre_f_trans_scalar_spin(nscalar)
+      call legendre_f_trans_scalar_spin(ncomp, nscalar, nvector,        &
+     &    vr_rtm_spin(1,1), sp_rlm_spin(1,1))
 !
-      call back_f_trans_scalar_spin(ncomp, nvector, nscalar)
+      call back_f_trans_scalar_spin(ncomp, nvector, nscalar,            &
+     &    sp_rlm_spin(1,1))
 !
       end subroutine leg_fwd_trans_scalar_spin
 !

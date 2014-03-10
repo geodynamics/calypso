@@ -9,10 +9,10 @@
 !!       (Original version)
 !!
 !!@verbatim
-!!      subroutine legendre_b_trans_vector_fdout(nvector)
-!!        Input:  vr_rtm_fdout   (Order: radius,theta,phi)
-!!        Output: sp_rlm_fdout   (Order: poloidal,diff_poloidal,toroidal)
-!!      subroutine legendre_b_trans_scalar_fdout(nscalar)
+!!      subroutine legendre_b_trans_vector_fdout(nvector,               &
+!!     &          sp_rlm_fdout, vr_rtm_fdout)
+!!      subroutine legendre_b_trans_scalar_fdout(nscalar,               &
+!!     &          sp_rlm_fdout, vr_rtm_fdout)
 !!        Input:  vr_rtm_fdout
 !!        Output: sp_rlm_fdout
 !!@endverbatim
@@ -30,7 +30,6 @@
       use m_spheric_param_smp
       use m_schmidt_poly_on_rtm
       use m_work_4_sph_trans
-      use m_work_4_sph_trans_fdout
 !
       implicit none
 !
@@ -40,9 +39,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_vector_fdout(nvector)
+      subroutine legendre_b_trans_vector_fdout(nvector,                 &
+     &          sp_rlm_fdout, vr_rtm_fdout)
 !
       integer(kind = kint), intent(in) :: nvector
+      real(kind = kreal), intent(in)                                    &
+     &      :: sp_rlm_fdout(nnod_rlm,3*nvector)
+      real(kind = kreal), intent(inout)                                 &
+     &      :: vr_rtm_fdout(nnod_rtm,3*nvector)
 !
       integer(kind = kint) :: i_rlm, j_rlm
       integer(kind = kint) :: k_rlm, l_rtm
@@ -97,9 +101,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_scalar_fdout(nscalar)
+      subroutine legendre_b_trans_scalar_fdout(nscalar,                 &
+     &          sp_rlm_fdout, vr_rtm_fdout)
 !
       integer(kind = kint), intent(in) :: nscalar
+      real(kind = kreal), intent(in)                                    &
+     &      :: sp_rlm_fdout(nnod_rlm,nscalar)
+      real(kind = kreal), intent(inout)                                 &
+     &      :: vr_rtm_fdout(nnod_rtm,nscalar)
 !
       integer(kind = kint) :: i_rlm, j_rlm
       integer(kind = kint) :: k_rlm, l_rtm

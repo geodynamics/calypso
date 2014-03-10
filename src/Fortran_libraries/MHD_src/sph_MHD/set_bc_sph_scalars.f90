@@ -228,7 +228,7 @@
         end if
       end do
 !
-      if(sph_bc_T%iflag_icb .eq. iflag_undefined_bc) then
+      if(sph_bc_C%iflag_icb .eq. iflag_undefined_bc) then
         if(my_rank .eq. 0) write(*,'(2a)')                              &
      &   'Compositional  boundary condition for ICB ',                  &
      &   'is not defined correctly.'
@@ -237,7 +237,7 @@
         call calypso_MPI_abort(2, 'Check boundary conditions')
       end if
 !
-      if(sph_bc_T%iflag_cmb .eq. iflag_undefined_bc) then
+      if(sph_bc_C%iflag_cmb .eq. iflag_undefined_bc) then
         if(my_rank .eq. 0) write(*,'(2a)')                              &
      &   'Compositional  boundary condition for CMB ',                  &
      &   'is not defined correctly.'

@@ -154,7 +154,6 @@
 !
       use m_phys_constants
       use m_circle_transform
-      use FFT_selector
 !
       real(kind = kreal), intent(in) :: d_rj_circle(0:jmax_circle,6)
       real(kind = kreal), intent(inout) :: v_rtp_circle(mphi_circle,6)

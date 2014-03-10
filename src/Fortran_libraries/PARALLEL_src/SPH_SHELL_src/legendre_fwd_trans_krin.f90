@@ -9,15 +9,16 @@
 !!       (innermost loop is field and radius)
 !!
 !!@verbatim
-!!      subroutine legendre_f_trans_vector_krin(nfld)
-!!        Input:  vr_rtm_krin   (Order: radius,theta,phi)
-!!        Output: sp_rlm_krin   (Order: poloidal,diff_poloidal,toroidal)
-!!      subroutine legendre_f_trans_scalar_krin(nfld)
+!!      subroutine legendre_f_trans_vector_krin(nvector,                &
+!!     &          vr_rtm_krin, sp_rlm_krin)
+!!      subroutine legendre_f_trans_scalar_krin(nscalar,                &
+!!     &          vr_rtm_krin, sp_rlm_krin)
 !!        Input:  vr_rtm_krin
 !!        Output: sp_rlm_krin
 !!@endverbatim
 !!
-!!@n @param  nfld  number of fields to be transformed
+!!@n @param  nvector  number of vector to be transformed
+!!@n @param  nscalar  number of scalar to be transformed
 !
       module legendre_fwd_trans_krin
 !
@@ -28,7 +29,6 @@
       use m_spheric_param_smp
       use m_schmidt_poly_on_rtm
       use m_work_4_sph_trans
-      use m_work_4_sph_trans_krin
 !
       implicit none
 !
@@ -38,58 +38,65 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_f_trans_vector_krin(nfld)
+      subroutine legendre_f_trans_vector_krin(nvector,                  &
+     &          vr_rtm_krin, sp_rlm_krin)
 !
-      integer(kind = kint), intent(in) :: nfld
+      integer(kind = kint), intent(in) :: nvector
+      real(kind = kreal), intent(in)                                    &
+     &      :: vr_rtm_krin(nnod_rtm,3*nvector)
+      real(kind = kreal), intent(inout)                                 &
+     &      :: sp_rlm_krin(nnod_rlm,3*nvector)
 !
       integer(kind = kint) :: j_rlm, mp_rlm, mn_rlm, l_rtm
-      integer(kind = kint) :: ip_rtm_1, in_rtm_1
-      integer(kind = kint) :: nb_nri, kr_nd, mst, med
+      integer(kind = kint) :: ip_rtm, in_rtm
+      integer(kind = kint) :: k_rtm, nd, mst, med, kr_j, kr_l
       real(kind = kreal) :: pwt_tmp, dpwt_tmp, pgwt_tmp
 !
 !
-      nb_nri = nfld*nidx_rtm(1)
-!$omp parallel do private(j_rlm,l_rtm,kr_nd,ip_rtm_1,in_rtm_1,mst,med,&
-!$omp&               pwt_tmp,dpwt_tmp,pgwt_tmp,mn_rlm)
+!$omp parallel do private(j_rlm,l_rtm,kr_j,kr_l,mst,med,ip_rtm,in_rtm,  &
+!$omp&               pwt_tmp,dpwt_tmp,pgwt_tmp,mn_rlm,k_rtm,nd)
       do mp_rlm = 1, nidx_rtm(3)
         mn_rlm = nidx_rtm(3) - mp_rlm + 1
         mst = lstack_rlm(mp_rlm-1)+1
         med = lstack_rlm(mp_rlm)
-        do j_rlm = mst, med
+        do nd = 1, nvector
           do l_rtm = 1, nidx_rtm(2)
-            ip_rtm_1 = l_rtm + (mp_rlm-1) * nidx_rtm(2)
-            in_rtm_1 = l_rtm + (mn_rlm-1) * nidx_rtm(2)
-            pwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
-            dpwt_tmp = dPdt_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
-            pgwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)           &
+!
+            do j_rlm = mst, med
+              pwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
+              dpwt_tmp = dPdt_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
+              pgwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)         &
      &                 * dble( idx_gl_1d_rlm_j(j_rlm,3) )               &
      &                 * asin_theta_1d_rtm(l_rtm)
 !
-!          do k_rtm = 1, nidx_rtm(1)
-!            do nd = 1, nfld
-!cdir nodep
-          do kr_nd = 1, nb_nri
-              sp_rlm_krin(kr_nd,j_rlm,1) = sp_rlm_krin(kr_nd,j_rlm,1)   &
-     &                   + vr_rtm_krin(kr_nd,ip_rtm_1,1) * pwt_tmp
-              sp_rlm_krin(kr_nd,j_rlm,2) = sp_rlm_krin(kr_nd,j_rlm,2)   &
-     &                 + ( vr_rtm_krin(kr_nd,ip_rtm_1,2) * dpwt_tmp     &
-     &                   - vr_rtm_krin(kr_nd,in_rtm_1,3) * pgwt_tmp)
-              sp_rlm_krin(kr_nd,j_rlm,3) = sp_rlm_krin(kr_nd,j_rlm,3)   &
-     &                 - ( vr_rtm_krin(kr_nd,in_rtm_1,2) * pgwt_tmp     &
-     &                   + vr_rtm_krin(kr_nd,ip_rtm_1,3) * dpwt_tmp)
+              do k_rtm = 1, nidx_rtm(1)
+                kr_j = k_rtm + (j_rlm-1)*nidx_rtm(1)
+                kr_l = k_rtm + (l_rtm-1)*nidx_rtm(1)
+                ip_rtm = kr_l + (mp_rlm-1)*nidx_rtm(1)*nidx_rtm(2)
+                in_rtm = kr_l + (mn_rlm-1)*nidx_rtm(1)*nidx_rtm(2)
+!
+                sp_rlm_krin(kr_j,3*nd-2) = sp_rlm_krin(kr_j,3*nd-2)     &
+     &                 + vr_rtm_krin(ip_rtm,3*nd-2) * pwt_tmp
+                sp_rlm_krin(kr_j,3*nd-1) = sp_rlm_krin(kr_j,3*nd-1)     &
+     &               + ( vr_rtm_krin(ip_rtm,3*nd-1) * dpwt_tmp          &
+     &                 - vr_rtm_krin(in_rtm,3*nd  ) * pgwt_tmp)
+                sp_rlm_krin(kr_j,3*nd  ) = sp_rlm_krin(kr_j,3*nd  )     &
+     &               - ( vr_rtm_krin(in_rtm,3*nd-1) * pgwt_tmp          &
+     &                 + vr_rtm_krin(ip_rtm,3*nd  ) * dpwt_tmp)
+              end do
             end do
           end do
 !
-!        do k_rtm = 1, nidx_rtm(1)
-!          do nd = 1, nfld
-!cdir nodep
-          do kr_nd = 1, nb_nri
-            sp_rlm_krin(kr_nd,j_rlm,1) = sp_rlm_krin(kr_nd,j_rlm,1)     &
-     &                             * g_sph_rlm(j_rlm,7)
-            sp_rlm_krin(kr_nd,j_rlm,2) = sp_rlm_krin(kr_nd,j_rlm,2)     &
-     &                             * g_sph_rlm(j_rlm,7)
-            sp_rlm_krin(kr_nd,j_rlm,3) = sp_rlm_krin(kr_nd,j_rlm,3)     &
-     &                             * g_sph_rlm(j_rlm,7)
+          do j_rlm = mst, med
+            do k_rtm = 1, nidx_rtm(1)
+              kr_j = k_rtm + (j_rlm-1)*nidx_rtm(1)
+              sp_rlm_krin(kr_j,3*nd-2)                                  &
+     &           = sp_rlm_krin(kr_j,3*nd-2) * g_sph_rlm(j_rlm,7)
+              sp_rlm_krin(kr_j,3*nd-1)                                  &
+     &           = sp_rlm_krin(kr_j,3*nd-1) * g_sph_rlm(j_rlm,7)
+              sp_rlm_krin(kr_j,3*nd  )                                  &
+     &           = sp_rlm_krin(kr_j,3*nd  ) * g_sph_rlm(j_rlm,7)
+            end do
           end do
         end do
       end do
@@ -99,42 +106,47 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_f_trans_scalar_krin(nfld)
+      subroutine legendre_f_trans_scalar_krin(nscalar,                  &
+     &          vr_rtm_krin, sp_rlm_krin)
 !
-      integer(kind = kint), intent(in) :: nfld
+      integer(kind = kint), intent(in) :: nscalar
+      real(kind = kreal), intent(in)                                    &
+     &      :: vr_rtm_krin(nnod_rtm,nscalar)
+      real(kind = kreal), intent(inout)                                 &
+     &      :: sp_rlm_krin(nnod_rlm,nscalar)
 !
-      integer(kind = kint) :: j_rlm, l_rtm, mst, med, mp_rlm
-      integer(kind = kint) :: ip_rtm_1
-      integer(kind = kint) :: nb_nri, kr_nd
+      integer(kind = kint) :: j_rlm, l_rtm, mst, med, mp_rlm, ip_rtm
+      integer(kind = kint) :: k_rtm, nd, kr_j, kr_l
       real(kind = kreal) :: pwt_tmp
 !
 !
-      nb_nri = nfld*nidx_rlm(1)
-!$omp parallel do private(j_rlm,kr_nd,ip_rtm_1,mst,med,l_rtm,pwt_tmp)
+!$omp parallel do private(j_rlm,k_rtm,kr_j,nd,kr_l,mst,med,l_rtm,       &
+!$omp&                   ip_rtm,pwt_tmp)
       do mp_rlm = 1, nidx_rtm(3)
         mst = lstack_rlm(mp_rlm-1)+1
         med = lstack_rlm(mp_rlm)
-        do j_rlm = mst, med
-!
+        do nd = 1, nscalar
           do l_rtm = 1, nidx_rtm(2)
-            ip_rtm_1 = l_rtm + (mp_rlm-1) * nidx_rtm(2)
-            pwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
+            do j_rlm = mst, med
+              pwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
 !
-!          do k_rtm = 1, nidx_rtm(1)
-!            do nd = 1, nfld
-!cdir nodep
-            do kr_nd = 1, nb_nri
-              sp_rlm_krin(kr_nd,j_rlm,1) = sp_rlm_krin(kr_nd,j_rlm,1)   &
-     &                    + vr_rtm_krin(kr_nd,ip_rtm_1,1) * pwt_tmp
+              do k_rtm = 1, nidx_rtm(1)
+                kr_j = k_rtm + (j_rlm-1)*nidx_rtm(1)
+                kr_l = k_rtm + (l_rtm-1)*nidx_rtm(1)
+                ip_rtm = kr_l + (mp_rlm-1)*nidx_rtm(1)*nidx_rtm(2)
+!
+                sp_rlm_krin(kr_j,nd) = sp_rlm_krin(kr_j,nd)             &
+     &                    + vr_rtm_krin(ip_rtm,nd) * pwt_tmp
+              end do
             end do
           end do
 !
-!        do k_rtm = 1, nidx_rtm(1)
-!          do nd = 1, nfld
-!cdir nodep
-          do kr_nd = 1, nb_nri
-            sp_rlm_krin(kr_nd,j_rlm,1) = sp_rlm_krin(kr_nd,j_rlm,1)     &
+          do j_rlm = mst, med
+            do k_rtm = 1, nidx_rtm(1)
+              kr_j = k_rtm + (j_rlm-1)*nidx_rtm(1)
+              sp_rlm_krin(kr_j,nd) = sp_rlm_krin(kr_j,nd)               &
      &                               * g_sph_rlm(j_rlm,6)
+            end do
           end do
         end do
       end do

@@ -19,6 +19,11 @@
 !!      subroutine adjust_out_fixed_flux_sph(jmax, kr_out, r_CMB,       &
 !!     &          fdm2_fix_dr_CMB, flux_CMB, coef_d,                    &
 !!     &          coef_imp,  dt, is_fld)
+!!
+!!      subroutine poisson_in_fixed_flux_sph(jmax, kr_in, r_ICB,        &
+!!     &          fdm2_fix_dr_ICB, flux_ICB, is_fld)
+!!      subroutine poisson_out_fixed_flux_sph(jmax, kr_out, r_CMB,      &
+!!     &          fdm2_fix_dr_CMB, flux_CMB, is_fld)
 !!@endverbatim
 !!
 !!@param  jmax        Number of modes for local spectrum
@@ -140,6 +145,61 @@
 !$omp end parallel do
 !
       end subroutine adjust_out_fixed_flux_sph
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine poisson_in_fixed_flux_sph(jmax, kr_in, r_ICB,          &
+     &          fdm2_fix_dr_ICB, flux_ICB, is_fld)
+!
+      use m_sph_spectr_data
+!
+      integer(kind = kint), intent(in) :: jmax, kr_in
+      integer(kind = kint), intent(in) :: is_fld
+      real(kind = kreal), intent(in) :: flux_ICB(jmax)
+      real(kind = kreal), intent(in) :: r_ICB(0:1)
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_ICB(-1:1,3)
+!
+      integer(kind = kint) :: inod, j
+!
+!
+!$omp parallel do private(inod)
+      do j = 1, jmax
+        inod = j + (kr_in-1) * jmax
+!
+        d_rj(inod,is_fld) = (fdm2_fix_dr_ICB(-1,3) + two*r_ICB(1))      &
+     &                     * flux_ICB(j)
+      end do
+!$omp end parallel do
+!
+      end subroutine poisson_in_fixed_flux_sph
+!
+! -----------------------------------------------------------------------
+!
+      subroutine poisson_out_fixed_flux_sph(jmax, kr_out, r_CMB,        &
+     &          fdm2_fix_dr_CMB, flux_CMB, is_fld)
+!
+      use m_sph_spectr_data
+!
+      integer(kind = kint), intent(in) :: jmax, kr_out
+      integer(kind = kint), intent(in) :: is_fld
+      real(kind = kreal), intent(in) :: flux_CMB(jmax)
+      real(kind = kreal), intent(in) :: r_CMB(0:1)
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_CMB(-1:1,3)
+!
+      integer(kind = kint) :: inod, j
+!
+!
+!$omp parallel do private(inod)
+      do j = 1, jmax
+        inod = j + (kr_out-1) * jmax
+!
+        d_rj(inod,is_fld) = (fdm2_fix_dr_CMB( 1,3) + two*r_CMB(1))      &
+     &                     * flux_CMB(j)
+      end do
+!$omp end parallel do
+!
+      end subroutine poisson_out_fixed_flux_sph
 !
 ! -----------------------------------------------------------------------
 !

@@ -49,12 +49,14 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
 !
 !
-      call order_b_trans_vector_fdout(ncomp, nvector)
-      call clear_b_trans_field_fdout(ncomp)
+      call order_b_trans_vector_fdout(ncomp, nvector,                   &
+     &    sp_rlm_fdout(1,1))
+      call clear_b_trans_field_fdout(ione, 3*nvector)
 !
-      call legendre_b_trans_vector_fdout(nvector)
+      call legendre_b_trans_vector_fdout(nvector,                       &
+     &    sp_rlm_fdout(1,1), vr_rtm_fdout(1,1))
 !
-      call back_b_trans_vector_fdout(ncomp, nvector)
+      call back_b_trans_vector_fdout(ncomp, nvector, vr_rtm_fdout(1,1))
 !
       end subroutine leg_bwd_trans_vector_fdout
 !
@@ -66,14 +68,19 @@
       use legendre_bwd_trans_fdout
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      integer(kind = kint) :: ist_fld
 !
 !
-      call order_b_trans_scalar_fdout(ncomp, nvector, nscalar)
-      call clear_b_trans_field_fdout(ncomp)
+      ist_fld = 3*nvector+1
+      call order_b_trans_scalar_fdout(ncomp, nvector, nscalar,          &
+     &    sp_rlm_fdout(1,ist_fld))
+      call clear_b_trans_field_fdout(ist_fld, 3*nvector+nscalar)
 !
-      call legendre_b_trans_scalar_fdout(nscalar)
+      call legendre_b_trans_scalar_fdout(nscalar,                       &
+     &    sp_rlm_fdout(1,ist_fld), vr_rtm_fdout(1,ist_fld))
 !
-      call back_b_trans_scalar_fdout(ncomp, nvector, nscalar)
+      call back_b_trans_scalar_fdout(ncomp, nvector, nscalar,           &
+     &    vr_rtm_fdout(1,ist_fld))
 !
       end subroutine leg_bwd_trans_scalar_fdout
 !
@@ -88,12 +95,14 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
 !
 !
-      call order_f_trans_vector_fdout(ncomp, nvector)
-      call clear_f_trans_field_fdout(ncomp)
+      call order_f_trans_vector_fdout(ncomp, nvector,                   &
+     &    vr_rtm_fdout(1,1))
+      call clear_f_trans_field_fdout(ione, 3*nvector)
 !
-      call legendre_f_trans_vector_fdout(nvector)
+      call legendre_f_trans_vector_fdout(nvector,                       &
+     &    vr_rtm_fdout(1,1), sp_rlm_fdout(1,1))
 !
-      call back_f_trans_vector_fdout(ncomp, nvector)
+      call back_f_trans_vector_fdout(ncomp, nvector, sp_rlm_fdout(1,1))
 !
       end subroutine leg_fwd_trans_vector_fdout
 !
@@ -105,14 +114,19 @@
       use legendre_fwd_trans_fdout
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      integer(kind = kint) :: ist_fld
 !
 !
-      call order_f_trans_scalar_fdout(ncomp, nvector, nscalar)
-      call clear_f_trans_field_fdout(ncomp)
+      ist_fld = 3*nvector+1
+      call order_f_trans_scalar_fdout(ncomp, nvector, nscalar,          &
+     &    vr_rtm_fdout(1,ist_fld))
+      call clear_f_trans_field_fdout(ist_fld, nvector+nscalar)
 !
-      call legendre_f_trans_scalar_fdout(nscalar)
+      call legendre_f_trans_scalar_fdout(nscalar,                       &
+     &    vr_rtm_fdout(1,ist_fld), sp_rlm_fdout(1,ist_fld))
 !
-      call back_f_trans_scalar_fdout(ncomp, nvector, nscalar)
+      call back_f_trans_scalar_fdout(ncomp, nvector, nscalar,           &
+     &    sp_rlm_fdout(1,ist_fld))
 !
       end subroutine leg_fwd_trans_scalar_fdout
 !

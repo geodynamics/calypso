@@ -44,9 +44,8 @@
 !
       private :: hd_model, hd_control, i_model, i_control
 !
-      private :: read_sph_noviz_mhd_ctl_data
-      private :: read_sph_noviz_mhd_model
-      private :: read_sph_noviz_mhd_control
+      private :: read_sph_mhd_control_data
+      private :: read_sph_mhd_model, read_sph_mhd_control
 !
 ! ----------------------------------------------------------------------
 !
@@ -61,7 +60,7 @@
       open ( ctl_file_code, file = MHD_ctl_name, status='old' )
 !
       call load_ctl_label_and_line
-      call read_sph_noviz_mhd_ctl_data
+      call read_sph_mhd_control_data
 !
       close(ctl_file_code)
 !
@@ -76,7 +75,7 @@
       open ( ctl_file_code, file = snap_ctl_name, status='old' )
 !
       call load_ctl_label_and_line
-      call read_sph_noviz_mhd_ctl_data
+      call read_sph_mhd_control_data
 !
       close(ctl_file_code)
 !
@@ -85,7 +84,7 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine read_sph_noviz_mhd_ctl_data
+      subroutine read_sph_mhd_control_data
 !
       use calypso_mpi
       use m_ctl_data_4_platforms
@@ -106,19 +105,19 @@
         call read_ctl_data_4_platform
         call read_ctl_data_4_org_data
 !
-        call read_sph_noviz_mhd_model
-        call read_sph_noviz_mhd_control
+        call read_sph_mhd_model
+        call read_sph_mhd_control
 !
         call read_monitor_data_ctl
         call read_pickup_sph_ctl
       end do
 !
-      end subroutine read_sph_noviz_mhd_ctl_data
+      end subroutine read_sph_mhd_control_data
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_sph_noviz_mhd_model
+      subroutine read_sph_mhd_model
 !
       use m_ctl_data_4_fields
       use m_ctl_data_mhd_evolution
@@ -155,11 +154,11 @@
         call read_temp_def
       end do
 !
-      end subroutine read_sph_noviz_mhd_model
+      end subroutine read_sph_mhd_model
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_sph_noviz_mhd_control
+      subroutine read_sph_mhd_control
 !
       use m_ctl_data_4_time_steps
       use m_ctl_data_mhd_evo_scheme
@@ -180,7 +179,7 @@
         call read_time_loop_ctl
       end do
 !
-      end subroutine read_sph_noviz_mhd_control
+      end subroutine read_sph_mhd_control
 !
 !   --------------------------------------------------------------------
 !

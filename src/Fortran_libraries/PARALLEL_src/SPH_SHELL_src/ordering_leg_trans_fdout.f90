@@ -9,15 +9,23 @@
 !!       (innermost loop is spherical harmonics)
 !!
 !!@verbatim
-!!      subroutine order_b_trans_vector_fdout(ncomp, nvector)
-!!      subroutine order_b_trans_scalar_fdout(ncomp, nvector, nscalar)
-!!      subroutine order_f_trans_vector_fdout(ncomp, nvector)
-!!      subroutine order_f_trans_scalar_fdout(ncomp, nvector, nscalar)
+!!      subroutine order_b_trans_vector_fdout(ncomp, nvector,           &
+!!     &          sp_rlm_fdout)
+!!      subroutine order_b_trans_scalar_fdout(ncomp, nvector, nscalar,  &
+!!     &          sp_rlm_fdout)
+!!      subroutine order_f_trans_vector_fdout(ncomp, nvector,           &
+!!     &          vr_rtm_fdout)
+!!      subroutine order_f_trans_scalar_fdout(ncomp, nvector, nscalar,  &
+!!     &          vr_rtm_fdout)
 !!
-!!      subroutine back_f_trans_vector_fdout(ncomp, nvector)
-!!      subroutine back_f_trans_scalar_fdout(ncomp, nvector, nscalar)
-!!      subroutine back_b_trans_vector_fdout(ncomp, nvector)
-!!      subroutine back_b_trans_scalar_fdout(ncomp, nvector, nscalar)
+!!      subroutine back_f_trans_vector_fdout(ncomp, nvector             &
+!!     &          sp_rlm_fdout)
+!!      subroutine back_f_trans_scalar_fdout(ncomp, nvector, nscalar,   &
+!!     &          sp_rlm_fdout)
+!!      subroutine back_b_trans_vector_fdout(ncomp, nvector,            &
+!!     &          vr_rtm_fdout)
+!!      subroutine back_b_trans_scalar_fdout(ncomp, nvector, nscalar,   &
+!!     &          vr_rtm_fdout)
 !!@endverbatim
 !!
 !!@param   ncomp    Total number of components for spherical transform
@@ -35,7 +43,6 @@
       use m_spheric_param_smp
       use m_schmidt_poly_on_rtm
       use m_work_4_sph_trans
-      use m_work_4_sph_trans_fdout
 !
       implicit none
 !
@@ -45,9 +52,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine order_b_trans_vector_fdout(ncomp, nvector)
+      subroutine order_b_trans_vector_fdout(ncomp, nvector,             &
+     &          sp_rlm_fdout)
 !
       integer(kind = kint), intent(in) :: ncomp, nvector
+      real(kind = kreal), intent(inout)                                 &
+     &      :: sp_rlm_fdout(nnod_rlm,3*nvector)
 !
       integer(kind = kint) :: ip, ist, ied, inod
       integer(kind = kint) :: k_rlm, j_rlm, nd, kr_nd
@@ -81,9 +91,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine order_b_trans_scalar_fdout(ncomp, nvector, nscalar)
+      subroutine order_b_trans_scalar_fdout(ncomp, nvector, nscalar,    &
+     &          sp_rlm_fdout)
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      real(kind = kreal), intent(inout)                                 &
+     &      :: sp_rlm_fdout(nnod_rlm,nscalar)
 !
       integer(kind = kint) :: ip, ist, ied, inod
       integer(kind = kint) :: k_rlm, j_rlm, nd, kr_nd
@@ -116,9 +129,12 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine order_f_trans_vector_fdout(ncomp, nvector)
+      subroutine order_f_trans_vector_fdout(ncomp, nvector,             &
+     &          vr_rtm_fdout)
 !
       integer(kind = kint), intent(in) :: ncomp, nvector
+      real(kind = kreal), intent(inout)                                 &
+     &      :: vr_rtm_fdout(nnod_rtm,3*nvector)
 !
       integer(kind = kint) :: ip, ist, ied, inod, lnod
       integer(kind = kint) :: i_rtm_0, k_rtm, l_rtm, m_rtm
@@ -157,9 +173,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine order_f_trans_scalar_fdout(ncomp, nvector, nscalar)
+      subroutine order_f_trans_scalar_fdout(ncomp, nvector, nscalar,    &
+     &          vr_rtm_fdout)
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      real(kind = kreal), intent(inout)                                 &
+     &      :: vr_rtm_fdout(nnod_rtm,nscalar)
 !
       integer(kind = kint) :: ip, ist, ied, inod, lnod
       integer(kind = kint) :: i_rtm_0, k_rtm, l_rtm, m_rtm
@@ -195,9 +214,12 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine back_f_trans_vector_fdout(ncomp, nvector)
+      subroutine back_f_trans_vector_fdout(ncomp, nvector,             &
+     &          sp_rlm_fdout)
 !
       integer(kind = kint), intent(in) :: ncomp, nvector
+      real(kind = kreal), intent(in)                                    &
+     &      :: sp_rlm_fdout(nnod_rlm,3*nvector)
 !
       integer(kind = kint) :: ip, ist, ied, inum, inod
       integer(kind = kint) :: k_rlm, j_rlm, i_rlm_0
@@ -228,9 +250,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine back_f_trans_scalar_fdout(ncomp, nvector, nscalar)
+      subroutine back_f_trans_scalar_fdout(ncomp, nvector, nscalar,     &
+     &          sp_rlm_fdout)
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      real(kind = kreal), intent(in) :: sp_rlm_fdout(nnod_rlm,nscalar)
 !
       integer(kind = kint) :: ip, ist, ied, inum, inod
       integer(kind = kint) :: k_rlm, j_rlm, i_rlm_0
@@ -260,9 +284,12 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine back_b_trans_vector_fdout(ncomp, nvector)
+      subroutine back_b_trans_vector_fdout(ncomp, nvector,              &
+     &          vr_rtm_fdout)
 !
       integer(kind = kint), intent(in) :: ncomp, nvector
+      real(kind = kreal), intent(in)                                    &
+     &      :: vr_rtm_fdout(nnod_rtm,3*nvector)
 !
       integer(kind = kint) :: ip, ist, ied, inum, inod, lnod
       integer(kind = kint) :: i_rtm_0, k_rtm, l_rtm, m_rtm
@@ -301,9 +328,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine back_b_trans_scalar_fdout(ncomp, nvector, nscalar)
+      subroutine back_b_trans_scalar_fdout(ncomp, nvector, nscalar,     &
+     &          vr_rtm_fdout)
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      real(kind = kreal), intent(in) :: vr_rtm_fdout(nnod_rtm,nscalar)
 !
       integer(kind = kint) :: ip, ist, ied, inum, inod, lnod
       integer(kind = kint) :: i_rtm_0, k_rtm, l_rtm, m_rtm

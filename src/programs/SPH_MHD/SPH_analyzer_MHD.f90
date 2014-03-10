@@ -70,8 +70,6 @@
       call set_sph_sprctr_data_address
       call set_sph_nod_data_address
 !
-!      if(iflag_debug .gt. 0) call check_add_trans_sph_MHD
-!
       if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr'
       call init_rms_4_sph_spectr
 !

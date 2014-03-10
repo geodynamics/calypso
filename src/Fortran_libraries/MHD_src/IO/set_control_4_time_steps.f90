@@ -25,7 +25,6 @@
 !
       implicit  none
 !
-      private :: set_control_4_initial
       private :: set_monitor_param_4_flex_step
       private :: set_fixed_time_step_controls
 !
@@ -38,12 +37,13 @@
       subroutine s_set_control_4_time_steps
 !
       use m_ctl_data_mhd_evo_scheme
+      use m_initial_field_control
       use cal_num_digits
 !
 !
 !  control for restert
 !
-      call set_control_4_initial
+      call set_initial_field_id
 !
         iflag_flexible_step = iflag_fixed_step
         if(i_flexible_step .gt. 0) then
@@ -247,93 +247,6 @@
       end subroutine set_flex_time_step_controls
 !
 ! -----------------------------------------------------------------------
-!
-      subroutine set_control_4_initial
-!
-      use m_ctl_data_mhd_evo_scheme
-      use m_initial_field_control
-!
-!  control for restert
-!
-        if (i_rst_flag.eq.0.0d0) then
-          e_message  = 'Set initial condition'
-          call calypso_MPI_abort(90, e_message)
-        else
-          if(     restart_flag_ctl .eq. '0'                             &
-     &       .or. restart_flag_ctl .eq. 'no_data'                       &
-     &       .or. restart_flag_ctl .eq. 'No_data'                       &
-     &       .or. restart_flag_ctl .eq. 'NO_DATA') then
-            iflag_restart = i_rst_no_file
-          else if(restart_flag_ctl .eq. '1'                             &
-     &       .or. restart_flag_ctl .eq. 'start_from_rst_file'           &
-     &       .or. restart_flag_ctl .eq. 'Start_from_rst_file'           &
-     &       .or. restart_flag_ctl .eq. 'START_FROM_RST_FILE') then
-            iflag_restart = i_rst_by_file
-          else if(restart_flag_ctl .eq. '-1'                            &
-     &       .or. restart_flag_ctl .eq. 'dynamo_benchmark_0'            &
-     &       .or. restart_flag_ctl .eq. 'Dynamo_benchmark_0'            &
-     &       .or. restart_flag_ctl .eq. 'DYNAMO_BENCHMARK_0') then
-            iflag_restart = i_rst_dbench0
-          else if(restart_flag_ctl .eq. '-2'                            &
-     &       .or. restart_flag_ctl .eq. 'dynamo_benchmark_1'            &
-     &       .or. restart_flag_ctl .eq. 'Dynamo_benchmark_1'            &
-     &       .or. restart_flag_ctl .eq. 'DYNAMO_BENCHMARK_1') then
-            iflag_restart = i_rst_dbench1
-          else if(restart_flag_ctl .eq. '-2'                            &
-     &       .or. restart_flag_ctl .eq. 'dynamo_benchmark_2'            &
-     &       .or. restart_flag_ctl .eq. 'Dynamo_benchmark_2'            &
-     &       .or. restart_flag_ctl .eq. 'DYNAMO_BENCHMARK_2') then
-            iflag_restart = i_rst_dbench2
-          else if(restart_flag_ctl .eq. '-3'                            &
-     &       .or. restart_flag_ctl .eq. 'pseudo_vacuum_benchmark'       &
-     &       .or. restart_flag_ctl .eq. 'Pseudo_vacuum_benchmark'       &
-     &       .or. restart_flag_ctl .eq. 'PSEUDO_VACUUM_BENCHMARK') then
-            iflag_restart = i_rst_dbench_qcv
-          else if(restart_flag_ctl .eq. '-11'                           &
-     &       .or. restart_flag_ctl .eq. 'rotate_x'                      &
-     &       .or. restart_flag_ctl .eq. 'Rotate_x'                      &
-     &       .or. restart_flag_ctl .eq. 'ROTATE_X') then
-            iflag_restart = i_rst_rotate_x
-          else if(restart_flag_ctl .eq. '-12'                           &
-     &       .or. restart_flag_ctl .eq. 'rotate_y'                      &
-     &       .or. restart_flag_ctl .eq. 'Rotate_y'                      &
-     &       .or. restart_flag_ctl .eq. 'ROTATE_Y') then
-            iflag_restart = i_rst_rotate_y
-          else if(restart_flag_ctl .eq. '-13'                           &
-     &       .or. restart_flag_ctl .eq. 'rotate_z'                      &
-     &       .or. restart_flag_ctl .eq. 'Rotate_z'                      &
-     &       .or. restart_flag_ctl .eq. 'ROTATE_Z') then
-            iflag_restart = i_rst_rotate_z
-          else if(restart_flag_ctl .eq. '20'                            &
-     &       .or. restart_flag_ctl .eq. 'kinematic'                     &
-     &       .or. restart_flag_ctl .eq. 'Kinematic'                     &
-     &       .or. restart_flag_ctl .eq. 'KINEMATIC') then
-            iflag_restart = i_rst_kinematic
-          else if(restart_flag_ctl .eq. '-20'                           &
-     &       .or. restart_flag_ctl .eq. 'linear_conveciton'             &
-     &       .or. restart_flag_ctl .eq. 'Linear_conveciton'             &
-     &       .or. restart_flag_ctl .eq. 'LINEAR_CONVECTION') then
-            iflag_restart = i_rst_licv
-          end if
-        end if
-!
-        if (iflag_restart .eq. i_rst_no_file) then
-          if (i_dt .eq. 0) then
-            e_message  = 'Set initial time'
-            call calypso_MPI_abort(90, e_message)
-          else
-            time_init = time_init_ctl
-          end if
-        end if
-!
-      if (iflag_debug .ge. iflag_routine_msg) then
-        write(*,*) 'iflag_restart ',iflag_restart
-        write(*,*) 'time_init ',time_init
-      end if
-!
-      end subroutine set_control_4_initial
-!
-!-----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine set_monitor_param_4_flex_step(istep_def,               &

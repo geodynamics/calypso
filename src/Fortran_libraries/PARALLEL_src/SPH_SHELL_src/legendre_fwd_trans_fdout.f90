@@ -9,10 +9,10 @@
 !!       (outmost field loop version)
 !!
 !!@verbatim
-!!      subroutine legendre_f_trans_vector_fdout(nvector)
-!!        Input:  vr_rtm_fdout   (Order: radius,theta,phi)
-!!        Output: sp_rlm_fdout   (Order: poloidal,diff_poloidal,toroidal)
-!!      subroutine legendre_f_trans_scalar_fdout(nscalar)
+!!      subroutine legendre_f_trans_vector_fdout(nvector,               &
+!!     &          vr_rtm_fdout, sp_rlm_fdout)
+!!      subroutine legendre_f_trans_scalar_fdout(nscalar,               &
+!!     &          vr_rtm_fdout, sp_rlm_fdout)
 !!        Input:  vr_rtm_fdout
 !!        Output: sp_rlm_fdout
 !!@endverbatim
@@ -30,7 +30,6 @@
       use m_spheric_param_smp
       use m_schmidt_poly_on_rtm
       use m_work_4_sph_trans
-      use m_work_4_sph_trans_fdout
 !
       implicit none
 !
@@ -40,9 +39,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_f_trans_vector_fdout(nvector)
+      subroutine legendre_f_trans_vector_fdout(nvector,                 &
+     &          vr_rtm_fdout, sp_rlm_fdout)
 !
       integer(kind = kint), intent(in) :: nvector
+      real(kind = kreal), intent(in)                                    &
+     &      :: vr_rtm_fdout(nnod_rtm,3*nvector)
+      real(kind = kreal), intent(inout)                                 &
+     &      :: sp_rlm_fdout(nnod_rlm,3*nvector)
 !
       integer(kind = kint) :: i_rlm, k_rlm, j_rlm
       integer(kind = kint) :: l_rtm
@@ -99,9 +103,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_f_trans_scalar_fdout(nscalar)
+      subroutine legendre_f_trans_scalar_fdout(nscalar,                 &
+     &          vr_rtm_fdout, sp_rlm_fdout)
 !
       integer(kind = kint), intent(in) :: nscalar
+      real(kind = kreal), intent(in)                                    &
+     &      :: vr_rtm_fdout(nnod_rtm,nscalar)
+      real(kind = kreal), intent(inout)                                 &
+     &      :: sp_rlm_fdout(nnod_rlm,nscalar)
 !
       integer(kind = kint) :: i_rlm, k_rlm, j_rlm
       integer(kind = kint) :: l_rtm

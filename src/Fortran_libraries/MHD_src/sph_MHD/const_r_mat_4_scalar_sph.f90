@@ -37,7 +37,7 @@
 !
 !
       call const_radial_mat_4_scalar_sph(nidx_rj(1), nidx_rj(2),        &
-     &    sph_bc_T, coef_imp_t, coef_d_temp, temp_evo_mat,              &
+     &    sph_bc_T, coef_imp_t, coef_temp, coef_d_temp, temp_evo_mat,   &
      &    temp_evo_lu, temp_evo_det, i_temp_pivot)
 !
       end subroutine const_radial_mat_4_temp_sph
@@ -53,16 +53,18 @@
 !
 !
       call const_radial_mat_4_scalar_sph(nidx_rj(1), nidx_rj(2),        &
-     &    sph_bc_C, coef_imp_c, coef_d_light, composit_evo_mat,         &
-     &    composit_evo_lu, composit_evo_det, i_composit_pivot)
+     &    sph_bc_C, coef_imp_c, coef_light, coef_d_light,               &
+     &    composit_evo_mat, composit_evo_lu, composit_evo_det,          &
+     &    i_composit_pivot)
 !
       end subroutine const_radial_mat_4_composit_sph
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_radial_mat_4_scalar_sph(nri, jmax, sph_bc,       &
-     &          coef_imp, coef_d, evo_mat3, evo_lu, evo_det, i_pivot)
+      subroutine const_radial_mat_4_scalar_sph                          &
+     &         (nri, jmax, sph_bc, coef_imp, coef_f, coef_d,            &
+     &          evo_mat3, evo_lu, evo_det, i_pivot)
 !
       use m_spheric_param_smp
       use m_coef_fdm_to_center
@@ -74,7 +76,7 @@
 !
       integer(kind = kint), intent(in) :: nri, jmax
       type(sph_boundary_type), intent(in) :: sph_bc
-      real(kind = kreal) :: coef_imp, coef_d
+      real(kind = kreal) :: coef_imp, coef_f, coef_d
       real(kind = kreal), intent(inout) :: evo_mat3(3,nri,jmax)
       real(kind = kreal), intent(inout) :: evo_lu(5,nri,jmax)
       real(kind = kreal), intent(inout) :: evo_det(nri,jmax)
@@ -86,7 +88,7 @@
       real(kind = kreal) :: coef
 !
 !
-      if(coef_d .eq. zero) then
+      if(coef_f .eq. zero) then
         coef = one
         call set_unit_mat_4_poisson                                     &
      &     (nri, jmax, sph_bc%kr_in, sph_bc%kr_out, evo_mat3)

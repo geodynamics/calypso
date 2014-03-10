@@ -1,39 +1,42 @@
-!t_group_data.f90
-!      module t_group_data
+!>@file   t_group_data.f90
+!!@brief  module t_group_data
+!!
+!!@author H. Matsui
+!!@date Programmed in Nov., 2008
 !
 !> @brief Structure of group data
 !
-!>    Substitution of 
+!>@n    Substitution of 
 !>@n        (module m_node_group)
 !>@n        (module m_element_group)
 !>@n        (module m_surface_group)
-!
-!     Written by H. Matsui on Nov., 2008
-!
-!      subroutine allocate_grp_type_num(grp)
-!      subroutine allocate_grp_type_item(grp)
-!      subroutine allocate_grp_type_smp(grp)
-!      subroutine allocate_sf_grp_type_num(sf_grp)
-!      subroutine allocate_sf_grp_type_item(sf_grp)
-!      subroutine allocate_sf_grp_type_smp(grp)
-!
-!      subroutine deallocate_grp_type_num(grp)
-!      subroutine deallocate_grp_type_item(grp)
-!      subroutine deallocate_grp_type_smp(grp)
-!      subroutine deallocate_sf_grp_type_num(sf_grp)
-!      subroutine deallocate_sf_grp_type_item(sf_grp)
-!      subroutine deallocate_sf_grp_type_smp(grp)
-!
-!      subroutine link_group_type(grp_org, grp_new)
-!      subroutine link_surf_group_type(sf_grp_org, sf_grp_new)
-!      subroutine unlink_group_type(grp)
-!      subroutine unlink_surf_group_type(sf_grp)
-!
-!      subroutine check_group_type_data(my_rank, grp)
-!      subroutine check_surf_grp_type_data(my_rank, sf_grp)
-!        integer(kind = kint), intent(in) :: my_rank
-!        type(group_data), intent(in) :: grp
-!        type(surface_group_data), intent(in) :: sf_grp
+!!
+!!@verbatim
+!!      subroutine allocate_grp_type_num(grp)
+!!      subroutine allocate_grp_type_item(grp)
+!!      subroutine allocate_grp_type_smp(grp)
+!!      subroutine allocate_sf_grp_type_num(sf_grp)
+!!      subroutine allocate_sf_grp_type_item(sf_grp)
+!!      subroutine allocate_sf_grp_type_smp(grp)
+!!
+!!      subroutine deallocate_grp_type_num(grp)
+!!      subroutine deallocate_grp_type_item(grp)
+!!      subroutine deallocate_grp_type_smp(grp)
+!!      subroutine deallocate_sf_grp_type_num(sf_grp)
+!!      subroutine deallocate_sf_grp_type_item(sf_grp)
+!!      subroutine deallocate_sf_grp_type_smp(grp)
+!!
+!!      subroutine link_group_type(grp_org, grp_new)
+!!      subroutine link_surf_group_type(sf_grp_org, sf_grp_new)
+!!      subroutine unlink_group_type(grp)
+!!      subroutine unlink_surf_group_type(sf_grp)
+!!
+!!      subroutine check_group_type_data(my_rank, grp)
+!!      subroutine check_surf_grp_type_data(my_rank, sf_grp)
+!!        integer(kind = kint), intent(in) :: my_rank
+!!        type(group_data), intent(in) :: grp
+!!        type(surface_group_data), intent(in) :: sf_grp
+!!@endverbatim
 !
       module t_group_data
 !

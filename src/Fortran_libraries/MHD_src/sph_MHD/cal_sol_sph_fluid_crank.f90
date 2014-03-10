@@ -136,18 +136,6 @@
       use m_boundary_params_sph_MHD
       use set_reference_sph_mhd
 !
-      integer(kind = kint) :: k, inod, icmb, j
-!
-!
-!      j = find_local_sph_mode_address(14, -9)
-!      if (j .gt.0 ) then
-!        write(171,*) 'k, l=14,m=-9, inod, div_v'
-!        do k = 1, sph_bc_U%kr_out
-!            inod = (k-1)*nidx_rj(2) + j
-!            write(171,'(2i10,1p9E25.15e3)') k,                         &
-!     &              j, d_rj(inod,ipol%i_press)
-!        end do
-!      end if
 !
       call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &
      &    nidx_rj(2), nidx_rj(1), p_poisson_lu, i_p_pivot,              &
@@ -155,15 +143,6 @@
 !
       call adjust_by_ave_pressure_on_CMB                                &
      &   (sph_bc_U%kr_in, sph_bc_U%kr_out)
-!
-!      if (idx_rj_degree_zero .gt. 0) then
-!        icmb = (sph_bc_U%kr_out-1)*nidx_rj(2) + idx_rj_degree_zero
-!        do k = 1, sph_bc_U%kr_out
-!          inod = (k-1)*nidx_rj(2) + idx_rj_degree_zero
-!          d_rj(inod,ipol%i_press) = d_rj(inod,ipol%i_press)            &
-!     &                         - d_rj(icmb,ipol%i_press)
-!        end do
-!      end if
 !
       end subroutine cal_sol_pressure_by_div_v
 !
@@ -219,25 +198,33 @@
       use m_boundary_params_sph_MHD
       use set_scalar_boundary_sph
 !
-      if (sph_bc_T%iflag_icb .eq. iflag_fixed_flux) then
+!
+      if (sph_bc_T%iflag_icb .eq. iflag_fixed_field) then
+        call set_fixed_scalar_sph(nidx_rj(2), ione, sph_bc_T%kr_in,     &
+     &      ipol%i_temp, sph_bc_T%ICB_fld)
+      else if(coef_temp .ne. 0.0d0) then
         call adjust_in_fixed_flux_sph(nidx_rj(2),                       &
      &      sph_bc_T%kr_in, sph_bc_T%r_ICB, sph_bc_T%fdm2_fix_dr_ICB,   &
      &      sph_bc_T%ICB_flux, coef_d_temp, coef_imp_t, dt,             &
      &      ipol%i_temp)
       else
-        call set_fixed_scalar_sph(nidx_rj(2), ione, sph_bc_T%kr_in,     &
-     &      ipol%i_temp, sph_bc_T%ICB_fld)
+        call poisson_in_fixed_flux_sph(nidx_rj(2),                      &
+     &      sph_bc_T%kr_in, sph_bc_T%r_ICB, sph_bc_T%fdm2_fix_dr_ICB,   &
+     &      sph_bc_T%ICB_flux, ipol%i_temp)
       end if
 !
-      if (sph_bc_T%iflag_cmb .eq. iflag_fixed_flux) then
+      if (sph_bc_T%iflag_cmb .eq. iflag_fixed_field) then
+        call set_fixed_scalar_sph(nidx_rj(2), sph_bc_T%kr_out,          &
+     &     nidx_rj(1), ipol%i_temp, sph_bc_T%CMB_fld)
+      else if(coef_temp .ne. 0.0d0) then
         call adjust_out_fixed_flux_sph(nidx_rj(2),                      &
      &      sph_bc_T%kr_out, sph_bc_T%r_CMB, sph_bc_T%fdm2_fix_dr_CMB,  &
      &      sph_bc_T%CMB_flux, coef_d_temp, coef_imp_t, dt,             &
      &      ipol%i_temp)
       else
-        call set_fixed_scalar_sph                                       &
-     &     (nidx_rj(2), sph_bc_T%kr_out, nidx_rj(1),                    &
-     &     ipol%i_temp, sph_bc_T%CMB_fld)
+        call poisson_out_fixed_flux_sph(nidx_rj(2),                     &
+     &      sph_bc_T%kr_out, sph_bc_T%r_CMB, sph_bc_T%fdm2_fix_dr_CMB,  &
+     &      sph_bc_T%CMB_flux, ipol%i_temp)
       end if
 !
       call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &
@@ -256,25 +243,32 @@
       use set_scalar_boundary_sph
 !
 !
-      if (sph_bc_C%iflag_icb .eq. iflag_fixed_flux) then
+      if (sph_bc_C%iflag_icb .eq. iflag_fixed_field) then
+        call set_fixed_scalar_sph(nidx_rj(2), ione, sph_bc_C%kr_in,     &
+     &      ipol%i_light, sph_bc_C%ICB_fld)
+      else if(coef_light .ne. 0.0d0) then
         call adjust_in_fixed_flux_sph(nidx_rj(2),                       &
      &      sph_bc_C%kr_in, sph_bc_C%r_ICB, sph_bc_C%fdm2_fix_dr_ICB,   &
      &      sph_bc_C%ICB_flux, coef_d_light, coef_imp_c, dt,            &
      &      ipol%i_light)
       else
-        call set_fixed_scalar_sph(nidx_rj(2), ione, sph_bc_C%kr_in,     &
-     &      ipol%i_light, sph_bc_C%ICB_fld)
+        call poisson_in_fixed_flux_sph(nidx_rj(2),                      &
+     &      sph_bc_C%kr_in, sph_bc_C%r_ICB, sph_bc_C%fdm2_fix_dr_ICB,   &
+     &      sph_bc_C%ICB_flux, ipol%i_light)
       end if
 !
-      if (sph_bc_C%iflag_cmb .eq. iflag_fixed_flux) then
+      if (sph_bc_C%iflag_cmb .eq. iflag_fixed_field) then
+        call set_fixed_scalar_sph(nidx_rj(2), sph_bc_C%kr_out,          &
+     &      nidx_rj(1), ipol%i_light, sph_bc_C%CMB_fld)
+      else if(coef_light .ne. 0.0d0) then
         call adjust_out_fixed_flux_sph(nidx_rj(2),                      &
      &      sph_bc_C%kr_out, sph_bc_C%r_CMB, sph_bc_C%fdm2_fix_dr_CMB,  &
      &      sph_bc_C%CMB_flux, coef_d_light, coef_imp_c, dt,            &
      &      ipol%i_light)
       else
-        call set_fixed_scalar_sph                                       &
-     &     (nidx_rj(2), sph_bc_C%kr_out, nidx_rj(1),                    &
-     &      ipol%i_light, sph_bc_C%CMB_fld)
+        call poisson_out_fixed_flux_sph(nidx_rj(2),                     &
+     &      sph_bc_C%kr_out, sph_bc_C%r_CMB, sph_bc_C%fdm2_fix_dr_CMB,  &
+     &      sph_bc_C%CMB_flux, ipol%i_light)
       end if
 !
       call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &

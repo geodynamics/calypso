@@ -32,15 +32,17 @@
       use copy_time_steps_4_restart
 !      use range_data_IO
 !
+      integer(kind = kint) :: istep_ucd
+!
 !
       if(i_step_output_ucd .eq. 0) return
       if(mod(istep_max_dt,i_step_output_ucd) .ne. 0) return
 !
-      ucd_step = istep_max_dt / i_step_output_ucd
+      istep_ucd = istep_max_dt / i_step_output_ucd
 !
       call copy_time_steps_to_restart
-      call sel_write_parallel_ucd_file(ucd_step, fem_ucd, merged_ucd)
-!      call output_range_data
+      call sel_write_parallel_ucd_file(istep_ucd, fem_ucd, merged_ucd)
+!      call output_range_data(istep_ucd, time)
 !
       end subroutine s_output_ucd_file_control
 !

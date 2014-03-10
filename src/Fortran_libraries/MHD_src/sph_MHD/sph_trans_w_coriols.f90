@@ -156,7 +156,7 @@
       call start_eleps_time(13)
       if(iflag_debug .gt. 0) write(*,*) 'copy_coriolis_terms_rlm'
       call copy_coriolis_terms_rlm(ncomp_trans, sp_rlm)
-      call end_eleps_time(24)
+      call end_eleps_time(13)
 !
       START_SRtime= MPI_WTIME()
       call start_eleps_time(21)

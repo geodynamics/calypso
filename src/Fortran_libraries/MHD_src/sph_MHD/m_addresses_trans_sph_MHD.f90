@@ -48,6 +48,8 @@
       use m_control_parameter
       use m_work_4_sph_trans
 !
+      integer(kind = kint) :: ncomp_fwd, ncomp_bwd
+!
 !
       nvector_rj_2_rtp = 0
       nscalar_rj_2_rtp = 0
@@ -140,6 +142,10 @@
       nb_sph_trans = max(nb_sph_trans,nvector_rtp_2_rj)
       nb_sph_trans = max(nb_sph_trans,nscalar_rtp_2_rj)
 !
+      ncomp_bwd = 3*nvector_rj_2_rtp + nscalar_rj_2_rtp
+      ncomp_fwd = 3*nvector_rtp_2_rj + nscalar_rtp_2_rj
+      ncomp_sph_trans = max(ncomp_bwd,ncomp_fwd)
+!
       end subroutine set_addresses_trans_sph_MHD
 !
 !-----------------------------------------------------------------------
@@ -150,7 +156,8 @@
       use m_work_4_sph_trans
 !
 !
-      write(*,*) 'nb_sph_trans   ', nb_sph_trans
+      write(*,*) 'nb_sph_trans    ', nb_sph_trans
+      write(*,*) 'ncomp_sph_trans ', ncomp_sph_trans
 !
       write(*,*) 'nvector_rj_2_rtp  ', nvector_rj_2_rtp
       if(b_trns%i_velo .gt. 0) write(*,*) 'b_trns%i_velo  ',            &
@@ -201,8 +208,7 @@
       write(*,*) 'nscalar_rtp_2_rj  ', nscalar_rtp_2_rj
       if(f_trns%i_div_Coriolis .gt. 0) write(*,*)                       &
      &       'f_trns%i_div_Coriolis  ', f_trns%i_div_Coriolis,          &
-     &        irtp%i_div_Coriolis, ipol%i_div_Coriolis,                 &
-     &        itor%i_div_Coriolis, idpdr%i_div_Coriolis
+     &        irtp%i_div_Coriolis, ipol%i_div_Coriolis
       write(*,*)
 !
       end subroutine check_add_trans_sph_MHD

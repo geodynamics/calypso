@@ -1,12 +1,20 @@
+!>@file   m_schmidt_polynomial.f90
+!!@brief  module m_schmidt_polynomial
+!!
+!!@author H. Matsui
+!!@date Programmed in 1993
+!!@n    Modified in 2009
 !
-!     module m_schmidt_polynomial
-!.......................................................................
-!
-!      subroutine allocate_schmidt_polynomial
-!      subroutine deallocate_schmidt_polynomial
-!
-!      subroutine dlad
-!      subroutine dschmidt
+!> @brief Data array for Legendre polyonomials with
+!!        Schmidt normalization
+!!
+!!@verbatim
+!!      subroutine allocate_schmidt_polynomial
+!!      subroutine deallocate_schmidt_polynomial
+!!
+!!      subroutine dlad
+!!      subroutine dschmidt
+!!@endverbatim
 !
       module m_schmidt_polynomial
 !
@@ -19,7 +27,8 @@
       integer(kind = kint) :: nth = 10
       real(kind = kreal) :: dth
 !
-      real(kind = kreal), allocatable :: p(:,:), dp(:,:)
+      real(kind = kreal), allocatable :: p(:,:)
+      real(kind = kreal), allocatable :: dp(:,:)
 !
       real(kind = kreal), allocatable :: dplm(:,:)
       real(kind = kreal), allocatable :: dc(:,:)

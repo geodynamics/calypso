@@ -63,8 +63,8 @@
       integer(kind = kint), intent(in) :: i_rtp, i_field
 !
 !
-      call cvt_sph_vec_to_nod_vec                                       &
-     &   (numnod, np_smp, inod_smp_stack, colatitude, longitude,        &
+      call cvt_sph_vec_to_nod_vec(numnod, internal_node, np_smp,        &
+     &    inod_smp_stack, colatitude, longitude,                        &
      &    i_rtp, nnod_rtp, ntot_phys_rtp, d_rtp,                        &
      &    i_field, num_tot_nod_phys, d_nod, d_nod_rtp)
 !
@@ -96,7 +96,8 @@
       integer(kind = kint), intent(in) :: i_rtp, i_field
 !
 !
-      call cvt_sph_tsr_to_nod_tsr(numnod, np_smp, inod_smp_stack,       &
+      call cvt_sph_tsr_to_nod_tsr                                       &
+     &         (numnod, internal_node, np_smp, inod_smp_stack,          &
      &          xx, radius, s_cylinder, a_radius, a_s_cylinder,         &
      &          i_rtp, nnod_rtp, ntot_phys_rtp, d_rtp,                  &
      &          i_field, num_tot_nod_phys, d_nod, d_nod_rtp)

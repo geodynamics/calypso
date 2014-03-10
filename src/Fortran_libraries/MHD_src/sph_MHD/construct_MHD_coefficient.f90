@@ -54,6 +54,7 @@
      &          r_low_t, r_high_t)
 !
       use calypso_mpi
+      use skip_comment_f
 !
       integer (kind = kint), intent(in) :: num_dimless
       character(len=kchara), intent(in) :: name_dimless(num_dimless)
@@ -70,15 +71,16 @@
 !
 !
        do i = 1, num_coef
-         if (coef_name(i).eq.'One') then
+         if (cmp_no_case(coef_name(i), 'One') .gt. 0) then
            coef = coef * one
-         else if (coef_name(i).eq.'Two') then
+         else if(cmp_no_case(coef_name(i), 'Two') .gt. 0) then
            coef = coef * two**coef_power(i)
-         else if (coef_name(i).eq.'Zero') then
+         else if(cmp_no_case(coef_name(i), 'Zero') .gt. 0) then
            coef = coef * zero
-         else if (coef_name(i).eq.'Radial_parameter') then
+         else if(cmp_no_case(coef_name(i), 'Radial_parameter') .gt. 0)  &
+     &        then
            coef = coef * (one - r_high_t/r_low_t)
-         else if (coef_name(i).eq.'Radial_35') then
+         else if(cmp_no_case(coef_name(i), 'Radial_35').gt.0) then
            coef = coef * (one - 0.35d0)
          else
            iflag = 0

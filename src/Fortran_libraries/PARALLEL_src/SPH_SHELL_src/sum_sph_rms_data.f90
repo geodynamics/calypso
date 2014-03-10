@@ -80,9 +80,9 @@
       num_mode_sum_l =      0
       num_mode_sum_m =      0
       num_mode_sum_lm =     0
-      istack_mode_sum_l =  -1
-      istack_mode_sum_m =  -1
-      istack_mode_sum_lm = -1
+      istack_mode_sum_l =   0
+      istack_mode_sum_m =   0
+      istack_mode_sum_lm =  0
       item_mode_sum_l =     0
       item_mode_sum_m =     0
       item_mode_sum_lm =    0
@@ -213,6 +213,8 @@
      &          idx_gl_1d_rj_r, istack_sum, item_mode_4_sum,            &
      &          ntot_rms, rms_sph_dat, rms_sph_lc)
 !
+      use calypso_mpi
+!
       integer(kind = kint), intent(in) :: ltr, nidx_r, nidx_j
       integer(kind = kint), intent(in) :: idx_gl_1d_rj_r(nidx_r)
 !
@@ -230,8 +232,9 @@
       integer(kind = kint) :: lst, led
 !
 !
-!$omp parallel do private(icou,lm,lst,led,k,j,kg,l0)
+!$omp parallel private(icou,k)
       do icou = 1, ntot_rms
+!$omp do private(lm,lst,led,j,kg,l0)
         do k = 1, nidx_r
           kg = idx_gl_1d_rj_r(k)
           rms_sph_lc(0:ltr,kg,icou) = 0.0d0
@@ -247,8 +250,9 @@
             end do
           end do
         end do
+!$omp end do nowait
       end do
-!$omp end parallel do
+!$omp end parallel
 !
       end subroutine sum_sph_rms_by_degree
 !

@@ -166,7 +166,7 @@
 !
       call sel_scalar_diff_adv_src_euler(kr_in, kr_out,                 &
      &    ipol%i_t_diffuse, ipol%i_h_advect, ipol%i_heat_source,        &
-     &    ipol%i_temp, coef_exp_t, coef_h_src)
+     &    ipol%i_temp, coef_exp_t, coef_temp, coef_h_src)
 !
       end subroutine sel_heat_diff_adv_src_euler
 !
@@ -199,7 +199,7 @@
 !
       call sel_scalar_diff_adv_src_euler(kr_in, kr_out,                 &
      &    ipol%i_c_diffuse, ipol%i_c_advect, ipol%i_light_source,       &
-     &    ipol%i_light, coef_exp_c, coef_c_src)
+     &    ipol%i_light, coef_exp_c, coef_light, coef_c_src)
 !
       end subroutine sel_light_diff_adv_src_euler
 !

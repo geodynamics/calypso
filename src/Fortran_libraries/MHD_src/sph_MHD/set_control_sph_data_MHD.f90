@@ -99,6 +99,10 @@
         else if(cmp_no_case(FFT_library_ctl, 'fftw') .gt. 0             &
      &     .or. cmp_no_case(FFT_library_ctl, 'fftw3') .gt. 0) then
           iflag_FFT = iflag_FFTW
+        else if(cmp_no_case(FFT_library_ctl, 'fftw_single') .gt. 0      &
+     &     .or. cmp_no_case(FFT_library_ctl, 'fftw3_single') .gt. 0)    &
+     &     then
+          iflag_FFT = iflag_FFTW_SINGLE
         end if
       end if
 !

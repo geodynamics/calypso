@@ -22,6 +22,7 @@
 !
       use m_precision
       use m_constants
+      use m_machine_parameter
 !
       implicit  none
 !
@@ -36,7 +37,6 @@
       subroutine init_sph_transform_MHD
 !
       use calypso_mpi
-      use m_machine_parameter
       use m_addresses_trans_sph_MHD
       use m_addresses_trans_sph_snap
       use m_work_4_sph_trans
@@ -56,16 +56,21 @@
         call check_addresses_snapshot_trans
       end if
 !
+      if (iflag_debug.eq.1) write(*,*) 'initialize_sph_trans'
       call initialize_sph_trans
 !
+      if (iflag_debug.eq.1) write(*,*) 'set_colatitude_rtp'
       call set_colatitude_rtp
+      if (iflag_debug.eq.1) write(*,*) 'init_sum_coriolis_rlm'
       call init_sum_coriolis_rlm
 !
       if(id_legendre_transfer .eq. iflag_leg_undefined) then
+        if (iflag_debug.eq.1) write(*,*) 'select_legendre_transform'
         call select_legendre_transform
       end if
 !
-      call sel_alloc_legendre_trans(nb_sph_trans)
+      if (iflag_debug.eq.1) write(*,*) 'sel_alloc_legendre_trans'
+      call sel_alloc_legendre_trans(ncomp_sph_trans)
 !
       end subroutine init_sph_transform_MHD
 !
@@ -202,7 +207,7 @@
 !
       do iloop_type = 1, 5
         id_legendre_transfer = iloop_type
-        call sel_alloc_legendre_trans(nb_sph_trans)
+        call sel_alloc_legendre_trans(ncomp_sph_trans)
 !
         stime = MPI_WTIME()
         call sph_back_trans_4_MHD

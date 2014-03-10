@@ -19,6 +19,7 @@
       use m_precision
 !
       use calypso_mpi
+      use m_machine_parameter
       use m_phys_constants
       use m_spheric_constants
       use m_spheric_parameter
@@ -38,6 +39,7 @@
       use sum_b_trans_at_pole
 !
 !
+      if(iflag_debug .gt. 0) write(*,*) 'set_pole_flag_4_sph_trans'
       call set_pole_flag_4_sph_trans(numnod, internal_node)
       call allocate_work_pole_sph_trans
 !
