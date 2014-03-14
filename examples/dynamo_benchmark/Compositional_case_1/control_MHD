@@ -20,14 +20,14 @@ begin MHD_control
     debug_flag_ctl            'OFF'
 !
     num_subdomain_ctl            4
-    num_smp_ctl                  8
+    num_smp_ctl                  2
 !
     sph_file_prefix             'sph_lm31r48c_4/in'
 !
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
 !
-    field_file_fmt_ctl          'merged_VTK'
+    field_file_fmt_ctl          'VTK'
   end data_files_def
 !
   begin model
@@ -44,8 +44,6 @@ begin MHD_control
 !
 !   thermal_diffusion, viscous_diffusion, magnetic_diffusion
 !   Coriolis_force, buoyancy
-!
-!   heat_source, composition_source
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl

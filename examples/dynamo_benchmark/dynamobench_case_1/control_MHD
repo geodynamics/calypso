@@ -20,7 +20,7 @@ begin MHD_control
     debug_flag_ctl            'OFF'
 !
     num_subdomain_ctl            4
-    num_smp_ctl                  8
+    num_smp_ctl                  2
 !
     sph_file_prefix             'sph_lm31r48c_4/in'
 !
@@ -28,6 +28,7 @@ begin MHD_control
     field_file_prefix           'field/out'
 !
     field_file_fmt_ctl          'merged_VTK'
+!     field_file_fmt_ctl       'VTK'
   end data_files_def
 !
   begin model
@@ -45,10 +46,9 @@ begin MHD_control
 !   thermal_diffusion, viscous_diffusion, magnetic_diffusion
 !   Coriolis_force, buoyancy
 !
-!   heat_source, composition_source
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
-      array nod_value_ctl     8
+      array nod_value_ctl     15
         nod_value_ctl  velocity                Viz_On   Monitor_On
         nod_value_ctl  temperature             Viz_On   Monitor_On
         nod_value_ctl  pressure                Viz_On   Monitor_On
@@ -58,6 +58,15 @@ begin MHD_control
 !
         nod_value_ctl  Lorentz_work             Viz_On   Monitor_On
         nod_value_ctl  buoyancy_flux            Viz_On   Monitor_On
+!
+        nod_value_ctl  Coriolis_force            Viz_On   Monitor_On
+        nod_value_ctl  Lorentz_force            Viz_On   Monitor_On
+        nod_value_ctl  inertia            Viz_On   Monitor_On
+!
+        nod_value_ctl  rot_Coriolis_force            Viz_On   Monitor_On
+        nod_value_ctl  rot_Lorentz_force            Viz_On   Monitor_On
+        nod_value_ctl  rot_inertia            Viz_On   Monitor_On
+        nod_value_ctl  rot_buoyancy            Viz_On   Monitor_On
       end array nod_value_ctl
     end phys_values_ctl
 !
@@ -206,7 +215,7 @@ begin MHD_control
 !!!!!!!!! model for hydrostatic !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
 !    ref_temperature_ctl: none           (No reference of temperature)
-!                         spherical_shell ( for spherical shell model)
+!                         spherical_shell (for spherical shell model)
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin temperature_define
@@ -229,12 +238,12 @@ begin MHD_control
 !!!!!  information for sime integration
    begin time_step_ctl
       elapsed_time_ctl      80000.
-      i_step_init_ctl           0
+      i_step_init_ctl       10000
       i_step_finish_ctl     20000
 !
-      i_step_check_ctl        100
+      i_step_check_ctl       10
       i_step_rst_ctl         5000
-      i_step_field_ctl      10000
+      i_step_field_ctl       0
 !
       dt_ctl              5.0e-5
       time_init_ctl       0.0e-8
@@ -242,8 +251,8 @@ begin MHD_control
 !
 !!!!!  control for restart data
     begin restart_file_ctl
-      rst_ctl                dynamo_benchmark_1
-!      rst_ctl                start_from_rst_file
+!      rst_ctl                dynamo_benchmark_1
+      rst_ctl                start_from_rst_file
     end restart_file_ctl
 !
 !!!!!!   method for time evolution
@@ -254,8 +263,13 @@ begin MHD_control
       coef_imp_t_ctl          6.0e-1
       coef_imp_b_ctl          6.0e-1
       coef_imp_d_ctl          6.0e-1
+      Legendre_trans_loop_ctl   'outer_field_loop'
     end time_loop_ctl
   end control
+!
+!   Long_loop, outer_field_loop...broken...
+!                   ('inner_radial_loop', 'outer_radial_loop', 'long_loop',
+!                    'original_loop', 'outer_field_loop'
 !
   begin sph_monitor_ctl
     volume_average_prefix        'sph_ave_volume'

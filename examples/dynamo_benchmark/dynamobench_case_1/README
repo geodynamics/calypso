@@ -3,7 +3,7 @@
 !       Please see Christensen et.al. (2001) for the model description
 !-----------------------------------------------------------------------
 !
- Here is the input files for the dynamo benchmark case 1 with 4 MPI processes.
+ Here is the input files for the dynamo benchmark case 1 using 4 MPI processes.
 This example consists of the following files and directories
 
 control_sph_shell:  control file for gen_sph_grids

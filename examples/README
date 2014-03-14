@@ -10,3 +10,7 @@ Calypso examples consists of the following three parts.
 2. dynamo_benchmark: Examples of dynamo benchmark by Christensen et. al.(2001)
 
 3. assemble_sph: Example to conversion spctr data between data with differenct number of parallelization.
+
+4. heat_composition_source: Example to use heat and composition source terms.
+
+5. heterogineous_temp: Example to apply heat and compositional heteroginity at boundaries.

@@ -1,8 +1,8 @@
 !-----------------------------------------------------------------------
 !     Example using dynamo benchmark test Case 1
+!      using compositional variation instead of temperature
 !       Please see Christensen et.al. (2001) for the model description
 !-----------------------------------------------------------------------
 !
- Here is the directory for spectr files for restarting.
- Files named "rst.[restart step #].[process #].fst" are saved
- in this directory.
+
+Restart data files are stored in this directory.

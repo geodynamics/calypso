@@ -1,0 +1,14 @@
+!-----------------------------------------------------------------------
+!     Example to generate spherical harmonics index data files
+!-----------------------------------------------------------------------
+!
+ Here is the files to generate spherical harmonics index data file
+for simulations with 2 MPI processes.
+ In this example, radial grid points are defined explicitly in the control file.
+This example consists of the following files and directories
+
+control_sph_shell:   control file for data transform
+sph_lm31r48c_2:     Directory for spherical harmonics index table
+
+Run index generation program in both directory for index tables
+[sph_lm31r48c_2]$ [CALYPSO_DIR]/bin/gen_sph_grids

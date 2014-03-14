@@ -17,17 +17,17 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
   begin data_files_def
-    debug_flag_ctl            'OFF'
+    debug_flag_ctl            'Off'
 !
     num_subdomain_ctl            4
-    num_smp_ctl                  8
+    num_smp_ctl                  4
 !
-    sph_file_prefix             'sph_lm31r48c_4_ic/in'
+    sph_file_prefix             'sph_lm31r48c_ic_4/in'
 !
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
 !
-    field_file_fmt_ctl          'merged_VTK'
+    field_file_fmt_ctl          'VTK'
   end data_files_def
 !
   begin model
@@ -45,7 +45,6 @@ begin MHD_control
 !   thermal_diffusion, viscous_diffusion, magnetic_diffusion
 !   Coriolis_force, buoyancy
 !
-!   heat_source, composition_source
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
       array nod_value_ctl     6
@@ -80,6 +79,7 @@ begin MHD_control
 !
       array bc_velocity    2
         bc_velocity  rot_inner_core  ICB   0.000
+!        bc_velocity  non_slip_sph   ICB   0.000
         bc_velocity  non_slip_sph    CMB   0.000
       end array bc_velocity
 !
@@ -87,6 +87,7 @@ begin MHD_control
 !
       array bc_magnetic_field   2
         bc_magnetic_field  sph_to_center  to_Center  0.000  end
+!        bc_magnetic_field  insulator      ICB        0.000  end
         bc_magnetic_field  insulator      CMB        0.000  end
       end array bc_magnetic_field
     end boundary_condition
@@ -229,7 +230,7 @@ begin MHD_control
       i_step_init_ctl           0
       i_step_finish_ctl     20000
 !
-      i_step_check_ctl        100
+      i_step_check_ctl         10
       i_step_rst_ctl         5000
       i_step_field_ctl      10000
 !
@@ -239,7 +240,7 @@ begin MHD_control
 !
 !!!!!  control for restart data
     begin restart_file_ctl
-      rst_ctl                dynamo_benchmark_1
+      rst_ctl                dynamo_benchmark_2
 !      rst_ctl                start_from_rst_file
     end restart_file_ctl
 !
@@ -263,9 +264,9 @@ begin MHD_control
     gauss_coefs_prefix    'gauss_coefs'
     gauss_coefs_radius_ctl    2.91
 !
-    array pick_sph_spectr_ctl  2
+    array pick_sph_spectr_ctl  1
       pick_sph_spectr_ctl   1   0
-      pick_sph_spectr_ctl   2   0
+!      pick_sph_spectr_ctl   2   0
     end array pick_sph_spectr_ctl
 !
     array pick_gauss_coef_degree_ctl  1

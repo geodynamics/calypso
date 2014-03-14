@@ -1,7 +1,7 @@
 begin spherical_shell_ctl
   begin data_files_def
-    num_subdomain_ctl    4
-    sph_file_prefix             'sph_lm31r48c_4_ic/in'
+    num_subdomain_ctl    6
+    sph_file_prefix             'sph_lm31r48c_6_ic/in'
 !
     memory_conservation_ctl     'YES'
   end data_files_def
@@ -9,16 +9,16 @@ begin spherical_shell_ctl
   begin num_domain_ctl
     array num_domain_sph_grid  2
       num_domain_sph_grid   radial         2     end
-      num_domain_sph_grid   meridional     2     end
+      num_domain_sph_grid   meridional     3     end
     end array num_domain_sph_grid
 !
     array num_domain_legendre   2
       num_domain_legendre   radial         2     end
-      num_domain_legendre   zonal          2     end
+      num_domain_legendre   zonal          3     end
     end array num_domain_legendre
 !
     array num_domain_spectr     1
-      num_domain_spectr      modes         4    end
+      num_domain_spectr      modes         6    end
     end array num_domain_spectr
   end num_domain_ctl
 !

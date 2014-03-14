@@ -18,7 +18,7 @@ begin MHD_control
     debug_flag_ctl            'OFF'
 !
     num_subdomain_ctl           4
-    num_smp_ctl                 8
+    num_smp_ctl                 2
 !
     sph_file_prefix             'sph_lm31r48c_4/in'
 !
@@ -36,8 +36,6 @@ begin MHD_control
 !   composition
 !
 !   magnetic_ene_generation
-!
-!   heat_source, composition_source
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
       array nod_value_ctl    4
@@ -86,16 +84,16 @@ begin MHD_control
 !
 !!!!!  dimensionless numbers !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  available numbers
-!     Prandtl_number, magnetic_Prandtl_number
-!     Rayleigh_number, modified_Rayleigh_number
+!     Pr, Pm
+!     modified_Ra
 !     Reynords_number
 !     Taylor_number, Ekman_number
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin dimensionless_ctl
       array dimless_ctl 3
-        dimless_ctl  Prandtl_number                   1.0e-0
-        dimless_ctl  modified_Rayleigh_number         1.0e+2
-        dimless_ctl  Ekman_number                     1.0e-3
+        dimless_ctl  Pr                  1.0e-0
+        dimless_ctl  modified_Ra         1.0e+2
+        dimless_ctl  E                   1.0e-3
       end array dimless_ctl
     end dimensionless_ctl
 !
@@ -125,42 +123,37 @@ begin MHD_control
     begin coefficients_ctl
       begin thermal
         array coef_4_termal_ctl     1
-          coef_4_termal_ctl            One                        1.0
+          coef_4_termal_ctl            One           1.0
         end array coef_4_termal_ctl
 !
         array coef_4_t_diffuse_ctl  1
-          coef_4_t_diffuse_ctl         Prandtl_number            -1.0
+          coef_4_t_diffuse_ctl         Pr           -1.0
         end array coef_4_t_diffuse_ctl
       end thermal
 !
       begin momentum
         array coef_4_velocity_ctl   1
-          coef_4_velocity_ctl          One                        1.0
+          coef_4_velocity_ctl          One           1.0
         end array coef_4_velocity_ctl
 !
         array coef_4_press_ctl      1
-          coef_4_press_ctl             Ekman_number              -1.0
+          coef_4_press_ctl             E            -1.0
         end array coef_4_press_ctl
 !
         array coef_4_v_diffuse_ctl  1
-          coef_4_v_diffuse_ctl         One                        1.0
+          coef_4_v_diffuse_ctl         One           1.0
         end array coef_4_v_diffuse_ctl
 !
         array coef_4_buoyancy_ctl   3
-          coef_4_buoyancy_ctl          Radial_35                  1.0
-          coef_4_buoyancy_ctl          modified_Rayleigh_number   1.0
-          coef_4_buoyancy_ctl          Ekman_number              -1.0
+          coef_4_buoyancy_ctl          Radial_35     1.0
+          coef_4_buoyancy_ctl          modified_Ra   1.0
+          coef_4_buoyancy_ctl          E            -1.0
         end array coef_4_buoyancy_ctl
 !
         array coef_4_Coriolis_ctl   2
-          coef_4_Coriolis_ctl          Two                        1.0
-          coef_4_Coriolis_ctl          Ekman_number              -1.0
+          coef_4_Coriolis_ctl          Two           1.0
+          coef_4_Coriolis_ctl          E            -1.0
         end array coef_4_Coriolis_ctl
-!
-        array coef_4_Lorentz_ctl    2
-          coef_4_Lorentz_ctl           magnetic_Prandtl_number   -1.0
-          coef_4_Lorentz_ctl           Ekman_number              -1.0
-        end array coef_4_Lorentz_ctl
       end momentum
 !
     end coefficients_ctl

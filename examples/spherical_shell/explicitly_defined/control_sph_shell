@@ -1,7 +1,7 @@
 begin spherical_shell_ctl
   begin data_files_def
     num_subdomain_ctl    2
-    sph_file_prefix             'in'
+    sph_file_prefix             'sph_lm31r48c_2/in'
   end data_files_def
 !
   begin num_domain_ctl
@@ -25,7 +25,7 @@ begin spherical_shell_ctl
     ngrid_meridonal_ctl      48
     ngrid_zonal_ctl          96
 !
-    radial_grid_type_ctl   explicit
+    raidal_grid_type_ctl   explicit
     array r_layer     49
       r_layer        1   5.384615384615384E-001
       r_layer        2   5.395320768422367E-001

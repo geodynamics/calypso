@@ -1,7 +1,7 @@
 begin spherical_shell_ctl
   begin data_files_def
     num_subdomain_ctl    4
-    sph_file_prefix             'sph_lm31r48c_4_ic/in'
+    sph_file_prefix             'sph_lm31r48c_ic_4/in'
 !
     memory_conservation_ctl     'YES'
   end data_files_def
