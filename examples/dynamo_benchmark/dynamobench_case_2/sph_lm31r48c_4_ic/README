@@ -1,8 +1,0 @@
-!-----------------------------------------------------------------------
-!     Example using dynamo benchmark test Case 2
-!       Please see Christensen et.al. (2001) for the model description
-!-----------------------------------------------------------------------
-!
- Here is the directory for spectr indexing files for simulation.
- Files named "in.[process #].[rj, rlm, rtm, rtp, gfm]" are saved
- in this directory.
