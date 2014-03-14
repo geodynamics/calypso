@@ -12,11 +12,10 @@
 !!      subroutine read_boundary_spectr_file
 !!      subroutine write_boundary_spectr_file
 !!
-!!      subroutine set_fixed_scalar_bc_by_file(field_name, ref_nod_grp, &
-!!     &          jmax, bc_data, iflag_bc_scalar)
-!!      subroutine set_fixed_gradient_bc_by_file(field_name,            &
-!!     &          ref_nod_grp, ref_sf_grp, jmax, bc_data,               &
-!!     &          iflag_bc_scalar)
+!!      subroutine set_fixed_scalar_bc_by_file(field_name, jmax,        &
+!!     &          ref_grp, bc_data, iflag_bc_scalar)
+!!      subroutine set_fixed_gradient_bc_by_file(field_name, jmax,      &
+!!     &          ref_grp, bc_data, iflag_bc_scalar)
 !!
 !!  ---------------------------------------------------------------------
 !!      Data format
@@ -34,9 +33,7 @@
 !!
 !!@param    field_name       Field name to be define
 !!                           the boundary condition by file
-!!@param    ref_nod_grp      Boundary group name to be defined
-!!                           the boundary condition by file
-!!@param    ref_sf_grp       Surface group name to be defined
+!!@param    ref_grp          Boundary group name to be defined
 !!                           the boundary condition by file
 !!@param    jamx             Number of local spherical harmonics modes
 !!@param    bc_data(jmax)    Local boundary condition spectrum
@@ -221,14 +218,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_fixed_scalar_bc_by_file(field_name, ref_nod_grp,   &
-     &          jmax, bc_data, iflag_bc_scalar)
+      subroutine set_fixed_scalar_bc_by_file(field_name, jmax,          &
+     &          ref_grp, bc_data, iflag_bc_scalar)
 !
       use t_boundary_params_sph_MHD
       use skip_comment_f
 !
       character(len=kchara), intent(in) :: field_name
-      character(len=kchara), intent(in) :: ref_nod_grp
+      character(len=kchara), intent(in) :: ref_grp
       integer(kind = kint), intent(in) :: jmax
       real(kind = kreal), intent(inout) :: bc_data(jmax)
       integer(kind = kint), intent(inout) :: iflag_bc_scalar
@@ -239,7 +236,7 @@
       if(iflag_bc_scalar .ne. iflag_undefined_bc) return
       do igrp = 1, num_bc_field_ctl
         iflag = cmp_no_case(bc_ctls(igrp)%bc_field, field_name)         &
-     &        * cmp_no_case(bc_ctls(igrp)%bc_group, ref_nod_grp)
+     &        * cmp_no_case(bc_ctls(igrp)%bc_group, ref_grp)
         if(iflag .gt. 0) then
           iflag_bc_scalar =  iflag_fixed_field
           call set_bc_for_sph_scalar_by_file                            &
@@ -251,15 +248,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_fixed_gradient_bc_by_file(field_name,              &
-     &          ref_nod_grp, ref_sf_grp, jmax, bc_data,                 &
-     &          iflag_bc_scalar)
+      subroutine set_fixed_gradient_bc_by_file(field_name, jmax,        &
+     &          ref_grp, bc_data, iflag_bc_scalar)
 !
       use t_boundary_params_sph_MHD
       use skip_comment_f
 !
       character(len=kchara), intent(in) :: field_name
-      character(len=kchara), intent(in) :: ref_nod_grp, ref_sf_grp
+      character(len=kchara), intent(in) :: ref_grp
       integer(kind = kint), intent(in) :: jmax
       real(kind = kreal), intent(inout) :: bc_data(jmax)
       integer(kind = kint), intent(inout) :: iflag_bc_scalar
@@ -270,8 +266,7 @@
       if(iflag_bc_scalar .ne. iflag_undefined_bc) return
       do igrp = 1, num_bc_field_ctl
         iflag = cmp_no_case(bc_ctls(igrp)%bc_field, field_name)         &
-     &        * (cmp_no_case(bc_ctls(igrp)%bc_group, ref_nod_grp)       &
-     &         + cmp_no_case(bc_ctls(igrp)%bc_group, ref_sf_grp))
+     &        * cmp_no_case(bc_ctls(igrp)%bc_group, ref_grp)
         if(iflag .gt. 0) then
           iflag_bc_scalar =  iflag_fixed_flux
           call set_bc_for_sph_scalar_by_file                            &

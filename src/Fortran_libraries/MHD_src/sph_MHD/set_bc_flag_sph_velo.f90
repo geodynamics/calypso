@@ -37,50 +37,35 @@
       subroutine set_sph_bc_velo_sph
 !
       use m_boundary_params_sph_MHD
+      use set_bc_sph_scalars
 !
       integer(kind = kint) :: i
+      integer(kind = kint) :: igrp_icb, igrp_cmb
 !
+!
+      call find_both_sides_of_boundaries(velo_nod, torque_surf,         &
+     &    sph_bc_U, igrp_icb, igrp_cmb)
 !
       call allocate_vsp_bc_array( nidx_rj(2) )
 !
 !
-      do i = 1, velo_nod%num_bc
-        if(sph_bc_U%iflag_icb .ne. iflag_undefined_bc) exit
-        if(velo_nod%bc_name(i) .eq. ICB_nod_grp_name                    &
-     &    .or. velo_nod%bc_name(i) .eq. CTR_nod_grp_name) then
-          call set_sph_velo_ICB_flag(velo_nod%ibc_type(i),              &
-     &        velo_nod%bc_magnitude(i))
-        end if
-      end do
+      i = abs(igrp_icb)
+      if(igrp_icb .lt. 0) then
+        call set_sph_velo_ICB_flag(torque_surf%ibc_type(i),             &
+     &      torque_surf%bc_magnitude(i))
+      else
+        call set_sph_velo_ICB_flag(velo_nod%ibc_type(i),                &
+     &      velo_nod%bc_magnitude(i))
+      end if
 !
-      do i = 1, torque_surf%num_bc
-        if(sph_bc_U%iflag_icb .ne. iflag_undefined_bc) exit
-        if    (torque_surf%bc_name(i) .eq. ICB_sf_grp_name              &
-     &    .or. torque_surf%bc_name(i) .eq. ICB_nod_grp_name             &
-     &    .or. torque_surf%bc_name(i) .eq. CTR_sf_grp_name              &
-     &    .or. torque_surf%bc_name(i) .eq. CTR_nod_grp_name) then
-          call set_sph_velo_ICB_flag(torque_surf%ibc_type(i),           &
-     &        torque_surf%bc_magnitude(i))
-        end if
-      end do
-!
-!
-      do i = 1, velo_nod%num_bc
-        if(sph_bc_U%iflag_cmb .ne. iflag_undefined_bc) exit
-        if(velo_nod%bc_name(i) .eq. CMB_nod_grp_name) then
-          call set_sph_velo_CMB_flag(velo_nod%ibc_type(i),              &
-     &        velo_nod%bc_magnitude(i))
-        end if
-      end do
-!
-      do i = 1, torque_surf%num_bc
-        if(sph_bc_U%iflag_cmb .ne. iflag_undefined_bc) exit
-        if(     torque_surf%bc_name(i) .eq. CMB_sf_grp_name             &
-     &     .or. torque_surf%bc_name(i) .eq. CMB_nod_grp_name) then
-          call set_sph_velo_CMB_flag(torque_surf%ibc_type(i),           &
-     &        torque_surf%bc_magnitude(i))
-        end if
-      end do
+      i = abs(igrp_cmb)
+      if(igrp_icb .lt. 0) then
+        call set_sph_velo_CMB_flag(torque_surf%ibc_type(i),             &
+     &      torque_surf%bc_magnitude(i))
+      else
+        call set_sph_velo_CMB_flag(velo_nod%ibc_type(i),                &
+     &      velo_nod%bc_magnitude(i))
+      end if
 !
       end subroutine set_sph_bc_velo_sph
 !

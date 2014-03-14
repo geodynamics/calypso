@@ -46,44 +46,34 @@
 !
       if (iflag_t_evo_4_velo .gt.     id_no_evolution) then
         call set_sph_bc_velo_sph
+!
+        call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_U)
+        call cal_fdm2_ICB_free_vp(radius_1d_rj_r(sph_bc_U%kr_in))
+        call cal_fdm2_ICB_free_vt(radius_1d_rj_r(sph_bc_U%kr_in))
+!
+        call cal_fdm2_CMB_free_vp(radius_1d_rj_r(sph_bc_U%kr_out-1))
+        call cal_fdm2_CMB_free_vt(radius_1d_rj_r(sph_bc_U%kr_out-1))
       end if
 !
       if (iflag_t_evo_4_temp .gt.     id_no_evolution) then
         call set_sph_bc_temp_sph
+        call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_T)
       end if
 !
       if (iflag_t_evo_4_magne .gt.    id_no_evolution) then
         call set_sph_bc_magne_sph
+        call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_B)
       end if
 !
       if (iflag_t_evo_4_composit .gt. id_no_evolution) then
         call set_sph_bc_composition_sph
+        call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_C)
       end if
 !
-!
-!      Set FDM matrices for boundaries
-!
-      call set_radial_range_by_BC(sph_bc_U)
-      call set_radial_range_by_BC(sph_bc_B)
-      call set_radial_range_by_BC(sph_bc_T)
-      call set_radial_range_by_BC(sph_bc_C)
-!
-!      Set FDM matrices for boundaries
-!
-      call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_U)
-      call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_B)
-      call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_T)
-      call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_C)
-!
-      call cal_fdm2_ICB_free_vp(radius_1d_rj_r(sph_bc_U%kr_in))
-      call cal_fdm2_ICB_free_vt(radius_1d_rj_r(sph_bc_U%kr_in))
-!
-      call cal_fdm2_CMB_free_vp(radius_1d_rj_r(sph_bc_U%kr_out-1))
-      call cal_fdm2_CMB_free_vt(radius_1d_rj_r(sph_bc_U%kr_out-1))
+!      Set FDM matrices for Center
 !
       call cal_2nd_to_center_fixed_fdm(radius_1d_rj_r(1))
       call cal_2nd_to_center_fix_df_fdm(radius_1d_rj_r(1))
-!
 !
 !      Set reference temperature and adjust boundary conditions
 !
@@ -94,6 +84,23 @@
 !      Check data
 !
       if(i_debug .gt. 1) then
+        write(*,*) 'sph_bc_U%iflag_icb', sph_bc_U%kr_in,                &
+     &          sph_bc_U%iflag_icb
+        write(*,*) 'sph_bc_U%iflag_cmb', sph_bc_U%kr_out,               &
+     &          sph_bc_U%iflag_cmb
+        write(*,*) 'sph_bc_T%iflag_icb', sph_bc_T%kr_in,                &
+     &          sph_bc_T%iflag_icb
+        write(*,*) 'sph_bc_T%iflag_cmb', sph_bc_T%kr_out,               &
+     &          sph_bc_T%iflag_cmb
+        write(*,*) 'sph_bc_B%iflag_icb', sph_bc_B%kr_in,                &
+     &          sph_bc_B%iflag_icb
+        write(*,*) 'sph_bc_B%iflag_cmb', sph_bc_B%kr_out,               &
+     &          sph_bc_B%iflag_cmb
+        write(*,*) 'sph_bc_C%iflag_icb', sph_bc_C%kr_in,                &
+     &          sph_bc_C%iflag_icb
+        write(*,*) 'sph_bc_C%iflag_cmb', sph_bc_C%kr_out,               &
+     &          sph_bc_C%iflag_cmb
+!
         if (iflag_t_evo_4_temp .gt.     id_no_evolution) then
           call check_sph_boundary_spectra(fhd_temp,                     &
      &        nidx_rj(2), idx_gl_1d_rj_j, sph_bc_T)
@@ -105,12 +112,22 @@
       end if
 !
       if (iflag_debug .eq. iflag_full_msg) then
-        call check_fdm_coefs_4_BC2(fhd_velo,  sph_bc_U)
-        call check_fdm_coefs_4_BC2(fhd_magne, sph_bc_B)
-        call check_fdm_coefs_4_BC2(fhd_temp,  sph_bc_T)
-        call check_fdm_coefs_4_BC2(fhd_light, sph_bc_C)
-        call check_coef_fdm_free_ICB
-        call check_coef_fdm_free_CMB
+        if (iflag_t_evo_4_velo .gt.     id_no_evolution) then
+          call check_fdm_coefs_4_BC2(fhd_velo,  sph_bc_U)
+          call check_coef_fdm_free_ICB
+          call check_coef_fdm_free_CMB
+        end if
+!
+        if (iflag_t_evo_4_magne .gt.    id_no_evolution) then
+          call check_fdm_coefs_4_BC2(fhd_magne, sph_bc_B)
+        end if
+        if (iflag_t_evo_4_temp .gt.     id_no_evolution) then
+          call check_fdm_coefs_4_BC2(fhd_temp,  sph_bc_T)
+        end if
+        if (iflag_t_evo_4_composit .gt. id_no_evolution) then
+          call check_fdm_coefs_4_BC2(fhd_light, sph_bc_C)
+        end if
+!
         call check_coef_fdm_fix_dr_2ctr
       end if
 !
@@ -123,60 +140,58 @@
       use m_boundary_params_sph_MHD
       use m_bc_data_list
       use m_surf_data_list
+      use set_bc_sph_scalars
 !
 !
       integer(kind = kint) :: i
+      integer(kind = kint) :: igrp_icb, igrp_cmb
 !
+!
+      call find_both_sides_of_boundaries(magne_nod, magne_surf,         &
+     &    sph_bc_B, igrp_icb, igrp_cmb)
 !
       sph_bc_B%iflag_icb = iflag_sph_insulator
       sph_bc_B%iflag_cmb = iflag_sph_insulator
 !
-      do i = 1, magne_nod%num_bc
-        if(magne_nod%bc_name(i) .eq. ICB_nod_grp_name) then
-          if(magne_nod%ibc_type(i) .eq. iflag_pseudo_vacuum) then
-            sph_bc_B%iflag_icb =  iflag_radial_magne
-          end if
-        end if
 !
-        if(magne_nod%bc_name(i) .eq. CMB_nod_grp_name) then
-          if(magne_nod%ibc_type(i) .eq. iflag_pseudo_vacuum) then
-            sph_bc_B%iflag_cmb =  iflag_radial_magne
-          end if
-        end if
-!
-        if(magne_nod%bc_name(i) .eq. CTR_nod_grp_name) then
-          if     (magne_nod%ibc_type(i) .eq. iflag_sph_2_center) then
-            sph_bc_B%iflag_icb =  iflag_sph_fill_center
-          else if(magne_nod%ibc_type(i) .eq. iflag_sph_clip_center)     &
-     &        then
-            sph_bc_B%iflag_icb =  iflag_sph_fix_center
-          end if
-        end if
-      end do
-!
-!
-      do i = 1, magne_surf%num_bc
-        if(magne_surf%bc_name(i) .eq. ICB_nod_grp_name) then
-          if(magne_surf%ibc_type(i) .eq. iflag_pseudo_vacuum) then
-            sph_bc_B%iflag_icb =  iflag_radial_magne
-          end if
-        end if
-!
-        if(magne_surf%bc_name(i) .eq. CMB_nod_grp_name) then
-          if(magne_surf%ibc_type(i) .eq. iflag_pseudo_vacuum) then
-            sph_bc_B%iflag_cmb =  iflag_radial_magne
-          end if
-        end if
-!
-        if(magne_surf%bc_name(i) .eq. CTR_nod_grp_name) then
+      i = abs(igrp_icb)
+      if(igrp_icb .lt. 0) then
+        if(sph_bc_B%icb_grp_name .eq. CTR_sf_grp_name) then
           if(magne_surf%ibc_type(i) .eq. iflag_sph_2_center) then
             sph_bc_B%iflag_icb =  iflag_sph_fill_center
           else if(magne_surf%ibc_type(i) .eq. iflag_sph_clip_center)    &
      &        then
             sph_bc_B%iflag_icb =  iflag_sph_fix_center
           end if
+!
+        else if(magne_surf%ibc_type(i) .eq. iflag_pseudo_vacuum) then
+          sph_bc_B%iflag_icb =  iflag_radial_magne
         end if
-      end do
+      else
+        if(sph_bc_B%icb_grp_name .eq. CTR_nod_grp_name) then
+          if(magne_nod%ibc_type(i) .eq. iflag_sph_2_center) then
+            sph_bc_B%iflag_icb =  iflag_sph_fill_center
+          else if(magne_nod%ibc_type(i) .eq. iflag_sph_clip_center)     &
+     &        then
+            sph_bc_B%iflag_icb =  iflag_sph_fix_center
+          end if
+!
+        else if(magne_nod%ibc_type(i) .eq. iflag_pseudo_vacuum) then
+            sph_bc_B%iflag_icb =  iflag_radial_magne
+        end if
+      end if
+!
+!
+      i = abs(igrp_cmb)
+      if(igrp_icb .lt. 0) then
+        if(magne_surf%ibc_type(i) .eq. iflag_pseudo_vacuum) then
+          sph_bc_B%iflag_cmb =  iflag_radial_magne
+        end if
+      else
+        if(magne_nod%ibc_type(i) .eq. iflag_pseudo_vacuum) then
+          sph_bc_B%iflag_cmb =  iflag_radial_magne
+        end if
+      end if
 !
       end subroutine set_sph_bc_magne_sph
 !

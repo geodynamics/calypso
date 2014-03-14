@@ -9,12 +9,36 @@ Settings for Makefiles
 #./configure --prefix='/Users/matsui/local' CFLAGS='-O -Wall -g'  FCFLAGS='-O -Wall -g' --enable-fftw3 --with-hdf5=/Users/matsui/local/bin/h5pcc
 #
 #
+#  Makefile for geoynamo platform Calypso
+#    Written by H. Matsui
+#
+SHELL           = /bin/sh
+#
+#  directories of Calypso
+#
+SRCDIR = /Users/matsui/src_release
+INSTDIR= /Users/matsui/local
+#
+MHDDIR = $(SRCDIR)/src
+MAKEDIR= $(SRCDIR)/work
+BUILDDIR= $(SRCDIR)/bin
+#
+# MPI settings
+#
+MPICHDIR =    
+MPICHLIBDIR = $(MPICHDIR)/lib
+MPICHBINDIR = $(MPICHDIR)/bin
+MPICHINCDIR = 
+MPILIBS =      
+#
+[Kemo-MacBook-Pro:~/src_release] matsui% more Makefile
+#
 #  Makefile for geoynamo platform CALYPSO
 #    Written by H. Matsui
 #
 SHELL           = /bin/sh
 #
-#  directories
+#  directories of Calypso
 #
 SRCDIR = /Users/matsui/src_release
 INSTDIR= /Users/matsui/local
@@ -67,7 +91,7 @@ FFTW3_LIBS=   -L/Users/matsui/local/lib -lfftw3 -lm
 #
 SHELL           = /bin/sh
 #
-#  directories
+#  directories of Calypso
 #
 SRCDIR = /Users/matsui/src_release
 INSTDIR= /Users/matsui/local
@@ -121,7 +145,7 @@ FFTW3_LIBS=   -L/opt/local/lib -lfftw3 -lm
 #
 SHELL           = /bin/sh
 #
-#  directories
+#  directories of Calypso
 #
 SRCDIR = /home/matsui/src_release
 INSTDIR= /home/matsui/local
@@ -183,7 +207,7 @@ FFTW3_LIBS=   -L/usr/local/lib -lfftw3 -lm
 #
 SHELL           = /bin/sh
 #
-#  directories
+#  directories of Calypso
 #
 SRCDIR = /GPFS/matsui/src_release
 INSTDIR= /home0/matsui/local
@@ -265,7 +289,7 @@ CXXFLAGS =
 #
 SHELL           = /bin/sh
 #
-#  directories
+#  directories of Calypso
 #
 SRCDIR = /Users/matsui/src_release
 INSTDIR= /Users/matsui/local

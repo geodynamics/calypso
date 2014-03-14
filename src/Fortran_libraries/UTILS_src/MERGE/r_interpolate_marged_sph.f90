@@ -44,7 +44,7 @@
 !>      Innermost new radial ID within the original domain
       integer(kind = kint) :: kr_inner_domain =  0
 !>      Outmost new radial ID within the original domain
-      integer(kind = kint) :: kr_outner_domain = 0
+      integer(kind = kint) :: kr_outer_domain = 0
 !
       private :: nri_old2new, k_old2new_in, k_old2new_out
       private :: coef_old2new_in
@@ -149,16 +149,16 @@
           exit
         end if
       end do
-      kr_outner_domain = nidx_rj(1) + 1
+      kr_outer_domain = nidx_rj(1) + 1
       do k = 1, nidx_rj(1)
         if(radius_1d_rj_r(k) .gt. r_org(nri_org)) then
-          kr_outner_domain = k - 1
+          kr_outer_domain = k - 1
           exit
         end if
       end do
 !
       write(*,*) 'kr_inner_domain', kr_inner_domain
-      write(*,*) 'kr_outner_domain', kr_outner_domain
+      write(*,*) 'kr_outer_domain', kr_outer_domain
 !      do k = 1, nidx_rj(1)
 !        write(*,'(i5,1pe16.8,2i5,1p3e16.8)') k, radius_1d_rj_r(k),     &
 !     &         k_old2new_in(k), k_old2new_out(k),                      &
@@ -191,7 +191,7 @@
 !
           if(j_gl .ge. nidx_rj(2)) cycle
 !
-          do kr = kr_inner_domain, kr_outner_domain
+          do kr = kr_inner_domain, kr_outer_domain
             inod_gl = 1 + j_gl + (kr - 1) * nidx_rj(2)
             inod_in =  j + (k_old2new_in(kr) - 1) *  jmax_org
             inod_out = j + (k_old2new_out(kr) - 1) * jmax_org
@@ -228,8 +228,8 @@
       end do
       if(is_magne .eq. 0) return
 !
-      if(kr_outner_domain .lt. nidx_rj(1)) then
-        call ext_outside_potential(is_magne, kr_outner_domain)
+      if(kr_outer_domain .lt. nidx_rj(1)) then
+        call ext_outside_potential(is_magne, kr_outer_domain)
       end if
       if(kr_inner_domain .gt. 1) then
         call ext_inside_potential(is_magne, kr_inner_domain)

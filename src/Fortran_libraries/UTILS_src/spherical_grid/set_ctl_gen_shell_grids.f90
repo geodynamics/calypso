@@ -25,10 +25,12 @@
       subroutine s_set_control_4_gen_shell_grids
 !
       use m_constants
+      use m_machine_parameter
       use m_read_mesh_data
       use m_spheric_constants
       use m_spheric_parameter
       use m_parallel_sph_grids
+      use m_sph_1d_global_index
       use m_node_id_spherical_IO
       use m_file_format_switch
 !
@@ -42,7 +44,7 @@
       use skip_comment_f
 !
       integer(kind = kint) :: nprocs_ctl
-      integer(kind = kint) :: i, np, kr
+      integer(kind = kint) :: i, np, kr, icou
       integer(kind = kint) :: iflag_no, iflag_yes
       integer(kind = kint) :: iflag_r, iflag_t, iflag_p
 !
@@ -116,7 +118,36 @@
         nidx_global_rtp(3) = ngrid_azimuth_ctl
       end if
 !
+!   Set radial group
+      if(i_bc_sph .gt. 0) then
+        numlayer_sph_bc = numlayer_bc_ctl
+      else
+        numlayer_sph_bc = 0
+      end if
+      call allocate_sph_radial_group
 !
+      icou = 0
+      do i = 1, numlayer_bc_ctl
+        if     (cmp_no_case(bc_bondary_name_ctl(i), 'ICB')              &
+     &          .gt. 0) then
+          numlayer_sph_bc = numlayer_sph_bc - 1
+        else if(cmp_no_case(bc_bondary_name_ctl(i), 'CMB')              &
+     &          .gt. 0) then
+          numlayer_sph_bc = numlayer_sph_bc - 1
+        else if(cmp_no_case(bc_bondary_name_ctl(i), 'to_Center')        &
+     &          .gt. 0) then
+          numlayer_sph_bc = numlayer_sph_bc - 1
+        else if(cmp_no_case(bc_bondary_name_ctl(i), 'Mid_Depth')        &
+     &          .gt. 0) then
+          numlayer_sph_bc = numlayer_sph_bc - 1
+        else
+          icou = icou + 1
+          kr_sph_boundary(icou) =  kr_boundary_ctl(i)
+          sph_bondary_name(icou) = bc_bondary_name_ctl(i)
+        end if
+      end do
+!
+!   Set radial grid explicitly
       if(iflag_radial_grid .eq. igrid_non_euqidist) then
         if (i_numlayer_shell .gt. 0) then
           nidx_global_rtp(1) = numlayer_shell_ctl
@@ -151,11 +182,12 @@
               nlayer_mid_OC = kr_boundary_ctl(i)
             end if
           end do
+!
           call deallocate_boundary_layers
         end if
 !
+!   Set radial grid by Chebyshev or equaidistance
       else
-!
         if(i_ICB_radius.gt.0 .and. i_CMB_radius.gt.0) then
           r_ICB = ICB_radius_ctl
           r_CMB = CMB_radius_ctl
@@ -256,6 +288,21 @@
       if(mod(nidx_global_rtp(3),2) .ne. 0) then
         write(*,*) 'Set even number for the number of zonal grids'
         stop
+      end if
+!
+      if(nidx_global_rtp(2) .le. (l_truncation+1)*3/2) then
+        write(*,*) 'Spherical harmonics transform has Ailiasing'
+      else if (nidx_global_rtp(2) .lt. (l_truncation+1)) then
+        write(*,*) "Grid has less than Nyquist's sampling theorem"
+      end if
+!
+      if(iflag_debug .gt. 0) then
+        write(*,*) 'icou, kr_sph_boundary, sph_bondary_name',           &
+     &             numlayer_sph_bc
+        do icou = 1, numlayer_sph_bc
+          write(*,*) icou, kr_sph_boundary(icou),                       &
+     &               trim(sph_bondary_name(icou))
+        end do
       end if
 !
       end subroutine s_set_control_4_gen_shell_grids

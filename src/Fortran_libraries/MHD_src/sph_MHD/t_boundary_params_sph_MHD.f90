@@ -61,6 +61,11 @@
 !>        boundary condition flag at CMB
         integer(kind = kint) :: iflag_cmb = iflag_undefined_bc
 !
+!>        Start radial group name of fluid shell for @f$ f(r,j) @f$
+        character(len = kchara) :: icb_grp_name
+!>        End radial group name of fluid shell for @f$ f(r,j) @f$
+        character(len = kchara) :: cmb_grp_name
+!
 !>        Start radial address of fluid shell for @f$ f(r,j) @f$
         integer(kind = kint) :: kr_in =   1
 !>        End radial address of fluid shell for @f$ f(r,j) @f$

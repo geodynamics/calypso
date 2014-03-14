@@ -55,11 +55,12 @@
 !
       subroutine set_rtp_radial_grp
 !
+      use m_sph_1d_global_index
       use set_stack_4_sph_groups
       use set_item_4_sph_groups
 !
 !
-      num_radial_grp_rtp =  3
+      num_radial_grp_rtp =  3 + numlayer_sph_bc
       if (nlayer_2_center .gt. 0) then
         num_radial_grp_rtp =  num_radial_grp_rtp + 2
       end if
