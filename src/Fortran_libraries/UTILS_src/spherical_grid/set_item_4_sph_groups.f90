@@ -24,10 +24,11 @@
 !
       subroutine set_item_rtp_radial_grp
 !
+      use m_sph_1d_global_index
       use m_spheric_parameter
       use m_group_data_sph_specr
 !
-      integer(kind = kint) :: icou, nlayer_ed
+      integer(kind = kint) :: icou, nlayer_ed, inum
 !
       icou = 0
       call set_item_sph_grp_by_list(icou, nlayer_ICB, nlayer_ICB,       &
@@ -63,16 +64,25 @@
      &    nidx_rtp(1), idx_gl_1d_rtp_r(1), ntot_radial_grp_rtp,         &
      &    item_radial_grp_rtp)
 !
+!
+      do inum = 1, numlayer_sph_bc
+        call set_item_sph_grp_by_list(icou,                             &
+     &      kr_sph_boundary(inum), kr_sph_boundary(inum),               &
+     &      nidx_rtp(1), idx_gl_1d_rtp_r(1), ntot_radial_grp_rtp,       &
+     &      item_radial_grp_rtp)
+      end do
+!
       end subroutine set_item_rtp_radial_grp
 !
 ! -----------------------------------------------------------------------
 !
       subroutine set_item_rj_radial_grp
 !
+      use m_sph_1d_global_index
       use m_spheric_parameter
       use m_group_data_sph_specr
 !
-      integer(kind = kint) :: icou, nlayer_ed
+      integer(kind = kint) :: icou, nlayer_ed, inum
 !
 !
       icou = 0
@@ -106,6 +116,12 @@
       call set_item_sph_grp_by_rng(icou, nlayer_ICB, nlayer_CMB,        &
      &    ist_rj(1), ied_rj(1), ntot_radial_grp_rj, item_radial_grp_rj)
 !
+      do inum = 1, numlayer_sph_bc
+        call set_item_sph_grp_by_rng(icou,                              &
+     &      kr_sph_boundary(inum), kr_sph_boundary(inum),               &
+     &      ist_rj(1), ied_rj(1), ntot_radial_grp_rj,                   &
+     &      item_radial_grp_rj)
+      end do
 !
       end subroutine set_item_rj_radial_grp
 !

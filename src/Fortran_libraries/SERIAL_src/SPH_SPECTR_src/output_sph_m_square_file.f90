@@ -154,27 +154,27 @@
       if(iflag_volume_rms_spec .eq. 0 .or. my_rank .ne. 0) return
 !
       write(fname_rms, '(a,a6)') trim(fhead_rms_vol), '_l.dat'
-      write(mode_label,'(a)') 'degree, '
+      write(mode_label,'(a)') 'degree'
       call open_sph_vol_rms_file                                        &
      &      (id_file_rms_l, fname_rms, mode_label)
 !
       write(fname_rms, '(a,a6)') trim(fhead_rms_vol), '_m.dat'
-      write(mode_label,'(a)') 'order, '
+      write(mode_label,'(a)') 'order'
       call open_sph_vol_rms_file                                        &
      &      (id_file_rms_m, fname_rms, mode_label)
 !
       write(fname_rms,'(a,a7)') trim(fhead_rms_vol), '_lm.dat'
-      write(mode_label,'(a)') 'diff_deg_order, '
+      write(mode_label,'(a)') 'diff_deg_order'
       call open_sph_vol_rms_file                                        &
      &      (id_file_rms_lm, fname_rms, mode_label)
 !
       do lm = 0, l_truncation
         write(id_file_rms_l,'(i10,1pe23.14e3,i10,1p200e23.14e3)')       &
-     &            istep, time, lm, rms_sph_vol_l(1:ntot_rms_rj,lm)
+     &            istep, time, lm, rms_sph_vol_l(lm,1:ntot_rms_rj)
         write(id_file_rms_m,'(i10,1pe23.14e3,i10,1p200e23.14e3)')       &
-     &            istep, time, lm, rms_sph_vol_m(1:ntot_rms_rj,lm)
+     &            istep, time, lm, rms_sph_vol_m(lm,1:ntot_rms_rj)
         write(id_file_rms_lm,'(i10,1pe23.14e3,i10,1p200e23.14e3)')      &
-     &            istep, time, lm, rms_sph_vol_lm(1:ntot_rms_rj,lm)
+     &            istep, time, lm, rms_sph_vol_lm(lm,1:ntot_rms_rj)
       end do
 !
       close(id_file_rms_l)
@@ -201,12 +201,12 @@
       if(iflag_layer_rms_spec.eq.0 .or. my_rank .ne. 0) return
 !
       write(fname_rms,   '(a,a4)') trim(fhead_rms_layer), '.dat'
-      write(mode_label,'(a)') 'radial_id, '
+      write(mode_label,'(a)') 'radial_id'
       call open_sph_vol_rms_file(id_file_rms, fname_rms, mode_label)
 !
-      do kg = 1, nidx_global_rj(1)
+      do kg = 1, nidx_rj(1)
         write(id_file_rms,'(i10,1pe23.14e3,i10,1p200e23.14e3)')         &
-     &                   istep, time, kg, rms_sph(1:ntot_rms_rj,kg)
+     &                   istep, time, kg, rms_sph(kg,1:ntot_rms_rj)
       end do
 !
       close(id_file_rms)
@@ -214,25 +214,25 @@
 !
 !
       write(fname_rms, '(a,a6)') trim(fhead_rms_layer), '_l.dat'
-      write(mode_label,'(a)') 'radial_id    degree    '
+      write(mode_label,'(a)') 'radial_id    degree'
       call open_sph_vol_rms_file(id_file_rms_l, fname_rms, mode_label)
 !
       write(fname_rms, '(a,a6)') trim(fhead_rms_layer), '_m.dat'
-      write(mode_label,'(a)') 'radial_id    order    '
+      write(mode_label,'(a)') 'radial_id    order'
       call open_sph_vol_rms_file(id_file_rms_m, fname_rms, mode_label)
 !
       write(fname_rms,'(a,a7)') trim(fhead_rms_layer), '_lm.dat'
-      write(mode_label,'(a)') 'radial_id    diff_deg_order    '
+      write(mode_label,'(a)') 'radial_id    diff_deg_order'
       call open_sph_vol_rms_file(id_file_rms_lm, fname_rms, mode_label)
 !
-      do kg = 1, nidx_global_rj(1)
+      do kg = 1, nidx_rj(1)
         do lm = 0, l_truncation
           write(id_file_rms_l,'(i10,1pe23.14e3,2i10,1p200e23.14e3)')    &
-     &           istep, time, kg, lm, rms_sph_l(1:ntot_rms_rj,lm,kg)
+     &           istep, time, kg, lm, rms_sph_l(lm,kg,1:ntot_rms_rj)
           write(id_file_rms_m,'(i10,1pe23.14e3,2i10,1p200e23.14e3)')    &
-     &           istep, time, kg, lm, rms_sph_m(1:ntot_rms_rj,lm,kg)
+     &           istep, time, kg, lm, rms_sph_m(lm,kg,1:ntot_rms_rj)
           write(id_file_rms_lm,'(i10,1pe23.14e3,2i10,1p200e23.14e3)')   &
-     &           istep, time, kg, lm, rms_sph_lm(1:ntot_rms_rj,lm,kg)
+     &           istep, time, kg, lm, rms_sph_lm(lm,kg,1:ntot_rms_rj)
          end do
       end do
 !
@@ -280,7 +280,7 @@
 !
 !
       write(id_file,'(a)')    'radial_layers, truncation'
-      write(id_file,'(3i10)') nidx_global_rj(1), l_truncation
+      write(id_file,'(3i10)') nidx_rj(1), l_truncation
       write(id_file,'(a)')    'ICB_id, CMB_id'
       write(id_file,'(3i10)') nlayer_ICB, nlayer_CMB
 !
@@ -291,7 +291,7 @@
 !
       write(id_file,'(a)',advance='no')    't_step    time    '
       if(mode_label .ne. 'EMPTY') then
-        write(id_file,'(a)',advance='no') trim(mode_label)
+        write(id_file,'(a,a4)',advance='no') trim(mode_label), '    '
       end if
 !
       do i = 1, num_rms_rj

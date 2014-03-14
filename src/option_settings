@@ -5,9 +5,8 @@ Settings for Makefiles
 # Intel mac with gfortran-openmpi with self compiled FFTW3
 # -------------------------------------------------------------------------------
 #
-# ./configure --prefix='/Users/matsui/local' FCFLAGS='-O -Wall -g' \
-# PKG_CONFIG_PATH='/Users/matsui/local/lib/pkgconfig:/usr/local/lib/pkgconfig' \
-# --enable-fftw3 --with-hdf5='/Users/matsui/local/bin/h5pcc'
+# setenv PKG_CONFIG_PATH /Users/matsui/local/lib/pkgconfig:/usr/lib/pkgconfig;
+#./configure --prefix='/Users/matsui/local' CFLAGS='-O -Wall -g'  FCFLAGS='-O -Wall -g' --enable-fftw3 --with-hdf5=/Users/matsui/local/bin/h5pcc
 #
 #
 #  Makefile for geoynamo platform CALYPSO
@@ -52,16 +51,6 @@ FFTW3_CFLAGS= -I/Users/matsui/local/include
 FFTW3_LIBS=   -L/Users/matsui/local/lib -lfftw3 -lm  
 #
 #
-#    HDF5 fortran wrapper settings
-#
-HDF5_FFLAGS=    -I/Users/matsui/local/lib -L/Users/matsui/local/lib -I/Users/matsui/local/include 
-HDF5_LDFLAGS=   -L/Users/matsui/local/lib 
-HDF5_FLIBS=     -L/Users/matsui/local/lib /Users/matsui/local/lib/libhdf5hl_fortran.a /Users/matsui/local/lib/libhdf5_hl.a /Users/matsui/local/lib/libhdf5_fortran.a /Users/matsui/local/lib/libhdf5.a -L/Users/matsui/local/lib -lmpi -lz -ldl -lm
-#
-#
-
-
-
 # -------------------------------------------------------------------------------
 # Intel mac with gfortran4.7-openmpi with FFTW3(Macport)
 # -------------------------------------------------------------------------------
@@ -73,7 +62,7 @@ HDF5_FLIBS=     -L/Users/matsui/local/lib /Users/matsui/local/lib/libhdf5hl_fort
 #  CFLAGS='-O -Wall -g'  FCFLAGS='-O -Wall -g' --enable-fftw3
 #
 #
-#  Makefile for geoynamo platform CALIPSO
+#  Makefile for geoynamo platform Calypso
 #    Written by H. Matsui
 #
 SHELL           = /bin/sh
@@ -127,7 +116,7 @@ FFTW3_LIBS=   -L/opt/local/lib -lfftw3 -lm
 #  CFLAGS='-O3  -Wall -g' FCFLAGS='-O3 -warn all -g' \
 #  --enable-fftw3
 #
-#  Makefile for geoynamo platform CALIPSO
+#  Makefile for geoynamo platform Calypso
 #    Written by H. Matsui
 #
 SHELL           = /bin/sh
@@ -189,7 +178,7 @@ FFTW3_LIBS=   -L/usr/local/lib -lfftw3 -lm
 #  FCFLAGS="-64 -Oss -noifswpl -omp -pardiag=2 -autoinline=2 -model=L1" \
 #  MPICC=mpcc_r MPIFC=mpif90_r
 #
-#  Makefile for geoynamo platform CALIPSO
+#  Makefile for geoynamo platform Calypso
 #    Written by H. Matsui
 #
 SHELL           = /bin/sh
@@ -271,7 +260,7 @@ CXXFLAGS =
 # ./configure --prefix=/Users/matsui/local CC=cc FC=f90 FCFLAGS='-O3 -qsuffix=f=f90:cpp=F90'
 #
 #
-#  Makefile for geoynamo platform CALIPSO
+#  Makefile for geoynamo platform Calypso
 #    Written by H. Matsui
 #
 SHELL           = /bin/sh

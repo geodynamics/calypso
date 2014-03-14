@@ -8,14 +8,20 @@
 !!
 !!@verbatim
 !! ------------------------------------------------------------------
-!!      subroutine init_FFTW_type(Nsmp, Nstacksmp, Nfft, WK)
-!!      subroutine finalize_FFTW_type(Nsmp, WK)
-!!      subroutine verify_wk_FFTW_type(Nsmp, Nstacksmp, Nfft, WK)
+!!      subroutine init_FFTW_type(Ncomp, Nfft, WK)
+!!      subroutine finalize_FFTW_type(Ncomp, WK)
+!!      subroutine verify_wk_FFTW_type(Ncomp, Nfft, WK)
+!!
+!!      subroutine init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
+!!      subroutine finalize_FFTW_mul_type(Nsmp, WK)
+!!      subroutine verify_wk_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
 !!
 !!   wrapper subroutine for initierize FFT by FFTW
 !! ------------------------------------------------------------------
 !!
-!!      subroutine FFTW_forward_type(Nsmp, Nstacksmp, M, Nfft, X, WK)
+!!      subroutine FFTW_forward_type(Nsmp, Nstacksmp, Ncomp, Nfft, X, WK)
+!!      subroutine FFTW_mul_forward_type(Nsmp, Nstacksmp, Ncomp, Nfft,  &
+!!     &          X, WK)
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for forward Fourier transform by FFTW3
@@ -29,7 +35,10 @@
 !!
 !! ------------------------------------------------------------------
 !!
-!!      subroutine FFTW_backward_type(Nsmp, Nstacksmp, M, Nfft, X, WK)
+!!      subroutine FFTW_backward_type(Nsmp, Nstacksmp, Ncomp, Nfft,     &
+!!                X, WK)
+!!      subroutine FFTW_mul_backward_type(Nsmp, Nstacksmp, Ncomp, Nfft, &
+!!     &          X, WK)
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for backward Fourier transform by FFTW3
@@ -55,9 +64,9 @@
 !!
 !!@n @param Nsmp  Number of SMP processors
 !!@n @param Nstacksmp(0:Nsmp)   End number for each SMP process
-!!@n @param M           Number of components for Fourier transforms
+!!@n @param Ncomp           Number of components for Fourier transforms
 !!@n @param Nfft        Data length for eadh FFT
-!!@n @param X(M, Nfft)  Data for Fourier transform
+!!@n @param X(Ncomp, Nfft)  Data for Fourier transform
 !!@n @param WK          Work structure for FFTW3
 !
       module t_FFTW_wrapper
@@ -71,8 +80,6 @@
 !
 !>      structure for working data for FFTW
       type working_FFTW
-!>        Maximum nuber of components for each SMP process
-        integer(kind = kint) :: Mmax_smp
 !>        plan ID for backward transform
         integer(kind = fftw_plan), pointer :: plan_backward(:)
 !>        plan ID for forward transform
@@ -96,31 +103,109 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine init_FFTW_type(Nsmp, Nstacksmp, Nfft, WK)
+      subroutine init_FFTW_type(Ncomp, Nfft, WK)
 !
-      integer(kind = kint), intent(in) ::  Nfft
-      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+      integer(kind = kint), intent(in) ::  Ncomp, Nfft
 !
       type(working_FFTW), intent(inout) :: WK
 !
-      integer(kind = kint) :: ip
 !
-!
-      WK%Mmax_smp = Nstacksmp(1)
-      do ip = 1, Nsmp
-        WK%Mmax_smp                                                     &
-     &      = max(WK%Mmax_smp, (Nstacksmp(ip) - Nstacksmp(ip-1)) )
-      end do
-!
-      call alloc_work_4_FFTW_t(Nsmp, Nfft, WK)
-      call init_4_FFTW_smp(Nsmp, Nfft, WK%plan_forward,                 &
+      call alloc_work_4_FFTW_t(Ncomp, Ncomp, Nfft, WK)
+      call init_4_FFTW_smp(Ncomp, Nfft, WK%plan_forward,                &
      &      WK%plan_backward, WK%aNfft, WK%X_FFTW, WK%C_FFTW)
 !
       end subroutine init_FFTW_type
 !
 ! ------------------------------------------------------------------
 !
-      subroutine finalize_FFTW_type(Nsmp, WK)
+      subroutine finalize_FFTW_type(Ncomp, WK)
+!
+      integer(kind = kint), intent(in) ::  Ncomp
+!
+      type(working_FFTW), intent(inout) :: WK
+!
+!
+      call destroy_FFTW_smp(Ncomp, WK%plan_forward, WK%plan_backward)
+      call dealloc_work_4_FFTW_t(WK)
+!
+      end subroutine finalize_FFTW_type
+!
+! ------------------------------------------------------------------
+!
+      subroutine verify_wk_FFTW_type(Ncomp, Nfft, WK)
+!
+      integer(kind = kint), intent(in) ::  Ncomp, Nfft
+!
+      type(working_FFTW), intent(inout) :: WK
+!
+!
+      if(WK%iflag_fft_len .lt. 0) then
+        call init_FFTW_type(Ncomp, Nfft, WK)
+        return
+      end if
+!
+      if( WK%iflag_fft_len .ne. Nfft*Ncomp) then
+        call finalize_FFTW_type(Ncomp, WK)
+        call init_FFTW_type(Ncomp, Nfft, WK)
+      end if
+!
+      end subroutine verify_wk_FFTW_type
+!
+! ------------------------------------------------------------------
+! ------------------------------------------------------------------
+!
+      subroutine FFTW_forward_type(Nsmp, Nstacksmp, Ncomp, Nfft, X, WK)
+!
+      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+      integer(kind = kint), intent(in) :: Ncomp, Nfft
+!
+      real(kind = kreal), intent(inout) :: X(Ncomp, Nfft)
+      type(working_FFTW), intent(inout) :: WK
+!
+!
+      call FFTW_forward_SMP(WK%plan_forward, Nsmp, Nstacksmp,           &
+     &          Ncomp, Nfft, WK%aNfft, X, WK%X_FFTW, WK%C_FFTW)
+!
+      end subroutine FFTW_forward_type
+!
+! ------------------------------------------------------------------
+!
+      subroutine FFTW_backward_type(Nsmp, Nstacksmp, Ncomp, Nfft,       &
+     &          X, WK)
+!
+      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+      integer(kind = kint), intent(in) :: Ncomp, Nfft
+!
+      real(kind = kreal), intent(inout) :: X(Ncomp,Nfft)
+      type(working_FFTW), intent(inout) :: WK
+!
+!
+      call FFTW_backward_SMP(WK%plan_backward, Nsmp, Nstacksmp,         &
+     &    Ncomp, Nfft, X, WK%X_FFTW, WK%C_FFTW)
+!
+      end subroutine FFTW_backward_type
+!
+! ------------------------------------------------------------------
+! ------------------------------------------------------------------
+!
+      subroutine init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
+!
+      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+      integer(kind = kint), intent(in) ::  Nfft
+!
+      type(working_FFTW), intent(inout) :: WK
+!
+!
+      call alloc_work_4_FFTW_t(Nsmp, Nstacksmp(Nsmp), Nfft, WK)
+      call init_4_FFTW_mul_smp(Nsmp, Nstacksmp, Nstacksmp(Nsmp), Nfft,  &
+     &    WK%plan_forward, WK%plan_backward, WK%aNfft,                  &
+     &    WK%X_FFTW, WK%C_FFTW)
+!
+      end subroutine init_FFTW_mul_type
+!
+! ------------------------------------------------------------------
+!
+      subroutine finalize_FFTW_mul_type(Nsmp, WK)
 !
       integer(kind = kint), intent(in) ::  Nsmp
 !
@@ -130,90 +215,80 @@
       call destroy_FFTW_smp(Nsmp, WK%plan_forward, WK%plan_backward)
       call dealloc_work_4_FFTW_t(WK)
 !
-      end subroutine finalize_FFTW_type
+      end subroutine finalize_FFTW_mul_type
 !
 ! ------------------------------------------------------------------
 !
-      subroutine verify_wk_FFTW_type(Nsmp, Nstacksmp, Nfft, WK)
+      subroutine verify_wk_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
 !
-      integer(kind = kint), intent(in) ::  Nfft
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
+      integer(kind = kint), intent(in) :: Nfft
 !
       type(working_FFTW), intent(inout) :: WK
-!
-      integer(kind = kint) :: ip
 !
 !
       if(WK%iflag_fft_len .lt. 0) then
-        call init_FFTW_type(Nsmp, Nstacksmp, Nfft, WK)
+        call init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
         return
       end if
 !
-      WK%Mmax_smp = Nstacksmp(1)
-      do ip = 1, Nsmp
-        WK%Mmax_smp                                                     &
-     &      = max(WK%Mmax_smp, (Nstacksmp(ip) - Nstacksmp(ip-1)) )
-      end do
-!
-      if( WK%iflag_fft_len .ne. Nfft) then
-        call destroy_FFTW_smp(Nsmp, WK%plan_forward, WK%plan_backward)
-        call dealloc_work_4_FFTW_t(WK)
-!
-        call alloc_work_4_FFTW_t(Nsmp, Nfft, WK)
-        call init_4_FFTW_smp(Nsmp, Nfft, WK%plan_forward,               &
-     &      WK%plan_backward, WK%aNfft, WK%X_FFTW, WK%C_FFTW)
+      if( WK%iflag_fft_len .ne. Nfft*Nstacksmp(Nsmp)) then
+        call finalize_FFTW_mul_type(Nsmp, WK)
+        call init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WK)
       end if
 !
-      end subroutine verify_wk_FFTW_type
+      end subroutine verify_wk_FFTW_mul_type
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine FFTW_forward_type(Nsmp, Nstacksmp, M, Nfft, X, WK)
+      subroutine FFTW_mul_forward_type(Nsmp, Nstacksmp, Ncomp, Nfft,    &
+     &          X, WK)
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-      integer(kind = kint), intent(in) :: M, Nfft
+      integer(kind = kint), intent(in) :: Ncomp, Nfft
 !
-      real(kind = kreal), intent(inout) :: X(M, Nfft)
+      real(kind = kreal), intent(inout) :: X(Ncomp, Nfft)
       type(working_FFTW), intent(inout) :: WK
 !
 !
-      call FFTW_forward_SMP(WK%plan_forward, Nsmp, Nstacksmp,           &
-     &          M, Nfft, WK%aNfft, X, WK%X_FFTW, WK%C_FFTW)
+      call FFTW_mul_forward_SMP(WK%plan_forward, Nsmp, Nstacksmp,       &
+     &          Ncomp, Nfft, WK%aNfft, X, WK%X_FFTW, WK%C_FFTW)
 !
-      end subroutine FFTW_forward_type
+      end subroutine FFTW_mul_forward_type
 !
 ! ------------------------------------------------------------------
 !
-      subroutine FFTW_backward_type(Nsmp, Nstacksmp, M, Nfft, X, WK)
+      subroutine FFTW_mul_backward_type(Nsmp, Nstacksmp, Ncomp, Nfft,   &
+     &          X, WK)
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
-      integer(kind = kint), intent(in) :: M, Nfft
+      integer(kind = kint), intent(in) :: Ncomp, Nfft
 !
-      real(kind = kreal), intent(inout) :: X(M,Nfft)
+      real(kind = kreal), intent(inout) :: X(Ncomp,Nfft)
       type(working_FFTW), intent(inout) :: WK
 !
 !
-      call FFTW_backward_SMP(WK%plan_backward, Nsmp, Nstacksmp,         &
-     &    M, Nfft, X, WK%X_FFTW, WK%C_FFTW)
+      call FFTW_mul_backward_SMP(WK%plan_backward, Nsmp, Nstacksmp,     &
+     &    Ncomp, Nfft, X, WK%X_FFTW, WK%C_FFTW)
 !
-      end subroutine FFTW_backward_type
+      end subroutine FFTW_mul_backward_type
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine alloc_work_4_FFTW_t(Nsmp, Nfft, WK)
+      subroutine alloc_work_4_FFTW_t(Nplan, Ncomp, Nfft, WK)
 !
-      integer(kind = kint), intent(in) :: Nsmp, Nfft
+      integer(kind = kint), intent(in) :: Nplan, Ncomp, Nfft
       type(working_FFTW), intent(inout) :: WK
 !
 !
-      allocate(WK%plan_forward(Nsmp))
-      allocate(WK%plan_backward(Nsmp))
+      allocate(WK%plan_forward(Nplan))
+      allocate(WK%plan_backward(Nplan))
 !
-      WK%iflag_fft_len = Nfft
-      allocate( WK%X_FFTW(Nfft,Nsmp) )
-      allocate( WK%C_FFTW(Nfft/2+1,Nsmp) )
+      WK%iflag_fft_len = Nfft*Ncomp
+      allocate( WK%X_FFTW(Nfft,Ncomp) )
+      allocate( WK%C_FFTW(Nfft/2+1,Ncomp) )
       WK%X_FFTW = 0.0d0
       WK%C_FFTW = 0.0d0
 !

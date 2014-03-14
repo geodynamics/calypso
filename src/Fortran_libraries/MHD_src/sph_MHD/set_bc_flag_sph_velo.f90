@@ -7,7 +7,7 @@
 !>@brief Set boundary conditions flags for velocity
 !!
 !!@verbatim
-!!      subroutine s_set_bc_sph_mhd
+!!      subroutine set_sph_bc_velo_sph
 !!@endverbatim
 !
       module set_bc_flag_sph_velo
@@ -18,7 +18,6 @@
       use m_machine_parameter
       use m_boundary_condition_IDs
       use m_control_parameter
-      use m_control_params_sph_MHD
 !
       use m_spheric_parameter
 !
@@ -37,43 +36,36 @@
 !
       subroutine set_sph_bc_velo_sph
 !
-      integer(kind = kint) :: i
+      use m_boundary_params_sph_MHD
+      use set_bc_sph_scalars
 !
+      integer(kind = kint) :: i
+      integer(kind = kint) :: igrp_icb, igrp_cmb
+!
+!
+      call find_both_sides_of_boundaries(velo_nod, torque_surf,         &
+     &    sph_bc_U, igrp_icb, igrp_cmb)
 !
       call allocate_vsp_bc_array( nidx_rj(2) )
 !
 !
-      do i = 1, num_bc_v
-        if(iflag_icb_velocity .ne. iflag_fixed_velo) exit
-        if(bc_v_name(i) .eq. 'ICB') then 
-          call set_sph_velo_ICB_flag(ibc_v_type(i), bc_v_magnitude(i))
-        end if
-      end do
+      i = abs(igrp_icb)
+      if(igrp_icb .lt. 0) then
+        call set_sph_velo_ICB_flag(torque_surf%ibc_type(i),             &
+     &      torque_surf%bc_magnitude(i))
+      else
+        call set_sph_velo_ICB_flag(velo_nod%ibc_type(i),                &
+     &      velo_nod%bc_magnitude(i))
+      end if
 !
-      do i = 1, num_bc_tq
-        if(iflag_icb_velocity .ne. iflag_fixed_velo) exit
-        if    (bc_tq_name(i) .eq. 'ICB_surf'                            &
-     &    .or. bc_tq_name(i) .eq. 'ICB') then 
-          call set_sph_velo_ICB_flag(ibc_tq_type(i), bc_tq_magnitude(i))
-        end if
-      end do
-!
-!
-!
-      do i = 1, num_bc_v
-        if(iflag_cmb_velocity .ne. iflag_fixed_velo) exit
-        if(bc_v_name(i) .eq. 'CMB') then 
-          call set_sph_velo_CMB_flag(ibc_v_type(i), bc_v_magnitude(i))
-        end if
-      end do
-!
-      do i = 1, num_bc_tq
-        if(iflag_cmb_velocity .ne. iflag_fixed_velo) exit
-        if(     bc_tq_name(i) .eq. 'CMB_surf'                           &
-     &     .or. bc_tq_name(i) .eq. 'CMB') then 
-          call set_sph_velo_CMB_flag(ibc_tq_type(i), bc_tq_magnitude(i))
-        end if
-      end do
+      i = abs(igrp_cmb)
+      if(igrp_icb .lt. 0) then
+        call set_sph_velo_CMB_flag(torque_surf%ibc_type(i),             &
+     &      torque_surf%bc_magnitude(i))
+      else
+        call set_sph_velo_CMB_flag(velo_nod%ibc_type(i),                &
+     &      velo_nod%bc_magnitude(i))
+      end if
 !
       end subroutine set_sph_bc_velo_sph
 !
@@ -82,30 +74,35 @@
 !
       subroutine set_sph_velo_ICB_flag(ibc_type, bc_mag)
 !
+      use m_boundary_params_sph_MHD
+!
       integer(kind = kint), intent(in) :: ibc_type
       real(kind = kreal), intent(in) :: bc_mag
 !
 !
       if      (ibc_type .eq. iflag_free_sph) then
-        iflag_icb_velocity = iflag_free_slip
-        return
+        sph_bc_U%iflag_icb = iflag_free_slip
       else if (ibc_type .eq. iflag_non_slip_sph) then
-        iflag_icb_velocity = iflag_fixed_velo
+        sph_bc_U%iflag_icb = iflag_fixed_velo
       else if (ibc_type .eq. iflag_rotatable_icore) then
-        iflag_icb_velocity = iflag_rotatable_ic
+        sph_bc_U%iflag_icb = iflag_rotatable_ic
+      else if (ibc_type .eq. iflag_sph_2_center) then
+        sph_bc_U%iflag_icb = iflag_sph_fill_center
+      else if (ibc_type .eq. iflag_sph_clip_center) then
+        sph_bc_U%iflag_icb = iflag_sph_fix_center
 !
       else if (ibc_type .eq. (iflag_bc_rot+1)) then
-        iflag_icb_velocity = iflag_fixed_velo
+        sph_bc_U%iflag_icb = iflag_fixed_velo
         if(idx_rj_degree_one( 1) .gt.0 ) then
           vt_ICB_bc( idx_rj_degree_one( 1) ) = r_ICB*r_ICB * bc_mag
         end if
       else if (ibc_type .eq. (iflag_bc_rot+2)) then
-        iflag_icb_velocity = iflag_fixed_velo
+        sph_bc_U%iflag_icb = iflag_fixed_velo
         if(idx_rj_degree_one(-1) .gt. 0) then
           vt_ICB_bc( idx_rj_degree_one(-1) ) = r_ICB*r_ICB * bc_mag
         end if
       else if (ibc_type .eq. (iflag_bc_rot+3)) then
-        iflag_icb_velocity = iflag_fixed_velo
+        sph_bc_U%iflag_icb = iflag_fixed_velo
         if(idx_rj_degree_one( 0) .gt. 0) then
           vt_ICB_bc( idx_rj_degree_one( 0) ) = r_ICB*r_ICB * bc_mag
         end if
@@ -117,28 +114,29 @@
 !
       subroutine set_sph_velo_CMB_flag(ibc_type, bc_mag)
 !
+      use m_boundary_params_sph_MHD
+!
       integer(kind = kint), intent(in) :: ibc_type
       real(kind = kreal), intent(in) :: bc_mag
 !
 !
       if      (ibc_type .eq. iflag_free_sph) then
-        iflag_cmb_velocity = iflag_free_slip
-        return
+        sph_bc_U%iflag_cmb = iflag_free_slip
       else if (ibc_type .eq. iflag_non_slip_sph) then
-        iflag_cmb_velocity = iflag_fixed_velo
+        sph_bc_U%iflag_cmb = iflag_fixed_velo
 !
       else if (ibc_type .eq. (iflag_bc_rot+1)) then
-        iflag_cmb_velocity = iflag_fixed_velo
+        sph_bc_U%iflag_cmb = iflag_fixed_velo
         if(idx_rj_degree_one( 1) .gt.0 ) then
           vt_CMB_bc( idx_rj_degree_one( 1) ) = r_CMB*r_CMB * bc_mag
         end if
       else if (ibc_type .eq. (iflag_bc_rot+2)) then
-        iflag_cmb_velocity = iflag_fixed_velo
+        sph_bc_U%iflag_cmb = iflag_fixed_velo
         if(idx_rj_degree_one(-1) .gt. 0) then
           vt_CMB_bc( idx_rj_degree_one(-1) ) = r_CMB*r_CMB * bc_mag
         end if
       else if (ibc_type .eq. (iflag_bc_rot+3)) then
-        iflag_cmb_velocity = iflag_fixed_velo
+        sph_bc_U%iflag_cmb = iflag_fixed_velo
         if(idx_rj_degree_one( 0) .gt. 0) then
           vt_CMB_bc( idx_rj_degree_one( 0) ) = r_CMB*r_CMB * bc_mag
         end if

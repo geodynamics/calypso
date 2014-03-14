@@ -12,6 +12,8 @@
 !!      subroutine sph_back_trans_4_MHD
 !!      subroutine sph_forward_trans_4_MHD
 !!
+!!      subroutine sph_transform_4_licv
+!!
 !!      subroutine sph_back_trans_snapshot_MHD
 !!      subroutine sph_forward_trans_snapshot_MHD
 !!@endverbatim
@@ -20,6 +22,7 @@
 !
       use m_precision
       use m_constants
+      use m_machine_parameter
 !
       implicit  none
 !
@@ -33,12 +36,14 @@
 !
       subroutine init_sph_transform_MHD
 !
-      use m_machine_parameter
+      use calypso_mpi
       use m_addresses_trans_sph_MHD
       use m_addresses_trans_sph_snap
       use m_work_4_sph_trans
       use init_sph_trans
       use const_wz_coriolis_rtp
+      use const_coriolis_sph_rlm
+      use legendre_transform_select
 !
 !
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
@@ -51,12 +56,21 @@
         call check_addresses_snapshot_trans
       end if
 !
+      if (iflag_debug.eq.1) write(*,*) 'initialize_sph_trans'
       call initialize_sph_trans
 !
+      if (iflag_debug.eq.1) write(*,*) 'set_colatitude_rtp'
       call set_colatitude_rtp
+      if (iflag_debug.eq.1) write(*,*) 'init_sum_coriolis_rlm'
+      call init_sum_coriolis_rlm
 !
-      if(id_legendre_transfer .ne. iflag_leg_undefined) return
-      call select_legendre_transform
+      if(id_legendre_transfer .eq. iflag_leg_undefined) then
+        if (iflag_debug.eq.1) write(*,*) 'select_legendre_transform'
+        call select_legendre_transform
+      end if
+!
+      if (iflag_debug.eq.1) write(*,*) 'sel_alloc_legendre_trans'
+      call sel_alloc_legendre_trans(ncomp_sph_trans)
 !
       end subroutine init_sph_transform_MHD
 !
@@ -68,13 +82,13 @@
       use m_addresses_trans_sph_MHD
       use copy_MHD_4_sph_trans
 !
-      use sph_trans_vector
+      use sph_trans_w_coriols
       use sph_trans_scalar
 !
 !
       if(nvector_rj_2_rtp .gt. 0) then
         call copy_mhd_vec_spec_to_trans
-        call sph_b_trans_vector(nvector_rj_2_rtp)
+        call sph_b_trans_w_coriolis(nvector_rj_2_rtp)
         call copy_mhd_vec_fld_from_trans
       end if
 !
@@ -93,13 +107,13 @@
       use m_addresses_trans_sph_MHD
       use copy_MHD_4_sph_trans
 !
-      use sph_trans_vector
+      use sph_trans_w_coriols
       use sph_trans_scalar
 !
 !
       if(nvector_rtp_2_rj .gt. 0) then
         call copy_mhd_vec_fld_to_trans
-        call sph_f_trans_vector(nvector_rtp_2_rj)
+        call sph_f_trans_w_coriolis(nvector_rtp_2_rj)
         call copy_mhd_vec_spec_from_trans
       end if
 !
@@ -153,69 +167,96 @@
       end subroutine sph_forward_trans_snapshot_MHD
 !
 !-----------------------------------------------------------------------
+!
+      subroutine sph_transform_4_licv
+!
+      use m_addresses_trans_sph_MHD
+      use copy_MHD_4_sph_trans
+!
+      use sph_trans_w_coriols
+!
+!
+      if(nvector_rj_2_rtp .gt. 0) then
+        call copy_mhd_vec_spec_to_trans
+        call sph_b_trans_licv(nvector_rj_2_rtp)
+      end if
+!
+!
+      if(nvector_rtp_2_rj .gt. 0) then
+        call sph_f_trans_licv(nvector_rtp_2_rj)
+        call copy_mhd_vec_spec_from_trans
+      end if
+!
+      end subroutine sph_transform_4_licv
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine select_legendre_transform
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_machine_parameter
       use m_work_4_sph_trans
+      use legendre_transform_select
 !
-      real(kind = kreal) :: stime, etime(1:3), etime_shortest
-      real(kind = kreal) :: etime_trans(1:3)
+      real(kind = kreal) :: stime, etime_shortest
+      real(kind = kreal) :: etime(5), etime_trans(5)
+!
+      integer(kind = kint) :: iloop_type
 !
 !
-      id_legendre_transfer = iflag_leg_orginal_loop
-      stime = MPI_WTIME()
-      call sph_back_trans_4_MHD
-      call sph_forward_trans_4_MHD
-      etime(id_legendre_transfer) = MPI_WTIME() - stime
+      do iloop_type = 1, 5
+        id_legendre_transfer = iloop_type
+        call sel_alloc_legendre_trans(ncomp_sph_trans)
 !
-      id_legendre_transfer = iflag_leg_krloop_inner
-      stime = MPI_WTIME()
-      call sph_back_trans_4_MHD
-      call sph_forward_trans_4_MHD
-      etime(id_legendre_transfer) = MPI_WTIME() - stime
+        stime = MPI_WTIME()
+        call sph_back_trans_4_MHD
+        call sph_forward_trans_4_MHD
+        etime(id_legendre_transfer) = MPI_WTIME() - stime
 !
-      id_legendre_transfer = iflag_leg_krloop_outer
-      stime = MPI_WTIME()
-      call sph_back_trans_4_MHD
-      call sph_forward_trans_4_MHD
-      etime(id_legendre_transfer) = MPI_WTIME() - stime
+        call sel_dealloc_legendre_trans
+      end do
 !
-      call MPI_allREDUCE (etime, etime_trans, ifour,                    &
-     &    MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+      call MPI_allREDUCE (etime, etime_trans, ifive,                    &
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      etime_trans(1:5) = etime_trans(1:5) / dble(nprocs)
 !
       id_legendre_transfer = iflag_leg_orginal_loop
       etime_shortest =       etime_trans(iflag_leg_orginal_loop)
 !
-      if(etime_trans(iflag_leg_krloop_inner) .lt. etime_shortest) then
-        id_legendre_transfer = iflag_leg_krloop_inner
-        etime_shortest =       etime_trans(iflag_leg_krloop_inner)
-      end if
-      if(etime_trans(iflag_leg_krloop_outer) .lt. etime_shortest) then
-        id_legendre_transfer = iflag_leg_krloop_outer
-        etime_shortest =       etime_trans(iflag_leg_krloop_outer)
-      end if
+      do iloop_type = 2, 5
+        if(etime_trans(iloop_type) .lt. etime_shortest) then
+          id_legendre_transfer = iloop_type
+          etime_shortest =       etime_trans(iloop_type)
+        end if
+      end do
 !
       if(my_rank .gt. 0) return
         write(*,'(a,i4)', advance='no')                                 &
      &         'Selected id_legendre_transfer: ', id_legendre_transfer
 !
         if     (id_legendre_transfer .eq. iflag_leg_orginal_loop) then
-          write(*,'(a,a)') ' (LONG_LOOP) '
+          write(*,'(a,a)') ' (ORIGINAL_LOOP) '
         else if(id_legendre_transfer .eq. iflag_leg_krloop_inner) then
           write(*,'(a,a)') ' (INNER_RADIAL_LOOP) '
         else if(id_legendre_transfer .eq. iflag_leg_krloop_outer) then
           write(*,'(a,a)') ' (OUTER_RADIAL_LOOP) '
+        else if(id_legendre_transfer .eq. iflag_leg_long_loop) then
+          write(*,'(a,a)') ' (LONG_LOOP) '
+        else if(id_legendre_transfer .eq. iflag_lef_fdout_loop) then
+          write(*,'(a,a)') ' (OUTER_FIELD_LOOP) '
         end if
 !
-        write(*,*) '1: elapsed by original loop: ',                     &
+        write(*,*) '1: elapsed by original loop:      ',                &
      &            etime_trans(iflag_leg_orginal_loop)
-        write(*,*) '2: elapsed by inner radius loop: ',                 &
+        write(*,*) '2: elapsed by inner radius loop:  ',                &
      &            etime_trans(iflag_leg_krloop_inner)
-        write(*,*) '3: elapsed by outer radius loop: ',                 &
+        write(*,*) '3: elapsed by outer radius loop:  ',                &
      &            etime_trans(iflag_leg_krloop_outer)
+        write(*,*) '4: elapsed by long loop:          ',                &
+     &            etime_trans(iflag_leg_long_loop)
+        write(*,*) '5: elapsed by outmost field loop: ',                &
+     &            etime_trans(iflag_lef_fdout_loop)
 !
       end subroutine select_legendre_transform
 !

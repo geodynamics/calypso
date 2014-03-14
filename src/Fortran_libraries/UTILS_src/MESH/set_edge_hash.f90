@@ -34,7 +34,7 @@
       integer(kind = kint), intent(in) :: nnod_4_surf, nnod_4_edge
       integer(kind = kint), intent(in) :: ie_surf(numsurf,nnod_4_surf)
 !
-      integer(kind = kint) :: isurf, inod1, inod2, is1, is2, k1
+      integer(kind = kint) :: isurf, is1, is2, k1
       integer(kind = kint) :: ihash
 !
 !
@@ -69,7 +69,7 @@
       integer(kind = kint), intent(in) :: ie_surf(numsurf,nnod_4_surf)
 !
       integer(kind = kint) :: j
-      integer(kind = kint) :: isurf, inod1, inod2, is1, is2, k1
+      integer(kind = kint) :: isurf, is1, is2, k1
       integer(kind = kint) :: ihash
 !
 !
@@ -102,7 +102,7 @@
       integer(kind = kint), intent(in) :: isf_part(numsurf_part)
       integer(kind = kint), intent(in) :: ie_surf(numsurf,nnod_4_surf)
 !
-      integer(kind = kint) :: inum, isurf, inod1, inod2, is1, is2, k1
+      integer(kind = kint) :: inum, isurf, is1, is2, k1
       integer(kind = kint) :: ihash
 !
 !
@@ -141,7 +141,7 @@
       integer(kind = kint), intent(in) :: ie_surf(numsurf,nnod_4_surf)
 !
       integer(kind = kint) :: j
-      integer(kind = kint) :: inum, isurf, inod1, inod2, is1, is2, k1
+      integer(kind = kint) :: inum, isurf, is1, is2, k1
       integer(kind = kint) :: ihash
 !
 !

@@ -1,0 +1,14 @@
+!-----------------------------------------------------------------------
+!     Example to generate spherical harmonics index data files
+!-----------------------------------------------------------------------
+!
+ Here is the files to generate spherical harmonics index data file
+for simulations with 1 MPI process.
+ In this example, equidistance grids are used for the radial spacing.
+This example consists of the following files and directories
+
+control_sph_shell:   control file for data transform
+sph_lm24r24e_1:     Directory for spherical harmonics index table
+
+Run index generation program in both directory for index tables
+[equidistance]$ [CALYPSO_DIR]/bin/gen_sph_grids

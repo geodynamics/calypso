@@ -30,7 +30,7 @@
       use m_precision
       use m_constants
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_work_time
 !
       implicit none
@@ -44,6 +44,7 @@
       subroutine FEM_initialize
 !
       use m_geometry_parameter
+      use m_array_for_send_recv
       use m_t_step_parameter
       use m_surface_geometry_data
       use m_edge_geometry_data
@@ -69,8 +70,6 @@
       call input_mesh(my_rank)
       call end_eleps_time(4)
 !
-      call time_prog_barrier
-!
 ! ---------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'set_local_node_id_4_monitor'
@@ -83,11 +82,9 @@
 !
       call deallocate_surface_geometry
       call deallocate_edge_geometry
-      call time_prog_barrier
 !
-      if (iflag_debug.gt.0 ) write(*,*) 'allocate_iccgN_matrix'
-      call allocate_iccgN_matrix(isix, numnod)
-      call time_prog_barrier
+      if (iflag_debug.gt.0 ) write(*,*) 'allocate_vector_for_solver'
+      call allocate_vector_for_solver(isix, numnod)
 !
       if(iflag_debug.gt.0) write(*,*)' init_send_recv'
       call init_send_recv
@@ -179,7 +176,7 @@
       call cvt_xyz_from_sph_vec_sph_data
       call cvt_sph_to_xyz_tensor_data
 !
-      call phys_send_recv_4_viz
+      call phys_send_recv_all
 !
       end subroutine SPH_to_FEM_bridge_MHD
 !

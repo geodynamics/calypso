@@ -27,7 +27,7 @@
 !
       subroutine set_material_property
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
       use m_normalize_parameter
       use m_geometry_parameter
@@ -43,6 +43,7 @@
 !
         coef_temp =   one
         coef_d_temp = one
+        coef_h_src =  one
 !
         call construct_coefficient(coef_temp, num_dimless, dimless,     &
      &      name_dimless, num_coef_4_termal, coef_4_termal_name,        &
@@ -51,6 +52,10 @@
         call construct_coefficient(coef_d_temp, num_dimless, dimless,   &
      &      name_dimless, num_coef_4_t_diffuse, coef_4_t_diffuse_name,  &
      &      coef_4_t_diffuse_power, depth_low_t, depth_high_t)
+!
+        call construct_coefficient(coef_h_src, num_dimless, dimless,    &
+     &      name_dimless, num_coef_4_h_source, coef_4_h_source_name,    &
+     &      coef_4_h_source_power, depth_low_t, depth_high_t)
 !
         call set_implicit_4_inf_viscous(coef_temp,                      &
      &      coef_imp_t, coef_exp_t)
@@ -151,8 +156,9 @@
 !   For light element
 !
       if (iflag_t_evo_4_composit .gt. id_no_evolution) then
-        coef_light =   one
-        coef_d_light = one
+        coef_light =    one
+        coef_d_light =  one
+        coef_c_src =    one
 !
         call construct_coefficient(coef_light, num_dimless, dimless,    &
      &      name_dimless, num_coef_4_composition, coef_4_composit_name, &
@@ -161,6 +167,10 @@
         call construct_coefficient(coef_d_light, num_dimless, dimless,  &
      &      name_dimless, num_coef_4_c_diffuse, coef_4_c_diffuse_name,  &
      &      coef_4_c_diffuse_power, depth_low_t, depth_high_t)
+!
+        call construct_coefficient(coef_c_src, num_dimless, dimless,    &
+     &      name_dimless, num_coef_4_c_source, coef_4_c_source_name,    &
+     &      coef_4_c_source_power, depth_low_t, depth_high_t)
 !
         call set_implicit_4_inf_viscous(coef_light,                     &
      &      coef_imp_c, coef_exp_c)
@@ -194,6 +204,8 @@
      &              coef_temp
           write(*,*) 'coefficient for thermal diffusion:   ',           &
      &              coef_d_temp
+          write(*,*) 'coefficient for heat source:         ',           &
+     &              coef_h_src
         end if
 !
         if (iflag_t_evo_4_magne .gt. id_no_evolution                    &
@@ -213,6 +225,8 @@
      &              coef_light
           write(*,*) 'coefficient for composite diffusion: ',           &
      &              coef_d_light
+          write(*,*) 'coefficient for light element source:',           &
+     &              coef_c_src
           write(*,*)''
         end if
       end if

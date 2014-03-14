@@ -134,7 +134,7 @@
       subroutine check_near_ele_4_node(my_rank,numnod)
 !
       integer(kind = kint), intent(in) :: my_rank, numnod
-      integer(kind = kint) :: inod, inum, ist, ied
+      integer(kind = kint) :: inod, ist, ied
 !
       write(50+my_rank,*) 'max and min. of near element for node ',     &
      &                    nmax_ele_near_nod, nmin_ele_near_nod

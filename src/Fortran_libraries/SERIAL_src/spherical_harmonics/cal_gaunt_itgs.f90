@@ -1,71 +1,71 @@
 !cal_gaunt_itgs.f90
 !      module cal_gaunt_itgs
 !
-!***********************************************************************
-!*       subroutine of lead Gaunt integrals with harmonics
-!*                                  update : 1995 08 08
-!***********************************************************************
-!*
-!
-!      double precision function leadki(l1, m1, l2, m2, l3, m3)
-!
-!*******************************************************************
-!*
-!*  Adams - Gaunt integrals
-!*
-!*  (m1,m2,m3)  //  (m1)   (m2)   (m3)  
-!* Ki         = || Y    * Y    * Y    *sin(theta) d(theta)d(fai)   
-!*  (l1,l2,l3)  //  (l1)   (l2)   (l3)                             
-!*                                                                 
-!*  where                                                          
-!*                   (m)   (m)  | sin(m*fai) |                     
-!*                  Y   = P   * |   1        |                     
-!*                   (l)   (l)  | cos(m*fai) |                     
-!*                                                                 
-!*                         (m)    2*(l-m)!     1                   
-!*                        P   = [----------]**--- * P(l,m)         
-!*                         (l)      (l+m)!     2                   
-!*           mm1 = abs(m1)
-!*           mm2 = abs(m3)
-!*           mm2 = abs(m3)
-!*
-!*           mm1 = mm2 + m3
-!*
-!*******************************************************************
-!*
-!
-!      double precision function leadli(l1, m1, l2, m2, l3, m3)
-!
-!***********************************************************************
-!*
-!*          ei : elsasser integral only Schmidt function (input)
-!*          li : Elsasser integral with harmonics (output)
-!*                            (m2)        (m3)                     
-!*  (m1,m2,m3)  //  (m1)    dY(l2)      dY(l3)                     
-!* Li         = || Y    *[ -------- * ----------                   
-!*  (l1,l2,l3)  //  (l1)   d(theta)     d(phi)                    
-!*                                                                 
-!*                    (m2)        (m3)                             
-!*                  dY(l2)      dY(l3)                             
-!*              - ---------- * -------- ] d(theta)d(fai)           
-!*                  d(phi)     d(theta)                             
-!*                                                                 
-!*  where                                                          
-!*                   (m)   (m)  | sin(m*fai) |                     
-!*                  Y   = P   * |   1        |                     
-!*                   (l)   (l)  | cos(m*fai) |                     
-!*                                                                 
-!*                         (m)    2*(l-m)!     1                   
-!*                        P   = [----------]**--- * P(l,m)         
-!*                         (l)      (l+m)!     2                   
-!*           mm1 = abs(m1)
-!*           mm2 = abs(m3)
-!*           mm2 = abs(m3)
-!*
-!*           mm1 = mm2 + m3
-!*                                                                 
-!********************************************************************
-!*
+!!***********************************************************************
+!!*       subroutine of lead Gaunt integrals with harmonics
+!!*                                  update : 1995 08 08
+!!***********************************************************************
+!!*
+!!
+!!      double precision function leadki(l1, m1, l2, m2, l3, m3)
+!!
+!!*******************************************************************
+!!*
+!!*  Adams - Gaunt integrals
+!!*
+!!*  (m1,m2,m3)  //  (m1)   (m2)   (m3)  
+!!* Ki         = || Y    * Y    * Y    *sin(theta) d(theta)d(fai)   
+!!*  (l1,l2,l3)  //  (l1)   (l2)   (l3)                             
+!!*                                                                 
+!!*  where                                                          
+!!*                   (m)   (m)  | sin(m*fai) |                     
+!!*                  Y   = P   * |   1        |                     
+!!*                   (l)   (l)  | cos(m*fai) |                     
+!!*                                                                 
+!!*                         (m)    2*(l-m)!     1                   
+!!*                        P   = [----------]**--- * P(l,m)         
+!!*                         (l)      (l+m)!     2                   
+!!*           mm1 = abs(m1)
+!!*           mm2 = abs(m3)
+!!*           mm2 = abs(m3)
+!!*
+!!*           mm1 = mm2 + m3
+!!*
+!!*******************************************************************
+!!*
+!!
+!!      double precision function leadli(l1, m1, l2, m2, l3, m3)
+!!
+!!***********************************************************************
+!!*
+!!*          ei : elsasser integral only Schmidt function (input)
+!!*          li : Elsasser integral with harmonics (output)
+!!*                            (m2)        (m3)                     
+!!*  (m1,m2,m3)  //  (m1)    dY(l2)      dY(l3)                     
+!!* Li         = || Y    *[ -------- * ----------                   
+!!*  (l1,l2,l3)  //  (l1)   d(theta)     d(phi)                    
+!!*                                                                 
+!!*                    (m2)        (m3)                             
+!!*                  dY(l2)      dY(l3)                             
+!!*              - ---------- * -------- ] d(theta)d(fai)           
+!!*                  d(phi)     d(theta)                             
+!!*                                                                 
+!!*  where                                                          
+!!*                   (m)   (m)  | sin(m*fai) |                     
+!!*                  Y   = P   * |   1        |                     
+!!*                   (l)   (l)  | cos(m*fai) |                     
+!!*                                                                 
+!!*                         (m)    2*(l-m)!     1                   
+!!*                        P   = [----------]**--- * P(l,m)         
+!!*                         (l)      (l+m)!     2                   
+!!*           mm1 = abs(m1)
+!!*           mm2 = abs(m3)
+!!*           mm2 = abs(m3)
+!!*
+!!*           mm1 = mm2 + m3
+!!*                                                                 
+!!********************************************************************
+!!*
       module cal_gaunt_itgs
 !
       use m_precision

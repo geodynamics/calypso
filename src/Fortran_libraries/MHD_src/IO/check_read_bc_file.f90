@@ -21,7 +21,7 @@
 !
       subroutine check_read_boundary_files
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
       use m_bc_data_list
       use m_surf_data_list
@@ -33,30 +33,30 @@
 !
       if ( iflag_t_evo_4_temp .gt. id_no_evolution) then
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &    num_bc_e, ibc_e_type)
+     &      temp_nod%num_bc, temp_nod%ibc_type)
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &    num_bc_h_flux, ibc_h_flux_type)
+     &      h_flux_surf%num_bc, h_flux_surf%ibc_type)
       end if
 !
 ! ----  read boundary data for velocity
 !
       if ( iflag_t_evo_4_velo .gt. id_no_evolution) then
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_v, ibc_v_type)
+     &      velo_nod%num_bc, velo_nod%ibc_type)
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_tq, ibc_tq_type)
+     &      torque_surf%num_bc, torque_surf%ibc_type)
 !
 !  set boundary conditions for pressure
 !
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_p, ibc_p_type)
+     &      press_nod%num_bc, press_nod%ibc_type)
       end if
 !
 ! ----  read boundary data for dummy scalar
 !
       if ( iflag_t_evo_4_composit .gt. id_no_evolution) then
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_composit, ibc_composit_type)
+     &      light_nod%num_bc, light_nod%ibc_type)
       end if
 !
 ! ----  read boundary data for magnetic field
@@ -65,14 +65,14 @@
      &      .or. iflag_t_evo_4_vect_p .gt. id_no_evolution) then
 !
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_b, ibc_b_type)
+     &      magne_nod%num_bc, magne_nod%ibc_type)
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_bs, ibc_bs_type)
+     &      magne_surf%num_bc, magne_surf%ibc_type)
 !
 ! ----  read boundary data for magnetic potential
 !
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_mag_p, ibc_mag_p_type)
+     &      e_potential_nod%num_bc, e_potential_nod%ibc_type)
       end if
 !
 ! ----  read boundary data for vector potential
@@ -80,14 +80,14 @@
       if ( iflag_t_evo_4_vect_p .gt. id_no_evolution) then
 !
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_vp, ibc_vp_type)
+     &      a_potential_nod%num_bc, a_potential_nod%ibc_type)
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &     num_bc_vps, ibc_vps_type)
+     &      a_potential_surf%num_bc, a_potential_surf%ibc_type)
 !
 ! ----  read boundary data for magnetic potential
 !
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_mag_p, ibc_mag_p_type)
+     &      e_potential_nod%num_bc, e_potential_nod%ibc_type)
       end if
 !
 ! ----  read boundary data for current density
@@ -96,9 +96,9 @@
      &      .or. iflag_t_evo_4_vect_p .gt. id_no_evolution) then
 !
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_j, ibc_j_type)
+     &      current_nod%num_bc, current_nod%ibc_type)
         call set_serch_boundary_file_flag(iflag_boundary_file,          &
-     &      num_bc_js, ibc_js_type)
+     &      current_surf%num_bc, current_surf%ibc_type)
       end if
 !
       end subroutine check_read_boundary_files

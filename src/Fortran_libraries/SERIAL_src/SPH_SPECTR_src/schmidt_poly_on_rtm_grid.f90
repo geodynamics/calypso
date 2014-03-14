@@ -127,6 +127,10 @@
         g_sph_rlm(j,11) = g(jj,11)
         g_sph_rlm(j,12) = g(jj,12)
         g_sph_rlm(j,13) = g(jj,13)
+        g_sph_rlm(j,14) = g(jj,14)
+        g_sph_rlm(j,15) = g(jj,15)
+        g_sph_rlm(j,16) = g(jj,16)
+        g_sph_rlm(j,17) = g(jj,17)
 !
         if(jj .eq. 0) g_sph_rlm(j,3) = half
       end do

@@ -7,7 +7,7 @@
 !>@brief Evaluate divergence of forces for pressure evaluation
 !!
 !!@verbatim
-!!      subroutine s_cal_div_of_forces
+!!      subroutine sum_div_of_forces
 !!@endverbatim
 !
       module cal_div_of_forces
@@ -29,7 +29,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine s_cal_div_of_forces
+      subroutine sum_div_of_forces
 !
       use m_control_parameter
 !
@@ -73,7 +73,7 @@
       end if
 !$omp end parallel
 !
-      end subroutine s_cal_div_of_forces
+      end subroutine sum_div_of_forces
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

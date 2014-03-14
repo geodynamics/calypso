@@ -72,7 +72,7 @@
         do nd = 1, nb
           i_rlm = nd + ist_rtm_order_zero * nb
           v_ct_local(3*nd-2) =  two * sp_rlm(3*i_rlm-2)                 &
-     &                  * a_r_1d_rtm_r(1)*a_r_1d_rtm_r(1)
+     &                  * a_r_1d_rlm_r(1)*a_r_1d_rlm_r(1)
         end do
       end if
 !
@@ -80,7 +80,7 @@
         do nd = 1, nb
           i_rlm = nd + (ist_rtm_order_1s-1) * nb
           v_ct_local(3*nd  ) = -two * sp_rlm(3*i_rlm-2)                 &
-     &                  * a_r_1d_rtm_r(1)*a_r_1d_rtm_r(1)
+     &                  * a_r_1d_rlm_r(1)*a_r_1d_rlm_r(1)
         end do
       end if
 !
@@ -88,7 +88,7 @@
         do nd = 1, nb
           i_rlm = nd + (ist_rtm_order_1c-1) * nb
           v_ct_local(3*nd-1) = -two * sp_rlm(3*i_rlm-2)                 &
-     &                  * a_r_1d_rtm_r(1)*a_r_1d_rtm_r(1)
+     &                  * a_r_1d_rlm_r(1)*a_r_1d_rlm_r(1)
         end do
       end if
 !

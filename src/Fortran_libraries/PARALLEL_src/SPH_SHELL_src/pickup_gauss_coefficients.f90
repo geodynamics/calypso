@@ -1,10 +1,15 @@
-!pickup_gauss_coefficients.f90
-!      module pickup_gauss_coefficients
+!>@file   pickup_gauss_coefficients.f90
+!!@brief      module pickup_gauss_coefficients
+!!
+!!@author H. Matsui and H. Okuda
+!!@date Programmed in  Dec., 2012
 !
-!        programmed by H.Matsui on Dec., 2012
-!
-!      subroutine init_gauss_coefs_4_monitor
-!      subroutine cal_gauss_coefficients
+!> @brief choose Gauss coefficients to output
+!!
+!!@verbatim
+!!      subroutine init_gauss_coefs_4_monitor
+!!      subroutine cal_gauss_coefficients
+!!@endverbatim
 !
       module pickup_gauss_coefficients
 !
@@ -42,7 +47,8 @@
       call allocate_iflag_pick_sph(l_truncation)
 !
       if (ipol%i_magne .gt. 0) then
-        call set_picked_sph_adrress(l_truncation, ist_rj(2), ied_rj(2), &
+      call set_picked_sph_address                                       &
+     &   (l_truncation, nidx_rj(2), idx_gl_1d_rj_j(1,1),                &
      &    num_pick_gauss_coefs, num_pick_gauss_l, num_pick_gauss_m,     &
      &    idx_pick_gauss_mode, idx_pick_gauss_l, idx_pick_gauss_m,      &
      &    ntot_pick_gauss_mode, num_pick_gauss_mode,                    &
@@ -62,7 +68,7 @@
 !
       subroutine cal_gauss_coefficients
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_sph_spectr_data
       use m_sph_phys_address
 !
@@ -93,8 +99,8 @@
 !$omp end parallel do
 !
       call MPI_allREDUCE(gauss_coef_lc(1), gauss_coef_gl(1),            &
-     &    num_pick_gauss_mode, MPI_DOUBLE_PRECISION, MPI_SUM,           &
-     &    SOLVER_COMM, ierr)
+     &    num_pick_gauss_mode, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM,     &
+     &    ierr_MPI)
 !
       end subroutine cal_gauss_coefficients
 !

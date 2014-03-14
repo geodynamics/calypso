@@ -6,7 +6,7 @@
 !      subroutine allocate_idx_sph_recieve
 !      subroutine deallocate_idx_sph_recieve
 !
-!      subroutine sph_indices_transfer
+!      subroutine sph_indices_transfer(itype)
 !      subroutine compare_transfer_sph_indices(id_check)
 !      subroutine check_missing_sph_indices(id_check)
 !
@@ -57,12 +57,16 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine sph_indices_transfer
+      subroutine sph_indices_transfer(itype)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
       use spherical_SRs_int
 !
+      integer(kind = kint), intent(in) ::itype
+!
+!
+      iflag_sph_SR_int = itype
 !
       if (my_rank .eq. 0) write(*,*) 'send_recv_rtp_2_rtm_int'
       call send_recv_rtp_2_rtm_int                                      &
@@ -184,7 +188,7 @@
 !
       write(id_check,*) 'No commnication data in rtm => rtp'
       write(id_check,*)                                                 &
-     &         'local_id, global_id, global_r, global_t, global_m'
+     &   'local_id, global_id, global_r, global_t, global_p, global_m'
       do mphi = 1, nidx_rtp(3)
         do lth = 1, nidx_rtp(2)
           do kr = 1, nidx_rtp(1)

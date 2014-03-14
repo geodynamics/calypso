@@ -28,6 +28,7 @@
 !
       subroutine s_lead_fields_4_sph_mhd
 !
+      use m_control_parameter
       use m_t_step_parameter
       use output_viz_file_control
 !
@@ -37,7 +38,9 @@
       call set_lead_physical_values_flag(iflag)
 !
       if ( (iflag*mod(istep_max_dt,i_step_output_rst)) .eq.0 ) then
-         call pressure_4_sph_mhd
+        if(iflag_t_evo_4_velo .gt. id_no_evolution) then
+          call pressure_4_sph_mhd
+        end if
       end if
 !
       if(iflag .eq. 0) call enegy_fluxes_4_sph_mhd
@@ -48,6 +51,8 @@
 !
       subroutine pressure_4_sph_mhd
 !
+      use m_sph_phys_address
+      use m_boundary_params_sph_MHD
       use cal_sol_sph_fluid_crank
 !
       use cal_sph_field_by_rotation
@@ -61,14 +66,15 @@
 !
       call s_const_radial_forces_on_bc
 !
-      call s_cal_div_of_forces
+      call sum_div_of_forces
 !
       if (iflag_debug.eq.1) write(*,*) 'cal_sol_pressure_by_div_v'
       call cal_sol_pressure_by_div_v
 !
       if(ipol%i_press_grad .gt. 0) then
         if (iflag_debug.eq.1) write(*,*) 'const_pressure_gradient'
-        call const_pressure_gradient
+        call const_pressure_gradient                                    &
+     &     (sph_bc_U, ipol%i_press, ipol%i_press_grad)
       end if
 !
       end subroutine pressure_4_sph_mhd

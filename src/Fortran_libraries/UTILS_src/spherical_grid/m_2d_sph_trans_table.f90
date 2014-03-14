@@ -36,6 +36,8 @@
       integer(kind = kint), allocatable :: jtbl_fsph(:,:)
       integer(kind = kint), allocatable :: jtbl_isph(:)
 !
+      integer(kind = kint), allocatable :: jtbl_rj(:,:)
+!
 ! -----------------------------------------------------------------------
 !
       contains
@@ -54,8 +56,9 @@
 !
       allocate( mdx_ispack(nphi) )
 !
+      allocate( jtbl_rj(0:jmax,3)   )
       allocate( jtbl_fsph(0:jmax,3) )
-      allocate( jtbl_isph(0:jmax) )
+      allocate( jtbl_isph(0:jmax)   )
 !
       jdx_fsph = 0
       mspec_4_ispack = 0
@@ -63,6 +66,7 @@
       mdx_4_lgd = 0
       mdx_ispack = 0
 !
+      jtbl_rj =   0
       jtbl_fsph = 0
       jtbl_isph = 0
 !
@@ -80,6 +84,7 @@
 !
       deallocate( mdx_ispack )
 !
+      deallocate( jtbl_rj )
       deallocate( jtbl_fsph )
       deallocate( jtbl_isph )
 !
@@ -112,6 +117,12 @@
       write(my_rank+50,*) 'j, jtbl_fsph(j,1:3)'
       do j = 0, jmax
         write(my_rank+50,*) j, jtbl_fsph(j,1:3)
+      end do
+!
+      write(my_rank+50,*) 'spectr data ordering for linear terms'
+      write(my_rank+50,*) 'j, jtbl_fsph(j,1:3)'
+      do j = 0, jmax
+        write(my_rank+50,*) j, jtbl_rj(j,1:3)
       end do
 !
       write(my_rank+50,*) 'spectr data for final distribution'

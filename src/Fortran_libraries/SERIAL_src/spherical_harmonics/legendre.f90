@@ -1,31 +1,32 @@
-!legendre.f90
-!      module legendre
+!>@file   legendre.f90
+!!@brief  module legendre
+!!
+!!@author H. Matsui
+!!@date Programmed in 1995
+!!@n    Modified in June, 2006
 !
-!        Written by H. Matsui in 1995
-!        Modified by H. Matsui on June, 2006
-!>
-!!    @brief module for Legendre polynomials
+!>@brief module for Legendre polynomials
 !!
 !!@verbatim
 !!    subroutine dladendre(nth, x, dplm, df)
 !!*************************************************************
 !!     lead legendre and adjoint Legendle Polynomial
-!!*
-!!*      dplm(m,l) : adjoint Legendre Polynomial P_l^m (x)
-!!*         x        :  input value x ( -1 =< x =<1 )
-!!*        df(m,l)  :   work area
-!!*
+!!
+!!      dplm(m,l) : adjoint Legendre Polynomial P_l^m (x)
+!!         x        :  input value x ( -1 =< x =<1 )
+!!        df(m,l)  :   work area
+!!
 !!*************************************************************
-!!*
+!!
 !!      subroutine schmidt_normalization(nth, dplm, dc, p, dp)
 !!*************************************************************
-!!*     lead Schmidt quasi-normalization
-!!*
-!!*      p(m,l)  : Schmidt Polynomial
-!!*      dp(m,l) : diffrence of Schmidt Polynomial dp/dtheta
-!!*      dplm(m,l)  : adjoint Legendre Polynomial P_l^m (x)
-!!*      dc(m,l)  :   work area
-!!*
+!!     lead Schmidt quasi-normalization
+!!
+!!      p(m,l)  : Schmidt Polynomial
+!!      dp(m,l) : diffrence of Schmidt Polynomial dp/dtheta
+!!      dplm(m,l)  : adjoint Legendre Polynomial P_l^m (x)
+!!      dc(m,l)  :   work area
+!!
 !!*************************************************************
 !!@endverbatim
 !!

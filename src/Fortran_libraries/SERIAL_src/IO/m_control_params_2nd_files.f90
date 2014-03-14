@@ -59,7 +59,7 @@
 !
       iflag_org_rst_head = i_org_rst_head
       if (iflag_org_rst_head .gt. 0) then
-        org_rst_header = org_rst_head_ctl
+        org_rst_header = orginal_restart_prefix
       end if
 !
       if (i_org_udt_head .gt. 0) then

@@ -11,16 +11,19 @@
 !!      subroutine cal_diff_induction_wSGS_adams
 !!      subroutine cal_diff_induction_MHD_euler
 !!
-!!      subroutine cal_heat_diff_advect_adams
-!!      subroutine cal_heat_diff_advect_euler
+!!      subroutine sel_heat_diff_adv_src_adams(kr_in, kr_out)
+!!      subroutine sel_heat_diff_adv_src_euler(kr_in, kr_out)
 !!
-!!      subroutine cal_scalar_diff_advect_adams
-!!      subroutine cal_scalar_diff_advect_euler
+!!      subroutine sel_light_diff_adv_src_adams(kr_in, kr_out)
+!!      subroutine sel_light_diff_adv_src_euler(kr_in, kr_out)
 !!
-!!      subroutine set_adams_mag_induct_ini
-!!      subroutine set_adams_heat_ini
-!!      subroutine set_adams_dscalar_ini
+!!      subroutine set_ini_adams_mag_induct
+!!      subroutine sel_ini_adams_heat_w_src(kr_in, kr_out)
+!!      subroutine sel_ini_adams_light_w_src(kr_in, kr_out)
 !!@endverbatim
+!!
+!!@n @param kr_in       Radial ID for inner boundary
+!!@n @param kr_out      Radial ID for outer boundary
 !
       module cal_explicit_terms
 !
@@ -137,91 +140,73 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_heat_diff_advect_adams
+      subroutine sel_heat_diff_adv_src_adams(kr_in, kr_out)
 !
-      integer(kind = kint) :: inod, ist, ied
+      use m_physical_property
+      use cal_diff_adv_src_explicit
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
 !
-      ist = (nlayer_ICB-1)*nidx_rj(2) + 1
-      ied = nlayer_CMB * nidx_rj(2)
-!$omp do private (inod)
-      do inod = ist, ied
-        d_rj(inod,ipol%i_temp) = d_rj(inod,ipol%i_temp)                 &
-     &                + dt * (coef_exp_t * d_rj(inod,ipol%i_t_diffuse)  &
-     &                          - adam_0 * d_rj(inod,ipol%i_h_advect)   &
-     &                          + adam_1 * d_rj(inod,ipol%i_pre_heat))
+      call sel_scalar_diff_adv_src_adams(kr_in, kr_out,                 &
+     &    ipol%i_t_diffuse, ipol%i_h_advect, ipol%i_heat_source,        &
+     &    ipol%i_temp, ipol%i_pre_heat, coef_exp_t, coef_h_src)
 !
-         d_rj(inod,ipol%i_pre_heat) =  -d_rj(inod,ipol%i_h_advect)
-       end do
-!$omp end do
-!
-      end subroutine cal_heat_diff_advect_adams
+      end subroutine sel_heat_diff_adv_src_adams
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_heat_diff_advect_euler
+      subroutine sel_heat_diff_adv_src_euler(kr_in, kr_out)
 !
-      integer(kind = kint) :: inod, ist, ied
+      use m_physical_property
+      use cal_diff_adv_src_explicit
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
 !
-      ist = (nlayer_ICB-1)*nidx_rj(2) + 1
-      ied = nlayer_CMB * nidx_rj(2)
-!$omp do private (inod)
-      do inod = ist, ied
-        d_rj(inod,ipol%i_temp) = d_rj(inod,ipol%i_temp)                 &
-     &       + dt * (coef_exp_t * d_rj(inod,ipol%i_t_diffuse)           &
-     &                          - d_rj(inod,ipol%i_h_advect))
-       end do
-!$omp end do
+      call sel_scalar_diff_adv_src_euler(kr_in, kr_out,                 &
+     &    ipol%i_t_diffuse, ipol%i_h_advect, ipol%i_heat_source,        &
+     &    ipol%i_temp, coef_exp_t, coef_temp, coef_h_src)
 !
-      end subroutine cal_heat_diff_advect_euler
+      end subroutine sel_heat_diff_adv_src_euler
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_scalar_diff_advect_adams
+      subroutine sel_light_diff_adv_src_adams(kr_in, kr_out)
 !
-      integer(kind = kint) :: inod, ist, ied
+      use m_physical_property
+      use cal_diff_adv_src_explicit
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
 !
-      ist = (nlayer_ICB-1)*nidx_rj(2) + 1
-      ied = nlayer_CMB * nidx_rj(2)
-!$omp do private (inod)
-      do inod = ist, ied
-        d_rj(inod,ipol%i_light) = d_rj(inod,ipol%i_light)               &
-     &          + dt * (coef_exp_c * d_rj(inod,ipol%i_c_diffuse)        &
-     &                    - adam_0 * d_rj(inod,ipol%i_c_advect)         &
-     &                    + adam_1 * d_rj(inod,ipol%i_pre_composit) )
+      call sel_scalar_diff_adv_src_adams(kr_in, kr_out,                 &
+     &    ipol%i_c_diffuse, ipol%i_c_advect, ipol%i_light_source,       &
+     &    ipol%i_light, ipol%i_pre_composit, coef_exp_c, coef_c_src)
 !
-         d_rj(inod,ipol%i_pre_composit) =  -d_rj(inod,ipol%i_c_advect)
-       end do
-!$omp end do
-!
-      end subroutine cal_scalar_diff_advect_adams
+      end subroutine sel_light_diff_adv_src_adams
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_scalar_diff_advect_euler
+      subroutine sel_light_diff_adv_src_euler(kr_in, kr_out)
 !
-      integer(kind = kint) :: inod, ist, ied
+      use m_physical_property
+      use cal_diff_adv_src_explicit
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
 !
-      ist = (nlayer_ICB-1)*nidx_rj(2) + 1
-      ied = nlayer_CMB * nidx_rj(2)
-!$omp do private (inod)
-      do inod = ist, ied
-        d_rj(inod,ipol%i_light) = d_rj(inod,ipol%i_light)               &
-     &         + dt * (coef_exp_c*d_rj(inod,ipol%i_c_diffuse)           &
-     &                 - d_rj(inod,ipol%i_c_advect) )
-       end do
-!$omp end do
+      call sel_scalar_diff_adv_src_euler(kr_in, kr_out,                 &
+     &    ipol%i_c_diffuse, ipol%i_c_advect, ipol%i_light_source,       &
+     &    ipol%i_light, coef_exp_c, coef_light, coef_c_src)
 !
-      end subroutine cal_scalar_diff_advect_euler
+      end subroutine sel_light_diff_adv_src_euler
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_adams_mag_induct_ini
+      subroutine set_ini_adams_mag_induct
 !
       integer(kind = kint) :: inod
 !
@@ -233,41 +218,39 @@
        end do
 !$omp end do
 !
-      end subroutine set_adams_mag_induct_ini
+      end subroutine set_ini_adams_mag_induct
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_adams_heat_ini
+      subroutine sel_ini_adams_heat_w_src(kr_in, kr_out)
 !
-      integer(kind = kint) :: inod, ist, ied
+      use m_physical_property
+      use cal_diff_adv_src_explicit
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
 !
-      ist = (nlayer_ICB-1)*nidx_rj(2) + 1
-      ied = nlayer_CMB * nidx_rj(2)
-!$omp do private (inod)
-      do inod = ist, ied
-         d_rj(inod,ipol%i_pre_heat) = -d_rj(inod,ipol%i_h_advect)
-      end do
-!$omp end do
+      call sel_ini_adams_scalar_w_src(kr_in, kr_out,                    &
+     &    ipol%i_h_advect, ipol%i_heat_source, ipol%i_pre_heat,         &
+     &    coef_h_src)
 !
-      end subroutine set_adams_heat_ini
+      end subroutine sel_ini_adams_heat_w_src
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_adams_dscalar_ini
+      subroutine sel_ini_adams_light_w_src(kr_in, kr_out)
 !
-      integer(kind = kint) :: inod, ist, ied
+      use m_physical_property
+      use cal_diff_adv_src_explicit
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
 !
-      ist = (nlayer_ICB-1)*nidx_rj(2) + 1
-      ied = nlayer_CMB * nidx_rj(2)
-!$omp do private (inod)
-      do inod = ist, ied
-         d_rj(inod,ipol%i_pre_composit) = -d_rj(inod,ipol%i_c_advect)
-      end do
-!$omp end do
+      call sel_ini_adams_scalar_w_src(kr_in, kr_out,                    &
+     &    ipol%i_c_advect, ipol%i_light_source, ipol%i_pre_composit,    &
+     &    coef_c_src)
 !
-      end subroutine set_adams_dscalar_ini
+      end subroutine sel_ini_adams_light_w_src
 !
 ! ----------------------------------------------------------------------
 !

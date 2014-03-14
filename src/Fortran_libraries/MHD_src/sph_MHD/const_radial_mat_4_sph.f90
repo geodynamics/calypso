@@ -16,7 +16,7 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_radial_matrices_sph
 !
       implicit none
@@ -30,7 +30,6 @@
       subroutine s_const_radial_mat_4_sph
 !
       use m_control_parameter
-      use m_control_params_sph_MHD
       use const_r_mat_4_scalar_sph
       use const_r_mat_4_vector_sph
 !

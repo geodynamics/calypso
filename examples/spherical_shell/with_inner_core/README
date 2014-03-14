@@ -1,0 +1,15 @@
+!-----------------------------------------------------------------------
+!     Example to generate spherical harmonics index data files
+!-----------------------------------------------------------------------
+!
+ Here is the files to generate spherical harmonics index data file
+for simulations with 6 MPI processes.
+ In this example, Chebyshev points are used for the radial spacing
+including inner core and external of the core.
+This example consists of the following files and directories
+
+control_sph_shell:   control file for data transform
+sph_lm31r48c_4_ic:   Directory for spherical harmonics index table
+
+Run index generation program in both directory for index tables
+[with_inner_core]$ [CALYPSO_DIR]/bin/gen_sph_grids

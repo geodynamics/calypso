@@ -33,7 +33,7 @@
       subroutine sph_transfer_on_circle
 !
       use m_phys_constants
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_sph_phys_address
       use m_circle_transform
 !
@@ -115,7 +115,7 @@
 !
       subroutine collect_spectr_for_circle
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_sph_spectr_data
       use m_sph_phys_address
 !
@@ -154,7 +154,7 @@
       num = d_circle%ntot_phys * (nidx_global_rj(2) + 1)
       if(my_rank .eq. 0) d_rj_circle =   zero
       call MPI_Reduce(d_rj_circ_lc(0,1), d_rj_circle(0,1), num,         &
-     &    MPI_DOUBLE_PRECISION, MPI_SUM, izero, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine collect_spectr_for_circle
 !

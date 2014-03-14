@@ -38,7 +38,6 @@
 !!      subroutine check_spheric_param_rtm(my_rank)
 !!      subroutine check_spheric_param_rlm(my_rank)
 !!      subroutine check_spheric_param_rj(my_rank)
-!!      subroutine check_radial_fung_rj
 !!@endverbatim
 !!
 !!@n @param  my_rank     Running rank ID
@@ -66,9 +65,10 @@
 !!@n    idx_rj_degree_zero = 0.
       integer (kind=kint) :: idx_rj_degree_zero =   0
 !
-!>      local spectr index for @f$ l = 1@f$ and  @f$ m = -1, 0, 1@f$.
-!!@n    If spectr data do not exist in subdomain,
-!!@n    idx_rj_degree_one(m) = 0.
+!>        local spectr index for @f$ l = 1@f$ and  @f$ m = -1, 0, 1@f$.
+!!        for @f$ f(r,j) @f$
+!!@n        If spectr data do not exist in subdomain,
+!!@n        idx_rj_degree_one(m) = 0.
       integer (kind=kint) :: idx_rj_degree_one(-1:1) = (/0,0,0/)
 !
 !>      Start address for @f$ m = 0 @f$ for @f$ f(r,\theta,m) @f$
@@ -103,6 +103,31 @@
 !
 !>      global radius data @f$ r(k) @f$
       real(kind = kreal), allocatable :: radius_1d_gl(:)
+!
+!    Group names for spherical shell dynamos
+!
+!>      Group name for ICB
+      character(len=kchara), parameter :: ICB_nod_grp_name = 'ICB'
+!>      Group name for CMB
+      character(len=kchara), parameter :: CMB_nod_grp_name = 'CMB'
+!>      Group name for innermost radius
+      character(len=kchara), parameter                                  &
+     &                      :: CTR_nod_grp_name = 'to_Center'
+!
+!>      Element Group name for inner core
+      character(len=kchara), parameter                                  &
+     &                      :: IC_ele_grp_name = 'inner_core'
+!>      Element Group name for outer core
+      character(len=kchara), parameter                                  &
+     &                      :: OC_ele_grp_name = 'outer_core'
+!
+!>      Surface Group name for ICB
+      character(len=kchara), parameter :: ICB_sf_grp_name = 'ICB_surf'
+!>      Surface Group name for CMB
+      character(len=kchara), parameter :: CMB_sf_grp_name = 'CMB_surf'
+!>      Group name for innermost radius
+      character(len=kchara), parameter                                  &
+     &                      :: CTR_sf_grp_name = 'to_Center_surf'
 !
 !   global parameters
 !
@@ -243,12 +268,11 @@
       real(kind = kreal), allocatable :: a_r_1d_rtp_r(:)
 !>      1d @f$1 / r @f$ for @f$ f(r,\theta,m) @f$
       real(kind = kreal), allocatable :: a_r_1d_rtm_r(:)
+!>      1d @f$1 / r @f$ for @f$ f(r,l,m) @f$
+      real(kind = kreal), allocatable :: a_r_1d_rlm_r(:)
 !>      1d @f$1 / r @f$ for @f$ f(r,j) @f$
       real(kind = kreal), allocatable :: a_r_1d_rj_r(:)
 !
-!>      1d @f$ \Delta r @f$ for @f$ f(r,j) @f$
-!!@n@see  set_radius_func_cheby or set_radius_func_cheby
-      real(kind = kreal), allocatable :: dr_1d_rj(:,:)
 !>      1d @f$1 / r @f$ for @f$ f(r,j) @f$
 !!@n@see  set_radius_func_cheby or set_radius_func_cheby
       real(kind = kreal), allocatable :: ar_1d_rj(:,:)
@@ -413,6 +437,7 @@
       num = nidx_rlm(1)
       allocate(idx_gl_1d_rlm_r(num))
       allocate(radius_1d_rlm_r(num))
+      allocate(a_r_1d_rlm_r(num))
       num = nidx_rlm(2)
       allocate(idx_gl_1d_rlm_j(num,3))
 !
@@ -420,6 +445,7 @@
       if(nidx_rlm(1) .gt. 0) then
         idx_gl_1d_rlm_r = 0
         radius_1d_rlm_r = 0.0d0
+        a_r_1d_rlm_r =    0.0d0
       end if
 !
       end subroutine allocate_sph_1d_index_rlm
@@ -435,7 +461,6 @@
       allocate(radius_1d_rj_r(num))
       allocate(a_r_1d_rj_r(num))
 !
-      allocate(dr_1d_rj(num,0:2))
       allocate(ar_1d_rj(num,3))
       allocate(r_ele_rj(num))
       allocate(ar_ele_rj(num,3))
@@ -449,7 +474,6 @@
         radius_1d_rj_r = 0.0d0
         a_r_1d_rj_r = 0.0d0
 !
-        dr_1d_rj =  0.0d0
         ar_1d_rj = 0.0d0
         r_ele_rj = 0.0d0
         ar_ele_rj = 0.0d0
@@ -532,6 +556,7 @@
       subroutine deallocate_sph_1d_index_rlm
 !
       deallocate(radius_1d_rlm_r)
+      deallocate(a_r_1d_rlm_r)
       deallocate(idx_gl_1d_rlm_r)
       deallocate(idx_gl_1d_rlm_j)
 !
@@ -544,7 +569,7 @@
       deallocate(radius_1d_rj_r)
       deallocate(a_r_1d_rj_r)
 !
-      deallocate(dr_1d_rj, ar_1d_rj, r_ele_rj, ar_ele_rj)
+      deallocate(ar_1d_rj, r_ele_rj, ar_ele_rj)
 !
       deallocate(idx_gl_1d_rj_r)
       deallocate(idx_gl_1d_rj_j)
@@ -658,22 +683,6 @@
       end do
 !
       end subroutine check_spheric_param_rj
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine check_radial_fung_rj
-!
-      integer(kind = kint) :: k
-!
-!
-      write(*,*) 'k, r, dr_1d_rj(0:2)'
-      do k = 1, nidx_rj(1)
-        write(*,'(i8, 1p4e20.12)') k, radius_1d_rj_r(k),                &
-     &                                  dr_1d_rj(k,0:2)
-      end do
-!
-      end subroutine check_radial_fung_rj
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

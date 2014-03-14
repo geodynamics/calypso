@@ -14,7 +14,7 @@
 !
       use m_precision
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_work_time
       use m_machine_parameter
       use m_spheric_parameter
@@ -37,9 +37,9 @@
       integer(kind = kint), intent(in) :: ncomp
       integer(kind = kint), intent(in) :: Nstacksmp(0:np_smp)
 !
-      integer(kind = kint) :: iflag_seelcted
+      integer(kind = kint) :: iflag_selcted
       real(kind = kreal) :: etime_shortest
-      real(kind = kreal) :: etime_fft(1:3)
+      real(kind = kreal) :: etime_fft(1:4)
 !
 !
       if(iflag_FFT .ne.  iflag_UNDEFINED_FFT) then
@@ -51,24 +51,33 @@
 
       iflag_FFT = iflag_FFTPACK
       call test_fourier_trans_vector(ncomp, Nstacksmp,                  &
-     &    etime_fft(iflag_FFTPACK) )
+     &    etime_fft(iflag_FFT) )
 !
-      iflag_seelcted = iflag_FFTPACK
-      etime_shortest = etime_fft(iflag_FFTPACK)
+      iflag_selcted = iflag_FFT
+      etime_shortest = etime_fft(iflag_FFT)
 !
 !
 #ifdef FFTW3
       iflag_FFT = iflag_FFTW
       call test_fourier_trans_vector(ncomp, Nstacksmp,                  &
-     &    etime_fft(iflag_FFTW))
+     &    etime_fft(iflag_FFT))
 !
-      if(etime_fft(iflag_FFTW) .lt. etime_shortest) then
-        iflag_seelcted = iflag_FFTW
-        etime_shortest = etime_fft(iflag_FFTW)
+      if(etime_fft(iflag_FFT) .lt. etime_shortest) then
+        iflag_selcted = iflag_FFT
+        etime_shortest = etime_fft(iflag_FFT)
+      end if
+!
+      iflag_FFT = iflag_FFTW_SINGLE
+      call test_fourier_trans_vector(ncomp, Nstacksmp,                  &
+     &    etime_fft(iflag_FFT))
+!
+      if(etime_fft(iflag_FFT) .lt. etime_shortest) then
+        iflag_selcted = iflag_FFT
+        etime_shortest = etime_fft(iflag_FFT)
       end if
 #endif
 !
-      iflag_FFT = iflag_seelcted
+      iflag_FFT = iflag_selcted
       call initialize_FFT_select(my_rank, np_smp, Nstacksmp,            &
      &    nidx_rtp(3))
 !
@@ -80,12 +89,19 @@
           write(*,'(a,a)') ' (FFTPACK) '
         else if(iflag_FFT .eq. iflag_FFTW) then
           write(*,'(a,a)') ' (FFTW) '
+        else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+          write(*,'(a,a)') ' (FFTW_SINGLE) '
         end if
 !
         write(*,*) '1: elapsed by FFTPACK: ',                           &
      &            etime_fft(iflag_FFTPACK)
         if(etime_fft(iflag_FFTW) .gt. zero) then
-          write(*,*) '2: elapsed by FFTW3:   ', etime_fft(iflag_FFTW)
+          write(*,*) '2: elapsed by FFTW3:          ',                  &
+     &            etime_fft(iflag_FFTW)
+        end if
+        if(etime_fft(iflag_FFTW_SINGLE) .gt. zero) then
+          write(*,*) '3: elapsed by single FFTW3:   ',                  &
+     &            etime_fft(iflag_FFTW_SINGLE)
         end if
 !
       end subroutine s_select_fourier_transform
@@ -111,10 +127,11 @@
      &    vr_rtp)
       etime = MPI_WTIME() - stime
 !
-      call finalize_FFT_select(np_smp)
+      call finalize_FFT_select(np_smp, Nstacksmp)
 !
       call MPI_allREDUCE (etime, etime_fft, ione,                       &
-     &    MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      etime_fft = etime_fft / dble(nprocs)
 !
       end subroutine test_fourier_trans_vector
 !

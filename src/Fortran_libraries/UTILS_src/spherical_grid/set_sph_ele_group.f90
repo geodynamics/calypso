@@ -109,7 +109,7 @@
             if(iflag_r(kg1)*iflag_r(kg2) .gt. 0) then
               call count_ele_grp_item_on_sphere(ip_t,                   &
      &            ele_grp%nitem_grp(icou))
-            else if(ele_grp%grp_name(icou) .eq. name_IC                 &
+            else if(ele_grp%grp_name(icou) .eq. IC_ele_grp_name         &
      &           .and. iflag_r(kg1).gt.0) then
               call count_ele_grp_item_on_sphere(ip_t,                   &
      &            ele_grp%nitem_grp(icou))
@@ -135,7 +135,7 @@
 !
       use m_sph_mesh_1d_connect
       use set_stack_4_sph_groups
-      use set_sph_local_node
+      use cal_sph_node_addresses
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t
       type(group_data), intent(inout) :: ele_grp
@@ -167,7 +167,7 @@
             if(iflag_r(kg1)*iflag_r(kg2) .gt. 0) then
               call set_ele_grp_item_on_sphere(ip_r, ip_t, kele,         &
      &            inum, ele_grp)
-            else if(ele_grp%grp_name(icou) .eq. name_IC                 &
+            else if(ele_grp%grp_name(icou) .eq. IC_ele_grp_name         &
      &           .and. iflag_r(kg1).gt.0) then
               call set_ele_grp_item_on_sphere(ip_r, ip_t, kele,         &
      &            inum, ele_grp)
@@ -204,13 +204,13 @@
 !
 !    Set elements for south pole
         if(iflag_Spole_t(ip_t) .gt. 0)  then
-          nitem_grp = nitem_grp + nidx_global_rtp(3)
+          nitem_grp = nitem_grp + nele_around_pole
         end if
 !
 !    Set elements for north pole
 !
         if(iflag_Npole_t(ip_t) .gt. 0)  then
-          nitem_grp = nitem_grp + nidx_global_rtp(3)
+          nitem_grp = nitem_grp + nele_around_pole
         end if
       end if
 !
@@ -231,15 +231,15 @@
 !    Set elements for Center elements
       if(iflag_Spole_t(ip_t) .gt. 0)  then
         nitem_grp = nitem_grp                                           &
-     &                     + (nidx_global_rtp(2)+1)*nidx_global_rtp(3)
+     &             + (nidx_global_rtp(2)-1)*nidx_global_rtp(3)          &
+     &             + nidx_global_rtp(3)
 !
       else
         nitem_grp = nitem_grp + nele_sph_t(ip_t)*nidx_global_rtp(3)
-!
 !    Set element for north pole
-        if(iflag_Npole_t(ip_t) .gt. 0)  then
-          nitem_grp = nitem_grp + nidx_global_rtp(3)
-        end if
+         if(iflag_Npole_t(ip_t) .gt. 0)  then
+           nitem_grp = nitem_grp + nele_around_pole
+         end if
       end if
 !
       end subroutine count_ele_grp_item_4_center
@@ -251,7 +251,7 @@
 !
       use m_spheric_parameter
       use m_sph_mesh_1d_connect
-      use set_sph_local_element
+      use cal_sph_ele_addresses
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t, kr
       integer(kind = kint), intent(inout) :: inum
@@ -274,7 +274,7 @@
 !
 !    Set elements for south pole
         if(iflag_Spole_t(ip_t) .gt. 0)  then
-          do m = 1, nidx_global_rtp(3)
+          do m = 1, nele_around_pole
             inum = inum + 1
             ele_grp%item_grp(inum) = sph_s_pole_ele_id(ip_r, kr, m)
           end do
@@ -283,7 +283,7 @@
 !    Set elements for north pole
 !
         if(iflag_Npole_t(ip_t) .gt. 0)  then
-          do m = 1, nidx_global_rtp(3)
+          do m = 1, nele_around_pole
             inum = inum + 1
             ele_grp%item_grp(inum) = sph_n_pole_ele_id(ip_r, kr, m)
           end do
@@ -298,7 +298,7 @@
 !
       use m_spheric_parameter
       use m_sph_mesh_1d_connect
-      use set_sph_local_element
+      use cal_sph_ele_addresses
 !
       integer(kind = kint), intent(in) :: ip_t
       integer(kind = kint), intent(inout) :: inum
@@ -318,13 +318,13 @@
         end do
 !
 !    Set element for south pole
-        do m = 1, nidx_global_rtp(3)
+        do m = 1, nele_around_pole
           inum = inum + 1
           ele_grp%item_grp(inum) = sph_inter_ctr_spole_ele_id(m)
         end do
 !
 !    Set element for north pole
-        do m = 1, nidx_global_rtp(3)
+        do m = 1, nele_around_pole
           inum = inum + 1
           ele_grp%item_grp(inum) = sph_inter_ctr_npole_ele_id(m)
         end do
@@ -340,10 +340,10 @@
 !
 !    Set element for north pole
         if(iflag_Npole_t(ip_t) .gt. 0)  then
-          do m = 1, nidx_global_rtp(3)
+          do m = 1, nele_around_pole
             inum = inum + 1
             ele_grp%item_grp(inum)                                      &
-     &           = sph_exter_ctr_npole_ele_id(ip_t, m)
+     &           = sph_exter_ctr_npole_ele_id(m)
           end do
         end if
       end if

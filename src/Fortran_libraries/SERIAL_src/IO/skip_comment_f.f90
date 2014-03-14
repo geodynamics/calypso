@@ -1,14 +1,25 @@
+!>@file   skip_comment_f.f90
+!!@brief  module skip_comment_f
+!!
+!!@authorH.Matsui and H.Okuda
+!!@date Programmed  H. Matsui in  Feb. 2001 
+!!@date Modified   H. Matsui in  Oct. 2013 
 !
-!      module skip_comment_f
-!
-!        programmed by H.Matsui and H.Okuda
-!                                    on Feb. 2001 (ver 1.2)
-!
-!      subroutine skip_comment(character_4_read,id_file)
-!      subroutine count_field_by_comma(id_file, charabuf,               &
-!     &          ncomp, field_name)
-!      subroutine read_stack_array(character_4_read, id_file, num,      &
-!     &          istack_array)
+!> @brief subroutines to find comment lines in data
+!!
+!!@verbatim
+!!      subroutine skip_comment(character_4_read,id_file)
+!!      subroutine count_field_by_comma(id_file, charabuf,              &
+!!     &          ncomp, field_name)
+!!      subroutine read_stack_array(character_4_read, id_file, num,     &
+!!     &          istack_array)
+!!
+!!      subroutine change_2_upper_case(string)
+!!      subroutine change_2_lower_case(string)
+!!      integer function cmp_no_case(cmp_chara, ref_chara)
+!!          if ref_chara and cmp_chara are same ignoreing case,
+!!          returns 1, othewwise returns 0
+!!@endverbatim
 !
       module skip_comment_f
 !
@@ -115,6 +126,67 @@
         end if
 !
       end subroutine read_stack_array
+!
+!-----------------------------------------------------------------------
+!
+      subroutine change_2_upper_case(string)
+!
+      character(len=kchara), intent(inout) :: string
+      integer(kind = kint) :: i, len
+!
+!
+      len = len_trim(string)
+      do i = 1, len
+        if (string(i:i) .ge. 'a' .and. string(i:i) .le. 'z') then 
+          string(i:i) = char(ichar(string(i:i)) - 32)
+        end if
+      end do
+!
+      end subroutine change_2_upper_case
+!
+!-----------------------------------------------------------------------
+!
+      subroutine change_2_lower_case(string)
+!
+      character(len=kchara), intent(inout) :: string
+      integer(kind = kint) :: i, len
+!
+!
+      len = len_trim(string)
+      do i = 1, len
+        if (string(i:i) .ge. 'A' .and. string(i:i) .le. 'Z') then 
+          string(i:i) = char(ichar(string(i:i)) + 32)
+        end if
+      end do
+!
+      end subroutine change_2_lower_case
+!
+!-----------------------------------------------------------------------
+!
+      integer function cmp_no_case(cmp_chara, ref_chara)
+!
+      character(len=*), intent(in) :: ref_chara
+      character(len=kchara), intent(in) :: cmp_chara
+      character(len=kchara)  :: ref_tmp, cmp_tmp
+      integer(kind = kint) :: len
+!
+!
+      len = len_trim(ref_chara)
+      if(len_trim(cmp_chara) .ne. len) then
+        cmp_no_case = 0
+        return
+      end if
+!
+      write(ref_tmp,'(a)')  trim(ref_chara)
+      write(cmp_tmp,'(a)')  trim(cmp_chara)
+      call change_2_lower_case(ref_tmp)
+      call change_2_lower_case(cmp_tmp)
+!
+      cmp_no_case = 0
+      if(ref_tmp .eq. cmp_tmp) cmp_no_case = 1
+      return
+!
+      end function cmp_no_case
 !
 !-----------------------------------------------------------------------
 !

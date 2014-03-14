@@ -41,13 +41,13 @@
       subroutine set_radius_rot_reft_dat_4_sph(r_hot, r_cold,           &
      &          temp_hot, temp_cold, rotate)
 !
+      use m_poloidal_rotation
       use m_sph_spectr_data
       use m_sph_phys_address
       use set_radius_func_noequi
 !
       use set_radius_4_sph_dynamo
       use set_reference_temp_sph
-      use set_poloidal_rotation
 !
       real(kind = kreal), intent(in) :: r_hot, r_cold
       real(kind = kreal), intent(in) :: temp_hot, temp_cold
@@ -62,9 +62,10 @@
       call set_radius_dat_4_sph_dynamo
 !
 !   Choose radial grid mode
+      if (iflag_debug .ge. iflag_routine_msg)                           &
+     &      write(*,*) 'set_dr_for_nonequi'
+      call allocate_dr_rj_noequi
       call set_dr_for_nonequi
-!
-      if(iflag_debug .eq. iflag_full_msg) call check_radial_fung_rj
 !
 !*  ----------   reference of temperature --------
 !*
@@ -94,6 +95,7 @@
       call allocate_fdm_matrices(nidx_rj(1))
 !   Choose radial differences
       call nod_r_2nd_fdm_coefs_nonequi
+      call deallocate_dr_rj_noequi
 !
       end subroutine const_2nd_fdm_matrices
 !

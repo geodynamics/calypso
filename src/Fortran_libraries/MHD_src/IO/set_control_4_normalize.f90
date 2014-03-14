@@ -25,7 +25,7 @@
 !
       subroutine s_set_control_4_normalize
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_machine_parameter
       use m_control_parameter
       use m_normalize_parameter
@@ -44,7 +44,7 @@
       if (i_num_dimless .eq. 0) then
           e_message =                                                   &
      &     'Set dimensionless numbers'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
       else
         num_dimless = num_dimless_ctl
       end if
@@ -66,14 +66,15 @@
 !    set normalization for thermal
 !
       if (iflag_t_evo_4_temp .eq. id_no_evolution) then
-        num_coef_4_termal = 0
+        num_coef_4_termal =    0
         num_coef_4_t_diffuse = 0
+        num_coef_4_h_source =  0
       else
 !
         if (i_n_thermal.eq.0) then
           e_message =                                                   &
      &     'Set coefficients for time stepping for temperature'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_termal = num_coef_4_termal_ctl
         end if
@@ -81,9 +82,13 @@
         if (i_n_t_diff.eq.0) then
           e_message =                                                   &
      &     'Set coefficients for time stepping for thermal diffusion'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_t_diffuse = num_coef_4_t_diffuse_ctl
+        end if
+!
+        if (i_n_h_src .eq. 0) then
+          num_coef_4_h_source = num_coef_4_h_source_ctl
         end if
       end if
 !
@@ -101,6 +106,13 @@
         call deallocate_coef_4_t_diffuse_ctl
       end if
 !
+      if (num_coef_4_h_source.gt.0) then
+        call allocate_coef_4_h_source
+        coef_4_h_source_name = coef_4_h_src_name_ctl
+        coef_4_h_source_power = coef_4_h_src_power_ctl
+        call deallocate_coef_4_h_source_ctl
+      end if
+!
 !    set coefficients for momentum equation
 !
       if (iflag_t_evo_4_velo .eq. id_no_evolution) then
@@ -116,7 +128,7 @@
         if (i_n_mom.eq.0) then
           e_message =                                                   &
      &     'Set coefficients for time stepping for velocity'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_velocity = num_coef_4_velocity_ctl
         end if
@@ -124,7 +136,7 @@
         if (i_n_press.eq.0) then
           e_message =                                                   &
      &     'Set coefficients for pressure gradient'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_press = num_coef_4_press_ctl
         end if
@@ -132,18 +144,18 @@
         if (i_n_v_diff.eq.0) then
           e_message =                                                   &
      &     'Set coefficients for viscosity'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_v_diffuse = num_coef_4_v_diffuse_ctl
         end if
 !
         if(iflag_4_gravity .eq. id_turn_OFF                             &
-     &     .and. iflag_4_filter_gravity .eq. id_turn_OFF) then
+     &      .and. iflag_4_filter_gravity .eq. id_turn_OFF) then
           num_coef_4_buoyancy = 0
         else
           if (i_n_buo.eq.0) then
             e_message = 'Set coefficients for buoyancy'
-            call parallel_abort(90, e_message)
+            call calypso_MPI_abort(90, e_message)
           else
             num_coef_4_buoyancy = num_coef_4_buoyancy_ctl
           end if
@@ -158,7 +170,7 @@
         else
           if (i_n_c_buo.eq.0) then
             e_message = 'Set coefficients for compiositional buoyancy'
-            call parallel_abort(90, e_message)
+            call calypso_MPI_abort(90, e_message)
           else
             num_coef_4_comp_buo = num_coef_4_comp_buo_ctl
           end if
@@ -169,7 +181,7 @@
         else
           if (i_n_cor.eq.0) then
             e_message = 'Set coefficients for Coriolis force'
-            call parallel_abort(90, e_message)
+            call calypso_MPI_abort(90, e_message)
           else
             num_coef_4_Coriolis = num_coef_4_Coriolis_ctl
           end if
@@ -180,7 +192,7 @@
         else
           if (i_n_lor.eq.0) then
             e_message = 'Set coefficients for Lorentz force'
-            call parallel_abort(90, e_message)
+            call calypso_MPI_abort(90, e_message)
           else
             num_coef_4_Lorentz = num_coef_4_Lorentz_ctl
           end if
@@ -250,7 +262,7 @@
         if (i_n_magne.eq.0) then
           e_message =                                                   &
      &     'Set coefficients for integration for magnetic field'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_magnetic = num_coef_4_magnetic_ctl
         end if
@@ -259,21 +271,21 @@
      &       .and. iflag_t_evo_4_vect_p .gt. id_no_evolution) then
           e_message =                                                   &
      &     'Set coefficients for integration for magnetic potential'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_mag_p = num_coef_4_mag_p_ctl
         end if
 !
         if (i_n_m_diff.eq.0) then
           e_message = 'Set coefficients for magnetic diffusion'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_m_diffuse = num_coef_4_m_diffuse_ctl
         end if
 !
         if (i_n_induct.eq.0) then
           e_message = 'Set coefficients for induction term'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_induction = num_coef_4_induction_ctl
         end if
@@ -312,38 +324,50 @@
 !
       if (iflag_t_evo_4_composit .eq. id_no_evolution) then
         num_coef_4_composition =  0
-        num_coef_4_c_diffuse = 0
+        num_coef_4_c_diffuse =    0
+        num_coef_4_c_source =     0
       else
 !
-        if (i_n_dscalar.eq.0) then
+        if (i_n_dscalar .eq. 0) then
           e_message =                                                   &
      &     'Set coefficients for time stepping for composition scalar'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_composition = num_coef_4_composit_ctl
         end if
 !
-        if (i_n_dsc_diff.eq.0) then
+        if (i_n_dsc_diff .eq. 0) then
           e_message =                                                   &
      &     'Set coefficients for time stepping for scalar diffusion'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
           num_coef_4_c_diffuse = num_coef_4_c_diffuse_ctl
         end if
+!
+        if (i_n_dsc_src .gt. 0) then
+          num_coef_4_c_source = num_coef_4_c_src_ctl
+        end if
       end if
 !
-      if (num_coef_4_composition.gt.0) then
+      if (num_coef_4_composition .gt. 0) then
         call allocate_coef_4_composition
         coef_4_composit_name =  coef_4_composit_name_ctl
         coef_4_composit_power = coef_4_composit_power_ctl
         call deallocate_coef_4_dscalar_ctl
       end if
 !
-      if (num_coef_4_c_diffuse.gt.0) then
+      if (num_coef_4_c_diffuse .gt. 0) then
         call allocate_coef_4_c_diffuse
         coef_4_c_diffuse_name =  coef_4_c_diff_name_ctl
         coef_4_c_diffuse_power = coef_4_c_diff_power_ctl
         call deallocate_coef_4_dsc_diff_ctl
+      end if
+!
+      if (num_coef_4_c_source .gt. 0) then
+        call allocate_coef_4_c_source
+        coef_4_c_source_name =  coef_4_c_src_name_ctl
+        coef_4_c_source_power = coef_4_c_src_power_ctl
+        call deallocate_coef_4_dsc_src_ctl
       end if
 !
       end subroutine s_set_control_4_normalize

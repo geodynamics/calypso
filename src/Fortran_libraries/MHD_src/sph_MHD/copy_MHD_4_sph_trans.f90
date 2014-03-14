@@ -156,6 +156,8 @@
 !   Coriolis flag
       call copy_vec_spec_from_trans(nvector_rtp_2_rj,                   &
      &      ipol%i_coriolis, f_trns%i_coriolis)
+      call copy_vec_spec_from_trans(nvector_rtp_2_rj,                   &
+     &      ipol%i_rot_Coriolis, f_trns%i_rot_Coriolis)
 !   Lorentz flag
       call copy_vec_spec_from_trans(nvector_rtp_2_rj,                   &
      &      ipol%i_lorentz, f_trns%i_lorentz)

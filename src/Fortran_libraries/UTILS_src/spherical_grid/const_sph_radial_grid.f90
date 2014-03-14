@@ -65,7 +65,7 @@
       write(*,*) 'radial grid is written in radial_point.dat'
       open(id_file, file='radial_point.dat')
 !
-      write(id_file,'(a)')    '    raidal_grid_type_ctl   explicit'
+      write(id_file,'(a)')    '    radial_grid_type_ctl   explicit'
       write(id_file,'(a,i6)') '    array r_layer ', nidx_global_rtp(1)
       do k = 1, nidx_global_rtp(1)
         write(id_file,'(a,i6,1pE25.15e3)')                              &

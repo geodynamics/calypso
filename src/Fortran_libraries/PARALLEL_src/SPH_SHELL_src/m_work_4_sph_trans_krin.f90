@@ -8,14 +8,12 @@
 !!       (innermost loop is field and radius)
 !!
 !!@verbatim
-!!      subroutine allocate_work_sph_trans_krin(nb_sph_trans)
+!!      subroutine allocate_work_sph_trans_krin(ncomp)
 !!      subroutine deallocate_work_sph_trans_krin
 !!
-!!      subroutine clear_b_trans_vector_krin(nb)
-!!      subroutine clear_b_trans_scalar_krin(nb)
+!!      subroutine clear_b_trans_krin(icomp_st, icomp_ed)
 !!
-!!      subroutine clear_f_trans_vector_krin(nb)
-!!      subroutine clear_f_trans_scalar_krin(nb)
+!!      subroutine clear_f_trans_krin(icomp_st, icomp_ed)
 !!
 !!    Data for single vector field
 !!      radial component:      vr_rtp(3*i_rtp-2)
@@ -33,7 +31,7 @@
 !!
 !!@endverbatim
 !!
-!!@n @param  nb_sph_trans
+!!@n @param  ncomp  number of components for Legendre transform
 !!             maximum number of fields for Legendre transform
 !!@n @param  nb  number of fields to be transformed
 !
@@ -47,13 +45,13 @@
 !
 !>     field data for Legendre transform
 !!@n       original layout: vr_rtm_krin(i_fld,k_rtm,l_rtm,m_rtm,nd)
-!!@n       size: vr_rtm_krin(nb*nidx_rtm(1),nidx_rtm(2),nidx_rtm(3),3)
-      real(kind = kreal), allocatable :: vr_rtm_krin(:,:,:)
+!!@n       size: vr_rtm_krin(nidx_rtm(1)*nidx_rtm(2)*nidx_rtm(3),nb)
+      real(kind = kreal), allocatable :: vr_rtm_krin(:,:)
 !
 !>     spectr data for Legendre transform
-!!@n      original layout: sp_rlm_krin(i_fld,k_rtm,j_rlm,nd)
-!!@n      size: sp_rlm_krin(nb*nidx_rtm(1),nidx_rlm(2),3)
-      real(kind = kreal), allocatable :: sp_rlm_krin(:,:,:)
+!!@n      original layout: sp_rlm_krin(k_rtm,j_rlm,i_fld)
+!!@n      size: sp_rlm_krin(nidx_rlm(1)*nidx_rlm(2),nb)
+      real(kind = kreal), allocatable :: sp_rlm_krin(:,:)
 !
 ! ----------------------------------------------------------------------
 !
@@ -61,20 +59,16 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine allocate_work_sph_trans_krin(nb_sph_trans)
+      subroutine allocate_work_sph_trans_krin(ncomp)
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: nb_sph_trans
-      integer(kind = kint) :: num1, num2
+      integer(kind = kint), intent(in) :: ncomp
 !
 !
-      num1 = nb_sph_trans*nidx_rlm(1)
-      allocate(sp_rlm_krin(num1,nidx_rlm(2),3))
+      allocate(sp_rlm_krin(nnod_rlm,ncomp))
+      allocate(vr_rtm_krin(nnod_rtm,ncomp))
       sp_rlm_krin = 0.0d0
-!
-      num2 = nidx_rtm(2)*nidx_rtm(3)
-      allocate(vr_rtm_krin(num1,num2,3))
       vr_rtm_krin = 0.0d0
 !
       end subroutine allocate_work_sph_trans_krin
@@ -90,96 +84,49 @@
 ! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine clear_b_trans_vector_krin(nb)
+      subroutine clear_b_trans_krin(icomp_st, icomp_ed)
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: nb
-      integer(kind = kint) :: k_rtm, l_rtm, m_rtm, i_rtm_1
+      integer(kind = kint), intent(in) :: icomp_st, icomp_ed
+      integer(kind = kint) :: i_rtm, nd
 !
 !
-!$omp parallel do private(k_rtm,l_rtm,i_rtm_1)
-      do m_rtm = 1, nidx_rtm(3)
-        do l_rtm = 1, nidx_rtm(2)
-          do k_rtm = 1, nidx_rtm(1)*nb
-            i_rtm_1 = l_rtm + (m_rtm-1) * nidx_rtm(2)
-            vr_rtm_krin(k_rtm,i_rtm_1,1) = zero
-            vr_rtm_krin(k_rtm,i_rtm_1,2) = zero
-            vr_rtm_krin(k_rtm,i_rtm_1,3) = zero
-          end do
+!$omp parallel
+      do nd = icomp_st, icomp_ed
+!$omp do private(i_rtm)
+        do i_rtm = 1, nnod_rtm
+          vr_rtm_krin(i_rtm,nd) = zero
         end do
+!$omp end do nowait
       end do
-!$omp end parallel do
+!$omp end parallel
 !
-      end subroutine clear_b_trans_vector_krin
+      end subroutine clear_b_trans_krin
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
-      subroutine clear_b_trans_scalar_krin(nb)
+      subroutine clear_f_trans_krin(icomp_st, icomp_ed)
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: nb
-      integer(kind = kint) :: k_rtm, l_rtm, m_rtm, i_rtm_1
+      integer(kind = kint), intent(in) :: icomp_st, icomp_ed
+!
+      integer(kind = kint) :: i_rlm, nd
 !
 !
-!$omp parallel do private(k_rtm,l_rtm,i_rtm_1)
-      do m_rtm = 1, nidx_rtm(3)
-        do l_rtm = 1, nidx_rtm(2)
-          do k_rtm = 1, nidx_rtm(1)*nb
-            i_rtm_1 = l_rtm + (m_rtm-1) * nidx_rtm(2)
-            vr_rtm_krin(k_rtm,i_rtm_1,1) = zero
-          end do
+!$omp parallel
+      do nd = icomp_st, icomp_ed
+!$omp do private(i_rlm)
+        do i_rlm = 1, nnod_rlm
+          sp_rlm_krin(i_rlm,nd) = zero
         end do
+!$omp end do nowait
       end do
-!$omp end parallel do
+!$omp end parallel
 !
-      end subroutine clear_b_trans_scalar_krin
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine clear_f_trans_vector_krin(nb)
-!
-      use m_spheric_parameter
-!
-      integer(kind = kint), intent(in) :: nb
-!
-      integer(kind = kint) :: j_rlm, k_rtm
-!
-!
-!$omp parallel do private(j_rlm)
-      do k_rtm = 1, nidx_rtm(1)*nb
-          do j_rlm = 1, nidx_rlm(2)
-            sp_rlm_krin(k_rtm,j_rlm,1) = zero
-            sp_rlm_krin(k_rtm,j_rlm,2) = zero
-            sp_rlm_krin(k_rtm,j_rlm,3) = zero
-          end do
-      end do
-!$omp end parallel do
-!
-      end subroutine clear_f_trans_vector_krin
-!
-! -----------------------------------------------------------------------
-!
-      subroutine clear_f_trans_scalar_krin(nb)
-!
-      use m_spheric_parameter
-!
-      integer(kind = kint), intent(in) :: nb
-!
-      integer(kind = kint) ::  j_rlm, k_rtm
-!
-!
-!$omp parallel do private(j_rlm)
-      do k_rtm = 1, nidx_rtm(1)*nb
-          do j_rlm = 1, nidx_rlm(2)
-            sp_rlm_krin(k_rtm,j_rlm,1) = zero
-          end do
-      end do
-!$omp end parallel do
-!
-      end subroutine clear_f_trans_scalar_krin
+      end subroutine clear_f_trans_krin
 !
 ! -----------------------------------------------------------------------
 !

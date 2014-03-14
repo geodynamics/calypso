@@ -9,15 +9,18 @@
 !!       (Original version)
 !!
 !!@verbatim
-!!      subroutine legendre_b_trans_vector_org(nb)
+!!      subroutine legendre_b_trans_vector_org(ncomp, nvector)
 !!        Input:  vr_rtm   (Order: radius,theta,phi)
 !!        Output: sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
-!!      subroutine legendre_b_trans_scalar_org(nb)
+!!      subroutine legendre_b_trans_scalar_org(ncomp, nvector, nscalar)
 !!        Input:  vr_rtm
 !!        Output: sp_rlm
 !!@endverbatim
 !!
-!!@n @param  nb  number of fields to be transformed
+!!@param   ncomp    Total number of components for spherical transform
+!!@param   nvector  Number of vector for spherical transform
+!!@param   nscalar  Number of scalar (including tensor components)
+!!                  for spherical transform
 !
       module legendre_bwd_trans_org
 !
@@ -37,9 +40,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_vector_org(nb)
+      subroutine legendre_b_trans_vector_org(ncomp, nvector)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: ncomp, nvector
 !
       integer(kind = kint) :: i_rlm, j_rlm
       integer(kind = kint) :: k_rtm, l_rtm
@@ -57,28 +60,23 @@
             pg_tmp = P_rtm(l_rtm,j_rlm) * g_sph_rlm(j_rlm,3)
             dp_tmp = dPdt_rtm(l_rtm,j_rlm)
 !cdir nodep
-            do nd = 1, nb
-              ip_rtm = nd + (l_rtm-1) * nb                              &
-     &                    + (k_rtm-1) * nb*nidx_rtm(2)                  &
-     &                    + (mdx_p_rlm_rtm(j_rlm)-1) * nb               &
-     &                     * nidx_rtm(1)*nidx_rtm(2)
+            do nd = 1, nvector
+              ip_rtm = 3*nd + (l_rtm-1) * ncomp                         &
+     &                      + (k_rtm-1) * ncomp*nidx_rtm(2)             &
+     &                      + (mdx_p_rlm_rtm(j_rlm)-1) * ncomp          &
+     &                       * nidx_rtm(1)*nidx_rtm(2)
 !
-              i_rlm = nd                                                &
-     &               + (j_rlm-1) * nb                                   &
-     &               + (k_rtm-1) * nb * nidx_rlm(2)
+              i_rlm = 3*nd + (j_rlm-1) * ncomp                          &
+     &                     + (k_rtm-1) * ncomp * nidx_rlm(2)
 !
-!              vr_rtm(ip_rtm) = vr_rtm(ip_rtm)                          &
-              vr_rtm(3*ip_rtm-2) = vr_rtm(3*ip_rtm-2)                   &
-     &                     + sp_rlm(3*i_rlm-2) * pg_tmp
+              vr_rtm(ip_rtm-2) = vr_rtm(ip_rtm-2)                       &
+     &                     + sp_rlm(i_rlm-2) * pg_tmp
 !
-!              vt_rtm(ip_rtm) = vt_rtm(ip_rtm)                          &
-              vr_rtm(3*ip_rtm-1) = vr_rtm(3*ip_rtm-1)                   &
-     &                     + sp_rlm(3*i_rlm-1) * dp_tmp
+              vr_rtm(ip_rtm-1) = vr_rtm(ip_rtm-1)                       &
+     &                     + sp_rlm(i_rlm-1) * dp_tmp
 !
-!              vp_rtm(ip_rtm) = vp_rtm(ip_rtm)                          &
-              vr_rtm(3*ip_rtm  ) = vr_rtm(3*ip_rtm  )                   &
-     &                     - sp_rlm(3*i_rlm  ) * dp_tmp
-!
+              vr_rtm(ip_rtm  ) = vr_rtm(ip_rtm  )                       &
+     &                     - sp_rlm(i_rlm  ) * dp_tmp
             end do
           end do
 !
@@ -86,24 +84,20 @@
             pg_tmp = P_rtm(l_rtm,j_rlm) * asin_theta_1d_rtm(l_rtm)      &
      &              * dble( -idx_gl_1d_rlm_j(j_rlm,3) )
 !cdir nodep
-            do nd = 1, nb
-              in_rtm = nd + (l_rtm-1) * nb                              &
-     &                    + (k_rtm-1) * nb*nidx_rtm(2)                  &
-     &                    + (mdx_n_rlm_rtm(j_rlm)-1) * nb               &
-     &                     * nidx_rtm(1)*nidx_rtm(2)
+            do nd = 1, nvector
+              in_rtm = 3*nd + (l_rtm-1) * ncomp                         &
+     &                      + (k_rtm-1) * ncomp*nidx_rtm(2)             &
+     &                      + (mdx_n_rlm_rtm(j_rlm)-1) * ncomp          &
+     &                       * nidx_rtm(1)*nidx_rtm(2)
 !
-              i_rlm = nd                                                &
-     &               + (j_rlm-1) * nb                                   &
-     &               + (k_rtm-1) * nb * nidx_rlm(2)
+              i_rlm = 3*nd + (j_rlm-1) * ncomp                          &
+     &                     + (k_rtm-1) * ncomp * nidx_rlm(2)
 !
-!              vt_rtm(in_rtm) = vt_rtm(in_rtm)                          &
-              vr_rtm(3*in_rtm-1) = vr_rtm(3*in_rtm-1)                   &
-     &                       + sp_rlm(3*i_rlm  ) * pg_tmp
+              vr_rtm(in_rtm-1) = vr_rtm(in_rtm-1)                       &
+     &                       + sp_rlm(i_rlm  ) * pg_tmp
 !
-!              vp_rtm(in_rtm) = vp_rtm(in_rtm)                          &
-              vr_rtm(3*in_rtm  ) = vr_rtm(3*in_rtm  )                   &
-     &                       + sp_rlm(3*i_rlm-1) * pg_tmp
-!
+              vr_rtm(in_rtm  ) = vr_rtm(in_rtm  )                       &
+     &                       + sp_rlm(i_rlm-1) * pg_tmp
             end do
           end do
 !
@@ -115,9 +109,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_scalar_org(nb)
+      subroutine legendre_b_trans_scalar_org(ncomp, nvector, nscalar)
 !
-      integer(kind = kint), intent(in) :: nb
+      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
 !
       integer(kind = kint) :: i_rlm, j_rlm
       integer(kind = kint) :: k_rtm, l_rtm
@@ -131,15 +125,14 @@
 !
           do l_rtm = 1, nidx_rtm(2)
 !cdir nodep
-            do nd = 1, nb
-              ip_rtm = nd + (l_rtm-1) * nb                              &
-     &                    + (k_rtm-1) * nb*nidx_rtm(2)                  &
-     &                    + (mdx_p_rlm_rtm(j_rlm)-1) * nb               &
+            do nd = 1, nscalar
+              ip_rtm = nd + 3*nvector + (l_rtm-1) * ncomp               &
+     &                    + (k_rtm-1) * ncomp*nidx_rtm(2)               &
+     &                    + (mdx_p_rlm_rtm(j_rlm)-1) * ncomp            &
      &                     * nidx_rtm(1)*nidx_rtm(2)
 !
-              i_rlm = nd                                                &
-     &               + (j_rlm-1) * nb                                   &
-     &               + (k_rtm-1) * nb * nidx_rlm(2)
+              i_rlm = nd + 3*nvector + (j_rlm-1) * ncomp                &
+     &                               + (k_rtm-1) * ncomp * nidx_rlm(2)
 !
 !              vr_rtm(ip_rtm) = vr_rtm(ip_rtm)                          &
               vr_rtm(ip_rtm) = vr_rtm(ip_rtm)                           &

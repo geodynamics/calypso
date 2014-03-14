@@ -7,7 +7,7 @@
 !> @brief Spherical transform at poles
 !!
 !!@verbatim
-!!      subroutine lead_pole_data_4_sph_mhd
+!!      subroutine lead_pole_fields_4_sph_mhd
 !!@endverbatim
 !
       module lead_pole_data_4_sph_mhd

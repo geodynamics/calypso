@@ -4,18 +4,17 @@ begin MHD_control
 !  num_subdomain_ctl: number of subdomains
 !  num_smp_ctl:       number of smp processes
 !
-!  sph_file_prefix:  prefix of mode file (Default: in.domain#)
-!
+!  sph_file_prefix:     prefix of mesh file (Default: in.domain#)
 !  restart_file_prefix: prefix of restart file
 !                            (Default: restart/rst.step#.domain#)
 !
-!  field_file_prefix:   prefix for snapshot field data 
+!  field_file_prefix:   prefix of snapshot field data
 !                            (Default: out.step#.domain#.udt)
 !
 !    mesh_file_fmt_ctl:    data format for mesh file
 !    restart_file_fmt_ctl: data format for restart files
 !    field_file_fmt_ctl:   data format for field files
-!                            ('VTK, merged_VTK, merged_HDF5')
+!                            (ascii or binary, Dafault is 'ascii')
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
@@ -24,16 +23,16 @@ begin MHD_control
     num_smp_ctl                 4
 !
     sph_file_prefix             'sph_grid/in'
-    coriolis_int_file_name      'sph_shell/rot_int.dat'
+!
+    boundary_data_file_name     'bc_spec.dat'
 !
     restart_file_prefix         'restart/rst'
     field_file_prefix           'field/out'
 !
     mesh_file_fmt_ctl           'ascii'
     sph_file_fmt_ctl            'ascii'
-    restart_file_fmt_ctl           'ascii'
+    restart_file_fmt_ctl        'ascii'
     field_file_fmt_ctl          'ascii'
-    coriolis_file_fmt_ctl       'ascii'
   end data_files_def
 !
   begin model
@@ -41,16 +40,55 @@ begin MHD_control
 ! available valuables 
 !   velocity, temperature, pressure, vorticity
 !   vector_potential, magnetic_field, current_density, magnetic_potential
+!   electric_field, poynting_flux
 !   composition, perturbation_temp
 !
+!   filter_velo, filter_temp, filter_part_temp
+!   filter_vecp, filter_magne
+!
+!   kinetic_helicity, magnetic_helicity
+!   current_helicity, cross_helicity
+!
 !   buoyancy_flux, Lorentz_work, mag_tension_work
-!   magnetic_ene_generation
+!   magnetic_ene_generation, work_against_Lorentz
 !   temp_generation, part_temp_gen
 !   vis_ene_diffuse, mag_ene_diffuse
 !
-!   thermal_diffusion, viscous_diffusion, magnetic_diffusion
+!   thermal_diffusion, viscous_diffusion
+!   diffuse_vector_p, magnetic_diffusion
+!   magnetic_tension, Lorentz_force
 !   Coriolis_force, buoyancy
 !
+!
+!   heat_flux, part_h_flux
+!   momentum_flux, maxwell_tensor
+!   magnetic_induction, vecp_induction
+!
+!   heat_advect, part_h_advect
+!   inertia,  
+!   div_h_flux, div_part_h_flux
+!   div_m_flux, div_maxwell_t
+!
+!   induction_tensor, div_induct_t
+!
+!   SGS_heat_flux
+!   SGS_momentum_flux, SGS_maxwell_tensor
+!   SGS_induct_tensor, SGS_vecp_induction
+!
+!   div_SGS_h_flux, div_SGS_m_flux
+!   SGS_Lorentz
+!   SGS_induction, 
+!
+!   SGS_Lorentz_work Reynolds_work
+!   SGS_temp_gen     SGS_m_ene_gen
+!
+! termes for direct estimation
+!   SGS_div_h_flux_true
+!   SGS_div_m_flux_true, SGS_Lorentz_true, SGS_mag_induct_true
+!
+!   SGS_Lorentz_work_true   Reynolds_work_true
+!   SGS_temp_gen_true       SGS_m_ene_gen_true
+!   
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
       array nod_value_ctl   8
@@ -85,8 +123,8 @@ begin MHD_control
 !  available type:  fixed, file
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
       array bc_temperature   2
-        bc_temperature  fixed ICB  1.000
-        bc_temperature  fixed CMB  0.000
+        bc_temperature  file ICB  1.000
+        bc_temperature  file CMB  0.000
       end array
 !!!!!  boundary condition for velocity  !!!!!!!!!!!!!!!!!!!!!!!!
 !  available type
@@ -232,6 +270,10 @@ begin MHD_control
         array coef_4_t_diffuse_ctl  1
           coef_4_t_diffuse_ctl         Prandtl_number            -1.0
         end array coef_4_t_diffuse_ctl
+!
+        array coef_4_heat_source_ctl  1
+          coef_4_heat_source_ctl       One                        1.0
+        end array coef_4_heat_source_ctl
       end  thermal
 !
 !
@@ -289,9 +331,14 @@ begin MHD_control
         array coef_4_composition_ctl     1
           coef_4_composition_ctl       One                        1.0
         end array coef_4_composition_ctl
+!
         array coef_4_c_diffuse_ctl  1
           coef_4_c_diffuse_ctl         Composite_Prandtl_number  -1.0
         end array coef_4_c_diffuse_ctl
+!
+        array coef_4_light_source_ctl  1
+          coef_4_light_source_ctl     One                         1.0
+        end array coef_4_light_source_ctl
       end  composition
 !
     end  coefficients_ctl
@@ -409,7 +456,7 @@ begin MHD_control
 !                                j = l*(l+1) + m
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin restart_file_ctl
-       rst_ctl                -2
+      rst_ctl                dynamo_benchmark_1
     end restart_file_ctl
 !
 !!!!!!   method for time evolution  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -429,8 +476,9 @@ begin MHD_control
 !   method_4_velo_ctl:    method for Crank Nicolson Scheme
 !   precond_4_crank_ctl:  preconditioning method for Crank Nicolson Scheme
 !
-!   Legendre_trans_loop_ctl: Legendre transform loop type  
-!                   ('inner_radial_loop' 'outer_radial_loop' 'long_loop')
+!   Legendre_trans_loop_ctl: spherical transfer loop type
+!                   ('inner_radial_loop', 'outer_radial_loop', 'long_loop',
+!                    'original_loop', 'outer_field_loop'
 !   FFT_library_ctl:  Selection of FFT librarry  ('FFTW3' or 'FFTPACK')
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -441,6 +489,7 @@ begin MHD_control
       coef_imp_t_ctl          5.0e-1
       coef_imp_b_ctl          5.0e-1
       coef_imp_c_ctl          5.0e-1
+      FFT_library_ctl          'ISPACK'
     end time_loop_ctl
   end control
 !

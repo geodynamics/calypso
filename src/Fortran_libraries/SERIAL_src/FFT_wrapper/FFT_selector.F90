@@ -11,7 +11,7 @@
 !!
 !!@verbatim
 !!      subroutine initialize_FFT_select(my_rank, Nsmp, Nstacksmp, Nfft)
-!!      subroutine finalize_FFT_select(Nsmp)
+!!      subroutine finalize_FFT_select(Nsmp, Nstacksmp)
 !!      subroutine verify_FFT_select(Nsmp, Nstacksmp, Nfft)
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT for ISPACK
@@ -73,12 +73,13 @@
 !>      integer flag for undefined
       integer(kind = kint), parameter :: iflag_UNDEFINED_FFT =   0
 !>      integer flag to use FFTPACK5
-      integer(kind = kint), parameter :: iflag_FFTPACK =   1
+      integer(kind = kint), parameter :: iflag_FFTPACK =     1
 !>      integer flag to use FFTW3
-      integer(kind = kint), parameter :: iflag_FFTW =      2
-!      integer(kind = kint), parameter :: iflag_FFTW = 3
+      integer(kind = kint), parameter :: iflag_FFTW =        2
+!>      integer flag to use single transforms in FFTW3
+      integer(kind = kint), parameter :: iflag_FFTW_SINGLE = 3
 !>      integer flag to use ISPACK
-      integer(kind = kint), parameter :: iflag_ISPACK =    3
+      integer(kind = kint), parameter :: iflag_ISPACK =      4
 !
       integer(kind = kint) :: iflag_FFT = iflag_UNDEFINED_FFT
 !
@@ -97,6 +98,10 @@
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
         if(my_rank .eq. 0) write(*,*) 'Use FFTW'
+        call init_FFTW_mul(Nsmp, Nstacksmp, Nfft)
+        return
+      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+        if(my_rank .eq. 0) write(*,*) 'Use single FFTW transforms'
         call init_4_FFTW(Nsmp, Nstacksmp, Nfft)
         return
       end if
@@ -108,15 +113,19 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine finalize_FFT_select(Nsmp)
+      subroutine finalize_FFT_select(Nsmp, Nstacksmp)
 !
-      integer(kind = kint), intent(in) ::  Nsmp
+      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
 !
 !
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
         if(iflag_debug .gt. 0) write(*,*) 'Finalize FFTW'
-        call finalize_4_FFTW(Nsmp)
+        call finalize_FFTW_mul(Nsmp)
+        return
+      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+        if(iflag_debug .gt. 0) write(*,*) 'Finalize single FFTW'
+        call finalize_4_FFTW(Nsmp, Nstacksmp)
         return
       end if
 #endif
@@ -137,6 +146,10 @@
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
         if(iflag_debug .gt. 0) write(*,*) 'Use FFTW'
+        call verify_work_FFTW_mul(Nsmp, Nstacksmp, Nfft)
+        return
+      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+        if(iflag_debug .eq. 0) write(*,*) 'Use single FFTW transforms'
         call verify_work_4_FFTW(Nsmp, Nstacksmp, Nfft)
         return
       end if
@@ -160,6 +173,9 @@
 !
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
+        call FFTW_mul_forward(Nsmp, Nstacksmp, M, Nfft, X)
+        return
+      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         call FFTW_forward(Nsmp, Nstacksmp, M, Nfft, X)
         return
       end if
@@ -181,6 +197,9 @@
 !
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
+        call FFTW_mul_backward(Nsmp, Nstacksmp, M, Nfft, X)
+        return
+      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         call FFTW_backward(Nsmp, Nstacksmp, M, Nfft, X)
         return
       end if

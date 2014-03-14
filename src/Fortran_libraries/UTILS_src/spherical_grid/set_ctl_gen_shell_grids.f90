@@ -25,10 +25,12 @@
       subroutine s_set_control_4_gen_shell_grids
 !
       use m_constants
+      use m_machine_parameter
       use m_read_mesh_data
       use m_spheric_constants
       use m_spheric_parameter
       use m_parallel_sph_grids
+      use m_sph_1d_global_index
       use m_node_id_spherical_IO
       use m_file_format_switch
 !
@@ -39,9 +41,12 @@
 !
       use const_sph_radial_grid
       use set_control_platform_data
+      use skip_comment_f
 !
       integer(kind = kint) :: nprocs_ctl
-      integer(kind = kint) :: i, np, kr
+      integer(kind = kint) :: i, np, kr, icou
+      integer(kind = kint) :: iflag_no, iflag_yes
+      integer(kind = kint) :: iflag_r, iflag_t, iflag_p
 !
 !
       nprocs_ctl = num_subdomain_ctl
@@ -56,37 +61,28 @@
       call choose_file_format(coriolis_file_fmt_ctl,                    &
      &    i_coriolis_file_fmt, ifmt_cor_int_file)
 !
+      iflag_memory_conserve_sph = 1
       if(i_mem_conserve .gt. 0) then
-        if(      memory_conservation_ctl .eq. 'no'                      &
-     &      .or. memory_conservation_ctl .eq. 'No'                      &
-     &      .or. memory_conservation_ctl .eq. 'NO'                      &
-     &      .or. memory_conservation_ctl .eq. 'off'                     &
-     &      .or. memory_conservation_ctl .eq. 'Off'                     &
-     &      .or. memory_conservation_ctl .eq. 'OFF') then
+        iflag_no =  cmp_no_case(memory_conservation_ctl, 'no')          &
+     &         + cmp_no_case(memory_conservation_ctl, 'off')
+        iflag_yes = cmp_no_case(memory_conservation_ctl, 'yes')         &
+     &         + cmp_no_case(memory_conservation_ctl, 'on')
+        if(iflag_no .gt. 0) then
           iflag_memory_conserve_sph = 0
-        else if( memory_conservation_ctl .eq. 'yes'                     &
-     &      .or. memory_conservation_ctl .eq. 'Yes'                     &
-     &      .or. memory_conservation_ctl .eq. 'YES'                     &
-     &      .or. memory_conservation_ctl .eq. 'on'                      &
-     &      .or. memory_conservation_ctl .eq. 'On'                      &
-     &      .or. memory_conservation_ctl .eq. 'ON') then
+        else if(iflag_yes .gt. 0) then
           iflag_memory_conserve_sph = 1
         end if
       end if
 !
       iflag_shell_mode = iflag_no_FEMMESH
       if(i_sph_g_type .gt. 0) then
-        if      (sph_grid_type_ctl .eq. 'no_pole'                       &
-     &      .or. sph_grid_type_ctl .eq. 'No_pole'                       &
-     &      .or. sph_grid_type_ctl .eq. 'NO_POLE') then
+        if      (cmp_no_case(sph_grid_type_ctl, 'no_pole') .gt. 0) then
           iflag_shell_mode = iflag_MESH_same
-        else if (sph_grid_type_ctl .eq. 'with_pole'                     &
-     &      .or. sph_grid_type_ctl .eq. 'With_pole'                     &
-     &      .or. sph_grid_type_ctl .eq. 'WITH_POLE') then
+        else if(cmp_no_case(sph_grid_type_ctl, 'with_pole')             &
+     &     .gt. 0) then
           iflag_shell_mode = iflag_MESH_w_pole
-        else if (sph_grid_type_ctl .eq. 'with_center'                   &
-     &      .or. sph_grid_type_ctl .eq. 'With_center'                   &
-     &      .or. sph_grid_type_ctl .eq. 'WITH_CENTER') then
+        else if(cmp_no_case(sph_grid_type_ctl, 'with_center')           &
+     &     .gt. 0) then
           iflag_shell_mode = iflag_MESH_w_center
         end if
       else
@@ -99,17 +95,14 @@
       nidx_global_rtp(3) = 4
       l_truncation = 2
 !
-      if     (raidal_grid_type_ctl .eq. 'explicit'                      &
-     &   .or. raidal_grid_type_ctl .eq. 'Explicit'                      &
-     &   .or. raidal_grid_type_ctl .eq. 'EXPLICIT') then
+      if     (cmp_no_case(radial_grid_type_ctl, 'explicit')             &
+     &     .gt. 0) then
        iflag_radial_grid =  igrid_non_euqidist
-      else if(raidal_grid_type_ctl .eq. 'chebyshev'                     &
-     &   .or. raidal_grid_type_ctl .eq. 'Chebyshev'                     &
-     &   .or. raidal_grid_type_ctl .eq. 'CHEBYSHEV') then
+      else if(cmp_no_case(radial_grid_type_ctl, 'Chebyshev')            &
+     &     .gt. 0) then
        iflag_radial_grid =  igrid_Chebyshev
-      else if(raidal_grid_type_ctl .eq. 'equi_distance'                 &
-     &   .or. raidal_grid_type_ctl .eq. 'Equi_distance'                 &
-     &   .or. raidal_grid_type_ctl .eq. 'EQUI_DISTANCE') then
+      else if(cmp_no_case(radial_grid_type_ctl, 'equi_distance')        &
+     &     .gt. 0) then
        iflag_radial_grid =  igrid_euqidistance
       end if
 !
@@ -125,7 +118,36 @@
         nidx_global_rtp(3) = ngrid_azimuth_ctl
       end if
 !
+!   Set radial group
+      if(i_bc_sph .gt. 0) then
+        numlayer_sph_bc = numlayer_bc_ctl
+      else
+        numlayer_sph_bc = 0
+      end if
+      call allocate_sph_radial_group
 !
+      icou = 0
+      do i = 1, numlayer_bc_ctl
+        if     (cmp_no_case(bc_bondary_name_ctl(i), 'ICB')              &
+     &          .gt. 0) then
+          numlayer_sph_bc = numlayer_sph_bc - 1
+        else if(cmp_no_case(bc_bondary_name_ctl(i), 'CMB')              &
+     &          .gt. 0) then
+          numlayer_sph_bc = numlayer_sph_bc - 1
+        else if(cmp_no_case(bc_bondary_name_ctl(i), 'to_Center')        &
+     &          .gt. 0) then
+          numlayer_sph_bc = numlayer_sph_bc - 1
+        else if(cmp_no_case(bc_bondary_name_ctl(i), 'Mid_Depth')        &
+     &          .gt. 0) then
+          numlayer_sph_bc = numlayer_sph_bc - 1
+        else
+          icou = icou + 1
+          kr_sph_boundary(icou) =  kr_boundary_ctl(i)
+          sph_bondary_name(icou) = bc_bondary_name_ctl(i)
+        end if
+      end do
+!
+!   Set radial grid explicitly
       if(iflag_radial_grid .eq. igrid_non_euqidist) then
         if (i_numlayer_shell .gt. 0) then
           nidx_global_rtp(1) = numlayer_shell_ctl
@@ -146,27 +168,26 @@
         nlayer_mid_OC =   -1
         if(i_bc_sph .gt. 0) then
           do i = 1, numlayer_bc_ctl
-            if     (bc_bondary_name_ctl(i) .eq. 'ICB'                   &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'icb') then
+            if     (cmp_no_case(bc_bondary_name_ctl(i), 'ICB')          &
+     &          .gt. 0) then
               nlayer_ICB = kr_boundary_ctl(i)
-            else if(bc_bondary_name_ctl(i) .eq. 'CMB'                   &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'cmb') then
+            else if(cmp_no_case(bc_bondary_name_ctl(i), 'CMB')          &
+     &          .gt. 0) then
               nlayer_CMB = kr_boundary_ctl(i)
-            else if(bc_bondary_name_ctl(i) .eq. 'to_Center'             &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'to_center'             &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'TO_CENTER') then
+            else if(cmp_no_case(bc_bondary_name_ctl(i), 'to_Center')    &
+     &          .gt. 0) then
               nlayer_2_center = kr_boundary_ctl(i)
-            else if(bc_bondary_name_ctl(i) .eq. 'Mid_Depth'             &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'mid_depth'             &
-     &         .or. bc_bondary_name_ctl(i) .eq. 'MID_DEPTH') then
+            else if(cmp_no_case(bc_bondary_name_ctl(i), 'Mid_Depth')    &
+     &          .gt. 0) then
               nlayer_mid_OC = kr_boundary_ctl(i)
             end if
           end do
+!
           call deallocate_boundary_layers
         end if
 !
+!   Set radial grid by Chebyshev or equaidistance
       else
-!
         if(i_ICB_radius.gt.0 .and. i_CMB_radius.gt.0) then
           r_ICB = ICB_radius_ctl
           r_CMB = CMB_radius_ctl
@@ -190,20 +211,15 @@
       ndomain_rtp(1:3) = 1
       if (ndir_domain_sph_grid .gt. 0) then
         do i = 1, ndir_domain_sph_grid
-          if (         dir_domain_sph_grid_ctl(i) .eq. 'radial'         &
-     &            .or. dir_domain_sph_grid_ctl(i) .eq. 'Radial'         &
-     &            .or. dir_domain_sph_grid_ctl(i) .eq. 'RADIAL'         &
-     &            .or. dir_domain_sph_grid_ctl(i) .eq. 'r'              &
-     &            .or. dir_domain_sph_grid_ctl(i) .eq. 'R'     ) then
-             ndomain_rtp(1) = num_domain_sph_grid_ctl(i)
-          else if (    dir_domain_sph_grid_ctl(i) .eq. 'meridional'     &
-     &            .or. dir_domain_sph_grid_ctl(i) .eq. 'Meridional'     &
-     &            .or. dir_domain_sph_grid_ctl(i) .eq. 'MERIDiONAL'     &
-     &            .or. dir_domain_sph_grid_ctl(i) .eq. 'theta'          &
-     &            .or. dir_domain_sph_grid_ctl(i) .eq. 'Theta'          &
-     &            .or. dir_domain_sph_grid_ctl(i) .eq. 'THETA'   ) then
-             ndomain_rtp(2) = num_domain_sph_grid_ctl(i)
-           end if
+          iflag_r = cmp_no_case(dir_domain_sph_grid_ctl(i), 'r')        &
+     &           + cmp_no_case(dir_domain_sph_grid_ctl(i), 'radial')
+          iflag_t = cmp_no_case(dir_domain_sph_grid_ctl(i), 'theta')    &
+     &       + cmp_no_case(dir_domain_sph_grid_ctl(i), 'meridional')
+          if     (iflag_r .gt. 0) then
+            ndomain_rtp(1) = num_domain_sph_grid_ctl(i)
+          else if (iflag_t .gt. 0) then
+            ndomain_rtp(2) = num_domain_sph_grid_ctl(i)
+          end if
         end do
 !
         call deallocate_ndomain_rtp_ctl
@@ -212,19 +228,14 @@
       ndomain_rtm(1:3) = 1
       if (ndir_domain_sph_grid .gt. 0) then
         do i = 1, ndir_domain_legendre
-          if (         dir_domain_legendre_ctl(i) .eq. 'radial'         &
-     &            .or. dir_domain_legendre_ctl(i) .eq. 'Radial'         &
-     &            .or. dir_domain_legendre_ctl(i) .eq. 'RADIAL'         &
-     &            .or. dir_domain_legendre_ctl(i) .eq. 'r'              &
-     &            .or. dir_domain_legendre_ctl(i) .eq. 'R'     ) then
-             ndomain_rtm(1) = num_domain_legendre_ctl(i)
-          else if (    dir_domain_legendre_ctl(i) .eq. 'zonal'          &
-     &            .or. dir_domain_legendre_ctl(i) .eq. 'Zonal'          &
-     &            .or. dir_domain_legendre_ctl(i) .eq. 'ZONAL'          &
-     &            .or. dir_domain_legendre_ctl(i) .eq. 'phi'            &
-     &            .or. dir_domain_legendre_ctl(i) .eq. 'Phi'            &
-     &            .or. dir_domain_legendre_ctl(i) .eq. 'PHI'   ) then
-             ndomain_rtm(3) = num_domain_legendre_ctl(i)
+          iflag_r = cmp_no_case(dir_domain_legendre_ctl(i), 'r')        &
+     &           + cmp_no_case(dir_domain_legendre_ctl(i), 'radial')
+          iflag_p = cmp_no_case(dir_domain_legendre_ctl(i), 'phi')      &
+     &           + cmp_no_case(dir_domain_legendre_ctl(i), 'zonal')
+          if     (iflag_r .gt. 0) then
+            ndomain_rtm(1) = num_domain_legendre_ctl(i)
+          else if (iflag_p .gt. 0) then
+            ndomain_rtm(3) = num_domain_legendre_ctl(i)
            end if
         end do
 !
@@ -237,14 +248,9 @@
       ndomain_rj(1:2) = 1
       if (ndir_domain_sph_grid .gt. 0) then
         do i = 1, ndir_domain_spectr
-          if (         dir_domain_spectr_ctl(i) .eq. 'degree_order'     &
-     &            .or. dir_domain_spectr_ctl(i) .eq. 'Degree_order'     &
-     &            .or. dir_domain_spectr_ctl(i) .eq. 'DEGREE_ORDER'     &
-     &            .or. dir_domain_spectr_ctl(i) .eq. 'modes'            &
-     &            .or. dir_domain_spectr_ctl(i) .eq. 'Modes'            &
-     &            .or. dir_domain_spectr_ctl(i) .eq. 'MODES' ) then
-             ndomain_rj(2) = num_domain_spectr_ctl(i)
-           end if
+          iflag_t = cmp_no_case(dir_domain_spectr_ctl(i), 'modes')      &
+     &       + cmp_no_case(dir_domain_spectr_ctl(i), 'degree_order')
+          if (iflag_t .gt. 0) ndomain_rj(2) = num_domain_spectr_ctl(i)
         end do
 !
         call deallocate_ndomain_rj_ctl
@@ -271,6 +277,32 @@
       if (ndomain_sph .ne. np) then
         write(*,*) 'check num of domain for (r,l,m)'
         stop
+      end if
+!
+      if(ndomain_rtm(1) .ne. ndomain_rtp(1)) then
+        write(*,*) 'Set same number of radial subdomains'
+        write(*,*) 'for Legendre transform and spherical grids'
+        stop
+      end if
+!
+      if(mod(nidx_global_rtp(3),2) .ne. 0) then
+        write(*,*) 'Set even number for the number of zonal grids'
+        stop
+      end if
+!
+      if(nidx_global_rtp(2) .le. (l_truncation+1)*3/2) then
+        write(*,*) 'Spherical harmonics transform has Ailiasing'
+      else if (nidx_global_rtp(2) .lt. (l_truncation+1)) then
+        write(*,*) "Grid has less than Nyquist's sampling theorem"
+      end if
+!
+      if(iflag_debug .gt. 0) then
+        write(*,*) 'icou, kr_sph_boundary, sph_bondary_name',           &
+     &             numlayer_sph_bc
+        do icou = 1, numlayer_sph_bc
+          write(*,*) icou, kr_sph_boundary(icou),                       &
+     &               trim(sph_bondary_name(icou))
+        end do
       end if
 !
       end subroutine s_set_control_4_gen_shell_grids

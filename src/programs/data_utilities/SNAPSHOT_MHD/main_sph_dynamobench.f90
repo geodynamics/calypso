@@ -12,19 +12,19 @@
 !
       use m_precision
 !
+      use calypso_mpi
       use analyzer_sph_dynamobench
-      use m_parallel_var_dof
 !
       implicit none
 !
 !
-      call parallel_cal_init
+      call calypso_MPI_init
 !
       call initialize_sph_dynamobench
 !
       call evolution_sph_dynamobench
 !
-      call parallel_cal_fin
+      call calypso_MPI_finalize
 !
       write(*,*) '***** program finished *****'
       stop

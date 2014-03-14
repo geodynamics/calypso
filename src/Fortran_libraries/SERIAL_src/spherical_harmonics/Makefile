@@ -3,7 +3,7 @@
 #
 
 SPH_DIR = $$(CORE_SRCDIR)/spherical_harmonics
-SRC_SPH = $(shell ls *.f90)
+SRC_SPH = $(shell ls *.f90 *.F90)
 MOD_SPH = $(addsuffix .o,$(basename $(SRC_SPH)) )
 
 #

@@ -35,9 +35,9 @@
 !
       call allocate_boundary_data
 !
-      bc_name(1) = 'ICB'
-      bc_name(2) = 'CMB'
-      bc_name(3) = 'to_Center'
+      bc_name(1) = ICB_nod_grp_name
+      bc_name(2) = CMB_nod_grp_name
+      bc_name(3) = CTR_nod_grp_name
 !
       bc_istack(0) = 0
       bc_istack(1) = bc_istack(0)                                       &
@@ -75,9 +75,9 @@
 !
       call allocate_boundary_data
 !
-      bc_name(1) = 'ICB'
-      bc_name(2) = 'CMB'
-      bc_name(3) = 'to_Center'
+      bc_name(1) = ICB_nod_grp_name
+      bc_name(2) = CMB_nod_grp_name
+      bc_name(3) = CTR_nod_grp_name
 !
       bc_name(4) = 'South_pole'
       bc_name(5) = 'North_pole'
@@ -128,9 +128,9 @@
 !
       call allocate_boundary_data
 !
-      bc_name(1) = 'ICB'
-      bc_name(2) = 'CMB'
-      bc_name(3) = 'to_Center'
+      bc_name(1) = ICB_nod_grp_name
+      bc_name(2) = CMB_nod_grp_name
+      bc_name(3) = CTR_nod_grp_name
 !
       bc_name(4) = 'South_pole'
       bc_name(5) = 'North_pole'

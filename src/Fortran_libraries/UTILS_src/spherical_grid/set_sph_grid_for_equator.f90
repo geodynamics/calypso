@@ -37,6 +37,7 @@
 !
       use m_2d_sph_trans_table
       use set_indices_4_sph_tranform
+      use set_sph_tranform_ordering
 !
       integer(kind= kint) :: i, kp, kr, inod, np, np2
 !
@@ -151,12 +152,12 @@
       istack_radial_grp_rtp(6) = istack_radial_grp_rtp(5)               &
      &                          + nlayer_CMB - nlayer_ICB + 1
 !
-      name_radial_grp_rtp(1) = 'ICB'
-      name_radial_grp_rtp(2) = 'CMB'
-      name_radial_grp_rtp(3) = 'to_Center'
+      name_radial_grp_rtp(1) = ICB_nod_grp_name
+      name_radial_grp_rtp(2) = CMB_nod_grp_name
+      name_radial_grp_rtp(3) = CTR_nod_grp_name
       name_radial_grp_rtp(4) = 'Mid_OC'
-      name_radial_grp_rtp(5) = 'inner_core'
-      name_radial_grp_rtp(6) = 'outer_core'
+      name_radial_grp_rtp(5) = IC_ele_grp_name
+      name_radial_grp_rtp(6) = OC_ele_grp_name
 !
       ntot_radial_grp_rtp = istack_radial_grp_rtp(6)
       call allocate_rtp_r_grp_item

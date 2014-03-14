@@ -246,7 +246,6 @@
 !
 !
       icount = iargc_kemo()
-!      write(*,*) 'icount: ',  icount
 !
       if(icount .le. 2) then
         write(*,*)                                                      &

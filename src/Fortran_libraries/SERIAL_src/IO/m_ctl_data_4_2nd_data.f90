@@ -10,6 +10,7 @@
 !
 !  begin new_data_files_def
 !    num_new_domain_ctl           2
+!
 !    new_mesh_prefix            'mesh_target/in'
 !    new_sph_mode_prefix        'sph_new/in_rj'
 !

@@ -20,15 +20,14 @@ begin MHD_control
     debug_flag_ctl            'OFF'
 !
     num_subdomain_ctl            4
-    num_smp_ctl                  8
+    num_smp_ctl                  4
 !
     sph_file_prefix             'sph_lm31r48c_4/in'
-    coriolis_int_file_name      'sph_lm31r48c_4/rot_int.dat'
 !
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
 !
-    field_file_fmt_ctl          'merged_VTK'
+    field_file_fmt_ctl          'VTK'
   end data_files_def
 !
   begin model
@@ -48,7 +47,7 @@ begin MHD_control
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
-      array nod_value_ctl     8
+      array nod_value_ctl     9
         nod_value_ctl  velocity                Viz_On   Monitor_On
         nod_value_ctl  temperature             Viz_On   Monitor_On
         nod_value_ctl  pressure                Viz_On   Monitor_On
@@ -58,6 +57,8 @@ begin MHD_control
 !
         nod_value_ctl  Lorentz_work             Viz_On   Monitor_On
         nod_value_ctl  buoyancy_flux            Viz_On   Monitor_On
+!
+        nod_value_ctl  Lorentz_force            Viz_On   Monitor_On
       end array nod_value_ctl
     end phys_values_ctl
 !
@@ -234,13 +235,13 @@ begin MHD_control
    begin time_step_ctl
       elapsed_time_ctl      80000.
       i_step_init_ctl           0
-      i_step_finish_ctl     20000
+      i_step_finish_ctl      2000
 !
-      i_step_check_ctl        100
-      i_step_rst_ctl         5000
-      i_step_field_ctl      10000
+      i_step_check_ctl         20
+      i_step_rst_ctl         1000
+      i_step_field_ctl       1000
 !
-      dt_ctl              1.0e-5
+      dt_ctl              5.0e-6
       time_init_ctl       0.0e-8
     end time_step_ctl
 !
@@ -270,7 +271,7 @@ begin MHD_control
     gauss_coefs_radius_ctl    2.91
 !
     array pick_sph_spectr_ctl  2
-      pick_sph_spectr_ctl   1   0
+      pick_sph_spectr_ctl   0   0
       pick_sph_spectr_ctl   2   0
     end array pick_sph_spectr_ctl
 !

@@ -15,7 +15,7 @@
 !
       use m_precision
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
       use m_gauss_coefs_monitor_data
       use m_pickup_sph_spectr_data
@@ -53,7 +53,6 @@
       integer (kind = kint) :: i_flag
 !
 !
-      call time_prog_barrier
       call set_output_flag(i_flag, istep_max_dt, i_step_check)
 !
       if (i_flag .ne. 0) return

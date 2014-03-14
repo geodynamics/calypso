@@ -106,7 +106,7 @@
       use t_comm_table
       use m_spheric_parameter
       use m_sph_mesh_1d_connect
-      use set_sph_local_node
+      use cal_sph_node_addresses
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t, jp_r, jp_t
       integer(kind = kint), intent(inout) :: icou
@@ -136,7 +136,7 @@
       use t_comm_table
       use m_spheric_parameter
       use m_sph_mesh_1d_connect
-      use set_sph_local_node
+      use cal_sph_node_addresses
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t, jp_r, jp_t
       integer(kind = kint), intent(inout) :: icou
@@ -192,7 +192,7 @@
       use t_comm_table
       use m_spheric_parameter
       use m_sph_mesh_1d_connect
-      use set_sph_local_node
+      use cal_sph_node_addresses
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t, jp_r, jp_t
       integer(kind = kint), intent(inout) :: icou

@@ -15,7 +15,7 @@
       use m_precision
 !
       use m_machine_parameter
-      use m_parallel_var_dof
+      use calypso_mpi
 !
       implicit none
 !
@@ -43,7 +43,7 @@
       use set_control_4_magne
       use set_control_4_composition
       use set_control_4_pickup_sph
-      use parallel_ucd_IO_select
+      use output_parallel_ucd_file
       use check_read_bc_file
 !
       use check_dependency_for_MHD

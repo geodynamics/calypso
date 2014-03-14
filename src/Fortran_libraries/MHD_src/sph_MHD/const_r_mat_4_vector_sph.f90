@@ -16,11 +16,11 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_parallel_var_dof
       use m_t_int_parameter
       use m_spheric_param_smp
       use m_spheric_parameter
       use m_radial_matrices_sph
+      use m_physical_property
       use m_ludcmp_3band
       use set_radial_mat_sph
 !
@@ -34,64 +34,122 @@
 !
       subroutine const_radial_mat_vort_2step
 !
-      use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
+      use m_coef_fdm_to_center
+      use m_coef_fdm_free_ICB
+      use m_coef_fdm_free_CMB
       use m_ludcmp_band
-      use set_free_slip_sph_mat_bc
-      use set_non_slip_sph_mat_bc
-      use set_sph_mom_mat_bc
+      use set_sph_scalar_mat_bc
       use cal_inner_core_rotation
+      use center_sph_matrices
       use mat_product_3band_mul
 !
       integer(kind = kint) :: ip, jst, jed, j
-!      integer(kind = kint) :: k
+      integer(kind = kint) :: ierr
+      real(kind = kreal) :: coef_dvt, coef_p
 !
 !
-!$omp parallel
-      call set_radial_vect_evo_mat_sph(nidx_rj(1), nidx_rj(2),          &
-     &    nlayer_ICB, nlayer_CMB, coef_imp_v, coef_d_velo, vt_evo_mat)
-      call set_radial_vect_evo_mat_sph(nidx_rj(1), nidx_rj(2),          &
-     &    nlayer_ICB, nlayer_CMB, coef_imp_v, coef_d_velo, wt_evo_mat)
-      call set_radial_vp3_mat_sph(nidx_rj(1), nidx_rj(2),               &
-     &    nlayer_ICB, nlayer_CMB, vs_poisson_mat)
-      call set_radial_press_mat_sph(nidx_rj(1), nidx_rj(2),             &
-     &    nlayer_ICB, nlayer_CMB, coef_press, p_poisson_mat)
-!$omp end parallel
+      if(coef_d_velo .eq. zero) then
+        coef_dvt = one
+        coef_p = - coef_press
+        call set_unit_mat_4_poisson(nidx_rj(1), nidx_rj(2),             &
+     &      sph_bc_U%kr_in, sph_bc_U%kr_out, vt_evo_mat)
+        call set_unit_mat_4_poisson(nidx_rj(1), nidx_rj(2),             &
+     &      sph_bc_U%kr_in, sph_bc_U%kr_out, wt_evo_mat)
+      else
+        coef_dvt = coef_imp_v * coef_d_velo * dt
+        coef_p = - coef_press
+        call set_unit_mat_4_time_evo(nidx_rj(1), nidx_rj(2),            &
+     &      vt_evo_mat)
+        call set_unit_mat_4_time_evo(nidx_rj(1), nidx_rj(2),            &
+     &      wt_evo_mat)
+      end if
+!
+      call set_unit_mat_4_poisson(nidx_rj(1), nidx_rj(2),               &
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, vs_poisson_mat)
+      call set_unit_mat_4_poisson(nidx_rj(1), nidx_rj(2),               &
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, p_poisson_mat)
+!
+      call add_vector_poisson_mat_sph(nidx_rj(1), nidx_rj(2),           &
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, coef_dvt, vt_evo_mat)
+      call add_vector_poisson_mat_sph(nidx_rj(1), nidx_rj(2),           &
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, coef_dvt, wt_evo_mat)
+      call add_vector_poisson_mat_sph(nidx_rj(1), nidx_rj(2),           &
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, one, vs_poisson_mat)
+      call add_scalar_poisson_mat_sph(nidx_rj(1), nidx_rj(2),           &
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, coef_p, p_poisson_mat)
 !
 !   Boundary condition for ICB
 !
-      call set_icb_wt_sph_evo_mat
-      call set_icb_p_sph_poisson_mat
-!
-      if(iflag_icb_velocity .eq. iflag_free_slip) then
-        call set_free_slip_icb_vt_sph_mat
-        call set_free_icb_vp_poisson3_mat
+      if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
+        call add_scalar_poisson_mat_filled(idx_rj_degree_zero,          &
+     &      nidx_rj(1), nidx_rj(2),  sph_bc_U%r_ICB,                    &
+     &      fdm2_fix_fld_center, fdm2_fix_dr_center,                    &
+     &      coef_p, p_poisson_mat)
+        call add_vector_poisson_mat_center(nidx_rj(1), nidx_rj(2),      &
+     &      sph_bc_U%r_ICB, fdm2_fix_fld_center, coef_dvt, vt_evo_mat)
+        call add_vector_poisson_mat_center(nidx_rj(1), nidx_rj(2),      &
+     &      sph_bc_U%r_ICB, fdm2_fix_fld_center, coef_dvt, wt_evo_mat)
+        call add_vector_poisson_mat_center(nidx_rj(1), nidx_rj(2),      &
+     &      sph_bc_U%r_ICB, fdm2_fix_fld_center, one, vs_poisson_mat)
       else
-        call set_non_slip_icb_vt_sph_mat
-        call set_rgd_icb_vp_poisson3_mat
+        call add_fix_flux_icb_poisson_mat(nidx_rj(1), nidx_rj(2),       &
+     &      sph_bc_U%kr_in, sph_bc_U%r_ICB, sph_bc_U%fdm2_fix_dr_ICB,   &
+     &      coef_dvt, wt_evo_mat)
+        call add_icb_scalar_poisson_mat(nidx_rj(1), nidx_rj(2),         &
+     &      sph_bc_U%kr_in, sph_bc_U%r_ICB, sph_bc_U%fdm2_fix_dr_ICB,   &
+     &      coef_p, p_poisson_mat)
+!
+        if(sph_bc_U%iflag_icb .eq. iflag_free_slip) then
+          call add_fix_flux_icb_poisson_mat(nidx_rj(1), nidx_rj(2),     &
+     &        sph_bc_U%kr_in, sph_bc_U%r_ICB, fdm2_free_vt_ICB,         &
+     &        coef_dvt, vt_evo_mat)
+          call add_fix_flux_icb_poisson_mat(nidx_rj(1), nidx_rj(2),     &
+     &        sph_bc_U%kr_in, sph_bc_U%r_ICB, fdm2_free_vp_ICB,         &
+     &        one, vs_poisson_mat)
+        else
+          call set_fix_fld_icb_poisson_mat(nidx_rj(1), nidx_rj(2),      &
+     &        sph_bc_U%kr_in, vt_evo_mat)
+          call add_fix_flux_icb_poisson_mat(nidx_rj(1), nidx_rj(2),     &
+     &        sph_bc_U%kr_in, sph_bc_U%r_ICB, sph_bc_U%fdm2_fix_dr_ICB, &
+     &        one, vs_poisson_mat)
+        end if
       end if
 !
 !   Overwrite rotation for inner core
 !
-      if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
-        call set_icore_viscous_matrix
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
+        call set_icore_viscous_matrix                                   &
+     &     (sph_bc_U%kr_in, sph_bc_U%fdm1_fix_fld_ICB)
       end if
 !
 !   Boundary condition for CMB
 !
-      call set_cmb_wt_sph_evo_mat
-      call set_cmb_p_sph_poisson_mat
+      call add_fix_flux_cmb_poisson_mat(nidx_rj(1), nidx_rj(2),         &
+     &    sph_bc_U%kr_out, sph_bc_U%r_CMB, sph_bc_U%fdm2_fix_dr_CMB,    &
+     &    coef_dvt, wt_evo_mat)
+      call add_cmb_scalar_poisson_mat(nidx_rj(1), nidx_rj(2),           &
+     &    sph_bc_U%kr_out, sph_bc_U%r_CMB, sph_bc_U%fdm2_fix_dr_CMB,    &
+     &    coef_p, p_poisson_mat)
 !
-      if(iflag_cmb_velocity .eq. iflag_free_slip) then
-        call set_free_slip_cmb_vt_sph_mat
-        call set_free_cmb_vp_poisson3_mat
+      if(sph_bc_U%iflag_cmb .eq. iflag_free_slip) then
+        call add_fix_flux_cmb_poisson_mat(nidx_rj(1), nidx_rj(2),       &
+     &      sph_bc_U%kr_out, sph_bc_U%r_CMB, fdm2_free_vt_CMB,          &
+     &      coef_dvt, vt_evo_mat)
+        call add_fix_flux_cmb_poisson_mat(nidx_rj(1), nidx_rj(2),       &
+     &      sph_bc_U%kr_out, sph_bc_U%r_CMB, fdm2_free_vp_CMB,          &
+     &      one, vs_poisson_mat)
       else
-        call set_non_slip_cmb_vt_sph_mat
-        call set_rgd_cmb_vp_poisson3_mat
+        call set_fix_fld_cmb_poisson_mat(nidx_rj(1), nidx_rj(2),        &
+     &      sph_bc_U%kr_out, vt_evo_mat)
+        call add_fix_flux_cmb_poisson_mat(nidx_rj(1), nidx_rj(2),       &
+     &      sph_bc_U%kr_out, sph_bc_U%r_CMB, sph_bc_U%fdm2_fix_dr_CMB,  &
+     &      one, vs_poisson_mat)
       end if
 !
 !
       call cal_mat_product_3band_mul(nidx_rj(1), nidx_rj(2),            &
-     &    nlayer_ICB, nlayer_CMB, wt_evo_mat, vs_poisson_mat,           &
+     &    sph_bc_U%kr_in, sph_bc_U%kr_out, wt_evo_mat, vs_poisson_mat,  &
      &    vp_evo_mat)
 !
       if(i_debug .eq. iflag_full_msg)                                   &
@@ -133,35 +191,67 @@
 !
       subroutine const_radial_mat_4_magne_sph
 !
-      use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
+      use m_coef_fdm_to_center
+      use set_sph_scalar_mat_bc
       use set_sph_magne_mat_bc
+      use center_sph_matrices
 !
-      integer(kind = kint) :: kr_in, ip, jst, jed, j
+      integer(kind = kint) :: ip, jst, jed, j
+      integer(kind = kint) :: ierr
+      real(kind = kreal) :: coef_dbt
 !
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
-        kr_in = ione
-        call set_magne_center_rmat_sph
-      else if(iflag_icb_magne .eq. iflag_radial_magne) then
-        kr_in = nlayer_ICB
-        call set_qvacume_magne_icb_rmat_sph
+      if(coef_d_magne .eq. zero) then
+        coef_dbt = one
+        call set_unit_mat_4_poisson(nidx_rj(1), nidx_rj(2),             &
+     &      sph_bc_B%kr_in, sph_bc_B%kr_out, bs_evo_mat)
+        call set_unit_mat_4_poisson(nidx_rj(1), nidx_rj(2),             &
+     &      sph_bc_B%kr_in, sph_bc_B%kr_out, bt_evo_mat)
       else
-        kr_in = nlayer_ICB
-        call set_ins_magne_icb_rmat_sph
+        coef_dbt = coef_imp_b * coef_d_magne * dt
+        call set_unit_mat_4_time_evo(nidx_rj(1), nidx_rj(2),            &
+     &      bs_evo_mat)
+        call set_unit_mat_4_time_evo(nidx_rj(1), nidx_rj(2),            &
+     &      bt_evo_mat)
       end if
 !
-      if(iflag_cmb_magne .eq. iflag_radial_magne) then
-        call set_qvacume_magne_cmb_rmat_sph
+      call add_vector_poisson_mat_sph(nidx_rj(1), nidx_rj(2),           &
+     &    sph_bc_B%kr_in, sph_bc_B%kr_out, coef_dbt, bs_evo_mat)
+      call add_vector_poisson_mat_sph(nidx_rj(1), nidx_rj(2),           &
+     &    sph_bc_B%kr_in, sph_bc_B%kr_out, coef_dbt, bt_evo_mat)
+!
+!
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
+        call add_vector_poisson_mat_center(nidx_rj(1), nidx_rj(2),      &
+     &      sph_bc_B%r_ICB, fdm2_fix_fld_center, coef_dbt, bs_evo_mat)
+        call add_vector_poisson_mat_center(nidx_rj(1), nidx_rj(2),      &
+     &      sph_bc_B%r_ICB, fdm2_fix_fld_center, coef_dbt, bt_evo_mat)
+      else if(sph_bc_B%iflag_icb .eq. iflag_radial_magne) then
+        call add_fix_flux_icb_poisson_mat(nidx_rj(1), nidx_rj(2),       &
+     &      sph_bc_B%kr_in, sph_bc_B%r_ICB, sph_bc_B%fdm2_fix_dr_ICB,   &
+     &      coef_dbt, bs_evo_mat)
+        call set_fix_fld_icb_poisson_mat(nidx_rj(1), nidx_rj(2),        &
+     &      sph_bc_B%kr_in, bt_evo_mat)
       else
-        call set_ins_magne_cmb_rmat_sph
+        call set_ins_magne_icb_rmat_sph(nidx_rj(1), nidx_rj(2),         &
+     &      sph_bc_B%kr_in, sph_bc_B%r_ICB, sph_bc_B%fdm2_fix_dr_ICB,   &
+     &      coef_dbt, bs_evo_mat)
+        call set_fix_fld_icb_poisson_mat(nidx_rj(1), nidx_rj(2),        &
+     &      sph_bc_B%kr_in, bt_evo_mat)
       end if
 !
-!$omp parallel
-      call set_radial_vect_evo_mat_sph(nidx_rj(1), nidx_rj(2),          &
-     &    kr_in, nlayer_CMB, coef_imp_b, coef_d_magne, bs_evo_mat)
-      call set_radial_vect_evo_mat_sph(nidx_rj(1), nidx_rj(2),          &
-     &    kr_in, nlayer_CMB, coef_imp_b, coef_d_magne, bt_evo_mat)
-!$omp end parallel
+      if(sph_bc_B%iflag_cmb .eq. iflag_radial_magne) then
+        call add_fix_flux_cmb_poisson_mat(nidx_rj(1), nidx_rj(2),       &
+     &      sph_bc_B%kr_out, sph_bc_B%r_CMB, sph_bc_B%fdm2_fix_dr_CMB,  &
+     &      coef_dbt, bs_evo_mat)
+      else
+        call set_ins_magne_cmb_rmat_sph(nidx_rj(1), nidx_rj(2),         &
+     &      sph_bc_B%kr_out, sph_bc_B%r_CMB, sph_bc_B%fdm2_fix_dr_CMB,  &
+     &      coef_dbt, bs_evo_mat)
+      end if
+      call set_fix_fld_cmb_poisson_mat(nidx_rj(1), nidx_rj(2),          &
+     &    sph_bc_B%kr_out, bt_evo_mat)
 !
 !
 !$omp parallel do private(jst,jed,j)

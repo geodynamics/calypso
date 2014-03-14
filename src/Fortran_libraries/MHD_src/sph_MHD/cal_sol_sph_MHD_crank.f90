@@ -17,10 +17,9 @@
 !
       use m_precision
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_machine_parameter
       use m_control_parameter
-      use m_control_params_sph_MHD
       use m_spheric_parameter
       use m_spheric_param_smp
       use m_radial_matrices_sph
@@ -44,6 +43,7 @@
 !
       subroutine s_cal_sol_sph_MHD_crank
 !
+      use m_boundary_params_sph_MHD
       use cal_rot_buoyancies_sph_MHD
       use cal_sol_sph_fluid_crank
 !
@@ -85,7 +85,7 @@
 !
       if(iflag_t_evo_4_velo .gt. id_no_evolution) then
         call update_after_vorticity_sph
-        call cal_rot_radial_self_gravity
+        call cal_rot_radial_self_gravity(sph_bc_U)
       end if
 !
       if(iflag_t_evo_4_temp .gt.     id_no_evolution) then
@@ -105,18 +105,19 @@
 !
       subroutine set_sph_field_to_start
 !
+      use m_boundary_params_sph_MHD
       use const_sph_radial_grad
       use cal_rot_buoyancies_sph_MHD
 !
 !
       if(ipol%i_velo*ipol%i_vort .gt. 0) then
-        call const_grad_vp_and_vorticity
+        call const_grad_vp_and_vorticity(ipol%i_velo, ipol%i_vort)
       end if
 !
       if(iflag_debug.gt.0) write(*,*) 'update_after_vorticity_sph'
       call update_after_vorticity_sph
       if(iflag_debug.gt.0) write(*,*) 'cal_rot_radial_self_gravity'
-      call cal_rot_radial_self_gravity
+      call cal_rot_radial_self_gravity(sph_bc_U)
 !
       if(iflag_debug.gt.0) write(*,*) 'update_after_heat_sph'
       call update_after_heat_sph
@@ -124,11 +125,9 @@
       call update_after_composit_sph
 !
       if(ipol%i_magne*ipol%i_current .gt. 0) then
-        call const_grad_bp_and_current
+        call const_grad_bp_and_current                                  &
+     &     (sph_bc_B, ipol%i_magne, ipol%i_current)
       end if
-!        Input:    ipol%i_magne, itor%i_magne
-!        Solution: idpdr%i_magne, 
-!                  ipol%i_current, itor%i_current, idpdr%i_current
 !
       call update_after_magne_sph
 !
@@ -139,22 +138,30 @@
 !
       subroutine update_after_vorticity_sph
 !
+      use m_physical_property
+      use m_boundary_params_sph_MHD
       use cal_inner_core_rotation
 !
 !
-      if(iflag_icb_velocity .eq. iflag_rotatable_ic                     &
-     &  .and. idx_rj_degree_one(1) .gt. 0) then
-        call set_inner_core_rotation
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
+        call set_inner_core_rotation(sph_bc_U%kr_in)
       end if
 !
 !       Input: ipol%i_vort, itor%i_vort
 !       Solution: ipol%i_v_diffuse, itor%i_v_diffuse, idpdr%i_v_diffuse
-      if(iflag_debug.gt.0) write(*,*) 'const_sph_viscous_by_vort2'
-      if(ipol%i_v_diffuse .gt. 0) call const_sph_viscous_by_vort2
+      if(ipol%i_v_diffuse .gt. 0) then
+        if(iflag_debug.gt.0) write(*,*) 'const_sph_viscous_by_vort2'
+        call const_sph_viscous_by_vort2(sph_bc_U, coef_d_velo,          &
+     &     ipol%i_velo, ipol%i_vort, ipol%i_v_diffuse)
+      end if
+!
 !       Input:    ipol%i_vort, itor%i_vort
 !       Solution: ipol%i_w_diffuse, itor%i_w_diffuse, idpdr%i_w_diffuse
-      if(iflag_debug.gt.0) write(*,*)'const_sph_vorticirty_diffusion'
-      if(ipol%i_w_diffuse .gt. 0) call const_sph_vorticirty_diffusion
+      if(ipol%i_w_diffuse .gt. 0) then
+        if(iflag_debug.gt.0) write(*,*)'const_sph_vorticirty_diffusion'
+        call const_sph_vorticirty_diffusion(sph_bc_U, coef_d_velo,      &
+     &      ipol%i_vort, ipol%i_w_diffuse)
+      end if
 !
       end subroutine update_after_vorticity_sph
 !
@@ -163,11 +170,17 @@
 !
       subroutine update_after_magne_sph
 !
+      use m_physical_property
+      use m_boundary_params_sph_MHD
+!
 !
 !       Input:    ipol%i_current, itor%i_current
 !       Solution: ipol%i_b_diffuse, itor%i_b_diffuse, idpdr%i_b_diffuse
-      if(iflag_debug .gt. 0) write(*,*) 'const_sph_mag_diffuse_by_j'
-      if(ipol%i_b_diffuse .gt. 0) call const_sph_mag_diffuse_by_j
+      if(ipol%i_b_diffuse .gt. 0) then
+        if(iflag_debug .gt. 0) write(*,*) 'const_sph_mag_diffuse_by_j'
+        call const_sph_mag_diffuse_by_j(sph_bc_B, coef_d_magne,         &
+     &      ipol%i_magne, ipol%i_current, ipol%i_b_diffuse)
+      end if
 !
       end subroutine update_after_magne_sph
 !
@@ -175,16 +188,25 @@
 !
       subroutine update_after_heat_sph
 !
+      use m_boundary_params_sph_MHD
+      use m_physical_property
+!
 !
 !         Input: ipol%i_temp,  Solution: ipol%i_grad_t
       if(iflag_debug .gt. 0)  write(*,*)                                &
      &           'const_radial_grad_temp', ipol%i_grad_t
-      if(ipol%i_grad_t .gt. 0)   call const_radial_grad_temp
+      if(ipol%i_grad_t .gt. 0) then
+        call const_radial_grad_scalar                                   &
+     &     (sph_bc_T, ipol%i_temp, ipol%i_grad_t)
+      end if
 !
 !         Input: ipol%i_temp,  Solution: ipol%i_t_diffuse
-      if(iflag_debug .gt. 0)  write(*,*)                                &
-     &           'const_sph_thermal_diffusion', ipol%i_t_diffuse
-      if(ipol%i_t_diffuse .gt. 0) call const_sph_thermal_diffusion
+      if(ipol%i_t_diffuse .gt. 0) then
+        if(iflag_debug .gt. 0)  write(*,*)                              &
+     &           'const_sph_scalar_diffusion', ipol%i_t_diffuse
+        call const_sph_scalar_diffusion(sph_bc_T, coef_d_temp,          &
+     &      ipol%i_temp, ipol%i_t_diffuse)
+      end if
 !
       end subroutine update_after_heat_sph
 !
@@ -192,13 +214,22 @@
 !
       subroutine update_after_composit_sph
 !
+      use m_boundary_params_sph_MHD
+      use m_physical_property
 !
 !         Input: ipol%i_light,  Solution: ipol%i_grad_composit
-      if(ipol%i_grad_composit .gt. 0) call const_radial_grad_composit
+      if(ipol%i_grad_composit .gt. 0) then
+        call const_radial_grad_scalar                                   &
+     &     (sph_bc_C, ipol%i_light, ipol%i_grad_composit)
+      end if
 !
-      if (iflag_debug .gt. 0) write(*,*) 'const_sph_composit_diffusion'
 !         Input: ipol%i_light,  Solution: ipol%i_c_diffuse
-      if(ipol%i_c_diffuse .gt. 0) call const_sph_composit_diffusion
+      if(ipol%i_c_diffuse .gt. 0) then
+        if(iflag_debug .gt. 0)  write(*,*)                              &
+     &           'const_sph_scalar_diffusion', ipol%i_c_diffuse
+        call const_sph_scalar_diffusion(sph_bc_C, coef_d_light,         &
+     &      ipol%i_light, ipol%i_c_diffuse)
+      end if
 !
       end subroutine update_after_composit_sph
 !

@@ -28,7 +28,7 @@
 !
       subroutine initialize_sph_trans
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_machine_parameter
       use m_spheric_parameter
       use m_spheric_param_smp
@@ -54,6 +54,7 @@
       call set_sin_theta_rtm
       call set_sin_theta_rtp
 !
+!
       ncomp = 3*nb_sph_trans*nidx_rtp(1)*nidx_rtp(2)
       Nstacksmp(0:np_smp) = 3*nb_sph_trans*irt_rtp_smp_stack(0:np_smp)
       call s_select_fourier_transform(ncomp, Nstacksmp)
@@ -68,7 +69,7 @@
 !
       subroutine set_mdx_rlm_rtm
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_spheric_parameter
       use m_work_4_sph_trans
 !
@@ -153,6 +154,7 @@
 !
       a_r_1d_rtp_r(1:nidx_rtp(1)) = one/radius_1d_rtp_r(1:nidx_rtp(1))
       a_r_1d_rtm_r(1:nidx_rtm(1)) = one/radius_1d_rtm_r(1:nidx_rtm(1))
+      a_r_1d_rlm_r(1:nidx_rlm(1)) = one/radius_1d_rlm_r(1:nidx_rlm(1))
       a_r_1d_rj_r(1:nidx_rj(1)) =   one/radius_1d_rj_r(1:nidx_rj(1))
 !
       end subroutine radial_4_sph_trans

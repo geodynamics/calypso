@@ -27,7 +27,7 @@
 !
       subroutine s_set_control_sph_data_MHD
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_machine_parameter
       use m_node_phys_data
       use m_ctl_data_4_platforms
@@ -36,19 +36,22 @@
       use m_ctl_data_mhd_evo_scheme
       use m_int_4_sph_coriolis_IO
       use m_node_id_spherical_IO
-      use m_control_params_sph_MHD
       use m_physical_property
       use m_work_4_sph_trans
       use m_file_format_switch
 !
       use m_field_data_IO
+      use m_sph_boundary_input_data
 !
+      use skip_comment_f
       use set_control_sph_data
       use set_phys_name_4_sph_trans
       use FFT_selector
+      use legendre_transform_select
       use add_nodal_fields_4_MHD
       use add_sph_MHD_fields_2_ctl
 !
+      integer(kind = kint) :: ierr
 !
 !   overwrite restart header for magnetic field extension
 !
@@ -59,7 +62,7 @@
 !   set physical values
 !
       if(i_num_nod_phys.eq.0) then
-        call parallel_abort(90, 'Set field for simulation')
+        call calypso_MPI_abort(90, 'Set field for simulation')
       end if
       if (iflag_debug.eq.1) write(*,*)                                  &
      &    'original number of field ', num_nod_phys_ctl
@@ -83,40 +86,27 @@
       end if
 !
 !
+      
       if(i_sph_transform_mode .gt. 0) then
-        if(     Legendre_trans_loop_ctl .eq. 'inner_radial_loop'        &
-     &    .or.  Legendre_trans_loop_ctl .eq. 'Inner_radial_loop'        &
-     &    .or.  Legendre_trans_loop_ctl .eq. 'INNER_RADIAL_LOOP') then
-          id_legendre_transfer = iflag_leg_krloop_inner
-        else if(Legendre_trans_loop_ctl .eq. 'outer_radial_loop'        &
-     &    .or.  Legendre_trans_loop_ctl .eq. 'Outer_radial_loop'        &
-     &    .or.  Legendre_trans_loop_ctl .eq. 'OUTER_RADIAL_LOOP') then
-          id_legendre_transfer = iflag_leg_krloop_outer
-        else if(Legendre_trans_loop_ctl .eq. 'long_loop'                &
-     &    .or.  Legendre_trans_loop_ctl .eq. 'Long_loop'                &
-     &    .or.  Legendre_trans_loop_ctl .eq. 'LONG_LOOP') then
-          id_legendre_transfer = iflag_leg_orginal_loop
-        end if
+        call set_legendre_trans_mode_ctl(Legendre_trans_loop_ctl)
       end if
 !
       if(i_FFT_package .gt. 0) then
-        if(     FFT_library_ctl .eq. 'ispack'                           &
-     &    .or.  FFT_library_ctl .eq. 'ISPACK') then
+        if(     cmp_no_case(FFT_library_ctl, 'ispack') .gt. 0) then
           iflag_FFT = iflag_ISPACK
-        else if(FFT_library_ctl .eq. 'fftpack'                          &
-     &    .or.  FFT_library_ctl .eq. 'FFTPACK') then
+        else if(cmp_no_case(FFT_library_ctl, 'fftpack') .gt. 0) then
           iflag_FFT = iflag_FFTPACK
-        else if(FFT_library_ctl .eq. 'fftw'                             &
-     &    .or.  FFT_library_ctl .eq. 'FFTW'                             &
-     &    .or.  FFT_library_ctl .eq. 'fftw3'                            &
-     &    .or.  FFT_library_ctl .eq. 'FFTW3') then
+        else if(cmp_no_case(FFT_library_ctl, 'fftw') .gt. 0             &
+     &     .or. cmp_no_case(FFT_library_ctl, 'fftw3') .gt. 0) then
           iflag_FFT = iflag_FFTW
+        else if(cmp_no_case(FFT_library_ctl, 'fftw_single') .gt. 0      &
+     &     .or. cmp_no_case(FFT_library_ctl, 'fftw3_single') .gt. 0)    &
+     &     then
+          iflag_FFT = iflag_FFTW_SINGLE
         end if
       end if
 !
       if (iflag_4_coriolis .gt. id_turn_OFF) then
-        iflag_sph_coriolis_file                                         &
-     &         = max(i_sph_coriolis_file,i_coriolis_tri_int_name)
         if(i_sph_coriolis_file .gt. 0) then
           sph_cor_file_name = sph_cor_file_name_ctl
            call choose_file_format(sph_cor_file_fmt_ctl,                &
@@ -129,6 +119,10 @@
         end if
       end if
 !
+!
+      if (i_bc_data_file_name .gt. 0) then
+        bc_sph_file_name = bc_data_file_name_ctl
+      end if
 !
       end subroutine s_set_control_sph_data_MHD
 !
@@ -154,7 +148,6 @@
         mphi_circle = -1
       end if
 !
-      write(*,*) 'phys_nod_name_ctl', allocated(phys_nod_name_ctl)
       do ifld = 1, num_nod_phys_ctl
         if(phys_nod_name_ctl(ifld) .eq. fhd_temp) ibench_temp = 1
         if(phys_nod_name_ctl(ifld) .eq. fhd_velo) ibench_velo = 1
@@ -206,21 +199,18 @@
       use m_circle_transform
       use t_phys_data
       use ordering_field_by_viz
+      use skip_comment_f
 !
 !
       iflag_circle_coord = iflag_circle_sph
       if (i_circle_coord .ne. 0) then
-        if(pick_circle_coord_ctl .eq. 'spherical'                       &
-     &     .or. pick_circle_coord_ctl .eq. 'Spherical'                  &
-     &     .or. pick_circle_coord_ctl .eq. 'SPHERICAL'                  &
-     &     .or. pick_circle_coord_ctl .eq. 'rtp'                        &
-     &     .or. pick_circle_coord_ctl .eq. 'RTP') then
+        if(    cmp_no_case(pick_circle_coord_ctl,'spherical') .gt. 0    &
+     &    .or. cmp_no_case(pick_circle_coord_ctl,'rtp') .gt.       0    &
+         ) then
           iflag_circle_coord = iflag_circle_sph
-        else if(pick_circle_coord_ctl .eq. 'cyrindrical'                &
-     &     .or. pick_circle_coord_ctl .eq. 'Cyrindrical'                &
-     &     .or. pick_circle_coord_ctl .eq. 'CYRINDRICAL'                &
-     &     .or. pick_circle_coord_ctl .eq. 'spz'                        &
-     &     .or. pick_circle_coord_ctl .eq. 'SPZ') then
+        else if(cmp_no_case(pick_circle_coord_ctl,'cyrindrical') .gt. 0 &
+      &    .or. cmp_no_case(pick_circle_coord_ctl,'spz') .gt.         0 &
+         ) then
           iflag_circle_coord = iflag_circle_cyl
         end if
       end if

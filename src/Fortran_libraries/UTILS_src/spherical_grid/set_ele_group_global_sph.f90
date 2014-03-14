@@ -37,8 +37,8 @@
 !
       call allocate_material_data
 !
-      mat_name(1) = 'inner_core'
-      mat_name(2) = 'outer_core'
+      mat_name(1) = IC_ele_grp_name
+      mat_name(2) = OC_ele_grp_name
 !
       mat_istack(0) = 0
       mat_istack(1) = mat_istack(0) + (nlayer_ICB - 1)                  &
@@ -66,8 +66,8 @@
 !
       call allocate_material_data
 !
-      mat_name(1) = 'inner_core'
-      mat_name(2) = 'outer_core'
+      mat_name(1) = IC_ele_grp_name
+      mat_name(2) = OC_ele_grp_name
 !
       mat_istack(0) = 0
       mat_istack(1) = mat_istack(0) + (nlayer_ICB - 1)                  &
@@ -97,8 +97,8 @@
 !
       call allocate_material_data
 !
-      mat_name(1) = 'inner_core'
-      mat_name(2) = 'outer_core'
+      mat_name(1) = IC_ele_grp_name
+      mat_name(2) = OC_ele_grp_name
 !
       mat_istack(0) = 0
       mat_istack(1) = mat_istack(0) + nlayer_ICB                        &

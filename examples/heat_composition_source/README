@@ -1,0 +1,23 @@
+!-----------------------------------------------------------------------
+!     Example using heat and compositional source terms
+!-----------------------------------------------------------------------
+!
+Here is the input files to use heat and compositional source terms in Calypso.
+To simplify the problem, only the thermal and compositional fields are evolved with no velocity.
+
+This example consists of the following files and directories
+
+control_sph_shell:  control file for gen_sph_grids
+control_MHD:        control file for simulation
+
+sph_lm3r64c_1:     Directory for spherical harmonics index table
+rst_1:              Directory for restart files
+field:              Directory for field data files
+
+This example only run with 1 MPI process. The simulation procedure is the following
+
+1: Run index generation program as
+[heat_composition_source]$ [CALYPSO_DIR]/bin/gen_sph_grids
+
+2. Run simulation program
+[heat_composition_source]$ mpirun -np 1 [CALYPSO_DIR]/bin/sph_mhd

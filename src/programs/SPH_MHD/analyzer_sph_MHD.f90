@@ -15,16 +15,13 @@
       module analyzer_sph_MHD
 !
       use m_precision
+      use calypso_mpi
 !
       use m_machine_parameter
-      use m_parallel_var_dof
       use m_work_time
       use m_control_parameter
-      use m_control_params_sph_MHD
       use m_t_int_parameter
       use m_t_step_parameter
-!
-      use const_coriolis_sph
 !
       use FEM_analyzer_sph_MHD
       use SPH_analyzer_MHD
@@ -69,7 +66,6 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize'
       call FEM_initialize
-      call time_prog_barrier
 !
 !        Initialize spherical transform dynamo
 !
@@ -77,7 +73,7 @@
       call SPH_initialize_MHD
       if(iflag_debug .gt. 0) write(*,*) 'SPH_to_FEM_init_MHD'
       call SPH_to_FEM_init_MHD
-      call time_prog_barrier
+      call calypso_MPI_barrier
 !
       call end_eleps_time(2)
 !
@@ -116,16 +112,18 @@
 !*  -----------  output field data --------------
 !*
         call start_eleps_time(4)
+!
         if (iflag_debug.eq.1) write(*,*) 'SPH_to_FEM_bridge_MHD'
         call SPH_to_FEM_bridge_MHD
         if (iflag_debug.eq.1) write(*,*) 'FEM_analyze'
         call FEM_analyze(i_step_MHD, istep_psf, istep_iso,              &
      &      istep_pvr, istep_fline, visval)
+!
         call end_eleps_time(4)
 !
 !*  -----------  exit loop --------------
 !*
-        if(iflag_finish .gt. izero) exit
+        if(iflag_finish .gt. 0) exit
       end do
 !
 !  time evolution end
@@ -143,7 +141,7 @@
 !
       call output_elapsed_times
 !
-      call time_prog_barrier
+      call calypso_MPI_barrier
       if (iflag_debug.eq.1) write(*,*) 'exit evolution'
 !
       end subroutine evolution_sph_MHD

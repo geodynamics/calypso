@@ -4,28 +4,36 @@
 !!@author H. Matsui
 !!@date Programmed in July, 2007
 !!@n     Modified in Aug., 2007
+!!@n     Modified in Sep., 2013
 !
 !>@brief  Work area for data communications
 !!
 !!@verbatim
-!!      subroutine resize_work_4_SR(NB, NEIBPETOT, ntot_send, ntot_recv)
-!!      subroutine resize_iwork_4_SR(NEIBPETOT, ntot_send, ntot_recv)
+!!      subroutine set_reverse_import_table(N_SHIFT,                    &
+!!     &          NTOT_RECV, ITEM_IMPORT, REV_IMPORT)
 !!
-!!      subroutine resize_work_itp_SR(NB, npe_send, npe_recv, ntot_recv)
-!!      subroutine resize_iwork_itp_SR(npe_send, npe_recv, ntot_recv)
+!!      subroutine resize_work_4_SR(NB, NEIBPETOT, NTOT_SEND, NTOT_RECV)
+!!      subroutine resize_iwork_4_SR(NEIBPETOT, NTOT_SEND, NTOT_RECV)
 !!
-!!      subroutine resize_work_sph_SR(NB, npe_send, npe_recv,           &
-!!     &          ntot_send, ntot_recv)
-!!      subroutine resize_iwork_sph_SR(npe_send, npe_recv,              &
-!!     &          ntot_send, ntot_recv)
+!!      subroutine resize_work_itp_SR(NB, NPE_SEND, NPE_RECV, NTOT_RECV)
+!!      subroutine resize_iwork_itp_SR(NPE_SEND, NPE_RECV, NTOT_RECV)
+!!
+!!      subroutine resize_work_sph_SR(NB, NPE_SEND, NPE_RECV,           &
+!!     &          NTOT_SEND, NTOT_RECV)
+!!      subroutine resize_iwork_sph_SR(NPE_SEND, NPE_RECV,              &
+!!     &          NTOT_SEND, NTOT_RECV)
 !!@endverbatim
 !!
 !!@n @param  NB           Number of components
 !!@n @param  NEIBPETOT    Number of neighboring domains
-!!@n @param  ntot_send    Total number of data points for export
-!!@n @param  ntot_recv    Total number of data points for import
-!!@n @param  npe_send      Number of processses to receive
-!!@n @param  npe_recv      Number of processses to send
+!!@n @param  NTOT_SEND    Total number of data points for export
+!!@n @param  NTOT_RECV    Total number of data points for import
+!!@n @param  NPE_SEND      Number of processses to receive
+!!@n @param  NPE_RECV      Number of processses to send
+!!
+!!@n @param  N_SHIFT      number of shifting of the reversed import table
+!!@n @param  ITEM_IMPORT  import table
+!!@n @param  REV_IMPORT   reversed import table
 !
       module m_solver_SR
 !
@@ -88,129 +96,150 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_work_4_SR(NB, NEIBPETOT, ntot_send, ntot_recv)
+      subroutine set_reverse_import_table(N_SHIFT,                      &
+     &          NTOT_RECV, ITEM_IMPORT, REV_IMPORT)
+!
+      integer(kind = kint), intent(in) :: N_SHIFT
+      integer(kind = kint), intent(in) :: NTOT_RECV
+      integer(kind = kint), intent(in) :: ITEM_IMPORT(NTOT_RECV)
+!
+      integer(kind = kint), intent(inout) :: REV_IMPORT(NTOT_RECV)
+!
+      integer(kind = kint) :: inum, inod
+!
+!
+      do inum = 1, NTOT_RECV
+        inod = ITEM_IMPORT(inum) - N_SHIFT
+        REV_IMPORT(inod) = inum
+      end do
+!
+      end subroutine set_reverse_import_table
+!
+! ----------------------------------------------------------------------
+!
+      subroutine resize_work_4_SR(NB, NEIBPETOT, NTOT_SEND, NTOT_RECV)
 !
       integer(kind = kint), intent(in) ::  NEIBPETOT
-      integer(kind = kint), intent(in) ::  NB, ntot_send, ntot_recv
+      integer(kind = kint), intent(in) ::  NB, NTOT_SEND, NTOT_RECV
 !
 !
       call resize_flag_4_SR(NEIBPETOT, NEIBPETOT)
-      call resize_wsend_SR(NB, ntot_send)
-      call resize_wrecv_SR(NB, ntot_recv)
+      call resize_wsend_SR(NB, NTOT_SEND)
+      call resize_wrecv_SR(NB, NTOT_RECV)
 !
       end subroutine resize_work_4_SR
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_iwork_4_SR(NEIBPETOT, ntot_send, ntot_recv)
+      subroutine resize_iwork_4_SR(NEIBPETOT, NTOT_SEND, NTOT_RECV)
 !
       integer(kind = kint), intent(in) ::  NEIBPETOT
-      integer(kind = kint), intent(in) ::  ntot_send, ntot_recv
+      integer(kind = kint), intent(in) ::  NTOT_SEND, NTOT_RECV
 !
 !
       call resize_flag_4_SR( NEIBPETOT, NEIBPETOT )
-      call resize_isend_SR(ntot_send)
-      call resize_irecv_SR(ntot_recv)
+      call resize_isend_SR(NTOT_SEND)
+      call resize_irecv_SR(NTOT_RECV)
 !
       end subroutine resize_iwork_4_SR
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_work_itp_SR(NB, npe_send, npe_recv, ntot_recv)
+      subroutine resize_work_itp_SR(NB, NPE_SEND, NPE_RECV, NTOT_RECV)
 !
-      integer(kind = kint), intent(in) ::  npe_send, npe_recv
-      integer(kind = kint), intent(in) ::  NB, ntot_recv
+      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
+      integer(kind = kint), intent(in) ::  NB, NTOT_RECV
 !
 !
-      call resize_flag_4_SR(npe_send, npe_recv)
-      call resize_wrecv_SR(NB, ntot_recv)
+      call resize_flag_4_SR(NPE_SEND, NPE_RECV)
+      call resize_wrecv_SR(NB, NTOT_RECV)
 !
       end subroutine resize_work_itp_SR
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_iwork_itp_SR(npe_send, npe_recv, ntot_recv)
+      subroutine resize_iwork_itp_SR(NPE_SEND, NPE_RECV, NTOT_RECV)
 !
-      integer(kind = kint), intent(in) ::  npe_send, npe_recv
-      integer(kind = kint), intent(in) ::  ntot_recv
+      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
+      integer(kind = kint), intent(in) ::  NTOT_RECV
 !
 !
-      call resize_flag_4_SR(npe_send, npe_recv)
-      call resize_irecv_SR(ntot_recv)
+      call resize_flag_4_SR(NPE_SEND, NPE_RECV)
+      call resize_irecv_SR(NTOT_RECV)
 !
       end subroutine resize_iwork_itp_SR
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_work_sph_SR(NB, npe_send, npe_recv,             &
-     &          ntot_send, ntot_recv)
+      subroutine resize_work_sph_SR(NB, NPE_SEND, NPE_RECV,             &
+     &          NTOT_SEND, NTOT_RECV)
 !
-      integer(kind = kint), intent(in) ::  npe_send, npe_recv
-      integer(kind = kint), intent(in) ::  NB, ntot_send, ntot_recv
+      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
+      integer(kind = kint), intent(in) ::  NB, NTOT_SEND, NTOT_RECV
 !
 !
-      call resize_flag_4_SR(npe_send, npe_recv)
-      call resize_wsend_SR(NB, ntot_send  )
-      call resize_wrecv_SR(NB, ntot_recv+1)
+      call resize_flag_4_SR(NPE_SEND, NPE_RECV)
+      call resize_wsend_SR(NB, NTOT_SEND  )
+      call resize_wrecv_SR(NB, NTOT_RECV+1)
 !
       end subroutine resize_work_sph_SR
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_iwork_sph_SR(npe_send, npe_recv,                &
-     &          ntot_send, ntot_recv)
+      subroutine resize_iwork_sph_SR(NPE_SEND, NPE_RECV,                &
+     &          NTOT_SEND, NTOT_RECV)
 !
-      integer(kind = kint), intent(in) ::  npe_send, npe_recv
-      integer(kind = kint), intent(in) ::  ntot_send, ntot_recv
+      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
+      integer(kind = kint), intent(in) ::  NTOT_SEND, NTOT_RECV
 !
 !
-      call resize_flag_4_SR(npe_send, npe_recv)
-      call resize_isend_SR(ntot_send  )
-      call resize_irecv_SR(ntot_recv+1)
+      call resize_flag_4_SR(NPE_SEND, NPE_RECV)
+      call resize_isend_SR(NTOT_SEND  )
+      call resize_irecv_SR(NTOT_RECV+1)
 !
       end subroutine resize_iwork_sph_SR
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_flag_4_SR( npe_send, npe_recv )
+      subroutine resize_flag_4_SR( NPE_SEND, NPE_RECV )
 !
-      integer(kind = kint) , intent(in)   ::  npe_send, npe_recv
+      integer(kind = kint) , intent(in)   ::  NPE_SEND, NPE_RECV
 !
 !
       if (iflag_snd_flags .lt. 0) then
-        call allocate_sendflag_4_SR(npe_send)
+        call allocate_sendflag_4_SR(NPE_SEND)
       else if (iflag_snd_flags .ge. 0                                   &
-     &       .and. iflag_snd_flags .lt. npe_send) then
+     &       .and. iflag_snd_flags .lt. NPE_SEND) then
         call deallocate_sendflag_4_SR
-        call allocate_sendflag_4_SR(npe_send)
+        call allocate_sendflag_4_SR(NPE_SEND)
       end if
 !
       if (iflag_rcv_flags .lt. 0) then
-        call allocate_recvflag_4_SR(npe_recv)
+        call allocate_recvflag_4_SR(NPE_RECV)
       else if (iflag_rcv_flags .ge. 0                                   &
-     &       .and. iflag_rcv_flags .lt. npe_recv) then
+     &       .and. iflag_rcv_flags .lt. NPE_RECV) then
         call deallocate_recvflag_4_SR
-        call allocate_recvflag_4_SR(npe_recv)
+        call allocate_recvflag_4_SR(NPE_RECV)
       end if
 !
       end subroutine resize_flag_4_SR
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_wsend_SR(NB, ntot_send)
+      subroutine resize_wsend_SR(NB, NTOT_SEND)
 !
-      integer(kind=kint), intent(in)   ::  NB, ntot_send
+      integer(kind=kint), intent(in)   ::  NB, NTOT_SEND
 !
       if (iflag_ws .lt. 0) then
-        call allocate_wsend_SR(NB, ntot_send)
+        call allocate_wsend_SR(NB, NTOT_SEND)
 !
       else if (iflag_ws .ge. 0                                          &
-     &       .and. iflag_ws .lt. (NB*ntot_send) ) then
+     &       .and. iflag_ws .lt. (NB*NTOT_SEND) ) then
         call deallocate_wsend_SR
-        call allocate_wsend_SR(NB, ntot_send)
+        call allocate_wsend_SR(NB, NTOT_SEND)
 !
       end if
 !
@@ -218,9 +247,9 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_wrecv_SR(NB, ntot_recv)
+      subroutine resize_wrecv_SR(NB, NTOT_RECV)
 !
-      integer(kind=kint), intent(in) ::  NB, ntot_recv
+      integer(kind=kint), intent(in) ::  NB, NTOT_RECV
 !
       if (iflag_wr .lt. 0) then
         call allocate_wrecv_SR(NB, ntot_recv)
@@ -236,17 +265,17 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_isend_SR(ntot_send)
+      subroutine resize_isend_SR(NTOT_SEND)
 !
-      integer(kind=kint), intent(in) :: ntot_send
+      integer(kind=kint), intent(in) :: NTOT_SEND
 !
       if (iflag_iws .lt. 0) then
-        call allocate_isend_SR(ntot_send)
+        call allocate_isend_SR(NTOT_SEND)
 !
       else if (iflag_iws .ge. 0                                         &
-     &       .and. iflag_iws .lt. ntot_send ) then
+     &       .and. iflag_iws .lt. NTOT_SEND ) then
         call deallocate_isend_SR
-        call allocate_isend_SR(ntot_send)
+        call allocate_isend_SR(NTOT_SEND)
 !
       end if
 !
@@ -273,47 +302,47 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-       subroutine allocate_sendflag_4_SR( npe_send )
+       subroutine allocate_sendflag_4_SR( NPE_SEND )
 !
       use calypso_mpi
 !
 !
-      integer(kind=kint ) , intent(in)   ::  npe_send
+      integer(kind=kint ) , intent(in)   ::  NPE_SEND
 !      num. total neighboring domains
 !C
 !C-- INIT.
-        allocate (sta1(MPI_STATUS_SIZE,npe_send))
-        allocate (req1(npe_send))
+        allocate (sta1(MPI_STATUS_SIZE,NPE_SEND))
+        allocate (req1(NPE_SEND))
 !
-        iflag_snd_flags = npe_send
+        iflag_snd_flags = NPE_SEND
 !
        end subroutine allocate_sendflag_4_SR
 !
 ! ----------------------------------------------------------------------
 !
-       subroutine allocate_recvflag_4_SR( npe_recv )
+       subroutine allocate_recvflag_4_SR( NPE_RECV )
 !
       use calypso_mpi
 !
 !
-      integer(kind=kint ) , intent(in)   ::  npe_recv
+      integer(kind=kint ) , intent(in)   ::  NPE_RECV
 !      num. total neighboring domains
 !C
 !C-- INIT.
-        allocate (sta2(MPI_STATUS_SIZE,npe_recv))
-        allocate (req2(npe_recv))
+        allocate (sta2(MPI_STATUS_SIZE,NPE_RECV))
+        allocate (req2(NPE_RECV))
 !
-        iflag_rcv_flags = npe_recv
+        iflag_rcv_flags = NPE_RECV
 !
        end subroutine allocate_recvflag_4_SR
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine allocate_wsend_SR(NB, ntot_send)
+      subroutine allocate_wsend_SR(NB, NTOT_SEND)
 !
-      integer(kind=kint), intent(in)   ::  NB, ntot_send
+      integer(kind=kint), intent(in)   ::  NB, NTOT_SEND
 !
-      iflag_ws = NB * ntot_send
+      iflag_ws = NB * NTOT_SEND
       allocate (WS(iflag_ws))
 !
       end subroutine allocate_wsend_SR
@@ -331,11 +360,11 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine allocate_isend_SR(ntot_send)
+      subroutine allocate_isend_SR(NTOT_SEND)
 !
-      integer(kind=kint), intent(in) :: ntot_send
+      integer(kind=kint), intent(in) :: NTOT_SEND
 !
-      iflag_iws = ntot_send
+      iflag_iws = NTOT_SEND
       allocate (iWS(iflag_iws))
 !
       end subroutine allocate_isend_SR

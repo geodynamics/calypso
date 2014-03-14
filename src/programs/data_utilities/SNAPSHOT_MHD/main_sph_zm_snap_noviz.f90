@@ -1,26 +1,31 @@
+!>@file   sph_zm_snap_noviz.f90
+!!@brief  program sph_zm_snap_noviz
+!!
+!!@author H. Matsui
+!!@date   Programmed  H. Matsui in Apr., 2010
 !
-!     program  sph_zm_snap_noviz
-
-!-----------------------------------------------------------------------
+!>@brief  main routines to obtain zonal mean snapshots
+!!
+!!@verbatim
+!!     program  sph_zm_snap_noviz
+!!@endverbatim
+!
       program sph_zm_snap_noviz
 !
-!    main routine for GeoFEM/Tiger version       on mar. 2000 (ver 1.0)
-!    main routine for zonal mean field           on May, 2012 (ver 2.0)
-!
-
       use m_precision
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use analyzer_noviz_sph_zm_snap
 !
       implicit none
 !
-      call parallel_cal_init
 !
-      call initialization
-      call evolution
+      call calypso_MPI_init
 !
-      call  parallel_cal_fin
+      call initialize_noviz_sph_zm_snap
+      call evolution_voviz_sph_zm_snap
+!
+      call  calypso_MPI_finalize
 !
       write(*,*) '***** program finished *****'
       stop

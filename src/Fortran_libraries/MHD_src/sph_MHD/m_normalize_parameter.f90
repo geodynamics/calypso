@@ -24,8 +24,12 @@
 !!      subroutine allocate_coef_4_lorentz
 !!      subroutine allocate_coef_4_induction
 !!
-!!      subroutine deallocate_coef_4_composition
-!!      subroutine deallocate_coef_4_c_diffuse
+!!      subroutine allocate_coef_4_composition
+!!      subroutine allocate_coef_4_c_diffuse
+!!
+!!      subroutine allocate_coef_4_h_source
+!!      subroutine allocate_coef_4_c_source
+!!
 !!
 !!      subroutine deallocate_coef_4_termal
 !!      subroutine deallocate_coef_4_velocity
@@ -45,6 +49,9 @@
 !!
 !!      subroutine deallocate_coef_4_composition
 !!      subroutine deallocate_coef_4_c_diffuse
+!!
+!!      subroutine deallocate_coef_4_h_source
+!!      subroutine deallocate_coef_4_c_source
 !!@endverbatim
 !!
       module m_normalize_parameter
@@ -84,6 +91,10 @@
       integer(kind=kint) :: num_coef_4_Lorentz
 !>      Number of dimensionless numbers for magnetic induction
       integer(kind=kint) :: num_coef_4_induction
+!>      Number of dimensionless numbers for heat source
+      integer(kind=kint) :: num_coef_4_h_source
+!>      Number of dimensionless numbers for compositional source
+      integer(kind=kint) :: num_coef_4_c_source
 !
 !>      Name of dimensionless numbers for heat flux
       character (len=kchara), allocatable :: coef_4_termal_name(:)
@@ -115,6 +126,10 @@
       character (len=kchara), allocatable :: coef_4_Lorentz_name(:)
 !>      Name of dimensionless numbers for magnetic induction
       character (len=kchara), allocatable :: coef_4_induction_name(:)
+!>      Name of dimensionless numbers for heat source
+      character (len=kchara), allocatable :: coef_4_h_source_name(:)
+!>      Name of dimensionless numbers for light element source
+      character (len=kchara), allocatable :: coef_4_c_source_name(:)
 !
 !>      Power of dimensionless numbers for heat flux
       real (kind = kreal), allocatable :: coef_4_termal_power(:)
@@ -146,6 +161,10 @@
       real (kind = kreal), allocatable :: coef_4_Lorentz_power(:)
 !>      Power of dimensionless numbers for magnetic induction
       real (kind = kreal), allocatable :: coef_4_induction_power(:)
+!>      Power of dimensionless numbers for heat source
+      real (kind = kreal), allocatable :: coef_4_h_source_power(:)
+!>      Power of dimensionless numbers for light element source
+      real (kind = kreal), allocatable :: coef_4_c_source_power(:)
 !
 !  ---------------------------------------------------------------------
 !
@@ -302,6 +321,26 @@
       end subroutine allocate_coef_4_c_diffuse
 !
 ! -----------------------------------------------------------------------
+!
+      subroutine allocate_coef_4_h_source
+!
+      allocate(coef_4_h_source_name(num_coef_4_h_source))
+      allocate(coef_4_h_source_power(num_coef_4_h_source))
+      coef_4_h_source_power = 0.0d0
+!
+      end subroutine allocate_coef_4_h_source
+!
+! -----------------------------------------------------------------------
+!
+      subroutine allocate_coef_4_c_source
+!
+      allocate(coef_4_c_source_name(num_coef_4_c_source))
+      allocate(coef_4_c_source_power(num_coef_4_c_source))
+      coef_4_c_source_power = 0.0d0
+!
+      end subroutine allocate_coef_4_c_source
+!
+! -----------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine deallocate_coef_4_termal
@@ -421,6 +460,22 @@
       deallocate(coef_4_c_diffuse_name, coef_4_c_diffuse_power)
 !
       end subroutine deallocate_coef_4_c_diffuse
+!
+! -----------------------------------------------------------------------
+!
+      subroutine deallocate_coef_4_h_source
+!
+      deallocate(coef_4_h_source_name, coef_4_h_source_power)
+!
+      end subroutine deallocate_coef_4_h_source
+!
+! -----------------------------------------------------------------------
+!
+      subroutine deallocate_coef_4_c_source
+!
+      deallocate(coef_4_c_source_name, coef_4_c_source_power)
+!
+      end subroutine deallocate_coef_4_c_source
 !
 ! -----------------------------------------------------------------------
 !

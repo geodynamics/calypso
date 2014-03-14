@@ -168,7 +168,7 @@
 !
       subroutine set_sph_1d_global_idx_rj
 !
-      integer(kind = kint) :: n1, n2, j, l, m
+      integer(kind = kint) :: n1, n2, j
       integer(kind = kint) :: ist_1, ist_2
       integer(kind = kint) :: ied_1, ied_2
 !
@@ -184,16 +184,16 @@
         idx_global_rj_r(j) = j
       end do
 !
-      do l = 0, l_truncation
-        do m = -l, l
-          j = l*(l+1) + m
-          if(j.ge.ist_2 .and. j.le.ied_2) then
-            idx_global_rj_j(j,1) = j
-            idx_global_rj_j(j,2) = l
-            idx_global_rj_j(j,3) = m
-          end if
-        end do
+      do j = ist_2, ied_2
+        idx_global_rj_j(j,1) = jtbl_rj(j,1)
+        idx_global_rj_j(j,2) = jtbl_rj(j,2)
+        idx_global_rj_j(j,3) = jtbl_rj(j,3)
       end do
+!
+!      write(8,*) 'j, idx_global_rj_j(j,1:3)'
+!      do j = ist_2, ied_2
+!        write(8,*) j, idx_global_rj_j(j,1:3)
+!      end do
 !
       end subroutine set_sph_1d_global_idx_rj
 !

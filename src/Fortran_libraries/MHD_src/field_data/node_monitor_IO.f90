@@ -130,7 +130,7 @@
 !
       subroutine set_local_node_id_4_monitor
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
       use m_geometry_parameter
       use m_geometry_data
@@ -183,7 +183,7 @@
 !
       subroutine output_monitor_control
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_geometry_data
       use m_geometry_parameter
       use m_node_phys_address

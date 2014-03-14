@@ -12,7 +12,7 @@
 !!@verbatim
 !!      subroutine initialize_FFT_sel_t(my_rank, Nsmp, Nstacksmp, Nfft, &
 !!     &          WKS)
-!!      subroutine finalize_FFT_sel_t(Nsmp, WKS)
+!!      subroutine finalize_FFT_sel_t(Nsmp, Nstacksmp, WKS)
 !!      subroutine verify_FFT_sel_t(Nsmp, Nstacksmp, Nfft, WKS)
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT for ISPACK
@@ -99,7 +99,7 @@
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
         if(my_rank .eq. 0) write(*,*) 'Use FFTW'
-        call init_FFTW_type(Nsmp, Nstacksmp, Nfft, WKS%WK_FFTW)
+        call init_FFTW_type(Nstacksmp(Nsmp), Nfft, WKS%WK_FFTW)
         return
       end if
 #endif
@@ -111,18 +111,18 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine finalize_FFT_sel_t(Nsmp, WKS)
+      subroutine finalize_FFT_sel_t(Nsmp, Nstacksmp, WKS)
 !
       use FFT_selector
 !
-      integer(kind = kint), intent(in) ::  Nsmp
+      integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       type(working_FFTs), intent(inout) :: WKS
 !
 !
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
         if(iflag_debug .gt. 0) write(*,*) 'Finalize FFTW'
-        call finalize_FFTW_type(Nsmp, WKS%WK_FFTW)
+        call finalize_FFTW_type(Nstacksmp(Nsmp), WKS%WK_FFTW)
         return
       end if
 #endif
@@ -147,7 +147,7 @@
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
         if(iflag_debug .gt. 0) write(*,*) 'Use FFTW'
-        call verify_wk_FFTW_type(Nsmp, Nstacksmp, Nfft, WKS%WK_FFTW)
+        call verify_wk_FFTW_type(Nstacksmp(Nsmp), Nfft, WKS%WK_FFTW)
         return
       end if
 #endif

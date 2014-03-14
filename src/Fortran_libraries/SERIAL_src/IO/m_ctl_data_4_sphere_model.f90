@@ -25,12 +25,12 @@
 !!    ngrid_meridonal_ctl     12
 !!    ngrid_zonal_ctl         24
 !!
-!!   raidal_grid_type_ctl:   Definition for radial grid   
+!!   radial_grid_type_ctl:  Definition for radial grid   
 !!         explicit:        Set each radial grid explicitly
 !!         Chebyshev:       Set Chebyshev collocation points
 !!         equi_distance:   Set equi-diatance grid
 !!
-!!    raidal_grid_type_ctl   explicit
+!!    radial_grid_type_ctl   explicit
 !!    array r_layer       4
 !!      r_layer    1  0.3584615384615
 !!      r_layer    2  0.5384615384615     ICB
@@ -38,7 +38,7 @@
 !!      r_layer    4  1.538461538462      CMB
 !!    end array r_layer
 !!
-!!    raidal_grid_type_ctl   Chebyshev
+!!    radial_grid_type_ctl   Chebyshev
 !!     num_fluid_grid_ctl  5
 !!     fluid_core_size_ctl   0.35
 !!     ICB_to_CMB_ratio_ctl  1.0
@@ -92,7 +92,7 @@
       character(len = kchara), allocatable :: bc_bondary_name_ctl(:)
 !
 !>      Grid spacing type
-      character(len = kchara) :: raidal_grid_type_ctl
+      character(len = kchara) :: radial_grid_type_ctl
 !>      Minimum radius of the simulation domain @f$ R_{c} @f$
       integer(kind = kint) :: num_fluid_grid_ctl
 !>      ICB radius     @f$ R_{i} @f$
@@ -131,7 +131,7 @@
      &      ::  hd_sph_g_type =   'sph_grid_type_ctl'
 !
       character(len=kchara), parameter                                  &
-     &      ::  hd_r_grid_type = 'raidal_grid_type_ctl'
+     &      ::  hd_r_grid_type = 'radial_grid_type_ctl'
       character(len=kchara), parameter                                  &
      &      ::  hd_n_fluid_grid = 'num_fluid_grid_ctl'
       character(len=kchara), parameter                                  &
@@ -263,7 +263,7 @@
         call read_character_ctl_item(hd_sph_g_type,                     &
      &        i_sph_g_type, sph_grid_type_ctl)
         call read_character_ctl_item(hd_r_grid_type,                    &
-     &        i_r_grid_type, raidal_grid_type_ctl)
+     &        i_r_grid_type, radial_grid_type_ctl)
 !
         call read_integer_ctl_item(hd_sph_truncate,                     &
      &          i_sph_truncate, ltr_ctl)

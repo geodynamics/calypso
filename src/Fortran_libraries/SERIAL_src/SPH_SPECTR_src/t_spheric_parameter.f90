@@ -195,6 +195,8 @@
 !
 !>        1d radius data for @f$ f(r,l,m) @f$
         real(kind = kreal), pointer :: radius_1d_rlm_r(:)
+!>        1 / radius_1d_rlm_r
+        real(kind = kreal), pointer :: a_r_1d_rlm_r(:)
       end type sph_rlm_grid
 !
 !
@@ -212,6 +214,7 @@
 !!@n      idx_rj_degree_zero = 0.
         integer (kind=kint) :: idx_rj_degree_zero
 !>        local spectr index for @f$ l = 1@f$ and  @f$ m = -1, 0, 1@f$.
+!!        for @f$ f(r,j) @f$
 !!@n        If spectr data do not exist in subdomain,
 !!@n        idx_rj_degree_one(m) = 0.
         integer (kind=kint) :: idx_rj_degree_one(-1:1)
@@ -246,9 +249,6 @@
 !>        1d @f$1 / r @f$ for @f$ f(r,j) @f$
         real(kind = kreal), pointer :: a_r_1d_rj_r(:)
 !
-!>        1d @f$ \Delta r @f$ for @f$ f(r,j) @f$
-!!@n@see  set_radius_func_cheby or set_radius_func_cheby
-        real(kind = kreal), pointer :: dr_1d_rj(:,:)
 !>        1d @f$1 / r @f$ for @f$ f(r,j) @f$
 !!@n@see  set_radius_func_cheby or set_radius_func_cheby
         real(kind = kreal), pointer :: ar_1d_rj(:,:)
@@ -465,6 +465,7 @@
       num = rlm%nidx_rlm(1)
       allocate(rlm%idx_gl_1d_rlm_r(num))
       allocate(rlm%radius_1d_rlm_r(num))
+      allocate(rlm%a_r_1d_rlm_r(num))
       num = rlm%nidx_rlm(2)
       allocate(rlm%idx_gl_1d_rlm_j(num,3))
 !
@@ -472,6 +473,7 @@
       if(rlm%nidx_rlm(1) .gt. 0) then
         rlm%idx_gl_1d_rlm_r = 0
         rlm%radius_1d_rlm_r = 0.0d0
+        rlm%a_r_1d_rlm_r    = 0.0d0
       end if
 !
       end subroutine alloc_type_sph_1d_index_rlm
@@ -488,7 +490,6 @@
       allocate(rj%radius_1d_rj_r(num))
       allocate(rj%a_r_1d_rj_r(num))
 !
-      allocate(rj%dr_1d_rj(num,0:2))
       allocate(rj%ar_1d_rj(num,3))
       allocate(rj%r_ele_rj(num))
       allocate(rj%ar_ele_rj(num,3))
@@ -505,7 +506,6 @@
         rj%radius_1d_rj_r = 0.0d0
         rj%a_r_1d_rj_r = 0.0d0
 !
-        rj%dr_1d_rj =  0.0d0
         rj%ar_1d_rj = 0.0d0
         rj%r_ele_rj = 0.0d0
         rj%ar_ele_rj = 0.0d0
@@ -602,6 +602,7 @@
 !
 !
       deallocate(rlm%radius_1d_rlm_r)
+      deallocate(rlm%a_r_1d_rlm_r   )
       deallocate(rlm%idx_gl_1d_rlm_r)
       deallocate(rlm%idx_gl_1d_rlm_j)
 !
@@ -615,7 +616,7 @@
 !
 !
       deallocate(rj%radius_1d_rj_r, rj%a_r_1d_rj_r)
-      deallocate(rj%dr_1d_rj, rj%ar_1d_rj, rj%r_ele_rj, rj%ar_ele_rj)
+      deallocate(rj%ar_1d_rj, rj%r_ele_rj, rj%ar_ele_rj)
       deallocate(rj%idx_gl_1d_rj_r, rj%idx_gl_1d_rj_j)
 !
       end subroutine dealloc_type_sph_1d_index_rj

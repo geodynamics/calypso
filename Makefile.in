@@ -27,6 +27,7 @@ MPILIBS =     @MPILIBS@
 F90_LOCAL = @FC@
 MPIF90 = @MPIFC@
 
+GMAKE = @GMAKE@
 AR = @ar_bin@
 RANLIB = @RANLIB@
 
@@ -52,7 +53,7 @@ MAKE_MOD_DEP= $(BUILDDIR)/make_f90depends
 #
 
 all: makemake
-	cd $(MAKEDIR); make
+	cd $(MAKEDIR); $(GMAKE)
 
 $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
 	if [ ! -d $(MAKEDIR) ]; then \
@@ -67,7 +68,8 @@ $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
 makemake: $(MAKE_MOD_DEP)
 	echo "# Construct Makefile"; \
 	cd $(MHDDIR) ; \
-		make \
+		$(GMAKE) \
+		GMAKE="$(GMAKE)" \
 		MAKEDIR="$(MAKEDIR)" \
 		BUILDDIR="$(BUILDDIR)" \
 		INSTDIR="$(INSTDIR)" \
@@ -95,12 +97,12 @@ makemake: $(MAKE_MOD_DEP)
 
 install:
 	cd $(MAKEDIR) ; \
-		make install
+		$(GMAKE) install
 
 clean:
 	for dir in $(MAKEDIR) $(MHDDIR) ; do \
 	echo "# cleaning $${dir} directory..."; \
 		( cd $${dir}; \
-		make clean )\
+		$(GMAKE) clean )\
 	done; \
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90

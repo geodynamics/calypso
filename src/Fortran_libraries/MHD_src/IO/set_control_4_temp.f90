@@ -27,70 +27,72 @@
       subroutine s_set_control_4_temp
 !
       use m_machine_parameter
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
       use m_ctl_data_node_boundary
       use m_ctl_data_surf_boundary
       use m_node_group
       use m_bc_data_list
       use m_surf_data_list
+      use set_node_group_types
       use set_surface_group_types
 !
       integer(kind = kint) :: i
 !
 !
       if (iflag_t_evo_4_temp .eq. id_no_evolution) then
-        num_bc_e = 0
-        num_bc_h_flux = 0
+        temp_nod%num_bc =    0
+        h_flux_surf%num_bc = 0
       else
-        num_bc_e =      num_bc_e_ctl
-        num_bc_h_flux = num_bc_h_flux_ctl
+        temp_nod%num_bc =    num_bc_e_ctl
+        h_flux_surf%num_bc = num_bc_h_flux_ctl
       end if
 !
 !   set boundary conditions for temperature
 !
       if(iflag_debug .eq. iflag_full_msg)                               &
-     &          write(*,*)  'num_bc_e ',num_bc_e
-      if(num_bc_e .gt. 0) then
+     &          write(*,*)  'temp_nod%num_bc ',temp_nod%num_bc
+      if(temp_nod%num_bc .gt. 0) then
 !
         call allocate_nod_bc_list_temp
 !
-        bc_e_name      =  bc_e_name_ctl
-        bc_e_magnitude = bc_e_magnitude_ctl
+        temp_nod%bc_name =      bc_e_name_ctl
+        temp_nod%bc_magnitude = bc_e_magnitude_ctl
 !
-        do i = 1, num_bc_e
-          if ( bc_e_type_ctl(i) .eq. 'fixed' ) then
-            ibc_e_type(i) =  iflag_bc_fix_s
-          else if ( bc_e_type_ctl(i) .eq. 'file' ) then
-            ibc_e_type(i) = -iflag_bc_fix_s
-          else if ( bc_e_type_ctl(i) .eq. 'fixed_flux' ) then
-            ibc_e_type(i) =  iflag_bc_fix_flux
-          else if ( bc_e_type_ctl(i) .eq. 'sgs' ) then
-            ibc_e_type(i) =  iflag_bc_sgs_s
-          end if
+        do i = 1, temp_nod%num_bc
+          call set_bc_group_types_scalar(bc_e_type_ctl(i),              &
+     &        temp_nod%ibc_type(i))
+          call set_bc_group_types_sgs_scalar(bc_e_type_ctl(i),          &
+     &        temp_nod%ibc_type(i))
+          call set_bc_group_types_sph_center(bc_e_type_ctl(i),          &
+     &        temp_nod%ibc_type(i))
+          call set_bc_group_types_fluxes(bc_e_type_ctl(i),              &
+     &        temp_nod%ibc_type(i))
         end do
 !
         if (iflag_debug .eq. iflag_full_msg) then
-          write(*,*) 'i, ibc_e_type, bc_e_magnitude, bc_e_name'
-          do i = 1, num_bc_e
-            write(*,*)  i, ibc_e_type(i), bc_e_magnitude(i),            &
-     &                 trim(bc_e_name(i))
+          write(*,*) 'i, temp_nod'
+          do i = 1, temp_nod%num_bc
+            write(*,*)  i, temp_nod%ibc_type(i),                        &
+     &         temp_nod%bc_magnitude(i), trim(temp_nod%bc_name(i))
           end do
         end if
       end if
 !
 !   set boundary conditions for heat flux
 !
-      if (num_bc_h_flux .gt. 0) then
+      if (h_flux_surf%num_bc .gt. 0) then
 !
         call allocate_temp_surf_ctl
 !
-        bc_h_flux_magnitude = bc_h_flux_magnitude_ctl
-        bc_h_flux_name     =  bc_h_flux_name_ctl
+        h_flux_surf%bc_magnitude = bc_h_flux_magnitude_ctl
+        h_flux_surf%bc_name =      bc_h_flux_name_ctl
 !
-        do i = 1, num_bc_h_flux
+        do i = 1, h_flux_surf%num_bc
           call set_surf_group_types_scalar(bc_h_flux_type_ctl(i),       &
-     &            ibc_h_flux_type(i))
+     &            h_flux_surf%ibc_type(i))
+          call set_bc_group_types_sph_center(bc_h_flux_type_ctl(i),     &
+     &            h_flux_surf%ibc_type(i))
         end do
       end if
 !

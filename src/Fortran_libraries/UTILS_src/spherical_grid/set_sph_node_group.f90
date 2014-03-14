@@ -120,7 +120,7 @@
       subroutine set_sph_local_node_grp_item(ip_r, ip_t, nod_grp)
 !
       use m_sph_mesh_1d_connect
-      use set_sph_local_node
+      use cal_sph_node_addresses
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t
       type(group_data), intent(inout) :: nod_grp
@@ -219,7 +219,7 @@
 !
       use m_spheric_parameter
       use m_sph_mesh_1d_connect
-      use set_sph_local_node
+      use cal_sph_node_addresses
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t, knum, icou
       type(group_data), intent(inout) :: nod_grp

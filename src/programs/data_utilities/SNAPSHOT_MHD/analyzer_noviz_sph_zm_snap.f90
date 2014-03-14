@@ -1,26 +1,26 @@
-!analyzer_noviz_sph_zm_snap.f90
-!      module analyzer_noviz_sph_zm_snap
-!..................................................
+!>@file   analyzer_noviz_sph_zm_snap.f90
+!!@brief  module analyzer_noviz_sph_zm_snap
+!!
+!!@author H. Matsui
+!!@date   Programmed  H. Matsui in Apr., 2010
 !
-!      Written by H. Matsui
-!      modified by H. Matsui on June, 2005 
-!
-!      subroutine initialization
-!      subroutine evolution
+!>@brief  Main loop to evaluate zonal mean field
+!!
+!!@verbatim
+!!      subroutine initialize_noviz_sph_zm_snap
+!!      subroutine evolution_voviz_sph_zm_snap
+!!@endverbatim
 !
       module analyzer_noviz_sph_zm_snap
 !
       use m_precision
+      use calypso_mpi
 !
       use m_machine_parameter
-      use m_parallel_var_dof
       use m_work_time
       use m_control_parameter
-      use m_control_params_sph_MHD
       use m_t_int_parameter
       use m_t_step_parameter
-!
-      use const_coriolis_sph
 !
       use FEM_analyzer_sph_MHD
       use SPH_analyzer_zm_snap
@@ -33,7 +33,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine initialization
+      subroutine initialize_noviz_sph_zm_snap
 !
       use set_control_sph_mhd
       use set_control_SPH_to_FEM
@@ -66,7 +66,6 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize'
       call FEM_initialize
-      call time_prog_barrier
 !
 !        Initialize spherical transform dynamo
 !
@@ -74,15 +73,15 @@
       call SPH_init_sph_snap
       if(iflag_debug .gt. 0) write(*,*) 'SPH_to_FEM_init_MHD'
       call SPH_to_FEM_init_MHD
-      call time_prog_barrier
+      call calypso_MPI_barrier
 !
       call end_eleps_time(2)
 !
-      end subroutine initialization
+      end subroutine initialize_noviz_sph_zm_snap
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine evolution
+      subroutine evolution_voviz_sph_zm_snap
 !
       integer(kind = kint) :: visval
       integer(kind = kint) :: istep_psf, istep_iso
@@ -143,10 +142,10 @@
 !
       call output_elapsed_times
 !
-      call time_prog_barrier
+      call calypso_MPI_barrier
       if (iflag_debug.eq.1) write(*,*) 'exit evolution'
 !
-      end subroutine evolution
+      end subroutine evolution_voviz_sph_zm_snap
 !
 ! ----------------------------------------------------------------------
 !

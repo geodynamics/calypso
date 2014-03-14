@@ -25,8 +25,8 @@
 !
       subroutine s_set_control_4_force
 !
+      use calypso_mpi
       use m_machine_parameter
-      use m_parallel_var_dof
       use m_control_parameter
       use m_ctl_data_mhd_forces
       use m_physical_property
@@ -145,7 +145,7 @@
           else if ( name_force(i) .eq. 'Lorentz_full' ) then
             iflag_4_lorentz = id_Lorentz_w_Emag
           else if ( name_force(i) .eq. 'Rotation_form' ) then
-            iflag_4_rotate = id_turn_ON
+            iflag_4_rotate =  id_turn_ON
           end if
         end do
       end if
@@ -181,7 +181,7 @@
         if (i_grav .eq. iflag_const_g) then
           if (i_gravity_vect .eq. 0) then
             e_message = 'Set gravity vector'
-            call parallel_abort(90, e_message)
+            call calypso_MPI_abort(90, e_message)
           else
 !
             do i = 1, i_gravity_vect
@@ -236,7 +236,7 @@
       if (iflag_magneto_cv .gt. id_turn_OFF) then
         if (i_magne_vect .eq. 0) then
           e_message = 'Set external magnetic field'
-          call parallel_abort(90, e_message)
+          call calypso_MPI_abort(90, e_message)
         else
 !
           do i = 1, i_magne_vect

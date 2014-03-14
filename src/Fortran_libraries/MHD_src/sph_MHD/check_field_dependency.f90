@@ -33,7 +33,7 @@
       subroutine check_dependence_phys(num_nod_phys, num_check,         &
      &          target_name, phys_nod_name, phys_check_name)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
 !
       integer(kind=kint) :: num_nod_phys, num_check
       character(len=kchara) :: target_name
@@ -61,7 +61,7 @@
             write(*,*)  trim(phys_check_name(j))
           end do
         end if
-        call parallel_abort(402,'Stop program.')
+        call calypso_MPI_abort(402,'Stop program.')
       end if
 !
       end subroutine check_dependence_phys

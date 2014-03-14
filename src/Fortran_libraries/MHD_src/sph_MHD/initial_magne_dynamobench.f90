@@ -29,12 +29,11 @@
 !
       subroutine initial_b_dynamobench_1
 !
-      use m_control_params_sph_MHD
       use m_spheric_parameter
       use m_sph_spectr_data
 !
       real (kind = kreal) :: pi, rr
-      integer(kind = kint) :: is, it, k, j, js, jt
+      integer(kind = kint) :: is, it, k, js, jt
       integer(kind = kint), parameter :: ls = 1, lt = 2
 !
 !
@@ -74,7 +73,7 @@
           d_rj(it,itor%i_magne) = (ten/three) * rr * sin(pi*(rr-r_ICB))
           d_rj(it,ipol%i_current) =  d_rj(it,itor%i_magne)
           d_rj(it,idpdr%i_current)                                      &
-     &             = (ten / three) * (sin(pi*(rr-r_ICB))    &
+     &             = (ten / three) * (sin(pi*(rr-r_ICB))                &
      &              + pi * rr * cos(pi*(rr-r_ICB)) )
         end do
       end if
@@ -85,12 +84,11 @@
 !
       subroutine initial_b_dynamobench_2
 !
-      use m_control_params_sph_MHD
       use m_spheric_parameter
       use m_sph_spectr_data
 !
       real (kind = kreal) :: pi, rr
-      integer(kind = kint) :: is, it, k, j, js, jt
+      integer(kind = kint) :: is, it, k, js, jt
       integer(kind = kint), parameter :: ls = 1, lt = 2
 !
 !

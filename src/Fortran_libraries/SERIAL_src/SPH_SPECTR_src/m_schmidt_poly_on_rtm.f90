@@ -63,7 +63,7 @@
       allocate( P_rtm(nidx_rtm(2),nidx_rlm(2)) )
       allocate( dPdt_rtm(nidx_rtm(2),nidx_rlm(2)) )
 !
-      allocate( g_sph_rlm(nidx_rlm(2),13) )
+      allocate( g_sph_rlm(nidx_rlm(2),17) )
       allocate( g_sph_rj(nidx_rj(2),13) )
 !
       P_rtm = 0.0d0

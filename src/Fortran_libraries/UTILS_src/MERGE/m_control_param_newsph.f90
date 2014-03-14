@@ -42,7 +42,9 @@
       use m_node_id_spherical_IO
       use m_field_data_IO
       use m_file_format_switch
+      use m_ucd_data
       use set_control_platform_data
+      use ucd_IO_select
 !
 !
       if (i_num_subdomain .gt. 0) then

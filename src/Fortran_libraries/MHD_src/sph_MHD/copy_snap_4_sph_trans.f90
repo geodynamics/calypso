@@ -25,6 +25,7 @@
       module copy_snap_4_sph_trans
 !
       use m_precision
+      use m_machine_parameter
 !
       use m_sph_phys_address
       use m_addresses_trans_sph_snap

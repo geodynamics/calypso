@@ -46,27 +46,10 @@
 !
       implicit none
 !
-!
-!>      integer flag to run elpse time check for legendre transform
-      integer(kind = kint), parameter :: iflag_leg_undefined = -1
-!>      integer flag to perform Legendre transform 
-!@n     using original array order
-      integer(kind = kint), parameter :: iflag_leg_orginal_loop = 1
-!>      integer flag to perform Legendre transform 
-!!@n    using longer loop for original array order 
-      integer(kind = kint), parameter :: iflag_leg_krloop_inner = 2
-!>      integer flag to perform Legendre transform 
-!@n     with inneromst LEgendre polynomial loop
-      integer(kind = kint), parameter :: iflag_leg_krloop_outer = 3
-!
-!>      Integer flag for Legendre transform
-      integer(kind = kint)                                              &
-     &              :: id_legendre_transfer = iflag_leg_undefined
-!
 !>      maximum number of fields for Legendre transform
       integer(kind = kint) :: nb_sph_trans
 !>      total number of components for spherical harmonics transform
-      integer(kind = kint) :: ntot_comp_sph_trans
+      integer(kind = kint) :: ncomp_sph_trans
 !
 !>      field data including pole and center  @f$ f(r,\theta,\phi) @f$ 
       real(kind = kreal), allocatable :: d_nod_rtp(:,:)
@@ -115,8 +98,6 @@
 !
       if (nb_sph_trans .gt. iflag_sph_trans) then
         call deallocate_work_4_sph_trans
-        call allocate_work_4_sph_trans
-        return
       end if
 !
       if (iflag_sph_trans .le. 0)  call allocate_work_4_sph_trans
@@ -129,8 +110,6 @@
       subroutine allocate_work_4_sph_trans
 !
       use m_spheric_parameter
-      use m_work_4_sph_trans_krin
-      use m_work_4_sph_trans_spin
 !
 !
       allocate(lstack_rlm(0:nidx_rtm(3)))
@@ -163,9 +142,6 @@
       sp_rlm = 0.0d0
       vr_rtm = 0.0d0
 !
-      call allocate_work_sph_trans_krin(nb_sph_trans)
-      call allocate_work_sph_trans_spin(nb_sph_trans)
-!
       iflag_sph_trans = nb_sph_trans
 !
       end subroutine allocate_work_4_sph_trans
@@ -174,12 +150,6 @@
 !
       subroutine deallocate_work_4_sph_trans
 !
-      use m_work_4_sph_trans_krin
-      use m_work_4_sph_trans_spin
-!
-!
-      call deallocate_work_sph_trans_spin
-      call deallocate_work_sph_trans_krin
 !
       deallocate(lstack_rlm)
       deallocate(mdx_p_rlm_rtm, mdx_n_rlm_rtm)

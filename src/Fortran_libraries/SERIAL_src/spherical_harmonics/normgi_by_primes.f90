@@ -93,7 +93,7 @@
       integer(kind = kint) kiu(0:2), kil(0:4), ktu(0:2), ktl(0:4)
       integer(kind = kint) ksu(0:4), ksl(0:2)
       integer(kind = kint) :: itmin, itmax, is, it, i2exp
-      integer(kind = kint) :: i, m, nmax_prm_ks
+      integer(kind = kint) :: i, m
       real(kind = kreal) ::  tsum, tfac
 !
 !

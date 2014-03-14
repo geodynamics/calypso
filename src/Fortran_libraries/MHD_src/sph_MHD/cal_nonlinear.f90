@@ -17,7 +17,7 @@
       use m_precision
 !
       use m_machine_parameter
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
 !
       implicit none
@@ -33,8 +33,8 @@
       subroutine nonlinear
 !
       use m_sph_phys_address
-      use cal_vorticity_terms_adams
-      use const_coriolis_sph
+      use m_boundary_params_sph_MHD
+      use cal_inner_core_rotation
 !
       use cal_nonlinear_sph_MHD
 !
@@ -47,15 +47,28 @@
       call nonlinear_by_pseudo_sph
 !
       if (iflag_4_ref_temp .eq. id_sphere_ref_temp) then
-        call add_reftemp_advect_sph_MHD
+        call add_reftemp_advect_sph_MHD                                 &
+     &     (sph_bc_T%kr_in, sph_bc_T%kr_out)
       end if
 !
-!*  ----  set coriolis term
+!*  ----  copy coriolis term for inner core rotation
 !*
       call start_eleps_time(13)
-      if (iflag_debug.eq.1) write(*,*) 'sum_coriolis_rj_sph'
-      if(iflag_4_coriolis .gt. id_turn_OFF) call sum_coriolis_rj_sph
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
+        call copy_icore_rot_to_tor_coriolis(sph_bc_U%kr_in)
+      end if
       call end_eleps_time(13)
+!
+      call sum_forces_by_explicit
+!
+      end subroutine nonlinear
+!*
+!*   ------------------------------------------------------------------
+!
+      subroutine sum_forces_by_explicit
+!
+      use cal_vorticity_terms_adams
+!
 !
 !$omp parallel
       if(      iflag_4_gravity  .ne. id_turn_OFF                        &
@@ -94,8 +107,8 @@
       end if
 !$omp end parallel
 !
-      end subroutine nonlinear
-!*
+      end subroutine sum_forces_by_explicit
+!
 !*   ------------------------------------------------------------------
 !
       subroutine nonlinear_by_pseudo_sph
@@ -137,16 +150,17 @@
       subroutine licv_exp
 !
       use m_sph_phys_address
+      use m_boundary_params_sph_MHD
+      use sph_transforms_4_MHD
       use cal_nonlinear_sph_MHD
       use cal_vorticity_terms_adams
-      use const_coriolis_sph
 !
       integer(kind = kint) :: inod
 !
 !*  ----  copy velocity for coriolis term ------------------
 !*
-      if (iflag_debug.eq.1) write(*,*) 'sum_coriolis_rj_sph'
-      if(iflag_4_coriolis .ne. id_turn_OFF) call sum_coriolis_rj_sph
+      if (iflag_debug.eq.1) write(*,*) 'sph_transform_4_licv'
+      if(iflag_4_coriolis .ne. id_turn_OFF) call sph_transform_4_licv
 !
 !   ----  lead nonlinear terms by phesdo spectrum
 !
@@ -159,7 +173,8 @@
 !$omp end parallel do
 !
       if (iflag_4_ref_temp .eq. id_sphere_ref_temp) then
-        call add_reftemp_advect_sph_MHD
+        call add_reftemp_advect_sph_MHD                                 &
+     &     (sph_bc_T%kr_in, sph_bc_T%kr_out)
       end if
 !
 !$omp parallel

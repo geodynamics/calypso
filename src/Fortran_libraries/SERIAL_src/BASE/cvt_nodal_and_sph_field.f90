@@ -12,8 +12,8 @@
 !!     &          xx, radius, s_cylinder, a_radius, a_s_cylinder,       &
 !!     &          i_field, ntot_phys, d_nod,                            &
 !!     &          i_rtp, nnod_rtp, ntot_rtp, d_rtp, d_tmp)
-!!      subroutine cvt_sph_vec_to_nod_vec                               &
-!!     &         (numnod, np_smp, inod_smp_stack, colatitude, longitude,&
+!!      subroutine cvt_sph_vec_to_nod_vec(numnod, internal_node,        &
+!!     &          np_smp, inod_smp_stack, colatitude, longitude,        &
 !!     &          i_rtp, nnod_rtp, ntot_rtp, d_rtp,                     &
 !!     &          i_field, ntot_phys, d_nod, d_tmp)
 !!
@@ -22,15 +22,16 @@
 !!     &          xx, radius, s_cylinder, a_radius, a_s_cylinder,       &
 !!     &          i_field, ntot_phys, d_nod,                            &
 !!     &          i_rtp, nnod_rtp, ntot_rtp, d_rtp, d_tmp)
-!!      subroutine cvt_sph_tsr_to_nod_tsr                               &
-!!     &         (numnod, np_smp, inod_smp_stack, xx,                   &
+!!      subroutine cvt_sph_tsr_to_nod_tsr(numnod, internal_node,        &
+!!     &          np_smp, inod_smp_stack, xx,                           &
 !!     &          radius, s_cylinder, a_radius, a_s_cylinder,           &
 !!     &          i_rtp, nnod_rtp, ntot_rtp, d_rtp,                     &
 !!     &          i_field, ntot_phys, d_nod, d_tmp)
 !!@endverbatim
 !!
-!!@n @param  np_smp   Number of SMP processes
-!!@n @param  numnod   Number of FEM nodes
+!!@n @param  np_smp          Number of SMP processes
+!!@n @param  numnod          Number of FEM nodes
+!!@n @param  internal_node   Number of internal FEM nodes
 !!@n @param  inod_smp_stack(0:np_smp)
 !!                    End address of FEM nodes for each SMP process
 !!@n @param  xx(numnod,3) position of FEM node
@@ -105,8 +106,8 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine cvt_sph_vec_to_nod_vec                                 &
-     &         (numnod, np_smp, inod_smp_stack, colatitude, longitude,  &
+      subroutine cvt_sph_vec_to_nod_vec(numnod, internal_node,          &
+     &          np_smp, inod_smp_stack, colatitude, longitude,          &
      &          i_rtp, nnod_rtp, ntot_rtp, d_rtp,                       &
      &          i_field, ntot_phys, d_nod, d_tmp)
 !
@@ -114,7 +115,7 @@
       use copy_between_two_fields
 !
       integer(kind = kint), intent(in) :: i_rtp, i_field
-      integer(kind = kint), intent(in) :: np_smp, numnod
+      integer(kind = kint), intent(in) :: np_smp, numnod, internal_node
       integer(kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
       real(kind = kreal), intent(in) :: colatitude(numnod)
       real(kind = kreal), intent(in) :: longitude(numnod)
@@ -130,10 +131,10 @@
 !
 !
       call copy_vector_2_vector_fld(i_rtp, nnod_rtp, ntot_rtp, d_rtp,   &
-     &                              ione, numnod, isix, d_tmp)
+     &    ione, numnod, isix, d_tmp)
 !
       call fill_rest_vector_field(i_field, nnod_rtp, ntot_phys, d_nod,  &
-     &                            ione, numnod, isix, d_tmp)
+     &    ione, numnod, internal_node, isix, d_tmp)
 !
       call cvt_sph_vect_2_xyz_smp(np_smp, numnod, inod_smp_stack,       &
      &    d_nod(1,i_field), d_tmp(1,1), colatitude, longitude)
@@ -181,8 +182,8 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine cvt_sph_tsr_to_nod_tsr                                 &
-     &         (numnod, np_smp, inod_smp_stack, xx,                     &
+      subroutine cvt_sph_tsr_to_nod_tsr(numnod, internal_node,          &
+     &          np_smp, inod_smp_stack, xx,                             &
      &          radius, s_cylinder, a_radius, a_s_cylinder,             &
      &          i_rtp, nnod_rtp, ntot_rtp, d_rtp,                       &
      &          i_field, ntot_phys, d_nod, d_tmp)
@@ -191,7 +192,7 @@
       use copy_between_two_fields
 !
       integer(kind = kint), intent(in) :: i_rtp, i_field
-      integer(kind = kint), intent(in) :: np_smp, numnod
+      integer(kind = kint), intent(in) :: np_smp, numnod, internal_node
       integer(kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
       real(kind = kreal), intent(in) :: xx(numnod, 3)
       real(kind = kreal), intent(in) :: radius(numnod)
@@ -209,10 +210,10 @@
 !
 !
       call copy_tensor_2_tensor_fld(i_rtp, nnod_rtp, ntot_rtp, d_rtp,   &
-     &                              ione, numnod, isix, d_tmp)
+     &    ione, numnod, isix, d_tmp)
 !
       call fill_rest_tensor_field(i_field, nnod_rtp, ntot_phys, d_nod,  &
-     &                            ione, numnod, isix, d_tmp)
+     &    ione, numnod, internal_node, isix, d_tmp)
 !
       call cal_xyz_tensor_by_sph_smp(np_smp, numnod,                    &
      &          inod_smp_stack, d_tmp(1,1), d_nod(1,i_field),           &

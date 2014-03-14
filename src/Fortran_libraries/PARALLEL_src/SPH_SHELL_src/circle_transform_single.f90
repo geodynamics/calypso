@@ -43,7 +43,7 @@
 !
       subroutine initialize_circle_transform(ltr, s_circ, z_circ)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_schmidt_polynomial
       use m_circle_transform
 !
@@ -154,7 +154,6 @@
 !
       use m_phys_constants
       use m_circle_transform
-      use FFT_selector
 !
       real(kind = kreal), intent(in) :: d_rj_circle(0:jmax_circle,6)
       real(kind = kreal), intent(inout) :: v_rtp_circle(mphi_circle,6)

@@ -18,7 +18,7 @@
 !
       use m_precision
       use m_constants
-      use m_parallel_var_dof
+      use calypso_mpi
 !
       implicit none
 !
@@ -79,7 +79,7 @@
 !
       subroutine open_dynamobench_monitor_file
 !
-      use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use m_sph_phys_address
 !
 !
@@ -99,17 +99,18 @@
      &     'ME_pol    ME_tor    ME_total    '
       end if
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         write(id_dynamobench,'(a)', advance='NO')                       &
      &     'ME_pol_icore    ME_tor_icore    ME_total_icore    '
       end if
 !
-      if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         write(id_dynamobench,'(a)', advance='NO') 'omega_ic_z    '
       end if
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center                     &
-     &  .and. iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      write(*,*) 'sph_bc_U%iflag_icb', sph_bc_U%iflag_icb
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center                  &
+     &  .and. sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         write(id_dynamobench,'(a)', advance='NO') 'MAG_torque_ic_z    '
       end if
 !
@@ -130,7 +131,7 @@
 !
       subroutine output_field_4_dynamobench(i_step, time)
 !
-      use m_control_params_sph_MHD
+      use m_boundary_params_sph_MHD
       use m_sph_phys_address
 !
       integer(kind = kint), intent(in) :: i_step
@@ -151,18 +152,18 @@
       end if
 !
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         write(id_dynamobench,'(1p3E25.15e3)', advance='NO')             &
      &     mene_icore(1:3)
       end if
 !
-      if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         write(id_dynamobench,'(1pE25.15e3)', advance='NO')              &
      &     rotate_icore(0)
       end if
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center                     &
-     &   .and. iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center                  &
+     &   .and. sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         write(id_dynamobench,'(1pE25.15e3)', advance='NO')              &
      &     m_torque_icore(0)
       end if

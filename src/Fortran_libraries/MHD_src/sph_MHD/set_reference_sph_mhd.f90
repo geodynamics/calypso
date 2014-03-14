@@ -7,9 +7,10 @@
 !> @brief Convert temperature data using reference temperature
 !!
 !!@verbatim
-!!      subroutine adjust_by_ave_pressure_on_CMB
+!!      subroutine adjust_by_ave_pressure_on_CMB(kr_in, kr_out)
 !!
-!!      subroutine s_set_ref_temp_sph_mhd
+!!      subroutine set_ref_temp_sph_mhd(sph_bc_T)
+!!      subroutine adjust_sph_temp_bc_by_reftemp(sph_bc_T)
 !!
 !!      subroutine sync_temp_by_per_temp_sph
 !!        d_rj(inod,ipol%i_temp):        T => \Theta = T - T0
@@ -27,6 +28,8 @@
 !!      subroutine delete_zero_degree_comp(is_fld)
 !!@endverbatim
 !!
+!!@param sph_bc_T  Structure for basic boundary condition parameters
+!!                 for temperature
 !!@n @param is_fld Address of poloidal component
 !
       module set_reference_sph_mhd
@@ -34,7 +37,7 @@
       use m_precision
 !
       use m_constants
-      use m_parallel_var_dof
+      use calypso_mpi
       use m_control_parameter
       use m_spheric_parameter
       use m_sph_spectr_data
@@ -47,9 +50,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine adjust_by_ave_pressure_on_CMB
+      subroutine adjust_by_ave_pressure_on_CMB(kr_in, kr_out)
 !
       use m_sph_phys_address
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out
 !
       integer(kind = kint) :: k, inod
       real(kind = kreal) :: ref_p
@@ -57,10 +62,10 @@
 !
       if (idx_rj_degree_zero .eq. 0) return
 !
-      inod = idx_rj_degree_zero + (nlayer_CMB-1)*nidx_rj(2)
+      inod = idx_rj_degree_zero + (kr_out-1)*nidx_rj(2)
       ref_p = d_rj(inod,ipol%i_press)
 !
-      do k = 1, nidx_rj(1)
+      do k = kr_in, kr_out
         inod = idx_rj_degree_zero + (k-1)*nidx_rj(2)
         d_rj(inod,ipol%i_press) = d_rj(inod,ipol%i_press) - ref_p
       end do
@@ -70,18 +75,22 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_ref_temp_sph_mhd
+      subroutine set_ref_temp_sph_mhd(sph_bc_T)
+!
+      use t_boundary_params_sph_MHD
+!
+      type(sph_boundary_type), intent(in) :: sph_bc_T
 !
       integer (kind = kint) :: k
 !
 ! set reference temperature (for spherical shell)
 !
       if (iflag_4_ref_temp .eq. id_sphere_ref_temp) then
-        do k = 1, nlayer_ICB-1
+        do k = 1, sph_bc_T%kr_in-1
           reftemp_rj(k,0) = high_temp
           reftemp_rj(k,1) = zero
         end do
-        do k = nlayer_ICB, nlayer_CMB
+        do k = sph_bc_T%kr_in, sph_bc_T%kr_out
           reftemp_rj(k,0) = (depth_high_t*depth_low_t*ar_1d_rj(k,1)     &
      &                   * (high_temp - low_temp)                       &
      &                    - depth_high_t*high_temp                      &
@@ -91,7 +100,7 @@
      &                   * (high_temp - low_temp)                       &
      &                     / (depth_low_t - depth_high_t)
         end do
-        do k = nlayer_CMB+1, nidx_rj(1)
+        do k = sph_bc_T%kr_out+1, nidx_rj(1)
           reftemp_rj(k,0) = low_temp
           reftemp_rj(k,1) = zero
         end do
@@ -102,8 +111,38 @@
         depth_low_t =  r_CMB
       end if
 !
-      end subroutine s_set_ref_temp_sph_mhd
+      end subroutine set_ref_temp_sph_mhd
 !
+! -----------------------------------------------------------------------
+!
+      subroutine adjust_sph_temp_bc_by_reftemp(sph_bc_T)
+!
+      use m_spheric_parameter
+      use m_sph_spectr_data
+      use t_boundary_params_sph_MHD
+!
+      type(sph_boundary_type), intent(inout) :: sph_bc_T
+!
+!
+      if(idx_rj_degree_zero .gt. 0                                      &
+     &      .and. iflag_4_ref_temp .eq. id_sphere_ref_temp) then
+        sph_bc_T%ICB_fld(idx_rj_degree_zero)                            &
+     &   = sph_bc_T%ICB_fld(idx_rj_degree_zero)                         &
+     &    - reftemp_rj(sph_bc_T%kr_in,0)
+        sph_bc_T%CMB_fld(idx_rj_degree_zero)                            &
+     &   = sph_bc_T%CMB_fld(idx_rj_degree_zero)                         &
+     &     - reftemp_rj(sph_bc_T%kr_out,0)
+        sph_bc_T%ICB_flux(idx_rj_degree_zero)                           &
+     &   = sph_bc_T%ICB_flux(idx_rj_degree_zero)                        &
+     &    - reftemp_rj(sph_bc_T%kr_in,1)
+        sph_bc_T%CMB_flux(idx_rj_degree_zero)                           &
+     &   = sph_bc_T%CMB_flux(idx_rj_degree_zero)                        &
+     &    - reftemp_rj(sph_bc_T%kr_out,1)
+      end if
+!
+      end subroutine adjust_sph_temp_bc_by_reftemp
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine sync_temp_by_per_temp_sph
@@ -128,8 +167,9 @@
 !
 !$omp parallel do
       do inod = 1, nnod_rj
-        d_rj(inod,ipol%i_par_temp) =    d_rj(inod,ipol%i_temp)
-        d_rj(inod,ipol%i_grad_part_t) = d_rj(inod,ipol%i_grad_t)
+        d_rj(inod,ipol%i_par_temp) =     d_rj(inod,ipol%i_temp)
+        d_rj(inod,ipol%i_grad_part_t) =  d_rj(inod,ipol%i_grad_t)
+        d_rj(inod,idpdr%i_grad_part_t) = d_rj(inod,ipol%i_temp)
       end do
 !$omp end parallel do
 !

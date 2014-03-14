@@ -13,19 +13,19 @@
 !
       use m_precision
 !
-      use m_parallel_var_dof
+      use calypso_mpi
       use analyzer_noviz_sph_snap
 !
       implicit none
 !
 !
-      call parallel_cal_init
+      call calypso_MPI_init
 !
       call initialize_noviz_sph_snap
 !
       call evolution_noviz_sph_snap
 !
-      call parallel_cal_fin
+      call calypso_MPI_finalize
 !
       write(*,*) '***** program finished *****'
       stop

@@ -112,7 +112,6 @@
       ist = kr_in * nidx_rj(2) + 1
       ied = (kr_out-1) * nidx_rj(2)
 !$omp parallel do private(inod,i_p1,i_n1,j,k,d1s_dr1)
-!cdir nodep
       do inod = ist, ied
         i_p1 = inod + nidx_rj(2)
         i_n1 = inod - nidx_rj(2)
@@ -145,7 +144,6 @@
       ist = kr_in * nidx_rj(2) + 1
       ied = (kr_out-1) * nidx_rj(2)
 !$omp parallel do private(inod,i_p1,i_n1,j,k,d2s_dr2,d1t_dr1)
-!cdir nodep
       do inod = ist, ied
         i_p1 = inod + nidx_rj(2)
         i_n1 = inod - nidx_rj(2)
@@ -185,7 +183,6 @@
       ist = kr_in * nidx_rj(2) + 1
       ied = (kr_out-1) * nidx_rj(2)
 !$omp parallel do private(inod,i_p1,i_n1,j,k,d1d_dr1,d1t_dr1)
-!cdir nodep
       do inod = ist, ied
         i_p1 = inod + nidx_rj(2)
         i_n1 = inod - nidx_rj(2)
@@ -224,7 +221,6 @@
       ist = kr_in * nidx_rj(2) + 1
       ied = (kr_out-1) * nidx_rj(2)
 !$omp parallel do private(inod,i_p1,i_n1,j,k,d1s_dr1)
-!cdir nodep
       do inod = ist, ied
         i_p1 = inod + nidx_rj(2)
         i_n1 = inod - nidx_rj(2)

@@ -1,17 +1,23 @@
+!>@file  m_work_time.f90
+!!       module m_work_time
+!!
+!!@author H. Matsui
+!!@date   Programmed by H. Matsui in 2001
 !
-!      module m_work_time
-!.......................................................................
-!
-!      Written by H. Matsui on 2001
-!
-!      subroutine allocate_elapsed_times
-!      subroutine deallocate_elapsed_times
-!
-!      subroutine start_eleps_time(iflag_elps)
-!      subroutine end_eleps_time(iflag_elps)
-!      subroutine copy_COMM_TIME_to_eleps(iflag_elps)
-!
-!      subroutine output_elapsed_times
+!> @brief routines to count elapsed time
+!!
+!!@verbatim
+!!      subroutine allocate_elapsed_times
+!!      subroutine deallocate_elapsed_times
+!!
+!!      subroutine start_eleps_time(iflag_elps)
+!!      subroutine end_eleps_time(iflag_elps)
+!!      subroutine copy_COMM_TIME_to_eleps(iflag_elps)
+!!
+!!      subroutine output_elapsed_times
+!!@endverbatim
+!!
+!!@params  timer ID
 !
       module m_work_time
 !
@@ -31,6 +37,8 @@
 !
       real (kind=kreal), allocatable :: start_times(:)
       character (len=kchara), allocatable :: elapse_labels(:)
+!
+      real(kind=kreal) :: START_SRtime, END_SRtime, SendRecvtime
 !
       private :: start_times!, elapsed
       private :: elapsed_total, elapsed_min, elapsed_max
@@ -78,7 +86,7 @@
 !
       subroutine start_eleps_time(iflag_elps)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
 !
       integer(kind = kint), intent(in) :: iflag_elps
 !
@@ -91,14 +99,13 @@
 !
       subroutine end_eleps_time(iflag_elps)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
 !
       integer(kind = kint), intent(in) :: iflag_elps
 !
 !
-      end_time = MPI_WTIME()
-      elapsed(iflag_elps) = elapsed(iflag_elps)                         &
-     &                           + end_time - start_times(iflag_elps)
+      elapsed(iflag_elps) = MPI_WTIME() - start_times(iflag_elps)       &
+     &                     + elapsed(iflag_elps)
 !
       end subroutine end_eleps_time
 !
@@ -106,12 +113,12 @@
 !
       subroutine copy_COMM_TIME_to_eleps(iflag_elps)
 !
-      use m_parallel_var_dof
+      use calypso_mpi
 !
       integer(kind = kint), intent(in) :: iflag_elps
 !
 !
-      elapsed(iflag_elps) = COMMtime
+      elapsed(iflag_elps) = SendRecvtime
 !
       end subroutine copy_COMM_TIME_to_eleps
 !
@@ -120,17 +127,17 @@
 !
       subroutine output_elapsed_times
 !
-      use m_parallel_var_dof
+      use calypso_mpi
 !
       integer(kind = kint) :: i
 !
 !
       call MPI_allREDUCE(elapsed, elapsed_total, num_elapsed,           &
-     &    MPI_DOUBLE_PRECISION, MPI_SUM, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       call MPI_allREDUCE(elapsed, elapsed_min, num_elapsed,             &
-     &    MPI_DOUBLE_PRECISION, MPI_MIN, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_MIN, CALYPSO_COMM, ierr_MPI)
       call MPI_allREDUCE(elapsed, elapsed_max, num_elapsed,             &
-     &    MPI_DOUBLE_PRECISION, MPI_MAX, SOLVER_COMM, ierr)
+     &    CALYPSO_REAL, MPI_MAX, CALYPSO_COMM, ierr_MPI)
 !
       if (my_rank.eq.0) then
 !

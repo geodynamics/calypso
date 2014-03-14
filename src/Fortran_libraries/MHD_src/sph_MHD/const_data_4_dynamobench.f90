@@ -27,8 +27,8 @@
 !
       subroutine s_const_data_4_dynamobench
 !
-      use m_control_params_sph_MHD
-      use m_parallel_var_dof
+      use m_boundary_params_sph_MHD
+      use calypso_mpi
       use cal_rms_fields_by_sph
       use global_field_4_dynamobench
       use m_field_at_mid_equator
@@ -41,17 +41,17 @@
       call cal_rms_sph_outer_core
       call copy_energy_4_dynamobench
 !
-      if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call pick_inner_core_rotation
       end if
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         call cal_rms_sph_inner_core
         call copy_icore_energy_4_dbench
       end if
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center                     &
-     &   .and. iflag_icb_velocity .eq. iflag_rotatable_ic) then
+      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center                  &
+     &   .and. sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call pick_mag_torque_inner_core
       end if
 !

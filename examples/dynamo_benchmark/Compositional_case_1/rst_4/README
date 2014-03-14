@@ -1,0 +1,8 @@
+!-----------------------------------------------------------------------
+!     Example using dynamo benchmark test Case 1
+!      using compositional variation instead of temperature
+!       Please see Christensen et.al. (2001) for the model description
+!-----------------------------------------------------------------------
+!
+
+Restart data files are stored in this directory.

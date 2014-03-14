@@ -26,6 +26,8 @@
 !!      sph_file_prefix             'sph_shell/in'
 !!
 !!      coriolis_int_file_name      'sph_shell/rot_int.dat'
+!!      boundary_data_file_name     'bc_spec.dat'
+!!
 !!      interpolate_sph_to_fem_ctl  'sph_shell/sph_to_fem'
 !!      interpolate_fem_to_sph_ctl  'sph_shell/fem_to_sph'
 !!
@@ -37,7 +39,7 @@
 !!
 !!      mesh_file_fmt_ctl           'ascii'
 !!      restart_file_fmt_ctl        'ascii'
-!!      field_file_fmt_ctl          'merged_VTK'
+!!      field_file_fmt_ctl          'ucd_ascii'
 !!      sph_file_fmt_ctl            'ascii'
 !!      spectr_file_fmt_ctl         'ascii'
 !!      itp_file_fmt_ctl            'ascii'
@@ -56,7 +58,7 @@
 !>                Number of subdomain (MPI processes)
 !>@n@param      num_smp_ctl                Number of SMP threads
 !>@n
-!>@n@param      mesh_file_prefix           File prefix for FEM mesh
+!>@n@param      mesh_file_prefix         File prefix for FEM mesh
 !>@n@param      elem_file_prefix
 !>                File prefix for FEM element comm. table
 !>@n@param      surf_file_prefix           File prefix for surface data
@@ -69,7 +71,9 @@
 !>@n@param      restart_file_prefix        File prefix for restart data
 !>@n
 !>@n@param      coriolis_int_file_name
-!>               File name for hermonic integration for Coriolis term
+!>                File name for hermonic integration for Coriolis term
+!>@n@param      boundary_data_file_name
+!>                File name for boundary conditions
 !>@n@param      interpolate_sph_to_fem_ctl 
 !>               File header for interpolation table
 !>               from spherical grid to FEM grid
@@ -113,6 +117,7 @@
       character(len=kchara) :: sph_file_prefix
 !
       character(len=kchara) :: coriolis_int_file_name
+      character(len=kchara) :: bc_data_file_name_ctl
       character(len=kchara) :: interpolate_sph_to_fem_ctl
       character(len=kchara) :: interpolate_fem_to_sph_ctl
 !
@@ -164,6 +169,8 @@
       character(len=kchara), parameter                                  &
      &       :: hd_coriolis_tri_int_name = 'coriolis_int_file_name'
       character(len=kchara), parameter                                  &
+     &       :: hd_bc_data_file_name = 'boundary_data_file_name'
+      character(len=kchara), parameter                                  &
      &       :: hd_itp_sph_to_fem =  'interpolate_sph_to_fem_ctl'
       character(len=kchara), parameter                                  &
      &       :: hd_itp_fem_to_sph =  'interpolate_fem_to_sph_ctl'
@@ -207,6 +214,7 @@
       integer(kind = kint) :: i_sph_files_header = 0
 !
       integer(kind = kint) :: i_coriolis_tri_int_name = 0
+      integer(kind = kint) :: i_bc_data_file_name = 0
       integer(kind = kint) :: i_itp_sph_to_fem = 0
       integer(kind = kint) :: i_itp_fem_to_sph = 0
 !
@@ -226,7 +234,7 @@
       private :: hd_num_subdomain, hd_num_smp, hd_sph_files_header
       private :: hd_mesh_header, hd_elem_header, hd_surf_header
       private :: hd_udt_header, hd_rst_header
-      private :: hd_spectr_header
+      private :: hd_spectr_header, hd_bc_data_file_name
       private :: hd_edge_header
       private :: hd_mesh_file_fmt, hd_rst_files_fmt
       private :: hd_udt_files_fmt, hd_sph_files_fmt
@@ -285,6 +293,9 @@
 !
         call read_character_ctl_item(hd_coriolis_tri_int_name,          &
      &        i_coriolis_tri_int_name, coriolis_int_file_name)
+        call read_character_ctl_item(hd_bc_data_file_name,              &
+     &        i_bc_data_file_name, bc_data_file_name_ctl)
+!
         call read_character_ctl_item(hd_itp_sph_to_fem,                 &
      &        i_itp_sph_to_fem, interpolate_sph_to_fem_ctl)
         call read_character_ctl_item(hd_itp_fem_to_sph,                 &

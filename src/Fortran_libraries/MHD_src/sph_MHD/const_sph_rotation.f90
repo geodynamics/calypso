@@ -7,45 +7,70 @@
 !> @brief Evaluate curl of fields
 !!
 !!@verbatim
-!!      subroutine const_sph_vorticity
+!!      subroutine const_sph_vorticity(sph_bc_U, is_velo, is_vort)
 !!        Input:    ipol%i_velo, itor%i_velo
 !!        Solution: ipol%i_vort, itor%i_vort, idpdr%i_vort
 !!
-!!      subroutine const_sph_current
+!!      subroutine const_sph_current(sph_bc_B, is_magne, is_current)
 !!        Input:    ipol%i_magne, itor%i_magne
 !!        Solution: ipol%i_current, itor%i_current, idpdr%i_current
 !!
-!!      subroutine const_sph_rotation_uxb(is_fld, is_rot)
+!!      subroutine const_sph_rotation_uxb(isph_bc_B, s_fld, is_rot)
 !!        Input:    is_fld, it_fld
 !!        Solution: is_rot, it_rot, ids_rot
 !!
-!!      subroutine const_sph_rotation_no_bc(kr_inside, kr_outside,      &
-!!     &          coef_fdm_fix_in_2, coef_fdm_fix_out_2, is_fld, is_rot)
+!!      subroutine const_sph_rotation_no_bc(sph_bc, is_fld, is_rot)
 !!        Input:    is_fld, it_fld
 !!        Solution: is_rot, it_rot, ids_rot
 !!
-!!      subroutine const_sph_force_rot2(is_fld, is_rot)
+!!      subroutine const_sph_force_rot2(sph_bc_U, is_fld, is_rot)
 !!        Input:    is_fld, it_fld
 !!        Solution: is_rot, it_rot, ids_rot
 !!
-!!      subroutine const_sph_viscous_by_vort2
+!!      subroutine const_sph_viscous_by_vort2(sph_bc_U, coef_diffuse,   &
+!!     &          is_velo, is_vort, is_viscous)
 !!        Input:    ipol%i_vort, itor%i_vort
 !!        Solution: ipol%i_v_diffuse, itor%i_v_diffuse, idpdr%i_v_diffuse
 !!
-!!      subroutine const_sph_mag_diffuse_by_j
+!!      subroutine const_sph_mag_diffuse_by_j(sph_bc_B, coef_diffuse,   &
+!!     &          is_magne, is_current, is_ohmic)
 !!        Input:    ipol%i_current, itor%i_current
 !!        Solution: ipol%i_b_diffuse, itor%i_b_diffuse, idpdr%i_b_diffuse
+!!
+!!      subroutine const_sph_viscous_by_vort2(sph_bc_U, coef_diffuse,   &
+!!     &          is_velo, is_vort, is_viscous)
 !!@endverbatim
 !!
-!!@n @param kr_inside     Radial ID for inner boundary
-!!@n @param kr_outside    RAdial ID for outer boundary
-!!@n @param coef_fdm_fix_in_2(0:2,3)
+!!@param sph_bc_U  Structure for basic boundary condition parameters
+!!                 for velocity
+!!@param sph_bc_B  Structure for basic boundary condition parameters
+!!                 for magnetic field
+!!@param sph_bc  Structure for basic boundary condition parameters
+!!
+!!@param kr_inside     Radial ID for inner boundary
+!!@param kr_outside    RaAdial ID for outer boundary
+!!@param coef_fdm_fix_in_2(0:2,3)
 !!             Finite difference matrix for inner boundary
-!!@n @param coef_fdm_fix_out_2(0:2,3)
+!!@param coef_fdm_fix_out_2(0:2,3)
 !!             Finite difference matrix for outer boundary
 !!
-!!@n @param is_fld      Input spectr field address
-!!@n @param is_rot      Address of curl of field
+!!@param coef_diffuse   Diffusion coefficient
+!!
+!!@param is_fld      Input spectr field address
+!!@param is_rot      Address of curl of field
+!!
+!!@param is_velo     Spherical hermonics data address
+!!                   for poloidal velocity field
+!!@param is_vort     Spherical hermonics data address
+!!                   for poloidal voeticity
+!!@param is_viscous  Spherical hermonics data address
+!!                   for poloidal visous diffusion
+!!@param is_magne    Spherical hermonics data address
+!!                   for poloidal magnetic field
+!!@param is_current  Spherical hermonics data address
+!!                   for poloidal current density
+!!@param is_ohmic    Spherical hermonics data address
+!!                   for poloidal ohmic dissipation
 !
       module const_sph_rotation
 !
@@ -64,159 +89,96 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_sph_vorticity
+      subroutine const_sph_vorticity(sph_bc_U, is_velo, is_vort)
 !
-      use m_control_params_sph_MHD
-      use m_sph_phys_address
-      use set_sph_exp_rigid_ICB
-      use set_sph_exp_rigid_CMB
-      use set_sph_exp_free_ICB
-      use set_sph_exp_free_CMB
+      use t_boundary_params_sph_MHD
+      use select_exp_velocity_bc
+!
+      type(sph_boundary_type), intent(in) :: sph_bc_U
+      integer(kind = kint), intent(in) :: is_velo, is_vort
 !
 !
-      if(iflag_icb_velocity .eq. iflag_free_slip) then
-        call cal_sph_nod_icb_free_rot2(ipol%i_velo, ipol%i_vort)
-      else if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
-        call cal_sph_nod_icb_rigid_rot2(ipol%i_velo, ipol%i_vort)
-      else
-        call cal_sph_nod_icb_rigid_rot2(ipol%i_velo, ipol%i_vort)
-      end if
+      call sel_bc_sph_vorticity(sph_bc_U, is_velo, is_vort)
 !
-      if(iflag_cmb_velocity .eq. iflag_free_slip) then
-        call cal_sph_nod_cmb_free_rot2(ipol%i_velo, ipol%i_vort)
-      else
-        call cal_sph_nod_cmb_rigid_rot2(ipol%i_velo, ipol%i_vort)
-      end if
-!
-      call cal_sph_nod_vect_rot2(nlayer_ICB, nlayer_CMB,                &
-     &    ipol%i_velo, ipol%i_vort)
+      call cal_sph_nod_vect_rot2(sph_bc_U%kr_in, sph_bc_U%kr_out,       &
+     &    is_velo, is_vort)
 !
       end subroutine const_sph_vorticity
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_sph_current
+      subroutine const_sph_current(sph_bc_B, is_magne, is_current)
 !
-      use m_control_params_sph_MHD
-      use m_sph_phys_address
-      use cal_sph_exp_nod_icb_ins
-      use cal_sph_exp_nod_cmb_ins
-      use cal_sph_exp_nod_icb_qvac
-      use cal_sph_exp_nod_cmb_qvac
-      use set_sph_exp_nod_center
+      use t_boundary_params_sph_MHD
+      use select_exp_magne_bc
 !
-      integer(kind = kint) :: kr_in
+      type(sph_boundary_type), intent(in) :: sph_bc_B
+      integer(kind = kint), intent(in) :: is_magne, is_current
 !
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
-        kr_in = ione
-        call cal_sph_nod_center_rot2(ipol%i_magne, ipol%i_current)
-      else if(iflag_icb_magne .eq. iflag_radial_magne) then
-        kr_in = nlayer_ICB
-        call cal_sph_nod_icb_qvc_rot2(ipol%i_magne, ipol%i_current)
-      else
-        kr_in = nlayer_ICB
-        call cal_sph_nod_icb_ins_rot2(ipol%i_magne, ipol%i_current)
-      end if
+      call sel_bc_sph_current(sph_bc_B, is_magne, is_current)
 !
-      call cal_sph_nod_vect_rot2(kr_in, nlayer_CMB,                     &
-     &    ipol%i_magne, ipol%i_current)
-!
-      if(iflag_cmb_magne .eq. iflag_radial_magne) then
-        call cal_sph_nod_cmb_qvc_rot2(ipol%i_magne, ipol%i_current)
-      else
-        call cal_sph_nod_cmb_ins_rot2(ipol%i_magne, ipol%i_current)
-      end if
+      call cal_sph_nod_vect_rot2(sph_bc_B%kr_in, sph_bc_B%kr_out,       &
+     &    is_magne, is_current)
 !
       end subroutine const_sph_current
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_sph_rotation_uxb(is_fld, is_rot)
+      subroutine const_sph_rotation_uxb(sph_bc_B, is_fld, is_rot)
 !
-      use m_control_params_sph_MHD
-      use m_sph_phys_address
-      use cal_sph_exp_nod_icb_ins
-      use cal_sph_exp_nod_cmb_ins
-      use cal_sph_exp_nod_icb_qvac
-      use cal_sph_exp_nod_cmb_qvac
-      use set_sph_exp_nod_center
+      use t_boundary_params_sph_MHD
+      use select_exp_magne_bc
 !
+      type(sph_boundary_type), intent(in) :: sph_bc_B
       integer(kind = kint), intent(in) :: is_fld, is_rot
 !
-      integer(kind = kint) :: kr_st
 !
+      call sel_bc_sph_rotation_uxb(sph_bc_B, is_fld, is_rot)
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
-        kr_st = ione
-        call cal_sph_nod_center_rot2(is_fld, is_rot)
-      else if(iflag_icb_magne .eq. iflag_radial_magne) then
-        kr_st = nlayer_ICB
-        call cal_sph_nod_icb_qvc_vp_rot2(is_fld, is_rot)
-      else
-        kr_st = nlayer_ICB
-        call cal_sph_nod_icb_ins_vp_rot2(is_fld, is_rot)
-      end if
-!
-      call cal_sph_nod_vect_w_div_rot2(kr_st, nlayer_CMB,               &
+      call cal_sph_nod_vect_w_div_rot2(sph_bc_B%kr_in, sph_bc_B%kr_out, &
      &    is_fld, is_rot)
-!
-      if(iflag_cmb_magne .eq. iflag_radial_magne) then
-        call cal_sph_nod_cmb_qvc_vp_rot2(is_fld, is_rot)
-      else
-        call cal_sph_nod_cmb_ins_vp_rot2(is_fld, is_rot)
-      end if
 !
       end subroutine const_sph_rotation_uxb
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_sph_rotation_no_bc(kr_inside, kr_outside,        &
-     &          coef_fdm_fix_in_2, coef_fdm_fix_out_2, is_fld, is_rot)
+      subroutine const_sph_rotation_no_bc(sph_bc, is_fld, is_rot)
 !
+      use t_boundary_params_sph_MHD
       use cal_sph_exp_nod_none_bc
 !
-      integer(kind = kint), intent(in) :: kr_inside, kr_outside
+      type(sph_boundary_type), intent(in) :: sph_bc
+!
       integer(kind = kint), intent(in) :: is_fld, is_rot
-      real(kind = kreal), intent(in) :: coef_fdm_fix_in_2(0:2,3)
-      real(kind = kreal), intent(in) :: coef_fdm_fix_out_2(0:2,3)
 !
 !
-      call cal_sph_nod_nobc_in_rot2(coef_fdm_fix_in_2, kr_inside,       &
+      call cal_sph_nod_nobc_in_rot2(nidx_rj(2),                         &
+     &    sph_bc%kr_in, sph_bc%r_ICB, sph_bc%fdm2_fix_fld_ICB,          &
      &    is_fld, is_rot)
-      call cal_sph_nod_nobc_out_rot2(coef_fdm_fix_out_2, kr_outside,    &
+      call cal_sph_nod_nobc_out_rot2(nidx_rj(2),                        &
+     &    sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_fld_CMB,         &
      &    is_fld, is_rot)
 !
-      call cal_sph_nod_vect_rot2(kr_inside, kr_outside, is_fld, is_rot)
+      call cal_sph_nod_vect_rot2(sph_bc%kr_in, sph_bc%kr_out,           &
+     &     is_fld, is_rot)
 !
       end subroutine const_sph_rotation_no_bc
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_sph_force_rot2(is_fld, is_rot)
+      subroutine const_sph_force_rot2(sph_bc_U, is_fld, is_rot)
 !
-      use m_control_params_sph_MHD
-      use set_sph_exp_rigid_ICB
-      use set_sph_exp_rigid_CMB
-      use set_sph_exp_free_ICB
-      use set_sph_exp_free_CMB
+      use t_boundary_params_sph_MHD
+      use select_exp_velocity_bc
 !
+      type(sph_boundary_type), intent(in) :: sph_bc_U
       integer(kind = kint), intent(in) :: is_fld, is_rot
 !
 !
-      if(iflag_icb_velocity .eq. iflag_free_slip) then
-        call cal_sph_nod_icb_free_rot2(is_fld, is_rot)
-      else
-        call cal_sph_nod_icb_rigid_rot2(is_fld, is_rot)
-      end if
+      call sel_bc_sph_vorticity(sph_bc_U, is_fld, is_rot)
 !
-      if(iflag_cmb_velocity .eq. iflag_free_slip) then
-        call cal_sph_nod_cmb_free_rot2(is_fld, is_rot)
-      else
-        call cal_sph_nod_cmb_rigid_rot2(is_fld, is_rot)
-      end if
-!
-      call cal_sph_nod_vect_w_div_rot2(nlayer_ICB, nlayer_CMB,          &
+      call cal_sph_nod_vect_w_div_rot2(sph_bc_U%kr_in, sph_bc_U%kr_out, &
      &    is_fld, is_rot)
 !
       end subroutine const_sph_force_rot2
@@ -224,96 +186,54 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_sph_viscous_by_vort2
+      subroutine const_sph_viscous_by_vort2(sph_bc_U, coef_diffuse,     &
+     &          is_velo, is_vort, is_viscous)
 !
-      use m_control_params_sph_MHD
-      use m_sph_phys_address
-      use m_physical_property
-      use set_sph_exp_rigid_ICB
-      use set_sph_exp_rigid_CMB
-      use set_sph_exp_free_ICB
-      use set_sph_exp_free_CMB
-      use cal_sph_exp_fixed_scalar
-      use cal_inner_core_rotation
+      use t_boundary_params_sph_MHD
+      use const_sph_diffusion
+      use select_exp_velocity_bc
+!
+      type(sph_boundary_type), intent(in) :: sph_bc_U
+      integer(kind = kint), intent(in) :: is_velo, is_vort, is_viscous
+      real(kind = kreal), intent(in) :: coef_diffuse
+!
+      integer(kind = kint) :: idp_diffuse
 !
 !
-      call cal_sph_nod_diffuse_by_rot2(nlayer_ICB, nlayer_CMB,          &
-     &    coef_d_velo, ipol%i_vort, ipol%i_v_diffuse)
+      idp_diffuse = is_viscous + 1
 !
-      if(iflag_icb_velocity .eq. iflag_free_slip) then
-        call cal_sph_nod_icb_free_diffuse2(coef_d_velo,                 &
-     &      ipol%i_velo, ipol%i_v_diffuse)
-      else
-        call cal_sph_nod_icb_rigid_diffuse2(coef_d_velo,                &
-     &      ipol%i_velo, ipol%i_v_diffuse)
-      end if
-      call cal_dsdr_sph_icb_nobc_2(ipol%i_v_diffuse, idpdr%i_v_diffuse)
+      call cal_sph_nod_diffuse_by_rot2(sph_bc_U%kr_in, sph_bc_U%kr_out, &
+     &    coef_diffuse, is_vort, is_viscous)
 !
-      if(iflag_icb_velocity .eq. iflag_rotatable_ic) then
-        call cal_icore_viscous_drag_explicit(coef_d_velo,               &
-     &      ipol%i_vort, itor%i_v_diffuse)
-      end if
-!
-      if(iflag_cmb_velocity .eq. iflag_free_slip) then
-        call cal_sph_nod_cmb_free_diffuse2(coef_d_velo,                 &
-     &      ipol%i_velo, ipol%i_v_diffuse)
-      else
-        call cal_sph_nod_cmb_rigid_diffuse2(coef_d_velo, ipol%i_velo,   &
-     &      ipol%i_v_diffuse)
-      end if
-      call cal_dsdr_sph_cmb_nobc_2(ipol%i_v_diffuse, idpdr%i_v_diffuse)
+      call sel_bc_sph_viscous_diffusion(sph_bc_U, coef_diffuse,         &
+     &    is_velo, is_vort, is_viscous, idp_diffuse)
 !
       end subroutine const_sph_viscous_by_vort2
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_sph_mag_diffuse_by_j
+      subroutine const_sph_mag_diffuse_by_j(sph_bc_B, coef_diffuse,     &
+     &          is_magne, is_current, is_ohmic)
 !
-      use m_control_params_sph_MHD
-      use m_sph_phys_address
-      use m_physical_property
-      use cal_sph_exp_fixed_scalar
-      use cal_sph_exp_nod_icb_ins
-      use cal_sph_exp_nod_cmb_ins
-      use cal_sph_exp_nod_icb_qvac
-      use cal_sph_exp_nod_cmb_qvac
-      use set_sph_exp_nod_center
+      use t_boundary_params_sph_MHD
+      use select_exp_magne_bc
 !
+      type(sph_boundary_type), intent(in) :: sph_bc_B
+      integer(kind = kint), intent(in) :: is_magne, is_current
+      integer(kind = kint), intent(in) :: is_ohmic
+      real(kind = kreal), intent(in) :: coef_diffuse
 !
-      integer(kind = kint) :: kr_in
+      integer(kind = kint) :: idp_diffuse
 !
 !
-      if(iflag_icb_magne .eq. iflag_sph_fill_center) then
-        kr_in = ione
-        call cal_sph_nod_center_diffuse2(coef_d_magne,                  &
-     &      ipol%i_magne, ipol%i_b_diffuse)
-        call cal_dsdr_sph_center_2(ipol%i_b_diffuse)
-      else if(iflag_icb_magne .eq. iflag_radial_magne) then
-        kr_in = nlayer_ICB
-        call cal_sph_nod_icb_qvc_diffuse2(coef_d_magne,                 &
-     &      ipol%i_magne, ipol%i_b_diffuse)
-        call cal_dsdr_sph_icb_nobc_2(ipol%i_b_diffuse,                  &
-     &      idpdr%i_b_diffuse)
-      else
-        kr_in = nlayer_ICB
-        call cal_sph_nod_icb_ins_diffuse2(coef_d_magne,                 &
-     &      ipol%i_magne, ipol%i_b_diffuse)
-        call cal_dsdr_sph_icb_nobc_2(ipol%i_b_diffuse,                  &
-     &      idpdr%i_b_diffuse)
-      end if
+      idp_diffuse = is_ohmic + 1
 !
-      call cal_sph_nod_diffuse_by_rot2(kr_in, nlayer_CMB, coef_d_magne, &
-     &    ipol%i_current, ipol%i_b_diffuse)
+      call cal_sph_nod_diffuse_by_rot2(sph_bc_B%kr_in, sph_bc_B%kr_out, &
+     &    coef_diffuse, is_current, is_ohmic)
 !
-      if(iflag_cmb_magne .eq. iflag_radial_magne) then
-        call cal_sph_nod_cmb_qvc_diffuse2(coef_d_magne,                 &
-     &      ipol%i_magne, ipol%i_b_diffuse)
-      else
-        call cal_sph_nod_cmb_ins_diffuse2(coef_d_magne,                 &
-     &      ipol%i_magne, ipol%i_b_diffuse)
-      end if
-      call cal_dsdr_sph_cmb_nobc_2(ipol%i_b_diffuse, idpdr%i_b_diffuse)
+      call sel_bc_sph_magnetic_diffusion(sph_bc_B, coef_diffuse,        &
+     &    is_magne, is_ohmic, idp_diffuse)
 !
       end subroutine const_sph_mag_diffuse_by_j
 !

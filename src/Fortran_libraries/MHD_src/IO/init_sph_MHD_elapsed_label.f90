@@ -27,7 +27,7 @@
       use m_work_time
 !
 !
-      num_elapsed = 25
+      num_elapsed = 36
       call allocate_elapsed_times
 !
       elapse_labels(1) = 'Total time                 '
@@ -57,6 +57,19 @@
       elapse_labels(22) = 'Legendre backward transform'
       elapse_labels(23) = 'Legendre forward transform '
       elapse_labels(24) = 'Fourier transform          '
+!
+      elapse_labels(25) = 'order_b_trans_vector_spin  '
+      elapse_labels(26) = 'clear_b_trans_vector_spin  '
+      elapse_labels(27) = 'legendre_b_trans_vector_spin '
+      elapse_labels(28) = 'back_b_trans_vector_spin'
+      elapse_labels(29) = 'order_f_trans_vector_spin  '
+      elapse_labels(30) = 'clear_f_trans_vector_spin  '
+      elapse_labels(31) = 'legendre_f_trans_vector_spin '
+      elapse_labels(32) = 'back_f_trans_vector_spin'
+!
+      elapse_labels(33) = 'copy_FFT_real       '
+      elapse_labels(34) = 'dfftw_execute       '
+      elapse_labels(35) = 'copy_FFT_complex    '
 !
       elapse_labels(num_elapsed) = 'Communication time        '
 !

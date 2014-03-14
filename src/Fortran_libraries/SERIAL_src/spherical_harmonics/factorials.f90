@@ -1,16 +1,22 @@
-!
-!      module factorials
+!>@file   factorials.f90
+!!@brief  module factorials
+!!
+!!@author H. Matsui
+!!@date Programmed in 1993
+!!@n    Modified in 2009
 !
 !> @brief  double precision function fact(ns,ne,ni)
 !!
+!!@verbatim
+!!********************************************
+!!*                                          *
+!!*     caliculate factorials                *
+!!*                                          *
+!!*  factorial(ns,ne,ni) = [ne! / ns!] **ni  *
+!!*                                          *
+!!********************************************
+!!@endverbatim
 !!
-!!@n********************************************
-!!@n*                                          *
-!!@n*     caliculate factorials                *
-!!@n*                                          *
-!!@n*  factorial(ns,ne,ni) = [ne! / ns!] **ni  *
-!!@n*                                          *
-!!@n********************************************
 !!@n @param ns       Start number for factorization
 !!@n @param ne       End number for factorization
 !!@n @param ni       Order of factorization

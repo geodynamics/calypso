@@ -4,7 +4,7 @@
 !     Written by H. Matsui on Apr., 2006
 !
 !
-!      subroutine construct_surface_data(my_rank)
+!      subroutine construct_surface_data
 !      subroutine const_element_list_4_surface
 !
       module const_surface_data
@@ -28,14 +28,12 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine construct_surface_data(my_rank)
+      subroutine construct_surface_data
 !
       use m_surface_hash
 !
       use set_surface_hash
       use check_geometries
-!
-      integer(kind = kint), intent(in) :: my_rank
 !
 !   set hash data for suface elements using sum of local node ID
 !

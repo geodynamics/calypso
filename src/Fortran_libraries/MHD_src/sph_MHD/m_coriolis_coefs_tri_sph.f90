@@ -41,20 +41,20 @@
 !!*
 !!*************************************************
 !!*
-!!*     wss(jc,1,j3) = sw(jc,1,j3)
-!!*     wss(jc,2,j3) = sw(jc,2,j3)
-!!*     wts(jc,j3)   = sw(jc,3,j3)
-!!*     wst(jc,1,j3) = tw(jc,1,j3)
-!!*     wst(jc,2,j3) = tw(jc,2,j3)
-!!*     wtt(jc,1,j3) = tw(jc,3,j3)
-!!*     wtt(jc,2,j3) = tw(jc,4,j3)
+!!*     wss(jc,1,j3) = sw_rj(jc,1,j3)
+!!*     wss(jc,2,j3) = sw_rj(jc,2,j3)
+!!*     wts(jc,j3)   = sw_rj(jc,3,j3)
+!!*     wst(jc,1,j3) = tw_rj(jc,1,j3)
+!!*     wst(jc,2,j3) = tw_rj(jc,2,j3)
+!!*     wtt(jc,1,j3) = tw_rj(jc,3,j3)
+!!*     wtt(jc,2,j3) = tw_rj(jc,4,j3)
 !!*
-!!*     wsd(jc,1,j3) = sd(jc,1,j3)
-!!*     wsd(jc,2,j3) = sd(jc,2,j3)
-!!*     wtd(jc,j3)   = td(jc,j3)
+!!*     wsd(jc,1,j3) = sd_rj(jc,1,j3)
+!!*     wsd(jc,2,j3) = sd_rj(jc,2,j3)
+!!*     wtd(jc,j3)   = td_rj(jc,j3)
 !!*
-!!*     wsr(jc,j3) =   sr(jc,j3)
-!!*     wtr(jc,j3) =   tr(jc,j3)
+!!*     wsr(jc,j3) =   sr_rj(jc,j3)
+!!*     wtr(jc,j3) =   tr_rj(jc,j3)
 !!*
 !!*************************************************
 !!*
@@ -112,21 +112,21 @@
       implicit none
 !
 !>      Coefficients for curl of Coriolis force for poloidal vorticity
-      real(kind = kreal), allocatable :: sw(:,:,:)
+      real(kind = kreal), allocatable :: sw_rj(:,:,:)
 !>      Coefficients for curl of Coriolis force for toroidal vorticity
-      real(kind = kreal), allocatable :: tw(:,:,:)
+      real(kind = kreal), allocatable :: tw_rj(:,:,:)
 !>      Coefficients for divergence of Coriolis force 
 !!       for poloidal vorticity by poloidal velocity
-      real(kind = kreal), allocatable :: sd(:,:,:)
+      real(kind = kreal), allocatable :: sd_rj(:,:,:)
 !>      Coefficients for divergence of Coriolis force 
 !!       for poloidal vorticity by Toroidal velocity
-      real(kind = kreal), allocatable :: td(:,:)
+      real(kind = kreal), allocatable :: td_rj(:,:)
 !>      Coefficients for radial compoonent of Coriolis force 
 !!       for poloidal vorticity by poloidal velocity
-      real(kind = kreal), allocatable :: sr(:,:)
+      real(kind = kreal), allocatable :: sr_rj(:,:)
 !>      Coefficients for radial compoennt of Coriolis force 
 !!       for poloidal vorticity by Toroidal velocity
-      real(kind = kreal), allocatable :: tr(:,:)
+      real(kind = kreal), allocatable :: tr_rj(:,:)
 !
 !
 !>      Coefficients for curl of Coriolis force
@@ -175,23 +175,23 @@
 !
       subroutine alloc_g0
 !
-      allocate( sw(2,3,jmax_tri_sph) )
-      allocate( tw(2,4,jmax_tri_sph) )
+      allocate( sw_rj(2,3,jmax_tri_sph) )
+      allocate( tw_rj(2,4,jmax_tri_sph) )
 !
-      allocate( sd(2,2,jmax_tri_sph) )
-      allocate( td(2,jmax_tri_sph) )
+      allocate( sd_rj(2,2,jmax_tri_sph) )
+      allocate( td_rj(2,jmax_tri_sph) )
 !
-      allocate( sr(2,jmax_tri_sph) )
-      allocate( tr(2,jmax_tri_sph) )
+      allocate( sr_rj(2,jmax_tri_sph) )
+      allocate( tr_rj(2,jmax_tri_sph) )
 !
-      sw = zero
-      tw = zero
+      sw_rj = zero
+      tw_rj = zero
 !
-      sd = zero
-      td = zero
+      sd_rj = zero
+      td_rj = zero
 !
-      sr = zero
-      tr = zero
+      sr_rj = zero
+      tr_rj = zero
 !
       end subroutine alloc_g0
 !
@@ -230,9 +230,9 @@
 !
       subroutine dealloc_g0
 !
-      deallocate( sw, tw )
-      deallocate( sd, td )
-      deallocate( sr, tr )
+      deallocate( sw_rj, tw_rj )
+      deallocate( sd_rj, td_rj )
+      deallocate( sr_rj, tr_rj )
 !
       end subroutine dealloc_g0
 !

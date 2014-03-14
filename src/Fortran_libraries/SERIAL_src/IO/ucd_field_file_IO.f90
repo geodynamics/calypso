@@ -1,12 +1,22 @@
-!ucd_field_file_IO.f90
-!      module ucd_field_file_IO
+!>@file  ucd_field_file_IO.f90
+!!       module ucd_field_file_IO
+!!
+!! @author H. Matsui
+!! @date   Programmed in July, 2006
 !
-!     Written by H. Matsui
-!
-!      subroutine write_ucd_2_fld_file(my_rank, istep)
-!
-!      subroutine read_ucd_2_fld_file(my_rank, istep)
-!      subroutine read_alloc_ucd_2_fld_file(my_rank, istep)
+!> @brief ascii format data IO
+!!
+!!@verbatim
+!!      subroutine write_ucd_2_fld_file(my_rank, istep, ucd)
+!!
+!!      subroutine read_ucd_2_fld_file(my_rank, istep, ucd)
+!!      subroutine read_alloc_ucd_2_fld_file(my_rank, istep, ucd)
+!!        type(ucd_data), intent(inout) :: ucd
+!!@endverbatim
+!!
+!!@param my_rank  process ID
+!!@param istep    step number for output
+!!@param ucd      Structure for FEM field data IO
 !
       module ucd_field_file_IO
 !
@@ -15,13 +25,18 @@
 !
       use m_constants
       use m_time_data_IO
-      use m_ucd_data
       use m_field_file_format
+!
+      use t_ucd_data
+!
       use field_data_IO
       use skip_gz_comment
       use set_ucd_file_names
 !
       implicit none
+!
+!>      file ID for field file IO
+      integer(kind = kint), parameter, private :: id_fld_file = 16
 !
 !------------------------------------------------------------------
 !
@@ -29,98 +44,104 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine write_ucd_2_fld_file(my_rank, istep)
+      subroutine write_ucd_2_fld_file(my_rank, istep, ucd)
 !
       integer(kind=kint), intent(in) :: my_rank, istep
+      type(ucd_data), intent(in) :: ucd
+!
       character(len=kchara) :: file_name
 !
 !
-      call set_parallel_ucd_file_name(ucd_header_name, iflag_fld,       &
+      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_fld,       &
      &    my_rank, istep, file_name)
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write ascii step data file: ', trim(file_name)
 !
-      open(ucd_file_code, file = file_name, form = 'formatted')
+      open(id_fld_file, file = file_name, form = 'formatted')
 !
-      call write_step_data(ucd_file_code, my_rank)
-      call write_field_data(ucd_file_code,                              &
-     &          nnod_ucd, num_field_ucd, ntot_comp_ucd,                 &
-     &          num_comp_ucd, phys_name_ucd, d_nod_ucd)
+      call write_step_data(id_fld_file, my_rank)
+      call write_field_data(id_fld_file,                                &
+     &          ucd%nnod, ucd%num_field, ucd%ntot_comp,                 &
+     &          ucd%num_comp, ucd%phys_name, ucd%d_ucd)
 !
-      close (ucd_file_code)
+      close (id_fld_file)
 !
       end subroutine write_ucd_2_fld_file
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_ucd_2_fld_file(my_rank, istep)
+      subroutine read_ucd_2_fld_file(my_rank, istep, ucd)
 !
       use skip_comment_f
 !
       integer(kind=kint), intent(in) :: my_rank, istep
+      type(ucd_data), intent(inout) :: ucd
+!
       character(len=kchara) :: file_name
       character(len=255) :: character_4_read
 !
 !
-      call set_parallel_ucd_file_name(ucd_header_name, iflag_fld,       &
+      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_fld,       &
      &    my_rank, istep, file_name)
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read ascii data file: ', trim(file_name)
 !
-      open(ucd_file_code, file = file_name, form = 'formatted')
+      open(id_fld_file, file = file_name, form = 'formatted')
 !
-      call read_step_data(ucd_file_code)
+      call read_step_data(id_fld_file)
 !
-      call skip_comment(character_4_read, ucd_file_code)
-      read(character_4_read,*) nnod_ucd, num_field_ucd
-      read(ucd_file_code,*) num_comp_ucd(1:num_field_ucd)
+      call skip_comment(character_4_read, id_fld_file)
+      read(character_4_read,*) ucd%nnod, ucd%num_field
+      read(id_fld_file,*) ucd%num_comp(1:ucd%num_field)
 !
-      call read_field_data(ucd_file_code,                               &
-     &          nnod_ucd, num_field_ucd, ntot_comp_ucd,                 &
-     &          num_comp_ucd, phys_name_ucd, d_nod_ucd)
+      call read_field_data(id_fld_file,                                 &
+     &          ucd%nnod, ucd%num_field, ucd%ntot_comp,                 &
+     &          ucd%num_comp, ucd%phys_name, ucd%d_ucd)
 !
-      close (ucd_file_code)
+      close (id_fld_file)
 !
       end subroutine read_ucd_2_fld_file
 !
 !------------------------------------------------------------------
 !
-      subroutine read_alloc_ucd_2_fld_file(my_rank, istep)
+      subroutine read_alloc_ucd_2_fld_file(my_rank, istep, ucd)
 !
       use skip_comment_f
 !
       integer(kind=kint), intent(in) :: my_rank, istep
+      type(ucd_data), intent(inout) :: ucd
+!
       character(len=kchara) :: file_name
       character(len=255) :: character_4_read
 !
 !
-      call set_parallel_ucd_file_name(ucd_header_name, iflag_fld,       &
+      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_fld,       &
      &    my_rank, istep, file_name)
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read ascii data file: ', trim(file_name)
 !
-      open(ucd_file_code, file = file_name, form = 'formatted')
+      open(id_fld_file, file = file_name, form = 'formatted')
 !
-      call read_step_data(ucd_file_code)
+      call read_step_data(id_fld_file)
 !
-      call skip_comment(character_4_read, ucd_file_code)
-      read(character_4_read,*) nnod_ucd, num_field_ucd
+      call skip_comment(character_4_read, id_fld_file)
+      read(character_4_read,*) ucd%nnod, ucd%num_field
 !
-      call allocate_ucd_phys_name
-      read(ucd_file_code,*) num_comp_ucd(1:num_field_ucd)
+      call allocate_ucd_phys_name(ucd)
+      read(id_fld_file,*) ucd%num_comp(1:ucd%num_field)
 !
-      call cal_istack_ucd_component
-      call allocate_ucd_phys_data
+      call cal_istack_ucd_component(ucd)
+      call allocate_ucd_phys_data(ucd)
 !
-      call read_field_data(ucd_file_code,                               &
-     &          nnod_ucd, num_field_ucd, ntot_comp_ucd,                 &
-     &          num_comp_ucd, phys_name_ucd, d_nod_ucd)
+      call read_field_data(id_fld_file,                                 &
+     &          ucd%nnod, ucd%num_field, ucd%ntot_comp,                 &
+     &          ucd%num_comp, ucd%phys_name, ucd%d_ucd)
 !
-      close (ucd_file_code)
+      close (id_fld_file)
 !
       end subroutine read_alloc_ucd_2_fld_file
 !

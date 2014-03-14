@@ -10,13 +10,12 @@
 !!
 !!@verbatim
 !!      subroutine  SOLVER_SEND_RECV_3                                  &
-!!     &                (N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,&
-!!     &                                       STACK_EXPORT, NOD_EXPORT,&
-!!     &                 X, SOLVER_COMM,my_rank)
+!!     &          (N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,      &
+!!     &                                 STACK_EXPORT, NOD_EXPORT, X)
 !!      subroutine  solver_send_recv_3x3                                &
-!!     &                (N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,&
-!!     &                                       STACK_EXPORT, NOD_EXPORT,&
-!!     &                 X1, X2, X3, SOLVER_COMM,my_rank)
+!!     &          (N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,      &
+!!     &                                 STACK_EXPORT, NOD_EXPORT,      &
+!!     &           X1, X2, X3)
 !!@endverbatim
 !!
 !!@n @param  N     Number of data points
@@ -36,9 +35,6 @@
 !!@n @param  X1(3*N)  1st vector field data
 !!@n @param  X2(3*N)  2nd vector field data
 !!@n @param  X3(3*N)  3rd vector field data
-!!
-!!@n @param  SOLVER_COMM      MPI communicator
-!!@n @param  my_rank          own process rank
 !
       module solver_SR_3
 !
@@ -54,12 +50,11 @@
 ! ----------------------------------------------------------------------
 !
 !C
-!C*** SOLVER_SEND_RECV
+!C*** SOLVER_SEND_RECV_3
 !C
       subroutine  SOLVER_SEND_RECV_3                                    &
-     &                ( N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT, &
-     &                                        STACK_EXPORT, NOD_EXPORT, &
-     &                  X, SOLVER_COMM,my_rank)
+     &         ( N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,        &
+     &                                 STACK_EXPORT, NOD_EXPORT, X)
 
       use calypso_mpi
       use m_solver_SR
@@ -82,12 +77,8 @@
      &        :: NOD_EXPORT
 !>       communicated result vector
       real   (kind=kreal), dimension(3*N), intent(inout):: X
-!<       communicator for mpi
-      integer                            , intent(in)   ::SOLVER_COMM
-!>       Own process
-      integer                            , intent(in)   :: my_rank
 !
-      integer (kind = kint) :: neib, istart, inum, iend, ierr, k, ii
+      integer (kind = kint) :: neib, istart, inum, iend, k, ii
 !
 !
       call resize_work_4_SR(ithree, NEIBPETOT,                          &
@@ -108,8 +99,9 @@
         enddo
         istart= 3 * STACK_EXPORT(neib-1) + 1
         inum  = 3 * ( STACK_EXPORT(neib  ) - STACK_EXPORT(neib-1) )
-        call MPI_ISEND (WS(istart), inum, MPI_DOUBLE_PRECISION,         &
-     &                  NEIBPE(neib), 0, SOLVER_COMM, req1(neib), ierr)
+        call MPI_ISEND(WS(istart), inum, CALYPSO_REAL,                  &
+     &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib),       &
+     &                 ierr_MPI)
       enddo
 
 !C
@@ -117,11 +109,12 @@
       do neib= 1, NEIBPETOT
         istart= 3 * STACK_IMPORT(neib-1) + 1
         inum  = 3 * ( STACK_IMPORT(neib  ) - STACK_IMPORT(neib-1) )
-        call MPI_IRECV (WR(istart), inum, MPI_DOUBLE_PRECISION,         &
-     &                  NEIBPE(neib), 0, SOLVER_COMM, req2(neib), ierr)
+        call MPI_IRECV(WR(istart), inum, CALYPSO_REAL,                  &
+     &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib),       &
+     &                 ierr_MPI)
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr)
+      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr_MPI)
    
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1) + 1
@@ -134,16 +127,16 @@
       enddo
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr)
+      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr_MPI)
 
       end subroutine solver_send_recv_3
 !
 !  ---------------------------------------------------------------------
 !
       subroutine  solver_send_recv_3x3                                  &
-     &                ( N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT, &
-     &                                        STACK_EXPORT, NOD_EXPORT, &
-     &                  X1, X2, X3, SOLVER_COMM,my_rank)
+     &         ( N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,        &
+     &                                 STACK_EXPORT, NOD_EXPORT,        &
+     &           X1, X2, X3)
 
       use calypso_mpi
       use m_solver_SR
@@ -160,10 +153,8 @@
       real   (kind=kreal), dimension(3*N), intent(inout):: X1
       real   (kind=kreal), dimension(3*N), intent(inout):: X2
       real   (kind=kreal), dimension(3*N), intent(inout):: X3
-      integer                            , intent(in)   ::SOLVER_COMM
-      integer                            , intent(in)   :: my_rank
 !
-      integer (kind = kint) :: neib, istart, inum, iend, ierr, k, ii
+      integer (kind = kint) :: neib, istart, inum, iend, k, ii
 !
 !
       call resize_work_4_SR(inine, NEIBPETOT,                           &
@@ -189,8 +180,9 @@
         enddo
         istart= 9 * STACK_EXPORT(neib-1) + 1
         inum  = 9 * (STACK_EXPORT(neib  ) - STACK_EXPORT(neib-1))
-        call MPI_ISEND (WS(istart), inum, MPI_DOUBLE_PRECISION,         &
-     &                  NEIBPE(neib), 0, SOLVER_COMM, req1(neib), ierr)
+        call MPI_ISEND(WS(istart), inum, CALYPSO_REAL,                  &
+     &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib),       &
+     &                 ierr_MPI)
       enddo
 
 !C
@@ -198,11 +190,12 @@
       do neib= 1, NEIBPETOT
         istart= 9 * STACK_IMPORT(neib-1) + 1
         inum  = 9 * ( STACK_IMPORT(neib  ) - STACK_IMPORT(neib-1) )
-        call MPI_IRECV (WR(istart), inum, MPI_DOUBLE_PRECISION,         &
-     &                  NEIBPE(neib), 0, SOLVER_COMM, req2(neib), ierr)
+        call MPI_IRECV(WR(istart), inum, CALYPSO_REAL,                  &
+     &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib),       &
+     &                 ierr_MPI)
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr)
+      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr_MPI)
    
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1) + 1
@@ -221,7 +214,7 @@
         enddo
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr)
+      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr_MPI)
 !
       end subroutine solver_send_recv_3x3
 !

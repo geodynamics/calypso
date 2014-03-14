@@ -13,17 +13,17 @@
 !
       use m_precision
 !
-      use m_parallel_var_dof
-      use analyzer_sph_initial_fld
+      use calypso_mpi
+      use SPH_analyzer_const_initial
 !
       implicit none
 !
 !
-      call parallel_cal_init
+      call calypso_MPI_init
 !
       call initialize_const_sph_initial
 !
-      call parallel_cal_fin
+      call calypso_MPI_finalize
 !
       stop
       end program sph_meke_initial
