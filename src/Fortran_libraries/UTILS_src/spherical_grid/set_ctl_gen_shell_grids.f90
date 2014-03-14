@@ -290,7 +290,7 @@
         stop
       end if
 !
-      if(nidx_global_rtp(2) .le. (l_truncation+1)*3/2) then
+      if(nidx_global_rtp(2) .lt. (l_truncation+1)*3/2) then
         write(*,*) 'Spherical harmonics transform has Ailiasing'
       else if (nidx_global_rtp(2) .lt. (l_truncation+1)) then
         write(*,*) "Grid has less than Nyquist's sampling theorem"
