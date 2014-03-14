@@ -117,9 +117,8 @@
 !
 ! ---------------------------------
 !
-     if(iflag_debug.gt.0) write(*,*)' read_alloc_sph_restart_data'
+     if(iflag_debug.gt.0) write(*,*)' sph_initial_spectrum'
      call read_alloc_sph_restart_data
-     istep_max_dt = i_step_init
 !
      if(iflag_debug.gt.0) write(*,*)' sph_initial_spectrum'
      call sph_initial_spectrum

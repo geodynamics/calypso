@@ -78,25 +78,25 @@
       time   =     time_init
 !
 !  Set initial velocity if velocity is exist
-!      if(ipol%i_velo .gt. izero) call  set_initial_velocity
+      if(ipol%i_velo .gt. izero) call  set_initial_velocity
 !
 !  Set initial temperature if temperature is exist
-!      if(ipol%i_temp .gt. izero) call  set_initial_temperature
+      if(ipol%i_temp .gt. izero) call  set_initial_temperature
 !
 !  Set initial composition if composition is exist
-!      if(ipol%i_light .gt. izero) call set_initial_composition
+      if(ipol%i_light .gt. izero) call set_initial_composition
 !
 !  Set initial magnetic field if magnetic field is exist
-!      if(ipol%i_magne .gt. izero) call set_initial_magne_sph
+      if(ipol%i_magne .gt. izero) call set_initial_magne_sph
 !
 !  Set heat source if  heat source is exist
       if(ipol%i_heat_source .gt. izero) then
         call set_initial_heat_source_sph
       end if
 !  Set light element source if light element is exist
-!      if(ipol%i_light_source .gt. izero) then
-!        call set_initial_light_source_sph
-!      end if
+      if(ipol%i_light_source .gt. izero) then
+        call set_initial_light_source_sph
+      end if
 !
 !  Copy initial field to restart IO data
       call set_sph_restart_num_to_IO
@@ -166,9 +166,19 @@
         end do
       end if
 !
+!    Find local addrtess for (l,m) = (3,3)
+      jj =  find_local_sph_mode_address(3, 3)
+      if (jj .gt. 0) then
+        do k = nlayer_ICB, nlayer_CMB
+          rr = radius_1d_rj_r(k)
+          inod = local_sph_data_address(k,jj)
+          xr = two * rr - one * (r_CMB+r_ICB) / shell
+          d_rj(inod,ipol%i_temp) = (one-three*xr**2+three*xr**4-xr**6)  &
+     &                            * A_temp * three / (sqrt(two*pi))
+        end do
+      end if
 !
-!    Find local addrtess for (l,m) = (4,4)
-!      jj =  find_local_sph_mode_address(4, 4)
+!    Find local addrtess for (l,m) = (5,5)
       jj =  find_local_sph_mode_address(5, 5)
 !
 !    If data for (l,m) = (4,4) is there, set initial temperature
@@ -329,12 +339,11 @@
       jj =  find_local_sph_mode_address(izero, izero)
 !
       if (jj .gt. 0) then
-        do k = 1, nlayer_ICB
+        do k = nlayer_ICB, nlayer_CMB
           ii = local_sph_data_address(k,jj)
           rr = radius_1d_rj_r(k)
 !   Substitute initial heat source
-          d_rj(ii,ipol%i_heat_source) = 0.35 * four*r_CMB**2            &
-     &                                 / (four * r_ICB**3 / three)
+          d_rj(ii,ipol%i_heat_source) = two / rr
         end do
       end if
 !
