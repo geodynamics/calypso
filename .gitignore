@@ -7,3 +7,17 @@ config.status
 
 .DS_Store
 
+CALYPSO.bbl
+
+CALYPSO.blg
+
+CALYPSO.synctex.gz
+
+CALYPSO.toc
+
+CALYPSO.out
+
+CALYPSO.log
+
+CALYPSO.aux
+
