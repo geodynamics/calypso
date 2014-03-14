@@ -1,0 +1,1151 @@
+\section{Preprocessing program ({\tt gen\_sph\_grid})}
+\label{section:gen_sph_grid}
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{images/flow_1}
+\end{center}
+\caption{Generated files by preprocessing program in Data flow.}
+\label{fig:gen_sph_grid}
+\end{figure}
+%
+This program generates index table and a communication table for parallel spherical harmonics, table of integrals for Coriolis term, and FEM mesh information to generate visualization data (see Figure \ref{fig:gen_sph_grid}). This program needs control file for input. The output files include the indexing tables. 
+
+%
+\begin{table}[htdp]
+\caption{List of files for {\tt gen\_sph\_grid} }
+\begin{center} 
+\begin{tabular}{|c|c|c|}
+\hline
+ extension & Parallelization & I/O \\ \hline \hline
+\verb|control_sph_grid| & Single & Input \\ \hline
+\verb|[sph_prefix].[domain#].rj|  & Distributed & Output \\
+\verb|[sph_prefix].[domain#].rlm| & Distributed & Output \\
+\verb|[sph_prefix].[domain#].rtm| & Distributed & Output \\
+\verb|[sph_prefix].[domain#].rtp| & Distributed & Output \\ \hline
+\verb|[sph_prefix].[domain#].gfm| & Distributed & Output \\
+\verb|radial_info.dat| & Single & Output \\ \hline
+\end{tabular}
+\end{center}
+\label{table:gen_sph_grid}
+\end{table}
+%
+
+\subsection{Position of radial grid}
+The preprocessing program sets the radial grid spacing, either by a list in the control file or by setting an equidistant grid or Chebyshev collocation points.
+
+In equidistance grid, radial grids are defined by
+%
+\begin{eqnarray}
+r(k) & = & r_{i} + \left(r_{o}-r_{i} \right) \frac{k-k_{ICB}}{N},
+\nonumber
+\end{eqnarray}
+%
+where, $k_{ICB}$ is the grid points number at ICB. The radial grid set from the closest points of minimum radius defined by \hyperref[href_i:Min_radius_ctl]{\tt [Min\_radius\_ctl]} in control file to the closest points of the maximum radius defined by \hyperref[href_i:Max_radius_ctl]{\tt [Max\_radius\_ctl]} in control file, and radial grid number for the innermost points is set to $k = 1$.
+
+In Chebyshev collocation points, radial grids in the fluid shell are defined by
+%
+\begin{eqnarray}
+r(k) & = & r_{i} + \frac{\left(r_{o}-r_{i} \right)}{2} \left[ \frac{1}{2} - \cos \left(\pi \frac{ k-k_{ICB}}{N} \right) \right],
+\nonumber
+\end{eqnarray}
+%
+For the inner core ($r<r_{i}$), grid points is defined by
+%
+\begin{eqnarray}
+r(k) & = & r_{i} - \frac{\left(r_{o}-r_{i} \right)}{2} \left[ \frac{1}{2} - \cos \left(\pi \frac{ k-k_{ICB}}{N} \right) \right],
+\nonumber
+\end{eqnarray}
+%
+and, grid points in the external of the shell ($r>r_{o}$) is defined by
+%
+\begin{eqnarray}
+r(k) & = & r_{o} + \frac{\left(r_{o}-r_{i} \right)}{2} \left[ \frac{1}{2} - \cos \left(\pi \frac{ k-k_{CMB}}{N} \right) \right],
+\nonumber
+\end{eqnarray}
+%
+where, $k_{CMB}$ is the grid point number at CMB.
+
+\subsection{Control file (\tt{control\_sph\_shell})}
+\label{section:control_sph_shell}
+Control file ({\tt control\_sph\_shell}) consists the following items. Detailed description for each item can be checked by clicking "(Detail)" at the end of each item.
+\\
+%
+\verb|spherical_shell_ctl|
+\label{href_i:spherical_shell_ctl}
+\\
+%
+\begin{itemize}
+\item \verb|data_files_def|
+	\label{href_i:data_files_def2}
+	\hyperref[href_t:data_files_def]{(Detail)}
+	\begin{itemize}
+	\item \verb|num_subdomain_ctl        [Num_PE]|
+		\hyperref[href_t:num_subdomain_ctl]{(Detail)}
+	\item \verb|sph_file_prefix          [sph_prefix]|
+    		\hyperref[href_t:sph_file_prefix]{(Detail)}
+	\end{itemize}
+%
+\item \verb|num_domain_ctl|
+	\label{href_i:num_domain_ctl}
+	\hyperref[href_t:num_domain_ctl]{(Detail)}
+	\begin{itemize}
+	\item \verb|array  num_domain_sph_grid  [Direction]  [Ndomain]|
+		\hyperref[href_t:num_domain_sph_grid]{(Detail)}
+	\item \verb|array  num_domain_legendre  [Direction]  [Ndomain]|
+	\hyperref[href_t:num_domain_legendre]{(Detail)}
+	\item \verb|array  num_domain_spectr    [Direction]  [Ndomain]|
+		\hyperref[href_t:num_domain_spectr]{(Detail)}
+	\end{itemize}
+%
+\item \verb|num_grid_sph|
+	\label{href_i:num_grid_sph}
+	\hyperref[href_t:num_grid_sph]{(Detail)}
+	\begin{itemize}
+	\item \verb|truncation_level_ctl    [Lmax]|
+		\hyperref[href_t:truncation_level_ctl]{(Detail)}
+	\item \verb|ngrid_meridonal_ctl     [Ntheta]|
+		\hyperref[href_t:ngrid_meridonal_ctl]{(Detail)}
+	\item \verb|ngrid_zonal_ctl         [Nphi]|
+		\hyperref[href_t:ngrid_zonal_ctl]{(Detail)}
+%
+	\item \verb|radial_grid_type_ctl   [explicit, Chebyshev, or equi_distance]| \label{href_i:radial_grid_type_ctl}
+		\hyperref[href_t:radial_grid_type_ctl]{(Detail)}
+%
+	\item \verb|num_fluid_grid_ctl     [Nr_shell]|
+		\hyperref[href_t:num_fluid_grid_ctl]{(Detail)}
+	\item \verb|fluid_core_size_ctl    [Length]|
+		\hyperref[href_t:fluid_core_size_ctl]{(Detail)}
+	\item \verb|ICB_to_CMB_ratio_ctl   [R_ratio]|
+		\hyperref[href_t:ICB_to_CMB_ratio_ctl]{(Detail)}
+	\item \verb|Min_radius_ctl         [Rmin]|
+		\hyperref[href_t:Min_radius_ctl]{(Detail)}    
+		\label{href_i:Min_radius_ctl}
+	\item \verb|Max_radius_ctl         [Rmax]|
+			\hyperref[href_t:Max_radius_ctl]{(Detail)}    
+		\label{href_i:Max_radius_ctl}
+%
+\\
+	\item \verb|array r_layer          [Layer #]   [Radius]|
+		\hyperref[href_t:r_layer]{(Detail)}    
+%
+	\item \verb|array boundaries_ctl   [Boundary_name]  [Layer #]|
+		\hyperref[href_t:boundaries_ctl]{(Detail)}    
+	\end{itemize}
+\end{itemize}
+
+\subsection{Spectrum index data}
+\verb|gen_sph_grid| generates indexing table of the spherical transform. To perform spherical harmonics transform with distributed memory computers, data communication table is also included in these files. Calypso needs four indexing data for the spherical transform.
+%
+\begin{description}
+\item{\verb|[sph_prefix].[domain#].rj|} Indexing table for spectrum data $f(r,l,m)$ to calculate linear terms. In program,  spherical harmonics modes $(l,m)$ is indexed by $j = l(l+1) + m$. The spectrum data are decomposed by spherical harmonics modes $j$. Data communication table for Legendre transform is included. The data also have the radial index of the ICB and CMB.
+\item{\verb|[sph_prefix].[domain#].rlm|} Indexing table for spectrum data $f(r,l,m)$ for Legendre transform. The spectrum data are decomposed by radial direction $r$ and spherical harmonics order $m$. Data communication table to caricurate liner terms is included.
+\item{\verb|[sph_prefix].[domain#].rtm|} Indexing table for data $f(r,\theta,m)$ for Legendre transform. The data are decomposed by radial direction $r$ and spherical harmonics order $m$. Data communication table for backward Fourier transform is included.
+\item{\verb|[sph_prefix].[domain#].rtp|} Indexing table for data $f(r,\theta,m)$ for Fourier transform and field data $f(r,\theta,\phi)$. The data are decomposed by radial direction $r$ and meridional direction $\theta$. Data communication table for forward Legendre transform is included.
+\end{description}
+%
+
+\subsection{Finite element mesh data}
+Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written as GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. 
+
+\subsection{Radial grid data}
+The preprocessing program generates radius of each layer in \verb|radial_info.dat| if \verb|radial_grid_type_ctl| is set to \verb|Chebyshev| or \verb|equi_distance|. This file consists of blocks \verb|array r_layer| and \verb|array boundaries_ctl| for control file. This data may be useful if you want to modify radial grid spacing by yourself.
+
+
+\newpage
+\section{Simulation program ({\tt sph\_mhd})}
+\label{section:sph_mhd}
+%
+
+The name of the simulation program is {\tt sph\_mhd}. This program requires {\tt control\_MHD} as a Control file. This program performs with the indexing file for spherical harmonics and Coriolis term integration file generated by the preprocessing program {\tt gen\_sph\_grid}.
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{images/flow_2}
+\end{center}
+\caption{Data flow for the simulation program.}
+\label{fig:flow_2}
+\end{figure}
+%
+Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing data for spherical harmonics which starting with \verb|[sph_prefix]| are obtained by the preprocessing program \verb|gen_sph_grid|. The boundary condition data file \verb|[boundary_data_name]| is optionally required if boundary conditions for temperature and composition are not homogenious.
+%
+\begin{table}[htdp]
+\caption{List of files for simulation {\tt sph\_mhd} }
+\begin{center} 
+\begin{tabular}{|c|c|c|}
+\hline
+ name & Parallelization & I/O \\ \hline \hline
+\verb|control_MHD| & Serial & Input \\ \hline
+\verb|[sph_prefix].[domain#].rj|  & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rlm| & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rtm| & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rtp| & Distributed & Input \\ \hline
+\verb|[sph_prefix].[domain#].gfm| & Distributed & Input \\ \hline
+\verb|[boundary_data_name]| & Single & Input \\ \hline
+\verb|[rst_prefix].[step#].[domain#].fst| &  Distributed & Input/Output  \\ \hline
+\verb|[vol_pwr_prefix].dat| & Single & Output \\ \hline
+\verb|[vol_pwr_prefix]_l.dat| & Single & Output \\
+\verb|[vol_pwr_prefix]_m.dat| & Single & Output \\
+\verb|[vol_pwr_prefix]_lm.dat| & Single & Output \\
+\verb|[vol_ave_prefix].dat| & Single & Output \\ \hline
+\verb|[layer_pwr_prefix]_l.dat| & Single & Output \\
+\verb|[layer_pwr_prefix]_m.dat| & Single & Output \\
+\verb|[layer_pwr_prefix]_lm.dat| & Single & Output \\ \hline
+\verb|[gauss_coef_prefix].dat| & Single & Output   \\
+\verb|[picked_sph_prefix].dat| & Single & Output   \\ \hline
+\verb|[fld_prefix].[step#].[domain#].[extension]| &  - & Output  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:sph_mhd}
+\end{table}
+%
+\newpage
+\subsection{Control file}
+The format of the control file \verb|control_MHD| is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking "(Detail)". \\
+\\
+%
+\verb|MHD_control|  (Header of the control file)
+\label{href_i:MHD_control}
+%
+\begin{itemize}
+\item \verb|data_files_def|
+	\label{href_i:data_files_def}
+	\hyperref[href_t:data_files_def]{(Detail)}
+	\begin{itemize}
+	\item \verb|num_subdomain_ctl           [Num_PE]|
+		\hyperref[href_t:num_subdomain_ctl]{(Detail)}
+	\item \verb|num_smp_ctl                 [Num_Threads]|
+		\hyperref[href_t:num_smp_ctl]{(Detail)}
+	\item \verb|sph_file_prefix             [sph_prefix]|
+    		\hyperref[href_t:sph_file_prefix]{(Detail)}
+	\item \verb|boundary_data_file_name      [boundary_data_name]|
+    		\hyperref[href_t:boundary_data_file_name]{(Detail)}
+%
+	\item \verb|restart_file_prefix         [rst_prefix]|
+    		\hyperref[href_t:restart_file_prefix]{(Detail)}
+	\item \verb|field_file_prefix           [fld_prefix]|
+    		\hyperref[href_t:field_file_prefix]{(Detail)}
+%
+	\item \verb|field_file_fmt_ctl          [fld_format]|
+    		\hyperref[href_t:field_file_fmt_ctl]{(Detail)}
+	\end{itemize}
+%
+\item \verb|model|
+	\begin{itemize}
+	\item \verb|phys_values_ctl|
+		\label{href_i:phys_values_ctl}
+    		\hyperref[href_t:phys_values_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|array nod_value_ctl       [Field]   [Viz_flag] [Monitor_flag]|
+	    		\hyperref[href_t:nod_value_ctl]{(Detail)}
+		\end{itemize}
+%
+	\item \verb|time_evolution_ctl|
+		\label{href_i:time_evolution_ctl}
+    		\hyperref[href_t:time_evolution_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|array time_evo_ctl       [Field]|
+	    		\hyperref[href_t:time_evo_ctl]{(Detail)}
+		\end{itemize}
+%
+	\item \verb|boundary_condition|
+		\label{href_i:boundary_condition}
+    		\hyperref[href_t:boundary_condition]{(Detail)}
+		\begin{itemize}
+		\item \verb|array bc_temperature       [Group]  [Type]  [Value]|
+	    		\hyperref[href_t:bc_temperature]{(Detail)}
+		\item \verb|array bc_velocity          [Group]  [Type]  [Value]|
+	    		\hyperref[href_t:bc_velocity]{(Detail)}
+		\item \verb|array bc_composition       [Group]  [Type]  [Value]|
+	    		\hyperref[href_t:bc_composition]{(Detail)}
+		\item \verb|array bc_magnetic_field    [Group]  [Type]  [Value]|
+	    		\hyperref[href_t:bc_magnetic_field]{(Detail)}
+		\end{itemize}
+%
+	\item \verb|forces_define|
+    		\label{href_i:forces_define}
+    		\hyperref[href_t:forces_define]{(Detail)}
+		\begin{itemize}
+		\item \verb|array force_ctl       [Force]|
+	    		\hyperref[href_t:force_ctl]{(Detail)}
+		\end{itemize}
+%
+	\item \verb|dimensionless_ctl|
+		\label{href_i:dimensionless_ctl}
+    		\hyperref[href_t:dimensionless_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|array dimless_ctl       [Name]  [Value]|
+	    		\hyperref[href_t:dimless_ctl]{(Detail)}
+		\end{itemize}
+%
+	\item \verb|coefficients_ctl|
+		\label{href_i:coefficients_ctl}
+    		\hyperref[href_t:coefficients_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|thermal|
+			\label{href_i:thermal}
+	    		\hyperref[href_t:thermal]{(Detail)}
+			\begin{itemize}
+			\item \verb|array coef_4_termal_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_termal_ctl]{(Detail)}
+			\item \verb|array coef_4_t_diffuse_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_t_diffuse_ctl]{(Detail)}
+			\item \verb|array coef_4_heat_source_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_heat_source_ctl]{(Detail)}
+			\end{itemize}
+%
+		\item \verb|momentum|
+			\label{href_i:momentum}
+	    		\hyperref[href_t:momentum]{(Detail)}
+			\begin{itemize}
+			\item \verb|array coef_4_velocity_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_velocity_ctl]{(Detail)}
+			\item \verb|array coef_4_press_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_press_ctl]{(Detail)}
+			\item \verb|array coef_4_v_diffuse_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_v_diffuse_ctl]{(Detail)}
+			\item \verb|array coef_4_buoyancy_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_buoyancy_ctl]{(Detail)}
+			\item \verb|array coef_4_Coriolis_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_Coriolis_ctl]{(Detail)}
+			\item \verb|array coef_4_Lorentz_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_Lorentz_ctl]{(Detail)}
+			\item \verb|array coef_4_composit_buoyancy_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_composit_buoyancy_ctl]{(Detail)}
+			\end{itemize}
+%
+		\item \verb|induction|
+			\label{href_i:induction}
+	    		\hyperref[href_t:induction]{(Detail)}
+			\begin{itemize}
+			\item \verb|array coef_4_magnetic_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_magnetic_ctl]{(Detail)}
+			\item \verb|array coef_4_m_diffuse_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_m_diffuse_ctl]{(Detail)}
+			\item \verb|array coef_4_induction_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_induction_ctl]{(Detail)}
+			\end{itemize}
+%
+		\item \verb|composition|
+			\label{href_i:composition}
+	    		\hyperref[href_t:composition]{(Detail)}
+			\begin{itemize}
+			\item \verb|array coef_4_composition_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_composition_ctl]{(Detail)}
+			\item \verb|array coef_4_c_diffuse_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_c_diffuse_ctl]{(Detail)}
+			\item \verb|array coef_4_composition_source_ctl [Name] [Power]|
+		    		\hyperref[href_t:coef_4_composition_source_ctl]{(Detail)}
+			\end{itemize}
+		\end{itemize}
+%
+%	\item \verb|gravity_define|
+% 		\label{href_i:gravity_define}
+%    		\hyperref[href_t:gravity_define]{(Detail)}
+%		\begin{itemize}
+%		\item \verb|gravity_type_ctl       [Name]|
+%	    		\hyperref[href_t:gravity_type_ctl]{(Detail)}
+%		\end{itemize}
+%
+%	\item \verb|Coriolis_define|
+%		\label{href_i:Coriolis_define}
+%    		\hyperref[href_t:Coriolis_define]{(Detail)}
+%		\begin{itemize}
+%		\item \verb|array rotation_vec       [Direction] [Value]|
+%	    		\hyperref[href_t:rotation_vec]{(Detail)}
+%		\end{itemize}
+%
+	\item \verb|temperature_define|
+		\label{href_i:temperature_define}
+    		\hyperref[href_t:temperature_define]{(Detail)}
+		\begin{itemize}
+		\item \verb|ref_temp_ctl        [REFERENCE_TEMP]|
+	    		\hyperref[href_t:ref_temp_ctl]{(Detail)}
+		\item \verb|low_temp_ctl|
+	    		\hyperref[href_t:low_temp_ctl]{(Detail)}
+			\begin{itemize}
+			\item \verb|depth             [RADIUS]|
+		    		\hyperref[href_t:depth]{(Detail)}
+			\item \verb|temperature       [TEMPERATURE]|
+		    		\hyperref[href_t:temperature]{(Detail)}
+			\end{itemize}
+%
+		\item \verb|high_temp_ctl|
+	    		\hyperref[href_t:high_temp_ctl]{(Detail)}
+			\begin{itemize}
+			\item \verb|depth             [RADIUS]|
+		    		\hyperref[href_t:depth]{(Detail)}
+			\item \verb|temperature       [TEMPERATURE]|
+		    		\hyperref[href_t:temperature]{(Detail)}
+			\end{itemize}
+%
+		\end{itemize}
+%
+	\end{itemize}
+%
+\item \verb|control|
+	\begin{itemize}
+	\item \verb|time_step_ctl|
+		\label{href_i:time_step_ctl}
+    		\hyperref[href_t:time_step_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|elapsed_time_ctl      [ELAPSED_TIME]|
+	    		\hyperref[href_t:elapsed_time_ctl]{(Detail)}
+		\item \verb|i_step_init_ctl       [ISTEP_START]|
+	    		\hyperref[href_t:i_step_init_ctl]{(Detail)}
+		\item \verb|i_step_finish_ctl     [ISTEP_FINISH]|
+	    		\hyperref[href_t:i_step_finish_ctl]{(Detail)}
+		\item \verb|i_step_check_ctl      [ISTEP_MONITOR]|
+	    		\hyperref[href_t:i_step_check_ctl]{(Detail)}
+		\item \verb|i_step_rst_ctl        [ISTEP_RESTART]|
+	    		\hyperref[href_t:i_step_rst_ctl]{(Detail)}
+		\item \verb|i_step_field_ctl      [ISTEP_FIELD]|
+	    		\hyperref[href_t:i_step_field_ctl]{(Detail)}
+		\item \verb|dt_ctl                [DELTA_TIME]|
+	    		\hyperref[href_t:dt_ctl]{(Detail)}
+		\item \verb|time_init_ctl         [INITIAL_TIME]|
+	    		\hyperref[href_t:time_init_ctl]{(Detail)}
+		\end{itemize}
+%
+	\item \verb|restart_file_ctl|
+		\label{href_i:restart_file_ctl}
+    		\hyperref[href_t:restart_file_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|rst_ctl      [INITIAL_TYPE]|
+	    		\hyperref[href_t:rst_ctl]{(Detail)}
+		\end{itemize}
+%
+	\item \verb|time_loop_ctl|
+		\label{href_i:time_loop_ctl}
+    		\hyperref[href_t:time_loop_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|scheme_ctl              [EVOLUTION_SCHEME]|
+	    		\hyperref[href_t:scheme_ctl]{(Detail)}
+		\item \verb|coef_imp_v_ctl          [COEF_INP_U]|
+	    		\hyperref[href_t:coef_imp_v_ctl]{(Detail)}
+		\item \verb|coef_imp_t_ctl          [COEF_INP_T]|
+	    		\hyperref[href_t:coef_imp_t_ctl]{(Detail)}
+		\item \verb|coef_imp_b_ctl          [COEF_INP_B]|
+	    		\hyperref[href_t:coef_imp_b_ctl]{(Detail)}
+		\item \verb|coef_imp_c_ctl          [COEF_INP_C]|
+	    		\hyperref[href_t:coef_imp_c_ctl]{(Detail)}
+		\item \verb|FFT_library_ctl         [FFT_Name]|
+	    		\hyperref[href_t:FFT_library_ctl]{(Detail)}
+		\item \verb|Legendre_trans_loop_ctl [Leg_Loop]|
+	    		\hyperref[href_t:Legendre_trans_loop_ctl]{(Detail)}
+		\end{itemize}
+%
+	\end{itemize}
+%
+\item \verb|sph_monitor_ctl|
+	\label{href_i:sph_monitor_ctl}
+	\hyperref[href_t:sph_monitor_ctl]{(Detail)}
+	\begin{itemize}
+	\item \verb|volume_average_prefix             [vol_ave_prefix]|
+    		\hyperref[href_t:volume_average_prefix]{(Detail)}
+	\item \verb|volume_pwr_spectr_prefix          [vol_pwr_prefix]|
+    		\hyperref[href_t:volume_pwr_spectr_prefix]{(Detail)}
+	\item \verb|layered_pwr_spectr_prefix         [layer_pwr_prefix]| \\
+    		\hyperref[href_t:layered_pwr_spectr_prefix]{(Detail)}
+	\item \verb|picked_sph_prefix                 [picked_sph_prefix]| \\
+    		\hyperref[href_t:picked_sph_prefix]{(Detail)}
+	\item \verb|gauss_coefs_prefix                [gauss_coef_prefix]| \\
+    		\hyperref[href_t:gauss_coefs_prefix]{(Detail)}
+	\item \verb|gauss_coefs_radius_ctl            [gauss_coef_radius]| \\
+    		\hyperref[href_t:gauss_coefs_radius_ctl]{(Detail)}
+	\item \verb|array pick_layer_ctl              [Layer #]|
+    		\hyperref[href_t:pick_layer_ctl]{(Detail)}
+	\item \verb|array pick_sph_spectr_ctl         [Degree]  [Order]| \\
+    		\hyperref[href_t:pick_sph_spectr_ctl]{(Detail)}
+	\item \verb|array pick_sph_degree_ctl         [Degree]|
+    		\hyperref[href_t:pick_sph_degree_ctl]{(Detail)}
+	\item \verb|array pick_sph_order_ctl          [Order]|
+    		\hyperref[href_t:pick_sph_order_ctl]{(Detail)}
+	\item \verb|array pick_gauss_coefs_ctl        [Degree]   [Order]| \\
+    		\hyperref[href_t:pick_gauss_coefs_ctl]{(Detail)}
+	\item \verb|array pick_gauss_coef_degree_ctl  [Degree]|
+    		\hyperref[href_t:pick_gauss_coef_degree_ctl]{(Detail)}
+	\item \verb|array pick_gauss_coef_order_ctl   [Order]|
+    		\hyperref[href_t:pick_gauss_coef_order_ctl]{(Detail)}
+%
+	\item \verb|nphi_mid_eq_ctl   [Nphi_mid_equator]|
+		\label{href_i:nphi_mid_eq_ctl}
+    		\hyperref[href_t:nphi_mid_eq_ctl]{(Detail)}
+%
+	\end{itemize}
+\end{itemize}
+%
+\subsection{Spectrum data for restarting}
+Spectrum data is used for restarting data and generating field data by Data transform program \verb|sph_snapshot|, \verb|sph_zm_snapshot|, or \verb|sph_dynamobench|. This file is saved for each subdomain (MPI processes), then \verb|[step #]| and \verb|[domain #]| are added in the file name. The \verb|[step #]| is calculated by \verb|time step| / \verb|[ISTEP_RESTART]|.
+
+\subsection{Thermal and compositional boundary condition data file}\label{sec:boundary_file}
+Thermal and compositional heterogeneity at boundaries are defined by a external file named  \verb|[boundary_data_name]|. In this file, temperature, composition, heat flux, or compositional flux at ICB or CMB can be defined by spherical harmonics coefficients. To use boundary conditions in \verb|[boundary_data_name]|, file name is defined by \verb|boundary_data_file_name| column in control file, and boundary condition type \verb|[type]| is set to \verb|fixed_file| or \verb|fixed_flux_file| in \verb|bc_temperature| or \verb|bc_composition| column. By setting \verb|fixed_file| or \verb|fixed_flux_file| in control file, boundary conditions are copied from the file \verb|[boundary_data_name]|.
+
+An example of the boundary condition file is shown in Figure \ref{fig:boundary_file}. As for the control file, a line starting from '\verb|#|' or '\verb|!|' is recognized as a comment line. In \verb|[boundary_data_name]|, boundary condition data is defined as following:
+%
+\begin{enumerate}
+\item  Number of total boundary conditions to be defined in this file.
+\item  Field name to define the first boundary condition
+\item  Place to define the first boundary condition (\verb|ICB| or \verb|CMB|)
+\item  Number of spherical harmonics modes for each boundary condition
+\item  Spectrum data for the boundary conditions (degree $l$, order $m$, and harmonics coefficients)
+\item  After finishing the list of spectrum data return to Step 2 for the next boundary condition
+\end{enumerate}
+%
+If harmonics coefficients of the boundary conditions are not listed in item 5, 0.0 is automatically applied for the harmonics coefficients of the boundary conditions. So, only non-zero components need to be listed in the boundary condition file.
+
+%
+\begin{figure}[htbp]
+\begin{center}
+\begin{verbatim}
+#
+#  number of boundary conditions
+      4
+#
+#   boundary condition data list
+#
+#    Fixed temperature at ICB
+temperature
+ICB
+    3
+  0  0   1.0E+00
+  1  1   2.0E-01
+  2  2   3.0E-01
+#
+#    Fixed heat flux at CMB
+heat_flux
+CMB
+   2
+  0  0    -0.9E+0
+  1  -1    5.0E-1
+#
+#    Fixed composition flux at ICB
+composite_flux
+ICB
+   2
+  0  0    0.0E+00
+  2  0   -2.5E-01
+#
+#    Fixed composition at CMB
+composition
+CMB
+   2
+  0   0   1.0E+00
+  2  -2   5.0E-01
+\end{verbatim}
+\end{center}
+\caption{An example of boundary condition file.}
+\label{fig:boundary_file}
+\end{figure}
+%
+
+
+\subsection{Field data for visualization}
+\label{sec:VTK}
+ Field data is used for the visualization processes.  Field data are written with XDMF format (\url{http://www.xdmf.org/index.php/Main_Page}), merged VTK, or distributed VTK format (\url{http://www.vtk.org/VTK/img/file-formats.pdf}). The output data format is defined by \verb|fld_format|. Visualization applications which we checked are listed in Table \ref{table:Viz_app}. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, coordinate conversion is required to plot vector field in spherical coordinate $(r, \theta, \phi)$ or cylindrical coordinate $(s,\phi, z)$. We will introduce a example of visualization process using ParaView in Section \ref{sec:paraview}.
+%
+%
+\begin{table}[htdp]
+\caption{Checked visualization application}
+\label{table:Viz_app}
+\begin{center} 
+\begin{tabular}{|c|c|}
+\hline
+ Format & Application  \\ \hline \hline
+Distributed VTK & ParaView (\url{http://www.paraview.org})  \\ \hline
+Merged VTK & ParaView, VisIt (\url{https://wci.llnl.gov/codes/visit/}) \\
+ & Mayavi (\url{http://mayavi.sourceforge.net/}) \\ \hline
+XDMF   & ParaView, VisIt   \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+%
+
+\subsubsection{Distributed VTK data}
+Distributed VTK data have the following advantage and disadvantages to use:
+%
+\begin{itemize}
+\item Advantage
+\begin{itemize} 
+\item Faster output
+\item No external library is required
+\end{itemize}
+\item Disadvantage
+\begin{itemize} 
+\item Many data files are generated
+\item Total data file size is large
+\item Only ParaView supports this format
+\end{itemize}
+\end{itemize}
+%
+Distributed VTK data consist files listed in Table \ref{table:parallel_vtk}. For ParaView, all subdomain data is read by choosing \verb|[fld_prefix].[step#].pvtk| in file menu.
+%
+\begin{table}[htdp]
+\caption{List of written files for distributed VTK format}
+\begin{center} 
+\begin{tabular}{|c|c|}
+\hline
+ name &  \\ \hline \hline
+\verb|[fld_prefix].[step#].[domain#].vtk|  & VTK data for each subdomain  \\ \hline
+\verb|[fld_prefix].[step#].pvtk| & Subdomain file list for Paraview  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:parallel_vtk}
+\end{table}
+%
+
+\subsubsection{Merged VTK data}
+Merged VTK data have the following advantage and disadvantages to use:
+%
+\begin{itemize}
+\item Advantage
+\begin{itemize} 
+\item Merged field data is generated
+\item No external library is required
+\item Many applications support VTK format
+\end{itemize}
+\item Disadvantage
+\begin{itemize} 
+\item Very slow to output
+\item Total data file size is large
+\end{itemize}
+\end{itemize}
+%
+Merged VTK data generate files listed in Table \ref{table:Merged_vtk}. 
+%
+\begin{table}[htdp]
+\caption{List of written files for merged VTK format}
+\begin{center} 
+\begin{tabular}{|c|c|}
+\hline
+ name &  \\ \hline \hline
+\verb|[fld_prefix].[step#].vtk|  & Merged VTK data  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:Merged_vtk}
+\end{table}
+%
+
+\subsubsection{Merged XDMF data}
+Merged XDMF data have the following advantage and disadvantages to use:
+%
+\begin{itemize}
+\item Advantage
+\begin{itemize} 
+\item Fastest output
+\item Merged field data is generated
+\item File size is smaller than the VTK formats
+\end{itemize}
+\item Disadvantage
+\begin{itemize} 
+\item Parallel HDF5 library should be required to use
+\end{itemize}
+\end{itemize}
+%
+Merged XDMF data generate files listed in Table \ref{table:XDMF}. For ParaView, all subdomain data is read by choosing \verb|[fld_prefix].solution.xdmf| in file menu.
+%
+\begin{table}[htdp]
+\caption{List of written files for XDMF format}
+\begin{center} 
+\begin{tabular}{|c|c|}
+\hline
+ name &  \\ \hline \hline
+\verb|[fld_prefix].mesh.h5|  & HDF5 file for geometry data \\ \hline
+\verb|[fld_prefix].[step#].h5|  &HDF5 file for field data   \\ \hline
+\verb|[fld_prefix].solution.xdmf|  & HDF5 file lists to be read  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:XDMF}
+\end{table}
+%
+
+
+\subsection{Mean square amplitude data}
+This program output mean square amplitude of the fields which is marked as \verb|Monitor_ON| over the fluid shell at every \verb|[increment_monitor]| steps. For vector fields, For the velocity $\bvec{u}$ and magnetic field $\bvec{B}$, the kinetic energy $1/2 u^{2}$ and magnetic energy $1/2 B^{2}$ are calculated instead of mean square amplitude. Labels on the first lines indicate following data. The data file have the following headers in the first 7 lines, and headers of the data and data are stored in the following lines. The header in the first 7 lines is the following. If these mean square amplitude data files exist before starting the simulation, programs append results at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the existed data files to another directory before starting the programs.
+%
+\begin{description}
+\item{\tt  line 2: } Number of radial grid and truncation level
+\item{\tt  line 4: } radial layer ID for ICB and CMB
+\item{\tt  line 6: } Number of field of data, total number of components
+\item{\tt  line 7: } Number of components for each field
+\end{description}
+%
+Labels for data indicates as
+%
+\begin{description}
+\item{\tt  t\_step}  Time setp number
+\item{\tt  time}   Time
+\item{\tt  K\_ene\_pol}  Amplitude of poloidal kinetic energy
+\item{\tt  K\_ene\_tor}  Amplitude of toroidal kinetic energy
+\item{\tt  K\_ene}       Amplitude of total kinetic energy
+\item{\tt  M\_ene\_pol}  Amplitude of poloidal magnetic energy
+\item{\tt  M\_ene\_tor}  Amplitude of toroidal magnetic energy
+\item{\tt  M\_ene}       Amplitude of total magnetic energy
+\item{\tt  [Field]\_pol} Mean square amplitude of poloidal component of {\tt [Field]}
+\item{\tt  [Field]\_tor} Mean square amplitude of toroidal component of {\tt [Field]}
+\item{\tt  [Field]}      Mean square amplitude of {\tt [Field]}
+\end{description}
+%
+\subsubsection{Volume average data}
+Volume average data are written by defining {\tt volume\_average\_prefix} in control file. Volume average data are written in \verb|[vol_ave_prefix].dat| with same format as RMS amplitude data. If you need the sphere average data for specific radial point, you can use picked spectrum data for $l = m = 0$ at specific radius.
+
+\subsubsection{Volume spectrum data}
+Volume spectrum data are written by defining {\tt volume\_pwr\_spectr\_prefix} in control file. By defining {\tt volume\_pwr\_spectr\_prefix}, following spectrum data averaged over the fluid shell is written. Data format is the same as the volume mean square data, but degree $l$, order $m$, or meridional wave number $l-m$ is added in the list of data. \\
+%
+\begin{description}
+\item{\tt [vol\_pwr\_prefix\_l.dat}  Volume average of mean square amplitude of the fields as a function of spherical harmonic degree $l$. For scalar field, the spectrum is
+%
+\begin{eqnarray}
+f_{sq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left({f_{l}^{m}} \right)^{2} dV.
+\nonumber
+\end{eqnarray}
+%
+For vector field, spectrum for the poloidal and toroidal components are written by 
+%
+\begin{eqnarray}
+B_{Ssq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left(\bvec{B}_{Sl}^{\ m} \right)^{2} dV,
+\nonumber \\
+B_{Tsq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left(\bvec{B}_{Tl}^{\ m} \right)^{2} dV.
+\end{eqnarray}
+%
+If the vector field $\bvec{F}$ is not solenoidal (i.e. $\nabla \times \bvec{F} \neq 0$), The poloidal component of mean square data are included mean square field of the potential components as
+%
+\begin{eqnarray}
+F_{Ssq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left[\left(\bvec{B}_{Sl}^{\ m} \right)^{2}
+ + \left(-\nabla \phi_{Fl}^{\ m} \right)^{2} \right] dV.
+\nonumber \\
+\end{eqnarray}
+%
+
+\item{\tt [vol\_pwr\_prefix]\_m.dat} Volume average of mean square amplitude of the fields as a function of spherical harmonic order $m$. The zonal wave number is referred in this spectrum data. For scalar field, the spectrum is
+\begin{eqnarray}
+f_{sq}(m) &=& \frac{1}{V} \sum_{l=0}^{l=m} \int \left[ \left(f_{l}^{m} \right)^{2}
+ + \left( f_{l}^{-m} \right)^{2} \right] dV.
+\nonumber
+\end{eqnarray}
+For vector field, spectrum for the poloidal and toroidal components are written by 
+\begin{eqnarray}
+B_{Ssq}(m) &=& \frac{1}{V} \sum_{l=0}^{l=m} \int \left[\left(\bvec{B}_{Sl}^{\ m} \right)^{2} 
+ + \left(\bvec{B}_{Sl}^{\ -m} \right)^{2}  \right] dV,
+\nonumber \\
+B_{Tsq}(m) &=& \frac{1}{V} \sum_{l=0}^{l=m} \int \left[\left(\bvec{B}_{Tl}^{\ m} \right)^{2} 
+ + \left(\bvec{B}_{Tl}^{\ -m} \right)^{2}  \right] dV.
+\nonumber
+\end{eqnarray}
+
+\item{\tt [vol\_pwr\_prefix]\_lm.dat} Volume average of mean square amplitude of the fields as a function of spherical harmonic order $n = l-m$. The wave number in the latitude direction is referred in this spectrum data. For scalar field, the spectrum is
+\begin{eqnarray}
+f_{sq}(n) &=& \frac{1}{V} \sum_{l=n}^{l=l-n} \int \left[ \left(f_{l}^{l-n}\right)^{2} + \left(f_{l}^{-l+n}\right)^2 \right] dV.
+\nonumber
+\end{eqnarray}
+For vector field, spectrum for the poloidal and toroidal components are written by 
+\begin{eqnarray}
+B_{Ssq}(n) &=& \frac{1}{V} \sum_{l=n}^{l=l-n} \int  \left[\left(\bvec{B}_{Sl}^{\ l-n} \right)^{2} 
+ + \left(\bvec{B}_{Sl}^{\ -l+n} \right)^{2}  \right]  dV,
+\nonumber \\
+B_{Tsq}(n) &=& \frac{1}{V} \sum_{l=n}^{l=l-n} \int \left[\left(\bvec{B}_{Tl}^{\ l-n} \right)^{2} 
+ + \left(\bvec{B}_{Tl}^{\ -l+n} \right)^{2}  \right] dV.
+\nonumber
+\end{eqnarray}
+
+\end{description}
+%
+
+\subsubsection{layered spectrum data}
+Spectrum data for the each radial position are written by defining {\tt volume\_pwr\_spectr\_prefix} in control file. By defining {\tt layered\_pwr\_spectr\_prefix}, following spectrum data averaged over the fluid shell is written. Data format is the same as the volume spectrum data, but radial grid point and radius of the layer is added in the list. The following files are generated.
+%
+\begin{description}
+\item{\tt [layer\_pwr\_prefix]\_l.dat} Surface average of mean square amplitude of the fields as a function of spherical harmonic degree $l$ and radial grid id $k$. For scalar field, the spectrum is
+\begin{eqnarray}
+f_{sq}(k,l) &=& \frac{1}{S} \sum_{m=-l}^{m=l} \int \left({f_{l}^{m}} \right)^{2} dS.
+\nonumber
+\end{eqnarray}
+For vector field, spectrum for the poloidal and toroidal components are written by 
+\begin{eqnarray}
+B_{Ssq}(k,l) &=& \frac{1}{S} \sum_{m=-l}^{m=l} \int \left(\bvec{B}_{Sl}^{\ m} \right)^{2} dS,
+\nonumber \\
+B_{Tsq}(k,l) &=& \frac{1}{S} \sum_{m=-l}^{m=l} \int \left(\bvec{B}_{Tl}^{\ m} \right)^{2} dS.
+\nonumber
+\end{eqnarray}
+
+\item{\tt [layer\_pwr\_prefix]\_m.dat} Surace average of mean square amplitude of the fields as a function of spherical harmonic order $m$ and radial grid id $k$. The zonal wave number is referred in this spectrum data. For scalar field, the spectrum is
+\begin{eqnarray}
+f_{sq}(k,m) &=& \frac{1}{S} \sum_{l=m}^{l=L} \int \left[ \left(f_{l}^{m} \right)^{2}
+ + \left( f_{l}^{-m} \right)^{2} \right] dS.
+\nonumber
+\end{eqnarray}
+For vector field, spectrum for the poloidal and toroidal components are written by 
+\begin{eqnarray}
+B_{Ssq}(k,m) &=& \frac{1}{S} \sum_{l=m}^{l=L} \int \left[\left(\bvec{B}_{Sl}^{\ m} \right)^{2} 
+ + \left(\bvec{B}_{Sl}^{\ -m} \right)^{2}  \right] dS,
+\nonumber \\
+B_{Tsq}(k,m) &=& \frac{1}{S} \sum_{l=m}^{l=L} \int \left[\left(\bvec{B}_{Tl}^{\ m} \right)^{2} 
+ + \left(\bvec{B}_{Tl}^{\ -m} \right)^{2}  \right] dS.
+\nonumber
+\end{eqnarray}
+
+\item{\tt [layer\_pwr\_prefix]\_lm.dat} Surface average of mean square amplitude of the fields as a function of spherical harmonic order $n = l-m$ and radial grid id $k$. The wave number in the latitude direction is referred in this spectrum data. For scalar field, the spectrum is
+\begin{eqnarray}
+f_{sq}(k,n) &=& \frac{1}{S} \sum_{l=n}^{l=L} \int \left[ \left(f_{l}^{l-n}\right)^{2} + \left(f_{l}^{-l+n}\right)^2 \right] dS.
+\nonumber
+\end{eqnarray}
+For vector field, spectrum for the poloidal and toroidal components are written by 
+\begin{eqnarray}
+B_{Ssq}(k,n) &=& \frac{1}{S} \sum_{l=n}^{l=L} \int  \left[\left(\bvec{B}_{Sl}^{\ l-n} \right)^{2} 
+ + \left(\bvec{B}_{Sl}^{\ -l+n} \right)^{2}  \right] dS,
+\nonumber \\
+B_{Tsq}(k,n) &=& \frac{1}{S} \sum_{l=n}^{l=L} \int \left[\left(\bvec{B}_{Tl}^{\ l-n} \right)^{2} 
+ + \left(\bvec{B}_{Tl}^{\ -l+n} \right)^{2}  \right] dS.
+\nonumber
+\end{eqnarray}
+
+\end{description}
+%
+
+\subsection{Gauss coefficient data {\tt [gauss\_coef\_prefix].dat}}
+This program output selected Gauss coefficients of the magnetic field. Gauss coefficients is evaluated for radius defined by \verb|[gauss_coef_radius]| every \verb|[increment_monitor]| steps. Gauss coefficients are evaluated by using poloidal magnetic field at CMB $B_{Sl}^{\ m}(r_{o})$ and radius defined by \verb|[gauss_coef_radius]| $r_{e}$ as
+%
+\begin{eqnarray}
+g_{l}^{m} &=& \frac{l}{r_{e}^2} \left(\frac{r_{o}}{r_{e}}\right)^{l} B_{Sl}^{\ m}(r_{o}),
+\nonumber \\
+h_{l}^{m} &=& \frac{l}{r_{e}^2} \left(\frac{r_{o}}{r_{e}}\right)^{l} B_{Sl}^{\ -m}(r_{o}).
+\nonumber
+\end{eqnarray}
+%
+The data file has the following headers in the first three lines,
+%
+\begin{description}
+\item{\tt  line 2: } Number of saved Gauss coefficients and reference radius.
+\item{\tt  line 3: } Labels of Gauss coefficients data.
+\end{description}
+%
+The data consists of time step, time, and Gauss coefficients for each step in one line. If the Gauss coefficients data file exist before starting the simulation, programs append Gauss coefficients at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old Gauss coefficients file to another directory before starting the programs.
+
+\subsection{Spectrum monitor data {\tt [picked\_sph\_prefix].dat}}
+This program output spectrum data at specified spherical harmonics modes and radial points in single text file. Spectrum data marked \verb|[Monitor_On]| are written in our line for each spherical harmonics mode and radial point every \verb|[increment_monitor]| steps. If the spectrum monitor data file exist before starting the simulation, programs append spectrum data at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old spectrum monitor file to another directory before starting the programs.
+
+
+\newpage
+\section{Data transform program ({\tt sph\_snapshot} and {\tt sph\_zm\_snapshot})}
+\label{section:assemble_sph}
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{images/flow_3}
+\end{center}
+\caption{Data flow for data transform program.}
+\label{fig:flow_3}
+\end{figure}
+%
+Simulation program outputs spectrum data as a whole field data. This program generates field data from spectrum data for visualization. This program also can pick Gauss coefficients, mean square data over sphere or each surface from spectrum data as the simulation program.
+
+\begin{table}[htdp]
+\caption{List of files for simulation {\tt sph\_snap} and {\tt sph\_zm\_snap} }
+\begin{center} 
+\begin{tabular}{|c|c|c|}
+\hline
+ name & Parallelization & I/O \\ \hline \hline
+\verb|control_snapshot| & Serial & Input \\ \hline
+\verb|[sph_prefix].[domain#].rj|  & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rlm| & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rtm| & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rtp| & Distributed & Input \\ \hline
+\verb|[sph_prefix].[domain#].gfm| & Distributed & Input \\ \hline
+\verb|[boundary_data_name]| & Single & Input \\ \hline
+\verb|[rst_prefix].[step#].[domain#].fst| &  Distributed & Input  \\ \hline
+\verb|[vol_pwr_prefix].dat| & Single & Output \\ \hline
+\verb|[vol_pwr_prefix]_l.dat| & Single & Output \\
+\verb|[vol_pwr_prefix]_m.dat| & Single & Output \\
+\verb|[vol_pwr_prefix]_lm.dat| & Single & Output \\
+\verb|[vol_ave_prefix].dat| & Single & Output \\ \hline
+\verb|[layer_pwr_prefix]_l.dat| & Single & Output \\
+\verb|[layer_pwr_prefix]_m.dat| & Single & Output \\
+\verb|[layer_pwr_prefix]_lm.dat| & Single & Output \\ \hline
+\verb|[gauss_coef_prefix].dat| & Single & Output   \\
+\verb|[picked_sph_prefix].dat| & Single & Output   \\ \hline
+\verb|[fld_prefix].[step#].[domain#].[extension]| &  - & Output  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:sph_snap}
+\end{table}
+%
+This program requires control file \verb|control_snapshot|. File format of the control file is same as the control field for simulation \hyperref[href_i:MHD_control]{\tt control\_MHD}.
+
+The same files as the simulation program are read in this program, and field data are generated from the snapshots of spectrum data. The monitoring data for snapshots can also be generated. \verb|[step #]| is added in the file name, and the \verb|[step #]| is calculated by \verb|time step| / \verb|[ISTEP_FIELD]|.
+
+\newpage
+\section{Initial field generation program \\
+({\tt sph\_initial\_field})}
+\label{sec:sph_initial_field}
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{images/flow_ini}
+\end{center}
+\caption{Data flow for initial field generation program.}
+\label{fig:flow_ini}
+\end{figure}
+%
+ The initial fields for dynamo benchmark can set in the simulation program by setting \verb|[INITIAL_TYPE]| flag. This program is used to generate initial field by user.  The heat source $q_{T}$ and light element source $q_{C}$ are also defined by this program because $q_{T}$ and $q_{C}$ are defined as scalar fields.  The module to define initial field \verb|const_sph_initial_spectr.f90| is saved in \verb|src/programs/data_utilities/INITIAL_FIELD/| directory,  and please compile again after modifying this module. This program also needs the files listed in Table \ref{table:inital_fld}.
+%
+\begin{table}[htdp]
+\caption{List of files for simulation {\tt sph\_initial\_field} }
+\begin{center} 
+\begin{tabular}{|c|c|c|}
+\hline
+ name & Parallelization & I/O \\ \hline \hline
+\verb|control_MHD| & Serial & Input \\ \hline
+\verb|[sph_prefix].[domain#].rj|  & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rlm| & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rtm| & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rtp| & Distributed & Input \\ \hline
+\verb|[rst_prefix].0.[domain#].fst| &  Distributed & Input/Output  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:inital_fld}
+\end{table}
+%
+This program generates the spectrum data files \verb|[rst_prefix].0.[domain#].fst|. To use generated initial data file, please set 
+ \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}} to be 0 and \hyperref[href_t:restart_file_ctl]{{\tt [INITIAL\_TYPE]}} to be \hyperref[href_t:restart_file_ctl]{{\tt start\_from\_rst\_file}}.
+
+\newpage
+\section{Initial field modification program \\
+({\tt sph\_add\_initial\_field})}
+\label{sec:ad_initial_field}
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{images/flow_ini}
+\end{center}
+\caption{Data flow for initial field modification program.}
+\label{fig:flow_add_ini}
+\end{figure}
+%
+{\bf Caution: This program overwrites existing initial field data. Please run it after taking a backup.} \\
+
+ This program modifies or adds new data to an initial field file. It could be used to start a new geodynamo simulation by adding seed magnetic field or source terms to a non-magnetic convection simulation. The initial fields to be added are also defined in \verb|const_sph_initial_spectr.f90|. \verb|data_utilities/INITIAL_FIELD/| directory. This program also needs the files listed in Table \ref{table:inital_fld}.
+%
+\begin{table}[htdp]
+\caption{List of files for simulation {\tt sph\_add\_initial\_field} }
+\begin{center} 
+\begin{tabular}{|c|c|c|}
+\hline
+ name & Parallelization & I/O \\ \hline \hline
+\verb|control_MHD| & Serial & Input \\ \hline
+\verb|[sph_prefix].[domain#].rj|  & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rlm| & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rtm| & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rtp| & Distributed & Input \\ \hline
+\verb|[rst_prefix].[step #].[domain#].fst| &  Distributed & Input/Output  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:inital_fld}
+\end{table}
+%
+This program generates the spectrum data files \verb|[rst_prefix].[step#].[domain#].fst|. To use generated initial data file, set 
+ \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}} and \verb|[ISTEP_RESTART]| to be appropriate time step and increment, respectively.
+To read the original initial field data, \hyperref[href_t:restart_file_ctl]{{\tt [INITIAL\_TYPE]}} is set to be \hyperref[href_t:restart_file_ctl]{{\tt start\_from\_rst\_file}} in \verb|control_MHD|. In other words, the \verb|[step #]| in the file name, \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}}, and \verb|[ISTEP_RESTART]| in the control file should be the consistent.
+
+
+\section{Check program for dynamo benchmark \\
+({\tt sph\_dynamobench})}
+This program is only used to check solution for dynamo benchmark by Christensen {\it et. al}. The following files are used for this program.
+
+\begin{table}[htdp]
+\caption{List of files for dynamo benchmark check {\tt sph\_dynamobench} }
+\begin{center} 
+\begin{tabular}{|c|c|c|}
+\hline
+ name & Parallelization & I/O \\ \hline \hline
+\verb|control_snapshot| & Serial & Input \\ \hline
+\verb|[sph_prefix].[domain#].rj|  & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rlm| & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rtm| & Distributed & Input \\
+\verb|[sph_prefix].[domain#].rtp| & Distributed & Input \\ \hline
+\verb|[rst_prefix].[step#].[domain#].fst| &  Distributed & Input  \\ \hline
+\verb|dynamobench.dat| & Single & Output \\ \hline
+\end{tabular}
+\end{center}
+\label{table:sph_dynamobench}
+\end{table}
+
+\subsection{Dynamo benchmark data {\tt dynamobench.dat}}
+ In benchmark test by Christensen {\it et. al.}, both global values and local values are checked. As global results, Kinetic energy $1/V \int \frac{1}{2} u^{2} dV$ in the fluid shell, magnetic energy in the fluid shell $1/V 1/(E Pm) \int \frac{1}{2} B^{2} dV$ (for case 1 and 2), and magnetic energy in the solid inner sphere $1/V_{i} 1/(E Pm) \int \frac{1}{2} B^{2} dV_{i}$ (for case 2 only). Benchmark also requests 
+ By increasing number of grid point at mid-dpeth of the fluid shell in the equatorial plane by \hyperref[href_t:nphi_mid_eq_ctl]{{\tt nphi\_mid\_eq\_ctl}}, program can find accurate solution for the point where $u_{r} = 0$ and $\partial u_{r} / \partial \phi > 0$. Angular frequency of the field pattern with respect to the $\phi$ direction is also required. The benchmark test also requires temperature and $\theta$ component of velocity. In the text file {\tt dynamobench.dat}, the following data are written in one line for every {\tt i\_step\_check\_ctl} step.
+%
+\begin{description}
+\item{\tt t\_step:  }  Time step number
+\item{\tt time:     }  Time
+\item{\tt KE\_pol:   }  Poloidal kinetic energy
+\item{\tt KE\_tor:   }  Toroidal kinetic energy
+\item{\tt KE\_total: }  Total kinetic energy
+\item{\tt ME\_pol:   }  Poloidal magnetic energy  (Case 1 and 2)
+\item{\tt ME\_tor:   }  Toroidal magnetic energy  (Case 1 and 2)
+\item{\tt ME\_total: }  Total magnetic energy  (Case 1 and 2)
+\item{\tt ME\_pol\_ic:      }  Poloidal magnetic energy in inner core  (Case 2)
+\item{\tt ME\_tor\_icore:   }  Toroidal magnetic energy in inner core (Case 2)
+\item{\tt ME\_total\_icore: }  Total magnetic energy in inner core (Case 2)
+\item{\tt omega\_ic\_z: } Angular velocity of inner core rotation (Case 2)
+\item{\tt MAG\_torque\_ic\_z: }  Magnetic torque integrated over the inner core (Case 2)
+\item{\tt phi\_1...4: } Longitude where $u_{r} = 0$ and $\partial u_{r} / \partial \phi > 0$ at mid-depth in equatorial plane.
+\item{\tt omega\_vp44:} Drift frequency evaluated by $V_{S4}^{\ 4}$ component
+\item{\tt omega\_vt54:} Drift frequency evaluated by $V_{T5}^{\ 4}$ component
+\item{\tt B\_theta: } $\Theta$ component of magnetic field at requested point.
+\item{\tt v\_phi: } $\phi$ component of velocity at requested point.
+\item{\tt temp: } Temperature at requested point.
+
+
+\end{description}
+
+{\small 
+\begin{verbatim}
+
+t_step    time    KE_pol    KE_tor    KE_total    ME_pol    ME_tor    ME_total  
+  ME_pol_icore    ME_tor_icore    ME_total_icore    omega_ic_z    MAG_torque_ic_
+z    phi_1    phi_2    phi_3    phi_4    omega_vp44    omega_vt54    B_theta    
+v_phi    temp
+     20000   9.999999999998981E-001   1.534059732073072E+001   2.431439471284618
+E+001   3.965499203357688E+001   2.405694011955009E+000   1.648662987055900E+000
+   4.054356999010911E+000   3.908687924452961E+001   4.812865754441352E-001   3.
+956816581997376E+001   5.220517005592486E+000  -2.321885847438682E+002   3.59417
+5626663308E-001   1.930213889461227E+000   3.501010216256124E+000   5.0718065430
+51021E+000   7.808553595635292E-001  -1.649583441437563E-001  -5.136522824340612
+E+000  -8.047915942925034E+000   3.752181234262930E-001
+...
+\end{verbatim}
+}
+ 
+\section{Data assemble program ({\tt assemble\_sph})}
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{images/flow_4}
+\end{center}
+\caption{Data flow for spectrum data assemble program}
+\label{fig:flow_4}
+\end{figure}
+%
+Calypso uses distributed data files for simulations. This program is to generate new spectrum data for restarting with different spatial resolution or parallel configuration. This program organizes new spectral data by using specter indexing data using different domain decomposition. The following files used for data IO. If radial resolution is changed from the original data, the program makes new spectrum data by linear interpolation. If new data have smaller or larger truncation degree, the program fills zero to the new spectrum data or truncates the data to fit the new spatial resolution, respectively. Data files for the program are shown In Table \ref{table:assemble_newsph}, and definition of \verb|control_assemble_sph| is 
+%
+\begin{table}[htdp]
+\caption{List of files for {\tt assemble\_sph} }
+\begin{center} 
+\begin{tabular}{|c|c|c|}
+\hline
+ extension & Distributed? & I/O \\ \hline
+\verb|control_sph_assemble| & Serial & Input \\ \hline
+\verb|[sph_prefix].[domain#].rj| &  Distributed & Input \\
+\verb|[new_sph_prefix].[domain#].rj| &  Distributed & Input \\ \hline
+\verb|[rst_prefix].[step#].[domain#].fst| &  Distributed & Input  \\
+\verb|[new_rst_prefix].[step#].[domain#].fst| &  Distributed & Output \\ \hline
+\end{tabular}
+\end{center}
+\label{table:assemble_newsph}
+\end{table}
+%
+
+\subsection{Format of control file}
+Control file consists the following groups. \\
+%
+\verb|assemble_control| \label{href_i:assemble_control}
+\begin{itemize}
+\item \verb|data_files_def|
+	\hyperref[href_t:data_files_def]{(Detail)}
+	\begin{itemize}
+	\item \verb|num_subdomain_ctl           [Num_PE]|
+		\hyperref[href_t:num_subdomain_ctl]{(Detail)}
+	\item \verb|sph_file_prefix             [sph_prefix]|
+    		\hyperref[href_t:sph_file_prefix]{(Detail)}
+	\item \verb|restart_file_prefix         [rst_prefix]|
+    		\hyperref[href_t:restart_file_prefix]{(Detail)}
+	\end{itemize}
+%
+\item \verb|new_data_files_def|
+	\label{href_i:new_data_files_def}
+	\hyperref[href_t:new_data_files_def]{(Detail)}
+	\begin{itemize}
+	\item \verb|num_new_domain_ctl           [new_num_domain]|
+		\hyperref[href_t:num_new_domain_ctl]{(Detail)}
+	\item \verb|new_sph_mode_prefix          [new_sph_prefix]|
+    		\hyperref[href_t:new_sph_mode_prefix]{(Detail)}
+	\item \verb|new_restart_prefix           [new_rst_prefix]|
+    		\hyperref[href_t:new_restart_prefix]{(Detail)}
+	\item \verb|delete_original_data_flag    [YES or NO]|
+    		\hyperref[href_t:delete_original_data_flag]{(Detail)}
+	\end{itemize}
+%
+\item \verb|control|
+	\begin{itemize}
+	\item \verb|time_step_ctl|
+		\label{href_i:time_step_ctl2}
+    		\hyperref[href_t:time_step_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|i_step_init_ctl       [integer]|
+	    		\hyperref[href_t:i_step_init_ctl]{(Detail)}
+		\item \verb|i_step_finish_ctl     [integer]|
+	    		\hyperref[href_t:i_step_finish_ctl]{(Detail)}
+		\item \verb|i_step_rst_ctl        [integer]|
+	    		\hyperref[href_t:i_step_rst_ctl]{(Detail)}
+		\end{itemize}
+	\end{itemize}
+%
+\item \verb|newrst_magne_ctl|
+	\label{href_i:newrst_magne_ctl}
+	\hyperref[href_t:newrst_magne_ctl]{(Detail)}
+	\begin{itemize}
+	\item \verb|magnetic_field_ratio_ctl [ratio] |
+    		\hyperref[href_t:magnetic_field_ratio_ctl]{(Detail)}
+	\end{itemize}
+\end{itemize}
+
+\section{Module dependency program ({\tt module\_dependency})}
+This program is only used to generate Makefile in {\tt work} directory. Most of case, Fortran 90 modules have to compiled prior to be referred by another fortran90 routines. This program is generates dependency lists in Makefile. To use this program, the following limitation is required.
+\begin{itemize}
+\item One source code has to consist of one module.
+\item The module name should be the same as the file name.
+\end{itemize}
+
+\section{Visualization using field data}
+\label{sec:paraview}
+The field data is written by XDMF or VTK data format using Cartesian coordinate. In this section we briefly introduce how to display the radial magnetic field using ParaView as an example.
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{images/paraview_open}
+\caption{File open window for ParaView}
+\label{fig:paraview_load}
+\end{center}
+\end{figure}
+%
+
+After the starting Paraview, the file to be read is chosen in the file menu, and press "apply", button. Then, Paraview load the data from files (see Figure \ref{fig:paraview_load}). 
+Because the magnetic field is saved by the Cartesian coordinate, the radial magnetic field is obtained by the calculator tool. The procedure is as following (see Figure \ref{fig:paraview_gen_Br})
+%
+\begin{enumerate}
+\item Push calculator button.
+\item Choose "Point Data" in Attribute menu
+\item Input data name for radial magnetic field ("B\_r" in  Figure \ref{fig:paraview_gen_Br})
+\item Enter the equation to evaluate radial mantic field $B_{r} = \bvec{B} \cdot \bvec{r} / |r|$.
+\item Finally, push "Apply" button.
+\end{enumerate}
+%
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=100mm]{images/paraview_calc}
+\caption{File open window for ParaView}
+\label{fig:paraview_gen_Br}
+\end{center}
+\end{figure}
+%
+After obtaining the radial mantric field, the image in figure \ref{fig:paraview_br} is obtained by using "slice" and  "Contour" tools with appropriate color mapping.
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=100mm]{images/Paraview_Br}
+\end{center}
+\caption{Visualization of radial magnetic field by Paraview.}
+\label{fig:paraview_br}
+\end{figure}
+%
+

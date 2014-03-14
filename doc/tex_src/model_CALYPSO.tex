@@ -1,0 +1,329 @@
+\section{Model of Simulation}
+\subsection{Governing equations}
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{images/Spherical_shell}
+\end{center}
+\caption{Rotating spherical shell modeled on the Earth's outer core.}
+\label{fig:shell}
+\end{figure}
+%
+This model performs a magnetohydrodynamics (MHD) simulation in a rotating spherical shell modeled on the Earth's outer core (see Figure \ref{fig:shell}). We consider a spherical shell from the inner core boundary (ICB) to the core mantle Boundary (CMB) in a rotating frame which constantly rotates with angular velocity $\bvec{\Omega} = \Omega \hat{z}$. The fluid shell is filled with a conductive fluid with constant diffusivities (kinematic viscosity $\nu$, magnetic diffusivity $\eta$, thermal diffusivity $\kappa_{T}$, and compositional diffusivity $\kappa_{C}$). The inner core ($0 < r < r_{i}$) is solid, and may be considered an electrical insulator  or may have the same conductivity as the outer core. We assume that the region outside of the core is an electrical insulator. The rotating spherical shell is filled with Boussinesq modeled fluid. The governing equations of the MHD dynamo problem are the following,
+%
+\begin{eqnarray}
+\frac{\partial \bvec{u}}{\partial t} + \left(\bvec{\omega} \times \bvec{u}\right)
+ & = & - \nabla \left(P+\frac{1}{2}u^{2} \right) -\nu \nabla \times \nabla \times \bvec{u}
+\nonumber \\
+ & &  - 2 \Omega \left(\hat{z} \times \bvec{u} \right)
+     + \left( \frac{\rho}{\rho_{0}} \bvec{g} \right)
+     + \frac{1}{\rho_{0}} \left(\bvec{J} \times \bvec{B} \right),
+\nonumber \\
+ \frac{\partial \bvec{B}}{\partial t}
+ & = & -\eta \nabla \times \nabla \times \bvec{B}
+       + \nabla \times \left(\bvec{u} \times \bvec{B} \right),
+\nonumber \\
+\frac{\partial T}{\partial t} + \left(\bvec{u} \cdot \nabla \right) T
+ & = & \kappa_{T} \nabla^{2} T + q_{T},
+\nonumber \\
+\frac{\partial C}{\partial t} + \left(\bvec{u} \cdot \nabla \right) C
+ & = & \kappa_{C} \nabla^{2} C + q_{C},
+\nonumber \\
+\nabla \cdot \bvec{u} & = & \nabla \cdot \bvec{B} = 0,
+\label{eq:conservation}
+\nonumber \\
+\bvec{\omega} & = & \nabla \times \bvec{u},
+\nonumber
+\end{eqnarray}
+%
+and
+\begin{eqnarray}
+\bvec{J} & = & \frac{1}{\mu_{0}} \nabla \times \bvec{B},
+\nonumber
+\end{eqnarray}
+%
+where, $\bvec{u}$, $\bvec{\omega}$, $P$, \bvec{B}, \bvec{J}, $T$, $C$, $q_{T}$, and $q_{C}$ are the velocity, vorticity, pressure, magnetic field, current density, temperature, compositional variation, heat source, and source of light element, respectively. Coefficients in the governing equations are the kinetic viscosity $\nu$, thermal diffusivity $\kappa_{T}$, compositional diffusivity $\kappa_{C}$, and magnetic diffusivity $\eta$. The density $\rho$ is written as a function of $T$, $C$, average density $\rho_{0}$, thermal expansion $\alpha_{T}$, and density ratio of light element to main composition $\alpha_{C}$,
+%
+\begin{eqnarray}
+\rho & = & \rho_{0} \left[1 - \alpha_{T} \left( T - T_{0} \right)
+                               - \alpha_{C} \left( C - C_{0} \right) \right]
+\nonumber
+\end{eqnarray}
+%
+In Calypso, the vorticity equation and divergence of the momentum equation are used for solving $\bvec{u}$, $\bvec{\omega}$, and $P$ as,
+\begin{eqnarray}
+\frac{\partial \bvec{\omega}}{\partial t} + \nabla \times \left(\bvec{\omega} \times \bvec{u}\right)
+ & = & -\nu \nabla \times \nabla \times \bvec{\omega}
+     - 2 \Omega \nabla \times \left(\hat{z} \times \bvec{u} \right)
+\nonumber \\
+ & & + \nabla \times \left( \frac{\rho}{\rho_{0}} \bvec{g} \right)
+     + \frac{1}{\rho_{0}} \nabla \times \left(\bvec{J} \times \bvec{B} \right),
+\nonumber
+\end{eqnarray}
+%
+and
+\begin{eqnarray}
+\nabla \cdot \left(\bvec{\omega} \times \bvec{u}\right)
+ & = & -\nabla^{2} \left(P+\frac{1}{2}u^{2} \right) - 2 \Omega \nabla \cdot \left(\hat{z} \times \bvec{u} \right)
+\nonumber \\
+ & & + \nabla \cdot \left( \frac{\rho}{\rho_{0}} \bvec{g} \right)
+     + \frac{1}{\rho_{0}} \nabla \cdot \left(\bvec{J} \times \bvec{B} \right)
+\nonumber.
+\end{eqnarray}
+
+
+\subsection{Spherical harmonics expansion}
+In Calypso, fields are expanded into spherical harmonics. A scalar field (for example, temperature $T(r, \theta, \phi)$) is expanded as
+%
+\begin{eqnarray}
+T(r, \theta, \phi) &=& \sum_{l=0}^{L} \sum_{m=-l}^{l} T_{l}^{m}(r) Y_{l}^{m}(\theta,\phi),
+\nonumber
+\end{eqnarray}
+where  $Y_{l}^{m}$ are the spherical harmonics. Solenoidal fields (e.g. velocity $\bvec{u}$, vorticity $\bvec{\omega}$, magnetic field $\bvec{B}$, and current density $\bvec{J}$) are decomposed into poloidal and toroidal components. For example, the magnetic field is described as 
+\begin{eqnarray}
+\bvec{B}(r, \theta, \phi) & = & \sum_{l=1}^{L} \sum_{m=-l}^{l} 
+\left( \bvec{B}_{Sl}^{\ m} + \bvec{B}_{Tl}^{\ m} \right),\nonumber
+\end{eqnarray}
+where
+\begin{eqnarray}
+\bvec{B}_{Sl}^{\ m}(r, \theta, \phi) & = & \nabla \times \nabla \times \left( B_{Sl}^{\ m}(r) Y_{l}^{m}(\theta,\phi) \hat{r} \right),
+\nonumber \\
+\bvec{B}_{Tl}^{\ m}(r, \theta, \phi) & = & \nabla \times \left( B_{Tl}^{\ m}(r) Y_{l}^{m}(\theta,\phi) \hat{r} \right).
+\nonumber
+\end{eqnarray}
+
+The spherical harmonics are defined as real functions. $P_{l}^{m} \cos \left( m\phi \right)$ is assigned for positive $m$, $P_{l}^{m} \sin \left( m\phi \right)$ is assigned for negative $m$, where $P_{l}^{m}$ are Legendre polynomials. Because Schmidt quasi normalization is used for the Legendre polynomials $P_{l}^{m}$, the orthogonality relation for the spherical harmonics is 
+%
+\begin{eqnarray}
+\int Y_{l}^{m} Y_{l'}^{m'} \sin \theta d\theta d\phi &=& 4\pi \frac{1}{2l+1} \delta_{ll'}\delta_{mm'},
+\nonumber
+\end{eqnarray}
+%
+where, $\delta_{ll'}$ is Kronecker delta.
+
+\subsection{Evaluation of Coriolis term}
+The curl of the Coriolis force $-2\Omega \nabla \times \left(\hat{z} \times \bvec{u} \right)$ is evaluated in the spectrum space using the triple products of the spherical harmonics. These 3j-symbols (or Gaunt integral $G_{Lll'}^{Mmm'}$ and Elsasser integral $E_{Lll'}^{Mmm'}$) are written as
+%
+\begin{eqnarray}
+G_{Lll'}^{Mmm'} & = & \int Y_{L}^{M} Y_{l}^{m} Y_{l'}^{m'}
+\sin\theta d\theta d\phi,
+\nonumber \\
+E_{Lll'}^{Mmm'} & = & \int Y_{L}^{M} \left (
+   \frac{\partial Y_{l}^{m}}{\partial \theta} \frac{\partial Y_{l'}^{m'}}{\partial\phi}
+ - \frac{\partial Y_{l}^{m}}{\partial \phi} \frac{\partial Y_{l'}^{m'}}{\partial \theta}
+ \nonumber
+\right) d\theta d\phi.
+\nonumber
+\end{eqnarray}
+%
+The Gaunt integral $1/(4\pi) G_{Lll'}^{Mmm'}$ and Elsasser integral $1/(4\pi) E_{Lll'}^{Mmm'}$ for the Coriolis terms are evaluated in the simulation program.
+
+
+\subsection{Boundary conditions}
+Calypso currently supports the following boundary conditions for velocity $\bvec{u}$, magnetic field $\bvec{B}$, temperature $T$, and composition variation $C$. These boundary conditions are defined in the control file \verb|control_MHD|.
+
+\subsubsection{Non-slip boundary}
+The velocity $\bvec{u}$ is set to be 0 at the boundary. For poloidal and toroidal coefficients of velocity, $U_{Sl}^{\ m}(r)$ and $U_{Tl}^{\ m}(r)$, the boundary condition can be described as
+%
+\begin{eqnarray}
+U_{Sl}^{\ m}(r) & = & \frac{\partial U_{Sl}^{\ m}}{\partial r} = 0,
+\nonumber
+\end{eqnarray}
+%
+and 
+%
+\begin{eqnarray}
+U_{Tl}^{\ m}(r) & = & 0.
+\nonumber
+\end{eqnarray}
+%
+\subsubsection{Free-slip boundary}
+For a free slip boundary, shear stress and radial flow vanish at the boundary. The boundary condition for poloidal and toroidal coefficients are described as
+%
+\begin{eqnarray}
+U_{Sl}^{\ m}(r) = \frac{\partial^2}{\partial r^2} \left( \frac{1}{r} U_{Sl}^{\ m}(r) \right) & = & 0,
+\nonumber
+\end{eqnarray}
+%
+and 
+%
+\begin{eqnarray}
+\frac{\partial}{\partial r} \left( \frac{1}{r^2} U_{Tl}^{\ m}(r) \right) & = & 0.
+\nonumber
+\end{eqnarray}
+%
+\subsubsection{Fixed rotation rate}
+If the boundary rotates with a rotation vector $\bvec{\Omega}_{b} = \left(\Omega_{bx}, \Omega_{by}, \Omega_{bz}\right)$, the boundary conditions for poloidal and toroidal coefficients are described as
+%
+\begin{eqnarray}
+U_{Sl}^{\ m}(r) & = & \frac{\partial U_{Sl}^{\ m}}{\partial r} = 0,
+\nonumber \\
+U_{T1}^{\ 1s}(r) & = & r^{2} \Omega_{by},
+\nonumber \\
+U_{T1}^{\ 0}(r) & = &  r^{2} \Omega_{bz},
+\nonumber \\
+U_{T1}^{\ 1c}(r) & = & r^{2} \Omega_{bx},
+\nonumber
+\end{eqnarray}
+%
+and 
+%
+\begin{eqnarray}
+U_{Tl}^{\ m}(r) & = & 0 \mbox{ for } l > 2.
+\nonumber
+\end{eqnarray}
+%
+\subsubsection{Fixed homogenous temperature}
+When a constant temperature $T_{b}$ is is applied, the spherical harmonic coefficients are
+%
+\begin{eqnarray}
+T_{0}^{0}(r) & = &  T_{b},
+\nonumber
+\end{eqnarray}
+%
+and 
+%
+\begin{eqnarray}
+T_{l}^{m}(r) & = & 0 \mbox{ for } l > 1.
+\nonumber
+\end{eqnarray}
+%
+\subsubsection{Fixed homogenous heat flux}
+A constant heat flux is imposed by setting the radial temperature gradient to $F_{Tb}$. The spherical harmonic coefficients are
+%
+\begin{eqnarray}
+\frac{\partial T_{0}^{0}}{\partial r} & = &  F_{Tb},
+\nonumber
+\end{eqnarray}
+%
+and 
+%
+\begin{eqnarray}
+\frac{\partial T_{l}^{m}}{\partial r} & = & 0 \mbox{ for } l > 1.
+\nonumber
+\end{eqnarray}
+%
+\subsubsection{Fixed composition}
+When a constant composition $C_{b}$ is applied, the spherical harmonic coefficients are 
+%
+\begin{eqnarray}
+C_{0}^{0}(r) & = & C_{b},
+\nonumber
+\end{eqnarray}
+%
+and 
+%
+\begin{eqnarray}
+C_{l}^{m}(r) & = & 0 \mbox{ for } l > 1.
+\nonumber
+\end{eqnarray}
+%
+\subsubsection{Fixed composition flux}
+A constant composition flux is imposed by setting the radial composition gradient to $F_{Cb}$. The spherical harmonic coefficients are
+%
+\begin{eqnarray}
+\frac{\partial C_{0}^{0}}{\partial r} & = &  F_{Cb},
+\nonumber
+\end{eqnarray}
+%
+and 
+%
+\begin{eqnarray}
+\frac{\partial C_{l}^{m}}{\partial r} & = & 0 \mbox{ for } l > 1.
+\nonumber
+\end{eqnarray}
+%
+\subsubsection{Connection to the magnetic potential field}
+If the regions outside the fluid shell are assumed to be electrical insulators, current density vanishes in the electric insulator
+ %
+\begin{eqnarray}
+\bvec{J}_{ext} &= & 0,
+\nonumber
+\end{eqnarray}
+%
+where the suffix ${}_{ext}$ indicates fields outside of the fluid shell. At the boundaries of the fluid shell, the magnetic field $\bvec{B}_{fluid}$, current density $\bvec{J}_{fluid}$ , and electric field $\bvec{E}_{fluid}$ in the conductive fluid satisfy:
+ %
+\begin{eqnarray}
+\left (\bvec{B}_{fluid} - \bvec{B}_{ext} \right)  = 0,
+\nonumber \\
+\left (\bvec{J}_{fluid} - \bvec{J}_{ext} \right)  \cdot \hat{r}   = 0,
+\nonumber
+\end{eqnarray}
+and 
+\begin{eqnarray}
+\left (\bvec{E}_{fluid} - \bvec{E}_{ext} \right) \times \hat{r}  = 0,
+\nonumber
+\end{eqnarray}
+%
+where, $\hat{r}$ is the radial unit vector (i.e. normal vector for the spherical shell boundaries). 
+Consequently, radial current density $\bvec{J} $ vanishes at the boundary as
+  %
+\begin{eqnarray}
+\bvec{J} \cdot \hat{r}  = 0
+ \mbox{ at } r = r_{i}, r_{o}
+\nonumber
+\end{eqnarray}
+%
+
+In an electrical insulator the magnetic field can be described as a potential field
+ %
+\begin{eqnarray}
+\bvec{B}_{ext} = - \nabla W_{ext},
+\nonumber
+\end{eqnarray}
+%
+where $W_{ext}$ is the magnetic potential. The boundary conditions can be satisfied by  connecting the magnetic field in the fluid shell at boundaries to the potential fields. The magnetic field is connected to the potential field in an electrical insulator. At CMB ($r = r_{o}$), the boundary condition can be described by the poloidal and toroidal coefficients of the magnetic field as
+%
+\begin{eqnarray}
+\frac{l}{r} B_{Sl}^{\ m}(r) & = & - \frac{\partial B_{Sl}^{\ m}}{\partial r},
+\nonumber
+\end{eqnarray}
+%
+and 
+%
+\begin{eqnarray}
+B_{Tl}^{\ m}(r) & = & 0.
+\nonumber
+\end{eqnarray}
+%
+
+If the inner core is also assumed to be an insulator, the magnetic boundary conditions for ICB ($r = r_{i}$) can be described as
+%
+\begin{eqnarray}
+\frac{l+1}{r} B_{Sl}^{\ m}(r) & = & \frac{\partial B_{Sl}^{\ m}}{\partial r},
+\nonumber
+\end{eqnarray}
+%
+and 
+%
+\begin{eqnarray}
+B_{Tl}^{\ m}(r) & = & 0.
+\nonumber
+\end{eqnarray}
+%
+
+\subsubsection{Magnetic boundary condition for center}
+If the inner core has the same conductivity as the outer core, we solve the induction equation for the inner core as for the outer core with the boundary conditions for the center. The poloidal and toroidal coefficients at center are set to 
+%
+\begin{eqnarray}
+B_{Sl}^{\ m}(0) &=& B_{Tl}^{\ m}(0) = 0.
+\nonumber
+\end{eqnarray}
+%
+
+\subsubsection{Pseudo-vacuum magnetic boundary condition}
+Under the pseudo-vacuum boundary condition, the magnetic field has only a radial component at the boundaries. Considering the conservation of the magnetic field, the magnetic boundary condition will be
+%
+\begin{eqnarray}
+\frac{\partial}{\partial r}\left(r^{2} B_{r} \right) =  B_{\theta} = B_{\phi} = 0
+ \mbox{ at } r = r_{i}, r_{o}.
+\nonumber
+\end{eqnarray}
+%
+The present boundary condition is also described by using the poloidal and toroidal coefficients as
+%
+\begin{eqnarray}
+\frac{\partial B_{Sl}^{\ m}}{\partial r} & = &  B_{Tl}^{\ m}(r) = 0
+ \mbox{ at } r = r_{i}, r_{o}.
+\nonumber
+\end{eqnarray}

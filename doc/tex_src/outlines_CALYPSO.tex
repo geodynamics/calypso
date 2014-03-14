@@ -1,0 +1,192 @@
+\section{Simulation procedure}
+Calypso consists of programs shown in Table \ref{table:controls}.
+%
+\begin{table}[htdp]
+\caption{List of program and required control file name}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Program & Control file name & Type \\ \hline
+\verb|gen_sph_grids|         & \verb|control_sph_shell| &  Serial    \\
+\verb|sph_mhd|               & \verb|control_MHD| &        Parallel  \\
+\verb|sph_initial_field|     & \verb|control_MHD| &        Parallel  \\
+\verb|sph_add_initial_field| & \verb|control_MHD| &        Parallel  \\
+\verb|sph_snapshot|          & \verb|control_snapshot| &   Parallel  \\
+\verb|sph_dynamobench|       & \verb|control_snapshot| &   Parallel  \\
+\verb|sph_zm_snapshot|       & \verb|control_snapshot| &   Parallel  \\
+\verb|assemble_sph|          & \verb|control_sph_assemble| & Serial  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:controls}
+\end{table}
+%
+Because the serial programs do not use MPI, they are simply invoked by
+%
+\begin{verbatim}
+% [program]
+\end{verbatim}
+%
+Parallel programs must be invoked using MPI commands. On a Linux cluster using MPICH, parallel programs are invoked with 
+%
+\begin{verbatim}
+% mpirun -np [# of processes] [program]
+\end{verbatim}
+%
+
+This command will vary depending on the MPI implementation installed on the machine.  Please consult with your sysadmin for details.
+
+%
+To perform simulations by Calypso, the following processes are required.
+%
+\begin{enumerate}
+\item Generate grids and spherical harmonics indexing information by \\
+\verb|gen_sph_grids|.
+\item Make initial fields by \verb|sph_initial_field| (if necessary). 
+\item Perform the simulation by \verb|sph_mhd|.
+\item Convert the parallel spectra data by \verb|assemble_sph| to continue with changing number of processes (if necessary).
+\item Data analysis by \verb|sph_snapshot|, \verb|sph_snapshot|, or \verb|sph_dynamobench|.
+\item Update initial fields by \verb|sph_add_initial_field| for more simulations (if necessary). 
+\end{enumerate}
+%
+The simulation program \verb|sph_mhd| requires an indexing file for spherical transform.  \verb|sph_mhd| generates spectrum data and monitoring data, and field data in Cartesian coordinate as outputs. The data transform programs ( \verb|sph_snapshot| and \verb|sph_zm_snapshot|) generate outputs data  from parallel spectra data. The flow of data is shown in Figure \ref{fig:flow_0}. 
+%
+\begin{figure}[H]
+\begin{center}
+\includegraphics*[width=130mm]{images/flow_0}
+\end{center}
+\caption{Data flow of the simulation. Simulations require index data for spherical harmonics transform, initial spectra (optional) data, and FEM mesh data. Simulation program also outputs spectra data, monitoring data and  field data in Cartesian coordinate. Data transform program generates output data for simulation program from spectra data.}
+\label{fig:flow_0}
+\end{figure}
+%
+
+Each program needs one control file, the name of which is defined by the program.
+ (Standard input is not supported by Fortran 90 so Calypso uses control files.)
+The appropriate control file names are shown in the Table \ref{table:controls}. 
+The following rules are used in the control files. An example of a control file is shown in Figure \ref{fig:control_example}.
+%
+\begin{itemize}
+\item Lines starting with `\verb|#|' or `\verb|!|' are treated as a comment lines and ignored. 
+\item All control files consist of blocks which start with `\verb|begin [name]|' and end with `\verb|end [name]|'.
+\item The item name is shown first and the associated value/data is second.
+\item The order of items and blocks can be changed.
+\item If an item consists of multiple data, these should be listed in one line.
+\item If an item does not belong in the block it is ignored.
+\item An array block starts with `\verb|begin array [name] [number of components]|' and ends with `\verb|end array [name]|'.
+\item If \verb|[number of components]| for an array is 0, `\verb|end array [name]|' on the next line is not needed.
+\item In Fortran program, character `\verb|/|' is recognized as an end of character valuable if text with `\verb|/|' ({\it e.g.} file prefix including file paths) is not enclosed by {\tt '} or {\tt "}.
+\item Calypso's control file input is limited to 255 characters for each line.
+\end{itemize}
+%
+\begin{figure}[htbp]
+\begin{center}
+%
+\begin{verbatim}
+begin spherical_shell_ctl
+!
+  begin data_files_def
+    num_subdomain_ctl    4
+!
+    sph_file_prefix             'sph_shell/in'
+  end data_files_def
+!
+  begin num_grid_sph
+    truncation_level_ctl     4
+    ngrid_meridonal_ctl     12
+    ngrid_zonal_ctl         24
+!
+    radial_grid_type_ctl   explicit
+    array r_layer       4
+      r_layer    1  0.5384615384615
+      r_layer    2  0.5384615384615
+      r_layer    3  1.038461538462
+      r_layer    4  1.538461538462
+    end array r_layer
+!
+  end num_grid_sph
+end spherical_shell_ctl
+\end{verbatim}
+%
+\caption{Example of Control file}
+\label{fig:control_example}
+\end{center}
+\end{figure}
+%
+
+\section{Examples}
+Several examples are provided in the \verb|examples| directory. There are three subdirectories as examples. README files are also provided to perform these examples in each subdirectory.
+%
+\begin{description}
+\item{\tt assemble\_sph}    Examples for assembling program of spectrum data. (see section \ref{section:assemble_sph})
+\item{\tt dynamo\_benchmark} Examples for dynamo benchmark by Christensen {\it et. al.} (2001)
+\item{\tt spherical\_shell} Examples for preprocessing program (see Section \ref{section:gen_sph_grid})
+\end{description}
+%
+
+\subsection{Examples for preprocessing program}
+Four examples illustrate the use of the preprocessing program. The examples include
+%
+\begin{description}
+\item{\tt Chebyshev\_points}   Example to generate indexing data using Chebyshev collocation points
+\item{\tt equidistance}        Example to generate indexing data with equi-distance grid
+\item{\tt explicitly\_defined} Example to generate indexing data with explicitly defined radial points
+\item{\tt with\_inner\_core}   Example to generate indexing data including inner core and external of the fluid shell.
+\end{description}
+%
+\subsection{Examples of dynamo benchmark}
+There are four examples for simulations using dynamo benchmark test as following.
+%
+\begin{description}
+\item{\tt Case\_0} Example of dynamo benchmark case 0 (Thermally driven convection without magnetic field)
+\item{\tt Case\_1} Example of dynamo benchmark case 1 (Dynamo model with co-rotating and electrically insulated inner core)
+\item{\tt Case\_2} Example of dynamo benchmark case 2 (Dynamo model with rotatable and conductive inner core)
+\item{\tt Compositional\_case\_1} Example of dynamo benchmark case 1 using compositional variation instead of temperature
+\end{description}
+%
+The process of the simulation is as following:
+%
+\begin{enumerate}
+\item Change to the directory for Benchmark Case 1 (for example) \\
+\begin{verbatim}
+[username]$ cd [CALYPSO_DIR]/examples/dynamo_benchmark/dynamobench_case1
+\end{verbatim}
+
+\item  Create the grid files for the simulation  \\
+\begin{verbatim}
+[dynamobench_case_1]$ [CALYPSO_DIR]/bin/gen_sph_grids
+\end{verbatim}
+
+\item  Run simulation program
+\begin{verbatim}
+[dynamobench_case_1]$ mpirun -np 4 [CALYPSO_DIR]/bin/sph_mhd
+\end{verbatim}
+
+\item  To continue the simulation change \verb|rst_ctl| in \verb|control_MHD| from \\
+\begin{verbatim}
+    rst_ctl                dynamo_benchmark_1
+\end{verbatim}
+  to
+\begin{verbatim}
+    rst_ctl                start_from_rst_file
+\end{verbatim}
+   Continue simulation by repeating step 2.
+
+\item  To check the results for dynamo benchmark, run 
+\begin{verbatim}
+[dynamobench_case_1]$ mpirun -np 4 [CALYPSO_DIR]/bin/sph_dynamobench
+\end{verbatim}
+\end{enumerate}
+%
+
+\subsection{Example of data assembling program}
+An example for spectrum data assembling program is provided in \verb|assemble_sph| directory.
+%
+
+\subsection{Example of heat and compositional source}
+ An example to perform a simulation with heat and compositional sources is given in \verb|heat_composition_source| directory. To simplify the problem, only the thermal and compositional fields are evolved with no velocity (i.e. pure diffusion problem). A module to generate initial field data \\
+ \verb|const_sph_initial_spectr| is copied to \verb|src/programs/data_utilities/|\\
+\verb|INITIAL_FIELD/| directory. The code must be recompiled after modifying this module. Initial field is generated by the program \verb|sph_initial_field| after generating spherical harmonics information by \verb|gen_sph_grid|. Aftrer the simulation, $Y_{0}^{0}$ component of temperature and composition as a function of radius and time is written in \verb|picked_mode.dat|.
+
+ \subsection{Example of thermal and compositional boundary conditions by external file}
+ Heterogeneous boundary are input using an external file. An example to set thermal and compositional boundary conditions is given in \verb|heterogineous_temp| directory. As in the heat source example, only the diffusion problem is solved in this example. In file \verb|bc_spectr.btx|, temperature boundary conditions are defined for $Y_{0}^{0}$, $Y_{1}^{1s}$, $Y_{1}^{1c}$, and ,$ Y_{2}^{2c}$ component, and compositional boundary is defined for $Y_{0}^{0}$, $Y_{2}^{2s}$, and $Y_{2}^{2c}$ components. The radial profile of these spherical harmonics coefficients are written in \verb|picked_mode.dat|.
+
+
