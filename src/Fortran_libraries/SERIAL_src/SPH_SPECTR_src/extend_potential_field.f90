@@ -3,6 +3,9 @@
 !
 !      modified by H. Matsuiui on Apr., 2009
 !
+!      subroutine ext_outside_scalar(is_fld, kr_out)
+!      subroutine ext_inside_scalar(is_fld, kr_in)
+!
 !      subroutine ext_outside_potential(is_fld, kr_out)
 !        Output: d_rj(kr_out+1:,is_fld:is_fld+2)
 !      subroutine ext_inside_potential(is_fld, kr_in)
@@ -33,6 +36,61 @@
 !  -------------------------------------------------------------------
 !
       contains
+!
+!  -------------------------------------------------------------------
+!
+      subroutine ext_outside_scalar(is_fld, kr_out)
+!
+      integer(kind = kint), intent(in) :: is_fld, kr_out
+      real(kind = kreal) :: ratio
+      integer(kind = kint) :: inod, inod_cmb
+      integer(kind = kint) :: j, l_gl, k
+!
+!
+!$omp parallel private(k,ratio)
+      do k = kr_out+1, nidx_rj(1)
+        ratio = radius_1d_rj_r(kr_out) * a_r_1d_rj_r(k)
+!$omp do private(j,l_gl,inod,inod_cmb)
+        do j = 1, nidx_rj(2)
+          inod = j + (k-1) * nidx_rj(2)
+          inod_cmb = j + (kr_out-1) * nidx_rj(2)
+          l_gl = idx_gl_1d_rj_j(j,2)
+!
+          d_rj(inod,is_fld  ) =  d_rj(inod_cmb,is_fld) * ratio**l_gl
+        end do
+!$omp end do nowait
+      end do
+!$omp end parallel
+!
+      end subroutine ext_outside_scalar
+!
+!  -------------------------------------------------------------------
+!
+      subroutine ext_inside_scalar(is_fld, kr_in)
+!
+      integer(kind = kint), intent(in) :: is_fld, kr_in
+!
+      real(kind = kreal) :: ratio
+      integer(kind = kint) :: inod, inod_icb
+      integer(kind = kint) :: j, l_gl, k
+!
+!
+!$omp parallel private(k,ratio)
+      do k = 1, kr_in-1
+        ratio = radius_1d_rj_r(k) * a_r_1d_rj_r(kr_in)
+!$omp do private(j,l_gl,inod,inod_icb)
+        do j = 1, nidx_rj(2)
+          inod =     j + (k-1) * nidx_rj(2)
+          inod_icb = j + (kr_in-1) * nidx_rj(2)
+          l_gl = idx_gl_1d_rj_j(j,2)
+!
+          d_rj(inod,is_fld  ) = d_rj(inod_icb,is_fld) * ratio**l_gl
+        end do
+!$omp end do nowait
+      end do
+!$omp end parallel
+!
+      end subroutine ext_inside_scalar
 !
 !  -------------------------------------------------------------------
 !

@@ -16,6 +16,7 @@
       module merge_sph_step_spectr
 !
       use m_precision
+      use m_machine_parameter
       use m_constants
       use m_field_data_IO
 !
@@ -104,18 +105,26 @@
 !
       phys_file_head = org_sph_fst_head
 !
+
       do ip = 1, np_sph_org
         my_rank = ip - 1
         call sel_read_alloc_step_SPH_file(my_rank, istep)
         call deallocate_phys_data_name_IO
 !
         if(iflag_same_rgrid .eq. 0) then
+!          write(*,*) 'itp_rj_merged_phys_from_IO'
           call itp_rj_merged_phys_from_IO                               &
      &       (org_sph_mesh(ip)%sph_mesh%sph_rj%nnod_rj,                 &
      &        org_sph_mesh(ip)%sph_mesh%sph_rj%nidx_rj(2),              &
      &        org_sph_mesh(ip)%sph_mesh%sph_rj%idx_gl_1d_rj_j,          &
      &        phys_data_IO)
+
+!          write(*,*) 'extend_potential_magne'
           call extend_potential_magne
+!          write(*,*) 'extend_inner_core_temp'
+          call extend_inner_core_temp
+!          write(*,*) 'extend_inner_core_light'
+          call extend_inner_core_light
         else
           call copy_rj_merged_phys_from_IO                              &
      &      (org_sph_mesh(ip)%sph_mesh%sph_rj%nidx_rj(2),               &

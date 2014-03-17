@@ -78,16 +78,16 @@
       time   =     time_init
 !
 !  Set initial velocity if velocity is exist
-!      if(ipol%i_velo .gt. izero) call  set_initial_velocity
+      if(ipol%i_velo .gt. izero) call  set_initial_velocity
 !
 !  Set initial temperature if temperature is exist
-!      if(ipol%i_temp .gt. izero) call  set_initial_temperature
+      if(ipol%i_temp .gt. izero) call  set_initial_temperature
 !
 !  Set initial composition if composition is exist
-!      if(ipol%i_light .gt. izero) call set_initial_composition
+      if(ipol%i_light .gt. izero) call set_initial_composition
 !
 !  Set initial magnetic field if magnetic field is exist
-!      if(ipol%i_magne .gt. izero) call set_initial_magne_sph
+      if(ipol%i_magne .gt. izero) call set_initial_magne_sph
 !
 !  Set heat source if  heat source is exist
       if(ipol%i_heat_source .gt. izero) then
@@ -333,8 +333,8 @@
           ii = local_sph_data_address(k,jj)
           rr = radius_1d_rj_r(k)
 !   Substitute initial heat source
-          d_rj(ii,ipol%i_heat_source) = 0.35 * four*r_CMB**2            &
-     &                                 / (four * r_ICB**3 / three)
+          d_rj(ii,ipol%i_heat_source) = 0.893 * r_CMB**2                &
+     &                                 / (r_ICB**3 / three)
         end do
       end if
 !

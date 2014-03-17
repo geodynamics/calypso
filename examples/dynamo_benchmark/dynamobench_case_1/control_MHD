@@ -28,7 +28,6 @@ begin MHD_control
     field_file_prefix           'field/out'
 !
     field_file_fmt_ctl          'merged_VTK'
-!     field_file_fmt_ctl       'VTK'
   end data_files_def
 !
   begin model

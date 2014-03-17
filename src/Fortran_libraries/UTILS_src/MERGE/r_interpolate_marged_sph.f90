@@ -12,6 +12,8 @@
 !!      subroutine itp_rj_merged_phys_from_IO(nnod_org,                 &
 !!     &          nri_org, jmax_org, idx_gl_1d_j_org, d_rj_IO)
 !!      subroutine extend_potential_magne
+!!      subroutine extend_inner_core_temp
+!!      subroutine extend_inner_core_light
 !!@endverbatim
 !!
 !!@param   nnod_org  Number of spectr data for original data
@@ -48,7 +50,7 @@
 !
       private :: nri_old2new, k_old2new_in, k_old2new_out
       private :: coef_old2new_in
-      private :: allocate_radial_itp_tbl
+      private :: allocate_radial_itp_tbl, extend_inner_core_scalar
 !
 ! -----------------------------------------------------------------------
 !
@@ -149,7 +151,7 @@
           exit
         end if
       end do
-      kr_outer_domain = nidx_rj(1) + 1
+      kr_outer_domain = nidx_rj(1)
       do k = 1, nidx_rj(1)
         if(radius_1d_rj_r(k) .gt. r_org(nri_org)) then
           kr_outer_domain = k - 1
@@ -160,9 +162,9 @@
       write(*,*) 'kr_inner_domain', kr_inner_domain
       write(*,*) 'kr_outer_domain', kr_outer_domain
 !      do k = 1, nidx_rj(1)
-!        write(*,'(i5,1pe16.8,2i5,1p3e16.8)') k, radius_1d_rj_r(k),     &
-!     &         k_old2new_in(k), k_old2new_out(k),                      &
-!     &         r_org(k_old2new_in(k)),  r_org(k_old2new_out(k)),       &
+!        write(*,'(i5,1pe16.8,2i5,1p3e16.8)') k, radius_1d_rj_r(k),    &
+!     &         k_old2new_in(k), k_old2new_out(k),                     &
+!     &         r_org(k_old2new_in(k)),  r_org(k_old2new_out(k)),      &
 !     &         coef_old2new_in(k)
 !      end do
 !
@@ -183,26 +185,27 @@
       integer(kind = kint) :: inod_gl, inod_in, inod_out
 !
 !
-!$omp parallel
+!!$omp parallel private(nd)
       do nd = 1, ntot_phys_rj
-!$omp do private(j,j_gl,kr,inod_in,inod_out,inod_gl)
+!!$omp do private(j,j_gl,kr,inod_in,inod_out,inod_gl)
         do j = 1, jmax_org
           j_gl = idx_gl_1d_j_org(j,1)
 !
-          if(j_gl .ge. nidx_rj(2)) cycle
+          if(j_gl .lt. nidx_rj(2)) then
 !
-          do kr = kr_inner_domain, kr_outer_domain
-            inod_gl = 1 + j_gl + (kr - 1) * nidx_rj(2)
-            inod_in =  j + (k_old2new_in(kr) - 1) *  jmax_org
-            inod_out = j + (k_old2new_out(kr) - 1) * jmax_org
-            d_rj(inod_gl,nd)                                            &
-     &         = coef_old2new_in(kr) * d_rj_IO(inod_in,nd)              &
+            do kr = kr_inner_domain, kr_outer_domain
+              inod_gl = 1 + j_gl + (kr - 1) * nidx_rj(2)
+              inod_in =  j + (k_old2new_in(kr) - 1) *  jmax_org
+              inod_out = j + (k_old2new_out(kr) - 1) * jmax_org
+              d_rj(inod_gl,nd)                                          &
+     &           = coef_old2new_in(kr) * d_rj_IO(inod_in,nd)            &
      &          + (1.0d0 - coef_old2new_in(kr)) * d_rj_IO(inod_out,nd)
-          end do
+            end do
+          end if
         end do
-!$omp end do
+!!$omp end do
       end do
-!$omp end parallel
+!!$omp end parallel
 !
       end subroutine itp_rj_merged_phys_from_IO
 !
@@ -236,6 +239,57 @@
       end if
 !
       end subroutine extend_potential_magne
+!
+! -----------------------------------------------------------------------
+!
+      subroutine extend_inner_core_temp
+!
+      use m_phys_labels
+!
+!
+      call extend_inner_core_scalar(fhd_temp)
+!
+      end subroutine extend_inner_core_temp
+!
+! -----------------------------------------------------------------------
+!
+      subroutine extend_inner_core_light
+!
+      use m_phys_labels
+!
+!
+      call extend_inner_core_scalar(fhd_light)
+!
+      end subroutine extend_inner_core_light
+!
+! -----------------------------------------------------------------------
+!
+      subroutine extend_inner_core_scalar(field_name)
+!
+      use extend_potential_field
+!
+      use m_sph_spectr_data
+!
+      character(len = kchara), intent(in) :: field_name
+!
+      integer(kind = kint) :: is_field
+      integer(kind = kint) :: i
+!
+!
+      is_field = 0
+      do i = 1, num_phys_rj
+        if(phys_name_rj(i) .eq. field_name) then
+          is_field = istack_phys_comp_rj(i-1) + 1
+          exit
+        end if
+      end do
+      if(is_field .eq. 0) return
+!
+      if(kr_inner_domain .gt. 1) then
+        call ext_inside_scalar(is_field, kr_inner_domain)
+      end if
+!
+      end subroutine extend_inner_core_scalar
 !
 ! -----------------------------------------------------------------------
 !
