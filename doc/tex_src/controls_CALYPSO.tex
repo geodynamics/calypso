@@ -1,0 +1,788 @@
+\section{Definition of parameters for control files}
+\label{section:def_control}
+
+\subsection{\tt data\_files\_def}
+\label{href_t:data_files_def}
+File names and number of processes and threads are defined in this block. \\
+\hyperref[href_i:MHD_control]{(Back to {\tt control\_MHD})} \\
+\hyperref[href_i:spherical_shell_ctl]{(Back to {\tt control\_sph\_shell})} \\
+\hyperref[href_i:assemble_control]{(Back to {\tt control\_assemble\_sph})}
+
+\paragraph{\tt num\_subdomain\_ctl}
+\label{href_t:num_subdomain_ctl}
+\verb|[Num_PE]| \\
+Number of subdomain for the MPI program \verb|[Num_PE]| is defined by integer. If number of processes in \verb| mpirun -np | is different from number of subdomains, program will be stopped with message.
+
+\paragraph{\tt num\_smp\_ctl}
+\label{href_t:num_smp_ctl}
+\verb|[Num_Threads]| \\
+Number of SMP threads for OpenMP \verb|[Num_Threads]| is defined by integer. You can set larger number than the actual umber of thread to be used. If actual number of thread is less than this number, number of threads is set to the number which is defined in this field.
+
+\paragraph{\tt sph\_file\_prefix}
+\label{href_t:sph_file_prefix}
+\verb|[sph_prefix]| \\
+File prefix of spherical harmonics indexing and FEM mesh file \verb|[sph_prefix]| is defined by text. Process ID and extension are added after this file prefix.
+
+\paragraph{\tt boundary\_data\_file\_name}
+\label{href_t:boundary_data_file_name}
+\verb|[boundary_data_name]| \\
+File name of boundary condition data file \verb|[boundary_data_name]| is defined by text. 
+
+\paragraph{\tt restart\_file\_prefix}
+\label{href_t:restart_file_prefix}
+\verb|[rst_prefix]| \\
+File prefix of spectrum data for restarting and snapshots \verb|[rst_prefix]| is defined by text. Step number, process ID, and extension are added after this file prefix.
+
+\paragraph{\tt field\_file\_prefix}
+\label{href_t:field_file_prefix}
+\verb|[fld_prefix]| \\
+File prefix of field data for visualize snapshots \verb|[fld_prefix]| is defined by text. Step number and file extension are  added after this file prefix.
+
+\paragraph{\tt field\_file\_fmt\_ctl}
+\label{href_t:field_file_fmt_ctl}
+\verb|[fld_format]| \\
+Field data field format for visualize snapshots \verb|[fld_format]| is defined by text. The following formats are currently supported.
+%
+\begin{description}
+\item{\tt single\_HDF5}  Merged HDF5 file (Available if HDF5 library is linked)
+\item{\tt single\_VTK}   Merged VTK file (Default)
+\item{\tt VTK}           Distributed VTK file
+\end{description}
+%
+
+\subsection{\tt phys\_values\_ctl}
+\label{href_t:phys_values_ctl}
+Fields for the simulation are defined in this block. \\
+\hyperref[href_i:phys_values_ctl]{(Back to {\tt control\_MHD})}
+%
+\paragraph{\tt array nod\_value\_ctl}
+\label{href_t:nod_value_ctl}
+\verb|[Field] [Viz_flag] [Monitor_flag]| \\
+Fields name \verb|[Field]| for the simulation are listed in this array. If required fields for simulation are not in the list, simulation program adds required field in the list, but does not output any field data and monitoring data. \verb|[Viz_flag]| is set to output of the field data for visualization by
+%
+\begin{description}
+\item{\tt VIz\_On}  Write field data to VTK file
+\item{\tt VIz\_Off} Do not write field data to VTK file.
+\end{description}
+%
+In the \verb|[Monitor_flag]|, output in the monitoring data is defined by
+%
+\begin{description}
+\item{\tt Monitor\_On}  Write spectrum into monitoring data
+\item{\tt Monitor\_Off} Do not write spectrum into monitoring data
+\end{description}
+%
+Supported field in the present version is listed in Table \ref{table:fields}
+%
+\begin{table}[htdp]
+\caption{List of field name}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\verb|[Name]| & field name & Description \\ \hline \hline
+\verb|velocity| &    Velocity &  \bvec{u} \\
+\verb|vorticity| &   Vorticity & $\bvec{\omega} = \nabla \times \bvec{u} $ \\
+\verb|pressure| &    Pressure & $P$ \\
+\hline
+\verb|temperature| & Temperature & $T$ \\
+\verb|perturbation_temp| & Perturbation of temperature
+& $\Theta = T - T_{0}$ \\
+\verb|heat_source| & Heat source
+& $q_{T}$ \\
+\hline
+\verb|composition| & Composition variation & $C$ \\
+\verb|composition_source| & Composition source & $q_{C}$ \\
+\hline
+\verb|magnetic_field| &  Magnetic field  & $\bvec{B}$ \\
+\verb|current_density| & Current density & $\bvec{J} = \nabla \times \bvec{B} $ \\
+\verb|electric_field| & Electric field & $\bvec{E} = \sigma \left(\bvec{J} - \bvec{u} \times \bvec{B}\right) $ \\
+ \hline
+\verb|viscous_diffusion| & Viscous diffusion
+& $-\nu \nabla \times \nabla \times \bvec{u}$ \\
+\verb|thermal_diffusion| & Termal diffusion & $ \kappa \nabla^{2} T $ \\
+\verb|magnetic_diffusion| & Magnetic diffusion 
+& $-\eta \nabla \times \nabla \times \bvec{B}$ \\
+\verb poynting_flux & Poynting flux &  $ \bvec{E} \times \bvec{B} $ \\
+\verb Lorentz_force & Lorentz force &  $ \bvec{J} \times \bvec{B} $ \\
+\verb Coriolis_force & Coriolis force &  $ -2 \Omega \hat{z} \times \bvec{u} $ \\
+\verb buoyancy                   & Thermal buoyancy &  $ -\alpha_{T} T \bvec{g}  $ \\
+\verb composite_buoyancy & Compositional buoyancy &  $ -\alpha_{C} C\bvec{g}  $\\
+\hline
+\verb rot_Lorentz_force & Curl of Lorentz force &  $ \nabla \times \left(\bvec{J} \times \bvec{B}\right) $ \\
+\verb rot_Coriolis_force & Curl of Coriolis force &  $ -2 \Omega \nabla \times \left(\hat{z} \times \bvec{u} \right) $ \\
+\verb rot_buoyancy                   & Curl of thermal buoyancy &  $ - \nabla \times \left(\alpha_{T} T \bvec{g}\right)  $ \\
+\verb rot_composite_buoyancy & Curl of compositional buoyancy &  $ - \nabla \times \left(\alpha_{C} C\bvec{g}\right)  $\\
+\hline
+\verb|buoyancy_flux| & Buoyancy flux & $ -\alpha_{T} T \bvec{g} \cdot \bvec{u} $ \\
+\verb|Lorentz_work| & Work of Lorentz force
+ & $\bvec{u}\cdot \left( \bvec{J} \times \bvec{B} \right) $ \\ \hline
+\end{tabular}
+\end{center}
+\label{table:fields}
+\end{table}
+%
+
+\subsection{\tt time\_evolution\_ctl}
+\label{href_t:time_evolution_ctl}
+Fields for time evolution are defined in this block. \\
+\hyperref[href_i:time_evolution_ctl]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt array time\_evo\_ctl}
+\label{href_t:time_evo_ctl}
+\verb|[Field]| \\
+Fields name for time evolution are listed in this array in \verb|[Field]| by text.
+Available fields are listed in Table \ref{table:evolution_field}.
+%
+\begin{table}[htdp]
+\caption{List of field name for time evolution}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+ label & field name & Description \\ \hline
+\verb|velocity| &    Velocity &  \bvec{u} \\
+\verb|temperature| & Temperature & $T$ \\
+\verb|composition| & Composition variation & $C$ \\
+\verb|magnetic_field| &  Magnetic field  & $\bvec{B}$ \\ \hline
+\end{tabular}
+\end{center}
+\label{table:evolution_field}
+\end{table}
+
+\subsection{\tt boundary\_condition}
+\label{href_t:boundary_condition}
+Boundary condition are defined in this block. \\
+\hyperref[href_i:boundary_condition]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt array bc\_temperature}
+\label{href_t:bc_temperature}
+\verb|[Group]  [Type]  [Value]| \\
+Boundary conditions for temperature are defined by this array. Position of boundary is defined in \verb|[Group]| column by {\tt ICB} or {\tt CMB}. The following type of boundary conditions are available for temperature in \verb|[Type]| column.
+%
+\begin{description}
+\item{\tt fixed}			Fixed homogeneous temperature on the boundary. The fixed value is defined in \verb|[Value]| by real.
+\item{\tt fixed\_file}			Fixed temperature defined by external file. \verb|[Value]| in this line is ignored. See section \ref{sec:boundary_file}.
+\item{\tt fixed\_flux}	Fixed homogeneous heat flux on the boundary. The value is defined in \verb|[Value]| by real. Positive value indicates outward flux from fluid shell. ({\it e.g.} Flux to center at ICB and Flux to mantle at CMB are positive.)
+\item{\tt fixed\_flux\_file}			Fixed heat flux defined by external file. \verb|[Value]| in this line is ignored.  See section \ref{sec:boundary_file}.
+\end{description}
+%
+
+\paragraph{\tt array bc\_velocity}
+\label{href_t:bc_velocity}
+\verb|[Group]  [Type]  [Value]| \\
+Boundary conditions for velocity are defined by this array. Position of boundary is defined in \verb|[Group]| by {\tt ICB} or {\tt CMB}. The following boundary conditions are available for velocity in \verb|[Type]| column.
+%
+\begin{description}
+\item{\tt non\_slip\_sph}	Non-slip boundary is applied to the boundary defined in \verb|[Group]|. Real value is required in \verb|[Value]|, but they value is not used in the program.
+\item{\tt free\_slip\_sph}	Free-slip boundary is applied to the boundary defined in \verb|[Group]|. Real value is required in \verb|[Value]|, but they value is not used in the program.
+\item{\tt rot\_inner\_core} If this condition is set, inner core ($r < r_{i}$) rotation is solved by using viscous torque and Lorentz torque. This boundary condition can be used for {\tt ICB}, and grid is filled to center. Real value is required in \verb|[Value]|, but they value is not used in the program.
+
+\item{\tt rot\_x} Set constant rotation around $x$-axis in \verb|[Value]| by real. Rotation vector can be defined with {\tt rot\_y} and {\tt rot\_z}.
+\item{\tt rot\_y} Set constant rotation around $y$-axis in \verb|[Value]| by real. Rotation vector can be defined with {\tt rot\_z} and {\tt rot\_x}.
+\item{\tt rot\_z} Set constant rotation around $z$-axis in \verb|[Value]| by real. Rotation vector can be defined with {\tt rot\_x} and {\tt rot\_y}.
+\end{description}
+%
+
+\paragraph{\tt array bc\_magnetic\_field}
+\label{href_t:bc_magnetic_field}
+\verb|[Group]  [Type]  [Value]| \\
+Boundary conditions for magnetic field are defined by this array. Position of boundary is defined in \verb|[Group]| by {\tt to\_Center}, {\tt ICB}, or {\tt CMB}. The following boundary conditions are available for magnetic field in \verb|[Type]| column.
+%
+\begin{description}
+\item{\tt insulator}	Magnetic field is connected to potential field at boundary defined in [Group]. real value is required at \verb|[Value]|, but they value is not used in the program.
+\item{\tt sph\_to\_center}	 If this condition is set, magnetic field in conductive inner core ($r < r_{i}$) is solved. This boundary condition can be used for {\tt ICB}, and grid is filled to center. The value at \verb|[Value]| does not used.
+\end{description}
+%
+
+\paragraph{\tt array bc\_composition}
+\label{href_t:bc_composition}
+\verb|[Group]  [Type]  [Value]| \\
+Boundary conditions for composition variation are defined by this array. Position of boundary is defined in \verb|[Group]| by {\tt ICB} or {\tt CMB}. The following boundary conditions are available for composition variation in \verb|[Type]| column.
+%
+\begin{description}
+\item{\tt fixed}			Fixed homogeneous composition on the boundary. The fixed value is defined in \verb|[Value]| by real.
+\item{\tt fixed\_file}			Fixed composition defined by external file. \verb|[Value]| in this line is ignored. See section \ref{sec:boundary_file}.
+\item{\tt fixed\_flux}	Fixed homogeneous compositional flux on the boundary. The value is defined in \verb|[Value]| by real. Positive value indicates outward flux from fluid shell. ({\it e.g.} Flux to center at ICB and Flux to mantle at CMB are positive.)
+\item{\tt fixed\_flux\_file}			Fixed compositional flux defined by external file. \verb|[Value]| in this line is ignored. See section \ref{sec:boundary_file}.
+\end{description}
+%
+
+\subsection{\tt forces\_define}
+\label{href_t:forces_define}
+Forces for the momentum equation are defined in this block. \\
+\hyperref[href_i:forces_define]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt array force\_ctl}
+\label{href_t:force_ctl}
+\verb|[Force]| \\
+Name of forces for momentum equation are listed in \verb|[Force]| by text.
+The following fields are available.
+%
+\begin{table}[htdp]
+\caption{List of force}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+ Label & Field name & Equation \\ \hline
+\verb|Coriolis| & Coriolis force & $-2\Omega \hat{z} \times \bvec{u} $ \\
+\verb|Lorentz| & Lorentz force &  $\bvec{J} \times \bvec{B} $ \\
+\verb|gravity| & Thermal buoyancy & $-\alpha_{T} T \bvec{g}$ \\
+\verb|Composite_gravity| & Compositional buoyancy  & $-\alpha_{C} C \bvec{g}$\\ \hline
+\end{tabular}
+\end{center}
+\label{table:forces}
+\end{table}
+%
+
+\subsection{\tt dimensionless\_ctl}
+\label{href_t:dimensionless_ctl}
+Dimensionless numbers are defined in this block. \\
+\hyperref[href_i:dimensionless_ctl]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt array dimless\_ctl}
+\label{href_t:dimless_ctl}
+\verb|[Name] [Value]| \\
+Dimensionless are listed in this array. The name is defined in \verb|[Name]| by text, and value is defined in \verb|[Value]| by real. These name of the dimensionless numbers are used to construct coefficients for each terms in governing equations. The following names can not be used because of reserved name in the program.
+%
+\begin{table}[htdp]
+\caption{List of reserved name of dimensionless numbers}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+ label & field name & value \\ \hline
+\verb|Zero| & zero & 0.0 \\
+\verb|One| &  one &  1.0 \\
+\verb|Two| &  two &  2.0 \\
+\verb|Radial_35| & Ratio of outer core thickness to whole core & $0.65 = 1 - 0.35$ \\ \hline
+\end{tabular}
+\end{center}
+\label{table:reserved_params}
+\end{table}
+%
+
+\subsection{\tt coefficients\_ctl}
+\label{href_t:coefficients_ctl}
+Coefficients of each term in governing equations are defined in this block.
+Each coefficients are defined by list of name of dimensionless number \verb|[Name]| and its power \verb|[Power]|. For example, coefficient for Coriolis term for the dynamo benchmark $ 2E^{-1}$ is defined as
+%
+\begin{verbatim}
+        array coef_4_Coriolis_ctl   2
+          coef_4_Coriolis_ctl       Two            1.0
+          coef_4_Coriolis_ctl       Ekman_number  -1.0
+        end array coef_4_Coriolis_ctl
+\end{verbatim}
+%
+\hyperref[href_i:coefficients_ctl]{(Back to {\tt control\_MHD})}
+
+\subsubsection{\tt thermal}
+\label{href_t:thermal}
+Coefficients of each term in heat equation are defined in this block. \\
+\hyperref[href_i:thermal]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt coef\_4\_termal\_ctl}
+\label{href_t:coef_4_termal_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for evolution of temperature $\displaystyle \frac{\partial T}{\partial t}$ and advection of heat $\left(\bvec{u} \cdot \nabla \right) T$ is defined by this array.
+
+\paragraph{\tt coef\_4\_t\_diffuse\_ctl}
+\label{href_t:coef_4_t_diffuse_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for thermal diffusion $\displaystyle \kappa_{T} \nabla^{2} T$ is defined by this array.
+
+\paragraph{\tt coef\_4\_heat\_source\_ctll}
+\label{href_t:coef_4_heat_source_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for heat source $\displaystyle q_{T}$ is defined by this array.
+
+\subsubsection{\tt momentum}
+\label{href_t:momentum}
+Coefficients of each term in momentum equation are defined in this block. \\
+\hyperref[href_i:momentum]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt coef\_4\_velocity\_ctl}
+\label{href_t:coef_4_velocity_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for evolution of velocity $\displaystyle \frac{\partial \bvec{u}}{\partial t}$ (or $\displaystyle \frac{\partial \bvec{\omega}}{\partial t}$ for the vorticity equation) and advection $-\bvec{\omega} \times \bvec{u}$ (or $- \nabla \times \left(\bvec{\omega} \times \bvec{u} \right)$ for the vorticity equation) is defined by this array.
+
+\paragraph{\tt coef\_4\_press\_ctl}
+\label{href_t:coef_4_press_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for pressure gradient $-\nabla P$ is defined by this array. Pressure does not appear the vorticity equation which is used for the time integration. But this coefficient is used to evaluate pressure field.
+
+\paragraph{\tt coef\_4\_v\_diffuse\_ctl}
+\label{href_t:coef_4_v_diffuse_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for viscous diffusion $- \nu \nabla \times \nabla \times \bvec{u}$ is defined by this array.
+
+\paragraph{\tt coef\_4\_buoyancy\_ctl}
+\label{href_t:coef_4_buoyancy_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for buoyancy $- \alpha_{T} T \bvec{g}$ is defined by this array.
+
+\paragraph{\tt coef\_4\_Coriolis\_ctl}
+\label{href_t:coef_4_Coriolis_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for Coriolis force $-2 \Omega \hat{z} \times \bvec{u}$ is defined by this array.
+
+\paragraph{\tt coef\_4\_Lorentz\_ctl}
+\label{href_t:coef_4_Lorentz_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for Lorentz force $ \rho_{0}^{-1} \bvec{J} \times \bvec{B}$ is defined by this array.
+
+\paragraph{\tt coef\_4\_composit\_buoyancy\_ctl}
+\label{href_t:coef_4_composit_buoyancy_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for compositional buoyancy $ -\alpha_{C} C \bvec{g}$ is defined by this array.
+
+\subsubsection{\tt induction}
+\label{href_t:induction}
+Coefficients of each term in magnetic induction equation are defined in this block. \\
+\hyperref[href_i:induction]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt coef\_4\_magnetic\_ctl}
+\label{href_t:coef_4_magnetic_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for evolution of temperature $\displaystyle \frac{\partial \bvec{B}}{\partial t}$ is defined by this array.
+
+\paragraph{\tt coef\_4\_m\_diffuse\_ctl}
+\label{href_t:coef_4_m_diffuse_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for magnetic diffusion $ -\eta \nabla \times \nabla \times \bvec{B}$ is defined by this array.
+
+\paragraph{\tt coef\_4\_induction\_ctl}
+\label{href_t:coef_4_induction_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for magnetic induction $\nabla \times \left(\bvec{u} \times \bvec{B} \right)$ is defined by this array.
+
+\subsubsection{\tt composition}
+\label{href_t:composition}
+Coefficients of each term in composition equation are defined in this block. \\
+\hyperref[href_i:composition]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt coef\_4\_composition\_ctl}
+\label{href_t:coef_4_composition_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for evolution of composition variation $\displaystyle \frac{\partial C}{\partial t}$ and advection of heat $\left(\bvec{u} \cdot \nabla \right) C$ is defined by this array.
+
+\paragraph{\tt coef\_4\_c\_diffuse\_ctl}
+\label{href_t:coef_4_c_diffuse_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for compositional diffusion $\displaystyle \kappa_{C} \nabla^{2} C$ is defined by this array.
+
+\paragraph{\tt coef\_4\_composition\_source\_ctll}
+\label{href_t:coef_4_composition_source_ctl}
+\verb|[Name] [Power]| \\
+Coefficient for composition source $\displaystyle q_{C}$ is defined by this array.
+
+% \subsection{\tt gravity\_define}
+% \label{href_t:gravity_define}
+% Gravity (buoyancy) vector is defined in this block \\
+% \hyperref[href_i:gravity_define]{(Back to {\tt control\_MHD})} 
+%
+% \paragraph{\tt gravity\_type\_ctl}
+% \label{href_t:gravity_type_ctl}
+% \verb|[Direction]  [Value]| \\
+% Gravity (buoyancy) type is defined by text. The following setting is available.
+% \begin{description}
+% \item{\tt radial} Gravity vector goes to center and is proportional to the radius $\bvec{g} = -\bvec{r}$. This model generally used to the geodyanmo simulations. 
+% \item{\tt constant\_radial} Gravity vector goes to center and has constants amplitude  $\bvec{g} = -\bvec{r} / r$. This model generally used to the geodyanmo simulations. 
+% \end{description}
+%
+% \subsection{\tt Coriolis\_define}
+% \label{href_t:Coriolis_define}
+% Rotation of the system for Coriolis force is defined in this block. \\
+% \hyperref[href_i:Coriolis_define]{(Back to {\tt control\_MHD})}
+%
+% \paragraph{\tt array rotation\_vec}
+% \label{href_t:rotation_vec}
+% \verb|[Direction]  [Value]| \\
+% Rotation vector of the system is defined by array. {\tt x}, {\tt y}, or {\tt z} is set in \verb|[Direction]|, and each component of the rotation vector is set in the \verb|[Value]| as real. In this program, the rotation vector does NOT normalized.
+
+\subsection{\tt temperature\_define}
+\label{href_t:temperature_define}
+Reference of temperature $T_{0}$ is defined in this block. If reference of temperature is defined, perturbation of temperature $\Theta = T - T_{0}$ is used for time evolution and buoyancy. \\
+\hyperref[href_i:temperature_define]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt ref\_temp\_ctl}
+\label{href_t:ref_temp_ctl}
+\verb|[REFERENCE_TEMP]| \\
+Type of reference temperature is defined by text. The following options are available for \verb|[REFERENCE_TEMP]|.
+%
+\begin{description}
+\item{\tt none}   Reference of temperature is not defined. Temperature $T$ is used to time evolution and thermal buoyancy.
+\item{\tt spherical\_shell} Reference of temperature is set by
+\begin{eqnarray}
+ T_{0} = \frac{1}{\left(r_{h}-r_{l} \right)} \left[
+          r_{l}T_{l} - r_{h}T_{h} + \frac{r_{l} r_{h}}{r} \left(T_{h}-T_{l}\right) \right].
+\nonumber
+\end{eqnarray}
+\end{description}
+%
+
+\paragraph{\tt low\_temp\_ctl}
+\label{href_t:low_temp_ctl}
+Amplitude of low reference temperature $T_{l}$ and its radius $r_{l}$ (Generally $r_{l} = r_{o}$) are defined in this block.
+
+\paragraph{\tt high\_temp\_ctl}
+\label{href_t:high_temp_ctl}
+Amplitude of high reference temperature $T_{h}$ and its radius $r_{h}$ (Generally $r_{h} = r_{i}$) are defined in this block.
+
+\paragraph{\tt depth}
+\label{href_t:depth}
+\verb|[RADIUS]| \\
+Radius for reference temperature is defined by real.
+
+\paragraph{\tt temperature}
+\label{href_t:temperature}
+\verb|[TEMPERATURE]| \\
+Temperature for reference temperature is defined by real.
+
+
+\subsection{\tt time\_step\_ctl}
+\label{href_t:time_step_ctl}
+Time stepping parameters are defined in this block. \\
+\hyperref[href_i:time_step_ctl]{(Back to {\tt control\_MHD})} \\
+\hyperref[href_i:time_step_ctl2]{(Back to {\tt control\_assemble\_sph)}}
+
+\paragraph{\tt elapsed\_time\_ctl}
+\label{href_t:elapsed_time_ctl}
+\verb|[ELAPSED_TIME]| \\
+Elapsed (wall clock) time (second) for simulation \verb|[ELAPSED_TIME]| is defined by real. 
+This parameter varies if end step \verb|[ISTEP_FINISH]| is defined to {\tt -1}. If simulation runs for given time, program output spectrum data  \verb|[rst_prefix].elaps.[process #].fst| immediately, and finish the simulation.
+
+\paragraph{\tt i\_step\_init\_ctl}
+\label{href_t:i_step_init_ctl}
+\verb|[ISTEP_START]| \\
+Start step of simulation \verb|[ISTEP_START]| is defined by integer. if \verb|[ISTEP_START]| is set to {\tt -1} and \verb|[INITIAL_TYPE]| is set to \verb|start_from_rst_file|, program read spectrum data file \verb|[rst_prefix].elaps.[process #].fst| and start the simulation.
+
+\paragraph{\tt i\_step\_finish\_ctl}
+\label{href_t:i_step_finish_ctl}
+\verb|[ISTEP_FINISH]| \\
+End step of simulation \verb|[ISTEP_FINISH]| is defined by integer. If this value is set to  {\tt -1}, simulation stops when elapsed time reaches to \verb|[ELAPSED_TIME]|.
+
+\paragraph{\tt i\_step\_check\_ctl}
+\label{href_t:i_step_check_ctl}
+\verb|[ISTEP_MONITOR]| \\
+Increment of time step for monitoring data \verb|[ISTEP_MONITOR]| is defined by integer.
+
+\paragraph{\tt i\_step\_rst\_ctl}
+\label{href_t:i_step_rst_ctl}
+\verb|[ISTEP_RESTART]| \\
+Increment of time step to output spectrum data for restarting \verb|[ISTEP_RESTART]| is defined by integer.
+
+\paragraph{\tt i\_step\_field\_ctl}
+\label{href_t:i_step_field_ctl}
+\verb|[ISTEP_FIELD]| \\
+Increment of time step to output field data for visualization \verb|[ISTEP_FIELD]| is defined by integer. If \verb|[ISTEP_FIELD]| is set to be 0, no field data are written.
+
+\paragraph{\tt dt\_ctl}
+\label{href_t:dt_ctl}
+\verb|[DELTA_TIME]| \\
+Length of time step $\Delta t$ is defined by real value.
+
+\paragraph{\tt time\_init\_ctl}
+\label{href_t:time_init_ctl}
+\verb|[INITIAL_TIME]| \\
+Initial time $t_{0}$ is defined by real value. This value is ignored if simulation starts from restart data.
+
+
+\subsection{\tt restart\_file\_ctl}
+\label{href_t:restart_file_ctl}
+Initial field for simulation is defined in this block.\\
+\hyperref[href_t:restart_file_prefix]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt rst\_ctl}
+\label{href_t:rst_ctl}
+\verb|[INITIAL_TYPE]| \\
+Type of Initial field is defined by text. The following parameters are available for \verb|[INITIAL_TYPE]|.
+%
+\begin{description}
+\item{\tt No\_data}  No initial data file. Small temperature perturbation and seed magnetic field are set as an initial field.
+\item{\tt start\_from\_rst\_file} Initial field is read from spectrum data file. File prefix is defined by \hyperref[href_t:restart_file_prefix]{$\mbox{\tt restart\_file\_prefix}$}.
+\item{\tt Dynamo\_benchmark\_0}   Generate initial field for dynamo benchmark case 0
+\item{\tt Dynamo\_benchmark\_1}   Generate initial field for dynamo benchmark case 1
+\item{\tt Dynamo\_benchmark\_2}   Generate initial field for dynamo benchmark case 2
+\item{\tt Pseudo\_vacuum\_benchmark} Generate initial field for pseudo vacuum dynamo benchmark
+\end{description}
+%
+
+\subsection{\tt time\_loop\_ctl}
+\label{href_t:time_loop_ctl}
+Time evolution scheme is defined in this block. \\
+\hyperref[href_i:time_loop_ctl]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt scheme\_ctl}
+\label{href_t:scheme_ctl}
+\verb|[EVOLUTION_SCHEME]| \\
+Time evolution scheme is defined by text. Currently, Crank-Nicolson scheme is only available for diffusion terms.
+%
+\begin{description}
+\item{\tt Crank\_Nicolson} Crank-Nicolson scheme for diffusion terms and second order Adams-Bashforth scheme the other terms.
+% \item{\tt 2nd\_Adams\_Bashforth}  Second order Adams-Bashforth scheme
+% \item{\tt explicit\_Euler} First order Euler scheme.
+\end{description}
+%
+
+\paragraph{\tt coef\_imp\_v\_ctl}
+\label{href_t:coef_imp_v_ctl}
+\verb|[COEF_INP_U]| \\
+Coefficients for the implicit parts of the Crank-Nicolson scheme for viscous diffusion \verb|[COEF_INP_U]| is defined by real.
+
+\paragraph{\tt coef\_imp\_t\_ctl}
+\label{href_t:coef_imp_t_ctl}
+\verb|[COEF_INP_T]| \\
+Coefficients for the implicit parts of the Crank-Nicolson scheme for thermal diffusion \verb|[COEF_INP_T]| is defined by real.
+
+\paragraph{\tt coef\_imp\_b\_ctl}
+\label{href_t:coef_imp_b_ctl}
+\verb|[COEF_INP_B]| \\
+Coefficients for the implicit parts of the Crank-Nicolson scheme for magnetic diffusion \verb|[COEF_INP_B]| is defined by real.
+
+\paragraph{\tt coef\_imp\_c\_ctl}
+\label{href_t:coef_imp_c_ctl}
+\verb|[COEF_INP_C]| \\
+Coefficients for the implicit parts of the Crank-Nicolson scheme for compositional diffusion \verb|[COEF_INP_C]| is defined by real. 
+
+
+\paragraph{\tt FFT\_library\_ctl}
+\label{href_t:FFT_library_ctl}
+\verb|[FFT_Name]| \\
+FFT library name for Fourier transform is defined by text. The following libraries are available for \verb|[FFT_Name]|. 
+If this flag is not defined, program searches the fastest library in the initialization process.
+%
+\begin{description}
+\item{\tt FFTW}		Use FFTW
+\item{\tt FFTPACK}	Use FFTPACK
+% \item{\tt ISPACK}	Use ISPACK
+\end{description}
+%
+
+\paragraph{\tt FFT\_library\_ctl}
+\label{href_t:Legendre_trans_loop_ctl}
+\verb|[FFT_Name]| \\
+Loop configuration for Legendre transform is defined by text. The following settings are available for \verb|[Leg_Loop]|. 
+If this flag is not defined, program searches the fastest approarch in the initialization process.
+%
+\begin{description}
+\item{\tt Inner\_radial\_loop}	Loop for the radial grids is set as the innermost loop
+\item{\tt Outer\_radial\_loop}	Loop for the radial grids is set as the outermost loop
+\item{\tt Long\_loop}	        Long one-dimentional loop is used
+\end{description}
+%
+
+\subsection{\tt sph\_monitor\_ctl}
+\label{href_t:sph_monitor_ctl}
+Monitoring data is defined in this block. Monitoring data output root mean square, average, Gauss coefficients, or specific components of spectrum data which are flagged by {\tt Monitor\_On} in \hyperref[href_t:nod_value_ctl]{ {\tt nod\_value\_ctl} array}. \\
+\hyperref[href_i:sph_monitor_ctl]{(Back to {\tt control\_MHD})}
+
+\paragraph{\tt volume\_average\_prefix}
+\label{href_t:volume_average_prefix}
+\verb|[vol_ave_prefix]| \\
+File prefix for volume average data \verb|[vol_ave_prefix]| is defined by Text. Program add {\tt .dat} extension after this file prefix. If this file prefix is not defined, volume average data are not generated. 
+
+\paragraph{\tt volume\_pwr\_spectr\_prefix}
+\label{href_t:volume_pwr_spectr_prefix}
+\verb|[vol_pwr_prefix]| \\
+File prefix for mean square spectrum data averaged over the fluid shell \verb|[vol_pwr_prefix]| is defined by Text. 
+
+Spectrum as a function of degree {l} is written in \verb|[vol_pwr_prefix])_l.dat|, spectrum as a function of order {m} is written in \verb|[vol_pwr_prefix]_m.dat|, and spectrum as a function of $(l-m)$ is written in \verb|[vol_pwr_prefix]_lm.dat|. This prefix is also used for the file name of the volume mean square data as \verb|[vol_pwr_prefix].dat|.
+If this file prefix is not defined, volume spectrum data are not generated and volume mean square data is written as \verb|sph_pwr_volume.dat|.
+
+\paragraph{\tt layered\_pwr\_spectr\_prefix}
+\label{href_t:layered_pwr_spectr_prefix}
+\verb|[layer_pwr_prefix]| \\
+File prefix for mean square spectrum data averaged over each sphere surface \verb|[layer_pwr_prefix]| is defined by Text.
+
+Spectrum as a function of degree {l} is written in \verb|[layer_pwr_prefix]_l.dat|, spectrum as a function of order {m} is written in \verb|[layer_pwr_prefix]_m.dat|, and spectrum as a function of $(l-m)$ is written in \verb|[layer_pwr_prefix]_lm.dat|. If this file prefix is not defined, sphere averaged spectrum data are not generated. 
+
+\paragraph{\tt picked\_sph\_prefix}
+\label{href_t:picked_sph_prefix}
+\verb|[picked_sph_prefix]| \\
+File prefix for picked spectrum data \verb|[picked_sph_prefix]| is defined by Text. Program add {\tt .dat} extension after this file prefix. If this file prefix is not defined, picked spectrum data are not generated. 
+
+\paragraph{\tt gauss\_coefs\_prefix}
+\label{href_t:gauss_coefs_prefix}
+\verb|[gauss_coef_prefix]| \\
+File prefix for Gauss coefficients \verb|[gauss_coef_prefix]| is defined by Text. Program add {\tt .dat} extension after this file prefix. If this file prefix is not defined, Gauss coefficients data are not generated. 
+
+\paragraph{\tt gauss\_coefs\_radius\_ctl}
+\label{href_t:gauss_coefs_radius_ctl}
+\verb|[gauss_coef_radius]| \\
+Normalized radius to obtain Gauss coefficients \verb|[gauss_coef_radius]| is defined by real. Gauss coefficients are evaluated from the poloidal magnetic field at CMB by assuming electrically insulated mantle. Do not set \verb|[gauss_coef_radius]| less than the outer core radius $r_{o}$.
+
+\paragraph{\tt array pick\_layer\_ctl}
+\label{href_t:pick_layer_ctl}
+\verb|[Layer #]|
+List of radial grid point number \verb|[Layer #]| to output spectrum data by integer. If this array is not defined, picked spectrum data are written for all radial grid points.
+
+\paragraph{\tt array pick\_sph\_spectr\_ctl}
+\label{href_t:pick_sph_spectr_ctl}
+\verb|[Degree]  [Order]| \\
+List of spherical harmonics mode $l$ and $m$ of spectrum data to output. \verb|[Degree]| and \verb| [Order]| are defined by integer.
+
+\paragraph{\tt array pick\_sph\_degree\_ctl}
+\label{href_t:pick_sph_degree_ctl}
+\verb|[Degree]| \\
+Degrees $l$ to output spectrum data are listed in \verb|[Degree]| by integer. All spectrum data with listed degree $l$ is output in file.
+
+\paragraph{\tt array pick\_sph\_order\_ctl}
+\label{href_t:pick_sph_order_ctl}
+\verb|[Order]| \\
+Order $m$ to output spectrum data are listed in \verb|[Order]| by integer. All spectrum data with listed order $m$ is output in file.
+
+\paragraph{\tt array pick\_gauss\_coefs\_ctl}
+\label{href_t:pick_gauss_coefs_ctl}
+\verb|[Degree]  [Order]| \\
+List of spherical harmonics mode $l$ and $m$ of Gauss coefficients to output. \verb|[Degree]| and \verb| [Order]| are defined by integer.
+
+\paragraph{\tt array pick\_gauss\_coef\_degree\_ctl}
+\label{href_t:pick_gauss_coef_degree_ctl}
+\verb|[Degree]| \\
+Degrees $l$ to output Gauss coefficients are listed in \verb|[Degree]| by integer. All Gauss coefficients with listed $l$ is output in file.
+
+\paragraph{\tt array pick\_gauss\_coef\_order\_ctl}
+\label{href_t:pick_gauss_coef_order_ctl}
+\verb|[Order]| \\
+Orders $m$ to output Gauss coefficients are listed in \verb|[Order]| by integer. All Gauss coefficients with listed order $m$ is output in file.
+
+\paragraph{\tt nphi\_mid\_eq\_ctl}
+\label{href_t:nphi_mid_eq_ctl}
+\verb|[Nphi_mid_equator]| \\
+Number of grid points \verb|[Nphi_mid_equator]|in longitudinal direction to evaluate mid-depth of the shell in the equatorial plane for dynamo benchmark is defined as integer. If \verb|[Nphi_mid_equator]| is not defined or less than zero, \verb|[Nphi_mid_equator]| is set set number grid as the input spherical transform data. 
+
+
+\subsection{\tt num\_domain\_ctl}
+\label{href_t:num_domain_ctl}
+Parallelization is defined in this block. Domain decomposition is defined for spectrum data, field data, and Legendre transform. \\
+\hyperref[href_i:num_domain_ctl]{(Back to {\tt control\_sph\_shell})}
+
+\paragraph{\tt num\_domain\_sph\_grid}
+\label{href_t:num_domain_sph_grid} 
+\verb|[Direction]| \verb|[Ndomain]| \\
+ Definition of number of subdomains for physical data in spherical coordinate $(r, \theta, \phi)$. Direction {\tt  radial} or {\tt meridional} is set in \verb|[Direction]|, and number of subdomains \verb|[Ndomain]| are defined in the integer field.
+
+\paragraph{\tt num\_domain\_legendre}
+\label{href_t:num_domain_legendre}
+\verb|[Direction]| \verb|[Ndomain]| \\
+ Definition of number of subdomains for Legendre transform between $(r, \theta, m)$ and $(r, l, m)$. Direction {\tt  radial} or {\tt zonal} is set in \verb|[Direction]|, and number of subdomains \verb|[Ndomain]| are defined in the integer field.
+
+\paragraph{\tt num\_domain\_spectr}
+\label{href_t:num_domain_spectr}
+\verb|[Direction]| \verb|[Ndomain]| \\
+Definition of number of subdomains for spectrum data in $(r, l, m)$. Direction {\tt  modes} is set in the \verb|[Direction]| field, and number of subdomains \verb|[Ndomain]| are defined in the integer field.
+
+
+\subsection{\tt num\_grid\_sph}
+\label{href_t:num_grid_sph}
+Spatial resolution of the spherical shell is defined in this block. \\
+\hyperref[href_i:num_grid_sph]{(Back to {\tt control\_sph\_shell})}
+
+\paragraph{\tt truncation\_level\_ctl}
+\label{href_t:truncation_level_ctl}
+\verb|[Lmax]| \\
+Truncation level $L$ is defined by integer. Spherical harmonics is truncated by triangular $0 \le l \le L$ and $0 <m < l$.
+
+\paragraph{\tt ngrid\_meridonal\_ctl}
+\label{href_t:ngrid_meridonal_ctl}
+\verb|[Ntheta]| \\
+Number of grid in the meridional direction \verb|[Ntheta]| is defined by integer.
+
+\paragraph{\tt ngrid\_zonal\_ctl}
+\label{href_t:ngrid_zonal_ctl}
+\verb|[Nphi]| \\
+Number of grid in the zonal direction \verb|[Nphi]| is defined by integer.
+
+\paragraph{\tt raidal\_grid\_type\_ctl}
+\label{href_t:radial_grid_type_ctl}
+\verb|[explicit, Chebyshev, or equi_distance]| \\
+Type of the radial grid spacing is defined by text. The following types are supported in Calypso.
+%
+\begin{description}
+	\item{\tt explicit}  Equi-distance grid
+	\item{\tt Chebyshev} Chebyshev collocation points
+	\item{\tt equi\_distance} Set explicitly by \verb|r_layer| array
+\end{description}
+%
+
+\paragraph{\tt num\_fluid\_grid\_ctl}
+\label{href_t:num_fluid_grid_ctl}
+\verb|[Nr_shell]| \\
+(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
+Number of layer in the fluid shell \verb|[Nr_shell]| is defined by integer. Number of grids including CMB and ICB will be (\verb|[Nr_shell]| + 1).
+
+\paragraph{\tt fluid\_core\_size\_ctl}
+\label{href_t:fluid_core_size_ctl}
+\verb|[Length]| \\
+(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
+Size of the outer core \verb|[Length]| ($ = r_{o}-r_{i}$) is defined by real.
+
+\paragraph{\tt ICB\_to\_CMB\_ratio\_ctl}
+\label{href_t:ICB_to_CMB_ratio_ctl} 
+\verb|[R_ratio]| \\
+(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
+Ratio of the inner core radius to outer core \verb|[R_ratio]| ($ = r_{i} / r_{o}$) is defined by real.
+
+\paragraph{\tt Min\_radius\_ctl}
+\label{href_t:Min_radius_ctl}
+\verb|[Rmin]| \\
+(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
+Minimum radius of the domains \verb|[Rmin]| is defined by real. If this value is not defined, ICB becomes inner boundary of the domain.
+
+\paragraph{\tt Max\_radius\_ctl }
+\label{href_t:Max_radius_ctl} 
+\verb|[Rmax]| \\
+(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
+Maximum radius of the domains \verb|[Rmax]| is defined by real. If this value is not defined, CMB becomes outer boundary of the domain.
+
+\paragraph{\tt r\_layer}
+\label{href_t:r_layer}
+\verb|[Layer #]   [Radius]| \\
+(This option works with \verb|[radial_grid_type_ctl]| is {\tt explicit}.)
+List of the radial grid points in the simulation domain. Index of the radial point \verb|[Layer #]| is defined by integer, and radius \verb|[Radius]| is defined by real.
+
+\paragraph{\tt array boundaries\_ctl}
+\verb|[Boundary_name]  [Layer #]| \\
+\label{href_t:boundaries_ctl} 
+(This option works with \verb|[radial_grid_type_ctl]| is {\tt explicit}.)
+Boundaries of the simulation domain is defined by \verb|[Layer #]| in \verb|[r_layer]| array. The following boundary name can be defined for \verb|[Boundary_name]|.
+%
+\begin{description}
+	\item{\tt to\_Center} Inner boundary of the domain to fill the center.
+	\item{\tt ICB} ICB
+	\item{\tt CMB} CMB
+\end{description}
+%
+
+\subsection{\tt new\_data\_files\_def}
+\label{href_t:new_data_files_def}
+File names and number of processes for new domain decomposed data are defined in this block. \\
+\hyperref[href_i:new_data_files_def]{(Back to {\tt control\_assemble\_sph)}}
+
+\paragraph{\tt num\_new\_domain\_ctl}
+\label{href_t:num_new_domain_ctl}
+\verb|[new_num_domain]| \\
+Number of subdomain for new new decomposed data \verb|[new_num_domain]| is defined by integer.
+
+\paragraph{\tt new\_sph\_mode\_prefix}
+\label{href_t:new_sph_mode_prefix}
+\verb|[new_sph_prefix]| \\
+File prefix of new spherical harmonics indexing \verb|[new_sph_prefix]| is defined by text.
+
+\paragraph{\tt new\_restart\_prefix}
+\label{href_t:new_restart_prefix}
+\verb|[new_rst_prefix]| \\
+File prefix of new spectrum data \verb|[new_rst_prefix]| is defined by text.
+
+\paragraph{\tt delete\_original\_data\_flag}
+\label{href_t:delete_original_data_flag}
+\verb|[delete_original_data_flag]| \\
+If this flag set to \verb|YES|, original specter data is deleted at the end of program. 
+
+\subsection{\tt newrst\_magne\_ctl}
+\label{href_t:newrst_magne_ctl}
+Parameters to modify magnetic field are defined in this block. \\
+\hyperref[href_i:newrst_magne_ctl]{(Back to {\tt control\_assemble\_sph)}}
+
+\paragraph{\tt magnetic\_field\_ratio\_ctl}
+\label{href_t:magnetic_field_ratio_ctl} 
+\verb|[ratio]| \\
+Ratio of new magnetic field data to original magnetic field \verb|[ratio]| is defined by real.

@@ -1,0 +1,61 @@
+% Template article for preprint document class `elsart'
+% SP 2001/01/05
+
+\documentclass[12pt]{article}
+\usepackage{graphicx,color,amssymb}
+\usepackage{times,textpos}
+\usepackage{geometry}
+\usepackage{epstopdf,hyperref,float}
+%\usepackage{epstopdf,hyperref,float,slashbox}
+\usepackage[titletoc,toc,title]{appendix}
+
+% Use the option doublespacing or reviewcopy to obtain double line spacing
+% \documentclass[doublespacing]{elsart}
+
+% The amssymb package provides various useful mathematical symbols
+%\usepackage{amssymb}
+\begin{document}
+\input{tex_src/cover_CALYPSO.tex}
+\input{tex_src/mathdef.tex}
+%\maketitle
+%\input{captions.txt}
+%
+%
+
+\section*{Preface}
+Calypso is a program package of magnetohydrodynamics (MHD) simulations in a rotating spherical shell for geodynamo problems. This package consists of the simulation program, preprocessing program, post processing program to generate field data for visualization programs, and several small utilities. The simulation program runs on parallel computing systems using MPI and OpenMP parallelization.
+
+\newpage
+\tableofcontents
+
+%
+\newpage
+\input{tex_src/intro_CALYPSO.tex}
+
+\newpage
+\input{tex_src/model_CALYPSO.tex}
+
+\input{tex_src/install_CALYPSO.tex}
+
+\input{tex_src/outlines_CALYPSO.tex}
+%
+
+\newpage
+\input{tex_src/programs_CALYPSO.tex}
+
+\newpage
+\begin{thebibliography}{10}
+
+\bibitem{Bullard:54} Bullard, E. C. and Gellman, H., Homogeneous dynamos and terrestrial magnetism, {\it Proc. of the Roy. Soc. of London}, {\bf A247}, 213--278, 1954.
+\bibitem{Uli:2001} Christensen, U.R., Aubert, J., Cardin, P., Dormy, E., Gibbons, S., Glatzmaier, G. A., Grote, E., Honkura, H., Jones, C., Kono, M., Matsushima, M., Sakuraba, A., Takahashi, F., Tilgner, A., Wicht, J. and Zhang, K., A numerical dynamo benchmark, {\it Physics of the Earth and Planetary Interiors}, {\bf 128}, 25--34, 2001.
+
+\end{thebibliography}
+
+
+\newpage
+\begin{appendices}
+\input{tex_src/controls_CALYPSO.tex}
+\input{tex_src/gpl3.tex}
+\end{appendices}
+
+\end{document}
