@@ -160,7 +160,7 @@
           d_rj(inod,ipol%i_temp) = d_rj(inod,ipol%i_temp)               &
      &                    - reftemp_rj(k,0)
           d_rj(inod,ipol%i_grad_t) = d_rj(inod,ipol%i_grad_t)           &
-     &                    - reftemp_rj(k,1) * radius_1d_rj_r(k)**2
+     &                    - two*reftemp_rj(k,1) * radius_1d_rj_r(k)**2
           d_rj(inod,idpdr%i_grad_t) = d_rj(inod,ipol%i_temp)
         end do
       end if
@@ -199,7 +199,7 @@
           d_rj(inod,ipol%i_temp) = d_rj(inod,ipol%i_temp)               &
      &                            + reftemp_rj(k,0)
           d_rj(inod,ipol%i_grad_t) = d_rj(inod,ipol%i_grad_part_t)      &
-     &                 + reftemp_rj(k,1) * radius_1d_rj_r(k)**2
+     &                 + two*reftemp_rj(k,1) * radius_1d_rj_r(k)**2
           d_rj(inod,idpdr%i_grad_t) = d_rj(inod,ipol%i_temp)
         end do
       end if

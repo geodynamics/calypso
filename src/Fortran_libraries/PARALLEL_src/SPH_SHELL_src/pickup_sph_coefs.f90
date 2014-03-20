@@ -66,6 +66,8 @@
      &    idx_pick_sph_mode, idx_pick_sph_l, idx_pick_sph_m,            &
      &    ntot_pick_sph_mode, num_pick_sph_mode, idx_pick_sph_gl,       &
      &    idx_pick_sph_lc)
+      call set_scale_4_vect_l0                                          &
+     &   (num_pick_sph_mode, idx_pick_sph_gl(1), scale_for_zelo(1))
       call deallocate_iflag_pick_sph
       call deallocate_pick_sph_mode
 !
@@ -105,9 +107,12 @@
               icou = istack_phys_comp_rj(i_fld-1)
               jcou = istack_comp_pick_sph(j_fld-1)
               if(num_phys_comp_rj(i_fld) .eq. 3) then
-                d_rj_pick_sph_lc(jcou+1,ipick)= d_rj(inod,icou+1)
-                d_rj_pick_sph_lc(jcou+2,ipick)= d_rj(inod,icou+3)
-                d_rj_pick_sph_lc(jcou+3,ipick)= d_rj(inod,icou+2)
+                d_rj_pick_sph_lc(jcou+1,ipick)                          &
+     &                    = scale_for_zelo(inum) * d_rj(inod,icou+1)
+                d_rj_pick_sph_lc(jcou+2,ipick)                          &
+     &                    = scale_for_zelo(inum) * d_rj(inod,icou+3)
+                d_rj_pick_sph_lc(jcou+3,ipick)                          &
+     &                    = scale_for_zelo(inum) * d_rj(inod,icou+2)
               else
                 do nd = 1, num_phys_comp_rj(i_fld)
                   d_rj_pick_sph_lc(jcou+nd,ipick) = d_rj(inod,icou+nd)

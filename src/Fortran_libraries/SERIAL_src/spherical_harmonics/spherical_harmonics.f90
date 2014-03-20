@@ -30,6 +30,7 @@
 !*   g(j,11)           :  1 / (2*l+1)
 !*   g(j,12)           :  l*(l+1) / (2*l+1)
 !*   g(j,13)           :  1 / (l*(l+1))
+!*            g(j,13)  :    1                           (l=m=0)
 !
 !*   g(j,16)           : (2*l+1) / 4
 !*   g(j,17)           : (2*l+1) / ( 4*l*(l+1) )
@@ -37,6 +38,7 @@
 !
 !
 !   Note: g(0,3) = 1/2 for spherical harmonics transform
+!   Note: g(0,13) = 2  for gradient of scalar
 !    (See g_sph_rlm in schmidt_poly_on_rtm_grid.f90)
 !
 !*
@@ -120,7 +122,7 @@
 !
           if ( j .eq. 0 ) then
             g(j,9) = one / (four*pi)
-            g(j,13) = zero
+            g(j,13) = one
           else
             g(j,9) = dble(2*l+1) / (four*pi*dble( l*(l+1) ))
             g(j,13) = one / dble( l*(l+1) )

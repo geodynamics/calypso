@@ -128,6 +128,14 @@
         end do
 !$omp end parallel do
 !
+      if (idx_rj_degree_zero .eq. 0) return
+!$omp parallel do private (inod,k)
+      do k = 1, nidx_rj(1)
+        inod = idx_rj_degree_zero + (k-1)*nidx_rj(2)
+        d_rj(inod,is_div) = half * d_rj(inod,is_div)
+      end do
+!$omp end parallel do
+!
       end subroutine cal_div_double_buoyancy_sph_MHD
 !
 !-----------------------------------------------------------------------
@@ -150,6 +158,14 @@
         d_rj(inod,is_div) = coef * ( three * d_rj(inod,is_fld)          &
      &                       + d_rj(inod,ids_fld) * radius_1d_rj_r(k)   &
      &                        * g_sph_rj(j,3) * a_r_1d_rj_r(k))
+      end do
+!$omp end parallel do
+!
+      if (idx_rj_degree_zero .eq. 0) return
+!$omp parallel do private (inod,k)
+      do k = 1, nidx_rj(1)
+        inod = idx_rj_degree_zero + (k-1)*nidx_rj(2)
+        d_rj(inod,is_div) = half * d_rj(inod,is_div)
       end do
 !$omp end parallel do
 !

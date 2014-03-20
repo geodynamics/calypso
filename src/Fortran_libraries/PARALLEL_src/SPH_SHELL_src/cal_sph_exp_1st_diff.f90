@@ -9,6 +9,7 @@
 !!@verbatim
 !!      subroutine cal_sph_nod_gradient_2(kr_in, kr_out,                &
 !!     &          dnod_rj, dnod_dr)
+!!      subroutine normalize_sph_average_grad(dnod_dr)
 !!      subroutine cal_sph_nod_vect_dr_2(kr_in, kr_out, dnod_rj, dnod_dr)
 !!@endverbatim
 !!
@@ -71,24 +72,29 @@
       end do
 !$omp end parallel do
 !
+      end subroutine cal_sph_nod_gradient_2
+!
+! -----------------------------------------------------------------------
+!
+      subroutine normalize_sph_average_grad(dnod_dr)
+!
+      real(kind = kreal), intent(inout) :: dnod_dr(nnod_rj,3)
+!
+      integer(kind = kint) :: inod, k
+!
+!
       if(idx_rj_degree_zero .eq. 0) return
 !
-      j = idx_rj_degree_zero
-!$omp parallel do private(inod,i_p1,i_n1,k,d1sdr)
-      do k = kr_in+1, kr_out-1
+!$omp parallel do private(inod,k)
+      do k = 1, nidx_rj(1)
         inod = (k-1) * nidx_rj(2) + idx_rj_degree_zero
-        i_p1 = inod + nidx_rj(2)
-        i_n1 = inod - nidx_rj(2)
-!
-        d1sdr =  d1nod_mat_fdm_2(k,-1) * dnod_rj(i_n1)                  &
-     &         + d1nod_mat_fdm_2(k, 0) * dnod_rj(inod)                  &
-     &         + d1nod_mat_fdm_2(k, 1) * dnod_rj(i_p1)
-!
-        dnod_dr(inod,1) = d1sdr * radius_1d_rj_r(k)**2
+        dnod_dr(inod,1) = two * dnod_dr(inod,1)
+        dnod_dr(inod,2) = zero
+        dnod_dr(inod,3) = zero
       end do
 !$omp end parallel do
 !
-      end subroutine cal_sph_nod_gradient_2
+      end subroutine normalize_sph_average_grad
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

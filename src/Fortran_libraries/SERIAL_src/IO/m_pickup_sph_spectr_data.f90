@@ -83,6 +83,8 @@
       real(kind = kreal), allocatable :: d_rj_pick_sph_gl(:,:)
 !>      Localy evaluated  monitoring spectrum
       real(kind = kreal), allocatable :: d_rj_pick_sph_lc(:,:)
+!>      Scale factor for vector at l=m=0
+      real(kind = kreal), allocatable :: scale_for_zelo(:)
 !>      Name of  monitoring spectrum
       character(len=kchara), allocatable :: pick_sph_spec_name(:)
 !
@@ -148,6 +150,7 @@
       allocate( idx_pick_sph_lc(ntot_pick_sph_mode) )
       allocate( d_rj_pick_sph_lc(ntot_comp_pick_sph,num) )
       allocate( d_rj_pick_sph_gl(ntot_comp_pick_sph,num) )
+      allocate( scale_for_zelo(ntot_comp_pick_sph) )
       allocate( pick_sph_spec_name(ntot_comp_pick_sph) )
       allocate( istack_comp_pick_sph(0:num_fld_pick_sph) )
       allocate( ifield_monitor_rj(num_fld_pick_sph) )
@@ -161,6 +164,7 @@
         idx_pick_sph_lc =  0
         d_rj_pick_sph_lc = 0.0d0
         d_rj_pick_sph_gl = 0.0d0
+        scale_for_zelo   = 1.0d0
       end if
 !
       end subroutine allocate_pick_sph_monitor
@@ -190,7 +194,7 @@
 !
 !
       deallocate(idx_pick_sph_gl, d_rj_pick_sph_gl)
-      deallocate(idx_pick_sph_lc, d_rj_pick_sph_lc)
+      deallocate(idx_pick_sph_lc, d_rj_pick_sph_lc, scale_for_zelo)
       deallocate(pick_sph_spec_name)
       deallocate(istack_comp_pick_sph, ifield_monitor_rj)
 !

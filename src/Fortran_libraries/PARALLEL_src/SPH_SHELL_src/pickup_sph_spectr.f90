@@ -12,7 +12,9 @@
 !!      subroutine set_picked_sph_address(l_truncation, jmax, idx_gl_j, &
 !!     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,         &
 !!     &          idx_pick_sph, idx_pick_sph_l, idx_pick_sph_m,         &
-!!     &          ntot_pickup, num_pickup, idx_pick_gl, idx_pick_lc)
+!!     &          ntot_pickup, num_pickup, idx_pick_gl, idx_pick_lc,    &
+!!      subroutine set_scale_4_vect_l0(num_pickup,                      &
+!!     &          idx_pick_gl, scale_for_zelo)
 !
       module pickup_sph_spectr
 !
@@ -162,6 +164,28 @@
       end do
 !
       end subroutine set_picked_sph_address
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_scale_4_vect_l0(num_pickup,                        &
+     &          idx_pick_gl, scale_for_zelo)
+!
+      integer(kind = kint), intent(in) :: num_pickup
+      integer(kind = kint), intent(in) :: idx_pick_gl(num_pickup)
+      real(kind = kreal), intent(inout) :: scale_for_zelo(num_pickup)
+!
+      integer(kind = kint) :: inum
+!
+!
+      do inum = 1, num_pickup
+        if(idx_pick_gl(inum) .eq. 0) then
+          scale_for_zelo(inum) = half
+        else
+          scale_for_zelo(inum) = one
+        end if
+      end do
+!
+      end subroutine set_scale_4_vect_l0
 !
 ! -----------------------------------------------------------------------
 !

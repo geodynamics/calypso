@@ -84,6 +84,23 @@
       end do
 !$omp end parallel do
 !
+        j = idx_rj_degree_zero
+      if(idx_rj_degree_zero .eq. izero) then
+        do k = 1, nidx_rj(1)
+          rms_sph_dat(j,k,jcomp  ) = zero
+          rms_sph_dat(j,k,jcomp+1) = zero
+          rms_sph_dat(j,k,jcomp+2) = zero
+        end do
+      else
+        do k = 1, nidx_rj(1)
+          idx = idx_rj_degree_zero + (k-1) * nidx_rj(2)
+          rms_sph_dat(j,k,jcomp  ) = (half * d_rj(idx,icomp))**2        &
+     &                            * a_r_1d_rj_r(k)*a_r_1d_rj_r(k)
+          rms_sph_dat(j,k,jcomp+1) = zero
+          rms_sph_dat(j,k,jcomp+2) = rms_sph_dat(j,k,jcomp  )
+        end do
+      end if
+!
       end subroutine cal_rms_each_vector_sph_spec
 !
 ! -----------------------------------------------------------------------
@@ -150,11 +167,9 @@
         do k = 1, nidx_rj(1)
           kg = idx_gl_1d_rj_r(k)
           inod = idx_rj_degree_zero + (k-1) * nidx_rj(2)
-          ave_sph_lc(kg,jcomp  ) = d_rj(inod,icomp)                     &
-     &         * radius_1d_rj_r(kg) * radius_1d_rj_r(kg)
+          ave_sph_lc(kg,jcomp  ) = half * d_rj(inod,icomp)
           ave_sph_lc(kg,jcomp+1) = zero
-          ave_sph_lc(kg,jcomp+2) = d_rj(inod,icomp)                     &
-     &         * radius_1d_rj_r(kg) * radius_1d_rj_r(kg)
+          ave_sph_lc(kg,jcomp+2) = ave_sph_lc(kg,jcomp  )
         end do
       end if
 !
