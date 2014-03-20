@@ -706,17 +706,19 @@ For vector field, spectrum for the poloidal and toroidal components are written 
 B_{Ssq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left(\bvec{B}_{Sl}^{\ m} \right)^{2} dV,
 \nonumber \\
 B_{Tsq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left(\bvec{B}_{Tl}^{\ m} \right)^{2} dV.
+\nonumber
 \end{eqnarray}
-%
-If the vector field $\bvec{F}$ is not solenoidal (i.e. $\nabla \times \bvec{F} \neq 0$), The poloidal component of mean square data are included mean square field of the potential components as
+
+If the vector field $\bvec{F}$ is not solenoidal (i.e. $\nabla \cdot \bvec{F} \neq 0$), The poloidal component of mean square data are included mean square field of the potential components as
 %
 \begin{eqnarray}
 F_{Ssq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left[\left(\bvec{B}_{Sl}^{\ m} \right)^{2}
  + \left(-\nabla \phi_{Fl}^{\ m} \right)^{2} \right] dV.
-\nonumber \\
+\nonumber
 \end{eqnarray}
 %
 
+%
 \item{\tt [vol\_pwr\_prefix]\_m.dat} Volume average of mean square amplitude of the fields as a function of spherical harmonic order $m$. The zonal wave number is referred in this spectrum data. For scalar field, the spectrum is
 \begin{eqnarray}
 f_{sq}(m) &=& \frac{1}{V} \sum_{l=0}^{l=m} \int \left[ \left(f_{l}^{m} \right)^{2}
@@ -749,6 +751,7 @@ B_{Tsq}(n) &=& \frac{1}{V} \sum_{l=n}^{l=l-n} \int \left[\left(\bvec{B}_{Tl}^{\ 
 \end{eqnarray}
 
 \end{description}
+
 %
 
 \subsubsection{layered spectrum data}
@@ -822,11 +825,47 @@ The data file has the following headers in the first three lines,
 The data consists of time step, time, and Gauss coefficients for each step in one line. If the Gauss coefficients data file exist before starting the simulation, programs append Gauss coefficients at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old Gauss coefficients file to another directory before starting the programs.
 
 \subsection{Spectrum monitor data {\tt [picked\_sph\_prefix].dat}}
-This program output spectrum data at specified spherical harmonics modes and radial points in single text file. Spectrum data marked \verb|[Monitor_On]| are written in our line for each spherical harmonics mode and radial point every \verb|[increment_monitor]| steps. If the spectrum monitor data file exist before starting the simulation, programs append spectrum data at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old spectrum monitor file to another directory before starting the programs.
+This program outputs spherical harmonics coefficients at specified spherical harmonics modes and radial points in single text file. Spectrum data marked \verb|[Monitor_On]| are written in our line for each spherical harmonics mode and radial point every \\
+\verb|[increment_monitor]| steps. If the spectrum monitor data file exist before starting the simulation, programs append spectrum data at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old spectrum monitor file to another directory before starting the programs.
+
+If a vector field $\bvec{F}$ is not a solenoidal field, $\bvec{F}$ is described by the spherical harmonics coefficients of the poloidal $F_{Sl}^{\ m}$, toroidal $F_{Tl}^{\ m}$, and potential $\varphi_{l}^{m}$ components as
+\begin{eqnarray}
+\bvec{F}(r, \theta, \phi) & = &  - \frac{1}{r^{2}}\frac{\partial \varphi_{0}^{0}}{\partial r} \hat{r}
+ + \sum_{l=1}^{L} \sum_{m=-l}^{l} 
+\left[\nabla \times \nabla \times \left( F_{Sl}^{\ m} \hat{r} \right) +  \nabla \times \left(F_{Tl}^{\ m}\right)
+ - \nabla \left(\varphi_{l}^{m} Y_{l}^{m} \right)\right].
+\nonumber
+\end{eqnarray}
+In Calypso, the following coefficients are written for the non-solenoidal vector.
+\begin{description}
+\item{\tt  $\verb|[field_name]_pol|$ : }
+ $\left\{\begin{array}{ccr}
+\displaystyle{
+F_{Sl}^{\ m} - \frac{r^{2}}{l \left(l+1\right)} \frac{\partial \varphi_{l}^{m}}{\partial r} }
+& \mbox{for} & \left (l \ne 0 \right)\\
+\displaystyle{
+ -r^{2} \frac{\partial \varphi_{0}^{0}}{\partial r}
+} & \mbox{for} & \left (l = 0 \right)
+\end{array}
+\right.$
+\item{\tt  $\verb|[field_name]_dpdr|$ : } 
+$
+\left\{
+\begin{array}{ccr}
+\displaystyle{
+\frac{\partial F_{Sl}^{\ m}}{\partial r} - \varphi_{l}^{m}}
+ & \mbox{for} & \left (l \ne 0 \right)\\
+ 0 & \mbox{for} & \left (l = 0 \right)
+\end{array}
+\right. $
+\item{\tt  $\verb|[field_name]_tor|$ : }  $F_{Tl}^{\ m}$
+\end{description}
+
 
 
 \newpage
-\section{Data transform program ({\tt sph\_snapshot} and {\tt sph\_zm\_snapshot})}
+\section{Data transform program \\
+({\tt sph\_snapshot} and {\tt sph\_zm\_snapshot})}
 \label{section:assemble_sph}
 %
 \begin{figure}[htbp]
@@ -886,7 +925,9 @@ The same files as the simulation program are read in this program, and field dat
 \label{fig:flow_ini}
 \end{figure}
 %
- The initial fields for dynamo benchmark can set in the simulation program by setting \verb|[INITIAL_TYPE]| flag. This program is used to generate initial field by user.  The heat source $q_{T}$ and light element source $q_{C}$ are also defined by this program because $q_{T}$ and $q_{C}$ are defined as scalar fields.  The module to define initial field \verb|const_sph_initial_spectr.f90| is saved in \verb|src/programs/data_utilities/INITIAL_FIELD/| directory,  and please compile again after modifying this module. This program also needs the files listed in Table \ref{table:inital_fld}.
+ The initial fields for dynamo benchmark can set in the simulation program by setting \verb|[INITIAL_TYPE]| flag. This program is used to generate initial field by user.  The heat source $q_{T}$ and light element source $q_{C}$ are also defined by this program because $q_{T}$ and $q_{C}$ are defined as scalar fields.  The Fortran source file to define initial field \\
+ \verb|const_sph_initial_spectr.f90| is saved in \verb|src/programs/data_utilities| \\
+ \verb|/INITIAL_FIELD/| directory,  and please compile again after modifying this module. This program also needs the files listed in Table \ref{table:inital_fld}.
 %
 \begin{table}[htdp]
 \caption{List of files for simulation {\tt sph\_initial\_field} }
@@ -908,7 +949,6 @@ The same files as the simulation program are read in this program, and field dat
 This program generates the spectrum data files \verb|[rst_prefix].0.[domain#].fst|. To use generated initial data file, please set 
  \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}} to be 0 and \hyperref[href_t:restart_file_ctl]{{\tt [INITIAL\_TYPE]}} to be \hyperref[href_t:restart_file_ctl]{{\tt start\_from\_rst\_file}}.
 
-\newpage
 \section{Initial field modification program \\
 ({\tt sph\_add\_initial\_field})}
 \label{sec:ad_initial_field}
@@ -923,7 +963,7 @@ This program generates the spectrum data files \verb|[rst_prefix].0.[domain#].fs
 %
 {\bf Caution: This program overwrites existing initial field data. Please run it after taking a backup.} \\
 
- This program modifies or adds new data to an initial field file. It could be used to start a new geodynamo simulation by adding seed magnetic field or source terms to a non-magnetic convection simulation. The initial fields to be added are also defined in \verb|const_sph_initial_spectr.f90|. \verb|data_utilities/INITIAL_FIELD/| directory. This program also needs the files listed in Table \ref{table:inital_fld}.
+ This program modifies or adds new data to an initial field file. It could be used to start a new geodynamo simulation by adding seed magnetic field or source terms to a non-magnetic convection simulation. The initial fields to be added are also defined in \verb|const_sph_initial_spectr.f90|. \verb|data_utilities/INITIAL_FIELD/| directory. This program also needs the files listed in Table \ref{table:add_inital_fld}.
 %
 \begin{table}[htdp]
 \caption{List of files for simulation {\tt sph\_add\_initial\_field} }
@@ -939,7 +979,7 @@ This program generates the spectrum data files \verb|[rst_prefix].0.[domain#].fs
 \verb|[rst_prefix].[step #].[domain#].fst| &  Distributed & Input/Output  \\ \hline
 \end{tabular}
 \end{center}
-\label{table:inital_fld}
+\label{table:add_inital_fld}
 \end{table}
 %
 This program generates the spectrum data files \verb|[rst_prefix].[step#].[domain#].fst|. To use generated initial data file, set 
@@ -970,8 +1010,11 @@ This program is only used to check solution for dynamo benchmark by Christensen 
 \end{table}
 
 \subsection{Dynamo benchmark data {\tt dynamobench.dat}}
- In benchmark test by Christensen {\it et. al.}, both global values and local values are checked. As global results, Kinetic energy $1/V \int \frac{1}{2} u^{2} dV$ in the fluid shell, magnetic energy in the fluid shell $1/V 1/(E Pm) \int \frac{1}{2} B^{2} dV$ (for case 1 and 2), and magnetic energy in the solid inner sphere $1/V_{i} 1/(E Pm) \int \frac{1}{2} B^{2} dV_{i}$ (for case 2 only). Benchmark also requests 
- By increasing number of grid point at mid-dpeth of the fluid shell in the equatorial plane by \hyperref[href_t:nphi_mid_eq_ctl]{{\tt nphi\_mid\_eq\_ctl}}, program can find accurate solution for the point where $u_{r} = 0$ and $\partial u_{r} / \partial \phi > 0$. Angular frequency of the field pattern with respect to the $\phi$ direction is also required. The benchmark test also requires temperature and $\theta$ component of velocity. In the text file {\tt dynamobench.dat}, the following data are written in one line for every {\tt i\_step\_check\_ctl} step.
+ In benchmark test by Christensen {\it et. al.}, both global values and local values are checked. As global results, Kinetic energy 
+ $\displaystyle{ \frac{1}{V} \int \frac{1}{2} u^{2} dV}$ in the fluid shell, magnetic energy in the fluid shell 
+ $\displaystyle{ \frac{1}{V} \frac{1}{E Pm} \int \frac{1}{2} B^{2} dV}$ (for case 1 and 2), and magnetic energy in the solid inner sphere 
+ $\displaystyle{ \frac{1}{V_{i}} \frac{1}{E Pm} \int \frac{1}{2} B^{2} dV_{i}}$ (for case 2 only). Benchmark also requests 
+ By increasing number of grid point at mid-dpeth of the fluid shell in the equatorial plane by \hyperref[href_t:nphi_mid_eq_ctl]{{\tt nphi\_mid\_eq\_ctl}}, program can find accurate solution for the point where $u_{r} = 0$ and $\partial u_{r} / \partial \phi > 0$. Angular frequency of the field pattern with respect to the $\phi$ direction is also required. The benchmark test also requires temperature and $\theta$ component of velocity. In the text file {\tt dynamobench.dat}, the following data are written in one line for every \verb|[i_step_rst_ctl]| step.
 %
 \begin{description}
 \item{\tt t\_step:  }  Time step number
@@ -999,18 +1042,19 @@ This program is only used to check solution for dynamo benchmark by Christensen 
 
 {\small 
 \begin{verbatim}
-
-t_step    time    KE_pol    KE_tor    KE_total    ME_pol    ME_tor    ME_total  
-  ME_pol_icore    ME_tor_icore    ME_total_icore    omega_ic_z    MAG_torque_ic_
-z    phi_1    phi_2    phi_3    phi_4    omega_vp44    omega_vt54    B_theta    
-v_phi    temp
-     20000   9.999999999998981E-001   1.534059732073072E+001   2.431439471284618
-E+001   3.965499203357688E+001   2.405694011955009E+000   1.648662987055900E+000
-   4.054356999010911E+000   3.908687924452961E+001   4.812865754441352E-001   3.
-956816581997376E+001   5.220517005592486E+000  -2.321885847438682E+002   3.59417
-5626663308E-001   1.930213889461227E+000   3.501010216256124E+000   5.0718065430
-51021E+000   7.808553595635292E-001  -1.649583441437563E-001  -5.136522824340612
-E+000  -8.047915942925034E+000   3.752181234262930E-001
+t_step    time    KE_pol    KE_tor    KE_total    ME_pol    ME_t
+or    ME_total    ME_pol_icore    ME_tor_icore    ME_total_icore
+    omega_ic_z    MAG_torque_ic_z    phi_1    phi_2    phi_3    
+phi_4    omega_vp44    omega_vt54    B_theta    v_phi    temp
+     20000   9.999999999998981E-001   1.534059732073072E+001   2
+.431439471284618E+001   3.965499203357688E+001   2.4056940119550
+09E+000   1.648662987055900E+000   4.054356999010911E+000   3.90
+8687924452961E+001   4.812865754441352E-001   3.956816581997376E
++001   5.220517005592486E+000  -2.321885847438682E+002   3.59417
+5626663308E-001   1.930213889461227E+000   3.501010216256124E+00
+0   5.071806543051021E+000   7.808553595635292E-001  -1.64958344
+1437563E-001  -5.136522824340612E+000  -8.047915942925034E+000  
+ 3.752181234262930E-001
 ...
 \end{verbatim}
 }

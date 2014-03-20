@@ -90,8 +90,8 @@ After the installation, object modules can be deleted by the following command;
 
 {./configure} generates a Makefile in the current directory.  Available options for {\tt configure} can be checked using the {\tt ./configure --help} command. The following options are available in the {\tt configure} command.
 %
+{\small
 \begin{verbatim}
-
 Optional Features:
   --disable-option-checking  ignore unrecognized --enable/--with options
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
@@ -121,6 +121,7 @@ Some influential environment variables:
   FFTW3_LIBS  linker flags for FFTW3, overriding pkg-config
 
 \end{verbatim}
+}
 %
 An example of usage of the configure command is the following;
 \begin{verbatim}
@@ -208,7 +209,8 @@ CMake is a cross-platform, open-source build system. CMake can be downloaded fro
 \end{enumerate}
 %
 In this section, \verb|[CALYPSO\_HOME]/work| is used as the working directory.
-Options for CMake can be checked by \verb|cmake -i [CALYPSO\_HOME]| command at \verb|[CALYPSO\_HOME]/work|. There are a number of options can be found, but the following valuables are important settings for installation:
+Options for CMake can be checked by \verb|cmake -i [CALYPSO_HOME]| command at \verb|[CALYPSO_HOME]| \\
+\verb|/work|. There are a number of options can be found, but the following valuables are important settings for installation:
 %
 \begin{description}
 \item{\verb|CMAKE_INSTALL_PREFIX|}  Install directory

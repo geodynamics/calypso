@@ -99,14 +99,22 @@ Supported field in the present version is listed in Table \ref{table:fields}
  \hline
 \verb|viscous_diffusion| & Viscous diffusion
 & $-\nu \nabla \times \nabla \times \bvec{u}$ \\
-\verb|thermal_diffusion| & Termal diffusion & $ \kappa \nabla^{2} T $ \\
-\verb|magnetic_diffusion| & Magnetic diffusion 
-& $-\eta \nabla \times \nabla \times \bvec{B}$ \\
-\verb poynting_flux & Poynting flux &  $ \bvec{E} \times \bvec{B} $ \\
-\verb Lorentz_force & Lorentz force &  $ \bvec{J} \times \bvec{B} $ \\
-\verb Coriolis_force & Coriolis force &  $ -2 \Omega \hat{z} \times \bvec{u} $ \\
 \verb buoyancy                   & Thermal buoyancy &  $ -\alpha_{T} T \bvec{g}  $ \\
 \verb composite_buoyancy & Compositional buoyancy &  $ -\alpha_{C} C\bvec{g}  $\\
+\verb Lorentz_force & Lorentz force &  $ \bvec{J} \times \bvec{B} $ \\
+\verb Coriolis_force & Coriolis force &  $ -2 \Omega \hat{z} \times \bvec{u} $ \\
+\hline
+\verb|thermal_diffusion| & Termal diffusion & $ \kappa_{T} \nabla^{2} T $ \\
+\verb grad_temp & Temperature gradient & $ \nabla T$ \\
+\verb heat_flux & Advective heat flux & $ \bvec{u} T$ \\
+\hline
+\verb composition_diffusion & Compositional diffusion & $ \kappa_{C} \nabla^{2} C $ \\
+\verb grad_composition & Composition gradient & $ \nabla C$ \\
+\verb composite_flux & Advective composition flux & $ \bvec{u} C$ \\
+\hline
+\verb magnetic_diffusion & Magnetic diffusion 
+& $-\eta \nabla \times \nabla \times \bvec{B}$ \\
+\verb poynting_flux & Poynting flux &  $ \bvec{E} \times \bvec{B} $ \\
 \hline
 \verb rot_Lorentz_force & Curl of Lorentz force &  $ \nabla \times \left(\bvec{J} \times \bvec{B}\right) $ \\
 \verb rot_Coriolis_force & Curl of Coriolis force &  $ -2 \Omega \nabla \times \left(\hat{z} \times \bvec{u} \right) $ \\
