@@ -52,7 +52,7 @@ target_task:
 	@echo 'parallels: sph_mhd'      \
 	>> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
-	@echo 'utilities: data_utils mesh_utils' >> $(MAKENAME)
+	@echo 'utilities: data_utils mesh_utils sph_data_util' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
