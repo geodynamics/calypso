@@ -30,7 +30,6 @@
       use t_ucd_data
 !
       use field_data_IO
-      use skip_gz_comment
       use set_ucd_file_names
 !
       implicit none
