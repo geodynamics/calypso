@@ -31,6 +31,7 @@
 !!
 !!    picked_sph_prefix            'sph_spectr/picked_mode'
 !!    gauss_coefs_prefix           'sph_spectr/gauss_coefs'
+!!    nusselt_number_prefix        'Nusselt'
 !!
 !!    gauss_coefs_radius_ctl        2.91
 !!
@@ -94,6 +95,7 @@
       character(len = kchara) :: volume_pwr_spectr_prefix
       character(len = kchara) :: layered_pwr_spectr_prefix
 !
+      character(len = kchara) :: Nusselt_file_prefix
       character(len = kchara) :: picked_mode_head_ctl
       character(len = kchara) :: gauss_coefs_prefix
       real(kind = kreal) :: gauss_coefs_radius_ctl = 2.91
@@ -144,6 +146,8 @@
       character(len=kchara), parameter                                  &
      &           :: hd_gauss_coefs_head = 'gauss_coefs_prefix'
       character(len=kchara), parameter                                  &
+     &           :: hd_Nusselt_file_head = 'nusselt_number_prefix'
+      character(len=kchara), parameter                                  &
      &           :: hd_gauss_coefs_r =    'gauss_coefs_radius_ctl'
 !
       character(len=kchara), parameter                                  &
@@ -178,6 +182,7 @@
       integer (kind=kint) :: i_layer_rms_head =         0
       integer (kind=kint) :: i_picked_mode_head =       0
       integer (kind=kint) :: i_gauss_coefs_head =       0
+      integer (kind=kint) :: i_Nusselt_file_head =      0
       integer (kind=kint) :: i_gauss_coefs_r =          0
 !
       integer (kind=kint) :: i_num_pick_layer =         0
@@ -197,7 +202,7 @@
 !
       private :: hd_pick_sph, i_pick_sph, hd_num_pick_layer
       private :: hd_gauss_coefs_head, hd_gauss_coefs_r
-      private :: hd_picked_mode_head
+      private :: hd_picked_mode_head, hd_Nusselt_file_head
       private :: hd_num_pick_sph, hd_num_pick_gauss
       private :: hd_num_pick_l, hd_num_pick_m
       private :: hd_num_pick_gauss_l, hd_num_pick_gauss_m
@@ -425,6 +430,9 @@
      &          i_gauss_coefs_head, gauss_coefs_prefix)
         call read_character_ctl_item(hd_picked_mode_head,               &
      &          i_picked_mode_head, picked_mode_head_ctl)
+!
+        call read_character_ctl_item(hd_Nusselt_file_head,              &
+     &          i_Nusselt_file_head, Nusselt_file_prefix)
 !
         call read_character_ctl_item(hd_voume_ave_head,                 &
      &          i_voume_ave_head, volume_average_prefix)

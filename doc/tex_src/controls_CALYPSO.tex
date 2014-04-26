@@ -617,6 +617,12 @@ File prefix for Gauss coefficients \verb|[gauss_coef_prefix]| is defined by Text
 \verb|[gauss_coef_radius]| \\
 Normalized radius to obtain Gauss coefficients \verb|[gauss_coef_radius]| is defined by real. Gauss coefficients are evaluated from the poloidal magnetic field at CMB by assuming electrically insulated mantle. Do not set \verb|[gauss_coef_radius]| less than the outer core radius $r_{o}$.
 
+\paragraph{\tt nusselt\_number\_prefix}
+\label{href_t:gauss_coefs_prefix}
+\verb|[nusselt_number_prefix]| \\
+File prefix for Nusselt number data at ICB and CMB \verb|[nusselt_number_prefix]| is defined by Text. Program add {\tt .dat} extension after this file prefix. If this file prefix is not defined, Nusselt number data are not generated. \\
+{\bf CAUTION: Nusselt number is not evaluated if heat source is exsist.}
+
 \paragraph{\tt array pick\_layer\_ctl}
 \label{href_t:pick_layer_ctl}
 \verb|[Layer #]|

@@ -37,7 +37,7 @@ begin MHD_control
 !   vector_potential, magnetic_field, current_density, magnetic_potential
 !   composition, perturbation_temp
 !
-!   buoyancy_flux, Lorentz_work, mag_tension_work
+!   buoyancy_flux, Lorentz_work
 !   magnetic_ene_generation
 !   temp_generation, part_temp_gen
 !   vis_ene_diffuse, mag_ene_diffuse

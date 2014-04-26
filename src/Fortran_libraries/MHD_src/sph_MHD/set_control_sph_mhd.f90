@@ -120,6 +120,7 @@
 !
       call set_ctl_params_pick_sph
       call set_ctl_params_pick_gauss
+      call set_ctl_params_no_heat_Nu
 !
       end subroutine set_control_4_sph_mhd
 !

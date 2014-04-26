@@ -37,7 +37,7 @@ begin MHD_control
 !   vector_potential, magnetic_field, current_density, magnetic_potential
 !   composition, perturbation_temp
 !
-!   buoyancy_flux, Lorentz_work, mag_tension_work
+!   buoyancy_flux, Lorentz_work
 !   magnetic_ene_generation
 !   temp_generation, part_temp_gen
 !   vis_ene_diffuse, mag_ene_diffuse
@@ -237,8 +237,8 @@ begin MHD_control
 !!!!!  information for sime integration
    begin time_step_ctl
       elapsed_time_ctl      80000.
-      i_step_init_ctl       10000
-      i_step_finish_ctl     20000
+      i_step_init_ctl           0
+      i_step_finish_ctl     10000
 !
       i_step_check_ctl       10
       i_step_rst_ctl         5000
@@ -250,8 +250,8 @@ begin MHD_control
 !
 !!!!!  control for restart data
     begin restart_file_ctl
-!      rst_ctl                dynamo_benchmark_1
-      rst_ctl                start_from_rst_file
+      rst_ctl                dynamo_benchmark_1
+!      rst_ctl                start_from_rst_file
     end restart_file_ctl
 !
 !!!!!!   method for time evolution

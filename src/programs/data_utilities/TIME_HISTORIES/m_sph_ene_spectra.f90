@@ -134,7 +134,7 @@
       subroutine select_sph_ene_spec_data_file
 !
 !
-      write(*,*) ' Choose data type to taking average'
+      write(*,*) ' Choose data type to take average'
       write(*,*)  ' 1: volume average spectrum '
       write(*,*)  ' 2: spectrum on each layer  '
       write(*,*)  ' 3: spectrum on specific layer  '

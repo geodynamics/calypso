@@ -97,6 +97,7 @@
      &         .or. phys_nod_name(i) .eq. fhd_filter_temp               &
      &         .or. phys_nod_name(i) .eq. fhd_buoyancy                  &
      &         .or. phys_nod_name(i) .eq. fhd_heat_source               &
+     &         .or. phys_nod_name(i) .eq. fhd_grad_temp                 &
      &       ) then
            num_check = 1
            phys_check_name(1) = fhd_temp

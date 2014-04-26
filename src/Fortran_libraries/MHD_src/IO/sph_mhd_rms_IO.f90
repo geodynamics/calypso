@@ -47,8 +47,10 @@
       subroutine output_rms_sph_mhd_control
 !
       use m_t_step_parameter
+      use m_boundary_params_sph_MHD
       use set_exit_flag_4_visualizer
       use cal_rms_fields_by_sph
+      use m_no_heat_Nusselt_num
 !
       integer (kind = kint) :: i_flag
 !
@@ -60,6 +62,8 @@
       call cal_rms_sph_outer_core
       call cal_gauss_coefficients
       call pickup_sph_spec_4_monitor
+      call cal_no_heat_source_Nu(sph_bc_U%kr_in, sph_bc_U%kr_out,       &
+     &    sph_bc_U%r_ICB(0), sph_bc_U%r_CMB(0) )
 !
       call write_total_energy_to_screen(my_rank, i_step_MHD, time)
 !
@@ -70,6 +74,9 @@
 !
       call write_gauss_coefs_4_monitor(my_rank, istep_max_dt, time)
       call write_sph_spec_4_monitor(my_rank, istep_max_dt, time)
+!
+      call write_no_heat_source_Nu(idx_rj_degree_zero,                  &
+     &    istep_max_dt, time)
 !
       end subroutine output_rms_sph_mhd_control
 !

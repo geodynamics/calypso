@@ -193,6 +193,7 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 \verb|[layer_pwr_prefix]_lm.dat| & Single & Output \\ \hline
 \verb|[gauss_coef_prefix].dat| & Single & Output   \\
 \verb|[picked_sph_prefix].dat| & Single & Output   \\ \hline
+\verb|[nusselt_number_prefix].dat| & Single & Output   \\ \hline
 \verb|[fld_prefix].[step#].[domain#].[extension]| &  - & Output  \\ \hline
 \end{tabular}
 \end{center}
@@ -453,6 +454,8 @@ The format of the control file \verb|control_MHD| is described below. The detail
     		\hyperref[href_t:gauss_coefs_prefix]{(Detail)}
 	\item \verb|gauss_coefs_radius_ctl            [gauss_coef_radius]| \\
     		\hyperref[href_t:gauss_coefs_radius_ctl]{(Detail)}
+	\item \verb|nusselt_number_prefix             [nusselt_number_prefix]| \\
+    		\hyperref[href_t:nusselt_number_prefix]{(Detail)}
 	\item \verb|array pick_layer_ctl              [Layer #]|
     		\hyperref[href_t:pick_layer_ctl]{(Detail)}
 	\item \verb|array pick_sph_spectr_ctl         [Degree]  [Order]| \\
@@ -862,6 +865,22 @@ $
 \end{description}
 
 
+\subsection{Nusselt number data {\tt [nusselt\_number\_prefix].dat}}
+{\bf CAUTION: Nusselt number is not evaluated if heat source is exsist.}
+The Nusselt number Nu at CMB and ICB is written for each step in one line. The Nusselt number is evaluated by
+%
+\begin{eqnarray*}
+Nu = \frac{<\partial T / \partial r>}{\partial T_{diff}/ \partial r},
+\end{eqnarray*}
+where, $<\partial T / \partial r>$ and $T_{diff}$ are the horizontal average of the temperature gradient at ICB and CMB and diffusive temperature profile, respectively. $T_{diff}$ is evaluated without heat source, as
+\begin{eqnarray*}
+T_{diff} = \frac{r_{o}T_{o} - r_{i}T_{i}}{r_{o} - r_{i}}
+    +  \frac{r_{o}r_{i}\left(T_{i} - T_{o}\right)}{r_{o} - r_{i}} \frac{1}{r}.
+\end{eqnarray*}
+%
+This diffusive temperature profile is for the case without heat source in the fluid. If simulation is performed including the heat source, this data file does not written.
+If the Nusselt number data file exist before starting the simulation, programs append spectrum data at the end of files without checking constancy. If you change the configuration of data output structure, please move the old spectrum monitor file to another directory before starting the programs.
+
 
 \newpage
 \section{Data transform program \\
@@ -902,6 +921,7 @@ Simulation program outputs spectrum data as a whole field data. This program gen
 \verb|[layer_pwr_prefix]_lm.dat| & Single & Output \\ \hline
 \verb|[gauss_coef_prefix].dat| & Single & Output   \\
 \verb|[picked_sph_prefix].dat| & Single & Output   \\ \hline
+\verb|[nusselt_number_prefix].dat| & Single & Output   \\ \hline
 \verb|[fld_prefix].[step#].[domain#].[extension]| &  - & Output  \\ \hline
 \end{tabular}
 \end{center}
@@ -1148,6 +1168,31 @@ This program is only used to generate Makefile in {\tt work} directory. Most of 
 \item One source code has to consist of one module.
 \item The module name should be the same as the file name.
 \end{itemize}
+
+\section{Time averaging programs ({\tt t\_ave\_picked\_sph\_coefs}, {\tt t\_ave\_sph\_mean\_square}, and {\tt t\_ave\_nusselt})}
+These small programs are used to evaluate time average and standard deviation of the time sequencial data.
+%
+\begin{table}[htdp]
+\caption{List of programs to take time average}
+\begin{center} 
+\begin{tabular}{|c|c|}
+\hline
+ name & Program to use \\ \hline \hline
+\verb|[vol_pwr_prefix].dat| & \verb|t_ave_sph_mean_square|  \\ \hline
+\verb|[vol_pwr_prefix]_l.dat| & \verb|t_ave_sph_mean_square|  \\
+\verb|[vol_pwr_prefix]_m.dat| & \verb|t_ave_sph_mean_square|  \\
+\verb|[vol_pwr_prefix]_lm.dat| & \verb|t_ave_sph_mean_square|  \\ \hline
+\verb|[layer_pwr_prefix]_l.dat| & \verb|t_ave_sph_mean_square|  \\
+\verb|[layer_pwr_prefix]_m.dat| & \verb|t_ave_sph_mean_square|  \\
+\verb|[layer_pwr_prefix]_lm.dat| & \verb|t_ave_sph_mean_square|  \\ \hline
+\verb|[picked_sph_prefix].dat| & \verb|t_ave_picked_sph_coefs|    \\ \hline
+\verb|[nusselt_number_prefix].dat| & \verb|t_ave_sph_mean_square|   \\ \hline
+\end{tabular}
+\end{center}
+\label{table:time_averages}
+\end{table}
+%
+
 
 \section{Visualization using field data}
 \label{sec:paraview}

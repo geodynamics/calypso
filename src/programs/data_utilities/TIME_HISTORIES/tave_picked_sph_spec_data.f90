@@ -21,9 +21,8 @@
       integer(kind = kint), parameter :: id_pick = 15
 !
       integer(kind = kint) :: i_step, ierr, num, icou, ipick, nd
-      integer(kind = kint) :: istep_start
       real(kind = kreal) :: acou, time, prev_time
-      real(kind = kint) :: start_time, end_time, true_start
+      real(kind = kreal) :: start_time, end_time, true_start
 !
 !
       write(*,*) 'Input picked spectr evolution file header'

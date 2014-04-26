@@ -171,4 +171,21 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine set_ctl_params_no_heat_Nu
+!
+      use m_ctl_data_4_pickup_sph
+      use m_no_heat_Nusselt_num
+!
+!
+      if(i_Nusselt_file_head .gt. 0) then
+        iflag_no_source_Nu = 1
+        Nusselt_file_head = Nusselt_file_prefix
+      else
+        iflag_no_source_Nu = 0
+      end if
+!
+      end subroutine set_ctl_params_no_heat_Nu
+!
+! -----------------------------------------------------------------------
+!
       end module set_control_4_pickup_sph

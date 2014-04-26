@@ -7,14 +7,17 @@ Calypso consists of programs shown in Table \ref{table:controls}.
 \begin{tabular}{|c|c|c|}
 \hline
 Program & Control file name & Type \\ \hline
-\verb|gen_sph_grids|         & \verb|control_sph_shell| &  Serial    \\
-\verb|sph_mhd|               & \verb|control_MHD| &        Parallel  \\
-\verb|sph_initial_field|     & \verb|control_MHD| &        Parallel  \\
-\verb|sph_add_initial_field| & \verb|control_MHD| &        Parallel  \\
-\verb|sph_snapshot|          & \verb|control_snapshot| &   Parallel  \\
-\verb|sph_dynamobench|       & \verb|control_snapshot| &   Parallel  \\
-\verb|sph_zm_snapshot|       & \verb|control_snapshot| &   Parallel  \\
-\verb|assemble_sph|          & \verb|control_sph_assemble| & Serial  \\ \hline
+\verb|gen_sph_grids|          & \verb|control_sph_shell| &  Serial    \\
+\verb|sph_mhd|                & \verb|control_MHD| &        Parallel  \\ \hline
+\verb|sph_initial_field|      & \verb|control_MHD| &        Parallel  \\
+\verb|sph_add_initial_field|  & \verb|control_MHD| &        Parallel  \\
+\verb|sph_snapshot|           & \verb|control_snapshot| &   Parallel  \\ \hline
+\verb|sph_zm_snapshot|        & \verb|control_snapshot| &   Parallel  \\
+\verb|sph_dynamobench|        & \verb|control_snapshot| &   Parallel  \\ \hline
+\verb|assemble_sph|           & \verb|control_sph_assemble| & Serial  \\ \hline
+\verb|t_ave_sph_mean_square|  & N/A & Serial  \\ \hline
+\verb|t_ave_picked_sph_coefs| & N/A & Serial  \\ \hline
+\verb|t_ave_nusselt|          & N/A & Serial  \\ \hline
 \end{tabular}
 \end{center}
 \label{table:controls}
@@ -45,10 +48,11 @@ To perform simulations by Calypso, the following processes are required.
 \item Perform the simulation by \verb|sph_mhd|.
 \item Convert the parallel spectra data by \verb|assemble_sph| to continue with changing number of processes (if necessary).
 \item Data analysis by \verb|sph_snapshot|, \verb|sph_snapshot|, or \verb|sph_dynamobench|.
-\item Update initial fields by \verb|sph_add_initial_field| for more simulations (if necessary). 
+\item Update initial fields by \verb|sph_add_initial_field| for more simulations (if necessary).
+\item Evaluate time averages by \verb|t_ave_sph_mean_square|, \verb|t_ave_picked_sph_coefs|, or \verb|t_ave_nusselt| if necessary.
 \end{enumerate}
 %
-The simulation program \verb|sph_mhd| requires an indexing file for spherical transform.  \verb|sph_mhd| generates spectrum data and monitoring data, and field data in Cartesian coordinate as outputs. The data transform programs ( \verb|sph_snapshot| and \verb|sph_zm_snapshot|) generate outputs data  from parallel spectra data. The flow of data is shown in Figure \ref{fig:flow_0}. 
+The simulation program \verb|sph_mhd| requires an indexing file for spherical transform.  \verb|sph_mhd| generates spectrum data and monitoring data, and field data in Cartesian coordinate as outputs. The data transform programs (\verb|sph_snapshot| and \verb|sph_zm_snapshot|) generate outputs data  from parallel spectra data. The flow of data is shown in Figure \ref{fig:flow_0}. 
 %
 \begin{figure}[H]
 \begin{center}

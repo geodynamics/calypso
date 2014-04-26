@@ -18,7 +18,7 @@
       implicit none
 !
 !
-      integer(kind = kint) :: ierr
+      integer(kind = kint) :: ierr, i
       integer(kind = kint) :: icou, istep
       real(kind = kreal) :: start_time, end_time
 !
@@ -45,6 +45,8 @@
 !
       ist_true = -1
       icou = 0
+      write(*,'(a5,i12,a30,i12)',advance="NO")                          &
+     &       'step= ', istep,   ' averaging finished. Count=  ', icou
       do
         if(iflag_sph_ene_file .eq. 1) then
           call read_org_volume_ene_data(istep, ierr)
@@ -67,12 +69,13 @@
           end if
         end if
 !
+        write(*,'(59a1,a5,i12,a30,i12)',advance="NO") (char(8),i=1,59), &
+     &       'step= ', istep,   ' averaging finished. Count=   ', icou
         if (time_sph .ge. end_time) exit
-!
-        write(*,*) 'step', istep, 'averaging finished. Count: ', icou
       end do
    99 continue
       call close_ene_spec_data
+      write(*,*)
 !
       call divide_average_ene_sph
       call output_tave_ene_sph_data
@@ -85,6 +88,8 @@
 !
       ist_true = -1
       icou = 0
+      write(*,'(a5,i12,a30,i12)',advance="NO")                          &
+     &       'step= ', istep,   ' deviation finished. Count=  ', icou
       do
         if(iflag_sph_ene_file .eq. 1) then
           call read_org_volume_ene_data(istep, ierr)
@@ -107,12 +112,12 @@
           end if
         end if
 !
+        write(*,'(59a1,a5,i12,a30,i12)',advance="NO") (char(8),i=1,59), &
+     &       'step= ', istep,   ' deviation finished. Count=   ', icou
         if (time_sph .ge. end_time) exit
-!
-        write(*,*) 'step', istep, 'deviation finished. Count: ', icou
-!
       end do
    98 continue
+      write(*,*)
       call close_ene_spec_data
 !
       call divide_deviation_ene_sph

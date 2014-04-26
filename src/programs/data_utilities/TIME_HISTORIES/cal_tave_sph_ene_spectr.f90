@@ -53,7 +53,7 @@
           tmp = spectr_t(nd,kr)
           ave_spec_t(nd,kr) = ave_spec_t(nd,kr)                         &
      &           + half * (tmp + spectr_pre_t(nd,kr))                   &
-     &            * (time_sph + pre_time)
+     &            * (time_sph - pre_time)
           spectr_pre_t(nd,kr) = tmp
         end do
 !$omp end do nowait
@@ -67,13 +67,13 @@
 !
             ave_spec_l(nd,lth,kr) =  ave_spec_l(nd,lth,kr)              &
      &           + half * (tmp_l + spectr_pre_l(nd,lth,kr))             &
-     &            * (time_sph + pre_time)
+     &            * (time_sph - pre_time)
             ave_spec_m(nd,lth,kr) =  ave_spec_m(nd,lth,kr)              &
      &           + half * (tmp_m + spectr_pre_l(nd,lth,kr))             &
-     &            * (time_sph + pre_time)
+     &            * (time_sph - pre_time)
             ave_spec_lm(nd,lth,kr) = ave_spec_lm(nd,lth,kr)             &
      &           + half * (tmp_lm + spectr_pre_l(nd,lth,kr))            &
-     &            * (time_sph + pre_time)
+     &            * (time_sph - pre_time)
 !
             spectr_pre_l(nd,lth,kr) =  tmp_l
             spectr_pre_m(nd,lth,kr) =  tmp_m
@@ -103,7 +103,7 @@
           tmp = (spectr_t(nd,kr) - ave_spec_t(nd,kr))**2
           sigma_spec_t(nd,kr) = sigma_spec_t(nd,kr)                     &
      &           + half * (tmp + spectr_pre_t(nd,kr))                   &
-     &            * (time_sph + pre_time)
+     &            * (time_sph - pre_time)
           spectr_pre_t(nd,kr) = tmp
         end do
 !$omp end do nowait
@@ -117,13 +117,13 @@
 !
             sigma_spec_l(nd,lth,kr) =  sigma_spec_l(nd,lth,kr)          &
      &           + half * (tmp_l + spectr_pre_l(nd,lth,kr))             &
-     &            * (time_sph + pre_time)
+     &            * (time_sph - pre_time)
             sigma_spec_m(nd,lth,kr) =  sigma_spec_m(nd,lth,kr)          &
      &           + half * (tmp_m + spectr_pre_l(nd,lth,kr))             &
-     &            * (time_sph + pre_time)
+     &            * (time_sph - pre_time)
             sigma_spec_lm(nd,lth,kr) = sigma_spec_lm(nd,lth,kr)         &
      &           + half * (tmp_lm + spectr_pre_l(nd,lth,kr))            &
-     &            * (time_sph + pre_time)
+     &            * (time_sph - pre_time)
 !
             spectr_pre_l(nd,lth,kr) =  tmp_l
             spectr_pre_m(nd,lth,kr) =  tmp_m

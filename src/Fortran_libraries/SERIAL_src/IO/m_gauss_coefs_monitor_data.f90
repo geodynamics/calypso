@@ -40,8 +40,6 @@
       integer(kind = kint), parameter :: id_gauss_coef = 23
 !>      File prefix for Gauss coefficients file
       character(len = kchara) :: gauss_coefs_file_head
-!>      File name for Gauss coefficients file
-      character(len = kchara) :: gauss_coefs_file_name
 !
 !>      Number of modes of Gauss coefficients to be evaluated
       integer(kind = kint) :: num_pick_gauss_coefs = 0
@@ -158,6 +156,8 @@
       use set_parallel_file_name
       use write_field_labels
 !
+      character(len = kchara) :: gauss_coefs_file_name
+!
 !
       call add_dat_extension(gauss_coefs_file_head,                     &
      &    gauss_coefs_file_name)
@@ -216,13 +216,17 @@
       subroutine open_gauss_coefs_read_monitor(id_pick)
 !
       use skip_comment_f
+      use set_parallel_file_name
 !
       integer(kind = kint), intent(in) :: id_pick
 !
       integer(kind = kint) :: i
+      character(len = kchara) :: gauss_coefs_file_name
       character(len=255) :: tmpchara
 !
 !
+      call add_dat_extension(gauss_coefs_file_head,                     &
+     &    gauss_coefs_file_name)
       open(id_pick, file = gauss_coefs_file_name)
 !
       call skip_comment(tmpchara,id_pick)

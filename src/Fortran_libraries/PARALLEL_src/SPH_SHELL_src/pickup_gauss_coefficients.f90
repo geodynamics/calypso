@@ -5,10 +5,13 @@
 !!@date Programmed in  Dec., 2012
 !
 !> @brief choose Gauss coefficients to output
+!>@n      Evaluate Nusselt number without heat source
 !!
 !!@verbatim
 !!      subroutine init_gauss_coefs_4_monitor
 !!      subroutine cal_gauss_coefficients
+!!
+!!      subroutine cal_no_heat_source_Nu(kr_ICB, kr_CMB, r_in, r_out)
 !!@endverbatim
 !
       module pickup_gauss_coefficients
@@ -17,7 +20,6 @@
       use m_constants
 !
       use m_spheric_parameter
-      use m_gauss_coefs_monitor_data
       use pickup_sph_spectr
 !
       implicit  none
@@ -33,6 +35,7 @@
       subroutine init_gauss_coefs_4_monitor
 !
       use m_sph_phys_address
+      use m_gauss_coefs_monitor_data
 !
 !
       if (ipol%i_magne .gt. 0) then
@@ -71,6 +74,7 @@
       use calypso_mpi
       use m_sph_spectr_data
       use m_sph_phys_address
+      use m_gauss_coefs_monitor_data
 !
       integer(kind = kint) :: inum, j, l, inod
       real(kind = kreal) :: a2r_4_gauss
@@ -110,6 +114,7 @@
       subroutine set_gauss_coefs_labels
 !
       use set_parallel_file_name
+      use m_gauss_coefs_monitor_data
 !
       integer(kind = kint) :: j, l, m, mm, inum
       character(len=kchara) :: gauss_head
@@ -133,6 +138,56 @@
       end do
 !
       end subroutine set_gauss_coefs_labels
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine cal_no_heat_source_Nu(kr_ICB, kr_CMB, r_in, r_out)
+!
+      use m_sph_spectr_data
+      use m_sph_phys_address
+      use m_no_heat_Nusselt_num
+!
+      integer(kind = kint), intent(in) :: kr_ICB, kr_CMB
+      real(kind = kreal), intent(in) :: r_in, r_out
+      real(kind = kreal) :: temp_ICB, dTdr_ICB
+      real(kind = kreal) :: temp_CMB, dTdr_CMB
+!
+      real(kind = kreal) :: c1, c2
+!      real(kind = kreal) :: dTdr_diff_ICB, dTdr_diff_CMB
+      integer(kind = kint) :: inod_ICB, inod_CMB
+!
+!
+      if(iflag_no_source_Nu .eq. izero) return
+      if(idx_rj_degree_zero .eq. 0) return
+!
+      r_ICB_Nu = r_in
+      r_CMB_Nu = r_out
+!
+      inod_ICB = idx_rj_degree_zero + (kr_ICB-1) * nidx_rj(2)
+      temp_ICB = d_rj(inod_ICB,ipol%i_temp)
+!      dTdr_ICB = half*d_rj(inod_ICB,ipol%i_grad_t)                     &
+!     &           * a_r_1d_rj_r(kr_ICB)**2
+!
+      inod_CMB = idx_rj_degree_zero + (kr_CMB-1) * nidx_rj(2)
+      temp_CMB = d_rj(inod_CMB,ipol%i_temp)
+!      dTdr_CMB = half*d_rj(inod_CMB,ipol%i_grad_t)                     &
+!     &          * a_r_1d_rj_r(kr_CMB)**2
+!
+      c1 = (r_CMB_Nu*temp_CMB - r_ICB_Nu*temp_ICB)                      &
+     &    / ( r_CMB_Nu - r_ICB_Nu )
+      c2 = r_CMB_Nu * r_ICB_Nu * (temp_ICB - temp_CMB)                  &
+     &    / ( r_CMB_Nu - r_ICB_Nu )
+!
+!      dTdr_diff_ICB = - c2 * a_r_1d_rj_r(kr_ICB)**2
+!      dTdr_diff_CMB = - c2 * a_r_1d_rj_r(kr_CMB)**2
+!      Nu_ICB = dTdr_ICB / dTdr_diff_ICB
+!      Nu_CMB = dTdr_CMB / dTdr_diff_CMB
+!
+      Nu_ICB = - half*d_rj(inod_ICB,ipol%i_grad_t) / c2
+      Nu_CMB = - half*d_rj(inod_CMB,ipol%i_grad_t) / c2
+!
+      end subroutine cal_no_heat_source_Nu
 !
 ! -----------------------------------------------------------------------
 !
