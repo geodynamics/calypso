@@ -164,7 +164,8 @@
 !
       ncomp_bwd = 3*nvector_snap_rj_2_rtp + nscalar_snap_rj_2_rtp
       ncomp_fwd = 3*nvector_snap_rtp_2_rj + nscalar_snap_rtp_2_rj
-      ncomp_sph_trans = max(ncomp_bwd,ncomp_fwd)
+      ncomp_sph_trans = max(ncomp_sph_trans, ncomp_fwd)
+      ncomp_sph_trans = max(ncomp_sph_trans, ncomp_bwd)
 !
       end subroutine set_addresses_snapshot_trans
 !
