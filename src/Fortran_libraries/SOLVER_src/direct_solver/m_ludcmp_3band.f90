@@ -126,13 +126,10 @@
 !
       do j = 1, n
 !
-        if(j .gt. 2) then
-          band_lu(2,j) = band_lu(2,j) - band_lu(4,j-2)*band_lu(1,j)
-        end if
-!
         if(j .eq. 2) then
           band_lu(3,j) = band_lu(3,j) - band_lu(4,j-1)*band_lu(2,j)
-        else
+        else if(j .gt. 2) then
+          band_lu(2,j) = band_lu(2,j) - band_lu(4,j-2)*band_lu(1,j)
           band_lu(3,j) = band_lu(3,j) - band_lu(5,j-2)*band_lu(1,j)     &
      &                                - band_lu(4,j-1)*band_lu(2,j)
         end if
