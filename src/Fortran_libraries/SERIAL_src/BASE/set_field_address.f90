@@ -195,6 +195,8 @@
           iphys%i_induction =   i0
         else if (field_name(i) .eq. fhd_vp_induct) then
           iphys%i_vp_induct =   i0
+        else if (field_name(i) .eq. fhd_mag_stretch) then
+          iphys%i_mag_stretch = i0
         else if (field_name(i) .eq. fhd_press_grad) then
           iphys%i_press_grad =  i0
         else if (field_name(i) .eq. fhd_mag_tension) then

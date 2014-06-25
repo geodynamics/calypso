@@ -12,6 +12,7 @@
       use m_precision
       use m_constants
       use m_machine_parameter
+      use calypso_mpi
 !
       implicit none
 !
@@ -27,10 +28,9 @@
 !
       subroutine init_analyzer
 !
-      use calypso_mpi
       use m_read_ctl_gen_sph_shell
       use set_control_platform_data
-      use load_data_for_sph_IO
+      use parallel_load_data_4_sph
 !
 !
       if (my_rank.eq.0) then
@@ -44,8 +44,8 @@
       call read_control_4_gen_shell_grids
       call set_control_sph_mesh
 !
-      if (iflag_debug.gt.0) write(*,*) 'input_sph_trans_grids'
-      call input_sph_trans_grids(my_rank)
+      if (iflag_debug.gt.0) write(*,*) 'load_para_sph_mesh'
+      call load_para_sph_mesh
 !
        end subroutine init_analyzer
 !
@@ -53,7 +53,6 @@
 !
       subroutine analyze
 !
-      use calypso_mpi
       use cmp_trans_sph_indices
       use set_parallel_file_name
       use cmp_trans_sph_tests

@@ -92,6 +92,7 @@
      &  .or. (phys_nod_name_ctl .eq. fhd_div_induct_t       )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_mag_induct         )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_vp_induct          )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_mag_stretch        )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_press_grad         )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_Lorentz            )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_Coriolis           )           &
@@ -334,13 +335,12 @@
 !
       subroutine check_vis_control_flag(visualize_ctl, iflag_viz)
 !
+      use skip_comment_f
+!
       character(len = kchara), intent(in) :: visualize_ctl
       integer (kind = kint), intent(inout) :: iflag_viz
 !
-      if ( (visualize_ctl .eq. 'Viz_On') .or.                           &
-     &     (visualize_ctl .eq. 'Viz_on') .or.                           &
-     &     (visualize_ctl .eq. 'viz_On') .or.                           &
-     &     (visualize_ctl .eq. 'viz_on')  ) then
+      if (cmp_no_case(visualize_ctl, 'Viz_On') .gt. 0) then
         iflag_viz = 1
       else
         iflag_viz = 0
@@ -353,15 +353,14 @@
       subroutine check_monitor_control_flag(iflag, monitor_ctl,         &
      &          iflag_fld_monitor)
 !
+      use skip_comment_f
+!
       character(len = kchara), intent(in) :: monitor_ctl
       integer (kind = kint), intent(in) :: iflag
       integer (kind = kint), intent(inout) :: iflag_fld_monitor
 !
       if (iflag .eq. 0) return
-      if ( (monitor_ctl .eq. 'Monitor_On') .or.                         &
-     &     (monitor_ctl .eq. 'monitor_On') .or.                         &
-     &     (monitor_ctl .eq. 'Monitor_on') .or.                         &
-     &     (monitor_ctl .eq. 'monitor_on')  ) then
+      if (cmp_no_case(monitor_ctl, 'Monitor_On') .gt. 0) then
         iflag_fld_monitor = 1
       else
         iflag_fld_monitor = 0

@@ -48,6 +48,8 @@
       integer(kind = kint), parameter :: inine =   9
       integer(kind = kint), parameter :: iten =    10
 !
+      integer(kind = kint), parameter :: iminus =  -1
+!
       real, parameter :: rzero =  0.0e0
       real, parameter :: rone =   1.0e0
       real, parameter :: rtwo =   2.0e0

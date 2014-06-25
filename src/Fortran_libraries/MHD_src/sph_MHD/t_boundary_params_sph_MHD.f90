@@ -78,6 +78,8 @@
 !!         (r(0) = r_CMB, r(1) = 1/r_CMB, and r(2) = 1/r_ICB^2)
         real(kind= kreal) :: r_CMB(0:2)
 !
+!>        Fixed data at center
+        real(kind= kreal) :: CTR_fld
 !>        Fixed composition spectrum for ICB
         real(kind= kreal), pointer :: ICB_fld(:)
 !>        Fixed composition flux spectrum for ICB
@@ -87,19 +89,19 @@
 !>        Fixed composition flux spectrum for CMB
         real(kind= kreal), pointer :: CMB_flux(:)
 !
-!>        Matrix to evaluate radial derivative at ICB with fiexed field
+!>        Matrix to evaluate radial derivative at ICB with fixed field
         real(kind = kreal) :: fdm2_fix_fld_ICB(0:2,3)
-!>        Matrix to evaluate field at ICB with fiexed radial derivative
+!>        Matrix to evaluate field at ICB with fixed radial derivative
         real(kind = kreal) :: fdm2_fix_dr_ICB(-1:1,3)
-!>        Matrix to evaluate radial derivative at CMB with fiexed field
+!>        Matrix to evaluate radial derivative at CMB with fixed field
         real(kind = kreal) :: fdm2_fix_fld_CMB(0:2,3)
-!>        Matrix to evaluate field at CMB with fiexed radial derivative
+!>        Matrix to evaluate field at CMB with fixed radial derivative
         real(kind = kreal) :: fdm2_fix_dr_CMB(-1:1,3)
 !
-!>        Matrix to evaluate radial derivative at ICB with fiexed field
+!>        Matrix to evaluate radial derivative at ICB with fixed field
 !!        with first order accuracy
         real(kind = kreal) :: fdm1_fix_fld_ICB(0:1,2)
-!>        Matrix to evaluate radial derivative at CMB with fiexed field
+!>        Matrix to evaluate radial derivative at CMB with fixed field
 !!        with first order accuracy
         real(kind = kreal) :: fdm1_fix_fld_CMB(0:1,2)
       end type sph_boundary_type
@@ -119,6 +121,7 @@
       allocate(sph_bc%CMB_fld(jmax))
       allocate(sph_bc%ICB_flux(jmax))
       allocate(sph_bc%CMB_flux(jmax))
+      sph_bc%CTR_fld = 0.0d0
       sph_bc%ICB_fld = 0.0d0
       sph_bc%CMB_fld = 0.0d0
       sph_bc%ICB_flux = 0.0d0

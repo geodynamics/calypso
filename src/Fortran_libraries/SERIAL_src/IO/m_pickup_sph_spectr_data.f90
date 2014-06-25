@@ -44,7 +44,7 @@
 !>      Number of modes of monitoring spectrum to be evaluated
       integer(kind = kint) :: num_pick_sph = 0
 !>      Degree and Order ID of  monitoring spectrum to be evaluated
-      integer(kind = kint), allocatable :: idx_pick_sph_mode(:)
+      integer(kind = kint), allocatable :: idx_pick_sph_mode(:,:)
 !>      Number of degrees of  monitoring spectrum to be evaluated
       integer(kind = kint) :: num_pick_sph_l = 0
 !>      Degree ID of  monitoring spectrum to be evaluated
@@ -112,7 +112,7 @@
 !
       subroutine allocate_pick_sph_mode
 !
-      allocate( idx_pick_sph_mode(num_pick_sph) )
+      allocate( idx_pick_sph_mode(num_pick_sph,2) )
       if(num_pick_sph .gt. 0) idx_pick_sph_mode = 0
 !
       end subroutine allocate_pick_sph_mode

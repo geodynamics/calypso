@@ -37,21 +37,25 @@
       module m_ctl_data_termal_norm
 !
       use m_precision
+      use t_read_control_arrays
 !
       implicit  none
 !
 !
-      integer(kind=kint) :: num_coef_4_t_diffuse_ctl = 0
-      character(len=kchara),allocatable :: coef_4_t_diffuse_name_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_t_diffuse_power_ctl(:)
+!>      Structure for number and power to construct heat flux
+!!@n      coef_4_heat_flux_ctl%c_tbl:  Name of number 
+!!@n      coef_4_heat_flux_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_heat_flux_ctl
 !
-      integer(kind=kint) :: num_coef_4_termal_ctl =    0
-      character(len=kchara),allocatable :: coef_4_termal_name_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_termal_power_ctl(:)
+!>      Structure for number and power to construct thermal diffusion
+!!@n      coef_4_t_diffuse_ctl%c_tbl:  Name of number 
+!!@n      coef_4_t_diffuse_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_t_diffuse_ctl
 !
-      integer(kind=kint) :: num_coef_4_h_source_ctl =    0
-      character(len=kchara),allocatable :: coef_4_h_src_name_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_h_src_power_ctl(:)
+!>      Structure for number and power to construct heat source
+!!@n      coef_4_heat_src_ctl%c_tbl:  Name of number 
+!!@n      coef_4_heat_src_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_heat_src_ctl
 !
 !   entry label
 !
@@ -63,16 +67,9 @@
       character(len=kchara) :: hd_n_thermal = 'coef_4_termal_ctl'
       character(len=kchara) :: hd_n_t_diff =  'coef_4_t_diffuse_ctl'
       character(len=kchara) :: hd_n_h_src =  'coef_4_heat_source_ctl'
-      integer (kind=kint) :: i_n_thermal = 0
-      integer (kind=kint) :: i_n_t_diff = 0
-      integer (kind=kint) :: i_n_h_src = 0
 !
       private :: hd_thermal, i_thermal
       private :: hd_n_thermal, hd_n_t_diff, hd_n_h_src
-!
-      private :: allocate_coef_4_termal_ctl
-      private :: allocate_coef_4_t_diffuse_ctl
-      private :: allocate_coef_4_h_source_ctl
 !
 !   --------------------------------------------------------------------
 !
@@ -80,60 +77,27 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine allocate_coef_4_termal_ctl
+      subroutine deallocate_coef_4_termal_ctl
 !
-      allocate(coef_4_termal_name_ctl(num_coef_4_termal_ctl))
-      allocate(coef_4_termal_power_ctl(num_coef_4_termal_ctl))
-      coef_4_termal_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_heat_flux_ctl)
 !
-      end subroutine allocate_coef_4_termal_ctl
+      end subroutine deallocate_coef_4_termal_ctl
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine allocate_coef_4_t_diffuse_ctl
+      subroutine deallocate_coef_4_t_diffuse_ctl
 !
-      allocate(coef_4_t_diffuse_name_ctl(num_coef_4_t_diffuse_ctl))
-      allocate(coef_4_t_diffuse_power_ctl(num_coef_4_t_diffuse_ctl))
-      coef_4_t_diffuse_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_t_diffuse_ctl)
 !
-      end subroutine allocate_coef_4_t_diffuse_ctl
+      end subroutine deallocate_coef_4_t_diffuse_ctl
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine allocate_coef_4_h_source_ctl
+      subroutine deallocate_coef_4_h_source_ctl
 !
-      allocate(coef_4_h_src_name_ctl(num_coef_4_h_source_ctl))
-      allocate(coef_4_h_src_power_ctl(num_coef_4_h_source_ctl))
-      coef_4_h_src_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_heat_src_ctl)
 !
-      end subroutine allocate_coef_4_h_source_ctl
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_termal_ctl
-!
-        deallocate(coef_4_termal_name_ctl, coef_4_termal_power_ctl)
-!
-       end subroutine deallocate_coef_4_termal_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_t_diffuse_ctl
-!
-        deallocate(coef_4_t_diffuse_name_ctl)
-        deallocate(coef_4_t_diffuse_power_ctl)
-!
-       end subroutine deallocate_coef_4_t_diffuse_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_h_source_ctl
-!
-        deallocate(coef_4_h_src_name_ctl)
-        deallocate(coef_4_h_src_power_ctl)
-!
-       end subroutine deallocate_coef_4_h_source_ctl
+      end subroutine deallocate_coef_4_h_source_ctl
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -154,32 +118,9 @@
         if(i_thermal .gt. 0) exit
 !
 !
-        call find_control_array_flag(hd_n_thermal,                      &
-     &      num_coef_4_termal_ctl)
-        if(num_coef_4_termal_ctl.gt.0 .and. i_n_thermal.eq.0) then
-          call allocate_coef_4_termal_ctl
-          call read_control_array_vect_list(hd_n_thermal,               &
-     &        num_coef_4_termal_ctl, i_n_thermal,                       &
-     &        coef_4_termal_name_ctl, coef_4_termal_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_t_diff,                       &
-     &      num_coef_4_t_diffuse_ctl)
-        if(num_coef_4_t_diffuse_ctl.gt.0 .and. i_n_t_diff.eq.0) then
-          call allocate_coef_4_t_diffuse_ctl
-          call read_control_array_vect_list(hd_n_t_diff,                &
-     &        num_coef_4_t_diffuse_ctl, i_n_t_diff,                     &
-     &        coef_4_t_diffuse_name_ctl, coef_4_t_diffuse_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_h_src,                        &
-     &      num_coef_4_h_source_ctl)
-        if(num_coef_4_h_source_ctl.gt.0 .and. i_n_h_src.eq.0) then
-          call allocate_coef_4_h_source_ctl
-          call read_control_array_vect_list(hd_n_h_src,                 &
-     &        num_coef_4_h_source_ctl, i_n_h_src,                       &
-     &        coef_4_h_src_name_ctl, coef_4_h_src_power_ctl)
-        end if
+        call read_control_array_c_r(hd_n_thermal, coef_4_heat_flux_ctl)
+        call read_control_array_c_r(hd_n_t_diff, coef_4_t_diffuse_ctl)
+        call read_control_array_c_r(hd_n_h_src, coef_4_heat_src_ctl)
       end do
 !
       end subroutine read_thermal_ctl

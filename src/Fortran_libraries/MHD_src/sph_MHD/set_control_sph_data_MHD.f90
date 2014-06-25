@@ -61,20 +61,20 @@
 !
 !   set physical values
 !
-      if(i_num_nod_phys.eq.0) then
+      if(field_ctl%icou .eq. 0) then
         call calypso_MPI_abort(90, 'Set field for simulation')
       end if
       if (iflag_debug.eq.1) write(*,*)                                  &
-     &    'original number of field ', num_nod_phys_ctl
+     &    'original number of field ', field_ctl%num
 !
-      if ( num_nod_phys_ctl .ne. 0 ) then
+      if ( field_ctl%num .ne. 0 ) then
 !
 !     add terms for potentials
 !
         call add_field_name_4_mhd
         call add_field_name_4_sph_mhd
         if (iflag_debug.eq.1) write(*,*)                                &
-     &    'num_nod_phys_ctl after modified ', num_nod_phys_ctl
+     &    'field_ctl%num after modified ', field_ctl%num
 !
 !    set nodal data
 !
@@ -148,10 +148,10 @@
         mphi_circle = -1
       end if
 !
-      do ifld = 1, num_nod_phys_ctl
-        if(phys_nod_name_ctl(ifld) .eq. fhd_temp) ibench_temp = 1
-        if(phys_nod_name_ctl(ifld) .eq. fhd_velo) ibench_velo = 1
-        if(phys_nod_name_ctl(ifld) .eq. fhd_magne) ibench_magne = 1
+      do ifld = 1, field_ctl%num
+        if(field_ctl%c1_tbl(ifld) .eq. fhd_temp) ibench_temp = 1
+        if(field_ctl%c1_tbl(ifld) .eq. fhd_velo) ibench_velo = 1
+        if(field_ctl%c1_tbl(ifld) .eq. fhd_magne) ibench_magne = 1
       end do
 !
       d_circle%num_phys = ibench_velo + ibench_temp + ibench_magne
@@ -233,7 +233,7 @@
         z_circle = 0.0d0
       end if
 !
-      d_circle%num_phys = num_nod_phys_ctl
+      d_circle%num_phys = field_ctl%num
       call alloc_phys_name_type(d_circle)
       call s_ordering_field_by_viz(d_circle%num_phys,                   &
      &    d_circle%num_phys_viz, d_circle%num_component,                &

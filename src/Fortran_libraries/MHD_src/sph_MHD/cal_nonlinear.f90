@@ -121,7 +121,6 @@
 !
 !   ----  lead nonlinear terms by phesdo spectrum
 !
-!
       call start_eleps_time(14)
       if (iflag_debug.ge.1) write(*,*) 'sph_back_trans_4_MHD'
       call sph_back_trans_4_MHD

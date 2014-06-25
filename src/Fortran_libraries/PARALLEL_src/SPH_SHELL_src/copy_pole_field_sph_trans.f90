@@ -1,25 +1,21 @@
-!copy_pole_field_sph_trans.f90
-!     module copy_pole_field_sph_trans
+!> @file  copy_pole_field_sph_trans.f90
+!!      module copy_pole_field_sph_trans
+!!
+!! @author  H. Matsui
+!! @date Programmed in Oct., 2012
 !
-!      subroutine copy_pole_vec_fld_from_trans(numnod, internal_node,   &
-!     &          xx, ntot_phys, ncomp_trans, i_fld, i_trns, d_nod)
-!      subroutine copy_pole_scl_fld_from_trans(numnod, internal_node,   &
-!     &          xx, ntot_phys, ncomp_trans, i_fld, i_trns, d_nod)
-!      subroutine copy_pole_tsr_fld_from_trans(numnod, internal_node,   &
-!     &          xx, ntot_phys, ncomp_trans, i_fld, i_trns, d_nod)
-!
-!      subroutine copy_pole_vector_from_trans(numnod, internal_node, xx,&
-!     &         ntot_phys, nnod_rtp, nidx_rtp_r, ncomp_trans,           &
-!     &         idx_gl_rtp_r, v_n_pole, v_s_pole, v_center,             &
-!     &         i_fld, i_trns, d_nod)
-!      subroutine copy_pole_scalar_from_trans(numnod, internal_node, xx,&
-!     &         ntot_phys, nnod_rtp, nidx_rtp_r, ncomp_trans,           &
-!     &         idx_gl_rtp_r, i_fld, i_trns, d_nod)
-!      subroutine copy_pole_tensor_from_trans(numnod, internal_node, xx,&
-!     &         ntot_phys, nnod_rtp, nidx_rtp_r, ncomp_trans,           &
-!     &         idx_gl_rtp_r, i_fld, i_trns, d_nod)
-!
-!      Written by H. Matsui on Feb., 2008
+!> @brief copy field data from spherical transform for poles
+!!
+!!@verbatim
+!!      subroutine copy_pole_vec_fld_from_trans(numnod, internal_node,  &
+!!     &          xx, ntot_phys, ncomp_trans, i_fld, i_trns, d_nod)
+!!      subroutine copy_pole_scl_fld_from_trans(numnod, internal_node,  &
+!!     &          xx, ntot_phys, ncomp_trans, i_fld, i_trns, d_nod)
+!!      subroutine copy_pole_tsr_fld_from_trans(numnod, internal_node,  &
+!!     &          xx, ntot_phys, ncomp_trans, i_fld, i_trns, d_nod)
+!!@endverbatim
+!!
+!!
 !
       module copy_pole_field_sph_trans
 !

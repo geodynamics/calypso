@@ -7,25 +7,32 @@
 !
 !     Written by H. Matsui on Nov., 2008
 !
-!      subroutine allocate_node_geometry_type(node)
-!      subroutine allocate_ele_connect_type(ele)
-!      subroutine allocate_ele_geometry_type(ele)
-!      subroutine allocate_node_param_smp_type(node)
-!      subroutine allocate_ele_param_smp_type(ele)
-!
-!      subroutine deallocate_node_geometry_type(node)
-!      subroutine deallocate_ele_connect_type(ele)
-!      subroutine deallocate_ele_geometry_type(ele)
-!      subroutine deallocate_node_param_smp_type(node)
-!      subroutine deallocate_ele_param_smp_type(ele)
-!
-!      subroutine link_new_nod_geometry_type(nod_org, node)
-!      subroutine link_new_ele_connect_type(ele_org, ele)
-!      subroutine unlink_node_geometry_type(node)
-!      subroutine unlink_ele_connect_type(ele)
-!
-!      subroutine check_nod_size_smp_type(node, my_rank)
-!      subroutine check_ele_size_smp_type(ele, my_rank)
+!!      subroutine allocate_node_geometry_type(node)
+!!      subroutine allocate_ele_connect_type(ele)
+!!      subroutine allocate_overlaped_ele_type(ele)
+!!      subroutine allocate_ele_geometry_type(ele)
+!!      subroutine allocate_node_param_smp_type(node)
+!!      subroutine allocate_ele_param_smp_type(ele)
+!!
+!!      subroutine deallocate_node_geometry_type(node)
+!!      subroutine deallocate_ele_connect_type(ele)
+!!      subroutine deallocate_overlaped_ele_type(ele)
+!!      subroutine deallocate_ele_geometry_type(ele)
+!!      subroutine deallocate_node_param_smp_type(node)
+!!      subroutine deallocate_ele_param_smp_type(ele)
+!!
+!!      subroutine link_new_nod_geometry_type(nod_org, node)
+!!      subroutine link_new_ele_connect_type(ele_org, ele)
+!!      subroutine link_new_overlaped_ele_type(ele_org, ele)
+!!      subroutine link_new_ele_geometry_type(ele_org, ele)
+!!
+!!      subroutine unlink_node_geometry_type(node)
+!!      subroutine unlink_overlaped_ele_type(ele)
+!!      subroutine unlink_ele_connect_type(ele)
+!!      subroutine unlink_ele_geometry_type(ele)
+!!
+!!      subroutine check_nod_size_smp_type(node, my_rank)
+!!      subroutine check_ele_size_smp_type(ele, my_rank)
 !
       module t_geometry_data
 !
@@ -36,97 +43,99 @@
 !
 !>  structure for node data (position)
       type node_data
+!>       number of node on local PE (include external node)
         integer( kind=kint )  ::  numnod
-!<       number of node on local PE (include external node)
+!>       number of node on local PE
         integer( kind=kint )  ::  internal_node
-!<       number of node on local PE
 !
+!>       end number of node for SMP on local PE
         integer( kind=kint ), pointer :: istack_nod_smp(:)
-!<       end number of node for SMP on local PE
+!>       end number of internal node for SMP on local PE
         integer( kind=kint ), pointer :: istack_internal_smp(:)
-!<       end number of internal node for SMP on local PE
+!>       maximum smp number of node on local PE
         integer( kind=kint )  ::  max_nod_smp
-!<       maximum smp number of node on local PE
+!>       maximum internal smp number of node on local PE
         integer( kind=kint )  ::  max_internal_nod_smp
-!<       maximum internal smp number of node on local PE
 !
+!>       nodal coordinates (where i:x_1, x_2, x_3 , j:id)
         real(kind=kreal)  , pointer  :: xx(:,:)
-!<       nodal coordinates (where i:x_1, x_2, x_3 , j:id)
 !
+!>       global node    id (where i:node id)
         integer(kind=kint), pointer  ::  inod_global(:)
-!<       global node    id (where i:node id)
 !
+!>       distance from the centre
         real(kind=kreal)  , pointer  :: rr(:)
-!<       distance from the centre
+!>       1/radius
         real(kind=kreal)  , pointer  :: a_r(:)
-!<       1/radius
+!>       longitude of node
         real(kind=kreal)  , pointer  :: phi(:)
-!<       longitude of node
+!>       colatitude of node
         real(kind=kreal)  , pointer  :: theta(:)
-!<       colatitude of node
+!>       cylindorical radius of node
         real(kind=kreal)  , pointer  :: ss(:)
-!<       cylindorical radius of node
+!>       1 / a_s_cylinder
         real(kind=kreal)  , pointer  :: a_s(:)
-!<       1 / a_s_cylinder
       end type node_data
 !
 !
 !>  structure for element data (position and connectivity)
       type element_data
-        integer( kind=kint )  ::  numele, internal_ele
-!<       number of element on local PE
+!>       number of element on local PE
+        integer(kind=kint)  ::  numele
+!>       number of internal element on local PE
+        integer(kind=kint)  ::  internal_ele
+!>       number of nodes in each element
         integer(kind=kint) :: nnod_4_ele
-!<       number of nodes in each element
 !
+!>       end number of element for SMP on local PE
         integer( kind=kint ), pointer :: istack_ele_smp(:)
-!<       end number of element for SMP on local PE
+!>       maximum smp number of element on local PE
         integer( kind=kint )  ::  max_ele_smp
-!<       maximum smp number of element on local PE
+!>       maximum internal smp number of element on local PE
         integer( kind=kint )  ::  max_internal_ele_smp
-!<       maximum internal smp number of element on local PE
 !
+!>       element connectivity  (where i:nodal order j:element id)
         integer(kind=kint), pointer  :: ie(:,:)
-!<       element connectivity  (where i:nodal order j:element id)
 !
+!>       element type id   (where i:element id)
         integer(kind=kint), pointer  ::  elmtyp(:)
-!<       element type id   (where i:element id)
+!>       element type id   (where i:element id)
         integer(kind=kint), pointer  ::  nodelm(:)
-!<       element type id   (where i:element id)
+!>       global element id (where i:element id)
         integer(kind=kint), pointer  ::  iele_global(:)
-!<       global element id (where i:element id)
+!>        element type defined by the first element
         integer(kind=kint) ::  first_ele_type
-!<        element type defined by the first element
 !
+!>       flag for interior element
         integer(kind = kint), pointer :: interior_ele(:)
-!<       flag for interior element
+!>       parameter for overlap
         real(kind=kreal)  , pointer  :: e_multi(:)
-!<       parameter for overlap
 !
+!>       position of centre of element
         real(kind=kreal)  , pointer :: x_ele(:,:)
-!<       position of centre of element
+!>       distance from the centre of element
         real(kind=kreal)  , pointer :: r_ele(:)
-!<       distance from the centre of element
+!>       1/r_ele
         real(kind=kreal)  , pointer :: ar_ele(:)
-!<       1/r_ele
+!>       longitude of element
         real(kind=kreal)  , pointer :: phi_ele(:)
-!<       longitude of element
+!>       colatitude of element
         real(kind=kreal)  , pointer :: theta_ele(:)
-!<       colatitude of element
+!>       cylindorical radius of element
         real(kind=kreal)  , pointer :: s_ele(:)
-!<       cylindorical radius of element
+!>       1 / s_ele
         real(kind=kreal)  , pointer :: as_ele(:)
-!<       1 / s_ele
 !
+!>       volume of each element
         real (kind=kreal), pointer :: volume_ele(:)
-!<       volume of each element
+!>       1 / (volume of each element)
         real (kind=kreal), pointer :: a_vol_ele(:)
-!<       1 / (volume of each element)
 !
 !
+!>      Volume of domain
         real(kind=kreal) :: volume
-!<      Volume of domain
+!>      1 / (Volume)
         real(kind=kreal) :: a_vol
-!<      1 / (Volume)
       end type element_data
 !
 !  ---------------------------------------------------------------------
@@ -185,9 +194,28 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine allocate_overlaped_ele_type(ele)
+!
+      type(element_data), intent(inout) :: ele
+!
+!
+      allocate(ele%interior_ele(ele%numele) )
+      allocate(ele%e_multi(ele%numele) )
+!
+      if(ele%numele .le. 0) return
+      ele%interior_ele = 1
+      ele%e_multi = 1.0d0
+!
+      end subroutine allocate_overlaped_ele_type
+!
+!  ---------------------------------------------------------------------
+!
       subroutine allocate_ele_geometry_type(ele)
 !
       type(element_data), intent(inout) :: ele
+!
+!
+      call allocate_overlaped_ele_type(ele)
 !
       allocate( ele%x_ele(ele%numele,3))
       allocate( ele%r_ele(ele%numele))
@@ -196,17 +224,11 @@
       allocate( ele%theta_ele(ele%numele))
       allocate( ele%s_ele(ele%numele))
       allocate( ele%as_ele(ele%numele))
-
-      allocate ( ele%interior_ele(ele%numele) )
-      allocate ( ele%e_multi(ele%numele) )
 !
       allocate( ele%volume_ele(ele%numele) )
       allocate( ele%a_vol_ele(ele%numele) )
 !
       if (ele%numele .gt. 0) then
-        ele%interior_ele = 1
-        ele%e_multi = 1.0d0
-!
         ele%x_ele = 0.0d0
 !
         ele%r_ele = 0.0d0
@@ -230,11 +252,11 @@
 !
       type(node_data), intent(inout) :: node
 !
-       allocate( node%istack_nod_smp(0:np_smp))
-       allocate( node%istack_internal_smp(0:np_smp))
+      allocate( node%istack_nod_smp(0:np_smp))
+      allocate( node%istack_internal_smp(0:np_smp))
 !
-       node%istack_nod_smp =      0
-       node%istack_internal_smp = 0
+      node%istack_nod_smp =      0
+      node%istack_internal_smp = 0
 !
       end subroutine allocate_node_param_smp_type
 !
@@ -279,9 +301,22 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine deallocate_overlaped_ele_type(ele)
+!
+      type(element_data), intent(inout) :: ele
+!
+!
+      deallocate(ele%interior_ele, ele%e_multi)
+!
+      end subroutine deallocate_overlaped_ele_type
+!
+!  ---------------------------------------------------------------------
+!
       subroutine deallocate_ele_geometry_type(ele)
 !
       type(element_data), intent(inout) :: ele
+!
+      call deallocate_overlaped_ele_type(ele)
 !
       deallocate( ele%x_ele)
       deallocate( ele%r_ele)
@@ -306,8 +341,8 @@
 !
       type(node_data), intent(inout) :: node
 !
-      deallocate( node%istack_nod_smp)
-      deallocate( node%istack_internal_smp)
+      deallocate(node%istack_nod_smp)
+      deallocate(node%istack_internal_smp)
 !
       end subroutine deallocate_node_param_smp_type
 !
@@ -373,6 +408,46 @@
 !
 !-----------------------------------------------------------------------
 !
+      subroutine link_new_overlaped_ele_type(ele_org, ele)
+!
+!
+      type(element_data), intent(in) :: ele_org
+      type(element_data), intent(inout) :: ele
+!
+!
+      ele%interior_ele => ele_org%interior_ele
+      ele%e_multi =>      ele_org%e_multi
+!
+      end subroutine link_new_overlaped_ele_type
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine link_new_ele_geometry_type(ele_org, ele)
+!
+      type(element_data), intent(in) :: ele_org
+      type(element_data), intent(inout) :: ele
+!
+!
+       ele%numele =  ele_org%numele
+       ele%x_ele =>  ele_org%x_ele
+!
+       ele%r_ele =>     ele_org%r_ele
+       ele%ar_ele =>    ele_org%ar_ele
+       ele%phi_ele =>   ele_org%phi_ele
+       ele%theta_ele => ele_org%theta_ele
+       ele%s_ele =>     ele_org%s_ele
+       ele%as_ele =>    ele_org%as_ele
+!
+       ele%volume_ele => ele_org%volume_ele
+       ele%a_vol_ele =>  ele_org%a_vol_ele
+!
+       ele%volume =      ele_org%volume
+!
+       end subroutine link_new_ele_geometry_type
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
       subroutine unlink_node_geometry_type(node)
 !
       type(node_data), intent(inout) :: node
@@ -394,11 +469,40 @@
       nullify(ele%elmtyp, ele%nodelm)
       nullify(ele%ie)
 !
-      nullify(ele%interior_ele, ele%e_multi)
-!
       end subroutine unlink_ele_connect_type
 !
 !-----------------------------------------------------------------------
+!
+      subroutine unlink_overlaped_ele_type(ele)
+!
+      type(element_data), intent(inout) :: ele
+!
+!
+      deallocate(ele%interior_ele, ele%e_multi)
+!
+      end subroutine unlink_overlaped_ele_type
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine unlink_ele_geometry_type(ele)
+!
+      type(element_data), intent(inout) :: ele
+!
+!
+      nullify(ele%x_ele)
+      nullify(ele%r_ele)
+      nullify(ele%ar_ele)
+      nullify(ele%phi_ele)
+      nullify(ele%theta_ele)
+      nullify(ele%s_ele)
+      nullify(ele%as_ele)
+!
+      nullify(ele%volume_ele)
+      nullify(ele%a_vol_ele)
+!
+      end subroutine unlink_ele_geometry_type
+!
+! ------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine check_nod_size_smp_type(node, my_rank)

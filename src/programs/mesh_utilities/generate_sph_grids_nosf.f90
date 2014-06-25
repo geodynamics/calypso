@@ -39,6 +39,6 @@
         stop "*** spherical shell mesh done"
       end if
 !
-      write(*,*) 'program is normally terminated'
+      write(*,*) 'program is normally finished'
 !
       end program generate_sph_grids_nosf

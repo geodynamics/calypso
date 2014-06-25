@@ -30,29 +30,28 @@
 !
 !> Structure of connectivity data for surface group items
       type surface_node_grp_data
+!>   total number of node for surface group
         integer(kind=kint) :: ntot_node_sf_grp
-!<   total number of node for surface group
+!>   number of node for each surface group
         integer(kind=kint), pointer :: nnod_sf_grp(:)
-!<   number of node for each surface group
+!>   end number of node for each surface group
         integer(kind=kint), pointer :: inod_stack_sf_grp(:)
-!<   end number of node for each surface group
 !
+!>      end address of each element group for SMP process
         integer( kind=kint ), pointer :: istack_surf_nod_smp(:)
-!<      end address of each element group for SMP process
+!>      maximum number of element group for SMP process
         integer( kind=kint )  ::  max_sf_nod_4_smp
-!<      maximum number of element group for SMP process
 !
+!>   local node ID for surface group
         integer(kind=kint), pointer :: inod_surf_grp(:)
-!<   local node ID for surface group
+!>   local node ID on opposite surface
         integer(kind=kint), pointer :: surf_node_n(:)
-!<   local node ID on opposite surface
+!>   number of surface for each node on surface group
         integer(kind=kint), pointer :: num_sf_4_nod(:)
-!<   number of surface for each node on surface group
+!>   normal vector at each node for surface group
         real(kind=kreal),   pointer :: surf_norm_nod(:,:)
-!<   normal vector at each node for surface group
+!>   multiply coefs at each node for surface group
         real(kind=kreal),   pointer :: coef_sf_nod(:)
-!<   multiply coefs at each node for surface group
-!
       end type surface_node_grp_data
 !
 !

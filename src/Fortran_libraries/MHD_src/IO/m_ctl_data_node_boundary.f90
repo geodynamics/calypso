@@ -110,49 +110,59 @@
       module m_ctl_data_node_boundary
 !
       use m_precision
+      use t_read_control_arrays
 !
       implicit  none
 !
+!>      Structure for nodal boundary conditions for temperature
+!!@n      node_bc_T_ctl%c1_tbl:  Type of boundary conditions
+!!@n      node_bc_T_ctl%c2_tbl:  Node (radial) group name for boundary
+!!@n      node_bc_T_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: node_bc_T_ctl
 !
-      integer(kind=kint) :: num_bc_e_ctl = 0
-      character (len=kchara), allocatable :: bc_e_name_ctl(:)
-      character (len=kchara), allocatable :: bc_e_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_e_magnitude_ctl(:)
+!>      Structure for nodal boundary conditions for velocity
+!!@n      node_bc_U_ctl%c1_tbl:  Type of boundary conditions
+!!@n      node_bc_U_ctl%c2_tbl:  Node (radial) group name for boundary
+!!@n      node_bc_U_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: node_bc_U_ctl
 !
-      integer(kind=kint) :: num_bc_v_ctl = 0
-      character (len=kchara), allocatable :: bc_v_name_ctl(:)
-      character (len=kchara), allocatable :: bc_v_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_v_magnitude_ctl(:)
+!>      Structure for nodal boundary conditions for pressure
+!!@n      node_bc_P_ctl%c1_tbl:  Type of boundary conditions
+!!@n      node_bc_P_ctl%c2_tbl:  Node (radial) group name for boundary
+!!@n      node_bc_P_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: node_bc_P_ctl
 !
-      integer(kind=kint) :: num_bc_p_ctl = 0
-      character (len=kchara), allocatable :: bc_p_name_ctl(:)
-      character (len=kchara), allocatable :: bc_p_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_p_magnitude_ctl(:)
+!>      Structure for nodal boundary conditions for composition variation
+!!@n      node_bc_C_ctl%c1_tbl:  Type of boundary conditions
+!!@n      node_bc_C_ctl%c2_tbl:  Node (radial) group name for boundary
+!!@n      node_bc_C_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: node_bc_C_ctl
 !
-      integer(kind=kint) :: num_bc_composit_ctl = 0
-      character (len=kchara), allocatable :: bc_composit_name_ctl(:)
-      character (len=kchara), allocatable :: bc_composit_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_composit_magnitude_ctl(:)
+!>      Structure for nodal boundary conditions for magnetic field
+!!@n      node_bc_B_ctl%c1_tbl:  Type of boundary conditions
+!!@n      node_bc_B_ctl%c2_tbl:  Node (radial) group name for boundary
+!!@n      node_bc_B_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: node_bc_B_ctl
 !
-      integer(kind=kint) :: num_bc_b_ctl = 0
-      character (len=kchara), allocatable :: bc_b_name_ctl(:)
-      character (len=kchara), allocatable :: bc_b_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_b_magnitude_ctl(:)
+!>      Structure for nodal boundary conditions
+!!                           for magnetic scalar potential
+!!@n      node_bc_MP_ctl%c1_tbl:  Type of boundary conditions
+!!@n      node_bc_MP_ctl%c2_tbl:  Node (radial) group name for boundary
+!!@n      node_bc_MP_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: node_bc_MP_ctl
 !
-      integer(kind=kint) :: num_bc_mag_p_ctl = 0
-      character (len=kchara), allocatable :: bc_mag_p_name_ctl(:)
-      character (len=kchara), allocatable :: bc_mag_p_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_mag_p_magnitude_ctl(:)
+!>      Structure for nodal boundary conditions
+!!                           for magnetic vector potential
+!!@n      node_bc_A_ctl%c1_tbl:  Type of boundary conditions
+!!@n      node_bc_A_ctl%c2_tbl:  Node (radial) group name for boundary
+!!@n      node_bc_A_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: node_bc_A_ctl
 !
-      integer(kind=kint) :: num_bc_vp_ctl = 0
-      character (len=kchara), allocatable :: bc_vp_name_ctl(:)
-      character (len=kchara), allocatable :: bc_vp_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_vp_magnitude_ctl(:)
-!
-      integer(kind=kint) :: num_bc_j_ctl = 0
-      character (len=kchara), allocatable :: bc_j_name_ctl(:)
-      character (len=kchara), allocatable :: bc_j_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_j_magnitude_ctl(:)
+!>      Structure for nodal boundary conditions for current density
+!!@n      node_bc_J_ctl%c1_tbl:  Type of boundary conditions
+!!@n      node_bc_J_ctl%c2_tbl:  Node (radial) group name for boundary
+!!@n      node_bc_J_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: node_bc_J_ctl
 !
 !
 !   entry label
@@ -182,24 +192,10 @@
       character(len=kchara), parameter                                  &
      &        :: hd_n_bc_currect = 'bc_current'
 !
-      integer (kind=kint) :: i_n_bc_temp =     0
-      integer (kind=kint) :: i_n_bc_velo =     0
-      integer (kind=kint) :: i_n_bc_press =    0
-      integer (kind=kint) :: i_n_bc_composit = 0
-      integer (kind=kint) :: i_n_bc_magne =    0
-      integer (kind=kint) :: i_n_bc_mag_p =    0
-      integer (kind=kint) :: i_n_bc_vect_p =   0
-      integer (kind=kint) :: i_n_bc_currect =  0
-!
       private :: hd_bc_4_node, hd_boundary_condition, i_bc_4_node
       private :: hd_n_bc_temp, hd_n_bc_velo, hd_n_bc_press
       private :: hd_n_bc_magne, hd_n_bc_mag_p, hd_n_bc_vect_p
       private :: hd_n_bc_composit, hd_n_bc_currect
-!
-      private :: allocate_bc_temp_ctl, allocate_bc_composit_ctl
-      private :: allocate_bc_velo_ctl, allocate_bc_press_ctl
-      private :: allocate_bc_magne_ctl, allocate_bc_magne_p_ctl
-      private :: allocate_bc_vect_p_ctl, allocate_bc_current_ctl
 !
 ! -----------------------------------------------------------------------
 !
@@ -207,165 +203,67 @@
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_bc_temp_ctl
+      subroutine deallocate_bc_temp_ctl
 !
-        allocate(bc_e_magnitude_ctl(num_bc_e_ctl))
-        allocate(bc_e_type_ctl(num_bc_e_ctl))
-        allocate(bc_e_name_ctl(num_bc_e_ctl))
-        if(num_bc_e_ctl .gt. 0) bc_e_magnitude_ctl = 0.0d0
+      call dealloc_control_array_c2_r(node_bc_T_ctl)
 !
-       end subroutine allocate_bc_temp_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_velo_ctl
-!
-        allocate(bc_v_magnitude_ctl(num_bc_v_ctl))
-        allocate(bc_v_name_ctl(num_bc_v_ctl))
-        allocate(bc_v_type_ctl(num_bc_v_ctl))
-        if(num_bc_v_ctl .gt. 0) bc_v_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_velo_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_press_ctl
-!
-        allocate(bc_p_magnitude_ctl( num_bc_p_ctl))
-        allocate(bc_p_name_ctl(num_bc_p_ctl))
-        allocate(bc_p_type_ctl(num_bc_p_ctl))
-        if(num_bc_p_ctl .gt. 0) bc_p_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_press_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_composit_ctl
-!
-        allocate(bc_composit_magnitude_ctl( num_bc_composit_ctl))
-        allocate(bc_composit_name_ctl(num_bc_composit_ctl))
-        allocate(bc_composit_type_ctl(num_bc_composit_ctl))
-        if(num_bc_composit_ctl .gt. 0)                                 &
-     &               bc_composit_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_composit_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_magne_ctl
-!
-        allocate(bc_b_magnitude_ctl( num_bc_b_ctl))
-        allocate(bc_b_name_ctl(num_bc_b_ctl))
-        allocate(bc_b_type_ctl(num_bc_b_ctl))
-        if(num_bc_b_ctl .gt. 0) bc_b_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_magne_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_magne_p_ctl
-!
-        allocate(bc_mag_p_magnitude_ctl( num_bc_mag_p_ctl))
-        allocate(bc_mag_p_name_ctl(num_bc_mag_p_ctl))
-        allocate(bc_mag_p_type_ctl(num_bc_mag_p_ctl))
-        if(num_bc_mag_p_ctl .gt. 0) bc_mag_p_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_magne_p_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_vect_p_ctl
-!
-        allocate(bc_vp_magnitude_ctl( num_bc_vp_ctl))
-        allocate(bc_vp_name_ctl(num_bc_vp_ctl))
-        allocate(bc_vp_type_ctl(num_bc_vp_ctl))
-        if(num_bc_vp_ctl .gt. 0) bc_vp_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_vect_p_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_current_ctl
-!
-        allocate(bc_j_magnitude_ctl( num_bc_j_ctl))
-        allocate(bc_j_name_ctl(num_bc_j_ctl))
-        allocate(bc_j_type_ctl(num_bc_j_ctl))
-        if(num_bc_j_ctl .gt. 0) bc_j_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_current_ctl
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_bc_temp_ctl
-!
-        deallocate(bc_e_magnitude_ctl)
-        deallocate(bc_e_type_ctl, bc_e_name_ctl)
-!
-       end subroutine deallocate_bc_temp_ctl
+      end subroutine deallocate_bc_temp_ctl
 !
 ! -----------------------------------------------------------------------
 !
        subroutine deallocate_bc_velo_ctl
 !
-        deallocate(bc_v_magnitude_ctl)
-        deallocate(bc_v_name_ctl, bc_v_type_ctl)
+      call dealloc_control_array_c2_r(node_bc_U_ctl)
 !
        end subroutine deallocate_bc_velo_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_bc_press_ctl
+      subroutine deallocate_bc_press_ctl
 !
-        deallocate(bc_p_magnitude_ctl)
-        deallocate(bc_p_name_ctl, bc_p_type_ctl)
+      call dealloc_control_array_c2_r(node_bc_P_ctl)
 !
-       end subroutine deallocate_bc_press_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_bc_composit_ctl
-!
-        deallocate(bc_composit_magnitude_ctl)
-        deallocate(bc_composit_name_ctl, bc_composit_type_ctl)
-!
-       end subroutine deallocate_bc_composit_ctl
+      end subroutine deallocate_bc_press_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_bc_magne_ctl
+      subroutine deallocate_bc_composit_ctl
 !
-        deallocate(bc_b_magnitude_ctl)
-        deallocate(bc_b_name_ctl, bc_b_type_ctl)
+      call dealloc_control_array_c2_r(node_bc_C_ctl)
 !
-       end subroutine deallocate_bc_magne_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_bc_magne_p_ctl
-!
-        deallocate(bc_mag_p_magnitude_ctl)
-        deallocate(bc_mag_p_name_ctl, bc_mag_p_type_ctl)
-!
-       end subroutine deallocate_bc_magne_p_ctl
+      end subroutine deallocate_bc_composit_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_bc_vect_p_ctl
+      subroutine deallocate_bc_magne_ctl
 !
-        deallocate(bc_vp_magnitude_ctl)
-        deallocate(bc_vp_name_ctl, bc_vp_type_ctl)
+      call dealloc_control_array_c2_r(node_bc_B_ctl)
 !
-       end subroutine deallocate_bc_vect_p_ctl
+      end subroutine deallocate_bc_magne_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_bc_current_ctl
+      subroutine deallocate_bc_magne_p_ctl
 !
-        deallocate(bc_j_magnitude_ctl)
-        deallocate(bc_j_name_ctl, bc_j_type_ctl)
+      call dealloc_control_array_c2_r(node_bc_MP_ctl)
 !
-       end subroutine deallocate_bc_current_ctl
+      end subroutine deallocate_bc_magne_p_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine deallocate_bc_vect_p_ctl
+!
+      call dealloc_control_array_c2_r(node_bc_A_ctl)
+!
+      end subroutine deallocate_bc_vect_p_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine deallocate_bc_current_ctl
+!
+      call dealloc_control_array_c2_r(node_bc_J_ctl)
+!
+      end subroutine deallocate_bc_current_ctl
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -388,87 +286,15 @@
         call find_control_end_flag(hd_bc_4_node, i_bc_4_node)
         if(i_bc_4_node .gt. 0) exit
 !
-!-----read b. c. for temp.-----------------------------
 !
-        call find_control_array_flag(hd_n_bc_temp, num_bc_e_ctl)
-        if(num_bc_e_ctl.gt.0 .and. i_n_bc_temp.eq.0) then
-          call allocate_bc_temp_ctl
-          call read_control_array_c2_r_list(hd_n_bc_temp, num_bc_e_ctl, &
-     &        i_n_bc_temp, bc_e_type_ctl, bc_e_name_ctl,                &
-     &        bc_e_magnitude_ctl)
-        end if
-!
-!-----read b.c. for velocity -------------
-!
-        call find_control_array_flag(hd_n_bc_velo, num_bc_v_ctl)
-        if(num_bc_v_ctl.gt.0 .and. i_n_bc_velo.eq.0) then
-          call allocate_bc_velo_ctl
-          call read_control_array_c2_r_list(hd_n_bc_velo, num_bc_v_ctl, &
-     &        i_n_bc_velo, bc_v_type_ctl, bc_v_name_ctl,                &
-     &        bc_v_magnitude_ctl)
-        end if
-!
-!-------read b.c. for pressure ---------------------------
-!
-        call find_control_array_flag(hd_n_bc_press, num_bc_p_ctl)
-        if(num_bc_p_ctl.gt.0 .and. i_n_bc_press.eq.0) then
-          call allocate_bc_press_ctl
-          call read_control_array_c2_r_list(hd_n_bc_press,              &
-     &        num_bc_p_ctl, i_n_bc_press, bc_p_type_ctl,                &
-     &        bc_p_name_ctl, bc_p_magnitude_ctl)
-        end if
-!
-!-------read b.c. for Dummy Scalar ---------------------------
-!
-        call find_control_array_flag(hd_n_bc_composit,                  &
-     &      num_bc_composit_ctl)
-        if(num_bc_composit_ctl.gt.0 .and. i_n_bc_composit.eq.0) then
-          call allocate_bc_composit_ctl
-          call read_control_array_c2_r_list(hd_n_bc_composit,           &
-     &        num_bc_composit_ctl, i_n_bc_composit,                     &
-     &        bc_composit_type_ctl, bc_composit_name_ctl,               &
-     &        bc_composit_magnitude_ctl)
-        end if
-!
-!-------read b.c. for magnetic field ---------------------------
-!
-        call find_control_array_flag(hd_n_bc_magne, num_bc_b_ctl)
-        if(num_bc_b_ctl.gt.0 .and. i_n_bc_magne.eq.0) then
-          call allocate_bc_magne_ctl
-          call read_control_array_c2_r_list(hd_n_bc_magne,              &
-     &        num_bc_b_ctl, i_n_bc_magne, bc_b_type_ctl,                &
-     &        bc_b_name_ctl, bc_b_magnitude_ctl)
-        end if
-!
-!-------read b.c. for magnetic potential ---------------------------
-!
-        call find_control_array_flag(hd_n_bc_mag_p, num_bc_mag_p_ctl)
-        if(num_bc_mag_p_ctl.gt.0 .and. i_n_bc_mag_p.eq.0) then
-          call allocate_bc_magne_p_ctl
-          call read_control_array_c2_r_list(hd_n_bc_mag_p,              &
-     &        num_bc_mag_p_ctl, i_n_bc_mag_p, bc_mag_p_type_ctl,        &
-     &        bc_mag_p_name_ctl,  bc_mag_p_magnitude_ctl)
-        end if
-!
-!-------read b.c. for vector potential ---------------------------
-!
-        call find_control_array_flag(hd_n_bc_vect_p, num_bc_vp_ctl)
-        if(num_bc_vp_ctl.gt.0 .and. i_n_bc_vect_p.eq.0) then
-          call allocate_bc_vect_p_ctl
-          call read_control_array_c2_r_list(hd_n_bc_vect_p,             &
-     &        num_bc_vp_ctl, i_n_bc_vect_p, bc_vp_type_ctl,             &
-     &        bc_vp_name_ctl, bc_vp_magnitude_ctl)
-        end if
-!
-!-------read b.c. for current density ---------------------------
-!
-        call find_control_array_flag(hd_n_bc_currect,  num_bc_j_ctl)
-        if(num_bc_j_ctl.gt.0 .and. i_n_bc_currect.eq.0) then
-          call allocate_bc_current_ctl
-          call read_control_array_c2_r_list(hd_n_bc_currect,            &
-     &        num_bc_j_ctl, i_n_bc_currect, bc_j_type_ctl,              &
-     &            bc_j_name_ctl, bc_j_magnitude_ctl)
-        end if
+        call read_control_array_c2_r(hd_n_bc_temp, node_bc_T_ctl)
+        call read_control_array_c2_r(hd_n_bc_velo, node_bc_U_ctl)
+        call read_control_array_c2_r(hd_n_bc_press, node_bc_P_ctl)
+        call read_control_array_c2_r(hd_n_bc_composit, node_bc_C_ctl)
+        call read_control_array_c2_r(hd_n_bc_magne, node_bc_B_ctl)
+        call read_control_array_c2_r(hd_n_bc_mag_p, node_bc_MP_ctl)
+        call read_control_array_c2_r(hd_n_bc_vect_p, node_bc_A_ctl)
+        call read_control_array_c2_r(hd_n_bc_currect, node_bc_J_ctl)
       end do
 !
       end subroutine read_bc_4_node

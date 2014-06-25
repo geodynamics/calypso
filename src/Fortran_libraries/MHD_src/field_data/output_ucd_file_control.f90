@@ -110,12 +110,7 @@
 !
 !
       call link_fem_node_data_2_ucd_out
-!
-      call count_udt_elements(internal_node, numele, nnod_4_ele,        &
-     &    ie_org, fem_ucd)
-      call allocate_ucd_ele(fem_ucd)
-!
-      call set_udt_global_connect(internal_node, numele, nnod_4_ele,    &
+      call const_udt_global_connect(internal_node, numele, nnod_4_ele,  &
      &    globalelmid_org, ie_org, fem_ucd)
 !
       end subroutine link_global_org_mesh_4_ucd
@@ -131,14 +126,8 @@
       use set_and_cal_udt_data
 !
 !
-      call allocate_ucd_node(fem_ucd)
-      call set_udt_local_nodes(numnod, xx, fem_ucd)
-!
-      call count_udt_elements(internal_node, numele, nnod_4_ele,        &
-     &    ie_org, fem_ucd)
-      call allocate_ucd_ele(fem_ucd)
-!
-      call set_udt_local_connect(internal_node, numele, nnod_4_ele,     &
+      call const_udt_local_nodes(numnod, xx, fem_ucd)
+      call const_udt_local_connect(internal_node, numele, nnod_4_ele,   &
      &    ie_org, fem_ucd)
 !
       end subroutine link_local_org_mesh_4_ucd

@@ -30,6 +30,8 @@
 !!      subroutine dealloc_merged_hdt5_ele_list(m_ucd)
 !!      subroutine dealloc_merged_hdt5_array(m_ucd)
 !!
+!!      subroutine set_ucd_file_format_prefix(file_head, i_fmt, ucd)
+!!
 !!      subroutine cal_istack_ucd_component(ucd)
 !!
 !!      subroutine append_new_ucd_field_name(new_field_name,            &
@@ -348,6 +350,22 @@
       deallocate(m_ucd%fld_hdf5)
 !
       end subroutine dealloc_merged_hdt5_array
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_ucd_file_format_prefix(file_head, i_fmt, ucd)
+!
+      character(len = kchara), intent(in) :: file_head
+      integer(kind = kint), intent(in) :: i_fmt
+!
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      ucd%ifmt_file = i_fmt
+      write(ucd%file_prefix,'(a)') trim(file_head)
+!
+      end subroutine set_ucd_file_format_prefix
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

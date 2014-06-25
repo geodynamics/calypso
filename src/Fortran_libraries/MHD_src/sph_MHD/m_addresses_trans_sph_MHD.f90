@@ -20,16 +20,25 @@
 !
       implicit none
 !
+!>      number of components for backward spherical harmonics transform
+      integer(kind = kint) :: ncomp_rj_2_rtp = 0
 !>      number of components
 !!      for backward vector spherical harmonics transform
       integer(kind = kint) :: nvector_rj_2_rtp = 0
 !>      number of scalars for backward spherical harmonics transform
       integer(kind = kint) :: nscalar_rj_2_rtp = 0
-!>      number of components
-!!      for forward vector spherical harmonics transform
+!>      number of tensors for backward spherical harmonics transform
+      integer(kind = kint) :: ntensor_rj_2_rtp = 0
+!
+!>      number of components for forward spherical harmonics transform
+      integer(kind = kint) :: ncomp_rtp_2_rj = 0
+!>      number of vectors for forward spherical harmonics transform
       integer(kind = kint) :: nvector_rtp_2_rj = 0
 !>      number of scalars for forward spherical harmonics transform
       integer(kind = kint) :: nscalar_rtp_2_rj = 0
+!>      number of tensors for forward spherical harmonics transform
+      integer(kind = kint) :: ntensor_rtp_2_rj = 0
+!
 !
 !>    addresses of fields for backward transform
       type(phys_address), save :: b_trns
@@ -48,103 +57,98 @@
       use m_control_parameter
       use m_work_4_sph_trans
 !
-      integer(kind = kint) :: ncomp_fwd, ncomp_bwd
-!
 !
       nvector_rj_2_rtp = 0
-      nscalar_rj_2_rtp = 0
-      nvector_rtp_2_rj = 0
-      nscalar_rtp_2_rj = 0
-!
 !   velocity flag
       if(iflag_t_evo_4_velo .gt. id_no_evolution                        &
      &     .or. iflag_t_evo_4_magne .gt. id_no_evolution) then
-        nvector_rj_2_rtp = nvector_rj_2_rtp + 3
-        b_trns%i_velo = nvector_rj_2_rtp - 2
+        nvector_rj_2_rtp = nvector_rj_2_rtp + 1
+        b_trns%i_velo = 3*nvector_rj_2_rtp - 2
       end if
 !   vorticity flag
       if(iflag_t_evo_4_velo .gt. id_no_evolution) then
-        nvector_rj_2_rtp = nvector_rj_2_rtp + 3
-        b_trns%i_vort = nvector_rj_2_rtp - 2
+        nvector_rj_2_rtp = nvector_rj_2_rtp + 1
+        b_trns%i_vort = 3*nvector_rj_2_rtp - 2
       end if
 !   magnetic field flag
       if(iflag_t_evo_4_magne .gt. id_no_evolution                       &
      &      .or. iflag_4_lorentz .gt. id_turn_OFF) then
-        nvector_rj_2_rtp = nvector_rj_2_rtp + 3
-        b_trns%i_magne = nvector_rj_2_rtp - 2
+        nvector_rj_2_rtp = nvector_rj_2_rtp + 1
+        b_trns%i_magne = 3*nvector_rj_2_rtp - 2
       end if
 !   current density flag
       if(iflag_4_lorentz .gt. id_turn_OFF) then
-        nvector_rj_2_rtp = nvector_rj_2_rtp + 3
-        b_trns%i_current = nvector_rj_2_rtp - 2
+        nvector_rj_2_rtp = nvector_rj_2_rtp + 1
+        b_trns%i_current = 3*nvector_rj_2_rtp - 2
       end if
+      ncomp_rj_2_rtp = 3*nvector_rj_2_rtp
 !
 !
+      nscalar_rj_2_rtp = 0
 !   temperature flag
       if(iflag_t_evo_4_temp .gt. id_no_evolution) then
         nscalar_rj_2_rtp = nscalar_rj_2_rtp + 1
-        b_trns%i_temp = nscalar_rj_2_rtp
+        b_trns%i_temp = nscalar_rj_2_rtp + ncomp_rj_2_rtp
       end if
 !
 !   composition flag
       if(iflag_t_evo_4_composit .gt. id_no_evolution) then
         nscalar_rj_2_rtp = nscalar_rj_2_rtp + 1
-        b_trns%i_light = nscalar_rj_2_rtp
+        b_trns%i_light = nscalar_rj_2_rtp + ncomp_rj_2_rtp
       end if
+      ncomp_rj_2_rtp = ncomp_rj_2_rtp + nscalar_rj_2_rtp
 !
 !
+      nvector_rtp_2_rj = 0
 !   advection flag
       if(iflag_t_evo_4_velo .gt. id_no_evolution) then
-        nvector_rtp_2_rj = nvector_rtp_2_rj + 3
-        f_trns%i_m_advect = nvector_rtp_2_rj - 2
+        nvector_rtp_2_rj = nvector_rtp_2_rj + 1
+        f_trns%i_m_advect = 3*nvector_rtp_2_rj - 2
 !   Coriolis flag
         if(iflag_4_coriolis .gt. id_turn_OFF) then
-          nvector_rtp_2_rj = nvector_rtp_2_rj + 3
-          f_trns%i_coriolis = nvector_rtp_2_rj - 2
+          nvector_rtp_2_rj = nvector_rtp_2_rj + 1
+          f_trns%i_coriolis = 3*nvector_rtp_2_rj - 2
         end if
         if(iflag_4_coriolis .gt. id_turn_OFF) then
-          nvector_rtp_2_rj =      nvector_rtp_2_rj + 3
-          f_trns%i_rot_Coriolis = nvector_rtp_2_rj - 2
+          nvector_rtp_2_rj =      nvector_rtp_2_rj + 1
+          f_trns%i_rot_Coriolis = 3*nvector_rtp_2_rj - 2
         end if
 !   Lorentz flag
         if(iflag_4_lorentz .gt. id_turn_OFF) then
-          nvector_rtp_2_rj = nvector_rtp_2_rj + 3
-          f_trns%i_lorentz = nvector_rtp_2_rj - 2
+          nvector_rtp_2_rj = nvector_rtp_2_rj + 1
+          f_trns%i_lorentz = 3*nvector_rtp_2_rj - 2
         end if
       end if
 !
 !   induction flag
       if(iflag_t_evo_4_magne .gt. id_no_evolution) then
-        nvector_rtp_2_rj = nvector_rtp_2_rj + 3
-        f_trns%i_vp_induct =  nvector_rtp_2_rj - 2
+        nvector_rtp_2_rj = nvector_rtp_2_rj + 1
+        f_trns%i_vp_induct =  3*nvector_rtp_2_rj - 2
       end if
 !
 !   heat flux flag
       if(iflag_t_evo_4_temp .gt. id_no_evolution) then
-        nvector_rtp_2_rj = nvector_rtp_2_rj + 3
-        f_trns%i_h_flux = nvector_rtp_2_rj - 2
+        nvector_rtp_2_rj = nvector_rtp_2_rj + 1
+        f_trns%i_h_flux = 3*nvector_rtp_2_rj - 2
       end if
 !
 !   composition flux flag
       if(iflag_t_evo_4_composit .gt. id_no_evolution) then
-        nvector_rtp_2_rj = nvector_rtp_2_rj + 3
-        f_trns%i_c_flux = nvector_rtp_2_rj - 2
+        nvector_rtp_2_rj = nvector_rtp_2_rj + 1
+        f_trns%i_c_flux = 3*nvector_rtp_2_rj - 2
       end if
+      ncomp_rtp_2_rj = 3*nvector_rtp_2_rj
 !
+!
+      nscalar_rtp_2_rj = 0
 !   divergence of Coriolis flux flag
       if(iflag_4_coriolis .gt. id_turn_OFF) then
         nscalar_rtp_2_rj = nscalar_rtp_2_rj + 1
-        f_trns%i_div_Coriolis = nscalar_rtp_2_rj
+        f_trns%i_div_Coriolis = nscalar_rtp_2_rj + ncomp_rtp_2_rj
       end if
+      ncomp_rtp_2_rj = ncomp_rtp_2_rj + nscalar_rtp_2_rj
 !
-      nb_sph_trans = nvector_rj_2_rtp
-      nb_sph_trans = max(nb_sph_trans,nscalar_rj_2_rtp)
-      nb_sph_trans = max(nb_sph_trans,nvector_rtp_2_rj)
-      nb_sph_trans = max(nb_sph_trans,nscalar_rtp_2_rj)
-!
-      ncomp_bwd = 3*nvector_rj_2_rtp + nscalar_rj_2_rtp
-      ncomp_fwd = 3*nvector_rtp_2_rj + nscalar_rtp_2_rj
-      ncomp_sph_trans = max(ncomp_bwd,ncomp_fwd)
+      ncomp_sph_trans = max(ncomp_rj_2_rtp, ncomp_rtp_2_rj)
 !
       end subroutine set_addresses_trans_sph_MHD
 !
@@ -156,8 +160,9 @@
       use m_work_4_sph_trans
 !
 !
-      write(*,*) 'nb_sph_trans    ', nb_sph_trans
       write(*,*) 'ncomp_sph_trans ', ncomp_sph_trans
+      write(*,*) 'ncomp_rj_2_rtp  ', ncomp_rj_2_rtp
+      write(*,*) 'ncomp_rtp_2_rj  ', ncomp_rtp_2_rj
 !
       write(*,*) 'nvector_rj_2_rtp  ', nvector_rj_2_rtp
       if(b_trns%i_velo .gt. 0) write(*,*) 'b_trns%i_velo  ',            &

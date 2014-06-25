@@ -1,35 +1,42 @@
-!m_group_data_sph_specr.f90
-!      module m_group_data_sph_specr
+!>@file   m_group_data_sph_specr.f90
+!!@brief  module m_group_data_sph_specr
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine allocate_rtp_nod_grp_stack
-!      subroutine allocate_rtp_r_grp_stack
-!      subroutine allocate_rtp_theta_grp_stack
-!      subroutine allocate_rtp_zonal_grp_stack
-!      subroutine allocate_rj_r_grp_stack
-!      subroutine allocate_rj_sphere_grp_stack
-!
-!      subroutine allocate_rtp_nod_grp_item
-!      subroutine allocate_rtp_r_grp_item
-!      subroutine allocate_rtp_theta_grp_item
-!      subroutine allocate_rtp_zonal_grp_item
-!      subroutine allocate_rj_r_grp_item
-!      subroutine allocate_rj_sphere_grp_item
-!
-!      subroutine deallocate_rtp_nod_grp_item
-!      subroutine deallocate_rtp_r_grp_item
-!      subroutine deallocate_rtp_theta_grp_item
-!      subroutine deallocate_rtp_zonal_grp_item
-!      subroutine deallocate_rj_r_grp_item
-!      subroutine deallocate_rj_sphere_grp_item
-!
-!      subroutine check_rtp_nod_grp_stack(my_rank)
-!      subroutine check_rtp_r_grp_stack(my_rank)
-!      subroutine check_rtp_theta_grp_stack(my_rank)
-!      subroutine check_rtp_zonal_grp_stack(my_rank)
-!      subroutine check_rj_r_grp_stack(my_rank)
-!      subroutine check_rj_sph_grp_stack(my_rank)
+!>@brief  Grouping information for spherical hermonics data
+!!
+!!@verbatim
+!!      subroutine allocate_rtp_nod_grp_stack
+!!      subroutine allocate_rtp_r_grp_stack
+!!      subroutine allocate_rtp_theta_grp_stack
+!!      subroutine allocate_rtp_zonal_grp_stack
+!!      subroutine allocate_rj_r_grp_stack
+!!      subroutine allocate_rj_sphere_grp_stack
+!!
+!!      subroutine allocate_rtp_nod_grp_item
+!!      subroutine allocate_rtp_r_grp_item
+!!      subroutine allocate_rtp_theta_grp_item
+!!      subroutine allocate_rtp_zonal_grp_item
+!!      subroutine allocate_rj_r_grp_item
+!!      subroutine allocate_rj_sphere_grp_item
+!!
+!!      subroutine deallocate_rtp_nod_grp_item
+!!      subroutine deallocate_rtp_r_grp_item
+!!      subroutine deallocate_rtp_theta_grp_item
+!!      subroutine deallocate_rtp_zonal_grp_item
+!!      subroutine deallocate_rj_r_grp_item
+!!      subroutine deallocate_rj_sphere_grp_item
+!!
+!!      subroutine check_rtp_nod_grp_stack(my_rank)
+!!      subroutine check_rtp_r_grp_stack(my_rank)
+!!      subroutine check_rtp_theta_grp_stack(my_rank)
+!!      subroutine check_rtp_zonal_grp_stack(my_rank)
+!!      subroutine check_rj_r_grp_stack(my_rank)
+!!      subroutine check_rj_sph_grp_stack(my_rank)
+!!@endverbatim
+!!
+!!@n @param  my_rank  Proccess ID
 !
       module m_group_data_sph_specr
 !

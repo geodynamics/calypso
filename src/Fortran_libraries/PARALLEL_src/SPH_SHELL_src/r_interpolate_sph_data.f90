@@ -239,12 +239,12 @@
       use extend_potential_field
 !
 !
-!      write(*,*) ' ipol%i_magne', ipol%i_magne, kr_outside, kr_inside
+      write(*,*) ' ipol%i_magne', ipol%i_magne, kr_outside, kr_inside
       if (ipol%i_magne .gt. 0) then
         call gauss_to_poloidal_out(ipol%i_magne, kr_outside,            &
-     &      ltr_w, r_gauss, w_gauss)
+     &      ltr_w, r_gauss, w_gauss, index_w)
         call gauss_to_poloidal_in(ipol%i_magne,  kr_inside,             &
-     &      ltr_w, r_gauss, w_gauss)
+     &      ltr_w, r_gauss, w_gauss, index_w)
       end if
 !
       end subroutine set_poloidal_b_by_gauss_coefs

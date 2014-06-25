@@ -37,6 +37,7 @@
       use m_surf_data_list
       use set_node_group_types
       use set_surface_group_types
+      use skip_comment_f
 !
       integer (kind = kint) :: i, iflag_4_hemi
 !
@@ -45,8 +46,8 @@
         velo_nod%num_bc =    0
         torque_surf%num_bc = 0
       else
-        velo_nod%num_bc =    num_bc_v_ctl
-        torque_surf%num_bc = num_bc_torque_ctl
+        velo_nod%num_bc =    node_bc_U_ctl%num
+        torque_surf%num_bc = surf_bc_ST_ctl%num
       end if
 !
 !  set boundary conditions for velocity
@@ -57,8 +58,10 @@
 !
         call allocate_nod_bc_list_velo
 !
-        velo_nod%bc_name = bc_v_name_ctl
-        velo_nod%bc_magnitude = bc_v_magnitude_ctl
+        velo_nod%bc_name(1:velo_nod%num_bc)                             &
+     &      = node_bc_U_ctl%c2_tbl(1:velo_nod%num_bc)
+        velo_nod%bc_magnitude(1:velo_nod%num_bc)                        &
+     &      = node_bc_U_ctl%vect(1:velo_nod%num_bc)
 !
         iflag_4_hemi = 0
         do i = 1, velo_nod%num_bc
@@ -68,26 +71,21 @@
         end do
 !
         do i = 1, velo_nod%num_bc
-         call set_bc_group_types_vector(bc_v_type_ctl(i),               &
+         call set_bc_group_types_vector(node_bc_U_ctl%c1_tbl(i),        &
      &       velo_nod%ibc_type(i))
-         call set_bc_group_types_sgs_vect(bc_v_type_ctl(i),             &
+         call set_bc_group_types_sgs_vect(node_bc_U_ctl%c1_tbl(i),      &
      &       velo_nod%ibc_type(i))
-         call set_bc_group_types_rotation(bc_v_type_ctl(i),             &
+         call set_bc_group_types_rotation(node_bc_U_ctl%c1_tbl(i),      &
      &       velo_nod%ibc_type(i))
-         call set_bc_group_types_sph_center(bc_v_type_ctl(i),           &
+         call set_bc_group_types_sph_center(node_bc_U_ctl%c1_tbl(i),    &
+     &       velo_nod%ibc_type(i))
+         call set_bc_group_types_sph_velo(node_bc_U_ctl%c1_tbl(i),      &
      &       velo_nod%ibc_type(i))
 !
-          if (bc_v_type_ctl(i) .eq. 'vr_0' ) then
-            velo_nod%ibc_type(i) = iflag_no_vr
-          else if ( bc_v_type_ctl(i) .eq. 'free_slip_sph' ) then
-            velo_nod%ibc_type(i) = iflag_free_sph
-          else if ( bc_v_type_ctl(i) .eq. 'non_slip_sph' ) then
-            velo_nod%ibc_type(i) = iflag_non_slip_sph
-          else if ( bc_v_type_ctl(i) .eq. 'rot_inner_core' ) then
-            velo_nod%ibc_type(i) = iflag_rotatable_icore
-          else if ( bc_v_type_ctl(i) .eq. 'special' ) then
-            velo_nod%ibc_type(i) = iflag_bc_special
-          end if
+          if(cmp_no_case(node_bc_U_ctl%c1_tbl(i), 'vr_0')               &
+     &       .gt. 0) velo_nod%ibc_type(i) = iflag_no_vr
+          if(cmp_no_case(node_bc_U_ctl%c1_tbl(i), 'special')            &
+     &       .gt. 0) velo_nod%ibc_type(i) = iflag_bc_special
         end do
 !
         if (iflag_debug .eq. iflag_full_msg) then
@@ -97,6 +95,8 @@
      &         velo_nod%bc_magnitude(i), trim(velo_nod%bc_name(i))
           end do
         end if
+!
+        call deallocate_bc_velo_ctl
       end if
 !
 !
@@ -107,24 +107,18 @@
 !
         call allocate_velo_surf_ctl
 !
-        torque_surf%bc_name =      bc_torque_name_ctl
-        torque_surf%bc_magnitude = bc_torque_magnitude_ctl
+        torque_surf%bc_name(1:torque_surf%num_bc)                       &
+     &       = surf_bc_ST_ctl%c2_tbl(1:torque_surf%num_bc)
+        torque_surf%bc_magnitude(1:torque_surf%num_bc)                  &
+     &       = surf_bc_ST_ctl%vect(1:torque_surf%num_bc)
 !
         do i = 1, torque_surf%num_bc
-          call set_surf_group_types_vector(bc_torque_type_ctl(i),       &
+          call set_surf_group_types_vector(surf_bc_ST_ctl%c1_tbl(i),    &
      &       torque_surf%ibc_type(i) )
-          call set_stress_free_group_types(bc_torque_type_ctl(i),       &
+          call set_stress_free_group_types(surf_bc_ST_ctl%c1_tbl(i),    &
      &       torque_surf%ibc_type(i) )
-          call set_bc_group_types_sph_center(bc_torque_type_ctl(i),     &
-     &       torque_surf%ibc_type(i) )
-!
-          if      (bc_torque_type_ctl(i) .eq. 'free_slip_sph' ) then
-            torque_surf%ibc_type(i) = iflag_free_sph
-          else if (bc_torque_type_ctl(i) .eq. 'non_slip_sph' ) then
-            torque_surf%ibc_type(i) = iflag_non_slip_sph
-          else if (bc_torque_type_ctl(i) .eq. 'rot_inner_core' ) then
-            torque_surf%ibc_type(i) = iflag_rotatable_icore
-          end if
+         call set_bc_group_types_sph_velo(surf_bc_ST_ctl%c1_tbl(i),     &
+     &       torque_surf%ibc_type(i))
         end do
 !
         if (iflag_debug .eq. iflag_full_msg) then
@@ -135,6 +129,8 @@
      &                 trim(torque_surf%bc_name(i))
           end do
         end if
+!
+        call deallocate_bc_torque_ctl
       end if
 !
       end subroutine s_set_control_4_velo

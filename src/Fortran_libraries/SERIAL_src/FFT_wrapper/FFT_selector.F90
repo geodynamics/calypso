@@ -66,7 +66,11 @@
       use m_precision
       use m_machine_parameter
       use m_FFTPACK5_wrapper
+!
+#ifdef FFTW3
       use m_FFTW_wrapper
+      use m_multi_FFTW_wrapper
+#endif
 !
       implicit none
 !
@@ -124,7 +128,7 @@
         call finalize_FFTW_mul(Nsmp)
         return
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
-        if(iflag_debug .gt. 0) write(*,*) 'Finalize single FFTW'
+        if(iflag_debug .eq. 0) write(*,*) 'Finalize single FFTW'
         call finalize_4_FFTW(Nsmp, Nstacksmp)
         return
       end if

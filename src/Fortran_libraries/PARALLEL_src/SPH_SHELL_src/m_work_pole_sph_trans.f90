@@ -53,7 +53,7 @@
 !
       use m_work_4_sph_trans
 !
-      if (nb_sph_trans .gt. iflag_pole_trans) then
+      if (ncomp_sph_trans .gt. iflag_pole_trans) then
         call deallocate_work_pole_sph_trans
         call allocate_work_pole_sph_trans
         return
@@ -74,16 +74,16 @@
 !
       integer(kind = kint) :: num1
 !
-      num1 = nb_sph_trans*nidx_global_rtp(1)
+      num1 = ncomp_sph_trans*nidx_global_rtp(1)
       allocate(v_np_local(n_vector*num1) )
       allocate(v_sp_local(n_vector*num1) )
-      allocate(v_ct_local(n_vector*nb_sph_trans) )
+      allocate(v_ct_local(n_vector*ncomp_sph_trans) )
 !
       allocate(v_n_pole(n_vector*num1) )
       allocate(v_s_pole(n_vector*num1) )
-      allocate(v_center(n_vector*nb_sph_trans) )
+      allocate(v_center(n_vector*ncomp_sph_trans) )
 !
-      iflag_pole_trans = nb_sph_trans
+      iflag_pole_trans = ncomp_sph_trans
 !
       end subroutine allocate_work_pole_sph_trans
 !

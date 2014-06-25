@@ -120,6 +120,9 @@
       end if
 !$omp end parallel
 !
+      if (iflag_debug.eq.1) write(*,*) 'cal_rtp_magnetic_streaching'
+      call cal_rtp_magnetic_streaching
+!
       end subroutine s_cal_energy_flux_rtp
 !
 !-----------------------------------------------------------------------

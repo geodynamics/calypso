@@ -189,14 +189,14 @@
      &              coef_press
           write(*,*) 'coefficient for viscous diffusion:   ',           &
      &              coef_d_velo
-          write(*,*) 'coefficient for buoyancy:            ',           &
-     &              coef_buo
-          write(*,*) 'coefficient for composit buoyancy:   ',           &
-     &              coef_comp_buo
-          write(*,*) 'coefficient for coriolis force:      ',           &
-     &              coef_cor
-          write(*,*) 'coefficient for Lorentz force:       ',           &
-     &              coef_lor
+        if (iflag_4_gravity .gt. id_turn_OFF)       write(*,*)          &
+     &         'coefficient for buoyancy:            ', coef_buo
+        if (iflag_4_composit_buo .gt. id_turn_OFF)  write(*,*)          &
+     &         'coefficient for composit buoyancy:   ', coef_comp_buo
+        if (iflag_4_coriolis .gt. id_turn_OFF)      write(*,*)          &
+     &         'coefficient for coriolis force:      ', coef_cor
+        if (iflag_4_lorentz .gt. id_turn_OFF)       write(*,*)          &
+     &         'coefficient for Lorentz force:       ', coef_lor
         end if
 !
         if (iflag_t_evo_4_temp .gt. id_no_evolution) then
@@ -204,8 +204,8 @@
      &              coef_temp
           write(*,*) 'coefficient for thermal diffusion:   ',           &
      &              coef_d_temp
-          write(*,*) 'coefficient for heat source:         ',           &
-     &              coef_h_src
+          if(iphys%i_heat_source .gt. 0) write(*,*)                     &
+     &         'coefficient for heat source:         ', coef_h_src
         end if
 !
         if (iflag_t_evo_4_magne .gt. id_no_evolution                    &
@@ -225,8 +225,8 @@
      &              coef_light
           write(*,*) 'coefficient for composite diffusion: ',           &
      &              coef_d_light
-          write(*,*) 'coefficient for light element source:',           &
-     &              coef_c_src
+          if(iphys%i_light_source .gt. 0) write(*,*)                    &
+     &         'coefficient for light element source:', coef_c_src
           write(*,*)''
         end if
       end if

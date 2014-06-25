@@ -28,7 +28,7 @@
 !!@n @param r_ICB(0:2)   Radius at ICB
 !!
 !!@n @param fdm2_fix_fld_ICB(0:2,3)
-!!         Matrix to evaluate radial derivative at ICB with fiexed field
+!!         Matrix to evaluate radial derivative at ICB with fixed field
 !!@n @param fdm2_free_vp_ICB(-1:1,3)
 !!         Matrix to evaluate poloidal velocity
 !!         with free slip boundary at ICB

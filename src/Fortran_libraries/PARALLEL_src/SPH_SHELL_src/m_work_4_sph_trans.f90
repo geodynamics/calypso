@@ -46,8 +46,6 @@
 !
       implicit none
 !
-!>      maximum number of fields for Legendre transform
-      integer(kind = kint) :: nb_sph_trans
 !>      total number of components for spherical harmonics transform
       integer(kind = kint) :: ncomp_sph_trans
 !
@@ -80,6 +78,8 @@
       real(kind = kreal), allocatable :: sin_theta_1d_rtp(:)
 !>      @f$ \cos \theta @f$ in sapherical grid (one-dimentional)
       real(kind = kreal), allocatable :: cos_theta_1d_rtp(:)
+!>      @f$ \cot \theta @f$ in sapherical grid (one-dimentional)
+      real(kind = kreal), allocatable :: cot_theta_1d_rtp(:)
 !
 !
 !>      End address of spherical harmonics order for SMP parallelization
@@ -96,7 +96,7 @@
 !
       subroutine resize_work_4_sph_trans
 !
-      if (nb_sph_trans .gt. iflag_sph_trans) then
+      if (ncomp_sph_trans .gt. iflag_sph_trans) then
         call deallocate_work_4_sph_trans
       end if
 !
@@ -118,15 +118,16 @@
       allocate(mdx_n_rlm_rtm(nidx_rlm(2)))
       allocate(asin_theta_1d_rtm(nidx_rtm(2)))
 !
-      allocate(sp_rlm(3*nb_sph_trans*nnod_rlm))
-      allocate(vr_rtp(3*nb_sph_trans*nnod_rtp))
+      allocate(sp_rlm(ncomp_sph_trans*nnod_rlm))
+      allocate(vr_rtp(ncomp_sph_trans*nnod_rtp))
 !
-      allocate(sp_rj(3*nb_sph_trans*nnod_rj))
+      allocate(sp_rj(ncomp_sph_trans*nnod_rj))
 !
-      allocate(vr_rtm(3*nb_sph_trans*nnod_rtm))
+      allocate(vr_rtm(ncomp_sph_trans*nnod_rtm))
 !
       allocate(cos_theta_1d_rtp(nidx_rtp(2)))
       allocate(sin_theta_1d_rtp(nidx_rtp(2)))
+      allocate(cot_theta_1d_rtp(nidx_rtp(2)))
 !
       lstack_rlm = 0
       mdx_p_rlm_rtm = 0
@@ -135,6 +136,7 @@
 !
       cos_theta_1d_rtp = 0.0d0
       sin_theta_1d_rtp = 0.0d0
+      cot_theta_1d_rtp = 0.0d0
 !
       sp_rj =  0.0d0
       vr_rtp = 0.0d0
@@ -142,7 +144,7 @@
       sp_rlm = 0.0d0
       vr_rtm = 0.0d0
 !
-      iflag_sph_trans = nb_sph_trans
+      iflag_sph_trans = ncomp_sph_trans
 !
       end subroutine allocate_work_4_sph_trans
 !
@@ -153,7 +155,8 @@
 !
       deallocate(lstack_rlm)
       deallocate(mdx_p_rlm_rtm, mdx_n_rlm_rtm)
-      deallocate(asin_theta_1d_rtm, sin_theta_1d_rtp, cos_theta_1d_rtp)
+      deallocate(asin_theta_1d_rtm, cot_theta_1d_rtp)
+      deallocate(sin_theta_1d_rtp, cos_theta_1d_rtp)
 !
       deallocate(sp_rj, vr_rtp)
       deallocate(sp_rlm, vr_rtm)
@@ -169,10 +172,10 @@
 !
       use m_spheric_parameter
 !
-      allocate(vr_rtp(3*nb_sph_trans*nnod_rtp))
+      allocate(vr_rtp(ncomp_sph_trans*nnod_rtp))
       vr_rtp = 0.0d0
 !
-      iflag_sph_trans = nb_sph_trans
+      iflag_sph_trans = ncomp_sph_trans
 !
       end subroutine allocate_work_4_zonal_fft
 !

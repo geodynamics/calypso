@@ -62,6 +62,9 @@
      &       .or. phys_nod_name(i) .eq. fhd_inertia                     &
      &       .or. phys_nod_name(i) .eq. fhd_Coriolis                    &
      &       .or. phys_nod_name(i) .eq. fhd_SGS_m_flux                  &
+     &       .or. phys_nod_name(i) .eq. fhd_grad_v_1                    &
+     &       .or. phys_nod_name(i) .eq. fhd_grad_v_2                    &
+     &       .or. phys_nod_name(i) .eq. fhd_grad_v_3                    &
      &       ) then
 !
            num_check = 1
@@ -145,6 +148,15 @@
             num_check = 1
             phys_check_name(1) = fhd_vp_induct
            end if
+!
+          else if ( phys_nod_name(i) .eq. fhd_mag_stretch               &
+     &       ) then
+            num_check = 4
+            phys_check_name(1) = fhd_magne
+            phys_check_name(2) = fhd_grad_v_1
+            phys_check_name(3) = fhd_grad_v_2
+            phys_check_name(4) = fhd_grad_v_3
+
 !
           else if ( phys_nod_name(i) .eq. fhd_div_SGS_m_flux            &
      &       ) then

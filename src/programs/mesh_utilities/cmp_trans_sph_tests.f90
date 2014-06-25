@@ -209,15 +209,22 @@
       if (my_rank .eq. 0) write(*,*) 'send_recv_rtp_2_rtm_N'
       call send_recv_rtp_2_rtm_N                                        &
      &    (NB, X_global_rtp(1), X_rtm_recieve(1) )
+      call finish_send_recv_rtp_2_rtm
+!
       if (my_rank .eq. 0) write(*,*) 'send_recv_rtm_2_rtp_N'
       call send_recv_rtm_2_rtp_N                                        &
      &    (NB, X_global_rtm(1), X_rtp_recieve(1) )
+      call finish_send_recv_rtm_2_rtp
+!
       if (my_rank .eq. 0) write(*,*) 'send_recv_rj_2_rlm_N'
       call send_recv_rj_2_rlm_N                                         &
      &    (NB, X_global_rj(1), X_rlm_recieve(1) )
+      call finish_send_recv_rj_2_rlm
+!
       if (my_rank .eq. 0) write(*,*) 'send_recv_rlm_2_rj_N'
       call send_recv_rlm_2_rj_N                                         &
      &    (NB, X_global_rlm(1), X_rj_recieve(1) )
+      call finish_send_recv_rlm_2_rj
 !
       end subroutine sph_transfer_test_N
 !

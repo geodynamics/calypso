@@ -39,7 +39,7 @@
       integer(kind = kint) :: j, l, m
 !
 !
-      jmax_w = ltr_w*(ltr_w+1)
+      jmax_w = ltr_w*(ltr_w+2)
 !
       allocate(index_w(jmax_w,2))
       allocate(w_gauss(jmax_w))
@@ -97,10 +97,10 @@
   99  continue
       close(id_gauss)
 !
-!      write(*,*) 'j, index_w(j,1:2), w_gauss(j)'
-!      do j = 1, jmax_w
-!        write(*,*) j, index_w(j,1:2), w_gauss(j)
-!      end do
+      write(*,*) 'j, index_w(j,1:2), w_gauss(j)'
+      do j = 1, jmax_w
+        write(*,*) j, index_w(j,1:2), w_gauss(j)
+      end do
 !
       end subroutine read_gauss_global_coefs
 !

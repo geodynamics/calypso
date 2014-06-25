@@ -62,6 +62,7 @@
 !!   composite_flux, part_c_flux
 !!   momentum_flux, maxwell_tensor
 !!   magnetic_induction, vecp_induction
+!!   magnetic_stretch
 !!
 !!   heat_advect, part_h_advect
 !!   inertia,  
@@ -217,6 +218,10 @@
 !!         @f$ e_{ijk} u_{j} B_{k} @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_vp_induct =     'vecp_induction'
+!>        Field label for magnetic stretch term
+!!         @f$ B_{i} \partial_{k} \u_{k} \right)@f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_mag_stretch =   'magnetic_stretch'
 !>        Field label for Lorentz force
 !!         @f$ e_{ijk} J_{j} B_{k} @f$
       character(len=kchara), parameter                                  &
@@ -516,7 +521,7 @@
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_maxwell_t = 'SGS_maxwell_tensor'
 !
-!>        Field label for TEnsor for magnetic induction
+!>        Field label for Tensor for magnetic induction
 !!         @f$ u_{i} B_{j}  - B_{i} u_{J} @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_induct_t =      'induction_tensor'

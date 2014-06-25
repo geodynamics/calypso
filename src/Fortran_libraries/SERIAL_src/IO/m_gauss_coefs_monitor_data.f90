@@ -44,7 +44,7 @@
 !>      Number of modes of Gauss coefficients to be evaluated
       integer(kind = kint) :: num_pick_gauss_coefs = 0
 !>      Degree and Order ID of Gauss coefficients to be evaluated
-      integer(kind = kint), allocatable :: idx_pick_gauss_mode(:)
+      integer(kind = kint), allocatable :: idx_pick_gauss_mode(:,:)
 !>      Number of degrees of Gauss coefficients to be evaluated
       integer(kind = kint) :: num_pick_gauss_l = 0
 !>      Degree ID of Gauss coefficients to be evaluated
@@ -84,7 +84,7 @@
 !
       subroutine allocate_pick_gauss
 !
-      allocate( idx_pick_gauss_mode(num_pick_gauss_coefs) )
+      allocate( idx_pick_gauss_mode(num_pick_gauss_coefs,2) )
       if(num_pick_gauss_coefs .gt. 0) idx_pick_gauss_mode = -1
 !
       end subroutine allocate_pick_gauss

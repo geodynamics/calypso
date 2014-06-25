@@ -44,8 +44,8 @@
         light_nod%num_bc =  0
         light_surf%num_bc = 0
       else
-        light_nod%num_bc =  num_bc_composit_ctl
-        light_surf%num_bc = num_bc_grad_ds_ctl
+        light_nod%num_bc =  node_bc_C_ctl%num
+        light_surf%num_bc = surf_bc_CF_ctl%num
       end if
 !
 !   set boundary conditions for composition
@@ -57,15 +57,17 @@
 !
         call allocate_nod_bc_list_composit
 !
-        light_nod%bc_name =      bc_composit_name_ctl
-        light_nod%bc_magnitude = bc_composit_magnitude_ctl
+        light_nod%bc_name(1:light_nod%num_bc)                           &
+     &      = node_bc_C_ctl%c2_tbl(1:light_nod%num_bc)
+        light_nod%bc_magnitude(1:light_nod%num_bc)                      &
+     &      = node_bc_C_ctl%vect(1:light_nod%num_bc)
 !
         do i = 1, light_nod%num_bc
-          call set_bc_group_types_scalar(bc_composit_type_ctl(i),       &
+          call set_bc_group_types_scalar(node_bc_C_ctl%c1_tbl(i),       &
      &        light_nod%ibc_type(i))
-          call set_bc_group_types_sph_center(bc_composit_type_ctl(i),   &
+          call set_bc_group_types_sph_center(node_bc_C_ctl%c1_tbl(i),   &
      &        light_nod%ibc_type(i))
-          call set_bc_group_types_fluxes(bc_composit_type_ctl(i),       &
+          call set_bc_group_types_fluxes(node_bc_C_ctl%c1_tbl(i),       &
      &        light_nod%ibc_type(i))
         end do
 !
@@ -77,6 +79,8 @@
      &         light_nod%bc_magnitude(i), trim(light_nod%bc_name(i))
           end do
         end if
+!
+        call deallocate_bc_composit_ctl
       end if
 !
 !
@@ -88,18 +92,18 @@
 !
         call allocate_d_scalar_surf_ctl
 !
-        light_surf%bc_name      = bc_grad_ds_name_ctl
-        light_surf%bc_magnitude = bc_grad_ds_magnitude_ctl
-        light_surf%ibc_type = 0
+        light_surf%bc_name(1:light_surf%num_bc)                         &
+     &          = surf_bc_CF_ctl%c2_tbl(1:light_surf%num_bc)
+        light_surf%bc_magnitude(1:light_surf%num_bc)                    &
+     &          = surf_bc_CF_ctl%vect(1:light_surf%num_bc)
+        light_surf%ibc_type(1:light_surf%num_bc) = 0
 !
         do i = 1, light_surf%num_bc
-          call set_surf_group_types_scalar(bc_grad_ds_type_ctl(i),      &
+          call set_surf_group_types_scalar(surf_bc_CF_ctl%c1_tbl(i),    &
      &        light_surf%ibc_type(i) )
-          call set_bc_group_types_sph_center(bc_grad_ds_type_ctl(i),    &
+          call set_bc_group_types_sph_center(surf_bc_CF_ctl%c1_tbl(i),  &
      &        light_surf%ibc_type(i) )
         end do
-!
-        call deallocate_sf_dscalar_ctl
 !
         if (iflag_debug .eq. iflag_full_msg) then
           write(*,*)  'i, isurf_c_type, surf_c_magnitude, surf_c_name'
@@ -108,6 +112,8 @@
      &         light_surf%bc_magnitude(i), trim(light_surf%bc_name(i))
           end do
         end if
+!
+        call deallocate_sf_comp_flux_ctl
       end if
 !
       end subroutine s_set_control_4_composition

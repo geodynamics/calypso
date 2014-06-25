@@ -24,9 +24,6 @@
       use m_t_int_parameter
       use m_t_step_parameter
 !
-!
-      use SPH_analyzer_MHD
-!
       implicit none
 !
       private :: SPH_const_initial_field
@@ -84,7 +81,7 @@
       use m_physical_property
 !
       use set_control_sph_mhd
-      use load_data_for_sph_IO
+      use parallel_load_data_4_sph
       use const_sph_initial_spectr
       use set_reference_sph_mhd
       use set_bc_sph_mhd
@@ -97,9 +94,9 @@
 !
 !   Load spherical harmonics data
 !
-      if (iflag_debug.eq.1) write(*,*) 'input_sph_trans_grids'
+      if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
       call start_eleps_time(4)
-      call input_sph_trans_grids(my_rank)
+      call load_para_sph_mesh
       call end_eleps_time(4)
 !
 !   Allocate spectr field data

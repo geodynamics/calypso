@@ -182,9 +182,8 @@
       type(phys_data), intent(inout) :: fld
 !
 !
-       nullify( fld%phys_name, fld%iorder_eletype, fld%iflag_monitor)
-       nullify( fld%num_component )
-       nullify( fld%istack_component )
+       nullify(fld%phys_name, fld%iorder_eletype, fld%iflag_monitor)
+       nullify(fld%num_component, fld%istack_component)
 !
       end subroutine disconnect_phys_name_type
 !

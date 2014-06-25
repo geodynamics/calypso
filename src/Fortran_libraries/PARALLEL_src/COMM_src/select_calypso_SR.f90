@@ -58,6 +58,8 @@
 !!     &                       npe_recv, irecv_self,                    &
 !!     &                       id_pe_recv, istack_recv, inod_import,    &
 !!     &                       irev_import, iX_org, iX_new)
+!!
+!!      subroutine finish_calypso_send_recv(npe_send, isend_self)
 !!@endverbatim
 !!
 !!@n @param  NB    Number of components for communication
@@ -253,6 +255,8 @@
      &                       X_org, X_new)
       end if
 !
+      call finish_calypso_send_recv(npe_send, isend_self)
+!
       end subroutine sel_calypso_send_recv_6
 !
 !-----------------------------------------------------------------------
@@ -306,6 +310,8 @@
      &                       id_pe_recv, istack_recv, inod_import,      &
      &                       X_org, X_new)
       end if
+!
+      call finish_calypso_send_recv(npe_send, isend_self)
 !
       end subroutine sel_calypso_send_recv_3
 !
@@ -361,6 +367,8 @@
      &                       X_org, X_new)
       end if
 !
+      call finish_calypso_send_recv(npe_send, isend_self)
+!
       end subroutine sel_calypso_send_recv_2
 !
 ! ----------------------------------------------------------------------
@@ -414,6 +422,8 @@
      &                       id_pe_recv, istack_recv, inod_import,      &
      &                       X_org, X_new)
       end if
+!
+      call finish_calypso_send_recv(npe_send, isend_self)
 !
       end subroutine sel_calypso_send_recv
 !
@@ -470,8 +480,30 @@
      &                       iX_org, iX_new)
       end if
 !
+      call finish_calypso_send_recv(npe_send, isend_self)
+!
       end subroutine sel_calypso_send_recv_int
 !
 ! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine finish_calypso_send_recv(npe_send, isend_self)
+!
+      use calypso_mpi
+      use m_solver_SR
+!
+      integer(kind = kint), intent(in) :: npe_send, isend_self
+!
+      integer(kind = kint) :: ncomm_send
+!
+!
+      ncomm_send = npe_send - isend_self
+      if(ncomm_send .gt. 0) then
+       call MPI_WAITALL (ncomm_send, req1, sta1, ierr_MPI)
+      end if
+!
+      end subroutine finish_calypso_send_recv
+!
+!-----------------------------------------------------------------------
 !
       end module select_calypso_SR

@@ -67,11 +67,12 @@
           if( sph_bc_T%CMB_fld(i) .ne. 0.0d0) write(*,*)                &
      &       ' sph_bc_T%CMB_fld', i, idx_gl_1d_rj_j(i,2:3),             &
      &        sph_bc_T%CMB_fld(i)
-          if( sph_bc_T%CMB_flux(i) .ne. 0.0d0) write(*,*) '             &
-     &        sph_bc_T%CMB_flux', i,  idx_gl_1d_rj_j(i,2:3),            &
+          if( sph_bc_T%CMB_flux(i) .ne. 0.0d0) write(*,*)               &
+     &       ' sph_bc_T%CMB_flux', i,  idx_gl_1d_rj_j(i,2:3),           &
      &        sph_bc_T%CMB_flux(i)
         end do
       end if
+      
 !
       if(sph_bc_T%iflag_icb .eq. iflag_undefined_bc) then
         if(my_rank .eq. 0) write(*,'(a)')                               &
@@ -226,6 +227,7 @@
         else if ( surf_bc_list%ibc_type(i) .eq. iflag_sph_clip_center   &
      &    .and. surf_bc_list%bc_name(i) .eq. sph_bc%icb_grp_name) then
          sph_bc%iflag_icb = iflag_sph_fix_center
+         sph_bc%CTR_fld =   surf_bc_list%bc_magnitude(i)
         end if
 !
       else if(igrp_icb .gt. 0) then
@@ -240,9 +242,9 @@
      &       sph_bc%ICB_flux, sph_bc%iflag_icb)
 !
         else if(nod_bc_list%ibc_type(i)  .eq. iflag_bc_fix_s) then
-          call set_homogenious_scalar_bc(ICB_nod_grp_name,              &
-     &        nod_bc_list%bc_name(i), nod_bc_list%bc_magnitude(i),      &
-     &        nidx_rj(2), sph_bc%ICB_fld, sph_bc%iflag_icb)
+          call set_homogenious_scalar_bc(nod_bc_list%bc_name(i),        &
+     &        nod_bc_list%bc_magnitude(i), nidx_rj(2),                  &
+     &        sph_bc%icb_grp_name, sph_bc%ICB_fld, sph_bc%iflag_icb)
         else if(nod_bc_list%ibc_type(i)  .eq. iflag_bc_file_s) then
           call set_fixed_scalar_bc_by_file(fhd_field, nidx_rj(2),       &
      &        sph_bc%icb_grp_name, sph_bc%ICB_fld,                      &
@@ -254,6 +256,7 @@
         else if(nod_bc_list%ibc_type(i) .eq. iflag_sph_clip_center      &
      &    .and. nod_bc_list%bc_name(i) .eq. sph_bc%icb_grp_name) then
           sph_bc%iflag_icb = iflag_sph_fix_center
+          sph_bc%CTR_fld =   nod_bc_list%bc_magnitude(i)
         end if
       end if
 !
@@ -309,9 +312,9 @@
      &        sph_bc%CMB_flux, sph_bc%iflag_cmb)
 !
         else if(nod_bc_list%ibc_type(i)  .eq. iflag_bc_fix_s) then
-          call set_homogenious_scalar_bc(CMB_nod_grp_name,              &
-     &        nod_bc_list%bc_name(i), nod_bc_list%bc_magnitude(i),      &
-     &        nidx_rj(2), sph_bc%CMB_fld, sph_bc%iflag_cmb)
+          call set_homogenious_scalar_bc(nod_bc_list%bc_name(i),        &
+     &        nod_bc_list%bc_magnitude(i), nidx_rj(2),                  &
+     &        sph_bc%cmb_grp_name, sph_bc%CMB_fld, sph_bc%iflag_cmb)
         else if(nod_bc_list%ibc_type(i)  .eq. iflag_bc_file_s) then
           call set_fixed_scalar_bc_by_file(fhd_field, nidx_rj(2),       &
      &        sph_bc%cmb_grp_name, sph_bc%CMB_fld,                      &
@@ -324,13 +327,13 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_homogenious_scalar_bc(reference_grp, bc_name,      &
-     &          bc_magnitude,jmax, bc_data, iflag_bc_scalar)
+      subroutine set_homogenious_scalar_bc(bc_name, bc_magnitude,       &
+     &          jmax, ref_grp, bc_data, iflag_bc_scalar)
 !
       use t_boundary_params_sph_MHD
       use m_spheric_parameter
 !
-      character(len=kchara), intent(in) :: reference_grp
+      character(len=kchara), intent(in) :: ref_grp
       character(len=kchara), intent(in) :: bc_name
       real(kind = kreal), intent(in) :: bc_magnitude
       integer(kind = kint), intent(in) :: jmax
@@ -338,7 +341,7 @@
       integer(kind = kint), intent(inout) :: iflag_bc_scalar
 !
 !
-      if     (bc_name .eq. reference_grp) then
+      if     (bc_name .eq. ref_grp) then
         iflag_bc_scalar =  iflag_fixed_field
         if(idx_rj_degree_zero .gt. 0) then
           bc_data(idx_rj_degree_zero) = bc_magnitude
@@ -417,7 +420,7 @@
       do i = 1, bc_surf%num_bc
         if(icou .ge. 2) exit
         do j = 1, num_radial_grp_rj
-          if(bc_surf%bc_name(i) .eq. sf_grp_name) then
+          if(bc_surf%bc_name(i) .eq. name_radial_grp_rj(j)) then
             num = istack_radial_grp_rj(j) - istack_radial_grp_rj(j-1)
             if(num .ne. 1) go to 10
 !

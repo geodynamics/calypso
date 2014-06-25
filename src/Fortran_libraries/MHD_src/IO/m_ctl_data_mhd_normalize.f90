@@ -3,7 +3,6 @@
 !
 !        programmed by H.Matsui on March. 2006
 !
-!      subroutine allocate_dimless_ctl
 !      subroutine deallocate_dimless_ctl
 !
 !      subroutine read_dimless_ctl
@@ -88,13 +87,15 @@
       use m_machine_parameter
       use m_read_control_elements
       use skip_comment_f
+      use t_read_control_arrays
 !
       implicit  none
 !
 !
-      integer(kind=kint) :: num_dimless_ctl
-      real(kind=kreal), allocatable  :: dimless_ctl(:)
-      character(len=kchara), allocatable :: name_dimless_ctl(:)
+!>      Structure for list of dimensionless numbers
+!!@n      coef_4_dimless_ctl%c_tbl:  Name of each number 
+!!@n      coef_4_dimless_ctl%vect:   valus of each number
+      type(ctl_array_cr), save :: coef_4_dimless_ctl
 !
 !   entry label
 !
@@ -108,9 +109,7 @@
 !
 !   4th level for dimensionless numbers
 !
-      character(len=kchara), parameter                                  &
-     &        :: hd_num_dimless =  'dimless_ctl'
-      integer (kind=kint) :: i_num_dimless =     0
+      character(len=kchara), parameter :: hd_dimless =  'dimless_ctl'
 !
       private :: hd_dimless_ctl, hd_coef_term_ctl
       private :: i_dimless_ctl,  i_coef_term_ctl
@@ -121,22 +120,11 @@
 !
 !   --------------------------------------------------------------------
 !
-       subroutine allocate_dimless_ctl
+      subroutine deallocate_dimless_ctl
 !
-       allocate(name_dimless_ctl(num_dimless_ctl))
-       allocate(dimless_ctl(num_dimless_ctl))
-       dimless_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_dimless_ctl)
 !
-       end subroutine allocate_dimless_ctl
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_dimless_ctl
-!
-       deallocate(name_dimless_ctl, dimless_ctl)
-!
-       end subroutine deallocate_dimless_ctl
+      end subroutine deallocate_dimless_ctl
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -152,14 +140,7 @@
         call find_control_end_flag(hd_dimless_ctl, i_dimless_ctl)
         if(i_dimless_ctl .gt. 0) exit
 !
-!
-        call find_control_array_flag(hd_num_dimless,  num_dimless_ctl)
-        if(num_dimless_ctl.gt.0 .and. i_num_dimless.eq.0) then
-          call allocate_dimless_ctl
-          call read_control_array_vect_list(hd_num_dimless,             &
-     &        num_dimless_ctl, i_num_dimless,                           &
-     &        name_dimless_ctl, dimless_ctl)
-        end if
+        call read_control_array_c_r(hd_dimless, coef_4_dimless_ctl)
       end do
 !
       end subroutine read_dimless_ctl

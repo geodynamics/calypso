@@ -74,6 +74,7 @@
 !
 !>   surface connectivity ie_surf(i:surface ID,j:surface index)
         integer(kind=kint), pointer  :: ie_surf(:,:)
+!
 !>   surface ID for element surface isf_4_ele(:,:)
 !>          ...i:element ID, j:surface ID
 !>@n          Positive: normal direction negative: reverse direction

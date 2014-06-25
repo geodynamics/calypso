@@ -31,7 +31,7 @@
       use set_control_platform_data
       use skip_comment_f
 !
-      integer(kind = kint) :: i, ip
+      integer(kind = kint) :: i, kr
 !
 !
       call turn_off_debug_flag_by_ctl(izero)
@@ -55,14 +55,13 @@
         iflag_shell_mode = iflag_MESH_same
       end if
 !
-!
       nidx_global_rtp(1) = 2
       nidx_global_rtp(2) = 1
       nidx_global_rtp(3) = 4
       l_truncation = -1
 !
-      if (i_numlayer_shell .gt. 0) then
-        nidx_global_rtp(1) = numlayer_shell_ctl
+      if (radius_ctl%icou .gt. 0) then
+        nidx_global_rtp(1) = radius_ctl%num
       end if
 !
 !      if (i_ntheta_shell .gt. 0) then
@@ -76,36 +75,38 @@
 !
 !
       if (nidx_global_rtp(1) .gt. 0) then
-!
         call allocate_radius_1d_gl
 !
         do i = 1, nidx_global_rtp(1)
-          radius_1d_gl(i) = radius_layer_ctl(i)
+         kr = radius_ctl%ivec(i)
+         radius_1d_gl(kr) = radius_ctl%vect(i)
         end do
+!
+        call dealloc_control_array_i_r(radius_ctl)
       end if
 !
 !
       nlayer_2_center = -1
       nlayer_ICB =       1
-      nlayer_CMB =       numlayer_shell_ctl
+      nlayer_CMB =       nidx_global_rtp(1)
       nlayer_mid_OC =   -1
-      if(i_bc_sph .gt. 0) then
-        do i = 1, numlayer_bc_ctl
-          if     (cmp_no_case(bc_bondary_name_ctl(i), 'ICB') .gt. 0     &
+      if(radial_grp_ctl%icou .gt. 0) then
+        do i = 1, radial_grp_ctl%num
+          if     (cmp_no_case(radial_grp_ctl%c_tbl(i),'ICB') .gt. 0     &
      &            ) then
-            nlayer_ICB = kr_boundary_ctl(i)
-          else if(cmp_no_case(bc_bondary_name_ctl(i), 'CMB') .gt. 0     &
+            nlayer_ICB = radial_grp_ctl%ivec(i)
+          else if(cmp_no_case(radial_grp_ctl%c_tbl(i),'CMB') .gt. 0     &
      &            ) then
-            nlayer_CMB = kr_boundary_ctl(i)
-          else if(cmp_no_case(bc_bondary_name_ctl(i), 'to_center').gt.0 &
+            nlayer_CMB = radial_grp_ctl%ivec(i)
+          else if(cmp_no_case(radial_grp_ctl%c_tbl(i),'to_center').gt.0 &
      &            ) then
-            nlayer_2_center = kr_boundary_ctl(i)
-          else if(cmp_no_case(bc_bondary_name_ctl(i), 'mid_depth').gt.0 &
+            nlayer_2_center = radial_grp_ctl%ivec(i)
+          else if(cmp_no_case(radial_grp_ctl%c_tbl(i),'mid_depth').gt.0 &
      &            ) then
-            nlayer_mid_OC = kr_boundary_ctl(i)
+            nlayer_mid_OC = radial_grp_ctl%ivec(i)
           end if
         end do
-        call deallocate_boundary_layers
+        call dealloc_control_array_c_i(radial_grp_ctl)
       end if
 !
       write(*,*) 'nidx_global_rtp: ', nidx_global_rtp(1:3)

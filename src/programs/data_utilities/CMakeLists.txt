@@ -14,7 +14,7 @@ SET(MOD_SPH_D_BENCH_MAIN_SRC_FILES SNAPSHOT_MHD/main_sph_dynamobench.f90 SNAPSHO
 ADD_EXECUTABLE(sph_dynamobench ${MOD_SPH_D_BENCH_MAIN_SRC_FILES})
 TARGET_LINK_LIBRARIES(sph_dynamobench calypso fftpack.5d)
 
-SET(MOD_SPH_INITIAL INITIAL_FIELD/main_sph_initial_fld.f90 INITIAL_FIELD/SPH_analyzer_const_initial.f90 INITIAL_FIELD/const_sph_initial_spectr.f90)
+SET(MOD_SPH_INITIAL INITIAL_FIELD/main_sph_initial_fld.f90 INITIAL_FIELD/analyzer_sph_initial_fld.f90 INITIAL_FIELD/SPH_analyzer_const_initial.f90 INITIAL_FIELD/const_sph_initial_spectr.f90)
 ADD_EXECUTABLE(sph_initial_field ${MOD_SPH_INITIAL})
 TARGET_LINK_LIBRARIES(sph_initial_field calypso fftpack.5d)
 

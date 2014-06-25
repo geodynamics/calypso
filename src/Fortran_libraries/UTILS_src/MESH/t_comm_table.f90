@@ -15,6 +15,9 @@
 !      subroutine allocate_type_export_item(comm_tbls)
 !
 !      subroutine deallocate_type_neib_id(comm_tbls)
+!      subroutine deallocate_type_import(comm_tbls)
+!      subroutine deallocate_type_export(comm_tbls)
+!      subroutine deallocate_type_import_num(comm_tbls)
 !      subroutine deallocate_type_import_item(comm_tbls)
 !      subroutine deallocate_type_export_item(comm_tbls)
 !
@@ -33,27 +36,27 @@
 !
 !> data structure for communication table
       type communication_table
+!>     number of neighboring domain
         integer(kind = kint) :: num_neib
-!<     number of neighboring domain
+!>     neighboring pe id
         integer(kind = kint), pointer :: id_neib(:)
-!<     neighboring pe id
+!>    total number of import data 
         integer(kind = kint) :: ntot_import
-!<    total number of import data 
+!>     import data count for each neighbor pe (i-th pe)
         integer(kind = kint), pointer :: num_import(:)
-!<     import data count for each neighbor pe (i-th pe)
+!>     import data end point for each neighbor pe (i-th pe)
         integer(kind = kint), pointer :: istack_import(:)
-!<     import data end point for each neighbor pe (i-th pe)
+!>      local id for import data                     (i-th)
         integer(kind = kint), pointer :: item_import(:)
-!<      local id for import data                     (i-th)
 !
+!>     total number of export data 
         integer(kind = kint) :: ntot_export
-!<     total number of export data 
+!>     export data count for each neighbor pe (i-th pe)
         integer(kind = kint), pointer :: num_export(:)
-!<     export data count for each neighbor pe (i-th pe)
+!>     export data end point for each neighbor pe (i-th pe)
         integer(kind = kint), pointer :: istack_export(:)
-!<     export data end point for each neighbor pe (i-th pe)
+!>     local id for export data                     (i-th)
         integer(kind = kint), pointer :: item_export(:)
-!<     local id for export data                     (i-th)
       end type communication_table
 !
 !------------------------------------------------------------------
@@ -93,8 +96,8 @@
 !
 !
       call deallocate_type_neib_id(comm_tbls)
-      call deallocate_type_import_item(comm_tbls)
-      call deallocate_type_export_item(comm_tbls)
+      call deallocate_type_import(comm_tbls)
+      call deallocate_type_export(comm_tbls)
 !
       end subroutine deallocate_type_comm_tbl
 !
@@ -181,12 +184,54 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine deallocate_type_import_item(comm_tbls)
+      subroutine deallocate_type_import(comm_tbls)
+!
+      type(communication_table), intent(inout) :: comm_tbls
+!
+      call deallocate_type_import_num(comm_tbls)
+      call deallocate_type_import_item(comm_tbls)
+!
+      end subroutine deallocate_type_import
+!
+!------------------------------------------------------------------
+!
+      subroutine deallocate_type_export(comm_tbls)
+!
+      type(communication_table), intent(inout) :: comm_tbls
+!
+      call deallocate_type_export_num(comm_tbls)
+      call deallocate_type_export_item(comm_tbls)
+!
+      end subroutine deallocate_type_export
+!
+!------------------------------------------------------------------
+!
+      subroutine deallocate_type_import_num(comm_tbls)
 !
       type(communication_table), intent(inout) :: comm_tbls
 !
       deallocate(comm_tbls%num_import)
       deallocate(comm_tbls%istack_import)
+!
+      end subroutine deallocate_type_import_num
+!
+!------------------------------------------------------------------
+!
+      subroutine deallocate_type_export_num(comm_tbls)
+!
+      type(communication_table), intent(inout) :: comm_tbls
+!
+      deallocate(comm_tbls%num_export)
+      deallocate(comm_tbls%istack_export)
+!
+      end subroutine deallocate_type_export_num
+!
+!------------------------------------------------------------------
+!
+      subroutine deallocate_type_import_item(comm_tbls)
+!
+      type(communication_table), intent(inout) :: comm_tbls
+!
       deallocate(comm_tbls%item_import)
 !
       end subroutine deallocate_type_import_item
@@ -197,8 +242,6 @@
 !
       type(communication_table), intent(inout) :: comm_tbls
 !
-      deallocate(comm_tbls%num_export)
-      deallocate(comm_tbls%istack_export)
       deallocate(comm_tbls%item_export)
 !
       end subroutine deallocate_type_export_item

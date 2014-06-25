@@ -51,33 +51,42 @@
       module m_ctl_data_momentum_norm
 !
       use m_precision
+      use t_read_control_arrays
 !
       implicit  none
 !
 !
-      integer(kind=kint) :: num_coef_4_v_diffuse_ctl = 0
-      character(len=kchara),allocatable :: coef_4_v_diffuse_name_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_v_diffuse_power_ctl(:)
+!>      Structure for number and power to construct viscousity term
+!!@n      coef_4_viscous_ctl%c_tbl:  Name of number 
+!!@n      coef_4_viscous_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_viscous_ctl
 !
-      integer(kind=kint) :: num_coef_4_velocity_ctl =  0
-      integer(kind=kint) :: num_coef_4_press_ctl =     0
-      character(len=kchara),allocatable :: coef_4_velocity_name_ctl(:)
-      character(len=kchara),allocatable :: coef_4_press_name_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_velocity_power_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_press_power_ctl(:)
+!>      Structure for number and power to construct intertia term
+!!@n      coef_4_intertia_ctl%c_tbl:  Name of number 
+!!@n      coef_4_intertia_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_intertia_ctl
+!>      Structure for number and power to construct pressure gradient
+!!@n      coef_4_grad_p_ctl%c_tbl:  Name of number 
+!!@n      coef_4_grad_p_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_grad_p_ctl
 !
-      integer(kind=kint) :: num_coef_4_buoyancy_ctl =  0
-      integer(kind=kint) :: num_coef_4_comp_buo_ctl =  0
-      integer(kind=kint) :: num_coef_4_Coriolis_ctl =  0
-      integer(kind=kint) :: num_coef_4_Lorentz_ctl =   0
-      character(len=kchara),allocatable :: coef_4_buoyancy_name_ctl(:)
-      character(len=kchara),allocatable :: coef_4_comp_buo_name_ctl(:)
-      character(len=kchara),allocatable :: coef_4_Coriolis_name_ctl(:)
-      character(len=kchara),allocatable :: coef_4_Lorentz_name_ctl(:)
-      real(kind = kreal), allocatable :: coef_4_buoyancy_power_ctl(:)
-      real(kind = kreal), allocatable :: coef_4_comp_buo_power_ctl(:)
-      real(kind = kreal), allocatable :: coef_4_Coriolis_power_ctl(:)
-      real(kind = kreal), allocatable :: coef_4_Lorentz_power_ctl(:)
+!
+!>      Structure for number and power to construct termal buoyancy
+!!@n      coef_4_termal_buo_ctl%c_tbl:  Name of number 
+!!@n      coef_4_termal_buo_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_termal_buo_ctl
+!>      Structure for number and power to construct compositional buoyancy
+!!@n      coef_4_comp_buo_ctl%c_tbl:  Name of number 
+!!@n      coef_4_comp_buo_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_comp_buo_ctl
+!>      Structure for number and power to construct Coriolis force
+!!@n      coef_4_Coriolis_ctl%c_tbl:  Name of number 
+!!@n      coef_4_Coriolis_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_Coriolis_ctl
+!>      Structure for number and power to construct Lorentz force
+!!@n      coef_4_Loreantz_ctl%c_tbl:  Name of number 
+!!@n      coef_4_Loreantz_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_Loreantz_ctl
 !
 !   entry label
 !
@@ -95,25 +104,10 @@
       character(len=kchara) :: hd_n_cor =    'coef_4_Coriolis_ctl'
       character(len=kchara) :: hd_n_lor =    'coef_4_Lorentz_ctl'
 !
-      integer (kind=kint) :: i_n_mom =    0
-      integer (kind=kint) :: i_n_press =  0
-      integer (kind=kint) :: i_n_v_diff = 0
-      integer (kind=kint) :: i_n_buo =    0
-      integer (kind=kint) :: i_n_c_buo =  0
-      integer (kind=kint) :: i_n_cor =    0
-      integer (kind=kint) :: i_n_lor =    0
-!
 !
       private :: hd_momentum, i_momentum
       private :: hd_n_mom, hd_n_press, hd_n_v_diff
       private :: hd_n_buo, hd_n_c_buo, hd_n_cor, hd_n_lor
-!
-      private :: allocate_coef_4_velocity_ctl
-      private :: allocate_coef_4_v_diffuse_ctl
-      private :: allocate_coef_4_buoyancy_ctl
-      private :: allocate_coef_4_comp_buo_ctl
-      private :: allocate_coef_4_coriolis_ctl
-      private :: allocate_coef_4_lorentz_ctl
 !
 ! -----------------------------------------------------------------------
 !
@@ -121,131 +115,59 @@
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_velocity_ctl
+      subroutine deallocate_coef_4_velocity_ctl
 !
-        allocate(coef_4_velocity_name_ctl(num_coef_4_velocity_ctl))
-        allocate(coef_4_velocity_power_ctl(num_coef_4_velocity_ctl))
-        coef_4_velocity_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_intertia_ctl)
 !
-       end subroutine allocate_coef_4_velocity_ctl
+      end subroutine deallocate_coef_4_velocity_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_press_ctl
+      subroutine deallocate_coef_4_press_ctl
 !
-        allocate(coef_4_press_name_ctl(num_coef_4_press_ctl))
-        allocate(coef_4_press_power_ctl(num_coef_4_press_ctl))
-        coef_4_press_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_grad_p_ctl)
 !
-       end subroutine allocate_coef_4_press_ctl
+      end subroutine deallocate_coef_4_press_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_v_diffuse_ctl
+      subroutine deallocate_coef_4_v_diffuse_ctl
 !
-        allocate(coef_4_v_diffuse_name_ctl(num_coef_4_v_diffuse_ctl))
-        allocate(coef_4_v_diffuse_power_ctl(num_coef_4_v_diffuse_ctl))
-        coef_4_v_diffuse_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_viscous_ctl)
 !
-       end subroutine allocate_coef_4_v_diffuse_ctl
+      end subroutine deallocate_coef_4_v_diffuse_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_buoyancy_ctl
+      subroutine deallocate_coef_4_buoyancy_ctl
 !
-        allocate(coef_4_buoyancy_name_ctl(num_coef_4_buoyancy_ctl))
-        allocate(coef_4_buoyancy_power_ctl(num_coef_4_buoyancy_ctl))
-        coef_4_buoyancy_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_termal_buo_ctl)
 !
-       end subroutine allocate_coef_4_buoyancy_ctl
+      end subroutine deallocate_coef_4_buoyancy_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_comp_buo_ctl
+      subroutine deallocate_coef_4_comp_buo_ctl
 !
-        allocate(coef_4_comp_buo_name_ctl(num_coef_4_comp_buo_ctl))
-        allocate(coef_4_comp_buo_power_ctl(num_coef_4_comp_buo_ctl))
-        coef_4_comp_buo_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_comp_buo_ctl)
 !
-       end subroutine allocate_coef_4_comp_buo_ctl
+      end subroutine deallocate_coef_4_comp_buo_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_coriolis_ctl
+      subroutine deallocate_coef_4_coriolis_ctl
 !
-        allocate(coef_4_Coriolis_name_ctl(num_coef_4_Coriolis_ctl))
-        allocate(coef_4_Coriolis_power_ctl(num_coef_4_Coriolis_ctl))
-        coef_4_Coriolis_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_Coriolis_ctl)
 !
-       end subroutine allocate_coef_4_coriolis_ctl
+      end subroutine deallocate_coef_4_coriolis_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_lorentz_ctl
+      subroutine deallocate_coef_4_lorentz_ctl
 !
-        allocate(coef_4_Lorentz_name_ctl(num_coef_4_Lorentz_ctl))
-        allocate(coef_4_Lorentz_power_ctl(num_coef_4_Lorentz_ctl))
-        coef_4_Lorentz_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_Loreantz_ctl)
 !
-       end subroutine allocate_coef_4_lorentz_ctl
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_velocity_ctl
-!
-        deallocate(coef_4_velocity_name_ctl, coef_4_velocity_power_ctl)
-!
-       end subroutine deallocate_coef_4_velocity_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_press_ctl
-!
-        deallocate(coef_4_press_name_ctl, coef_4_press_power_ctl)
-!
-       end subroutine deallocate_coef_4_press_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_v_diffuse_ctl
-!
-        deallocate(coef_4_v_diffuse_name_ctl)
-        deallocate(coef_4_v_diffuse_power_ctl)
-!
-       end subroutine deallocate_coef_4_v_diffuse_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_buoyancy_ctl
-!
-        deallocate(coef_4_buoyancy_name_ctl, coef_4_buoyancy_power_ctl)
-!
-       end subroutine deallocate_coef_4_buoyancy_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_comp_buo_ctl
-!
-        deallocate(coef_4_comp_buo_name_ctl, coef_4_comp_buo_power_ctl)
-!
-       end subroutine deallocate_coef_4_comp_buo_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_coriolis_ctl
-!
-        deallocate(coef_4_Coriolis_name_ctl, coef_4_Coriolis_power_ctl)
-!
-       end subroutine deallocate_coef_4_coriolis_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_lorentz_ctl
-!
-        deallocate(coef_4_Lorentz_name_ctl, coef_4_Lorentz_power_ctl)
-!
-       end subroutine deallocate_coef_4_lorentz_ctl
+      end subroutine deallocate_coef_4_lorentz_ctl
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -266,63 +188,14 @@
         if(i_momentum .gt. 0) exit
 !
 !
-        call find_control_array_flag(hd_n_mom, num_coef_4_velocity_ctl)
-        if(num_coef_4_velocity_ctl.gt.0 .and. i_n_mom.eq.0) then
-          call allocate_coef_4_velocity_ctl
-          call read_control_array_vect_list(hd_n_mom,                   &
-     &        num_coef_4_velocity_ctl, i_n_mom,                         &
-     &        coef_4_velocity_name_ctl, coef_4_velocity_power_ctl)
-        end if
+        call read_control_array_c_r(hd_n_mom, coef_4_intertia_ctl)
+        call read_control_array_c_r(hd_n_press, coef_4_grad_p_ctl)
+        call read_control_array_c_r(hd_n_v_diff, coef_4_viscous_ctl)
 !
-        call find_control_array_flag(hd_n_press, num_coef_4_press_ctl)
-        if(num_coef_4_press_ctl.gt.0 .and. i_n_press.eq.0) then
-          call allocate_coef_4_press_ctl
-          call read_control_array_vect_list(hd_n_press,                 &
-     &        num_coef_4_press_ctl, i_n_press,                          &
-     &        coef_4_press_name_ctl, coef_4_press_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_v_diff,                       &
-     &      num_coef_4_v_diffuse_ctl)
-        if(num_coef_4_v_diffuse_ctl.gt.0 .and. i_n_v_diff.eq.0) then
-          call allocate_coef_4_v_diffuse_ctl
-          call read_control_array_vect_list(hd_n_v_diff,                &
-     &        num_coef_4_v_diffuse_ctl, i_n_v_diff,                     &
-     &        coef_4_v_diffuse_name_ctl, coef_4_v_diffuse_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_buo, num_coef_4_buoyancy_ctl)
-        if(num_coef_4_buoyancy_ctl.gt.0 .and. i_n_buo.eq.0) then
-          call allocate_coef_4_buoyancy_ctl
-          call read_control_array_vect_list(hd_n_buo,                   &
-     &        num_coef_4_buoyancy_ctl, i_n_buo,                         &
-     &        coef_4_buoyancy_name_ctl, coef_4_buoyancy_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_c_buo,                        &
-     &      num_coef_4_comp_buo_ctl)
-        if(num_coef_4_comp_buo_ctl.gt.0 .and. i_n_c_buo.eq.0) then
-          call allocate_coef_4_comp_buo_ctl
-          call read_control_array_vect_list(hd_n_c_buo,                 &
-     &        num_coef_4_comp_buo_ctl, i_n_c_buo,                       &
-     &        coef_4_comp_buo_name_ctl, coef_4_comp_buo_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_cor, num_coef_4_Coriolis_ctl)
-        if(num_coef_4_Coriolis_ctl.gt.0 .and. i_n_cor.eq.0) then
-          call allocate_coef_4_coriolis_ctl
-          call read_control_array_vect_list(hd_n_cor,                   &
-     &        num_coef_4_Coriolis_ctl, i_n_cor,                         &
-     &        coef_4_Coriolis_name_ctl, coef_4_Coriolis_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_lor, num_coef_4_Lorentz_ctl)
-        if(num_coef_4_Lorentz_ctl.gt.0 .and. i_n_lor.eq.0) then
-          call allocate_coef_4_lorentz_ctl
-          call read_control_array_vect_list(hd_n_lor,                   &
-     &        num_coef_4_Lorentz_ctl, i_n_lor,                          &
-     &        coef_4_Lorentz_name_ctl, coef_4_Lorentz_power_ctl)
-        end if
+        call read_control_array_c_r(hd_n_buo, coef_4_termal_buo_ctl)
+        call read_control_array_c_r(hd_n_c_buo, coef_4_comp_buo_ctl)
+        call read_control_array_c_r(hd_n_cor, coef_4_Coriolis_ctl)
+        call read_control_array_c_r(hd_n_lor, coef_4_Loreantz_ctl)
       end do
 !
       end subroutine read_momentum_ctl

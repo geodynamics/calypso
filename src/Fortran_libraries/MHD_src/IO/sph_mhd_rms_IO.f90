@@ -46,6 +46,7 @@
 !
       subroutine output_rms_sph_mhd_control
 !
+      use m_machine_parameter
       use m_t_step_parameter
       use m_boundary_params_sph_MHD
       use set_exit_flag_4_visualizer
@@ -59,12 +60,17 @@
 !
       if (i_flag .ne. 0) return
 !
+      if(iflag_debug.gt.0)  write(*,*) 'cal_rms_sph_outer_core'
       call cal_rms_sph_outer_core
+      if(iflag_debug.gt.0)  write(*,*) 'cal_gauss_coefficients'
       call cal_gauss_coefficients
+      if(iflag_debug.gt.0)  write(*,*) 'pickup_sph_spec_4_monitor'
       call pickup_sph_spec_4_monitor
+      if(iflag_debug.gt.0)  write(*,*) 'cal_no_heat_source_Nu'
       call cal_no_heat_source_Nu(sph_bc_U%kr_in, sph_bc_U%kr_out,       &
      &    sph_bc_U%r_ICB(0), sph_bc_U%r_CMB(0) )
 !
+      if(iflag_debug.gt.0)  write(*,*) 'write_total_energy_to_screen'
       call write_total_energy_to_screen(my_rank, i_step_MHD, time)
 !
       call write_sph_vol_ave_file(my_rank, i_step_MHD, time)

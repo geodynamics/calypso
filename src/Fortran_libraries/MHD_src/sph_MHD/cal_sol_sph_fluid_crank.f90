@@ -33,8 +33,6 @@
 !
       use calypso_mpi
       use m_machine_parameter
-      use m_spheric_parameter
-      use m_spheric_param_smp
       use m_sph_spectr_data
       use m_sph_phys_address
       use m_radial_matrices_sph
@@ -44,6 +42,8 @@
 !
       implicit none
 !
+      private :: cal_sol_scalar_sph_crank
+!
 ! -----------------------------------------------------------------------
 !
       contains
@@ -52,6 +52,8 @@
 !
       subroutine cal_sol_velo_by_vort_sph_crank
 !
+      use m_spheric_parameter
+      use m_spheric_param_smp
       use m_boundary_params_sph_MHD
       use m_coef_fdm_free_ICB
       use m_coef_fdm_free_CMB
@@ -133,6 +135,8 @@
 !
       subroutine cal_sol_pressure_by_div_v
 !
+      use m_spheric_parameter
+      use m_spheric_param_smp
       use m_boundary_params_sph_MHD
       use set_reference_sph_mhd
 !
@@ -150,6 +154,8 @@
 !
       subroutine cal_sol_magne_sph_crank
 !
+      use m_spheric_parameter
+      use m_spheric_param_smp
       use m_boundary_params_sph_MHD
       use const_sph_radial_grad
       use cal_sph_exp_nod_icb_ins
@@ -193,43 +199,18 @@
 !
       subroutine cal_sol_temperature_sph_crank
 !
+      use m_spheric_parameter
+      use m_spheric_param_smp
       use m_t_int_parameter
       use m_physical_property
       use m_boundary_params_sph_MHD
-      use set_scalar_boundary_sph
+      use m_radial_mat_sph_w_center
 !
 !
-      if (sph_bc_T%iflag_icb .eq. iflag_fixed_field) then
-        call set_fixed_scalar_sph(nidx_rj(2), ione, sph_bc_T%kr_in,     &
-     &      ipol%i_temp, sph_bc_T%ICB_fld)
-      else if(coef_temp .ne. 0.0d0) then
-        call adjust_in_fixed_flux_sph(nidx_rj(2),                       &
-     &      sph_bc_T%kr_in, sph_bc_T%r_ICB, sph_bc_T%fdm2_fix_dr_ICB,   &
-     &      sph_bc_T%ICB_flux, coef_d_temp, coef_imp_t, dt,             &
-     &      ipol%i_temp)
-      else
-        call poisson_in_fixed_flux_sph(nidx_rj(2),                      &
-     &      sph_bc_T%kr_in, sph_bc_T%r_ICB, sph_bc_T%fdm2_fix_dr_ICB,   &
-     &      sph_bc_T%ICB_flux, ipol%i_temp)
-      end if
-!
-      if (sph_bc_T%iflag_cmb .eq. iflag_fixed_field) then
-        call set_fixed_scalar_sph(nidx_rj(2), sph_bc_T%kr_out,          &
-     &     nidx_rj(1), ipol%i_temp, sph_bc_T%CMB_fld)
-      else if(coef_temp .ne. 0.0d0) then
-        call adjust_out_fixed_flux_sph(nidx_rj(2),                      &
-     &      sph_bc_T%kr_out, sph_bc_T%r_CMB, sph_bc_T%fdm2_fix_dr_CMB,  &
-     &      sph_bc_T%CMB_flux, coef_d_temp, coef_imp_t, dt,             &
-     &      ipol%i_temp)
-      else
-        call poisson_out_fixed_flux_sph(nidx_rj(2),                     &
-     &      sph_bc_T%kr_out, sph_bc_T%r_CMB, sph_bc_T%fdm2_fix_dr_CMB,  &
-     &      sph_bc_T%CMB_flux, ipol%i_temp)
-      end if
-!
-      call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &
-     &    nidx_rj(2), nidx_rj(1), temp_evo_lu,                          &
-     &    i_temp_pivot, d_rj(1,ipol%i_temp) )
+      call cal_sol_scalar_sph_crank(nidx_rj(1), nidx_rj(2),             &
+     &    idx_rj_smp_stack, sph_bc_T, coef_temp, coef_d_temp,           &
+     &    coef_imp_t, temp_evo_mat, temp_evo_lu, i_temp_pivot,          &
+     &    t00_evo_lu, i_t00_pivot, t00_solution, ipol%i_temp)
 !
       end subroutine cal_sol_temperature_sph_crank
 !
@@ -237,45 +218,205 @@
 !
       subroutine cal_sol_composition_sph_crank
 !
+      use m_spheric_parameter
+      use m_spheric_param_smp
       use m_t_int_parameter
       use m_physical_property
       use m_boundary_params_sph_MHD
-      use set_scalar_boundary_sph
+      use m_radial_mat_sph_w_center
 !
 !
-      if (sph_bc_C%iflag_icb .eq. iflag_fixed_field) then
-        call set_fixed_scalar_sph(nidx_rj(2), ione, sph_bc_C%kr_in,     &
-     &      ipol%i_light, sph_bc_C%ICB_fld)
-      else if(coef_light .ne. 0.0d0) then
-        call adjust_in_fixed_flux_sph(nidx_rj(2),                       &
-     &      sph_bc_C%kr_in, sph_bc_C%r_ICB, sph_bc_C%fdm2_fix_dr_ICB,   &
-     &      sph_bc_C%ICB_flux, coef_d_light, coef_imp_c, dt,            &
-     &      ipol%i_light)
-      else
-        call poisson_in_fixed_flux_sph(nidx_rj(2),                      &
-     &      sph_bc_C%kr_in, sph_bc_C%r_ICB, sph_bc_C%fdm2_fix_dr_ICB,   &
-     &      sph_bc_C%ICB_flux, ipol%i_light)
-      end if
-!
-      if (sph_bc_C%iflag_cmb .eq. iflag_fixed_field) then
-        call set_fixed_scalar_sph(nidx_rj(2), sph_bc_C%kr_out,          &
-     &      nidx_rj(1), ipol%i_light, sph_bc_C%CMB_fld)
-      else if(coef_light .ne. 0.0d0) then
-        call adjust_out_fixed_flux_sph(nidx_rj(2),                      &
-     &      sph_bc_C%kr_out, sph_bc_C%r_CMB, sph_bc_C%fdm2_fix_dr_CMB,  &
-     &      sph_bc_C%CMB_flux, coef_d_light, coef_imp_c, dt,            &
-     &      ipol%i_light)
-      else
-        call poisson_out_fixed_flux_sph(nidx_rj(2),                     &
-     &      sph_bc_C%kr_out, sph_bc_C%r_CMB, sph_bc_C%fdm2_fix_dr_CMB,  &
-     &      sph_bc_C%CMB_flux, ipol%i_light)
-      end if
-!
-      call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &
-     &    nidx_rj(2), nidx_rj(1), composit_evo_lu, i_composit_pivot,    &
-     &    d_rj(1,ipol%i_light) )
+      call cal_sol_scalar_sph_crank(nidx_rj(1), nidx_rj(2),             &
+     &    idx_rj_smp_stack, sph_bc_C, coef_light, coef_d_light,         &
+     &    coef_imp_c, composit_evo_mat, composit_evo_lu,                &
+     &    i_composit_pivot, c00_evo_lu, i_c00_pivot, c00_solution,      &
+     &    ipol%i_light)
 !
       end subroutine cal_sol_composition_sph_crank
+!
+! -----------------------------------------------------------------------
+!
+      subroutine check_temperature(l, m, is_field)
+!
+      integer(kind = kint), intent(in) :: l, m, is_field
+!
+      integer(kind = kint) :: j,k,inod
+!
+!
+      j = find_local_sph_mode_address(l, m)
+      if(j .eq. 0) return
+!
+      write(*,*) 'field ID, l, m: ', is_field, l, m
+      do k = 1, nidx_rj(1)
+        inod = j + (k-1)*nidx_rj(2)
+        write(*,*) k, d_rj(inod,is_field)
+      end do
+!
+      end subroutine check_temperature
+!
+! -----------------------------------------------------------------------
+!
+      subroutine check_NaN_temperature(is_field)
+!
+      integer(kind = kint), intent(in) :: is_field
+!
+      integer(kind = kint) :: inod, j, k, l, m
+!
+!
+      do inod = 1, nnod_rj
+        if(d_rj(inod,is_field) .ne. d_rj(inod,is_field)) then
+          j = idx_global_rj(inod,2)
+          k = idx_global_rj(inod,1)
+          l = aint(sqrt(real(j)))
+          m = j - l*(l+1)
+          write(50+my_rank,*) 'Broken', inod, k, j, l, m,  &
+     &              d_rj(inod,is_field)
+        end if
+      end do
+!
+end subroutine check_NaN_temperature
+!
+! -----------------------------------------------------------------------
+!
+      subroutine cal_sol_scalar_sph_crank(nri, jmax, idx_rj_smp_stack,  &
+     &          sph_bc, coef_f, coef_d, coef_imp, evo_mat, evo_lu,      &
+     &          i_pivot, s00_evo_lu, i_s00_pivot, sol_00, is_field)
+!
+      use m_t_int_parameter
+      use t_boundary_params_sph_MHD
+      use set_scalar_boundary_sph
+      use cal_sph_exp_center
+      use lubksb_357band
+!
+      integer(kind = kint), intent(in) :: nri, jmax
+      integer(kind = kint), intent(in) :: idx_rj_smp_stack(0:np_smp,2)
+      type(sph_boundary_type), intent(in) :: sph_bc
+      real(kind = kreal), intent(in) :: coef_imp, coef_f, coef_d
+      real(kind = kreal), intent(in) :: evo_mat(3,nri,jmax)
+      real(kind = kreal), intent(in) :: evo_lu(5,nri,jmax)
+      integer(kind = kint), intent(in) :: i_pivot(nri,jmax)
+      real(kind = kreal), intent(in) :: s00_evo_lu(5,0:nri)
+      integer(kind = kint), intent(in) :: i_s00_pivot(0:nri)
+!
+      integer(kind = kint), intent(in) :: is_field
+      real(kind = kreal), intent(inout) :: sol_00(0:nri)
+!
+!
+!   Set RHS vector for CMB
+      if (sph_bc%iflag_cmb .eq. iflag_fixed_field) then
+        call set_fixed_scalar_sph(jmax, sph_bc%kr_out,                  &
+     &      nri, is_field, sph_bc%CMB_fld)
+      else if(coef_f .ne. 0.0d0) then
+        call adjust_out_fixed_flux_sph(jmax,                            &
+     &      sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_dr_CMB,        &
+     &      sph_bc%CMB_flux, coef_d, coef_imp, dt, is_field)
+      else
+        call poisson_out_fixed_flux_sph(jmax,                           &
+     &      sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_dr_CMB,        &
+     &      sph_bc%CMB_flux, is_field)
+      end if
+!
+!   Set RHS vector for ICB
+      if (sph_bc%iflag_icb .eq. iflag_fixed_field) then
+        call set_fixed_scalar_sph(jmax, ione, sph_bc%kr_in,             &
+     &      is_field, sph_bc%ICB_fld)
+      else if (sph_bc%iflag_icb .eq. iflag_sph_fix_center) then
+        call cal_sph_fixed_center(inod_rj_center, sph_bc%CTR_fld,       &
+     &      is_field)
+      else if(sph_bc%iflag_icb .eq. iflag_fixed_flux                    &
+     &     .and. coef_f .ne. 0.0d0) then
+        call adjust_in_fixed_flux_sph(jmax,                             &
+     &      sph_bc%kr_in, sph_bc%r_ICB, sph_bc%fdm2_fix_dr_ICB,         &
+     &      sph_bc%ICB_flux, coef_d, coef_imp, dt, is_field)
+      else if (sph_bc%iflag_icb .eq. iflag_fixed_flux) then
+        call poisson_in_fixed_flux_sph(jmax,                            &
+     &      sph_bc%kr_in, sph_bc%r_ICB, sph_bc%fdm2_fix_dr_ICB,         &
+     &      sph_bc%ICB_flux, is_field)
+      end if
+!
+      if(inod_rj_center .gt. 0) then
+        call copy_degree0_comps_to_sol(nri, jmax,                       &
+     &      inod_rj_center, idx_rj_degree_zero, is_field, sol_00)
+      end if
+!
+!      j = find_local_sph_mode_address(30,-23)
+!      if(j.gt.0) then
+!        write(*,*) 'matrix'
+!        call check_single_radial_3band_mat(my_rank, nri,                &
+!     &      radius_1d_rj_r, evo_mat(1,1,j))
+!      end if
+!
+      call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &
+     &    jmax, nri, evo_lu, i_pivot, d_rj(1,is_field) )
+!
+!       write(*,*) 'solution'
+!       call check_temperature(30,-23, is_field)
+!       write(*,*) 'check_NaN_temperature'
+!       call check_NaN_temperature(is_field)
+!
+!   Solve l=m=0 including center
+      if(inod_rj_center .eq. 0) return
+      call lubksb_3band(nri+1, s00_evo_lu, i_s00_pivot, sol_00)
+      call copy_degree0_comps_from_sol(nri, jmax,                       &
+     &    inod_rj_center, idx_rj_degree_zero, sol_00, is_field)
+!
+      end subroutine cal_sol_scalar_sph_crank
+!
+! -----------------------------------------------------------------------
+!
+      subroutine copy_degree0_comps_to_sol(nri, jmax,                   &
+     &          inod_rj_center, idx_rj_degree_zero, is_field, sol_00)
+!
+      integer(kind = kint), intent(in) :: nri, jmax
+      integer(kind = kint), intent(in) :: inod_rj_center
+      integer(kind = kint), intent(in) :: idx_rj_degree_zero
+      integer(kind = kint), intent(in) :: is_field
+      real(kind = kreal), intent(inout) :: sol_00(0:nri)
+!
+      integer(kind = kint) :: kr, inod
+!
+!$omp parallel do private(inod)
+      do kr = 1, nri
+        inod = idx_rj_degree_zero + (kr-1) * jmax
+        sol_00(kr) = d_rj(inod,is_field)
+      end do
+!$omp end parallel do
+      sol_00(0) = d_rj(inod_rj_center,is_field)
+!
+!       write(*,*) 'kr, Average RHS'
+!       do kr = 0, nri
+!         write(*,*) kr, sol_00(kr)
+!       end do
+
+      end subroutine copy_degree0_comps_to_sol
+!
+! -----------------------------------------------------------------------
+!
+      subroutine copy_degree0_comps_from_sol(nri, jmax,                 &
+     &          inod_rj_center, idx_rj_degree_zero, sol_00, is_field)
+!
+      integer(kind = kint), intent(in) :: nri, jmax
+      integer(kind = kint), intent(in) :: inod_rj_center
+      integer(kind = kint), intent(in) :: idx_rj_degree_zero
+      integer(kind = kint), intent(in) :: is_field
+      real(kind = kreal), intent(in) :: sol_00(0:nri)
+!
+      integer(kind = kint) :: kr, inod
+!
+!$omp parallel do private(inod)
+      do kr = 1, nri
+        inod = idx_rj_degree_zero + (kr-1) * jmax
+        d_rj(inod,is_field) = sol_00(kr)
+      end do
+!$omp end parallel do
+      d_rj(inod_rj_center,is_field) = sol_00(0)
+!
+!       write(*,*) 'kr, average Solution'
+!       do kr = 0, nri
+!         write(*,*) kr, sol_00(kr)
+!      end do
+!
+      end subroutine copy_degree0_comps_from_sol
 !
 ! -----------------------------------------------------------------------
 !

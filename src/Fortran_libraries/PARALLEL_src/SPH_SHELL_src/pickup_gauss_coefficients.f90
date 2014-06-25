@@ -39,9 +39,10 @@
 !
 !
       if (ipol%i_magne .gt. 0) then
-        call count_picked_sph_adrress(l_truncation,                     &
-     &      num_pick_gauss_coefs, num_pick_gauss_l, num_pick_gauss_m,   &
-     &      idx_pick_gauss_l, idx_pick_gauss_m, ntot_pick_gauss_mode)
+        call count_picked_sph_adrress                                   &
+     &     (num_pick_gauss_coefs, num_pick_gauss_l, num_pick_gauss_m,   &
+     &      idx_pick_gauss_mode, idx_pick_gauss_l, idx_pick_gauss_m,    &
+     &      ntot_pick_gauss_mode)
       else
         ntot_pick_gauss_mode = 0
       end if
@@ -51,8 +52,7 @@
 !
       if (ipol%i_magne .gt. 0) then
       call set_picked_sph_address                                       &
-     &   (l_truncation, nidx_rj(2), idx_gl_1d_rj_j(1,1),                &
-     &    num_pick_gauss_coefs, num_pick_gauss_l, num_pick_gauss_m,     &
+     &   (num_pick_gauss_coefs, num_pick_gauss_l, num_pick_gauss_m,     &
      &    idx_pick_gauss_mode, idx_pick_gauss_l, idx_pick_gauss_m,      &
      &    ntot_pick_gauss_mode, num_pick_gauss_mode,                    &
      &    idx_pick_gauss_coef_gl, idx_pick_gauss_coef_lc)
@@ -150,8 +150,8 @@
 !
       integer(kind = kint), intent(in) :: kr_ICB, kr_CMB
       real(kind = kreal), intent(in) :: r_in, r_out
-      real(kind = kreal) :: temp_ICB, dTdr_ICB
-      real(kind = kreal) :: temp_CMB, dTdr_CMB
+      real(kind = kreal) :: temp_ICB, temp_CMB
+!      real(kind = kreal) :: dTdr_ICB, dTdr_CMB
 !
       real(kind = kreal) :: c1, c2
 !      real(kind = kreal) :: dTdr_diff_ICB, dTdr_diff_CMB

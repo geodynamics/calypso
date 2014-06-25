@@ -6,13 +6,13 @@
 !      subroutine allocate_iflag_pick_sph(l_truncation)
 !      subroutine deallocate_iflag_pick_sph
 !
-!!      subroutine count_picked_sph_adrress(l_truncation,               &
-!!     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,         &
-!!     &          idx_pick_sph_l, idx_pick_sph_m, ntot_pickup)
-!!      subroutine set_picked_sph_address(l_truncation, jmax, idx_gl_j, &
-!!     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,         &
+!!      subroutine count_picked_sph_adrress                             &
+!!     &     (num_pick_sph, num_pick_sph_l, num_pick_sph_m,             &
+!!     &      idx_pick_sph, idx_pick_sph_l, idx_pick_sph_m, ntot_pickup)
+!!      subroutine set_picked_sph_address                               &
+!!     &         (num_pick_sph, num_pick_sph_l, num_pick_sph_m,         &
 !!     &          idx_pick_sph, idx_pick_sph_l, idx_pick_sph_m,         &
-!!     &          ntot_pickup, num_pickup, idx_pick_gl, idx_pick_lc,    &
+!!     &          ntot_pickup, num_pickup, idx_pick_gl, idx_pick_lc)
 !!      subroutine set_scale_4_vect_l0(num_pickup,                      &
 !!     &          idx_pick_gl, scale_for_zelo)
 !
@@ -55,15 +55,16 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine count_picked_sph_adrress(l_truncation,                 &
-     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,           &
-     &          idx_pick_sph_l, idx_pick_sph_m, ntot_pickup)
+      subroutine count_picked_sph_adrress                               &
+     &     (num_pick_sph, num_pick_sph_l, num_pick_sph_m,               &
+     &      idx_pick_sph, idx_pick_sph_l, idx_pick_sph_m, ntot_pickup)
 !
-      integer(kind = kint), intent(in) :: l_truncation
+      use m_spheric_parameter
 !
       integer(kind = kint), intent(in) :: num_pick_sph
       integer(kind = kint), intent(in) :: num_pick_sph_l
       integer(kind = kint), intent(in) :: num_pick_sph_m
+      integer(kind = kint), intent(in) :: idx_pick_sph(num_pick_sph,2)
       integer(kind = kint), intent(in) :: idx_pick_sph_l(num_pick_sph_l)
       integer(kind = kint), intent(in) :: idx_pick_sph_m(num_pick_sph_m)
 !
@@ -72,7 +73,12 @@
       integer(kind = kint) :: inum, mm
 !
 !
-      ntot_pickup = num_pick_sph
+      ntot_pickup = 0
+      do inum = 1, num_pick_sph
+        if(idx_pick_sph(inum,1) .le. l_truncation) then
+          ntot_pickup = ntot_pickup + 1
+        end if
+      end do
       do inum = 1, num_pick_sph_l
         if(idx_pick_sph_l(inum) .le. l_truncation) then
           ntot_pickup = ntot_pickup + 2*idx_pick_sph_l(inum) + 1
@@ -89,18 +95,18 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_picked_sph_address(l_truncation, jmax, idx_gl_j,   &
-     &          num_pick_sph, num_pick_sph_l, num_pick_sph_m,           &
+      subroutine set_picked_sph_address                                 &
+     &         (num_pick_sph, num_pick_sph_l, num_pick_sph_m,           &
      &          idx_pick_sph, idx_pick_sph_l, idx_pick_sph_m,           &
      &          ntot_pickup, num_pickup, idx_pick_gl, idx_pick_lc)
 !
-      integer(kind = kint), intent(in) :: l_truncation, jmax
-      integer(kind = kint), intent(in) :: idx_gl_j(jmax)
+      use m_spheric_parameter
+      use quicksort
 !
       integer(kind = kint), intent(in) :: num_pick_sph
       integer(kind = kint), intent(in) :: num_pick_sph_l
       integer(kind = kint), intent(in) :: num_pick_sph_m
-      integer(kind = kint), intent(in) :: idx_pick_sph(num_pick_sph)
+      integer(kind = kint), intent(in) :: idx_pick_sph(num_pick_sph,2)
       integer(kind = kint), intent(in) :: idx_pick_sph_l(num_pick_sph_l)
       integer(kind = kint), intent(in) :: idx_pick_sph_m(num_pick_sph_m)
 !
@@ -115,10 +121,12 @@
 !
       icou = 0
       do inum = 1, num_pick_sph
-        j = idx_pick_sph(inum)
-        if(j .le. l_truncation*(l_truncation+2)) then
+        l = idx_pick_sph(inum,1)
+        m = idx_pick_sph(inum,2)
+        if(l .le. l_truncation) then
           icou = icou + 1
-          idx_pick_gl(icou) = j
+          idx_pick_gl(icou) = l*(l+1) + m
+          idx_pick_lc(icou) = find_local_sph_mode_address(l, m)
           iflag_picked_sph(j)  = icou
         end if
       end do
@@ -131,6 +139,7 @@
             if(iflag_picked_sph(j) .le. izero) then
               icou = icou + 1
               idx_pick_gl(icou) = j
+              idx_pick_lc(icou) = find_local_sph_mode_address(l, m)
               iflag_picked_sph(j)  = icou
             end if
           end do
@@ -146,6 +155,7 @@
             if(iflag_picked_sph(j) .le. izero) then
               icou = icou + 1
               idx_pick_gl(icou) = j
+              idx_pick_lc(icou) = find_local_sph_mode_address(l, m)
               iflag_picked_sph(j)  = icou
             end if
           end do
@@ -153,15 +163,8 @@
       end do
       num_pickup = icou
 !
-      do inum = 1, num_pickup
-        idx_pick_lc(inum) = 0
-        do j = 1, jmax
-          if (idx_gl_j(j) .eq. idx_pick_gl(inum)) then
-            idx_pick_lc(inum) = j
-            exit
-          end if
-        end do
-      end do
+      call quicksort_w_index(num_pickup, idx_pick_gl,                   &
+     &    ione, num_pickup, idx_pick_lc)
 !
       end subroutine set_picked_sph_address
 !

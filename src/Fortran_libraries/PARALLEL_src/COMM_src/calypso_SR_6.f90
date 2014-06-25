@@ -138,10 +138,6 @@
       call set_from_recv_buf_6(nnod_new,                                &
      &    istack_recv(npe_recv), inod_import, WR, X_new)
 !
-      if(ncomm_send .gt. 0) then
-        call MPI_WAITALL (ncomm_send, req1, sta1, ierr_MPI)
-      end if
-!
       end subroutine calypso_send_recv_6
 !
 ! ----------------------------------------------------------------------
@@ -231,10 +227,6 @@
 !
       call set_from_recv_buf_3x6(nnod_new, istack_recv(npe_recv),       &
      &    inod_import, WR, X1_new, X2_new, X3_new)
-!
-      if(ncomm_send .gt. 0) then
-        call MPI_WAITALL (ncomm_send, req1, sta1, ierr_MPI)
-      end if
 !
       end subroutine calypso_send_recv_3x6
 !

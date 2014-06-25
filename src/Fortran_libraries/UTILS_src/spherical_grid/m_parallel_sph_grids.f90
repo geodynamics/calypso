@@ -47,7 +47,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine  copy_sph_rlm_grid_to_mem(ip)
+      subroutine copy_sph_rlm_grid_to_mem(ip)
 !
       use m_spheric_parameter
       use copy_sph_node_4_type
@@ -61,7 +61,6 @@
      &    sph_para(ip)%sph_mesh%sph_rlm)
       call copy_comm_rlm_to_type(sph_para(ip)%sph_mesh%sph_rlm,         &
      &    sph_para(ip)%sph_comms%comm_rlm)
-!
 !
       end subroutine  copy_sph_rlm_grid_to_mem
 !

@@ -24,15 +24,22 @@
 ! 
 !
 !
+!>      Truncation level
       integer(kind = kint) :: nth = 10
+!>      theta for input
       real(kind = kreal) :: dth
 !
+!>      Schmidt quasi-normalized Legendre polynomials
       real(kind = kreal), allocatable :: p(:,:)
+!>      diffrence of Schmidt quasi-normalized Legendre polynomials
       real(kind = kreal), allocatable :: dp(:,:)
 !
+!>      Legendre polynomials without normalization
       real(kind = kreal), allocatable :: dplm(:,:)
+!>      work area
       real(kind = kreal), allocatable :: dc(:,:)
-      real(kind = kreal), allocatable :: df(:,:)
+!>      work area
+      real(kind = kreal), allocatable :: df(:)
 !
 ! -----------------------------------------------------------------------
 !
@@ -46,7 +53,7 @@
         allocate ( dp(0:nth,0:nth) )
         allocate ( dplm(0:nth+2,0:nth+2) )
         allocate ( dc(0:nth,0:nth+2) )
-        allocate ( df(0:nth+2,0:nth+2) )
+        allocate ( df(0:nth+2) )
 !
         p = 0.0d0
         dp = 0.0d0
@@ -60,7 +67,7 @@
 !
        subroutine deallocate_schmidt_polynomial
 !
-        deallocate ( p, dp, dplm, dc, df )
+        deallocate (p, dp, dplm, dc, df)
 !
        end subroutine deallocate_schmidt_polynomial
 !

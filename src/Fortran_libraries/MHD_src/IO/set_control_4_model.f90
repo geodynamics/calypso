@@ -78,11 +78,11 @@
 !
 !   set control for time evolution
 !
-        if (i_num_time_evo .eq. 0) then
+        if (t_evo_field_ctl%icou .eq. 0) then
           e_message = 'Set field for time integration'
           call calypso_MPI_abort(91, e_message)
         else
-          num_field_to_evolve = num_t_evo_control_ctl
+          num_field_to_evolve = t_evo_field_ctl%num
           if (iflag_debug .ge. iflag_routine_msg)                       &
      &    write(*,*) 'num_field_to_evolve ',num_field_to_evolve
         end if
@@ -90,7 +90,9 @@
         if ( num_field_to_evolve .ne. 0 ) then
           allocate( t_evo_name(num_field_to_evolve) )
 !
-          t_evo_name  = t_evo_name_ctl
+          do i = 1, num_field_to_evolve
+            t_evo_name(i)  = t_evo_field_ctl%c_tbl(i)
+          end do
 !
           call dealloc_t_evo_name_ctl
 !
@@ -221,18 +223,19 @@
            write(*,*) 'stratified_outer_r ', stratified_outer_r
         end if
 !
-        if (i_monitor_grp.eq.0) then
+        if (group_4_monitor_ctl%icou .eq. 0) then
           num_monitor = 0
         else
-          num_monitor = num_monitor_ctl
+          num_monitor = group_4_monitor_ctl%num
         end if
 !
       if (num_monitor .ne. 0) then
         call allocate_monitor_group
 !
         do i = 1, num_monitor
-          monitor_grp(i) = monitor_grp_ctl(i)
+          monitor_grp(i) = group_4_monitor_ctl%c_tbl(i)
         end do
+        call dealloc_monitor_grp_ctl
 !
         if (iflag_debug .ge. iflag_routine_msg) then
           do i = 1, num_monitor

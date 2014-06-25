@@ -78,8 +78,8 @@
       integer(kind = kint), intent(in) :: ncomp_trans
       real(kind = kreal), intent(in) :: sp_rlm(ncomp_trans*nnod_rlm)
 !
-      if( iflag_4_coriolis .eq. id_turn_OFF) return
 !
+      if( iflag_4_coriolis .eq. id_turn_OFF) return
 !
       call sum_rot_coriolis_rlm_10(ncomp_trans, sp_rlm)
 !
@@ -100,6 +100,7 @@
       subroutine copy_coriolis_terms_rlm(ncomp_trans, sp_rlm)
 !
       use m_coriolis_terms_rlm
+      use sum_coriolis_terms_rlm
 !
       integer(kind = kint), intent(in) :: ncomp_trans
       real(kind = kreal), intent(inout) :: sp_rlm(ncomp_trans*nnod_rlm)

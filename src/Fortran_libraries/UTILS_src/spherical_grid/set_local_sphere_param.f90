@@ -1,12 +1,19 @@
+!>@file   set_local_sphere_param.f90
+!!@brief  module set_local_sphere_param
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!      module set_local_sphere_param
-!
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine set_global_sph_rtp_id
-!      subroutine set_global_sph_rj_id
-!      subroutine set_global_sph_4_rtm
-!      subroutine set_global_sph_4_rlm
+!>@brief  Copy number of global spherical harmonics indices
+!!        to local data
+!!
+!!
+!!@verbatim
+!!      subroutine set_global_sph_rtp_id
+!!      subroutine set_global_sph_rj_id
+!!      subroutine set_global_sph_4_rtm
+!!      subroutine set_global_sph_4_rlm
+!!@endverbatim
 !
       module set_local_sphere_param
 !
@@ -80,14 +87,19 @@
       inod = 0
       do k = 1, nidx_rj(1)
         do j = 1, nidx_rj(2)
-            inod = inod + 1
-            idx_global_rj(inod,1) = idx_gl_1d_rj_r(k)
-            idx_global_rj(inod,2) = idx_gl_1d_rj_j(j,1)
-            inod_global_rj(inod)                                        &
+          inod = inod + 1
+          idx_global_rj(inod,1) = idx_gl_1d_rj_r(k)
+          idx_global_rj(inod,2) = idx_gl_1d_rj_j(j,1)
+          inod_global_rj(inod)                                          &
      &            =   idx_global_rj(inod,1) - kst_gl                    &
      &             + (idx_global_rj(inod,2) - jst_gl - 1) * nsize_r
-          end do
         end do
+      end do
+!
+      if(inod_rj_center .eq. 0) return
+      idx_global_rj(nnod_rj,1) = 0
+      idx_global_rj(nnod_rj,2) = 0
+      inod_global_rj(nnod_rj) =  nsize_r * (nidx_global_rj(2) + 1) + 1
 !
       end subroutine set_global_sph_rj_id
 !

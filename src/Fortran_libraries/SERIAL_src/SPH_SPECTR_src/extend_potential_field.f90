@@ -19,9 +19,9 @@
 !        Output: d_rj(1:kr_in,is_rot:is_rot+2)
 !
 !      subroutine gauss_to_poloidal_out(is_fld, kr_out,                 &
-!     &          ltr_w, r_gauss, w_gauss)
+!     &          ltr_w, r_gauss, w_gauss, index_w)
 !      subroutine gauss_to_poloidal_in(is_fld, kr_in,                   &
-!     &          ltr_w, r_gauss, w_gauss)
+!     &          ltr_w, r_gauss, w_gauss, index_w)
 !
       module extend_potential_field
 !
@@ -225,89 +225,74 @@
 !  -------------------------------------------------------------------
 !
       subroutine gauss_to_poloidal_out(is_fld, kr_out,                  &
-     &          ltr_w, r_gauss, w_gauss)
+     &          ltr_w, r_gauss, w_gauss, index_w)
 !
       integer(kind = kint), intent(in) :: is_fld, kr_out, ltr_w
       real(kind = kreal), intent(in) :: r_gauss
-      real(kind = kreal), intent(in) :: w_gauss( ltr_w*(ltr_w+1) )
-
+      real(kind = kreal), intent(in) :: w_gauss( ltr_w*(ltr_w+2) )
+      integer(kind = kint), intent(in) :: index_w( ltr_w*(ltr_w+2),2 )
+!
       real(kind = kreal) :: ratio, al
-      integer(kind = kint) :: inod
-      integer(kind = kint) :: j, j_gl, l_gl, k, jst, jed
+      integer(kind = kint) :: inod, j, j_gl, l_gl, m_gl, k
 !
 !
-      jst = 1
-      jed = 0
-      do j = 1, nidx_rj(2)
-        j_gl = idx_gl_1d_rj_j(j,1)
-        if(j_gl .gt. ltr_w*(ltr_w+1)) exit
-        jed = j
-      end do
-      if(idx_gl_1d_rj_j(1,1) .eq. izero) jst = 2
+!$omp parallel do private(j_gl,l_gl,m_gl,j,inod,ratio,al)
+      do j_gl = 1, ltr_w*(ltr_w+2)
+        l_gl = index_w(j_gl,1)
+        m_gl = index_w(j_gl,2)
+        j = find_local_sph_mode_address(l_gl, m_gl)
+        if(j .eq. 0) cycle
+        al = one / dble(l_gl)
 !
-!$omp parallel private(k,ratio)
-      do k = kr_out, nidx_rj(1)
-        ratio = r_gauss * a_r_1d_rj_r(k)
-!$omp do private(j,j_gl,l_gl,inod,al)
-        do j = jst, jed
+        do k = kr_out, nidx_rj(1)
           inod = j + (k-1) * nidx_rj(2)
-          j_gl = idx_gl_1d_rj_j(j,1)
-          l_gl = idx_gl_1d_rj_j(j,2)
-          al = one / dble(l_gl)
+          ratio = r_gauss * a_r_1d_rj_r(k)
 !
           d_rj(inod,is_fld  ) =  al*w_gauss(j_gl) * ratio**l_gl         &
      &                         * r_gauss
           d_rj(inod,is_fld+1) = - w_gauss(j_gl) * ratio**(l_gl+1)
           d_rj(inod,is_fld+2) = zero
         end do
-!$omp end do nowait
       end do
-!$omp end parallel
+!$omp end parallel do
 !
       end subroutine gauss_to_poloidal_out
 !
 !  -------------------------------------------------------------------
 !
       subroutine gauss_to_poloidal_in(is_fld, kr_in,                    &
-     &          ltr_w, r_gauss, w_gauss)
+     &          ltr_w, r_gauss, w_gauss, index_w)
 !
       integer(kind = kint), intent(in) :: is_fld, kr_in, ltr_w
       real(kind = kreal), intent(in) :: r_gauss
-      real(kind = kreal), intent(in) :: w_gauss( ltr_w*(ltr_w+1) )
+      real(kind = kreal), intent(in) :: w_gauss( ltr_w*(ltr_w+2) )
+      integer(kind = kint), intent(in) :: index_w( ltr_w*(ltr_w+2),2 )
 !
       real(kind = kreal) :: ratio, ar_gauss, al1
-      integer(kind = kint) :: inod
-      integer(kind = kint) :: j, j_gl, l_gl, k, jst, jed
+      integer(kind = kint) :: inod, j, j_gl, l_gl, m_gl, k
 !
 !
       ar_gauss = one / r_gauss
 !
-      jed = 0
-      do j = 1, nidx_rj(2)
-        j_gl = idx_gl_1d_rj_j(j,1)
-        if(j_gl .gt. ltr_w*(ltr_w+1)) exit
-        jed = j
-      end do
-      if(idx_gl_1d_rj_j(1,1) .eq. izero) jst = 2
+!$omp parallel do private(j_gl,l_gl,m_gl,j,al1,inod,ratio)
+      do j_gl = 1, ltr_w*(ltr_w+2)
+        l_gl = index_w(j_gl,1)
+        m_gl = index_w(j_gl,2)
+        j = find_local_sph_mode_address(l_gl, m_gl)
+        if(j .eq. 0) cycle
+        al1 = one / dble(l_gl+1)
 !
-!$omp parallel private(k,ratio)
-      do k = 1, kr_in
-        ratio = radius_1d_rj_r(k) * ar_gauss
-!$omp do private(j,j_gl,l_gl,inod,al1)
-        do j = jst, jed
-          inod =     j + (k-1) * nidx_rj(2)
-          j_gl = idx_gl_1d_rj_j(j,1)
-          l_gl = idx_gl_1d_rj_j(j,2)
-          al1 = one / dble(l_gl+1)
+        do k = 1, kr_in
+          inod = j + (k-1) * nidx_rj(2)
+          ratio = radius_1d_rj_r(k) * ar_gauss
 !
           d_rj(inod,is_fld  ) = - al1 * w_gauss(j_gl) * ratio**(l_gl+1) &
      &                         * r_gauss
           d_rj(inod,is_fld+1) = - w_gauss(j_gl) * ratio**l_gl
           d_rj(inod,is_fld+1) = zero
         end do
-!$omp end do nowait
       end do
-!$omp end parallel
+!$omp end parallel do
 !
       end subroutine gauss_to_poloidal_in
 !

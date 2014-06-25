@@ -47,6 +47,7 @@
 !!
 !!      mesh_extension_flags_ctl    'ON'
 !!      memory_conservation_ctl     'YES'
+!!      excluding_FEM_mesh_ctl      'NO'
 !!    end data_files_def
 !! ------------------------------------------------------------------
 !!@endverbatim
@@ -133,6 +134,7 @@
 !
       character(len=kchara) :: memory_conservation_ctl =  'OFF'
       character(len=kchara) :: mesh_extension_flags_ctl = 'ON'
+      character(len=kchara) :: excluding_FEM_mesh_ctl =   'OFF'
 !
 !     Label for the entry
 !
@@ -197,6 +199,8 @@
      &       :: hd_mem_conserve =   'memory_conservation_ctl'
       character(len=kchara), parameter                                  &
      &       :: hd_mesh_extension = 'mesh_extension_flags_ctl'
+      character(len=kchara), parameter                                  &
+     &       :: hd_exclude_FEM_mesh = 'excluding_FEM_mesh_ctl'
 !
 !
       integer(kind = kint) :: i_num_subdomain = 0
@@ -229,6 +233,7 @@
       integer(kind = kint) :: i_debug_flag_ctl =   0
       integer(kind = kint) :: i_mem_conserve =     0
       integer(kind = kint) :: i_mesh_extension =   0
+      integer(kind = kint) :: i_exclude_FEM_mesh = 0
 !
       private :: hd_platform, i_platform
       private :: hd_num_subdomain, hd_num_smp, hd_sph_files_header
@@ -322,6 +327,8 @@
      &          i_mem_conserve, memory_conservation_ctl)
         call read_character_ctl_item(hd_mesh_extension,                 &
      &          i_mesh_extension, mesh_extension_flags_ctl)
+        call read_character_ctl_item(hd_exclude_FEM_mesh,               &
+     &          i_exclude_FEM_mesh, excluding_FEM_mesh_ctl)
        end do
 !
       end subroutine read_ctl_data_4_platform

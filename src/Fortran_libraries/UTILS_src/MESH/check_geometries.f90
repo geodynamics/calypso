@@ -132,7 +132,7 @@
       use m_geometry_constants
 !
       integer(kind = kint), intent(in) :: my_rank
-      integer(kind = kint) :: iedge, iele
+      integer(kind = kint) :: iele
 !
 !
       write(50+my_rank,*) 'numele, nedge_4_ele'

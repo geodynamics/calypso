@@ -44,8 +44,8 @@
         temp_nod%num_bc =    0
         h_flux_surf%num_bc = 0
       else
-        temp_nod%num_bc =    num_bc_e_ctl
-        h_flux_surf%num_bc = num_bc_h_flux_ctl
+        temp_nod%num_bc =    node_bc_T_ctl%num
+        h_flux_surf%num_bc = surf_bc_HF_ctl%num
       end if
 !
 !   set boundary conditions for temperature
@@ -56,17 +56,19 @@
 !
         call allocate_nod_bc_list_temp
 !
-        temp_nod%bc_name =      bc_e_name_ctl
-        temp_nod%bc_magnitude = bc_e_magnitude_ctl
+        temp_nod%bc_name(1:temp_nod%num_bc)                             &
+     &        = node_bc_T_ctl%c2_tbl(1:temp_nod%num_bc)
+        temp_nod%bc_magnitude(1:temp_nod%num_bc)                        &
+     &        = node_bc_T_ctl%vect(1:temp_nod%num_bc)
 !
         do i = 1, temp_nod%num_bc
-          call set_bc_group_types_scalar(bc_e_type_ctl(i),              &
+          call set_bc_group_types_scalar(node_bc_T_ctl%c1_tbl(i),       &
      &        temp_nod%ibc_type(i))
-          call set_bc_group_types_sgs_scalar(bc_e_type_ctl(i),          &
+          call set_bc_group_types_sgs_scalar(node_bc_T_ctl%c1_tbl(i),   &
      &        temp_nod%ibc_type(i))
-          call set_bc_group_types_sph_center(bc_e_type_ctl(i),          &
+          call set_bc_group_types_sph_center(node_bc_T_ctl%c1_tbl(i),   &
      &        temp_nod%ibc_type(i))
-          call set_bc_group_types_fluxes(bc_e_type_ctl(i),              &
+          call set_bc_group_types_fluxes(node_bc_T_ctl%c1_tbl(i),       &
      &        temp_nod%ibc_type(i))
         end do
 !
@@ -77,6 +79,8 @@
      &         temp_nod%bc_magnitude(i), trim(temp_nod%bc_name(i))
           end do
         end if
+!
+        call deallocate_bc_temp_ctl
       end if
 !
 !   set boundary conditions for heat flux
@@ -85,15 +89,19 @@
 !
         call allocate_temp_surf_ctl
 !
-        h_flux_surf%bc_magnitude = bc_h_flux_magnitude_ctl
-        h_flux_surf%bc_name =      bc_h_flux_name_ctl
+        h_flux_surf%bc_name(1:h_flux_surf%num_bc)                       &
+     &       = surf_bc_HF_ctl%c2_tbl(1:h_flux_surf%num_bc)
+        h_flux_surf%bc_magnitude(1:h_flux_surf%num_bc)                  &
+     &       = surf_bc_HF_ctl%vect(1:h_flux_surf%num_bc)
 !
         do i = 1, h_flux_surf%num_bc
-          call set_surf_group_types_scalar(bc_h_flux_type_ctl(i),       &
+          call set_surf_group_types_scalar(surf_bc_HF_ctl%c1_tbl(i),    &
      &            h_flux_surf%ibc_type(i))
-          call set_bc_group_types_sph_center(bc_h_flux_type_ctl(i),     &
+          call set_bc_group_types_sph_center(surf_bc_HF_ctl%c1_tbl(i),  &
      &            h_flux_surf%ibc_type(i))
         end do
+ !
+        call deallocate_bc_h_flux_ctl
       end if
 !
       end subroutine s_set_control_4_temp

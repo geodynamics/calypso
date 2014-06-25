@@ -8,13 +8,10 @@
 !>@brief set mesh and field data from UCD data input
 !!
 !!@verbatim
-!!      subroutine set_udt_local_nodes(numnod, xx, ucd)
-!!
-!!      subroutine count_udt_elements(internal_node, nele, nnod_ele, ie,&
-!!     &          ucd)
-!!      subroutine set_udt_local_connect(internal_node,                 &
+!!      subroutine const_udt_local_nodes(numnod, xx, ucd)
+!!      subroutine const_udt_local_connect(internal_node,               &
 !!     &          nele, nnod_ele, ie, ucd)
-!!      subroutine set_udt_global_connect(internal_node,                &
+!!      subroutine const_udt_global_connect(internal_node,              &
 !!     &          nele, nnod_ele, iele_global, ie, ucd)
 !!
 !!      subroutine set_one_field_to_udt_data(nnod, numdir, i_field,     &
@@ -39,10 +36,75 @@
 !
       implicit none
 !
+      private :: set_udt_local_nodes
+      private :: count_udt_elements
+      private :: set_udt_local_connect
+      private :: set_udt_global_connect
+!
 !-----------------------------------------------------------------------
 !
       contains
 !
+!-----------------------------------------------------------------------
+!
+      subroutine const_udt_local_nodes(numnod, xx, ucd)
+!
+      integer(kind=kint), intent(in)  :: numnod
+      real(kind=kreal), intent(in)  :: xx(numnod,3)
+!
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      call allocate_ucd_node(ucd)
+      call set_udt_local_nodes(numnod, xx, ucd)
+!
+      end subroutine const_udt_local_nodes
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine const_udt_local_connect(internal_node,                 &
+     &          nele, nnod_ele, ie, ucd)
+!
+      integer(kind=kint), intent(in)  :: internal_node
+      integer(kind=kint), intent(in)  :: nele, nnod_ele
+      integer(kind=kint), intent(in)  :: ie(nele, nnod_ele)
+!
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      call count_udt_elements(internal_node, nele, nnod_ele,            &
+     &    ie, ucd)
+      call allocate_ucd_ele(ucd)
+!
+      call set_udt_local_connect(internal_node, nele, nnod_ele,        &
+     &    ie, ucd)
+!
+      end subroutine const_udt_local_connect
+!
+!-----------------------------------------------------------------------
+!
+      subroutine const_udt_global_connect(internal_node,                &
+     &          nele, nnod_ele, iele_global, ie, ucd)
+!
+      integer(kind=kint), intent(in)  :: internal_node
+      integer(kind=kint), intent(in)  :: nele, nnod_ele
+      integer(kind=kint), intent(in)  :: iele_global(nele)
+      integer(kind=kint), intent(in)  :: ie(nele, nnod_ele)
+!
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      call count_udt_elements(internal_node, nele, nnod_ele,            &
+     &    ie, ucd)
+      call allocate_ucd_ele(ucd)
+!
+      call set_udt_global_connect(internal_node, nele, nnod_ele,        &
+     &    iele_global, ie, ucd)
+!
+      end subroutine const_udt_global_connect
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine set_udt_local_nodes(numnod, xx, ucd)
@@ -134,9 +196,6 @@
 !
       integer(kind = kint) :: iele, k1, inod, icou
 !
-!
-      call count_udt_elements(internal_node, nele, nnod_ele, ie, ucd)
-      call allocate_ucd_ele(ucd)
 !
       icou = 0
       do iele = 1, nele
@@ -302,8 +361,6 @@
 ! -----------------------------------------------------------------------
 !
       subroutine find_field_id_in_ucd(ucd, field_name, i_field, ncomp)
-!
-      use calypso_mpi
 !
       character(len = kchara), intent(in) :: field_name
       integer(kind = kint), intent(inout) :: i_field, ncomp

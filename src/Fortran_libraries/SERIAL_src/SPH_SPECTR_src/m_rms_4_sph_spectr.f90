@@ -23,9 +23,7 @@
       integer (kind=kint), allocatable :: istack_rms_comp_rj(:)
       character (len=kchara), allocatable :: rms_name_rj(:)
 !
-      real(kind = kreal), allocatable :: rms_sph_dat(:,:,:)
-      real(kind = kreal), allocatable :: rms_sph_vol_dat(:,:)
-!
+      integer (kind=kint) :: nri_rms
       real(kind = kreal), allocatable :: rms_sph_l(:,:,:)
       real(kind = kreal), allocatable :: rms_sph_m(:,:,:)
       real(kind = kreal), allocatable :: rms_sph_lm(:,:,:)
@@ -37,8 +35,6 @@
       real(kind = kreal), allocatable :: rms_sph_vol(:)
 !
 !
-      real(kind = kreal), allocatable :: ave_sph_lc(:,:)
-      real(kind = kreal), allocatable :: ave_sph(:,:)
       real(kind = kreal), allocatable :: ave_sph_vol(:)
 !
 !    output flag
@@ -80,21 +76,12 @@
 !
       use m_spheric_parameter
 !
-      integer(kind = kint) :: nri, jmax
 !
-!
-      nri =  nidx_rj(1)
-      jmax = nidx_rj(2)
-      allocate( rms_sph_dat(jmax,nri,ntot_rms_rj) )
-      allocate( rms_sph_vol_dat(jmax,ntot_rms_rj) )
-!
-      allocate( rms_sph_l(0:l_truncation,nri,ntot_rms_rj) )
-      allocate( rms_sph_m(0:l_truncation,nri,ntot_rms_rj) )
-      allocate( rms_sph_lm(0:l_truncation,nri,ntot_rms_rj) )
-      allocate( rms_sph(nri,ntot_rms_rj) )
-!
-      allocate( ave_sph(nri,ntot_rms_rj) )
-      allocate( ave_sph_lc(nri,ntot_rms_rj) )
+      nri_rms =  nidx_rj(1) 
+      allocate( rms_sph_l(0:nri_rms,0:l_truncation,ntot_rms_rj) )
+      allocate( rms_sph_m(0:nri_rms,0:l_truncation,ntot_rms_rj) )
+      allocate( rms_sph_lm(0:nri_rms,0:l_truncation,ntot_rms_rj) )
+      allocate( rms_sph(0:nri_rms,ntot_rms_rj) )
 !
       allocate( rms_sph_vol_l(0:l_truncation,ntot_rms_rj) )
       allocate( rms_sph_vol_m(0:l_truncation,ntot_rms_rj) )
@@ -102,7 +89,6 @@
 !
       allocate( rms_sph_vol(ntot_rms_rj) )
       allocate( ave_sph_vol(ntot_rms_rj) )
-!
 !
       call clear_rms_sph_spectr
 !
@@ -113,16 +99,12 @@
       subroutine deallocate_rms_4_sph_spectr
 !
 !
-      deallocate( rms_sph_dat )
-      deallocate( rms_sph_vol_dat )
-!
       deallocate( rms_sph_l, rms_sph_m, rms_sph_lm)
       deallocate( rms_sph )
 !
       deallocate( rms_sph_vol_l, rms_sph_vol_m, rms_sph_vol_lm )
       deallocate( rms_sph_vol )
 !
-      deallocate( ave_sph, ave_sph_lc )
       deallocate( ave_sph_vol )
 !
       deallocate(num_rms_comp_rj, istack_rms_comp_rj)
@@ -135,9 +117,6 @@
 !
       subroutine clear_rms_sph_spectr
 !
-      rms_sph_dat =  0.0d0
-      rms_sph_vol_dat =  0.0d0
-!
       rms_sph_l =  0.0d0
       rms_sph_m =  0.0d0
       rms_sph_lm = 0.0d0
@@ -147,10 +126,6 @@
       rms_sph_vol_m = 0.0d0
       rms_sph_vol_lm = 0.0d0
       rms_sph_vol =    0.0d0
-!
-      ave_sph_lc =    0.0d0
-      ave_sph =       0.0d0
-      ave_sph_vol =   0.0d0
 !
       end subroutine clear_rms_sph_spectr
 !

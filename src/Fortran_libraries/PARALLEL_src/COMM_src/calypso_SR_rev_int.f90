@@ -130,10 +130,6 @@
       call set_from_recv_buf_rev_int(nnod_new,                          &
      &    istack_recv(npe_recv), irev_import, iWR, iX_new)
 !
-      if(ncomm_send .gt. 0) then
-        call MPI_WAITALL (ncomm_send, req1, sta1, ierr_MPI)
-      end if
-!
       end subroutine calypso_send_recv_rev_int
 !
 ! ----------------------------------------------------------------------

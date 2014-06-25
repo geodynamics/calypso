@@ -42,16 +42,16 @@
 !
 !
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_rj_2_rtp, iphys%i_velo,             &
+     &    num_tot_nod_phys, ncomp_rj_2_rtp, iphys%i_velo,               &
      &    b_trns%i_velo, d_nod)
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_rj_2_rtp, iphys%i_vort,             &
+     &    num_tot_nod_phys, ncomp_rj_2_rtp, iphys%i_vort,               &
      &    b_trns%i_vort, d_nod)
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_rj_2_rtp, iphys%i_magne,            &
+     &    num_tot_nod_phys, ncomp_rj_2_rtp, iphys%i_magne,              &
      &    b_trns%i_magne, d_nod)
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_rj_2_rtp, iphys%i_current,          &
+     &    num_tot_nod_phys, ncomp_rj_2_rtp, iphys%i_current,            &
      &    b_trns%i_current, d_nod)
 !
       end subroutine copy_mhd_vec_from_pole_trans
@@ -73,10 +73,10 @@
 !
 !
       call copy_pole_scl_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nscalar_rj_2_rtp, iphys%i_temp,             &
+     &    num_tot_nod_phys, ncomp_rj_2_rtp, iphys%i_temp,               &
      &    b_trns%i_temp, d_nod)
       call copy_pole_scl_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nscalar_rj_2_rtp, iphys%i_light,            &
+     &    num_tot_nod_phys, ncomp_rj_2_rtp, iphys%i_light,              &
      &    b_trns%i_light, d_nod)
 !
       end subroutine copy_mhd_scl_from_pole_trans
@@ -99,40 +99,40 @@
 !
 !
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp, iphys%i_velo,        &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_velo,          &
      &    bsnap_trns%i_velo, d_nod)
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp, iphys%i_vort,        &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_vort,          &
      &    bsnap_trns%i_vort, d_nod)
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp, iphys%i_magne,       &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_magne,         &
      &    bsnap_trns%i_magne, d_nod)
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp, iphys%i_current,     &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_current,       &
      &    bsnap_trns%i_current, d_nod)
 !
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp, iphys%i_v_diffuse,   &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_v_diffuse,     &
      &    bsnap_trns%i_v_diffuse, d_nod)
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp, iphys%i_w_diffuse,   &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_w_diffuse,     &
      &    bsnap_trns%i_w_diffuse, d_nod)
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp, iphys%i_vp_diffuse,  &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_vp_diffuse,    &
      &    bsnap_trns%i_vp_diffuse, d_nod)
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp, iphys%i_b_diffuse,   &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_b_diffuse,     &
      &    bsnap_trns%i_b_diffuse, d_nod)
 !
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp, iphys%i_induction,   &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_induction,     &
      &    bsnap_trns%i_induction, d_nod)
 !
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp, iphys%i_grad_t,      &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_grad_t,        &
      &    bsnap_trns%i_grad_t, d_nod)
       call copy_pole_vec_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nvector_snap_rj_2_rtp,                      &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp,                        &
      &    iphys%i_grad_composit, bsnap_trns%i_grad_composit, d_nod)
 !
       end subroutine copy_snap_vec_from_pole_trans
@@ -154,23 +154,23 @@
 !
 !
       call copy_pole_scl_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nscalar_snap_rj_2_rtp, iphys%i_temp,        &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_temp,          &
      &    bsnap_trns%i_temp, d_nod)
       call copy_pole_scl_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nscalar_snap_rj_2_rtp, iphys%i_light,       &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_light,         &
      &    bsnap_trns%i_light, d_nod)
 !
       call copy_pole_scl_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nscalar_snap_rj_2_rtp, iphys%i_press,       &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_press,         &
      &    bsnap_trns%i_press, d_nod)
       call copy_pole_scl_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nscalar_snap_rj_2_rtp, iphys%i_par_temp,    &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_par_temp,      &
      &    bsnap_trns%i_par_temp, d_nod)
       call copy_pole_scl_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nscalar_snap_rj_2_rtp, iphys%i_t_diffuse,   &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_t_diffuse,     &
      &    bsnap_trns%i_t_diffuse, d_nod)
       call copy_pole_scl_fld_from_trans(numnod, internal_node, xx,      &
-     &    num_tot_nod_phys, nscalar_snap_rj_2_rtp, iphys%i_c_diffuse,   &
+     &    num_tot_nod_phys, ncomp_snap_rj_2_rtp, iphys%i_c_diffuse,     &
      &    bsnap_trns%i_c_diffuse, d_nod)
 !
       end subroutine copy_snap_scl_from_pole_trans

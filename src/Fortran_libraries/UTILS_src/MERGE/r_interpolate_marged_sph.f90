@@ -144,7 +144,7 @@
         end if
       end do
 !
-      kr_inner_domain = 0
+      kr_inner_domain = 1
       do k = nidx_rj(1), 1, -1
         if(radius_1d_rj_r(k) .lt. r_org(1)) then
           kr_inner_domain = k + 1

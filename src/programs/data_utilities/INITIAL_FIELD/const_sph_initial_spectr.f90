@@ -18,6 +18,9 @@
 !!         If requested mode does not exist in the process, 0 is set
 !!       inod = local_sph_data_address(k, j_lc)
 !!         Return address of sphectrum data
+!!       inod = inod_rj_center
+!!         If spectrum data have center, inod_rj_center 
+!!         returns this address.
 !!
 !!       nidx_rj(1) :: Number of radial grids
 !!       rr = radius_1d_rj_r(k)
@@ -94,9 +97,9 @@
         call set_initial_heat_source_sph
       end if
 !  Set light element source if light element is exist
-!      if(ipol%i_light_source .gt. izero) then
-!        call set_initial_light_source_sph
-!      end if
+      if(ipol%i_light_source .gt. izero) then
+        call set_initial_light_source_sph
+      end if
 !
 !  Copy initial field to restart IO data
       call set_sph_restart_num_to_IO
@@ -333,8 +336,9 @@
           ii = local_sph_data_address(k,jj)
           rr = radius_1d_rj_r(k)
 !   Substitute initial heat source
-          d_rj(ii,ipol%i_heat_source) = 0.893 * r_CMB**2                &
-     &                                 / (r_ICB**3 / three)
+          d_rj(ii,ipol%i_heat_source)                                   &
+     &         = 0.35 * four*r_CMB**2 / (four * r_ICB**3 / three)
+!     &         = 1.0
         end do
       end if
 !
@@ -344,6 +348,7 @@
 !
       subroutine set_initial_light_source_sph
 !
+      use calypso_mpi
       use m_sph_spectr_data
 !
 !      real (kind = kreal) :: rr
@@ -364,7 +369,7 @@
         do k = nlayer_ICB, nlayer_CMB
           ii = local_sph_data_address(k,jj)
 !          rr = radius_1d_rj_r(k)
-!   Substitute initial heat source
+!    Substitute initial heat source
           d_rj(ii,ipol%i_light_source) = one
         end do
       end if

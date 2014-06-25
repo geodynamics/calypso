@@ -39,7 +39,7 @@
 !!@n @param p(m,l)    Schmidt Polynomial  \f$ P_{l}^{m} \f$
 !!@n @param dp(m,l)   diffrence of Schmidt Polynomial
 !!                     \f$ d P_{l}^{m} / d\theta \f$
-!!@n @param df(m,l)   work area
+!!@n @param df(m)     work area
 !!
       module schmidt
 !
@@ -61,7 +61,7 @@
       real(kind = kreal), intent(in) :: theta
 !
       real(kind = kreal), intent(inout) :: p(0:nth,0:nth)
-      real(kind = kreal), intent(inout) :: df(0:nth+2,0:nth+2)
+      real(kind = kreal), intent(inout) :: df(0:nth+2)
 !
       integer(kind = kint) :: l, m, k, m1
 !
@@ -81,24 +81,24 @@
 !*
       do m = 1, nth
 !*
-        df(m,1) = one
+        df(m) = one
         do k = 1, m
-          df(m,1) =  df(m,1) * dble(2*k-1) / dble(2*k)
+          df(m) =  df(m) * dble(2*k-1) / dble(2*k)
         end do
-        df(m+1,1) = sqrt( two * df(m,1) * dble(2*m+1) ) * cos(theta)
-        df(m,1) =   sqrt( two * df(m,1) )
+        df(m+1) = sqrt( two * df(m) * dble(2*m+1) ) * cos(theta)
+        df(m  ) =   sqrt( two * df(m) )
 !*
 !*
         if ( m .lt. nth-1 ) then
           do l = m+2, nth
-            df(l,1) = ( cos(theta) * dble(2*l-1) * df(l-1,1)            &
-     &               - sqrt( dble( (l-1)*(l-1) - m*m )) * df(l-2,1) )   &
+            df(l) = ( cos(theta) * dble(2*l-1) * df(l-1)                &
+     &               - sqrt( dble( (l-1)*(l-1) - m*m )) * df(l-2) )     &
      &               / sqrt( dble( l*l - m*m ))
           end do
         end if
 !*
         do l = m, nth
-          p(m,l) =  df(l,1)
+          p(m,l) =  df(l)
           do m1 = 1, m
             p(m,l) =  p(m,l) * sin(theta)
           end do

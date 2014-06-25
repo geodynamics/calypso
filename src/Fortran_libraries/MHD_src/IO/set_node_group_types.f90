@@ -13,6 +13,8 @@
 !!      subroutine set_bc_group_types_sgs_vect(bc_type_ctl, ibc_type)
 !!      subroutine set_bc_group_types_rotation(bc_type_ctl, ibc_type)
 !!      subroutine set_bc_group_types_sph_center(bc_type_ctl, ibc_type)
+!!      subroutine set_bc_group_types_sph_velo(bc_type_ctl, ibc_type)
+!!      subroutine set_bc_group_types_sph_magne(bc_type_ctl, ibc_type)
 !!      subroutine set_bc_group_types_fluxes(bc_type_ctl, ibc_type)
 !!@endverbatim
 !
@@ -74,6 +76,23 @@
 !>      control name for fixed rotation around z-axis boundary
       character(len = kchara), parameter :: fix_rot_z = 'rot_z'
 !
+!>      control name for free slip boundary for spherical shell
+      character(len = kchara), parameter                                &
+     &                :: free_slip_sph = 'free_slip_sph'
+!>      control name for non-slip boundary for spherical shell
+      character(len = kchara), parameter                                &
+     &                :: non_slip_sph = 'non_slip_sph'
+!>      control name for rotetable inner core for spherical shell
+      character(len = kchara), parameter                                &
+     &                :: rot_inner_core = 'rot_inner_core'
+!
+!>      control name for insulated for spherical shell
+      character(len = kchara), parameter                                &
+     &                :: insulator_sph =     'insulator'
+!>      control name for psuedo vacuum for spherical shell
+      character(len = kchara), parameter                                &
+     &                :: pseudo_vacuum_sph = 'pseudo_vacuum'
+!
 !>      control name to filling to center
       character(len = kchara), parameter                                &
      &               :: fill_sph_center = 'sph_to_center'
@@ -97,6 +116,7 @@
       private :: fix_SGS_y, fix_rot_y
       private :: fix_SGS_z, fix_rot_z
       private :: fill_sph_center, fix_sph_center
+      private :: free_slip_sph, non_slip_sph, rot_inner_core
 !
 !-----------------------------------------------------------------------
 !
@@ -215,6 +235,41 @@
       end if
 !
       end subroutine set_bc_group_types_sph_center
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine set_bc_group_types_sph_velo(bc_type_ctl, ibc_type)
+!
+      character (len=kchara), intent(in) :: bc_type_ctl
+      integer(kind = kint), intent(inout) :: ibc_type
+!
+!
+      if      (cmp_no_case(bc_type_ctl, free_slip_sph) .gt. 0) then
+        ibc_type = iflag_free_sph
+      else if (cmp_no_case(bc_type_ctl, non_slip_sph) .gt. 0) then
+        ibc_type = iflag_non_slip_sph
+      else if (cmp_no_case(bc_type_ctl, rot_inner_core) .gt. 0) then
+        ibc_type = iflag_rotatable_icore
+      end if
+!
+      end subroutine set_bc_group_types_sph_velo
+!
+!-----------------------------------------------------------------------
+!
+      subroutine set_bc_group_types_sph_magne(bc_type_ctl, ibc_type)
+!
+      character (len=kchara), intent(in) :: bc_type_ctl
+      integer(kind = kint), intent(inout) :: ibc_type
+!
+!
+      if      (cmp_no_case(bc_type_ctl, insulator_sph) .gt. 0) then
+        ibc_type = iflag_insulator
+      else if (cmp_no_case(bc_type_ctl, pseudo_vacuum_sph) .gt. 0) then
+        ibc_type = iflag_pseudo_vacuum
+      end if
+!
+      end subroutine set_bc_group_types_sph_magne
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

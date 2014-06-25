@@ -31,16 +31,18 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, nd
+      integer(kind = kint) :: i, j, j0, i_field, itrans
 !
 !
       do j = 1, num_scalar_rtp
         j0 = j + istart_scalar_rtp - 1
+        itrans = j+3*num_vector_rtp
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            nd = istack_phys_comp_rj(i-1) + 1
+            i_field = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_scalar_spec_to_trans(num_scalar_rtp, nd, j)
+            call copy_scalar_spec_to_trans(ncomp_sph_trans,             &
+     &          i_field, itrans)
 !$omp end parallel
             exit
           end if
@@ -55,16 +57,18 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, nd
+      integer(kind = kint) :: i, j, j0, i_field, itrans
 !
 !
       do j = 1, num_scalar_rtp
         j0 = j + istart_scalar_rtp - 1
+        itrans = j+3*num_vector_rtp
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            nd = istack_phys_comp_rj(i-1) + 1
+            i_field = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_scalar_spec_from_trans(num_scalar_rtp, nd, j)
+            call copy_scalar_spec_from_trans(ncomp_sph_trans,           &
+     &          i_field, itrans)
 !$omp end parallel
             exit
           end if
@@ -80,16 +84,18 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, nd
+      integer(kind = kint) :: i, j, j0, i_field, itrans
 !
 !
       do j = 1, num_vector_rtp
         j0 = j + istart_vector_rtp - 1
+        itrans = 3*j - 2
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            nd = istack_phys_comp_rj(i-1) + 1
+            i_field = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_vec_spec_to_trans(3*num_vector_rtp, nd, 3*j-2)
+            call copy_vec_spec_to_trans(ncomp_sph_trans,                &
+     &          i_field, itrans)
 !$omp end parallel
             exit
           end if
@@ -104,16 +110,18 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, nd
+      integer(kind = kint) :: i, j, j0, i_field, itrans
 !
 !
       do j = 1, num_vector_rtp
         j0 = j + istart_vector_rtp - 1
+        itrans = 3*j - 2
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            nd = istack_phys_comp_rj(i-1) + 1
+            i_field = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_vec_spec_from_trans(3*num_vector_rtp, nd, 3*j-2)
+            call copy_vec_spec_from_trans(ncomp_sph_trans,              &
+     &          i_field, itrans)
 !$omp end parallel
             exit
           end if
@@ -129,16 +137,18 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, nd
+      integer(kind = kint) :: i, j, j0, i_field, itrans
 !
 !
       do j = 1, num_tensor_rtp
         j0 = j + istart_tensor_rtp - 1
+        itrans = 1 + 6*(j-1) + num_scalar_rtp + 3*num_vector_rtp
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            nd = istack_phys_comp_rj(i-1) + 1
+            i_field = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_tsr_spec_to_trans(6*num_tensor_rtp, nd, 6*j-5)
+            call copy_tsr_spec_to_trans(ncomp_sph_trans,                &
+     &          i_field, itrans)
 !$omp end parallel
             exit
           end if
@@ -153,16 +163,18 @@
 !
       use copy_spectr_4_sph_trans
 !
-      integer(kind = kint) :: i, j, j0, nd
+      integer(kind = kint) :: i, j, j0, i_field, itrans
 !
 !
       do j = 1, num_tensor_rtp
         j0 = j + istart_tensor_rtp - 1
+        itrans = 1 + 6*(j-1) + num_scalar_rtp + 3*num_vector_rtp
         do i = 1, num_phys_rj
           if ( phys_name_rtp(j0) .eq. phys_name_rj(i) ) then
-            nd = istack_phys_comp_rj(i-1) + 1
+            i_field = istack_phys_comp_rj(i-1) + 1
 !$omp parallel
-            call copy_tsr_spec_from_trans(6*num_tensor_rtp, nd, 6*j-5)
+            call copy_tsr_spec_from_trans(ncomp_sph_trans,              &
+     &          i_field, itrans)
 !$omp end parallel
             exit
           end if

@@ -35,7 +35,7 @@
 !!@n @param dplm(m,l) adjoint Legendre Polynomial P_l^m (x)
 !!@n @param p(m,l)    Schmidt Polynomial
 !!@n @param dp(m,l)   diffrence of Schmidt Polynomial  dp/dtheta
-!!@n @param df(m,l)   work area
+!!@n @param df(m)     work area
 !!@n @param dc(m,l)   work area
 !
       module legendre
@@ -57,7 +57,7 @@
       real(kind = kreal), intent(in) :: x
 !
       real(kind = kreal), intent(inout) :: dplm(0:nth+2,0:nth+2)
-      real(kind = kreal), intent(inout) :: df(0:nth+2,0:nth+2)
+      real(kind = kreal), intent(inout) :: df(0:nth+2)
 !
       integer(kind = kint) :: l, m, mm, n
 !
@@ -77,25 +77,25 @@
 !*
       do 20 m = 1 ,nth+1
 !*
-        df(m,m) = 1.0
-        df(m,m+1) = x
+        df(m) = 1.0
+        df(m+1) = x
         do 30 n = 1 ,2*m-1 ,2
-          df(m,m) = df(m,m)*dble(n)
-          df(m,m+1) = df(m,m+1)*dble(n)
+          df(m) = df(m)*dble(n)
+          df(m+1) = df(m+1)*dble(n)
   30    continue
-        df(m,m+1) = df(m,m+1)*dble(2*m+1)
+        df(m+1) = df(m+1)*dble(2*m+1)
 !*
 !*
         if ( m .lt. nth-1 ) then
           do 40 mm = m+2 ,nth
-            df(m,mm) = x * df(m,mm-1) * dble(2*mm-1)/dble(mm-m)         &
-     &                - df(m,mm-2) * dble(mm+m-1)/dble(mm-m)
+            df(mm) = x * df(mm-1) * dble(2*mm-1)/dble(mm-m)         &
+     &                - df(mm-2) * dble(mm+m-1)/dble(mm-m)
   40      continue
         endif
 !*
         do 50 l = m ,nth
-!            write(*,*) 'l,m,df', l,m,df(m,l)
-          dplm(m,l) = ( abs(1-x**2) )**(dble(m)/2) * df(m,l)
+!            write(*,*) 'l,m,df', l,m,df(l)
+          dplm(m,l) = ( abs(1-x**2) )**(dble(m)/2) * df(l)
   50    continue
 !*
   20  continue

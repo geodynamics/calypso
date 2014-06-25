@@ -145,15 +145,11 @@
       end if
 !
 !
-      s2time = MPI_WTIME()
+!      s2time = MPI_WTIME()
       call set_from_recv_buf_N(NB, nnod_new, npe_recv,                  &
      &    istack_recv(npe_recv), istack_recv, inod_import, WR, X_new)
-      elaps3(2) = elaps3(2) + MPI_WTIME() - s2time
-!
-      if(ncomm_send .gt. 0) then
-        call MPI_WAITALL (ncomm_send, req1, sta1, ierr_MPI)
-      end if
-      elaps3(3) = elaps3(3) + MPI_WTIME() - s1time
+!      elaps3(2) = elaps3(2) + MPI_WTIME() - s2time
+!      elaps3(3) = elaps3(3) + MPI_WTIME() - s1time
 !
       end subroutine calypso_send_recv_N
 !
@@ -255,16 +251,12 @@
       end if
 !
 !
-      s2time = MPI_WTIME()
+!      s2time = MPI_WTIME()
       call set_from_recv_buf_3xN(NB, nnod_new,                          &
      &    npe_recv, istack_recv(npe_recv), istack_recv, inod_import,    &
      &    WR, X1_new, X2_new, X3_new)
-      elaps3(2) = elaps3(2) + MPI_WTIME() - s2time
-!
-      if(ncomm_send .gt. 0) then
-        call MPI_WAITALL (ncomm_send, req1, sta1, ierr_MPI)
-      end if
-      elaps3(3) = elaps3(3) + MPI_WTIME() - s1time
+!      elaps3(2) = elaps3(2) + MPI_WTIME() - s2time
+!      elaps3(3) = elaps3(3) + MPI_WTIME() - s1time
 !
       end subroutine calypso_send_recv_3xN
 !

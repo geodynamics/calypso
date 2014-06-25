@@ -73,9 +73,10 @@
      &       'step= ', istep,   ' averaging finished. Count=   ', icou
         if (time_sph .ge. end_time) exit
       end do
+!
    99 continue
-      call close_ene_spec_data
       write(*,*)
+      call close_ene_spec_data
 !
       call divide_average_ene_sph
       call output_tave_ene_sph_data

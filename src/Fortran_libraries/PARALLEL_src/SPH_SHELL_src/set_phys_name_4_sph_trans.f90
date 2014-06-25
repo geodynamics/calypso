@@ -79,11 +79,7 @@
 !
       ntot_phys_rtp = istack_phys_comp_rtp(i0)
 !
-      nb_sph_trans = itwo * num_tensor_rtp
-      nb_sph_trans = max(num_scalar_rtp,nb_sph_trans)
-      nb_sph_trans = max(num_vector_rtp,nb_sph_trans)
-!
-      if (iflag_debug .eq. 1) then
+      if (iflag_debug .gt. 0) then
 !        write(*,*) 'num_phys_rj', num_phys_rj
 !        write(*,*) 'id, components, stack, phys_name_rj'
 !        do i = 1, num_phys_rj

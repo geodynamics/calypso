@@ -33,12 +33,12 @@
 !   set physical values
 !
       ierr = 0
-      if(i_num_nod_phys .eq. 0) then
+      if(field_ctl%icou .eq. 0) then
         e_message = 'Set field for simulation'
         ierr = 90
         return
       else
-        num_phys_rj = num_nod_phys_ctl
+        num_phys_rj = field_ctl%num
       end if
 !
 !    set spectr data

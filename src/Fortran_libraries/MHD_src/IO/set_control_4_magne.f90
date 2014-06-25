@@ -37,7 +37,6 @@
       use set_node_group_types
       use set_surface_group_types
 !
-      character(len=kchara) :: tmpchara
       integer (kind = kint) :: i
 !
 !
@@ -46,8 +45,8 @@
         magne_nod%num_bc =  0
         magne_surf%num_bc = 0
       else
-        magne_nod%num_bc =  num_bc_b_ctl
-        magne_surf%num_bc = num_bc_grad_b_ctl
+        magne_nod%num_bc =  node_bc_B_ctl%num
+        magne_surf%num_bc = surf_bc_BN_ctl%num
       end if
 !
 !   set boundary_conditons for magnetic field
@@ -58,25 +57,23 @@
 !
         call allocate_nod_bc_list_magne
 !
-        magne_nod%bc_name =      bc_b_name_ctl
-        magne_nod%bc_magnitude = bc_b_magnitude_ctl
+        magne_nod%bc_name(1:magne_nod%num_bc)                           &
+     &      = node_bc_B_ctl%c2_tbl(1:magne_nod%num_bc)
+        magne_nod%bc_magnitude(1:magne_nod%num_bc)                      &
+     &      = node_bc_B_ctl%vect(1:magne_nod%num_bc)
 !
         do i = 1, magne_nod%num_bc
-         call set_bc_group_types_vector(bc_b_type_ctl(i),               &
+          call set_bc_group_types_vector(node_bc_B_ctl%c1_tbl(i),       &
      &       magne_nod%ibc_type(i))
-         call set_bc_group_types_sgs_vect(bc_b_type_ctl(i),             &
+          call set_bc_group_types_sgs_vect(node_bc_B_ctl%c1_tbl(i),     &
      &       magne_nod%ibc_type(i))
-         call set_bc_group_types_sph_center(bc_b_type_ctl(i),           &
+          call set_bc_group_types_sph_center(node_bc_B_ctl%c1_tbl(i),   &
+     &       magne_nod%ibc_type(i))
+          call set_bc_group_types_sph_magne(node_bc_B_ctl%c1_tbl(i),    &
      &       magne_nod%ibc_type(i))
 !
-          tmpchara = bc_b_type_ctl(i)
-          if ( tmpchara .eq. 'insulator' ) then
-            magne_nod%ibc_type(i) = iflag_insulator
-          else if ( tmpchara .eq. 'pseudo_vacuum' ) then
-            magne_nod%ibc_type(i) = iflag_pseudo_vacuum
-!          else if ( tmpchara .eq. 'sph' ) then
-!            magne_nod%ibc_type(i) = 999
-          end if
+!          if(cmp_no_case(node_bc_B_ctl%c1_tbl(i),'sph')                &
+!     &        .gt. 0) magne_nod%ibc_type(i) = 999
         end do
 !
         if (iflag_debug .ge. iflag_routine_msg) then
@@ -87,6 +84,7 @@
           end do
         end if
 !
+        call deallocate_bc_magne_ctl
       end if
 !
 !
@@ -96,20 +94,18 @@
 !
         call allocate_magne_surf_ctl
 !
-        magne_surf%bc_name =       bc_grad_b_name_ctl
-        magne_surf%bc_magnitude =  bc_grad_b_magnitude_ctl
+        magne_surf%bc_name(1:magne_surf%num_bc)                         &
+     &        = surf_bc_BN_ctl%c2_tbl(1:magne_surf%num_bc)
+        magne_surf%bc_magnitude(1:magne_surf%num_bc)                    &
+     &        = surf_bc_BN_ctl%vect(1:magne_surf%num_bc)
 !
         do i = 1, magne_surf%num_bc
-          call set_surf_group_types_vector(bc_grad_b_type_ctl(i),       &
+          call set_surf_group_types_vector(surf_bc_BN_ctl%c1_tbl(i),    &
      &        magne_surf%ibc_type(i))
-          call set_bc_group_types_sph_center(bc_grad_b_type_ctl(i),     &
+          call set_bc_group_types_sph_center(surf_bc_BN_ctl%c1_tbl(i),  &
      &        magne_surf%ibc_type(i))
-!
-          if (bc_grad_b_type_ctl(i) .eq. 'insulator' ) then
-            magne_surf%ibc_type(i) = iflag_insulator
-          else if (bc_grad_b_type_ctl(i) .eq. 'pseudo_vacuum' ) then
-            magne_surf%ibc_type(i) = iflag_pseudo_vacuum
-          end if
+          call set_bc_group_types_sph_magne(surf_bc_BN_ctl%c1_tbl(i),   &
+     &        magne_surf%ibc_type(i))
         end do
 !
         if (iflag_debug .ge. iflag_routine_msg) then
@@ -119,6 +115,8 @@
      &         magne_surf%bc_magnitude(i), trim(magne_surf%bc_name(i))
           end do
         end if
+!
+        call deallocate_bc_magne_sf_ctl
       end if
 !
 !
