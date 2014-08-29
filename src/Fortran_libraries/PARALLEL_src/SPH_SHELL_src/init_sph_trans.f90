@@ -115,10 +115,12 @@
       mdx_p_rlm_rtm(1:nidx_rlm(2)) = 0
       mdx_n_rlm_rtm(1:nidx_rlm(2)) = 0
       lstack_rlm(0) = 0
+      maxdegree_rlm = 0
       do m = 1, nidx_rtm(3)
         mm = idx_gl_1d_rtm_m(m,2)
         mdx_rlm_rtm(mm) = m
         lstack_rlm(m) = lstack_rlm(m-1) + (l_truncation - abs(mm) + 1)
+        maxdegree_rlm = max(maxdegree_rlm,(l_truncation - abs(mm) + 1))
       end do
 !
       do m = 1, nidx_rtm(3)

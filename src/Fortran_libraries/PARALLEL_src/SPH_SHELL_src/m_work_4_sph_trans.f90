@@ -84,6 +84,8 @@
 !
 !>      End address of spherical harmonics order for SMP parallelization
       integer(kind = kint), allocatable :: lstack_rlm(:)
+!>      MAximum number of spherical harmonics order for SMP parallelization
+      integer(kind = kint), allocatable :: maxdegree_rlm
 !
 !>      Data size for Legendre transform to check work area
       integer(kind = kint), private :: iflag_sph_trans = -1
@@ -129,6 +131,7 @@
       allocate(sin_theta_1d_rtp(nidx_rtp(2)))
       allocate(cot_theta_1d_rtp(nidx_rtp(2)))
 !
+      maxdegree_rlm = 0
       lstack_rlm = 0
       mdx_p_rlm_rtm = 0
       mdx_n_rlm_rtm = 0
@@ -161,6 +164,7 @@
       deallocate(sp_rj, vr_rtp)
       deallocate(sp_rlm, vr_rtm)
 !
+      maxdegree_rlm =   0
       iflag_sph_trans = 0
 !
       end subroutine deallocate_work_4_sph_trans
