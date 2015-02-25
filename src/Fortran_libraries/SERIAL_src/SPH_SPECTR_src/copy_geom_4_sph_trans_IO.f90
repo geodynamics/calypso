@@ -3,10 +3,10 @@
 !
 !     Written by H. Matsui on July, 2007
 !
-!      subroutine copy_geom_rtp_sph_trans(my_rank)
-!      subroutine copy_spectr_modes_rj_sph_trans(my_rank)
-!      subroutine copy_geom_rtm_sph_trans(my_rank)
-!      subroutine copy_modes_rlm_sph_trans(my_rank)
+!      subroutine copy_geom_rtp_sph_trans
+!      subroutine copy_spectr_modes_rj_sph_trans
+!      subroutine copy_geom_rtm_sph_trans
+!      subroutine copy_modes_rlm_sph_trans
 !
 !      subroutine copy_geom_rtp_IO(my_rank)
 !      subroutine copy_spectr_modes_rj_IO(my_rank)
@@ -28,16 +28,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_geom_rtp_sph_trans(my_rank)
+      subroutine copy_geom_rtp_sph_trans
 !
       use m_spheric_parameter
       use copy_sph_groups_from_IO
 !
-      integer(kind = kint), intent(in) :: my_rank
-!
 !
       call copy_sph_node_rtp_from_IO
-      call copy_comm_rtp_from_IO(my_rank, nnod_rtp)
+      call copy_comm_rtp_from_IO(nnod_rtp)
 !
       call copy_rtp_nod_grp_from_IO
       call copy_rtp_radial_grp_from_IO
@@ -48,16 +46,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_spectr_modes_rj_sph_trans(my_rank)
+      subroutine copy_spectr_modes_rj_sph_trans
 !
       use m_spheric_parameter
       use copy_sph_groups_from_IO
 !
-      integer(kind = kint), intent(in) :: my_rank
-!
 !
       call copy_sph_node_rj_from_IO
-      call copy_comm_rj_from_IO(my_rank, nnod_rj)
+      call copy_comm_rj_from_IO(nnod_rj)
 !
       call copy_rj_radial_grp_from_IO
       call copy_rj_sphere_grp_from_IO
@@ -66,29 +62,25 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_geom_rtm_sph_trans(my_rank)
+      subroutine copy_geom_rtm_sph_trans
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: my_rank
-!
 !
       call copy_sph_node_rtm_from_IO
-      call copy_comm_rtm_from_IO(my_rank, nnod_rtm)
+      call copy_comm_rtm_from_IO(nnod_rtm)
 !
       end subroutine copy_geom_rtm_sph_trans
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_modes_rlm_sph_trans(my_rank)
+      subroutine copy_modes_rlm_sph_trans
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: my_rank
-!
 !
       call copy_sph_node_rlm_from_IO
-      call copy_comm_rlm_from_IO(my_rank, nnod_rlm)
+      call copy_comm_rlm_from_IO(nnod_rlm)
 !
       end subroutine copy_modes_rlm_sph_trans
 !

@@ -230,7 +230,7 @@
 !
       write(50+my_rank,*) 'inod, nodal field: ', i_field, numdir
       do inod = 1, nnod
-        write(50+my_rank,'(i10,1p10e25.14)')                            &
+        write(50+my_rank,'(i16,1p10e25.14)')                            &
      &         inod, (fld%d_fld(inod,i_field+nd-1),nd=1, numdir)
       end do
 !

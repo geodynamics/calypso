@@ -46,18 +46,18 @@
       call link_local_mesh_4_ucd_out
       call link_fem_field_data_2_ucd_out
 !
-      if (fem_ucd%ifmt_file/100 .eq. iflag_single/100) then
+      if (fem_ucd%ifmt_file/icent .eq. iflag_single/icent) then
         call init_merged_ucd(fem_ucd, merged_ucd)
       end if
 !
       call sel_write_parallel_ucd_mesh(fem_ucd, merged_ucd)
 !
-      if(   mod(fem_ucd%ifmt_file,100)/10 .eq. iflag_udt/10             &
-     & .or. mod(fem_ucd%ifmt_file,100)/10 .eq. iflag_vtd/10) then
+      if(   mod(fem_ucd%ifmt_file,icent)/iten .eq. iflag_udt/iten       &
+     & .or. mod(fem_ucd%ifmt_file,icent)/iten .eq. iflag_vtd/iten) then
         call deallocate_ucd_ele(fem_ucd)
       end if
 !
-      if(mod(fem_ucd%ifmt_file,100)/10 .eq. iflag_vtd/10) then
+      if(mod(fem_ucd%ifmt_file,icent)/iten .eq. iflag_vtd/iten) then
         call deallocate_ucd_node(fem_ucd)
       end if
 !
@@ -79,7 +79,7 @@
       call link_local_mesh_4_ucd_out
       call link_fem_field_data_2_ucd_out
 !
-      if (fem_ucd%ifmt_file/100 .eq. iflag_single/100) then
+      if (fem_ucd%ifmt_file/icent .eq. iflag_single/icent) then
         call init_merged_ucd(fem_ucd, merged_ucd)
       end if
 !
@@ -91,7 +91,7 @@
       call deallocate_ucd_ele(fem_ucd)
       call disconnect_ucd_data(fem_ucd)
 !
-      if (fem_ucd%ifmt_file/100 .eq. iflag_single/100) then
+      if (fem_ucd%ifmt_file/icent .eq. iflag_single/icent) then
         call finalize_merged_ucd(fem_ucd, merged_ucd)
       end if
 !
@@ -104,7 +104,7 @@
       use merged_udt_vtk_file_IO
 !
 !
-      if (fem_ucd%ifmt_file/100 .eq. iflag_single/100) then
+      if (fem_ucd%ifmt_file/icent .eq. iflag_single/icent) then
         call finalize_merged_ucd(fem_ucd, merged_ucd)
       end if
 !

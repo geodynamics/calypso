@@ -53,10 +53,12 @@
 !
       subroutine analyze
 !
+      use m_solver_SR
       use cmp_trans_sph_indices
-      use set_parallel_file_name
       use cmp_trans_sph_tests
+      use set_parallel_file_name
       use select_calypso_SR
+      use select_copy_from_recv
 !
       character(len=kchara) :: fname_tmp, file_name
       integer(kind = kint) :: itype
@@ -64,7 +66,7 @@
 !
 !
       call allocate_idx_sph_recieve
-      call allocate_real_sph_test(8)
+      call allocate_real_sph_test(ieight)
 !
       call add_int_suffix(my_rank, check_header, fname_tmp)
       call add_dat_extension(fname_tmp, file_name)

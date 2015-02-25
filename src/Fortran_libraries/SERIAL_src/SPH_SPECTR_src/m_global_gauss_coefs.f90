@@ -115,7 +115,7 @@
       write(id_gauss,'(a)') '# truncation, radius for potential'
       write(id_gauss,'(a)') '#'
 !
-      write(id_gauss,'(i10,1pe25.15e3)') ltr_w, r_gauss
+      write(id_gauss,'(i16,1pe25.15e3)') ltr_w, r_gauss
 !
 !
       write(id_gauss,'(a)') '#'

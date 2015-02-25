@@ -49,7 +49,7 @@
       coef_p = - coef_press
 !
       call copy_to_band3_mat_w_center(nidx_rj(1), zero,                 &
-      &   vs_poisson_mat(1,1,idx_rj_degree_zero), p00_poisson_mat(1,0))
+      &   p_poisson_mat(1,1,idx_rj_degree_zero), p00_poisson_mat(1,0))
 !
       if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
         call add_scalar_poisson_mat_fill_ctr(nidx_rj(1),                &

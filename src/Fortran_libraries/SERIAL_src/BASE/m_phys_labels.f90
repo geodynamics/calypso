@@ -219,7 +219,7 @@
       character(len=kchara), parameter                                  &
      &             :: fhd_vp_induct =     'vecp_induction'
 !>        Field label for magnetic stretch term
-!!         @f$ B_{i} \partial_{k} \u_{k} \right)@f$
+!!         @f$ B_{i} \partial_{k} u_{k} \right)@f$
       character(len=kchara), parameter                                  &
      &             :: fhd_mag_stretch =   'magnetic_stretch'
 !>        Field label for Lorentz force
@@ -531,11 +531,11 @@
 !
 !   work fields
 !
-!>        Field label for momentum equation's potential
+!>        Field label for potential in momentum euqaion
 !!         @f$  \varphi @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_press_work =      'pressure_work'
-!>        Field label for induction equation's potential
+!>        Field label for potential in induction euqaion
 !!         @f$  \varphi @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_m_potential_work = 'm_potential_work'

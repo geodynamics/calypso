@@ -129,13 +129,13 @@
 !>     element type id   (where i:element id)
       integer(kind=kint), allocatable, target  ::  nodelm(:)
 !>     global node    id (where i:node id)
-      integer(kind=kint), allocatable, target  ::  globalnodid(:)
+      integer(kind=kint_gl), allocatable, target  ::  inod_global(:)
 !>     global element id (where i:element id)
-      integer(kind=kint), allocatable, target  ::  globalelmid(:)
+      integer(kind=kint_gl), allocatable, target  ::  iele_global(:)
 !>     global surface id (where i:surface id)
-      integer(kind=kint), allocatable, target  ::  globalsurfid(:)
+      integer(kind=kint), allocatable, target  ::  isurf_global(:)
 !>     global edge id (where i:edge id)
-      integer(kind=kint), allocatable, target  ::  globaledgeid(:)
+      integer(kind=kint), allocatable, target  ::  iedge_global(:)
 !
 !>   distance from the center
       real(kind=kreal)  , allocatable, target  :: radius(:)
@@ -212,7 +212,7 @@
       use m_geometry_parameter
 !
 !
-      allocate(globalnodid(numnod))
+      allocate(inod_global(numnod))
       allocate(xx(numnod,3))
 !
       allocate(radius(numnod))
@@ -222,7 +222,7 @@
       allocate(longitude(numnod))
       allocate(colatitude(numnod))
 !
-      globalnodid = 0
+      inod_global = 0
       xx = 0.0d00
 !
       radius = 0.0d00
@@ -241,12 +241,12 @@
       use m_geometry_parameter
 !
 !
-      allocate(globalelmid(numele))
+      allocate(iele_global(numele))
       allocate(elmtyp(numele))
       allocate(nodelm(numele))
       allocate(ie(numele,nnod_4_ele))
 !
-      globalelmid = 0
+      iele_global = 0
       elmtyp = 0
       nodelm = 0
       ie = 0
@@ -257,7 +257,7 @@
 !
       subroutine deallocate_node_geometry
 !
-      deallocate(globalnodid)
+      deallocate(inod_global)
       deallocate(xx)
 !
       deallocate(radius)
@@ -273,7 +273,7 @@
 !
       subroutine deallocate_element_connection
 !
-      deallocate(globalelmid)
+      deallocate(iele_global)
       deallocate(elmtyp)
       deallocate(nodelm)
       deallocate(ie)
@@ -348,12 +348,12 @@
       allocate( isf_4_ele(numele,nsurf_4_ele) )
       allocate( isf_rot_ele(numele,nsurf_4_ele) )
       allocate( ie_surf(numsurf,nnod_4_surf) )
-      allocate( globalsurfid(numsurf) )
+      allocate( isurf_global(numsurf) )
       allocate( interior_surf(numsurf) )
 !
       isf_rot_ele =   0
       ie_surf =       0
-      globalsurfid =  0
+      isurf_global =  0
       interior_surf = 0
 !
       end subroutine allocate_surface_connect
@@ -367,12 +367,12 @@
 !
       allocate( iedge_4_sf(numsurf,nedge_4_surf) )
       allocate( ie_edge(numedge,nnod_4_edge) )
-      allocate( globaledgeid(numedge) )
+      allocate( iedge_global(numedge) )
       allocate( interior_edge(numedge) )
 !
       iedge_4_sf = 0
       ie_edge = 0
-      globaledgeid = 0
+      iedge_global = 0
       interior_edge = 0
 !
       end subroutine allocate_edge_connect
@@ -458,7 +458,7 @@
 !
       deallocate( isf_4_ele, isf_rot_ele)
       deallocate( ie_surf )
-      deallocate( globalsurfid )
+      deallocate( isurf_global )
       deallocate( interior_surf )
 !
       end subroutine deallocate_surface_connect
@@ -469,7 +469,7 @@
 !
       deallocate( iedge_4_sf )
       deallocate( ie_edge )
-      deallocate( globaledgeid )
+      deallocate( iedge_global )
       deallocate( interior_edge )
 !
       end subroutine deallocate_edge_connect

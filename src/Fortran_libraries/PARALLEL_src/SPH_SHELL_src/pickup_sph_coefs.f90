@@ -37,10 +37,20 @@
       use calypso_mpi
       use quicksort
 !
+      integer(kind = kint) :: l
+!
 !
       call init_sph_radial_monitor_list
 !
       if( (num_pick_sph+num_pick_sph_l+num_pick_sph_m) .eq. 0) return
+!
+      if(num_pick_sph_l .eq. -9999) then
+        num_pick_sph_l = l_truncation+1
+        call allocate_pick_sph_l
+        do l = 0, l_truncation
+          idx_pick_sph_l(l+1) = l
+        end do
+      end if
 !
       call count_sph_labels_4_monitor
       call count_picked_sph_adrress                                     &

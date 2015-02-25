@@ -119,7 +119,7 @@
       ip_rlm_div_cor = 3
 !
       ncomp_coriolis_rlm = 3
-      allocate( d_cor_rlm(ncomp_coriolis_rlm,nnod_rlm) )
+      allocate( d_cor_rlm(nnod_rlm,ncomp_coriolis_rlm) )
 !
       num = nidx_rlm(2)
       allocate( d_cor_in_rlm(num) )

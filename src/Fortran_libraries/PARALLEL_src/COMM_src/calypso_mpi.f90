@@ -10,12 +10,12 @@
 !!@verbatim
 !!      subroutine calypso_MPI_init
 !!      subroutine calypso_MPI_finalize
-!!      subroutine calypso_MPI_abort(code, message)
+!!      subroutine calypso_MPI_abort(icode, message)
 !!
 !!      subroutine calypso_MPI_barrier
 !!@endverbatim
 !!
-!!@n @param  code       error code
+!!@n @param  icode       error code
 !!@n @param  message    message to output
 !
       module calypso_mpi
@@ -37,13 +37,16 @@
 !>     character size for MPI
       integer :: CALYPSO_CHARACTER
 !
+!>     integer size for MPI
+      integer :: CALYPSO_GLOBAL_INT
+!
 !>      process ID (start from 0)
       integer(kind=kint) :: my_rank
 !>      total number of processes
       integer(kind=kint) :: nprocs
 !
 !>      error flag for MPI
-      integer(kind=kint) :: ierr_MPI
+      integer :: ierr_MPI
 !
 ! ----------------------------------------------------------------------
 !
@@ -53,11 +56,15 @@
 !
       subroutine calypso_MPI_init
 !
+      integer :: nprocs4, my_rank4
+!
 !
       call  MPI_INIT(ierr_MPI)
       call  MPI_COMM_DUP (MPI_COMM_WORLD, CALYPSO_COMM, ierr_MPI)
-      call  MPI_COMM_SIZE(CALYPSO_COMM, nprocs, ierr_MPI)
-      call  MPI_COMM_RANK(CALYPSO_COMM, my_rank, ierr_MPI)
+      call  MPI_COMM_SIZE(CALYPSO_COMM, nprocs4, ierr_MPI)
+      call  MPI_COMM_RANK(CALYPSO_COMM, my_rank4, ierr_MPI)
+      nprocs =  nprocs4
+      my_rank = my_rank4
 !
       CALYPSO_CHARACTER = MPI_CHARACTER
 !
@@ -83,6 +90,14 @@
         CALYPSO_REAL = MPI_DOUBLE_PRECISION
       end if
 !
+      if(kint_gl .eq. 4) then
+        CALYPSO_GLOBAL_INT = MPI_INTEGER
+      else if(kint_gl .eq. 8) then
+        CALYPSO_GLOBAL_INT = MPI_INTEGER8
+      else
+        CALYPSO_GLOBAL_INT = MPI_INTEGER
+      end if
+!
       end subroutine calypso_MPI_init
 !
 !  ---------------------------------------------------------------------
@@ -96,16 +111,16 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine calypso_MPI_abort(code, message)
+      subroutine calypso_MPI_abort(icode, message)
 !
-      integer,       intent(in)  ::  code
+      integer(kind = kint), intent(in)  ::  icode
       character(len=*), intent(in)  ::  message
 !
 !
-      write(*,*) ' ///// abnormal termination ///// ', code,            &
+      write(*,*) ' ///// abnormal termination ///// ', icode,           &
      &                                            ' ', message
 !
-      call  MPI_ABORT(CALYPSO_COMM, ierr_MPI)
+      call  MPI_ABORT(CALYPSO_COMM, 999, ierr_MPI)
 !
       stop
       end subroutine calypso_MPI_abort

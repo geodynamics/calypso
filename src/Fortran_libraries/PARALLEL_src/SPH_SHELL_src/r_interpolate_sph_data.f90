@@ -140,12 +140,16 @@
 !
       subroutine input_old_rj_sph_trans(my_rank)
 !
+      use m_node_id_spherical_IO
+      use m_control_params_2nd_files
       use sph_file_IO_select
 !
       integer(kind = kint), intent(in) :: my_rank
 !
 !
-      call sel_read_org_spectr_rj_file(my_rank)
+      call set_sph_mesh_file_fmt_prefix                                 &
+     &   (ifmt_org_sph_rj_head, org_sph_rj_head)
+      call sel_read_spectr_modes_rj_file(my_rank)
       call copy_original_sph_rj_from_IO
 !
       call const_radial_itp_table
@@ -193,8 +197,8 @@
       end do
 !
       if (ipol%i_magne .gt. 0) then
-        call ext_outside_potential(ipol%i_magne, kr_outside)
-        call ext_inside_potential(ipol%i_magne, kr_inside)
+        call ext_outside_potential(kr_outside, d_rj(1,ipol%i_magne))
+        call ext_inside_potential(kr_inside, d_rj(1,ipol%i_magne))
       end if
 !
       end subroutine r_interpolate_sph_rst_from_IO
@@ -222,8 +226,8 @@
       end do
 !
       if (ipol%i_magne .gt. 0) then
-        call ext_outside_potential(ipol%i_magne, kr_outside)
-        call ext_inside_potential(ipol%i_magne, kr_inside)
+        call ext_outside_potential(kr_outside, d_rj(1,ipol%i_magne))
+        call ext_inside_potential(kr_inside, d_rj(1,ipol%i_magne))
       end if
 !
       end subroutine r_interpolate_sph_fld_from_IO
@@ -241,10 +245,10 @@
 !
       write(*,*) ' ipol%i_magne', ipol%i_magne, kr_outside, kr_inside
       if (ipol%i_magne .gt. 0) then
-        call gauss_to_poloidal_out(ipol%i_magne, kr_outside,            &
-     &      ltr_w, r_gauss, w_gauss, index_w)
-        call gauss_to_poloidal_in(ipol%i_magne,  kr_inside,             &
-     &      ltr_w, r_gauss, w_gauss, index_w)
+        call gauss_to_poloidal_out(kr_outside, ltr_w, r_gauss,          &
+     &      w_gauss, index_w, d_rj(1,ipol%i_magne))
+        call gauss_to_poloidal_in(kr_inside, ltr_w, r_gauss,            &
+     &      w_gauss, index_w, d_rj(1,ipol%i_magne))
       end if
 !
       end subroutine set_poloidal_b_by_gauss_coefs
@@ -254,6 +258,7 @@
 !
       subroutine copy_original_sph_rj_from_IO
 !
+      use m_error_IDs
       use m_node_id_spherical_IO
       use m_comm_data_IO
       use m_group_data_sph_specr_IO
@@ -261,21 +266,24 @@
 !
       if(sph_rank_rj(1).ne.sph_rank_IO(1)                               &
      &       .or. sph_rank_rj(2).ne.sph_rank_IO(2)) then
-        call calypso_MPI_abort(1,'rj rank ID is wrong')
+        call calypso_MPI_abort(ierr_sph,'rj rank ID is wrong')
       end if
 !
       if(nidx_global_rj(2) .ne. nidx_gl_sph_IO(2)) then
-        call calypso_MPI_abort(1,'number of local mode is wrong')
+        call calypso_MPI_abort                                          &
+     &     (ierr_sph,'number of local mode is wrong')
       end if
       if(l_truncation .ne. ltr_gl_IO) then
-        call calypso_MPI_abort(1,'truncation is wrong')
+        call calypso_MPI_abort(ierr_sph,'truncation is wrong')
       end if
 !
       if(ist_rj(2).ne.ist_sph_IO(2)) then
-        call calypso_MPI_abort(1,'start point of harminics is wrong')
+        call calypso_MPI_abort                                          &
+     &      (ierr_sph,'start point of harminics is wrong')
       end if
       if(ied_rj(2).ne.ied_sph_IO(2)) then
-        call calypso_MPI_abort(1,'end point of harminics is wrong')
+        call calypso_MPI_abort                                          &
+     &     (ierr_sph,'end point of harminics is wrong')
       end if
 !
       n_rj_org = nnod_sph_IO

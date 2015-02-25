@@ -122,7 +122,7 @@
 !         j = 6
 !        do k = 1, sph_bc_U%kr_out
 !            inod = (k-1)*nidx_rj(2) + j
-!            write(my_rank+170,'(2i10,1p8E25.15e3)') k, j,              &
+!            write(my_rank+170,'(2i16,1p8E25.15e3)') k, j,              &
 !     &              d_rj(inod,ipol%i_velo),d_rj(inod,itor%i_velo)
 !     &          d_rj(inod,ipol%i_velo), d_rj(inod,idpdr%i_velo),       &
 !     &          d_rj(inod,itor%i_velo), d_rj(inod,itor%i_vort)
@@ -241,9 +241,12 @@
       integer(kind = kint), intent(in) :: l, m, is_field
 !
       integer(kind = kint) :: j,k,inod
+      integer(kind = 4) :: l4, m4
 !
 !
-      j = find_local_sph_mode_address(l, m)
+      l4 = int(l)
+      m4 = int(m)
+      j = find_local_sph_mode_address(l4, m4)
       if(j .eq. 0) return
 !
       write(*,*) 'field ID, l, m: ', is_field, l, m
@@ -267,7 +270,7 @@
         if(d_rj(inod,is_field) .ne. d_rj(inod,is_field)) then
           j = idx_global_rj(inod,2)
           k = idx_global_rj(inod,1)
-          l = aint(sqrt(real(j)))
+          l = int(aint(sqrt(real(j))))
           m = j - l*(l+1)
           write(50+my_rank,*) 'Broken', inod, k, j, l, m,  &
      &              d_rj(inod,is_field)
@@ -342,7 +345,7 @@ end subroutine check_NaN_temperature
 !      j = find_local_sph_mode_address(30,-23)
 !      if(j.gt.0) then
 !        write(*,*) 'matrix'
-!        call check_single_radial_3band_mat(my_rank, nri,                &
+!        call check_single_radial_3band_mat(my_rank, nri,               &
 !     &      radius_1d_rj_r, evo_mat(1,1,j))
 !      end if
 !

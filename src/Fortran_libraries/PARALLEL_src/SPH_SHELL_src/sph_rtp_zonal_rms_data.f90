@@ -7,8 +7,8 @@
 !>@brief Get zonal mean and RMS fields in spherical grid
 !!
 !!@verbatim
-!!      subroutine zonal_rms_all_rtp_field
 !!      subroutine zonal_mean_all_rtp_field
+!!      subroutine zonal_rms_all_rtp_field
 !!      subroutine zonal_cyl_rms_all_rtp_field
 !!
 !!      subroutine cal_sph_zonal_rms_data(numdir, irtp_fld)
@@ -22,9 +22,12 @@
 !
       use m_precision
       use m_constants
+      use m_machine_parameter
 !
       implicit  none
-! 
+!
+      private :: cal_sph_zonal_rms_data, cal_sph_zonal_ave_data
+!
 ! -------------------------------------------------------------------
 !
       contains
@@ -33,10 +36,15 @@
 !
       subroutine zonal_mean_all_rtp_field
 !
-      use m_sph_spectr_data
+      use m_geometry_parameter
+      use m_geometry_data
+      use m_node_phys_data
+      use coordinate_convert_4_sph
 !
 !
-      call cal_sph_zonal_ave_data(ntot_phys_rtp, ione)
+      call cal_sph_zonal_ave_data                                       &
+     &   (numnod, num_tot_nod_phys, ione, d_nod)
+      call overwrite_nodal_sph_2_xyz
 !
       end subroutine zonal_mean_all_rtp_field
 !
@@ -44,10 +52,15 @@
 !
       subroutine zonal_rms_all_rtp_field
 !
-      use m_sph_spectr_data
+      use m_geometry_parameter
+      use m_geometry_data
+      use m_node_phys_data
+      use coordinate_convert_4_sph
 !
 !
-      call cal_sph_zonal_rms_data(ntot_phys_rtp, ione)
+      call cal_sph_zonal_rms_data                                       &
+     &   (numnod, num_tot_nod_phys, ione, d_nod)
+      call overwrite_nodal_sph_2_xyz
 !
       end subroutine zonal_rms_all_rtp_field
 !
@@ -56,47 +69,29 @@
 !
       subroutine zonal_cyl_rms_all_rtp_field
 !
-      use m_sph_spectr_data
-      use sph_overwrite_sph_and_cyl
+      use m_geometry_parameter
+      use m_geometry_data
+      use m_node_phys_data
+      use coordinate_convert_4_sph
 !
-      integer(kind = kint) :: i, i_fld
 !
-!
-      do i = 1, num_phys_rtp
-        i_fld = istack_phys_comp_rtp(i-1) + 1
-        if     (num_phys_comp_rtp(i) .eq. 6) then
-          call sph_overwrte_sph_tsr_to_cyl(ntot_phys_rtp,               &
-     &        i_fld, d_rtp)
-        else if(num_phys_comp_rtp(i) .eq. 3) then
-          call sph_overwrte_sph_vect_to_cyl(ntot_phys_rtp,              &
-     &         i_fld, d_rtp)
-        end if
-      end do
-!
-      call cal_sph_zonal_rms_data(ntot_phys_rtp, ione)
-!
-      do i = 1, num_phys_rtp
-        i_fld = istack_phys_comp_rtp(i-1) + 1
-        if     (num_phys_comp_rtp(i) .eq. 6) then
-          call sph_overwrte_cyl_tsr_to_sph(ntot_phys_rtp,               &
-     &         i_fld, d_rtp)
-        else if(num_phys_comp_rtp(i) .eq. 3) then
-          call sph_overwrte_cyl_vect_to_sph(ntot_phys_rtp,              &
-     &         i_fld, d_rtp)
-        end if
-      end do
+      call overwrite_nodal_sph_2_cyl
+      call cal_sph_zonal_rms_data                                       &
+     &   (numnod, num_tot_nod_phys, ione, d_nod)
+      call overwrite_nodal_cyl_2_xyz
 !
       end subroutine zonal_cyl_rms_all_rtp_field
 !
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
-      subroutine cal_sph_zonal_rms_data(numdir, irtp_fld)
+      subroutine cal_sph_zonal_rms_data(nnod, numdir, irtp_fld, d_rtp)
 !
       use m_spheric_parameter
-      use m_sph_spectr_data
 !
-      integer(kind = kint), intent(in) :: numdir, irtp_fld
+      integer(kind = kint), intent(in) :: nnod, numdir, irtp_fld
+      real(kind = kreal), intent(inout) :: d_rtp(nnod,numdir)
+!
       integer(kind = kint) :: nd, kt, mphi, inod
       real(kind = kreal) :: anphi
 !
@@ -145,12 +140,13 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine cal_sph_zonal_ave_data(numdir, irtp_fld)
+      subroutine cal_sph_zonal_ave_data(nnod, numdir, irtp_fld, d_rtp)
 !
       use m_spheric_parameter
-      use m_sph_spectr_data
 !
-      integer(kind = kint), intent(in) :: numdir, irtp_fld
+      integer(kind = kint), intent(in) :: nnod, numdir, irtp_fld
+      real(kind = kreal), intent(inout) :: d_rtp(nnod,numdir)
+!
       integer(kind = kint) :: nd, kt, mphi, inod
       real(kind = kreal) :: anphi
 !

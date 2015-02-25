@@ -340,11 +340,8 @@
       character(len = kchara), intent(in) :: visualize_ctl
       integer (kind = kint), intent(inout) :: iflag_viz
 !
-      if (cmp_no_case(visualize_ctl, 'Viz_On') .gt. 0) then
-        iflag_viz = 1
-      else
-        iflag_viz = 0
-      end if
+      iflag_viz = 0
+      if (cmp_no_case(visualize_ctl, 'Viz_On'))  iflag_viz = 1
 !
       end subroutine check_vis_control_flag
 !
@@ -360,11 +357,8 @@
       integer (kind = kint), intent(inout) :: iflag_fld_monitor
 !
       if (iflag .eq. 0) return
-      if (cmp_no_case(monitor_ctl, 'Monitor_On') .gt. 0) then
-        iflag_fld_monitor = 1
-      else
-        iflag_fld_monitor = 0
-      end if
+      iflag_fld_monitor = 0
+      if (cmp_no_case(monitor_ctl, 'Monitor_On')) iflag_fld_monitor = 1
 !
       end subroutine check_monitor_control_flag
 !

@@ -16,6 +16,7 @@
       use m_precision
       use m_machine_parameter
       use calypso_mpi
+      use m_error_IDs
 !
       implicit  none
 !
@@ -109,7 +110,7 @@
       if (coef_4_dimless_ctl%icou .eq. 0) then
           e_message =                                                   &
      &     'Set dimensionless numbers'
-          call calypso_MPI_abort(90, e_message)
+          call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_dimless = coef_4_dimless_ctl%num
       end if
@@ -133,7 +134,7 @@
       if (coef_4_heat_flux_ctl%icou .eq. 0) then
         e_message =                                                     &
      &     'Set coefficients for time stepping for temperature'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_termal = coef_4_heat_flux_ctl%num
       end if
@@ -141,12 +142,12 @@
       if (coef_4_t_diffuse_ctl%icou .eq. 0) then
         e_message =                                                     &
      &     'Set coefficients for time stepping for thermal diffusion'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_t_diffuse = coef_4_t_diffuse_ctl%num
       end if
 !
-      if (coef_4_heat_src_ctl%icou .eq. 0) then
+      if (coef_4_heat_src_ctl%icou .gt. 0) then
         num_coef_4_h_source = coef_4_heat_src_ctl%num
       end if
 !
@@ -181,7 +182,7 @@
       if (coef_4_intertia_ctl%icou .eq. 0) then
         e_message =                                                     &
      &     'Set coefficients for time stepping for velocity'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_velocity = coef_4_intertia_ctl%num
       end if
@@ -189,7 +190,7 @@
       if (coef_4_grad_p_ctl%icou .eq. 0) then
         e_message =                                                     &
      &     'Set coefficients for pressure gradient'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_press = coef_4_grad_p_ctl%num
       end if
@@ -197,7 +198,7 @@
       if (coef_4_viscous_ctl%icou .eq. 0) then
         e_message =                                                     &
      &     'Set coefficients for viscosity'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_v_diffuse = coef_4_viscous_ctl%num
       end if
@@ -208,7 +209,7 @@
       else
         if (coef_4_termal_buo_ctl%icou .eq. 0) then
           e_message = 'Set coefficients for buoyancy'
-          call calypso_MPI_abort(90, e_message)
+          call calypso_MPI_abort(ierr_dless, e_message)
         else
           num_coef_4_buoyancy = coef_4_termal_buo_ctl%num
         end if
@@ -219,7 +220,7 @@
       else
         if (coef_4_comp_buo_ctl%icou .eq. 0) then
           e_message = 'Set coefficients for compiositional buoyancy'
-          call calypso_MPI_abort(90, e_message)
+          call calypso_MPI_abort(ierr_dless, e_message)
         else
           num_coef_4_comp_buo = coef_4_comp_buo_ctl%num
         end if
@@ -230,7 +231,7 @@
       else
         if (coef_4_Coriolis_ctl%icou .eq. 0) then
           e_message = 'Set coefficients for Coriolis force'
-          call calypso_MPI_abort(90, e_message)
+          call calypso_MPI_abort(ierr_dless, e_message)
         else
           num_coef_4_Coriolis = coef_4_Coriolis_ctl%num
         end if
@@ -241,7 +242,7 @@
       else
         if (coef_4_Loreantz_ctl%icou .eq. 0) then
           e_message = 'Set coefficients for Lorentz force'
-          call calypso_MPI_abort(90, e_message)
+          call calypso_MPI_abort(ierr_dless, e_message)
         else
           num_coef_4_Lorentz = coef_4_Loreantz_ctl%num
         end if
@@ -303,7 +304,7 @@
       if (coef_4_magne_evo_ctl%icou .eq. 0) then
         e_message =                                                     &
      &     'Set coefficients for integration for magnetic field'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_magnetic = coef_4_magne_evo_ctl%num
       end if
@@ -312,21 +313,21 @@
      &       .and. iflag_t_evo_4_vect_p .gt. id_no_evolution) then
         e_message =                                                     &
      &     'Set coefficients for integration for magnetic potential'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_mag_p = coef_4_mag_potential_ctl%num
       end if
 !
       if (coef_4_mag_diffuse_ctl%icou .eq. 0) then
         e_message = 'Set coefficients for magnetic diffusion'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_m_diffuse = coef_4_mag_diffuse_ctl%num
       end if
 !
       if (coef_4_induction_ctl%icou .eq. 0) then
         e_message = 'Set coefficients for induction term'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_induction = coef_4_induction_ctl%num
       end if
@@ -367,7 +368,7 @@
       if (coef_4_comp_flux_ctl%icou .eq. 0) then
         e_message =                                                     &
      &     'Set coefficients for time stepping for composition scalar'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_composition = coef_4_comp_flux_ctl%num
       end if
@@ -375,7 +376,7 @@
       if (coef_4_c_diffuse_ctl%icou .eq. 0) then
         e_message =                                                     &
      &     'Set coefficients for time stepping for scalar diffusion'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_dless, e_message)
       else
         num_coef_4_c_diffuse = coef_4_c_diffuse_ctl%num
       end if

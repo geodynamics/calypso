@@ -472,13 +472,12 @@ begin MHD_control
 !                 Crank_Nicolson...Crank_Nicolson with 2nd_Adams_Bashforth
 !                 Crank_Nicolson_consist...Crank_Nicolson
 !                                         with consistent mass matrix
-!   eps_crank_ctl:        
 !   method_4_velo_ctl:    method for Crank Nicolson Scheme
 !   precond_4_crank_ctl:  preconditioning method for Crank Nicolson Scheme
 !
 !   Legendre_trans_loop_ctl: spherical transfer loop type
 !                   ('inner_radial_loop', 'outer_radial_loop', 'long_loop',
-!                    'original_loop', 'outer_field_loop'
+!                    'original_loop'
 !   FFT_library_ctl:  Selection of FFT librarry  ('FFTW3' or 'FFTPACK')
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -489,7 +488,11 @@ begin MHD_control
       coef_imp_t_ctl          5.0e-1
       coef_imp_b_ctl          5.0e-1
       coef_imp_c_ctl          5.0e-1
-      FFT_library_ctl          'ISPACK'
+      Legendre_trans_loop_ctl        'outer_radial_loop'
+      FFT_library_ctl                'ISPACK'
+      import_table_mode_ctl          'reversed_table'
+      send_recv_routine_ctl          'SEND_RECV'
+      Legendre_vector_length_ctl    2
     end time_loop_ctl
   end control
 !

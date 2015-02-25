@@ -117,16 +117,20 @@
       integer(kind = kint), intent(inout) :: idx_pick_lc(ntot_pickup)
 !
       integer(kind = kint) :: l, m, mm, j, icou, inum
+      integer(kind = 4) :: l4, m4
 !
 !
       icou = 0
       do inum = 1, num_pick_sph
         l = idx_pick_sph(inum,1)
         m = idx_pick_sph(inum,2)
+        l4 = int(l)
+        m4 = int(m)
+        j = l*(l+1) + m
         if(l .le. l_truncation) then
           icou = icou + 1
           idx_pick_gl(icou) = l*(l+1) + m
-          idx_pick_lc(icou) = find_local_sph_mode_address(l, m)
+          idx_pick_lc(icou) = find_local_sph_mode_address(l4, m4)
           iflag_picked_sph(j)  = icou
         end if
       end do
@@ -135,11 +139,13 @@
         l = idx_pick_sph_l(inum)
         if(l .le. l_truncation) then
           do m = -l, l
-            j = l*(l+1) + m
+           l4 = int(l)
+           m4 = int(m)
+           j = l*(l+1) + m
             if(iflag_picked_sph(j) .le. izero) then
               icou = icou + 1
               idx_pick_gl(icou) = j
-              idx_pick_lc(icou) = find_local_sph_mode_address(l, m)
+              idx_pick_lc(icou) = find_local_sph_mode_address(l4, m4)
               iflag_picked_sph(j)  = icou
             end if
           end do
@@ -151,11 +157,13 @@
         mm = abs(m)
         if(mm .le. l_truncation) then
           do l = mm, l_truncation
+            l4 = int(l)
+            m4 = int(m)
             j = l*(l+1) + m
             if(iflag_picked_sph(j) .le. izero) then
               icou = icou + 1
               idx_pick_gl(icou) = j
-              idx_pick_lc(icou) = find_local_sph_mode_address(l, m)
+              idx_pick_lc(icou) = find_local_sph_mode_address(l4, m4)
               iflag_picked_sph(j)  = icou
             end if
           end do
@@ -163,8 +171,8 @@
       end do
       num_pickup = icou
 !
-      call quicksort_w_index(num_pickup, idx_pick_gl,                   &
-     &    ione, num_pickup, idx_pick_lc)
+      call quicksort_w_index(num_pickup, idx_pick_gl(1),                &
+     &    ione, num_pickup, idx_pick_lc(1))
 !
       end subroutine set_picked_sph_address
 !

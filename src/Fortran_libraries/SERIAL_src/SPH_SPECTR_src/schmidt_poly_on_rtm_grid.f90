@@ -171,26 +171,46 @@
 !
       subroutine set_lagender_4_rlm
 !
+      use m_machine_parameter
       use m_spheric_parameter
+      use m_spheric_param_smp
       use m_schmidt_poly_on_rtm
-      use m_schmidt_polynomial
+      use schmidt_fix_m
+      use m_work_4_sph_trans
 !
-      integer(kind = kint) :: i, j, l, mm, jj
+      integer(kind = kint) :: ip, i, j, l, m, mm, jj
+      integer(kind = kint) :: jst, jed, lst, led
+      real(kind = kreal) :: p_m(0:l_truncation), dp_m(0:l_truncation)
+      real(kind = kreal) :: pmp1(0:l_truncation), pmn1(0:l_truncation)
+      real(kind = kreal) :: df_m(0:l_truncation+2)
 !
 !
-      do i = 1, nidx_rtm(2)
-        dth = g_colat_rtm(i)
-        call dschmidt
+!$omp parallel do                                                       &
+!$omp& private(i,j,l,m,mm,jj,jst,jed,lst,led,p_m,dp_m,pmn1,pmp1,df_m)
+      do ip = 1, np_smp
+        lst = idx_rtm_smp_stack(ip-1,2) + 1
+        led = idx_rtm_smp_stack(ip,  2)
+        do i = lst, led
 !
-        do j = 1, nidx_rlm(2)
-          jj = idx_gl_1d_rlm_j(j,1)
-          l =  idx_gl_1d_rlm_j(j,2)
-          mm = abs( idx_gl_1d_rlm_j(j,3) )
-          P_rtm(i,j) =    p(mm,l)
-          dPdt_rtm(i,j) = dp(mm,l)
+          do m = 1, nidx_rtm(3)
+            mm = abs(idx_gl_1d_rtm_m(m,2))
+            jst = lstack_rlm(m-1) + 1
+            jed = lstack_rlm(m)
+!
+            call schmidt_legendres_m(l_truncation, mm, g_colat_rtm(i),  &
+     &          p_m, dp_m, pmn1, pmp1, df_m)
+!
+            do j = jst, jed
+              jj = idx_gl_1d_rlm_j(j,1)
+              l =  idx_gl_1d_rlm_j(j,2)
+              P_rtm(i,j) =    p_m(l)
+              dPdt_rtm(i,j) = dp_m(l)
+            end do
+          end do
         end do
 !
       end do
+!$omp end parallel do
 !
       end subroutine set_lagender_4_rlm
 !
@@ -201,34 +221,47 @@
       use m_constants
       use m_spheric_parameter
       use m_schmidt_poly_on_rtm
-      use m_schmidt_polynomial
+      use m_work_4_sph_trans
+      use schmidt_fix_m
 !
-      integer(kind = kint) :: j, l, mm, jj
+      integer(kind = kint) :: j, l, m, mm, jj, jst, jed
       real(kind = kreal) :: pi
+      real(kind = kreal) :: p_m(0:l_truncation), dp_m(0:l_truncation)
+      real(kind = kreal) :: pmp1(0:l_truncation), pmn1(0:l_truncation)
+      real(kind = kreal) :: df_m(0:l_truncation+2)
 !
 !
-      pi = four * atan(one)
+      do m = 1, nidx_rtm(3)
+        mm = abs(idx_gl_1d_rtm_m(m,2))
+        jst = lstack_rlm(m-1) + 1
+        jed = lstack_rlm(m)
 !
-      dth = zero
-      call dschmidt
+        call schmidt_legendres_m(l_truncation, mm, zero,                &
+     &          p_m, dp_m, pmn1, pmp1, df_m)
 !
-      do j = 1, nidx_rlm(2)
-        jj = idx_gl_1d_rlm_j(j,1)
-        l =  idx_gl_1d_rlm_j(j,2)
-        mm = abs( idx_gl_1d_rlm_j(j,3) )
-        P_pole_rtm(1,j) =    p(mm,l)
-        dPdt_pole_rtm(1,j) = dp(mm,l)
+        do j = jst, jed
+          jj = idx_gl_1d_rlm_j(j,1)
+          l =  idx_gl_1d_rlm_j(j,2)
+          P_pole_rtm(1,j) =    p_m(l)
+          dPdt_pole_rtm(1,j) = dp_m(l)
+        end do
       end do
 !
-      dth = pi
-      call dschmidt
+      pi = four * atan(one)
+      do m = 1, nidx_rtm(3)
+        mm = abs(idx_gl_1d_rtm_m(m,2))
+        jst = lstack_rlm(m-1) + 1
+        jed = lstack_rlm(m)
 !
-      do j = 1, nidx_rlm(2)
-        jj = idx_gl_1d_rlm_j(j,1)
-        l =  idx_gl_1d_rlm_j(j,2)
-        mm = abs( idx_gl_1d_rlm_j(j,3) )
-        P_pole_rtm(2,j) =    p(mm,l)
-        dPdt_pole_rtm(2,j) = dp(mm,l)
+        call schmidt_legendres_m(l_truncation, mm, pi,                  &
+     &          p_m, dp_m, pmn1, pmp1, df_m)
+!
+        do j = jst, jed
+          jj = idx_gl_1d_rlm_j(j,1)
+          l =  idx_gl_1d_rlm_j(j,2)
+          P_pole_rtm(2,j) =    p_m(l)
+          dPdt_pole_rtm(2,j) = dp_m(l)
+        end do
       end do
 !
       end subroutine set_lagender_pole_rlm

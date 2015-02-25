@@ -81,25 +81,25 @@
       time   =     time_init
 !
 !  Set initial velocity if velocity is exist
-      if(ipol%i_velo .gt. izero) call  set_initial_velocity
+!      if(ipol%i_velo .gt. izero) call  set_initial_velocity
 !
 !  Set initial temperature if temperature is exist
-      if(ipol%i_temp .gt. izero) call  set_initial_temperature
+!      if(ipol%i_temp .gt. izero) call  set_initial_temperature
 !
 !  Set initial composition if composition is exist
-      if(ipol%i_light .gt. izero) call set_initial_composition
+!      if(ipol%i_light .gt. izero) call set_initial_composition
 !
 !  Set initial magnetic field if magnetic field is exist
-      if(ipol%i_magne .gt. izero) call set_initial_magne_sph
+!      if(ipol%i_magne .gt. izero) call set_initial_magne_sph
 !
 !  Set heat source if  heat source is exist
       if(ipol%i_heat_source .gt. izero) then
         call set_initial_heat_source_sph
       end if
 !  Set light element source if light element is exist
-      if(ipol%i_light_source .gt. izero) then
-        call set_initial_light_source_sph
-      end if
+!      if(ipol%i_light_source .gt. izero) then
+!        call set_initial_light_source_sph
+!      end if
 !
 !  Copy initial field to restart IO data
       call set_sph_restart_num_to_IO
@@ -116,7 +116,12 @@
       use m_sph_spectr_data
 !
       integer ( kind = kint) :: inod, jj, k
-      real (kind = kreal) :: rr
+!      real (kind = kreal) :: rr
+      real (kind = kreal) :: pi, rr, xr, shell
+      real(kind = kreal), parameter :: A_light = 0.1d0
+!
+      pi = four * atan(one)
+      shell = r_CMB - r_ICB
 !
 !
 !$omp parallel do
@@ -126,13 +131,24 @@
       end do
 !$omp end parallel do
 !
-      jj = find_local_sph_mode_address(1, 0)
+!      jj = find_local_sph_mode_address(1, 0)
+!      if (jj .gt. 0) then
+!        do k = nlayer_ICB+1, nlayer_CMB
+!          rr = radius_1d_rj_r(k)
+!          inod = local_sph_data_address(k,jj)
+!          d_rj(inod,itor%i_velo) = half * rr*rr
+!        end do
+!      end if
+!
+      jj =  find_local_sph_mode_address(2, 1)
+!
       if (jj .gt. 0) then
-        do k = nlayer_ICB+1, nlayer_CMB
-          rr = radius_1d_rj_r(k)
-          inod = local_sph_data_address(k,jj)
-          d_rj(inod,itor%i_velo) = half * rr*rr
-        end do
+      do k = nlayer_ICB, nlayer_CMB
+      inod = local_sph_data_address(k,jj)
+      xr = two * radius_1d_rj_r(k) - one * (r_CMB+r_ICB) / shell
+      d_rj(inod,itor%i_velo) = (one-three*xr**2+three*xr**4-xr**6)      &
+    &                            * A_light * three / (sqrt(two*pi))
+      end do
       end if
 !
       end subroutine set_initial_velocity
@@ -171,8 +187,8 @@
 !
 !
 !    Find local addrtess for (l,m) = (4,4)
-!      jj =  find_local_sph_mode_address(4, 4)
-      jj =  find_local_sph_mode_address(5, 5)
+      jj =  find_local_sph_mode_address(4, 4)
+!      jj =  find_local_sph_mode_address(5, 5)
 !
 !    If data for (l,m) = (4,4) is there, set initial temperature
       if (jj .gt. 0) then
@@ -262,7 +278,7 @@
 !
 !
 !    Find local addrtess for (l,m) = (1,0)
-      js =  find_local_sph_mode_address(ione, izero)
+      js =  find_local_sph_mode_address(1, 0)
 !
       if (js .gt. 0) then
         do k = nlayer_ICB, nlayer_CMB
@@ -296,7 +312,7 @@
 !
 !
 !    Find local addrtess for (l,m) = (2,0)
-      jt =  find_local_sph_mode_address(itwo, izero)
+      jt =  find_local_sph_mode_address(2, 0)
 !
       if (jt .gt. 0) then
         do k = 1, nlayer_CMB
@@ -329,7 +345,7 @@
 !
 !
 !    Find address for l = m = 0
-      jj =  find_local_sph_mode_address(izero, izero)
+      jj =  find_local_sph_mode_address(0, 0)
 !
       if (jj .gt. 0) then
         do k = 1, nlayer_ICB
@@ -363,7 +379,7 @@
 !
 !
 !    Find address for l = m = 0
-      jj =  find_local_sph_mode_address(izero, izero)
+      jj =  find_local_sph_mode_address(0, 0)
 !
       if (jj .gt. 0) then
         do k = nlayer_ICB, nlayer_CMB

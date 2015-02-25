@@ -73,7 +73,7 @@
      &       magne_nod%ibc_type(i))
 !
 !          if(cmp_no_case(node_bc_B_ctl%c1_tbl(i),'sph')                &
-!     &        .gt. 0) magne_nod%ibc_type(i) = 999
+!     &       ) magne_nod%ibc_type(i) = 999
         end do
 !
         if (iflag_debug .ge. iflag_routine_msg) then

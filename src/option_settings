@@ -1,5 +1,23 @@
 Settings for Makefiles
 
+# -------------------------------------------------------------------------------
+# SR24000 (NIPR:sr1)
+# -------------------------------------------------------------------------------
+#
+./configure --prefix='/hsfs/home0/matsui/local' CC=cc FC=f90 \
+AR="ar -X64" RANLIB="ranlib -X64" MPICC=mpcc_r MPIFC=mpif90 \
+FCFLAGS="-64 -O4 -noifswpl -omp -pardiag=2 -autoinline=2 -model=L1 -pmfunc" \
+PKG_CONFIG_PATH=/home0/matsui/local/lib/pkgconfig
+#
+# -------------------------------------------------------------------------------
+# SR24000 without FFTW3 (NIPR:sr1)
+# -------------------------------------------------------------------------------
+#
+# setenv PKG_CONFIG_PATH /home0/matsui/local/lib/pkgconfig
+#
+# ./configure --prefix='/home0/matsui/local' CC=cc FC=mpif90_r AR="ar -X64" RANLIB="ranlib -X64"\
+#  FCFLAGS="-64 -Oss -noifswpl -omp -pardiag=2 -autoinline=2 -model=L1" \
+#  MPICC=mpcc_r MPIFC=mpif90_r
 #
 # -------------------------------------------------------------------------------
 # Intel mac with gfortran-openmpi with self compiled FFTW3

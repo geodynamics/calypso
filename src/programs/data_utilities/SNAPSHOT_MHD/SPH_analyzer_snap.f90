@@ -42,7 +42,6 @@
       use set_radius_func
       use const_radial_mat_4_sph
       use cal_rms_fields_by_sph
-      use cvt_nod_data_to_sph_data
       use r_interpolate_sph_data
       use sph_mhd_rms_IO
       use sph_mhd_rst_IO_control
@@ -61,9 +60,7 @@
 !   Allocate spectr field data
 !
       call allocate_phys_rj_data
-      call allocate_phys_rtp_data
       call set_sph_sprctr_data_address
-      call set_sph_nod_data_address
 !
       if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr'
       call init_rms_4_sph_spectr
@@ -142,34 +139,33 @@
 !
 !*  ----------------lead nonlinear term ... ----------
 !*
-      call start_eleps_time(12)
+      call start_eleps_time(8)
       call nonlinear
-      call end_eleps_time(12)
+      call end_eleps_time(8)
 !
 !* ----  Update fields after time evolution ------------------------=
 !*
-      call start_eleps_time(4)
-      call start_eleps_time(7)
-!
+      call start_eleps_time(9)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
       call trans_per_temp_to_temp_sph
 !*
       if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
       call s_lead_fields_4_sph_mhd
-      call end_eleps_time(7)
+      call end_eleps_time(9)
 !
 !*  -----------  lead energy data --------------
 !*
-      call start_eleps_time(10)
+      call start_eleps_time(4)
+      call start_eleps_time(11)
       if(iflag_debug.gt.0)  write(*,*) 'output_rms_sph_mhd_control'
       call output_rms_sph_mhd_control
-      call end_eleps_time(10)
-      call end_eleps_time(4)
+      call end_eleps_time(11)
 !
 !*  -----------  Output spectr data --------------
 !*
       if(iflag_debug.gt.0)  write(*,*) 'output_spectr_4_snap'
       call output_spectr_4_snap(i_step)
+      call end_eleps_time(4)
 !
       end subroutine SPH_analyze_snap
 !

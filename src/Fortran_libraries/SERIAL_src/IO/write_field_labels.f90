@@ -27,6 +27,7 @@
       module write_field_labels
 !
       use m_precision
+      use m_constants
 !
       implicit none
 !
@@ -56,8 +57,7 @@
       character(len=kchara), intent(in) :: label_v(3)
 !
 !
-      call write_three_labels(id_file,                                  &
-     &    label_v(1), label_v(2), label_v(3))
+      call write_multi_labels(id_file, ithree, label_v)
 !
       end subroutine write_vector_label
 !
@@ -69,8 +69,7 @@
       character(len=kchara), intent(in) :: label_st(6)
 !
 !
-      call write_six_labels(id_file, label_st(1), label_st(2),          &
-     &    label_st(3), label_st(4), label_st(5), label_st(6) )
+      call write_multi_labels(id_file, isix, label_st)
 !
       end subroutine write_sym_tensor_label
 !

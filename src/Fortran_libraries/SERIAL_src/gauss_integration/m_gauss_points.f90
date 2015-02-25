@@ -134,7 +134,7 @@
       nl = ione
 !
       do n = 2, n_point
-        m = ( n+1-mod(n+1,2) ) / 2
+        m = ( n+ione-mod(n+ione,itwo) ) / itwo
         xm = half * (x2+x1)
         xl = half * (x2-x1)
 !

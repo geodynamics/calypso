@@ -26,18 +26,20 @@
 !!      subroutine cal_sph_local_numnod(numnod, internal_node)
 !!      subroutine check_local_sph_node_constants
 !!
-!!      integer function sph_shell_node_id(ip_r, ip_t, kr, lt, mp)
-!!      integer function sph_s_pole_node_i( kr)
-!!      integer function sph_n_pole_node_id(kr)
-!!      integer function sph_center_node_id()
-!!      integer function sph_ctr_shell_node_id(nnod_ct, lt, mp)
-!!      integer function sph_center_np_node_id()
+!!      integer(kind = kint) function sph_shell_node_id                 &
+!!     &           (ip_r, ip_t, kr, lt, mp)
+!!      integer(kind = kint) function sph_s_pole_node_i( kr)
+!!      integer(kind = kint) function sph_n_pole_node_id(kr)
+!!      integer(kind = kint) function sph_center_node_id()
+!!      integer(kind = kint) function sph_ctr_shell_node_id             &
+!!     &           (nnod_ct, lt, mp)
+!!      integer(kind = kint) function sph_center_np_node_id()
 !!
-!!      integer function global_sph_shell_node_id(nidx_global_rtp,      &
-!!     &       kr, lt, mp)
-!!      integer function global_sph_s_pole_node_id(kr)
-!!      integer function global_sph_n_pole_node_id(kr)
-!!      integer function global_sph_center_node_id()
+!!      integer(kind = kint) function global_sph_shell_node_id          &
+!!                 (nidx_global_rtp, kr, lt, mp)
+!!      integer(kind = kint) function global_sph_s_pole_node_id(kr)
+!!      integer(kind = kint) function global_sph_n_pole_node_id(kr)
+!!      integer(kind = kint) function global_sph_center_node_id()
 !
       module cal_sph_node_addresses
 !
@@ -278,7 +280,8 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      integer function sph_shell_node_id(ip_r, ip_t, kr, lt, mp)
+      integer(kind = kint) function sph_shell_node_id                   &
+     &                    (ip_r, ip_t, kr, lt, mp)
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t
       integer(kind = kint), intent(in) :: kr, lt, mp
@@ -291,7 +294,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer function sph_s_pole_node_id(kr)
+      integer(kind = kint) function sph_s_pole_node_id(kr)
 !
       integer(kind = kint), intent(in) :: kr
 !
@@ -302,7 +305,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer function sph_n_pole_node_id(kr)
+      integer(kind = kint) function sph_n_pole_node_id(kr)
 !
       integer(kind = kint), intent(in) :: kr
 !
@@ -313,7 +316,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer function sph_center_node_id()
+      integer(kind = kint) function sph_center_node_id()
 !
 !
       sph_center_node_id = 1 + nnod_lc_shell                            &
@@ -323,7 +326,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer function sph_ctr_shell_node_id(nnod_ct, lt, mp)
+      integer(kind = kint) function sph_ctr_shell_node_id               &
+     &                   (nnod_ct, lt, mp)
 !
       integer(kind = kint), intent(in) :: nnod_ct, lt, mp
 !
@@ -336,7 +340,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer function sph_center_np_node_id()
+      integer(kind = kint) function sph_center_np_node_id()
 !
 !
       sph_center_np_node_id                                             &
@@ -348,8 +352,8 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      integer function global_sph_shell_node_id(nidx_global_rtp,        &
-     &       kr, lt, mp)
+      integer(kind = kint) function global_sph_shell_node_id            &
+     &                    (nidx_global_rtp, kr, lt, mp)
 !
       integer(kind = kint), intent(in) :: nidx_global_rtp(3)
       integer(kind = kint), intent(in) :: kr, lt, mp
@@ -362,7 +366,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer function global_sph_s_pole_node_id(kr)
+      integer(kind = kint) function global_sph_s_pole_node_id(kr)
 !
       integer(kind = kint), intent(in) :: kr
 !
@@ -373,7 +377,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer function global_sph_n_pole_node_id(kr)
+      integer(kind = kint) function global_sph_n_pole_node_id(kr)
 !
       integer(kind = kint), intent(in) :: kr
 !
@@ -384,7 +388,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer function global_sph_center_node_id()
+      integer(kind = kint) function global_sph_center_node_id()
 !
 !
       global_sph_center_node_id = 1 + nnod_gl_shell                     &

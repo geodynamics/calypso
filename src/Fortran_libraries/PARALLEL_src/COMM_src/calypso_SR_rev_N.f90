@@ -49,6 +49,7 @@
       module calypso_SR_rev_N
 !
       use m_precision
+      use m_work_time
 !
       implicit none
 !
@@ -67,6 +68,7 @@
 !
       use calypso_mpi
       use m_solver_SR
+      use calypso_SR_core
       use set_to_send_buffer
       use set_from_recv_buf_rev
 !
@@ -91,64 +93,24 @@
 !
       real (kind=kreal), intent(inout):: X_new(NB*nnod_new)
 !
-      real (kind=kreal) :: elaps3(3)
-!
-      real(kind = kreal) :: s1time, s2time
-      integer (kind = kint) :: neib, ist, num
-      integer (kind = kint) :: i
-      integer (kind = kint) :: ncomm_send, ncomm_recv
-      integer (kind = kint) :: ist_send, ist_recv
-!
-!
-      call resize_work_sph_SR(NB, npe_send, npe_recv,                   &
-     &    istack_send(npe_send), istack_recv(npe_recv))
-!
-      ncomm_send = npe_send - isend_self
-      ncomm_recv = npe_recv - irecv_self
 !
 !C-- SEND
 !
-      s1time = MPI_WTIME()
+      call start_eleps_time(36)
       call set_to_send_buf_N(NB, nnod_org, istack_send(npe_send),       &
      &    inod_export, X_org, WS)
-      elaps3(1) = elaps3(1) + MPI_WTIME() - s1time
+      call end_eleps_time(36)
 !C
-      s1time = MPI_WTIME()
-      do neib = 1, ncomm_send
-        ist= NB * istack_send(neib-1) + 1
-        num  = NB * (istack_send(neib  ) - istack_send(neib-1))
-        call MPI_ISEND(WS(ist), num, CALYPSO_REAL,                      &
-     &      id_pe_send(neib), 0, CALYPSO_COMM, req1(neib), ierr_MPI)
-      end do
-!C
-!C-- RECEIVE
-      if(ncomm_recv .gt. 0) then
-        do neib= 1, ncomm_recv
-          ist= NB * istack_recv(neib-1) + 1
-          num  = NB * (istack_recv(neib  ) - istack_recv(neib-1))
-          call MPI_IRECV(WR(ist), num, CALYPSO_REAL,                    &
-     &        id_pe_recv(neib), 0, CALYPSO_COMM, req2(neib), ierr_MPI)
-        end do
+      call start_eleps_time(37)
+      call calypso_send_recv_core                                       &
+     &         (NB, npe_send, isend_self, id_pe_send, istack_send,      &
+     &              npe_recv, irecv_self, id_pe_recv, istack_recv)
+      call end_eleps_time(37)
 !
-        call MPI_WAITALL (ncomm_recv, req2, sta2, ierr_MPI)
-      end if
-!
-      if (isend_self .eq. 1) then
-        ist_send= NB * istack_send(npe_send-1)
-        ist_recv= NB * istack_recv(npe_recv-1)
-        num = NB * (istack_send(npe_send  ) - istack_send(npe_send-1))
-!$omp parallel do
-        do i = 1, num
-          WR(ist_recv+i) = WS(ist_send+i)
-        end do
-!$omp end parallel do
-      end if
-!
-!      s2time = MPI_WTIME()
+      call start_eleps_time(38)
       call set_from_recv_buf_rev_N(NB, nnod_new,                        &
      &    istack_recv(npe_recv), irev_import, WR, X_new)
-!      elaps3(2) = elaps3(2) + MPI_WTIME() - s2time
-!      elaps3(3) = elaps3(3) + MPI_WTIME() - s1time
+      call end_eleps_time(38)
 !
       end subroutine calypso_send_recv_rev_N
 !
@@ -164,6 +126,7 @@
 !
       use calypso_mpi
       use m_solver_SR
+      use calypso_SR_core
       use set_to_send_buf_tri
       use set_from_recv_buf_rev_tri
 !
@@ -192,67 +155,19 @@
       real (kind=kreal), intent(inout):: X2_new(NB*nnod_new)
       real (kind=kreal), intent(inout):: X3_new(NB*nnod_new)
 !
-      real (kind=kreal) :: elaps3(3)
-!
-      real(kind = kreal) :: s1time, s2time
-      integer (kind = kint) :: neib, ist, num
-      integer (kind = kint) :: i
-      integer (kind = kint) :: ncomm_send, ncomm_recv
-      integer (kind = kint) :: ist_send, ist_recv
-!
-!
-      call resize_work_sph_SR( (3*NB), npe_send, npe_recv,              &
-     &    istack_send(npe_send), istack_recv(npe_recv))
-!
-      ncomm_send = npe_send - isend_self
-      ncomm_recv = npe_recv - irecv_self
 !
 !C-- SEND
 !
-      s1time = MPI_WTIME()
       call set_to_send_buf_3xN(NB, nnod_org, istack_send(npe_send),     &
      &    inod_export, X1_org, X2_org, X3_org, WS)
-      elaps3(1) = elaps3(1) + MPI_WTIME() - s1time
 !C
-      s1time = MPI_WTIME()
-      do neib = 1, ncomm_send
-        ist = 3*NB * istack_send(neib-1) + 1
-        num = 3*NB * (istack_send(neib  ) - istack_send(neib-1))
-        call MPI_ISEND(WS(ist), num, CALYPSO_REAL,                      &
-     &      id_pe_send(neib), 0, CALYPSO_COMM, req1(neib), ierr_MPI)
-      end do
-!C
-!C-- RECEIVE
-      if(ncomm_recv .gt. 0) then
-        do neib= 1, ncomm_recv
-          ist = 3*NB * istack_recv(neib-1) + 1
-          num = 3*NB * (istack_recv(neib  ) - istack_recv(neib-1))
-          call MPI_IRECV(WR(ist), num, CALYPSO_REAL,                    &
-     &        id_pe_recv(neib), 0, CALYPSO_COMM, req2(neib), ierr_MPI)
-        end do
+      call calypso_send_recv_core                                       &
+     &        ((3*NB), npe_send, isend_self, id_pe_send, istack_send,   &
+     &                 npe_recv, irecv_self, id_pe_recv, istack_recv)
 !
-        call MPI_WAITALL (ncomm_recv, req2, sta2, ierr_MPI)
-      end if
-!
-      if (isend_self .eq. 1) then
-        ist_send= NB * istack_send(npe_send-1)
-        ist_recv= NB * istack_recv(npe_recv-1)
-        num = NB * (istack_send(npe_send  ) - istack_send(npe_send-1))
-!$omp parallel do
-        do i = 1, num
-          WR( 3*(ist_recv+i)-2) = WS(3*(ist_send+i)-2)
-          WR( 3*(ist_recv+i)-1) = WS(3*(ist_send+i)-1)
-          WR( 3*(ist_recv+i)  ) = WS(3*(ist_send+i)  )
-        end do
-!$omp end parallel do
-      end if
-!
-!      s2time = MPI_WTIME()
       call set_from_recv_buf_rev_3xN(NB, nnod_new,                      &
      &    istack_recv(npe_recv), irev_import,                           &
      &    WR, X1_new, X2_new, X3_new)
-!      elaps3(2) = elaps3(2) + MPI_WTIME() - s2time
-!      elaps3(3) = elaps3(3) + MPI_WTIME() - s1time
 !
       end subroutine calypso_send_recv_rev_3xN
 !

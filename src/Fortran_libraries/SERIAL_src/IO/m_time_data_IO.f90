@@ -42,9 +42,9 @@
 !
 !
       write(id_file,'(a)'   )   '!  domain ID'
-      write(id_file,'(i10)') my_rank
+      write(id_file,'(i16)') my_rank
       write(id_file,'(a)'   )   '!  time step number'
-      write(id_file,'(i10)') i_time_step_IO
+      write(id_file,'(i16)') i_time_step_IO
       write(id_file,'(a)'   )   '!  time, Delta t'
       write(id_file,'(1p20E25.15e3)') time_IO, delta_t_IO
 !

@@ -51,8 +51,8 @@
 !
 !
 #ifdef HDF5_IO
-      nnod_hdf = m_ucd%istack_merged_intnod(my_rank+1)                  &
-     &          - m_ucd%istack_merged_intnod(my_rank)
+      nnod_hdf = int(m_ucd%istack_merged_intnod(my_rank+1)              &
+     &             - m_ucd%istack_merged_intnod(my_rank)  )
       call alloc_merged_hdt5_array(nnod_hdf, ucd, m_ucd)
       call h5open_f(hdferr)
 #endif
@@ -82,14 +82,15 @@
 !
       type(ucd_data), intent(in) :: ucd
       type(merged_ucd_data), intent(inout) :: m_ucd
-      integer(kind = kint) :: iele, k1, i
+      integer(kind = kint) :: k1
+      integer(kind = kint_gl) :: iele, i
 !
 !
 !$omp parallel do private(iele,k1,i)
       do iele = 1, ucd%nele
         do k1 = 1, ucd%nnod_4_ele
           i = k1 + (iele-1) * ucd%nnod_4_ele
-          m_ucd%ie_hdf5(i) = ucd%ie(iele,k1) - 1
+          m_ucd%ie_hdf5(i) = int(ucd%ie(iele,k1)) - 1
         end do
       end do
 !$omp end parallel do
@@ -217,8 +218,8 @@
       integer :: hdferr
 !
 !
-      nnod = m_ucd%istack_merged_intnod(my_rank+1)                      &
-     &      - m_ucd%istack_merged_intnod(my_rank)
+      nnod = int(m_ucd%istack_merged_intnod(my_rank+1)                  &
+     &         - m_ucd%istack_merged_intnod(my_rank)  )
 !
       call set_merged_hdf_mesh_file_name(ucd%file_prefix, file_name)
 !
@@ -403,8 +404,8 @@
 !
       icou = 0
       do istep = 1, ucd%num_field, 1
-        nnod = m_ucd%istack_merged_intnod(my_rank+1)                    &
-     &        - m_ucd%istack_merged_intnod(my_rank)
+        nnod = int(m_ucd%istack_merged_intnod(my_rank+1)                &
+     &           - m_ucd%istack_merged_intnod(my_rank)  )
 !
 ! Transpose the field data to fit XDMF standards
 !
@@ -553,15 +554,17 @@
       character(len = kchara) :: node_str, elem_str
       character(len = kchara) :: time_str, attr_str, tmp_str
       integer(kind=kint), parameter :: id_xdmf = 14
-      integer :: istep
+      integer(kind=kint) :: i_adjusted
+      integer(kind=kint) :: istep
 !
 ! Only write the file on process 0
       if (my_rank .ne. 0) return
 !
-      call int_to_str(kreal, bite_str)
+      i_adjusted = kreal
+      call int_to_str(i_adjusted, bite_str)
       call int_to_str(ithree, dim_str)
-      call int_to_str(m_ucd%istack_merged_intnod(nprocs), node_str)
-      call int_to_str(m_ucd%istack_merged_ele(nprocs), elem_str)
+      call lint_to_str(m_ucd%istack_merged_intnod(nprocs), node_str)
+      call lint_to_str(m_ucd%istack_merged_ele(nprocs), elem_str)
 !
 ! Open the XDMF file to append
       open(id_xdmf, file=xdmf_dir_file, status='old',                   &

@@ -36,7 +36,7 @@
 !
       integer(kind = kint) :: istep_st, istep_ed, istep_read
       integer(kind = kint) :: ist_true, ied_true
-      real(kind = kreal) :: time_sph, time_ini
+      real(kind = kreal) :: time_sph, time_ini, pre_time
 !
       integer(kind = kint), allocatable :: kr_sph(:)
       real(kind = kreal), allocatable :: spectr_t(:,:)
@@ -48,8 +48,6 @@
       real(kind = kreal), allocatable :: spectr_pre_l(:,:,:)
       real(kind = kreal), allocatable :: spectr_pre_m(:,:,:)
       real(kind = kreal), allocatable :: spectr_pre_lm(:,:,:)
-!
-      real(kind = kreal) :: pre_time
 !
       integer(kind = kint) :: iflag_sph_ene_file
       integer(kind = kint) :: ilayer_sph_ene

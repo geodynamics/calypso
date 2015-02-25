@@ -44,11 +44,11 @@
       integer (kind = kint) :: i
 !
 !
-      write(id_file,'(i10)') numele_dummy
-      write(id_file,'(10i8)') i_ele_dummy(1:numele_dummy)
+      write(id_file,'(i16)') numele_dummy
+      write(id_file,'(10i16)') i_ele_dummy(1:numele_dummy)
 !
       do i=1, numele_dummy
-        write(id_file,'(40i10)') globalelmid_dummy(i),                  &
+        write(id_file,'(28i16)') globalelmid_dummy(i),                  &
      &    ie_dummy(i,1:nodelm_dummy(i))
       end do
 !
@@ -63,10 +63,10 @@
       integer (kind = kint), intent(in) :: id_file
       integer(kind = kint) :: i
 !
-      write(id_file,'(2i10)') nsf_4_ele_IO, nsurf_in_ele_IO
+      write(id_file,'(2i16)') nsf_4_ele_IO, nsurf_in_ele_IO
 !
       do i = 1, nsf_4_ele_IO
-        write(id_file,'(10i10)') i, isf_4_ele_IO(i,1:nsurf_in_ele_IO)
+        write(id_file,'(10i16)') i, isf_4_ele_IO(i,1:nsurf_in_ele_IO)
       end do
 !
       call deallocate_surface_connect_IO
@@ -80,10 +80,10 @@
       integer (kind = kint), intent(in) :: id_file
       integer(kind = kint) :: i
 !
-      write(id_file,'(2i10)') ned_4_ele_IO, nedge_in_ele_IO
+      write(id_file,'(2i16)') ned_4_ele_IO, nedge_in_ele_IO
 !
       do i = 1, ned_4_ele_IO
-        write(id_file,'(15i10)') i, iedge_4_ele_IO(i,1:nedge_in_ele_IO)
+        write(id_file,'(15i16)') i, iedge_4_ele_IO(i,1:nedge_in_ele_IO)
       end do
 !
       call deallocate_edge_connect_IO

@@ -143,7 +143,7 @@
         ied = iele_stack_near_nod(inod)
         write(50+my_rank,*) 'near element ID for node ',                &
      &                     inod, ist, ied, nele_near_nod(inod)
-        write(50+my_rank,'(8i10)') iele_near_nod(ist:ied)
+        write(50+my_rank,'(8i16)') iele_near_nod(ist:ied)
       end do
 !
       end subroutine check_near_ele_4_node

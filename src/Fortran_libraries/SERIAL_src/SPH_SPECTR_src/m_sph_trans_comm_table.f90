@@ -27,9 +27,6 @@
 !!      subroutine deallocate_sph_comm_item_rtm
 !!      subroutine deallocate_sph_comm_item_rlm
 !!      subroutine deallocate_sph_comm_item_rj
-!!
-!!      subroutine set_reverse_sph_comm_table(numnod, ntot_item,        &
-!!     &          item_sr, irev_sr)
 !!@endverbatim
 !!
 !!@n @param nnod_rtp
@@ -321,36 +318,6 @@
       deallocate( istack_sr_rj )
 !
       end subroutine deallocate_sph_comm_item_rj
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine set_reverse_sph_comm_table(numnod, ntot_item,          &
-     &          item_sr, irev_sr)
-!
-      integer(kind = kint), intent(in) :: numnod
-      integer(kind = kint), intent(in) :: ntot_item
-      integer(kind = kint), intent(in) :: item_sr(ntot_item)
-!
-      integer(kind = kint), intent(inout) :: irev_sr(numnod)
-!
-      integer(kind = kint) :: i, k
-!
-!
-!$omp parallel do
-      do i = 1, numnod
-        irev_sr(i) = ntot_item + 1
-      end do
-!$omp end parallel do
-!
-!$omp parallel do private(i)
-      do k = 1, ntot_item
-        i = item_sr(k)
-        irev_sr(i) = k
-      end do
-!$omp end parallel do
-!
-      end subroutine set_reverse_sph_comm_table
 !
 ! -----------------------------------------------------------------------
 !

@@ -110,14 +110,16 @@
       use cal_rot_buoyancies_sph_MHD
 !
 !
-      if(ipol%i_velo*ipol%i_vort .gt. 0) then
-        call const_grad_vp_and_vorticity(ipol%i_velo, ipol%i_vort)
-      end if
+      if(iflag_t_evo_4_velo .gt. id_no_evolution) then
+        if(ipol%i_velo*ipol%i_vort .gt. 0) then
+          call const_grad_vp_and_vorticity(ipol%i_velo, ipol%i_vort)
+        end if
 !
-      if(iflag_debug.gt.0) write(*,*) 'update_after_vorticity_sph'
-      call update_after_vorticity_sph
-      if(iflag_debug.gt.0) write(*,*) 'cal_rot_radial_self_gravity'
-      call cal_rot_radial_self_gravity(sph_bc_U)
+        if(iflag_debug.gt.0) write(*,*) 'update_after_vorticity_sph'
+        call update_after_vorticity_sph
+        if(iflag_debug.gt.0) write(*,*) 'cal_rot_radial_self_gravity'
+        call cal_rot_radial_self_gravity(sph_bc_U)
+      end if
 !
       if(iflag_debug.gt.0) write(*,*) 'update_after_heat_sph'
       call update_after_heat_sph
@@ -244,7 +246,7 @@
       do j = 1, nidx_rj(2)
          do k = 1, nidx_rj(1)
           inod = j + (k-1) * nidx_rj(2)
-          write(150+my_rank,'(2i10,1p20E25.15e3)') j, k,                &
+          write(150+my_rank,'(2i16,1p20E25.15e3)') j, k,                &
      &        d_rj(inod,ipol%i_velo),d_rj(inod,idpdr%i_velo),           &
      &        d_rj(inod,itor%i_velo)
         end do
@@ -262,7 +264,7 @@
       do j = 1, nidx_rj(2)
          do k = 1, nidx_rj(1)
           inod = j + (k-1) * nidx_rj(2)
-          write(150+my_rank,'(2i10,1p20E25.15e3)') j, k,                &
+          write(150+my_rank,'(2i16,1p20E25.15e3)') j, k,                &
      &        d_rj(inod,ipol%i_vort), d_rj(inod,idpdr%i_vort),          &
      &        d_rj(inod,itor%i_vort)
         end do

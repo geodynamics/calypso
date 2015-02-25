@@ -157,7 +157,7 @@
 !
       call open_field_data_on_circle
 !
-      write(fmt_txt,'(a20,i5,a13)') '(i10,1pE25.15e3,i10,',             &
+      write(fmt_txt,'(a20,i5,a13)') '(i16,1pE25.15e3,i16,',             &
      &              (d_circle%ntot_phys_viz+1), '(1pE25.15e3))'
       do mphi = 1, mphi_circle
         phi = dble(mphi-1) * amphi_circle
@@ -165,7 +165,7 @@
      &             d_circle%d_fld(mphi,1:d_circle%ntot_phys_viz)
       end do
 !
-      write(fmt_txt,'(a20,i5,a13)') '(i10,1pE25.15e3,i10,',             &
+      write(fmt_txt,'(a20,i5,a13)') '(i16,1pE25.15e3,i16,',             &
      &              d_circle%ntot_phys_viz, '(1pE25.15e3))'
       do mphi = 0, mphi_circle / 2
         write(id_circ_sq,fmt_txt) i_step, time, mphi,                   &
@@ -261,9 +261,9 @@
       write(id_circ_fid,'(a)') '# Number of points and components'
       write(id_circ_sq, '(a)') '# Number of modes and components'
       write(id_circ_ph, '(a)') '# Number of modes and components'
-      write(id_circ_fid,'(2i10)') mphi_circle, d_circle%ntot_phys_viz
-      write(id_circ_sq, '(2i10)') mphi_circle/2, d_circle%ntot_phys_viz
-      write(id_circ_ph, '(2i10)') mphi_circle/2, d_circle%ntot_phys_viz
+      write(id_circ_fid,'(2i16)') mphi_circle, d_circle%ntot_phys_viz
+      write(id_circ_sq, '(2i16)') mphi_circle/2, d_circle%ntot_phys_viz
+      write(id_circ_ph, '(2i16)') mphi_circle/2, d_circle%ntot_phys_viz
 !
 !
       write(label(1),'(a)') 't_step'

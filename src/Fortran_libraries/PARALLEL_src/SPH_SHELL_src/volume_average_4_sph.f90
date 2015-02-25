@@ -5,6 +5,8 @@
 !
 !!      subroutine allocate_ave_4_sph_spectr(nri_ave, ntot_rms)
 !!      subroutine deallocate_ave_4_sph_spectr
+!!      subroutine write_sph_vol_ave_file(istep, time)
+!!
 !!      subroutine cal_volume_average_sph(kg_st, kg_ed, avol)
 !
       module volume_average_4_sph
@@ -19,11 +21,13 @@
 !
       integer(kind = kint) :: nri_ave
 !
-      real(kind = kreal), allocatable :: ave_vol_lc(:)
+      integer(kind = kint), parameter :: id_file_ave =      43
 !
       real(kind = kreal), allocatable :: ave_sph(:,:)
+      real(kind = kreal), allocatable :: ave_sph_vol(:)
 !
-      private :: nri_ave, ave_vol_lc, ave_sph
+      private :: id_file_ave
+      private :: nri_ave, ave_sph, ave_sph_vol
       private :: cal_sphere_average_sph, averaging_4_sph_ave_int
       private :: cal_ave_vector_sph_spectr, cal_ave_scalar_sph_spectr
 !
@@ -38,16 +42,17 @@
       integer(kind = kint), intent(in) :: ntot_rms
 !
 !
-      allocate(ave_vol_lc(ntot_rms))
-      if(ntot_rms .gt. 0) ave_vol_lc = 0.0d0
-!
       if(idx_rj_degree_zero .eq. izero) return
 !
       nri_ave = nidx_rj(1)
 !
+      allocate(ave_sph_vol(ntot_rms))
       allocate(ave_sph(0:nri_ave,ntot_rms))
 !
-      if(nri_ave*ntot_rms .gt. 0)  ave_sph=     0.0d0
+      if(nri_ave*ntot_rms .gt. 0) then
+        ave_sph=     0.0d0
+        ave_sph_vol = 0.0d0
+      end if
 !
       end subroutine allocate_ave_4_sph_spectr
 !
@@ -56,17 +61,44 @@
       subroutine deallocate_ave_4_sph_spectr
 !
 !
-      deallocate( ave_vol_lc )
-      if(idx_rj_degree_zero .ne. izero)  deallocate( ave_sph )
+      if(idx_rj_degree_zero .eq. izero) return
+      deallocate(ave_sph, ave_sph_vol)
 !
       end subroutine deallocate_ave_4_sph_spectr
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
+      subroutine write_sph_vol_ave_file(istep, time)
+!
+      use set_parallel_file_name
+      use m_rms_4_sph_spectr
+!
+      integer(kind = kint), intent(in) :: istep
+      real(kind = kreal), intent(in) :: time
+!
+      character(len=kchara) :: fname_rms, mode_label
+!
+!
+      if(idx_rj_degree_zero .eq. 0)  return
+      if(ntot_rms_rj .eq. 0)  return
+!
+      write(fname_rms, '(a,a4)') trim(fhead_ave_vol), '.dat'
+      write(mode_label,'(a)') 'EMPTY'
+      call open_sph_mean_sq_file                                        &
+     &      (id_file_ave, fname_rms, mode_label)
+!
+      write(id_file_ave,'(i15,1pe23.14e3,1p200e23.14e3)')               &
+     &                 istep, time, ave_sph_vol(1:ntot_rms_rj)
+      close(id_file_ave)
+!
+      end subroutine write_sph_vol_ave_file
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
       subroutine cal_volume_average_sph(kg_st, kg_ed, avol)
 !
-      use calypso_mpi
       use m_phys_constants
       use m_sph_spectr_data
       use m_rms_4_sph_spectr
@@ -82,14 +114,9 @@
         call cal_sphere_average_sph
 !
         call radial_integration(kg_st, kg_ed, nidx_rj(1),               &
-     &      radius_1d_rj_r, ntot_rms_rj, ave_sph(0,1),  ave_vol_lc(1))
+     &      radius_1d_rj_r, ntot_rms_rj, ave_sph(0,1),  ave_sph_vol(1))
         call averaging_4_sph_ave_int(avol)
-      else
-        ave_vol_lc = 0.0d0
       end if
-!
-      call MPI_allREDUCE (ave_vol_lc(1), ave_sph_vol(1), ntot_rms_rj,   &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine cal_volume_average_sph
 !
@@ -134,7 +161,7 @@
 !
 !$omp parallel do private(k,icou)
       do icou = 1, ntot_rms_rj
-        ave_vol_lc(icou) = avol * ave_vol_lc(icou)
+        ave_sph_vol(icou) = avol * ave_sph_vol(icou)
       end do
 !$omp end parallel do
 !

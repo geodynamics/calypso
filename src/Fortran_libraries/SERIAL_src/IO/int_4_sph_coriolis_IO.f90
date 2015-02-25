@@ -31,19 +31,19 @@
       open(id_sph_cor,file=sph_cor_file_name)
       write(id_sph_cor,'(a)') '# ----- rotate.dat -----'
       write(id_sph_cor,'(a)') '#  truncation'
-      write(id_sph_cor,'(i10)')  ltr_cor_IO
+      write(id_sph_cor,'(i16)')  ltr_cor_IO
 !
       j1 = 2
       write(id_sph_cor,'(a)') '# j1, l2_gl, j3_gl, Ki/pi'
       do j3 = 1 ,jmax_cor_IO
         do j2 = 1, 2
-          write(id_sph_cor,'(3i10,1pE25.15e3)') j1,                     &
+          write(id_sph_cor,'(3i16,1pE25.15e3)') j1,                     &
      &                jgl_kcor_IO(j3,j2,j1), j3, gk_cor_IO(j3,j2,j1)
         end do
       end do
       write(id_sph_cor,'(a)') '# j1, l2_gl, j3_gl, Li/pi'
       do j3 = 1 ,jmax_cor_IO
-        write(id_sph_cor,'(3i10,1pE25.15e3)') j1,                       &
+        write(id_sph_cor,'(3i16,1pE25.15e3)') j1,                       &
      &                jgl_lcor_IO(j3,1,j1), j3, el_cor_IO(j3,1,j1)
       end do
 !*
@@ -52,7 +52,7 @@
         write(id_sph_cor,'(a)') '# j1, l2_gl, j3_gl, Ki/pi'
         do j3 = 1 ,jmax_cor_IO
           do j2 = 1, 4
-            write(id_sph_cor,'(3i10,1pE25.15e3)') j1,                   &
+            write(id_sph_cor,'(3i16,1pE25.15e3)') j1,                   &
      &                jgl_kcor_IO(j3,j2,j1), j3, gk_cor_IO(j3,j2,j1)
           end do
         end do
@@ -60,7 +60,7 @@
         write(id_sph_cor,'(a)') '# j1, l2_gl, j3_gl, Li/pi'
         do j3 = 1, jmax_cor_IO
           do j2 = 1, 2
-            write(id_sph_cor,'(3i10,1pE25.15e3)') j1,                   &
+            write(id_sph_cor,'(3i16,1pE25.15e3)') j1,                   &
      &                jgl_lcor_IO(j3,j2,j1), j3, el_cor_IO(j3,j2,j1)
           end do
         end do

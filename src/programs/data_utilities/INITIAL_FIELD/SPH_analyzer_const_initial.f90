@@ -37,7 +37,7 @@
       subroutine initialize_const_sph_initial
 !
       use set_control_sph_mhd
-      use m_ctl_data_noviz_MHD
+      use m_ctl_data_sph_MHD_noviz
       use init_sph_MHD_elapsed_label
 !
 !
@@ -49,8 +49,8 @@
 !
       call start_eleps_time(1)
       call start_eleps_time(4)
-      if (iflag_debug.eq.1) write(*,*) 'read_control_4_MHD_noviz'
-      call read_control_4_MHD_noviz
+      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_noviz'
+      call read_control_4_sph_MHD_noviz
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
       call set_control_4_sph_mhd
 !
@@ -102,9 +102,7 @@
 !   Allocate spectr field data
 !
       call allocate_phys_rj_data
-      call allocate_phys_rtp_data
       call set_sph_sprctr_data_address
-      call set_sph_nod_data_address
 !
 ! ---------------------------------
 !

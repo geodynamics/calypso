@@ -61,7 +61,7 @@
         real(kind=kreal)  , pointer  :: xx(:,:)
 !
 !>       global node    id (where i:node id)
-        integer(kind=kint), pointer  ::  inod_global(:)
+        integer(kind=kint_gl), pointer  ::  inod_global(:)
 !
 !>       distance from the centre
         real(kind=kreal)  , pointer  :: rr(:)
@@ -102,7 +102,7 @@
 !>       element type id   (where i:element id)
         integer(kind=kint), pointer  ::  nodelm(:)
 !>       global element id (where i:element id)
-        integer(kind=kint), pointer  ::  iele_global(:)
+        integer(kind=kint_gl), pointer  ::  iele_global(:)
 !>        element type defined by the first element
         integer(kind=kint) ::  first_ele_type
 !

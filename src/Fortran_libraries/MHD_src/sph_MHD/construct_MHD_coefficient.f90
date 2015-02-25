@@ -40,6 +40,7 @@
 !
       use m_precision
       use m_constants
+      use m_machine_parameter
 !
       implicit none
 !
@@ -54,6 +55,7 @@
      &          r_low_t, r_high_t)
 !
       use calypso_mpi
+      use m_error_IDs
       use skip_comment_f
 !
       integer (kind = kint), intent(in) :: num_dimless
@@ -71,16 +73,15 @@
 !
 !
        do i = 1, num_coef
-         if (cmp_no_case(coef_name(i), 'One') .gt. 0) then
+         if     (cmp_no_case(coef_name(i), 'One'))  then
            coef = coef * one
-         else if(cmp_no_case(coef_name(i), 'Two') .gt. 0) then
+         else if(cmp_no_case(coef_name(i), 'Two') ) then
            coef = coef * two**coef_power(i)
-         else if(cmp_no_case(coef_name(i), 'Zero') .gt. 0) then
+         else if(cmp_no_case(coef_name(i), 'Zero')) then
            coef = coef * zero
-         else if(cmp_no_case(coef_name(i), 'Radial_parameter') .gt. 0)  &
-     &        then
+         else if(cmp_no_case(coef_name(i), 'Radial_parameter')) then
            coef = coef * (one - r_high_t/r_low_t)
-         else if(cmp_no_case(coef_name(i), 'Radial_35').gt.0) then
+         else if(cmp_no_case(coef_name(i), 'Radial_35')) then
            coef = coef * (one - 0.35d0)
          else
            iflag = 0
@@ -91,8 +92,8 @@
              end if
            end do
            if (iflag .eq. 0) then
-             write(*,*) 'there is missing dimensionless number'
-             call calypso_MPI_abort(1000, 'normalization problem')
+             write(e_message,*) 'there is missing dimensionless number'
+             call calypso_MPI_abort(ierr_dless, e_message)
            end if
          end if
        end do

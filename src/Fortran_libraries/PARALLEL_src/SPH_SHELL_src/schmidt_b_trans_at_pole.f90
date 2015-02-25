@@ -7,8 +7,10 @@
 !>@brief  Legendre transform at poles
 !!
 !!@verbatim
-!!      subroutine schmidt_b_trans_pole_scalar(ncomp, nvector, nscalar)
-!!      subroutine schmidt_b_trans_pole_vect(ncomp, nvector)
+!!      subroutine schmidt_b_trans_pole_scalar(ncomp, nvector, nscalar, &
+!!     &          irev_sr_rlm, n_WR, WR, v_pl_local)
+!!      subroutine schmidt_b_trans_pole_vect(ncomp, nvector,            &
+!!     &          irev_sr_rlm, n_WR, WR, v_pl_local)
 !!
 !!------------------------------------------------------------------
 !!
@@ -80,76 +82,89 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine schmidt_b_trans_pole_scalar(ncomp, nvector, nscalar)
+      subroutine schmidt_b_trans_pole_scalar(ncomp, nvector, nscalar,   &
+     &          irev_sr_rlm, n_WR, WR, v_pl_local)
 !
       use calypso_mpi
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      integer(kind = kint), intent(in) :: n_WR
+      integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
+      real (kind=kreal), intent(in):: WR(n_WR)
+      real(kind = kreal), intent(inout) :: v_pl_local(nnod_pole,ncomp)
 !
-      integer(kind = kint) :: k_rlm, nd, kr_nd
-      integer(kind = kint) :: jst, jed, j_rlm, i_rlm
+      integer(kind = kint) :: k_rlm, nd, k_np, k_sp
+      integer(kind = kint) :: jst, jed, j_rlm, i_rlm, i_recv
 !
 !
-      v_np_local = zero
-      v_sp_local = zero
+      do nd = 1+3*nvector, nscalar+3*nvector
+        v_pl_local(1:2*nidx_global_rtp(1),nd) = zero
+      end do
 !
       if(ist_rtm_order_zero .le. 0) return
-!!$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
+!$omp parallel do private(k_rlm,nd,k_np,k_sp,jst,jed,j_rlm,i_rlm,i_recv)
       do k_rlm = 1, nidx_rlm(1)
-        do nd = 1, nscalar
-          kr_nd = nd + 3*nvector + (idx_gl_1d_rtm_r(k_rlm)-1) * ncomp
+        k_np = idx_gl_1d_rtm_r(k_rlm)
+        k_sp = idx_gl_1d_rtm_r(k_rlm) + nidx_global_rtp(1)
+        do nd = 1+3*nvector, nscalar+3*nvector
 !
           jst = ist_rtm_order_zero
           jed = ist_rtm_order_zero + l_truncation
           do j_rlm = jst, jed
-            i_rlm = nd + 3*nvector + (j_rlm-1) * ncomp                  &
-     &                             + (k_rlm-1) * ncomp * nidx_rlm(2)
-            v_np_local(kr_nd) = v_np_local(kr_nd)                       &
-     &                        + sp_rlm(i_rlm) * P_pole_rtm(1,j_rlm)
-            v_sp_local(kr_nd) = v_sp_local(kr_nd)                       &
-     &                        + sp_rlm(i_rlm) * P_pole_rtm(2,j_rlm)
+            i_rlm = 1 + (j_rlm-1) * istep_rlm(2)                        &
+     &                + (k_rlm-1) * istep_rlm(1)
+            i_recv = nd + (irev_sr_rlm(i_rlm)-1) * ncomp
+            v_pl_local(k_np,nd) = v_pl_local(k_np,nd)                   &
+     &                         + WR(i_recv) * P_pole_rtm(1,j_rlm)
+            v_pl_local(k_sp,nd) = v_pl_local(k_sp,nd)                   &
+     &                         + WR(i_recv) * P_pole_rtm(2,j_rlm)
           end do
         end do
       end do
-!!$omp end parallel do
+!$omp end parallel do
 !
       end subroutine schmidt_b_trans_pole_scalar
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine schmidt_b_trans_pole_vect(ncomp, nvector)
+      subroutine schmidt_b_trans_pole_vect(ncomp, nvector,              &
+     &          irev_sr_rlm, n_WR, WR, v_pl_local)
 !
       use calypso_mpi
 !
       integer(kind = kint), intent(in) :: ncomp, nvector
+      integer(kind = kint), intent(in) :: n_WR
+      integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
+      real (kind=kreal), intent(in):: WR(n_WR)
+      real(kind = kreal), intent(inout) :: v_pl_local(nnod_pole,ncomp)
 !
-      integer(kind = kint) :: k_rlm, nd, kr_nd
-      integer(kind = kint) :: jst, jed, j_rlm, i_rlm, iflag
+      integer(kind = kint) :: k_rlm, nd, k_np, k_sp
+      integer(kind = kint) :: jst, jed, j_rlm, i_rlm, i_recv, iflag
 !
 !
-      v_np_local = zero
-      v_sp_local = zero
-      v_n_pole =   zero
-      v_s_pole =   zero
+      do nd = 1, 3*nvector
+        v_pl_local(1:2*nidx_global_rtp(1),nd) = zero
+      end do
 !
       if(ist_rtm_order_zero .gt. 0) then
-!$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
+!$omp parallel do private(k_rlm,nd,k_np,k_sp,jst,jed,j_rlm,i_rlm,i_recv)
         do k_rlm = 1, nidx_rlm(1)
+          k_np = idx_gl_1d_rtm_r(k_rlm)
+          k_sp = idx_gl_1d_rtm_r(k_rlm) + nidx_global_rtp(1)
           do nd = 1, nvector
-            kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * ncomp
 !
             jst = ist_rtm_order_zero
             jed = ist_rtm_order_zero + l_truncation
             do j_rlm = jst, jed
-              i_rlm = nd + (j_rlm-1) * ncomp                            &
-     &                   + (k_rlm-1) * ncomp * nidx_rlm(2)
-              v_np_local(3*kr_nd-2) = v_np_local(3*kr_nd-2)             &
-     &                           + sp_rlm(3*i_rlm-2)                    &
-     &                            * P_pole_rtm(1,j_rlm)                 &
+              i_rlm = 1 + (j_rlm-1) * istep_rlm(2)                      &
+     &                  + (k_rlm-1) * istep_rlm(1)
+              i_recv = 3*nd + (irev_sr_rlm(i_rlm)-1) * ncomp
+!
+              v_pl_local(k_np,3*nd-2) = v_pl_local(k_np,3*nd-2)         &
+     &                           + WR(i_recv-2) * P_pole_rtm(1,j_rlm)   &
      &                            * g_sph_rlm(j_rlm,3)
-              v_sp_local(3*kr_nd-2) = v_sp_local(3*kr_nd-2)             &
-     &                           + sp_rlm(3*i_rlm-2)                    &
-     &                            * P_pole_rtm(2,j_rlm)                 &
+              v_pl_local(k_sp,3*nd-2) = v_pl_local(k_sp,3*nd-2)         &
+     &                           + WR(i_recv-2) * P_pole_rtm(2,j_rlm)   &
      &                            * g_sph_rlm(j_rlm,3)
             end do
           end do
@@ -158,29 +173,28 @@
       end if
 !
       if(ist_rtm_order_1s .gt. 0) then
-!$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
+!$omp parallel do private(k_rlm,nd,k_np,k_sp,jst,jed,j_rlm,i_rlm,i_recv)
         do k_rlm = 1, nidx_rlm(1)
+          k_np = idx_gl_1d_rtm_r(k_rlm)
+          k_sp = idx_gl_1d_rtm_r(k_rlm) + nidx_global_rtp(1)
           do nd = 1, nvector
-            kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * ncomp
 !
             jst = ist_rtm_order_1s
-            jed = ist_rtm_order_1s + l_truncation
+            jed = ist_rtm_order_1s + l_truncation-1
             do j_rlm = jst, jed
-              i_rlm = nd + (j_rlm-1) * ncomp                            &
-     &                   + (k_rlm-1) * ncomp * nidx_rlm(2)
-              v_np_local(3*kr_nd-1) = v_np_local(3*kr_nd-1)             &
-     &                              + sp_rlm(3*i_rlm  )                 &
-     &                               * dPdt_pole_rtm(1,j_rlm)
-              v_np_local(3*kr_nd  ) = v_np_local(3*kr_nd  )             &
-     &                              + sp_rlm(3*i_rlm-1)                 &
-     &                               * dPdt_pole_rtm(1,j_rlm)
+              i_rlm = 1 + (j_rlm-1) * istep_rlm(2)                      &
+     &                  + (k_rlm-1) * istep_rlm(1)
+              i_recv = 3*nd + (irev_sr_rlm(i_rlm)-1) * ncomp
 !
-              v_sp_local(3*kr_nd-1) = v_sp_local(3*kr_nd-1)             &
-     &                              - sp_rlm(3*i_rlm  )                 &
-     &                               * dPdt_pole_rtm(2,j_rlm)
-              v_sp_local(3*kr_nd  ) = v_sp_local(3*kr_nd  )             &
-     &                              + sp_rlm(3*i_rlm-1)                 &
-     &                               * dPdt_pole_rtm(2,j_rlm)
+              v_pl_local(k_np,3*nd-1) = v_pl_local(k_np,3*nd-1)         &
+     &                + WR(i_recv  ) * dPdt_pole_rtm(1,j_rlm)
+              v_pl_local(k_np,3*nd  ) = v_pl_local(k_np,3*nd  )         &
+     &                + WR(i_recv-1) * dPdt_pole_rtm(1,j_rlm)
+!
+              v_pl_local(k_sp,3*nd-1) = v_pl_local(k_sp,3*nd-1)         &
+     &                - WR(i_recv  ) * dPdt_pole_rtm(2,j_rlm)
+              v_pl_local(k_sp,3*nd  ) = v_pl_local(k_sp,3*nd  )         &
+     &                + WR(i_recv-1) * dPdt_pole_rtm(2,j_rlm)
             end do
           end do
         end do
@@ -188,29 +202,28 @@
       end if
 !
       if(ist_rtm_order_1c .gt. 0) then
-!$omp parallel do private(k_rlm,nd,kr_nd,jst,jed,j_rlm,i_rlm)
+!$omp parallel do private(k_rlm,nd,k_np,k_sp,jst,jed,j_rlm,i_rlm,i_recv)
         do k_rlm = 1, nidx_rlm(1)
+          k_np = idx_gl_1d_rtm_r(k_rlm)
+          k_sp = idx_gl_1d_rtm_r(k_rlm) + nidx_global_rtp(1)
           do nd = 1, nvector
-            kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * ncomp
 !
             jst = ist_rtm_order_1c
-            jed = ist_rtm_order_1c + l_truncation
+            jed = ist_rtm_order_1c + l_truncation-1
             do j_rlm = jst, jed
-              i_rlm = nd + (j_rlm-1) * ncomp                            &
-     &                   + (k_rlm-1) * ncomp * nidx_rlm(2)
-              v_np_local(3*kr_nd-1) = v_np_local(3*kr_nd-1)             &
-     &                              + sp_rlm(3*i_rlm-1)                 &
-     &                               * dPdt_pole_rtm(1,j_rlm)
-              v_np_local(3*kr_nd  ) = v_np_local(3*kr_nd  )             &
-     &                              - sp_rlm(3*i_rlm  )                 &
-     &                               * dPdt_pole_rtm(1,j_rlm)
+              i_rlm = 1 + (j_rlm-1) * istep_rlm(2)                      &
+     &                  + (k_rlm-1) * istep_rlm(1)
+              i_recv = 3*nd + (irev_sr_rlm(i_rlm)-1) * ncomp
 !
-              v_sp_local(3*kr_nd-1) = v_sp_local(3*kr_nd-1)             &
-     &                              + sp_rlm(3*i_rlm-1)                 &
-     &                               * dPdt_pole_rtm(2,j_rlm)
-              v_sp_local(3*kr_nd  ) = v_sp_local(3*kr_nd  )             &
-     &                              - sp_rlm(3*i_rlm  )                 &
-     &                               * dPdt_pole_rtm(2,j_rlm)
+              v_pl_local(k_np,3*nd-1) = v_pl_local(k_np,3*nd-1)         &
+     &                + WR(i_recv-1) * dPdt_pole_rtm(1,j_rlm)
+              v_pl_local(k_np,3*nd  ) = v_pl_local(k_np,3*nd  )         &
+     &                - WR(i_recv  ) * dPdt_pole_rtm(1,j_rlm)
+!
+              v_pl_local(k_sp,3*nd-1) = v_pl_local(k_sp,3*nd-1)         &
+     &                + WR(i_recv-1) * dPdt_pole_rtm(2,j_rlm)
+              v_pl_local(k_sp,3*nd  ) = v_pl_local(k_sp,3*nd  )         &
+     &                - WR(i_recv  ) * dPdt_pole_rtm(2,j_rlm)
             end do
           end do
         end do
@@ -220,19 +233,20 @@
       iflag = ist_rtm_order_zero+ist_rtm_order_1s+ist_rtm_order_1c
       if(iflag .gt. 0) then
         do k_rlm = 1, nidx_rlm(1)
+          k_np = idx_gl_1d_rtm_r(k_rlm)
+          k_sp = idx_gl_1d_rtm_r(k_rlm) + nidx_global_rtp(1)
           do nd = 1, nvector
-            kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * ncomp
-            v_np_local(3*kr_nd-2) = v_np_local(3*kr_nd-2)               &
+            v_pl_local(k_np,3*nd-2) = v_pl_local(k_np,3*nd-2)           &
      &                      * a_r_1d_rlm_r(k_rlm)*a_r_1d_rlm_r(k_rlm)
-            v_np_local(3*kr_nd-1) = v_np_local(3*kr_nd-1)               &
+            v_pl_local(k_np,3*nd-1) = v_pl_local(k_np,3*nd-1)           &
      &                      * a_r_1d_rlm_r(k_rlm)
-            v_np_local(3*kr_nd  ) = v_np_local(3*kr_nd  )               &
+            v_pl_local(k_np,3*nd  ) = v_pl_local(k_np,3*nd  )           &
      &                      * a_r_1d_rlm_r(k_rlm)
-            v_sp_local(3*kr_nd-2) = v_sp_local(3*kr_nd-2)               &
+            v_pl_local(k_sp,3*nd-2) = v_pl_local(k_sp,3*nd-2)           &
      &                      * a_r_1d_rlm_r(k_rlm)*a_r_1d_rlm_r(k_rlm)
-            v_sp_local(3*kr_nd-1) = v_sp_local(3*kr_nd-1)               &
+            v_pl_local(k_sp,3*nd-1) = v_pl_local(k_sp,3*nd-1)           &
      &                      * a_r_1d_rlm_r(k_rlm)
-            v_sp_local(3*kr_nd  ) = v_sp_local(3*kr_nd  )               &
+            v_pl_local(k_sp,3*nd  ) = v_pl_local(k_sp,3*nd  )           &
      &                      * a_r_1d_rlm_r(k_rlm)
           end do
         end do

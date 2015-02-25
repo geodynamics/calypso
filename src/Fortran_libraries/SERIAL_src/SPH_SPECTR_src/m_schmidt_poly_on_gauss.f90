@@ -205,7 +205,7 @@
 !
 !
       write(50,*) 'num_gauss_points, truncation', nth_g, jmax_g
-      write(50,*) 'med_no, j, l, m, P, dp/dth'
+      write(50,*) 'med_no, j, l, m, P, dp/dtheta'
 !
       do j = 0, jmax_g
         do i = 1, nth_g
@@ -226,7 +226,7 @@
 !
       write(50,*) 'Fully normalized Legendre Polynomials'
       write(50,*) 'num_gauss_points, truncation', nth_g, jmax_g
-      write(50,*) 'med_no, j, l, m, P, dp/dth'
+      write(50,*) 'med_no, j, l, m, P, dp/dtheta'
 !
       do j = 0, jmax_g
         do i = 1, nth_g
@@ -247,7 +247,7 @@
 !
       write(50,*) 'Legendre Polynomials without normalizatio'
       write(50,*) 'num_gauss_points, truncation', nth_g, jmax_g
-      write(50,*) 'med_no, j, l, m, P, dp/dth'
+      write(50,*) 'med_no, j, l, m, P, dp/dtheta'
 !
       do j = 0, jmax_g
         do i = 1, nth_g

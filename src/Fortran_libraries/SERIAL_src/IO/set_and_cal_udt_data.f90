@@ -89,7 +89,7 @@
 !
       integer(kind=kint), intent(in)  :: internal_node
       integer(kind=kint), intent(in)  :: nele, nnod_ele
-      integer(kind=kint), intent(in)  :: iele_global(nele)
+      integer(kind=kint_gl), intent(in)  :: iele_global(nele)
       integer(kind=kint), intent(in)  :: ie(nele, nnod_ele)
 !
       type(ucd_data), intent(inout) :: ucd
@@ -189,7 +189,7 @@
 !
       integer(kind=kint), intent(in)  :: internal_node
       integer(kind=kint), intent(in)  :: nele, nnod_ele
-      integer(kind=kint), intent(in)  :: iele_global(nele)
+      integer(kind=kint_gl), intent(in)  :: iele_global(nele)
       integer(kind=kint), intent(in)  :: ie(nele, nnod_ele)
 !
       type(ucd_data), intent(inout) :: ucd

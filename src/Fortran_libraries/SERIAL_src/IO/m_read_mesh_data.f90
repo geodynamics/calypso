@@ -1,19 +1,24 @@
+!>@file   m_read_mesh_data.f90
+!!@brief  module m_read_mesh_data
+!!
+!!@author H. Matsui
+!!@date    programmed by H.Matsui
 !
-!   --------------   module m_read_mesh_data
-!
-!     written by H. Matsui
-!
-!      subroutine allocate_node_data_dummy
-!      subroutine allocate_ele_info_dummy
-!      subroutine allocate_connect_dummy
-!
-!      subroutine deallocate_mesh_arrays
-!
-!      subroutine deallocate_node_data_dummy
-!      subroutine deallocate_ele_info_dummy
-!
-!      subroutine allocate_ele_scalar_IO
-!      subroutine deallocate_ele_scalar_IO
+!>@brief Data arry for mesh_data_IO
+!!
+!!@verbatim
+!!      subroutine allocate_node_data_dummy
+!!      subroutine allocate_ele_info_dummy
+!!      subroutine allocate_connect_dummy
+!!
+!!      subroutine deallocate_mesh_arrays
+!!
+!!      subroutine deallocate_node_data_dummy
+!!      subroutine deallocate_ele_info_dummy
+!!
+!!      subroutine allocate_ele_scalar_IO
+!!      subroutine deallocate_ele_scalar_IO
+!!@endverbatim
 !
       module m_read_mesh_data
 !
@@ -23,7 +28,7 @@
 !
       integer(kind=kint) :: numnod_dummy
       integer(kind=kint) :: internal_node_dummy
-      integer(kind=kint), allocatable :: globalnodid_dummy(:)
+      integer(kind=kint_gl), allocatable :: globalnodid_dummy(:)
       real(kind=kreal),   allocatable :: xx_dummy(:,:)
 ! 
       real(kind=kreal),   allocatable :: ele_vector_IO(:,:)
@@ -31,7 +36,7 @@
 !
       integer(kind=kint) :: numele_dummy
       integer (kind = kint) :: nnod_4_ele_dummy = 8
-      integer(kind=kint), allocatable:: globalelmid_dummy(:)
+      integer(kind=kint_gl), allocatable:: globalelmid_dummy(:)
       integer(kind=kint), allocatable   :: i_ele_dummy(:)
       integer(kind=kint), allocatable   :: nodelm_dummy(:)
       integer(kind=kint), allocatable :: ie_dummy(:,:)

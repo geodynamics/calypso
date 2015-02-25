@@ -113,7 +113,7 @@
         write(id_monitor_file,1001)  num_field_monitor
         write(id_monitor_file,1002)                                     &
      &        num_nod_component(1:num_field_monitor)
- 1001   format('number_of_fields: ',i10)
+ 1001   format('number_of_fields: ',i16)
  1002   format('number_of_components: ',200i3)
 !
         do i = 1, num_field_monitor
@@ -202,7 +202,7 @@
 !
       do i = 1, num_monitor_local
         inod = monitor_local(i)
-        write(id_monitor_file,'(2i10,1pe25.15e3)',                      &
+        write(id_monitor_file,'(2i16,1pe25.15e3)',                      &
      &             advance='NO') i_step_MHD, inod, time
         write(id_monitor_file,'(1p3e25.15e3)',                          &
      &             advance='NO') xx(inod,1:3)

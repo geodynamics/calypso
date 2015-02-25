@@ -16,9 +16,12 @@
 !!
 !!      subroutine change_2_upper_case(string)
 !!      subroutine change_2_lower_case(string)
-!!      integer function cmp_no_case(cmp_chara, ref_chara)
+!!
+!!      logical function cmp_no_case(cmp_chara, ref_chara)
 !!          if ref_chara and cmp_chara are same ignoreing case,
 !!          returns 1, othewwise returns 0
+!!      logical function yes_flag(control)
+!!      logical function no_flag(control)
 !!@endverbatim
 !
       module skip_comment_f
@@ -163,7 +166,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      integer function cmp_no_case(cmp_chara, ref_chara)
+      logical function cmp_no_case(cmp_chara, ref_chara)
 !
       character(len=*), intent(in) :: ref_chara
       character(len=kchara), intent(in) :: cmp_chara
@@ -173,7 +176,7 @@
 !
       len = len_trim(ref_chara)
       if(len_trim(cmp_chara) .ne. len) then
-        cmp_no_case = 0
+        cmp_no_case = .false.
         return
       end if
 !
@@ -182,11 +185,46 @@
       call change_2_lower_case(ref_tmp)
       call change_2_lower_case(cmp_tmp)
 !
-      cmp_no_case = 0
-      if(ref_tmp .eq. cmp_tmp) cmp_no_case = 1
+      cmp_no_case = .false.
+      if(ref_tmp .eq. cmp_tmp) cmp_no_case = .true.
       return
 !
       end function cmp_no_case
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      logical function yes_flag(control)
+!
+      character(len=kchara), intent(in) :: control
+!
+!
+      if(cmp_no_case(control, 'yes') .or. cmp_no_case(control, '1')     &
+     &     .or. cmp_no_case(control, 'on')                              &
+     &     .or. cmp_no_case(control, '.true.')) then
+        yes_flag = .true.
+      else
+        yes_flag = .false.
+      end if
+!
+      end function yes_flag
+!
+!-----------------------------------------------------------------------
+!
+      logical function no_flag(control)
+!
+      character(len=kchara), intent(in) :: control
+!
+!
+      if(cmp_no_case(control, 'no') .or. cmp_no_case(control, '0')      &
+     &    .or. cmp_no_case(control, 'off')                              &
+     &    .or. cmp_no_case(control, '.false.') ) then
+        no_flag = .true.
+      else
+        no_flag = .false.
+      end if
+!
+      end function no_flag
 !
 !-----------------------------------------------------------------------
 !

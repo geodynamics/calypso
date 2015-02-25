@@ -9,28 +9,19 @@
 !!
 !!@verbatim
 !!  routines for backward transform
-!!      subroutine copy_mhd_vec_spec_to_trans
-!!      subroutine copy_mhd_scl_spec_to_trans
-!!
-!!      subroutine copy_mhd_vec_fld_from_trans
-!!      subroutine copy_mhd_scl_fld_from_trans
-!!
-!!  routines for forward transform
-!!      subroutine copy_mhd_scalar_fld_to_trans
-!!      subroutine copy_mhd_scalar_spec_from_trans
-!!
-!!      subroutine copy_mhd_vec_fld_to_trans
-!!      subroutine copy_mhd_vec_spec_from_trans
+!!      subroutine select_mhd_field_from_trans
 !!@endverbatim
 !
       module copy_MHD_4_sph_trans
 !
       use m_precision
-!
-      use m_sph_phys_address
-      use m_addresses_trans_sph_MHD
+      use m_machine_parameter
+      use m_spheric_parameter
+      use m_spheric_param_smp
 !
       implicit  none
+!
+      private :: sel_force_from_MHD_trans
 !
 !-----------------------------------------------------------------------
 !
@@ -38,143 +29,101 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_mhd_vec_spec_to_trans
+      subroutine select_mhd_field_from_trans
 !
-      use copy_spectr_4_sph_trans
-!
-!
-!$omp parallel
-      call copy_vec_spec_to_trans(ncomp_rj_2_rtp,                       &
-     &    ipol%i_velo, b_trns%i_velo)
-      call copy_vec_spec_to_trans(ncomp_rj_2_rtp,                       &
-     &    ipol%i_vort, b_trns%i_vort)
-      call copy_vec_spec_to_trans(ncomp_rj_2_rtp,                       &
-     &    ipol%i_magne, b_trns%i_magne)
-      call copy_vec_spec_to_trans(ncomp_rj_2_rtp,                       &
-     &    ipol%i_current, b_trns%i_current)
-!$omp end parallel
-!
-      end subroutine copy_mhd_vec_spec_to_trans
-!
-!-----------------------------------------------------------------------
-!
-      subroutine copy_mhd_scl_spec_to_trans
-!
-      use copy_spectr_4_sph_trans
-!
-!
-!$omp parallel
-      call copy_scalar_spec_to_trans(ncomp_rj_2_rtp,                    &
-     &      ipol%i_temp, b_trns%i_temp)
-      call copy_scalar_spec_to_trans(ncomp_rj_2_rtp,                    &
-     &      ipol%i_light, b_trns%i_light)
-!$omp end parallel
-!
-      end subroutine copy_mhd_scl_spec_to_trans
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine copy_mhd_vec_fld_from_trans
-!
-      use copy_sph_field_4_sph_trans
-!
-!
-!$omp parallel
-      call copy_vec_fld_from_trans(ncomp_rj_2_rtp,                      &
-     &    irtp%i_velo, b_trns%i_velo)
-      call copy_vec_fld_from_trans(ncomp_rj_2_rtp,                      &
-     &    irtp%i_vort, b_trns%i_vort)
-      call copy_vec_fld_from_trans(ncomp_rj_2_rtp,                      &
-     &    irtp%i_magne, b_trns%i_magne)
-      call copy_vec_fld_from_trans(ncomp_rj_2_rtp,                      &
-     &    irtp%i_current, b_trns%i_current)
-!$omp end parallel
-!
-      end subroutine copy_mhd_vec_fld_from_trans
-!
-!-----------------------------------------------------------------------
-!
-      subroutine copy_mhd_scl_fld_from_trans
-!
-      use copy_sph_field_4_sph_trans
-!
-!
-!$omp parallel
-      call copy_scalar_fld_from_trans(ncomp_rj_2_rtp,                   &
-     &      irtp%i_temp, b_trns%i_temp)
-      call copy_scalar_fld_from_trans(ncomp_rj_2_rtp,                   &
-     &      irtp%i_light, b_trns%i_light)
-!$omp end parallel
-!
-      end subroutine copy_mhd_scl_fld_from_trans
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine copy_mhd_vec_fld_to_trans
-!
-      use copy_sph_field_4_sph_trans
+      use m_node_phys_address
+      use m_addresses_trans_sph_MHD
 !
 !
 !$omp parallel
 !   advection flag
-      call copy_vec_fld_to_trans(ncomp_rtp_2_rj,                        &
-     &      irtp%i_m_advect, f_trns%i_m_advect)
+      call sel_force_from_MHD_trans(f_trns%i_m_advect)
 !   Coriolis flag
-      call copy_vec_fld_to_trans(ncomp_rtp_2_rj,                        &
-     &      irtp%i_coriolis, f_trns%i_coriolis)
+      call sel_force_from_MHD_trans(f_trns%i_coriolis)
 !   Lorentz flag
-      call copy_vec_fld_to_trans(ncomp_rtp_2_rj,                        &
-     &      irtp%i_lorentz, f_trns%i_lorentz)
+      call sel_force_from_MHD_trans(f_trns%i_lorentz)
 !
 !   induction flag
-      call copy_vec_fld_to_trans(ncomp_rtp_2_rj,                        &
-     &      irtp%i_vp_induct, f_trns%i_vp_induct)
+      call sel_force_from_MHD_trans(f_trns%i_vp_induct)
 !   divergence of heat flux flag
-      call copy_vec_fld_to_trans(ncomp_rtp_2_rj,                        &
-     &      irtp%i_h_flux, f_trns%i_h_flux)
+      call sel_force_from_MHD_trans(f_trns%i_h_flux)
 !
 !   divergence of composition flux flag
-      call copy_vec_fld_to_trans(ncomp_rtp_2_rj,                        &
-     &      irtp%i_c_flux, f_trns%i_c_flux)
+      call sel_force_from_MHD_trans(f_trns%i_c_flux)
 !$omp end parallel
 !
-      end  subroutine copy_mhd_vec_fld_to_trans
+      end subroutine select_mhd_field_from_trans
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_mhd_vec_spec_from_trans
+      subroutine copy_forces_to_snapshot_rtp
 !
-      use copy_spectr_4_sph_trans
+      use m_node_phys_address
+      use m_addresses_trans_sph_MHD
 !
 !
 !$omp parallel
 !   advection flag
-      call copy_vec_spec_from_trans(ncomp_rtp_2_rj,                     &
-     &      ipol%i_m_advect, f_trns%i_m_advect)
+      call copy_force_from_MHD_trans                                    &
+     &   (f_trns%i_m_advect, iphys%i_m_advect)
 !   Coriolis flag
-      call copy_vec_spec_from_trans(ncomp_rtp_2_rj,                     &
-     &      ipol%i_coriolis, f_trns%i_coriolis)
-      call copy_vec_spec_from_trans(ncomp_rtp_2_rj,                     &
-     &      ipol%i_rot_Coriolis, f_trns%i_rot_Coriolis)
+      call copy_force_from_MHD_trans                                    &
+     &   (f_trns%i_coriolis, iphys%i_coriolis)
 !   Lorentz flag
-      call copy_vec_spec_from_trans(ncomp_rtp_2_rj,                     &
-     &      ipol%i_lorentz, f_trns%i_lorentz)
+      call copy_force_from_MHD_trans                                    &
+     &   (f_trns%i_lorentz, iphys%i_lorentz)
 !
 !   induction flag
-      call copy_vec_spec_from_trans(ncomp_rtp_2_rj,                     &
-     &      ipol%i_vp_induct, f_trns%i_vp_induct)
-!
+      call copy_force_from_MHD_trans                                    &
+     &   (f_trns%i_vp_induct, iphys%i_vp_induct)
 !   divergence of heat flux flag
-      call copy_vec_spec_from_trans(ncomp_rtp_2_rj,                     &
-     &      ipol%i_h_flux, f_trns%i_h_flux)
+      call copy_force_from_MHD_trans(f_trns%i_h_flux, iphys%i_h_flux)
+!
 !   divergence of composition flux flag
-      call copy_vec_spec_from_trans(ncomp_rtp_2_rj,                     &
-     &      ipol%i_c_flux, f_trns%i_c_flux)
+      call copy_force_from_MHD_trans(f_trns%i_c_flux, iphys%i_c_flux)
 !$omp end parallel
 !
-      end  subroutine copy_mhd_vec_spec_from_trans
+      end subroutine copy_forces_to_snapshot_rtp
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine sel_force_from_MHD_trans(i_trns)
+!
+      use m_addresses_trans_sph_MHD
+      use m_addresses_trans_sph_snap
+      use m_geometry_parameter
+      use sel_fld_copy_4_sph_trans
+!
+      integer(kind = kint), intent(in) :: i_trns
+!
+!
+      if(i_trns .le. 0) return
+      call sel_vector_from_trans                                        &
+     &   (nnod_rtp, frc_rtp(1,i_trns), frm_rtp(1,i_trns) )
+!
+      end subroutine sel_force_from_MHD_trans
+!
+!-----------------------------------------------------------------------
+!
+      subroutine copy_force_from_MHD_trans(i_trns, i_field)
+!
+      use m_addresses_trans_sph_MHD
+      use m_addresses_trans_sph_snap
+      use m_geometry_parameter
+      use m_node_phys_data
+      use m_spheric_parameter
+      use m_spheric_param_smp
+      use copy_field_4_sph_trans
+!
+      integer(kind = kint), intent(in) :: i_field, i_trns
+!
+!
+      if( (i_field*i_trns) .le. 0) return
+      call copy_vector_from_trans(nnod_rtp, inod_rtp_smp_stack,         &
+     &   numnod, frm_rtp(1,i_trns), d_nod(1,i_field) )
+!
+      end subroutine copy_force_from_MHD_trans
 !
 !-----------------------------------------------------------------------
 !

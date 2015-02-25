@@ -141,60 +141,61 @@
       module m_ctl_data_4_time_steps
 !
       use m_precision
+      use t_control_elements
 !
       implicit  none
 !
 !
-      integer(kind=kint) :: i_step_init_ctl
+      type(read_integer_item), save :: i_step_init_ctl
 !   First step
-      integer(kind=kint) :: i_step_number_ctl
+      type(read_integer_item), save :: i_step_number_ctl
 !   End step
-      real(kind=kreal) :: elapsed_time_ctl
+      type(read_real_item), save :: elapsed_time_ctl
 !   Elapsed time for finish
 ! 
-      integer(kind=kint) :: i_step_check_ctl
+      type(read_integer_item), save :: i_step_check_ctl
 !   Monitoring interval
-      integer(kind=kint) :: i_step_rst_ctl
+      type(read_integer_item), save :: i_step_rst_ctl
 !   Interval for restart
-      integer(kind=kint) :: i_step_pvr_ctl
-      integer(kind=kint) :: i_step_psf_ctl
-      integer(kind=kint) :: i_step_iso_ctl
-      integer(kind=kint) :: i_step_ucd_ctl
-      integer(kind=kint) :: i_step_fline_ctl
-      integer(kind=kint) :: i_step_monitor_ctl
+      type(read_integer_item), save :: i_step_pvr_ctl
+      type(read_integer_item), save :: i_step_psf_ctl
+      type(read_integer_item), save :: i_step_iso_ctl
+      type(read_integer_item), save :: i_step_ucd_ctl
+      type(read_integer_item), save :: i_step_fline_ctl
+      type(read_integer_item), save :: i_step_monitor_ctl
 !
-      integer(kind=kint) :: i_step_sgs_coefs_ctl
+      type(read_integer_item), save :: i_step_sgs_coefs_ctl
 !   Interval to evaluate model coefficients
-      integer(kind=kint) :: i_step_boundary_ctl
+      type(read_integer_item), save :: i_step_boundary_ctl
 ! 
-      real(kind=kreal)   :: dt_ctl
+      type(read_real_item), save :: dt_ctl
 !   Delta t
-      real(kind=kreal)   :: time_init_ctl
+      type(read_real_item), save :: time_init_ctl
 !   Initial time (If there is no initial field data)
 !
-      integer(kind=kint) :: i_diff_steps_ctl
+      type(read_integer_item), save :: i_diff_steps_ctl
 !
 !
-      character(len=kchara) :: flexible_step_ctl = 'OFF'
+      type(read_character_item), save :: flexible_step_ctl
 !
-      integer(kind=kint) :: start_rst_step_ctl
-      integer(kind=kint) :: end_rst_step_ctl
+      type(read_integer_item), save :: start_rst_step_ctl
+      type(read_integer_item), save :: end_rst_step_ctl
 !
-      real(kind=kreal) :: min_delta_t_ctl
-      real(kind=kreal) :: max_delta_t_ctl
-      real(kind=kreal) :: max_eps_to_shrink_ctl
-      real(kind=kreal) :: min_eps_to_expand_ctl
+      type(read_real_item), save :: min_delta_t_ctl
+      type(read_real_item), save :: max_delta_t_ctl
+      type(read_real_item), save :: max_eps_to_shrink_ctl
+      type(read_real_item), save :: min_eps_to_expand_ctl
 !
-      real(kind=kreal) :: delta_t_check_ctl
-      real(kind=kreal) :: delta_t_rst_ctl
-      real(kind=kreal) :: delta_t_field_ctl
-      real(kind=kreal) :: delta_t_psf_ctl
-      real(kind=kreal) :: delta_t_iso_ctl
-      real(kind=kreal) :: delta_t_pvr_ctl
-      real(kind=kreal) :: delta_t_fline_ctl
-      real(kind=kreal) :: delta_t_monitor_ctl
-      real(kind=kreal) :: delta_t_sgs_coefs_ctl
-      real(kind=kreal) :: delta_t_boundary_ctl
+      type(read_real_item), save :: delta_t_check_ctl
+      type(read_real_item), save :: delta_t_rst_ctl
+      type(read_real_item), save :: delta_t_field_ctl
+      type(read_real_item), save :: delta_t_psf_ctl
+      type(read_real_item), save :: delta_t_iso_ctl
+      type(read_real_item), save :: delta_t_pvr_ctl
+      type(read_real_item), save :: delta_t_fline_ctl
+      type(read_real_item), save :: delta_t_monitor_ctl
+      type(read_real_item), save :: delta_t_sgs_coefs_ctl
+      type(read_real_item), save :: delta_t_boundary_ctl
 !
 !   entry label
 !
@@ -279,44 +280,6 @@
       character(len=kchara), parameter                                  &
      &       :: hd_time_init =        'time_init_ctl'
 !
-      integer (kind=kint) :: i_elapsed_time =      0
-!
-      integer (kind=kint) :: i_flexible_step =     0
-      integer (kind=kint) :: i_min_delta_t =       0
-      integer (kind=kint) :: i_max_delta_t =       0
-      integer (kind=kint) :: i_max_eps_to_shrink = 0
-      integer (kind=kint) :: i_min_eps_to_expand = 0
-!
-      integer (kind=kint) :: i_start_rst_step =    0
-      integer (kind=kint) :: i_end_rst_step =      0
-!
-      integer (kind=kint) :: i_delta_t_check =     0
-      integer (kind=kint) :: i_delta_t_rst =       0
-      integer (kind=kint) :: i_delta_t_psf =       0
-      integer (kind=kint) :: i_delta_t_iso =       0
-      integer (kind=kint) :: i_delta_t_pvr =       0
-      integer (kind=kint) :: i_delta_t_fline =     0
-      integer (kind=kint) :: i_delta_t_ucd =       0
-      integer (kind=kint) :: i_delta_t_monitor =   0
-      integer (kind=kint) :: i_delta_t_sgs_coefs = 0
-      integer (kind=kint) :: i_delta_t_boundary =  0
-!
-      integer (kind=kint) :: i_i_step_init =      0
-      integer (kind=kint) :: i_i_step_number =    0
-      integer (kind=kint) :: i_i_step_check =     0
-      integer (kind=kint) :: i_i_step_rst =       0
-      integer (kind=kint) :: i_i_step_psf =       0
-      integer (kind=kint) :: i_i_step_iso =       0
-      integer (kind=kint) :: i_i_step_pvr =       0
-      integer (kind=kint) :: i_i_step_fline =     0
-      integer (kind=kint) :: i_i_step_ucd =       0
-      integer (kind=kint) :: i_i_step_monitor =   0
-      integer (kind=kint) :: i_i_step_sgs_coefs = 0
-      integer (kind=kint) :: i_i_step_boundary =  0
-      integer (kind=kint) :: i_i_diff_steps =     0
-      integer (kind=kint) :: i_dt =               0
-      integer (kind=kint) :: i_time_init =        0
-!
       private :: hd_time_step, i_time_step
       private :: hd_flexible_step, hd_min_delta_t, hd_max_delta_t
       private :: hd_max_eps_to_shrink, hd_min_eps_to_expand
@@ -357,87 +320,63 @@
         if(i_time_step .gt. 0) exit
 !
 !
-        call read_real_ctl_item(hd_elapsed_time,                        &
-     &        i_elapsed_time, elapsed_time_ctl)
+        call read_real_ctl_type(hd_elapsed_time, elapsed_time_ctl)
 !
-        call read_real_ctl_item(hd_dt, i_dt, dt_ctl)
-        call read_real_ctl_item(hd_time_init, i_time_init,              &
-     &        time_init_ctl)
+        call read_real_ctl_type(hd_dt, dt_ctl)
+        call read_real_ctl_type(hd_time_init, time_init_ctl)
 !
-        call read_real_ctl_item(hd_min_delta_t,                         &
-     &          i_min_delta_t,  min_delta_t_ctl)
-        call read_real_ctl_item(hd_max_delta_t,                         &
-     &          i_max_delta_t, max_delta_t_ctl)
-        call read_real_ctl_item(hd_max_eps_to_shrink,                   &
-     &          i_max_eps_to_shrink, max_eps_to_shrink_ctl)
-        call read_real_ctl_item(hd_min_eps_to_expand,                   &
-     &          i_min_eps_to_expand, min_eps_to_expand_ctl)
+        call read_real_ctl_type(hd_min_delta_t, min_delta_t_ctl)
+        call read_real_ctl_type(hd_max_delta_t, max_delta_t_ctl)
+        call read_real_ctl_type(hd_max_eps_to_shrink,                   &
+     &      max_eps_to_shrink_ctl)
+        call read_real_ctl_type(hd_min_eps_to_expand,                   &
+     &      min_eps_to_expand_ctl)
 !
-        call read_real_ctl_item(hd_delta_t_check,                       &
-     &          i_delta_t_check, delta_t_check_ctl)
-        call read_real_ctl_item(hd_delta_t_rst,                         &
-     &          i_delta_t_rst, delta_t_rst_ctl)
-        call read_real_ctl_item(hd_delta_t_psf,                         &
-     &          i_delta_t_psf, delta_t_psf_ctl)
-        call read_real_ctl_item(hd_delta_t_iso,                         &
-     &          i_delta_t_iso, delta_t_iso_ctl)
-        call read_real_ctl_item(hd_delta_t_pvr,                         &
-     &          i_delta_t_pvr, delta_t_pvr_ctl)
-        call read_real_ctl_item(hd_delta_t_fline,                       &
-     &          i_delta_t_fline, delta_t_fline_ctl)
-        call read_real_ctl_item(hd_delta_t_ucd,                         &
-     &          i_delta_t_ucd, delta_t_field_ctl)
-        call read_real_ctl_item(hd_delta_t_monitor,                     &
-     &        i_delta_t_monitor, delta_t_monitor_ctl)
-        call read_real_ctl_item(hd_delta_t_sgs_coefs,                   &
-     &          i_delta_t_sgs_coefs, delta_t_sgs_coefs_ctl)
-        call read_real_ctl_item(hd_delta_t_boundary,                    &
-     &          i_delta_t_boundary, delta_t_boundary_ctl)
+        call read_real_ctl_type(hd_delta_t_check, delta_t_check_ctl)
+        call read_real_ctl_type(hd_delta_t_rst, delta_t_rst_ctl)
+        call read_real_ctl_type(hd_delta_t_psf, delta_t_psf_ctl)
+        call read_real_ctl_type(hd_delta_t_iso, delta_t_iso_ctl)
+        call read_real_ctl_type(hd_delta_t_pvr, delta_t_pvr_ctl)
+        call read_real_ctl_type(hd_delta_t_fline, delta_t_fline_ctl)
+        call read_real_ctl_type(hd_delta_t_ucd, delta_t_field_ctl)
+        call read_real_ctl_type(hd_delta_t_monitor,                     &
+     &      delta_t_monitor_ctl)
+        call read_real_ctl_type(hd_delta_t_sgs_coefs,                   &
+     &      delta_t_sgs_coefs_ctl)
+        call read_real_ctl_type(hd_delta_t_boundary,                    &
+     &      delta_t_boundary_ctl)
 !
 !
-        call read_integer_ctl_item(hd_i_step_init,                      &
-     &        i_i_step_init, i_step_init_ctl)
-        call read_integer_ctl_item(hd_i_step_number,                    &
-     &        i_i_step_number, i_step_number_ctl)
-        call read_integer_ctl_item(hd_i_finish_number,                  &
-     &        i_i_step_number, i_step_number_ctl)
+        call read_integer_ctl_type(hd_i_step_init, i_step_init_ctl)
+        call read_integer_ctl_type(hd_i_step_number,                    &
+     &      i_step_number_ctl)
+        call read_integer_ctl_type(hd_i_finish_number,                  &
+     &      i_step_number_ctl)
 !
-        call read_integer_ctl_item(hd_i_step_check,                     &
-     &        i_i_step_check, i_step_check_ctl)
-        call read_integer_ctl_item(hd_i_step_rst,                       &
-     &        i_i_step_rst, i_step_rst_ctl)
-        call read_integer_ctl_item(hd_i_step_psf,                       &
-     &        i_i_step_psf, i_step_psf_ctl)
-        call read_integer_ctl_item(hd_i_step_iso,                       &
-     &        i_i_step_iso, i_step_iso_ctl)
-        call read_integer_ctl_item(hd_i_step_pvr,                       &
-     &        i_i_step_pvr, i_step_pvr_ctl)
-        call read_integer_ctl_item(hd_i_step_fline,                     &
-     &        i_i_step_fline, i_step_fline_ctl)
+        call read_integer_ctl_type(hd_i_step_check, i_step_check_ctl)
+        call read_integer_ctl_type(hd_i_step_rst, i_step_rst_ctl)
+        call read_integer_ctl_type(hd_i_step_psf, i_step_psf_ctl)
+        call read_integer_ctl_type(hd_i_step_iso, i_step_iso_ctl)
+        call read_integer_ctl_type(hd_i_step_pvr, i_step_pvr_ctl)
+        call read_integer_ctl_type(hd_i_step_fline, i_step_fline_ctl)
 !
-        call read_integer_ctl_item(hd_i_step_ucd,                       &
-     &        i_i_step_ucd, i_step_ucd_ctl)
-        call read_integer_ctl_item(hd_i_step_snap,                      &
-     &        i_i_step_ucd, i_step_ucd_ctl)
-        call read_integer_ctl_item(hd_i_step_monitor,                   &
-     &        i_i_step_monitor, i_step_monitor_ctl)
+        call read_integer_ctl_type(hd_i_step_ucd, i_step_ucd_ctl)
+        call read_integer_ctl_type(hd_i_step_monitor,                   &
+     &      i_step_monitor_ctl)
 !
-        call read_integer_ctl_item(hd_i_step_sgs_coefs,                 &
-     &        i_i_step_sgs_coefs, i_step_sgs_coefs_ctl)
-        call read_integer_ctl_item(hd_i_step_boundary,                  &
-     &        i_i_step_boundary, i_step_boundary_ctl)
+        call read_integer_ctl_type(hd_i_step_sgs_coefs,                 &
+     &      i_step_sgs_coefs_ctl)
+        call read_integer_ctl_type(hd_i_step_boundary,                  &
+     &      i_step_boundary_ctl)
 !
-        call read_integer_ctl_item(hd_i_diff_steps,                     &
-     &        i_i_diff_steps, i_diff_steps_ctl)
+        call read_integer_ctl_type(hd_i_diff_steps, i_diff_steps_ctl)
 !
-        call read_integer_ctl_item(hd_start_rst_step,                   &
-     &        i_start_rst_step, start_rst_step_ctl)
-        call read_integer_ctl_item(hd_end_rst_step,                     &
-     &        i_end_rst_step, end_rst_step_ctl)
+        call read_integer_ctl_type(hd_start_rst_step,                   &
+     &      start_rst_step_ctl)
+        call read_integer_ctl_type(hd_end_rst_step, end_rst_step_ctl)
 !
 !
-        call read_character_ctl_item(hd_flexible_step,                  &
-     &          i_flexible_step, flexible_step_ctl)
+        call read_chara_ctl_type(hd_flexible_step, flexible_step_ctl)
       end do
 !
       end subroutine read_time_step_ctl

@@ -39,6 +39,7 @@
       module poynting_flux_smp
 !
       use m_precision
+      use m_constants
 !
 ! -----------------------------------------------------------------------
 !
@@ -133,9 +134,9 @@
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
         do inod = ist, ied
-          kr =   1 + mod( (inod-1),nri)
-          lnod = 1 + (inod - kr) / nri
-          lt =   1 + mod( (lnod-1),jmax)
+          kr =   ione + mod( (inod-ione),nri)
+          lnod = ione + (inod - kr) / nri
+          lt =   ione + mod( (lnod-ione),jmax)
 !
           magne_streach(inod,1) =  grad_ux(inod,1)*b_field(inod,1)      &
      &                           + grad_ux(inod,2)*b_field(inod,2)      &
@@ -188,9 +189,9 @@
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
         do inod = ist, ied
-          kr =   1 + mod( (inod-1),nri)
-          lnod = 1 + (inod - kr) / nri
-          lt =   1 + mod( (lnod-1),jmax)
+          kr =   ione + mod( (inod-ione),nri)
+          lnod = ione + (inod - kr) / nri
+          lt =   ione + mod( (lnod-ione),jmax)
 !
 !          magne_streach(inod,1) =  grad_ux(inod,1)*b_field(inod,1)     &
 !     &                           + grad_ux(inod,2)*b_field(inod,2)     &

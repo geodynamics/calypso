@@ -166,10 +166,17 @@
 !$omp parallel do
       do inod = 1, nnod_rj
         d_rj(inod,ipol%i_h_advect) = 0.0d0
-        d_rj(inod,ipol%i_forces) =   0.0d0
-        d_rj(inod,itor%i_forces) =   0.0d0
       end do
 !$omp end parallel do
+
+      if(ipol%i_forces .gt. 0) then
+!$omp parallel do
+        do inod = 1, nnod_rj
+          d_rj(inod,ipol%i_forces) =   0.0d0
+          d_rj(inod,itor%i_forces) =   0.0d0
+        end do
+!$omp end parallel do
+      end if
 !
       if (iflag_4_ref_temp .eq. id_sphere_ref_temp) then
         call add_reftemp_advect_sph_MHD                                 &

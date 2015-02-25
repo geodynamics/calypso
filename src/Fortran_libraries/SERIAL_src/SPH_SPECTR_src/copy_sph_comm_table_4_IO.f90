@@ -8,10 +8,10 @@
 !!        between IO data
 !!
 !!@verbatim
-!!      subroutine copy_comm_rtp_from_IO(my_rank, nnod_rtp)
-!!      subroutine copy_comm_rtm_from_IO(my_rank, nnod_rtm)
-!!      subroutine copy_comm_rlm_from_IO(my_rank, nnod_rlm)
-!!      subroutine copy_comm_rj_from_IO(my_rank, nnod_rj)
+!!      subroutine copy_comm_rtp_from_IO(nnod_rtp)
+!!      subroutine copy_comm_rtm_from_IO(nnod_rtm)
+!!      subroutine copy_comm_rlm_from_IO(nnod_rlm)
+!!      subroutine copy_comm_rj_from_IO(nnod_rj)
 !!
 !!      subroutine copy_comm_rtp_to_IO(my_rank)
 !!      subroutine copy_comm_rtm_to_IO(my_rank)
@@ -46,9 +46,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_comm_rtp_from_IO(my_rank, nnod_rtp)
+      subroutine copy_comm_rtp_from_IO(nnod_rtp)
 !
-      integer(kind = kint), intent(in) :: my_rank
       integer(kind = kint), intent(in) :: nnod_rtp
 !
 !
@@ -69,22 +68,12 @@
       call deallocate_import_item_IO
       call deallocate_neib_domain_IO
 !
-      call set_reverse_sph_comm_table(nnod_rtp, ntot_item_sr_rtp,       &
-     &    item_sr_rtp, irev_sr_rtp)
-!
-      if(id_domain_rtp(nneib_domain_rtp) .eq. my_rank) then
-        iflag_self_rtp = 1
-      else
-        iflag_self_rtp = 0
-      end if
-!
       end subroutine copy_comm_rtp_from_IO
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_comm_rtm_from_IO(my_rank, nnod_rtm)
+      subroutine copy_comm_rtm_from_IO(nnod_rtm)
 !
-      integer(kind = kint), intent(in) :: my_rank
       integer(kind = kint), intent(in) :: nnod_rtm
 !
 !
@@ -105,22 +94,12 @@
       call deallocate_import_item_IO
       call deallocate_neib_domain_IO
 !
-      call set_reverse_sph_comm_table(nnod_rtm, ntot_item_sr_rtm,       &
-     &    item_sr_rtm, irev_sr_rtm)
-!
-      if(id_domain_rtm(nneib_domain_rtm) .eq. my_rank) then
-        iflag_self_rtm = 1
-      else
-        iflag_self_rtm = 0
-      end if
-!
       end subroutine copy_comm_rtm_from_IO
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_comm_rlm_from_IO(my_rank, nnod_rlm)
+      subroutine copy_comm_rlm_from_IO(nnod_rlm)
 !
-      integer(kind = kint), intent(in) :: my_rank
       integer(kind = kint), intent(in) :: nnod_rlm
 !
 !
@@ -141,22 +120,12 @@
       call deallocate_import_item_IO
       call deallocate_neib_domain_IO
 !
-      call set_reverse_sph_comm_table(nnod_rlm, ntot_item_sr_rlm,       &
-     &    item_sr_rlm, irev_sr_rlm)
-!
-      if(id_domain_rlm(nneib_domain_rlm) .eq. my_rank) then
-        iflag_self_rlm = 1
-      else
-        iflag_self_rlm = 0
-      end if
-!
       end subroutine copy_comm_rlm_from_IO
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_comm_rj_from_IO(my_rank, nnod_rj)
+      subroutine copy_comm_rj_from_IO(nnod_rj)
 !
-      integer(kind = kint), intent(in) :: my_rank
       integer(kind = kint), intent(in) :: nnod_rj
 !
 !
@@ -176,15 +145,6 @@
 !
       call deallocate_import_item_IO
       call deallocate_neib_domain_IO
-!
-      call set_reverse_sph_comm_table(nnod_rj, ntot_item_sr_rj,         &
-     &    item_sr_rj, irev_sr_rj)
-!
-      if(id_domain_rj(nneib_domain_rj) .eq. my_rank) then
-        iflag_self_rj = 1
-      else
-        iflag_self_rj = 0
-      end if
 !
       end subroutine copy_comm_rj_from_IO
 !

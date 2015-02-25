@@ -101,9 +101,9 @@
       call set_sph_1d_domain_id_rj
 !
       if(iflag_debug .gt. 0) then
-        write(*,*) 'idx_global_rtp_r', idx_global_rtp_r
-        write(*,*) 'idx_global_rtm_r', idx_global_rtm_r
-        write(*,*) 'idx_global_rlm_r', idx_global_rlm_r
+        write(50,*) 'idx_global_rtp_r', idx_global_rtp_r
+        write(50,*) 'idx_global_rtm_r', idx_global_rtm_r
+        write(50,*) 'idx_global_rlm_r', idx_global_rlm_r
 !        call check_sph_1d_domain_id
       end if
 !

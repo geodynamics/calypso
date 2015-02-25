@@ -285,7 +285,7 @@
         write(50+my_rank,*) trim(name_bc_grp_rtp(i))
         ist = istack_bc_grp_rtp(i-1)+1
         ied = istack_bc_grp_rtp(i)
-        write(50+my_rank,'(5i10)') item_bc_grp_rtp(ist:ied)
+        write(50+my_rank,'(5i16)') item_bc_grp_rtp(ist:ied)
       end do
 !
       end subroutine check_rtp_nod_grp_stack
@@ -304,7 +304,7 @@
         write(50+my_rank,*) trim(name_radial_grp_rtp(i))
         ist = istack_radial_grp_rtp(i-1)+1
         ied = istack_radial_grp_rtp(i)
-        write(50+my_rank,'(5i10)') item_radial_grp_rtp(ist:ied)
+        write(50+my_rank,'(5i16)') item_radial_grp_rtp(ist:ied)
       end do
 !
       end subroutine check_rtp_r_grp_stack
@@ -323,7 +323,7 @@
         write(50+my_rank,*) trim(name_theta_grp_rtp(i))
         ist = istack_theta_grp_rtp(i-1)+1
         ied = istack_theta_grp_rtp(i)
-        write(50+my_rank,'(5i10)') item_theta_grp_rtp(ist:ied)
+        write(50+my_rank,'(5i16)') item_theta_grp_rtp(ist:ied)
       end do
 !
       end subroutine check_rtp_theta_grp_stack
@@ -342,7 +342,7 @@
         write(50+my_rank,*) trim(name_zonal_grp_rtp(i))
         ist = istack_zonal_grp_rtp(i-1)+1
         ied = istack_zonal_grp_rtp(i)
-        write(50+my_rank,'(5i10)') item_zonal_grp_rtp(ist:ied)
+        write(50+my_rank,'(5i16)') item_zonal_grp_rtp(ist:ied)
       end do
 !
       end subroutine check_rtp_zonal_grp_stack
@@ -362,7 +362,7 @@
         write(50+my_rank,*) trim(name_radial_grp_rj(i))
         ist = istack_radial_grp_rj(i-1)+1
         ied = istack_radial_grp_rj(i)
-        write(50+my_rank,'(5i10)') item_sphere_grp_rj(ist:ied)
+        write(50+my_rank,'(5i16)') item_sphere_grp_rj(ist:ied)
       end do
 !
       end subroutine check_rj_r_grp_stack
@@ -381,7 +381,7 @@
         write(50+my_rank,*) trim(name_sphere_grp_rj(i))
         ist = istack_sphere_grp_rj(i-1)+1
         ied = istack_sphere_grp_rj(i)
-        write(50+my_rank,'(5i10)') item_sphere_grp_rj(ist:ied)
+        write(50+my_rank,'(5i16)') item_sphere_grp_rj(ist:ied)
       end do
 !
       end subroutine check_rj_sph_grp_stack

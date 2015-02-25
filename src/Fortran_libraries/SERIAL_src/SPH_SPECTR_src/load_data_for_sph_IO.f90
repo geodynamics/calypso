@@ -39,7 +39,7 @@
 !
 !
       call sel_read_geom_rtp_file(my_rank)
-      call copy_geom_rtp_sph_trans(my_rank)
+      call copy_geom_rtp_sph_trans
 !
       end subroutine input_geom_rtp_sph_trans
 !
@@ -51,7 +51,7 @@
 !
 !
       call sel_read_spectr_modes_rj_file(my_rank)
-      call copy_spectr_modes_rj_sph_trans(my_rank)
+      call copy_spectr_modes_rj_sph_trans
 !
       end subroutine input_modes_rj_sph_trans
 !
@@ -63,7 +63,7 @@
 !
 !
       call sel_read_geom_rtm_file(my_rank)
-      call copy_geom_rtm_sph_trans(my_rank)
+      call copy_geom_rtm_sph_trans
 !
       end subroutine input_geom_rtm_sph_trans
 !
@@ -75,7 +75,7 @@
 !
 !
       call sel_read_modes_rlm_file(my_rank)
-      call copy_modes_rlm_sph_trans(my_rank)
+      call copy_modes_rlm_sph_trans
 !
       end subroutine input_modes_rlm_sph_trans
 !

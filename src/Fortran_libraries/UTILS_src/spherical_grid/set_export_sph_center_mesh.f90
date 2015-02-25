@@ -209,12 +209,12 @@
      &  .and.  iflag_Npole_t(ip_t) .eq.  ip_t) then
 !
         icou = icou + 1
-        item_import_1d_rtp(1,icou) = irev_sph_r(ione,ip_r)
-        item_import_1d_rtp(2,icou) = nnod_sph_t(ip_t)+1
-        item_import_1d_rtp(3,icou) = 1
+        item_export_1d_rtp(1,icou) = irev_sph_r(ione,ip_r)
+        item_export_1d_rtp(2,icou) = nnod_sph_t(ip_t)+1
+        item_export_1d_rtp(3,icou) = 1
 !
         nod_comm%item_export(icou)                                      &
-     &            = sph_n_pole_node_id(item_import_1d_rtp(1,icou))
+     &            = sph_n_pole_node_id(item_export_1d_rtp(1,icou))
       end if
 !
       end subroutine set_export_rtp_ctr_Npole_mesh

@@ -27,8 +27,6 @@
 !!     &          inod_smp_stack, v_x, v_cyl, phi)
 !!      subroutine cvt_cyl_vect_2_y_comp_smp(np_smp, numnod,            &
 !!     &          inod_smp_stack, v_y, v_cyl, phi)
-!!      subroutine cvt_cyl_vect_2_z_comp_smp(np_smp, numnod,            &
-!!     &          inod_smp_stack, v_z, v_cyl)
 !!
 !!*********************************************************************
 !!@endverbatim
@@ -71,7 +69,7 @@
        real(kind=kreal) :: vs, vp
 !
 !
-!$omp parallel do private(inod,ist,ied,vs,vp)
+!$omp do private(inod,ist,ied,vs,vp)
       do ip = 1, np_smp
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
@@ -87,7 +85,7 @@
 !
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cvt_cyl_vect_2_xyz_smp
 !
@@ -107,7 +105,7 @@
        real(kind=kreal) :: vs, vp
 !
 !
-!$omp parallel do private(inod,ist,ied,vs,vp)
+!$omp do private(inod,ist,ied,vs,vp)
       do ip = 1, np_smp
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
@@ -121,7 +119,7 @@
      &                   + vp * cos( phi(inod) ) )
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine overwrite_cyl_vect_2_xyz_smp
 !
@@ -141,7 +139,7 @@
        real(kind=kreal) :: vs, vp
 !
 !
-!$omp parallel do private(inod,ist,ied,vs,vp)
+!$omp do private(inod,ist,ied,vs,vp)
       do ip = 1, np_smp
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
@@ -153,7 +151,7 @@
      &                - vp * sin( phi(inod) ) )
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cvt_cyl_vect_2_x_comp_smp
 !
@@ -172,7 +170,7 @@
        real(kind=kreal) :: vs, vp
 !
 !
-!$omp parallel do private(inod,ist,ied,vs,vp)
+!$omp do private(inod,ist,ied,vs,vp)
       do ip = 1, np_smp
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
@@ -184,27 +182,9 @@
      &                + vp * cos( phi(inod) ) )
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cvt_cyl_vect_2_y_comp_smp
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cvt_cyl_vect_2_z_comp_smp(np_smp, numnod,              &
-     &          inod_smp_stack, v_z, v_cyl)
-!
-      use copy_field_smp
-!
-       integer (kind = kint), intent(in) :: np_smp, numnod
-       integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
-       real(kind=kreal), intent(in) :: v_cyl(numnod,3)
-       real(kind=kreal), intent(inout) :: v_z(numnod)
-!
-!
-      call copy_nod_scalar_smp(np_smp, numnod, inod_smp_stack,          &
-     &    v_cyl(1,3), v_z)
-!
-      end subroutine cvt_cyl_vect_2_z_comp_smp
 !
 ! -----------------------------------------------------------------------
 !

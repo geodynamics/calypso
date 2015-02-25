@@ -10,20 +10,22 @@
 !!@verbatim
 !!      subroutine allocate_work_sph_trans(ncomp)
 !!      subroutine deallocate_work_sph_trans
+!!      subroutine clear_fwd_legendre_work(ncomp)
+!!      subroutine clear_bwd_legendre_work(ncomp)
 !!
 !!    Data for single vector field
-!!      radial component:      vr_rtp(3*i_rtp-2)
-!!      elevetional component: vr_rtp(3*i_rtp-1)
-!!      azimuthal component:   vr_rtp(2*i_rtp  )
+!!      radial component:      vr_rtm_wk(3*i_rtm-2)
+!!      elevetional component: vr_rtm_wk(3*i_rtm-1)
+!!      azimuthal component:   vr_rtm_wk(3*i_rtm  )
 !!
 !!    Data for single vector spectrum
-!!      Poloidal component:          sp_rj(3*i_rj-2)
-!!      diff. of Poloidal component: sp_rj(3*i_rj-1)
-!!      Toroidal component:          sp_rj(3*i_rj  )
+!!      Poloidal component:          sp_rlm_wk(3*i_rlm-2)
+!!      diff. of Poloidal component: sp_rlm_wk(3*i_rlm-1)
+!!      Toroidal component:          sp_rlm_wk(3*i_rlm  )
 !!
 !!    Data for single scalar
-!!      field: vr_rtp(i_rtp)
-!!      spectr: sp_rj(i_rj)
+!!      field: vr_rtm_wk(i_rtm)
+!!      spectr: sp_rlm_wk(i_rlm)
 !!
 !!@endverbatim
 !!
@@ -39,10 +41,12 @@
       implicit none
 !
 !
-!>     Work field data for Legendre transform
+!>      field data for Legendre transform  @f$ f(r,\theta,m) @f$ 
+!!@n     size:  vr_rtm(ncomp*nidx_rtm(2)*nidx_rtm(1)*nidx_rtm(3))
       real(kind = kreal), allocatable :: vr_rtm_wk(:)
 !
-!>     Work spectr data for Legendre transform
+!>      Spectr data for Legendre transform  @f$ f(r,l,m) @f$ 
+!>@n      size: sp_rlm(ncomp*nidx_rlm(2)*nidx_rtm(1))
       real(kind = kreal), allocatable :: sp_rlm_wk(:)
 !
 ! ----------------------------------------------------------------------
@@ -61,8 +65,8 @@
       allocate(sp_rlm_wk(nnod_rlm*ncomp))
       allocate(vr_rtm_wk(nnod_rtm*ncomp))
 !
-      sp_rlm_wk = 0.0d0
-      vr_rtm_wk = 0.0d0
+      call clear_bwd_legendre_work(ncomp)
+      call clear_fwd_legendre_work(ncomp)
 !
       end subroutine allocate_work_sph_trans
 !
@@ -73,6 +77,39 @@
       deallocate(vr_rtm_wk, sp_rlm_wk)
 !
       end subroutine deallocate_work_sph_trans
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine clear_fwd_legendre_work(ncomp)
+!
+      use m_spheric_parameter
+!
+      integer(kind = kint), intent(in) :: ncomp
+!
+!
+      if(ncomp .le. 0) return
+!$omp parallel workshare
+      sp_rlm_wk(1:nnod_rlm*ncomp) = 0.0d0
+!$omp end parallel workshare
+!
+      end subroutine clear_fwd_legendre_work
+!
+! ----------------------------------------------------------------------
+!
+      subroutine clear_bwd_legendre_work(ncomp)
+!
+      use m_spheric_parameter
+!
+      integer(kind = kint), intent(in) :: ncomp
+!
+!
+      if(ncomp .le. 0) return
+!$omp parallel workshare
+      vr_rtm_wk(1:nnod_rtm*ncomp) = 0.0d0
+!$omp end parallel workshare
+!
+      end subroutine clear_bwd_legendre_work
 !
 ! ----------------------------------------------------------------------
 !

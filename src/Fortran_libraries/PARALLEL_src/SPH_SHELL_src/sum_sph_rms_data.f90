@@ -192,9 +192,6 @@
       rms_sph_l_local = zero
       rms_sph_m_local = zero
       rms_sph_lm_local = zero
-      rms_sph_l = zero
-      rms_sph_m = zero
-      rms_sph_lm = zero
 !
       do j_fld = 1, num_rms_rj
         i_fld = ifield_rms_rj(j_fld)
@@ -219,12 +216,12 @@
       end do
 !
       num = ntot_rms_rj * (nidx_rj(1) + 1) * (l_truncation + 1)
-      call MPI_allREDUCE (rms_sph_l_local, rms_sph_l,                   &
-     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
-      call MPI_allREDUCE (rms_sph_m_local, rms_sph_m,                   &
-     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
-      call MPI_allREDUCE (rms_sph_lm_local, rms_sph_lm,                 &
-     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call MPI_REDUCE (rms_sph_l_local, rms_sph_l, num, CALYPSO_REAL,   &
+     &    MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
+      call MPI_REDUCE (rms_sph_m_local, rms_sph_m, num, CALYPSO_REAL,   &
+     &    MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
+      call MPI_REDUCE (rms_sph_lm_local, rms_sph_lm, num, CALYPSO_REAL, &
+     &    MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
 !
       if(my_rank .gt. 0) return
 !
@@ -238,14 +235,14 @@
 !
       subroutine sum_sph_rms_by_degree(ltr, nnod_rj, nidx_r, nidx_j,    &
      &          inod_rj_center, istack_sum, item_mode_4_sum,            &
-     &          ncomp, rms_sph, rms_sph_lc)
+     &          ncomp, rms_sph_rj, rms_sph_lc)
 !
       integer(kind = kint), intent(in) :: ltr, nidx_r, nidx_j, nnod_rj
       integer(kind = kint), intent(in) :: ncomp, inod_rj_center
 !
       integer(kind = kint), intent(in) :: istack_sum(-1:ltr)
       integer(kind = kint), intent(in) :: item_mode_4_sum(nidx_j)
-      real(kind = kreal), intent(in) :: rms_sph(nnod_rj,ncomp)
+      real(kind = kreal), intent(in) :: rms_sph_rj(nnod_rj,ncomp)
 !
       real(kind = kreal), intent(inout)                                 &
      &                   :: rms_sph_lc(0:nidx_r,0:ltr,ncomp)
@@ -266,7 +263,7 @@
               inod = j + (k-1) * nidx_j
 !
               rms_sph_lc(k,lm,icomp) = rms_sph_lc(k,lm,icomp)           &
-     &                                + rms_sph(inod,icomp)
+     &                                + rms_sph_rj(inod,icomp)
             end do
           end do
         end do
@@ -276,7 +273,7 @@
 !
       if(inod_rj_center .eq. 0) return
       do icomp = 1, ncomp
-        rms_sph_lc(0,0,icomp) = rms_sph(inod_rj_center,icomp)
+        rms_sph_lc(0,0,icomp) = rms_sph_rj(inod_rj_center,icomp)
       end do
 !
       end subroutine sum_sph_rms_by_degree

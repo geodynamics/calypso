@@ -40,19 +40,14 @@
 !
 !
       iflag_shell_mode = iflag_no_FEMMESH
-      if(i_sph_g_type .gt. 0) then
-        if      (cmp_no_case(sph_grid_type_ctl, 'no_pole') .gt. 0       &
-     &         ) then
-          iflag_shell_mode = iflag_MESH_same
-        else if (cmp_no_case(sph_grid_type_ctl, 'with_pole') .gt. 0     &
-     &         ) then
-          iflag_shell_mode = iflag_MESH_w_pole
-        else if (cmp_no_case(sph_grid_type_ctl, 'with_center') .gt. 0   &
-     &         ) then
-          iflag_shell_mode = iflag_MESH_w_center
-        end if
-      else
-        iflag_shell_mode = iflag_MESH_same
+      iflag_shell_mode = iflag_MESH_same
+      if(sph_grid_type_ctl%iflag .gt. 0) then
+        if(cmp_no_case(sph_grid_type_ctl%charavalue, 'no_pole'))        &
+     &          iflag_shell_mode = iflag_MESH_same
+        if (cmp_no_case(sph_grid_type_ctl%charavalue, 'with_pole'))     &
+     &          iflag_shell_mode = iflag_MESH_w_pole
+        if (cmp_no_case(sph_grid_type_ctl%charavalue, 'with_center'))   &
+     &          iflag_shell_mode = iflag_MESH_w_center
       end if
 !
       nidx_global_rtp(1) = 2
@@ -64,12 +59,12 @@
         nidx_global_rtp(1) = radius_ctl%num
       end if
 !
-!      if (i_ntheta_shell .gt. 0) then
-!        nidx_global_rtp(2) = ngrid_elevation_ctl
+!      if (ngrid_elevation_ctl%iflag .gt. 0) then
+!        nidx_global_rtp(2) = ngrid_elevation_ctl%intvalue
 !      end if
 !
-      if (i_nphi_shell .gt. 0) then
-        nidx_global_rtp(3) = ngrid_azimuth_ctl
+      if (ngrid_azimuth_ctl%iflag .gt. 0) then
+        nidx_global_rtp(3) = ngrid_azimuth_ctl%intvalue
         l_truncation = nidx_global_rtp(3) / 2
       end if
 !
@@ -92,16 +87,14 @@
       nlayer_mid_OC =   -1
       if(radial_grp_ctl%icou .gt. 0) then
         do i = 1, radial_grp_ctl%num
-          if     (cmp_no_case(radial_grp_ctl%c_tbl(i),'ICB') .gt. 0     &
-     &            ) then
+          if     (cmp_no_case(radial_grp_ctl%c_tbl(i),'ICB')) then
             nlayer_ICB = radial_grp_ctl%ivec(i)
-          else if(cmp_no_case(radial_grp_ctl%c_tbl(i),'CMB') .gt. 0     &
-     &            ) then
+          else if(cmp_no_case(radial_grp_ctl%c_tbl(i),'CMB')) then
             nlayer_CMB = radial_grp_ctl%ivec(i)
-          else if(cmp_no_case(radial_grp_ctl%c_tbl(i),'to_center').gt.0 &
+          else if(cmp_no_case(radial_grp_ctl%c_tbl(i),'to_center')      &
      &            ) then
             nlayer_2_center = radial_grp_ctl%ivec(i)
-          else if(cmp_no_case(radial_grp_ctl%c_tbl(i),'mid_depth').gt.0 &
+          else if(cmp_no_case(radial_grp_ctl%c_tbl(i),'mid_depth')      &
      &            ) then
             nlayer_mid_OC = radial_grp_ctl%ivec(i)
           end if

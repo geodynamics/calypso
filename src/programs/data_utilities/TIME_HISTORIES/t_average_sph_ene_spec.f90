@@ -13,6 +13,7 @@
       use m_precision
 !
       use m_tave_sph_ene_spectr
+      use m_sph_ene_spectra
       use cal_tave_sph_ene_spectr
 !
       implicit none
@@ -58,6 +59,7 @@
         if (time_sph .ge. start_time) then
           if (ist_true .eq. -1) then
             ist_true = istep
+            pre_time = time_sph
           end if
           icou = icou + 1
           ied_true = istep
@@ -102,6 +104,7 @@
         if (time_sph .ge. start_time) then
           if (ist_true .eq. -1) then
             ist_true = istep
+            pre_time = time_sph
           end if
           icou = icou + 1
           ied_true = istep

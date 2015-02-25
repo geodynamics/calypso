@@ -33,16 +33,22 @@
 !
       call allocate_nnod_nele_sph_mesh
 !
+      
+      if(iflag_debug .gt. 0) write(*,*) 'count_nod_ele_4_sph_radial'
       call count_nod_ele_4_sph_radial
+      if(iflag_debug .gt. 0) write(*,*) 'count_nod_ele_4_sph_theta'
       call count_nod_ele_4_sph_theta
 !
       call allocate_iele_sph_mesh
 !
+      if(iflag_debug .gt. 0) write(*,*) 'set_iele_4_sph_radial'
       call set_iele_4_sph_radial
+      if(iflag_debug .gt. 0) write(*,*) 'set_iele_4_sph_theta'
       call set_iele_4_sph_theta
+      if(iflag_debug .gt. 0) write(*,*) 'set_iele_4_sph_phi'
       call set_iele_4_sph_phi
 !
-      if(iflag_debug .gt. 0) call check_iele_4_sph_connects
+      if(iflag_debug .gt. 1) call check_iele_4_sph_connects
 !
       end subroutine s_const_1d_ele_connect_4_sph
 !

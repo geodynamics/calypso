@@ -24,7 +24,7 @@
 !!      subroutine write_udt_mesh_header(ifile_psf, nnod_output,        &
 !!     &          nele_out, ncomp_output)
 !!      subroutine write_ucd_mesh_connect(ifile_psf, ntot_ele,          &
-!!     &          nnod_4_ele, nele, iele_gl, ie_out)
+!!     &          nnod_4_ele, nele, iele_gl, ie_gl)
 !!@endverbatim
 !
       module udt_data_IO
@@ -69,18 +69,18 @@
       subroutine write_ucd_field_data(ifile_psf, ntot_out, ncomp_dat,   &
      &          nnod, inod_out, dat_out)
 !
-      integer(kind = kint), intent(in) :: ifile_psf
-      integer(kind = kint), intent(in) :: ntot_out, ncomp_dat
-      integer(kind = kint), intent(in) :: nnod
-      integer(kind = kint), intent(in) :: inod_out(ntot_out)
+      integer(kind = kint), intent(in) :: ifile_psf, ncomp_dat
+      integer(kind = kint_gl), intent(in) :: ntot_out
+      integer(kind = kint_gl), intent(in) :: nnod
+      integer(kind = kint_gl), intent(in) :: inod_out(ntot_out)
       real(kind = kreal), intent(in) :: dat_out(ntot_out, ncomp_dat)
 !
-      integer(kind = kint) :: inod
+      integer(kind = kint_gl) :: inod
       character(len=kchara) :: fmt_txt
 !
 !
       write(fmt_txt,'(a5,i3,a13)')                                      &
-     &                '(i10,', ncomp_dat, '(1pE25.15e3))'
+     &                '(i16,', ncomp_dat, '(1pE25.15e3))'
       do inod = 1, nnod
         write(ifile_psf,fmt_txt)                                        &
      &                  inod_out(inod), dat_out(inod,1:ncomp_dat)
@@ -115,11 +115,11 @@
       subroutine read_ucd_field_data(ifile_psf, nnod_in,                &
      &          ncomp_dat, dat_in)
 !
-      integer(kind = kint), intent(in) :: ifile_psf
-      integer(kind = kint), intent(in) :: nnod_in, ncomp_dat
+      integer(kind = kint), intent(in) :: ifile_psf, ncomp_dat
+      integer(kind = kint_gl), intent(in) :: nnod_in
       real(kind = kreal), intent(inout) :: dat_in(nnod_in, ncomp_dat)
 !
-      integer(kind = kint) :: inod, itmp
+      integer(kind = kint_gl) :: inod, itmp
 !
 !
       do inod = 1, nnod_in
@@ -135,7 +135,7 @@
      &          ntot_comp)
 !
       integer(kind = kint), intent(in) :: ifile_psf
-      integer(kind = kint), intent(inout) :: nnod_in, nele_in
+      integer(kind = kint_gl), intent(inout) :: nnod_in, nele_in
       integer(kind = kint), intent(inout) :: ntot_comp
 !
       integer(kind = kint) :: itmp
@@ -149,14 +149,15 @@
       subroutine read_ucd_mesh_data(ifile_psf, nnod_in, nele_in,        &
      &          nnod_4_ele, inod_gl, iele_gl, xx_in, ie_in)
 !
-      integer(kind = kint), intent(in) :: ifile_psf
-      integer(kind = kint), intent(in) :: nnod_in, nele_in, nnod_4_ele
-      integer(kind = kint), intent(inout) :: iele_gl(nele_in)
-      integer(kind = kint), intent(inout) :: ie_in(nele_in,nnod_4_ele)
-      integer(kind = kint), intent(inout) :: inod_gl(nnod_in)
+      integer(kind=kint), intent(in) :: ifile_psf, nnod_4_ele
+      integer(kind=kint_gl), intent(in) :: nnod_in, nele_in
+      integer(kind=kint_gl), intent(inout) :: iele_gl(nele_in)
+      integer(kind=kint_gl), intent(inout) :: ie_in(nele_in,nnod_4_ele)
+      integer(kind=kint_gl), intent(inout) :: inod_gl(nnod_in)
       real(kind = kreal), intent(inout) :: xx_in(nnod_in,3)
 !
-      integer(kind = kint) :: inod, iele, itmp
+      integer(kind = kint_gl) :: inod, iele
+      integer(kind = kint) :: itmp
       character(len=6) :: eleflag
 !
 !
@@ -178,11 +179,11 @@
      &          nele_out, ncomp_output)
 !
       integer(kind = kint), intent(in) :: ifile_psf
-      integer(kind = kint), intent(in) :: nnod_output, nele_out
+      integer(kind = kint_gl), intent(in) :: nnod_output, nele_out
       integer(kind = kint), intent(in) :: ncomp_output
 !
 !
-      write(ifile_psf,'(3i10,2i5)')                                     &
+      write(ifile_psf,'(3i16,2i5)')                                     &
      &           nnod_output, nele_out, ncomp_output, izero, izero
 !
       end subroutine write_udt_mesh_header
@@ -190,16 +191,16 @@
 ! ----------------------------------------------------------------------
 !
       subroutine write_ucd_mesh_connect(ifile_psf, ntot_ele,            &
-     &          nnod_4_ele, nele, iele_gl, ie_out)
+     &          nnod_4_ele, nele, iele_gl, ie_gl)
 !
       use m_geometry_constants
 !
-      integer(kind = kint), intent(in) :: ifile_psf
-      integer(kind = kint), intent(in) :: ntot_ele, nnod_4_ele, nele
-      integer(kind = kint), intent(in) :: iele_gl(ntot_ele)
-      integer(kind = kint), intent(in) :: ie_out(ntot_ele,nnod_4_ele)
+      integer(kind = kint), intent(in) :: ifile_psf, nnod_4_ele
+      integer(kind = kint_gl), intent(in) :: ntot_ele, nele
+      integer(kind = kint_gl), intent(in) :: iele_gl(ntot_ele)
+      integer(kind = kint_gl), intent(in) :: ie_gl(ntot_ele,nnod_4_ele)
 !
-      integer(kind = kint) :: iele
+      integer(kind = kint_gl) :: iele
       character(len=6) :: eleflag
 !
 !
@@ -208,8 +209,8 @@
       if(nnod_4_ele.eq.num_linear_edge) write(eleflag,'(a6)') ' line '
 !
       do iele = 1, nele
-        write(ifile_psf,'(i10,i3,a6,30i10)') iele_gl(iele), ione,       &
-     &       eleflag, ie_out(iele,1:nnod_4_ele)
+        write(ifile_psf,'(i16,i3,a6,27i16)') iele_gl(iele), ione,       &
+     &       eleflag, ie_gl(iele,1:nnod_4_ele)
       end do
 !
       end subroutine  write_ucd_mesh_connect

@@ -93,7 +93,7 @@
       integer (kind = kint), intent(in) :: istack(0:num)
 !
 !
-      if(num .gt. 0) write(file_id,'(8i10)') istack(1:num)
+      if(num .gt. 0) write(file_id,'(8i16)') istack(1:num)
 !
       end subroutine write_arrays_for_stacks
 !

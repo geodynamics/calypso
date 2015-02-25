@@ -39,7 +39,7 @@
 !
       use set_control_sph_mhd
       use set_control_SPH_to_FEM
-      use m_ctl_data_noviz_MHD
+      use m_ctl_data_sph_MHD_noviz
       use init_sph_MHD_elapsed_label
 !
 !
@@ -51,8 +51,8 @@
 !
       call start_eleps_time(1)
       call start_eleps_time(4)
-      if (iflag_debug.eq.1) write(*,*) 'read_control_4_snap_noviz'
-      call read_control_4_snap_noviz
+      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_snap_noviz'
+      call read_control_4_sph_snap_noviz
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
       call set_control_4_sph_mhd
       call set_control_4_SPH_to_FEM
@@ -72,8 +72,6 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'SPH_init_sph_snap'
       call SPH_init_sph_snap
-      if(iflag_debug .gt. 0) write(*,*) 'SPH_to_FEM_init_MHD'
-      call SPH_to_FEM_init_MHD
       call calypso_MPI_barrier
 !
       call end_eleps_time(2)

@@ -37,7 +37,6 @@
 !!@n @param  numnod   Number of data points
 !!@n @param  inod_smp_stack(0:np_smp)
 !!                    End address of each SMP process
-!!@n @param  xx(numnod,3) position in Cartesian coordinate
 !!@n @param  theta(numnod)  colatitude
 !!@n @param  phi(numnod)    longitude
 !!
@@ -74,7 +73,7 @@
        real(kind=kreal) :: vr, vt, vp
 !
 !
-!$omp parallel do private(inod,ist,ied,vr,vt,vp)
+!$omp do private(inod,ist,ied,vr,vt,vp)
       do ip = 1, np_smp
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
@@ -96,7 +95,7 @@
 !
          end do
        end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cvt_sph_vect_2_xyz_smp
 !
@@ -117,7 +116,7 @@
        real(kind=kreal) :: vr, vt, vp
 !
 !
-!$omp parallel do private(inod,ist,ied,vr,vt,vp)
+!$omp do private(inod,ist,ied,vr,vt,vp)
       do ip = 1, np_smp
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
@@ -139,7 +138,7 @@
 !
          end do
        end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine overwrite_sph_vect_2_xyz_smp
 !
@@ -160,7 +159,7 @@
        real(kind=kreal) :: vr, vt, vp
 !
 !
-!$omp parallel do private(inod,ist,ied,vr,vt,vp)
+!$omp do private(inod,ist,ied,vr,vt,vp)
       do ip = 1, np_smp
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
@@ -174,7 +173,7 @@
      &                - vp * sin(phi(inod))   )
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cal_sph_2_x_comp_smp
 !
@@ -193,7 +192,7 @@
        real(kind=kreal) :: vr, vt, vp
 !
 !
-!$omp parallel do private(inod,ist,ied,vr,vt,vp)
+!$omp do private(inod,ist,ied,vr,vt,vp)
       do ip = 1, np_smp
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
@@ -207,7 +206,7 @@
      &                + vp * cos(phi(inod) ))
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cal_sph_2_y_comp_smp
 !
@@ -226,7 +225,7 @@
        real(kind=kreal) :: vr, vt
 !
 !
-!$omp parallel do private(inod,ist,ied,vr,vt)
+!$omp do private(inod,ist,ied,vr,vt)
       do ip = 1, np_smp
         ist = inod_smp_stack(ip-1) + 1
         ied = inod_smp_stack(ip)
@@ -238,7 +237,7 @@
      &                - vt * sin( theta(inod) ) )
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cal_sph_2_z_comp_smp
 !

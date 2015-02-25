@@ -25,7 +25,6 @@
       use m_machine_parameter
       use m_control_parameter
 !
-      use m_geometry_parameter
       use m_spheric_parameter
       use m_sph_spectr_data
       use m_sph_phys_address
@@ -43,7 +42,6 @@
       use set_radius_func
       use const_radial_mat_4_sph
       use cal_rms_fields_by_sph
-      use cvt_nod_data_to_sph_data
       use sph_mhd_rms_IO
       use cal_sol_sph_MHD_crank
       use cal_nonlinear
@@ -66,9 +64,7 @@
 !   Allocate spectr field data
 !
       call allocate_phys_rj_data
-      call allocate_phys_rtp_data
       call set_sph_sprctr_data_address
-      call set_sph_nod_data_address
 !
       if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr'
       call init_rms_4_sph_spectr
@@ -121,16 +117,14 @@
 !* obtain nonlinear terms for starting
 !*
        if(iflag_debug .gt. 0) write(*,*) 'first nonlinear'
-       call start_eleps_time(12)
        call nonlinear
-       call end_eleps_time(12)
 !
 !* -----  Open Volume integration data files -----------------
 !*
-       if(iflag_debug .gt. 0) write(*,*) 'open_sph_vol_rms_file_mhd'
-       call start_eleps_time(4)
-       call open_sph_vol_rms_file_mhd
-       call end_eleps_time(4)
+      if(iflag_debug .gt. 0) write(*,*) 'open_sph_vol_rms_file_mhd'
+      call start_eleps_time(4)
+      call open_sph_vol_rms_file_mhd
+      call end_eleps_time(4)
 !
       end subroutine SPH_initialize_MHD
 !
@@ -153,9 +147,13 @@
       integer(kind = kint), intent(in) :: i_step
       integer(kind = kint), intent(inout) :: iflag_finish
 !
+      real(kind = kreal) :: total_max
+!
 !*  ----------  add time evolution -----------------
 !*
 !
+      call start_eleps_time(5)
+      call start_eleps_time(6)
       if(i_step .eq. 1) then
         if(iflag_debug.gt.0) write(*,*) 'cal_expricit_sph_euler'
         call cal_expricit_sph_euler(i_step)
@@ -166,46 +164,51 @@
 !*
 !*  ----------  time evolution by inplicit method ----------
 !*
+      call start_eleps_time(7)
       call s_cal_sol_sph_MHD_crank
+      call end_eleps_time(7)
+      call end_eleps_time(6)
 !*
 !*  ----------------lead nonlinear term ... ----------
 !*
-      call start_eleps_time(12)
+      call start_eleps_time(8)
       call nonlinear
-      call end_eleps_time(12)
+      call end_eleps_time(8)
+      call end_eleps_time(5)
 !
 !* ----  Update fields after time evolution ------------------------=
 !*
-      call start_eleps_time(4)
-      call start_eleps_time(7)
-!
+      call start_eleps_time(9)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
       call trans_per_temp_to_temp_sph
 !*
       if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
       call s_lead_fields_4_sph_mhd
-      call end_eleps_time(7)
+      call end_eleps_time(9)
 !
 !*  -----------  output restart data --------------
 !*
-      call start_eleps_time(8)
+      call start_eleps_time(4)
+      call start_eleps_time(10)
       if(iflag_debug.gt.0) write(*,*) 'output_sph_restart_control'
       call output_sph_restart_control
 !
       total_time = MPI_WTIME() - total_start
+      call MPI_allREDUCE (total_time, total_max, ione, CALYPSO_REAL,    &
+     &    MPI_MAX, CALYPSO_COMM, ierr_MPI)
       if      (istep_rst_end .eq. -1                                    &
-     &   .and. total_time.gt.elapsed_time) then
+     &   .and. total_max.gt.elapsed_time) then
         call output_sph_rst_by_elaps
         iflag_finish = 1
       end if
-      call end_eleps_time(8)
+      call end_eleps_time(10)
 !
 !*  -----------  lead energy data --------------
 !*
-      call start_eleps_time(10)
+      call start_eleps_time(11)
       if(iflag_debug.gt.0)  write(*,*) 'output_rms_sph_mhd_control'
       call output_rms_sph_mhd_control
-      call end_eleps_time(10)
+      call end_eleps_time(11)
 !
       if(iflag_debug.gt.0) write(*,*) 'sync_temp_by_per_temp_sph'
       call sync_temp_by_per_temp_sph

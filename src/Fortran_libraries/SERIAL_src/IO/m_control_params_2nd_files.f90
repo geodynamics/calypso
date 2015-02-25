@@ -14,10 +14,24 @@
 !
       implicit  none
 !
+!>      file header for original spectrum indexing data
+      character(len=kchara) :: org_sph_rj_head =      "sph_org/in_rj"
+!>      file header for original spectrum indexing data
+      integer(kind = kint) :: ifmt_org_sph_rj_head = 0
+!>      file header for original spectrum indexing data
+      integer(kind = kint) :: iflag_org_sph_rj_head = 0
+!
 !>      file header for original field data
       character(len=kchara) :: org_ucd_header =  "field_org/out"
 !>      file header for original field data
       integer(kind=kint) :: ifmt_org_ucd
+!
+!>      file header for original restart data
+      character(len=kchara) :: org_rst_header =   "rst_org/rst"
+!>      file header for original restart data
+      integer (kind=kint) :: ifmt_org_rst
+!>      file header for original restart data
+      integer (kind=kint) :: iflag_org_rst
 !
 ! ----------------------------------------------------------------------
 !
@@ -34,15 +48,13 @@
       use m_file_format_switch
 !
 !
-      iflag_org_sph_rj_head = i_org_sph_mode_head
+      iflag_org_sph_rj_head = org_sph_mode_head_ctl%iflag
       if(iflag_org_sph_rj_head .gt. 0) then
-        org_sph_rj_head =       org_sph_mode_head_ctl
+        org_sph_rj_head = org_sph_mode_head_ctl%charavalue
       end if
 !
-      iflag_org_sph_spec_head = i_org_spectr_head
-      if(iflag_org_sph_spec_head .gt. 0) then
-        org_sph_spec_head =    org_spectr_file_head_ctl
-      end if
+      call choose_file_format(org_sph_file_fmt_ctl%charavalue,          &
+     &    org_sph_file_fmt_ctl%iflag, ifmt_org_sph_rj_head)
 !
       end subroutine set_control_org_sph_mesh
 !
@@ -57,17 +69,19 @@
       use m_file_format_switch
 !
 !
-      iflag_org_rst_head = i_org_rst_head
-      if (iflag_org_rst_head .gt. 0) then
-        org_rst_header = orginal_restart_prefix
+      iflag_org_rst = orginal_restart_prefix%iflag
+      if(iflag_org_rst .gt. 0) then
+        org_rst_header = orginal_restart_prefix%charavalue
       end if
 !
-      if (i_org_udt_head .gt. 0) then
-        org_ucd_header = org_udt_head_ctl
+      if (org_udt_head_ctl%iflag .gt. 0) then
+        org_ucd_header = org_udt_head_ctl%charavalue
       end if
 !
-      call choose_ucd_file_format(udt_file_fmt_ctl,                     &
-     &    i_udt_files_fmt, ifmt_org_ucd)
+      call choose_ucd_file_format(restart_file_fmt_ctl%charavalue,      &
+     &    restart_file_fmt_ctl%iflag, ifmt_org_rst)
+      call choose_ucd_file_format(udt_file_fmt_ctl%charavalue,          &
+     &    udt_file_fmt_ctl%iflag, ifmt_org_ucd)
 !
       end subroutine set_control_org_fld_file_def
 !

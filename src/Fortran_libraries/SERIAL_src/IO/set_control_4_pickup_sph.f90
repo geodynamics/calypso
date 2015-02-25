@@ -77,14 +77,6 @@
       end do
       call deallocate_pick_sph_ctl
 !
-      num_pick_sph_l = idx_pick_sph_l_ctl%num
-      call allocate_pick_sph_l
-!
-      do inum = 1, num_pick_sph_l
-        idx_pick_sph_l(inum) = idx_pick_sph_l_ctl%ivec(inum)
-      end do
-      call deallocate_pick_sph_l_ctl
-!
       num_pick_sph_m = idx_pick_sph_m_ctl%num
       call allocate_pick_sph_m
 !
@@ -92,6 +84,22 @@
         idx_pick_sph_m(inum) = idx_pick_sph_m_ctl%ivec(inum)
       end do
       call deallocate_pick_sph_m_ctl
+!
+!
+      num_pick_sph_l = idx_pick_sph_l_ctl%num
+      if(num_pick_sph_l .gt. 0) then
+        call allocate_pick_sph_l
+!
+        do inum = 1, num_pick_sph_l
+          idx_pick_sph_l(inum) = idx_pick_sph_l_ctl%ivec(inum)
+        end do
+      call deallocate_pick_sph_l_ctl
+      else if( i_picked_mode_head .gt. 0                                &
+     &   .and. num_pick_sph_m .le. 0  .and. num_pick_sph .le. 0) then
+        num_pick_sph_l = -9999
+      else 
+        call allocate_pick_sph_l
+      end if
 !
 !   set pickup layer
 !
@@ -147,13 +155,6 @@
 !
       if(num_pick_gauss_coefs .gt. 0) call deallocate_pick_gauss_ctl
 !
-      num_pick_gauss_l = idx_gauss_l_ctl%num
-      call allocate_pick_gauss_l
-!
-      do inum = 1, num_pick_gauss_l
-        idx_pick_gauss_l(inum) = idx_gauss_l_ctl%ivec(inum)
-      end do
-      call deallocate_pick_gauss_l_ctl
 !
       num_pick_gauss_m = idx_gauss_m_ctl%num
       call allocate_pick_gauss_m
@@ -162,6 +163,21 @@
         idx_pick_gauss_m(inum) = idx_gauss_m_ctl%ivec(inum)
       end do
       call deallocate_pick_gauss_m_ctl
+!
+!
+      num_pick_gauss_l = idx_gauss_l_ctl%num
+      if(num_pick_gauss_l .gt. 0) then
+        call allocate_pick_gauss_l
+!
+        do inum = 1, num_pick_gauss_l
+          idx_pick_gauss_l(inum) = idx_gauss_l_ctl%ivec(inum)
+        end do
+        call deallocate_pick_gauss_l_ctl
+      else if( i_gauss_coefs_head .gt. 0                                &
+     &   .and. num_pick_gauss_m .le. 0                                  &
+     &   .and. num_pick_gauss_coefs .le. 0) then
+       num_pick_gauss_l = -9999
+      end if
 !
       end subroutine set_ctl_params_pick_gauss
 !

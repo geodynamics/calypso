@@ -141,21 +141,21 @@
       use m_spheric_parameter
 !
       write(50,*) 'id_domain_rtp_r'
-      write(50,'(5i10)') id_domain_rtp_r(1:nidx_global_rtp(1))
+      write(50,'(5i16)') id_domain_rtp_r(1:nidx_global_rtp(1))
 !
       write(50,*) 'id_domain_rtp_t'
-      write(50,'(5i10)') id_domain_rtp_t(1:nidx_global_rtp(2))
+      write(50,'(5i16)') id_domain_rtp_t(1:nidx_global_rtp(2))
 !
       write(50,*) 'id_domain_rtp_p'
-      write(50,'(5i10)') id_domain_rtp_p(1:nidx_global_rtp(3))
+      write(50,'(5i16)') id_domain_rtp_p(1:nidx_global_rtp(3))
 !
 !
       write(50,*) 'id_domain_rj_r'
-      write(50,'(5i10)') id_domain_rj_r(1:nidx_global_rj(1))
+      write(50,'(5i16)') id_domain_rj_r(1:nidx_global_rj(1))
 !
       write(50,*) 'id_domain_rj_j'
-      write(50,'(5i10)') id_domain_rj_j(0)
-      write(50,'(5i10)') id_domain_rj_j(1:nidx_global_rj(2))
+      write(50,'(5i16)') id_domain_rj_j(0)
+      write(50,'(5i16)') id_domain_rj_j(1:nidx_global_rj(2))
 !
       end subroutine check_sph_1d_domain_id
 !

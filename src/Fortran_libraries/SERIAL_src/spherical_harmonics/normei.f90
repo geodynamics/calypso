@@ -83,35 +83,35 @@
         setei = zero
       else
 !*
-        if ( m3+1.gt.l3 .or. abs(m2-1).gt.l2-1 )then
+        if ( (m3+ione).gt.l3 .or. abs(m2-ione).gt.(l2-ione) )then
           gg(1) = zero
         else if (m2 .eq. 0 ) then
-          gg(1) =-gs(m3+1,l3,1,l2-1,m1,l1)
+          gg(1) =-gs((m3+ione), l3, ione, (l2-ione), m1, l1)
         else
-          gg(1) = gs(m1,l1,m2-1,l2-1,m3+1,l3)
+          gg(1) = gs(m1, l1, (m2-ione), (l2-ione), (m3+ione), l3)
         end if
 !*
-        if ( m2 .gt.l2-1 )then
+        if ( m2 .gt. (l2-ione) )then
           gg(2) = zero
         else
-          gg(2) = gs(m1,l1,m2,l2-1,m3,l3)
+          gg(2) = gs(m1, l1, m2, (l2-ione), m3, l3)
         end if
 !*
-        if ( m2+1 .gt.l2 .or. abs(m3-1).gt.l3-1 )then
+        if ( (m2+ione) .gt. l2 .or. abs(m3-ione).gt.(l3-ione) )then
           gg(3) = zero
         else if ( m3 .eq. 0) then
-          gg(3) = -gs(m2+1,l2,1,l3-1,m1,l1)
+          gg(3) = -gs((m2+ione), l2, ione, (l3-ione), m1,l1)
         else
-          gg(3) = gs(m1,l1,m2+1,l2,m3-1,l3-1)
+          gg(3) = gs(m1, l1, (m2+ione), l2, (m3-ione), (l3-ione))
         end if
 !*
-        if ( m3 .gt.l3-1  )then
+        if ( m3 .gt.(l3-ione))then
           gg(4) = zero
         else
-          gg(4) = gs(m1,l1,m2,l2,m3,l3-1)
+          gg(4) = gs(m1, l1, m2, l2, m3, (l3-ione))
         end if
 !*
-        setei = leades(m2,l2,m3,l3,gg)
+        setei = leades(m2, l2, m3, l3, gg)
       end if
 !*
       end function setei
@@ -130,11 +130,11 @@
       a1 = dble( (l2+m2)*(l3-m3) )
       a2 = dble( (l3+m3)*(l2-m2) )
 !
-      a3 = dble( (l2+m2-1)*(l3+m3+1) )
-      a4 = dble( (l3+m3-1)*(l2+m2+1) )
+      a3 = dble( (l2+m2-ione)*(l3+m3+ione) )
+      a4 = dble( (l3+m3-ione)*(l2+m2+ione) )
       a5 = dble( (l2-m2)*(l3-m3) )
 !
-      if (m2-1 .eq. 0 ) then
+      if ((m2-ione) .eq. 0 ) then
         a3 = a3 * two
       end if
       if (m3 .eq. 0 ) then
@@ -145,7 +145,7 @@
         a3 = a3 * half
         a4 = a4 * half
       end if
-      if (m3-1 .eq. 0 ) then
+      if ((m3-ione) .eq. 0 ) then
         a4 = a4 * two
       end if
 !*

@@ -103,8 +103,9 @@
           iphys%i_light_source = i0
         else if ( field_name(i) .eq. fhd_entropy_source ) then
           iphys%i_entropy_source = i0
+        end if
 !
-        else if ( field_name(i) .eq. fhd_filter_v ) then
+        if ( field_name(i) .eq. fhd_filter_v ) then
           iphys%i_filter_velo = i0
         else if ( field_name(i) .eq. fhd_filter_temp ) then
           iphys%i_filter_temp = i0
@@ -213,8 +214,9 @@
           iphys%i_filter_buo =  i0
         else if (field_name(i) .eq. fhd_composit_advect ) then
           iphys%i_c_advect =    i0
+        end if
 !
-        else if ( field_name(i) .eq. fhd_SGS_h_flux ) then
+        if ( field_name(i) .eq. fhd_SGS_h_flux ) then
           iphys%i_SGS_h_flux =   i0
         else if ( field_name(i) .eq. fhd_SGS_c_flux ) then
           iphys%i_SGS_c_flux =   i0
@@ -270,8 +272,9 @@
           iphys%i_SGS_t_gen_tr =   i0
         else if ( field_name(i) .eq. fhd_SGS_m_ene_gen_true ) then
           iphys%i_SGS_me_gen_tr =  i0
+        end if
 !
-        else if ( field_name(i) .eq. fhd_press_work ) then
+        if ( field_name(i) .eq. fhd_press_work ) then
           iphys%i_p_phi = i0
         else if ( field_name(i) .eq. fhd_m_potential_work ) then
           iphys%i_m_phi = i0
@@ -319,8 +322,9 @@
           iphys%i_grad_part_t =      i0
         else if ( field_name(i) .eq. fhd_grad_filter_temp ) then
           iphys%i_grad_filter_temp = i0
+        end if
 !
-        else if ( field_name(i) .eq. fhd_SGS_simi ) then
+        if ( field_name(i) .eq. fhd_SGS_simi ) then
           iphys%i_sgs_simi =     i0
         else if ( field_name(i) .eq. fhd_SGS_grad ) then
           iphys%i_sgs_grad =     i0
@@ -341,8 +345,9 @@
           iphys%i_wide_fil_vecp =  i0
         else if ( field_name(i) .eq. fhd_w_filter_magne ) then
           iphys%i_wide_fil_magne = i0
+        end if
 !
-        else if ( field_name(i) .eq. fhd_div_inertia ) then
+        if ( field_name(i) .eq. fhd_div_inertia ) then
           iphys%i_div_inertia =    i0
         else if ( field_name(i) .eq. fhd_div_Lorentz ) then
           iphys%i_div_Lorentz =    i0
@@ -376,8 +381,9 @@
           iphys%i_rot_forces = i0
         else if ( field_name(i) .eq. fhd_div_forces ) then
           iphys%i_div_forces = i0
+        end if
 !
-        else if ( field_name(i) .eq. fhd_pre_mom ) then
+        if ( field_name(i) .eq. fhd_pre_mom ) then
           iphys%i_pre_mom =      i0
         else if ( field_name(i) .eq. fhd_pre_uxb ) then
           iphys%i_pre_uxb =      i0
@@ -413,8 +419,9 @@
           iphys%i_chk_press_2 =     i0
         else if ( field_name(i) .eq. fhd_chk_potential_2 ) then
           iphys%i_chk_potential_2 = i0
+        end if
 !
-        else if ( field_name(i) .eq. fhd_velocity_scale) then
+        if ( field_name(i) .eq. fhd_velocity_scale) then
           iphys%i_velo_scale =  i0
         else if ( field_name(i) .eq. fhd_magnetic_scale) then
           iphys%i_magne_scale = i0
@@ -422,9 +429,10 @@
           iphys%i_temp_scale =  i0
         else if ( field_name(i) .eq. fhd_composition_scale) then
           iphys%i_comp_scale =  i0
+        end if
 !
 !   Old field label... Should be deleted later!!
-        else if (field_name(i) .eq. fhd_buoyancy_work) then
+        if (field_name(i) .eq. fhd_buoyancy_work) then
           iphys%i_buo_gen =   i0
         end if
 !

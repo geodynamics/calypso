@@ -8,10 +8,6 @@
 !!
 !!
 !!@verbatim
-!!      subroutine allocate_phys_rtp_name
-!!      subroutine allocate_phys_rj_name
-!!
-!!      subroutine allocate_phys_rtp_data
 !!      subroutine allocate_phys_rj_data
 !!      subroutine allocate_reft_rj_data
 !!
@@ -19,7 +15,6 @@
 !!      subroutine deallocate_phys_rj_data
 !!      subroutine deallocate_reft_rj_data
 !!
-!!      subroutine check_rtp_phys_data(my_rank)
 !!      subroutine check_rj_spectr_name
 !!      subroutine check_rj_spectr_data(my_rank)
 !!@endverbatim
@@ -32,13 +27,8 @@
 !
       implicit  none
 !
-!>      Number of fields on spherical grid @f$ f(r,\theta,\phi) @f$
-      integer (kind=kint) :: num_phys_rtp
 !>      Number of fields for spectrum data  @f$ f(r,j) @f$
       integer (kind=kint) :: num_phys_rj
-!>      Total number of components for fields on spherical grid
-!!      @f$ f(r,\theta,\phi) @f$
-      integer (kind=kint) :: ntot_phys_rtp
 !>      Total number of components for spectrum data
 !!      @f$ f(r,j) @f$
       integer (kind=kint) :: ntot_phys_rj
@@ -51,47 +41,26 @@
       integer (kind=kint) :: ntot_comp_rj_vis
 !
 !>      Integer flag for monitoring output
-!!       for field data @f$ f(r,\theta,\phi) @f$
-      integer (kind=kint), allocatable:: iflag_monitor_rtp(:)
-!>      Integer flag for monitoring output
 !!       for spectr data @f$ f(r,j) @f$
       integer (kind=kint), allocatable:: iflag_monitor_rj(:)
 !
-!>      Number of components for each field @f$ f(r,\theta,\phi) @f$
-      integer (kind=kint), allocatable :: num_phys_comp_rtp(:)
 !>      Number of components for each field @f$ f(r,j) @f$
       integer (kind=kint), allocatable :: num_phys_comp_rj(:)
-!
-!>      End address of d_rtp for each field @f$ f(r,\theta,\phi) @f$
-      integer (kind=kint), allocatable :: istack_phys_comp_rtp(:)
 !>      End address of d_rj for each field @f$ f(r,j) @f$
       integer (kind=kint), allocatable :: istack_phys_comp_rj(:)
 ! 
-!>      Field name for @f$ f(r,\theta,\phi) @f$
-      character (len=kchara), allocatable :: phys_name_rtp(:)
 !>      Field name for @f$ f(r,j) @f$
       character (len=kchara), allocatable :: phys_name_rj(:)
 ! 
 !>      Field data @f$ f(r,\theta,\phi) @f$
       real (kind=kreal), allocatable :: d_rj(:,:)
 !>      Spectr data @f$ f(r,j) @f$
-      real (kind=kreal), allocatable :: d_rtp(:,:)
-!
-!>      Start field address of scalar fields @f$ f(r,\theta,\phi) @f$
-      integer (kind=kint) :: istart_scalar_rtp
-!>      Start field address of vector fields @f$ f(r,\theta,\phi) @f$
-      integer (kind=kint) :: istart_vector_rtp
-!>      Start field address of gradient @f$ f(r,\theta,\phi) @f$
-      integer (kind=kint) :: istart_grad_v_rtp
-!>      Start field address of tensor fields @f$ f(r,\theta,\phi) @f$
-      integer (kind=kint) :: istart_tensor_rtp
+!      real (kind=kreal), allocatable :: d_rtp(:,:)
 !
 !>      Number of fields of scalar fields @f$ f(r,\theta,\phi) @f$
       integer (kind=kint) :: num_scalar_rtp
 !>      Number of fields of vector fields @f$ f(r,\theta,\phi) @f$
       integer (kind=kint) :: num_vector_rtp
-!>      Number of fields of gradient @f$ f(r,\theta,\phi) @f$
-      integer (kind=kint) :: num_grad_v_rtp
 !>      Number of fields of tensor fields @f$ f(r,\theta,\phi) @f$
       integer (kind=kint) :: num_tensor_rtp
 !
@@ -107,24 +76,6 @@
       contains
 !
 ! -------------------------------------------------------------------
-!
-      subroutine allocate_phys_rtp_name
-!
-      allocate( phys_name_rtp(num_phys_rtp) )
-      allocate( iflag_monitor_rtp(num_phys_rtp) )
-      allocate( num_phys_comp_rtp(num_phys_rtp) )
-      allocate( istack_phys_comp_rtp(0:num_phys_rtp) )
-!
-      if(num_phys_rtp .gt. 0) then
-        phys_name_rtp = ''
-        iflag_monitor_rtp =    0
-        num_phys_comp_rtp =    0
-      end if
-      istack_phys_comp_rtp = 0
-!
-      end subroutine allocate_phys_rtp_name
-!
-!  --------------------------------------------------------------------
 !
       subroutine allocate_phys_rj_name
 !
@@ -143,17 +94,6 @@
       end subroutine allocate_phys_rj_name
 !
 !  --------------------------------------------------------------------
-!  --------------------------------------------------------------------
-!
-      subroutine allocate_phys_rtp_data
-!
-      use m_spheric_parameter
-!
-      allocate( d_rtp(nnod_rtp,ntot_phys_rtp) )
-      if((nnod_rtp*ntot_phys_rtp) .gt. 0) d_rtp = 0.0d0
-!
-      end subroutine allocate_phys_rtp_data
-!
 !  --------------------------------------------------------------------
 !
       subroutine allocate_phys_rj_data
@@ -182,18 +122,6 @@
 !  --------------------------------------------------------------------
 !  --------------------------------------------------------------------
 !
-      subroutine deallocate_phys_rtp_data
-!
-      deallocate( phys_name_rtp )
-      deallocate( iflag_monitor_rtp )
-      deallocate( num_phys_comp_rtp )
-      deallocate( istack_phys_comp_rtp )
-      deallocate( d_rtp )
-!
-      end subroutine deallocate_phys_rtp_data
-!
-!  --------------------------------------------------------------------
-!
       subroutine deallocate_phys_rj_data
 !
       deallocate( phys_name_rj )
@@ -215,39 +143,12 @@
 !  --------------------------------------------------------------------
 !  --------------------------------------------------------------------
 !
-      subroutine check_rtp_phys_data(my_rank)
-!
-      use m_spheric_parameter
-!
-      integer(kind = kint), intent(in) :: my_rank
-      integer(kind = kint) :: inod
-      character(len=kchara) :: fmt_txt
-!
-      write(50+my_rank,*) 'num_phys_rtp',  num_phys_rtp
-      write(50+my_rank,*) 'ntot_phys_rtp', ntot_phys_rtp
-      write(50+my_rank,*) 'num_phys_comp_rtp', num_phys_comp_rtp
-      do inod = 1, num_phys_rtp
-        write(50+my_rank,*) phys_name_rtp(inod)
-      end do
-!
-      write(fmt_txt,'(a6,i3,a16)')                                      &
-     &           '(4i10,', ntot_phys_rtp, '(1pE25.15e3),a1)'
-      do inod = 1, nnod_rtp
-        write(50+my_rank,fmt_txt) inod,                                 &
-     &        idx_global_rtp(inod,1:3), d_rtp(inod,1:ntot_phys_rtp)
-      end do
-!
-!
-      end subroutine check_rtp_phys_data
-!
-!  --------------------------------------------------------------------
-!
       subroutine check_rj_spectr_name
 !
       integer(kind = kint) :: i
 !
 !
-      write(*,'(a,i10)') 'num_phys_rj ', num_phys_rj
+      write(*,'(a,i16)') 'num_phys_rj ', num_phys_rj
       write(*,'(a)') 'number, component, stack, monitor_flag, name'
       do i = 1, num_phys_rj
         write(*,'(4i6,a2,a)') i, num_phys_comp_rj(i),                   &
@@ -274,7 +175,7 @@
         write(50+my_rank,*) phys_name_rj(inod)
       end do
       write(fmt_txt,'(a6,i3,a16)')                                      &
-     &           '(3i10,', ntot_phys_rj, '(1pE25.15e3),a1)'
+     &           '(3i16,', ntot_phys_rj, '(1pE25.15e3),a1)'
       do inod = 1, nnod_rj
         write(50+my_rank,fmt_txt) inod,                                 &
      &        idx_global_rj(inod,1:2), d_rj(inod,1:ntot_phys_rj)

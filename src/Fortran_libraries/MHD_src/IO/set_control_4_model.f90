@@ -16,6 +16,7 @@
       module set_control_4_model
 !
       use m_precision
+      use m_error_IDs
 !
       use m_machine_parameter
       use m_control_parameter
@@ -48,7 +49,7 @@
 !
         if (i_scheme .eq. 0) then
           e_message = 'Set time integration scheme'
-          call calypso_MPI_abort(90, e_message)
+          call calypso_MPI_abort(ierr_evo, e_message)
         else
           if ( scheme_ctl .eq. 'explicit_Euler' ) then
             iflag_scheme = id_explicit_euler
@@ -80,7 +81,7 @@
 !
         if (t_evo_field_ctl%icou .eq. 0) then
           e_message = 'Set field for time integration'
-          call calypso_MPI_abort(91, e_message)
+          call calypso_MPI_abort(ierr_evo, e_message)
         else
           num_field_to_evolve = t_evo_field_ctl%num
           if (iflag_debug .ge. iflag_routine_msg)                       &
@@ -125,7 +126,7 @@
      &    .and. iflag_t_evo_4_magne    .eq. id_no_evolution             &
      &    .and. iflag_t_evo_4_vect_p   .eq. id_no_evolution) then
             e_message = 'Turn on field for time integration'
-        call calypso_MPI_abort(90, e_message)
+        call calypso_MPI_abort(ierr_evo, e_message)
       end if
 !
       if (iflag_debug .ge. iflag_routine_msg) then
@@ -162,7 +163,7 @@
            else
               e_message                                                 &
      &          = 'Set lower temperature and its position'
-             call calypso_MPI_abort(90, e_message)
+             call calypso_MPI_abort(ierr_fld, e_message)
            end if
          else
            low_temp  = low_temp_ctl
@@ -176,7 +177,7 @@
            else
               e_message                                                 &
      &          = 'Set lower temperature and its position'
-             call calypso_MPI_abort(90, e_message)
+             call calypso_MPI_abort(ierr_fld, e_message)
            end if
          else
            high_temp = high_temp_ctl
@@ -208,7 +209,7 @@
           if ( (i_strat_sigma*i_strat_width*i_strat_outer) .eq. 0) then
             e_message                                                   &
      &        = 'Set parameteres for stratification'
-            call calypso_MPI_abort(90, e_message)
+            call calypso_MPI_abort(ierr_fld, e_message)
           else
             stratified_sigma = stratified_sigma_ctl
             stratified_width = stratified_width_ctl

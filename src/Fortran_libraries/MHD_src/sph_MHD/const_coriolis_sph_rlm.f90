@@ -9,7 +9,7 @@
 !!
 !!@verbatim
 !!      subroutine init_sum_coriolis_rlm
-!!      subroutine sum_coriolis_rlm(ncomp_trans, sp_rlm)
+!!      subroutine sum_coriolis_rlm(ncomp_trans, n_WR, WR)
 !!      subroutine copy_coriolis_terms_rlm(ncomp_trans, sp_rlm)
 !!@endverbatim
 !
@@ -68,49 +68,65 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sum_coriolis_rlm(ncomp_trans, sp_rlm)
+      subroutine sum_coriolis_rlm(ncomp_trans, n_WR, WR)
 !
       use t_boundary_params_sph_MHD
       use m_boundary_params_sph_MHD
+      use m_sph_trans_comm_table
       use m_coriolis_terms_rlm
       use sum_coriolis_terms_rlm
 !
-      integer(kind = kint), intent(in) :: ncomp_trans
-      real(kind = kreal), intent(in) :: sp_rlm(ncomp_trans*nnod_rlm)
+      integer(kind = kint), intent(in) :: ncomp_trans, n_WR
+      real(kind = kreal), intent(in) :: WR(n_WR)
 !
 !
       if( iflag_4_coriolis .eq. id_turn_OFF) return
 !
-      call sum_rot_coriolis_rlm_10(ncomp_trans, sp_rlm)
+      call sum_rot_coriolis_rlm_10(ncomp_trans, n_WR, irev_sr_rlm, WR)
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        call inner_core_rot_z_coriolis_rlm(ncomp_trans, sp_rlm)
+        call inner_core_rot_z_coriolis_rlm(ncomp_trans, n_WR,           &
+     &      irev_sr_rlm, WR)
       end if
 !
-!      call sum_div_coriolis_rlm_10(ncomp_trans, sp_rlm)
+!      call sum_div_coriolis_rlm_10(ncomp_trans, n_WR, irev_sr_rlm, WR)
 !      call sum_r_coriolis_bc_rlm_10(ncomp_trans, kr_in_U_rlm,          &
-!     &    sp_rlm, d_cor_in_rlm)
+!     &    n_WR, irev_sr_rlm, WR, d_cor_in_rlm)
 !      call sum_r_coriolis_bc_rlm_10(ncomp_trans, kr_out_U_rlm,         &
-!     &    sp_rlm, d_cor_out_rlm)
+!     &    n_WR, irev_sr_rlm, WR, d_cor_out_rlm)
 !
       end subroutine sum_coriolis_rlm
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_coriolis_terms_rlm(ncomp_trans, sp_rlm)
+      subroutine copy_coriolis_terms_rlm(ncomp_trans, n_WS, WS)
 !
+      use m_sph_trans_comm_table
+      use m_sph_communicators
+      use m_sel_spherical_SRs
+      use m_addresses_trans_sph_MHD
       use m_coriolis_terms_rlm
       use sum_coriolis_terms_rlm
 !
-      integer(kind = kint), intent(in) :: ncomp_trans
-      real(kind = kreal), intent(inout) :: sp_rlm(ncomp_trans*nnod_rlm)
+      integer(kind = kint), intent(in) :: ncomp_trans, n_WS
+      real(kind = kreal), intent(inout) :: WS(n_WS)
+!
 !
       if( iflag_4_coriolis .eq. id_turn_OFF) return
 !
+      call sel_calypso_to_send_scalar(ncomp_trans, nnod_rlm, n_WS,      &
+     &    nmax_sr_rj, nneib_domain_rlm, istack_sr_rlm, item_sr_rlm,     &
+     &    ncomp_coriolis_rlm, ip_rlm_rot_cor,                           &
+     &    f_trns%i_rot_Coriolis, d_cor_rlm(1,1), WS(1))
+      call sel_calypso_to_send_scalar(ncomp_trans, nnod_rlm, n_WS,      &
+     &    nmax_sr_rj, nneib_domain_rlm, istack_sr_rlm, item_sr_rlm,     &
+     &    ncomp_coriolis_rlm, it_rlm_rot_cor,                           &
+     &    (f_trns%i_rot_Coriolis+2), d_cor_rlm(1,1), WS(1))
 !
-      call copy_rot_coriolis_rlm(ncomp_trans, sp_rlm)
-!      call copy_div_coriolis_rlm(ncomp_trans, sp_rlm)
-!      call copy_r_coriolis_bc_rlm(ncomp_trans, sp_rlm)
+!      call sel_calypso_to_send_scalar(ncomp_trans, nnod_rlm, n_WS,     &
+!     &    nmax_sr_rj, nneib_domain_rlm, istack_sr_rlm, item_sr_rlm,    &
+!     &    ncomp_coriolis_rlm, ip_rlm_div_cor,                          &
+!     &    f_trns%i_div_Coriolis, d_cor_rlm(1,1), WS(1))
 !
       end subroutine copy_coriolis_terms_rlm
 !

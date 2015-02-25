@@ -54,10 +54,6 @@
       call allocate_spheric_param_rtp
       call allocate_sph_1d_index_rtp
 !
-      do i = 1, nnod_rtp
-        inod_global_rtp(i) = i
-      end do
-!
       inod = 0
       do kp = 1, nidx_global_rtp(3)
         do kr = 1, nidx_global_rtp(1)

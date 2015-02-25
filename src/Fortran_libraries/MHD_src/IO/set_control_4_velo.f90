@@ -83,9 +83,9 @@
      &       velo_nod%ibc_type(i))
 !
           if(cmp_no_case(node_bc_U_ctl%c1_tbl(i), 'vr_0')               &
-     &       .gt. 0) velo_nod%ibc_type(i) = iflag_no_vr
+     &       ) velo_nod%ibc_type(i) = iflag_no_vr
           if(cmp_no_case(node_bc_U_ctl%c1_tbl(i), 'special')            &
-     &       .gt. 0) velo_nod%ibc_type(i) = iflag_bc_special
+     &       ) velo_nod%ibc_type(i) = iflag_bc_special
         end do
 !
         if (iflag_debug .eq. iflag_full_msg) then

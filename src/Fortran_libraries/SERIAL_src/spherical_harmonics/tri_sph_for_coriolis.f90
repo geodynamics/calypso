@@ -107,7 +107,7 @@
       integer(kind = kint) :: jmax
       integer(kind = kint), allocatable :: idx_lc(:,:)
 !
-      integer(kind = kint) :: j1, l, m, j
+      integer(kind = kint) :: l, m, j
 !
 !
 !*  -----------    set index  ---------------

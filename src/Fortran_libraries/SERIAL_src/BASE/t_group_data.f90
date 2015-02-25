@@ -349,7 +349,7 @@
         write(50+my_rank,*) trim(grp%grp_name(i))
         ist = grp%istack_grp(i-1)+1
         ied = grp%istack_grp(i)
-        write(50+my_rank,'(5i10)') grp%item_grp(ist:ied)
+        write(50+my_rank,'(5i16)') grp%item_grp(ist:ied)
       end do
 !
       end subroutine check_group_type_data
@@ -369,8 +369,8 @@
         write(50+my_rank,*) trim(sf_grp%grp_name(i))
         ist = sf_grp%istack_grp(i-1)+1
         ied = sf_grp%istack_grp(i)
-        write(50+my_rank,'(5i10)') sf_grp%item_sf_grp(1,ist:ied)
-        write(50+my_rank,'(5i10)') sf_grp%item_sf_grp(2,ist:ied)
+        write(50+my_rank,'(5i16)') sf_grp%item_sf_grp(1,ist:ied)
+        write(50+my_rank,'(5i16)') sf_grp%item_sf_grp(2,ist:ied)
       end do
 !
       end subroutine check_surf_grp_type_data

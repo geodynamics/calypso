@@ -56,8 +56,7 @@
      &         (num_neib, id_neib, istack_import, item_import,          &
      &          istack_export, item_export)
 !
-      call update_ele_by_double_address(ucd%nele, ucd%nnod_4_ele,       &
-     &    ucd%ie, m_ucd)
+      call update_ele_by_double_address(m_ucd, ucd)
 !
 !
       if (ucd%ifmt_file .eq. iflag_sgl_hdf5) then
@@ -106,14 +105,8 @@
         open(id_vtk_file,file=file_name, form='formatted')
       end if
 !
-      call write_merged_ucd_mesh(id_vtk_file, ucd%nnod, ucd%nele,       &
-     &    ucd%nnod_4_ele, ucd%xx, ucd%ie, ucd%ntot_comp,                &
-     &    m_ucd%istack_merged_nod,  m_ucd%istack_merged_intnod,         &
-     &    m_ucd%istack_merged_ele)
-      call write_merged_ucd_fields(id_vtk_file, ucd%nnod,               &
-     &    ucd%num_field, ucd%ntot_comp, ucd%num_comp, ucd%phys_name,    &
-     &    ucd%d_ucd, m_ucd%istack_merged_nod,                           &
-     &    m_ucd%istack_merged_intnod)
+      call write_merged_ucd_mesh(id_vtk_file, ucd, m_ucd)
+      call write_merged_ucd_fields(id_vtk_file, ucd, m_ucd)
 !
       if(my_rank .eq. 0) close(id_vtk_file)
 !
@@ -140,10 +133,7 @@
         open(id_vtk_file,file=file_name, form='formatted')
       end if
 !
-      call write_merged_ucd_fields(id_vtk_file, ucd%nnod,               &
-     &    ucd%num_field, ucd%ntot_comp, ucd%num_comp, ucd%phys_name,    &
-     &    ucd%d_ucd, m_ucd%istack_merged_nod,                           &
-     &    m_ucd%istack_merged_intnod)
+      call write_merged_ucd_fields(id_vtk_file, ucd, m_ucd)
 !
       if(my_rank .eq. 0) close(id_vtk_file)
 !
@@ -169,10 +159,7 @@
         open (id_vtk_file, file=file_name, status='replace')
       end if
 !
-      call write_merged_ucd_mesh(id_vtk_file, ucd%nnod, ucd%nele,       &
-     &    ucd%nnod_4_ele, ucd%xx, ucd%ie, ucd%ntot_comp,                &
-     &    m_ucd%istack_merged_nod,  m_ucd%istack_merged_intnod,         &
-     &    m_ucd%istack_merged_ele)
+      call write_merged_ucd_mesh(id_vtk_file, ucd, m_ucd)
 !
       if(my_rank .eq. 0) close(id_vtk_file)
 !
@@ -201,10 +188,7 @@
      &                  status ='unknown')
       end if
 !
-      call write_merged_vtk_mesh(id_vtk_file, ucd%nnod,                 &
-     &    ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie,                     &
-     &    m_ucd%istack_merged_nod, m_ucd%istack_merged_intnod,          &
-     &    m_ucd%istack_merged_ele)
+      call write_merged_vtk_mesh(id_vtk_file, ucd, m_ucd)
 !
       call write_merged_vtk_fields(id_vtk_file, ucd%nnod,               &
      &    ucd%num_field, ucd%ntot_comp, ucd%num_comp, ucd%phys_name,    &
@@ -267,10 +251,7 @@
      &                  status ='unknown')
       end if
 !
-      call write_merged_vtk_mesh(id_vtk_file, ucd%nnod,                 &
-     &    ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie,                     &
-     &    m_ucd%istack_merged_nod, m_ucd%istack_merged_intnod,          &
-     &    m_ucd%istack_merged_ele)
+      call write_merged_vtk_mesh(id_vtk_file, ucd, m_ucd)
 !
       if(my_rank .eq. 0) close(id_vtk_file)
 !

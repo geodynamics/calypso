@@ -61,7 +61,6 @@
       call allocate_spheric_param_rtp
       call allocate_sph_1d_index_rtp
 !
-      inod_global_rtp(1:nnod_rtp) = rtp%inod_global_rtp(1:rtp%nnod_rtp)
       do i = 1, ithree
         idx_global_rtp(1:nnod_rtp,i)                                    &
      &         = rtp%idx_global_rtp(1:rtp%nnod_rtp,i) 
@@ -108,7 +107,6 @@
       call allocate_spheric_param_rtm
       call allocate_sph_1d_index_rtm
 !
-      inod_global_rtm(1:nnod_rtm) = rtm%inod_global_rtm(1:nnod_rtm)
       do i = 1, ithree
         idx_global_rtm(1:nnod_rtm,i) = rtm%idx_global_rtm(1:nnod_rtm,i)
       end do
@@ -153,7 +151,6 @@
       call allocate_spheric_param_rlm
       call allocate_sph_1d_index_rlm
 !
-      inod_global_rlm(1:nnod_rlm) = rlm%inod_global_rlm(1:nnod_rlm)
       do i = 1, itwo
         idx_global_rlm(1:nnod_rlm,i) = rlm%idx_global_rlm(1:nnod_rlm,i)
       end do
@@ -198,7 +195,6 @@
       call allocate_spheric_param_rj
       call allocate_sph_1d_index_rj
 !
-      inod_global_rj(1:nnod_rj) = rj%inod_global_rj(1:nnod_rj)
       do i = 1, itwo
         idx_global_rj(1:nnod_rj,i) = rj%idx_global_rj(1:nnod_rj,i)
       end do
@@ -244,8 +240,6 @@
       call alloc_type_spheric_param_rtp(rtp)
       call alloc_type_sph_1d_index_rtp(rtp)
 !
-      rtp%inod_global_rtp(1:rtp%nnod_rtp)                               &
-     &       = inod_global_rtp(1:rtp%nnod_rtp)
       do i = 1, ithree
         rtp%idx_global_rtp(1:rtp%nnod_rtp,i)                            &
      &       = idx_global_rtp(1:rtp%nnod_rtp,i)
@@ -291,8 +285,6 @@
       call alloc_type_spheric_param_rtm(rtm)
       call alloc_type_sph_1d_index_rtm(rtm)
 !
-      rtm%inod_global_rtm(1:rtm%nnod_rtm)                               &
-     &      = inod_global_rtm(1:rtm%nnod_rtm)
       do i = 1, ithree
         rtm%idx_global_rtm(1:rtm%nnod_rtm,i)                            &
      &      = idx_global_rtm(1:rtm%nnod_rtm,i)
@@ -338,8 +330,6 @@
       call alloc_type_spheric_param_rlm(rlm)
       call alloc_type_sph_1d_index_rlm(rlm)
 !
-      rlm%inod_global_rlm(1:rlm%nnod_rlm)                               &
-     &      = inod_global_rlm(1:rlm%nnod_rlm)
       do i = 1, itwo
         rlm%idx_global_rlm(1:rlm%nnod_rlm,i)                            &
      &      = idx_global_rlm(1:rlm%nnod_rlm,i)
@@ -385,7 +375,6 @@
       call alloc_type_spheric_param_rj(rj)
       call alloc_type_sph_1d_index_rj(rj)
 !
-      rj%inod_global_rj(1:rj%nnod_rj) = inod_global_rj(1:rj%nnod_rj)
       do i = 1, itwo
         rj%idx_global_rj(1:rj%nnod_rj,i)                                &
      &       = idx_global_rj(1:rj%nnod_rj,i)

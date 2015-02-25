@@ -51,17 +51,15 @@
        real(kind=kreal), intent(in)    :: scalar(numnod)
        real(kind=kreal), intent(inout) :: copied(numnod)
 !
-       integer (kind = kint) :: ip, ist, ied, inod
+       integer (kind = kint) :: ip, ist, ied
 !
-!$omp parallel do private(ist,ied)
+!$omp do private(ist,ied)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
-         do inod = ist,ied
-           copied(inod) = scalar(inod)
-         end do
+         copied(ist:ied) = scalar(ist:ied)
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine copy_nod_scalar_smp
 !
@@ -75,19 +73,17 @@
        real(kind=kreal), intent(in)    :: vector(numnod,3)
        real(kind=kreal), intent(inout) :: copied(numnod,3)
 !
-       integer (kind = kint) :: ip, ist, ied, inod
+       integer (kind = kint) :: ip, ist, ied
 !
-!$omp parallel do private(ist,ied,inod)
+!$omp do private(ist,ied)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
-         do inod = ist,ied
-           copied(inod,1) = vector(inod,1)
-           copied(inod,2) = vector(inod,2)
-           copied(inod,3) = vector(inod,3)
-         end do
+         copied(ist:ied,1) = vector(ist:ied,1)
+         copied(ist:ied,2) = vector(ist:ied,2)
+         copied(ist:ied,3) = vector(ist:ied,3)
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine copy_nod_vector_smp
 !
@@ -101,22 +97,20 @@
        real(kind=kreal), intent(in)    :: tensor(numnod,6)
        real(kind=kreal), intent(inout) :: copied(numnod,6)
 !
-       integer (kind = kint) :: ip, ist, ied, inod
+       integer (kind = kint) :: ip, ist, ied
 !
-!$omp parallel do private(ist,ied,inod)
+!$omp do private(ist,ied)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
-         do inod = ist,ied
-           copied(inod,1) = tensor(inod,1)
-           copied(inod,2) = tensor(inod,2)
-           copied(inod,3) = tensor(inod,3)
-           copied(inod,4) = tensor(inod,4)
-           copied(inod,5) = tensor(inod,5)
-           copied(inod,6) = tensor(inod,6)
-         end do
+         copied(ist:ied,1) = tensor(ist:ied,1)
+         copied(ist:ied,2) = tensor(ist:ied,2)
+         copied(ist:ied,3) = tensor(ist:ied,3)
+         copied(ist:ied,4) = tensor(ist:ied,4)
+         copied(ist:ied,5) = tensor(ist:ied,5)
+         copied(ist:ied,6) = tensor(ist:ied,6)
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine copy_nod_sym_tensor_smp
 !
@@ -131,17 +125,15 @@
        integer (kind = kint), intent(in)    :: int_scalar(numnod)
        integer (kind = kint), intent(inout) :: int_copied(numnod)
 !
-       integer (kind = kint) :: ip, ist, ied, inod
+       integer (kind = kint) :: ip, ist, ied
 !
-!$omp parallel do private(ist,ied)
+!$omp do private(ist,ied)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
-         do inod = ist,ied
-           int_copied(inod) = int_scalar(inod)
-         end do
+         int_copied(ist:ied) = int_scalar(ist:ied)
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine copy_nod_integer_smp
 !

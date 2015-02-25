@@ -64,6 +64,7 @@
       module m_ctl_data_4_sphere_model
 !
       use m_precision
+      use t_control_elements
       use t_read_control_arrays
 !
       implicit  none
@@ -71,16 +72,16 @@
 !     resolution of spherical harmonics
 !
 !>      Truncation lavel of spherical harmonics
-      integer(kind = kint) :: ltr_ctl
+      type(read_integer_item), save :: ltr_ctl
 !>      Type of spherical grids
-      character(len = kchara) :: sph_grid_type_ctl
+      type(read_character_item), save :: sph_grid_type_ctl
 !>      Type of spherical coefficients
-      character(len = kchara) :: sph_coef_type_ctl
+      type(read_character_item), save :: sph_coef_type_ctl
 !
 !>      Number of grids in meridional direction
-      integer(kind = kint) :: ngrid_elevation_ctl
+      type(read_integer_item), save :: ngrid_elevation_ctl
 !>      Number of grids in longitudinal direction
-      integer(kind = kint) :: ngrid_azimuth_ctl
+      type(read_integer_item), save :: ngrid_azimuth_ctl
 !
 !>      Structure for radial point data
 !!@n      light_position_ctl%ivec:  radial ID
@@ -93,23 +94,23 @@
       type(ctl_array_ci), save :: radial_grp_ctl
 !
 !>      Grid spacing type
-      character(len = kchara) :: radial_grid_type_ctl
+      type(read_character_item), save :: radial_grid_type_ctl
 !>      Minimum radius of the simulation domain @f$ R_{c} @f$
-      integer(kind = kint) :: num_fluid_grid_ctl
+      type(read_integer_item), save :: num_fluid_grid_ctl
 !>      ICB radius     @f$ R_{i} @f$
-      real(kind = kreal) :: Min_radius_ctl
+      type(read_real_item), save :: Min_radius_ctl
 !>      ICB radius     @f$ R_{i} @f$
-      real(kind = kreal) :: ICB_radius_ctl
+      type(read_real_item), save :: ICB_radius_ctl
 !>      CMB radius     @f$ R_{o} @f$
-      real(kind = kreal) :: CMB_radius_ctl
+      type(read_real_item), save :: CMB_radius_ctl
 !>      Maximum radius of the simulation domain @f$ R_{m} @f$
-      real(kind = kreal) :: Max_radius_ctl
+      type(read_real_item), save :: Max_radius_ctl
 !>      Size of the fluid shell
 !!       @f$ L = R_{o} - R_{i} @f$
-      real(kind = kreal) :: fluid_core_size_ctl
+      type(read_real_item), save :: fluid_core_size_ctl
 !>      Ratio of inner core radius to the outer core radius
 !!       @f$ R_{i} / R_{o} @f$
-      real(kind = kreal) :: ICB_to_CMB_ratio_ctl
+      type(read_real_item), save :: ICB_to_CMB_ratio_ctl
 !
 !
 !   labels of data field
@@ -153,21 +154,6 @@
       character(len=kchara), parameter                                  &
      &      ::  hd_bc_sph = 'boundaries_ctl'
 !
-      integer (kind=kint) :: i_ntheta_shell = 0
-      integer (kind=kint) :: i_nphi_shell =   0
-      integer (kind=kint) :: i_sph_truncate = 0
-      integer (kind=kint) :: i_sph_c_type =   0
-      integer (kind=kint) :: i_sph_g_type =   0
-!
-      integer (kind=kint) :: i_r_grid_type =  0
-      integer (kind=kint) :: i_n_fluid_grid = 0
-      integer (kind=kint) :: i_Min_radius =   0
-      integer (kind=kint) :: i_ICB_radius =   0
-      integer (kind=kint) :: i_CMB_radius =   0
-      integer (kind=kint) :: i_Max_radius =   0
-      integer (kind=kint) :: i_shell_size =   0
-      integer (kind=kint) :: i_shell_ratio =  0
-!
 !   3rd level for boundary define
 !
       private :: hd_shell_def, i_shell_def
@@ -204,37 +190,25 @@
         call read_control_array_c_i(hd_bc_sph, radial_grp_ctl)
 !
 !
-        call read_character_ctl_item(hd_sph_c_type,                     &
-     &        i_sph_c_type, sph_coef_type_ctl)
-        call read_character_ctl_item(hd_sph_g_type,                     &
-     &        i_sph_g_type, sph_grid_type_ctl)
-        call read_character_ctl_item(hd_r_grid_type,                    &
-     &        i_r_grid_type, radial_grid_type_ctl)
+        call read_chara_ctl_type(hd_sph_c_type, sph_coef_type_ctl)
+        call read_chara_ctl_type(hd_sph_g_type, sph_grid_type_ctl)
+        call read_chara_ctl_type(hd_r_grid_type, radial_grid_type_ctl)
 !
-        call read_integer_ctl_item(hd_sph_truncate,                     &
-     &          i_sph_truncate, ltr_ctl)
-        call read_integer_ctl_item(hd_ntheta_shell,                     &
-     &        i_nphi_shell, ngrid_elevation_ctl)
-        call read_integer_ctl_item(hd_nphi_shell,                       &
-     &        i_ntheta_shell, ngrid_azimuth_ctl)
+        call read_integer_ctl_type(hd_sph_truncate, ltr_ctl)
+        call read_integer_ctl_type(hd_ntheta_shell,                     &
+     &      ngrid_elevation_ctl)
+        call read_integer_ctl_type(hd_nphi_shell, ngrid_azimuth_ctl)
 !
-        call read_integer_ctl_item(hd_n_fluid_grid,                     &
-     &         i_n_fluid_grid, num_fluid_grid_ctl)
+        call read_integer_ctl_type(hd_n_fluid_grid, num_fluid_grid_ctl)
 !
 !
-        call read_real_ctl_item(hd_Min_radius,                          &
-     &         i_Min_radius, Min_radius_ctl)
-        call read_real_ctl_item(hd_ICB_radius,                          &
-     &         i_ICB_radius, ICB_radius_ctl)
-        call read_real_ctl_item(hd_CMB_radius,                          &
-     &         i_CMB_radius, CMB_radius_ctl)
-        call read_real_ctl_item(hd_Max_radius,                          &
-     &         i_Max_radius, Max_radius_ctl)
+        call read_real_ctl_type(hd_Min_radius, Min_radius_ctl)
+        call read_real_ctl_type(hd_ICB_radius, ICB_radius_ctl)
+        call read_real_ctl_type(hd_CMB_radius, CMB_radius_ctl)
+        call read_real_ctl_type(hd_Max_radius, Max_radius_ctl)
 !
-        call read_real_ctl_item(hd_shell_size,                          &
-     &         i_shell_size, fluid_core_size_ctl)
-        call read_real_ctl_item(hd_shell_ratio,                         &
-     &         i_shell_ratio, ICB_to_CMB_ratio_ctl)
+        call read_real_ctl_type(hd_shell_size, fluid_core_size_ctl)
+        call read_real_ctl_type(hd_shell_ratio, ICB_to_CMB_ratio_ctl)
       end do
 !
       end subroutine read_ctl_4_shell_define

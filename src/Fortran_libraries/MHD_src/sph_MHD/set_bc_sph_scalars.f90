@@ -18,6 +18,7 @@
       use calypso_mpi
 !
       use m_constants
+      use m_error_IDs
       use m_machine_parameter
       use m_control_parameter
       use m_boundary_condition_IDs
@@ -79,7 +80,7 @@
      &   'Thermal boundary condition for ICB is not defined correctly.'
         if(my_rank .eq. 0) write(*,'(2a)')                              &
      &   'Check control_MHD and ', trim(bc_sph_file_name)
-        call calypso_MPI_abort(2, 'Check boundary conditions')
+        call calypso_MPI_abort(ierr_BC, 'Check boundary conditions')
       end if
 !
       if(sph_bc_T%iflag_cmb .eq. iflag_undefined_bc) then
@@ -87,7 +88,7 @@
      &   'Thermal boundary condition for CMB is not defined correctly.'
         if(my_rank .eq. 0) write(*,'(2a)')                              &
      &   'Check control_MHD and ', trim(bc_sph_file_name)
-        call calypso_MPI_abort(2, 'Check boundary conditions')
+        call calypso_MPI_abort(ierr_BC, 'Check boundary conditions')
       end if
 !
       end subroutine set_sph_bc_temp_sph
@@ -135,7 +136,7 @@
      &   'is not defined correctly.'
         if(my_rank .eq. 0) write(*,'(2a)')                              &
      &   'Check control_MHD and ', trim(bc_sph_file_name)
-        call calypso_MPI_abort(2, 'Check boundary conditions')
+        call calypso_MPI_abort(ierr_BC, 'Check boundary conditions')
       end if
 !
       if(sph_bc_C%iflag_cmb .eq. iflag_undefined_bc) then
@@ -144,7 +145,7 @@
      &   'is not defined correctly.'
         if(my_rank .eq. 0) write(*,'(2a)')                              &
      &   'Check control_MHD and ', trim(bc_sph_file_name)
-        call calypso_MPI_abort(2, 'Check boundary conditions')
+        call calypso_MPI_abort(ierr_BC, 'Check boundary conditions')
       end if
 
       end subroutine set_sph_bc_composition_sph
@@ -464,7 +465,7 @@
       return
 !
   10  continue
-      call calypso_MPI_abort(22, 'Set correct boundary condition')
+      call calypso_MPI_abort(ierr_BC, 'Set correct boundary condition')
 !
       end subroutine find_both_sides_of_boundaries
 !

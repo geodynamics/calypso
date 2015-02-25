@@ -37,8 +37,19 @@
       use m_sph_phys_address
       use m_gauss_coefs_monitor_data
 !
+      integer(kind = kint) :: l
+!
 !
       if (ipol%i_magne .gt. 0) then
+!
+        if(num_pick_gauss_l .eq. -9999) then
+          num_pick_gauss_l = l_truncation+1
+          call allocate_pick_gauss_l
+          do l = 0, l_truncation
+            idx_pick_gauss_l(l+1) = l
+          end do
+        end if
+!
         call count_picked_sph_adrress                                   &
      &     (num_pick_gauss_coefs, num_pick_gauss_l, num_pick_gauss_m,   &
      &      idx_pick_gauss_mode, idx_pick_gauss_l, idx_pick_gauss_m,    &
@@ -77,6 +88,7 @@
       use m_gauss_coefs_monitor_data
 !
       integer(kind = kint) :: inum, j, l, inod
+      real(kind = kreal) :: rcmb_to_Re, ricb_to_Rref
       real(kind = kreal) :: a2r_4_gauss
 !
 !
@@ -88,19 +100,36 @@
       end do
 !$omp end parallel do
 !
-      a2r_4_gauss = one / (r_4_gauss_coefs**2)
-      rcmb_to_Re = radius_1d_rj_r(nlayer_CMB) / r_4_gauss_coefs
-!$omp parallel do private(j,inod)
-      do inum = 1, num_pick_gauss_mode
-        j = idx_pick_gauss_coef_lc(inum)
-        l = int( aint(sqrt(dble(j))) )
-        if(j .gt. izero) then
-          inod =  j +    (nlayer_CMB-1) * nidx_rj(2)
-          gauss_coef_lc(inum) = d_rj(inod,ipol%i_magne) * dble(l)       &
+      if(r_4_gauss_coefs .ge. radius_1d_rj_r(nlayer_CMB)) then
+        a2r_4_gauss = one / (r_4_gauss_coefs**2)
+        rcmb_to_Re = radius_1d_rj_r(nlayer_CMB) / r_4_gauss_coefs
+!$omp parallel do private(j,l,inod)
+        do inum = 1, num_pick_gauss_mode
+          j = idx_pick_gauss_coef_lc(inum)
+          l = int( aint(sqrt(dble(j))) )
+          if(j .gt. izero) then
+            inod =  j +    (nlayer_CMB-1) * nidx_rj(2)
+            gauss_coef_lc(inum) = d_rj(inod,ipol%i_magne) * dble(l)     &
      &                        * rcmb_to_Re**l *a2r_4_gauss
-        end if
-      end do
+          end if
+        end do
 !$omp end parallel do
+!
+      else if(r_4_gauss_coefs .le. radius_1d_rj_r(nlayer_ICB)) then
+        a2r_4_gauss = one / (radius_1d_rj_r(nlayer_ICB)**2)
+        ricb_to_Rref = r_4_gauss_coefs / radius_1d_rj_r(nlayer_ICB)
+!$omp parallel do private(j,l,inod)
+        do inum = 1, num_pick_gauss_mode
+          j = idx_pick_gauss_coef_lc(inum)
+          l = int( aint(sqrt(dble(j))) )
+          if(j .gt. izero) then
+            inod =  j +    (nlayer_ICB-1) * nidx_rj(2)
+            gauss_coef_lc(inum) = - d_rj(inod,ipol%i_magne) * dble(l+1) &
+     &                            * ricb_to_Rref**(l-1) *a2r_4_gauss
+          end if
+        end do
+!$omp end parallel do
+      end if
 !
       call MPI_allREDUCE(gauss_coef_lc(1), gauss_coef_gl(1),            &
      &    num_pick_gauss_mode, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM,     &

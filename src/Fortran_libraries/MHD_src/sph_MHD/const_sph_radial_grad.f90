@@ -128,11 +128,11 @@
      &    is_magne, is_current)
 !
 !      Extend potential field
-      call ext_outside_potential_with_j(is_magne, is_current,           &
-     &    sph_bc_B%kr_out)
+      call ext_outside_potential_with_j                                 &
+     &   (sph_bc_B%kr_out, d_rj(1,is_magne), d_rj(1,is_current))
       if(sph_bc_B%iflag_icb .eq. iflag_sph_insulator) then
-        call ext_inside_potential_with_j(is_magne, is_current,          &
-     &      sph_bc_B%kr_in)
+        call ext_inside_potential_with_j                                &
+     &     (sph_bc_B%kr_in, d_rj(1,is_magne), d_rj(1,is_current))
       end if
 !
       end subroutine const_grad_bp_and_current
@@ -174,9 +174,9 @@
      &    is_magne)
 !
 !      Extend potential field
-      call ext_outside_potential(is_magne, sph_bc_B%kr_out)
+      call ext_outside_potential(sph_bc_B%kr_out, d_rj(1,is_magne))
       if(sph_bc_B%iflag_icb .eq. iflag_sph_insulator) then
-        call ext_inside_potential(is_magne, sph_bc_B%kr_in)
+        call ext_inside_potential(sph_bc_B%kr_in, d_rj(1,is_magne))
       end if
 !
       end subroutine const_grad_poloidal_magne

@@ -99,6 +99,7 @@
 !
       subroutine init_radial_sph_interpolation
 !
+      use m_control_params_2nd_files
       use m_node_id_spherical_IO
       use r_interpolate_sph_data
 !
@@ -116,6 +117,7 @@
 !
       subroutine read_alloc_sph_rst_4_snap(i_step)
 !
+      use m_control_params_2nd_files
       use m_node_id_spherical_IO
       use set_sph_restart_IO
       use r_interpolate_sph_data
@@ -147,6 +149,7 @@
       subroutine output_spectr_4_snap(i_step)
 !
       use m_t_int_parameter
+      use m_control_params_sph_data
       use copy_rj_phys_data_4_IO
       use copy_time_steps_4_restart
 !
@@ -154,7 +157,7 @@
       integer(kind = kint) :: istep_fld
 !
 !
-      if( (iflag_sph_spec_head*i_step_output_ucd) .eq. 0) return
+      if( (iflag_sph_spec_output*i_step_output_ucd) .eq. 0) return
       if(mod(i_step,i_step_output_ucd) .eq. 0) return
 !
       istep_fld = i_step / i_step_output_ucd
@@ -163,7 +166,7 @@
       call allocate_phys_data_IO
       call copy_rj_viz_phys_data_to_IO
 !
-      phys_file_head = spectr_file_head
+      call set_spectr_prefix_fmt_2_fld_IO
       call sel_write_step_SPH_field_file(my_rank, istep_fld)
 !
       call deallocate_phys_data_IO

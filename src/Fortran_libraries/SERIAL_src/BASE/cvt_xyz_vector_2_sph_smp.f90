@@ -21,17 +21,17 @@
 !!***********************************************************************
 !!
 !!      subroutine cvt_vector_2_sph_smp(np_smp, numnod, inod_smp_stack, &
-!!     &          vect, v_sph, xx, r, s, a_r, a_s)
+!!     &          vect, v_sph, xx, yy, zz, r, s, a_r, a_s)
 !!
 !!      subroutine overwrite_vector_2_sph_smp(np_smp, numnod,           &
-!!     &          inod_smp_stack, vect, xx, r, s, a_r, a_s)
+!!     &          inod_smp_stack, vect, xx, yy, zz, r, s, a_r, a_s)
 !!
 !!      subroutine cal_radial_comp_smp(np_smp, numnod, inod_smp_stack,  &
-!!     &          vect, v_r, xx, r, a_r)
+!!     &          vect, v_r, xx, yy, zz, r, a_r)
 !!      subroutine cal_theta_comp_smp(np_smp, numnod, inod_smp_stack,   &
-!!     &          vect, v_theta, xx, r, s, a_r, a_s)
+!!     &          vect, v_theta, xx, yy, zz, r, s, a_r, a_s)
 !!      subroutine cal_phi_comp_smp(np_smp, numnod, inod_smp_stack,     &
-!!     &          vect, v_phi, xx, s, a_s)
+!!     &          vect, v_phi, xx, yy, s, a_s)
 !!***********************************************************************
 !!@endverbatim
 !!
@@ -39,7 +39,9 @@
 !!@n @param  numnod   Number of data points
 !!@n @param  inod_smp_stack(0:np_smp)
 !!                    End address of each SMP process
-!!@n @param  xx(numnod,3) position in Cartesian coordinate
+!!@n @param  xx(numnod) position in Cartesian coordinate
+!!@n @param  yy(numnod) position in Cartesian coordinate
+!!@n @param  zz(numnod) position in Cartesian coordinate
 !!@n @param  r(numnod)    radius
 !!@n @param  s(numnod)    cylindrical radius
 !!@n @param  a_r(numnod)  1 / r
@@ -69,12 +71,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cvt_vector_2_sph_smp(np_smp, numnod, inod_smp_stack,   &
-     &          vect, v_sph, xx, r, s, a_r, a_s)
+     &          vect, v_sph, xx, yy, zz, r, s, a_r, a_s)
 !
        integer (kind = kint), intent(in) :: np_smp, numnod
        integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
        real(kind=kreal), intent(in) :: vect(numnod,3)
-       real(kind=kreal), intent(in) :: xx(numnod,3)
+       real(kind=kreal), intent(in) :: xx(numnod), yy(numnod)
+       real(kind=kreal), intent(in) :: zz(numnod)
        real(kind=kreal), intent(in) :: r(numnod), s(numnod)
        real(kind=kreal), intent(in) :: a_r(numnod), a_s(numnod)
 !
@@ -84,7 +87,7 @@
        real(kind=kreal) :: vx, vy, vz
 !
 !
-!$omp parallel do private(inod,ist,ied,vx,vy,vz)
+!$omp do private(inod,ist,ied,vx,vy,vz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -99,42 +102,35 @@
              v_sph(inod,3) = vy
 !
            else if ( s(inod).eq.0.0d0 ) then
-             v_sph(inod,1) = vz * xx(inod,3) * a_r(inod)
-             v_sph(inod,2) = vx * xx(inod,3) * a_r(inod)
+             v_sph(inod,1) = vz * zz(inod) * a_r(inod)
+             v_sph(inod,2) = vx * zz(inod) * a_r(inod)
              v_sph(inod,3) = vy
-!
            else
-!
-             v_sph(inod,1) = ( vx * xx(inod,1)                  &
-     &                       + vy * xx(inod,2)                  &
-     &                       + vz * xx(inod,3) )                &
+             v_sph(inod,1) = (vx*xx(inod) + vy*yy(inod) + vz*zz(inod))  &
      &                        * a_r(inod)
-!
-             v_sph(inod,2) = ( vx * xx(inod,3)*xx(inod,1)       &
-     &                       + vy * xx(inod,3)*xx(inod,2)       &
-     &                       - vz * s(inod)  * s(inod)  )       &
+             v_sph(inod,2) = ( vx * zz(inod)*xx(inod)                   &
+     &                       + vy * zz(inod)*yy(inod)                   &
+     &                       - vz * s(inod)  * s(inod)  )               &
      &                        * a_r(inod) * a_s(inod)
-!
-             v_sph(inod,3) = ( -vx * xx(inod,2)                &
-     &                        + vy * xx(inod,1) )              &
+             v_sph(inod,3) = ( -vx * yy(inod) + vy * xx(inod) )         &
      &                        * a_s(inod)
-!
           end if
 !
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cvt_vector_2_sph_smp
 !
 ! -----------------------------------------------------------------------
 !
       subroutine overwrite_vector_2_sph_smp(np_smp, numnod,             &
-     &          inod_smp_stack, vect, xx, r, s, a_r, a_s)
+     &          inod_smp_stack, vect, xx, yy, zz, r, s, a_r, a_s)
 !
        integer (kind = kint), intent(in) :: np_smp, numnod
        integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
-       real(kind=kreal), intent(in) :: xx(numnod,3)
+       real(kind=kreal), intent(in) :: xx(numnod), yy(numnod)
+       real(kind=kreal), intent(in) :: zz(numnod)
        real(kind=kreal), intent(in) :: r(numnod), s(numnod)
        real(kind=kreal), intent(in) :: a_r(numnod), a_s(numnod)
 !
@@ -144,7 +140,7 @@
        real(kind=kreal) :: vx, vy, vz
 !
 !
-!$omp parallel do private(inod,ist,ied,vx,vy,vz)
+!$omp do private(inod,ist,ied,vx,vy,vz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -159,31 +155,23 @@
              vect(inod,3) = vy
 !
            else if ( s(inod).eq.0.0d0 ) then
-             vect(inod,1) = vz*xx(inod,3) * a_r(inod)
-             vect(inod,2) = vx*xx(inod,3) * a_r(inod)
+             vect(inod,1) = vz*zz(inod) * a_r(inod)
+             vect(inod,2) = vx*zz(inod) * a_r(inod)
              vect(inod,3) = vy
-!
            else
-!
-             vect(inod,1) =  (  vx * xx(inod,1)                         &
-     &                        + vy * xx(inod,2)                         &
-     &                        + vz * xx(inod,3) )                       &
-     &                         * a_r(inod)
-!
-             vect(inod,2) =  (  vx * xx(inod,3)*xx(inod,1)              &
-     &                        + vy * xx(inod,3)*xx(inod,2)              &
+             vect(inod,1) =  (vx*xx(inod) + vy*yy(inod) + vz*zz(inod))  &
+     &                      * a_r(inod)
+             vect(inod,2) =  (  vx * zz(inod)*xx(inod)                  &
+     &                        + vy * zz(inod)*yy(inod)                  &
      &                        - vz * s(inod)  *s(inod)  )               &
      &                         * a_r(inod) * a_s(inod)
-!
-             vect(inod,3) =  ( -vx * xx(inod,2)                         &
-     &                         +vy * xx(inod,1) )                       &
-     &                        * a_s(inod)
-!
+             vect(inod,3) =  ( -vx * yy(inod) + vy * xx(inod))          &
+     &                      * a_s(inod)
           end if
 !
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine overwrite_vector_2_sph_smp
 !
@@ -191,12 +179,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_radial_comp_smp(np_smp, numnod, inod_smp_stack,    &
-     &          vect, v_r, xx, r, a_r)
+     &          vect, v_r, xx, yy, zz, r, a_r)
 !
        integer (kind = kint), intent(in) :: np_smp, numnod
        integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
        real(kind=kreal), intent(in) :: vect(numnod,3)
-       real(kind=kreal), intent(in) :: xx(numnod,3)
+       real(kind=kreal), intent(in) :: xx(numnod), yy(numnod)
+       real(kind=kreal), intent(in) :: zz(numnod)
        real(kind=kreal), intent(in) :: r(numnod)
        real(kind=kreal), intent(in) :: a_r(numnod)
 !
@@ -206,7 +195,7 @@
        real(kind=kreal) :: vx, vy, vz
 !
 !
-!$omp parallel do private(inod,ist,ied,vx,vy,vz)
+!$omp do private(inod,ist,ied,vx,vy,vz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -216,29 +205,28 @@
            vz = vect(inod,3)
 !
            if ( r(inod).eq.0.0 ) then
-             v_r(inod) =       vz
+             v_r(inod) =  vz
            else
-             v_r(inod) =     ( vx * xx(inod,1)                          &
-     &                       + vy * xx(inod,2)                          &
-     &                       + vz * xx(inod,3) )                        &
-     &                        * a_r(inod)
+             v_r(inod) = (vx*xx(inod) + vy*yy(inod) + vz*zz(inod))      &
+     &                  * a_r(inod)
            end if
 !
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cal_radial_comp_smp
 !
 ! -----------------------------------------------------------------------
 !
       subroutine cal_theta_comp_smp(np_smp, numnod, inod_smp_stack,     &
-     &          vect, v_theta, xx, r, s, a_r, a_s)
+     &          vect, v_theta, xx, yy, zz, r, s, a_r, a_s)
 !
        integer (kind = kint), intent(in) :: np_smp, numnod
        integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
        real(kind=kreal), intent(in) :: vect(numnod,3)
-       real(kind=kreal), intent(in) :: xx(numnod,3)
+       real(kind=kreal), intent(in) :: xx(numnod), yy(numnod)
+       real(kind=kreal), intent(in) :: zz(numnod)
        real(kind=kreal), intent(in) :: r(numnod), s(numnod)
        real(kind=kreal), intent(in) :: a_r(numnod), a_s(numnod)
 !
@@ -248,7 +236,7 @@
        real(kind=kreal) :: vx, vy, vz
 !
 !
-!$omp parallel do private(inod,ist,ied,vx,vy,vz)
+!$omp do private(inod,ist,ied,vx,vy,vz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -260,30 +248,30 @@
            if ( r(inod).eq.0.0 ) then
              v_theta(inod) = vx
            else if ( s(inod).eq.0.0d0 ) then
-             v_theta(inod) = vx*xx(inod,3) * a_r(inod)
+             v_theta(inod) = vx*zz(inod) * a_r(inod)
            else
-             v_theta(inod) = ( vx * xx(inod,3)*xx(inod,1)               &
-     &                       + vy * xx(inod,3)*xx(inod,2)               &
+             v_theta(inod) = ( vx * zz(inod)*xx(inod)                   &
+     &                       + vy * zz(inod)*yy(inod)                   &
      &                       - vz * s(inod)  * s(inod)  )               &
      &                        * a_r(inod) * a_s(inod)
           end if
 !
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cal_theta_comp_smp
 !
 ! -----------------------------------------------------------------------
 !
       subroutine cal_phi_comp_smp(np_smp, numnod, inod_smp_stack,       &
-     &          vect, v_phi, xx, s, a_s)
+     &          vect, v_phi, xx, yy, s, a_s)
 !
        integer (kind = kint), intent(in) :: np_smp, numnod
        integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
        real(kind=kreal), intent(in)    :: vect(numnod,3)
        real(kind=kreal), intent(inout) :: v_phi(numnod)
-       real(kind=kreal), intent(in)    :: xx(numnod,3)
+       real(kind=kreal), intent(in)    :: xx(numnod), yy(numnod)
        real(kind=kreal), intent(in) :: s(numnod)
        real(kind=kreal), intent(in) :: a_s(numnod)
 !
@@ -291,7 +279,7 @@
        real(kind=kreal) :: vx, vy, vz
 !
 !
-!$omp parallel do private(inod,ist,ied,vx,vy,vz)
+!$omp do private(inod,ist,ied,vx,vy,vz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -301,15 +289,14 @@
            vz = vect(inod,3)
 !
            if ( s(inod).eq.0.0d0 ) then
-             v_phi(inod) =   vy
+             v_phi(inod) = vy
            else
-             v_phi(inod) =   ( -vx * xx(inod,2) + vy * xx(inod,1) )     &
-     &                        * a_s(inod)
+             v_phi(inod) = (-vx*yy(inod) + vy*xx(inod)) * a_s(inod)
            end if
 !
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cal_phi_comp_smp
 !

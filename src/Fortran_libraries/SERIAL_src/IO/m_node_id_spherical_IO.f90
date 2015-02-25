@@ -3,15 +3,17 @@
 !
 !     Written by H. Matsui on July, 2007
 !
-!      subroutine allocate_nod_id_sph_IO
-!      subroutine allocate_idx_sph_1d1_IO
-!      subroutine allocate_idx_sph_1d2_IO
-!      subroutine allocate_idx_sph_1d3_IO
-!
-!      subroutine deallocate_nod_id_sph_IO
-!      subroutine deallocate_idx_sph_1d1_IO
-!      subroutine deallocate_idx_sph_1d2_IO
-!      subroutine deallocate_idx_sph_1d3_IO
+!!      subroutine allocate_nod_id_sph_IO
+!!      subroutine allocate_idx_sph_1d1_IO
+!!      subroutine allocate_idx_sph_1d2_IO
+!!      subroutine allocate_idx_sph_1d3_IO
+!!
+!!      subroutine deallocate_nod_id_sph_IO
+!!      subroutine deallocate_idx_sph_1d1_IO
+!!      subroutine deallocate_idx_sph_1d2_IO
+!!      subroutine deallocate_idx_sph_1d3_IO
+!!
+!!      subroutine set_sph_mesh_file_fmt_prefix(iflag_fmt, file_head)
 !
       module m_node_id_spherical_IO
 !
@@ -28,7 +30,7 @@
       integer(kind = kint) :: ndir_sph_IO
       integer(kind = kint) :: nnod_sph_IO
 !
-      integer(kind = kint), allocatable :: inod_gl_sph_IO(:)
+      integer(kind = kint_gl), allocatable :: inod_gl_sph_IO(:)
       integer(kind = kint), allocatable :: idx_gl_sph_IO(:,:)
 !
       integer(kind = kint) :: nidx_sph_IO(3)
@@ -43,13 +45,9 @@
 !
 !
       integer(kind = kint), parameter :: mesh_file_id = 14
-      character(len=kchara) :: sph_file_name
 !
-      character(len=kchara) :: sph_head =     "in_sph"
+      character(len=kchara) :: sph_file_head =     "in_sph"
       integer(kind = kint) :: iflag_sph_file_fmt = 0
-!
-      character(len=kchara) :: org_sph_rj_head =      "sph_org/in_rj"
-      integer(kind = kint) :: iflag_org_sph_rj_head = 0
 !
 ! -----------------------------------------------------------------------
 !
@@ -133,5 +131,18 @@
       end subroutine deallocate_idx_sph_1d3_IO
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_sph_mesh_file_fmt_prefix(iflag_fmt, file_head)
+!
+      integer(kind = kint), intent(in) :: iflag_fmt
+      character(len=kchara), intent(in) :: file_head
+!
+      iflag_sph_file_fmt = iflag_fmt
+      write(sph_file_head,'(a)') trim(file_head)
+!
+      end subroutine set_sph_mesh_file_fmt_prefix
+!
+! -------------------------------------------------------------------
 !
       end module m_node_id_spherical_IO

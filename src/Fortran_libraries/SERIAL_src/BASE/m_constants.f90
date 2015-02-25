@@ -47,6 +47,8 @@
       integer(kind = kint), parameter :: ieight =  8
       integer(kind = kint), parameter :: inine =   9
       integer(kind = kint), parameter :: iten =    10
+      integer(kind = kint), parameter :: icent =   100
+      integer(kind = kint), parameter :: ikilo =   1000
 !
       integer(kind = kint), parameter :: iminus =  -1
 !

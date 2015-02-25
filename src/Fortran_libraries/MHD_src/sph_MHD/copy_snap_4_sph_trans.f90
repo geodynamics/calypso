@@ -7,28 +7,14 @@
 !>@brief  Copy data from/to sphrical transform buffer for snapshots
 !!
 !!@verbatim
-!!  routines for backward transform
-!!      subroutine copy_snap_vec_spec_to_trans
-!!      subroutine copy_snap_scl_spec_to_trans
-!!
 !!      subroutine copy_snap_vec_fld_from_trans
-!!      subroutine copy_snap_scl_fld_from_trans
-!!
-!!  routines for forward transform
-!!      subroutine copy_snap_scl_fld_to_trans
-!!      subroutine copy_snap_scl_spec_from_trans
-!!
 !!      subroutine copy_snap_vec_fld_to_trans
-!!      subroutine copy_snap_vec_spec_from_trans
 !!@endverbatim
 !
       module copy_snap_4_sph_trans
 !
       use m_precision
       use m_machine_parameter
-!
-      use m_sph_phys_address
-      use m_addresses_trans_sph_snap
 !
       implicit  none
 !
@@ -38,253 +24,205 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_snap_vec_spec_to_trans
-!
-      use copy_spectr_4_sph_trans
-!
-!
-!$omp parallel
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_velo, bsnap_trns%i_velo)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_vort, bsnap_trns%i_vort)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_magne, bsnap_trns%i_magne)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_current, bsnap_trns%i_current)
-!
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_v_diffuse, bsnap_trns%i_v_diffuse)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_w_diffuse, bsnap_trns%i_w_diffuse)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_vp_diffuse, bsnap_trns%i_vp_diffuse)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_b_diffuse, bsnap_trns%i_b_diffuse)
-!
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_rot_inertia, bsnap_trns%i_rot_inertia)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_rot_Coriolis, bsnap_trns%i_rot_Coriolis)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_rot_Lorentz, bsnap_trns%i_rot_Lorentz)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_rot_buoyancy, bsnap_trns%i_rot_buoyancy)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_rot_comp_buo, bsnap_trns%i_rot_comp_buo)
-!
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_press_grad, bsnap_trns%i_press_grad)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_induction, bsnap_trns%i_induction)
-!
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_grad_t, bsnap_trns%i_grad_t)
-      call copy_vec_spec_to_trans(ncomp_snap_rj_2_rtp,                  &
-     &      ipol%i_grad_composit, bsnap_trns%i_grad_composit)
-!$omp end parallel
-!
-      end subroutine copy_snap_vec_spec_to_trans
-!
-!-----------------------------------------------------------------------
-!
-      subroutine copy_snap_scl_spec_to_trans
-!
-      use copy_spectr_4_sph_trans
-!
-!
-!$omp parallel
-      call copy_scalar_spec_to_trans(ncomp_snap_rj_2_rtp,               &
-     &      ipol%i_temp, bsnap_trns%i_temp)
-      call copy_scalar_spec_to_trans(ncomp_snap_rj_2_rtp,               &
-     &      ipol%i_light, bsnap_trns%i_light)
-!
-      call copy_scalar_spec_to_trans(ncomp_snap_rj_2_rtp,               &
-     &      ipol%i_press, bsnap_trns%i_press)
-      call copy_scalar_spec_to_trans(ncomp_snap_rj_2_rtp,               &
-     &      ipol%i_par_temp, bsnap_trns%i_par_temp)
-      call copy_scalar_spec_to_trans(ncomp_snap_rj_2_rtp,               &
-     &      ipol%i_t_diffuse, bsnap_trns%i_t_diffuse)
-      call copy_scalar_spec_to_trans(ncomp_snap_rj_2_rtp,               &
-     &      ipol%i_c_diffuse, bsnap_trns%i_c_diffuse)
-!
-      call copy_scalar_spec_to_trans(ncomp_snap_rj_2_rtp,               &
-     &      ipol%i_div_Coriolis, bsnap_trns%i_div_Coriolis)
-!$omp end parallel
-!
-      end subroutine copy_snap_scl_spec_to_trans
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
       subroutine copy_snap_vec_fld_from_trans
 !
-      use copy_sph_field_4_sph_trans
+      use m_node_phys_address
+      use m_addresses_trans_sph_snap
 !
 !
 !$omp parallel
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_velo, bsnap_trns%i_velo)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_vort, bsnap_trns%i_vort)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_magne, bsnap_trns%i_magne)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_current, bsnap_trns%i_current)
+!  Copy vectors
+      call copy_vector_from_snap_trans(bs_trns%i_velo, iphys%i_velo)
+      call copy_vector_from_snap_trans(bs_trns%i_vort, iphys%i_vort)
+      call copy_vector_from_snap_trans(bs_trns%i_magne, iphys%i_magne)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_current, iphys%i_current)
 !
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_v_diffuse, bsnap_trns%i_v_diffuse)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_w_diffuse, bsnap_trns%i_w_diffuse)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_vp_diffuse, bsnap_trns%i_vp_diffuse)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_b_diffuse, bsnap_trns%i_b_diffuse)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_v_diffuse, iphys%i_v_diffuse)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_w_diffuse, iphys%i_w_diffuse)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_vp_diffuse, iphys%i_vp_diffuse)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_b_diffuse, iphys%i_b_diffuse)
 !
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_rot_inertia, bsnap_trns%i_rot_inertia)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_rot_Coriolis, bsnap_trns%i_rot_Coriolis)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_rot_Lorentz, bsnap_trns%i_rot_Lorentz)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_rot_buoyancy, bsnap_trns%i_rot_buoyancy)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_rot_comp_buo, bsnap_trns%i_rot_comp_buo)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_rot_inertia, iphys%i_rot_inertia)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_rot_Coriolis, iphys%i_rot_Coriolis)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_rot_Lorentz, iphys%i_rot_Lorentz)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_rot_buoyancy, iphys%i_rot_buoyancy)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_rot_comp_buo, iphys%i_rot_comp_buo)
 !
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_press_grad, bsnap_trns%i_press_grad)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_induction, bsnap_trns%i_induction)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_press_grad, iphys%i_press_grad)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_induction, iphys%i_induction)
 !
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_grad_t, bsnap_trns%i_grad_t)
-      call copy_vec_fld_from_trans(ncomp_snap_rj_2_rtp,                 &
-     &    irtp%i_grad_composit, bsnap_trns%i_grad_composit)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_grad_t, iphys%i_grad_t)
+      call copy_vector_from_snap_trans                                  &
+     &   (bs_trns%i_grad_composit, iphys%i_grad_composit)
+!
+      call copy_vector_from_snap_trans                                  &
+     &    (bs_trns%i_grad_vx, iphys%i_grad_vx)
+      call copy_vector_from_snap_trans                                  &
+     &    (bs_trns%i_grad_vy, iphys%i_grad_vy)
+      call copy_vector_from_snap_trans                                  &
+     &    (bs_trns%i_grad_vz, iphys%i_grad_vz)
+!
+!  Copy scalars
+      call copy_scalar_from_snap_trans(bs_trns%i_temp, iphys%i_temp)
+      call copy_scalar_from_snap_trans(bs_trns%i_light, iphys%i_light)
+!
+      call copy_scalar_from_snap_trans(bs_trns%i_press, iphys%i_press)
+      call copy_scalar_from_snap_trans                                  &
+     &      (bs_trns%i_par_temp, iphys%i_par_temp)
+      call copy_scalar_from_snap_trans                                  &
+     &      (bs_trns%i_filter_temp, iphys%i_filter_temp)
+      call copy_scalar_from_snap_trans                                  &
+     &      (bs_trns%i_t_diffuse, iphys%i_t_diffuse)
+      call copy_scalar_from_snap_trans                                  &
+     &      (bs_trns%i_c_diffuse, iphys%i_c_diffuse)
+!
+      call copy_scalar_from_snap_trans                                  &
+     &      (bs_trns%i_div_Coriolis, iphys%i_div_Coriolis)
 !$omp end parallel
 !
       end subroutine copy_snap_vec_fld_from_trans
-!
-!-----------------------------------------------------------------------
-!
-      subroutine copy_snap_scl_fld_from_trans
-!
-      use copy_sph_field_4_sph_trans
-!
-!
-!$omp parallel
-        call copy_scalar_fld_from_trans(ncomp_snap_rj_2_rtp,            &
-     &      irtp%i_temp, bsnap_trns%i_temp)
-        call copy_scalar_fld_from_trans(ncomp_snap_rj_2_rtp,            &
-     &      irtp%i_light, bsnap_trns%i_light)
-!
-        call copy_scalar_fld_from_trans(ncomp_snap_rj_2_rtp,            &
-     &      irtp%i_press, bsnap_trns%i_press)
-        call copy_scalar_fld_from_trans(ncomp_snap_rj_2_rtp,            &
-     &      irtp%i_par_temp, bsnap_trns%i_par_temp)
-        call copy_scalar_fld_from_trans(ncomp_snap_rj_2_rtp,            &
-     &      irtp%i_t_diffuse, bsnap_trns%i_t_diffuse)
-        call copy_scalar_fld_from_trans(ncomp_snap_rj_2_rtp,            &
-     &      irtp%i_c_diffuse, bsnap_trns%i_c_diffuse)
-!
-        call copy_scalar_fld_from_trans(ncomp_snap_rj_2_rtp,            &
-     &      irtp%i_div_Coriolis, bsnap_trns%i_div_Coriolis)
-!$omp end parallel
-!
-      end subroutine copy_snap_scl_fld_from_trans
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine copy_snap_vec_fld_to_trans
 !
-      use copy_sph_field_4_sph_trans
+      use m_node_phys_address
+      use m_addresses_trans_sph_snap
 !
 !
 !$omp parallel
-      call copy_vec_fld_to_trans(ncomp_snap_rtp_2_rj,                   &
-     &      irtp%i_coriolis, fsnap_trns%i_coriolis)
+      call copy_vector_from_snap_force                                  &
+     &    (fs_trns%i_coriolis, iphys%i_Coriolis)
 !
-      call copy_vec_fld_to_trans(ncomp_snap_rtp_2_rj,                   &
-     &      irtp%i_electric, fsnap_trns%i_electric)
-      call copy_vec_fld_to_trans(ncomp_snap_rtp_2_rj,                   &
-     &      irtp%i_poynting, fsnap_trns%i_poynting)
+      call copy_vector_from_snap_force                                  &
+     &    (fs_trns%i_electric, iphys%i_electric)
+      call copy_vector_from_snap_force                                  &
+     &    (fs_trns%i_poynting, iphys%i_poynting)
 !
-      call copy_vec_fld_to_trans(ncomp_snap_rtp_2_rj,                   &
-     &      irtp%i_mag_stretch, fsnap_trns%i_mag_stretch)
+      call copy_vector_from_snap_force                                  &
+     &    (fs_trns%i_mag_stretch, iphys%i_mag_stretch)
+!
+!
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_me_gen, iphys%i_me_gen)
+      call copy_scalar_from_snap_force(fs_trns%i_ujb, iphys%i_ujb)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_nega_ujb, iphys%i_nega_ujb)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_buo_gen, iphys%i_buo_gen)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_c_buo_gen, iphys%i_c_buo_gen)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_f_buo_gen, iphys%i_f_buo_gen)
+!
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_velo_scale, iphys%i_velo_scale)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_magne_scale, iphys%i_magne_scale)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_temp_scale, iphys%i_temp_scale)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_comp_scale, iphys%i_comp_scale)
 !$omp end parallel
 !
       end  subroutine copy_snap_vec_fld_to_trans
 !
 !-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
-      subroutine copy_snap_scl_fld_to_trans
+      subroutine copy_scalar_from_snap_trans(i_trns, i_field)
 !
-      use copy_sph_field_4_sph_trans
+      use m_addresses_trans_sph_snap
+      use m_spheric_parameter
+      use m_spheric_param_smp
+      use m_geometry_parameter
+      use m_node_phys_data
+      use sel_fld_copy_4_sph_trans
+!
+      integer(kind = kint), intent(in) :: i_field, i_trns
 !
 !
-!$omp parallel
-      call copy_scalar_fld_to_trans(ncomp_snap_rtp_2_rj,                &
-     &      irtp%i_me_gen, fsnap_trns%i_me_gen)
-      call copy_scalar_fld_to_trans(ncomp_snap_rtp_2_rj,                &
-     &      irtp%i_ujb, fsnap_trns%i_ujb)
-      call copy_scalar_fld_to_trans(ncomp_snap_rtp_2_rj,                &
-     &      irtp%i_nega_ujb, fsnap_trns%i_nega_ujb)
-      call copy_scalar_fld_to_trans(ncomp_snap_rtp_2_rj,                &
-     &      irtp%i_buo_gen, fsnap_trns%i_buo_gen)
-      call copy_scalar_fld_to_trans(ncomp_snap_rtp_2_rj,                &
-     &      irtp%i_c_buo_gen, fsnap_trns%i_c_buo_gen)
-      call copy_scalar_fld_to_trans(ncomp_snap_rtp_2_rj,                &
-     &      irtp%i_f_buo_gen, fsnap_trns%i_f_buo_gen)
-!$omp end parallel
+      if( (i_field*i_trns) .le. 0) return
+      call copy_scalar_from_trans(nnod_rtp, inod_rtp_smp_stack,         &
+     &    numnod, fls_rtp(1,i_trns), d_nod(1,i_field) )
 !
-      end  subroutine copy_snap_scl_fld_to_trans
+      end subroutine copy_scalar_from_snap_trans
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_snap_vec_spec_from_trans
+      subroutine copy_vector_from_snap_trans(i_trns, i_field)
 !
-      use copy_spectr_4_sph_trans
+      use m_addresses_trans_sph_snap
+      use m_spheric_parameter
+      use m_spheric_param_smp
+      use m_geometry_parameter
+      use m_node_phys_data
+      use sel_fld_copy_4_sph_trans
+!
+      integer(kind = kint), intent(in) :: i_field, i_trns
 !
 !
-!$omp parallel
-      call copy_vec_spec_from_trans(ncomp_snap_rtp_2_rj,                &
-     &    ipol%i_coriolis, fsnap_trns%i_coriolis)
+      if( (i_field*i_trns) .le. 0) return
+      call copy_vector_from_trans(nnod_rtp, inod_rtp_smp_stack,         &
+     &    numnod, fls_rtp(1,i_trns), d_nod(1,i_field) )
 !
-      call copy_vec_spec_from_trans(ncomp_snap_rtp_2_rj,                &
-     &    ipol%i_electric, fsnap_trns%i_electric)
-      call copy_vec_spec_from_trans(ncomp_snap_rtp_2_rj,                &
-     &    ipol%i_poynting, fsnap_trns%i_poynting)
+      end subroutine copy_vector_from_snap_trans
 !
-      call copy_vec_spec_from_trans(ncomp_snap_rtp_2_rj,                &
-     &    ipol%i_mag_stretch, fsnap_trns%i_mag_stretch)
-!$omp end parallel
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
-      end  subroutine copy_snap_vec_spec_from_trans
+      subroutine copy_scalar_from_snap_force(i_trns, i_field)
+!
+      use m_addresses_trans_sph_snap
+      use m_spheric_parameter
+      use m_spheric_param_smp
+      use m_geometry_parameter
+      use m_geometry_data
+      use m_node_phys_data
+      use sel_fld_copy_4_sph_trans
+!
+      integer(kind = kint), intent(in) :: i_field, i_trns
+!
+!
+      if( (i_field*i_trns) .le. 0) return
+      call copy_scalar_from_trans(nnod_rtp, inod_rtp_smp_stack,         &
+     &    numnod, frs_rtp(1,i_trns), d_nod(1,i_field) )
+!
+      end subroutine copy_scalar_from_snap_force
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_snap_scl_spec_from_trans
+      subroutine copy_vector_from_snap_force(i_trns, i_field)
 !
-      use copy_spectr_4_sph_trans
+      use m_addresses_trans_sph_snap
+      use m_spheric_parameter
+      use m_spheric_param_smp
+      use m_geometry_parameter
+      use m_node_phys_data
+      use sel_fld_copy_4_sph_trans
+!
+      integer(kind = kint), intent(in) :: i_field, i_trns
 !
 !
-!$omp parallel
-      call copy_scalar_spec_from_trans(ncomp_snap_rtp_2_rj,             &
-     &      ipol%i_me_gen, fsnap_trns%i_me_gen)
-      call copy_scalar_spec_from_trans(ncomp_snap_rtp_2_rj,             &
-     &      ipol%i_ujb, fsnap_trns%i_ujb)
-      call copy_scalar_spec_from_trans(ncomp_snap_rtp_2_rj,             &
-     &      ipol%i_nega_ujb, fsnap_trns%i_nega_ujb)
-      call copy_scalar_spec_from_trans(ncomp_snap_rtp_2_rj,             &
-     &      ipol%i_buo_gen, fsnap_trns%i_buo_gen)
-      call copy_scalar_spec_from_trans(ncomp_snap_rtp_2_rj,             &
-     &      ipol%i_c_buo_gen, fsnap_trns%i_c_buo_gen)
-      call copy_scalar_spec_from_trans(ncomp_snap_rtp_2_rj,             &
-     &      ipol%i_f_buo_gen, fsnap_trns%i_f_buo_gen)
-!$omp end parallel
+      if( (i_field*i_trns) .le. 0) return
+      call copy_vector_from_trans(nnod_rtp, inod_rtp_smp_stack,         &
+     &    numnod, frs_rtp(1,i_trns), d_nod(1,i_field) )
 !
-      end  subroutine copy_snap_scl_spec_from_trans
+      end subroutine copy_vector_from_snap_force
 !
 !-----------------------------------------------------------------------
 !

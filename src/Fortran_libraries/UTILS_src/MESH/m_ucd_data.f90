@@ -88,9 +88,9 @@
       use set_and_cal_udt_data
 !
 !
-      call link_node_data_2_output(numnod, globalnodid, xx, fem_ucd)
+      call link_node_data_2_output(numnod, inod_global, xx, fem_ucd)
       call const_udt_global_connect(internal_node, numele, nnod_4_ele,  &
-     &    globalelmid, ie, fem_ucd)
+     &    iele_global, ie, fem_ucd)
 !
       end subroutine link_global_mesh_4_ucd_out
 !
@@ -117,7 +117,7 @@
       use set_ucd_data
 !
 !
-      call link_node_data_2_output(numnod, globalnodid, xx, fem_ucd)
+      call link_node_data_2_output(numnod, inod_global, xx, fem_ucd)
 !
       end subroutine link_fem_node_data_2_ucd_out
 !

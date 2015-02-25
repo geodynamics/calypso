@@ -81,18 +81,12 @@
       use m_sph_global_parameter
 !
       integer(kind = kint) :: n1, n2, n3
-      integer(kind = kint) :: ist_2, ist_3
-      integer(kind = kint) :: ied_2, ied_3
       integer(kind = kint) :: icou, i, ip
 !
 !
       n1 = ndomain_rtm(1)
       n2 = ndomain_rtm(2)
       n3 = ndomain_rtm(3)
-      ist_2 = istack_idx_local_rtm_t(0) + 1
-      ied_2 = istack_idx_local_rtm_t(n2)
-      ist_3 = istack_idx_local_rtm_m(0) + 1
-      ied_3 = istack_idx_local_rtm_m(n3)
 !
       do ip  = 1, n1
         icou = istack_idx_local_rtm_r(ip-1)
@@ -115,17 +109,17 @@
       end do
 !
 !
-      do i = ist_2, ied_2
+      do i = 1, istack_idx_local_rtm_t(n2)
         idx_global_rtm_t(i) = i
       end do
 !
-      do i = ist_3, ied_3
+      do i = 0, istack_idx_local_rtm_m(n3)
         idx_global_rtm_m(i,1) = mtbl_fft_2_lgd(i)
         idx_global_rtm_m(i,2) = mdx_4_lgd(i)
       end do
 !
 !      write(8,*) 'i,j, idx_global_rtm_m(j,1:2)'
-!      do i = ist_3, ied_3
+!      do i = 0, istack_idx_local_rtm_m(n3)
 !        write(8,*) i, idx_global_rtm_m(i,1:2)
 !      end do
 !
@@ -136,29 +130,23 @@
       subroutine set_sph_1d_global_idx_rlm
 !
       integer(kind = kint) :: n1, n2, i
-      integer(kind = kint) :: ist_1, ist_2
-      integer(kind = kint) :: ied_1, ied_2
 !
 !
       n1 = ndomain_rlm(1)
       n2 = ndomain_rlm(2)
-      ist_1 = istack_idx_local_rlm_r(0) + 1
-      ied_1 = istack_idx_local_rlm_r(n1)
-      ist_2 = istack_idx_local_rlm_j(0) + 1
-      ied_2 = istack_idx_local_rlm_j(n2)
 !
-      do i = ist_1, ied_1
+      do i = 1, istack_idx_local_rlm_r(n1)
         idx_global_rlm_r(i) = idx_global_rtm_r(i)
       end do
 !
-      do i = ist_2, ied_2
+      do i = 0, istack_idx_local_rlm_j(n2)
         idx_global_rlm_j(i,1) = jtbl_fsph(i,1)
         idx_global_rlm_j(i,2) = jtbl_fsph(i,2)
         idx_global_rlm_j(i,3) = jtbl_fsph(i,3)
       end do
 !
 !      write(8,*) 'i, jtbl_fsph(i,1:3)'
-!      do i = ist_2, ied_2
+!      do i = 0, istack_idx_local_rlm_j(n2)
 !        write(8,*) i, jtbl_fsph(i,1:3)
 !      end do
 !
@@ -169,29 +157,23 @@
       subroutine set_sph_1d_global_idx_rj
 !
       integer(kind = kint) :: n1, n2, j
-      integer(kind = kint) :: ist_1, ist_2
-      integer(kind = kint) :: ied_1, ied_2
 !
 !
       n1 = ndomain_rj(1)
       n2 = ndomain_rj(2)
-      ist_1 = istack_idx_local_rj_r(0) + 1
-      ied_1 = istack_idx_local_rj_r(n1)
-      ist_2 = istack_idx_local_rj_j(0) + 1
-      ied_2 = istack_idx_local_rj_j(n2)
 !
-      do j = ist_1, ied_1
+      do j = 1, istack_idx_local_rj_r(n1)
         idx_global_rj_r(j) = j
       end do
 !
-      do j = ist_2, ied_2
+      do j = 0, istack_idx_local_rj_j(n2)
         idx_global_rj_j(j,1) = jtbl_rj(j,1)
         idx_global_rj_j(j,2) = jtbl_rj(j,2)
         idx_global_rj_j(j,3) = jtbl_rj(j,3)
       end do
 !
 !      write(8,*) 'j, idx_global_rj_j(j,1:3)'
-!      do j = ist_2, ied_2
+!      do j = 0, istack_idx_local_rj_j(n2)
 !        write(8,*) j, idx_global_rj_j(j,1:3)
 !      end do
 !

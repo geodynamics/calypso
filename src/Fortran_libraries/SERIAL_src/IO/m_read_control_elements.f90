@@ -138,7 +138,7 @@
 !
 !
       right_begin_flag = 0
-      if (cmp_no_case(header_chara, hd_begin) .gt. 0) then
+      if (cmp_no_case(header_chara, hd_begin)) then
         read(character_4_read,*) tmpchara, item_name
         if(item_name .eq. ctl_name) right_begin_flag = 1
       end if
@@ -159,7 +159,7 @@
 !
 !
       right_file_flag = 0
-      if (cmp_no_case(header_chara, hd_file) .gt. 0) then
+      if (cmp_no_case(header_chara, hd_file)) then
         read(character_4_read,*) tmpchara, item_name
         if(item_name .eq. ctl_name) right_file_flag = 1
       end if
@@ -178,7 +178,7 @@
       character(len=kchara)  :: tmpchara, item_name
 !
 !
-      if (cmp_no_case(header_chara, hd_end) .gt. 0) then
+      if (cmp_no_case(header_chara, hd_end)) then
         read(character_4_read,*) tmpchara, item_name
         if(item_name .eq. ctl_name) iflag_end = 1
       end if 
@@ -200,7 +200,7 @@
 !      write(*,*) 'header_chara: ', num_array, trim(header_chara)
       if(num_array .gt. 0) return
 !
-      if (cmp_no_case(header_chara, hd_array) .gt. 0) then
+      if (cmp_no_case(header_chara, hd_array)) then
         read(character_4_read,*) tmpchara, item_name
 !        write(*,*) trim(item_name),': ', trim(ctl_name)
         if(item_name .ne. ctl_name) return
@@ -226,9 +226,9 @@
 !
 !
       iflag = 0
-      if (cmp_no_case(header_chara, hd_end) .gt. 0) then
+      if (cmp_no_case(header_chara, hd_end)) then
         read(character_4_read,*) tmpchara, array_name
-        if (cmp_no_case(array_name, hd_array) .gt. 0) then
+        if (cmp_no_case(array_name, hd_array)) then
           read(character_4_read,*) tmpchara, array_name, item_name
           if(item_name .eq. ctl_name) iflag = 1
         end if
