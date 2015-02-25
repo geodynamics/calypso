@@ -1,24 +1,22 @@
-!>@file   analyzer_noviz_sph_snap.f90
-!!@brief  module analyzer_noviz_sph_snap
+!>@file   analyzer_sph_snap_w_psf.f90
+!!@brief  module analyzer_sph_snap_w_psf
 !!
 !!@author H. Matsui
 !!@date   Programmed  H. Matsui in Apr., 2010
 !
 !>@brief  Main loop to evaluate snapshots from spectr data
-!!        without visualization routines
 !!
 !!@verbatim
-!!      subroutine initialize_noviz_sph_snap
-!!      subroutine evolution_noviz_sph_snap
+!!      subroutine initialize_sph_snap_w_psf
+!!      subroutine evolution_sph_snap_w_psf
 !!@endverbatim
 !
-      module analyzer_noviz_sph_snap
+      module analyzer_sph_snap_w_psf
 !
       use m_precision
       use calypso_mpi
 !
       use m_machine_parameter
-      use calypso_mpi
       use m_work_time
       use m_control_parameter
       use m_t_int_parameter
@@ -26,6 +24,7 @@
 !
       use FEM_analyzer_sph_MHD
       use SPH_analyzer_snap
+      use sections_for_1st
 !
       implicit none
 !
@@ -35,11 +34,11 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine initialize_noviz_sph_snap
+      subroutine initialize_sph_snap_w_psf
 !
       use set_control_sph_mhd
       use set_control_SPH_to_FEM
-      use m_ctl_data_sph_MHD_noviz
+      use m_ctl_data_sph_MHD_psf
       use init_sph_MHD_elapsed_label
 !
 !
@@ -51,8 +50,8 @@
 !
       call start_eleps_time(1)
       call start_eleps_time(4)
-      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_snap_noviz'
-      call read_control_4_sph_snap_noviz
+      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_snap_w_psf'
+      call read_control_4_sph_snap_w_psf
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
       call set_control_4_sph_mhd
       call set_control_4_SPH_to_FEM
@@ -72,15 +71,20 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'SPH_init_sph_snap'
       call SPH_init_sph_snap
-      call calypso_MPI_barrier
 !
+!        Initialize visualization
+!
+      if(iflag_debug .gt. 0) write(*,*) 'init_visualize_surface'
+      call init_visualize_surface
+!
+      call calypso_MPI_barrier
       call end_eleps_time(2)
 !
-      end subroutine initialize_noviz_sph_snap
+      end subroutine initialize_sph_snap_w_psf
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine evolution_noviz_sph_snap
+      subroutine evolution_sph_snap_w_psf
 !
       integer(kind = kint) :: visval
       integer(kind = kint) :: istep_psf, istep_iso
@@ -119,6 +123,15 @@
      &      istep_pvr, istep_fline, visval)
 !
         call end_eleps_time(4)
+!
+!*  ----------- Visualization --------------
+!*
+        if(visval .eq. 0) then
+          if (iflag_debug.eq.1) write(*,*) 'visualize_surface'
+          call start_eleps_time(12)
+          call visualize_surface(istep_psf, istep_iso)
+          call end_eleps_time(12)
+        end if
         call end_eleps_time(1)
 !
 !*  -----------  exit loop --------------
@@ -144,8 +157,8 @@
       call calypso_MPI_barrier
       if (iflag_debug.eq.1) write(*,*) 'exit evolution'
 !
-      end subroutine evolution_noviz_sph_snap
+      end subroutine evolution_sph_snap_w_psf
 !
 ! ----------------------------------------------------------------------
 !
-      end module analyzer_noviz_sph_snap
+      end module analyzer_sph_snap_w_psf

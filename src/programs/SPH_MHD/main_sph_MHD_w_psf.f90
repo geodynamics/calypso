@@ -1,5 +1,5 @@
-!>@file   main_sph_MHD_noviz.f90
-!!@brief  program sph_MHD_noviz
+!>@file   main_sph_MHD_w_psf.f90
+!!@brief  program kemorin_sph_MHD
 !!
 !!@author H. Matsui
 !!@date Programmed by H. Okuda in 2000
@@ -7,25 +7,24 @@
 !!@n    Connect to vizs  by H. Matsui in July 2006 (ver 2.0)
 !
 !>@brief  Main program for MHD dynamo simulation
-!!        without cross sectioning routines
 !
-     program sph_MHD_noviz
+      program kemorin_sph_MHD
 !
       use m_precision
 !
       use calypso_mpi
-      use analyzer_sph_MHD_noviz
+      use analyzer_sph_MHD_w_psf
 !
       implicit none
 !
 !
       call calypso_MPI_init
 !
-      call initialize_sph_MHD_noviz
+      call initialize_sph_mhd_w_psf
 !
-      call evolution_sph_MHD_noviz
+      call evolution_sph_mhd_w_psf
 !
       call calypso_MPI_finalize
 !
       stop
-      end program sph_MHD_noviz
+      end program kemorin_sph_MHD

@@ -13,7 +13,8 @@ SERIAL_src     \
 SOLVER_src   \
 PARALLEL_src \
 MHD_src      \
-UTILS_src
+UTILS_src    \
+VIZ_src
 
 #
 #  -------------------------------------------------------------------------

@@ -1,18 +1,17 @@
-!>@file   analyzer_sph_MHD_noviz.f90
-!!@brief  module analyzer_sph_MHD_noviz
+!>@file   analyzer_sph_MHD_w_psf.f90
+!!@brief  module analyzer_sph_MHD_w_psf
 !!
 !!@author H. Matsui
 !!@date   Programmed  H. Matsui in Apr., 2010
 !
 !>@brief  Main loop for MHD dynamo simulation
-!!        without cross sectioning routines
 !!
 !!@verbatim
-!!      subroutine initialize_sph_MHD_noviz
-!!      subroutine evolution_sph_MHD_noviz
+!!      subroutine initialize_sph_mhd_w_psf
+!!      subroutine evolution_sph_mhd_w_psf
 !!@endverbatim
 !
-      module analyzer_sph_MHD_noviz
+      module analyzer_sph_MHD_w_psf
 !
       use m_precision
       use calypso_mpi
@@ -25,6 +24,8 @@
 !
       use FEM_analyzer_sph_MHD
       use SPH_analyzer_MHD
+      use sections_for_1st
+      use init_sph_MHD_elapsed_label
 !
       implicit none
 !
@@ -34,12 +35,11 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine initialize_sph_MHD_noviz
+      subroutine initialize_sph_mhd_w_psf
 !
       use set_control_sph_mhd
       use set_control_SPH_to_FEM
-      use m_ctl_data_sph_MHD_noviz
-      use init_sph_MHD_elapsed_label
+      use m_ctl_data_sph_MHD_psf
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
@@ -50,8 +50,9 @@
 !
       call start_eleps_time(1)
       call start_eleps_time(4)
-      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_noviz'
-      call read_control_4_sph_MHD_noviz
+      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_w_psf'
+      call read_control_4_sph_MHD_w_psf
+!
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
       call set_control_4_sph_mhd
       call set_control_4_SPH_to_FEM
@@ -71,15 +72,20 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'SPH_initialize_MHD'
       call SPH_initialize_MHD
-      call calypso_MPI_barrier
 !
+!        Initialize visualization
+!
+      if(iflag_debug .gt. 0) write(*,*) 'init_visualize_surface'
+      call init_visualize_surface
+!
+      call calypso_MPI_barrier
       call end_eleps_time(2)
 !
-      end subroutine initialize_sph_MHD_noviz
+      end subroutine initialize_sph_mhd_w_psf
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine evolution_sph_MHD_noviz
+      subroutine evolution_sph_mhd_w_psf
 !
       integer(kind = kint) :: visval, iflag_finish
       integer(kind = kint) :: istep_psf, istep_iso
@@ -119,6 +125,15 @@
 !
         call end_eleps_time(4)
 !
+!*  ----------- Visualization --------------
+!*
+        if(visval .eq. 0) then
+          if (iflag_debug.eq.1) write(*,*) 'visualize_surface', my_rank
+          call start_eleps_time(12)
+          call visualize_surface(istep_psf, istep_iso)
+          call end_eleps_time(12)
+        end if
+!
 !*  -----------  exit loop --------------
 !*
         if(iflag_finish .gt. 0) exit
@@ -137,13 +152,16 @@
       call copy_COMM_TIME_to_eleps(num_elapsed)
       call end_eleps_time(1)
 !
+      if (iflag_debug.eq.1) write(*,*) 'write_resolution_data'
+      call write_resolution_data
+      if (iflag_debug.eq.1) write(*,*) 'output_elapsed_times '
       call output_elapsed_times
 !
       call calypso_MPI_barrier
       if (iflag_debug.eq.1) write(*,*) 'exit evolution'
 !
-      end subroutine evolution_sph_MHD_noviz
+      end subroutine evolution_sph_mhd_w_psf
 !
 ! ----------------------------------------------------------------------
 !
-      end module analyzer_sph_MHD_noviz
+      end module analyzer_sph_MHD_w_psf

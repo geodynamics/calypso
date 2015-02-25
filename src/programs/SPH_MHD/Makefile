@@ -9,8 +9,8 @@ TARGET_SPH_MHD =   sph_mhd
 SOURCES = $(shell ls *.f90)
 
 MOD_SPH_MHD_MAIN =  \
-main_sph_MHD_noviz.o \
-analyzer_sph_MHD_noviz.o \
+main_sph_MHD_w_psf.o \
+analyzer_sph_MHD_w_psf.o \
 SPH_analyzer_MHD.o
 
 #
