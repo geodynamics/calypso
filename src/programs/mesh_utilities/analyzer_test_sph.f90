@@ -4,8 +4,8 @@
 !
 !      modified by H. Matsui on Aug., 2007
 !
-!      subroutine init_analyzer
-!      subroutine analyze
+!      subroutine init_test_sph
+!      subroutine analyze_test_sph
 !
       module analyzer_test_sph
 !
@@ -26,7 +26,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine init_analyzer
+      subroutine init_test_sph
 !
       use m_read_ctl_gen_sph_shell
       use set_control_platform_data
@@ -47,11 +47,11 @@
       if (iflag_debug.gt.0) write(*,*) 'load_para_sph_mesh'
       call load_para_sph_mesh
 !
-       end subroutine init_analyzer
+       end subroutine init_test_sph
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine analyze
+      subroutine analyze_test_sph
 !
       use m_solver_SR
       use cmp_trans_sph_indices
@@ -102,9 +102,9 @@
       call deallocate_real_sph_test
       call deallocate_idx_sph_recieve
 !
-      if (iflag_debug.eq.1) write(*,*) 'exit analyze'
+      if (iflag_debug.eq.1) write(*,*) 'exit analyze_test_sph'
 !
-      end subroutine analyze
+      end subroutine analyze_test_sph
 !
 ! ----------------------------------------------------------------------
 !
