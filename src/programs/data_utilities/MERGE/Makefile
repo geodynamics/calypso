@@ -9,7 +9,8 @@ TARGET_NEWSPH = assemble_sph
 SOURCES = $(shell ls *.f90)
 
 MOD_NEWSPH = \
-assemble_newsph.o
+main_assemble_sph.o \
+analyzer_assemble_sph.o
 
 #
 #  -------------------------------------------------------------------------
