@@ -100,6 +100,7 @@
       use t_mesh_data
       use t_comm_table
       use t_geometry_data
+      use m_spheric_parameter
       use m_gauss_points
       use m_group_data_sph_specr
       use set_local_index_table_sph
@@ -122,6 +123,8 @@
 !
 !
       call copy_gl_2_local_rtp_param(ip_rank)
+      nidx_local_fem(1:3) = nidx_rtp(1:3)
+      nidx_local_fem(3) =   m_folding * nidx_local_fem(3)
 !
       call s_const_FEM_mesh_for_sph(ip_rank, mesh, group)
 !

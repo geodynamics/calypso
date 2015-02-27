@@ -130,6 +130,7 @@
       use m_gauss_points
       use m_group_data_sph_specr
       use m_sph_mesh_1d_connect
+      use const_1d_ele_connect_4_sph
       use gen_sph_grids_modes
       use set_local_index_table_sph
       use set_sph_groups
@@ -145,6 +146,7 @@
       call construct_gauss_coefs
       call set_gauss_colatitude
 !
+      call s_const_1d_ele_connect_4_sph
       call set_rj_radial_grp
 !
       do ip_rank = 0, ndomain_sph-1

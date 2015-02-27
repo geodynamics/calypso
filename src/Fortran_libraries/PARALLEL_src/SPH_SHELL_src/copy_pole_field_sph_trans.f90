@@ -54,8 +54,8 @@
 !
       if(i_fld .le. 0) return
       call copy_pole_vector_from_trans(numnod, internal_node, xx,       &
-     &    ntot_phys, nnod_rtp, nidx_rtp(1), nidx_global_rtp(1),         &
-     &    idx_gl_1d_rtp_r, v_pole, i_fld, d_nod)
+     &    ntot_phys, nnod_rtp, m_folding, nidx_rtp(1),                  &
+     &    nidx_global_rtp(1), idx_gl_1d_rtp_r, v_pole, i_fld, d_nod)
 !
       end subroutine copy_pole_vec_fld_from_trans
 !
@@ -77,8 +77,8 @@
 !
       if(i_fld .le. 0) return
       call copy_pole_scalar_from_trans(numnod, internal_node, xx,       &
-     &    ntot_phys, nnod_rtp, nidx_rtp(1),  nidx_global_rtp(1),        &
-     &    idx_gl_1d_rtp_r, v_pole, i_fld, d_nod)
+     &    ntot_phys, nnod_rtp, m_folding, nidx_rtp(1),                  &
+     &    nidx_global_rtp(1), idx_gl_1d_rtp_r, v_pole, i_fld, d_nod)
 !
       end subroutine copy_pole_scl_fld_from_trans
 !
@@ -100,8 +100,8 @@
 !
       if(i_fld .le. 0) return
       call copy_pole_tensor_from_trans(numnod, internal_node, xx,       &
-     &    ntot_phys, nnod_rtp, nidx_rtp(1), nidx_global_rtp(1),         &
-     &    idx_gl_1d_rtp_r, v_pole, i_fld, d_nod)
+     &    ntot_phys, nnod_rtp, m_folding, nidx_rtp(1),                  &
+     &     nidx_global_rtp(1), idx_gl_1d_rtp_r, v_pole, i_fld, d_nod)
 !
       end subroutine copy_pole_tsr_fld_from_trans
 !
@@ -109,15 +109,15 @@
 ! -----------------------------------------------------------------------
 !
       subroutine copy_pole_vector_from_trans(numnod, internal_node, xx, &
-     &         ntot_phys, nnod_rtp, nidx_rtp_r, nidx_rtp_gl_r,          &
-     &         idx_gl_rtp_r, v_pole, i_fld, d_nod)
+     &         ntot_phys, nnod_rtp, m_folding, nidx_rtp_r,              &
+     &         nidx_rtp_gl_r, idx_gl_rtp_r, v_pole, i_fld, d_nod)
 !
       integer(kind = kint), intent(in) :: numnod, internal_node
       integer(kind = kint), intent(in) :: ntot_phys
       real(kind = kreal), intent(in) :: xx(numnod,3)
 !
       integer(kind = kint), intent(in) :: nidx_rtp_r, nidx_rtp_gl_r
-      integer(kind = kint), intent(in) :: nnod_rtp
+      integer(kind = kint), intent(in) :: nnod_rtp, m_folding
       integer(kind = kint), intent(in) :: idx_gl_rtp_r(nidx_rtp_gl_r)
 !
       integer(kind = kint), intent(in) :: i_fld
@@ -128,7 +128,7 @@
       integer(kind = kint) :: inod, jnod, kr
 !
 !
-      inod = nnod_rtp
+      inod = nnod_rtp * m_folding
       if(inod .ge. internal_node) return
 !
 !  copy field for north pole
@@ -167,15 +167,15 @@
 ! -----------------------------------------------------------------------
 !
       subroutine copy_pole_scalar_from_trans(numnod, internal_node, xx, &
-     &         ntot_phys, nnod_rtp, nidx_rtp_r, nidx_rtp_gl_r,          &
-     &         idx_gl_rtp_r, v_pole, i_fld, d_nod)
+     &         ntot_phys, nnod_rtp, m_folding, nidx_rtp_r,              &
+     &         nidx_rtp_gl_r, idx_gl_rtp_r, v_pole, i_fld, d_nod)
 !
       integer(kind = kint), intent(in) :: numnod, internal_node
       integer(kind = kint), intent(in) :: ntot_phys
       real(kind = kreal), intent(in) :: xx(numnod,3)
 !
       integer(kind = kint), intent(in) :: nidx_rtp_r, nidx_rtp_gl_r
-      integer(kind = kint), intent(in) :: nnod_rtp
+      integer(kind = kint), intent(in) :: nnod_rtp, m_folding
       integer(kind = kint), intent(in) :: idx_gl_rtp_r(nidx_rtp_gl_r)
 !
       integer(kind = kint), intent(in) :: i_fld
@@ -186,7 +186,7 @@
       integer(kind = kint) :: inod, jnod, kr
 !
 !
-      inod = nnod_rtp
+      inod = nnod_rtp * m_folding
       if(inod .ge. internal_node) return
 !
 !  copy field for north pole
@@ -221,15 +221,15 @@
 ! -----------------------------------------------------------------------
 !
       subroutine copy_pole_tensor_from_trans(numnod, internal_node, xx, &
-     &         ntot_phys, nnod_rtp, nidx_rtp_r, nidx_rtp_gl_r,          &
-     &         idx_gl_rtp_r, v_pole, i_fld, d_nod)
+     &         ntot_phys, nnod_rtp, m_folding, nidx_rtp_r,              &
+     &         nidx_rtp_gl_r, idx_gl_rtp_r, v_pole, i_fld, d_nod)
 !
       integer(kind = kint), intent(in) :: numnod, internal_node
       integer(kind = kint), intent(in) :: ntot_phys
       real(kind = kreal), intent(in) :: xx(numnod,3)
 !
       integer(kind = kint), intent(in) :: nidx_rtp_r, nidx_rtp_gl_r
-      integer(kind = kint), intent(in) :: nnod_rtp
+      integer(kind = kint), intent(in) :: nnod_rtp, m_folding
       integer(kind = kint), intent(in) :: idx_gl_rtp_r(nidx_rtp_gl_r)
 !
       integer(kind = kint), intent(in) :: i_fld
@@ -240,7 +240,7 @@
       integer(kind = kint) :: inod, jnod, kr
 !
 !
-      inod = nnod_rtp
+      inod = nnod_rtp * m_folding
       if(inod .ge. internal_node) return
 !
 !  copy field for north pole

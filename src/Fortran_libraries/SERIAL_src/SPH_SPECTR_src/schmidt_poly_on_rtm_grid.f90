@@ -36,14 +36,9 @@
       use m_spheric_parameter
       use m_schmidt_poly_on_rtm
       use m_gauss_points
-      use m_schmidt_polynomial
-      use m_spherical_harmonics
-!
-      use spherical_harmonics
 !
 !
       n_point = nidx_rtm(2)
-      nth = l_truncation
 !
       call allocate_gauss_colat_rtm
       call allocate_gauss_points
@@ -56,10 +51,6 @@
 !
 !     set Legendre polynomials
 !
-      call allocate_index_4_sph(nth)
-      call allocate_schmidt_polynomial
-      call idx28
-!
       call allocate_schmidt_poly_rtm
 !
       call copy_sph_normalization_2_rlm
@@ -69,9 +60,6 @@
 !
       call allocate_schmidt_p_rtm_pole
       call set_lagender_pole_rlm
-!
-      call deallocate_index_4_sph
-      call deallocate_schmidt_polynomial
 !
       end subroutine s_cal_schmidt_poly_rtm
 !
@@ -108,32 +96,23 @@
       use m_constants
       use m_spheric_parameter
       use m_schmidt_poly_on_rtm
-      use m_spherical_harmonics
+      use spherical_harmonics
 !
-      integer(kind = kint) :: j, jj
+      integer(kind = kint) :: j, ll, mm
+      integer(kind = kint) :: idx_lm(2)
+      real(kind = kreal) :: g_lm(17)
 !
+!$omp parallel do private(j,ll,mm,idx_lm,g_lm)
       do j = 1, nidx_rlm(2)
-        jj = idx_gl_1d_rlm_j(j,1)
-        g_sph_rlm(j,1) =  g(jj,1)
-        g_sph_rlm(j,2) =  g(jj,2)
-        g_sph_rlm(j,3) =  g(jj,3)
-        g_sph_rlm(j,4) =  g(jj,4)
-        g_sph_rlm(j,5) =  g(jj,5)
-        g_sph_rlm(j,6) =  g(jj,6)
-        g_sph_rlm(j,7) =  g(jj,7)
-        g_sph_rlm(j,8) =  g(jj,8)
-        g_sph_rlm(j,9) =  g(jj,9)
-        g_sph_rlm(j,10) = g(jj,10)
-        g_sph_rlm(j,11) = g(jj,11)
-        g_sph_rlm(j,12) = g(jj,12)
-        g_sph_rlm(j,13) = g(jj,13)
-        g_sph_rlm(j,14) = g(jj,14)
-        g_sph_rlm(j,15) = g(jj,15)
-        g_sph_rlm(j,16) = g(jj,16)
-        g_sph_rlm(j,17) = g(jj,17)
+        ll = idx_gl_1d_rlm_j(j,2)
+        mm = idx_gl_1d_rlm_j(j,3)
 !
-        if(jj .eq. 0) g_sph_rlm(j,3) = half
+        call sph_normalizations(ll, mm, idx_lm, g_lm)
+        g_sph_rlm(j,1:17) =  g_lm(1:17)
+!
+        if(ll.eq.0 .and. mm.eq.0) g_sph_rlm(j,3) = half
       end do
+!$omp end parallel do 
 !
       end subroutine copy_sph_normalization_2_rlm
 !
@@ -143,26 +122,22 @@
 !
       use m_spheric_parameter
       use m_schmidt_poly_on_rtm
-      use m_spherical_harmonics
+      use spherical_harmonics
 !
-      integer(kind = kint) :: j, jj
+      integer(kind = kint) :: j, ll, mm
+      integer(kind = kint) :: idx_lm(2)
+      real(kind = kreal) :: g_lm(17)
 !
+!
+!$omp parallel do private(j,ll,mm,idx_lm,g_lm)
       do j = 1, nidx_rj(2)
-        jj = idx_gl_1d_rj_j(j,1)
-        g_sph_rj(j,1) =  g(jj,1)
-        g_sph_rj(j,2) =  g(jj,2)
-        g_sph_rj(j,3) =  g(jj,3)
-        g_sph_rj(j,4) =  g(jj,4)
-        g_sph_rj(j,5) =  g(jj,5)
-        g_sph_rj(j,6) =  g(jj,6)
-        g_sph_rj(j,7) =  g(jj,7)
-        g_sph_rj(j,8) =  g(jj,8)
-        g_sph_rj(j,9) =  g(jj,9)
-        g_sph_rj(j,10) = g(jj,10)
-        g_sph_rj(j,11) = g(jj,11)
-        g_sph_rj(j,12) = g(jj,12)
-        g_sph_rj(j,13) = g(jj,13)
+        ll = idx_gl_1d_rj_j(j,2)
+        mm = idx_gl_1d_rj_j(j,3)
+!
+        call sph_normalizations(ll, mm, idx_lm, g_lm)
+        g_sph_rj(j,1:13) =  g_lm(1:13)
       end do
+!$omp end parallel do 
 !
       end subroutine copy_sph_normalization_2_rj
 !

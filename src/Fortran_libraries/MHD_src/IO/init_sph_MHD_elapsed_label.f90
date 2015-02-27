@@ -8,6 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine set_sph_MHD_elapsed_label
+!!      subroutine reset_elapse_4_init_sph_mhd
 !!      subroutine write_resolution_data
 !!@endverbatim
 !
@@ -99,6 +100,20 @@
 !
 ! ----------------------------------------------------------------------
 !
+      subroutine reset_elapse_4_init_sph_mhd
+!
+      use m_work_time
+!
+      integer(kind = kint) :: i
+!
+      do i = 3, 54
+        call reset_eleps_time(i)
+      end do
+!
+      end subroutine reset_elapse_4_init_sph_mhd
+!
+! ----------------------------------------------------------------------
+!
       subroutine write_resolution_data
 !
       use calypso_mpi
@@ -129,11 +144,12 @@
 !
       write(id_timer_file,*)
       write(id_timer_file,*) '=========================================='
-      write(id_timer_file,*) 'Truncation level:    ', l_truncation
-      write(id_timer_file,*) 'N_r for fluid shell: ',                   &
+      write(id_timer_file,*) 'Truncation level:      ', l_truncation
+      write(id_timer_file,*) 'Longitudinal symmetry: ', m_folding
+      write(id_timer_file,*) 'N_r for fluid shell:   ',                 &
      &                      nlayer_CMB-nlayer_ICB
-      write(id_timer_file,*) 'N_theta:              ', nidx_rtm(2)
-      write(id_timer_file,*) 'N_phi:                ', nidx_rtp(3)
+      write(id_timer_file,*) 'N_theta:               ', nidx_rtm(2)
+      write(id_timer_file,*) 'N_phi:                 ', nidx_rtp(3)
 !
       write(id_timer_file,*) 'Total MPI processes: ',  nprocs
       write(id_timer_file,*)                                            &

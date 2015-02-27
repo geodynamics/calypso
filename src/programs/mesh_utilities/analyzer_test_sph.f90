@@ -31,12 +31,15 @@
       use m_read_ctl_gen_sph_shell
       use set_control_platform_data
       use parallel_load_data_4_sph
+      use cmp_trans_sph_tests
 !
 !
       if (my_rank.eq.0) then
         write(*,*) 'Construct commutation filter'
         write(*,*) 'Input file: mesh data'
       end if
+!
+      call set_tesh_sph_elapsed_label
 !
 !     --------------------- 
 !

@@ -292,10 +292,10 @@
 !
 !>        number of subdomains
         integer(kind = kint) :: ndomain_sph
-!>        local spectr index for @f$ l = 1@f$ and  @f$ m = -1, 0, 1@f$.
-!!@n      If spectr data do not exist in subdomain,
-!!@n      idx_rj_degree_one(m) = 0.
+!>        Truncation for spherical harmonics
         integer(kind = kint) :: l_truncation
+!>        m-folding symmetry for longitudinal direction
+        integer(kind = kint) :: m_folding = 1
 !>        global radius data @f$ r(k) @f$
         real(kind = kreal), pointer :: radius_1d_gl(:)
 !
@@ -631,6 +631,7 @@
       type(sph_grids), intent(in) :: sph
 !
       write(50,*) 'l_truncation ', sph%l_truncation
+      write(50,*) 'm_folding ',    sph%m_folding
       write(50,*) 'nidx_global_rtm ', sph%sph_rtm%nidx_global_rtm(1:3)
       write(50,*) 'nidx_global_rlm ', sph%sph_rlm%nidx_global_rlm(1:2)
       write(50,*) 'nidx_global_rj ',  sph%sph_rj%nidx_global_rj(1:2)

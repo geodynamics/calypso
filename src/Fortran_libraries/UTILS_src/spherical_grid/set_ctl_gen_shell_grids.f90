@@ -87,6 +87,7 @@
       nidx_global_rtp(2) = 2
       nidx_global_rtp(3) = 4
       l_truncation = 2
+      m_folding =    1
 !
       iflag_radial_grid =  igrid_Chebyshev
       if(cmp_no_case(radial_grid_type_ctl%charavalue, 'explicit'))      &
@@ -100,13 +101,17 @@
         l_truncation = ltr_ctl%intvalue
       end if
 !
+      if (phi_symmetry_ctl%iflag .gt. 0) then
+        m_folding = phi_symmetry_ctl%intvalue
+      end if
+!
       if (ngrid_elevation_ctl%iflag .gt. 0) then
         nidx_global_rtp(2) = ngrid_elevation_ctl%intvalue
       end if
 !
-      if (ngrid_azimuth_ctl%iflag .gt. 0) then
-        nidx_global_rtp(3) = ngrid_azimuth_ctl%intvalue
-      end if
+!      if (ngrid_azimuth_ctl%iflag .gt. 0) then
+!        nidx_global_rtp(3) = ngrid_azimuth_ctl%intvalue
+!      end if
 !
 !   Set radial group
       if(radial_grp_ctl%icou .gt. 0) then

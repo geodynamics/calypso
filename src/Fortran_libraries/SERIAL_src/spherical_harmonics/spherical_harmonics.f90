@@ -8,6 +8,7 @@
 !> @brief Routines for spherical harmonics and normalization
 !!
 !!@verbatim
+!!      subroutine sph_normalizations(l, m, idx_lm, g_lm)
 !!      subroutine idx28
 !!***********************************************************************
 !!*    subroutine for make indices for spherical harmonics
@@ -85,62 +86,78 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine sph_normalizations(l, m, idx_lm, g_lm)
+!*
+      integer(kind = kint), intent(in) :: l, m
+      integer(kind = kint), intent(inout) :: idx_lm(2)
+      real(kind = kreal), intent(inout) :: g_lm(17)
+!
+!
+      real(kind = kreal) :: pi
+!*
+      pi = four*atan(one)
+!
+      idx_lm(1) = l
+      idx_lm(2) = m
+      g_lm(1) = dble(l)
+      g_lm(2) = dble(m)
+      g_lm(3) = dble( l*(l+1) )
+      g_lm(4) = dble( (l-1)*l)
+      g_lm(5) = dble( (l+1)*(l+2) )
+!
+      g_lm(8) =  four*pi * dble( l*(l+1) ) / dble(2*l+1)
+!
+      g_lm(10) = four*pi / dble(2*l+1)
+      g_lm(11) = one / dble(2*l+1)
+      g_lm(12) = dble( l*(l+1) ) / dble(2*l+1)
+!
+      g_lm(14) = one
+      g_lm(15) = one
+      g_lm(16) = dble(2*l+1) / four
+!
+!   l = m = 0
+      if(l .eq. 0 .and. m .eq. 0) then
+        g_lm(6) = one / two
+        g_lm(7) = one
+        g_lm(9) = one / (four*pi)
+        g_lm(13) = one
+        g_lm(17) = zero
+      else
+        g_lm(9) =  dble(2*l+1) / (four*pi*dble( l*(l+1) ))
+        g_lm(13) = one / dble( l*(l+1) )
+        g_lm(17) = dble(2*l+1) / dble( 4*l*(l+1) )
+        if( m .eq. 0 ) then
+          g_lm(6) = dble(2*l+1) / two
+          g_lm(7) = dble(2*l+1) / dble( 2*l*(l+1) )
+        else
+          g_lm(6) = dble(2*l+1) / four
+          g_lm(7) = dble(2*l+1) / dble( 4*l*(l+1) )
+        end if
+      end if
+!*
+      end subroutine sph_normalizations
+!
+!  ---------------------------------------------------------------------
+!
       subroutine idx28
 !*
-      real(kind = kreal) :: pi
+      integer(kind = kint) :: idx_lm(2)
+      real(kind = kreal) :: g_lm(17)
       integer(kind = kint) :: l, m, j
 !*
 !
 !* -----  set index -----------------
 !*
-      pi = four* atan(one)
-!
       do l = 0, ltr_tri_sph
         do m = -l, l
           j = l*(l+1) + m
+          call sph_normalizations(l, m, idx_lm, g_lm)
 !
-          idx(j,1) = l
-          idx(j,2) = m
-          g(j,1) = dble(l)
-          g(j,2) = dble(m)
-          g(j,3) = dble( l*(l+1) )
-          g(j,4) = dble( (l-1)*l)
-          g(j,5) = dble( (l+1)*(l+2) )
-!
-          g(j,8) =  four*pi * dble( l*(l+1) ) / dble(2*l+1)
-!
-          g(j,10) = four*pi / dble(2*l+1)
-          g(j,11) = one / dble(2*l+1)
-          g(j,12) = dble( l*(l+1) ) / dble(2*l+1)
-!
-          g(j,16) = dble(2*l+1) / four
+          idx(j,1:2) = idx_lm(1:2)
+          g(j,1:17) = g_lm(1:17)
         end do
       end do
 !
-!   l = m = 0
-      g(0,6) = one / two
-      g(0,7) = one
-      g(0,9) = one / (four*pi)
-      g(0,13) = one
-      g(0,17) = zero
-!
-      do l = 1, ltr_tri_sph
-        do m = -l, l
-          j = l*(l+1) + m
-          if ( m .eq. 0 ) then
-            g(j,6) = dble(2*l+1) / two
-            g(j,7) = dble(2*l+1) / dble( 2*l*(l+1) )
-          else
-            g(j,6) = dble(2*l+1) / four
-            g(j,7) = dble(2*l+1) / dble( 4*l*(l+1) )
-          end if
-!
-          g(j,9) =  dble(2*l+1) / (four*pi*dble( l*(l+1) ))
-          g(j,13) = one / dble( l*(l+1) )
-          g(j,17) = dble(2*l+1) / dble( 4*l*(l+1) )
-        end do
-      end do
-!*
       end subroutine idx28
 !
 !  ---------------------------------------------------------------------

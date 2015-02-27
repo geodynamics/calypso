@@ -66,6 +66,7 @@
       call SPH_const_initial_field
 !
       call end_eleps_time(2)
+      call reset_elapse_4_init_sph_mhd
 !
       end subroutine initialize_const_sph_initial
 !

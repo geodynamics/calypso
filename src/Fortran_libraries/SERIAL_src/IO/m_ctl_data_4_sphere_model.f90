@@ -26,6 +26,7 @@
 !!    sph_coef_type_ctl       no_pole
 !!    sph_grid_type_ctl       no_pole
 !!    truncation_level_ctl     4
+!!    longitude_symmetry_ctl   2
 !!    ngrid_meridonal_ctl     12
 !!    ngrid_zonal_ctl         24
 !!
@@ -73,6 +74,9 @@
 !
 !>      Truncation lavel of spherical harmonics
       type(read_integer_item), save :: ltr_ctl
+!>      longitudinal symmetry
+      type(read_integer_item), save :: phi_symmetry_ctl
+!
 !>      Type of spherical grids
       type(read_character_item), save :: sph_grid_type_ctl
 !>      Type of spherical coefficients
@@ -130,6 +134,8 @@
       character(len=kchara), parameter                                  &
      &      ::  hd_sph_truncate = 'truncation_level_ctl'
       character(len=kchara), parameter                                  &
+     &      ::  hd_phi_symmetry = 'longitude_symmetry_ctl'
+      character(len=kchara), parameter                                  &
      &      ::  hd_sph_c_type =   'sph_coef_type_ctl'
       character(len=kchara), parameter                                  &
      &      ::  hd_sph_g_type =   'sph_grid_type_ctl'
@@ -157,7 +163,7 @@
 !   3rd level for boundary define
 !
       private :: hd_shell_def, i_shell_def
-      private :: hd_numlayer_shell, hd_sph_c_type
+      private :: hd_numlayer_shell, hd_sph_c_type, hd_phi_symmetry
       private :: hd_ntheta_shell, hd_nphi_shell, hd_sph_truncate
       private :: hd_r_grid_type, hd_n_fluid_grid, hd_Min_radius
       private :: hd_ICB_radius, hd_CMB_radius, hd_Max_radius
@@ -194,6 +200,7 @@
         call read_chara_ctl_type(hd_sph_g_type, sph_grid_type_ctl)
         call read_chara_ctl_type(hd_r_grid_type, radial_grid_type_ctl)
 !
+        call read_integer_ctl_type(hd_phi_symmetry, phi_symmetry_ctl)
         call read_integer_ctl_type(hd_sph_truncate, ltr_ctl)
         call read_integer_ctl_type(hd_ntheta_shell,                     &
      &      ngrid_elevation_ctl)

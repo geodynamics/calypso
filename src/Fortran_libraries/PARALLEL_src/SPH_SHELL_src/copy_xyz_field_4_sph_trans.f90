@@ -8,15 +8,15 @@
 !!
 !!@verbatim
 !!      subroutine copy_scalar_from_sph_trans                           &
-!!     &         (nnod_rtp, inod_rtp_smp_stack,numnod, d_rtp, i_field,  &
-!!     &          ntot_phys, d_nod)
+!!     &       (nnod_rtp, m_folding, inod_rtp_smp_stack,numnod,         &
+!!     &        d_rtp, i_field, ntot_phys, d_nod)
 !!      subroutine copy_xyz_vec_from_sph_trans                          &
-!!     &         (nnod_rtp, inod_rtp_smp_stack, numnod,  colatitude,    &
-!!     &         longitude, d_rtp, i_field, ntot_phys, d_nod)
+!!     &       (nnod_rtp, m_folding, inod_rtp_smp_stack, numnod,        &
+!!     &        colatitude, longitude, d_rtp, i_field, ntot_phys, d_nod)
 !!      subroutine copy_xyz_tsr_from_sph_trans                          &
-!!     &         (nnod_rtp, inod_rtp_smp_stack, numnod,                 &
-!!     &          xx, radius, s_cylinder, a_radius, a_s_cylinder,       &
-!!     &          d_rtp, i_field, ntot_phys, d_nod)
+!!     &         (nnod_rtp, m_folding, inod_rtp_smp_stack, numnod,      &
+!!     &        xx, radius, s_cylinder, a_radius, a_s_cylinder,         &
+!!     &        d_rtp, i_field, ntot_phys, d_nod)
 !!
 !!      subroutine copy_scalar_to_sph_trans(nnod_rtp,inod_rtp_smp_stack,&
 !!     &          numnod, i_field, ntot_phys, d_nod, d_rtp)
@@ -47,14 +47,14 @@
 ! -------------------------------------------------------------------
 !
       subroutine copy_scalar_from_sph_trans                             &
-     &         (nnod_rtp, inod_rtp_smp_stack,numnod, d_rtp, i_field,    &
-     &          ntot_phys, d_nod)
+     &       (nnod_rtp, m_folding, inod_rtp_smp_stack, numnod,          &
+     &        d_rtp, i_field, ntot_phys, d_nod)
 !
       use copy_field_4_sph_trans
 !
       integer(kind = kint), intent(in) :: i_field
 !
-      integer(kind = kint), intent(in) :: nnod_rtp
+      integer(kind = kint), intent(in) :: nnod_rtp, m_folding
       integer(kind = kint), intent(in) :: inod_rtp_smp_stack(0:np_smp)
       integer(kind = kint), intent(in) :: numnod
 !
@@ -64,8 +64,8 @@
 !
 !
 !$omp parallel
-      call copy_scalar_from_trans(nnod_rtp, inod_rtp_smp_stack,         &
-     &    numnod, d_rtp, d_nod(1,i_field))
+      call copy_scalar_from_trans(nnod_rtp, m_folding,                  &
+     &    inod_rtp_smp_stack, numnod, d_rtp, d_nod(1,i_field))
 !$omp end parallel
 !
       end subroutine copy_scalar_from_sph_trans
@@ -73,15 +73,15 @@
 ! -------------------------------------------------------------------
 !
       subroutine copy_xyz_vec_from_sph_trans                            &
-     &         (nnod_rtp, inod_rtp_smp_stack, numnod,  colatitude,      &
-     &         longitude, d_rtp, i_field, ntot_phys, d_nod)
+     &       (nnod_rtp, m_folding, inod_rtp_smp_stack, numnod,          &
+     &        colatitude, longitude, d_rtp, i_field, ntot_phys, d_nod)
 !
       use copy_field_4_sph_trans
       use cvt_sph_vector_2_xyz_smp
 !
       integer(kind = kint), intent(in) :: i_field
 !
-      integer(kind = kint), intent(in) :: nnod_rtp
+      integer(kind = kint), intent(in) :: nnod_rtp, m_folding
       integer(kind = kint), intent(in) :: inod_rtp_smp_stack(0:np_smp)
       integer(kind = kint), intent(in) :: numnod
       real(kind = kreal), intent(in) :: colatitude(numnod)
@@ -93,8 +93,8 @@
 !
 !
 !$omp parallel
-      call copy_vector_from_trans(nnod_rtp, inod_rtp_smp_stack,         &
-     &    numnod, d_rtp, d_nod(1,i_field))
+      call copy_vector_from_trans(nnod_rtp, m_folding,                  &
+     &    inod_rtp_smp_stack, numnod, d_rtp, d_nod(1,i_field))
       call overwrite_sph_vect_2_xyz_smp(np_smp, numnod,                 &
      &    inod_rtp_smp_stack, d_nod(1,i_field), colatitude, longitude)
 !$omp end parallel
@@ -104,7 +104,7 @@
 ! -------------------------------------------------------------------
 !
       subroutine copy_xyz_tsr_from_sph_trans                            &
-     &         (nnod_rtp, inod_rtp_smp_stack, numnod,                   &
+     &         (nnod_rtp, m_folding, inod_rtp_smp_stack, numnod,        &
      &          xx, radius, s_cylinder, a_radius, a_s_cylinder,         &
      &          d_rtp, i_field, ntot_phys, d_nod)
 !
@@ -113,7 +113,7 @@
 !
       integer(kind = kint), intent(in) :: i_field
 !
-      integer(kind = kint), intent(in) :: nnod_rtp
+      integer(kind = kint), intent(in) :: nnod_rtp, m_folding
       integer(kind = kint), intent(in) :: inod_rtp_smp_stack(0:np_smp)
       integer(kind = kint), intent(in) :: numnod
       real(kind = kreal), intent(in) :: xx(numnod,3)
@@ -128,11 +128,11 @@
 !
 !
 !$omp parallel
-      call copy_tensor_from_trans(nnod_rtp, inod_rtp_smp_stack,         &
-     &    numnod, d_rtp, d_nod(1,i_field))
+      call copy_tensor_from_trans(nnod_rtp, m_folding,                  &
+     &    inod_rtp_smp_stack, numnod, d_rtp, d_nod(1,i_field))
       call overwrite_xyz_tensor_by_sph_smp(np_smp, numnod,              &
      &    inod_rtp_smp_stack, d_nod(1,i_field), xx(1,1), xx(1,2),       &
-     &     xx(1,3), radius, s_cylinder, a_radius, a_s_cylinder)
+     &    xx(1,3), radius, s_cylinder, a_radius, a_s_cylinder)
 !$omp end parallel
 !
       end subroutine copy_xyz_tsr_from_sph_trans

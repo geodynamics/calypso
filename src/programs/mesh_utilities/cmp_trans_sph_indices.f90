@@ -85,12 +85,14 @@
      &    (idx_global_rtm(1,3), idx_rtp_recieve(1,3) )
 !
       if (my_rank .eq. 0) write(*,*) 'send_recv_rj_2_rlm_int'
+      idx_rlm_recieve = -1
       call send_recv_rj_2_rlm_int                                       &
      &    (idx_global_rj(1,1), idx_rlm_recieve(1,1) )
       call send_recv_rj_2_rlm_int                                       &
      &    (idx_global_rj(1,2), idx_rlm_recieve(1,2) )
 !
       if (my_rank .eq. 0) write(*,*) 'send_recv_rlm_2_rj_int'
+      idx_rj_recieve = -1
       call send_recv_rlm_2_rj_int                                       &
      &    (idx_global_rlm(1,1), idx_rj_recieve(1,1) )
       call send_recv_rlm_2_rj_int                                       &
@@ -142,9 +144,9 @@
       write(id_check,*) 'Wrong commnication in rj => rlm'
       do inod = 1, nnod_rlm
         if (     idx_rlm_recieve(inod,1) .ne. idx_global_rlm(inod,1)    &
-     &      .and. idx_rlm_recieve(inod,1) .ne. 0) then
+     &      .and. idx_rlm_recieve(inod,1) .ge. 0) then
           if (   idx_rlm_recieve(inod,2) .ne. idx_global_rlm(inod,2)    &
-     &      .and. idx_rlm_recieve(inod,2) .ne. 0) then
+     &      .and. idx_rlm_recieve(inod,2) .ge. 0) then
             write(id_check,'(i16,6i5)') inod,                           &
      &        idx_global_rlm(inod,1:2), idx_rlm_recieve(inod,1:2)
           end if
@@ -154,9 +156,9 @@
       write(id_check,*) 'Wrong commnication in rlm => rj'
       do inod = 1, nnod_rj
         if (     idx_rj_recieve(inod,1) .ne. idx_global_rj(inod,1)      &
-     &      .and. idx_rj_recieve(inod,1) .ne. 0) then
+     &      .and. idx_rj_recieve(inod,1) .ge. 0) then
           if (   idx_rj_recieve(inod,2) .ne. idx_global_rj(inod,2)      &
-     &      .and. idx_rj_recieve(inod,2) .ne. 0) then
+     &      .and. idx_rj_recieve(inod,2) .ge. 0) then
             write(id_check,'(i16,6i5)') inod,                           &
      &        idx_global_rj(inod,1:2), idx_rj_recieve(inod,1:2)
           end if
@@ -216,12 +218,12 @@
 !
       write(id_check,*) 'No commnication in rj => rlm'
       write(id_check,*)                                                 &
-     &         'local_id, global_id, global_r, global_l, global_m'
+     &     'local_id, global_r, global_j, global_r, global_l, global_m'
       do kr = 1, nidx_rlm(1)
         do j = 1, nidx_rlm(2)
           inod = j + (kr-1) * nidx_rlm(2)
-          if(      idx_rlm_recieve(inod,1) .eq. 0                       &
-     &        .or. idx_rlm_recieve(inod,2) .eq. 0) then
+          if(      idx_rlm_recieve(inod,1) .lt. 0                       &
+     &        .or. idx_rlm_recieve(inod,2) .lt. 0) then
               write(id_check,'(4i16,6i5)') inod,                        &
      &        idx_global_rlm(inod,1:2), idx_gl_1d_rlm_r(kr),            &
      &        idx_gl_1d_rlm_j(j,2:3)
@@ -231,12 +233,12 @@
 !
       write(id_check,*) 'No commnication in rlm => rj'
       write(id_check,*)                                                 &
-     &         'local_id, global_id, global_r, global_l, global_m'
+     &     'local_id, global_r, global_j, global_r, global_l, global_m'
       do kr = 1, nidx_rj(1)
         do j = 1, nidx_rj(2)
           inod = j + (kr-1) * nidx_rj(2)
-          if(      idx_rj_recieve(inod,1) .eq. 0                        &
-     &        .or. idx_rj_recieve(inod,2) .eq. 0) then
+          if(      idx_rj_recieve(inod,1) .lt. 0                        &
+     &        .or. idx_rj_recieve(inod,2) .lt. 0) then
               write(id_check,'(4i16,6i5)') inod,                        &
      &          idx_global_rj(inod,1:2),  idx_gl_1d_rj_r(kr),           &
      &          idx_gl_1d_rj_j(j,2:3)

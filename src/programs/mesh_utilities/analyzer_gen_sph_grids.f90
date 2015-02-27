@@ -33,6 +33,7 @@
       use m_read_ctl_gen_sph_shell
       use set_ctl_gen_shell_grids
       use const_sph_radial_grid
+      use set_global_spherical_param
 !
 !
       num_elapsed = 4
@@ -48,6 +49,8 @@
       call read_control_4_gen_shell_grids
       call s_set_control_4_gen_shell_grids
 !
+      call set_global_sph_resolution
+!
       if(my_rank .eq. 0) then
         call check_global_spheric_parameter
         call output_set_radial_grid
@@ -61,16 +64,12 @@
 !
       use para_gen_sph_grids_modes
       use set_comm_table_rtp_rj
-      use const_1d_ele_connect_4_sph
       use const_global_sph_grids_modes
 !
 !
 !  ========= Generate spherical harmonics table ========================
 !
       call s_const_global_sph_grids_modes
-!
-      if(iflag_debug .gt. 0) write(*,*) 's_const_1d_ele_connect_4_sph'
-      call s_const_1d_ele_connect_4_sph
 !
       call alloc_parallel_sph_grids
       if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rlm_grids'

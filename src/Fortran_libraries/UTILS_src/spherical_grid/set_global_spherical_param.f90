@@ -47,17 +47,17 @@
       use m_spheric_parameter
 !
 !
-      nidx_global_rtp(3) = 2*nidx_global_rtp(2)
+      nidx_global_rtp(3) = 2*nidx_global_rtp(2) / m_folding
 !
       nidx_global_rtm(1) = nidx_global_rtp(1)
       nidx_global_rtm(2) = nidx_global_rtp(2)
-      nidx_global_rtm(3) = 2*(l_truncation + 1)
+      nidx_global_rtm(3) = 2*(l_truncation/m_folding + 1) 
 !
       nidx_global_rlm(1) = nidx_global_rtp(1)
-      nidx_global_rlm(2) = l_truncation * (l_truncation + 2)
+      nidx_global_rlm(2) = (l_truncation+2)*l_truncation / m_folding
 !
       nidx_global_rj(1) = nidx_global_rtp(1)
-      nidx_global_rj(2) = l_truncation * (l_truncation + 2)
+      nidx_global_rj(2) = (l_truncation+2)*l_truncation / m_folding
 !
       nnod_global_rtp                                                   &
      &  = nidx_global_rtp(1) * nidx_global_rtp(2) * nidx_global_rtp(3)

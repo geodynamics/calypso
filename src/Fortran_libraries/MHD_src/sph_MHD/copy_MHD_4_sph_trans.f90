@@ -100,7 +100,8 @@
 !
       if(i_trns .le. 0) return
       call sel_vector_from_trans                                        &
-     &   (nnod_rtp, frc_rtp(1,i_trns), frm_rtp(1,i_trns) )
+     &   (nnod_rtp, nidx_rtp, ione, inod_rtp_smp_stack,                 &
+     &    nnod_rtp, frc_rtp(1,i_trns), frm_rtp(1,i_trns) )
 !
       end subroutine sel_force_from_MHD_trans
 !
@@ -120,7 +121,8 @@
 !
 !
       if( (i_field*i_trns) .le. 0) return
-      call copy_vector_from_trans(nnod_rtp, inod_rtp_smp_stack,         &
+      call copy_vector_from_trans                                       &
+     &  (nnod_rtp, m_folding, inod_rtp_smp_stack,                       &
      &   numnod, frm_rtp(1,i_trns), d_nod(1,i_field) )
 !
       end subroutine copy_force_from_MHD_trans

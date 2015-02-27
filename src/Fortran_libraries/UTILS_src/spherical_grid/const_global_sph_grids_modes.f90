@@ -70,7 +70,6 @@
       call allocate_sph_ranks
       call allocate_nidx_local
 !
-      call set_global_sph_resolution
 !
       if(iflag_debug .gt. 0) write(*,*) 'const_global_rtp_grids'
       call const_global_rtp_grids
@@ -257,7 +256,7 @@
       call cal_local_nums(ndomain_rtm(2), ione, nidx_global_rtm(2),     &
      &    nidx_local_rtm_t, istack_idx_local_rtm_t)
       call cal_local_num_rtm_m(ndomain_rtm(3), l_truncation,            &
-     &    nidx_local_rtm_m, istack_idx_local_rtm_m)
+     &    m_folding, nidx_local_rtm_m, istack_idx_local_rtm_m)
 !
       call cal_local_nums_st(ndomain_rtm(1), nlayer_ICB, nlayer_CMB,    &
      &    nidx_local_rtm_OC, ist_idx_local_rtm_OC)
@@ -338,17 +337,16 @@
 !
 !
       call set_wavenumber_4_ispack_fft(nidx_global_rtp(2),              &
-     &    nidx_global_rtp(3), mspec_4_ispack, mdx_ispack)
+     &    nidx_global_rtp(3), m_folding, mspec_4_ispack, mdx_ispack)
 !
       call set_zonal_wavenum_4_legendre(ndomain_rtm(3),                 &
-     &    l_truncation, nidx_global_rtp(2), nidx_global_rtp(3),         &
-     &    jdx_fsph, mdx_4_lgd)
+     &    l_truncation, m_folding, nidx_global_rtp(2),                  &
+     &    nidx_global_rtp(3), jdx_fsph, mdx_4_lgd)
 !
-      call set_merged_index_4_sph_trans(ndomain_rtm(3),                 &
-     &    l_truncation, nidx_global_rj(2), nidx_global_rtp(3),          &
+      call set_merged_index_4_sph_trans(ndomain_rtm(3), l_truncation,   &
+     &    nidx_global_rj(2), nidx_global_rtp(3), m_folding,             &
      &    istack_idx_local_rtm_m, mdx_4_lgd, nidx_local_rlm_j,          &
      &    istack_idx_local_rlm_j, jtbl_fsph)
-!
 !
       call set_gl_nnod_spheric_rj(ndomain_sph,                          &
      &    ndomain_rlm(1), ndomain_rlm(2),                               &
@@ -367,8 +365,8 @@
 !
 !
       call set_trans_table_fft_2_lgd(l_truncation,                      &
-     &    nidx_global_rtp(2), nidx_global_rtp(3), mspec_4_ispack,       &
-     &    jdx_fsph, mtbl_fft_2_lgd)
+     &    nidx_global_rtp(2), nidx_global_rtp(3), m_folding,            &
+     &    mspec_4_ispack,jdx_fsph, mtbl_fft_2_lgd)
 !
       call set_trans_table_lgd_2_sph(nidx_global_rj(2),                 &
      &    jtbl_fsph(0,1), jtbl_isph)

@@ -95,10 +95,10 @@
 !>      Start address for @f$ l=1, m= 1 @f$ for @f$ f(r,\theta,m) @f$
       integer (kind=kint) :: ist_rtm_order_1c =   0
 !
-!>      local spectr index for @f$ l = 1@f$ and  @f$ m = -1, 0, 1@f$.
-!!@n    If spectr data do not exist in subdomain,
-!!@n    idx_rj_degree_one(m) = 0.
+!>        Truncation for spherical harmonics
       integer(kind = kint) :: l_truncation
+!>        m-folding symmetry for longitudinal direction
+      integer(kind = kint) :: m_folding = 1
 
 !    global parameteres for radius
 !
@@ -576,6 +576,7 @@
 !
 !
       write(*,*) 'truncation degree:           ', l_truncation
+      write(*,*) 'm-folding symmetry:          ', m_folding
       write(*,*) 'number of grid for f(r,t,p): ', nidx_global_rtp(1:3)
       write(*,*) 'subdomain for f(r,t,p):      ', ndomain_rtp(1:3)
       write(*,*) 'subdomain for f(r,t,m):      ', ndomain_rtm(1:3)

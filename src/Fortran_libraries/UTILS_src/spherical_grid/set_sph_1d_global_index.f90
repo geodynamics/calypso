@@ -68,7 +68,7 @@
         ied = istack_idx_local_rtp_p(ip)
         do i = ist, ied
           idx_global_rtp_p(i,1) = i
-          idx_global_rtp_p(i,2) = mdx_ispack(i)
+          idx_global_rtp_p(i,2) = mdx_ispack(i) * m_folding
         end do
       end do
 !
@@ -115,12 +115,12 @@
 !
       do i = 0, istack_idx_local_rtm_m(n3)
         idx_global_rtm_m(i,1) = mtbl_fft_2_lgd(i)
-        idx_global_rtm_m(i,2) = mdx_4_lgd(i)
+        idx_global_rtm_m(i,2) = mdx_4_lgd(i) * m_folding
       end do
 !
-!      write(8,*) 'i,j, idx_global_rtm_m(j,1:2)'
+!      write(*,*) 'i,j, idx_global_rtm_m(j,1:2)'
 !      do i = 0, istack_idx_local_rtm_m(n3)
-!        write(8,*) i, idx_global_rtm_m(i,1:2)
+!        write(*,*) i, idx_global_rtm_m(i,1:2)
 !      end do
 !
       end subroutine set_sph_1d_global_idx_rtm
@@ -145,9 +145,9 @@
         idx_global_rlm_j(i,3) = jtbl_fsph(i,3)
       end do
 !
-!      write(8,*) 'i, jtbl_fsph(i,1:3)'
+!      write(*,*) 'i, jtbl_fsph(i,1:3)'
 !      do i = 0, istack_idx_local_rlm_j(n2)
-!        write(8,*) i, jtbl_fsph(i,1:3)
+!        write(*,*) i, jtbl_fsph(i,1:3)
 !      end do
 !
       end subroutine set_sph_1d_global_idx_rlm

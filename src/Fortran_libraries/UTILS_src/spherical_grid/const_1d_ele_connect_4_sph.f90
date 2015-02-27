@@ -17,7 +17,6 @@
       use m_precision
       use m_constants
       use m_machine_parameter
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
 !
       implicit none
@@ -30,10 +29,12 @@
 !
       subroutine s_const_1d_ele_connect_4_sph
 !
+      use m_spheric_parameter
 !
-      call allocate_nnod_nele_sph_mesh
 !
-      
+      call allocate_nnod_nele_sph_mesh(ndomain_sph, ndomain_rtp,        &
+     &    nidx_global_rtp, m_folding)
+!
       if(iflag_debug .gt. 0) write(*,*) 'count_nod_ele_4_sph_radial'
       call count_nod_ele_4_sph_radial
       if(iflag_debug .gt. 0) write(*,*) 'count_nod_ele_4_sph_theta'
@@ -57,6 +58,7 @@
 !
       subroutine count_nod_ele_4_sph_radial
 !
+      use m_spheric_parameter
       use m_sph_1d_global_index
 !
       integer(kind = kint) :: k, kr, ip, jp, ist, ied
@@ -67,7 +69,7 @@
       iflag_ele_r =      0
       nmax_nod_sph_r =   0
       nmax_ele_sph_r =   0
-      do ip = 1, ndomain_rtp(1)
+      do ip = 1, ndomain_fem(1)
         ist = istack_idx_local_rtp_r(ip-1) + 1
         ied = istack_idx_local_rtp_r(ip)
         do k = ist, ied
@@ -84,7 +86,7 @@
             end if
           end if
 !
-          if(kr .lt. nidx_global_rtp(1)                                 &
+          if(kr .lt. nidx_global_fem(1)                                 &
      &        .and. iflag_internal_r(kr+1,ip) .eq. 0) then
             iflag_internal_r(kr+1,ip) = -1
           end if
@@ -94,7 +96,7 @@
      &                        * iflag_internal_r(1,ip))
         nnod_sph_r(ip) = abs(iflag_internal_r(1,ip))
         nele_sph_r(ip) = 0
-        do kr = 1, nidx_global_rtp(1)-1
+        do kr = 1, nidx_global_fem(1)-1
           iflag_ele_r(kr,ip) = abs(iflag_internal_r(kr,ip)              &
      &                           * iflag_internal_r(kr+1,  ip))
           nnod_sph_r(ip) = nnod_sph_r(ip)                               &
@@ -105,21 +107,21 @@
         nmax_ele_sph_r = max(nmax_ele_sph_r,nele_sph_r(ip))
       end do
 !
-      do ip = 1, ndomain_rtp(1)
+      do ip = 1, ndomain_fem(1)
         iflag_neib_r(ip,ip) = 1
       end do
 !
-      do kr = 1, nidx_global_rtp(1)
-        do jp = 1, ndomain_rtp(1)
+      do kr = 1, nidx_global_fem(1)
+        do jp = 1, ndomain_fem(1)
           if(iflag_internal_r(kr,jp) .eq. 1) then
             ip = jp
             exit
           end if
         end do
-        do jp = 1, ndomain_rtp(1)
+        do jp = 1, ndomain_fem(1)
           iflag_internal_r(kr,jp) = iflag_internal_r(kr,jp) * ip
         end do
-        do jp = 1, ndomain_rtp(1)
+        do jp = 1, ndomain_fem(1)
           if(iflag_internal_r(kr,jp) .lt. 0) then
             ip = abs(iflag_internal_r(kr,jp))
             iflag_neib_r(ip,jp) = -1
@@ -127,10 +129,10 @@
         end do
       end do
 !
-      do jp = 1, ndomain_rtp(1)
+      do jp = 1, ndomain_fem(1)
         iflag_center_r(jp) = iflag_center_r(jp) * jp
       end do
-      do jp = 1, ndomain_rtp(1)
+      do jp = 1, ndomain_fem(1)
         if(iflag_center_r(jp) .lt. 0) then
           ip = abs(iflag_center_r(jp))
           iflag_neib_r(ip,jp) = -1
@@ -143,6 +145,7 @@
 !
       subroutine count_nod_ele_4_sph_theta
 !
+      use m_spheric_parameter
       use m_sph_1d_global_index
 !
       integer(kind = kint) :: k, ip, ist, ied, jp
@@ -152,7 +155,7 @@
       iflag_ele_t =      0
       nmax_nod_sph_t =   0
       nmax_ele_sph_t =   0
-      do ip = 1, ndomain_rtp(2)
+      do ip = 1, ndomain_fem(2)
         ist = istack_idx_local_rtp_t(ip-1) + 1
         ied = istack_idx_local_rtp_t(ip)
 !
@@ -169,7 +172,7 @@
           iflag_internal_t(k,ip) = 1
         end do
 !
-        if(ied .eq. nidx_global_rtp(2)) then
+        if(ied .eq. nidx_global_fem(2)) then
           if    (iflag_shell_mode .eq. iflag_MESH_w_pole                &
      &      .or. iflag_shell_mode .eq. iflag_MESH_w_center) then
             iflag_Npole_t(ip) = 1
@@ -183,7 +186,7 @@
         nnod_sph_t(ip) = abs(iflag_internal_t(1,ip))
         nele_sph_t(ip) = 0
 !
-        do k = 1, nidx_global_rtp(2)-1
+        do k = 1, nidx_global_fem(2)-1
           iflag_ele_t(k,ip) = abs(iflag_internal_t(k,ip)                &
      &                          * iflag_internal_t(k+1,  ip))
           nnod_sph_t(ip) = nnod_sph_t(ip)                               &
@@ -191,7 +194,7 @@
           nele_sph_t(ip)= nele_sph_t(ip) + abs(iflag_ele_t(k,ip))
         end do
 !
-        k = nidx_global_rtp(2)
+        k = nidx_global_fem(2)
         iflag_ele_Npole(ip) = abs(iflag_internal_t(k,ip)                &
      &                          * iflag_Npole_t(ip))
 !
@@ -201,34 +204,34 @@
 !
       nnod_sph_ct = 0
       if(iflag_shell_mode .eq. iflag_MESH_w_center) then
-        nnod_sph_ct = nidx_global_rtp(2) - nnod_sph_t(1)
+        nnod_sph_ct = nidx_global_fem(2) - nnod_sph_t(1)
         iflag_center_t(0) = iflag_Spole_t(1)
-        do k = 1, nidx_global_rtp(2)
+        do k = 1, nidx_global_fem(2)
           iflag_center_t(k) = iflag_internal_t(k,1)
         end do
-        iflag_center_t(nidx_global_rtp(2)+1) = iflag_Npole_t(1)
-        do k = 0, nidx_global_rtp(2)+1
+        iflag_center_t(nidx_global_fem(2)+1) = iflag_Npole_t(1)
+        do k = 0, nidx_global_fem(2)+1
           if(iflag_center_t(k) .eq. 0) iflag_center_t(k) = -1
         end do
       end if
 !
 !
-      do ip = 1, ndomain_rtp(2)
+      do ip = 1, ndomain_fem(2)
         iflag_neib_t(ip,ip) = 1
       end do
 !
-      do k = 1, nidx_global_rtp(2)
-        do jp = 1, ndomain_rtp(2)
+      do k = 1, nidx_global_fem(2)
+        do jp = 1, ndomain_fem(2)
           if(iflag_internal_t(k,jp) .eq. 1) then
             ip = jp
             exit
           end if
         end do
-        do jp = 1, ndomain_rtp(2)
+        do jp = 1, ndomain_fem(2)
           iflag_internal_t(k,jp) = iflag_internal_t(k,jp) * ip
         end do
         iflag_center_t(k) =   iflag_center_t(k) * ip
-        do jp = 1, ndomain_rtp(2)
+        do jp = 1, ndomain_fem(2)
           if(iflag_internal_t(k,jp) .lt. 0) then
             ip = abs(iflag_internal_t(k,jp))
             iflag_neib_t(ip,jp) = -1
@@ -236,26 +239,26 @@
         end do
       end do
 !
-      do jp = 1, ndomain_rtp(2)
+      do jp = 1, ndomain_fem(2)
         if(iflag_Spole_t(jp) .gt. 0) then
           ip = jp
           exit
         end if
       end do
       iflag_center_t(0) =   iflag_center_t(0) * ip
-      do jp = 1, ndomain_rtp(2)
+      do jp = 1, ndomain_fem(2)
         iflag_Spole_t(jp) = iflag_Spole_t(jp) * ip
       end do
 !
-      do jp = 1, ndomain_rtp(2)
+      do jp = 1, ndomain_fem(2)
         if(iflag_Npole_t(jp) .gt. 0) then
           ip = jp
           exit
         end if
       end do
-      iflag_center_t(nidx_global_rtp(2)+1)                              &
-     &           =   iflag_center_t(nidx_global_rtp(2)+1) * ip
-      do jp = 1, ndomain_rtp(2)
+      iflag_center_t(nidx_global_fem(2)+1)                              &
+     &           =   iflag_center_t(nidx_global_fem(2)+1) * ip
+      do jp = 1, ndomain_fem(2)
         iflag_Npole_t(jp) = iflag_Npole_t(jp) * ip
       end do
 !
@@ -271,9 +274,9 @@
       integer(kind = kint) :: kr, ip, icou
 !
 !
-      do ip = 1, ndomain_rtp(1)
+      do ip = 1, ndomain_fem(1)
         icou = 0
-        do kr = 1, nidx_global_rtp(1)
+        do kr = 1, nidx_global_fem(1)
           if(iflag_internal_r(kr,ip) .ne. 0) then
             icou = icou + 1
             inod_sph_r(icou,ip) = kr
@@ -286,7 +289,7 @@
         end if
 !
         icou = 0
-        do kr = 1, nidx_global_rtp(1)-1
+        do kr = 1, nidx_global_fem(1)-1
           if(iflag_ele_r(kr,ip) .gt. 0) then
             icou = icou + 1
             ie_sph_r(icou,1,ip) = irev_sph_r(kr,  ip)
@@ -311,13 +314,13 @@
       integer(kind = kint) :: k, ip, icou
 !
 !
-      do ip = 1, ndomain_rtp(2)
+      do ip = 1, ndomain_fem(2)
         icou = 0
         if(iflag_Spole_t(ip) .ne. 0) then
           inod_sph_t(0,ip) = 0
           irev_sph_t(0,ip) = 0
         end if
-        do k = 1, nidx_global_rtp(2)
+        do k = 1, nidx_global_fem(2)
           if(iflag_internal_t(k,ip) .ne. 0) then
             icou = icou + 1
             inod_sph_t(icou,ip) = k
@@ -326,12 +329,12 @@
         end do
         if(iflag_Npole_t(ip) .ne. 0) then
           icou = icou + 1
-          inod_sph_t(icou,ip) = nidx_global_rtp(2) + 1
-          irev_sph_t(nidx_global_rtp(2)+1,ip) = icou
+          inod_sph_t(icou,ip) = nidx_global_fem(2) + 1
+          irev_sph_t(nidx_global_fem(2)+1,ip) = icou
         end if
 !
         icou = 0
-        do k = 1, nidx_global_rtp(2)-1
+        do k = 1, nidx_global_fem(2)-1
           if(iflag_ele_t(k,ip) .gt. 0) then
             icou = icou + 1
             ie_sph_t(icou,1,ip) = irev_sph_t(k,  ip)
@@ -344,8 +347,8 @@
           ie_Spole_t(2,ip) = irev_sph_t(1,ip)
         end if
         if(iflag_ele_Npole(ip) .gt. 0) then
-          ie_Npole_t(1,ip) = irev_sph_t(nidx_global_rtp(2),  ip)
-          ie_Npole_t(2,ip) = irev_sph_t(nidx_global_rtp(2)+1,ip)
+          ie_Npole_t(1,ip) = irev_sph_t(nidx_global_fem(2),  ip)
+          ie_Npole_t(2,ip) = irev_sph_t(nidx_global_fem(2)+1,ip)
         end if
       end do
 !
@@ -356,14 +359,14 @@
         irev_sph_ct(0) = icou
       end if
 !
-      do k = 1, nidx_global_rtp(2)
+      do k = 1, nidx_global_fem(2)
         if(iflag_internal_t(k,1) .eq. 0) then
           icou = icou + 1
           inod_sph_ct(icou) = k
           irev_sph_ct(k) = icou
         end if
       end do
-      do k = 1, nidx_global_rtp(2)-1
+      do k = 1, nidx_global_fem(2)-1
         if(irev_sph_t(k,1) .eq. 0) then
           ie_center_t(k,1) = -irev_sph_ct(k  )
         else
@@ -388,7 +391,7 @@
         ie_center_Np(2) = -(nnod_sph_ct+1)
       end if
 !
-      k = nidx_global_rtp(2)+1
+      k = nidx_global_fem(2)+1
       if(iflag_center_t(k).lt.0 .and. iflag_Npole_t(1).eq.0) then
         icou = icou + 1
         inod_sph_ct(icou) = k
@@ -404,9 +407,9 @@
       integer(kind = kint) :: m
 !
 !
-      do m = 1, nidx_global_rtp(3)
+      do m = 1, nidx_global_fem(3)
         ie_sph_p(m,1) = m
-        ie_sph_p(m,2) = mod(m,nidx_global_rtp(3)) + 1
+        ie_sph_p(m,2) = mod(m,nidx_global_fem(3)) + 1
       end do
 !
       end subroutine set_iele_4_sph_phi

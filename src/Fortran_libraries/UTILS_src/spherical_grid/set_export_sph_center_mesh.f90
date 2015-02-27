@@ -32,7 +32,6 @@
       subroutine count_export_4_center_mesh(ip_r, ip_t, jp_r, jp_t,     &
      &          num_export)
 !
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t, jp_r, jp_t
@@ -53,7 +52,6 @@
       subroutine count_export_4_ctr_shell_mesh(ip_r, ip_t, jp_r, jp_t,  &
      &          num_export)
 !
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
 !
@@ -69,7 +67,7 @@
         do lnum = 1, nnod_sph_ct
           l = inod_sph_ct(lnum)
           if(iflag_internal_t(l,ip_t) .eq. ip_t) then
-            num_export = num_export + nidx_global_rtp(3)
+            num_export = num_export + nidx_global_fem(3)
           end if
         end do
       end if
@@ -81,7 +79,6 @@
       subroutine count_export_4_ctr_Npole_mesh(ip_r, ip_t, jp_r, jp_t,  &
      &          num_export)
 !
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
 !
@@ -105,7 +102,6 @@
      &          icou, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
 !
@@ -135,7 +131,6 @@
      &          icou, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
 !
@@ -169,7 +164,7 @@
         end do
         num_rl = icou - ist
 !
-        do m = 2, nidx_global_rtp(3)
+        do m = 2, nidx_global_fem(3)
           do l = 1, num_rl
             icou = icou + 1
             item_export_1d_rtp(1,icou) = item_export_1d_rtp(1,l+ist)
@@ -192,7 +187,6 @@
      &          icou, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
 !
