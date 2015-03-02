@@ -4,7 +4,7 @@
 !!@author H. Matsui and H. Okuda
 !!@date Programmed in  Dec., 2012
 !
-!> @brief choose Gauss coefficients to output
+!> @brief Pick Gauss coefficients to output
 !>@n      Evaluate Nusselt number without heat source
 !!
 !!@verbatim
@@ -106,7 +106,7 @@
 !$omp parallel do private(j,l,inod)
         do inum = 1, num_pick_gauss_mode
           j = idx_pick_gauss_coef_lc(inum)
-          l = int( aint(sqrt(dble(j))) )
+          l = idx_pick_gauss_coef_gl(inum,2)
           if(j .gt. izero) then
             inod =  j +    (nlayer_CMB-1) * nidx_rj(2)
             gauss_coef_lc(inum) = d_rj(inod,ipol%i_magne) * dble(l)     &
@@ -121,7 +121,7 @@
 !$omp parallel do private(j,l,inod)
         do inum = 1, num_pick_gauss_mode
           j = idx_pick_gauss_coef_lc(inum)
-          l = int( aint(sqrt(dble(j))) )
+          l = idx_pick_gauss_coef_gl(inum,2)
           if(j .gt. izero) then
             inod =  j +    (nlayer_ICB-1) * nidx_rj(2)
             gauss_coef_lc(inum) = - d_rj(inod,ipol%i_magne) * dble(l+1) &
@@ -150,9 +150,9 @@
 !
 !
       do inum = 1, num_pick_gauss_mode
-        j = idx_pick_gauss_coef_gl(inum)
-        l = int( aint(sqrt(dble(j))) )
-        m = j - l*(l+1)
+        j = idx_pick_gauss_coef_gl(inum,1)
+        l = idx_pick_gauss_coef_gl(inum,2)
+        m = idx_pick_gauss_coef_gl(inum,3)
         mm = abs(m)
 !
         if(m .lt. izero) then

@@ -4,7 +4,7 @@
 !!@author H. Matsui
 !!@date Programmed in Dec., 2012
 !
-!>@brief  Data arrays for gauss coefficients
+!>@brief  Data arrays for gauss coefficients output
 !!
 !!@verbatim
 !!      subroutine allocate_pick_gauss
@@ -59,7 +59,7 @@
 !>      Number of modes of Gauss coefficients to be evaluated
       integer(kind = kint) :: num_pick_gauss_mode
 !>      Global spherical harmonics ID to evaluate Gauss coefficients
-      integer(kind = kint), allocatable :: idx_pick_gauss_coef_gl(:)
+      integer(kind = kint), allocatable :: idx_pick_gauss_coef_gl(:,:)
 !>      Local spherical harmonics ID to evaluate Gauss coefficients
       integer(kind = kint), allocatable :: idx_pick_gauss_coef_lc(:)
 !>      Gauss coefficients
@@ -110,7 +110,7 @@
       subroutine allocate_gauss_coef_monitor
 !
 !
-      allocate( idx_pick_gauss_coef_gl(ntot_pick_gauss_mode) )
+      allocate( idx_pick_gauss_coef_gl(ntot_pick_gauss_mode,3) )
       allocate( idx_pick_gauss_coef_lc(ntot_pick_gauss_mode) )
       allocate( gauss_coef_lc(ntot_pick_gauss_mode) )
       allocate( gauss_coef_gl(ntot_pick_gauss_mode) )

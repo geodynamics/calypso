@@ -4,7 +4,7 @@
 !!@author H. Matsui
 !!@date Programmed in Dec., 2012
 !
-!>@brief  Data arrays to monitoring specified modes
+!>@brief  Data arrays to monitoring spectrum data
 !!
 !!@verbatim
 !!      subroutine allocate_num_pick_layer
@@ -66,7 +66,7 @@
 !>      Number of modes of  monitoring spectrum to be evaluated
       integer(kind = kint) :: num_pick_sph_mode =  0
 !>      Global spherical harmonics ID to evaluate  monitoring spectrum
-      integer(kind = kint), allocatable :: idx_pick_sph_gl(:)
+      integer(kind = kint), allocatable :: idx_pick_sph_gl(:,:)
 !>      Local spherical harmonics ID to evaluate  monitoring spectrum
       integer(kind = kint), allocatable :: idx_pick_sph_lc(:)
 !
@@ -146,7 +146,7 @@
 !
       num = ntot_pick_sph_mode*num_pick_layer
 !
-      allocate( idx_pick_sph_gl(ntot_pick_sph_mode) )
+      allocate( idx_pick_sph_gl(ntot_pick_sph_mode,3) )
       allocate( idx_pick_sph_lc(ntot_pick_sph_mode) )
       allocate( scale_for_zelo(ntot_pick_sph_mode) )
       allocate( d_rj_pick_sph_lc(ntot_comp_pick_sph,num) )
@@ -246,7 +246,7 @@
       integer(kind = kint), intent(in) :: i_step
       real(kind = kreal), intent(in) :: time
 !
-      integer(kind = kint) :: inum, knum, j, l, m, ipick, i_fld
+      integer(kind = kint) :: inum, knum, ipick, i_fld
 !
 !
       if(num_pick_sph_mode .eq. izero) return
@@ -255,15 +255,13 @@
       call open_sph_spec_4_monitor
 !
       do inum = 1, num_pick_sph_mode
-        j = idx_pick_sph_gl(inum)
-        l = int( aint(sqrt(dble(j))) )
-        m = j - l*(l+1)
         do knum = 1, num_pick_layer
           ipick = knum + (inum-1) * num_pick_layer
           write(id_pick_mode,'(i16,1pe23.14e3)', advance='NO')          &
      &               i_step, time
           write(id_pick_mode,'(i16,1pe23.14e3,2i16)', advance='NO')     &
-     &               id_pick_layer(knum), r_pick_layer(knum), l, m
+     &               id_pick_layer(knum), r_pick_layer(knum),           &
+     &               idx_pick_sph_gl(inum,2:3)
           do i_fld = 1, ntot_comp_pick_sph
             write(id_pick_mode,'(1pe23.14e3)', advance='NO')            &
      &              d_rj_pick_sph_gl(i_fld,ipick)
@@ -312,6 +310,8 @@
 !
       subroutine read_sph_spec_4_monitor(id_pick, i_step, time, ierr)
 !
+      use spherical_harmonics
+!
       integer(kind = kint), intent(in) :: id_pick
       integer(kind = kint), intent(inout) :: i_step, ierr
       real(kind = kreal), intent(inout) :: time
@@ -326,7 +326,9 @@
           read(id_pick,*,err=99,end=99) i_step, time,                   &
      &               id_pick_layer(knum), r_pick_layer(knum), l, m,     &
      &               d_rj_pick_sph_gl(1:ntot_comp_pick_sph,ipick)
-          idx_pick_sph_gl(inum) = l*(l+1) + m
+          idx_pick_sph_gl(inum,1) = get_idx_by_full_degree_order(l, m)
+          idx_pick_sph_gl(inum,2) = l
+          idx_pick_sph_gl(inum,3) = m
         end do
       end do
       return
