@@ -6,8 +6,8 @@
 !      subroutine allocate_psf_ctl_stract
 !      subroutine allocate_iso_ctl_stract
 !
-!      subroutine deallocate_psf_file_header_ctl
-!      subroutine deallocate_iso_file_header_ctl
+!      subroutine deallocate_psf_ctl_stract
+!      subroutine deallocate_iso_ctl_stract
 !
 !      subroutine read_sections_control_data
 !
@@ -38,11 +38,11 @@
 !
       integer(kind = kint) :: num_psf_ctl = 0
       character(len = kchara), allocatable :: fname_psf_ctl(:)
-      type(psf_ctl), pointer, save :: psf_ctl_struct(:)
+      type(psf_ctl), allocatable, save :: psf_ctl_struct(:)
 !
       integer(kind = kint) :: num_iso_ctl = 0
       character(len = kchara), allocatable :: fname_iso_ctl(:)
-      type(iso_ctl), pointer, save :: iso_ctl_struct(:)
+      type(iso_ctl), allocatable, save :: iso_ctl_struct(:)
 !
 !   entry label
 !
@@ -62,21 +62,9 @@
       private :: hd_viz_ctl, i_viz_ctl
       private :: i_psf_ctl, i_iso_ctl
 !
-      private :: allocate_psf_file_header_ctl
-      private :: allocate_iso_file_header_ctl
-!
 !   --------------------------------------------------------------------
 !
       contains
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine allocate_psf_file_header_ctl
-!
-!
-      allocate(fname_psf_ctl(num_psf_ctl))
-!
-      end subroutine allocate_psf_file_header_ctl
 !
 !  ---------------------------------------------------------------------
 !
@@ -84,6 +72,7 @@
 !
       integer(kind = kint) :: i
 !
+      allocate(fname_psf_ctl(num_psf_ctl))
       allocate(psf_ctl_struct(num_psf_ctl))
 !
       if(num_psf_ctl .gt. 0) then
@@ -98,18 +87,10 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_iso_file_header_ctl
-!
-!
-      allocate(fname_iso_ctl(num_iso_ctl))
-!
-      end subroutine allocate_iso_file_header_ctl
-!
-!  ---------------------------------------------------------------------
-!
       subroutine allocate_iso_ctl_stract
 !
 !
+      allocate(fname_iso_ctl(num_iso_ctl))
       allocate(iso_ctl_struct(num_iso_ctl))
 !
       end subroutine allocate_iso_ctl_stract
@@ -117,21 +98,21 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_psf_file_header_ctl
+      subroutine deallocate_psf_ctl_stract
 !
       deallocate(psf_ctl_struct)
       deallocate(fname_psf_ctl)
 !
-      end subroutine deallocate_psf_file_header_ctl
+      end subroutine deallocate_psf_ctl_stract
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_iso_file_header_ctl
+      subroutine deallocate_iso_ctl_stract
 !
       deallocate(iso_ctl_struct)
       deallocate(fname_iso_ctl)
 !
-      end subroutine deallocate_iso_file_header_ctl
+      end subroutine deallocate_iso_ctl_stract
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
@@ -170,7 +151,7 @@
 !
       if(i_psf_ctl .gt. 0) return
 !
-      call allocate_psf_file_header_ctl
+      call allocate_psf_ctl_stract
       do
         call load_ctl_label_and_line
 !
@@ -203,7 +184,7 @@
 !
       if (i_iso_ctl .gt. 0) return
 !
-      call allocate_iso_file_header_ctl
+      call allocate_iso_ctl_stract
       do
         call load_ctl_label_and_line
 !

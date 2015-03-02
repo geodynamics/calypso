@@ -136,7 +136,7 @@
       character(len=kchara) :: hd_iso_result_field = 'output_field'
       character(len=kchara) :: hd_result_value =      'result_value'
 !
-      private :: hd_iso_plot_grp, hd_result_type, hd_iso_ctl
+      private :: hd_iso_plot_grp, hd_result_type
       private :: hd_result_value, hd_iso_plot_area, hd_iso_value
       private :: hd_iso_comp, hd_iso_field, hd_iso_result
       private :: hd_iso_define, hd_iso_out_type, hd_iso_file_head

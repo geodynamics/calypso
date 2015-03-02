@@ -218,9 +218,9 @@
 !
 !  Degree 0
       j_rlm = find_local_sph_rlm_address(nidx_rlm(2), idx_gl_1d_rlm_j,  &
-     &       izero)
+     &       izero, izero)
       j11 = find_local_sph_rlm_address(nidx_rlm(2), idx_gl_1d_rlm_j,    &
-     &       itwo)
+     &       ione, izero)
 !
       if( (j_rlm*j11) .gt. 0) then
 !$omp  parallel do private(k_rlm,i_rlm,i11,ir_11,sp_wp_k1,sp_dwp_k1)
@@ -292,9 +292,9 @@
 !
 !  Degree 0
       j_rlm = find_local_sph_rlm_address(nidx_rlm(2), idx_gl_1d_rlm_j,  &
-     &       izero)
+     &       izero, izero)
       j11 = find_local_sph_rlm_address(nidx_rlm(2), idx_gl_1d_rlm_j,    &
-     &       itwo)
+     &       ione, izero)
       if( (j_rlm*j11) .gt. 0) then
         i11 =  j11 + (kr-1)*nidx_rlm(2)
         ir_11 = irev_sr_rlm(i11)

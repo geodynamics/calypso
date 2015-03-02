@@ -20,7 +20,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!! example of control for Kemo's surface rendering
 !
-!  begin surface_rendering
+!  begin cross_sectioning
 !    psf_file_head    'psf'
 !    psf_output_type   ucd
 !  
@@ -53,7 +53,7 @@
 !        output_field    magnetic_field   radial   end
 !      end  array output_field
 !    end output_field_define
-!  end  surface_rendering
+!  end  cross_sectioning
 !  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !  
@@ -174,6 +174,7 @@
 !
 !     Top level
       character(len=kchara) :: hd_psf_ctl = 'surface_rendering'
+      character(len=kchara) :: hd_section_ctl = 'cross_sectioning'
 !
 !     2nd level for surface_rendering
       character(len=kchara) :: hd_psf_file_head = 'psf_file_head'
@@ -286,12 +287,15 @@
       type(psf_ctl), intent(inout) :: psf
 !
 !
-      if(right_begin_flag(hd_psf_ctl) .eq. 0) return
+      if(right_begin_flag(hd_psf_ctl) .eq. 0                            &
+     &   .and. right_begin_flag(hd_section_ctl) .eq. 0) return
       if (psf%i_psf_ctl.gt.0) return
       do
         call load_ctl_label_and_line
 !
         call find_control_end_flag(hd_psf_ctl, psf%i_psf_ctl)
+        if(psf%i_psf_ctl .gt. 0) exit
+        call find_control_end_flag(hd_section_ctl, psf%i_psf_ctl)
         if(psf%i_psf_ctl .gt. 0) exit
 !
         call  read_section_def_control(psf)

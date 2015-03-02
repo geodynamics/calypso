@@ -60,11 +60,9 @@
       integer(kind = kint) :: i_psf, ierr
 !
 !
-      ctl_file_code = psf_ctl_file_code
-!
       call allocate_control_params_4_psf(num_psf)
-      call allocate_psf_ctl_stract
 !
+      ctl_file_code = psf_ctl_file_code
       do i_psf = 1, num_psf
         call read_control_4_psf(i_psf)
       end do
@@ -86,7 +84,7 @@
         call deallocate_cont_dat_4_psf(psf_ctl_struct(i_psf))
       end do
 !
-      call deallocate_psf_file_header_ctl
+      call deallocate_psf_ctl_stract
 !
       call count_total_comps_4_viz                                      &
      &   (num_psf, psf_fld, psf_pat%max_ncomp_psf)
@@ -123,11 +121,9 @@
       integer(kind = kint) :: i
 !
 !
-      ctl_file_code = iso_ctl_file_code
-!
       call allocate_control_params_4_iso(num_iso)
-      call allocate_iso_ctl_stract
 !
+      ctl_file_code = iso_ctl_file_code
       do i = 1, num_iso
         call read_control_4_iso(i)
       end do
@@ -146,7 +142,7 @@
         call deallocate_cont_dat_4_iso(iso_ctl_struct(i))
       end do
 !
-      call deallocate_iso_file_header_ctl
+      call deallocate_iso_ctl_stract
 !
       call count_total_comps_4_viz                                      &
      &   (num_iso, iso_fld, iso_pat%max_ncomp_psf)
