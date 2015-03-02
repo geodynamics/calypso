@@ -130,7 +130,7 @@
       use m_spheric_parameter
       use m_sph_spectr_data
 !
-      integer ( kind = kint) :: inod, k
+      integer ( kind = kint) :: inod, k, jj
 !
 !
 !$omp parallel do
@@ -147,12 +147,23 @@
             d_rj(inod,ipol%i_temp) = reftemp_rj(k,0)
           end do
         else
-          do k = 1, nidx_rj(1)
+          do k = 1, nlayer_ICB-1
+            inod = local_sph_data_address(k,jj)
+            d_rj(inod,ipol%i_temp) = 1.0d0
+          end do
+          do k = nlayer_ICB, nlayer_CMB
             inod = idx_rj_degree_zero + (k-1)*nidx_rj(2)
             d_rj(inod,ipol%i_temp) = (ar_1d_rj(k,1) * 20.d0/13.0d0      &
      &                              - 1.0d0 ) * 7.0d0 / 13.0d0
           end do
         end if
+      end if
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        jj = find_local_sph_mode_address(0, 0)
+        inod = local_sph_data_address(1,jj)
+        d_rj(inod_rj_center,ipol%i_temp) = d_rj(inod,ipol%i_temp)
       end if
 !
       end subroutine set_ini_reference_temp_sph
@@ -166,7 +177,7 @@
       use m_sph_spectr_data
 !
 !
-      integer ( kind = kint) :: inod, j, k
+      integer ( kind = kint) :: inod, j, k, jj
       real (kind = kreal) :: pi, xr, shell
 !
 !
@@ -182,6 +193,13 @@
      &                            * 0.1d0 * six / (sqrt(pi))
         end do
       end do
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        jj = find_local_sph_mode_address(0, 0)
+        inod = local_sph_data_address(1,jj)
+        d_rj(inod_rj_center,ipol%i_temp) = d_rj(inod,ipol%i_temp)
+      end if
 !
       end subroutine set_all_part_temp_sph
 !
@@ -214,6 +232,13 @@
           d_rj(inod,ipol%i_temp) = (one-three*xr**2+three*xr**4-xr**6)  &
      &                            * 0.1d0 * three / (sqrt(two*pi))
         end do
+      end if
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        jj = find_local_sph_mode_address(0, 0)
+        inod = local_sph_data_address(1,jj)
+        d_rj(inod_rj_center,ipol%i_temp) = d_rj(inod,ipol%i_temp)
       end if
 !
       end subroutine set_initial_temp_sph
@@ -261,6 +286,13 @@
           d_rj(inod,is_fld) = (one-three*xr**2+three*xr**4-xr**6)      &
      &                            * 0.1d0 * three / (sqrt(two*pi))
         end do
+      end if
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        jj = find_local_sph_mode_address(0, 0)
+        inod = local_sph_data_address(1,jj)
+        d_rj(inod_rj_center,is_fld) = d_rj(inod,is_fld)
       end if
 !
       end subroutine set_initial_light_sph
@@ -363,7 +395,7 @@
 !
 !
       integer(kind = kint), intent(in) :: is_fld
-      integer ( kind = kint) :: inod, j, k
+      integer ( kind = kint) :: inod, j, k, jj
       real (kind = kreal) :: pi, xr, shell
 !
 !
@@ -398,6 +430,13 @@
      &                       * 1.0d-4 * six / (sqrt(pi))
         end do
       end do
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        jj = find_local_sph_mode_address(0, 0)
+        inod = local_sph_data_address(1,jj)
+        d_rj(inod_rj_center,is_fld) = d_rj(inod,is_fld)
+      end if
 !
       end subroutine set_noize_scalar_sph
 !
