@@ -36,7 +36,6 @@
       use m_ctl_data_4_platforms
       use m_ctl_data_4_sphere_model
       use m_ctl_data_4_divide_sphere
-      use m_int_4_sph_coriolis_IO
 !
       use const_sph_radial_grid
       use set_control_platform_data
@@ -53,13 +52,6 @@
       call turn_off_debug_flag_by_ctl(izero)
       call set_control_mesh_def
       call set_control_sph_mesh
-!
-      if(coriolis_int_file_name%iflag .gt. 0) then
-        sph_cor_file_name = coriolis_int_file_name%charavalue
-      end if
-!
-      call choose_file_format(coriolis_file_fmt_ctl%charavalue,         &
-     &    coriolis_file_fmt_ctl%iflag, ifmt_cor_int_file)
 !
       iflag_excluding_FEM_mesh = 0
       if(excluding_FEM_mesh_ctl%iflag .gt. 0                            &

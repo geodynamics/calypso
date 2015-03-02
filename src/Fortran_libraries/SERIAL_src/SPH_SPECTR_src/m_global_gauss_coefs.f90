@@ -45,11 +45,12 @@
       allocate(w_gauss(jmax_w))
 !
       w_gauss(1:jmax_w) = 0.0d0
-      do j = 1, jmax_w
-        l = int(aint( sqrt(real(j)) ))
-        m = j - l*(l + 1)
-        index_w(j,1) = l
-        index_w(j,2) = m
+      do l = 1, ltr_w
+        do m = -l, l
+          j = l*(l + 1) + m
+          index_w(j,1) = l
+          index_w(j,2) = m
+        end do
       end do
 !
       end subroutine allocate_gauss_global_coefs

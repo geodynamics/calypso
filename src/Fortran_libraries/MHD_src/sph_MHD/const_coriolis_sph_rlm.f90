@@ -33,12 +33,13 @@
 !
       subroutine init_sum_coriolis_rlm
 !
+      use calypso_mpi
       use m_boundary_params_sph_MHD
       use m_gaunt_coriolis_rlm
       use m_coriolis_terms_rlm
       use interact_coriolis_rlm
 !
-      integer(kind = kint) :: m, j_gl
+      integer(kind = kint) :: m
 !
 !
       call alloacte_gaunt_coriolis_rlm(nidx_rlm(2))
@@ -49,11 +50,10 @@
       idx_rlm_ICB = find_local_radius_rlm_address(nidx_rlm(1),          &
      &             idx_gl_1d_rlm_r, sph_bc_U%kr_in)
       idx_rlm_degree_zero = find_local_sph_rlm_address(nidx_rlm(2),     &
-     &                          idx_gl_1d_rlm_j, izero)
+     &                          idx_gl_1d_rlm_j, izero, izero)
       do m = -1, 1
-        j_gl = ione*(ione+1) + m
         idx_rlm_degree_one(m) = find_local_sph_rlm_address(nidx_rlm(2), &
-     &                          idx_gl_1d_rlm_j, j_gl)
+     &                          idx_gl_1d_rlm_j, ione, m)
       end do
 !
 !

@@ -15,7 +15,7 @@
 !!      subroutine dealloc_coriolis_coef_tri_rlm
 !!
 !!      integer function find_local_sph_rlm_address(jmax_rlm,           &
-!!     &       idx_gl_1d_rlm_j, j_gl)
+!!     &       idx_gl_1d_rlm_j, l_gl, m_gl)
 !!      integer function find_local_radius_rlm_address(nri_rlm,         &
 !!     &       idx_gl_1d_rlm_r, kr_gl)
 !!
@@ -214,22 +214,19 @@
 ! ----------------------------------------------------------------------
 !
       integer function find_local_sph_rlm_address(jmax_rlm,             &
-     &       idx_gl_1d_rlm_j, j_gl)
+     &       idx_gl_1d_rlm_j, l_gl, m_gl)
 !
       integer(kind = kint), intent(in) :: jmax_rlm
       integer(kind = kint), intent(in) :: idx_gl_1d_rlm_j(jmax_rlm,3)
-      integer(kind = kint), intent(in) :: j_gl
+      integer(kind = kint), intent(in) :: l_gl, m_gl
 !
-      integer(kind = kint) :: j, l, m
+      integer(kind = kint) :: j
 !
-!
-      l = int( aint(sqrt(dble(j_gl))) )
-      m = j_gl - l*(l+1)
 !
       find_local_sph_rlm_address = 0
       do j = 1, jmax_rlm
-        if (   idx_gl_1d_rlm_j(j,2) .eq. l                              &
-     &   .and. idx_gl_1d_rlm_j(j,3) .eq. m) then
+        if (   idx_gl_1d_rlm_j(j,2) .eq. l_gl                           &
+     &   .and. idx_gl_1d_rlm_j(j,3) .eq. m_gl) then
           find_local_sph_rlm_address = j
           return
         end if

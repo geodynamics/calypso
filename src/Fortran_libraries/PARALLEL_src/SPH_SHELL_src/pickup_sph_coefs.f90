@@ -64,10 +64,10 @@
       call set_picked_sph_address                                       &
      &   (num_pick_sph, num_pick_sph_l, num_pick_sph_m,                 &
      &    idx_pick_sph_mode, idx_pick_sph_l, idx_pick_sph_m,            &
-     &    ntot_pick_sph_mode, num_pick_sph_mode, idx_pick_sph_gl,       &
+     &    ntot_pick_sph_mode, num_pick_sph_mode, idx_pick_sph_gl(1,1),  &
      &    idx_pick_sph_lc)
       call set_scale_4_vect_l0                                          &
-     &   (num_pick_sph_mode, idx_pick_sph_gl(1), scale_for_zelo(1))
+     &   (num_pick_sph_mode, idx_pick_sph_gl(1,1), scale_for_zelo(1))
       call deallocate_iflag_pick_sph
       call deallocate_pick_sph_mode
 !
@@ -133,7 +133,7 @@
 !$omp end parallel do
 !
 !   Set field at center
-      if(idx_pick_sph_gl(1).eq.0 .and. iflag_rj_center.gt.0             &
+      if(idx_pick_sph_gl(1,1).eq.0 .and. iflag_rj_center.gt.0           &
      &   .and. iflag_rj_center.gt.0) then
         inod = inod_rj_center
 !

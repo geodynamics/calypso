@@ -9,7 +9,7 @@
 \label{fig:gen_sph_grid}
 \end{figure}
 %
-This program generates index table and a communication table for parallel spherical harmonics, table of integrals for Coriolis term, and FEM mesh information to generate visualization data (see Figure \ref{fig:gen_sph_grid}). This program needs control file for input. The output files include the indexing tables. 
+This program generates index table and a communication table for parallel spherical harmonics, table of integrals for Coriolis term, and FEM mesh information to generate visualization data (see Figure \ref{fig:gen_sph_grid}). This program needs control file for input. This program can perform with {\bf any} number of MPI processes less than the number of subdomains. The output files include the indexing tables. 
 
 %
 \begin{table}[htdp]
@@ -885,7 +885,7 @@ If the Nusselt number data file exist before starting the simulation, programs a
 \newpage
 \section{Data transform program \\
 ({\tt sph\_snapshot} and {\tt sph\_zm\_snapshot})}
-\label{section:assemble_sph}
+\label{section:sph_snapshot}
 %
 \begin{figure}[htbp]
 \begin{center}
@@ -1080,6 +1080,7 @@ phi_4    omega_vp44    omega_vt54    B_theta    v_phi    temp
 }
  
 \section{Data assemble program ({\tt assemble\_sph})}
+\label{section:assemble_sph}
 %
 \begin{figure}[htbp]
 \begin{center}
@@ -1089,7 +1090,7 @@ phi_4    omega_vp44    omega_vt54    B_theta    v_phi    temp
 \label{fig:flow_4}
 \end{figure}
 %
-Calypso uses distributed data files for simulations. This program is to generate new spectrum data for restarting with different spatial resolution or parallel configuration. This program organizes new spectral data by using specter indexing data using different domain decomposition. The following files used for data IO. If radial resolution is changed from the original data, the program makes new spectrum data by linear interpolation. If new data have smaller or larger truncation degree, the program fills zero to the new spectrum data or truncates the data to fit the new spatial resolution, respectively. Data files for the program are shown In Table \ref{table:assemble_newsph}, and definition of \verb|control_assemble_sph| is 
+Calypso uses distributed data files for simulations. This program is to generate new spectrum data for restarting with different spatial resolution or parallel configuration. This program organizes new spectral data by using specter indexing data using different domain decomposition. The following files used for data IO. If radial resolution is changed from the original data, the program makes new spectrum data by linear interpolation. If new data have smaller or larger truncation degree, the program fills zero to the new spectrum data or truncates the data to fit the new spatial resolution, respectively. This program can perform with {\bf any} number of MPI processes. Data files for the program are shown In Table \ref{table:assemble_newsph}, and definition of \verb|control_assemble_sph| is 
 %
 \begin{table}[htdp]
 \caption{List of files for {\tt assemble\_sph} }

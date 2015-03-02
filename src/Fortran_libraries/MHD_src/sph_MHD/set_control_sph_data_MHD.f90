@@ -36,7 +36,6 @@
       use m_ctl_data_mhd_forces
       use m_ctl_data_mhd_evo_scheme
       use m_control_params_2nd_files
-      use m_int_4_sph_coriolis_IO
       use m_node_id_spherical_IO
       use m_physical_property
       use m_work_4_sph_trans
@@ -104,20 +103,6 @@
       if(i_SR_routine .gt. 0) then
         call set_sph_comm_routine_ctl(SR_routine_ctl)
       end if
-!
-      if (iflag_4_coriolis .gt. id_turn_OFF) then
-        if(i_sph_coriolis_file .gt. 0) then
-          sph_cor_file_name = sph_cor_file_name_ctl
-           call choose_file_format(sph_cor_file_fmt_ctl,                &
-     &         i_sph_coriolis_fmt, ifmt_cor_int_file)
-        end if
-        if(coriolis_int_file_name%iflag .gt. 0) then
-          sph_cor_file_name = coriolis_int_file_name%charavalue
-          call choose_file_format(coriolis_file_fmt_ctl%charavalue,     &
-     &        coriolis_file_fmt_ctl%iflag, ifmt_cor_int_file)
-        end if
-      end if
-!
 !
       if (bc_data_file_name_ctl%iflag .gt. 0) then
         bc_sph_file_name = bc_data_file_name_ctl%charavalue

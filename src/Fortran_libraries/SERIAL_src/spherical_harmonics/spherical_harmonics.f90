@@ -69,6 +69,9 @@
 !!*       work  :   work area
 !!*
 !!*************************************************************
+!!
+!!      subroutine get_dgree_order_by_full_j(j, l, m)
+!!      integer(kind = kint) function get_idx_by_full_degree_order(l, m)
 !!@endverbatim
 !*
       module spherical_harmonics
@@ -205,6 +208,28 @@
       return
       end subroutine spheric
 !*
+!  ---------------------------------------------------------------------
+!
+      subroutine get_dgree_order_by_full_j(j, l, m)
+!
+      integer(kind = kint), intent(in) :: j
+      integer(kind = kint), intent(inout) :: l, m
+!
+      l = int(aint(sqrt(real(j))))
+      m = j - l*(l+1)
+!
+      end subroutine get_dgree_order_by_full_j
+!
+!  ---------------------------------------------------------------------
+!
+      integer(kind = kint) function get_idx_by_full_degree_order(l, m)
+!
+      integer(kind = kint), intent(in) :: l, m
+!
+      get_idx_by_full_degree_order = l*(l+1) + m
+!
+      end function get_idx_by_full_degree_order
+!
 !  ---------------------------------------------------------------------
 !
       end module spherical_harmonics
