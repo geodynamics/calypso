@@ -37,15 +37,15 @@
      &          ntot_comp, ncomp_field, field_name, d_nod,              &
      &          istack_numnod, istack_intnod)
 !
-      integer(kind = kint), intent(in) ::  id_vtk
-      integer (kind=kint), intent(in) :: nnod
-      integer (kind=kint), intent(in) :: num_field, ntot_comp
-      integer(kind=kint ), intent(in) :: ncomp_field(num_field)
+      integer(kind=kint), intent(in) ::  id_vtk
+      integer(kind=kint_gl), intent(in) :: nnod
+      integer(kind=kint), intent(in) :: num_field, ntot_comp
+      integer(kind=kint), intent(in) :: ncomp_field(num_field)
       character(len=kchara), intent(in) :: field_name(num_field)
       real(kind = kreal), intent(in) :: d_nod(nnod,ntot_comp)
 !
-      integer (kind=kint), intent(in) :: istack_numnod(0:nprocs)
-      integer (kind=kint), intent(in) :: istack_intnod(0:nprocs)
+      integer (kind=kint_gl), intent(in) :: istack_numnod(0:nprocs)
+      integer (kind=kint_gl), intent(in) :: istack_intnod(0:nprocs)
 !
       integer(kind = kint) :: icou, j
 !
@@ -73,31 +73,28 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_merged_vtk_mesh(id_vtk, nnod, nele, nnod_ele,    &
-     &          xx, ie, istack_numnod, istack_intnod, istack_numele)
+      subroutine write_merged_vtk_mesh(id_vtk, ucd, m_ucd)
 !
       use m_geometry_constants
       use m_phys_constants
+      use t_ucd_data
 !
       integer(kind = kint), intent(in) ::  id_vtk
-      integer(kind = kint), intent(in) :: nnod, nele
-      integer(kind = kint), intent(in) :: nnod_ele
-      integer(kind = kint), intent(in) :: ie(nele,nnod_ele)
-      real(kind = kreal), intent(in) :: xx(nnod,n_vector)
-!
-      integer (kind=kint), intent(in) :: istack_numnod(0:nprocs)
-      integer (kind=kint), intent(in) :: istack_intnod(0:nprocs)
-      integer (kind=kint), intent(in) :: istack_numele(0:nprocs)
+      type(ucd_data), intent(in) :: ucd
+      type(merged_ucd_data), intent(in) :: m_ucd
 !
 !
       if(my_rank .eq. 0) then
-        call write_vtk_node_head(id_vtk, istack_intnod(nprocs) )
+        call write_vtk_node_head                                        &
+     &     (id_vtk, m_ucd%istack_merged_intnod(nprocs) )
       end if
-      call write_merged_vtk_each_field(id_vtk, nnod, n_vector, xx,      &
-     &    istack_numnod, istack_intnod)
+      call write_merged_vtk_each_field(id_vtk,                          &
+     &    ucd%nnod, n_vector, ucd%xx,                                   &
+     &    m_ucd%istack_merged_nod, m_ucd%istack_merged_intnod)
 !
-      call write_merged_vtk_connect(id_vtk, nele, nnod_ele, ie,         &
-     &    istack_numele)
+      call write_merged_vtk_connect(id_vtk,                             &
+     &    ucd%nele, ucd%nnod_4_ele, ucd%ie,                             &
+     &    m_ucd%istack_merged_ele)
 !
       end subroutine write_merged_vtk_mesh
 !
@@ -110,12 +107,13 @@
       use m_geometry_constants
       use m_merged_ucd_data
 !
-      integer(kind = kint), intent(in) ::  id_vtk
-      integer(kind = kint), intent(in) :: nele, nnod_ele
-      integer(kind = kint), intent(in) :: ie(nele,nnod_ele)
-      integer (kind=kint), intent(in) :: istack_numele(0:nprocs)
+      integer(kind = kint), intent(in) ::  id_vtk, nnod_ele
+      integer(kind = kint_gl), intent(in) :: nele
+      integer(kind = kint_gl), intent(in) :: ie(nele,nnod_ele)
+      integer(kind=kint_gl), intent(in) :: istack_numele(0:nprocs)
 !
-      integer(kind = kint) :: ip, num, isend_rank
+      integer(kind = kint) :: ip, num4, isend_rank
+      integer(kind = kint_gl) :: num
 !
 !
       if(my_rank .eq. 0) then
@@ -131,15 +129,16 @@
         isend_rank = ip- 1
 !
         if(my_rank .eq. isend_rank) then
-          num = nele*nnod_ele
-          call MPI_ISEND(ie(1,1), num, CALYPSO_INTEGER,                 &
+          num4 = int(nele*nnod_ele)
+          call MPI_ISEND(ie(1,1), num4, CALYPSO_GLOBAL_INT,             &
      &        izero, 0, CALYPSO_COMM, req1, ierr_MPI)
         end if
 !C
 !C-- RECV
         if(my_rank .eq. 0) then
-          num = (istack_numele(ip) - istack_numele(ip-1)) * nnod_ele
-          call MPI_IRECV(ie_single_ucd(1), num, CALYPSO_INTEGER,        &
+          num4 = int(istack_numele(ip) - istack_numele(ip-1))           &
+     &          * nnod_ele
+          call MPI_IRECV(ie_single_ucd(1), num4, CALYPSO_GLOBAL_INT,    &
      &        isend_rank, 0, CALYPSO_COMM, req2, ierr_MPI)
 !
           call MPI_WAITALL (ione, req2, sta2, ierr_MPI)
@@ -169,13 +168,14 @@
 !
       use m_merged_ucd_data
 !
-      integer(kind = kint), intent(in) ::  id_vtk
-      integer (kind=kint), intent(in) :: numnod, ncomp_field
+      integer(kind = kint), intent(in) ::  id_vtk, ncomp_field
+      integer(kind=kint_gl), intent(in) :: numnod
       real(kind = kreal), intent(in) :: d_nod(numnod,ncomp_field)
-      integer (kind=kint), intent(in) :: istack_numnod(0:nprocs)
-      integer (kind=kint), intent(in) :: istack_intnod(0:nprocs)
+      integer(kind=kint_gl), intent(in) :: istack_numnod(0:nprocs)
+      integer(kind=kint_gl), intent(in) :: istack_intnod(0:nprocs)
 !
-      integer(kind = kint) :: ip, num, nnod, isend_rank
+      integer(kind = kint) :: ip, num4, isend_rank
+      integer(kind = kint_gl) :: nnod
 !
 !
       if(my_rank .eq. 0) then
@@ -188,23 +188,23 @@
 !C
 !C-- SEND
         if(my_rank .eq. isend_rank ) then
-          num = numnod*ncomp_field
-          call MPI_ISEND(d_nod(1,1), num, CALYPSO_REAL,                 &
+          num4 = int(numnod*ncomp_field)
+          call MPI_ISEND(d_nod(1,1), num4, CALYPSO_REAL,                &
      &        izero, 0, CALYPSO_COMM, req1, ierr_MPI)
         end if
 !C
 !C-- RECV
         if(my_rank .eq. 0) then
-          num = (istack_numnod(ip) - istack_numnod(ip-1)) * ncomp_field
-          call MPI_IRECV(d_single_ucd(1), num, CALYPSO_REAL,            &
+          num4 = int(istack_numnod(ip) - istack_numnod(ip-1))           &
+     &          * ncomp_field
+          call MPI_IRECV(d_single_ucd(1), num4, CALYPSO_REAL,           &
      &        isend_rank, 0, CALYPSO_COMM, req2, ierr_MPI)
 !
           call MPI_WAITALL (ione, req2, sta2, ierr_MPI)
 !
           nnod = istack_numnod(ip) - istack_numnod(ip-1)
-          num =  istack_intnod(ip) - istack_intnod(ip-1)
           call write_vtk_each_field(id_vtk, nnod,                       &
-     &        ncomp_field, num, d_single_ucd(1))
+     &        ncomp_field, nnod, d_single_ucd(1))
         end if
 !
         if(my_rank .eq. isend_rank ) then

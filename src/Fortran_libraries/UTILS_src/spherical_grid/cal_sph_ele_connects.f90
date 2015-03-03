@@ -20,9 +20,7 @@
       use m_gauss_points
       use t_geometry_data
 !
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
-!
       use cal_sph_node_addresses
       use cal_sph_ele_addresses
 !
@@ -45,7 +43,7 @@
       integer(kind = kint) :: iele
 !
 !
-      do m = 1, nidx_global_rtp(3)
+      do m = 1, nidx_global_fem(3)
         m1 = ie_sph_p(m,1)
         m2 = ie_sph_p(m,2)
         do l = 1, nele_sph_t(ip_t)
@@ -166,10 +164,10 @@
 !
 !
       k2 = ie_center_r(2,ip_r)
-      do m = 1, nidx_global_rtp(3)
+      do m = 1, nidx_global_fem(3)
         m1 = ie_sph_p(m,1)
         m2 = ie_sph_p(m,2)
-        do l = 1, nidx_global_rtp(2)-1
+        do l = 1, nidx_global_fem(2)-1
           l1 = ie_center_t(l,1)
           l2 = ie_center_t(l,2)
 !
@@ -216,7 +214,7 @@
 !
 !
       k2 = ie_center_r(2,ip_r)
-      do m = 1, nidx_global_rtp(3)
+      do m = 1, nidx_global_fem(3)
         m1 = ie_sph_p(m,1)
         m2 = ie_sph_p(m,2)
         do l = 1, nele_sph_t(ip_t)

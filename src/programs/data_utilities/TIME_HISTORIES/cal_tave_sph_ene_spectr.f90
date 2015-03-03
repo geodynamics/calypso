@@ -145,6 +145,7 @@
       integer(kind = kint) :: kr, nd, lth
 !
 !
+      write(*,*) '(time_sph - time_ini)', (time_sph - time_ini)
 !$omp parallel private(kr,lth,nd)
       do kr = 1, nri_sph
 !$omp do

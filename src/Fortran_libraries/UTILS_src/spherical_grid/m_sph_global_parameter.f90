@@ -3,14 +3,14 @@
 !
 !     Written by H. Matsui on July, 2007
 !
-!      subroutine allocate_sph_gl_parameter
-!      subroutine allocate_sph_gl_bc_param
-!
-!      subroutine deallocate_sph_gl_parameter
-!      subroutine deallocate_sph_gl_bc_param
-!
-!      subroutine check_spheric_global_param(my_rank)
-!      subroutine check_sph_gl_bc_param(my_rank)
+!!      subroutine allocate_sph_gl_parameter
+!!      subroutine allocate_sph_gl_bc_param
+!!
+!!      subroutine deallocate_sph_gl_parameter
+!!      subroutine deallocate_sph_gl_bc_param
+!!
+!!      subroutine check_spheric_global_param(my_rank)
+!!      subroutine check_sph_gl_bc_param(my_rank)
 !
 !
       module m_sph_global_parameter

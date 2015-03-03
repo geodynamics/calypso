@@ -11,9 +11,10 @@
 !!      subroutine dealloc_sphere_ave_coriolis
 !!
 !!      subroutine set_colatitude_rtp
-!!      subroutine cal_wz_coriolis_rtp
-!!      subroutine cal_wz_div_coriolis_rtp
-!!      subroutine subtract_sphere_ave_coriolis
+!!      subroutine cal_wz_coriolis_rtp(nnod, velo_rtp, coriolis_rtp)
+!!      subroutine cal_wz_div_coriolis_rtp(nnod, velo_rtp,              &
+!!     &          div_coriolis_rtp)
+!!      subroutine subtract_sphere_ave_coriolis(nnod, drtp_coriolis)
 !!
 !!      subroutine ovwrt_rj_coef_prod_vect_smp(coef, i_r)
 !!      subroutine clear_rj_degree0_scalar_smp(irj_fld)
@@ -29,7 +30,6 @@
 !
       use m_machine_parameter
       use m_spheric_parameter
-      use m_sph_spectr_data
 !
       implicit none
 !
@@ -98,11 +98,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_wz_coriolis_rtp
+      subroutine cal_wz_coriolis_rtp(nnod, velo_rtp, coriolis_rtp)
 !
       use m_sph_phys_address
       use m_physical_property
       use m_work_4_sph_trans
+!
+      integer(kind = kint), intent(in) :: nnod
+      real(kind = kreal), intent(in) :: velo_rtp(nnod,3)
+      real(kind = kreal), intent(inout) :: coriolis_rtp(nnod,3)
 !
       integer(kind = kint) :: mphi, l_rtp, kr, inod
       real(kind = kreal) :: omega(3)
@@ -119,15 +123,15 @@
             omega(2) = -sin( theta_1d_rtp(l_rtp) )
             omega(3) = zero
 !
-            d_rtp(inod,irtp%i_coriolis  ) = - coef_cor                  &
-     &                         * ( omega(2)*d_rtp(inod,irtp%i_velo+2)   &
-     &                           - omega(3)*d_rtp(inod,irtp%i_velo+1) )
-            d_rtp(inod,irtp%i_coriolis+1) = - coef_cor                  &
-     &                         * ( omega(3)*d_rtp(inod,irtp%i_velo  )   &
-     &                           - omega(1)*d_rtp(inod,irtp%i_velo+2) )
-            d_rtp(inod,irtp%i_coriolis+2) = - coef_cor                  &
-     &                         * ( omega(1)*d_rtp(inod,irtp%i_velo+1)   &
-     &                           - omega(2)*d_rtp(inod,irtp%i_velo  ) )
+            coriolis_rtp(inod,1) = - coef_cor                           &
+     &                         * ( omega(2)*velo_rtp(inod,3)            &
+     &                           - omega(3)*velo_rtp(inod,2) )
+            coriolis_rtp(inod,2) = - coef_cor                           &
+     &                         * ( omega(3)*velo_rtp(inod,1)            &
+     &                           - omega(1)*velo_rtp(inod,3) )
+            coriolis_rtp(inod,3) = - coef_cor                           &
+     &                         * ( omega(1)*velo_rtp(inod,2)            &
+     &                           - omega(2)*velo_rtp(inod,1) )
           end do
         end do
       end do
@@ -137,11 +141,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_wz_div_coriolis_rtp
+      subroutine cal_wz_div_coriolis_rtp(nnod, velo_rtp,                &
+     &          div_coriolis_rtp)
 !
-      use m_sph_phys_address
       use m_physical_property
       use m_work_4_sph_trans
+!
+      integer(kind = kint), intent(in) :: nnod
+      real(kind = kreal), intent(in) :: velo_rtp(nnod,3)
+      real(kind = kreal), intent(inout) :: div_coriolis_rtp(nnod)
 !
       integer(kind = kint) :: mphi, l_rtp, kr, inod
       real(kind = kreal) :: omega(3)
@@ -158,9 +166,9 @@
             omega(2) = -sin( theta_1d_rtp(l_rtp) )
             omega(3) = zero
 !
-            d_rtp(inod,irtp%i_div_Coriolis) = coef_cor                  &
-     &                         * ( omega(1)*d_rtp(inod,irtp%i_velo  )   &
-     &                           - omega(2)*d_rtp(inod,irtp%i_velo+1) )
+            div_coriolis_rtp(inod)                                      &
+     &          = coef_cor * ( omega(1)*velo_rtp(inod,1)                &
+     &                       - omega(2)*velo_rtp(inod,2) )
           end do
         end do
       end do
@@ -170,11 +178,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine subtract_sphere_ave_coriolis
+      subroutine subtract_sphere_ave_coriolis(nnod, coriolis_rtp)
 !
       use calypso_mpi
       use m_sph_phys_address
+      use m_sph_spectr_data
       use m_work_4_sph_trans
+!
+      integer(kind = kint), intent(in) :: nnod
+      real(kind = kreal), intent(inout) :: coriolis_rtp(nnod,3)
 !
       integer(kind = kint) :: mphi, l_rtp, kr, k_gl, inod
 !
@@ -201,8 +213,8 @@
             inod = kr + (l_rtp-1) * nidx_rtp(1)                         &
      &                + (mphi-1)  * nidx_rtp(1)*nidx_rtp(2)
 !
-            d_rtp(inod,irtp%i_coriolis) = d_rtp(inod,irtp%i_coriolis)   &
-     &                                   - sphere_ave_coriolis_g(k_gl)
+            coriolis_rtp(inod,1) = coriolis_rtp(inod,1)                 &
+     &                             - sphere_ave_coriolis_g(k_gl)
           end do
         end do
       end do
@@ -216,6 +228,7 @@
       subroutine ovwrt_rj_coef_prod_vect_smp(coef, i_r)
 !
       use m_spheric_param_smp
+      use m_sph_spectr_data
       use overwrite_prod_const_smp
 !
       real(kind = kreal), intent(in) :: coef
@@ -230,6 +243,8 @@
 !-----------------------------------------------------------------------
 !
       subroutine clear_rj_degree0_scalar_smp(irj_fld)
+!
+      use m_sph_spectr_data
 !
       integer (kind = kint), intent(in) :: irj_fld
 !
@@ -250,6 +265,8 @@
 ! ----------------------------------------------------------------------
 !
       subroutine clear_rj_degree0_vector_smp(irj_fld)
+!
+      use m_sph_spectr_data
 !
       integer (kind = kint), intent(in) :: irj_fld
 !

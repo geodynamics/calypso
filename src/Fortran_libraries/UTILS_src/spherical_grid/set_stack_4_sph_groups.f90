@@ -1,11 +1,17 @@
-!set_stack_4_sph_groups.f90
-!      module set_stack_4_sph_groups
+!>@file   set_stack_4_sph_groups.f90
+!!@brief  module set_stack_4_sph_groups
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine set_stack_rtp_radial_grp
-!      subroutine set_stack_rj_radial_grp
-!      subroutine set_stack_rj_spectr_grp
+!>@brief  Make group informations for spherical shell model
+!!
+!!
+!!@verbatim
+!!      subroutine set_stack_rtp_radial_grp
+!!      subroutine set_stack_rj_radial_grp
+!!      subroutine set_stack_rj_spectr_grp
+!!@endverbatim
 !
       module set_stack_4_sph_groups
 !
@@ -24,7 +30,6 @@
 !
       private :: name_mid
       private :: name_y00, name_y10, name_y11s, name_y11c
-      private :: izero, ione, itwo, ithree
       private :: set_stack_sph_grp_by_list, set_stack_sph_grp_by_rng
 !
 ! -----------------------------------------------------------------------

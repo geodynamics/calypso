@@ -28,8 +28,10 @@
       use m_constants
       use m_spheric_parameter
       use m_sph_trans_comm_table
+      use select_copy_from_recv
 !
-      use select_calypso_SR
+      use calypso_SR
+      use m_solver_SR
 !
       implicit none
 !
@@ -49,8 +51,6 @@
       use m_spheric_parameter
       use m_sph_trans_comm_table
 !
-      use m_solver_SR
-!
       real (kind=kreal), intent(inout) :: X_rtp(nnod_rtp)
       real (kind=kreal), intent(inout) :: X_rtm(nnod_rtm)
       real (kind=kreal), intent(inout) :: X_rlm(nnod_rlm)
@@ -60,7 +60,7 @@
       integer (kind=kint) :: nnod_max_send,  nnod_max_recv
       integer (kind=kint), parameter :: NB = 1
 !
-      real(kind = kreal) :: stime, etime
+      real(kind = kreal) :: starttime, endtime
       real(kind = kreal) :: etime_item_import, etime_irev_import
 !
 !
@@ -90,25 +90,25 @@
 !
 !
       iflag_sph_SR = iflag_import_item
-      stime = MPI_WTIME()
+      starttime = MPI_WTIME()
       call send_recv_rtp_2_rtm(X_rtp, X_rtm)
       call send_recv_rtm_2_rtp(X_rtm, X_rtp)
       call send_recv_rj_2_rlm(X_rj, X_rlm)
       call send_recv_rlm_2_rj(X_rlm, X_rj)
 !
-      etime = MPI_WTIME() - stime
-      call MPI_allREDUCE (etime, etime_item_import, ione,               &
+      endtime = MPI_WTIME() - starttime
+      call MPI_allREDUCE (endtime, etime_item_import, ione,             &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       iflag_sph_SR = iflag_import_rev
-      stime = MPI_WTIME()
+      starttime = MPI_WTIME()
       call send_recv_rtp_2_rtm(X_rtp, X_rtm)
       call send_recv_rtm_2_rtp(X_rtm, X_rtp)
       call send_recv_rj_2_rlm(X_rj, X_rlm)
       call send_recv_rlm_2_rj(X_rlm, X_rj)
 !
-      etime = MPI_WTIME() - stime
-      call MPI_allREDUCE (etime, etime_irev_import, ione,               &
+      endtime = MPI_WTIME() - starttime
+      call MPI_allREDUCE (endtime, etime_irev_import, ione,             &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       if(etime_irev_import .le. etime_item_import) then
@@ -136,7 +136,7 @@
       real (kind=kreal), intent(inout):: X_rtm(nnod_rtm)
 !
 !
-      call sel_calypso_send_recv(iflag_sph_SR, nnod_rtp, nnod_rtm,      &
+      call calypso_send_recv(iflag_sph_SR, nnod_rtp, nnod_rtm,          &
      &              nneib_domain_rtp, iflag_self_rtp,                   &
      &              id_domain_rtp, istack_sr_rtp, item_sr_rtp,          &
      &              nneib_domain_rtm, iflag_self_rtm,                   &
@@ -156,7 +156,7 @@
       real (kind=kreal), intent(inout):: X_rtp(nnod_rtp)
 !
 !
-      call sel_calypso_send_recv(iflag_sph_SR, nnod_rtm, nnod_rtp,      &
+      call calypso_send_recv(iflag_sph_SR, nnod_rtm, nnod_rtp,          &
      &              nneib_domain_rtm, iflag_self_rtm,                   &
      &              id_domain_rtm, istack_sr_rtm, item_sr_rtm,          &
      &              nneib_domain_rtp, iflag_self_rtp,                   &
@@ -176,7 +176,7 @@
       real (kind=kreal), intent(inout):: X_rlm(nnod_rlm)
 !
 !
-      call sel_calypso_send_recv(iflag_sph_SR, nnod_rj, nnod_rlm,       &
+      call calypso_send_recv(iflag_sph_SR, nnod_rj, nnod_rlm,           &
      &              nneib_domain_rj, iflag_self_rj,                     &
      &              id_domain_rj, istack_sr_rj, item_sr_rj,             &
      &              nneib_domain_rlm, iflag_self_rlm,                   &
@@ -196,7 +196,7 @@
       real (kind=kreal), intent(inout):: X_rj(nnod_rj)
 !
 !
-      call sel_calypso_send_recv(iflag_sph_SR, nnod_rlm, nnod_rj,       &
+      call calypso_send_recv(iflag_sph_SR, nnod_rlm, nnod_rj,           &
      &              nneib_domain_rlm, iflag_self_rlm,                   &
      &              id_domain_rlm, istack_sr_rlm, item_sr_rlm,          &
      &              nneib_domain_rj, iflag_self_rj,                     &

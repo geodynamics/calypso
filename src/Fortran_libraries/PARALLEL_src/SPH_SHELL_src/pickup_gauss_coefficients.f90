@@ -4,7 +4,7 @@
 !!@author H. Matsui and H. Okuda
 !!@date Programmed in  Dec., 2012
 !
-!> @brief choose Gauss coefficients to output
+!> @brief Pick Gauss coefficients to output
 !>@n      Evaluate Nusselt number without heat source
 !!
 !!@verbatim
@@ -36,6 +36,8 @@
 !
       use m_sph_phys_address
       use m_gauss_coefs_monitor_data
+!
+      integer(kind = kint) :: l
 !
 !
       if (ipol%i_magne .gt. 0) then
@@ -99,9 +101,25 @@
           inod =  j +    (nlayer_CMB-1) * nidx_rj(2)
           gauss_coef_lc(inum) = d_rj(inod,ipol%i_magne) * dble(l)       &
      &                        * rcmb_to_Re**l *a2r_4_gauss
-        end if
-      end do
+          end if
+        end do
 !$omp end parallel do
+!
+      else if(r_4_gauss_coefs .le. radius_1d_rj_r(nlayer_ICB)) then
+        a2r_4_gauss = one / (radius_1d_rj_r(nlayer_ICB)**2)
+        ricb_to_Rref = r_4_gauss_coefs / radius_1d_rj_r(nlayer_ICB)
+!$omp parallel do private(j,l,inod)
+        do inum = 1, num_pick_gauss_mode
+          j = idx_pick_gauss_coef_lc(inum)
+          l = idx_pick_gauss_coef_gl(inum,2)
+          if(j .gt. izero) then
+            inod =  j +    (nlayer_ICB-1) * nidx_rj(2)
+            gauss_coef_lc(inum) = - d_rj(inod,ipol%i_magne) * dble(l+1) &
+     &                            * ricb_to_Rref**(l-1) *a2r_4_gauss
+          end if
+        end do
+!$omp end parallel do
+      end if
 !
       call MPI_allREDUCE(gauss_coef_lc(1), gauss_coef_gl(1),            &
      &    num_pick_gauss_mode, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM,     &

@@ -35,7 +35,7 @@
       subroutine initialize_add_sph_initial
 !
       use set_control_sph_mhd
-      use m_ctl_data_noviz_MHD
+      use m_ctl_data_sph_MHD_noviz
       use init_sph_MHD_elapsed_label
 !
 !
@@ -47,8 +47,8 @@
 !
       call start_eleps_time(1)
       call start_eleps_time(4)
-      if (iflag_debug.eq.1) write(*,*) 'read_control_4_MHD_noviz'
-      call read_control_4_MHD_noviz
+      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_noviz'
+      call read_control_4_sph_MHD_noviz
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
       call set_control_4_sph_mhd
 !
@@ -64,6 +64,7 @@
       call SPH_add_initial_field
 !
       call end_eleps_time(2)
+      call reset_elapse_4_init_sph_mhd
 !
       end subroutine initialize_add_sph_initial
 !
@@ -79,7 +80,7 @@
       use m_physical_property
 !
       use set_control_sph_mhd
-      use load_data_for_sph_IO
+      use parallel_load_data_4_sph
       use const_sph_initial_spectr
       use set_reference_sph_mhd
       use set_bc_sph_mhd
@@ -94,17 +95,15 @@
 !
 !   Load spherical harmonics data
 !
-      if (iflag_debug.eq.1) write(*,*) 'input_sph_trans_grids'
+      if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
       call start_eleps_time(4)
-      call input_sph_trans_grids(my_rank)
+      call load_para_sph_mesh
       call end_eleps_time(4)
 !
 !   Allocate spectr field data
 !
       call allocate_phys_rj_data
-      call allocate_phys_rtp_data
       call set_sph_sprctr_data_address
-      call set_sph_nod_data_address
 !
 ! ---------------------------------
 !

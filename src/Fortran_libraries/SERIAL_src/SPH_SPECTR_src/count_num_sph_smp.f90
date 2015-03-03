@@ -1,9 +1,16 @@
+!>@file   count_num_sph_smp.f90
+!!@brief  module count_num_sph_smp
+!!
+!!@author H. Matsui
+!!@date Programmed in Aug., 2007
 !
-!      module count_num_sph_smp
-!
-!        programmed by H. Matsui on Aug., 2007
-!
-!      subroutine s_count_num_sph_smp
+!>@brief  
+!!
+!!@verbatim
+!!      subroutine s_count_num_sph_smp(ierr)
+!!@endverbatim
+!!
+!!@param  ierr  Error flag
 !
       module count_num_sph_smp
 !
@@ -12,21 +19,32 @@
 !
       implicit none
 !
+!>      Error message
+      character(len=kchara), parameter :: e_message_Rsmp                &
+     &  = '# of r-grid for SPH trans. should be more than SMP threads'
+!
 !  ---------------------------------------------------------------------
 !
       contains
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_count_num_sph_smp
+      subroutine s_count_num_sph_smp(ierr)
 !
       use m_machine_parameter
       use m_spheric_parameter
       use m_spheric_param_smp
       use cal_minmax_and_stacks
 !
+      integer(kind = kint), intent(inout) :: ierr
       integer(kind = kint) :: num
 !
+!
+      ierr = 0
+      if(nidx_rtm(1) .lt. np_smp) then
+        ierr = 72
+        return
+      end if
 !
       call allocate_sph_param_smp
 !

@@ -144,7 +144,7 @@
 !
       integer(kind=kint), allocatable, target  :: ie_org(:,:)
 !   element connectivity  (where i:nodal order j:element id)
-      integer(kind=kint), allocatable, target  ::  globalelmid_org(:)
+      integer(kind=kint_gl), allocatable, target :: iele_global_org(:)
 !   global element id (where i:element id)
 !
 !------------------------------------------------------------------
@@ -193,9 +193,9 @@
       use m_geometry_parameter
 !
 !
-      allocate(globalelmid_org(numele))
+      allocate(iele_global_org(numele))
       allocate(ie_org(numele,nnod_4_ele))
-      globalelmid_org = 0
+      iele_global_org = 0
       ie_org =          0
 !
       end subroutine allocate_element_connect_org
@@ -302,7 +302,7 @@
 !
        subroutine deallocate_element_connect_org
 !
-       deallocate(ie_org, globalelmid_org)
+       deallocate(ie_org, iele_global_org)
 !
        end subroutine deallocate_element_connect_org
 !

@@ -10,14 +10,13 @@
 !!
 !!
 !!@verbatim
-!!      subroutine leg_bwd_trans_vector_long(ncomp, nvector)
-!!      subroutine leg_bwd_trans_scalar_long(ncomp, nvector, nscalar)
+!!      subroutine leg_backward_trans_long                              &
+!!     &         (ncomp, nvector, nscalar, n_WR, n_WS, WR, WS)
 !!        Input:  sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!        Output: vr_rtm   (Order: radius,theta,phi)
 !!
 !!    Forward transforms
-!!      subroutine leg_fwd_trans_vector_long(ncomp, nvector)
-!!      subroutine leg_fwd_trans_scalar_long(ncomp, nvector, nscalar)
+!!      subroutine leg_forward_trans_long(ncomp, nvector, nscalar)
 !!        Input:  vr_rtm   (Order: radius,theta,phi)
 !!        Output: sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!@endverbatim
@@ -39,67 +38,58 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine leg_bwd_trans_vector_long(ncomp, nvector)
+      subroutine leg_backward_trans_long                                &
+     &         (ncomp, nvector, nscalar, n_WR, n_WS, WR, WS)
 !
+      use m_work_4_sph_trans_spin
       use legendre_bwd_trans_lgloop
-      use merge_polidal_toroidal_v
-!
-      integer(kind = kint), intent(in) :: ncomp, nvector
-!
-!
-      call clear_bwd_legendre_trans(ncomp)
-      call legendre_b_trans_vector_long(ncomp, nvector)
-      call const_vect_sph_b_trans(ncomp, nvector)
-!
-      end subroutine leg_bwd_trans_vector_long
-!
-! -----------------------------------------------------------------------
-!
-      subroutine leg_bwd_trans_scalar_long(ncomp, nvector, nscalar)
-!
-      use legendre_bwd_trans_lgloop
-      use merge_polidal_toroidal_v
+      use spherical_SRs_N
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      integer(kind = kint), intent(in) :: n_WR, n_WS
+      real (kind=kreal), intent(inout):: WR(n_WR)
+      real (kind=kreal), intent(inout):: WS(n_WS)
 !
 !
-      call clear_bwd_legendre_trans(ncomp)
-      call legendre_b_trans_scalar_long(ncomp, nvector, nscalar)
+      call calypso_rlm_from_recv_N(ncomp, n_WR, WR, sp_rlm_wk(1))
+      call clear_bwd_legendre_work(ncomp)
 !
-      end subroutine leg_bwd_trans_scalar_long
+      call legendre_b_trans_vector_long                                 &
+     &     (ncomp, nvector, sp_rlm_wk(1), vr_rtm_wk(1))
+      call legendre_b_trans_scalar_long                                 &
+     &     (ncomp, nvector, nscalar, sp_rlm_wk(1), vr_rtm_wk(1))
+!
+      call finish_send_recv_rj_2_rlm
+      call calypso_rtm_to_send_N(ncomp, n_WS, vr_rtm_wk(1), WS)
+!
+      end subroutine leg_backward_trans_long
 !
 ! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
 !
-      subroutine leg_fwd_trans_vector_long(ncomp, nvector)
+      subroutine leg_forward_trans_long                                 &
+     &         (ncomp, nvector, nscalar, n_WR, n_WS, WR, WS)
 !
+      use m_work_4_sph_trans_spin
       use legendre_fwd_trans_lgloop
-      use merge_polidal_toroidal_v
-!
-      integer(kind = kint), intent(in) :: ncomp, nvector
-!
-!
-      call prod_r_vect_sph_f_trans(ncomp, nvector)
-!
-      call clear_fwd_legendre_trans(ncomp)
-      call legendre_f_trans_vector_long(ncomp, nvector)
-!
-      end subroutine leg_fwd_trans_vector_long
-!
-! -----------------------------------------------------------------------
-!
-      subroutine leg_fwd_trans_scalar_long(ncomp, nvector, nscalar)
-!
-      use legendre_fwd_trans_lgloop
-      use merge_polidal_toroidal_v
+      use spherical_SRs_N
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      integer(kind = kint), intent(in) :: n_WR, n_WS
+      real (kind=kreal), intent(inout):: WR(n_WR)
+      real (kind=kreal), intent(inout):: WS(n_WS)
 !
 !
-      call clear_fwd_legendre_trans(ncomp)
-      call legendre_f_trans_scalar_long(ncomp, nvector, nscalar)
+      call calypso_rtm_from_recv_N(ncomp, n_WR, WR, vr_rtm_wk(1))
 !
-      end subroutine leg_fwd_trans_scalar_long
+      call legendre_f_trans_vector_long                                 &
+     &    (ncomp, nvector, vr_rtm_wk(1), sp_rlm_wk(1))
+      call legendre_f_trans_scalar_long                                 &
+     &    (ncomp, nvector, nscalar, vr_rtm_wk(1), sp_rlm_wk(1))
+!
+      call finish_send_recv_rtp_2_rtm
+      call calypso_rlm_to_send_N(ncomp, n_WS, sp_rlm_wk(1), WS)
+!
+      end subroutine leg_forward_trans_long
 !
 ! -----------------------------------------------------------------------
 !

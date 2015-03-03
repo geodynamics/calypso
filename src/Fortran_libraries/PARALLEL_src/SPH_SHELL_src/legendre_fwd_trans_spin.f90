@@ -10,16 +10,19 @@
 !!
 !!@verbatim
 !!      subroutine legendre_f_trans_vector_spin(ncomp, nvector,         &
-!!     &          vr_rtm_spin, sp_rlm_spin)
-!!      subroutine legendre_f_trans_scalar_spin(ncomp, nscalar, nvector,&
-!!     &          vr_rtm_spin, sp_rlm_spin)
-!!        Input:  vr_rtm_spin
-!!        Output: sp_rlm_spin
+!!     &          irev_sr_rtm, irev_sr_rlm, n_WR, n_WS, WR, WS)
+!!        Input:  vr_rtm   (Order: radius,theta,phi)
+!!        Output: sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
+!!      subroutine legendre_f_trans_scalar_spin                         &
+!!     &         (ncomp, nvector, nscalar, vr_rtm, sp_rlm)
+!!        Input:  vr_rtm
+!!        Output: sp_rlm
 !!@endverbatim
 !!
-!!@n @param  ncomp    number of components to be transformed
-!!@n @param  nvector  number of vector to be transformed
-!!@n @param  nscalar  number of fields to be transformed
+!!@param   ncomp    Total number of components for spherical transform
+!!@param   nvector  Number of vector for spherical transform
+!!@param   nscalar  Number of scalar (including tensor components)
+!!                  for spherical transform
 !
       module legendre_fwd_trans_spin
 !
@@ -30,6 +33,7 @@
       use m_spheric_param_smp
       use m_schmidt_poly_on_rtm
       use m_work_4_sph_trans
+      use m_legendre_work_sym_matmul
 !
       implicit none
 !
@@ -40,74 +44,61 @@
 ! -----------------------------------------------------------------------
 !
       subroutine legendre_f_trans_vector_spin(ncomp, nvector,           &
-     &          vr_rtm_spin, sp_rlm_spin)
+     &          irev_sr_rtm, irev_sr_rlm, n_WR, n_WS, WR, WS)
+!
+      use set_vr_rtm_for_leg_vecprod
+      use cal_sp_rlm_by_vecprod
 !
       integer(kind = kint), intent(in) :: ncomp, nvector
-      real(kind = kreal), intent(in)                                    &
-     &      :: vr_rtm_spin(nidx_rtm(2),nidx_rtm(3),nidx_rtm(1)*ncomp)
-      real(kind = kreal), intent(inout)                                 &
-     &      :: sp_rlm_spin(nidx_rlm(2),nidx_rtm(1)*ncomp)
+      integer(kind = kint), intent(in) :: n_WR, n_WS
+      integer(kind = kint), intent(in) :: irev_sr_rtm(nnod_rtm)
+      integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
+      real (kind=kreal), intent(inout):: WR(n_WR)
+      real (kind=kreal), intent(inout):: WS(n_WS)
 !
-      integer(kind = kint) :: j_rlm, mp_rlm, mn_rlm, mst, med, l_rtm
-      integer(kind = kint) :: nb_nri, kr_nd
-      real(kind = kreal) :: pwt_tmp, dpwt_tmp, pgwt_tmp
+      integer(kind = kint) :: i_rlm, k_rlm, j_rlm, i_send
+      integer(kind = kint) :: kr_nd, nd, ip, kst, ked, lp, lst, nth
+      real(kind = kreal) :: r1_1d_rlm_r, r2_1d_rlm_r, g7, gm
 !
 !
-      nb_nri = nvector*nidx_rlm(1)
-!$omp parallel do private(j_rlm,l_rtm,mp_rlm,mn_rlm,                    &
-!$omp&               mst,med,pwt_tmp,dpwt_tmp,pgwt_tmp)
-!cdir nodep
-      do kr_nd = 1, nb_nri
-!      do nd = 1, nvector
-!        do k_rlm = 1, nidx_rlm(1)
-!          kr_nd = k_rlm + (nd-1) * nidx_rlm(1)
+!$omp parallel do schedule(static)                                      &
+!$omp             private(ip,kst,ked,lp,lst,nth,j_rlm,k_rlm,nd,kr_nd,   &
+!$omp&                    i_rlm,r1_1d_rlm_r,r2_1d_rlm_r,i_send,g7,gm)
+      do ip = 1, np_smp
+        kst = nvector*idx_rlm_smp_stack(ip-1,1) + 1
+        ked = nvector*idx_rlm_smp_stack(ip,  1)
+        do kr_nd = kst, ked
+          nd = 1 + mod((kr_nd-1),nvector)
+          k_rlm = 1 + (kr_nd - nd) / nvector
+          r1_1d_rlm_r = radius_1d_rlm_r(k_rlm)
+          r2_1d_rlm_r = radius_1d_rlm_r(k_rlm)*radius_1d_rlm_r(k_rlm)
 !
-        do mp_rlm = 1, nidx_rtm(3)
-          mn_rlm = nidx_rtm(3) - mp_rlm + 1
-          mst = lstack_rlm(mp_rlm-1)+1
-          med = lstack_rlm(mp_rlm)
-          do j_rlm = mst, med
-!cdir nodep
-            do l_rtm = 1, nidx_rtm(2)
-              pwt_tmp =  P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
-              dpwt_tmp = dPdt_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
-              pgwt_tmp = P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)         &
-     &                 * dble( idx_gl_1d_rlm_j(j_rlm,3) )               &
-     &                 * asin_theta_1d_rtm(l_rtm)
+          do lp = 1, nblock_l_rtm
+            lst = lstack_block_rtm(lp-1) 
+            nth = lstack_block_rtm(lp  ) - lstack_block_rtm(lp-1)
 !
-              sp_rlm_spin(j_rlm,kr_nd         )                         &
-     &         = sp_rlm_spin(j_rlm,kr_nd           )                    &
-     &           + vr_rtm_spin(l_rtm,mp_rlm,kr_nd         ) * pwt_tmp
+            do j_rlm = 1, nidx_rlm(2)
+              g7 = g_sph_rlm(j_rlm,7)
+              gm = dble(idx_gl_1d_rlm_j(j_rlm,3))
 !
-              sp_rlm_spin(j_rlm,kr_nd+nb_nri  )                         &
-     &         = sp_rlm_spin(j_rlm,kr_nd+nb_nri  )                      &
-     &         + ( vr_rtm_spin(l_rtm,mp_rlm,kr_nd+nb_nri  ) * dpwt_tmp  &
-     &           - vr_rtm_spin(l_rtm,mn_rlm,kr_nd+2*nb_nri) * pgwt_tmp)
+              i_rlm = 1 + (j_rlm-1) * istep_rlm(2)                      &
+     &                  + (k_rlm-1) * istep_rlm(1)
+              i_send = 3*nd-2 + (irev_sr_rlm(i_rlm) - 1) * ncomp
 !
-              sp_rlm_spin(j_rlm,kr_nd+2*nb_nri)                         &
-     &         = sp_rlm_spin(j_rlm,kr_nd+2*nb_nri)                      &
-     &         - ( vr_rtm_spin(l_rtm,mn_rlm,kr_nd+nb_nri  ) * pgwt_tmp  &
-     &           + vr_rtm_spin(l_rtm,mp_rlm,kr_nd+2*nb_nri) * dpwt_tmp)
+              call set_vr_rtm_vector_blocked(nd, k_rlm,                 &
+     &              mdx_p_rlm_rtm(j_rlm), mdx_n_rlm_rtm(j_rlm),         &
+     &              asin_theta_1d_rtm(1+lst), lst, nth,                 &
+     &              ncomp, irev_sr_rtm, n_WR, WR,                       &
+     &              symp_r(1,ip), asmp_t(1,ip), asmp_p(1,ip),           &
+     &              symn_t(1,ip), symn_p(1,ip))
+              call cal_vector_sp_rlm_dotprod                            &
+     &             (nth, g7, gm, r1_1d_rlm_r, r2_1d_rlm_r,              &
+     &              P_rtm(1+lst,j_rlm), dPdt_rtm(1+lst,j_rlm),          &
+     &              symp_r(1,ip), asmp_t(1,ip), asmp_p(1,ip),           &
+     &              symn_t(1,ip), symn_p(1,ip), WS(i_send))
             end do
           end do
         end do
-      end do
-!$omp end parallel do
-!
-!$omp parallel do private(j_rlm)
-      do kr_nd = 1, nb_nri
-!      do nd = 1, nvector
-!        do k_rlm = 1, nidx_rlm(1)
-!          kr_nd = k_rlm + (nd-1) * nidx_rlm(1)
-!
-          do j_rlm = 1, nidx_rlm(2)
-            sp_rlm_spin(j_rlm,kr_nd         )                           &
-     &        = sp_rlm_spin(j_rlm,kr_nd         ) * g_sph_rlm(j_rlm,7)
-            sp_rlm_spin(j_rlm,kr_nd+nb_nri  )                           &
-     &        = sp_rlm_spin(j_rlm,kr_nd+nb_nri  ) * g_sph_rlm(j_rlm,7)
-            sp_rlm_spin(j_rlm,kr_nd+2*nb_nri)                           &
-     &        = sp_rlm_spin(j_rlm,kr_nd+2*nb_nri) * g_sph_rlm(j_rlm,7)
-          end do
       end do
 !$omp end parallel do
 !
@@ -115,54 +106,51 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_f_trans_scalar_spin(ncomp, nscalar, nvector,  &
-     &          vr_rtm_spin, sp_rlm_spin)
+      subroutine legendre_f_trans_scalar_spin(ncomp, nvector, nscalar,  &
+     &          irev_sr_rtm, irev_sr_rlm, n_WR, n_WS, WR, WS)
 !
-      integer(kind = kint), intent(in) :: ncomp, nscalar, nvector
-      real(kind = kreal), intent(in)                                    &
-     &      :: vr_rtm_spin(nidx_rtm(2),nidx_rtm(3),nidx_rtm(1)*ncomp)
-      real(kind = kreal), intent(inout)                                 &
-     &      :: sp_rlm_spin(nidx_rlm(2),nidx_rtm(1)*ncomp)
+      use set_vr_rtm_for_leg_vecprod
+      use cal_sp_rlm_by_vecprod
 !
-      integer(kind = kint) :: j_rlm, l_rtm, mp_rlm, mst, med
-      integer(kind = kint) :: kr_nd, kst, ked
-      real(kind = kreal) :: pwt_tmp
+      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      integer(kind = kint), intent(in) :: n_WR, n_WS
+      integer(kind = kint), intent(in) :: irev_sr_rtm(nnod_rtm)
+      integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
+      real (kind=kreal), intent(inout):: WR(n_WR)
+      real (kind=kreal), intent(inout):: WS(n_WS)
+!
+      integer(kind = kint) :: i_rlm, k_rlm, j_rlm, i_send
+      integer(kind = kint) :: kr_nd, nd, ip, kst, ked, lp, lst, nth
 !
 !
-      kst = 1 + 3*nvector * nidx_rtm(1)
-      ked = (nscalar + 3*nvector) * nidx_rtm(1)
-!$omp parallel do private(j_rlm,l_rtm,pwt_tmp,mp_rlm,mst,med)
-!cdir nodep
-      do kr_nd = kst, ked
-!      do nd = nvector+1, nvector+nscalar
-!        do k_rlm = 1, nidx_rlm(1)
-!          kr_nd = k_rlm + (nd-1) * nidx_rlm(1)
+!$omp parallel do schedule(static)                                      &
+!$omp&            private(ip,kst,ked,lp,lst,nth,j_rlm,kr_nd,k_rlm,nd,   &
+!$omp&                    i_rlm,i_send)
+      do ip = 1, np_smp
+        kst = nscalar*idx_rlm_smp_stack(ip-1,1) + 1
+        ked = nscalar*idx_rlm_smp_stack(ip,  1)
 !
-        do mp_rlm = 1, nidx_rtm(3)
-          mst = lstack_rlm(mp_rlm-1)+1
-          med = lstack_rlm(mp_rlm)
-          do j_rlm = mst, med
-            do l_rtm = 1, nidx_rtm(2)
-              pwt_tmp =  P_rtm(l_rtm,j_rlm) * weight_rtm(l_rtm)
+        do kr_nd = kst, ked
+          nd = 1 + mod((kr_nd-1),nscalar)
+          k_rlm = 1 + (kr_nd - nd) / nscalar
+          do lp = 1, nblock_l_rtm
+            lst = lstack_block_rtm(lp-1)
+            nth = lstack_block_rtm(lp  ) - lstack_block_rtm(lp-1)
 !
-              sp_rlm_spin(j_rlm,kr_nd) = sp_rlm_spin(j_rlm,kr_nd)       &
-     &                  + vr_rtm_spin(l_rtm,mp_rlm,kr_nd) * pwt_tmp
+            do j_rlm = 1, nidx_rlm(2)
+              i_rlm = 1 + (j_rlm-1) * istep_rlm(2)                      &
+     &                    + (k_rlm-1) * istep_rlm(1)
+              i_send = nd + 3*nvector                                   &
+     &                      + (irev_sr_rlm(i_rlm) - 1) * ncomp
+!
+              call set_vr_rtm_scalar_blocked                            &
+     &             (nd, k_rlm, mdx_p_rlm_rtm(j_rlm), lst, nth,          &
+     &              ncomp, nvector, irev_sr_rtm, n_WR, WR, symp(1,ip))
+              call cal_scalar_sp_rlm_dotprod(nth, g_sph_rlm(j_rlm,6),   &
+     &             P_rtm(lst+1,j_rlm), symp(1,ip), WS(i_send))
             end do
           end do
         end do
-      end do
-!$omp end parallel do
-!
-!$omp parallel do private(j_rlm)
-      do kr_nd = kst, ked
-!      do nd = nvector+1, nvector+nscalar
-!        do k_rlm = 1, nidx_rlm(1)
-!          kr_nd = k_rlm + (nd-1) * nidx_rlm(1)
-!
-          do j_rlm = 1, nidx_rlm(2)
-            sp_rlm_spin(j_rlm,kr_nd) = sp_rlm_spin(j_rlm,kr_nd)         &
-     &                                  * g_sph_rlm(j_rlm,6)
-          end do
       end do
 !$omp end parallel do
 !
@@ -171,4 +159,3 @@
 ! -----------------------------------------------------------------------
 !
       end module legendre_fwd_trans_spin
-

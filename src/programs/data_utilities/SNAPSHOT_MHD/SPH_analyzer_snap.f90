@@ -34,7 +34,7 @@
       use m_physical_property
 !
       use set_control_sph_mhd
-      use load_data_for_sph_IO
+      use parallel_load_data_4_sph
       use set_reference_sph_mhd
       use set_bc_sph_mhd
       use material_property
@@ -42,7 +42,6 @@
       use set_radius_func
       use const_radial_mat_4_sph
       use cal_rms_fields_by_sph
-      use cvt_nod_data_to_sph_data
       use r_interpolate_sph_data
       use sph_mhd_rms_IO
       use sph_mhd_rst_IO_control
@@ -50,8 +49,8 @@
 !
 !   Load spherical harmonics data
 !
-      if (iflag_debug.eq.1) write(*,*) 'input_sph_trans_grids'
-      call input_sph_trans_grids(my_rank)
+      if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
+      call load_para_sph_mesh
 !
       if (iflag_boundary_file .eq. id_read_boundary_file) then
         if (iflag_debug.eq.1) write(*,*) 'read_boundary_spectr_file'
@@ -61,9 +60,7 @@
 !   Allocate spectr field data
 !
       call allocate_phys_rj_data
-      call allocate_phys_rtp_data
       call set_sph_sprctr_data_address
-      call set_sph_nod_data_address
 !
       if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr'
       call init_rms_4_sph_spectr
@@ -97,14 +94,13 @@
 !
 ! ---------------------------------
 !
-      if (iflag_debug.eq.1) write(*,*) 's_const_radial_mat_4_sph'
-      call s_const_radial_mat_4_sph
+      if (iflag_debug.eq.1) write(*,*) 'const_radial_mat_sph_snap'
+      call const_radial_mat_sph_snap
 !
 !     --------------------- 
 !  set original spectr mesh data for extension of B
 !
       call init_radial_sph_interpolation
-!
 !
 !* -----  set integrals for coriolis -----------------
 !*
@@ -143,33 +139,33 @@
 !
 !*  ----------------lead nonlinear term ... ----------
 !*
-      call start_eleps_time(12)
+      call start_eleps_time(8)
       call nonlinear
-      call end_eleps_time(12)
+      call end_eleps_time(8)
 !
 !* ----  Update fields after time evolution ------------------------=
 !*
-      call start_eleps_time(4)
-      call start_eleps_time(7)
-!
+      call start_eleps_time(9)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
       call trans_per_temp_to_temp_sph
 !*
       if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
       call s_lead_fields_4_sph_mhd
-      call end_eleps_time(7)
+      call end_eleps_time(9)
 !
 !*  -----------  lead energy data --------------
 !*
-      call start_eleps_time(10)
+      call start_eleps_time(4)
+      call start_eleps_time(11)
       if(iflag_debug.gt.0)  write(*,*) 'output_rms_sph_mhd_control'
       call output_rms_sph_mhd_control
-      call end_eleps_time(10)
-      call end_eleps_time(4)
+      call end_eleps_time(11)
 !
 !*  -----------  Output spectr data --------------
 !*
+      if(iflag_debug.gt.0)  write(*,*) 'output_spectr_4_snap'
       call output_spectr_4_snap(i_step)
+      call end_eleps_time(4)
 !
       end subroutine SPH_analyze_snap
 !

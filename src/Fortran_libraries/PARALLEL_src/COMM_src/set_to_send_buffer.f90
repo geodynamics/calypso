@@ -212,7 +212,7 @@
           do k = 1, num
             jj = nd + (inod_export(k+ist) - 1) * NB
             kk = k + (nd-1)*num + NB*ist
-            WS(kk         ) = X_org(jj)
+            WS(kk) = X_org(jj)
           end do
 !$omp end do nowait
         end do

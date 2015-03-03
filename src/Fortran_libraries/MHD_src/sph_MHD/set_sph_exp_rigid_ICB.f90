@@ -29,9 +29,9 @@
 !!@n @param Vt_ICB(jmax) Spectr data for toroidal velocity ICB
 !!
 !!@n @param fdm2_fix_fld_ICB(0:2,3)
-!!         Matrix to evaluate radial derivative at ICB with fiexed field
+!!         Matrix to evaluate radial derivative at ICB with fixed field
 !!@n @param fdm2_fix_dr_ICB(-1:1,3)
-!!         Matrix to evaluate field at ICB with fiexed radial derivative
+!!         Matrix to evaluate field at ICB with fixed radial derivative
 !!
 !!@n @param coef_d     Coefficient for diffusion term
 !!@n @param is_fld     Address of poloidal velocity in d_rj

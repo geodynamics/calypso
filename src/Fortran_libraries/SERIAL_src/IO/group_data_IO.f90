@@ -117,14 +117,14 @@
       integer(kind = kint) :: i, ist, ied
 !
 !
-      write(id_file,'(i10)') ngrp
+      write(id_file,'(i16)') ngrp
       if (ngrp .gt. 0) then
-        write(id_file,'(8i10)') istack(1:ngrp)
+        write(id_file,'(8i16)') istack(1:ngrp)
         do i = 1, ngrp
           ist = istack(i-1)+1
           ied = istack(i)
           write(id_file,'(a)') trim(name(i))
-          write(id_file,'(8i10)') item(ist:ied)
+          write(id_file,'(8i16)') item(ist:ied)
         end do
       else
         write(id_file,*) ''
@@ -146,15 +146,15 @@
       integer(kind = kint) :: i, ist, ied
 !
 !
-      write(id_file,'(i10)') ngrp
+      write(id_file,'(i16)') ngrp
       if (ngrp .gt. 0) then
-        write(id_file,'(8i10)') istack(1:ngrp)
+        write(id_file,'(8i16)') istack(1:ngrp)
         do i = 1, ngrp
           ist = istack(i-1)+1
           ied = istack(i)
           write(id_file,'(a)') trim(name(i))
-          write(id_file,'(8i10)') item_sf(ist:ied,1)
-          write(id_file,'(8i10)') item_sf(ist:ied,2)
+          write(id_file,'(8i16)') item_sf(ist:ied,1)
+          write(id_file,'(8i16)') item_sf(ist:ied,2)
         end do
       else
         write(id_file,*) ''

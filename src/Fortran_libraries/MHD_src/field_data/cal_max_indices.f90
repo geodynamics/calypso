@@ -72,11 +72,11 @@
        do nd = 1, num_tot_nod_phys_vis
         if ( phys_max(nd) .eq. phys_max_local(nd) ) then
          inod = node_max(nd)
-         node_max_local(nd) = globalnodid(inod)
+         node_max_local(nd) = inod_global(inod)
         end if
         if ( phys_min(nd) .eq. phys_min_local(nd) ) then
          inod = node_min(nd)
-         node_min_local(nd) = globalnodid(inod)
+         node_min_local(nd) = inod_global(inod)
         end if
        end do
 !

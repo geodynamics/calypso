@@ -63,6 +63,7 @@
       module m_ludcmp_3band
 !
       use m_precision
+      use m_constants
 !
       implicit none
 !
@@ -111,8 +112,8 @@
 !
       do i = 1, n
         aamax = abs(band_lu(3,i))
-        if(i .lt. n) aamax = max(aamax, abs(band_lu(2,i+1)) )
-        if(i .gt. 1) aamax = max(aamax, abs(band_lu(4,i-1)) )
+        if(i .lt. n) aamax = max(aamax, abs(band_lu(itwo, i+ione)) )
+        if(i .gt. 1) aamax = max(aamax, abs(band_lu(ifour,i-ione)) )
 !
         if (aamax.eq.0.0d0) then
            write(*,*) 'singular matrix in ludcmp'
@@ -148,8 +149,8 @@
             idx_org(j) =    k
 !
             i_pivot(j) = j+1
-            kst = max(1,j-1)
-            ked = min(j+2,n)
+            kst = max(ione,  j-ione)
+            ked = min(j+itwo,n)
             do k = kst, ked
               dum =              band_lu(j+4-k,k)
               band_lu(j+4-k,k) = band_lu(j+3-k,k)

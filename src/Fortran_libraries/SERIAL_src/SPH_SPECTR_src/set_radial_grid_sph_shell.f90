@@ -70,6 +70,12 @@
       shell = r_CMB - r_ICB
 !
       kst = 1
+      ked = nlayer_ICB-nri/2 - 1
+      do k = kst, ked
+        r_grid(k) = (r_ICB - half * shell) * dble(k) / dble(ked+1)
+      end do
+!
+      kst = max(ione,nlayer_ICB-nri/itwo)
       ked = nlayer_ICB-1
       do k = kst, ked
         r_grid(k) = r_ICB - half * shell * (one - cos( pi               &
@@ -159,7 +165,9 @@
 !
       pi = four * atan(one)
       shell = r_CMB - r_ICB
+      dr =   half * shell * ( one - cos( pi/dble(nri)) )
 !
+!      Set grid by Chebyshev grid
       r = r_ICB
       k = 0
       do
@@ -173,12 +181,9 @@
 !        write(*,*) k, r, dr
       end do
 !
-      do
-        if(r .le. r_min) exit
-        k = k + 1
-        r = r - dr
-!        write(*,*) k, r, dr
-      end do
+!
+!      Set grid by equidistance grid
+      if(k .eq. nri/2) k = int(aint((r - r_min) /  dr)) + nri/2
       ngrid_icore = k-1
       if(ngrid_icore .lt. 0) ngrid_icore = 0
 !

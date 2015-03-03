@@ -20,6 +20,9 @@
 !
       implicit none
 !
+      private :: pressure_4_sph_mhd
+      private :: gradients_of_vectors_sph, enegy_fluxes_4_sph_mhd
+!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -31,6 +34,8 @@
       use m_control_parameter
       use m_t_step_parameter
       use output_viz_file_control
+      use copy_MHD_4_sph_trans
+      use cal_energy_flux_rtp
 !
       integer (kind =kint) :: iflag
 !
@@ -43,7 +48,15 @@
         end if
       end if
 !
-      if(iflag .eq. 0) call enegy_fluxes_4_sph_mhd
+      if(iflag .gt. 0) return
+!
+      call select_mhd_field_from_trans
+      if(iflag_shell_mode .ne. iflag_no_FEMMESH) then
+        call cal_nonlinear_pole_MHD
+      end if
+!
+      call gradients_of_vectors_sph
+      call enegy_fluxes_4_sph_mhd
 !
       end subroutine s_lead_fields_4_sph_mhd
 !
@@ -89,20 +102,42 @@
       use cal_energy_flux_rj
 !
 !
-!
+!      Evaluate fields for output in spectrum space
       if (iflag_debug.eq.1) write(*,*) 's_cal_energy_flux_rj'
       call s_cal_energy_flux_rj
 !
       if (iflag_debug.eq.1) write(*,*) 'sph_back_trans_snapshot_MHD'
       call sph_back_trans_snapshot_MHD
 !
+!      Evaluate fields for output in grid space
       if (iflag_debug.eq.1) write(*,*) 's_cal_energy_flux_rtp'
       call s_cal_energy_flux_rtp
+!
       if (iflag_debug.eq.1) write(*,*)                                  &
      &                          'sph_forward_trans_snapshot_MHD'
       call sph_forward_trans_snapshot_MHD
 !
       end subroutine enegy_fluxes_4_sph_mhd
+!
+! ----------------------------------------------------------------------
+!
+      subroutine gradients_of_vectors_sph
+!
+      use m_sph_phys_address
+      use sph_transforms_4_MHD
+      use sph_poynting_flux_smp
+!
+!
+      if (iflag_debug.eq.1) write(*,*) 'copy_velo_to_grad_v_rtp'
+      call copy_velo_to_grad_v_rtp
+!
+      if (iflag_debug.eq.1) write(*,*) 'sph_forward_trans_tmp_snap_MHD'
+      call sph_forward_trans_tmp_snap_MHD
+!
+      if (iflag_debug.eq.1) write(*,*) 'cal_grad_of_velocities_sph'
+      call cal_grad_of_velocities_sph
+!
+      end subroutine gradients_of_vectors_sph
 !
 ! ----------------------------------------------------------------------
 !

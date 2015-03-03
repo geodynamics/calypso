@@ -39,7 +39,7 @@
 !$omp do private(iele,isurf,k2)
         do iele = 1, nele
           isurf = abs(isf_4_ele(iele,k1))
-          k2 = 1 + (1 - sign(1,isf_4_ele(iele,k1))) / 2
+          k2 = 1 + (1 - sign(1,int(isf_4_ele(iele,k1))) ) / 2
           iele_4_surf(isurf,k2,1) = iele
           iele_4_surf(isurf,k2,2) = k1
         end do
@@ -105,7 +105,7 @@
 !$omp do private(iele,iedge,icou,k2)
         do iele = 1, nele
           iedge = abs(iedge_4_ele(iele,k1))
-          k2 = k1 * sign(1,iedge_4_ele(iele,k1))
+          k2 = k1 * sign(1, int(iedge_4_ele(iele,k1)) )
 !
           num_iele_4_edge(iedge) = num_iele_4_edge(iedge) + 1
           icou = istack_iele_4_edge(iedge-1) + num_iele_4_edge(iedge)

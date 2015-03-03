@@ -3,19 +3,24 @@
 !
 !     Written by H. Matsui on March, 2012
 !
-!      subroutine allocate_nnod_nele_sph_mesh
-!      subroutine allocate_iele_sph_mesh
-!      subroutine deallocate_nnod_nele_sph_mesh
-!
-!      subroutine check_iele_4_sph_connects
+!!      subroutine allocate_nnod_nele_sph_mesh(ndomain_sph, ndomain_rtp,&
+!!     &          nidx_global_rtp, m_folding)
+!!      subroutine allocate_iele_sph_mesh
+!!      subroutine deallocate_nnod_nele_sph_mesh
+!!
+!!      subroutine check_iele_4_sph_connects
 !
       module m_sph_mesh_1d_connect
 !
       use m_precision
       use m_constants
-      use m_spheric_parameter
 !
       implicit none
+!
+      integer(kind = kint) :: ntot_domain
+      integer(kind = kint) :: ndomain_fem(3)
+      integer(kind = kint) :: nidx_global_fem(3)
+      integer(kind = kint) :: nidx_local_fem(3)
 !
       integer(kind = kint), allocatable :: iflag_neib_r(:,:)
       integer(kind = kint), allocatable :: iflag_neib_t(:,:)
@@ -81,13 +86,23 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine allocate_nnod_nele_sph_mesh
+      subroutine allocate_nnod_nele_sph_mesh(ndomain_sph, ndomain_rtp,  &
+     &          nidx_global_rtp, m_folding)
 !
+      integer(kind = kint), intent(in) :: ndomain_sph
+      integer(kind = kint), intent(in) :: ndomain_rtp(3)
+      integer(kind = kint), intent(in) :: nidx_global_rtp(3)
+      integer(kind = kint), intent(in) :: m_folding
       integer(kind = kint) :: np, num
 !
 !
-      np =  ndomain_rtp(1)
-      num = nidx_global_rtp(1)
+      ntot_domain =      ndomain_sph
+      ndomain_fem(1:3) = ndomain_rtp(1:3)
+      nidx_global_fem(1:3) = nidx_global_rtp(1:3)
+      nidx_global_fem(3) =  m_folding * nidx_global_fem(3)
+!
+      np =  ndomain_fem(1)
+      num = nidx_global_fem(1)
       allocate( iflag_neib_r(np,np) )
       allocate( iflag_ele_r(num-1,np) )
       allocate( iflag_internal_r(num,np) )
@@ -104,8 +119,8 @@
       iflag_center_r =   0
       iflag_ele_center = 0
 !
-      np =  ndomain_rtp(2)
-      num = nidx_global_rtp(2)
+      np =  ndomain_fem(2)
+      num = nidx_global_fem(2)
       allocate( iflag_neib_t(np,np) )
       allocate( iflag_internal_t(num,np) )
       allocate( iflag_ele_t(num-1,np) )
@@ -129,7 +144,7 @@
       allocate( iflag_center_t(0:num+1) )
       iflag_center_t = 0
 !
-      nele_around_pole = nidx_global_rtp(3) / 2
+      nele_around_pole = nidx_global_fem(3) / 2
 !
       end subroutine allocate_nnod_nele_sph_mesh
 !
@@ -140,8 +155,8 @@
       integer(kind = kint) :: num, np
 !
 !
-      np =  ndomain_rtp(1)
-      num = nidx_global_rtp(1)
+      np =  ndomain_fem(1)
+      num = nidx_global_fem(1)
       allocate( irev_sph_r(0:num,np) )
       allocate( inod_sph_r(0:nmax_nod_sph_r,np) )
       allocate( ie_sph_r(nmax_ele_sph_r,2,np) )
@@ -152,8 +167,8 @@
       allocate( ie_center_r(2,np) )
       ie_center_r = 0
 !
-      np =  ndomain_rtp(2)
-      num = nidx_global_rtp(2)
+      np =  ndomain_fem(2)
+      num = nidx_global_fem(2)
       allocate( irev_sph_t(0:num+1,np) )
       allocate( inod_sph_t(0:nmax_nod_sph_t+1,np) )
       allocate( ie_sph_t(nmax_ele_sph_t,2,np) )
@@ -175,8 +190,8 @@
       inod_sph_ct = 0
       irev_sph_ct = 0
 !
-      np =  ndomain_rtp(3)
-      num = nidx_global_rtp(3)
+      np =  ndomain_fem(3)
+      num = nidx_global_fem(3)
       allocate( ie_sph_p(num,2) )
       ie_sph_p = 0
 !!
@@ -239,43 +254,43 @@
       integer(kind = kint) :: k, ip, i12(2)
 !
 !
-      write(*,'(a,255i6)') 'iflag_neib_r', ndomain_rtp(1)
-      do k = 1, ndomain_rtp(1)
-        write(*,'(255i6)') k, iflag_neib_r(k,1:ndomain_rtp(1))
+      write(*,'(a,255i6)') 'iflag_neib_r', ndomain_fem(1)
+      do k = 1, ndomain_fem(1)
+        write(*,'(255i6)') k, iflag_neib_r(k,1:ndomain_fem(1))
       end do
-      write(*,*) 'iflag_neib_t', ndomain_rtp(2)
-      do k = 1, ndomain_rtp(2)
-        write(*,'(255i6)') k, iflag_neib_t(k,1:ndomain_rtp(2))
+      write(*,*) 'iflag_neib_t', ndomain_fem(2)
+      do k = 1, ndomain_fem(2)
+        write(*,'(255i6)') k, iflag_neib_t(k,1:ndomain_fem(2))
       end do
 !
       write(*,'(a,255i6)') 'iflag_internal_r',                          &
-     &                       nidx_global_rtp(1), ndomain_rtp(1)
-      write(*,'(a,255i6)') 'Center: ', iflag_center_r(1:ndomain_rtp(1))
-      do k = 0, nidx_global_rtp(2)+1
+     &                       nidx_global_fem(1), ndomain_fem(1)
+      write(*,'(a,255i6)') 'Center: ', iflag_center_r(1:ndomain_fem(1))
+      do k = 0, nidx_global_fem(2)+1
         write(*,'(255i6)') k, iflag_center_t(k),                        &
      &                    inod_sph_ct(k), irev_sph_ct(k)
       end do
       write(*,'(a)') 'connectivity for center element'
       write(*,'(a,255i6)') 'S-pole: ', ie_center_Sp
-      do k = 1, nidx_global_rtp(2)-1
+      do k = 1, nidx_global_fem(2)-1
         write(*,'(255i6)') k, ie_center_t(k,1:2)
       end do
       write(*,'(a,255i6)') 'N-pole: ', ie_center_Np
 !
       write(*,'(a,255i6)') 'radial numbers: ',                          &
-     &         nnod_sph_r(1:ndomain_rtp(1))
-      do k = 1, nidx_global_rtp(1)
-        write(*,'(255i6)') k, iflag_internal_r(k,1:ndomain_rtp(1))
+     &         nnod_sph_r(1:ndomain_fem(1))
+      do k = 1, nidx_global_fem(1)
+        write(*,'(255i6)') k, iflag_internal_r(k,1:ndomain_fem(1))
       end do
-      write(*,*) 'iflag_internal_t', nidx_global_rtp(2), ndomain_rtp(2)
+      write(*,*) 'iflag_internal_t', nidx_global_fem(2), ndomain_fem(2)
       write(*,*) 'numbers: ', nnod_sph_t
-      write(*,'(a,255i6)') 'S_pole: ', iflag_Spole_t(1:ndomain_rtp(2))
-      do k = 1, nidx_global_rtp(2)
-        write(*,'(255i6)') k, iflag_internal_t(k,1:ndomain_rtp(2))
+      write(*,'(a,255i6)') 'S_pole: ', iflag_Spole_t(1:ndomain_fem(2))
+      do k = 1, nidx_global_fem(2)
+        write(*,'(255i6)') k, iflag_internal_t(k,1:ndomain_fem(2))
       end do
-      write(*,'(a,255i6)') 'N_pole: ', iflag_Npole_t(1:ndomain_rtp(2))
+      write(*,'(a,255i6)') 'N_pole: ', iflag_Npole_t(1:ndomain_fem(2))
 !
-      do ip = 1, ndomain_rtp(1)
+      do ip = 1, ndomain_fem(1)
         write(*,*) 'k, ie_sph_r(k,1:2,ip) for ', ip, nele_sph_r(ip)
         i12(1:2) = ie_center_r(1:2,ip)
         write(*,*) 'Center: ' , i12(1:2), inod_sph_r(i12(1:2),ip)
@@ -285,7 +300,7 @@
         end do
       end do
 !
-      do ip = 1, ndomain_rtp(2)
+      do ip = 1, ndomain_fem(2)
         write(*,*) 'k, ie_sph_t(k,1:2,ip) for ', ip
         i12(1:2) = ie_Spole_t(1:2,ip)
         write(*,*) 'S_pole: ', i12(1:2), inod_sph_t(i12(1:2),ip)
@@ -298,7 +313,7 @@
       end do
 !
       write(*,*) 'k, ie_sph_p(k,1:2) for all'
-      do k = 1, nidx_global_rtp(3)
+      do k = 1, nidx_global_fem(3)
         write(*,*) k, ie_sph_p(k,1:2)
       end do
 !

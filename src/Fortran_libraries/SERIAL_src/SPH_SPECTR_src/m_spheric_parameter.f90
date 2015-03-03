@@ -38,9 +38,17 @@
 !!      subroutine check_spheric_param_rtm(my_rank)
 !!      subroutine check_spheric_param_rlm(my_rank)
 !!      subroutine check_spheric_param_rj(my_rank)
+!!
+!!      integer(kind = kint) function find_local_sph_mode_address(l, m)
+!!        integer(kind = 4), intent(in) :: l, m
+!!      integer(kind = kint) function local_sph_data_address(kr, j_lc)
+!!
 !!@endverbatim
 !!
 !!@n @param  my_rank     Running rank ID
+!!@n @param   l          Sphrical harmonics degree
+!!@n @param   m          Sphrical harmonics order
+!!
 !
       module m_spheric_parameter
 !
@@ -54,11 +62,20 @@
 !!@n    iflag_MESH_w_pole:   Gauss-Legendre points with poles
 !!@n    iflag_MESH_w_center: Gauss-Legendre points with center and poles
       integer (kind=kint) :: iflag_shell_mode =  iflag_MESH_same
+!>      integer flag for center point in spectr data
+!!@n    This flag should have same value for all processes
+!!@n    0: No center point
+!!@n    1: Center point is there
+      integer (kind=kint) :: iflag_rj_center =  0
 !>      radial grid type flag
 !!@n    igrid_Chebyshev =    2 :: Chebyshev collocation points
 !!@n    igrid_non_euqidist = 1 :: non-equi-distance
 !!@n    igrid_euqidistance = 0 :: equi-distance
       integer (kind=kint) :: iflag_radial_grid = igrid_non_euqidist
+!
+!>      local spectr index for @f$ l = m = 0 @f$ at center
+!!@n    if center does not exist in subdomain, inod_rj_center = 0.
+      integer (kind=kint) :: inod_rj_center =   0
 !
 !>      local spectr index for @f$ l = m = 0 @f$
 !!@n    If @f$ l = m = 0 @f$ mode does not exist in subdomain, 
@@ -78,10 +95,10 @@
 !>      Start address for @f$ l=1, m= 1 @f$ for @f$ f(r,\theta,m) @f$
       integer (kind=kint) :: ist_rtm_order_1c =   0
 !
-!>      local spectr index for @f$ l = 1@f$ and  @f$ m = -1, 0, 1@f$.
-!!@n    If spectr data do not exist in subdomain,
-!!@n    idx_rj_degree_one(m) = 0.
+!>        Truncation for spherical harmonics
       integer(kind = kint) :: l_truncation
+!>        m-folding symmetry for longitudinal direction
+      integer(kind = kint) :: m_folding = 1
 
 !    global parameteres for radius
 !
@@ -201,15 +218,15 @@
 !>      number of 1d data points for @f$ f(r,j) @f$
       integer(kind = kint) :: nidx_rj(2)
 !
+!>      number of increments for @f$ f(r,\theta,\phi) @f$
+      integer(kind = kint) :: istep_rtp(3)
+!>      number of increments for @f$ f(r,\theta,m) @f$
+      integer(kind = kint) :: istep_rtm(3)
+!>      number of increments for @f$ f(r,l,m) @f$
+      integer(kind = kint) :: istep_rlm(2)
+!>      number of increments for @f$ f(r,j) @f$
+      integer(kind = kint) :: istep_rj(2)
 !
-!>      global data address @f$ f(r,\theta,\phi) @f$
-      integer(kind = kint), allocatable :: inod_global_rtp(:)
-!>      global data address @f$ f(r,\theta,m) @f$
-      integer(kind = kint), allocatable :: inod_global_rtm(:)
-!>      global data address @f$ f(r,l,m) @f$
-      integer(kind = kint), allocatable :: inod_global_rlm(:)
-!>      global data address @f$ f(r,j) @f$
-      integer(kind = kint), allocatable :: inod_global_rj(:)
 !
 !>      global address for each direction @f$ f(r,\theta,\phi) @f$
       integer(kind = kint), allocatable :: idx_global_rtp(:,:)
@@ -325,13 +342,8 @@
 !
       subroutine allocate_spheric_param_rtp
 !
-      allocate(inod_global_rtp(nnod_rtp))
       allocate(idx_global_rtp(nnod_rtp,3))
-!
-      if(nnod_rtp .gt. 0) then
-        inod_global_rtp = 0
-        idx_global_rtp = 0
-      end if
+      if(nnod_rtp .gt. 0) idx_global_rtp = 0
 !
       end subroutine allocate_spheric_param_rtp
 !
@@ -339,13 +351,8 @@
 !
       subroutine allocate_spheric_param_rtm
 !
-      allocate(inod_global_rtm(nnod_rtm))
       allocate(idx_global_rtm(nnod_rtm,3))
-!
-      if(nnod_rtm .gt. 0) then
-        inod_global_rtm = 0
-        idx_global_rtm = 0
-      end if
+      if(nnod_rtm .gt. 0) idx_global_rtm = 0
 !
       end subroutine allocate_spheric_param_rtm
 !
@@ -353,13 +360,8 @@
 !
       subroutine allocate_spheric_param_rlm
 !
-      allocate(inod_global_rlm(nnod_rlm))
       allocate(idx_global_rlm(nnod_rlm,2))
-!
-      if(nnod_rlm .gt. 0) then
-        inod_global_rlm = 0
-        idx_global_rlm = 0
-      end if
+      if(nnod_rlm .gt. 0) idx_global_rlm = 0
 !
       end subroutine allocate_spheric_param_rlm
 !
@@ -367,13 +369,8 @@
 !
       subroutine allocate_spheric_param_rj
 !
-      allocate(inod_global_rj(nnod_rj))
       allocate(idx_global_rj(nnod_rj,2))
-!
-      if(nnod_rj .gt. 0) then
-        inod_global_rj =  0
-        idx_global_rj =  0
-      end if
+      if(nnod_rj .gt. 0) idx_global_rj =  0
 !
       end subroutine allocate_spheric_param_rj
 !
@@ -494,7 +491,6 @@
 !
       subroutine deallocate_spheric_param_rtp
 !
-      deallocate(inod_global_rtp)
       deallocate(idx_global_rtp)
 !
       end subroutine deallocate_spheric_param_rtp
@@ -503,7 +499,6 @@
 !
       subroutine deallocate_spheric_param_rtm
 !
-      deallocate(inod_global_rtm)
       deallocate(idx_global_rtm)
 !
       end subroutine deallocate_spheric_param_rtm
@@ -512,7 +507,6 @@
 !
       subroutine deallocate_spheric_param_rlm
 !
-      deallocate(inod_global_rlm)
       deallocate(idx_global_rlm)
 !
       end subroutine deallocate_spheric_param_rlm
@@ -521,7 +515,6 @@
 !
       subroutine deallocate_spheric_param_rj
 !
-      deallocate(inod_global_rj)
       deallocate(idx_global_rj)
 !
       end subroutine deallocate_spheric_param_rj
@@ -583,6 +576,7 @@
 !
 !
       write(*,*) 'truncation degree:           ', l_truncation
+      write(*,*) 'm-folding symmetry:          ', m_folding
       write(*,*) 'number of grid for f(r,t,p): ', nidx_global_rtp(1:3)
       write(*,*) 'subdomain for f(r,t,p):      ', ndomain_rtp(1:3)
       write(*,*) 'subdomain for f(r,t,m):      ', ndomain_rtm(1:3)
@@ -616,10 +610,9 @@
       write(my_rank+50,*) 'nidx_rtp ', nidx_rtp(1:3)
       write(my_rank+50,*) 'nnod_rtp ', nnod_rtp
 !
-      write(my_rank+50,*)  'i, inod_global_rtp, idx_global_rtp(r,t,p)'
+      write(my_rank+50,*)  'i, idx_global_rtp(r,t,p)'
       do i = 1, nnod_rtp
-        write(my_rank+50,*)                                             &
-     &             i, inod_global_rtp(i), idx_global_rtp(i,1:3)
+        write(my_rank+50,*) i, idx_global_rtp(i,1:3)
       end do
 !
       end subroutine check_spheric_param_rtp
@@ -636,10 +629,9 @@
       write(my_rank+50,*) 'nidx_rtm ', nidx_rtm(1:3)
       write(my_rank+50,*) 'nnod_rtm ', nnod_rtm
 !
-      write(my_rank+50,*) 'i, inod_global_rtm, idx_global_rtm(r,t,p)'
+      write(my_rank+50,*) 'i, idx_global_rtm(r,t,p)'
       do i = 1, nnod_rtm
-        write(my_rank+50,*)                                             &
-     &             i, inod_global_rtm(i), idx_global_rtm(i,1:3)
+        write(my_rank+50,*) i, idx_global_rtm(i,1:3)
       end do
 !
       end subroutine check_spheric_param_rtm
@@ -656,10 +648,9 @@
       write(my_rank+50,*) 'nidx_rlm ', nidx_rlm(1:2)
       write(my_rank+50,*) 'nnod_rlm ', nnod_rlm
 !
-      write(my_rank+50,*) 'i, inod_global_rlm, idx_global_rlm(r,j)'
+      write(my_rank+50,*) 'i, idx_global_rlm(r,j)'
       do i = 1, nnod_rlm
-        write(my_rank+50,*)                                             &
-     &             i, inod_global_rlm(i), idx_global_rlm(i,1:2)
+        write(my_rank+50,*) i, idx_global_rlm(i,1:2)
       end do
 !
       end subroutine check_spheric_param_rlm
@@ -676,10 +667,9 @@
       write(my_rank+50,*) 'nidx_rj  ',  nidx_rj(1:2)
       write(my_rank+50,*) 'nnod_rj ',  nnod_rj
 !
-      write(my_rank+50,*) 'i, inod_global_rj, idx_global_rj(r,j)'
+      write(my_rank+50,*) 'i, idx_global_rj(r,j)'
       do i = 1, nnod_rj
-        write(my_rank+50,*)                                             &
-     &             i, inod_global_rj(i), idx_global_rj(i,1:2)
+        write(my_rank+50,*) i, idx_global_rj(i,1:2)
       end do
 !
       end subroutine check_spheric_param_rj
@@ -687,17 +677,17 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      integer function find_local_sph_mode_address(l, m)
+      integer(kind = kint) function find_local_sph_mode_address(l, m)
 !
-      integer(kind = kint), intent(in) :: l, m
+      integer(kind = 4), intent(in) :: l, m
 !
       integer(kind = kint) :: j
 !
 !
       find_local_sph_mode_address = 0
       do j = 1, nidx_rj(2)
-        if (   idx_gl_1d_rj_j(j,2) .eq. l                               &
-     &   .and. idx_gl_1d_rj_j(j,3) .eq. m) then
+        if (   int(idx_gl_1d_rj_j(j,2)) .eq. l                          &
+     &   .and. int(idx_gl_1d_rj_j(j,3)) .eq. m) then
           find_local_sph_mode_address = j
           return
         end if
@@ -707,7 +697,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      integer function local_sph_data_address(kr, j_lc)
+      integer(kind = kint) function local_sph_data_address(kr, j_lc)
 !
       integer(kind = kint), intent(in) :: kr, j_lc
 !

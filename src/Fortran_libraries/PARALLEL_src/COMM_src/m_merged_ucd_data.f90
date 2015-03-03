@@ -11,12 +11,11 @@
 !!      subroutine allocate_merged_ucd_data(numnod, nnod_ele, ntot_comp)
 !!      subroutine deallocate_merged_ucd_data(m_ucd)
 !!
-!!      subroutine count_merged_ucd(nnod, nele, m_ucd)
+!!      subroutine count_merged_ucd(nnod, nele_ucd, m_ucd)
 !!      subroutine set_node_double_address                              &
 !!     &         (NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,          &
 !!     &          STACK_EXPORT, NOD_EXPORT)
-!!      subroutine update_ele_by_double_address(nele, nnod_ele, ie,     &
-!!     &          m_ucd)
+!!      subroutine update_ele_by_double_address(m_ucd, ucd)
 !!@endverbatim
 !
       module m_merged_ucd_data
@@ -38,9 +37,9 @@
 !>        belonged subdomains ID for each node
       integer(kind = kint), allocatable :: ihome_pe_ucd(:)
 !
-      integer(kind = kint), allocatable :: inod_single_ucd(:)
-      integer(kind = kint), allocatable :: iele_single_ucd(:)
-      integer(kind = kint), allocatable :: ie_single_ucd(:)
+      integer(kind = kint_gl), allocatable :: inod_single_ucd(:)
+      integer(kind = kint_gl), allocatable :: iele_single_ucd(:)
+      integer(kind = kint_gl), allocatable :: ie_single_ucd(:)
       real(kind = kreal), allocatable :: d_single_ucd(:)
 !
       integer, allocatable :: sta1(:)
@@ -138,11 +137,12 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine count_merged_ucd(nnod, internal_node, nele, m_ucd)
+      subroutine count_merged_ucd(nnod, internal_node, nele_ucd, m_ucd)
 !
       use t_ucd_data
 !
-      integer(kind = kint), intent(in) :: nnod, internal_node, nele
+      integer(kind = kint), intent(in) :: nnod, internal_node
+      integer(kind = kint_gl), intent(inout) :: nele_ucd
       type(merged_ucd_data), intent(inout) :: m_ucd
 !
       integer(kind = kint), allocatable :: nnod_ucd_list(:)
@@ -160,7 +160,7 @@
 !
       call MPI_Allgather(nnod, ione, CALYPSO_INTEGER,                   &
      &    nnod_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
-      call MPI_Allgather(nele, ione, CALYPSO_INTEGER,                   &
+      call MPI_Allgather(nele_ucd, ione, CALYPSO_INTEGER,               &
      &    nele_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
       call MPI_Allgather(internal_node, ione, CALYPSO_INTEGER,          &
      &    internod_ucd_list, ione, CALYPSO_INTEGER, CALYPSO_COMM,       &
@@ -220,25 +220,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine update_ele_by_double_address(nele, nnod_ele, ie,       &
-     &          m_ucd)
+      subroutine update_ele_by_double_address(m_ucd, ucd)
 !
       use t_ucd_data
 !
       type(merged_ucd_data), intent(in) :: m_ucd
-      integer(kind = kint), intent(in) :: nele, nnod_ele
-      integer(kind = kint), intent(inout) :: ie(nele,nnod_ele)
+      type(ucd_data), intent(inout) :: ucd
 !
-      integer(kind = kint) :: ip, k1, iele, inod
+      integer(kind = kint) :: ip, k1
+      integer(kind = kint_gl) :: inod, iele
 !
 !
 !$omp parallel private(iele)
-      do k1 = 1, nnod_ele
+      do k1 = 1, ucd%nnod_4_ele
 !$omp do private(inod,ip)
-        do iele = 1, nele
-          inod = ie(iele,k1)
+        do iele = 1, ucd%nele
+          inod = ucd%ie(iele,k1)
           ip = ihome_pe_ucd(inod)
-          ie(iele,k1) = m_ucd%istack_merged_intnod(ip-1)                &
+          ucd%ie(iele,k1) = m_ucd%istack_merged_intnod(ip-1)            &
      &                 + inod_local_ucd(inod)
         end do
 !$omp end do nowait

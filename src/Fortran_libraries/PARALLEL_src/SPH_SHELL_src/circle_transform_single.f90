@@ -65,8 +65,7 @@
       nth = ltr_circle
       call allocate_schmidt_polynomial
 !
-      dth = theta_circle
-      call dschmidt
+      call dschmidt(theta_circle)
 !
       do l = 1, ltr_circle
         do m = -l, l
@@ -84,7 +83,7 @@
       write(*,*) 'np_smp', np_smp
       write(*,*) 'istack_circfft_smp', istack_circfft_smp
       write(*,*) 'mphi_circle', mphi_circle
-      call initialize_FFT_sel_t(my_rank, np_smp, istack_circfft_smp,    &
+      call initialize_FFT_select(my_rank, np_smp, istack_circfft_smp,   &
      &    mphi_circle, WK_circle_fft)
 !
       end subroutine initialize_circle_transform
@@ -96,7 +95,7 @@
 !
       use m_geometry_constants
       use m_circle_transform
-      use FFT_selector
+      use m_FFT_selector
 !
       real(kind = kreal), intent(in) :: d_rj_circle(0:jmax_circle,3)
 !
@@ -114,11 +113,11 @@
       call cal_circle_spectrum_vector(ithree, vrtm_mag, vrtm_phase)
       call copy_circle_spectrum_4_fft(ithree, v_rtp_circle)
 !
-      call backward_FFT_sel_t(np_smp, istack_circfft_smp, ione,         &
+      call backward_FFT_select(np_smp, istack_circfft_smp, ione,        &
      &    mphi_circle, v_rtp_circle(1,1), WK_circle_fft)
-      call backward_FFT_sel_t(np_smp, istack_circfft_smp, ione,         &
+      call backward_FFT_select(np_smp, istack_circfft_smp, ione,        &
      &    mphi_circle, v_rtp_circle(1,2), WK_circle_fft)
-      call backward_FFT_sel_t(np_smp, istack_circfft_smp, ione,         &
+      call backward_FFT_select(np_smp, istack_circfft_smp, ione,        &
      &    mphi_circle, v_rtp_circle(1,3), WK_circle_fft)
 !
       end subroutine circle_transfer_vector
@@ -129,7 +128,7 @@
      &          vrtm_mag, vrtm_phase)
 !
       use m_circle_transform
-      use FFT_selector
+      use m_FFT_selector
 !
       real(kind = kreal), intent(in) :: d_rj_circle(0:jmax_circle)
       real(kind = kreal), intent(inout) :: v_rtp_circle(mphi_circle)
@@ -142,7 +141,7 @@
       call cal_circle_spectrum_vector(ione, vrtm_mag(0), vrtm_phase(0))
       call copy_circle_spectrum_4_fft(ione, v_rtp_circle(1))
 !
-      call backward_FFT_sel_t(np_smp, istack_circfft_smp, ione,         &
+      call backward_FFT_select(np_smp, istack_circfft_smp, ione,        &
      &    mphi_circle, v_rtp_circle(1), WK_circle_fft)
 !
       end subroutine circle_transfer_scalar

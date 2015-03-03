@@ -10,29 +10,29 @@
 !>@brief  Selector of Fourier transform using structure
 !!
 !!@verbatim
-!!      subroutine initialize_FFT_sel_t(my_rank, Nsmp, Nstacksmp, Nfft, &
+!!      subroutine initialize_FFT_select(my_rank, Nsmp, Nstacksmp, Nfft,&
 !!     &          WKS)
 !!      subroutine finalize_FFT_sel_t(Nsmp, Nstacksmp, WKS)
-!!      subroutine verify_FFT_sel_t(Nsmp, Nstacksmp, Nfft, WKS)
+!!      subroutine verify_FFT_select(Nsmp, Nstacksmp, Nfft, WKS)
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT for ISPACK
 !! ------------------------------------------------------------------
 !!
-!!      subroutine forward_FFT_sel_t(Nsmp, Nstacksmp, M, Nfft, X, WKS)
+!!      subroutine forward_FFT_select(Nsmp, Nstacksmp, M, Nfft, X, WKS)
 !! ------------------------------------------------------------------
 !!
 !!   wrapper subroutine for FFT in ISPACK
 !!
-!!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\grac{2\pijk}{Nfft})
-!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\grac{2\pijk}{Nfft})
+!!   a_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
+!!   b_{k} = \frac{2}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
 !!
 !!   a_{0} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j}
 !!    K = Nfft/2....
-!!   a_{k} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\grac{2\pijk}{Nfft})
+!!   a_{k} = \frac{1}{Nfft} \sum_{j=0}^{Nfft-1} x_{j} \cos (\frac{2\pi j k}{Nfft})
 !!
 !! ------------------------------------------------------------------
 !!
-!!      subroutine backward_FFT_sel_t(Nsmp, Nstacksmp, M, Nfft, X, WKS)
+!!      subroutine backward_FFT_select(Nsmp, Nstacksmp, M, Nfft, X, WKS)
 !! ------------------------------------------------------------------
 !!
 !!   wrapper subroutine for backward FFT
@@ -67,16 +67,19 @@
 !
       use m_precision
       use m_machine_parameter
+      use m_FFT_selector
       use t_FFTPACK5_wrapper
 !
       use t_FFTW_wrapper
+      use t_multi_FFTW_wrapper
 !
       implicit none
 !
 !>      structure for working data for FFT
       type working_FFTs
-        type(working_FFTPACK) :: WK_FFTPACK
-        type(working_FFTW) ::    WK_FFTW
+        type(working_FFTPACK) ::  WK_FFTPACK
+        type(working_FFTW) ::     WK_FFTW
+        type(working_mul_FFTW) :: WK_MUL_FFTW
       end type working_FFTs
 !
 ! ------------------------------------------------------------------
@@ -85,10 +88,9 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine initialize_FFT_sel_t(my_rank, Nsmp, Nstacksmp, Nfft,   &
+      subroutine initialize_FFT_select(my_rank, Nsmp, Nstacksmp, Nfft,  &
      &          WKS)
 !
-      use FFT_selector
 !
       integer(kind = kint), intent(in) ::  my_rank, Nfft
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
@@ -99,6 +101,10 @@
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
         if(my_rank .eq. 0) write(*,*) 'Use FFTW'
+        call init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WKS%WK_MUL_FFTW)
+        return
+      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+        if(my_rank .eq. 0) write(*,*) 'Use single transform in FFTW'
         call init_FFTW_type(Nstacksmp(Nsmp), Nfft, WKS%WK_FFTW)
         return
       end if
@@ -107,13 +113,12 @@
         if(my_rank .eq. 0) write(*,*) 'Use FFTPACK'
         call init_WK_FFTPACK_t(Nsmp, Nstacksmp, Nfft, WKS%WK_FFTPACK)
 !
-      end subroutine initialize_FFT_sel_t
+!
+      end subroutine initialize_FFT_select
 !
 ! ------------------------------------------------------------------
 !
       subroutine finalize_FFT_sel_t(Nsmp, Nstacksmp, WKS)
-!
-      use FFT_selector
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       type(working_FFTs), intent(inout) :: WKS
@@ -122,6 +127,10 @@
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
         if(iflag_debug .gt. 0) write(*,*) 'Finalize FFTW'
+        call finalize_FFTW_mul_type(Nsmp, WKS%WK_MUL_FFTW)
+        return
+      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+        if(iflag_debug .gt. 0) write(*,*) 'Finalize single FFTW'
         call finalize_FFTW_type(Nstacksmp(Nsmp), WKS%WK_FFTW)
         return
       end if
@@ -134,9 +143,7 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine verify_FFT_sel_t(Nsmp, Nstacksmp, Nfft, WKS)
-!
-      use FFT_selector
+      subroutine verify_FFT_select(Nsmp, Nstacksmp, Nfft, WKS)
 !
       integer(kind = kint), intent(in) ::  Nfft
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
@@ -147,6 +154,11 @@
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
         if(iflag_debug .gt. 0) write(*,*) 'Use FFTW'
+        call verify_wk_FFTW_mul_type(Nsmp, Nstacksmp,                   &
+     &      Nfft, WKS%WK_MUL_FFTW)
+        return
+      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
+        if(iflag_debug .gt. 0) write(*,*) 'Use single FFTW transforms'
         call verify_wk_FFTW_type(Nstacksmp(Nsmp), Nfft, WKS%WK_FFTW)
         return
       end if
@@ -155,14 +167,12 @@
         if(iflag_debug .gt. 0) write(*,*) 'Use FFTPACK'
         call verify_wk_FFTPACK_t(Nsmp, Nstacksmp, Nfft, WKS%WK_FFTPACK)
 !
-      end subroutine verify_FFT_sel_t
+      end subroutine verify_FFT_select
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine forward_FFT_sel_t(Nsmp, Nstacksmp, M, Nfft, X, WKS)
-!
-      use FFT_selector
+      subroutine forward_FFT_select(Nsmp, Nstacksmp, M, Nfft, X, WKS)
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: M, Nfft
@@ -173,6 +183,10 @@
 !
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
+        call FFTW_mul_forward_type(Nsmp, Nstacksmp, M, Nfft, X,         &
+     &      WKS%WK_MUL_FFTW)
+        return
+      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         call FFTW_forward_type(Nsmp, Nstacksmp, M, Nfft, X,             &
      &      WKS%WK_FFTW)
         return
@@ -182,13 +196,11 @@
         call CALYPSO_RFFTMF_t(Nsmp, Nstacksmp, M, Nfft, X,              &
      &      WKS%WK_FFTPACK)
 !
-      end subroutine forward_FFT_sel_t
+      end subroutine forward_FFT_select
 !
 ! ------------------------------------------------------------------
 !
-      subroutine backward_FFT_sel_t(Nsmp, Nstacksmp, M, Nfft, X, WKS)
-!
-      use FFT_selector
+      subroutine backward_FFT_select(Nsmp, Nstacksmp, M, Nfft, X, WKS)
 !
       integer(kind = kint), intent(in) ::  Nsmp, Nstacksmp(0:Nsmp)
       integer(kind = kint), intent(in) :: M, Nfft
@@ -199,6 +211,10 @@
 !
 #ifdef FFTW3
       if(iflag_FFT .eq. iflag_FFTW) then
+        call FFTW_mul_backward_type(Nsmp, Nstacksmp, M, Nfft, X,        &
+     &      WKS%WK_MUL_FFTW)
+        return
+      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         call FFTW_backward_type(Nsmp, Nstacksmp, M, Nfft, X,            &
      &      WKS%WK_FFTW)
         return
@@ -208,7 +224,7 @@
         call CALYPSO_RFFTMB_t(Nsmp, Nstacksmp, M, Nfft, X,              &
      &      WKS%WK_FFTPACK)
 !
-      end subroutine backward_FFT_sel_t
+      end subroutine backward_FFT_select
 !
 ! ------------------------------------------------------------------
 !

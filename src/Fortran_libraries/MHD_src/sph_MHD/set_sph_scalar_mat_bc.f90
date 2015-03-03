@@ -32,15 +32,9 @@
 !!@n @param coef_imp   Coefficient for contribution of implicit term
 !!@n @param coef_d     Coefficient of diffusiotn term
 !!@n @param fdm2_fix_dr_ICB(-1:1,3)
-!!         Matrix to evaluate field at ICB with fiexed radial derivative
+!!         Matrix to evaluate field at ICB with fixed radial derivative
 !!@n @param fdm2_fix_dr_CMB(-1:1,3)
-!!         Matrix to evaluate field at CMB with fiexed radial derivative
-!!@n @param fdm2_fix_fld_center(-1:1,3)
-!!         Matrix to evaluate radial derivative
-!!         for center with fiexed field
-!!@n @param fdm2_fix_dr_center(-1:1,3)
-!!         Matrix to evaluate field at center
-!!         with fiexed radial derivative
+!!         Matrix to evaluate field at CMB with fixed radial derivative
 !!
 !!@n @param evo_mat(3,nri,jmax)  Band matrix for time evolution
 !

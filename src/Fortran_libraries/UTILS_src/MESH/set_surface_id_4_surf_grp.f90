@@ -12,6 +12,7 @@
       module set_surface_id_4_surf_grp
 !
       use m_precision
+      use m_constants
 !
       implicit none
 !
@@ -46,7 +47,7 @@
         do inum = ist, ied
           iele = surf_item(1,inum)
           isf =  surf_item(2,inum)
-          isf_n = (isf - mod(isf-1,2)) + mod(isf,2)
+          isf_n = (isf - mod(isf-ione,itwo)) + mod(isf,itwo)
 !
           isurf_grp(inum) = isf_4_ele(iele,isf)
           isurf_grp_n(inum) = isf_4_ele(iele,isf_n)

@@ -230,6 +230,17 @@
        end do
 !$omp end do
 !
+      if(inod_rj_center .eq. 0) return
+        inod = inod_rj_center
+        d_rj(inod,ipol_scalar) = d_rj(inod,ipol_scalar)                 &
+     &          + dt * (coef_exp * d_rj(inod,ipol_diffuse)              &
+     &              + adam_0 * ( -d_rj(inod,ipol_advect)                &
+     &                 + coef_src * d_rj(inod,ipol_source) )            &
+     &              + adam_1 * d_rj(inod,ipol_pre) )
+!
+         d_rj(inod,ipol_pre) = - d_rj(inod,ipol_advect)                 &
+     &               + coef_src * d_rj(inod,ipol_source)
+!
       end subroutine scalar_diff_adv_src_adams
 !
 ! ----------------------------------------------------------------------
@@ -258,6 +269,13 @@
        end do
 !$omp end do
 !
+      if(inod_rj_center .eq. 0) return
+        inod = inod_rj_center
+        d_rj(inod,ipol_scalar) = d_rj(inod,ipol_scalar)                 &
+     &         + dt * (coef_exp*d_rj(inod,ipol_diffuse)                 &
+     &             - d_rj(inod,ipol_advect)                             &
+     &              + coef_src * d_rj(inod,ipol_source) )
+!
       end subroutine scalar_diff_adv_src_euler
 !
 ! ----------------------------------------------------------------------
@@ -282,6 +300,10 @@
       end do
 !$omp end do
 !
+      if(inod_rj_center .eq. 0) return
+      d_rj(inod_rj_center,ipol_pre) = -d_rj(inod_rj_center,ipol_advect) &
+     &                    + coef_src * d_rj(inod_rj_center,ipol_source)
+!
       end subroutine set_ini_adams_scalar_w_src
 !
 ! ----------------------------------------------------------------------
@@ -301,8 +323,12 @@
 !$omp do private (inod)
       do inod = ist, ied
         d_rj(inod,ipol_scalar) = coef_src * d_rj(inod,ipol_source)
-       end do
+      end do
 !$omp end do
+!
+      if(inod_rj_center .eq. 0) return
+      d_rj(inod_rj_center,ipol_scalar)                                  &
+     &     = coef_src * d_rj(inod_rj_center,ipol_source)
 !
       end subroutine scalar_stable_diff_src
 !
@@ -321,7 +347,7 @@
 !$omp do private (inod)
       do inod = ist, ied
         d_rj(inod,ipol_scalar) = zero
-       end do
+      end do
 !$omp end do
 !
       end subroutine scalar_stable_diffusion

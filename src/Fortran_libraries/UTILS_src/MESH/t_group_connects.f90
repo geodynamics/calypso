@@ -13,6 +13,10 @@
 !      subroutine dealloc_num_other_grp(e_grp)
 !      subroutine dealloc_item_other_grp(e_grp)
 !
+!      subroutine unlink_surf_item_sf_grp_type(sf_grp_data)
+!      subroutine unlink_num_other_grp(e_grp)
+!      subroutine unlink_item_other_grp(e_grp)
+!
 !      subroutine link_ele_grp_connect_type(tbls_org, tbls_ele_new)
 !      subroutine link_surf_grp_connect_type(tbls_org, tbls_sf_new)
 !
@@ -142,6 +146,41 @@
       deallocate(e_grp%item_e_grp)
 !
       end subroutine dealloc_item_other_grp
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine unlink_surf_item_sf_grp_type(sf_grp_data)
+!
+      type(surface_group_table), intent(inout) :: sf_grp_data
+!
+      nullify(sf_grp_data%isurf_grp  )
+      nullify(sf_grp_data%isurf_grp_n)
+!
+      end subroutine unlink_surf_item_sf_grp_type
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine unlink_num_other_grp(e_grp)
+!
+      type(group_connect_data), intent(inout) :: e_grp
+!
+!
+      nullify(e_grp%nitem_e_grp )
+      nullify(e_grp%istack_e_grp)
+!
+      end subroutine unlink_num_other_grp
+!
+!-----------------------------------------------------------------------
+!
+      subroutine unlink_item_other_grp(e_grp)
+!
+      type(group_connect_data), intent(inout) :: e_grp
+!
+      nullify(e_grp%item_e_grp)
+!
+      end subroutine unlink_item_other_grp
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

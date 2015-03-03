@@ -1,21 +1,31 @@
+!>@file   copy_sph_1d_global_index.f90
+!!@brief  module copy_sph_1d_global_index
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!      module copy_sph_1d_global_index
+!>@brief  Copy global spherical harmonics indices in local array
+!!
+!!
+!!@verbatim
+!!      subroutine copy_sph_1d_gl_idx_rtp
+!!      subroutine copy_sph_1d_gl_idx_rtm
+!!      subroutine copy_sph_1d_gl_idx_rlm
+!!      subroutine copy_sph_1d_gl_idx_rj
+!!
+!!      subroutine add_center_mode_rj
+!!@endverbatim
+!
 !
       module copy_sph_1d_global_index
 !
-!     Written by H. Matsui on July, 2007
-!
       use m_precision
+      use m_constants
 !
       use m_spheric_parameter
       use m_sph_1d_global_index
 !
       implicit none
-!
-!      subroutine copy_sph_1d_gl_idx_rtp
-!      subroutine copy_sph_1d_gl_idx_rtm
-!      subroutine copy_sph_1d_gl_idx_rlm
-!      subroutine copy_sph_1d_gl_idx_rj
 !
 ! ----------------------------------------------------------------------
 !
@@ -128,6 +138,29 @@
       end do
 !
       end subroutine copy_sph_1d_gl_idx_rj
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine add_center_mode_rj
+!
+      integer(kind = kint) :: i, j
+!
+!
+      inod_rj_center = 0
+      if(iflag_rj_center .eq. izero) return
+!
+      do i = 1, nidx_rj(2)
+        j = i - 1 + ist_rj(2)
+        if(idx_global_rj_j(j,1) .eq. 0) then
+          write(*,*) 'Add center mode!!'
+          nnod_rj = nnod_rj + 1
+          inod_rj_center = 1
+          exit
+        end if
+      end do
+!
+      end subroutine add_center_mode_rj
 !
 ! ----------------------------------------------------------------------
 !

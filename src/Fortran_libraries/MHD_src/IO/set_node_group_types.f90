@@ -13,6 +13,8 @@
 !!      subroutine set_bc_group_types_sgs_vect(bc_type_ctl, ibc_type)
 !!      subroutine set_bc_group_types_rotation(bc_type_ctl, ibc_type)
 !!      subroutine set_bc_group_types_sph_center(bc_type_ctl, ibc_type)
+!!      subroutine set_bc_group_types_sph_velo(bc_type_ctl, ibc_type)
+!!      subroutine set_bc_group_types_sph_magne(bc_type_ctl, ibc_type)
 !!      subroutine set_bc_group_types_fluxes(bc_type_ctl, ibc_type)
 !!@endverbatim
 !
@@ -74,6 +76,23 @@
 !>      control name for fixed rotation around z-axis boundary
       character(len = kchara), parameter :: fix_rot_z = 'rot_z'
 !
+!>      control name for free slip boundary for spherical shell
+      character(len = kchara), parameter                                &
+     &                :: free_slip_sph = 'free_slip_sph'
+!>      control name for non-slip boundary for spherical shell
+      character(len = kchara), parameter                                &
+     &                :: non_slip_sph = 'non_slip_sph'
+!>      control name for rotetable inner core for spherical shell
+      character(len = kchara), parameter                                &
+     &                :: rot_inner_core = 'rot_inner_core'
+!
+!>      control name for insulated for spherical shell
+      character(len = kchara), parameter                                &
+     &                :: insulator_sph =     'insulator'
+!>      control name for psuedo vacuum for spherical shell
+      character(len = kchara), parameter                                &
+     &                :: pseudo_vacuum_sph = 'pseudo_vacuum'
+!
 !>      control name to filling to center
       character(len = kchara), parameter                                &
      &               :: fill_sph_center = 'sph_to_center'
@@ -97,6 +116,7 @@
       private :: fix_SGS_y, fix_rot_y
       private :: fix_SGS_z, fix_rot_z
       private :: fill_sph_center, fix_sph_center
+      private :: free_slip_sph, non_slip_sph, rot_inner_core
 !
 !-----------------------------------------------------------------------
 !
@@ -110,11 +130,11 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if     (cmp_no_case(bc_type_ctl, fixed_bc) .gt. 0                 &
-     &   .or. cmp_no_case(bc_type_ctl, fixed_ctl_bc) .gt. 0) then
+      if     (cmp_no_case(bc_type_ctl, fixed_bc)                        &
+     &   .or. cmp_no_case(bc_type_ctl, fixed_ctl_bc)) then
         ibc_type =  iflag_bc_fix_s
-      else if(cmp_no_case(bc_type_ctl, fixed_file) .gt. 0               &
-     &   .or. cmp_no_case(bc_type_ctl, fixed_file_bc) .gt. 0) then
+      else if(cmp_no_case(bc_type_ctl, fixed_file)                      &
+     &   .or. cmp_no_case(bc_type_ctl, fixed_file_bc)) then
         ibc_type =  iflag_bc_file_s
       end if
 !
@@ -128,23 +148,23 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if      (cmp_no_case(bc_type_ctl, fixed_x) .gt.   0               &
-     &    .or. cmp_no_case(bc_type_ctl, fix_ctl_x) .gt. 0) then
+      if      (cmp_no_case(bc_type_ctl, fixed_x)                       &
+     &    .or. cmp_no_case(bc_type_ctl, fix_ctl_x) ) then
         ibc_type = iflag_bc_fix_x
-      else if (cmp_no_case(bc_type_ctl, fixed_y) .gt.   0               &
-     &    .or. cmp_no_case(bc_type_ctl, fix_ctl_y) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, fixed_y)                        &
+     &    .or. cmp_no_case(bc_type_ctl, fix_ctl_y) ) then
         ibc_type = iflag_bc_fix_y
-      else if (cmp_no_case(bc_type_ctl, fixed_z) .gt. 0                 &
-     &    .or. cmp_no_case(bc_type_ctl, fix_ctl_z) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, fixed_z)                        &
+     &    .or. cmp_no_case(bc_type_ctl, fix_ctl_z) ) then
         ibc_type = iflag_bc_fix_z
-      else if (cmp_no_case(bc_type_ctl, bc_file_x) .gt. 0               &
-     &    .or. cmp_no_case(bc_type_ctl, fix_file_x) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, bc_file_x)                      &
+     &    .or. cmp_no_case(bc_type_ctl, fix_file_x)) then
         ibc_type = iflag_bc_file_x
-      else if (cmp_no_case(bc_type_ctl, bc_file_y) .gt. 0               &
-     &    .or. cmp_no_case(bc_type_ctl, fix_file_y) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, bc_file_y)                      &
+     &    .or. cmp_no_case(bc_type_ctl, fix_file_y)) then
         ibc_type = iflag_bc_file_y
-      else if (cmp_no_case(bc_type_ctl, bc_file_z) .gt. 0               &
-     &    .or. cmp_no_case(bc_type_ctl, fix_file_z) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, bc_file_z)                      &
+     &    .or. cmp_no_case(bc_type_ctl, fix_file_z)) then
         ibc_type = iflag_bc_file_z
       end if
 !
@@ -158,7 +178,7 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if(cmp_no_case(bc_type_ctl, fixed_SGS).gt. 0) then
+      if(cmp_no_case(bc_type_ctl, fixed_SGS)) then
         ibc_type = iflag_bc_sgs_s
       end if
 !
@@ -172,11 +192,11 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if      (cmp_no_case(bc_type_ctl, fix_SGS_x) .gt. 0) then
+      if      (cmp_no_case(bc_type_ctl, fix_SGS_x)) then
         ibc_type = iflag_bc_sgs_x
-      else if (cmp_no_case(bc_type_ctl, fix_SGS_y) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, fix_SGS_y)) then
         ibc_type = iflag_bc_sgs_y
-      else if (cmp_no_case(bc_type_ctl, fix_SGS_z) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, fix_SGS_z)) then
         ibc_type = iflag_bc_sgs_z
       end if
 !
@@ -190,11 +210,11 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if      (cmp_no_case(bc_type_ctl, fix_rot_x) .gt. 0) then
+      if      (cmp_no_case(bc_type_ctl, fix_rot_x)) then
         ibc_type = iflag_bc_rot + 1
-      else if (cmp_no_case(bc_type_ctl, fix_rot_y) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, fix_rot_y)) then
         ibc_type = iflag_bc_rot + 2
-      else if (cmp_no_case(bc_type_ctl, fix_rot_z) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, fix_rot_z)) then
         ibc_type = iflag_bc_rot + 3
       end if
 !
@@ -208,13 +228,48 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if      (cmp_no_case(bc_type_ctl, fill_sph_center) .gt. 0) then
+      if      (cmp_no_case(bc_type_ctl, fill_sph_center)) then
         ibc_type = iflag_sph_2_center
-      else if (cmp_no_case(bc_type_ctl, fix_sph_center) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, fix_sph_center)) then
         ibc_type = iflag_sph_clip_center
       end if
 !
       end subroutine set_bc_group_types_sph_center
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine set_bc_group_types_sph_velo(bc_type_ctl, ibc_type)
+!
+      character (len=kchara), intent(in) :: bc_type_ctl
+      integer(kind = kint), intent(inout) :: ibc_type
+!
+!
+      if      (cmp_no_case(bc_type_ctl, free_slip_sph)) then
+        ibc_type = iflag_free_sph
+      else if (cmp_no_case(bc_type_ctl, non_slip_sph)) then
+        ibc_type = iflag_non_slip_sph
+      else if (cmp_no_case(bc_type_ctl, rot_inner_core)) then
+        ibc_type = iflag_rotatable_icore
+      end if
+!
+      end subroutine set_bc_group_types_sph_velo
+!
+!-----------------------------------------------------------------------
+!
+      subroutine set_bc_group_types_sph_magne(bc_type_ctl, ibc_type)
+!
+      character (len=kchara), intent(in) :: bc_type_ctl
+      integer(kind = kint), intent(inout) :: ibc_type
+!
+!
+      if      (cmp_no_case(bc_type_ctl, insulator_sph)) then
+        ibc_type = iflag_insulator
+      else if (cmp_no_case(bc_type_ctl, pseudo_vacuum_sph)) then
+        ibc_type = iflag_pseudo_vacuum
+      end if
+!
+      end subroutine set_bc_group_types_sph_magne
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -225,9 +280,9 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if      (cmp_no_case(bc_type_ctl, flux_bc) .gt. 0) then
+      if      (cmp_no_case(bc_type_ctl, flux_bc)) then
         ibc_type = iflag_bc_fix_flux
-      else if (cmp_no_case(bc_type_ctl, flux_file_bc) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, flux_file_bc)) then
         ibc_type = iflag_bc_file_flux
       end if
 !

@@ -89,29 +89,29 @@
       call add_int_suffix(istep_ucd, file_prefix, fname_tmp)
 !
       if (my_rank .ge. 0                                                &
-     &      .and. (itype_file/100) .eq. (iflag_para/100)) then
+     &      .and. (itype_file/icent) .eq. (iflag_para/icent)) then
         call add_int_suffix(my_rank, fname_tmp, file_name)
       else
         file_name = fname_tmp
       end if
 !
-      if(mod(itype_file,10) .eq. iflag_bin) then
+      if(mod(itype_file,iten) .eq. iflag_bin) then
         call add_flb_extension(file_name, fname_tmp)
         file_name = fname_tmp
         return
-      else if(mod(itype_file,100)/10 .eq. iflag_vtk/10) then
+      else if(mod(itype_file,icent)/iten .eq. iflag_vtk/iten) then
         call add_vtk_extension(file_name, fname_tmp)
-      else if(mod(itype_file,100)/10 .eq. iflag_vtd/10) then
+      else if(mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
         call add_vtd_extension(file_name, fname_tmp)
-      else if(mod(itype_file,100)/10 .eq. iflag_ucd/10) then
+      else if(mod(itype_file,icent)/iten .eq. iflag_ucd/iten) then
         call add_ucd_extension(file_name, fname_tmp)
-      else if(mod(itype_file,100)/10 .eq. iflag_udt/10) then
+      else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
         call add_udt_extension(file_name, fname_tmp)
       else
         call add_fld_extension(file_name, fname_tmp)
       end if
 !
-      if (   mod(itype_file,10) .eq. iflag_gzip) then
+      if (   mod(itype_file,iten) .eq. iflag_gzip) then
         call add_gzip_extension(fname_tmp, file_name)
       else
         file_name = fname_tmp
@@ -135,21 +135,21 @@
       call add_int_suffix(izero, file_prefix, fname_tmp)
 !
       if (my_rank .ge. 0                                                &
-     &     .and. itype_file/100 .eq. iflag_para/100) then
+     &     .and. itype_file/icent .eq. iflag_para/icent) then
         call add_int_suffix(my_rank, fname_tmp, file_name)
       else
         file_name = fname_tmp
       end if
 !
-      if     (mod(itype_file,100)/10 .eq. iflag_vtd/10) then
+      if     (mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
         call add_vtg_extension(file_name, fname_tmp)
-      else if(mod(itype_file,100)/10 .eq. iflag_udt/10) then
+      else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
         call add_grd_extension(file_name, fname_tmp)
       else
         fname_tmp = file_name
       end if
 !
-      if (   mod(itype_file,10) .eq. iflag_gzip) then
+      if (   mod(itype_file,iten) .eq. iflag_gzip) then
         call add_gzip_extension(fname_tmp, file_name)
       else
         file_name = fname_tmp
@@ -173,19 +173,19 @@
 !
       call add_int_suffix(istep_ucd, file_prefix, file_name)
 !
-      if (    mod(itype_file,100)/10 .eq. iflag_vtk/10) then
+      if (    mod(itype_file,icent)/iten .eq. iflag_vtk/iten) then
         call add_vtk_extension(file_name, fname_tmp)
-      else if(mod(itype_file,100)/10 .eq. iflag_vtd/10) then
+      else if(mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
         call add_vtd_extension(file_name, fname_tmp)
-      else if(mod(itype_file,100)/10 .eq. iflag_ucd/10) then
+      else if(mod(itype_file,icent)/iten .eq. iflag_ucd/iten) then
         call add_ucd_extension(file_name, fname_tmp)
-      else if(mod(itype_file,100)/10 .eq. iflag_udt/10) then
+      else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
         call add_udt_extension(file_name, fname_tmp)
       else
         call add_fld_extension(file_name, fname_tmp)
       end if
 !
-      if (   mod(itype_file,10) .eq. iflag_gzip) then
+      if (   mod(itype_file,iten) .eq. iflag_gzip) then
         call add_gzip_extension(fname_tmp, file_name)
       else
         file_name = fname_tmp
@@ -208,15 +208,15 @@
 !
       call add_int_suffix(izero, file_prefix, file_name)
 !
-      if     (mod(itype_file,100)/10 .eq. iflag_vtd/10) then
+      if     (mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
         call add_vtg_extension(file_name, fname_tmp)
-      else if(mod(itype_file,100)/10 .eq. iflag_udt/10) then
+      else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
         call add_grd_extension(file_name, fname_tmp)
       else
         fname_tmp = file_name
       end if
 !
-      if (   mod(itype_file,10) .eq. iflag_gzip) then
+      if (   mod(itype_file,iten) .eq. iflag_gzip) then
         call add_gzip_extension(fname_tmp, file_name)
       else
         file_name = fname_tmp

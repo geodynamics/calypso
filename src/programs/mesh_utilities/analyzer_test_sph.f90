@@ -4,14 +4,15 @@
 !
 !      modified by H. Matsui on Aug., 2007
 !
-!      subroutine init_analyzer
-!      subroutine analyze
+!      subroutine init_test_sph
+!      subroutine analyze_test_sph
 !
       module analyzer_test_sph
 !
       use m_precision
       use m_constants
       use m_machine_parameter
+      use calypso_mpi
 !
       implicit none
 !
@@ -25,12 +26,12 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine init_analyzer
+      subroutine init_test_sph
 !
-      use calypso_mpi
       use m_read_ctl_gen_sph_shell
       use set_control_platform_data
-      use load_data_for_sph_IO
+      use parallel_load_data_4_sph
+      use cmp_trans_sph_tests
 !
 !
       if (my_rank.eq.0) then
@@ -38,26 +39,29 @@
         write(*,*) 'Input file: mesh data'
       end if
 !
+      call set_tesh_sph_elapsed_label
+!
 !     --------------------- 
 !
       call turn_off_debug_flag_by_ctl(my_rank)
       call read_control_4_gen_shell_grids
       call set_control_sph_mesh
 !
-      if (iflag_debug.gt.0) write(*,*) 'input_sph_trans_grids'
-      call input_sph_trans_grids(my_rank)
+      if (iflag_debug.gt.0) write(*,*) 'load_para_sph_mesh'
+      call load_para_sph_mesh
 !
-       end subroutine init_analyzer
+       end subroutine init_test_sph
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine analyze
+      subroutine analyze_test_sph
 !
-      use calypso_mpi
+      use m_solver_SR
       use cmp_trans_sph_indices
-      use set_parallel_file_name
       use cmp_trans_sph_tests
+      use set_parallel_file_name
       use select_calypso_SR
+      use select_copy_from_recv
 !
       character(len=kchara) :: fname_tmp, file_name
       integer(kind = kint) :: itype
@@ -65,7 +69,7 @@
 !
 !
       call allocate_idx_sph_recieve
-      call allocate_real_sph_test(8)
+      call allocate_real_sph_test(ieight)
 !
       call add_int_suffix(my_rank, check_header, fname_tmp)
       call add_dat_extension(fname_tmp, file_name)
@@ -101,9 +105,9 @@
       call deallocate_real_sph_test
       call deallocate_idx_sph_recieve
 !
-      if (iflag_debug.eq.1) write(*,*) 'exit analyze'
+      if (iflag_debug.eq.1) write(*,*) 'exit analyze_test_sph'
 !
-      end subroutine analyze
+      end subroutine analyze_test_sph
 !
 ! ----------------------------------------------------------------------
 !

@@ -11,7 +11,6 @@
 !
       use m_precision
       use m_constants
-      use m_spheric_parameter
       use m_group_data_sph_specr
 !
       use t_group_data
@@ -48,6 +47,7 @@
 !
       subroutine count_sph_local_surf_grp_item(ip_r, ip_t, surf_grp)
 !
+      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use set_stack_4_sph_groups
 !
@@ -95,6 +95,7 @@
 !
       subroutine set_sph_local_surf_grp_item(ip_r, ip_t, surf_grp)
 !
+      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use set_stack_4_sph_groups
       use cal_sph_node_addresses
@@ -152,7 +153,7 @@
       integer(kind = kint), intent(inout) :: nitem_grp
 !
 !
-      nitem_grp = nitem_grp + nele_sph_t(ip_t)*nidx_global_rtp(3)
+      nitem_grp = nitem_grp + nele_sph_t(ip_t)*nidx_global_fem(3)
 !
 !    Set elements for poles
       if    (iflag_shell_mode .eq. iflag_MESH_w_pole                    &
@@ -188,7 +189,7 @@
       integer(kind = kint) :: l, m
 !
 !
-      do m = 1, nidx_global_rtp(3)
+      do m = 1, nidx_global_fem(3)
         do l = 1, nele_sph_t(ip_t)
           inum = inum + 1
           surf_grp%item_sf_grp(1,inum)                                  &

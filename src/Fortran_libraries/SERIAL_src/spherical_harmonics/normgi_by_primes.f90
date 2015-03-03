@@ -101,15 +101,15 @@
 !
       is = int((l1+l2+l3)/2)
 !*
-      itmax = min ( (l1-m1) ,(l3-m3) ,(l2+l3-m1))
-      itmin = -( min ( (l2-l3+m1) ,(l1+m1) , 0 ) )
+      itmax =  min((l1-m1), (l3-m3), (l2+l3-m1))
+      itmin = -min((l2-l3+m1), (l1+m1), izero)
 !*
 !*
       kil(0) = 0
       kil(1) = is-l1
       kil(2) = is-l2
       kil(3) = is-l3
-      kil(4) = 2*is+1
+      kil(4) = 2*is+ione
       kiu(0) = 0
       kiu(1) = 2*is-2*l3
       kiu(2) = is
@@ -122,23 +122,23 @@
       ksl(1) = l1+m1
       ksl(2) = l2-m2
 !*
-      call quicksort_int(5,kil(0),1,5)
-      call quicksort_int(3,kiu(0),1,3)
-      call quicksort_int(3,ksl(0),1,3)
-      call quicksort_int(5,ksu(0),1,5)
+      call quicksort_int(ifive, kil(0), ione, ifive)
+      call quicksort_int(ithree, kiu(0), ione, ithree)
+      call quicksort_int(ithree, ksl(0), ione, ithree)
+      call quicksort_int(ifive, ksu(0), ione, ifive)
 !
 !
       iexp_gi = 0
       do m = 1, 2
         call const_prime_table_4_factor(num_fact, nmax_prms,            &
      &      itbl_prime_ks(1), num_prm_ks, iprm_ks(1,1), iexp_ks(1,1),   &
-     &      (kiu(m-1)+1) ,kiu(m), (3-m), iexp_gi(1) )
+     &      (kiu(m-ione)+ione) ,kiu(m), (ithree-m), iexp_gi(1) )
       end do
 !
       do m = 1, 4
         call const_prime_table_4_factor(num_fact, nmax_prms,            &
      &      itbl_prime_ks(1), num_prm_ks, iprm_ks(1,1), iexp_ks(1,1),   &
-     &      (kil(m-1)+1) ,kil(m), (m-5), iexp_gi(1) )
+     &      (kil(m-ione)+ione) ,kil(m), (m-ifive), iexp_gi(1) )
       end do
 !
 !
@@ -146,13 +146,13 @@
       do m = 1, 4
         call const_prime_table_4_factor(num_fact, nmax_prms,            &
      &      itbl_prime_ks(1), num_prm_ks, iprm_ks(1,1), iexp_ks(1,1),   &
-     &      (ksu(m-1)+1) ,ksu(m), (5-m), iexp_gsi(1) )
+     &      (ksu(m-ione)+ione) ,ksu(m), (ifive-m), iexp_gsi(1) )
       end do
 !
       do m = 1, 2
         call const_prime_table_4_factor(num_fact, nmax_prms,            &
      &      itbl_prime_ks(1), num_prm_ks, iprm_ks(1,1), iexp_ks(1,1),   &
-     &      (ksl(m-1)+1) ,ksl(m), (m-3), iexp_gsi(1) )
+     &      (ksl(m-ione)+ione) ,ksl(m), (m-ithree), iexp_gsi(1) )
       end do
 !
       tsum = 0
@@ -167,20 +167,22 @@
         ktl(4) = it
 !*
 !*
-        call quicksort_int(3,ktu(0),1,3)
-        call quicksort_int(5,ktl(0),1,5)
+        call quicksort_int(ithree, ktu(0), ione, ithree)
+        call quicksort_int(ifive, ktl(0), ione, ifive)
 !*
         iexp_ti = 0
         do m = 1, 2
           call const_prime_table_4_factor(num_fact, nmax_prms,          &
      &        itbl_prime_ks(1), num_prm_ks(1), iprm_ks(1,1),            &
-     &        iexp_ks(1,1), (ktu(m-1)+1) ,ktu(m), (3-m), iexp_ti(1) )
+     &        iexp_ks(1,1), (ktu(m-ione)+ione) ,ktu(m), (ithree-m),     &
+     &        iexp_ti(1) )
         end do
 !
         do m = 1, 4
           call const_prime_table_4_factor(num_fact, nmax_prms,          &
      &        itbl_prime_ks(1), num_prm_ks(1), iprm_ks(1,1),            &
-     &        iexp_ks(1,1), (ktl(m-1)+1) ,ktl(m), (m-5), iexp_ti(1) )
+     &        iexp_ks(1,1), (ktl(m-ione)+ione) ,ktl(m), (m-ifive),      &
+     &        iexp_ti(1) )
         end do
 !
         tfac = (-1)**it
@@ -226,15 +228,15 @@
 !
       is = int((l1+l2+l3)/2)
 !
-      itmax = min ( (l1-m1) ,(l3-m3) ,(l2+l3-m1))
-      itmin = -( min ( (l2-l3+m1) ,(l1+m1) , 0 ) )
+      itmax =  min((l1-m1), (l3-m3), (l2+l3-m1))
+      itmin = -min((l2-l3+m1), (l1+m1), izero)
 !
 !
       kil(0) = 0
       kil(1) = is-l1
       kil(2) = is-l2
       kil(3) = is-l3
-      kil(4) = 2*is+1
+      kil(4) = 2*is+ione
       kiu(0) = 0
       kiu(1) = 2*is-2*l3
       kiu(2) = is
@@ -247,10 +249,10 @@
       ksl(1) = l1+m1
       ksl(2) = l2-m2
 !*
-      call quicksort_int(5,kil(0),1,5)
-      call quicksort_int(3,kiu(0),1,3)
-      call quicksort_int(3,ksl(0),1,3)
-      call quicksort_int(5,ksu(0),1,5)
+      call quicksort_int(ifive, kil(0), ione, ifive)
+      call quicksort_int(ithree, kiu(0), ione, ithree)
+      call quicksort_int(ithree, ksl(0), ione, ithree)
+      call quicksort_int(ifive, ksu(0), ione, ifive)
 !
       num_fact = max(kil(4),kiu(2),ksu(4),ksl(2))
 !
@@ -264,8 +266,8 @@
         ktl(3) = l3-m3-it
         ktl(4) = it
 !*
-        call quicksort_int(3,ktu(0),1,3)
-        call quicksort_int(5,ktl(0),1,5)
+        call quicksort_int(ithree, ktu(0), ione, ithree)
+        call quicksort_int(ifive, ktl(0), ione, ifive)
 !*
         num_fact = max(num_fact,ktu(2),ktl(4))
       end do

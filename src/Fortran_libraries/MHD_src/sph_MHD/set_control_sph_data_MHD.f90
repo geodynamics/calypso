@@ -28,13 +28,14 @@
       subroutine s_set_control_sph_data_MHD
 !
       use calypso_mpi
+      use m_error_IDs
       use m_machine_parameter
       use m_node_phys_data
       use m_ctl_data_4_platforms
       use m_ctl_data_4_fields
       use m_ctl_data_mhd_forces
       use m_ctl_data_mhd_evo_scheme
-      use m_int_4_sph_coriolis_IO
+      use m_control_params_2nd_files
       use m_node_id_spherical_IO
       use m_physical_property
       use m_work_4_sph_trans
@@ -42,11 +43,11 @@
 !
       use m_field_data_IO
       use m_sph_boundary_input_data
+      use m_sel_spherical_SRs
+      use m_FFT_selector
 !
       use skip_comment_f
       use set_control_sph_data
-      use set_phys_name_4_sph_trans
-      use FFT_selector
       use legendre_transform_select
       use add_nodal_fields_4_MHD
       use add_sph_MHD_fields_2_ctl
@@ -55,73 +56,56 @@
 !
 !   overwrite restart header for magnetic field extension
 !
-      if( (iflag_org_sph_rj_head*iflag_org_rst_head) .gt. 0) then
+      if( (iflag_org_sph_rj_head*iflag_org_rst) .gt. 0) then
         phys_file_head = org_rst_header
       end if
 !
 !   set physical values
 !
-      if(i_num_nod_phys.eq.0) then
-        call calypso_MPI_abort(90, 'Set field for simulation')
+      if(field_ctl%icou .eq. 0) then
+        call calypso_MPI_abort(ierr_fld, 'Set field for simulation')
       end if
       if (iflag_debug.eq.1) write(*,*)                                  &
-     &    'original number of field ', num_nod_phys_ctl
+     &    'original number of field ', field_ctl%num
 !
-      if ( num_nod_phys_ctl .ne. 0 ) then
+      if ( field_ctl%num .ne. 0 ) then
 !
 !     add terms for potentials
 !
         call add_field_name_4_mhd
         call add_field_name_4_sph_mhd
         if (iflag_debug.eq.1) write(*,*)                                &
-     &    'num_nod_phys_ctl after modified ', num_nod_phys_ctl
+     &    'field_ctl%num after modified ', field_ctl%num
 !
 !    set nodal data
 !
         if (iflag_debug.gt.0) write(*,*) 's_set_control_sph_data'
         call s_set_control_sph_data(ierr)
-!
-        if (iflag_debug.gt.0) write(*,*) 'copy_sph_name_rj_to_rtp'
-        call copy_sph_name_rj_to_rtp
       end if
 !
 !
-      
+      if(i_legendre_vect_len .gt. 0) then
+        nvector_legendre = legendre_vector_len_ctl
+      else
+        nvector_legendre = 0
+      end if
+!      
       if(i_sph_transform_mode .gt. 0) then
         call set_legendre_trans_mode_ctl(Legendre_trans_loop_ctl)
       end if
 !
       if(i_FFT_package .gt. 0) then
-        if(     cmp_no_case(FFT_library_ctl, 'ispack') .gt. 0) then
-          iflag_FFT = iflag_ISPACK
-        else if(cmp_no_case(FFT_library_ctl, 'fftpack') .gt. 0) then
-          iflag_FFT = iflag_FFTPACK
-        else if(cmp_no_case(FFT_library_ctl, 'fftw') .gt. 0             &
-     &     .or. cmp_no_case(FFT_library_ctl, 'fftw3') .gt. 0) then
-          iflag_FFT = iflag_FFTW
-        else if(cmp_no_case(FFT_library_ctl, 'fftw_single') .gt. 0      &
-     &     .or. cmp_no_case(FFT_library_ctl, 'fftw3_single') .gt. 0)    &
-     &     then
-          iflag_FFT = iflag_FFTW_SINGLE
-        end if
+        call set_fft_library_ctl(FFT_library_ctl)
+      end if
+      if(i_import_mode .gt. 0) then
+        call set_import_table_ctl(import_mode_ctl)
+      end if
+      if(i_SR_routine .gt. 0) then
+        call set_sph_comm_routine_ctl(SR_routine_ctl)
       end if
 !
-      if (iflag_4_coriolis .gt. id_turn_OFF) then
-        if(i_sph_coriolis_file .gt. 0) then
-          sph_cor_file_name = sph_cor_file_name_ctl
-           call choose_file_format(sph_cor_file_fmt_ctl,                &
-     &         i_sph_coriolis_fmt, ifmt_cor_int_file)
-        end if
-        if(i_coriolis_tri_int_name .gt. 0) then
-          sph_cor_file_name = coriolis_int_file_name
-          call choose_file_format(coriolis_file_fmt_ctl,                &
-     &        i_coriolis_file_fmt, ifmt_cor_int_file)
-        end if
-      end if
-!
-!
-      if (i_bc_data_file_name .gt. 0) then
-        bc_sph_file_name = bc_data_file_name_ctl
+      if (bc_data_file_name_ctl%iflag .gt. 0) then
+        bc_sph_file_name = bc_data_file_name_ctl%charavalue
       end if
 !
       end subroutine s_set_control_sph_data_MHD
@@ -148,10 +132,10 @@
         mphi_circle = -1
       end if
 !
-      do ifld = 1, num_nod_phys_ctl
-        if(phys_nod_name_ctl(ifld) .eq. fhd_temp) ibench_temp = 1
-        if(phys_nod_name_ctl(ifld) .eq. fhd_velo) ibench_velo = 1
-        if(phys_nod_name_ctl(ifld) .eq. fhd_magne) ibench_magne = 1
+      do ifld = 1, field_ctl%num
+        if(field_ctl%c1_tbl(ifld) .eq. fhd_temp) ibench_temp = 1
+        if(field_ctl%c1_tbl(ifld) .eq. fhd_velo) ibench_velo = 1
+        if(field_ctl%c1_tbl(ifld) .eq. fhd_magne) ibench_magne = 1
       end do
 !
       d_circle%num_phys = ibench_velo + ibench_temp + ibench_magne
@@ -204,13 +188,11 @@
 !
       iflag_circle_coord = iflag_circle_sph
       if (i_circle_coord .ne. 0) then
-        if(    cmp_no_case(pick_circle_coord_ctl,'spherical') .gt. 0    &
-     &    .or. cmp_no_case(pick_circle_coord_ctl,'rtp') .gt.       0    &
-         ) then
+        if(    cmp_no_case(pick_circle_coord_ctl,'spherical')           &
+     &    .or. cmp_no_case(pick_circle_coord_ctl,'rtp')) then
           iflag_circle_coord = iflag_circle_sph
-        else if(cmp_no_case(pick_circle_coord_ctl,'cyrindrical') .gt. 0 &
-      &    .or. cmp_no_case(pick_circle_coord_ctl,'spz') .gt.         0 &
-         ) then
+        else if(cmp_no_case(pick_circle_coord_ctl,'cyrindrical')        &
+      &    .or. cmp_no_case(pick_circle_coord_ctl,'spz')) then
           iflag_circle_coord = iflag_circle_cyl
         end if
       end if
@@ -233,7 +215,7 @@
         z_circle = 0.0d0
       end if
 !
-      d_circle%num_phys = num_nod_phys_ctl
+      d_circle%num_phys = field_ctl%num
       call alloc_phys_name_type(d_circle)
       call s_ordering_field_by_viz(d_circle%num_phys,                   &
      &    d_circle%num_phys_viz, d_circle%num_component,                &

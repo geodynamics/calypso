@@ -11,7 +11,6 @@
 !
       use m_precision
       use m_constants
-      use m_spheric_parameter
       use m_group_data_sph_specr
 !
       use t_group_data
@@ -27,6 +26,8 @@
 ! ----------------------------------------------------------------------
 !
       subroutine count_sph_local_node_group(nod_grp)
+!
+      use m_spheric_parameter
 !
       type(group_data), intent(inout) :: nod_grp
 !
@@ -56,6 +57,7 @@
 !
       subroutine count_sph_local_node_grp_item(ip_r, ip_t, nod_grp)
 !
+      use m_spheric_parameter
       use m_sph_mesh_1d_connect
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t
@@ -119,6 +121,7 @@
 !
       subroutine set_sph_local_node_grp_item(ip_r, ip_t, nod_grp)
 !
+      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
 !
@@ -188,14 +191,13 @@
 !
       subroutine count_node_grp_on_sphere(ip_r, ip_t, knum, nitem_grp)
 !
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t, knum
       integer(kind = kint), intent(inout) :: nitem_grp
 !
 !
-      nitem_grp = nidx_global_rtp(3)*nnod_sph_t(ip_t)
+      nitem_grp = nidx_global_fem(3)*nnod_sph_t(ip_t)
 !
       if(iflag_Spole_t(ip_t) .gt. 0) nitem_grp = nitem_grp + 1
       if(iflag_Npole_t(ip_t) .gt. 0) nitem_grp = nitem_grp + 1
@@ -205,7 +207,7 @@
       if(inod_sph_r(knum,ip_r) .eq. 1                                   &
      &     .and.  iflag_center_r(ip_r) .gt. 0)  then
         if(iflag_Spole_t(ip_t) .gt. 0)  then
-          nitem_grp = nitem_grp + nidx_global_rtp(3)*nnod_sph_ct
+          nitem_grp = nitem_grp + nidx_global_fem(3)*nnod_sph_ct
           if(iflag_Npole_t(ip_t) .eq. 0) nitem_grp = nitem_grp + 1
           end if
       end if
@@ -217,7 +219,6 @@
       subroutine set_node_grp_item_on_sphere(ip_r, ip_t, knum,          &
      &          icou, nod_grp)
 !
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
 !
@@ -228,7 +229,7 @@
 !
 !
       inum = nod_grp%istack_grp(icou-1)
-      do mnum = 1, nidx_global_rtp(3)
+      do mnum = 1, nidx_global_fem(3)
         do lnum = 1, nnod_sph_t(ip_t)
           inum = inum + 1
           nod_grp%item_grp(inum) = sph_shell_node_id(ip_r, ip_t,        &
@@ -252,7 +253,7 @@
       if(inod_sph_r(knum,ip_r) .eq. 1                                   &
      &     .and.  iflag_center_r(ip_r) .gt. 0)  then
         if(iflag_Spole_t(ip_t) .gt. 0)  then
-          do mnum = 1, nidx_global_rtp(3)
+          do mnum = 1, nidx_global_fem(3)
             do lnum = 1, nnod_sph_ct
               inum = inum + 1
               nod_grp%item_grp(inum)                                    &

@@ -33,37 +33,37 @@
 !
 !
       call reset_local_sph_node_constants
-      call set_intnod_shell(nidx_rtp)
-      call set_nnod_lc_shell(ip_r, ip_t, nidx_global_rtp(3))
-      call set_nnod_gl_shell(nidx_global_rtp)
+      call set_intnod_shell
+      call set_nnod_lc_shell(ip_r, ip_t)
+      call set_nnod_gl_shell
 !
 !  Count nodes for poles
 !
       if    (iflag_shell_mode .eq. iflag_MESH_w_pole                    &
      &  .or. iflag_shell_mode .eq. iflag_MESH_w_center) then
         if(iflag_Spole_t(ip_t) .gt. 0)  then
-          call set_intnod_Spole(nidx_rtp(1))
+          call set_intnod_Spole
           call set_nnod_lc_Spole(nnod_sph_r(ip_r))
         end if
-        call set_nnod_gl_Spole(nidx_global_rtp(1))
+        call set_nnod_gl_Spole
 !
         if(iflag_Npole_t(ip_t) .gt. 0)  then
-          call set_intnod_Npole(nidx_rtp(1))
+          call set_intnod_Npole
           call set_nnod_lc_Npole(nnod_sph_r(ip_r))
         end if
-        call set_nnod_gl_Npole(nidx_global_rtp(1))
+        call set_nnod_gl_Npole
       end if
 !
 !  Count nodes for center
 !
       if    (iflag_shell_mode .eq. iflag_MESH_w_center) then
-        call set_nnod_gl_center(ione)
+        call set_nnod_gl_center
 !
         if(iflag_center_r(ip_r) .gt. 0) then
           if(iflag_Spole_t(ip_t) .gt. 0)  then
-            call set_intnod_center(ione)
+            call set_intnod_center
             call set_nnod_lc_center(ione)
-            call set_nnod_lc_ctr_sph(nnod_sph_ct, nidx_global_rtp(3))
+            call set_nnod_lc_ctr_sph(nnod_sph_ct)
             if(iflag_Npole_t(ip_t) .eq. 0) then
               call set_nnod_lc_ctr_Np(ione)
             end if
@@ -98,18 +98,18 @@
 !
       pi = four*atan(one)
 !
-      do mnum = 1, nidx_global_rtp(3)
+      do mnum = 1, nidx_global_fem(3)
         do lnum = 1, nnod_sph_t(ip_t)
           l = inod_sph_t(lnum,ip_t)
           do knum = 1, nnod_sph_r(ip_r)
             k = inod_sph_r(knum,ip_r)
             inod = sph_shell_node_id(ip_r, ip_t, knum, lnum, mnum)
             node%inod_global(inod)                                      &
-     &          = global_sph_shell_node_id(nidx_global_rtp, k, l, mnum)
+     &          = global_sph_shell_node_id(k, l, mnum)
             node%rr(inod) =     radius_1d_gl(k)
             node%theta(inod) =  w_colat(l)
             node%phi(inod) =  two*pi*dble(mnum-1)                       &
-     &                         / dble(nidx_global_rtp(3))
+     &                         / dble(nidx_global_fem(3))
           end do
         end do
       end do
@@ -160,18 +160,17 @@
           node%phi(inod) =    zero
 !
           if(iflag_Spole_t(ip_t) .gt. 0)  then
-            do mnum = 1, nidx_global_rtp(3)
+            do mnum = 1, nidx_global_fem(3)
               do lnum = 1, nnod_sph_ct
                 l = inod_sph_ct(lnum)
                 inod = sph_ctr_shell_node_id(nnod_sph_ct, lnum, mnum)
                 node%inod_global(inod)                                  &
-     &                = global_sph_shell_node_id(nidx_global_rtp,       &
-     &                 ione, l, mnum)
+     &                = global_sph_shell_node_id(ione, l, mnum)
 !
                 node%rr(inod) =     radius_1d_gl(1)
                 node%theta(inod) = w_colat(l)
                 node%phi(inod) =  two*pi*dble(mnum-1)                   &
-     &                         / dble(nidx_global_rtp(3))
+     &                         / dble(nidx_global_fem(3))
               end do
             end do
 !

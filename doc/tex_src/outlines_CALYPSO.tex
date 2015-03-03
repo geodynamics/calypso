@@ -7,14 +7,14 @@ Calypso consists of programs shown in Table \ref{table:controls}.
 \begin{tabular}{|c|c|c|}
 \hline
 Program & Control file name & Type \\ \hline
-\verb|gen_sph_grids|          & \verb|control_sph_shell| &  Serial    \\
+\verb|gen_sph_grids|          & \verb|control_sph_shell| &  Parallel    \\
 \verb|sph_mhd|                & \verb|control_MHD| &        Parallel  \\ \hline
 \verb|sph_initial_field|      & \verb|control_MHD| &        Parallel  \\
 \verb|sph_add_initial_field|  & \verb|control_MHD| &        Parallel  \\
 \verb|sph_snapshot|           & \verb|control_snapshot| &   Parallel  \\ \hline
 \verb|sph_zm_snapshot|        & \verb|control_snapshot| &   Parallel  \\
 \verb|sph_dynamobench|        & \verb|control_snapshot| &   Parallel  \\ \hline
-\verb|assemble_sph|           & \verb|control_sph_assemble| & Serial  \\ \hline
+\verb|assemble_sph|           & \verb|control_sph_assemble| & Parallel  \\ \hline
 \verb|t_ave_sph_mean_square|  & N/A & Serial  \\ \hline
 \verb|t_ave_picked_sph_coefs| & N/A & Serial  \\ \hline
 \verb|t_ave_nusselt|          & N/A & Serial  \\ \hline
@@ -159,7 +159,7 @@ The process of the simulation is as following:
 \item  Create the grid files for the simulation  \\
 {\small
 \begin{verbatim}
-[dynamobench_case_1]$ [CALYPSO_DIR]/bin/gen_sph_grids
+[dynamobench_case_1]$ mpirun -np 4 [CALYPSO_DIR]/bin/gen_sph_grids
 \end{verbatim}
 }
 

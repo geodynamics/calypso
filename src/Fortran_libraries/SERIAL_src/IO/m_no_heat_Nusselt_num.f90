@@ -87,7 +87,7 @@
 !
       call open_no_heat_source_Nu
 !
-      write(id_Nusselt,'(i10,1p3e23.14e3)')                             &
+      write(id_Nusselt,'(i16,1p3e23.14e3)')                             &
      &       i_step, time, Nu_ICB, Nu_CMB
 !
       close(id_Nusselt)

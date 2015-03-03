@@ -221,8 +221,7 @@
       integer(kind = kint), intent(inout) :: i_smp_stack(0:np_smp)
       integer(kind = kint), intent(inout) :: max_4_smp
 !
-      integer(kind = kint) :: iproc, num
-!
+      integer(kind = kint) :: num
       integer(kind = kint)  :: irest, i8
 !
        num = iend - istart + 1

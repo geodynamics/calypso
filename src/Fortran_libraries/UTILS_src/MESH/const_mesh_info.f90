@@ -243,8 +243,8 @@
       logical :: read_surface, read_edge
 !
 !
-      read_surface = allocated(globalsurfid)
-      read_edge =    allocated(globaledgeid)
+      read_surface = allocated(isurf_global)
+      read_edge =    allocated(iedge_global)
 !
       if(read_surface .eqv. .false.) then
         if (iflag_debug.gt.0) write(*,*) 'construct_surface_data'

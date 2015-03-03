@@ -144,63 +144,63 @@
         return
       end if
 !
-      if     (cmp_no_case(file_fmt_ctl, 'binary') .gt. 0                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'bin') .gt.    0) then
+      if     (cmp_no_case(file_fmt_ctl, 'binary')                       &
+     &   .or. cmp_no_case(file_fmt_ctl, 'bin')         ) then
            id_field_file_format = iflag_udt
-      else if(cmp_no_case(file_fmt_ctl, 'field_ascii') .gt. 0           &
-     &   .or. cmp_no_case(file_fmt_ctl, 'field') .gt.       0           &
-     &   .or. cmp_no_case(file_fmt_ctl, 'fld_ascii') .gt.   0           &
-     &   .or. cmp_no_case(file_fmt_ctl, 'fld') .gt.         0           &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_field') .gt. 0           &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_fld') .gt.   0           &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii') .gt.       0           &
-     &   .or. cmp_no_case(file_fmt_ctl, 'text') .gt.        0) then
+      else if(cmp_no_case(file_fmt_ctl, 'field_ascii')                  &
+     &   .or. cmp_no_case(file_fmt_ctl, 'field')                        &
+     &   .or. cmp_no_case(file_fmt_ctl, 'fld_ascii')                    &
+     &   .or. cmp_no_case(file_fmt_ctl, 'fld')                          &
+     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_field')                  &
+     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_fld')                    &
+     &   .or. cmp_no_case(file_fmt_ctl, 'ascii')                        &
+     &   .or. cmp_no_case(file_fmt_ctl, 'text')        ) then
            id_field_file_format = iflag_fld
-      else if(cmp_no_case(file_fmt_ctl, 'field_gzip') .gt. 0            &
-     &   .or. cmp_no_case(file_fmt_ctl, 'field_gz') .gt.   0            &
-     &   .or. cmp_no_case(file_fmt_ctl, 'fld_gzip') .gt.   0            &
-     &   .or. cmp_no_case(file_fmt_ctl, 'fld_gz') .gt.     0            &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_field') .gt. 0            &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_field') .gt.   0            &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_fld') .gt.   0            &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_fld') .gt.     0            &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip') .gt.       0            &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz') .gt.         0) then
+      else if(cmp_no_case(file_fmt_ctl, 'field_gzip')                   &
+     &   .or. cmp_no_case(file_fmt_ctl, 'field_gz')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'fld_gzip')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'fld_gz')                       &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_field')                   &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gz_field')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_fld')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gz_fld')                       &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gzip')                         &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gz')         ) then
            id_field_file_format = iflag_fld + iflag_gzip
-      else if(cmp_no_case(file_fmt_ctl, 'UDT_ascii') .gt. 0             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'UDT') .gt.       0) then
+      else if(cmp_no_case(file_fmt_ctl, 'UDT_ascii')                    &
+     &   .or. cmp_no_case(file_fmt_ctl, 'UDT')        ) then
            id_field_file_format = iflag_udt
-      else if(cmp_no_case(file_fmt_ctl, 'UDT_gzip') .gt. 0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'UDT_gz') .gt.   0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_UDT') .gt. 0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_UDT') .gt.   0) then
+      else if(cmp_no_case(file_fmt_ctl, 'UDT_gzip')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'UDT_gz')                       &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_UDT')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gz_UDT')     ) then
            id_field_file_format = iflag_udt + iflag_gzip
 !
-      else if(cmp_no_case(file_fmt_ctl, 'UCD_ascii') .gt. 0             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'UCD') .gt.       0) then
+      else if(cmp_no_case(file_fmt_ctl, 'UCD_ascii')                    &
+     &   .or. cmp_no_case(file_fmt_ctl, 'UCD')        ) then
            id_field_file_format = iflag_ucd
-      else if(cmp_no_case(file_fmt_ctl, 'UCD_gzip') .gt. 0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'UCD_gz') .gt.   0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_UCD') .gt. 0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_UCD') .gt.   0) then
+      else if(cmp_no_case(file_fmt_ctl, 'UCD_gzip')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'UCD_gz')                       &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_UCD')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gz_UCD')     ) then
            id_field_file_format = iflag_ucd + iflag_gzip
 !
-      else if(cmp_no_case(file_fmt_ctl, 'VTD_ascii') .gt. 0             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'VTD') .gt.       0) then
+      else if(cmp_no_case(file_fmt_ctl, 'VTD_ascii')                    &
+     &   .or. cmp_no_case(file_fmt_ctl, 'VTD')        ) then
            id_field_file_format = iflag_vtd
-      else if(cmp_no_case(file_fmt_ctl, 'VTD_gzip') .gt. 0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'VTD_gz') .gt.   0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_VTD') .gt. 0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_VTD') .gt.   0) then
+      else if(cmp_no_case(file_fmt_ctl, 'VTD_gzip')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'VTD_gz')                       &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_VTD')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gz_VTD')     ) then
            id_field_file_format = iflag_vtd + iflag_gzip
 !
-      else if(cmp_no_case(file_fmt_ctl, 'VTK_ascii') .gt. 0             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'VTK') .gt.       0) then
+      else if(cmp_no_case(file_fmt_ctl, 'VTK_ascii')                    &
+     &   .or. cmp_no_case(file_fmt_ctl, 'VTK')        ) then
            id_field_file_format = iflag_vtk
-      else if(cmp_no_case(file_fmt_ctl, 'VTK_gzip') .gt. 0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'VTK_gz') .gt.   0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_VTK') .gt. 0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_VTK') .gt.   0) then
+      else if(cmp_no_case(file_fmt_ctl, 'VTK_gzip')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'VTK_gz')                       &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_VTK')                     &
+     &   .or. cmp_no_case(file_fmt_ctl, 'gz_VTK')     ) then
            id_field_file_format = iflag_vtk + iflag_gzip
       else
            id_field_file_format = iflag_udt

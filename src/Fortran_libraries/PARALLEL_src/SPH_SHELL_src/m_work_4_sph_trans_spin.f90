@@ -8,26 +8,24 @@
 !!       (innermost loop is spherical harmonics)
 !!
 !!@verbatim
-!!      subroutine allocate_work_sph_trans_spin(ncomp)
-!!      subroutine deallocate_work_sph_trans_spin
-!!
-!!      subroutine clear_b_trans_spin(icomp_st, icomp_ed)
-!!      subroutine clear_f_trans_spin(icomp_st, icomp_ed)
-!!
+!!      subroutine allocate_work_sph_trans(ncomp)
+!!      subroutine deallocate_work_sph_trans
+!!      subroutine clear_fwd_legendre_work(ncomp)
+!!      subroutine clear_bwd_legendre_work(ncomp)
 !!
 !!    Data for single vector field
-!!      radial component:      vr_rtp(3*i_rtp-2)
-!!      elevetional component: vr_rtp(3*i_rtp-1)
-!!      azimuthal component:   vr_rtp(2*i_rtp  )
+!!      radial component:      vr_rtm_wk(3*i_rtm-2)
+!!      elevetional component: vr_rtm_wk(3*i_rtm-1)
+!!      azimuthal component:   vr_rtm_wk(3*i_rtm  )
 !!
 !!    Data for single vector spectrum
-!!      Poloidal component:          sp_rj(3*i_rj-2)
-!!      diff. of Poloidal component: sp_rj(3*i_rj-1)
-!!      Toroidal component:          sp_rj(3*i_rj  )
+!!      Poloidal component:          sp_rlm_wk(3*i_rlm-2)
+!!      diff. of Poloidal component: sp_rlm_wk(3*i_rlm-1)
+!!      Toroidal component:          sp_rlm_wk(3*i_rlm  )
 !!
 !!    Data for single scalar
-!!      field: vr_rtp(i_rtp)
-!!      spectr: sp_rj(i_rj)
+!!      field: vr_rtm_wk(i_rtm)
+!!      spectr: sp_rlm_wk(i_rlm)
 !!
 !!@endverbatim
 !!
@@ -43,15 +41,13 @@
       implicit none
 !
 !
-!>     field data for Legendre transform
-!!@n       original layout: vr_rtm_spin(l_rtm,m_rtm,k_rtm,icomp)
-!!@n       size: vr_rtm_spin(nidx_rtm(2),nidx_rtm(3)*nidx_rtm(1),ncomp)
-      real(kind = kreal), allocatable :: vr_rtm_spin(:,:)
+!>      field data for Legendre transform  @f$ f(r,\theta,m) @f$ 
+!!@n     size:  vr_rtm(ncomp*nidx_rtm(2)*nidx_rtm(1)*nidx_rtm(3))
+      real(kind = kreal), allocatable :: vr_rtm_wk(:)
 !
-!>     spectr data for Legendre transform
-!!@n      original layout: sp_rlm_spin(j_rlm,k_rtm,icomp)
-!!@n        size: sp_rlm_spin(nidx_rlm(2),nidx_rtm(1)*ncomp)
-      real(kind = kreal), allocatable :: sp_rlm_spin(:,:)
+!>      Spectr data for Legendre transform  @f$ f(r,l,m) @f$ 
+!>@n      size: sp_rlm(ncomp*nidx_rlm(2)*nidx_rtm(1))
+      real(kind = kreal), allocatable :: sp_rlm_wk(:)
 !
 ! ----------------------------------------------------------------------
 !
@@ -59,75 +55,62 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine allocate_work_sph_trans_spin(ncomp)
+      subroutine allocate_work_sph_trans(ncomp)
 !
       use m_spheric_parameter
 !
       integer(kind = kint), intent(in) :: ncomp
 !
 !
-      allocate(sp_rlm_spin(nnod_rlm,ncomp))
-      allocate(vr_rtm_spin(nnod_rtm,ncomp))
+      allocate(sp_rlm_wk(nnod_rlm*ncomp))
+      allocate(vr_rtm_wk(nnod_rtm*ncomp))
 !
-      sp_rlm_spin = 0.0d0
-      vr_rtm_spin = 0.0d0
+      call clear_bwd_legendre_work(ncomp)
+      call clear_fwd_legendre_work(ncomp)
 !
-      end subroutine allocate_work_sph_trans_spin
-!
-! ----------------------------------------------------------------------
-!
-      subroutine deallocate_work_sph_trans_spin
-!
-      deallocate(vr_rtm_spin, sp_rlm_spin)
-!
-      end subroutine deallocate_work_sph_trans_spin
+      end subroutine allocate_work_sph_trans
 !
 ! ----------------------------------------------------------------------
+!
+      subroutine deallocate_work_sph_trans
+!
+      deallocate(vr_rtm_wk, sp_rlm_wk)
+!
+      end subroutine deallocate_work_sph_trans
+!
+! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine clear_b_trans_spin(icomp_st, icomp_ed)
+      subroutine clear_fwd_legendre_work(ncomp)
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: icomp_st, icomp_ed
-      integer(kind = kint) :: nd, inod
+      integer(kind = kint), intent(in) :: ncomp
 !
 !
-!$omp parallel private(nd)
-      do nd = icomp_st, icomp_ed
-!$omp do private(inod)
-        do inod = 1, nnod_rtm
-          vr_rtm_spin(inod,nd) = zero
-        end do
-!$omp end do nowait
-      end do
-!$omp end parallel
+      if(ncomp .le. 0) return
+!$omp parallel workshare
+      sp_rlm_wk(1:nnod_rlm*ncomp) = 0.0d0
+!$omp end parallel workshare
 !
-      end subroutine clear_b_trans_spin
+      end subroutine clear_fwd_legendre_work
 !
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
-      subroutine clear_f_trans_spin(icomp_st, icomp_ed)
+      subroutine clear_bwd_legendre_work(ncomp)
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: icomp_st, icomp_ed
-      integer(kind = kint) :: nd, inod
+      integer(kind = kint), intent(in) :: ncomp
 !
 !
-!$omp parallel private(nd)
-      do nd = icomp_st, icomp_ed
-!$omp do private(inod)
-        do inod = 1, nnod_rlm
-          sp_rlm_spin(inod,nd) = zero
-        end do
-!$omp end do nowait
-      end do
-!$omp end parallel
+      if(ncomp .le. 0) return
+!$omp parallel workshare
+      vr_rtm_wk(1:nnod_rtm*ncomp) = 0.0d0
+!$omp end parallel workshare
 !
-      end subroutine clear_f_trans_spin
+      end subroutine clear_bwd_legendre_work
 !
-! -----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
       end module m_work_4_sph_trans_spin

@@ -39,17 +39,18 @@
       integer(kind = kint) :: j, l, m
 !
 !
-      jmax_w = ltr_w*(ltr_w+1)
+      jmax_w = ltr_w*(ltr_w+2)
 !
       allocate(index_w(jmax_w,2))
       allocate(w_gauss(jmax_w))
 !
       w_gauss(1:jmax_w) = 0.0d0
-      do j = 1, jmax_w
-        l = int(aint( sqrt(real(j)) ))
-        m = j - l*(l + 1)
-        index_w(j,1) = l
-        index_w(j,2) = m
+      do l = 1, ltr_w
+        do m = -l, l
+          j = l*(l + 1) + m
+          index_w(j,1) = l
+          index_w(j,2) = m
+        end do
       end do
 !
       end subroutine allocate_gauss_global_coefs
@@ -97,10 +98,10 @@
   99  continue
       close(id_gauss)
 !
-!      write(*,*) 'j, index_w(j,1:2), w_gauss(j)'
-!      do j = 1, jmax_w
-!        write(*,*) j, index_w(j,1:2), w_gauss(j)
-!      end do
+      write(*,*) 'j, index_w(j,1:2), w_gauss(j)'
+      do j = 1, jmax_w
+        write(*,*) j, index_w(j,1:2), w_gauss(j)
+      end do
 !
       end subroutine read_gauss_global_coefs
 !
@@ -115,7 +116,7 @@
       write(id_gauss,'(a)') '# truncation, radius for potential'
       write(id_gauss,'(a)') '#'
 !
-      write(id_gauss,'(i10,1pe25.15e3)') ltr_w, r_gauss
+      write(id_gauss,'(i16,1pe25.15e3)') ltr_w, r_gauss
 !
 !
       write(id_gauss,'(a)') '#'

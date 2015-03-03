@@ -261,6 +261,9 @@
 !>        start address for inductino for vector potential
 !!         @f$ e_{ijk} u_{j} B_{k} @f$
         integer (kind=kint) :: i_vp_induct =       izero
+!>        start address for magnetic stretch term
+!!         @f$ B_{i} \partial_{k} \u_{k} \right)@f$
+        integer (kind=kint) :: i_mag_stretch =     izero
 !>        start address for advection for composition
 !!         @f$ u_{i} \partial_{i} C @f$
         integer (kind=kint) :: i_c_advect =        izero

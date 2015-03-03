@@ -21,6 +21,7 @@
       module check_field_dependency
 !
       use m_precision
+      use m_error_IDs
 !
       implicit none
 !
@@ -61,7 +62,7 @@
             write(*,*)  trim(phys_check_name(j))
           end do
         end if
-        call calypso_MPI_abort(402,'Stop program.')
+        call calypso_MPI_abort(ierr_fld,'Stop program.')
       end if
 !
       end subroutine check_dependence_phys

@@ -36,9 +36,9 @@
 !!@param r_ICB(0:2)   Radius at ICB
 !!@param r_CMB(0:2)   Radius at CMB
 !!@param fdm2_fix_dr_ICB(-1:1,3)
-!!         Matrix to evaluate field at ICB with fiexed radial derivative
+!!         Matrix to evaluate field at ICB with fixed radial derivative
 !!@param fdm2_fix_dr_CMB(-1:1,3)
-!!         Matrix to evaluate field at CMB with fiexed radial derivative
+!!         Matrix to evaluate field at CMB with fixed radial derivative
 !!
 !!@param flux_ICB(jamx)  Spectrum of fixed flux at ICB
 !!@param flux_CMB(jamx)  Spectrum of fixed flux at CMB

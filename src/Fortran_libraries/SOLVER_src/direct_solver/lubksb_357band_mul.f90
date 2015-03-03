@@ -246,7 +246,7 @@
      &                - band_lu(9, 4,mst:med)*x(mst:med,4)              &
      &                - band_lu(8, 5,mst:med)*x(mst:med,5)
         do i = 7, n
-          x(mst:med,i) = x(mst:med,i) &
+          x(mst:med,i) = x(mst:med,i)                                   &
      &                  - band_lu(13,i-6,mst:med)*x(mst:med,i-6)        &
      &                  - band_lu(12,i-5,mst:med)*x(mst:med,i-5)        &
      &                  - band_lu(11,i-4,mst:med)*x(mst:med,i-4)        &

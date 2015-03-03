@@ -30,24 +30,33 @@
       module m_ctl_data_induct_norm
 !
       use m_precision
+      use t_read_control_arrays
 !
       implicit  none
 !
 !
-      integer(kind=kint) :: num_coef_4_m_diffuse_ctl = 0
-      character(len=kchara),allocatable :: coef_4_m_diffuse_name_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_m_diffuse_power_ctl(:)
+!>      Structure for number and power to construct
+!!               evolution of magnetic field term
+!!@n      coef_4_magne_evo_ctl%c_tbl:  Name of number 
+!!@n      coef_4_magne_evo_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_magne_evo_ctl
 !
-      integer(kind=kint) :: num_coef_4_magnetic_ctl =  0
-      integer(kind=kint) :: num_coef_4_mag_p_ctl =     0
-      character(len=kchara),allocatable :: coef_4_magnetic_name_ctl(:)
-      character(len=kchara),allocatable :: coef_4_mag_p_name_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_magnetic_power_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_mag_p_power_ctl(:)
+!>      Structure for number and power to construct
+!!               magnetic diffusion term
+!!@n      coef_4_mag_diffuse_ctl%c_tbl:  Name of number 
+!!@n      coef_4_mag_diffuse_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_mag_diffuse_ctl
 !
-      integer(kind=kint) :: num_coef_4_induction_ctl = 0
-      character(len=kchara),allocatable :: coef_4_induction_name_ctl(:)
-      real(kind = kreal), allocatable :: coef_4_induction_power_ctl(:)
+!>      Structure for number and power to construct
+!!               gradient of potenrial
+!!@n      coef_4_mag_potential_ctl%c_tbl:  Name of number 
+!!@n      coef_4_mag_potential_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_mag_potential_ctl
+!
+!>      Structure for number and power to construct magnetic induction
+!!@n      coef_4_induction_ctl%c_tbl:  Name of number 
+!!@n      coef_4_induction_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_induction_ctl
 !
 !   entry label
 !
@@ -61,19 +70,9 @@
       character(len=kchara) :: hd_n_m_diff = 'coef_4_m_diffuse_ctl'
       character(len=kchara) :: hd_n_induct = 'coef_4_induction_ctl'
 !
-      integer (kind=kint) :: i_n_magne =  0
-      integer (kind=kint) :: i_n_mag_p =  0
-      integer (kind=kint) :: i_n_m_diff = 0
-      integer (kind=kint) :: i_n_induct = 0
-!
       private :: hd_induction, i_induct_ctl
       private :: hd_n_magne, hd_n_mag_p
       private :: hd_n_m_diff, hd_n_induct
-!
-      private :: allocate_coef_4_magne_ctl
-      private :: allocate_coef_4_mag_p_ctl
-      private :: allocate_coef_4_m_diffuse_ctl
-      private :: allocate_coef_4_induction_ctl
 !
 ! -----------------------------------------------------------------------
 !
@@ -81,78 +80,35 @@
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_magne_ctl
+      subroutine deallocate_coef_4_magne_ctl
 !
-        allocate(coef_4_magnetic_name_ctl(num_coef_4_magnetic_ctl))
-        allocate(coef_4_magnetic_power_ctl(num_coef_4_magnetic_ctl))
-        coef_4_magnetic_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_magne_evo_ctl)
 !
-       end subroutine allocate_coef_4_magne_ctl
+      end subroutine deallocate_coef_4_magne_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_mag_p_ctl
+      subroutine deallocate_coef_4_mag_p_ctl
 !
-        allocate(coef_4_mag_p_name_ctl(num_coef_4_mag_p_ctl))
-        allocate(coef_4_mag_p_power_ctl(num_coef_4_mag_p_ctl))
-        coef_4_mag_p_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_mag_potential_ctl)
 !
-       end subroutine allocate_coef_4_mag_p_ctl
+      end subroutine deallocate_coef_4_mag_p_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_m_diffuse_ctl
+      subroutine deallocate_coef_4_m_diffuse_ctl
 !
-        allocate(coef_4_m_diffuse_name_ctl(num_coef_4_m_diffuse_ctl))
-        allocate(coef_4_m_diffuse_power_ctl(num_coef_4_m_diffuse_ctl))
-        coef_4_m_diffuse_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_mag_diffuse_ctl)
 !
-       end subroutine allocate_coef_4_m_diffuse_ctl
+      end subroutine deallocate_coef_4_m_diffuse_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_coef_4_induction_ctl
+      subroutine deallocate_coef_4_induction_ctl
 !
-        allocate(coef_4_induction_name_ctl(num_coef_4_induction_ctl))
-        allocate(coef_4_induction_power_ctl(num_coef_4_induction_ctl))
-        coef_4_induction_power_ctl = 0.0d0
+      call dealloc_control_array_c_r(coef_4_induction_ctl)
 !
-       end subroutine allocate_coef_4_induction_ctl
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_magne_ctl
-!
-        deallocate(coef_4_magnetic_name_ctl, coef_4_magnetic_power_ctl)
-!
-       end subroutine deallocate_coef_4_magne_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_mag_p_ctl
-!
-        deallocate(coef_4_mag_p_name_ctl, coef_4_mag_p_power_ctl)
-!
-       end subroutine deallocate_coef_4_mag_p_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_m_diffuse_ctl
-!
-        deallocate(coef_4_m_diffuse_name_ctl)
-        deallocate(coef_4_m_diffuse_power_ctl)
-!
-       end subroutine deallocate_coef_4_m_diffuse_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_coef_4_induction_ctl
-!
-        deallocate(coef_4_induction_name_ctl)
-        deallocate(coef_4_induction_power_ctl)
-!
-       end subroutine deallocate_coef_4_induction_ctl
+      end subroutine deallocate_coef_4_induction_ctl
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -173,42 +129,12 @@
         if(i_induct_ctl .gt. 0) exit
 !
 !
-        call find_control_array_flag(hd_n_magne,                        &
-     &      num_coef_4_magnetic_ctl)
-        if(num_coef_4_magnetic_ctl.gt.0 .and. i_n_magne.eq.0) then
-          call allocate_coef_4_magne_ctl
-          call read_control_array_vect_list(hd_n_magne,                 &
-     &        num_coef_4_magnetic_ctl, i_n_magne,                       &
-     &        coef_4_magnetic_name_ctl, coef_4_magnetic_power_ctl)
-        end if
-!
-!
-        call find_control_array_flag(hd_n_mag_p,                        &
-     &      num_coef_4_mag_p_ctl)
-        if(num_coef_4_mag_p_ctl.gt.0 .and. i_n_mag_p.eq.0) then
-          call allocate_coef_4_mag_p_ctl
-          call read_control_array_vect_list(hd_n_mag_p,                 &
-     &        num_coef_4_mag_p_ctl, i_n_mag_p,                          &
-     &        coef_4_mag_p_name_ctl, coef_4_mag_p_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_m_diff,                       &
-     &      num_coef_4_m_diffuse_ctl)
-        if(num_coef_4_m_diffuse_ctl.gt.0 .and. i_n_m_diff.eq.0) then
-          call allocate_coef_4_m_diffuse_ctl
-          call read_control_array_vect_list(hd_n_m_diff,                &
-     &        num_coef_4_m_diffuse_ctl, i_n_m_diff,                     &
-     &        coef_4_m_diffuse_name_ctl, coef_4_m_diffuse_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_induct,                       &
-     &      num_coef_4_induction_ctl)
-        if(num_coef_4_induction_ctl.gt.0 .and. i_n_induct.eq.0) then
-          call allocate_coef_4_induction_ctl
-          call read_control_array_vect_list(hd_n_induct,                &
-     &        num_coef_4_induction_ctl, i_n_induct,                     &
-     &        coef_4_induction_name_ctl, coef_4_induction_power_ctl)
-        end if
+        call read_control_array_c_r(hd_n_magne, coef_4_magne_evo_ctl)
+        call read_control_array_c_r                                     &
+     &     (hd_n_mag_p, coef_4_mag_potential_ctl)
+        call read_control_array_c_r                                     &
+     &     (hd_n_m_diff, coef_4_mag_diffuse_ctl)
+        call read_control_array_c_r(hd_n_induct, coef_4_induction_ctl)
       end do
 !
       end subroutine read_induction_ctl

@@ -45,6 +45,7 @@
 !
 !
       if (iflag_t_evo_4_velo .gt.     id_no_evolution) then
+        if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_velo_sph'
         call set_sph_bc_velo_sph
 !
         call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_U)
@@ -56,34 +57,40 @@
       end if
 !
       if (iflag_t_evo_4_temp .gt.     id_no_evolution) then
+        if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_temp_sph'
         call set_sph_bc_temp_sph
         call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_T)
       end if
 !
       if (iflag_t_evo_4_magne .gt.    id_no_evolution) then
+        if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_magne_sph'
         call set_sph_bc_magne_sph
         call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_B)
       end if
 !
       if (iflag_t_evo_4_composit .gt. id_no_evolution) then
+        if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_composition_sph'
         call set_sph_bc_composition_sph
         call cal_fdm_coefs_4_BCs(nidx_rj(1), radius_1d_rj_r, sph_bc_C)
       end if
 !
 !      Set FDM matrices for Center
 !
+      if(iflag_debug .gt. 0) write(*,*) 'cal_2nd_to_center_fixed_fdm'
       call cal_2nd_to_center_fixed_fdm(radius_1d_rj_r(1))
-      call cal_2nd_to_center_fix_df_fdm(radius_1d_rj_r(1))
+      call cal_2nd_center_fix_df_fdm(radius_1d_rj_r(1))
+      call cal_2nd_center_fixed_fdm(radius_1d_rj_r(1))
 !
 !      Set reference temperature and adjust boundary conditions
 !
+      if(iflag_debug .gt. 0) write(*,*) 'set_ref_temp_sph_mhd'
       call allocate_reft_rj_data
       call set_ref_temp_sph_mhd(sph_bc_T)
       call adjust_sph_temp_bc_by_reftemp(sph_bc_T)
 !
 !      Check data
 !
-      if(i_debug .gt. 1) then
+      if(iflag_debug .gt. 1) then
         write(*,*) 'sph_bc_U%iflag_icb', sph_bc_U%kr_in,                &
      &          sph_bc_U%iflag_icb
         write(*,*) 'sph_bc_U%iflag_cmb', sph_bc_U%kr_out,               &

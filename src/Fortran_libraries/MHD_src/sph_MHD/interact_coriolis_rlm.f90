@@ -43,7 +43,8 @@
       integer(kind = kint), intent(in) :: idx_gl_1d_rlm_j(jmax_rlm,3)
 !
       integer(kind = kint) :: l3, m3, j3, l2, m2, j_rlm
-      integer(kind = kint) :: j2_gl_k1, j2_gl_k2, j2_gl_l1
+      integer(kind = kint) :: l2_gl_k1, l2_gl_k2, l2_gl_l1
+      integer(kind = kint) :: m2_gl_k1, m2_gl_k2, m2_gl_l1
 !
 !
       do j_rlm = 1, jmax_rlm
@@ -54,41 +55,49 @@
         l2 = l3 - 1
         if(l2.ge.1 .and. l2.le.l_truncation .and. abs(m3).le.l2) then
           gi_cor_rlm(j_rlm,1) = leadki(ione, izero, l2, m3, l3, m3)
-          j2_gl_k1 = l2*(l2+1) + m3
+          l2_gl_k1 = l2
+          m2_gl_k1 = m3
         else
           gi_cor_rlm(j_rlm,1) = zero
-          j2_gl_k1 = j3
+          l2_gl_k1 = l3
+          m2_gl_k1 = m3
         end if
 !
         l2 = l3 + 1
         if(l2.ge.1 .and. l2.le.l_truncation .and. abs(m3).le.l2) then
           gi_cor_rlm(j_rlm,2) = leadki(ione, izero, l2, m3, l3, m3)
-          j2_gl_k2 = l2*(l2+1) + m3
+          l2_gl_k2 = l2
+          m2_gl_k2 = m3
         else
           gi_cor_rlm(j_rlm,2) = zero
-          j2_gl_k2 = j3
+          l2_gl_k2 = l3
+          m2_gl_k2 = m3
         end if
 !
         if(l3 .ge. 1) then
           m2 = -m3
           ei_cor_rlm(j_rlm,1) = leadli(ione, izero, l3, m2, l3, m3)
-          j2_gl_l1 = l3*(l3+1) + m2
+          l2_gl_l1 = l3
+          m2_gl_l1 = m2
         end if
 !
         if(j3 .eq. 0) then
-          j2_gl_k1 = izero
-          j2_gl_k2 = izero
-          j2_gl_l1 = izero
+          l2_gl_k1 = izero
+          m2_gl_k1 = izero
+          l2_gl_k2 = izero
+          m2_gl_k2 = izero
+          l2_gl_l1 = izero
+          m2_gl_l1 = izero
           gi_cor_rlm(j_rlm,2) = zero
           ei_cor_rlm(j_rlm,1) = zero
         end if
 !
         jgi_cor_rlm(j_rlm,1) = find_local_sph_rlm_address(jmax_rlm,     &
-     &                          idx_gl_1d_rlm_j, j2_gl_k1)
+     &                          idx_gl_1d_rlm_j, l2_gl_k1, m2_gl_k1)
         jgi_cor_rlm(j_rlm,2) = find_local_sph_rlm_address(jmax_rlm,     &
-     &                          idx_gl_1d_rlm_j, j2_gl_k2)
+     &                          idx_gl_1d_rlm_j, l2_gl_k2, m2_gl_k2)
         jei_cor_rlm(j_rlm,1) = find_local_sph_rlm_address(jmax_rlm,     &
-     &                          idx_gl_1d_rlm_j, j2_gl_l1)
+     &                          idx_gl_1d_rlm_j, l2_gl_l1, m2_gl_l1)
       end do
 !
       end subroutine cal_gaunt_coriolis_rlm

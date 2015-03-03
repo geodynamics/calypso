@@ -23,8 +23,6 @@
       integer ( kind = kint) :: ltr_tri_sph
       integer ( kind = kint) :: jmax_tri_sph
 !
-      real ( kind = kreal) :: dph
-!
       integer ( kind = kint), dimension(:,:), allocatable:: idx
       real   ( kind = kreal), dimension(:,:), allocatable:: g
       real   ( kind = kreal), dimension(:,:), allocatable:: s

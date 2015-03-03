@@ -7,22 +7,23 @@
 !>@brief  Set order of spheherical harmonics modes
 !!
 !!@verbatim
-!!      subroutine set_wavenumber_4_ispack_fft(nth, nph,                &
+!!      subroutine set_wavenumber_4_ispack_fft(nth, nph, m_folding,     &
 !!     &          mspec_4_ispack, mdx_ispack)
 !!        output: mspec_4_ispack, mdx_ispack
 !!      subroutine set_zonal_wavenum_4_legendre(ndomain_m,              &
-!!     &          ltr, nth, nph, jdx_fsph, mdx_4_lgd)
+!!     &          ltr, m_folding, nth, nph, jdx_fsph, mdx_4_lgd)
 !!        output: jdx_fsph, mdx_4_lgd
 !!
 !!      subroutine set_merged_index_4_sph_trans(ndomain_m, ltr, jmax,   &
-!!     &          nph, istack_m, mdx_4_lgd, nidx_ml, istack_ml, jdx_lag)
+!!     &          nph, m_folding, istack_m, mdx_4_lgd, nidx_ml,         &
+!!     &          istack_ml, jdx_lag)
 !!        output: nidx_ml, istack_ml, jdx_lag
 !!      subroutine set_merged_index_4_sph_rj(ndomain_r, ndomain_m,      &
 !!     &          ndomain_rj, jmax, istack_ml, jdx_lag,                 &
 !!     &          nidx_j, istack_j, jdx_rj)
 !!        output:  nidx_j, istack_j, jdx_rj
 !!
-!!      subroutine set_trans_table_fft_2_lgd(ltr, nth, nph,             &
+!!      subroutine set_trans_table_fft_2_lgd(ltr, nth, nph, m_folding,  &
 !!     &          mspec_4_ispack, jdx_fsph, mtbl_fft_2_lgd)
 !!        output: mtbl_fft_2_lgd
 !!      subroutine set_trans_table_lgd_2_sph(jmax, jtbl_fsph, jtbl_isph)
@@ -41,22 +42,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_wavenumber_4_ispack_fft(nth, nph,                  &
+      subroutine set_wavenumber_4_ispack_fft(nth, nph, m_folding,       &
      &          mspec_4_ispack, mdx_ispack)
 !
-      integer(kind = kint), intent(in) :: nth, nph
+      integer(kind = kint), intent(in) :: nth, nph, m_folding
       integer(kind = kint), intent(inout) :: mspec_4_ispack(-nth:nth)
       integer(kind = kint), intent(inout) :: mdx_ispack(nph)
-      integer(kind = kint) :: m, mm
+      integer(kind = kint) :: m, mm, mnum
 !
+!
+      mnum = nth/m_folding
       mspec_4_ispack(0) =   1
-      mspec_4_ispack(nth) = 2
-      do m = 1, nth-1
+      mspec_4_ispack(nth/m_folding) = 2
+      do m = 1, nth/m_folding-1
         mspec_4_ispack( m) = 2*m+1
         mspec_4_ispack(-m) = 2*m+2
       end do
 !
-      do m = -nth+1, nth
+      do m = -nth/m_folding+1, nth/m_folding
         mm = mspec_4_ispack(m)
         mdx_ispack(mm) = m
       end do
@@ -66,9 +69,10 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_zonal_wavenum_4_legendre(ndomain_m,                &
-     &          ltr, nth, nph, jdx_fsph, mdx_4_lgd)
+     &          ltr, m_folding, nth, nph, jdx_fsph, mdx_4_lgd)
 !
-      integer(kind = kint), intent(in) :: ltr, nth, nph, ndomain_m
+      integer(kind = kint), intent(in) :: ltr, m_folding
+      integer(kind = kint), intent(in) :: nth, nph, ndomain_m
       integer(kind = kint), intent(inout) :: jdx_fsph(-nth:nth)
       integer(kind = kint), intent(inout) :: mdx_4_lgd(0:nph)
 !
@@ -81,7 +85,7 @@
 !
       ip = 1
       imark = 1
-      ltr_half = ( ltr-mod(ltr,2) ) / 2
+      ltr_half = ( ltr-mod(ltr,2) ) / (2*m_folding)
 !
       do m = 1, ltr_half
         ip_tmp(m) = ip
@@ -95,7 +99,8 @@
         end if
       end do
 !
-      ip_tmp(0) = ip
+      m = 0
+      ip_tmp(m) = ip
       ip = ip + imark
       if (ip .gt. ndomain_m) then
         ip =    ndomain_m
@@ -105,7 +110,7 @@
         imark =  1
       end if
 !
-      do m = ltr_half+1, ltr
+      do m = ltr_half+1, ltr/m_folding
         ip_tmp(m) = ip
         ip = ip + imark
         if (ip .gt. ndomain_m) then
@@ -128,7 +133,7 @@
 !
       mm = -1
       do ip = 1, ndomain_m
-        do m = -ltr, ltr
+        do m = -ltr/m_folding, ltr/m_folding
           if (ip_tmp(m) .eq. ip) then
             mm = mm + 1
             jdx_fsph(m) = mm
@@ -136,20 +141,20 @@
         end do
       end do
 !
-      do m = -ltr, ltr
+      do m = -ltr/m_folding, ltr/m_folding
         mm = jdx_fsph(m)
         mdx_4_lgd(mm) = m
       end do
 !
       deallocate( ip_tmp )
 !
-!        write(8,*) 'm, jdx_fsph(m)'
+!        write(*,*) 'm, jdx_fsph(m)'
 !      do m = -ltr, ltr
-!        write(8,*) m, jdx_fsph(m)
+!        write(*,*) m, jdx_fsph(m)
 !      end do
-!        write(8,*) 'mm, mdx_4_lgd(mm)'
+!        write(*,*) 'mm, mdx_4_lgd(mm)'
 !      do mm = 0,nph
-!        write(8,*) mm, mdx_4_lgd(mm)
+!        write(*,*) mm, mdx_4_lgd(mm)
 !      end do
 !
 !
@@ -158,9 +163,11 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_merged_index_4_sph_trans(ndomain_m, ltr, jmax,     &
-     &          nph, istack_m, mdx_4_lgd, nidx_ml, istack_ml, jdx_lag)
+     &          nph, m_folding, istack_m, mdx_4_lgd, nidx_ml,           &
+     &          istack_ml, jdx_lag)
 !
-      integer(kind = kint), intent(in) :: ndomain_m, ltr, jmax, nph
+      integer(kind = kint), intent(in) :: ndomain_m, ltr, jmax
+      integer(kind = kint), intent(in) :: nph, m_folding
       integer(kind = kint), intent(in) :: istack_m(0:ndomain_m)
       integer(kind = kint), intent(in) :: mdx_4_lgd(0:nph)
       integer(kind = kint), intent(inout) :: jdx_lag(0:jmax,3)
@@ -168,7 +175,7 @@
       integer(kind = kint), intent(inout) :: istack_ml(0:ndomain_m)
 !
       integer(kind = kint) :: ip, mst, med
-      integer(kind = kint) :: j, l, m, mm
+      integer(kind = kint) :: j, l, m, mm, ls, ll, ms
 !
       nidx_ml = 0
       istack_ml(0) = -1
@@ -177,13 +184,17 @@
         mst = istack_m(ip-1) + 1
         med = istack_m(ip)
         do mm = mst, med
-          m = mdx_4_lgd(mm)
-          do l= abs(m), ltr
+          m = mdx_4_lgd(mm)*m_folding
+          ms = m / m_folding
+          do l = abs(m), ltr
             j = j + 1
+!
+            ls = mod(l,m_folding)
+            ll = (l - ls)/m_folding
+!
             jdx_lag(j,2) = l
             jdx_lag(j,3) = m
-            jdx_lag(j,1) = jdx_lag(j,2) * (jdx_lag(j,2)+1)              &
-     &                    + jdx_lag(j,3)
+            jdx_lag(j,1) = m_folding*ll**2 + ls*(2*ll+1) + ll + ms
             nidx_ml(ip) = nidx_ml(ip) + 1
           end do
         end do
@@ -264,17 +275,18 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_trans_table_fft_2_lgd(ltr, nth, nph,               &
+      subroutine set_trans_table_fft_2_lgd(ltr, nth, nph, m_folding,    &
      &          mspec_4_ispack, jdx_fsph, mtbl_fft_2_lgd)
 !
-      integer(kind = kint), intent(in) :: ltr, nth, nph
+      integer(kind = kint), intent(in) :: ltr, nth, nph, m_folding
       integer(kind = kint), intent(in) :: mspec_4_ispack(-nth:nth)
       integer(kind = kint), intent(in) :: jdx_fsph(-nth:nth)
       integer(kind = kint), intent(inout) :: mtbl_fft_2_lgd(0:nph)
 !
-      integer(kind = kint) :: m, m0, mm
+      integer(kind = kint) :: m, m0, mm, mnum
 !
-      do m = -ltr, ltr
+      mnum = ltr/m_folding
+      do m = -mnum, mnum
         m0 = mspec_4_ispack(m)
         mm = jdx_fsph(m)
         mtbl_fft_2_lgd(mm) = m0

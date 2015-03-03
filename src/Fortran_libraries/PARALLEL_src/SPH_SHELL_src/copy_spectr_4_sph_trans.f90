@@ -1,22 +1,28 @@
-!>@file   copy_snap_4_sph_trans.f90
-!!@brief  module copy_snap_4_sph_trans
+!>@file   copy_spectr_4_sph_trans.f90
+!!@brief  module copy_spectr_4_sph_trans
 !!
 !!@author H. Matsui
 !!@date Programmed in Oct., 2009
 !
 !>@brief  Copy data from/to sphrical transform buffer
+!!        and local array for center
 !!
 !!@verbatim
-!!      subroutine copy_scalar_spec_to_trans(ncomp_trans,               &
-!!     &          is_spec, i_trns)
-!!      subroutine copy_scalar_spec_from_trans(ncomp_trans,             &
-!!     &          is_spec, i_trns)
+!!      subroutine sel_sph_rj_scalar_2_send_wpole                       &
+!!     &         (ncomp_send, i_field, i_send, n_WS, WS, v_pl_local)
+!!      subroutine sel_sph_rj_scalar_to_send                            &
+!!     &         (ncomp_send, i_field, i_send, n_WS, WS)
+!!      subroutine sel_sph_rj_vector_to_send                            &
+!!     &         (ncomp_send, i_field, i_send, n_WS, WS)
+!!      subroutine sel_sph_rj_tensor_to_send                            &
+!!     &         (ncomp_send, i_field, i_send, n_WS, WS)
 !!
-!!      subroutine copy_vec_spec_to_trans(ncomp_trans, is_spec, i_trns)
-!!      subroutine copy_vec_spec_from_trans(ncomp_trans, is_spec, i_trns)
-!!
-!!      subroutine copy_tsr_spec_to_trans(ncomp_trans, is_spec, i_trns)
-!!      subroutine copy_tsr_spec_from_trans(ncomp_trans, is_spec, i_trns)
+!!      subroutine sel_sph_rj_scalar_from_recv                          &
+!!     &         (ncomp_recv, i_field, i_recv, n_WR, WR)
+!!      subroutine sel_sph_rj_vector_from_recv                          &
+!!     &         (ncomp_recv, i_field, i_recv, n_WR, WR)
+!!      subroutine sel_sph_rj_tensor_from_recv                          &
+!!     &         (ncomp_recv, i_field, i_recv, n_WR, WR)
 !!@endverbatim
 !
       module copy_spectr_4_sph_trans
@@ -37,165 +43,162 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine copy_scalar_spec_to_trans(ncomp_trans,                 &
-     &          is_spec, i_trns)
+      subroutine sel_sph_rj_scalar_2_send_wpole                         &
+     &         (ncomp_send, i_field, i_send, n_WS, WS, v_pl_local)
 !
-      integer(kind = kint), intent(in) :: ncomp_trans
-      integer(kind = kint), intent(in) :: is_spec, i_trns
-      integer(kind = kint) :: inod, jnod, ist, ied, ip
+      use m_sph_communicators
+      use m_sph_trans_comm_table
+      use m_sel_spherical_SRs
+      use m_work_pole_sph_trans
 !
-!
-      if( (is_spec*i_trns) .le. 0) return
-!
-!$omp do private(ist,ied,inod,jnod)
-      do ip = 1, np_smp
-        ist = inod_rj_smp_stack(ip-1) + 1
-        ied = inod_rj_smp_stack(ip)
-        do inod = ist, ied
-          jnod = i_trns + (inod-1)*ncomp_trans
-          sp_rj(jnod  ) = d_rj(inod,is_spec  )
-        end do
-      end do
-!$omp end do nowait
-!
-      end subroutine copy_scalar_spec_to_trans
-!
-!-----------------------------------------------------------------------
-!
-      subroutine copy_scalar_spec_from_trans(ncomp_trans,               &
-     &          is_spec, i_trns)
-!
-      integer(kind = kint), intent(in) :: ncomp_trans
-      integer(kind = kint), intent(in) :: is_spec, i_trns
-      integer(kind = kint) :: inod, jnod, ist, ied, ip
+      integer(kind = kint), intent(in) :: i_field, i_send
+      integer(kind = kint), intent(in) :: ncomp_send, n_WS
+      real(kind = kreal), intent(inout) :: WS(n_WS)
+      real(kind = kreal), intent(inout)                                 &
+     &                :: v_pl_local(nnod_pole,ncomp_send)
 !
 !
-      if( (is_spec*i_trns) .le. 0) return
+      if(i_field*i_send .eq. 0) return
+      call sel_calypso_to_send_scalar(ncomp_send, nnod_rj, n_WS,        &
+     &    nmax_sr_rj,  nneib_domain_rj,  istack_sr_rj,  item_sr_rj,     &
+     &    ntot_phys_rj, i_field, i_send, d_rj, WS)
 !
-!$omp do private(ist,ied,inod,jnod)
-      do ip = 1, np_smp
-        ist = inod_rj_smp_stack(ip-1) + 1
-        ied = inod_rj_smp_stack(ip)
-        do inod = ist, ied
-          jnod = i_trns + (inod-1)*ncomp_trans
-          d_rj(inod,is_spec  ) = sp_rj(jnod  )
-        end do
-      end do
-!$omp end do nowait
+      if(iflag_rj_center .le. 0) return
 !
-      end subroutine copy_scalar_spec_from_trans
+      if(inod_rj_center .gt. 0) then
+        v_pl_local(nnod_pole,i_send) = d_rj(inod_rj_center,i_field)
+      else
+        v_pl_local(nnod_pole,i_send) = 0.0d0
+      end if
 !
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine copy_vec_spec_to_trans(ncomp_trans, is_spec, i_trns)
-!
-      integer(kind = kint), intent(in) :: ncomp_trans
-      integer(kind = kint), intent(in) :: is_spec, i_trns
-      integer(kind = kint) :: inod, jnod, ist, ied, ip
-!
-!
-      if( (is_spec*i_trns) .le. 0) return
-!
-!$omp do private(ist,ied,inod,jnod)
-      do ip = 1, np_smp
-        ist = inod_rj_smp_stack(ip-1) + 1
-        ied = inod_rj_smp_stack(ip)
-        do inod = ist, ied
-          jnod = i_trns + (inod-1)*ncomp_trans
-          sp_rj(jnod  ) = d_rj(inod,is_spec  )
-          sp_rj(jnod+1) = d_rj(inod,is_spec+1)
-          sp_rj(jnod+2) = d_rj(inod,is_spec+2)
-        end do
-      end do
-!$omp end do nowait
-!
-      end subroutine copy_vec_spec_to_trans
+      end subroutine sel_sph_rj_scalar_2_send_wpole
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_vec_spec_from_trans(ncomp_trans, is_spec, i_trns)
+      subroutine sel_sph_rj_scalar_to_send                              &
+     &         (ncomp_send, i_field, i_send, n_WS, WS)
 !
-      integer(kind = kint), intent(in) :: ncomp_trans
-      integer(kind = kint), intent(in) :: is_spec, i_trns
-      integer(kind = kint) :: inod, jnod, ist, ied, ip
+      use m_sph_communicators
+      use m_sph_trans_comm_table
+      use m_sel_spherical_SRs
+!
+      integer(kind = kint), intent(in) :: i_field, i_send
+      integer(kind = kint), intent(in) :: ncomp_send, n_WS
+      real(kind = kreal), intent(inout) :: WS(n_WS)
 !
 !
-      if( (is_spec*i_trns) .le. 0) return
+      if(i_field*i_send .eq. 0) return
+      call sel_calypso_to_send_scalar(ncomp_send, nnod_rj, n_WS,        &
+     &    nmax_sr_rj,  nneib_domain_rj,  istack_sr_rj,  item_sr_rj,     &
+     &    ntot_phys_rj, i_field, i_send, d_rj, WS)
 !
-!$omp do private(ist,ied,inod,jnod)
-      do ip = 1, np_smp
-        ist = inod_rj_smp_stack(ip-1) + 1
-        ied = inod_rj_smp_stack(ip)
-        do inod = ist, ied
-          jnod = i_trns + (inod-1)*ncomp_trans
-          d_rj(inod,is_spec  ) = sp_rj(jnod  )
-          d_rj(inod,is_spec+1) = sp_rj(jnod+1)
-          d_rj(inod,is_spec+2) = sp_rj(jnod+2)
-        end do
-      end do
-!$omp end do nowait
+      end subroutine sel_sph_rj_scalar_to_send
 !
-      end subroutine copy_vec_spec_from_trans
+!-----------------------------------------------------------------------
+!
+      subroutine sel_sph_rj_vector_to_send                              &
+     &         (ncomp_send, i_field, i_send, n_WS, WS)
+!
+      use m_sph_communicators
+      use m_sph_trans_comm_table
+      use m_sel_spherical_SRs
+!
+      integer(kind = kint), intent(in) :: i_field, i_send
+      integer(kind = kint), intent(in) :: ncomp_send, n_WS
+      real(kind = kreal), intent(inout) :: WS(n_WS)
+!
+!
+      if(i_field*i_send .eq. 0) return
+      call sel_calypso_to_send_vector(ncomp_send, nnod_rj, n_WS,        &
+     &    nmax_sr_rj,  nneib_domain_rj,  istack_sr_rj,  item_sr_rj,     &
+     &    ntot_phys_rj, i_field, i_send, d_rj, WS)
+!
+      end subroutine sel_sph_rj_vector_to_send
+!
+!-----------------------------------------------------------------------
+!
+      subroutine sel_sph_rj_tensor_to_send                              &
+     &         (ncomp_send, i_field, i_send, n_WS, WS)
+!
+      use m_sph_communicators
+      use m_sph_trans_comm_table
+      use m_sel_spherical_SRs
+!
+      integer(kind = kint), intent(in) :: i_field, i_send
+      integer(kind = kint), intent(in) :: ncomp_send, n_WS
+      real(kind = kreal), intent(inout) :: WS(n_WS)
+!
+!
+      if(i_field*i_send .eq. 0) return
+      call sel_calypso_to_send_tensor(ncomp_send, nnod_rj, n_WS,        &
+     &    nmax_sr_rj,  nneib_domain_rj,  istack_sr_rj,  item_sr_rj,     &
+     &    ntot_phys_rj, i_field, i_send, d_rj, WS)
+!
+      end subroutine sel_sph_rj_tensor_to_send
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine copy_tsr_spec_to_trans(ncomp_trans, is_spec, i_trns)
+      subroutine sel_sph_rj_scalar_from_recv                            &
+     &         (ncomp_recv, i_field, i_recv, n_WR, WR)
 !
-      integer(kind = kint), intent(in) :: ncomp_trans
-      integer(kind = kint), intent(in) :: is_spec, i_trns
-      integer(kind = kint) :: inod, jnod, ist, ied, ip
+      use m_sph_communicators
+      use m_sph_trans_comm_table
+      use m_sel_spherical_SRs
+!
+      integer(kind = kint), intent(in) :: i_field, i_recv
+      integer(kind = kint), intent(in) :: ncomp_recv, n_WR
+      real(kind = kreal), intent(inout) :: WR(n_WR)
 !
 !
-      if( (is_spec*i_trns) .le. 0) return
+      if(i_field*i_recv .eq. 0) return
+      call sel_sph_scalar_from_recv(ncomp_recv, nnod_rj, n_WR,          &
+     &    nmax_sr_rj,  nneib_domain_rj,  istack_sr_rj,  item_sr_rj,     &
+     &    irev_sr_rj,  ntot_phys_rj, i_field, i_recv, WR, d_rj)
 !
-!$omp do private(ist,ied,inod,jnod)
-      do ip = 1, np_smp
-        ist = inod_rj_smp_stack(ip-1) + 1
-        ied = inod_rj_smp_stack(ip)
-        do inod = ist, ied
-          jnod = i_trns + (inod-1)*ncomp_trans
-          sp_rj(jnod  ) = d_rj(inod,is_spec  )
-          sp_rj(jnod+1) = d_rj(inod,is_spec+1)
-          sp_rj(jnod+2) = d_rj(inod,is_spec+2)
-          sp_rj(jnod+3) = d_rj(inod,is_spec+3)
-          sp_rj(jnod+4) = d_rj(inod,is_spec+4)
-          sp_rj(jnod+5) = d_rj(inod,is_spec+5)
-        end do
-      end do
-!$omp end do nowait
-!
-      end subroutine copy_tsr_spec_to_trans
+      end subroutine sel_sph_rj_scalar_from_recv
 !
 !-----------------------------------------------------------------------
 !
-      subroutine copy_tsr_spec_from_trans(ncomp_trans, is_spec, i_trns)
+      subroutine sel_sph_rj_vector_from_recv                            &
+     &         (ncomp_recv, i_field, i_recv, n_WR, WR)
 !
-      integer(kind = kint), intent(in) :: ncomp_trans
-      integer(kind = kint), intent(in) :: is_spec, i_trns
-      integer(kind = kint) :: inod, jnod, ist, ied, ip
+      use m_sph_communicators
+      use m_sph_trans_comm_table
+      use m_sel_spherical_SRs
+!
+      integer(kind = kint), intent(in) :: i_field, i_recv
+      integer(kind = kint), intent(in) :: ncomp_recv, n_WR
+      real(kind = kreal), intent(inout) :: WR(n_WR)
 !
 !
-      if( (is_spec*i_trns) .le. 0) return
+      if(i_field*i_recv .eq. 0) return
+      call sel_sph_vector_from_recv(ncomp_recv, nnod_rj, n_WR,          &
+     &    nmax_sr_rj,  nneib_domain_rj,  istack_sr_rj,  item_sr_rj,     &
+     &    irev_sr_rj,  ntot_phys_rj, i_field, i_recv, WR, d_rj)
 !
-!$omp do private(ist,ied,inod,jnod)
-      do ip = 1, np_smp
-        ist = inod_rj_smp_stack(ip-1) + 1
-        ied = inod_rj_smp_stack(ip)
-        do inod = ist, ied
-          jnod = i_trns + (inod-1)*ncomp_trans
-          d_rj(inod,is_spec  ) = sp_rj(jnod  )
-          d_rj(inod,is_spec+1) = sp_rj(jnod+1)
-          d_rj(inod,is_spec+2) = sp_rj(jnod+2)
-          d_rj(inod,is_spec+3) = sp_rj(jnod+3)
-          d_rj(inod,is_spec+4) = sp_rj(jnod+4)
-          d_rj(inod,is_spec+5) = sp_rj(jnod+5)
-        end do
-      end do
-!$omp end do nowait
+      end subroutine sel_sph_rj_vector_from_recv
 !
-      end subroutine copy_tsr_spec_from_trans
+!-----------------------------------------------------------------------
+!
+      subroutine sel_sph_rj_tensor_from_recv                            &
+     &         (ncomp_recv, i_field, i_recv, n_WR, WR)
+!
+      use m_sph_communicators
+      use m_sph_trans_comm_table
+      use m_sel_spherical_SRs
+!
+      integer(kind = kint), intent(in) :: i_field, i_recv
+      integer(kind = kint), intent(in) :: ncomp_recv, n_WR
+      real(kind = kreal), intent(inout) :: WR(n_WR)
+!
+!
+      if(i_field*i_recv .eq. 0) return
+      call sel_sph_tensor_from_recv(ncomp_recv, nnod_rj, n_WR,          &
+     &    nmax_sr_rj,  nneib_domain_rj,  istack_sr_rj,  item_sr_rj,     &
+     &    irev_sr_rj,  ntot_phys_rj, i_field, i_recv, WR, d_rj)
+!
+      end subroutine sel_sph_rj_tensor_from_recv
 !
 !-----------------------------------------------------------------------
 !

@@ -76,7 +76,7 @@
 !
       write(*,*) 'k, r, dr_1d_rj'
       do k = 1, nidx_rj(1)
-        write(*,'(i8, 1p4e20.12)') k, radius_1d_rj_r(k), dr_1d_rj(k)
+        write(*,'(i16, 1p4e20.12)') k, radius_1d_rj_r(k), dr_1d_rj(k)
       end do
 !
       end subroutine check_radial_func_rj

@@ -45,8 +45,8 @@
         press_nod%num_bc = 0
         wall_surf%num_bc = 0
       else
-        press_nod%num_bc = num_bc_p_ctl
-        wall_surf%num_bc = num_bc_grad_p_ctl
+        press_nod%num_bc = node_bc_P_ctl%num
+        wall_surf%num_bc = surf_bc_PN_ctl%num
       end if
 !
 !  set boundary conditions for pressure
@@ -57,13 +57,15 @@
 !
         call allocate_nod_bc_list_press
 !
-        press_nod%bc_name =      bc_p_name_ctl
-        press_nod%bc_magnitude = bc_p_magnitude_ctl
+        press_nod%bc_name(1:press_nod%num_bc)                           &
+     &      = node_bc_P_ctl%c2_tbl(1:press_nod%num_bc)
+        press_nod%bc_magnitude(1:press_nod%num_bc)                      &
+     &      = node_bc_P_ctl%vect(1:press_nod%num_bc)
 !
         do i = 1, press_nod%num_bc
-          call set_bc_group_types_scalar(bc_p_type_ctl(i),              &
+          call set_bc_group_types_scalar(node_bc_P_ctl%c1_tbl(i),       &
      &        press_nod%ibc_type(i))
-          call set_bc_group_types_sgs_scalar(bc_p_type_ctl(i),          &
+          call set_bc_group_types_sgs_scalar(node_bc_P_ctl%c1_tbl(i),   &
      &        press_nod%ibc_type(i))
         end do
 !
@@ -75,6 +77,8 @@
      &        press_nod%bc_magnitude(i), trim(press_nod%bc_name(i))
           end do
         end if
+!
+        call deallocate_bc_press_ctl
       end if
 !
 !
@@ -83,15 +87,19 @@
 !
         call allocate_press_surf_ctl
 !
-        wall_surf%bc_magnitude =  bc_grad_p_magnitude_ctl
-        wall_surf%bc_name =       bc_grad_p_name_ctl
+        wall_surf%bc_magnitude(1:wall_surf%num_bc)                      &
+     &        =  surf_bc_PN_ctl%vect(1:wall_surf%num_bc)
+        wall_surf%bc_name(1:wall_surf%num_bc)                           &
+     &        = surf_bc_PN_ctl%c2_tbl(1:wall_surf%num_bc)
 !
         do i = 1, wall_surf%num_bc
-          call set_surf_group_types_scalar(bc_grad_p_type_ctl(i),       &
+          call set_surf_group_types_scalar(surf_bc_PN_ctl%c1_tbl(i),    &
      &       wall_surf%ibc_type(i) )
-          call set_surf_wall_group_types(bc_grad_p_type_ctl(i),         &
+          call set_surf_wall_group_types(surf_bc_PN_ctl%c1_tbl(i),      &
      &       wall_surf%ibc_type(i) )
         end do
+!
+        call deallocate_bc_press_sf_ctl
       end if
 !
       end subroutine s_set_control_4_press

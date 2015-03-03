@@ -18,6 +18,9 @@
 !!         If requested mode does not exist in the process, 0 is set
 !!       inod = local_sph_data_address(k, j_lc)
 !!         Return address of sphectrum data
+!!       inod = inod_rj_center
+!!         If spectrum data have center, inod_rj_center 
+!!         returns this address.
 !!
 !!       nidx_rj(1) :: Number of radial grids
 !!       rr = radius_1d_rj_r(k)
@@ -94,9 +97,9 @@
         call set_initial_heat_source_sph
       end if
 !  Set light element source if light element is exist
-!      if(ipol%i_light_source .gt. izero) then
-!        call set_initial_light_source_sph
-!      end if
+      if(ipol%i_light_source .gt. izero) then
+        call set_initial_light_source_sph
+      end if
 !
 !  Copy initial field to restart IO data
       call set_sph_restart_num_to_IO
@@ -113,7 +116,12 @@
       use m_sph_spectr_data
 !
       integer ( kind = kint) :: inod, jj, k
-      real (kind = kreal) :: rr
+!      real (kind = kreal) :: rr
+      real (kind = kreal) :: pi, rr, xr, shell
+      real(kind = kreal), parameter :: A_light = 0.1d0
+!
+      pi = four * atan(one)
+      shell = r_CMB - r_ICB
 !
 !
 !$omp parallel do
@@ -123,12 +131,23 @@
       end do
 !$omp end parallel do
 !
-      jj = find_local_sph_mode_address(1, 0)
+!      jj = find_local_sph_mode_address(1, 0)
+!      if (jj .gt. 0) then
+!        do k = nlayer_ICB+1, nlayer_CMB
+!          rr = radius_1d_rj_r(k)
+!          inod = local_sph_data_address(k,jj)
+!          d_rj(inod,itor%i_velo) = half * rr*rr
+!        end do
+!      end if
+!
+      jj =  find_local_sph_mode_address(2, 1)
+!
       if (jj .gt. 0) then
-        do k = nlayer_ICB+1, nlayer_CMB
-          rr = radius_1d_rj_r(k)
+        do k = nlayer_ICB, nlayer_CMB
           inod = local_sph_data_address(k,jj)
-          d_rj(inod,itor%i_velo) = half * rr*rr
+          xr = two * radius_1d_rj_r(k) - one * (r_CMB+r_ICB) / shell
+          d_rj(inod,itor%i_velo) = (one-three*xr**2+three*xr**4-xr**6)  &
+    &                            * A_light * three / (sqrt(two*pi))
         end do
       end if
 !
@@ -159,7 +178,11 @@
 !
 !   set reference temperature if (l = m = 0) mode is there
       if (jj .gt. 0) then
-        do k = 1, nidx_rj(1)
+        do k = 1, nlayer_ICB-1
+          inod = local_sph_data_address(k,jj)
+          d_rj(inod,ipol%i_temp) = 1.0d0
+        end do
+        do k = nlayer_ICB, nlayer_CMB
           inod = local_sph_data_address(k,jj)
           d_rj(inod,ipol%i_temp) = (ar_1d_rj(k,1) * 20.d0/13.0d0        &
      &                              - 1.0d0 ) * 7.0d0 / 13.0d0
@@ -168,8 +191,8 @@
 !
 !
 !    Find local addrtess for (l,m) = (4,4)
-!      jj =  find_local_sph_mode_address(4, 4)
-      jj =  find_local_sph_mode_address(5, 5)
+      jj =  find_local_sph_mode_address(4, 4)
+!      jj =  find_local_sph_mode_address(5, 5)
 !
 !    If data for (l,m) = (4,4) is there, set initial temperature
       if (jj .gt. 0) then
@@ -186,6 +209,13 @@
           d_rj(inod,ipol%i_temp) = (one-three*xr**2+three*xr**4-xr**6)  &
      &                            * A_temp * three / (sqrt(two*pi))
         end do
+      end if
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        jj = find_local_sph_mode_address(0, 0)
+        inod = local_sph_data_address(1,jj)
+        d_rj(inod_rj_center,ipol%i_temp) = d_rj(inod,ipol%i_temp)
       end if
 !
       end subroutine set_initial_temperature
@@ -216,7 +246,11 @@
 !   set reference temperature if (l = m = 0) mode is there
 !
       if (jj .gt. 0) then
-        do k = 1, nidx_rj(1)
+        do k = 1, nlayer_ICB-1
+          inod = local_sph_data_address(k,jj)
+          d_rj(inod,ipol%i_light) = 1.0d0
+        end do
+        do k = nlayer_ICB, nidx_rj(1)
           inod = local_sph_data_address(k,jj)
           d_rj(inod,ipol%i_light) = (ar_1d_rj(k,1) * 20.d0/13.0d0       &
      &                              - 1.0d0 ) * 7.0d0 / 13.0d0
@@ -234,6 +268,13 @@
           d_rj(inod,ipol%i_light) = (one-three*xr**2+three*xr**4-xr**6) &
      &                            * A_light * three / (sqrt(two*pi))
         end do
+      end if
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        jj = find_local_sph_mode_address(0, 0)
+        inod = local_sph_data_address(1,jj)
+        d_rj(inod_rj_center,ipol%i_light) = d_rj(inod,ipol%i_light)
       end if
 !
       end subroutine set_initial_composition
@@ -259,7 +300,7 @@
 !
 !
 !    Find local addrtess for (l,m) = (1,0)
-      js =  find_local_sph_mode_address(ione, izero)
+      js =  find_local_sph_mode_address(1,0)
 !
       if (js .gt. 0) then
         do k = nlayer_ICB, nlayer_CMB
@@ -293,7 +334,7 @@
 !
 !
 !    Find local addrtess for (l,m) = (2,0)
-      jt =  find_local_sph_mode_address(itwo, izero)
+      jt =  find_local_sph_mode_address(1,-1)
 !
       if (jt .gt. 0) then
         do k = 1, nlayer_CMB
@@ -315,27 +356,34 @@
       use m_sph_spectr_data
 !
       real (kind = kreal) :: rr
-      integer(kind = kint) :: ii, k, jj
+      integer(kind = kint) :: inod, k, jj
 !
 !
 !$omp parallel do
-      do ii = 1, nnod_rj
-        d_rj(ii,ipol%i_heat_source) = zero
+      do inod = 1, nnod_rj
+        d_rj(inod,ipol%i_heat_source) = zero
       end do
 !$omp end parallel do
 !
 !
 !    Find address for l = m = 0
-      jj =  find_local_sph_mode_address(izero, izero)
+      jj =  find_local_sph_mode_address(0, 0)
 !
       if (jj .gt. 0) then
         do k = 1, nlayer_ICB
-          ii = local_sph_data_address(k,jj)
+          inod = local_sph_data_address(k,jj)
           rr = radius_1d_rj_r(k)
 !   Substitute initial heat source
-          d_rj(ii,ipol%i_heat_source) = 0.893 * r_CMB**2                &
-     &                                 / (r_ICB**3 / three)
+          d_rj(inod,ipol%i_heat_source)                                 &
+     &         = 0.35 * four*r_CMB**2 / (four * r_ICB**3 / three)
+!     &         = 1.0
         end do
+      end if
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        d_rj(inod_rj_center,ipol%i_heat_source)                         &
+     &         = 0.35 * four*r_CMB**2 / (four * r_ICB**3 / three)
       end if
 !
       end subroutine set_initial_heat_source_sph
@@ -344,29 +392,39 @@
 !
       subroutine set_initial_light_source_sph
 !
+      use calypso_mpi
       use m_sph_spectr_data
 !
 !      real (kind = kreal) :: rr
-      integer(kind = kint) :: ii, k, jj
+      integer(kind = kint) :: k, jj, inod
 !
 !
 !$omp parallel do
-      do ii = 1, nnod_rj
-        d_rj(ii,ipol%i_light_source) = zero
+      do inod = 1, nnod_rj
+        d_rj(inod,ipol%i_light_source) = zero
       end do
 !$omp end parallel do
 !
 !
 !    Find address for l = m = 0
-      jj =  find_local_sph_mode_address(izero, izero)
+      jj =  find_local_sph_mode_address(0, 0)
 !
       if (jj .gt. 0) then
-        do k = nlayer_ICB, nlayer_CMB
-          ii = local_sph_data_address(k,jj)
-!          rr = radius_1d_rj_r(k)
-!   Substitute initial heat source
-          d_rj(ii,ipol%i_light_source) = one
+        do k = 1, nlayer_ICB-1
+          inod = local_sph_data_address(k,jj)
+          d_rj(inod,ipol%i_light) = 1.0d0
         end do
+        do k = nlayer_ICB, nlayer_CMB
+          inod = local_sph_data_address(k,jj)
+!          rr = radius_1d_rj_r(k)
+!    Substitute initial heat source
+          d_rj(inod,ipol%i_light_source) = 1.0d0
+        end do
+      end if
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        d_rj(inod_rj_center,ipol%i_light_source) = one
       end if
 !
       end subroutine set_initial_light_source_sph

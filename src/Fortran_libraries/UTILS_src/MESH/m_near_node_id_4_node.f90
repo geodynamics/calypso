@@ -161,11 +161,11 @@
         ied = inod_stack_near_nod(inod)
         write(50+my_rank,*) 'near node ID for node nnod_near_nod',      &
      &                     inod, ist, ied, nnod_near_nod(inod)
-        write(50+my_rank,'(8i10)') inod_near_nod(ist:ied)
+        write(50+my_rank,'(8i16)') inod_near_nod(ist:ied)
         write(50+my_rank,*) 'iweight_node '
-        write(50+my_rank,'(8i10)') iweight_node(ist:ied)
+        write(50+my_rank,'(8i16)') iweight_node(ist:ied)
         write(50+my_rank,*) 'idist_from_center '
-        write(50+my_rank,'(8i10)') idist_from_center(ist:ied)
+        write(50+my_rank,'(8i16)') idist_from_center(ist:ied)
       end do
 !
       end subroutine check_near_nod_4_node
@@ -184,7 +184,7 @@
         ied = inod_stack_near_nod(inod)
         write(50+my_rank,*) 'near node ID for node (sorted)',           &
      &                     inod, ist, ied, nnod_near_nod(inod)
-        write(50+my_rank,'(8i10)') inod_near_nod(ist:ied)
+        write(50+my_rank,'(8i16)') inod_near_nod(ist:ied)
       end do
 !
       end subroutine check_near_nod_4_nod_sorted

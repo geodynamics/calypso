@@ -77,6 +77,7 @@
 !!
 !!      subroutine add_index_after_name(int_id, chara_head, chara_name)
 !!      subroutine int_to_str(int_val, int_string)
+!!      subroutine lint_to_str(lint_val, int_string)
 !!      subroutine real_to_str(real_val, real_string)
 !!@endverbatim
 !!
@@ -510,6 +511,20 @@
       write(int_string,'(a)') trim(adjustl(tmp_string))
 !
       end subroutine int_to_str
+!
+!-----------------------------------------------------------------------
+!
+      subroutine lint_to_str(lint_val, int_string)
+!
+      integer(kind=kint_gl), intent(in) :: lint_val
+      character(len=kchara), intent(inout) :: int_string
+      character(len=kchara) :: tmp_string
+!
+!
+      write(tmp_string,*) lint_val
+      write(int_string,'(a)') trim(adjustl(tmp_string))
+!
+      end subroutine lint_to_str
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

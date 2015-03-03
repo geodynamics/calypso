@@ -29,7 +29,6 @@
       subroutine count_import_4_shell_mesh(ip_r, ip_t, jp_r, jp_t,      &
      &          num_import)
 !
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
 !
@@ -51,7 +50,7 @@
           if(abs(kflag) .ne. jp_r) cycle
 !
           if(kflag.lt.izero .or. lflag.lt. izero) then
-            num_import = num_import + nidx_global_rtp(3)
+            num_import = num_import + nidx_global_fem(3)
           end if
         end do
       end do
@@ -64,7 +63,6 @@
      &          icou, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
@@ -104,7 +102,7 @@
       end do
       num_rl = icou - ist
 !
-      do m = 2, nidx_global_rtp(3)
+      do m = 2, nidx_global_fem(3)
         do k = 1, num_rl
           icou = icou + 1
           item_import_1d_rtp(1,icou) = item_import_1d_rtp(1,k+ist)
@@ -125,7 +123,6 @@
       subroutine count_export_4_shell_mesh(ip_r, ip_t, jp_r, jp_t,      &
      &          num_export)
 !
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
 !
@@ -147,7 +144,7 @@
           if(abs(kflag) .ne. ip_r) cycle
 !
           if(kflag.lt.izero .or. lflag.lt. izero) then
-            num_export = num_export + nidx_global_rtp(3)
+            num_export = num_export + nidx_global_fem(3)
           end if
         end do
       end do
@@ -160,7 +157,6 @@
      &          icou, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
@@ -200,7 +196,7 @@
       end do
       num_rl = icou - ist
 !
-      do m = 2, nidx_global_rtp(3)
+      do m = 2, nidx_global_fem(3)
         do k = 1, num_rl
           icou = icou + 1
           item_export_1d_rtp(1,icou) = item_export_1d_rtp(1,k+ist)

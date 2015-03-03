@@ -11,7 +11,7 @@
 !      subroutine deallocate_bc_vecp_sf_ctl
 !      subroutine deallocate_bc_current_sf_ctl
 !      subroutine deallocate_bc_mag_p_sf_ctl
-!      subroutine deallocate_sf_dscalar_ctl
+!      subroutine deallocate_sf_comp_flux_ctl
 !      subroutine deallocate_sf_infty_ctl
 !
 !      subroutine read_bc_4_surf
@@ -85,11 +85,11 @@
 !  available type:  fixed_grad (not used), file_grad (not used)
 !                   fixed_field
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!       array composition_surf  3
-!          composition_surf  insulate_in  ICB_surf  0.000 end
-!          composition_surf  insulate_out CMB_surf  0.000 end
-!          composition_surf  far_away infinity_surf  0.000 end
-!      end array composition_surf
+!       array composition_flux_surf  3
+!          composition_flux_surf  insulate_in  ICB_surf  0.000 end
+!          composition_flux_surf  insulate_out CMB_surf  0.000 end
+!          composition_flux_surf  far_away infinity_surf  0.000 end
+!      end array composition_flux_surf
 !!!!!  boundary condition for infinity (obsolute) !!!!!!!!!!!!!!!!!
 !  available type:  fixed (not used), file (not used)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -105,57 +105,69 @@
       use m_precision
 !
       use m_machine_parameter
+      use t_read_control_arrays
 !
       implicit  none
 !
 !
-      integer(kind=kint) :: num_bc_h_flux_ctl = 0
-      character (len=kchara), allocatable :: bc_h_flux_name_ctl(:)
-      character (len=kchara), allocatable :: bc_h_flux_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_h_flux_magnitude_ctl(:)
+!>      Structure for surface boundary conditions for heat flux
+!!@n      surf_bc_HF_ctl%c1_tbl:  Type of boundary conditions
+!!@n      surf_bc_HF_ctl%c2_tbl:  Surface group name for boundary
+!!@n      surf_bc_HF_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: surf_bc_HF_ctl
 !
-      integer(kind=kint) :: num_bc_torque_ctl = 0
-      character (len=kchara), allocatable :: bc_torque_name_ctl(:)
-      character (len=kchara), allocatable :: bc_torque_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_torque_magnitude_ctl(:)
+!>      Structure for surface boundary conditions for stress
+!!@n      surf_bc_ST_ctl%c1_tbl:  Type of boundary conditions
+!!@n      surf_bc_ST_ctl%c2_tbl:  Surface group name for boundary
+!!@n      surf_bc_ST_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: surf_bc_ST_ctl
 !
-      integer(kind=kint) :: num_bc_grad_p_ctl = 0
-      character (len=kchara), allocatable :: bc_grad_p_name_ctl(:)
-      character (len=kchara), allocatable :: bc_grad_p_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_grad_p_magnitude_ctl(:)
+!>      Structure for surface boundary conditions for pressure gradient
+!!@n      surf_bc_PN_ctl%c1_tbl:  Type of boundary conditions
+!!@n      surf_bc_PN_ctl%c2_tbl:  Surface group name for boundary
+!!@n      surf_bc_PN_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: surf_bc_PN_ctl
 !
-      integer(kind=kint) :: num_bc_grad_b_ctl = 0
-      character (len=kchara), allocatable :: bc_grad_b_name_ctl(:)
-      character (len=kchara), allocatable :: bc_grad_b_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_grad_b_magnitude_ctl(:)
+!>      Structure for surface boundary conditions
+!!           for grad of magnetic field
+!!@n      surf_bc_BN_ctl%c1_tbl:  Type of boundary conditions
+!!@n      surf_bc_BN_ctl%c2_tbl:  Surface group name for boundary
+!!@n      surf_bc_BN_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: surf_bc_BN_ctl
 !
-      integer(kind=kint) :: num_bc_grad_j_ctl = 0
-      character (len=kchara), allocatable :: bc_grad_j_name_ctl(:)
-      character (len=kchara), allocatable :: bc_grad_j_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_grad_j_magnitude_ctl(:)
+!>      Structure for surface boundary conditions
+!!           for grad of current density
+!!@n      surf_bc_JN_ctl%c1_tbl:  Type of boundary conditions
+!!@n      surf_bc_JN_ctl%c2_tbl:  Surface group name for boundary
+!!@n      surf_bc_JN_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: surf_bc_JN_ctl
 !
-      integer(kind=kint) :: num_bc_vps_ctl = 0
-      character (len=kchara), allocatable :: bc_vps_name_ctl(:)
-      character (len=kchara), allocatable :: bc_vps_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_vps_magnitude_ctl(:)
+!>      Structure for surface boundary conditions
+!!          for grad of magnetic vector potential
+!!@n      surf_bc_AN_ctl%c1_tbl:  Type of boundary conditions
+!!@n      surf_bc_AN_ctl%c2_tbl:  Surface group name for boundary
+!!@n      surf_bc_AN_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: surf_bc_AN_ctl
 !
-      integer(kind=kint) :: num_bc_grad_magp_ctl = 0
-      character (len=kchara), allocatable :: bc_grad_magp_name_ctl(:)
-      character (len=kchara), allocatable :: bc_grad_magp_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_grad_magp_magnitude_ctl(:)
+!>      Structure for surface boundary conditions
+!!          for grad of magnetic scalar potential
+!!@n      surf_bc_MPN_ctl%c1_tbl:  Type of boundary conditions
+!!@n      surf_bc_MPN_ctl%c2_tbl:  Surface group name for boundary
+!!@n      surf_bc_MPN_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: surf_bc_MPN_ctl
 !
-      integer(kind=kint) :: num_bc_grad_ds_ctl = 0
-      character (len=kchara), allocatable :: bc_grad_ds_name_ctl(:)
-      character (len=kchara), allocatable :: bc_grad_ds_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_grad_ds_magnitude_ctl(:)
+!>      Structure for surface boundary conditions for compositional flux
+!!@n      surf_bc_CF_ctl%c1_tbl:  Type of boundary conditions
+!!@n      surf_bc_CF_ctl%c2_tbl:  Surface group name for boundary
+!!@n      surf_bc_CF_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: surf_bc_CF_ctl
 !
 !
-      integer(kind=kint) :: num_bc_infinity_ctl = 0
-      character (len=kchara), allocatable :: bc_infinity_name_ctl(:)
-      character (len=kchara), allocatable :: bc_infinity_type_ctl(:)
-      real (kind=kreal), allocatable :: bc_infinity_magnitude_ctl(:)
-      integer(kind=kint), allocatable                                   &
-     &                   :: ibc_infinity_surface_num_ctl(:)
+!>      Structure for surface boundary conditions for infinity
+!!@n      surf_bc_INF_ctl%c1_tbl:  Type of boundary conditions
+!!@n      surf_bc_INF_ctl%c2_tbl:  Surface group name for boundary
+!!@n      surf_bc_INF_ctl%vect:    boundary condition value
+      type(ctl_array_c2r), save :: surf_bc_INF_ctl
 !
 !   entry label
 !
@@ -180,35 +192,14 @@
       character(len=kchara), parameter                                  &
      &       :: hd_n_bc_gradmp = 'electric_potential_surf'
       character(len=kchara), parameter                                  &
-     &       :: hd_n_bc_gradds = 'dummy_scalar_surf'
+     &       :: hd_n_bc_gradc =  'composition_flux_surf'
       character(len=kchara), parameter                                  &
      &       :: hd_n_bc_infty =  'infinity_surf'
 !
-      integer (kind=kint) :: i_n_bc_hf =     0
-      integer (kind=kint) :: i_n_bc_mf =     0
-      integer (kind=kint) :: i_n_bc_gradp =  0
-      integer (kind=kint) :: i_n_bc_gradb =  0
-      integer (kind=kint) :: i_n_bc_grada =  0
-      integer (kind=kint) :: i_n_bc_gradj =  0
-      integer (kind=kint) :: i_n_bc_gradmp = 0
-      integer (kind=kint) :: i_n_bc_gradds = 0
-      integer (kind=kint) :: i_n_bc_infty =  0
-!
-!
       private :: hd_bc_4_surf, i_bc_4_surf
-      private :: hd_n_bc_hf, hd_n_bc_gradds, hd_n_bc_infty
+      private :: hd_n_bc_hf, hd_n_bc_gradc, hd_n_bc_infty
       private :: hd_n_bc_mf, hd_n_bc_gradp, hd_n_bc_gradmp
       private :: hd_n_bc_gradb, hd_n_bc_grada, hd_n_bc_gradj
-!
-      private :: allocate_bc_h_flux_ctl
-      private :: allocate_bc_torque_ctl
-      private :: allocate_bc_press_sf_ctl
-      private :: allocate_bc_magne_sf_ctl
-      private :: allocate_bc_vecp_sf_ctl
-      private :: allocate_bc_current_sf_ctl
-      private :: allocate_bc_m_potential_sf_ctl
-      private :: allocate_bc_d_scalar_sf_ctl
-      private :: allocate_bc_infinity_sf_ctl
 !
 !   --------------------------------------------------------------------
 !
@@ -216,184 +207,75 @@
 !
 !   --------------------------------------------------------------------
 !
-       subroutine allocate_bc_h_flux_ctl
+      subroutine deallocate_bc_h_flux_ctl
 !
-        allocate(bc_h_flux_magnitude_ctl( num_bc_h_flux_ctl))
-        allocate(bc_h_flux_name_ctl(num_bc_h_flux_ctl))
-        allocate(bc_h_flux_type_ctl(num_bc_h_flux_ctl))
-        bc_h_flux_magnitude_ctl = 0.0d0
+      call dealloc_control_array_c2_r(surf_bc_HF_ctl)
 !
-       end subroutine allocate_bc_h_flux_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_torque_ctl
-!
-        allocate(bc_torque_magnitude_ctl( num_bc_torque_ctl))
-        allocate(bc_torque_name_ctl(num_bc_torque_ctl))
-        allocate(bc_torque_type_ctl(num_bc_torque_ctl))
-        bc_torque_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_torque_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_press_sf_ctl
-!
-        allocate(bc_grad_p_magnitude_ctl( num_bc_grad_p_ctl))
-        allocate(bc_grad_p_name_ctl(num_bc_grad_p_ctl))
-        allocate(bc_grad_p_type_ctl(num_bc_grad_p_ctl))
-        bc_grad_p_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_press_sf_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_magne_sf_ctl
-!
-        allocate(bc_grad_b_magnitude_ctl( num_bc_grad_b_ctl))
-        allocate(bc_grad_b_name_ctl(num_bc_grad_b_ctl))
-        allocate(bc_grad_b_type_ctl(num_bc_grad_b_ctl))
-        bc_grad_b_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_magne_sf_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_vecp_sf_ctl
-!
-        allocate(bc_vps_magnitude_ctl( num_bc_vps_ctl))
-        allocate(bc_vps_name_ctl(num_bc_vps_ctl))
-        allocate(bc_vps_type_ctl(num_bc_vps_ctl))
-        bc_vps_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_vecp_sf_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_current_sf_ctl
-!
-        allocate(bc_grad_j_magnitude_ctl( num_bc_grad_j_ctl))
-        allocate(bc_grad_j_name_ctl(num_bc_grad_j_ctl))
-        allocate(bc_grad_j_type_ctl(num_bc_grad_j_ctl))
-        bc_grad_j_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_current_sf_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_m_potential_sf_ctl
-!
-        allocate(bc_grad_magp_magnitude_ctl( num_bc_grad_magp_ctl))
-        allocate(bc_grad_magp_name_ctl(num_bc_grad_magp_ctl))
-        allocate(bc_grad_magp_type_ctl(num_bc_grad_magp_ctl))
-        bc_grad_magp_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_m_potential_sf_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_d_scalar_sf_ctl
-!
-        allocate(bc_grad_ds_magnitude_ctl( num_bc_grad_ds_ctl))
-        allocate(bc_grad_ds_name_ctl(num_bc_grad_ds_ctl))
-        allocate(bc_grad_ds_type_ctl(num_bc_grad_ds_ctl))
-        bc_grad_ds_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_d_scalar_sf_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_bc_infinity_sf_ctl
-!
-        allocate(bc_infinity_magnitude_ctl( num_bc_infinity_ctl))
-        allocate(bc_infinity_name_ctl(num_bc_infinity_ctl))
-        allocate(bc_infinity_type_ctl(num_bc_infinity_ctl))
-        bc_infinity_magnitude_ctl = 0.0d0
-!
-       end subroutine allocate_bc_infinity_sf_ctl
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_bc_h_flux_ctl
-!
-        deallocate(bc_h_flux_magnitude_ctl)
-        deallocate(bc_h_flux_name_ctl, bc_h_flux_type_ctl)
-!
-       end subroutine deallocate_bc_h_flux_ctl
+      end subroutine deallocate_bc_h_flux_ctl
 !
 ! -----------------------------------------------------------------------
 !
        subroutine deallocate_bc_torque_ctl
 !
-        deallocate(bc_torque_magnitude_ctl)
-        deallocate(bc_torque_name_ctl, bc_torque_type_ctl)
+      call dealloc_control_array_c2_r(surf_bc_ST_ctl)
 !
        end subroutine deallocate_bc_torque_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_bc_press_sf_ctl
+      subroutine deallocate_bc_press_sf_ctl
 !
-        deallocate(bc_grad_p_magnitude_ctl)
-        deallocate(bc_grad_p_name_ctl, bc_grad_p_type_ctl)
+      call dealloc_control_array_c2_r(surf_bc_PN_ctl)
 !
-       end subroutine deallocate_bc_press_sf_ctl
-!
-! -----------------------------------------------------------------------
-!
-       subroutine deallocate_bc_magne_sf_ctl
-!
-        deallocate(bc_grad_b_magnitude_ctl)
-        deallocate(bc_grad_b_name_ctl, bc_grad_b_type_ctl)
-!
-       end subroutine deallocate_bc_magne_sf_ctl
+      end subroutine deallocate_bc_press_sf_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_bc_vecp_sf_ctl
+      subroutine deallocate_bc_magne_sf_ctl
 !
-        deallocate(bc_vps_magnitude_ctl)
-        deallocate(bc_vps_name_ctl, bc_vps_type_ctl)
+      call dealloc_control_array_c2_r(surf_bc_BN_ctl)
 !
-       end subroutine deallocate_bc_vecp_sf_ctl
+      end subroutine deallocate_bc_magne_sf_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_bc_current_sf_ctl
+      subroutine deallocate_bc_current_sf_ctl
 !
-        deallocate(bc_grad_j_magnitude_ctl)
-        deallocate(bc_grad_j_name_ctl, bc_grad_j_type_ctl)
+      call dealloc_control_array_c2_r(surf_bc_JN_ctl)
 !
-       end subroutine deallocate_bc_current_sf_ctl
+      end subroutine deallocate_bc_current_sf_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine deallocate_bc_vecp_sf_ctl
+!
+      call dealloc_control_array_c2_r(surf_bc_AN_ctl)
+!
+      end subroutine deallocate_bc_vecp_sf_ctl
 !
 ! -----------------------------------------------------------------------
 !
        subroutine deallocate_bc_mag_p_sf_ctl
 !
-        deallocate(bc_grad_magp_magnitude_ctl)
-        deallocate(bc_grad_magp_name_ctl, bc_grad_magp_type_ctl)
+      call dealloc_control_array_c2_r(surf_bc_MPN_ctl)
 !
        end subroutine deallocate_bc_mag_p_sf_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_sf_dscalar_ctl
+      subroutine deallocate_sf_comp_flux_ctl
 !
-        deallocate(bc_grad_ds_magnitude_ctl)
-        deallocate(bc_grad_ds_name_ctl, bc_grad_ds_type_ctl)
+      call dealloc_control_array_c2_r(surf_bc_CF_ctl)
 !
-       end subroutine deallocate_sf_dscalar_ctl
+      end subroutine deallocate_sf_comp_flux_ctl
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_sf_infty_ctl
+      subroutine deallocate_sf_infty_ctl
 !
-        deallocate(bc_infinity_magnitude_ctl)
-        deallocate(bc_infinity_name_ctl, bc_infinity_type_ctl)
+      call dealloc_control_array_c2_r(surf_bc_INF_ctl)
 !
-       end subroutine deallocate_sf_infty_ctl
+      end subroutine deallocate_sf_infty_ctl
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -412,100 +294,16 @@
         call find_control_end_flag(hd_bc_4_surf, i_bc_4_surf)
         if(i_bc_4_surf .gt. 0) exit
 !
-!-------read b.c. for heat flux ---------------------------
 !
-        call find_control_array_flag(hd_n_bc_hf, num_bc_h_flux_ctl)
-        if(num_bc_h_flux_ctl.gt.0 .and. i_n_bc_hf.eq.0) then
-          call allocate_bc_h_flux_ctl
-          call read_control_array_c2_r_list(hd_n_bc_hf,                 &
-     &        num_bc_h_flux_ctl, i_n_bc_hf, bc_h_flux_type_ctl,         &
-     &        bc_h_flux_name_ctl, bc_h_flux_magnitude_ctl)
-        end if
-!
-!-------read b.c. for torque ---------------------------
-!
-        call find_control_array_flag(hd_n_bc_mf, num_bc_torque_ctl)
-        if(num_bc_torque_ctl.gt.0 .and. i_n_bc_mf.eq.0) then
-          call allocate_bc_torque_ctl
-          call read_control_array_c2_r_list(hd_n_bc_mf,                 &
-     &        num_bc_torque_ctl, i_n_bc_mf, bc_torque_type_ctl,         &
-     &        bc_torque_name_ctl, bc_torque_magnitude_ctl)
-        end if
-!
-!-------read b.c. for pressure gradient ---------------------------
-!
-        call find_control_array_flag(hd_n_bc_gradp, num_bc_grad_p_ctl)
-        if(num_bc_grad_p_ctl.gt.0 .and. i_n_bc_gradp.eq.0) then
-          call allocate_bc_press_sf_ctl
-          call read_control_array_c2_r_list(hd_n_bc_gradp,              &
-     &        num_bc_grad_p_ctl, i_n_bc_gradp, bc_grad_p_type_ctl,      &
-     &        bc_grad_p_name_ctl, bc_grad_p_magnitude_ctl)
-        end if
-!
-!-------read b.c. for gradient of magnetic field----------------
-!
-        call find_control_array_flag(hd_n_bc_gradb, num_bc_grad_b_ctl)
-        if(num_bc_grad_b_ctl.gt.0 .and. i_n_bc_gradb.eq.0) then
-          call allocate_bc_magne_sf_ctl
-          call read_control_array_c2_r_list(hd_n_bc_gradb,              &
-     &        num_bc_grad_b_ctl, i_n_bc_gradb, bc_grad_b_type_ctl,      &
-     &        bc_grad_b_name_ctl, bc_grad_b_magnitude_ctl)
-        end if
-!
-!-------read b.c. for gradient of vector potential ----------------
-!
-        call find_control_array_flag(hd_n_bc_grada, num_bc_vps_ctl)
-        if(num_bc_vps_ctl.gt.0 .and. i_n_bc_grada.eq.0) then
-          call allocate_bc_vecp_sf_ctl
-          call read_control_array_c2_r_list(hd_n_bc_grada,              &
-     &        num_bc_vps_ctl, i_n_bc_grada, bc_vps_type_ctl,            &
-     &        bc_vps_name_ctl, bc_vps_magnitude_ctl)
-        end if
-!
-!-------read b.c. for current density on surface ----------------
-!
-        call find_control_array_flag(hd_n_bc_gradj, num_bc_grad_j_ctl)
-        if(num_bc_grad_j_ctl.gt.0 .and. i_n_bc_gradj.eq.0) then
-          call allocate_bc_current_sf_ctl
-          call read_control_array_c2_r_list(hd_n_bc_gradj,              &
-     &        num_bc_grad_j_ctl, i_n_bc_gradj, bc_grad_j_type_ctl,      &
-     &        bc_grad_j_name_ctl, bc_grad_j_magnitude_ctl)
-        end if
-!
-!-------read b.c. for magnetic potential on surface ----------------
-!
-        call find_control_array_flag(hd_n_bc_gradmp,                    &
-     &      num_bc_grad_magp_ctl)
-        if(num_bc_grad_magp_ctl.gt.0 .and. i_n_bc_gradmp.eq.0) then
-          call allocate_bc_m_potential_sf_ctl
-          call read_control_array_c2_r_list(hd_n_bc_gradmp,             &
-     &        num_bc_grad_magp_ctl, i_n_bc_gradmp,                      &
-     &        bc_grad_magp_type_ctl, bc_grad_magp_name_ctl,             &
-     &        bc_grad_magp_magnitude_ctl)
-        end if
-!
-!-------read b.c. for dummy scalar on surface ----------------
-!
-        call find_control_array_flag(hd_n_bc_gradds,                    &
-     &      num_bc_grad_ds_ctl)
-        if(num_bc_grad_ds_ctl.gt.0 .and. i_n_bc_gradds.eq.0) then
-          call allocate_bc_d_scalar_sf_ctl
-          call read_control_array_c2_r_list(hd_n_bc_gradds,             &
-     &        num_bc_grad_ds_ctl, i_n_bc_gradds, bc_grad_ds_type_ctl,   &
-     &        bc_grad_ds_name_ctl, bc_grad_ds_magnitude_ctl)
-        end if
-!
-!-------read b.c. for infinity----------------
-!
-        call find_control_array_flag(hd_n_bc_infty,                     &
-     &      num_bc_infinity_ctl)
-        if(num_bc_infinity_ctl.gt.0 .and. i_n_bc_infty.eq.0) then
-          call allocate_bc_infinity_sf_ctl
-          call read_control_array_c2_r_list(hd_n_bc_infty,              &
-     &        num_bc_infinity_ctl, i_n_bc_infty, bc_infinity_type_ctl,  &
-     &        bc_infinity_name_ctl, bc_infinity_magnitude_ctl)
-        end if
-!
+        call read_control_array_c2_r(hd_n_bc_hf, surf_bc_HF_ctl)
+        call read_control_array_c2_r(hd_n_bc_mf, surf_bc_ST_ctl)
+        call read_control_array_c2_r(hd_n_bc_gradp, surf_bc_PN_ctl)
+        call read_control_array_c2_r(hd_n_bc_gradb, surf_bc_BN_ctl)
+        call read_control_array_c2_r(hd_n_bc_gradj, surf_bc_JN_ctl)
+        call read_control_array_c2_r(hd_n_bc_grada, surf_bc_AN_ctl)
+        call read_control_array_c2_r(hd_n_bc_gradmp, surf_bc_MPN_ctl)
+        call read_control_array_c2_r(hd_n_bc_gradc, surf_bc_CF_ctl)
+        call read_control_array_c2_r(hd_n_bc_infty, surf_bc_INF_ctl)
       end do
 !
       end subroutine read_bc_4_surf

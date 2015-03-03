@@ -33,7 +33,6 @@
       subroutine count_neib_4_sph_mesh(ip_rank, ip_r, ip_t, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
 !
@@ -46,8 +45,8 @@
 !
 !
       nod_comm%num_neib = 0
-      do jp = 1, ndomain_sph-1
-        j_rank = mod((ip_rank+jp),ndomain_sph)
+      do jp = 1, ntot_domain-1
+        j_rank = mod((ip_rank+jp),ntot_domain)
         jp_r = iglobal_rank_rtp(1,j_rank) + 1
         jp_t = iglobal_rank_rtp(2,j_rank) + 1
         if(     iflag_neib_r(jp_r,ip_r).ne.izero                        &
@@ -64,7 +63,6 @@
      &          nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
 !
@@ -78,8 +76,8 @@
 !
       if(iflag_center_r(ip_r) .eq. izero) return
 !
-      do jp = 1, ndomain_sph-1
-        j_rank = mod((ip_rank+jp),ndomain_sph)
+      do jp = 1, ntot_domain-1
+        j_rank = mod((ip_rank+jp),ntot_domain)
         jp_r = iglobal_rank_rtp(1,j_rank) + 1
         jp_t = iglobal_rank_rtp(2,j_rank) + 1
         if(     iflag_neib_r(jp_r,ip_r).gt.izero                        &
@@ -96,7 +94,6 @@
       subroutine set_neib_4_sph_mesh(ip_rank, ip_r, ip_t, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
 !
@@ -109,8 +106,8 @@
 !
 !
       icou = 0
-      do jp = 1, ndomain_sph-1
-        j_rank = mod((ip_rank+jp),ndomain_sph)
+      do jp = 1, ntot_domain-1
+        j_rank = mod((ip_rank+jp),ntot_domain)
         jp_r = iglobal_rank_rtp(1,j_rank) + 1
         jp_t = iglobal_rank_rtp(2,j_rank) + 1
 !
@@ -130,7 +127,6 @@
      &          nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use set_comm_tbl_4_pole_mesh
@@ -146,8 +142,8 @@
       if(iflag_center_r(ip_r) .eq. izero) return
 !
       icou = nod_comm%num_neib
-      do jp = 1, ndomain_sph-1
-        j_rank = mod((ip_rank+jp),ndomain_sph)
+      do jp = 1, ntot_domain-1
+        j_rank = mod((ip_rank+jp),ntot_domain)
         jp_r = iglobal_rank_rtp(1,j_rank) + 1
         jp_t = iglobal_rank_rtp(2,j_rank) + 1
         if(     iflag_neib_r(jp_r,ip_r).gt.izero                        &
@@ -166,7 +162,6 @@
       subroutine count_import_4_sph_mesh(ip_r, ip_t, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use set_comm_tbl_4_sph_mesh
@@ -213,7 +208,6 @@
       subroutine set_import_rtp_sph_mesh(ip_r, ip_t, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use set_comm_tbl_4_sph_mesh
@@ -257,7 +251,6 @@
       subroutine count_export_4_sph_mesh(ip_r, ip_t, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use set_comm_tbl_4_sph_mesh
@@ -304,7 +297,6 @@
       subroutine set_export_rtp_sph_mesh(ip_r, ip_t, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use set_comm_tbl_4_sph_mesh

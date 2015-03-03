@@ -7,21 +7,22 @@
 !>@brief  Six components data communication
 !!
 !!@verbatim
-!!      subroutine calypso_send_recv_6(nnod_org, nnod_new,              &
-!!     &                           npe_send, isend_self,                &
-!!     &                           id_pe_send, istack_send, inod_export,&
-!!     &                           npe_recv, irecv_self,                &
-!!     &                           id_pe_recv, istack_recv, inod_import,&
-!!     &                           X_org, X_new)
-!!      subroutine calypso_send_recv_3x6(nnod_org, nnod_new,            &
-!!     &                           npe_send, isend_self,                &
-!!     &                           id_pe_send, istack_send, inod_export,&
-!!     &                           npe_recv, irecv_self,                &
-!!     &                           id_pe_recv, istack_recv, inod_import,&
-!!     &                           X1_org, X2_org, X3_org,              &
-!!     &                           X1_new, X2_new, X3_new)
+!!      subroutine calypso_send_recv_6(iflag_SR, nnod_org, nnod_new,    &
+!!     &                         npe_send, isend_self,                  &
+!!     &                         id_pe_send, istack_send, inod_export,  &
+!!     &                         npe_recv, irecv_self,                  &
+!!     &                         id_pe_recv, istack_recv, inod_import,  &
+!!     &                         irev_import, X_org, X_new)
+!!      subroutine calypso_send_recv_3x6(iflag_SR, nnod_org, nnod_new,  &
+!!     &                         npe_send, isend_self,                  &
+!!     &                         id_pe_send, istack_send, inod_export,  &
+!!     &                         npe_recv, irecv_self,                  &
+!!     &                         id_pe_recv, istack_recv, inod_import,  &
+!!     &                         irev_import, X1_org, X2_org, X3_org,   &
+!!     &                                      X1_new, X2_new, X3_new)
 !!@endverbatim
 !!
+!!@n @param  iflag_SR    import table mode
 !!@n @param  nnod_org    Number of data points for origin
 !!@n @param  nnod_new    Number of components for destination
 !!@n
@@ -40,6 +41,8 @@
 !!                    End points of receive buffer for each process
 !!@n @param  inod_import(istack_recv(npe_recv))
 !!                    local node ID to copy from receive buffer
+!!@n @param  irev_import(nnod_new)
+!!                    import buffer ID for each data point
 !!@n
 !!@n @param  X_org(6*nnod_org)   Send data
 !!@n @param  X_new(6*nnod_new)   Received data
@@ -57,18 +60,20 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine calypso_send_recv_6(nnod_org, nnod_new,                &
-     &                           npe_send, isend_self,                  &
-     &                           id_pe_send, istack_send, inod_export,  &
-     &                           npe_recv, irecv_self,                  &
-     &                           id_pe_recv, istack_recv, inod_import,  &
-     &                           X_org, X_new)
+      subroutine calypso_send_recv_6(iflag_SR, nnod_org, nnod_new,      &
+     &                         npe_send, isend_self,                    &
+     &                         id_pe_send, istack_send, inod_export,    &
+     &                         npe_recv, irecv_self,                    &
+     &                         id_pe_recv, istack_recv, inod_import,    &
+     &                         irev_import, X_org, X_new)
 !
       use calypso_mpi
       use m_solver_SR
+      use calypso_SR_core
       use set_to_send_buffer
-      use set_from_recv_buffer
+      use select_copy_from_recv
 !
+      integer(kind = kint), intent(in) :: iflag_SR
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
 !
@@ -83,81 +88,50 @@
       integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
       integer(kind = kint), intent(in)                                  &
      &                      :: inod_import( istack_recv(npe_recv) )
+      integer(kind = kint), intent(in) :: irev_import(nnod_new)
 !
       real (kind=kreal), intent(in)::    X_org(6*nnod_org)
 !
       real (kind=kreal), intent(inout):: X_new(6*nnod_new)
 !
-      integer (kind = kint) :: neib, istart, num
-      integer (kind = kint) :: i
-      integer (kind = kint) :: ncomm_send, ncomm_recv
-      integer (kind = kint) :: ist_send, ist_recv
-!
-!
-      call resize_work_sph_SR(isix, npe_send, npe_recv,                 &
-     &    istack_send(npe_send), istack_recv(npe_recv))
-!
-      ncomm_send = npe_send - isend_self
-      ncomm_recv = npe_recv - irecv_self
 !
 !C-- SEND
 !
       call set_to_send_buf_6(nnod_org,                                  &
      &    istack_send(npe_send), inod_export, X_org, WS)
 !C
-      do neib = 1, ncomm_send
-        istart= 6 * istack_send(neib-1) + 1
-        num  = 6 * (istack_send(neib  ) - istack_send(neib-1))
-        call MPI_ISEND(WS(istart), num, CALYPSO_REAL,                   &
-     &      id_pe_send(neib), 0, CALYPSO_COMM, req1(neib), ierr_MPI)
-      end do
-!C
-!C-- RECEIVE
-      if(ncomm_recv .gt. 0) then
-        do neib= 1, ncomm_recv
-          istart= 6 * istack_recv(neib-1) + 1
-          num  = 6 * (istack_recv(neib  ) - istack_recv(neib-1))
-          call MPI_IRECV(WR(istart), num, CALYPSO_REAL,                 &
-     &      id_pe_recv(neib), 0, CALYPSO_COMM, req2(neib), ierr_MPI)
-        end do
+!C-- COMM
+      call calypso_send_recv_core                                       &
+     &       (isix, npe_send, isend_self, id_pe_send, istack_send,      &
+     &              npe_recv, irecv_self, id_pe_recv, istack_recv)
 !
-        call MPI_WAITALL (ncomm_recv, req2, sta2, ierr_MPI)
-      end if
+!C-- RECV
+      call sel_cppy_from_recv_buf_6(iflag_SR, nnod_new,                 &
+     &    istack_recv(npe_recv), inod_import, irev_import,              &
+     &    WR(1), X_new)
 !
-      if (isend_self .eq. 1) then
-        ist_send= 6 * istack_send(npe_send-1)
-        ist_recv= 6 * istack_recv(npe_recv-1)
-        num = 6*(istack_send(npe_send) - istack_send(npe_send-1))
-!$omp parallel do
-        do i = 1, num
-          WR(ist_recv+i) = WS(ist_send+i)
-        end do
-!$omp end parallel do
-      end if
-!
-      call set_from_recv_buf_6(nnod_new,                                &
-     &    istack_recv(npe_recv), inod_import, WR, X_new)
-!
-      if(ncomm_send .gt. 0) then
-        call MPI_WAITALL (ncomm_send, req1, sta1, ierr_MPI)
-      end if
+!C-- WAIT
+      call calypso_send_recv_fin(npe_send, isend_self)
 !
       end subroutine calypso_send_recv_6
 !
 ! ----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
-      subroutine calypso_send_recv_3x6(nnod_org, nnod_new,              &
-     &                           npe_send, isend_self,                  &
-     &                           id_pe_send, istack_send, inod_export,  &
-     &                           npe_recv, irecv_self,                  &
-     &                           id_pe_recv, istack_recv, inod_import,  &
-     &                           X1_org, X2_org, X3_org,                &
-     &                           X1_new, X2_new, X3_new)
+      subroutine calypso_send_recv_3x6(iflag_SR, nnod_org, nnod_new,    &
+     &                         npe_send, isend_self,                    &
+     &                         id_pe_send, istack_send, inod_export,    &
+     &                         npe_recv, irecv_self,                    &
+     &                         id_pe_recv, istack_recv, inod_import,    &
+     &                         irev_import, X1_org, X2_org, X3_org,     &
+     &                                      X1_new, X2_new, X3_new)
 !
-      use calypso_mpi
       use m_solver_SR
+      use calypso_SR_core
       use set_to_send_buf_tri
-      use set_from_recv_buff_tri
+      use select_copy_from_recv
+!
+      integer(kind = kint), intent(in) :: iflag_SR
 !
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
@@ -173,71 +147,40 @@
       integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
       integer(kind = kint), intent(in)                                  &
      &                      :: inod_import( istack_recv(npe_recv) )
+      integer(kind = kint), intent(in) :: irev_import(nnod_new)
 !
-      real (kind=kreal), intent(in)::    X1_org(6*nnod_org)
-      real (kind=kreal), intent(in)::    X2_org(6*nnod_org)
-      real (kind=kreal), intent(in)::    X3_org(6*nnod_org)
+      real (kind=kreal), intent(in)::    X1_org(isix*nnod_org)
+      real (kind=kreal), intent(in)::    X2_org(isix*nnod_org)
+      real (kind=kreal), intent(in)::    X3_org(isix*nnod_org)
 !
-      real (kind=kreal), intent(inout):: X1_new(6*nnod_new)
-      real (kind=kreal), intent(inout):: X2_new(6*nnod_new)
-      real (kind=kreal), intent(inout):: X3_new(6*nnod_new)
-!
-      integer (kind = kint) :: neib, istart, num
-      integer (kind = kint) :: i
-      integer (kind = kint) :: ncomm_send, ncomm_recv
-      integer (kind = kint) :: ist_send, ist_recv
+      real (kind=kreal), intent(inout):: X1_new(isix*nnod_new)
+      real (kind=kreal), intent(inout):: X2_new(isix*nnod_new)
+      real (kind=kreal), intent(inout):: X3_new(isix*nnod_new)
 !
 !
-      call resize_work_sph_SR( (ithree*isix), npe_send, npe_recv,       &
+      call resize_work_sph_SR((ithree*isix), npe_send, npe_recv,        &
      &    istack_send(npe_send), istack_recv(npe_recv))
 !
-      ncomm_send = npe_send - isend_self
-      ncomm_recv = npe_recv - irecv_self
-!
 !C-- SEND
-!
       call set_to_send_buf_3x6(nnod_org, istack_send(npe_send),         &
      &    inod_export, X1_org, X2_org, X3_org, WS)
-!C
-      do neib = 1, ncomm_send
-        istart= 18 * istack_send(neib-1) + 1
-        num  = 18 * (istack_send(neib  ) - istack_send(neib-1))
-        call MPI_ISEND(WS(istart), num, CALYPSO_REAL,                   &
-     &      id_pe_send(neib), 0, CALYPSO_COMM, req1(neib), ierr_MPI)
-      end do
-!C
-!C-- RECEIVE
-      if(ncomm_recv .gt. 0) then
-        do neib= 1, ncomm_recv
-          istart= 18 * istack_recv(neib-1) + 1
-          num  = 18 * (istack_recv(neib  ) - istack_recv(neib-1))
-          call MPI_IRECV(WR(istart), num, CALYPSO_REAL,                 &
-     &      id_pe_recv(neib), 0, CALYPSO_COMM, req2(neib), ierr_MPI)
-        end do
 !
-        call MPI_WAITALL (ncomm_recv, req2, sta2, ierr_MPI)
-      end if
+!C-- COMM
+      call calypso_send_recv_core                                       &
+     &   ((isix*ithree), npe_send, isend_self, id_pe_send, istack_send, &
+     &                   npe_recv, irecv_self, id_pe_recv, istack_recv)
 !
-      if (isend_self .eq. 1) then
-        ist_send= 18 * istack_send(npe_send-1)
-        ist_recv= 18 * istack_recv(npe_recv-1)
-        num = 18*(istack_send(npe_send) - istack_send(npe_send-1))
-!$omp parallel do
-        do i = 1, num
-          WR(ist_recv+i) = WS(ist_send+i)
-        end do
-!$omp end parallel do
-      end if
+!C-- RECV
+      call sel_cppy_from_recv_buf_3x6(iflag_SR, nnod_new,               &
+     &    istack_recv(npe_recv), inod_import, irev_import,              &
+     &    WR(1), X1_new, X2_new, X3_new)
 !
-      call set_from_recv_buf_3x6(nnod_new, istack_recv(npe_recv),       &
-     &    inod_import, WR, X1_new, X2_new, X3_new)
-!
-      if(ncomm_send .gt. 0) then
-        call MPI_WAITALL (ncomm_send, req1, sta1, ierr_MPI)
-      end if
+!C-- WAIT
+      call calypso_send_recv_fin(npe_send, isend_self)
 !
       end subroutine calypso_send_recv_3x6
 !
-! ----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
 !
       end module calypso_SR_6

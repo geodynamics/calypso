@@ -62,12 +62,12 @@
 !
       subroutine write_vtk_fields_head(id_vtk, nnod)
 !
-      integer(kind=kint ), intent(in) :: nnod
+      integer(kind=kint_gl), intent(in) :: nnod
       integer(kind = kint), intent(in) :: id_vtk
 !
 !
       write(id_vtk,'(a)')
-      write(id_vtk,'(a,i10)') 'POINT_DATA ', nnod
+      write(id_vtk,'(a,i16)') 'POINT_DATA ', nnod
 ! 
       end subroutine write_vtk_fields_head
 !
@@ -85,7 +85,7 @@
 !
 !
       if (ncomp_field .eq. n_scalar) then
-        write(id_vtk,'(a,a,a,i10)') 'SCALARS ', trim(field_name),       &
+        write(id_vtk,'(a,a,a,i16)') 'SCALARS ', trim(field_name),       &
      &                        ' double ', ione
         write(id_vtk,'(a)') 'LOOKUP_TABLE default'
       else if (ncomp_field .eq. n_vector) then
@@ -103,12 +103,14 @@
 !
       use m_phys_constants
 !
-      integer (kind=kint), intent(in) :: ntot_nod, nnod, ncomp_field
+      integer(kind=kint_gl), intent(in) :: ntot_nod, nnod
+      integer(kind=kint), intent(in) :: ncomp_field
       real(kind = kreal), intent(in) :: d_nod(ntot_nod,ncomp_field)
 !
       integer(kind = kint), intent(in) ::  id_vtk
 !
-      integer(kind = kint) :: inod, nd, nd2
+      integer(kind = kint) :: nd, nd2
+      integer(kind = kint_gl) :: inod
 !
 !
       if (ncomp_field .eq. n_sym_tensor) then
@@ -131,7 +133,7 @@
 !
       subroutine write_vtk_node_head(id_vtk, nnod)
 !
-      integer(kind = kint), intent(in) :: nnod
+      integer(kind = kint_gl), intent(in) :: nnod
       integer(kind = kint), intent(in) ::  id_vtk
 !
 !
@@ -141,7 +143,7 @@
       write(id_vtk,'(a)') 'ASCII'
       write(id_vtk,'(a)') 'DATASET UNSTRUCTURED_GRID'
 !
-      write(id_vtk,'(a,i10,a)')  'POINTS ', nnod, ' double'
+      write(id_vtk,'(a,i16,a)')  'POINTS ', nnod, ' double'
 !
       end subroutine write_vtk_node_head
 !
@@ -150,14 +152,15 @@
 !
       subroutine write_vtk_connect_head(id_vtk, nele, nnod_ele)
 !
-      integer(kind = kint), intent(in) :: nele, nnod_ele
-      integer(kind = kint), intent(in) ::  id_vtk
+      integer(kind = kint_gl), intent(in) :: nele
+      integer(kind = kint), intent(in) :: nnod_ele
+      integer(kind = kint), intent(in) :: id_vtk
 !
-      integer(kind = kint) :: nums
+      integer(kind = kint_gl) :: nums
 !
 !
       nums = nele * (nnod_ele+1)
-      write(id_vtk,'(a,2i10)') 'CELLS ', nele, nums
+      write(id_vtk,'(a,2i16)') 'CELLS ', nele, nums
 !
       end subroutine write_vtk_connect_head
 !
@@ -167,10 +170,11 @@
 !
       use m_geometry_constants
 !
-      integer(kind = kint), intent(in) :: nele, nnod_ele
-      integer(kind = kint), intent(in) ::  id_vtk
+      integer(kind = kint_gl), intent(in) :: nele
+      integer(kind = kint), intent(in) ::  id_vtk, nnod_ele
 !
-      integer(kind = kint) :: iele, icellid
+      integer(kind = kint) :: icellid
+      integer(kind = kint_gl) :: iele
 !
 !
       if (nnod_ele .eq. num_t_linear) then
@@ -183,7 +187,7 @@
         icellid = 3
       end if
 !
-      write(id_vtk,'(a,i10)') 'CELL_TYPES ', nele
+      write(id_vtk,'(a,i16)') 'CELL_TYPES ', nele
       do iele = 1, nele
         write(id_vtk,'(i5)') icellid
       end do
@@ -199,17 +203,17 @@
       use m_geometry_constants
 !
       integer(kind = kint), intent(in) :: id_vtk
-      integer(kind = kint), intent(in) :: ntot_ele, nnod_ele
-      integer(kind = kint), intent(in) :: nele
-      integer(kind = kint), intent(in) :: ie(ntot_ele,nnod_ele)
+      integer(kind = kint), intent(in) :: nnod_ele
+      integer(kind = kint_gl), intent(in) :: ntot_ele, nele
+      integer(kind = kint_gl), intent(in) :: ie(ntot_ele,nnod_ele)
 !
-      integer(kind = kint) :: iele
-      integer(kind = kint), dimension(nnod_ele) :: ie0
+      integer(kind = kint_gl) :: iele
+      integer(kind = kint_gl) :: ie0(nnod_ele)
 !
 !
       do iele = 1, nele
         ie0(1:nnod_ele) = ie(iele,1:nnod_ele) - 1
-        write(id_vtk,'(30i10)') nnod_ele, ie0(1:nnod_ele)
+        write(id_vtk,'(28i16)') nnod_ele, ie0(1:nnod_ele)
       end do
 !
       end subroutine  write_vtk_connect_data
@@ -223,7 +227,7 @@
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_vtk
-      integer(kind=kint ), intent(inout) :: nnod
+      integer(kind=kint_gl), intent(inout) :: nnod
 !
       character(len=kchara)  :: tmpchara, label
 !
@@ -272,12 +276,12 @@
 !
       use m_phys_constants
 !
-      integer(kind = kint), intent(in) ::  id_vtk
-      integer (kind=kint), intent(in) :: ntot_nod, nnod, ncomp_field
+      integer(kind = kint), intent(in) ::  id_vtk, ncomp_field
+      integer(kind=kint_gl), intent(in) :: ntot_nod, nnod
 !
       real(kind = kreal), intent(inout) :: d_nod(ntot_nod,ncomp_field)
 !
-      integer(kind = kint) :: inod
+      integer(kind = kint_gl) :: inod
       real(kind = kreal) :: rtmp
 !
 !
@@ -301,7 +305,7 @@
       subroutine read_vtk_node_head(id_vtk, nnod)
 !
       integer(kind = kint), intent(in) :: id_vtk
-      integer(kind = kint), intent(inout) :: nnod
+      integer(kind = kint_gl), intent(inout) :: nnod
 !
       character(len=kchara) :: tmpchara
 !
@@ -311,7 +315,7 @@
       read(id_vtk,*) tmpchara
       read(id_vtk,*) tmpchara
 !
-      read(id_vtk,'(a,i10,a)')  tmpchara, nnod
+      read(id_vtk,'(a,i16,a)')  tmpchara, nnod
 !
       end subroutine read_vtk_node_head
 !
@@ -320,14 +324,15 @@
       subroutine read_vtk_connect_head(id_vtk, nele, nnod_ele)
 !
       integer(kind = kint), intent(in) ::  id_vtk
-      integer(kind = kint), intent(inout) :: nele, nnod_ele
+      integer(kind = kint), intent(inout) :: nnod_ele
+      integer(kind = kint_gl), intent(inout) :: nele
 !
-      integer(kind = kint) :: nums
+      integer(kind = kint_gl) :: nums
       character(len=kchara) :: tmpchara
 !
 !
       read(id_vtk,*) tmpchara, nele, nums
-      nnod_ele = nums / nele - 1
+      nnod_ele = int(nums / nele) - 1
 !
       end subroutine read_vtk_connect_head
 !
@@ -335,10 +340,11 @@
 !
       subroutine read_vtk_cell_type(id_vtk, nele)
 !
-      integer(kind = kint), intent(in) :: nele
+      integer(kind = kint_gl), intent(in) :: nele
       integer(kind = kint), intent(in) :: id_vtk
 !
-      integer(kind = kint) :: iele, icellid
+      integer(kind = kint_gl) :: iele
+      integer(kind = kint) :: icellid
       character(len=kchara) :: tmpchara
 !
 !
@@ -354,12 +360,13 @@
       subroutine read_vtk_connect_data(id_vtk, ntot_ele, nnod_ele,      &
      &          nele, ie)
 !
-      integer(kind = kint), intent(in) :: id_vtk
-      integer(kind = kint), intent(in) :: ntot_ele, nnod_ele
-      integer(kind = kint), intent(in) :: nele
-      integer(kind = kint), intent(inout) :: ie(ntot_ele,nnod_ele)
+      integer(kind = kint), intent(in) :: id_vtk, nnod_ele
+      integer(kind = kint_gl), intent(in) :: ntot_ele
+      integer(kind = kint_gl), intent(in) :: nele
+      integer(kind = kint_gl), intent(inout) :: ie(ntot_ele,nnod_ele)
 !
-      integer(kind = kint) :: iele, itmp
+      integer(kind = kint_gl) :: iele
+      integer(kind = kint) :: itmp
 !
 !
       do iele = 1, nele

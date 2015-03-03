@@ -13,8 +13,8 @@
 !
       call calypso_MPI_init
 !
-      call init_analyzer
-      call analyze
+      call init_test_sph
+      call analyze_test_sph
 
       call calypso_MPI_finalize
 !

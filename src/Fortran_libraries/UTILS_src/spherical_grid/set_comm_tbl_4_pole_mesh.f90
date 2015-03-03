@@ -37,7 +37,6 @@
       subroutine count_import_4_Spole_mesh(ip_r, ip_t, jp_r, jp_t,      &
      &          num_import)
 !
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
 !
@@ -69,7 +68,6 @@
      &          num_import)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
 !
@@ -101,7 +99,6 @@
      &          icou, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
@@ -142,7 +139,6 @@
      &          icou, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
@@ -183,7 +179,6 @@
       subroutine count_export_4_Spole_mesh(ip_r, ip_t, jp_r, jp_t,      &
      &          num_export)
 !
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
 !
@@ -214,7 +209,6 @@
       subroutine count_export_4_Npole_mesh(ip_r, ip_t, jp_r, jp_t,      &
      &          num_export)
 !
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
 !
@@ -246,7 +240,6 @@
      &          icou, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
@@ -287,7 +280,6 @@
      &          icou, nod_comm)
 !
       use t_comm_table
-      use m_spheric_parameter
       use m_spheric_global_ranks
       use m_sph_mesh_1d_connect
       use cal_sph_node_addresses

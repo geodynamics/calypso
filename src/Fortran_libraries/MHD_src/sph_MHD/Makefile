@@ -3,7 +3,7 @@
 #
 
 MHD_SPH_DIR = $$(MHD_SRCDIR)/sph_MHD
-SRC_SPH_MHD = $(shell ls *.f90)
+SRC_SPH_MHD = $(shell ls *.f90 *.F90)
 MOD_SPH_MHD = $(addsuffix .o,$(basename $(SRC_SPH_MHD)) )
 
 #
