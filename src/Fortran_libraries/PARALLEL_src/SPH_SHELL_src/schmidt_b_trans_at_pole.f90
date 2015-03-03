@@ -156,15 +156,15 @@
             jst = ist_rtm_order_zero
             jed = ist_rtm_order_zero + l_truncation
             do j_rlm = jst, jed
-              i_rlm = nd + (j_rlm-1) * nb                               &
-     &                   + (k_rlm-1) * nb * nidx_rlm(2)
-              v_np_local(3*kr_nd  ) = v_np_local(3*kr_nd  )             &
-     &                           + sp_rlm(3*i_rlm-2)                    &
-     &                            * P_pole_rtm(1,j_rlm)                 &
+              i_rlm = 1 + (j_rlm-1) * istep_rlm(2)                      &
+     &                  + (k_rlm-1) * istep_rlm(1)
+              i_recv = 3*nd + (irev_sr_rlm(i_rlm)-1) * ncomp
+!
+              v_pl_local(k_np,3*nd  ) = v_pl_local(k_np,3*nd  )         &
+     &                           + WR(i_recv-2) * P_pole_rtm(1,j_rlm)   &
      &                            * g_sph_rlm(j_rlm,3)
-              v_sp_local(3*kr_nd  ) = v_sp_local(3*kr_nd  )             &
-     &                           - sp_rlm(3*i_rlm-2)                    &
-     &                            * P_pole_rtm(2,j_rlm)                 &
+              v_pl_local(k_sp,3*nd  ) = v_pl_local(k_sp,3*nd  )         &
+     &                           - WR(i_recv-2) * P_pole_rtm(2,j_rlm)   &
      &                            * g_sph_rlm(j_rlm,3)
             end do
           end do
@@ -182,21 +182,19 @@
             jst = ist_rtm_order_1s
             jed = ist_rtm_order_1s + l_truncation-1
             do j_rlm = jst, jed
-              i_rlm = nd + (j_rlm-1) * nb                               &
-     &                   + (k_rlm-1) * nb * nidx_rlm(2)
-              v_np_local(3*kr_nd-2) = v_np_local(3*kr_nd-2)             &
-     &                              + sp_rlm(3*i_rlm  )                 &
-     &                               * dPdt_pole_rtm(1,j_rlm)
-              v_np_local(3*kr_nd-1) = v_np_local(3*kr_nd-1)             &
-     &                              + sp_rlm(3*i_rlm-1)                 &
-     &                               * dPdt_pole_rtm(1,j_rlm)
+              i_rlm = 1 + (j_rlm-1) * istep_rlm(2)                      &
+     &                  + (k_rlm-1) * istep_rlm(1)
+              i_recv = 3*nd + (irev_sr_rlm(i_rlm)-1) * ncomp
 !
-              v_sp_local(3*kr_nd-2) = v_sp_local(3*kr_nd-2)             &
-     &                              + sp_rlm(3*i_rlm  )                 &
-     &                               * dPdt_pole_rtm(2,j_rlm)
-              v_sp_local(3*kr_nd-1) = v_sp_local(3*kr_nd-1)             &
-     &                              - sp_rlm(3*i_rlm-1)                 &
-     &                               * dPdt_pole_rtm(2,j_rlm)
+              v_pl_local(k_np,3*nd-2) = v_pl_local(k_np,3*nd-2)         &
+     &                + WR(i_recv  ) * dPdt_pole_rtm(1,j_rlm)
+              v_pl_local(k_np,3*nd-1) = v_pl_local(k_np,3*nd-1)         &
+     &                + WR(i_recv-1) * dPdt_pole_rtm(1,j_rlm)
+!
+              v_pl_local(k_sp,3*nd-2) = v_pl_local(k_sp,3*nd-2)         &
+     &                + WR(i_recv  ) * dPdt_pole_rtm(2,j_rlm)
+              v_pl_local(k_sp,3*nd-1) = v_pl_local(k_sp,3*nd-1)         &
+     &                - WR(i_recv-1) * dPdt_pole_rtm(2,j_rlm)
             end do
           end do
         end do
@@ -213,21 +211,19 @@
             jst = ist_rtm_order_1c
             jed = ist_rtm_order_1c + l_truncation-1
             do j_rlm = jst, jed
-              i_rlm = nd + (j_rlm-1) * nb                               &
-     &                   + (k_rlm-1) * nb * nidx_rlm(2)
-              v_np_local(3*kr_nd-2) = v_np_local(3*kr_nd-2)             &
-     &                              + sp_rlm(3*i_rlm-1)                 &
-     &                               * dPdt_pole_rtm(1,j_rlm)
-              v_np_local(3*kr_nd-1) = v_np_local(3*kr_nd-1)             &
-     &                              - sp_rlm(3*i_rlm  )                 &
-     &                               * dPdt_pole_rtm(1,j_rlm)
+              i_rlm = 1 + (j_rlm-1) * istep_rlm(2)                      &
+     &                  + (k_rlm-1) * istep_rlm(1)
+              i_recv = 3*nd + (irev_sr_rlm(i_rlm)-1) * ncomp
 !
-              v_sp_local(3*kr_nd-2) = v_sp_local(3*kr_nd-2)             &
-     &                              - sp_rlm(3*i_rlm-1)                 &
-     &                               * dPdt_pole_rtm(2,j_rlm)
-              v_sp_local(3*kr_nd-1) = v_sp_local(3*kr_nd-1)             &
-     &                              - sp_rlm(3*i_rlm  )                 &
-     &                               * dPdt_pole_rtm(2,j_rlm)
+              v_pl_local(k_np,3*nd-2) = v_pl_local(k_np,3*nd-2)         &
+     &                + WR(i_recv-1) * dPdt_pole_rtm(1,j_rlm)
+              v_pl_local(k_np,3*nd-1) = v_pl_local(k_np,3*nd-1)         &
+     &                - WR(i_recv  ) * dPdt_pole_rtm(1,j_rlm)
+!
+              v_pl_local(k_sp,3*nd-2) = v_pl_local(k_sp,3*nd-2)         &
+     &                - WR(i_recv-1) * dPdt_pole_rtm(2,j_rlm)
+              v_pl_local(k_sp,3*nd-1) = v_pl_local(k_sp,3*nd-1)         &
+     &                - WR(i_recv  ) * dPdt_pole_rtm(2,j_rlm)
             end do
           end do
         end do
@@ -237,19 +233,20 @@
       iflag = ist_rtm_order_zero+ist_rtm_order_1s+ist_rtm_order_1c
       if(iflag .gt. 0) then
         do k_rlm = 1, nidx_rlm(1)
-          do nd = 1, nb
-            kr_nd = nd + (idx_gl_1d_rtm_r(k_rlm)-1) * nb
-            v_np_local(3*kr_nd-2) = v_np_local(3*kr_nd-2)               &
+          k_np = idx_gl_1d_rtm_r(k_rlm)
+          k_sp = idx_gl_1d_rtm_r(k_rlm) + nidx_global_rtp(1)
+          do nd = 1, nvector
+            v_pl_local(k_np,3*nd-2) = v_pl_local(k_np,3*nd-2)           &
      &                      * a_r_1d_rlm_r(k_rlm)
-            v_np_local(3*kr_nd-1) = v_np_local(3*kr_nd-1)               &
+            v_pl_local(k_np,3*nd-1) = v_pl_local(k_np,3*nd-1)           &
      &                      * a_r_1d_rlm_r(k_rlm)
-            v_np_local(3*kr_nd  ) = v_np_local(3*kr_nd  )               &
+            v_pl_local(k_np,3*nd  ) = v_pl_local(k_np,3*nd  )           &
      &                      * a_r_1d_rlm_r(k_rlm)*a_r_1d_rlm_r(k_rlm)
-            v_sp_local(3*kr_nd-2) = v_sp_local(3*kr_nd-2)               &
+            v_pl_local(k_sp,3*nd-2) = v_pl_local(k_sp,3*nd-2)           &
      &                      * a_r_1d_rlm_r(k_rlm)
-            v_sp_local(3*kr_nd-1) = v_sp_local(3*kr_nd-1)               &
+            v_pl_local(k_sp,3*nd-1) = v_pl_local(k_sp,3*nd-1)           &
      &                      * a_r_1d_rlm_r(k_rlm)
-            v_sp_local(3*kr_nd  ) = v_sp_local(3*kr_nd  )               &
+            v_pl_local(k_sp,3*nd  ) = v_pl_local(k_sp,3*nd  )           &
      &                      * a_r_1d_rlm_r(k_rlm)*a_r_1d_rlm_r(k_rlm)
           end do
         end do

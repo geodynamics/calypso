@@ -41,6 +41,15 @@
 !
 !
       if (ipol%i_magne .gt. 0) then
+!
+        if(num_pick_gauss_l .eq. -9999) then
+          num_pick_gauss_l = l_truncation+1
+          call allocate_pick_gauss_l
+          do l = 0, l_truncation
+            idx_pick_gauss_l(l+1) = l
+          end do
+        end if
+!
         call count_picked_sph_adrress                                   &
      &     (num_pick_gauss_coefs, num_pick_gauss_l, num_pick_gauss_m,   &
      &      idx_pick_gauss_mode, idx_pick_gauss_l, idx_pick_gauss_m,    &
@@ -91,15 +100,16 @@
       end do
 !$omp end parallel do
 !
-      a2r_4_gauss = one / (r_4_gauss_coefs**2)
-      rcmb_to_Re = radius_1d_rj_r(nlayer_CMB) / r_4_gauss_coefs
+      if(r_4_gauss_coefs .ge. radius_1d_rj_r(nlayer_CMB)) then
+        a2r_4_gauss = one / (r_4_gauss_coefs**2)
+        rcmb_to_Re = radius_1d_rj_r(nlayer_CMB) / r_4_gauss_coefs
 !$omp parallel do private(j,l,inod)
-      do inum = 1, num_pick_gauss_mode
-        j = idx_pick_gauss_coef_lc(inum)
-        l = idx_pick_gauss_coef_gl(inum,2)
-        if(j .gt. izero) then
-          inod =  j +    (nlayer_CMB-1) * nidx_rj(2)
-          gauss_coef_lc(inum) = d_rj(inod,ipol%i_magne) * dble(l)       &
+        do inum = 1, num_pick_gauss_mode
+          j = idx_pick_gauss_coef_lc(inum)
+          l = idx_pick_gauss_coef_gl(inum,2)
+          if(j .gt. izero) then
+            inod =  j +    (nlayer_CMB-1) * nidx_rj(2)
+            gauss_coef_lc(inum) = d_rj(inod,ipol%i_magne) * dble(l)     &
      &                        * rcmb_to_Re**l *a2r_4_gauss
           end if
         end do

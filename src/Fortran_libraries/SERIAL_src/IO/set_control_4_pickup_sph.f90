@@ -72,16 +72,8 @@
       call allocate_pick_sph_mode
 !
       do inum = 1, num_pick_sph
-        idx_pick_sph_mode(inum,1) = idx_pick_sph_mode_ctl(inum,1)
-        idx_pick_sph_mode(inum,2) = idx_pick_sph_mode_ctl(inum,2)
-      end do
-      if(num_pick_sph .gt. 0) call deallocate_pick_sph_ctl
-!
-      num_pick_sph_l = num_pick_sph_l_ctl
-      call allocate_pick_sph_l
-!
-      do inum = 1, num_pick_sph_l
-        idx_pick_sph_l(inum) = idx_pick_sph_l_ctl(inum)
+        idx_pick_sph_mode(inum,1) = idx_pick_sph_ctl%int1(inum)
+        idx_pick_sph_mode(inum,2) = idx_pick_sph_ctl%int2(inum)
       end do
       call deallocate_pick_sph_ctl
 !
@@ -157,8 +149,8 @@
       call allocate_pick_gauss
 !
       do inum = 1, num_pick_gauss_coefs
-        idx_pick_gauss_mode(inum,1) = idx_pick_gauss_mode_ctl(inum,1)
-        idx_pick_gauss_mode(inum,2) = idx_pick_gauss_mode_ctl(inum,2)
+        idx_pick_gauss_mode(inum,1) = idx_gauss_ctl%int1(inum)
+        idx_pick_gauss_mode(inum,2) = idx_gauss_ctl%int2(inum)
       end do
 !
       if(num_pick_gauss_coefs .gt. 0) call deallocate_pick_gauss_ctl
