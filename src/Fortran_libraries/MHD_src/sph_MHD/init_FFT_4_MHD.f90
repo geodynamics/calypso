@@ -108,15 +108,15 @@
      &    n_WS, n_WR, WS, WR, etime_fft(iflag_FFTW_SINGLE))
 #endif
 !
-#ifdef FFTW3_C
-      iflag_FFT = iflag_FFTW
-      call test_fourier_trans_4_MHD(ncomp_tot, ncomp_fwd, ncomp_bwd,    &
-     &    n_WS, n_WR, WS, WR, etime_fft(iflag_FFTW))
-#endif
+!#ifdef FFTW3_C
+!      iflag_FFT = iflag_FFTW
+!      call test_fourier_trans_4_MHD(ncomp_tot, ncomp_fwd, ncomp_bwd,   &
+!     &    n_WS, n_WR, WS, WR, etime_fft(iflag_FFTW))
+!#endif
 !
-      iflag_FFT = iflag_ISPACK
-      call test_fourier_trans_4_MHD(ncomp_tot, ncomp_fwd, ncomp_bwd,    &
-     &    n_WS, n_WR, WS, WR, etime_fft(iflag_ISPACK))
+!      iflag_FFT = iflag_ISPACK
+!      call test_fourier_trans_4_MHD(ncomp_tot, ncomp_fwd, ncomp_bwd,   &
+!     &    n_WS, n_WR, WS, WR, etime_fft(iflag_ISPACK))
 !
       iflag_selected = minloc(etime_fft,1)
       etime_shortest = minval(etime_fft)
@@ -135,10 +135,10 @@
           write(*,*) '4: elapsed by field FFTW3:   ',                   &
      &            etime_fft(iflag_FFTW_FIELD)
         end if
-        if(etime_fft(iflag_ISPACK) .gt. zero) then
-          write(*,*) '5: elapsed by ISPACK:         ',                  &
-     &            etime_fft(iflag_ISPACK)
-        end if
+!        if(etime_fft(iflag_ISPACK) .gt. zero) then
+!          write(*,*) '5: elapsed by ISPACK:         ',                 &
+!     &            etime_fft(iflag_ISPACK)
+!        end if
 !
       end subroutine compare_FFT_4_MHD
 !
