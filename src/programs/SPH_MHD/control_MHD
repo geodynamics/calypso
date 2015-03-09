@@ -525,6 +525,12 @@ begin MHD_control
 !
 !
 !   if num_pick_layer_ctl = 0 or negative: 
+!           No output
+    array spectr_layer_ctl  1
+      spectr_layer_ctl  62
+    end array spectr_layer_ctl
+!
+!   if num_pick_layer_ctl = 0 or negative: 
 !           output all layer and volume average
 !
     array pick_layer_ctl  1

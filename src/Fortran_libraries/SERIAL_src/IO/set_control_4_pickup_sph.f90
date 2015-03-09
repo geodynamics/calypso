@@ -102,7 +102,19 @@
       end if
 !
 !   set pickup layer
+      num_spectr_layer = 0
+      if(idx_spec_layer_ctl%num .gt. 0) then
+      num_spectr_layer = idx_spec_layer_ctl%num
+      call allocate_num_spec_layer
 !
+      do inum = 1, num_spectr_layer
+        id_spectr_layer(inum) = idx_spec_layer_ctl%ivec(inum)
+      end do
+!
+        call deallocate_num_spec_layer_ctl
+      end if
+!
+!   set pickup layer
       num_pick_layer = 0
       if(idx_pick_layer_ctl%num .gt. 0) then
         num_pick_layer = idx_pick_layer_ctl%num

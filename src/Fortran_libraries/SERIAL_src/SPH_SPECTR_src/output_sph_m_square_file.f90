@@ -175,7 +175,7 @@
       write(mode_label,'(a)') 'radial_id    diff_deg_order'
       call open_sph_mean_sq_file(id_file_rms_lm, fname_rms, mode_label)
 !
-      call write_sph_all_layer_pwr(istep, time)
+      call write_sph_selected_layer_pwr(istep, time)
 !
       close(id_file_rms)
       close(id_file_rms_l)
@@ -240,8 +240,7 @@
      &    (id_file_rms_lm, fname_rms, mode_label)
 !
 !
-      call write_sph_selected_layer_pwr(istep, time,                    &
-     &          num_pick_layer, id_pick_layer)
+      call write_sph_selected_layer_pwr(istep, time)
 !
       close(id_file_rms)
 !

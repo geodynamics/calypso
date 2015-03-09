@@ -108,6 +108,12 @@
      &    n_WS, n_WR, WS, WR, etime_fft(iflag_FFTW_SINGLE))
 #endif
 !
+#ifdef FFTW3_C
+      iflag_FFT = iflag_FFTW
+      call test_fourier_trans_4_MHD(ncomp_tot, ncomp_fwd, ncomp_bwd,    &
+     &    n_WS, n_WR, WS, WR, etime_fft(iflag_FFTW))
+#endif
+!
       iflag_FFT = iflag_ISPACK
       call test_fourier_trans_4_MHD(ncomp_tot, ncomp_fwd, ncomp_bwd,    &
      &    n_WS, n_WR, WS, WR, etime_fft(iflag_ISPACK))

@@ -3,14 +3,15 @@
 !
 !     Written by H. Matsui on Feb., 2008
 !
+!!@verbatim
+!!      subroutine allocate_num_spec_layer
 !!      subroutine allocate_rms_name_sph_spec
 !!      subroutine allocate_rms_4_sph_spectr(my_rank)
+!!      subroutine deallocate_num_spec_layer
 !!      subroutine deallocate_rms_4_sph_spectr(my_rank)
 !!
 !!      subroutine write_sph_vol_pwr(istep, time)
-!!      subroutine write_sph_all_layer_pwr(istep, time)
-!!      subroutine write_sph_selected_layer_pwr(istep, time,            &
-!!     &          num_pick_layer, id_pick_layer)
+!!      subroutine write_sph_selected_layer_pwr(istep, time)
 !!      subroutine open_sph_mean_sq_file(id_file, fname_rms, mode_label)
 !!@endverbatim
 !!
@@ -41,7 +42,12 @@
       integer (kind=kint), allocatable :: istack_rms_comp_rj(:)
       character (len=kchara), allocatable :: rms_name_rj(:)
 !
-      integer (kind=kint) :: nri_rms
+      integer(kind = kint) :: num_spectr_layer = 0
+      integer (kind=kint), allocatable :: id_spectr_layer(:)
+!
+      integer(kind=kint) :: nri_rms = 0
+      integer(kind=kint), allocatable :: kr_for_rms(:)
+      real(kind = kreal), allocatable :: r_for_rms(:)
       real(kind = kreal), allocatable :: rms_sph_l(:,:,:)
       real(kind = kreal), allocatable :: rms_sph_m(:,:,:)
       real(kind = kreal), allocatable :: rms_sph_lm(:,:,:)
@@ -72,6 +78,15 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine allocate_num_spec_layer
+!
+      allocate(id_spectr_layer(num_spectr_layer))
+      if(num_spectr_layer .gt. 0) id_spectr_layer = 0
+!
+      end subroutine allocate_num_spec_layer
+!
+! -----------------------------------------------------------------------
+!
       subroutine allocate_rms_name_sph_spec
 !
 !
@@ -97,18 +112,25 @@
       integer(kind = kint), intent(in) :: my_rank
 !
 !
-      nri_rms =  nidx_rj(1) 
+      allocate( kr_for_rms(nri_rms) )
+      allocate( r_for_rms(nri_rms) )
+      if(nri_rms .gt. 0) then
+        kr_for_rms = 0
+        r_for_rms =  0.0d0
+      end if
 !
       if(my_rank .gt. 0) return
 !
-      allocate( rms_sph_l(0:nri_rms,0:l_truncation,ntot_rms_rj) )
-      allocate( rms_sph_m(0:nri_rms,0:l_truncation,ntot_rms_rj) )
-      allocate( rms_sph_lm(0:nri_rms,0:l_truncation,ntot_rms_rj) )
-      allocate( rms_sph(0:nri_rms,ntot_rms_rj) )
-      rms_sph = 0.0d0
-      rms_sph_l =  0.0d0
-      rms_sph_m =  0.0d0
-      rms_sph_lm = 0.0d0
+      allocate( rms_sph_l(nri_rms,0:l_truncation,ntot_rms_rj) )
+      allocate( rms_sph_m(nri_rms,0:l_truncation,ntot_rms_rj) )
+      allocate( rms_sph_lm(nri_rms,0:l_truncation,ntot_rms_rj) )
+      allocate( rms_sph(nri_rms,ntot_rms_rj) )
+      if(nri_rms .gt. 0) then
+        rms_sph = 0.0d0
+        rms_sph_l =  0.0d0
+        rms_sph_m =  0.0d0
+        rms_sph_lm = 0.0d0
+      end if
 !
       allocate( rms_sph_vol_l(0:l_truncation,ntot_rms_rj) )
       allocate( rms_sph_vol_m(0:l_truncation,ntot_rms_rj) )
@@ -123,14 +145,23 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine deallocate_num_spec_layer
+!
+      deallocate(id_spectr_layer)
+!
+      end subroutine deallocate_num_spec_layer
+!
+! -----------------------------------------------------------------------
+!
       subroutine deallocate_rms_4_sph_spectr(my_rank)
 !
       integer(kind = kint), intent(in) :: my_rank
 !
 !
+      deallocate(r_for_rms, kr_for_rms)
+!
       if(my_rank .gt. 0) return
-      deallocate( rms_sph_l, rms_sph_m, rms_sph_lm)
-      deallocate( rms_sph )
+      deallocate(rms_sph_l, rms_sph_m, rms_sph_lm, rms_sph)
 !
       deallocate(rms_sph_vol_l, rms_sph_vol_m, rms_sph_vol_lm)
       deallocate(rms_sph_vol)
@@ -166,66 +197,27 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_sph_all_layer_pwr(istep, time)
+      subroutine write_sph_selected_layer_pwr(istep, time)
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: istep
-      real(kind = kreal), intent(in) :: time
-!
-      integer(kind = kint) :: kst, kg, lm
-!
-      kst = 1
-      if(iflag_rj_center .gt. 0) kst = 0
-!
-      do kg = kst, nidx_rj(1)
-        write(id_file_rms,'(i16,1pe23.14e3,i16,1p200e23.14e3)')         &
-     &                   istep, time, kg, rms_sph(kg,1:ntot_rms_rj)
-      end do
-!
-      do kg = kst, nidx_rj(1)
-        do lm = 0, l_truncation
-          write(id_file_rms_l,'(i16,1pe23.14e3,2i16,1p200e23.14e3)')    &
-     &           istep, time, kg, lm, rms_sph_l(kg,lm,1:ntot_rms_rj)
-          write(id_file_rms_m,'(i16,1pe23.14e3,2i16,1p200e23.14e3)')    &
-     &           istep, time, kg, lm, rms_sph_m(kg,lm,1:ntot_rms_rj)
-          write(id_file_rms_lm,'(i16,1pe23.14e3,2i16,1p200e23.14e3)')   &
-     &           istep, time, kg, lm, rms_sph_lm(kg,lm,1:ntot_rms_rj)
-        end do
-      end do
-!
-      end subroutine write_sph_all_layer_pwr
-!
-! -----------------------------------------------------------------------
-!
-      subroutine write_sph_selected_layer_pwr(istep, time,              &
-     &          num_pick_layer, id_pick_layer)
-!
-      use m_spheric_parameter
-!
-      integer(kind = kint), intent(in) :: num_pick_layer
-      integer(kind = kint), intent(in) :: id_pick_layer(num_pick_layer)
       integer(kind = kint), intent(in) :: istep
       real(kind = kreal), intent(in) :: time
 !
       integer(kind = kint) :: k, kg, lm
 !
 !
-      do k = 1, num_pick_layer
-        kg = id_pick_layer(k)
+      do k = 1, nri_rms
+        kg = kr_for_rms(k)
         write(id_file_rms,'(i16,1pe23.14e3,i16,1p200e23.14e3)')         &
-     &                   istep, time, kg, rms_sph(kg,1:ntot_rms_rj)
-      end do
-!
-      do k = 1, num_pick_layer
-        kg = id_pick_layer(k)
+     &                   istep, time, kg, rms_sph(k,1:ntot_rms_rj)
         do lm = 0, l_truncation
           write(id_file_rms_l,'(i16,1pe23.14e3,2i16,1p200e23.14e3)')    &
-     &           istep, time, kg, lm, rms_sph_l(kg,lm,1:ntot_rms_rj)
+     &           istep, time, kg, lm, rms_sph_l(k,lm,1:ntot_rms_rj)
           write(id_file_rms_m,'(i16,1pe23.14e3,2i16,1p200e23.14e3)')    &
-     &           istep, time, kg, lm, rms_sph_m(kg,lm,1:ntot_rms_rj)
+     &           istep, time, kg, lm, rms_sph_m(k,lm,1:ntot_rms_rj)
           write(id_file_rms_lm,'(i16,1pe23.14e3,2i16,1p200e23.14e3)')   &
-     &           istep, time, kg, lm, rms_sph_lm(kg,lm,1:ntot_rms_rj)
+     &           istep, time, kg, lm, rms_sph_lm(k,lm,1:ntot_rms_rj)
         end do
       end do
 !

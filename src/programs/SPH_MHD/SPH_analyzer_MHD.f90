@@ -41,7 +41,6 @@
       use sph_transforms_4_MHD
       use set_radius_func
       use const_radial_mat_4_sph
-      use cal_rms_fields_by_sph
       use sph_mhd_rms_IO
       use cal_sol_sph_MHD_crank
       use cal_nonlinear
@@ -65,9 +64,6 @@
 !
       call allocate_phys_rj_data
       call set_sph_sprctr_data_address
-!
-      if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr'
-      call init_rms_4_sph_spectr
 !
 ! ---------------------------------
 !

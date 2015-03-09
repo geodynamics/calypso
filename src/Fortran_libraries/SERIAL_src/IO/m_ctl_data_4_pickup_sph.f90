@@ -8,6 +8,7 @@
 !> @brief Monitoring section IO for Control data
 !!
 !!@verbatim
+!!      subroutine deallocate_num_spec_layer_ctl
 !!      subroutine deallocate_num_pick_layer_ctl
 !!
 !!      subroutine deallocate_pick_sph_ctl
@@ -35,9 +36,13 @@
 !!
 !!    gauss_coefs_radius_ctl        2.91
 !!
+!!   if num_pick_layer_ctl = 0 or negative: 
+!!           No output
+!!    array spectr_layer_ctl  1
+!!      spectr_layer_ctl  62
+!!    end array spectr_layer_ctl
 !!   if pick_layer_ctl = 0 or negative:
 !!           output all layer and volume average
-!!
 !!    array pick_layer_ctl  1
 !!      pick_layer_ctl  62
 !!    end array
@@ -101,6 +106,10 @@
       character(len = kchara) :: gauss_coefs_prefix
       real(kind = kreal) :: gauss_coefs_radius_ctl = 2.91
 !
+!>      Structure for list of radial grid of spectr energy data output
+!!@n      idx_spec_layer_ctl%num:   Number of grid
+!!@n      idx_spec_layer_ctl%ivec: list of radial ID of spectr data
+       type(ctl_array_int), save :: idx_spec_layer_ctl
 !>      Structure for list of radial grid of spectr data output
 !!@n      idx_pick_layer_ctl%num:   Number of grid
 !!@n      idx_pick_layer_ctl%ivec: list of radial ID of spectr data
@@ -168,7 +177,9 @@
      &           :: hd_gauss_coefs_r =    'gauss_coefs_radius_ctl'
 !
       character(len=kchara), parameter                                  &
-     &           :: hd_pick_layer = 'pick_layer_ctl'
+     &           :: hd_spctr_layer = 'spectr_layer_ctl'
+      character(len=kchara), parameter                                  &
+     &           :: hd_pick_layer =  'pick_layer_ctl'
 !
       character(len=kchara), parameter                                  &
      &            :: hd_pick_sph_lm =   'pick_sph_spectr_ctl'
@@ -207,7 +218,7 @@
       integer (kind=kint) :: i_pick_z_ctl =             0
       integer (kind=kint) :: i_circle_coord =           0
 !
-      private :: hd_pick_sph, i_pick_sph, hd_pick_layer
+      private :: hd_pick_sph, i_pick_sph, hd_pick_layer, hd_spctr_layer
       private :: hd_gauss_coefs_head, hd_gauss_coefs_r
       private :: hd_picked_mode_head, hd_Nusselt_file_head
       private :: hd_pick_sph_lm, hd_pick_gauss_lm
@@ -220,6 +231,14 @@
 ! -----------------------------------------------------------------------
 !
       contains
+!
+! -----------------------------------------------------------------------
+!
+      subroutine deallocate_num_spec_layer_ctl
+!
+      call dealloc_control_array_int(idx_spec_layer_ctl)
+!
+      end subroutine deallocate_num_spec_layer_ctl
 !
 ! -----------------------------------------------------------------------
 !
@@ -294,6 +313,7 @@
         if(i_pick_sph .gt. 0) exit
 !
 !
+        call read_control_array_i1(hd_spctr_layer, idx_spec_layer_ctl)
         call read_control_array_i1(hd_pick_layer, idx_pick_layer_ctl)
 !
         call read_control_array_i2(hd_pick_sph_lm, idx_pick_sph_ctl)

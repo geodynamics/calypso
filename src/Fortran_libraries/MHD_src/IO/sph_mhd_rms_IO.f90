@@ -16,6 +16,7 @@
       use m_precision
 !
       use calypso_mpi
+      use m_machine_parameter
       use m_spheric_parameter
       use m_gauss_coefs_monitor_data
       use m_pickup_sph_spectr_data
@@ -35,9 +36,15 @@
 !
       use m_sph_spectr_data
       use m_rms_4_sph_spectr
+      use cal_rms_fields_by_sph
 !
 !
+      if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr'
+      call init_rms_4_sph_spectr
+!
+      if ( iflag_debug.gt.0 ) write(*,*) 'init_gauss_coefs_4_monitor'
       call init_gauss_coefs_4_monitor
+      if ( iflag_debug.gt.0 ) write(*,*) 'init_sph_spec_4_monitor'
       call init_sph_spec_4_monitor
 !
       end subroutine open_sph_vol_rms_file_mhd
