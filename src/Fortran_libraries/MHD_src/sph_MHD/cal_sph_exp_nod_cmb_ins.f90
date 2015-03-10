@@ -25,9 +25,9 @@
 !!@n @param kr_out       Radial ID for outer boundary
 !!@n @param r_CMB(0:2)   Radius at CMB
 !!@n @param fdm2_fix_fld_CMB(0:2,3)
-!!         Matrix to evaluate radial derivative at CMB with fiexed field
+!!         Matrix to evaluate radial derivative at CMB with fixed field
 !!@n @param fdm2_fix_dr_CMB(-1:1,3)
-!!         Matrix to evaluate field at CMB with fiexed radial derivative
+!!         Matrix to evaluate field at CMB with fixed radial derivative
 !!
 !!@n @param coef_d       Coefficient for diffusion term
 !!@n @param is_fld       Field address of input field

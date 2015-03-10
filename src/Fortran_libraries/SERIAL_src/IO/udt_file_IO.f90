@@ -195,7 +195,7 @@
      &    my_rank, istep, file_name)
 !
       open (id_ucd_file, file=file_name, status='old')
-      read(id_ucd_file,'(i10)') ucd%num_field
+      read(id_ucd_file,'(i16)') ucd%num_field
       backspace(id_ucd_file)
 !
       call allocate_ucd_phys_name(ucd)
@@ -225,7 +225,7 @@
      &    my_rank, istep, file_name)
 !
       open (id_ucd_file, file=file_name, status='old')
-      read(id_ucd_file,'(i10)') ucd%num_field
+      read(id_ucd_file,'(i16)') ucd%num_field
       backspace(id_ucd_file)
 !
       call allocate_ucd_phys_name(ucd)
@@ -261,7 +261,7 @@
 !
       call read_ucd_mesh(nnod_ele, ucd)
 !
-      read(id_ucd_file,'(i10)') ucd%num_field
+      read(id_ucd_file,'(i16)') ucd%num_field
       backspace(id_ucd_file)
 !
       call allocate_ucd_phys_name(ucd)

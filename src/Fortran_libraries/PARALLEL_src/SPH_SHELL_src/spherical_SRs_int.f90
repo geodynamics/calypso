@@ -28,8 +28,10 @@
       use m_constants
       use m_spheric_parameter
       use m_sph_trans_comm_table
+      use m_solver_SR
 !
-      use select_calypso_SR
+      use calypso_SR_int
+      use select_copy_from_recv
 !
       implicit none
 !
@@ -49,8 +51,6 @@
       use m_spheric_parameter
       use m_sph_trans_comm_table
 !
-      use m_solver_SR
-!
       integer (kind=kint), intent(inout):: iX_rtp(nnod_rtp)
       integer (kind=kint), intent(inout):: iX_rtm(nnod_rtm)
       integer (kind=kint), intent(inout):: iX_rlm(nnod_rlm)
@@ -59,7 +59,7 @@
       integer (kind=kint) :: nneib_max_send, nneib_max_recv
       integer (kind=kint) :: nnod_max_send,  nnod_max_recv
 !
-      real(kind = kreal) :: stime, etime
+      real(kind = kreal) :: starttime, endtime
       real(kind = kreal) :: etime_item_import, etime_irev_import
 !
 !
@@ -89,25 +89,25 @@
 !
 !
       iflag_sph_SR_int = iflag_import_item
-      stime = MPI_WTIME()
+      starttime = MPI_WTIME()
       call send_recv_rtp_2_rtm_int(iX_rtp, iX_rtm)
       call send_recv_rtm_2_rtp_int(iX_rtm, iX_rtp)
       call send_recv_rj_2_rlm_int(iX_rj, iX_rlm)
       call send_recv_rlm_2_rj_int(iX_rlm, iX_rj)
 !
-      etime = MPI_WTIME() - stime
-      call MPI_allREDUCE (etime, etime_item_import, ione,               &
+      endtime = MPI_WTIME() - starttime
+      call MPI_allREDUCE (endtime, etime_item_import, ione,             &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       iflag_sph_SR_int = iflag_import_rev
-      stime = MPI_WTIME()
+      starttime = MPI_WTIME()
       call send_recv_rtp_2_rtm_int(iX_rtp, iX_rtm)
       call send_recv_rtm_2_rtp_int(iX_rtm, iX_rtp)
       call send_recv_rj_2_rlm_int(iX_rj, iX_rlm)
       call send_recv_rlm_2_rj_int(iX_rlm, iX_rj)
 !
-      etime = MPI_WTIME() - stime
-      call MPI_allREDUCE (etime, etime_irev_import, ione,               &
+      endtime = MPI_WTIME() - starttime
+      call MPI_allREDUCE (endtime, etime_irev_import, ione,             &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       if(etime_irev_import .le. etime_item_import) then
@@ -135,7 +135,7 @@
       integer (kind=kint), intent(inout):: iX_rtm(nnod_rtm)
 !
 !
-      call sel_calypso_send_recv_int                                    &
+      call calypso_send_recv_int                                        &
      &             (iflag_sph_SR_int, nnod_rtp, nnod_rtm,               &
      &              nneib_domain_rtp, iflag_self_rtp,                   &
      &              id_domain_rtp, istack_sr_rtp, item_sr_rtp,          &
@@ -156,7 +156,7 @@
       integer (kind=kint), intent(inout):: iX_rtp(nnod_rtp)
 !
 !
-      call sel_calypso_send_recv_int                                    &
+      call calypso_send_recv_int                                        &
      &             (iflag_sph_SR_int, nnod_rtm, nnod_rtp,               &
      &              nneib_domain_rtm, iflag_self_rtm,                   &
      &              id_domain_rtm, istack_sr_rtm, item_sr_rtm,          &
@@ -177,7 +177,7 @@
       integer (kind=kint), intent(inout):: iX_rlm(nnod_rlm)
 !
 !
-      call sel_calypso_send_recv_int                                    &
+      call calypso_send_recv_int                                        &
      &             (iflag_sph_SR_int, nnod_rj, nnod_rlm,                &
      &              nneib_domain_rj, iflag_self_rj,                     &
      &              id_domain_rj, istack_sr_rj, item_sr_rj,             &
@@ -198,7 +198,7 @@
       integer (kind=kint), intent(inout):: iX_rj(nnod_rj)
 !
 !
-      call sel_calypso_send_recv_int                                    &
+      call calypso_send_recv_int                                        &
      &             (iflag_sph_SR_int, nnod_rlm, nnod_rj,                &
      &              nneib_domain_rlm, iflag_self_rlm,                   &
      &              id_domain_rlm, istack_sr_rlm, item_sr_rlm,          &

@@ -89,9 +89,9 @@
         ied = inod_next_stack_4_node(inod)
         write(50+my_rank,*) 'next node ID for node inod_next_4_node ',  &
      &                     inod, ist, ied, nnod_next_4_node(inod)
-        write(50+my_rank,'(8i10)') inod_next_4_node(ist:ied)
+        write(50+my_rank,'(8i16)') inod_next_4_node(ist:ied)
         write(50+my_rank,*) 'iweight_next_4_node'
-        write(50+my_rank,'(8i10)') iweight_next_4_node(ist:ied)
+        write(50+my_rank,'(8i16)') iweight_next_4_node(ist:ied)
       end do
 !
       end subroutine check_next_node_id_4_node

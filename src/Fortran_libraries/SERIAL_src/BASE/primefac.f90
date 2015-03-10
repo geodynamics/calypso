@@ -179,6 +179,7 @@
 
 !--------INITIALIZATIONS.
       j = 0
+      iexp = 0
       n = NUMBER
       olddiv = 0
       offset = 0

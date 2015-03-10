@@ -13,14 +13,14 @@ TARGET_SPH_D_BENCH =    sph_dynamobench
 SOURCES = $(shell ls *.f90)
 
 MOD_SPH_SNAP_NOVIZ_MAIN =  \
-main_sph_snapshot_noviz.o \
-analyzer_noviz_sph_snap.o \
+main_sph_snapshot_w_psf.o \
+analyzer_sph_snap_w_psf.o \
 SPH_analyzer_snap.o \
 FEM_analyzer_sph_MHD.o
 
 MOD_SPH_ZM_SNAP_NOVIZ_MAIN =  \
-main_sph_zm_snap_noviz.o \
-analyzer_noviz_sph_zm_snap.o \
+main_sph_zm_snap.o \
+analyzer_sph_zm_snap.o \
 SPH_analyzer_snap.o \
 SPH_analyzer_zm_snap.o \
 FEM_analyzer_sph_MHD.o

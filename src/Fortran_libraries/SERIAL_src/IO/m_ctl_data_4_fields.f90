@@ -61,28 +61,29 @@
       module m_ctl_data_4_fields
 !
       use m_precision
+      use t_read_control_arrays
 !
       implicit  none
 !
-!>      Number of field
-      integer (kind=kint)  :: num_nod_phys_ctl = 0
+!>      Structure for list of field
+!!@n      field_ctl%icou:  Read flag for 'nod_value_ctl'
+!!@n      field_ctl%num:   Number of field
+!!@n      field_ctl%c1_tbl: Name of field
+!!@n      field_ctl%c2_tbl: flag for visualization output
+!!@n      field_ctl%c3_tbl: flag for time series output
+      type(ctl_array_c3), save :: field_ctl
 !
-!>      Name list of field
-      character (len=kchara), allocatable :: phys_nod_name_ctl(:)
-!>      flag for visualization output
-      character (len=kchara), allocatable :: visualize_ctl(:)
-!>      flag for visualization output
-      character (len=kchara), allocatable :: monitor_ctl(:)
+!>      Structure for list of field on quadrature elements
+!!@n      quad_phys_ctl%icou:  Read flag for 'quad_field_name_ctl'
+!!@n      quad_phys_ctl%num:   Number of field
+!!@n      quad_phys_ctl%c_tbl: Name list of field
+      type(ctl_array_chara), save :: quad_phys_ctl
 !
-!>      Number of field for the quadrature elements
-      integer (kind=kint)  :: num_quad_field_ctl =   0
-!>      Name list of field for the quadrature elements
-      character (len=kchara), allocatable :: quad_phys_name_ctl(:)
-!
-!>      Number of field for the linear elements
-      integer (kind=kint)  :: num_linear_field_ctl = 0
-!>      Name list of field for the linear elements
-      character (len=kchara), allocatable :: linear_phys_name_ctl(:)
+!>      Structure for list of field on linear elements
+!!@n      linear_phys_ctl%icou:  Read flag for 'linear_field_name_ctl'
+!!@n      linear_phys_ctl%num:   Number of field
+!!@n      linear_phys_ctl%c_tbl: Name list of field
+      type(ctl_array_chara), save :: linear_phys_ctl
 !
 !   label for entry of group
 !
@@ -95,27 +96,18 @@
 !   4th level for fields
 !
       character(len=kchara), parameter                                  &
-     &      :: hd_num_nod_phys = 'nod_value_ctl'
-!>      Read flag for 'nod_value_ctl'
-      integer (kind=kint) :: i_num_nod_phys =   0
+     &      :: hd_field_list = 'nod_value_ctl'
 !
 !   4th level for each order
 !
       character(len=kchara), parameter                                  &
-     &      :: hd_num_quad_field =   'quad_field_name_ctl'
+     &      :: hd_quad_field =   'quad_field_name_ctl'
       character(len=kchara), parameter                                  &
-     &      :: hd_num_linear_field = 'linear_field_name_ctl'
-!>      Read flag for 'quad_field_name_ctl'
-      integer (kind=kint) :: i_num_quad_field =   0
-!>      Read flag for 'linear_field_name_ctl'
-      integer (kind=kint) :: i_num_linear_field = 0
+     &      :: hd_linear_field = 'linear_field_name_ctl'
 !
       private :: hd_phys_values, i_phys_values
-      private :: hd_num_nod_phys
-      private :: hd_num_quad_field, hd_num_linear_field
-!
-      private :: allocate_quad_phys_control
-      private :: allocate_linear_phys_control
+      private :: hd_field_list
+      private :: hd_quad_field, hd_linear_field
 !
 ! -----------------------------------------------------------------------
 !
@@ -123,56 +115,27 @@
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_phys_control
-!
-       allocate( phys_nod_name_ctl(num_nod_phys_ctl) )
-       allocate( visualize_ctl(num_nod_phys_ctl) )
-       allocate( monitor_ctl(num_nod_phys_ctl) )
-!
-       end subroutine allocate_phys_control
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_quad_phys_control
-!
-       allocate( quad_phys_name_ctl(num_quad_field_ctl) )
-!
-       end subroutine allocate_quad_phys_control
-!
-! -----------------------------------------------------------------------
-!
-       subroutine allocate_linear_phys_control
-!
-       allocate( linear_phys_name_ctl(num_linear_field_ctl) )
-!
-       end subroutine allocate_linear_phys_control
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
        subroutine deallocate_phys_control
 !
-       deallocate( phys_nod_name_ctl )
-       deallocate( visualize_ctl )
-       deallocate( monitor_ctl )
+       call dealloc_control_array_c3(field_ctl)
 !
        end subroutine deallocate_phys_control
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_quad_phys_control
+      subroutine deallocate_quad_phys_control
 !
-       deallocate( quad_phys_name_ctl )
+      call dealloc_control_array_chara(quad_phys_ctl)
 !
-       end subroutine deallocate_quad_phys_control
+      end subroutine deallocate_quad_phys_control
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine deallocate_linear_phys_control
+      subroutine deallocate_linear_phys_control
 !
-       deallocate( linear_phys_name_ctl )
+      call dealloc_control_array_chara(linear_phys_ctl)
 !
-       end subroutine deallocate_linear_phys_control
+      end subroutine deallocate_linear_phys_control
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -192,31 +155,10 @@
         call find_control_end_flag(hd_phys_values, i_phys_values)
         if(i_phys_values .gt. 0) exit
 !
-        call find_control_array_flag(hd_num_nod_phys, num_nod_phys_ctl)
-        if(num_nod_phys_ctl.gt.0 .and. i_num_nod_phys.eq.0) then
-          call allocate_phys_control
-          call read_control_array_chara3_list(hd_num_nod_phys,          &
-     &        num_nod_phys_ctl, i_num_nod_phys, phys_nod_name_ctl,      &
-     &        visualize_ctl, monitor_ctl)
-        end if
+        call read_control_array_c3(hd_field_list, field_ctl)
 !
-        call find_control_array_flag(hd_num_quad_field,                 &
-     &      num_quad_field_ctl)
-        if(num_quad_field_ctl.gt.0 .and. i_num_quad_field.eq.0) then
-          call allocate_quad_phys_control
-          call read_control_array_chara_list(hd_num_quad_field,         &
-     &        num_quad_field_ctl, i_num_quad_field, quad_phys_name_ctl)
-        end if
-!
-        call find_control_array_flag(hd_num_linear_field,               &
-     &      num_linear_field_ctl)
-        if(num_linear_field_ctl.gt.0                                    &
-     &      .and. i_num_linear_field.eq.0) then
-          call allocate_linear_phys_control
-          call read_control_array_chara_list(hd_num_linear_field,       &
-     &        num_linear_field_ctl, i_num_linear_field,                 &
-     &        linear_phys_name_ctl)
-        end if
+        call read_control_array_c1(hd_quad_field, quad_phys_ctl)
+        call read_control_array_c1(hd_linear_field, linear_phys_ctl)
       end do
 !
       end subroutine read_phys_values

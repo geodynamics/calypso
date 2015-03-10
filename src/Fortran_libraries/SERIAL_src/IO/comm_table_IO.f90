@@ -90,9 +90,9 @@
       integer(kind = kint) :: i
 !
       if (num_sr .gt. 0) then
-        write(id_file,'(8i10)') istack_sr(1:num_sr)
+        write(id_file,'(8i16)') istack_sr(1:num_sr)
         do i = 1, ntot_sr
-          write(id_file,'(i10)') inod_sr(i)
+          write(id_file,'(i16)') inod_sr(i)
         end do
       else
         write(id_file,'(a)')
@@ -115,9 +115,9 @@
 !
 !
       if (num_sr .gt. 0) then
-        write(id_file,'(8i10)') istack_sr(1:num_sr)
+        write(id_file,'(8i16)') istack_sr(1:num_sr)
         do i = 1, ntot_sr
-          write(id_file,'(20i10)') inod_sr(i), idx_work(i,1:nwork)
+          write(id_file,'(20i16)') inod_sr(i), idx_work(i,1:nwork)
         end do
       else
         write(id_file,'(a)')

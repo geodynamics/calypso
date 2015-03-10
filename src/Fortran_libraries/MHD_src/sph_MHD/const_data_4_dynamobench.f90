@@ -39,7 +39,7 @@
       call mid_eq_transfer_dynamobench
 !
       call cal_rms_sph_outer_core
-      call copy_energy_4_dynamobench
+      if(my_rank .eq. 0) call copy_energy_4_dynamobench
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call pick_inner_core_rotation
@@ -47,7 +47,7 @@
 !
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         call cal_rms_sph_inner_core
-        call copy_icore_energy_4_dbench
+        if(my_rank .eq. 0) call copy_icore_energy_4_dbench
       end if
 !
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center                  &

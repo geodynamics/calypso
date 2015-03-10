@@ -11,7 +11,6 @@
 !
       use m_precision
       use m_constants
-      use m_spheric_parameter
       use m_group_data_sph_specr
 !
       use t_group_data
@@ -33,12 +32,14 @@
 !
       subroutine allocate_sph_ele_grp_flag
 !
+      use m_sph_mesh_1d_connect
+!
       integer(kind = kint) :: num
 !
 !
-      num = nidx_global_rtp(1)
+      num = nidx_global_fem(1)
       allocate(iflag_r(num))
-      if(nidx_global_rtp(1) .gt. 0) iflag_r = 0
+      if(nidx_global_fem(1) .gt. 0) iflag_r = 0
 !
       end subroutine allocate_sph_ele_grp_flag
 !
@@ -76,6 +77,7 @@
 !
       subroutine count_sph_local_ele_grp_item(ip_r, ip_t, ele_grp)
 !
+      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use set_stack_4_sph_groups
 !
@@ -133,6 +135,7 @@
 !
       subroutine set_sph_local_ele_grp_item(ip_r, ip_t, ele_grp)
 !
+      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use set_stack_4_sph_groups
       use cal_sph_node_addresses
@@ -196,7 +199,7 @@
       integer(kind = kint), intent(inout) :: nitem_grp
 !
 !
-      nitem_grp = nitem_grp + nele_sph_t(ip_t)*nidx_global_rtp(3)
+      nitem_grp = nitem_grp + nele_sph_t(ip_t)*nidx_global_fem(3)
 !
 !    Set elements for poles
       if    (iflag_shell_mode .eq. iflag_MESH_w_pole                    &
@@ -220,7 +223,6 @@
 !
       subroutine count_ele_grp_item_4_center(ip_t, nitem_grp)
 !
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
 !
       integer(kind = kint), intent(in) :: ip_t
@@ -231,11 +233,11 @@
 !    Set elements for Center elements
       if(iflag_Spole_t(ip_t) .gt. 0)  then
         nitem_grp = nitem_grp                                           &
-     &             + (nidx_global_rtp(2)-1)*nidx_global_rtp(3)          &
-     &             + nidx_global_rtp(3)
+     &             + (nidx_global_fem(2)-1)*nidx_global_fem(3)          &
+     &             + nidx_global_fem(3)
 !
       else
-        nitem_grp = nitem_grp + nele_sph_t(ip_t)*nidx_global_rtp(3)
+        nitem_grp = nitem_grp + nele_sph_t(ip_t)*nidx_global_fem(3)
 !    Set element for north pole
          if(iflag_Npole_t(ip_t) .gt. 0)  then
            nitem_grp = nitem_grp + nele_around_pole
@@ -260,7 +262,7 @@
       integer(kind = kint) :: l, m
 !
 !
-      do m = 1, nidx_global_rtp(3)
+      do m = 1, nidx_global_fem(3)
         do l = 1, nele_sph_t(ip_t)
           inum = inum + 1
           ele_grp%item_grp(inum)                                        &
@@ -296,7 +298,6 @@
 !
       subroutine set_ele_grp_item_4_center(ip_t, inum, ele_grp)
 !
-      use m_spheric_parameter
       use m_sph_mesh_1d_connect
       use cal_sph_ele_addresses
 !
@@ -310,8 +311,8 @@
 !    Set elements for Center elements
 !
       if(iflag_Spole_t(ip_t) .gt. 0)  then
-        do m = 1, nidx_global_rtp(3)
-          do l = 1, nidx_global_rtp(2)-1
+        do m = 1, nidx_global_fem(3)
+          do l = 1, nidx_global_fem(2)-1
             inum = inum + 1
             ele_grp%item_grp(inum) = sph_inter_ctr_shell_ele_id(l, m)
           end do
@@ -330,7 +331,7 @@
         end do
 !
       else
-        do m = 1, nidx_global_rtp(3)
+        do m = 1, nidx_global_fem(3)
           do l = 1, nele_sph_t(ip_t)
             inum = inum + 1
             ele_grp%item_grp(inum)                                      &

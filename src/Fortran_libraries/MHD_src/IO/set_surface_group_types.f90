@@ -115,14 +115,14 @@
       call set_bc_group_types_scalar(bc_type_ctl, ibc_type)
       call set_bc_group_types_sgs_scalar(bc_type_ctl, ibc_type)
 !
-      if      ( cmp_no_case(bc_type_ctl, grad_sf) .gt. 0                &
-     &    .or.  cmp_no_case(bc_type_ctl, gradient_sf) .gt. 0            &
-     &    .or.  cmp_no_case(bc_type_ctl, grad_ctl) .gt. 0) then
+      if      ( cmp_no_case(bc_type_ctl, grad_sf)                       &
+     &    .or.  cmp_no_case(bc_type_ctl, gradient_sf)                   &
+     &    .or.  cmp_no_case(bc_type_ctl, grad_ctl)   ) then
         ibc_type =  iflag_fixed_grad_s
-      else if ( cmp_no_case(bc_type_ctl, grad_file) .gt. 0) then
+      else if ( cmp_no_case(bc_type_ctl, grad_file)  ) then
         ibc_type = -iflag_fixed_grad_s
 !
-      else if ( cmp_no_case(bc_type_ctl, grad_lead) .gt. 0) then
+      else if ( cmp_no_case(bc_type_ctl, grad_lead)  ) then
         ibc_type = iflag_lead_grad_s
       end if
 !
@@ -139,33 +139,33 @@
       call set_bc_group_types_vector(bc_type_ctl, ibc_type)
       call set_bc_group_types_sgs_vect(bc_type_ctl, ibc_type)
 !
-      if      (cmp_no_case(bc_type_ctl, fixed_norm) .gt. 0              &
-     &    .or. cmp_no_case(bc_type_ctl, norm_ctl) .gt. 0) then
+      if      (cmp_no_case(bc_type_ctl, fixed_norm)                     &
+     &    .or. cmp_no_case(bc_type_ctl, norm_ctl)  ) then
         ibc_type = iflag_fixed_norm
-      else if (cmp_no_case(bc_type_ctl, norm_file) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, norm_file) ) then
         ibc_type = -iflag_fixed_norm
 !
-      else if (cmp_no_case(bc_type_ctl, fixed_grad_x) .gt. 0            &
-     &    .or. cmp_no_case(bc_type_ctl, grad_ctl_x) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, fixed_grad_x)                   &
+     &    .or. cmp_no_case(bc_type_ctl, grad_ctl_x)  ) then
         ibc_type = iflag_fixed_grad_x
-      else if (cmp_no_case(bc_type_ctl, fixed_grad_y) .gt. 0            &
-     &    .or. cmp_no_case(bc_type_ctl, grad_ctl_y) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, fixed_grad_y)                   &
+     &    .or. cmp_no_case(bc_type_ctl, grad_ctl_y)  ) then
         ibc_type = iflag_fixed_grad_y
-      else if (cmp_no_case(bc_type_ctl, fixed_grad_z) .gt. 0            &
-     &    .or. cmp_no_case(bc_type_ctl, grad_ctl_z) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, fixed_grad_z)                   &
+     &    .or. cmp_no_case(bc_type_ctl, grad_ctl_z)  ) then
         ibc_type = iflag_fixed_grad_z
-      else if (cmp_no_case(bc_type_ctl, grad_file_x) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, grad_file_x) ) then
         ibc_type = -iflag_fixed_grad_x
-      else if (cmp_no_case(bc_type_ctl, grad_file_y) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, grad_file_y) ) then
         ibc_type = -iflag_fixed_grad_z
-      else if (cmp_no_case(bc_type_ctl, grad_file_z) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, grad_file_z) ) then
         ibc_type = -iflag_fixed_grad_z
 !
-      else if (cmp_no_case(bc_type_ctl, grad_lead_x) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, grad_lead_x) ) then
         ibc_type = iflag_lead_grad_x
-      else if (cmp_no_case(bc_type_ctl, grad_lead_y) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, grad_lead_y) ) then
         ibc_type = iflag_lead_grad_y
-      else if (cmp_no_case(bc_type_ctl, grad_lead_z) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, grad_lead_z) ) then
         ibc_type = iflag_lead_grad_z
       end if
 !
@@ -179,9 +179,9 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if (cmp_no_case(bc_type_ctl, free_sph_in) .gt. 0) then
+      if (cmp_no_case(bc_type_ctl, free_sph_in)) then
         ibc_type = iflag_surf_free_sph_in
-      else if (cmp_no_case(bc_type_ctl, free_sph_out) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, free_sph_out)) then
         ibc_type = iflag_surf_free_sph_out
       end if
 !
@@ -195,11 +195,11 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if      (cmp_no_case(bc_type_ctl, wall_surf) .gt. 0) then
+      if      (cmp_no_case(bc_type_ctl, wall_surf) ) then
         ibc_type = iflag_surf_wall
-      else if (cmp_no_case(bc_type_ctl, sphere_in) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, sphere_in) ) then
         ibc_type = iflag_surf_sph_in
-      else if (cmp_no_case(bc_type_ctl, sphere_out) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, sphere_out)) then
         ibc_type = iflag_surf_sph_out
       end if
 !
@@ -213,9 +213,9 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if      (cmp_no_case(bc_type_ctl, pseudo_in) .gt. 0) then
+      if      (cmp_no_case(bc_type_ctl, pseudo_in) ) then
         ibc_type = iflag_surf_qvc_sph_in
-      else if (cmp_no_case(bc_type_ctl, pseudo_out) .gt. 0) then
+      else if (cmp_no_case(bc_type_ctl, pseudo_out)) then
         ibc_type = iflag_surf_qvc_sph_out
       end if
 !
@@ -229,7 +229,7 @@
       integer(kind = kint), intent(inout) :: ibc_type
 !
 !
-      if(cmp_no_case(bc_type_ctl, infty_surf) .gt. 0) then
+      if(cmp_no_case(bc_type_ctl, infty_surf)) then
         ibc_type = iflag_surf_infty
       end if
 !

@@ -38,8 +38,8 @@
       ele%nnod_4_ele = num_t_linear
 !
       call reset_local_sph_ele_constants
-      call set_nele_lc_shell(ip_r, ip_t, nidx_global_rtp(3))
-      call set_nele_gl_shell(nidx_global_rtp)
+      call set_nele_lc_shell(ip_r, ip_t)
+      call set_nele_gl_shell
 !
 !    Set elements for poles
 !
@@ -50,13 +50,13 @@
         if(iflag_Spole_t(ip_t) .gt. 0)  then
           call set_nele_lc_Spole(ip_r)
         end if
-        call set_nele_gl_Spole(nidx_global_rtp)
+        call set_nele_gl_Spole
 !
 !    Set elements for North pole
         if(iflag_Npole_t(ip_t) .gt. 0)  then
           call set_nele_lc_Npole(ip_r)
         end if
-        call set_nele_gl_Npole(nidx_global_rtp)
+        call set_nele_gl_Npole
       end if
 !
 !    Set elements for Center elements
@@ -66,17 +66,17 @@
 !     Mesh with center
         if     (iflag_center_r(ip_r) .gt. 0)  then
           if(iflag_Spole_t(ip_t) .gt. 0)  then
-            call set_nele_lc_ctr_sph(nidx_global_rtp)
+            call set_nele_lc_ctr_sph
             call set_nele_center_Spole
             call set_nele_center_Npole
           else
-            call set_nele_ext_ctr_sph(ip_t, nidx_global_rtp(3))
+            call set_nele_ext_ctr_sph(ip_t)
             if(iflag_Npole_t(ip_t) .gt. 0)  then
               call set_nele_center_Npole
             end if
           end if
         end if
-        call set_nele_gl_ctr_sph(nidx_global_rtp)
+        call set_nele_gl_ctr_sph
       end if
 !
       call cal_sph_local_numele(ele%numele)

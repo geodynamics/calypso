@@ -14,8 +14,8 @@
       module set_field_file_names
 !
       use m_precision
-!
       use m_constants
+!
       use m_field_file_format
 !
       implicit none
@@ -86,7 +86,7 @@
       character(len=kchara) :: fname_tmp
 !
 !
-      if(istep_fld .eq. -1) then
+      if(istep_fld .eq. iminus) then
         call add_elaps_postfix(file_header, fname_tmp)
       else
         call add_int_suffix(istep_fld, file_header, fname_tmp)
@@ -94,7 +94,7 @@
       call add_int_suffix(my_rank, fname_tmp, file_name)
       call add_fld_extension(file_name, fname_tmp)
 !
-      if (   mod(itype_file,10) .eq. id_gzip_txt_file_fmt) then
+      if (   mod(itype_file,iten) .eq. id_gzip_txt_file_fmt) then
         call add_gzip_extension(fname_tmp, file_name)
       else
         file_name = fname_tmp
@@ -115,7 +115,7 @@
       character(len=kchara) :: fname_tmp
 !
 !
-      if(istep_fld .eq. -1) then
+      if(istep_fld .eq. iminus) then
         call add_elaps_postfix(file_header, fname_tmp)
       else
         call add_int_suffix(istep_fld, file_header, fname_tmp)
@@ -123,7 +123,7 @@
       call add_int_suffix(my_rank, fname_tmp, file_name)
       call add_fst_extension(file_name, fname_tmp)
 !
-      if (   mod(itype_file,10) .eq. id_gzip_txt_file_fmt) then
+      if (   mod(itype_file,iten) .eq. id_gzip_txt_file_fmt) then
         call add_gzip_extension(fname_tmp, file_name)
       else
         file_name = fname_tmp

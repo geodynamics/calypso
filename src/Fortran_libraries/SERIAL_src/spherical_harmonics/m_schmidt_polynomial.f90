@@ -12,8 +12,10 @@
 !!      subroutine allocate_schmidt_polynomial
 !!      subroutine deallocate_schmidt_polynomial
 !!
-!!      subroutine dlad
-!!      subroutine dschmidt
+!!      subroutine dlad(theta)
+!!      subroutine dschmidt(theta)
+!!
+!!      subroutine full_norm_legendre(theta)
 !!@endverbatim
 !
       module m_schmidt_polynomial
@@ -24,15 +26,19 @@
 ! 
 !
 !
+!>      Truncation level
       integer(kind = kint) :: nth = 10
-      real(kind = kreal) :: dth
 !
+!>      Schmidt quasi-normalized Legendre polynomials
       real(kind = kreal), allocatable :: p(:,:)
+!>      diffrence of Schmidt quasi-normalized Legendre polynomials
       real(kind = kreal), allocatable :: dp(:,:)
 !
+!>      Legendre polynomials without normalization
       real(kind = kreal), allocatable :: dplm(:,:)
-      real(kind = kreal), allocatable :: dc(:,:)
-      real(kind = kreal), allocatable :: df(:,:)
+!
+!>      work area
+      real(kind = kreal), allocatable :: df(:)
 !
 ! -----------------------------------------------------------------------
 !
@@ -45,13 +51,11 @@
         allocate ( p(0:nth,0:nth) )
         allocate ( dp(0:nth,0:nth) )
         allocate ( dplm(0:nth+2,0:nth+2) )
-        allocate ( dc(0:nth,0:nth+2) )
-        allocate ( df(0:nth+2,0:nth+2) )
+        allocate ( df(0:nth+2) )
 !
         p = 0.0d0
         dp = 0.0d0
         dplm = 0.0d0
-        dc = 0.0d0
         df = 0.0d0
 !
        end subroutine allocate_schmidt_polynomial
@@ -60,64 +64,65 @@
 !
        subroutine deallocate_schmidt_polynomial
 !
-        deallocate ( p, dp, dplm, dc, df )
+        deallocate (p, dp, dplm, df)
 !
        end subroutine deallocate_schmidt_polynomial
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine dlad
+      subroutine dlad(theta)
 !
       use legendre
 !
+      real(kind = kreal), intent(in) :: theta
       real(kind = kreal) :: x
 !
 !*  ++++++++  set x ++++++++++++++++
 !*
-      x = cos(dth)
+      x = cos(theta)
 !
 !*   ++++++++++  lead adjoint Legendre Polynomial  ++++++
 !*
-      call dladendre(nth, x, dplm, df)
+      call dledendre(nth, x, dplm, df)
 !
       end subroutine dlad
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine dschmidt
+      subroutine dschmidt(theta)
 !
       use schmidt
+!
+      real(kind = kreal), intent(in) :: theta
 !
 !
 !*   ++++++++++  lead adjoint Legendre Polynomial  ++++++
 !*
-      call schmidt_polynomial(nth, dth, p, df)
+      call schmidt_legendre(nth, theta, p, df)
 !
 !*   ++++++++++  lead difference of Legendre Polynomial  ++++++
 !*
-      call diff_schmidt_polynomial(nth, p, dp)
+      call diff_schmidt_legendre(nth, p, dp)
 !
       end subroutine dschmidt
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine full_norm_legendre
+      subroutine full_norm_legendre(theta)
 !
       use schmidt
+!
+      real(kind = kreal), intent(in) :: theta
 !
 !
 !*   ++++++++++  lead adjoint Legendre Polynomial  ++++++
 !*
-      call schmidt_polynomial(nth, dth, p, df)
-!
-!*   ++++++++++  lead difference of Legendre Polynomial  ++++++
-!*
-      call diff_schmidt_polynomial(nth, p, dp)
+      call dschmidt(theta)
 !
 !*   ++++++++++  Full normalizationl  ++++++
 !*
-      call full_normalize_by_smdt(nth, p, dp)
+      call full_normalize_from_smdt(nth, p, dp)
 !
       end subroutine full_norm_legendre
 !

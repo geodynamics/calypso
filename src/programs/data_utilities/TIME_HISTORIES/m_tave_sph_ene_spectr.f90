@@ -225,15 +225,15 @@
       integer(kind = kint) :: lth
 !
 !
-      write(id_tave_rms,'(i10,1pE25.15e3,i10,1p255E25.15e3)')           &
+      write(id_tave_rms,'(i16,1pE25.15e3,i16,1p255E25.15e3)')           &
      &         ied_true, time_sph, izero, spec(1:ncomp,1)
 !
       do lth = 0, ltr
-        write(id_tave_rms_l,'(i10,1pE25.15e3,i10,1p255E25.15e3)')       &
+        write(id_tave_rms_l,'(i16,1pE25.15e3,i16,1p255E25.15e3)')       &
      &         ied_true, time_sph, lth, spec_l(1:ncomp,lth,1)
-        write(id_tave_rms_m,'(i10,1pE25.15e3,i10,1p255E25.15e3)')       &
+        write(id_tave_rms_m,'(i16,1pE25.15e3,i16,1p255E25.15e3)')       &
      &         ied_true, time_sph, lth, spec_m(1:ncomp,lth,1)
-        write(id_tave_rms_lm,'(i10,1pE25.15e3,i10,1p255E25.15e3)')      &
+        write(id_tave_rms_lm,'(i16,1pE25.15e3,i16,1p255E25.15e3)')      &
      &         ied_true, time_sph, lth, spec_lm(1:ncomp,lth,1)
       end do
 !
@@ -256,18 +256,18 @@
 !
 !
       do kr = 1, nri
-        write(id_tave_rms,'(i10,1pE25.15e3,2i10,1p255E25.15e3)')        &
+        write(id_tave_rms,'(i16,1pE25.15e3,2i16,1p255E25.15e3)')        &
      &         ied_true, time_sph, kr_sph(kr), izero,                   &
      &         spec(1:ncomp,kr)
 !
         do lth = 0, ltr
-          write(id_tave_rms_l,'(i10,1pE25.15e3,2i10,1p255E25.15e3)')    &
+          write(id_tave_rms_l,'(i16,1pE25.15e3,2i16,1p255E25.15e3)')    &
      &         ied_true, time_sph, kr_sph(kr), lth,                     &
      &         spec_l(1:ncomp,lth,kr)
-          write(id_tave_rms_m,'(i10,1pE25.15e3,2i10,1p255E25.15e3)')    &
+          write(id_tave_rms_m,'(i16,1pE25.15e3,2i16,1p255E25.15e3)')    &
      &         ied_true, time_sph, kr_sph(kr), lth,                     &
      &         spec_m(1:ncomp,lth,kr)
-          write(id_tave_rms_lm,'(i10,1pE25.15e3,2i10,1p255E25.15e3)')   &
+          write(id_tave_rms_lm,'(i16,1pE25.15e3,2i16,1p255E25.15e3)')   &
      &         ied_true, time_sph, kr_sph(kr), lth,                     &
      &         spec_lm(1:ncomp,lth,kr)
         end do

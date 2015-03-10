@@ -51,28 +51,28 @@
 !
       id_file_fmt = id_ascii_file_fmt
       if (i_file_fmt .gt. 0) then
-        if     (cmp_no_case(file_fmt_ctl, 'binary') .gt. 0              &
-     &     .or. cmp_no_case(file_fmt_ctl, 'bin') .gt.    0) then
+        if     (cmp_no_case(file_fmt_ctl, 'binary')                     &
+     &     .or. cmp_no_case(file_fmt_ctl, 'bin')        ) then
            id_file_fmt = id_binary_file_fmt
-        else if(cmp_no_case(file_fmt_ctl, 'gzip_ascii') .gt. 0          &
-     &     .or. cmp_no_case(file_fmt_ctl, 'gz_ascii') .gt.   0          &
-     &     .or. cmp_no_case(file_fmt_ctl, 'ascii_gzip') .gt. 0          &
-     &     .or. cmp_no_case(file_fmt_ctl, 'ascii_gz') .gt.   0          &
-     &     .or. cmp_no_case(file_fmt_ctl, 'gzip_text') .gt.  0          &
-     &     .or. cmp_no_case(file_fmt_ctl, 'gz_text') .gt.    0          &
-     &     .or. cmp_no_case(file_fmt_ctl, 'text_gzip') .gt.  0          &
-     &     .or. cmp_no_case(file_fmt_ctl, 'text_gz') .gt.    0          &
-     &     .or. cmp_no_case(file_fmt_ctl, 'gzip') .gt.       0          &
-     &     .or. cmp_no_case(file_fmt_ctl, 'gz') .gt.         0) then
+        else if(cmp_no_case(file_fmt_ctl, 'gzip_ascii')                 &
+     &     .or. cmp_no_case(file_fmt_ctl, 'gz_ascii')                   &
+     &     .or. cmp_no_case(file_fmt_ctl, 'ascii_gzip')                 &
+     &     .or. cmp_no_case(file_fmt_ctl, 'ascii_gz')                   &
+     &     .or. cmp_no_case(file_fmt_ctl, 'gzip_text')                  &
+     &     .or. cmp_no_case(file_fmt_ctl, 'gz_text')                    &
+     &     .or. cmp_no_case(file_fmt_ctl, 'text_gzip')                  &
+     &     .or. cmp_no_case(file_fmt_ctl, 'text_gz')                    &
+     &     .or. cmp_no_case(file_fmt_ctl, 'gzip')                       &
+     &     .or. cmp_no_case(file_fmt_ctl, 'gz')         ) then
            id_file_fmt = id_gzip_txt_file_fmt
-!        else if(cmp_no_case(file_fmt_ctl, 'gzip_binary') .gt. 0        &
-!     &     .or. cmp_no_case(file_fmt_ctl, 'gz_binary') .gt.   0        &
-!     &     .or. cmp_no_case(file_fmt_ctl, 'binary_gzip') .gt. 0        &
-!     &     .or. cmp_no_case(file_fmt_ctl, 'binary_gz') .gt.   0        &
-!     &     .or. cmp_no_case(file_fmt_ctl, 'gzip_bin') .gt.    0        &
-!     &     .or. cmp_no_case(file_fmt_ctl, 'gz_bin') .gt.      0        &
-!     &     .or. cmp_no_case(file_fmt_ctl, 'bin_gzip') .gt.    0        &
-!     &     .or. cmp_no_case(file_fmt_ctl, 'bin_gz') .gt.      0) then
+!        else if(cmp_no_case(file_fmt_ctl, 'gzip_binary')               &
+!     &     .or. cmp_no_case(file_fmt_ctl, 'gz_binary')                 &
+!     &     .or. cmp_no_case(file_fmt_ctl, 'binary_gzip')               &
+!     &     .or. cmp_no_case(file_fmt_ctl, 'binary_gz')                 &
+!     &     .or. cmp_no_case(file_fmt_ctl, 'gzip_bin')                  &
+!     &     .or. cmp_no_case(file_fmt_ctl, 'gz_bin')                    &
+!     &     .or. cmp_no_case(file_fmt_ctl, 'bin_gzip')                  &
+!     &     .or. cmp_no_case(file_fmt_ctl, 'bin_gz')    ) then
 !           id_file_fmt = id_gzip_bin_file_fmt
         end if
       end if

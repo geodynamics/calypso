@@ -7,10 +7,14 @@
 !>@brief  Communication tables for spherical transform
 !!
 !!@verbatim
+!!      subroutine set_sph_rj_center_flag                               &
+!!     &         (nnod_rj, nidx_rj, inod_rj_center)
 !!      subroutine set_special_degree_order_flags(nidx_rj2, nidx_rlm2,  &
 !!     &          idx_gl_1d_rj_j, idx_gl_1d_rlm_j, idx_rj_degree_zero,  &
 !!     &          idx_rj_degree_one, ist_rtm_order_zero,                &
 !!     &          ist_rtm_order_1s, ist_rtm_order_1c)
+!!      integer function find_local_rj_mode_address                     &
+!!     &      (jmax, idx_gl_1d_rj_j, l, m)
 !!@endverbatim
 !
       module set_special_sph_lm_flags
@@ -23,6 +27,20 @@
 !  -------------------------------------------------------------------
 !
       contains
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_sph_rj_center_flag                                 &
+     &         (nnod_rj, nidx_rj, inod_rj_center)
+!
+      integer (kind=kint), intent(in) :: nnod_rj
+      integer (kind=kint), intent(in) :: nidx_rj(2)
+      integer (kind=kint), intent(inout) :: inod_rj_center
+!
+!
+      inod_rj_center = nnod_rj * (nnod_rj - nidx_rj(1)*nidx_rj(2))
+!
+      end subroutine set_sph_rj_center_flag
 !
 ! ----------------------------------------------------------------------
 !
@@ -87,8 +105,8 @@
 !
 !  -------------------------------------------------------------------
 !
-      integer function find_local_rj_mode_address(jmax, idx_gl_1d_rj_j, &
-     &       l, m)
+      integer function find_local_rj_mode_address                       &
+     &      (jmax, idx_gl_1d_rj_j, l, m)
 !
       integer(kind = kint), intent(in) :: jmax
       integer(kind = kint), intent(in) :: idx_gl_1d_rj_j(jmax,3)

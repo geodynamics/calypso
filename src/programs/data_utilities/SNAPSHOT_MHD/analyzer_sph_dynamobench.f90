@@ -35,7 +35,7 @@
 !
       subroutine initialize_sph_dynamobench
 !
-      use m_ctl_data_noviz_MHD
+      use m_ctl_data_sph_MHD_noviz
       use set_control_sph_mhd
       use set_control_sph_data_MHD
       use set_control_SPH_to_FEM
@@ -50,8 +50,8 @@
 !
       call start_eleps_time(1)
       call start_eleps_time(4)
-      if (iflag_debug.eq.1) write(*,*) 'read_control_4_snap_noviz'
-      call read_control_4_snap_noviz
+      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_snap_noviz'
+      call read_control_4_sph_snap_noviz
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
       call set_control_4_sph_mhd
       call set_control_4_SPH_to_FEM
@@ -70,6 +70,7 @@
       call calypso_MPI_barrier
 !
       call end_eleps_time(2)
+      call reset_elapse_4_init_sph_mhd
 !
       end subroutine initialize_sph_dynamobench
 !

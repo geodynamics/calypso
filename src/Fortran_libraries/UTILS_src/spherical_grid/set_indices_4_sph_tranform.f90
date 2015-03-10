@@ -9,7 +9,8 @@
 !!@verbatim
 !!      subroutine cal_local_nums(n_div, ist, ied, num, istack)
 !!      subroutine cal_local_nums_rev(n_div, ist, ied, num, istack)
-!!      subroutine cal_local_num_rtm_m(ndomain_m, ltr, num, istack)
+!!      subroutine cal_local_num_rtm_m(ndomain_m, ltr, m_folding,       &
+!!     &          num, istack)
 !!
 !!      subroutine merge_num_3_local_layers(n_div, num_1, num_2, num_3, &
 !!     &          ist, num, istack)
@@ -116,9 +117,10 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_local_num_rtm_m(ndomain_m, ltr, num, istack)
+      subroutine cal_local_num_rtm_m(ndomain_m, ltr, m_folding,         &
+     &          num, istack)
 !
-      integer(kind = kint), intent(in) :: ndomain_m, ltr
+      integer(kind = kint), intent(in) :: ndomain_m, ltr, m_folding
       integer(kind = kint), intent(inout) :: num(ndomain_m)
       integer(kind = kint), intent(inout) :: istack(0:ndomain_m)
 !
@@ -128,9 +130,9 @@
       m = -1
       num = 0
 !
-      ltr_half = ( ltr-mod(ltr,2) ) / 2
       ip = 1
       imark = 1
+      ltr_half = ( ltr-mod(ltr,2) ) / (2*m_folding)
 !
       do m = 1, ltr_half
         num(ip) = num(ip) + 2
@@ -154,7 +156,7 @@
         imark =  1
       end if
 !
-      do m = ltr_half+1, ltr
+      do m = ltr_half+1, ltr/m_folding
         num(ip) = num(ip) + 2
         ip = ip + imark
         if (ip .gt. ndomain_m) then

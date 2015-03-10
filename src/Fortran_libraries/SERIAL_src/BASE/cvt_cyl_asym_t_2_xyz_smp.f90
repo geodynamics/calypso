@@ -9,17 +9,17 @@
 !!
 !!@verbatim
 !!      subroutine cal_xyz_asym_t_by_cyl_smp(np_smp, numnod,            &
-!!     &          inod_smp_stack, t_cyl, txyz, xx, s, a_s)
+!!     &          inod_smp_stack, t_cyl, txyz, xx, yy, s, a_s)
 !!
 !!      subroutine overwrite_xyz_asym_t_by_cyl_smp(np_smp, numnod,      &
-!!     &          inod_smp_stack, tensor, xx, s, a_s)
+!!     &          inod_smp_stack, tensor, xx, yy, s, a_s)
 !!
 !!      subroutine cal_xy_asym_t_by_cyl_smp(np_smp, numnod,             &
 !!     &          inod_smp_stack, t_cyl, v_xy)
 !!      subroutine cal_zx_asym_t_by_cyl_smp(np_smp, numnod,             &
-!!     &          inod_smp_stack, t_cyl, v_zx, xx, s, a_s)
+!!     &          inod_smp_stack, t_cyl, v_zx, xx, yy, s, a_s)
 !!      subroutine cal_yz_asym_t_by_cyl_smp(np_smp, numnod,             &
-!!     &          inod_smp_stack, t_cyl, v_yz, xx, s, a_s)
+!!     &          inod_smp_stack, t_cyl, v_yz, xx, yy, s, a_s)
 !!
 !!   uxuy =         us*up
 !!   uzux = (as) * (      x* uz*us + y* up*uz)
@@ -59,12 +59,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_xyz_asym_t_by_cyl_smp(np_smp, numnod,              &
-     &          inod_smp_stack, t_cyl, txyz, xx, s, a_s)
+     &          inod_smp_stack, t_cyl, txyz, xx, yy, s, a_s)
 !
        integer (kind = kint), intent(in) :: np_smp, numnod
        integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
        real(kind=kreal), intent(in) :: t_cyl(numnod,3)
-       real(kind=kreal), intent(in) :: xx(numnod,3)
+       real(kind=kreal), intent(in) :: xx(numnod), yy(numnod)
        real(kind=kreal), intent(in) :: s(numnod)
        real(kind=kreal), intent(in) :: a_s(numnod)
 !
@@ -74,7 +74,7 @@
        real(kind=kreal) :: tsp, tzs, tpz
 !
 !
-!$omp parallel do private(inod,ist,ied,tsp,tzs,tpz)
+!$omp do private(inod,ist,ied,tsp,tzs,tpz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -90,16 +90,16 @@
            else
              txyz(inod,1) =   tsp
 !
-             txyz(inod,2) = ( tzs * xx(inod,1)                          &
-     &                      + tpz * xx(inod,2) ) * a_s(inod)
+             txyz(inod,2) = ( tzs * xx(inod)                            &
+     &                      + tpz * yy(inod) ) * a_s(inod)
 !
-             txyz(inod,3) = (-tzs * xx(inod,2)                          &
-     &                      + tpz * xx(inod,1) ) * a_s(inod)
+             txyz(inod,3) = (-tzs * yy(inod)                            &
+     &                      + tpz * xx(inod)  ) * a_s(inod)
            end if
 !
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cal_xyz_asym_t_by_cyl_smp
 !
@@ -107,11 +107,11 @@
 ! -----------------------------------------------------------------------
 !
       subroutine overwrite_xyz_asym_t_by_cyl_smp(np_smp, numnod,        &
-     &          inod_smp_stack, tensor, xx, s, a_s)
+     &          inod_smp_stack, tensor, xx, yy, s, a_s)
 !
        integer (kind = kint), intent(in) :: np_smp, numnod
        integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
-       real(kind=kreal), intent(in) :: xx(numnod,3)
+       real(kind=kreal), intent(in) :: xx(numnod), yy(numnod)
        real(kind=kreal), intent(in) :: s(numnod)
        real(kind=kreal), intent(in) :: a_s(numnod)
 !
@@ -121,7 +121,7 @@
        real(kind=kreal) :: tsp, tzs, tpz
 !
 !
-!$omp parallel do private(inod,ist,ied,tsp,tzs,tpz)
+!$omp do private(inod,ist,ied,tsp,tzs,tpz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -137,16 +137,16 @@
            else
              tensor(inod,1) =   tsp
 !
-             tensor(inod,2) = ( tzs * xx(inod,1)                        &
-     &                      + tpz * xx(inod,2) ) * a_s(inod)
+             tensor(inod,2) = ( tzs * xx(inod)                          &
+     &                      + tpz * yy(inod) ) * a_s(inod)
 !
-             tensor(inod,3) = (-tzs * xx(inod,2)                        &
-     &                      + tpz * xx(inod,1) ) * a_s(inod)
+             tensor(inod,3) = (-tzs * yy(inod)                          &
+     &                      + tpz * xx(inod)  ) * a_s(inod)
            end if
 !
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine overwrite_xyz_asym_t_by_cyl_smp
 !
@@ -165,7 +165,7 @@
        integer (kind = kint) :: ip, inod, ist, ied
 !
 !
-!$omp parallel do private(inod,ist,ied)
+!$omp do private(inod,ist,ied)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -173,19 +173,19 @@
            v_xy(inod) =   t_cyl(inod,1)
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cal_xy_asym_t_by_cyl_smp
 !
 ! -----------------------------------------------------------------------
 !
       subroutine cal_zx_asym_t_by_cyl_smp(np_smp, numnod,               &
-     &          inod_smp_stack, t_cyl, v_zx, xx, s, a_s)
+     &          inod_smp_stack, t_cyl, v_zx, xx, yy, s, a_s)
 !
        integer (kind = kint), intent(in) :: np_smp, numnod
        integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
        real(kind=kreal), intent(in) :: t_cyl(numnod,3)
-       real(kind=kreal), intent(in) :: xx(numnod,3)
+       real(kind=kreal), intent(in) :: xx(numnod), yy(numnod)
        real(kind=kreal), intent(in) :: s(numnod)
        real(kind=kreal), intent(in) :: a_s(numnod)
 !
@@ -195,7 +195,7 @@
        real(kind=kreal) :: tzs, tpz
 !
 !
-!$omp parallel do private(inod,ist,ied,tzs,tpz)
+!$omp do private(inod,ist,ied,tzs,tpz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -206,25 +206,25 @@
            if ( s(inod).eq.0.0 ) then
              v_zx(inod) =       tzs
            else
-             v_zx(inod) =   ( tzs * xx(inod,1)                          &
-     &                      + tpz * xx(inod,2) ) * a_s(inod)
+             v_zx(inod) =   ( tzs * xx(inod)                            &
+     &                      + tpz * yy(inod) ) * a_s(inod)
            end if
 !
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cal_zx_asym_t_by_cyl_smp
 !
 ! -----------------------------------------------------------------------
 !
       subroutine cal_yz_asym_t_by_cyl_smp(np_smp, numnod,               &
-     &          inod_smp_stack, t_cyl, v_yz, xx, s, a_s)
+     &          inod_smp_stack, t_cyl, v_yz, xx, yy, s, a_s)
 !
        integer (kind = kint), intent(in) :: np_smp, numnod
        integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
        real(kind=kreal), intent(in) :: t_cyl(numnod,3)
-       real(kind=kreal), intent(in) :: xx(numnod,3)
+       real(kind=kreal), intent(in) :: xx(numnod), yy(numnod)
        real(kind=kreal), intent(in) :: s(numnod)
        real(kind=kreal), intent(in) :: a_s(numnod)
 !
@@ -234,7 +234,7 @@
        real(kind=kreal) :: tzs, tpz
 !
 !
-!$omp parallel do private(inod,ist,ied,tzs,tpz)
+!$omp do private(inod,ist,ied,tzs,tpz)
        do ip = 1, np_smp
          ist = inod_smp_stack(ip-1) + 1
          ied = inod_smp_stack(ip)
@@ -245,13 +245,13 @@
            if ( s(inod).eq.0.0 ) then
              v_yz(inod) =       tpz
            else
-             v_yz(inod) = ( - tzs * xx(inod,2)                          &
-     &                      + tpz * xx(inod,1) ) * a_s(inod)
+             v_yz(inod) = ( - tzs * yy(inod)                            &
+     &                      + tpz * xx(inod) ) * a_s(inod)
            end if
 !
         end do
       end do
-!$omp end parallel do
+!$omp end do nowait
 !
       end subroutine cal_yz_asym_t_by_cyl_smp
 !

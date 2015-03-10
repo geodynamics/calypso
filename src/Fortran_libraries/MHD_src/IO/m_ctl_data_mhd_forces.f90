@@ -76,28 +76,36 @@
       use m_read_control_elements
       use calypso_mpi
       use skip_comment_f
+      use t_read_control_arrays
 !
       implicit  none
 !
 !
-      integer(kind=kint) :: num_force_ctl
-      character (len=kchara), allocatable :: name_force_ctl(:)
+!>      Structure for constant force list
+!!@n      force_names_ctl%c_tbl: Name of force
+      type(ctl_array_chara), save :: force_names_ctl
 !
       character(len=kchara) :: gravity_ctl
-      integer(kind=kint) :: num_g_vect_ctl = 0
-      real(kind=kreal) :: g_vect_ctl(3)
-      character (len=kchara) :: g_dir_name_ctl(3)
 !
-      integer(kind=kint) :: num_angular_vect_ctl = 0
-      real(kind=kreal) :: angular_vect_ctl(3) = (/zero,zero,one/)
-      character (len=kchara) :: angular_dir_name_ctl(3)
+!>      Structure for constant gravity vector
+!!@n      gravity_vector_ctl%c_tbl:  Direction of gravity vector
+!!@n      gravity_vector_ctl%vect:   Amplitude of gravity vector
+      type(ctl_array_cr), save :: gravity_vector_ctl
+!
       character (len=kchara) :: sph_cor_file_name_ctl
       character (len=kchara) :: sph_cor_file_fmt_ctl
 !
+!>      Structure for rotation of system
+!!@n      system_rotation_ctl%c_tbl:  Direction of rotation vector
+!!@n      system_rotation_ctl%vect:   Amplitude of rotation vector
+      type(ctl_array_cr), save :: system_rotation_ctl
+!
       character(len=kchara) :: magneto_cv_ctl
-      integer(kind=kint) :: num_magne_vect_ctl = 0
-      real(kind=kreal) :: magne_vect_ctl(3)
-      character (len=kchara) :: magne_dir_name_ctl(3)
+!
+!>      Structure for external magnetic field control
+!!@n      ext_magne_ctl%c_tbl:  Direction of external magnetic field
+!!@n      ext_magne_ctl%vect:   Amplitude of external magnetic field
+      type(ctl_array_cr), save :: ext_magne_ctl
 !
 !   entry label
 !
@@ -121,7 +129,6 @@
 !
       character(len=kchara), parameter                                  &
      &        :: hd_num_forces =  'force_ctl'
-      integer (kind=kint) :: i_num_forces =     0
 !
 !   4th level for time steps
 !
@@ -130,7 +137,6 @@
       character(len=kchara), parameter                                  &
      &        :: hd_gravity_vect = 'gravity_vec'
       integer (kind=kint) :: i_gravity_type = 0
-      integer (kind=kint) :: i_gravity_vect = 0
 !
 !   4th level for time steps
 !
@@ -140,7 +146,6 @@
      &        :: hd_sph_coriolis_file  = 'tri_sph_int_file'
       character(len=kchara), parameter                                  &
      &        :: hd_sph_coriolis_fmt = 'sph_int_file_format'
-      integer (kind=kint) :: i_rotation_vec = 0
       integer (kind=kint) :: i_sph_coriolis_file = 0
       integer (kind=kint) :: i_sph_coriolis_fmt = 0
 !
@@ -151,7 +156,6 @@
       character(len=kchara), parameter                                  &
      &        :: hd_magne_vect = 'ext_magne_vec'
       integer (kind=kint) :: i_magneto_cv = 0
-      integer (kind=kint) :: i_magne_vect = 0
 !
 !
       private :: hd_forces_ctl, i_forces_ctl
@@ -161,7 +165,6 @@
       private :: hd_sph_coriolis_fmt
       private :: hd_gravity_type, hd_gravity_vect
       private :: hd_magneto_cv, hd_magne_vect
-      private :: allocate_name_force_ctl
 !
 !   --------------------------------------------------------------------
 !
@@ -169,17 +172,9 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine allocate_name_force_ctl
-!
-      allocate(name_force_ctl(num_force_ctl))
-!
-      end subroutine allocate_name_force_ctl
-!
-! -----------------------------------------------------------------------
-!
       subroutine deallocate_name_force_ctl
 !
-      deallocate(name_force_ctl)
+      call dealloc_control_array_chara(force_names_ctl)
 !
       end subroutine deallocate_name_force_ctl
 !
@@ -197,13 +192,7 @@
         call find_control_end_flag(hd_forces_ctl, i_forces_ctl)
         if(i_forces_ctl .gt. 0) exit
 !
-!
-        call find_control_array_flag(hd_num_forces, num_force_ctl)
-        if(num_force_ctl.gt.0 .and. i_num_forces.eq.0) then
-          call allocate_name_force_ctl
-          call read_control_array_chara_list(hd_num_forces,             &
-     &        num_force_ctl, i_num_forces, name_force_ctl)
-        end if
+        call read_control_array_c1(hd_num_forces, force_names_ctl)
       end do
 !
       end subroutine read_forces_ctl
@@ -221,14 +210,8 @@
         call find_control_end_flag(hd_gravity_ctl, i_gravity_ctl)
         if(i_gravity_ctl .gt. 0) exit
 !
-        call find_control_array_flag(hd_gravity_vect, num_g_vect_ctl)
-        if(num_g_vect_ctl.gt.0 .and. i_gravity_vect.eq.0) then
-          if(num_g_vect_ctl .gt. 3) call calypso_MPI_abort(10,          &
-     &          'gravity vector should be 3 components')
-          call read_control_array_vect_list(hd_gravity_vect,            &
-     &        num_g_vect_ctl, i_gravity_vect,                           &
-     &        g_dir_name_ctl, g_vect_ctl)
-        end if
+        call read_control_array_c_r                                     &
+     &     (hd_gravity_vect, gravity_vector_ctl)
 !
         call read_character_ctl_item(hd_gravity_type,                   &
      &        i_gravity_type, gravity_ctl)
@@ -250,15 +233,8 @@
         if(i_coriolis_ctl .gt. 0) exit
 !
 !
-        call find_control_array_flag(hd_rotation_vec,                   &
-     &      num_angular_vect_ctl)
-        if(num_angular_vect_ctl.gt.0 .and. i_rotation_vec.eq.0) then
-          if(num_angular_vect_ctl .gt. 3) call calypso_MPI_abort(10,    &
-     &          'rotation vector should be 3 components')
-          call read_control_array_vect_list(hd_rotation_vec,            &
-     &        num_angular_vect_ctl, i_rotation_vec,                     &
-     &        angular_dir_name_ctl, angular_vect_ctl)
-        end if
+        call read_control_array_c_r                                     &
+     &     (hd_rotation_vec, system_rotation_ctl)
 !
         call read_character_ctl_item(hd_sph_coriolis_file,              &
      &        i_sph_coriolis_file, sph_cor_file_name_ctl)
@@ -281,14 +257,7 @@
         call find_control_end_flag(hd_magneto_ctl, i_magneto_ctl)
         if(i_magneto_ctl .gt. 0) exit
 !
-        call find_control_array_flag(hd_magne_vect, num_magne_vect_ctl)
-        if(num_magne_vect_ctl.gt.0 .and. i_magne_vect.eq.0) then
-          if(num_magne_vect_ctl .ne. 3) call calypso_MPI_abort(10,      &
-     &          'external magnetic field should be 3 components')
-          call read_control_array_vect_list(hd_magne_vect,              &
-     &        num_magne_vect_ctl, i_magne_vect,                         &
-     &        magne_dir_name_ctl, magne_vect_ctl)
-        end if
+        call read_control_array_c_r(hd_magne_vect, ext_magne_ctl)
 !
         call read_character_ctl_item(hd_magneto_cv,                     &
      &        i_magneto_cv, magneto_cv_ctl)

@@ -58,8 +58,6 @@
 !$omp end do
 !$omp end parallel
 !
-      call deallocate_ele_connect_type(ele)
-!
       end subroutine copy_ele_connect_type_to_IO
 !
 !------------------------------------------------------------------

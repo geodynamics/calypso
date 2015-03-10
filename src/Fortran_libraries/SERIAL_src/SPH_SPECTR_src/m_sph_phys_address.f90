@@ -8,7 +8,6 @@
 !!
 !!@verbatim
 !!      subroutine set_sph_sprctr_data_address
-!!      subroutine set_sph_nod_data_address
 !!@endverbatim
 !
       module m_sph_phys_address
@@ -28,9 +27,6 @@
 !
 !>   address for toroidal component
       type(phys_address), save :: itor
-!
-!>   address for fields on spherical coordinate
-      type(phys_address), save :: irtp
 !
       private :: set_sph_vect_spec_address, set_vect_sph_address
 !
@@ -53,20 +49,6 @@
       call set_sph_vect_spec_address
 !
       end subroutine set_sph_sprctr_data_address
-!
-!  --------------------------------------------------------------------
-!
-      subroutine set_sph_nod_data_address
-!
-      use m_sph_spectr_data
-      use set_field_address
-!
-!   set address of fields in sphericall coordinates
-!
-      call set_field_addresses(ione, num_phys_rtp,                      &
-     &    phys_name_rtp, num_phys_comp_rtp, irtp)
-!
-      end subroutine set_sph_nod_data_address
 !
 !  --------------------------------------------------------------------
 !  --------------------------------------------------------------------
@@ -118,6 +100,8 @@
      &    idpdr%i_induction)
       call set_vect_sph_address(ipol%i_vp_induct, itor%i_vp_induct,     &
      &    idpdr%i_vp_induct)
+      call set_vect_sph_address(ipol%i_mag_stretch, itor%i_mag_stretch, &
+     &    idpdr%i_mag_stretch)
       call set_vect_sph_address(ipol%i_m_tension, itor%i_m_tension,     &
      &    idpdr%i_m_tension)
       call set_vect_sph_address(ipol%i_lorentz, itor%i_lorentz,         &

@@ -21,9 +21,9 @@
 !!@n @param r_ICB(0:2)   Radius at ICB
 !!@n @param r_CMB(0:2)   Radius at CMB
 !!@n @param fdm2_fix_dr_ICB(-1:1,3)
-!!         Matrix to evaluate field at ICB with fiexed radial derivative
+!!         Matrix to evaluate field at ICB with fixed radial derivative
 !!@n @param fdm2_fix_dr_CMB(-1:1,3)
-!!         Matrix to evaluate field at CMB with fiexed radial derivative
+!!         Matrix to evaluate field at CMB with fixed radial derivative
 !!@n @param coef_dbt     coefficient for implicit diffusion term
 !!
 !!@n @param bs_evo_mat(3,nri,jmax)    3-band matrix for evolution of 

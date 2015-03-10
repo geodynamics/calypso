@@ -3,7 +3,7 @@
 !
 !      Written by H. Matsui on Oct., 2007
 !
-!      subroutine copy_rj_phys_name_to_IO
+!      subroutine copy_rj_all_phys_name_to_IO
 !      subroutine copy_rj_all_phys_data_to_IO
 !      subroutine copy_rj_viz_phys_data_to_IO
 !

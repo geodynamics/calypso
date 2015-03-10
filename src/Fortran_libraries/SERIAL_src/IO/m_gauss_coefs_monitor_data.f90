@@ -44,7 +44,7 @@
 !>      Number of modes of Gauss coefficients to be evaluated
       integer(kind = kint) :: num_pick_gauss_coefs = 0
 !>      Degree and Order ID of Gauss coefficients to be evaluated
-      integer(kind = kint), allocatable :: idx_pick_gauss_mode(:)
+      integer(kind = kint), allocatable :: idx_pick_gauss_mode(:,:)
 !>      Number of degrees of Gauss coefficients to be evaluated
       integer(kind = kint) :: num_pick_gauss_l = 0
 !>      Degree ID of Gauss coefficients to be evaluated
@@ -59,7 +59,7 @@
 !>      Number of modes of Gauss coefficients to be evaluated
       integer(kind = kint) :: num_pick_gauss_mode
 !>      Global spherical harmonics ID to evaluate Gauss coefficients
-      integer(kind = kint), allocatable :: idx_pick_gauss_coef_gl(:)
+      integer(kind = kint), allocatable :: idx_pick_gauss_coef_gl(:,:)
 !>      Local spherical harmonics ID to evaluate Gauss coefficients
       integer(kind = kint), allocatable :: idx_pick_gauss_coef_lc(:)
 !>      Gauss coefficients
@@ -71,8 +71,6 @@
 !
 !>      Radius to evaluate Gauss coefficients (Default: 6400km/2200km)
       real(kind = kreal) :: r_4_gauss_coefs = 2.91
-!>      Radius RAtio between CMB and point to be evaluated
-      real(kind = kreal) :: rcmb_to_Re = 3.5d3 / 6.4d3
 !
       private :: open_gauss_coefs_4_monitor
 !
@@ -84,7 +82,7 @@
 !
       subroutine allocate_pick_gauss
 !
-      allocate( idx_pick_gauss_mode(num_pick_gauss_coefs) )
+      allocate( idx_pick_gauss_mode(num_pick_gauss_coefs,2) )
       if(num_pick_gauss_coefs .gt. 0) idx_pick_gauss_mode = -1
 !
       end subroutine allocate_pick_gauss
@@ -112,7 +110,7 @@
       subroutine allocate_gauss_coef_monitor
 !
 !
-      allocate( idx_pick_gauss_coef_gl(ntot_pick_gauss_mode) )
+      allocate( idx_pick_gauss_coef_gl(ntot_pick_gauss_mode,3) )
       allocate( idx_pick_gauss_coef_lc(ntot_pick_gauss_mode) )
       allocate( gauss_coef_lc(ntot_pick_gauss_mode) )
       allocate( gauss_coef_gl(ntot_pick_gauss_mode) )
@@ -171,7 +169,7 @@
 !
 !
       write(id_gauss_coef,'(a)')    'num_spectr, reference_radius'
-      write(id_gauss_coef,'(i10,1pe25.15e3)')                           &
+      write(id_gauss_coef,'(i16,1pe25.15e3)')                           &
      &     num_pick_gauss_mode, r_4_gauss_coefs
 !
       write(id_gauss_coef,'(a)',advance='NO')    't_step    time    '
@@ -198,7 +196,7 @@
 !
       call open_gauss_coefs_4_monitor
 !
-      write(id_gauss_coef,'(i10,1pe23.14e3)', advance='NO')             &
+      write(id_gauss_coef,'(i16,1pe23.14e3)', advance='NO')             &
      &       i_step, time
       do inum = 1, num_pick_gauss_mode
         write(id_gauss_coef,'(1pe23.14e3)', advance='NO')               &
@@ -230,7 +228,7 @@
       open(id_pick, file = gauss_coefs_file_name)
 !
       call skip_comment(tmpchara,id_pick)
-      read(tmpchara,*) num_pick_gauss_mode
+      read(id_pick,*) num_pick_gauss_mode
 !
       ntot_pick_gauss_mode = num_pick_gauss_mode
       call allocate_gauss_coef_monitor
@@ -253,6 +251,7 @@
       ierr = 0
       read(id_pick,*,err=99,end=99) i_step, time,                       &
      &       gauss_coef_gl(1:num_pick_gauss_mode)
+      write(*,*) 'i_step', i_step, time
 !
       return
 !

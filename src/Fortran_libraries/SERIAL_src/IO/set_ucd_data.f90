@@ -29,7 +29,7 @@
       subroutine link_node_data_2_output(numnod, inod_gl, xx, ucd)
 !
       integer(kind = kint), intent(in) :: numnod
-      integer(kind = kint), target, intent(in) :: inod_gl(numnod)
+      integer(kind = kint_gl), target, intent(in) :: inod_gl(numnod)
       real(kind = kreal), target, intent(in) :: xx(numnod,3)
 !
       type(ucd_data), intent(inout) :: ucd
@@ -47,15 +47,20 @@
      &          iele_gl, ie, ucd)
 !
       integer(kind = kint), intent(in) :: numele, nnod_4_ele
-      integer(kind = kint), target, intent(in) :: iele_gl(numele)
+      integer(kind = kint_gl), target, intent(in) :: iele_gl(numele)
       integer(kind = kint), target, intent(in) :: ie(numele,nnod_4_ele)
       type(ucd_data), intent(inout) :: ucd
 !
 !
+      call allocate_ucd_ele(ucd)
+!
       ucd%nele =         numele
       ucd%nnod_4_ele =   nnod_4_ele
-      ucd%ie =>          ie(1:numele,1:nnod_4_ele)
-      ucd%iele_global => iele_gl(1:numele)
+!
+!$omp parallel workshare
+      ucd%ie(1:numele,1:nnod_4_ele) = ie(1:numele,1:nnod_4_ele)
+      ucd%iele_global(1:numele) =     iele_gl(1:numele)
+!$omp end parallel workshare
 !
       end subroutine link_ele_data_2_output
 !

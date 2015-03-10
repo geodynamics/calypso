@@ -49,18 +49,18 @@
 !
       i0 = 0
       do i = 1, num_phys
-        call check_vis_control_flag(visualize_ctl(i), iflag_viz)
+        call check_vis_control_flag(field_ctl%c2_tbl(i), iflag_viz)
 !
         if (iflag_viz .eq. 1) then
           iflag = 0
-          call set_vector_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_vector_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
-          call set_scalar_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_scalar_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
-          call set_tensor_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_tensor_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
 !
-          call check_monitor_control_flag(iflag, monitor_ctl(i),        &
+          call check_monitor_control_flag(iflag, field_ctl%c3_tbl(i),   &
      &        iflag_monitor(i0))
 !
         end if
@@ -69,17 +69,17 @@
 !
       do i = 1, num_phys
         call mark_vis_checked_fields(num_phys, num_phys_viz, phys_name, &
-     &      phys_nod_name_ctl(i), iflag)
+     &      field_ctl%c1_tbl(i), iflag)
 !
         if ( iflag .eq. 0 ) then
-          call set_vector_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_vector_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
-          call set_scalar_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_scalar_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
-          call set_tensor_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_tensor_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
 !
-          call check_monitor_control_flag(iflag, monitor_ctl(i),        &
+          call check_monitor_control_flag(iflag, field_ctl%c3_tbl(i),   &
      &         iflag_monitor(i0))
         end if
       end do
@@ -108,39 +108,39 @@
 !
       i0 = 0
       do i = 1, num_phys
-        call check_vis_control_flag(visualize_ctl(i), iflag_viz)
+        call check_vis_control_flag(field_ctl%c2_tbl(i), iflag_viz)
 !
         if (iflag_viz .eq. 1) then
           iflag = 0
-          call set_vector_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_vector_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
-          call check_monitor_control_flag(iflag, monitor_ctl(i),        &
+          call check_monitor_control_flag(iflag, field_ctl%c3_tbl(i),   &
      &        iflag_monitor(i0))
 !
         end if
       end do
 !
       do i = 1, num_phys
-        call check_vis_control_flag(visualize_ctl(i), iflag_viz)
+        call check_vis_control_flag(field_ctl%c2_tbl(i), iflag_viz)
 !
         if (iflag_viz .eq. 1) then
           iflag = 0
-          call set_scalar_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_scalar_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
-          call check_monitor_control_flag(iflag, monitor_ctl(i),        &
+          call check_monitor_control_flag(iflag, field_ctl%c3_tbl(i),   &
      &        iflag_monitor(i0))
 !
         end if
       end do
 !
       do i = 1, num_phys
-        call check_vis_control_flag(visualize_ctl(i), iflag_viz)
+        call check_vis_control_flag(field_ctl%c2_tbl(i), iflag_viz)
 !
         if (iflag_viz .eq. 1) then
           iflag = 0
-          call set_tensor_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_tensor_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
-          call check_monitor_control_flag(iflag, monitor_ctl(i),        &
+          call check_monitor_control_flag(iflag, field_ctl%c3_tbl(i),   &
      &        iflag_monitor(i0))
 !
         end if
@@ -151,36 +151,36 @@
 !
       do i = 1, num_phys
         call mark_vis_checked_fields(num_phys, num_phys_viz, phys_name, &
-     &      phys_nod_name_ctl(i), iflag)
+     &      field_ctl%c1_tbl(i), iflag)
 !
         if (iflag .eq. 0) then
-          call set_vector_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_vector_field_name(field_ctl%c1_tbl(i), i0,           &
      &       phys_name(i0+1), num_component(i0+1), iflag)
-          call check_monitor_control_flag(iflag, monitor_ctl(i),        &
+          call check_monitor_control_flag(iflag, field_ctl%c3_tbl(i),   &
      &       iflag_monitor(i0))
         end if
       end do
 !
       do i = 1, num_phys
         call mark_vis_checked_fields(num_phys, num_phys_viz, phys_name, &
-     &      phys_nod_name_ctl(i), iflag)
+     &      field_ctl%c1_tbl(i), iflag)
 !
         if (iflag .eq. 0) then
-          call set_scalar_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_scalar_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
-          call check_monitor_control_flag(iflag, monitor_ctl(i),        &
+          call check_monitor_control_flag(iflag, field_ctl%c3_tbl(i),   &
      &        iflag_monitor(i0))
         end if
       end do
 !
       do i = 1, num_phys
         call mark_vis_checked_fields(num_phys, num_phys_viz, phys_name, &
-     &      phys_nod_name_ctl(i), iflag)
+     &      field_ctl%c1_tbl(i), iflag)
 !
         if (iflag .eq. 0) then
-          call set_tensor_field_name(phys_nod_name_ctl(i), i0,          &
+          call set_tensor_field_name(field_ctl%c1_tbl(i), i0,           &
      &        phys_name(i0+1), num_component(i0+1), iflag)
-          call check_monitor_control_flag(iflag, monitor_ctl(i),        &
+          call check_monitor_control_flag(iflag, field_ctl%c3_tbl(i),   &
      &        iflag_monitor(i0))
         end if
       end do

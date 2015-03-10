@@ -176,7 +176,7 @@
 !
       allocate(coef_4_termal_name(num_coef_4_termal))
       allocate(coef_4_termal_power(num_coef_4_termal))
-      coef_4_termal_power = 0.0d0
+      if(num_coef_4_termal .gt. 0) coef_4_termal_power = 0.0d0
 !
       end subroutine allocate_coef_4_termal
 !
@@ -186,7 +186,7 @@
 !
       allocate(coef_4_velocity_name(num_coef_4_velocity))
       allocate(coef_4_velocity_power(num_coef_4_velocity))
-      coef_4_velocity_power = 0.0d0
+      if(num_coef_4_velocity .gt. 0) coef_4_velocity_power = 0.0d0
 !
       end subroutine allocate_coef_4_velocity
 !
@@ -196,7 +196,7 @@
 !
       allocate(coef_4_press_name(num_coef_4_press))
       allocate(coef_4_press_power(num_coef_4_press))
-      coef_4_press_power = 0.0d0
+      if(num_coef_4_press .gt. 0) coef_4_press_power = 0.0d0
 !
       end subroutine allocate_coef_4_press
 !
@@ -206,7 +206,7 @@
 !
       allocate(coef_4_magnetic_name(num_coef_4_magnetic))
       allocate(coef_4_magnetic_power(num_coef_4_magnetic))
-      coef_4_magnetic_power = 0.0d0
+      if(num_coef_4_magnetic .gt. 0) coef_4_magnetic_power = 0.0d0
 !
       end subroutine allocate_coef_4_magne
 !
@@ -216,7 +216,7 @@
 !
       allocate(coef_4_mag_p_name(num_coef_4_mag_p))
       allocate(coef_4_mag_p_power(num_coef_4_mag_p))
-      coef_4_mag_p_power = 0.0d0
+      if(num_coef_4_mag_p .gt. 0) coef_4_mag_p_power = 0.0d0
 !
       end subroutine allocate_coef_4_mag_p
 !
@@ -226,7 +226,7 @@
 !
       allocate(coef_4_t_diffuse_name(num_coef_4_t_diffuse))
       allocate(coef_4_t_diffuse_power(num_coef_4_t_diffuse))
-      coef_4_t_diffuse_power = 0.0d0
+      if(num_coef_4_t_diffuse .gt. 0) coef_4_t_diffuse_power = 0.0d0
 !
       end subroutine allocate_coef_4_t_diffuse
 !
@@ -236,7 +236,7 @@
 !
       allocate(coef_4_v_diffuse_name(num_coef_4_v_diffuse))
       allocate(coef_4_v_diffuse_power(num_coef_4_v_diffuse))
-      coef_4_v_diffuse_power = 0.0d0
+      if(num_coef_4_v_diffuse .gt. 0) coef_4_v_diffuse_power = 0.0d0
 !
       end subroutine allocate_coef_4_v_diffuse
 !
@@ -246,7 +246,7 @@
 !
       allocate(coef_4_m_diffuse_name(num_coef_4_m_diffuse))
       allocate(coef_4_m_diffuse_power(num_coef_4_m_diffuse))
-      coef_4_m_diffuse_power = 0.0d0
+      if(num_coef_4_m_diffuse .gt. 0) coef_4_m_diffuse_power = 0.0d0
 !
       end subroutine allocate_coef_4_m_diffuse
 !
@@ -256,7 +256,7 @@
 !
       allocate(coef_4_buoyancy_name(num_coef_4_buoyancy))
       allocate(coef_4_buoyancy_power(num_coef_4_buoyancy))
-      coef_4_buoyancy_power = 0.0d0
+      if(num_coef_4_buoyancy .gt. 0) coef_4_buoyancy_power = 0.0d0
 !
       end subroutine allocate_coef_4_buoyancy
 !
@@ -266,7 +266,7 @@
 !
       allocate(coef_4_comp_buo_name(num_coef_4_comp_buo))
       allocate(coef_4_comp_buo_power(num_coef_4_comp_buo))
-      coef_4_comp_buo_power = 0.0d0
+      if(num_coef_4_comp_buo .gt. 0) coef_4_comp_buo_power = 0.0d0
 !
       end subroutine allocate_coef_4_comp_buo
 !
@@ -276,7 +276,7 @@
 !
       allocate(coef_4_Coriolis_name(num_coef_4_Coriolis))
       allocate(coef_4_Coriolis_power(num_coef_4_Coriolis))
-      coef_4_Coriolis_power = 0.0d0
+      if(num_coef_4_Coriolis .gt. 0) coef_4_Coriolis_power = 0.0d0
 !
       end subroutine allocate_coef_4_coriolis
 !
@@ -286,7 +286,7 @@
 !
       allocate(coef_4_Lorentz_name(num_coef_4_Lorentz))
       allocate(coef_4_Lorentz_power(num_coef_4_Lorentz))
-      coef_4_Lorentz_power = 0.0d0
+      if(num_coef_4_Lorentz .gt. 0) coef_4_Lorentz_power = 0.0d0
 !
       end subroutine allocate_coef_4_lorentz
 !
@@ -296,7 +296,7 @@
 !
       allocate(coef_4_induction_name(num_coef_4_induction))
       allocate(coef_4_induction_power(num_coef_4_induction))
-      coef_4_induction_power = 0.0d0
+      if(num_coef_4_induction .gt. 0) coef_4_induction_power = 0.0d0
 !
       end subroutine allocate_coef_4_induction
 !
@@ -306,7 +306,7 @@
 !
       allocate(coef_4_composit_name(num_coef_4_composition))
       allocate(coef_4_composit_power(num_coef_4_composition))
-      coef_4_composit_power = 0.0d0
+      if(num_coef_4_composition .gt. 0) coef_4_composit_power = 0.0d0
 !
       end subroutine allocate_coef_4_composition
 !
@@ -316,7 +316,7 @@
 !
       allocate(coef_4_c_diffuse_name(num_coef_4_c_diffuse))
       allocate(coef_4_c_diffuse_power(num_coef_4_c_diffuse))
-      coef_4_c_diffuse_power = 0.0d0
+      if(num_coef_4_c_diffuse .gt. 0) coef_4_c_diffuse_power = 0.0d0
 !
       end subroutine allocate_coef_4_c_diffuse
 !
@@ -326,7 +326,7 @@
 !
       allocate(coef_4_h_source_name(num_coef_4_h_source))
       allocate(coef_4_h_source_power(num_coef_4_h_source))
-      coef_4_h_source_power = 0.0d0
+      if(num_coef_4_h_source .gt. 0) coef_4_h_source_power = 0.0d0
 !
       end subroutine allocate_coef_4_h_source
 !
@@ -336,7 +336,7 @@
 !
       allocate(coef_4_c_source_name(num_coef_4_c_source))
       allocate(coef_4_c_source_power(num_coef_4_c_source))
-      coef_4_c_source_power = 0.0d0
+      if(num_coef_4_c_source .gt. 0) coef_4_c_source_power = 0.0d0
 !
       end subroutine allocate_coef_4_c_source
 !

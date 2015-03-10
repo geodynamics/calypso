@@ -40,8 +40,8 @@
 !
 !
       iflag = 0
-      do i = 1, num_nod_phys_ctl
-        if (phys_nod_name_ctl(i) .eq. fld_name) then
+      do i = 1, field_ctl%num
+        if (field_ctl%c1_tbl(i) .eq. fld_name) then
           iflag = 1
           exit
         end if
@@ -49,23 +49,22 @@
 !
       if (iflag .gt. 0) return
 !
-      num_nod_phys_tmp = num_nod_phys_ctl
+      num_nod_phys_tmp = field_ctl%num
       call allocate_work_4_field_ctl
       call copy_field_ctl_to_tmp
       call deallocate_phys_control
 !
-      num_nod_phys_ctl = num_nod_phys_ctl + 1
-      call allocate_phys_control
+      field_ctl%num = field_ctl%num + 1
       call copy_field_ctl_from_tmp
       call deallocate_work_4_field_ctl
 !
-      phys_nod_name_ctl(num_nod_phys_ctl) = fld_name
-      visualize_ctl(num_nod_phys_ctl) =    'Viz_off'
-      monitor_ctl(num_nod_phys_ctl) =      'Monitor_off'
+      field_ctl%c1_tbl(field_ctl%num) = fld_name
+      field_ctl%c2_tbl(field_ctl%num) = 'Viz_off'
+      field_ctl%c3_tbl(field_ctl%num) = 'Monitor_off'
 !
       if(iflag_debug .eq. iflag_full_msg) then
-        write(*,*) trim(phys_nod_name_ctl(num_nod_phys_ctl) ),          &
-     &            ' is added at field ID ',   num_nod_phys_ctl
+        write(*,*) trim(field_ctl%c1_tbl(field_ctl%num) ),              &
+     &            ' is added at field ID ',   field_ctl%num
       end if
 !
       end subroutine add_phys_name_tmp
@@ -102,9 +101,9 @@
       integer(kind = kint) :: i
 !
       do i = 1, num_nod_phys_tmp
-        phys_nod_name_tmp(i) =  phys_nod_name_ctl(i)
-        visualize_ctl_tmp(i) =  visualize_ctl(i)
-        monitor_ctl_tmp(i) =    monitor_ctl(i)
+        phys_nod_name_tmp(i) =  field_ctl%c1_tbl(i)
+        visualize_ctl_tmp(i) =  field_ctl%c2_tbl(i)
+        monitor_ctl_tmp(i) =    field_ctl%c3_tbl(i)
       end do
 !
       end subroutine copy_field_ctl_to_tmp
@@ -117,10 +116,13 @@
 !
       integer(kind = kint) :: i
 !
+!
+      call alloc_control_array_c3(field_ctl)
+!
       do i = 1, num_nod_phys_tmp
-        phys_nod_name_ctl(i) = phys_nod_name_tmp(i)
-        visualize_ctl(i) =     visualize_ctl_tmp(i)
-        monitor_ctl(i) =       monitor_ctl_tmp(i)
+        field_ctl%c1_tbl(i) = phys_nod_name_tmp(i)
+        field_ctl%c2_tbl(i) =  visualize_ctl_tmp(i)
+        field_ctl%c3_tbl(i) =  monitor_ctl_tmp(i)
       end do
 !
       end subroutine copy_field_ctl_from_tmp

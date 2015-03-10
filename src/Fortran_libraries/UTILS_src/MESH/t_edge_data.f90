@@ -1,5 +1,8 @@
-!t_edge_data.f90
-!      module t_edge_data
+!>@file   t_edge_data.f90
+!!@brief  module t_edge_data
+!!
+!!@author H. Matsui
+!!@date Programmed in Nov., 2008
 !
 !> @brief Structure of edge geometry data
 !
@@ -7,46 +10,46 @@
 !> @n      (module m_geometry_parameter)
 !> @n      (module m_geometry_data)
 !> @n      (module m_edgerime_geometry_data)
-!
-!     Written by H. Matsui on Nov., 2008
-!
-!      subroutine allocate_inod_in_edge_type(edge)
-!      subroutine allocate_edge_connect_type(edge, nsurf)
-!      subroutine allocate_edge_4_ele_type(edge, nele)
-!      subroutine allocate_iso_edge_type(edge)
-!      subroutine allocate_edge_geom_type(edge)
-!      subroutine allocate_edge_vect_type(edge)
-!      subroutine allocate_edge_vect_sph_type(edge)
-!      subroutine allocate_edge_vect_cyl_type(edge)
-!      subroutine allocate_edge_param_smp_type(edge)
-!
-!      subroutine alloc_ele_4_edge_num_type(edge)
-!      subroutine alloc_ele_4_edge_item_type(edge)
-!      subroutine alloc_surf_4_edge_num_type(edge)
-!      subroutine alloc_surf_4_edge_item_type(edge)
-!
-!
-!      subroutine deallocate_inod_in_edge_type(edge)
-!      subroutine deallocate_edge_connect_type(edge)
-!      subroutine deallocate_edge_4_ele_type(edge)
-!      subroutine deallocate_iso_edge_type(edge)
-!      subroutine deallocate_edge_geom_type(edge)
-!      subroutine deallocate_edge_vect_type(edge)
-!      subroutine deallocate_edge_vect_sph_type(edge)
-!      subroutine deallocate_edge_vect_cyl_type(edge)
-!      subroutine deallocate_edge_param_smp_type(edge)
-!
-!      subroutine dealloc_ele_4_edge_num_type(edge)
-!      subroutine dealloc_ele_4_edge_item_type(edge)
-!      subroutine dealloc_surf_4_edge_num_type(edge)
-!      subroutine dealloc_surf_4_edge_item_type(edge)
-!        integer(kind = kint), intent(in) :: nele
-!        integer(kind = kint), intent(in) :: nsurf
-!        type(edge_data), intent(inout) :: edge
-!
-!      subroutine link_new_edge_connect_type(edge_org, edge)
-!        type(edge_data), intent(in) :: edge_org
-!        type(edge_data), intent(inout) :: edge
+!!
+!!@verbatim
+!!      subroutine allocate_inod_in_edge_type(edge)
+!!      subroutine allocate_edge_connect_type(edge, nsurf)
+!!      subroutine allocate_edge_4_ele_type(edge, nele)
+!!      subroutine allocate_iso_edge_type(edge)
+!!      subroutine allocate_edge_geom_type(edge)
+!!      subroutine allocate_edge_vect_type(edge)
+!!      subroutine allocate_edge_vect_sph_type(edge)
+!!      subroutine allocate_edge_vect_cyl_type(edge)
+!!      subroutine allocate_edge_param_smp_type(edge)
+!!
+!!      subroutine alloc_ele_4_edge_num_type(edge)
+!!      subroutine alloc_ele_4_edge_item_type(edge)
+!!      subroutine alloc_surf_4_edge_num_type(edge)
+!!      subroutine alloc_surf_4_edge_item_type(edge)
+!!
+!!
+!!      subroutine deallocate_inod_in_edge_type(edge)
+!!      subroutine deallocate_edge_connect_type(edge)
+!!      subroutine deallocate_edge_4_ele_type(edge)
+!!      subroutine deallocate_iso_edge_type(edge)
+!!      subroutine deallocate_edge_geom_type(edge)
+!!      subroutine deallocate_edge_vect_type(edge)
+!!      subroutine deallocate_edge_vect_sph_type(edge)
+!!      subroutine deallocate_edge_vect_cyl_type(edge)
+!!      subroutine deallocate_edge_param_smp_type(edge)
+!!
+!!      subroutine dealloc_ele_4_edge_num_type(edge)
+!!      subroutine dealloc_ele_4_edge_item_type(edge)
+!!      subroutine dealloc_surf_4_edge_num_type(edge)
+!!      subroutine dealloc_surf_4_edge_item_type(edge)
+!!        integer(kind = kint), intent(in) :: nele
+!!        integer(kind = kint), intent(in) :: nsurf
+!!        type(edge_data), intent(inout) :: edge
+!!
+!!      subroutine link_new_edge_connect_type(edge_org, edge)
+!!        type(edge_data), intent(in) :: edge_org
+!!        type(edge_data), intent(inout) :: edge
+!!@endverbatim
 !
       module t_edge_data
 !

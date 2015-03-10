@@ -46,11 +46,12 @@
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      ucd%ifmt_file = i_udt_header
-      if (i_udt_header .gt. 0) ucd%file_prefix = udt_file_head_ctl
+      ucd%ifmt_file = udt_file_head_ctl%iflag
+      if (ucd%ifmt_file .gt. 0)                                         &
+     &        ucd%file_prefix = udt_file_head_ctl%charavalue
 !
-      call choose_ucd_file_format(udt_file_fmt_ctl,                     &
-     &    i_udt_files_fmt, ucd%ifmt_file)
+      call choose_ucd_file_format(udt_file_fmt_ctl%charavalue,          &
+     &    udt_file_fmt_ctl%iflag, ucd%ifmt_file)
 !
       end subroutine set_ucd_file_define
 !

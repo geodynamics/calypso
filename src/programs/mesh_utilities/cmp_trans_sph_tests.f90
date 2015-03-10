@@ -6,6 +6,7 @@
 !      subroutine allocate_real_sph_test(NB)
 !      subroutine deallocate_real_sph_test
 !
+!      subroutine set_tesh_sph_elapsed_label
 !      subroutine sph_transfer_test_1(itype)
 !      subroutine sph_transfer_test_2(itype)
 !      subroutine sph_transfer_test_3(itype)
@@ -76,6 +77,37 @@
       end subroutine deallocate_real_sph_test
 !
 ! -----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine set_tesh_sph_elapsed_label
+!
+      use m_work_time
+!
+      integer(kind = kint) :: i
+!
+!
+      num_elapsed = 39
+      call allocate_elapsed_times
+!
+      elapse_labels(1) = 'Total time                 '
+      elapse_labels(2) = 'Initialization time        '
+      elapse_labels(3) = 'Time evolution loop time   '
+      elapse_labels(4) = 'Data IO time               '
+      elapse_labels(5) = 'Evolution excluding IO     '
+!
+      do i = 6, 35
+        elapse_labels(i) = 'unused    '
+      end do
+!
+      elapse_labels(36) = 'set_to_send_buf_N    '
+      elapse_labels(37) = 'calypso_send_recv_core    '
+      elapse_labels(38) = 'set_from_recv_buf_rev_N    '
+!
+      elapse_labels(num_elapsed) = 'Communication time        '
+!
+      end subroutine set_tesh_sph_elapsed_label
+!
+! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine sph_transfer_test_1(itype)
@@ -209,12 +241,15 @@
       if (my_rank .eq. 0) write(*,*) 'send_recv_rtp_2_rtm_N'
       call send_recv_rtp_2_rtm_N                                        &
      &    (NB, X_global_rtp(1), X_rtm_recieve(1) )
+!
       if (my_rank .eq. 0) write(*,*) 'send_recv_rtm_2_rtp_N'
       call send_recv_rtm_2_rtp_N                                        &
      &    (NB, X_global_rtm(1), X_rtp_recieve(1) )
+!
       if (my_rank .eq. 0) write(*,*) 'send_recv_rj_2_rlm_N'
       call send_recv_rj_2_rlm_N                                         &
      &    (NB, X_global_rj(1), X_rlm_recieve(1) )
+!
       if (my_rank .eq. 0) write(*,*) 'send_recv_rlm_2_rj_N'
       call send_recv_rlm_2_rj_N                                         &
      &    (NB, X_global_rlm(1), X_rj_recieve(1) )
@@ -248,13 +283,15 @@
 !
       do inod = 1, nnod_rlm
         do nd = 1, NB
-          X_global_rlm(NB*inod-NB+nd) = dble(nd*inod_global_rlm(inod))
+          k = mod(nd-1,2) + 1
+          X_global_rlm(NB*inod-NB+nd) = dble(nd*idx_global_rlm(inod,k))
         end do
       end do
 !
       do inod = 1, nnod_rj
         do nd = 1, NB
-          X_global_rj(NB*inod-NB+nd) = dble(nd*inod_global_rj(inod))
+          k = mod(nd-1,2) + 1
+          X_global_rj(NB*inod-NB+nd) = dble(nd*idx_global_rj(inod,k))
         end do
       end do
 !
@@ -275,59 +312,65 @@
 !
       write(id_check,*) 'Wrong commnication in rtm => rtp with ', NB
       do inod = 1, nnod_rtp
-        if(idx_rtp_recieve(inod,4) .ne. 0) then
+        if(   idx_rtp_recieve(inod,1) .eq. 0                            &
+     &   .or. idx_rtp_recieve(inod,2) .eq. 0                            &
+     &   .or. idx_rtp_recieve(inod,3) .eq. 0) then
           do nd = 1, NB
             diff = diff + abs(X_rtp_recieve(NB*inod-NB+nd)              &
      &                      - X_global_rtp(NB*inod-NB+nd))
           end do
           if (diff .gt. 1.0E-11) then
-            write(id_check,'(2i10,1p3E23.15)') inod,                    &
-     &       inod_global_rtp(inod), diff, X_rtp_recieve(NB*inod-NB+1),  &
-     &       X_global_rtp(NB*inod-NB+1)
+            write(id_check,'(4i16,1p3E23.15)') inod,                    &
+     &       idx_global_rtp(inod,1:3), diff,                            &
+     &       X_rtp_recieve(NB*inod-NB+1), X_global_rtp(NB*inod-NB+1)
           end if
         end if
       end do
 !
       write(id_check,*) 'Wrong commnication in rtp => rtm with ', NB
       do inod = 1, nnod_rtm
-        if(idx_rtm_recieve(inod,4) .ne. 0) then
+        if(   idx_rtm_recieve(inod,1) .eq. 0                            &
+     &   .or. idx_rtm_recieve(inod,2) .eq. 0                            &
+     &   .or. idx_rtm_recieve(inod,3) .eq. 0) then
           do nd = 1, NB
             diff = diff + abs(X_rtm_recieve(NB*inod-NB+nd)              &
      &                      - X_global_rtm(NB*inod-NB+nd))
           end do
           if (diff .gt. 1.0E-11) then
-            write(id_check,'(2i10,1pE23.15)') inod,                     &
-     &                             inod_global_rtm(inod), diff
+            write(id_check,'(4i16,1pE23.15)') inod,                     &
+     &          idx_global_rtm(inod,1:3), diff
           end if
         end if
       end do
 !
       write(id_check,*) 'Wrong commnication in rj => rlm with ', NB
       do inod = 1, nnod_rlm
-        if(idx_rlm_recieve(inod,3) .ne. 0) then
+        if(      idx_rlm_recieve(inod,1) .ge. 0                         &
+     &      .or. idx_rlm_recieve(inod,2) .ge. 0) then
           diff = 0.0d0
           do nd = 1, NB
             diff = diff + abs(X_rlm_recieve(NB*inod-NB+nd)              &
      &                      - X_global_rlm(NB*inod-NB+nd))
           end do
           if (diff .gt. 1.0E-11) then
-            write(id_check,'(2i10,1pE23.15)') inod,                     &
-     &                             inod_global_rlm(inod), diff
+            write(id_check,'(3i16,1pE23.15)') inod,                     &
+     &          idx_global_rlm(inod,1:2), diff
           end if
         end if
       end do
 !
       write(id_check,*) 'Wrong commnication in rlm => rj with ', NB
       do inod = 1, nnod_rj
-        if(idx_rj_recieve(inod,3) .ne. 0) then
+        if(      idx_rj_recieve(inod,1) .ge. 0                          &
+     &      .or. idx_rj_recieve(inod,2) .ge. 0) then
           diff = 0.0d0
           do nd = 1, NB
             diff = diff + abs(X_rj_recieve(NB*inod-NB+nd)               &
      &                      - X_global_rj(NB*inod-NB+nd))
           end do
           if (diff .gt. 1.0E-11) then
-            write(id_check,'(2i10,1p3E23.15)') inod,                    &
-     &                             inod_global_rj(inod), diff
+            write(id_check,'(3i16,1p3E23.15)') inod,                    &
+     &          idx_global_rj(inod,1:2), diff
           end if
         end if
       end do

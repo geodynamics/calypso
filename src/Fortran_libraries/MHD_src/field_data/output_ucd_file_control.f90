@@ -11,6 +11,7 @@
       module output_ucd_file_control
 !
       use m_precision
+      use m_constants
 !
       implicit none
 !
@@ -80,18 +81,18 @@
       call link_local_org_mesh_4_ucd
       call link_fem_field_data_2_ucd_out
 !
-      if (fem_ucd%ifmt_file/100 .eq. iflag_single/100) then
+      if (fem_ucd%ifmt_file/icent .eq. iflag_single/icent) then
         call init_merged_ucd(fem_ucd, merged_ucd)
       end if
 !
       call sel_write_parallel_ucd_mesh(fem_ucd, merged_ucd)
 !
-      if(   mod(fem_ucd%ifmt_file,100)/10 .eq. iflag_udt/10             &
-     & .or. mod(fem_ucd%ifmt_file,100)/10 .eq. iflag_vtd/10) then
+      if(   mod(fem_ucd%ifmt_file,icent)/iten .eq. iflag_udt/iten       &
+     & .or. mod(fem_ucd%ifmt_file,icent)/iten .eq. iflag_vtd/iten) then
         call deallocate_ucd_ele(fem_ucd)
       end if
 !
-      if(mod(fem_ucd%ifmt_file,100)/10 .eq. iflag_vtd/10) then
+      if(mod(fem_ucd%ifmt_file,icent)/iten .eq. iflag_vtd/iten) then
         call deallocate_ucd_node(fem_ucd)
       end if
 !
@@ -110,13 +111,8 @@
 !
 !
       call link_fem_node_data_2_ucd_out
-!
-      call count_udt_elements(internal_node, numele, nnod_4_ele,        &
-     &    ie_org, fem_ucd)
-      call allocate_ucd_ele(fem_ucd)
-!
-      call set_udt_global_connect(internal_node, numele, nnod_4_ele,    &
-     &    globalelmid_org, ie_org, fem_ucd)
+      call const_udt_global_connect(internal_node, numele, nnod_4_ele,  &
+     &    iele_global_org, ie_org, fem_ucd)
 !
       end subroutine link_global_org_mesh_4_ucd
 !
@@ -131,14 +127,8 @@
       use set_and_cal_udt_data
 !
 !
-      call allocate_ucd_node(fem_ucd)
-      call set_udt_local_nodes(numnod, xx, fem_ucd)
-!
-      call count_udt_elements(internal_node, numele, nnod_4_ele,        &
-     &    ie_org, fem_ucd)
-      call allocate_ucd_ele(fem_ucd)
-!
-      call set_udt_local_connect(internal_node, numele, nnod_4_ele,     &
+      call const_udt_local_nodes(numnod, xx, fem_ucd)
+      call const_udt_local_connect(internal_node, numele, nnod_4_ele,   &
      &    ie_org, fem_ucd)
 !
       end subroutine link_local_org_mesh_4_ucd

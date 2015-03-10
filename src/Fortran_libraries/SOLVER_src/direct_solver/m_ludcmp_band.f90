@@ -45,7 +45,7 @@
 !!      subroutine set_band_mt_2_mat(n, np, nband, band_a, a)
 !!      subroutine set_mt_2_band_mat(n, np, nband, a, band_a)
 !!
-!!      Data formt of band matrix
+!!      Example: data format of 3-band matrix
 !!
 !!               | a(2,1)  a(1,2)  ........     0         0     |
 !!               | a(3,1)  a(2,2)  ........     .         .     |
@@ -70,6 +70,7 @@
       module m_ludcmp_band
 !
       use m_precision
+      use m_constants
 !
       implicit none
 !
@@ -105,7 +106,7 @@
 !
       d = 1.0d0
       do i = 1,n
-        jst = max(i-nb1,1)
+        jst = max(i-nb1,ione)
         jed = min(i+nb1,n)
         k = i - jst + nb1+1
         aamax = abs(band_a(k,jst))
@@ -122,7 +123,7 @@
 !
       band_lu = 0.0d0
       do i = 1, n
-        jst = max(i-nb1,1)
+        jst = max(i-nb1,ione)
         jed = min(i+nb1,n)
         do j = jst, jed
           k = i - j + nb1+1
@@ -132,7 +133,7 @@
       end do
 !
       do j = 1,n
-        ist = max( (j-nb2),1 )
+        ist = max( (j-nb2),ione )
         ied = min( (j+nb1),n )
 !
         do i = ist, j-1
@@ -148,7 +149,7 @@
         aamax = 0.0d0
         do i = j, ied
           l = i - j + nb2+1
-          kst = max( (i-nb2),1 )
+          kst = max( (i-nb2),ione )
           do k = kst, j-1
             m1 = i - k + nb2+1
             m2 = k - j + nb2+1
@@ -168,7 +169,7 @@
           idx_org(imax) = idx_org(j)
           idx_org(j) = k
 !
-          kst = max( (j-nb2),1 )
+          kst = max( (j-nb2),ione )
           ked = min( (imax+nb2),n ) 
           do k = kst, ked
             m1 = j - k + nb2+1
@@ -237,7 +238,7 @@
 !
 !     x(ist) = x(ist)
       do i = ist+1, n
-        jst = max( (i-nb2),1 )
+        jst = max( (i-nb2),ione )
         do j = jst,i-1
           k = i - j + nb2+1
           x(i) = x(i) - band_lu(k,j) * x(j)
@@ -303,7 +304,7 @@
         end do
 !
         do i = ist+1, n
-          jst = max( (i-nb2),1 )
+          jst = max( (i-nb2),ione )
           do j = jst,i-1
             k = i - j + nb2+1
             x(mst:med,i) = x(mst:med,i)                                 &
@@ -339,7 +340,7 @@
 !
       nb1 = (nband-1) / 2
       do i = 1, n
-        jst = max( (i-nb1),1 )
+        jst = max( (i-nb1),ione )
         jed = min( (i+nb1),n )
         do j = jst, jed
           k = i - j + nb1+1
@@ -361,7 +362,7 @@
 !
       nb1 = (nband-1) / 2
       do i = 1, n
-        jst = max( (i-nb1),1 )
+        jst = max( (i-nb1),ione )
         jed = min( (i+nb1),n )
         do j = jst, jed
           k = i - j + nb1+1

@@ -37,21 +37,26 @@
       module m_ctl_data_composite_norm
 !
       use m_precision
+      use t_read_control_arrays
 !
       implicit  none
 !
 !
-      integer(kind=kint) :: num_coef_4_c_diffuse_ctl =  0
-      character(len=kchara),allocatable :: coef_4_c_diff_name_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_c_diff_power_ctl(:)
+!>      Structure for number and power to construct composiitonal flux
+!!@n      coef_4_comp_flux_ctl%c_tbl:  Name of number 
+!!@n      coef_4_comp_flux_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_comp_flux_ctl
 !
-      integer(kind=kint) :: num_coef_4_composit_ctl =   0
-      character(len=kchara),allocatable :: coef_4_composit_name_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_composit_power_ctl(:)
+!>      Structure for number and power
+!!            to construct composiitonal diffusion
+!!@n      coef_4_c_diffuse_ctl%c_tbl:  Name of number 
+!!@n      coef_4_c_diffuse_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_c_diffuse_ctl
 !
-      integer(kind=kint) :: num_coef_4_c_src_ctl =   0
-      character(len=kchara),allocatable :: coef_4_c_src_name_ctl(:)
-      real (kind = kreal), allocatable :: coef_4_c_src_power_ctl(:)
+!>      Structure for number and power to construct compositional source
+!!@n      coef_4_comp_src_ctl%c_tbl:  Name of number 
+!!@n      coef_4_comp_src_ctl%vect:   Power of the number
+      type(ctl_array_cr), save :: coef_4_comp_src_ctl
 !
 !   entry label
 !
@@ -67,16 +72,9 @@
      &         :: hd_n_dsc_diff = 'coef_4_c_diffuse_ctl'
       character(len=kchara), parameter                                  &
      &         :: hd_n_dsc_src =    'coef_4_light_source_ctl'
-      integer (kind=kint) :: i_n_dscalar =     0
-      integer (kind=kint) :: i_n_dsc_diff =    0
-      integer (kind=kint) :: i_n_dsc_src =     0
 !
       private :: hd_dsc_diff_adv, i_dsc_diff_adv
       private :: hd_n_dscalar, hd_n_dsc_diff, hd_n_dsc_src
-!
-      private :: allocate_coef_4_dscalar_ctl
-      private :: allocate_coef_4_dsc_diff_ctl
-      private :: allocate_coef_4_dsc_src_ctl
 !
 !   --------------------------------------------------------------------
 !
@@ -84,40 +82,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine allocate_coef_4_dscalar_ctl
-!
-      allocate(coef_4_composit_name_ctl(num_coef_4_composit_ctl))
-      allocate(coef_4_composit_power_ctl(num_coef_4_composit_ctl))
-      coef_4_composit_power_ctl = 0.0d0
-!
-      end subroutine allocate_coef_4_dscalar_ctl
-!
-! -----------------------------------------------------------------------
-!
-      subroutine allocate_coef_4_dsc_diff_ctl
-!
-      allocate(coef_4_c_diff_name_ctl(num_coef_4_c_diffuse_ctl))
-      allocate(coef_4_c_diff_power_ctl(num_coef_4_c_diffuse_ctl))
-      coef_4_c_diff_power_ctl = 0.0d0
-!
-      end subroutine allocate_coef_4_dsc_diff_ctl
-!
-! -----------------------------------------------------------------------
-!
-      subroutine allocate_coef_4_dsc_src_ctl
-!
-      allocate(coef_4_c_src_name_ctl(num_coef_4_c_src_ctl))
-      allocate(coef_4_c_src_power_ctl(num_coef_4_c_src_ctl))
-      coef_4_c_src_power_ctl = 0.0d0
-!
-      end subroutine allocate_coef_4_dsc_src_ctl
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
       subroutine deallocate_coef_4_dscalar_ctl
 !
-      deallocate(coef_4_composit_name_ctl, coef_4_composit_power_ctl)
+      call dealloc_control_array_c_r(coef_4_comp_flux_ctl)
 !
       end subroutine deallocate_coef_4_dscalar_ctl
 !
@@ -125,7 +92,7 @@
 !
       subroutine deallocate_coef_4_dsc_diff_ctl
 !
-      deallocate(coef_4_c_diff_name_ctl, coef_4_c_diff_power_ctl)
+      call dealloc_control_array_c_r(coef_4_c_diffuse_ctl)
 !
       end subroutine deallocate_coef_4_dsc_diff_ctl
 !
@@ -133,7 +100,7 @@
 !
       subroutine deallocate_coef_4_dsc_src_ctl
 !
-      deallocate(coef_4_c_src_name_ctl, coef_4_c_src_power_ctl)
+      call dealloc_control_array_c_r(coef_4_comp_src_ctl)
 !
       end subroutine deallocate_coef_4_dsc_src_ctl
 !
@@ -156,32 +123,9 @@
         if(i_dsc_diff_adv .gt. 0) exit
 !
 !
-        call find_control_array_flag(hd_n_dscalar,                      &
-     &      num_coef_4_composit_ctl)
-        if(num_coef_4_composit_ctl.gt.0 .and. i_n_dscalar.eq.0) then
-          call allocate_coef_4_dscalar_ctl
-          call read_control_array_vect_list(hd_n_dscalar,               &
-     &        num_coef_4_composit_ctl, i_n_dscalar,                     &
-     &        coef_4_composit_name_ctl, coef_4_composit_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_dsc_diff,                     &
-     &      num_coef_4_c_diffuse_ctl)
-        if(num_coef_4_c_diffuse_ctl.gt.0 .and. i_n_dsc_diff.eq.0) then
-          call allocate_coef_4_dsc_diff_ctl
-          call read_control_array_vect_list(hd_n_dsc_diff,              &
-     &        num_coef_4_c_diffuse_ctl, i_n_dsc_diff,                   &
-     &        coef_4_c_diff_name_ctl, coef_4_c_diff_power_ctl)
-        end if
-!
-        call find_control_array_flag(hd_n_dsc_src,                      &
-     &      num_coef_4_c_src_ctl)
-        if(num_coef_4_c_src_ctl.gt.0 .and. i_n_dsc_src.eq.0) then
-          call allocate_coef_4_dsc_src_ctl
-          call read_control_array_vect_list(hd_n_dsc_src,               &
-     &        num_coef_4_c_src_ctl, i_n_dsc_src,                        &
-     &        coef_4_c_src_name_ctl, coef_4_c_src_power_ctl)
-        end if
+        call read_control_array_c_r(hd_n_dscalar, coef_4_comp_flux_ctl)
+        call read_control_array_c_r(hd_n_dsc_diff, coef_4_c_diffuse_ctl)
+        call read_control_array_c_r(hd_n_dsc_src, coef_4_comp_src_ctl)
       end do
 !
       end subroutine read_composition_eq_ctl

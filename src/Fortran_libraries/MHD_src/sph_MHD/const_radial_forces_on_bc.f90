@@ -19,7 +19,6 @@
       use m_control_parameter
       use m_spherical_harmonics
       use m_spheric_parameter
-      use m_integrals_4_sph_coriolis
       use m_sph_spectr_data
       use m_sph_phys_address
 !

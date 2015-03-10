@@ -193,11 +193,6 @@
             X_FFTPACK5(inod_s,ismp) = X(j,2*i+2)
           end do
         end do
-        if(mod(Nfft,2) .eq. 0) then
-          do inum = 1, num
-            j = ist + inum
-          end do
-        end if
 !
         call RFFTMB (num, ione, Nfft, num, X_FFTPACK5(1,ismp), nsize,   &
      &      WSAVE, lSAVE, WORK(1,ismp), nsize, ierr)

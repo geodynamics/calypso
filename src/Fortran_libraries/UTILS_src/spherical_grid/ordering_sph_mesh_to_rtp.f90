@@ -14,7 +14,7 @@
       implicit none
 !
       integer(kind = kint), allocatable, private :: inod_old2new(:)
-      integer(kind = kint), allocatable, private :: id_global_org(:)
+      integer(kind = kint_gl), allocatable, private :: id_global_org(:)
 !
 ! -----------------------------------------------------------------------
 !

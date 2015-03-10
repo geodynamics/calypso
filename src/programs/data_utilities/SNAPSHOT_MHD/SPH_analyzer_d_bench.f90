@@ -42,7 +42,7 @@
       use m_physical_property
 !
       use set_control_sph_mhd
-      use load_data_for_sph_IO
+      use parallel_load_data_4_sph
       use set_reference_sph_mhd
       use set_bc_sph_mhd
       use material_property
@@ -50,7 +50,6 @@
       use set_radius_func
       use const_radial_mat_4_sph
       use cal_rms_fields_by_sph
-      use cvt_nod_data_to_sph_data
       use r_interpolate_sph_data
       use sph_mhd_rst_IO_control
       use m_field_at_mid_equator
@@ -58,15 +57,13 @@
 !
 !   Load spherical harmonics data
 !
-      if (iflag_debug.eq.1) write(*,*) 'input_sph_trans_grids'
-      call input_sph_trans_grids(my_rank)
+      if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
+      call load_para_sph_mesh
 !
 !   Allocate spectr field data
 !
       call allocate_phys_rj_data
-      call allocate_phys_rtp_data
       call set_sph_sprctr_data_address
-      call set_sph_nod_data_address
 !
       if (iflag_debug.gt.0 ) write(*,*) 'allocate_vector_for_solver'
       call allocate_vector_for_solver(isix, nnod_rtp)
@@ -103,8 +100,8 @@
 !
 ! ---------------------------------
 !
-      if (iflag_debug.eq.1) write(*,*) 's_const_radial_mat_4_sph'
-      call s_const_radial_mat_4_sph
+      if (iflag_debug.eq.1) write(*,*) 'const_radial_mat_sph_snap'
+      call const_radial_mat_sph_snap
 !
 !     --------------------- 
 !  set original spectr mesh data for extension of B
@@ -147,29 +144,28 @@
 !
 !*  ----------------lead nonlinear term ... ----------
 !*
-      call start_eleps_time(12)
+      call start_eleps_time(8)
       call nonlinear
-      call end_eleps_time(12)
+      call end_eleps_time(8)
 !
 !* ----  Update fields after time evolution ------------------------=
 !*
-      call start_eleps_time(4)
-      call start_eleps_time(7)
-!
+      call start_eleps_time(9)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
       call trans_per_temp_to_temp_sph
 !*
       if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
       call s_lead_fields_4_sph_mhd
-      call end_eleps_time(7)
+      call end_eleps_time(9)
 !
 !*  -----------  lead mid-equator field --------------
 !*
-      call start_eleps_time(10)
+      call start_eleps_time(4)
+      call start_eleps_time(11)
       if(iflag_debug.gt.0)  write(*,*) 'const_data_4_dynamobench'
       call s_const_data_4_dynamobench
       call output_field_4_dynamobench(i_step, time)
-      call end_eleps_time(10)
+      call end_eleps_time(11)
       call end_eleps_time(4)
 !
       end subroutine SPH_analyze_dbench

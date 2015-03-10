@@ -94,7 +94,7 @@
 !
       leadki = zero
       if ( l1+l2.ge.l3 .and. l2+l3.ge.l1 .and. l3+l1.ge.l2) then
-        if ( mod(l1+l2+l3,2) .eq. 0) then
+        if ( mod(l1+l2+l3,itwo) .eq. izero) then
           if (    (m1+m2+m3).eq.0 .or. ( m1+m2-m3).eq.0                 &
      &      .or.  (m1-m2+m3).eq.0 .or. (-m1+m2+m3).eq.0) then
 !*
@@ -136,7 +136,7 @@
 !
       leadli = zero
       if (l1+l2.ge.l3 .and. l2+l3.ge.l1 .and. l3+l1.ge.l2) then
-        if ( mod(l1+l2+l3,2).eq.1 ) then
+        if ( mod(l1+l2+l3,itwo) .eq. ione) then
           if (   (m1+m2+m3).eq.0 .or. ( m1+m2-m3).eq.0                  &
      &      .or. (m1-m2+m3).eq.0 .or. (-m1+m2+m3).eq.0) then
 !*

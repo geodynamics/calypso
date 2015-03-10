@@ -1,0 +1,212 @@
+!
+!      module m_control_data_sections
+!
+!      Written by H. Matsui on July, 2006
+!
+!      subroutine allocate_psf_ctl_stract
+!      subroutine allocate_iso_ctl_stract
+!
+!      subroutine deallocate_psf_ctl_stract
+!      subroutine deallocate_iso_ctl_stract
+!
+!      subroutine read_sections_control_data
+!
+!      subroutine read_files_4_psf_ctl
+!      subroutine read_files_4_iso_ctl
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!    array surface_rendering  1
+!!      file   surface_rendering   'ctl_psf_eq'
+!!    end array surface_rendering
+!!
+!!    array isosurf_rendering  2
+!!      file   isosurf_rendering   'ctl_iso_p_n1e4'
+!!      file   isosurf_rendering   'ctl_iso_p_p1e4'
+!!    end array isosurf_rendering
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+      module m_control_data_sections
+!
+      use m_precision
+!
+      use m_machine_parameter
+      use m_control_data_4_psf
+      use m_control_data_4_iso
+!
+      implicit  none
+!
+!
+      integer(kind = kint) :: num_psf_ctl = 0
+      character(len = kchara), allocatable :: fname_psf_ctl(:)
+      type(psf_ctl), allocatable, save :: psf_ctl_struct(:)
+!
+      integer(kind = kint) :: num_iso_ctl = 0
+      character(len = kchara), allocatable :: fname_iso_ctl(:)
+      type(iso_ctl), allocatable, save :: iso_ctl_struct(:)
+!
+!   entry label
+!
+      character(len=kchara), parameter :: hd_viz_ctl = 'visual_control'
+      integer (kind=kint) :: i_viz_ctl = 0
+!
+!     lavel for surfaces sectionings
+!
+      character(len=kchara), parameter                                  &
+     &       :: hd_psfs_ctl =   'surface_rendering'
+      character(len=kchara), parameter                                  &
+     &       :: hd_isos_ctl =   'isosurf_rendering'
+!
+      integer (kind=kint) :: i_psf_ctl =    0
+      integer (kind=kint) :: i_iso_ctl =    0
+!
+      private :: hd_viz_ctl, i_viz_ctl
+      private :: i_psf_ctl, i_iso_ctl
+!
+!   --------------------------------------------------------------------
+!
+      contains
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine allocate_psf_ctl_stract
+!
+      integer(kind = kint) :: i
+!
+      allocate(fname_psf_ctl(num_psf_ctl))
+      allocate(psf_ctl_struct(num_psf_ctl))
+!
+      if(num_psf_ctl .gt. 0) then
+        do i = 1, num_psf_ctl
+          psf_ctl_struct(i)%radius_psf_ctl =       0.0d0
+          psf_ctl_struct(i)%psf_out_field_ctl%num = 0
+          psf_ctl_struct(i)%psf_area_ctl%num =      0
+        end do
+      end if
+!
+      end subroutine allocate_psf_ctl_stract
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine allocate_iso_ctl_stract
+!
+!
+      allocate(fname_iso_ctl(num_iso_ctl))
+      allocate(iso_ctl_struct(num_iso_ctl))
+!
+      end subroutine allocate_iso_ctl_stract
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine deallocate_psf_ctl_stract
+!
+      deallocate(psf_ctl_struct)
+      deallocate(fname_psf_ctl)
+!
+      end subroutine deallocate_psf_ctl_stract
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine deallocate_iso_ctl_stract
+!
+      deallocate(iso_ctl_struct)
+      deallocate(fname_iso_ctl)
+!
+      end subroutine deallocate_iso_ctl_stract
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine read_sections_control_data
+!
+      use m_read_control_elements
+      use skip_comment_f
+!
+!
+      if(right_begin_flag(hd_viz_ctl) .eq. 0) return
+      if (i_viz_ctl .gt. 0) return
+      do
+        call load_ctl_label_and_line
+!
+        call find_control_end_flag(hd_viz_ctl, i_viz_ctl)
+        if(i_viz_ctl .eq. 1) exit
+!
+        call find_control_array_flag(hd_psfs_ctl, num_psf_ctl)
+        if(num_psf_ctl .gt. 0) call read_files_4_psf_ctl
+!
+        call find_control_array_flag(hd_isos_ctl, num_iso_ctl)
+        if(num_iso_ctl .gt. 0) call read_files_4_iso_ctl
+      end do
+!
+      end subroutine read_sections_control_data
+!
+!   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+      subroutine read_files_4_psf_ctl
+!
+      use m_read_control_elements
+      use skip_comment_f
+!
+!
+      if(i_psf_ctl .gt. 0) return
+!
+      call allocate_psf_ctl_stract
+      do
+        call load_ctl_label_and_line
+!
+        call find_control_end_array_flag(hd_psfs_ctl,                   &
+     &      num_psf_ctl, i_psf_ctl)
+        if(i_psf_ctl .ge. num_psf_ctl) exit
+!
+        if(right_file_flag(hd_psfs_ctl) .gt. 0) then
+          call read_file_names_from_ctl_line(num_psf_ctl, i_psf_ctl,    &
+     &        fname_psf_ctl)
+        end if
+!
+        if(right_begin_flag(hd_psfs_ctl) .gt. 0) then
+          i_psf_ctl = i_psf_ctl + 1
+          fname_psf_ctl(i_psf_ctl) = 'NO_FILE'
+          call read_psf_control_data(psf_ctl_struct(i_psf_ctl))
+        end if
+!
+      end do
+!
+      end subroutine read_files_4_psf_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine read_files_4_iso_ctl
+!
+      use m_read_control_elements
+      use skip_comment_f
+!
+!
+      if (i_iso_ctl .gt. 0) return
+!
+      call allocate_iso_ctl_stract
+      do
+        call load_ctl_label_and_line
+!
+        call find_control_end_array_flag(hd_isos_ctl,                   &
+     &      num_iso_ctl, i_iso_ctl)
+        if(i_iso_ctl .ge. num_iso_ctl) exit
+!
+        if(right_file_flag(hd_isos_ctl) .gt. 0) then
+          call read_file_names_from_ctl_line(num_iso_ctl, i_iso_ctl,    &
+     &        fname_iso_ctl)
+        end if
+!
+        if(right_begin_flag(hd_isos_ctl) .gt. 0) then
+          i_iso_ctl = i_iso_ctl + 1
+          fname_iso_ctl(i_iso_ctl) = 'NO_FILE'
+          call read_control_data_4_iso(iso_ctl_struct(i_iso_ctl))
+        end if
+!
+      end do
+!
+      end subroutine read_files_4_iso_ctl
+!
+!   --------------------------------------------------------------------
+!
+      end module m_control_data_sections

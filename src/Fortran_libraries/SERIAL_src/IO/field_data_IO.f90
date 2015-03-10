@@ -42,7 +42,7 @@
 !
 !
       write(id_file,'(a)'   )  '! number of field and component'
-      write(id_file,'(2i10)') nnod, num_field
+      write(id_file,'(2i16)') nnod, num_field
       write(id_file,'(10i5)') ncomp_field(1:num_field)
 !
       icou = 0

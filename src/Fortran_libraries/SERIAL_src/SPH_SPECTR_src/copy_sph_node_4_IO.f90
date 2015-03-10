@@ -48,7 +48,6 @@
       call allocate_spheric_param_rtp
       call allocate_sph_1d_index_rtp
 !
-      inod_global_rtp(1:nnod_rtp) = inod_gl_sph_IO(1:nnod_rtp)
       do i = 1, ithree
         idx_global_rtp(1:nnod_rtp,i) = idx_gl_sph_IO(1:nnod_rtp,i)
       end do
@@ -85,7 +84,6 @@
       call allocate_spheric_param_rtm
       call allocate_sph_1d_index_rtm
 !
-      inod_global_rtm(1:nnod_rtm) = inod_gl_sph_IO(1:nnod_rtm)
       do i = 1, ithree
         idx_global_rtm(1:nnod_rtm,i) = idx_gl_sph_IO(1:nnod_rtm,i)
       end do
@@ -122,7 +120,6 @@
       call allocate_spheric_param_rlm
       call allocate_sph_1d_index_rlm
 !
-      inod_global_rlm(1:nnod_rlm) = inod_gl_sph_IO(1:nnod_rlm)
       do i = 1, itwo
         idx_global_rlm(1:nnod_rlm,i) = idx_gl_sph_IO(1:nnod_rlm,i)
       end do
@@ -158,12 +155,13 @@
       call allocate_spheric_param_rj
       call allocate_sph_1d_index_rj
 !
-      inod_global_rj(1:nnod_rj) = inod_gl_sph_IO(1:nnod_rj)
       do i = 1, itwo
         idx_global_rj(1:nnod_rj,i) = idx_gl_sph_IO(1:nnod_rj,i)
       end do
 !
       radius_1d_rj_r(1:nidx_rj(1)) =   r_gl_1_IO(1:nidx_rj(1))
+      a_r_1d_rj_r(1:nidx_rj(1)) = one / radius_1d_rj_r(1:nidx_rj(1))
+!
       idx_gl_1d_rj_r(1:nidx_rj(1)) =   idx_gl_1_IO(1:nidx_rj(1))
       idx_gl_1d_rj_j(1:nidx_rj(2),1) = idx_gl_2_IO(1:nidx_rj(2),1)
       idx_gl_1d_rj_j(1:nidx_rj(2),2) = idx_gl_2_IO(1:nidx_rj(2),2)
@@ -181,6 +179,8 @@
       subroutine copy_sph_node_rtp_to_IO
 !
       integer(kind = kint) :: i
+      integer(kind = kint_gl) :: nr_8, nrt8
+!
 !
       ndir_sph_IO =              ithree
       sph_rank_IO(1:ithree) =    sph_rank_rtp(1:ithree)
@@ -202,10 +202,18 @@
       call allocate_idx_sph_1d2_IO
       call allocate_idx_sph_1d3_IO
 !
-      inod_gl_sph_IO(1:nnod_rtp) = inod_global_rtp(1:nnod_rtp)
-      do i = 1, ithree
-        idx_gl_sph_IO(1:nnod_rtp,i) = idx_global_rtp(1:nnod_rtp,i)
+!$omp parallel do private(i,nr_8,nrt8)
+      do i = 1, nnod_rtp
+        nr_8 = nidx_global_rtp(1)
+        nrt8 = nidx_global_rtp(1)*nidx_global_rtp(2)
+        idx_gl_sph_IO(i,1) = idx_global_rtp(i,1)
+        idx_gl_sph_IO(i,2) = idx_global_rtp(i,2)
+        idx_gl_sph_IO(i,3) = idx_global_rtp(i,3)
+        inod_gl_sph_IO(i) = idx_global_rtp(i,1)                         &
+     &                   + (idx_global_rtp(i,2) - 1) * nr_8             &
+     &                   + (idx_global_rtp(i,3) - 1) * nrt8
       end do
+!$omp end parallel do
 !
       r_gl_1_IO(1:nidx_rtp(1)) =     radius_1d_rtp_r(1:nidx_rtp(1))
       idx_gl_1_IO(1:nidx_rtp(1)) =   idx_gl_1d_rtp_r(1:nidx_rtp(1))
@@ -223,6 +231,8 @@
       subroutine copy_sph_node_rtm_to_IO
 !
       integer(kind = kint) :: i
+      integer(kind = kint_gl) :: nr_8, nrt8
+!
 !
       ndir_sph_IO =              ithree
       sph_rank_IO(1:ithree) =    sph_rank_rtm(1:ithree)
@@ -244,10 +254,18 @@
       call allocate_idx_sph_1d2_IO
       call allocate_idx_sph_1d3_IO
 !
-      inod_gl_sph_IO(1:nnod_rtm) = inod_global_rtm(1:nnod_rtm)
-      do i = 1, ithree
-        idx_gl_sph_IO(1:nnod_rtm,i) = idx_global_rtm(1:nnod_rtm,i)
+!$omp parallel do private(i,nr_8,nrt8)
+      do i = 1, nnod_rtm
+        nr_8 = nidx_global_rtm(1)
+        nrt8 = nidx_global_rtm(1)*nidx_global_rtm(2)
+        idx_gl_sph_IO(i,1) = idx_global_rtm(i,1)
+        idx_gl_sph_IO(i,2) = idx_global_rtm(i,2)
+        idx_gl_sph_IO(i,3) = idx_global_rtm(i,3)
+        inod_gl_sph_IO(i) = idx_global_rtm(i,1)                         &
+     &                   + (idx_global_rtm(i,2) - 1) * nr_8             &
+     &                   +  idx_global_rtm(i,3) * nrt8
       end do
+!$omp end parallel do
 !
       r_gl_1_IO(1:nidx_rtm(1)) =     radius_1d_rtm_r(1:nidx_rtm(1))
       idx_gl_1_IO(1:nidx_rtm(1)) =   idx_gl_1d_rtm_r(1:nidx_rtm(1))
@@ -265,6 +283,8 @@
       subroutine copy_sph_node_rlm_to_IO
 !
       integer(kind = kint) :: i
+      integer(kind = kint_gl) :: nr_8
+!
 !
       ndir_sph_IO =            itwo
       sph_rank_IO(1:itwo) =    sph_rank_rlm(1:itwo)
@@ -284,10 +304,21 @@
       call allocate_idx_sph_1d1_IO
       call allocate_idx_sph_1d2_IO
 !
-      inod_gl_sph_IO(1:nnod_rlm) =    inod_global_rlm(1:nnod_rlm)
+!$omp parallel do private(i,nr_8)
+      do i = 1, nnod_rlm
+        nr_8 = nidx_global_rlm(1)
+        idx_gl_sph_IO(i,1) = idx_global_rlm(i,1)
+        idx_gl_sph_IO(i,2) = idx_global_rlm(i,2)
+        inod_gl_sph_IO(i) =  idx_global_rlm(i,1)                        &
+     &                     + idx_global_rlm(i,2) * nr_8
+      end do
+!$omp end parallel do
       do i = 1, itwo
         idx_gl_sph_IO(1:nnod_rlm,i) = idx_global_rlm(1:nnod_rlm,i)
       end do
+      inod_gl_sph_IO(1:nnod_rlm)                                        &
+     &           =  idx_global_rlm(1:nnod_rlm,1)                        &
+     &            + idx_global_rlm(1:nnod_rlm,2) * nidx_global_rlm(1)
 !
       r_gl_1_IO(1:nidx_rlm(1)) =     radius_1d_rlm_r(1:nidx_rlm(1))
       idx_gl_1_IO(1:nidx_rlm(1)) =   idx_gl_1d_rlm_r(1:nidx_rlm(1))
@@ -305,6 +336,7 @@
       subroutine copy_sph_node_rj_to_IO
 !
       integer(kind = kint) :: i
+      integer(kind = kint_gl) :: nr_8
 !
       ndir_sph_IO =            itwo
       sph_rank_IO(1:itwo) =    sph_rank_rj(1:itwo)
@@ -324,10 +356,20 @@
       call allocate_idx_sph_1d1_IO
       call allocate_idx_sph_1d2_IO
 !
-      inod_gl_sph_IO(1:nnod_rj) =    inod_global_rj(1:nnod_rj)
-      do i = 1, itwo
-        idx_gl_sph_IO(1:nnod_rj,i) = idx_global_rj(1:nnod_rj,i)
+!$omp parallel do private(i,nr_8)
+      do i = 1, nnod_rj
+        nr_8 = nidx_global_rj(1)
+        idx_gl_sph_IO(i,1) = idx_global_rj(i,1)
+        idx_gl_sph_IO(i,2) = idx_global_rj(i,2)
+        inod_gl_sph_IO(i) =  idx_global_rj(i,1)                         &
+     &                     + idx_global_rj(i,2) * nr_8
       end do
+!$omp end parallel do
+!
+      if(inod_gl_sph_IO(nnod_rj) .eq. izero) then
+        nr_8 = (nidx_global_rj(2) + 1)
+        inod_gl_sph_IO(nnod_rj) = nidx_global_rj(1) * nr_8 + 1
+      end if
 !
       r_gl_1_IO(1:nidx_rj(1)) =     radius_1d_rj_r(1:nidx_rj(1))
       idx_gl_1_IO(1:nidx_rj(1)) =   idx_gl_1d_rj_r(1:nidx_rj(1))

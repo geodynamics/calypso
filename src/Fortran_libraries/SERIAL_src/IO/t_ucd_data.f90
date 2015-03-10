@@ -30,6 +30,8 @@
 !!      subroutine dealloc_merged_hdt5_ele_list(m_ucd)
 !!      subroutine dealloc_merged_hdt5_array(m_ucd)
 !!
+!!      subroutine set_ucd_file_format_prefix(file_head, i_fmt, ucd)
+!!
 !!      subroutine cal_istack_ucd_component(ucd)
 !!
 !!      subroutine append_new_ucd_field_name(new_field_name,            &
@@ -62,20 +64,20 @@
         integer (kind = kint) :: ifmt_file = iflag_fld
 !
 !>        number of nodes for field data
-        integer(kind = kint) :: nnod
+        integer(kind = kint_gl) :: nnod
 !>        number of elements for field data
-        integer(kind = kint) :: nele
+        integer(kind = kint_gl) :: nele
 !>        number of nodes for each element for field data
         integer(kind = kint) :: nnod_4_ele
 !
 !>        position of nodes
         real (kind=kreal), pointer :: xx(:,:)
 !>        global node ID
-        integer(kind = kint), pointer :: inod_global(:)
+        integer(kind = kint_gl), pointer :: inod_global(:)
 !>        global element ID
-        integer(kind = kint), pointer :: iele_global(:)
+        integer(kind = kint_gl), pointer :: iele_global(:)
 !>        element connectivity
-        integer(kind = kint), pointer :: ie(:,:)
+        integer(kind = kint_gl), pointer :: ie(:,:)
 !
 !>        number of field for IO
         integer(kind=kint) :: num_field
@@ -94,18 +96,18 @@
 !>        Structure for numbers of FEM mesh for merged IO
       type merged_ucd_data
 !>        end point for number of node for each subdomain
-        integer(kind = kint), pointer :: istack_merged_nod(:)
+        integer(kind = kint_gl), pointer :: istack_merged_nod(:)
 !>        end point for number of element for each subdomain
-        integer(kind = kint), pointer :: istack_merged_ele(:)
+        integer(kind = kint_gl), pointer :: istack_merged_ele(:)
 !>        end point for number of internal node for each subdomain
-        integer(kind = kint), pointer :: istack_merged_intnod(:)
+        integer(kind = kint_gl), pointer :: istack_merged_intnod(:)
 !
 !>        number of components for HDF data output
         integer(kind = kint) :: ncomp_hdf5
 !>        Real work array for HDF data output
         real(kind=kreal), pointer :: fld_hdf5(:)
 !>        Integer array for HDF data output
-        integer(kind=kint), pointer :: ie_hdf5(:)
+        integer(kind = 4), pointer :: ie_hdf5(:)
       end type merged_ucd_data
 !
 ! -----------------------------------------------------------------------
@@ -348,6 +350,22 @@
       deallocate(m_ucd%fld_hdf5)
 !
       end subroutine dealloc_merged_hdt5_array
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_ucd_file_format_prefix(file_head, i_fmt, ucd)
+!
+      character(len = kchara), intent(in) :: file_head
+      integer(kind = kint), intent(in) :: i_fmt
+!
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      ucd%ifmt_file = i_fmt
+      write(ucd%file_prefix,'(a)') trim(file_head)
+!
+      end subroutine set_ucd_file_format_prefix
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

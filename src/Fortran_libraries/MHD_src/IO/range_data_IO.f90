@@ -17,6 +17,7 @@
 !
 !
       use m_precision
+      use m_constants
 !
       implicit none
 !
@@ -93,6 +94,8 @@
       integer(kind = kint), intent(in) :: istep_ucd
       real(kind = kreal), intent(in) :: time
 !
+      character(len=kchara) :: fmt_txt
+!
 !
       call s_cal_max_indices
 !
@@ -100,13 +103,15 @@
 !
       call open_maximum_file
 !
-      write(maximum_data_code,'(i10,1p250E25.15e3)')                    &
-     &       istep_ucd, time,                                           &
+      write(fmt_txt,'(a5,i3,a13)')                                      &
+     &   '(i16,', (itwo*num_tot_nod_phys_vis+ione), '(1pE25.15e3))'
+      write(maximum_data_code,fmt_txt) istep_ucd, time,                 &
      &      phys_min(1:num_tot_nod_phys_vis),                           &
      &      phys_max(1:num_tot_nod_phys_vis)
 !
-      write(maximum_position_code,'(i10,1pE25.15e3,249i10)')            &
-     &       istep_ucd, time,                                           &
+      write(fmt_txt,'(a16,i3,a6)')                                      &
+     &   '(i16,1pE25.15e3,', (itwo*num_tot_nod_phys_vis), '(i16))'
+      write(maximum_position_code,fmt_txt) istep_ucd, time,             &
      &      node_min(1:num_tot_nod_phys_vis),                           &
      &      node_max(1:num_tot_nod_phys_vis)
 !

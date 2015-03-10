@@ -182,9 +182,8 @@
       type(phys_data), intent(inout) :: fld
 !
 !
-       nullify( fld%phys_name, fld%iorder_eletype, fld%iflag_monitor)
-       nullify( fld%num_component )
-       nullify( fld%istack_component )
+       nullify(fld%phys_name, fld%iorder_eletype, fld%iflag_monitor)
+       nullify(fld%num_component, fld%istack_component)
 !
       end subroutine disconnect_phys_name_type
 !
@@ -231,7 +230,7 @@
 !
       write(50+my_rank,*) 'inod, nodal field: ', i_field, numdir
       do inod = 1, nnod
-        write(50+my_rank,'(i10,1p10e25.14)')                            &
+        write(50+my_rank,'(i16,1p10e25.14)')                            &
      &         inod, (fld%d_fld(inod,i_field+nd-1),nd=1, numdir)
       end do
 !

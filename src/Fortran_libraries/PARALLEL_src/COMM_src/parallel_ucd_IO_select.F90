@@ -35,11 +35,12 @@
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      ucd%ifmt_file = i_udt_header
-      if(i_udt_header .gt. 0) ucd%file_prefix = udt_file_head_ctl
+      ucd%ifmt_file = udt_file_head_ctl%iflag
+      if(ucd%ifmt_file .gt. 0)                                          &
+     &         ucd%file_prefix = udt_file_head_ctl%charavalue
 !
-      call choose_para_fld_file_format(udt_file_fmt_ctl,                &
-     &    i_udt_files_fmt, ucd%ifmt_file)
+      call choose_para_fld_file_format(udt_file_fmt_ctl%charavalue,     &
+     &    udt_file_fmt_ctl%iflag, ucd%ifmt_file)
 !
       end subroutine set_merged_ucd_file_define
 !
@@ -106,8 +107,6 @@
       subroutine choose_para_fld_file_format(file_fmt_ctl, i_file_fmt,  &
      &          id_field_file_format)
 !
-      use skip_comment_f
-!
       integer(kind= kint), intent(in) :: i_file_fmt
       character(len=kchara), intent(in) :: file_fmt_ctl
       integer(kind= kint), intent(inout) :: id_field_file_format
@@ -118,10 +117,15 @@
         return
       end if
 !
-      if(     cmp_no_case(file_fmt_ctl, 'merged_VTK').gt.0              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_vtk_ascii').gt.0) then
+      if(     file_fmt_ctl.eq.'merged_vtk'                              &
+     &   .or. file_fmt_ctl.eq.'MERGED_VTK'                              &
+     &   .or. file_fmt_ctl.eq.'merged_vtk_ascii'                        &
+     &   .or. file_fmt_ctl.eq.'MERGED_VTK_ASCII') then
            id_field_file_format = iflag_sgl_vtk
-      else if(cmp_no_case(file_fmt_ctl, 'merged_HDF5').gt. 0) then
+      else if(file_fmt_ctl.eq.'merged_hdf5'                             &
+     &   .or. file_fmt_ctl.eq.'merged_HDF5'                             &
+     &   .or. file_fmt_ctl.eq.'Merged_HDF5'                             &
+     &   .or. file_fmt_ctl.eq.'MERGED_HDF5') then
            id_field_file_format = iflag_sgl_hdf5
       else
         call choose_ucd_file_format(file_fmt_ctl, i_file_fmt,           &

@@ -47,6 +47,7 @@
 !!
 !!      mesh_extension_flags_ctl    'ON'
 !!      memory_conservation_ctl     'YES'
+!!      excluding_FEM_mesh_ctl      'NO'
 !!    end data_files_def
 !! ------------------------------------------------------------------
 !!@endverbatim
@@ -88,51 +89,53 @@
 !>@n@param      itp_file_fmt_ctl         interpolation data file format
 !>@n@param      spectr_file_fmt_ctl      Spectr data file format
 !>@n@param      coriolis_file_fmt_ctl    integration data  file format
-!
-!
+!>
+!>
 !>@n@param      memory_conservation_ctl    memory conservation flag
 !>              File format for spherical shell grid data
 !
       module m_ctl_data_4_platforms
 !
       use m_precision
+      use t_control_elements
 !
       implicit  none
 !
 !
-      integer(kind = kint) :: num_subdomain_ctl
-      integer(kind = kint) :: num_smp_ctl
+      type(read_integer_item), save :: ndomain_ctl
+      type(read_integer_item), save :: num_smp_ctl
 !
-      character(len=kchara) :: mesh_file_prefix
+      type(read_character_item), save :: mesh_file_prefix
 !
-      character(len=kchara) :: elem_file_prefix
-      character(len=kchara) :: surf_file_prefix
-      character(len=kchara) :: edge_file_prefix
+      type(read_character_item), save :: elem_file_prefix
+      type(read_character_item), save :: surf_file_prefix
+      type(read_character_item), save :: edge_file_prefix
 !
 !
-      character(len=kchara) :: udt_file_head_ctl
-      character(len=kchara) :: restart_file_prefix
-      character(len=kchara) :: spectr_file_head_ctl
+      type(read_character_item), save :: udt_file_head_ctl
+      type(read_character_item), save :: restart_file_prefix
+      type(read_character_item), save :: spectr_file_head_ctl
 !
-      character(len=kchara) :: sph_file_prefix
+      type(read_character_item), save :: sph_file_prefix
 !
-      character(len=kchara) :: coriolis_int_file_name
-      character(len=kchara) :: bc_data_file_name_ctl
-      character(len=kchara) :: interpolate_sph_to_fem_ctl
-      character(len=kchara) :: interpolate_fem_to_sph_ctl
+      type(read_character_item), save :: coriolis_int_file_name
+      type(read_character_item), save :: bc_data_file_name_ctl
+      type(read_character_item), save :: interpolate_sph_to_fem_ctl
+      type(read_character_item), save :: interpolate_fem_to_sph_ctl
 !
-      character(len=kchara) :: mesh_file_fmt_ctl =      'ascii'
-      character(len=kchara) :: sph_file_fmt_ctl =       'ascii'
-      character(len=kchara) :: restart_file_fmt_ctl =   'ascii'
-      character(len=kchara) :: udt_file_fmt_ctl =       'ascii'
-      character(len=kchara) :: itp_file_fmt_ctl =       'ascii'
-      character(len=kchara) :: spectr_file_fmt_ctl =    'ascii'
-      character(len=kchara) :: coriolis_file_fmt_ctl =  'ascii'
+      type(read_character_item), save :: mesh_file_fmt_ctl
+      type(read_character_item), save :: sph_file_fmt_ctl
+      type(read_character_item), save :: restart_file_fmt_ctl
+      type(read_character_item), save :: udt_file_fmt_ctl
+      type(read_character_item), save :: itp_file_fmt_ctl
+      type(read_character_item), save :: spectr_file_fmt_ctl
+      type(read_character_item), save :: coriolis_file_fmt_ctl
 !
-      character(len=kchara) :: debug_flag_ctl = 'OFF'
+      type(read_character_item), save :: debug_flag_ctl
 !
-      character(len=kchara) :: memory_conservation_ctl =  'OFF'
-      character(len=kchara) :: mesh_extension_flags_ctl = 'ON'
+      type(read_character_item), save :: memory_conservation_ctl
+      type(read_character_item), save :: mesh_extension_ctl
+      type(read_character_item), save :: excluding_FEM_mesh_ctl
 !
 !     Label for the entry
 !
@@ -197,38 +200,9 @@
      &       :: hd_mem_conserve =   'memory_conservation_ctl'
       character(len=kchara), parameter                                  &
      &       :: hd_mesh_extension = 'mesh_extension_flags_ctl'
+      character(len=kchara), parameter                                  &
+     &       :: hd_exclude_FEM_mesh = 'excluding_FEM_mesh_ctl'
 !
-!
-      integer(kind = kint) :: i_num_subdomain = 0
-      integer(kind = kint) :: i_num_smp =       0
-!
-      integer(kind = kint) :: i_mesh_header =   0
-      integer(kind = kint) :: i_elem_header =   0
-      integer(kind = kint) :: i_surf_header =   0
-      integer(kind = kint) :: i_edge_header =   0
-!
-      integer(kind = kint) :: i_udt_header =    0
-      integer(kind = kint) :: i_rst_header =    0
-      integer(kind = kint) :: i_spectr_header = 0
-!
-      integer(kind = kint) :: i_sph_files_header = 0
-!
-      integer(kind = kint) :: i_coriolis_tri_int_name = 0
-      integer(kind = kint) :: i_bc_data_file_name = 0
-      integer(kind = kint) :: i_itp_sph_to_fem = 0
-      integer(kind = kint) :: i_itp_fem_to_sph = 0
-!
-      integer(kind = kint) :: i_mesh_file_fmt =   0
-      integer(kind = kint) :: i_rst_files_fmt =   0
-      integer(kind = kint) :: i_udt_files_fmt =   0
-      integer(kind = kint) :: i_sph_files_fmt =   0
-      integer(kind = kint) :: i_itp_files_fmt =   0
-      integer(kind = kint) :: i_spect_files_fmt =    0
-      integer(kind = kint) :: i_coriolis_file_fmt =  0
-!
-      integer(kind = kint) :: i_debug_flag_ctl =   0
-      integer(kind = kint) :: i_mem_conserve =     0
-      integer(kind = kint) :: i_mesh_extension =   0
 !
       private :: hd_platform, i_platform
       private :: hd_num_subdomain, hd_num_smp, hd_sph_files_header
@@ -266,62 +240,50 @@
         if(i_platform .gt. 0) exit
 !
 !
-        call read_integer_ctl_item(hd_num_subdomain,                    &
-     &        i_num_subdomain, num_subdomain_ctl)
-        call read_integer_ctl_item(hd_num_smp, i_num_smp, num_smp_ctl)
+        call read_integer_ctl_type(hd_num_subdomain, ndomain_ctl)
+        call read_integer_ctl_type(hd_num_smp, num_smp_ctl)
 !
 !
-        call read_character_ctl_item(hd_mesh_header,                    &
-     &        i_mesh_header, mesh_file_prefix)
+        call read_chara_ctl_type(hd_mesh_header, mesh_file_prefix)
 !
-        call read_character_ctl_item(hd_elem_header,                    &
-     &        i_elem_header, elem_file_prefix)
-        call read_character_ctl_item(hd_surf_header,                    &
-     &        i_surf_header, surf_file_prefix)
-        call read_character_ctl_item(hd_edge_header,                    &
-     &        i_edge_header, edge_file_prefix)
+        call read_chara_ctl_type(hd_elem_header, elem_file_prefix)
+        call read_chara_ctl_type(hd_surf_header, surf_file_prefix)
+        call read_chara_ctl_type(hd_edge_header, edge_file_prefix)
 !
-        call read_character_ctl_item(hd_udt_header,                     &
-     &        i_udt_header, udt_file_head_ctl)
-        call read_character_ctl_item(hd_rst_header,                     &
-     &        i_rst_header, restart_file_prefix)
-        call read_character_ctl_item(hd_spectr_header,                  &
-     &        i_spectr_header, spectr_file_head_ctl)
+        call read_chara_ctl_type(hd_udt_header, udt_file_head_ctl)
+        call read_chara_ctl_type(hd_rst_header, restart_file_prefix)
+        call read_chara_ctl_type(hd_spectr_header,                      &
+     &      spectr_file_head_ctl)
 !
-        call read_character_ctl_item(hd_sph_files_header,               &
-     &        i_sph_files_header, sph_file_prefix)
+        call read_chara_ctl_type(hd_sph_files_header, sph_file_prefix)
 !
-        call read_character_ctl_item(hd_coriolis_tri_int_name,          &
-     &        i_coriolis_tri_int_name, coriolis_int_file_name)
-        call read_character_ctl_item(hd_bc_data_file_name,              &
-     &        i_bc_data_file_name, bc_data_file_name_ctl)
+        call read_chara_ctl_type(hd_coriolis_tri_int_name,              &
+     &      coriolis_int_file_name)
+        call read_chara_ctl_type(hd_bc_data_file_name,                  &
+     &      bc_data_file_name_ctl)
 !
-        call read_character_ctl_item(hd_itp_sph_to_fem,                 &
-     &        i_itp_sph_to_fem, interpolate_sph_to_fem_ctl)
-        call read_character_ctl_item(hd_itp_fem_to_sph,                 &
-     &        i_itp_fem_to_sph, interpolate_fem_to_sph_ctl)
+        call read_chara_ctl_type(hd_itp_sph_to_fem,                     &
+     &      interpolate_sph_to_fem_ctl)
+        call read_chara_ctl_type(hd_itp_fem_to_sph,                     &
+     &      interpolate_fem_to_sph_ctl)
 !
-        call read_character_ctl_item(hd_mesh_file_fmt,                  &
-     &        i_mesh_file_fmt, mesh_file_fmt_ctl)
-        call read_character_ctl_item(hd_rst_files_fmt,                  &
-     &        i_rst_files_fmt, restart_file_fmt_ctl)
-        call read_character_ctl_item(hd_udt_files_fmt,                  &
-     &        i_udt_files_fmt, udt_file_fmt_ctl)
-        call read_character_ctl_item(hd_sph_files_fmt,                  &
-     &        i_sph_files_fmt, sph_file_fmt_ctl)
-        call read_character_ctl_item(hd_itp_files_fmt,                  &
-     &        i_itp_files_fmt, itp_file_fmt_ctl)
-        call read_character_ctl_item(hd_spect_files_fmt,                &
-     &        i_spect_files_fmt, spectr_file_fmt_ctl)
-        call read_character_ctl_item(hd_coriolis_file_fmt,              &
-     &        i_coriolis_file_fmt, coriolis_file_fmt_ctl)
+        call read_chara_ctl_type(hd_mesh_file_fmt, mesh_file_fmt_ctl)
+        call read_chara_ctl_type(hd_rst_files_fmt,                      &
+     &      restart_file_fmt_ctl)
+        call read_chara_ctl_type(hd_udt_files_fmt, udt_file_fmt_ctl)
+        call read_chara_ctl_type(hd_sph_files_fmt, sph_file_fmt_ctl)
+        call read_chara_ctl_type(hd_itp_files_fmt, itp_file_fmt_ctl)
+        call read_chara_ctl_type(hd_spect_files_fmt,                    &
+     &      spectr_file_fmt_ctl)
+        call read_chara_ctl_type(hd_coriolis_file_fmt,                  &
+     &      coriolis_file_fmt_ctl)
 !
-        call read_character_ctl_item(hd_debug_flag_ctl,                 &
-     &          i_debug_flag_ctl, debug_flag_ctl)
-        call read_character_ctl_item(hd_mem_conserve,                   &
-     &          i_mem_conserve, memory_conservation_ctl)
-        call read_character_ctl_item(hd_mesh_extension,                 &
-     &          i_mesh_extension, mesh_extension_flags_ctl)
+        call read_chara_ctl_type(hd_debug_flag_ctl, debug_flag_ctl)
+        call read_chara_ctl_type(hd_mem_conserve,                       &
+     &      memory_conservation_ctl)
+        call read_chara_ctl_type(hd_mesh_extension, mesh_extension_ctl)
+        call read_chara_ctl_type(hd_exclude_FEM_mesh,                   &
+     &      excluding_FEM_mesh_ctl)
        end do
 !
       end subroutine read_ctl_data_4_platform

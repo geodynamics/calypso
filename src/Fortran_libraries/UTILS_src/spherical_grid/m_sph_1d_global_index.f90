@@ -134,23 +134,19 @@
       use m_spheric_parameter
 !
       integer(kind = kint) :: n1, n2, n3
-      integer(kind = kint) :: ist_1, ist_2, ist_3
       integer(kind = kint) :: ied_1, ied_2, ied_3
 !
 !
       n1 = ndomain_rtp(1)
       n2 = ndomain_rtp(2)
       n3 = ndomain_rtp(3)
-      ist_1 = istack_idx_local_rtp_r(0) + 1
       ied_1 = istack_idx_local_rtp_r(n1)
-      ist_2 = istack_idx_local_rtp_t(0) + 1
       ied_2 = istack_idx_local_rtp_t(n2)
-      ist_3 = istack_idx_local_rtp_p(0) + 1
       ied_3 = istack_idx_local_rtp_p(n3)
 !
-      allocate( idx_global_rtp_r(ist_1:ied_1) )
-      allocate( idx_global_rtp_t(ist_2:ied_2) )
-      allocate( idx_global_rtp_p(ist_3:ied_3,2) )
+      allocate( idx_global_rtp_r(1:ied_1) )
+      allocate( idx_global_rtp_t(1:ied_2) )
+      allocate( idx_global_rtp_p(1:ied_3,2) )
 !
       idx_global_rtp_r = 0
       idx_global_rtp_t = 0
@@ -160,16 +156,13 @@
       n1 = ndomain_rtm(1)
       n2 = ndomain_rtm(2)
       n3 = ndomain_rtm(3)
-      ist_1 = istack_idx_local_rtm_r(0) + 1
       ied_1 = istack_idx_local_rtm_r(n1)
-      ist_2 = istack_idx_local_rtm_t(0) + 1
       ied_2 = istack_idx_local_rtm_t(n2)
-      ist_3 = istack_idx_local_rtm_m(0) + 1
       ied_3 = istack_idx_local_rtm_m(n3)
 !
-      allocate( idx_global_rtm_r(ist_1:ied_1) )
-      allocate( idx_global_rtm_t(ist_2:ied_2) )
-      allocate( idx_global_rtm_m(ist_3:ied_3,2) )
+      allocate( idx_global_rtm_r(1:ied_1) )
+      allocate( idx_global_rtm_t(1:ied_2) )
+      allocate( idx_global_rtm_m(0:ied_3,2) )
 !
       idx_global_rtm_r = 0
       idx_global_rtm_t = 0
@@ -178,13 +171,11 @@
 !
       n1 = ndomain_rlm(1)
       n2 = ndomain_rlm(2)
-      ist_1 = istack_idx_local_rlm_r(0) + 1
       ied_1 = istack_idx_local_rlm_r(n1)
-      ist_2 = istack_idx_local_rlm_j(0) + 1
       ied_2 = istack_idx_local_rlm_j(n2)
 !
-      allocate( idx_global_rlm_r(ist_1:ied_1) )
-      allocate( idx_global_rlm_j(ist_2:ied_2,3) )
+      allocate( idx_global_rlm_r(1:ied_1) )
+      allocate( idx_global_rlm_j(0:ied_2,3) )
 !
       idx_global_rlm_r = 0
       idx_global_rlm_j = 0
@@ -192,13 +183,11 @@
 !
       n1 = ndomain_rj(1)
       n2 = ndomain_rj(2)
-      ist_1 = istack_idx_local_rj_r(0) + 1
       ied_1 = istack_idx_local_rj_r(n1)
-      ist_2 = istack_idx_local_rj_j(0) + 1
       ied_2 = istack_idx_local_rj_j(n2)
 !
-      allocate( idx_global_rj_r(ist_1:ied_1) )
-      allocate( idx_global_rj_j(ist_2:ied_2,3) )
+      allocate( idx_global_rj_r(1:ied_1) )
+      allocate( idx_global_rj_j(0:ied_2,3) )
 !
       idx_global_rj_r = 0
       idx_global_rj_j = 0

@@ -13,6 +13,7 @@
       use m_precision
 !
       use m_tave_sph_ene_spectr
+      use m_sph_ene_spectra
       use cal_tave_sph_ene_spectr
 !
       implicit none
@@ -58,6 +59,7 @@
         if (time_sph .ge. start_time) then
           if (ist_true .eq. -1) then
             ist_true = istep
+            pre_time = time_sph
           end if
           icou = icou + 1
           ied_true = istep
@@ -73,9 +75,10 @@
      &       'step= ', istep,   ' averaging finished. Count=   ', icou
         if (time_sph .ge. end_time) exit
       end do
+!
    99 continue
-      call close_ene_spec_data
       write(*,*)
+      call close_ene_spec_data
 !
       call divide_average_ene_sph
       call output_tave_ene_sph_data
@@ -101,6 +104,7 @@
         if (time_sph .ge. start_time) then
           if (ist_true .eq. -1) then
             ist_true = istep
+            pre_time = time_sph
           end if
           icou = icou + 1
           ied_true = istep

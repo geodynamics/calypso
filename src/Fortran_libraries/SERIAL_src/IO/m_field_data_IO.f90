@@ -5,7 +5,7 @@
 !! @date Programmed in June, 2005
 !! @n    Modified in Oct., 2007
 !
-!> @brief Data for dield data IO
+!> @brief Data for field data IO
 !!
 !!@verbatim
 !!      subroutine allocate_phys_data_name_IO
@@ -14,6 +14,7 @@
 !!      subroutine deallocate_phys_data_name_IO
 !!      subroutine deallocate_phys_data_IO
 !!
+!!      subroutine set_field_file_fmt_prefix(iflag_fmt, file_head)
 !!      subroutine cal_istack_phys_comp_IO
 !!@endverbatim
 !!
@@ -27,22 +28,10 @@
 !
 !>      file ID for field data IO
       integer(kind = kint), parameter :: id_phys_file = 15
-!>      file name for field data
-      character(len=kchara) :: phys_file_name
 !
 !>      file header for field data
       character(len=kchara) :: phys_file_head = "rst"
       integer(kind = kint) :: iflag_field_data_fmt =  0
-      integer(kind = kint) :: iflag_phys_header_def = 0
-!
-      integer (kind=kint) :: iflag_org_rst_head
-      character(len=kchara) :: org_rst_header =   "rst_org/rst"
-!
-      character(len=kchara) :: spectr_file_head
-      character(len=kchara) :: org_sph_spec_head
-      integer(kind = kint) ::  iflag_sph_spectr_fmt =     0
-      integer(kind = kint) ::  iflag_sph_spec_head =      0
-      integer(kind = kint) ::  iflag_org_sph_spec_head =  0
 !
 !>      number of field for IO
       integer(kind = kint) :: num_phys_data_IO
@@ -83,7 +72,7 @@
       subroutine allocate_phys_data_IO
 !
       allocate( phys_data_IO(numgrid_phys_IO, ntot_phys_data_IO) )
-      phys_data_IO = 0.0d0
+      if(numgrid_phys_IO .gt. 0) phys_data_IO = 0.0d0
 !
       end subroutine allocate_phys_data_IO
 !
@@ -107,6 +96,18 @@
       end subroutine deallocate_phys_data_IO
 !
 ! -------------------------------------------------------------------
+! -------------------------------------------------------------------
+!
+      subroutine set_field_file_fmt_prefix(iflag_fmt, file_head)
+!
+      integer(kind = kint), intent(in) :: iflag_fmt
+      character(len=kchara), intent(in) :: file_head
+!
+      iflag_field_data_fmt = iflag_fmt
+      write(phys_file_head,'(a)') trim(file_head)
+!
+      end subroutine set_field_file_fmt_prefix
+!
 ! -------------------------------------------------------------------
 !
       subroutine cal_istack_phys_comp_IO

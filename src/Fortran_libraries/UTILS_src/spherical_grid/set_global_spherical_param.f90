@@ -16,8 +16,10 @@
 !     &          id_gl_rank, nidx_local_1, nidx_local_2,                &
 !     &          nidx_local, nnod_local)
 !
-!      subroutine set_rank_by_1b_sph_rank(ndomain_3d,                   &
-!     &          ip_r, ip_t, ip_p, ip_rank)
+!      integer(kind= kint) function set_rank_by_1b_sph_rank             &
+!     &                  (ndomain_3d, ip_r, ip_t, ip_p, ip_rank)
+!      integer(kind= kint) function set_rank_by_1b_rj_rank              &
+!     &                   (ndomain_2d, ip_r, ip_j)
 !      subroutine set_gl_rank_3d(nproc, ndomain_3d, id_gl_rank)
 !      subroutine set_gl_rank_2d(nproc, ndomain_2d, id_gl_rank)
 !
@@ -45,17 +47,17 @@
       use m_spheric_parameter
 !
 !
-      nidx_global_rtp(3) = 2*nidx_global_rtp(2)
+      nidx_global_rtp(3) = 2*nidx_global_rtp(2) / m_folding
 !
       nidx_global_rtm(1) = nidx_global_rtp(1)
       nidx_global_rtm(2) = nidx_global_rtp(2)
-      nidx_global_rtm(3) = 2*(l_truncation + 1)
+      nidx_global_rtm(3) = 2*(l_truncation/m_folding + 1) 
 !
       nidx_global_rlm(1) = nidx_global_rtp(1)
-      nidx_global_rlm(2) = l_truncation * (l_truncation + 2)
+      nidx_global_rlm(2) = (l_truncation+2)*l_truncation / m_folding
 !
       nidx_global_rj(1) = nidx_global_rtp(1)
-      nidx_global_rj(2) = l_truncation * (l_truncation + 2)
+      nidx_global_rj(2) = (l_truncation+2)*l_truncation / m_folding
 !
       nnod_global_rtp                                                   &
      &  = nidx_global_rtp(1) * nidx_global_rtp(2) * nidx_global_rtp(3)
@@ -137,19 +139,18 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_rank_by_1b_sph_rank(ndomain_3d,                    &
-     &          ip_r, ip_t, ip_p, ip_rank)
+      integer(kind= kint) function set_rank_by_1b_sph_rank              &
+     &                  (ndomain_3d, ip_r, ip_t, ip_p)
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t, ip_p
       integer(kind = kint), intent(in) :: ndomain_3d(3)
-      integer(kind = kint), intent(inout) :: ip_rank
 !
 !
-      ip_rank =  ip_r*ndomain_3d(2)*ndomain_3d(3)                       &
-     &         + ip_t*ndomain_3d(3)                                     &
-     &         + ip_p
+      set_rank_by_1b_sph_rank =  ip_r*ndomain_3d(2)*ndomain_3d(3)       &
+     &                         + ip_t*ndomain_3d(3)                     &
+     &                         + ip_p
 !
-      end subroutine set_rank_by_1b_sph_rank
+      end function set_rank_by_1b_sph_rank
 !
 ! -----------------------------------------------------------------------
 !
@@ -171,6 +172,19 @@
       end do
 !
       end subroutine set_gl_rank_3d
+!
+! -----------------------------------------------------------------------
+!
+      integer(kind= kint) function set_rank_by_1b_rj_rank               &
+     &                   (ndomain_2d, ip_r, ip_j)
+!
+      integer(kind = kint), intent(in) :: ip_r, ip_j
+      integer(kind = kint), intent(in) :: ndomain_2d(2)
+!
+!
+      set_rank_by_1b_rj_rank =  ip_r*ndomain_2d(2) + ip_j
+!
+      end function set_rank_by_1b_rj_rank
 !
 ! -----------------------------------------------------------------------
 !
