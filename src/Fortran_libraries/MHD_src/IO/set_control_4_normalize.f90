@@ -87,7 +87,7 @@
           num_coef_4_t_diffuse = num_coef_4_t_diffuse_ctl
         end if
 !
-        if (i_n_h_src .eq. 0) then
+        if (i_n_h_src .gt. 0) then
           num_coef_4_h_source = num_coef_4_h_source_ctl
         end if
       end if
