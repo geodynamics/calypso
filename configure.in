@@ -26,7 +26,7 @@ dnl Include pkg-config Check
 builtin(include,src/confdb/pkg.m4)
 
 
-AC_CONFIG_SRCDIR([src/programs/SPH_MHD/main_sph_MHD.f90])
+AC_CONFIG_SRCDIR([src/programs/SPH_MHD/main_sph_MHD_w_psf.f90])
 # AC_CONFIG_HEADER([config.h])
 
 AC_ARG_ENABLE(fftw3,

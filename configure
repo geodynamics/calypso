@@ -585,7 +585,7 @@ PACKAGE_STRING='FULL-PACKAGE-NAME VERSION'
 PACKAGE_BUGREPORT='BUG-REPORT-ADDRESS'
 PACKAGE_URL=''
 
-ac_unique_file="src/programs/SPH_MHD/main_sph_MHD.f90"
+ac_unique_file="src/programs/SPH_MHD/main_sph_MHD_w_psf.f90"
 # Factoring default headers for most tests.
 ac_includes_default="\
 #include <stdio.h>
@@ -3985,7 +3985,7 @@ else
 ax_cv_c_openmp=unknown
 # Flags to try:  -fopenmp (gcc), -openmp (icc), -mp (SGI & PGI),
 #                -xopenmp (Sun), -omp (Tru64), -qsmp=omp (AIX), none
-ax_openmp_flags="-fopenmp -openmp -mp -xopenmp -omp -qsmp=omp none"
+ax_openmp_flags="-openmp -fopenmp -mp -xopenmp -omp -qsmp=omp none"
 if test "x$OPENMP_CFLAGS" != x; then
   ax_openmp_flags="$OPENMP_CFLAGS $ax_openmp_flags"
 fi
@@ -4249,7 +4249,7 @@ else
 ax_cv_fc_openmp=unknown
 # Flags to try:  -fopenmp (gcc), -openmp (icc), -mp (SGI & PGI),
 #                -xopenmp (Sun), -omp (Tru64), -qsmp=omp (AIX), none
-ax_openmp_flags="-fopenmp -openmp -mp -xopenmp -omp -qsmp=omp none"
+ax_openmp_flags="-openmp -fopenmp -mp -xopenmp -omp -qsmp=omp none"
 if test "x$OPENMP_FCFLAGS" != x; then
   ax_openmp_flags="$OPENMP_FCFLAGS $ax_openmp_flags"
 fi
