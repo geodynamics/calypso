@@ -46,6 +46,7 @@
 !
       call set_gauss_points_rtm
 !
+
       call deallocate_gauss_colatitude
       call deallocate_gauss_points
 !

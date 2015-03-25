@@ -17,27 +17,31 @@
 #endif
 */
 //Function and variable declarations.
+extern int nComp;
 //CPU pointers to GPU memory data
-
-/*
- *   Set of variables that take advantage of constant memory.
- *     Access to constant memory is faster than access to global memory.
- *       */
 
 // Fortran function calls
 extern "C" {
   //void inputcalypso_(int*, int*, double*, double*, double*);
   //void cleancalypso_();
   void transform_f_(int*, int*, int*);
-  void transform_b_(int*, int*, int*);
+  void transform_b_(int*, int*, int*, double*);
 }
 
 //Fortran Variables
-extern "C" {
-  int nidx_rtm[3];
-  int nidx_rlm[3];
-  int ncomp_trans;
-}
+typedef struct {
+  int *nidx_rtm;
+  int *nidx_rlm;
+  int *istep_rtm;
+  int *istep_rlm;
+  int nnod_rtp;
+  int nnod_rlm;
+  int nnod_rtm;
+  int ncomp;
+  int nscalar;
+  int nvector;
+  int t_lvl;
+} Geometry_c;
 
 //Cublas library/Cuda variables
 extern cudaError_t error;
@@ -53,54 +57,63 @@ typedef unsigned int uint;
 typedef struct 
 {
   // OLD: 0 = g_point_med, 1 =  double* g_colat_med, 2 = double* weight_med;
-  // Current: 0 = vr_rtm, 1 = sp_rlm, 2 = g_sph_rlm
-  int argc; 
-  double** argv;
+  // Current: 0 = vr_rtm,  = g_sph_rlm
+  double *vr_rtm, *g_sph_rlm, *g_colat_rtm;
+  double *sp_rlm;
+  double *a_r_1d_rlm_r; //Might be pssible to copy straight to constant memory
 } Parameters_s;
 
 typedef struct 
 {
-  //Order:*P_smdt, *dPdt_smdt, *P_org
-  int argc, l;
-  double **argv;
+  double *P_smdt; 
+  double *dp_smdt;
+  double *g_colat_rtm;
 } Debug;
 
 extern Parameters_s deviceInput;
 extern Debug h_schmidt, d_schmidt;
+extern Geometry_c constants;
+
+//What is the best method to do this?
+//FileStreams: For debugging and Timing
+//D for debug
+extern ofStream clockD, dataD;
+
+/*
+ *   Set of variables that take advantage of constant memory.
+ *     Access to constant memory is faster than access to global memory.
+ *       */
+
+extern __constant__ Geometry_c devConstants;
+
 ////////////////////////////////////////////////////////////////////////////////
 //! Function Defines
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" {
 
-void initGpu();
- 
-void initDevConstVariables(int *nidx_rlm, int *nidx_rtm);
+void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, double *g_sph_rlm, double *a_r_1d_rlm_r, int lstack_rlm[], double *g_colat_rtm, int *trunc_lvl);
+void finalizegpu_(); 
+void initDevConstVariables();
 
-void allocMemOnGPU();
+void allocMemOnGPU(double *g_sph_rlm, double *a_r, double *g_colat);
 void deAllocMemOnGPU();
+void deAllocDebugMem();
 void allocHostDebug(Debug*);
 void allocDevDebug(Debug*);
-void cpyDev2Host();
-void writeDebugData(std::ofstream*, double**);
+void cpyDev2Host(Debug*, Debug*);
+void set_spectrum_data_(double *sp_rlm);
+void set_physical_data_(double *vr_rtm);
+void retrieve_spectrum_data_(double *sp_rlm);
+void retrieve_physical_data_(double *vr_rtm);
 
-void doWork(int order, int degree);
-void doWorkDP(int);
-__global__
-void cuSHT(int order, int degree, double *, double *);
+void writeDebugData2File(std::ofstream*, Debug*);
+void cleangpu_();
 
-//__global__
-//void cuSHT1(int order, int degree, int, double **, int, double**, int);
-__global__
-void cuSHT1(int order, int degree, int, double*, double*, double*, double*, double*, double*);
-
-__global__
-void cuSHT_m0(int order, int degree, int, double*, double*, double*, double*, double*, double*);
-
-__global__
-void diffSchmidt(int degree, int theta, double *P_smdt, double *dP_smdt);
-
-__device__
-double cuLGP(int, int, double);
-
-void cleanup_();
+__device__ double nextLGP_m_eq0(int l, double x, double p_0, double p_1);
+__device__ double nextDp_m_eq_0(int l, double lgp_mp);
+__device__ double calculateLGP_m_eq_l(int mode);
+__device__ double calculateLGP_m_eq_lp1(int mode, double x, double lgp_m_eq_l);
+__device__ double calculateLGP_m_l(int m, int degree, double theta, double lgp_0, double lgp_1);
+__device__ double scaleBySine(int l, double lgp, double theta);
+__global__ void transB(double *vr_rtm, const double *sp_rlm, double *g_sph_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm); 
 }

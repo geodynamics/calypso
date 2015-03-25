@@ -54,6 +54,9 @@
       use m_work_4_sph_trans_spin
       use legendre_bwd_trans_org
       use spherical_SRs_N
+#ifdef CUDA
+      use cuda_optimizations
+#endif
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: n_WR, n_WS

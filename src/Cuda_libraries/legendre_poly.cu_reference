@@ -16,7 +16,7 @@
   cudaStream_t streams[32]; 
 
 //Declaring device matrices 
-  Parameters_s deviceInput;
+//  Parameters_s deviceInput;
   
 //Global variables
   Debug h_schmidt, d_schmidt;

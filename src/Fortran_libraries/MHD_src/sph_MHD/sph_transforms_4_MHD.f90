@@ -51,6 +51,9 @@
       use legendre_transform_select
       use pole_sph_transform
       use skip_comment_f
+#ifdef CUDA
+      use cuda_optimizations 
+#endif
 !
       character(len=kchara) :: tmpchara
 !
@@ -118,6 +121,8 @@
           write(tmpchara,'(a)') trim(leg_sym_matprod)
         else if(id_legendre_transfer .eq. iflag_leg_test_loop) then
           write(tmpchara,'(a)') trim(leg_test_loop)
+        else if(id_legendre_transfer .eq. iflag_leg_cuda) then
+          write(tmpchara,'(a)') trim(leg_cuda)
         end if
         call change_2_upper_case(tmpchara)
 !
