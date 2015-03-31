@@ -26,8 +26,8 @@
           call initgpu(nnod_rtp, nnod_rtm, nnod_rlm, nidx_rtm(1),       &
      &                      nidx_rlm(1), istep_rtm(1), istep_rlm(1),    &
      &                      ncomp, g_sph_rlm(1,3), a_r_1d_rlm_r(1),     &
-     &                      lstack_rlm(1), g_colat_rtm(1),            &
-     &                      l_truncation)
+     &                      lstack_rlm(0), g_colat_rtm(1),            &
+     &                      l_truncation, g_sph_rlm(1,3))
         end subroutine initialize_gpu
 
         subroutine legendre_b_trans_vector_cuda                         &
@@ -37,7 +37,15 @@
         real(kind = kreal), intent(inout) :: sp_rlm(ncomp*nnod_rlm)
         real(kind = kreal), intent(inout) :: vr_rtm(ncomp*nnod_rtm)
         
-        integer(kind = kint) :: ip, kst, ked, jst, jed
+#ifdef CUDA_DEBUG
+        integer(kind = kint) :: l, m, j, l_rtm, k_rtm, nd, ip_rtm 
+        integer(kind = kint) :: jst, jed, mp_rlm, j_rlm
+        character(len=5) :: c_rank
+        character(len=30) :: fileName        
+        write(c_rank, '(I5)') my_rank
+#endif 
+
+!        integer(kind = kint) :: ip, kst, ked, jst, jed
 
 !        kst = idx_rtm_smp_stack(ip-1,1) + 1 
 !        ked = idx_rtm_smp_stack(np_smp,1) 
@@ -45,7 +53,48 @@
 !        jed = lstack_rlm(nidx_rtm(3))
 
 !        call transform_b(ncomp, nvector, nscalar, kst, ked, jst, jed) 
-        call transform_b(ncomp, nvector, nscalar, sp_rlm(1)) 
+        call set_spectrum_data(sp_rlm(1))
+        call transform_b(ncomp, nvector, nscalar, vr_rtm(1)) 
+! End of transform, the physical data is copied into vr_rtm
+
+#ifdef CUDA_DEBUG
+       fileName = "bwd_SHT_domainId_"//c_rank//"_base.dat"         
+       open (unit=1, file=fileName, action="write", status="replace")
+       write(1, '(a)') 'order, degree, j, shell, idx_theta, theta,      &
+     &      g_sph_rlm, P_smdt, dP_smdt, vr_rtm[0], vr_rtm[1], vr_rtm[2]'
+
+       do k_rtm = 1, nidx_rtm(1) 
+! l_trncation + 1 is s.t. m==0 and +2 is s.t. m==1
+         do mp_rlm = l_truncation+1, l_truncation+2
+           jst = lstack_rlm(mp_rlm-1) + 1
+           jed = lstack_rlm(mp_rlm)
+           m = mp_rlm - (l_truncation + 1)
+           do l = m, l_truncation
+             j = l*(l+1) + m
+             do l_rtm = 1, nidx_rtm(2) 
+               do nd = 1, nvector
+                 ip_rtm = 3*nd + ncomp*(l_rtm-1)*istep_rtm(2) +         &
+     &            (k_rtm-1)*istep_rtm(1) + (mp_rlm-1)*istep_rtm(3)
+                 do j_rlm = jst, jed
+                   if (m .EQ. 0) then
+                   write(1,'(4i16,1p4E25.15e3)') m, l, j, k_rtm, l_rtm, &
+     &               g_colat_rtm(l_rtm), g_sph_rlm(j_rlm,3),             &
+     &                     P_jl(j_rlm,l_rtm),            &
+     &                   dPdt_jl(j_rlm,l_rtm)                         &
+     &               , vr_rtm(ip_rtm-2), vr_rtm(ip_rtm-1),vr_rtm(ip_rtm)
+                   else if (m .EQ. 1) then
+                   write(1,'(4i16,1p4E25.15e3)') m, l, j, k_rtm, l_rtm, &
+     &               g_colat_rtm(l_rtm), g_sph_rlm(j_rlm,3),            &
+     &                   P_jl(j_rlm,l_rtm)
+                   end if
+                 end do
+               end do
+             end do
+           end do
+         end do
+       end do
+      close(1)
+#endif
 
         end subroutine legendre_b_trans_vector_cuda                     
 

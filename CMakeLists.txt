@@ -42,14 +42,16 @@ ENDIF(HDF5_FOUND AND HDF5_IS_PARALLEL)
 FIND_PACKAGE(CUDA)
 IF (CUDA_FOUND)
   #Adding flags to fortran compiler
-  #Debugging Purposes
   ADD_DEFINITIONS(-DCUDA)
-  ADD_DEFINITIONS(-DCUDA_DEBUG)
+  #Debugging Purposes
+  IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+    ADD_DEFINITIONS(-DCUDA_DEBUG)
+  ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
   INCLUDE_DIRECTORIES(${CUDA_INCLUDE_DIRS})
   #These environment variables are specific to the supercomputers accessed
   # through xsede.
   #SET (CUDA_LIBRARY_FLAGS "-I${CUDA_INCLUDE_DIRS};-L${CUDA_TOOLKIT_ROOT_DIR}/lib64;-lcudart;-lcublas;-lcuda;-lcublas_device;-lcudadevrt")
-  SET (CUDA_LIBRARY_FLAGS "-L${CUDA_TOOLKIT_ROOT_DIR}/lib64;-lcudart;-lcuda;-lcudadevrt;-lcublas;-lcublas_device;-lcurand")
+  SET (CUDA_LIBRARY_FLAGS "-L${CUDA_TOOLKIT_ROOT_DIR}/lib64;-lcudart;-lcuda;-lcudadevrt;-lcublas;-lcublas_device")
 ENDIF(CUDA_FOUND)
 
 #Need to set this s.t when user specifies Degug mode, these flags are set

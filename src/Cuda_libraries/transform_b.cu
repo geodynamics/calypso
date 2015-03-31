@@ -2,7 +2,7 @@
 #include "legendre_poly.h"
 #include "math_functions.h"
 #include "math_constants.h"
-#include <math.h>
+#include <sstream>
 
 __device__
 double nextLGP_m_eq0(int l, double x, double p_0, double p_1) {
@@ -44,7 +44,7 @@ double scaleBySine(int l, double lgp, double theta) {
 }
 
 __global__
-void transB(double *vr_rtm, const double* __restrict__ sp_rlm, double *g_sph_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm) {
+void transB(double *vr_rtm, const double* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm) {
   unsigned int id = threadIdx.x;
   // The work is parallelized over theta within a grid
   int nTheta = devConstants.nidx_rtm[1];
@@ -238,8 +238,105 @@ void transB(double *vr_rtm, const double* __restrict__ sp_rlm, double *g_sph_rlm
 
 }
 
-void transform_b_(int *ncomp, int *nvector, int *nscalar, double *sp_rlm) {
+__global__
+void transB(double *vr_rtm, const double* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, int *lstack_rlm) {
+  unsigned int id = threadIdx.x;
+  // The work is parallelized over theta within a grid
+  int nTheta = devConstants.nidx_rtm[1];
+  unsigned int workLoad = nTheta/(blockDim.x);
+  if( nTheta%blockDim.x > (threadIdx.x)) 
+    workLoad++;
 
+  int order=0, deg=0, j[3]={0,0,0};
+  int jst=0, jed=0; 
+  // P(m,m)[cos theta]
+  
+// **** Memory needs to be freed at the end of the function
+  double *p_mn_l_0 = (double*) malloc (workLoad * 8);
+  double *p_mn_l_1 = (double*) malloc (workLoad * 8);
+  double *p_m_l_0 = (double*) malloc (workLoad * 8);
+  double *p_m_l_1 = (double*) malloc (workLoad * 8);
+  double *p_mp_l_0 = (double*) malloc (workLoad * 8);
+  double *p_mp_l_1 = (double*) malloc (workLoad * 8);
+  double *dp_m_l_0 = (double*) malloc (workLoad * 8);
+  double *dp_m_l_1 = (double*) malloc (workLoad * 8);
+ 
+  double x=1, theta=0;
+// 3 for m-1, m, m+1
+  unsigned int idx[3] = {0,0,0}, idx_rtm[3] = {0,0,0};
+  double reg1, reg2, reg3;
+
+  double *vr_reg = (double*) malloc (3*sizeof(double)*devConstants.nvector);
+
+  int l;
+  //base case, m=0,1 l=0...t_lvl
+  for(int i=0; i<workLoad; i++) {
+    theta = g_colat_rtm[threadIdx.x + i*blockDim.x];
+    x = cos(theta);
+    memset(vr_reg, 0, 3*devConstants.nvector);
+    // m=0, l=0 && m=0, l=1
+    g_sph_rlm[0] = 0;
+    P_smdt[(i*blockDim.x + id) + 0*(nTheta)] = p_m_l_0[i*blockDim.x + id] = 1;
+    p_m_l_1[i*blockDim.x + id] = x;
+    // m=1, l=1 && m=1, l=2
+    g_sph_rlm[3] = 3;
+    P_smdt[(i*blockDim.x + id) + 3*(nTheta)] = p_mp_l_0[i*blockDim.x + id] = calculateLGP_m_eq_l(1);
+    p_mp_l_1[i*blockDim.x + id] = calculateLGP_m_eq_lp1(1, x, p_mp_l_0[i*blockDim.x + id]);
+    // m=0, l=0 && m=0, l=1
+    dP_smdt[(i*blockDim.x + id) + 0*(nTheta)] = dp_m_l_0[i*blockDim.x + id] = 0;
+    dp_m_l_1[i*blockDim.x + id] = nextDp_m_eq_0(1, scaleBySine(1, p_mp_l_0[i*blockDim.x + id], theta));
+
+    jst = lstack_rlm[devConstants.t_lvl] + 1;
+    jed = lstack_rlm[devConstants.t_lvl+1];
+    
+    for(int j_rlm=jst, l=order; j_rlm<=jed; j_rlm++, l++) {
+      idx[1] = devConstants.ncomp * (j_rlm * devConstants.istep_rlm[1] + blockIdx.x * devConstants.istep_rlm[0]); 
+      for(int t=1; t<=devConstants.nvector; t++) {
+        idx[1] += 3;
+        vr_reg[t*3 - 3] += sp_rlm[idx[1] - 1] * a_r_1d_rlm_r[blockIdx.x] * p_m_l_0[blockIdx.x*i + id] * g_sph_rlm[j_rlm-1];    
+        vr_reg[t*3 - 2] += sp_rlm[idx[1] - 2]  * a_r_1d_rlm_r[blockIdx.x] * dp_m_l_0[blockIdx.x*i + id];    
+        vr_reg[t*3 - 1] -= sp_rlm[idx[1] - 3] * a_r_1d_rlm_r[blockIdx.x] * a_r_1d_rlm_r[blockIdx.x] * dp_m_l_0[blockIdx.x*i + id];    
+      }
+
+      reg1 = nextLGP_m_eq0(l+2, x, p_m_l_0[i*blockDim.x + id], p_m_l_1[i*blockDim.x + id]); 
+      j[0] = (l+1)*(l+2) + 0;
+      g_sph_rlm[j[0]] = j[0];
+      //P_smdt is set to be nTheta x nJ
+      P_smdt[(i*blockDim.x + id) + j[0]*nTheta] = p_m_l_0[i*blockDim.x + id] = p_m_l_1[blockDim.x + id];
+      p_m_l_1[i*blockDim.x + id] = reg1;
+
+      reg2 = calculateLGP_m_l(1, l+3, theta, p_mp_l_0[blockIdx.x + id], p_mp_l_1[blockIdx.x + id]);
+      j[0] = (l+1)*(l+2) + 1;
+      P_smdt[(i*blockDim.x + id) + j[0]*(nTheta)] = p_mp_l_0[i*blockDim.x + id] = p_mp_l_1[blockIdx.x + id];
+      p_mp_l_1[i*blockDim.x + id] = reg2;
+   
+      j[0] = (l+1)*(l+2) + 0;
+      dP_smdt[(i*blockDim.x + id) + j[0]*(nTheta)] = dp_m_l_0[i*blockDim.x + id] = dp_m_l_1[i*blockDim.x + id];
+      dp_m_l_1[i*blockDim.x + id] = nextDp_m_eq_0(1, scaleBySine(l+2, p_mp_l_0[i*blockDim.x + id], theta));
+        
+    }
+    
+    idx_rtm[0] = devConstants.ncomp * ((threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0] + ((devConstants.t_lvl + 1)-1) * devConstants.istep_rtm[2]); 
+    for(int t=1; t<=devConstants.nvector; t++) {
+      idx_rtm[0] += 3;
+      vr_rtm[idx_rtm[0] - 2 - 1]  += vr_reg[t*3 - 3]; 
+      vr_rtm[idx_rtm[0] - 1 - 1]  += vr_reg[t*3 - 2]; 
+      vr_rtm[idx_rtm[0] - 1]  += vr_reg[t*3 - 1]; 
+    }
+  }     
+   
+  free(p_mn_l_0);
+  free(p_mn_l_1);
+  free(p_m_l_0);
+  free(p_m_l_1);
+  free(p_mp_l_0);
+  free(p_mp_l_1);
+  free(dp_m_l_0);
+  free(dp_m_l_1);
+}
+
+void transform_b_(int *ncomp, int *nvector, int *nscalar, double *vr_rtm) {
+  
 //  static int nShells = *ked - *kst + 1;
   static int nShells = constants.nidx_rtm[0];
   static int nTheta = constants.nidx_rtm[1];
@@ -247,27 +344,48 @@ void transform_b_(int *ncomp, int *nvector, int *nscalar, double *sp_rlm) {
   constants.ncomp = *ncomp; 
   constants.nscalar = *nscalar;
   constants.nvector = *nvector;
- 
+
   initDevConstVariables();
-  cudaErrorCheck(cudaMemcpy(deviceInput.sp_rlm, sp_rlm, constants.nnod_rlm*constants.ncomp*sizeof(double), cudaMemcpyHostToDevice));
 
   dim3 grid(nShells, 1);
   dim3 block(32,1,1);  
   // Current: 0 = vr_rtm, 1 = sp_rlm, 2 = g_sph_rlm, 3 = a_r_1d_rlm_r
 
   double iTime, fTime;
+
+#ifdef CUDA_DEBUG  
+  countBT++;
+  std::ostringstream cvrt;
+  cvrt.clear();
+  cvrt << countBT;
+  std::string fileName = "backwardSHT_" + cvrt.str() + ".dat";      
+  std::ofstream data(fileName.c_str());
+  data.precision(16);
+#endif
+
   iTime = MPI_Wtime();
 #ifdef CUDA_DEBUG  
-  transB<<<grid, block>>> (deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.g_sph_rlm, deviceInput.a_r_1d_rlm_r, deviceInput.g_colat_rtm, d_debug.P_smdt, d_debug.dP_smdt);
+  transB<<<grid, block>>> (deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.a_r_1d_rlm_r, deviceInput.g_colat_rtm, d_debug.P_smdt, d_debug.dP_smdt, deviceInput.g_sph_rlm, deviceInput.lstack_rlm);
   cudaErrorCheck(cudaDeviceSynchronize());
-  
 #else
-  transB<<<grid, block>>> (deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.g_sph_rlm, deviceInput.a_r_1d_rlm_r, deviceInput.g_colat_rtm)
+  transB<<<grid, block>>> (deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.a_r_1d_rlm_r, deviceInput.g_colat_rtm)
+  cudaErrorCheck(cudaDeviceSynchronize());
 #endif 
   fTime = MPI_Wtime();
  
-  //******* Left at this point 
-  //cout <<  
+  *clockD << "Backward Transform Time for iteration # " << countBT << " took " << fTime-iTime << std::endl;
 
+  iTime = MPI_Wtime();
+  set_physical_data_(vr_rtm); 
+  cudaErrorCheck(cudaDeviceSynchronize());
+  fTime = MPI_Wtime();
+  *clockD << "Time to copy results of backward SHT from dev to host is " << fTime-iTime << std::endl;
+
+#ifdef CUDA_DEBUG
+  cpyDev2Host(&d_debug, &h_debug); 
+  h_debug.vr_rtm = vr_rtm;
+  writeDebugData2File(&data, &h_debug);
+  data.close();
+#endif
 }
 

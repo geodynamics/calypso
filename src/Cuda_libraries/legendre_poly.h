@@ -2,13 +2,11 @@
 
 #include <cstdlib>
 #include "helper_cuda.h"
-#include <cufft.h>
-#include <curand.h>
 #include <string>
 #include <math.h>
 #include "cuda.h"
-#include <iostream>
 #include <fstream>
+#include <mpi.h>
 
 #define ARGC 3 
 
@@ -58,26 +56,34 @@ typedef struct
 {
   // OLD: 0 = g_point_med, 1 =  double* g_colat_med, 2 = double* weight_med;
   // Current: 0 = vr_rtm,  = g_sph_rlm
-  double *vr_rtm, *g_sph_rlm, *g_colat_rtm;
+  double *vr_rtm, *g_colat_rtm, *g_sph_rlm;
   double *sp_rlm;
   double *a_r_1d_rlm_r; //Might be pssible to copy straight to constant memory
+  int *lstack_rlm;
 } Parameters_s;
 
 typedef struct 
 {
   double *P_smdt; 
-  double *dp_smdt;
+  double *dP_smdt;
+  double *g_sph_rlm;
+#ifdef CUDA_DEBUG
   double *g_colat_rtm;
+  double *vr_rtm;
+  int *lstack_rlm;
+#endif
 } Debug;
 
 extern Parameters_s deviceInput;
-extern Debug h_schmidt, d_schmidt;
+extern Debug h_debug, d_debug;
 extern Geometry_c constants;
 
-//What is the best method to do this?
 //FileStreams: For debugging and Timing
 //D for debug
-extern ofStream clockD, dataD;
+extern std::ofstream *clockD;
+
+// Counters for forward and backward Transform
+extern double countFT, countBT;
 
 /*
  *   Set of variables that take advantage of constant memory.
@@ -91,11 +97,11 @@ extern __constant__ Geometry_c devConstants;
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" {
 
-void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, double *g_sph_rlm, double *a_r_1d_rlm_r, int lstack_rlm[], double *g_colat_rtm, int *trunc_lvl);
+void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, double *a_r_1d_rlm_r, int lstack_rlm[], double *g_colat_rtm, int *trunc_lvl, double *g_sph_rlm);
 void finalizegpu_(); 
 void initDevConstVariables();
 
-void allocMemOnGPU(double *g_sph_rlm, double *a_r, double *g_colat);
+void allocMemOnGPU(int *lstack_rlm, double *a_r, double *g_colat, double *g_sph_rlm);
 void deAllocMemOnGPU();
 void deAllocDebugMem();
 void allocHostDebug(Debug*);
@@ -115,5 +121,7 @@ __device__ double calculateLGP_m_eq_l(int mode);
 __device__ double calculateLGP_m_eq_lp1(int mode, double x, double lgp_m_eq_l);
 __device__ double calculateLGP_m_l(int m, int degree, double theta, double lgp_0, double lgp_1);
 __device__ double scaleBySine(int l, double lgp, double theta);
-__global__ void transB(double *vr_rtm, const double *sp_rlm, double *g_sph_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm); 
 }
+
+__global__ void transB(double *vr_rtm, const double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm); 
+__global__ void transB(double *vr_rtm, const double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *lstack_rlm); 
