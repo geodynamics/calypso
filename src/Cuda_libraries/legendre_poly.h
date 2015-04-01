@@ -28,10 +28,10 @@ extern "C" {
 
 //Fortran Variables
 typedef struct {
-  int *nidx_rtm;
-  int *nidx_rlm;
-  int *istep_rtm;
-  int *istep_rlm;
+  int nidx_rtm[3];
+  int nidx_rlm[2];
+  int istep_rtm[3];
+  int istep_rlm[2];
   int nnod_rtp;
   int nnod_rlm;
   int nnod_rtm;
@@ -80,7 +80,7 @@ extern Geometry_c constants;
 
 //FileStreams: For debugging and Timing
 //D for debug
-extern std::ofstream *clockD;
+extern std::ofstream clockD;
 
 // Counters for forward and backward Transform
 extern double countFT, countBT;
@@ -97,11 +97,13 @@ extern __constant__ Geometry_c devConstants;
 ////////////////////////////////////////////////////////////////////////////////
 extern "C" {
 
-void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, double *a_r_1d_rlm_r, int lstack_rlm[], double *g_colat_rtm, int *trunc_lvl, double *g_sph_rlm);
+//void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, double *a_r_1d_rlm_r, int lstack_rlm[], double *g_colat_rtm, int *trunc_lvl, double *g_sph_rlm);
+void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, int *t_lvl);
 void finalizegpu_(); 
 void initDevConstVariables();
 
-void allocMemOnGPU(int *lstack_rlm, double *a_r, double *g_colat, double *g_sph_rlm);
+void allocMemOnGPU();
+void memcpy_h2d_(int *lstack_rlm, double *a_r, double *g_colat, double *g_sph_rlm);
 void deAllocMemOnGPU();
 void deAllocDebugMem();
 void allocHostDebug(Debug*);
@@ -112,7 +114,7 @@ void set_physical_data_(double *vr_rtm);
 void retrieve_spectrum_data_(double *sp_rlm);
 void retrieve_physical_data_(double *vr_rtm);
 
-void writeDebugData2File(std::ofstream*, Debug*);
+void writeDebugData2File(Debug*, std::string);
 void cleangpu_();
 
 __device__ double nextLGP_m_eq0(int l, double x, double p_0, double p_1);
@@ -123,5 +125,5 @@ __device__ double calculateLGP_m_l(int m, int degree, double theta, double lgp_0
 __device__ double scaleBySine(int l, double lgp, double theta);
 }
 
-__global__ void transB(double *vr_rtm, const double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm); 
 __global__ void transB(double *vr_rtm, const double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *lstack_rlm); 
+__global__ void transB(double *vr_rtm, const double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm); 

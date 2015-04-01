@@ -69,7 +69,8 @@
      &     (ncomp, nvector, nscalar, sp_rlm_wk(1), vr_rtm_wk(1))
       end if
 
-      call cpy_physical_dat_from_gpu(ncomp, vr_rtm_wk(1))
+!Copying the data wihtin trans_b function
+!      call cpy_physical_dat_from_gpu(ncomp, vr_rtm_wk(1))
 !
       call finish_send_recv_rj_2_rlm
       call calypso_rtm_to_send_N(ncomp, n_WS, vr_rtm_wk(1), WS(1))

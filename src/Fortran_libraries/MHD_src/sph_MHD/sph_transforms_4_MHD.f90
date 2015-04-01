@@ -52,7 +52,7 @@
       use pole_sph_transform
       use skip_comment_f
 #ifdef CUDA
-      use cuda_optimizations 
+      use cuda_optimizations
 #endif
 !
       character(len=kchara) :: tmpchara
@@ -93,6 +93,10 @@
 !
       call sel_init_legendre_trans                                      &
      &    (ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+!
+#ifdef CUDA
+      call set_mem_4_gpu
+#endif      
 !
       if(my_rank .ne. 0) return
         if     (id_legendre_transfer .eq. iflag_leg_orginal_loop) then

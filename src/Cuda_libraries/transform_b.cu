@@ -239,7 +239,7 @@ void transB(double *vr_rtm, const double* __restrict__ sp_rlm, double *a_r_1d_rl
 }
 
 __global__
-void transB(double *vr_rtm, const double* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, int *lstack_rlm) {
+void transB(double *vr_rtm, double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, int *lstack_rlm) {
   unsigned int id = threadIdx.x;
   // The work is parallelized over theta within a grid
   int nTheta = devConstants.nidx_rtm[1];
@@ -273,13 +273,12 @@ void transB(double *vr_rtm, const double* __restrict__ sp_rlm, double *a_r_1d_rl
   for(int i=0; i<workLoad; i++) {
     theta = g_colat_rtm[threadIdx.x + i*blockDim.x];
     x = cos(theta);
-    memset(vr_reg, 0, 3*devConstants.nvector);
+    for(int rt=0; rt<3*devConstants.nvector;rt++)
+      vr_reg[rt]=0;
     // m=0, l=0 && m=0, l=1
-    g_sph_rlm[0] = 0;
     P_smdt[(i*blockDim.x + id) + 0*(nTheta)] = p_m_l_0[i*blockDim.x + id] = 1;
     p_m_l_1[i*blockDim.x + id] = x;
     // m=1, l=1 && m=1, l=2
-    g_sph_rlm[3] = 3;
     P_smdt[(i*blockDim.x + id) + 3*(nTheta)] = p_mp_l_0[i*blockDim.x + id] = calculateLGP_m_eq_l(1);
     p_mp_l_1[i*blockDim.x + id] = calculateLGP_m_eq_lp1(1, x, p_mp_l_0[i*blockDim.x + id]);
     // m=0, l=0 && m=0, l=1
@@ -300,7 +299,6 @@ void transB(double *vr_rtm, const double* __restrict__ sp_rlm, double *a_r_1d_rl
 
       reg1 = nextLGP_m_eq0(l+2, x, p_m_l_0[i*blockDim.x + id], p_m_l_1[i*blockDim.x + id]); 
       j[0] = (l+1)*(l+2) + 0;
-      g_sph_rlm[j[0]] = j[0];
       //P_smdt is set to be nTheta x nJ
       P_smdt[(i*blockDim.x + id) + j[0]*nTheta] = p_m_l_0[i*blockDim.x + id] = p_m_l_1[blockDim.x + id];
       p_m_l_1[i*blockDim.x + id] = reg1;
@@ -333,6 +331,7 @@ void transB(double *vr_rtm, const double* __restrict__ sp_rlm, double *a_r_1d_rl
   free(p_mp_l_1);
   free(dp_m_l_0);
   free(dp_m_l_1);
+  free(vr_reg);
 }
 
 void transform_b_(int *ncomp, int *nvector, int *nscalar, double *vr_rtm) {
@@ -346,9 +345,9 @@ void transform_b_(int *ncomp, int *nvector, int *nscalar, double *vr_rtm) {
   constants.nvector = *nvector;
 
   initDevConstVariables();
-
+   
   dim3 grid(nShells, 1);
-  dim3 block(32,1,1);  
+  dim3 block(1,1,1);  
   // Current: 0 = vr_rtm, 1 = sp_rlm, 2 = g_sph_rlm, 3 = a_r_1d_rlm_r
 
   double iTime, fTime;
@@ -359,8 +358,6 @@ void transform_b_(int *ncomp, int *nvector, int *nscalar, double *vr_rtm) {
   cvrt.clear();
   cvrt << countBT;
   std::string fileName = "backwardSHT_" + cvrt.str() + ".dat";      
-  std::ofstream data(fileName.c_str());
-  data.precision(16);
 #endif
 
   iTime = MPI_Wtime();
@@ -373,19 +370,18 @@ void transform_b_(int *ncomp, int *nvector, int *nscalar, double *vr_rtm) {
 #endif 
   fTime = MPI_Wtime();
  
-  *clockD << "Backward Transform Time for iteration # " << countBT << " took " << fTime-iTime << std::endl;
+  clockD << "Backward Transform Time for iteration # " << countBT << " took " << fTime-iTime << std::endl;
 
   iTime = MPI_Wtime();
   set_physical_data_(vr_rtm); 
   cudaErrorCheck(cudaDeviceSynchronize());
   fTime = MPI_Wtime();
-  *clockD << "Time to copy results of backward SHT from dev to host is " << fTime-iTime << std::endl;
+  clockD << "Time to copy results of backward SHT from dev to host is " << fTime-iTime << std::endl;
 
 #ifdef CUDA_DEBUG
   cpyDev2Host(&d_debug, &h_debug); 
   h_debug.vr_rtm = vr_rtm;
-  writeDebugData2File(&data, &h_debug);
-  data.close();
+  writeDebugData2File(&h_debug, fileName);
 #endif
 }
 

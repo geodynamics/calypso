@@ -16,19 +16,23 @@
         use merge_polidal_toroidal_v
         use spherical_SRs_N
         use const_coriolis_sph_rlm
-       
+        use legendre_bwd_trans_org
+
         implicit none
   
         contains
       
-        subroutine initialize_gpu(ncomp)
+        subroutine alloc_mem_4_gpu(ncomp)
         integer(kind = kint), intent(in) :: ncomp
           call initgpu(nnod_rtp, nnod_rtm, nnod_rlm, nidx_rtm(1),       &
      &                      nidx_rlm(1), istep_rtm(1), istep_rlm(1),    &
-     &                      ncomp, g_sph_rlm(1,3), a_r_1d_rlm_r(1),     &
-     &                      lstack_rlm(0), g_colat_rtm(1),            &
-     &                      l_truncation, g_sph_rlm(1,3))
-        end subroutine initialize_gpu
+     &                      ncomp, l_truncation)
+        end subroutine alloc_mem_4_gpu
+
+        subroutine set_mem_4_gpu
+          call memcpy_h2d(lstack_rlm(0), a_r_1d_rlm_r(1),g_colat_rtm(1),&
+     &                         g_sph_rlm(1,3))
+        end subroutine set_mem_4_gpu
 
         subroutine legendre_b_trans_vector_cuda                         &
      &         (ncomp, nvector, nscalar, sp_rlm, vr_rtm)
@@ -41,8 +45,8 @@
         integer(kind = kint) :: l, m, j, l_rtm, k_rtm, nd, ip_rtm 
         integer(kind = kint) :: jst, jed, mp_rlm, j_rlm
         character(len=5) :: c_rank
-        character(len=30) :: fileName        
-        write(c_rank, '(I5)') my_rank
+        character(len=35) :: fileName        
+        write(c_rank, '(I1)') my_rank
 #endif 
 
 !        integer(kind = kint) :: ip, kst, ked, jst, jed
@@ -53,11 +57,12 @@
 !        jed = lstack_rlm(nidx_rtm(3))
 
 !        call transform_b(ncomp, nvector, nscalar, kst, ked, jst, jed) 
-        call set_spectrum_data(sp_rlm(1))
         call transform_b(ncomp, nvector, nscalar, vr_rtm(1)) 
 ! End of transform, the physical data is copied into vr_rtm
 
 #ifdef CUDA_DEBUG
+       call legendre_b_trans_vector_org(ncomp, nvector, sp_rlm, vr_rtm)
+
        fileName = "bwd_SHT_domainId_"//c_rank//"_base.dat"         
        open (unit=1, file=fileName, action="write", status="replace")
        write(1, '(a)') 'order, degree, j, shell, idx_theta, theta,      &
@@ -77,13 +82,13 @@
      &            (k_rtm-1)*istep_rtm(1) + (mp_rlm-1)*istep_rtm(3)
                  do j_rlm = jst, jed
                    if (m .EQ. 0) then
-                   write(1,'(4i16,1p4E25.15e3)') m, l, j, k_rtm, l_rtm, &
+                   write(1,*) m, l, j, k_rtm, l_rtm, &
      &               g_colat_rtm(l_rtm), g_sph_rlm(j_rlm,3),             &
      &                     P_jl(j_rlm,l_rtm),            &
      &                   dPdt_jl(j_rlm,l_rtm)                         &
      &               , vr_rtm(ip_rtm-2), vr_rtm(ip_rtm-1),vr_rtm(ip_rtm)
                    else if (m .EQ. 1) then
-                   write(1,'(4i16,1p4E25.15e3)') m, l, j, k_rtm, l_rtm, &
+                   write(1,*) m, l, j, k_rtm, l_rtm, &
      &               g_colat_rtm(l_rtm), g_sph_rlm(j_rlm,3),            &
      &                   P_jl(j_rlm,l_rtm)
                    end if
@@ -94,6 +99,7 @@
          end do
        end do
       close(1)
+      stop
 #endif
 
         end subroutine legendre_b_trans_vector_cuda                     

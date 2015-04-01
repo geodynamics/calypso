@@ -241,7 +241,7 @@
 #ifdef CUDA
       else if(id_legendre_transfer .eq. iflag_leg_cuda) then
         call allocate_work_sph_trans(ncomp)
-        call initialize_gpu(ncomp)
+        call alloc_mem_4_gpu(ncomp)
 #endif
       else
         call allocate_work_sph_trans(ncomp)
