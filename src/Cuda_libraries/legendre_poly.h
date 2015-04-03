@@ -71,6 +71,8 @@ typedef struct
   double *g_colat_rtm;
   double *vr_rtm;
   int *lstack_rlm;
+// Dim: jx3
+  int *idx_gl_1d_rlm_j;
 #endif
 } Debug;
 
@@ -99,6 +101,7 @@ extern "C" {
 
 //void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, double *a_r_1d_rlm_r, int lstack_rlm[], double *g_colat_rtm, int *trunc_lvl, double *g_sph_rlm);
 void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, int *t_lvl);
+void setptrs_(int *idx_gl_1d_rlm_j);
 void finalizegpu_(); 
 void initDevConstVariables();
 
@@ -120,7 +123,7 @@ void cleangpu_();
 __device__ double nextLGP_m_eq0(int l, double x, double p_0, double p_1);
 __device__ double nextDp_m_eq_0(int l, double lgp_mp);
 __device__ double calculateLGP_m_eq_l(int mode);
-__device__ double calculateLGP_m_eq_lp1(int mode, double x, double lgp_m_eq_l);
+__device__ double calculateLGP_mp1_eq_l(int mode, double x, double lgp_m_eq_l);
 __device__ double calculateLGP_m_l(int m, int degree, double theta, double lgp_0, double lgp_1);
 __device__ double scaleBySine(int l, double lgp, double theta);
 }

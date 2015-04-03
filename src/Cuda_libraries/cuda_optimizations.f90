@@ -27,6 +27,9 @@
           call initgpu(nnod_rtp, nnod_rtm, nnod_rlm, nidx_rtm(1),       &
      &                      nidx_rlm(1), istep_rtm(1), istep_rlm(1),    &
      &                      ncomp, l_truncation)
+#ifdef CUDA_DEBUG
+          call setptrs(idx_gl_1d_rlm_j(1,1))
+#endif
         end subroutine alloc_mem_4_gpu
 
         subroutine set_mem_4_gpu
@@ -65,7 +68,7 @@
 
        fileName = "bwd_SHT_domainId_"//c_rank//"_base.dat"         
        open (unit=1, file=fileName, action="write", status="replace")
-       write(1, '(a)') 'order, degree, j, shell, idx_theta, theta,      &
+       write(1, '(a)') 'shell,theta, vector,order, degree,      &
      &      g_sph_rlm, P_smdt, dP_smdt, vr_rtm[0], vr_rtm[1], vr_rtm[2]'
 
        do k_rtm = 1, nidx_rtm(1) 
@@ -73,31 +76,29 @@
          do mp_rlm = l_truncation+1, l_truncation+2
            jst = lstack_rlm(mp_rlm-1) + 1
            jed = lstack_rlm(mp_rlm)
-           m = mp_rlm - (l_truncation + 1)
-           do l = m, l_truncation
-             j = l*(l+1) + m
-             do l_rtm = 1, nidx_rtm(2) 
-               do nd = 1, nvector
-                 ip_rtm = 3*nd + ncomp*(l_rtm-1)*istep_rtm(2) +         &
+           do l_rtm = 1, nidx_rtm(2) 
+             do nd = 1, nvector
+               ip_rtm = 3*nd + ncomp*(l_rtm-1)*istep_rtm(2) +         &
      &            (k_rtm-1)*istep_rtm(1) + (mp_rlm-1)*istep_rtm(3)
                  do j_rlm = jst, jed
+                   m = idx_gl_1d_rlm_j(j_rlm,3)
+                   l = idx_gl_1d_rlm_j(j_rlm,2)
                    if (m .EQ. 0) then
-                   write(1,*) m, l, j, k_rtm, l_rtm, &
-     &               g_colat_rtm(l_rtm), g_sph_rlm(j_rlm,3),             &
+                   write(1,*) k_rtm, g_colat_rtm(l_rtm), nd, m, l,  &
+     &               g_sph_rlm(j_rlm,3),             &
      &                     P_jl(j_rlm,l_rtm),            &
      &                   dPdt_jl(j_rlm,l_rtm)                         &
      &               , vr_rtm(ip_rtm-2), vr_rtm(ip_rtm-1),vr_rtm(ip_rtm)
                    else if (m .EQ. 1) then
-                   write(1,*) m, l, j, k_rtm, l_rtm, &
-     &               g_colat_rtm(l_rtm), g_sph_rlm(j_rlm,3),            &
-     &                   P_jl(j_rlm,l_rtm)
+                   write(1,*) k_rtm, g_colat_rtm(l_rtm), nd, m, l,  &
+     &               g_sph_rlm(j_rlm,3),             &
+     &                     P_jl(j_rlm,l_rtm)
                    end if
                  end do
                end do
              end do
            end do
          end do
-       end do
       close(1)
       stop
 #endif

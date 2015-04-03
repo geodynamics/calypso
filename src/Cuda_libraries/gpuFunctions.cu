@@ -59,6 +59,10 @@ void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int n
   cudaErrorCheck(cudaDeviceSetCacheConfig(cudaFuncCachePreferEqual));
 }
 
+void setptrs_(int *idx_gl_1d_rlm_j) {
+  h_debug.idx_gl_1d_rlm_j = idx_gl_1d_rlm_j;
+}
+
 void allocMemOnGPU() {
   // Current: 0 = vr_rtm, 1 = sp_rlm, 2 = g_sph_rlm 
   int ncomp = constants.ncomp;
@@ -94,7 +98,9 @@ void allocHostDebug(Debug* h_data) {
  
 void allocDevDebug(Debug* d_data) {
   cudaErrorCheck(cudaMalloc((void**)&(d_data->P_smdt), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
+  cudaErrorCheck(cudaMemset(d_data->P_smdt, -1, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
   cudaErrorCheck(cudaMalloc((void**)&(d_data->dP_smdt), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
+  cudaErrorCheck(cudaMemset(d_data->dP_smdt, -1, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
 //  cudaErrorCheck(cudaMalloc((void**)&(d_data->g_sph_rlm), sizeof(double)*constants.nidx_rlm[1]));
 }
 
@@ -110,31 +116,35 @@ void writeDebugData2File(Debug *data, std::string fileName) {
   fp.open(fileName.c_str(), std::ofstream::out);
   fp.precision(16);
   //Header for file
-  fp << "order\tdegree\tj\tshell\tidx_theta\ttheta\tg_sph_rlm\tP_smdt\tdP_smdt\tvr_rtm[0]\tvr_rtm[1]\tvr_rtm[2]\n"; 
+  fp << "shell\ttheta\tvector\torder\tdegree\tg_sph_rlm\tP_smdt\tdP_smdt\tvr_rtm[0]\tvr_rtm[1]\tvr_rtm[2]\n"; 
 
- int idx_vr_rtm, jst, jed, m, j;
+ int idx_vr_rtm, jst, jed, m, j, l;
+ int *ptr;
  for(int k=0; k<constants.nidx_rtm[0]; k++){ 
    for(int mp_rlm=constants.t_lvl+1; mp_rlm<=constants.t_lvl+2; mp_rlm++) {
      jst = data->lstack_rlm[mp_rlm-1] + 1;
      jed = data->lstack_rlm[mp_rlm];
-     m = mp_rlm - (constants.t_lvl+1);
-     for(int l=m; l<=constants.t_lvl; l++) {
-        j = l*(l+1) + m; 
-        for(int l_rtm=0; l_rtm<constants.nidx_rtm[1]; l_rtm++) {
-          for(int nd=1; nd <= constants.nvector; nd++) {
-            idx_vr_rtm = (3*nd-1) + constants.ncomp*(l_rtm)*constants.istep_rtm[1] + k*constants.istep_rtm[0] + (mp_rlm-1)*constants.istep_rtm[2];
-            for(int j_rlm=jst; j_rlm<=jed; j_rlm++) {
-            if(m==0) { 
-              fp << m << "\t" << l << "\t" << j << "\t" << k+1 << "\t" << l_rtm+1 << "\t" << data->g_colat_rtm[l_rtm];
-              fp << "\t" << data->g_sph_rlm[j_rlm];
-              fp << "\t" << data->P_smdt[l_rtm + constants.nidx_rtm[1]*j] << "\t" << data->dP_smdt[l_rtm + constants.nidx_rtm[1]*j];
-              fp << "\t" << data->vr_rtm[idx_vr_rtm-2];
-              fp << "\t" << data->vr_rtm[idx_vr_rtm-1];
-              fp << "\t" << data->vr_rtm[idx_vr_rtm] << "\n"; 
-             }
-            else if(m==1)
-              fp << m << "\t" << l << "\t" << j << "\t" << k+1 << "\t" << l_rtm+1 << "\t" << data->g_colat_rtm[l_rtm] << "\t" << data->g_sph_rlm[j_rlm] << "\t" << data->P_smdt[l_rtm + constants.nidx_rtm[1]*j] << "\t" << "\t" << "\t" << "\n"; 
-           }
+     for(int l_rtm=0; l_rtm<constants.nidx_rtm[1]; l_rtm++) {
+       for(int nd=1; nd <= constants.nvector; nd++) {
+         idx_vr_rtm = (3*nd-1) + constants.ncomp*(l_rtm)*constants.istep_rtm[1] + k*constants.istep_rtm[0] + (mp_rlm-1)*constants.istep_rtm[2];
+         for(int j_rlm=jst; j_rlm<=jed; j_rlm++) {
+           ptr = data->idx_gl_1d_rlm_j;
+           m = *(ptr + (j_rlm-1 + constants.nidx_rlm[1]*2));
+           l = *(ptr + (j_rlm-1 + constants.nidx_rlm[1]*1));
+           j = l*(l+1) + m;
+           if(m==0) { 
+             fp << k+1 << "\t" << data->g_colat_rtm[l_rtm] << "\t" << nd << "\t" << m << "\t" << l;
+             fp << "\t" << data->g_sph_rlm[j_rlm-1];
+             fp << "\t" << data->P_smdt[l_rtm*constants.nidx_rlm[1]+j] << "\t" << data->dP_smdt[l_rtm*constants.nidx_rlm[1]+j];
+             fp << "\t" << data->vr_rtm[idx_vr_rtm-2];
+             fp << "\t" << data->vr_rtm[idx_vr_rtm-1];
+             fp << "\t" << data->vr_rtm[idx_vr_rtm] << "\n"; 
+            }
+            else if(m==1) {
+             fp << k+1 << "\t" << data->g_colat_rtm[l_rtm] << "\t" << nd << "\t" << m << "\t" << l;
+             fp << "\t" << data->g_sph_rlm[j_rlm];
+             fp << "\t" << data->P_smdt[l_rtm*constants.nidx_rlm[1]+j] << "\n";
+            }
          }
        }
       }
