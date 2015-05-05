@@ -47,6 +47,7 @@
       use spherical_SRs_N
       use cuda_optimizations
       use legendre_bwd_trans_org 
+      use calypso_mpi
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: n_WR, n_WS
@@ -57,21 +58,53 @@
       call calypso_rlm_from_recv_N(ncomp, n_WR, WR, sp_rlm_wk(1))
       call clear_bwd_legendre_work(ncomp)
 !
-     
+#if defined(CUDA_TIMINGS)
+        call start_eleps_time(57) 
+#endif
       call cpy_spectrum_dat_2_gpu(ncomp, sp_rlm_wk(1)) 
+#if defined(CUDA_TIMINGS)
+        call end_eleps_time(57) 
+#endif
 
       if(nvector .gt. 0) then
-        call legendre_b_trans_vector_cuda                                &
-     &     (ncomp, nvector, nscalar, sp_rlm_wk(1), vr_rtm_wk(1))
+#if defined(CUDA_TIMINGS)
+          call start_eleps_time(59) 
+#endif
+        call legendre_b_trans_vector_cuda(ncomp, nvector, nscalar)
+#if defined(CUDA_TIMINGS)
+          call end_eleps_time(59) 
+#endif
+#if defined(CUDA_DEBUG) || defined(CHECK_SCHMIDT_OTF)
+          call legendre_b_trans_vector_org(ncomp, nvector, sp_rlm_wk(1) &
+     &       , vr_rtm_wk(1))
+#endif
       end if
       if(nscalar .gt. 0) then
+#if defined(CUDA_DEBUG) || defined(CHECK_SCHMIDT_OTF)
         call legendre_b_trans_scalar_org                                &
      &     (ncomp, nvector, nscalar, sp_rlm_wk(1), vr_rtm_wk(1))
+#endif
       end if
 
-!Copying the data wihtin trans_b function
-!      call cpy_physical_dat_from_gpu(ncomp, vr_rtm_wk(1))
+#if defined(CUDA_TIMINGS)
+        call start_eleps_time(58) 
+#endif
+#if defined(CUDA_DEBUG) || defined(CHECK_SCHMIDT_OTF)
+         call cpy_dev2host_4_debug
+#elif defined(CUDA_OPTIMIZED)
+        call cpy_physical_dat_from_gpu(ncomp, vr_rtm_wk(1))
+#endif
+#if defined(CUDA_TIMINGS)
+        call end_eleps_time(58) 
+#endif
 !
+
+#if defined(CUDA_DEBUG) || defined(CHECK_SCHMIDT_OTF)
+!         call check_field_data_cuda(ncomp,nvector,nscalar,vr_rtm_wk(1))
+        call check_bwd_trans_cuda(my_rank, vr_rtm_wk(1), P_jl(1,1),     &
+     &            dPdt_jl(1,1))
+#endif
+
       call finish_send_recv_rj_2_rlm
       call calypso_rtm_to_send_N(ncomp, n_WS, vr_rtm_wk(1), WS(1))
 !

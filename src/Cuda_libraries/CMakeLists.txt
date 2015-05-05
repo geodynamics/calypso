@@ -6,8 +6,8 @@ set(GENCODE "-gencode=arch=compute_35,code=sm_35")
 # The option dc enables dynamic parallelism in cuda
 
 # debug options
-set(CUDA_NVCC_FLAGS_DEBUG "-G;-g;-O0")
-set(CUDA_NVCC_FLAGS_RELEASE "-O2")
+set(CUDA_NVCC_FLAGS_DEBUG "-G;-g;-DCUDA_DEBUG")
+set(CUDA_NVCC_FLAGS_RELEASE "-O3;-DCUDA_OPTIMIZED")
 
 
 #The following command links the compiled code. 
@@ -20,7 +20,14 @@ set(CUDA_HOST_COMPILER ${CMAKE_Fortran_COMPILER})
 
 #cuda_add_library( cudaLib ${CUDA_SRC_FILES} STATIC OPTIONS ${GENCODE})
 cuda_add_library( cudaLib ${CUDA_SRC_FILES} STATIC OPTIONS ${GENCODE} ${CUDA_LIBRARY_FLAGS} )
-set_target_properties(cudaLib PROPERTIES LINK_FLAGS "${CUDA_LIBRARY_FLAGS}")
+IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+  set_target_properties(cudaLib PROPERTIES LINK_FLAGS
+"${CUDA_LIBRARY_FLAGS};-DCUDA_DEBUG")
+ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+IF(CMAKE_BUILD_TYPE MATCHES RELEASE)
+  set_target_properties(cudaLib PROPERTIES LINK_FLAGS
+"${CUDA_LIBRARY_FLAGS};-DCUDA_OPTIMIZED")
+ENDIF(CMAKE_BUILD_TYPE MATCHES RELEASE)
 
 #add_library( cudaFortran ${FORTRAN_CUDA_INTERFACE} )
 

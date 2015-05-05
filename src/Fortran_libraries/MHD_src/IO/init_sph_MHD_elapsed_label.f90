@@ -29,7 +29,12 @@
       use m_work_time
 !
 !
+#if defined(CUDA_TIMINGS)
+      num_elapsed = 60
+#else
       num_elapsed = 54
+#endif
+
       call allocate_elapsed_times
 !
       elapse_labels(1) = 'Total time                 '
@@ -94,8 +99,16 @@
       elapse_labels(52) = 'copy_mhd_field_from_trans.    '
       elapse_labels(53) = 'copy_mhd_spectr_from_recv.    '
 !
-      elapse_labels(num_elapsed) = 'Communication time        '
+      elapse_labels(54) = 'Communication time        '
 !
+#if defined(CUDA_TIMINGS)
+      elapse_labels(55) = 'Memory allocation time on GPU'  
+      elapse_labels(56) = 'Memcpy time for intialization on GPU'  
+      elapse_labels(57) = 'cpy sp_rlm host2dev for bwd. trans.'
+      elapse_labels(58) = 'cpy vr_rtm dev2host for bwd. trans.'
+      elapse_labels(59) = 'bwd vector transform'
+      elapse_labels(60) = 'Memalloc + Memcpy for Ass. Schmidt 2 GPU'
+#endif
       end subroutine set_sph_MHD_elapsed_label
 !
 ! ----------------------------------------------------------------------
@@ -109,6 +122,11 @@
       do i = 3, 54
         call reset_eleps_time(i)
       end do
+#ifdef CUDA_TIMINGS
+      do i = 55, 60
+        call reset_eleps_time(i)
+      end do
+#endif
 !
       end subroutine reset_elapse_4_init_sph_mhd
 !

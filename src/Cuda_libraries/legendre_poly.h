@@ -7,7 +7,9 @@
 #include "cuda.h"
 #include <fstream>
 #include <mpi.h>
-
+#ifdef CUDA_DEBUG
+  #include "cuda_profiler_api.h"
+#endif
 #define ARGC 3 
 
 /*#if __CUDA_ARCH__ < 350 
@@ -20,10 +22,8 @@ extern int nComp;
 
 // Fortran function calls
 extern "C" {
-  //void inputcalypso_(int*, int*, double*, double*, double*);
-  //void cleancalypso_();
   void transform_f_(int*, int*, int*);
-  void transform_b_(int*, int*, int*, double*);
+  void legendre_b_trans_vector_cuda_(int*, int*, int*);
 }
 
 //Fortran Variables
@@ -59,7 +59,12 @@ typedef struct
   double *vr_rtm, *g_colat_rtm, *g_sph_rlm;
   double *sp_rlm;
   double *a_r_1d_rlm_r; //Might be pssible to copy straight to constant memory
+  double *asin_theta_1d_rtm;
   int *lstack_rlm;
+  #ifdef CUDA_STATIC
+    double *p_jl;
+    double *dP_jl;
+  #endif
 } Parameters_s;
 
 typedef struct 
@@ -67,13 +72,11 @@ typedef struct
   double *P_smdt; 
   double *dP_smdt;
   double *g_sph_rlm;
-#ifdef CUDA_DEBUG
+  int *lstack_rlm;
+  int *idx_gl_1d_rlm_j;
   double *g_colat_rtm;
   double *vr_rtm;
-  int *lstack_rlm;
 // Dim: jx3
-  int *idx_gl_1d_rlm_j;
-#endif
 } Debug;
 
 extern Parameters_s deviceInput;
@@ -106,27 +109,34 @@ void finalizegpu_();
 void initDevConstVariables();
 
 void allocMemOnGPU();
-void memcpy_h2d_(int *lstack_rlm, double *a_r, double *g_colat, double *g_sph_rlm);
+void memcpy_h2d_(int *lstack_rlm, double *a_r, double *g_colat, double *g_sph_rlm, double *asin_theta_1d_rtm);
 void deAllocMemOnGPU();
 void deAllocDebugMem();
 void allocHostDebug(Debug*);
 void allocDevDebug(Debug*);
-void cpyDev2Host(Debug*, Debug*);
+void cpy_dev2host_4_debug_();
+void cpy_schmidt_2_gpu_(double *P_jl, double *dP_jl);
 void set_spectrum_data_(double *sp_rlm);
 void set_physical_data_(double *vr_rtm);
 void retrieve_spectrum_data_(double *sp_rlm);
 void retrieve_physical_data_(double *vr_rtm);
 
 void writeDebugData2File(Debug*, std::string);
+void check_bwd_trans_cuda_(int*, double*, double*, double*);
 void cleangpu_();
 
 __device__ double nextLGP_m_eq0(int l, double x, double p_0, double p_1);
 __device__ double nextDp_m_eq_0(int l, double lgp_mp);
+__device__ double nextDp_m_eq_1(int l, double p_mn_l, double p_pn_l);
+__device__ double nextDp_m_l(int m, int l, double p_mn, double p_pn);
 __device__ double calculateLGP_m_eq_l(int mode);
 __device__ double calculateLGP_mp1_eq_l(int mode, double x, double lgp_m_eq_l);
 __device__ double calculateLGP_m_l(int m, int degree, double theta, double lgp_0, double lgp_1);
-__device__ double scaleBySine(int l, double lgp, double theta);
+__device__ double scaleBySine(int mode, double lgp, double theta);
 }
 
-__global__ void transB(double *vr_rtm, const double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *lstack_rlm); 
+__global__ void transB_m_l_eq0_ver1D(int mp_rlm, int jst, int jed, double *vr_rtm,  double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm); 
+__global__ void transB_m_l_eq1_ver1D( int mp_rlm,  int jst,  int jed, int order, int degree, double *vr_rtm, double *sp_rlm, double *a_r_1d_rlm_r,     double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
+__global__ void transB_m_l_ver1D( int mp_rlm,  int jst,  int jed, int order, int degree, double *vr_rtm,  double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
+
 __global__ void transB(double *vr_rtm, const double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm); 

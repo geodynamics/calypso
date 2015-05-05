@@ -47,15 +47,31 @@ IF (CUDA_FOUND)
   IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
     ADD_DEFINITIONS(-DCUDA_DEBUG)
   ENDIF(CMAKE_BUILD_TYPE MATCHES DEBUG)
+
+  IF(CMAKE_BUILD_TYPE MATCHES RELEASE)
+    ADD_DEFINITIONS(-DCUDA_OPTIMIZED)
+  ENDIF(CMAKE_BUILD_TYPE MATCHES RELEASE)
+
+  #IF(CHECK_SCHMIDT)
+  #  ADD_DEFINITIONS(-DCHECK_SCHMIDT_OTF)
+  #ENDIF(CHECK_SCHMIDT)
+
+  IF(TIME)
+    ADD_DEFINITIONS(-DCUDA_TIMINGS)
+  ENDIF(TIME)
+
   INCLUDE_DIRECTORIES(${CUDA_INCLUDE_DIRS})
   #These environment variables are specific to the supercomputers accessed
   # through xsede.
   #SET (CUDA_LIBRARY_FLAGS "-I${CUDA_INCLUDE_DIRS};-L${CUDA_TOOLKIT_ROOT_DIR}/lib64;-lcudart;-lcublas;-lcuda;-lcublas_device;-lcudadevrt")
-  SET (CUDA_LIBRARY_FLAGS "-L${CUDA_TOOLKIT_ROOT_DIR}/lib64;-lcudart;-lcuda;-lcudadevrt;-lcublas;-lcublas_device")
+  SET (CUDA_LIBRARY_FLAGS
+"-L${CUDA_TOOLKIT_ROOT_DIR}/lib64;-lcudart;-lcuda;-lcudadevrt;-lstdc++")
 ENDIF(CUDA_FOUND)
 
 #Need to set this s.t when user specifies Degug mode, these flags are set
 set (CMAKE_Fortran_FLAGS_DEBUG "-O0 -g")
+set (CMAKE_CXX_FLAGS_DEBUG "-lstdc++;-DCUDA_DEBUG")
+set (CMAKE_CXX_FLAGS_RELEASE "-lstdc++;-DCUDA_OPTIMIZED")
 
 # Recurse into the "src" subdirectory
 ADD_SUBDIRECTORY (src) 
