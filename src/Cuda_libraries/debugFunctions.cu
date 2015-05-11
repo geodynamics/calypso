@@ -2,13 +2,21 @@
 #include "legendre_poly.h"
 #include <math.h>
 #include <iostream>
+#include <sstream>
 
 void check_bwd_trans_cuda_(int *my_rank, double *vr_rtm, double *P_jl, double *dP_jl) {
   #if defined(CUDA_DEBUG) || defined(CHECK_SCHMIDT_OTF)
+    std::stringstream sc;
+    sc << *my_rank;
+    
     std::ofstream schmidt, field_vec, field_slr;
-    schmidt.open("cuda_schimdt.log");
-    field_vec.open("cuda_field_vectors.log");
-    field_slr.open("cuda_field_scalars.log");
+    //std::string fName = "cuda_schmidt" + "_" + sc.str() + ".log");
+    std::string fName = "cuda_schmidt_" + sc.str() + ".log";
+    schmidt.open(fName.c_str());
+    fName = "cuda_field_vectors_" + sc.str() + ".log";
+    field_vec.open(fName.c_str());
+    fName = "cuda_field_scalars_" + sc.str() + ".log";
+    field_slr.open(fName.c_str());
       
     schmidt << "order\t degree\t P_smdt \t P_smdt_cuda\t dP_smdt \t dP_smdt_cuda\n";
 

@@ -16,7 +16,7 @@ __constant__ Geometry_c devConstants;
 //File Streams
 std::ofstream clockD;
 
-void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rlm[], int istep_rtm[], int istep_rlm[], int *ncomp, int *trunc_lvl) {
+void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rlm[], int istep_rtm[], int istep_rlm[], int *ncomp, int *trunc_lvl, int *nscalar, int *nvector) {
 
   std::string fileName = "GPUTimings.dat";
   clockD.open(fileName.c_str(), std::ofstream::out);
@@ -39,10 +39,20 @@ void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int n
   constants.ncomp = *ncomp;
   constants.t_lvl = *trunc_lvl; 
 
+  constants.ncomp = *ncomp;
+  constants.nscalar = *nscalar;
+  constants.nvector = *nvector;
+
+  initDevConstVariables();
+
+
   #if defined(CUDA_DEBUG) || defined(CHECK_SCHMIDT_OTF)
-    cudaProfilerStart();
     allocHostDebug(&h_debug);
     allocDevDebug(&d_debug);
+  #endif
+
+  #if defined(CUDA_TIMINGS)
+    cudaProfilerStart();
   #endif
 
   allocMemOnGPU();
@@ -50,7 +60,7 @@ void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int n
   for(unsigned int i=0; i<32; i++)       
     cudaErrorCheck(cudaStreamCreate(&streams[i]));
 
-  cudaErrorCheck(cudaDeviceSetCacheConfig(cudaFuncCachePreferEqual));
+  cudaErrorCheck(cudaDeviceSetCacheConfig(cudaFuncCachePreferL1));
 
   #if defined(CUDA_TIMINGS)
     cudaErrorCheck(cudaDeviceSynchronize());
@@ -226,7 +236,7 @@ void deAllocDebugMem() {
 void cleangpu_() {
   deAllocMemOnGPU();
   deAllocDebugMem();
-  #ifdef CUDA_DEBUG
+  #if defined(CUDA_TIMINGS)
     cudaProfilerStop();
     cudaDeviceReset();
   #endif

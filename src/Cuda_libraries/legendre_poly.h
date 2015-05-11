@@ -7,7 +7,7 @@
 #include "cuda.h"
 #include <fstream>
 #include <mpi.h>
-#ifdef CUDA_DEBUG
+#ifdef CUDA_TIMINGS
   #include "cuda_profiler_api.h"
 #endif
 #define ARGC 3 
@@ -103,7 +103,7 @@ extern __constant__ Geometry_c devConstants;
 extern "C" {
 
 //void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, double *a_r_1d_rlm_r, int lstack_rlm[], double *g_colat_rtm, int *trunc_lvl, double *g_sph_rlm);
-void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, int *t_lvl);
+void initgpu_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[], int nidx_rtp[], int istep_rtm[], int istep_rlm[], int *ncomp, int *t_lvl, int *nscalar, int *nvector);
 void setptrs_(int *idx_gl_1d_rlm_j);
 void finalizegpu_(); 
 void initDevConstVariables();

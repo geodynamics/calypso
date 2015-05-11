@@ -304,7 +304,7 @@ void transB_m_l_eq0_ver1D(const int mp_rlm, const int jst, const int jed, double
 
     for(int j_rlm=jst; j_rlm<=jed; j_rlm++, l++) {
       idx = devConstants.ncomp * ((j_rlm-1) * devConstants.istep_rlm[1] + blockIdx.x * devConstants.istep_rlm[0]); 
-      idx2 = 3*devConstants.nvector + devConstants.ncomp * ((j_rlm-1) * devConstants.istep_rlm[1] + blockIdx.x * devConstants.istep_rlm[0]); 
+      idx2 = 3*devConstants.nvector + idx; 
       for(int t=1; t<=devConstants.nvector; t++) {
         idx += 3;
         reg2 = __dmul_rd(__dmul_rd(-1 * p_m_l_0, (double) order), asin_theta_1d_rtm[id + i*blockDim.x]);         
@@ -345,10 +345,11 @@ void transB_m_l_eq0_ver1D(const int mp_rlm, const int jst, const int jed, double
       p_mp_l_1 = reg2;
         
     }
-    
-    idx_rtm[0] = devConstants.ncomp * ((threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0] + (mp_rlm-1) * devConstants.istep_rtm[2]); 
-    idx_rtm[1] = devConstants.ncomp * ((threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0] + (mn_rlm-1) * devConstants.istep_rtm[2]); 
-    idx2 = devConstants.nvector*3 + devConstants.ncomp * ((threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0] + (mp_rlm-1) * devConstants.istep_rtm[2]); 
+     
+    reg2 = (threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0]; 
+    idx_rtm[0] = devConstants.ncomp * (reg2 + (mp_rlm-1) * devConstants.istep_rtm[2]); 
+    idx_rtm[1] = devConstants.ncomp * (reg2 + (mn_rlm-1) * devConstants.istep_rtm[2]); 
+    idx2 = devConstants.nvector*3 + idx_rtm[0]; 
     for(int t=1; t<=devConstants.nvector; t++) {
       idx_rtm[0] += 3;
       idx_rtm[1] += 3;
@@ -433,19 +434,20 @@ void transB_m_l_eq1_ver1D(const int mp_rlm, const int jst, const int jed, int or
 
     for(int j_rlm=jst, deg=degree; j_rlm<=jed; j_rlm++, deg++) {
       idx[1] = devConstants.ncomp * ((j_rlm-1) * devConstants.istep_rlm[1] + blockIdx.x * devConstants.istep_rlm[0]); 
-      idx[0] = devConstants.nvector*3 + devConstants.ncomp * ((j_rlm-1) * devConstants.istep_rlm[1] + blockIdx.x * devConstants.istep_rlm[0]); 
+      idx[0] = devConstants.nvector*3 + idx[1]; 
+      reg1 = scaleBySine(order, p_m_l_0, theta);
       for(int t=1; t<=devConstants.nvector; t++) {
         idx[1] += 3;
-        reg2 = __dmul_rd(__dmul_rd(-1 * scaleBySine(order, p_m_l_0, theta), (double) order), asin_theta_1d_rtm[id + i*blockDim.x]);         
+        reg2 = __dmul_rd(__dmul_rd(-1 * reg1, (double) order), asin_theta_1d_rtm[id + i*blockDim.x]);         
         vr_reg[t*5 - 5] += sp_rlm[idx[1] - 1] * a_r_1d_rlm_r[blockIdx.x] * reg2;
         vr_reg[t*5 - 4] += sp_rlm[idx[1] - 2] * a_r_1d_rlm_r[blockIdx.x] * reg2;
-        vr_reg[t*5 - 3] += sp_rlm[idx[1] - 3] * __dmul_rd(a_r_1d_rlm_r[blockIdx.x], a_r_1d_rlm_r[blockIdx.x]) * scaleBySine(order, p_m_l_0, theta) * g_sph_rlm[j_rlm-1];    
+        vr_reg[t*5 - 3] += sp_rlm[idx[1] - 3] * __dmul_rd(a_r_1d_rlm_r[blockIdx.x], a_r_1d_rlm_r[blockIdx.x]) * reg1 * g_sph_rlm[j_rlm-1];    
         vr_reg[t*5 - 2] += sp_rlm[idx[1] - 2]  * a_r_1d_rlm_r[blockIdx.x] * dp_m_l;    
         vr_reg[t*5 - 1] -= sp_rlm[idx[1] - 1] * a_r_1d_rlm_r[blockIdx.x] * dp_m_l;    
       }
       for(int t=1; t<=devConstants.nscalar; t++) {
         idx[0] += 1;
-        vr_reg_scalar[t-1] += sp_rlm[idx[0] - 1] * scaleBySine(order, p_m_l_0, theta);
+        vr_reg_scalar[t-1] += sp_rlm[idx[0] - 1] * reg1;
       }
 
       // Initially l and m are set to 1
@@ -486,9 +488,11 @@ void transB_m_l_eq1_ver1D(const int mp_rlm, const int jst, const int jed, int or
         
     }
     
-    idx_rtm[0] = devConstants.ncomp * ((threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0] + (mp_rlm-1) * devConstants.istep_rtm[2]); 
-    idx_rtm[1] = devConstants.ncomp * ((threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0] + (mn_rlm-1) * devConstants.istep_rtm[2]); 
-    idx_rtm[2] = 3*devConstants.nvector + devConstants.ncomp * ((threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0] + (mp_rlm-1) * devConstants.istep_rtm[2]); 
+    reg1 = (threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0];
+    idx_rtm[0] = devConstants.ncomp * (reg1 + (mp_rlm-1) * devConstants.istep_rtm[2]); 
+    // mn_rlm
+    idx_rtm[1] = devConstants.ncomp * (reg1 + (mn_rlm-1) * devConstants.istep_rtm[2]); 
+    idx_rtm[2] = 3*devConstants.nvector + idx_rtm[0]; 
     for(int t=1; t<=devConstants.nvector; t++) {
       idx_rtm[0] += 3;
       idx_rtm[1] += 3;
@@ -517,9 +521,9 @@ void transB_m_l_ver1D(const int mp_rlm, const int jst, const int jed, int order,
   if( nTheta%blockDim.x > (threadIdx.x)) 
     workLoad++;
 
-  int deg=0, j=0;
+  int deg, j;
+
   // P(m,m)[cos theta]
-  
   double p_mn_l_0, p_mn_l_1;
   double p_m_l_0, p_m_l_1;
   double p_mp_l_0, p_mp_l_1;
@@ -529,6 +533,8 @@ void transB_m_l_ver1D(const int mp_rlm, const int jst, const int jed, int order,
 // 3 for m-1, m, m+1
   unsigned int idx[3] = {0,0,0}, idx_rtm[3] = {0,0,0};
   double reg1, reg2, reg3;
+ 
+  double norm=0;
 
   double *vr_reg = (double*) malloc (sizeof(double)*5*devConstants.nvector);
   double *vr_reg_scalar = (double*) malloc (sizeof(double)*devConstants.nscalar);
@@ -575,26 +581,25 @@ void transB_m_l_ver1D(const int mp_rlm, const int jst, const int jed, int order,
     #endif
 
     for(int j_rlm=jst, deg=degree; j_rlm<=jed; j_rlm++, deg++) {
-      idx[1] = devConstants.ncomp * ((j_rlm-1) * devConstants.istep_rlm[1] + blockIdx.x * devConstants.istep_rlm[0]); 
-      idx[0] = 3*devConstants.nvector + devConstants.ncomp * ((j_rlm-1) * devConstants.istep_rlm[1] + blockIdx.x * devConstants.istep_rlm[0]); 
-      for(int t=1; t<=devConstants.nvector; t++) {
-        idx[1] += 3;
-        reg1 = scaleBySine(order, p_m_l_0, theta);
-        reg1 *= g_sph_rlm[j_rlm-1];
-        reg2 = __dmul_rd(__dmul_rd(-1 * scaleBySine(order, p_m_l_0, theta), (double) order), asin_theta_1d_rtm[id + i*blockDim.x]);         
-        vr_reg[t*5 - 5] += sp_rlm[idx[1] - 1] * a_r_1d_rlm_r[blockIdx.x] * reg2;
-        vr_reg[t*5 - 4] += sp_rlm[idx[1] - 2] * a_r_1d_rlm_r[blockIdx.x] * reg2;
-        //vr_reg[t*3 - 3] += sp_rlm[idx[1] - 3] * __dmul_rd(a_r_1d_rlm_r[blockIdx.x], a_r_1d_rlm_r[blockIdx.x]) * scaleBySine(order, p_m_l_0, theta) * g_sph_rlm[j_rlm-1];    
-        vr_reg[t*5 - 3] += sp_rlm[idx[1] - 3] * __dmul_rd(a_r_1d_rlm_r[blockIdx.x], a_r_1d_rlm_r[blockIdx.x]) * reg1;    
-        vr_reg[t*5 - 2] += sp_rlm[idx[1] - 2]  * a_r_1d_rlm_r[blockIdx.x] * dp_m_l;    
-        vr_reg[t*5 - 1] -= sp_rlm[idx[1] - 1] * a_r_1d_rlm_r[blockIdx.x] * dp_m_l;    
-      }
+        idx[1] = devConstants.ncomp * ((j_rlm-1) * devConstants.istep_rlm[1] + blockIdx.x * devConstants.istep_rlm[0]); 
+        idx[0] = 3*devConstants.nvector + idx[1]; 
+        norm = scaleBySine(order, p_m_l_0, theta);
+        for(int t=1; t<=devConstants.nvector; t++) {
+          idx[1] += 3;
+          reg2 = __dmul_rd(__dmul_rd(-1 * norm, (double) order), asin_theta_1d_rtm[id + i*blockDim.x]);         
+          vr_reg[t*5 - 5] += sp_rlm[idx[1] - 1] * a_r_1d_rlm_r[blockIdx.x] * reg2;
+          vr_reg[t*5 - 4] += sp_rlm[idx[1] - 2] * a_r_1d_rlm_r[blockIdx.x] * reg2;
+       //vr_reg[t*3 - 3] += sp_rlm[idx[1] - 3] * __dmul_rd(a_r_1d_rlm_r[blockIdx.x], a_r_1d_rlm_r[blockIdx.x]) * scaleBySine(order, p_m_l_0, theta) * g_sph_rlm[j_rlm-1];    
+          vr_reg[t*5 - 3] += sp_rlm[idx[1] - 3] * __dmul_rd(a_r_1d_rlm_r[blockIdx.x], a_r_1d_rlm_r[blockIdx.x]) * norm * g_sph_rlm[j_rlm-1];    
+          vr_reg[t*5 - 2] += sp_rlm[idx[1] - 2]  * a_r_1d_rlm_r[blockIdx.x] * dp_m_l;    
+          vr_reg[t*5 - 1] -= sp_rlm[idx[1] - 1] * a_r_1d_rlm_r[blockIdx.x] * dp_m_l;    
+        }
       
-      for(int t=1; t<=devConstants.nscalar; t++) {
-        idx[0] += 1;
-        vr_reg_scalar[t-1] += sp_rlm[idx[0] - 1] * scaleBySine(order, p_m_l_0, theta);
-      } 
-
+        for(int t=1; t<=devConstants.nscalar; t++) {
+          idx[0] += 1;
+          vr_reg_scalar[t-1] += sp_rlm[idx[0] - 1] * norm;
+        } 
+      
       // m-1, l+1 
       reg1 = calculateLGP_m_l(abs(order)-1, deg+1, theta, p_mn_l_0, p_mn_l_1); 
       p_mn_l_0 = p_mn_l_1;
@@ -623,16 +628,15 @@ void transB_m_l_ver1D(const int mp_rlm, const int jst, const int jed, int order,
       reg3 = calculateLGP_m_l(abs(order)+1, deg+3, theta, p_mp_l_0, p_mp_l_1);  
       p_mp_l_0 = p_mp_l_1;
       // p_mp_1_0, m+1, l+2
-      //j = (deg+2)*(deg+3) + order+1;
-      //P_smdt[(i*blockDim.x + id)*devConstants.nidx_rlm[1] + j] = scaleBySine(order+1, p_mp_l_0, theta);
       p_mp_l_1 = reg3;
         
     }
     // mp_rlm 
-    idx_rtm[0] = devConstants.ncomp * ((threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0] + (mp_rlm-1) * devConstants.istep_rtm[2]); 
+    reg1 = (threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0];
+    idx_rtm[0] = devConstants.ncomp * (reg1 + (mp_rlm-1) * devConstants.istep_rtm[2]); 
     // mn_rlm
-    idx_rtm[1] = devConstants.ncomp * ((threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0] + (mn_rlm-1) * devConstants.istep_rtm[2]); 
-    idx_rtm[2] = 3*devConstants.nvector + devConstants.ncomp * ((threadIdx.x + i*blockDim.x) * devConstants.istep_rtm[1] + blockIdx.x*devConstants.istep_rtm[0] + (mp_rlm-1) * devConstants.istep_rtm[2]); 
+    idx_rtm[1] = devConstants.ncomp * (reg1 + (mn_rlm-1) * devConstants.istep_rtm[2]); 
+    idx_rtm[2] = 3*devConstants.nvector + idx_rtm[0]; 
     for(int t=1; t<=devConstants.nvector; t++) {
       idx_rtm[0] += 3;
       idx_rtm[1] += 3;
@@ -658,14 +662,24 @@ void legendre_b_trans_vector_cuda_(int *ncomp, int *nvector, int *nscalar) {
   static int nShells = constants.nidx_rtm[0];
   static int nTheta = constants.nidx_rtm[1];
 
-  constants.ncomp = *ncomp; 
-  constants.nscalar = *nscalar;
-  constants.nvector = *nvector;
-
-  initDevConstVariables();
-   
-  dim3 grid(nShells, 1);
-  dim3 block(16,1,1);  
+  dim3 grid(1, 1);
+  int nThreads=0; 
+  if((int) nTheta/16 < 10)
+    nThreads = 16;
+  else if((int) nTheta/32 < 10)
+    nThreads = 32;
+  else if((int) nTheta/64 < 10)
+    nThreads = 64;
+  else if((int) nTheta/128 < 10)
+    nThreads = 128;
+  else if((int) nTheta/256 < 10)
+    nThreads = 256;
+  else if((int) nTheta/512 < 10)
+    nThreads = 512;
+  else
+    nThreads = 1024;
+ 
+  dim3 block(nThreads, 1,1); 
   // Current: 0 = vr_rtm, 1 = sp_rlm, 2 = g_sph_rlm, 3 = a_r_1d_rlm_r
 
   int jst, jed, m, l;

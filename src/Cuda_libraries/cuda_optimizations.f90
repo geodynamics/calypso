@@ -20,14 +20,14 @@
 
         contains
       
-        subroutine alloc_mem_4_gpu(ncomp)
-        integer(kind = kint), intent(in) :: ncomp
+        subroutine alloc_mem_4_gpu(ncomp, nvector, nscalar)
+        integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
 #if defined(CUDA_TIMINGS)
           call start_eleps_time(55) 
 #endif
           call initgpu(nnod_rtp, nnod_rtm, nnod_rlm, nidx_rtm(1),       &
      &                      nidx_rlm(1), istep_rtm(1), istep_rlm(1),    &
-     &                      ncomp, l_truncation)
+     &                      ncomp, l_truncation, nscalar, nvector)
 #if defined(CUDA_TIMINGS)
           call end_eleps_time(55) 
 #endif

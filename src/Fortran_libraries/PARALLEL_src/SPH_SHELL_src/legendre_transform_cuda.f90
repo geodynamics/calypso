@@ -100,7 +100,6 @@
 !
 
 #if defined(CUDA_DEBUG) || defined(CHECK_SCHMIDT_OTF)
-!         call check_field_data_cuda(ncomp,nvector,nscalar,vr_rtm_wk(1))
         call check_bwd_trans_cuda(my_rank, vr_rtm_wk(1), P_jl(1,1),     &
      &            dPdt_jl(1,1))
 #endif
