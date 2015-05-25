@@ -100,13 +100,15 @@
 !
 
 #if defined(CUDA_DEBUG) || defined(CHECK_SCHMIDT_OTF)
-        call check_bwd_trans_cuda(my_rank, vr_rtm_wk(1), P_jl(1,1),     &
-     &            dPdt_jl(1,1))
+        !call check_bwd_trans_cuda(my_rank, vr_rtm_wk(1), P_jl(1,1),     &
+     !&            dPdt_jl(1,1))
 #endif
-
       call finish_send_recv_rj_2_rlm
       call calypso_rtm_to_send_N(ncomp, n_WS, vr_rtm_wk(1), WS(1))
 !
+      call finalize_gpu
+      stop
+      
       end subroutine leg_backward_trans_cuda
 !
 ! -----------------------------------------------------------------------

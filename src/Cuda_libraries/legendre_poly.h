@@ -60,6 +60,7 @@ typedef struct
   double *sp_rlm;
   double *a_r_1d_rlm_r; //Might be pssible to copy straight to constant memory
   double *asin_theta_1d_rtm;
+  int *idx_gl_1d_rlm_j;
   int *lstack_rlm;
   #ifdef CUDA_STATIC
     double *p_jl;
@@ -95,7 +96,7 @@ extern double countFT, countBT;
  *     Access to constant memory is faster than access to global memory.
  *       */
 
-extern __constant__ Geometry_c devConstants;
+__constant__ Geometry_c devConstants;
 
 ////////////////////////////////////////////////////////////////////////////////
 //! Function Defines
@@ -109,7 +110,7 @@ void finalizegpu_();
 void initDevConstVariables();
 
 void allocMemOnGPU();
-void memcpy_h2d_(int *lstack_rlm, double *a_r, double *g_colat, double *g_sph_rlm, double *asin_theta_1d_rtm);
+void memcpy_h2d_(int *lstack_rlm, double *a_r, double *g_colat, double *g_sph_rlm, double *asin_theta_1d_rtm, int *idx_gl_1d_rlm_j);
 void deAllocMemOnGPU();
 void deAllocDebugMem();
 void allocHostDebug(Debug*);
@@ -135,8 +136,12 @@ __device__ double calculateLGP_m_l(int m, int degree, double theta, double lgp_0
 __device__ double scaleBySine(int mode, double lgp, double theta);
 }
 
-__global__ void transB_m_l_eq0_ver1D(int mp_rlm, int jst, int jed, double *vr_rtm,  double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm); 
-__global__ void transB_m_l_eq1_ver1D( int mp_rlm,  int jst,  int jed, int order, int degree, double *vr_rtm, double *sp_rlm, double *a_r_1d_rlm_r,     double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
+__global__ void transB_m_l_eq0_ver1D(int mp_rlm, int jst, int jed, double *vr_rtm,  double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm); 
+__global__ void transB_m_l_eq1_ver1D( int mp_rlm,  int jst,  int jed, int order, int degree, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r,     double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
 __global__ void transB_m_l_ver1D( int mp_rlm,  int jst,  int jed, int order, int degree, double *vr_rtm,  double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
-
+__global__ void transB_m_l_ver2D(int *lstack_rlm, int m0, int m1, int *idx_gl_1d_rlm_j, double *vr_rtm, double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
+__global__ void transB_m_l_ver3D(int *lstack_rlm, int m0, int m1, int *idx_gl_1d_rlm_j, double *vr_rtm, double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
+__global__ void transB_m_l_ver4D(int *lstack_rlm, int m0, int m1, int *idx_gl_1d_rlm_j, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
+__global__ void transB_m_l_ver5D(int *lstack_rlm, int *idx_gl_1d_rlm_j, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
+__global__ void transB_m_l_ver6D(int *lstack_rlm, int m0, int m1, int *idx_gl_1d_rlm_j, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_jl, double *dP_jl, double *g_sph_rlm, double *asin_theta_1d_rtm);
 __global__ void transB(double *vr_rtm, const double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm); 

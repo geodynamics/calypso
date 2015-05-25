@@ -7,19 +7,21 @@ set(GENCODE "-gencode=arch=compute_35,code=sm_35")
 
 # debug options
 set(CUDA_NVCC_FLAGS_DEBUG "-G;-g;-DCUDA_DEBUG")
-set(CUDA_NVCC_FLAGS_RELEASE "-O3;-DCUDA_OPTIMIZED")
+#set(CUDA_NVCC_FLAGS_RELEASE "-O3;-DCUDA_OPTIMIZED")
+set(CUDA_NVCC_FLAGS_RELEASE "-g;-G;-DCUDA_OPTIMIZED")
 
 
 #The following command links the compiled code. 
 #This is necessary when using dynamic parallelism for one. 
 #Dynamic Parallelism essentially allows you to nest kernel calls. 
 
-set(CUDA_SEPARABLE_COMPILATION ON)
+set(CUDA_SEPARABLE_COMPILATION OFF)
 set(CUDA_VERBOSE_BUILD ON)
 set(CUDA_HOST_COMPILER ${CMAKE_Fortran_COMPILER})
 
 #cuda_add_library( cudaLib ${CUDA_SRC_FILES} STATIC OPTIONS ${GENCODE})
-cuda_add_library( cudaLib ${CUDA_SRC_FILES} STATIC OPTIONS ${GENCODE} ${CUDA_LIBRARY_FLAGS} )
+#cuda_add_library( cudaLib ${CUDA_SRC_FILES} STATIC OPTIONS ${GENCODE} ${CUDA_LIBRARY_FLAGS} )
+cuda_add_library( cudaLib ${CUDA_SRC_FILES} OPTIONS ${GENCODE} ${CUDA_LIBRARY_FLAGS} )
 IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
   set_target_properties(cudaLib PROPERTIES LINK_FLAGS
 "${CUDA_LIBRARY_FLAGS};-DCUDA_DEBUG")

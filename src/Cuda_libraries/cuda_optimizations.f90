@@ -52,7 +52,8 @@
 #endif
 
           call memcpy_h2d(lstack_rlm(0), a_r_1d_rlm_r(1),g_colat_rtm(1),&
-     &                         g_sph_rlm(1,3), asin_theta_1d_rtm(1))
+     &                         g_sph_rlm(1,3), asin_theta_1d_rtm(1),    &
+     &                         idx_gl_1d_rlm_j(1,1));
 
 #if defined(CUDA_TIMINGS)
           call end_eleps_time(56) 
