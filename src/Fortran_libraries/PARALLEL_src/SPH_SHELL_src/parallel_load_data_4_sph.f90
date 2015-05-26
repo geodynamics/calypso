@@ -6,6 +6,8 @@
 !>@brief Load spherical harmonics indexing data on multiple processes
 !!
 !!@verbatim
+!!      subroutine load_para_SPH_and_FEM_mesh
+!!      subroutine load_FEM_mesh_4_SPH
 !!      subroutine load_para_sph_mesh
 !!@endverbatim
 !
@@ -17,6 +19,7 @@
       implicit none
 !
       private :: count_interval_4_each_dir, self_comm_flag
+      private :: set_fem_center_mode_4_SPH
 !
 ! -----------------------------------------------------------------------
 !
@@ -24,19 +27,65 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine load_para_SPH_and_FEM_mesh
+!
+      call load_para_sph_mesh
+      call load_FEM_mesh_4_SPH
+!
+      end subroutine load_para_SPH_and_FEM_mesh
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine load_FEM_mesh_4_SPH
+!
+      use calypso_mpi
+      use t_mesh_data
+      use t_group_data
+!
+      use m_spheric_constants
+      use m_spheric_parameter
+      use load_mesh_data
+      use const_FEM_mesh_sph_mhd
+      use copy_mesh_from_type
+      use mesh_IO_select
+!
+      type(mesh_geometry) :: mesh
+      type(mesh_groups) ::  group
+!
+!
+!  --  load FEM mesh data
+      if(check_exist_mesh(my_rank) .eq. 0) then
+        if (iflag_debug.gt.0) write(*,*) 'input_mesh'
+        call input_mesh(my_rank)
+        call set_fem_center_mode_4_SPH
+        return
+      end if
+!
+!  --  Construct FEM mesh
+      if(iflag_shell_mode .eq. iflag_no_FEMMESH) then
+        if(iflag_rj_center .gt. 0) then
+          iflag_shell_mode =  iflag_MESH_w_center
+        else
+          iflag_shell_mode = iflag_MESH_same
+        end if
+      end if
+!
+      call const_FEM_mesh_4_sph_mhd(mesh, group)
+!      call compare_mesh_type_vs_1st(my_rank, mesh, group)
+!
+      call set_mesh_from_type(mesh, group)
+!
+      end subroutine load_FEM_mesh_4_SPH
+!
+! -----------------------------------------------------------------------
+!
       subroutine load_para_sph_mesh
 !
       use calypso_mpi
       use m_machine_parameter
-      use m_spheric_parameter
 !
       use load_data_for_sph_IO
-      use count_num_sph_smp
-      use set_special_sph_lm_flags
-!
-      use set_from_recv_buf_rev
-!
-      integer(kind = kint) :: ierr
 !
 !
       if (iflag_debug.gt.0) write(*,*) 'input_geom_rtp_sph_trans'
@@ -51,10 +100,31 @@
       if (iflag_debug.gt.0) write(*,*) 'input_modes_rlm_sph_trans'
       call input_modes_rlm_sph_trans(my_rank)
 !
+      if (iflag_debug.gt.0) write(*,*) 'set_reverse_tables_4_SPH'
+      call set_reverse_tables_4_SPH
+!
+      end subroutine load_para_sph_mesh
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_reverse_tables_4_SPH
+!
+      use calypso_mpi
+      use m_machine_parameter
+      use m_spheric_parameter
+      use m_sph_trans_comm_table
+!
+      use count_num_sph_smp
+      use set_special_sph_lm_flags
+!
+      use set_from_recv_buf_rev
+!
+      integer(kind = kint) :: ierr
+!
+!
       if (iflag_debug.gt.0) write(*,*) 's_count_num_sph_smp'
       call s_count_num_sph_smp(ierr)
 !      if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message_Rsmp)
-!
 !
       call set_reverse_import_table(nnod_rtp, ntot_item_sr_rtp,         &
      &    item_sr_rtp, irev_sr_rtp)
@@ -94,7 +164,44 @@
      &    CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       if(iflag_rj_center .gt. 0) iflag_rj_center = 1
 !
-      end subroutine load_para_sph_mesh
+      end subroutine set_reverse_tables_4_SPH
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_fem_center_mode_4_SPH
+!
+      use calypso_mpi
+      use m_geometry_parameter
+      use m_machine_parameter
+      use m_spheric_parameter
+      use m_spheric_constants
+!
+      integer(kind = kint) :: iflag_shell_local
+      integer(kind = kint) :: nnod_full_shell
+!
+!
+      nnod_full_shell = nnod_rtp * m_folding
+      iflag_shell_mode = 0
+      if(internal_node .le. nnod_full_shell) then
+        iflag_shell_local = iflag_MESH_same
+      else if(internal_node .eq. nnod_full_shell+nidx_rtp(1)) then
+        iflag_shell_local = iflag_MESH_w_pole
+      else if(internal_node .eq. nnod_full_shell+2*nidx_rtp(1)) then
+        iflag_shell_local = iflag_MESH_w_pole
+      else if(internal_node .eq. nnod_full_shell+nidx_rtp(1)+1) then
+        iflag_shell_local = iflag_MESH_w_center
+      else if(internal_node .eq. nnod_full_shell+2*nidx_rtp(1)+1) then
+        iflag_shell_local = iflag_MESH_w_center
+      end if
+!
+      if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_local',   &
+     &     my_rank, iflag_shell_local, internal_node, nnod_full_shell
+      call MPI_allreduce(iflag_shell_local, iflag_shell_mode, ione,     &
+     &    CALYPSO_INTEGER, MPI_MAX, CALYPSO_COMM, ierr_MPI)
+      if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_mode',    &
+     &     my_rank, iflag_shell_mode
+!
+      end subroutine set_fem_center_mode_4_SPH
 !
 ! -----------------------------------------------------------------------
 !

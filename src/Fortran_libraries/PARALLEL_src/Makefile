@@ -9,7 +9,8 @@ LIB_PARA_FILE = libcalypso_parallel.a
 
 SUBDIRS = \
 COMM_src      \
-SPH_SHELL_src
+SPH_SHELL_src \
+CONST_SPH_GRID
 
 #
 #  -------------------------------------------------------------------------
@@ -56,7 +57,7 @@ mod_list:
 	'$$(MOD_COMM)       $$(MOD_FEM_INT) '  \
 	'$$(MOD_MULTIGRID)  $$(MOD_FILTERING)' \
 	'$$(MOD_COMM_SPH)   $$(MOD_SOLVER_SET_ORDER)' \
-	'$$(MOD_ITP_PARA)'   >> $(MAKENAME)
+	'$$(MOD_ITP_PARA)   $$(MOD_SPH_GRID)'         >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \

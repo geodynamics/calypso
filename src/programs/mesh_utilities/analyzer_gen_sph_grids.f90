@@ -18,8 +18,16 @@
       use calypso_mpi
 !
       use m_work_time
+      use t_sph_trans_comm_tbl
 !
       implicit none
+!
+!>      Structure for parallel spherical mesh table
+      type(sph_comm_tbl), allocatable :: comm_rlm(:)
+!>      Structure for parallel spherical mesh table
+      type(sph_comm_tbl), allocatable :: comm_rtm(:)
+!
+      private :: comm_rlm, comm_rtm
 !
 ! ----------------------------------------------------------------------
 !
@@ -62,37 +70,45 @@
 !
       subroutine analyze_gen_sph_grids
 !
+      use m_spheric_global_ranks
       use para_gen_sph_grids_modes
       use set_comm_table_rtp_rj
       use const_global_sph_grids_modes
-!
 !
 !  ========= Generate spherical harmonics table ========================
 !
       call s_const_global_sph_grids_modes
 !
-      call alloc_parallel_sph_grids
-      if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rlm_grids'
       call start_eleps_time(2)
-      call para_gen_sph_rlm_grids
+      allocate(comm_rlm(ndomain_sph))
+!
+      if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rlm_grids'
+      call para_gen_sph_rlm_grids(ndomain_sph, comm_rlm)
       call end_eleps_time(2)
       if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rj_modes'
       call start_eleps_time(3)
-      call para_gen_sph_rj_modes
+      call para_gen_sph_rj_modes(ndomain_sph, comm_rlm)
+      call dealloc_comm_stacks_rlm(ndomain_sph, comm_rlm)
+      deallocate(comm_rlm)
       call end_eleps_time(3)
 !
-      if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rtm_grids'
       call start_eleps_time(2)
-      call para_gen_sph_rtm_grids
+      allocate(comm_rtm(ndomain_sph))
+!
+      if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rtm_grids'
+      call para_gen_sph_rtm_grids(ndomain_sph, comm_rtm)
       call end_eleps_time(2)
-      if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rtp_grids'
       call start_eleps_time(3)
-      call para_gen_sph_rtp_grids
+      if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rtp_grids'
+      call para_gen_sph_rtp_grids(ndomain_sph, comm_rtm)
+      call dealloc_comm_stacks_rtm(ndomain_sph, comm_rtm)
+!
+      deallocate(comm_rtm)
       call end_eleps_time(3)
 !
       call start_eleps_time(4)
       if(iflag_debug .gt. 0) write(*,*) 'para_gen_fem_mesh_for_sph'
-      call para_gen_fem_mesh_for_sph
+      call para_gen_fem_mesh_for_sph(ndomain_sph)
       call end_eleps_time(4)
 !
       call end_eleps_time(1)

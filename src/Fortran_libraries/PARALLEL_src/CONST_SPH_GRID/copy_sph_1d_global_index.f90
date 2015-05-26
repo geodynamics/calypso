@@ -35,6 +35,8 @@
 !
       subroutine copy_sph_1d_gl_idx_rtp
 !
+      use m_sph_mesh_1d_connect
+!
       integer(kind = kint) :: i, j
 !
 !
@@ -63,6 +65,8 @@
 ! ----------------------------------------------------------------------
 !
       subroutine copy_sph_1d_gl_idx_rtm
+!
+      use m_sph_mesh_1d_connect
 !
       integer(kind = kint) :: i, j
 !
@@ -93,6 +97,8 @@
 !
       subroutine copy_sph_1d_gl_idx_rlm
 !
+      use m_sph_mesh_1d_connect
+!
       integer(kind = kint) :: i, j
 !
 !
@@ -117,6 +123,8 @@
 ! ----------------------------------------------------------------------
 !
       subroutine copy_sph_1d_gl_idx_rj
+!
+      use m_sph_mesh_1d_connect
 !
       integer(kind = kint) :: i, j
 !

@@ -503,6 +503,16 @@ begin MHD_control
     end array monitor_grp_ctl
   end monitor_data_ctl
 !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!   sph_grid_type_ctl:  grid type for mesh data
+!!!         no_pole:      Gaussian points only
+!!!         with_pole:    Add pole grids
+!!!         with_center:  Add center
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  begin shell_define_ctl
+    sph_grid_type_ctl       no_pole
+  end shell_define_ctl
+!
   begin visual_control
     array surface_rendering  4
       file  surface_rendering   ctl_psf_cmb

@@ -11,7 +11,7 @@
 !!      subroutine deallocate_2d_sph_trans_table
 !!
 !!      subroutine check_2d_sph_indices(my_rank, nphi, ltr, jmax)
-!!      subroutine check_2d_sph_trans_table(my_rank, ntheta, nphi, jmax)
+!!      subroutine check_2d_sph_trans_table(my_rank, ntheta, nphi)
 !!@endverbatim
 !!
 !!@param my_rank  Process ID
@@ -34,7 +34,6 @@
 !
       integer(kind = kint), allocatable :: mdx_4_lgd(:)
       integer(kind = kint), allocatable :: jtbl_fsph(:,:)
-      integer(kind = kint), allocatable :: jtbl_isph(:)
 !
       integer(kind = kint), allocatable :: jtbl_rj(:,:)
 !
@@ -58,7 +57,6 @@
 !
       allocate( jtbl_rj(0:jmax,3)   )
       allocate( jtbl_fsph(0:jmax,3) )
-      allocate( jtbl_isph(0:jmax)   )
 !
       jdx_fsph = 0
       mspec_4_ispack = 0
@@ -68,7 +66,6 @@
 !
       jtbl_rj =   0
       jtbl_fsph = 0
-      jtbl_isph = 0
 !
       end subroutine allocate_2d_sph_trans_table
 !
@@ -86,7 +83,6 @@
 !
       deallocate( jtbl_rj )
       deallocate( jtbl_fsph )
-      deallocate( jtbl_isph )
 !
       end subroutine deallocate_2d_sph_trans_table
 !
@@ -138,12 +134,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_2d_sph_trans_table(my_rank, ntheta, nphi, jmax)
+      subroutine check_2d_sph_trans_table(my_rank, ntheta, nphi)
 !
       integer(kind = kint), intent(in) :: my_rank
-      integer(kind = kint), intent(in) :: ntheta, nphi, jmax
+      integer(kind = kint), intent(in) :: ntheta, nphi
 !
-      integer(kind = kint) :: m, j
+      integer(kind = kint) :: m
 !
       write(my_rank+50,*) 'zonal wave number and tranfer table'
       write(my_rank+50,*) 'm, mspec_4_ispack(m), jdx_fsph(m)'
@@ -156,12 +152,6 @@
       write(my_rank+50,*) 'm0, mtbl_fft_2_lgd, mdx_4_lgd(m0)'
       do m = 0, nphi
         write(my_rank+50,*) m, mtbl_fft_2_lgd(m), mdx_4_lgd(m)
-      end do
-!
-      write(my_rank+50,*) 'transfer table for spherical spectr'
-      write(my_rank+50,*) 'j, jtbl_isph(j)'
-      do j = 0, jmax
-        write(my_rank+50,*) j, jtbl_isph(j)
       end do
 !
       end subroutine check_2d_sph_trans_table

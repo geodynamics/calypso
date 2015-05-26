@@ -17,8 +17,6 @@
 !!      subroutine dealloc_type_spheric_parameter(sph)
 !!        type(sph_grids), intent(inout) :: sph
 !!
-!!      subroutine alloc_type_radius_1d_gl(sph)
-!!        type(sph_grids), intent(inout) :: sph
 !!      subroutine alloc_type_spheric_param_rtp(rtp)
 !!        type(sph_rtp_grid), intent(inout) :: rtp
 !!      subroutine alloc_type_spheric_param_rtm(rtm)
@@ -37,8 +35,6 @@
 !!      subroutine alloc_type_sph_1d_index_rj(rj)
 !!        type(sph_rj_grid), intent(inout) :: rj
 !!
-!!      subroutine dealloc_type_radius_1d_gl(sph)
-!!        type(sph_grids), intent(inout) :: sph
 !!      subroutine dealloc_type_spheric_param_rtp(rtp)
 !!        type(sph_rtp_grid), intent(inout) :: rtp
 !!      subroutine dealloc_type_spheric_param_rtm(rtm)
@@ -97,8 +93,6 @@
       type sph_rtp_grid
 !>        number of global 1d data points for @f$ f(r,\theta,\phi) @f$
         integer(kind = kint) :: nidx_global_rtp(3)
-!>        number of 1d subdomains for @f$ f(r,\theta,\phi) @f$
-        integer(kind = kint) :: ndomain_rtp(3)
 !>        1d subdomain ID for @f$ f(r,\theta,\phi) @f$ (start from 0)
         integer(kind = kint) :: sph_rank_rtp(3)
 !
@@ -137,8 +131,6 @@
       type sph_rtm_grid
 !>        number of global 1d data points for @f$ f(r,\theta,m) @f$
         integer(kind = kint) :: nidx_global_rtm(3)
-!>        number of 1d subdomains for @f$ f(r,\theta,m) @f$
-        integer(kind = kint) :: ndomain_rtm(3)
 !>        1d subdomain ID for @f$ f(r,\theta,m) @f$ (start from 0)
         integer(kind = kint) :: sph_rank_rtm(3)
 !
@@ -174,8 +166,6 @@
       type sph_rlm_grid
 !>        number of global 1d data points for @f$ f(r,l,m) @f$
         integer(kind = kint) :: nidx_global_rlm(2)
-!>        number of 1d subdomains for @f$ f(r,l,m) @f$
-        integer(kind = kint) :: ndomain_rlm(2)
 !>        1d subdomain ID for @f$ f(r,l,m) @f$ (start from 0)
         integer(kind = kint) :: sph_rank_rlm(2)
 !
@@ -212,8 +202,6 @@
       type sph_rj_grid
 !>        number of global 1d data points for @f$ f(r,j) @f$
         integer(kind = kint) :: nidx_global_rj(2)
-!>        number of 1d subdomains for @f$ f(r,j) @f$
-        integer(kind = kint) :: ndomain_rj(2)
 !>        1d subdomain ID for @f$ f(r,j) @f$ (start from 0)
         integer(kind = kint) :: sph_rank_rj(2)
 !
@@ -290,14 +278,10 @@
 !!@n      if center does not exist in subdomain, inod_rj_center = 0.
         integer (kind=kint) :: inod_rj_center =   0
 !
-!>        number of subdomains
-        integer(kind = kint) :: ndomain_sph
 !>        Truncation for spherical harmonics
         integer(kind = kint) :: l_truncation
 !>        m-folding symmetry for longitudinal direction
         integer(kind = kint) :: m_folding = 1
-!>        global radius data @f$ r(k) @f$
-        real(kind = kreal), pointer :: radius_1d_gl(:)
 !
 !>        structure of index table for @f$ f(r,\theta,\phi) @f$
         type(sph_rtp_grid) :: sph_rtp
@@ -343,19 +327,6 @@
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
-!
-      subroutine alloc_type_radius_1d_gl(sph)
-!
-      type(sph_grids), intent(inout) :: sph
-      integer(kind = kint) :: num
-!
-      num = sph%sph_rtp%nidx_global_rtp(1)
-      allocate(sph%radius_1d_gl(num))
-      if(num .gt. 0) sph%radius_1d_gl = 0.0d0
-!
-      end subroutine alloc_type_radius_1d_gl
-!
-! ----------------------------------------------------------------------
 !
       subroutine alloc_type_spheric_param_rtp(rtp)
 !
@@ -516,16 +487,6 @@
       end subroutine alloc_type_sph_1d_index_rj
 !
 ! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine dealloc_type_radius_1d_gl(sph)
-!
-      type(sph_grids), intent(inout) :: sph
-!
-      deallocate(sph%radius_1d_gl)
-!
-      end subroutine dealloc_type_radius_1d_gl
-!
 ! ----------------------------------------------------------------------
 !
       subroutine dealloc_type_spheric_param_rtp(rtp)

@@ -38,11 +38,9 @@
       use m_gauss_points
 !
 !
-      n_point = nidx_rtm(2)
-!
-      call allocate_gauss_colat_rtm
-      call allocate_gauss_points
+      call allocate_gauss_points(nidx_rtm(2))
       call allocate_gauss_colatitude
+      call allocate_gauss_colat_rtm
 !
       call set_gauss_points_rtm
 !

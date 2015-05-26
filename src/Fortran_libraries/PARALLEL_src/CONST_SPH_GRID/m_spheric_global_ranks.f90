@@ -18,6 +18,18 @@
 !
       implicit none
 !
+!>      number of subdomains
+      integer(kind = kint) :: ndomain_sph
+!
+!>      number of 1d subdomains for @f$ f(r,\theta,\phi) @f$
+      integer(kind = kint) :: ndomain_rtp(3)
+!>      number of 1d subdomains for @f$ f(r,l,m) @f$
+      integer(kind = kint) :: ndomain_rlm(2)
+!>      number of 1d subdomains for @f$ f(r,j) @f$
+      integer(kind = kint) :: ndomain_rj(2)
+!>      number of 1d subdomains for @f$ f(r,\theta,m) @f$
+      integer(kind = kint) :: ndomain_rtm(3)
+!
       integer(kind = kint), allocatable :: iglobal_rank_rtp(:,:)
       integer(kind = kint), allocatable :: iglobal_rank_rtm(:,:)
       integer(kind = kint), allocatable :: iglobal_rank_rlm(:,:)
@@ -36,8 +48,6 @@
 ! -----------------------------------------------------------------------
 !
       subroutine allocate_sph_ranks
-!
-      use m_spheric_parameter
 !
       allocate(iglobal_rank_rtp(3,0:ndomain_sph))
       allocate(iglobal_rank_rtm(3,0:ndomain_sph))
@@ -105,8 +115,6 @@
 ! -----------------------------------------------------------------------
 !
       subroutine check_sph_ranks(my_rank)
-!
-      use m_spheric_parameter
 !
       integer(kind = kint), intent(in) :: my_rank
       integer(kind = kint) :: i

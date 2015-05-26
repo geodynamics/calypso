@@ -42,13 +42,16 @@
 !* --------  radius  --------------
 !
       do k = 1, num_radial_grp_rj
-        if(     cmp_no_case(name_radial_grp_rj(k), 'ICB')) then
+        if(     cmp_no_case(name_radial_grp_rj(k),                    &
+     &                      ICB_nod_grp_name)) then
           kk = istack_radial_grp_rj(k-1) + 1
           nlayer_ICB = item_radial_grp_rj(kk)
-        else if(cmp_no_case(name_radial_grp_rj(k), 'CMB')) then
+        else if(cmp_no_case(name_radial_grp_rj(k),                    &
+     &                      CMB_nod_grp_name)) then
           kk = istack_radial_grp_rj(k-1) + 1
           nlayer_CMB = item_radial_grp_rj(kk)
-        else if(cmp_no_case(name_radial_grp_rj(k), 'to_Center')) then
+        else if(cmp_no_case(name_radial_grp_rj(k),                    &
+     &                      CTR_nod_grp_name)) then
           kk = istack_radial_grp_rj(k-1) + 1
           nlayer_2_center = item_radial_grp_rj(kk)
         end if

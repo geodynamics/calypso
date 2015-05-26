@@ -10,7 +10,6 @@
 !!      subroutine allocate_spheric_parameter
 !!      subroutine deallocate_spheric_parameter
 !!
-!!      subroutine allocate_radius_1d_gl
 !!      subroutine allocate_spheric_param_rtp
 !!      subroutine allocate_spheric_param_rtm
 !!      subroutine allocate_spheric_param_rlm
@@ -21,7 +20,6 @@
 !!      subroutine allocate_sph_1d_index_rlm
 !!      subroutine allocate_sph_1d_index_rj
 !!
-!!      subroutine deallocate_radius_1d_gl
 !!      subroutine deallocate_spheric_param_rtp
 !!      subroutine deallocate_spheric_param_rtm
 !!      subroutine deallocate_spheric_param_rlm
@@ -118,9 +116,6 @@
 !>      Earth's radius @f$ Re @f$
       real(kind = kreal) :: R_earth(0:2)
 !
-!>      global radius data @f$ r(k) @f$
-      real(kind = kreal), allocatable :: radius_1d_gl(:)
-!
 !    Group names for spherical shell dynamos
 !
 !>      Group name for ICB
@@ -137,6 +132,9 @@
 !>      Element Group name for outer core
       character(len=kchara), parameter                                  &
      &                      :: OC_ele_grp_name = 'outer_core'
+!>      Element Group name for outer core
+      character(len=kchara), parameter                                  &
+     &                      :: MT_ele_grp_name = 'external'
 !
 !>      Surface Group name for ICB
       character(len=kchara), parameter :: ICB_sf_grp_name = 'ICB_surf'
@@ -156,17 +154,6 @@
       integer(kind = kint) :: nidx_global_rlm(2)
 !>      number of global 1d data points for @f$ f(r,j) @f$
       integer(kind = kint) :: nidx_global_rj(2)
-!
-!>      number of subdomains
-      integer(kind = kint) :: ndomain_sph
-!>      number of 1d subdomains for @f$ f(r,\theta,\phi) @f$
-      integer(kind = kint) :: ndomain_rtp(3)
-!>      number of 1d subdomains for @f$ f(r,\theta,m) @f$
-      integer(kind = kint) :: ndomain_rtm(3)
-!>      number of 1d subdomains for @f$ f(r,l,m) @f$
-      integer(kind = kint) :: ndomain_rlm(2)
-!>      number of 1d subdomains for @f$ f(r,j) @f$
-      integer(kind = kint) :: ndomain_rj(2)
 !
 !>      1d start address of global data for @f$ f(r,\theta,\phi) @f$
       integer(kind = kint) :: ist_rtp(3)
@@ -328,18 +315,6 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine allocate_radius_1d_gl
-!
-      integer(kind = kint) :: num
-!
-      num = nidx_global_rtp(1)
-      allocate(radius_1d_gl(num))
-      if(num .gt. 0) radius_1d_gl = 0.0d0
-!
-      end subroutine allocate_radius_1d_gl
-!
-! ----------------------------------------------------------------------
-!
       subroutine allocate_spheric_param_rtp
 !
       allocate(idx_global_rtp(nnod_rtp,3))
@@ -481,14 +456,6 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine deallocate_radius_1d_gl
-!
-      deallocate(radius_1d_gl)
-!
-      end subroutine deallocate_radius_1d_gl
-!
-! ----------------------------------------------------------------------
-!
       subroutine deallocate_spheric_param_rtp
 !
       deallocate(idx_global_rtp)
@@ -578,10 +545,6 @@
       write(*,*) 'truncation degree:           ', l_truncation
       write(*,*) 'm-folding symmetry:          ', m_folding
       write(*,*) 'number of grid for f(r,t,p): ', nidx_global_rtp(1:3)
-      write(*,*) 'subdomain for f(r,t,p):      ', ndomain_rtp(1:3)
-      write(*,*) 'subdomain for f(r,t,m):      ', ndomain_rtm(1:3)
-      write(*,*) 'subdomain for f(r,l,m):      ', ndomain_rlm(1:2)
-      write(*,*) 'subdomain for spectr f(r,j): ', ndomain_rj(1:2)
 !
       end subroutine check_global_spheric_parameter
 !

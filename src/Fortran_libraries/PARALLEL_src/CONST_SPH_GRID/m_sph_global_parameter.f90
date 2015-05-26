@@ -52,7 +52,7 @@
 !
       subroutine allocate_sph_gl_parameter
 !
-      use m_spheric_parameter
+      use m_spheric_global_ranks
 !
 !
       allocate(nnod_local_rtp(ndomain_sph))
@@ -81,7 +81,7 @@
 !
       subroutine allocate_sph_gl_bc_param
 !
-      use m_spheric_parameter
+      use m_spheric_global_ranks
 !
       integer(kind = kint) :: num
 !
@@ -158,7 +158,7 @@
 !
       subroutine check_spheric_global_param(my_rank)
 !
-      use m_spheric_parameter
+      use m_spheric_global_ranks
 !
       integer(kind = kint), intent(in) :: my_rank
       integer(kind = kint) :: i

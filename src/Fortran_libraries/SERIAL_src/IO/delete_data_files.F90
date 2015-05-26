@@ -10,9 +10,11 @@
 !!@verbatim
 !!      subroutine delete_file_by_f(file_name)
 !!      subroutine delete_parallel_files(iflag_fmt, nprocs, file_head)
+!!
+!!      integer(kind = kint) function check_file_exist(file_name)
 !!@endverbatim
 !!
-!!@n @param  file_name   file name to delete
+!!@n @param  file_name   file name
 !!@n @param  file_head   file header to delete
 !!@n @param  iflag_fmt   file format flag
 !!@n @param  nprocs      number of subdomains
@@ -69,5 +71,28 @@
       end subroutine delete_parallel_files
 !
 !------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      integer(kind = kint) function check_file_exist(file_name)
+!
+      use m_error_IDs
+!
+      character(len=kchara), intent(in) :: file_name
+      integer(kind = kint), parameter :: id_file = 255
+!
+!
+      open (id_file, file=file_name, status='old', err=99)
+      close(id_file)
+!
+      check_file_exist = 0
+      return
+!
+  99  continue
+      check_file_exist = ierr_file
+      return
+!
+      end function check_file_exist
+!
+!  ---------------------------------------------------------------------
 !
       end module delete_data_files

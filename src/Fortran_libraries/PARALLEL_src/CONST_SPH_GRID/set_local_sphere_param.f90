@@ -20,7 +20,6 @@
       use m_precision
 !
       use m_spheric_parameter
-      use m_sph_1d_global_index
 !
       implicit none
 !
@@ -31,6 +30,9 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_global_sph_rtp_id
+!
+      use m_spheric_global_ranks
+      use m_sph_1d_global_index
 !
       integer(kind = kint) :: inod, k, l, m
       integer(kind = kint) :: k_gl, l_gl, m_gl
@@ -64,6 +66,9 @@
 !
       subroutine set_global_sph_rj_id
 !
+      use m_spheric_global_ranks
+      use m_sph_1d_global_index
+!
       integer(kind = kint) :: j, k, inod
       integer(kind = kint) :: ndom_r, nsize_r
 !
@@ -88,6 +93,9 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_global_sph_4_rtm
+!
+      use m_spheric_global_ranks
+      use m_sph_1d_global_index
 !
       integer(kind = kint) :: inod, k, l, m
       integer(kind = kint) :: ndom_r, ndom_t, nsize_r, nsize_t
@@ -115,6 +123,9 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_global_sph_4_rlm
+!
+      use m_spheric_global_ranks
+      use m_sph_1d_global_index
 !
       integer(kind = kint) :: j, k, inod
       integer(kind = kint) :: ndom_r, nsize_r

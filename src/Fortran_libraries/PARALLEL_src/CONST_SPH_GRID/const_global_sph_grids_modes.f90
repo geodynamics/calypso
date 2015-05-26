@@ -39,15 +39,15 @@
       integer(kind = kint), allocatable :: nidx_local_rj_r(:)
       integer(kind = kint), allocatable :: nidx_local_rj_j(:)
 !
-      private :: nidx_local_rtp_r, nidx_local_rtp_t, nidx_local_rtp_p
-      private :: nidx_local_rtm_r, nidx_local_rtm_t, nidx_local_rtm_m
-      private :: nidx_local_rlm_r, nidx_local_rlm_j
-      private :: nidx_local_rj_r, nidx_local_rj_j
+!      private :: nidx_local_rtp_r, nidx_local_rtp_t, nidx_local_rtp_p
+!      private :: nidx_local_rtm_r, nidx_local_rtm_t, nidx_local_rtm_m
+!      private :: nidx_local_rlm_r, nidx_local_rlm_j
+!      private :: nidx_local_rj_r, nidx_local_rj_j
 !
-      private :: const_global_rtp_grids, const_global_rtm_grids
-      private :: const_global_rj_modes_by_rlm, const_global_rlm_modes
-      private :: const_sph_transfer_tables
-      private :: allocate_nidx_local, deallocate_nidx_local
+!      private :: const_global_rtp_grids, const_global_rtm_grids
+!      private :: const_global_rj_modes_by_rlm, const_global_rlm_modes
+!      private :: const_sph_transfer_tables
+!      private :: allocate_nidx_local, deallocate_nidx_local
 !
 ! -----------------------------------------------------------------------
 !
@@ -60,6 +60,7 @@
       use m_spheric_global_ranks
       use m_sph_global_parameter
       use m_sph_1d_global_index
+      use m_2d_sph_trans_table
       use set_sph_1d_global_index
       use set_sph_1d_domain_id
 !
@@ -89,10 +90,12 @@
       call deallocate_nidx_local
       call allocate_sph_1d_global_idx
 !
-      call set_sph_1d_global_idx_rtp
-      call set_sph_1d_global_idx_rtm
-      call set_sph_1d_global_idx_rlm
-      call set_sph_1d_global_idx_rj
+      call set_sph_1d_global_idx_rtp                                    &
+     &   (m_folding, nidx_global_rtp(3), mdx_ispack)
+      call set_sph_1d_global_idx_rtm                                    &
+     &   (m_folding, nidx_global_rtp(3), mtbl_fft_2_lgd, mdx_4_lgd)
+      call set_sph_1d_global_idx_rlm(nidx_global_rj(2), jtbl_fsph)
+      call set_sph_1d_global_idx_rj(nidx_global_rj(2), jtbl_rj)
 !
       call allocate_sph_1d_domain_id
 !
@@ -109,9 +112,52 @@
       end subroutine s_const_global_sph_grids_modes
 !
 ! -----------------------------------------------------------------------
+!
+      subroutine const_global_sph_FEM_grid
+!
+      use m_spheric_global_ranks
+      use m_sph_global_parameter
+      use m_sph_1d_global_index
+      use m_2d_sph_trans_table
+      use set_sph_1d_global_index
+      use set_sph_1d_domain_id
+!
+!
+      call allocate_sph_1d_global_stack
+      call allocate_sph_gl_parameter
+      call allocate_sph_gl_bc_param
+      call allocate_sph_ranks
+      call allocate_nidx_local
+!
+!
+      if(iflag_debug .gt. 0) write(*,*) 'const_global_rtp_grids'
+      call const_global_rtp_grids
+!
+      if(iflag_debug .gt. 0) write(*,*) 'const_sph_transfer_tables'
+      call const_sph_transfer_tables
+!
+      call deallocate_nidx_local
+      call allocate_sph_1d_global_idx
+!
+      call set_sph_1d_global_idx_rtp                                    &
+     &   (m_folding, nidx_global_rtp(3), mdx_ispack)
+!
+      call allocate_sph_1d_domain_id
+!
+      call set_sph_1d_domain_id_rtp
+!
+      if(iflag_debug .gt. 0) then
+        write(50,*) 'idx_global_rtp_r', idx_global_rtp_r
+      end if
+!
+      end subroutine const_global_sph_FEM_grid
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine allocate_nidx_local
+!
+      use m_spheric_global_ranks
 !
       integer(kind = kint) :: num
 !
@@ -200,37 +246,45 @@
       integer(kind = kint) :: ist, ied
 !
 !
+!      write(*,*) 'set_gl_rank_3d', ndomain_rtp(1:3)
       call set_gl_rank_3d(ndomain_sph, ndomain_rtp, iglobal_rank_rtp)
 !
 !      call cal_local_nums(ndomain_rtp(1), ione, nidx_global_rtp(1),    &
 !     &    nidx_local_rtp_r, istack_idx_local_rtp_r)
+!      write(*,*) 'cal_local_nums 1', ndomain_rtp(1:3), nidx_global_rtp(2)
       call cal_local_nums(ndomain_rtp(2), ione, nidx_global_rtp(2),     &
      &    nidx_local_rtp_t, istack_idx_local_rtp_t)
+!      write(*,*) 'cal_local_nums 2'
       call cal_local_nums(ndomain_rtp(3), ione, nidx_global_rtp(3),     &
      &    nidx_local_rtp_p, istack_idx_local_rtp_p)
 !
 !
+!      write(*,*) 'cal_local_nums_st'
       call cal_local_nums_st(ndomain_rtp(1), nlayer_ICB, nlayer_CMB,    &
      &    nidx_local_rtp_OC, ist_idx_local_rtp_OC)
 !
       if (nlayer_ICB .gt. 1) then
         ied = nlayer_ICB - 1
+!      write(*,*) 'cal_local_nums_rev'
         call cal_local_nums_rev(ndomain_rtp(1), ione, ied,              &
      &      nidx_local_rtp_IC, ist_idx_local_rtp_IC)
       end if
 !
       if (nlayer_CMB .lt. nidx_global_rtp(1)) then
         ist = nlayer_CMB + 1
+!      write(*,*) 'cal_local_nums_rev'
         call cal_local_nums_rev(ndomain_rtp(1), ist,                    &
      &      nidx_global_rtp(1), nidx_local_rtp_MT,                      &
      &      ist_idx_local_rtp_MT)
       end if
 !
+!      write(*,*) 'merge_num_3_local_layers'
       call merge_num_3_local_layers(ndomain_rtp(1),                     &
      &    nidx_local_rtp_OC, nidx_local_rtp_IC, nidx_local_rtp_MT,      &
      &    ione, nidx_local_rtp_r, istack_idx_local_rtp_r)
 !
 !
+!      write(*,*) 'set_gl_nnod_spherical'
       call set_gl_nnod_spherical(ndomain_sph,                           &
      &    ndomain_rtp(1), ndomain_rtp(2), ndomain_rtp(3),               &
      &    iglobal_rank_rtp, nidx_local_rtp_r, nidx_local_rtp_t,         &
@@ -367,9 +421,6 @@
       call set_trans_table_fft_2_lgd(l_truncation,                      &
      &    nidx_global_rtp(2), nidx_global_rtp(3), m_folding,            &
      &    mspec_4_ispack,jdx_fsph, mtbl_fft_2_lgd)
-!
-      call set_trans_table_lgd_2_sph(nidx_global_rj(2),                 &
-     &    jtbl_fsph(0,1), jtbl_isph)
 !
       end subroutine const_sph_transfer_tables
 !

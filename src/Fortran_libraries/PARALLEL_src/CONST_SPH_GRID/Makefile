@@ -2,7 +2,7 @@
 #
 #
 
-SPH_GRID_SRCDIR = $$(UTILS_SRCDIR)/spherical_grid
+SPH_GRID_SRCDIR = $$(PARA_SRCDIR)/CONST_SPH_GRID
 SRC_SPH_GRID = $(shell ls *.f90)
 MOD_SPH_GRID = $(addsuffix .o,$(basename $(SRC_SPH_GRID)) )
 

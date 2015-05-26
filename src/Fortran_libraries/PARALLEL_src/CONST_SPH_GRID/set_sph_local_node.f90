@@ -3,9 +3,11 @@
 !
 !     Written by H. Matsui on March, 2012
 !
-!      subroutine count_numnod_local_sph_mesh(ip_r, ip_t, node)
-!      subroutine set_local_nodes_sph_mesh(ip_r, ip_t, node)
-!        type(node_data), intent(inout) :: node
+!!      subroutine count_numnod_local_sph_mesh                          &
+!!     &          (iflag_shell_mode, ip_r, ip_t, node)
+!!      subroutine set_local_nodes_sph_mesh                             &
+!!     &          (iflag_shell_mode, ip_r, ip_t, r_global, node)
+!!        type(node_data), intent(inout) :: node
 !
       module set_sph_local_node
 !
@@ -22,13 +24,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine count_numnod_local_sph_mesh(ip_r, ip_t, node)
+      subroutine count_numnod_local_sph_mesh                            &
+     &          (iflag_shell_mode, ip_r, ip_t, node)
 !
       use t_geometry_data
-      use m_spheric_parameter
+      use m_spheric_constants
       use m_sph_mesh_1d_connect
 !
-      integer(kind = kint), intent(in) :: ip_r, ip_t
+      integer(kind = kint), intent(in) :: iflag_shell_mode, ip_r, ip_t
       type(node_data), intent(inout) :: node
 !
 !
@@ -80,14 +83,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_local_nodes_sph_mesh(ip_r, ip_t, node)
+      subroutine set_local_nodes_sph_mesh                               &
+     &          (iflag_shell_mode, ip_r, ip_t, r_global, node)
 !
-      use m_spheric_parameter
+      use m_spheric_constants
       use m_sph_mesh_1d_connect
       use m_gauss_points
       use t_geometry_data
 !
-      integer(kind = kint), intent(in) :: ip_r, ip_t
+      integer(kind = kint), intent(in) :: iflag_shell_mode, ip_r, ip_t
+      real(kind= kreal), intent(in) :: r_global(nidx_global_fem(1))
       type(node_data), intent(inout) :: node
 !
       integer(kind = kint) :: knum, lnum, mnum
@@ -106,7 +111,7 @@
             inod = sph_shell_node_id(ip_r, ip_t, knum, lnum, mnum)
             node%inod_global(inod)                                      &
      &          = global_sph_shell_node_id(k, l, mnum)
-            node%rr(inod) =     radius_1d_gl(k)
+            node%rr(inod) =     r_global(k)
             node%theta(inod) =  w_colat(l)
             node%phi(inod) =  two*pi*dble(mnum-1)                       &
      &                         / dble(nidx_global_fem(3))
@@ -127,7 +132,7 @@
             inod = sph_s_pole_node_id(knum)
             node%inod_global(inod) = global_sph_s_pole_node_id(k)
 !
-            node%rr(inod) =     radius_1d_gl(k)
+            node%rr(inod) =    r_global(k)
             node%theta(inod) = pi
             node%phi(inod) =  zero
           end do
@@ -141,7 +146,7 @@
             inod = sph_n_pole_node_id(knum)
             node%inod_global(inod) = global_sph_n_pole_node_id(k)
 !
-            node%rr(inod) =     radius_1d_gl(k)
+            node%rr(inod) =     r_global(k)
             node%theta(inod) = zero
             node%phi(inod) =   zero
           end do
@@ -167,7 +172,7 @@
                 node%inod_global(inod)                                  &
      &                = global_sph_shell_node_id(ione, l, mnum)
 !
-                node%rr(inod) =     radius_1d_gl(1)
+                node%rr(inod) =    r_global(1)
                 node%theta(inod) = w_colat(l)
                 node%phi(inod) =  two*pi*dble(mnum-1)                   &
      &                         / dble(nidx_global_fem(3))
@@ -178,7 +183,7 @@
               inod = sph_center_np_node_id()
               node%inod_global(inod) = global_sph_n_pole_node_id(ione)
 !
-              node%rr(inod) =    radius_1d_gl(1)
+              node%rr(inod) =    r_global(1)
               node%theta(inod) = zero
               node%phi(inod) =   zero
             end if

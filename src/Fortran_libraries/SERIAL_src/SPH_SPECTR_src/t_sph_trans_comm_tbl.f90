@@ -16,6 +16,7 @@
 !!      subroutine alloc_type_sph_comm_stack(comm)
 !!      subroutine alloc_type_sph_comm_item(numnod, comm)
 !!      subroutine dealloc_type_sph_comm_item(comm)
+!!      subroutine dealloc_type_sph_comm_item(comm)
 !!        type(sph_comm_tbl), intent(inout) :: comm
 !!
 !!      subroutine set_reverse_sph_comm_tbl_t(numnod, comm)
@@ -144,12 +145,22 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
+      subroutine dealloc_type_sph_comm_stack(comm)
+!
+      type(sph_comm_tbl), intent(inout) :: comm
+!
+      deallocate(comm%id_domain, comm%istack_sr)
+!
+      end subroutine dealloc_type_sph_comm_stack
+!
+! -----------------------------------------------------------------------
+!
       subroutine dealloc_type_sph_comm_item(comm)
 !
       type(sph_comm_tbl), intent(inout) :: comm
 !
       deallocate(comm%item_sr, comm%irev_sr)
-      deallocate(comm%id_domain, comm%istack_sr)
+      call dealloc_type_sph_comm_stack(comm)
 !
       end subroutine dealloc_type_sph_comm_item
 !

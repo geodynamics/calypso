@@ -8,13 +8,8 @@
 !> @brief Construct communication table for rj and rtp grid
 !!
 !!@verbatim
-!!      subroutine alloc_parallel_sph_grids
-!!      subroutine allocate_domain_sr_tmp
-!!      subroutine dealloc_parallel_sph_grids
-!!      subroutine deallocate_domain_sr_tmp
-!!
-!!      subroutine const_sph_rj_modes(ip_rank)
-!!      subroutine const_sph_rtp_grids(ip_rank)
+!!      subroutine const_sph_rj_modes(ip_rank, ndomain_sph, comm_rlm)
+!!      subroutine const_sph_rtp_grids(ip_rank, ndomain_sph, comm_rtm)
 !!
 !!      subroutine set_comm_stack_rtp_rj(nneib_domain, id_domain,       &
 !!     &          istack_sr, ntot_item_sr)
@@ -24,17 +19,15 @@
 !
       use m_precision
       use m_machine_parameter
-      use t_spheric_mesh
+      use t_sph_trans_comm_tbl
 !
       implicit none
-!
-!>      Structure for parallel spherical mesh table
-      type(sph_mesh_data), allocatable, save :: sph_para(:)
 !
       integer(kind = kint), allocatable :: id_domain_tmp(:)
       integer(kind = kint), allocatable :: nnod_sr_tmp(:)
       private :: id_domain_tmp, nnod_sr_tmp
 !
+      private :: allocate_domain_sr_tmp,  deallocate_domain_sr_tmp
       private :: const_comm_table_4_rj,  const_comm_table_4_rtp
       private :: count_comm_table_4_rj,  set_comm_table_4_rj
       private :: count_comm_table_4_rtp, set_comm_table_4_rtp
@@ -45,20 +38,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_parallel_sph_grids
+      subroutine allocate_domain_sr_tmp(ndomain_sph)
 !
-      use m_spheric_parameter
-!
-!
-      allocate(sph_para(ndomain_sph))
-!
-      end subroutine alloc_parallel_sph_grids
-!
-! -----------------------------------------------------------------------
-!
-      subroutine allocate_domain_sr_tmp
-!
-      use m_spheric_parameter
+      integer(kind = kint), intent(in) :: ndomain_sph
 !
       allocate( id_domain_tmp(ndomain_sph) )
       allocate( nnod_sr_tmp(ndomain_sph) )
@@ -66,15 +48,6 @@
       nnod_sr_tmp = 0
 !
       end subroutine allocate_domain_sr_tmp
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_parallel_sph_grids
-!
-      deallocate(sph_para)
-!
-      end subroutine dealloc_parallel_sph_grids
 !
 ! -----------------------------------------------------------------------
 !
@@ -88,7 +61,7 @@
 ! -----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine const_sph_rj_modes(ip_rank)
+      subroutine const_sph_rj_modes(ip_rank, ndomain_sph, comm_rlm)
 !
       use m_spheric_parameter
       use load_data_for_sph_IO
@@ -99,6 +72,8 @@
       use set_local_index_table_sph
 !
       integer(kind = kint), intent(in) :: ip_rank
+      integer(kind = kint), intent(in) :: ndomain_sph
+      type(sph_comm_tbl), intent(in) :: comm_rlm(ndomain_sph)
 !
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
@@ -120,7 +95,8 @@
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &                 'const_comm_table_4_rj', ip_rank
-      call const_comm_table_4_rj(ip_rank, nnod_rj)
+      call const_comm_table_4_rj                                        &
+     &   (ip_rank, nnod_rj, ndomain_sph, comm_rlm)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &                  'set_sph_rj_groups', ip_rank
@@ -137,7 +113,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine const_sph_rtp_grids(ip_rank)
+      subroutine const_sph_rtp_grids(ip_rank, ndomain_sph, comm_rtm)
 !
       use m_spheric_parameter
       use load_data_for_sph_IO
@@ -148,6 +124,8 @@
       use set_local_index_table_sph
 !
       integer(kind = kint), intent(in) :: ip_rank
+      integer(kind = kint), intent(in) :: ndomain_sph
+      type(sph_comm_tbl), intent(in) :: comm_rtm(ndomain_sph)
 !
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
@@ -170,7 +148,8 @@
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &                 'const_comm_table_4_rtp', ip_rank
-      call const_comm_table_4_rtp(ip_rank, nnod_rtp)
+      call const_comm_table_4_rtp                                       &
+     &   (ip_rank, nnod_rtp, ndomain_sph, comm_rtm)
 !
       if(iflag_debug .gt. 0) write(*,*) 'set_sph_rtp_groups', ip_rank
       call set_sph_rtp_groups
@@ -187,18 +166,21 @@
 ! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_comm_table_4_rj(ip_rank, nnod_rj)
+      subroutine const_comm_table_4_rj                                  &
+     &         (ip_rank, nnod_rj, ndomain_sph, comm_rlm)
 !
       use m_sph_trans_comm_table
 !
       integer(kind = kint), intent(in) :: ip_rank, nnod_rj
+      integer(kind = kint), intent(in) :: ndomain_sph
+      type(sph_comm_tbl), intent(in) :: comm_rlm(ndomain_sph)
       integer(kind = kint) :: icou
 !
 !
-      call allocate_domain_sr_tmp
+      call allocate_domain_sr_tmp(ndomain_sph)
 !
       nneib_domain_rj = 0
-      call count_comm_table_4_rj(ip_rank)
+      call count_comm_table_4_rj(ip_rank, ndomain_sph, comm_rlm)
 !
       call allocate_sph_comm_stack_rj
 !
@@ -209,26 +191,29 @@
       call allocate_sph_comm_item_rj(nnod_rj)
 !
       icou = 0
-      call set_comm_table_4_rj(ip_rank, icou)
+      call set_comm_table_4_rj(ip_rank, ndomain_sph, comm_rlm, icou)
 !
       end subroutine const_comm_table_4_rj
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_comm_table_4_rtp(ip_rank, nnod_rtp)
+      subroutine const_comm_table_4_rtp                                 &
+     &         (ip_rank, nnod_rtp, ndomain_sph, comm_rtm)
 !
       use m_sph_trans_comm_table
 !
       integer(kind = kint), intent(in) :: ip_rank
       integer(kind = kint), intent(in) :: nnod_rtp
+      integer(kind = kint), intent(in) :: ndomain_sph
+      type(sph_comm_tbl), intent(in) :: comm_rtm(ndomain_sph)
 !
       integer(kind = kint) :: icou
 !
 !
-      call allocate_domain_sr_tmp
+      call allocate_domain_sr_tmp(ndomain_sph)
 !
       nneib_domain_rtp = 0
-      call count_comm_table_4_rtp(ip_rank)
+      call count_comm_table_4_rtp(ip_rank, ndomain_sph, comm_rtm)
 !
       call allocate_sph_comm_stack_rtp
 !
@@ -243,19 +228,20 @@
       call allocate_sph_comm_item_rtp(nnod_rtp)
 !
       icou = 0
-      call set_comm_table_4_rtp(ip_rank, icou)
+      call set_comm_table_4_rtp(ip_rank, ndomain_sph, comm_rtm, icou)
 !
       end subroutine const_comm_table_4_rtp
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine count_comm_table_4_rj(ip_rank)
+      subroutine count_comm_table_4_rj(ip_rank, ndomain_sph, comm_rlm)
 !
-      use m_spheric_parameter
       use m_sph_trans_comm_table
 !
       integer(kind = kint), intent(in) :: ip_rank
+      integer(kind = kint), intent(in) :: ndomain_sph
+      type(sph_comm_tbl), intent(in) :: comm_rlm(ndomain_sph)
 !
       integer(kind = kint) :: ip1, jp, id_org_rank, ip_org
       integer(kind = kint) :: iflag_jp
@@ -266,9 +252,8 @@
         ip_org = id_org_rank + 1
 !
         iflag_jp = 0
-        do jp = 1, sph_para(ip_org)%sph_comms%comm_rlm%nneib_domain
-          if(sph_para(ip_org)%sph_comms%comm_rlm%id_domain(jp)          &
-     &       .eq. ip_rank) then
+        do jp = 1, comm_rlm(ip_org)%nneib_domain
+          if(comm_rlm(ip_org)%id_domain(jp) .eq. ip_rank) then
             iflag_jp = jp
             exit
           end if
@@ -278,22 +263,24 @@
         nneib_domain_rj = nneib_domain_rj + 1
         id_domain_tmp(nneib_domain_rj) = id_org_rank
         nnod_sr_tmp(nneib_domain_rj)                                    &
-     &     =  sph_para(ip_org)%sph_comms%comm_rlm%istack_sr(iflag_jp)   &
-     &      - sph_para(ip_org)%sph_comms%comm_rlm%istack_sr(iflag_jp-1)
+     &     =  comm_rlm(ip_org)%istack_sr(iflag_jp)                      &
+     &      - comm_rlm(ip_org)%istack_sr(iflag_jp-1)
       end do
 !
       end subroutine count_comm_table_4_rj
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_comm_table_4_rj(ip_rank, icou)
+      subroutine set_comm_table_4_rj                                    &
+     &         (ip_rank, ndomain_sph, comm_rlm, icou)
 !
-      use m_spheric_parameter
       use m_sph_trans_comm_table
       use set_local_index_table_sph
       use gen_sph_grids_modes
 !
       integer(kind = kint), intent(in) :: ip_rank
+      integer(kind = kint), intent(in) :: ndomain_sph
+      type(sph_comm_tbl), intent(in) :: comm_rlm(ndomain_sph)
       integer(kind = kint), intent(inout) :: icou
 !
       integer(kind = kint) :: jst, jed, j, jnod, k_tmp, j_tmp
@@ -309,9 +296,8 @@
         ip_org = id_org_rank + 1
 !
         iflag_jp = 0
-        do jp = 1, sph_para(ip_org)%sph_comms%comm_rlm%nneib_domain
-          if(sph_para(ip_org)%sph_comms%comm_rlm%id_domain(jp)          &
-     &         .eq. ip_rank) then
+        do jp = 1, comm_rlm(ip_org)%nneib_domain
+          if(comm_rlm(ip_org)%id_domain(jp) .eq. ip_rank) then
             iflag_jp = jp
             exit
           end if
@@ -342,12 +328,13 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine count_comm_table_4_rtp(ip_rank)
+      subroutine count_comm_table_4_rtp(ip_rank, ndomain_sph, comm_rtm)
 !
-      use m_spheric_parameter
       use m_sph_trans_comm_table
 !
       integer(kind = kint), intent(in) :: ip_rank
+      integer(kind = kint), intent(in) :: ndomain_sph
+      type(sph_comm_tbl), intent(in) :: comm_rtm(ndomain_sph)
 !
       integer(kind = kint) :: ip1, jp, id_org_rank, ip_org
       integer(kind = kint) :: iflag_jp
@@ -358,9 +345,8 @@
         ip_org = id_org_rank + 1
 !
         iflag_jp = 0
-        do jp = 1, sph_para(ip_org)%sph_comms%comm_rtm%nneib_domain
-          if(sph_para(ip_org)%sph_comms%comm_rtm%id_domain(jp)          &
-     &        .eq. ip_rank) then
+        do jp = 1, comm_rtm(ip_org)%nneib_domain
+          if(comm_rtm(ip_org)%id_domain(jp) .eq. ip_rank) then
             iflag_jp = jp
             exit
           end if
@@ -370,22 +356,24 @@
         nneib_domain_rtp = nneib_domain_rtp + 1
         id_domain_tmp(nneib_domain_rtp) = id_org_rank
         nnod_sr_tmp(nneib_domain_rtp)                                   &
-     &     =  sph_para(ip_org)%sph_comms%comm_rtm%istack_sr(iflag_jp)   &
-     &      - sph_para(ip_org)%sph_comms%comm_rtm%istack_sr(iflag_jp-1)
+     &     =  comm_rtm(ip_org)%istack_sr(iflag_jp)                      &
+     &      - comm_rtm(ip_org)%istack_sr(iflag_jp-1)
       end do
 !
       end subroutine count_comm_table_4_rtp
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_comm_table_4_rtp(ip_rank, icou)
+      subroutine set_comm_table_4_rtp                                   &
+     &         (ip_rank, ndomain_sph, comm_rtm, icou)
 !
-      use m_spheric_parameter
       use m_sph_trans_comm_table
       use set_local_index_table_sph
       use gen_sph_grids_modes
 !
       integer(kind = kint), intent(in) :: ip_rank
+      integer(kind = kint), intent(in) :: ndomain_sph
+      type(sph_comm_tbl), intent(in) :: comm_rtm(ndomain_sph)
       integer(kind = kint), intent(inout) :: icou
 !
       integer(kind = kint) :: jst, jed, j, jnod
@@ -400,9 +388,8 @@
         ip_org = id_org_rank + 1
 !
         iflag_jp = 0
-        do jp = 1, sph_para(ip_org)%sph_comms%comm_rtm%nneib_domain
-          if(sph_para(ip_org)%sph_comms%comm_rtm%id_domain(jp)          &
-     &        .eq. ip_rank) then
+        do jp = 1, comm_rtm(ip_org)%nneib_domain
+          if(comm_rtm(ip_org)%id_domain(jp) .eq. ip_rank) then
             iflag_jp = jp
             exit
           end if

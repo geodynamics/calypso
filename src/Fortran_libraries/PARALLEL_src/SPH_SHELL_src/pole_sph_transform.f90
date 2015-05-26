@@ -94,31 +94,6 @@
       integer(kind = kint) :: nnod_full_shell
 !
 !
-      nnod_full_shell = nnod_rtp * m_folding
-      iflag_shell_mode = 0
-      if(internal_node .le. nnod_full_shell) then
-        iflag_shell_local = iflag_MESH_same
-      else if(internal_node .eq. nnod_full_shell+nidx_rtp(1)) then
-        iflag_shell_local = iflag_MESH_w_pole
-      else if(internal_node .eq. nnod_full_shell+2*nidx_rtp(1)) then
-        iflag_shell_local = iflag_MESH_w_pole
-      else if(internal_node .eq. nnod_full_shell+nidx_rtp(1)+1) then
-        iflag_shell_local = iflag_MESH_w_center
-      else if(internal_node .eq. nnod_full_shell+2*nidx_rtp(1)+1) then
-        iflag_shell_local = iflag_MESH_w_center
-      end if
-!
-      if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_local',   &
-     &     my_rank, iflag_shell_local, internal_node, nnod_full_shell
-      call MPI_allreduce(iflag_shell_local, iflag_shell_mode, ione,     &
-     &    CALYPSO_INTEGER, MPI_MAX, CALYPSO_COMM, ierr_MPI)
-      if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_mode',    &
-     &     my_rank, iflag_shell_mode
-!
-      if(iflag_shell_mode .ne. iflag_MESH_same) then
-        nnod_rtp_pole = numnod
-      end if
-!
       call init_num_pole_sph_trans
 !
       end subroutine init_pole_transform

@@ -21,7 +21,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_const_FEM_mesh_for_sph(ip_rank, mesh, group)
+      subroutine s_const_FEM_mesh_for_sph                               &
+     &         (ip_rank, r_global, mesh, group)
 !
       use t_mesh_data
       use t_comm_table
@@ -34,6 +35,7 @@
       use ordering_sph_mesh_to_rtp
 !
       integer(kind = kint), intent(in) :: ip_rank
+      real(kind= kreal), intent(in) :: r_global(nidx_global_fem(1))
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::  group
@@ -45,7 +47,8 @@
       ip_t = iglobal_rank_rtp(2,ip_rank) + 1
 !
 !  Construct element connectivity
-      call const_FEM_geometry_for_sph(ip_r, ip_t, mesh%node, mesh%ele)
+      call const_FEM_geometry_for_sph(ip_r, ip_t, r_global,             &
+     &    mesh%node, mesh%ele)
 !
 !  Construct groups
       call const_FEM_groups_for_sph(ip_r, ip_t, group)
@@ -69,8 +72,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_FEM_geometry_for_sph(ip_r, ip_t, node, ele)
+      subroutine const_FEM_geometry_for_sph(ip_r, ip_t, r_global,       &
+     &          node, ele)
 !
+      use calypso_mpi
+      use m_geometry_parameter
       use t_geometry_data
       use m_spheric_parameter
       use m_spheric_global_ranks
@@ -80,15 +86,18 @@
       use set_sph_local_element
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t
+      real(kind= kreal), intent(in) :: r_global(nidx_global_fem(1))
 !
       type(node_data), intent(inout) :: node
       type(element_data), intent(inout) :: ele
 !
 !  Construct node geometry
-      call count_numnod_local_sph_mesh(ip_r, ip_t, node)
+      call count_numnod_local_sph_mesh                                  &
+     &   (iflag_shell_mode, ip_r, ip_t, node)
 !
       call allocate_node_geometry_type(node)
-      call set_local_nodes_sph_mesh(ip_r, ip_t, node)
+      call set_local_nodes_sph_mesh                                     &
+     &   (iflag_shell_mode, ip_r, ip_t, r_global, node)
 !
 !  Construct element connectivity
       call count_local_elements_sph_mesh(ip_r, ip_t, ele)
@@ -114,6 +123,7 @@
       integer(kind = kint), intent(in) :: ip_r, ip_t
 !
       type(mesh_groups), intent(inout) ::  group
+!
 !
 !  Construct node group
       call count_sph_local_node_group(group%nod_grp)

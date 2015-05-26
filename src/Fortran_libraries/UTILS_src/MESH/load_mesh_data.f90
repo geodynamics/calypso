@@ -15,7 +15,7 @@
 !
       implicit none
 !
-      private :: set_mesh_data, set_mesh_to_IO
+      private :: set_mesh_to_IO
 !
 ! -----------------------------------------------------------------------
 !

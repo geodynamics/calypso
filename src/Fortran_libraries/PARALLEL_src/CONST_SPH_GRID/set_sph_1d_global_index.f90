@@ -3,18 +3,25 @@
 !
 !     Written by H. Matsui on July, 2007
 !
-!      subroutine set_sph_1d_global_idx_rtp
-!      subroutine set_sph_1d_global_idx_rtm
-!      subroutine set_sph_1d_global_idx_rlm
-!      subroutine set_sph_1d_global_idx_rj
+!>@file   set_sph_1d_global_index.f90
+!!@brief  module set_sph_1d_global_index
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
+!
+!>@brief  Set global indices for spherical harominics transform
+!!
+!!@verbatim
+!!      subroutine set_sph_1d_global_idx_rtp(m_folding, nphi, mdx_ispack)
+!!      subroutine set_sph_1d_global_idx_rtm                            &
+!!     &         (m_folding, nphi, mtbl_fft_2_lgd, mdx_4_lgd)
+!!      subroutine set_sph_1d_global_idx_rlm
+!!      subroutine set_sph_1d_global_idx_rj
+!!@endverbatim
 !
       module set_sph_1d_global_index
 !
       use m_precision
-!
-      use m_spheric_parameter
-      use m_sph_1d_global_index
-      use m_2d_sph_trans_table
 !
       implicit none
 !
@@ -24,9 +31,14 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_sph_1d_global_idx_rtp
+      subroutine set_sph_1d_global_idx_rtp(m_folding, nphi, mdx_ispack)
 !
+      use m_spheric_global_ranks
       use m_sph_global_parameter
+      use m_sph_1d_global_index
+!
+      integer(kind = kint), intent(in) :: m_folding, nphi
+      integer(kind = kint), intent(in) :: mdx_ispack(nphi)
 !
       integer(kind = kint) :: ist, ied
       integer(kind = kint) :: icou, i, ip, kr
@@ -76,9 +88,16 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_sph_1d_global_idx_rtm
+      subroutine set_sph_1d_global_idx_rtm                              &
+     &         (m_folding, nphi, mtbl_fft_2_lgd, mdx_4_lgd)
 !
+      use m_spheric_global_ranks
       use m_sph_global_parameter
+      use m_sph_1d_global_index
+!
+      integer(kind = kint), intent(in) :: m_folding, nphi
+      integer(kind = kint), intent(in) :: mtbl_fft_2_lgd(0:nphi)
+      integer(kind = kint), intent(in) :: mdx_4_lgd(0:nphi)
 !
       integer(kind = kint) :: n1, n2, n3
       integer(kind = kint) :: icou, i, ip
@@ -109,17 +128,17 @@
       end do
 !
 !
-      do i = 1, istack_idx_local_rtm_t(n2)
+      do i = 1, num_gl_rtm_t
         idx_global_rtm_t(i) = i
       end do
 !
-      do i = 0, istack_idx_local_rtm_m(n3)
+      do i = 0, num_gl_rtm_m
         idx_global_rtm_m(i,1) = mtbl_fft_2_lgd(i)
         idx_global_rtm_m(i,2) = mdx_4_lgd(i) * m_folding
       end do
 !
 !      write(*,*) 'i,j, idx_global_rtm_m(j,1:2)'
-!      do i = 0, istack_idx_local_rtm_m(n3)
+!      do i = 0, num_gl_rtm_m
 !        write(*,*) i, idx_global_rtm_m(i,1:2)
 !      end do
 !
@@ -127,26 +146,28 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_sph_1d_global_idx_rlm
+      subroutine set_sph_1d_global_idx_rlm(jmax, jtbl_fsph)
 !
-      integer(kind = kint) :: n1, n2, i
+      use m_sph_1d_global_index
+!
+      integer(kind = kint), intent(in) :: jmax
+      integer(kind = kint), intent(in) :: jtbl_fsph(0:jmax,3)
+!
+      integer(kind = kint) :: i
 !
 !
-      n1 = ndomain_rlm(1)
-      n2 = ndomain_rlm(2)
-!
-      do i = 1, istack_idx_local_rlm_r(n1)
+      do i = 1, num_gl_rlm_r
         idx_global_rlm_r(i) = idx_global_rtm_r(i)
       end do
 !
-      do i = 0, istack_idx_local_rlm_j(n2)
+      do i = 0, num_gl_rlm_j
         idx_global_rlm_j(i,1) = jtbl_fsph(i,1)
         idx_global_rlm_j(i,2) = jtbl_fsph(i,2)
         idx_global_rlm_j(i,3) = jtbl_fsph(i,3)
       end do
 !
 !      write(*,*) 'i, jtbl_fsph(i,1:3)'
-!      do i = 0, istack_idx_local_rlm_j(n2)
+!      do i = 0, num_gl_rlm_j
 !        write(*,*) i, jtbl_fsph(i,1:3)
 !      end do
 !
@@ -154,26 +175,28 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_sph_1d_global_idx_rj
+      subroutine set_sph_1d_global_idx_rj(jmax, jtbl_rj)
 !
-      integer(kind = kint) :: n1, n2, j
+      use m_sph_1d_global_index
+!
+      integer(kind = kint), intent(in) :: jmax
+      integer(kind = kint), intent(in) :: jtbl_rj(0:jmax,3)
+!
+      integer(kind = kint) :: k, j
 !
 !
-      n1 = ndomain_rj(1)
-      n2 = ndomain_rj(2)
-!
-      do j = 1, istack_idx_local_rj_r(n1)
-        idx_global_rj_r(j) = j
+      do k = 1, nun_gl_rj_r
+        idx_global_rj_r(k) = k
       end do
 !
-      do j = 0, istack_idx_local_rj_j(n2)
+      do j = 0, num_gl_rj_j
         idx_global_rj_j(j,1) = jtbl_rj(j,1)
         idx_global_rj_j(j,2) = jtbl_rj(j,2)
         idx_global_rj_j(j,3) = jtbl_rj(j,3)
       end do
 !
 !      write(8,*) 'j, idx_global_rj_j(j,1:3)'
-!      do j = 0, istack_idx_local_rj_j(n2)
+!      do j = 0, num_gl_rj_j
 !        write(8,*) j, idx_global_rj_j(j,1:3)
 !      end do
 !

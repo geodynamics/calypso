@@ -116,13 +116,13 @@
       if (ncomp_field .eq. n_sym_tensor) then
         do inod = 1, nnod
           do nd2 = 1, 3
-            write(id_vtk,'(1p3e23.12)')                                 &
+            write(id_vtk,'(1p3E25.15e3)')                               &
      &             (d_nod(inod,1+l_sim_t(nd,nd2)), nd=1,3)
           end do
         end do
       else
         do inod = 1, nnod
-          write(id_vtk,'(1p3e23.12)') d_nod(inod,1:ncomp_field)
+          write(id_vtk,'(1p3E25.15e3)') d_nod(inod,1:ncomp_field)
         end do
       end if
 !

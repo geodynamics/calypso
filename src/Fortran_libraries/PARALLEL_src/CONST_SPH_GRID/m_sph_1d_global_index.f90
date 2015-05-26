@@ -48,22 +48,45 @@
       integer(kind = kint), allocatable :: istack_idx_local_rj_j(:)
 !
 !
+!>      number of radial address for f(r,t,p)
+      integer(kind = kint) :: num_gl_rtp_r
+!>      number of radial address for f(r,t,p)
+      integer(kind = kint) :: num_gl_rtp_t
+!>      number of zonal grid address for f(r,t,p)
+      integer(kind = kint) :: num_gl_rtp_p
 !>      Global radial address for f(r,t,p)
       integer(kind = kint), allocatable :: idx_global_rtp_r(:)
 !>      Global radial address for f(r,t,p)
       integer(kind = kint), allocatable :: idx_global_rtp_t(:)
 !>      Global zonal grid address for f(r,t,p)
       integer(kind = kint), allocatable :: idx_global_rtp_p(:,:)
+!
+!>      number of radial address for f(r,t,m)
+      integer(kind = kint) :: num_gl_rtm_r
+!>      number of meridional grid address for f(r,t,m)
+      integer(kind = kint) :: num_gl_rtm_t
+!>      number of zonal mode address for f(r,t,m)
+      integer(kind = kint) :: num_gl_rtm_m
 !>      Global radial address for f(r,t,m)
       integer(kind = kint), allocatable :: idx_global_rtm_r(:)
 !>      Global meridional grid address for f(r,t,m)
       integer(kind = kint), allocatable :: idx_global_rtm_t(:)
 !>      Global zonal mode address for f(r,t,m)
       integer(kind = kint), allocatable :: idx_global_rtm_m(:,:)
+!
+!>      number of radial address for f(r,l,m)
+      integer(kind = kint) :: num_gl_rlm_r
+!>      number of spherical harmonics mode address for f(r,l,m)
+      integer(kind = kint) :: num_gl_rlm_j
 !>      Global radial address for f(r,l,m)
       integer(kind = kint), allocatable :: idx_global_rlm_r(:)
 !>      Global spherical harmonics mode address for f(r,l,m)
       integer(kind = kint), allocatable :: idx_global_rlm_j(:,:)
+!
+!>      number of Global radial address for f(r,j)
+      integer(kind = kint) :: nun_gl_rj_r
+!>      number of spherical harmonics mode address for f(r,j)
+      integer(kind = kint) :: num_gl_rj_j
 !>      Global radial address for f(r,j)
       integer(kind = kint), allocatable :: idx_global_rj_r(:)
 !>      Global spherical harmonics mode address for f(r,j)
@@ -85,7 +108,7 @@
 !
       subroutine allocate_sph_1d_global_stack
 !
-      use m_spheric_parameter
+      use m_spheric_global_ranks
 !
       integer(kind = kint) :: num
 !
@@ -131,22 +154,21 @@
 !
       subroutine allocate_sph_1d_global_idx
 !
-      use m_spheric_parameter
+      use m_spheric_global_ranks
 !
       integer(kind = kint) :: n1, n2, n3
-      integer(kind = kint) :: ied_1, ied_2, ied_3
 !
 !
       n1 = ndomain_rtp(1)
       n2 = ndomain_rtp(2)
       n3 = ndomain_rtp(3)
-      ied_1 = istack_idx_local_rtp_r(n1)
-      ied_2 = istack_idx_local_rtp_t(n2)
-      ied_3 = istack_idx_local_rtp_p(n3)
+      num_gl_rtp_r = istack_idx_local_rtp_r(n1)
+      num_gl_rtp_t = istack_idx_local_rtp_t(n2)
+      num_gl_rtp_p = istack_idx_local_rtp_p(n3)
 !
-      allocate( idx_global_rtp_r(1:ied_1) )
-      allocate( idx_global_rtp_t(1:ied_2) )
-      allocate( idx_global_rtp_p(1:ied_3,2) )
+      allocate( idx_global_rtp_r(1:num_gl_rtp_r) )
+      allocate( idx_global_rtp_t(1:num_gl_rtp_t) )
+      allocate( idx_global_rtp_p(1:num_gl_rtp_p,2) )
 !
       idx_global_rtp_r = 0
       idx_global_rtp_t = 0
@@ -156,13 +178,13 @@
       n1 = ndomain_rtm(1)
       n2 = ndomain_rtm(2)
       n3 = ndomain_rtm(3)
-      ied_1 = istack_idx_local_rtm_r(n1)
-      ied_2 = istack_idx_local_rtm_t(n2)
-      ied_3 = istack_idx_local_rtm_m(n3)
+      num_gl_rtm_r = istack_idx_local_rtm_r(n1)
+      num_gl_rtm_t = istack_idx_local_rtm_t(n2)
+      num_gl_rtm_m = istack_idx_local_rtm_m(n3)
 !
-      allocate( idx_global_rtm_r(1:ied_1) )
-      allocate( idx_global_rtm_t(1:ied_2) )
-      allocate( idx_global_rtm_m(0:ied_3,2) )
+      allocate( idx_global_rtm_r(1:num_gl_rtm_r) )
+      allocate( idx_global_rtm_t(1:num_gl_rtm_t) )
+      allocate( idx_global_rtm_m(0:num_gl_rtm_m,2) )
 !
       idx_global_rtm_r = 0
       idx_global_rtm_t = 0
@@ -171,11 +193,11 @@
 !
       n1 = ndomain_rlm(1)
       n2 = ndomain_rlm(2)
-      ied_1 = istack_idx_local_rlm_r(n1)
-      ied_2 = istack_idx_local_rlm_j(n2)
+      num_gl_rlm_r = istack_idx_local_rlm_r(n1)
+      num_gl_rlm_j = istack_idx_local_rlm_j(n2)
 !
-      allocate( idx_global_rlm_r(1:ied_1) )
-      allocate( idx_global_rlm_j(0:ied_2,3) )
+      allocate( idx_global_rlm_r(1:num_gl_rlm_r) )
+      allocate( idx_global_rlm_j(0:num_gl_rlm_j,3) )
 !
       idx_global_rlm_r = 0
       idx_global_rlm_j = 0
@@ -183,11 +205,11 @@
 !
       n1 = ndomain_rj(1)
       n2 = ndomain_rj(2)
-      ied_1 = istack_idx_local_rj_r(n1)
-      ied_2 = istack_idx_local_rj_j(n2)
+      nun_gl_rj_r = istack_idx_local_rj_r(n1)
+      num_gl_rj_j = istack_idx_local_rj_j(n2)
 !
-      allocate( idx_global_rj_r(1:ied_1) )
-      allocate( idx_global_rj_j(0:ied_2,3) )
+      allocate( idx_global_rj_r(1:nun_gl_rj_r) )
+      allocate( idx_global_rj_j(0:num_gl_rj_j,3) )
 !
       idx_global_rj_r = 0
       idx_global_rj_j = 0

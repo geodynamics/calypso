@@ -30,11 +30,9 @@
       use m_sph_phys_address
       use m_rms_4_sph_spectr
       use m_node_id_spherical_IO
-      use m_sph_boundary_input_data
       use m_physical_property
 !
       use set_control_sph_mhd
-      use parallel_load_data_4_sph
       use set_reference_sph_mhd
       use set_bc_sph_mhd
       use material_property
@@ -45,16 +43,6 @@
       use sph_mhd_rms_IO
       use sph_mhd_rst_IO_control
 !
-!
-!   Load spherical harmonics data
-!
-      if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
-      call load_para_sph_mesh
-!
-      if (iflag_boundary_file .eq. id_read_boundary_file) then
-        if (iflag_debug.eq.1) write(*,*) 'read_boundary_spectr_file'
-        call read_boundary_spectr_file
-      end if
 !
 !   Allocate spectr field data
 !

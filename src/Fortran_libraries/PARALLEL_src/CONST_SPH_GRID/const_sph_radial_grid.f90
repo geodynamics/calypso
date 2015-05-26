@@ -23,6 +23,7 @@
 !
       use m_spheric_constants
       use m_spheric_parameter
+      use m_sph_mesh_1d_connect
       use set_radial_grid_sph_shell
 !
       integer(kind = kint), intent(in) :: nele
@@ -39,7 +40,7 @@
      &      nidx_global_rtp(1), nlayer_ICB, nlayer_CMB)
       end if
 !
-      call allocate_radius_1d_gl
+      call allocate_radius_1d_gl(nidx_global_rtp(1))
 !
       if(iflag_radial_grid .eq. igrid_Chebyshev) then
         call set_chebyshev_distance_shell(nidx_global_rtp(1),           &
@@ -56,6 +57,7 @@
       subroutine output_set_radial_grid
 !
       use m_spheric_parameter
+      use m_sph_mesh_1d_connect
 !
 !
       integer(kind = kint), parameter :: id_file = 14

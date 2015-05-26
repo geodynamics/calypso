@@ -119,6 +119,8 @@
 !
 !   labels of data field
 !
+      character(len=kchara), parameter                                  &
+     &                     :: hd_sph_def = 'shell_define_ctl'
       character(len=kchara), parameter :: hd_shell_def = 'num_grid_sph'
       integer(kind = kint) :: i_shell_def =   0
 !
@@ -162,7 +164,7 @@
 !
 !   3rd level for boundary define
 !
-      private :: hd_shell_def, i_shell_def
+      private :: hd_sph_def, hd_shell_def, i_shell_def
       private :: hd_numlayer_shell, hd_sph_c_type, hd_phi_symmetry
       private :: hd_ntheta_shell, hd_nphi_shell, hd_sph_truncate
       private :: hd_r_grid_type, hd_n_fluid_grid, hd_Min_radius
@@ -181,13 +183,18 @@
       use m_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint) :: iflag
 !
-      if(right_begin_flag(hd_shell_def) .eq. 0) return
-      if (i_shell_def .gt. 0) return
+!
+      iflag =  right_begin_flag(hd_shell_def)                           &
+     &       + right_begin_flag(hd_sph_def)
+      if(iflag .eq. 0) return
+      if(i_shell_def .gt. 0) return
       do
         call load_ctl_label_and_line
 !
         call find_control_end_flag(hd_shell_def, i_shell_def)
+        call find_control_end_flag(hd_sph_def, i_shell_def)
         if(i_shell_def .gt. 0) exit
 !
 !

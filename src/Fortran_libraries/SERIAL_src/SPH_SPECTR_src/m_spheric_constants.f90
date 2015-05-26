@@ -20,13 +20,33 @@
 !
       use m_precision
 !
-      integer(kind = kint), parameter :: igrid_Chebyshev =    2
-      integer(kind = kint), parameter :: igrid_non_euqidist = 1
-      integer(kind = kint), parameter :: igrid_euqidistance = 0
+      integer(kind = kint), parameter :: igrid_half_Chebyshev = 3
+      integer(kind = kint), parameter :: igrid_Chebyshev =      2
+      integer(kind = kint), parameter :: igrid_non_euqidist =   1
+      integer(kind = kint), parameter :: igrid_euqidistance =   0
 !
       integer(kind = kint), parameter :: iflag_no_FEMMESH =   -1
       integer(kind = kint), parameter :: iflag_MESH_same =     0
       integer(kind = kint), parameter :: iflag_MESH_w_pole =   1
       integer(kind = kint), parameter :: iflag_MESH_w_center = 2
+!
+!
+      character(len = kchara), parameter                                &
+     &             :: label_half_Cbyv = 'half_Chebyshev'
+      character(len = kchara), parameter                                &
+     &             :: label_Chebyshev = 'Chebyshev'
+      character(len = kchara), parameter                                &
+     &             :: label_explicit =  'explicit'
+      character(len = kchara), parameter                                &
+     &             :: label_equi =      'equi_distance'
+!
+      character(len = kchara), parameter                                &
+     &             :: label_no_FEMMESH =  'no_mesh'
+      character(len = kchara), parameter                                &
+     &             :: label_MESH_same =   'no_pole'
+      character(len = kchara), parameter                                &
+     &             :: label_MESH_pole =   'with_pole'
+      character(len = kchara), parameter                                &
+     &             :: label_MESH_ctr =    'with_center'
 !
       end module m_spheric_constants

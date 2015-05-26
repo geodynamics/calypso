@@ -29,7 +29,10 @@
       use m_read_mesh_data
       use m_spheric_constants
       use m_spheric_parameter
+      use m_spheric_global_ranks
       use m_sph_1d_global_index
+      use m_sph_mesh_1d_connect
+!
       use m_node_id_spherical_IO
       use m_file_format_switch
 !
@@ -37,6 +40,7 @@
       use m_ctl_data_4_sphere_model
       use m_ctl_data_4_divide_sphere
 !
+      use set_controls_4_sph_shell
       use const_sph_radial_grid
       use set_control_platform_data
       use gen_sph_grids_modes
@@ -59,21 +63,7 @@
         iflag_excluding_FEM_mesh = 1
       end if
 !
-      iflag_shell_mode = iflag_no_FEMMESH
-      if(sph_grid_type_ctl%iflag .gt. 0) then
-        if      (cmp_no_case(sph_grid_type_ctl%charavalue, 'no_pole'))  &
-     &          iflag_shell_mode = iflag_MESH_same
-        if(cmp_no_case(sph_grid_type_ctl%charavalue, 'with_pole'))      &
-     &          iflag_shell_mode = iflag_MESH_w_pole
-        if(cmp_no_case(sph_grid_type_ctl%charavalue, 'with_center'))    &
-     &          iflag_shell_mode = iflag_MESH_w_center
-      else
-        iflag_shell_mode = iflag_MESH_same
-      end if
-      if(iflag_debug .gt. 0) then
-        write(*,*) 'iflag_shell_mode', iflag_shell_mode
-      end if
-!
+      call set_FEM_mesh_mode_4_SPH(iflag_shell_mode)
 !
       nidx_global_rtp(1) = 2
       nidx_global_rtp(2) = 2
@@ -82,11 +72,11 @@
       m_folding =    1
 !
       iflag_radial_grid =  igrid_Chebyshev
-      if(cmp_no_case(radial_grid_type_ctl%charavalue, 'explicit'))      &
+      if(cmp_no_case(radial_grid_type_ctl%charavalue, label_explicit))  &
      &       iflag_radial_grid =  igrid_non_euqidist
-      if(cmp_no_case(radial_grid_type_ctl%charavalue, 'Chebyshev'))     &
+      if(cmp_no_case(radial_grid_type_ctl%charavalue, label_Chebyshev)) &
      &       iflag_radial_grid =  igrid_Chebyshev
-      if(cmp_no_case(radial_grid_type_ctl%charavalue, 'equi_distance')) &
+      if(cmp_no_case(radial_grid_type_ctl%charavalue, label_equi))      &
      &       iflag_radial_grid =  igrid_euqidistance
 !
       if (ltr_ctl%iflag .gt. 0) then
@@ -115,11 +105,14 @@
 !
       icou = 0
       do i = 1, numlayer_sph_bc
-        if     (cmp_no_case(radial_grp_ctl%c_tbl(i), 'ICB')) then
+        if     (cmp_no_case(radial_grp_ctl%c_tbl(i),                    &
+     &                      ICB_nod_grp_name)) then
           numlayer_sph_bc = numlayer_sph_bc - 1
-        else if(cmp_no_case(radial_grp_ctl%c_tbl(i), 'CMB')) then
+        else if(cmp_no_case(radial_grp_ctl%c_tbl(i),                    &
+     &                      CMB_nod_grp_name)) then
           numlayer_sph_bc = numlayer_sph_bc - 1
-        else if(cmp_no_case(radial_grp_ctl%c_tbl(i), 'to_Center')) then
+        else if(cmp_no_case(radial_grp_ctl%c_tbl(i),                    &
+     &                      CTR_nod_grp_name)) then
           numlayer_sph_bc = numlayer_sph_bc - 1
         else if(cmp_no_case(radial_grp_ctl%c_tbl(i), 'Mid_Depth')) then
           numlayer_sph_bc = numlayer_sph_bc - 1
@@ -139,7 +132,7 @@
         if (radius_ctl%icou .gt. 0) nidx_global_rtp(1) = radius_ctl%num
 !
         if (nidx_global_rtp(1) .gt. 0) then
-          call allocate_radius_1d_gl
+          call allocate_radius_1d_gl(nidx_global_rtp(1))
 !
           do i = 1, nidx_global_rtp(1)
             kr = radius_ctl%ivec(i)
@@ -155,17 +148,17 @@
         nlayer_mid_OC =   -1
         if(radial_grp_ctl%icou .gt. 0) then
           do i = 1, radial_grp_ctl%num
-            if     (cmp_no_case(radial_grp_ctl%c_tbl(i), 'ICB')         &
-     &         ) then
+            if     (cmp_no_case(radial_grp_ctl%c_tbl(i),                &
+     &                      ICB_nod_grp_name) ) then
               nlayer_ICB = radial_grp_ctl%ivec(i)
-            else if(cmp_no_case(radial_grp_ctl%c_tbl(i), 'CMB')         &
-     &         ) then
+            else if(cmp_no_case(radial_grp_ctl%c_tbl(i),                &
+     &                      CMB_nod_grp_name) ) then
               nlayer_CMB = radial_grp_ctl%ivec(i)
-            else if(cmp_no_case(radial_grp_ctl%c_tbl(i), 'to_Center')   &
-     &         ) then
+            else if(cmp_no_case(radial_grp_ctl%c_tbl(i),                &
+     &                      CTR_nod_grp_name) ) then
               nlayer_2_center = radial_grp_ctl%ivec(i)
-            else if(cmp_no_case(radial_grp_ctl%c_tbl(i), 'Mid_Depth')   &
-     &         ) then
+            else if(cmp_no_case(radial_grp_ctl%c_tbl(i),                &
+     &                      'Mid_Depth') ) then
               nlayer_mid_OC = radial_grp_ctl%ivec(i)
             end if
           end do

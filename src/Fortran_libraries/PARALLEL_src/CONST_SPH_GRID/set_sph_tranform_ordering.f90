@@ -26,8 +26,6 @@
 !!      subroutine set_trans_table_fft_2_lgd(ltr, nth, nph, m_folding,  &
 !!     &          mspec_4_ispack, jdx_fsph, mtbl_fft_2_lgd)
 !!        output: mtbl_fft_2_lgd
-!!      subroutine set_trans_table_lgd_2_sph(jmax, jtbl_fsph, jtbl_isph)
-!!        output: jtbl_isph
 !!@endverbatim
 !
       module set_sph_tranform_ordering
@@ -293,23 +291,6 @@
       end do
 !
       end subroutine set_trans_table_fft_2_lgd
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_trans_table_lgd_2_sph(jmax, jtbl_fsph, jtbl_isph)
-!
-      integer(kind = kint), intent(in) :: jmax
-      integer(kind = kint), intent(in) :: jtbl_fsph(0:jmax)
-      integer(kind = kint), intent(inout) :: jtbl_isph(0:jmax)
-!
-      integer(kind = kint) :: j, jj
-!
-      do j = 0, jmax
-        jj = jtbl_fsph(j)
-        jtbl_isph(jj) = j
-      end do
-!
-      end subroutine set_trans_table_lgd_2_sph
 !
 ! -----------------------------------------------------------------------
 !

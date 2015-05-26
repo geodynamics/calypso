@@ -36,10 +36,8 @@
       subroutine initialize_sph_dynamobench
 !
       use m_ctl_data_sph_MHD_noviz
-      use set_control_sph_mhd
-      use set_control_sph_data_MHD
-      use set_control_SPH_to_FEM
       use init_sph_MHD_elapsed_label
+      use input_control_sph_MHD
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
@@ -52,15 +50,13 @@
       call start_eleps_time(4)
       if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_snap_noviz'
       call read_control_4_sph_snap_noviz
-      if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
-      call set_control_4_sph_mhd
-      call set_control_4_SPH_to_FEM
-      call set_ctl_params_dynamobench
 !
-!    IO elapsed end
+      if (iflag_debug.eq.1) write(*,*) 'input_control_SPH_dynamobench'
+      call input_control_SPH_dynamobench
+      call end_eleps_time(4)
+!
 !    precondition elaps start
 !
-      call end_eleps_time(4)
       call start_eleps_time(2)
 !
 !        Initialize spherical transform dynamo

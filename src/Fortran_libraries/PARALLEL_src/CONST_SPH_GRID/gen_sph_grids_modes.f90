@@ -126,7 +126,7 @@
       nidx_local_fem(1:3) = nidx_rtp(1:3)
       nidx_local_fem(3) =   m_folding * nidx_local_fem(3)
 !
-      call s_const_FEM_mesh_for_sph(ip_rank, mesh, group)
+      call s_const_FEM_mesh_for_sph(ip_rank, radius_1d_gl, mesh, group)
 !
       call copy_comm_tbl_type_to_IO(ip_rank, mesh%nod_comm)
       call copy_node_type_to_IO(mesh%node)

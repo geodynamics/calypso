@@ -5,10 +5,6 @@
 !
 !      subroutine s_const_1d_ele_connect_4_sph
 !
-!      subroutine allocate_nnod_nele_sph_mesh
-!      subroutine allocate_iele_sph_mesh
-!      subroutine deallocate_nnod_nele_sph_mesh
-!
 !      subroutine count_nod_ele_4_sph_radial
 !      subroutine count_nod_ele_4_sph_theta
 !
@@ -29,6 +25,7 @@
 !
       subroutine s_const_1d_ele_connect_4_sph
 !
+      use m_spheric_global_ranks
       use m_spheric_parameter
 !
 !

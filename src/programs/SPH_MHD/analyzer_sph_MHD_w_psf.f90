@@ -37,9 +37,8 @@
 !
       subroutine initialize_sph_mhd_w_psf
 !
-      use set_control_sph_mhd
-      use set_control_SPH_to_FEM
       use m_ctl_data_sph_MHD_psf
+      use input_control_sph_MHD
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
@@ -53,20 +52,15 @@
       if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_w_psf'
       call read_control_4_sph_MHD_w_psf
 !
-      if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
-      call set_control_4_sph_mhd
-      call set_control_4_SPH_to_FEM
-!
-!    IO elapsed end
-!    precondition elaps start
-!
+      if (iflag_debug.eq.1) write(*,*) 'input_control_SPH_mesh'
+      call input_control_SPH_mesh
       call end_eleps_time(4)
-      call start_eleps_time(2)
 !
 !        Initialize FEM mesh data for field data IO
 !
-      if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize'
-      call FEM_initialize
+      call start_eleps_time(2)
+      if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize_sph_MHD'
+      call FEM_initialize_sph_MHD
 !
 !        Initialize spherical transform dynamo
 !
@@ -120,8 +114,8 @@
 !
         if (iflag_debug.eq.1) write(*,*) 'SPH_to_FEM_bridge_MHD'
         call SPH_to_FEM_bridge_MHD
-        if (iflag_debug.eq.1) write(*,*) 'FEM_analyze'
-        call FEM_analyze(i_step_MHD, istep_psf, istep_iso,              &
+        if (iflag_debug.eq.1) write(*,*) 'FEM_analyze_sph_MHD'
+        call FEM_analyze_sph_MHD(i_step_MHD, istep_psf, istep_iso,      &
      &      istep_pvr, istep_fline, visval)
 !
         call end_eleps_time(4)

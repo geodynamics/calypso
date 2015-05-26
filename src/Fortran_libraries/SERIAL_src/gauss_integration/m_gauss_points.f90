@@ -8,7 +8,7 @@
 !> @brief Constants for Gauss-Legendre integration
 !!
 !!@verbatim
-!!       subroutine allocate_gauss_points
+!!       subroutine allocate_gauss_points(num_gauss)
 !!       subroutine allocate_gauss_colatitude
 !!       subroutine deallocate_gauss_points
 !!       subroutine deallocate_gauss_colatitude
@@ -61,15 +61,19 @@
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine allocate_gauss_points
+      subroutine allocate_gauss_points(num_gauss)
 !
-       allocate(w_point(n_point))
-       allocate(w_coefs(n_point))
+      integer(kind = kint), intent(in) :: num_gauss
 !
-       w_point = 0.0d0
-       w_coefs = 0.0d0
 !
-       end subroutine allocate_gauss_points
+      n_point = num_gauss
+      allocate(w_point(n_point))
+      allocate(w_coefs(n_point))
+!
+      w_point = 0.0d0
+      w_coefs = 0.0d0
+!
+      end subroutine allocate_gauss_points
 !
 ! -----------------------------------------------------------------------
 !

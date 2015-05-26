@@ -35,7 +35,8 @@
       type(element_data), intent(inout) :: ele
 !
 !
-      ele%nnod_4_ele = num_t_linear
+      ele%first_ele_type = 331
+      ele%nnod_4_ele =     num_t_linear
 !
       call reset_local_sph_ele_constants
       call set_nele_lc_shell(ip_r, ip_t)

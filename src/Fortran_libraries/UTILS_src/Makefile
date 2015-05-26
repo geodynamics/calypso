@@ -8,7 +8,6 @@ LIB_UTILS =       -lcalypso_utils
 LIB_UTILS_FILE = libcalypso_utils.a
 
 SUBDIRS = \
-spherical_grid \
 MESH           \
 MERGE
 
@@ -69,9 +68,7 @@ mod_list:
 	@echo MOD_KEMO_UTILS=  \\ >> $(MAKENAME)
 	@echo  \
 	'$$(MOD_MESH)'         \
-	'$$(MOD_MERGE)'        \
-	'$$(MOD_PART_COMMON)'  \
-	'$$(MOD_SPH_GRID)'     >> $(MAKENAME)
+	'$$(MOD_MERGE)'        >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \

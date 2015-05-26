@@ -7,6 +7,9 @@
 !>@brief  One-dimmentional connectivity list for spherical shell
 !!
 !!@verbatim
+!!      subroutine allocate_radius_1d_gl(nri_global)
+!!      subroutine deallocate_radius_1d_gl
+!!
 !!      subroutine allocate_nnod_nele_sph_mesh(ndomain_sph, ndomain_rtp,&
 !!     &          nidx_global_rtp, m_folding)
 !!      subroutine allocate_iele_sph_mesh
@@ -26,6 +29,9 @@
       integer(kind = kint) :: ndomain_fem(3)
       integer(kind = kint) :: nidx_global_fem(3)
       integer(kind = kint) :: nidx_local_fem(3)
+!
+!>      global radius data @f$ r(k) @f$
+      real(kind = kreal), allocatable :: radius_1d_gl(:)
 !
       integer(kind = kint), allocatable :: iflag_neib_r(:,:)
       integer(kind = kint), allocatable :: iflag_neib_t(:,:)
@@ -89,6 +95,27 @@
 !
       contains
 !
+! ----------------------------------------------------------------------
+!
+      subroutine allocate_radius_1d_gl(nri_global)
+!
+      integer(kind = kint), intent(in) :: nri_global
+!
+!
+      allocate(radius_1d_gl(nri_global))
+      if(nri_global .gt. 0) radius_1d_gl = 0.0d0
+!
+      end subroutine allocate_radius_1d_gl
+!
+! ----------------------------------------------------------------------
+!
+      subroutine deallocate_radius_1d_gl
+!
+      deallocate(radius_1d_gl)
+!
+      end subroutine deallocate_radius_1d_gl
+!
+! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
       subroutine allocate_nnod_nele_sph_mesh(ndomain_sph, ndomain_rtp,  &

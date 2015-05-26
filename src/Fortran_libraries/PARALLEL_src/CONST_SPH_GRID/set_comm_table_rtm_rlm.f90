@@ -40,7 +40,7 @@
 !
       subroutine allocate_ncomm
 !
-      use m_spheric_parameter
+      use m_spheric_global_ranks
 !
       allocate( ncomm(0:ndomain_sph) )
       allocate( ineib_tgt(0:ndomain_sph) )
@@ -219,7 +219,7 @@
 !
       subroutine count_num_domain_rtm_rlm(nneib_domain)
 !
-      use m_spheric_parameter
+      use m_spheric_global_ranks
 !
       integer(kind = kint), intent(inout) :: nneib_domain
       integer(kind = kint) :: ip_rank
@@ -237,7 +237,7 @@
       subroutine set_comm_stack_rtm_rlm(ip_rank,                        &
      &          nneib_domain, id_domain, istack_sr, ntot_item_sr)
 !
-      use m_spheric_parameter
+      use m_spheric_global_ranks
 !
       integer(kind = kint), intent(in) :: ip_rank
       integer(kind = kint), intent(in) :: nneib_domain

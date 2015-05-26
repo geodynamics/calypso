@@ -39,6 +39,7 @@
       use set_control_sph_mhd
       use m_ctl_data_sph_MHD_noviz
       use init_sph_MHD_elapsed_label
+      use input_control_sph_MHD
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
@@ -51,17 +52,14 @@
       call start_eleps_time(4)
       if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_noviz'
       call read_control_4_sph_MHD_noviz
-      if (iflag_debug.eq.1) write(*,*) 'set_control_4_sph_mhd'
-      call set_control_4_sph_mhd
 !
-!    IO elapsed end 
-!    precondition elaps start
-!
+      if (iflag_debug.eq.1) write(*,*) 'input_control_4_SPH_make_init'
+      call input_control_4_SPH_make_init
       call end_eleps_time(4)
-      call start_eleps_time(2)
 !
 !        Initialize spherical transform dynamo
 !
+      call start_eleps_time(2)
       if(iflag_debug .gt. 0) write(*,*) 'SPH_initialize_MHD'
       call SPH_const_initial_field
 !
@@ -92,13 +90,6 @@
       use const_radial_mat_4_sph
       use set_initial_sph_dynamo
 !
-!
-!   Load spherical harmonics data
-!
-      if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
-      call start_eleps_time(4)
-      call load_para_sph_mesh
-      call end_eleps_time(4)
 !
 !   Allocate spectr field data
 !
