@@ -2,11 +2,11 @@ FILE(GLOB ASSEMBLE_SPH_SRC_FILES MERGE/*.[fF]90)
 ADD_EXECUTABLE(assemble_sph ${ASSEMBLE_SPH_SRC_FILES})
 TARGET_LINK_LIBRARIES(assemble_sph calypso)
 
-SET(MOD_SPH_SNAP_NOVIZ_MAIN_SRC_FILES SNAPSHOT_MHD/main_sph_snapshot_noviz.f90 SNAPSHOT_MHD/analyzer_noviz_sph_snap.f90 SNAPSHOT_MHD/SPH_analyzer_snap.f90)
+SET(MOD_SPH_SNAP_NOVIZ_MAIN_SRC_FILES SNAPSHOT_MHD/main_sph_snapshot_w_psf.f90 SNAPSHOT_MHD/analyzer_sph_snap_w_psf.f90 SNAPSHOT_MHD/SPH_analyzer_snap.f90)
 ADD_EXECUTABLE(sph_snapshot ${MOD_SPH_SNAP_NOVIZ_MAIN_SRC_FILES})
 TARGET_LINK_LIBRARIES(sph_snapshot calypso fftpack.5d)
 
-SET(MOD_SPH_ZM_SNAP_NOVIZ_MAIN_SRC_FILES SNAPSHOT_MHD/main_sph_zm_snap_noviz.f90 SNAPSHOT_MHD/analyzer_noviz_sph_zm_snap.f90 SNAPSHOT_MHD/SPH_analyzer_snap.f90 SNAPSHOT_MHD/SPH_analyzer_zm_snap.f90)
+SET(MOD_SPH_ZM_SNAP_NOVIZ_MAIN_SRC_FILES SNAPSHOT_MHD/main_sph_zm_snap.f90 SNAPSHOT_MHD/analyzer_sph_zm_snap.f90 SNAPSHOT_MHD/SPH_analyzer_snap.f90 SNAPSHOT_MHD/SPH_analyzer_zm_snap.f90)
 ADD_EXECUTABLE(sph_zm_snapshot ${MOD_SPH_ZM_SNAP_NOVIZ_MAIN_SRC_FILES})
 TARGET_LINK_LIBRARIES(sph_zm_snapshot calypso fftpack.5d)
 
