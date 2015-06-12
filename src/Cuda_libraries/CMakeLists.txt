@@ -6,9 +6,8 @@ set(GENCODE "-gencode=arch=compute_35,code=sm_35")
 # The option dc enables dynamic parallelism in cuda
 
 # debug options
-set(CUDA_NVCC_FLAGS_DEBUG "-G;-g;-DCUDA_DEBUG")
-#set(CUDA_NVCC_FLAGS_RELEASE "-O3;-DCUDA_OPTIMIZED")
-set(CUDA_NVCC_FLAGS_RELEASE "-g;-G;-DCUDA_OPTIMIZED")
+set(CUDA_NVCC_FLAGS_DEBUG "-G;-g;-O0;-DCUDA_DEBUG;-Xcompiler;-fopenmp")
+set(CUDA_NVCC_FLAGS_RELEASE "-O3;-DCUDA_OPTIMIZED;-Xcompiler;-fopenmp")
 
 
 #The following command links the compiled code. 

@@ -44,7 +44,9 @@
 !
       write(*,*) 'Simulation start: PE. ', my_rank
       total_start = MPI_WTIME()
+#if !defined CUDA
       call set_sph_MHD_elapsed_label
+#endif
 !
 !   Load parameter file
 !

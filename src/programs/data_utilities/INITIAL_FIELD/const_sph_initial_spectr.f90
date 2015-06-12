@@ -126,8 +126,8 @@
 !
 !$omp parallel do
       do inod = 1, nnod_rj
-        d_rj(inod,ipol%i_velo) = zero
-        d_rj(inod,itor%i_velo) = zero
+        d_rj(inod,ipol%i_velo) = one
+        d_rj(inod,itor%i_velo) = one
       end do
 !$omp end parallel do
 !
@@ -140,7 +140,7 @@
 !        end do
 !      end if
 !
-      jj =  find_local_sph_mode_address(2, 2)
+      jj =  find_local_sph_mode_address(2, 1)
 !
       if (jj .gt. 0) then
         do k = nlayer_ICB, nlayer_CMB
@@ -148,10 +148,6 @@
           xr = two * radius_1d_rj_r(k) - one * (r_CMB+r_ICB) / shell
           d_rj(inod,itor%i_velo) = (one-three*xr**2+three*xr**4-xr**6)  &
     &                            * A_light * three / (sqrt(two*pi))
-#ifdef CUDA_DEBUG
-            d_rj(inod,itor%i_velo) = 1
-            d_rj(inod,ipol%i_velo) = 1
-#endif
         end do
       end if
 !
@@ -170,7 +166,7 @@
 !
 !$omp parallel do
       do inod = 1, nnod_rj
-        d_rj(inod,ipol%i_temp) = zero
+        d_rj(inod,ipol%i_temp) = 0.3
       end do
 !$omp end parallel do
 !
@@ -178,7 +174,7 @@
       shell = r_CMB - r_ICB
 !
 !   search address for (l = m = 0)
-      jj = find_local_sph_mode_address(2, 2)
+      jj = find_local_sph_mode_address(0, 0)
 !
 !   set reference temperature if (l = m = 0) mode is there
       if (jj .gt. 0) then
@@ -190,15 +186,12 @@
           inod = local_sph_data_address(k,jj)
           d_rj(inod,ipol%i_temp) = (ar_1d_rj(k,1) * 20.d0/13.0d0        &
      &                              - 1.0d0 ) * 7.0d0 / 13.0d0
-#ifdef CUDA_DEBUG
-            d_rj(inod,ipol%i_temp) = 1
-#endif
         end do
       end if
 !
 !
 !    Find local addrtess for (l,m) = (4,4)
-      jj =  find_local_sph_mode_address(2, 2)
+      jj =  find_local_sph_mode_address(4, 4)
 !      jj =  find_local_sph_mode_address(5, 5)
 !
 !    If data for (l,m) = (4,4) is there, set initial temperature
@@ -215,9 +208,6 @@
           xr = two * rr - one * (r_CMB+r_ICB) / shell
           d_rj(inod,ipol%i_temp) = (one-three*xr**2+three*xr**4-xr**6)  &
      &                            * A_temp * three / (sqrt(two*pi))
-#ifdef CUDA_DEBUG
-            d_rj(inod,ipol%i_temp) = 1
-#endif
         end do
       end if
 !
@@ -246,12 +236,12 @@
 !
 !$omp parallel do
       do inod = 1, nnod_rj
-        d_rj(inod,ipol%i_light) = zero
+        d_rj(inod,ipol%i_light) = 0.1
       end do
 !$omp end parallel do
 !
 !   search address for (l = m = 0)
-      jj = find_local_sph_mode_address(2, 2)
+      jj = find_local_sph_mode_address(0, 0)
 !
 !   set reference temperature if (l = m = 0) mode is there
 !
@@ -264,15 +254,12 @@
           inod = local_sph_data_address(k,jj)
           d_rj(inod,ipol%i_light) = (ar_1d_rj(k,1) * 20.d0/13.0d0       &
      &                              - 1.0d0 ) * 7.0d0 / 13.0d0
-#ifdef CUDA_DEBUG
-            d_rj(inod,ipol%i_light) = 1
-#endif
         end do
       end if
 !
 !
 !    Find local addrtess for (l,m) = (4,4)
-      jj =  find_local_sph_mode_address(2, 2)
+      jj =  find_local_sph_mode_address(4, 4)
 !
       if (jj .gt. 0) then
         do k = nlayer_ICB, nlayer_CMB
@@ -280,9 +267,6 @@
           xr = two * radius_1d_rj_r(k) - one * (r_CMB+r_ICB) / shell
           d_rj(inod,ipol%i_light) = (one-three*xr**2+three*xr**4-xr**6) &
      &                            * A_light * three / (sqrt(two*pi))
-#ifdef CUDA_DEBUG
-            d_rj(inod,ipol%i_light) = 1
-#endif
         end do
       end if
 !
@@ -309,14 +293,14 @@
 !
 !$omp parallel do
       do is = 1, nnod_rj
-        d_rj(is,ipol%i_magne) = zero
-        d_rj(is,itor%i_magne) = zero
+        d_rj(is,ipol%i_magne) = 0.2
+        d_rj(is,itor%i_magne) = 0.2
       end do
 !$omp end parallel do
 !
 !
 !    Find local addrtess for (l,m) = (1,0)
-      js =  find_local_sph_mode_address(2,2)
+      js =  find_local_sph_mode_address(1,0)
 !
       if (js .gt. 0) then
         do k = nlayer_ICB, nlayer_CMB
@@ -325,9 +309,6 @@
 !   Substitute poloidal mangetic field
           d_rj(is,ipol%i_magne) =  (5.0d0/8.0d0) * (-3.0d0 * rr**3      &
      &                     + 4.0d0 * r_CMB * rr**2 - r_ICB**4 / rr)
-#ifdef CUDA_DEBUG
-            d_rj(is,ipol%i_magne) = 1
-#endif
         end do
 !
 !   Fill potential field if inner core exist
@@ -338,9 +319,6 @@
 !   Substitute poloidal mangetic field
           d_rj(is,ipol%i_magne) =  d_rj(is_ICB,ipol%i_magne)            &
      &                            * rr**(ione+1)
-#ifdef CUDA_DEBUG
-            d_rj(is,ipol%i_magne) = 1
-#endif
         end do
 !
 !   Fill potential field if external of the core exist
@@ -351,15 +329,12 @@
 !   Substitute poloidal mangetic field
           d_rj(is,ipol%i_magne) =  d_rj(is_ICB,ipol%i_magne)            &
      &                            * rr**(-ione)
-#ifdef CUDA_DEBUG
-            d_rj(is,ipol%i_magne) = 1
-#endif
         end do
       end if
 !
 !
 !    Find local addrtess for (l,m) = (2,0)
-      jt =  find_local_sph_mode_address(2,2)
+      jt =  find_local_sph_mode_address(1,-1)
 !
       if (jt .gt. 0) then
         do k = 1, nlayer_CMB
@@ -368,9 +343,6 @@
 !   Substitute totoidal mangetic field
           d_rj(it,itor%i_magne) = (10.0d0/3.0d0) * rr                   &
      &                           * sin(pi*(rr-r_ICB))
-#ifdef CUDA_DEBUG
-            d_rj(it,ipol%i_magne) = 1
-#endif
         end do
       end if
 !
@@ -389,13 +361,13 @@
 !
 !$omp parallel do
       do inod = 1, nnod_rj
-        d_rj(inod,ipol%i_heat_source) = zero
+        d_rj(inod,ipol%i_heat_source) = 0.5
       end do
 !$omp end parallel do
 !
 !
 !    Find address for l = m = 0
-      jj =  find_local_sph_mode_address(2, 2)
+      jj =  find_local_sph_mode_address(0, 0)
 !
       if (jj .gt. 0) then
         do k = 1, nlayer_ICB
@@ -405,9 +377,6 @@
           d_rj(inod,ipol%i_heat_source)                                 &
      &         = 0.35 * four*r_CMB**2 / (four * r_ICB**3 / three)
 !     &         = 1.0
-#ifdef CUDA_DEBUG
-            d_rj(inod,ipol%i_heat_source) = 1
-#endif
         end do
       end if
 !
@@ -432,13 +401,13 @@
 !
 !$omp parallel do
       do inod = 1, nnod_rj
-        d_rj(inod,ipol%i_light_source) = zero
+        d_rj(inod,ipol%i_light_source) = 0.1
       end do
 !$omp end parallel do
 !
 !
 !    Find address for l = m = 0
-      jj =  find_local_sph_mode_address(2, 2)
+      jj =  find_local_sph_mode_address(0, 0)
 !
       if (jj .gt. 0) then
         do k = 1, nlayer_ICB-1
@@ -450,9 +419,6 @@
 !          rr = radius_1d_rj_r(k)
 !    Substitute initial heat source
           d_rj(inod,ipol%i_light_source) = 1.0d0
-#ifdef CUDA_DEBUG
-            d_rj(inod,ipol%i_light_source) = 1
-#endif
         end do
       end if
 !

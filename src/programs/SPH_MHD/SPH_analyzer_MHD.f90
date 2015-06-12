@@ -55,6 +55,15 @@
       if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
       call load_para_sph_mesh
 !
+!    Setting MHD model parameters on the GPU
+#ifdef CUDA
+      if(iflag_debug .gt. 0) write(*,*) 'GPU_SPH_initialize_MHD'
+          call set_constants(nnod_rtp, nnod_rtm, nnod_rlm, nidx_rtm(1), &
+     &                      nidx_rlm(1), istep_rtm(1), istep_rlm(1),    &
+     &                      l_truncation, np_smp)
+#endif
+
+!
       if (iflag_boundary_file .eq. id_read_boundary_file) then
         if (iflag_debug.eq.1) write(*,*) 'read_boundary_spectr_file'
         call read_boundary_spectr_file

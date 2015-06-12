@@ -95,7 +95,12 @@
      &    (ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
 #ifdef CUDA
+      call start_eleps_time(56)
       call set_mem_4_gpu
+#ifdef CUDA_TIMINGS
+      call sync_device
+#endif
+      call end_eleps_time(56)
 #endif      
 !
       if(my_rank .ne. 0) return
