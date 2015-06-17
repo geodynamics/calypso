@@ -6,3 +6,4 @@ SET(MOD_TEST_SPH_GRID cmp_trans_sph_indices.f90 cmp_trans_sph_tests.f90 analyzer
 ADD_EXECUTABLE(check_sph_grids ${MOD_TEST_SPH_GRID})
 TARGET_LINK_LIBRARIES(check_sph_grids calypso)
 
+
