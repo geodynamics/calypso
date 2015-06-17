@@ -42,7 +42,9 @@
       use legendre_transform_testloop
       use legendre_transform_matmul
       use legendre_trans_sym_matmul
+#ifdef CUDA
       use legendre_transform_cuda
+#endif
 !
       implicit none
 !
@@ -103,8 +105,10 @@
      &           :: leg_test_loop =    'test_loop'
 !>      Character flag to perform Legendre transform 
 !@n     with CUDA 
+#ifdef CUDA
       character(len = kchara), parameter                                &
      &           :: leg_cuda =    'cuda'
+#endif
 !
 !
 !>      integer flag to run elpse time check for legendre transform
@@ -146,7 +150,9 @@
       integer(kind = kint), parameter :: iflag_leg_sym_matprod =  12
 !>      integer flag to perform Legendre transform 
 !@n     with CUDA 
+#ifdef CUDA
       integer(kind = kint), parameter :: iflag_leg_cuda =  13
+#endif
 !>      integer flag to perform Legendre transform 
 !@n     with testing loop
       integer(kind = kint), parameter :: iflag_leg_test_loop =   99
@@ -197,8 +203,10 @@
         id_legendre_transfer = iflag_leg_blocked
       else if(cmp_no_case(tranx_loop_ctl, leg_orginal_loop)) then
         id_legendre_transfer = iflag_leg_orginal_loop
+#ifdef CUDA
       else if(cmp_no_case(tranx_loop_ctl, leg_cuda)) then
         id_legendre_transfer = iflag_leg_cuda
+#endif
       else
         id_legendre_transfer = iflag_leg_orginal_loop
       end if
@@ -341,9 +349,11 @@
       else if(id_legendre_transfer .eq. iflag_leg_blocked) then
         call leg_backward_trans_blocked(ncomp, nvector, nscalar,        &
      &      n_WR, n_WS, WR, WS)
+#ifdef CUDA
       else if(id_legendre_transfer .eq. iflag_leg_cuda) then
         call leg_backward_trans_cuda(ncomp, nvector, nscalar,        &
      &      n_WR, n_WS, WR, WS)
+#endif
       else
         call leg_backward_trans_org(ncomp, nvector, nscalar,            &
      &      n_WR, n_WS, WR, WS)
@@ -402,9 +412,11 @@
       else if(id_legendre_transfer .eq. iflag_leg_blocked) then
         call leg_forwawd_trans_blocked(ncomp, nvector, nscalar,         &
      &      n_WR, n_WS, WR, WS)
+#ifdef CUDA
       else if(id_legendre_transfer .eq. iflag_leg_cuda) then
         call leg_forward_trans_cuda(ncomp, nvector, nscalar,        &
      &      n_WR, n_WS, WR, WS)
+#endif
       else
         call leg_forwawd_trans_org(ncomp, nvector, nscalar,             &
      &      n_WR, n_WS, WR, WS)

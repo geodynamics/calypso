@@ -8,7 +8,6 @@
 #include <fstream>
 #include <iostream>
 #include <mpi.h>
-#include <omp.h>
 #ifdef CUDA_TIMINGS
   #include "cuda_profiler_api.h"
 #endif
@@ -27,7 +26,7 @@ extern int nComp;
 // Fortran function calls
 extern "C" {
   void legendre_b_trans_cuda_(int*, int*, int*);
-  void legendre_f_trans_cuda_(int*, int*, int*, int*);
+  void legendre_f_trans_cuda_(int*, int*, int*);
 }
 
 //Fortran Variables
@@ -67,11 +66,9 @@ typedef struct
   int *lstack_rlm;
   double *radius_1d_rlm_r, *weight_rtm;
   int *mdx_p_rlm_rtm, *mdx_n_rlm_rtm;
-  #ifdef CUDA_STATIC
-    double *p_jl;
-    double *dP_jl;
-  #endif
-    double *p_rtm, *dP_rtm;
+  double *p_jl;
+  double *dP_jl;
+  double *p_rtm, *dP_rtm;
 } Parameters_s;
 
 typedef struct 
@@ -136,16 +133,19 @@ void check_fwd_trans_cuda_(int *my_rank, double *sp_rlm);
 void cleangpu_();
 void cuda_sync_device_();
 
-__device__ double nextLGP_m_eq0(int l, double x, double p_0, double p_1);
-__device__ double nextDp_m_eq_0(int l, double lgp_mp);
-__device__ double nextDp_m_eq_1(int l, double p_mn_l, double p_pn_l);
-__device__ double nextDp_m_l(int m, int l, double p_mn, double p_pn);
-__device__ double calculateLGP_m_eq_l(int mode);
-__device__ double calculateLGP_mp1_eq_l(int mode, double x, double lgp_m_eq_l);
-__device__ double calculateLGP_m_l(int m, int degree, double theta, double lgp_0, double lgp_1);
-__device__ double scaleBySine(int mode, double lgp, double theta);
+#ifdef CUDA_OTF
+  __device__ double nextLGP_m_eq0(int l, double x, double p_0, double p_1);
+  __device__ double nextDp_m_eq_0(int l, double lgp_mp);
+  __device__ double nextDp_m_eq_1(int l, double p_mn_l, double p_pn_l);
+  __device__ double nextDp_m_l(int m, int l, double p_mn, double p_pn);
+  __device__ double calculateLGP_m_eq_l(int mode);
+  __device__ double calculateLGP_mp1_eq_l(int mode, double x, double lgp_m_eq_l);
+  __device__ double calculateLGP_m_l(int m, int degree, double theta, double lgp_0, double lgp_1);
+  __device__ double scaleBySine(int mode, double lgp, double theta);
+#endif
 }
 
+#ifdef CUDA_OTF
 __global__ void transB_m_l_eq0_ver1D(int mp_rlm, int jst, int jed, double *vr_rtm,  double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm); 
 __global__ void transB_m_l_eq1_ver1D( int mp_rlm,  int jst,  int jed, int order, int degree, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r,     double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
 __global__ void transB_m_l_ver1D( int mp_rlm,  int jst,  int jed, int order, int degree, double *vr_rtm,  double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
@@ -154,11 +154,11 @@ __global__ void transB_m_l_ver3D(int *lstack_rlm, int m0, int m1, int *idx_gl_1d
 __global__ void transB_m_l_ver4D(int *lstack_rlm, int m0, int m1, int *idx_gl_1d_rlm_j, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
 __global__ void transB_m_l_ver5D(int *lstack_rlm, int *idx_gl_1d_rlm_j, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_smdt, double *dP_smdt, double *g_sph_rlm, double *asin_theta_1d_rtm);
 __global__ void transB_m_l_ver6D(int *lstack_rlm, int m0, int m1, int *idx_gl_1d_rlm_j, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_jl, double *dP_jl, double *g_sph_rlm, double *asin_theta_1d_rtm);
-#ifdef CUDA_STATIC
+__global__ void transB(double *vr_rtm, const double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm); 
+#else
 __global__ void transB_dydt(int *lstack_rlm, int *idx_gl_1d_rlm_j, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *P_jl, double *dP_jl, const Geometry_c constants);
 __global__ void transB_dydp(int *lstack_rlm, int *idx_gl_1d_rlm_j, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *P_jl, double *asin_theta_1d_rtm, const Geometry_c constants);
 __global__ void transB_scalar(int *lstack_rlm, double *vr_rtm, double const* __restrict__ sp_rlm, double *P_jl, const Geometry_c constants);
-#endif
-__global__ void transB(double *vr_rtm, const double *sp_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm); 
 __global__ void transF_vec(int kst, int *idx_gl_1d_rlm_j, double *vr_rtm, double *sp_rlm, double *radius_1d_rlm_r, double *weight_rtm, int *mdx_p_rlm_rtm, int *mdx_n_rlm_rtm, double *a_r_1d_rlm_r, double *g_colat_rtm, double *P_rtm, double *dP_rtm, double *g_sph_rlm_7, double *asin_theta_1d_rtm, const Geometry_c constants); 
 __global__ void transF_scalar(int kst, double *vr_rtm, double *sp_rlm, double *weight_rtm, int *mdx_p_rlm_rtm, double *P_rtm, double *g_sph_rlm_7, const Geometry_c constants);
+#endif

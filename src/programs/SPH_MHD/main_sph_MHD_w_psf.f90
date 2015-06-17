@@ -14,34 +14,27 @@
 !
       use calypso_mpi
       use analyzer_sph_MHD_w_psf
+#ifdef CUDA
       use cuda_optimizations
+#endif
       use m_work_time
 !
       implicit none
 !
 !
-#ifdef CUDA_DEBUG
-      integer i
-12    i=1
-      if (i .eq. 1) then
-        goto 12
-      endif
+      call calypso_MPI_init
+!
+#ifdef CUDA
+      call calypso_GPU_init
 #endif
 !
-      call calypso_MPI_init
-      call calypso_GPU_init
-!
       call initialize_sph_mhd_w_psf
-!#ifdef CUDA_DEBUG
-!      call calypso_GPU_finalize
-!      call calypso_MPI_finalize
-!      stop
-!#endif
-
-!
       call evolution_sph_mhd_w_psf
 !
+#ifdef CUDA
       call calypso_GPU_finalize
+#endif
+!
       call calypso_MPI_finalize
 !
       stop

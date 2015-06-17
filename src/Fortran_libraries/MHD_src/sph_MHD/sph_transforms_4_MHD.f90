@@ -130,8 +130,10 @@
           write(tmpchara,'(a)') trim(leg_sym_matprod)
         else if(id_legendre_transfer .eq. iflag_leg_test_loop) then
           write(tmpchara,'(a)') trim(leg_test_loop)
+#ifdef CUDA
         else if(id_legendre_transfer .eq. iflag_leg_cuda) then
           write(tmpchara,'(a)') trim(leg_cuda)
+#endif
         end if
         call change_2_upper_case(tmpchara)
 !

@@ -133,8 +133,7 @@
 
       if(nvector .gt. 0 .OR. nscalar .gt. 0) then
         call start_eleps_time(60)
-        call legendre_f_trans_cuda(ncomp, nvector, nscalar,  &
-     &            idx_rlm_smp_stack(0,1))
+        call legendre_f_trans_cuda(ncomp, nvector, nscalar) 
 #if defined(CUDA_TIMINGS)
         call sync_device
 #endif

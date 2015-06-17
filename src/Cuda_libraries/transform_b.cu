@@ -4,6 +4,7 @@
 #include "math_constants.h"
 #include <sstream>
 
+#ifdef CUDA_OTF
 __device__
 double nextLGP_m_eq0(int l, double x, double p_0, double p_1) {
 // x = cos(theta)
@@ -1354,7 +1355,7 @@ void transB_m_l_ver6D(int *lstack_rlm, int m0, int m1, int *idx_gl_1d_rlm_j, dou
 */
 }
 
-#ifdef CUDA_STATIC
+#else
 __global__
 void transB_dydt(int *lstack_rlm, int *idx_gl_1d_rlm_j, double *vr_rtm, double const* __restrict__ sp_rlm, double *a_r_1d_rlm_r, double *P_jl, double *dP_jl, const Geometry_c constants) {
   int mp_rlm = blockIdx.y;
@@ -1451,6 +1452,14 @@ void legendre_b_trans_cuda_(int *ncomp, int *nvector, int *nscalar) {
   constants.ncomp = *ncomp;
   constants.nvector = *nvector;
   constants.nscalar = *nscalar;
+
+#ifndef CUDA_OTF
+  dim3 grid3(nTheta, constants.nidx_rtm[2]);
+  dim3 block3(nShells,1,1);
+  transB_dydt<<<grid3, block3, 0, streams[0]>>> (deviceInput.lstack_rlm, deviceInput.idx_gl_1d_rlm_j, deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.a_r_1d_rlm_r, deviceInput.p_jl, deviceInput.dP_jl, constants);
+  transB_dydp<<<grid3, block3, 0, streams[0]>>> (deviceInput.lstack_rlm, deviceInput.idx_gl_1d_rlm_j, deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.a_r_1d_rlm_r, deviceInput.p_jl, deviceInput.asin_theta_1d_rtm, constants);
+  transB_scalar<<<grid3, block3, 0, streams[1]>>> (deviceInput.lstack_rlm, deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.p_jl, constants);
+#else
   dim3 grid(nShells, 1);
   int nThreads=0; 
   if((int) nTheta/16 < 10)
@@ -1475,15 +1484,6 @@ void legendre_b_trans_cuda_(int *ncomp, int *nvector, int *nscalar) {
   int m0=0, m1=0;
 
   bool begin_set = false, end_set = false;
-
-#ifdef CUDA_STATIC
-  dim3 grid3(nTheta, constants.nidx_rtm[2]);
-  dim3 block3(nShells,1,1);
-  transB_dydt<<<grid3, block3, 0, streams[0]>>> (deviceInput.lstack_rlm, deviceInput.idx_gl_1d_rlm_j, deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.a_r_1d_rlm_r, deviceInput.p_jl, deviceInput.dP_jl, constants);
-  transB_dydp<<<grid3, block3, 0, streams[0]>>> (deviceInput.lstack_rlm, deviceInput.idx_gl_1d_rlm_j, deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.a_r_1d_rlm_r, deviceInput.p_jl, deviceInput.asin_theta_1d_rtm, constants);
-  transB_scalar<<<grid3, block3, 0, streams[1]>>> (deviceInput.lstack_rlm, deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.p_jl, constants);
-#else
- 
   /*dim3 grid5(nTheta, constants.nidx_rtm[2], 1);
   dim3 block5(nShells,1,1);
   size_t smem =  sizeof(double) * (constants.nvector*5 + constants.nscalar) * nShells;

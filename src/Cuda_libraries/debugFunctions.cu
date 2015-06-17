@@ -9,28 +9,28 @@ void check_bwd_trans_cuda_(int *my_rank, double *vr_rtm, double *P_jl, double *d
     std::string fName;
     std::stringstream sc;
     sc << *my_rank;
-  #if !defined(CUDA_STATIC) 
-    std::ofstream schmidt;
-  #endif
+    #if defined(CUDA_OTF)
+      std::ofstream schmidt;
+    #endif
     std::ofstream field_vec, field_slr;
     //std::string fName = "cuda_schmidt" + "_" + sc.str() + ".log");
-  #if !defined(CUDA_STATIC) 
-    fName = "cuda_schmidt_" + sc.str() + ".log";
-    schmidt.open(fName.c_str());
-  #endif
+    #if defined(CUDA_OTF) 
+      fName = "cuda_schmidt_" + sc.str() + ".log";
+      schmidt.open(fName.c_str());
+    #endif
     fName = "cuda_field_vectors_" + sc.str() + ".log";
     field_vec.open(fName.c_str());
     fName = "cuda_field_scalars_" + sc.str() + ".log";
     field_slr.open(fName.c_str());
       
-  #if !defined(CUDA_STATIC) 
-    schmidt << "order\t degree\t P_smdt \t P_smdt_cuda\t dP_smdt \t dP_smdt_cuda\n";
-  #endif
+    #if defined(CUDA_OTF) 
+      schmidt << "order\t degree\t P_smdt \t P_smdt_cuda\t dP_smdt \t dP_smdt_cuda\n";
+    #endif
 
     double error=0, eps = 1E-7;
     int jst, jed, ip_rtm, in_rtm, pos, m, l, mn_rlm;
 
-  #if !defined(CUDA_STATIC) 
+  #if defined(CUDA_OTF) 
     for(int mp_rlm=1; mp_rlm<=constants.nidx_rtm[2]; mp_rlm++){
       jst = h_debug.lstack_rlm[mp_rlm-1] + 1; 
       jed = h_debug.lstack_rlm[mp_rlm];
@@ -81,11 +81,11 @@ void check_fwd_trans_cuda_(int *my_rank, double *sp_rlm) {
     std::string fName;
     std::stringstream sc;
     sc << *my_rank;
-  #if !defined(CUDA_STATIC) 
+  #if defined(CUDA_OTF) 
     std::ofstream schmidt;
   #endif
     std::ofstream spec_vec, spec_slr;
-  #if !defined(CUDA_STATIC) 
+  #if defined(CUDA_OTF) 
     fName = "cuda_f_schmidt_" + sc.str() + ".log";
     schmidt.open(fName.c_str());
   #endif
@@ -94,7 +94,7 @@ void check_fwd_trans_cuda_(int *my_rank, double *sp_rlm) {
     fName = "cuda_spec_scalars_" + sc.str() + ".log";
     spec_slr.open(fName.c_str());
       
-  #if !defined(CUDA_STATIC) 
+  #if defined(CUDA_OTF) 
     schmidt << "order\t degree\t P_smdt \t P_smdt_cuda\t dP_smdt \t dP_smdt_cuda\n";
     schmidt.close();
   #endif

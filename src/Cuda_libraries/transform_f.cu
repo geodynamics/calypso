@@ -95,8 +95,7 @@ void transF_scalar(int kst, double *vr_rtm, double *sp_rlm, double *weight_rtm, 
   } 
 }
 
-void legendre_f_trans_cuda_(int *ncomp, int *nvector, int *nscalar, int *idx_rlm_smp_stack) {
-  
+void legendre_f_trans_cuda_(int *ncomp, int *nvector, int *nscalar) {
 //  static int nShells = *ked - *kst + 1;
   static int nShells = constants.nidx_rtm[0];
   static int nTheta = constants.nidx_rtm[1];
@@ -111,5 +110,3 @@ void legendre_f_trans_cuda_(int *ncomp, int *nvector, int *nscalar, int *idx_rlm
   transF_vec<<<grid, block, 0, streams[0]>>> (1, deviceInput.idx_gl_1d_rlm_j, deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.radius_1d_rlm_r, deviceInput.weight_rtm, deviceInput.mdx_p_rlm_rtm, deviceInput.mdx_n_rlm_rtm, deviceInput.a_r_1d_rlm_r, deviceInput.g_colat_rtm, deviceInput.p_rtm, deviceInput.dP_rtm, deviceInput.g_sph_rlm_7, deviceInput.asin_theta_1d_rtm, constants);
   transF_scalar<<<grid, block, 0, streams[1]>>> (1, deviceInput.vr_rtm, deviceInput.sp_rlm, deviceInput.weight_rtm, deviceInput.mdx_p_rlm_rtm, deviceInput.p_rtm, deviceInput.g_sph_rlm_7, constants);
 }
-
-

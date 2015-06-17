@@ -46,7 +46,7 @@ void set_constants_(int *nnod_rtp, int *nnod_rtm, int *nnod_rlm, int nidx_rtm[],
 
   constants.np_smp = *np_smp;
 
-  #if !defined(CUDA_STATIC)
+  #if defined(CUDA_OTF)
     initDevConstVariables();
   #endif
 
@@ -99,12 +99,10 @@ void alloc_space_on_gpu_(int *ncmp, int *nvector, int *nscalar) {
   cudaErrorCheck(cudaMalloc((void**)&(deviceInput.weight_rtm), constants.nidx_rtm[1]*sizeof(double))); 
   cudaErrorCheck(cudaMalloc((void**)&(deviceInput.mdx_p_rlm_rtm), constants.nidx_rlm[1]*sizeof(int))); 
   cudaErrorCheck(cudaMalloc((void**)&(deviceInput.mdx_n_rlm_rtm), constants.nidx_rlm[1]*sizeof(int))); 
-  #ifdef CUDA_STATIC
-    cudaErrorCheck(cudaMalloc((void**)&(deviceInput.p_jl), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
-    cudaErrorCheck(cudaMalloc((void**)&(deviceInput.dP_jl), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
-  #endif
-    cudaErrorCheck(cudaMalloc((void**)&(deviceInput.p_rtm), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
-    cudaErrorCheck(cudaMalloc((void**)&(deviceInput.dP_rtm), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
+  cudaErrorCheck(cudaMalloc((void**)&(deviceInput.p_jl), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
+  cudaErrorCheck(cudaMalloc((void**)&(deviceInput.dP_jl), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
+  cudaErrorCheck(cudaMalloc((void**)&(deviceInput.p_rtm), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
+  cudaErrorCheck(cudaMalloc((void**)&(deviceInput.dP_rtm), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
    
   cudaErrorCheck(cudaMemset(deviceInput.vr_rtm, 0, constants.nnod_rtm*ncomp*sizeof(double)));
   cudaErrorCheck(cudaMemset(deviceInput.sp_rlm, 0, constants.nnod_rlm*ncomp*sizeof(double)));
@@ -131,16 +129,14 @@ void memcpy_h2d_(int *lstack_rlm, double *a_r_1d_rlm_r, double *g_colat_rtm, dou
 }
 
 void cpy_schmidt_2_gpu_(double *P_jl, double *dP_jl, double *P_rtm, double *dP_rtm) {
-  #ifdef CUDA_STATIC
     cudaErrorCheck(cudaMemcpy(deviceInput.p_jl, P_jl, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1], cudaMemcpyHostToDevice));
     cudaErrorCheck(cudaMemcpy(deviceInput.dP_jl, dP_jl, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1], cudaMemcpyHostToDevice));
-  #endif
     cudaErrorCheck(cudaMemcpy(deviceInput.p_rtm, P_rtm, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1], cudaMemcpyHostToDevice));
     cudaErrorCheck(cudaMemcpy(deviceInput.dP_rtm, dP_rtm, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1], cudaMemcpyHostToDevice));
 }
  
 void allocHostDebug(Debug* h_data) {
-  #if !defined(CUDA_STATIC)
+  #if defined(CUDA_OTF)
     h_debug.P_smdt = (double*) malloc (sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]);
     h_debug.dP_smdt = (double*) malloc (sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]);
   #endif
@@ -152,7 +148,7 @@ void allocHostDebug(Debug* h_data) {
 }
  
 void allocDevDebug(Debug* d_data) {
-  #if !defined(CUDA_STATIC)
+  #if defined(CUDA_OTF)
     cudaErrorCheck(cudaMalloc((void**)&(d_data->P_smdt), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
     cudaErrorCheck(cudaMemset(d_data->P_smdt, -1, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
     cudaErrorCheck(cudaMalloc((void**)&(d_data->dP_smdt), sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1]));
@@ -162,7 +158,7 @@ void allocDevDebug(Debug* d_data) {
 }
 
 void cpy_field_dev2host_4_debug_() {
-  #if !defined(CUDA_STATIC)
+  #if defined(CUDA_OTF)
     cudaErrorCheck(cudaMemcpy(h_debug.P_smdt, d_debug.P_smdt, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1], cudaMemcpyDeviceToHost)); 
     cudaErrorCheck(cudaMemcpy(h_debug.dP_smdt, d_debug.dP_smdt, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1], cudaMemcpyDeviceToHost)); 
   #endif
@@ -171,7 +167,7 @@ void cpy_field_dev2host_4_debug_() {
 }
 
 void cpy_spec_dev2host_4_debug_() {
-  #if !defined(CUDA_STATIC)
+  #if defined(CUDA_OTF)
     cudaErrorCheck(cudaMemcpy(h_debug.P_smdt, d_debug.P_smdt, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1], cudaMemcpyDeviceToHost)); 
     cudaErrorCheck(cudaMemcpy(h_debug.dP_smdt, d_debug.dP_smdt, sizeof(double)*constants.nidx_rtm[1]*constants.nidx_rlm[1], cudaMemcpyDeviceToHost)); 
   #endif
@@ -222,23 +218,21 @@ void deAllocMemOnGPU() {
     cudaErrorCheck(cudaFree(deviceInput.mdx_p_rlm_rtm));
     cudaErrorCheck(cudaFree(deviceInput.mdx_n_rlm_rtm));
     cudaErrorCheck(cudaFree(deviceInput.asin_theta_1d_rtm));
-  #ifdef CUDA_STATIC
     cudaErrorCheck(cudaFree(deviceInput.p_jl));
     cudaErrorCheck(cudaFree(deviceInput.dP_jl));
-  #endif
     cudaErrorCheck(cudaFree(deviceInput.p_rtm));
     cudaErrorCheck(cudaFree(deviceInput.dP_rtm));
 }
 
 void deAllocDebugMem() {
-  #if !defined(CUDA_STATIC) 
+  #if defined(CUDA_OTF) 
     free(h_debug.P_smdt);
     free(h_debug.dP_smdt);
   #endif
     free(h_debug.vr_rtm);
     free(h_debug.sp_rlm);
 //  free(h_debug.g_sph_rlm);
-  #if !defined(CUDA_STATIC) 
+  #if defined(CUDA_OTF) 
     cudaErrorCheck(cudaFree(d_debug.P_smdt));
     cudaErrorCheck(cudaFree(d_debug.dP_smdt));
   #endif
