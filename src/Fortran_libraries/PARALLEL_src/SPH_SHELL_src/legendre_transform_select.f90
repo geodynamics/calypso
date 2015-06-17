@@ -42,6 +42,9 @@
       use legendre_transform_testloop
       use legendre_transform_matmul
       use legendre_trans_sym_matmul
+#ifdef CUDA
+      use legendre_transform_cuda
+#endif
 !
       implicit none
 !
@@ -100,6 +103,12 @@
 !@n     with testing loop
       character(len = kchara), parameter                                &
      &           :: leg_test_loop =    'test_loop'
+!>      Character flag to perform Legendre transform 
+!@n     with CUDA 
+#ifdef CUDA
+      character(len = kchara), parameter                                &
+     &           :: leg_cuda =    'cuda'
+#endif
 !
 !
 !>      integer flag to run elpse time check for legendre transform
@@ -139,6 +148,11 @@
 !>      integer flag to perform Legendre transform 
 !@n     with symmetry and  self matrix product
       integer(kind = kint), parameter :: iflag_leg_sym_matprod =  12
+!>      integer flag to perform Legendre transform 
+!@n     with CUDA 
+#ifdef CUDA
+      integer(kind = kint), parameter :: iflag_leg_cuda =  13
+#endif
 !>      integer flag to perform Legendre transform 
 !@n     with testing loop
       integer(kind = kint), parameter :: iflag_leg_test_loop =   99
@@ -189,6 +203,10 @@
         id_legendre_transfer = iflag_leg_blocked
       else if(cmp_no_case(tranx_loop_ctl, leg_orginal_loop)) then
         id_legendre_transfer = iflag_leg_orginal_loop
+#ifdef CUDA
+      else if(cmp_no_case(tranx_loop_ctl, leg_cuda)) then
+        id_legendre_transfer = iflag_leg_cuda
+#endif
       else
         id_legendre_transfer = iflag_leg_orginal_loop
       end if
@@ -201,6 +219,9 @@
 !
       use m_legendre_work_sym_matmul
       use m_legendre_work_testlooop
+#ifdef CUDA
+      use cuda_optimizations
+#endif
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
 !
@@ -225,6 +246,18 @@
         call alloc_leg_scl_blocked
       else if(id_legendre_transfer .eq. iflag_leg_test_loop) then
         call alloc_leg_vec_test(nvector, nscalar)
+#ifdef CUDA
+      else if(id_legendre_transfer .eq. iflag_leg_cuda) then
+        call start_eleps_time(62)
+        call allocate_work_sph_trans(ncomp)
+        call end_eleps_time(62)
+        call start_eleps_time(55)
+        call alloc_space_on_gpu(ncomp, nvector, nscalar)
+!#ifdef CUDA_TIMINGS
+!        call cuda_sync_device
+!#endif
+        call end_eleps_time(55)
+#endif
       else
         call allocate_work_sph_trans(ncomp)
       end if
@@ -316,6 +349,11 @@
       else if(id_legendre_transfer .eq. iflag_leg_blocked) then
         call leg_backward_trans_blocked(ncomp, nvector, nscalar,        &
      &      n_WR, n_WS, WR, WS)
+#ifdef CUDA
+      else if(id_legendre_transfer .eq. iflag_leg_cuda) then
+        call leg_backward_trans_cuda(ncomp, nvector, nscalar,        &
+     &      n_WR, n_WS, WR, WS)
+#endif
       else
         call leg_backward_trans_org(ncomp, nvector, nscalar,            &
      &      n_WR, n_WS, WR, WS)
@@ -374,6 +412,11 @@
       else if(id_legendre_transfer .eq. iflag_leg_blocked) then
         call leg_forwawd_trans_blocked(ncomp, nvector, nscalar,         &
      &      n_WR, n_WS, WR, WS)
+#ifdef CUDA
+      else if(id_legendre_transfer .eq. iflag_leg_cuda) then
+        call leg_forward_trans_cuda(ncomp, nvector, nscalar,        &
+     &      n_WR, n_WS, WR, WS)
+#endif
       else
         call leg_forwawd_trans_org(ncomp, nvector, nscalar,             &
      &      n_WR, n_WS, WR, WS)

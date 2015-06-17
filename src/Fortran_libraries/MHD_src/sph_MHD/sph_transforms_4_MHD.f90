@@ -51,6 +51,9 @@
       use legendre_transform_select
       use pole_sph_transform
       use skip_comment_f
+#ifdef CUDA
+      use cuda_optimizations
+#endif
 !
       character(len=kchara) :: tmpchara
 !
@@ -91,6 +94,15 @@
       call sel_init_legendre_trans                                      &
      &    (ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
+#ifdef CUDA
+      call start_eleps_time(56)
+      call set_mem_4_gpu
+#ifdef CUDA_TIMINGS
+      call sync_device
+#endif
+      call end_eleps_time(56)
+#endif      
+!
       if(my_rank .ne. 0) return
         if     (id_legendre_transfer .eq. iflag_leg_orginal_loop) then
           write(tmpchara,'(a)') trim(leg_orginal_loop)
@@ -118,6 +130,10 @@
           write(tmpchara,'(a)') trim(leg_sym_matprod)
         else if(id_legendre_transfer .eq. iflag_leg_test_loop) then
           write(tmpchara,'(a)') trim(leg_test_loop)
+#ifdef CUDA
+        else if(id_legendre_transfer .eq. iflag_leg_cuda) then
+          write(tmpchara,'(a)') trim(leg_cuda)
+#endif
         end if
         call change_2_upper_case(tmpchara)
 !

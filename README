@@ -24,3 +24,14 @@ work:     Work directory (created by make)
 
 For installation instructions, please read INSTALL or the documentation page 16--19.
 
+The following instructions will setup a build for Calypso with GPU optimizations using CMAKE on Maverick:
+	1). module load cuda
+	2). mkdir <NAME_of_DIRECTORY> && cd <NAME_OF_DIRECTORY>
+	3). cmake -DCMAKE_BUILD_TYPE=RELEASE <PATH_TO_CALYPSO_SRC_ROOT_DIR>
+	4). make -j <number_of_processes>
+Note that cmake can be ran with a multitude of options that specify compilers, flags, libraries and etc.
+Some of the common ones to be aware of are:
+	-DCMAKE_Fortran_COMPILER, -DCMAKE_CXX_COMPILER, -DCMAKE_LIBRARY_PATH 
+For example, the third command can be modified to:
+	cmake -DCMAKE_BUILD_TYPE=RELEASE -DCMAKE_Fortran_COMPILER=<Full_Path_to_ifort> <PATH_TO_CALYPSO_SRC_ROOT_DIR>
+Note that, after running the cmake command, one of the files that is generated is called the CMakeCache.txt. To flush the cached variables, this file needs to be removed. 

@@ -94,7 +94,7 @@
                 dPdt_j(j_rlm) = dPdt_jl(j_rlm,l_rtm)
               end do
 !
-              do nd = 1, nvector
+               do nd = 1, nvector
                 vr1 = 0.0d0
                 vr2 = 0.0d0
                 vr3 = 0.0d0

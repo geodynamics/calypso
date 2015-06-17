@@ -14,15 +14,26 @@
 !
       use calypso_mpi
       use analyzer_sph_MHD_w_psf
+#ifdef CUDA
+      use cuda_optimizations
+#endif
+      use m_work_time
 !
       implicit none
 !
 !
       call calypso_MPI_init
 !
-      call initialize_sph_mhd_w_psf
+#ifdef CUDA
+      call calypso_GPU_init
+#endif
 !
+      call initialize_sph_mhd_w_psf
       call evolution_sph_mhd_w_psf
+!
+#ifdef CUDA
+      call calypso_GPU_finalize
+#endif
 !
       call calypso_MPI_finalize
 !
