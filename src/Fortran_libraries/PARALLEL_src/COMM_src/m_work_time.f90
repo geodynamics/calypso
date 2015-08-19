@@ -98,6 +98,8 @@
 !
 !
       start_times(iflag_elps) = MPI_WTIME()
+!      if(iflag_elps .eq. 3) call summary_start()
+!      call hpm_start(elapse_labels(iflag_elps))
 !
       end subroutine start_eleps_time
 !
@@ -110,6 +112,8 @@
       integer, intent(in) :: iflag_elps
 !
 !
+!      if(iflag_elps .eq. 3) call summary_stop()
+!      call hpm_stop(elapse_labels(iflag_elps)) 
       elapsed(iflag_elps) = MPI_WTIME() - start_times(iflag_elps)       &
      &                     + elapsed(iflag_elps)
 !

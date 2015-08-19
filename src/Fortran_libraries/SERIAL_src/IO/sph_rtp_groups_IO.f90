@@ -1,10 +1,15 @@
-!sph_rtp_groups_IO.f90
-!      module sph_rtp_groups_IO
+!>@file  sph_rtp_groups_IO.f90
+!!       module sph_rtp_groups_IO
+!!
+!!@author H. Matsui
+!!@date        programmed by H.Matsui in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine read_geom_rtp_groups(mesh_file_id)
-!      subroutine write_geom_rtp_groups(mesh_file_id)
+!> @brief routines for spectrum group data IO
+!!
+!!@verbatim
+!!      subroutine read_geom_rtp_groups(mesh_file_id)
+!!      subroutine write_geom_rtp_groups(mesh_file_id)
+!!@endverbatim
 !
       module sph_rtp_groups_IO
 !

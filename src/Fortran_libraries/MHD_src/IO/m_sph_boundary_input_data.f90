@@ -45,12 +45,13 @@
 !
       implicit  none
 !
+!>      File name for boundary condition file
       character(len=kchara) :: bc_sph_file_name = 'boundary_spectr.dat'
+!>      File ID for boundary condition file
       integer(kind = kint), parameter :: id_boundary_file = 41
 !
+!>      Number of boundary condition data in file
       integer(kind = kint) :: ntot_bc_data_ctl
-!
-      integer(kind = kint), allocatable :: istack_bc_data_ctl(:)
 !
 !>        Structure for each boundary condition
       type each_boundary_spectr
@@ -75,6 +76,7 @@
 !>        Structures for boundary conditions
       type(each_boundary_spectr), allocatable, save :: bc_ctls(:)
 !
+      private :: id_boundary_file
       private :: num_bc_field_ctl, bc_ctls
 !
       private :: alloc_each_bc_item_ctl, dealloc_each_bc_item_ctl

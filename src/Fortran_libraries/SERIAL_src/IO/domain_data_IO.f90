@@ -1,12 +1,19 @@
+!>@file   domain_data_IO.f90
+!!@brief  module domain_data_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!      module domain_data_IO
-!
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine read_domain_info(id_file)
-!      subroutine read_domain_info_b(id_file)
-!      subroutine write_domain_info(id_file)
-!      subroutine write_domain_info_b(id_file)
+!>@brief  Routine for doimain data IO
+!!
+!!@verbatim
+!!      subroutine read_domain_info(id_file)
+!!      subroutine read_domain_info_b(id_file)
+!!      subroutine write_domain_info(id_file)
+!!      subroutine write_domain_info_b(id_file)
+!!@endverbatim
+!!
+!@param id_file file ID
 !
       module domain_data_IO
 !

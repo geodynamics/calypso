@@ -14,8 +14,14 @@
 !!
 !!      subroutine add_scalar_poisson_mat_sph(nri, jmax, kr_in, kr_out, &
 !!     &          coef_p, mat3)
+!!         
 !!      subroutine add_vector_poisson_mat_sph(nri, jmax, kr_in, kr_out, &
 !!     &          kr_in, kr_out, coef_p, mat3)
+!!
+!!      subroutine add_scalar_r_diffuse_mat_sph(nri, jmax,              &
+!!     &          kr_in, kr_out, coef_p, val_r, dval_r, mat3)
+!!      subroutine add_vector_r_diffuse_mat_sph(nri, jmax,              &
+!!     &          kr_in, kr_out, coef_p, val_r, dval_r, mat3)
 !!
 !!    Format of band matrix
 !!               | a(2,1)  a(1,2)  ........     0         0     |
@@ -226,6 +232,75 @@
 !$omp end parallel do
 !
       end subroutine add_vector_poisson_mat_sph
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine add_scalar_r_diffuse_mat_sph(nri, jmax,                &
+     &          kr_in, kr_out, coef_p, val_r, dval_r, mat3)
+!
+      integer(kind = kint), intent(in) :: jmax, nri
+      integer(kind = kint), intent(in) :: kr_in, kr_out
+      real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: val_r(nri), dval_r(nri)
+!
+      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
+!
+      integer(kind = kint) :: k, j
+!
+!
+!$omp parallel do private (k,j)
+      do k = kr_in+1, kr_out-1
+        do j = 1, jmax
+          mat3(3,k-1,j) = mat3(3,k-1,j)                                 &
+     &                   - coef_p * val_r(k) * (d2nod_mat_fdm_2(k,-1)   &
+     &                 + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k,-1))   &
+     &                   - coef_p * dval_r(k) * d1nod_mat_fdm_2(k,-1)
+          mat3(2,k,  j) = mat3(2,k,  j)                                 &
+     &                   - coef_p * val_r(k) * (d2nod_mat_fdm_2(k, 0)   &
+     &                  + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k, 0)   &
+     &                 - g_sph_rj(j,3)*ar_1d_rj(k,2) )                  &
+     &                   - coef_p * dval_r(k) * d1nod_mat_fdm_2(k,-1)
+          mat3(1,k+1,j) = mat3(1,k+1,j)                                 &
+     &                   - coef_p  * val_r(k) * (d2nod_mat_fdm_2(k, 1)  &
+     &                 + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k, 1))   &
+     &                   - coef_p * dval_r(k) * d1nod_mat_fdm_2(k,-1)
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine add_scalar_r_diffuse_mat_sph
+!
+! -----------------------------------------------------------------------
+!
+      subroutine add_vector_r_diffuse_mat_sph(nri, jmax,                &
+     &          kr_in, kr_out, coef_p, val_r, dval_r, mat3)
+!
+      integer(kind = kint), intent(in) :: jmax, nri
+      integer(kind = kint), intent(in) :: kr_in, kr_out
+      real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: val_r(nri), dval_r(nri)
+!
+      real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
+!
+      integer(kind = kint) :: k, j
+!
+!
+!$omp parallel do private (k,j)
+      do k = kr_in+1, kr_out-1
+        do j = 1, jmax
+          mat3(3,k-1,j) = mat3(3,k-1,j)                                 &
+     &                   - coef_p *  d2nod_mat_fdm_2(k,-1)
+          mat3(2,k,  j) = mat3(2,k,  j)                                 &
+     &                   - coef_p * (d2nod_mat_fdm_2(k, 0)              &
+     &                    - g_sph_rj(j,3)*ar_1d_rj(k,2) )
+          mat3(1,k+1,j) = mat3(1,k+1,j)                                 &
+     &                   - coef_p *  d2nod_mat_fdm_2(k, 1)
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine add_vector_r_diffuse_mat_sph
 !
 ! -----------------------------------------------------------------------
 !

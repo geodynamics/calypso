@@ -124,12 +124,14 @@
       integer (kind=kint), parameter :: id_read_boundary_file = 1
 !>      Flag to check external boundary condition file
       integer (kind=kint) :: iflag_boundary_file = id_no_boundary_file
+!>      Flag to check external file for radial field
+      integer (kind=kint) :: iflag_radial_param_file = id_no_boundary_file
 !
 !
 !>      Thermal stratification flag
       integer (kind=kint) :: iflag_t_strat
 !>      Magneto convectio flag
-      integer (kind=kint) :: iflag_magneto_cv
+      integer (kind=kint) :: iflag_magneto_cv = id_turn_OFF
 !
 !  Parameters for FEM dynamo
 !

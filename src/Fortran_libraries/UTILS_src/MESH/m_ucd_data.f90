@@ -10,6 +10,8 @@
 !!      subroutine set_control_ucd_file_def
 !!      subroutine set_ucd_file_prefix(file_prefix)
 !!      subroutine set_ucd_file_format(ifile_format)
+!!
+!!      subroutine link_nnod_stacks_2_ucd_out(nprocs)
 !!@endverbatim
 !
       module m_ucd_data
@@ -67,14 +69,13 @@
 !
       subroutine link_local_mesh_4_ucd_out
 !
-      use m_geometry_parameter
       use m_geometry_data
       use set_and_cal_udt_data
 !
 !
-      call const_udt_local_nodes(numnod, xx, fem_ucd)
-      call const_udt_local_connect(internal_node, numele, nnod_4_ele,   &
-     &    ie, fem_ucd)
+      call const_udt_local_nodes(node1%numnod, node1%xx, fem_ucd)
+      call const_udt_local_connect(node1%internal_node,                 &
+     &    ele1%numele, ele1%nnod_4_ele, ele1%ie, fem_ucd)
 !
       end subroutine link_local_mesh_4_ucd_out
 !
@@ -82,15 +83,16 @@
 !
       subroutine link_global_mesh_4_ucd_out
 !
-      use m_geometry_parameter
       use m_geometry_data
       use set_ucd_data
       use set_and_cal_udt_data
 !
 !
-      call link_node_data_2_output(numnod, inod_global, xx, fem_ucd)
-      call const_udt_global_connect(internal_node, numele, nnod_4_ele,  &
-     &    iele_global, ie, fem_ucd)
+      call link_node_data_2_output                                      &
+     &   (node1%numnod, node1%inod_global, node1%xx, fem_ucd)
+      call const_udt_global_connect(node1%internal_node,                &
+     &    ele1%numele, ele1%nnod_4_ele, ele1%iele_global, ele1%ie,      &
+     &    fem_ucd)
 !
       end subroutine link_global_mesh_4_ucd_out
 !
@@ -99,12 +101,13 @@
 !
       subroutine link_fem_num_field_2_ucd_out
 !
-      use m_geometry_parameter
+      use m_geometry_data
       use m_node_phys_data
       use set_ucd_data
 !
 !
-      call link_num_field_2_output(numnod, num_nod_phys_vis, fem_ucd)
+      call link_num_field_2_output                                      &
+     &   (node1%numnod, num_nod_phys_vis, fem_ucd)
 !
       end subroutine link_fem_num_field_2_ucd_out
 !
@@ -112,12 +115,12 @@
 !
       subroutine link_fem_node_data_2_ucd_out
 !
-      use m_geometry_parameter
       use m_geometry_data
       use set_ucd_data
 !
 !
-      call link_node_data_2_output(numnod, inod_global, xx, fem_ucd)
+      call link_node_data_2_output                                      &
+     &   (node1%numnod, node1%inod_global, node1%xx, fem_ucd)
 !
       end subroutine link_fem_node_data_2_ucd_out
 !
@@ -125,16 +128,31 @@
 !
       subroutine link_fem_field_data_2_ucd_out
 !
-      use m_geometry_parameter
+      use m_geometry_data
       use m_node_phys_data
       use set_ucd_data
 !
 !
-      call link_field_data_2_output(numnod, num_nod_phys,               &
+      call link_field_data_2_output(node1%numnod, num_nod_phys,         &
      &    num_tot_nod_phys, num_nod_phys_vis, num_tot_nod_phys_vis,     &
      &    num_nod_component, phys_nod_name, d_nod, fem_ucd)
 !
       end subroutine link_fem_field_data_2_ucd_out
+!
+!-----------------------------------------------------------------------
+!
+      subroutine link_nnod_stacks_2_ucd_out(nprocs)
+!
+      use m_geometry_data
+      use set_ucd_data
+!
+      integer(kind = kint),  intent(in) :: nprocs
+!
+!
+      call link_numnod_stacks_2_output(nprocs, node1%istack_numnod,     &
+     &    node1%istack_internod, ele1%istack_numele, merged_ucd)
+!
+      end subroutine link_nnod_stacks_2_ucd_out
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -142,7 +160,7 @@
       subroutine link_output_ucd_file_once(my_rank, istep_ucd,          &
      &          ifile_format, ucd_prefix)
 !
-      use m_geometry_parameter
+      use m_geometry_data
       use m_node_phys_data
 !
       use set_ucd_data
@@ -155,7 +173,7 @@
       type(ucd_data) :: local_ucd
 !
 !
-      call link_field_data_2_output(numnod, num_nod_phys,               &
+      call link_field_data_2_output(node1%numnod, num_nod_phys,         &
      &    num_tot_nod_phys, num_nod_phys_vis, num_tot_nod_phys_vis,     &
      &    num_nod_component, phys_nod_name, d_nod, local_ucd)
 !

@@ -1,9 +1,15 @@
+!>@file   set_control_sph_data.f90
+!!@brief  module set_control_sph_data
+!!
+!!@author H. Matsui
+!!@date Programmed in Dec., 2007
+!!@date Modified in 2008
 !
-!      module set_control_sph_data
-!
-!        programmed by H.Matsui on Dec., 2007
-!
-!     subroutine s_set_control_sph_data(ierr)
+!> @brief Load control data for sphrical dynamo
+!!
+!!@verbatim
+!!     subroutine s_set_control_sph_data(ierr)
+!!@endverbatim
 !
       module set_control_sph_data
 !

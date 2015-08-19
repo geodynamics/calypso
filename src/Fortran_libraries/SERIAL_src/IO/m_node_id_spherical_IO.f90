@@ -1,8 +1,12 @@
+!> @file  m_node_id_spherical_IO.f90
+!!      module m_node_id_spherical_IO
+!!
+!! @author  H. Matsui
+!! @date Written in July, 2007
 !
-!      module m_node_id_spherical_IO
-!
-!     Written by H. Matsui on July, 2007
-!
+!> @brief Array for speherical harmonics indexing IO
+!!
+!!@verbatim
 !!      subroutine allocate_nod_id_sph_IO
 !!      subroutine allocate_idx_sph_1d1_IO
 !!      subroutine allocate_idx_sph_1d2_IO
@@ -14,6 +18,7 @@
 !!      subroutine deallocate_idx_sph_1d3_IO
 !!
 !!      subroutine set_sph_mesh_file_fmt_prefix(iflag_fmt, file_head)
+!!@endverbatim
 !
       module m_node_id_spherical_IO
 !

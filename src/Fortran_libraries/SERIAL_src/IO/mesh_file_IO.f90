@@ -1,17 +1,22 @@
-!mesh_file_IO.f90
-!      module mesh_file_IO
+!> @file  mesh_file_IO.f90
+!!      module mesh_file_IO
+!!
+!! @author  H. Matsui
+!! @date Programmed in Apr., 2006
 !
-!      Written by H. Matsui on Apr., 2006
-!
-!      subroutine set_mesh_fname(my_rank)
-!
-!      subroutine read_mesh_file(my_rank)
-!      subroutine read_mesh_geometry(my_rank)
-!
-!      subroutine read_node_size(my_rank)
-!      subroutine read_geometry_size(my_rank)
-!
-!      subroutine write_mesh_file(my_rank)
+!> @brief ASCII mesh file IO
+!!
+!!@verbatim
+!!      subroutine set_mesh_fname(my_rank)
+!!
+!!      subroutine read_mesh_file(my_rank)
+!!      subroutine read_mesh_geometry(my_rank)
+!!
+!!      subroutine read_node_size(my_rank)
+!!      subroutine read_geometry_size(my_rank)
+!!
+!!      subroutine write_mesh_file(my_rank)
+!!@endverbatim
 !
       module mesh_file_IO
 !

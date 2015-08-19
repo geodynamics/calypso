@@ -11,14 +11,12 @@
 !!      subroutine allocate_schmidt_poly_rtm
 !!      subroutine allocate_hemi_schmidt_rtm
 !!      subroutine allocate_trans_schmidt_rtm
-!!      subroutine allocate_legendre_trans_mat
 !!      subroutine allocate_schmidt_p_rtm_pole
 !!
 !!      subroutine deallocate_gauss_colat_rtm
 !!      subroutine deallocate_schmidt_poly_rtm
 !!      subroutine deallocate_hemi_schmidt_rtm
 !!      subroutine deallocate_trans_schmidt_rtm
-!!      subroutine deallocate_legendre_trans_mat
 !!      subroutine deallocate_schmidt_p_rtm_pole
 !!
 !!      subroutine check_gauss_colat_rtm(my_rank)
@@ -43,14 +41,14 @@
 !
 !>        Number of meridional grid points in northern hemisphere
       integer(kind = kint) :: nth_hemi_rtm
-!>        @$f P_{l}{m} @$f with even (l-m) 
+!>        @$f P_{l}{m} @$f
 !!        at gouss points in northen hemisphere
       real(kind = kreal), allocatable :: Ps_rtm(:,:)
 !>        @$f dP_{l}{m}/d\theta @$f  with even (l-m) 
 !!        at gouss points in northen hemisphere
       real(kind = kreal), allocatable :: dPsdt_rtm(:,:)
 !
-!>        @$f P_{l}{m} @$f with even (l-m) 
+!>        @$f P_{l}{m} @$f
 !!        at gouss points in northen hemisphere
       real(kind = kreal), allocatable :: Ps_jl(:,:)
 !>        @$f dP_{l}{m}/d\theta @$f  with even (l-m) 
@@ -68,43 +66,19 @@
 !>        @$f dP_{l}{m}/d\theta @$f at poles
       real(kind = kreal), allocatable :: dPdt_pole_rtm(:,:)
 !
-!>        @$f Wt_{\theta} Nv_{l} P_{l}{m} @$f with A(theta,j)
-      real(kind = kreal), allocatable :: Pvw_lj(:,:)
-!>        @$f Wt_{\theta} Nv_{l} dP_{l}{m}/d\theta @$f with A(theta,j)
-      real(kind = kreal), allocatable :: dPvw_lj(:,:)
-!>        @$f Wt_{\theta} Nv_{l} m P_{l}{m} / \sin \theta @$f
-!!           with A(theta,j)
-      real(kind = kreal), allocatable :: Pgvw_lj(:,:)
-!
-!>        @$f Wt_{\theta} Ns_{l} P_{l}{m} @$f with A(theta,j)
-      real(kind = kreal), allocatable :: Pws_lj(:,:)
-!
-!>        @$f l(l+1) P_{l}{m} @$f with A(theta,j)
-      real(kind = kreal), allocatable :: Pg3_lj(:,:)
-!>        @$f -m P_{l}{m} / \sin \theta @$f with A(theta,j)
-      real(kind = kreal), allocatable :: Pgv_lj(:,:)
-!
-!
-!>        @$f Wt_{\theta} Nv_{l} P_{l}{m} @$f with A(j,theta)
-      real(kind = kreal), allocatable :: Pvw_jl(:,:)
-!>        @$f Wt_{\theta} Nv_{l} dP_{l}{m}/d\theta @$f with A(j,theta)
-      real(kind = kreal), allocatable :: dPvw_jl(:,:)
-!>        @$f Wt_{\theta} Nv_{l} m P_{l}{m} / \sin \theta @$f
-!!            with A(j,theta)
-      real(kind = kreal), allocatable :: Pgvw_jl(:,:)
-!
-!>        @$f Wt_{\theta} Ns_{l} P_{l}{m} @$f  with A(j,theta)
-      real(kind = kreal), allocatable :: Pws_jl(:,:)
-!
-!>        @$f l(l+1) P_{l}{m} @$f  with A(j,theta)
-      real(kind = kreal), allocatable :: Pg3_jl(:,:)
-!>        @$f -m P_{l}{m} / \sin \theta @$f with A(j,theta)
-      real(kind = kreal), allocatable :: Pgv_jl(:,:)
 !
 !>        @$f P_{l}{m} @$f with A(j,theta)
       real(kind = kreal), allocatable :: P_jl(:,:)
 !>        @$f dP_{l}{m}/d\theta @$f with A(j,theta)
       real(kind = kreal), allocatable :: dPdt_jl(:,:)
+!
+!
+!>        @$f P_{l}{m} @$f at gouss points
+!!        in northen hemisphere decomposited for SMP
+      real(kind = kreal), allocatable :: Ps_rtm_smp(:,:,:)
+!>        @$f dP_{l}{m}/d\theta @$f at gouss points 
+!!        in northen hemisphere decomposited for SMP
+      real(kind = kreal), allocatable :: dPsdt_rtm_smp(:,:,:)
 !
 ! -----------------------------------------------------------------------
 !
@@ -184,42 +158,6 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine allocate_legendre_trans_mat
-!
-      use m_spheric_parameter
-!
-      allocate( Pvw_lj(nidx_rtm(2),nidx_rlm(2)) )
-      allocate( dPvw_lj(nidx_rtm(2),nidx_rlm(2)) )
-      allocate( Pgvw_lj(nidx_rtm(2),nidx_rlm(2)) )
-      allocate( Pws_lj(nidx_rtm(2),nidx_rlm(2)) )
-      allocate( Pg3_lj(nidx_rtm(2),nidx_rlm(2)) )
-      allocate( Pgv_lj(nidx_rtm(2),nidx_rlm(2)) )
-!
-      allocate( Pvw_jl(nidx_rlm(2),nidx_rtm(2)) )
-      allocate( dPvw_jl(nidx_rlm(2),nidx_rtm(2)) )
-      allocate( Pgvw_jl(nidx_rlm(2),nidx_rtm(2)) )
-      allocate( Pws_jl(nidx_rlm(2),nidx_rtm(2)) )
-      allocate( Pg3_jl(nidx_rlm(2),nidx_rtm(2)) )
-      allocate( Pgv_jl(nidx_rlm(2),nidx_rtm(2)) )
-!
-      Pvw_lj =  0.0d0
-      dPvw_lj = 0.0d0
-      Pgvw_lj = 0.0d0
-      Pws_lj =  0.0d0
-      Pg3_lj =  0.0d0
-      Pgv_lj =  0.0d0
-!
-      Pvw_jl =  0.0d0
-      dPvw_jl = 0.0d0
-      Pgvw_jl = 0.0d0
-      Pws_jl =  0.0d0
-      Pg3_jl =  0.0d0
-      Pgv_jl =  0.0d0
-!
-      end subroutine allocate_legendre_trans_mat
-!
-! -----------------------------------------------------------------------
-!
       subroutine allocate_schmidt_p_rtm_pole
 !
       use m_spheric_parameter
@@ -268,18 +206,6 @@
       deallocate( P_jl, dPdt_jl)
 !
       end subroutine deallocate_trans_schmidt_rtm
-!
-! -----------------------------------------------------------------------
-!
-      subroutine deallocate_legendre_trans_mat
-!
-!
-      deallocate( Pvw_lj, dPvw_lj, Pgvw_lj)
-      deallocate( Pws_lj, Pg3_lj,  Pgv_lj)
-      deallocate( Pvw_jl, dPvw_jl, Pgvw_jl)
-      deallocate( Pws_jl, Pg3_jl,  Pgv_jl)
-!
-      end subroutine deallocate_legendre_trans_mat
 !
 ! -----------------------------------------------------------------------
 !

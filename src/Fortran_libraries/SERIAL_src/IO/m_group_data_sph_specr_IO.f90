@@ -1,29 +1,33 @@
-!m_group_data_sph_specr_IO.f90
-!      module m_group_data_sph_specr_IO
+!>@file   m_group_data_sph_specr_IO.f90
+!!@brief  module m_group_data_sph_specr_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!
-!      subroutine allocate_rtp_nod_grp_IO_stack
-!      subroutine allocate_rtp_r_grp_IO_stack
-!      subroutine allocate_rtp_t_grp_IO_stack
-!      subroutine allocate_rtp_p_grp_IO_stack
-!      subroutine allocate_rj_r_grp_IO_stack
-!      subroutine allocate_rj_j_grp_IO_stack
-!
-!      subroutine allocate_rtp_nod_grp_IO_item
-!      subroutine allocate_rtp_r_grp_IO_item
-!      subroutine allocate_rtp_t_grp_IO_item
-!      subroutine allocate_rtp_p_grp_IO_item
-!      subroutine allocate_rj_r_grp_IO_item
-!      subroutine allocate_rj_j_grp_IO_item
-!
-!      subroutine deallocate_rtp_nod_grp_IO_item
-!      subroutine deallocate_rtp_r_grp_IO_item
-!      subroutine deallocate_rtp_t_grp_IO_item
-!      subroutine deallocate_rtp_p_grp_IO_item
-!      subroutine deallocate_rj_r_grp_IO_item
-!      subroutine deallocate_rj_j_grp_IO_item
+!>@brief Array for spectr group data
+!!
+!!@verbatim
+!!      subroutine allocate_rtp_nod_grp_IO_stack
+!!      subroutine allocate_rtp_r_grp_IO_stack
+!!      subroutine allocate_rtp_t_grp_IO_stack
+!!      subroutine allocate_rtp_p_grp_IO_stack
+!!      subroutine allocate_rj_r_grp_IO_stack
+!!      subroutine allocate_rj_j_grp_IO_stack
+!!
+!!      subroutine allocate_rtp_nod_grp_IO_item
+!!      subroutine allocate_rtp_r_grp_IO_item
+!!      subroutine allocate_rtp_t_grp_IO_item
+!!      subroutine allocate_rtp_p_grp_IO_item
+!!      subroutine allocate_rj_r_grp_IO_item
+!!      subroutine allocate_rj_j_grp_IO_item
+!!
+!!      subroutine deallocate_rtp_nod_grp_IO_item
+!!      subroutine deallocate_rtp_r_grp_IO_item
+!!      subroutine deallocate_rtp_t_grp_IO_item
+!!      subroutine deallocate_rtp_p_grp_IO_item
+!!      subroutine deallocate_rj_r_grp_IO_item
+!!      subroutine deallocate_rj_j_grp_IO_item
+!!@endverbatim
 !
       module m_group_data_sph_specr_IO
 !

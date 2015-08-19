@@ -1,14 +1,19 @@
-!copy_sph_groups_to_IO.f90
-!      module copy_sph_groups_to_IO
+!>@file   copy_sph_groups_to_IO.f90
+!!@brief  module copy_sph_groups_to_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine copy_rtp_nod_grp_to_IO
-!      subroutine copy_rtp_radial_grp_to_IO
-!      subroutine copy_rtp_theta_grp_to_IO
-!      subroutine copy_rtp_zonal_grp_to_IO
-!      subroutine copy_rj_radial_grp_to_IO
-!      subroutine copy_rj_sphere_grp_to_IO
+!>@brief Copy sphectr grouping data to IO buffer
+!!
+!!@verbatim
+!!      subroutine copy_rtp_nod_grp_to_IO
+!!      subroutine copy_rtp_radial_grp_to_IO
+!!      subroutine copy_rtp_theta_grp_to_IO
+!!      subroutine copy_rtp_zonal_grp_to_IO
+!!      subroutine copy_rj_radial_grp_to_IO
+!!      subroutine copy_rj_sphere_grp_to_IO
+!!@endverbatim
 !
       module copy_sph_groups_to_IO
 !

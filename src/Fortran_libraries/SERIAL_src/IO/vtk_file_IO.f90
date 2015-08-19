@@ -51,6 +51,7 @@
 !
       call write_vtk_data(id_vtk, ucd%nnod, ucd%num_field,              &
      &    ucd%ntot_comp, ucd%num_comp, ucd%phys_name, ucd%d_ucd)
+      endfile(id_vtk)
 !
       close(id_vtk)
 !
@@ -68,8 +69,10 @@
 !
       open(id_vtk, file=file_name, form='formatted', status ='unknown')
 !
-      call write_vtk_data(id_vtk, ucd%nnod, ucd%num_field, ucd%ntot_comp,           &
+      call write_vtk_data                                               &
+     &   (id_vtk, ucd%nnod, ucd%num_field, ucd%ntot_comp,               &
      &    ucd%num_comp, ucd%phys_name, ucd%d_ucd)
+      endfile(id_vtk)
 !
       close(id_vtk)
 !
@@ -86,7 +89,8 @@
 !
 !
       open(id_vtk, file=file_name, form='formatted', status ='unknown')
-      call write_vtk_mesh(id_vtk, ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie)
+      call write_vtk_mesh(id_vtk, ucd%nnod, ucd%nele, ucd%nnod_4_ele,   &
+     &    ucd%xx, ucd%ie)
       close(id_vtk)
 !
       end subroutine write_vtk_grid
@@ -140,10 +144,7 @@
       call write_vtk_node_head(id_vtk, nnod)
       call write_vtk_each_field(id_vtk, nnod, ithree, nnod, xx)
 !
-      call write_vtk_connect_head(id_vtk, nele, nnod_ele)
       call write_vtk_connect_data(id_vtk, nele, nnod_ele, nele, ie)
-!
-      call write_vtk_cell_type(id_vtk, nele, nnod_ele)
 !
       end subroutine write_vtk_mesh
 !

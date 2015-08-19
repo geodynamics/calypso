@@ -53,10 +53,6 @@
       integer(kind = kint)  :: iflag_mesh_file_fmt = 0
       integer(kind = kint)  :: iflag_mesh_file_ext = 1
 !
-      integer(kind=kint) :: iflag_ele_file_name =  0
-      integer(kind=kint) :: iflag_surf_file_name = 0
-      integer(kind=kint) :: iflag_edge_file_name = 0
-!
       character(len=kchara), parameter:: def_mesh_file_head = 'mesh/in'
       character(len=kchara), parameter                                  &
                   :: mesh_ele_def_head = 'mesh/element'

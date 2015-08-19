@@ -36,7 +36,7 @@
       integer(kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
       real(kind = kreal), intent(in) :: xx(numnod,3)
 !
-      type(sectiong_list), intent(inout):: psf_list(num_psf)
+      type(sectioning_list), intent(inout):: psf_list(num_psf)
 !
       integer(kind = kint) :: i_psf
 !
@@ -71,7 +71,7 @@
       integer(kind = kint), intent(in) :: istack_ncomp(0:num_phys)
       real(kind = kreal), intent(in)  :: d_nod(numnod,ntot_phys)
 !
-      type(sectiong_list), intent(inout):: iso_list(num_iso)
+      type(sectioning_list), intent(inout):: iso_list(num_iso)
 !
       integer(kind = kint) :: i_iso
 !

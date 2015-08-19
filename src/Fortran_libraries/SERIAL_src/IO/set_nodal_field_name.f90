@@ -1,20 +1,25 @@
-!set_nodal_field_name.f90
-!      module set_nodal_field_name
+!>@file   set_nodal_field_name.f90
+!!@brief  module set_nodal_field_name
+!!
+!!@author H. Matsui
+!!@date Programmed in Jan., 2008
+!!@n        modified by H.Matsui on Oct.,  2009
+!!@n        modified by H.Matsui on June., 2012
 !
-!        programmed by H.Matsui on Jan., 2008
-!        modified by H.Matsui on Oct.,  2009
-!        modified by H.Matsui on June., 2012
-!
-!      subroutine set_vector_field_name(phys_nod_name_ctl, icou,        &
-!     &          phys_nod_name, num_nod_component, iflag)
-!      subroutine set_scalar_field_name(phys_nod_name_ctl, icou,        &
-!     &          phys_nod_name, num_nod_component, iflag)
-!      subroutine set_tensor_field_name(phys_nod_name_ctl, icou,        &
-!     &          phys_nod_name, num_nod_component, iflag)
-!
-!      subroutine check_vis_control_flag(visualize_ctl, iflag_viz)
-!      subroutine check_monitor_control_flag(iflag, monitor_ctl,        &
-!     &          iflag_fld_monitor)
+!>@brief  Set field names from control data
+!!
+!!@verbatim
+!!      subroutine set_vector_field_name(phys_nod_name_ctl, icou,       &
+!!     &          phys_nod_name, num_nod_component, iflag)
+!!      subroutine set_scalar_field_name(phys_nod_name_ctl, icou,       &
+!!     &          phys_nod_name, num_nod_component, iflag)
+!!      subroutine set_tensor_field_name(phys_nod_name_ctl, icou,       &
+!!     &          phys_nod_name, num_nod_component, iflag)
+!!
+!!      subroutine check_vis_control_flag(visualize_ctl, iflag_viz)
+!!      subroutine check_monitor_control_flag(iflag, monitor_ctl,       &
+!!     &          iflag_fld_monitor)
+!!@endverbatim
 !
       module set_nodal_field_name
 !

@@ -6,6 +6,9 @@
 !      Written by H. Matsui on Sep., 2007
 !
 !      subroutine set_num_node_for_ele_by_etype(ierr)
+!        type(node_data), intent(in) :: node
+!        type(element_data), intent(inout) :: ele
+!        integer(kind = kint), intent(inout) :: ierr
 !
 !>@n List of the element type is the following:
 !!
@@ -63,18 +66,20 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine set_num_node_for_ele_by_etype(ierr)
+      subroutine set_num_node_for_ele_by_etype(node, ele, ierr)
 !
-      use m_geometry_parameter
-      use m_geometry_data
+      use t_geometry_data
       use set_nnod_for_element
 !
+      type(node_data), intent(in) :: node
+      type(element_data), intent(inout) :: ele
       integer(kind = kint), intent(inout) :: ierr
 !
 !
-      call set_nnod_for_ele_by_eletype(numele, elmtyp, nodelm, ierr)
-      call check_wrong_element_list(numnod, numele, nnod_4_ele,         &
-     &    nodelm, ie, ierr)
+      call set_nnod_for_ele_by_eletype(ele%numele, ele%elmtyp,          &
+     &    ele%nodelm, ierr)
+      call check_wrong_element_list(node%numnod, ele%numele,            &
+     &    ele%nnod_4_ele, ele%nodelm, ele%ie, ierr)
 !
       end subroutine set_num_node_for_ele_by_etype
 !

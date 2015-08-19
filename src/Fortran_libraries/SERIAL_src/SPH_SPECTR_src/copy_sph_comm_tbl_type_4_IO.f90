@@ -1,12 +1,18 @@
-!copy_sph_comm_tbl_type_4_IO.f90
-!      module copy_sph_comm_tbl_type_4_IO
+!>@file  copy_sph_comm_tbl_type_4_IO.f90
+!!      module copy_sph_comm_tbl_type_4_IO
+!!
+!!@author  H. Matsui
+!!@date Programmed in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine copy_comm_sph_type_from_IO(my_rank, numnod, comm)
-!      subroutine copy_comm_sph_type_to_IO(my_rank, comm)
-!        integer(kind = kint), intent(in) :: my_rank
-!        type(sph_comm_tbl), intent(inout) :: comm
+!>@brief Copy communication table for spherical harmonics transform
+!!@n     between IO buffer
+!!
+!!@verbatim
+!!      subroutine copy_comm_sph_type_from_IO(my_rank, numnod, comm)
+!!      subroutine copy_comm_sph_type_to_IO(my_rank, comm)
+!!        integer(kind = kint), intent(in) :: my_rank
+!!        type(sph_comm_tbl), intent(inout) :: comm
+!!@endverbatim
 !
       module copy_sph_comm_tbl_type_4_IO
 !

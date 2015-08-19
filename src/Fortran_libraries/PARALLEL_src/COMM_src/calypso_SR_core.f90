@@ -94,9 +94,9 @@
           call MPI_IRECV(WR(ist), num, CALYPSO_REAL,                    &
      &        id_pe_recv(neib), 0, CALYPSO_COMM, req2(neib), ierr_MPI)
         end do
-!
-        call MPI_WAITALL (ncomm_recv, req2, sta2, ierr_MPI)
       end if
+!
+      call MPI_WAITALL (ncomm_recv, req2, sta2, ierr_MPI)
 !
       if (isend_self .eq. 0) return
       ist_send= NB * istack_send(npe_send-1)
@@ -150,9 +150,9 @@
           call MPI_IRECV(iWR(ist), num, CALYPSO_INTEGER,                &
      &        id_pe_recv(neib), 0, CALYPSO_COMM, req2(neib), ierr_MPI)
         end do
-!
-        call MPI_WAITALL (ncomm_recv, req2, sta2, ierr_MPI)
       end if
+!
+      call MPI_WAITALL (ncomm_recv, req2, sta2, ierr_MPI)
 !
       if (isend_self .eq. 0) return
 !
@@ -180,8 +180,6 @@
 !
 !
       ncomm_send = npe_send - isend_self
-      if(ncomm_send .eq. 0) return
-!
       call MPI_WAITALL (ncomm_send, req1, sta1, ierr_MPI)
 !
       end subroutine calypso_send_recv_fin

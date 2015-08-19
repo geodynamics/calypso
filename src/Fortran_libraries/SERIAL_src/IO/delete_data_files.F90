@@ -8,6 +8,7 @@
 !>@brief Delete data files use close command
 !!
 !!@verbatim
+!!      subroutine delete_file_if_exist(file_name)
 !!      subroutine delete_file_by_f(file_name)
 !!      subroutine delete_parallel_files(iflag_fmt, nprocs, file_head)
 !!
@@ -29,6 +30,21 @@
 !------------------------------------------------------------------
 !
       contains
+!
+!------------------------------------------------------------------
+!
+      subroutine delete_file_if_exist(file_name)
+!
+      character(len=kchara), intent(in) :: file_name
+!
+!
+      open(255, file=file_name, status='old', err=99)
+      close(255, status='DELETE')
+      write(*,*) trim(file_name), ' is deleted.'
+!
+  99  return
+!
+      end subroutine delete_file_if_exist
 !
 !------------------------------------------------------------------
 !

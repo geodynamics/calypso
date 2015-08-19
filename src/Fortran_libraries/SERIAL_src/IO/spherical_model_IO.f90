@@ -3,22 +3,32 @@
 !
 !     Written by H. Matsui on July, 2007
 !
-!      subroutine read_rank_4_sph(id_file)
-!      subroutine read_gl_resolution_sph(id_file)
-!      subroutine read_gl_nodes_sph(id_file)
+!>@file  spherical_model_IO.f90
+!!       module spherical_model_IO
+!!
+!!@author H. Matsui
+!!@date        programmed by H.Matsui in July, 2007
 !
-!      subroutine write_rank_4_sph(id_file)
-!      subroutine write_gl_resolution_sph(id_file)
-!      subroutine write_gl_nodes_sph(id_file)
-!
-!
-!      subroutine read_rank_4_sph_b(id_file)
-!      subroutine read_gl_resolution_sph_b(id_file)
-!      subroutine read_gl_nodes_sph_b(id_file)
-!
-!      subroutine write_rank_4_sph_b(id_file)
-!      subroutine write_gl_resolution_sph_b(id_file)
-!      subroutine write_gl_nodes_sph_b(id_file)
+!> @brief  Data IO routines for spectrum data
+!!
+!!@verbatim
+!!      subroutine read_rank_4_sph(id_file)
+!!      subroutine read_gl_resolution_sph(id_file)
+!!      subroutine read_gl_nodes_sph(id_file)
+!!
+!!      subroutine write_rank_4_sph(id_file)
+!!      subroutine write_gl_resolution_sph(id_file)
+!!      subroutine write_gl_nodes_sph(id_file)
+!!
+!!
+!!      subroutine read_rank_4_sph_b(id_file)
+!!      subroutine read_gl_resolution_sph_b(id_file)
+!!      subroutine read_gl_nodes_sph_b(id_file)
+!!
+!!      subroutine write_rank_4_sph_b(id_file)
+!!      subroutine write_gl_resolution_sph_b(id_file)
+!!      subroutine write_gl_nodes_sph_b(id_file)
+!!@endverbatim
 !
       module spherical_model_IO
 !

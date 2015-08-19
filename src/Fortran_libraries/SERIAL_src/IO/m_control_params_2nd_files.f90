@@ -1,10 +1,15 @@
-!m_control_params_2nd_files.f90
-!      module m_control_params_2nd_files
+!>@file   m_control_params_2nd_files.f90
+!!@brief  module m_control_params_2nd_files
+!!
+!!@author H. Matsui
+!!@date Programmed in Nov., 2009
 !
-!        programmed by H.Matsui on Nov., 2009
-!
-!      subroutine set_control_org_sph_mesh
-!      subroutine set_control_org_fld_file_def
+!>@brief Array for the second mesh data
+!!
+!!@verbatim
+!!      subroutine set_control_org_sph_mesh
+!!      subroutine set_control_org_fld_file_def
+!!@endverbatim
 !
       module m_control_params_2nd_files
 !
@@ -44,7 +49,6 @@
       use m_ctl_data_4_org_data
       use m_read_mesh_data
       use m_node_id_spherical_IO
-      use m_field_data_IO
       use m_file_format_switch
 !
 !
@@ -53,8 +57,8 @@
         org_sph_rj_head = org_sph_mode_head_ctl%charavalue
       end if
 !
-      call choose_file_format(org_sph_file_fmt_ctl%charavalue,          &
-     &    org_sph_file_fmt_ctl%iflag, ifmt_org_sph_rj_head)
+      call choose_file_format                                           &
+     &   (org_sph_file_fmt_ctl, ifmt_org_sph_rj_head)
 !
       end subroutine set_control_org_sph_mesh
 !
@@ -64,7 +68,6 @@
 !
       use m_ctl_data_4_platforms
       use m_ctl_data_4_org_data
-      use m_field_data_IO
       use m_field_file_format
       use m_file_format_switch
 !

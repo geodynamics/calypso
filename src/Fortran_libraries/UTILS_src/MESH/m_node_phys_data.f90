@@ -76,10 +76,10 @@
 !
        subroutine allocate_data_arrays
 !
-       use m_geometry_parameter
+       use m_geometry_data
 !
        allocate( iflag_nod_update(num_tot_nod_phys) )
-       allocate( d_nod(numnod,num_tot_nod_phys) )
+       allocate( d_nod(node1%numnod,num_tot_nod_phys) )
 !
        iflag_nod_update = 0
        d_nod = 0.0d0
@@ -130,14 +130,14 @@
 !
       subroutine check_nodal_data(my_rank, numdir, i_field)
 !
-       use m_geometry_parameter
+       use m_geometry_data
 !
       integer(kind = kint), intent(in) :: my_rank
       integer(kind = kint), intent(in) :: numdir, i_field
       integer(kind = kint) :: inod, nd
 !
       write(50+my_rank,*) 'inod, nodal field: ', i_field, numdir
-      do inod = 1, numnod
+      do inod = 1, node1%numnod
         write(50+my_rank,'(i16,1p10e25.14)')                            &
      &         inod, (d_nod(inod,i_field+nd-1),nd=1, numdir)
       end do

@@ -60,7 +60,7 @@
       call set_parallel_ucd_file_name(ucd%file_prefix, iflag_ucd,       &
      &    my_rank, istep, file_name)
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii UCD file: ', trim(file_name)
 !
       open(id_ucd_file,file=file_name, form='formatted')
@@ -85,7 +85,7 @@
       call set_parallel_ucd_file_name(ucd%file_prefix, iflag_udt,       &
      &    my_rank, istep, file_name)
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii UCD field: ', trim(file_name)
 !
       open(id_ucd_file,file=file_name, form='formatted')
@@ -109,7 +109,7 @@
       call set_parallel_grd_file_name(ucd%file_prefix, iflag_udt,       &
      &    my_rank, file_name)
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii UCD mesh: ', trim(file_name)
 !
       open (id_ucd_file, file=file_name, status='replace')

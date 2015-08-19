@@ -31,7 +31,6 @@
       use m_machine_parameter
       use m_phys_constants
 !
-      use m_geometry_parameter
       use m_geometry_data
       use m_node_phys_data
 !
@@ -59,8 +58,8 @@
 !
       call copy_1st_scl_from_sph_trans(d_rtp(1,i_trns), i_field)
       call copy_pole_scl_fld_from_trans                                 &
-     &   (numnod, internal_node, xx, v_pole(1,i_trns),                  &
-     &    num_tot_nod_phys, i_field, d_nod)
+     &   (node1%numnod, node1%internal_node, node1%xx,                  &
+     &    v_pole(1,i_trns), num_tot_nod_phys, i_field, d_nod)
 !
       end subroutine copy_1st_scl_from_trans_wpole
 !
@@ -82,8 +81,8 @@
 !
       call copy_1st_vec_from_sph_trans(d_rtp(1,i_trns), i_field)
       call copy_pole_vec_fld_from_trans                                 &
-     &   (numnod, internal_node, xx, v_pole(1,i_trns),                  &
-     &    num_tot_nod_phys, i_field, d_nod)
+     &   (node1%numnod, node1%internal_node, node1%xx,                  &
+     &    v_pole(1,i_trns), num_tot_nod_phys, i_field, d_nod)
 !
       end subroutine copy_1st_vec_from_trans_wpole
 !
@@ -105,8 +104,8 @@
 !
       call copy_1st_tsr_from_sph_trans(d_rtp(1,i_trns), i_field)
       call copy_pole_tsr_fld_from_trans                                 &
-     &   (numnod, internal_node, xx, v_pole(1,i_trns),                  &
-     &    num_tot_nod_phys, i_field, d_nod)
+     &   (node1%numnod, node1%internal_node, node1%xx,                  &
+     &    v_pole(1,i_trns), num_tot_nod_phys, i_field, d_nod)
 !
       end subroutine copy_1st_tsr_from_trans_wpole
 !
@@ -125,7 +124,7 @@
 !
       call copy_scalar_from_sph_trans                                   &
      &   (nnod_rtp, m_folding, inod_rtp_smp_stack,                      &
-     &    numnod, d_rtp, i_field, num_tot_nod_phys, d_nod)
+     &    node1%numnod, d_rtp, i_field, num_tot_nod_phys, d_nod)
 !
       end subroutine copy_1st_scl_from_sph_trans
 !
@@ -143,7 +142,7 @@
 !
       call copy_xyz_vec_from_sph_trans                                  &
      &   (nnod_rtp, m_folding, inod_rtp_smp_stack,                      &
-     &    numnod, colatitude, longitude, d_rtp,                         &
+     &    node1%numnod, node1%theta, node1%phi, d_rtp,                  &
      &    i_field, num_tot_nod_phys, d_nod)
 !
       end subroutine copy_1st_vec_from_sph_trans
@@ -162,7 +161,8 @@
 !
       call copy_xyz_tsr_from_sph_trans                                  &
      &   (nnod_rtp, m_folding, inod_rtp_smp_stack,                      &
-     &    numnod, xx, radius, s_cylinder, a_radius, a_s_cylinder,       &
+     &    node1%numnod, node1%xx, node1%rr,                             &
+     &    node1%ss, node1%a_r, node1%a_s,                               &
      &    d_rtp, i_field, num_tot_nod_phys, d_nod)
 !
       end subroutine copy_1st_tsr_from_sph_trans
@@ -181,7 +181,7 @@
 !
 !
       call copy_scalar_to_sph_trans(nnod_rtp, inod_rtp_smp_stack,       &
-     &    numnod, i_field, num_tot_nod_phys, d_nod, d_rtp)
+     &    node1%numnod, i_field, num_tot_nod_phys, d_nod, d_rtp)
 !
       end subroutine copy_1st_scl_to_sph_trans
 !
@@ -198,8 +198,8 @@
 !
 !
       call copy_xyz_vec_to_sph_trans                                    &
-     &   (nnod_rtp, inod_rtp_smp_stack, numnod,                         &
-     &    xx, radius, s_cylinder, a_radius, a_s_cylinder,               &
+     &   (nnod_rtp, inod_rtp_smp_stack, node1%numnod,                   &
+     &    node1%xx, node1%rr, node1%ss, node1%a_r, node1%a_s,           &
      &    i_field, num_tot_nod_phys, d_nod, d_rtp)
 !
       end subroutine copy_1st_vec_to_sph_trans
@@ -217,8 +217,8 @@
 !
 !
       call copy_xyz_tsr_to_sph_trans                                    &
-     &   (nnod_rtp, inod_rtp_smp_stack, numnod,                         &
-     &    xx, radius, s_cylinder, a_radius, a_s_cylinder,               &
+     &   (nnod_rtp, inod_rtp_smp_stack, node1%numnod,                   &
+     &    node1%xx, node1%rr, node1%ss, node1%a_r, node1%a_s,           &
      &    i_field, num_tot_nod_phys, d_nod, d_rtp)
 !
       end subroutine copy_1st_tsr_to_sph_trans

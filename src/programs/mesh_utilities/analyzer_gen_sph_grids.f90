@@ -88,7 +88,7 @@
       if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rj_modes'
       call start_eleps_time(3)
       call para_gen_sph_rj_modes(ndomain_sph, comm_rlm)
-      call dealloc_comm_stacks_rlm(ndomain_sph, comm_rlm)
+      call dealloc_comm_stacks_sph(ndomain_sph, comm_rlm)
       deallocate(comm_rlm)
       call end_eleps_time(3)
 !
@@ -101,7 +101,7 @@
       call start_eleps_time(3)
       if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rtp_grids'
       call para_gen_sph_rtp_grids(ndomain_sph, comm_rtm)
-      call dealloc_comm_stacks_rtm(ndomain_sph, comm_rtm)
+      call dealloc_comm_stacks_sph(ndomain_sph, comm_rtm)
 !
       deallocate(comm_rtm)
       call end_eleps_time(3)

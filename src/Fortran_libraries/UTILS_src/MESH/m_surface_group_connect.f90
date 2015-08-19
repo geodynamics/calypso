@@ -5,71 +5,26 @@
 !
 !     Writteg by H.Matsui on Aug., 2006
 !
-!      subroutine allocate_surf_id_4_sf_grp
-!
-!      subroutine allocate_edge_stack_4_sf_grp
-!      subroutine allocate_edge_id_4_sf_grp
-!
-!      subroutine allocate_node_stack_4_sf_grp
-!      subroutine allocate_surf_nod_param_smp
-!
-!      subroutine allocate_edge_stack_4_sf_grp
-!      subroutine deallocate_edge_id_4_sf_grp
-!
-!      subroutine allocate_surf_nod
-!      subroutine allocate_vect_4_node_on_surf
-!      subroutine deallocate_surf_nod
-!      subroutine deallocate_vect_4_node_on_surf
-!      subroutine deallocate_surf_nod_param_smp
-!
-!      subroutine check_surface_node_id(id_check)
+!      subroutine const_surf_group_connect
+!      subroutine deallocate_surf_group_connect
+!      subroutine set_surface_node_grp(sf_grp)
 !
       module m_surface_group_connect
 !
       use m_precision
+      use m_machine_parameter
+      use t_group_connects
+      use t_surface_group_connect
 !
       implicit  none
 !
 !
-      integer(kind=kint), allocatable, target :: isurf_grp(:)
-!<   local surface ID for surface group
+!>   Structure of connectivities for surface group
+      type(surface_group_table), save :: sf_grp_data1
+!> Structure of connectivity data for surface group items
+      type(surface_node_grp_data), save :: sf_grp_nod1
 !
-      integer(kind=kint) :: ntot_edge_sf_grp
-!<   total number of edge for surface group
-      integer(kind=kint), allocatable, target :: nedge_sf_grp(:)
-!<   number of edge for each surface group
-      integer(kind=kint), allocatable, target :: iedge_stack_sf_grp(:)
-!<   end number of edge for each surface group
-      integer(kind=kint), allocatable, target :: iedge_surf_grp(:)
-!<   local edge ID for surface group
-!
-      integer(kind=kint) :: ntot_node_sf_grp
-!<   total number of node for surface group
-      integer(kind=kint), allocatable, target :: nnod_sf_grp(:)
-!<   number of node for each surface group
-      integer(kind=kint), allocatable, target :: inod_stack_sf_grp(:)
-!<   end number of node for each surface group
-      integer(kind=kint), allocatable, target :: inod_surf_grp(:)
-!<   local node ID for surface group
-!
-      integer(kind=kint), allocatable, target :: surf_node_n(:)
-!<   local node ID on opposite surface
-      integer(kind=kint), allocatable, target :: num_sf_4_nod(:)
-!<   number of surface for each node on surface group
-!
-      real(kind=kreal),   allocatable, target :: surf_norm_nod(:,:)
-!<   normal vector at each node for surface group
-      real(kind=kreal),   allocatable, target :: coef_sf_nod(:)
-!<   multiply coefs at each node for surface group
-!
-      integer(kind=kint), allocatable, target :: isurf_grp_n(:)
-!<   local surface ID for opposite side of surface group
-!
-!
-      integer( kind=kint ), allocatable :: isurf_nod_smp_stack(:)
-!<      end address of each element group for SMP process
-      integer( kind=kint )  ::  max_sf_nod_4_smp
-!<      maximum number of element group for SMP process
+      private :: set_surf_id_4_surf_group, set_edge_4_surf_group
 !
 !-----------------------------------------------------------------------
 !
@@ -77,172 +32,144 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine allocate_surf_id_4_sf_grp
+      subroutine const_surf_group_connect
 !
-      use m_surface_group
+      use m_group_data
 !
-      allocate(isurf_grp(num_surf_bc))
-      allocate(isurf_grp_n(num_surf_bc))
-      isurf_grp = 0
-      isurf_grp_n = 0
 !
-      end subroutine allocate_surf_id_4_sf_grp
+       if (iflag_debug.eq.1) write(*,*) 'set_surf_id_4_surf_group'
+      call set_surf_id_4_surf_group(sf_grp1)
+!
+       if (iflag_debug.eq.1) write(*,*) 'set_edge_4_surf_group'
+      call set_edge_4_surf_group(sf_grp1)
+!
+      end subroutine const_surf_group_connect
+!
+!-----------------------------------------------------------------------
+!
+      subroutine deallocate_surf_group_connect
+!
+!
+      call dealloc_grp_connect(sf_grp_data1%edge)
+      call dealloc_surf_item_sf_grp_type(sf_grp_data1)
+      call dealloc_num_surf_grp_nod_smp(sf_grp_nod1)
+      call dealloc_surf_grp_nod(sf_grp_nod1)
+!
+      end subroutine deallocate_surf_group_connect
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine allocate_edge_stack_4_sf_grp
+      subroutine set_surf_id_4_surf_group(sf_grp)
 !
-      use m_surface_group
+      use m_geometry_data
+      use set_surface_id_4_surf_grp
+      use t_group_data
 !
-      allocate(nedge_sf_grp(num_surf))
-      allocate(iedge_stack_sf_grp(0:num_surf))
+      type(surface_group_data), intent(in) :: sf_grp
 !
-      nedge_sf_grp = 0
-      iedge_stack_sf_grp = 0
 !
-      end subroutine allocate_edge_stack_4_sf_grp
+      call alloc_surf_item_sf_grp_type(sf_grp%num_item, sf_grp_data1)
 !
-!-----------------------------------------------------------------------
+      call set_surface_id_4_surf_group(ele1%numele, surf1%isf_4_ele,    &
+     &    sf_grp%num_grp, sf_grp%num_item,                              &
+     &    sf_grp%istack_grp, sf_grp%item_sf_grp,                        &
+     &    sf_grp_data1%isurf_grp, sf_grp_data1%isurf_grp_n)
 !
-      subroutine allocate_edge_id_4_sf_grp
-!
-      allocate(iedge_surf_grp(ntot_edge_sf_grp))
-      iedge_surf_grp = 0
-!
-      end subroutine allocate_edge_id_4_sf_grp
+      end subroutine set_surf_id_4_surf_group
 !
 !-----------------------------------------------------------------------
 !
-      subroutine allocate_node_stack_4_sf_grp
+      subroutine set_edge_4_surf_group(sf_grp)
 !
-      use m_surface_group
+      use m_geometry_constants
+      use m_geometry_data
+      use t_group_data
 !
-      allocate(nnod_sf_grp(num_surf))
-      allocate(inod_stack_sf_grp(0:num_surf))
+      use set_node_4_group
 !
-      nnod_sf_grp = 0
-      inod_stack_sf_grp = 0
+      type(surface_group_data), intent(in) :: sf_grp
 !
-      end subroutine allocate_node_stack_4_sf_grp
+      integer(kind=kint), allocatable :: imark_4_grp(:)
 !
-!-----------------------------------------------------------------------
 !
-       subroutine allocate_surf_nod_param_smp
+      allocate(imark_4_grp(edge1%numedge))
+      if(edge1%numedge .gt. 0) imark_4_grp = 0
 !
-      use m_surface_group
+      call alloc_num_other_grp(sf_grp%num_grp, sf_grp_data1%edge)
 !
-       allocate( isurf_nod_smp_stack(0:num_surf_smp))
-       isurf_nod_smp_stack = 0
+      call count_nod_4_ele_grp                                          &
+     &   (edge1%numedge, surf1%numsurf, nedge_4_surf,                   &
+     &    edge1%iedge_4_sf, sf_grp%num_grp, sf_grp%num_item,            &
+     &    sf_grp%istack_grp, sf_grp_data1%isurf_grp,                    &
+     &    sf_grp_data1%edge%ntot_e_grp, sf_grp_data1%edge%nitem_e_grp,  &
+     &    sf_grp_data1%edge%istack_e_grp, imark_4_grp)
 !
-       end subroutine allocate_surf_nod_param_smp
+      call alloc_item_other_grp(sf_grp_data1%edge)
 !
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
+      call set_nod_4_ele_grp                                            &
+     &   (edge1%numedge, surf1%numsurf, nedge_4_surf,                   &
+     &    edge1%iedge_4_sf, sf_grp%num_grp, sf_grp%num_item,            &
+     &    sf_grp%istack_grp, sf_grp_data1%isurf_grp,                    &
+     &    sf_grp_data1%edge%ntot_e_grp, sf_grp_data1%edge%nitem_e_grp,  &
+     &    sf_grp_data1%edge%istack_e_grp, sf_grp_data1%edge%item_e_grp, &
+     &    imark_4_grp)
 !
-      subroutine deallocate_surf_id_4_sf_grp
+      deallocate(imark_4_grp)
 !
-      use m_surface_group
-!
-      deallocate(isurf_grp)
-      deallocate(isurf_grp_n)
-!
-      end subroutine deallocate_surf_id_4_sf_grp
-!
-!-----------------------------------------------------------------------
-!
-      subroutine deallocate_edge_id_4_sf_grp
-!
-      deallocate(nedge_sf_grp, iedge_stack_sf_grp)
-      deallocate(iedge_surf_grp)
-!
-      end subroutine deallocate_edge_id_4_sf_grp
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine allocate_surf_nod
-!
-       allocate ( inod_surf_grp(ntot_node_sf_grp) )
-       allocate ( surf_node_n(ntot_node_sf_grp) )
-       allocate ( num_sf_4_nod(ntot_node_sf_grp) )
-       inod_surf_grp = 0
-       surf_node_n =   0
-       num_sf_4_nod =  0
-!
-      end subroutine allocate_surf_nod
+      end subroutine set_edge_4_surf_group
 !
 !-----------------------------------------------------------------------
 !
-      subroutine allocate_vect_4_node_on_surf
+      subroutine set_surface_node_grp(sf_grp)
 !
-       allocate ( surf_norm_nod(ntot_node_sf_grp,3) )
-       allocate ( coef_sf_nod(ntot_node_sf_grp) )
+      use m_machine_parameter
+      use m_geometry_data
+      use t_group_data
+      use set_surface_node
+      use cal_minmax_and_stacks
 !
-       surf_norm_nod    = 0.0d0
-       coef_sf_nod      = 0.0d0
-!
-      end subroutine allocate_vect_4_node_on_surf
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine deallocate_surf_nod
-!
-       deallocate ( inod_surf_grp )
-       deallocate ( surf_node_n )
-       deallocate ( num_sf_4_nod )
-       deallocate ( inod_stack_sf_grp, nnod_sf_grp )
-!
-      end subroutine deallocate_surf_nod
-!
-!-----------------------------------------------------------------------
-!
-      subroutine deallocate_vect_4_node_on_surf
-!
-       deallocate ( surf_norm_nod )
-       deallocate ( coef_sf_nod )
-!
-      end subroutine deallocate_vect_4_node_on_surf
-!
-!-----------------------------------------------------------------------
-!
-       subroutine deallocate_surf_nod_param_smp
-!
-       deallocate(isurf_nod_smp_stack)
-!
-       end subroutine deallocate_surf_nod_param_smp
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-       subroutine check_surface_node_id(id_check)
-!
-       use m_surface_group
-!
-       integer(kind = kint), intent(in) :: id_check
-       integer(kind = kint) :: inum
+      type(surface_group_data), intent(in) :: sf_grp
 !
 !
-       write(id_check,*) 'inod_stack_sf_grp', inod_stack_sf_grp
-       do inum = 1, ntot_node_sf_grp
-       write(id_check,*) inum, inod_surf_grp(inum), surf_node_n(inum),  &
-     &                     num_sf_4_nod(inum)
-       end do
+      call allocate_make_4_surf_nod_grp(node1%numnod)
 !
-       end subroutine check_surface_node_id
+      call alloc_num_surf_grp_nod(sf_grp%num_grp, sf_grp_nod1)
 !
-!-----------------------------------------------------------------------
+      call count_surf_nod_grp_stack(np_smp, node1%istack_nod_smp,       &
+     &    ele1%numele, ele1%nnod_4_ele, ele1%ie, surf1%nnod_4_surf,     &
+     &    surf1%node_on_sf, sf_grp%num_grp, sf_grp%num_item,            &
+     &    sf_grp%istack_grp, sf_grp%item_sf_grp,                        &
+     &    sf_grp_nod1%ntot_node_sf_grp, sf_grp_nod1%nnod_sf_grp,        &
+     &    sf_grp_nod1%inod_stack_sf_grp)
 !
-      subroutine check_surf_nod_4_sheard_para(my_rank)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      call alloc_num_surf_grp_nod_smp(sf_grp%num_grp_smp, sf_grp_nod1)
 !
-       write(*,*) 'PE: ', my_rank,                                      &
-     &           'isurf_nod_smp_stack ', isurf_nod_smp_stack
+      call set_group_size_4_smp                                         &
+     &   (np_smp, sf_grp%num_grp, sf_grp_nod1%inod_stack_sf_grp,        &
+     &    sf_grp_nod1%istack_surf_nod_smp,                              &
+     &    sf_grp_nod1%max_sf_nod_4_smp)
 !
-      end subroutine check_surf_nod_4_sheard_para
 !
-!-----------------------------------------------------------------------
+!
+      if (sf_grp_nod1%ntot_node_sf_grp .gt. 0) then
+        call alloc_item_surf_grp_nod(sf_grp_nod1)
+!
+        call set_surf_nod_grp_item                                      &
+     &     (node1%numnod, ele1%numele, ele1%nnod_4_ele, ele1%ie,        &
+     &      surf1%nnod_4_surf, surf1%node_on_sf, surf1%node_on_sf_n,    &
+     &      sf_grp%num_grp, sf_grp%num_item,                            &
+     &      sf_grp%istack_grp, sf_grp%item_sf_grp,                      &
+     &      sf_grp_nod1%ntot_node_sf_grp,                               &
+     &      sf_grp_nod1%inod_stack_sf_grp, sf_grp_nod1%inod_surf_grp,   &
+     &      sf_grp_nod1%surf_node_n, sf_grp_nod1%num_sf_4_nod)
+      end if
+!
+      call deallocate_make_4_surf_nod_grp
+!
+      end subroutine set_surface_node_grp
+!
+! -----------------------------------------------------------------------
 !
       end module m_surface_group_connect

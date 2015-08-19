@@ -3,17 +3,24 @@
 !
 !      Written by H. Matsui
 !
-!      subroutine mark_all_surfaces(numele, nnod_4_ele, ie)
-!
-!      subroutine mark_independent_surface(numele, nnod_4_ele, ie)
-!      subroutine mark_external_surface(internal_node, numele,          &
-!     &          nnod_4_ele, ie)
+!!      subroutine mark_all_surfaces                                    &
+!!     &         (numnod, numele, nnod_4_ele, nnod_4_surf, ie,          &
+!!     &          istack_surf_hash, iend_surf_hash, isurf_hash,         &
+!!     &          isurf_flag)
+!!
+!!      subroutine mark_independent_surface                             &
+!!     &         (numnod, numele, nnod_4_ele, nnod_4_surf, ie,          &
+!!     &          istack_surf_hash, iend_surf_hash, isurf_hash,         &
+!!     &          isurf_flag)
+!!      subroutine mark_external_surface(internal_node, numnod, numele, &
+!!     &          nnod_4_ele, nnod_4_surf, ie,                          &
+!!     &          istack_surf_hash, iend_surf_hash, isurf_hash,         &
+!!     &          isurf_flag)
 !
       module mark_surf_hash
 !
       use m_precision
-!
-      use m_surface_hash
+      use m_geometry_constants
 !
       implicit none
 !
@@ -23,13 +30,25 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine mark_all_surfaces(numele, nnod_4_ele, ie)
+      subroutine mark_all_surfaces                                      &
+     &         (numnod, numele, nnod_4_ele, nnod_4_surf, ie,            &
+     &          istack_surf_hash, iend_surf_hash, isurf_hash,           &
+     &          isurf_flag)
 !
-      use m_geometry_constants
       use compare_indices
 !
-      integer(kind = kint), intent(in) :: numele, nnod_4_ele
+      integer(kind = kint), intent(in) :: numnod, numele
+      integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_surf
       integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
+!
+      integer(kind = kint), intent(in) :: iend_surf_hash
+      integer(kind = kint), intent(in)                                  &
+     &                     :: istack_surf_hash(0:nnod_4_surf*numnod)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: isurf_hash(nsurf_4_ele*numele,2)
+!
+      integer(kind = kint), intent(inout)                               &
+     &                     :: isurf_flag(nsurf_4_ele*numele)
 !
       integer(kind = kint) :: iele, is
       integer(kind = kint) :: jele, js
@@ -97,13 +116,25 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine mark_independent_surface(numele, nnod_4_ele, ie)
+      subroutine mark_independent_surface                               &
+     &         (numnod, numele, nnod_4_ele, nnod_4_surf, ie,            &
+     &          istack_surf_hash, iend_surf_hash, isurf_hash,           &
+     &          isurf_flag)
 !
-      use m_geometry_constants
       use compare_indices
 !
-      integer(kind = kint), intent(in) :: numele, nnod_4_ele
+      integer(kind = kint), intent(in) :: numnod, numele
+      integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_surf
       integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
+!
+      integer(kind = kint), intent(in) :: iend_surf_hash
+      integer(kind = kint), intent(in)                                  &
+     &                     :: istack_surf_hash(0:nnod_4_surf*numnod)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: isurf_hash(nsurf_4_ele*numele,2)
+!
+      integer(kind = kint), intent(inout)                               &
+     &                     :: isurf_flag(nsurf_4_ele*numele)
 !
       integer(kind = kint) :: iele, is
       integer(kind = kint) :: jele, js
@@ -164,14 +195,23 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine mark_external_surface(internal_node, numele,           &
-     &          nnod_4_ele, ie)
+      subroutine mark_external_surface(internal_node, numnod, numele,   &
+     &          nnod_4_ele, nnod_4_surf, ie,                            &
+     &          istack_surf_hash, iend_surf_hash, isurf_hash,           &
+     &          isurf_flag)
 !
-      use m_geometry_constants
-!
-      integer(kind = kint), intent(in) :: internal_node
-      integer(kind = kint), intent(in) :: numele, nnod_4_ele
+      integer(kind = kint), intent(in) :: internal_node, numnod, numele
+      integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_surf
       integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
+!
+      integer(kind = kint), intent(in) :: iend_surf_hash
+      integer(kind = kint), intent(in)                                  &
+     &                     :: istack_surf_hash(0:nnod_4_surf*numnod)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: isurf_hash(nsurf_4_ele*numele,2)
+!
+      integer(kind = kint), intent(inout)                               &
+     &                     :: isurf_flag(nsurf_4_ele*numele)
 !
       integer(kind = kint) :: iele, is
       integer(kind = kint) :: i1, i2, i3, i4

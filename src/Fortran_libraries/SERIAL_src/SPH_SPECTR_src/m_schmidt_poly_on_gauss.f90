@@ -1,8 +1,3 @@
-!
-!      module m_schmidt_poly_on_gauss
-!
-!     Written by H. Matsui on June, 2007
-!
 !>@file   m_schmidt_poly_on_gauss.f90
 !!@brief  module m_schmidt_poly_on_gauss
 !!

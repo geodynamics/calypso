@@ -1,9 +1,14 @@
-!copy_rj_spec_name_to_node.f90
-!     module copy_rj_spec_name_to_node
+!> @file  copy_rj_spec_name_to_node.f90
+!!      module copy_rj_spec_name_to_node
+!!
+!! @author  H. Matsui
+!! @date Programmed in Feb., 2008
 !
-!      Written by H. Matsui on Feb., 2008
-!
-!      subroutine copy_rj_spec_name_to_nod_fld
+!> @brief Copy spectr fields name to nodal field name
+!!
+!!@verbatim
+!!      subroutine copy_rj_spec_name_to_nod_fld
+!!@endverbatim
 !
       module copy_rj_spec_name_to_node
 !

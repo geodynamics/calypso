@@ -1,11 +1,15 @@
-!
-!      module add_nodal_fields_ctl
-!
-!        programmed by H.Matsui on Sep., 2006
-!
+!>@file   add_nodal_fields_ctl.f90
+!!@brief  module add_nodal_fields_ctl
 !!
+!!@author H. Matsui
+!!@date Programmed in Sep., 2006
+!
+!>@brief  Add require field name
+!!
+!!@verbatim
 !!      subroutine add_phys_name_tmp(fld_name)
-!!
+!!@endverbatim
+!
       module add_nodal_fields_ctl
 !
       use m_precision

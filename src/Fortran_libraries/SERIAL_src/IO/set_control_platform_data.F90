@@ -12,7 +12,7 @@
 !!      subroutine set_control_smp_def(my_rank)
 !!      subroutine set_control_mesh_def
 !!      subroutine set_control_sph_mesh
-!!      subroutine set_control_restart_file_def
+!!      subroutine set_control_restart_file_def(fld_IO)
 !!@endverbatim
 !!
 !!@param my_rank  preocess ID
@@ -105,8 +105,7 @@
 !
 !   set data format
 !
-      call choose_file_format(mesh_file_fmt_ctl%charavalue,             &
-     &    mesh_file_fmt_ctl%iflag, iflag_mesh_file_fmt)
+      call choose_file_format(mesh_file_fmt_ctl, iflag_mesh_file_fmt)
 !
       end subroutine set_control_mesh_def
 !
@@ -117,15 +116,13 @@
       use m_read_mesh_data
       use m_control_params_sph_data
       use m_node_id_spherical_IO
-      use m_field_data_IO
       use m_file_format_switch
 !
 !   set data format
 !
-      call choose_file_format(sph_file_fmt_ctl%charavalue,              &
-     &    sph_file_fmt_ctl%iflag, iflag_sph_file_fmt)
-      call choose_file_format(spectr_file_fmt_ctl%charavalue,           &
-     &    spectr_file_fmt_ctl%iflag, iflag_sph_spectr_fmt)
+      call choose_file_format(sph_file_fmt_ctl, iflag_sph_file_fmt)
+      call choose_file_format                                           &
+     &   (spectr_file_fmt_ctl, iflag_sph_spectr_fmt)
 !
 !   set file header at once
 !
@@ -145,18 +142,20 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_control_restart_file_def
+      subroutine set_control_restart_file_def(fld_IO)
 !
-      use m_field_data_IO
+      use t_field_data_IO
       use m_file_format_switch
+!
+      type(field_IO), intent(inout) :: fld_IO
 !
 !
       if (restart_file_prefix%iflag .gt. 0) then
-        phys_file_head = restart_file_prefix%charavalue
+        fld_IO%file_prefix = restart_file_prefix%charavalue
       end if
 !
-      call choose_file_format(restart_file_fmt_ctl%charavalue,          &
-     &    restart_file_fmt_ctl%iflag, iflag_field_data_fmt)
+      call choose_para_file_format                                      &
+     &   (restart_file_fmt_ctl, fld_IO%iflag_file_fmt)
 !
       end subroutine set_control_restart_file_def
 !

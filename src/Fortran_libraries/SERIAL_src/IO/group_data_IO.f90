@@ -1,17 +1,22 @@
+!>@file   group_data_IO.f90
+!!@brief  module group_data_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!      module group_data_IO
-!
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine read_group_stack(id_file, ngrp, ntot, istack)
-!      subroutine read_group_item(id_file, ngrp, ntot, istack, name,    &
-!     &          item)
-!      subroutine read_surface_group_item(id_file, ngrp, ntot,          &
-!     &          istack, name, item_sf)
-!
-!      subroutine write_group_data(id_file, ngrp, ntot, istack, name,   &
-!     &          item)
-!      subroutine write_surf_group_data(id_file, ngrp, ntot,            &
+!>@brief Routines for ASCII group data IO
+!!
+!!@verbatim
+!!      subroutine read_group_stack(id_file, ngrp, ntot, istack)
+!!      subroutine read_group_item(id_file, ngrp, ntot, istack, name,   &
+!!     &          item)
+!!      subroutine read_surface_group_item(id_file, ngrp, ntot,         &
+!!     &          istack, name, item_sf)
+!!
+!!      subroutine write_group_data(id_file, ngrp, ntot, istack, name,  &
+!!     &          item)
+!!      subroutine write_surf_group_data(id_file, ngrp, ntot,           &
+!!@verbatim
 !
       module group_data_IO
 !

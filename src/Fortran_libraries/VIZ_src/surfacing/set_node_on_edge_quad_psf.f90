@@ -3,17 +3,22 @@
 !
 !      Written by H. Matsui on Apr., 2006
 !
-!!      subroutine set_node_on_edge_4_quad_psf(numnod, numedge,         &
-!!     &          nnod_4_edge, ie_edge, xx, const_psf, nnod_on_edge,    &
-!!     &          np_smp, istack_n_on_e_smp, iedge_4_nod, coef_on_edge)
+!!      subroutine set_node_on_edge_int_quad_psf(numnod, numedge,       &
+!!     &          nnod_4_edge, ie_edge, xx, const_psf, psf_list)
+!!      subroutine set_node_on_edge_int_linear_psf(numnod, numedge,     &
+!!     &          nnod_4_edge, ie_edge, psf_list)
 !
 !
       module set_node_on_edge_quad_psf
 !
       use m_precision
       use m_constants
+      use m_machine_parameter
 !
       implicit none
+!
+      private :: set_node_on_edge_4_linear_psf
+!      private :: set_node_on_edge_4_quad_psf
 !
 !  ---------------------------------------------------------------------
 !
@@ -21,15 +26,111 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_node_on_edge_4_quad_psf(numnod, numedge,           &
-     &          nnod_4_edge, ie_edge, xx, const_psf, nnod_on_edge,      &
-     &          np_smp, istack_n_on_e_smp, iedge_4_nod, coef_on_edge)
+      subroutine set_node_on_edge_int_quad_psf(numnod, numedge,         &
+     &          nnod_4_edge, ie_edge, xx, const_psf, psf_list)
+!
+      use t_psf_geometry_list
 !
       integer(kind = kint), intent(in) :: numnod, numedge, nnod_4_edge
       integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
       real(kind = kreal), intent(in) :: xx(numnod,3)
 !
-      integer(kind = kint), intent(in) :: np_smp
+      real(kind = kreal), intent(in) :: const_psf(10)
+!
+      type(sectioning_list), intent(inout) :: psf_list
+!
+!
+      call set_node_on_edge_4_quad_psf(numnod, numedge,                 &
+     &    nnod_4_edge, ie_edge, xx, const_psf,                          &
+     &    psf_list%internod_on_edge, psf_list%istack_inter_n_on_e_smp,  &
+     &    psf_list%iedge_int_nod, psf_list%coef_int_edge)
+!
+      call set_node_on_edge_4_quad_psf(numnod, numedge,                 &
+     &    nnod_4_edge, ie_edge, xx, const_psf,                          &
+     &    psf_list%externod_on_edge, psf_list%istack_exter_n_on_e_smp,  &
+     &    psf_list%iedge_ext_nod, psf_list%coef_ext_edge)
+!
+      end subroutine set_node_on_edge_int_quad_psf
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine set_node_on_edge_int_linear_psf(numnod, numedge,       &
+     &          nnod_4_edge, ie_edge, psf_list)
+!
+      use m_machine_parameter
+      use m_constants
+      use t_psf_geometry_list
+!
+      integer(kind = kint), intent(in) :: numnod, numedge, nnod_4_edge
+      integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
+!
+      type(sectioning_list), intent(inout) :: psf_list
+!
+!
+      call set_node_on_edge_4_linear_psf(numnod, numedge, nnod_4_edge,  &
+     &    ie_edge, psf_list%ref_fld, psf_list%internod_on_edge,         &
+     &    psf_list%istack_inter_n_on_e_smp, psf_list%iedge_int_nod,     &
+     &    psf_list%coef_int_edge)
+!
+      call set_node_on_edge_4_linear_psf(numnod, numedge, nnod_4_edge,  &
+     &    ie_edge, psf_list%ref_fld, psf_list%externod_on_edge,         &
+     &    psf_list%istack_exter_n_on_e_smp, psf_list%iedge_ext_nod,     &
+     &    psf_list%coef_ext_edge)
+!
+      end subroutine set_node_on_edge_int_linear_psf
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine set_node_on_edge_4_linear_psf                          &
+     &         (numnod, numedge, nnod_4_edge, ie_edge, ref_fld,         &
+     &          nnod_on_edge, istack_n_on_e_smp, iedge_4_nod,           &
+     &          coef_on_edge)
+!
+      use m_machine_parameter
+      use m_constants
+!
+      integer(kind = kint), intent(in) :: numnod, numedge, nnod_4_edge
+      integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
+      real(kind= kreal), intent(in) :: ref_fld(numnod)
+      integer(kind = kint), intent(in) :: nnod_on_edge
+      integer(kind = kint), intent(in) :: istack_n_on_e_smp(0:np_smp)
+      integer(kind = kint), intent(in) :: iedge_4_nod(nnod_on_edge)
+!
+      real(kind= kreal), intent(inout) :: coef_on_edge(nnod_on_edge,2)
+!
+      integer(kind = kint) :: ip, icou, ist, ied, iedge
+      integer(kind = kint) :: inod1, inod2
+      real(kind= kreal) :: diff
+!
+!$omp parallel do                                                       &
+!$omp& private(ist,ied,icou,iedge,inod1,inod2,diff)
+      do ip = 1, np_smp
+        ist = istack_n_on_e_smp(ip-1)
+        ied = istack_n_on_e_smp(ip-1) + 1
+        do icou = ist, ied
+          iedge = iedge_4_nod(icou)
+          inod1 = abs( ie_edge(iedge,1) )
+          inod2 = abs( ie_edge(iedge,2) )
+          diff = ref_fld(inod2) - ref_fld(inod1)
+          coef_on_edge(icou,1) =  ref_fld(inod2) / diff
+          coef_on_edge(icou,2) = -ref_fld(inod1) / diff
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine set_node_on_edge_4_linear_psf
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine set_node_on_edge_4_quad_psf(numnod, numedge,           &
+     &          nnod_4_edge, ie_edge, xx, const_psf, nnod_on_edge,      &
+     &          istack_n_on_e_smp, iedge_4_nod, coef_on_edge)
+!
+      integer(kind = kint), intent(in) :: numnod, numedge, nnod_4_edge
+      integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
+      real(kind = kreal), intent(in) :: xx(numnod,3)
+!
       integer(kind = kint), intent(in) :: nnod_on_edge
       integer(kind = kint), intent(in) :: istack_n_on_e_smp(0:np_smp)
       integer(kind = kint), intent(in) :: iedge_4_nod(nnod_on_edge)

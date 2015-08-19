@@ -1,11 +1,16 @@
+!>@file   copy_time_steps_4_restart.f90
+!!@brief  module copy_time_steps_4_restart
+!!
+!!@author H. Matsui
+!!@date Programmed in Sep., 2006
 !
-!------- module copy_time_steps_4_restart ---------------------
-!
-!        programmed by H.Matsui on Nov., 2009
-!
-!      subroutine copy_init_time_from_restart
-!      subroutine copy_time_steps_from_restart
-!      subroutine copy_time_steps_to_restart
+!>@brief  Routines to copy time step information from IO data
+!!
+!!@verbatim
+!!      subroutine copy_init_time_from_restart
+!!      subroutine copy_time_steps_from_restart
+!!      subroutine copy_time_steps_to_restart
+!!@endverbatim
 !
       module copy_time_steps_4_restart
 !

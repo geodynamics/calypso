@@ -1,17 +1,22 @@
-!sph_modes_grids_data_IO.f90
-!      module sph_modes_grids_data_IO
+!>@file  sph_modes_grids_data_IO.f90
+!!       module sph_modes_grids_data_IO
+!!
+!!@author H. Matsui
+!!@date        programmed by H.Matsui in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine read_geom_rtp_data(mesh_file_id)
-!      subroutine read_spectr_modes_rj_data(mesh_file_id)
-!      subroutine read_geom_rtm_data(mesh_file_id)
-!      subroutine read_spectr_modes_rlm_data(mesh_file_id)
-!
-!      subroutine write_geom_rtp_data(id_mesh)
-!      subroutine write_spectr_modes_rj_data(id_mesh)
-!      subroutine write_geom_rtm_data(id_mesh)
-!      subroutine write_modes_rlm_data(id_mesh)
+!> @brief Routines for speherical grid data IO
+!!
+!!@verbatim
+!!      subroutine read_geom_rtp_data(mesh_file_id)
+!!      subroutine read_spectr_modes_rj_data(mesh_file_id)
+!!      subroutine read_geom_rtm_data(mesh_file_id)
+!!      subroutine read_spectr_modes_rlm_data(mesh_file_id)
+!!
+!!      subroutine write_geom_rtp_data(id_mesh)
+!!      subroutine write_spectr_modes_rj_data(id_mesh)
+!!      subroutine write_geom_rtm_data(id_mesh)
+!!      subroutine write_modes_rlm_data(id_mesh)
+!!@endverbatim
 !
       module sph_modes_grids_data_IO
 !

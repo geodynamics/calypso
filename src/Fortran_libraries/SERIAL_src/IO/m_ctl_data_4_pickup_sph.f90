@@ -30,9 +30,13 @@
 !!    volume_pwr_spectr_prefix     'sph_pwr_volume'
 !!    layered_pwr_spectr_prefix    'sph_pwr_layer'
 !!
+!!    degree_spectr_switch         'On'
+!!    order_spectr_switch          'On'
+!!    diff_lm_spectr_switch        'On'
+!!
+!!    nusselt_number_prefix        'Nusselt'
 !!    picked_sph_prefix            'sph_spectr/picked_mode'
 !!    gauss_coefs_prefix           'sph_spectr/gauss_coefs'
-!!    nusselt_number_prefix        'Nusselt'
 !!
 !!    gauss_coefs_radius_ctl        2.91
 !!
@@ -91,20 +95,43 @@
 !
       use m_precision
 !
-      use m_read_control_elements
+      use t_control_elements
       use t_read_control_arrays
       use skip_comment_f
 !
       implicit  none
 !
-      character(len = kchara) :: volume_average_prefix
-      character(len = kchara) :: volume_pwr_spectr_prefix
-      character(len = kchara) :: layered_pwr_spectr_prefix
+!>      Structure for layered spectrum file prefix
+      type(read_character_item), save :: volume_average_prefix
 !
-      character(len = kchara) :: Nusselt_file_prefix
-      character(len = kchara) :: picked_mode_head_ctl
-      character(len = kchara) :: gauss_coefs_prefix
-      real(kind = kreal) :: gauss_coefs_radius_ctl = 2.91
+!>      Structure for layered spectrum file prefix
+      type(read_character_item), save :: volume_pwr_spectr_prefix
+!
+!>      Structure for layered spectrum file prefix
+      type(read_character_item), save :: layered_pwr_spectr_prefix
+!
+!>      Structure for picked spectrum file prefix
+      type(read_character_item), save :: Nusselt_file_prefix
+!
+!>      Structure for picked spectrum file prefix
+      type(read_character_item), save :: picked_mode_head_ctl
+!
+!>      Structure for gauss coefficient file prefix
+      type(read_character_item), save :: gauss_coefs_prefix
+!
+!>      Structure for reference radus 
+      type(read_real_item), save :: gauss_coefs_radius_ctl
+!
+!
+!>      Structure for degree spectrum switch
+      type(read_character_item), save :: degree_spectr_switch
+!
+!>      Structure for order spectrum switch
+      type(read_character_item), save :: order_spectr_switch
+!
+!>      Structure for l-m spectrum switch
+      type(read_character_item), save :: diff_lm_spectr_switch
+!
 !
 !>      Structure for list of radial grid of spectr energy data output
 !!@n      idx_spec_layer_ctl%num:   Number of grid
@@ -148,10 +175,18 @@
 !!@n      idx_gauss_m_ctl%ivec: list of order of gauss coefficient
       type(ctl_array_int), save :: idx_gauss_m_ctl
 !
-      character(len = kchara) :: pick_circle_coord_ctl = 'spherical'
-      integer(kind = kint) :: nphi_mid_eq_ctl
-      real(kind = kreal) :: pick_s_ctl = 7.0d0/13.0d0 + 0.5d0
-      real(kind = kreal) :: pick_z_ctl = 0.0d0
+!
+!>      Structure for coordiniate system for circled data
+      type(read_character_item), save :: pick_circle_coord_ctl
+!
+!>      Structure for Number of zonal points for benchamek check
+      type(read_integer_item), save :: nphi_mid_eq_ctl
+!
+!>      Structure for position for s
+      type(read_real_item), save :: pick_s_ctl
+!
+!>      Structure for position for z
+      type(read_real_item), save :: pick_z_ctl
 !
 !    label for entry
 !
@@ -173,6 +208,14 @@
      &           :: hd_gauss_coefs_head = 'gauss_coefs_prefix'
       character(len=kchara), parameter                                  &
      &           :: hd_Nusselt_file_head = 'nusselt_number_prefix'
+!
+      character(len=kchara), parameter                                  &
+     &           :: hd_degree_spectr_switch = 'degree_spectr_switch'
+      character(len=kchara), parameter                                  &
+     &           :: hd_order_spectr_switch = 'order_spectr_switch'
+      character(len=kchara), parameter                                  &
+     &           :: hd_diff_lm_spectr_switch = 'diff_lm_spectr_switch'
+!
       character(len=kchara), parameter                                  &
      &           :: hd_gauss_coefs_r =    'gauss_coefs_radius_ctl'
 !
@@ -205,19 +248,6 @@
      &            :: hd_circle_coord = 'pick_circle_coord_ctl'
 !
 !
-      integer (kind=kint) :: i_voume_ave_head =         0
-      integer (kind=kint) :: i_voume_rms_head =         0
-      integer (kind=kint) :: i_layer_rms_head =         0
-      integer (kind=kint) :: i_picked_mode_head =       0
-      integer (kind=kint) :: i_gauss_coefs_head =       0
-      integer (kind=kint) :: i_Nusselt_file_head =      0
-      integer (kind=kint) :: i_gauss_coefs_r =          0
-!
-      integer (kind=kint) :: i_nphi_mid_eq =            0
-      integer (kind=kint) :: i_pick_s_ctl =             0
-      integer (kind=kint) :: i_pick_z_ctl =             0
-      integer (kind=kint) :: i_circle_coord =           0
-!
       private :: hd_pick_sph, i_pick_sph, hd_pick_layer, hd_spctr_layer
       private :: hd_gauss_coefs_head, hd_gauss_coefs_r
       private :: hd_picked_mode_head, hd_Nusselt_file_head
@@ -226,7 +256,8 @@
       private :: hd_pick_gauss_l, hd_pick_gauss_m
       private :: hd_voume_ave_head, hd_voume_rms_head
       private :: hd_layer_rms_head, hd_nphi_mid_eq
-      private :: hd_pick_s_ctl, hd_pick_z_ctl
+      private :: hd_pick_s_ctl, hd_pick_z_ctl, hd_diff_lm_spectr_switch
+      private :: hd_degree_spectr_switch, hd_order_spectr_switch
 !
 ! -----------------------------------------------------------------------
 !
@@ -326,33 +357,37 @@
         call read_control_array_i1(hd_pick_gauss_m, idx_gauss_m_ctl)
 !
 !
-        call read_real_ctl_item(hd_gauss_coefs_r,                       &
-     &          i_gauss_coefs_r, gauss_coefs_radius_ctl)
-        call read_real_ctl_item(hd_pick_s_ctl,                          &
-     &          i_pick_s_ctl, pick_s_ctl)
-        call read_real_ctl_item(hd_pick_z_ctl,                          &
-     &          i_pick_z_ctl, pick_z_ctl)
+        call read_real_ctl_type(hd_gauss_coefs_r,                       &
+     &      gauss_coefs_radius_ctl)
+        call read_real_ctl_type(hd_pick_s_ctl, pick_s_ctl)
+        call read_real_ctl_type(hd_pick_z_ctl, pick_z_ctl)
 !
-        call read_integer_ctl_item(hd_nphi_mid_eq,                      &
-     &          i_nphi_mid_eq, nphi_mid_eq_ctl)
+        call read_integer_ctl_type(hd_nphi_mid_eq, nphi_mid_eq_ctl)
 !
-        call read_character_ctl_item(hd_gauss_coefs_head,               &
-     &          i_gauss_coefs_head, gauss_coefs_prefix)
-        call read_character_ctl_item(hd_picked_mode_head,               &
-     &          i_picked_mode_head, picked_mode_head_ctl)
+        call read_chara_ctl_type(hd_gauss_coefs_head,                   &
+     &          gauss_coefs_prefix)
+        call read_chara_ctl_type(hd_picked_mode_head,                   &
+     &          picked_mode_head_ctl)
 !
-        call read_character_ctl_item(hd_Nusselt_file_head,              &
-     &          i_Nusselt_file_head, Nusselt_file_prefix)
+        call read_chara_ctl_type(hd_Nusselt_file_head,                  &
+     &          Nusselt_file_prefix)
 !
-        call read_character_ctl_item(hd_voume_ave_head,                 &
-     &          i_voume_ave_head, volume_average_prefix)
-        call read_character_ctl_item(hd_voume_rms_head,                 &
-     &          i_voume_rms_head, volume_pwr_spectr_prefix)
-        call read_character_ctl_item(hd_layer_rms_head,                 &
-     &          i_layer_rms_head, layered_pwr_spectr_prefix)
+        call read_chara_ctl_type(hd_voume_ave_head,                     &
+     &          volume_average_prefix)
+        call read_chara_ctl_type(hd_voume_rms_head,                     &
+     &          volume_pwr_spectr_prefix)
+        call read_chara_ctl_type(hd_layer_rms_head,                     &
+     &          layered_pwr_spectr_prefix)
 !
-        call read_character_ctl_item(hd_circle_coord,                   &
-     &          i_circle_coord, pick_circle_coord_ctl)
+        call read_chara_ctl_type(hd_degree_spectr_switch,               &
+     &          degree_spectr_switch)
+        call read_chara_ctl_type(hd_order_spectr_switch,                &
+     &          order_spectr_switch)
+        call read_chara_ctl_type(hd_diff_lm_spectr_switch,              &
+     &          diff_lm_spectr_switch)
+!
+        call read_chara_ctl_type(hd_circle_coord,                       &
+     &          pick_circle_coord_ctl)
       end do
 !
       end subroutine read_pickup_sph_ctl

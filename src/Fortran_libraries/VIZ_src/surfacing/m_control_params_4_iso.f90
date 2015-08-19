@@ -69,9 +69,9 @@
       subroutine count_control_4_iso(i_iso, iso, num_mat, mat_name,     &
      &          num_nod_phys, phys_nod_name, iso_fld, iso_param)
 !
-      use m_field_file_format
       use m_file_format_switch
       use m_control_data_4_iso
+      use parallel_ucd_IO_select
       use set_field_comp_for_viz
       use t_phys_data
       use t_psf_patch_data
@@ -96,7 +96,7 @@
         iso_header(i_iso) =  'iso'
       end if
 !
-      call choose_ucd_file_format(iso%iso_output_type_ctl,              &
+      call choose_para_fld_file_format(iso%iso_output_type_ctl,         &
      &    iso%i_iso_out_type, itype_iso_file(i_iso) )
 !
       if(iso%iso_out_field_ctl%num .eq. 0) then
@@ -110,7 +110,7 @@
       else if ( id_iso_result_type(i_iso) .eq. iflag_field_iso) then
         call check_field_4_viz(num_nod_phys, phys_nod_name,             &
      &      iso%iso_out_field_ctl%num, iso%iso_out_field_ctl%c1_tbl,    &
-     &      iso_fld%num_phys)
+     &      iso_fld%num_phys, iso_fld%num_phys_viz)
       end if
 !
       call count_area_4_viz(num_mat, mat_name,                          &

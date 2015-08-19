@@ -1,13 +1,17 @@
-!t_surface_boundary.f90
-!     module t_surface_boundary
+!>@file  t_surface_boundary.f90
+!!       module t_surface_boundary
+!!
+!!@author H. Matsui
+!!@date   Programmed on Nov., 2008
+!!@n      Modified by H. Matsui on Feb., 2012
 !
 !> @brief Structure for boundary condition on surface
-!
-!     written by H. Matsui on Dec., 2008
-!
-!      subroutine alloc_scalar_surf_BC(sf_list)
-!      subroutine dealloc_scalar_surf_BC(sf_list)
-!        type(scalar_surf_BC_list), intent(inout) :: sf_list
+!!
+!!@verbatim
+!!      subroutine alloc_scalar_surf_BC(sf_list)
+!!      subroutine dealloc_scalar_surf_BC(sf_list)
+!!        type(scalar_surf_BC_list), intent(inout) :: sf_list
+!!@endverbatim
 !
       module t_surface_boundary
 !
@@ -16,26 +20,26 @@
       implicit  none
 !
 !
-!> @brief Structure for scalar's boundary condition on surface
+!>      Structure for scalar's boundary condition on surface
       type scalar_surf_BC_list
+!>     number of surface group
         integer (kind=kint) :: ngrp_sf
-!<     number of surface group
+!>     surface group ID for boundary condition
         integer (kind=kint), pointer :: igrp_sf(:)
-!<     surface group ID for boundary condition
+!>     field value for boundary condition
         real (kind=kreal), pointer :: sf_apt(:)
-!<     field value for boundary condition
       end type scalar_surf_BC_list
 !
 !> @brief Structure for vactor's boundary condition on surface
       type vector_surf_BC_list
+!>     maximum number number of surface group
         integer (kind=kint) :: nmax_sf
-!<     maximum number number of surface group
+!>     number of surface group
         integer (kind=kint) :: ngrp_sf(3)
-!<     number of surface group
+!>     surface group ID for boundary condition
         integer (kind=kint), pointer :: id_grp_vect_sf(:,:)
-!<     surface group ID for boundary condition
+!>     vector value for boundary condition
         real (kind=kreal), pointer :: sf_apt(:,:)
-!<     vector value for boundary condition
       end type vector_surf_BC_list
 !
 !

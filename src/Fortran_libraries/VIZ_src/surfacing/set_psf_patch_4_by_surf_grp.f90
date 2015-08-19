@@ -7,8 +7,8 @@
 !     &          igrp, istack_patch_smp)
 !      subroutine set_patch_4_grp(numnod, numele, nnod_4_ele, ie,       &
 !     &          num_surf_grp, ntot_surf_grp, istack_surf_grp,          &
-!     &          item_surf_grp, igrp, id_n_on_n,                        &
-!     &          npatch_tot, istack_patch_smp, ie_patch)
+!     &          item_surf_grp, igrp, id_n_on_n, istack_numele,         &
+!     &          npatch_tot, istack_patch_smp, iele_global, ie_patch)
 !
       module set_psf_patch_4_by_surf_grp
 !
@@ -51,8 +51,8 @@
 !
       subroutine set_patch_4_grp(numnod, numele, nnod_4_ele, ie,        &
      &          num_surf_grp, ntot_surf_grp, istack_surf_grp,           &
-     &          item_surf_grp, igrp, id_n_on_n,                         &
-     &          npatch_tot, istack_patch_smp, ie_patch)
+     &          item_surf_grp, igrp, id_n_on_n, istack_numele,          &
+     &          npatch_tot, istack_patch_smp, iele_global, ie_patch)
 !
       use m_machine_parameter
       use m_geometry_constants
@@ -67,10 +67,12 @@
      &                      :: item_surf_grp(2,ntot_surf_grp)
 !
       integer(kind = kint), intent(in) :: igrp
-      integer(kind = kint), intent(in) :: id_n_on_n(numnod)
+      integer(kind = kint_gl), intent(in) :: id_n_on_n(numnod)
+      integer(kind = kint_gl), intent(in) :: istack_numele
       integer(kind = kint), intent(in) :: npatch_tot
       integer(kind = kint), intent(in) :: istack_patch_smp(0:np_smp)
 !
+      integer(kind = kint_gl), intent(inout) :: iele_global(npatch_tot)
       integer(kind = kint), intent(inout) :: ie_patch(npatch_tot,3)
 !
       integer(kind = kint) :: n, i, j, inum, iele, isurf, jnum
@@ -94,9 +96,10 @@
           i1 = ie(k1,iele)
           i2 = ie(k2,iele)
           i3 = ie(k3,iele)
-          ie_patch(jnum,1) = id_n_on_n(i1)
-          ie_patch(jnum,2) = id_n_on_n(i2)
-          ie_patch(jnum,3) = id_n_on_n(i3)
+          iele_global(jnum) = jnum + istack_numele
+          ie_patch(jnum,1) = int(id_n_on_n(i1))
+          ie_patch(jnum,2) = int(id_n_on_n(i2))
+          ie_patch(jnum,3) = int(id_n_on_n(i3))
         end do
 !
       end do

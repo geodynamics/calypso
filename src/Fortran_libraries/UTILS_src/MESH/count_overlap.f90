@@ -9,8 +9,6 @@
 !!@verbatim
 !!      subroutine set_overlap_flag(np_smp, inum_smp_stack,             &
 !!     &          internal_node, numele, ie, internal_n, interior_flag)
-!!      subroutine copy_real_overlap_flag(np_smp, inum_smp_stack,       &
-!!     &          numele, interior_flag, e_multi)
 !!
 !!      subroutine set_original_domiain_by_comm(my_rank, nnod,          &
 !!     &          num_neib, ntot_import, id_neib, istack_import,        &
@@ -63,31 +61,6 @@
       end do
 !
       end subroutine set_overlap_flag
-!
-! ----------------------------------------------------------------------
-!
-      subroutine copy_real_overlap_flag(np_smp, inum_smp_stack,         &
-     &          numele, interior_flag, e_multi)
-!
-      integer(kind = kint), intent(in) :: np_smp
-      integer(kind = kint), intent(in) :: inum_smp_stack(0:np_smp)
-      integer(kind = kint), intent(in) :: numele
-      integer(kind = kint), intent(in) :: interior_flag(numele)
-!
-      real(kind = kreal), intent(inout) :: e_multi(numele)
-!
-      integer (kind = kint) :: ip, inum
-!
-!
-!$omp parallel do private(inum)
-      do ip = 1, np_smp
-        do inum = inum_smp_stack(ip-1)+1, inum_smp_stack(ip)
-            e_multi(inum) = dble(interior_flag(inum))
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine copy_real_overlap_flag
 !
 ! ----------------------------------------------------------------------
 !

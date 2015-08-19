@@ -1,15 +1,20 @@
+!>@file  stack_array_IO.f90
+!!       module stack_array_IO
+!!
+!!@author H. Matsui
+!!@date        programmed by H.Matsui in July, 2007
 !
-!      module stack_array_IO
-!
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine read_arrays_for_stacks(file_id, num, istack_begin,    &
-!     &          ntot, istack)
-!      subroutine read_arrays_for_stacks_b(file_id, num, istack_begin,  &
-!    &           ntot,istack)
-!
-!      subroutine write_arrays_for_stacks(file_id, num, istack)
-!      subroutine write_arrays_for_stacks_b(file_id, num, istack)
+!> @brief routines for stack list IO
+!!
+!!@verbatim
+!!      subroutine read_arrays_for_stacks(file_id, num, istack_begin,   &
+!!     &          ntot, istack)
+!!      subroutine read_arrays_for_stacks_b(file_id, num, istack_begin, &
+!!    &           ntot,istack)
+!!
+!!      subroutine write_arrays_for_stacks(file_id, num, istack)
+!!      subroutine write_arrays_for_stacks_b(file_id, num, istack)
+!!@endverbatim
 !
       module stack_array_IO
 !

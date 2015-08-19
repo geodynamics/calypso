@@ -9,7 +9,7 @@
 !      subroutine allocate_monitor_local
 !      subroutine deallocate_monitor_local
 !
-!      subroutine set_local_node_id_4_monitor
+!      subroutine set_local_node_id_4_monitor(nod_grp)
 !      subroutine output_monitor_control
 !      subroutine skip_monitor_data
 !
@@ -128,14 +128,14 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_local_node_id_4_monitor
+      subroutine set_local_node_id_4_monitor(nod_grp)
 !
       use calypso_mpi
       use m_control_parameter
-      use m_geometry_parameter
       use m_geometry_data
-      use m_node_group
+      use t_group_data
 !
+      type(group_data), intent(in) :: nod_grp
       integer (kind = kint) :: i, k, inum
 !
 !
@@ -144,12 +144,13 @@
       num_monitor_local = 0
 !
       if ( num_monitor .gt. 0 ) then
-        do i=1, num_bc
+        do i = 1, nod_grp%num_grp
 !
           do inum = 1, num_monitor
-            if (bc_name(i) .eq. monitor_grp(inum)) then
+            if (nod_grp%grp_name(i) .eq. monitor_grp(inum)) then
                num_monitor_local = num_monitor_local                    &
-     &                            + bc_istack(i)-bc_istack(i-1)
+     &                            + nod_grp%istack_grp(i)               &
+     &                            - nod_grp%istack_grp(i-1)
                exit
             end if
           end do
@@ -162,13 +163,13 @@
       if (num_monitor_local .eq. 0) return
 !
       num_monitor_local = 0
-      do i=1, num_bc
+      do i=1, nod_grp%num_grp
         do inum = 1, num_monitor
-          if (bc_name(i) .eq. monitor_grp(inum)) then
-            do k= bc_istack(i-1)+1, bc_istack(i)
-              if( bc_item(k) .le. internal_node ) then 
+          if (nod_grp%grp_name(i) .eq. monitor_grp(inum)) then
+            do k= nod_grp%istack_grp(i-1)+1, nod_grp%istack_grp(i)
+              if( nod_grp%item_grp(k) .le. node1%internal_node ) then 
                 num_monitor_local = num_monitor_local + 1
-                monitor_local(num_monitor_local) = bc_item(k)
+                monitor_local(num_monitor_local) = nod_grp%item_grp(k)
               end if
             end do
             exit
@@ -185,7 +186,6 @@
 !
       use calypso_mpi
       use m_geometry_data
-      use m_geometry_parameter
       use m_node_phys_address
       use m_node_phys_data
       use m_t_step_parameter
@@ -205,7 +205,7 @@
         write(id_monitor_file,'(2i16,1pe25.15e3)',                      &
      &             advance='NO') i_step_MHD, inod, time
         write(id_monitor_file,'(1p3e25.15e3)',                          &
-     &             advance='NO') xx(inod,1:3)
+     &             advance='NO') node1%xx(inod,1:3)
         do i_fld = 1, num_nod_phys
           if(iflag_nod_fld_monitor(i_fld) .gt. 0) then
             ist = istack_nod_component(i_fld-1) + 1

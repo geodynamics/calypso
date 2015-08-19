@@ -34,7 +34,7 @@
 !!      field_file_prefix           'field/out'
 !!      restart_file_prefix         'restart/rst'
 !!
-!!      spectr_file_head_ctl        'sph_spectr/spectr'
+!!      spectr_data_file_prefix     'sph_spectr/spectr'
 !!
 !!
 !!      mesh_file_fmt_ctl           'ascii'
@@ -164,7 +164,7 @@
       character(len=kchara), parameter                                  &
      &       :: hd_rst_header =   'restart_file_prefix'
       character(len=kchara), parameter                                  &
-     &       :: hd_spectr_header =   'spectr_file_head_ctl'
+     &       :: hd_spectr_header =   'spectr_data_file_prefix'
 !
       character(len=kchara), parameter                                  &
      &       :: hd_sph_files_header = 'sph_file_prefix'

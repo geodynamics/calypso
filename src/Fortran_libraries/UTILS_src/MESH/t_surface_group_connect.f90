@@ -8,18 +8,20 @@
 !> Substitution of
 !> @n      (module m_surface_group_connect)
 !
-!      subroutine alloc_num_surf_grp_nod(sf_grp, sf_nod)
-!      subroutine alloc_num_surf_grp_nod_smp(sf_grp, sf_nod)
+!      subroutine alloc_num_surf_grp_nod(num_surf, sf_nod)
+!      subroutine alloc_num_surf_grp_nod_smp(num_surf_smp, sf_nod)
 !      subroutine alloc_item_surf_grp_nod(sf_nod)
 !      subroutine alloc_vect_surf_grp_nod(sf_nod)
 !        type(surface_group_data), intent(in) :: sf_grp
 !        type(surface_node_grp_data), intent(in) :: sf_nod
 !
-!      subroutine dealloc_num_surf_grp_nod(sf_nod)
 !      subroutine dealloc_num_surf_grp_nod_smp(sf_nod)
-!      subroutine dealloc_item_surf_grp_nod(sf_nod)
-!      subroutine dealloc_vect_surf_grp_nod(sf_nod)
+!      subroutine dealloc_surf_grp_nod(sf_nod)
 !        type(surface_node_grp_data), intent(in) :: sf_nod
+!
+!!       subroutine check_surface_node_id(id_check, sf_nod)
+!!      subroutine check_surf_nod_4_sheard_para                         &
+!!     &         (id_check, num_surf, sf_nod)
 !
       module t_surface_group_connect
 !
@@ -61,32 +63,28 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_num_surf_grp_nod(sf_grp, sf_nod)
+      subroutine alloc_num_surf_grp_nod(num_surf, sf_nod)
 !
-      use t_group_data
-!
-      type(surface_group_data), intent(in) :: sf_grp
+      integer(kind = kint), intent(in) :: num_surf
       type(surface_node_grp_data), intent(inout) :: sf_nod
 !
 !
-      allocate ( sf_nod%nnod_sf_grp(sf_grp%num_grp) )
-      allocate ( sf_nod%inod_stack_sf_grp(0:sf_grp%num_grp) )
-      if(sf_grp%num_grp .gt. 0) sf_nod%nnod_sf_grp = 0
+      allocate ( sf_nod%nnod_sf_grp(num_surf) )
+      allocate ( sf_nod%inod_stack_sf_grp(0:num_surf) )
+      if(num_surf .gt. 0) sf_nod%nnod_sf_grp = 0
       sf_nod%inod_stack_sf_grp = 0
 !
       end subroutine alloc_num_surf_grp_nod
 !
 !-----------------------------------------------------------------------
 !
-      subroutine alloc_num_surf_grp_nod_smp(sf_grp, sf_nod)
+      subroutine alloc_num_surf_grp_nod_smp(num_surf_smp, sf_nod)
 !
-      use t_group_data
-!
-      type(surface_group_data), intent(in) :: sf_grp
+      integer(kind = kint), intent(in) :: num_surf_smp
       type(surface_node_grp_data), intent(inout) :: sf_nod
 !
 !
-       allocate( sf_nod%istack_surf_nod_smp(0:sf_grp%num_grp_smp))
+       allocate( sf_nod%istack_surf_nod_smp(0:num_surf_smp))
        sf_nod%istack_surf_nod_smp = 0
 !
       end subroutine alloc_num_surf_grp_nod_smp
@@ -130,17 +128,6 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine dealloc_num_surf_grp_nod(sf_nod)
-!
-      type(surface_node_grp_data), intent(inout) :: sf_nod
-!
-!
-      deallocate ( sf_nod%inod_stack_sf_grp, sf_nod%nnod_sf_grp )
-!
-      end subroutine dealloc_num_surf_grp_nod
-!
-!-----------------------------------------------------------------------
-!
       subroutine dealloc_num_surf_grp_nod_smp(sf_nod)
 !
       type(surface_node_grp_data), intent(inout) :: sf_nod
@@ -152,28 +139,57 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine dealloc_item_surf_grp_nod(sf_nod)
+      subroutine dealloc_surf_grp_nod(sf_nod)
 !
       type(surface_node_grp_data), intent(inout) :: sf_nod
 !
 !
       deallocate ( sf_nod%inod_surf_grp )
-      deallocate ( sf_nod%surf_node_n   )
-      deallocate ( sf_nod%num_sf_4_nod  )
+      deallocate ( sf_nod%surf_node_n, sf_nod%num_sf_4_nod  )
+      deallocate (sf_nod%surf_norm_nod, sf_nod%coef_sf_nod)
+      deallocate ( sf_nod%inod_stack_sf_grp, sf_nod%nnod_sf_grp )
 !
-      end subroutine dealloc_item_surf_grp_nod
+      end subroutine dealloc_surf_grp_nod
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+       subroutine check_surface_node_id(id_check, sf_nod)
+!
+       integer(kind = kint), intent(in) :: id_check
+      type(surface_node_grp_data), intent(in) :: sf_nod
+       integer(kind = kint) :: inum
+!
+!
+       write(id_check+50,*) 'inod_stack_sf_grp',                        &
+     &                   sf_nod%inod_stack_sf_grp
+       do inum = 1, sf_nod%ntot_node_sf_grp
+         write(id_check+50,*) inum, sf_nod%inod_surf_grp(inum),         &
+     &          sf_nod%surf_node_n(inum), sf_nod%num_sf_4_nod(inum)
+       end do
+!
+       end subroutine check_surface_node_id
 !
 !-----------------------------------------------------------------------
 !
-      subroutine dealloc_vect_surf_grp_nod(sf_nod)
+      subroutine check_surf_nod_4_sheard_para                           &
+     &         (id_check, num_surf, sf_nod)
 !
-      type(surface_node_grp_data), intent(inout) :: sf_nod
+       use m_machine_parameter
+!
+      integer(kind = kint), intent(in) :: id_check, num_surf
+      type(surface_node_grp_data), intent(in) :: sf_nod
+!
+      integer(kind = kint) :: isurf, ist, ied
 !
 !
-      deallocate ( sf_nod%surf_norm_nod    )
-      deallocate ( sf_nod%coef_sf_nod      )
+      do isurf = 1, num_surf
+        ist = np_smp*(isurf-1)+1
+        ied = np_smp*isurf
+        write(50+id_check,*) isurf,sf_nod%istack_surf_nod_smp(ist:ied)
+      end do
 !
-      end subroutine dealloc_vect_surf_grp_nod
+      end subroutine check_surf_nod_4_sheard_para
 !
 !-----------------------------------------------------------------------
 !

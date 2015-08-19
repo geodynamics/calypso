@@ -4,12 +4,12 @@
 !        programmed by H.Matsui on May. 2006
 !
 !!      subroutine check_field_4_viz(num_nod_phys, phys_nod_name,      &
-!!     &          n_field_ctl, field_name, num_field)
+!!     &          n_field_ctl, field_name, num_field, num_field_vis)
 !!      subroutine set_components_4_viz(num_nod_phys, phys_nod_name,   &
 !!     &          n_field_ctl, field_name, comp_name, num_field,       &
 !!     &          ifield, icomp, ncomp, ncomp_org, rst_name)
 !!
-!!      subroutine count_total_comps_4_viz(num, psf_fld, max_ncomp_out)
+!!      subroutine count_total_comps_4_viz(psf_fld)
 !
       module set_field_comp_for_viz
 !
@@ -24,14 +24,14 @@
 !  ---------------------------------------------------------------------
 !
       subroutine check_field_4_viz(num_nod_phys, phys_nod_name,         &
-     &          n_field_ctl, field_name, num_field)
+     &          n_field_ctl, field_name, num_field, num_field_vis)
 !
       integer(kind = kint), intent(in) :: num_nod_phys, n_field_ctl
 !
       character(len=kchara), intent(in) :: phys_nod_name(num_nod_phys)
       character(len=kchara), intent(in) :: field_name(n_field_ctl)
 !
-      integer(kind = kint), intent(inout) :: num_field
+      integer(kind = kint), intent(inout) :: num_field, num_field_vis
 !
       integer(kind = kint) :: i, id
 !
@@ -45,6 +45,7 @@
           end if
         end do
       end do
+      num_field_vis = num_field
 !
       end subroutine check_field_4_viz
 !
@@ -93,28 +94,22 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine count_total_comps_4_viz(num, psf_fld, max_ncomp_out)
+      subroutine count_total_comps_4_viz(psf_fld)
 !
       use t_phys_data
 !
-      integer(kind = kint), intent(in) :: num
-!
-      type(phys_data), intent(inout) :: psf_fld(num)
-      integer(kind = kint), intent(inout) :: max_ncomp_out
+      type(phys_data), intent(inout) :: psf_fld
 !
 !
-      integer(kind = kint) :: i, j
+      integer(kind = kint) :: j
 !
 !
-      max_ncomp_out = 1
-      do i = 1, num
-        psf_fld(i)%ntot_phys = 0
-        do j = 1, psf_fld(i)%num_phys
-          psf_fld(i)%ntot_phys = psf_fld(i)%ntot_phys                   &
-     &                          + psf_fld(i)%num_component(j)
-        end do
-        max_ncomp_out = max(max_ncomp_out,psf_fld(i)%ntot_phys)
+      psf_fld%ntot_phys = 0
+      do j = 1, psf_fld%num_phys
+        psf_fld%ntot_phys = psf_fld%ntot_phys                           &
+     &                     + psf_fld%num_component(j)
       end do
+      psf_fld%ntot_phys_viz = psf_fld%ntot_phys
 !
       end subroutine count_total_comps_4_viz
 !

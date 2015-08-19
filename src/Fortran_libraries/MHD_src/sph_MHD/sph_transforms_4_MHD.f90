@@ -7,7 +7,7 @@
 !>@brief Perform spherical harmonics transform for MHD dynamo model
 !!
 !!@verbatim
-!!      subroutine init_sph_transform_MHD
+!!      subroutine init_sph_transform_MHD(numnod)
 !!
 !!      subroutine sph_back_trans_4_MHD
 !!      subroutine sph_forward_trans_4_MHD
@@ -26,9 +26,20 @@
       use m_constants
       use m_machine_parameter
       use m_work_time
+      use legendre_transform_select
 !
       implicit  none
 !
+      integer(kind = kint), parameter :: num_test =  6
+      integer(kind = kint), parameter :: list_test(num_test)            &
+     &        = (/iflag_leg_krloop_inner,                               &
+     &            iflag_leg_sym_spin_loop,                              &
+     &            iflag_leg_sym_matmul,                                 &
+     &            iflag_leg_sym_dgemm,                                  &
+     &            iflag_leg_sym_matmul_big,                             &
+     &            iflag_leg_sym_dgemm_big/)
+!
+      private :: num_test, list_test
       private :: select_legendre_transform
 !
 !-----------------------------------------------------------------------
@@ -40,6 +51,7 @@
       subroutine init_sph_transform_MHD
 !
       use calypso_mpi
+      use m_geometry_data
       use m_addresses_trans_sph_MHD
       use m_addresses_trans_sph_snap
       use m_addresses_trans_sph_tmp
@@ -48,14 +60,13 @@
       use init_FFT_4_MHD
       use const_wz_coriolis_rtp
       use const_coriolis_sph_rlm
-      use legendre_transform_select
       use pole_sph_transform
       use skip_comment_f
 !
       character(len=kchara) :: tmpchara
 !
 !
-      call init_pole_transform
+      call init_pole_transform(node1%numnod)
 !
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &                     'set_addresses_trans_sph_MHD'
@@ -116,6 +127,14 @@
           write(tmpchara,'(a)') trim(leg_sym_dgemm)
         else if(id_legendre_transfer .eq. iflag_leg_sym_matprod) then
           write(tmpchara,'(a)') trim(leg_sym_matprod)
+        else if(id_legendre_transfer .eq. iflag_leg_sym_matmul_big)     &
+     &          then
+          write(tmpchara,'(a)') trim(leg_sym_matmul_big)
+        else if(id_legendre_transfer .eq. iflag_leg_sym_dgemm_big) then
+          write(tmpchara,'(a)') trim(leg_sym_dgemm_big)
+        else if(id_legendre_transfer .eq. iflag_leg_sym_matprod_big)    &
+     &          then
+          write(tmpchara,'(a)') trim(leg_sym_matprod_big)
         else if(id_legendre_transfer .eq. iflag_leg_test_loop) then
           write(tmpchara,'(a)') trim(leg_test_loop)
         end if
@@ -292,17 +311,20 @@
       use calypso_mpi
       use m_machine_parameter
       use m_work_4_sph_trans
-      use legendre_transform_select
 !
       real(kind = kreal) :: starttime, etime_shortest
       real(kind = kreal) :: endtime(ntype_Leg_trans_loop)
       real(kind = kreal) :: etime_trans(ntype_Leg_trans_loop)
+      real(kind = kreal) :: etime_max(ntype_Leg_trans_loop)
 !
-      integer(kind = kint) :: iloop_type
+      integer(kind = kint) :: id, iloop_type
 !
 !
-      do iloop_type = 1, ntype_Leg_trans_loop
-        id_legendre_transfer = iloop_type
+      endtime(1:ntype_Leg_trans_loop) =     zero
+      etime_trans(1:ntype_Leg_trans_loop) = zero
+      etime_max(1:ntype_Leg_trans_loop) =   zero
+      do iloop_type = 1, num_test
+        id_legendre_transfer = list_test(iloop_type)
         if(my_rank .eq. 0) write(*,*)                                   &
      &            'Test SPH transform for ', id_legendre_transfer
         call sel_init_legendre_trans                                    &
@@ -318,44 +340,88 @@
 !
       call MPI_allREDUCE (endtime, etime_trans, ntype_Leg_trans_loop,   &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call MPI_allREDUCE (endtime, etime_max, ntype_Leg_trans_loop,     &
+     &    CALYPSO_REAL, MPI_MAX, CALYPSO_COMM, ierr_MPI)
       etime_trans(1:ntype_Leg_trans_loop)                               &
      &      = etime_trans(1:ntype_Leg_trans_loop) / dble(nprocs)
 !
-      id_legendre_transfer = iflag_leg_orginal_loop
-      etime_shortest =       etime_trans(iflag_leg_orginal_loop)
-!
-      do iloop_type = 2, ntype_Leg_trans_loop
-        if(etime_trans(iloop_type) .lt. etime_shortest) then
-          id_legendre_transfer = iloop_type
-          etime_shortest =       etime_trans(iloop_type)
+      etime_shortest =  1.0d30
+      do iloop_type = 1, num_test
+        id = list_test(iloop_type)
+        if(etime_max(id) .lt. etime_shortest) then
+          id_legendre_transfer = id
+          etime_shortest =       etime_max(id)
         end if
       end do
 !
       if(my_rank .gt. 0) return
-        write(*,*) ' 1: elapsed by original loop:      ',               &
+        write(*,'(a)') 'Loop ID: type, maximum time, average time'
+        if(etime_trans(iflag_leg_orginal_loop) .gt. zero)               &
+     &  write(*,'(a,1p2e16.6)') ' 1: elapsed by original loop:      ',  &
+     &            etime_max(iflag_leg_orginal_loop),  &
      &            etime_trans(iflag_leg_orginal_loop)
-        write(*,*) ' 2: elapsed by blocked loop:      ',                &
+        if(etime_trans(iflag_leg_blocked) .gt. zero)                    &
+     &  write(*,'(a,1p2e16.6)') ' 2: elapsed by blocked loop:      ',   &
+     &            etime_max(iflag_leg_blocked),                         &
      &            etime_trans(iflag_leg_blocked)
-        write(*,*) ' 3: elapsed by inner radius loop:  ',               &
+        if(etime_trans(iflag_leg_krloop_inner) .gt. zero)               &
+     &  write(*,'(a,1p2e16.6)') ' 3: elapsed by inner radius loop:  ',  &
+     &            etime_max(iflag_leg_krloop_inner),                    &
      &            etime_trans(iflag_leg_krloop_inner)
-        write(*,*) ' 4: elapsed by outer radius loop:  ',               &
+        if(etime_trans(iflag_leg_krloop_outer) .gt. zero)               &
+     &  write(*,'(a,1p2e16.6)') ' 4: elapsed by outer radius loop:  ',  &
+     &            etime_max(iflag_leg_krloop_outer),                    &
      &            etime_trans(iflag_leg_krloop_outer)
-        write(*,*) ' 5: elapsed by original loop with symmetric: ',     &
+        if(etime_trans(iflag_leg_symmetry) .gt. zero)                   &
+     &  write(*,'(a,1p2e16.6)')                                         &
+     &          ' 5: elapsed by original loop with symmetric: ',        &
+     &            etime_max(iflag_leg_symmetry),                        &
      &            etime_trans(iflag_leg_symmetry)
-        write(*,*) ' 6: elapsed by sym. outer radius: ',                &
+        if(etime_trans(iflag_leg_sym_spin_loop) .gt. zero)              &
+     &  write(*,'(a,1p2e16.6)') ' 6: elapsed by sym. outer radius: ',   &
+     &            etime_max(iflag_leg_sym_spin_loop),                   &
      &            etime_trans(iflag_leg_sym_spin_loop)
-        write(*,*) ' 7: elapsed by matmul: ',                           &
+        if(etime_trans(iflag_leg_matmul) .gt. zero)                     &
+     &  write(*,'(a,1p2e16.6)') ' 7: elapsed by matmul: ',              &
+     &            etime_max(iflag_leg_matmul),                          &
      &            etime_trans(iflag_leg_matmul)
-        write(*,*) ' 8: elapsed by BLAS: ',                             &
+        if(etime_trans(iflag_leg_dgemm) .gt. zero)                      &
+     &  write(*,'(a,1p2e16.6)') ' 8: elapsed by BLAS: ',                &
+     &            etime_max(iflag_leg_dgemm),                           &
      &            etime_trans(iflag_leg_dgemm)
-        write(*,*) ' 9: elapsed by matrix product: ',                   &
+        if(etime_trans(iflag_leg_matprod) .gt. zero)                    &
+     &  write(*,'(a,1p2e16.6)') ' 9: elapsed by matrix product: ',      &
+     &            etime_max(iflag_leg_matprod),                         &
      &            etime_trans(iflag_leg_matprod)
-        write(*,*) '10: elapsed by matmul with symmetric: ',            &
+        if(etime_trans(iflag_leg_sym_matmul) .gt. zero)                 &
+     &  write(*,'(a,1p2e16.6)')                                         &
+     &          '10: elapsed by matmul with symmetric: ',               &
+     &            etime_max(iflag_leg_sym_matmul),                      &
      &            etime_trans(iflag_leg_sym_matmul)
-        write(*,*) '11: elapsed by BLAS with symmetric: ',              &
+        if(etime_trans(iflag_leg_sym_dgemm) .gt. zero)                  &
+     &  write(*,'(a,1p2e16.6)') '11: elapsed by BLAS with symmetric: ', &
+     &            etime_max(iflag_leg_sym_dgemm),                       &
      &            etime_trans(iflag_leg_sym_dgemm)
-        write(*,*) '12: elapsed by matrix prod. with symm.: ',          &
+        if(etime_trans(iflag_leg_sym_matprod) .gt. zero)                &
+     &  write(*,'(a,1p2e16.6)')                                         &
+     &          '12: elapsed by matrix prod. with symm.: ',             &
+     &            etime_max(iflag_leg_sym_matprod),                     &
      &            etime_trans(iflag_leg_sym_matprod)
+        if(etime_trans(iflag_leg_sym_matmul_big) .gt. zero)             &
+     &  write(*,'(a,1p2e16.6)')                                         &
+     &          '13: elapsed by big matmul with symmetric: ',           &
+     &            etime_max(iflag_leg_sym_matmul_big),                  &
+     &            etime_trans(iflag_leg_sym_matmul_big)
+        if(etime_trans(iflag_leg_sym_dgemm_big) .gt. zero)              &
+     &  write(*,'(a,1p2e16.6)')                                         &
+     &          '14: elapsed by big BLAS with symmetric: ',             &
+     &            etime_max(iflag_leg_sym_dgemm_big),                   &
+     &            etime_trans(iflag_leg_sym_dgemm_big)
+        if(etime_trans(iflag_leg_sym_matprod_big) .gt. zero)            &
+     &  write(*,'(a,1p2e16.6)')                                         &
+     &          '15: elapsed by big matrix prod. with symm.: ',         &
+     &            etime_max(iflag_leg_sym_matprod_big),                 &
+     &            etime_trans(iflag_leg_sym_matprod_big)
 !
       end subroutine select_legendre_transform
 !

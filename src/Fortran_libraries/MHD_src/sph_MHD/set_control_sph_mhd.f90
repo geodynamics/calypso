@@ -43,6 +43,7 @@
       use set_control_4_magne
       use set_control_4_composition
       use set_control_4_pickup_sph
+      use sph_mhd_rst_IO_control
       use output_parallel_ucd_file
       use check_read_bc_file
 !
@@ -55,7 +56,7 @@
       call set_control_smp_def(my_rank)
       call set_control_mesh_def
       call set_control_sph_mesh
-      call set_control_restart_file_def
+      call set_ctl_restart_4_sph_mhd
       call set_control_parallel_field_def
       call set_control_org_sph_mesh
       call set_control_org_fld_file_def

@@ -44,8 +44,13 @@ ifdef FFTW3_LIBS
   F90LIBS+= $$(FFTW3_LIBS)
 endif
 
+ifdef BLAS_LIBS
+  FORTRAN_C_CONNECT+= -DBLAS
+  F90LIBS+= $$(BLAS_LIBS)
+endif
+
 ifdef HDF5_FLIBS
-  FORTRAN_C_CONNECT += -DHDF5_IO
+  FORTRAN_C_CONNECT+= -DHDF5_IO
   F_INCLUDE+= $$(HDF5_FFLAGS)
   F90LIBS+= $$(HDF5_LDFLAGS) $$(HDF5_FLIBS)
 endif
@@ -112,6 +117,10 @@ makemake:
 	@echo 'F90LIBS =   $(F90LIBS)'   >> $(MAKENAME)
 	@echo 'F_INCLUDE = $(F_INCLUDE)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo '# BLAS settings' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@echo 'BLAS_LIBS =   $(BLAS_LIBS)'   >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo '# FFTW3 settings' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)

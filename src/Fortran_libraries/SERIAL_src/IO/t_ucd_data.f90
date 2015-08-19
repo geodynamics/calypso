@@ -22,10 +22,14 @@
 !!      subroutine deallocate_ucd_phys_name(ucd)
 !!      subroutine deallocate_ucd_data(ucd)
 !!      subroutine deallocate_ucd_mesh(ucd)
+!!      subroutine deallocate_parallel_ucd_mesh(ucd, m_ucd)
 !!
 !!      subroutine disconnect_ucd_node(ucd)
 !!      subroutine disconnect_ucd_data(ucd)
+!!      subroutine disconnect_ucd_mesh(ucd)
+!!      subroutine disconnect_merged_ucd_mesh(ucd, m_ucd)
 !!
+!!      subroutine disconnect_merged_ucd_stack(m_ucd)
 !!      subroutine dealloc_merged_ucd_stack(m_ucd)
 !!      subroutine dealloc_merged_hdt5_ele_list(m_ucd)
 !!      subroutine dealloc_merged_hdt5_array(m_ucd)
@@ -292,6 +296,21 @@
       end subroutine deallocate_ucd_mesh
 !
 ! -----------------------------------------------------------------------
+!
+      subroutine deallocate_parallel_ucd_mesh(ucd, m_ucd)
+!
+      type(ucd_data), intent(inout) :: ucd
+      type(merged_ucd_data), intent(inout) :: m_ucd
+!
+!
+      call deallocate_ucd_data(ucd)
+      call deallocate_ucd_ele(ucd)
+      call deallocate_ucd_node(ucd)
+      call dealloc_merged_ucd_stack(m_ucd)
+!
+      end subroutine deallocate_parallel_ucd_mesh
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine disconnect_ucd_node(ucd)
@@ -318,6 +337,48 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
+      subroutine disconnect_ucd_mesh(ucd)
+!
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      call disconnect_ucd_data(ucd)
+      call deallocate_ucd_ele(ucd)
+      call disconnect_ucd_node(ucd)
+!
+      end subroutine disconnect_ucd_mesh
+!
+! -----------------------------------------------------------------------
+!
+      subroutine disconnect_merged_ucd_mesh(ucd, m_ucd)
+!
+      type(ucd_data), intent(inout) :: ucd
+      type(merged_ucd_data), intent(inout) :: m_ucd
+!
+!
+      call disconnect_ucd_data(ucd)
+      call deallocate_ucd_ele(ucd)
+      call disconnect_ucd_node(ucd)
+      call disconnect_merged_ucd_stack(m_ucd)
+!
+      end subroutine disconnect_merged_ucd_mesh
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine disconnect_merged_ucd_stack(m_ucd)
+!
+      type(merged_ucd_data), intent(inout) :: m_ucd
+!
+!
+      nullify(m_ucd%istack_merged_nod)
+      nullify(m_ucd%istack_merged_ele)
+      nullify(m_ucd%istack_merged_intnod)
+!
+      end subroutine disconnect_merged_ucd_stack
+!
+! -----------------------------------------------------------------------
+!
       subroutine dealloc_merged_ucd_stack(m_ucd)
 !
       type(merged_ucd_data), intent(inout) :: m_ucd
@@ -329,6 +390,7 @@
 !
       end subroutine dealloc_merged_ucd_stack
 !
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine dealloc_merged_hdt5_ele_list(m_ucd)

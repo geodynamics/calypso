@@ -36,14 +36,13 @@
 !
       subroutine zonal_mean_all_rtp_field
 !
-      use m_geometry_parameter
       use m_geometry_data
       use m_node_phys_data
       use coordinate_convert_4_sph
 !
 !
       call cal_sph_zonal_ave_data                                       &
-     &   (numnod, num_tot_nod_phys, ione, d_nod)
+     &   (node1%numnod, num_tot_nod_phys, ione, d_nod)
       call overwrite_nodal_sph_2_xyz
 !
       end subroutine zonal_mean_all_rtp_field
@@ -52,14 +51,13 @@
 !
       subroutine zonal_rms_all_rtp_field
 !
-      use m_geometry_parameter
       use m_geometry_data
       use m_node_phys_data
       use coordinate_convert_4_sph
 !
 !
       call cal_sph_zonal_rms_data                                       &
-     &   (numnod, num_tot_nod_phys, ione, d_nod)
+     &   (node1%numnod, num_tot_nod_phys, ione, d_nod)
       call overwrite_nodal_sph_2_xyz
 !
       end subroutine zonal_rms_all_rtp_field
@@ -69,7 +67,6 @@
 !
       subroutine zonal_cyl_rms_all_rtp_field
 !
-      use m_geometry_parameter
       use m_geometry_data
       use m_node_phys_data
       use coordinate_convert_4_sph
@@ -77,7 +74,7 @@
 !
       call overwrite_nodal_sph_2_cyl
       call cal_sph_zonal_rms_data                                       &
-     &   (numnod, num_tot_nod_phys, ione, d_nod)
+     &   (node1%numnod, num_tot_nod_phys, ione, d_nod)
       call overwrite_nodal_cyl_2_xyz
 !
       end subroutine zonal_cyl_rms_all_rtp_field

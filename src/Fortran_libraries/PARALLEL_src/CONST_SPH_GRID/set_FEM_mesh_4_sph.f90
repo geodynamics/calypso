@@ -76,7 +76,6 @@
      &          node, ele)
 !
       use calypso_mpi
-      use m_geometry_parameter
       use t_geometry_data
       use m_spheric_parameter
       use m_spheric_global_ranks

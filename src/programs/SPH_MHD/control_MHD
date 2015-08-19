@@ -528,6 +528,11 @@ begin MHD_control
     volume_pwr_spectr_prefix     'sph_pwr_volume'
     layered_pwr_spectr_prefix    'sph_pwr_layer'
 !
+    degree_spectr_switch         'On'
+    order_spectr_switch          'On'
+    diff_lm_spectr_switch        'On'
+!
+    nusselt_number_prefix        'Nusselt'
     picked_sph_prefix            'sph_spectr/picked_mode'
     gauss_coefs_prefix           'sph_spectr/gauss_coefs'
 !

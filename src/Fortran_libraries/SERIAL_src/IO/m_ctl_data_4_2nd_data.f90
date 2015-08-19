@@ -1,38 +1,42 @@
+!>@file   m_ctl_data_4_2nd_data.f90
+!!@brief  module m_ctl_data_4_2nd_data
+!!
+!!@author H. Matsui
+!!@date Programmed in Oct., 2008
 !
-!      module m_ctl_data_4_2nd_data
-!
-!        programmed by H.Matsui on Oct., 2008
-!
-!
-!      subroutine read_ctl_data_4_new_data
-!
-!  ---------------------------------------------------------------------
-!
-!  begin new_data_files_def
-!    num_new_domain_ctl           2
-!
-!    new_mesh_prefix            'mesh_target/in'
-!    new_sph_mode_prefix        'sph_new/in_rj'
-!
-!    new_restart_prefix         'rst_new/rst'
-!
-!    new_field_file_prefix      'field_new/out'
-!    new_spectr_file_prefix     'spectr_new/spectr'
-!
-!    new_vtk_prefix             'outall'
-!
-!    new_dx_head_prefix         'outall'
-!    new_dx_data_prefix         'field_new/field'
-!
-!    new_mesh_file_fmt_ctl           'ascii'
-!    new_rst_files_fmt_ctl           'ascii'
-!    new_field_files_fmt_ctl         'ascii'
-!    new_sph_files_fmt_ctl           'ascii'
-!
-!    delete_original_data_flag       'YES'
-!  end new_data_files_def
-!
-!  ---------------------------------------------------------------------
+!>@brief  Control data for new file settings
+!!
+!!@verbatim
+!!      subroutine read_ctl_data_4_new_data
+!!
+!!  ---------------------------------------------------------------------
+!!
+!!  begin new_data_files_def
+!!    num_new_domain_ctl           2
+!!
+!!    new_mesh_prefix            'mesh_target/in'
+!!    new_sph_mode_prefix        'sph_new/in_rj'
+!!
+!!    new_restart_prefix         'rst_new/rst'
+!!
+!!    new_field_file_prefix      'field_new/out'
+!!    new_spectr_file_prefix     'spectr_new/spectr'
+!!
+!!    new_vtk_prefix             'outall'
+!!
+!!    new_dx_head_prefix         'outall'
+!!    new_dx_data_prefix         'field_new/field'
+!!
+!!    new_mesh_file_fmt_ctl           'ascii'
+!!    new_rst_files_fmt_ctl           'ascii'
+!!    new_field_files_fmt_ctl         'ascii'
+!!    new_sph_files_fmt_ctl           'ascii'
+!!
+!!    delete_original_data_flag       'YES'
+!!  end new_data_files_def
+!!
+!!  ---------------------------------------------------------------------
+!!@endverbatim
 !
       module m_ctl_data_4_2nd_data
 !

@@ -49,12 +49,17 @@
       integer(kind = kint) :: inum, nd, k1
 !
 !
+      if(ntot_psf .le. 0) return
+!$omp parallel private(nd)
       do nd = 1, ncomp_dat
+!$omp do private(inum,k1)
         do inum = 1, ntot_psf
           k1 = (nd-1)*ntot_psf + inum
           send(k1) = dat_psf(inum,nd)
         end do
+!$omp end do nowait
       end do
+!$omp end parallel
 !
       end subroutine set_real_data_2_send_psf
 !
@@ -71,12 +76,17 @@
       integer(kind = kint) :: inum, nd, k1
 !
 !
+      if(ntot_psf .le. 0) return
+!$omp parallel private(nd)
       do nd = 1, ncomp_dat
+!$omp do private(inum,k1)
         do inum = 1, ntot_psf
           k1 = (nd-1)*ntot_psf + inum
           isend(k1) = ie_psf(inum,nd)
         end do
+!$omp end do nowait
       end do
+!$omp end parallel
 !
       end subroutine set_int_data_2_send_psf
 !

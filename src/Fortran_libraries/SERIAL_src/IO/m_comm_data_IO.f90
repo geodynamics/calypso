@@ -1,25 +1,30 @@
+!>@file   m_comm_data_IO.f90
+!!@brief  module m_comm_data_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!      module m_comm_data_IO
-!
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine allocate_neib_comm_stack_IO
-!      subroutine allocate_comm_item_IO
-!      subroutine deallocate_comm_item_IO
-!
-!      subroutine allocate_neib_domain_IO
-!      subroutine allocate_import_stack_IO
-!      subroutine allocate_export_stack_IO
-!      subroutine allocate_import_item_IO
-!      subroutine allocate_export_item_IO
-!      subroutine allocate_import_work_IO
-!      subroutine allocate_export_work_IO
-!
-!      subroutine deallocate_neib_domain_IO
-!      subroutine deallocate_import_item_IO
-!      subroutine deallocate_export_item_IO
-!      subroutine deallocate_import_work_IO
-!      subroutine deallocate_export_work_IO
+!>@brief Array for communication table IO
+!!
+!!@verbatim
+!!      subroutine allocate_neib_comm_stack_IO
+!!      subroutine allocate_comm_item_IO
+!!      subroutine deallocate_comm_item_IO
+!!
+!!      subroutine allocate_neib_domain_IO
+!!      subroutine allocate_import_stack_IO
+!!      subroutine allocate_export_stack_IO
+!!      subroutine allocate_import_item_IO
+!!      subroutine allocate_export_item_IO
+!!      subroutine allocate_import_work_IO
+!!      subroutine allocate_export_work_IO
+!!
+!!      subroutine deallocate_neib_domain_IO
+!!      subroutine deallocate_import_item_IO
+!!      subroutine deallocate_export_item_IO
+!!      subroutine deallocate_import_work_IO
+!!      subroutine deallocate_export_work_IO
+!!@verbatim
 !
       module m_comm_data_IO
 !

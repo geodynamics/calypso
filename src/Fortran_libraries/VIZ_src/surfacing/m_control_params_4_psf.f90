@@ -49,7 +49,7 @@
 !
       allocate(id_psf_group(num_psf))
 !
-      itype_psf_file =   iflag_udt
+      itype_psf_file =   iflag_sgl_udt
       id_section_method =  0
       id_psf_group =       0
 !
@@ -65,10 +65,10 @@
 !
       use m_error_IDs
       use m_control_data_4_psf
-      use m_field_file_format
       use m_file_format_switch
       use t_phys_data
       use t_psf_patch_data
+      use parallel_ucd_IO_select
       use set_area_4_viz
       use set_field_comp_for_viz
 !
@@ -92,12 +92,12 @@
         psf_header(i_psf) =  'psf'
       end if
 !
-      call choose_ucd_file_format(psf%psf_output_type_ctl,              &
+      call choose_para_fld_file_format(psf%psf_output_type_ctl,         &
      &    psf%i_psf_out_type, itype_psf_file(i_psf) )
 !
       call check_field_4_viz(num_nod_phys, phys_nod_name,               &
      &   psf%psf_out_field_ctl%num, psf%psf_out_field_ctl%c1_tbl,       &
-     &   psf_fld%num_phys)
+     &   psf_fld%num_phys, psf_fld%num_phys_viz)
 !
       call count_area_4_viz(num_mat, mat_name,                          &
      &    psf%psf_area_ctl%num, psf%psf_area_ctl%c_tbl,                 &

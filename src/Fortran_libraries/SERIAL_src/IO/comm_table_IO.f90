@@ -1,24 +1,28 @@
+!>@file   comm_table_IO.f90
+!!@brief  module comm_table_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!      module comm_table_IO
-!
-!     Written by H. Matsui on July, 2007
-!
-!
-!      subroutine read_send_recv_item(id_file, ntot_sr, inod_sr)
-!      subroutine read_send_recv_work(id_file, ntot_sr, nwork,          &
-!     &          inod_sr, idx_work)
-!      subroutine write_send_recv_data(id_file, num_sr, ntot_sr,        &
-!     &          istack_sr, inod_sr)
-!      subroutine write_send_recv_work(id_file, num_sr, ntot_sr, nwork, &
-!     &          istack_sr, inod_sr, idx_work)
-!
-!      subroutine read_send_recv_item_b(id_file, ntot_sr, inod_sr)
-!      subroutine read_send_recv_work_b(id_file, ntot_sr, nwork,        &
-!     &          inod_sr, idx_work)
-!      subroutine write_send_recv_data_b(id_file, num_sr, ntot_sr,      &
-!     &          istack_sr, inod_sr)
-!      subroutine write_send_recv_work_b(id_file, num_sr, ntot_sr,      &
-!     &          nwork, istack_sr, inod_sr, idx_work)
+!>@brief  Routines for communcation table IO
+!!
+!!@verbatim
+!!      subroutine read_send_recv_item(id_file, ntot_sr, inod_sr)
+!!      subroutine read_send_recv_work(id_file, ntot_sr, nwork,         &
+!!     &          inod_sr, idx_work)
+!!      subroutine write_send_recv_data(id_file, num_sr, ntot_sr,       &
+!!     &          istack_sr, inod_sr)
+!!      subroutine write_send_recv_work(id_file, num_sr, ntot_sr, nwork,&
+!!     &          istack_sr, inod_sr, idx_work)
+!!
+!!      subroutine read_send_recv_item_b(id_file, ntot_sr, inod_sr)
+!!      subroutine read_send_recv_work_b(id_file, ntot_sr, nwork,       &
+!!     &          inod_sr, idx_work)
+!!      subroutine write_send_recv_data_b(id_file, num_sr, ntot_sr,     &
+!!     &          istack_sr, inod_sr)
+!!      subroutine write_send_recv_work_b(id_file, num_sr, ntot_sr,     &
+!!     &          nwork, istack_sr, inod_sr, idx_work)
+!!@endverbatim
 !
       module comm_table_IO
 !

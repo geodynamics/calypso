@@ -42,7 +42,7 @@
       subroutine share_sph_rj_data(np_sph_org, org_sph_mesh)
 !
       use m_node_id_spherical_IO
-      use m_merge_spheric_mesh
+      use new_SPH_restart
 !
       integer(kind = kint), intent(in) :: np_sph_org
       type(sph_mesh_data), intent(inout) :: org_sph_mesh(np_sph_org)
@@ -60,16 +60,22 @@
 !
       do ip = 1, np_sph_org
         irank_org = mod(ip - 1,nprocs)
+!        write(*,*) 'MPI_Bcast sph_rank_rj', ip
         call MPI_Bcast(org_sph_mesh(ip)%sph_mesh%sph_rj%sph_rank_rj,    &
      &      itwo, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast nidx_global_rj', ip
         call MPI_Bcast(org_sph_mesh(ip)%sph_mesh%sph_rj%nidx_global_rj, &
      &      itwo, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast nnod_rj', ip
         call MPI_Bcast(org_sph_mesh(ip)%sph_mesh%sph_rj%nnod_rj,        &
      &      ione, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast nidx_rj', ip
         call MPI_Bcast(org_sph_mesh(ip)%sph_mesh%sph_rj%nidx_rj,        &
      &      itwo, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast ist_rj', ip
         call MPI_Bcast(org_sph_mesh(ip)%sph_mesh%sph_rj%ist_rj,         &
      &      itwo, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast ied_rj', ip
         call MPI_Bcast(org_sph_mesh(ip)%sph_mesh%sph_rj%ied_rj,         &
      &      itwo, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
       end do
@@ -85,16 +91,20 @@
 !
       do ip = 1, np_sph_org
         irank_org = mod(ip - 1,nprocs)
+!        write(*,*) 'MPI_Bcast idx_global_rj', ip
         call MPI_Bcast(org_sph_mesh(ip)%sph_mesh%sph_rj%idx_global_rj,  &
      &      itwo*org_sph_mesh(ip)%sph_mesh%sph_rj%nnod_rj,              &
      &      CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
 !
+!        write(*,*) 'MPI_Bcast radius_1d_rj_r', ip
         call MPI_Bcast(org_sph_mesh(ip)%sph_mesh%sph_rj%radius_1d_rj_r, &
      &      org_sph_mesh(ip)%sph_mesh%sph_rj%nidx_rj(1),                &
      &      CALYPSO_REAL, irank_org, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast idx_gl_1d_rj_r', ip
         call MPI_Bcast(org_sph_mesh(ip)%sph_mesh%sph_rj%idx_gl_1d_rj_r, &
      &      org_sph_mesh(ip)%sph_mesh%sph_rj%nidx_rj(1),                &
      &      CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast idx_gl_1d_rj_j', ip
         call MPI_Bcast(org_sph_mesh(ip)%sph_mesh%sph_rj%idx_gl_1d_rj_j, &
      &      ithree*org_sph_mesh(ip)%sph_mesh%sph_rj%nidx_rj(2),         &
      &      CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
@@ -116,30 +126,38 @@
 !
 !
       do ip = 1, np_sph_org
+!        write(*,*) 'MPI_Bcast num_phys', ip
         call MPI_Bcast(org_sph_phys(ip)%num_phys, ione,                 &
      &      CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast ntot_phys', ip
         call MPI_Bcast(org_sph_phys(ip)%ntot_phys, ione,                &
      &      CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
 !
         if(my_rank .ne. 0) call alloc_phys_name_type(org_sph_phys(ip))
 !
+!        write(*,*) 'MPI_Bcast num_component', ip
         call MPI_Bcast(org_sph_phys(ip)%num_component,                  &
      &      org_sph_phys(ip)%num_phys, CALYPSO_INTEGER,                 &
      &      izero, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast istack_component', ip
         call MPI_Bcast(org_sph_phys(ip)%istack_component,               &
      &      (org_sph_phys(ip)%num_phys+1),                              &
      &      CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast iflag_monitor', ip
         call MPI_Bcast(org_sph_phys(ip)%iflag_monitor,                  &
      &      org_sph_phys(ip)%num_phys, CALYPSO_INTEGER,                 &
      &      izero, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast phys_name', ip
         call MPI_Bcast(org_sph_phys(ip)%phys_name,                      &
      &     (org_sph_phys(ip)%num_phys*kchara),                          &
      &      CALYPSO_CHARACTER, izero, CALYPSO_COMM, ierr_MPI)
       end do
 !
 !
+!        write(*,*) 'MPI_Bcast num_phys', ip
       call MPI_Bcast(new_sph_phys(1)%num_phys, ione, CALYPSO_INTEGER,   &
      &    izero, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast ntot_phys', ip
       call MPI_Bcast(new_sph_phys(1)%ntot_phys, ione, CALYPSO_INTEGER,  &
      &    izero, CALYPSO_COMM, ierr_MPI)
 !
@@ -147,15 +165,19 @@
         call alloc_phys_name_type(new_sph_phys(1))
       end if
 !
+!        write(*,*) 'MPI_Bcast num_component', ip
       call MPI_Bcast(new_sph_phys(1)%num_component,                     &
      &    new_sph_phys(1)%num_phys, CALYPSO_INTEGER,                    &
      &    izero, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast istack_component', ip
       call MPI_Bcast(new_sph_phys(1)%istack_component,                  &
      &    (new_sph_phys(1)%num_phys+1),                                 &
      &    CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast iflag_monitor', ip
       call MPI_Bcast(new_sph_phys(1)%iflag_monitor,                     &
      &    new_sph_phys(1)%num_phys, CALYPSO_INTEGER,                    &
      &    izero, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast phys_name', ip
       call MPI_Bcast(new_sph_phys(1)%phys_name,                         &
      &   (new_sph_phys(1)%num_phys*kchara),                             &
      &    CALYPSO_CHARACTER, izero, CALYPSO_COMM, ierr_MPI)
@@ -204,11 +226,18 @@
 !
       call MPI_Bcast(r_itp%iflag_same_rgrid, ione, CALYPSO_INTEGER,     &
      &    izero, CALYPSO_COMM, ierr_MPI)
+      call MPI_Bcast(new_sph_mesh(1)%sph_mesh%sph_rj%nidx_rj(1),        &
+     &    ione, CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
+      if(my_rank .eq. 0) write(*,*) 'iflag_same_rgrid: ',               &
+     &            r_itp%iflag_same_rgrid,                               &
+     &            new_sph_mesh(1)%sph_mesh%sph_rj%nidx_rj(1)
 !
       if(r_itp%iflag_same_rgrid .eq. 0) then
         if(my_rank .ne. 0)  call allocate_radial_itp_tbl                &
      &             (new_sph_mesh(1)%sph_mesh%sph_rj%nidx_rj(1), r_itp)
 !
+        call MPI_Bcast(r_itp%nri_old2new, ione, CALYPSO_INTEGER,        &
+     &      izero, CALYPSO_COMM, ierr_MPI)
         call MPI_Bcast(r_itp%kr_inner_domain, ione, CALYPSO_INTEGER,    &
      &      izero, CALYPSO_COMM, ierr_MPI)
         call MPI_Bcast(r_itp%kr_outer_domain, ione, CALYPSO_INTEGER,    &

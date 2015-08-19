@@ -1,30 +1,32 @@
+!>@file   m_ctl_data_4_org_data.f90
+!!@brief  module m_ctl_data_4_org_data
+!!
+!!@author H. Matsui
+!!@date Programmed in Oct., 2008
 !
-!      module m_ctl_data_4_org_data
-!
-!        programmed by H.Matsui on Oct., 2008
-!
-!
-!      subroutine read_ctl_data_4_org_data
-!
-!  ---------------------------------------------------------------------
-!
-!  begin org_data_files_def
-!    num_org_domain_ctl           2
-!    org_mesh_head_ctl           'mesh_target/in'
-!    orginal_sph_file_prefix     'sph_org/in_rj'
-!
-!    orginal_restart_prefix      'rst_org/rst'
-!
-!    org_field_file_head_ctl     'field_org/out'
-!    org_spectr_file_head_ctl    'spectr_org/spectr'
-!
-!    org_mesh_file_fmt_ctl           'ascii'
-!    org_restart_file_fmt_ctl        'ascii'
-!    org_field_file_fmt_ctl          'ascii'
-!    org_sph_file_fmt_ctl            'ascii'
-!  end org_data_files_def
-!
-!  ---------------------------------------------------------------------
+!>@brief  Structure for reading parameters for original mesh
+!!
+!!@verbatim
+!!  ---------------------------------------------------------------------
+!!
+!!  begin org_data_files_def
+!!    num_org_domain_ctl           2
+!!    org_mesh_head_ctl           'mesh_target/in'
+!!    orginal_sph_file_prefix     'sph_org/in_rj'
+!!
+!!    orginal_restart_prefix      'rst_org/rst'
+!!
+!!    org_field_file_head_ctl     'field_org/out'
+!!    org_spectr_file_head_ctl    'spectr_org/spectr'
+!!
+!!    org_mesh_file_fmt_ctl           'ascii'
+!!    org_restart_file_fmt_ctl        'ascii'
+!!    org_field_file_fmt_ctl          'ascii'
+!!    org_sph_file_fmt_ctl            'ascii'
+!!  end org_data_files_def
+!!
+!!  ---------------------------------------------------------------------
+!!@endverbatim
 !
       module m_ctl_data_4_org_data
 !
@@ -33,19 +35,29 @@
 !
       implicit  none
 !
+!>      number of subdomains for original mesh
       type(read_integer_item), save :: num_org_domain_ctl
 !
+!>      prefix for original mesh
       type(read_character_item), save :: org_mesh_head_ctl
+!>      prefix for original spherical harmonics index
       type(read_character_item), save :: org_sph_mode_head_ctl
 !
+!>      prefix for original restart data
       type(read_character_item), save :: orginal_restart_prefix
 !
+!>      prefix for original field data
       type(read_character_item), save :: org_udt_head_ctl
+!>      prefix for original spectrum data
       type(read_character_item), save :: org_spectr_file_head_ctl
 !
+!>      file format for original mesh
       type(read_character_item), save :: org_mesh_file_fmt_ctl
+!>      file format for original spherical harmonics index
       type(read_character_item), save :: org_sph_file_fmt_ctl
+!>      file format for original restart data
       type(read_character_item), save :: org_restart_file_fmt_ctl
+!>      file format for original field data
       type(read_character_item), save :: org_udt_file_fmt_ctl
 !
 !  label for group entry

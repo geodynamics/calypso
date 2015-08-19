@@ -6,7 +6,7 @@
 !      subroutine allocate_fluid_node_list
 !      subroutine allocate_conduct_node_list
 !      subroutine allocate_inner_core_ele_list
-!      subroutine allocate_element_connect_org
+!      subroutine allocate_element_connect_org(numele, nnod_4_ele)
 !
 !      subroutine allocate_geometry_fluid_smp
 !      subroutine allocate_geometry_conduct_smp
@@ -188,9 +188,9 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine allocate_element_connect_org
+      subroutine allocate_element_connect_org(numele, nnod_4_ele)
 !
-      use m_geometry_parameter
+      integer(kind = kint), intent(in) :: numele, nnod_4_ele
 !
 !
       allocate(iele_global_org(numele))
@@ -384,4 +384,3 @@
 ! ----------------------------------------------------------------------
 !
       end module m_geometry_data_MHD
-

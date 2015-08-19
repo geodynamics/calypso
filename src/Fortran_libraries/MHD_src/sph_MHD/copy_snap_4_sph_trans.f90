@@ -149,7 +149,7 @@
       use m_addresses_trans_sph_snap
       use m_spheric_parameter
       use m_spheric_param_smp
-      use m_geometry_parameter
+      use m_geometry_data
       use m_node_phys_data
       use sel_fld_copy_4_sph_trans
 !
@@ -159,7 +159,7 @@
       if( (i_field*i_trns) .le. 0) return
       call copy_scalar_from_trans                                       &
      &   (nnod_rtp, m_folding, inod_rtp_smp_stack,                      &
-     &    numnod, fls_rtp(1,i_trns), d_nod(1,i_field) )
+     &    node1%numnod, fls_rtp(1,i_trns), d_nod(1,i_field) )
 !
       end subroutine copy_scalar_from_snap_trans
 !
@@ -170,7 +170,7 @@
       use m_addresses_trans_sph_snap
       use m_spheric_parameter
       use m_spheric_param_smp
-      use m_geometry_parameter
+      use m_geometry_data
       use m_node_phys_data
       use sel_fld_copy_4_sph_trans
 !
@@ -180,7 +180,7 @@
       if( (i_field*i_trns) .le. 0) return
       call copy_vector_from_trans                                       &
      &   (nnod_rtp, m_folding, inod_rtp_smp_stack,                      &
-     &    numnod, fls_rtp(1,i_trns), d_nod(1,i_field) )
+     &    node1%numnod, fls_rtp(1,i_trns), d_nod(1,i_field) )
 !
       end subroutine copy_vector_from_snap_trans
 !
@@ -192,7 +192,6 @@
       use m_addresses_trans_sph_snap
       use m_spheric_parameter
       use m_spheric_param_smp
-      use m_geometry_parameter
       use m_geometry_data
       use m_node_phys_data
       use sel_fld_copy_4_sph_trans
@@ -203,7 +202,7 @@
       if( (i_field*i_trns) .le. 0) return
       call copy_scalar_from_trans                                       &
      &   (nnod_rtp, m_folding, inod_rtp_smp_stack,                      &
-     &    numnod, frs_rtp(1,i_trns), d_nod(1,i_field) )
+     &    node1%numnod, frs_rtp(1,i_trns), d_nod(1,i_field) )
 !
       end subroutine copy_scalar_from_snap_force
 !
@@ -214,7 +213,7 @@
       use m_addresses_trans_sph_snap
       use m_spheric_parameter
       use m_spheric_param_smp
-      use m_geometry_parameter
+      use m_geometry_data
       use m_node_phys_data
       use sel_fld_copy_4_sph_trans
 !
@@ -224,7 +223,7 @@
       if( (i_field*i_trns) .le. 0) return
       call copy_vector_from_trans                                       &
      &   (nnod_rtp, m_folding, inod_rtp_smp_stack,                      &
-     &    numnod, frs_rtp(1,i_trns), d_nod(1,i_field) )
+     &    node1%numnod, frs_rtp(1,i_trns), d_nod(1,i_field) )
 !
       end subroutine copy_vector_from_snap_force
 !

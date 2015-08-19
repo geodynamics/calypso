@@ -1,27 +1,33 @@
-!set_reference_temp_sph.f90
-!      module set_reference_temp_sph
+!>@file   set_reference_temp_sph.f90
+!!@brief  module set_reference_temp_sph
+!!
+!!@author H. Matsui
+!!@date Programmed June., 1994
+!!@date Modified Apr., 2009
 !
-!      Programmed by H. Matsui on June., 1994
-!      modified by H. Matsui on Apr., 2009
-!
-!      subroutine set_reftemp_4_sph
-!***********************************************************************
-!*
-!*     ref_temp(k,0) : reference of temperature  (output)
-!*     ref_temp(k,1) : dT_0 / dr
-!*
-!*                          c2
-!*      ref_temp(k) = c1 + ------
-!*                          r(k)
-!*
-!*                      dto(k)
-!*     dref_temp(k) = ---------
-!*                        dr
-!*                         c2
-!*                  = - --------
-!*                        rs(k)
-!*
-!***********************************************************************
+!> @brief Set diffusive temperature profile
+!!@n      with fixed temperature boundary
+!!
+!!@verbatim
+!!      subroutine set_reftemp_4_sph
+!!***********************************************************************
+!!*
+!!*     ref_temp(k,0) : reference of temperature  (output)
+!!*     ref_temp(k,1) : dT_0 / dr
+!!*
+!!*                          c2
+!!*      ref_temp(k) = c1 + ------
+!!*                          r(k)
+!!*
+!!*                      dto(k)
+!!*     dref_temp(k) = ---------
+!!*                        dr
+!!*                         c2
+!!*                  = - --------
+!!*                        rs(k)
+!!*
+!!***********************************************************************
+!!@endverbatim
 !
       module set_reference_temp_sph
 !

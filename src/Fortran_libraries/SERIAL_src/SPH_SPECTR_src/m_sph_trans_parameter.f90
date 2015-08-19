@@ -1,9 +1,14 @@
+!>@file   m_sph_trans_parameter.f90
+!!@brief  module m_sph_trans_parameter
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007 
 !
-!      module m_sph_trans_parameter
-!
-!      Written by H. Matsui on July, 2007
-!
-!      subroutine set_local_sph_dimension(my_rank)
+!>@brief  Work parameters for parallelization of spherical harmonics
+!!
+!!@verbatim
+!!      subroutine set_local_sph_dimension(my_rank)
+!!@endverbatim
 !
       module m_sph_trans_parameter
 !

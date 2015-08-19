@@ -105,7 +105,7 @@
       call set_parallel_ucd_file_name(ucd%file_prefix, iflag_vtk,       &
      &    my_rank, istep, file_name)
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii VTK file: ', trim(file_name)
 !
       call write_vtk_file(file_name, id_vtk_file, ucd)
@@ -127,7 +127,7 @@
       call set_parallel_ucd_file_name(ucd%file_prefix, iflag_vtd,       &
      &    my_rank, istep, file_name)
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii VTK fields: ', trim(file_name)
 !
       call write_vtk_phys(file_name, id_vtk_file, ucd)
@@ -149,7 +149,7 @@
       call set_parallel_grd_file_name(ucd%file_prefix, iflag_vtd,       &
      &    my_rank, file_name)
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii VTK mesh: ', trim(file_name)
 !
       call write_vtk_grid(file_name, id_vtk_file, ucd)

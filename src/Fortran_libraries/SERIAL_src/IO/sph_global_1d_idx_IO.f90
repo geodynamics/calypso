@@ -1,13 +1,18 @@
-!sph_global_1d_idx_IO.f90
-!      module sph_global_1d_idx_IO
+!>@file  sph_global_1d_idx_IO.f90
+!!       module sph_global_1d_idx_IO
+!!
+!!@author H. Matsui
+!!@date        programmed by H.Matsui in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine read_rtp_gl_1d_table(id_file)
-!      subroutine read_rj_gl_1d_table(id_file)
-!
-!      subroutine write_rtp_gl_1d_table(id_file)
-!      subroutine write_rj_gl_1d_table(id_file)
+!> @brief BAse routines for spectr indexing data IO
+!!
+!!@verbatim
+!!      subroutine read_rtp_gl_1d_table(id_file)
+!!      subroutine read_rj_gl_1d_table(id_file)
+!!
+!!      subroutine write_rtp_gl_1d_table(id_file)
+!!      subroutine write_rj_gl_1d_table(id_file)
+!!@endverbatim
 !
       module sph_global_1d_idx_IO
 !

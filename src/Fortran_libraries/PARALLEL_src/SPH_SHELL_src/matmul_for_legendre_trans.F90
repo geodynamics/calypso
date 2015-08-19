@@ -87,6 +87,7 @@
       real(kind = kreal), intent(inout) :: S_kj(nkr,n_jk)
 !
 !
+      if(nkr .eq. 0) return
       S_kj = matmul(V_kl,P_lj)
 !
       end subroutine matmul_fwd_leg_trans
@@ -109,11 +110,11 @@
 !
       do jj = 1, n_jk
         do kk = 1, nkr
-          s = 0.0d0
+          s = coef * S_kj(kk,jj)
           do ll = 1, nl_rtm
             s = s + P_lj(ll,jj) * V_kl(kk,ll)
           end do
-          S_kj(kk,jj) = coef * S_kj(kk,jj) + s
+          S_kj(kk,jj) = s
         end do
       end do
 !
@@ -132,6 +133,7 @@
       real(kind = kreal), intent(inout) :: S_kj(nkr,n_jk)
 !
 !
+      if(nkr .eq. 0) return
       S_kj(1:nkr,1:n_jk) = coef * S_kj(1:nkr,1:n_jk)                    &
      &         +  matmul(V_kl(1:nkr,1:nl_rtm), P_lj(1:nl_rtm,1:n_jk))
 !
@@ -152,6 +154,7 @@
       integer :: n_jk4, nkr4, nl_rtm4
 !
 !
+      if(nkr .eq. 0) return
 #ifdef BLAS
       nkr4 =    int(nkr)
       n_jk4 =   int(n_jk)
@@ -205,6 +208,7 @@
       real(kind = kreal), intent(inout) :: V_lk(nl_rtm,nkr)
 !
 !
+      if(nkr .eq. 0) return
       V_lk = matmul(P_lj,S_jk)
 !
       end subroutine matmul_bwd_leg_trans
@@ -250,6 +254,7 @@
       real(kind = kreal), intent(inout) :: V_lk(nl_rtm,nkr)
 !
 !
+      if(nkr .eq. 0) return
       V_lk(1:nl_rtm,1:nkr) = coef * V_lk(1:nl_rtm,1:nkr)                &
      &       + matmul(P_lj(1:nl_rtm,1:n_jk), S_jk(1:n_jk,1:nkr))
 !
@@ -270,6 +275,7 @@
       integer :: n_jk4, nkr4, nl_rtm4
 !
 !
+      if(nkr .eq. 0) return
 #ifdef BLAS
       if(n_jk .eq. 0) then
         V_lk = 0.0d0

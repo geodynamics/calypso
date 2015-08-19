@@ -73,7 +73,7 @@
 !>      Spectr data for circle point collected to 0 process
       real(kind = kreal), allocatable :: vrtm_phase(:,:)
 !
-!>       Structure for field data on circle
+!>       Structure of field data on circle
       type(phys_data), save :: d_circle
 !
       private :: id_circ_fid, id_circ_sq, id_circ_ph

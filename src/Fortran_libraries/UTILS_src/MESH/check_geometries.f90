@@ -20,7 +20,6 @@
       use m_precision
 !
       use m_machine_parameter
-      use m_geometry_parameter
       use m_geometry_data
 !
       implicit  none
@@ -38,11 +37,11 @@
 !
 !
       write(50+my_rank,*) 'numnod, internal_node'
-      write(50+my_rank,'(2i16)') numnod, internal_node
+      write(50+my_rank,'(2i16)') node1%numnod, node1%internal_node
 !
       write(50+my_rank,*) 'inod, position'
-      do inod = 1, numnod
-        write(50+my_rank,'(i16,1p3e25.14)') inod, xx(inod,1:3)
+      do inod = 1, node1%numnod
+        write(50+my_rank,'(i16,1p3e25.14)') inod, node1%xx(inod,1:3)
       end do
 !
       end subroutine check_node_data
@@ -56,11 +55,12 @@
       integer(kind = kint) :: iele
 !
       write(50+my_rank,*) 'numele, nnod_4_ele'
-      write(50+my_rank,'(2i16)') numele, nnod_4_ele
+      write(50+my_rank,'(2i16)') ele1%numele, ele1%nnod_4_ele
 !
       write(50+my_rank,*) 'iele, connection'
-      do iele = 1, numele
-        write(50+my_rank,'(28i16)') iele, ie(iele,1:nnod_4_ele)
+      do iele = 1, ele1%numele
+        write(50+my_rank,'(28i16)')                                     &
+     &         iele, ele1%ie(iele,1:ele1%nnod_4_ele)
       end do
 !
       end subroutine check_element_data
@@ -76,20 +76,21 @@
 !
 !
       write(50+my_rank,*) 'numsurf, nnod_4_surf'
-      write(50+my_rank,'(2i16)') numsurf, nnod_4_surf
+      write(50+my_rank,'(2i16)') surf1%numsurf, surf1%nnod_4_surf
 !
       write(50+my_rank,*) 'isurf, connection'
-      do isurf = 1, numsurf
-        write(50+my_rank,'(10i16)') isurf, ie_surf(isurf,1:nnod_4_surf)
+      do isurf = 1, surf1%numsurf
+        write(50+my_rank,'(10i16)')                                     &
+     &            isurf, surf1%ie_surf(isurf,1:surf1%nnod_4_surf)
       end do
 !
       write(50+my_rank,*) 'numele, nsurf_4_ele'
-      write(50+my_rank,'(2i16)') numele, nsurf_4_ele
+      write(50+my_rank,'(2i16)') ele1%numele, nsurf_4_ele
       write(50+my_rank,*) 'iele, edge ID for surface'
 !
-      do iele = 1, numele
+      do iele = 1, ele1%numele
         write(50+my_rank,'(7i16)')                                     &
-     &            iele, isf_4_ele(iele,1:nsurf_4_ele)
+     &            iele, surf1%isf_4_ele(iele,1:nsurf_4_ele)
       end do
 !
 !
@@ -106,21 +107,22 @@
 !
 !
       write(50+my_rank,*) 'numedge, nnod_4_edge'
-      write(50+my_rank,'(2i16)') numedge, nnod_4_edge
+      write(50+my_rank,'(2i16)') edge1%numedge, edge1%nnod_4_edge
 !
       write(50+my_rank,*) 'iedge, connection'
-      do iedge = 1, numedge
-        write(50+my_rank,'(4i16)') iedge, ie_edge(iedge,1:nnod_4_edge)
+      do iedge = 1, edge1%numedge
+        write(50+my_rank,'(4i16)')                                      &
+     &             iedge, edge1%ie_edge(iedge,1:edge1%nnod_4_edge)
       end do
 !
 !
       write(50+my_rank,*) 'numsurf, nedge_4_surf'
-      write(50+my_rank,'(2i16)') numsurf, nedge_4_surf
+      write(50+my_rank,'(2i16)') surf1%numsurf, nedge_4_surf
       write(50+my_rank,*) 'isurf, edge ID for surface'
 !
-      do isurf = 1, numsurf
+      do isurf = 1, surf1%numsurf
         write(50+my_rank,'(5i16)')                                      &
-     &            isurf, iedge_4_sf(isurf,1:nedge_4_surf)
+     &            isurf, edge1%iedge_4_sf(isurf,1:nedge_4_surf)
       end do
 !
       end subroutine check_edge_data
@@ -136,12 +138,12 @@
 !
 !
       write(50+my_rank,*) 'numele, nedge_4_ele'
-      write(50+my_rank,'(2i16)') numele, nedge_4_ele
+      write(50+my_rank,'(2i16)') ele1%numele, nedge_4_ele
       write(50+my_rank,*) 'isurf, edge ID for surface'
 !
-      do iele = 1, numele
+      do iele = 1, ele1%numele
         write(50+my_rank,'(13i16)')                                     &
-     &            iele, iedge_4_ele(iele,1:nedge_4_ele)
+     &            iele, edge1%iedge_4_ele(iele,1:nedge_4_ele)
       end do
 !
       end subroutine check_edge_hexa_data
@@ -154,10 +156,11 @@
       integer(kind = kint), intent(in) :: my_rank
 !
 !
-      write(50+my_rank,*) 'numsurf_ext', numsurf_ext
+      write(50+my_rank,*) 'numsurf_ext', surf1%numsurf_ext
 !
       write(50+my_rank,*) 'isf_external'
-      write(50+my_rank,'(8i16)') isf_external(1:numsurf_ext)
+      write(50+my_rank,'(8i16)')                                        &
+     &         surf1%isf_external(1:surf1%numsurf_ext)
 !
       end subroutine check_external_surface
 !
@@ -168,10 +171,10 @@
       integer(kind = kint), intent(in) :: my_rank
 !
 !
-      write(50+my_rank,*) 'numsurf_iso', numsurf_iso
+      write(50+my_rank,*) 'numsurf_iso', surf1%numsurf_iso
 !
       write(50+my_rank,*) 'isf_isolate'
-      write(50+my_rank,'(8i16)') isf_isolate(1:numsurf_iso)
+      write(50+my_rank,'(8i16)') surf1%isf_isolate(1:surf1%numsurf_iso)
 !
       end subroutine check_iso_surface
 !
@@ -182,10 +185,11 @@
       integer(kind = kint), intent(in) :: my_rank
 !
 !
-      write(50+my_rank,*) 'numedge_iso', numedge_iso
+      write(50+my_rank,*) 'numedge_iso', edge1%numedge_iso
 !
       write(50+my_rank,*) 'iedge_isolate'
-      write(50+my_rank,'(8i16)') iedge_isolate(1:numedge_iso)
+      write(50+my_rank,'(8i16)')                                        &
+     &                 edge1%iedge_isolate(1:edge1%numedge_iso)
 !
       end subroutine check_bc_edge
 !

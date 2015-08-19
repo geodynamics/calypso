@@ -1,15 +1,20 @@
+!> @file  m_subdomain_table_IO.f90
+!!      module m_subdomain_table_IO
+!!
+!! @author  H. Matsui
+!! @date Written in June, 2009
 !
-!     module m_subdomain_table_IO
-!
-!      Written by H. Matsui on Aug., 2007
-!
-!      subroutine allocate_domain_group_IO
-!      subroutine deallocate_domain_group_IO
-!
-!      subroutine output_group_4_partition
-!      subroutine read_group_4_partition
-!
-!      subroutine read_group_by_metis(ierr, numnod, internal_node)
+!> @brief Arrays for subdomain list for partitioner
+!!
+!!@verbatim
+!!      subroutine allocate_domain_group_IO
+!!      subroutine deallocate_domain_group_IO
+!!
+!!      subroutine output_group_4_partition
+!!      subroutine read_group_4_partition
+!!
+!!      subroutine read_group_by_metis(ierr, numnod, internal_node)
+!!@endverbatim
 !
       module m_subdomain_table_IO
 !

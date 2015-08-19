@@ -1,42 +1,43 @@
-!t_surface_data.f90
-!      module t_surface_data
+!>@file   t_surface_data.f90
+!!@brief  module t_surface_data
+!!
+!!@author  H. Matsui
+!!@date Programmed in 2008
 !
 !> @brief structure of surface data (geometry and connectivity)
-!
+!!
 !> Substitution of
-!> @n      (module m_geometry_parameter)
 !> @n      (module m_geometry_data)
-!> @n      (module m_surface_geometry_data)
-!
-!     Written by H. Matsui on Nov., 2008
-!
-!      subroutine allocate_inod_in_surf_type(surf)
-!      subroutine allocate_surface_connect_type(surf, nele)
-!      subroutine allocate_ext_surface_type(surf)
-!      subroutine allocate_iso_surface_type(surf)
-!      subroutine allocate_surface_geom_type(surf)
-!      subroutine allocate_normal_vect_type(surf)
-!      subroutine allocate_normal_vect_sph_type(surf)
-!      subroutine allocate_normal_vect_cyl_type(surf)
-!      subroutine allocate_surf_param_smp_type(surf)
-!      subroutine alloc_ele_4_surf_type(surf)
-!
-!      subroutine deallocate_inod_in_surf_type(surf)
-!      subroutine deallocate_surface_connect_type(surf)
-!      subroutine deallocate_ext_surface_type(surf)
-!      subroutine deallocate_iso_surface_type(surf)
-!      subroutine deallocate_surface_geom_type(surf)
-!      subroutine deallocate_normal_vect_type(surf)
-!      subroutine deallocate_normal_vect_sph_type(surf)
-!      subroutine deallocate_normal_vect_cyl_type(surf)
-!      subroutine deallocate_surf_param_smp_type(surf)
-!      subroutine dealloc_ele_4_surf_type(surf)
-!        integer(kind = kint), intent(in) :: nele
-!        type(surface_data), intent(inout) :: surf
-!
-!      subroutine link_new_surf_connect_type(surf_org, surf)
-!        type(surface_data), intent(in) :: surf_org
-!        type(surface_data), intent(inout) :: surf
+!!
+!!@verbatim
+!!      subroutine alloc_numsurf_stack(nprocs, surf)
+!!      subroutine allocate_inod_in_surf(surf)
+!!      subroutine allocate_surface_connect_type(surf, nele)
+!!      subroutine allocate_ext_surface_type(surf)
+!!      subroutine allocate_iso_surface_type(surf)
+!!      subroutine allocate_surface_geom_type(surf)
+!!      subroutine allocate_normal_vect_type(surf)
+!!      subroutine allocate_normal_vect_sph_type(surf)
+!!      subroutine allocate_normal_vect_cyl_type(surf)
+!!      subroutine allocate_surf_param_smp_type(surf)
+!!      subroutine alloc_ele_4_surf_type(surf)
+!!
+!!      subroutine dealloc_numsurf_stack(surf)
+!!      subroutine deallocate_inod_in_surf_type(surf)
+!!      subroutine deallocate_surface_connect_type(surf)
+!!      subroutine deallocate_ext_surface_type(surf)
+!!      subroutine deallocate_iso_surface_type(surf)
+!!      subroutine deallocate_surface_geom_type(surf)
+!!      subroutine deallocate_normal_vect_type(surf)
+!!      subroutine deallocate_normal_vect_sph_type(surf)
+!!      subroutine deallocate_normal_vect_cyl_type(surf)
+!!      subroutine deallocate_surf_param_smp_type(surf)
+!!      subroutine dealloc_ele_4_surf_type(surf)
+!!        integer(kind = kint), intent(in) :: nele
+!!        type(surface_data), intent(inout) :: surf
+!!
+!!      subroutine link_new_surf_connect_type(surf_org, surf)
+!!@endverbatim
 !
       module t_surface_data
 !
@@ -57,6 +58,11 @@
 !>       number of isolated sueface
         integer(kind=kint) ::  numsurf_iso
 !
+!>        Stack list of number of surface
+        integer(kind=kint_gl), pointer  :: istack_numsurf(:)
+!>        Stack list of number of internal surface
+        integer(kind=kint_gl), pointer  :: istack_intersurf(:)
+!
 !>   local index for surface on each element
         integer (kind=kint), pointer :: node_on_sf(:,:)
 !>   local index for opposite surface on each element
@@ -70,7 +76,7 @@
         integer( kind=kint )  ::  max_internal_surf_smp
 !
 !>       global surface id (where i:surface id)
-        integer(kind=kint), pointer  ::  isurf_global(:)
+        integer(kind=kint_gl), pointer  ::  isurf_global(:)
 !
 !>   surface connectivity ie_surf(i:surface ID,j:surface index)
         integer(kind=kint), pointer  :: ie_surf(:,:)
@@ -131,7 +137,22 @@
 !
 !  ---------------------------------------------------------------------
 !
-       subroutine allocate_inod_in_surf_type(surf)
+      subroutine alloc_numsurf_stack(nprocs, surf)
+!
+      integer(kind = kint), intent(in) :: nprocs
+      type(surface_data), intent(inout) :: surf
+!
+!
+      allocate(surf%istack_numsurf(0:nprocs))
+      allocate(surf%istack_intersurf(0:nprocs))
+      surf%istack_numsurf =   0
+      surf%istack_intersurf = 0
+!
+      end subroutine alloc_numsurf_stack
+!
+!  ---------------------------------------------------------------------
+!
+       subroutine allocate_inod_in_surf(surf)
 !
       use m_geometry_constants
 !
@@ -144,7 +165,7 @@
        surf%node_on_sf =   0
        surf%node_on_sf_n = 0
 !
-       end subroutine allocate_inod_in_surf_type
+       end subroutine allocate_inod_in_surf
 !
 !  ---------------------------------------------------------------------
 !
@@ -289,6 +310,17 @@
       end subroutine alloc_ele_4_surf_type
 !
 !  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine dealloc_numsurf_stack(surf)
+!
+      type(surface_data), intent(inout) :: surf
+!
+!
+      deallocate (surf%istack_numsurf, surf%istack_intersurf)
+!
+      end subroutine dealloc_numsurf_stack
+!
 !  ---------------------------------------------------------------------
 !
        subroutine deallocate_inod_in_surf_type(surf)

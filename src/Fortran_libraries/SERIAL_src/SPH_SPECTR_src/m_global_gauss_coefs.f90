@@ -1,16 +1,20 @@
-!m_global_gauss_coefs.f90
+!>@file   m_global_gauss_coefs.f90
+!!@brief  module m_global_gauss_coefs
+!!
+!!@author H. Matsui
+!!@date Programmed in March, 2012
 !
-!      module m_global_gauss_coefs
-!
-!     Written by H. Matsui on March, 2012
-!
-!      subroutine allocate_gauss_coef_monitor
-!      subroutine allocate_gauss_global_coefs
-!      subroutine deallocate_gauss_coef_monitor
-!      subroutine deallocate_gauss_global_coefs
-!
-!      subroutine read_gauss_global_coefs
-!      subroutine write_gauss_global_coefs
+!>@brief Gauss coefficients data for output
+!!
+!!@verbatim
+!!      subroutine allocate_gauss_coef_monitor
+!!      subroutine allocate_gauss_global_coefs
+!!      subroutine deallocate_gauss_coef_monitor
+!!      subroutine deallocate_gauss_global_coefs
+!!
+!!      subroutine read_gauss_global_coefs
+!!      subroutine write_gauss_global_coefs
+!!@endverbatim
 !
 !
       module m_global_gauss_coefs

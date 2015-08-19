@@ -1,17 +1,22 @@
+!>@file   copy_sph_node_4_IO.f90
+!!@brief  module copy_sph_node_4_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!      module copy_sph_node_4_IO
-!
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine copy_sph_node_rtp_from_IO
-!      subroutine copy_sph_node_rtm_from_IO
-!      subroutine copy_sph_node_rlm_from_IO
-!      subroutine copy_sph_node_rj_from_IO
-!
-!      subroutine copy_sph_node_rtp_to_IO
-!      subroutine copy_sph_node_rtm_to_IO
-!      subroutine copy_sph_node_rlm_to_IO
-!      subroutine copy_sph_node_rj_to_IO
+!>@brief Copy sphectr indices from IO buffer
+!!
+!!@verbatim
+!!      subroutine copy_sph_node_rtp_from_IO
+!!      subroutine copy_sph_node_rtm_from_IO
+!!      subroutine copy_sph_node_rlm_from_IO
+!!      subroutine copy_sph_node_rj_from_IO
+!!
+!!      subroutine copy_sph_node_rtp_to_IO
+!!      subroutine copy_sph_node_rtm_to_IO
+!!      subroutine copy_sph_node_rlm_to_IO
+!!      subroutine copy_sph_node_rj_to_IO
+!!@endverbatim
 !
       module copy_sph_node_4_IO
 !

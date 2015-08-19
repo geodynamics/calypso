@@ -65,19 +65,16 @@
       end do
       ntot_rms_rj = istack_rms_comp_rj(num_rms_rj)
 !
-      call quicksort_int                                                &
-     &   (num_spectr_layer, id_spectr_layer, ione, num_spectr_layer)
+      call quicksort_int(nri_rms, kr_for_rms, ione, nri_rms)
 !
-      nri_rms = num_spectr_layer
       call allocate_rms_4_sph_spectr(my_rank)
-      call allocate_ave_4_sph_spectr(ntot_rms_rj)
+      call allocate_ave_4_sph_spectr
       call set_sum_table_4_sph_spectr
 !
 !
 
-      do knum = 1, num_spectr_layer
-        k = id_spectr_layer(knum)
-        kr_for_rms(knum) = k
+      do knum = 1, nri_rms
+        k = kr_for_rms(knum)
         if(k .le. 0) then
           r_for_rms(knum) = 0.0d0
         else

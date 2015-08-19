@@ -1,18 +1,24 @@
-!ordering_field_by_viz.f90
-!      module ordering_field_by_viz
+!>@file   ordering_field_by_viz.f90
+!!@brief  module ordering_field_by_viz
+!!
+!!@author H. Matsui
+!!@date Programmed by H.Matsui and H.Okuda in July 2000
+!!@n     Modified by H. Matsui on  Aug., 2006
 !
-!        programmed by H.Matsui on Jan., 2008
-!
-!      subroutine s_ordering_field_by_viz(num_phys, num_phys_viz,       &
-!     &          num_component, phys_name, iflag_monitor)
-!      subroutine ordering_field_by_comp_viz(num_phys, num_phys_viz,    &
-!     &          num_component, phys_name,iflag_monitor)
-!
-!      subroutine set_istack_4_nodal_field(num_phys, num_phys_viz,      &
-!     &          num_component, ntot_phys, ntot_phys_viz,               &
-!     &          istack_component)
-!      subroutine count_field_4_monitor(num_phys, num_component,        &
-!     &          iflag_monitor, num_field_monitor, ntot_comp_monitor)
+!>@brief  Ordering field data by visualization flag
+!!
+!!@verbatim
+!!      subroutine s_ordering_field_by_viz(num_phys, num_phys_viz,      &
+!!     &          num_component, phys_name, iflag_monitor)
+!!      subroutine ordering_field_by_comp_viz(num_phys, num_phys_viz,   &
+!!     &          num_component, phys_name,iflag_monitor)
+!!
+!!      subroutine set_istack_4_nodal_field(num_phys, num_phys_viz,     &
+!!     &          num_component, ntot_phys, ntot_phys_viz,              &
+!!     &          istack_component)
+!!      subroutine count_field_4_monitor(num_phys, num_component,       &
+!!     &          iflag_monitor, num_field_monitor, ntot_comp_monitor)
+!!@endverbatim
 !
       module ordering_field_by_viz
 !

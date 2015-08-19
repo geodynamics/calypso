@@ -3,17 +3,21 @@
 !
 !      Written by H. Matsui on July, 2006
 !
-!      subroutine set_spherical_position
-!      subroutine set_center_of_element
-!
-!      subroutine set_center_of_surface
-!      subroutine set_center_of_edge
+!      subroutine set_spherical_position(nod)
+!        type(node_data), intent(inout) :: nod
+!      subroutine set_center_of_element(nod, ele)
+!        type(node_data),    intent(in) :: nod
+!        type(element_data), intent(inout) :: ele
+!      subroutine set_center_of_surface(nod, surf)
+!        type(node_data),    intent(in) :: nod
+!        type(surface_data), intent(inout) :: surf
+!      subroutine set_center_of_edge(nod, edge)
+!        type(node_data), intent(in) :: nod
+!        type(edge_data), intent(inout) :: edge
 !
       module cal_mesh_position
 !
       use m_precision
-!
-      use  m_machine_parameter
 !
       implicit none
 !
@@ -23,93 +27,105 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_spherical_position
+      subroutine set_spherical_position(nod)
 !
-      use m_geometry_parameter
-      use m_geometry_data
+      use t_geometry_data
       use coordinate_converter
 !
-       call position_2_sph( numnod, xx, radius, colatitude,             &
-     &       longitude, a_radius, s_cylinder, a_s_cylinder)
+      type(node_data), intent(inout) :: nod
+!
+!
+       call position_2_sph(nod%numnod, nod%xx,                          &
+     &     nod%rr, nod%theta, nod%phi, nod%a_r, nod%ss, nod%a_s)
 !
       end subroutine set_spherical_position
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_center_of_element
+      subroutine set_center_of_element(nod, ele)
 !
       use m_geometry_constants
-      use m_geometry_parameter
-      use m_geometry_data
+      use t_geometry_data
       use set_element_position
       use coordinate_converter
 !
-      if (nnod_4_ele .eq. num_t_quad) then
-        call set_quad_ele_position(numnod, numele, ie, xx,              &
-     &          x_ele)
-      else if (nnod_4_ele .eq. num_t_linear) then
-        call set_linear_ele_position(numnod, numele, ie, xx,            &
-     &          x_ele)
-      else if (nnod_4_ele .eq. num_t_lag) then
-        call set_lag_ele_position(numnod, numele, ie, xx,               &
-     &          x_ele)
+      type(node_data),    intent(in) :: nod
+      type(element_data), intent(inout) :: ele
+!
+!
+      if (ele%nnod_4_ele .eq. num_t_quad) then
+        call set_quad_ele_position(nod%numnod, ele%numele, ele%ie,      &
+     &      nod%xx, ele%x_ele)
+      else if (ele%nnod_4_ele .eq. num_t_linear) then
+        call set_linear_ele_position(nod%numnod, ele%numele, ele%ie,    &
+     &      nod%xx, ele%x_ele)
+      else if (ele%nnod_4_ele .eq. num_t_lag) then
+        call set_lag_ele_position(nod%numnod, ele%numele, ele%ie,       &
+     &      nod%xx, ele%x_ele)
       end if
 !
-      call position_2_sph( numele, x_ele, r_ele, theta_ele,             &
-     &       phi_ele, ar_ele, s_ele, as_ele)
+      call position_2_sph( ele%numele, ele%x_ele,                       &
+     &    ele%r_ele, ele%theta_ele,   ele%phi_ele,                      &
+     &    ele%ar_ele, ele%s_ele, ele%as_ele)
 !
       end subroutine set_center_of_element
 !
 ! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
 !
-      subroutine set_center_of_surface
+      subroutine set_center_of_surface(nod, surf)
 !
       use m_geometry_constants
-      use m_geometry_parameter
-      use m_geometry_data
-      use m_surface_geometry_data
+      use t_geometry_data
+      use t_surface_data
       use set_surface_position
       use coordinate_converter
 !
-      if (nnod_4_surf .eq. num_quad_sf) then
-        call set_quad_surf_position(numnod, numsurf, ie_surf, xx,       &
-     &          x_surf)
-      else if (nnod_4_surf .eq. num_linear_sf) then
-        call set_linear_surf_position(numnod, numsurf, ie_surf, xx,     &
-     &          x_surf)
-      else if (nnod_4_surf .eq. num_lag_sf) then
-        call set_lag_surf_position(numnod, numsurf, ie_surf, xx,        &
-     &          x_surf)
+      type(node_data),    intent(in) :: nod
+      type(surface_data), intent(inout) :: surf
+!
+!
+      if (surf%nnod_4_surf .eq. num_quad_sf) then
+        call set_quad_surf_position(nod%numnod,                         &
+     &      surf%numsurf, surf%ie_surf, nod%xx, surf%x_surf)
+      else if (surf%nnod_4_surf .eq. num_linear_sf) then
+        call set_linear_surf_position(nod%numnod,                       &
+     &      surf%numsurf, surf%ie_surf, nod%xx, surf%x_surf)
+      else if (surf%nnod_4_surf .eq. num_lag_sf) then
+        call set_lag_surf_position(nod%numnod,                          &
+     &      surf%numsurf, surf%ie_surf, nod%xx, surf%x_surf)
       end if
 !
-      call position_2_sph(numsurf, x_surf, r_surf, theta_surf,          &
-     &    phi_surf, ar_surf, s_surf, as_surf)
+      call position_2_sph(surf%numsurf, surf%x_surf,                    &
+     &    surf%r_surf, surf%theta_surf, surf%phi_surf,                  &
+     &    surf%ar_surf, surf%s_surf, surf%as_surf)
 !
       end subroutine set_center_of_surface
 !
 ! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
 !
-      subroutine set_center_of_edge
+      subroutine set_center_of_edge(nod, edge)
 !
       use m_geometry_constants
-      use m_geometry_parameter
-      use m_geometry_data
-      use m_edge_geometry_data
+      use t_geometry_data
+      use t_edge_data
       use set_edge_position
       use coordinate_converter
 !
-      if (nnod_4_edge .eq. num_quad_edge) then
-        call set_quad_edge_position(numnod, numedge, ie_edge, xx,       &
-     &          x_edge )
-      else if (nnod_4_edge .eq. num_linear_edge) then
-        call set_linear_edge_position(numnod, numedge, ie_edge, xx,     &
-     &          x_edge )
+      type(node_data), intent(in) :: nod
+      type(edge_data), intent(inout) :: edge
+!
+!
+      if (edge%nnod_4_edge .eq. num_quad_edge) then
+        call set_quad_edge_position(nod%numnod,                         &
+     &      edge%numedge, edge%ie_edge, nod%xx, edge%x_edge )
+      else if (edge%nnod_4_edge .eq. num_linear_edge) then
+        call set_linear_edge_position(nod%numnod,                       &
+     &      edge%numedge, edge%ie_edge, nod%xx, edge%x_edge )
       end if
 !
-      call position_2_sph(numedge, x_edge, r_edge, theta_edge,          &
-     &    phi_edge, ar_edge, s_edge, as_edge)
+      call position_2_sph(edge%numedge, edge%x_edge,                    &
+     &    edge%r_edge, edge%theta_edge, edge%phi_edge,                  &
+     &    edge%ar_edge, edge%s_edge, edge%as_edge)
 !
       end subroutine set_center_of_edge
 !

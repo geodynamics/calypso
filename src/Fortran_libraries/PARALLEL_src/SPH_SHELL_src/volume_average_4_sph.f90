@@ -1,13 +1,17 @@
-!
-!      module volume_average_4_sph
-!
-!     Written by H. Matsui on Feb., 2008
-!
-!!      subroutine allocate_ave_4_sph_spectr(nri_ave, ntot_rms)
-!!      subroutine deallocate_ave_4_sph_spectr
-!!      subroutine write_sph_vol_ave_file(istep, time)
+!> @file  volume_average_4_sph.f90
+!!      module volume_average_4_sph
 !!
+!! @author  H. Matsui
+!! @date Programmed in Feb. 2008
+!
+!> @brief Output mean square of spectr data
+!!
+!!@verbatim
 !!      subroutine cal_volume_average_sph(kg_st, kg_ed, avol)
+!!@endverbatim
+!!
+!!@n @param istep         time step number
+!!@n @param time          time
 !
       module volume_average_4_sph
 !
@@ -19,15 +23,9 @@
       implicit none
 !
 !
-      integer(kind = kint) :: nri_ave
+!>      File prefix for volume average file
+      character(len = kchara) :: fhead_ave_vol =    'sph_ave_volume'
 !
-      integer(kind = kint), parameter :: id_file_ave =      43
-!
-      real(kind = kreal), allocatable :: ave_sph(:,:)
-      real(kind = kreal), allocatable :: ave_sph_vol(:)
-!
-      private :: id_file_ave
-      private :: nri_ave, ave_sph, ave_sph_vol
       private :: cal_sphere_average_sph, averaging_4_sph_ave_int
       private :: cal_ave_vector_sph_spectr, cal_ave_scalar_sph_spectr
 !
@@ -35,66 +33,6 @@
 !
       contains
 !
-! -----------------------------------------------------------------------
-!
-      subroutine allocate_ave_4_sph_spectr(ntot_rms)
-!
-      integer(kind = kint), intent(in) :: ntot_rms
-!
-!
-      if(idx_rj_degree_zero .eq. izero) return
-!
-      nri_ave = nidx_rj(1)
-!
-      allocate(ave_sph_vol(ntot_rms))
-      allocate(ave_sph(0:nri_ave,ntot_rms))
-!
-      if(nri_ave*ntot_rms .gt. 0) then
-        ave_sph=     0.0d0
-        ave_sph_vol = 0.0d0
-      end if
-!
-      end subroutine allocate_ave_4_sph_spectr
-!
-! -----------------------------------------------------------------------
-!
-      subroutine deallocate_ave_4_sph_spectr
-!
-!
-      if(idx_rj_degree_zero .eq. izero) return
-      deallocate(ave_sph, ave_sph_vol)
-!
-      end subroutine deallocate_ave_4_sph_spectr
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine write_sph_vol_ave_file(istep, time)
-!
-      use set_parallel_file_name
-      use m_rms_4_sph_spectr
-!
-      integer(kind = kint), intent(in) :: istep
-      real(kind = kreal), intent(in) :: time
-!
-      character(len=kchara) :: fname_rms, mode_label
-!
-!
-      if(idx_rj_degree_zero .eq. 0)  return
-      if(ntot_rms_rj .eq. 0)  return
-!
-      write(fname_rms, '(a,a4)') trim(fhead_ave_vol), '.dat'
-      write(mode_label,'(a)') 'EMPTY'
-      call open_sph_mean_sq_file                                        &
-     &      (id_file_ave, fname_rms, mode_label)
-!
-      write(id_file_ave,'(i15,1pe23.14e3,1p200e23.14e3)')               &
-     &                 istep, time, ave_sph_vol(1:ntot_rms_rj)
-      close(id_file_ave)
-!
-      end subroutine write_sph_vol_ave_file
-!
-! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine cal_volume_average_sph(kg_st, kg_ed, avol)
@@ -174,6 +112,7 @@
 !
       use m_constants
       use m_sph_spectr_data
+      use m_rms_4_sph_spectr
 !
       integer(kind = kint), intent(in) :: icomp, jcomp
       integer(kind = kint) :: k, inod
@@ -194,6 +133,7 @@
       subroutine cal_ave_vector_sph_spectr(icomp, jcomp)
 !
       use m_sph_spectr_data
+      use m_rms_4_sph_spectr
 !
       integer(kind = kint), intent(in) :: icomp, jcomp
       integer(kind = kint) :: k, inod

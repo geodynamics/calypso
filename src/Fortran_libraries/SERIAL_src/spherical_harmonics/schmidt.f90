@@ -1,38 +1,40 @@
 !> @file  schmidt.f90
-!>      module schmidt
+!!      module schmidt
 !!
 !! @author  H. Matsui
 !! @date Programmed on Jan., 1998
 !
 !> @brief module for Legendre polynomials with Schmidt normalization
 !!
-!!@n      subroutine schmidt_legendre(ltr, theta,  p, df)
-!!@n*************************************************************
-!!@n*     lead legendre and adjoint Legendle Polynomial
-!!@n*
-!!@n*      p(m,l)  : Schmidt Polynomial
-!!@n*         Normalization...
-!!@n*           P_{l}^{0} = P_{l,0}
-!!@n*           P_{l}^{m} = sqrt( 2(l-m)! / (l+m)! ) * P_{l,m}
-!!@n*        theta :  input colatitude ( 0 =< theta <= pi )
-!!@n*
-!!@n*        df(m,l)  :   work area
-!!@n*
-!!@n*************************************************************
-!!@n
-!!@n      subroutine diff_schmidt_legendre(ltr, p, dp)
-!!@n*************************************************************
-!!@n*     lead difference of Schmidt Polynomial
-!!@n*
-!!@n*      p(m,l)  : Schmidt Polynomial (input)
-!!@n*         Normalization...
-!!@n*           P_{l}^{0} = P_{l,0}
-!!@n*           P_{l}^{m} = sqrt( 2(l-m)! / (l+m)! ) * P_{l,m}
-!!@n*      dp(m,l) : diffrential of Schmidt Polynomial  dp/dtheta
-!!@n*
-!!@n*************************************************************
-!!@n
-!!@n      subroutine full_normalize_from_smdt(ltr, p, dp)
+!!@verbatim
+!!      subroutine schmidt_legendre(ltr, theta,  p, df)
+!!*************************************************************
+!!*     lead legendre and adjoint Legendle Polynomial
+!!*
+!!*      p(m,l)  : Schmidt Polynomial
+!!*         Normalization...
+!!*           P_{l}^{0} = P_{l,0}
+!!*           P_{l}^{m} = sqrt( 2(l-m)! / (l+m)! ) * P_{l,m}
+!!*        theta :  input colatitude ( 0 =< theta <= pi )
+!!*
+!!*        df(m,l)  :   work area
+!!*
+!!*************************************************************
+!!
+!!      subroutine diff_schmidt_legendre(ltr, p, dp)
+!!*************************************************************
+!!*     lead difference of Schmidt Polynomial
+!!*
+!!*      p(m,l)  : Schmidt Polynomial (input)
+!!*         Normalization...
+!!*           P_{l}^{0} = P_{l,0}
+!!*           P_{l}^{m} = sqrt( 2(l-m)! / (l+m)! ) * P_{l,m}
+!!*      dp(m,l) : diffrential of Schmidt Polynomial  dp/dtheta
+!!*
+!!*************************************************************
+!!
+!!      subroutine full_normalize_from_smdt(ltr, p, dp)
+!!@endverbatim
 !!@n
 !!@n @param ltr       Truncation level for the polynomial
 !!@n @param theta     Input degree ( \f$ 0 \le \theta \le \pi \f$)

@@ -1,25 +1,30 @@
-!copy_sph_node_4_type.f90
-!      module copy_sph_node_4_type
+!>@file   copy_sph_node_4_type.f90
+!!@brief  module copy_sph_node_4_type
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine copy_sph_node_rtp_from_type(ltr, ltr_type, rtp)
-!      subroutine copy_sph_node_rtm_from_type(ltr, ltr_type, rtm)
-!      subroutine copy_sph_node_rlm_from_type(ltr, ltr_type, rlm)
-!      subroutine copy_sph_node_rj_from_type(ltr, ltr_type, rj)
-!        integer(kind = kint), intent(in) :: ltr_type
-!        integer(kind = kint), intent(inout) :: ltr
-!
-!      subroutine copy_sph_node_rtp_to_type(ltr, ltr_type, rtp)
-!      subroutine copy_sph_node_rtm_to_type(ltr, ltr_type, rtm)
-!      subroutine copy_sph_node_rlm_to_type(ltr, ltr_type, rlm)
-!      subroutine copy_sph_node_rj_to_type(ltr, ltr_type, rj)
-!        integer(kind = kint), intent(in) :: ltr
-!        integer(kind = kint), intent(inout) :: ltr_type
-!        type(sph_rtp_grid), intent(inout) :: rtp
-!        type(sph_rtm_grid), intent(inout) :: rtm
-!        type(sph_rlm_grid), intent(inout) :: rlm
-!        type(sph_rj_grid), intent(inout) :: rj
+!>@brief Copy sphectr indices between structure
+!!
+!!@verbatim
+!!      subroutine copy_sph_node_rtp_from_type(ltr, ltr_type, rtp)
+!!      subroutine copy_sph_node_rtm_from_type(ltr, ltr_type, rtm)
+!!      subroutine copy_sph_node_rlm_from_type(ltr, ltr_type, rlm)
+!!      subroutine copy_sph_node_rj_from_type(ltr, ltr_type, rj)
+!!        integer(kind = kint), intent(in) :: ltr_type
+!!        integer(kind = kint), intent(inout) :: ltr
+!!
+!!      subroutine copy_sph_node_rtp_to_type(ltr, ltr_type, rtp)
+!!      subroutine copy_sph_node_rtm_to_type(ltr, ltr_type, rtm)
+!!      subroutine copy_sph_node_rlm_to_type(ltr, ltr_type, rlm)
+!!      subroutine copy_sph_node_rj_to_type(ltr, ltr_type, rj)
+!!        integer(kind = kint), intent(in) :: ltr
+!!        integer(kind = kint), intent(inout) :: ltr_type
+!!        type(sph_rtp_grid), intent(inout) :: rtp
+!!        type(sph_rtm_grid), intent(inout) :: rtm
+!!        type(sph_rlm_grid), intent(inout) :: rlm
+!!        type(sph_rj_grid), intent(inout) :: rj
+!!@endverbatim
 !
       module copy_sph_node_4_type
 !

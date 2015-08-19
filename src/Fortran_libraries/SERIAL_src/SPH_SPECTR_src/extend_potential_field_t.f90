@@ -1,8 +1,12 @@
-!extend_potential_field_t.f90
-!      module extend_potential_field_t
+!>@file   extend_potential_field_t.f90
+!!@brief  module extend_potential_field_t
+!!
+!!@author H. Matsui
+!!@date Programmed in Apr., 2009
 !
-!      modified by H. Matsuiui on Apr., 2009
-!
+!>@brief  Extend magnetic field by potential field structure
+!!
+!!@verbatim
 !!      subroutine ext_outside_scalar_t(rj, kr_out, d_rj)
 !!      subroutine ext_inside_scalar_t(rj, kr_in, d_rj)
 !!
@@ -25,6 +29,7 @@
 !!      subroutine gauss_to_poloidal_in_t(rj, kr_in, ltr_w, r_gauss,    &
 !!     &          w_gauss, index_w, d_rj)
 !!        type(sph_rj_grid), intent(in) :: rj
+!!@endverbatim
 !
       module extend_potential_field_t
 !

@@ -1,16 +1,22 @@
+!>@file   mesh_data_IO.f90
+!!@brief  module mesh_data_IO
+!!
+!!@author H. Matsui
+!!@date Programmed by H.Matsui and H.Okuda in July 2000
+!!@n     Modified by H. Matsui on Sep., 2006
 !
-!      module mesh_data_IO
-!
-!     Written by H. Matsui on Sep., 2006
-!
-!      subroutine write_geometry_data
-!      subroutine write_geometry_data_b
-!
-!       subroutine read_geometry_data
-!       subroutine read_geometry_data_b
-!
-!      subroutine output_node_sph_geometry
-!      subroutine output_node_cyl_geometry
+!>@brief  Routines for ASCII mesh data IO
+!!
+!!@verbatim
+!!      subroutine write_geometry_data
+!!      subroutine write_geometry_data_b
+!!
+!!      subroutine read_geometry_data
+!!      subroutine read_geometry_data_b
+!!
+!!      subroutine output_node_sph_geometry
+!!      subroutine output_node_cyl_geometry
+!!@endverbatim
 !
       module mesh_data_IO
 !

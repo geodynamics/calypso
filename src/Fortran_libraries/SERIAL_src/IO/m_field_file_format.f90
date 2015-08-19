@@ -81,12 +81,6 @@
       integer(kind = kint), parameter :: iflag_vtd =      40
 !
 !
-!>      Integer flag for distributed data
-      integer(kind = kint), parameter :: iflag_para =      0
-!>      Integer flag for merged data
-      integer(kind = kint), parameter :: iflag_single =  100
-!
-!
 !>      Integer flag for merged UCD data
       integer(kind = kint), parameter :: iflag_sgl_ucd =  110
 !>      Integer flag for merged UCD data

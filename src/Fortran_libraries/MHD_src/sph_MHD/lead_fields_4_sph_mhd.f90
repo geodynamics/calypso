@@ -51,7 +51,8 @@
       if(iflag .gt. 0) return
 !
       call select_mhd_field_from_trans
-      if(iflag_shell_mode .ne. iflag_no_FEMMESH) then
+      if     (iflag_shell_mode .eq. iflag_MESH_w_pole                   &
+     &   .or. iflag_shell_mode .eq. iflag_MESH_w_center) then
         call cal_nonlinear_pole_MHD
       end if
 !

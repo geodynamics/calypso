@@ -1,9 +1,16 @@
-!set_fixed_time_step_params.f90
-!      module set_fixed_time_step_params
+!>@file   set_fixed_time_step_params.f90
+!!@brief  module set_fixed_time_step_params
+!!
+!!@author H. Matsui
+!!@date Programmed in Sep., 2006
 !
-!        programmed by H.Matsui on Sep., 2006
-!
-!      subroutine s_set_fixed_time_step_params
+!>@brief  Set time step parameters
+!!
+!!@verbatim
+!!      subroutine s_set_fixed_time_step_params
+!!      subroutine set_monitor_param_4_fixed_step(istep_def, istep_ctl, &
+!!     &          delta_t_ctl, istep_out, dt_out)
+!!@endverbatim
 !
       module set_fixed_time_step_params
 !

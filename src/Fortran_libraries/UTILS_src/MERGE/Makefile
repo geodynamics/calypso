@@ -3,7 +3,7 @@
 #
 
 MERGE_DIR = $$(UTILS_SRCDIR)/MERGE
-SRC_MERGE = $(shell ls *.f90)
+SRC_MERGE = $(shell ls *.f90 *.F90)
 MOD_MERGE = $(addsuffix .o,$(basename $(SRC_MERGE)) )
 
 #

@@ -72,13 +72,9 @@
       use m_initial_field_control
       use m_t_int_parameter
       use m_t_step_parameter
-      use m_field_data_IO
       use sph_mhd_rst_IO_control
       use set_sph_restart_IO
 !
-!
-      i_step_MHD = i_step_init
-      time   =     time_init
 !
 !  Set initial velocity if velocity is exist
       if(ipol%i_velo .gt. izero) call  set_initial_velocity
@@ -102,7 +98,7 @@
       end if
 !
 !  Copy initial field to restart IO data
-      call set_sph_restart_num_to_IO
+      call init_output_sph_restart_file
 !
       call output_sph_restart_control
 !
@@ -117,7 +113,7 @@
 !
       integer ( kind = kint) :: inod, jj, k
 !      real (kind = kreal) :: rr
-      real (kind = kreal) :: pi, rr, xr, shell
+      real (kind = kreal) :: pi, xr, shell
       real(kind = kreal), parameter :: A_light = 0.1d0
 !
       pi = four * atan(one)

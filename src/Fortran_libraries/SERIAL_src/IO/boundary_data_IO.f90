@@ -1,10 +1,17 @@
-!boundary_data_IO.f90
-!      module boundary_data_IO
+!>@file   boundary_data_IO.f90
+!!@brief  module boundary_data_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in Sep., 2006
 !
-!     Written by H. Matsui on Sep., 2006
-!
-!       subroutine read_boundary_data_a(input_file_code)
-!       subroutine write_boundary_data_a(input_file_code)
+!>@brief  Add require field name
+!!
+!!@verbatim
+!!       subroutine read_boundary_data_a(input_file_code)
+!!       subroutine write_boundary_data_a(input_file_code)
+!!@endverbatim
+!!
+!!@param  input_file_code file ID
 !
       module boundary_data_IO
 !

@@ -1,32 +1,40 @@
-!t_comm_table.f90
-!      module t_comm_table
+!>@file   t_comm_table.f90
+!!@brief  module t_comm_table
+!!
+!!@author H. Matsui
+!!@date Programmed in Nov., 2008
+!
 !> @brief Structure for communication table
-!
-!     Written by H. Matsui on Nov., 2008
-!
-!      subroutine allocate_type_comm_tbl_num(comm_tbls)
-!      subroutine allocate_type_comm_tbl_item(comm_tbls)
-!      subroutine deallocate_type_comm_tbl(comm_tbls)
-!
-!      subroutine allocate_type_neib_id(comm_tbls)
-!      subroutine allocate_type_import_num(comm_tbls)
-!      subroutine allocate_type_export_num(comm_tbls)
-!      subroutine allocate_type_import_item(comm_tbls)
-!      subroutine allocate_type_export_item(comm_tbls)
-!
-!      subroutine deallocate_type_neib_id(comm_tbls)
-!      subroutine deallocate_type_import(comm_tbls)
-!      subroutine deallocate_type_export(comm_tbls)
-!      subroutine deallocate_type_import_num(comm_tbls)
-!      subroutine deallocate_type_import_item(comm_tbls)
-!      subroutine deallocate_type_export_item(comm_tbls)
-!
-!      subroutine link_comm_tbl_types(comm_org, comm_tbls)
-!        type(communication_table), intent(in) :: comm_org
-!        type(communication_table), intent(inout) :: comm_tbls
-!
-!      subroutine unlink_dest_comm_tbl_type(comm_tbls)
-!        type(interpolate_table), intent(inout) :: comm_tbls
+!!
+!!@verbatim
+!!      subroutine allocate_type_comm_tbl_num(comm_tbls)
+!!      subroutine allocate_type_comm_tbl_item(comm_tbls)
+!!      subroutine deallocate_type_comm_tbl(comm_tbls)
+!!
+!!      subroutine allocate_type_neib_id(comm_tbls)
+!!      subroutine allocate_type_import_num(comm_tbls)
+!!      subroutine allocate_type_export_num(comm_tbls)
+!!      subroutine allocate_type_import_item(comm_tbls)
+!!      subroutine allocate_type_export_item(comm_tbls)
+!!
+!!      subroutine deallocate_type_neib_id(comm_tbls)
+!!      subroutine deallocate_type_import(comm_tbls)
+!!      subroutine deallocate_type_export(comm_tbls)
+!!      subroutine deallocate_type_import_num(comm_tbls)
+!!      subroutine deallocate_type_import_item(comm_tbls)
+!!      subroutine deallocate_type_export_item(comm_tbls)
+!!
+!!      subroutine link_comm_tbl_types(comm_org, comm_tbls)
+!!        type(communication_table), intent(in) :: comm_org
+!!        type(communication_table), intent(inout) :: comm_tbls
+!!
+!!      subroutine unlink_dest_comm_tbl_type(comm_tbls)
+!!        type(interpolate_table), intent(inout) :: comm_tbls
+!!
+!!      subroutine copy_comm_tbl_types(comm_org, comm_tbls)
+!!        type(communication_table), intent(in) :: comm_org
+!!        type(communication_table), intent(inout) :: comm_tbls
+!!@endverbatim
 !
       module t_comm_table
 !
@@ -289,6 +297,48 @@
       nullify( comm_tbls%item_export   )
 !
       end subroutine unlink_dest_comm_tbl_type
+!
+!------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      subroutine copy_comm_tbl_types(comm_org, comm_tbls)
+!
+      use copy_communication_table
+!
+      type(communication_table), intent(in) :: comm_org
+      type(communication_table), intent(inout) :: comm_tbls
+!
+!
+      comm_tbls%num_neib =    comm_org%num_neib
+      call allocate_type_comm_tbl_num(comm_tbls)
+!
+      if(comm_tbls%num_neib .gt. 0) then
+        comm_tbls%id_neib(1:comm_tbls%num_neib)                         &
+     &      = comm_org%id_neib(1:comm_tbls%num_neib)
+        comm_tbls%num_import(1:comm_tbls%num_neib)                      &
+     &      =    comm_org%num_import(1:comm_tbls%num_neib)
+        comm_tbls%num_export(1:comm_tbls%num_neib)                      &
+     &      = comm_org%num_export(1:comm_tbls%num_neib)
+      end if
+      comm_tbls%istack_import(0:comm_tbls%num_neib)                     &
+     &      = comm_org%istack_import(0:comm_tbls%num_neib)
+      comm_tbls%istack_export(0:comm_tbls%num_neib)                     &
+     &      = comm_org%istack_export(0:comm_tbls%num_neib)
+      comm_tbls%ntot_import = comm_org%ntot_import
+      comm_tbls%ntot_export = comm_org%ntot_export
+!
+      call allocate_type_comm_tbl_item(comm_tbls)
+!
+      if(comm_tbls%ntot_import .gt. 0) then
+        comm_tbls%item_import(1:comm_tbls%ntot_import)                  &
+     &      = comm_org%item_import(1:comm_tbls%ntot_import)
+      end if
+      if(comm_tbls%ntot_export .gt. 0) then
+        comm_tbls%item_export(1:comm_tbls%ntot_export)                  &
+     &      = comm_org%item_export(1:comm_tbls%ntot_export)
+      end if
+!
+      end subroutine copy_comm_tbl_types
 !
 !------------------------------------------------------------------
 !

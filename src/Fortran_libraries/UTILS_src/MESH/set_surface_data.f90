@@ -3,23 +3,24 @@
 !
 !      Written by H. Matsui
 !
-!      subroutine count_all_surfaces(numele, numsurf)
-!      subroutine set_all_surfaces(numele, numsurf, nnod_4_ele,         &
-!     &          nnod_4_surf, ie, node_on_sf, ie_surf, isf_4_ele)
-!
-!      subroutine set_surf_rotation_flag(numele, numsurf, nnod_4_ele,   &
-!     &          nnod_4_surf, ie, ie_surf, isf_4_ele, isf_rot_ele)
-!
-!      subroutine count_part_surface(nele_grp, numsurf_part)
-!      subroutine set_part_surface(numele, nele_grp,                    &
-!     &          numsurf_part, isf_4_ele, isf_part)
+!!      subroutine count_all_surfaces(numele, isurf_flag, numsurf)
+!!      subroutine set_all_surfaces(numele, numsurf, nnod_4_ele,        &
+!!     &          nnod_4_surf, ie, node_on_sf, isurf_hash, isurf_flag,  &
+!!     &          ie_surf, isf_4_ele)
+!!
+!!      subroutine set_surf_rotation_flag(numele, numsurf, nnod_4_ele,  &
+!!     &          nnod_4_surf, ie, ie_surf, isf_4_ele, isf_rot_ele)
+!!
+!!      subroutine count_part_surface                                   &
+!!     &         (numele, nele_grp, isurf_flag, numsurf_part)
+!!      subroutine set_part_surface                                     &
+!!     &         (numele, nele_grp,  numsurf_part, isf_4_ele,           &
+!!     &          isurf_hash, isurf_flag, isf_part)
 !
       module set_surface_data
 !
       use m_precision
-!
       use m_geometry_constants
-      use m_surface_hash
 !
       implicit none
 !
@@ -29,9 +30,12 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine count_all_surfaces(numele, numsurf)
+      subroutine count_all_surfaces(numele, isurf_flag, numsurf)
 !
       integer(kind = kint), intent(in) :: numele
+      integer(kind = kint), intent(in)                                  &
+     &                     :: isurf_flag(nsurf_4_ele*numele)
+!
       integer(kind = kint), intent(inout) :: numsurf
 !
       integer(kind = kint) :: k1
@@ -47,13 +51,19 @@
 !------------------------------------------------------------------
 !
       subroutine set_all_surfaces(numele, numsurf, nnod_4_ele,          &
-     &          nnod_4_surf, ie, node_on_sf, ie_surf, isf_4_ele)
+     &          nnod_4_surf, ie, node_on_sf, isurf_hash, isurf_flag,    &
+     &          ie_surf, isf_4_ele)
 !
       integer(kind = kint), intent(in) :: numsurf, nnod_4_surf
       integer(kind = kint), intent(in) :: numele, nnod_4_ele
       integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
       integer(kind = kint), intent(in)                                  &
      &                  :: node_on_sf(nnod_4_surf,nsurf_4_ele)
+!
+      integer(kind = kint), intent(in)                                  &
+     &                     :: isurf_hash(nsurf_4_ele*numele,2)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: isurf_flag(nsurf_4_ele*numele)
 !
       integer(kind = kint), intent(inout)                               &
      &      :: ie_surf(numsurf,nnod_4_surf)
@@ -146,9 +156,14 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine count_part_surface(nele_grp, numsurf_part)
+      subroutine count_part_surface                                     &
+     &         (numele, nele_grp, isurf_flag, numsurf_part)
 !
-      integer(kind = kint), intent(in) :: nele_grp
+      integer(kind = kint), intent(in) :: numele, nele_grp
+!
+      integer(kind = kint), intent(in)                                  &
+     &                     :: isurf_flag(nsurf_4_ele*numele)
+!
       integer(kind = kint), intent(inout) :: numsurf_part
 !
       integer(kind = kint) :: k1
@@ -162,15 +177,21 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine set_part_surface(numele, nele_grp,                     &
-     &          numsurf_part, isf_4_ele, isf_part)
+      subroutine set_part_surface                                       &
+     &         (numele, nele_grp,  numsurf_part, isf_4_ele,             &
+     &          isurf_hash, isurf_flag, isf_part)
 !
       integer(kind = kint), intent(in) :: numele, nele_grp
       integer(kind = kint), intent(in) :: numsurf_part
       integer(kind = kint), intent(in) :: isf_4_ele(numele,nsurf_4_ele)
 !
+      integer(kind = kint), intent(in)                                  &
+     &                     :: isurf_hash(nsurf_4_ele*numele,2)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: isurf_flag(nsurf_4_ele*numele)
+!
       integer(kind = kint), intent(inout) :: isf_part(numsurf_part)
-!!
+!
       integer(kind = kint) :: k1
       integer(kind = kint) :: iele, is, inum
 !

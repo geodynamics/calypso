@@ -1,8 +1,12 @@
-!extend_potential_field.f90
-!      module extend_potential_field
+!>@file   extend_potential_field.f90
+!!@brief  module extend_potential_field
+!!
+!!@author H. Matsui
+!!@date Programmed in Apr., 2009
 !
-!      modified by H. Matsuiui on Apr., 2009
-!
+!>@brief  Extend magnetic field by potential field
+!!
+!!@verbatim
 !!      subroutine ext_outside_scalar(kr_out, d_rj)
 !!      subroutine ext_inside_scalar(kr_in, d_rj)
 !!
@@ -22,6 +26,7 @@
 !!     &          w_gauss, index_w, d_rj)
 !!      subroutine gauss_to_poloidal_in(kr_in, ltr_w, r_gauss,          &
 !!     &          w_gauss, index_w, d_rj)
+!!@endverbatim
 !
       module extend_potential_field
 !

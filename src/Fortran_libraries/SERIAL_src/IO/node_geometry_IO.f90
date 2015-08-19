@@ -1,23 +1,23 @@
-!node_geometry_IO.f90
-!      module node_geometry_IO
+!>@file   node_geometry_IO.f90
+!!@brief  module node_geometry_IO
+!!
+!!@author H. Matsui
+!!@date Programmed by H.Matsui and H.Okuda in July 2000
+!!@n     Modified by H. Matsui on  Aug., 2006
 !
-!     Written by H. Matsui on Aug., 2006
-!
-!      subroutine write_geometry_info(id_file)
-!      subroutine write_scalar_in_element(id_file)
-!      subroutine write_vector_in_element(id_file)
-!      subroutine write_geometry_info_b(id_file)
-!      subroutine write_scalar_in_element_b(id_file)
-!      subroutine write_vector_in_element_b(id_file)
-!
-!      subroutine read_number_of_node(id_file)
-!      subroutine read_geometry_info(id_file)
-!      subroutine read_scalar_in_element(id_file)
-!      subroutine read_vector_in_element(id_file)
-!      subroutine read_number_of_node_b(id_file)
-!      subroutine read_geometry_info_b(id_file)
-!      subroutine read_scalar_in_element_b(id_file)
-!      subroutine read_vector_in_element_b(id_file)
+!>@brief  routines for ASCII data IO for mesh geometry
+!!
+!!@verbatim
+!!      subroutine write_geometry_info(id_file)
+!!      subroutine write_scalar_in_element(id_file)
+!!      subroutine write_vector_in_element(id_file)
+!!      subroutine write_geometry_info_b(id_file)
+!!
+!!      subroutine read_number_of_node(id_file)
+!!      subroutine read_geometry_info(id_file)
+!!      subroutine read_number_of_node_b(id_file)
+!!      subroutine read_geometry_info_b(id_file)
+!!@endverbatim
 !
       module node_geometry_IO
 !
@@ -105,34 +105,6 @@
       end subroutine write_geometry_info_b
 !
 !------------------------------------------------------------------
-!
-      subroutine write_scalar_in_element_b(id_file)
-!
-      integer (kind = kint), intent(in) :: id_file
-      integer(kind = kint) :: i
-!
-      write(id_file) numnod_dummy, internal_node_dummy
-      write(id_file) (ele_scalar_IO(i),i=1,numnod_dummy )
-!
-      call deallocate_ele_scalar_IO
-!
-      end subroutine write_scalar_in_element_b
-!
-!------------------------------------------------------------------
-!
-      subroutine write_vector_in_element_b(id_file)
-!
-      integer (kind = kint), intent(in) :: id_file
-      integer (kind = kint) :: i
-!
-      write(id_file) numnod_dummy, internal_node_dummy
-      write(id_file) (ele_vector_IO(i,1:3),i=1,numnod_dummy )
-!
-      call deallocate_ele_vector_IO
-!
-      end subroutine write_vector_in_element_b
-!
-!------------------------------------------------------------------
 !------------------------------------------------------------------
 !
       subroutine read_number_of_node(id_file)
@@ -166,43 +138,6 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_scalar_in_element(id_file)
-!
-      integer (kind = kint), intent(in) :: id_file
-      integer(kind = kint) :: i, itmp
-!
-!
-      call read_number_of_node(id_file)
-!
-      call allocate_ele_scalar_IO
-!
-      do i = 1, numnod_dummy
-        read(id_file,*) itmp, ele_scalar_IO(i)
-      end do
-!
-      end subroutine read_scalar_in_element
-!
-!------------------------------------------------------------------
-!
-      subroutine read_vector_in_element(id_file)
-!
-      integer (kind = kint), intent(in) :: id_file
-      integer(kind = kint) :: i, itmp
-!
-!
-      call read_number_of_node(id_file)
-!
-      call allocate_ele_vector_IO
-!
-      do i = 1, numnod_dummy
-        read(id_file,*) itmp, ele_vector_IO(i,1:3)
-      end do
-!
-      end subroutine read_vector_in_element
-!
-!------------------------------------------------------------------
-!------------------------------------------------------------------
-!
        subroutine read_number_of_node_b(id_file)
 !
        integer (kind = kint), intent(in) :: id_file
@@ -227,40 +162,6 @@
        end do
 !
        end subroutine read_geometry_info_b
-!
-!------------------------------------------------------------------
-!
-      subroutine read_scalar_in_element_b(id_file)
-!
-       integer (kind = kint), intent(in) :: id_file
-      integer(kind = kint) :: i
-!
-!
-      call read_number_of_node_b(id_file)
-!
-      call allocate_ele_scalar_IO
-!
-      read(id_file) (ele_scalar_IO(i),i=1,numnod_dummy )
-!
-      end subroutine read_scalar_in_element_b
-!
-!------------------------------------------------------------------
-!
-      subroutine read_vector_in_element_b(id_file)
-!
-       integer (kind = kint), intent(in) :: id_file
-      integer(kind = kint) :: i
-!
-!
-      call read_number_of_node_b(id_file)
-!
-      call allocate_ele_scalar_IO
-!
-      read(id_file) (ele_vector_IO(i,1:3),i=1,numnod_dummy )
-!
-      call deallocate_ele_vector_IO
-!
-      end subroutine read_vector_in_element_b
 !
 !------------------------------------------------------------------
 !

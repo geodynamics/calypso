@@ -1,20 +1,25 @@
-!set_radial_grid_sph_shell.f90
-!      module set_radial_grid_sph_shell
+!>@file   set_radial_grid_sph_shell.f90
+!!@brief  module set_radial_grid_sph_shell
+!!
+!!@author H. Okuda and H. Matsui
+!!@date Programmed in Sep., 2009
 !
-!      Written by H. Matsui on Sep., 2009
-!
-!      subroutine set_equi_distance_shell(num_layer, nlayer_ICB,        &
-!     &          nlayer_CMB, r_ICB, r_CMB, r_grid)
-!      subroutine set_chebyshev_distance_shell(num_layer, nlayer_ICB,   &
-!     &          nlayer_CMB, r_ICB, r_CMB, r_grid)
-!
-!      subroutine count_equi_ext_layers(nri, r_ICB, r_CMB,              &
-!     &          r_min, r_max, ntot_shell, nlayer_ICB, nlayer_CMB)
-!      subroutine count_chebyshev_ext_layers(nri, r_ICB, r_CMB,         &
-!     &          r_min, r_max, ntot_shell, nlayer_ICB, nlayer_CMB)
-!
-!      subroutine set_radial_distance_flag(num_layer, nlayer_ICB,       &
-!     &          nlayer_CMB, r_ICB, r_CMB, r_grid, iflag_rgrid)
+!> @brief Set radial grid data
+!!
+!!@verbatim
+!!      subroutine set_equi_distance_shell(num_layer, nlayer_ICB,       &
+!!     &          nlayer_CMB, r_ICB, r_CMB, r_grid)
+!!      subroutine set_chebyshev_distance_shell(num_layer, nlayer_ICB,  &
+!!     &          nlayer_CMB, r_ICB, r_CMB, r_grid)
+!!
+!!      subroutine count_equi_ext_layers(nri, r_ICB, r_CMB,             &
+!!     &          r_min, r_max, ntot_shell, nlayer_ICB, nlayer_CMB)
+!!      subroutine count_chebyshev_ext_layers(nri, r_ICB, r_CMB,        &
+!!     &          r_min, r_max, ntot_shell, nlayer_ICB, nlayer_CMB)
+!!
+!!      subroutine set_radial_distance_flag(num_layer, nlayer_ICB,      &
+!!     &          nlayer_CMB, r_ICB, r_CMB, r_grid, iflag_rgrid)
+!!@endverbatim
 !
       module set_radial_grid_sph_shell
 !

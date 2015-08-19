@@ -43,12 +43,13 @@
 !
       subroutine FEM_initialize_sph_MHD
 !
+      use m_geometry_data
+      use m_group_data
       use m_array_for_send_recv
       use m_t_step_parameter
-      use m_surface_geometry_data
-      use m_edge_geometry_data
       use m_node_phys_address
       use m_cal_max_indices
+      use m_ele_sf_eg_comm_tables
 !
       use const_mesh_info
       use nodal_vector_send_recv
@@ -58,23 +59,26 @@
 !
 !
       if (iflag_debug.gt.0) write(*,*) 'set_local_node_id_4_monitor'
-      call set_local_node_id_4_monitor
+      call set_local_node_id_4_monitor(nod_grp1)
+!
+!  -------------------------------
+!
+      if (iflag_debug.gt.0 ) write(*,*) 'allocate_vector_for_solver'
+      call allocate_vector_for_solver(isix, node1%numnod)
+!
+      if(iflag_debug.gt.0) write(*,*)' init_send_recv'
+      call init_send_recv
 !
 !  -----    construct geometry informations
 !
       if (iflag_debug.gt.0) write(*,*) 'const_mesh_informations'
       call const_mesh_informations(my_rank)
 !
-      call deallocate_surface_geometry
-      call deallocate_edge_geometry
+      if(iflag_debug.gt.0) write(*,*)' const_element_comm_tables_1st'
+      call const_element_comm_tables_1st
 !
-!  -------------------------------
-!
-      if (iflag_debug.gt.0 ) write(*,*) 'allocate_vector_for_solver'
-      call allocate_vector_for_solver(isix, numnod)
-!
-      if(iflag_debug.gt.0) write(*,*)' init_send_recv'
-      call init_send_recv
+      call deallocate_surface_geom_type(surf1)
+      call deallocate_edge_geom_type(edge1)
 !
 !  -------------------------------
 !

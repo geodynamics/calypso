@@ -73,7 +73,6 @@
 !
       subroutine SPH_const_initial_field
 !
-      use m_geometry_parameter
       use m_spheric_parameter
       use m_sph_spectr_data
       use m_sph_phys_address

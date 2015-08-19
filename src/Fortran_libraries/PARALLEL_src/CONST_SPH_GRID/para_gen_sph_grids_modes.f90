@@ -17,8 +17,7 @@
 !!
 !!      subroutine para_gen_fem_mesh_for_sph(ndomain_sph)
 !!
-!!      subroutine dealloc_comm_stacks_rlm(ndomain_sph, comm_rlm)
-!!      subroutine dealloc_comm_stacks_rtm(ndomain_sph, comm_rtm)
+!!      subroutine dealloc_comm_stacks_sph(ndomain_sph, comm_rtm)
 !!@endverbatim
 !
       module para_gen_sph_grids_modes
@@ -34,35 +33,17 @@
 !
       implicit none
 !
-      integer(kind = kint), allocatable :: nneib_rlm_lc(:)
-      integer(kind = kint), allocatable :: nneib_rlm_gl(:)
       integer(kind = kint), allocatable :: nneib_rtm_lc(:)
       integer(kind = kint), allocatable :: nneib_rtm_gl(:)
 !
-      private :: nneib_rlm_lc, nneib_rtm_lc, nneib_rlm_gl, nneib_rtm_gl
-      private :: allocate_nneib_sph_rlm_tmp
-      private :: deallocate_nneib_sph_rlm_tmp
+      private :: nneib_rtm_lc, nneib_rtm_gl
       private :: allocate_nneib_sph_rtm_tmp
       private :: deallocate_nneib_sph_rtm_tmp
-      private :: bcast_comm_stacks_rlm, bcast_comm_stacks_rtm
+      private :: bcast_comm_stacks_sph
 !
 ! -----------------------------------------------------------------------
 !
       contains
-!
-! -----------------------------------------------------------------------
-!
-      subroutine allocate_nneib_sph_rlm_tmp(ndomain_sph)
-!
-      integer(kind = kint), intent(in) :: ndomain_sph
-!
-!
-      allocate(nneib_rlm_lc(ndomain_sph))
-      allocate(nneib_rlm_gl(ndomain_sph))
-      nneib_rlm_lc = 0
-      nneib_rlm_gl = 0
-!
-      end subroutine allocate_nneib_sph_rlm_tmp
 !
 ! -----------------------------------------------------------------------
 !
@@ -76,15 +57,6 @@
       nneib_rtm_gl = 0
 !
       end subroutine allocate_nneib_sph_rtm_tmp
-!
-! -----------------------------------------------------------------------
-!
-      subroutine deallocate_nneib_sph_rlm_tmp
-!
-!
-      deallocate(nneib_rlm_lc, nneib_rlm_gl)
-!
-      end subroutine deallocate_nneib_sph_rlm_tmp
 !
 ! -----------------------------------------------------------------------
 !
@@ -111,7 +83,6 @@
       integer(kind = kint) :: ip_rank, ip
 !
 !
-      call allocate_nneib_sph_rlm_tmp(ndomain_sph)
       do ip = 1, ndomain_sph
         ip_rank = ip - 1
         if(mod(ip_rank,nprocs) .ne. my_rank) cycle
@@ -124,7 +95,6 @@
         call copy_comm_rlm_num_to_type(comm_rlm(ip))
 !
         if(iflag_debug .gt. 0) write(*,*) 'copy_comm_rlm_num_to_type d'
-        nneib_rlm_lc(ip) = comm_rlm(ip)%nneib_domain
 !
         if(iflag_debug .gt. 0) write(*,*)                               &
      &        'output_modes_rlm_sph_trans', ip_rank
@@ -133,8 +103,7 @@
         write(*,'(a,i6,a)') 'Spherical transform table for domain',     &
      &          ip_rank, ' is done.'
       end do
-      call bcast_comm_stacks_rlm(ndomain_sph, comm_rlm)
-      call deallocate_nneib_sph_rlm_tmp
+      call bcast_comm_stacks_sph(ndomain_sph, comm_rlm)
 !
       end subroutine para_gen_sph_rlm_grids
 !
@@ -153,7 +122,6 @@
       integer(kind = kint) :: ip_rank, ip
 !
 !
-      call allocate_nneib_sph_rtm_tmp(ndomain_sph)
       do ip = 1, ndomain_sph
         ip_rank = ip - 1
         if(mod(ip_rank,nprocs) .ne. my_rank) cycle
@@ -162,9 +130,7 @@
      &             'start rtm table generation for',                    &
      &            ip_rank, 'on ', my_rank, nprocs
         call const_sph_rtm_grids(ip_rank)
-!
         call copy_comm_rtm_num_to_type(comm_rtm(ip))
-        nneib_rtm_lc(ip) = comm_rtm(ip_rank+1)%nneib_domain
 !
         if(iflag_debug .gt. 0) write(*,*)                               &
      &        'output_geom_rtm_sph_trans', ip_rank
@@ -173,8 +139,7 @@
         write(*,'(a,i6,a)') 'Legendre transform table rtm',             &
      &          ip_rank, ' is done.'
       end do
-      call bcast_comm_stacks_rtm(ndomain_sph, comm_rtm)
-      call deallocate_nneib_sph_rtm_tmp
+      call bcast_comm_stacks_sph(ndomain_sph, comm_rtm)
 !
       end subroutine para_gen_sph_rtm_grids
 !
@@ -273,152 +238,84 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine bcast_comm_stacks_rlm(ndomain_sph, comm_rlm)
+      subroutine bcast_comm_stacks_sph(ndomain_sph, comm_sph)
 !
       integer(kind = kint), intent(in) :: ndomain_sph
-      type(sph_comm_tbl), intent(inout) :: comm_rlm(ndomain_sph)
+      type(sph_comm_tbl), intent(inout) :: comm_sph(ndomain_sph)
 !
-      integer(kind = kint) :: ip_rank, ip, iroot, nneib
-      integer(kind = kint) :: iflag, i, irank_tgt
+      integer(kind = kint) :: ip, iroot
+      integer(kind = kint) :: iflag, i
+      type(sph_comm_tbl) :: comm_tmp
 !
 !
-      if(i_debug .gt. 0) write(*,*) 'barrier for rlm', my_rank
+!      if(i_debug .gt. 0) write(*,*) 'barrier', my_rank
       call calypso_MPI_barrier
-      if(my_rank .eq. 0) write(*,*) 'barrier finished for rlm'
+      if(my_rank .eq. 0) write(*,*) 'barrier finished'
 !
-      call MPI_allREDUCE(nneib_rlm_lc(1), nneib_rlm_gl(1),              &
-     &      ndomain_sph, CALYPSO_INTEGER, MPI_SUM,                      &
-     &      CALYPSO_COMM, ierr_MPI)
-!
-      comm_rlm(1:ndomain_sph)%nneib_domain                              &
-     &        = nneib_rlm_gl(1:ndomain_sph)
-!
+      call allocate_nneib_sph_rtm_tmp(ndomain_sph)
       do ip = 1, ndomain_sph
-        ip_rank = ip - 1
-        if(mod(ip_rank,nprocs) .eq. my_rank) cycle
-        call alloc_type_sph_comm_stack(comm_rlm(ip))
-      end do
-!
-      do ip = 1, ndomain_sph
-        ip_rank = ip - 1
-        iroot = mod(ip_rank,nprocs)
-        nneib = comm_rlm(ip)%nneib_domain
-        call MPI_Bcast(comm_rlm(ip)%id_domain(1), nneib,                &
-     &      CALYPSO_INTEGER, iroot, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(comm_rlm(ip)%istack_sr(1), nneib,                &
-     &      CALYPSO_INTEGER, iroot, CALYPSO_COMM, ierr_MPI)
-!
-        iflag = 0
-        do i = 1, comm_rlm(ip)%nneib_domain
-          irank_tgt = comm_rlm(ip)%id_domain(i)
-          if(mod(irank_tgt,nprocs) .eq. my_rank) then
-            iflag = 1
-            exit
-          end if
-        end do
-!
-        if(iflag .eq. 0) then
-!          write(*,*) 'deallocate rlm:', my_rank, ip
-          call dealloc_type_sph_comm_stack(comm_rlm(ip))
-          comm_rlm(ip)%nneib_domain = 0
+        if(mod(ip-1,nprocs) .eq. my_rank) then
+          nneib_rtm_lc(ip) = comm_sph(ip)%nneib_domain
         end if
       end do
-!
-!      do ip = 1, ndomain_sph
-!        write(50+my_rank,*) 'ip', ip
-!        write(50+my_rank,*) 'nneib_domain', comm_rlm(ip)%nneib_domain
-!        write(50+my_rank,*) 'id_domain', comm_rlm(ip)%id_domain
-!      end do
-!
-      end subroutine bcast_comm_stacks_rlm
-!
-! ----------------------------------------------------------------------
-!
-      subroutine bcast_comm_stacks_rtm(ndomain_sph, comm_rtm)
-!
-      integer(kind = kint), intent(in) :: ndomain_sph
-      type(sph_comm_tbl), intent(inout) :: comm_rtm(ndomain_sph)
-!
-      integer(kind = kint) :: ip_rank, ip, iroot, nneib
-      integer(kind = kint) :: iflag, i, irank_tgt
-!
-!
-      if(i_debug .gt. 0) write(*,*) 'barrier for rtm', my_rank
-      call calypso_MPI_barrier
-      if(my_rank .eq. 0) write(*,*) 'barrier finished for rtm'
 !
       call MPI_allREDUCE(nneib_rtm_lc(1), nneib_rtm_gl(1),              &
      &      ndomain_sph, CALYPSO_INTEGER, MPI_SUM,                      &
      &      CALYPSO_COMM, ierr_MPI)
 !
-      comm_rtm(1:ndomain_sph)%nneib_domain                              &
-     &           = nneib_rtm_gl(1:ndomain_sph)
-!
       do ip = 1, ndomain_sph
-        ip_rank = ip - 1
-        if(mod(ip_rank,nprocs) .eq. my_rank) cycle
-        call alloc_type_sph_comm_stack(comm_rtm(ip))
-      end do
+        iroot = mod(ip-1,nprocs)
+        comm_tmp%nneib_domain = nneib_rtm_gl(ip)
+        call alloc_type_sph_comm_stack(comm_tmp)
 !
-      do ip = 1, ndomain_sph
-        ip_rank = ip - 1
-        iroot = mod(ip_rank,nprocs)
-        nneib = comm_rtm(ip)%nneib_domain
-        call MPI_Bcast(comm_rtm(ip)%id_domain(1), nneib,                &
+        if(iroot .eq. my_rank) then
+          comm_tmp%id_domain(1:comm_sph(ip)%nneib_domain)               &
+     &       = comm_sph(ip)%id_domain(1:comm_sph(ip)%nneib_domain)
+          comm_tmp%istack_sr(0:comm_sph(ip)%nneib_domain)               &
+     &       = comm_sph(ip)%istack_sr(0:comm_sph(ip)%nneib_domain)
+        end if
+!
+        call MPI_Bcast(comm_tmp%id_domain(1), comm_tmp%nneib_domain,    &
      &      CALYPSO_INTEGER, iroot, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(comm_rtm(ip)%istack_sr(1), nneib,                &
+        call MPI_Bcast(comm_tmp%istack_sr(1), comm_tmp%nneib_domain,    &
      &      CALYPSO_INTEGER, iroot, CALYPSO_COMM, ierr_MPI)
 !
         iflag = 0
-        do i = 1, comm_rtm(ip)%nneib_domain
-          irank_tgt = comm_rtm(ip)%id_domain(i)
-          if(mod(irank_tgt,nprocs) .eq. my_rank) then
+        do i = 1, comm_tmp%nneib_domain
+          if(mod(comm_tmp%id_domain(i),nprocs) .eq. my_rank) then
             iflag = 1
             exit
           end if
         end do
 !
         if(iflag .eq. 0) then
-!          write(*,*) 'deallocate rtm:', my_rank, ip
-          call dealloc_type_sph_comm_stack(comm_rtm(ip))
-          comm_rtm(ip)%nneib_domain = 0
+          comm_sph(ip)%nneib_domain = 0
+        else if(iroot .ne. my_rank) then
+!          write(*,*) 'allocate rtm:', my_rank, ip
+          comm_sph(ip)%nneib_domain = comm_tmp%nneib_domain
+          call alloc_type_sph_comm_stack(comm_sph(ip))
+          comm_sph(ip)%id_domain(1:comm_sph(ip)%nneib_domain)           &
+     &       = comm_tmp%id_domain(1:comm_sph(ip)%nneib_domain)
+          comm_sph(ip)%istack_sr(0:comm_sph(ip)%nneib_domain)           &
+     &       = comm_tmp%istack_sr(0:comm_sph(ip)%nneib_domain)
         end if
+!
+        call dealloc_type_sph_comm_stack(comm_tmp)
       end do
+      call deallocate_nneib_sph_rtm_tmp
 !
-      end subroutine bcast_comm_stacks_rtm
+!      do ip = 1, ndomain_sph
+!        write(50+my_rank,*) 'ip', ip
+!        write(50+my_rank,*) 'nneib_domain', comm_sph(ip)%nneib_domain
+!        write(50+my_rank,*) 'id_domain', comm_sph(ip)%id_domain
+!      end do
 !
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine dealloc_comm_stacks_rlm(ndomain_sph, comm_rlm)
-!
-      integer(kind = kint), intent(in) :: ndomain_sph
-      type(sph_comm_tbl), intent(inout) :: comm_rlm(ndomain_sph)
-      integer(kind = kint) :: ip, iflag, i, irank_tgt
-!
-!
-      do ip = 1, ndomain_sph
-        iflag = 0
-        do i = 1, comm_rlm(ip)%nneib_domain
-          irank_tgt = comm_rlm(ip)%id_domain(i)
-          if(mod(irank_tgt,nprocs) .eq. my_rank) then
-            iflag = 1
-            exit
-          end if
-        end do
-!
-        if(iflag .gt. 0) then
-!          write(*,*) 'deallocate rlm:', my_rank, ip
-          call dealloc_type_sph_comm_stack(comm_rlm(ip))
-          comm_rlm(ip)%nneib_domain = 0
-        end if
-      end do
-!
-      end subroutine dealloc_comm_stacks_rlm
+      end subroutine bcast_comm_stacks_sph
 !
 ! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
-      subroutine dealloc_comm_stacks_rtm(ndomain_sph, comm_rtm)
+      subroutine dealloc_comm_stacks_sph(ndomain_sph, comm_rtm)
 !
       integer(kind = kint), intent(in) :: ndomain_sph
       type(sph_comm_tbl), intent(inout) :: comm_rtm(ndomain_sph)
@@ -442,7 +339,7 @@
         end if
       end do
 !
-      end subroutine dealloc_comm_stacks_rtm
+      end subroutine dealloc_comm_stacks_sph
 !
 ! ----------------------------------------------------------------------
 !

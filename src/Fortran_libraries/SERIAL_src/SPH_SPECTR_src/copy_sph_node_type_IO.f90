@@ -1,33 +1,38 @@
+!>@file   copy_sph_node_type_IO.f90
+!!@brief  module copy_sph_node_type_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!      module copy_sph_node_type_IO
-!
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine copy_sph_node_type_rtp_from_IO(l_truncation, rtp)
-!        integer(kind = kint), intent(inout) :: l_truncation
-!        type(sph_rtp_grid), intent(inout) :: rtp
-!      subroutine copy_sph_node_type_rtm_from_IO(l_truncation, rtm)
-!        integer(kind = kint), intent(inout) :: l_truncation
-!        type(sph_rtm_grid), intent(inout) :: rtm
-!      subroutine copy_sph_node_type_rlm_from_IO(l_truncation, rlm)
-!        integer(kind = kint), intent(inout) :: l_truncation
-!        type(sph_rlm_grid), intent(inout) :: rlm
-!      subroutine copy_sph_node_type_rj_from_IO(l_truncation, rj)
-!        integer(kind = kint), intent(inout) :: l_truncation
-!        type(sph_rj_grid), intent(inout) :: rj
-!
-!      subroutine copy_sph_node_type_rtp_to_IO(l_truncation, rtp)
-!        integer(kind = kint), intent(in) :: l_truncation
-!        type(sph_rtp_grid), intent(inout) :: rtp
-!      subroutine copy_sph_node_type_rtm_to_IO(l_truncation, rtm)
-!        integer(kind = kint), intent(in) :: l_truncation
-!        type(sph_rtm_grid), intent(inout) :: rtm
-!      subroutine copy_sph_node_type_rlm_to_IO(l_truncation, rlm)
-!        integer(kind = kint), intent(in) :: l_truncation
-!        type(sph_rlm_grid), intent(inout) :: rlm
-!      subroutine copy_sph_node_type_rj_to_IO(l_truncation, rj)
-!        integer(kind = kint), intent(in) :: l_truncation
-!        type(sph_rj_grid), intent(inout) :: rj
+!>@brief Copy sphectr indices structure between IO buffer
+!!
+!!@verbatim
+!!      subroutine copy_sph_node_type_rtp_from_IO(l_truncation, rtp)
+!!        integer(kind = kint), intent(inout) :: l_truncation
+!!        type(sph_rtp_grid), intent(inout) :: rtp
+!!      subroutine copy_sph_node_type_rtm_from_IO(l_truncation, rtm)
+!!        integer(kind = kint), intent(inout) :: l_truncation
+!!        type(sph_rtm_grid), intent(inout) :: rtm
+!!      subroutine copy_sph_node_type_rlm_from_IO(l_truncation, rlm)
+!!        integer(kind = kint), intent(inout) :: l_truncation
+!!        type(sph_rlm_grid), intent(inout) :: rlm
+!!      subroutine copy_sph_node_type_rj_from_IO(l_truncation, rj)
+!!        integer(kind = kint), intent(inout) :: l_truncation
+!!        type(sph_rj_grid), intent(inout) :: rj
+!!
+!!      subroutine copy_sph_node_type_rtp_to_IO(l_truncation, rtp)
+!!        integer(kind = kint), intent(in) :: l_truncation
+!!        type(sph_rtp_grid), intent(inout) :: rtp
+!!      subroutine copy_sph_node_type_rtm_to_IO(l_truncation, rtm)
+!!        integer(kind = kint), intent(in) :: l_truncation
+!!        type(sph_rtm_grid), intent(inout) :: rtm
+!!      subroutine copy_sph_node_type_rlm_to_IO(l_truncation, rlm)
+!!        integer(kind = kint), intent(in) :: l_truncation
+!!        type(sph_rlm_grid), intent(inout) :: rlm
+!!      subroutine copy_sph_node_type_rj_to_IO(l_truncation, rj)
+!!        integer(kind = kint), intent(in) :: l_truncation
+!!        type(sph_rj_grid), intent(inout) :: rj
+!!@endverbatim
 !
       module copy_sph_node_type_IO
 !

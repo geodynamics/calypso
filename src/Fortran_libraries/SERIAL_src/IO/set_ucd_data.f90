@@ -1,8 +1,12 @@
-!set_ucd_data.f90
-!      module set_ucd_data
+!>@file  set_ucd_data.f90
+!!       module set_ucd_data
+!!
+!!@author H. Matsui
+!!@date        programmed by H.Matsui in July, 2007
 !
-!        programmed by H.Matsui on July, 2006
-!
+!> @brief Link field data to IO structure for data IO
+!!
+!!@verbatim
 !!      subroutine link_node_data_2_output(numnod, inod_gl, xx, ucd)
 !!      subroutine link_ele_data_2_output(numele, nnod_4_ele,           &
 !!     &          iele_gl, ie, ucd)
@@ -10,6 +14,10 @@
 !!      subroutine link_field_data_2_output(numnod, num_phys, ntot_comp,&
 !!     &          num_phys_vis, ntot_comp_vis, num_component,           &
 !!     &          phy_name, d_nod, ucd)
+!!
+!!      subroutine link_numnod_stacks_2_output(nprocs, istack_numnod,   &
+!!     &          istack_internod, istack_interele, m_ucd)
+!!@endverbatim
 !
       module set_ucd_data
 !
@@ -36,8 +44,8 @@
 !
 !
       ucd%nnod =         numnod
-      ucd%inod_global => inod_gl(1:numnod)
-      ucd%xx =>          xx(1:numnod,1:3)
+      ucd%inod_global => inod_gl
+      ucd%xx =>          xx
 !
       end subroutine link_node_data_2_output
 !
@@ -52,10 +60,12 @@
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      call allocate_ucd_ele(ucd)
-!
       ucd%nele =         numele
       ucd%nnod_4_ele =   nnod_4_ele
+!
+      call allocate_ucd_ele(ucd)
+!
+      if(numele .le. 0) return
 !
 !$omp parallel workshare
       ucd%ie(1:numele,1:nnod_4_ele) = ie(1:numele,1:nnod_4_ele)
@@ -101,12 +111,35 @@
       ucd%num_field = num_phys_vis
       ucd%ntot_comp = ntot_comp_vis
 !
-      ucd%num_comp =>  num_component(1:num_phys_vis)
-      ucd%phys_name => phy_name(1:num_phys_vis)
+      ucd%num_comp =>  num_component
+      ucd%phys_name => phy_name
 !
-      ucd%d_ucd =>     d_nod(1:numnod,1:ntot_comp_vis)
+      ucd%d_ucd =>     d_nod
 !
       end subroutine link_field_data_2_output
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine link_numnod_stacks_2_output(nprocs, istack_numnod,     &
+     &          istack_internod, istack_interele, m_ucd)
+!
+      integer(kind = kint), intent(in) :: nprocs
+      integer(kind = kint_gl), intent(in), target                       &
+     &                        :: istack_numnod(0:nprocs)
+      integer(kind = kint_gl), intent(in), target                       &
+     &                        :: istack_internod(0:nprocs)
+      integer(kind = kint_gl), intent(in), target                       &
+     &                        :: istack_interele(0:nprocs)
+!
+      type(merged_ucd_data), intent(inout) :: m_ucd
+!
+!
+      m_ucd%istack_merged_nod  =>   istack_numnod
+      m_ucd%istack_merged_intnod => istack_internod
+      m_ucd%istack_merged_ele =>    istack_interele
+!
+      end subroutine link_numnod_stacks_2_output
 !
 !-----------------------------------------------------------------------
 !

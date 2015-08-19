@@ -4,6 +4,9 @@
 !     Writteg by H.Matsui on Aug., 2006
 !
 !
+!      subroutine count_nod_4_ele_grp(numnod, numele, nnod_4_ele, ie,   &
+!     &          num_grp, num_item, istack_grp, item_grp,               &
+!     &          ntot_nod_grp, nnod_grp, inod_stack_grp, inod_2_nod_grp)
 !      subroutine count_nod_each_grp(numnod, numele, nnod_4_ele, ie,    &
 !     &          nele_grp, iele_grp, nnod_grp, inod_2_nod_grp)
 !

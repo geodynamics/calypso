@@ -1,14 +1,21 @@
-!set_psf_iso_control.f90
-!      module set_psf_iso_control
+!>@file   set_psf_iso_control.f90
+!!@brief  module set_psf_iso_control
+!!
+!!@author H. Matsui
+!!@date Programmed in May., 2006
+!!@n    Modified in  June, 1015
 !
-!     Written by H. Matsui on May., 2006
-!
+!>@brief Structure for parallel sectioned data
+!!
+!!@verbatim
+!!      subroutine dealloc_psf_field_name(num_psf, psf_mesh)
 !!      subroutine set_psf_control(num_psf, num_mat, mat_name,          &
 !!     &          num_surf, surf_name, num_nod_phys, phys_nod_name,     &
-!!     &          psf_param, psf_fld, psf_pat)
+!!     &          psf_param, psf_mesh)
 !!      subroutine set_iso_control                                      &
 !!     &         (num_iso, num_mat, mat_name, num_nod_phys,             &
-!!     &          phys_nod_name, iso_param, iso_fld, iso_pat)
+!!     &          phys_nod_name, iso_param, iso_mesh)
+!!@endverbatim
 !
       module set_psf_iso_control
 !
@@ -29,16 +36,32 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine dealloc_psf_field_name(num_psf, psf_mesh)
+!
+      use t_psf_patch_data
+!
+      integer(kind = kint), intent(in) :: num_psf
+      type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
+!
+      integer(kind = kint) :: i
+!
+      do i = 1, num_psf
+        call dealloc_phys_name_type(psf_mesh(i)%field)
+      end do
+!
+      end subroutine dealloc_psf_field_name
+!
+!  ---------------------------------------------------------------------
+!
       subroutine set_psf_control(num_psf, num_mat, mat_name,            &
      &          num_surf, surf_name, num_nod_phys, phys_nod_name,       &
-     &          psf_param, psf_fld, psf_pat)
+     &          psf_param, psf_mesh)
 !
       use calypso_mpi
       use m_control_data_sections
       use m_control_data_4_psf
       use m_control_params_4_psf
       use m_read_control_elements
-      use t_phys_data
       use t_psf_patch_data
 !
       use set_field_comp_for_viz
@@ -54,8 +77,7 @@
       character(len=kchara), intent(in) :: phys_nod_name(num_nod_phys)
 !
       type(psf_parameters), intent(inout) :: psf_param(num_psf)
-      type(phys_data), intent(inout) :: psf_fld(num_psf)
-      type(psf_patch_data), intent(inout) :: psf_pat
+      type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !
       integer(kind = kint) :: i_psf, ierr
 !
@@ -70,24 +92,24 @@
       do i_psf = 1, num_psf
         call count_control_4_psf(i_psf, psf_ctl_struct(i_psf),          &
      &      num_mat, mat_name, num_nod_phys, phys_nod_name,             &
-     &      psf_fld(i_psf), psf_param(i_psf), ierr)
+     &      psf_mesh(i_psf)%field, psf_param(i_psf), ierr)
         if(ierr.gt.0) call calypso_MPI_abort                            &
      &                   (ierr, 'set correct element group')
       end do
 !
       do i_psf = 1, num_psf
-        call alloc_phys_name_type(psf_fld(i_psf))
+        call alloc_phys_name_type(psf_mesh(i_psf)%field)
         call set_control_4_psf                                          &
      &     (i_psf, psf_ctl_struct(i_psf), num_mat, mat_name,            &
      &      num_surf, surf_name, num_nod_phys, phys_nod_name,           &
-     &      psf_fld(i_psf), psf_param(i_psf))
+     &      psf_mesh(i_psf)%field, psf_param(i_psf))
         call deallocate_cont_dat_4_psf(psf_ctl_struct(i_psf))
+!
+        call count_total_comps_4_viz(psf_mesh(i_psf)%field)
       end do
 !
       call deallocate_psf_ctl_stract
 !
-      call count_total_comps_4_viz                                      &
-     &   (num_psf, psf_fld, psf_pat%max_ncomp_psf)
 !
       end subroutine set_psf_control
 !
@@ -95,14 +117,13 @@
 !
       subroutine set_iso_control                                        &
      &         (num_iso, num_mat, mat_name, num_nod_phys,               &
-     &          phys_nod_name, iso_param, iso_fld, iso_pat)
+     &          phys_nod_name, iso_param, iso_mesh)
 !
       use calypso_mpi
       use m_control_data_sections
       use m_control_data_4_iso
       use m_control_params_4_iso
       use m_read_control_elements
-      use t_phys_data
       use t_psf_patch_data
 !
       use set_field_comp_for_viz
@@ -115,8 +136,7 @@
       character(len=kchara), intent(in) :: phys_nod_name(num_nod_phys)
 !
       type(psf_parameters), intent(inout) :: iso_param(num_iso)
-      type(phys_data), intent(inout) :: iso_fld(num_iso)
-      type(psf_patch_data), intent(inout) :: iso_pat
+      type(psf_local_data), intent(inout) :: iso_mesh(num_iso)
 !
       integer(kind = kint) :: i
 !
@@ -131,21 +151,21 @@
       do i = 1, num_iso
         call count_control_4_iso(i, iso_ctl_struct(i),                  &
      &      num_mat, mat_name, num_nod_phys, phys_nod_name,             &
-     &      iso_fld(i), iso_param(i))
+     &      iso_mesh(i)%field, iso_param(i))
       end do
 !
       do i = 1, num_iso
-        call alloc_phys_name_type(iso_fld(i))
+        call alloc_phys_name_type(iso_mesh(i)%field)
         call set_control_4_iso(i, iso_ctl_struct(i),                    &
      &      num_mat, mat_name, num_nod_phys, phys_nod_name,             &
-     &      iso_fld(i), iso_param(i))
+     &      iso_mesh(i)%field, iso_param(i))
         call deallocate_cont_dat_4_iso(iso_ctl_struct(i))
+!
+        call count_total_comps_4_viz(iso_mesh(i)%field)
       end do
 !
       call deallocate_iso_ctl_stract
 !
-      call count_total_comps_4_viz                                      &
-     &   (num_iso, iso_fld, iso_pat%max_ncomp_psf)
 !
       if(iflag_debug .gt. 0) then
         do i = 1, num_iso

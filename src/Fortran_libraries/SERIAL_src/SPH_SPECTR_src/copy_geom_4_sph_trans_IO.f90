@@ -1,17 +1,23 @@
-!copy_geom_4_sph_trans_IO.f90
-!      module copy_geom_4_sph_trans_IO
+!>@file   copy_geom_4_sph_trans_IO.f90
+!!@brief  module copy_geom_4_sph_trans_IO
+!!
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine copy_geom_rtp_sph_trans
-!      subroutine copy_spectr_modes_rj_sph_trans
-!      subroutine copy_geom_rtm_sph_trans
-!      subroutine copy_modes_rlm_sph_trans
-!
-!      subroutine copy_geom_rtp_IO(my_rank)
-!      subroutine copy_spectr_modes_rj_IO(my_rank)
-!      subroutine copy_geom_rtm_IO(my_rank)
-!      subroutine copy_modes_rlm_IO(my_rank)
+!>@brief Construct matrices for 4th order FDM
+!!
+!!@verbatim
+!!      subroutine copy_geom_rtp_sph_trans
+!!      subroutine copy_spectr_modes_rj_sph_trans
+!!      subroutine copy_geom_rtm_sph_trans
+!!      subroutine copy_modes_rlm_sph_trans
+!!
+!!      subroutine copy_geom_rtp_IO(my_rank)
+!!      subroutine copy_spectr_modes_rj_IO(my_rank)
+!!      subroutine copy_geom_rtm_IO(my_rank)
+!!      subroutine copy_modes_rlm_IO(my_rank)
+!!@endverbatim
 !
       module copy_geom_4_sph_trans_IO
 !

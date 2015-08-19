@@ -3,20 +3,24 @@
 !
 !      Written by H. Matsui
 !
-!      subroutine count_surface_hash(numnod, numele, nnod_4_ele,        &
-!     &          nnod_4_surf, ie)
-!      subroutine set_surf_hash(numele, nnod_4_ele, ie)
-!
-!      subroutine count_part_surface_hash(numnod, numele, numele_part,  &
-!     &          nnod_4_ele, nnod_4_surf, ie, iele_part)
-!      subroutine set_part_surf_hash(numele, numele_part, nnod_4_ele,   &
-!     &          ie, iele_part)
+!!      subroutine const_surf_hash                                      &
+!!     &         (numnod, numele, nnod_4_ele, nnod_4_surf, ie,          &
+!!     &          inum_surf_hash, istack_surf_hash,                     &
+!!     &          iend_surf_hash, isurf_hash)
+!!      subroutine const_part_surf_hash(numnod, numele, numele_part,    &
+!!     &          nnod_4_ele, nnod_4_surf, ie, iele_part,               &
+!!     &          inum_surf_hash, istack_surf_hash,                     &
+!!     &          iend_surf_hash, isurf_hash)
 !
       module set_surface_hash
 !
       use m_precision
+      use m_geometry_constants
 !
       implicit none
+!
+      private :: count_surface_hash, set_surf_hash
+      private :: count_part_surface_hash, set_part_surf_hash
 !
 !------------------------------------------------------------------
 !
@@ -24,15 +28,80 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine count_surface_hash(numnod, numele, nnod_4_ele,         &
-     &          nnod_4_surf, ie)
-!
-      use m_geometry_constants
-      use m_surface_hash
+      subroutine const_surf_hash                                        &
+     &         (numnod, numele, nnod_4_ele, nnod_4_surf, ie,            &
+     &          inum_surf_hash, istack_surf_hash,                       &
+     &          iend_surf_hash, isurf_hash)
 !
       integer(kind = kint), intent(in) :: numnod, numele
       integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_surf
       integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
+!
+      integer(kind = kint), intent(inout) :: iend_surf_hash
+      integer(kind = kint), intent(inout)                               &
+     &                     :: inum_surf_hash(nnod_4_surf*numnod)
+      integer(kind = kint), intent(inout)                               &
+     &                     :: istack_surf_hash(0:nnod_4_surf*numnod)
+      integer(kind = kint), intent(inout)                               &
+     &                     :: isurf_hash(nsurf_4_ele*numele,2)
+!
+!
+      call count_surface_hash                                           &
+     &   (numnod, numele, nnod_4_ele, nnod_4_surf, ie,                  &
+     &    inum_surf_hash, istack_surf_hash, iend_surf_hash)
+!
+      call set_surf_hash(numnod, numele, nnod_4_ele, nnod_4_surf, ie,   &
+     &    inum_surf_hash, istack_surf_hash, isurf_hash)
+!
+      end subroutine const_surf_hash
+!
+!------------------------------------------------------------------
+!
+      subroutine const_part_surf_hash(numnod, numele, numele_part,      &
+     &          nnod_4_ele, nnod_4_surf, ie, iele_part,                 &
+     &          inum_surf_hash, istack_surf_hash,                       &
+     &          iend_surf_hash, isurf_hash)
+!
+      integer(kind = kint), intent(in) :: numnod, numele, numele_part
+      integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_surf
+      integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
+      integer(kind = kint), intent(in) :: iele_part(numele_part)
+!
+      integer(kind = kint), intent(inout) :: iend_surf_hash
+      integer(kind = kint), intent(inout)                               &
+     &                     :: inum_surf_hash(nnod_4_surf*numnod)
+      integer(kind = kint), intent(inout)                               &
+     &                     :: istack_surf_hash(0:nnod_4_surf*numnod)
+      integer(kind = kint), intent(inout)                               &
+     &                     :: isurf_hash(nsurf_4_ele*numele,2)
+!
+!
+      call count_part_surface_hash(numnod, numele, numele_part,         &
+     &          nnod_4_ele, nnod_4_surf, ie, iele_part,                 &
+     &          inum_surf_hash, istack_surf_hash, iend_surf_hash)
+!
+      call set_part_surf_hash(numnod, numele, numele_part,              &
+     &          nnod_4_ele, nnod_4_surf, ie, iele_part,                 &
+     &          inum_surf_hash, istack_surf_hash, isurf_hash)
+!
+      end subroutine const_part_surf_hash
+!
+!------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      subroutine count_surface_hash                                     &
+     &         (numnod, numele, nnod_4_ele, nnod_4_surf, ie,            &
+     &          inum_surf_hash, istack_surf_hash, iend_surf_hash)
+!
+      integer(kind = kint), intent(in) :: numnod, numele
+      integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_surf
+      integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
+!
+      integer(kind = kint), intent(inout) :: iend_surf_hash
+      integer(kind = kint), intent(inout)                               &
+     &                     :: inum_surf_hash(nnod_4_surf*numnod)
+      integer(kind = kint), intent(inout)                               &
+     &                     :: istack_surf_hash(0:nnod_4_surf*numnod)
 !
       integer(kind = kint) :: iele, is
       integer(kind = kint) :: i1, i2, i3, i4
@@ -72,20 +141,25 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine set_surf_hash(numele, nnod_4_ele, ie)
+      subroutine set_surf_hash                                          &
+     &         (numnod, numele, nnod_4_ele, nnod_4_surf, ie,            &
+     &          inum_surf_hash, istack_surf_hash, isurf_hash)
 !
-      use m_geometry_constants
-      use m_surface_hash
-!
-      integer(kind = kint), intent(in) :: numele
-      integer(kind = kint), intent(in) :: nnod_4_ele
+      integer(kind = kint), intent(in) :: numnod, numele
+      integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_surf
       integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
 !
-      integer(kind = kint) :: j
+      integer(kind = kint), intent(inout)                               &
+     &                     :: inum_surf_hash(nnod_4_surf*numnod)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: istack_surf_hash(0:nnod_4_surf*numnod)
+      integer(kind = kint), intent(inout)                               &
+     &                     :: isurf_hash(nsurf_4_ele*numele,2)
+!
       integer(kind = kint) :: iele, is
       integer(kind = kint) :: i1, i2, i3, i4
       integer(kind = kint) :: is1, is2, is3, is4
-      integer(kind = kint) :: ihash
+      integer(kind = kint) :: ihash, icou
 !
 !
       inum_surf_hash = 0
@@ -103,9 +177,9 @@
 !
           ihash = i1+i2+i3+i4
           inum_surf_hash(ihash) = inum_surf_hash(ihash) + 1
-          j = istack_surf_hash(ihash-1) + inum_surf_hash(ihash)
-          isurf_hash(j,1) = iele
-          isurf_hash(j,2) = is
+          icou = istack_surf_hash(ihash-1) + inum_surf_hash(ihash)
+          isurf_hash(icou,1) = iele
+          isurf_hash(icou,2) = is
 !
         end do
       end do
@@ -116,15 +190,19 @@
 !------------------------------------------------------------------
 !
       subroutine count_part_surface_hash(numnod, numele, numele_part,   &
-     &          nnod_4_ele, nnod_4_surf, ie, iele_part)
-!
-      use m_geometry_constants
-      use m_surface_hash
+     &          nnod_4_ele, nnod_4_surf, ie, iele_part,                 &
+     &          inum_surf_hash, istack_surf_hash, iend_surf_hash)
 !
       integer(kind = kint), intent(in) :: numnod, numele, numele_part
       integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_surf
       integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
       integer(kind = kint), intent(in) :: iele_part(numele_part)
+!
+      integer(kind = kint), intent(inout) :: iend_surf_hash
+      integer(kind = kint), intent(inout)                               &
+     &                     :: inum_surf_hash(nnod_4_surf*numnod)
+      integer(kind = kint), intent(inout)                               &
+     &                     :: istack_surf_hash(0:nnod_4_surf*numnod)
 !
       integer(kind = kint) :: inum, iele, is
       integer(kind = kint) :: i1, i2, i3, i4
@@ -166,22 +244,26 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine set_part_surf_hash(numele, numele_part, nnod_4_ele,    &
-     &          ie, iele_part)
+      subroutine set_part_surf_hash(numnod, numele, numele_part,        &
+     &          nnod_4_ele, nnod_4_surf, ie, iele_part,                 &
+     &          inum_surf_hash, istack_surf_hash, isurf_hash)
 !
-      use m_geometry_constants
-      use m_surface_hash
-!
-      integer(kind = kint), intent(in) :: numele, numele_part
-      integer(kind = kint), intent(in) :: nnod_4_ele
+      integer(kind = kint), intent(in) :: numnod, numele, numele_part
+      integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_surf
       integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
       integer(kind = kint), intent(in) :: iele_part(numele_part)
 !
-      integer(kind = kint) :: j
+      integer(kind = kint), intent(inout)                               &
+     &                     :: inum_surf_hash(nnod_4_surf*numnod)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: istack_surf_hash(0:nnod_4_surf*numnod)
+      integer(kind = kint), intent(inout)                               &
+     &                     :: isurf_hash(nsurf_4_ele*numele,2)
+!
       integer(kind = kint) :: inum, iele, is
       integer(kind = kint) :: i1, i2, i3, i4
       integer(kind = kint) :: is1, is2, is3, is4
-      integer(kind = kint) :: ihash
+      integer(kind = kint) :: ihash, icou
 !
 !
       inum_surf_hash = 0
@@ -200,9 +282,9 @@
 !
           ihash = i1+i2+i3+i4
           inum_surf_hash(ihash) = inum_surf_hash(ihash) + 1
-          j = istack_surf_hash(ihash-1) + inum_surf_hash(ihash)
-          isurf_hash(j,1) = iele
-          isurf_hash(j,2) = is
+          icou = istack_surf_hash(ihash-1) + inum_surf_hash(ihash)
+          isurf_hash(icou,1) = iele
+          isurf_hash(icou,2) = is
 !
         end do
       end do

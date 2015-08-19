@@ -1,16 +1,20 @@
-!set_exit_flag_4_visualizer.f90
-!     module set_exit_flag_4_visualizer
+!>@file   set_exit_flag_4_visualizer.f90
+!!@brief  module set_exit_flag_4_visualizer
+!!
+!!@author H. Matsui
+!!@date Programmed in Sep., 2007
 !
-!      Written by H.Matsui
-!      Moified by H. Matsui on Sep., 2007
-!
-!      subroutine set_output_flag_4_viz(i_step, iflag_set_field)
-!      subroutine set_flag_to_visualization(i_step,                     &
-!     &          istep_psf, istep_iso, istep_pvr, istep_fline, visval)
-!      subroutine set_flag_to_visualization(count, visval)
-!
-!      subroutine set_output_flag(i_flag, i_step, interval)
-!      subroutine set_viz_file_step(istep_ref, i_step_viz, iviz, i_cnt)
+!>@brief Set exit loop flag for visualization
+!!
+!!@verbatim
+!!      subroutine set_output_flag_4_viz(i_step, iflag_set_field)
+!!      subroutine set_flag_to_visualization(i_step,                    &
+!!     &          istep_psf, istep_iso, istep_pvr, istep_fline, visval)
+!!      subroutine set_flag_to_visualization(count, visval)
+!!
+!!      subroutine set_output_flag(i_flag, i_step, interval)
+!!      subroutine set_viz_file_step(istep_ref, i_step_viz, iviz, i_cnt)
+!!@endverbatim
 !
       module set_exit_flag_4_visualizer
 !

@@ -503,6 +503,27 @@
         integer (kind=kint) :: i_temp_scale =       izero
 !>        start address for composition length scale
         integer (kind=kint) :: i_comp_scale =       izero
+!
+!>        start address for kinetic viscosity
+        integer (kind=kint) :: i_K_viscosity =   izero
+!>        start address for thermal diffusivity
+        integer (kind=kint) :: i_T_diffusivity = izero
+!>        start address for chemical diffusivity
+        integer (kind=kint) :: i_C_diffusivity = izero
+!>        start address for magnetic diffusivity
+        integer (kind=kint) :: i_B_diffusivity = izero
+!
+!>        start address for rotation of ststem @f$ Omega @f$
+!!          i_omega:   poloidal component
+!!          i_omega+1: radial derivative of poloidal component
+!!          i_omega+2: 2nd radial derivative of poloidal component
+        integer (kind=kint) :: i_omega = izero
+!
+!>        start address for background magnetic field @f$ B_{0} @f$
+!!          i_back_B:   poloidal component
+!!          i_back_B+1: radial derivative of poloidal component
+!!          i_back_B+2: 2nd radial derivative of poloidal component
+        integer (kind=kint) :: i_back_B = izero
       end type phys_address
 !
 !

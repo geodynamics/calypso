@@ -53,12 +53,12 @@
 !!@endverbatim
 !!
 !!@n @param  n         Number of points
-!!@n @param  xx(n,3)   position @f$ (x,y,z) @f$
-!!@n @param  r(n)      radius   @f$ r @f$
-!!@n @param  theta(n)  colatitude  @f$ \theta @f$
-!!@n @param  phi(n)    longitude   @f$ \phi @f$
+!!@n @param  xx(n,3)   Position @f$ (x,y,z) @f$
+!!@n @param  r(n)      Radius   @f$ r @f$
+!!@n @param  theta(n)  Colatitude  @f$ \theta @f$
+!!@n @param  phi(n)    Longitude   @f$ \phi @f$
 !!@n @param  a_r(n)     @f$ 1/ r @f$
-!!@n @param  rs(n)     cylindrical radius  @f$ s @f$
+!!@n @param  rs(n)     Cylindrical radius  @f$ s @f$
 !!@n @param  a_rs(n)    @f$ 1 / s @f$
 !!
 !!@n @param  xx(n)   position @f$ x @f$
@@ -248,7 +248,7 @@
 !
       pi = four * atan(one)
 !
-!$omp parallel private(ratio_z)
+!$omp parallel
 !$omp do
       do inod = 1, n
         if ( rs(inod).eq.0.0 ) then
@@ -261,24 +261,21 @@
 !
 !$omp do private(ratio_z)
       do inod = 1, n
-!
         r(inod) = sqrt( zz(inod)**2 + rs(inod)**2)
 !
-        if ( r(inod).eq.0.0 ) then
+        if    (zz(inod).eq.zero .and. rs(inod).eq.zero) then
           a_r(inod) =  1.0d99
           theta(inod) = 0.0
+        else if(zz(inod).gt.zero  .and. rs(inod).eq.zero) then
+          a_r(inod) = 1.0d0 / r(inod)
+          theta(inod) = 0.0d0
+        else if(zz(inod).lt.zero  .and. rs(inod).eq.zero) then
+          a_r(inod) = 1.0d0 / r(inod)
+          theta(inod) = pi
         else
           a_r(inod) = 1.0d0 / r(inod)
           ratio_z = zz(inod) * a_r(inod)
-!
-          if (ratio_z .ge. one) then
-            theta(inod) = 0.0d0
-          else if (ratio_z .le.-one) then
-            theta(inod) = pi
-          else
-            theta(inod) = acos(ratio_z)
-          end if
-!
+          theta(inod) = acos(ratio_z)
         end if
       end do
 !$omp end do

@@ -10,9 +10,9 @@
 !      subroutine set_sph_magne_address
 !      subroutine input_old_rj_sph_trans(my_rank)
 !
-!      subroutine r_interpolate_sph_rst_from_IO
+!      subroutine r_interpolate_sph_rst_from_IO(fld_IO)
 !         (substitution for set_sph_restart_from_IO)
-!      subroutine r_interpolate_sph_fld_from_IO
+!      subroutine r_interpolate_sph_fld_from_IO(fld_IO)
 !         (substitution for set_rj_phys_data_from_IO)
 !      subroutine set_poloidal_b_by_gauss_coefs
 !
@@ -158,20 +158,22 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine r_interpolate_sph_rst_from_IO
+      subroutine r_interpolate_sph_rst_from_IO(fld_IO)
 !
       use m_phys_labels
       use m_sph_phys_address
       use m_sph_spectr_data
-      use m_field_data_IO
+      use t_field_data_IO
       use extend_potential_field
+!
+      type(field_IO), intent(in) :: fld_IO
 !
       integer(kind = kint) :: i_fld, j_fld
 !
 !
       do i_fld = 1, ntot_phys_rj
-        do j_fld = 1, num_phys_data_IO
-          if (phys_name_rj(i_fld) .eq. phys_data_name_IO(j_fld)) then
+        do j_fld = 1, fld_IO%num_field_IO
+          if (phys_name_rj(i_fld) .eq. fld_IO%fld_name(j_fld)) then
             if     (phys_name_rj(i_fld) .eq. fhd_velo                   &
      &         .or. phys_name_rj(i_fld) .eq. fhd_vort                   &
      &         .or. phys_name_rj(i_fld) .eq. fhd_press                  &
@@ -188,7 +190,7 @@
      &         .or. phys_name_rj(i_fld) .eq. fhd_light_source           &
      &         .or. phys_name_rj(i_fld) .eq. fhd_entropy_source         &
      &         ) then
-              call set_org_rj_phys_data_from_IO(j_fld)
+              call set_org_rj_phys_data_from_IO(j_fld, fld_IO)
               call r_interpolate_sph_vector(i_fld)
               exit
             end if
@@ -205,20 +207,22 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine r_interpolate_sph_fld_from_IO
+      subroutine r_interpolate_sph_fld_from_IO(fld_IO)
 !
       use m_sph_phys_address
       use m_sph_spectr_data
-      use m_field_data_IO
+      use t_field_data_IO
       use extend_potential_field
+!
+      type(field_IO), intent(in) :: fld_IO
 !
       integer(kind = kint) ::  i_fld, j_fld
 !
 !
       do i_fld = 1, ntot_phys_rj
-        do j_fld = 1, num_phys_data_IO
-          if (phys_name_rj(i_fld) .eq. phys_data_name_IO(j_fld)) then
-            call set_org_rj_phys_data_from_IO(j_fld)
+        do j_fld = 1, fld_IO%num_field_IO
+          if (phys_name_rj(i_fld) .eq. fld_IO%fld_name(j_fld)) then
+            call set_org_rj_phys_data_from_IO(j_fld, fld_IO)
             call r_interpolate_sph_vector(i_fld)
             exit
           end if
@@ -352,22 +356,24 @@
 !  -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
-      subroutine set_org_rj_phys_data_from_IO(j_fld)
+      subroutine set_org_rj_phys_data_from_IO(j_fld, fld_IO)
 !
-      use m_field_data_IO
+      use t_field_data_IO
 !
       integer(kind = kint), intent(in) :: j_fld
+      type(field_IO), intent(in) :: fld_IO
+!
       integer(kind = kint) :: jst, nd
 !
 !
-      jst = istack_phys_comp_IO(j_fld-1)
-      if(num_phys_comp_IO(j_fld) .eq. 3) then
-        d_rj_org(1:n_rj_org,1) = phys_data_IO(1:n_rj_org,jst+1)
-        d_rj_org(1:n_rj_org,2) = phys_data_IO(1:n_rj_org,jst+3)
-        d_rj_org(1:n_rj_org,3) = phys_data_IO(1:n_rj_org,jst+2)
+      jst = fld_IO%istack_comp_IO(j_fld-1)
+      if(fld_IO%num_comp_IO(j_fld) .eq. 3) then
+        d_rj_org(1:n_rj_org,1) = fld_IO%d_IO(1:n_rj_org,jst+1)
+        d_rj_org(1:n_rj_org,2) = fld_IO%d_IO(1:n_rj_org,jst+3)
+        d_rj_org(1:n_rj_org,3) = fld_IO%d_IO(1:n_rj_org,jst+2)
       else
-        do nd = 1, num_phys_comp_IO(j_fld)
-          d_rj_org(1:n_rj_org,nd) = phys_data_IO(1:n_rj_org,jst+nd)
+        do nd = 1, fld_IO%num_comp_IO(j_fld)
+          d_rj_org(1:n_rj_org,nd) = fld_IO%d_IO(1:n_rj_org,jst+nd)
         end do
       end if
 !

@@ -1,18 +1,26 @@
-!set_radius_4_sph_dynamo.f90
-!      module set_radius_4_sph_dynamo
+!>@file   set_radius_4_sph_dynamo.f90
+!!@brief  module set_radius_4_sph_dynamo
+!!
+!!@author H. Okuda and H. Matsui
+!!@date Programmed in  2008
 !
-!      Programmed by H. Matsui on June., 1994
-!      modified by H. Matsui on Apr., 2009
+!> @brief Set radial information
+!!
+!!@verbatim
+!!      Programmed by H. Matsui on June., 1994
+!!      modified by H. Matsui on Apr., 2009
+!!
+!!      subroutine set_radius_dat_4_sph_dynamo
+!!***********************************************************************
+!!*
+!!*       ar_1d_rj(k,1)   : 1 / r
+!!*       ar_1d_rj(k,2)   : 1 / r**2
+!!*       ar_1d_rj(k,3)   : 1 / r**3
+!!*
+!!***********************************************************************
+!!@endverbatim
 !
-!      subroutine set_radius_dat_4_sph_dynamo
-!***********************************************************************
-!*
-!*       ar_1d_rj(k,1)   : 1 / r
-!*       ar_1d_rj(k,2)   : 1 / r**2
-!*       ar_1d_rj(k,3)   : 1 / r**3
-!*
-!***********************************************************************
-!*
+!
       module set_radius_4_sph_dynamo
 !
       use m_precision

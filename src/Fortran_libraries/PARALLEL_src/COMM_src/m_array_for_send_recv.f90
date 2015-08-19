@@ -10,12 +10,15 @@
 !>@brief Work array for data communication of FEM data
 !!
 !!@verbatim
-!!      subroutine verify_vector_for_solver(NB, N)
-!!      subroutine allocate_vector_for_solver(NB, N)
+!!      subroutine verify_vector_for_solver(NB, NP)
+!!      subroutine allocate_vector_for_solver(NB, NP)
 !!      subroutine deallocate_vector_for_solver
 !!
-!!      subroutine allocate_iccg_int_matrix(N)
+!!      subroutine allocate_iccg_int_matrix(NP)
 !!      subroutine deallocate_iccg_int_matrix
+!!
+!!      subroutine allocate_iccg_int8_matrix(NP)
+!!      subroutine deallocate_iccg_int8_matrix
 !!@endverbatim
 !!
 !!@param  N    length of vector
@@ -37,6 +40,8 @@
 !
 !>      Work area for integer data
       integer(kind=kint), allocatable :: ix_vec(:)
+!>      Work area for 8-byte integer data
+      integer(kind=kint_gl), allocatable :: i8x_vec(:)
 !
       private :: isize_solver_vect
 !
@@ -46,19 +51,19 @@
 !
 ! ----------------------------------------------------------------------
 !
-       subroutine verify_vector_for_solver(NB, N)
+       subroutine verify_vector_for_solver(NB, NP)
 !
-       integer(kind = kint), intent(in) :: NB, N
+       integer(kind = kint), intent(in) :: NB, NP
        integer(kind = kint) :: ncomp
 !
 !
-       ncomp = NB*N
+       ncomp = NB*NP
        if (isize_solver_vect .lt. 0) then
-         call allocate_vector_for_solver(NB,N)
+         call allocate_vector_for_solver(NB,NP)
        else
          if (isize_solver_vect .lt. ncomp) then
            call deallocate_vector_for_solver
-           call allocate_vector_for_solver(NB,N)
+           call allocate_vector_for_solver(NB,NP)
          end if
        end if
 !
@@ -66,16 +71,16 @@
 !
 !  ---------------------------------------------------------------------
 !
-       subroutine allocate_vector_for_solver(NB, N)
+       subroutine allocate_vector_for_solver(NB, NP)
 !
-       integer(kind = kint), intent(in) :: NB, N
+       integer(kind = kint), intent(in) :: NB, NP
 !
 !
-       allocate(x_vec(NB*N))
-       allocate(b_vec(NB*N))
-       isize_solver_vect = NB*N
+       allocate(x_vec(NB*NP))
+       allocate(b_vec(NB*NP))
+       isize_solver_vect = NB*NP
 !
-       if(N*NB .gt. 0) then
+       if(NP*NB .gt. 0) then
          b_vec  = 0.0d00
          x_vec  =0.0d00
        end if
@@ -95,12 +100,12 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-       subroutine allocate_iccg_int_matrix(N)
+       subroutine allocate_iccg_int_matrix(NP)
 !
-       integer(kind = kint), intent(in) :: N
+       integer(kind = kint), intent(in) :: NP
 !
 !
-       allocate(ix_vec(N))
+       allocate(ix_vec(NP))
        ix_vec  = 0
 !
        end subroutine allocate_iccg_int_matrix
@@ -112,6 +117,27 @@
        deallocate(ix_vec)
 !
        end subroutine deallocate_iccg_int_matrix
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+       subroutine allocate_iccg_int8_matrix(NP)
+!
+       integer(kind = kint), intent(in) :: NP
+!
+!
+       allocate(i8x_vec(NP))
+       i8x_vec  = 0
+!
+       end subroutine allocate_iccg_int8_matrix
+!
+!  ---------------------------------------------------------------------
+!
+       subroutine deallocate_iccg_int8_matrix
+!
+       deallocate(i8x_vec)
+!
+       end subroutine deallocate_iccg_int8_matrix
 !
 !  ---------------------------------------------------------------------
 !

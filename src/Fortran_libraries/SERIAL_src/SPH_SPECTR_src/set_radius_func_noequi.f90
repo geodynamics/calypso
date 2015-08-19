@@ -1,34 +1,39 @@
+!>@file   set_radius_func_noequi.f90
+!!@brief  module set_radius_func_noequi
+!!
+!!@author H. Matsui
+!!@date Programmed in June., 1994
+!!@date Modified in Apr., 2009
 !
-!      module set_radius_func_noequi
+!!@brief  Set radial informations for non-equidistance grid
+!!
+!!@verbatim
+!!      subroutine allocate_dr_rj_noequi
+!!      subroutine deallocate_dr_rj_noequi
+!!
+!!      subroutine set_dr_for_equidist
+!!      subroutine set_dr_for_nonequi
+!!
+!!      subroutine nod_r_2nd_fdm_coefs_equi
+!!      subroutine nod_r_2nd_fdm_coefs_nonequi
+!!
+!!      subroutine nod_r_2nd_fdm_coef_noequi(kr, dr_p1, dr_n1, mat_fdm)
+!!*
+!!***********************************************************************
+!!
+!!    delta r for eqidistance grid
+!!*        dr_1d_rj(kr) = r(kr+1) - r(kr)
+!!*
+!!***********************************************************************
+!!*
+!!***********************************************************************
+!!
+!!    delta r for non_eqidistance grid
+!!*        dr_1d_rj(kr,0) = r(kr+1) - r(kr)
+!!*
+!!***********************************************************************
+!!@endverbatim
 !
-!      Programmed by H. Matsui on June., 1994
-!      modified by H. Matsui on Apr., 2009
-!
-!      subroutine allocate_dr_rj_noequi
-!      subroutine deallocate_dr_rj_noequi
-!
-!      subroutine set_dr_for_equidist
-!      subroutine set_dr_for_nonequi
-!
-!      subroutine nod_r_2nd_fdm_coefs_equi
-!      subroutine nod_r_2nd_fdm_coefs_nonequi
-!
-!      subroutine nod_r_2nd_fdm_coef_noequi(kr, dr_p1, dr_n1, mat_fdm)
-!*
-!***********************************************************************
-!
-!    delta r for eqidistance grid
-!*        dr_1d_rj(kr) = r(kr+1) - r(kr)
-!*
-!***********************************************************************
-!*
-!***********************************************************************
-!
-!    delta r for non_eqidistance grid
-!*        dr_1d_rj(kr,0) = r(kr+1) - r(kr)
-!*
-!***********************************************************************
-!*
       module set_radius_func_noequi
 !
       use m_precision

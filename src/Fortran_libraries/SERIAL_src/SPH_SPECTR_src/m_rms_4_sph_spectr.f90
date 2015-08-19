@@ -1,18 +1,23 @@
+!>@file   m_rms_4_sph_spectr.f90
+!!@brief  module m_rms_4_sph_spectr
+!!
+!!@author H. Matsui
+!!@date Programmed in Feb., 2008
 !
-!      module m_rms_4_sph_spectr
-!
-!     Written by H. Matsui on Feb., 2008
-!
+!>@brief Mean sqare data
+!!
 !!@verbatim
 !!      subroutine allocate_num_spec_layer
 !!      subroutine allocate_rms_name_sph_spec
 !!      subroutine allocate_rms_4_sph_spectr(my_rank)
-!!      subroutine deallocate_num_spec_layer
+!!      subroutine allocate_ave_4_sph_spectr(nri_ave)
 !!      subroutine deallocate_rms_4_sph_spectr(my_rank)
+!!      subroutine deallocate_ave_4_sph_spectr
 !!
-!!      subroutine write_sph_vol_pwr(istep, time)
-!!      subroutine write_sph_selected_layer_pwr(istep, time)
 !!      subroutine open_sph_mean_sq_file(id_file, fname_rms, mode_label)
+!!      subroutine write_sph_volume_data(id_file, istep, time, rms_sph_x)
+!!      subroutine write_sph_layerd_power(id_file, istep, time)
+!!      subroutine write_sph_layer_data(id_file, istep, time, rms_sph_x)
 !!@endverbatim
 !!
 !!@n @param my_rank       Process ID
@@ -30,45 +35,68 @@
       implicit none
 !
 !
-      integer(kind = kint), parameter :: id_file_rms_l =    31
-      integer(kind = kint), parameter :: id_file_rms_m =    32
-      integer(kind = kint), parameter :: id_file_rms_lm =   33
-      integer(kind = kint), parameter :: id_file_rms =      34
-!
+!>      Number of field for mean square
       integer (kind=kint) :: num_rms_rj
+!
+!>      Number of component for mean square
       integer (kind=kint) :: ntot_rms_rj
+!
+!>      Field ID for mean square
       integer (kind=kint), allocatable :: ifield_rms_rj(:)
+!
+!>      Number of each component for mean square
       integer (kind=kint), allocatable :: num_rms_comp_rj(:)
+!
+!>      End ID of each field for mean square
       integer (kind=kint), allocatable :: istack_rms_comp_rj(:)
+!
+!>      Field name for mean square
       character (len=kchara), allocatable :: rms_name_rj(:)
 !
-      integer(kind = kint) :: num_spectr_layer = 0
-      integer (kind=kint), allocatable :: id_spectr_layer(:)
 !
+!>      Number of radial points for mean square
       integer(kind=kint) :: nri_rms = 0
+!
+!>      Radial ID from layered mean square
       integer(kind=kint), allocatable :: kr_for_rms(:)
+!
+!>      Radius from layered mean square
       real(kind = kreal), allocatable :: r_for_rms(:)
+!
+!>      Mean square spectrum for degree on spheres
       real(kind = kreal), allocatable :: rms_sph_l(:,:,:)
+!
+!>      Mean square spectrum for order on spheres
       real(kind = kreal), allocatable :: rms_sph_m(:,:,:)
+!
+!>      Mean square spectrum for l-m on spheres
       real(kind = kreal), allocatable :: rms_sph_lm(:,:,:)
+!
+!>       Mean square on spheres
       real(kind = kreal), allocatable :: rms_sph(:,:)
 !
+!
+!>      Volume mean square spectrum for degree
       real(kind = kreal), allocatable :: rms_sph_vol_l(:,:)
+!
+!>      Volume mean square spectrum for order
       real(kind = kreal), allocatable :: rms_sph_vol_m(:,:)
+!
+!>      Volume mean square spectrum for l-m
       real(kind = kreal), allocatable :: rms_sph_vol_lm(:,:)
+!
+!>      Volume mean square
       real(kind = kreal), allocatable :: rms_sph_vol(:)
 !
-!    output flag
 !
-      integer(kind = kint) :: iflag_layer_rms_spec =  0
-      integer(kind = kint) :: iflag_volume_rms_spec = 0
-      integer(kind = kint) :: iflag_volume_ave_sph =  0
+!>      Number of radial point for average
+      integer(kind = kint) :: nri_ave
 !
-!      data file name
+!>      Average over single sphere
+      real(kind = kreal), allocatable :: ave_sph(:,:)
 !
-      character(len = kchara) :: fhead_ave_vol =    'sph_ave_volume'
-      character(len = kchara) :: fhead_rms_vol =    'sph_pwr_volume'
-      character(len = kchara) :: fhead_rms_layer =  'sph_pwr_layer'
+!>      Volume average
+      real(kind = kreal), allocatable :: ave_sph_vol(:)
 !
       private :: write_sph_mean_sq_header, set_sph_rms_labels
 !
@@ -80,8 +108,13 @@
 !
       subroutine allocate_num_spec_layer
 !
-      allocate(id_spectr_layer(num_spectr_layer))
-      if(num_spectr_layer .gt. 0) id_spectr_layer = 0
+!
+      allocate( kr_for_rms(nri_rms) )
+      allocate( r_for_rms(nri_rms) )
+      if(nri_rms .gt. 0) then
+        kr_for_rms = 0
+        r_for_rms =  0.0d0
+      end if
 !
       end subroutine allocate_num_spec_layer
 !
@@ -112,13 +145,6 @@
       integer(kind = kint), intent(in) :: my_rank
 !
 !
-      allocate( kr_for_rms(nri_rms) )
-      allocate( r_for_rms(nri_rms) )
-      if(nri_rms .gt. 0) then
-        kr_for_rms = 0
-        r_for_rms =  0.0d0
-      end if
-!
       if(my_rank .gt. 0) return
 !
       allocate( rms_sph_l(nri_rms,0:l_truncation,ntot_rms_rj) )
@@ -145,11 +171,23 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine deallocate_num_spec_layer
+      subroutine allocate_ave_4_sph_spectr
 !
-      deallocate(id_spectr_layer)
+      use m_spheric_parameter
 !
-      end subroutine deallocate_num_spec_layer
+      if(idx_rj_degree_zero .eq. 0) return
+!
+!
+      nri_ave = nidx_rj(1)
+      allocate(ave_sph_vol(ntot_rms_rj))
+      allocate(ave_sph(0:nri_ave,ntot_rms_rj))
+!
+      if(nri_ave*ntot_rms_rj .gt. 0) then
+        ave_sph=     0.0d0
+        ave_sph_vol = 0.0d0
+      end if
+!
+      end subroutine allocate_ave_4_sph_spectr
 !
 ! -----------------------------------------------------------------------
 !
@@ -172,56 +210,15 @@
       end subroutine deallocate_rms_4_sph_spectr
 !
 ! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
 !
-      subroutine write_sph_vol_pwr(istep, time)
-!
-      use m_spheric_parameter
-!
-      integer(kind = kint), intent(in) :: istep
-      real(kind = kreal), intent(in) :: time
-!
-      integer(kind = kint) :: lm
-!
-!
-      do lm = 0, l_truncation
-        write(id_file_rms_l,'(i16,1pe23.14e3,i16,1p200e23.14e3)')       &
-     &            istep, time, lm, rms_sph_vol_l(lm,1:ntot_rms_rj)
-        write(id_file_rms_m,'(i16,1pe23.14e3,i16,1p200e23.14e3)')       &
-     &            istep, time, lm, rms_sph_vol_m(lm,1:ntot_rms_rj)
-        write(id_file_rms_lm,'(i16,1pe23.14e3,i16,1p200e23.14e3)')      &
-     &            istep, time, lm, rms_sph_vol_lm(lm,1:ntot_rms_rj)
-      end do
-!
-      end subroutine write_sph_vol_pwr
-!
-! -----------------------------------------------------------------------
-!
-      subroutine write_sph_selected_layer_pwr(istep, time)
+      subroutine deallocate_ave_4_sph_spectr
 !
       use m_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: istep
-      real(kind = kreal), intent(in) :: time
+      if(idx_rj_degree_zero .eq. 0) return
+      deallocate(ave_sph, ave_sph_vol)
 !
-      integer(kind = kint) :: k, kg, lm
-!
-!
-      do k = 1, nri_rms
-        kg = kr_for_rms(k)
-        write(id_file_rms,'(i16,1pe23.14e3,i16,1p200e23.14e3)')         &
-     &                   istep, time, kg, rms_sph(k,1:ntot_rms_rj)
-        do lm = 0, l_truncation
-          write(id_file_rms_l,'(i16,1pe23.14e3,2i16,1p200e23.14e3)')    &
-     &           istep, time, kg, lm, rms_sph_l(k,lm,1:ntot_rms_rj)
-          write(id_file_rms_m,'(i16,1pe23.14e3,2i16,1p200e23.14e3)')    &
-     &           istep, time, kg, lm, rms_sph_m(k,lm,1:ntot_rms_rj)
-          write(id_file_rms_lm,'(i16,1pe23.14e3,2i16,1p200e23.14e3)')   &
-     &           istep, time, kg, lm, rms_sph_lm(k,lm,1:ntot_rms_rj)
-        end do
-      end do
-!
-      end subroutine write_sph_selected_layer_pwr
+      end subroutine deallocate_ave_4_sph_spectr
 !
 ! -----------------------------------------------------------------------
 !  --------------------------------------------------------------------
@@ -253,16 +250,13 @@
 !
       integer(kind = kint), intent(in) :: id_file
       character(len = kchara), intent(in) :: mode_label
-      integer(kind = kint) :: i, nri
+      integer(kind = kint) :: i
 !
       character(len=kchara) :: labels(6)
 !
 !
-      nri = nidx_rj(1)
-      if(iflag_rj_center .gt. 0) nri = nri + 1
-!
       write(id_file,'(a)')    'radial_layers, truncation'
-      write(id_file,'(3i16)') nri, l_truncation
+      write(id_file,'(3i16)') nri_rms, l_truncation
       write(id_file,'(a)')    'ICB_id, CMB_id'
       write(id_file,'(3i16)') nlayer_ICB, nlayer_CMB
 !
@@ -332,5 +326,82 @@
       end subroutine set_sph_rms_labels
 !
 !  --------------------------------------------------------------------
+!  --------------------------------------------------------------------
+!
+      subroutine write_sph_volume_data(id_file, istep, time, rms_sph_x)
+!
+      use m_spheric_parameter
+!
+      integer(kind = kint), intent(in) :: id_file, istep
+      real(kind = kreal), intent(in) :: time
+      real(kind = kreal), intent(in)                                    &
+     &      :: rms_sph_x(0:l_truncation, ntot_rms_rj)
+!
+      integer(kind = kint) :: lm
+      character(len=kchara) :: fmt_txt
+!
+!
+      write(fmt_txt,'(a20,i3,a16)')                                     &
+     &     '(i16,1pe23.14e3,i16,', ntot_rms_rj, '(1pe23.14e3),a1)'
+!
+      do lm = 0, l_truncation
+        write(id_file,fmt_txt) istep, time, lm,                         &
+     &                         rms_sph_x(lm,1:ntot_rms_rj)
+      end do
+!
+      end subroutine write_sph_volume_data
+!
+! -----------------------------------------------------------------------
+!
+      subroutine write_sph_layerd_power(id_file, istep, time)
+!
+      use m_spheric_parameter
+!
+      integer(kind = kint), intent(in) :: id_file, istep
+      real(kind = kreal), intent(in) :: time
+!
+      integer(kind = kint) :: k, kg
+      character(len=kchara) :: fmt_txt
+!
+!
+      write(fmt_txt,'(a20,i3,a16)')                                     &
+     &     '(i16,1pe23.14e3,i16,', ntot_rms_rj, '(1pe23.14e3),a1)'
+      do k = 1, nri_rms
+        kg = kr_for_rms(k)
+        write(id_file,fmt_txt) istep, time, kg,                         &
+     &                         rms_sph(k,1:ntot_rms_rj)
+      end do
+!
+      end subroutine write_sph_layerd_power
+!
+! -----------------------------------------------------------------------
+!
+      subroutine write_sph_layer_data(id_file, istep, time, rms_sph_x)
+!
+      use m_spheric_parameter
+!
+      integer(kind = kint), intent(in) :: id_file, istep
+      real(kind = kreal), intent(in) :: time
+      real(kind = kreal), intent(in)                                    &
+     &      :: rms_sph_x(nri_rms,0:l_truncation, ntot_rms_rj)
+!
+      integer(kind = kint) :: k, kg, lm
+      character(len=kchara) :: fmt_txt
+!
+!
+      write(fmt_txt,'(a21,i3,a16)')                                     &
+     &     '(i16,1pe23.14e3,2i16,', ntot_rms_rj, '(1pe23.14e3),a1)'
+!
+      do k = 1, nri_rms
+        kg = kr_for_rms(k)
+        do lm = 0, l_truncation
+          write(id_file,fmt_txt) istep, time, kg, lm,                   &
+     &                           rms_sph_x(k,lm,1:ntot_rms_rj)
+        end do
+      end do
+!
+      end subroutine write_sph_layer_data
+!
+! -----------------------------------------------------------------------
 !
       end module m_rms_4_sph_spectr

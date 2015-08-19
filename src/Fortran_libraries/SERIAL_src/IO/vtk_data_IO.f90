@@ -15,12 +15,9 @@
 !!     &          nnod, d_nod)
 !!
 !!      subroutine write_vtk_node_head(id_vtk, nnod)
-!!      subroutine write_vtk_connect_head(id_vtk, nele, nnod_ele)
-!!      subroutine write_vtk_cell_type(id_vtk, nele, nnod_ele)
 !!
-!!      subroutine write_vtk_connect_data(id_vtk, ntot_ele, nnod_ele,   &
-!!     &          nele, ie)
-!!
+!!      subroutine write_vtk_connect_data                               &
+!!     &         (id_vtk, ntot_ele, nnod_ele, nele, ie)
 !!
 !!      subroutine read_vtk_fields_head(id_vtk, nnod)
 !!      subroutine read_vtk_each_field_head(id_vtk, iflag_end,          &
@@ -51,6 +48,7 @@
 !
       use m_precision
       use m_constants
+      use vtk_data_to_buffer
 !
       implicit none
 !
@@ -66,8 +64,7 @@
       integer(kind = kint), intent(in) :: id_vtk
 !
 !
-      write(id_vtk,'(a)')
-      write(id_vtk,'(a,i16)') 'POINT_DATA ', nnod
+      write(id_vtk,'(a)',advance='NO') vtk_fields_head(nnod)
 ! 
       end subroutine write_vtk_fields_head
 !
@@ -85,13 +82,11 @@
 !
 !
       if (ncomp_field .eq. n_scalar) then
-        write(id_vtk,'(a,a,a,i16)') 'SCALARS ', trim(field_name),       &
-     &                        ' double ', ione
-        write(id_vtk,'(a)') 'LOOKUP_TABLE default'
+        write(id_vtk,'(a)',advance='NO') vtk_scalar_head(field_name)
       else if (ncomp_field .eq. n_vector) then
-        write(id_vtk,'(a,a,a)') 'VECTORS ', trim(field_name), ' double'
+        write(id_vtk,'(a)',advance='NO') vtk_vector_head(field_name)
       else if (ncomp_field .eq. n_sym_tensor) then
-        write(id_vtk,'(a,a,a)') 'TENSORS ', trim(field_name), ' double'
+        write(id_vtk,'(a)',advance='NO') vtk_tensor_head(field_name)
       end if
 !
       end subroutine write_vtk_each_field_head
@@ -109,20 +104,26 @@
 !
       integer(kind = kint), intent(in) ::  id_vtk
 !
-      integer(kind = kint) :: nd, nd2
       integer(kind = kint_gl) :: inod
 !
 !
       if (ncomp_field .eq. n_sym_tensor) then
         do inod = 1, nnod
-          do nd2 = 1, 3
-            write(id_vtk,'(1p3E25.15e3)')                               &
-     &             (d_nod(inod,1+l_sim_t(nd,nd2)), nd=1,3)
-          end do
+          write(id_vtk,'(a)',advance='NO')                              &
+     &     vtk_each_vector(d_nod(inod,1), d_nod(inod,2), d_nod(inod,3))
+          write(id_vtk,'(a)',advance='NO')                              &
+     &     vtk_each_vector(d_nod(inod,2), d_nod(inod,4), d_nod(inod,5))
+          write(id_vtk,'(a)',advance='NO')                              &
+     &     vtk_each_vector(d_nod(inod,3), d_nod(inod,5), d_nod(inod,6))
+        end do
+      else if(ncomp_field .eq. n_vector) then
+        do inod = 1, nnod
+          write(id_vtk,'(a)',advance='NO')                              &
+     &     vtk_each_vector(d_nod(inod,1), d_nod(inod,2), d_nod(inod,3))
         end do
       else
         do inod = 1, nnod
-          write(id_vtk,'(1p3E25.15e3)') d_nod(inod,1:ncomp_field)
+          write(id_vtk,'(1p3E23.12e3,a1)') d_nod(inod,1)
         end do
       end if
 !
@@ -137,68 +138,15 @@
       integer(kind = kint), intent(in) ::  id_vtk
 !
 !
-      write(id_vtk,'(a)') '# vtk DataFile Version 2.0'
-      write(id_vtk,'(a)')                                               &
-     &              'converted data of tri-linear hexahedral element'
-      write(id_vtk,'(a)') 'ASCII'
-      write(id_vtk,'(a)') 'DATASET UNSTRUCTURED_GRID'
-!
-      write(id_vtk,'(a,i16,a)')  'POINTS ', nnod, ' double'
+      write(id_vtk,'(a)',advance='NO') vtk_node_head(nnod)
 !
       end subroutine write_vtk_node_head
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine write_vtk_connect_head(id_vtk, nele, nnod_ele)
-!
-      integer(kind = kint_gl), intent(in) :: nele
-      integer(kind = kint), intent(in) :: nnod_ele
-      integer(kind = kint), intent(in) :: id_vtk
-!
-      integer(kind = kint_gl) :: nums
-!
-!
-      nums = nele * (nnod_ele+1)
-      write(id_vtk,'(a,2i16)') 'CELLS ', nele, nums
-!
-      end subroutine write_vtk_connect_head
-!
-! -----------------------------------------------------------------------
-!
-      subroutine write_vtk_cell_type(id_vtk, nele, nnod_ele)
-!
-      use m_geometry_constants
-!
-      integer(kind = kint_gl), intent(in) :: nele
-      integer(kind = kint), intent(in) ::  id_vtk, nnod_ele
-!
-      integer(kind = kint) :: icellid
-      integer(kind = kint_gl) :: iele
-!
-!
-      if (nnod_ele .eq. num_t_linear) then
-        icellid = 12
-      else if (nnod_ele .eq. num_t_quad) then
-        icellid = 25
-      else if (nnod_ele .eq. num_triangle) then
-        icellid = 5
-      else if (nnod_ele .eq. num_linear_edge) then
-        icellid = 3
-      end if
-!
-      write(id_vtk,'(a,i16)') 'CELL_TYPES ', nele
-      do iele = 1, nele
-        write(id_vtk,'(i5)') icellid
-      end do
-!
-      end subroutine write_vtk_cell_type
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine write_vtk_connect_data(id_vtk, ntot_ele, nnod_ele,     &
-     &          nele, ie)
+      subroutine write_vtk_connect_data                                 &
+     &         (id_vtk, ntot_ele, nnod_ele, nele, ie)
 !
       use m_geometry_constants
 !
@@ -209,16 +157,25 @@
 !
       integer(kind = kint_gl) :: iele
       integer(kind = kint_gl) :: ie0(nnod_ele)
+      integer(kind = kint) :: icellid
 !
+!
+      icellid = vtk_cell_type(nnod_ele)
+      write(id_vtk,'(a)',advance='NO') vtk_connect_head(nele, nnod_ele)
 !
       do iele = 1, nele
         ie0(1:nnod_ele) = ie(iele,1:nnod_ele) - 1
-        write(id_vtk,'(28i16)') nnod_ele, ie0(1:nnod_ele)
+        write(id_vtk,'(a)',advance='NO')                                &
+     &         vtk_each_connect(nnod_ele, ie0)
+      end do
+!
+      write(id_vtk,'(a)',advance='NO') vtk_cell_type_head(nele)
+      do iele = 1, nele
+        write(id_vtk,'(a)',advance='NO') vtk_each_cell_type(icellid)
       end do
 !
       end subroutine  write_vtk_connect_data
 !
-! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !

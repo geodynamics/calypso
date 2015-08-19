@@ -1,20 +1,25 @@
+!> @file  m_read_boundary_data.f90
+!!      module m_read_boundary_data
+!!
+!! @author  H. Matsui and H. Okuda
+!! @date Written in 2001
 !
-!   --------------   module m_read_boundary_data
-!
-!     written by H. Matsui
-!
-!      subroutine allocate_bc_stack_dummy
-!      subroutine allocate_bc_item_dummy
-!      subroutine allocate_bc_ele_stack_dummy
-!      subroutine allocate_bc_ele_item_dummy
-!      subroutine allocate_bc_sf_stack_dummy
-!      subroutine allocate_bc_sf_item_dummy
-!
-!      subroutine deallocate_bc_item_dummy
-!      subroutine deallocate_bc_ele_item_dummy
-!      subroutine deallocate_bc_sf_item_dummy
-!
-!      subroutine deallocate_boundary_arrays
+!> @brief Array for group data IO
+!!
+!!@verbatim
+!!      subroutine allocate_bc_stack_dummy
+!!      subroutine allocate_bc_item_dummy
+!!      subroutine allocate_bc_ele_stack_dummy
+!!      subroutine allocate_bc_ele_item_dummy
+!!      subroutine allocate_bc_sf_stack_dummy
+!!      subroutine allocate_bc_sf_item_dummy
+!!
+!!      subroutine deallocate_bc_item_dummy
+!!      subroutine deallocate_bc_ele_item_dummy
+!!      subroutine deallocate_bc_sf_item_dummy
+!!
+!!      subroutine deallocate_boundary_arrays
+!!@endverbatim
 !
       module m_read_boundary_data
 !

@@ -89,7 +89,6 @@
       use calypso_mpi
       use m_node_phys_data
       use m_cal_max_indices
-      use cal_max_indices
 !
       integer(kind = kint), intent(in) :: istep_ucd
       real(kind = kreal), intent(in) :: time
@@ -97,7 +96,7 @@
       character(len=kchara) :: fmt_txt
 !
 !
-      call s_cal_max_indices
+      call cal_max_indices
 !
       if ( my_rank .ne. 0 ) return
 !

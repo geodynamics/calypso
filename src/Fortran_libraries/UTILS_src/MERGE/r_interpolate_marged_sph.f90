@@ -110,7 +110,7 @@
         end do
       end if
 !
-      write(*,*) 'r_itp%iflag_same_rgrid', r_itp%iflag_same_rgrid
+!      write(*,*) 'r_itp%iflag_same_rgrid', r_itp%iflag_same_rgrid
       if(r_itp%iflag_same_rgrid .ne. 0) return
 !
       call allocate_radial_itp_tbl(nri_new, r_itp)

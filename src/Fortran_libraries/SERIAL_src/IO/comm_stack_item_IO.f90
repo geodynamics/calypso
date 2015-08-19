@@ -1,17 +1,25 @@
 !
-!      module comm_stack_item_IO
+!>@file   comm_stack_item_IO.f90
+!!@brief  module comm_stack_item_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine read_import_data(id_file)
-!      subroutine read_export_data(id_file)
-!      subroutine write_import_data(id_file)
-!      subroutine write_export_data(id_file)
-!
-!      subroutine read_import_data_b(id_file)
-!      subroutine read_export_data_b(id_file)
-!      subroutine write_import_data_b(id_file)
-!      subroutine write_export_data_b(id_file)
+!>@brief  Subroutines to read control arrays
+!!
+!!@verbatim
+!!      subroutine read_import_data(id_file)
+!!      subroutine read_export_data(id_file)
+!!      subroutine write_import_data(id_file)
+!!      subroutine write_export_data(id_file)
+!!
+!!      subroutine read_import_data_b(id_file)
+!!      subroutine read_export_data_b(id_file)
+!!      subroutine write_import_data_b(id_file)
+!!      subroutine write_export_data_b(id_file)
+!!@endverbatim
+!!
+!!@param  id_file file ID
 !
       module comm_stack_item_IO
 !

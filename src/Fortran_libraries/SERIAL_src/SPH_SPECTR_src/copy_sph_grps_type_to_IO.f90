@@ -1,15 +1,20 @@
-!copy_sph_grps_type_to_IO.f90
-!      module copy_sph_grps_type_to_IO
+!>@file   copy_sph_grps_type_to_IO.f90
+!!@brief  module copy_sph_grps_type_to_IO
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine copy_rtp_nod_grp_type_to_IO(sph_grps)
-!      subroutine copy_rtp_radial_grp_type_to_IO(sph_grps)
-!      subroutine copy_rtp_theta_grp_type_to_IO(sph_grps)
-!      subroutine copy_rtp_zonal_grp_type_to_IO(sph_grps)
-!      subroutine copy_rj_radial_grp_type_to_IO(sph_grps)
-!      subroutine copy_rj_sphere_grp_type_to_IO(sph_grps)
-!        type(sph_group_data), intent(inout) ::  sph_grps
+!>@brief Copy sphectr groups to IO buffer
+!!
+!!@verbatim
+!!      subroutine copy_rtp_nod_grp_type_to_IO(sph_grps)
+!!      subroutine copy_rtp_radial_grp_type_to_IO(sph_grps)
+!!      subroutine copy_rtp_theta_grp_type_to_IO(sph_grps)
+!!      subroutine copy_rtp_zonal_grp_type_to_IO(sph_grps)
+!!      subroutine copy_rj_radial_grp_type_to_IO(sph_grps)
+!!      subroutine copy_rj_sphere_grp_type_to_IO(sph_grps)
+!!        type(sph_group_data), intent(inout) ::  sph_grps
+!!@endverbatim
 !
       module copy_sph_grps_type_to_IO
 !

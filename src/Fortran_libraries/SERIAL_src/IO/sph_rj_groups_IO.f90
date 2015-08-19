@@ -1,10 +1,15 @@
-!sph_rj_groups_IO.f90
-!      module sph_rj_groups_IO
+!>@file  sph_rj_groups_IO.f90
+!!       module sph_rj_groups_IO
+!!
+!!@author H. Matsui
+!!@date        programmed by H.Matsui in July, 2007
 !
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine read_modes_rj_groups(mesh_file_id)
-!      subroutine write_modes_rj_groups(mesh_file_id)
+!> @brief Base routines for spectrum group data IO
+!!
+!!@verbatim
+!!      subroutine read_modes_rj_groups(mesh_file_id)
+!!      subroutine write_modes_rj_groups(mesh_file_id)
+!!@endverbatim
 !
       module sph_rj_groups_IO
 !
