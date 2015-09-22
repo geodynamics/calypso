@@ -48,6 +48,7 @@
       use m_array_for_send_recv
       use m_t_step_parameter
       use m_node_phys_address
+      use m_node_phys_data
       use m_cal_max_indices
       use m_ele_sf_eg_comm_tables
 !
@@ -87,7 +88,9 @@
 !
 !  connect grid data to volume output
 !
-      if(i_step_output_ucd.gt.0) call allocate_phys_range
+      if(i_step_output_ucd.gt.0) then
+        call allocate_phys_range(nod_fld1%ntot_phys_viz)
+      end if
 !
       if(iflag_debug .gt. 0) write(*,*) 'output_grd_file_4_snapshot'
       call output_grd_file_4_snapshot
@@ -150,16 +153,22 @@
 !*
 !*  -----------  data transfer to FEM array --------------
 !*
+      if (iflag_debug.gt.0) write(*,*) 'copy_forces_to_snapshot_rtp'
       call copy_forces_to_snapshot_rtp
+      if (iflag_debug.gt.0) write(*,*) 'copy_snap_vec_fld_from_trans'
       call copy_snap_vec_fld_from_trans
+      if (iflag_debug.gt.0) write(*,*) 'copy_snap_vec_fld_to_trans'
       call copy_snap_vec_fld_to_trans
 !
+      if (iflag_debug.gt.0) write(*,*) 'overwrite_nodal_sph_2_xyz'
       call overwrite_nodal_sph_2_xyz
 !
 !*  ----------- transform field at pole and center --------------
 !*
+      if (iflag_debug.gt.0) write(*,*) 'lead_pole_fields_4_sph_mhd'
       call lead_pole_fields_4_sph_mhd
 !
+      if (iflag_debug.gt.0) write(*,*) 'phys_send_recv_all'
       call phys_send_recv_all
 !
       end subroutine SPH_to_FEM_bridge_MHD

@@ -138,10 +138,9 @@
       real(kind = kreal)  :: dat_1(ntot_comp)
 !
       integer(kind = kint) :: ilen_n
-      character(len=16+ntot_comp*23+1), allocatable, target             &
-     &                                :: textbuf_n(:)
+      character(len=16+ntot_comp*23+1), target :: textbuf_n(nnod)
 !
-!
+      ilen_n = 16+ntot_comp*23+1
       nt_nod = istack_merged_intnod(nprocs)
       num = istack_merged_intnod(my_rank+1)                             &
      &     - istack_merged_intnod(my_rank)
@@ -154,21 +153,19 @@
      &      ucd_field_name(field_name(j)))
       end do
 !
-      ilen_n = 16+ntot_comp*23+1
-      ioffset = int(ioff_gl + ilen_n * istack_merged_intnod(my_rank))
+      ioffset = ioff_gl + ilen_n * istack_merged_intnod(my_rank)
       ioff_gl = ioff_gl + ilen_n * nt_nod
+      
 !
       if(num .le. 0) return
 !
-      allocate(textbuf_n(num))
       do inod = 1, num
         inod_gl =    inod + istack_merged_intnod(my_rank)
         dat_1(1:ntot_comp) = d_nod(inod,1:ntot_comp)
         textbuf_n(inod) = ucd_each_field(inod_gl, ntot_comp, dat_1)
       end do
-      call calypso_mpi_seek_write_ext(id_vtk, ioffset, (num*ilen_n),    &
-     &    textbuf_n(1))
-      deallocate(textbuf_n)
+      call calypso_mpi_seek_wrt_mul_chara(id_vtk, ioffset, ilen_n,      &
+     &    num, textbuf_n(1))
 !
       end subroutine write_ucd_data_mpi
 !
@@ -196,9 +193,8 @@
 !
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
-      integer(kind = kint) :: ilen_n
-      character(len=16+n_vector*23+1), allocatable, target              &
-     &                                :: textbuf_n(:)
+      integer(kind = kint), parameter :: ilen_n = 16+n_vector*23+1
+      character(len=ilen_n), target  :: textbuf_n(nnod)
 !
 !
       nt_nod = istack_merged_intnod(nprocs)
@@ -209,21 +205,18 @@
       call calypso_mpi_seek_write_head_c(id_vtk, ioff_gl,               &
      &   ucd_connect_head(nt_nod, nt_ele, ntot_comp))
 
-      ilen_n = 16+n_vector*23+1
-      ioffset = int(ioff_gl + ilen_n * istack_merged_intnod(my_rank))
+      ioffset = ioff_gl + ilen_n * istack_merged_intnod(my_rank)
       ioff_gl = ioff_gl + ilen_n * nt_nod
 !
       if(num .le. 0) return
 !
-      allocate(textbuf_n(num))
       do inod = 1, num
         inod_gl =    inod + istack_merged_intnod(my_rank)
         dat_1(1:n_vector) = xx(inod,1:n_vector)
         textbuf_n(inod) = ucd_each_field(inod_gl, n_vector, dat_1)
       end do
-      call calypso_mpi_seek_write_ext(id_vtk, ioffset, (num*ilen_n),    &
-     &    textbuf_n(1))
-      deallocate(textbuf_n)
+      call calypso_mpi_seek_wrt_mul_chara(id_vtk, ioffset, ilen_n,      &
+     &    num, textbuf_n)
 !
       end subroutine write_ucd_node_mpi
 !
@@ -249,27 +242,24 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
       integer(kind = kint) :: ilen_e
-      character(len=16+3+6+16*nnod_ele+1), allocatable, target          &
-     &                                :: textbuf_e(:)
+      character(len=16+3+6+16*nnod_ele+1), target :: textbuf_e(nele)
 !
 !
       nt_ele = istack_merged_ele(nprocs)
 !
       ilen_e = 16+3+6+16*nnod_ele+1
-      ioffset = int(ioff_gl + ilen_e * istack_merged_ele(my_rank))
+      ioffset = ioff_gl + ilen_e * istack_merged_ele(my_rank)
       ioff_gl = ioff_gl + ilen_e * nt_ele
 !
       if(nele .le. 0) return
 !
-      allocate(textbuf_e(nele))
       do iele = 1, nele
         iele_gl = iele + istack_merged_ele(my_rank)
         ie0(1:nnod_ele) = ie(iele,1:nnod_ele)
         textbuf_e(iele) = ucd_each_connect(iele_gl, nnod_ele,ie0)
       end do
-      call calypso_mpi_seek_write_ext(id_vtk, ioffset, (nele*ilen_e),   &
-     &    textbuf_e(1))
-      deallocate(textbuf_e)
+      call calypso_mpi_seek_wrt_mul_chara(id_vtk, ioffset, ilen_e,      &
+     &    nele, textbuf_e)
 !
       end subroutine write_ucd_connect_mpi
 !

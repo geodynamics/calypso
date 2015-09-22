@@ -31,9 +31,6 @@
 !!      subroutine unlink_group_type(grp)
 !!      subroutine unlink_surf_group_type(sf_grp)
 !!
-!!      subroutine copy_group_data(grp_org, grp_new)
-!!      subroutine copy_surface_group(sf_grp_org, sf_grp_new)
-!!
 !!      subroutine check_group_type_data(my_rank, grp)
 !!      subroutine check_surf_grp_type_data(my_rank, sf_grp)
 !!      subroutine check_grp_4_sheard_para(my_rank, grp)
@@ -359,68 +356,6 @@
       nullify(sf_grp%item_sf_grp)
 !
       end subroutine unlink_surf_group_type
-!
-!  ---------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine copy_group_data(grp_org, grp_new)
-!
-      type(group_data), intent(in) :: grp_org
-      type(group_data), intent(inout) :: grp_new
-!
-!
-      grp_new%num_grp =     grp_org%num_grp
-      grp_new%num_item = grp_org%num_item
-!
-      call allocate_grp_type_num(grp_new)
-!
-      if (grp_new%num_grp .gt. 0) then
-        grp_new%grp_name(1:grp_new%num_grp)                             &
-     &          =    grp_org%grp_name(1:grp_new%num_grp)
-        grp_new%istack_grp(0:grp_new%num_grp)                           &
-     &          =  grp_org%istack_grp(0:grp_new%num_grp)
-      end if
-!
-      call allocate_grp_type_item(grp_new)
-!
-      if (grp_new%num_item .gt. 0) then
-        grp_new%item_grp(1:grp_new%num_item)                            &
-     &          = grp_org%item_grp(1:grp_new%num_item)
-      end if
-!
-      end subroutine copy_group_data
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine copy_surface_group(sf_grp_org, sf_grp_new)
-!
-      type(surface_group_data), intent(in) :: sf_grp_org
-      type(surface_group_data), intent(inout) :: sf_grp_new
-!
-!
-      sf_grp_new%num_grp = sf_grp_org%num_grp
-      sf_grp_new%num_item = sf_grp_org%num_item
-!
-      call allocate_sf_grp_type_num(sf_grp_new)
-!
-      if(sf_grp_new%num_grp .gt. 0) then
-        sf_grp_new%grp_name(1:sf_grp_new%num_grp)                       &
-     &     = sf_grp_org%grp_name(1:sf_grp_new%num_grp)
-        sf_grp_new%istack_grp(0:sf_grp_new%num_grp)                     &
-     &     =  sf_grp_org%istack_grp(0:sf_grp_new%num_grp)
-      end if
-!
-      call allocate_sf_grp_type_item(sf_grp_new)
-!
-      if(sf_grp_new%num_item .gt. 0) then
-        sf_grp_new%item_sf_grp(1,1:sf_grp_new%num_item)                 &
-     &     = sf_grp_org%item_sf_grp(1,1:sf_grp_new%num_item)
-        sf_grp_new%item_sf_grp(2,1:sf_grp_new%num_item)                 &
-     &     = sf_grp_org%item_sf_grp(2,1:sf_grp_new%num_item)
-      end if
-!
-      end subroutine copy_surface_group
-!
 !
 !  ---------------------------------------------------------------------
 ! ----------------------------------------------------------------------

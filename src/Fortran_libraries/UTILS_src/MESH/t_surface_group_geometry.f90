@@ -6,7 +6,6 @@
 !
 !>   @brief Structure of geometry data for surface group
 !>@n   substitution of 
-!>@n        (module m_surface_group_geometry)
 !>@n        (module m_int_surface_data)
 !!
 !!@verbatim

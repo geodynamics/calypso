@@ -73,13 +73,14 @@
       real(kind = kreal), intent(in) :: dat_out(ntot_out, ncomp_dat)
 !
       integer(kind = kint_gl) :: inod
-      real(kind = kreal)  :: dat_1(ncomp_dat)
 !
+      character(len=kchara) :: fmt_txt
 !
+      write(fmt_txt,'(a5,i4,a13)')                                      &
+     &                '(i16,', ncomp_dat, '(1pE23.12e3))'
       do inod = 1, nnod
-        dat_1(1:ncomp_dat) = dat_out(inod,1:ncomp_dat)
-        write(ifile_psf,'(a)',advance='NO')                             &
-     &             ucd_each_field(inod_out(inod), ncomp_dat, dat_1)
+        write(ifile_psf,fmt_txt)                                        &
+     &                  inod_out(inod), dat_out(inod,1:ncomp_dat)
       end do
 !
       end subroutine  write_ucd_field_data
@@ -179,8 +180,8 @@
       integer(kind = kint), intent(in) :: ncomp_output
 !
 !
-      write(ifile_psf,'(a)',advance='NO')                               &
-     &       ucd_connect_head(nnod_output, nele_out, ncomp_output)
+      write(ifile_psf,'(3i16,2i5,a1)')                                  &
+     &           nnod_output, nele_out, ncomp_output, izero, izero
 !
       end subroutine write_udt_mesh_header
 !
@@ -197,13 +198,20 @@
       integer(kind = kint_gl), intent(in) :: ie_gl(ntot_ele,nnod_ele)
 !
       integer(kind = kint_gl) :: iele
-      integer(kind = kint_gl) :: ie0(nnod_ele)
 !
+      character(len=6) :: eleflag
+      character(len=kchara) :: fmt_txt
+!
+      if(nnod_ele.eq.num_t_linear)    write(eleflag,'(a6)') UCD_HEX
+      if(nnod_ele.eq.num_triangle)    write(eleflag,'(a6)') UCD_TRI
+      if(nnod_ele.eq.num_linear_edge) write(eleflag,'(a6)') UCD_LNE
+!
+      write(fmt_txt,'(a11,i3,a6)')                                      &
+     &                      '(i16,i3,a6,', nnod_ele, '(i16))'
 !
       do iele = 1, nele
-        ie0(1:nnod_ele) = ie_gl(iele,1:nnod_ele)
-        write(ifile_psf,'(a)',advance='NO')                             &
-     &                  ucd_each_connect(iele_gl(iele), nnod_ele, ie0)
+        write(ifile_psf,fmt_txt) iele_gl(iele), ione,                   &
+     &       eleflag, ie_gl(iele,1:nnod_ele)
       end do
 !
       end subroutine  write_ucd_mesh_connect

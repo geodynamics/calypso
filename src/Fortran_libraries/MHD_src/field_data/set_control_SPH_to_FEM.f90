@@ -43,7 +43,7 @@
       call copy_rj_spec_name_to_nod_fld
 !
       if (iflag_debug .ge. iflag_routine_msg)                           &
-     &     call check_nodal_field_name
+     &     call check_nodal_field_name_type(nod_fld1)
 !
       call count_field_4_monitor(num_phys_rj, num_phys_comp_rj,         &
      &    iflag_monitor_rj, num_field_monitor, ntot_comp_monitor)

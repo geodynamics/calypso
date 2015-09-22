@@ -57,11 +57,12 @@
 !
       subroutine write_geom_rtp_groups(mesh_file_id)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: mesh_file_id
 !
-      write(mesh_file_id,'(a)') '!'
-      write(mesh_file_id,'(a)') '! Group data'
-      write(mesh_file_id,'(a)') '!'
+!
+      write(mesh_file_id,'(a)', advance='NO') hd_grphd()
 !
       call write_rtp_node_grp_data(mesh_file_id)
 !
@@ -202,12 +203,12 @@
 !
       subroutine write_rtp_node_grp_data(mesh_file_id)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: mesh_file_id
 !
 !
-      write(mesh_file_id,'(a)') '!'
-      write(mesh_file_id,'(a)') '! Node groups'
-      write(mesh_file_id,'(a)') '!'
+      write(mesh_file_id,'(a)', advance='NO') hd_ngrphd()
 !
       call write_group_data(mesh_file_id, num_bc_grp_rtp_IO,            &
      &    ntot_bc_grp_rtp_IO, istack_bc_grp_rtp_IO, name_bc_grp_rtp_IO, &
@@ -221,12 +222,12 @@
 !
       subroutine write_rtp_radial_grp_data(mesh_file_id)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: mesh_file_id
 !
 !
-      write(mesh_file_id,'(a)') '!'
-      write(mesh_file_id,'(a)') '! radial groups'
-      write(mesh_file_id,'(a)') '!'
+      write(mesh_file_id,'(a)', advance='NO') hd_rgrphd()
 !
       call write_group_data(mesh_file_id, num_radial_grp_rtp_IO,        &
      &    ntot_radial_grp_rtp_IO, istack_radial_grp_rtp_IO,             &
@@ -240,12 +241,12 @@
 !
       subroutine write_rtp_theta_grp_data(mesh_file_id)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: mesh_file_id
 !
 !
-      write(mesh_file_id,'(a)') '!'
-      write(mesh_file_id,'(a)') '! meridional groups'
-      write(mesh_file_id,'(a)') '!'
+      write(mesh_file_id,'(a)', advance='NO') hd_tgrphd()
 !
       call write_group_data(mesh_file_id, num_theta_grp_rtp_IO,         &
      &    ntot_theta_grp_rtp_IO, istack_theta_grp_rtp_IO,               &
@@ -259,12 +260,12 @@
 !
       subroutine write_rtp_zonal_grp_data(mesh_file_id)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: mesh_file_id
 !
 !
-      write(mesh_file_id,'(a)') '!'
-      write(mesh_file_id,'(a)') '! zonal groups'
-      write(mesh_file_id,'(a)') '!'
+      write(mesh_file_id,'(a)', advance='NO') hd_pgrphd()
 !
       call write_group_data(mesh_file_id, num_zonal_grp_rtp_IO,         &
      &    ntot_zonal_grp_rtp_IO, istack_zonal_grp_rtp_IO,               &

@@ -16,7 +16,7 @@
 !!      subroutine dealloc_reft_rj_data_t(sph_phys)
 !!
 !!      subroutine check_rj_spectr_name_t(sph_phys)
-!!      subroutine check_rj_spectr_data_t(my_rank, nnod_rj, sph_phys)
+!!      subroutine check_rj_spectr_data_t(my_rank, sph_phys)
 !!@endverbatim
 !!
 !!@n @param my_rank process ID
@@ -158,9 +158,9 @@
 !
 !  --------------------------------------------------------------------
 !
-      subroutine check_rj_spectr_data_t(my_rank, nnod_rj, sph_phys)
+      subroutine check_rj_spectr_data_t(my_rank, sph_phys)
 !
-      integer(kind = kint), intent(in) :: my_rank, nnod_rj
+      integer(kind = kint), intent(in) :: my_rank
       type(sph_phys_data), intent(in) :: sph_phys
 !
       integer(kind = kint) :: i_fld
@@ -171,8 +171,8 @@
 !
       write(50+my_rank,*) 'sph_phys%phys_rj%fld'
       do i_fld = 1, sph_phys%phys_rj%fld%num_phys
-        call check_nodal_data_type(my_rank, sph_phys%phys_rj%fld,       &
-     &      nnod_rj, sph_phys%phys_rj%fld%ntot_phys,                    &
+        call check_nodal_data(my_rank, sph_phys%phys_rj%fld,            &
+     &      sph_phys%phys_rj%fld%ntot_phys,                             &
      &      sph_phys%phys_rj%fld%istack_component(i_fld-1)+1)
       end do
 !

@@ -35,7 +35,6 @@
       use m_addresses_trans_sph_MHD
 !
 !
-!$omp parallel
 !   advection flag
       call sel_force_from_MHD_trans(f_trns%i_m_advect)
 !   Coriolis flag
@@ -50,7 +49,6 @@
 !
 !   divergence of composition flux flag
       call sel_force_from_MHD_trans(f_trns%i_c_flux)
-!$omp end parallel
 !
       end subroutine select_mhd_field_from_trans
 !
@@ -62,7 +60,6 @@
       use m_addresses_trans_sph_MHD
 !
 !
-!$omp parallel
 !   advection flag
       call copy_force_from_MHD_trans                                    &
      &   (f_trns%i_m_advect, iphys%i_m_advect)
@@ -81,7 +78,6 @@
 !
 !   divergence of composition flux flag
       call copy_force_from_MHD_trans(f_trns%i_c_flux, iphys%i_c_flux)
-!$omp end parallel
 !
       end subroutine copy_forces_to_snapshot_rtp
 !
@@ -108,21 +104,19 @@
 !
       subroutine copy_force_from_MHD_trans(i_trns, i_field)
 !
-      use m_addresses_trans_sph_MHD
-      use m_addresses_trans_sph_snap
       use m_geometry_data
       use m_node_phys_data
-      use m_spheric_parameter
-      use m_spheric_param_smp
+      use m_addresses_trans_sph_MHD
+      use m_addresses_trans_sph_snap
       use copy_field_4_sph_trans
 !
       integer(kind = kint), intent(in) :: i_field, i_trns
 !
 !
       if( (i_field*i_trns) .le. 0) return
-      call copy_vector_from_trans                                       &
-     &  (nnod_rtp, m_folding, inod_rtp_smp_stack,                       &
-     &   node1%numnod, frm_rtp(1,i_trns), d_nod(1,i_field) )
+      call copy_nodal_vector_from_trans                                 &
+     &   (ncomp_rtp_2_rj, i_trns, frm_rtp,                              &
+     &    node1%numnod, nod_fld1%ntot_phys, i_field, nod_fld1%d_fld)
 !
       end subroutine copy_force_from_MHD_trans
 !

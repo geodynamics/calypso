@@ -8,11 +8,11 @@
 !!
 !!@verbatim
 !!      subroutine cal_pole_electric_field_smp(numnod, internal_node,   &
-!!     &          xx, nnod_rtp, nidx_rtp_r, coef_d,                     &
-!!     &          current, uxb, e_field)
+!!     &          xx, nnod_rtp, nidx_rtp_r, coef_d, ncomp_nod,          &
+!!     &          i_curent, i_uxb, i_electric, d_nod)
 !!      subroutine cal_pole_poynting_flux_smp(numnod, internal_node,    &
-!!     &          xx, nnod_rtp, nidx_rtp_r, coef_d,                     &
-!!     &          current, uxb, b_field, poynting)
+!!     &          xx, nnod_rtp, nidx_rtp_r, coef_d, ncomp_nod,          &
+!!     &          i_curent, i_uxb, i_magne, i_poynting, d_nod)
 !!@endverbatim
 !!
 !!@n @param numnod               number of nodes
@@ -24,13 +24,13 @@
 !!                               for @f$ f(r,\theta,\phi) @f$
 !!@n @param coef_d        Coefficient for magnetic diffusion
 !!
-!!@n @param  b_field(numnod,3)  Magnetic field @f$ B_{i} @f$
-!!@n @param  current(numnod,3)  Current density
+!!@n @param  i_magne   Magnetic field @f$ B_{i} @f$
+!!@n @param  i_curent  Current density
 !!                                 @f$e_{ijk) \partial_{j} B_{k})@f$
-!!@n @param  uxb(numnod,3)      Induction @f$(e_{ijk) u{j} B_{k})@f$
-!!@n @param  e_field(numnod,3)  Electric field
+!!@n @param  i_uxb      Induction @f$(e_{ijk) u{j} B_{k})@f$
+!!@n @param  i_electric  Electric field
 !!              @f$ E_{i} = \sigma^{-1} J_{i} - (e_{ijk) u{j} B_{k})@f$
-!!@n @param  poynting(numnod,3) Poynting flux @f$(e_{ijk) E{j} B_{k})@f$
+!!@n @param  i_poynting          Poynting flux @f$(e_{ijk) E{j} B_{k})@f$
 !
       module pole_poynting_flux_smp
 !
@@ -46,8 +46,8 @@
 !-----------------------------------------------------------------------
 !
       subroutine cal_pole_electric_field_smp(numnod, internal_node,     &
-     &          xx, nnod_rtp, nidx_rtp_r, coef_d,                       &
-     &          current, uxb, e_field)
+     &          xx, nnod_rtp, nidx_rtp_r, coef_d, ncomp_nod,            &
+     &          i_curent, i_uxb, i_electric, d_nod)
 !
       integer(kind = kint), intent(in) :: numnod, internal_node
       real(kind = kreal), intent(in) :: xx(numnod,3)
@@ -56,9 +56,10 @@
       integer(kind = kint), intent(in) :: nnod_rtp
 !
       real(kind = kreal), intent(in) :: coef_d
-      real(kind = kreal), intent(in) :: current(numnod,3)
-      real(kind = kreal), intent(in) :: uxb(numnod,3)
-      real(kind = kreal), intent(inout) :: e_field(numnod,3)
+!
+      integer(kind = kint), intent(in) :: ncomp_nod, i_electric
+      integer(kind = kint), intent(in) :: i_uxb, i_curent
+      real(kind = kreal), intent(inout) :: d_nod(numnod, ncomp_nod)
 !
       integer(kind = kint) :: inod, kr
 !
@@ -70,9 +71,12 @@
       if(xx(inod+1,3) .gt. zero) then
         do kr = 1, nidx_rtp_r
           inod = inod + 1
-          e_field(inod,1) = coef_d * current(inod,1) - uxb(inod,1)
-          e_field(inod,2) = coef_d * current(inod,2) - uxb(inod,2)
-          e_field(inod,3) = coef_d * current(inod,3) - uxb(inod,3)
+          d_nod(inod,i_electric  ) = coef_d * d_nod(inod,i_curent  )    &
+     &                              - d_nod(inod,i_uxb  )
+          d_nod(inod,i_electric+1) = coef_d * d_nod(inod,i_curent+1)    &
+     &                              - d_nod(inod,i_uxb+1)
+          d_nod(inod,i_electric+2) = coef_d * d_nod(inod,i_curent+2)    &
+     &                              - d_nod(inod,i_uxb+2)
         end do
       end if
 !
@@ -82,9 +86,12 @@
       if(xx(inod+1,3) .lt. zero) then
         do kr = 1, nidx_rtp_r
           inod = inod + 1
-          e_field(inod,1) = coef_d * current(inod,1) - uxb(inod,1)
-          e_field(inod,2) = coef_d * current(inod,2) - uxb(inod,2)
-          e_field(inod,3) = coef_d * current(inod,3) - uxb(inod,3)
+          d_nod(inod,i_electric  ) = coef_d * d_nod(inod,i_curent  )    &
+     &                              - d_nod(inod,i_uxb  )
+          d_nod(inod,i_electric+1) = coef_d * d_nod(inod,i_curent+1)    &
+     &                              - d_nod(inod,i_uxb+1)
+          d_nod(inod,i_electric+2) = coef_d * d_nod(inod,i_curent+2)    &
+     &                              - d_nod(inod,i_uxb+2)
         end do
       end if
 !
@@ -92,17 +99,20 @@
 !
 !  copy field for center
       inod = inod + 1
-      e_field(inod,1) = coef_d * current(inod,1) - uxb(inod,1)
-      e_field(inod,2) = coef_d * current(inod,2) - uxb(inod,2)
-      e_field(inod,3) = coef_d * current(inod,3) - uxb(inod,3)
+      d_nod(inod,i_electric  ) = coef_d * d_nod(inod,i_curent  )        &
+     &                          - d_nod(inod,i_uxb  )
+      d_nod(inod,i_electric+1) = coef_d * d_nod(inod,i_curent+1)        &
+     &                          - d_nod(inod,i_uxb+1)
+      d_nod(inod,i_electric+2) = coef_d * d_nod(inod,i_curent+2)        &
+     &                          - d_nod(inod,i_uxb+2)
 !
       end subroutine cal_pole_electric_field_smp
 !
 ! -----------------------------------------------------------------------
 !
       subroutine cal_pole_poynting_flux_smp(numnod, internal_node,      &
-     &          xx, nnod_rtp, nidx_rtp_r, coef_d,                       &
-     &          current, uxb, b_field, poynting)
+     &          xx, nnod_rtp, nidx_rtp_r, coef_d, ncomp_nod,            &
+     &          i_curent, i_uxb, i_magne, i_poynting, d_nod)
 !
       integer(kind = kint), intent(in) :: numnod, internal_node
       real(kind = kreal), intent(in) :: xx(numnod,3)
@@ -111,10 +121,9 @@
       integer(kind = kint), intent(in) :: nnod_rtp
 !
       real(kind = kreal), intent(in) :: coef_d
-      real(kind = kreal), intent(in) :: current(numnod,3)
-      real(kind = kreal), intent(in) :: uxb(numnod,3)
-      real(kind = kreal), intent(in) :: b_field(numnod,3)
-      real(kind = kreal), intent(inout) :: poynting(numnod,3)
+      integer(kind = kint), intent(in) :: ncomp_nod, i_poynting
+      integer(kind = kint), intent(in) :: i_uxb, i_magne, i_curent
+      real(kind = kreal), intent(inout) :: d_nod(numnod, ncomp_nod)
 !
       integer(kind = kint) :: inod, kr
       real (kind=kreal) :: e_fld(3)
@@ -127,16 +136,19 @@
       if(xx(inod+1,3) .gt. zero) then
         do kr = 1, nidx_rtp_r
           inod = inod + 1
-          e_fld(1) = coef_d * current(inod,1) - uxb(inod,1)
-          e_fld(2) = coef_d * current(inod,2) - uxb(inod,2)
-          e_fld(3) = coef_d * current(inod,3) - uxb(inod,3)
+          e_fld(1) = coef_d * d_nod(inod,i_curent  )                    &
+     &              - d_nod(inod,i_uxb  )
+          e_fld(2) = coef_d * d_nod(inod,i_curent+1)                    &
+     &              - d_nod(inod,i_uxb+1)
+          e_fld(3) = coef_d * d_nod(inod,i_curent+2)                    &
+     &              - d_nod(inod,i_uxb+2)
 !
-          poynting(inod,1)                                              &
-     &         = e_fld(2)*b_field(inod,3) - e_fld(3)*b_field(inod,2)
-          poynting(inod,2)                                              &
-     &         = e_fld(3)*b_field(inod,1) - e_fld(1)*b_field(inod,3)
-          poynting(inod,3)                                              &
-     &         = e_fld(1)*b_field(inod,2) - e_fld(2)*b_field(inod,1)
+          d_nod(inod,i_poynting  ) = e_fld(2)*d_nod(inod,i_magne+2)     &
+     &                              - e_fld(3)*d_nod(inod,i_magne+1)
+          d_nod(inod,i_poynting+1) = e_fld(3)*d_nod(inod,i_magne  )     &
+     &                              - e_fld(1)*d_nod(inod,i_magne+2)
+          d_nod(inod,i_poynting+2) = e_fld(1)*d_nod(inod,i_magne+1)     &
+     &                              - e_fld(2)*d_nod(inod,i_magne  )
         end do
       end if
 !
@@ -146,16 +158,19 @@
       if(xx(inod+1,3) .lt. zero) then
         do kr = 1, nidx_rtp_r
           inod = inod + 1
-          e_fld(1) = coef_d * current(inod,1) - uxb(inod,1)
-          e_fld(2) = coef_d * current(inod,2) - uxb(inod,2)
-          e_fld(3) = coef_d * current(inod,3) - uxb(inod,3)
+          e_fld(1) = coef_d * d_nod(inod,i_curent  )                    &
+     &              - d_nod(inod,i_uxb  )
+          e_fld(2) = coef_d * d_nod(inod,i_curent+1)                    &
+     &              - d_nod(inod,i_uxb+1)
+          e_fld(3) = coef_d * d_nod(inod,i_curent+2)                    &
+     &              - d_nod(inod,i_uxb+2)
 !
-          poynting(inod,1)                                              &
-     &         = e_fld(2)*b_field(inod,3) - e_fld(3)*b_field(inod,2)
-          poynting(inod,2)                                              &
-     &         = e_fld(3)*b_field(inod,1) - e_fld(1)*b_field(inod,3)
-          poynting(inod,3)                                              &
-     &         = e_fld(1)*b_field(inod,2) - e_fld(2)*b_field(inod,1)
+          d_nod(inod,i_poynting  ) = e_fld(2)*d_nod(inod,i_magne+2)     &
+     &                              - e_fld(3)*d_nod(inod,i_magne+1)
+          d_nod(inod,i_poynting+1) = e_fld(3)*d_nod(inod,i_magne  )     &
+     &                              - e_fld(1)*d_nod(inod,i_magne+2)
+          d_nod(inod,i_poynting+2) = e_fld(1)*d_nod(inod,i_magne+1)     &
+     &                              - e_fld(2)*d_nod(inod,i_magne  )
         end do
       end if
 !
@@ -163,16 +178,16 @@
 !
 !  copy field for center
       inod = inod + 1
-      e_fld(1) = coef_d * current(inod,1) - uxb(inod,1)
-      e_fld(2) = coef_d * current(inod,2) - uxb(inod,2)
-      e_fld(3) = coef_d * current(inod,3) - uxb(inod,3)
+      e_fld(1) = coef_d * d_nod(inod,i_curent  ) - d_nod(inod,i_uxb  )
+      e_fld(2) = coef_d * d_nod(inod,i_curent+1) - d_nod(inod,i_uxb+1)
+      e_fld(3) = coef_d * d_nod(inod,i_curent+2) - d_nod(inod,i_uxb+2)
 !
-      poynting(inod,1)                                                  &
-     &         = e_fld(2)*b_field(inod,3) - e_fld(3)*b_field(inod,2)
-      poynting(inod,2)                                                  &
-     &         = e_fld(3)*b_field(inod,1) - e_fld(1)*b_field(inod,3)
-      poynting(inod,3)                                                  &
-     &         = e_fld(1)*b_field(inod,2) - e_fld(2)*b_field(inod,1)
+      d_nod(inod,i_poynting  ) = e_fld(2)*d_nod(inod,i_magne+2)         &
+     &                          - e_fld(3)*d_nod(inod,i_magne+1)
+      d_nod(inod,i_poynting+1) = e_fld(3)*d_nod(inod,i_magne  )         &
+     &                          - e_fld(1)*d_nod(inod,i_magne+2)
+      d_nod(inod,i_poynting+2) = e_fld(1)*d_nod(inod,i_magne+1)         &
+     &                          - e_fld(2)*d_nod(inod,i_magne  )
 !
       end subroutine cal_pole_poynting_flux_smp
 !

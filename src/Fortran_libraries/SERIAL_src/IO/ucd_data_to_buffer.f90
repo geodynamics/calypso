@@ -26,8 +26,6 @@
       character(len=*), parameter :: UCD_TRI = '  tri '
       character(len=*), parameter :: UCD_LNE = ' line '
 !
-      private :: UCD_HEX, UCD_TRI, UCD_LNE
-!
 ! ----------------------------------------------------------------------
 !
       contains

@@ -31,18 +31,19 @@
 !
       subroutine initialize_nod_field_data
 !
+      use m_geometry_data
       use m_node_phys_data
       use set_field_address
 !
 !
 !  allocation for physical values
 !
-      call allocate_data_arrays
+      call alloc_phys_data_type(node1%numnod, nod_fld1)
 !
 !   set address of nodal values
 !
-      call set_field_addresses(ione, num_nod_phys, phys_nod_name,       &
-     &    num_nod_component, iphys)
+      call set_field_addresses(ione, nod_fld1%num_phys,                 &
+     &    nod_fld1%phys_name, nod_fld1%num_component, iphys)
 !
        end subroutine initialize_nod_field_data
 !

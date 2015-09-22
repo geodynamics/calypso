@@ -33,9 +33,8 @@
 !
       use m_geometry_data
       use m_group_data
-      use m_element_group_connect
-      use m_surface_group_connect
       use const_surface_data
+      use set_connects_4_surf_group
 !      use check_surface_groups
 !
       integer(kind = kint), intent(in) :: my_rank
@@ -56,6 +55,9 @@
        if (iflag_debug.gt.0) write(*,*) 'set_edge_and_surf_geometry'
       call set_edge_and_surf_geometry
 !
+      if (iflag_debug.gt.0) write(*,*) 'const_ele_list_4_surface'
+      call const_ele_list_4_surface(ele1, surf1)
+!
 !
        if (iflag_debug.gt.0) write(*,*) 'count_num_groups_4_smp'
       call count_num_groups_4_smp
@@ -65,21 +67,17 @@
 !         call check_surf_grp_4_sheard_para(my_rank, sf_grp1)
 !       end if
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_surface_node_grp'
-      call set_surface_node_grp(sf_grp1)
+      if (iflag_debug.gt.0) write(*,*) 'set_node_4_surf_group'
+      call set_node_4_surf_group(node1, ele1, surf1, sf_grp1,           &
+     &    sf_grp_nod1)
 !       call check_surface_node_id(my_rank, sf_grp_nod1)
-!
-      if (iflag_debug.gt.0) write(*,*) 'const_ele_list_4_surface'
-      call const_ele_list_4_surface(ele1, surf1)
 !
 !       if (iflag_debug.gt.0) call check_surf_nod_4_sheard_para         &
 !     &                     (my_rank, sf_grp1%num_grp, sf_grp_nod1)
 !
 !
-       if (iflag_debug.eq.1) write(*,*) 'const_ele_group_connect'
-      call const_ele_group_connect
-       if (iflag_debug.eq.1) write(*,*) 'const_surf_group_connect'
-      call const_surf_group_connect
+       if (iflag_debug.eq.1) write(*,*) 'const_group_connectivity_1st'
+      call const_group_connectivity_1st
 !
       end subroutine const_mesh_informations
 !
@@ -87,8 +85,7 @@
 !
       subroutine const_nod_ele_infos
 !
-      use m_surface_group_connect
-!
+      use m_group_data
 !
        if (iflag_debug.gt.0) write(*,*) 'set_local_element_info'
       call set_local_element_info
@@ -111,12 +108,8 @@
       use m_geometry_data
       use m_group_data
 !
-      use m_element_group_connect
-      use m_surface_group_connect
 !
-!
-      call deallocate_surf_group_connect
-      call deallocate_ele_group_connect
+      call dealloc_grp_connectivity_1st
 !
       call deallocate_sf_grp_type_smp(sf_grp1)
       call deallocate_grp_type_smp(ele_grp1)
@@ -258,9 +251,9 @@
         if (iflag_debug.gt.0) write(*,*) 'construct_surface_data'
         call construct_surface_data(node1, ele1, surf1)
 !
-!        call check_surface_data(my_rank)
-!        call check_external_surface(my_rank)
-!        call check_iso_surface(my_rank)
+!        call check_surface_data(my_rank, ele1, surf1)
+!        call check_external_surface(my_rank, surf1)
+!        call check_iso_surface(my_rank, surf1)
       end if
 !
       if (iflag_debug.gt.0) write(*,*) 'count_overlap_surface'
@@ -271,8 +264,8 @@
         if (iflag_debug.gt.0) write(*,*) 'construct_edge_data'
         call construct_edge_data(node1, ele1, surf1, edge1)
 !
-!        call check_edge_data(id_rank)
-!        call check_edge_hexa_data(id_rank)
+!        call check_edge_data(id_rank, surf1, edge1)
+!        call check_edge_hexa_data(id_rank, ele1, edge1)
       end if
 !
       if (iflag_debug.gt.0) write(*,*) 'count_overlap_edge'

@@ -35,7 +35,6 @@
       use sel_fld_copy_4_sph_trans
 !
 !
-!$omp parallel
       if(ft_trns%i_grad_vx.gt.0) then
         call sel_scalar_from_trans                                      &
      &     (nnod_rtp, nidx_rtp, ione, inod_rtp_smp_stack, nnod_rtp,     &
@@ -51,7 +50,6 @@
      &     (nnod_rtp, nidx_rtp, ione, inod_rtp_smp_stack, nnod_rtp,     &
      &      fld_rtp(1,b_trns%i_velo+2), frt_rtp(1,ft_trns%i_grad_vz) )
       end if
-!$omp end parallel
 !
       end subroutine copy_velo_to_grad_v_rtp
 !

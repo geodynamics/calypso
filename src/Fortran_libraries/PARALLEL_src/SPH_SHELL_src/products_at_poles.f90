@@ -7,6 +7,16 @@
 !> @brief Evaluate products at poles
 !!
 !!@verbatim
+!!      subroutine pole_fld_cst_dot_prod(numnod, internal_node,         &
+!!     &          xx, nnod_rtp, nidx_rtp_r, coef,                       &
+!!     &          ncomp_nod, i_vec1, i_vec2, i_prod, d_nod)
+!!      subroutine pole_fld_cst_cross_prod(numnod, internal_node,       &
+!!     &          xx, nnod_rtp, nidx_rtp_r, coef,                       &
+!!     &          ncomp_nod, i_vec1, i_vec2, i_prod, d_nod)
+!!      subroutine pole_fld_cst_vec_scalar_prod(numnod, internal_node,  &
+!!     &          xx, nnod_rtp, nidx_rtp_r, coef,                       &
+!!     &          ncomp_nod, i_vec1, i_scl, i_prod, d_nod)
+!!
 !!      subroutine pole_sph_dot_prod_w_const(numnod, internal_node,     &
 !!     &          xx, nnod_rtp, nidx_rtp_r, coef, d_vec1, d_vec2,       &
 !!     &          d_prod)
@@ -42,6 +52,79 @@
 !
       contains
 !
+!-----------------------------------------------------------------------
+!
+      subroutine pole_fld_cst_dot_prod(numnod, internal_node,           &
+     &          xx, nnod_rtp, nidx_rtp_r, coef,                         &
+     &          ncomp_nod, i_vec1, i_vec2, i_prod, d_nod)
+!
+      integer(kind = kint), intent(in) :: numnod, internal_node
+      real(kind = kreal), intent(in) :: xx(numnod,3)
+!
+      integer(kind = kint), intent(in) :: nidx_rtp_r
+      integer(kind = kint), intent(in) :: nnod_rtp
+!
+      real(kind = kreal), intent(in) :: coef
+      integer(kind = kint), intent(in) :: ncomp_nod
+      integer(kind = kint), intent(in) :: i_vec1, i_vec2, i_prod
+      real(kind = kreal), intent(inout) :: d_nod(numnod,ncomp_nod)
+!
+!
+      call pole_sph_dot_prod_w_const(numnod, internal_node,             &
+     &          xx, nnod_rtp, nidx_rtp_r, coef,                         &
+     &          d_nod(1,i_vec1), d_nod(1,i_vec2), d_nod(1,i_prod))
+!
+      end subroutine pole_fld_cst_dot_prod
+!
+! -----------------------------------------------------------------------
+!
+      subroutine pole_fld_cst_cross_prod(numnod, internal_node,         &
+     &          xx, nnod_rtp, nidx_rtp_r, coef,                         &
+     &          ncomp_nod, i_vec1, i_vec2, i_prod, d_nod)
+!
+      integer(kind = kint), intent(in) :: numnod, internal_node
+      real(kind = kreal), intent(in) :: xx(numnod,3)
+!
+      integer(kind = kint), intent(in) :: nidx_rtp_r
+      integer(kind = kint), intent(in) :: nnod_rtp
+!
+      real(kind = kreal), intent(in) :: coef
+      integer(kind = kint), intent(in) :: ncomp_nod
+      integer(kind = kint), intent(in) :: i_vec1, i_vec2, i_prod
+      real(kind = kreal), intent(inout) :: d_nod(numnod,ncomp_nod)
+!
+!
+      call pole_sph_cross_prod_w_const(numnod, internal_node,           &
+     &          xx, nnod_rtp, nidx_rtp_r, coef,                         &
+     &          d_nod(1,i_vec1), d_nod(1,i_vec2), d_nod(1,i_prod))
+!
+      end subroutine pole_fld_cst_cross_prod
+!
+! -----------------------------------------------------------------------
+!
+      subroutine pole_fld_cst_vec_scalar_prod(numnod, internal_node,    &
+     &          xx, nnod_rtp, nidx_rtp_r, coef,                         &
+     &          ncomp_nod, i_vec1, i_scl, i_prod, d_nod)
+!
+      integer(kind = kint), intent(in) :: numnod, internal_node
+      real(kind = kreal), intent(in) :: xx(numnod,3)
+!
+      integer(kind = kint), intent(in) :: nidx_rtp_r
+      integer(kind = kint), intent(in) :: nnod_rtp
+!
+      real(kind = kreal), intent(in) :: coef
+      integer(kind = kint), intent(in) :: ncomp_nod
+      integer(kind = kint), intent(in) :: i_vec1, i_scl, i_prod
+      real(kind = kreal), intent(inout) :: d_nod(numnod,ncomp_nod)
+!
+!
+      call pole_vec_scalar_prod_w_const(numnod, internal_node,          &
+     &          xx, nnod_rtp, nidx_rtp_r, coef,                         &
+     &          d_nod(1,i_vec1), d_nod(1,i_scl), d_nod(1,i_prod))
+!
+      end subroutine pole_fld_cst_vec_scalar_prod
+!
+! -----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine pole_sph_dot_prod_w_const(numnod, internal_node,       &

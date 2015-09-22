@@ -49,12 +49,12 @@
 !
       subroutine write_modes_rj_groups(mesh_file_id)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: mesh_file_id
 !
 !
-      write(mesh_file_id,'(a)') '!'
-      write(mesh_file_id,'(a)') '! Group data'
-      write(mesh_file_id,'(a)') '!'
+      write(mesh_file_id,'(a)', advance='NO') hd_grphd()
       call write_rj_radial_grp_data(mesh_file_id)
       call write_rj_sphere_grp_data(mesh_file_id)
 !
@@ -122,12 +122,12 @@
 !
       subroutine write_rj_radial_grp_data(mesh_file_id)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: mesh_file_id
 !
 !
-      write(mesh_file_id,'(a)') '!'
-      write(mesh_file_id,'(a)') '! radial groups in spectr'
-      write(mesh_file_id,'(a)') '!'
+      write(mesh_file_id,'(a)', advance='NO') hd_kgrphd()
 !
       call write_group_data(mesh_file_id, num_radial_grp_rj_IO,         &
      &    ntot_radial_grp_rj_IO, istack_radial_grp_rj_IO,               &
@@ -141,12 +141,12 @@
 !
       subroutine write_rj_sphere_grp_data(mesh_file_id)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: mesh_file_id
 !
 !
-      write(mesh_file_id,'(a)') '!'
-      write(mesh_file_id,'(a)') '! spehrical harmonics groups'
-      write(mesh_file_id,'(a)') '!'
+      write(mesh_file_id,'(a)', advance='NO') hd_jgrphd()
 !
       call write_group_data(mesh_file_id, num_sphere_grp_rj_IO,         &
      &    ntot_sphere_grp_rj_IO, istack_sphere_grp_rj_IO,               &

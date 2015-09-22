@@ -25,6 +25,7 @@
 !!      subroutine read_character3_ctl_item(label, iflag_dat,           &
 !!     &           chara_data)
 !!
+!!      subroutine read_file_name_from_ctl_line(icou, fname)
 !!      subroutine read_file_names_from_ctl_line(num, icou, fname)
 !!
 !!      subroutine read_control_array_real_list(label, num, icou,       &
@@ -381,6 +382,22 @@
        end subroutine read_character3_ctl_item
 !
 !   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+       subroutine read_file_name_from_ctl_line(icou, fname)
+!
+       integer (kind=kint), intent(inout) :: icou
+       character(len=kchara), intent(inout) :: fname
+!
+       character(len=kchara) :: tmpchara
+!
+!
+       if(icou .ge. 1) return
+       icou = icou + 1
+       read(character_4_read,*) header_chara, tmpchara, fname
+!
+       end subroutine read_file_name_from_ctl_line
+!
 !   --------------------------------------------------------------------
 !
        subroutine read_file_names_from_ctl_line(num, icou, fname)

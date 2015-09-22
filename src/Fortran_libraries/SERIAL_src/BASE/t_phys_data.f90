@@ -24,10 +24,8 @@
 !!        type(phys_data), intent(inout) :: fld
 !!
 !!      subroutine check_nodal_field_name_type(fld)
-!!      subroutine check_nodal_data_type(my_rank, fld, nnod,            &
-!!     &          numdir, i_field)
-!!        integer(kind = kint), intent(in) :: my_rank
-!!        integer(kind = kint), intent(in) :: nnod, numdir, i_field
+!!      subroutine check_nodal_data(my_rank, fld, numdir, i_field)
+!!        integer(kind = kint), intent(in) :: my_rank, numdir, i_field
 !!        type(phys_data), intent(in) :: fld
 !!@endverbatim
 !
@@ -41,6 +39,8 @@
 ! 
 !>       Structure for field data
       type phys_data
+!>       number of data points
+        integer (kind=kint) :: n_point
 !>       number of field
         integer (kind=kint) :: num_phys
 !>       total number of component
@@ -90,7 +90,7 @@
         fld%phys_name = ''
         fld%num_component =    0
         fld%istack_component = 0
-        fld%iorder_eletype =   0
+        fld%iorder_eletype =   1
         fld%iflag_monitor =    0
       end if
 !
@@ -104,9 +104,10 @@
       type(phys_data), intent(inout) :: fld
 !
 !
-      allocate( fld%d_fld(num,fld%ntot_phys) )
+      fld%n_point = num
+      allocate( fld%d_fld(fld%n_point,fld%ntot_phys) )
       allocate( fld%iflag_update(fld%ntot_phys) )
-      if(num*fld%ntot_phys .gt. 0)  then
+      if(fld%n_point*fld%ntot_phys .gt. 0)  then
         fld%d_fld =        0.0d0
         fld%iflag_update = 0
       end if
@@ -169,6 +170,9 @@
 !
 !
       call link_field_name_type(org_fld, new_fld)
+!
+      new_fld%n_point =       org_fld%n_point
+!
       new_fld%d_fld =>        org_fld%d_fld
       new_fld%iflag_update => org_fld%iflag_update
 !
@@ -220,21 +224,19 @@
 !
 !   ---------------------------------------------------------------------
 !
-      subroutine check_nodal_data_type(my_rank, fld, nnod,              &
-     &          numdir, i_field)
+      subroutine check_nodal_data(my_rank, fld, numdir, i_field)
 !
-      integer(kind = kint), intent(in) :: my_rank
-      integer(kind = kint), intent(in) :: nnod, numdir, i_field
+      integer(kind = kint), intent(in) :: my_rank, numdir, i_field
       type(phys_data), intent(in) :: fld
       integer(kind = kint) :: inod, nd
 !
       write(50+my_rank,*) 'inod, nodal field: ', i_field, numdir
-      do inod = 1, nnod
+      do inod = 1, fld%n_point
         write(50+my_rank,'(i16,1p10e25.14)')                            &
      &         inod, (fld%d_fld(inod,i_field+nd-1),nd=1, numdir)
       end do
 !
-      end subroutine check_nodal_data_type
+      end subroutine check_nodal_data
 !
 !  --------------------------------------------------------------------
 !

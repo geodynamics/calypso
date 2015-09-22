@@ -1,27 +1,27 @@
-!t_surface_group_connect.f90
-!      module t_surface_group_connect
-!
-!     Written by H. Matsui on Dec., 2008
+!>@file   t_surface_group_connect.f90
+!!@brief  module t_surface_group_connect
+!!
+!!@author H. Matsui
+!!@date Programmed in Dec., 2008
 !
 !> @brief Structure of connectivity data for surface group items
-!
-!> Substitution of
-!> @n      (module m_surface_group_connect)
-!
-!      subroutine alloc_num_surf_grp_nod(num_surf, sf_nod)
-!      subroutine alloc_num_surf_grp_nod_smp(num_surf_smp, sf_nod)
-!      subroutine alloc_item_surf_grp_nod(sf_nod)
-!      subroutine alloc_vect_surf_grp_nod(sf_nod)
-!        type(surface_group_data), intent(in) :: sf_grp
-!        type(surface_node_grp_data), intent(in) :: sf_nod
-!
-!      subroutine dealloc_num_surf_grp_nod_smp(sf_nod)
-!      subroutine dealloc_surf_grp_nod(sf_nod)
-!        type(surface_node_grp_data), intent(in) :: sf_nod
-!
+!!
+!!@verbatim
+!!      subroutine alloc_num_surf_grp_nod(num_surf, sf_nod)
+!!      subroutine alloc_num_surf_grp_nod_smp(num_surf_smp, sf_nod)
+!!      subroutine alloc_item_surf_grp_nod(sf_nod)
+!!      subroutine alloc_vect_surf_grp_nod(sf_nod)
+!!        type(surface_group_data), intent(in) :: sf_grp
+!!        type(surface_node_grp_data), intent(in) :: sf_nod
+!!
+!!      subroutine dealloc_num_surf_grp_nod_smp(sf_nod)
+!!      subroutine dealloc_surf_grp_nod(sf_nod)
+!!        type(surface_node_grp_data), intent(in) :: sf_nod
+!!
 !!       subroutine check_surface_node_id(id_check, sf_nod)
 !!      subroutine check_surf_nod_4_sheard_para                         &
 !!     &         (id_check, num_surf, sf_nod)
+!!@endverbatim
 !
       module t_surface_group_connect
 !

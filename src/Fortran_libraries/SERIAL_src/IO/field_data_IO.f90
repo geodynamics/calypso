@@ -14,6 +14,7 @@
 !!      function field_comp_buffer(num_field, ncomp_field)
 !!      function each_field_name_buffer(field_name)
 !!      function each_field_data_buffer(ncomp, vect)
+!!      integer(kind = kint) function len_each_field_data_buf(ncomp)
 !!
 !!      subroutine read_field_num_buffer(textbuf, nnod, num_field)
 !!      subroutine read_bufer_istack_nod_buffer                         &
@@ -149,6 +150,16 @@
       end function each_field_data_buffer
 !
 ! -------------------------------------------------------------------
+!
+      integer(kind = kint) function len_each_field_data_buf(ncomp)
+!
+      integer(kind = kint), intent(in) :: ncomp
+!
+      len_each_field_data_buf = ncomp*25+1
+!
+      end function len_each_field_data_buf
+!
+! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
       subroutine read_field_istack_nod_buffer                           &
@@ -187,7 +198,7 @@
 !
       subroutine read_field_num_buffer(textbuf, num_field)
 !
-      character(len=48), intent(in) :: textbuf
+      character(len=49), intent(in) :: textbuf
       integer(kind = kint), intent(inout) :: num_field
 !
       character(len=16) ::    tmp1
@@ -203,7 +214,7 @@
      &         (textbuf, num_field, ncomp_field)
 !
       integer(kind = kint), intent(in) :: num_field
-      character(len=num_field*5), intent(in) :: textbuf
+      character(len=num_field*5+1), intent(in) :: textbuf
       integer(kind = kint), intent(inout) :: ncomp_field(num_field)
 !
       character(len=num_field*5) ::    tmp1

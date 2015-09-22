@@ -103,13 +103,12 @@
 !
       subroutine write_rank_4_sph(id_file)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: id_file
 !
-      write(id_file,'(a)') '!'
-      write(id_file,'(a)') '! Domain ID'
-      write(id_file,'(a)') '! segment ID for each direction'
-      write(id_file,'(a)') '!'
 !
+      write(id_file,'(a)', advance='NO') hd_segment()
       write(id_file,'(10i16)') sph_rank_IO(1:ndir_sph_IO)
 !
       end subroutine write_rank_4_sph
@@ -118,13 +117,12 @@
 !
       subroutine write_gl_resolution_sph(id_file)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: id_file
 !
-      write(id_file,'(a)') '!'
-      write(id_file,'(a)') '! num. of global grids'
-      write(id_file,'(a)') '! truncation level for spherical harmonics'
-      write(id_file,'(a)') '!'
 !
+      write(id_file,'(a)', advance='NO') hd_trunc()
       write(id_file,'(3i16)') nidx_gl_sph_IO(1:ndir_sph_IO)
       write(id_file,'(i16)') ltr_gl_IO
 !

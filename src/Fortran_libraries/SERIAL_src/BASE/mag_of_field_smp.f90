@@ -9,6 +9,13 @@
 !!@n      Need $omp parallel to use these routines
 !!
 !!@verbatim
+!!      subroutine nodal_lscale_by_rot_smp(np_smp, nnod,                &
+!!     &          inod_smp_stack, ncomp_nod, i_fld, i_rot,              &
+!!     &          d_nod, d_len)
+!!      subroutine nodal_lscale_by_diffuse_smp(np_smp, nnod,            &
+!!     &          inod_smp_stack, ncomp_nod, i_fld, i_diffuse,          &
+!!     &          d_nod, d_len)
+!!
 !!      subroutine cal_vector_magnitude(np_smp, nnod, inod_smp_stack,   &
 !!     &          d_fld, d_mag)
 !!      subroutine cal_sym_tensor_magnitude(np_smp, nnod,               &
@@ -45,6 +52,45 @@
       contains
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine nodal_lscale_by_rot_smp(np_smp, nnod,                  &
+     &          inod_smp_stack, ncomp_nod, i_fld, i_rot,                &
+     &          d_nod, d_len)
+!
+      integer (kind = kint) :: np_smp, nnod
+      integer (kind = kint) :: inod_smp_stack(0:np_smp)
+      integer(kind = kint), intent(in) :: ncomp_nod
+      integer(kind = kint), intent(in) :: i_fld, i_rot
+      real(kind=kreal), intent(in) :: d_nod(nnod,ncomp_nod)
+      real(kind=kreal), intent(inout) :: d_len(nnod)
+!
+      call cal_len_scale_by_rot_smp(np_smp, nnod, inod_smp_stack,       &
+     &    d_nod(1,i_fld), d_nod(1,i_rot), d_len)
+!
+      end subroutine nodal_lscale_by_rot_smp
+!
+!-----------------------------------------------------------------------
+!
+      subroutine nodal_lscale_by_diffuse_smp(np_smp, nnod,              &
+     &          inod_smp_stack, ncomp_nod, i_fld, i_diffuse,            &
+     &          d_nod, d_len)
+!
+      integer (kind = kint) :: np_smp, nnod
+      integer (kind = kint) :: inod_smp_stack(0:np_smp)
+      integer(kind = kint), intent(in) :: ncomp_nod
+      integer(kind = kint), intent(in) :: i_fld, i_diffuse
+      real(kind=kreal), intent(in) :: d_nod(nnod,ncomp_nod)
+      real(kind=kreal), intent(inout) :: d_len(nnod)
+!
+!
+      call cal_len_scale_by_diffuse_smp(np_smp, nnod, inod_smp_stack,   &
+     &    d_nod(1,i_fld), d_nod(1,i_diffuse), d_len)
+!
+      end subroutine nodal_lscale_by_diffuse_smp
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
       subroutine cal_vector_magnitude(np_smp, nnod, inod_smp_stack,     &
      &          d_fld, d_mag)
@@ -197,7 +243,7 @@
       end do
 !$omp end do nowait
 !
-     end subroutine cal_len_scale_by_diffuse_smp
+      end subroutine cal_len_scale_by_diffuse_smp
 !
 !-----------------------------------------------------------------------
 !

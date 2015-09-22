@@ -94,17 +94,14 @@
 !
       subroutine write_boundary_data_a(input_file_code)
 !
+      use m_fem_mesh_labels
       use group_data_IO
 !
       integer (kind = kint), intent(in) :: input_file_code
 !
 !   write node group
 !
-      write(input_file_code,'(a)') '!'
-      write(input_file_code,'(a)') '! 4. group information  '
-      write(input_file_code,'(a)') '! 4.1 node group '
-      write(input_file_code,'(a)') '!'
-!
+      write(input_file_code,'(a)', advance='NO') hd_fem_nodgrp()
       call write_group_data(input_file_code, num_bc_dummy,              &
      &    num_nod_bc_dummy, bc_istack_dummy, bc_name_dummy,             &
      &    bc_item_dummy)
@@ -113,10 +110,7 @@
 !
 !  write element group
 !
-      write(input_file_code,'(a)') '!'
-      write(input_file_code,'(a)') '! 4.2 element group '
-      write(input_file_code,'(a)') '!'
-!
+      write(input_file_code,'(a)', advance='NO') hd_fem_elegrp()
       call write_group_data(input_file_code, num_mat_dummy,             &
      &    num_mat_bc_dummy, mat_istack_dummy, mat_name_dummy,           &
      &    mat_item_dummy)
@@ -125,10 +119,7 @@
 !
 !  write surface group
 !
-      write(input_file_code,'(a)') '!'
-      write(input_file_code,'(a)') '! 4.3 surface group '
-      write(input_file_code,'(a)') '!'
-!
+      write(input_file_code,'(a)', advance='NO') hd_fem_sfgrp()
       call write_surf_group_data(input_file_code, num_surf_dummy,       &
      &    num_surf_bc_dummy, surf_istack_dummy, surf_name_dummy,        &
      &    surf_item_dummy)

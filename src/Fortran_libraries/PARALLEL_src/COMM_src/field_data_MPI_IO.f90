@@ -32,21 +32,6 @@
 !!      subroutine skip_fld_vecotr_mpi(nprocs_in, ioff_gl, ncomp,       &
 !!     &          istack_merged)
 !!
-!!  External routines in this file
-!!      subroutine calypso_mpi_seek_write_ext                           &
-!!     &         (id_mpi_file, ioffset, ilength, textbuf)
-!!      subroutine read_step_data_buf_ext(textbuf, id_rank)
-!!      subroutine read_field_istack_nod_buf_ext                        &
-!!     &         (textbuf, nprocs, istack_nod)
-!!      subroutine read_bufer_istack_nod_buf_ext                        &
-!!     &         (textbuf, nprocs, istack_nod)
-!!      subroutine read_field_num_buf_ext(textbuf, num_field)
-!!      subroutine read_field_comp_buf_ext                              &
-!!     &         (textbuf, num_field, ncomp_field)
-!!      subroutine read_each_field_name_buf_ext(textbuf, field_name)
-!!      subroutine read_each_field_data_buf_ext(textbuf, ncomp, vect)
-!!
-!!
 !!   Data format for the merged ascii field data
 !!     1.   Number of process
 !!     2.   Time step
@@ -179,7 +164,7 @@
 !
 !
       v1(1:ncomp) = 0.0d0
-      ilength = len(each_field_data_buffer(ncomp, v1))
+      ilength = len_each_field_data_buf(ncomp)
       istack_buffer(0:nprocs_in) = ilength * istack_merged(0:nprocs_in)
 !
       call calypso_mpi_seek_write_head_c                                &
@@ -187,7 +172,7 @@
       call calypso_mpi_seek_write_head_c(id_fld, ioff_gl,               &
      &    buffer_istack_nod_buffer(nprocs_in, istack_buffer))
 !
-      ioffset = int(ioff_gl + ilength * istack_merged(id_rank))
+      ioffset = ioff_gl + ilength * istack_merged(id_rank)
       do inod = 1, nnod
         v1(1:ncomp) = vect(inod,1:ncomp)
         call calypso_mpi_seek_write_chara(id_fld, ioffset, ilength,     &
@@ -211,19 +196,16 @@
 !
       integer, intent(in) ::  id_fld
 !
-      character(len=1), allocatable :: c1buf(:)
+      character(len=len_step_data_buf) :: textbuf_c
       integer(kind = MPI_OFFSET_KIND) :: ioffset
-      integer(kind = kint) :: ilength, iread
+      integer(kind = kint) :: iread
 !
 !
-      ilength = len(step_data_buffer(izero))
       if(my_rank .eq. 0) then
-        ioffset = int(ioff_gl)
-        allocate(c1buf(ilength))
-        call calypso_mpi_seek_read_chara                                &
-     &     (id_fld, ioffset, ilength, c1buf(1))
-        call read_step_data_buf_ext(c1buf(1), iread)
-        deallocate(c1buf)
+        ioffset = ioff_gl
+        call calypso_mpi_seek_read_lenchara                             &
+     &     (id_fld, ioffset, len_step_data_buf, textbuf_c)
+        call read_step_data_buffer(textbuf_c, iread)
 !
         if(nprocs_in .ne. iread) then
           call calypso_mpi_abort                                        &
@@ -231,7 +213,7 @@
         end if
 !
       end if
-      ioff_gl = ioff_gl + ilength
+      ioff_gl = ioff_gl + len_step_data_buf
 !
       call sync_field_time_mpi
 !
@@ -254,31 +236,28 @@
 !
       integer, intent(in) ::  id_fld
 !
-      character(len=1), allocatable :: c1buf(:)
+      character(len=31+1+16+1) ::           textbuf_c
+      character(len=25+1+nprocs_in*16+1) :: textbuf_d
       integer(kind = MPI_OFFSET_KIND) :: ioffset
       integer(kind = kint) :: ilength
 !
 !
-      ilength = len(field_istack_nod_buffer(nprocs_in, istack_merged))
+      ilength = len(textbuf_d)
       if(my_rank .eq. 0) then
-        ioffset = int(ioff_gl)
-        allocate(c1buf(ilength))
-        call calypso_mpi_seek_read_chara                                &
-     &     (id_fld, ioffset, ilength, c1buf(1))
-        call read_field_istack_nod_buf_ext                              &
-     &     (c1buf(1), nprocs_in, istack_merged)
-        deallocate(c1buf)
+        ioffset = ioff_gl
+        call calypso_mpi_seek_read_lenchara                             &
+     &     (id_fld, ioffset, ilength, textbuf_d)
+        call read_field_istack_nod_buffer                               &
+     &     (textbuf_d, nprocs_in, istack_merged)
       end if
       ioff_gl = ioff_gl + ilength
 !
-      ilength = len(field_num_buffer(izero))
+      ilength = len(textbuf_c)
       if(my_rank .eq. 0) then
-        ioffset = int(ioff_gl)
-        allocate(c1buf(ilength))
-        call calypso_mpi_seek_read_chara                              &
-     &       (id_fld, ioffset, ilength, c1buf(1))
-        call read_field_num_buf_ext(c1buf(1), num_field)
-        deallocate(c1buf)
+        ioffset = ioff_gl
+        call calypso_mpi_seek_read_lenchara                             &
+     &       (id_fld, ioffset, ilength, textbuf_c)
+        call read_field_num_buffer(textbuf_c, num_field)
       end if
       ioff_gl = ioff_gl + ilength
 !
@@ -302,19 +281,17 @@
 !
       integer, intent(in) ::  id_fld
 !
-      character(len=1), allocatable :: c1buf(:)
+      character(len=num_field*5+1) :: charabuf_c
       integer(kind = MPI_OFFSET_KIND) :: ioffset
       integer(kind = kint) :: ilength
 !
 !
-      ilength = len(field_comp_buffer(num_field, ncomp_field))
+      ilength = len(charabuf_c)
       if(my_rank .eq. 0) then
-        ioffset = int(ioff_gl)
-        allocate(c1buf(ilength))
-        call calypso_mpi_seek_read_chara                                &
-     &       (id_fld, ioffset, ilength, c1buf(1))
-        call read_field_comp_buf_ext(c1buf(1), num_field, ncomp_field)
-        deallocate(c1buf)
+        ioffset = ioff_gl
+        call calypso_mpi_seek_read_lenchara                             &
+     &       (id_fld, ioffset, ilength, charabuf_c)
+        call read_field_comp_buffer(charabuf_c, num_field, ncomp_field)
       end if
       ioff_gl = ioff_gl + ilength
 !
@@ -335,19 +312,17 @@
 !
       integer, intent(in) ::  id_fld
 !
-      character(len=1), allocatable :: c1buf(:)
+      character(len=kchara+1) :: textbuf_c
       integer(kind = MPI_OFFSET_KIND) :: ioffset
       integer(kind = kint) :: ilength
 !
 !
       if(my_rank .eq. 0) then
-        ioffset = int(ioff_gl)
-        ilength = kchara + 1
-        allocate(c1buf(ilength))
-        call calypso_mpi_seek_read_chara                                &
-     &     (id_fld, ioffset, ilength, c1buf(1))
-        call read_each_field_name_buf_ext(c1buf(1), field_name)
-        deallocate(c1buf)
+        ioffset = ioff_gl
+        ilength = len(textbuf_c)
+        call calypso_mpi_seek_read_lenchara                             &
+     &     (id_fld, ioffset, ilength, textbuf_c)
+        call read_each_field_name_buffer(textbuf_c, field_name)
       end if
 !
       call sync_field_name_mpi(field_name)
@@ -382,21 +357,22 @@
       ilength = ncomp*25 + 1
       num = istack_merged_intnod(my_rank+1)                             &
      &     - istack_merged_intnod(my_rank)
-      ioffset = int(ioff_gl + ilength * istack_merged_intnod(my_rank))
+      ioffset = ioff_gl + ilength * istack_merged_intnod(my_rank)
       ioff_gl = ioff_gl + ilength * istack_merged_intnod(nprocs)
 !
       if(num .le. 0) return
       write(fmt_txt,'(a1,i5,a16)') '(', ncomp, '(1pE25.15e3),a1)'
 !
-      allocate(textbuf_n(nnod))
+      allocate(textbuf_n(num))
 !
       do i = 1, num
         charatmp => textbuf_n(i)
         write(charatmp,'(1p3E23.12e3,a1)') vect(i,1:ncomp), char(10)
       end do
-      call calypso_mpi_seek_write_ext(id_fld, ioffset, (num*ilength),   &
-     &    textbuf_n(1))
+      call calypso_mpi_seek_wrt_mul_chara(id_fld, ioffset, ilength,     &
+     &    num, textbuf_n)
 !
+      nullify(charatmp)
       deallocate(textbuf_n)
 !
       end subroutine write_field_vecotr_mpi
@@ -416,7 +392,7 @@
 !
       integer, intent(in) ::  id_fld
 !
-      character(len=1), allocatable :: c1buf(:)
+      character(len=ncomp*25+1) :: textbuf_d
       real(kind = kreal) :: v1(ncomp)
       integer(kind = MPI_OFFSET_KIND) :: ioffset
       integer(kind = kint) :: ilength
@@ -429,17 +405,15 @@
       ioff_gl = ioff_gl + ilength
 !
       v1(1:ncomp) = 0.0d0
-      ilength = len(each_field_data_buffer(ncomp, v1))
-      ioffset = int(ioff_gl + ilength * istack_merged(id_rank))
-      allocate(c1buf(ilength))
+      ilength = len(textbuf_d)
+      ioffset = ioff_gl + ilength * istack_merged(id_rank)
 !
       do inod = 1, nnod
-        call calypso_mpi_seek_read_chara                                &
-     &    (id_fld, ioffset, ilength, c1buf(1))
-        call read_each_field_data_buf_ext(c1buf(1), ncomp, v1)
+        call calypso_mpi_seek_read_lenchara                             &
+     &    (id_fld, ioffset, ilength, textbuf_d)
+        call read_each_field_data_buffer(textbuf_d, ncomp, v1)
         vect(inod,1:ncomp) = v1(1:ncomp)
       end do
-      deallocate(c1buf)
       ioff_gl = ioff_gl + ilength * istack_merged(nprocs_in)
 !
       end subroutine read_fld_vecotr_mpi
@@ -462,7 +436,7 @@
 !
 !
       v1(1:ncomp) = 0.0d0
-      ilength = len(each_field_data_buffer(ncomp, v1))
+      ilength = len_each_field_data_buf(ncomp)
       ioff_gl = ioff_gl + ilength * istack_merged(nprocs_in)
 !
       end subroutine skip_fld_vecotr_mpi
@@ -470,132 +444,3 @@
 ! -----------------------------------------------------------------------
 !
       end module field_data_MPI_IO
-!
-! -----------------------------------------------------------------------
-!
-!      External routine to pass character lengh check
-!
-! -----------------------------------------------------------------------
-!
-      subroutine calypso_mpi_seek_write_ext                             &
-     &         (id_mpi_file, ioffset, ilength, textbuf)
-!
-      use m_calypso_mpi_IO
-!
-      integer, intent(in) ::  id_mpi_file
-      integer(kind = kint), intent(in) :: ilength
-      character(len=ilength), intent(in) :: textbuf
-      integer(kind = MPI_OFFSET_KIND), intent(inout) :: ioffset
-!
-!
-      call calypso_mpi_seek_write_chara                                 &
-     &         (id_mpi_file, ioffset, ilength, textbuf)
-!
-      end subroutine calypso_mpi_seek_write_ext
-!
-! -------------------------------------------------------------------
-!
-      subroutine read_step_data_buf_ext(textbuf, id_rank)
-!
-      use m_time_data_IO
-!
-      character(len=len_step_data_buf), intent(in) :: textbuf
-      integer(kind = kint), intent(inout) :: id_rank
-!
-!
-      call read_step_data_buffer(textbuf, id_rank)
-!
-      end subroutine read_step_data_buf_ext
-!
-! -------------------------------------------------------------------
-!
-      subroutine read_field_istack_nod_buf_ext                          &
-     &         (textbuf, nprocs, istack_nod)
-!
-      use field_data_IO
-!
-      integer(kind = kint), intent(in) :: nprocs
-      character(len=25+1+nprocs*16+1), intent(in) :: textbuf
-      integer(kind = kint_gl), intent(inout) :: istack_nod(0:nprocs)
-!
-      call read_field_istack_nod_buffer(textbuf, nprocs, istack_nod)
-!
-      end subroutine read_field_istack_nod_buf_ext
-!
-! -------------------------------------------------------------------
-!
-      subroutine read_bufer_istack_nod_buf_ext                          &
-     &         (textbuf, nprocs, istack_nod)
-!
-      use field_data_IO
-!
-      integer(kind = kint), intent(in) :: nprocs
-      character(nprocs*16+1), intent(in) :: textbuf
-      integer(kind = kint_gl), intent(inout) :: istack_nod(0:nprocs)
-!
-!
-      call read_bufer_istack_nod_buffer(textbuf, nprocs, istack_nod)
-!
-      end subroutine read_bufer_istack_nod_buf_ext
-!
-! -------------------------------------------------------------------
-!
-      subroutine read_field_num_buf_ext(textbuf, num_field)
-!
-      use field_data_IO
-!
-      character(len=48), intent(in) :: textbuf
-      integer(kind = kint), intent(inout) :: num_field
-!
-!
-      call read_field_num_buffer(textbuf, num_field)
-!
-      end subroutine read_field_num_buf_ext
-!
-! -------------------------------------------------------------------
-!
-      subroutine read_field_comp_buf_ext                                &
-     &         (textbuf, num_field, ncomp_field)
-!
-      use field_data_IO
-!
-      integer(kind = kint), intent(in) :: num_field
-      character(len=num_field*5), intent(in) :: textbuf
-      integer(kind = kint), intent(inout) :: ncomp_field(num_field)
-!
-!
-      call read_field_comp_buffer(textbuf, num_field, ncomp_field)
-!
-      end subroutine read_field_comp_buf_ext
-!
-! -------------------------------------------------------------------
-!
-      subroutine read_each_field_name_buf_ext(textbuf, field_name)
-!
-      use field_data_IO
-!
-      character(len=kchara), intent(in) :: textbuf
-      character(len=kchara), intent(inout) :: field_name
-!
-!
-      call read_each_field_name_buffer(textbuf, field_name)
-!
-      end subroutine read_each_field_name_buf_ext
-!
-! -------------------------------------------------------------------
-!
-      subroutine read_each_field_data_buf_ext(textbuf, ncomp, vect)
-!
-      use field_data_IO
-!
-      integer(kind = kint), intent(in) :: ncomp
-      character(len=ncomp*25+1), intent(in) :: textbuf
-      real(kind = kreal), intent(inout) :: vect(ncomp)
-!
-!
-      call read_each_field_data_buffer(textbuf, ncomp, vect)
-!
-      end subroutine read_each_field_data_buf_ext
-!
-! -------------------------------------------------------------------
-!

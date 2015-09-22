@@ -162,14 +162,11 @@
         if(right_file_flag(hd_psfs_ctl) .gt. 0) then
           call read_file_names_from_ctl_line(num_psf_ctl, i_psf_ctl,    &
      &        fname_psf_ctl)
-        end if
-!
-        if(right_begin_flag(hd_psfs_ctl) .gt. 0) then
+        else if(right_begin_flag(hd_psfs_ctl) .gt. 0) then
           i_psf_ctl = i_psf_ctl + 1
           fname_psf_ctl(i_psf_ctl) = 'NO_FILE'
           call read_psf_control_data(psf_ctl_struct(i_psf_ctl))
         end if
-!
       end do
 !
       end subroutine read_files_4_psf_ctl
@@ -195,9 +192,7 @@
         if(right_file_flag(hd_isos_ctl) .gt. 0) then
           call read_file_names_from_ctl_line(num_iso_ctl, i_iso_ctl,    &
      &        fname_iso_ctl)
-        end if
-!
-        if(right_begin_flag(hd_isos_ctl) .gt. 0) then
+        else if(right_begin_flag(hd_isos_ctl) .gt. 0) then
           i_iso_ctl = i_iso_ctl + 1
           fname_iso_ctl(i_iso_ctl) = 'NO_FILE'
           call read_control_data_4_iso(iso_ctl_struct(i_iso_ctl))

@@ -59,7 +59,7 @@
 !
 !
       nrl = nidx_rtp(1)*nidx_rtp(2)
-!$omp do private(ist,ied,inum,inod,mphi,kr_lt,m_sym)
+!$omp parallel do private(ist,ied,inum,inod,mphi,kr_lt,m_sym)
       do ip = 1, np_smp
         ist = inod_rtp_smp_stack(ip-1) + 1
         ied = inod_rtp_smp_stack(ip)
@@ -72,7 +72,7 @@
           end do
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine swap_phi_scalar_from_trans
 !
@@ -94,7 +94,7 @@
 !
 !
       nrl = nidx_rtp(1)*nidx_rtp(2)
-!$omp do private(ist,ied,inum,inod,mphi,kr_lt,m_sym)
+!$omp parallel do private(ist,ied,inum,inod,mphi,kr_lt,m_sym)
       do ip = 1, np_smp
         ist = inod_rtp_smp_stack(ip-1) + 1
         ied = inod_rtp_smp_stack(ip)
@@ -109,7 +109,7 @@
           end do
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine swap_phi_vector_from_trans
 !
@@ -131,7 +131,7 @@
 !
 !
       nrl = nidx_rtp(1)*nidx_rtp(2)
-!$omp do private(ist,ied,inum,inod,mphi,kr_lt,m_sym)
+!$omp parallel do private(ist,ied,inum,inod,mphi,kr_lt,m_sym)
       do ip = 1, np_smp
         ist = inod_rtp_smp_stack(ip-1) + 1
         ied = inod_rtp_smp_stack(ip)
@@ -149,7 +149,7 @@
           end do
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine swap_phi_tensor_from_trans
 !
@@ -169,14 +169,14 @@
 !
 !
       nrl = nidx_rtp(1)*nidx_rtp(2)
-!$omp do private(inod,mphi,kr_lt)
+!$omp parallel do private(inod,mphi,kr_lt)
       do kr_lt = 1, nrl
         do mphi = 1, nidx_rtp(3)
           inod = kr_lt + (mphi-1)*nrl
           v_prt(mphi,kr_lt) = d_sph(inod)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine swap_phi_scalar_to_trans
 !
@@ -195,7 +195,7 @@
 !
 !
       nrl = nidx_rtp(1)*nidx_rtp(2)
-!$omp do private(inod,mphi,kr_lt)
+!$omp parallel do private(inod,mphi,kr_lt)
       do kr_lt = 1, nrl
         do mphi = 1, nidx_rtp(3)
           inod = kr_lt + (mphi-1)*nrl
@@ -204,7 +204,7 @@
           v_prt(mphi,kr_lt,3) = d_sph(inod,3)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine swap_phi_vector_to_trans
 !
@@ -223,7 +223,7 @@
 !
 !
       nrl = nidx_rtp(1)*nidx_rtp(2)
-!$omp do private(inod,mphi,kr_lt)
+!$omp parallel do private(inod,mphi,kr_lt)
       do kr_lt = 1, nrl
         do mphi = 1, nidx_rtp(3)
           inod = kr_lt + (mphi-1)*nrl
@@ -235,7 +235,7 @@
           v_prt(mphi,kr_lt,6) = d_sph(inod,6)
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine swap_phi_tensor_to_trans
 !

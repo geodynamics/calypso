@@ -68,13 +68,13 @@
      &    'ID step time x y z     '
 !
       call write_multi_labels(maximum_data_code,                        &
-     &    num_tot_nod_phys_vis, phys_nod_name)
+     &    nod_fld1%ntot_phys_viz, nod_fld1%phys_name)
       call write_multi_labels(maximum_data_code,                        &
-     &    num_tot_nod_phys_vis, phys_nod_name)
+     &    nod_fld1%ntot_phys_viz, nod_fld1%phys_name)
       call write_multi_labels(maximum_position_code,                    &
-     &    num_tot_nod_phys_vis, phys_nod_name)
+     &    nod_fld1%ntot_phys_viz, nod_fld1%phys_name)
       call write_multi_labels(maximum_position_code,                    &
-     &    num_tot_nod_phys_vis, phys_nod_name)
+     &    nod_fld1%ntot_phys_viz, nod_fld1%phys_name)
 !
       write(maximum_data_code,'(a)')     ''
       write(maximum_position_code,'(a)') ''
@@ -103,16 +103,14 @@
       call open_maximum_file
 !
       write(fmt_txt,'(a5,i3,a13)')                                      &
-     &   '(i16,', (itwo*num_tot_nod_phys_vis+ione), '(1pE25.15e3))'
+     &   '(i16,', (itwo*ncomp_minmax+ione), '(1pE25.15e3))'
       write(maximum_data_code,fmt_txt) istep_ucd, time,                 &
-     &      phys_min(1:num_tot_nod_phys_vis),                           &
-     &      phys_max(1:num_tot_nod_phys_vis)
+     &      phys_min(1:ncomp_minmax), phys_max(1:ncomp_minmax)
 !
       write(fmt_txt,'(a16,i3,a6)')                                      &
-     &   '(i16,1pE25.15e3,', (itwo*num_tot_nod_phys_vis), '(i16))'
+     &   '(i16,1pE25.15e3,', (itwo*ncomp_minmax), '(i16))'
       write(maximum_position_code,fmt_txt) istep_ucd, time,             &
-     &      node_min(1:num_tot_nod_phys_vis),                           &
-     &      node_max(1:num_tot_nod_phys_vis)
+     &      node_min(1:ncomp_minmax), node_max(1:ncomp_minmax)
 !
       close (maximum_data_code)
       close (maximum_position_code)
@@ -136,16 +134,16 @@
 !
       do
         read(maximum_data_code,*,err=99,end=99)  i_read_step, rtmp,     &
-     &      (rtmp,i=1,num_tot_nod_phys_vis),                            &
-     &      (rtmp,i=1,num_tot_nod_phys_vis)
+     &      (rtmp,i=1,nod_fld1%ntot_phys_viz),                          &
+     &      (rtmp,i=1,nod_fld1%ntot_phys_viz)
           if (i_read_step.ge.iflag) exit
         end do
   99  continue
 !
       do
         read(maximum_position_code,*,err=98,end=98)                     &
-     &      i_read_step, rtmp, (itmp,i=1,num_tot_nod_phys_vis),         &
-     &      (itmp,i=1,num_tot_nod_phys_vis)
+     &      i_read_step, rtmp, (itmp,i=1,nod_fld1%ntot_phys_viz),       &
+     &      (itmp,i=1,nod_fld1%ntot_phys_viz)
         if (i_read_step.ge.iflag) exit
       end do
   98  continue

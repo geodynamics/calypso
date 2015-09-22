@@ -92,9 +92,10 @@
       real(kind = kreal), intent(inout) :: d_nod(numnod,ntot_phys)
 !
 !
-!$omp parallel
       call copy_vector_from_trans(nnod_rtp, m_folding,                  &
      &    inod_rtp_smp_stack, numnod, d_rtp, d_nod(1,i_field))
+!
+!$omp parallel
       call overwrite_sph_vect_2_xyz_smp(np_smp, numnod,                 &
      &    inod_rtp_smp_stack, d_nod(1,i_field), colatitude, longitude)
 !$omp end parallel
@@ -127,9 +128,10 @@
       real(kind = kreal), intent(inout) :: d_nod(numnod,ntot_phys)
 !
 !
-!$omp parallel
       call copy_tensor_from_trans(nnod_rtp, m_folding,                  &
      &    inod_rtp_smp_stack, numnod, d_rtp, d_nod(1,i_field))
+!
+!$omp parallel
       call overwrite_xyz_tensor_by_sph_smp(np_smp, numnod,              &
      &    inod_rtp_smp_stack, d_nod(1,i_field), xx(1,1), xx(1,2),       &
      &    xx(1,3), radius, s_cylinder, a_radius, a_s_cylinder)
@@ -155,10 +157,8 @@
       real(kind = kreal), intent(inout) :: d_rtp(nnod_rtp)
 !
 !
-!$omp parallel
       call copy_scalar_to_trans(nnod_rtp, inod_rtp_smp_stack, numnod,   &
      &    d_nod(1,i_field), d_rtp)
-!$omp end parallel
 !
       end subroutine copy_scalar_to_sph_trans
 !
@@ -188,9 +188,10 @@
       real(kind = kreal), intent(inout) :: d_rtp(nnod_rtp,3)
 !
 !
-!$omp parallel
       call copy_vector_to_trans(nnod_rtp, inod_rtp_smp_stack, numnod,   &
      &    d_nod(1,i_field), d_rtp)
+!
+!$omp parallel
       call overwrite_vector_2_sph_smp                                   &
      &   (np_smp, nnod_rtp, inod_rtp_smp_stack, d_rtp,                  &
      &    xx(1,1), xx(1,2), xx(1,3), radius(1), s_cylinder(1),          &
@@ -225,9 +226,10 @@
       real(kind = kreal), intent(inout) :: d_rtp(nnod_rtp,6)
 !
 !
-!$omp parallel
       call copy_tensor_to_trans(nnod_rtp, inod_rtp_smp_stack, numnod,   &
      &    d_nod(1,i_field), d_rtp)
+!
+!$omp parallel
       call overwrite_sph_tensor_smp                                     &
      &   (np_smp, nnod_rtp, inod_rtp_smp_stack, d_rtp,                  &
      &    xx(1,1), xx(1,2), xx(1,3), radius(1), s_cylinder(1),          &

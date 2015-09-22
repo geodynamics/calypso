@@ -21,6 +21,11 @@
 !!     &          inod_smp_stack, vector, const)
 !!      subroutine subtruct_const_4_tensor_smp_ow(np_smp, nnod,       &
 !!     &          inod_smp_stack, tensor, const)
+!!
+!!      subroutine subt_const_to_vector_smp_ow(np_smp, nnod,            &
+!!     &          inod_smp_stack, vector, const)
+!!      subroutine subt_const_to_tensor_smp_ow(np_smp, nnod,            &
+!!     &          inod_smp_stack, tensor, const)
 !!@endverbatim
 !!
 !!@n @param  np_smp   Number of SMP processes
@@ -215,5 +220,61 @@
       end subroutine subtruct_const_4_tensor_smp_ow
 !
 ! -----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine subt_const_to_vector_smp_ow(np_smp, nnod,              &
+     &          inod_smp_stack, vector, const)
+!
+      integer (kind=kint), intent(in) :: np_smp, nnod
+      integer (kind=kint), intent(in) :: inod_smp_stack(0:np_smp)
+      real (kind=kreal), intent(in) :: const(3)
+!
+      real (kind=kreal), intent(inout) :: vector(nnod,3)
+      integer(kind = kint) :: ip, inod, ist, ied
+!
+!$omp do private(inod,ist,ied)
+      do ip = 1, np_smp
+        ist = inod_smp_stack(ip-1) + 1
+        ied = inod_smp_stack(ip)
+        do inod = ist, ied
+          vector(inod,1) = vector(inod,1) - const(1)
+          vector(inod,2) = vector(inod,2) - const(2)
+          vector(inod,3) = vector(inod,3) - const(3)
+        end do
+      end do
+!$omp end do nowait
+!
+       end subroutine subt_const_to_vector_smp_ow
+!
+!-----------------------------------------------------------------------
+!
+      subroutine subt_const_to_tensor_smp_ow(np_smp, nnod,              &
+     &          inod_smp_stack, tensor, const)
+!
+      integer (kind=kint), intent(in) :: np_smp, nnod
+      integer (kind=kint), intent(in) :: inod_smp_stack(0:np_smp)
+      real (kind=kreal), intent(in) :: const(6)
+!
+      real (kind=kreal), intent(inout) :: tensor(nnod,6)
+      integer(kind = kint) :: ip, inod, ist, ied
+!
+!$omp do private(inod,ist,ied)
+      do ip = 1, np_smp
+        ist = inod_smp_stack(ip-1) + 1
+        ied = inod_smp_stack(ip)
+        do inod = ist, ied
+          tensor(inod,1) = tensor(inod,1) - const(1)
+          tensor(inod,2) = tensor(inod,2) - const(2)
+          tensor(inod,3) = tensor(inod,3) - const(3)
+          tensor(inod,4) = tensor(inod,4) - const(4)
+          tensor(inod,5) = tensor(inod,5) - const(5)
+          tensor(inod,6) = tensor(inod,6) - const(6)
+        end do
+      end do
+!$omp end do nowait
+!
+      end subroutine subt_const_to_tensor_smp_ow
+!
+!-----------------------------------------------------------------------
 !
       end module subtract_const_smp

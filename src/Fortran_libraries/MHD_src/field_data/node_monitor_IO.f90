@@ -100,11 +100,11 @@
       allocate(phys_name_monitor(num_field_monitor))
 !
       j = 0
-      do i = 1, num_nod_phys
-        if (iflag_nod_fld_monitor(i) .eq. 1 ) then
+      do i = 1, nod_fld1%num_phys
+        if (nod_fld1%iflag_monitor(i) .eq. 1 ) then
           j = j + 1
-          num_comp_phys_monitor(j) = num_nod_component(i)
-          phys_name_monitor(j) = phys_nod_name(i)
+          num_comp_phys_monitor(j) = nod_fld1%num_component(i)
+          phys_name_monitor(j) =     nod_fld1%phys_name(i)
         end if
       end do
 !
@@ -112,7 +112,7 @@
         write(id_monitor_file,'(a)') 'ID step time x y z '
         write(id_monitor_file,1001)  num_field_monitor
         write(id_monitor_file,1002)                                     &
-     &        num_nod_component(1:num_field_monitor)
+     &        nod_fld1%num_component(1:num_field_monitor)
  1001   format('number_of_fields: ',i16)
  1002   format('number_of_components: ',200i3)
 !
@@ -206,12 +206,12 @@
      &             advance='NO') i_step_MHD, inod, time
         write(id_monitor_file,'(1p3e25.15e3)',                          &
      &             advance='NO') node1%xx(inod,1:3)
-        do i_fld = 1, num_nod_phys
-          if(iflag_nod_fld_monitor(i_fld) .gt. 0) then
-            ist = istack_nod_component(i_fld-1) + 1
-            ied = istack_nod_component(i_fld)
+        do i_fld = 1, nod_fld1%num_phys
+          if(nod_fld1%iflag_monitor(i_fld) .gt. 0) then
+            ist = nod_fld1%istack_component(i_fld-1) + 1
+            ied = nod_fld1%istack_component(i_fld)
             write(id_monitor_file,'(1p6E25.15e3)',                      &
-     &             advance='NO')  d_nod(inod,ist:ied)
+     &             advance='NO')  nod_fld1%d_fld(inod,ist:ied)
           end if
         end do
         write(id_monitor_file,'(a)') ''

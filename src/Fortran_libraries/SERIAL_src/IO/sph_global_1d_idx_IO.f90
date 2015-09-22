@@ -109,34 +109,26 @@
 !
       subroutine write_rtp_gl_1d_table(id_file)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: id_file
       integer(kind = kint) :: i
 !
-      write(id_file,'(a)') '!'
-      write(id_file,'(a)') '! num. start and end global grids'
-      write(id_file,'(a)') '! r-direction'
-      write(id_file,'(a)') '!'
+      write(id_file,'(a)', advance='NO') hd_rgrid()
       write(id_file,'(3i16)') nidx_sph_IO(1),                           &
      &                        ist_sph_IO(1), ied_sph_IO(1)
       do i = 1, nidx_sph_IO(1)
         write(id_file,'(i16,1pE25.15e3)') idx_gl_1_IO(i), r_gl_1_IO(i)
       end do
 !
-      write(id_file,'(a)') '!'
-      write(id_file,'(a)') '! num. start and end global grids'
-      write(id_file,'(a)') '! theta direction'
-      write(id_file,'(a)') '!'
+      write(id_file,'(a)', advance='NO') hd_tgrid()
       write(id_file,'(3i16)') nidx_sph_IO(2),                           &
      &                        ist_sph_IO(2), ied_sph_IO(2)
       do i = 1, nidx_sph_IO(2)
         write(id_file,'(8i16)') idx_gl_2_IO(i,1:ncomp_itbl_1d_IO(2))
       end do
 !
-      write(id_file,'(a)') '!'
-      write(id_file,'(a)')                                              &
-     &      '! num. of start and end global grids and modes'
-      write(id_file,'(a)') '! phi direction'
-      write(id_file,'(a)') '!'
+      write(id_file,'(a)', advance='NO') hd_pgrid()
       write(id_file,'(3i16)') nidx_sph_IO(3),                           &
      &                        ist_sph_IO(3), ied_sph_IO(3)
       do i = 1, nidx_sph_IO(3)
@@ -153,24 +145,20 @@
 !
       subroutine write_rj_gl_1d_table(id_file)
 !
+      use m_sph_modes_grid_labels
+!
       integer(kind = kint), intent(in) :: id_file
       integer(kind = kint) :: i
 !
 !
-      write(id_file,'(a)') '!'
-      write(id_file,'(a)') '! num. start and end global grids'
-      write(id_file,'(a)') '! r-direction'
-      write(id_file,'(a)') '!'
+      write(id_file,'(a)', advance='NO') hd_rgrid()
       write(id_file,'(3i16)') nidx_sph_IO(1),                           &
      &                        ist_sph_IO(1), ied_sph_IO(1)
       do i = 1, nidx_sph_IO(1)
         write(id_file,'(i16,1pE25.15e3)') idx_gl_1_IO(i), r_gl_1_IO(i)
       end do
 !
-      write(id_file,'(a)') '!'
-      write(id_file,'(a)') '! num. start and end global modes'
-      write(id_file,'(a)') '! on sphere surface wuth degree and order'
-      write(id_file,'(a)') '!'
+      write(id_file,'(a)', advance='NO') hd_jmode()
       write(id_file,'(3i16)') nidx_sph_IO(2),                           &
      &                        ist_sph_IO(2), ied_sph_IO(2)
       do i = 1, nidx_sph_IO(2)
