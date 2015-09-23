@@ -36,6 +36,10 @@ RANLIB = @RANLIB@
 #
 F90OPTFLAGS= @FCFLAGS@   @OPENMP_FCFLAGS@
 #
+#   BLAS settings
+#
+BLAS_LIBS = @BLAS_LIBS@
+#
 #    FFTW3 settings
 #
 FFTW3_CFLAGS= @FFTW3_CFLAGS@
@@ -53,17 +57,13 @@ MAKE_MOD_DEP= $(BUILDDIR)/make_f90depends
 #
 
 all: makemake
-	cd $(MAKEDIR); $(GMAKE)
+	cd $(MAKEDIR); make
 
 $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
-	if [ ! -d $(MAKEDIR) ]; then \
-		mkdir $(MAKEDIR); \
-	fi
 	if [ ! -d $(BUILDDIR) ]; then \
 		mkdir $(BUILDDIR); \
 	fi
-	$(F90_LOCAL) -c -o $(MAKEDIR)/make_module_dependency.o $<
-	$(F90_LOCAL) -o $@ $(MAKEDIR)/make_module_dependency.o
+	$(F90_LOCAL) $< -o $@
 
 makemake: $(MAKE_MOD_DEP)
 	echo "# Construct Makefile"; \
@@ -79,6 +79,7 @@ makemake: $(MAKE_MOD_DEP)
 		MPILIBS="$(MPILIBS)" \
 		MPICHBINDIR="$(MPICHBINDIR)" \
 		MPICHINCDIR="$(MPICHINCDIR)" \
+		BLAS_LIBS="$(BLAS_LIBS)" \
 		FFTW3_CFLAGS="$(FFTW3_CFLAGS)" \
 		FFTW3_LIBS="$(FFTW3_LIBS)" \
 		HDF5_FFLAGS="$(HDF5_FFLAGS)" \
@@ -97,12 +98,16 @@ makemake: $(MAKE_MOD_DEP)
 
 install:
 	cd $(MAKEDIR) ; \
-		$(GMAKE) install
+		make install
 
 clean:
 	for dir in $(MAKEDIR) $(MHDDIR) ; do \
 	echo "# cleaning $${dir} directory..."; \
 		( cd $${dir}; \
-		$(GMAKE) clean )\
+		make clean )\
 	done; \
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
+
+distclean:
+	echo "# Back to initial package"; \
+	rm -fr $(MAKEDIR) $(BUILDDIR) Makefile config.log
