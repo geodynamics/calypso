@@ -137,6 +137,9 @@
 !
       subroutine SPH_to_FEM_bridge_MHD
 !
+      use m_geometry_data
+      use m_node_phys_data
+!
       use output_viz_file_control
       use lead_pole_data_4_sph_mhd
       use nod_phys_send_recv
@@ -161,7 +164,7 @@
       call copy_snap_vec_fld_to_trans
 !
       if (iflag_debug.gt.0) write(*,*) 'overwrite_nodal_sph_2_xyz'
-      call overwrite_nodal_sph_2_xyz
+      call overwrite_nodal_sph_2_xyz(node1, nod_fld1)
 !
 !*  ----------- transform field at pole and center --------------
 !*

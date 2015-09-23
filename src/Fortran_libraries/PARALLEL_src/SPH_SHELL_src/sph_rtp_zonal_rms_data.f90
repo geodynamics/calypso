@@ -43,7 +43,7 @@
 !
       call cal_sph_zonal_ave_data                                       &
      &   (node1%numnod, nod_fld1%ntot_phys, ione, nod_fld1%d_fld)
-      call overwrite_nodal_sph_2_xyz
+      call overwrite_nodal_sph_2_xyz(node1, nod_fld1)
 !
       end subroutine zonal_mean_all_rtp_field
 !
@@ -58,7 +58,7 @@
 !
       call cal_sph_zonal_rms_data                                       &
      &   (node1%numnod, nod_fld1%ntot_phys, ione, nod_fld1%d_fld)
-      call overwrite_nodal_sph_2_xyz
+      call overwrite_nodal_sph_2_xyz(node1, nod_fld1)
 !
       end subroutine zonal_rms_all_rtp_field
 !
@@ -72,10 +72,10 @@
       use coordinate_convert_4_sph
 !
 !
-      call overwrite_nodal_sph_2_cyl
+      call overwrite_nodal_sph_2_cyl(node1, nod_fld1)
       call cal_sph_zonal_rms_data                                       &
      &   (node1%numnod, nod_fld1%ntot_phys, ione, nod_fld1%d_fld)
-      call overwrite_nodal_cyl_2_xyz
+      call overwrite_nodal_cyl_2_xyz(node1, nod_fld1)
 !
       end subroutine zonal_cyl_rms_all_rtp_field
 !

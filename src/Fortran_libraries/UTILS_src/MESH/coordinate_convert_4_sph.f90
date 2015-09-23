@@ -7,10 +7,12 @@
 !>@brief Get zonal mean and RMS fields in spherical grid
 !!
 !!@verbatim
-!!      subroutine overwrite_nodal_sph_2_xyz
-!!      subroutine overwrite_nodal_cyl_2_xyz
-!!      subroutine overwrite_nodal_xyz_2_sph
-!!      subroutine overwrite_nodal_sph_2_cyl
+!!      subroutine overwrite_nodal_sph_2_xyz(node, nod_fld)
+!!      subroutine overwrite_nodal_cyl_2_xyz(node, nod_fld)
+!!      subroutine overwrite_nodal_xyz_2_sph(node, nod_fld)
+!!      subroutine overwrite_nodal_sph_2_cyl(node, nod_fld)
+!!        type(node_data), intent(in) ::    node
+!!        type(phys_data), intent(inout) :: nod_fld
 !!@endverbatim
 !!
 !!@n @param  numdir     Number of component of field
@@ -35,20 +37,23 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine overwrite_nodal_sph_2_xyz
+      subroutine overwrite_nodal_sph_2_xyz(node, nod_fld)
 !
-      use m_geometry_data
-      use m_node_phys_data
+      use t_geometry_data
+      use t_phys_data
+!
+      type(node_data), intent(in) ::    node
+      type(phys_data), intent(inout) :: nod_fld
 !
       integer(kind = kint) :: i, i_fld, numdir
 !
 !
 !$omp parallel private(i,i_fld,numdir)
-      do i = 1, nod_fld1%num_phys
-        i_fld =  nod_fld1%istack_component(i-1) + 1
-        numdir = nod_fld1%num_component(i)
+      do i = 1, nod_fld%num_phys
+        i_fld =  nod_fld%istack_component(i-1) + 1
+        numdir = nod_fld%num_component(i)
         call overwrite_nodal_sph_2_xyz_smp                              &
-     &     (node1, nod_fld1%ntot_phys, i_fld, numdir, nod_fld1%d_fld)
+     &     (node, nod_fld%ntot_phys, i_fld, numdir, nod_fld%d_fld)
       end do
 !$omp end parallel
 !
@@ -56,20 +61,23 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine overwrite_nodal_cyl_2_xyz
+      subroutine overwrite_nodal_cyl_2_xyz(node, nod_fld)
 !
-      use m_geometry_data
-      use m_node_phys_data
+      use t_geometry_data
+      use t_phys_data
+!
+      type(node_data), intent(in) ::    node
+      type(phys_data), intent(inout) :: nod_fld
 !
       integer(kind = kint) :: i, i_fld, numdir
 !
 !
 !$omp parallel private(i,i_fld,numdir)
-      do i = 1, nod_fld1%num_phys
-        i_fld =  nod_fld1%istack_component(i-1) + 1
-        numdir = nod_fld1%num_component(i)
+      do i = 1, nod_fld%num_phys
+        i_fld =  nod_fld%istack_component(i-1) + 1
+        numdir = nod_fld%num_component(i)
         call overwrite_nodal_cyl_2_xyz_smp                              &
-     &     (node1, nod_fld1%ntot_phys, i_fld, numdir, nod_fld1%d_fld)
+     &     (node, nod_fld%ntot_phys, i_fld, numdir, nod_fld%d_fld)
       end do
 !$omp end parallel
 !
@@ -78,20 +86,23 @@
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
-      subroutine overwrite_nodal_xyz_2_sph
+      subroutine overwrite_nodal_xyz_2_sph(node, nod_fld)
 !
-      use m_geometry_data
-      use m_node_phys_data
+      use t_geometry_data
+      use t_phys_data
+!
+      type(node_data), intent(in) ::    node
+      type(phys_data), intent(inout) :: nod_fld
 !
       integer(kind = kint) :: i, i_fld, numdir
 !
 !
 !$omp parallel private(i,i_fld,numdir)
-      do i = 1, nod_fld1%num_phys
-        i_fld =  nod_fld1%istack_component(i-1) + 1
-        numdir = nod_fld1%num_component(i)
+      do i = 1, nod_fld%num_phys
+        i_fld =  nod_fld%istack_component(i-1) + 1
+        numdir = nod_fld%num_component(i)
         call overwrite_nodal_xyz_2_sph_smp                              &
-     &     (node1, nod_fld1%ntot_phys, i_fld, numdir, nod_fld1%d_fld)
+     &     (node, nod_fld%ntot_phys, i_fld, numdir, nod_fld%d_fld)
       end do
 !$omp end parallel
 !
@@ -100,20 +111,23 @@
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
-      subroutine overwrite_nodal_sph_2_cyl
+      subroutine overwrite_nodal_sph_2_cyl(node, nod_fld)
 !
-      use m_geometry_data
-      use m_node_phys_data
+      use t_geometry_data
+      use t_phys_data
+!
+      type(node_data), intent(in) ::    node
+      type(phys_data), intent(inout) :: nod_fld
 !
       integer(kind = kint) :: i, i_fld, numdir
 !
 !
 !$omp parallel private(i,i_fld,numdir)
-      do i = 1, nod_fld1%num_phys
-        i_fld =  nod_fld1%istack_component(i-1) + 1
-        numdir = nod_fld1%num_component(i)
+      do i = 1, nod_fld%num_phys
+        i_fld =  nod_fld%istack_component(i-1) + 1
+        numdir = nod_fld%num_component(i)
         call overwrite_nodal_sph_2_cyl_smp                              &
-     &     (node1, nod_fld1%ntot_phys, i_fld, numdir, nod_fld1%d_fld)
+     &     (node, nod_fld%ntot_phys, i_fld, numdir, nod_fld%d_fld)
       end do
 !$omp end parallel
 !

@@ -16,7 +16,6 @@
       implicit none
 !
       private :: set_mesh_to_IO
-      private ::  copy_group_data_from_IO, copy_group_data_to_IO
 !
 ! -----------------------------------------------------------------------
 !
@@ -61,10 +60,13 @@
 !
       use m_nod_comm_table
       use m_geometry_data
+      use m_group_data
+!
       use set_node_data_4_IO
       use set_element_data_4_IO
       use set_nnod_4_ele_by_type
       use set_comm_table_4_IO
+      use set_group_types_4_IO
 !
 !
       call copy_comm_tbl_type_from_IO(nod_comm)
@@ -77,7 +79,9 @@
 !
       call allocate_sph_node_geometry(node1)
 !
-      call copy_group_data_from_IO
+      call set_nod_grp_type_from_IO(nod_grp1)
+      call set_ele_grp_type_from_IO(ele_grp1)
+      call set_surf_grp_type_from_IO(sf_grp1)
 !
       end subroutine set_mesh_data
 !
@@ -87,9 +91,12 @@
 !
       use m_nod_comm_table
       use m_geometry_data
+      use m_group_data
+!
       use set_node_data_4_IO
       use set_element_data_4_IO
       use set_comm_table_4_IO
+      use set_group_types_4_IO
 !
       integer(kind = kint), intent(in) :: my_rank
 !
@@ -97,46 +104,21 @@
       call copy_comm_tbl_type_to_IO(my_rank, nod_comm)
       call copy_node_geometry_to_IO(node1)
       call copy_ele_connect_to_IO(ele1)
-      call copy_group_data_to_IO
-!
-      call deallocate_ele_connect_type(ele1)
-      call deallocate_node_geometry_type(node1)
-!
-      end subroutine set_mesh_to_IO
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine copy_group_data_from_IO
-!
-      use m_group_data
-      use set_group_types_4_IO
-!
-!
-      call set_nod_grp_type_from_IO(nod_grp1)
-      call set_ele_grp_type_from_IO(ele_grp1)
-      call set_surf_grp_type_from_IO(sf_grp1)
-!
-      end subroutine copy_group_data_from_IO
-!
-!-----------------------------------------------------------------------
-!
-      subroutine copy_group_data_to_IO
-!
-      use m_group_data
-      use set_group_types_4_IO
-!
 !
       call set_node_grp_type_to_IO(nod_grp1)
       call set_ele_grp_type_to_IO(ele_grp1)
       call set_surface_grp_type_to_IO(sf_grp1)
 !
+!
+      call deallocate_ele_connect_type(ele1)
+      call deallocate_node_geometry_type(node1)
+!
       call deallocate_grp_type(nod_grp1)
       call deallocate_grp_type(ele_grp1)
       call deallocate_sf_grp_type(sf_grp1)
 !
-      end subroutine copy_group_data_to_IO
+      end subroutine set_mesh_to_IO
 !
-!-----------------------------------------------------------------------
+!   --------------------------------------------------------------------
 !
       end module load_mesh_data
