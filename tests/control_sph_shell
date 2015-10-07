@@ -1,0 +1,34 @@
+begin spherical_shell_ctl
+  begin data_files_def
+    num_subdomain_ctl    4
+    sph_file_prefix             'sph_lm31r48c_4/in'
+  end data_files_def
+!
+  begin num_domain_ctl
+    array num_domain_sph_grid  2
+      num_domain_sph_grid   radial         2     end
+      num_domain_sph_grid   meridional     2     end
+    end array num_domain_sph_grid
+!
+    array num_domain_legendre   2
+      num_domain_legendre   radial         2     end
+      num_domain_legendre   zonal          2     end
+    end array num_domain_legendre
+!
+    array num_domain_spectr     1
+      num_domain_spectr      modes         4    end
+    end array num_domain_spectr
+  end num_domain_ctl
+!
+  begin num_grid_sph
+    truncation_level_ctl      31
+!
+    ngrid_meridonal_ctl      48
+    ngrid_zonal_ctl          96
+!
+    radial_grid_type_ctl   Chebyshev
+    num_fluid_grid_ctl     48
+    fluid_core_size_ctl   1.0
+    ICB_to_CMB_ratio_ctl  0.35
+  end num_grid_sph
+end spherical_shell_ctl

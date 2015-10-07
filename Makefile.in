@@ -12,6 +12,7 @@ INSTDIR= @prefix@
 MHDDIR = $(SRCDIR)/src
 MAKEDIR= $(SRCDIR)/work
 BUILDDIR= $(SRCDIR)/bin
+TESTDIR=  $(SRCDIR)/tests
 #
 # MPI settings
 #
@@ -20,6 +21,7 @@ MPICHLIBDIR = $(MPICHDIR)/lib
 MPICHBINDIR = $(MPICHDIR)/bin
 MPICHINCDIR = @MPIINCDIR@
 MPILIBS =     @MPILIBS@
+MPIRUN =      mpirun
 #
 #    compilers
 #
@@ -58,6 +60,7 @@ MAKE_MOD_DEP= $(BUILDDIR)/make_f90depends
 
 all: makemake
 	cd $(MAKEDIR); make
+	make test
 
 $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
 	if [ ! -d $(BUILDDIR) ]; then \
@@ -95,13 +98,23 @@ makemake: $(MAKE_MOD_DEP)
 		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
 		makemake
 
+test:
+	echo "Test!!"; \
+	cd $(TESTDIR) ; \
+		$(GMAKE) \
+		GMAKE="$(GMAKE)" \
+		BUILDDIR="$(BUILDDIR)" \
+		TESTDIR="$(TESTDIR)" \
+		MHDDIR="$(MHDDIR)" \
+		MPIRUN="$(MPIRUN)" \
+		test
 
 install:
 	cd $(MAKEDIR) ; \
 		make install
 
 clean:
-	for dir in $(MAKEDIR) $(MHDDIR) ; do \
+	for dir in $(MAKEDIR) $(MHDDIR) $(TESTDIR) ; do \
 	echo "# cleaning $${dir} directory..."; \
 		( cd $${dir}; \
 		make clean )\
@@ -111,3 +124,5 @@ clean:
 distclean:
 	echo "# Back to initial package"; \
 	rm -fr $(MAKEDIR) $(BUILDDIR) Makefile config.log
+	cd $(TESTDIR) ;  make distclean
+
