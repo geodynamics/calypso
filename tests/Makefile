@@ -24,7 +24,7 @@ MPILIBS =
 all: test
 
 test: 
-	rm *.dat
+	rm -f *.dat
 	$(MPIRUN) -np 4 $(BUILDDIR)/gen_sph_grids
 	$(MPIRUN) -np 4 $(BUILDDIR)/sph_mhd
 	echo 'Compare with reference mean square data'
