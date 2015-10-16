@@ -209,7 +209,6 @@ def create_main_parser():
 
     parser.add_argument(
         nargs="+",
-        type=argparse.FileType("rt"),
         metavar="file",
         dest="files",
         help=("Files to be modified by adding the header. Be sure not to mix"
@@ -236,9 +235,9 @@ def main(args):
                     args.block_tokens[1]))
                 exit(1)
 
-    for file in args.files:
+    for filename in args.files:
         with tempfile.NamedTemporaryFile('wt', delete=False) as tmp_file:
-            with file:
+            with open(filename, "rt") as file:
                 if args.line_token:
                     header = line_comment(header, *args.line_token)
                 elif args.block_tokens:
