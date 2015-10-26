@@ -43,6 +43,7 @@
       use t_mesh_data
       use t_group_data
 !
+      use m_geometry_data
       use m_spheric_constants
       use m_spheric_parameter
       use load_mesh_data
@@ -58,7 +59,7 @@
       if(check_exist_mesh(my_rank) .eq. 0) then
         if (iflag_debug.gt.0) write(*,*) 'input_mesh'
         call input_mesh(my_rank)
-        call set_fem_center_mode_4_SPH
+        call set_fem_center_mode_4_SPH(node1%internal_node)
         return
       end if
 !
@@ -168,20 +169,21 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_fem_center_mode_4_SPH
+      subroutine set_fem_center_mode_4_SPH(internal_node)
 !
       use calypso_mpi
-      use m_geometry_data
       use m_machine_parameter
       use m_spheric_parameter
       use m_spheric_constants
+!
+      integer(kind = kint), intent(in) :: internal_node
 !
       integer(kind = kint) :: iflag_shell_local, nsample
       integer(kind = kint) :: nnod_full_shell
 !
 !
       nnod_full_shell = nnod_rtp * m_folding
-      nsample = node1%internal_node
+      nsample = internal_node
       iflag_shell_mode = 0
       if(nsample .le. nnod_full_shell) then
         iflag_shell_local = iflag_MESH_same
@@ -196,8 +198,7 @@
       end if
 !
       if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_local',   &
-     &     my_rank, iflag_shell_local, node1%internal_node,             &
-     &     nnod_full_shell
+     &     my_rank, iflag_shell_local, internal_node, nnod_full_shell
       call MPI_allreduce(iflag_shell_local, iflag_shell_mode, ione,     &
      &    CALYPSO_INTEGER, MPI_MAX, CALYPSO_COMM, ierr_MPI)
       if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_mode',    &

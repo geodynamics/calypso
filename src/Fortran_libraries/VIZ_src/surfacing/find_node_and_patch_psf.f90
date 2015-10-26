@@ -13,14 +13,14 @@
 !!      subroutine set_node_and_patch_psf                               &
 !!     &         (num_psf, numnod, internal_node, numele,               &
 !!     &          numedge, nnod_4_ele, nnod_4_edge, xx, ie, ie_edge,    &
-!!     &          iedge_4_ele, nod_comm, edge_comm,                     &
+!!     &          interior_edge, iedge_4_ele, nod_comm, edge_comm,      &
 !!     &          num_surf, num_surf_bc, surf_istack, surf_item,        &
 !!     &          ntot_node_sf_grp, inod_stack_sf_grp, inod_surf_grp,   &
 !!     &          psf_search, psf_list, psf_mesh)
-!!      subroutine set_node_and_patch_iso                               &
-!!     &         (num_iso, numnod, internal_node,  numele, numedge,     &
-!!     &          nnod_4_ele, nnod_4_edge, xx, ie, ie_edge, iedge_4_ele,&
-!!     &          edge_comm, iso_search, iso_list, iso_mesh)
+!!      subroutine set_node_and_patch_iso(num_iso, numnod, numele,      &
+!!     &          numedge, nnod_4_ele, nnod_4_edge, xx, ie, ie_edge,    &
+!!     &          interior_edge, iedge_4_ele, edge_comm,                &
+!!     &          iso_search, iso_list, iso_mesh)
 !!@endverbatim
 !
       module find_node_and_patch_psf
@@ -65,10 +65,10 @@
       subroutine set_node_and_patch_psf                                 &
      &         (num_psf, numnod, internal_node, numele,                 &
      &          numedge, nnod_4_ele, nnod_4_edge, xx, ie, ie_edge,      &
-     &          iedge_4_ele, nod_comm, edge_comm,                       &
+     &          interior_edge, iedge_4_ele, nod_comm, edge_comm,        &
      &          num_surf, num_surf_bc, surf_istack, surf_item,          &
      &          ntot_node_sf_grp, inod_stack_sf_grp, inod_surf_grp,     &
-     &          psf_search, psf_list, psf_mesh)
+     &          psf_search, psf_list, psf_grp_list, psf_mesh)
 !
       use m_geometry_constants
       use m_machine_parameter
@@ -88,6 +88,7 @@
       integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_edge
       integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
       integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
+      integer(kind = kint), intent(in) :: interior_edge(numedge)
       integer(kind = kint), intent(in)                                  &
      &                     :: iedge_4_ele(numele,nedge_4_ele)
       real(kind = kreal), intent(in) :: xx(numnod,3)
@@ -108,6 +109,7 @@
 !
       type(psf_search_lists), intent(inout) :: psf_search(num_psf)
       type(sectioning_list), intent(inout) :: psf_list(num_psf)
+      type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
       type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !
       integer(kind = kint) :: i_psf
@@ -115,18 +117,20 @@
 !
       do i_psf = 1, num_psf
         if (iflag_debug.eq.1) write(*,*) 'alloc_nnod_psf'
-        call alloc_nnod_psf(np_smp, numnod, numedge, psf_list(i_psf))
+        call alloc_nnod_psf(np_smp, numedge, psf_list(i_psf))
+        call alloc_nnod_grp_psf(np_smp, numnod, psf_grp_list(i_psf))
       end do
 !
       if (iflag_debug.eq.1)  write(*,*) 'count_nodes_4_psf'
-      call count_nodes_4_psf                                            &
-     &   (num_psf, internal_node, numedge, nnod_4_edge, ie_edge,        &
+      call count_nodes_4_psf(num_psf, internal_node,                    &
+     &    numedge, nnod_4_edge, ie_edge, interior_edge,                 &
      &    num_surf, ntot_node_sf_grp, inod_stack_sf_grp, inod_surf_grp, &
-     &    psf_search, psf_list, psf_mesh)
+     &    psf_search, psf_list, psf_grp_list, psf_mesh)
 !
 !
       do i_psf = 1, num_psf
         call alloc_inod_psf(psf_list(i_psf))
+        call alloc_inod_grp_psf(psf_grp_list(i_psf))
         call allocate_node_geometry_type(psf_mesh(i_psf)%node)
         call const_global_numnod_list(psf_mesh(i_psf)%node)
       end do
@@ -134,9 +138,9 @@
       if (iflag_debug.eq.1)  write(*,*) 'set_nodes_4_psf'
       call set_nodes_4_psf                                              &
      &   (num_psf, numnod, internal_node, numedge, nnod_4_edge,         &
-     &    xx, ie_edge, nod_comm, edge_comm,                             &
+     &    xx, ie_edge, interior_edge, nod_comm, edge_comm,              &
      &    num_surf, ntot_node_sf_grp, inod_stack_sf_grp,                &
-     &    inod_surf_grp, psf_search, psf_list, psf_mesh)
+     &    inod_surf_grp, psf_search, psf_list, psf_grp_list, psf_mesh)
 !
       if (iflag_debug.eq.1)  write(*,*) 'count_psf_patches'
       call count_psf_patches                                            &
@@ -152,16 +156,16 @@
       if (iflag_debug.eq.1)  write(*,*) 'set_psf_patches'
       call set_psf_patches(num_psf, numele, numedge, nnod_4_ele, ie,    &
      &    iedge_4_ele, num_surf, num_surf_bc, surf_istack, surf_item,   &
-     &    psf_search, psf_list, psf_mesh)
+     &    psf_search, psf_list, psf_grp_list, psf_mesh)
 !
       end subroutine set_node_and_patch_psf
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_node_and_patch_iso                                 &
-     &         (num_iso, numnod, internal_node,  numele, numedge,       &
-     &          nnod_4_ele, nnod_4_edge, xx, ie, ie_edge, iedge_4_ele,  &
-     &          edge_comm, iso_search, iso_list, iso_mesh)
+      subroutine set_node_and_patch_iso(num_iso, numnod, numele,        &
+     &          numedge, nnod_4_ele, nnod_4_edge, xx, ie, ie_edge,      &
+     &          interior_edge, iedge_4_ele, edge_comm,                  &
+     &          iso_search, iso_list, iso_mesh)
 !
       use m_geometry_constants
       use m_control_params_4_iso
@@ -174,11 +178,11 @@
       use set_patches_for_psf
 !
       integer(kind = kint), intent(in) :: num_iso
-      integer(kind = kint), intent(in) :: numnod, internal_node
-      integer(kind = kint), intent(in) :: numele, numedge
+      integer(kind = kint), intent(in) :: numnod, numele, numedge
       integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_edge
       integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
       integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
+      integer(kind = kint), intent(in) :: interior_edge(numedge)
       integer(kind = kint), intent(in)                                  &
      &                      :: iedge_4_ele(numele,nedge_4_ele)
       real(kind = kreal), intent(in) :: xx(numnod,3)
@@ -195,15 +199,16 @@
 !
       do i_iso = 1, num_iso
         if (iflag_debug.eq.1) write(*,*) 'alloc_nnod_psf'
-        call alloc_nnod_psf(np_smp, numnod, numedge, iso_list(i_iso))
+        call alloc_nnod_psf(np_smp, numedge, iso_list(i_iso))
       end do
 !
-      call count_nodes_4_iso(num_iso, internal_node, numedge,           &
-     &    nnod_4_edge, ie_edge, iso_search, iso_list, iso_mesh)
+      call count_nodes_4_iso(num_iso, numedge,                          &
+     &    nnod_4_edge, ie_edge, interior_edge,                          &
+     &    iso_search, iso_list, iso_mesh)
 !
-      call set_nodes_4_iso                                              &
-     &   (num_iso, numnod, internal_node, numedge, nnod_4_edge,         &
-     &    xx, ie_edge, edge_comm, iso_search, iso_list, iso_mesh)
+      call set_nodes_4_iso(num_iso, numnod, numedge, nnod_4_edge,       &
+     &    xx, ie_edge, interior_edge, edge_comm,                        &
+     &    iso_search, iso_list, iso_mesh)
 !
 !
       call count_iso_patches                                            &

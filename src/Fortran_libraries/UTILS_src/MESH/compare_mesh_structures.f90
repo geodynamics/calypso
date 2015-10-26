@@ -7,6 +7,11 @@
 !>@brief Compare FEM mesh structures
 !!
 !!@verbatim
+!!      subroutine compare_mesh_type(my_rank, nod_comm, node, ele, mesh)
+!!        type(mesh_geometry),    intent(inout) :: mesh
+!!        type(communication_table), intent(inout) :: nod_comm
+!!        type(node_data), intent(inout) ::           node
+!!        type(element_data), intent(inout) ::        ele
 !!      subroutine compare_node_types(my_rank, org_node, new_node)
 !!        type(node_data), intent(in) :: org_node
 !!        type(node_data), intent(in) :: new_node
@@ -29,6 +34,28 @@
 !
       contains
 !
+!-----------------------------------------------------------------------
+!
+      subroutine compare_mesh_type(my_rank, nod_comm, node, ele, mesh)
+!
+      use t_comm_table
+      use t_geometry_data
+      use t_mesh_data
+!
+      integer(kind = kint), intent(in)  :: my_rank
+      type(mesh_geometry),    intent(inout) :: mesh
+      type(communication_table), intent(inout) :: nod_comm
+      type(node_data), intent(inout) ::           node
+      type(element_data), intent(inout) ::        ele
+!
+!
+      call compare_node_types(my_rank, node, mesh%node)
+      call compare_element_types(my_rank, ele, mesh%ele)
+      call compare_node_comm_types(my_rank, nod_comm, mesh%nod_comm)
+!
+      end subroutine compare_mesh_type
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine compare_node_types(my_rank, org_node, new_node)

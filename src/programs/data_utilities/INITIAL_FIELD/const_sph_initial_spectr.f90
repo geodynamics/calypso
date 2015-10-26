@@ -102,6 +102,10 @@
 !
       call output_sph_restart_control
 !
+      if(istep_rst_start .eq. -1) then
+        call output_sph_rst_by_elaps
+      end if
+!
       end subroutine sph_initial_spectrum
 !
 !-----------------------------------------------------------------------
@@ -379,7 +383,7 @@
 !    Center
       if(inod_rj_center .gt. 0) then
         d_rj(inod_rj_center,ipol%i_heat_source)                         &
-     &         = 0.35 * four*r_CMB**2 / (four * r_ICB**3 / three)
+     &         = four*r_CMB**2 / (four * r_ICB**3 / three)
       end if
 !
       end subroutine set_initial_heat_source_sph
@@ -424,6 +428,40 @@
       end if
 !
       end subroutine set_initial_light_source_sph
+!
+!-----------------------------------------------------------------------
+!
+      subroutine adjust_by_CMB_temp
+!
+      use m_sph_spectr_data
+!
+      integer ( kind = kint) :: inod, k, jj
+      real (kind = kreal) :: temp_CMB = 0.0d0
+!
+!
+!   search address for (l = m = 0)
+      jj = find_local_sph_mode_address(0, 0)
+!
+!   set reference temperature if (l = m = 0) mode is there
+      if (jj .gt. 0) then
+        inod = local_sph_data_address(nlayer_CMB,jj)
+        temp_CMB = d_rj(inod,ipol%i_temp)
+!
+        do k = 1, nidx_rj(1)
+          inod = local_sph_data_address(k,jj)
+          d_rj(inod,ipol%i_temp) = d_rj(inod,ipol%i_temp) - temp_CMB
+        end do
+      end if
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        jj = find_local_sph_mode_address(0, 0)
+        inod = local_sph_data_address(1,jj)
+        d_rj(inod_rj_center,ipol%i_temp)                                &
+     &              = d_rj(inod,ipol%i_temp) - temp_CMB
+      end if
+!
+      end subroutine adjust_by_CMB_temp
 !
 !-----------------------------------------------------------------------
 !

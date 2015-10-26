@@ -8,7 +8,6 @@
 !> @brief Neighbouring node and element list for each node
 !>     This routine is substitution of the following module
 !>@n        (module m_element_id_4_node)
-!>@n        (module m_next_node_id_4_node)
 !!
 !!@verbatim
 !!      subroutine alloc_numele_belonged(numnod, neib_ele)

@@ -27,7 +27,7 @@
 !
       subroutine copy_ele_connect_to_IO(ele)
 !
-      type(element_data), intent(inout) :: ele
+      type(element_data), intent(in) :: ele
       integer(kind = kint) :: iele, k1
 !
 !

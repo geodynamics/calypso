@@ -125,4 +125,3 @@ distclean:
 	echo "# Back to initial package"; \
 	rm -fr $(MAKEDIR) $(BUILDDIR) Makefile config.log
 	cd $(TESTDIR) ;  make distclean
-

@@ -20,6 +20,7 @@
       use m_precision
       use m_constants
 !
+      use calypso_mpi
       use m_machine_parameter
       use m_psf_case_table
 !
@@ -107,12 +108,13 @@
       integer(kind = kint) :: ip, iele, ist, ied, inum, np, icou, n
       integer(kind = kint) :: ie1, ie2, ie3, iedge1, iedge2, iedge3
       integer(kind = kint) :: mark
+      integer(kind = kint_gl) ::  ig1, ig2, ig3
 !
 !
       npatch_smp(1:np_smp) = 0
 !
 !$omp parallel do private(iele,ist,ied,inum,mark,np,icou,n,ie1,ie2,ie3, &
-!$omp&         iedge1,iedge2,iedge3)
+!$omp&         iedge1,iedge2,iedge3,ig1,ig2,ig3)
       do ip = 1, np_smp
         ist = ele_search%istack_search_smp(ip-1) + 1
         ied = ele_search%istack_search_smp(ip)
@@ -131,10 +133,13 @@
               iedge1 = abs( iedge_4_ele(iele,ie1) )
               iedge2 = abs( iedge_4_ele(iele,ie2) )
               iedge3 = abs( iedge_4_ele(iele,ie3) )
-              if (    id_n_on_e(iedge1).ne.id_n_on_e(iedge2)            &
-     &          .and. id_n_on_e(iedge2).ne.id_n_on_e(iedge3)            &
-     &          .and. id_n_on_e(iedge3).ne.id_n_on_e(iedge1))           &
-     &               npatch_smp(ip) = npatch_smp(ip) + 1
+              ig1 = id_n_on_e(iedge1)
+              ig2 = id_n_on_e(iedge2)
+              ig3 = id_n_on_e(iedge3)
+              if ((ig1*ig2*ig3) .gt. 0 .and. ig1.ne.ig2                 &
+     &               .and. ig2.ne.ig3  .and. ig3.ne.ig1) then
+                 npatch_smp(ip) = npatch_smp(ip) + 1
+              end if
             end do
           end if
         end do
@@ -174,44 +179,47 @@
 !
       integer(kind = kint) :: ip, iele, ist, ied, inum, np, icou, n
       integer(kind = kint) :: ie1, ie2, ie3, iedge1, iedge2, iedge3
-      integer(kind = kint) :: mark
+      integer(kind = kint) :: imark
+      integer(kind = kint_gl) ::  ig1, ig2, ig3
 !
 !
 !$omp parallel do                                                       &
-!$omp& private(iele,ist,ied,inum,mark,np,icou,n,ie1,ie2,ie3,            &
-!$omp&         iedge1,iedge2,iedge3)
+!$omp& private(iele,ist,ied,inum,imark,np,icou,n,ie1,ie2,ie3,           &
+!$omp&         iedge1,iedge2,iedge3,ig1,ig2,ig3)
       do ip = 1, np_smp
         icou = istack_patch_smp(ip-1)
         ist = ele_search%istack_search_smp(ip-1) + 1
         ied = ele_search%istack_search_smp(ip)
         do inum = ist, ied
           iele = ele_search%id_search(inum)
-          mark = mark_ele(inum)
-          np = psf_case_tbl(mark)%npatch
+          imark = mark_ele(inum)
+          np = psf_case_tbl(imark)%npatch
 !
           if (np .gt. 0) then
 !
             do n = 1, np
-              ie1 = psf_case_tbl(mark)%iedge(n,1)
-              ie2 = psf_case_tbl(mark)%iedge(n,2)
-              ie3 = psf_case_tbl(mark)%iedge(n,3)
+              ie1 = psf_case_tbl(imark)%iedge(n,1)
+              ie2 = psf_case_tbl(imark)%iedge(n,2)
+              ie3 = psf_case_tbl(imark)%iedge(n,3)
               iedge1 = abs( iedge_4_ele(iele,ie1) )
               iedge2 = abs( iedge_4_ele(iele,ie2) )
               iedge3 = abs( iedge_4_ele(iele,ie3) )
-              if (    id_n_on_e(iedge1).ne.id_n_on_e(iedge2)            &
-     &          .and. id_n_on_e(iedge2).ne.id_n_on_e(iedge3)            &
-     &          .and. id_n_on_e(iedge3).ne.id_n_on_e(iedge1)) then
+              ig1 = id_n_on_e(iedge1)
+              ig2 = id_n_on_e(iedge2)
+              ig3 = id_n_on_e(iedge3)
+              if ((ig1*ig2*ig3) .gt. 0 .and. ig1.ne.ig2                 &
+     &               .and. ig2.ne.ig3  .and. ig3.ne.ig1) then
                 icou = icou + 1
                 iele_global(icou) = icou + istack_numele
-                ie_patch(icou,1) = int(id_n_on_e(iedge1))
-                ie_patch(icou,2) = int(id_n_on_e(iedge2))
-                ie_patch(icou,3) = int(id_n_on_e(iedge3))
+                ie_patch(icou,1) = int(ig1)
+                ie_patch(icou,2) = int(ig2)
+                ie_patch(icou,3) = int(ig3)
 !                   write(40+my_rank,*) 'iedge_4_ele',                  &
-!     &                iele, mark, np, iedge_4_ele(iele,1:12)
+!     &                iele, imark, np, iedge_4_ele(iele,1:12)
 !                   write(40+my_rank,*) 'id_n_on_e',                    &
 !     &                iele, id_n_on_e( abs(iedge_4_ele(iele,1:12)) )
 !                   write(40+my_rank,*) 'iedge_4_patch',                &
-!     &                icou, psf_case_tbl(mark)%iedge(n,1:3)
+!     &                icou, psf_case_tbl(imark)%iedge(n,1:3)
 !                   write(40+my_rank,*)
               end if
             end do
@@ -222,11 +230,12 @@
       end do
 !$omp end parallel do
 !
-!      write(40+my_rank,*) 'ie_patch'
-!      do inum = 1, icou
+!      write(*,*) 'ie_patch', my_rank, npatch_tot
+!      write(40+my_rank,*) 'ie_patch', npatch_tot
+!      do inum = 1, npatch_tot
 !        write(40+my_rank,*) inum, ie_patch(inum,1:3)
 !      end do
-!      close(40+my_rank)
+      close(40+my_rank)
 !
       end subroutine set_patch_4_psf
 !

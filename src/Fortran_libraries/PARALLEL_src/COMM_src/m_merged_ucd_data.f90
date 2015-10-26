@@ -14,7 +14,8 @@
 !!      subroutine set_node_double_address                              &
 !!     &         (NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,          &
 !!     &          STACK_EXPORT, NOD_EXPORT)
-!!      subroutine update_ele_by_double_address(m_ucd, ucd)
+!!      subroutine update_ele_by_double_address                         &
+!!     &         (istack_internod, m_ucd, ucd)
 !!@endverbatim
 !
       module m_merged_ucd_data
@@ -112,11 +113,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine update_ele_by_double_address(m_ucd, ucd)
+      subroutine update_ele_by_double_address                           &
+     &         (istack_internod, m_ucd, ucd)
 !
       use t_ucd_data
-      use m_geometry_data
 !
+      integer(kind = kint_gl), intent(in) :: istack_internod(0:nprocs)
       type(merged_ucd_data), intent(in) :: m_ucd
       type(ucd_data), intent(inout) :: ucd
 !
@@ -125,9 +127,9 @@
 !
       do ip = 1, nprocs
         if(m_ucd%istack_merged_intnod(ip-1)                             &
-     &      .ne. node1%istack_internod(ip-1)) then
+     &      .ne. istack_internod(ip-1)) then
            write(*,*) 'aho', ip, m_ucd%istack_merged_intnod(ip-1) ,     &
-     &                           node1%istack_internod(ip-1)
+     &                           istack_internod(ip-1)
         end if
       end do
 !

@@ -7,6 +7,9 @@
 !>@brief Copy FEM mesh structures
 !!
 !!@verbatim
+!!      subroutine copy_mesh_geometry_from_type                         &
+!!     &         (org_mesh, tgt_comm, tgt_node, tgt_ele)
+!!
 !!      subroutine copy_node_geometry_types(org_node, new_node)
 !!        type(node_data), intent(in) :: org_node
 !!        type(node_data), intent(in) :: new_node
@@ -36,6 +39,30 @@
 !
       contains
 !
+!  ---------------------------------------------------------------------
+!
+      subroutine copy_mesh_geometry_from_type                           &
+     &         (org_mesh, tgt_comm, tgt_node, tgt_ele)
+!
+      use t_comm_table
+      use t_geometry_data
+      use t_mesh_data
+!
+      type(mesh_geometry),    intent(inout) :: org_mesh
+!
+      type(communication_table), intent(inout) :: tgt_comm
+      type(node_data), intent(inout) ::           tgt_node
+      type(element_data), intent(inout) ::        tgt_ele
+!
+!
+      call copy_comm_tbl_types(org_mesh%nod_comm, tgt_comm)
+!
+      call copy_node_geometry_types(org_mesh%node, tgt_node)
+      call copy_element_connect_types(org_mesh%ele, tgt_ele)
+!
+      end subroutine copy_mesh_geometry_from_type
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine copy_node_geometry_types(org_node, new_node)

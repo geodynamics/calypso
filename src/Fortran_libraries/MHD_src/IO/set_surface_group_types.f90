@@ -71,10 +71,10 @@
 !
 !>      control name for inner sphere boundary
       character(len = kchara), parameter                                &
-     &      :: free_sph_in = 'free_sph_in'
+     &      :: free_sph_in = 'free_shell_in'
 !>      control name for outer sphere boundary
       character(len = kchara), parameter                                &
-     &     :: free_sph_out = 'free_sph_out'
+     &     :: free_sph_out = 'free_shell_out'
 !
 !>      control name for wall boundary
       character(len = kchara), parameter :: wall_surf = 'wall'

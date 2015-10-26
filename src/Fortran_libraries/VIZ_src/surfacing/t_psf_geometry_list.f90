@@ -15,11 +15,14 @@
 !!      subroutine dealloc_mark_ele_psf(search)
 !!
 !!      subroutine alloc_ref_field_4_psf(numnod, psf_list)
-!!      subroutine alloc_nnod_psf(np_smp, numnod, numedge, psf_list)
+!!      subroutine alloc_nnod_psf(np_smp, numedge, psf_list)
 !!      subroutine alloc_inod_psf(psf_list)
+!!      subroutine alloc_nnod_grp_psf(np_smp, numnod, psf_g_list)
+!!      subroutine alloc_inod_grp_psf(psf_g_list)
 !!      subroutine dealloc_ref_field_4_psf(psf_list)
 !!      subroutine dealloc_nnod_psf(psf_list)
 !!      subroutine dealloc_inod_psf(psf_list)
+!!      subroutine dealloc_inod_grp_psf(psf_g_list)
 !!@endverbatim
 !
       module t_psf_geometry_list
@@ -62,26 +65,6 @@
 !>        reference field for sectioning
         real(kind = kreal), pointer :: ref_fld(:)
 !
-!>        Number of interior nodes for sections on node
-        integer(kind = kint) :: internod_on_nod
-!>        Number of interior nodes for sections on node
-        integer(kind = kint) :: externod_on_nod
-!>        SMP stack for sections on node
-        integer(kind = kint), pointer :: istack_inter_n_on_n_smp(:)
-!>        SMP stack for sections on edge
-        integer(kind = kint), pointer :: istack_exter_n_on_n_smp(:)
-!
-!>        ID for node on node
-        integer(kind = kint_gl), pointer :: id_n_on_n(:)
-!
-!>        Node ID for sections on node
-        integer(kind = kint), pointer :: inod_4_nod(:)
-!>        Node ID for sections on intenal node
-        integer(kind = kint), pointer :: inod_int_nod(:)
-!>        Node ID for sections on external node
-        integer(kind = kint), pointer :: inod_ext_nod(:)
-!
-!
 !>        Number of interior nodes for sections on edge
         integer(kind = kint) :: internod_on_edge
 !>        Number of interior nodes for sections on edge
@@ -104,6 +87,26 @@
 !>        Interpolation coefficients for external node on edge
         real(kind = kreal), pointer :: coef_ext_edge(:,:)
       end type sectioning_list
+!
+!>      Structure for cross sectioning by surface group list
+      type grp_section_list
+!>        ID for node on node
+        integer(kind = kint_gl), pointer :: id_n_on_n(:)
+!
+!>        Number of interior nodes for sections on node
+        integer(kind = kint) :: internod_on_nod
+!>        Number of interior nodes for sections on node
+        integer(kind = kint) :: externod_on_nod
+!>        SMP stack for sections on node
+        integer(kind = kint), pointer :: istack_inter_n_on_n_smp(:)
+!>        SMP stack for sections on edge
+        integer(kind = kint), pointer :: istack_exter_n_on_n_smp(:)
+!
+!>        Node ID for sections on intenal node
+        integer(kind = kint), pointer :: inod_int_nod(:)
+!>        Node ID for sections on external node
+        integer(kind = kint), pointer :: inod_ext_nod(:)
+      end type grp_section_list
 !
 !  ---------------------------------------------------------------------
 !
@@ -197,33 +200,22 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine alloc_nnod_psf(np_smp, numnod, numedge, psf_list)
+      subroutine alloc_nnod_psf(np_smp, numedge, psf_list)
 !
-      integer(kind= kint), intent(in) :: np_smp, numnod, numedge
+      integer(kind= kint), intent(in) :: np_smp, numedge
       type(sectioning_list), intent(inout) :: psf_list
 !
 !
-      allocate(psf_list%istack_inter_n_on_n_smp(0:np_smp))
       allocate(psf_list%istack_inter_n_on_e_smp(0:np_smp))
-      allocate(psf_list%istack_exter_n_on_n_smp(0:np_smp))
       allocate(psf_list%istack_exter_n_on_e_smp(0:np_smp))
-      allocate(psf_list%id_n_on_n(numnod))
       allocate(psf_list%id_n_on_e(numedge))
 !
-      psf_list%istack_inter_n_on_n_smp = 0
       psf_list%istack_inter_n_on_e_smp = 0
-      psf_list%istack_exter_n_on_n_smp = 0
       psf_list%istack_exter_n_on_e_smp = 0
-      if(numnod .gt. 0) then
-        psf_list%id_n_on_n = 0
-      end if
-      if(numedge .gt. 0) then
-        psf_list%id_n_on_e = 0
-      end if
+      if(numedge .gt. 0)  psf_list%id_n_on_e = 0
 !
       end subroutine alloc_nnod_psf
 !
-!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine alloc_inod_psf(psf_list)
@@ -231,16 +223,10 @@
       type(sectioning_list), intent(inout) :: psf_list
 !
 !
-      allocate(psf_list%inod_int_nod(psf_list%internod_on_nod))
-      allocate(psf_list%inod_ext_nod(psf_list%externod_on_nod))
-!
       allocate(psf_list%iedge_int_nod(psf_list%internod_on_edge))
       allocate(psf_list%coef_int_edge(psf_list%internod_on_edge,2))
       allocate(psf_list%iedge_ext_nod(psf_list%externod_on_edge))
       allocate(psf_list%coef_ext_edge(psf_list%externod_on_edge,2))
-!
-      if(psf_list%internod_on_nod .gt. 0)  psf_list%inod_int_nod = 0
-      if(psf_list%externod_on_nod .gt. 0)  psf_list%inod_ext_nod = 0
 !
       if(psf_list%internod_on_edge .gt. 0) psf_list%iedge_int_nod = 0
       if(psf_list%internod_on_edge .gt. 0) psf_list%coef_int_edge= zero
@@ -248,6 +234,40 @@
       if(psf_list%externod_on_edge .gt. 0) psf_list%coef_ext_edge= zero
 !
       end subroutine alloc_inod_psf
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine alloc_nnod_grp_psf(np_smp, numnod, psf_g_list)
+!
+      integer(kind= kint), intent(in) :: np_smp, numnod
+      type(grp_section_list), intent(inout) :: psf_g_list
+!
+!
+      allocate(psf_g_list%istack_inter_n_on_n_smp(0:np_smp))
+      allocate(psf_g_list%istack_exter_n_on_n_smp(0:np_smp))
+      allocate(psf_g_list%id_n_on_n(numnod))
+!
+      psf_g_list%istack_inter_n_on_n_smp = 0
+      psf_g_list%istack_exter_n_on_n_smp = 0
+      if(numnod .gt. 0) psf_g_list%id_n_on_n = 0
+!
+      end subroutine alloc_nnod_grp_psf
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine alloc_inod_grp_psf(psf_g_list)
+!
+      type(grp_section_list), intent(inout) :: psf_g_list
+!
+!
+      allocate(psf_g_list%inod_int_nod(psf_g_list%internod_on_nod))
+      allocate(psf_g_list%inod_ext_nod(psf_g_list%externod_on_nod))
+!
+      if(psf_g_list%internod_on_nod.gt.0) psf_g_list%inod_int_nod = 0
+      if(psf_g_list%externod_on_nod.gt.0) psf_g_list%inod_ext_nod = 0
+!
+      end subroutine alloc_inod_grp_psf
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
@@ -268,11 +288,9 @@
       type(sectioning_list), intent(inout) :: psf_list
 !
 !
-      deallocate(psf_list%istack_inter_n_on_n_smp)
       deallocate(psf_list%istack_inter_n_on_e_smp)
       deallocate(psf_list%istack_exter_n_on_e_smp)
       deallocate(psf_list%istack_exter_n_on_e_smp)
-      deallocate(psf_list%id_n_on_n)
       deallocate(psf_list%id_n_on_e)
 !
       end subroutine dealloc_nnod_psf
@@ -284,11 +302,24 @@
       type(sectioning_list), intent(inout) :: psf_list
 !
 !
-      deallocate(psf_list%inod_int_nod, psf_list%inod_ext_nod)
       deallocate(psf_list%iedge_int_nod, psf_list%coef_int_edge)
       deallocate(psf_list%iedge_ext_nod, psf_list%coef_ext_edge)
 !
       end subroutine dealloc_inod_psf
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine dealloc_inod_grp_psf(psf_g_list)
+!
+      type(grp_section_list), intent(inout) :: psf_g_list
+!
+!
+      deallocate(psf_g_list%istack_inter_n_on_n_smp)
+      deallocate(psf_g_list%inod_int_nod, psf_g_list%inod_ext_nod)
+      deallocate(psf_g_list%id_n_on_n)
+      deallocate(psf_g_list%istack_exter_n_on_n_smp)
+!
+      end subroutine dealloc_inod_grp_psf
 !
 !  ---------------------------------------------------------------------
 !

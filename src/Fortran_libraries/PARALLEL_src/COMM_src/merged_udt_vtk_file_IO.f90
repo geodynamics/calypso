@@ -8,7 +8,12 @@
 !> @brief Output merged VTK file usgin MPI-IO
 !!
 !!@verbatim
-!!      subroutine init_merged_ucd(ucd, m_ucd)
+!!      subroutine init_merged_ucd(node, ele, nod_comm, ucd, m_ucd)
+!!        type(node_data), intent(in) :: node
+!!        type(element_data), intent(in) :: ele
+!!        type(communication_table), intent(in) :: nod_comm
+!!        type(ucd_data), intent(inout) :: ucd
+!!        type(merged_ucd_data), intent(inout) :: m_ucd
 !!      subroutine finalize_merged_ucd(ucd, m_ucd)
 !!
 !!      subroutine write_merged_ucd_file(istep, ucd, m_ucd)
@@ -42,29 +47,33 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine init_merged_ucd(ucd, m_ucd)
+      subroutine init_merged_ucd(node, ele, nod_comm, ucd, m_ucd)
 !
-      use m_geometry_data
-      use m_nod_comm_table
+      use t_geometry_data
+      use t_comm_table
       use m_merged_ucd_data
       use hdf5_file_IO
       use set_ucd_data
 !
+      type(node_data), intent(in) :: node
+      type(element_data), intent(in) :: ele
+      type(communication_table), intent(in) :: nod_comm
       type(ucd_data), intent(inout) :: ucd
       type(merged_ucd_data), intent(inout) :: m_ucd
 !
 !
       write(*,*) 'init_merged_ucd', my_rank
-      call link_numnod_stacks_2_output(nprocs, node1%istack_numnod,     &
-     &    node1%istack_internod, ele1%istack_interele, m_ucd)
+      call link_numnod_stacks_2_output(nprocs, node%istack_numnod,      &
+     &    node%istack_internod, ele%istack_interele, m_ucd)
 !
-      call allocate_merged_ucd_data(node1%numnod)
+      call allocate_merged_ucd_data(node%numnod)
       call set_node_double_address                                      &
      &   (nod_comm%num_neib, nod_comm%id_neib,                          &
      &    nod_comm%istack_import, nod_comm%item_import,                 &
      &    nod_comm%istack_export, nod_comm%item_export)
 !
-      call update_ele_by_double_address(m_ucd, ucd)
+      call update_ele_by_double_address                                 &
+     &   (node%istack_internod, m_ucd, ucd)
 !
 !
       if (ucd%ifmt_file .eq. iflag_sgl_hdf5) then

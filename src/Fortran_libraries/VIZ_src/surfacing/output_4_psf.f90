@@ -49,13 +49,25 @@
       type(ucd_data), intent(inout) ::        psf_out(num_psf)
       type(merged_ucd_data), intent(inout) :: psf_out_m(num_psf)
 !
-      integer(kind= kint) :: i_psf, irank_tgt
+      integer(kind= kint) :: i_psf, irank_tgt, iele
 !
 !
       do i_psf = 1, num_psf
         psf_out(i_psf)%ifmt_file = itype_psf_file(i_psf)
         if((psf_out(i_psf)%ifmt_file/iflag_single) .eq. 0) then
           irank_tgt = mod(i_psf-1,nprocs)
+!
+          do iele = 1, psf_mesh(i_psf)%patch%numele
+            if(psf_mesh(i_psf)%patch%ie(iele,1) .le. 0                  &
+     &        .or. psf_mesh(i_psf)%patch%ie(iele,2) .le. 0              &
+     &        .or. psf_mesh(i_psf)%patch%ie(iele,3) .le. 0              &
+     &        .or. psf_mesh(i_psf)%patch%ie(iele,1) .gt. psf_mesh(i_psf)%node%istack_internod(nprocs) &
+     &        .or. psf_mesh(i_psf)%patch%ie(iele,2) .gt. psf_mesh(i_psf)%node%istack_internod(nprocs) &
+     &        .or. psf_mesh(i_psf)%patch%ie(iele,3) .gt. psf_mesh(i_psf)%node%istack_internod(nprocs)) then
+              write(*,*) 'Failed: ', my_rank,  psf_mesh(i_psf)%node%istack_internod(nprocs), &
+     &             iele, psf_mesh(i_psf)%patch%ie(iele,1:3)
+            end if
+          end do
           call merge_ucd_psf_mesh                                       &
      &       (irank_tgt, psf_mesh(i_psf), psf_out(i_psf))
           call calypso_mpi_barrier

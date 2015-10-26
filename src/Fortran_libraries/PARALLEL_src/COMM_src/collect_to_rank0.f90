@@ -301,19 +301,32 @@
           num = istack(i_rank+1) - istack(i_rank)
           if(num .le. 0) cycle
 !
+          if(i_rank .eq. irank_tgt) then
 !$omp parallel private(nd)
-          do nd = 1, NB
-!$omp do private(inum,inod,knod)
-            do inum = 1, num
-              inod = inum + ist
-              knod = inum + (nd-1) * num + NB * ist
-              i8X_merged(inod,nd) = i8WR(knod)
-            end do
+            do nd = 1, NB
+!$omp do private(inod)
+              do inod = 1, num
+                i8X_merged(inod+ist,nd) = i8X(inod,nd)
+              end do
 !$omp end do nowait
-          end do
+            end do
 !$omp end parallel
-       end do
-     end if
+!
+          else
+!$omp parallel private(nd)
+            do nd = 1, NB
+!$omp do private(inum,inod,knod)
+              do inum = 1, num
+                inod = inum + ist
+                knod = inum + (nd-1) * num + NB * ist
+                i8X_merged(inod,nd) = i8WR(knod)
+              end do
+!$omp end do nowait
+            end do
+!$omp end parallel
+          end if
+        end do
+      end if
 !
       call MPI_WAITALL(nneib_send, req1(1), sta1(1,1), ierr_MPI)
 !

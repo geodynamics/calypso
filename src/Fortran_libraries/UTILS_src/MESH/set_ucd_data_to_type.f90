@@ -16,15 +16,16 @@
 !!
 !!      subroutine alloc_phys_name_type_by_output(ucd, phys_nod)
 !!      subroutine alloc_phys_data_type_by_output(ucd, node, phys_nod)
-!!      subroutine set_ucd_data_type_from_IO(my_rank, istep_ucd,        &
-!!     &          numnod, ucd, phys_nod)
 !!
-!!      subroutine set_ucd_data_type_from_IO_once(my_rank, istep_ucd,   &
-!!     &          numnod, ucd, phys_nod)
-!!      subroutine add_by_ucd_data_type(my_rank, istep_ucd,             &
-!!     &          numnod, ucd, phys_nod)
-!!      subroutine subtract_by_ucd_data_type(my_rank, istep_ucd,        &
-!!     &          numnod, ucd, phys_nod)
+!!      subroutine set_data_by_read_ucd                                 &
+!!     &         (my_rank, istep_ucd, ucd, nod_fld)
+!!
+!!      subroutine set_data_by_read_ucd_once(my_rank, istep_ucd,        &
+!!     &          ifile_format, ucd_prefix, nod_fld)
+!!      subroutine add_ucd_to_data(my_rank, istep_ucd,                  &
+!!     &          ifile_format, ucd_prefix, nod_fld)
+!!      subroutine subtract_by_ucd_data(my_rank, istep_ucd,             &
+!!     &          ifile_format, ucd_prefix, nod_fld)
 !!@endverbatim
 !
       module set_ucd_data_to_type
@@ -180,105 +181,124 @@
       end subroutine alloc_phys_data_type_by_output
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
-      subroutine set_ucd_data_type_from_IO(my_rank, istep_ucd,          &
-     &          ucd, node, phys_nod)
+      subroutine set_data_by_read_ucd                                   &
+     &         (my_rank, istep_ucd, ucd, nod_fld)
 !
-      use t_geometry_data
       use t_phys_data
       use t_ucd_data
+!
       use set_and_cal_udt_data
       use ucd_IO_select
 !
       integer(kind = kint),  intent(in) :: my_rank, istep_ucd
       type(ucd_data), intent(inout) :: ucd
-      type(node_data), intent(in) :: node
-      type(phys_data), intent(inout) :: phys_nod
+      type(phys_data), intent(inout) :: nod_fld
 !
 !
       call sel_read_udt_file(my_rank, istep_ucd, ucd)
-      call set_field_by_udt_data(node%numnod, phys_nod%num_phys,        &
-     &    phys_nod%ntot_phys, phys_nod%istack_component,                &
-     &    phys_nod%phys_name, phys_nod%d_fld, ucd)
+      call set_field_by_udt_data(nod_fld%n_point, nod_fld%num_phys,     &
+     &    nod_fld%ntot_phys, nod_fld%istack_component,                  &
+     &    nod_fld%phys_name, nod_fld%d_fld, ucd)
 !
-      end subroutine set_ucd_data_type_from_IO
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_ucd_data_type_from_IO_once(my_rank, istep_ucd,     &
-     &          numnod, ucd, phys_nod)
-!
-      use t_phys_data
-      use t_ucd_data
-      use set_and_cal_udt_data
-      use ucd_IO_select
-!
-      integer(kind = kint),  intent(in) :: my_rank, istep_ucd
-      integer(kind = kint),  intent(in) :: numnod
-      type(ucd_data), intent(inout) :: ucd
-      type(phys_data), intent(inout) :: phys_nod
-!
-!
-      ucd%nnod = numnod
-      call sel_read_alloc_udt_file(my_rank, istep_ucd, ucd)
-      call set_field_by_udt_data(numnod, phys_nod%num_phys,             &
-     &    phys_nod%ntot_phys, phys_nod%istack_component,                &
-     &    phys_nod%phys_name, phys_nod%d_fld, ucd)
-      call deallocate_ucd_data(ucd)
-!
-      end subroutine set_ucd_data_type_from_IO_once
+      end subroutine set_data_by_read_ucd
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine add_by_ucd_data_type(my_rank, istep_ucd,               &
-     &          numnod, ucd, phys_nod)
+      subroutine set_data_by_read_ucd_once(my_rank, istep_ucd,          &
+     &          ifile_format, ucd_prefix, nod_fld)
 !
       use t_phys_data
       use t_ucd_data
+!
       use set_and_cal_udt_data
       use ucd_IO_select
 !
+      character(len=kchara), intent(in) :: ucd_prefix
+      integer(kind = kint),  intent(in) :: ifile_format
       integer(kind = kint),  intent(in) :: my_rank, istep_ucd
-      integer(kind = kint),  intent(in) :: numnod
-      type(ucd_data), intent(inout) :: ucd
-      type(phys_data), intent(inout) :: phys_nod
+!
+      type(phys_data), intent(inout) :: nod_fld
+!
+      type(ucd_data) :: local_ucd
 !
 !
-      ucd%nnod = numnod
-      call sel_read_alloc_udt_file(my_rank, istep_ucd, ucd)
-      call add_field_by_udt_data(numnod, phys_nod%num_phys,             &
-     &    phys_nod%ntot_phys, phys_nod%istack_component,                &
-     &    phys_nod%phys_name, phys_nod%d_fld, ucd)
-      call deallocate_ucd_data(ucd)
+      local_ucd%nnod = nod_fld%n_point
+      call set_ucd_file_format_prefix                                   &
+     &   (ucd_prefix, ifile_format, local_ucd)
+      call sel_read_alloc_udt_file(my_rank, istep_ucd, local_ucd)
+      call set_field_by_udt_data(nod_fld%n_point, nod_fld%num_phys,     &
+     &    nod_fld%ntot_phys, nod_fld%istack_component,                  &
+     &    nod_fld%phys_name, nod_fld%d_fld, local_ucd)
+      call deallocate_ucd_data(local_ucd)
 !
-      end subroutine add_by_ucd_data_type
+      end subroutine set_data_by_read_ucd_once
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine subtract_by_ucd_data_type(my_rank, istep_ucd,          &
-     &          numnod, ucd, phys_nod)
+      subroutine add_ucd_to_data(my_rank, istep_ucd,                    &
+     &          ifile_format, ucd_prefix, nod_fld)
 !
       use t_phys_data
       use t_ucd_data
+!
       use set_and_cal_udt_data
       use ucd_IO_select
 !
+      character(len=kchara), intent(in) :: ucd_prefix
+      integer(kind = kint),  intent(in) :: ifile_format
       integer(kind = kint),  intent(in) :: my_rank, istep_ucd
-      integer(kind = kint),  intent(in) :: numnod
-      type(phys_data), intent(inout) :: phys_nod
-      type(ucd_data), intent(inout) :: ucd
+!
+      type(phys_data), intent(inout) :: nod_fld
+!
+      type(ucd_data) :: local_ucd
 !
 !
-      ucd%nnod = numnod
-      call sel_read_alloc_udt_file(my_rank, istep_ucd, ucd)
-      call subtract_field_by_udt_data(numnod, phys_nod%num_phys,        &
-     &    phys_nod%ntot_phys, phys_nod%istack_component,                &
-     &    phys_nod%phys_name, phys_nod%d_fld, ucd)
-      call deallocate_ucd_data(ucd)
+      local_ucd%nnod =  nod_fld%n_point
+      call set_ucd_file_format_prefix                                   &
+     &   (ucd_prefix, ifile_format, local_ucd)
+      call sel_read_alloc_udt_file(my_rank, istep_ucd, local_ucd)
+      call add_field_by_udt_data(nod_fld%n_point, nod_fld%num_phys,     &
+     &    nod_fld%ntot_phys, nod_fld%istack_component,                  &
+     &    nod_fld%phys_name, nod_fld%d_fld, local_ucd)
+      call deallocate_ucd_data(local_ucd)
 !
-      end subroutine subtract_by_ucd_data_type
+      end subroutine add_ucd_to_data
 !
+! -----------------------------------------------------------------------
+!
+      subroutine subtract_by_ucd_data(my_rank, istep_ucd,               &
+     &          ifile_format, ucd_prefix, nod_fld)
+!
+      use t_phys_data
+      use t_ucd_data
+!
+      use set_and_cal_udt_data
+      use ucd_IO_select
+!
+      character(len=kchara), intent(in) :: ucd_prefix
+      integer(kind = kint),  intent(in) :: ifile_format
+      integer(kind = kint),  intent(in) :: my_rank, istep_ucd
+!
+      type(phys_data), intent(inout) :: nod_fld
+!
+      type(ucd_data) :: local_ucd
+!
+!
+      local_ucd%nnod = nod_fld%n_point
+      call set_ucd_file_format_prefix                                   &
+     &   (ucd_prefix, ifile_format, local_ucd)
+      call sel_read_alloc_udt_file(my_rank, istep_ucd, local_ucd)
+      call subtract_field_by_udt_data                                   &
+     &   (nod_fld%n_point, nod_fld%num_phys,                            &
+     &    nod_fld%ntot_phys, nod_fld%istack_component,                  &
+     &    nod_fld%phys_name, nod_fld%d_fld, local_ucd)
+      call deallocate_ucd_data(local_ucd)
+!
+      end subroutine subtract_by_ucd_data
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       end module set_ucd_data_to_type

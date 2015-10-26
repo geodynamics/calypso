@@ -50,11 +50,9 @@
       integer(kind = kint) :: max_4_smp
 !
 !
-      psf_node%internal_node =   psf_list%internod_on_nod               &
-     &                         + psf_list%internod_on_edge
+      psf_node%internal_node =   psf_list%internod_on_edge
       psf_node%numnod =          psf_node%internal_node                 &
-     &                         + psf_list%externod_on_edge              &
-     &                         + psf_list%externod_on_nod
+     &                         + psf_list%externod_on_edge
       call count_number_4_smp(np_smp, ione, psf_node%internal_node,     &
      &    psf_node%istack_internal_smp, max_4_smp)
       call count_number_4_smp(np_smp, ione, psf_node%numnod,            &
@@ -84,12 +82,7 @@
       integer(kind = kint) :: ishift
 !
 !
-      call set_position_at_nod_psf(nnod, xx, izero,                     &
-     &    psf_list%internod_on_nod, psf_list%istack_inter_n_on_n_smp,   &
-     &    psf_list%inod_int_nod, istack_intnod, nnod_patch,             &
-     &    inod_sum, xx_patch)
-!
-      ishift =  psf_list%internod_on_nod
+      ishift =  izero
       call set_position_on_edge_psf                                     &
      &   (nnod, nedge, nnod_edge, ie_edge, xx, ishift,                  &
      &    psf_list%internod_on_edge, psf_list%istack_inter_n_on_e_smp,  &
@@ -97,12 +90,6 @@
      &    istack_intnod, nnod_patch, inod_sum, xx_patch)
 !
       ishift = ishift + psf_list%internod_on_edge
-      call set_position_at_nod_psf(nnod, xx, ishift,                    &
-     &    psf_list%externod_on_nod, psf_list%istack_exter_n_on_n_smp,   &
-     &    psf_list%inod_ext_nod, istack_intnod, nnod_patch,             &
-     &    inod_sum, xx_patch)
-!
-      ishift = ishift + psf_list%externod_on_nod
       call set_position_on_edge_psf                                     &
      &   (nnod, nedge, nnod_edge, ie_edge, xx, ishift,                  &
      &    psf_list%externod_on_edge, psf_list%istack_exter_n_on_e_smp,  &
@@ -112,43 +99,6 @@
       end subroutine set_position_4_psf
 !
 !  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      subroutine set_position_at_nod_psf(nnod, xx,                      &
-     &          ishift, nnod_on_nod, istack_n_on_n_smp, inod_4_nod,     &
-     &          istack_intnod, nnod_patch, inod_sum, xx_patch)
-!
-      integer(kind = kint), intent(in) :: nnod
-      real(kind = kreal), intent(in) :: xx(nnod,3)
-!
-      integer(kind = kint), intent(in) :: nnod_on_nod, ishift
-      integer(kind = kint), intent(in) :: istack_n_on_n_smp(0:np_smp)
-      integer(kind = kint), intent(in) :: inod_4_nod(nnod_on_nod)
-      integer(kind = kint_gl), intent(in) :: istack_intnod
-      integer(kind = kint), intent(in) :: nnod_patch
-!
-      integer(kind = kint_gl), intent(inout) :: inod_sum(nnod_patch)
-      real(kind = kreal), intent(inout) :: xx_patch(nnod_patch,3)
-!
-      integer(kind = kint) :: ip, ist, ied, inum
-!
-!
-      call set_field_at_nod_psf(nnod, ithree, xx,                       &
-     &   ishift, nnod_on_nod, istack_n_on_n_smp, inod_4_nod,            &
-     &   nnod_patch, xx_patch)
-!
-!$omp parallel do private(ist,ied,inum)
-      do ip = 1, np_smp
-        ist = istack_n_on_n_smp(ip-1) + 1 + ishift
-        ied = istack_n_on_n_smp(ip  ) + ishift
-        do inum = ist, ied
-          inod_sum(inum) = inum + istack_intnod
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine set_position_at_nod_psf
-!
 !  ---------------------------------------------------------------------
 !
       subroutine set_position_on_edge_psf                               &
@@ -194,40 +144,6 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_field_at_nod_psf(nnod, ncomp, d_nod,               &
-     &          ishift, nnod_on_nod, istack_n_on_n_smp, inod_4_nod,     &
-     &          nnod_patch, dat_tmp)
-!
-      integer(kind = kint), intent(in) :: nnod
-      integer(kind = kint), intent(in) :: nnod_on_nod, ishift
-      integer(kind = kint), intent(in) :: istack_n_on_n_smp(0:np_smp)
-      integer(kind = kint), intent(in) :: inod_4_nod(nnod_on_nod)
-      integer(kind = kint), intent(in) :: nnod_patch, ncomp
-      real(kind = kreal), intent(in) :: d_nod(nnod,ncomp)
-!
-      real(kind = kreal), intent(inout) :: dat_tmp(nnod_patch,ncomp)
-!
-      integer(kind = kint) :: ip, ist, ied, inum, inod, jnum, nd
-!
-!
-!$omp parallel do private(ist,ied,inum,jnum,inod,nd)
-      do ip = 1, np_smp
-        ist = istack_n_on_n_smp(ip-1) + 1
-        ied = istack_n_on_n_smp(ip  )
-        do nd = 1, ncomp
-          do inum = ist, ied
-            jnum = inum + ishift
-            inod = inod_4_nod(inum)
-            dat_tmp(jnum,nd) = d_nod(inod,nd)
-          end do
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine set_field_at_nod_psf
-!
-!  ---------------------------------------------------------------------
-!
       subroutine set_field_on_edge_psf                                  &
      &         (nnod, nedge, nnod_edge, ie_edge, ncomp, d_nod,          &
      &          ishift, nnod_on_edge, istack_n_on_e_smp, iedge_4_nod,   &
@@ -250,8 +166,7 @@
       integer(kind = kint) :: inum, inod1, inod2, iedge, jnum
 !
 !
-!$omp parallel do                                                       &
-!$omp& private(ist,ied,inum,jnum,inod1,inod2,iedge,nd)
+!$omp parallel do private(ip,ist,ied,nd,inum,jnum,inod1,inod2,iedge)
       do ip = 1, np_smp
         ist = istack_n_on_e_smp(ip-1) + 1
         ied = istack_n_on_e_smp(ip  )
@@ -299,11 +214,7 @@
 !
 !
       ifld = istack_comp_nod(ifield_psf-1) + 1
-      call set_field_at_nod_psf(nnod, ncomp, d_nod(1,ifld), izero,      &
-     &    psf_list%internod_on_nod, psf_list%istack_inter_n_on_n_smp,   &
-     &    psf_list%inod_int_nod, nnod_patch, dat_tmp(1,1))
-!
-      ishift = psf_list%internod_on_nod
+      ishift = 0
       call set_field_on_edge_psf                                        &
      &  (nnod, nedge, nnod_edge, ie_edge, ncomp, d_nod(1,ifld), ishift, &
      &   psf_list%internod_on_edge, psf_list%istack_inter_n_on_e_smp,   &
@@ -311,11 +222,6 @@
      &   nnod_patch, dat_tmp(1,1))
 !
       ishift = ishift + psf_list%internod_on_edge
-      call set_field_at_nod_psf(nnod, ncomp, d_nod(1,ifld), ishift,     &
-     &    psf_list%externod_on_nod, psf_list%istack_exter_n_on_n_smp,   &
-     &    psf_list%inod_ext_nod, nnod_patch, dat_tmp(1,1))
-!
-      ishift = ishift + psf_list%externod_on_nod
       call set_field_on_edge_psf                                        &
      &  (nnod, nedge, nnod_edge, ie_edge, ncomp, d_nod(1,ifld), ishift, &
      &   psf_list%externod_on_edge, psf_list%istack_exter_n_on_e_smp,   &

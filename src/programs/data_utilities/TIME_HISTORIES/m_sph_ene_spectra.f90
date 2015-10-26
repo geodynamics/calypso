@@ -9,7 +9,6 @@
 !!
 !!@verbatim
 !!      subroutine allocate_sph_espec_name
-!!      subroutine allocate_tave_sph_espec_data
 !!      subroutine deallocate_tave_sph_espec_data
 !!
 !!      subroutine select_sph_ene_spec_data_file
@@ -312,6 +311,34 @@
       return
 !
       end subroutine read_org_volume_ene_data
+!
+!   --------------------------------------------------------------------
+!
+      subroutine read_org_volume_ms_data(istep, ierr)
+!
+      integer(kind = kint), intent(inout) :: istep, ierr
+      integer(kind = kint) :: itmp
+      integer(kind = kint) :: lth
+!
+!
+      ierr = 0
+      read(id_file_rms,*,err=99,end=99) istep, time_sph,                &
+     &         spectr_t(1:ncomp_sph_spec,ione)
+      do lth = 0, ltr_sph
+          read(id_file_rms_l,*,err=99,end=99) istep, time_sph,          &
+     &         itmp, spectr_l(1:ncomp_sph_spec,lth,ione)
+          read(id_file_rms_m,*,err=99,end=99) istep, time_sph,          &
+     &         itmp, spectr_m(1:ncomp_sph_spec,lth,ione)
+          read(id_file_rms_lm,*,err=99,end=99) istep, time_sph,         &
+     &         itmp, spectr_lm(1:ncomp_sph_spec,lth,ione)
+      end do
+      return
+!
+   99 continue
+      ierr = 1
+      return
+!
+      end subroutine read_org_volume_ms_data
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------

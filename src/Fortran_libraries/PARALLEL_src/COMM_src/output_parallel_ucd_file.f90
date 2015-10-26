@@ -6,9 +6,10 @@
 !
 !      subroutine set_control_parallel_field_def
 !
-!      subroutine output_grd_file
-!      subroutine output_udt_one_snapshot(istep_ucd)
-!      subroutine finalize_ucd_file_output
+!!      subroutine output_grd_file(node, ele, nod_comm)
+!!      subroutine output_udt_one_snapshot                              &
+!!     &         (istep_ucd, node, ele, nod_comm)
+!!      subroutine finalize_ucd_file_output
 !
       module output_parallel_ucd_file
 !
@@ -36,10 +37,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine output_grd_file
+      subroutine output_grd_file(node, ele, nod_comm)
 !
+      use t_geometry_data
+      use t_comm_table
       use merged_udt_vtk_file_IO
       use parallel_ucd_IO_select
+!
+      type(node_data), intent(in) :: node
+      type(element_data), intent(in) :: ele
+      type(communication_table), intent(in) :: nod_comm
 !
 !
       call link_fem_num_field_2_ucd_out
@@ -47,7 +54,8 @@
       call link_fem_field_data_2_ucd_out
 !
       if (fem_ucd%ifmt_file/icent .eq. iflag_single/icent) then
-        call init_merged_ucd(fem_ucd, merged_ucd)
+        call init_merged_ucd                                            &
+     &     (node, ele, nod_comm, fem_ucd, merged_ucd)
       end if
 !
       call sel_write_parallel_ucd_mesh(fem_ucd, merged_ucd)
@@ -66,13 +74,19 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine output_udt_one_snapshot(istep_ucd)
+      subroutine output_udt_one_snapshot                                &
+     &         (istep_ucd, node, ele, nod_comm)
 !
+      use t_geometry_data
+      use t_comm_table
       use merged_udt_vtk_file_IO
       use copy_time_steps_4_restart
       use parallel_ucd_IO_select
 !
       integer(kind = kint), intent(in) :: istep_ucd
+      type(node_data), intent(in) :: node
+      type(element_data), intent(in) :: ele
+      type(communication_table), intent(in) :: nod_comm
 !
 !
       call link_fem_num_field_2_ucd_out
@@ -80,7 +94,8 @@
       call link_fem_field_data_2_ucd_out
 !
       if (fem_ucd%ifmt_file/icent .eq. iflag_single/icent) then
-        call init_merged_ucd(fem_ucd, merged_ucd)
+        call init_merged_ucd                                            &
+     &     (node, ele, nod_comm, fem_ucd, merged_ucd)
       end if
 !
       call copy_time_steps_to_restart

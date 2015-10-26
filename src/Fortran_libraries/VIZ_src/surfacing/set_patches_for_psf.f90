@@ -13,7 +13,7 @@
 !!      subroutine set_psf_patches(num_psf, numele, numedge, nnod_4_ele,&
 !!     &          ie, iedge_4_ele, num_surf_grp, ntot_surf_grp,         &
 !!     &          istack_surf_grp, item_surf_grp,                       &
-!!     &          psf_search, psf_list, psf_mesh)
+!!     &          psf_search, psf_list, psf_grp_list, psf_mesh)
 !!      subroutine set_iso_patches(num_iso, numele, numedge,            &
 !!     &          iedge_4_ele, iso_search, iso_list, iso_mesh)
 !
@@ -138,7 +138,7 @@
       subroutine set_psf_patches(num_psf, numele, numedge, nnod_4_ele,  &
      &          ie, iedge_4_ele, num_surf_grp, ntot_surf_grp,           &
      &          istack_surf_grp, item_surf_grp,                         &
-     &          psf_search, psf_list, psf_mesh)
+     &          psf_search, psf_list, psf_grp_list, psf_mesh)
 !
       use calypso_mpi
       use m_geometry_constants
@@ -163,6 +163,7 @@
 !
       type(psf_search_lists), intent(in) :: psf_search(num_psf)
       type(sectioning_list), intent(in) :: psf_list(num_psf)
+      type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
       type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !
       integer(kind = kint) :: i, ist_smp
@@ -183,7 +184,8 @@
 !
           call set_patch_4_grp(numele, numele, nnod_4_ele, ie,          &
      &        num_surf_grp, ntot_surf_grp, istack_surf_grp,             &
-     &        item_surf_grp, id_psf_group(i), psf_list(i)%id_n_on_n,    &
+     &        item_surf_grp, id_psf_group(i),                           &
+     &        psf_grp_list(i)%id_n_on_n,                                &
      &        psf_mesh(i)%patch%istack_numele(my_rank),                 &
      &        psf_mesh(i)%patch%numele,                                 &
      &        psf_mesh(i)%patch%istack_ele_smp,                         &

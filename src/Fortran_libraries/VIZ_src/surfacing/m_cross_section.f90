@@ -10,11 +10,10 @@
 !!@verbatim
 !!      subroutine cross_section_init                                   &
 !!     &         (numnod, internal_node, numele, numsurf, numedge,      &
-!!     &          nnod_4_ele, nnod_4_edge, ie, ie_edge, isf_4_ele,      &
-!!     &          iedge_4_sf, iedge_4_ele, nod_comm, edge_comm,         &
-!!     &          iedge_4_ele, nod_comm, edge_comm,                     &
-!!     &          interior_ele, xx, inod_smp_stack, iele_smp_stack,     &
-!!     &          isurf_smp_stack, iedge_smp_stack,                     &
+!!     &          nnod_4_ele, nnod_4_edge, ie, ie_edge, interior_edge,  &
+!!     &          isf_4_ele, iedge_4_sf, iedge_4_ele, nod_comm,         &
+!!     &          edge_comm, interior_ele, xx, inod_smp_stack,          &
+!!     &          iele_smp_stack, isurf_smp_stack, iedge_smp_stack,     &
 !!     &          ele_grp, sf_grp, sf_grp_nod,                          &
 !!     &          num_nod_phys, phys_nod_name)
 !!        type(communication_table), intent(in) :: nod_comm
@@ -54,6 +53,8 @@
 !
 !>      Structure for table for sections
       type(sectioning_list), allocatable, save :: psf_list(:)
+!>      Structure for table for sections
+      type(grp_section_list), allocatable, save :: psf_grp_list(:)
 !
 !>      Structure for search table for sections
       type(psf_search_lists), allocatable, save :: psf_search(:)
@@ -77,10 +78,10 @@
 !
       subroutine cross_section_init                                     &
      &         (numnod, internal_node, numele, numsurf, numedge,        &
-     &          nnod_4_ele, nnod_4_edge, ie, ie_edge, isf_4_ele,        &
-     &          iedge_4_sf, iedge_4_ele, nod_comm, edge_comm,           &
-     &          interior_ele, xx, inod_smp_stack, iele_smp_stack,       &
-     &          isurf_smp_stack, iedge_smp_stack,                       &
+     &          nnod_4_ele, nnod_4_edge, ie, ie_edge, interior_edge,    &
+     &          isf_4_ele, iedge_4_sf, iedge_4_ele, nod_comm,           &
+     &          edge_comm, interior_ele, xx, inod_smp_stack,            &
+     &          iele_smp_stack, isurf_smp_stack, iedge_smp_stack,       &
      &          ele_grp, sf_grp, sf_grp_nod,                            &
      &          num_nod_phys, phys_nod_name)
 !
@@ -104,6 +105,7 @@
       integer(kind=kint), intent(in) :: nnod_4_ele, nnod_4_edge
       integer(kind=kint), intent(in) :: ie(numele,nnod_4_ele)
       integer(kind=kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
+      integer(kind=kint), intent(in) :: interior_edge(numedge)
       integer(kind=kint), intent(in) :: isf_4_ele(numele,nsurf_4_ele)
       integer(kind = kint), intent(in)                                  &
      &              :: iedge_4_sf(numsurf,nedge_4_surf)
@@ -157,11 +159,12 @@
       if (iflag_debug.eq.1) write(*,*) 'set_node_and_patch_psf'
       call set_node_and_patch_psf                                       &
      &   (num_psf, numnod, internal_node, numele, numedge, nnod_4_ele,  &
-     &    nnod_4_edge, xx, ie, ie_edge, iedge_4_ele, nod_comm,          &
-     &    edge_comm, sf_grp%num_grp, sf_grp%num_item,                   &
+     &    nnod_4_edge, xx, ie, ie_edge, interior_edge, iedge_4_ele,     &
+     &    nod_comm, edge_comm, sf_grp%num_grp, sf_grp%num_item,         &
      &    sf_grp%istack_grp, sf_grp%item_sf_grp,                        &
      &    sf_grp_nod%ntot_node_sf_grp, sf_grp_nod%inod_stack_sf_grp,    &
-     &    sf_grp_nod%inod_surf_grp, psf_search, psf_list, psf_mesh)
+     &    sf_grp_nod%inod_surf_grp, psf_search, psf_list, psf_grp_list, &
+     &    psf_mesh)
 !
       call alloc_psf_field_data(num_psf, psf_mesh)
 !
@@ -199,7 +202,8 @@
 !      call start_eleps_time(20)
       call set_field_4_psf(num_psf, numnod, numedge, nnod_4_edge,       &
      &    ie_edge, num_nod_phys, num_tot_nod_phys,                      &
-     &    istack_nod_component, d_nod, psf_param, psf_list, psf_mesh)
+     &    istack_nod_component, d_nod, psf_param,                       &
+     &    psf_list, psf_grp_list, psf_mesh)
 !      call end_eleps_time(20)
 !
 !      call start_eleps_time(21)
@@ -217,6 +221,7 @@
 !
       allocate(psf_mesh(num_psf))
       allocate(psf_list(num_psf))
+      allocate(psf_grp_list(num_psf))
       allocate(psf_search(num_psf))
       allocate(psf_param(num_psf))
 !
@@ -238,13 +243,15 @@
       do i_psf = 1, num_psf
         call disconnect_merged_ucd_mesh                                 &
     &      (psf_out(i_psf), psf_out_m(i_psf))
+!
+        call dealloc_inod_grp_psf(psf_grp_list(i_psf))
       end do
 !
       call dealloc_psf_node_and_patch(num_psf, psf_list, psf_mesh)
       call dealloc_psf_field_name(num_psf, psf_mesh)
       call dealloc_psf_field_data(num_psf, psf_mesh)
 !
-      deallocate(psf_mesh, psf_list)
+      deallocate(psf_mesh, psf_list, psf_grp_list)
       deallocate(psf_search, psf_out, psf_out_m, psf_param)
 !
       end subroutine dealloc_psf_field_type

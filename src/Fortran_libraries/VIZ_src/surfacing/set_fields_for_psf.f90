@@ -13,7 +13,7 @@
 !!      subroutine set_field_4_psf                                      &
 !!     &         (num_psf, numnod, numedge, nnod_4_edge, ie_edge,       &
 !!     &          num_phys, ntot_phys, istack_ncomp, d_nod,             &
-!!     &          psf_param, psf_list, psf_mesh)
+!!     &          psf_param, psf_list, psf_grp_list, psf_mesh)
 !!      subroutine set_field_4_iso                                      &
 !!     &         (num_iso, numnod, numedge, nnod_4_edge, ie_edge,       &
 !!     &          num_phys, ntot_phys, istack_ncomp, d_nod,             &
@@ -77,8 +77,9 @@
       subroutine set_field_4_psf                                        &
      &         (num_psf, numnod, numedge, nnod_4_edge, ie_edge,         &
      &          num_phys, ntot_phys, istack_ncomp, d_nod,               &
-     &          psf_param, psf_list, psf_mesh)
+     &          psf_param, psf_list, psf_grp_list, psf_mesh)
 !
+      use m_control_params_4_psf
       use t_psf_geometry_list
       use t_psf_patch_data
 !
@@ -92,13 +93,15 @@
 !
       type(psf_parameters), intent(in) :: psf_param(num_psf)
       type(sectioning_list), intent(in):: psf_list(num_psf)
+      type(grp_section_list), intent(in) :: psf_grp_list(num_psf)
 !
       type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !
       integer(kind = kint) :: i
 !
       do i = 1, num_psf
-        call set_field_on_psf(numnod, numedge, nnod_4_edge, ie_edge,    &
+        if( id_section_method(i) .gt. 0) then
+          call set_field_on_psf(numnod, numedge, nnod_4_edge, ie_edge,  &
      &      psf_mesh(i)%node%numnod, psf_mesh(i)%node%istack_nod_smp,   &
      &      psf_mesh(i)%node%xx,  psf_mesh(i)%node%rr,                  &
      &      psf_mesh(i)%node%a_r, psf_mesh(i)%node%ss,                  &
@@ -108,6 +111,20 @@
      &      psf_param(i)%icomp_output,                                  &
      &      num_phys, ntot_phys, istack_ncomp, d_nod,                   &
      &      psf_mesh(i)%field%d_fld, psf_mesh(i)%tmp_psf, psf_list(i))
+!
+        else if( id_section_method(i) .eq. 0) then
+          call set_field_on_psf_grp(numnod,                             &
+     &      psf_mesh(i)%node%numnod, psf_mesh(i)%node%istack_nod_smp,   &
+     &      psf_mesh(i)%node%xx,  psf_mesh(i)%node%rr,                  &
+     &      psf_mesh(i)%node%a_r, psf_mesh(i)%node%ss,                  &
+     &      psf_mesh(i)%node%a_s, psf_mesh(i)%field%num_phys,           &
+     &      psf_mesh(i)%ntot_comp, psf_param(i)%id_output,              &
+     &      psf_mesh(i)%field%num_component, psf_param(i)%ncomp_org,    &
+     &      psf_param(i)%icomp_output,                                  &
+     &      num_phys, ntot_phys, istack_ncomp, d_nod,                   &
+     &      psf_mesh(i)%field%d_fld, psf_mesh(i)%tmp_psf,               &
+     &      psf_grp_list(i))
+        end if
       end do
 !
       end subroutine set_field_4_psf
@@ -209,7 +226,7 @@
 !
       icou = 0
       do i = 1, nfield_psf
-        call set_field_on_psf_xyz(numnod, numedge, nnod_4_edge,         &
+          call set_field_on_psf_xyz(numnod, numedge, nnod_4_edge,       &
      &          ie_edge, nnod_patch, num_phys, ntot_phys, istack_ncomp, &
      &          d_nod, ifield_psf(i), ncomp_org(i), dat_tmp, psf_list)
 !
@@ -222,6 +239,65 @@
 !
 !
       end subroutine set_field_on_psf
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine set_field_on_psf_grp(numnod,                           &
+     &      nnod_patch, istack_n_smp, xyz_psf, rr_psf, ar_psf,          &
+     &      ss_psf, as_psf, nfield_psf, max_ncomp_psf, ifield_psf,      &
+     &      ncomp_psf, ncomp_org, icomp_psf, num_phys, ntot_phys,       &
+     &      istack_ncomp, d_nod, dat_psf, dat_tmp, psf_grp_list)
+!
+      use t_psf_geometry_list
+      use m_geometry_constants
+!
+      use set_components_flags
+      use set_psf_nodes_4_by_surf_grp
+      use convert_components_4_viz
+!
+      integer(kind = kint), intent(in) :: numnod
+!
+      integer(kind = kint), intent(in) :: nnod_patch
+      integer(kind = kint), intent(in) :: istack_n_smp(0:np_smp)
+      real(kind = kreal), intent(in) :: xyz_psf(nnod_patch,3)
+      real(kind = kreal), intent(in) :: rr_psf(nnod_patch)
+      real(kind = kreal), intent(in) :: ar_psf(nnod_patch)
+      real(kind = kreal), intent(in) :: ss_psf(nnod_patch)
+      real(kind = kreal), intent(in) :: as_psf(nnod_patch)
+      integer(kind = kint), intent(in) :: nfield_psf, max_ncomp_psf
+      integer(kind = kint), intent(in) :: ifield_psf(nfield_psf)
+      integer(kind = kint), intent(in) :: ncomp_psf(nfield_psf)
+      integer(kind = kint), intent(in) :: ncomp_org(nfield_psf)
+      integer(kind = kint), intent(in) :: icomp_psf(nfield_psf)
+!
+      type(grp_section_list), intent(in) :: psf_grp_list
+!
+      integer(kind = kint), intent(in) :: num_phys, ntot_phys
+      integer(kind = kint), intent(in) :: istack_ncomp(0:num_phys)
+      real(kind = kreal), intent(in)  :: d_nod(numnod,ntot_phys)
+!
+      real(kind = kreal), intent(inout)                                 &
+     &           :: dat_psf(nnod_patch,max_ncomp_psf)
+!
+      real(kind = kreal), intent(inout) :: dat_tmp(nnod_patch,6)
+!
+      integer(kind = kint) :: i, icou
+!
+!
+      icou = 0
+      do i = 1, nfield_psf
+        call set_field_on_psf_grp_xyz                                   &
+     &     (numnod, nnod_patch, num_phys, ntot_phys, istack_ncomp,      &
+     &      d_nod, ifield_psf(i), ncomp_org(i), dat_tmp, psf_grp_list)
+!
+        call convert_comps_4_viz(nnod_patch, istack_n_smp,              &
+     &      xyz_psf, rr_psf, ar_psf, ss_psf, as_psf,                    &
+     &      ncomp_psf(i), ncomp_org(i), icomp_psf(i),                   &
+     &      dat_tmp(1,1), dat_psf(1,icou+1))
+        icou = icou + ncomp_psf(i)
+      end do
+!
+      end subroutine set_field_on_psf_grp
 !
 !  ---------------------------------------------------------------------
 !

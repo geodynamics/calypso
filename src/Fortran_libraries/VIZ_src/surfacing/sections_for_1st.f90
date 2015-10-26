@@ -84,8 +84,8 @@
       call cross_section_init(node1%numnod, node1%internal_node,        &
      &    ele1%numele, surf1%numsurf, edge1%numedge,                    &
      &    ele1%nnod_4_ele, edge1%nnod_4_edge, ele1%ie, edge1%ie_edge,   &
-     &    surf1%isf_4_ele, edge1%iedge_4_sf, edge1%iedge_4_ele,         &
-     &    nod_comm, edge_comm, ele1%interior_ele,                       &
+     &    edge1%interior_edge, surf1%isf_4_ele, edge1%iedge_4_sf,       &
+     &    edge1%iedge_4_ele, nod_comm, edge_comm, ele1%interior_ele,    &
      &    node1%xx, node1%istack_nod_smp, ele1%istack_ele_smp,          &
      &    surf1%istack_surf_smp, edge1%istack_edge_smp,                 &
      &    ele_grp1, sf_grp1, sf_grp_nod1,                               &
@@ -143,11 +143,10 @@
 !
       integer(kind = kint), intent(in) :: istep_iso
 !
-      call isosurface_main                                              &
-     &   (istep_iso, node1%numnod, node1%internal_node, ele1%numele,    &
-     &    edge1%numedge, ele1%nnod_4_ele, edge1%nnod_4_edge,            &
-     &    ele1%ie, edge1%ie_edge, edge1%iedge_4_ele, node1%xx,          &
-     &    node1%rr, node1%a_r, node1%ss, node1%a_s,                     &
+      call isosurface_main(istep_iso, node1%numnod, ele1%numele,        &
+     &    edge1%numedge, ele1%nnod_4_ele, edge1%nnod_4_edge, ele1%ie,   &
+     &    edge1%ie_edge, edge1%interior_edge, edge1%iedge_4_ele,        &
+     &    node1%xx, node1%rr, node1%a_r, node1%ss, node1%a_s,           &
      &    node1%istack_nod_smp, edge_comm,                              &
      &    nod_fld1%num_phys, nod_fld1%ntot_phys,                        &
      &    nod_fld1%istack_component, nod_fld1%d_fld)

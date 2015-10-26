@@ -111,7 +111,7 @@
       real(kind = kreal), parameter :: tiny = 1.0d-14
       real(kind = kreal) :: dx, dy, dz
       real(kind = kreal), allocatable :: x_test(:)
-      integer(kind = kint) :: iele
+      integer(kind = kint) :: iele, inum
 !
 !
       write(*,*) 'Number of  ', trim(txt), ' for ', my_rank, ': ',      &
@@ -123,6 +123,15 @@
         x_test(3*iele-2) = x_ele(iele,1)
         x_test(3*iele-1) = x_ele(iele,2)
         x_test(3*iele  ) = x_ele(iele,3)
+      end do
+!$omp end parallel do
+!
+!$omp parallel do private(inum,iele)
+      do inum = 1, e_comm%ntot_import
+        iele = e_comm%item_import(inum)
+        x_test(3*iele-2) = 1.e30
+        x_test(3*iele-1) = 1.e30
+        x_test(3*iele  ) = 1.e30
       end do
 !$omp end parallel do
 !

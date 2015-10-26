@@ -12,15 +12,16 @@ Calypso requires the following libraries.
 \end{itemize}
 Linux and Max OS X use GNU make as a default 'make' command, but some system (e.g. BSD or SOLARIS) does not use GNU make as default. \verb|configure| command searches and set correct GNU make command.
 
-In addition, the following libraries can be used (optional).
+In addition, the following environment and libraries can be used (optional).
 \begin{itemize}
 \item OpenMP
+\item BLAS
 \item FFTW version 3 (\url{http://www.fftw.org}) including Fortran wrapper
 \item PARALLEL HDF5 (\url{http://www.hdfgroup.org/HDF5/PHDF5})  including Fortran wrapper.
 \end{itemize}
 Note: Calypso does NOT use MPI and OpenMP features in FFTW3. 
 
-In the most of platforms, the Fourier transform is faster than that by FFTPACK. 
+In the most of platforms, the Fourier transform by FFTW is faster than that by FFTPACK. 
 
 HDF5 is used for field data output with XDMF format instead of VTK format. The comparison of field data format is described in section ref{sec:VTK}. 
 
@@ -32,6 +33,10 @@ FFTPACK fails to compile with Intel fortran using the {\tt `-warn all'} option. 
 
 \subsubsection*{Homebrew's FFTW3 on Mac OS X}
 Calypso uses Fortran wrappers in FFTW3. If FFTW3 is installed using Homebrew for Mac OS X (\url{http://mxcl.github.com/homebrew/}), the required fortran wrappers are not installed. In this case, please install FFTW3 with Fortran wrappers with another package manager (Macports (\url{http://www.macports.org}, for example), build FFTW3 by yourself including the Fortran wrapper, or turn off FFTW3 features in Calypso.
+
+\subsubsection*{XL fortran}
+In XL fortran, preprocessor options is not specified by \verb|-D...|, but \verb|-Wf, '-D...'|. Pleease edit preprocessor macro opthion \verb|F90CPPFLAGS| in \verb|work/Makefile| by an editor.
+
 \subsubsection*{Cross compiler support}
 {\tt configure} command in Calypso does not support cross compilation. If you want to compile with a cross compiler, please set the variables in Makefile manually (see section \ref{section:no_configure})
 
@@ -101,6 +106,7 @@ Optional Features:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-hdf5=yes/no/PATH full path of h5pcc for parallel HDF5 configuration
+  --with-blas=<lib>       use BLAS library <lib>
 
 Some influential environment variables:
   CC          C compiler command
@@ -147,6 +153,7 @@ Compile is performed using the {\tt make} command. The Makefile in the top direc
 \item{\verb t_ave_sph_mean_square:     } Time averaging program for the mean square data.
 \item{\verb t_ave_picked_sph_coefs:     }  Time averaging program for the picked spectrum data.
 \item{\verb t_ave_nusselt:     }                   Time averaging program for the Nusselt number data.
+\item{\verb check_sph_grids:   }                   Check program for tests.
 \item{\verb make_f90depends:  } Program to generate dependency of the source code ({\tt make} command uses to generate {\tt work/Makefile})
 \end{description}
 %

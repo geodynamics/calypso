@@ -363,7 +363,7 @@
       subroutine check_group_type_data(my_rank, grp)
 !
       integer(kind = kint), intent(in) :: my_rank
-      type(group_data), intent(inout) :: grp
+      type(group_data), intent(in) :: grp
       integer(kind = kint) :: i, ist, ied
 !
       write(50+my_rank,*) 'num_grp',  grp%num_grp

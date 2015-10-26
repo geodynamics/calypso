@@ -3,9 +3,11 @@
 !
 !      written by H. Matsui on Dec., 2008
 !
-!      subroutine set_grp_data_type_from_IO(group)
-!      subroutine set_grp_data_type_to_IO(group)
-!        type(mesh_groups), intent(inout) :: group
+!!      subroutine set_grp_data_type_from_IO(group)
+!!      subroutine set_grp_data_type_to_IO(group)
+!!      subroutine set_grp_data_from_IO(nod_grp, ele_grp, surf_grp)
+!!      subroutine set_grp_data_to_IO(nod_grp, ele_grp, surf_grp)
+!!        type(mesh_groups), intent(inout) :: group
 !
       module set_group_types_4_IO
 !
@@ -13,9 +15,9 @@
 !
       implicit  none
 !
-!      private :: set_node_grp_type_to_IO
-!      private :: set_ele_grp_type_to_IO
-!      private :: set_surface_grp_type_to_IO
+      private :: set_nod_grp_type_from_IO,  set_nod_grp_type_to_IO
+      private :: set_ele_grp_type_from_IO,  set_ele_grp_type_to_IO
+      private :: set_surf_grp_type_from_IO, set_surf_grp_type_to_IO
 !
 !-----------------------------------------------------------------------
 !
@@ -30,9 +32,8 @@
       type(mesh_groups), intent(inout) :: group
 !
 !
-      call set_nod_grp_type_from_IO(group%nod_grp)
-      call set_ele_grp_type_from_IO(group%ele_grp)
-      call set_surf_grp_type_from_IO(group%surf_grp)
+      call set_grp_data_from_IO                                         &
+     &   (group%nod_grp, group%ele_grp, group%surf_grp)
 !
       end subroutine set_grp_data_type_from_IO
 !
@@ -45,11 +46,43 @@
       type(mesh_groups), intent(inout) :: group
 !
 !
-      call set_node_grp_type_to_IO(group%nod_grp)
-      call set_ele_grp_type_to_IO(group%ele_grp)
-      call set_surface_grp_type_to_IO(group%surf_grp)
+      call set_grp_data_to_IO                                           &
+     &   (group%nod_grp, group%ele_grp, group%surf_grp)
 !
       end subroutine set_grp_data_type_to_IO
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine set_grp_data_from_IO(nod_grp, ele_grp, surf_grp)
+!
+      use  t_group_data
+!
+      type(group_data), intent(inout) :: nod_grp, ele_grp
+      type(surface_group_data), intent(inout) :: surf_grp
+!
+!
+      call set_nod_grp_type_from_IO(nod_grp)
+      call set_ele_grp_type_from_IO(ele_grp)
+      call set_surf_grp_type_from_IO(surf_grp)
+!
+      end subroutine set_grp_data_from_IO
+!
+!-----------------------------------------------------------------------
+!
+      subroutine set_grp_data_to_IO(nod_grp, ele_grp, surf_grp)
+!
+      use  t_group_data
+!
+      type(group_data), intent(inout) :: nod_grp, ele_grp
+      type(surface_group_data), intent(inout) :: surf_grp
+!
+!
+      call set_nod_grp_type_to_IO(nod_grp)
+      call set_ele_grp_type_to_IO(ele_grp)
+      call set_surf_grp_type_to_IO(surf_grp)
+!
+      end subroutine set_grp_data_to_IO
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -156,7 +189,7 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine set_node_grp_type_to_IO(nod_grp)
+      subroutine set_nod_grp_type_to_IO(nod_grp)
 !
       use t_group_data
       use m_read_boundary_data
@@ -179,7 +212,7 @@
       bc_item_dummy(1:nod_grp%num_item)                                 &
      &    = nod_grp%item_grp(1:nod_grp%num_item)
 !
-      end subroutine set_node_grp_type_to_IO
+      end subroutine set_nod_grp_type_to_IO
 !
 !-----------------------------------------------------------------------
 !
@@ -210,7 +243,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_surface_grp_type_to_IO(sf_grp)
+      subroutine set_surf_grp_type_to_IO(sf_grp)
 !
       use t_group_data
       use m_read_boundary_data
@@ -235,7 +268,7 @@
       surf_item_dummy(1:sf_grp%num_item,2)                              &
      &      = sf_grp%item_sf_grp(2,1:sf_grp%num_item)
 !
-      end subroutine set_surface_grp_type_to_IO
+      end subroutine set_surf_grp_type_to_IO
 !
 !-----------------------------------------------------------------------
 !

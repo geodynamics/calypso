@@ -24,6 +24,8 @@
 !
       implicit none
 !
+      private :: set_control_4_SPH_to_FEM
+!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -36,7 +38,6 @@
       use m_spheric_parameter
       use m_sph_boundary_input_data
       use set_control_sph_mhd
-      use set_control_SPH_to_FEM
       use parallel_load_data_4_sph
 !
 !
@@ -105,7 +106,6 @@
 !
       use m_control_parameter
       use set_control_sph_mhd
-      use set_control_SPH_to_FEM
       use set_control_sph_data_MHD
       use parallel_load_data_4_sph
 !
@@ -121,5 +121,34 @@
       end subroutine input_control_SPH_dynamobench
 !
 ! ----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_control_4_SPH_to_FEM
+!
+      use m_node_phys_data
+      use m_spheric_parameter
+      use m_sph_spectr_data
+      use m_ctl_data_4_sphere_model
+      use copy_rj_spec_name_to_node
+      use ordering_field_by_viz
+      use node_monitor_IO
+      use set_controls_4_sph_shell
+!
+!
+      call set_FEM_mesh_mode_4_SPH(iflag_shell_mode)
+!
+      if (iflag_debug .ge. iflag_routine_msg)                           &
+     &     write(*,*) 'copy_rj_spec_name_to_nod_fld'
+      call copy_rj_spec_name_to_nod_fld(nod_fld1)
+!
+      if (iflag_debug .ge. iflag_routine_msg)                           &
+     &     call check_nodal_field_name_type(nod_fld1)
+!
+      call count_field_4_monitor(num_phys_rj, num_phys_comp_rj,         &
+     &    iflag_monitor_rj, num_field_monitor, ntot_comp_monitor)
+!
+      end subroutine set_control_4_SPH_to_FEM
+!
+! -----------------------------------------------------------------------
 !
       end module input_control_sph_MHD

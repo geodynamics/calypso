@@ -12,6 +12,7 @@
 !!      subroutine dealloc_ele_comm_tbls_gl_nele                        &
 !!     &         (mesh, ele_mesh, surf_mesh, edge_mesh)
 !!
+!!      subroutine const_global_element_id(ele)
 !!      subroutine const_global_surface_id(surf, sf_comm)
 !!        type(surface_data), intent(inout) :: surf
 !!        type(communication_table), intent(in) :: sf_comm
@@ -34,9 +35,9 @@
 !
       implicit none
 !
-      private :: const_ele_comm_tbl, const_surf_comm_table
-      private :: const_edge_comm_table
-      private :: const_ele_comm_table_type
+!      private :: const_ele_comm_tbl, const_surf_comm_table
+!      private :: const_edge_comm_table
+!      private :: const_comm_table_by_connenct
 !
 !-----------------------------------------------------------------------
 !
@@ -60,13 +61,16 @@
 !
       call const_global_numnod_list(mesh%node)
 !
-      call const_ele_comm_tbl(mesh, belongs, ele_mesh)
+      call const_ele_comm_tbl(mesh%node, mesh%ele, mesh%nod_comm,       &
+     &    belongs, ele_mesh%ele_comm)
       call const_global_numele_list(mesh%ele)
 !
-      call const_surf_comm_table(mesh, belongs, surf_mesh)
+      call const_surf_comm_table(mesh%node, mesh%nod_comm,              &
+     &    surf_mesh%surf, belongs, surf_mesh%surf_comm)
       call const_global_surface_id(surf_mesh%surf, surf_mesh%surf_comm)
 !
-      call const_edge_comm_table(mesh, belongs, edge_mesh)
+      call const_edge_comm_table(mesh%node, mesh%nod_comm,              &
+     &    edge_mesh%edge, belongs, edge_mesh%edge_comm)
       call const_global_edge_id(edge_mesh%edge, edge_mesh%edge_comm)
 !
       end subroutine const_ele_comm_tbl_global_id
@@ -98,7 +102,6 @@
 !
       subroutine const_global_numnod_list(node)
 !
-      use t_geometry_data
       use const_global_element_ids
 !
       type(node_data), intent(inout) :: node
@@ -131,9 +134,26 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine const_global_element_id(ele, ele_comm)
+!
+      use const_global_element_ids
+!
+      type(element_data), intent(inout) :: ele
+      type(communication_table), intent(in) :: ele_comm
+!
+      character(len=kchara), parameter :: txt = 'element'
+!
+!
+      call const_global_numele_list(ele)
+      call set_global_ele_id(txt, ele%numele, ele%istack_interele,      &
+     &   ele%interior_ele, ele_comm, ele%iele_global)
+!
+      end subroutine const_global_element_id
+!
+!  ---------------------------------------------------------------------
+!
       subroutine const_global_surface_id(surf, sf_comm)
 !
-      use t_surface_data
       use const_global_element_ids
 !
       type(surface_data), intent(inout) :: surf
@@ -158,7 +178,6 @@
 !
       subroutine const_global_edge_id(edge, ed_comm)
 !
-      use t_edge_data
       use const_global_element_ids
 !
       type(edge_data), intent(inout) :: edge
@@ -182,23 +201,25 @@
 !  ---------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine const_ele_comm_tbl(mesh, belongs, ele_mesh)
+      subroutine const_ele_comm_tbl                                     &
+     &         (node, ele, nod_comm, belongs, ele_comm)
 !
       use set_ele_id_4_node_type
 !
-      type(mesh_geometry), intent(in) :: mesh
-      type(element_comms), intent(inout) ::    ele_mesh
+      type(node_data), intent(in) :: node
+      type(element_data), intent(in) :: ele
+      type(communication_table), intent(in) :: nod_comm
       type(belonged_table), intent(inout) :: belongs
+      type(communication_table), intent(inout) :: ele_comm
 !
       character(len=kchara), parameter :: txt = 'element'
 !
 !
-      call s_set_ele_id_4_node_type(mesh, belongs%blng_ele)
-      call belonged_ele_id_4_node(mesh, belongs%host_ele)
-      call const_ele_comm_table_type                                    &
-     &   (txt, mesh%ele%numele, mesh%ele%interior_ele, mesh%ele%x_ele,  &
-     &    mesh%node, mesh%nod_comm, belongs%blng_ele, belongs%host_ele, &
-     &    ele_mesh%ele_comm)
+      call set_ele_id_4_node(node, ele, belongs%blng_ele)
+      call belonged_ele_id_4_node(node, ele, belongs%host_ele)
+      call const_comm_table_by_connenct(txt, ele%numele,                &
+     &    ele%interior_ele, ele%x_ele, node, nod_comm,                  &
+     &    belongs%blng_ele, belongs%host_ele, ele_comm)
       call dealloc_iele_belonged(belongs%host_ele)
       call dealloc_iele_belonged(belongs%blng_ele)
 !
@@ -206,25 +227,25 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine const_surf_comm_table(mesh, belongs, surf_mesh)
+      subroutine const_surf_comm_table                                  &
+     &         (node, nod_comm, surf, belongs, surf_comm)
 !
       use set_ele_id_4_node_type
 !
-      type(mesh_geometry), intent(in) :: mesh
-      type(surface_geometry), intent(inout) :: surf_mesh
+      type(node_data), intent(in) :: node
+      type(surface_data), intent(in) :: surf
+      type(communication_table), intent(in) :: nod_comm
       type(belonged_table), intent(inout) :: belongs
+      type(communication_table), intent(inout) :: surf_comm
 !
       character(len=kchara), parameter :: txt = 'surface'
 !
 !
-      call set_surf_id_4_node_type                                      &
-     &   (mesh, surf_mesh%surf, belongs%blng_surf)
-      call belonged_surf_id_4_node                                      &
-     &   (mesh, surf_mesh%surf, belongs%host_surf)
-      call const_ele_comm_table_type                                    &
-     &   (txt, surf_mesh%surf%numsurf, surf_mesh%surf%interior_surf,    &
-     &    surf_mesh%surf%x_surf, mesh%node, mesh%nod_comm,              &
-     &    belongs%blng_surf, belongs%host_surf, surf_mesh%surf_comm)
+      call set_surf_id_4_node(node, surf, belongs%blng_surf)
+      call belonged_surf_id_4_node(node, surf, belongs%host_surf)
+      call const_comm_table_by_connenct(txt, surf%numsurf,              &
+     &    surf%interior_surf, surf%x_surf, node, nod_comm,              &
+     &    belongs%blng_surf, belongs%host_surf, surf_comm)
       call dealloc_iele_belonged(belongs%host_surf)
       call dealloc_iele_belonged(belongs%blng_surf)
 !
@@ -232,25 +253,26 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine const_edge_comm_table(mesh, belongs, edge_mesh)
+      subroutine const_edge_comm_table                                  &
+     &         (node, nod_comm, edge, belongs, edge_comm)
 !
       use set_ele_id_4_node_type
 !
-      type(mesh_geometry), intent(in) :: mesh
-      type(edge_geometry), intent(inout) :: edge_mesh
+      type(node_data), intent(in) :: node
+      type(edge_data), intent(in) :: edge
+      type(communication_table), intent(in) :: nod_comm
+!
       type(belonged_table), intent(inout) :: belongs
+      type(communication_table), intent(inout) :: edge_comm
 !
       character(len=kchara), parameter :: txt = 'edge'
 !
 !
-      call set_edge_id_4_node_type                                      &
-     &   (mesh, edge_mesh%edge, belongs%blng_edge)
-      call belonged_edge_id_4_node                                      &
-     &   (mesh, edge_mesh%edge, belongs%host_edge)
-      call const_ele_comm_table_type                                    &
-     &   (txt, edge_mesh%edge%numedge, edge_mesh%edge%interior_edge,    &
-     &    edge_mesh%edge%x_edge, mesh%node, mesh%nod_comm,              &
-     &    belongs%blng_edge, belongs%host_edge, edge_mesh%edge_comm)
+      call set_edge_id_4_node(node, edge, belongs%blng_edge)
+      call belonged_edge_id_4_node(node, edge, belongs%host_edge)
+      call const_comm_table_by_connenct(txt, edge%numedge,              &
+     &    edge%interior_edge, edge%x_edge, node, nod_comm,              &
+     &    belongs%blng_edge, belongs%host_edge, edge_comm)
       call dealloc_iele_belonged(belongs%host_edge)
       call dealloc_iele_belonged(belongs%blng_edge)
 !
@@ -259,7 +281,7 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine const_ele_comm_table_type                              &
+      subroutine const_comm_table_by_connenct                           &
      &         (txt, numele, internal_flag, x_ele, node, nod_comm,      &
      &          neib_e, host, e_comm)
 !
@@ -321,7 +343,7 @@
 !
       call check_element_position(txt, numele, x_ele, e_comm)
 !
-      end subroutine const_ele_comm_table_type
+      end subroutine const_comm_table_by_connenct
 !
 !-----------------------------------------------------------------------
 !

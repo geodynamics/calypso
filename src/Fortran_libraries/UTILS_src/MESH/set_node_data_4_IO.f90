@@ -28,7 +28,7 @@
       subroutine copy_node_geometry_to_IO(node)
 !
       integer(kind = kint) :: inod
-      type(node_data), intent(inout) :: node
+      type(node_data), intent(in) :: node
 !
 !
       numnod_dummy =        node%numnod

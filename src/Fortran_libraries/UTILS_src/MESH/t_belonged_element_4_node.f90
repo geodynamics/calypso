@@ -53,9 +53,10 @@
       type(belonged_table), intent(inout) :: belongs
 !
 !
-      call belonged_ele_id_4_node(mesh, belongs%host_ele)
-      call belonged_surf_id_4_node(mesh, surf, belongs%host_surf)
-      call belonged_edge_id_4_node(mesh, edge, belongs%host_edge)
+      call belonged_ele_id_4_node                                       &
+     &   (mesh%node, mesh%ele, belongs%host_ele)
+      call belonged_surf_id_4_node(mesh%node, surf, belongs%host_surf)
+      call belonged_edge_id_4_node(mesh%node, edge, belongs%host_edge)
 !
       end subroutine set_belonged_id_4_node
 !
@@ -75,30 +76,31 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine belonged_ele_id_4_node(mesh, host_ele)
+      subroutine belonged_ele_id_4_node(node, ele, host_ele)
 !
-      use t_mesh_data
+      use t_geometry_data
       use find_element_id_4_node
       use cal_minmax_and_stacks
 !
-      type(mesh_geometry), intent(in) :: mesh
+      type(node_data), intent(in) :: node
+      type(element_data), intent(in) :: ele
       type(element_around_node), intent(inout) :: host_ele
 !
 !
-      call alloc_numele_belonged(mesh%node%numnod, host_ele)
+      call alloc_numele_belonged(node%numnod, host_ele)
 !
-      call count_belonged_ele_4_node(mesh%node%numnod, mesh%ele%numele, &
-     &    mesh%ele%nnod_4_ele, mesh%ele%ie, ione, mesh%ele%numele,      &
+      call count_belonged_ele_4_node(node%numnod, ele%numele,           &
+     &    ele%nnod_4_ele, ele%ie, ione, ele%numele,                     &
      &    host_ele%nele_4_node)
-      call s_cal_minmax_and_stacks(mesh%node%numnod,                    &
+      call s_cal_minmax_and_stacks(node%numnod,                         &
      &    host_ele%nele_4_node, izero, host_ele%istack_4_node,          &
      &    host_ele%ntot, host_ele%nmax, host_ele%nmin)
 !
 !
       call alloc_iele_belonged(host_ele)
 !
-      call set_belonged_ele_4_node(mesh%node%numnod, mesh%ele%numele,   &
-     &    mesh%ele%nnod_4_ele, mesh%ele%ie,  ione, mesh%ele%numele,     &
+      call set_belonged_ele_4_node(node%numnod, ele%numele,             &
+     &    ele%nnod_4_ele, ele%ie,  ione, ele%numele,                    &
      &    host_ele%ntot, host_ele%istack_4_node, host_ele%nele_4_node,  &
      &    host_ele%iele_4_node, host_ele%iconn_4_node)
 !
@@ -106,31 +108,31 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine belonged_surf_id_4_node(mesh, surf, host_surf)
+      subroutine belonged_surf_id_4_node(node, surf, host_surf)
 !
-      use t_mesh_data
+      use t_geometry_data
       use t_surface_data
       use find_element_id_4_node
       use cal_minmax_and_stacks
 !
-      type(mesh_geometry), intent(in) :: mesh
+      type(node_data), intent(in) ::    node
       type(surface_data), intent(in) :: surf
       type(element_around_node), intent(inout) :: host_surf
 !
 !
-      call alloc_numele_belonged(mesh%node%numnod, host_surf)
+      call alloc_numele_belonged(node%numnod, host_surf)
 !
-      call count_belonged_ele_4_node(mesh%node%numnod, surf%numsurf,    &
+      call count_belonged_ele_4_node(node%numnod, surf%numsurf,         &
      &    surf%nnod_4_surf, surf%ie_surf, ione, surf%numsurf,           &
      &    host_surf%nele_4_node)
-      call s_cal_minmax_and_stacks(mesh%node%numnod,                    &
+      call s_cal_minmax_and_stacks(node%numnod,                         &
      &    host_surf%nele_4_node, izero, host_surf%istack_4_node,        &
      &    host_surf%ntot, host_surf%nmax, host_surf%nmin)
 !
 !
       call alloc_iele_belonged(host_surf)
 !
-      call set_belonged_ele_4_node(mesh%node%numnod, surf%numsurf,      &
+      call set_belonged_ele_4_node(node%numnod, surf%numsurf,           &
      &    surf%nnod_4_surf, surf%ie_surf,  ione, surf%numsurf,          &
      &    host_surf%ntot, host_surf%istack_4_node,                      &
      &    host_surf%nele_4_node, host_surf%iele_4_node,                 &
@@ -140,31 +142,31 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine belonged_edge_id_4_node(mesh, edge, host_edge)
+      subroutine belonged_edge_id_4_node(node, edge, host_edge)
 !
-      use t_mesh_data
+      use t_geometry_data
       use t_edge_data
       use find_element_id_4_node
       use cal_minmax_and_stacks
 !
-      type(mesh_geometry), intent(in) :: mesh
-      type(edge_data), intent(in) :: edge
+      type(node_data), intent(in) ::    node
+      type(edge_data), intent(in) ::    edge
       type(element_around_node), intent(inout) :: host_edge
 !
 !
-      call alloc_numele_belonged(mesh%node%numnod, host_edge)
+      call alloc_numele_belonged(node%numnod, host_edge)
 !
-      call count_belonged_ele_4_node(mesh%node%numnod, edge%numedge,    &
+      call count_belonged_ele_4_node(node%numnod, edge%numedge,         &
      &    edge%nnod_4_edge, edge%ie_edge, ione, edge%numedge,           &
      &    host_edge%nele_4_node)
-      call s_cal_minmax_and_stacks(mesh%node%numnod,                    &
+      call s_cal_minmax_and_stacks(node%numnod,                         &
      &    host_edge%nele_4_node, izero, host_edge%istack_4_node,        &
      &    host_edge%ntot, host_edge%nmax, host_edge%nmin)
 !
 !
       call alloc_iele_belonged(host_edge)
 !
-      call set_belonged_ele_4_node(mesh%node%numnod, edge%numedge,      &
+      call set_belonged_ele_4_node(node%numnod, edge%numedge,           &
      &    edge%nnod_4_edge, edge%ie_edge,  ione, edge%numedge,          &
      &    host_edge%ntot, host_edge%istack_4_node,                      &
      &    host_edge%nele_4_node, host_edge%iele_4_node,                 &

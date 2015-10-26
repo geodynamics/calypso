@@ -17,8 +17,8 @@
 !!        type(group_data), intent(in) :: ele_grp
 !!
 !!      subroutine isosurface_main(istep_iso,                           &
-!!     &          numnod, internal_node, numele, numedge, nnod_4_ele,   &
-!!     &          nnod_4_edge, ie, ie_edge, iedge_4_ele,                &
+!!     &          numnod, numele, numedge, nnod_4_ele,                  &
+!!     &          nnod_4_edge, ie, ie_edge, interior_edge, iedge_4_ele, &
 !!     &          xx, radius, a_radius, s_cylinder, a_s_cylinder,       &
 !!     &          inod_smp_stack, edge_comm, num_nod_phys,              &
 !!     &          num_tot_nod_phys, istack_nod_component, d_nod)
@@ -131,8 +131,8 @@
 !  ---------------------------------------------------------------------
 !
       subroutine isosurface_main(istep_iso,                             &
-     &          numnod, internal_node, numele, numedge, nnod_4_ele,     &
-     &          nnod_4_edge, ie, ie_edge, iedge_4_ele,                  &
+     &          numnod, numele, numedge, nnod_4_ele,                    &
+     &          nnod_4_edge, ie, ie_edge, interior_edge, iedge_4_ele,   &
      &          xx, radius, a_radius, s_cylinder, a_s_cylinder,         &
      &          inod_smp_stack, edge_comm, num_nod_phys,                &
      &          num_tot_nod_phys, istack_nod_component, d_nod)
@@ -149,11 +149,11 @@
 !
       integer(kind = kint), intent(in) :: istep_iso
 !
-      integer(kind=kint), intent(in) :: numnod, internal_node
-      integer(kind=kint), intent(in) :: numele, numedge
+      integer(kind=kint), intent(in) :: numnod, numele, numedge
       integer(kind=kint), intent(in) :: nnod_4_ele, nnod_4_edge
       integer(kind=kint), intent(in) :: ie(numele,nnod_4_ele)
       integer(kind=kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
+      integer(kind=kint), intent(in) :: interior_edge(numedge)
       integer(kind=kint), intent(in) :: iedge_4_ele(numele,nedge_4_ele)
 !
       real(kind = kreal), intent(in) :: xx(numnod,3)
@@ -183,9 +183,9 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'set_node_and_patch_iso'
       call set_node_and_patch_iso                                       &
-     &   (num_iso, numnod, internal_node, numele, numedge, nnod_4_ele,  &
-     &    nnod_4_edge, xx, ie, ie_edge, iedge_4_ele, edge_comm,         &
-     &    iso_search, iso_list, iso_mesh)
+     &   (num_iso, numnod, numele, numedge, nnod_4_ele,                 &
+     &    nnod_4_edge, xx, ie, ie_edge, interior_edge, iedge_4_ele,     &
+     &    edge_comm, iso_search, iso_list, iso_mesh)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_field_4_iso'
       call alloc_psf_field_data(num_iso, iso_mesh)

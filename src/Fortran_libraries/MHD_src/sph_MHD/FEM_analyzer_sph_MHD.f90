@@ -43,6 +43,7 @@
 !
       subroutine FEM_initialize_sph_MHD
 !
+      use m_nod_comm_table
       use m_geometry_data
       use m_group_data
       use m_array_for_send_recv
@@ -53,7 +54,7 @@
       use m_ele_sf_eg_comm_tables
 !
       use const_mesh_info
-      use nodal_vector_send_recv
+      use nod_phys_send_recv
       use output_ucd_file_control
       use range_data_IO
       use node_monitor_IO
@@ -68,7 +69,7 @@
       call allocate_vector_for_solver(isix, node1%numnod)
 !
       if(iflag_debug.gt.0) write(*,*)' init_send_recv'
-      call init_send_recv
+      call init_send_recv(nod_comm)
 !
 !  -----    construct geometry informations
 !
@@ -137,6 +138,7 @@
 !
       subroutine SPH_to_FEM_bridge_MHD
 !
+      use m_nod_comm_table
       use m_geometry_data
       use m_node_phys_data
 !
@@ -172,7 +174,7 @@
       call lead_pole_fields_4_sph_mhd
 !
       if (iflag_debug.gt.0) write(*,*) 'phys_send_recv_all'
-      call phys_send_recv_all
+      call nod_fields_send_recv(node1, nod_comm, nod_fld1)
 !
       end subroutine SPH_to_FEM_bridge_MHD
 !

@@ -47,12 +47,14 @@
 !
       subroutine output_grd_file_4_snapshot
 !
+      use m_geometry_data
+      use m_nod_comm_table
       use m_t_step_parameter
       use output_parallel_ucd_file
 !
 !
       if(i_step_output_ucd .eq. 0) return
-      call output_grd_file
+      call output_grd_file(node1, ele1, nod_comm)
 !
       end subroutine output_grd_file_4_snapshot
 !

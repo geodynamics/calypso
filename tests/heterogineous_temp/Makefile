@@ -31,6 +31,6 @@ test:
 	$(BUILDDIR)/sph_ene_check
 
 clean:
-	rm -r *.dat rst_2/rst.*  sph_lm4r64c_2/in.*
+	rm -f *.dat rst_2/rst.*  sph_lm4r64c_2/in.*
 
 distclean: clean

@@ -21,7 +21,8 @@
 !!     &         (textbuf, nprocs, istack_nod)
 !!      subroutine read_field_comp_buffer                               &
 !!     &         (textbuf, num_field, ncomp_field)
-!!      subroutine read_each_field_name_buffer(textbuf, field_name)
+!!      integer(kind = kint) function read_each_field_name_buffer       &
+!!     &                            (textbuf, field_name)
 !!      subroutine read_each_field_data_buffer(textbuf ncomp, vect)
 !!
 !!      subroutine write_field_data(id_file, nnod, num_field, ntot_comp,&
@@ -227,15 +228,23 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine read_each_field_name_buffer(textbuf, field_name)
+      integer(kind = kint) function read_each_field_name_buffer         &
+     &                            (textbuf, field_name)
 !
       character(len=kchara), intent(in) :: textbuf
       character(len=kchara), intent(inout) :: field_name
 !
+      integer(kind = kint) :: i
 !
-      read(textbuf,*) field_name
+      field_name = ''
+      do i = 1, kchara
+        if(iachar(textbuf(i:i)) .eq. 10                                 &
+     &    .or. iachar(textbuf(i:i)) .eq. 0) exit 
+        field_name(i:i) = textbuf(i:i)
+      end do
+      read_each_field_name_buffer = i - 1
 !
-      end subroutine read_each_field_name_buffer
+      end function read_each_field_name_buffer
 !
 ! -------------------------------------------------------------------
 !

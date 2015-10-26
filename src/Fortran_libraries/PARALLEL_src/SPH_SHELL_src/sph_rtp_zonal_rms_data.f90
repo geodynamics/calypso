@@ -7,9 +7,11 @@
 !>@brief Get zonal mean and RMS fields in spherical grid
 !!
 !!@verbatim
-!!      subroutine zonal_mean_all_rtp_field
-!!      subroutine zonal_rms_all_rtp_field
-!!      subroutine zonal_cyl_rms_all_rtp_field
+!!      subroutine zonal_mean_all_rtp_field(node, nod_fld)
+!!      subroutine zonal_rms_all_rtp_field(node, nod_fld)
+!!      subroutine zonal_cyl_rms_all_rtp_field(node, nod_fld)
+!!        type(node_data), intent(inout) :: node
+!!        type(phys_data),intent(inout) :: nod_fld
 !!
 !!      subroutine cal_sph_zonal_rms_data(numdir, irtp_fld)
 !!      subroutine cal_sph_zonal_ave_data(numdir, irtp_fld)
@@ -34,48 +36,57 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine zonal_mean_all_rtp_field
+      subroutine zonal_mean_all_rtp_field(node, nod_fld)
 !
-      use m_geometry_data
-      use m_node_phys_data
+      use t_geometry_data
+      use t_phys_data
       use coordinate_convert_4_sph
+!
+      type(node_data), intent(inout) :: node
+      type(phys_data),intent(inout) :: nod_fld
 !
 !
       call cal_sph_zonal_ave_data                                       &
-     &   (node1%numnod, nod_fld1%ntot_phys, ione, nod_fld1%d_fld)
-      call overwrite_nodal_sph_2_xyz(node1, nod_fld1)
+     &   (node%numnod, nod_fld%ntot_phys, ione, nod_fld%d_fld)
+      call overwrite_nodal_sph_2_xyz(node, nod_fld)
 !
       end subroutine zonal_mean_all_rtp_field
 !
 ! -------------------------------------------------------------------
 !
-      subroutine zonal_rms_all_rtp_field
+      subroutine zonal_rms_all_rtp_field(node, nod_fld)
 !
-      use m_geometry_data
-      use m_node_phys_data
+      use t_geometry_data
+      use t_phys_data
       use coordinate_convert_4_sph
+!
+      type(node_data), intent(inout) :: node
+      type(phys_data),intent(inout) :: nod_fld
 !
 !
       call cal_sph_zonal_rms_data                                       &
-     &   (node1%numnod, nod_fld1%ntot_phys, ione, nod_fld1%d_fld)
-      call overwrite_nodal_sph_2_xyz(node1, nod_fld1)
+     &   (node%numnod, nod_fld%ntot_phys, ione, nod_fld%d_fld)
+      call overwrite_nodal_sph_2_xyz(node, nod_fld)
 !
       end subroutine zonal_rms_all_rtp_field
 !
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
-      subroutine zonal_cyl_rms_all_rtp_field
+      subroutine zonal_cyl_rms_all_rtp_field(node, nod_fld)
 !
-      use m_geometry_data
-      use m_node_phys_data
+      use t_geometry_data
+      use t_phys_data
       use coordinate_convert_4_sph
 !
+      type(node_data), intent(inout) :: node
+      type(phys_data),intent(inout) :: nod_fld
 !
-      call overwrite_nodal_sph_2_cyl(node1, nod_fld1)
+!
+      call overwrite_nodal_sph_2_cyl(node, nod_fld)
       call cal_sph_zonal_rms_data                                       &
-     &   (node1%numnod, nod_fld1%ntot_phys, ione, nod_fld1%d_fld)
-      call overwrite_nodal_cyl_2_xyz(node1, nod_fld1)
+     &   (node%numnod, nod_fld%ntot_phys, ione, nod_fld%d_fld)
+      call overwrite_nodal_cyl_2_xyz(node, nod_fld)
 !
       end subroutine zonal_cyl_rms_all_rtp_field
 !

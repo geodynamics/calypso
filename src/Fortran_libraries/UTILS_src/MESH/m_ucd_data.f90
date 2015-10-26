@@ -8,9 +8,6 @@
 !!
 !!@verbatim
 !!      subroutine set_control_ucd_file_def
-!!      subroutine set_ucd_file_prefix(file_prefix)
-!!      subroutine set_ucd_file_format(ifile_format)
-!!
 !!      subroutine link_nnod_stacks_2_ucd_out(nprocs)
 !!@endverbatim
 !
@@ -43,26 +40,6 @@
       call set_ucd_file_define(fem_ucd)
 !
       end subroutine set_control_ucd_file_def
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_ucd_file_prefix(file_prefix)
-!
-      character(len=kchara), intent(in) :: file_prefix
-!
-      fem_ucd%file_prefix = file_prefix
-!
-      end subroutine set_ucd_file_prefix
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_ucd_file_format(ifile_format)
-!
-      integer(kind = kint), intent(in) :: ifile_format
-!
-      fem_ucd%ifmt_file = ifile_format
-!
-      end subroutine set_ucd_file_format
 !
 ! -----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -179,8 +156,8 @@
      &    nod_fld1%ntot_phys_viz, nod_fld1%num_component,               &
      &    nod_fld1%phys_name, nod_fld1%d_fld, local_ucd)
 !
-      call set_ucd_file_format(ifile_format)
-      call set_ucd_file_prefix(ucd_prefix)
+      call set_ucd_file_format(ifile_format, fem_ucd)
+      call set_ucd_file_prefix(ucd_prefix, fem_ucd)
       call sel_write_udt_file(my_rank, istep_ucd, local_ucd)
       call disconnect_ucd_data(local_ucd)
 !

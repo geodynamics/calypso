@@ -322,11 +322,11 @@
         ilength = len(textbuf_c)
         call calypso_mpi_seek_read_lenchara                             &
      &     (id_fld, ioffset, ilength, textbuf_c)
-        call read_each_field_name_buffer(textbuf_c, field_name)
+        ilength = read_each_field_name_buffer(textbuf_c, field_name)
       end if
 !
       call sync_field_name_mpi(field_name)
-      ioff_gl = ioff_gl + len_trim(field_name) + 1
+      ioff_gl = ioff_gl + ilength + 1
 !
       end subroutine read_field_name_mpi
 !
