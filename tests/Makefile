@@ -20,17 +20,41 @@ MPICHBINDIR = $(MPICHDIR)/bin
 MPICHINCDIR = 
 MPILIBS =      
 #
+#
+#  -------------------------------------------------------------------------
+#
+SUBDIRS = \
+Dynamobench_case1 \
+Dynamobench_case2 \
+heterogineous_temp
+
+#
+#  -------------------------------------------------------------------------
+#
+
 
 all: test
 
 test: 
-	rm -f *.dat
-	$(MPIRUN) -np 4 $(BUILDDIR)/gen_sph_grids
-	$(MPIRUN) -np 4 $(BUILDDIR)/sph_mhd
-	echo 'Compare with reference mean square data'
-	diff sph_pwr_volume.dat reference/sph_pwr_volume.dat
+	for dir in $(SUBDIRS) ; do \
+	echo "# Test in $${dir} directory..."; \
+		( cd $${dir}; \
+		$(GMAKE) \
+		GMAKE="$(GMAKE)" \
+		BUILDDIR="$(BUILDDIR)" \
+		TESTDIR="$(TESTDIR)" \
+		MHDDIR="$(MHDDIR)" \
+		MPIRUN="$(MPIRUN)" \
+		test)\
+	done; \
+	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 
 clean:
-	rm -r *.dat rst_4/*  sph_lm31r48c_4/*
+	for dir in $(SUBDIRS) ; do \
+	echo "# cleaning $${dir} directory..."; \
+		( cd $${dir}; \
+		make clean )\
+	done; \
+	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 
 distclean: clean

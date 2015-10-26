@@ -1,0 +1,10 @@
+radial_layers, truncation
+               0               4
+ICB_id, CMB_id
+               1              65
+number of components
+               2               2
+    1    1
+t_step    time    temperature    composition    
+              50  5.00000000000000E-003  1.24633611598717E-002  7.07296547178564E-002
+             100  1.00000000000000E-002  1.82576213418588E-002  1.00255167268881E-001
