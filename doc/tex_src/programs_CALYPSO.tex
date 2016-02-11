@@ -12,7 +12,7 @@
 This program generates index table and a communication table for parallel spherical harmonics, table of integrals for Coriolis term, and FEM mesh information to generate visualization data (see Figure \ref{fig:gen_sph_grid}). This program needs control file for input. This program can perform with {\bf any} number of MPI processes less than the number of subdomains. The output files include the indexing tables. 
 
 %
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of files for {\tt gen\_sph\_grid} }
 \begin{center} 
 \begin{tabular}{|c|c|c|}
@@ -169,7 +169,7 @@ The name of the simulation program is {\tt sph\_mhd}. This program requires {\tt
 %
 Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing data for spherical harmonics which starting with \verb|[sph_prefix]| are obtained by the preprocessing program \verb|gen_sph_grid|. The boundary condition data file \verb|[boundary_data_name]| is optionally required if boundary conditions for temperature and composition are not homogenious.
 %
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of files for simulation {\tt sph\_mhd} }
 \begin{center} 
 \begin{tabular}{|c|c|c|}
@@ -195,6 +195,8 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 \verb|[picked_sph_prefix].dat| & Single & Output   \\ \hline
 \verb|[nusselt_number_prefix].dat| & Single & Output   \\ \hline
 \verb|[fld_prefix].[step#].[domain#].[extension]| &  - & Output  \\ \hline
+\verb|[section_prefix].[step#].[extension]| &  Single & Output  \\
+\verb|[isosurface_prefix].[step#].[extension]| &  Single & Output  \\ \hline
 \end{tabular}
 \end{center}
 \label{table:sph_mhd}
@@ -548,7 +550,7 @@ CMB
  Field data is used for the visualization processes.  Field data are written with XDMF format (\url{http://www.xdmf.org/index.php/Main_Page}), merged VTK, or distributed VTK format (\url{http://www.vtk.org/VTK/img/file-formats.pdf}). The output data format is defined by \verb|fld_format|. Visualization applications which we checked are listed in Table \ref{table:Viz_app}. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, coordinate conversion is required to plot vector field in spherical coordinate $(r, \theta, \phi)$ or cylindrical coordinate $(s,\phi, z)$. We will introduce a example of visualization process using ParaView in Section \ref{sec:paraview}.
 %
 %
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{Checked visualization application}
 \label{table:Viz_app}
 \begin{center} 
@@ -583,7 +585,7 @@ Distributed VTK data have the following advantage and disadvantages to use:
 %
 Distributed VTK data consist files listed in Table \ref{table:parallel_vtk}. For ParaView, all subdomain data is read by choosing \verb|[fld_prefix].[step#].pvtk| in file menu.
 %
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of written files for distributed VTK format}
 \begin{center} 
 \begin{tabular}{|c|c|}
@@ -616,7 +618,7 @@ Merged VTK data have the following advantage and disadvantages to use:
 %
 Merged VTK data generate files listed in Table \ref{table:Merged_vtk}. 
 %
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of written files for merged VTK format}
 \begin{center} 
 \begin{tabular}{|c|c|}
@@ -647,7 +649,7 @@ Merged XDMF data have the following advantage and disadvantages to use:
 %
 Merged XDMF data generate files listed in Table \ref{table:XDMF}. For ParaView, all subdomain data is read by choosing \verb|[fld_prefix].solution.xdmf| in file menu.
 %
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of written files for XDMF format}
 \begin{center} 
 \begin{tabular}{|c|c|}
@@ -897,7 +899,7 @@ If the Nusselt number data file exist before starting the simulation, programs a
 %
 Simulation program outputs spectrum data as a whole field data. This program generates field data from spectrum data for visualization. This program also can pick Gauss coefficients, mean square data over sphere or each surface from spectrum data as the simulation program.
 
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of files for simulation {\tt sph\_snap} and {\tt sph\_zm\_snap} }
 \begin{center} 
 \begin{tabular}{|c|c|c|}
@@ -949,7 +951,7 @@ The same files as the simulation program are read in this program, and field dat
  \verb|const_sph_initial_spectr.f90| is saved in \verb|src/programs/data_utilities| \\
  \verb|/INITIAL_FIELD/| directory,  and please compile again after modifying this module. This program also needs the files listed in Table \ref{table:inital_fld}.
 %
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of files for simulation {\tt sph\_initial\_field} }
 \begin{center} 
 \begin{tabular}{|c|c|c|}
@@ -985,7 +987,7 @@ This program generates the spectrum data files \verb|[rst_prefix].0.[domain#].fs
 
  This program modifies or adds new data to an initial field file. It could be used to start a new geodynamo simulation by adding seed magnetic field or source terms to a non-magnetic convection simulation. The initial fields to be added are also defined in \verb|const_sph_initial_spectr.f90|. \verb|data_utilities/INITIAL_FIELD/| directory. This program also needs the files listed in Table \ref{table:add_inital_fld}.
 %
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of files for simulation {\tt sph\_add\_initial\_field} }
 \begin{center} 
 \begin{tabular}{|c|c|c|}
@@ -1011,7 +1013,7 @@ To read the original initial field data, \hyperref[href_t:restart_file_ctl]{{\tt
 ({\tt sph\_dynamobench})}
 This program is only used to check solution for dynamo benchmark by Christensen {\it et. al}. The following files are used for this program.
 
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of files for dynamo benchmark check {\tt sph\_dynamobench} }
 \begin{center} 
 \begin{tabular}{|c|c|c|}
@@ -1092,7 +1094,7 @@ phi_4    omega_vp44    omega_vt54    B_theta    v_phi    temp
 %
 Calypso uses distributed data files for simulations. This program is to generate new spectrum data for restarting with different spatial resolution or parallel configuration. This program organizes new spectral data by using specter indexing data using different domain decomposition. The following files used for data IO. If radial resolution is changed from the original data, the program makes new spectrum data by linear interpolation. If new data have smaller or larger truncation degree, the program fills zero to the new spectrum data or truncates the data to fit the new spatial resolution, respectively. This program can perform with {\bf any} number of MPI processes. Data files for the program are shown In Table \ref{table:assemble_newsph}, and definition of \verb|control_assemble_sph| is 
 %
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of files for {\tt assemble\_sph} }
 \begin{center} 
 \begin{tabular}{|c|c|c|}
@@ -1173,7 +1175,7 @@ This program is only used to generate Makefile in {\tt work} directory. Most of 
 \section{Time averaging programs ({\tt t\_ave\_picked\_sph\_coefs}, {\tt t\_ave\_sph\_mean\_square}, and {\tt t\_ave\_nusselt})}
 These small programs are used to evaluate time average and standard deviation of the time sequencial data.
 %
-\begin{table}[htdp]
+\begin{table}[htp]
 \caption{List of programs to take time average}
 \begin{center} 
 \begin{tabular}{|c|c|}
