@@ -52,9 +52,6 @@
       call set_sph_bc_scalar_sph(fhd_temp, fhd_h_flux,                  &
      &    temp_nod, h_flux_surf, sph_bc_T)
 !
-      sph_bc_T%ICB_flux(1:nidx_rj(2))                                   &
-     &      = -sph_bc_T%ICB_flux(1:nidx_rj(2))
-!
       if(iflag_debug .gt. 0) then
         do i = 1, nidx_rj(2)
           if( sph_bc_T%ICB_fld(i) .ne. 0.0d0) write(*,*)                &
