@@ -350,6 +350,8 @@
       end do
 !$omp end do
 !
+      if(inod_rj_center .gt. 0) d_rj(inod_rj_center,ipol_scalar) = zero
+!
       end subroutine scalar_stable_diffusion
 !
 ! ----------------------------------------------------------------------

@@ -81,6 +81,12 @@
       end do
 !$omp end parallel do
 !
+      if(inod_rj_center .eq. 0) return
+      if(idx_rj_degree_zero .eq. 0) return
+      if(kr_bc_st .ne. ione) return
+!
+      d_rj(inod_rj_center,is_fld) = fixed_bc(idx_rj_degree_zero)
+!
       end subroutine set_fixed_scalar_sph
 !
 ! -----------------------------------------------------------------------

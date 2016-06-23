@@ -261,6 +261,10 @@
      &    ncomp_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                   &
      &    bs_trns%i_c_diffuse)
 !
+      call add_scalar_trans_flag(ipol%i_h_advect, iphys%i_h_advect,     &
+     &    ncomp_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                   &
+     &    bs_trns%i_h_advect)
+!
       call add_scalar_trans_flag(ipol%i_div_Coriolis,                   &
      &    iphys%i_div_Coriolis, ncomp_snap_rj_2_rtp,                    &
      &    nscalar_snap_rj_2_rtp, bs_trns%i_div_Coriolis)
