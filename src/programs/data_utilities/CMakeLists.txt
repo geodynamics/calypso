@@ -18,3 +18,6 @@ SET(MOD_SPH_INITIAL INITIAL_FIELD/main_sph_initial_fld.f90 INITIAL_FIELD/SPH_ana
 ADD_EXECUTABLE(sph_initial_field ${MOD_SPH_INITIAL})
 TARGET_LINK_LIBRARIES(sph_initial_field calypso fftpack.5d)
 
+SET(SPH_ENE_CHECK_SRC_FILES TIME_HISTORIES/compare_sph_mean_square.f90)
+ADD_EXECUTABLE(sph_ene_check ${SPH_ENE_CHECK_SRC_FILES})
+TARGET_LINK_LIBRARIES(sph_ene_check calypso fftpack.5d)
