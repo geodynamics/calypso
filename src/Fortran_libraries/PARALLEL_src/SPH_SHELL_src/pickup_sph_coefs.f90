@@ -52,20 +52,20 @@
         end do
       end if
 !
+      call allocate_iflag_pick_sph(l_truncation)
+!
       call count_sph_labels_4_monitor
       call count_picked_sph_adrress                                     &
      &   (num_pick_sph, num_pick_sph_l, num_pick_sph_m,                 &
      &    idx_pick_sph_mode, idx_pick_sph_l, idx_pick_sph_m,            &
-     &    ntot_pick_sph_mode)
+     &    num_pick_sph_mode)
 !
       call allocate_pick_sph_monitor
-      call allocate_iflag_pick_sph(l_truncation)
 !
       call set_picked_sph_address                                       &
      &   (num_pick_sph, num_pick_sph_l, num_pick_sph_m,                 &
      &    idx_pick_sph_mode, idx_pick_sph_l, idx_pick_sph_m,            &
-     &    ntot_pick_sph_mode, num_pick_sph_mode, idx_pick_sph_gl(1,1),  &
-     &    idx_pick_sph_lc)
+     &    num_pick_sph_mode, idx_pick_sph_gl, idx_pick_sph_lc)
       call set_scale_4_vect_l0                                          &
      &   (num_pick_sph_mode, idx_pick_sph_gl(1,1), scale_for_zelo(1))
       call deallocate_iflag_pick_sph

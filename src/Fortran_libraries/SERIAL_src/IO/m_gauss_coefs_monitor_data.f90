@@ -54,8 +54,6 @@
 !>      Order ID of Gauss coefficients to be evaluated
       integer(kind = kint), allocatable :: idx_pick_gauss_m(:)
 !
-!>      Total number of modes of Gauss coefficients to be evaluated
-      integer(kind = kint) :: ntot_pick_gauss_mode
 !>      Number of modes of Gauss coefficients to be evaluated
       integer(kind = kint) :: num_pick_gauss_mode
 !>      Global spherical harmonics ID to evaluate Gauss coefficients
@@ -110,13 +108,13 @@
       subroutine allocate_gauss_coef_monitor
 !
 !
-      allocate( idx_pick_gauss_coef_gl(ntot_pick_gauss_mode,3) )
-      allocate( idx_pick_gauss_coef_lc(ntot_pick_gauss_mode) )
-      allocate( gauss_coef_lc(ntot_pick_gauss_mode) )
-      allocate( gauss_coef_gl(ntot_pick_gauss_mode) )
-      allocate( gauss_mode_name(ntot_pick_gauss_mode) )
+      allocate( idx_pick_gauss_coef_gl(num_pick_gauss_mode,3) )
+      allocate( idx_pick_gauss_coef_lc(num_pick_gauss_mode) )
+      allocate( gauss_coef_lc(num_pick_gauss_mode) )
+      allocate( gauss_coef_gl(num_pick_gauss_mode) )
+      allocate( gauss_mode_name(num_pick_gauss_mode) )
 !
-      if(ntot_pick_gauss_mode .gt. 0) then
+      if(num_pick_gauss_mode .gt. 0) then
         idx_pick_gauss_coef_gl = -1
         idx_pick_gauss_coef_lc =  0
         gauss_coef_lc = 0.0d0
@@ -230,7 +228,6 @@
       call skip_comment(tmpchara,id_pick)
       read(id_pick,*) num_pick_gauss_mode
 !
-      ntot_pick_gauss_mode = num_pick_gauss_mode
       call allocate_gauss_coef_monitor
 !
       read(id_pick,*) (tmpchara,i=1,2),                                 &

@@ -61,8 +61,6 @@
 !>      Radius for monitoring spectrum
       real(kind = kreal), allocatable :: r_pick_layer(:)
 !
-!>      Total number of modes of  monitoring spectrum to be evaluated
-      integer(kind = kint) :: ntot_pick_sph_mode = 0
 !>      Number of modes of  monitoring spectrum to be evaluated
       integer(kind = kint) :: num_pick_sph_mode =  0
 !>      Global spherical harmonics ID to evaluate  monitoring spectrum
@@ -144,11 +142,11 @@
       integer(kind = kint) :: num
 !
 !
-      num = ntot_pick_sph_mode*num_pick_layer
+      num = num_pick_sph_mode*num_pick_layer
 !
-      allocate( idx_pick_sph_gl(ntot_pick_sph_mode,3) )
-      allocate( idx_pick_sph_lc(ntot_pick_sph_mode) )
-      allocate( scale_for_zelo(ntot_pick_sph_mode) )
+      allocate( idx_pick_sph_gl(num_pick_sph_mode,3) )
+      allocate( idx_pick_sph_lc(num_pick_sph_mode) )
+      allocate( scale_for_zelo(num_pick_sph_mode) )
       allocate( d_rj_pick_sph_lc(ntot_comp_pick_sph,num) )
       allocate( d_rj_pick_sph_gl(ntot_comp_pick_sph,num) )
       allocate( pick_sph_spec_name(ntot_comp_pick_sph) )
@@ -297,7 +295,6 @@
       call skip_comment(tmpchara,id_pick)
       read(tmpchara,*) ntot_comp_pick_sph
 !
-      ntot_pick_sph_mode = num_pick_sph_mode
       call allocate_num_pick_layer
       call allocate_pick_sph_monitor
 !

@@ -37,7 +37,7 @@
 !
       call open_sph_spec_read_monitor(id_pick)
 !
-      num = ntot_pick_sph_mode*num_pick_layer
+      num = num_pick_sph_mode*num_pick_layer
       allocate( prev_spec(ntot_comp_pick_sph,num) )
       allocate( ave_spec(ntot_comp_pick_sph,num) )
       allocate( sdev_spec(ntot_comp_pick_sph,num) )
