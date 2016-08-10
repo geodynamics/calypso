@@ -7,19 +7,8 @@ begin spherical_shell_ctl
   end data_files_def
 !
   begin num_domain_ctl
-    array num_domain_sph_grid  2
-      num_domain_sph_grid   radial         2     end
-      num_domain_sph_grid   meridional     2     end
-    end array num_domain_sph_grid
-!
-    array num_domain_legendre   2
-      num_domain_legendre   radial         2     end
-      num_domain_legendre   zonal          2     end
-    end array num_domain_legendre
-!
-    array num_domain_spectr     1
-      num_domain_spectr      modes         4    end
-    end array num_domain_spectr
+    num_radial_domain_ctl         2
+    num_horizontal_domain_ctl     2
   end num_domain_ctl
 !
   begin num_grid_sph

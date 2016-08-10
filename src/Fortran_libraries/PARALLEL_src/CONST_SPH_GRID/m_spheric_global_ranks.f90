@@ -1,16 +1,22 @@
+!>@file   m_spheric_global_ranks.f90
+!!@brief  module m_spheric_global_ranks
+!!
+!!@author H. Matsui
+!!@date   Programmed  H. Matsui in July, 2007
 !
-!      module m_spheric_global_ranks
-!
-!     Written by H. Matsui on July, 2007
-!
-!      subroutine allocate_sph_ranks
-!      subroutine allocate_sph_1d_domain_id
-!
-!      subroutine deallocate_sph_ranks
-!      subroutine deallocate_sph_1d_domain_id
-!
-!      subroutine check_sph_ranks(my_rank)
-!      subroutine check_sph_1d_domain_id
+!>@brief  Global subdomain informatikn for spherical shell
+!!
+!!@verbatim
+!!      subroutine allocate_sph_ranks
+!!      subroutine allocate_sph_1d_domain_id
+!!
+!!      subroutine deallocate_sph_ranks
+!!      subroutine deallocate_sph_1d_domain_id
+!!
+!!      subroutine check_sph_domains(nprocs, ierr, e_message)
+!!      subroutine check_sph_ranks(my_rank)
+!!      subroutine check_sph_1d_domain_id
+!!@endverbatim
 !
       module m_spheric_global_ranks
 !
@@ -112,6 +118,55 @@
       end subroutine deallocate_sph_1d_domain_id
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine check_sph_domains(nprocs, ierr, e_message)
+!
+      use m_error_IDs
+!
+      integer(kind = kint), intent(in) :: nprocs
+      integer(kind = kint), intent(inout) :: ierr
+      character(len = kchara), intent(inout) :: e_message
+      integer(kind = kint) :: np
+!
+!
+      ierr = 0
+      ndomain_sph = ndomain_rj(1)*ndomain_rj(2)
+      if (ndomain_sph .ne. nprocs) then
+        write(e_message,'(a)') 'check num of domain spectr file(r,j)'
+        ierr = ierr_mesh
+        return
+      end if
+!
+      np = ndomain_rtp(1)*ndomain_rtp(2)*ndomain_rtp(3)
+      if (ndomain_sph .ne. np) then
+        write(e_message,'(a)') 'check num of domain for (r,t,p)'
+        ierr = ierr_mesh
+        return
+      end if
+      np = ndomain_rtm(1)*ndomain_rtm(2)*ndomain_rtm(3)
+      if (ndomain_sph .ne. np) then
+        write(e_message,'(a)') 'check num of domain for (r,t,m)'
+        ierr = ierr_mesh
+        return
+      end if
+      np = ndomain_rlm(1)*ndomain_rlm(2)
+      if (ndomain_sph .ne. np) then
+        write(e_message,'(a)') 'check num of domain for (r,l,m)'
+        ierr = ierr_mesh
+        return
+      end if
+!
+      if(ndomain_rtm(1) .ne. ndomain_rtp(1)) then
+        write(e_message,'(a,a1,a)')                                     &
+     &            'Set same number of radial subdomains', char(10),     &
+     &            'for Legendre transform and spherical grids'
+        ierr = ierr_mesh
+        return
+      end if
+!
+      end subroutine check_sph_domains
+!
 ! -----------------------------------------------------------------------
 !
       subroutine check_sph_ranks(my_rank)

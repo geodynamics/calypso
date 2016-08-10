@@ -8,8 +8,8 @@
 !!
 !!@verbatim
 !!        igrid_Chebyshev =    2 :: Chebyshev collocation points
-!!        igrid_non_euqidist = 1 :: non-equi-distance
-!!        igrid_euqidistance = 0 :: equi-distance
+!!        igrid_non_equidist = 1 :: non-equi-distance
+!!        igrid_equidistance = 0 :: equi-distance
 !!
 !!       spherical mesh type  -1: none, 0: Gauss points only
 !!                             1: include poles
@@ -22,8 +22,8 @@
 !
       integer(kind = kint), parameter :: igrid_half_Chebyshev = 3
       integer(kind = kint), parameter :: igrid_Chebyshev =      2
-      integer(kind = kint), parameter :: igrid_non_euqidist =   1
-      integer(kind = kint), parameter :: igrid_euqidistance =   0
+      integer(kind = kint), parameter :: igrid_non_equidist =   1
+      integer(kind = kint), parameter :: igrid_equidistance =   0
 !
       integer(kind = kint), parameter :: iflag_no_FEMMESH =   -1
       integer(kind = kint), parameter :: iflag_MESH_same =     0

@@ -669,6 +669,17 @@ Number of grid points \verb|[Nphi_mid_equator]|in longitudinal direction to eval
 Parallelization is defined in this block. Domain decomposition is defined for spectrum data, field data, and Legendre transform. \\
 \hyperref[href_i:num_domain_ctl]{(Back to {\tt control\_sph\_shell})}
 
+\paragraph{\tt num\_radial\_domain\_ctl}
+\label{href_t:num_radial_domain_ctl}
+\verb|[Ndomain]| \\
+Number of subdomains in the radial direction for the spherical grid $(r, \theta, \phi)$ and spherical transforms $(r, \theta, m)$ and $(r, l, m)$.
+
+\paragraph{\tt num\_horiaontal\_domain\_ctl}
+\label{href_t:num_horizontal_domain_ctl} 
+\verb|[Ndomain]| \\
+Number of subdomains in the horizontal direction. The number will be the number of subdomains for the meridional directios for the spherical grid $(r, \theta, \phi)$ and Fourier transform $(r, \theta, m)$. For Legendre transform $(r, \theta, m)$ and $(r, l, m)$, the number will be the number of subdomains for the h.armonics ordedr $m$.
+
+
 \paragraph{\tt num\_domain\_sph\_grid}
 \label{href_t:num_domain_sph_grid} 
 \verb|[Direction]| \verb|[Ndomain]| \\

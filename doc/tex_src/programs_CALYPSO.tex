@@ -90,6 +90,10 @@ Control file ({\tt control\_sph\_shell}) consists the following items. Detailed 
 	\label{href_i:num_domain_ctl}
 	\hyperref[href_t:num_domain_ctl]{(Detail)}
 	\begin{itemize}
+    \item \verb|num_radial_domain_ctl [Ndomain]|
+        \hyperref[href_t:num_radial_domain_ctl]{(Detail)}
+    \item \verb|num_horizontal_domain_ctl [Ndomain]|
+        \hyperref[href_t:num_horizontal_domain_ctl]{(Detail)}
 	\item \verb|array  num_domain_sph_grid  [Direction]  [Ndomain]|
 		\hyperref[href_t:num_domain_sph_grid]{(Detail)}
 	\item \verb|array  num_domain_legendre  [Direction]  [Ndomain]|
@@ -133,6 +137,8 @@ Control file ({\tt control\_sph\_shell}) consists the following items. Detailed 
 		\hyperref[href_t:boundaries_ctl]{(Detail)}    
 	\end{itemize}
 \end{itemize}
+
+If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined, the following arrays \verb|num_domain_sph_grid|, \verb|num_domain_legendre|, and \verb|num_domain_spectr| are not necessary.
 
 \subsection{Spectrum index data}
 \verb|gen_sph_grid| generates indexing table of the spherical transform. To perform spherical harmonics transform with distributed memory computers, data communication table is also included in these files. Calypso needs four indexing data for the spherical transform.

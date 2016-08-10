@@ -270,9 +270,9 @@
       if      (diff_ch_max .lt. 1.0d-10) then
         iflag_rgrid = igrid_Chebyshev
       else if (diff_eq_max .lt. 1.0d-10) then
-        iflag_rgrid = igrid_euqidistance
+        iflag_rgrid = igrid_equidistance
       else
-        iflag_rgrid = igrid_non_euqidist
+        iflag_rgrid = igrid_non_equidist
       end if
 !
       deallocate( r_eq, r_ch )

@@ -52,8 +52,8 @@
           end do
         end if
 !
-        call count_picked_sph_adrress                                   &
-     &     (num_pick_gauss_coefs, num_pick_gauss_l, num_pick_gauss_m,   &
+        call count_picked_sph_adrress(l_truncation,                     &
+     &      num_pick_gauss_coefs, num_pick_gauss_l, num_pick_gauss_m,   &
      &      idx_pick_gauss_mode, idx_pick_gauss_l, idx_pick_gauss_m,    &
      &      num_pick_gauss_mode)
       else

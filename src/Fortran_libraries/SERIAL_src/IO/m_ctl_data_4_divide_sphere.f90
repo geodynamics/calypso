@@ -17,18 +17,21 @@
 !!    example of control data
 !!
 !!  begin num_domain_ctl
+!!    num_radial_domain_ctl         2
+!!    num_horizontal_domain_ctl     2
+!!
 !!    array  num_domain_sph_grid   2
 !!      num_domain_sph_grid    radial       2   end
-!!      num_domain_sph_grid   meridional    2   end
+!!      num_domain_sph_grid   meridional    3   end
 !!    end array num_domain_sph_grid
 !!
 !!    array num_domain_legendre   2
 !!      num_domain_legendre   radial        2   end
-!!      num_domain_legendre   zonal         2   end
+!!      num_domain_legendre   zonal         3   end
 !!    end array num_domain_legendre
 !!
 !!    array num_domain_spectr     1
-!!      num_domain_spectr     modes         4   end
+!!      num_domain_spectr     modes         6   end
 !!    end array num_domain_spectr
 !!  end num_domain_ctl
 !!
@@ -38,9 +41,19 @@
       module m_ctl_data_4_divide_sphere
 !
       use m_precision
+      use t_control_elements
       use t_read_control_arrays
 !
       implicit  none
+!
+!
+!
+!>      Number of subdomains in raidal direction for reduced definition
+      type(read_integer_item), save :: num_radial_domain_ctl
+!
+!>      Number of subdomains in horizontal directions
+!!@n    for reduced definition
+      type(read_integer_item), save :: num_horiz_domain_ctl
 !
 !
 !>      Structure for domain decompostion for spherical grid
@@ -63,6 +76,11 @@
       integer(kind = kint) :: i_domains_sph = 0
 !
 !   labels for subdomain define for spherical shell
+!
+      character(len=kchara), parameter                                  &
+     &      :: hd_num_radial_domain =  'num_radial_domain_ctl'
+      character(len=kchara), parameter                                  &
+     &      :: hd_num_horiz_domain =  'num_horizontal_domain_ctl'
 !
       character(len=kchara), parameter                                  &
      &      :: hd_ndomain_rtp =  'num_domain_sph_grid'
@@ -119,6 +137,10 @@
         call find_control_end_flag(hd_domains_sph, i_domains_sph)
         if(i_domains_sph .gt. 0) exit
 !
+      call read_integer_ctl_type                                        &
+     &   (hd_num_radial_domain, num_radial_domain_ctl)
+      call read_integer_ctl_type                                        &
+     &   (hd_num_horiz_domain, num_horiz_domain_ctl)
 !
         call read_control_array_c_i                                     &
      &     (hd_ndomain_rtp, ndomain_sph_grid_ctl)

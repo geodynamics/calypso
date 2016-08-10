@@ -73,8 +73,10 @@
       integer(kind = kint), intent(in) :: num_pick_sph_l
       integer(kind = kint), intent(in) :: num_pick_sph_m
       integer(kind = kint), intent(in) :: idx_pick_sph(num_pick_sph,2)
-      integer(kind = kint), intent(in) :: idx_pick_sph_l(num_pick_sph_l)
-      integer(kind = kint), intent(in) :: idx_pick_sph_m(num_pick_sph_m)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: idx_pick_sph_l(num_pick_sph_l)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: idx_pick_sph_m(num_pick_sph_m)
 !
       integer(kind = kint), intent(inout) :: num_pickup
 !
@@ -137,8 +139,10 @@
       integer(kind = kint), intent(in) :: num_pick_sph_l
       integer(kind = kint), intent(in) :: num_pick_sph_m
       integer(kind = kint), intent(in) :: idx_pick_sph(num_pick_sph,2)
-      integer(kind = kint), intent(in) :: idx_pick_sph_l(num_pick_sph_l)
-      integer(kind = kint), intent(in) :: idx_pick_sph_m(num_pick_sph_m)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: idx_pick_sph_l(num_pick_sph_l)
+      integer(kind = kint), intent(in)                                  &
+     &                     :: idx_pick_sph_m(num_pick_sph_m)
 !
       integer(kind = kint), intent(in) :: num_pickup
 !

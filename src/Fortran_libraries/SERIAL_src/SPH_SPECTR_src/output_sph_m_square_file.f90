@@ -182,14 +182,14 @@
       end if
 !
       if(iflag_spectr_m .gt. izero) then
-        write(fname_rms,'(a,a7)') trim(fhead_rms_vol), '_m.dat'
+        write(fname_rms,'(a,a6)') trim(fhead_rms_vol), '_m.dat'
         write(mode_label,'(a)') 'order'
         call write_sph_volume_spec_file(fname_rms, mode_label,          &
      &      istep, time, rms_sph_vol_m)
       end if
 !
       if(iflag_spectr_lm .gt. izero) then
-        write(fname_rms, '(a,a6)') trim(fhead_rms_vol), '_lm.dat'
+        write(fname_rms, '(a,a7)') trim(fhead_rms_vol), '_lm.dat'
         write(mode_label,'(a)') 'diff_deg_order'
         call write_sph_volume_spec_file(fname_rms, mode_label,          &
      &      istep, time, rms_sph_vol_lm)

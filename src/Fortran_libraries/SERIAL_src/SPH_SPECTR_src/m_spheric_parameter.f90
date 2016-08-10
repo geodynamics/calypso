@@ -67,9 +67,9 @@
       integer (kind=kint) :: iflag_rj_center =  0
 !>      radial grid type flag
 !!@n    igrid_Chebyshev =    2 :: Chebyshev collocation points
-!!@n    igrid_non_euqidist = 1 :: non-equi-distance
-!!@n    igrid_euqidistance = 0 :: equi-distance
-      integer (kind=kint) :: iflag_radial_grid = igrid_non_euqidist
+!!@n    igrid_non_equidist = 1 :: non-equi-distance
+!!@n    igrid_equidistance = 0 :: equi-distance
+      integer (kind=kint) :: iflag_radial_grid = igrid_non_equidist
 !
 !>      local spectr index for @f$ l = m = 0 @f$ at center
 !!@n    if center does not exist in subdomain, inod_rj_center = 0.

@@ -7,7 +7,7 @@
 !>@brief  Set control data for domain decomposition for spherical transform
 !!
 !!@verbatim
-!!      subroutine s_set_control_4_gen_shell_grids
+!!      subroutine s_set_control_4_gen_shell_grids(ierr)
 !!@endverbatim
 !
       module set_ctl_gen_shell_grids
@@ -22,7 +22,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine s_set_control_4_gen_shell_grids
+      subroutine s_set_control_4_gen_shell_grids(ierr)
 !
       use m_constants
       use m_machine_parameter
@@ -32,6 +32,7 @@
       use m_spheric_global_ranks
       use m_sph_1d_global_index
       use m_sph_mesh_1d_connect
+      use m_error_IDs
 !
       use m_node_id_spherical_IO
       use m_file_format_switch
@@ -43,8 +44,11 @@
       use set_controls_4_sph_shell
       use const_sph_radial_grid
       use set_control_platform_data
+      use set_control_sph_subdomains
       use gen_sph_grids_modes
       use skip_comment_f
+!
+      integer(kind = kint), intent(inout) :: ierr
 !
       integer(kind = kint) :: nprocs_ctl
       integer(kind = kint) :: i, np, kr, icou
@@ -73,11 +77,11 @@
 !
       iflag_radial_grid =  igrid_Chebyshev
       if(cmp_no_case(radial_grid_type_ctl%charavalue, label_explicit))  &
-     &       iflag_radial_grid =  igrid_non_euqidist
+     &       iflag_radial_grid =  igrid_non_equidist
       if(cmp_no_case(radial_grid_type_ctl%charavalue, label_Chebyshev)) &
      &       iflag_radial_grid =  igrid_Chebyshev
       if(cmp_no_case(radial_grid_type_ctl%charavalue, label_equi))      &
-     &       iflag_radial_grid =  igrid_euqidistance
+     &       iflag_radial_grid =  igrid_equidistance
 !
       if (ltr_ctl%iflag .gt. 0) then
         l_truncation = ltr_ctl%intvalue
@@ -125,7 +129,7 @@
 !
 !   Set radial grid explicitly
       iflag_rj_center = 0
-      if(iflag_radial_grid .eq. igrid_non_euqidist) then
+      if(iflag_radial_grid .eq. igrid_non_equidist) then
         if(cmp_no_case(sph_coef_type_ctl%charavalue, 'with_center')     &
           .and. sph_coef_type_ctl%iflag .gt. 0) iflag_rj_center = 1
 !
@@ -194,86 +198,18 @@
      &      Min_radius_ctl%realvalue, Max_radius_ctl%realvalue)
       end if
 !
-      ndomain_rtp(1:3) = 1
-      if (ndomain_sph_grid_ctl%num .gt. 0) then
-        do i = 1, ndomain_sph_grid_ctl%num
-          if     (cmp_no_case(ndomain_sph_grid_ctl%c_tbl(i), 'r')       &
-     &       .or. cmp_no_case(ndomain_sph_grid_ctl%c_tbl(i), 'radial')  &
-     &           ) then
-            ndomain_rtp(1) = ndomain_sph_grid_ctl%ivec(i)
-          else if (cmp_no_case(ndomain_sph_grid_ctl%c_tbl(i), 'theta')  &
-     &     .or. cmp_no_case(ndomain_sph_grid_ctl%c_tbl(i),'meridional') &
-     &           ) then
-            ndomain_rtp(2) = ndomain_sph_grid_ctl%ivec(i)
-          end if
-        end do
 !
-        call deallocate_ndomain_rtp_ctl
-      end if
-!
-      ndomain_rtm(1:3) = 1
-      if (ndomain_legendre_ctl%num .gt. 0) then
-        do i = 1, ndomain_legendre_ctl%num
-          if     (cmp_no_case(ndomain_legendre_ctl%c_tbl(i), 'r')       &
-     &       .or. cmp_no_case(ndomain_legendre_ctl%c_tbl(i), 'radial')  &
-     &           ) then
-            ndomain_rtm(1) = ndomain_legendre_ctl%ivec(i)
-          else if (cmp_no_case(ndomain_legendre_ctl%c_tbl(i), 'phi')    &
-     &     .or. cmp_no_case(ndomain_legendre_ctl%c_tbl(i),'zonal')      &
-     &           ) then
-            ndomain_rtm(3) = ndomain_legendre_ctl%ivec(i)
-           end if
-        end do
-!
-        call deallocate_ndomain_rtm_ctl
-      end if
-!
-      ndomain_rlm(1) = ndomain_rtm(1)
-      ndomain_rlm(2) = ndomain_rtm(3)
-!
-      ndomain_rj(1:2) = 1
-      if (ndomain_spectr_ctl%num .gt. 0) then
-        do i = 1, ndomain_spectr_ctl%num
-          if(cmp_no_case(ndomain_spectr_ctl%c_tbl(i), 'degree_order')   &
-     &       .or. cmp_no_case(ndomain_spectr_ctl%c_tbl(i),'modes')      &
-     &      ) ndomain_rj(2) = ndomain_spectr_ctl%ivec(i)
-        end do
-!
-        call deallocate_ndomain_rj_ctl
-      end if
+      call set_subdomains_4_sph_shell(nprocs_ctl, ierr, e_message)
+      if (ierr .gt. 0) return
 !
 !
-      ndomain_sph = ndomain_rj(1)*ndomain_rj(2)
-      if (ndomain_sph .ne. nprocs_ctl) then
-        write(*,*) 'check num of domain spectr file(r,j)'
-        stop
-      end if
-!
-      np = ndomain_rtp(1)*ndomain_rtp(2)*ndomain_rtp(3)
-      if (ndomain_sph .ne. np) then
-        write(*,*) 'check num of domain for (r,t,p)'
-        stop
-      end if
-      np = ndomain_rtm(1)*ndomain_rtm(2)*ndomain_rtm(3)
-      if (ndomain_sph .ne. np) then
-        write(*,*) 'check num of domain for (r,t,m)'
-        stop
-      end if
-      np = ndomain_rlm(1)*ndomain_rlm(2)
-      if (ndomain_sph .ne. np) then
-        write(*,*) 'check num of domain for (r,l,m)'
-        stop
-      end if
-!
-      if(ndomain_rtm(1) .ne. ndomain_rtp(1)) then
-        write(*,*) 'Set same number of radial subdomains'
-        write(*,*) 'for Legendre transform and spherical grids'
-        stop
-      end if
-!
-      if(mod(nidx_global_rtp(3),2) .ne. 0) then
-        write(*,*) 'Set even number for the number of zonal grids'
-        stop
+      if    (iflag_shell_mode .eq. iflag_MESH_w_pole                    &
+     &  .or. iflag_shell_mode .eq. iflag_MESH_w_center) then
+        if(mod(nidx_global_rtp(3),2) .ne. 0) then
+          write(*,*) 'Set even number for the number of zonal grids'
+          ierr = ierr_mesh
+          return
+        end if
       end if
 !
       if(nidx_global_rtp(2) .lt. (l_truncation+1)*3/2) then

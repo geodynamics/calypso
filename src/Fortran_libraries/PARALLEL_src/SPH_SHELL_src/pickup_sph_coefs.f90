@@ -55,8 +55,8 @@
       call allocate_iflag_pick_sph(l_truncation)
 !
       call count_sph_labels_4_monitor
-      call count_picked_sph_adrress                                     &
-     &   (num_pick_sph, num_pick_sph_l, num_pick_sph_m,                 &
+      call count_picked_sph_adrress(l_truncation,                       &
+     &    num_pick_sph, num_pick_sph_l, num_pick_sph_m,                 &
      &    idx_pick_sph_mode, idx_pick_sph_l, idx_pick_sph_m,            &
      &    num_pick_sph_mode)
 !

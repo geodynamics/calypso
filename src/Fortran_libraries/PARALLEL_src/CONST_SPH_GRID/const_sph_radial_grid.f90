@@ -35,7 +35,7 @@
       if(iflag_radial_grid .eq. igrid_Chebyshev) then
         call count_chebyshev_ext_layers(nele, r_ICB, r_CMB, rmin, rmax, &
      &      nidx_global_rtp(1), nlayer_ICB, nlayer_CMB)
-      else if(iflag_radial_grid .eq. igrid_euqidistance) then
+      else if(iflag_radial_grid .eq. igrid_equidistance) then
         call count_equi_ext_layers(nele, r_ICB, r_CMB, rmin, rmax,      &
      &      nidx_global_rtp(1), nlayer_ICB, nlayer_CMB)
       end if
@@ -45,7 +45,7 @@
       if(iflag_radial_grid .eq. igrid_Chebyshev) then
         call set_chebyshev_distance_shell(nidx_global_rtp(1),           &
      &      nlayer_ICB, nlayer_CMB, r_ICB, r_CMB, radius_1d_gl)
-      else if(iflag_radial_grid .eq. igrid_euqidistance) then
+      else if(iflag_radial_grid .eq. igrid_equidistance) then
         call set_equi_distance_shell(nidx_global_rtp(1),                &
      &        nlayer_ICB, nlayer_CMB, r_ICB, r_CMB, radius_1d_gl)
       end if
