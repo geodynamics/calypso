@@ -60,6 +60,8 @@
       private :: set_initial_temperature
       private :: set_initial_composition
       private :: set_initial_magne_sph
+      private :: set_initial_heat_source_sph
+      private :: set_initial_light_source_sph
 !
 !-----------------------------------------------------------------------
 !

@@ -977,6 +977,103 @@ The same files as the simulation program are read in this program, and field dat
 This program generates the spectrum data files \verb|[rst_prefix].0.[domain#].fst|. To use generated initial data file, please set 
  \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}} to be 0 and \hyperref[href_t:restart_file_ctl]{{\tt [INITIAL\_TYPE]}} to be \hyperref[href_t:restart_file_ctl]{{\tt start\_from\_rst\_file}}.
 
+\subsection{Definition of the initial field}
+To construct Initial field data, you need to edit the source code \verb|const_sph_initial_spectr.f90| in \verb|src/programs/data_utilities/INITIAL_FIELD/| directory. The module \verb|const_sph_initial_spectr| consists of the following subroutines:
+%
+\begin{description}
+\item{\verb|sph_initial_spectrum|:}    Top subroutine to construct initial field.
+\item{\verb|set_initial_velocity|:}        Routine to construct initial velocity.
+\item{\verb|set_initial_temperature|:} Routine to construct initial temperature.
+\item{\verb|set_initial_composition|:} Routine to construct initial composition.
+\item{\verb|set_initial_magne_sph|:} Routine to construct initial magnetic field.
+\item{\verb|set_initial_heat_source_sph|:} Routine to construct heat source.
+\item{\verb|set_initial_light_source_sph|:}  Routine to construct composition source.
+\end{description}
+%
+The construction routine for each field are called from the top routine \\
+\verb|const_sph_initial_spectr.f90|. If lines to call subroutines are commented out, corresponding initial fields are set to 0. In addition, the initial fields to be constructed need to be defined by \verb|nod_value_ctl| array in the \verb|control_MHD|.
+%
+\begin{table}[htp]\caption{Field name and corresponding field id in Calypso}\begin{center}\begin{tabular}{|c|c|cc|}
+\hline
+field name & scalar & poloidal  & toroidal  \\ \hline
+Velocity & - & \verb|ipol%i_velo| &   \verb|itor%i_velo| \\ Magnetic field & - & \verb|ipol%i_magne| &  \verb|itor%i_magne| \\ Current density & - & \verb|ipol%i_current| &  \verb|itor%i_current| \\ Temperature & \verb|ipol%i_temp| & - & - \\ Composition & \verb|ipol%i_light| & - & - \\ Heat source & \verb|ipol%i_heat_source| & - & - \\ Composition source & \verb|ipol%i_light_source| & - & - \\ \hline\end{tabular}\end{center}\label{table:field_point}\end{table}%% 
+
+Initial fields need to be defined by the spherical harmonics coefficients at each radial points as array \verb|d_rj(i,i_field)|, where \verb|i| and \verb|i_field| are the local address of the spectrum data and field id, respectively. The address of the fields are listed in Table \ref{table:field_point}.
+
+In Calypso, local data address for each MPI process is used for the spectrum data address \verb|i|. To find the local address \verb|i|, two functions are required. \\
+First, \verb|j = find_local_sph_mode_address(l,m)| returns the local spherical  harmonics address \verb|j| from aa spherical harmonics mode $Y_{l}^{m}$. If process does not have the data for $Y_{l}^{m}$, \verb|j| is set to 0. Second, \verb|i = local_sph_data_address(k,j)| returns the local data address \verb|i| from radial grid number \verb|k| and local spherical harmonics id \verb|j|. For do loops in the radial direction, the total number of radial grid points, radial address for ICB, and radial address for CMB are defined as \verb|nidx_rj(1)|, \verb|nlayer_ICB|, and \verb|nlayer_CMB|, respectively. The radius for the \verb|k|-th grid points can be obtained by \verb|r = radius_1d_rj_r(k)|. The subroutines to define initial temperature for the dynamo benchmark Case 1 is shown below as an example.
+
+%
+\begin{verbatim}
+!
+      subroutine set_initial_temperature
+!
+      use m_sph_spectr_data
+!
+      integer ( kind = kint) :: inod, k, jj
+      real (kind = kreal) :: pi, rr, xr, shell
+      real(kind = kreal), parameter :: A_temp = 0.1d0
+!
+!
+!$omp parallel do
+      do inod = 1, nnod_rj
+        d_rj(inod,ipol%i_temp) = zero
+      end do
+!$omp end parallel do
+!
+      pi = four * atan(one)
+      shell = r_CMB - r_ICB
+!
+!   search address for (l = m = 0)
+      jj = find_local_sph_mode_address(0, 0)
+!
+!   set reference temperature if (l = m = 0) mode is there
+      if (jj .gt. 0) then
+        do k = 1, nlayer_ICB-1
+          inod = local_sph_data_address(k,jj)
+          d_rj(inod,ipol%i_temp) = 1.0d0
+        end do
+        do k = nlayer_ICB, nlayer_CMB
+          inod = local_sph_data_address(k,jj)
+          d_rj(inod,ipol%i_temp) = (ar_1d_rj(k,1) * 20.d0/13.0d0        &
+     &                              - 1.0d0 ) * 7.0d0 / 13.0d0
+        end do
+      end if
+!
+!
+!    Find local addrtess for (l,m) = (4,4)
+      jj =  find_local_sph_mode_address(4, 4)
+!      jj =  find_local_sph_mode_address(5, 5)
+!
+!    If data for (l,m) = (4,4) is there, set initial temperature
+      if (jj .gt. 0) then
+!    Set initial field from ICB to CMB
+        do k = nlayer_ICB, nlayer_CMB
+!
+!    Set radius data
+          rr = radius_1d_rj_r(k)
+!    Set 1d address to substitute at (Nr, j)
+          inod = local_sph_data_address(k,jj)
+!
+!    set initial temperature
+          xr = two * rr - one * (r_CMB+r_ICB) / shell
+          d_rj(inod,ipol%i_temp) = (one-three*xr**2+three*xr**4-xr**6)  &
+     &                            * A_temp * three / (sqrt(two*pi))
+        end do
+      end if
+!
+!    Center
+      if(inod_rj_center .gt. 0) then
+        jj = find_local_sph_mode_address(0, 0)
+        inod = local_sph_data_address(1,jj)
+        d_rj(inod_rj_center,ipol%i_temp) = d_rj(inod,ipol%i_temp)
+      end if
+!
+      end subroutine set_initial_temperature
+!
+\end{verbatim}
+%
+
 \section{Initial field modification program \\
 ({\tt sph\_add\_initial\_field})}
 \label{sec:ad_initial_field}
