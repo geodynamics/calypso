@@ -15,9 +15,9 @@
 !      subroutine read_files_4_iso_ctl
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!    array surface_rendering  1
-!!      file   surface_rendering   'ctl_psf_eq'
-!!    end array surface_rendering
+!!    array cross_section_ctl  1
+!!      file   cross_section_ctl   'ctl_psf_eq'
+!!    end array cross_section_ctl
 !!
 !!    array isosurf_rendering  2
 !!      file   isosurf_rendering   'ctl_iso_p_n1e4'
@@ -52,9 +52,7 @@
 !     lavel for surfaces sectionings
 !
       character(len=kchara), parameter                                  &
-     &       :: hd_psfs_ctl =   'surface_rendering'
-      character(len=kchara), parameter                                  &
-     &       :: hd_isos_ctl =   'isosurf_rendering'
+     &                  :: hd_isos_ctl =   'isosurf_rendering'
 !
       integer (kind=kint) :: i_psf_ctl =    0
       integer (kind=kint) :: i_iso_ctl =    0
@@ -131,7 +129,9 @@
         call find_control_end_flag(hd_viz_ctl, i_viz_ctl)
         if(i_viz_ctl .eq. 1) exit
 !
-        call find_control_array_flag(hd_psfs_ctl, num_psf_ctl)
+        call find_control_array_flag(hd_psf_ctl, num_psf_ctl)
+        if(num_psf_ctl .gt. 0) call read_files_4_psf_ctl
+        call find_control_array_flag(hd_section_ctl, num_psf_ctl)
         if(num_psf_ctl .gt. 0) call read_files_4_psf_ctl
 !
         call find_control_array_flag(hd_isos_ctl, num_iso_ctl)
@@ -155,14 +155,19 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_array_flag(hd_psfs_ctl,                   &
+        call find_control_end_array_flag(hd_psf_ctl,                    &
+     &      num_psf_ctl, i_psf_ctl)
+        if(i_psf_ctl .ge. num_psf_ctl) exit
+        call find_control_end_array_flag(hd_section_ctl,                &
      &      num_psf_ctl, i_psf_ctl)
         if(i_psf_ctl .ge. num_psf_ctl) exit
 !
-        if(right_file_flag(hd_psfs_ctl) .gt. 0) then
+        if(right_file_flag(hd_section_ctl) .gt. 0                       &
+     &     .or. right_file_flag(hd_psf_ctl) .gt. 0) then
           call read_file_names_from_ctl_line(num_psf_ctl, i_psf_ctl,    &
      &        fname_psf_ctl)
-        else if(right_begin_flag(hd_psfs_ctl) .gt. 0) then
+        else if(right_begin_flag(hd_section_ctl) .gt. 0                 &
+     &      .or. right_begin_flag(hd_psf_ctl) .gt. 0) then
           i_psf_ctl = i_psf_ctl + 1
           fname_psf_ctl(i_psf_ctl) = 'NO_FILE'
           call read_psf_control_data(psf_ctl_struct(i_psf_ctl))

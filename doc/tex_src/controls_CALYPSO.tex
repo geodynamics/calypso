@@ -482,6 +482,16 @@ Increment of time step to output spectrum data for restarting \verb|[ISTEP_RESTA
 \verb|[ISTEP_FIELD]| \\
 Increment of time step to output field data for visualization \verb|[ISTEP_FIELD]| is defined by integer. If \verb|[ISTEP_FIELD]| is set to be 0, no field data are written.
 
+\paragraph{\tt i\_step\_sectioning\_ctl}
+\label{href_t:i_step_sectioning_ctl}
+\verb|[ISTEP_SECTION]| \\
+Increment of time step to output cross section data for visualization \verb|[ISTEP_SECTION]| is defined by integer. If \verb|[ISTEP_SECTION]| is set to be 0, no cross section data are written.
+
+\paragraph{\tt i\_step\_isosurface\_ctl}
+\label{href_t:i_step_isosurface_ctl}
+\verb|[ISTEP_ISOSURFACE]| \\
+Increment of time step to output isosurface data for visualization \verb|[ISTEP_ISOSURFACE]| is defined by integer. If \verb|[ISTEP_ISOSURFACE]| is set to be 0, no isosurface data are written.
+
 \paragraph{\tt dt\_ctl}
 \label{href_t:dt_ctl}
 \verb|[DELTA_TIME]| \\
@@ -663,7 +673,19 @@ Orders $m$ to output Gauss coefficients are listed in \verb|[Order]| by integer.
 \verb|[Nphi_mid_equator]| \\
 Number of grid points \verb|[Nphi_mid_equator]|in longitudinal direction to evaluate mid-depth of the shell in the equatorial plane for dynamo benchmark is defined as integer. If \verb|[Nphi_mid_equator]| is not defined or less than zero, \verb|[Nphi_mid_equator]| is set set number grid as the input spherical transform data. 
 
+%
+\subsection{\tt cross\_section_\ctl}
+\label{href_t:cross_section_ctl}
+Control parameters for cross sectioning are defined in this block. \\
+\hyperref[href_i:cross_section_ctl]{(Back to {\tt cross\_section_\ctl)}}
 
+\paragraph{\tt section\_file\_prefix}
+\label{href_t:section_file_prefix}
+\verb|[section_file_prefix]| \\
+Number of subdomain for new new decomposed data \verb|[new_num_domain]| is defined by integer.
+
+
+%
 \subsection{\tt num\_domain\_ctl}
 \label{href_t:num_domain_ctl}
 Parallelization is defined in this block. Domain decomposition is defined for spectrum data, field data, and Legendre transform. \\
@@ -674,7 +696,7 @@ Parallelization is defined in this block. Domain decomposition is defined for sp
 \verb|[Ndomain]| \\
 Number of subdomains in the radial direction for the spherical grid $(r, \theta, \phi)$ and spherical transforms $(r, \theta, m)$ and $(r, l, m)$.
 
-\paragraph{\tt num\_horiaontal\_domain\_ctl}
+\paragraph{\tt num\_horizontal\_domain\_ctl}
 \label{href_t:num_horizontal_domain_ctl} 
 \verb|[Ndomain]| \\
 Number of subdomains in the horizontal direction. The number will be the number of subdomains for the meridional directios for the spherical grid $(r, \theta, \phi)$ and Fourier transform $(r, \theta, m)$. For Legendre transform $(r, \theta, m)$ and $(r, l, m)$, the number will be the number of subdomains for the h.armonics ordedr $m$.

@@ -398,21 +398,25 @@ The format of the control file \verb|control_MHD| is described below. The detail
 		\label{href_i:time_step_ctl}
     		\hyperref[href_t:time_step_ctl]{(Detail)}
 		\begin{itemize}
-		\item \verb|elapsed_time_ctl      [ELAPSED_TIME]|
+		\item \verb|elapsed_time_ctl        [ELAPSED_TIME]|
 	    		\hyperref[href_t:elapsed_time_ctl]{(Detail)}
-		\item \verb|i_step_init_ctl       [ISTEP_START]|
+		\item \verb|i_step_init_ctl         [ISTEP_START]|
 	    		\hyperref[href_t:i_step_init_ctl]{(Detail)}
-		\item \verb|i_step_finish_ctl     [ISTEP_FINISH]|
+		\item \verb|i_step_finish_ctl       [ISTEP_FINISH]|
 	    		\hyperref[href_t:i_step_finish_ctl]{(Detail)}
-		\item \verb|i_step_check_ctl      [ISTEP_MONITOR]|
+		\item \verb|i_step_check_ctl        [ISTEP_MONITOR]|
 	    		\hyperref[href_t:i_step_check_ctl]{(Detail)}
-		\item \verb|i_step_rst_ctl        [ISTEP_RESTART]|
+		\item \verb|i_step_rst_ctl          [ISTEP_RESTART]|
 	    		\hyperref[href_t:i_step_rst_ctl]{(Detail)}
-		\item \verb|i_step_field_ctl      [ISTEP_FIELD]|
+		\item \verb|i_step_field_ctl        [ISTEP_FIELD]|
 	    		\hyperref[href_t:i_step_field_ctl]{(Detail)}
-		\item \verb|dt_ctl                [DELTA_TIME]|
+        \item \verb|i_step_sectioning_ctl   [ISTEP_SECTION]|
+                \hyperref[href_t:i_step_sectioning_ctl]{(Detail)}
+        \item \verb|i_step_isosurface_ctl   [ISTEP_ISOSURFACE]|
+                \hyperref[href_t:i_step_isosurface_ctl]{(Detail)}
+		\item \verb|dt_ctl                  [DELTA_TIME]|
 	    		\hyperref[href_t:dt_ctl]{(Detail)}
-		\item \verb|time_init_ctl         [INITIAL_TIME]|
+		\item \verb|time_init_ctl           [INITIAL_TIME]|
 	    		\hyperref[href_t:time_init_ctl]{(Detail)}
 		\end{itemize}
 %
@@ -484,6 +488,17 @@ The format of the control file \verb|control_MHD| is described below. The detail
     		\hyperref[href_t:nphi_mid_eq_ctl]{(Detail)}
 %
 	\end{itemize}
+%
+\item \verb|visual_control|
+    \label{href_i:visual_control}
+    \hyperref[href_t:visual_control]{(Detail)}
+    \begin{itemize}
+    \item \verb|array cross_section_ctl   [Block]|
+            \hyperref[href_t:cross_section_ctl]{(Detail)}
+    \item \verb|array isosurf_rendering   [Block]|
+            \hyperref[href_t:isosurf_rendering]{(Detail)}
+%
+    \end{itemize}
 \end{itemize}
 %
 \subsection{Spectrum data for restarting}
@@ -549,7 +564,6 @@ CMB
 \label{fig:boundary_file}
 \end{figure}
 %
-
 
 \subsection{Field data for visualization}
 \label{sec:VTK}
@@ -668,6 +682,48 @@ Merged XDMF data generate files listed in Table \ref{table:XDMF}. For ParaView, 
 \end{center}
 \label{table:XDMF}
 \end{table}
+%
+
+%
+\subsection{Cross section data (Parallel SurFacing module}
+\label{section:PSF}
+Calypso can output cross section data for visualization with finer time increment than the whole domain data. The cross section data consist of triangle patches with VTK format, then data can be visualized by Paraview like as the whole field data. This cross sectioning module can output arbitrary quadrature surface, but plane, sphere, and cylindrical section would be useful for the geodynamo simulations.
+
+To output cross sectioning, increment of the surface output data should be defined by \verb|i_step_sectioning_ctl| in \verb|time_step_ctl| block. And, array block \verb|cross_section_ctl| in \verb|visual_control| section is required to define cross sections. Each \verb|cross_section_ctl| block defines one cross section. Each cross section can also define by an external file by specifying external file name with \verb|file| label.
+%
+Cross sections are defined by quadrature function
+%
+\begin{eqnarray*}
+a x^2 + b y^2 + c z^2 + d y x + e z x + f x y + g x + h y + j z + k = 0,
+\end{eqnarray*}
+and 10 constants $a$ to $k$ are defined in the control array \verb|coefs_ctl|. Area for visualization can be defined by array \verb|chosen_ele_grp_ctl| by choosing \verb|outer_core|, \verb|inner_core|, and \verb|all|. Fields to display is defined in array \verb|output_field|. In array \verb|output_field|, field type in Table \ref{table:field_type} needs to defined. The same field can be defined more than once in array \verb|output_field| to output vector field in Cartesian coordinate and radial component, for example.
+%
+\begin{table}[htp]
+\caption{List of field type for sectioning and isosurface module}
+\label{table:field_type}
+\begin{center} 
+\begin{tabular}{|c|c|}
+\hline
+ Definition & Field type  \\ \hline \hline
+ \verb|scalar| & scalar field  \\ \hline
+ \verb|vector| & Cartesian vector field \\ \hline
+ \verb|x| & $x$-component  \\ \hline
+ \verb|y| & $y$-component  \\ \hline
+ \verb|z| & $z$-component  \\ \hline
+ \verb|radial| & radial ($r$-) component  \\ \hline
+ \verb|theta| & $\theta$-component  \\ \hline
+ \verb|phi| & $\phi$ component  \\ \hline
+ \verb|cylinder_r| & cylindrical radial ($s$-) component  \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+%
+%
+\subsection{Isosurface data}
+%
+Calypso can also output isosurface data for visualization. Generally, data size of the isosurface is much larger than the sectioning data. The isosurface data is also written as a unstructured grid data with VTK format. The isosurface also consists of triangle patches.
+
+To output cross sectioning, increment of the surface output data should be defined by \verb|i_step_isosurface_ctl| in \verb|time_step_ctl| block. And, array block \verb|isosurf_rendering| in \verb|visual_control| section is required to define cross sections. Each \verb|isosurf_rendering| block defines one cross section. Each cross section can also define by an external file by specifying external file name with \verb|file| label.
 %
 
 
@@ -938,7 +994,9 @@ Simulation program outputs spectrum data as a whole field data. This program gen
 %
 This program requires control file \verb|control_snapshot|. File format of the control file is same as the control field for simulation \hyperref[href_i:MHD_control]{\tt control\_MHD}.
 
-The same files as the simulation program are read in this program, and field data are generated from the snapshots of spectrum data. The monitoring data for snapshots can also be generated. \verb|[step #]| is added in the file name, and the \verb|[step #]| is calculated by \verb|time step| / \verb|[ISTEP_FIELD]|.
+The same files as the simulation program are read in this program, and field data are generated from the snapshots of spectrum data. The monitoring data for snapshots can also be generated. \verb|[step #]| is added in the file name, and the \verb|[step #]| is calculated by \verb|time step|/\verb|[ISTEP_FIELD]|.
+
+We recommend to output cross section data at $y = 0$ by using sectioning module (see \ref{section:PSF}) for zonal mean snapshot program \verb|sph_sm_snapshot| to reduce data size.
 
 \newpage
 \section{Initial field generation program \\
@@ -993,10 +1051,24 @@ To construct Initial field data, you need to edit the source code \verb|const_sp
 The construction routine for each field are called from the top routine \\
 \verb|const_sph_initial_spectr.f90|. If lines to call subroutines are commented out, corresponding initial fields are set to 0. In addition, the initial fields to be constructed need to be defined by \verb|nod_value_ctl| array in the \verb|control_MHD|.
 %
-\begin{table}[htp]\caption{Field name and corresponding field id in Calypso}\begin{center}\begin{tabular}{|c|c|cc|}
+\begin{table}[htp]
+\caption{Field name and corresponding field id in Calypso}
+\begin{center}
+\begin{tabular}{|c|c|cc|}
 \hline
 field name & scalar & poloidal  & toroidal  \\ \hline
-Velocity & - & \verb|ipol%i_velo| &   \verb|itor%i_velo| \\ Magnetic field & - & \verb|ipol%i_magne| &  \verb|itor%i_magne| \\ Current density & - & \verb|ipol%i_current| &  \verb|itor%i_current| \\ Temperature & \verb|ipol%i_temp| & - & - \\ Composition & \verb|ipol%i_light| & - & - \\ Heat source & \verb|ipol%i_heat_source| & - & - \\ Composition source & \verb|ipol%i_light_source| & - & - \\ \hline\end{tabular}\end{center}\label{table:field_point}\end{table}%% 
+Velocity & - & \verb|ipol%i_velo| &   \verb|itor%i_velo| \\ 
+Magnetic field & - & \verb|ipol%i_magne| &  \verb|itor%i_magne| \\ 
+Current density & - & \verb|ipol%i_current| &  \verb|itor%i_current| \\ 
+Temperature & \verb|ipol%i_temp| & - & - \\ 
+Composition & \verb|ipol%i_light| & - & - \\ 
+Heat source & \verb|ipol%i_heat_source| & - & - \\ 
+Composition source & \verb|ipol%i_light_source| & - & - \\ \hline
+\end{tabular}
+\end{center}
+\label{table:field_point}
+\end{table}%
+% 
 
 Initial fields need to be defined by the spherical harmonics coefficients at each radial points as array \verb|d_rj(i,i_field)|, where \verb|i| and \verb|i_field| are the local address of the spectrum data and field id, respectively. The address of the fields are listed in Table \ref{table:field_point}.
 
