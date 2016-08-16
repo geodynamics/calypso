@@ -587,9 +587,10 @@ If this flag is not defined, program searches the fastest approarch in the initi
 \end{description}
 %
 
+%
 \subsection{\tt sph\_monitor\_ctl}
 \label{href_t:sph_monitor_ctl}
-Monitoring data is defined in this block. Monitoring data output root mean square, average, Gauss coefficients, or specific components of spectrum data which are flagged by {\tt Monitor\_On} in \hyperref[href_t:nod_value_ctl]{ {\tt nod\_value\_ctl} array}. \\
+Monitoring data is defined in this block. Monitoring data output (mean square, average, Gauss coefficients, or specific components of spectrum data) are flagged by {\tt Monitor\_On} in \hyperref[href_t:nod_value_ctl]{ {\tt nod\_value\_ctl} array}. \\
 \hyperref[href_i:sph_monitor_ctl]{(Back to {\tt control\_MHD})}
 
 \paragraph{\tt volume\_average\_prefix}
@@ -674,16 +675,27 @@ Orders $m$ to output Gauss coefficients are listed in \verb|[Order]| by integer.
 Number of grid points \verb|[Nphi_mid_equator]|in longitudinal direction to evaluate mid-depth of the shell in the equatorial plane for dynamo benchmark is defined as integer. If \verb|[Nphi_mid_equator]| is not defined or less than zero, \verb|[Nphi_mid_equator]| is set set number grid as the input spherical transform data. 
 
 %
-\subsection{\tt cross\_section_\ctl}
+%
+\subsection{\tt visual\_control}
+\label{href_t:visual_control}
+Visualization modules are defined in this block. Parameters for cross sections and isosurfaces are defined in this block. \\
+\hyperref[href_i:visual_control]{(Back to {\tt visual\_control})}
+%
+\subsubsection{\tt cross\_section\_ctl}
 \label{href_t:cross_section_ctl}
 Control parameters for cross sectioning are defined in this block. \\
-\hyperref[href_i:cross_section_ctl]{(Back to {\tt cross\_section_\ctl)}}
+\hyperref[href_i:cross_section_ctl]{(Back to {\tt cross\_section\_ctl)}}
 
 \paragraph{\tt section\_file\_prefix}
 \label{href_t:section_file_prefix}
 \verb|[section_file_prefix]| \\
 Number of subdomain for new new decomposed data \verb|[new_num_domain]| is defined by integer.
 
+%
+\subsubsection{\tt isosurface\_ctl}
+\label{href_t:isosurface_ctl}
+Control parameters for isosurfaces are defined in this block. \\
+\hyperref[href_i:isosurface_ctl]{(Back to {\tt isosurface\_ctl)}}
 
 %
 \subsection{\tt num\_domain\_ctl}

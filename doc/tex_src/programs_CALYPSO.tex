@@ -493,10 +493,10 @@ The format of the control file \verb|control_MHD| is described below. The detail
     \label{href_i:visual_control}
     \hyperref[href_t:visual_control]{(Detail)}
     \begin{itemize}
-    \item \verb|array cross_section_ctl   [Block]|
+    \item \verb|array cross_section_ctl   [Block]| \label{href_i:cross_section_ctl}
             \hyperref[href_t:cross_section_ctl]{(Detail)}
-    \item \verb|array isosurf_rendering   [Block]|
-            \hyperref[href_t:isosurf_rendering]{(Detail)}
+    \item \verb|array isosurface_ctl   [Block]|  \label{href_i:isosurface_ctl}
+            \hyperref[href_t:isosurface_ctl]{(Detail)}
 %
     \end{itemize}
 \end{itemize}
@@ -723,7 +723,7 @@ and 10 constants $a$ to $k$ are defined in the control array \verb|coefs_ctl|. A
 %
 Calypso can also output isosurface data for visualization. Generally, data size of the isosurface is much larger than the sectioning data. The isosurface data is also written as a unstructured grid data with VTK format. The isosurface also consists of triangle patches.
 
-To output cross sectioning, increment of the surface output data should be defined by \verb|i_step_isosurface_ctl| in \verb|time_step_ctl| block. And, array block \verb|isosurf_rendering| in \verb|visual_control| section is required to define cross sections. Each \verb|isosurf_rendering| block defines one cross section. Each cross section can also define by an external file by specifying external file name with \verb|file| label.
+To output cross sectioning, increment of the surface output data should be defined by \verb|i_step_isosurface_ctl| in \verb|time_step_ctl| block. And, array block \verb|isosurface_ctl| in \verb|visual_control| section is required to define cross sections. Each \verb|isosurface_ctl| block defines one cross section. Each cross section can also define by an external file by specifying external file name with \verb|file| label.
 %
 
 

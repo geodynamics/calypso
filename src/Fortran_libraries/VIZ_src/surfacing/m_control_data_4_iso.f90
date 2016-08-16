@@ -12,7 +12,7 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!     example of control for Kemo's surface rendering
 !!
-!!  begin isosurf_rendering
+!!  begin isosurface_ctl
 !!    iso_file_head    'psf'
 !!    iso_output_type  ucd
 !!
@@ -38,7 +38,7 @@
 !!      end array output_field
 !!    end isosurf_result_define
 !!
-!!  end isosurf_rendering
+!!  end isosurface_ctl
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -97,7 +97,7 @@
 !
 !     Top level
         integer (kind=kint) :: i_iso_ctl = 0
-!     2nd level for isosurf_rendering
+!     2nd level for isosurface_ctl
         integer (kind=kint) :: i_iso_file_head = 0
         integer (kind=kint) :: i_iso_out_type =  0
         integer (kind=kint) :: i_iso_define =    0
@@ -114,27 +114,42 @@
       end type iso_ctl
 !
 !     Top level
-      character(len=kchara) :: hd_iso_ctl = 'isosurf_rendering'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_ctl = 'isosurf_rendering'
+      character(len=kchara), parameter                                  &
+     &             :: hd_isosurf_ctl = 'isosurface_ctl'
 !
-!     2nd level for isosurf_rendering
-      character(len=kchara) :: hd_iso_file_head = 'iso_file_head'
-      character(len=kchara) :: hd_iso_out_type = 'iso_output_type'
-      character(len=kchara) :: hd_iso_define = 'isosurf_define'
-      character(len=kchara) :: hd_iso_result = 'isosurf_result_define'
+!     2nd level for isosurface_ctl
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_file_head = 'iso_file_head'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_out_type = 'iso_output_type'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_define = 'isosurf_define'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_result = 'isosurf_result_define'
 !
 !     3nd level for isosurf_define
-      character(len=kchara) :: hd_iso_field =     'isosurf_field'
-      character(len=kchara) :: hd_iso_comp =      'isosurf_component'
-      character(len=kchara) :: hd_iso_value =     'isosurf_value'
-      character(len=kchara) :: hd_iso_plot_area = 'plot_area_ctl'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_field =     'isosurf_field'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_comp =      'isosurf_component'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_value =     'isosurf_value'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_plot_area = 'plot_area_ctl'
 !
 !     4th level for plot_area_ctl
-      character(len=kchara) :: hd_iso_plot_grp  = 'chosen_ele_grp_ctl'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_plot_grp  = 'chosen_ele_grp_ctl'
 !
 !     3rd level for isosurf_result_define
-      character(len=kchara) :: hd_result_type =       'result_type'
-      character(len=kchara) :: hd_iso_result_field = 'output_field'
-      character(len=kchara) :: hd_result_value =      'result_value'
+      character(len=kchara), parameter                                  &
+     &             :: hd_result_type =       'result_type'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_result_field = 'output_field'
+      character(len=kchara), parameter                                  &
+     &             :: hd_result_value =      'result_value'
 !
       private :: hd_iso_plot_grp, hd_result_type
       private :: hd_result_value, hd_iso_plot_area, hd_iso_value
@@ -187,12 +202,15 @@
       type(iso_ctl), intent(inout) :: iso
 !
 !
-      if(right_begin_flag(hd_iso_ctl) .eq. 0) return
+      if(right_begin_flag(hd_iso_ctl) .eq. 0                            &
+     &   .and. right_begin_flag(hd_isosurf_ctl) .eq. 0) return
       if (iso%i_iso_ctl.gt.0) return
       do
         call load_ctl_label_and_line
 !
         call find_control_end_flag(hd_iso_ctl, iso%i_iso_ctl)
+        if(iso%i_iso_ctl .gt. 0) exit
+        call find_control_end_flag(hd_isosurf_ctl, iso%i_iso_ctl)
         if(iso%i_iso_ctl .gt. 0) exit
 !
         call read_iso_result_control(iso)

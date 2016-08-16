@@ -520,7 +520,7 @@ begin MHD_control
       file  cross_section_ctl   ctl_psf_z0.3
       file  cross_section_ctl   ctl_psf_z1.0
     end array cross_section_ctl
-    array isosurf_rendering  0
+    array isosurface_ctl     0
   end visual_control
 !
   begin sph_monitor_ctl

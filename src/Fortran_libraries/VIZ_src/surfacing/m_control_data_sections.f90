@@ -19,10 +19,10 @@
 !!      file   cross_section_ctl   'ctl_psf_eq'
 !!    end array cross_section_ctl
 !!
-!!    array isosurf_rendering  2
-!!      file   isosurf_rendering   'ctl_iso_p_n1e4'
-!!      file   isosurf_rendering   'ctl_iso_p_p1e4'
-!!    end array isosurf_rendering
+!!    array isosurface_ctl     2
+!!      file   isosurface_ctl   'ctl_iso_p_n1e4'
+!!      file   isosurface_ctl   'ctl_iso_p_p1e4'
+!!    end array isosurface_ctl
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
       module m_control_data_sections
@@ -48,11 +48,6 @@
 !
       character(len=kchara), parameter :: hd_viz_ctl = 'visual_control'
       integer (kind=kint) :: i_viz_ctl = 0
-!
-!     lavel for surfaces sectionings
-!
-      character(len=kchara), parameter                                  &
-     &                  :: hd_isos_ctl =   'isosurf_rendering'
 !
       integer (kind=kint) :: i_psf_ctl =    0
       integer (kind=kint) :: i_iso_ctl =    0
@@ -134,7 +129,9 @@
         call find_control_array_flag(hd_section_ctl, num_psf_ctl)
         if(num_psf_ctl .gt. 0) call read_files_4_psf_ctl
 !
-        call find_control_array_flag(hd_isos_ctl, num_iso_ctl)
+        call find_control_array_flag(hd_iso_ctl, num_iso_ctl)
+        if(num_iso_ctl .gt. 0) call read_files_4_iso_ctl
+        call find_control_array_flag(hd_isosurf_ctl, num_iso_ctl)
         if(num_iso_ctl .gt. 0) call read_files_4_iso_ctl
       end do
 !
@@ -190,14 +187,16 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_array_flag(hd_isos_ctl,                   &
+        call find_control_end_array_flag(hd_iso_ctl,                    &
      &      num_iso_ctl, i_iso_ctl)
         if(i_iso_ctl .ge. num_iso_ctl) exit
 !
-        if(right_file_flag(hd_isos_ctl) .gt. 0) then
+        if(right_file_flag(hd_isosurf_ctl) .gt. 0                       &
+     &     .or. right_file_flag(hd_iso_ctl) .gt. 0) then
           call read_file_names_from_ctl_line(num_iso_ctl, i_iso_ctl,    &
      &        fname_iso_ctl)
-        else if(right_begin_flag(hd_isos_ctl) .gt. 0) then
+        else if(right_begin_flag(hd_isosurf_ctl) .gt. 0                 &
+     &     .or. right_begin_flag(hd_iso_ctl) .gt. 0) then
           i_iso_ctl = i_iso_ctl + 1
           fname_iso_ctl(i_iso_ctl) = 'NO_FILE'
           call read_control_data_4_iso(iso_ctl_struct(i_iso_ctl))
