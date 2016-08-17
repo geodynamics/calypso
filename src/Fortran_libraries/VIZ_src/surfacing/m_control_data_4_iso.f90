@@ -70,21 +70,31 @@
       use m_machine_parameter
       use m_read_control_elements
       use skip_comment_f
+      use t_control_elements
       use t_read_control_arrays
 !
       implicit  none
 !
 !
       type iso_ctl
-        character(len=kchara) :: iso_file_head_ctl
-        character(len=kchara) :: iso_output_type_ctl
+!>        Structure for file prefix
+        type(read_character_item) :: iso_file_head_ctl
+!>        Structure for data field format
+        type(read_character_item) :: iso_output_type_ctl
 !
-        character(len=kchara) :: isosurf_data_ctl(1)
-        character(len=kchara) :: isosurf_comp_ctl(1)
-        real(kind=kreal) :: isosurf_value_ctl
-        real(kind=kreal) :: result_value_iso_ctl
+!>        Structure for field name for isosurface
+        type(read_character_item) :: isosurf_data_ctl
+!>        Structure for component name for isosurface
+        type(read_character_item) :: isosurf_comp_ctl
 !
-        character(len=kchara) :: iso_result_type_ctl
+!>        Structure for isosurface value
+        type(read_real_item) :: isosurf_value_ctl
+!
+!>        Structure for single number for isosurface
+        type(read_real_item) :: result_value_iso_ctl
+!
+!>        Structure for result type
+        type(read_character_item) :: iso_result_type_ctl
 !
 !>      Structure for list of output field
 !!@n      iso_out_field_ctl%c1_tbl: Name of field
@@ -98,19 +108,10 @@
 !     Top level
         integer (kind=kint) :: i_iso_ctl = 0
 !     2nd level for isosurface_ctl
-        integer (kind=kint) :: i_iso_file_head = 0
-        integer (kind=kint) :: i_iso_out_type =  0
         integer (kind=kint) :: i_iso_define =    0
         integer (kind=kint) :: i_iso_result =    0
 !     3nd level for isosurf_define
-        integer (kind=kint) :: i_iso_field =     0
-        integer (kind=kint) :: i_iso_comp =      0
-        integer (kind=kint) :: i_iso_value =     0
         integer (kind=kint) :: i_iso_plot_area = 0
-!     3rd level for field_on_isosurf
-        integer (kind=kint) :: i_result_type =     0
-        integer (kind=kint) :: i_result_value =    0
-!
       end type iso_ctl
 !
 !     Top level
@@ -227,12 +228,12 @@
         call read_iso_define_data(iso)
 !
 !
-        call read_character_ctl_item(hd_isosurf_prefix,                 &
-     &      iso%i_iso_file_head, iso%iso_file_head_ctl)
-        call read_character_ctl_item(hd_iso_file_head,                  &
-     &      iso%i_iso_file_head, iso%iso_file_head_ctl)
-        call read_character_ctl_item(hd_iso_out_type,                   &
-     &      iso%i_iso_out_type, iso%iso_output_type_ctl)
+        call read_chara_ctl_type(hd_isosurf_prefix,                     &
+     &      iso%iso_file_head_ctl)
+        call read_chara_ctl_type(hd_iso_file_head,                      &
+     &      iso%iso_file_head_ctl)
+        call read_chara_ctl_type(hd_iso_out_type,                       &
+     &      iso%iso_output_type_ctl)
       end do
 !
       end subroutine read_iso_control_data
@@ -255,13 +256,10 @@
         call  read_iso_plot_area_ctl(iso)
 !
 !
-        call read_character_ctl_item(hd_iso_field,                      &
-     &        iso%i_iso_field, iso%isosurf_data_ctl(1) )
-        call read_character_ctl_item(hd_iso_comp,                       &
-     &        iso%i_iso_comp, iso%isosurf_comp_ctl(1) )
+        call read_chara_ctl_type(hd_iso_field, iso%isosurf_data_ctl)
+        call read_chara_ctl_type(hd_iso_comp, iso%isosurf_comp_ctl)
 !
-        call read_real_ctl_item(hd_iso_value,                           &
-     &        iso%i_iso_value, iso%isosurf_value_ctl)
+        call read_real_ctl_type(hd_iso_value, iso%isosurf_value_ctl)
       end do
 !
       end subroutine read_iso_define_data
@@ -287,11 +285,11 @@
         call read_control_array_c2                                      &
      &     (hd_iso_result_field, iso%iso_out_field_ctl)
 !
-        call read_character_ctl_item(hd_result_type,                    &
-     &        iso%i_result_type, iso%iso_result_type_ctl)
+        call read_chara_ctl_type(hd_result_type,                        &
+     &      iso%iso_result_type_ctl)
 !
-        call read_real_ctl_item(hd_result_value,                        &
-     &        iso%i_result_value, iso%result_value_iso_ctl)
+        call read_real_ctl_type(hd_result_value,                        &
+     &      iso%result_value_iso_ctl)
       end do
 !
       end subroutine read_iso_result_control

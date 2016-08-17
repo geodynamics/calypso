@@ -90,14 +90,15 @@
       type(psf_parameters), intent(inout) :: iso_param
 !
 !
-      if(iso%i_iso_file_head .gt. 0) then
-        iso_header(i_iso) = iso%iso_file_head_ctl
+      if(iso%iso_file_head_ctl%iflag .gt. 0) then
+        iso_header(i_iso) = iso%iso_file_head_ctl%charavalue
       else
         iso_header(i_iso) =  'iso'
       end if
 !
-      call choose_para_fld_file_format(iso%iso_output_type_ctl,         &
-     &    iso%i_iso_out_type, itype_iso_file(i_iso) )
+      call choose_para_fld_file_format                                  &
+     &   (iso%iso_output_type_ctl%charavalue,                           &
+     &    iso%iso_output_type_ctl%iflag, itype_iso_file(i_iso) )
 !
       if(iso%iso_out_field_ctl%num .eq. 0) then
         id_iso_result_type(i_iso) = iflag_constant_iso
@@ -141,21 +142,22 @@
       type(phys_data), intent(inout) :: iso_fld
       type(psf_parameters), intent(inout) :: iso_param
 !
-      integer(kind = kint) :: ncomp(1), ncomp_org(1)
-      character(len=kchara) :: tmpchara(1)
+      integer(kind = kint) :: ncomp, ncomp_org
+      character(len=kchara) :: tmpchara
 !
 !
 !
-      call set_components_4_viz(num_nod_phys, phys_nod_name,            &
-     &    ione, iso%isosurf_data_ctl, iso%isosurf_comp_ctl,             &
-     &    ione, id_isosurf_data(i_iso), id_isosurf_comp(i_iso),         &
+      call set_one_component_4_viz(num_nod_phys, phys_nod_name,         &
+     &    iso%isosurf_data_ctl%charavalue,                              &
+     &    iso%isosurf_comp_ctl%charavalue,                              &
+     &    id_isosurf_data(i_iso), id_isosurf_comp(i_iso),               &
      &    ncomp, ncomp_org, tmpchara)
 !
-      isosurf_value(i_iso) = iso%isosurf_value_ctl
+      isosurf_value(i_iso) = iso%isosurf_value_ctl%realvalue
 !
       call alloc_output_comps_psf(iso_fld%num_phys, iso_param)
       if (id_iso_result_type(i_iso) .eq. iflag_constant_iso) then
-        result_value_iso(i_iso) = iso%result_value_iso_ctl
+        result_value_iso(i_iso) = iso%result_value_iso_ctl%realvalue
         iso_param%id_output(1) = iflag_constant_iso
         iso_param%icomp_output(1) = 0
         iso_fld%num_component(1) = 1

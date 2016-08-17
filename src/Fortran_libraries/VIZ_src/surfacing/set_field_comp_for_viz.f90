@@ -3,11 +3,14 @@
 !
 !        programmed by H.Matsui on May. 2006
 !
-!!      subroutine check_field_4_viz(num_nod_phys, phys_nod_name,      &
+!!      subroutine check_field_4_viz(num_nod_phys, phys_nod_name,       &
 !!     &          n_field_ctl, field_name, num_field, num_field_vis)
-!!      subroutine set_components_4_viz(num_nod_phys, phys_nod_name,   &
-!!     &          n_field_ctl, field_name, comp_name, num_field,       &
+!!      subroutine set_components_4_viz(num_nod_phys, phys_nod_name,    &
+!!     &          n_field_ctl, field_name, comp_name, num_field,        &
 !!     &          ifield, icomp, ncomp, ncomp_org, rst_name)
+!!      subroutine set_one_component_4_viz(num_nod_phys, phys_nod_name, &
+!!     &          field_name, comp_name, ifield, icomp, ncomp,          &
+!!     &          ncomp_org, rst_name)
 !!
 !!      subroutine count_total_comps_4_viz(psf_fld)
 !
@@ -91,6 +94,41 @@
       end do
 !
       end subroutine set_components_4_viz
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine set_one_component_4_viz(num_nod_phys, phys_nod_name,   &
+     &          field_name, comp_name, ifield, icomp, ncomp,            &
+     &          ncomp_org, rst_name)
+!
+      use set_components_flags
+!
+      integer(kind = kint), intent(in) :: num_nod_phys
+      character(len=kchara), intent(in) :: phys_nod_name(num_nod_phys)
+!
+      character(len=kchara), intent(in) :: field_name
+      character(len=kchara), intent(in) :: comp_name
+!
+      integer(kind = kint), intent(inout) :: ifield
+      integer(kind = kint), intent(inout) :: icomp
+      integer(kind = kint), intent(inout) :: ncomp
+      integer(kind = kint), intent(inout) :: ncomp_org
+      character(len=kchara), intent(inout) :: rst_name
+!
+      integer(kind = kint) :: id
+!
+!
+      do id = 1, num_nod_phys
+        if ( field_name .eq. phys_nod_name(id) ) then
+          ifield = id
+!
+          call s_set_components_flags(comp_name, field_name,            &
+     &        icomp, ncomp, ncomp_org, rst_name)
+          exit
+        end if
+      end do
+!
+      end subroutine set_one_component_4_viz
 !
 !  ---------------------------------------------------------------------
 !
