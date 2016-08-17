@@ -8,7 +8,7 @@
 !!     &          num_nod_phys, phys_nod_name, psf_fld, psf_param, ierr)
 !!      subroutine set_control_4_psf(i_psf, psf, num_mat, mat_name,     &
 !!     &          num_surf, surf_name, num_nod_phys, phys_nod_name,     &
-!!     &          psf_fld, psf_param)
+!!     &          psf_fld, psf_param, ierr)
 !
       module m_control_params_4_psf
 !
@@ -26,6 +26,13 @@
       real(kind = kreal), allocatable :: const_psf(:,:)
 !
       integer(kind = kint), allocatable :: id_psf_group(:)
+!
+      character(len = kchara), parameter :: cflag_eq =  'equation'
+      character(len = kchara), parameter :: cflag_sph = 'sphere'
+      character(len = kchara), parameter :: cflag_elp = 'ellipsoid'
+      character(len = kchara), parameter :: cflag_hyp = 'hyperboloid'
+      character(len = kchara), parameter :: cflag_prb = 'paraboloid'
+      character(len = kchara), parameter :: cflag_grp = 'group'
 !
 !  ---------------------------------------------------------------------
 !
@@ -86,14 +93,15 @@
 !
 !
       ierr = 0
-      if(psf%i_psf_file_head .gt. 0) then
-        psf_header(i_psf) =  psf%psf_file_head_ctl
+      if(psf%psf_file_head_ctl%iflag .gt. 0) then
+        psf_header(i_psf) =  psf%psf_file_head_ctl%charavalue
       else
         psf_header(i_psf) =  'psf'
       end if
 !
-      call choose_para_fld_file_format(psf%psf_output_type_ctl,         &
-     &    psf%i_psf_out_type, itype_psf_file(i_psf) )
+      call choose_para_fld_file_format                                  &
+     &   (psf%psf_output_type_ctl%charavalue,                           &
+     &    psf%psf_output_type_ctl%iflag, itype_psf_file(i_psf) )
 !
       call check_field_4_viz(num_nod_phys, phys_nod_name,               &
      &   psf%psf_out_field_ctl%num, psf%psf_out_field_ctl%c1_tbl,       &
@@ -103,7 +111,11 @@
      &    psf%psf_area_ctl%num, psf%psf_area_ctl%c_tbl,                 &
      &    psf_param%nele_grp_area)
 !
-      if(psf_param%nele_grp_area .eq. 0) ierr = ierr_VIZ
+      if(psf_param%nele_grp_area .eq. 0) then
+        ierr = ierr_VIZ
+        write(e_message,'(a)') 'set correct element group'
+        return
+      end if
 !
       end subroutine count_control_4_psf
 !
@@ -111,8 +123,9 @@
 !
       subroutine set_control_4_psf(i_psf, psf, num_mat, mat_name,       &
      &          num_surf, surf_name, num_nod_phys, phys_nod_name,       &
-     &          psf_fld, psf_param)
+     &          psf_fld, psf_param, ierr)
 !
+      use m_error_IDs
       use m_control_data_4_psf
       use t_phys_data
       use t_psf_patch_data
@@ -133,41 +146,51 @@
       type(psf_ctl), intent(inout) :: psf
       type(phys_data), intent(inout) :: psf_fld
       type(psf_parameters), intent(inout) :: psf_param
+      integer(kind = kint), intent(inout) :: ierr
+!
+      character(len = kchara) :: tmpchara
 !
 !
-      if     (psf%section_method_ctl.eq. 'equation') then
+      ierr = 0
+      tmpchara = psf%section_method_ctl%charavalue
+!
+      if(cmp_no_case(tmpchara, cflag_eq)) then
         id_section_method(i_psf) = 1
         call set_coefs_4_psf(psf%psf_coefs_ctl%num,                     &
      &      psf%psf_coefs_ctl%c_tbl,  psf%psf_coefs_ctl%vect,           &
      &      const_psf(1,i_psf) )
         call deallocate_psf_coefs_ctl(psf)
 !
-      else if(psf%section_method_ctl.eq. 'sphere') then
+      else if(cmp_no_case(tmpchara, cflag_sph)) then
         id_section_method(i_psf) = 2
         call set_coefs_4_sphere(psf, const_psf(1,i_psf))
 !
-      else if(psf%section_method_ctl.eq. 'ellipsoid') then
+      else if(cmp_no_case(tmpchara, cflag_elp)) then
         id_section_method(i_psf) = 3
         call set_coefs_4_ellipsode(psf, const_psf(1,i_psf) )
         call deallocate_psf_axis_ctl(psf)
         call deallocate_psf_center_ctl(psf)
 !
-      else if(psf%section_method_ctl.eq. 'hyperboloid') then
+      else if(cmp_no_case(tmpchara, cflag_hyp)) then
         id_section_method(i_psf) = 4
         call set_coefs_4_hyperboloide(psf, const_psf(1,i_psf) )
         call deallocate_psf_axis_ctl(psf)
         call deallocate_psf_center_ctl(psf)
 !
-      else if(psf%section_method_ctl.eq. 'paraboloid') then
+      else if(cmp_no_case(tmpchara, cflag_prb)) then
         id_section_method(i_psf) = 5
         call set_coefs_4_parabolic(psf, const_psf(1,i_psf) )
         call deallocate_psf_axis_ctl(psf)
         call deallocate_psf_center_ctl(psf)
 !
-      else if(psf%section_method_ctl.eq. 'group') then
+      else if(cmp_no_case(tmpchara, cflag_grp)) then
         id_section_method(i_psf) = 0
         call set_surf_grp_id_4_viz(num_surf, surf_name,                 &
-     &      psf%psf_group_name_ctl, id_psf_group(i_psf) )
+     &      psf%psf_group_name_ctl%charavalue, id_psf_group(i_psf) )
+      else
+        ierr = ierr_VIZ
+        write(e_message,'(a)') 'Set cross section mode'
+        return
       end if
 !
 !

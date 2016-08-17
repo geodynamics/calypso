@@ -680,23 +680,57 @@ Number of grid points \verb|[Nphi_mid_equator]|in longitudinal direction to eval
 \label{href_t:visual_control}
 Visualization modules are defined in this block. Parameters for cross sections and isosurfaces are defined in this block. \\
 \hyperref[href_i:visual_control]{(Back to {\tt visual\_control})}
+
+
 %
-\subsubsection{\tt cross\_section\_ctl}
+%
+%
+%
+\subsection{\tt cross\_section\_ctl}
 \label{href_t:cross_section_ctl}
 Control parameters for cross sectioning are defined in this block. \\
 \hyperref[href_i:cross_section_ctl]{(Back to {\tt cross\_section\_ctl)}}
 
 \paragraph{\tt section\_file\_prefix}
 \label{href_t:section_file_prefix}
-\verb|[section_file_prefix]| \\
-Number of subdomain for new new decomposed data \verb|[new_num_domain]| is defined by integer.
+\verb|[file_prefix]| \\
+File prefix for cross section data is defined as character \verb|[file_prefix]|.
+
+\subsubsection{\tt surface\_define}
+\label{href_t:surface_define}
+Each cross section is defined in this block. \\
+\hyperref[href_i:cross_section_ctl]{(Back to {\tt cross\_section\_ctl)}} \\
+
+\subsubsection{\tt output\_field\_define}
+\label{href_t:output_field_define}
+Field data on the cross section are defined in this block. \\
+\hyperref[href_i:cross_section_ctl]{(Back to {\tt cross\_section\_ctl)}} \\
 
 %
-\subsubsection{\tt isosurface\_ctl}
+\subsection{\tt isosurface\_ctl}
 \label{href_t:isosurface_ctl}
 Control parameters for isosurfaces are defined in this block. \\
 \hyperref[href_i:isosurface_ctl]{(Back to {\tt isosurface\_ctl)}}
 
+\paragraph{\tt isosurface\_file\_prefix}
+\label{href_t:isosurface_file_prefix}
+\verb|[file_prefix]| \\
+File prefix for isosurface data is defined as character \verb|[file_prefix]|.
+
+\subsubsection{\tt isosurf\_define}
+\label{href_t:isosurf_define}
+Each isosurface is defined in this block. \\
+\hyperref[href_i:isosurface_ctl]{(Back to {\tt isosurface\_ctl)}}
+
+\subsubsection{\tt field\_on\_isosurf}
+\label{href_t:field_on_isosurf}
+Field data on the isosurface are defined in this block. \\
+\hyperref[href_i:isosurface_ctl]{(Back to {\tt isosurface\_ctl)}}
+
+
+%
+%
+%
 %
 \subsection{\tt num\_domain\_ctl}
 \label{href_t:num_domain_ctl}

@@ -493,9 +493,9 @@ The format of the control file \verb|control_MHD| is described below. The detail
     \label{href_i:visual_control}
     \hyperref[href_t:visual_control]{(Detail)}
     \begin{itemize}
-    \item \verb|array cross_section_ctl   [Block]| \label{href_i:cross_section_ctl}
+    \item \verb|array cross_section_ctl   [File or Block]|
             \hyperref[href_t:cross_section_ctl]{(Detail)}
-    \item \verb|array isosurface_ctl   [Block]|  \label{href_i:isosurface_ctl}
+    \item \verb|array isosurface_ctl   [File or Block]|
             \hyperref[href_t:isosurface_ctl]{(Detail)}
 %
     \end{itemize}
@@ -718,6 +718,21 @@ and 10 constants $a$ to $k$ are defined in the control array \verb|coefs_ctl|. A
 \end{center}
 \end{table}
 %
+\subsubsection{Control file}
+The format of the control file or block for cross sections is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking "(Detail)". \\
+\\
+%
+\verb|cross_section_ctl|  (Header of the control file)
+\label{href_i:cross_section_ctl}
+\begin{itemize}
+	\item \verb|section_file_prefix         [section_prefix]|
+    		\hyperref[href_t:section_file_prefix]{(Detail)}
+	\item \verb|surface_define|
+    		\hyperref[href_t:surface_define]{(Detail)}
+	\item \verb|output_field_define|
+    		\hyperref[href_t:output_field_define]{(Detail)}
+\end{itemize}
+
 %
 \subsection{Isosurface data}
 %
@@ -725,6 +740,21 @@ Calypso can also output isosurface data for visualization. Generally, data size 
 
 To output cross sectioning, increment of the surface output data should be defined by \verb|i_step_isosurface_ctl| in \verb|time_step_ctl| block. And, array block \verb|isosurface_ctl| in \verb|visual_control| section is required to define cross sections. Each \verb|isosurface_ctl| block defines one cross section. Each cross section can also define by an external file by specifying external file name with \verb|file| label.
 %
+\subsubsection{Control file}
+The format of the control file or block for isosurfaces is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking "(Detail)". \\
+\\
+%
+\verb|isosurface_ctl|  (Header of the control file)
+\label{href_i:isosurface_ctl}
+\begin{itemize}
+	\item \verb|isosurface_file_prefix         [file_prefix]|
+    		\hyperref[href_t:isosurface_file_prefix]{(Detail)}
+	\item \verb|isosurf_define|
+    		\hyperref[href_t:isosurf_define]{(Detail)}
+	\item \verb|field_on_isosurf|
+    		\hyperref[href_t:field_on_isosurf]{(Detail)}
+\end{itemize}
+
 
 
 \subsection{Mean square amplitude data}

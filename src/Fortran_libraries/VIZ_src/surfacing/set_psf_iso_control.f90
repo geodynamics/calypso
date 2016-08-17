@@ -93,8 +93,7 @@
         call count_control_4_psf(i_psf, psf_ctl_struct(i_psf),          &
      &      num_mat, mat_name, num_nod_phys, phys_nod_name,             &
      &      psf_mesh(i_psf)%field, psf_param(i_psf), ierr)
-        if(ierr.gt.0) call calypso_MPI_abort                            &
-     &                   (ierr, 'set correct element group')
+        if(ierr.gt.0) call calypso_MPI_abort(ierr, e_message)
       end do
 !
       do i_psf = 1, num_psf
@@ -102,7 +101,9 @@
         call set_control_4_psf                                          &
      &     (i_psf, psf_ctl_struct(i_psf), num_mat, mat_name,            &
      &      num_surf, surf_name, num_nod_phys, phys_nod_name,           &
-     &      psf_mesh(i_psf)%field, psf_param(i_psf))
+     &      psf_mesh(i_psf)%field, psf_param(i_psf), ierr)
+        if(ierr.gt.0) call calypso_MPI_abort(ierr, e_message)
+!
         call deallocate_cont_dat_4_psf(psf_ctl_struct(i_psf))
 !
         call count_total_comps_4_viz(psf_mesh(i_psf)%field)

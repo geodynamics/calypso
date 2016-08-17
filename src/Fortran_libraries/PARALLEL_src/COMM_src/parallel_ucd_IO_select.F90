@@ -113,7 +113,7 @@
 !
 !
       if (i_file_fmt .eq. 0) then
-        id_field_file_format = iflag_udt
+        id_field_file_format = iflag_sgl_vtk
         return
       end if
 !

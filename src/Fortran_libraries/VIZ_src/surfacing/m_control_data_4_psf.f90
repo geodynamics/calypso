@@ -117,16 +117,20 @@
       use m_machine_parameter
       use m_read_control_elements
       use skip_comment_f
+      use t_control_elements
       use t_read_control_arrays
 !
       implicit  none
 !
 !
       type psf_ctl
-        character(len=kchara) :: psf_file_head_ctl
-        character(len=kchara) :: psf_output_type_ctl
+!>        Structure for file prefix
+        type(read_character_item) :: psf_file_head_ctl
+!>        Structure for data field format
+        type(read_character_item) :: psf_output_type_ctl
 !
-        character(len=kchara) :: section_method_ctl
+!>        Structure for cross section type
+        type(read_character_item) :: section_method_ctl
 !
 !
 !>      Structure for coefficients for sueface equation
@@ -144,9 +148,11 @@
 !!@n      psf_axis_ctl%vect:  vector component
         type(ctl_array_cr) :: psf_axis_ctl
 !
-        real(kind = kreal) :: radius_psf_ctl
+!>        Structure for radius
+        type(read_real_item) :: radius_psf_ctl
 !
-        character(len=kchara) :: psf_group_name_ctl
+!>        Surface group name for section
+        type(read_character_item) :: psf_group_name_ctl
 !
 !>      Structure for list of output field
 !!@n      psf_out_field_ctl%c1_tbl: Name of field
@@ -160,29 +166,20 @@
 !     Top level
         integer (kind=kint) :: i_psf_ctl = 0
 !     2nd level for cross_section_ctl
-        integer (kind=kint) :: i_psf_file_head =  0
-        integer (kind=kint) :: i_psf_out_type =   0
         integer (kind=kint) :: i_surface_define = 0
         integer (kind=kint) :: i_output_field =   0
 !     3rd level for surface_define
-        integer (kind=kint) :: i_section_method =  0
-        integer (kind=kint) :: i_radius =          0
-        integer (kind=kint) :: i_plot_area =       0
-        integer (kind=kint) :: i_group_name =      0
+        integer (kind=kint) :: i_plot_area =      0
       end type psf_ctl
 !
 !
 !     Top level
-      character(len=kchara), parameter                                  &
-     &                  :: hd_psf_ctl = 'surface_rendering'
       character(len=kchara), parameter                                  &
      &                  :: hd_section_ctl = 'cross_section_ctl'
 !
 !     2nd level for cross_section_ctl
       character(len=kchara), parameter                                  &
      &                  :: hd_psf_file_prefix = 'section_file_prefix'
-      character(len=kchara), parameter                                  &
-     &                  :: hd_psf_file_head =   'psf_file_head'
       character(len=kchara), parameter                                  &
      &                  :: hd_psf_out_type =    'psf_output_type'
       character(len=kchara), parameter                                  &
@@ -220,6 +217,13 @@
       character(len=kchara), parameter                                  &
      &                  :: hd_psf_result_field = 'output_field'
 !
+!
+!      Deprecated labels
+!
+      character(len=kchara), parameter                                  &
+     &                  :: hd_psf_ctl = 'surface_rendering'
+      character(len=kchara), parameter                                  &
+     &                  :: hd_psf_file_head =   'psf_file_head'
 !
       private :: hd_psf_file_head, hd_psf_file_prefix
       private :: hd_psf_out_type, hd_surface_define, hd_output_field
@@ -319,12 +323,12 @@
         call  read_psf_output_ctl(psf)
 !
 !
-        call read_character_ctl_item(hd_psf_file_prefix,                &
-     &      psf%i_psf_file_head, psf%psf_file_head_ctl)
-        call read_character_ctl_item(hd_psf_file_head,                  &
-     &      psf%i_psf_file_head, psf%psf_file_head_ctl)
-        call read_character_ctl_item(hd_psf_out_type,                   &
-     &      psf%i_psf_out_type, psf%psf_output_type_ctl)
+        call read_chara_ctl_type(hd_psf_file_prefix,                    &
+     &      psf%psf_file_head_ctl)
+        call read_chara_ctl_type(hd_psf_file_head,                      &
+     &      psf%psf_file_head_ctl)
+        call read_chara_ctl_type(hd_psf_out_type,                       &
+     &      psf%psf_output_type_ctl)
       end do
 !
       end subroutine read_psf_control_data
@@ -354,13 +358,11 @@
         call read_psf_plot_area_ctl(psf)
 !
 !
-        call read_real_ctl_item(hd_radius,                              &
-     &        psf%i_radius, psf%radius_psf_ctl)
+        call read_real_ctl_type(hd_radius, psf%radius_psf_ctl)
 !
-        call read_character_ctl_item(hd_section_method,                 &
-     &        psf%i_section_method, psf%section_method_ctl)
-        call read_character_ctl_item(hd_group_name,                     &
-     &        psf%i_group_name, psf%psf_group_name_ctl)
+        call read_chara_ctl_type(hd_section_method,                     &
+     &      psf%section_method_ctl)
+        call read_chara_ctl_type(hd_group_name, psf%psf_group_name_ctl)
       end do
 !
       end subroutine read_section_def_control

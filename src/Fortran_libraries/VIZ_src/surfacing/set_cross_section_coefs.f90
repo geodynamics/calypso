@@ -99,11 +99,13 @@
       type(psf_ctl), intent(in) :: psf
       real(kind = kreal), intent(inout) :: c_surf(10)
 !
-      real(kind = kreal) :: xc(3)
+      real(kind = kreal) :: xc(3), r
 !
 !
       call set_parameter_2_vectors(psf%psf_center_ctl%num,              &
      &    psf%psf_center_ctl%c_tbl, psf%psf_center_ctl%vect, xc)
+!
+      r = psf%radius_psf_ctl%realvalue
 !
       c_surf( 1) =  one
       c_surf( 2) =  one
@@ -114,8 +116,7 @@
       c_surf( 7) = -two*xc(1)
       c_surf( 8) = -two*xc(2)
       c_surf( 9) = -two*xc(3)
-      c_surf(10) = xc(1)*xc(1) + xc(2)*xc(2) + xc(3)*xc(3)              &
-     &            - (psf%radius_psf_ctl*psf%radius_psf_ctl)
+      c_surf(10) = xc(1)*xc(1) + xc(2)*xc(2) + xc(3)*xc(3) - (r*r)
 !
       end subroutine set_coefs_4_sphere
 !

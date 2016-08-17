@@ -70,7 +70,7 @@
 !
       if(num_psf_ctl .gt. 0) then
         do i = 1, num_psf_ctl
-          psf_ctl_struct(i)%radius_psf_ctl =       0.0d0
+          psf_ctl_struct(i)%radius_psf_ctl%realvalue = 0.0d0
           psf_ctl_struct(i)%psf_out_field_ctl%num = 0
           psf_ctl_struct(i)%psf_area_ctl%num =      0
         end do
