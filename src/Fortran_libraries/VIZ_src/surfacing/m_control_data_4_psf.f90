@@ -1,113 +1,121 @@
+!>@file   m_control_data_4_psf.f90
+!!@brief  module m_control_data_4_psf
+!!
+!!@author H. Matsui
+!!@date Programmed in May. 2006
 !
-!      module m_control_data_4_psf
-!
-!        programmed by H.Matsui on May. 2006
-!
-!      subroutine deallocate_cont_dat_4_psf(psf)
-!        type(psf_ctl), intent(inout) :: psf
-!      subroutine deallocate_psf_coefs_ctl(psf)
-!        type(psf_ctl), intent(inout) :: psf
-!      subroutine deallocate_psf_center_ctl(psf)
-!        type(psf_ctl), intent(inout) :: psf
-!      subroutine deallocate_psf_axis_ctl(psf)
-!        type(psf_ctl), intent(inout) :: psf
-!
-!      subroutine read_control_data_4_psf(psf)
-!        type(psf_ctl), intent(inout) :: psf
-!      subroutine read_psf_control_data(psf)
-!        type(psf_ctl), intent(inout) :: psf
-!
+!>@brief  control ID data for surfacing module
+!!
+!!@verbatim
+!!      subroutine deallocate_cont_dat_4_psf(psf)
+!!      subroutine deallocate_psf_coefs_ctl(psf)
+!!      subroutine deallocate_psf_center_ctl(psf)
+!!      subroutine deallocate_psf_normal_ctl(psf)
+!!      subroutine deallocate_psf_axis_ctl(psf)
+!!        type(psf_ctl), intent(inout) :: psf
+!!
+!!      subroutine read_control_data_4_psf(psf)
+!!      subroutine read_psf_control_data(psf)
+!!        type(psf_ctl), intent(inout) :: psf
+!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!! example of control for Kemo's surface rendering
-!
-!  begin cross_section_ctl
-!    section_file_prefix    'psf'
-!    psf_output_type         ucd
-!  
-!    begin surface_define
-!      section_method    equation
-!  
-!      array coefs_ctl  10
-!        coefs_ctl  x2     1.0
-!        coefs_ctl  y2     1.0
-!        coefs_ctl  z2     0.0
-!        coefs_ctl  xy     0.0
-!        coefs_ctl  yz     0.0
-!        coefs_ctl  zx     0.0
-!        coefs_ctl  x      0.0
-!        coefs_ctl  y      0.0
-!        coefs_ctl  z      0.0
-!        coefs_ctl  const  1.0
-!      end array coefs_ctl
-!  
-!      begin plot_area_ctl
-!        array chosen_ele_grp_ctl 1
-!          chosen_ele_grp_ctl   outer_core   end
-!        end array chosen_ele_grp_ctl
-!      end plot_area_ctl
-!    end surface_define
-!  
-!    begin output_field_define
-!      array  output_field   2
-!        output_field    velocity         vector   end
-!        output_field    magnetic_field   radial   end
-!      end  array output_field
-!    end output_field_define
-!  end  cross_section_ctl
-!  
+!!
+!!  begin cross_section_ctl
+!!    section_file_prefix    'psf'
+!!    psf_output_type         ucd
+!!  
+!!    begin surface_define
+!!      section_method    equation
+!!  
+!!      array coefs_ctl  10
+!!        coefs_ctl  x2     1.0
+!!        coefs_ctl  y2     1.0
+!!        coefs_ctl  z2     0.0
+!!        coefs_ctl  xy     0.0
+!!        coefs_ctl  yz     0.0
+!!        coefs_ctl  zx     0.0
+!!        coefs_ctl  x      0.0
+!!        coefs_ctl  y      0.0
+!!        coefs_ctl  z      0.0
+!!        coefs_ctl  const  1.0
+!!      end array coefs_ctl
+!!  
+!!      begin plot_area_ctl
+!!        array chosen_ele_grp_ctl 1
+!!          chosen_ele_grp_ctl   outer_core   end
+!!        end array chosen_ele_grp_ctl
+!!      end plot_area_ctl
+!!    end surface_define
+!!  
+!!    begin output_field_define
+!!      array  output_field   2
+!!        output_field    velocity         vector   end
+!!        output_field    magnetic_field   radial   end
+!!      end  array output_field
+!!    end output_field_define
+!!  end  cross_section_ctl
+!!  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!  
-!      psf_output_type:
-!           ucd, OpenDX
-!
-!    num_result_comp: number of fields
-!    output_field: (Original name: color_comp and color_subcomp)
-!         field and componenet name for output
-!           x, y, z, radial, elevation, azimuth, cylinder_r, norm
-!           vector, sym_tensor, asym_tensor
-!           spherical_vector, cylindrical_vector
-!    output_value: (Original name: specified_color)
-!
-!    section_method: (original: method)
-!           sphere, ellipsoid, hyperboloid, paraboloid, equation
-!           group
-!    center_position: position of center (for sphere)
-!        array center_position    3
-!          center_position  x   0.0
-!          center_position  y   0.0
-!          center_position  z   0.0
-!        end array center_position
-!    radius:  radius of sphere
-!    axial_length: length of axis
-!          (for ellipsoid, hyperboloid, paraboloid)
-!        array axial_length   3
-!          axial_length  x   1.0
-!          axial_length  y   0.5
-!          axial_length  z   0.0
-!        end array axial_length
-!    coefficients:  coefficients for equation
-!        array coefs_ctl  10
-!          coefs_ctl  x2     1.0
-!          coefs_ctl  y2     0.5
-!          coefs_ctl  z2     0.0
-!          coefs_ctl  xy     1.0
-!          coefs_ctl  yz     0.5
-!          coefs_ctl  zx     0.0
-!          coefs_ctl  x      1.0
-!          coefs_ctl  y      0.5
-!          coefs_ctl  z      0.0
-!          coefs_ctl  const  1.0
-!        end array coefs_ctl
-!    group_type:  (Original: defined_style)
-!           node_group or surface_group
-!    group_name:  name of group to plot
-!
-!   field type:
-!     scalar, vector,     sym_tensor, asym_tensor
-!     spherical_vector,   spherical_sym_tensor
-!     cylindrical_vector, cylindrical_sym_tensor
-!     norm
+!!  
+!!      psf_output_type:
+!!           ucd, OpenDX
+!!
+!!    num_result_comp: number of fields
+!!    output_field: (Original name: color_comp and color_subcomp)
+!!         field and componenet name for output
+!!           x, y, z, radial, elevation, azimuth, cylinder_r, norm
+!!           vector, sym_tensor, asym_tensor
+!!           spherical_vector, cylindrical_vector
+!!    output_value: (Original name: specified_color)
+!!
+!!    section_method: (original: method)
+!!           plane, sphere, ellipsoid, hyperboloid, paraboloid
+!!           equation, group
+!!    normal_vector: normal vector (for plane)
+!!        array normal_vector    3
+!!          normal_vector  x   0.0
+!!          normal_vector  y   0.0
+!!          normal_vector  z   1.0
+!!        end array normal_vector
+!!    center_position: position of center (for sphere and plane)
+!!        array center_position    3
+!!          center_position  x   0.0
+!!          center_position  y   0.0
+!!          center_position  z   0.0
+!!        end array center_position
+!!    radius:  radius of sphere
+!!    axial_length: length of axis
+!!          (for ellipsoid, hyperboloid, paraboloid)
+!!        array axial_length   3
+!!          axial_length  x   1.0
+!!          axial_length  y   0.5
+!!          axial_length  z   0.0
+!!        end array axial_length
+!!    coefficients:  coefficients for equation
+!!        array coefs_ctl  10
+!!          coefs_ctl  x2     1.0
+!!          coefs_ctl  y2     0.5
+!!          coefs_ctl  z2     0.0
+!!          coefs_ctl  xy     1.0
+!!          coefs_ctl  yz     0.5
+!!          coefs_ctl  zx     0.0
+!!          coefs_ctl  x      1.0
+!!          coefs_ctl  y      0.5
+!!          coefs_ctl  z      0.0
+!!          coefs_ctl  const  1.0
+!!        end array coefs_ctl
+!!    group_type:  (Original: defined_style)
+!!           node_group or surface_group
+!!    group_name:  name of group to plot
+!!
+!!   field type:
+!!     scalar, vector,     sym_tensor, asym_tensor
+!!     spherical_vector,   spherical_sym_tensor
+!!     cylindrical_vector, cylindrical_sym_tensor
+!!     norm
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!@endverbatim
 !
       module m_control_data_4_psf
 !
@@ -137,6 +145,11 @@
 !!@n      psf_coefs_ctl%c_tbl: 
 !!@n      psf_coefs_ctl%vect:  coefficients
         type(ctl_array_cr) :: psf_coefs_ctl
+!
+!>      Structure for definition of normal vector of plnae sruface
+!!@n      psf_axis_ctl%c_tbl: direction of axis
+!!@n      psf_axis_ctl%vect:  position
+        type(ctl_array_cr) :: psf_normal_ctl
 !
 !>      Structure for definition of center
 !!@n      psf_axis_ctl%c_tbl: direction of axis
@@ -198,6 +211,9 @@
      &                  :: hd_group_name =      'group_name'
 !
 !     4th level for center_position
+      character(len=kchara), parameter                                  &
+     &                  :: hd_normal_ctl = 'normal_vector'
+!
       character(len=kchara), parameter                                  &
      &                  :: hd_center_ctl = 'center_position'
 !
@@ -280,6 +296,17 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine deallocate_psf_normal_ctl(psf)
+!
+      type(psf_ctl), intent(inout) :: psf
+!
+!
+      call dealloc_control_array_c_r(psf%psf_normal_ctl)
+!
+      end subroutine deallocate_psf_normal_ctl
+!
+!  ---------------------------------------------------------------------
+!
       subroutine deallocate_psf_axis_ctl(psf)
 !
       type(psf_ctl), intent(inout) :: psf
@@ -353,6 +380,7 @@
 !
         call read_control_array_c_r(hd_coefs_ctl, psf%psf_coefs_ctl)
         call read_control_array_c_r(hd_center_ctl, psf%psf_center_ctl)
+        call read_control_array_c_r(hd_normal_ctl, psf%psf_normal_ctl)
         call read_control_array_c_r(hd_axis_ctl, psf%psf_axis_ctl)
 !
         call read_psf_plot_area_ctl(psf)

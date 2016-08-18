@@ -28,6 +28,7 @@
       integer(kind = kint), allocatable :: id_psf_group(:)
 !
       character(len = kchara), parameter :: cflag_eq =  'equation'
+      character(len = kchara), parameter :: cflag_pln = 'plane'
       character(len = kchara), parameter :: cflag_sph = 'sphere'
       character(len = kchara), parameter :: cflag_elp = 'ellipsoid'
       character(len = kchara), parameter :: cflag_hyp = 'hyperboloid'
@@ -161,9 +162,16 @@
      &      const_psf(1,i_psf) )
         call deallocate_psf_coefs_ctl(psf)
 !
+      else if(cmp_no_case(tmpchara, cflag_pln)) then
+        id_section_method(i_psf) = 2
+        call set_coefs_4_plane(psf, const_psf(1,i_psf))
+        call deallocate_psf_center_ctl(psf)
+        call deallocate_psf_normal_ctl(psf)
+!
       else if(cmp_no_case(tmpchara, cflag_sph)) then
         id_section_method(i_psf) = 2
         call set_coefs_4_sphere(psf, const_psf(1,i_psf))
+        call deallocate_psf_center_ctl(psf)
 !
       else if(cmp_no_case(tmpchara, cflag_elp)) then
         id_section_method(i_psf) = 3

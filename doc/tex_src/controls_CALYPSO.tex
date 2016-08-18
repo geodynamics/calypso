@@ -701,6 +701,33 @@ File prefix for cross section data is defined as character \verb|[file_prefix]|.
 Each cross section is defined in this block. \\
 \hyperref[href_i:cross_section_ctl]{(Back to {\tt cross\_section\_ctl)}} \\
 
+\paragraph{\tt section\_method}
+\label{href_t:section_method}
+\verb|[METHOD]| \\
+Method of the cross sectioning is defined as character \verb|[METHOD]|. Supported cross section is shown in Table \ref{table:surface_list}
+%
+\begin{table}[htp]
+\caption{Supported cross sections}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\verb|[METHOD]| & Surface type \\ \hline
+\verb|equation| & Quadrature surface \\
+% & $a x^2 + b y^2 + c z^2 + d y x + e z x + f x y + g x + h y + j z + k = 0$ \\
+\verb|plane| & Plane surface \\
+%& $a \left(x-x_{0} \right) + b \left(y-y_{0} \right) + c \left(z-z_{0} \right) = 0$ \\
+\verb|sphere| & Sphere \\
+%& $\left(x-x_{0} \right)^2 + \left(y-y_{0} \right)^2 + \left(z-z_{0} \right)^2 = r^2$  \\
+\verb|ellipsoid| & Ellipsoid  \\
+%& $\left(\frac{x-x_{0}}{a} \right)^2 + \left( \frac{y-y_{0}}{b} \right)^2 + \left( \frac{z-z_{0}}{c} \right)^2 = 1$ \\
+\hline
+\end{tabular}
+\end{center}
+\label{table:surface_list}
+\end{table}
+%
+
+%
 \subsubsection{\tt output\_field\_define}
 \label{href_t:output_field_define}
 Field data on the cross section are defined in this block. \\
