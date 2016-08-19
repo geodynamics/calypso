@@ -139,11 +139,35 @@
       use m_spheric_param_smp
       use m_boundary_params_sph_MHD
       use set_reference_sph_mhd
+      use check_sph_radial_mat
 !
+      integer(kind = kint) :: j
+      integer(kind = kint), parameter :: id_offset = 100
+      integer(kind = kint), parameter :: id_file = 50 + id_offset
+!
+!
+      j = find_local_sph_mode_address(0, 0)
+      if(i_debug*j .gt. 0) then
+        open(id_file,file='ave_press_test.txt')
+        write(id_file,*) 'Matrix for average pressure'
+        call check_single_radial_3band_mat(id_offset,                   &
+     &      nidx_rj(1), radius_1d_rj_r, p_poisson_mat(1,1,j))
+        write(id_file,*) 'LU decomposition for average pressure'
+        call check_single_radial_3band_mat(id_offset,                   &
+     &      nidx_rj(1), radius_1d_rj_r, p_poisson_lu(1,1,j))
+        write(id_file,*) 'RHS for average pressure'
+        call check_scalar_coefs(id_file, 0, 0, ipol%i_press)
+      end if
 !
       call lubksb_3band_mul(np_smp, idx_rj_smp_stack(0,2),              &
      &    nidx_rj(2), nidx_rj(1), p_poisson_lu, i_p_pivot,              &
      &    d_rj(1,ipol%i_press) )
+!
+      if(i_debug*j .gt. 0) then
+        write(id_file,*) 'Solution of average pressure'
+        call check_scalar_coefs(id_file, 0, 0, ipol%i_press)
+        close(id_file)
+      end if
 !
       call adjust_by_ave_pressure_on_CMB                                &
      &   (sph_bc_U%kr_in, sph_bc_U%kr_out)
@@ -236,9 +260,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_temperature(l, m, is_field)
+      subroutine check_scalar_coefs(id_file, l, m, is_field)
 !
-      integer(kind = kint), intent(in) :: l, m, is_field
+      integer(kind = kint), intent(in) :: id_file, l, m, is_field
 !
       integer(kind = kint) :: j,k,inod
       integer(kind = 4) :: l4, m4
@@ -249,13 +273,13 @@
       j = find_local_sph_mode_address(l4, m4)
       if(j .eq. 0) return
 !
-      write(*,*) 'field ID, l, m: ', is_field, l, m
+      write(id_file,*) 'field ID, l, m: ', is_field, l, m
       do k = 1, nidx_rj(1)
         inod = j + (k-1)*nidx_rj(2)
-        write(*,*) k, d_rj(inod,is_field)
+        write(id_file,*) k, d_rj(inod,is_field)
       end do
 !
-      end subroutine check_temperature
+      end subroutine check_scalar_coefs
 !
 ! -----------------------------------------------------------------------
 !
@@ -354,7 +378,7 @@ end subroutine check_NaN_temperature
      &    jmax, nri, evo_lu, i_pivot, d_rj(1,is_field) )
 !
 !       write(*,*) 'solution'
-!       call check_temperature(30,-23, is_field)
+!       call check_scalar_coefs(6, 30,-23, is_field)
 !       write(*,*) 'check_NaN_temperature'
 !       call check_NaN_temperature(is_field)
 !
