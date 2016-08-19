@@ -699,7 +699,7 @@ The sections shown in Table \ref{table:section_list} are supported in the sectio
 \hline
 Surface type & equation \\ \hline
 Quadrature surface 
- & $a x^2 + b y^2 + c z^2 + d y x + e z x + f x y + g x + h y + j z + k = 0$ \\
+ & $a x^2 + b y^2 + c z^2 + d y z + e z x + f x y + g x + h y + j z + k = 0$ \\
 Plane surface 
 & $a \left(x-x_{0} \right) + b \left(y-y_{0} \right) + c \left(z-z_{0} \right) = 0$ \\
  Sphere 
@@ -716,14 +716,14 @@ The easiest approarch is using sections defined by quadrature function with ten 
 
 A plane surface is defined by a normal vector $(a, b, c)$ and one point including the surface $(x_{0}, y_{0}, z_{0})$ in arrays \verb|normal_vector| and \verb|center_position|, respectively.
 
-A sphere surface is defined by the position of the center $(x_{0}, y_{0}, z_{0})$ and radius $r$ in array \verb|center_position| and \verb|radius| , respectively.
+A sphere surface is defined by the position of the center $(x_{0}, y_{0}, z_{0})$ and radius $r$ in array \verb|center_position| and \verb|radius|, respectively.
 
 An Ellipsoid surface is defined the position of the center $(x_{0}, y_{0}, z_{0})$ and length of the each axis $(a, b, c)$ in arrays  \verb|center_position| and \verb|axial_length|, respectively. If one component of the \verb|axial_length| is set to 0, surfaceing module generate a Ellipsoidal tube along with the axis where \verb|axial_length| is set to 0.
 
 Area for visualization can be defined by array \verb|chosen_ele_grp_ctl| by choosing \verb|outer_core|, \verb|inner_core|, and \verb|all|. Fields to display is defined in array \verb|output_field|. In array \verb|output_field|, field type in Table \ref{table:field_type} needs to defined. The same field can be defined more than once in array \verb|output_field| to output vector field in Cartesian coordinate and radial component, for example.
 %
 \begin{table}[htp]
-\caption{List of field type for sectioning and isosurface module}
+\caption{List of field type for cross sectioning and isosurface module}
 \label{table:field_type}
 \begin{center} 
 \begin{tabular}{|c|c|}
@@ -736,8 +736,9 @@ Area for visualization can be defined by array \verb|chosen_ele_grp_ctl| by choo
  \verb|z| & $z$-component  \\ \hline
  \verb|radial| & radial ($r$-) component  \\ \hline
  \verb|theta| & $\theta$-component  \\ \hline
- \verb|phi| & $\phi$ component  \\ \hline
+ \verb|phi| & $\phi$-component  \\ \hline
  \verb|cylinder_r| & cylindrical radial ($s$-) component  \\ \hline
+ \verb|magnitude| & magnitude of vector  \\ \hline
 \end{tabular}
 \end{center}
 \end{table}
@@ -753,10 +754,30 @@ The format of the control file or block for cross sections is described below. T
     		\hyperref[href_t:section_file_prefix]{(Detail)}
 	\item \verb|surface_define|
     		\hyperref[href_t:surface_define]{(Detail)}
+		\begin{itemize}
+			\item \verb|section_method	[METHOD]|
+    				\hyperref[href_t:section_method]{(Detail)}
+			\item \verb|array coefs_ctl	[TERM]	[COEFFICIENT]|
+   		 		\hyperref[href_t:psf_coefs_ctl]{(Detail)}
+			\item \verb|radius	[SIZE]|
+   		 		\hyperref[href_t:psf_radius]{(Detail)}
+			\item \verb|array normal_vector		[DIRECTION]	[COMPONENT]|
+    				\hyperref[href_t:psf_normal_vector]{(Detail)}
+			\item \verb|array axial_length		[DIRECTION]	[COMPONENT]|
+    				\hyperref[href_t:psf_axial_length]{(Detail)}
+			\item \verb|array center_position	[DIRECTION]	[COMPONENT]|
+    				\hyperref[href_t:psf_center_position]{(Detail)}
+%
+			\item \verb|array section_area_ctl		[AREA_NAME]|
+    				\hyperref[href_t:section_area_ctl]{(Detail)}
+	\end{itemize}
+%
 	\item \verb|output_field_define|
     		\hyperref[href_t:output_field_define]{(Detail)}
-	\item \verb|section_method	[METHOD]|
-    		\hyperref[href_t:section_method]{(Detail)}
+		\begin{itemize}
+			\item \verb|array output_field		[FIELD]	[COMPONENT]|
+    				\hyperref[href_t:psf_output_field]{(Detail)}
+		\end{itemize}
 \end{itemize}
 
 %
@@ -775,10 +796,31 @@ The format of the control file or block for isosurfaces is described below. The 
 \begin{itemize}
 	\item \verb|isosurface_file_prefix         [file_prefix]|
     		\hyperref[href_t:isosurface_file_prefix]{(Detail)}
+%
 	\item \verb|isosurf_define|
     		\hyperref[href_t:isosurf_define]{(Detail)}
+		\begin{itemize}
+			\item \verb|isosurf_field	[FIELD]|
+    				\hyperref[href_t:isosurf_field]{(Detail)}
+			\item \verb|isosurf_component	[COMPONENT]|
+    				\hyperref[href_t:isosurf_component]{(Detail)}
+			\item \verb|isosurf_value	[VALUE]|
+    				\hyperref[href_t:isosurf_value]{(Detail)}
+%
+			\item \verb|array isosurf_area_ctl		[AREA_NAME]|
+    				\hyperref[href_t:isosurf_area_ctl]{(Detail)}
+		\end{itemize}
+%
 	\item \verb|field_on_isosurf|
     		\hyperref[href_t:field_on_isosurf]{(Detail)}
+		\begin{itemize}
+			\item \verb|result_type	[TYPE]|
+    				\hyperref[href_t:result_type]{(Detail)}
+			\item \verb|result_value	[VALUE]|
+    				\hyperref[href_t:result_value]{(Detail)}
+			\item \verb|array output_field		[FIELD]	[COMPONENT]|
+    				\hyperref[href_t:iso_output_field]{(Detail)}
+		\end{itemize}
 \end{itemize}
 
 

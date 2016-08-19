@@ -85,7 +85,7 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'set_ref_temp_sph_mhd'
       call allocate_reft_rj_data
-      call set_ref_temp_sph_mhd(sph_bc_T)
+      call set_ref_temp_sph_mhd(sph_bc_T%kr_in, sph_bc_T%kr_out)
       call adjust_sph_temp_bc_by_reftemp(sph_bc_T)
 !
 !      Check data

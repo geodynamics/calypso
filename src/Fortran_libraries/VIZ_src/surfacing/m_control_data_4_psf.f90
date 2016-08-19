@@ -41,11 +41,9 @@
 !!        coefs_ctl  const  1.0
 !!      end array coefs_ctl
 !!  
-!!      begin plot_area_ctl
-!!        array chosen_ele_grp_ctl 1
-!!          chosen_ele_grp_ctl   outer_core   end
-!!        end array chosen_ele_grp_ctl
-!!      end plot_area_ctl
+!!      array section_area_ctl 1
+!!        section_area_ctl   outer_core   end
+!!      end array section_area_ctl
 !!    end surface_define
 !!  
 !!    begin output_field_define
@@ -206,28 +204,19 @@
       character(len=kchara), parameter                                  &
      &                  :: hd_radius =          'radius'
       character(len=kchara), parameter                                  &
-     &                  :: hd_plot_area =       'plot_area_ctl'
-      character(len=kchara), parameter                                  &
      &                  :: hd_group_name =      'group_name'
 !
-!     4th level for center_position
       character(len=kchara), parameter                                  &
      &                  :: hd_normal_ctl = 'normal_vector'
-!
       character(len=kchara), parameter                                  &
      &                  :: hd_center_ctl = 'center_position'
-!
-!     4th level for axial_length
       character(len=kchara), parameter                                  &
      &                  :: hd_axis_ctl = 'axial_length'
-!
-!     4th level for coefficients
       character(len=kchara), parameter                                  &
      &                  :: hd_coefs_ctl = 'coefs_ctl'
 !
-!     4th level for plot_area
       character(len=kchara), parameter                                  &
-     &                  :: hd_plot_grp = 'chosen_ele_grp_ctl'
+     &                  :: hd_psf_area = 'section_area_ctl'
 !
 !     3rd level for output_field_define
       character(len=kchara), parameter                                  &
@@ -241,9 +230,14 @@
       character(len=kchara), parameter                                  &
      &                  :: hd_psf_file_head =   'psf_file_head'
 !
+      character(len=kchara), parameter                                  &
+     &                  :: hd_plot_area =       'plot_area_ctl'
+      character(len=kchara), parameter                                  &
+     &                  :: hd_plot_grp = 'chosen_ele_grp_ctl'
+!
       private :: hd_psf_file_head, hd_psf_file_prefix
       private :: hd_psf_out_type, hd_surface_define, hd_output_field
-      private :: hd_section_method
+      private :: hd_section_method, hd_psf_area
       private :: hd_radius, hd_plot_area
       private :: hd_group_name, hd_center_ctl, hd_axis_ctl
       private :: hd_coefs_ctl, hd_plot_grp, hd_psf_result_field
@@ -382,6 +376,8 @@
         call read_control_array_c_r(hd_center_ctl, psf%psf_center_ctl)
         call read_control_array_c_r(hd_normal_ctl, psf%psf_normal_ctl)
         call read_control_array_c_r(hd_axis_ctl, psf%psf_axis_ctl)
+!
+        call read_control_array_c1(hd_psf_area, psf%psf_area_ctl)
 !
         call read_psf_plot_area_ctl(psf)
 !

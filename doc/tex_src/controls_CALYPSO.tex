@@ -727,6 +727,104 @@ Method of the cross sectioning is defined as character \verb|[METHOD]|. Supporte
 \end{table}
 %
 
+\paragraph{\tt coefs\_ctl}
+\label{href_t:psf_coefs_ctl}
+\verb|[TERM]	[COEFFICIENT]| \\
+This array defines coefficients for a quadrature surface described by 
+\begin{eqnarray*}
+a x^2 + b y^2 + c z^2 + d y z + e z x + f x y + g x + h y + j z + k &=& 0.
+\end{eqnarray*}
+Each coefficient $a$ to $k$ are defined by the name of the term \verb|[TERM]| and real value \verb|[COEFFICIENT]| as shown in Table \ref{table:psf_coefs}.
+%
+\begin{table}[htp]
+\caption{List of coefficient labels for quadrature surface}
+\begin{center}
+\begin{tabular}{|c|c||c|c||c|c|}
+\hline
+\verb|[TERM]| & Defined value & \verb|[TERM]| & Defined value & \verb|[TERM]| & Defined value \\ \hline
+\verb|x2| & $a$ & \verb|y2| & $b$  & \verb|z2| & $c$ \\
+\verb|yz| & $d$ & \verb|zx| & $e$  & \verb|xy| & $f$ \\
+\verb|x | & $g$ & \verb|y| & $h$  & \verb|z| & $i$ \\
+\verb|const| & $h$ &  &   & &  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:psf_coefs}
+\end{table}
+%
+
+\paragraph{\tt radius}
+\label{href_t:psf_radius}
+\verb|[SIZE]| \\
+\verb|[SIZE]| defines radius $r$ for a sphere surface defined by 
+\begin{eqnarray*}
+\left(x-x_{0} \right)^2 + \left(y-y_{0} \right)^2 + \left(z-z_{0} \right)^2 = r^2. 
+\end{eqnarray*}
+
+\paragraph{\tt normal\_vector}
+\label{href_t:psf_normal_vector}
+\verb|[DIRECTION]	[COMPONENT]| \\
+This array defines normal vector $(a, b, c)$ for a plane surface described by 
+\begin{eqnarray*}
+a \left(x-x_{0} \right) + b \left(y-y_{0} \right) + c \left(z-z_{0} \right) = 0. 
+\end{eqnarray*}
+Each component is defined by \verb|[DIRECTION]| and real value \verb|[COMPONENT]| as shown in Table \ref{table:psf_normal}.
+%
+\begin{table}[htp]
+\caption{List of coefficient labels for vector}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\verb|[DIRECTION]| & Defined value \\ \hline
+\verb|x| & $a$ \\
+\verb|y| & $b$ \\
+\verb|z| & $c$ \\ \hline
+\end{tabular}
+\end{center}
+\label{table:psf_normal}
+\end{table}
+%
+
+\paragraph{\tt axial\_length}
+\label{href_t:psf_axial_length}
+\verb|[DIRECTION]	[COMPONENT]| \\
+This array defines size $(a, b, c)$ of an ellipsoid surface described by 
+\begin{eqnarray*}
+\left(\frac{x-x_{0}}{a} \right)^2 + \left( \frac{y-y_{0}}{b} \right)^2 + \left( \frac{z-z_{0}}{c} \right)^2 = 1. 
+\end{eqnarray*}
+Each component is defined by \verb|[DIRECTION]| and real value \verb|[COMPONENT]| as shown in Table \ref{table:psf_normal}.
+%
+
+\paragraph{\tt center\_position}
+\label{href_t:psf_center_position}
+\verb|[DIRECTION]	[COMPONENT]| \\
+Position of center $(x_{0}, y_{0}, z_{0})$ of sphere or ellipsoid is defined this array. Position on a plane surface $(x_{0}, y_{0}, z_{0})$ is also defined. Each component is defined by \verb|[DIRECTION]| and real value \verb|[COMPONENT]| as shown in Table \ref{table:psf_position}.
+%
+\begin{table}[htp]
+\caption{List of coefficient labels for vector}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+\verb|[DIRECTION]| & Defined value \\ \hline
+\verb|x| & $x_{0}$ \\
+\verb|y| & $y_{0}$ \\
+\verb|z| & $z_{0}$ \\ \hline
+\end{tabular}
+\end{center}
+\label{table:psf_position}
+\end{table}
+%
+
+\paragraph{\tt section\_area\_ctl}
+\label{href_t:section_area_ctl}
+Areas for the cross sectioning are defined in this array. The following groups can be defined in this block.
+%
+\begin{description}
+	\item{\tt outer\_core} Outer core.
+	\item{\tt inner\_core} Inner core (If exist).
+	\item{\tt external} External of the core (If exist).
+	\item{\tt all} Whole simulation domain.
+\end{description}
+
 %
 \subsubsection{\tt output\_field\_define}
 \label{href_t:output_field_define}
@@ -734,11 +832,34 @@ Field data on the cross section are defined in this block. \\
 \hyperref[href_i:cross_section_ctl]{(Back to {\tt cross\_section\_ctl)}} \\
 
 %
-\subsection{\tt isosurface\_ctl}
-\label{href_t:isosurface_ctl}
-Control parameters for isosurfaces are defined in this block. \\
-\hyperref[href_i:isosurface_ctl]{(Back to {\tt isosurface\_ctl)}}
+\paragraph{\tt output\_field}
+\label{href_t:psf_output_field}
+Field informations for cross section are defined in this array. Name of the output fields is defined by \verb|[FIELD]|, and component of the fields is defined by \verb|[COMPONENT]|. Labels of the field name are listed in Table \ref{table:fields}, and labels of the component are listed in Table \ref{table:components}. \\
+%
+\begin{table}[htp]
+\caption{List of field type for cross sectioning and isosurface module}
+\label{table:components}
+\begin{center} 
+\begin{tabular}{|c|c|}
+\hline
+ \verb|[COMPONENT]| & Field type  \\ \hline \hline
+ \verb|scalar| & scalar field  \\ \hline
+ \verb|vector| & Cartesian vector field \\ \hline
+ \verb|x| & $x$-component  \\ \hline
+ \verb|y| & $y$-component  \\ \hline
+ \verb|z| & $z$-component  \\ \hline
+ \verb|radial| & radial ($r$-) component  \\ \hline
+ \verb|theta| & $\theta$-component  \\ \hline
+ \verb|phi| & $\phi$-component  \\ \hline
+ \verb|cylinder_r| & cylindrical radial ($s$-) component  \\ \hline
+ \verb|magnitude| & magnitude of vector  \\ \hline
+\end{tabular}
+\end{center}
+\end{table}
+%
 
+%
+%
 \paragraph{\tt isosurface\_file\_prefix}
 \label{href_t:isosurface_file_prefix}
 \verb|[file_prefix]| \\
@@ -749,11 +870,49 @@ File prefix for isosurface data is defined as character \verb|[file_prefix]|.
 Each isosurface is defined in this block. \\
 \hyperref[href_i:isosurface_ctl]{(Back to {\tt isosurface\_ctl)}}
 
+\paragraph{\tt isosurf\_field}
+\label{href_t:isosurf_field}
+Field name for isosurface is defined by \verb|[FIELD]|. Labels of the field name are listed in Table \ref{table:fields}. \\
+%
+\paragraph{\tt isosurf\_component}
+\label{href_t:isosurf_component}
+Component name for isosurface is defined by \verb|[COMPONENT]|. Labels of the component are listed in Table \ref{table:components}.
+
+%
+\paragraph{\tt isosurf\_value}
+\label{href_t:isosurf_value}
+Isosurface value is defined as real value \verb|VALUE|.
+
+\paragraph{\tt isosurf\_area\_ctl}
+\label{href_t:isosurf_area_ctl}
+Areas for the isosurfacing are defined in this array. The same groups can be defined as \hyperref[href_t:psf_output_field]{\tt section\_area\_ctl}.
+
+%
 \subsubsection{\tt field\_on\_isosurf}
 \label{href_t:field_on_isosurf}
 Field data on the isosurface are defined in this block. \\
 \hyperref[href_i:isosurface_ctl]{(Back to {\tt isosurface\_ctl)}}
 
+%
+\paragraph{\tt result\_type}
+\label{href_t:result_type}
+Output data type is defined by \verb|[TYPE]|. Following types can be defined:
+%
+\begin{description}
+	\item{\tt constant} Constant value is set as a result field. The amplitude is set by \verb|result_value|.
+	\item{\tt field} field data on the isosurface are written. Fields to be written are defined by \verb|output_field| array.
+\end{description}
+
+%
+\paragraph{\tt result\_value}
+\label{href_t:result_value}
+Isosurface value is defined as real value \verb|VALUE|.
+
+%
+\paragraph{\tt output\_field}
+\label{href_t:iso_output_field}
+Field informations for cross section are defined in this array. Name of the output fields is defined by \verb|[FIELD]|, and component of the fields is defined by \verb|[COMPONENT]|. Labels of the field name are listed in Table \ref{table:fields}, and labels of the component are listed in Table \ref{table:components}. \\
+%
 
 %
 %

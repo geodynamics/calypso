@@ -16,6 +16,9 @@
       implicit  none
 !
 !
+      character(len=kchara), parameter :: cflag_const_iso = 'const'
+      character(len=kchara), parameter :: cflag_field_iso = 'field'
+!
       integer(kind = kint), parameter :: iflag_constant_iso = -1
       integer(kind = kint), parameter :: iflag_field_iso =     1
 !
@@ -77,6 +80,7 @@
       use t_psf_patch_data
 !
       use set_area_4_viz
+      use skip_comment_f
 !
       integer(kind = kint), intent(in) :: num_mat
       character(len=kchara), intent(in) :: mat_name(num_mat)
@@ -89,6 +93,8 @@
       type(phys_data), intent(inout) :: iso_fld
       type(psf_parameters), intent(inout) :: iso_param
 !
+      character(len=kchara) :: tmpchara
+!
 !
       if(iso%iso_file_head_ctl%iflag .gt. 0) then
         iso_header(i_iso) = iso%iso_file_head_ctl%charavalue
@@ -100,7 +106,16 @@
      &   (iso%iso_output_type_ctl%charavalue,                           &
      &    iso%iso_output_type_ctl%iflag, itype_iso_file(i_iso) )
 !
-      if(iso%iso_out_field_ctl%num .eq. 0) then
+      if     (iso%iso_out_field_ctl%num .gt. 0                          &
+     &  .and. iso%result_value_iso_ctl%iflag .gt. 0) then
+        tmpchara = iso%iso_result_type_ctl%charavalue
+        if(cmp_no_case(tmpchara, cflag_field_iso)) then
+          id_iso_result_type(i_iso) = iflag_field_iso
+        else if(cmp_no_case(tmpchara, cflag_const_iso)) then
+          id_iso_result_type(i_iso) = iflag_constant_iso
+        end if
+!
+      else if(iso%iso_out_field_ctl%num .eq. 0) then
         id_iso_result_type(i_iso) = iflag_constant_iso
       else
         id_iso_result_type(i_iso) = iflag_field_iso

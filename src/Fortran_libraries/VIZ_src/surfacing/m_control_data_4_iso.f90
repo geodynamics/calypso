@@ -21,12 +21,10 @@
 !!      isosurf_component      scalar
 !!      isosurf_value            4000.0
 !!
-!!      begin plot_area_ctl
-!!        array chosen_ele_grp_ctl   2
-!!          chosen_ele_grp_ctl   inner_core   end
-!!          chosen_ele_grp_ctl   outer_core   end
-!!        end array chosen_ele_grp_ctl
-!!      end plot_area_ctl
+!!      array isosurf_area_ctl   2
+!!        isosurf_area_ctl   inner_core   end
+!!        isosurf_area_ctl   outer_core   end
+!!      end array isosurf_area_ctl
 !!    end isosurf_define
 !!
 !!    begin field_on_isosurf
@@ -135,12 +133,9 @@
      &             :: hd_iso_comp =      'isosurf_component'
       character(len=kchara), parameter                                  &
      &             :: hd_iso_value =     'isosurf_value'
-      character(len=kchara), parameter                                  &
-     &             :: hd_iso_plot_area = 'plot_area_ctl'
 !
-!     4th level for plot_area_ctl
       character(len=kchara), parameter                                  &
-     &             :: hd_iso_plot_grp  = 'chosen_ele_grp_ctl'
+     &                  :: hd_iso_area = 'isosurf_area_ctl'
 !
 !     3rd level for field_on_isosurf
       character(len=kchara), parameter                                  &
@@ -160,7 +155,12 @@
       character(len=kchara), parameter                                  &
      &             :: hd_iso_result = 'isosurf_result_define'
 !
-      private :: hd_iso_plot_grp, hd_result_type
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_plot_area = 'plot_area_ctl'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_plot_grp  = 'chosen_ele_grp_ctl'
+!
+      private :: hd_iso_plot_grp, hd_result_type, hd_iso_area
       private :: hd_result_value, hd_iso_plot_area, hd_iso_value
       private :: hd_iso_comp, hd_iso_field
       private :: hd_iso_result, hd_field_on_iso
@@ -260,6 +260,8 @@
         call read_chara_ctl_type(hd_iso_comp, iso%isosurf_comp_ctl)
 !
         call read_real_ctl_type(hd_iso_value, iso%isosurf_value_ctl)
+!
+        call read_control_array_c1(hd_iso_area, iso%iso_area_ctl)
       end do
 !
       end subroutine read_iso_define_data
@@ -310,6 +312,7 @@
      &      iso%i_iso_plot_area)
         if(iso%i_iso_plot_area .gt. 0) exit
 !
+        call read_control_array_c1(hd_iso_area, iso%iso_area_ctl)
         call read_control_array_c1(hd_iso_plot_grp, iso%iso_area_ctl)
       end do
 !
