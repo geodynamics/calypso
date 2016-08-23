@@ -1,0 +1,35 @@
+!
+!
+!     example of control for Kemo's surface rendering
+!
+begin cross_section_ctl
+  section_file_prefix    'sections/CMB'
+!
+  begin surface_define
+    section_method    equation
+!
+    array coefs_ctl  10
+      coefs_ctl  x2     1.0
+      coefs_ctl  y2     1.0
+      coefs_ctl  z2     1.0
+      coefs_ctl  xy     0.0
+      coefs_ctl  yz     0.0
+      coefs_ctl  zx     0.0
+      coefs_ctl  x      0.0
+      coefs_ctl  y      0.0
+      coefs_ctl  z      0.0
+      coefs_ctl  const  -2.3667
+    end array coefs_ctl
+!
+    array section_area_ctl 1
+      section_area_ctl   all   end
+    end array section_area_ctl
+  end surface_define
+!
+  begin output_field_define
+    array output_field   2
+      output_field  magnetic_field        vector
+      output_field  magnetic_field        radial
+    end array output_field
+  end output_field_define
+end cross_section_ctl

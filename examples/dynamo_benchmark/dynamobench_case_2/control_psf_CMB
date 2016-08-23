@@ -1,0 +1,30 @@
+!
+!
+!     example of control for Kemo's surface rendering
+!
+begin cross_section_ctl
+  section_file_prefix    'sections/CMB'
+!
+  begin surface_define
+    section_method    sphere
+!
+    array center_position    3
+      center_position  x   0.0
+      center_position  y   0.0
+      center_position  z   0.0
+    end array center_position
+!
+    radius             1.5384
+!
+    array section_area_ctl 1
+      section_area_ctl   all
+    end array section_area_ctl
+  end surface_define
+!
+  begin output_field_define
+    array output_field   2
+      output_field  magnetic_field        vector
+      output_field  magnetic_field        radial
+    end array output_field
+  end output_field_define
+end cross_section_ctl

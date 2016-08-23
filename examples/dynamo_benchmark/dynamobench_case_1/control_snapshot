@@ -17,10 +17,10 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
   begin data_files_def
-!    debug_flag_ctl            'On'
+    debug_flag_ctl            'On'
 !
     num_subdomain_ctl            4
-    num_smp_ctl                  8
+    num_smp_ctl                  2
 !
     sph_file_prefix             'sph_lm31r48c_4/in'
 !
@@ -28,7 +28,6 @@ begin MHD_control
     field_file_prefix           'field/out'
 !
     field_file_fmt_ctl          'merged_VTK'
-!     field_file_fmt_ctl       'VTK'
   end data_files_def
 !
   begin model
@@ -238,12 +237,14 @@ begin MHD_control
 !!!!!  information for sime integration
    begin time_step_ctl
       elapsed_time_ctl      80000.
-      i_step_init_ctl           0
-      i_step_finish_ctl       4
+      i_step_init_ctl           2
+      i_step_finish_ctl     3
 !
-      i_step_check_ctl       1
-      i_step_rst_ctl         5000
-      i_step_field_ctl       1000
+      i_step_check_ctl         1
+      i_step_rst_ctl         1
+      i_step_field_ctl          0
+      i_step_sectioning_ctl   1
+      i_step_isosurface_ctl   1
 !
       dt_ctl              5.0e-5
       time_init_ctl       0.0e-8
@@ -251,8 +252,8 @@ begin MHD_control
 !
 !!!!!  control for restart data
     begin restart_file_ctl
-!      rst_ctl                dynamo_benchmark_1
-      rst_ctl                start_from_rst_file
+      rst_ctl                dynamo_benchmark_1
+!      rst_ctl                start_from_rst_file
     end restart_file_ctl
 !
 !!!!!!   method for time evolution
@@ -263,11 +264,13 @@ begin MHD_control
       coef_imp_t_ctl          6.0e-1
       coef_imp_b_ctl          6.0e-1
       coef_imp_d_ctl          6.0e-1
-      Legendre_trans_loop_ctl   'outer_field_loop'
+!      Legendre_trans_loop_ctl   'outer_field_loop'
     end time_loop_ctl
   end control
 !
 !   Long_loop, outer_field_loop...broken...
+!                   ('inner_radial_loop', 'outer_radial_loop', 'long_loop',
+!                    'original_loop', 'outer_field_loop'
 !
   begin sph_monitor_ctl
     volume_average_prefix        'sph_ave_volume'
@@ -288,4 +291,17 @@ begin MHD_control
     end array pick_gauss_coef_degree_ctl
 !
   end sph_monitor_ctl
+!
+  begin visual_control
+    array cross_section_ctl  4
+      file  cross_section_ctl   control_psf_CMB
+      file  cross_section_ctl   control_psf_eq 
+      file  cross_section_ctl   control_psf_z0.3
+      file  cross_section_ctl   control_psf_s0.55
+    end array cross_section_ctl
+!
+    array isosurface_ctl     1
+      file  isosurface_ctl      control_iso_temp
+    end array isosurface_ctl
+  end  visual_control
 end MHD_control

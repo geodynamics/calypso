@@ -9,7 +9,6 @@
 !!@verbatim
 !!      subroutine set_sph_bc_temp_sph
 !!      subroutine set_sph_bc_composition_sph
-!!      subroutine adjust_sph_temp_bc_by_reftemp
 !!@endverbatim
 !
       module set_bc_sph_scalars

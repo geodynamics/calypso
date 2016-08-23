@@ -1,0 +1,42 @@
+!
+!
+!     example of control for Kemo's surface rendering
+!
+begin cross_section_ctl
+  section_file_prefix    'sections/cylinder_s055'
+!
+  begin surface_define
+    section_method    ellipsoid
+!
+    array center_position    3
+      center_position  x   0.0
+      center_position  y   0.0
+      center_position  z   0.0
+    end array center_position
+!
+    array axial_length   3
+      axial_length  x   0.55
+      axial_length  y   0.55
+      axial_length  z   -1.0
+    end array axial_length
+!
+    array section_area_ctl 1
+      section_area_ctl   all   end
+    end array section_area_ctl
+  end surface_define
+!
+  begin output_field_define
+    array output_field   9
+      output_field  temperature           scalar
+      output_field  velocity              vector
+      output_field  velocity              cylinder_r     
+      output_field  velocity              phi   
+      output_field  vorticity             vector
+      output_field  magnetic_field        vector
+      output_field  magnetic_field        cylinder_r
+      output_field  magnetic_field        phi
+!
+      output_field  Lorentz_work          scalar 
+    end array output_field
+  end output_field_define
+end cross_section_ctl

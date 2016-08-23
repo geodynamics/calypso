@@ -1,0 +1,41 @@
+!
+!     example of sectioning at equatoreial plane
+!
+begin cross_section_ctl
+  section_file_prefix    'sections/equator'
+!
+  begin surface_define
+    section_method    plane
+!
+    array normal_vector    3
+      normal_vector  x   0.0
+      normal_vector  y   0.0
+      normal_vector  z   1.0
+    end array normal_vector
+!
+    array center_position    3
+      center_position  x   0.0
+      center_position  y   0.0
+      center_position  z   0.0
+    end array center_position
+!
+    array section_area_ctl 2
+      section_area_ctl   inner_core   end
+      section_area_ctl   outer_core   end
+    end array section_area_ctl
+  end surface_define
+!
+  begin output_field_define
+    array output_field   8
+      output_field  temperature           scalar
+      output_field  velocity              vector
+      output_field  velocity              radial     
+      output_field  velocity              phi   
+      output_field  vorticity             z
+      output_field  magnetic_field        vector
+      output_field  magnetic_field        theta
+!
+      output_field  Lorentz_work          scalar 
+    end array output_field
+  end output_field_define
+end cross_section_ctl
