@@ -9,9 +9,13 @@ ENABLE_LANGUAGE(Fortran)
 SET(CMAKE_Fortran_MODULE_DIRECTORY "${CALYPSO_BINARY_DIR}/include")
 SET(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CALYPSO_BINARY_DIR}/bin")
 SET(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CALYPSO_BINARY_DIR}/lib")
-
 # Use the preprocessor to handle #ifdefs
 ADD_DEFINITIONS(-cpp)
+
+IF(EXISTS ${CMAKE_SOURCE_DIR}/tests/CMakeLists.txt)
+  ENABLE_TESTING()
+  ADD_SUBDIRECTORY(tests)
+ENDIF()
 
 # Look for MPI and add the required flags if found
 FIND_PACKAGE(MPI)
