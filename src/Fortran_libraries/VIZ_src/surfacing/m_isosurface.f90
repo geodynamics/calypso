@@ -172,8 +172,6 @@
 !
       type(communication_table), intent(in) :: edge_comm
 !
-      integer(kind = kint) :: i_iso
-!
 !
       if (iflag_debug.eq.1) write(*,*) 'set_const_4_isosurfaces'
       call set_const_4_isosurfaces(num_iso, numnod, inod_smp_stack,     &
@@ -199,10 +197,6 @@
 !
       call dealloc_psf_field_data(num_iso, iso_mesh)
       call dealloc_psf_node_and_patch(num_iso, iso_list, iso_mesh)
-!
-      do i_iso = 1, num_iso
-        call dealloc_inod_psf(iso_list(i_iso))
-      end do
 !
       end subroutine isosurface_main
 !

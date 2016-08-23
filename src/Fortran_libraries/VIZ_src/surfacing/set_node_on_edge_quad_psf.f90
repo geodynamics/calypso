@@ -106,8 +106,8 @@
 !$omp parallel do                                                       &
 !$omp& private(ist,ied,icou,iedge,inod1,inod2,diff)
       do ip = 1, np_smp
-        ist = istack_n_on_e_smp(ip-1)
-        ied = istack_n_on_e_smp(ip-1) + 1
+        ist = istack_n_on_e_smp(ip-1) + 1
+        ied = istack_n_on_e_smp(ip)
         do icou = ist, ied
           iedge = iedge_4_nod(icou)
           inod1 = abs( ie_edge(iedge,1) )

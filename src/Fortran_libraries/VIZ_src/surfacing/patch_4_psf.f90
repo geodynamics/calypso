@@ -235,7 +235,7 @@
 !      do inum = 1, npatch_tot
 !        write(40+my_rank,*) inum, ie_patch(inum,1:3)
 !      end do
-      close(40+my_rank)
+!      close(40+my_rank)
 !
       end subroutine set_patch_4_psf
 !

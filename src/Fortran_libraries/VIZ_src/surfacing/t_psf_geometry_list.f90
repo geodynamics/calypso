@@ -290,7 +290,6 @@
 !
       deallocate(psf_list%istack_inter_n_on_e_smp)
       deallocate(psf_list%istack_exter_n_on_e_smp)
-      deallocate(psf_list%istack_exter_n_on_e_smp)
       deallocate(psf_list%id_n_on_e)
 !
       end subroutine dealloc_nnod_psf

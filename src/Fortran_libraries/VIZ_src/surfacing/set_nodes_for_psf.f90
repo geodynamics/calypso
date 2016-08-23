@@ -117,6 +117,7 @@
 !
 !
       do i = 1, num_iso
+        call alloc_nnod_psf(np_smp, numedge, iso_list(i))
         call count_node_on_edge_4_psf                                   &
      &     (numedge, nnod_4_edge, ie_edge, interior_edge,               &
      &      iso_search(i)%edge_list, iso_list(i))
@@ -229,6 +230,7 @@
       use set_node_on_edge_quad_psf
       use cal_mesh_position
       use psf_global_nod_id
+      use const_element_comm_tables
 !
       integer(kind = kint), intent(in) :: num_iso
       integer(kind = kint), intent(in) :: numnod, numedge, nnod_4_edge
@@ -248,6 +250,7 @@
       do i = 1, num_iso
         call alloc_inod_psf(iso_list(i))
         call allocate_node_geometry_type(iso_mesh(i)%node)
+        call const_global_numnod_list(iso_mesh(i)%node)
 !
         call set_node_on_edge_4_psf                                     &
      &     (numedge,  nnod_4_edge, ie_edge, interior_edge,              &

@@ -58,14 +58,13 @@
       type(sectioning_list), intent(inout) :: psf_list(num_psf)
       type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !
-      integer(kind = kint) :: i, ist_smp
+      integer(kind = kint) :: i
 !
 !
       do i = 1, num_psf
         psf_mesh(i)%patch%istack_ele_smp(0) = 0
         call alloc_mark_ele_psf(psf_search(i))
 !
-        ist_smp = (i-1)*np_smp
         if( id_section_method(i) .gt. 0) then
           call set_psf_type_id(numnod, numele, nnod_4_ele, ie,          &
      &        psf_search(i)%elem_list, psf_search(i)%mark_e,            &
@@ -111,14 +110,13 @@
       type(sectioning_list), intent(inout) :: iso_list(num_iso)
       type(psf_local_data), intent(inout) :: iso_mesh(num_iso)
 !
-      integer(kind = kint) :: i, ist_smp
+      integer(kind = kint) :: i
 !
 !
       do i = 1, num_iso
         iso_mesh(i)%patch%istack_ele_smp(0) = 0
         call alloc_mark_ele_psf(iso_search(i))
 !
-        ist_smp = (i-1)*np_smp
         call set_psf_type_id(numnod, numele, nnod_4_ele, ie,            &
      &      iso_search(i)%elem_list, iso_search(i)%mark_e,              &
      &      iso_list(i)%ref_fld)
@@ -128,6 +126,8 @@
      &    iso_list(i)%id_n_on_e, iso_mesh(i)%patch%istack_ele_smp)
         iso_mesh(i)%patch%numele                                        &
       &       = iso_mesh(i)%patch%istack_ele_smp(np_smp)
+        iso_mesh(i)%patch%internal_ele = iso_mesh(i)%patch%numele
+        iso_mesh(i)%patch%nnod_4_ele = num_triangle
       end do
 !
       end subroutine count_iso_patches
@@ -146,6 +146,7 @@
       use t_psf_geometry_list
       use t_psf_patch_data
 !
+      use const_element_comm_tables
       use set_psf_patch_4_by_surf_grp
       use patch_4_psf
 !
@@ -166,10 +167,12 @@
       type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
       type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !
-      integer(kind = kint) :: i, ist_smp
+      integer(kind = kint) :: i
 !
       do i = 1, num_psf
-        ist_smp = (i-1)*np_smp
+        call allocate_ele_connect_type(psf_mesh(i)%patch)
+        call const_global_numele_list(psf_mesh(i)%patch)
+!
         if( id_section_method(i) .gt. 0) then
 !
           call set_patch_4_psf                                          &
@@ -207,6 +210,7 @@
       use t_psf_geometry_list
       use t_psf_patch_data
 !
+      use const_element_comm_tables
       use patch_4_psf
 !
       integer(kind = kint), intent(in) :: num_iso
@@ -218,10 +222,12 @@
       type(sectioning_list), intent(in) :: iso_list(num_iso)
       type(psf_local_data), intent(inout) :: iso_mesh(num_iso)
 !
-      integer(kind = kint) :: i, ist_smp
+      integer(kind = kint) :: i
 !
       do i = 1, num_iso
-        ist_smp = (i-1)*np_smp
+        call allocate_ele_connect_type(iso_mesh(i)%patch)
+        call const_global_numele_list(iso_mesh(i)%patch)
+!
         call set_patch_4_psf(numele, numedge, iedge_4_ele,              &
      &      iso_search(i)%elem_list, iso_search(i)%mark_e,              &
      &      iso_list(i)%id_n_on_e,                                      &
