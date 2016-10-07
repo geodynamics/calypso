@@ -8,7 +8,7 @@ This user guide describes the essentials of the magnetohydrodynamics theory and 
 
 \section{History}
 \label{sec:history}
-Calypso has its origins in two earlier projects. One is a dynamo simulation code written by Hiroaki Matsui in 1990's using a spectral method. This code solves for the poloidal and toroidal spectral coefficients, like Calypso, but it calculates the nonlinear terms in the spectral domain using a parallelization for SMP architectures. The other project is the thermal convection version of GeoFEM, which is Finite Element Method (FEM) platform for massively parallel computational environment, originally written by Hiroshi Okuda in 2000. 
+Calypso has its origins in two earlier projects. One is a dynamo simulation code written by Hiroaki Matsui in 1990's using a spectral method. This code solves for the poloidal and toroidal spectral coefficients, like Calypso, but it calculates the nonlinear terms in the spectral domain using a parallelization for SMP architectures. The other project is the thermal convection version of GeoFEM, which is Finite Element Method (FEM) platform for massively parallel computational environment, originally written by Hiroshi Okuda in 2000. Under GeoFEM Project, Lee Chen developed cross sectioning, iso-surfacing, and volume rendering modules for data visualization for parallel computations.. 
 
 Hiroaki Matsui was responsible for adding routines to GeoFEM to perform magnetohydrodynamics simulation in a rotating frame. In 2002 this code successfully performed dynamo simulations in a rotating spherical shell using insulating magnetic boundary conditions.  The following year Matsui implemented a subgrid scale (SGS) model in the FEM dynamo model in collaboration with Bruce Buffett. A module to solve for double diffusive convection was added to the FEM dynamo model by Hiroaki Matsui in 2009.
 
@@ -46,12 +46,22 @@ And, the following features are implemented
 \item The boundary conditions for temperature and composition can be defined by using spherical harmonics coefficients. (i.e. inhomogeneous boundary conditions can be applied.) These boundary conditions are defined by using single external data file. (See Section \ref{sec:boundary_file})
 \end{itemize}
 
+%
+\subsection{Updates for Ver 1.2}
+In Version 1.2, the following features are implimented:
+\begin{itemize}
+\item To reduce the number of computaion, Legendre transform is calculated with taking account to the symmetry with respect to the equator. Time for Legendre transform is approximately half of that in Ver 1.1.
+\item BLAS library can be used for the Legendre transform optionally.
+\item Cross sectioning and isosurfacing module are newly implemented. These modules are re-written by Fortran90 from the parallel sectioning modules in GeoFEM by Lee Chen in C, and some features are added for visualizations of geodynamo simulations.
+\end{itemize}
+
+
 \section{Acknowledgements}
 \label{section:acknowledgements}
 Calypso was primarily developed by Dr. Hiroaki Matsui in collaboration with Prof. Bruce Buffett at the University of California, Berkeley. The following NSF grants supported the development of Calypso, 
 %
 \begin{itemize}
-\item B.A. Buffett, NSF EAR-0509893; Models of sub-grid scale turbulence in the EarthÕs core and the geodynamo; 2005 - 2007.
+\item B.A. Buffett, NSF EAR-0509893; Models of sub-grid scale turbulence in the Earthï¾•s core and the geodynamo; 2005 - 2007.
 \item B.A. Buffett and D. Lathrop,  NSF EAR-0652882; CSEDI Collaborative Research: Integrating numerical and experimental geodynamo models, 2007 - 2009
 \item B.A. Buffett, NSF EAR-1045277; Development and application of turbulence models in numerical geodynamo simulations ;  2010 - 2012
 \end{itemize}

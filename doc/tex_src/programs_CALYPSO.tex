@@ -1134,6 +1134,7 @@ This program generates the spectrum data files \verb|[rst_prefix].0.[domain#].fs
  \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}} to be 0 and \hyperref[href_t:restart_file_ctl]{{\tt [INITIAL\_TYPE]}} to be \hyperref[href_t:restart_file_ctl]{{\tt start\_from\_rst\_file}}.
 
 \subsection{Definition of the initial field}
+\label{sec:def_initial}
 To construct Initial field data, you need to edit the source code \verb|const_sph_initial_spectr.f90| in \verb|src/programs/data_utilities/INITIAL_FIELD/| directory. The module \verb|const_sph_initial_spectr| consists of the following subroutines:
 %
 \begin{description}
@@ -1172,6 +1173,15 @@ Initial fields need to be defined by the spherical harmonics coefficients at eac
 
 In Calypso, local data address for each MPI process is used for the spectrum data address \verb|i|. To find the local address \verb|i|, two functions are required. \\
 First, \verb|j = find_local_sph_mode_address(l,m)| returns the local spherical  harmonics address \verb|j| from aa spherical harmonics mode $Y_{l}^{m}$. If process does not have the data for $Y_{l}^{m}$, \verb|j| is set to 0. Second, \verb|i = local_sph_data_address(k,j)| returns the local data address \verb|i| from radial grid number \verb|k| and local spherical harmonics id \verb|j|. For do loops in the radial direction, the total number of radial grid points, radial address for ICB, and radial address for CMB are defined as \verb|nidx_rj(1)|, \verb|nlayer_ICB|, and \verb|nlayer_CMB|, respectively. The radius for the \verb|k|-th grid points can be obtained by \verb|r = radius_1d_rj_r(k)|. The subroutines to define initial temperature for the dynamo benchmark Case 1 is shown below as an example.
+
+After updating the source code, the program \verb|sph_initial_field| needs to be updated. To update the program, move to the work directory \verb|[CALYPSO_HOME]/work| and run make command as
+% 
+\begin{verbatim}
+% cd \verb|[CALYPSO_HOME]/work|
+% make
+\end{verbatim}
+%
+Then, the program  \verb|sph_initial_field| and  \verb|sph_add_initial_field| are updated.
 
 %
 \begin{verbatim}
@@ -1281,6 +1291,7 @@ This program generates the spectrum data files \verb|[rst_prefix].[step#].[domai
  \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}} and \verb|[ISTEP_RESTART]| to be appropriate time step and increment, respectively.
 To read the original initial field data, \hyperref[href_t:restart_file_ctl]{{\tt [INITIAL\_TYPE]}} is set to be \hyperref[href_t:restart_file_ctl]{{\tt start\_from\_rst\_file}} in \verb|control_MHD|. In other words, the \verb|[step #]| in the file name, \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}}, and \verb|[ISTEP_RESTART]| in the control file should be the consistent.
 
+This program also uses the module file \verb|const_sph_initial_spectr.f90| to define the initial field. The initial fields are defined as following the previous section \ref{sec:def_initial}. After updating the source code, the program \verb|sph_initial_field| needs to be updated. After modifying  \verb|const_sph_initial_spectr.f90|, the program is build by make command in  the work directory \verb|[CALYPSO_HOME]/work|.
 
 \section{Check program for dynamo benchmark \\
 ({\tt sph\_dynamobench})}
