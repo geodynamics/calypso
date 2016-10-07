@@ -1,0 +1,44 @@
+{
+  "License": "gpl-2",
+  "IgnoredFiles": [
+    ".licensing.json",
+    ".git/**",
+    ".gitignore",
+    "doc/**",
+    "tests/**",
+    "examples/**",
+    "doxygen/**",
+    "**/*m4",
+    "**/CMakeLists.txt",
+    "config.guess",
+    "config.sub",
+    "configure",
+    "configure.in",
+    "insert_code_header.py",
+    "INSTALL",
+    "install-sh",
+    "LICENSE",
+    "**/Makefile*",
+    "README",
+    "src/External_libs/**",
+    "src/cmake/**",
+    "**/*dox",
+    "src/option_settings",
+    "**/.DS_Store"
+  ],
+  "LicenseParameters": {
+    "ProjectName": "Calypso",
+    "year": "2016",
+    "fullname": "Hiroaki Matsui"
+  },
+  "CommentedFiles": {
+    "**/*.f90": {
+      "LineCommentStart": "!  ",
+      "InsertAtLine": 0
+    },
+    "**/*.F90": {
+      "LineCommentStart": "!  ",
+      "InsertAtLine": 0
+    }
+  }
+}
