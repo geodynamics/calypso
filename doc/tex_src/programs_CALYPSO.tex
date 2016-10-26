@@ -67,6 +67,8 @@ r(k) & = & r_{o} + \frac{\left(r_{o}-r_{i} \right)}{2} \left[ \frac{1}{2} - \cos
 where, $k_{CMB}$ is the grid point number at CMB.
 
 \subsection{Control file (\tt{control\_sph\_shell})}
+Control files for Calypso consists of blocks starting and ending with \verb|begin| and \verb|end|, respectively. Entities with more than one components are defined between \verb|begin array| and \verb|end array| flags. The number of components of an array must be defined at \verb|begin array| line. If blocks to be defined in an external file, the external file name is defined by \verb|file| flag. 
+
 \label{section:control_sph_shell}
 Control file ({\tt control\_sph\_shell}) consists the following items. Detailed description for each item can be checked by clicking "(Detail)" at the end of each item.
 \\
@@ -157,6 +159,35 @@ Calypso generates field data for visualization with XDMF or VTK format. To gener
 \subsection{Radial grid data}
 The preprocessing program generates radius of each layer in \verb|radial_info.dat| if \verb|radial_grid_type_ctl| is set to \verb|Chebyshev| or \verb|equi_distance|. This file consists of blocks \verb|array r_layer| and \verb|array boundaries_ctl| for control file. This data may be useful if you want to modify radial grid spacing by yourself.
 
+\subsection{How to define spatial resolution and parallelization?}
+  Calypso uses spherical harmonics expansion method and in horizontal discretization and finite difference methods in the radial direction. In the spherical harmonics expansion methods, nonlinear terms are solved in the grid space while time integration and diffusion terms are solved in the spectrum space. We need to set truncation degree $l_{max}$ of the spherical harmonics and number of grids in the three direction $(N_{r}, N_{\theta}, N_{\phi})$ in the preprocessing program. The following condition is required (or recommended) for $l_{max}$ and $(N_{r}, N_{\theta}, N_{\phi})$. $l_{max}$ is defined by \verb|truncation_level_ctl|, and $N_{r}$ for the fluid shell (outer core) is defined by  \verb|num_fluid_grid_ctl|.  $N_{\theta}$ and $N_{\phi}$ is defined by \verb|ngrid_meridonal_ctl| and \verb|ngrid_zonal_ctl|, respectively.
+%
+\begin{itemize}
+\item $N_{\phi} = 2 N_{\theta}$.
+\item $N_{\theta}$ must be more than $l_{max}+1$, but
+\item To eliminate aliasing in the spherical transform, $N_{\theta} \ge 1.5 \left( l_{max}+1 \right)$ is highly recommended.
+\item $N_{\phi}$ should consists of products among power of 2, power of 3, and power of 5.
+\end{itemize}
+%
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{images/parallelize}
+\end{center}
+\caption{Parallelization and data communication in Calypso in the case using 9 (3x3) processors. Data are decomposed in radial and meridional direction for nonlinear term evaluations, decomposed in radial and harmonic order for Legendre transform, and decomposed in spherical harmonics for linear calculations.}
+\label{fig:parallelization}
+\end{figure}
+%
+Calypso is parallelized 2-dimensionally and direction of the parallelization is changed in the operations in the spherical transform (See Figure \ref{fig:parallelization}). Two dimensional parallelization delivers many parallelize configuration. Here is the approach  how to find the best configuration:
+%
+\begin{itemize}
+\item Maximum parallelization level in horizontal direction is $\left( l_{max} + 1 \right)  /2$,  and $N_{r}+1$ is the maximum level in radial direction.
+\item Decompose number of radial points $N_{r}+1$ and truncation degree $\left( l_{max} + 1 \right) / 2 $ into prime numbers.
+\item Decide number of MPI processes from the prime numbers.
+\item Choose the number of decomposition in the radial and horizontal direction as close as possible.
+\end{itemize}
+% 
+Here is an example for the case with $(N_{r}, l_{max}) = (89, 95)$. The maximum number of parallelization is $90 \times 48  = 4320$ processes.  $N_{r}+1$ and $\left( l_{max} + 1 \right)  /2$ can be decomposed into $90 = 2 \times 3^2 \times 5$ and $48 = 2^4 \times 3 $. Now, if 160 processes run is intended, $160 = 10 \times 16$ is the closest number of decompositions. Comparing with the prime numbers of the spatial resolution, radial and horizontal decomposition will be 10 and 16, respectively.
 
 \newpage
 \section{Simulation program ({\tt sph\_mhd})}
@@ -173,7 +204,7 @@ The name of the simulation program is {\tt sph\_mhd}. This program requires {\tt
 \label{fig:flow_2}
 \end{figure}
 %
-Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing data for spherical harmonics which starting with \verb|[sph_prefix]| are obtained by the preprocessing program \verb|gen_sph_grid|. The boundary condition data file \verb|[boundary_data_name]| is optionally required if boundary conditions for temperature and composition are not homogenious.
+Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing data for spherical harmonics which starting with \verb|[sph_prefix]| are obtained by the preprocessing program \verb|gen_sph_grid|. The boundary condition data file \verb|[boundary_data_name]| is optionally required if boundary conditions for temperature and composition are not homogenous.
 %
 \begin{table}[htp]
 \caption{List of files for simulation {\tt sph\_mhd} }
@@ -718,7 +749,7 @@ A plane surface is defined by a normal vector $(a, b, c)$ and one point includin
 
 A sphere surface is defined by the position of the center $(x_{0}, y_{0}, z_{0})$ and radius $r$ in array \verb|center_position| and \verb|radius|, respectively.
 
-An Ellipsoid surface is defined the position of the center $(x_{0}, y_{0}, z_{0})$ and length of the each axis $(a, b, c)$ in arrays  \verb|center_position| and \verb|axial_length|, respectively. If one component of the \verb|axial_length| is set to 0, surfaceing module generate a Ellipsoidal tube along with the axis where \verb|axial_length| is set to 0.
+An Ellipsoid surface is defined the position of the center $(x_{0}, y_{0}, z_{0})$ and length of the each axis $(a, b, c)$ in arrays  \verb|center_position| and \verb|axial_length|, respectively. If one component of the \verb|axial_length| is set to 0, surfacing module generate a Ellipsoidal tube along with the axis where \verb|axial_length| is set to 0.
 
 Area for visualization can be defined by array \verb|chosen_ele_grp_ctl| by choosing \verb|outer_core|, \verb|inner_core|, and \verb|all|. Fields to display is defined in array \verb|output_field|. In array \verb|output_field|, field type in Table \ref{table:field_type} needs to defined. The same field can be defined more than once in array \verb|output_field| to output vector field in Cartesian coordinate and radial component, for example.
 %
@@ -744,7 +775,7 @@ Area for visualization can be defined by array \verb|chosen_ele_grp_ctl| by choo
 \end{table}
 %
 \subsubsection{Control file}
-The format of the control file or block for cross sections is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking "(Detail)". \\
+The format of the control file or block for cross sections is described below. The detail of each block is described in section \ref{section:def_control}.  \verb|cross_section_ctl| block can be read from an external file. To define the external file name, as \verb|file cross_section_ctl [file name]| in \verb|control_MHD| or \verb|control_snapshot|. You can jump to detailed description by clicking "(Detail)". \\
 \\
 %
 \verb|cross_section_ctl|  (Header of the control file)
@@ -788,7 +819,7 @@ Calypso can also output isosurface data for visualization. Generally, data size 
 To output cross sectioning, increment of the surface output data should be defined by \verb|i_step_isosurface_ctl| in \verb|time_step_ctl| block. And, array block \verb|isosurface_ctl| in \verb|visual_control| section is required to define cross sections. Each \verb|isosurface_ctl| block defines one cross section. Each cross section can also define by an external file by specifying external file name with \verb|file| label.
 %
 \subsubsection{Control file}
-The format of the control file or block for isosurfaces is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking "(Detail)". \\
+The format of the control file or block for isosurfaces is described below. The detail of each block is described in section \ref{section:def_control}.  \verb|isosurface_ctl| block can be read from an external file. To define the external file name, as \verb|file isosurface_ctl [file name]| in \verb|control_MHD| or \verb|control_snapshot|. You can jump to detailed description by clicking "(Detail)". \\
 \\
 %
 \verb|isosurface_ctl|  (Header of the control file)
