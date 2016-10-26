@@ -67,6 +67,7 @@
 !
       subroutine sum_forces_by_explicit
 !
+      use m_sph_phys_address
       use cal_vorticity_terms_adams
 !
 !
@@ -90,7 +91,9 @@
      &   .and. iflag_4_lorentz  .eq.     id_turn_OFF) then
         call set_rot_cv_terms_to_force(itor%i_rot_comp_buo)
       else
-        call set_rot_advection_to_force
+        if((ipol%i_forces*ipol%i_rot_inertia) .gt. 0) then
+          call set_rot_advection_to_force
+        end if
         if(iflag_4_coriolis .ne. id_turn_OFF) then
           call add_coriolis_to_vort_force
         end if

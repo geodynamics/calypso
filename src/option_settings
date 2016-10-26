@@ -94,14 +94,13 @@ FFTW3_LIBS=   -L/Users/matsui/local/lib -lfftw3 -lm
 #
 #
 # -------------------------------------------------------------------------------
-# Intel mac with gfortran4.7-openmpi with FFTW3(Macport)
+# Intel mac with gfortran5-openmpi with FFTW3(Macport)
 # -------------------------------------------------------------------------------
 #
-# setenv PKG_CONFIG_PATH /Users/matsui/local/lib/pkgconfig:/usr/lib/pkgconfig:/opt/local/lib/pkgconfig
-#
-#./configure --prefix='/Users/matsui/local' FC=gfortran-mp-4.7 \
-#  MPICC=openmpicc MPIFC=openmpif90 \
-#  CFLAGS='-O -Wall -g'  FCFLAGS='-O -Wall -g' --enable-fftw3
+#  ./configure --prefix='/Users/matsui/local' FC=gfortran-mp-5 F77=gfortran-mp-5 \
+#  MPICC=mpicc MPIFC=mpif90 CFLAGS='-O -Wall -g' FCFLAGS='-O -Wall -g' \
+#  --enable-fftw3 --with-blas='-framework Accelerate'  \
+#  PKG_CONFIG_PATH=/Users/matsui/local/lib/pkgconfig:/usr/lib/pkgconfig:/opt/local/lib/pkgconfig
 #
 #
 #  Makefile for geoynamo platform Calypso
@@ -145,6 +144,15 @@ F90OPTFLAGS= -O -Wall -g   -fopenmp
 FFTW3_CFLAGS= -I/opt/local/include  
 FFTW3_LIBS=   -L/opt/local/lib -lfftw3 -lm
 #
+#
+# -------------------------------------------------------------------------------
+# Intel XEON cluster (Sirens.berkeley.edu)
+# -------------------------------------------------------------------------------
+#
+  ./configure --prefix='/Users/matsui/local' FC=ifort CC=icc \
+  MPICC=mpicc MPIFC=mpif90 CFLAGS='-O3 -Wall -g' FCFLAGS='-O3 -warn all -g -xhost ' \
+  --enable-fftw3 --with-blas=-mkl=sequential \
+  PKG_CONFIG_PATH=/home/hmatsui/local/lib/pkgconfig:/usr/lib/pkgconfig
 #
 # -------------------------------------------------------------------------------
 # Intel XEON cluster with Myrinet (Sirens.berkeley.edu)
