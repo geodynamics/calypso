@@ -122,6 +122,8 @@ Several examples are provided in the \verb|examples| directory. There are three 
 \begin{description}
 \item{\tt assemble\_sph}    Examples for assembling program of spectrum data. (see section \ref{section:assemble_sph})
 \item{\tt dynamo\_benchmark} Examples for dynamo benchmark by Christensen {\it et. al.} (2001)
+\item{\tt heat\_composition\_source} Examples for the heat and composition diffusion problem including source term )
+\item{\tt heterogineous\_temp} Examples for the heat and composition diffusion problem including thermal and compositional heterogeneity at boundaries.)
 \item{\tt spherical\_shell} Examples for preprocessing program (see Section \ref{section:gen_sph_grid})
 \end{description}
 %
@@ -146,7 +148,7 @@ There are four examples for simulations using dynamo benchmark test as following
 \item{\tt Compositional\_case\_1} Example of dynamo benchmark case 1 using compositional variation instead of temperature
 \end{description}
 %
-The process of the simulation is as following:
+The process of the simulation in these examples is the same using 4 MPI processes:
 %
 \begin{enumerate}
 \item Change to the directory for Benchmark Case 1 (for example) \\
@@ -179,7 +181,83 @@ The process of the simulation is as following:
 \end{verbatim}
 }
 \end{enumerate}
+Each example has the following input and data outputs.
 %
+\subsubsection{Data files and directories for Case 0}
+%
+\begin{description}
+\item{\tt control\_sph\_shell}	Control file for spherical shell preprocessing
+\item{\tt  control\_MHD}		Control file for simulation
+\item{\tt control\_snapshot}	Control file for postprocessing
+\item{\tt sph\_lm31r48c\_4} 	Spherical shell indexing data directory
+\item{\tt rst\_4}				Spectr data directory for restarting
+\item{\tt field}				Field data directory for for visualization
+\item{\tt setions}			Cross section data directory for for visualization
+\end{description}
+%
+\subsubsection{Data files and directories for Case 1}
+%
+\begin{description}
+\item{\tt control\_sph\_shell}	Control file for spherical shell preprocessing
+\item{\tt  control\_MHD}		Control file for simulation
+\item{\tt control\_snapshot}	Control file for postprocessing
+\item{\tt control\_psf\_CMB}	Control file for section at CMB
+\item{\tt control\_psf\_eq}		Control file for section at equatorial plane
+\item{\tt control\_psf\_z0.3}	Control file for section at z = 0.3 
+\item{\tt control\_psf\_s0.55}	Control file for cylindrical surface at s = 0.55
+\item{\tt control\_iso\_temp}	Control file for isosurface of temperature
+\item{\tt sph\_lm31r48c\_4} 	Spherical shell indexing data directory
+\item{\tt rst\_4}				Spectr data directory for restarting
+\item{\tt field}				Field data directory for for visualization
+\item{\tt field}				Field data directory for for visualization
+\item{\tt setions}			Cross section data directory for for visualization
+\item{\tt isourfaces}			Isosurface data directory for for visualization
+\end{description}
+%
+\subsubsection{Data files and directories for Case 2}
+%
+\begin{description}
+\item{\tt control\_sph\_shell}	Control file for spherical shell preprocessing
+\item{\tt  control\_MHD}		Control file for simulation
+\item{\tt control\_snapshot}	Control file for postprocessing
+\item{\tt control\_psf\_CMB}	Control file for section at CMB
+\item{\tt control\_psf\_ICB}		Control file for section at ICB
+\item{\tt control\_psf\_eq}		Control file for section at equatorial plane
+\item{\tt control\_psf\_z0.3}	Control file for section at z = 0.3 
+\item{\tt control\_psf\_s0.55}	Control file for cylindrical surface at s = 0.55
+\item{\tt sph\_lm31r48c\_4} 	Spherical shell indexing data directory
+\item{\tt rst\_4}				Spectr data directory for restarting
+\item{\tt field}				Field data directory for for visualization
+\item{\tt setions}			Cross section data directory for for visualization
+\end{description}
+%
+\subsubsection{Data files and directories for Compositional Case 1}
+%
+\begin{description}
+\item{\tt const\_sph\_initial\_spectr.f90}	Source code to generate initial field (need )
+\item{\tt control\_sph\_shell}	Control file for spherical shell preprocessing
+\item{\tt  control\_MHD}		Control file for simulation
+\item{\tt control\_snapshot}	Control file for postprocessing
+\item{\tt sph\_lm31r48c\_4} 	Spherical shell indexing data directory
+\item{\tt rst\_4}				Spectr data directory for restarting
+\item{\tt field}				Field data directory for for visualization
+\end{description}
+%
+
+\subsection{Example of treatment of heat and composition source term}
+This example solves heat and composition diffusion with including source terms. In this example, only temperature and composition are solved by
+%
+\begin{eqnarray}
+\frac{\partial T}{\partial t} =  \kappa_{T} \nabla^{2} T + q_{T},
+\nonumber \\
+\frac{\partial C}{\partial t} = \kappa_{C} \nabla^{2} C + q_{C},
+\nonumber
+\end{eqnarray}
+%
+ In the present example, diffusivities are fixed to be $\kappa_{T} = \kappa_{C} = 1$. Heat and composition sources are given as
+$q_{T} = \frac{2}{r}$ and $q_{C} = 1.0$, respectively. The source terms are given in the initial field data. To generate initial data, 
+
+
 
 \subsection{Example of data assembling program}
 An example for spectrum data assembling program is provided in \verb|assemble_sph| directory.

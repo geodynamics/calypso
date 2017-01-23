@@ -97,6 +97,7 @@ Supported field in the present version is listed in Table \ref{table:fields}
 \verb|current_density| & Current density & $\bvec{J} = \nabla \times \bvec{B} $ \\
 \verb|electric_field| & Electric field & $\bvec{E} = \sigma \left(\bvec{J} - \bvec{u} \times \bvec{B}\right) $ \\
  \hline
+\verb inertia & Inertia term &  $ -\bvec{\omega} \times \bvec{u} $ \\
 \verb|viscous_diffusion| & Viscous diffusion
 & $-\nu \nabla \times \nabla \times \bvec{u}$ \\
 \verb buoyancy                   & Thermal buoyancy &  $ -\alpha_{T} T \bvec{g}  $ \\
@@ -107,10 +108,12 @@ Supported field in the present version is listed in Table \ref{table:fields}
 \verb|thermal_diffusion| & Termal diffusion & $ \kappa_{T} \nabla^{2} T $ \\
 \verb grad_temp & Temperature gradient & $ \nabla T$ \\
 \verb heat_flux & Advective heat flux & $ \bvec{u} T$ \\
+\verb heat_advect & Heat advection & $ -\bvec{u} \cdot \nabla T = -\nabla \cdot \left(  \bvec{u} T \right) $ \\
 \hline
 \verb composition_diffusion & Compositional diffusion & $ \kappa_{C} \nabla^{2} C $ \\
 \verb grad_composition & Composition gradient & $ \nabla C$ \\
 \verb composite_flux & Advective composition flux & $ \bvec{u} C$ \\
+\verb composition_advect & Compositional advection & $ -\bvec{u} \cdot \nabla C = -\nabla \cdot \left(  \bvec{u} C \right) $ \\
 \hline
 \verb magnetic_diffusion & Magnetic diffusion 
 & $-\eta \nabla \times \nabla \times \bvec{B}$ \\
@@ -574,7 +577,7 @@ If this flag is not defined, program searches the fastest library in the initial
 \end{description}
 %
 
-\paragraph{\tt FFT\_library\_ctl}
+\paragraph{\tt Legendre\_trans\_loop\_ctl}
 \label{href_t:Legendre_trans_loop_ctl}
 \verb|[FFT_Name]| \\
 Loop configuration for Legendre transform is defined by text. The following settings are available for \verb|[Leg_Loop]|. 
@@ -632,7 +635,7 @@ Normalized radius to obtain Gauss coefficients \verb|[gauss_coef_radius]| is def
 \label{href_t:gauss_coefs_prefix}
 \verb|[nusselt_number_prefix]| \\
 File prefix for Nusselt number data at ICB and CMB \verb|[nusselt_number_prefix]| is defined by Text. Program add {\tt .dat} extension after this file prefix. If this file prefix is not defined, Nusselt number data are not generated. \\
-{\bf CAUTION: Nusselt number is not evaluated if heat source is exsist.}
+{\bf CAUTION: Nusselt number is not evaluated if heat source exsists.}
 
 \paragraph{\tt array pick\_layer\_ctl}
 \label{href_t:pick_layer_ctl}
