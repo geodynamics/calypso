@@ -120,9 +120,9 @@
           k = 1 + (inod- j) / nidx_rj(2)
 !
           d_rj(inod,is_div)                                             &
-     &          = three * (coef_buo * d_rj(inod,is_t)                   &
-     &                   + coef_t_buo * d_rj(inod,is_c))                &
-     &                   +  ( coef_buo * d_rj(inod,ids_t)               &
+     &          = three * (coef_t_buo * d_rj(inod,is_t)                 &
+     &                   + coef_c_buo * d_rj(inod,is_c))                &
+     &                  + (coef_t_buo * d_rj(inod,ids_t)                &
      &                   + coef_c_buo * d_rj(inod,ids_c) )              &
      &                  * g_sph_rj(j,3) * a_r_1d_rj_r(k)
         end do
