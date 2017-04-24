@@ -17,6 +17,10 @@
 !
       integer(kind=kint ) :: istep_start, istep_end, increment_step
 !
+      integer(kind = kint) :: iflag_newtime = 0
+      integer(kind = kint) :: istep_new_rst, increment_new_step
+      real(kind = kreal) :: time_new
+!
       character(len=kchara) :: org_sph_head = 'mesh_org/in_rj'
       character(len=kchara) :: new_sph_head = 'mesh_new/in_rj'
 !
@@ -36,6 +40,8 @@
 !>      multiply the amplitude
       real(kind = kreal) :: b_sph_ratio
 !
+      private :: set_control_original_step, set_control_new_step
+!
 !------------------------------------------------------------------
 !
       contains
@@ -47,7 +53,6 @@
       use m_control_data_4_merge
       use m_ctl_data_4_platforms
       use m_ctl_data_4_2nd_data
-      use m_ctl_data_4_time_steps
       use m_node_id_spherical_IO
       use m_file_format_switch
       use m_ucd_data
@@ -108,6 +113,18 @@
         b_sph_ratio = magnetic_field_ratio_ctl
       end if
 !
+      call set_control_original_step
+      call set_control_new_step
+!
+      end subroutine set_control_4_newsph
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_control_original_step
+!
+      use m_ctl_data_4_time_steps
+!
+!
       istep_start = 1
       if(i_step_init_ctl%iflag .gt. 0) then
         istep_start = i_step_init_ctl%intvalue
@@ -123,7 +140,40 @@
         increment_step = i_step_rst_ctl%intvalue
       end if
 !
-      end subroutine set_control_4_newsph
+      end subroutine set_control_original_step
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_control_new_step
+!
+      use m_ctl_data_new_time_steps
+!
+      if(i_step_init_ctl%iflag .gt. 0) then
+        istep_new_rst = i_step_init_ctl%intvalue
+      else
+        istep_new_rst = istep_start
+      end if
+      if (i_step_rst_ctl%iflag .gt. 0) then
+        increment_new_step = i_step_rst_ctl%intvalue
+      else
+        increment_new_step = increment_step
+      end if
+      if(time_init_ctl%iflag .gt. 0) then
+        time_new = time_init_ctl%realvalue
+      end if
+!
+      if(time_init_ctl%iflag .gt. 0 .and. i_step_init_ctl%iflag .gt. 0  &
+     &   .and. i_step_rst_ctl%iflag .gt. 0) then
+        if(istep_start .ne. istep_end) then
+          stop 'Choose one snapshot to change time step information'
+        else
+          iflag_newtime = 1
+        end if
+      else
+        iflag_newtime = 0
+      end if
+!
+      end subroutine set_control_new_step
 !
 ! -----------------------------------------------------------------------
 !

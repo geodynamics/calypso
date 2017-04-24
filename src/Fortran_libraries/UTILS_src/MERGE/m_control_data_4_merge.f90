@@ -146,6 +146,7 @@
        subroutine read_merge_step_data
 !
        use m_ctl_data_4_time_steps
+       use m_ctl_data_new_time_steps
 !
 !   2 begin time_step_ctl
 !
@@ -158,6 +159,7 @@
         if(i_control .gt. 0) exit
 !
         call read_time_step_ctl
+        call read_new_time_step_ctl
       end do
 !
       end subroutine read_merge_step_data

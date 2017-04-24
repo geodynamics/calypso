@@ -1,0 +1,9 @@
+!-----------------------------------------------------------------------
+!     Example of data assembling test
+!-----------------------------------------------------------------------
+!
+ Spherical harmonics table data for the example are stored in this directory.
+
+ To generate spherical harmonics table data, run the following command:
+ 
+ [sph_lm31r48c_4]$ [CALYPSO_DIR]/bin/gen_sph_grids

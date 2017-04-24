@@ -1,5 +1,5 @@
 !>@file   m_ctl_data_4_time_steps.f90
-!!@brief  module m_ctl_data_4_time_steps
+!!@brief  module m_ctl_data_new_time_steps
 !!
 !!@author H. Matsui
 !!@date Programmed in Sep., 2006
@@ -9,12 +9,12 @@
 !!
 !!@verbatim
 !!
-!!      subroutine read_time_step_ctl
+!!      subroutine read_new_time_step_ctl
 !!
 !! ------------------------------------------------------------------
 !!      Example of control parameters for flexible time step
 !!
-!!    begin time_step_ctl
+!!    begin new_time_step_ctl
 !!      elapsed_time_ctl      42500.
 !!
 !!      flexible_step_ctl        ON
@@ -36,13 +36,13 @@
 !!      delta_t_monitor_ctl      1.0e-4
 !!      delta_t_sgs_coefs_ctl    2.0e-5
 !!      delta_t_boundary_ctl     1.0e-4
-!!    end time_step_ctl
+!!    end new_time_step_ctl
 !!
 !! ------------------------------------------------------------------
 !!
 !!      Example of control parameters for fixed time step
 !!
-!!    begin time_step_ctl
+!!    begin new_time_step_ctl
 !!      elapsed_time_ctl      42500.
 !!
 !!      flexible_step_ctl     OFF
@@ -65,7 +65,7 @@
 !!
 !!      dt_ctl              5.0e-5
 !!      time_init_ctl       0.0e-8
-!!    end time_step_ctl
+!!    end new_time_step_ctl
 !!
 !! ------------------------------------------------------------------
 !!@endverbatim
@@ -139,7 +139,7 @@
 !>@n@param      time_init_ctl
 !>                Initial time
 !
-      module m_ctl_data_4_time_steps
+      module m_ctl_data_new_time_steps
 !
       use m_precision
       use t_control_elements
@@ -201,7 +201,7 @@
 !   entry label
 !
       character(len=kchara), parameter                                  &
-     &      :: hd_time_step = 'time_step_ctl'
+     &      :: hd_new_time_step = 'new_time_step_ctl'
       integer (kind=kint) :: i_time_step =      0
 !
 !   4th level for time steps
@@ -285,7 +285,7 @@
       character(len=kchara), parameter                                  &
      &       :: hd_time_init =        'time_init_ctl'
 !
-      private :: hd_time_step, i_time_step
+      private :: hd_new_time_step, i_time_step
       private :: hd_flexible_step, hd_min_delta_t, hd_max_delta_t
       private :: hd_max_eps_to_shrink, hd_min_eps_to_expand
       private :: hd_start_rst_step, hd_end_rst_step
@@ -310,19 +310,19 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_time_step_ctl
+      subroutine read_new_time_step_ctl
 !
       use m_machine_parameter
       use m_read_control_elements
       use skip_comment_f
 !
 !
-      if(right_begin_flag(hd_time_step) .eq. 0) return
+      if(right_begin_flag(hd_new_time_step) .eq. 0) return
       if (i_time_step .gt. 0) return
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_time_step, i_time_step)
+        call find_control_end_flag(hd_new_time_step, i_time_step)
         if(i_time_step .gt. 0) exit
 !
 !
@@ -387,8 +387,8 @@
         call read_chara_ctl_type(hd_flexible_step, flexible_step_ctl)
       end do
 !
-      end subroutine read_time_step_ctl
+      end subroutine read_new_time_step_ctl
 !
 !   --------------------------------------------------------------------
 !
-      end module m_ctl_data_4_time_steps
+      end module m_ctl_data_new_time_steps

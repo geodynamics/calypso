@@ -184,6 +184,7 @@
       use m_phys_labels
       use m_sph_spectr_data
       use m_t_step_parameter
+      use m_time_data_IO
       use r_interpolate_marged_sph
       use copy_time_steps_4_restart
       use set_field_file_names
@@ -192,6 +193,7 @@
       integer(kind = kint) :: istep, icou
       integer(kind = kint) :: ip, jp, irank_new
       integer(kind = kint) :: iloop, jloop
+      integer(kind = kint) :: istep_out
 !
 !
 !     ---------------------
@@ -242,8 +244,15 @@
         end do
 !
 !
+        istep_out = istep
+        if(iflag_newtime .gt. 0) then
+          istep_out =      istep_new_rst / increment_new_step
+          i_time_step_IO = istep_new_rst
+          time_IO =        time_new
+        end if
+!
         call sel_write_SPH_assemble_field                               &
-     &     (np_sph_new, istep, nloop_new, new_fst_IO)
+     &     (np_sph_new, istep_out, nloop_new, new_fst_IO)
 !
         do jloop = 1, nloop_new
           irank_new = my_rank + (jloop-1) * nprocs
