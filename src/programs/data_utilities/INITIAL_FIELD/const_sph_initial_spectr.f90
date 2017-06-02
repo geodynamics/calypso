@@ -22,6 +22,7 @@
 !!         If spectrum data have center, inod_rj_center 
 !!         returns this address.
 !!
+!!       l_truncation ::  Truncation level of spherical hermonics
 !!       nidx_rj(1) :: Number of radial grids
 !!       rr = radius_1d_rj_r(k)
 !!         Return radius at global grid address k

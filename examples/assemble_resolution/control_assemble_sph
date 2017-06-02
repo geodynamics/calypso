@@ -26,8 +26,8 @@ begin assemble_control
 !
     begin new_time_step_ctl
       i_step_init_ctl       1000
-      i_step_finish_ctl     50
-      i_step_rst_ctl        5.0e0
+      i_step_rst_ctl     50
+      time_init_ctl        5.0e0
     end new_time_step_ctl
   end control
 !
