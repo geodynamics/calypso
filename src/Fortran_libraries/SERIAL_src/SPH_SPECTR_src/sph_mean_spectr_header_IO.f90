@@ -16,11 +16,12 @@
 !!     &          num_rms_rj, ntot_rms_rj, num_rms_comp_rj, rms_name_rj,&
 !!     &          nri_rms, nlayer_ICB, nlayer_CMB)
 !!
-!!      integer(kind = kint), function check_sph_vol_mean_sq_header     &
+!!      integer(kind = kint)  function check_sph_vol_mean_sq_header     &
 !!     &         (id_file, mode_label, ltr,                             &
 !!     &          num_rms_rj, ntot_rms_rj, num_rms_comp_rj, rms_name_rj,&
-!!     &          nri, nlayer_ICB, nlayer_CMB, kr_inner, kr_outer,      &
-!!     &          r_inner,  r_outer)
+!!     &          nri, nlayer_ICB, nlayer_CMB, kr_inner, kr_outer)
+!!
+!!      subroutine set_sph_rms_labels(num_rms_comp, rms_name, labels)
 !!@endverbatim
 !!
 !!@n @param my_rank       Process ID
@@ -140,11 +141,10 @@
 !
 !  --------------------------------------------------------------------
 !
-      integer(kind = kint), function check_sph_vol_mean_sq_header       &
+      integer(kind = kint)  function check_sph_vol_mean_sq_header       &
      &         (id_file, mode_label, ltr,                               &
      &          num_rms_rj, ntot_rms_rj, num_rms_comp_rj, rms_name_rj,  &
-     &          nri, nlayer_ICB, nlayer_CMB, kr_inner, kr_outer,        &
-     &          r_inner,  r_outer)
+     &          nri, nlayer_ICB, nlayer_CMB, kr_inner, kr_outer)
 !
       use write_field_labels
       use skip_comment_f
@@ -155,7 +155,6 @@
       integer(kind = kint), intent(in) :: num_rms_rj, ntot_rms_rj
       integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
       integer(kind = kint), intent(in) :: kr_inner, kr_outer
-      real(kind = kreal), intent(in) ::   r_inner,  r_outer
       integer(kind = kint), intent(in) :: num_rms_comp_rj(num_rms_rj)
       character (len=kchara), intent(in) :: rms_name_rj(num_rms_rj)
 !
@@ -167,22 +166,22 @@
       character (len=kchara), allocatable :: read_name(:)
 !
       character(len=255) :: character_4_read
-      character(len=kchara) :: labels(6)
-      integer(kind = kint) :: i
+      character(len=kchara) :: labels(6), tmpc1, tmpc2, tmpc3
+      integer(kind = kint) :: i, nd, icou
       real(kind = kreal) :: rtmp
 !
 !
       call skip_comment(character_4_read, id_file)
       read(id_file,*) nri_read, ltr_read
       if(nri_read .ne. nri) then
-        write(*,*) 'Truncation does not match                           &
+        write(*,*) 'Truncation does not match ',                        &
      &             'with the data in the file'
         check_sph_vol_mean_sq_header = 1
         return
       end if
 !
       if(ltr_read .ne. ltr) then
-        write(*,*) 'Inner boundary address does not match               &
+        write(*,*) 'Inner boundary address does not match ',            &
      &             'with the data in the file'
         check_sph_vol_mean_sq_header = 1
         return
@@ -191,14 +190,14 @@
       call skip_comment(character_4_read, id_file)
       read(id_file,*) nlayer_ICB_read, nlayer_CMB_read
       if(nlayer_ICB_read .ne. nlayer_ICB) then
-        write(*,*) 'Inner boundary address does not match               &
+        write(*,*) 'Inner boundary address does not match ',            &
      &             'with the data in the file'
         check_sph_vol_mean_sq_header = 1
         return
       end if
 !
       if(nlayer_CMB_read .ne. nlayer_CMB) then
-        write(*,*) 'Outer boundary address does not match               &
+        write(*,*) 'Outer boundary address does not match ',            &
      &             'with the data in the file'
         check_sph_vol_mean_sq_header = 1
         return
@@ -207,7 +206,7 @@
       call skip_comment(character_4_read, id_file)
       read(id_file,*) kr_inner_read, rtmp
       if(kr_inner_read .ne. kr_inner) then
-        write(*,*) 'Inner area address does not match                   &
+        write(*,*) 'Inner area address does not match ',                &
      &             'with the data in the file'
         check_sph_vol_mean_sq_header = 1
         return
@@ -216,7 +215,7 @@
       call skip_comment(character_4_read, id_file)
       read(id_file,*) kr_outer_read, rtmp
       if(kr_outer_read .ne. kr_outer) then
-        write(*,*) 'Outer area address does not match                   &
+        write(*,*) 'Outer area address does not match ',                &
      &             'with the data in the file'
         check_sph_vol_mean_sq_header = 1
         return
@@ -226,14 +225,14 @@
       call skip_comment(character_4_read, id_file)
       read(id_file,*) nfld_read, ntot_read
       if(nfld_read .ne. num_rms_rj) then
-        write(*,*) 'Number of fields does not match                     &
+        write(*,*) 'Number of fields does not match ',                  &
      &             'with the data in the file'
         check_sph_vol_mean_sq_header = 1
         return
       end if
 !
       if(ntot_read .ne. ntot_rms_rj) then
-        write(*,*) 'total Number of components does not match           &
+        write(*,*) 'total Number of components does not match ',        &
      &             'with the data in the file'
         check_sph_vol_mean_sq_header = 1
         return
@@ -251,6 +250,7 @@
         read(id_file,*) tmpc1, tmpc2, read_name(1:ntot_read)
       end if
 !
+      icou = 0
       do i = 1, num_rms_rj
         call set_sph_rms_labels(num_rms_comp_rj(i), rms_name_rj(i),     &
      &      labels(1))
@@ -267,7 +267,8 @@
           icou = icou + 1
           if(read_name(icou) .ne. labels(nd)) then
             write(*,*) 'field ', trim(labels(nd)),                      &
-     &                 'does not match with the data file'
+     &                 ' does not match with the data file',            &
+     &                 read_name(icou), labels(nd)
             check_sph_vol_mean_sq_header = 1
             deallocate(read_name, num_read_comp)
             return
