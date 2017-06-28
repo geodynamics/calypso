@@ -19,5 +19,15 @@ This example only run with 1 MPI process. The simulation procedure is the follow
 1: Run index generation program as
 [heat_composition_source]$ [CALYPSO_DIR]/bin/gen_sph_grids
 
-2. Run simulation program
-[heat_composition_source]$ mpirun -np 1 [CALYPSO_DIR]/bin/sph_mhd
+2. Make initial field
+ 2.1  Copy source code "const_sph_initial_spectr.f90" to 
+    [CALYPSO_DIR]/src/programs/data_utilities/INITIAL_FIELD
+   [sph_initial_field]$ cp const_sph_initial_spectr.f90 [CALYPSO_DIR]/src/programs/data_utilities/INITIAL_FIELD
+ 2.2  Build initial field generation program
+   [sph_initial_field]$ cd [CALYPSO_DIR]/work
+   [work]$ make
+ 2.3  Move this directory and construct initial field data
+   [work]$ cd [CALYPSO]/examples/heat_composition_source
+   [sph_initial_field]$ [CALYPSO_DIR]/bin/sph_initial_field
+3. Run simulation program
+   [sph_initial_field]$ mpirun -np 1 [CALYPSO_DIR]/bin/sph_mhd

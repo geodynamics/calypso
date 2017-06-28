@@ -14,15 +14,14 @@ sph_lm31r48c_2:     Directory for new spherical harmonics index table
 
 The simulation procedure is the following
 
-1: Run index generation program in both directory for index tables
-[assemble_sph]% cd sph_lm31r48c_4
-[sph_lm31r48c_4]$ [CALYPSO_DIR]/bin/gen_sph_grids
-[sph_lm31r48c_4]% cd ../sph_lm31r48c_2
-[sph_lm31r48c_2]$ [CALYPSO_DIR]/bin/gen_sph_grids
-[sph_lm31r48c_2]% cd ../
+1. Copy spectr data from benchmark example
+[assemble_sph]$ cp ../dynamo_benchmark/dynamobench_case_1/sph_lm31r48c_4/* sph_lm31r48c_4/
+[assemble_sph]$ cp ../dynamo_benchmark/dynamobench_case_1/rst_4/rst.* 4domains/
 
-2. Copy spectr data from benchmark example
-[assemble_sph]% cp ../dynamo_benchmark/dynamobench_case_1/rst_4/rst.* 4domains/
+2: Run index generation program for new domein decomposition
+[sph_lm31r48c_4]$ sph_lm31r48c_2
+[sph_lm31r48c_2]$ [CALYPSO_DIR]/bin/gen_sph_grids
+[sph_lm31r48c_2]$ cd ../
 
 3. Run data transform program
 [sph_lm31r48c_2]$ [CALYPSO_DIR]/bin/assemble_sph

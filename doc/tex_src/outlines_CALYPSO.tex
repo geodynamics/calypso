@@ -116,7 +116,8 @@ end spherical_shell_ctl
 \end{figure}
 %
 
-\section{Examples}
+\newpage
+\section{Examples} \label{section:examples}
 Several examples are provided in the \verb|examples| directory. There are three subdirectories as examples. README files are also provided to perform these examples in each subdirectory.
 %
 \begin{description}
@@ -132,11 +133,13 @@ Several examples are provided in the \verb|examples| directory. There are three 
 Four examples illustrate the use of the preprocessing program. The examples include
 %
 \begin{description}
-\item{\tt Chebyshev\_points}   Example to generate indexing data using Chebyshev collocation points
-\item{\tt equidistance}        Example to generate indexing data with equi-distance grid
-\item{\tt explicitly\_defined} Example to generate indexing data with explicitly defined radial points
-\item{\tt with\_inner\_core}   Example to generate indexing data including inner core and external of the fluid shell.
+\item{\tt Chebyshev\_points} \label{href_t:gen_Chebyshev} Example to generate indexing data using Chebyshev collocation points
+\item{\tt equidistance} \label{href_t:gen_equidistance} Example to generate indexing data with equi-distance grid
+\item{\tt explicitly\_defined} \label{href_t:gen_explicit} Example to generate indexing data with explicitly defined radial points
+\item{\tt with\_inner\_core} \label{href_t:gen_w_innercore} Example to generate indexing data including inner core and external of the fluid shell.
 \end{description}
+
+The program \verb|gen_sph_grids| generate spherical harmonics indexing file under the directory defined by the file \verb|control_sph_shell|.
 %
 \subsection{Examples of dynamo benchmark}
 There are four examples for simulations using dynamo benchmark test as following.
@@ -161,7 +164,14 @@ The process of the simulation in these examples is the same using 4 MPI processe
 \item  Create the grid files for the simulation  \\
 {\small
 \begin{verbatim}
-[dynamobench_case_1]$ mpirun -np 4 [CALYPSO_DIR]/bin/gen_sph_grids
+[dynamobench_case_1]$ [CALYPSO_DIR]/bin/gen_sph_grids
+\end{verbatim}
+}
+
+\item  Create initial field (Benchmark Case 1 only, see section \ref{sec:sph_initial_field}) \\
+{\small
+\begin{verbatim}
+[dynamobench_case_1]$ [CALYPSO_DIR]/bin/sph_initial_field
 \end{verbatim}
 }
 
@@ -184,6 +194,7 @@ The process of the simulation in these examples is the same using 4 MPI processe
 Each example has the following input and data outputs.
 %
 \subsubsection{Data files and directories for Case 0}
+\label{section:bench_case0}
 %
 \begin{description}
 \item{\tt control\_sph\_shell}	Control file for spherical shell preprocessing
@@ -196,53 +207,79 @@ Each example has the following input and data outputs.
 \end{description}
 %
 \subsubsection{Data files and directories for Case 1}
+\label{section:bench_case1}
 %
 \begin{description}
 \item{\tt control\_sph\_shell}	Control file for spherical shell preprocessing
 \item{\tt  control\_MHD}		Control file for simulation
 \item{\tt control\_snapshot}	Control file for postprocessing
-\item{\tt control\_psf\_CMB}	Control file for section at CMB
-\item{\tt control\_psf\_eq}		Control file for section at equatorial plane
-\item{\tt control\_psf\_z0.3}	Control file for section at z = 0.3 
-\item{\tt control\_psf\_s0.55}	Control file for cylindrical surface at s = 0.55
-\item{\tt control\_iso\_temp}	Control file for isosurface of temperature
+\item{\tt control\_psf\_CMB}	Control file for section at CMB (See Section \ref{section:PSF})
+\item{\tt control\_psf\_eq}		Control file for section at equatorial plane (See Section \ref{section:PSF})
+\item{\tt control\_psf\_z0.3}	Control file for section at z = 0.3 (See Section \ref{section:PSF})
+\item{\tt control\_psf\_s0.55}	Control file for cylindrical surface at s = 0.55 (See Section \ref{section:PSF})
+\item{\tt control\_iso\_temp}	Control file for isosurface of temperature (See Section \ref{section:ISO})
 \item{\tt sph\_lm31r48c\_4} 	Spherical shell indexing data directory
 \item{\tt rst\_4}				Spectr data directory for restarting
 \item{\tt field}				Field data directory for for visualization
 \item{\tt field}				Field data directory for for visualization
-\item{\tt setions}			Cross section data directory for for visualization
-\item{\tt isourfaces}			Isosurface data directory for for visualization
+\item{\tt setions}			Cross section data directory for for visualization (See Section \ref{section:PSF})
+\item{\tt isourfaces}			Isosurface data directory for for visualization (See Section \ref{section:ISO})
 \end{description}
 %
 \subsubsection{Data files and directories for Case 2}
+\label{section:bench_case2}
 %
 \begin{description}
 \item{\tt control\_sph\_shell}	Control file for spherical shell preprocessing
 \item{\tt  control\_MHD}		Control file for simulation
 \item{\tt control\_snapshot}	Control file for postprocessing
-\item{\tt control\_psf\_CMB}	Control file for section at CMB
-\item{\tt control\_psf\_ICB}		Control file for section at ICB
-\item{\tt control\_psf\_eq}		Control file for section at equatorial plane
-\item{\tt control\_psf\_z0.3}	Control file for section at z = 0.3 
-\item{\tt control\_psf\_s0.55}	Control file for cylindrical surface at s = 0.55
+\item{\tt control\_psf\_CMB}	Control file for section at CMB (See Section \ref{section:PSF})
+\item{\tt control\_psf\_ICB}		Control file for section at ICB (See Section \ref{section:PSF})
+\item{\tt control\_psf\_eq}		Control file for section at equatorial plane (See Section \ref{section:PSF})
+\item{\tt control\_psf\_z0.3}	Control file for section at z = 0.3  (See Section \ref{section:PSF})
+\item{\tt control\_psf\_s0.55}	Control file for cylindrical surface at s = 0.55 (See Section \ref{section:PSF})
 \item{\tt sph\_lm31r48c\_4} 	Spherical shell indexing data directory
 \item{\tt rst\_4}				Spectr data directory for restarting
 \item{\tt field}				Field data directory for for visualization
-\item{\tt setions}			Cross section data directory for for visualization
+\item{\tt setions}			Cross section data directory for for visualization (See Section \ref{section:PSF})
 \end{description}
 %
 \subsubsection{Data files and directories for Compositional Case 1}
+\label{section:bench_case1C}
 %
 \begin{description}
 \item{\tt const\_sph\_initial\_spectr.f90}	Source code to generate initial field (need )
 \item{\tt control\_sph\_shell}	Control file for spherical shell preprocessing
-\item{\tt  control\_MHD}		Control file for simulation
+\item{\tt control\_MHD}		Control file for simulation
 \item{\tt control\_snapshot}	Control file for postprocessing
 \item{\tt sph\_lm31r48c\_4} 	Spherical shell indexing data directory
 \item{\tt rst\_4}				Spectr data directory for restarting
 \item{\tt field}				Field data directory for for visualization
 \end{description}
 %
+
+\subsection{Example of data assembling program}
+An example for spectrum data assembling program is provided in \verb|assemble_sph| directory. This example uses simulation results of dynamo benchmark case 1.
+First, copy data from dynamo benchmark case 1 as
+%
+\begin{verbatim}
+[assemble_sph]$ cp ../dynamo_benchmark/dynamobench_case_1/sph_lm31r48c_4/* sph_lm31r48c_4/
+[assemble_sph]$ cp ../dynamo_benchmark/dynamobench_case_1/rst_4/rst.* 4domains/
+\end{verbatim}
+
+Then, construct new domain decomposition data as 
+%
+\begin{verbatim}
+[sph_lm31r48c_4]$ sph_lm31r48c_2
+[sph_lm31r48c_2]$ [CALYPSO_DIR]/bin/gen_sph_grids
+[sph_lm31r48c_2]$ cd ../
+\end{verbatim}
+
+Finally restart data for new configuration is generated by \verb|assemble_sph| in \verb|2doamins| directory.
+\begin{verbatim}
+[sph_lm31r48c_2]$ [CALYPSO_DIR]/bin/assemble_sph
+\end{verbatim}
+
 
 \subsection{Example of treatment of heat and composition source term}
 This example solves heat and composition diffusion with including source terms. In this example, only temperature and composition are solved by
@@ -255,18 +292,29 @@ This example solves heat and composition diffusion with including source terms. 
 \end{eqnarray}
 %
  In the present example, diffusivities are fixed to be $\kappa_{T} = \kappa_{C} = 1$. Heat and composition sources are given as
-$q_{T} = \frac{2}{r}$ and $q_{C} = 1.0$, respectively. The source terms are given in the initial field data. To generate initial data, 
+$q_{T} = \frac{2}{r}$ and $q_{C} = 1.0$, respectively. The source terms are given in the initial field data. The procedure of the simulation is the same as for the dynamo benchmark Case 1. However, initial field generation program \verb|sph_initial_field| is required to build by the following process:
 
+\begin{enumerate}
+\item Copy source file \verb|const_sph_initial_spectr.f90| to \\
+ \verb|[CALYPSO_DIR]/src/programs/data_utilities/INITIAL_FIELD|.
+\begin{verbatim}
+\verb|$[sph_initial_field]$ INITIAL_FIELD|
+\end{verbatim}
 
+\item Build initial field generation program again.
+\begin{verbatim}
+[sph_initial_field]$ cd [CALYPSO_DIR]/work
+[work]$ make
+\end{verbatim}
 
-\subsection{Example of data assembling program}
-An example for spectrum data assembling program is provided in \verb|assemble_sph| directory.
-%
+\item Return to the example directory
+\begin{verbatim}
+[work]$ cd [CALYPSO]/examples/heat_composition_source
+\end{verbatim}
 
-\subsection{Example of heat and compositional source}
- An example to perform a simulation with heat and compositional sources is given in \verb|heat_composition_source| directory. To simplify the problem, only the thermal and compositional fields are evolved with no velocity (i.e. pure diffusion problem). A module to generate initial field data \\
- \verb|const_sph_initial_spectr| is copied to \verb|src/programs/data_utilities/|\\
-\verb|INITIAL_FIELD/| directory. The code must be recompiled after modifying this module. Initial field is generated by the program \verb|sph_initial_field| after generating spherical harmonics information by \verb|gen_sph_grid|. Aftrer the simulation, $Y_{0}^{0}$ component of temperature and composition as a function of radius and time is written in \verb|picked_mode.dat|.
+\end{enumerate}
+After building \verb|sph_initial_field|, the procedure is the same as for the dynamo benchmarks. Aftrer the simulation, $Y_{0}^{0}$ component of temperature and composition as a function of radius and time is written in \verb|picked_mode.dat|.
+
 
  \subsection{Example of thermal and compositional boundary conditions by external file}
  Heterogeneous boundary are input using an external file. An example to set thermal and compositional boundary conditions is given in \verb|heterogineous_temp| directory. As in the heat source example, only the diffusion problem is solved in this example. In file \verb|bc_spectr.btx|, temperature boundary conditions are defined for $Y_{0}^{0}$, $Y_{1}^{1s}$, $Y_{1}^{1c}$, and ,$ Y_{2}^{2c}$ component, and compositional boundary is defined for $Y_{0}^{0}$, $Y_{2}^{2s}$, and $Y_{2}^{2c}$ components. The radial profile of these spherical harmonics coefficients are written in \verb|picked_mode.dat|.

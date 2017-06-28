@@ -5,8 +5,8 @@ begin spherical_shell_ctl
   end data_files_def
 !
   begin num_domain_ctl
-    num_radial_domain_ctl         2
-    num_horizontal_domain_ctl     2
+    num_radial_domain_ctl         1
+    num_horizontal_domain_ctl     1
   end num_domain_ctl
 !
   begin num_grid_sph

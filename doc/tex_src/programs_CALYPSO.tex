@@ -140,7 +140,7 @@ Control file ({\tt control\_sph\_shell}) consists the following items. Detailed 
 	\end{itemize}
 \end{itemize}
 
-If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined, the following arrays \verb|num_domain_sph_grid|, \verb|num_domain_legendre|, and \verb|num_domain_spectr| are not necessary.
+If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined, the following arrays \verb|num_domain_sph_grid|, \verb|num_domain_legendre|, and \verb|num_domain_spectr| are not necessary. (see \hyperref[href_t:gen_w_innercore]{example} \verb|spherical_shell/with_inner_core|)
 
 \subsection{Spectrum index data}
 \verb|gen_sph_grid| generates indexing table of the spherical transform. To perform spherical harmonics transform with distributed memory computers, data communication table is also included in these files. Calypso needs four indexing data for the spherical transform.
@@ -716,7 +716,7 @@ Merged XDMF data generate files listed in Table \ref{table:XDMF}. For ParaView, 
 %
 
 %
-\subsection{Cross section data (Parallel SurFacing module}
+\subsection{Cross section data (Parallel Surfacing module}
 \label{section:PSF}
 Calypso can output cross section data for visualization with finer time increment than the whole domain data. The cross section data consist of triangle patches with VTK format, then data can be visualized by Paraview like as the whole field data. This cross sectioning module can output arbitrary quadrature surface, but plane, sphere, and cylindrical section would be useful for the geodynamo simulations.
 
@@ -813,6 +813,7 @@ The format of the control file or block for cross sections is described below. T
 
 %
 \subsection{Isosurface data}
+\label{section:ISO}
 %
 Calypso can also output isosurface data for visualization. Generally, data size of the isosurface is much larger than the sectioning data. The isosurface data is also written as a unstructured grid data with VTK format. The isosurface also consists of triangle patches.
 
