@@ -256,7 +256,7 @@ begin MHD_control
   begin sph_monitor_ctl
     volume_average_prefix        'sph_ave_volume'
     volume_pwr_spectr_prefix     'sph_pwr_volume'
-!    layered_pwr_spectr_prefix    'sph_pwr_layer'
+    layered_pwr_spectr_prefix    'sph_pwr_layer'
 !
     picked_sph_prefix     'picked_mode'
     gauss_coefs_prefix    'gauss_coefs'
@@ -270,6 +270,12 @@ begin MHD_control
     array pick_gauss_coef_degree_ctl  1
       pick_gauss_coef_degree_ctl   1
     end array pick_gauss_coef_degree_ctl
+!
+    array spectr_layer_ctl  3
+      spectr_layer_ctl   25
+      spectr_layer_ctl   49
+      spectr_layer_ctl   73
+    end array spectr_layer_ctl
   end sph_monitor_ctl
 !
   begin visual_control

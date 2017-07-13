@@ -65,12 +65,20 @@
       end do
       ntot_rms_rj = istack_rms_comp_rj(num_rms_rj)
 !
+      if(nri_rms .eq. -1) then
+        nri_rms = nidx_rj(1)
+        call allocate_num_spec_layer
+!
+        do k = 1, nidx_rj(1)
+          kr_for_rms(k) = k
+        end do
+      end if
+!
       call quicksort_int(nri_rms, kr_for_rms, ione, nri_rms)
 !
       call allocate_rms_4_sph_spectr(my_rank)
       call allocate_ave_4_sph_spectr
       call set_sum_table_4_sph_spectr
-!
 !
 
       do knum = 1, nri_rms

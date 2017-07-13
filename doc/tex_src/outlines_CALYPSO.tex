@@ -142,6 +142,7 @@ Four examples illustrate the use of the preprocessing program. The examples incl
 The program \verb|gen_sph_grids| generate spherical harmonics indexing file under the directory defined by the file \verb|control_sph_shell|.
 %
 \subsection{Examples of dynamo benchmark}
+\label{section:dynamobench}
 There are four examples for simulations using dynamo benchmark test as following.
 %
 \begin{description}
@@ -225,13 +226,19 @@ Each example has the following input and data outputs.
 \item{\tt setions}			Cross section data directory for for visualization (See Section \ref{section:PSF})
 \item{\tt isourfaces}			Isosurface data directory for for visualization (See Section \ref{section:ISO})
 \end{description}
+
+ After running the program, the following files are written.
+\begin{description}
+\item{\tt sph\_pwr\_volume\_s.dat}   Mean square data over the fluid shell.
+\end{description}
+
 %
 \subsubsection{Data files and directories for Case 2}
 \label{section:bench_case2}
 %
 \begin{description}
 \item{\tt control\_sph\_shell}	Control file for spherical shell preprocessing
-\item{\tt  control\_MHD}		Control file for simulation
+\item{\tt control\_MHD}		Control file for simulation
 \item{\tt control\_snapshot}	Control file for postprocessing
 \item{\tt control\_psf\_CMB}	Control file for section at CMB (See Section \ref{section:PSF})
 \item{\tt control\_psf\_ICB}		Control file for section at ICB (See Section \ref{section:PSF})
@@ -242,6 +249,11 @@ Each example has the following input and data outputs.
 \item{\tt rst\_4}				Spectr data directory for restarting
 \item{\tt field}				Field data directory for for visualization
 \item{\tt setions}			Cross section data directory for for visualization (See Section \ref{section:PSF})
+\end{description}
+
+ After running the program, the following files are written.
+\begin{description}
+\item{\tt sph\_pwr\_volume\_s.dat}   Mean square data over the fluid shell.
 \end{description}
 %
 \subsubsection{Data files and directories for Compositional Case 1}

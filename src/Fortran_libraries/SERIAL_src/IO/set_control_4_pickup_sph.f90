@@ -108,19 +108,6 @@
       end if
 !
 !   set pickup layer
-      nri_rms = 0
-      if(idx_spec_layer_ctl%num .gt. 0) then
-      nri_rms = idx_spec_layer_ctl%num
-      call allocate_num_spec_layer
-!
-      do inum = 1, nri_rms
-        kr_for_rms(inum) = idx_spec_layer_ctl%ivec(inum)
-      end do
-!
-        call deallocate_num_spec_layer_ctl
-      end if
-!
-!   set pickup layer
       num_pick_layer = 0
       if(idx_pick_layer_ctl%num .gt. 0) then
         num_pick_layer = idx_pick_layer_ctl%num
@@ -131,6 +118,21 @@
         end do
 !
         call deallocate_num_pick_layer_ctl
+      end if
+!
+!   set spectr layer
+      nri_rms = 0
+      if(iflag_layer_rms_spec .gt. 0) then
+        if(idx_spec_layer_ctl%num .gt. 0) then
+          nri_rms = idx_spec_layer_ctl%num
+          call allocate_num_spec_layer
+!
+          kr_for_rms(1:nri_rms) = idx_spec_layer_ctl%ivec(1:nri_rms)
+!
+          call deallocate_num_spec_layer_ctl
+        else
+          nri_rms = -1
+        end if
       end if
 !
       end subroutine set_ctl_params_pick_sph

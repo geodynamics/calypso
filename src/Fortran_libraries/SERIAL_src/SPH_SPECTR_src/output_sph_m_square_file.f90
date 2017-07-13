@@ -117,7 +117,7 @@
       if(idx_rj_degree_zero .eq. 0)  return
       if(ntot_rms_rj .eq. 0)  return
 !
-      write(fname_rms, '(a,a4)') trim(fhead_ave_vol), '.dat'
+      write(fname_rms, '(a,a6)') trim(fhead_ave_vol), '_s.dat'
       write(mode_label,'(a)') 'EMPTY'
       call open_sph_mean_sq_file                                        &
      &      (id_file_rms, fname_rms, mode_label)
@@ -217,7 +217,7 @@
       if(ntot_rms_rj .eq. 0)  return
 !
 !
-      write(fname_rms,   '(a,a4)') trim(fhead_rms_layer), '.dat'
+      write(fname_rms,   '(a,a6)') trim(fhead_rms_layer), '_s.dat'
       write(mode_label,'(a)') 'radial_id'
       call write_sph_layer_pwr_file(fname_rms, mode_label, istep, time)
 !

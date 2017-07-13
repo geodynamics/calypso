@@ -220,11 +220,12 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 \verb|[sph_prefix].[domain#].gfm| & Distributed & Input \\ \hline
 \verb|[boundary_data_name]| & Single & Input \\ \hline
 \verb|[rst_prefix].[step#].[domain#].fst| &  Distributed & Input/Output  \\ \hline
-\verb|[vol_pwr_prefix].dat| & Single & Output \\ \hline
+\verb|[vol_pwr_prefix]_s.dat| & Single & Output \\ \hline
 \verb|[vol_pwr_prefix]_l.dat| & Single & Output \\
 \verb|[vol_pwr_prefix]_m.dat| & Single & Output \\
 \verb|[vol_pwr_prefix]_lm.dat| & Single & Output \\
 \verb|[vol_ave_prefix].dat| & Single & Output \\ \hline
+\verb|[layer_pwr_prefix]_s.dat| & Single & Output \\
 \verb|[layer_pwr_prefix]_l.dat| & Single & Output \\
 \verb|[layer_pwr_prefix]_m.dat| & Single & Output \\
 \verb|[layer_pwr_prefix]_lm.dat| & Single & Output \\ \hline
@@ -858,7 +859,7 @@ The format of the control file or block for isosurfaces is described below. The 
 
 
 \subsection{Mean square amplitude data}
-This program output mean square amplitude of the fields which is marked as \verb|Monitor_ON| over the fluid shell at every \verb|[increment_monitor]| steps. For vector fields, For the velocity $\bvec{u}$ and magnetic field $\bvec{B}$, the kinetic energy $1/2 u^{2}$ and magnetic energy $1/2 B^{2}$ are calculated instead of mean square amplitude. Labels on the first lines indicate following data. The data file have the following headers in the first 7 lines, and headers of the data and data are stored in the following lines. The header in the first 7 lines is the following. If these mean square amplitude data files exist before starting the simulation, programs append results at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the existed data files to another directory before starting the programs.
+This program output mean square amplitude of the fields which is marked as \verb|Monitor_ON| over the fluid shell at every \verb|[increment_monitor]| steps. The data is written in the file \verb|[vol_pwr_prefix]_s.dat| or  \verb|sph_pwr_volume_s.dat| if  \verb|[vol_pwr_prefix]| is not defined in the control file. For vector fields, For the velocity $\bvec{u}$ and magnetic field $\bvec{B}$, the kinetic energy $1/2 u^{2}$ and magnetic energy $1/2 B^{2}$ are calculated instead of mean square amplitude. Labels on the first lines indicate following data. The data file have the following headers in the first 7 lines, and headers of the data and data are stored in the following lines. The header in the first 7 lines is the following. If these mean square amplitude data files exist before starting the simulation, programs append results at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the existed data files to another directory before starting the programs.
 %
 \begin{description}
 \item{\tt  line 2: } Number of radial grid and truncation level
@@ -950,11 +951,12 @@ B_{Tsq}(n) &=& \frac{1}{V} \sum_{l=n}^{l=l-n} \int \left[\left(\bvec{B}_{Tl}^{\ 
 \end{description}
 
 %
-
 \subsubsection{layered spectrum data}
-Spectrum data for the each radial position are written by defining {\tt volume\_pwr\_spectr\_prefix} in control file. By defining {\tt layered\_pwr\_spectr\_prefix}, following spectrum data averaged over the fluid shell is written. Data format is the same as the volume spectrum data, but radial grid point and radius of the layer is added in the list. The following files are generated.
+\label{section:layerd_spectr}
+Spectrum data for the each radial position are written by defining {\tt layered\_pwr\_spectr\_prefix} in control file. By defining {\tt layered\_pwr\_spectr\_prefix}, following spectrum data averaged over the fluid shell is written. Data format is the same as the volume spectrum data, but radial grid point and radius of the layer is added in the list. The following files are generated. The radial points for output is listed in the array \verb|spectr_layer_ctl|. If \verb|spectr_layer_ctl| is not defined, mean square data at {\bf all} radial levels will be written. See example of \hyperref[section:dynamobench]{dynamo benchmark case 2}.
 %
 \begin{description}
+\item{\tt [layer\_pwr\_prefix]\_s.dat} Surface average of mean square amplitude of the fields.
 \item{\tt [layer\_pwr\_prefix]\_l.dat} Surface average of mean square amplitude of the fields as a function of spherical harmonic degree $l$ and radial grid id $k$. For scalar field, the spectrum is
 \begin{eqnarray}
 f_{sq}(k,l) &=& \frac{1}{S} \sum_{m=-l}^{m=l} \int \left({f_{l}^{m}} \right)^{2} dS.
