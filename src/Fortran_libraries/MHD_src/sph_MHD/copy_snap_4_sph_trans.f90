@@ -89,6 +89,11 @@
      &      (bs_trns%i_c_diffuse, iphys%i_c_diffuse)
 !
       call copy_scalar_from_snap_trans                                  &
+     &      (bs_trns%i_h_advect, iphys%i_h_advect)
+      call copy_scalar_from_snap_trans                                  &
+     &      (bs_trns%i_c_advect, iphys%i_c_advect)
+!
+      call copy_scalar_from_snap_trans                                  &
      &      (bs_trns%i_div_Coriolis, iphys%i_div_Coriolis)
 !
       end subroutine copy_snap_vec_fld_from_trans
