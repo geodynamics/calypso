@@ -264,6 +264,9 @@
       call add_scalar_trans_flag(ipol%i_h_advect, iphys%i_h_advect,     &
      &    ncomp_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                   &
      &    bs_trns%i_h_advect)
+      call add_scalar_trans_flag(ipol%i_c_advect, iphys%i_c_advect,     &
+     &    ncomp_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                   &
+     &    bs_trns%i_c_advect)
 !
       call add_scalar_trans_flag(ipol%i_div_Coriolis,                   &
      &    iphys%i_div_Coriolis, ncomp_snap_rj_2_rtp,                    &
@@ -389,6 +392,13 @@
       if(bs_trns%i_c_diffuse .gt. 0) write(*,*)                         &
      &            'bs_trns%i_c_diffuse', bs_trns%i_c_diffuse,           &
      &            ipol%i_c_diffuse, iphys%i_c_diffuse
+!
+      if(bs_trns%i_h_advect .gt. 0) write(*,*)                          &
+     &            'bs_trns%i_h_advect', bs_trns%i_h_advect,             &
+     &            ipol%i_h_advect, iphys%i_h_advect
+      if(bs_trns%i_c_advect .gt. 0) write(*,*)                          &
+     &            'bs_trns%i_c_advect', bs_trns%i_c_advect,             &
+     &            ipol%i_c_advect, iphys%i_c_advect
 !
       if(bs_trns%i_div_Coriolis .gt. 0) write(*,*)                      &
      &          'bs_trns%i_div_Coriolis', bs_trns%i_div_Coriolis,       &

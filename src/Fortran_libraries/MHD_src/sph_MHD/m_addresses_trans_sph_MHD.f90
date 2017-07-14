@@ -174,7 +174,7 @@
 !
 !
       nscalar_rtp_2_rj = 0
-!   divergence of Coriolis flux flag
+!   divergence of Coriolis force flag
       if(iflag_4_coriolis .gt. id_turn_OFF) then
         nscalar_rtp_2_rj = nscalar_rtp_2_rj + 1
         f_trns%i_div_Coriolis = nscalar_rtp_2_rj + ncomp_rtp_2_rj

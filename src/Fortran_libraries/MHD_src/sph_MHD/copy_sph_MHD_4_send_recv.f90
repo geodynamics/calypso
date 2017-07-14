@@ -176,6 +176,13 @@
      &    n_WS, WS, v_pl_local)
 !
       call sel_sph_rj_scalar_2_send_wpole(ncomp_send,                   &
+     &    ipol%i_h_advect, bs_trns%i_h_advect,                          &
+     &    n_WS, WS, v_pl_local)
+      call sel_sph_rj_scalar_2_send_wpole(ncomp_send,                   &
+     &    ipol%i_c_advect, bs_trns%i_c_advect,                          &
+     &    n_WS, WS, v_pl_local)
+!
+      call sel_sph_rj_scalar_2_send_wpole(ncomp_send,                   &
      &    ipol%i_div_Coriolis, bs_trns%i_div_Coriolis,                  &
      &    n_WS, WS, v_pl_local)
 !
