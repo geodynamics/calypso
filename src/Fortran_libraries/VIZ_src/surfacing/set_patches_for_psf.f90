@@ -195,6 +195,8 @@
      &        psf_mesh(i)%patch%iele_global, psf_mesh(i)%patch%ie)
 !
         end if
+!
+        call dealloc_mark_ele_psf(psf_search(i))
       end do
 !
       end subroutine set_psf_patches
@@ -234,6 +236,8 @@
      &      iso_mesh(i)%patch%istack_numele(my_rank),                   &
      &      iso_mesh(i)%patch%numele, iso_mesh(i)%patch%istack_ele_smp, &
      &      iso_mesh(i)%patch%iele_global, iso_mesh(i)%patch%ie)
+!
+        call dealloc_mark_ele_psf(iso_search(i))
       end do
 !
       end subroutine set_iso_patches
