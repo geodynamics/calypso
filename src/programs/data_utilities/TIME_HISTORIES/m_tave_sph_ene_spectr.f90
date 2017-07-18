@@ -8,47 +8,30 @@
 !> @brief Time average spherical harmonics spectrum data
 !!
 !!@verbatim
-!!      subroutine allocate_tave_sph_espec_data
-!!      subroutine deallocate_tave_sph_espec_data
-!!
-!!      subroutine reset_tave_sph_espec_data
-!!      subroutine reset_tsigma_sph_espec_data
-!!
-!!      subroutine open_tave_ene_spec_data
-!!      subroutine open_tsigma_ene_spec_data
-!!
-!!      subroutine write_tave_vol_sph_data(nri, ltr, ncomp,             &
-!!     &          spec, spec_l, spec_m, spec_lm)
-!!      subroutine write_tave_layer_sph_data(nri, ltr, ncomp,           &
-!!     &          spec, spec_l, spec_m, spec_lm)
+!!      subroutine sph_spectr_average                                   &
+!!     &         (fname_org, start_time, end_time, sph_IN)
+!!      subroutine sph_spectr_std_deviation                             &
+!!     &         (fname_org, start_time, end_time, sph_IN)
 !!@endverbatim
 !
       module m_tave_sph_ene_spectr
 !
       use m_precision
       use m_constants
+      use t_read_sph_spectra
 !
       implicit none
 !
 !
-      real(kind = kreal), allocatable :: ave_spec_t(:,:)
+      integer(kind = kint), parameter :: id_file_rms =      34
+!
       real(kind = kreal), allocatable :: ave_spec_l(:,:,:)
-      real(kind = kreal), allocatable :: ave_spec_m(:,:,:)
-      real(kind = kreal), allocatable :: ave_spec_lm(:,:,:)
-!
-      real(kind = kreal), allocatable :: sigma_spec_t(:,:)
       real(kind = kreal), allocatable :: sigma_spec_l(:,:,:)
-      real(kind = kreal), allocatable :: sigma_spec_m(:,:,:)
-      real(kind = kreal), allocatable :: sigma_spec_lm(:,:,:)
+      real(kind = kreal), allocatable :: spectr_pre_l(:,:,:)
 !
-!     data file ID
-!
-      integer(kind = kint), parameter :: id_tave_rms_l =    31
-      integer(kind = kint), parameter :: id_tave_rms_m =    32
-      integer(kind = kint), parameter :: id_tave_rms_lm =   33
-      integer(kind = kint), parameter :: id_tave_rms =      34
-!
-      private :: write_average_ene_sph_head
+      private :: id_file_rms
+      private :: ave_spec_l, sigma_spec_l, spectr_pre_l
+      private :: allocate_tave_sph_data, deallocate_tave_sph_data
 !
 !   --------------------------------------------------------------------
 !
@@ -56,224 +39,187 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine allocate_tave_sph_espec_data
+      subroutine sph_spectr_average                                     &
+     &         (fname_org, start_time, end_time, sph_IN)
 !
-      use m_sph_ene_spectra
+      use sph_mean_square_IO_select
+      use cal_tave_sph_ene_spectr
 !
-      allocate( ave_spec_t(ncomp_sph_spec,nri_sph) )
-      allocate( ave_spec_l(ncomp_sph_spec,0:ltr_sph,nri_sph) )
-      allocate( ave_spec_m(ncomp_sph_spec,0:ltr_sph,nri_sph) )
-      allocate( ave_spec_lm(ncomp_sph_spec,0:ltr_sph,nri_sph) )
+      character(len = kchara), intent(in) :: fname_org
+      real(kind = kreal), intent(in) :: start_time, end_time
+      type(read_sph_spectr_data), intent(inout) :: sph_IN
 !
-      allocate( sigma_spec_t(ncomp_sph_spec,nri_sph) )
-      allocate( sigma_spec_l(ncomp_sph_spec,0:ltr_sph,nri_sph) )
-      allocate( sigma_spec_m(ncomp_sph_spec,0:ltr_sph,nri_sph) )
-      allocate( sigma_spec_lm(ncomp_sph_spec,0:ltr_sph,nri_sph) )
+      character(len = kchara) :: file_name
+      real(kind = kreal) :: time_ini, pre_time
+      integer(kind = kint) :: i, icou, ltr, ierr, ist_true
 !
-      ave_spec_t =  0.0d0
+!
+      open(id_file_rms, file=fname_org)
+      call select_input_sph_pwr_head(id_file_rms, sph_IN)
+!
+      ltr = sph_IN%ltr_sph * sph_IN%iflag_spectr
+      call allocate_tave_sph_data(ltr, sph_IN)
+!
+      icou = 0
+      ist_true = -1
+      pre_time = sph_IN%time
+      write(*,'(a5,i12,a30,i12)',advance="NO")                          &
+     &       'step= ', sph_IN%i_step,                                   &
+     &       ' averaging finished. Count=  ', icou
+      do
+        ierr = select_input_sph_pwr_data(id_file_rms, sph_IN)
+        if(ierr .gt. 0) go to 99
+!
+        if (sph_IN%time .ge. start_time) then
+          if (ist_true .eq. -1) then
+            ist_true = sph_IN%i_step
+            time_ini = sph_IN%time
+!
+            call copy_ene_spectr_2_pre(sph_IN%time, pre_time,          &
+     &          sph_IN%nri_sph, ltr, sph_IN%ntot_sph_spec,             &
+     &          sph_IN%spectr_IO, ave_spec_l, spectr_pre_l)
+          else
+!
+            call sum_average_ene_spectr(sph_IN%time, pre_time,         &
+     &          sph_IN%nri_sph, ltr, sph_IN%ntot_sph_spec,             &
+     &          sph_IN%spectr_IO, ave_spec_l, spectr_pre_l)
+
+            icou = icou + 1
+          end if
+        end if
+!
+        write(*,'(59a1,a5,i12,a30,i12)',advance="NO") (char(8),i=1,59), &
+     &       'step= ', sph_IN%i_step,                                   &
+     &       ' averaging finished. Count=   ', icou
+        if (sph_IN%time .ge. end_time) exit
+      end do
+!
+   99 continue
+      write(*,*)
+      close(id_file_rms)
+!
+!
+      call divide_average_ene_spectr(sph_IN%time, time_ini,             &
+     &    sph_IN%nri_sph, ltr, sph_IN%ntot_sph_spec, ave_spec_l,        &
+     &    sph_IN%spectr_IO)
+!
+      write(file_name, '(a6,a)') 't_ave_', trim(fname_org)
+      open(id_file_rms, file=file_name)
+      call select_output_sph_pwr_head(id_file_rms, sph_IN)
+      call select_output_sph_pwr_data(id_file_rms, sph_IN)
+      close(id_file_rms)
+!
+      call dealloc_sph_espec_data(sph_IN)
+!
+      end subroutine sph_spectr_average
+!
+!   --------------------------------------------------------------------
+!
+      subroutine sph_spectr_std_deviation                               &
+     &         (fname_org, start_time, end_time, sph_IN)
+!
+      use sph_mean_square_IO_select
+      use cal_tave_sph_ene_spectr
+!
+      character(len = kchara), intent(in) :: fname_org
+      real(kind = kreal), intent(in) :: start_time, end_time
+      type(read_sph_spectr_data), intent(inout) :: sph_IN
+!
+      character(len = kchara) :: file_name
+      real(kind = kreal) :: time_ini, pre_time
+      integer(kind = kint) :: i, icou, ltr, ierr, ist_true
+!
+!  Evaluate standard deviation
+!
+      write(*,*) 'Open file ', trim(fname_org)
+      open(id_file_rms, file=fname_org)
+!
+      call select_input_sph_pwr_head(id_file_rms, sph_IN)
+      ltr = sph_IN%ltr_sph * sph_IN%iflag_spectr
+!
+      icou = 0
+      ist_true = -1
+      pre_time = sph_IN%time
+      sigma_spec_l = 0.0d0
+      write(*,'(a5,i12,a30,i12)',advance="NO")                          &
+     &       'step= ', sph_IN%i_step,                                   &
+     &       ' deviation finished. Count=  ', icou
+      do
+        ierr = select_input_sph_pwr_data(id_file_rms, sph_IN)
+        if(ierr .gt. 0) go to 99
+!
+        if (sph_IN%time .ge. start_time) then
+          if (ist_true .eq. -1) then
+            ist_true = sph_IN%i_step
+            time_ini = sph_IN%time
+            call copy_deviation_ene_2_pre(sph_IN%time, pre_time,        &
+     &          sph_IN%nri_sph, ltr, sph_IN%ntot_sph_spec,              &
+     &          sph_IN%spectr_IO, ave_spec_l, sigma_spec_l,             &
+     &          spectr_pre_l)
+!
+          else
+            call sum_deviation_ene_spectr(sph_IN%time, pre_time,        &
+     &          sph_IN%nri_sph, ltr, sph_IN%ntot_sph_spec,              &
+     &          sph_IN%spectr_IO, ave_spec_l, sigma_spec_l,             &
+     &          spectr_pre_l)
+!
+            icou = icou + 1
+          end if
+        end if
+!
+        write(*,'(59a1,a5,i12,a30,i12)',advance="NO") (char(8),i=1,59), &
+     &       'step= ', sph_IN%i_step,                                   &
+     &       ' deviation finished. Count=   ', icou
+        if (sph_IN%time .ge. end_time) exit
+      end do
+   99 continue
+      write(*,*)
+      close(id_file_rms)
+!
+      call divide_deviation_ene_spectr(sph_IN%time, time_ini,           &
+     &    sph_IN%nri_sph, ltr, sph_IN%ntot_sph_spec,                    &
+     &    sigma_spec_l, sph_IN%spectr_IO)
+!
+      write(file_name, '(a8,a)') 't_sigma_', trim(fname_org)
+      open(id_file_rms, file=file_name)
+      call select_output_sph_pwr_head(id_file_rms, sph_IN)
+      call select_output_sph_pwr_data(id_file_rms, sph_IN)
+      close(id_file_rms)
+!
+      call dealloc_sph_espec_data(sph_IN)
+      call deallocate_tave_sph_data
+!
+      end subroutine sph_spectr_std_deviation
+!
+!   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+      subroutine allocate_tave_sph_data(ltr, sph_IN)
+!
+      integer(kind = kint), intent(in) :: ltr
+      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      integer(kind = kint) :: ncomp
+!
+!
+      ncomp = sph_IN%ntot_sph_spec
+      allocate( ave_spec_l(ncomp,0:ltr,sph_IN%nri_sph) )
+      allocate( sigma_spec_l(ncomp,0:ltr,sph_IN%nri_sph) )
+      allocate( spectr_pre_l(ncomp,0:ltr,sph_IN%nri_sph) )
+!
+      if(ncomp .le. 0) return
       ave_spec_l =  0.0d0
-      ave_spec_m =  0.0d0
-      ave_spec_lm = 0.0d0
-!
-      sigma_spec_t =  0.0d0
       sigma_spec_l =  0.0d0
-      sigma_spec_m =  0.0d0
-      sigma_spec_lm = 0.0d0
+      spectr_pre_l = 0.0d0
 !
-      end subroutine allocate_tave_sph_espec_data
-!
-!   --------------------------------------------------------------------
-!
-      subroutine deallocate_tave_sph_espec_data
-!
-      deallocate(ave_spec_t, ave_spec_l, ave_spec_m, ave_spec_lm)
-      deallocate(sigma_spec_l, sigma_spec_m)
-      deallocate(sigma_spec_t, sigma_spec_lm)
-!
-      end subroutine deallocate_tave_sph_espec_data
+      end subroutine allocate_tave_sph_data
 !
 !   --------------------------------------------------------------------
 !
-      subroutine reset_tave_sph_espec_data
+      subroutine deallocate_tave_sph_data
 !
-      use m_sph_ene_spectra
+      deallocate(ave_spec_l, sigma_spec_l, spectr_pre_l)
 !
-!
-      sigma_spec_t =  0.0d0
-      sigma_spec_l =  0.0d0
-      sigma_spec_m =  0.0d0
-      sigma_spec_lm = 0.0d0
-!
-      end subroutine reset_tave_sph_espec_data
-!
-!   --------------------------------------------------------------------
-!
-      subroutine reset_tsigma_sph_espec_data
-!
-!
-      sigma_spec_t =  0.0d0
-      sigma_spec_l =  0.0d0
-      sigma_spec_m =  0.0d0
-      sigma_spec_lm = 0.0d0
-!
-      end subroutine reset_tsigma_sph_espec_data
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine open_tave_ene_spec_data
-!
-      use m_sph_ene_spectra
-!
-      character(len = kchara) :: fname_tave_rms_l
-      character(len = kchara) :: fname_tave_rms_m
-      character(len = kchara) :: fname_tave_rms_lm
-      character(len = kchara) :: fname_tave_rms
-!
-!
-      write(fname_tave_rms_l, '(a6,a)')                                 &
-     &        't_ave_', trim(fname_org_rms_l)
-      write(fname_tave_rms_m, '(a6,a)')                                 &
-     &        't_ave_', trim(fname_org_rms_m)
-      write(fname_tave_rms_lm,'(a6,a)')                                 &
-     &        't_ave_', trim(fname_org_rms_lm)
-      write(fname_tave_rms,   '(a6,a)')                                 &
-     &        't_ave_', trim(fname_org_rms)
-!
-      open(id_tave_rms,   file=fname_tave_rms)
-      open(id_tave_rms_l, file=fname_tave_rms_l)
-      open(id_tave_rms_m, file=fname_tave_rms_m)
-      open(id_tave_rms_lm,file=fname_tave_rms_lm)
-!
-      call write_average_ene_sph_head
-!
-      end subroutine open_tave_ene_spec_data
-!
-!   --------------------------------------------------------------------
-!
-      subroutine open_tsigma_ene_spec_data
-!
-      use m_sph_ene_spectra
-!
-      character(len = kchara) :: fname_tave_rms_l
-      character(len = kchara) :: fname_tave_rms_m
-      character(len = kchara) :: fname_tave_rms_lm
-      character(len = kchara) :: fname_tave_rms
-!
-!
-      write(fname_tave_rms_l, '(a8,a)')                                 &
-     &        't_sigma_', trim(fname_org_rms_l)
-      write(fname_tave_rms_m, '(a8,a)')                                 &
-     &        't_sigma_', trim(fname_org_rms_m)
-      write(fname_tave_rms_lm,'(a8,a)')                                 &
-     &        't_sigma_', trim(fname_org_rms_lm)
-      write(fname_tave_rms,   '(a8,a)')                                 &
-     &        't_sigma_', trim(fname_org_rms)
-!
-      open(id_tave_rms,   file=fname_tave_rms)
-      open(id_tave_rms_l, file=fname_tave_rms_l)
-      open(id_tave_rms_m, file=fname_tave_rms_m)
-      open(id_tave_rms_lm,file=fname_tave_rms_lm)
-!
-      call write_average_ene_sph_head
-!
-      end subroutine open_tsigma_ene_spec_data
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine write_average_ene_sph_head
-!
-      use m_sph_ene_spectra
-      use write_field_labels
-!
-      integer(kind = kint) :: num
-!
-!
-      num = ncomp_sph_spec + num_time_labels
-      write(ene_sph_spec_name(num_time_labels),'(a)') 'degree'
-      call write_multi_labels(id_tave_rms, num, ene_sph_spec_name)
-      call write_multi_labels(id_tave_rms_l, num, ene_sph_spec_name)
-!
-      write(ene_sph_spec_name(num_time_labels),'(a)') 'order'
-      call write_multi_labels(id_tave_rms_m, num, ene_sph_spec_name)
-!
-      write(ene_sph_spec_name(num_time_labels),'(a)')                   &
-     &                                           'diff_deg_order'
-      call write_multi_labels(id_tave_rms_lm, num, ene_sph_spec_name)
-!
-      write(id_tave_rms,*   )
-      write(id_tave_rms_l,* )
-      write(id_tave_rms_m,* )
-      write(id_tave_rms_lm,*)
-!
-      end subroutine write_average_ene_sph_head
-!
-!   --------------------------------------------------------------------
-!
-      subroutine write_tave_vol_sph_data(nri, ltr, ncomp,               &
-     &          spec, spec_l, spec_m, spec_lm)
-!
-      use m_sph_ene_spectra
-!
-      integer(kind = kint), intent(in) :: nri, ltr, ncomp
-      real(kind = kreal), intent(inout) :: spec(ncomp,nri)
-      real(kind = kreal), intent(inout) :: spec_l(ncomp,0:ltr,nri)
-      real(kind = kreal), intent(inout) :: spec_m(ncomp,0:ltr,nri)
-      real(kind = kreal), intent(inout) :: spec_lm(ncomp,0:ltr,nri)
-!
-      integer(kind = kint) :: lth
-!
-!
-      write(id_tave_rms,'(i16,1pE25.15e3,i16,1p255E25.15e3)')           &
-     &         ied_true, time_sph, izero, spec(1:ncomp,1)
-!
-      do lth = 0, ltr
-        write(id_tave_rms_l,'(i16,1pE25.15e3,i16,1p255E25.15e3)')       &
-     &         ied_true, time_sph, lth, spec_l(1:ncomp,lth,1)
-        write(id_tave_rms_m,'(i16,1pE25.15e3,i16,1p255E25.15e3)')       &
-     &         ied_true, time_sph, lth, spec_m(1:ncomp,lth,1)
-        write(id_tave_rms_lm,'(i16,1pE25.15e3,i16,1p255E25.15e3)')      &
-     &         ied_true, time_sph, lth, spec_lm(1:ncomp,lth,1)
-      end do
-!
-      end subroutine write_tave_vol_sph_data
-!
-!   --------------------------------------------------------------------
-!
-      subroutine write_tave_layer_sph_data(nri, ltr, ncomp,             &
-     &          spec, spec_l, spec_m, spec_lm)
-!
-      use m_sph_ene_spectra
-!
-      integer(kind = kint), intent(in) :: nri, ltr, ncomp
-      real(kind = kreal), intent(inout) :: spec(ncomp,nri)
-      real(kind = kreal), intent(inout) :: spec_l(ncomp,0:ltr,nri)
-      real(kind = kreal), intent(inout) :: spec_m(ncomp,0:ltr,nri)
-      real(kind = kreal), intent(inout) :: spec_lm(ncomp,0:ltr,nri)
-!
-      integer(kind = kint) :: kr, lth
-!
-!
-      do kr = 1, nri
-        write(id_tave_rms,'(i16,1pE25.15e3,2i16,1p255E25.15e3)')        &
-     &         ied_true, time_sph, kr_sph(kr), izero,                   &
-     &         spec(1:ncomp,kr)
-!
-        do lth = 0, ltr
-          write(id_tave_rms_l,'(i16,1pE25.15e3,2i16,1p255E25.15e3)')    &
-     &         ied_true, time_sph, kr_sph(kr), lth,                     &
-     &         spec_l(1:ncomp,lth,kr)
-          write(id_tave_rms_m,'(i16,1pE25.15e3,2i16,1p255E25.15e3)')    &
-     &         ied_true, time_sph, kr_sph(kr), lth,                     &
-     &         spec_m(1:ncomp,lth,kr)
-          write(id_tave_rms_lm,'(i16,1pE25.15e3,2i16,1p255E25.15e3)')   &
-     &         ied_true, time_sph, kr_sph(kr), lth,                     &
-     &         spec_lm(1:ncomp,lth,kr)
-        end do
-      end do
-!
-      end subroutine write_tave_layer_sph_data
+      end subroutine deallocate_tave_sph_data
 !
 !   --------------------------------------------------------------------
 !

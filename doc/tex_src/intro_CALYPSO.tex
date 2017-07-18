@@ -48,11 +48,13 @@ And, the following features are implemented
 
 %
 \subsection{Updates for Ver 1.2}
-In Version 1.2, the following features are implimented:
+In Version 1.2, the following features are implemented:
 \begin{itemize}
-\item To reduce the number of computaion, Legendre transform is calculated with taking account to the symmetry with respect to the equator. Time for Legendre transform is approximately half of that in Ver 1.1.
+\item To reduce the number of calculation, Legendre transform is calculated with taking account to the symmetry with respect to the equator. Time for Legendre transform is approximately half of that in Ver 1.1.
 \item BLAS library can be used for the Legendre transform optionally.
-\item Cross sectioning and isosurfacing module are newly implemented. These modules are re-written by Fortran90 from the parallel sectioning modules in GeoFEM by Lee Chen in C, and some features are added for visualizations of geodynamo simulations.
+\item Cross sectioning and isosurfacing module are newly implemented. These modules are re-written by Fortran90 from the parallel sectioning modules in GeoFEM by Lee Chen in C, and some features are added for visualizations of geodynamo simulations. See section \ref{sec:PSF} and \ref{section:ISO}.
+\item Initial data assemble program \verb|assemble_mhd| is parallelized. This program can perform with any number of MPI processes, but we recommend to run the program with {\bf one} process or the same number of processes as the number of subdomains for the target configuration which is defined by \verb|num_new_domain_ctl|. See section \ref{sec:ad_initial_field}.
+\item The time and time step information in the restart data can be modifield by  \verb|assemble_mhd|. See section \ref{sec:ad_initial_field}
 \end{itemize}
 
 

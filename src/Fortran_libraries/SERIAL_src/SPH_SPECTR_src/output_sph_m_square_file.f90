@@ -117,7 +117,7 @@
       if(idx_rj_degree_zero .eq. 0)  return
       if(ntot_rms_rj .eq. 0)  return
 !
-      write(fname_rms, '(a,a6)') trim(fhead_ave_vol), '_s.dat'
+      write(fname_rms, '(a,a4)') trim(fhead_ave_vol), '.dat'
       write(mode_label,'(a)') 'EMPTY'
       call open_sph_mean_sq_file                                        &
      &      (id_file_rms, fname_rms, mode_label)
@@ -145,7 +145,7 @@
       if(my_rank .ne. 0)  return
       if(ntot_rms_rj .eq. 0)  return
 !
-      call add_dat_extension(fhead_rms_vol, fname_rms)
+      write(fname_rms, '(a,a6)') trim(fhead_rms_vol), '_s.dat'
       write(mode_label,'(a)') 'EMPTY'
       call open_sph_mean_sq_file(id_file_rms, fname_rms, mode_label)
 !

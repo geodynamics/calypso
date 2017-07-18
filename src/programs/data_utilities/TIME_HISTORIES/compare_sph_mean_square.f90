@@ -22,9 +22,9 @@
       integer(kind = kint) :: nfld, ltr_sph
       character(len=255) :: tmpchara
 !
-      character(len = kchara) :: fname_rms_vol = 'sph_pwr_volume.dat'
+      character(len = kchara) :: fname_rms_vol = 'sph_pwr_volume_s.dat'
       character(len = kchara) :: fname_rms_ref                          &
-     &                               = 'reference/sph_pwr_volume.dat'
+     &                               = 'reference/sph_pwr_volume_s.dat'
       integer(kind = kint), parameter :: id_file_rms =      34
 !
       integer(kind = kint) :: ncomp_sph_spec

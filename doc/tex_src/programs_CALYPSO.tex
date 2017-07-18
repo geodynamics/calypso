@@ -1505,31 +1505,35 @@ This program is only used to generate Makefile in {\tt work} directory. Most of 
 \item The module name should be the same as the file name.
 \end{itemize}
 
-\section{Time averaging programs ({\tt t\_ave\_picked\_sph\_coefs}, {\tt t\_ave\_sph\_mean\_square}, and {\tt t\_ave\_nusselt})}
-These small programs are used to evaluate time average and standard deviation of the time sequencial data.
+\section{Time averaging programs}
+These small programs are used to evaluate time average and standard deviation of the time evolution data.
+\subsection{Averaging for mean square and power spectrum \\
+ ({\tt t\_ave\_sph\_mean\_square})}
+This program generate time average and standard deviation of power spectrum data. The program processes one of data files listed in Table \ref{table:time_averages_sprectr}. The number for the first and second interactive input is also listed in Table \ref{table:time_averages_sprectr}. For the third input, the file name excluding \verb|.dat| is required. Start and end time is also required in the last input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
 %
 \begin{table}[htp]
 \caption{List of programs to take time average}
 \begin{center} 
-\begin{tabular}{|c|c|}
+\begin{tabular}{|c|c|c|c|}
 \hline
- name & Program to use \\ \hline \hline
-\verb|[vol_pwr_prefix].dat| & \verb|t_ave_sph_mean_square|  \\ \hline
-\verb|[vol_pwr_prefix]_l.dat| & \verb|t_ave_sph_mean_square|  \\
-\verb|[vol_pwr_prefix]_m.dat| & \verb|t_ave_sph_mean_square|  \\
-\verb|[vol_pwr_prefix]_lm.dat| & \verb|t_ave_sph_mean_square|  \\ \hline
-\verb|[layer_pwr_prefix]_l.dat| & \verb|t_ave_sph_mean_square|  \\
-\verb|[layer_pwr_prefix]_m.dat| & \verb|t_ave_sph_mean_square|  \\
-\verb|[layer_pwr_prefix]_lm.dat| & \verb|t_ave_sph_mean_square|  \\ \hline
-\verb|[picked_sph_prefix].dat| & \verb|t_ave_picked_sph_coefs|    \\ \hline
-\verb|[nusselt_number_prefix].dat| & \verb|t_ave_sph_mean_square|   \\ \hline
+ name & First input & Second input \\ \hline \hline
+\verb|[vol_pwr_prefix]_s.dat| & 1 & 1 \\ \hline
+\verb|[vol_pwr_prefix]_l.dat| & 2 & 1 \\
+\verb|[vol_pwr_prefix]_m.dat| & 2 & 1 \\
+\verb|[vol_pwr_prefix]_lm.dat| & 2 & 1 \\ \hline
+\verb|[layer_pwr_prefix]_s.dat| & 1 & 0  \\ \hline
+\verb|[layer_pwr_prefix]_l.dat| & 2 & 0 \\
+\verb|[layer_pwr_prefix]_m.dat| & 2 & 0 \\
+\verb|[layer_pwr_prefix]_lm.dat| & 2 & 0 \\ \hline
 \end{tabular}
 \end{center}
-\label{table:time_averages}
+\label{table:time_averages_sprectr}
 \end{table}
 %
-
-
+\subsection{Averaging for picked harmonics mode data \\
+ ({\tt t\_ave\_picked\_sph\_coefs})}
+This program generate time average and standard deviation of spherical harmonic coefficients which selected in the file \verb|[picked_sph_prefix].dat|. In this program, file prefix  \verb|[picked_sph_prefix]| and start and end time are required in the interactive input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
+%
 \section{Visualization using field data}
 \label{sec:paraview}
 The field data is written by XDMF or VTK data format using Cartesian coordinate. In this section we briefly introduce how to display the radial magnetic field using ParaView as an example.

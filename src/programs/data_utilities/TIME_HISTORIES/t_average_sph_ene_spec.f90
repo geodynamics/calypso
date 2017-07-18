@@ -13,120 +13,75 @@
       use m_precision
 !
       use m_tave_sph_ene_spectr
-      use m_sph_ene_spectra
-      use cal_tave_sph_ene_spectr
+      use t_read_sph_spectra
+      use set_parallel_file_name
 !
       implicit none
 !
 !
-      integer(kind = kint) :: ierr, i
-      integer(kind = kint) :: icou, istep
+      integer(kind = kint) :: iflag_data_mode
+      character(len = kchara) :: input_header
+      character(len = kchara) :: fname_org_rms, fname_org_rms_l
       real(kind = kreal) :: start_time, end_time
+      type(read_sph_spectr_data), save :: sph_IN_t
 !
 !
-      call select_sph_ene_spec_data_file
-      call set_org_ene_spec_file_name
+!
+      write(*,*) ' Choose data to take average'
+!      write(*,*)  ' 0: Spectrum data over l, m, and l-m '
+      write(*,*)  ' 1: Average over volume or sphere'
+      write(*,*)  ' 2: One spectrum data '
+      read(*,*) iflag_data_mode
+!
+      call select_sph_ene_spec_data_file(sph_IN_t, input_header)
+!
+      if(iflag_data_mode .eq. 0) then
+        call add_dat_extension(input_header, fname_org_rms)
+        write(fname_org_rms_l, '(a,a6)')                                &
+     &                        trim(input_header), '_l.dat'
+      else if(iflag_data_mode .eq. 1) then
+        call add_dat_extension(input_header, fname_org_rms)
+      else if(iflag_data_mode .eq. 2) then
+        call add_dat_extension(input_header, fname_org_rms_l)
+      end if
 !
       write(*,*) 'Input start and end time'
       read(*,*) start_time, end_time
 !
-      if(iflag_sph_ene_file .eq. 1) then
-        call count_degree_on_volume_data
-      else  if(iflag_sph_ene_file .eq. 2) then
-        call count_degree_on_layer_data
-      else
-        call count_degree_one_layer_data
-      end if
-      call allocate_sph_espec_data
-      call allocate_tave_sph_espec_data
-!
 !    Evaluate time average
 !
-      call open_org_ene_spec_data
+      sph_IN_t%iflag_spectr = 0
+      if(iflag_data_mode .eq. 1) then
+        call sph_spectr_average                                         &
+     &     (fname_org_rms, start_time, end_time, sph_IN_t)
+        call sph_spectr_std_deviation                                   &
+     &     (fname_org_rms, start_time, end_time, sph_IN_t)
+      end if
 !
-      ist_true = -1
-      icou = 0
-      write(*,'(a5,i12,a30,i12)',advance="NO")                          &
-     &       'step= ', istep,   ' averaging finished. Count=  ', icou
-      do
-        if(iflag_sph_ene_file .eq. 1) then
-          call read_org_volume_ene_data(istep, ierr)
-        else
-          call read_org_layer_ene_data(istep, ierr)
-        end if
-        if(ierr.gt.0) go to 99
+      sph_IN_t%iflag_spectr = 1
+      if(iflag_data_mode .eq. 0 .or. iflag_data_mode .eq. 2) then
+        call sph_spectr_average                                         &
+     &     (fname_org_rms_l, start_time, end_time, sph_IN_t)
+        call sph_spectr_std_deviation                                   &
+     &     (fname_org_rms_l, start_time, end_time, sph_IN_t)
+      end if
 !
-        if (time_sph .ge. start_time) then
-          if (ist_true .eq. -1) then
-            ist_true = istep
-            pre_time = time_sph
-          end if
-          icou = icou + 1
-          ied_true = istep
+      if(iflag_data_mode .eq. 0) then
+        write(fname_org_rms, '(a,a6)')                                  &
+     &                        trim(input_header), '_m.dat'
+        call sph_spectr_average                                         &
+     &     (fname_org_rms, start_time, end_time, sph_IN_t)
+        call sph_spectr_std_deviation                                   &
+     &     (fname_org_rms, start_time, end_time, sph_IN_t)
 !
-          call sum_average_ene_sph
-          if (icou .eq. 1) then
-            time_ini = time_sph
-            call reset_tave_sph_espec_data
-          end if
-        end if
-!
-        write(*,'(59a1,a5,i12,a30,i12)',advance="NO") (char(8),i=1,59), &
-     &       'step= ', istep,   ' averaging finished. Count=   ', icou
-        if (time_sph .ge. end_time) exit
-      end do
-!
-   99 continue
-      write(*,*)
-      call close_ene_spec_data
-!
-      call divide_average_ene_sph
-      call output_tave_ene_sph_data
-!
-      call close_ene_spec_data
-!
-!  Evaluate standard deviation
-!
-      call open_org_ene_spec_data
-!
-      ist_true = -1
-      icou = 0
-      write(*,'(a5,i12,a30,i12)',advance="NO")                          &
-     &       'step= ', istep,   ' deviation finished. Count=  ', icou
-      do
-        if(iflag_sph_ene_file .eq. 1) then
-          call read_org_volume_ene_data(istep, ierr)
-        else
-          call read_org_layer_ene_data(istep, ierr)
-        end if
-        if(ierr.gt.0) go to 98
-!
-        if (time_sph .ge. start_time) then
-          if (ist_true .eq. -1) then
-            ist_true = istep
-            pre_time = time_sph
-          end if
-          icou = icou + 1
-          ied_true = istep
-!
-          call sum_deviation_ene_sph
-          if (icou .eq. 1) then
-            time_ini = time_sph
-            call reset_tsigma_sph_espec_data
-          end if
-        end if
-!
-        write(*,'(59a1,a5,i12,a30,i12)',advance="NO") (char(8),i=1,59), &
-     &       'step= ', istep,   ' deviation finished. Count=   ', icou
-        if (time_sph .ge. end_time) exit
-      end do
-   98 continue
-      write(*,*)
-      call close_ene_spec_data
-!
-      call divide_deviation_ene_sph
-      call output_tsigma_ene_sph_data
-
+        write(fname_org_rms,'(a,a7)')                                   &
+     &                        trim(input_header), '_lm.dat'
+        call sph_spectr_average                                         &
+     &     (fname_org_rms, start_time, end_time, sph_IN_t)
+        call sph_spectr_std_deviation                                   &
+     &     (fname_org_rms, start_time, end_time, sph_IN_t)
+      end if
 !
       stop
+!
       end program t_average_sph_ene_spec
