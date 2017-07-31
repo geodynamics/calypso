@@ -86,15 +86,15 @@
 !
 !*  ----------------lead nonlinear term ... ----------
 !*
-      call start_eleps_time(8)
+      call start_elapsed_time(8)
       call nonlinear(sph1, comms_sph1, omega_sph1, r_2nd,               &
      &    MHD_prop1, sph_MHD_bc1, trans_p1, ref_temp1, ref_comp1,       &
      &    ipol, itor, trns_WK1, rj_fld1)
-      call end_eleps_time(8)
+      call end_elapsed_time(8)
 !
 !* ----  Update fields after time evolution ------------------------=
 !*
-      call start_eleps_time(9)
+      call start_elapsed_time(9)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
       call trans_per_temp_to_temp_sph(ref_temp1, ref_comp1, MHD_prop1,  &
      &    sph1%sph_rj, ipol, idpdr, rj_fld1)
@@ -106,7 +106,7 @@
      &     (sph1, comms_sph1, r_2nd, MHD_prop1, sph_MHD_bc1, trans_p1,  &
      &      ipol, sph_MHD_mat1, trns_WK1, rj_fld1)
       end if
-      call end_eleps_time(9)
+      call end_elapsed_time(9)
 !
 ! ----  Take zonal mean
 !
@@ -115,8 +115,8 @@
 !
 !*  -----------  lead energy data --------------
 !*
-      call start_eleps_time(4)
-      call start_eleps_time(11)
+      call start_elapsed_time(4)
+      call start_elapsed_time(11)
       if(output_IO_flag(i_step, MHD_step%rms_step) .eq. 0) then
         if(iflag_debug.gt.0)  write(*,*) 'output_rms_sph_mhd_control'
         call output_rms_sph_mhd_control                                 &
@@ -124,8 +124,8 @@
      &      sph_MHD_bc1%sph_bc_U, trans_p1%leg, ipol, rj_fld1,          &
      &      pwr1, WK_pwr)
       end if
-      call end_eleps_time(11)
-      call end_eleps_time(4)
+      call end_elapsed_time(11)
+      call end_elapsed_time(4)
 !
       end subroutine SPH_analyze_zm_snap
 !

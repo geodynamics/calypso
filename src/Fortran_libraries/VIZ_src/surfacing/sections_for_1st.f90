@@ -57,19 +57,19 @@
       type(phys_data), intent(in) :: nod_fld
 !
 !
-      call start_eleps_time(60)
+      call start_elapsed_time(60)
       if (iflag_debug.eq.1)  write(*,*) 'set_sectioning_case_table'
       call set_sectioning_case_table
 !
       call SECTIONING_initialize(mesh%node, mesh%ele, ele_mesh%surf,    &
      &    ele_mesh%edge, mesh%nod_comm, ele_mesh%edge_comm,             &
      &    group%ele_grp, group%surf_grp, group%surf_nod_grp, nod_fld)
-      call end_eleps_time(60)
+      call end_elapsed_time(60)
 !
-      call start_eleps_time(61)
+      call start_elapsed_time(61)
       call ISOSURF_initialize(mesh%node, mesh%ele,                      &
      &    ele_mesh%surf, ele_mesh%edge, group%ele_grp, nod_fld)
-      call end_eleps_time(61)
+      call end_elapsed_time(61)
 !
       end subroutine init_visualize_surface
 !
@@ -88,16 +88,16 @@
       type(phys_data), intent(in) :: nod_fld
 !
 !
-      call start_eleps_time(65)
+      call start_elapsed_time(65)
       call SECTIONING_visualize                                         &
      &   (viz_step%PSF_t%istep_file, time_d, ele_mesh%edge, nod_fld)
-      call end_eleps_time(65)
+      call end_elapsed_time(65)
 !
-      call start_eleps_time(66)
+      call start_elapsed_time(66)
       call ISOSURF_visualize                                            &
      &   (viz_step%ISO_t%istep_file, time_d, mesh%node, mesh%ele,       &
      &    ele_mesh%edge, ele_mesh%edge_comm, nod_fld)
-      call end_eleps_time(66)
+      call end_elapsed_time(66)
 !
       end subroutine visualize_surface
 !

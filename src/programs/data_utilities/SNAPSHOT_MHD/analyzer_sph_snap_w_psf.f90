@@ -60,8 +60,8 @@
 !
 !   Load parameter file
 !
-      call start_eleps_time(1)
-      call start_eleps_time(4)
+      call start_elapsed_time(1)
+      call start_elapsed_time(4)
       if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_w_psf'
       call read_control_4_sph_MHD_w_psf(snap_ctl_name, DNS_MHD_ctl1)
 !
@@ -71,11 +71,11 @@
      &    pwr1, flex_p1, MHD_step1, MHD_prop1, MHD_BC1, trns_WK1,       &
      &    mesh1, group1, ele_mesh1)
       call copy_delta_t(MHD_step1%init_d, MHD_step1%time_d)
-      call end_eleps_time(4)
+      call end_elapsed_time(4)
 !
 !     --------------------- 
 !
-      call start_eleps_time(2)
+      call start_elapsed_time(2)
       if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize_sph_MHD'
       call FEM_initialize_sph_MHD(MHD_files1%ucd_file_IO, MHD_step1,    &
      &    mesh1, group1, ele_mesh1, iphys, nod_fld1, range)
@@ -90,7 +90,7 @@
       call init_visualize_surface(mesh1, group1, ele_mesh1, nod_fld1)
 !
       call calypso_MPI_barrier
-      call end_eleps_time(2)
+      call end_elapsed_time(2)
       call reset_elapse_4_init_sph_mhd
 !
       end subroutine initialize_sph_snap_w_psf
@@ -108,7 +108,7 @@
 !
 !*  -----------  set initial step data --------------
 !*
-      call start_eleps_time(3)
+      call start_elapsed_time(3)
       call s_initialize_time_step(MHD_step1%init_d, MHD_step1%time_d)
 !*
 !*  -------  time evelution loop start -----------
@@ -128,8 +128,8 @@
 !*
 !*  -----------  output field data --------------
 !*
-        call start_eleps_time(1)
-        call start_eleps_time(4)
+        call start_elapsed_time(1)
+        call start_elapsed_time(4)
         iflag = lead_field_data_flag(MHD_step1%time_d%i_time_step,      &
      &                               MHD_step1)
         if(iflag .eq. 0) then
@@ -143,18 +143,18 @@
         call FEM_analyze_sph_MHD(MHD_files1%ucd_file_IO,                &
      &      mesh1, nod_fld1, MHD_step1, visval)
 !
-        call end_eleps_time(4)
+        call end_elapsed_time(4)
 !
 !*  ----------- Visualization --------------
 !*
         if(visval .eq. 0) then
           if (iflag_debug.eq.1) write(*,*) 'visualize_surface'
-          call start_eleps_time(12)
+          call start_elapsed_time(12)
           call visualize_surface(MHD_step1%viz_step, MHD_step1%time_d,  &
      &        mesh1, ele_mesh1, nod_fld1)
-          call end_eleps_time(12)
+          call end_elapsed_time(12)
         end if
-        call end_eleps_time(1)
+        call end_elapsed_time(1)
 !
 !*  -----------  exit loop --------------
 !*
@@ -164,7 +164,7 @@
 !
 !  time evolution end
 !
-      call end_eleps_time(3)
+      call end_elapsed_time(3)
 !
       if (iflag_debug.eq.1) write(*,*) 'FEM_finalize'
       call FEM_finalize(MHD_files1%ucd_file_IO, MHD_step1)
@@ -173,7 +173,7 @@
 !      call SPH_finalize_snap
 !
       call copy_COMM_TIME_to_elaps(num_elapsed)
-      call end_eleps_time(1)
+      call end_elapsed_time(1)
 !
       call output_elapsed_times
 !

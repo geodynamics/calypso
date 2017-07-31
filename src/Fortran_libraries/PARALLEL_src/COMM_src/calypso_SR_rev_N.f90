@@ -96,21 +96,21 @@
 !
 !C-- SEND
 !
-      call start_eleps_time(36)
+      call start_elapsed_time(36)
       call set_to_send_buf_N(NB, nnod_org, istack_send(npe_send),       &
      &    inod_export, X_org, WS)
-      call end_eleps_time(36)
+      call end_elapsed_time(36)
 !C
-      call start_eleps_time(37)
+      call start_elapsed_time(37)
       call calypso_send_recv_core                                       &
      &         (NB, npe_send, isend_self, id_pe_send, istack_send,      &
      &              npe_recv, irecv_self, id_pe_recv, istack_recv)
-      call end_eleps_time(37)
+      call end_elapsed_time(37)
 !
-      call start_eleps_time(38)
+      call start_elapsed_time(38)
       call set_from_recv_buf_rev_N(NB, nnod_new,                        &
      &    istack_recv(npe_recv), irev_import, WR, X_new)
-      call end_eleps_time(38)
+      call end_elapsed_time(38)
 !
       end subroutine calypso_send_recv_rev_N
 !

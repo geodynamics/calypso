@@ -127,7 +127,7 @@
       integer(kind = kint) :: i
 !
       do i = 3, 54
-        call reset_eleps_time(i)
+        call reset_elapsed_time(i)
       end do
 !
       end subroutine reset_elapse_4_init_sph_mhd

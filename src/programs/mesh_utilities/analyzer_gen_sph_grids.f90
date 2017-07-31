@@ -70,7 +70,7 @@
       elapse_labels(4) = 'Generation of FEM mesh data'
 !
 !
-      call start_eleps_time(1)
+      call start_elapsed_time(1)
       call read_ctl_file_gen_shell_grids                                &
      &   (control_file_name, psph_gen_plt, psph_gen_ctl)
       call set_control_4_gen_shell_grids                                &
@@ -94,7 +94,7 @@
       if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_grids'
       call para_gen_sph_grids(sph_const, gen_sph_G)
 !
-      call start_eleps_time(4)
+      call start_elapsed_time(4)
       if(gen_sph_G%s3d_ranks%ndomain_sph .eq. nprocs) then
         call mpi_gen_fem_mesh_for_sph(gen_sph_G,                        &
      &      sph_const%sph_params, sph_const%sph_rj, sph_const%sph_rtp,  &
@@ -106,8 +106,8 @@
      &      sph_const%sph_params, sph_const%sph_rj, sph_const%sph_rtp,  &
      &      fem_mesh_file)
       end if
-      call end_eleps_time(4)
-      call end_eleps_time(1)
+      call end_elapsed_time(4)
+      call end_elapsed_time(1)
 !
       call output_elapsed_times
 !

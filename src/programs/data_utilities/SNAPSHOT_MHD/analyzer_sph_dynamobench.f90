@@ -56,8 +56,8 @@
 !
 !   Load parameter file
 !
-      call start_eleps_time(1)
-      call start_eleps_time(4)
+      call start_elapsed_time(1)
+      call start_elapsed_time(4)
       if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_noviz'
       call read_control_4_sph_MHD_noviz(snap_ctl_name, DNS_MHD_ctl1)
 
@@ -66,11 +66,11 @@
      &    DNS_MHD_ctl1, sph1, comms_sph1, sph_grps1, rj_fld1, nod_fld1, &
      &    pwr1, flex_p1, MHD_step1, MHD_prop1, MHD_BC1, trns_WK1)
       call copy_delta_t(MHD_step1%init_d, MHD_step1%time_d)
-      call end_eleps_time(4)
+      call end_elapsed_time(4)
 !
 !    precondition elaps start
 !
-      call start_eleps_time(2)
+      call start_elapsed_time(2)
 !
 !        Initialize spherical transform dynamo
 !
@@ -78,7 +78,7 @@
       call SPH_init_sph_dbench(MHD_files1, bc_sph_IO1, iphys)
       call calypso_MPI_barrier
 !
-      call end_eleps_time(2)
+      call end_elapsed_time(2)
       call reset_elapse_4_init_sph_mhd
 !
       end subroutine initialize_sph_dynamobench
@@ -91,7 +91,7 @@
 !
 !*  -----------  set initial step data --------------
 !*
-      call start_eleps_time(3)
+      call start_elapsed_time(3)
       call s_initialize_time_step(MHD_step1%init_d, MHD_step1%time_d)
 !*
 !*  -------  time evelution loop start -----------
@@ -117,13 +117,13 @@
 !
 !  time evolution end
 !
-      call end_eleps_time(3)
+      call end_elapsed_time(3)
 !
 !      if (iflag_debug.eq.1) write(*,*) 'SPH_finalize_dbench'
 !      call SPH_finalize_dbench
 !
       call copy_COMM_TIME_to_elaps(num_elapsed)
-      call end_eleps_time(1)
+      call end_elapsed_time(1)
 !
       call output_elapsed_times
 !

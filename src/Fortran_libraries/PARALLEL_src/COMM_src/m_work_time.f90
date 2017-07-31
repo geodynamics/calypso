@@ -10,9 +10,9 @@
 !!      subroutine allocate_elapsed_times
 !!      subroutine deallocate_elapsed_times
 !!
-!!      subroutine start_eleps_time(iflag_elps)
-!!      subroutine end_eleps_time(iflag_elps)
-!!      subroutine reset_eleps_time(iflag_elps)
+!!      subroutine start_elapsed_time(iflag_elps)
+!!      subroutine end_elapsed_time(iflag_elps)
+!!      subroutine reset_elapsed_time(iflag_elps)
 !!      subroutine copy_COMM_TIME_to_elaps(iflag_elps)
 !!
 !!      subroutine output_elapsed_times
@@ -90,7 +90,7 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine start_eleps_time(iflag_elps)
+      subroutine start_elapsed_time(iflag_elps)
 !
       use calypso_mpi
 !
@@ -101,11 +101,11 @@
 !      if(iflag_elps .eq. 3) call summary_start()
 !      call hpm_start(elapse_labels(iflag_elps))
 !
-      end subroutine start_eleps_time
+      end subroutine start_elapsed_time
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine end_eleps_time(iflag_elps)
+      subroutine end_elapsed_time(iflag_elps)
 !
       use calypso_mpi
 !
@@ -117,11 +117,11 @@
       elapsed(iflag_elps) = MPI_WTIME() - start_times(iflag_elps)       &
      &                     + elapsed(iflag_elps)
 !
-      end subroutine end_eleps_time
+      end subroutine end_elapsed_time
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine reset_eleps_time(iflag_elps)
+      subroutine reset_elapsed_time(iflag_elps)
 !
 !
       integer, intent(in) :: iflag_elps
@@ -129,7 +129,7 @@
 !
       elapsed(iflag_elps) = zero
 !
-      end subroutine reset_eleps_time
+      end subroutine reset_elapsed_time
 !
 ! ----------------------------------------------------------------------
 !

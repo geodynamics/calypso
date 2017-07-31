@@ -201,15 +201,15 @@
 !
       if (num_psf.le.0 .or. istep_psf.le.0) return
 !
-!      call start_eleps_time(20)
+!      call start_elapsed_time(20)
       call set_field_4_psf                                              &
      &   (num_psf, nod_fld%n_point, edge%numedge, edge%nnod_4_edge,     &
      &    edge%ie_edge, nod_fld%num_phys, nod_fld%ntot_phys,            &
      &    nod_fld%istack_component, nod_fld%d_fld, psf_param,           &
      &    psf_list, psf_grp_list, psf_mesh)
-!      call end_eleps_time(20)
+!      call end_elapsed_time(20)
 !
-!      call start_eleps_time(21)
+!      call start_elapsed_time(21)
       if (iflag_debug.eq.1) write(*,*) 'output_section_mesh'
       call output_section_data(num_psf, psf_file_IO, istep_psf, time_d, &
      &    psf_mesh, psf_time_IO, psf_out, psf_out_m)
