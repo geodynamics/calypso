@@ -8,26 +8,27 @@
 !!
 !!@verbatim
 !!      subroutine cal_sph_nod_gradient_2(kr_in, kr_out,                &
-!!     &          dnod_rj, dnod_dr)
-!!      subroutine normalize_sph_average_grad(dnod_dr)
-!!      subroutine cal_sph_nod_vect_dr_2(kr_in, kr_out, dnod_rj, dnod_dr)
+!!     &          is_fld, is_grad, nidx_rj, radius_1d_rj_r, g_sph_rj,   &
+!!     &          d1nod_mat_fdm_2, n_point, ntot_phys_rj, d_rj)
+!!      subroutine normalize_sph_average_grad                           &
+!!     &         (is_fld, idx_rj_degree_zero, nidx_rj,                  &
+!!     &          n_point, ntot_phys_rj, d_rj)
+!!      subroutine cal_sph_nod_vect_dr_2(kr_in, kr_out, is_fld, is_dr,  &
+!!     &          nidx_rj, d1nod_mat_fdm_2, n_point, ntot_phys_rj, d_rj)
 !!@endverbatim
 !!
 !!@n @param kr_in    radial ID for inner boundary
 !!@n @param kr_out   radial ID for outer boundary
-!!@n @param dnod_rj(nnod_rj)      Input spectr data
-!!@n @param dnod_dr(nnod_rj,nd)   Gradient of field
-!!@n                 dnod_dr(nnod_rj,1) = r^2 l(l+1) d phi / dr
-!!@n                 dnod_dr(nnod_rj,2) = phi
-!!@n                 dnod_dr(nnod_rj,3) = 0
+!!@n @param dnod_rj(n_point)      Input spectr data
+!!@n @param dnod_dr(n_point,nd)   Gradient of field
+!!@n                 dnod_dr(n_point,1) = r^2 l(l+1) d phi / dr
+!!@n                 dnod_dr(n_point,2) = phi
+!!@n                 dnod_dr(n_point,3) = 0
 !
       module cal_sph_exp_1st_diff
 !
       use m_precision
-!
       use m_constants
-      use m_spheric_parameter
-      use m_fdm_coefs
 !
       implicit none
 !
@@ -38,14 +39,19 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_sph_nod_gradient_2(kr_in, kr_out,                  &
-     &          dnod_rj, dnod_dr)
-!
-      use m_schmidt_poly_on_rtm
+     &          is_fld, is_grad, nidx_rj, radius_1d_rj_r, g_sph_rj,     &
+     &          d1nod_mat_fdm_2, n_point, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: kr_in, kr_out
-      real(kind = kreal), intent(in) :: dnod_rj(nnod_rj)
+      integer(kind = kint), intent(in) :: is_fld, is_grad
+      integer(kind = kint), intent(in) :: nidx_rj(2)
+      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
+      real(kind = kreal), intent(in) :: radius_1d_rj_r(nidx_rj(1))
+      real(kind = kreal), intent(in) :: g_sph_rj(nidx_rj(2),13)
+      real(kind = kreal), intent(in)                                    &
+     &                   :: d1nod_mat_fdm_2(nidx_rj(1),-1:1)
 !
-      real(kind = kreal), intent(inout) :: dnod_dr(nnod_rj,3)
+      real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
       integer(kind = kint) :: inod, i_p1, i_n1, j, k
       integer(kind = kint) :: ist, ied
@@ -61,14 +67,14 @@
         j = mod((inod-1),nidx_rj(2)) + 1
         k = 1 + (inod- j) / nidx_rj(2)
 !
-        d1sdr =  d1nod_mat_fdm_2(k,-1) * dnod_rj(i_n1)                  &
-     &         + d1nod_mat_fdm_2(k, 0) * dnod_rj(inod)                  &
-     &         + d1nod_mat_fdm_2(k, 1) * dnod_rj(i_p1)
+        d1sdr =  d1nod_mat_fdm_2(k,-1) * d_rj(i_n1,is_fld)              &
+     &         + d1nod_mat_fdm_2(k, 0) * d_rj(inod,is_fld)              &
+     &         + d1nod_mat_fdm_2(k, 1) * d_rj(i_p1,is_fld)
 !
-        dnod_dr(inod,1) = d1sdr * g_sph_rj(j,13)                        &
+        d_rj(inod,is_grad  ) = d1sdr * g_sph_rj(j,13)                   &
      &                   * radius_1d_rj_r(k)**2
-        dnod_dr(inod,2) = dnod_rj(inod)
-        dnod_dr(inod,3) = zero
+        d_rj(inod,is_grad+1) = d_rj(inod,is_fld)
+        d_rj(inod,is_grad+2) = zero
       end do
 !$omp end parallel do
 !
@@ -76,9 +82,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine normalize_sph_average_grad(dnod_dr)
+      subroutine normalize_sph_average_grad                             &
+     &         (is_fld, idx_rj_degree_zero, nidx_rj,                    &
+     &          n_point, ntot_phys_rj, d_rj)
 !
-      real(kind = kreal), intent(inout) :: dnod_dr(nnod_rj,3)
+      integer(kind = kint), intent(in) :: is_fld
+      integer(kind = kint), intent(in) :: idx_rj_degree_zero
+      integer(kind = kint), intent(in) :: nidx_rj(2)
+      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
+!
+      real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
       integer(kind = kint) :: inod, k
 !
@@ -88,9 +101,9 @@
 !$omp parallel do private(inod,k)
       do k = 1, nidx_rj(1)
         inod = (k-1) * nidx_rj(2) + idx_rj_degree_zero
-        dnod_dr(inod,1) = two * dnod_dr(inod,1)
-        dnod_dr(inod,2) = zero
-        dnod_dr(inod,3) = zero
+        d_rj(inod,is_fld  ) = two * d_rj(inod,is_fld)
+        d_rj(inod,is_fld+1) = zero
+        d_rj(inod,is_fld+2) = zero
       end do
 !$omp end parallel do
 !
@@ -99,12 +112,17 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sph_nod_vect_dr_2(kr_in, kr_out, dnod_rj, dnod_dr)
+      subroutine cal_sph_nod_vect_dr_2(kr_in, kr_out, is_fld, is_dr,    &
+     &          nidx_rj, d1nod_mat_fdm_2, n_point, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: kr_in, kr_out
-      real(kind = kreal), intent(in) :: dnod_rj(nnod_rj)
+      integer(kind = kint), intent(in) :: is_fld, is_dr
+      integer(kind = kint), intent(in) :: nidx_rj(2)
+      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
+      real(kind = kreal), intent(in)                                    &
+     &                   :: d1nod_mat_fdm_2(nidx_rj(1),-1:1)
 !
-      real(kind = kreal), intent(inout) :: dnod_dr(nnod_rj)
+      real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
       integer(kind = kint) :: inod, i_p1, i_n1, j, k
       integer(kind = kint) :: ist, ied
@@ -119,9 +137,9 @@
         j = mod((inod-1),nidx_rj(2)) + 1
         k = 1 + (inod-j) / nidx_rj(2)
 !
-        dnod_dr(inod) =  d1nod_mat_fdm_2(k,-1) * dnod_rj(i_n1)          &
-     &                 + d1nod_mat_fdm_2(k, 0) * dnod_rj(inod)          &
-     &                 + d1nod_mat_fdm_2(k, 1) * dnod_rj(i_p1)
+        d_rj(inod,is_dr) =  d1nod_mat_fdm_2(k,-1) * d_rj(i_n1,is_fld)   &
+     &                    + d1nod_mat_fdm_2(k, 0) * d_rj(inod,is_fld)   &
+     &                    + d1nod_mat_fdm_2(k, 1) * d_rj(i_p1,is_fld)
       end do
 !$omp end parallel do
 !

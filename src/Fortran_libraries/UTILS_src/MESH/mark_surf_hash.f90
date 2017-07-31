@@ -50,67 +50,71 @@
       integer(kind = kint), intent(inout)                               &
      &                     :: isurf_flag(nsurf_4_ele*numele)
 !
-      integer(kind = kint) :: iele, is
-      integer(kind = kint) :: jele, js
-      integer(kind = kint) :: i1, i2, i3, i4
-      integer(kind = kint) :: j1, j2, j3, j4
-      integer(kind = kint) :: is1, is2, is3, is4
-      integer(kind = kint) :: js1, js2, js3, js4
+      integer(kind = kint) :: inod(4), jnod(4)
       integer(kind = kint) :: ihash, iflag_inside
       integer(kind = kint) :: ist, ied, k1, k2
 !
 !
       isurf_flag = 0
+!!$omp parallel do private(ihash,ist,ied,k1,k2,inod,jnod,iflag_inside)
       do ihash = 1, iend_surf_hash
         ist = istack_surf_hash(ihash-1)+1
         ied = istack_surf_hash(ihash)
 !
         if (ied .eq. ist) then
           isurf_flag(ist) = ist
-!
         else if (ied .gt. ist) then
 !
           do k1 = ist, ied
-            if( isurf_flag(k1) .eq. 0 ) then
+            if(isurf_flag(k1) .ne. 0) cycle
+            isurf_flag(k1) = k1
 !
-              isurf_flag(k1) = k1
-              iele = isurf_hash(k1,1)
-              is =   isurf_hash(k1,2)
+            call set_4nodes_id_on_surf                                  &
+     &         (isurf_hash(k1,1), isurf_hash(k1,2),                     &
+     &          numele, nnod_4_ele, ie, inod)
 !
-              is1 = node_on_sf_4(1,is)
-              is2 = node_on_sf_4(2,is)
-              is3 = node_on_sf_4(3,is)
-              is4 = node_on_sf_4(4,is)
-!
-              i1 = ie(iele,is1)
-              i2 = ie(iele,is2)
-              i3 = ie(iele,is3)
-              i4 = ie(iele,is4)
+            if(     inod(1).eq.inod(2) .and. inod(1).eq.inod(3)         &
+     &        .and. inod(1).eq.inod(4)) then
               do k2 = k1+1, ied
-                jele = isurf_hash(k2,1)
-                js =   isurf_hash(k2,2)
+                call set_4nodes_id_on_surf                              &
+     &             (isurf_hash(k2,1), isurf_hash(k2,2),                 &
+     &              numele, nnod_4_ele, ie, jnod)
+                if(     inod(1).eq.jnod(1) .and. inod(2).eq.jnod(2)     &
+     &            .and. inod(3).eq.jnod(3) .and. inod(4).eq.jnod(4))    &
+     &            isurf_flag(k2) = -k1
+              end do
 !
-                js1 =  node_on_sf_4(1,js)
-                js2 =  node_on_sf_4(2,js)
-                js3 =  node_on_sf_4(3,js)
-                js4 =  node_on_sf_4(4,js)
-                j1 = ie(jele,js1)
-                j2 = ie(jele,js2)
-                j3 = ie(jele,js3)
-                j4 = ie(jele,js4)
-                iflag_inside = check_4_on_3(i1, i2, i3, j1, j2, j3, j4)
+            else if((inod(1).eq.inod(2) .and. inod(3).eq.inod(4))       &
+     &        .or.  (inod(2).eq.inod(3) .and. inod(4).eq.inod(1))) then
+              do k2 = k1+1, ied
+                call set_4nodes_id_on_surf                              &
+     &             (isurf_hash(k2,1), isurf_hash(k2,2),                 &
+     &              numele, nnod_4_ele, ie, jnod)
+                iflag_inside = check_4_on_3(inod(1), inod(2), inod(3),  &
+     &                        jnod(1), jnod(2), jnod(3), jnod(4))
+                if (iflag_inside .eq. 1) isurf_flag(k2) = -k1
+              end do
+!
+            else
+              do k2 = k1+1, ied
+                call set_4nodes_id_on_surf                              &
+     &             (isurf_hash(k2,1), isurf_hash(k2,2),                 &
+     &              numele, nnod_4_ele, ie, jnod)
+!
+                iflag_inside = check_4_on_3(inod(1), inod(2), inod(3),  &
+     &                        jnod(1), jnod(2), jnod(3), jnod(4))
                 if (iflag_inside .eq. 1) then
-                  isurf_flag(k1) =  k1
                   isurf_flag(k2) = -k1
-                  go to 20
+                  exit
                 end if
               end do
-  20          continue
             end if
+!
           end do
         end if
 !
       end do
+!!$omp end parallel do
 !
       end subroutine mark_all_surfaces
 !
@@ -136,60 +140,70 @@
       integer(kind = kint), intent(inout)                               &
      &                     :: isurf_flag(nsurf_4_ele*numele)
 !
-      integer(kind = kint) :: iele, is
-      integer(kind = kint) :: jele, js
-      integer(kind = kint) :: i1, i2, i3, i4
-      integer(kind = kint) :: j1, j2, j3, j4
-      integer(kind = kint) :: is1, is2, is3, is4
-      integer(kind = kint) :: js1, js2, js3, js4
+      integer(kind = kint) :: inod(4), jnod(4)
       integer(kind = kint) :: ihash, iflag_inside
       integer(kind = kint) :: ist, ied, k1, k2
 !
 !
       isurf_flag = 0
+!!$omp parallel do private(ihash,ist,ied,k1,k2,inod,jnod,iflag_inside)
       do ihash = 1, iend_surf_hash
         ist = istack_surf_hash(ihash-1)+1
         ied = istack_surf_hash(ihash)
 !
         if (ied .gt. ist) then
           do k1 = ist, ied
-            iele = isurf_hash(k1,1)
-            is =   isurf_hash(k1,2)
-            if( isurf_flag(k1) .eq. 0 ) then
-              is1 = node_on_sf_4(1,is)
-              is2 = node_on_sf_4(2,is)
-              is3 = node_on_sf_4(3,is)
-              is4 = node_on_sf_4(4,is)
+            if( isurf_flag(k1) .ne. 0 ) cycle
 !
-              i1 = ie(iele,is1)
-              i2 = ie(iele,is2)
-              i3 = ie(iele,is3)
-              i4 = ie(iele,is4)
+            call set_4nodes_id_on_surf                                  &
+     &         (isurf_hash(k1,1), isurf_hash(k1,2),                     &
+     &          numele, nnod_4_ele, ie, inod)
+!
+            if(     inod(1).eq.inod(2) .and. inod(1).eq.inod(3)         &
+     &        .and. inod(1).eq.inod(4)) then
+              isurf_flag(k1) =  1
               do k2 = k1+1, ied
-                jele = isurf_hash(k2,1)
-                js =   isurf_hash(k2,2)
+                call set_4nodes_id_on_surf                              &
+     &             (isurf_hash(k2,1), isurf_hash(k2,2),                 &
+     &              numele, nnod_4_ele, ie, jnod)
+                if(     inod(1).eq.jnod(1) .and. inod(2).eq.jnod(2)     &
+     &            .and. inod(3).eq.jnod(3) .and. inod(4).eq.jnod(4))    &
+     &            isurf_flag(k2) = 1
+              end do
 !
-                js1 =  node_on_sf_4(1,js)
-                js2 =  node_on_sf_4(2,js)
-                js3 =  node_on_sf_4(3,js)
-                js4 =  node_on_sf_4(4,js)
-                j1 = ie(jele,js1)
-                j2 = ie(jele,js2)
-                j3 = ie(jele,js3)
-                j4 = ie(jele,js4)
-                iflag_inside = check_4_on_3(i1, i2, i3, j1, j2, j3, j4)
+            else if((inod(1).eq.inod(2) .and. inod(3).eq.inod(4))       &
+     &        .or.  (inod(2).eq.inod(3) .and. inod(4).eq.inod(1))) then
+              isurf_flag(k1) =  1
+              do k2 = k1+1, ied
+                call set_4nodes_id_on_surf                              &
+     &             (isurf_hash(k2,1), isurf_hash(k2,2),                 &
+     &              numele, nnod_4_ele, ie, jnod)
+                iflag_inside = check_4_on_3(inod(1), inod(2), inod(3),  &
+     &                        jnod(1), jnod(2), jnod(3), jnod(4))
+                if (iflag_inside .eq. 1) isurf_flag(k2) = iflag_inside
+              end do
+!
+            else
+              do k2 = k1+1, ied
+                call set_4nodes_id_on_surf                              &
+     &             (isurf_hash(k2,1), isurf_hash(k2,2),                 &
+     &              numele, nnod_4_ele, ie, jnod)
+!
+                iflag_inside = check_4_on_3(inod(1), inod(2), inod(3),  &
+     &                      jnod(1), jnod(2), jnod(3), jnod(4))
                 if (iflag_inside .eq. 1) then
                   isurf_flag(k1) =  iflag_inside
                   isurf_flag(k2) =  iflag_inside
-                  go to 20
+                  exit
                 end if
               end do
-  20          continue
+!
             end if
           end do
         end if
 !
       end do
+!!$omp end parallel do
 !
       end subroutine mark_independent_surface
 !
@@ -214,45 +228,67 @@
      &                     :: isurf_flag(nsurf_4_ele*numele)
 !
       integer(kind = kint) :: iele, is
-      integer(kind = kint) :: i1, i2, i3, i4
-      integer(kind = kint) :: is1, is2, is3, is4
+      integer(kind = kint) :: inod(4)
       integer(kind = kint) :: ihash
       integer(kind = kint) :: ist, ied, k1
 !
 !
+!!$omp parallel do private(ihash,ist,ied,k1,iele,is,inod)
       do ihash = 1, iend_surf_hash
         ist = istack_surf_hash(ihash-1)+1
         ied = istack_surf_hash(ihash)
 !
         do k1 = ist, ied
-          if( isurf_flag(k1) .eq. 0 ) then
-            iele = isurf_hash(k1,1)
-            is =   isurf_hash(k1,2)
+          if( isurf_flag(k1) .ne. 0 ) cycle
 !
-            is1 = node_on_sf_4(1,is)
-            is2 = node_on_sf_4(2,is)
-            is3 = node_on_sf_4(3,is)
-            is4 = node_on_sf_4(4,is)
-            i1 = ie(iele,is1)
-            i2 = ie(iele,is2)
-            i3 = ie(iele,is3)
-            i4 = ie(iele,is4)
+          iele = isurf_hash(k1,1)
+          is =   isurf_hash(k1,2)
 !
-            if ( ie(iele,1).gt.internal_node ) then
+          call set_4nodes_id_on_surf                                    &
+     &         (iele, is, numele, nnod_4_ele, ie, inod)
+!
+          if ( ie(iele,1).gt.internal_node ) then
                 isurf_flag(k1) = 2
-            else if ( (i1 .le. internal_node)                           &
-     &           .or. (i2 .le. internal_node)                           &
-     &           .or. (i3 .le. internal_node)                           &
-     &           .or. (i4 .le. internal_node) ) then
-              isurf_flag(k1) = 3
-            end if
-!
+          else if ( (inod(1) .le. internal_node)                        &
+     &         .or. (inod(2) .le. internal_node)                        &
+     &         .or. (inod(3) .le. internal_node)                        &
+     &         .or. (inod(4) .le. internal_node) ) then
+            isurf_flag(k1) = 3
           end if
         end do
 !
       end do
+!!$omp end parallel do
 !
       end subroutine mark_external_surface
+!
+!------------------------------------------------------------------
+!
+      subroutine set_4nodes_id_on_surf                                  &
+     &         (iele, is, numele, nnod_4_ele, ie, inod)
+!
+      use m_geometry_constants
+!
+      integer(kind = kint), intent(in) :: iele, is
+      integer(kind = kint), intent(in) :: numele, nnod_4_ele
+      integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
+!
+      integer(kind = kint), intent(inout) :: inod(4)
+!
+      integer(kind = kint) :: is1, is2, is3, is4
+!
+!
+      is1 = node_on_sf_4(1,is)
+      is2 = node_on_sf_4(2,is)
+      is3 = node_on_sf_4(3,is)
+      is4 = node_on_sf_4(4,is)
+!
+      inod(1) = ie(iele,is1)
+      inod(2) = ie(iele,is2)
+      inod(3) = ie(iele,is3)
+      inod(4) = ie(iele,is4)
+!
+      end subroutine set_4nodes_id_on_surf
 !
 !------------------------------------------------------------------
 !

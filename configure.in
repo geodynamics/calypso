@@ -27,6 +27,9 @@ dnl Include BLAS library check
 builtin(include,src/confdb/ax_blas.m4)
 builtin(include,src/confdb/ax_blas_f77_func.m4)
 
+dnl Include zlib Check related definitions
+builtin(include,src/confdb/ax_check_zlib.m4)
+
 dnl Include hdf5 Check
 builtin(include,src/confdb/ax_lib_hdf5.m4)
 
@@ -46,6 +49,13 @@ AC_MSG_RESULT(with-blas...    "${with_blas}")
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_FC
+
+if test -z ${FC}
+then
+	FC=${F77}
+else
+	F77=${FC}
+fi
 
 if test -z ${AR}
 then
@@ -98,6 +108,7 @@ AC_SUBST(MPIINCDIR)
 AX_LIB_HDF5(parallel)
 AC_MSG_RESULT(HDF5_LDFLAGS... "${HDF5_LDFLAGS}")
 AC_MSG_RESULT(HDF5_PFLIBS... "${HDF5_PFLIBS}")
+AC_MSG_RESULT(HDF5_H5PFC...  "${HDF5_H5PFC}")
 
 # Check BLAS
 if test -n "${with_blas}"; then
@@ -150,6 +161,15 @@ then
 	AC_SUBST(PKGFLAGS_FFTW3)
 	AC_SUBST(FFTW3_CFLAGS)
 	AC_SUBST(FFTW3_LIBS)
+
+# Check zlib
+	AX_CHECK_ZLIB
+	if test -n "${LIBS}"; then
+		ZLIB_CFLAGS="${CPPFLAGS}"
+		ZLIB_LIB="${LDFLAGS} ${LIBS}"
+		AC_SUBST(ZLIB_CFLAGS)
+		AC_SUBST(ZLIB_LIB)
+	fi
 fi
 
 
@@ -177,6 +197,12 @@ if test -n "${HDF5_PFLIBS}"; then
         AC_MSG_RESULT(    Use parallel HDF5 ... yes)
 else
         AC_MSG_RESULT(    Use parallel HDF5 ...  no)
+fi
+AC_MSG_RESULT()
+if test -n "${ZLIB_LIB}"; then
+        AC_MSG_RESULT(    Use zlib at ...       yes)
+else
+        AC_MSG_RESULT(    Use zlib ...           no)
 fi
 AC_MSG_RESULT()
 AC_MSG_RESULT(---------------------------------------------------------------)

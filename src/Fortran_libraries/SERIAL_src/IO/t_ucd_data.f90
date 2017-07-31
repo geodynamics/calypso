@@ -34,10 +34,6 @@
 !!      subroutine dealloc_merged_hdt5_ele_list(m_ucd)
 !!      subroutine dealloc_merged_hdt5_array(m_ucd)
 !!
-!!      subroutine set_ucd_file_format(i_fmt, ucd)
-!!      subroutine set_ucd_file_prefix(file_head, ucd)
-!!      subroutine set_ucd_file_format_prefix(file_head, i_fmt, ucd)
-!!
 !!      subroutine cal_istack_ucd_component(ucd)
 !!
 !!      subroutine append_new_ucd_field_name(new_field_name,            &
@@ -59,16 +55,6 @@
 !
 !>        Structure for FEM field data IO
       type ucd_data
-!>        file name for field data
-        character(len=kchara) :: file_name
-!
-!
-!>        file header for field data
-        character(len=kchara) :: file_prefix = "field/out"
-!
-!>        file type for field data IO
-        integer (kind = kint) :: ifmt_file = iflag_fld
-!
 !>        number of nodes for field data
         integer(kind = kint_gl) :: nnod
 !>        number of elements for field data
@@ -414,44 +400,6 @@
       deallocate(m_ucd%fld_hdf5)
 !
       end subroutine dealloc_merged_hdt5_array
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine set_ucd_file_format(i_fmt, ucd)
-!
-      integer(kind = kint),  intent(in) :: i_fmt
-      type(ucd_data), intent(inout) :: ucd
-!
-      ucd%ifmt_file = i_fmt
-!
-      end subroutine set_ucd_file_format
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_ucd_file_prefix(file_head, ucd)
-!
-      character(len = kchara), intent(in) :: file_head
-      type(ucd_data), intent(inout) :: ucd
-!
-      write(ucd%file_prefix,'(a)') trim(file_head)
-!
-      end subroutine set_ucd_file_prefix
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_ucd_file_format_prefix(file_head, i_fmt, ucd)
-!
-      character(len = kchara), intent(in) :: file_head
-      integer(kind = kint), intent(in) :: i_fmt
-!
-      type(ucd_data), intent(inout) :: ucd
-!
-!
-      call set_ucd_file_format(i_fmt, ucd)
-      call set_ucd_file_prefix(file_head, ucd)
-!
-      end subroutine set_ucd_file_format_prefix
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

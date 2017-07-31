@@ -50,8 +50,7 @@
 !$omp parallel
         if (icomp_viz .eq. 0) then
           if( ncomp_org .eq. ncomp_SCALAR) then
-            call copy_nod_scalar_smp(np_smp, nnod, istack_n_smp,        &
-     &          dat_xyz(1,1), dat_viz(1,1))
+            call copy_nod_scalar_smp(nnod, dat_xyz(1,1), dat_viz(1,1))
           else if ( ncomp_org .eq. ncomp_VECTOR) then
             call cal_vector_magnitude(np_smp, nnod, istack_n_smp,       &
      &          dat_xyz(1,1), dat_viz(1,1))
@@ -62,12 +61,11 @@
 !
         else if ( icomp_viz.eq.icomp_VECTOR                             &
      &        .or. icomp_viz.eq.icomp_ASYM_TENSOR) then
-          call copy_nod_vector_smp(np_smp, nnod, istack_n_smp,          &
-     &        dat_xyz(1,1), dat_viz(1,1))
+          call copy_nod_vector_smp(nnod, dat_xyz(1,1), dat_viz(1,1))
 !
         else if ( icomp_viz .eq. icomp_SYM_TENSOR ) then
-          call copy_nod_sym_tensor_smp(np_smp, nnod, istack_n_smp,      &
-     &        dat_xyz(1,1), dat_viz(1,1))
+          call copy_nod_sym_tensor_smp                                  &
+     &       (nnod, dat_xyz(1,1), dat_viz(1,1))
 !
 !
         else if (icomp_viz .eq. icomp_SPH_VECTOR) then
@@ -91,8 +89,8 @@
 !
         else if (icomp_viz.ge.icomp_XX                                  &
      &           .and. icomp_viz.le.icomp_ZZ) then
-          call copy_nod_scalar_smp(np_smp, nnod, istack_n_smp,          &
-     &        dat_xyz(1,icomp_viz), dat_viz(1,1))
+          call copy_nod_scalar_smp                                      &
+     &       (nnod, dat_xyz(1,icomp_viz), dat_viz(1,1))
 !
         else if (icomp_viz .eq. icomp_RADIAL) then
           call cal_radial_comp_smp(np_smp, nnod, istack_n_smp,          &

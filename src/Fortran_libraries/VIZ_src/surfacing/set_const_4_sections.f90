@@ -136,7 +136,7 @@
       use mag_of_field_smp
       use cvt_xyz_vector_2_sph_smp
       use cvt_xyz_vector_2_cyl_smp
-      use subtract_const_smp
+      use cal_subtract_smp
 !
       use copy_field_smp
 !
@@ -169,8 +169,7 @@
 !
       if (ncomp_org .eq. 1) then
 !$omp parallel
-        call copy_nod_scalar_smp(np_smp, nnod, istack_nod_smp,          &
-     &      d_nod(1,ist_field), c_ref_iso)
+        call copy_nod_scalar_smp(nnod, d_nod(1,ist_field), c_ref_iso)
 !$omp end parallel
 !
       else if (ncomp_org .eq. 3) then
@@ -181,8 +180,7 @@
 !
         else if (i_comp.ge.1 .and. i_comp.le.3) then
           ic = ist_field+i_comp-1
-          call copy_nod_scalar_smp(np_smp, nnod, istack_nod_smp,        &
-     &        d_nod(1,ic), c_ref_iso)
+          call copy_nod_scalar_smp(nnod, d_nod(1,ic), c_ref_iso)
 !
         else if (i_comp.eq.11) then
           call cal_radial_comp_smp(np_smp, nnod, istack_nod_smp,        &
@@ -215,16 +213,15 @@
 !
           ic = ist_field+i_comp-1
 !$omp parallel
-          call copy_nod_scalar_smp(np_smp, nnod, istack_nod_smp,        &
-     &        d_nod(1,ic), c_ref_iso)
+          call copy_nod_scalar_smp(nnod, d_nod(1,ic), c_ref_iso)
 !$omp end parallel
 !
         end if
       end if
 !
 !$omp parallel
-      call subtruct_const_4_scalar_smp_ow(np_smp, nnod, istack_nod_smp, &
-     &    c_ref_iso, isosurf_value(i_iso))
+      call subtruct_const_4_scalar_smp_ow                               &
+     &   (nnod, c_ref_iso, isosurf_value(i_iso))
 !$omp end parallel
 !
       end subroutine set_constant_4_iso

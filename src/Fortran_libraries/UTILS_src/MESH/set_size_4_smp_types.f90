@@ -19,13 +19,13 @@
 !!      subroutine count_edge_size_smp_type(edge)
 !!        type(edge_data),    intent(inout) :: edge
 !!
-!!      subroutine count_overlap_ele_type(nod, ele)
+!!      subroutine count_overlap_ele(nod, ele)
 !!        type(node_data),    intent(in) :: nod
 !!        type(element_data), intent(inout) :: ele
-!!      subroutine count_overlap_surf_type(nod, surf)
+!!      subroutine count_overlap_surf(nod, surf)
 !!        type(node_data),    intent(in) :: nod
 !!        type(surface_data), intent(inout) :: surf
-!!      subroutine count_overlap_edge_type(nod, edge)
+!!      subroutine count_overlap_edge(nod, edge)
 !!        type(node_data),    intent(in) :: nod
 !!        type(edge_data),    intent(inout) :: edge
 !!@endverbatim
@@ -133,7 +133,7 @@
 !-----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine count_overlap_ele_type(nod, ele)
+      subroutine count_overlap_ele(nod, ele)
 !
       use t_geometry_data
       use count_overlap
@@ -146,11 +146,11 @@
      &    nod%internal_node, ele%numele, ele%ie(1:ele%numele,1),        &
      &    ele%internal_ele, ele%interior_ele)
 !
-      end subroutine count_overlap_ele_type
+      end subroutine count_overlap_ele
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine count_overlap_surf_type(nod, surf)
+      subroutine count_overlap_surf(nod, surf)
 !
       use t_geometry_data
       use t_surface_data
@@ -165,11 +165,11 @@
      &    surf%ie_surf(1:surf%numsurf,1), surf%internal_surf,           &
      &    surf%interior_surf)
 !
-      end subroutine count_overlap_surf_type
+      end subroutine count_overlap_surf
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine count_overlap_edge_type(nod, edge)
+      subroutine count_overlap_edge(nod, edge)
 !
       use t_geometry_data
       use t_edge_data
@@ -184,7 +184,7 @@
      &    edge%ie_edge(1:edge%numedge,1), edge%internal_edge,           &
      &    edge%interior_edge)
 !
-      end subroutine count_overlap_edge_type
+      end subroutine count_overlap_edge
 !
 ! ----------------------------------------------------------------------
 !

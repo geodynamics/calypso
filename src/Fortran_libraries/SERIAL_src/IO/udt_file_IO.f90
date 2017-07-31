@@ -7,20 +7,21 @@
 !> @brief UCD format data IO
 !!
 !!@verbatim
-!!      subroutine write_ucd_file(my_rank, istep, ucd)
-!!      subroutine write_udt_file(my_rank, istep, ucd)
-!!      subroutine write_grd_file(my_rank, ucd)
+!!      subroutine write_ucd_file(my_rank, file_name, ucd)
+!!      subroutine write_udt_file(my_rank, file_name, ucd)
+!!      subroutine write_grd_file(my_rank, file_name, ucd)
 !!
-!!      subroutine read_udt_file(my_rank, istep, ucd)
-!!      subroutine read_and_alloc_udt_params(my_rank, istep, ucd)
-!!      subroutine read_and_alloc_udt_file(my_rank, istep, ucd)
-!!      subroutine read_and_alloc_ucd_file(my_rank, istep, nnod_ele, ucd)
-!!      subroutine read_grd_file(my_rank, nnod_ele, ucd)
+!!      subroutine read_udt_file(my_rank, file_name, ucd)
+!!      subroutine read_and_alloc_udt_params(my_rank, file_name, ucd)
+!!      subroutine read_and_alloc_udt_file(my_rank, file_name, ucd)
+!!      subroutine read_and_alloc_ucd_file                              &
+!!     &         (my_rank, file_name, nnod_ele, ucd)
+!!      subroutine read_grd_file(my_rank, file_name, nnod_ele, ucd)
 !!        type(ucd_data), intent(inout) :: ucd
 !!@endverbatim
 !!
 !!@param my_rank  process ID
-!!@param istep    step number for output
+!!@param file_name    file name
 !!@param ucd      Structure for FEM field data IO
 !
       module udt_file_IO
@@ -47,18 +48,14 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine write_ucd_file(my_rank, istep, ucd)
+      subroutine write_ucd_file(my_rank, file_name, ucd)
 !
       use set_parallel_file_name
 !
-      integer(kind=kint), intent(in) :: my_rank, istep
+      character(len=kchara), intent(in) :: file_name
+      integer(kind=kint), intent(in) :: my_rank
       type(ucd_data), intent(in) :: ucd
 !
-      character(len=kchara) :: file_name
-!
-!
-      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_ucd,       &
-     &    my_rank, istep, file_name)
 !
       if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii UCD file: ', trim(file_name)
@@ -72,18 +69,14 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine write_udt_file(my_rank, istep, ucd)
+      subroutine write_udt_file(my_rank, file_name, ucd)
 !
       use set_parallel_file_name
 !
-      integer(kind=kint), intent(in) :: my_rank, istep
+      character(len=kchara), intent(in) :: file_name
+      integer(kind=kint), intent(in) :: my_rank
       type(ucd_data), intent(in) :: ucd
 !
-      character(len=kchara) :: file_name
-!
-!
-      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_udt,       &
-     &    my_rank, istep, file_name)
 !
       if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii UCD field: ', trim(file_name)
@@ -96,18 +89,14 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine write_grd_file(my_rank, ucd)
+      subroutine write_grd_file(my_rank, file_name, ucd)
 !
       use set_parallel_file_name
 !
+      character(len=kchara), intent(in) :: file_name
       integer(kind=kint), intent(in) :: my_rank
       type(ucd_data), intent(in) :: ucd
 !
-      character(len=kchara) :: file_name
-!
-!
-      call set_parallel_grd_file_name(ucd%file_prefix, iflag_udt,       &
-     &    my_rank, file_name)
 !
       if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii UCD mesh: ', trim(file_name)
@@ -152,19 +141,17 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine read_udt_file(my_rank, istep, ucd)
+      subroutine read_udt_file(my_rank, file_name, ucd)
 !
       use udt_data_IO
 !
-      integer(kind=kint), intent(in) :: my_rank, istep
+      character(len=kchara), intent(in) :: file_name
+      integer(kind=kint), intent(in) :: my_rank
       type(ucd_data), intent(inout) :: ucd
 !
-      character(len=kchara) :: file_name
 !
-!
-      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_udt,       &
-     &    my_rank, istep, file_name)
-!
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii UDT data: ', trim(file_name)
       open (id_ucd_file, file=file_name, status='old')
 !
       call read_udt_field_header(id_ucd_file, ucd%num_field,            &
@@ -181,18 +168,17 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine read_and_alloc_udt_params(my_rank, istep, ucd)
+      subroutine read_and_alloc_udt_params(my_rank, file_name, ucd)
 !
       use udt_data_IO
 !
-      integer(kind=kint), intent(in) :: my_rank, istep
+      character(len=kchara), intent(in) :: file_name
+      integer(kind=kint), intent(in) :: my_rank
       type(ucd_data), intent(inout) :: ucd
 !
-      character(len=kchara) :: file_name
 !
-!
-      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_udt,       &
-     &    my_rank, istep, file_name)
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii UDT data: ', trim(file_name)
 !
       open (id_ucd_file, file=file_name, status='old')
       read(id_ucd_file,'(i16)') ucd%num_field
@@ -211,18 +197,17 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_and_alloc_udt_file(my_rank, istep, ucd)
+      subroutine read_and_alloc_udt_file(my_rank, file_name, ucd)
 !
       use udt_data_IO
 !
-      integer(kind=kint), intent(in) :: my_rank, istep
+      character(len=kchara), intent(in) :: file_name
+      integer(kind=kint), intent(in) :: my_rank
       type(ucd_data), intent(inout) :: ucd
 !
-      character(len=kchara) :: file_name
 !
-!
-      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_udt,       &
-     &    my_rank, istep, file_name)
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii UDT data: ', trim(file_name)
 !
       open (id_ucd_file, file=file_name, status='old')
       read(id_ucd_file,'(i16)') ucd%num_field
@@ -244,18 +229,18 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_and_alloc_ucd_file(my_rank, istep, nnod_ele, ucd)
+      subroutine read_and_alloc_ucd_file                                &
+     &         (my_rank, file_name, nnod_ele, ucd)
 !
       use udt_data_IO
 !
-      integer(kind=kint), intent(in) :: my_rank, istep, nnod_ele
+      character(len=kchara), intent(in) :: file_name
+      integer(kind=kint), intent(in) :: my_rank, nnod_ele
       type(ucd_data), intent(inout) :: ucd
 !
-      character(len=kchara) :: file_name
 !
-!
-      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_ucd,       &
-     &    my_rank, istep, file_name)
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii UCD data: ', trim(file_name)
 !
       open (id_ucd_file, file=file_name, status='old')
 !
@@ -280,18 +265,17 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_grd_file(my_rank, nnod_ele, ucd)
+      subroutine read_grd_file(my_rank, file_name, nnod_ele, ucd)
 !
+      character(len=kchara), intent(in) :: file_name
       integer(kind=kint), intent(in) :: my_rank, nnod_ele
       type(ucd_data), intent(inout) :: ucd
 !
-      character(len=kchara) :: file_name
 !
 !
-      call set_parallel_grd_file_name(ucd%file_prefix, iflag_udt,       &
-     &    my_rank, file_name)
+      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii PSF grid data: ', trim(file_name)
 !
-      write(*,*) 'PSF grid data: ', trim(file_name)
       open(id_ucd_file, file=file_name, form='formatted',               &
      &     status='old')
 !

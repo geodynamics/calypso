@@ -35,6 +35,57 @@ begin MHD_control
     field_file_fmt_ctl          'ascii'
   end data_files_def
 !
+!
+!!!!! Define of resolution and domain decomposition!!!!!!!!!
+!
+!    See 'spherical_shell_ctl' in detail'
+!
+!      num_radial_domain_ctl:       # of subdomains in radius
+!      num_horizontal_domain_ctl:   # of subdomains in horizontal
+!
+!      sph_grid_type_ctl:  FEM grid type
+!      radial_grid_type_ctl:  Type of raidal grid
+!      truncation_level_ctl:  Truncation for spherical harmonics
+!      ngrid_meridonal_ctl:   Number of meridianal grids
+!      ngrid_zonal_ctl:       Number of zonal grids
+!      num_fluid_grid_ctl:    Number of raidal grid in fluid shell
+!
+!      fluid_core_size_ctl:   Size of fluid shell
+!      ICB_to_CMB_ratio_ctl:  Aspect ratio of inner and outer boundary
+!      Min_radius_ctl         Minimum radius of the domain
+!      Max_radius_ctl         Maximum radius of the domain
+!
+!      num_radial_layering_ctl:       Nnumber of groups in fluid shell
+!      num_meridional_layering_ctl:   Nnumber of groups in meridional direction
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  file  spherical_shell_ctl  'ctl_shell'
+  begin spherical_shell_ctl
+    begin num_domain_ctl
+      num_radial_domain_ctl         2
+      num_horizontal_domain_ctl     4
+    end num_domain_ctl
+!
+    begin num_grid_sph
+      sph_grid_type_ctl       With_center
+!
+      truncation_level_ctl     31
+!
+      ngrid_meridonal_ctl      48
+      ngrid_zonal_ctl          96
+!
+      radial_grid_type_ctl   Chebyshev
+      num_fluid_grid_ctl     64
+      fluid_core_size_ctl   1.0
+      ICB_to_CMB_ratio_ctl  0.35
+      Min_radius_ctl        0.0
+      Max_radius_ctl        2.0
+!
+      num_radial_layering_ctl        4
+      num_meridional_layering_ctl    3
+    end num_grid_sph
+  end spherical_shell_ctl
+!
   begin model
 !!!!!  physical values!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! available valuables 
@@ -410,6 +461,55 @@ begin MHD_control
         ext_magne_vec  z     0.000   end
       end array ext_magne_vec
     end Magneto_convection_def
+!
+    begin SGS_control
+!      SGS_model_ctl           similarity
+      SGS_model_ctl           dynamic
+!
+      istep_dynamic_ctl         10
+      stabilize_weight_ctl      0.6
+!
+      begin filter_files_def
+        model_coef_rst_prefix       'rst_8/Csim_med'
+        commutel_coef_rst_prefix    'rst_8/Cdiff_med'
+        model_coef_rst_format  'merged_gz'
+        commute_coef_rst_format  'merged_gz'
+      end filter_files_def
+!
+      array sph_filter_ctl  1
+        begin sph_filter_ctl
+          number_of_moments        3
+          radial_filter_width     1.0
+          sphere_filter_width       1
+        end   sph_filter_ctl
+!
+!        begin sph_filter_ctl
+!          number_of_moments        5
+!          radial_filter_width     2.0
+!          sphere_filter_width       2
+!        end   sph_filter_ctl
+!
+!        begin sph_filter_ctl
+!          number_of_moments        9
+!          radial_filter_width     3.0
+!          sphere_filter_width       3
+!        end   sph_filter_ctl
+!
+!        begin sph_filter_ctl
+!          number_of_moments        23
+!          radial_filter_width     4.0
+!          sphere_filter_width       4
+!        end   sph_filter_ctl
+      end array sph_filter_ctl
+!
+      array SGS_terms_ctl      5
+        SGS_terms_ctl    heat              end
+        SGS_terms_ctl    inertia           end
+        SGS_terms_ctl    Lorentz           end
+        SGS_terms_ctl    induction         end
+        SGS_terms_ctl    gravity           end
+      end array SGS_terms_ctl
+    end SGS_control
   end model
 !
 !
@@ -526,63 +626,86 @@ begin MHD_control
   begin sph_monitor_ctl
     volume_average_prefix        'sph_ave_volume'
     volume_pwr_spectr_prefix     'sph_pwr_volume'
-    layered_pwr_spectr_prefix    'sph_pwr_layer'
-!
-    degree_spectr_switch         'On'
-    order_spectr_switch          'On'
-    diff_lm_spectr_switch        'On'
-!
     nusselt_number_prefix        'Nusselt'
-    picked_sph_prefix            'sph_spectr/picked_mode'
-    gauss_coefs_prefix           'sph_spectr/gauss_coefs'
-!
-    gauss_coefs_radius_ctl    2.91
-!
 !
 !   if num_pick_layer_ctl = 0 or negative: 
 !           No output
-    array spectr_layer_ctl  1
-      spectr_layer_ctl  62
-    end array spectr_layer_ctl
+!
+    begin layered_spectrum_ctl
+      layered_pwr_spectr_prefix    'sph_pwr_layer'
+!
+      degree_spectr_switch         'On'
+      order_spectr_switch          'On'
+      diff_lm_spectr_switch        'On'
+      axisymmetric_spectr_switch   'On'
+!
+      array spectr_layer_ctl  1
+        spectr_layer_ctl  62
+      end array spectr_layer_ctl
+    end layered_spectrum_ctl
 !
 !   if num_pick_layer_ctl = 0 or negative: 
 !           output all layer and volume average
 !
-    array pick_layer_ctl  1
-      pick_layer_ctl  62
-    end array pick_layer_ctl
+    begin pickup_spectr_ctl
+      picked_sph_prefix            'sph_spectr/picked_mode'
+!
+      array pick_layer_ctl  1
+        pick_layer_ctl  62
+      end array pick_layer_ctl
 !
 !
-    array pick_sph_spectr_ctl  2
-      pick_sph_spectr_ctl   2  -2
-      pick_sph_spectr_ctl   2   2
-    end array pick_sph_spectr_ctl
+      array pick_sph_spectr_ctl  2
+        pick_sph_spectr_ctl   2  -2
+        pick_sph_spectr_ctl   2   2
+      end array pick_sph_spectr_ctl
 !
-    array pick_sph_degree_ctl  2
-      pick_sph_degree_ctl   2
-      pick_sph_degree_ctl   2
-    end array pick_sph_degree_ctl
+      array pick_sph_degree_ctl  2
+        pick_sph_degree_ctl   2
+        pick_sph_degree_ctl   2
+      end array pick_sph_degree_ctl
 !
-    array pick_sph_order_ctl  2
-      pick_sph_order_ctl  -2
-      pick_sph_order_ctl   2
-    end array pick_sph_order_ctl
+      array pick_sph_order_ctl  2
+        pick_sph_order_ctl  -2
+        pick_sph_order_ctl   2
+      end array pick_sph_order_ctl
+    end pickup_spectr_ctl
 !
+    begin gauss_coefficient_ctl
+      gauss_coefs_prefix           'sph_spectr/gauss_coefs'
+      gauss_coefs_radius_ctl    2.82
 !
-    array pick_gauss_coefs_ctl  2
-      pick_gauss_coefs_ctl   2  -2
-      pick_gauss_coefs_ctl   2   2
-    end array pick_gauss_coefs_ctl
+      array pick_gauss_coefs_ctl  2
+        pick_gauss_coefs_ctl   2  -2
+        pick_gauss_coefs_ctl   2   2
+      end array pick_gauss_coefs_ctl
 !
-    array pick_gauss_coef_degree_ctl  2
-      pick_gauss_coef_degree_ctl   2
-      pick_gauss_coef_degree_ctl   2
-    end array pick_gauss_coef_degree_ctl
+      array pick_gauss_coef_degree_ctl  2
+        pick_gauss_coef_degree_ctl   1
+        pick_gauss_coef_degree_ctl   2
+      end array pick_gauss_coef_degree_ctl
 !
-    array pick_gauss_coef_order_ctl  2
-      pick_gauss_coef_order_ctl   -2
-      pick_gauss_coef_order_ctl    2
-    end array pick_gauss_coef_order_ctl
+      array pick_gauss_coef_order_ctl  2
+        pick_gauss_coef_order_ctl   -2
+        pick_gauss_coef_order_ctl    2
+      end array pick_gauss_coef_order_ctl
+    end   gauss_coefficient_ctl
+!
+    array volume_spectrum_ctl      2
+      begin volume_spectrum_ctl
+        volume_pwr_spectr_prefix     'sph_pwr_convective'
+        volume_average_prefix        'sph_ave_convective'
+        inner_radius_ctl           0.55
+        outer_radius_ctl           1.4
+      end volume_spectrum_ctl
+!
+      begin volume_spectrum_ctl
+        volume_pwr_spectr_prefix     'sph_pwr_inner_core'
+        volume_average_prefix        'sph_ave_inner_core'
+        inner_radius_ctl           0.0
+        outer_radius_ctl           0.538
+      end volume_spectrum_ctl
+    end array volume_spectrum_ctl
 !
     pick_circle_coord_ctl         spherical
     nphi_mid_eq_ctl         500

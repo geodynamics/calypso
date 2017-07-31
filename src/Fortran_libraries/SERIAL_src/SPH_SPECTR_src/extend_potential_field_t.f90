@@ -253,6 +253,8 @@
       subroutine gauss_to_poloidal_out_t(rj, kr_out, ltr_w, r_gauss,    &
      &          w_gauss, index_w, d_rj)
 !
+      use t_spheric_rj_data
+!
       type(sph_rj_grid), intent(in) :: rj
       integer(kind = kint), intent(in) :: kr_out, ltr_w
       real(kind = kreal), intent(in) :: r_gauss
@@ -270,7 +272,7 @@
       do j_gl = 1, ltr_w*(ltr_w+2)
         l_gl = int(index_w(j_gl,1))
         m_gl = int(index_w(j_gl,2))
-        j = find_local_sph_mode_address_t(rj, l_gl, m_gl)
+        j = find_local_sph_address(rj, l_gl, m_gl)
         if(j .eq. 0) cycle
         al = one / dble(l_gl)
 !
@@ -292,6 +294,8 @@
       subroutine gauss_to_poloidal_in_t(rj, kr_in, ltr_w, r_gauss,      &
      &          w_gauss, index_w, d_rj)
 !
+      use t_spheric_rj_data
+!
       type(sph_rj_grid), intent(in) :: rj
       integer(kind = kint), intent(in) :: kr_in, ltr_w
       real(kind = kreal), intent(in) :: r_gauss
@@ -311,7 +315,7 @@
       do j_gl = 1, ltr_w*(ltr_w+2)
         l_gl = int(index_w(j_gl,1))
         m_gl = int(index_w(j_gl,2))
-        j = find_local_sph_mode_address_t(rj, l_gl, m_gl)
+        j = find_local_sph_address(rj, l_gl, m_gl)
         if(j .eq. 0) cycle
         al1 = one / dble(l_gl+1)
 !

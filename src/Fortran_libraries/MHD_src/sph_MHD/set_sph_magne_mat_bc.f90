@@ -8,11 +8,10 @@
 !!
 !!@verbatim
 !!    Boundary condition to connect potential field
-!!      subroutine set_ins_magne_icb_rmat_sph(nri, jmax, kr_in, r_ICB,  &
-!!     &          fdm2_fix_dr_ICB, coef_dbt, bs_evo_mat)
-!!      subroutine set_ins_magne_cmb_rmat_sph(nri, jmax, kr_out, r_CMB, &
-!!     &          fdm2_fix_dr_CMB, coef_dbt, bs_evo_mat)
-!!
+!!      subroutine set_ins_magne_icb_rmat_sph(nri, jmax, g_sph_rj,      &
+!!     &          kr_in, r_ICB, fdm2_fix_dr_ICB, coef_dbt, bs_evo_mat)
+!!      subroutine set_ins_magne_cmb_rmat_sph(nri, jmax, g_sph_rj,      &
+!!     &          kr_out, r_CMB, fdm2_fix_dr_CMB, coef_dbt, bs_evo_mat)
 !!@endverbatim
 !
 !!@n @param jmax         Number of local spherical harmonics mode
@@ -32,11 +31,7 @@
       module set_sph_magne_mat_bc
 !
       use m_precision
-!
       use m_constants
-      use m_t_int_parameter
-      use m_physical_property
-      use m_schmidt_poly_on_rtm
 !
       implicit none
 !
@@ -46,10 +41,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_ins_magne_icb_rmat_sph(nri, jmax, kr_in, r_ICB,    &
-     &          fdm2_fix_dr_ICB, coef_dbt, bs_evo_mat)
+      subroutine set_ins_magne_icb_rmat_sph(nri, jmax, g_sph_rj,        &
+     &          kr_in, r_ICB, fdm2_fix_dr_ICB, coef_dbt, bs_evo_mat)
 !
       integer(kind = kint), intent(in) :: nri, jmax, kr_in
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
       real(kind = kreal), intent(in) :: r_ICB(0:2)
       real(kind = kreal), intent(in) :: fdm2_fix_dr_ICB(-1:1,3)
       real(kind = kreal), intent(in) :: coef_dbt
@@ -73,10 +69,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_ins_magne_cmb_rmat_sph(nri, jmax, kr_out, r_CMB,   &
-     &          fdm2_fix_dr_CMB, coef_dbt, bs_evo_mat)
+      subroutine set_ins_magne_cmb_rmat_sph(nri, jmax, g_sph_rj,        &
+     &          kr_out, r_CMB, fdm2_fix_dr_CMB, coef_dbt, bs_evo_mat)
 !
       integer(kind = kint), intent(in) :: nri, jmax, kr_out
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
       real(kind = kreal), intent(in) :: r_CMB(0:2)
       real(kind = kreal), intent(in) :: fdm2_fix_dr_CMB(-1:1,3)
       real(kind = kreal), intent(in) :: coef_dbt

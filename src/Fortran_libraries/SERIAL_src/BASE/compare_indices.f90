@@ -7,9 +7,12 @@
 !>@brief compare integers if these are same
 !!
 !!@verbatim
-!!      integer function check_4_on_3(i1, i2, i3, j1, j2, j3, j4)
-!!      integer function check_3_on_2(i1, i2, j1, j2, j3)
-!!      integer function check_2_on_1(i1, j1, j2)
+!!      integer(kind = kint) function                                   &
+!!     &                    check_4_on_3(i1, i2, i3, j1, j2, j3, j4)
+!!      integer(kind = kint) function                                   &
+!!     &                    check_3_on_2(i1, i2, j1, j2, j3)
+!!      integer(kind = kint) function                                   &
+!!     &                    check_2_on_1(i1, j1, j2)
 !!@endverbatim
 !!
 !!@param i1   1st compared integer
@@ -33,9 +36,10 @@
 !
 !------------------------------------------------------------------
 !
-      integer function check_4_on_3(i1, i2, i3, j1, j2, j3, j4)
+      integer(kind = kint) function                                     &
+     &                    check_4_on_3(i1, i2, i3, j1, j2, j3, j4)
 !
-      integer (kind = kint), intent(in) :: i1, i2, i3, j1, j2, j3, j4
+      integer(kind = kint), intent(in) :: i1, i2, i3, j1, j2, j3, j4
 !
 !
       if ( i1 .eq. j1 ) then
@@ -54,9 +58,10 @@
 !
 !------------------------------------------------------------------
 !
-      integer function check_3_on_2(i1, i2, j1, j2, j3)
+      integer(kind = kint) function                                     &
+     &                    check_3_on_2(i1, i2, j1, j2, j3)
 !
-      integer (kind = kint), intent(in) :: i1, i2, j1, j2, j3
+      integer(kind = kint), intent(in) :: i1, i2, j1, j2, j3
 !
       if ( i1 .eq. j1 ) then
        check_3_on_2 =  check_2_on_1(i2, j2, j3)
@@ -72,9 +77,10 @@
 !
 !------------------------------------------------------------------
 !
-      integer function check_2_on_1(i1, j1, j2)
+      integer(kind = kint) function                                     &
+     &                    check_2_on_1(i1, j1, j2)
 !
-      integer (kind = kint), intent(in) :: i1, j1, j2
+      integer(kind = kint), intent(in) :: i1, j1, j2
 !
 !
       if ( i1 .eq. j1 ) then

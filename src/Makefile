@@ -27,36 +27,60 @@ MAKENAME= $(MAKEDIR)/Makefile
 #
 FC_NAME_MANGLE = FC_NAME_LOWER_USCORE
 #
+#   zlib and libpng settings
+#
+ZLIB_CFLAGS =
+ZLIB_LIB =
+#
 #  -------------------------------------------------------------------------
 #
 
 SUBDIRS =         \
 Fortran_libraries \
+C_libraries       \
 External_libs     \
 programs
 
 
 
 F_INCLUDE = -I.
+C_INCLUDE = -I.
+
+ifdef FC_NAME_MANGLE
+  CPP_FLAGS = -DCONNECT_TO_C
+
+  ifdef ZLIB_LIB
+    CPP_FLAGS += -DZLIB_IO
+    C_INCLUDE+= $$(ZLIB_CFLAGS) 
+    F90LIBS+= $$(ZLIB_LIB)
+  endif
+endif
 
 ifdef FFTW3_LIBS
-  FORTRAN_C_CONNECT+= -DFFTW3
+  CPP_FLAGS+= -DFFTW3
+  C_INCLUDE+= $$(FFTW3_CFLAGS)
   F90LIBS+= $$(FFTW3_LIBS)
 endif
 
 ifdef BLAS_LIBS
-  FORTRAN_C_CONNECT+= -DBLAS
+  CPP_FLAGS+= -DBLAS
   F90LIBS+= $$(BLAS_LIBS)
 endif
 
 ifdef HDF5_FLIBS
-  FORTRAN_C_CONNECT+= -DHDF5_IO
+  CPP_FLAGS+= -DHDF5_IO
   F_INCLUDE+= $$(HDF5_FFLAGS)
   F90LIBS+= $$(HDF5_LDFLAGS) $$(HDF5_FLIBS)
 endif
 
 ifdef MPILIBS
   F90LIBS+= -L$(MPILIBDIR) $(MPILIBS)
+endif
+
+ifdef XL_FORTRAN
+  FORTRAN_C_CONNECT = -WF,"$(CPP_FLAGS)"
+else
+  FORTRAN_C_CONNECT = $(CPP_FLAGS)
 endif
 
 #
@@ -255,6 +279,19 @@ makemake:
 		MAKEDIR='$(MAKEDIR)' \
 		MAKENAME='$(MAKENAME)' \
 		module; \
+		) \
+	done
+	@echo '#' >> $(MAKENAME)
+	@echo '# Rules for includes' >> $(MAKENAME)
+	@echo '#' >> $(MAKENAME)
+	@for dir in C_libraries ; do \
+		( \
+		echo 'copy C include files for ' $$dir ; \
+		cd $${dir};  \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		MAKENAME='$(MAKENAME)' \
+		includes; \
 		) \
 	done
 	@echo '' >> $(MAKENAME)

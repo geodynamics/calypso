@@ -10,6 +10,7 @@ LIB_MESH_FILE = libcalypso_core.a
 SUBDIRS = \
 BASE                 \
 IO                   \
+IO_ZLIB              \
 spherical_harmonics  \
 gauss_integration    \
 FFT_wrapper          \
@@ -60,6 +61,9 @@ mod_list:
 	@echo  \
 	'$$(MOD_BASE)'     \
 	'$$(MOD_IO)'       \
+	'$$(MOD_BINARY_IO)'  \
+	'$$(MOD_ZLIB_IO)'    \
+	'$$(MOD_MPI_IO)'     \
 	'$$(MOD_GAUSS)'    \
 	'$$(MOD_SPH)'      \
 	'$$(MOD_FFT_WRAP)' \

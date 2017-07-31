@@ -7,34 +7,42 @@
 !>@brief  forward Legendre transform using matrix multi
 !!
 !!@verbatim
-!!      subroutine set_vr_rtm_vector_matmul(kst, nkr,                   &
-!!     &         mp_rlm, mn_rlm, ncomp, irev_sr_rtm, n_WR, WR,          &
+!!      subroutine set_vr_rtm_vector_matmul(nnod_rtm, nidx_rtm,         &
+!!     &         istep_rtm, nidx_rlm, asin_theta_1d_rtm, weight_rtm,    &
+!!     &         kst, nkr, mp_rlm, mn_rlm, ncomp, irev_sr_rtm, n_WR, WR,&
 !!     &         nvec_kl, symp_r, asmp_t, asmp_p, symn_t, symn_p)
-!!      subroutine set_vr_rtm_scalar_matmul(kst, nkr, mp_rlm,           &
-!!     &          ncomp, nvector, irev_sr_rtm, n_WR, WR, nscl_lk, symp)
+!!      subroutine set_vr_rtm_scalar_matmul                             &
+!!     &        (nnod_rtm, nidx_rtm, istep_rtm, nidx_rlm, weight_rtm,   &
+!!     &         kst, nkr, mp_rlm, ncomp, nvector, irev_sr_rtm,         &
+!!     &         n_WR, WR, nscl_lk, symp)
 !!
-!!      subroutine set_vr_rtm_vector_sym_matmul(kst, nkr,               &
-!!     &          mp_rlm, mn_rlm, nle_rtm, nlo_rtm, ncomp, irev_sr_rtm, &
-!!     &          n_WR, WR, symp_r, asmp_t, asmp_p, symn_t, symn_p,     &
+!!      subroutine set_vr_rtm_vector_sym_matmul(nnod_rtm, nidx_rtm,     &
+!!     &          istep_rtm, nidx_rlm, asin_theta_1d_rtm, weight_rtm,   &
+!!     &          kst, nkr, mp_rlm, mn_rlm, nle_rtm, nlo_rtm,           &
+!!     &          ncomp, irev_sr_rtm, n_WR, WR,                         &
+!!     &          symp_r, asmp_t, asmp_p, symn_t, symn_p,               &
 !!     &          asmp_r, symp_t, symp_p, asmn_t, asmn_p)
 !!      subroutine set_vr_rtm_scalar_sym_matmul                         &
-!!     &         (kst, nkr, mp_rlm, nle_rtm, nlo_rtm,                   &
-!!     &          ncomp, nvector, irev_sr_rtm, n_WR, WR, symp, asmp)
+!!     &        (nnod_rtm, nidx_rtm, istep_rtm, nidx_rlm, weight_rtm,   &
+!!     &         kst, nkr, mp_rlm, nle_rtm, nlo_rtm,                    &
+!!     &         ncomp, nvector, irev_sr_rtm, n_WR, WR, symp, asmp)
 !!
-!!      subroutine set_vr_rtm_vec_sym_matmul_big(kst, nkr,              &
-!!     &          mp_rlm, mn_rlm, nle_rtm, nlo_rtm, ncomp, nvector,     &
-!!     &          irev_sr_rtm, n_WR, WR, symp_r, asmp_p, asmp_r, symp_p)
-!!      subroutine set_vr_rtm_scl_sym_matmul_big(kst, nkr, mp_rlm,      &
-!!     &          nle_rtm, nlo_rtm, ncomp, nvector, nscalar,            &
-!!     &          irev_sr_rtm, n_WR, WR, symp, asmp)
+!!      subroutine set_vr_rtm_vec_sym_matmul_big(nnod_rtm, nidx_rtm,    &
+!!     &         istep_rtm, nidx_rlm, asin_theta_1d_rtm, weight_rtm,    &
+!!     &         kst, nkr, mp_rlm, mn_rlm, nle_rtm, nlo_rtm,            &
+!!     &         ncomp, nvector, irev_sr_rtm, n_WR, WR,                 &
+!!     &         symp_r, asmp_p, asmp_r, symp_p)
+!!      subroutine set_vr_rtm_scl_sym_matmul_big                        &
+!!     &         (nnod_rtm, nidx_rtm, istep_rtm, nidx_rlm, weight_rtm,  &
+!!     &          kst, nkr, mp_rlm,  nle_rtm, nlo_rtm,                  &
+!!     &          ncomp, nvector, nscalar, irev_sr_rtm,                 &
+!!     &          n_WR, WR, symp, asmp)
 !!@endverbatim
 !!
       module set_vr_rtm_for_leg_matmul
 !
       use m_precision
       use m_constants
-      use m_spheric_parameter
-      use m_schmidt_poly_on_rtm
 !
       implicit none
 !
@@ -44,11 +52,17 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_vr_rtm_vector_matmul(kst, nkr,                     &
-     &         mp_rlm, mn_rlm, ncomp, irev_sr_rtm, n_WR, WR,            &
+      subroutine set_vr_rtm_vector_matmul(nnod_rtm, nidx_rtm,           &
+     &         istep_rtm, nidx_rlm, asin_theta_1d_rtm, weight_rtm,      &
+     &         kst, nkr, mp_rlm, mn_rlm, ncomp, irev_sr_rtm, n_WR, WR,  &
      &         nvec_kl, symp_r, asmp_t, asmp_p, symn_t, symn_p)
 !
-      use m_work_4_sph_trans
+      integer(kind = kint), intent(in) :: nnod_rtm
+      integer(kind = kint), intent(in) :: nidx_rtm(3)
+      integer(kind = kint), intent(in) :: istep_rtm(3)
+      integer(kind = kint), intent(in) :: nidx_rlm(2)
+      real(kind = kreal), intent(in) :: weight_rtm(nidx_rtm(2))
+      real(kind = kreal), intent(in) :: asin_theta_1d_rtm(nidx_rtm(2))
 !
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: mp_rlm, mn_rlm
@@ -103,8 +117,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_vr_rtm_scalar_matmul(kst, nkr, mp_rlm,             &
-     &          ncomp, nvector, irev_sr_rtm, n_WR, WR, nscl_lk, symp)
+      subroutine set_vr_rtm_scalar_matmul                               &
+     &        (nnod_rtm, nidx_rtm, istep_rtm, nidx_rlm, weight_rtm,     &
+     &         kst, nkr, mp_rlm, ncomp, nvector, irev_sr_rtm,           &
+     &         n_WR, WR, nscl_lk, symp)
+!
+      integer(kind = kint), intent(in) :: nnod_rtm
+      integer(kind = kint), intent(in) :: nidx_rtm(3)
+      integer(kind = kint), intent(in) :: istep_rtm(3)
+      integer(kind = kint), intent(in) :: nidx_rlm(2)
+      real(kind = kreal), intent(in) :: weight_rtm(nidx_rtm(2))
 !
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: mp_rlm
@@ -145,12 +167,19 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_vr_rtm_vector_sym_matmul(kst, nkr,                 &
-     &          mp_rlm, mn_rlm, nle_rtm, nlo_rtm, ncomp, irev_sr_rtm,   &
-     &          n_WR, WR, symp_r, asmp_t, asmp_p, symn_t, symn_p,       &
+      subroutine set_vr_rtm_vector_sym_matmul(nnod_rtm, nidx_rtm,       &
+     &          istep_rtm, nidx_rlm, asin_theta_1d_rtm, weight_rtm,     &
+     &          kst, nkr, mp_rlm, mn_rlm, nle_rtm, nlo_rtm,             &
+     &          ncomp, irev_sr_rtm, n_WR, WR,                           &
+     &          symp_r, asmp_t, asmp_p, symn_t, symn_p,                 &
      &          asmp_r, symp_t, symp_p, asmn_t, asmn_p)
 !
-      use m_work_4_sph_trans
+      integer(kind = kint), intent(in) :: nnod_rtm
+      integer(kind = kint), intent(in) :: nidx_rtm(3)
+      integer(kind = kint), intent(in) :: istep_rtm(3)
+      integer(kind = kint), intent(in) :: nidx_rlm(2)
+      real(kind = kreal), intent(in) :: weight_rtm(nidx_rtm(2))
+      real(kind = kreal), intent(in) :: asin_theta_1d_rtm(nidx_rtm(2))
 !
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: mp_rlm, mn_rlm
@@ -264,8 +293,15 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_vr_rtm_scalar_sym_matmul                           &
-     &         (kst, nkr, mp_rlm, nle_rtm, nlo_rtm,                     &
-     &          ncomp, nvector, irev_sr_rtm, n_WR, WR, symp, asmp)
+     &        (nnod_rtm, nidx_rtm, istep_rtm, nidx_rlm, weight_rtm,     &
+     &         kst, nkr, mp_rlm, nle_rtm, nlo_rtm,                      &
+     &         ncomp, nvector, irev_sr_rtm, n_WR, WR, symp, asmp)
+!
+      integer(kind = kint), intent(in) :: nnod_rtm
+      integer(kind = kint), intent(in) :: nidx_rtm(3)
+      integer(kind = kint), intent(in) :: istep_rtm(3)
+      integer(kind = kint), intent(in) :: nidx_rlm(2)
+      real(kind = kreal), intent(in) :: weight_rtm(nidx_rtm(2))
 !
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: mp_rlm
@@ -330,11 +366,18 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_vr_rtm_vec_sym_matmul_big(kst, nkr,                &
-     &          mp_rlm, mn_rlm, nle_rtm, nlo_rtm, ncomp, nvector,       &
-     &          irev_sr_rtm, n_WR, WR, symp_r, asmp_p, asmp_r, symp_p)
+      subroutine set_vr_rtm_vec_sym_matmul_big(nnod_rtm, nidx_rtm,      &
+     &         istep_rtm, nidx_rlm, asin_theta_1d_rtm, weight_rtm,      &
+     &         kst, nkr, mp_rlm, mn_rlm, nle_rtm, nlo_rtm,              &
+     &         ncomp, nvector, irev_sr_rtm, n_WR, WR,                   &
+     &         symp_r, asmp_p, asmp_r, symp_p)
 !
-      use m_work_4_sph_trans
+      integer(kind = kint), intent(in) :: nnod_rtm
+      integer(kind = kint), intent(in) :: nidx_rtm(3)
+      integer(kind = kint), intent(in) :: istep_rtm(3)
+      integer(kind = kint), intent(in) :: nidx_rlm(2)
+      real(kind = kreal), intent(in) :: weight_rtm(nidx_rtm(2))
+      real(kind = kreal), intent(in) :: asin_theta_1d_rtm(nidx_rtm(2))
 !
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: mp_rlm, mn_rlm
@@ -446,9 +489,17 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_vr_rtm_scl_sym_matmul_big(kst, nkr, mp_rlm,        &
-     &          nle_rtm, nlo_rtm, ncomp, nvector, nscalar,              &
-     &          irev_sr_rtm, n_WR, WR, symp, asmp)
+      subroutine set_vr_rtm_scl_sym_matmul_big                          &
+     &         (nnod_rtm, nidx_rtm, istep_rtm, nidx_rlm, weight_rtm,    &
+     &          kst, nkr, mp_rlm,  nle_rtm, nlo_rtm,                    &
+     &          ncomp, nvector, nscalar, irev_sr_rtm,                   &
+     &          n_WR, WR, symp, asmp)
+!
+      integer(kind = kint), intent(in) :: nnod_rtm
+      integer(kind = kint), intent(in) :: nidx_rtm(3)
+      integer(kind = kint), intent(in) :: istep_rtm(3)
+      integer(kind = kint), intent(in) :: nidx_rlm(2)
+      real(kind = kreal), intent(in) :: weight_rtm(nidx_rtm(2))
 !
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: mp_rlm

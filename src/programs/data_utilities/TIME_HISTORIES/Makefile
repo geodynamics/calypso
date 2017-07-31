@@ -14,9 +14,9 @@ MOD_TAVE_SPH_ENE_SPEC = \
 t_average_sph_ene_spec.o \
 t_read_sph_spectra.o \
 m_tave_sph_ene_spectr.o \
+sph_mean_square_IO_select.o \
 simple_sph_spectr_head_IO.o \
 simple_sph_spectr_data_IO.o \
-sph_mean_square_IO_select.o \
 cal_tave_sph_ene_spectr.o
 
 MOD_T_AVE_PICK_SPH = \

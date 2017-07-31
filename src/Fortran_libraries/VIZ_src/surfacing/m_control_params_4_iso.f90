@@ -12,9 +12,12 @@
       module m_control_params_4_iso
 !
       use m_precision
+      use t_file_IO_parameter
 !
       implicit  none
 !
+!
+      character(len=kchara), parameter :: default_iso_prefix = 'iso'
 !
       character(len=kchara), parameter :: cflag_const_iso = 'const'
       character(len=kchara), parameter :: cflag_field_iso = 'field'
@@ -22,8 +25,9 @@
       integer(kind = kint), parameter :: iflag_constant_iso = -1
       integer(kind = kint), parameter :: iflag_field_iso =     1
 !
+      type(field_IO_params), allocatable :: iso_file_IO(:)
+!
       character(len = kchara), target, allocatable :: iso_header(:)
-      integer(kind = kint), target, allocatable :: itype_iso_file(:)
 !
 !
       integer(kind = kint), allocatable :: id_isosurf_data(:)
@@ -32,6 +36,8 @@
       real(kind=kreal), allocatable :: result_value_iso(:)
 !
       integer(kind = kint), allocatable :: id_iso_result_type(:)
+!
+      private :: default_iso_prefix
 !
 !  ---------------------------------------------------------------------
 !
@@ -46,8 +52,7 @@
       integer(kind= kint), intent(in) :: num_iso
 !
 !
-      allocate(iso_header(num_iso))
-      allocate(itype_iso_file(num_iso))
+      allocate(iso_file_IO(num_iso))
 !
       allocate(id_isosurf_data(num_iso))
       allocate(id_isosurf_comp(num_iso))
@@ -56,7 +61,7 @@
       allocate(id_iso_result_type(num_iso))
 !
 !
-      itype_iso_file = iflag_ucd
+      iso_file_IO(1:num_iso)%iflag_format = iflag_sgl_ucd
       id_iso_result_type = 0
 !
       id_isosurf_data =  0
@@ -73,9 +78,9 @@
      &          num_nod_phys, phys_nod_name, iso_fld, iso_param)
 !
       use m_file_format_switch
-      use m_control_data_4_iso
       use parallel_ucd_IO_select
       use set_field_comp_for_viz
+      use t_control_data_4_iso
       use t_phys_data
       use t_psf_patch_data
 !
@@ -94,17 +99,12 @@
       type(psf_parameters), intent(inout) :: iso_param
 !
       character(len=kchara) :: tmpchara
+      character(len=kchara), parameter :: default_iso_prefix = 'iso'
 !
 !
-      if(iso%iso_file_head_ctl%iflag .gt. 0) then
-        iso_header(i_iso) = iso%iso_file_head_ctl%charavalue
-      else
-        iso_header(i_iso) =  'iso'
-      end if
-!
-      call choose_para_fld_file_format                                  &
-     &   (iso%iso_output_type_ctl%charavalue,                           &
-     &    iso%iso_output_type_ctl%iflag, itype_iso_file(i_iso) )
+      call set_merged_ucd_file_ctl(default_iso_prefix,                  &
+     &    iso%iso_file_head_ctl, iso%iso_output_type_ctl,               &
+     &    iso_file_IO(i_iso))
 !
       if     (iso%iso_out_field_ctl%num .gt. 0                          &
      &  .and. iso%result_value_iso_ctl%iflag .gt. 0) then
@@ -140,9 +140,9 @@
       subroutine set_control_4_iso(i_iso, iso, num_mat, mat_name,       &
      &          num_nod_phys, phys_nod_name, iso_fld, iso_param)
 !
-      use m_control_data_4_iso
       use set_area_4_viz
       use set_field_comp_for_viz
+      use t_control_data_4_iso
       use t_phys_data
       use t_psf_patch_data
 !

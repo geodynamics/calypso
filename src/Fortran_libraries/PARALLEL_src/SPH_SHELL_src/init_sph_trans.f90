@@ -7,9 +7,19 @@
 !>@brief  Initialize spherical harmonics transform
 !!
 !!@verbatim
-!!      subroutine copy_sph_trans_nums_from_rtp
-!!      subroutine initialize_legendre_trans
-!!      subroutine initialize_sph_trans
+!!      subroutine initialize_sph_trans                                 &
+!!     &         (ncomp_trans, nvector_trns, nscalar_trns,              &
+!!     &          sph, comms_sph, trans_p, WK_sph)
+!!        type(sph_grids), intent(inout) :: sph
+!!        type(sph_comm_tables), intent(inout) :: comms_sph
+!!        type(parameters_4_sph_trans), intent(inout) :: trans_p
+!!        type(spherical_trns_works), intent(inout) :: WK_sph
+!!      subroutine initialize_legendre_trans                            &
+!!     &         (ncomp_trans, sph, comms_sph, leg, idx_trns)
+!!        type(sph_grids), intent(in) :: sph
+!!        type(sph_comm_tables), intent(in) :: comms_sph
+!!        type(legendre_4_sph_trans), intent(inout) :: leg
+!!        type(index_4_sph_trans), intent(inout) :: idx_trns
 !!@endverbatim
 !
       module init_sph_trans
@@ -17,9 +27,15 @@
       use m_precision
       use m_constants
 !
+      use t_spheric_parameter
+      use t_sph_trans_comm_tbl
+      use t_schmidt_poly_on_rtm
+      use t_work_4_sph_trans
+      use t_sph_transforms
+!
       implicit none
 !
-      private :: set_blocks_4_leg_trans
+      private :: init_legendre_rtm, set_blocks_4_leg_trans
 !
 ! -----------------------------------------------------------------------
 !
@@ -27,127 +43,183 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_sph_trans_nums_from_rtp
-!
-      use m_machine_parameter
-      use m_phys_constants
-      use m_sph_spectr_data
-      use m_work_4_sph_trans
-!
-!
-      ncomp_sph_trans =  num_tensor_rtp * n_sym_tensor                  &
-     &                 + num_vector_rtp * n_vector                      &
-     &                 + num_scalar_rtp * n_scalar
-!
-      if(iflag_debug .gt. 0) then
-        write(*,*) 'ncomp_sph_trans', ncomp_sph_trans
-      end if
-!
-      end subroutine copy_sph_trans_nums_from_rtp
-!
-! -----------------------------------------------------------------------
-!
-      subroutine initialize_sph_trans
+      subroutine initialize_sph_trans                                   &
+     &         (ncomp_trans, nvector_trns, nscalar_trns,                &
+     &          sph, comms_sph, trans_p, WK_sph)
 !
       use init_FFT_4_sph
-      use m_work_4_sph_trans
+!
+      integer(kind = kint), intent(in) :: ncomp_trans
+      integer(kind = kint), intent(in) :: nvector_trns, nscalar_trns
+      type(sph_grids), intent(inout) :: sph
+      type(sph_comm_tables), intent(inout) :: comms_sph
+      type(parameters_4_sph_trans), intent(inout) :: trans_p
+      type(spherical_trns_works), intent(inout) :: WK_sph
 !
 !
-      call initialize_legendre_trans
-      call init_fourier_transform_4_sph(ncomp_sph_trans)
+      iflag_FFT = iflag_FFTPACK
+      if(WK_sph%WK_leg%id_legendre .eq. iflag_leg_undefined) then
+        WK_sph%WK_leg%id_legendre = iflag_leg_sym_dgemm_big
+      end if
+!
+      call initialize_legendre_trans                                    &
+     &   (ncomp_trans, sph, comms_sph, trans_p%leg, trans_p%idx_trns)
+      call init_fourier_transform_4_sph(ncomp_trans, sph%sph_rtp,       &
+     &    comms_sph%comm_rtp, WK_sph%WK_FFTs)
+      call sel_init_legendre_trans                                      &
+     &   (ncomp_trans, nvector_trns, nscalar_trns,                      &
+     &    sph%sph_rtm, sph%sph_rlm, trans_p%leg, trans_p%idx_trns,      &
+     &    WK_sph%WK_leg)
 !
       end subroutine initialize_sph_trans
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine initialize_legendre_trans
+      subroutine initialize_legendre_trans                              &
+     &         (ncomp_trans, sph, comms_sph, leg, idx_trns)
 !
-      use m_schmidt_poly_on_rtm
-      use m_work_4_sph_trans
       use m_FFT_selector
       use schmidt_poly_on_rtm_grid
       use set_legendre_matrices
       use set_params_sph_trans
 !
+      integer(kind = kint), intent(in) :: ncomp_trans
+      type(sph_grids), intent(inout) :: sph
+      type(sph_comm_tables), intent(inout) :: comms_sph
+      type(legendre_4_sph_trans), intent(inout) :: leg
+      type(index_4_sph_trans), intent(inout) :: idx_trns
 !
-      call allocate_work_4_sph_trans
 !
-      call radial_4_sph_trans
-      call set_mdx_rlm_rtm
+      call alloc_work_4_sph_trans                                       &
+     &   (sph%sph_rtm%nidx_rtm, sph%sph_rlm%nidx_rlm, idx_trns)
 !
-      call s_cal_schmidt_poly_rtm
+      call radial_4_sph_trans                                           &
+     &   (sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
+      call set_mdx_rlm_rtm(sph%sph_params%l_truncation,                 &
+     &    sph%sph_rtm%nidx_rtm, sph%sph_rlm%nidx_rlm,                   &
+     &    sph%sph_rtm%idx_gl_1d_rtm_m, sph%sph_rlm%idx_gl_1d_rlm_j,     &
+     &    idx_trns%mdx_p_rlm_rtm, idx_trns%mdx_n_rlm_rtm,               &
+     &    idx_trns%maxdegree_rlm, idx_trns%lstack_rlm)
 !
-      call set_sin_theta_rtm
-      call set_sin_theta_rtp
+      call init_legendre_rtm(sph%sph_params%l_truncation,               &
+     &    sph%sph_rj, sph%sph_rtm, sph%sph_rlm, idx_trns, leg)
 !
-      call allocate_trans_schmidt_rtm
-      call set_trans_legendre_rtm
+      call const_sin_theta_rtp(leg, sph%sph_rtm, sph%sph_rtp)
 !
-      call allocate_hemi_schmidt_rtm
-      call set_legendre_hemispher_rtm
+      call set_sym_legendre_stack(sph%sph_rtm%nidx_rtm(3),              &
+     &    idx_trns%lstack_rlm, idx_trns%lstack_even_rlm)
 !
-      call set_blocks_4_leg_trans
+      call set_blocks_4_leg_trans                                       &
+     &   (ncomp_trans, sph, comms_sph, idx_trns)
 !
       end subroutine initialize_legendre_trans
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_blocks_4_leg_trans
+      subroutine init_legendre_rtm                                      &
+     &         (l_truncation, sph_rj, sph_rtm, sph_rlm, idx_trns, leg)
+!
+      use t_spheric_rtm_data
+      use t_spheric_rlm_data
+      use t_spheric_rj_data
+!
+      use set_legendre_matrices
+      use set_params_sph_trans
+      use schmidt_poly_on_rtm_grid
+!
+      integer(kind = kint), intent(in) :: l_truncation
+      type(sph_rj_grid), intent(in) :: sph_rj
+      type(sph_rtm_grid), intent(in) :: sph_rtm
+      type(sph_rlm_grid), intent(in) :: sph_rlm
+      type(index_4_sph_trans), intent(in) :: idx_trns
+!
+      type(legendre_4_sph_trans), intent(inout) :: leg
+!
+!
+      call set_gauss_points_rtm(sph_rtm%nidx_rtm(2), leg)
+!
+!     set Legendre polynomials
+!
+!
+      call alloc_schmidt_normalize                                      &
+     &   (sph_rlm%nidx_rlm(2), sph_rj%nidx_rj(2), leg)
+      call copy_sph_normalization_2_rlm(sph_rlm, leg%g_sph_rlm)
+      call copy_sph_normalization_2_rj(sph_rj, leg%g_sph_rj)
+!
+      call alloc_schmidt_poly_rtm                                       &
+     &   (sph_rtm%nidx_rtm(2), sph_rlm%nidx_rlm(2), leg)
+      call set_lagender_4_rlm(l_truncation, sph_rtm, sph_rlm,           &
+     &    idx_trns, leg%g_colat_rtm, leg%P_rtm, leg%dPdt_rtm)
+!
+      call alloc_trans_schmidt_rtm                                      &
+     &   (sph_rtm%nidx_rtm(2), sph_rlm%nidx_rlm(2), leg)
+      call set_trans_legendre_rtm                                       &
+     &   (sph_rtm%nidx_rtm(2), sph_rlm%nidx_rlm(2),                     &
+     &    leg%P_rtm, leg%dPdt_rtm, leg%P_jl, leg%dPdt_jl)
+!
+      call set_sin_theta_rtm(sph_rtm%nidx_rtm(2), leg%g_colat_rtm,      &
+     &    leg%asin_t_rtm)
+!
+      call alloc_schmidt_p_rtm_pole(sph_rlm%nidx_rlm(2), leg)
+      call set_lagender_pole_rlm(l_truncation, sph_rtm, sph_rlm,        &
+     &    idx_trns, leg%P_pole_rtm, leg%dPdt_pole_rtm)
+!
+      end subroutine init_legendre_rtm
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_blocks_4_leg_trans                                 &
+     &         (ncomp_trans, sph, comms_sph, idx_trns)
 !
       use calypso_mpi
       use m_machine_parameter
       use m_sph_communicators
-      use m_sph_trans_comm_table
-      use m_spheric_parameter
-      use m_spheric_param_smp
-      use m_work_4_sph_trans
+      use m_legendre_transform_list
       use init_spherical_SRs
-!      use set_all2all_buffer
       use cal_minmax_and_stacks
-      use legendre_transform_select
+!
+      integer(kind = kint), intent(in) :: ncomp_trans
+      type(sph_grids), intent(in) :: sph
+      type(sph_comm_tables), intent(in) :: comms_sph
+      type(index_4_sph_trans), intent(inout) :: idx_trns
+!
+      integer(kind = kint) :: lmax_block_rtm
 !
 !
       if(nvector_legendre .le. 0                                        &
-     &     .or. nvector_legendre .gt. nidx_rtm(2)) then
-        nblock_l_rtm =  1
+     &     .or. nvector_legendre .gt. sph%sph_rtm%nidx_rtm(2)) then
+        idx_trns%nblock_l_rtm =  1
       else
-        nblock_l_rtm =  nidx_rtm(2) / nvector_legendre
+        idx_trns%nblock_l_rtm                                           &
+     &         =  sph%sph_rtm%nidx_rtm(2) / nvector_legendre
       end if
       if(nvector_legendre .le. 0                                        &
-     &     .or. nvector_legendre .gt. nidx_rlm(2)) then
-        nblock_j_rlm =  1
+     &     .or. nvector_legendre .gt. sph%sph_rlm%nidx_rlm(2)) then
+        idx_trns%nblock_j_rlm =  1
       else
-        nblock_j_rlm =  nidx_rlm(2) / nvector_legendre
+        idx_trns%nblock_j_rlm                                           &
+     &          =  sph%sph_rlm%nidx_rlm(2) / nvector_legendre
       end if
 !
-      call allocate_l_rtm_block
-      call count_number_4_smp(nblock_l_rtm, ione, nidx_rtm(2),          &
-     &    lstack_block_rtm, lmax_block_rtm)
-      call count_number_4_smp(nblock_j_rlm, ione, nidx_rlm(2),          &
-     &    jstack_block_rlm, jmax_block_rlm)
+      call alloc_l_rtm_block(idx_trns)
+      call count_number_4_smp                                           &
+     &   (idx_trns%nblock_l_rtm, ione, sph%sph_rtm%nidx_rtm(2),         &
+     &    idx_trns%lstack_block_rtm, lmax_block_rtm)
 !
 !
-      call split_rtp_comms(nneib_domain_rtp, id_domain_rtp,             &
-     &    nneib_domain_rj) 
-      call init_sph_send_recv_N(ncomp_sph_trans)
-!
-!      if(iflag_sph_commN .eq. iflag_alltoall) then
-!        call set_rev_all2all_import_tbl(nnod_rtp, nmax_sr_rtp,         &
-!     &      nneib_domain_rtp, istack_sr_rtp, item_sr_rtp, irev_sr_rtp)
-!        call set_rev_all2all_import_tbl(nnod_rtm, nmax_sr_rtp,         &
-!     &      nneib_domain_rtm, istack_sr_rtm, item_sr_rtm, irev_sr_rtm)
-!        call set_rev_all2all_import_tbl(nnod_rlm, nmax_sr_rj,          &
-!     &      nneib_domain_rlm, istack_sr_rlm, item_sr_rlm, irev_sr_rlm)
-!        call set_rev_all2all_import_tbl(nnod_rj, nmax_sr_rj,           &
-!     &      nneib_domain_rj,  istack_sr_rj,  item_sr_rj,  irev_sr_rj)
-!      end if
+      call split_rtp_comms(comms_sph%comm_rtp%nneib_domain,             &
+     &    comms_sph%comm_rtp%id_domain, comms_sph%comm_rj%nneib_domain)
+      call init_sph_send_recv_N(ncomp_trans, sph, comms_sph)
 !
       if(my_rank .ne. 0) return
       write(*,*) 'Vector length for Legendre transform:',               &
      &          nvector_legendre
-      write(*,*) 'Block number for meridinal grid: ', nblock_l_rtm
-      write(*,*) 'Block number for Legendre transform: ', nblock_j_rlm
+      write(*,*) 'Block number for meridinal grid: ',                   &
+     &          idx_trns%nblock_l_rtm
+      write(*,*) 'Block number for Legendre transform: ',               &
+     &          idx_trns%nblock_j_rlm
 !
       end subroutine set_blocks_4_leg_trans
 !

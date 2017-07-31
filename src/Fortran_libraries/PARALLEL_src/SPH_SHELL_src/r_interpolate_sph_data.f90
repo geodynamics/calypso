@@ -5,16 +5,26 @@
 !
 !      subroutine deallocate_original_sph_data
 !
-!      subroutine copy_cmb_icb_radial_point
-!      subroutine set_cmb_icb_radial_point(cmb_r_grp, icb_r_grp)
-!      subroutine set_sph_magne_address
-!      subroutine input_old_rj_sph_trans(my_rank)
-!
-!      subroutine r_interpolate_sph_rst_from_IO(fld_IO)
-!         (substitution for set_sph_restart_from_IO)
-!      subroutine r_interpolate_sph_fld_from_IO(fld_IO)
-!         (substitution for set_rj_phys_data_from_IO)
-!      subroutine set_poloidal_b_by_gauss_coefs
+!!      subroutine copy_cmb_icb_radial_point(nlayer_ICB, nlayer_CMB)
+!!      subroutine set_cmb_icb_radial_point                             &
+!!     &         (cmb_r_grp, icb_r_grp, radial_rj_grp)
+!!        type(group_data), intent(in) :: radial_rj_grp
+!!      subroutine set_sph_magne_address(rj_fld, ipol)
+!!        type(phys_data), intent(in) :: rj_fld
+!!        type(phys_address), intent(inout) :: ipol
+!!      subroutine input_old_rj_sph_trans                               &
+!!     &         (rj_file_param, l_truncation, sph_rj)
+!!
+!!      subroutine r_interpolate_sph_rst_from_IO                        &
+!!     &         (fld_IO, sph_rj, ipol, rj_fld)
+!!      subroutine r_interpolate_sph_fld_from_IO                        &
+!!     &         (fld_IO, sph_rj, ipol, rj_fld)
+!!      subroutine set_poloidal_b_by_gauss_coefs                        &
+!!     &         (sph_rj, ipol, d_gauss, rj_fld)
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(phys_address), intent(in) :: ipol
+!!        type(global_gauss_points), intent(in) :: d_gauss
+!!        type(phys_data), intent(inout) :: rj_fld
 !
       module r_interpolate_sph_data
 !
@@ -23,7 +33,10 @@
       use calypso_mpi
       use m_constants
       use m_machine_parameter
-      use m_spheric_parameter
+!
+      use t_spheric_rj_data
+      use t_phys_address
+      use t_phys_data
 !
       implicit  none
 !
@@ -38,11 +51,9 @@
 !
       integer(kind = kint) :: ntot_phys_rj_itp
       real(kind = kreal), allocatable :: d_rj_org(:,:)
-      real(kind = kreal), allocatable :: d_rj_itp(:,:)
 !
       private :: allocate_original_sph_data
-      private :: copy_original_sph_rj_from_IO, const_radial_itp_table
-      private :: set_org_rj_phys_data_from_IO, r_interpolate_sph_vector
+      private :: copy_original_sph_rj_from_IO
 !
 !  -------------------------------------------------------------------
 !
@@ -50,7 +61,9 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine copy_cmb_icb_radial_point
+      subroutine copy_cmb_icb_radial_point(nlayer_ICB, nlayer_CMB)
+!
+      integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
 !
 !
       kr_outside = nlayer_CMB
@@ -60,28 +73,31 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine set_cmb_icb_radial_point(cmb_r_grp, icb_r_grp)
+      subroutine set_cmb_icb_radial_point                               &
+     &         (cmb_r_grp, icb_r_grp, radial_rj_grp)
 !
-      use m_group_data_sph_specr
+      use t_group_data
 !
       character(len = kchara), intent(in) :: cmb_r_grp, icb_r_grp
+      type(group_data), intent(in) :: radial_rj_grp
+!
       integer(kind = kint) :: igrp, inum
 !
 !
       kr_outside = 0
-      do igrp = 1, num_radial_grp_rj
-        if(name_radial_grp_rj(igrp) .eq. cmb_r_grp) then
-          inum = istack_radial_grp_rj(igrp-1) + 1
-          kr_outside = item_radial_grp_rj(inum)
+      do igrp = 1, radial_rj_grp%num_grp
+        if(radial_rj_grp%grp_name(igrp) .eq. cmb_r_grp) then
+          inum = radial_rj_grp%istack_grp(igrp-1) + 1
+          kr_outside = radial_rj_grp%item_grp(inum)
           exit
         end if
       end do
 !
       kr_inside = 0
-      do igrp = 1, num_radial_grp_rj
-        if(name_radial_grp_rj(igrp) .eq. icb_r_grp) then
-          inum = istack_radial_grp_rj(igrp-1) + 1
-          kr_inside = item_radial_grp_rj(inum)
+      do igrp = 1, radial_rj_grp%num_grp
+        if(radial_rj_grp%grp_name(igrp) .eq. icb_r_grp) then
+          inum = radial_rj_grp%istack_grp(igrp-1) + 1
+          kr_inside = radial_rj_grp%item_grp(inum)
           exit
         end if
       end do
@@ -119,17 +135,18 @@
 !  -------------------------------------------------------------------
 !  -------------------------------------------------------------------
 !
-      subroutine set_sph_magne_address
+      subroutine set_sph_magne_address(rj_fld, ipol)
 !
       use m_phys_labels
-      use m_sph_phys_address
-      use m_sph_spectr_data
+!
+      type(phys_data), intent(in) :: rj_fld
+      type(phys_address), intent(inout) :: ipol
 !
       integer(kind = kint) :: i
 !
-      do i = 1, num_phys_rj
-        if(phys_name_rj(i) .eq. fhd_magne) then
-          ipol%i_magne = istack_phys_comp_rj(i-1) + 1
+      do i = 1, rj_fld%num_phys
+        if(rj_fld%phys_name(i) .eq. fhd_magne) then
+          ipol%i_magne = rj_fld%istack_component(i-1) + 1
           exit
         end if
       end do
@@ -138,60 +155,79 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine input_old_rj_sph_trans(my_rank)
+      subroutine input_old_rj_sph_trans                                 &
+     &         (rj_file_param, l_truncation, sph_rj)
 !
-      use m_node_id_spherical_IO
-      use m_control_params_2nd_files
-      use sph_file_IO_select
+      use t_file_IO_parameter
+      use t_spheric_mesh
+      use t_spheric_data_IO
+      use sph_file_MPI_IO_select
+      use radial_interpolation
 !
-      integer(kind = kint), intent(in) :: my_rank
+      type(field_IO_params), intent(in) :: rj_file_param
+      integer(kind = kint), intent(inout) :: l_truncation
+      type(sph_rj_grid), intent(inout) ::  sph_rj
+!
+      type(sph_file_data_type) :: sph_file
 !
 !
       call set_sph_mesh_file_fmt_prefix                                 &
-     &   (ifmt_org_sph_rj_head, org_sph_rj_head)
-      call sel_read_spectr_modes_rj_file(my_rank)
-      call copy_original_sph_rj_from_IO
+     &   (rj_file_param%iflag_format, rj_file_param%file_prefix)
+      call sel_mpi_read_spectr_rj_file(nprocs, my_rank, sph_file)
+      call copy_original_sph_rj_from_IO(l_truncation, sph_rj,           &
+     &   sph_file%comm_IO, sph_file%sph_IO, sph_file%sph_grp_IO)
 !
-      call const_radial_itp_table
+      call const_radial_itp_table(nri_org, r_org,                       &
+     &    sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                     &
+     &    kr_inside, kr_outside, k_inter, rcoef_inter)
 !
       end subroutine input_old_rj_sph_trans
 !
 !  -------------------------------------------------------------------
 !
-      subroutine r_interpolate_sph_rst_from_IO(fld_IO)
+      subroutine r_interpolate_sph_rst_from_IO                          &
+     &         (fld_IO, sph_rj, ipol, rj_fld)
 !
       use m_phys_labels
-      use m_sph_phys_address
-      use m_sph_spectr_data
       use t_field_data_IO
       use extend_potential_field
+      use radial_interpolation
 !
       type(field_IO), intent(in) :: fld_IO
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(phys_address), intent(in) :: ipol
+!
+      type(phys_data), intent(inout) :: rj_fld
 !
       integer(kind = kint) :: i_fld, j_fld
 !
 !
-      do i_fld = 1, ntot_phys_rj
+      do i_fld = 1, rj_fld%ntot_phys
         do j_fld = 1, fld_IO%num_field_IO
-          if (phys_name_rj(i_fld) .eq. fld_IO%fld_name(j_fld)) then
-            if     (phys_name_rj(i_fld) .eq. fhd_velo                   &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_vort                   &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_press                  &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_temp                   &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_light                  &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_magne                  &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_mag_potential          &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_entropy                &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_pre_mom                &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_pre_uxb                &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_pre_heat               &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_pre_composit           &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_heat_source            &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_light_source           &
-     &         .or. phys_name_rj(i_fld) .eq. fhd_entropy_source         &
+          if(rj_fld%phys_name(i_fld) .eq. fld_IO%fld_name(j_fld)) then
+            if     (rj_fld%phys_name(i_fld) .eq. fhd_velo               &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_vort               &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_press              &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_temp               &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_light              &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_magne              &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_mag_potential      &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy            &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_mom            &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_uxb            &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_heat           &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_composit       &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_heat_source        &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_light_source       &
+     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy_source     &
      &         ) then
-              call set_org_rj_phys_data_from_IO(j_fld, fld_IO)
-              call r_interpolate_sph_vector(i_fld)
+              call set_org_rj_phys_data_from_IO                         &
+     &           (j_fld, fld_IO, n_rj_org, d_rj_org)
+              call r_interpolate_sph_vector(i_fld, sph_rj%nidx_rj,      &
+     &            rj_fld%n_point, rj_fld%num_phys, rj_fld%ntot_phys,    &
+     &            rj_fld%istack_component, kr_inside, kr_outside,       &
+     &            nri_org, k_inter, rcoef_inter, n_rj_org, d_rj_org,    &
+     &            rj_fld%d_fld)
               exit
             end if
           end if
@@ -199,39 +235,59 @@
       end do
 !
       if (ipol%i_magne .gt. 0) then
-        call ext_outside_potential(kr_outside, d_rj(1,ipol%i_magne))
-        call ext_inside_potential(kr_inside, d_rj(1,ipol%i_magne))
+        call ext_outside_potential(kr_outside, ipol%i_magne,            &
+     &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
+     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+        call ext_inside_potential(kr_inside, ipol%i_magne,              &
+     &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
+     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
 !
       end subroutine r_interpolate_sph_rst_from_IO
 !
 ! -------------------------------------------------------------------
 !
-      subroutine r_interpolate_sph_fld_from_IO(fld_IO)
+      subroutine r_interpolate_sph_fld_from_IO                          &
+     &         (fld_IO, sph_rj, ipol, rj_fld)
 !
-      use m_sph_phys_address
-      use m_sph_spectr_data
       use t_field_data_IO
       use extend_potential_field
+      use radial_interpolation
 !
       type(field_IO), intent(in) :: fld_IO
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(phys_address), intent(in) :: ipol
+      type(phys_data), intent(inout) :: rj_fld
 !
       integer(kind = kint) ::  i_fld, j_fld
 !
 !
-      do i_fld = 1, ntot_phys_rj
+      do i_fld = 1, rj_fld%ntot_phys
         do j_fld = 1, fld_IO%num_field_IO
-          if (phys_name_rj(i_fld) .eq. fld_IO%fld_name(j_fld)) then
-            call set_org_rj_phys_data_from_IO(j_fld, fld_IO)
-            call r_interpolate_sph_vector(i_fld)
+          if(rj_fld%phys_name(i_fld) .eq. fld_IO%fld_name(j_fld)) then
+            call set_org_rj_phys_data_from_IO                           &
+     &         (j_fld, fld_IO, n_rj_org, d_rj_org)
+            call r_interpolate_sph_vector(i_fld, sph_rj%nidx_rj,        &
+     &          rj_fld%n_point, rj_fld%num_phys, rj_fld%ntot_phys,      &
+     &          rj_fld%istack_component,  kr_inside, kr_outside,        &
+     &          nri_org, k_inter, rcoef_inter, n_rj_org, d_rj_org,      &
+     &          rj_fld%d_fld)
             exit
           end if
         end do
       end do
 !
       if (ipol%i_magne .gt. 0) then
-        call ext_outside_potential(kr_outside, d_rj(1,ipol%i_magne))
-        call ext_inside_potential(kr_inside, d_rj(1,ipol%i_magne))
+        call ext_outside_potential(kr_outside, ipol%i_magne,            &
+     &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
+     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+        call ext_inside_potential(kr_inside, ipol%i_magne,              &
+     &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
+     &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
 !
       end subroutine r_interpolate_sph_fld_from_IO
@@ -239,20 +295,28 @@
 ! -----------------------------------------------------------------------
 !  -------------------------------------------------------------------
 !
-      subroutine set_poloidal_b_by_gauss_coefs
+      subroutine set_poloidal_b_by_gauss_coefs                          &
+     &         (sph_rj, ipol, d_gauss, rj_fld)
 !
-      use m_sph_phys_address
-      use m_sph_spectr_data
-      use m_global_gauss_coefs
+      use t_global_gauss_coefs
       use extend_potential_field
+!
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(phys_address), intent(in) :: ipol
+      type(global_gauss_points), intent(in) :: d_gauss
+      type(phys_data), intent(inout) :: rj_fld
 !
 !
       write(*,*) ' ipol%i_magne', ipol%i_magne, kr_outside, kr_inside
       if (ipol%i_magne .gt. 0) then
-        call gauss_to_poloidal_out(kr_outside, ltr_w, r_gauss,          &
-     &      w_gauss, index_w, d_rj(1,ipol%i_magne))
-        call gauss_to_poloidal_in(kr_inside, ltr_w, r_gauss,            &
-     &      w_gauss, index_w, d_rj(1,ipol%i_magne))
+        call gauss_to_poloidal_out                                      &
+     &     (kr_outside, d_gauss%ltr_w, d_gauss%r_gauss,                 &
+     &      d_gauss%w_gauss, d_gauss%index_w, ipol%i_magne, sph_rj,     &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+        call gauss_to_poloidal_in                                       &
+     &     (kr_inside, d_gauss%ltr_w, d_gauss%r_gauss,                  &
+     &      d_gauss%w_gauss, d_gauss%index_w, ipol%i_magne, sph_rj,     &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
 !
       end subroutine set_poloidal_b_by_gauss_coefs
@@ -260,171 +324,65 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_original_sph_rj_from_IO
+      subroutine copy_original_sph_rj_from_IO(l_truncation, sph_rj,     &
+     &          comm_IO, sph_IO, sph_grps_IO)
 !
       use m_error_IDs
-      use m_node_id_spherical_IO
-      use m_comm_data_IO
-      use m_group_data_sph_specr_IO
+      use t_node_id_spherical_IO
+      use t_comm_table
+      use t_spheric_mesh
+!
+      integer(kind = kint), intent(in) :: l_truncation
+      type(sph_rj_grid), intent(in) ::  sph_rj
+!
+      type(communication_table), intent(inout) :: comm_IO
+      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_group_data), intent(inout) :: sph_grps_IO
 !
 !
-      if(sph_rank_rj(1).ne.sph_rank_IO(1)                               &
-     &       .or. sph_rank_rj(2).ne.sph_rank_IO(2)) then
+      if(sph_rj%irank_sph_rj(1).ne.sph_IO%sph_rank(1)                   &
+     &       .or. sph_rj%irank_sph_rj(2).ne.sph_IO%sph_rank(2)) then
         call calypso_MPI_abort(ierr_sph,'rj rank ID is wrong')
       end if
 !
-      if(nidx_global_rj(2) .ne. nidx_gl_sph_IO(2)) then
+      if(sph_rj%nidx_global_rj(2) .ne. sph_IO%nidx_gl_sph(2)) then
         call calypso_MPI_abort                                          &
      &     (ierr_sph,'number of local mode is wrong')
       end if
-      if(l_truncation .ne. ltr_gl_IO) then
+      if(l_truncation .ne. sph_IO%ltr_gl) then
         call calypso_MPI_abort(ierr_sph,'truncation is wrong')
       end if
 !
-      if(ist_rj(2).ne.ist_sph_IO(2)) then
+      if(sph_rj%ist_rj(2).ne.sph_IO%ist_sph(2)) then
         call calypso_MPI_abort                                          &
      &      (ierr_sph,'start point of harminics is wrong')
       end if
-      if(ied_rj(2).ne.ied_sph_IO(2)) then
+      if(sph_rj%ied_rj(2) .ne. sph_IO%ied_sph(2)) then
         call calypso_MPI_abort                                          &
      &     (ierr_sph,'end point of harminics is wrong')
       end if
 !
-      n_rj_org = nnod_sph_IO
-      nri_org =  nidx_sph_IO(1)
+      n_rj_org = sph_IO%numnod_sph
+      nri_org =  sph_IO%nidx_sph(1)
 !
       call allocate_original_sph_data
 !
-      r_org(1:n_rj_org) =   r_gl_1_IO(1:n_rj_org)
+      r_org(1:n_rj_org) = sph_IO%r_gl_1(1:n_rj_org)
 !
-      call deallocate_nod_id_sph_IO
-      call deallocate_idx_sph_1d1_IO
-      call deallocate_idx_sph_1d2_IO
+      call dealloc_num_idx_sph_IO(sph_IO)
+      call dealloc_nod_id_sph_IO(sph_IO)
+      call dealloc_idx_sph_1d1_IO(sph_IO)
+      call dealloc_idx_sph_1d2_IO(sph_IO)
 !
 !
-      call deallocate_import_item_IO
-      call deallocate_neib_domain_IO
+      call deallocate_type_import(comm_IO)
+      call deallocate_type_neib_id(comm_IO)
 !
-      call deallocate_rj_r_grp_IO_item
-      call deallocate_rj_j_grp_IO_item
+      call deallocate_grp_type(sph_grps_IO%radial_rj_grp)
+      call deallocate_grp_type(sph_grps_IO%sphere_rj_grp)
 !
       end subroutine copy_original_sph_rj_from_IO
 !
 ! ----------------------------------------------------------------------
-!
-      subroutine const_radial_itp_table
-!
-      integer(kind = kint) :: kst, k1, k2
-!
-!
-      kst = 1
-      do k1 = 1, nidx_rj(1)
-        if(radius_1d_rj_r(k1) .lt. r_org(1)) then
-          kr_inside = k1+1
-          k_inter(k1,1) = 0
-          k_inter(k1,2) = 0
-          rcoef_inter(k1,1) = zero
-          rcoef_inter(k1,2) = one
-        else if(radius_1d_rj_r(k1) .gt. r_org(nri_org)) then
-          kr_outside = k1-1
-          exit
-        else
-          do k2 = kst, nri_org-1
-            if(radius_1d_rj_r(k1).ge.r_org(k2)                          &
-     &        .and. radius_1d_rj_r(k1).le.r_org(k2+1)) then
-              k_inter(k1,1) = k2
-              k_inter(k1,2) = k2 + 1
-              rcoef_inter(k1,1) = (radius_1d_rj_r(k1) - r_org(k2))      &
-     &                           / (r_org(k2+1) - r_org(k2))
-              rcoef_inter(k1,2) = (r_org(k2+1) - radius_1d_rj_r(k1))    &
-     &                           / (r_org(k2+1) - r_org(k2))
-              kst = k2
-              exit
-            end if
-          end do
-        end if
-      end do
-      do k1 = kr_outside+1, nidx_rj(1)
-         k_inter(k1,1) = nri_org+1
-         k_inter(k1,2) = nri_org+1
-         rcoef_inter(k1,1) = one
-         rcoef_inter(k1,2) = zero
-      end do
-!
-      end subroutine const_radial_itp_table
-!
-!  -------------------------------------------------------------------
-! -------------------------------------------------------------------
-!
-      subroutine set_org_rj_phys_data_from_IO(j_fld, fld_IO)
-!
-      use t_field_data_IO
-!
-      integer(kind = kint), intent(in) :: j_fld
-      type(field_IO), intent(in) :: fld_IO
-!
-      integer(kind = kint) :: jst, nd
-!
-!
-      jst = fld_IO%istack_comp_IO(j_fld-1)
-      if(fld_IO%num_comp_IO(j_fld) .eq. 3) then
-        d_rj_org(1:n_rj_org,1) = fld_IO%d_IO(1:n_rj_org,jst+1)
-        d_rj_org(1:n_rj_org,2) = fld_IO%d_IO(1:n_rj_org,jst+3)
-        d_rj_org(1:n_rj_org,3) = fld_IO%d_IO(1:n_rj_org,jst+2)
-      else
-        do nd = 1, fld_IO%num_comp_IO(j_fld)
-          d_rj_org(1:n_rj_org,nd) = fld_IO%d_IO(1:n_rj_org,jst+nd)
-        end do
-      end if
-!
-      end subroutine set_org_rj_phys_data_from_IO
-!
-! -------------------------------------------------------------------
-! -------------------------------------------------------------------
-!
-      subroutine r_interpolate_sph_vector(i_fld)
-!
-      use m_sph_spectr_data
-!
-      integer(kind = kint), intent(in) :: i_fld
-      integer(kind = kint) :: i_comp, ist, ied, inod, k, j, nd, i1, i2
-!
-!
-!$omp parallel private(nd,i_comp,ist,ied,inod)
-      do nd = 1, num_phys_comp_rj(i_fld)
-        i_comp = nd + istack_phys_comp_rj(i_fld-1)
-        ist = 1
-        ied = (kr_inside-1) * nidx_rj(2)
-!$omp do private(inod)
-        do inod = 1, kr_inside-1
-            d_rj(inod,i_comp) = zero
-        end do
-!$omp end do nowait
-!
-!$omp do private(inod,k,j,i1,i2)
-        do k = kr_inside, kr_outside
-          do j = 1, nidx_rj(2)
-            inod = j + (k-1) * nidx_rj(2)
-            i1 = j + (k_inter(k,1)-1) * nidx_rj(2)
-            i2 = j + (k_inter(k,2)-1) * nidx_rj(2)
-            d_rj(i_comp,i_comp) = rcoef_inter(k,1)*d_rj_org(i1,nd)      &
-     &                         +  rcoef_inter(k,1)*d_rj_org(i2,nd)
-          end do
-        end do
-!$omp end do nowait
-!
-        ist = 1 + kr_outside * nidx_rj(2)
-        ied = nidx_rj(1) * nidx_rj(2)
-!$omp do private(inod)
-        do inod = 1, kr_inside-1
-          d_rj(inod,i_comp) = zero
-        end do
-!$omp end do nowait
-      end do
-!$omp end parallel
-!
-      end subroutine r_interpolate_sph_vector
-!
-!  -------------------------------------------------------------------
 !
       end module r_interpolate_sph_data

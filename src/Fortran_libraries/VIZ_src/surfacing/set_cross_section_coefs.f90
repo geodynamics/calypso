@@ -21,7 +21,7 @@
       use m_precision
 !
       use m_constants
-      use m_control_data_4_psf
+      use t_control_data_4_psf
 !
       implicit  none
 !

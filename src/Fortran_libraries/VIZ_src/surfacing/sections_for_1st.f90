@@ -3,21 +3,36 @@
 !
 !      Written by H. Matsui on Apr., 2012
 !
-!      subroutine init_visualize_surface
-!      subroutine visualize_surface(istep_psf, istep_iso)
-!
-!      subroutine cross_section_init_1st
-!      subroutine isosurface_init_1st
-!
-!      subroutine cross_section_main_1st(istep_psf)
-!      subroutine isosurface_main_1st(istep_iso)
+!!      subroutine init_visualize_surface(mesh, group, surf,            &
+!!     &          edge, edge_comm, nod_fld)
+!!      subroutine visualize_surface                                    &
+!!     &         (viz_step, time_d, mesh, ele_mesh, nod_fld)
+!!        type(VIZ_step_params), intent(in) :: viz_step
+!!        type(time_data), intent(in) :: time_d
+!!        type(mesh_geometry), intent(in) :: mesh
+!!        type(mesh_groups), intent(in) ::   group
+!!        type(element_geometry), intent(in) :: ele_mesh
+!!        type(phys_data), intent(in) :: nod_fld
 !
       module sections_for_1st
 !
       use m_precision
 !
       use m_machine_parameter
+      use m_work_time
       use calypso_mpi
+!
+      use t_VIZ_step_parameter
+      use t_time_data
+      use t_mesh_data
+      use t_comm_table
+      use t_geometry_data
+      use t_surface_data
+      use t_edge_data
+      use t_group_data
+      use t_surface_group_connect
+      use t_phys_data
+      use t_time_data
 !
       implicit  none
 !
@@ -27,131 +42,64 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine init_visualize_surface
+      subroutine init_visualize_surface                                 &
+     &         (mesh, group, ele_mesh, nod_fld)
 !
-      use m_control_data_sections
       use m_cross_section
       use m_isosurface
 !
       use set_psf_case_table
 !
+      type(mesh_geometry), intent(in) :: mesh
+      type(mesh_groups), intent(in) ::   group
+      type(element_geometry), intent(in) :: ele_mesh
 !
-      if ( (num_psf_ctl+num_iso_ctl) .gt. 0) then
-        if (iflag_debug.eq.1)  write(*,*) 'set_sectioning_case_table'
-        call set_sectioning_case_table
-      end if
+      type(phys_data), intent(in) :: nod_fld
 !
-      num_psf = num_psf_ctl
-      if (num_psf .gt. 0)  call cross_section_init_1st
 !
-      num_iso = num_iso_ctl
-      if (num_iso .gt. 0) call isosurface_init_1st
+      call start_eleps_time(60)
+      if (iflag_debug.eq.1)  write(*,*) 'set_sectioning_case_table'
+      call set_sectioning_case_table
+!
+      call SECTIONING_initialize(mesh%node, mesh%ele, ele_mesh%surf,    &
+     &    ele_mesh%edge, mesh%nod_comm, ele_mesh%edge_comm,             &
+     &    group%ele_grp, group%surf_grp, group%surf_nod_grp, nod_fld)
+      call end_eleps_time(60)
+!
+      call start_eleps_time(61)
+      call ISOSURF_initialize(mesh%node, mesh%ele,                      &
+     &    ele_mesh%surf, ele_mesh%edge, group%ele_grp, nod_fld)
+      call end_eleps_time(61)
 !
       end subroutine init_visualize_surface
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine visualize_surface(istep_psf, istep_iso)
+      subroutine visualize_surface                                      &
+     &         (viz_step, time_d, mesh, ele_mesh, nod_fld)
 !
       use m_cross_section
       use m_isosurface
 !
-      integer(kind = kint), intent(in) :: istep_psf, istep_iso
+      type(VIZ_step_params), intent(in) :: viz_step
+      type(time_data), intent(in) :: time_d
+      type(mesh_geometry), intent(in) :: mesh
+      type(element_geometry), intent(in) :: ele_mesh
+      type(phys_data), intent(in) :: nod_fld
 !
 !
-      if (num_psf.gt.0 .and. istep_psf.gt.0) then
-        call cross_section_main_1st(istep_psf)
-      end if
-      if (num_iso.gt.0 .and. istep_iso.gt.0) then
-        call isosurface_main_1st(istep_iso)
-      end if
+      call start_eleps_time(65)
+      call SECTIONING_visualize                                         &
+     &   (viz_step%PSF_t%istep_file, time_d, ele_mesh%edge, nod_fld)
+      call end_eleps_time(65)
+!
+      call start_eleps_time(66)
+      call ISOSURF_visualize                                            &
+     &   (viz_step%ISO_t%istep_file, time_d, mesh%node, mesh%ele,       &
+     &    ele_mesh%edge, ele_mesh%edge_comm, nod_fld)
+      call end_eleps_time(66)
 !
       end subroutine visualize_surface
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      subroutine cross_section_init_1st
-!
-      use m_nod_comm_table
-      use m_ele_sf_eg_comm_tables
-      use m_geometry_data
-      use m_group_data
-      use m_node_phys_data
-      use m_cross_section
-!
-!
-      call cross_section_init(node1%numnod, node1%internal_node,        &
-     &    ele1%numele, surf1%numsurf, edge1%numedge,                    &
-     &    ele1%nnod_4_ele, edge1%nnod_4_edge, ele1%ie, edge1%ie_edge,   &
-     &    edge1%interior_edge, surf1%isf_4_ele, edge1%iedge_4_sf,       &
-     &    edge1%iedge_4_ele, nod_comm, edge_comm, ele1%interior_ele,    &
-     &    node1%xx, node1%istack_nod_smp, ele1%istack_ele_smp,          &
-     &    surf1%istack_surf_smp, edge1%istack_edge_smp,                 &
-     &    ele_grp1, sf_grp1, sf_grp_nod1,                               &
-     &    nod_fld1%num_phys, nod_fld1%phys_name)
-!
-      end subroutine cross_section_init_1st
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine isosurface_init_1st
-!
-      use m_geometry_data
-      use m_group_data
-      use m_node_phys_data
-      use m_isosurface
-!
-!
-      call isosurface_init                                              &
-     &   (node1%numnod, ele1%numele, surf1%numsurf, edge1%numedge,      &
-     &    edge1%nnod_4_edge, edge1%ie_edge, surf1%isf_4_ele,            &
-     &    edge1%iedge_4_sf, ele1%interior_ele,                          &
-     &    node1%istack_nod_smp, ele1%istack_ele_smp,                    &
-     &    surf1%istack_surf_smp, edge1%istack_edge_smp,                 &
-     &    ele_grp1, nod_fld1%num_phys, nod_fld1%phys_name)
-!
-      end subroutine isosurface_init_1st
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      subroutine cross_section_main_1st(istep_psf)
-!
-      use m_geometry_data
-      use m_node_phys_data
-      use m_cross_section
-!
-      integer(kind = kint), intent(in) :: istep_psf
-!
-!
-      call cross_section_main(istep_psf, node1%numnod,                  &
-     &    edge1%numedge, edge1%nnod_4_edge, edge1%ie_edge,              &
-     &    nod_fld1%num_phys, nod_fld1%ntot_phys,                        &
-     &    nod_fld1%istack_component, nod_fld1%d_fld)
-!
-      end subroutine cross_section_main_1st
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine isosurface_main_1st(istep_iso)
-!
-      use m_geometry_data
-      use m_node_phys_data
-      use m_isosurface
-      use m_ele_sf_eg_comm_tables
-!
-      integer(kind = kint), intent(in) :: istep_iso
-!
-      call isosurface_main(istep_iso, node1%numnod, ele1%numele,        &
-     &    edge1%numedge, ele1%nnod_4_ele, edge1%nnod_4_edge, ele1%ie,   &
-     &    edge1%ie_edge, edge1%interior_edge, edge1%iedge_4_ele,        &
-     &    node1%xx, node1%rr, node1%a_r, node1%ss, node1%a_s,           &
-     &    node1%istack_nod_smp, edge_comm,                              &
-     &    nod_fld1%num_phys, nod_fld1%ntot_phys,                        &
-     &    nod_fld1%istack_component, nod_fld1%d_fld)
-!
-      end subroutine isosurface_main_1st
 !
 !  ---------------------------------------------------------------------
 !

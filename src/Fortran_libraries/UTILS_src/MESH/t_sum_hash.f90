@@ -24,13 +24,13 @@
 !>        Maximum address of sum of node ID
         integer(kind = kint) :: iend_hash
 !>        Number of items at each level
-        integer(kind = kint), pointer :: num_hash(:)
+        integer(kind = kint), allocatable :: num_hash(:)
 !>        Stack of items at each level
-        integer(kind = kint), pointer :: istack_hash(:)
+        integer(kind = kint), allocatable :: istack_hash(:)
 !>        item addresses
-        integer(kind = kint), pointer :: id_hash(:,:)
+        integer(kind = kint), allocatable :: id_hash(:,:)
 !>        item flag
-        integer(kind = kint), pointer :: iflag_hash(:)
+        integer(kind = kint), allocatable :: iflag_hash(:)
       end type sum_hash_tbl
 !
 !------------------------------------------------------------------

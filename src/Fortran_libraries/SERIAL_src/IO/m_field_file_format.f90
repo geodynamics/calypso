@@ -10,6 +10,7 @@
 !!@verbatim
 !!      subroutine choose_ucd_file_format(file_fmt_ctl, i_file_fmt,     &
 !!     &          id_field_file_format)
+!!      subroutine input_ucd_file_format_code(iflag_psf_fmt, file_head)
 !!
 !! ------------------------------------------------------------------
 !!   flag lists for field data
@@ -201,6 +202,32 @@
       end if
 !
       end subroutine choose_ucd_file_format
+!
+! -----------------------------------------------------------------------
+!
+      subroutine input_ucd_file_format_code(iflag_psf_fmt, file_head)
+!
+      integer(kind = kint), intent(inout) :: iflag_psf_fmt
+      character(len=kchara), intent(inout) :: file_head
+!
+!
+      write(*,*) 'Choose psf format'
+      write(*,*) iflag_ucd, ': UCD'
+      write(*,*) iflag_udt, ': UDT'
+      write(*,*) iflag_vtk, ': VTK'
+!      write(*,*) iflag_vtd, ': VTD'
+      write(*,*) iflag_ucd_gz, ': gzipped_UCD'
+      write(*,*) iflag_udt_gz, ': gzipped_UDT'
+      write(*,*) iflag_vtk_gz, ': gzipped_VTK'
+!      write(*,*) iflag_vtd_gz, ': gzipped_VTD'
+!
+      read(*,*)  iflag_psf_fmt
+      write(*,*) 'input file format code: ', iflag_psf_fmt
+!
+      write(*,*) 'input file prefix'
+      read(*,*) file_head
+!
+      end subroutine input_ucd_file_format_code
 !
 ! -----------------------------------------------------------------------
 !

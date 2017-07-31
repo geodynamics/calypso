@@ -71,7 +71,7 @@
       integer (kind = kint) :: neib, istart, inum, k, ii
 !
 !
-      call resize_work_4_SR(isix, NEIBPETOT,                            &
+      call resize_work_4_SR(isix, NEIBPETOT, NEIBPETOT,                 &
      &    STACK_EXPORT(NEIBPETOT), STACK_IMPORT(NEIBPETOT) )
 !C
 !C-- SEND

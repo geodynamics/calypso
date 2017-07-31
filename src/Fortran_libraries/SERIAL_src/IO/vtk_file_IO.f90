@@ -51,7 +51,6 @@
 !
       call write_vtk_data(id_vtk, ucd%nnod, ucd%num_field,              &
      &    ucd%ntot_comp, ucd%num_comp, ucd%phys_name, ucd%d_ucd)
-      endfile(id_vtk)
 !
       close(id_vtk)
 !
@@ -72,7 +71,6 @@
       call write_vtk_data                                               &
      &   (id_vtk, ucd%nnod, ucd%num_field, ucd%ntot_comp,               &
      &    ucd%num_comp, ucd%phys_name, ucd%d_ucd)
-      endfile(id_vtk)
 !
       close(id_vtk)
 !

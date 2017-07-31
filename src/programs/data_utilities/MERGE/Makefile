@@ -31,7 +31,7 @@ target_task:
 	'$$(LIB_CALYPSO_FILE)' \
 	>> $(MAKENAME)
 	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_NEWSPH)' '$$(MOD_NEWSPH)' \
-	'-L. $$(LIB_CALYPSO)' \
+	'-L. $$(LIB_CALYPSO) $$(LIB_CALYPSO_C)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 

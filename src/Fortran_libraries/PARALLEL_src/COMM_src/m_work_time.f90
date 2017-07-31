@@ -13,7 +13,7 @@
 !!      subroutine start_eleps_time(iflag_elps)
 !!      subroutine end_eleps_time(iflag_elps)
 !!      subroutine reset_eleps_time(iflag_elps)
-!!      subroutine copy_COMM_TIME_to_eleps(iflag_elps)
+!!      subroutine copy_COMM_TIME_to_elaps(iflag_elps)
 !!
 !!      subroutine output_elapsed_times
 !!@endverbatim
@@ -133,7 +133,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine copy_COMM_TIME_to_eleps(iflag_elps)
+      subroutine copy_COMM_TIME_to_elaps(iflag_elps)
 !
       use calypso_mpi
 !
@@ -142,7 +142,7 @@
 !
       elapsed(iflag_elps) = SendRecvtime
 !
-      end subroutine copy_COMM_TIME_to_eleps
+      end subroutine copy_COMM_TIME_to_elaps
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

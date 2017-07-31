@@ -7,16 +7,21 @@
 !> @brief ascii format data IO
 !!
 !!@verbatim
-!!      subroutine write_ucd_2_fld_file(my_rank, istep, ucd)
+!!      subroutine write_ucd_2_fld_file(my_rank, file_name, t_IO, ucd)
+!!        type(time_data), intent(in) :: t_IO
+!!        type(ucd_data), intent(in) :: ucd
 !!
-!!      subroutine read_ucd_2_fld_file(my_rank, istep, ucd)
-!!      subroutine read_alloc_ucd_2_fld_file(my_rank, istep, ucd)
+!!      subroutine read_ucd_2_fld_file(my_rank, file_name, t_IO, ucd)
+!!      subroutine read_alloc_ucd_2_fld_file                            &
+!!     &         (my_rank, file_name, t_IO, ucd)
+!!        type(time_data), intent(inout) :: t_IO
 !!        type(ucd_data), intent(inout) :: ucd
 !!@endverbatim
 !!
-!!@param my_rank  process ID
-!!@param istep    step number for output
-!!@param ucd      Structure for FEM field data IO
+!!@param my_rank    process ID
+!!@param file_name  File name
+!!@param t_IO      Structure for time information
+!!@param ucd       Structure for FEM field data IO
 !
       module ucd_field_file_IO
 !
@@ -24,13 +29,13 @@
       use m_machine_parameter
 !
       use m_constants
-      use m_time_data_IO
       use m_field_file_format
 !
+      use t_time_data
       use t_ucd_data
 !
+      use time_data_IO
       use field_data_IO
-      use set_ucd_file_names
 !
       implicit none
 !
@@ -43,17 +48,15 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine write_ucd_2_fld_file(my_rank, istep, ucd)
+      subroutine write_ucd_2_fld_file(my_rank, file_name, t_IO, ucd)
 !
-      integer(kind=kint), intent(in) :: my_rank, istep
+      character(len=kchara), intent(in) :: file_name
+      integer(kind=kint), intent(in) :: my_rank
+      type(time_data), intent(in) :: t_IO
       type(ucd_data), intent(in) :: ucd
 !
-      character(len=kchara) :: file_name
       integer(kind= kint) :: nnod4
 !
-!
-      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_fld,       &
-     &    my_rank, istep, file_name)
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write ascii step data file: ', trim(file_name)
@@ -61,7 +64,7 @@
       open(id_fld_file, file = file_name, form = 'formatted')
 !
       nnod4 = int(ucd%nnod)
-      call write_step_data(id_fld_file, my_rank)
+      call write_step_data(id_fld_file, my_rank, t_IO)
       call write_field_data(id_fld_file, nnod4, ucd%num_field,          &
      &    ucd%ntot_comp, ucd%num_comp, ucd%phys_name, ucd%d_ucd)
 !
@@ -72,27 +75,25 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_ucd_2_fld_file(my_rank, istep, ucd)
+      subroutine read_ucd_2_fld_file(my_rank, file_name, t_IO, ucd)
 !
       use skip_comment_f
 !
-      integer(kind=kint), intent(in) :: my_rank, istep
+      character(len=kchara), intent(in) :: file_name
+      integer(kind=kint), intent(in) :: my_rank
+      type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
 !
-      character(len=kchara) :: file_name
       character(len=255) :: character_4_read
       integer(kind= kint) :: nnod4
 !
-!
-      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_fld,       &
-     &    my_rank, istep, file_name)
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read ascii data file: ', trim(file_name)
 !
       open(id_fld_file, file = file_name, form = 'formatted')
 !
-      call read_step_data(id_fld_file)
+      call read_step_data(id_fld_file, t_IO)
 !
       call skip_comment(character_4_read, id_fld_file)
       read(character_4_read,*) nnod4, ucd%num_field
@@ -108,27 +109,26 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine read_alloc_ucd_2_fld_file(my_rank, istep, ucd)
+      subroutine read_alloc_ucd_2_fld_file                              &
+     &         (my_rank, file_name, t_IO, ucd)
 !
       use skip_comment_f
 !
-      integer(kind=kint), intent(in) :: my_rank, istep
+      character(len=kchara), intent(in) :: file_name
+      integer(kind=kint), intent(in) :: my_rank
+      type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
 !
-      character(len=kchara) :: file_name
       character(len=255) :: character_4_read
       integer(kind= kint) :: nnod4
 !
-!
-      call set_parallel_ucd_file_name(ucd%file_prefix, iflag_fld,       &
-     &    my_rank, istep, file_name)
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read ascii data file: ', trim(file_name)
 !
       open(id_fld_file, file = file_name, form = 'formatted')
 !
-      call read_step_data(id_fld_file)
+      call read_step_data(id_fld_file, t_IO)
 !
       call skip_comment(character_4_read, id_fld_file)
       read(character_4_read,*) nnod4, ucd%num_field

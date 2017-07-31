@@ -38,9 +38,9 @@
 !>        Number of node/edge/surface/element for searching
         integer(kind = kint) :: num_search
 !>        SMP stack for searching
-        integer(kind = kint), pointer :: istack_search_smp(:)
+        integer(kind = kint), allocatable :: istack_search_smp(:)
 !>        Local node/edge/surface/element ID for searching
-        integer(kind = kint), pointer :: id_search(:)
+        integer(kind = kint), allocatable :: id_search(:)
       end type sect_search_list
 !
 !>      Structure for search list for sectioning
@@ -55,7 +55,7 @@
         type(sect_search_list) :: node_list
 !
 !>        marking for element generation
-        integer(kind = kint), pointer :: mark_e(:)
+        integer(kind = kint), allocatable :: mark_e(:)
       end type psf_search_lists
 !
 !
@@ -63,49 +63,49 @@
       type sectioning_list
 !
 !>        reference field for sectioning
-        real(kind = kreal), pointer :: ref_fld(:)
+        real(kind = kreal), allocatable :: ref_fld(:)
 !
 !>        Number of interior nodes for sections on edge
         integer(kind = kint) :: internod_on_edge
 !>        Number of interior nodes for sections on edge
         integer(kind = kint) :: externod_on_edge
 !>        SMP stack for sections on edge
-        integer(kind = kint), pointer :: istack_inter_n_on_e_smp(:)
+        integer(kind = kint), allocatable :: istack_inter_n_on_e_smp(:)
 !>        SMP stack for sections on edge
-        integer(kind = kint), pointer :: istack_exter_n_on_e_smp(:)
+        integer(kind = kint), allocatable :: istack_exter_n_on_e_smp(:)
 !
 !>        ID for node on edge
-        integer(kind = kint_gl), pointer :: id_n_on_e(:)
+        integer(kind = kint_gl), allocatable :: id_n_on_e(:)
 !
 !>        Edge ID for sections on internal node
-        integer(kind = kint), pointer :: iedge_int_nod(:)
+        integer(kind = kint), allocatable :: iedge_int_nod(:)
 !>        Interpolation coefficients for internal node on edge
-        real(kind = kreal), pointer :: coef_int_edge(:,:)
+        real(kind = kreal), allocatable :: coef_int_edge(:,:)
 !
 !>        Edge ID for sections on external node
-        integer(kind = kint), pointer :: iedge_ext_nod(:)
+        integer(kind = kint), allocatable :: iedge_ext_nod(:)
 !>        Interpolation coefficients for external node on edge
-        real(kind = kreal), pointer :: coef_ext_edge(:,:)
+        real(kind = kreal), allocatable :: coef_ext_edge(:,:)
       end type sectioning_list
 !
 !>      Structure for cross sectioning by surface group list
       type grp_section_list
 !>        ID for node on node
-        integer(kind = kint_gl), pointer :: id_n_on_n(:)
+        integer(kind = kint_gl), allocatable :: id_n_on_n(:)
 !
 !>        Number of interior nodes for sections on node
         integer(kind = kint) :: internod_on_nod
 !>        Number of interior nodes for sections on node
         integer(kind = kint) :: externod_on_nod
 !>        SMP stack for sections on node
-        integer(kind = kint), pointer :: istack_inter_n_on_n_smp(:)
+        integer(kind = kint), allocatable :: istack_inter_n_on_n_smp(:)
 !>        SMP stack for sections on edge
-        integer(kind = kint), pointer :: istack_exter_n_on_n_smp(:)
+        integer(kind = kint), allocatable :: istack_exter_n_on_n_smp(:)
 !
 !>        Node ID for sections on intenal node
-        integer(kind = kint), pointer :: inod_int_nod(:)
+        integer(kind = kint), allocatable :: inod_int_nod(:)
 !>        Node ID for sections on external node
-        integer(kind = kint), pointer :: inod_ext_nod(:)
+        integer(kind = kint), allocatable :: inod_ext_nod(:)
       end type grp_section_list
 !
 !  ---------------------------------------------------------------------

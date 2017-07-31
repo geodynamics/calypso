@@ -7,8 +7,20 @@
 !>@brief  Set global spherical harmonics ID
 !!
 !!@verbatim
-!!      subroutine s_const_global_sph_grids_modes
-!!      subroutine check_nidx_local(ip_rank)
+!!      subroutine s_const_global_sph_grids_modes                       &
+!!     &         (sph_params, sph_rtp, sph_rtm, sph_rj, s3d_ranks,      &
+!!     &          sph_lcp, stk_lc1d, sph_gl1d)
+!!      subroutine const_global_sph_FEM_grid                            &
+!!     &         (sph_params, sph_rtp, sph_rj, s3d_ranks,               &
+!!     &          sph_lcp, stk_lc1d, sph_gl1d)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
+!!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!        type(sph_rtm_grid), intent(in) :: sph_rtm
+!!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(spheric_global_rank), intent(inout) :: s3d_ranks
+!!        type(sph_local_parameters), intent(inout) :: sph_lcp
+!!        type(sph_1d_index_stack), intent(inout) :: stk_lc1d
+!!        type(sph_1d_global_index), intent(inout) :: sph_gl1d
 !!@endverbatim
 !!
 !!@param ip_rank process ID
@@ -19,35 +31,25 @@
 !
       use m_machine_parameter
       use m_constants
-      use m_spheric_parameter
+!
+      use t_spheric_parameter
+      use t_sph_local_parameter
+      use t_spheric_global_ranks
+      use t_sph_1d_global_index
+      use t_sph_local_parameter
+      use t_2d_sph_trans_table
+!
       use set_global_spherical_param
       use set_indices_4_sph_tranform
+      use const_each_global_sph_list
 !
       implicit none
 !
-      integer(kind = kint), allocatable :: nidx_local_rtp_r(:)
-      integer(kind = kint), allocatable :: nidx_local_rtp_t(:)
-      integer(kind = kint), allocatable :: nidx_local_rtp_p(:)
+      type(sph_local_1d_param), save :: sph_lc1_SP
+      type(sph_trans_2d_table), save :: s2d_tbl_SP
+      type(sph_local_default_BC), save :: sph_dbc_SP
 !
-      integer(kind = kint), allocatable :: nidx_local_rtm_r(:)
-      integer(kind = kint), allocatable :: nidx_local_rtm_t(:)
-      integer(kind = kint), allocatable :: nidx_local_rtm_m(:)
-!
-      integer(kind = kint), allocatable :: nidx_local_rlm_r(:)
-      integer(kind = kint), allocatable :: nidx_local_rlm_j(:)
-!
-      integer(kind = kint), allocatable :: nidx_local_rj_r(:)
-      integer(kind = kint), allocatable :: nidx_local_rj_j(:)
-!
-!      private :: nidx_local_rtp_r, nidx_local_rtp_t, nidx_local_rtp_p
-!      private :: nidx_local_rtm_r, nidx_local_rtm_t, nidx_local_rtm_m
-!      private :: nidx_local_rlm_r, nidx_local_rlm_j
-!      private :: nidx_local_rj_r, nidx_local_rj_j
-!
-!      private :: const_global_rtp_grids, const_global_rtm_grids
-!      private :: const_global_rj_modes_by_rlm, const_global_rlm_modes
-!      private :: const_sph_transfer_tables
-!      private :: allocate_nidx_local, deallocate_nidx_local
+      private :: sph_lc1_SP, s2d_tbl_SP
 !
 ! -----------------------------------------------------------------------
 !
@@ -55,374 +57,146 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_const_global_sph_grids_modes
+      subroutine s_const_global_sph_grids_modes                         &
+     &         (sph_params, sph_rtp, sph_rtm, sph_rj, s3d_ranks,        &
+     &          sph_lcp, stk_lc1d, sph_gl1d)
 !
-      use m_spheric_global_ranks
-      use m_sph_global_parameter
-      use m_sph_1d_global_index
-      use m_2d_sph_trans_table
       use set_sph_1d_global_index
       use set_sph_1d_domain_id
+      use set_sph_tranform_ordering
+!
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_rtm_grid), intent(in) :: sph_rtm
+      type(sph_rj_grid), intent(in) :: sph_rj
+!
+      type(spheric_global_rank), intent(inout) :: s3d_ranks
+      type(sph_local_parameters), intent(inout) :: sph_lcp
+      type(sph_1d_index_stack), intent(inout) :: stk_lc1d
+      type(sph_1d_global_index), intent(inout) :: sph_gl1d
 !
 !
-      call allocate_sph_1d_global_stack
-      call allocate_sph_gl_parameter
-      call allocate_sph_gl_bc_param
-      call allocate_sph_ranks
-      call allocate_nidx_local
+      call alloc_sph_1d_global_stack(s3d_ranks, stk_lc1d)
+      call alloc_sph_gl_parameter(s3d_ranks, sph_lcp)
+      call alloc_sph_gl_bc_param(s3d_ranks, sph_dbc_SP)
+      call alloc_sph_ranks(s3d_ranks)
+      call alloc_nidx_local(s3d_ranks, sph_lc1_SP)
+      call alloc_2d_sph_trans_table(sph_rtp, sph_rj, s2d_tbl_SP)
 !
 !
       if(iflag_debug .gt. 0) write(*,*) 'const_global_rtp_grids'
-      call const_global_rtp_grids
+      call const_global_rtp_grids(sph_params, sph_rtp,                  &
+     &    s3d_ranks, sph_lc1_SP, sph_lcp, sph_dbc_SP, stk_lc1d)
 !
       if(iflag_debug .gt. 0) write(*,*) 'const_global_rtm_grids'
-      call const_global_rtm_grids
+      call const_global_rtm_grids(sph_params, sph_rtm,                  &
+     &    s3d_ranks, sph_lc1_SP, sph_lcp, sph_dbc_SP, stk_lc1d)
 !
       if(iflag_debug .gt. 0) write(*,*) 'const_global_rlm_modes'
-      call const_global_rlm_modes
+      call const_global_rlm_modes(sph_params, sph_rtp, sph_rj,          &
+     &    s3d_ranks, sph_lc1_SP, sph_lcp, stk_lc1d, s2d_tbl_SP)
 !
       if(iflag_debug .gt. 0) write(*,*) 'const_global_rj_modes_by_rlm'
-      call const_global_rj_modes_by_rlm
+      call const_global_rj_modes_by_rlm                                 &
+     &   (sph_rj, s3d_ranks, sph_lc1_SP, sph_lcp, stk_lc1d, s2d_tbl_SP)
 !
-      if(iflag_debug .gt. 0) write(*,*) 'const_sph_transfer_tables'
-      call const_sph_transfer_tables
+      if(iflag_debug .gt. 0) write(*,*) 'set_trans_table_fft_2_lgd'
+      call set_trans_table_fft_2_lgd(sph_params%l_truncation,           &
+     &    sph_rtp%nidx_global_rtp(2), sph_rtp%nidx_global_rtp(3),       &
+     &    sph_params%m_folding, s2d_tbl_SP%mspec_4_ispack,              &
+     &    s2d_tbl_SP%jdx_fsph, s2d_tbl_SP%mtbl_fft_2_lgd)
 !
-      call deallocate_nidx_local
-      call allocate_sph_1d_global_idx
+!
+      call dealloc_nidx_local(sph_lc1_SP)
+      call alloc_sph_1d_global_idx(s3d_ranks, stk_lc1d, sph_gl1d)
 !
       call set_sph_1d_global_idx_rtp                                    &
-     &   (m_folding, nidx_global_rtp(3), mdx_ispack)
+     &   (sph_params%m_folding, sph_rtp%nidx_global_rtp(3),             &
+     &    s2d_tbl_SP%mdx_ispack, s3d_ranks,                             &
+     &    sph_dbc_SP, stk_lc1d, sph_gl1d)
       call set_sph_1d_global_idx_rtm                                    &
-     &   (m_folding, nidx_global_rtp(3), mtbl_fft_2_lgd, mdx_4_lgd)
-      call set_sph_1d_global_idx_rlm(nidx_global_rj(2), jtbl_fsph)
-      call set_sph_1d_global_idx_rj(nidx_global_rj(2), jtbl_rj)
+     &   (sph_params%m_folding, sph_rtp%nidx_global_rtp(3),             &
+     &    s2d_tbl_SP%mtbl_fft_2_lgd, s2d_tbl_SP%mdx_4_lgd,              &
+     &    s3d_ranks, sph_dbc_SP, stk_lc1d, sph_gl1d)
+      call set_sph_1d_global_idx_rlm                                    &
+     &   (sph_rj%nidx_global_rj(2), s2d_tbl_SP%jtbl_fsph, sph_gl1d)
+      call set_sph_1d_global_idx_rj                                     &
+     &   (sph_rj%nidx_global_rj(2), s2d_tbl_SP%jtbl_rj, sph_gl1d)
 !
-      call allocate_sph_1d_domain_id
+      call alloc_sph_1d_domain_id(sph_rtp, sph_rj, s3d_ranks)
 !
-      call set_sph_1d_domain_id_rtp
-      call set_sph_1d_domain_id_rj
+      call set_sph_1d_domain_id_rtp(stk_lc1d, sph_gl1d, s3d_ranks)
+      call set_sph_1d_domain_id_rj(stk_lc1d, sph_gl1d, s3d_ranks)
 !
       if(iflag_debug .gt. 0) then
-        write(50,*) 'idx_global_rtp_r', idx_global_rtp_r
-        write(50,*) 'idx_global_rtm_r', idx_global_rtm_r
-        write(50,*) 'idx_global_rlm_r', idx_global_rlm_r
-!        call check_sph_1d_domain_id
+        write(50,*) 'idx_global_rtp_r', sph_gl1d%idx_global_rtp_r
+        write(50,*) 'idx_global_rtm_r', sph_gl1d%idx_global_rtm_r
+        write(50,*) 'idx_global_rlm_r', sph_gl1d%idx_global_rlm_r
+!        call check_sph_1d_domain_id(sph_rtp, sph_rj, s3d_ranks)
       end if
+!
+      call dealloc_2d_sph_trans_table(s2d_tbl_SP)
+      call dealloc_sph_gl_bc_param(sph_dbc_SP)
 !
       end subroutine s_const_global_sph_grids_modes
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_global_sph_FEM_grid
+      subroutine const_global_sph_FEM_grid                              &
+     &         (sph_params, sph_rtp, sph_rj, s3d_ranks,                 &
+     &          sph_lcp, stk_lc1d, sph_gl1d)
 !
-      use m_spheric_global_ranks
-      use m_sph_global_parameter
-      use m_sph_1d_global_index
-      use m_2d_sph_trans_table
       use set_sph_1d_global_index
       use set_sph_1d_domain_id
+      use set_sph_tranform_ordering
+!
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_rj_grid), intent(in) :: sph_rj
+!
+      type(spheric_global_rank), intent(inout) :: s3d_ranks
+      type(sph_local_parameters), intent(inout) :: sph_lcp
+      type(sph_1d_index_stack), intent(inout) :: stk_lc1d
+      type(sph_1d_global_index), intent(inout) :: sph_gl1d
 !
 !
-      call allocate_sph_1d_global_stack
-      call allocate_sph_gl_parameter
-      call allocate_sph_gl_bc_param
-      call allocate_sph_ranks
-      call allocate_nidx_local
+      call alloc_sph_1d_global_stack(s3d_ranks, stk_lc1d)
+      call alloc_sph_gl_parameter(s3d_ranks, sph_lcp)
+      call alloc_sph_gl_bc_param(s3d_ranks, sph_dbc_SP)
+      call alloc_sph_ranks(s3d_ranks)
+      call alloc_nidx_local(s3d_ranks, sph_lc1_SP)
 !
+      call alloc_2d_sph_trans_table(sph_rtp, sph_rj, s2d_tbl_SP)
 !
       if(iflag_debug .gt. 0) write(*,*) 'const_global_rtp_grids'
-      call const_global_rtp_grids
+      call const_global_rtp_grids(sph_params, sph_rtp,                  &
+     &    s3d_ranks, sph_lc1_SP, sph_lcp, sph_dbc_SP, stk_lc1d)
 !
-      if(iflag_debug .gt. 0) write(*,*) 'const_sph_transfer_tables'
-      call const_sph_transfer_tables
+      if(iflag_debug .gt. 0) write(*,*) 'set_trans_table_fft_2_lgd'
+      call set_trans_table_fft_2_lgd(sph_params%l_truncation,           &
+     &    sph_rtp%nidx_global_rtp(2), sph_rtp%nidx_global_rtp(3),       &
+     &    sph_params%m_folding, s2d_tbl_SP%mspec_4_ispack,              &
+     &    s2d_tbl_SP%jdx_fsph, s2d_tbl_SP%mtbl_fft_2_lgd)
 !
-      call deallocate_nidx_local
-      call allocate_sph_1d_global_idx
+      call dealloc_nidx_local(sph_lc1_SP)
+      call alloc_sph_1d_global_idx(s3d_ranks, stk_lc1d, sph_gl1d)
 !
-      call set_sph_1d_global_idx_rtp                                    &
-     &   (m_folding, nidx_global_rtp(3), mdx_ispack)
+      call set_sph_1d_global_idx_rtp(sph_params%m_folding,              &
+     &    sph_rtp%nidx_global_rtp(3), s2d_tbl_SP%mdx_ispack,            &
+     &    s3d_ranks, sph_dbc_SP, stk_lc1d, sph_gl1d)
 !
-      call allocate_sph_1d_domain_id
+      call alloc_sph_1d_domain_id(sph_rtp, sph_rj, s3d_ranks)
 !
-      call set_sph_1d_domain_id_rtp
+      call set_sph_1d_domain_id_rtp(stk_lc1d, sph_gl1d, s3d_ranks)
 !
       if(iflag_debug .gt. 0) then
-        write(50,*) 'idx_global_rtp_r', idx_global_rtp_r
+        write(50,*) 'idx_global_rtp_r', sph_gl1d%idx_global_rtp_r
       end if
+!
+      call dealloc_2d_sph_trans_table(s2d_tbl_SP)
+      call dealloc_sph_gl_bc_param(sph_dbc_SP)
 !
       end subroutine const_global_sph_FEM_grid
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine allocate_nidx_local
-!
-      use m_spheric_global_ranks
-!
-      integer(kind = kint) :: num
-!
-      num = ndomain_rtp(1)
-      allocate(nidx_local_rtp_r(num))
-      num = ndomain_rtp(2)
-      allocate(nidx_local_rtp_t(num))
-      num = ndomain_rtp(3)
-      allocate(nidx_local_rtp_p(num))
-!
-      num = ndomain_rtm(1)
-      allocate(nidx_local_rtm_r(num))
-      num = ndomain_rtm(2)
-      allocate(nidx_local_rtm_t(num))
-      num = ndomain_rtm(3)
-      allocate(nidx_local_rtm_m(num))
-!
-      num = ndomain_rlm(1)
-      allocate(nidx_local_rlm_r(num))
-      num = ndomain_rlm(2)
-      allocate(nidx_local_rlm_j(num))
-!
-      num = ndomain_rj(1)
-      allocate(nidx_local_rj_r(num))
-      num = ndomain_rj(2)
-      allocate(nidx_local_rj_j(num))
-!
-      nidx_local_rtp_r = 0
-      nidx_local_rtp_t = 0
-      nidx_local_rtp_p = 0
-      nidx_local_rtm_r = 0
-      nidx_local_rtm_t = 0
-      nidx_local_rtm_m = 0
-      nidx_local_rlm_r = 0
-      nidx_local_rlm_j = 0
-      nidx_local_rj_r =  0
-      nidx_local_rj_j =  0
-!
-      end subroutine allocate_nidx_local
-!
-! -----------------------------------------------------------------------
-!
-      subroutine deallocate_nidx_local
-!
-!
-      deallocate(nidx_local_rtp_r, nidx_local_rtp_t, nidx_local_rtp_p)
-      deallocate(nidx_local_rtm_r, nidx_local_rtm_t, nidx_local_rtm_m)
-      deallocate(nidx_local_rlm_r, nidx_local_rlm_j)
-      deallocate(nidx_local_rj_r, nidx_local_rj_j)
-!
-      end subroutine deallocate_nidx_local
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine check_nidx_local(ip_rank)
-!
-      integer(kind = kint), intent(in) :: ip_rank
-!
-!
-      write(ip_rank+50,*) 'nidx_local_rtp_r', nidx_local_rtp_r
-      write(ip_rank+50,*) 'nidx_local_rtp_t', nidx_local_rtp_t
-      write(ip_rank+50,*) 'nidx_local_rtp_p', nidx_local_rtp_p
-!
-      write(ip_rank+50,*) 'nidx_local_rtm_r', nidx_local_rtm_r
-      write(ip_rank+50,*) 'nidx_local_rtm_t', nidx_local_rtm_t
-      write(ip_rank+50,*) 'nidx_local_rtm_m', nidx_local_rtm_m
-!
-      write(ip_rank+50,*) 'nidx_local_rlm_r', nidx_local_rlm_r
-      write(ip_rank+50,*) 'nidx_local_rlm_j', nidx_local_rlm_j
-!
-      write(ip_rank+50,*) 'nidx_local_rj_r', nidx_local_rj_r
-      write(ip_rank+50,*) 'nidx_local_rj_j', nidx_local_rj_j
-!
-      end subroutine check_nidx_local
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine const_global_rtp_grids
-!
-      use m_spheric_global_ranks
-      use m_sph_global_parameter
-      use m_sph_1d_global_index
-!
-      integer(kind = kint) :: ist, ied
-!
-!
-!      write(*,*) 'set_gl_rank_3d', ndomain_rtp(1:3)
-      call set_gl_rank_3d(ndomain_sph, ndomain_rtp, iglobal_rank_rtp)
-!
-!      call cal_local_nums(ndomain_rtp(1), ione, nidx_global_rtp(1),    &
-!     &    nidx_local_rtp_r, istack_idx_local_rtp_r)
-!      write(*,*) 'cal_local_nums 1', ndomain_rtp(1:3), nidx_global_rtp(2)
-      call cal_local_nums(ndomain_rtp(2), ione, nidx_global_rtp(2),     &
-     &    nidx_local_rtp_t, istack_idx_local_rtp_t)
-!      write(*,*) 'cal_local_nums 2'
-      call cal_local_nums(ndomain_rtp(3), ione, nidx_global_rtp(3),     &
-     &    nidx_local_rtp_p, istack_idx_local_rtp_p)
-!
-!
-!      write(*,*) 'cal_local_nums_st'
-      call cal_local_nums_st(ndomain_rtp(1), nlayer_ICB, nlayer_CMB,    &
-     &    nidx_local_rtp_OC, ist_idx_local_rtp_OC)
-!
-      if (nlayer_ICB .gt. 1) then
-        ied = nlayer_ICB - 1
-!      write(*,*) 'cal_local_nums_rev'
-        call cal_local_nums_rev(ndomain_rtp(1), ione, ied,              &
-     &      nidx_local_rtp_IC, ist_idx_local_rtp_IC)
-      end if
-!
-      if (nlayer_CMB .lt. nidx_global_rtp(1)) then
-        ist = nlayer_CMB + 1
-!      write(*,*) 'cal_local_nums_rev'
-        call cal_local_nums_rev(ndomain_rtp(1), ist,                    &
-     &      nidx_global_rtp(1), nidx_local_rtp_MT,                      &
-     &      ist_idx_local_rtp_MT)
-      end if
-!
-!      write(*,*) 'merge_num_3_local_layers'
-      call merge_num_3_local_layers(ndomain_rtp(1),                     &
-     &    nidx_local_rtp_OC, nidx_local_rtp_IC, nidx_local_rtp_MT,      &
-     &    ione, nidx_local_rtp_r, istack_idx_local_rtp_r)
-!
-!
-!      write(*,*) 'set_gl_nnod_spherical'
-      call set_gl_nnod_spherical(ndomain_sph,                           &
-     &    ndomain_rtp(1), ndomain_rtp(2), ndomain_rtp(3),               &
-     &    iglobal_rank_rtp, nidx_local_rtp_r, nidx_local_rtp_t,         &
-     &    nidx_local_rtp_p, nidx_local_rtp, nnod_local_rtp)
-!
-      end subroutine const_global_rtp_grids
-!
-! -----------------------------------------------------------------------
-!
-      subroutine const_global_rtm_grids
-!
-      use m_spheric_global_ranks
-      use m_sph_global_parameter
-      use m_sph_1d_global_index
-!
-      integer(kind = kint) :: ist, ied
-!
-!
-      call set_gl_rank_3d(ndomain_sph, ndomain_rtm, iglobal_rank_rtm)
-!
-!      call cal_local_nums(ndomain_rtm(1), ione, nidx_global_rtm(1),    &
-!     &    nidx_local_rtm_r, istack_idx_local_rtm_r)
-      call cal_local_nums(ndomain_rtm(2), ione, nidx_global_rtm(2),     &
-     &    nidx_local_rtm_t, istack_idx_local_rtm_t)
-      call cal_local_num_rtm_m(ndomain_rtm(3), l_truncation,            &
-     &    m_folding, nidx_local_rtm_m, istack_idx_local_rtm_m)
-!
-      call cal_local_nums_st(ndomain_rtm(1), nlayer_ICB, nlayer_CMB,    &
-     &    nidx_local_rtm_OC, ist_idx_local_rtm_OC)
-!
-      if (nlayer_ICB .gt. 1) then
-        ied = nlayer_ICB - 1
-        call cal_local_nums_rev(ndomain_rtm(1), ione, ied,              &
-     &      nidx_local_rtm_IC, ist_idx_local_rtm_IC)
-      end if
-!
-      if (nlayer_CMB .lt. nidx_global_rtm(1)) then
-        ist = nlayer_CMB + 1
-        call cal_local_nums_rev(ndomain_rtm(1), ist,                    &
-     &      nidx_global_rtm(1), nidx_local_rtm_MT,                      &
-     &      ist_idx_local_rtm_MT)
-      end if
-!
-      call merge_num_3_local_layers(ndomain_rtm(1),                     &
-     &    nidx_local_rtm_OC, nidx_local_rtm_IC, nidx_local_rtm_MT,      &
-     &    ione, nidx_local_rtm_r, istack_idx_local_rtm_r)
-!
-      call set_gl_nnod_spherical(ndomain_sph,                           &
-     &    ndomain_rtm(1), ndomain_rtm(2), ndomain_rtm(3),               &
-     &    iglobal_rank_rtm, nidx_local_rtm_r, nidx_local_rtm_t,         &
-     &    nidx_local_rtm_m, nidx_local_rtm, nnod_local_rtm)
-!
-!      call check_sph_gl_bc_param(izero)
-!
-      end subroutine const_global_rtm_grids
-!
-! -----------------------------------------------------------------------
-!
-      subroutine const_global_rj_modes_by_rlm
-!
-      use m_spheric_global_ranks
-      use m_sph_global_parameter
-      use m_sph_1d_global_index
-      use m_2d_sph_trans_table
-      use set_sph_tranform_ordering
-!
-!
-      call set_gl_rank_2d(ndomain_sph, ndomain_rj,  iglobal_rank_rj)
-!
-      call cal_local_nums(ndomain_rj(1), ione, nidx_global_rj(1),       &
-     &    nidx_local_rj_r, istack_idx_local_rj_r)
-! 
-      call set_merged_index_4_sph_rj(ndomain_rtm(1), ndomain_rtm(3),   &
-     &    ndomain_rj(2), nidx_global_rj(2), istack_idx_local_rlm_j,    &
-     &    jtbl_fsph, nidx_local_rj_j, istack_idx_local_rj_j, jtbl_rj)
-!
-      call set_gl_nnod_spheric_rj(ndomain_sph,                          &
-     &    ndomain_rj(1), ndomain_rj(2),                                 &
-     &    iglobal_rank_rj, nidx_local_rj_r, nidx_local_rj_j,            &
-     &    nidx_local_rj, nnod_local_rj)
-!
-      end subroutine const_global_rj_modes_by_rlm
-!
-! -----------------------------------------------------------------------
-!
-      subroutine const_global_rlm_modes
-!
-      use m_spheric_global_ranks
-      use m_sph_global_parameter
-      use m_sph_1d_global_index
-      use m_2d_sph_trans_table
-      use set_sph_tranform_ordering
-!
-!
-      call allocate_2d_sph_trans_table(nidx_global_rtp(2),              &
-     &    nidx_global_rtp(3), nidx_global_rj(2))
-!
-      call set_gl_rank_2d(ndomain_sph, ndomain_rlm, iglobal_rank_rlm)
-!
-      nidx_local_rlm_r(1:ndomain_rlm(1))                                &
-     &      = nidx_local_rtm_r(1:ndomain_rlm(1))
-      istack_idx_local_rlm_r(0:ndomain_rlm(1))                          &
-     &      = istack_idx_local_rtm_r(0:ndomain_rlm(1))
-!
-!
-      call set_wavenumber_4_ispack_fft(nidx_global_rtp(2),              &
-     &    nidx_global_rtp(3), m_folding, mspec_4_ispack, mdx_ispack)
-!
-      call set_zonal_wavenum_4_legendre(ndomain_rtm(3),                 &
-     &    l_truncation, m_folding, nidx_global_rtp(2),                  &
-     &    nidx_global_rtp(3), jdx_fsph, mdx_4_lgd)
-!
-      call set_merged_index_4_sph_trans(ndomain_rtm(3), l_truncation,   &
-     &    nidx_global_rj(2), nidx_global_rtp(3), m_folding,             &
-     &    istack_idx_local_rtm_m, mdx_4_lgd, nidx_local_rlm_j,          &
-     &    istack_idx_local_rlm_j, jtbl_fsph)
-!
-      call set_gl_nnod_spheric_rj(ndomain_sph,                          &
-     &    ndomain_rlm(1), ndomain_rlm(2),                               &
-     &    iglobal_rank_rlm, nidx_local_rlm_r, nidx_local_rlm_j,         &
-     &    nidx_local_rlm, nnod_local_rlm)
-!
-      end subroutine const_global_rlm_modes
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine const_sph_transfer_tables
-!
-      use m_2d_sph_trans_table
-      use set_sph_tranform_ordering
-!
-!
-      call set_trans_table_fft_2_lgd(l_truncation,                      &
-     &    nidx_global_rtp(2), nidx_global_rtp(3), m_folding,            &
-     &    mspec_4_ispack,jdx_fsph, mtbl_fft_2_lgd)
-!
-      end subroutine const_sph_transfer_tables
 !
 ! -----------------------------------------------------------------------
 !

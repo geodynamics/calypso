@@ -13,13 +13,6 @@
 !!
 !!      subroutine dealloc_surf_item_sf_grp_type(sf_grp_data)
 !!      subroutine dealloc_grp_connect(e_grp)
-!!
-!!      subroutine unlink_surf_item_sf_grp_type(sf_grp_data)
-!!      subroutine unlink_num_other_grp(e_grp)
-!!      subroutine unlink_item_other_grp(e_grp)
-!!
-!!      subroutine link_ele_grp_connect_type(tbls_org, tbls_ele_new)
-!!      subroutine link_surf_grp_connect_type(tbls_org, tbls_sf_new)
 !!@endverbatim
 !
       module t_group_connects
@@ -33,12 +26,12 @@
 !>   total number of connectivity for group
         integer(kind=kint) :: ntot_e_grp
 !>   number of item for each group
-        integer(kind=kint), pointer :: nitem_e_grp(:)
+        integer(kind=kint), allocatable :: nitem_e_grp(:)
 !>   end number of item for each group
-        integer(kind=kint), pointer :: istack_e_grp(:)
+        integer(kind=kint), allocatable :: istack_e_grp(:)
 !
 !>   local item ID for group
-        integer(kind=kint), pointer :: item_e_grp(:)
+        integer(kind=kint), allocatable :: item_e_grp(:)
       end type group_connect_data
 !
 !
@@ -56,9 +49,9 @@
 !>   Structure of connectivities for surface group
       type surface_group_table
 !>   local surface ID for surface group
-        integer(kind=kint), pointer :: isurf_grp(:)
+        integer(kind=kint), allocatable :: isurf_grp(:)
 !>   local surface ID for opposite side of surface group
-        integer(kind=kint), pointer :: isurf_grp_n(:)
+        integer(kind=kint), allocatable :: isurf_grp_n(:)
 !
 !>   local edge connectivity for surface group
         type(group_connect_data) :: edge
@@ -139,86 +132,5 @@
       end subroutine dealloc_grp_connect
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine unlink_surf_item_sf_grp_type(sf_grp_data)
-!
-      type(surface_group_table), intent(inout) :: sf_grp_data
-!
-      nullify(sf_grp_data%isurf_grp  )
-      nullify(sf_grp_data%isurf_grp_n)
-!
-      end subroutine unlink_surf_item_sf_grp_type
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine unlink_num_other_grp(e_grp)
-!
-      type(group_connect_data), intent(inout) :: e_grp
-!
-!
-      nullify(e_grp%nitem_e_grp )
-      nullify(e_grp%istack_e_grp)
-!
-      end subroutine unlink_num_other_grp
-!
-!-----------------------------------------------------------------------
-!
-      subroutine unlink_item_other_grp(e_grp)
-!
-      type(group_connect_data), intent(inout) :: e_grp
-!
-      nullify(e_grp%item_e_grp)
-!
-      end subroutine unlink_item_other_grp
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine link_ele_grp_connect_type(tbls_org, tbls_ele_new)
-!
-      type(element_group_table), intent(in) :: tbls_org
-      type(element_group_table), intent(inout) :: tbls_ele_new
-!
-!
-      tbls_ele_new%surf%ntot_e_grp = tbls_org%surf%ntot_e_grp
-      tbls_ele_new%edge%ntot_e_grp = tbls_org%edge%ntot_e_grp
-      tbls_ele_new%node%ntot_e_grp = tbls_org%node%ntot_e_grp
-!
-      tbls_ele_new%surf%nitem_e_grp =>  tbls_org%surf%nitem_e_grp
-      tbls_ele_new%surf%istack_e_grp => tbls_org%surf%istack_e_grp
-      tbls_ele_new%surf%item_e_grp =>   tbls_org%surf%item_e_grp
-!
-      tbls_ele_new%edge%nitem_e_grp =>  tbls_org%edge%nitem_e_grp
-      tbls_ele_new%edge%istack_e_grp => tbls_org%edge%istack_e_grp
-      tbls_ele_new%edge%item_e_grp =>   tbls_org%edge%item_e_grp
-!
-      tbls_ele_new%node%nitem_e_grp =>   tbls_org%node%nitem_e_grp
-      tbls_ele_new%node%istack_e_grp =>  tbls_org%node%istack_e_grp
-      tbls_ele_new%node%item_e_grp =>    tbls_org%node%item_e_grp
-!
-      end subroutine link_ele_grp_connect_type
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine link_surf_grp_connect_type(tbls_org, tbls_sf_new)
-!
-      type(surface_group_table), intent(in) :: tbls_org
-      type(surface_group_table), intent(inout) :: tbls_sf_new
-!
-!
-      tbls_sf_new%edge%ntot_e_grp = tbls_org%edge%ntot_e_grp
-!
-      tbls_sf_new%isurf_grp =>          tbls_org%isurf_grp
-      tbls_sf_new%isurf_grp_n =>        tbls_org%isurf_grp_n
-!
-      tbls_sf_new%edge%nitem_e_grp =>  tbls_org%edge%nitem_e_grp
-      tbls_sf_new%edge%istack_e_grp => tbls_org%edge%istack_e_grp
-      tbls_sf_new%edge%item_e_grp =>   tbls_org%edge%item_e_grp
-!
-      end subroutine link_surf_grp_connect_type
-!
-!  ---------------------------------------------------------------------
 !
       end module t_group_connects

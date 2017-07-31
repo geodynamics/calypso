@@ -87,7 +87,7 @@
       integer (kind=kint), intent(inout):: iX_new(nnod_new)
 !
 !
-      call resize_iwork_sph_SR(npe_send, npe_recv,                      &
+      call resize_iwork_4_SR(npe_send, npe_recv,                        &
      &    istack_send(npe_send), istack_recv(npe_recv))
 !
 !C-- SEND

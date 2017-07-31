@@ -9,7 +9,13 @@
 !!@verbatim
 !!      subroutine set_sph_MHD_elapsed_label
 !!      subroutine reset_elapse_4_init_sph_mhd
-!!      subroutine write_resolution_data
+!!      subroutine write_resolution_data                                &
+!!     &         (sph_params, sph_rtp, sph_rtm, sph_rlm, sph_rj)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
+!!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!        type(sph_rtm_grid), intent(in) :: sph_rtm
+!!        type(sph_rlm_grid), intent(in) :: sph_rlm
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!@endverbatim
 !
       module init_sph_MHD_elapsed_label
@@ -29,7 +35,7 @@
       use m_work_time
 !
 !
-      num_elapsed = 54
+      num_elapsed = 81
       call allocate_elapsed_times
 !
       elapse_labels(1) = 'Total time                 '
@@ -45,7 +51,7 @@
       elapse_labels( 9) = 'Obtain field to output    '
       elapse_labels(10) = 'output_sph_restart_control'
       elapse_labels(11) = 'output_rms_sph_mhd_control'
-      elapse_labels(12) = 'PSF_time                  '
+      elapse_labels(12) = 'Visualizatio time         '
 !
       elapse_labels(13) = 'Coriolis term             '
       elapse_labels(14) = 'sph backward transform    '
@@ -94,6 +100,20 @@
       elapse_labels(52) = 'copy_mhd_field_from_trans.    '
       elapse_labels(53) = 'copy_mhd_spectr_from_recv.    '
 !
+      elapse_labels(60) = 'Sectioning initialization.    '
+      elapse_labels(61) = 'Isosurfaceing initialization.    '
+      elapse_labels(62) = 'Volume rendering initialization.    '
+      elapse_labels(63) = 'fieldline initialization.    '
+!
+      elapse_labels(65) = 'Sectioning.    '
+      elapse_labels(66) = 'Isosurfaceing.    '
+      elapse_labels(67) = 'Volume rendering.    '
+      elapse_labels(68) = 'fieldline.    '
+!
+      elapse_labels(71) = 'fieldline.    '
+!
+      elapse_labels(81) = 'Filtering fields   '
+!
       elapse_labels(num_elapsed) = 'Communication time        '
 !
       end subroutine set_sph_MHD_elapsed_label
@@ -114,23 +134,30 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine write_resolution_data
+      subroutine write_resolution_data                                  &
+     &         (sph_params, sph_rtp, sph_rtm, sph_rlm, sph_rj)
 !
       use calypso_mpi
       use m_work_time
-      use m_spheric_parameter
+      use t_spheric_parameter
+!
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_rtm_grid), intent(in) :: sph_rtm
+      type(sph_rlm_grid), intent(in) :: sph_rlm
+      type(sph_rj_grid), intent(in) ::  sph_rj
 !
       integer(kind = kint) :: nproc_rj_IO(2),  nproc_rlm_IO(2)
       integer(kind = kint) :: nproc_rtm_IO(3), nproc_rtp_IO(3)
 !
 !
-      call MPI_REDUCE(sph_rank_rj, nproc_rj_IO, itwo,                   &
+      call MPI_REDUCE(sph_rj%irank_sph_rj, nproc_rj_IO, itwo,           &
      &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE(sph_rank_rlm, nproc_rlm_IO, itwo,                 &
+      call MPI_REDUCE(sph_rlm%irank_sph_rlm, nproc_rlm_IO, itwo,        &
      &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE(sph_rank_rtm, nproc_rtm_IO, ithree,               &
+      call MPI_REDUCE(sph_rtm%irank_sph_rtm, nproc_rtm_IO, ithree,      &
      &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE(sph_rank_rtp, nproc_rtp_IO, ithree,               &
+      call MPI_REDUCE(sph_rtp%irank_sph_rtp, nproc_rtp_IO, ithree,      &
      &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
 !
       if(my_rank .ne. 0) return
@@ -144,12 +171,16 @@
 !
       write(id_timer_file,*)
       write(id_timer_file,*) '=========================================='
-      write(id_timer_file,*) 'Truncation level:      ', l_truncation
-      write(id_timer_file,*) 'Longitudinal symmetry: ', m_folding
+      write(id_timer_file,*) 'Truncation level:      ',                 &
+     &                      sph_params%l_truncation
+      write(id_timer_file,*) 'Longitudinal symmetry: ',                 &
+     &                      sph_params%m_folding
       write(id_timer_file,*) 'N_r for fluid shell:   ',                 &
-     &                      nlayer_CMB-nlayer_ICB
-      write(id_timer_file,*) 'N_theta:               ', nidx_rtm(2)
-      write(id_timer_file,*) 'N_phi:                 ', nidx_rtp(3)
+     &            (sph_params%nlayer_CMB - sph_params%nlayer_ICB)
+      write(id_timer_file,*) 'N_theta:               ',                 &
+     &                      sph_rtm%nidx_rtm(2)
+      write(id_timer_file,*) 'N_phi:                 ',                 &
+     &                      sph_rtp%nidx_rtp(3)
 !
       write(id_timer_file,*) 'Total MPI processes: ',  nprocs
       write(id_timer_file,*)                                            &

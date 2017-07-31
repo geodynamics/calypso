@@ -8,14 +8,17 @@
 !!@brief  Set radial informations for non-equidistance grid
 !!
 !!@verbatim
-!!      subroutine allocate_dr_rj_noequi
+!!      subroutine allocate_dr_rj_noequi(nri)
 !!      subroutine deallocate_dr_rj_noequi
 !!
-!!      subroutine set_dr_for_equidist
-!!      subroutine set_dr_for_nonequi
+!!      subroutine set_dr_for_equidist                                  &
+!!     &         (nlayer_ICB, nlayer_CMB, nri, radius_1d_rj_r)
+!!      subroutine set_dr_for_nonequi(nlayer_CMB, nri, radius_1d_rj_r)
 !!
-!!      subroutine nod_r_2nd_fdm_coefs_equi
-!!      subroutine nod_r_2nd_fdm_coefs_nonequi
+!!      subroutine nod_r_2nd_fdm_coefs_equi                             &
+!!     &         (nlayer_ICB, nri, radius_1d_rj_r, mat_fdm_2)
+!!      subroutine nod_r_2nd_fdm_coefs_nonequi                          &
+!!     &         (nlayer_ICB, nri, radius_1d_rj_r, mat_fdm_2)
 !!
 !!      subroutine nod_r_2nd_fdm_coef_noequi(kr, dr_p1, dr_n1, mat_fdm)
 !!*
@@ -40,7 +43,8 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_spheric_parameter
+!
+      implicit none
 !
 !>      1d @f$ \Delta r @f$ for @f$ f(r,j) @f$
 !!@n@see  set_radius_func_cheby or set_radius_func_cheby
@@ -55,11 +59,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine allocate_dr_rj_noequi
+      subroutine allocate_dr_rj_noequi(nri)
+!
+      integer(kind = kint), intent(in) :: nri
 !
 !
-      allocate(dr_1d_rj(nidx_rj(1)))
-      dr_1d_rj = 0.0d0
+      allocate(dr_1d_rj(nri))
+      if(nri .gt. 0) dr_1d_rj = 0.0d0
 !
       end subroutine allocate_dr_rj_noequi
 !
@@ -74,13 +80,16 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine check_radial_func_rj
+      subroutine check_radial_func_rj(nri, radius_1d_rj_r)
+!
+      integer(kind = kint), intent(in) :: nri
+      real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
 !
       integer(kind = kint) :: k
 !
 !
       write(*,*) 'k, r, dr_1d_rj'
-      do k = 1, nidx_rj(1)
+      do k = 1, nri
         write(*,'(i16, 1p4e20.12)') k, radius_1d_rj_r(k), dr_1d_rj(k)
       end do
 !
@@ -89,19 +98,23 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_dr_for_equidist
+      subroutine set_dr_for_equidist                                    &
+     &         (nlayer_ICB, nlayer_CMB, nri, radius_1d_rj_r)
+!
+      integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB, nri
+      real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
 !
       real(kind = kreal) ::  shell
-      integer(kind = kint) :: kr, nri
+      integer(kind = kint) :: kr, nele_shell
 !
 !
 !* ---------- whole domain --------
 !*
-      nri = nlayer_CMB - nlayer_ICB
+      nele_shell = nlayer_CMB - nlayer_ICB
       shell = radius_1d_rj_r(nlayer_CMB) - radius_1d_rj_r(nlayer_ICB)
 !
-      do kr = 1, nidx_rj(1)
-        dr_1d_rj(kr) = shell / dble(nri)
+      do kr = 1, nri
+        dr_1d_rj(kr) = shell / dble(nele_shell)
       end do
 !*
 !* ----------  inner boundary --------
@@ -114,23 +127,26 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine set_dr_for_nonequi
+      subroutine set_dr_for_nonequi(nlayer_CMB, nri, radius_1d_rj_r)
+!
+      integer(kind = kint), intent(in) :: nlayer_CMB, nri
+      real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
 !
       integer(kind = kint) :: kr
 !
 !* ---------- whole domain --------
 !*
-      do kr = 2, nidx_rj(1)-1
+      do kr = 2, nri-1
         dr_1d_rj(kr) = radius_1d_rj_r(kr+1) - radius_1d_rj_r(kr)
       end do
 !*
 !* ----------  outer boundary --------
 !*
-      if (nlayer_CMB .eq. nidx_rj(1)) then
+      if (nlayer_CMB .eq. nri) then
         dr_1d_rj(nlayer_CMB) =  radius_1d_rj_r(nlayer_CMB)              &
      &                        - radius_1d_rj_r(nlayer_CMB-1)
       else
-        kr = nidx_rj(1)
+        kr = nri
         dr_1d_rj(kr) = radius_1d_rj_r(kr) - radius_1d_rj_r(kr-1)
       end if
 !*
@@ -138,17 +154,21 @@
 !*
       dr_1d_rj(1) = radius_1d_rj_r(2) - radius_1d_rj_r(1)
 !
-      if(iflag_debug .eq. iflag_full_msg) call check_radial_func_rj
+      if(iflag_debug .eq. iflag_full_msg) then
+        call check_radial_func_rj(nri, radius_1d_rj_r)
+      end if
 !
       end subroutine set_dr_for_nonequi
 !
 !  -------------------------------------------------------------------
 !  -------------------------------------------------------------------
 !
-      subroutine nod_r_2nd_fdm_coefs_equi
+      subroutine nod_r_2nd_fdm_coefs_equi                               &
+     &         (nlayer_ICB, nri, radius_1d_rj_r, mat_fdm_2)
 !
-      use m_spheric_parameter
-      use m_fdm_coefs
+      integer(kind = kint), intent(in) :: nlayer_ICB, nri
+      real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
+      real(kind = kreal), intent(inout) :: mat_fdm_2(3,3,nri)
 !
       integer(kind = kint) :: kr
 !
@@ -161,7 +181,7 @@
      &      (ione, dr_1d_rj(1), dr_1d_rj(1), mat_fdm_2(1,1,1))
       end if
 !
-      do kr = 2, nidx_rj(1)
+      do kr = 2, nri
         call nod_r_2nd_fdm_coef_noequi                                  &
      &      (kr, dr_1d_rj(kr), dr_1d_rj(kr), mat_fdm_2(1,1,kr))
       end do
@@ -170,9 +190,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine nod_r_2nd_fdm_coefs_nonequi
+      subroutine nod_r_2nd_fdm_coefs_nonequi                            &
+     &         (nlayer_ICB, nri, radius_1d_rj_r, mat_fdm_2)
 !
-      use m_fdm_coefs
+      integer(kind = kint), intent(in) :: nlayer_ICB, nri
+      real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
+!
+      real(kind = kreal), intent(inout) :: mat_fdm_2(3,3,nri)
 !
       integer(kind = kint) :: kr
 !
@@ -185,12 +209,12 @@
      &     (ione, dr_1d_rj(1), dr_1d_rj(1), mat_fdm_2(1,1,1))
       end if
 !
-      do kr = 2, nidx_rj(1)-1
+      do kr = 2, nri-1
         call nod_r_2nd_fdm_coef_noequi                                  &
      &      (kr, dr_1d_rj(kr), dr_1d_rj(kr-1), mat_fdm_2(1,1,kr))
       end do
 !
-      kr = nidx_rj(1)
+      kr = nri
       call nod_r_2nd_fdm_coef_noequi                                    &
      &   (kr, dr_1d_rj(kr), dr_1d_rj(kr), mat_fdm_2(1,1,kr))
 !

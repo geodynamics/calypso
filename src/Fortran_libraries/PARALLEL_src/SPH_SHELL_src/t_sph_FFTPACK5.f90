@@ -9,18 +9,18 @@
 !!@verbatim
 !!  ---------------------------------------------------------------------
 !!
-!!      subroutine init_sph_FFTPACK5_t                                  &
-!!     &         (ncomp, nidx_rtp, maxirt_rtp_smp, fftpack_t)
-!!      subroutine finalize_sph_FFTPACK5_t(fftpack_t)
-!!      subroutine verify_sph_FFTPACK5_t                                &
-!!     &         (ncomp, nidx_rtp, maxirt_rtp_smp, fftpack_t)
+!!      subroutine init_sph_FFTPACK5                                    &
+!!     &         (nidx_rtp, maxirt_rtp_smp, ncomp, fftpack_t)
+!!      subroutine finalize_sph_FFTPACK5(fftpack_t)
+!!      subroutine verify_sph_FFTPACK5                                  &
+!!     &         (nidx_rtp, maxirt_rtp_smp, ncomp, fftpack_t)
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT
 !! ------------------------------------------------------------------
 !!
-!!      subroutine sph_RFFTMF_to_send_t(ncomp, nnod_rtp, nidx_rtp,      &
-!!     &          irt_rtp_smp_stack, n_WS, irev_sr_rtp, X_rtp, WS,      &
-!!     &          fftpack_t)
+!!      subroutine sph_RFFTMF_to_send(nnod_rtp, nidx_rtp,               &
+!!     &          irt_rtp_smp_stack, ncomp, n_WS, irev_sr_rtp,          &
+!!     &          X_rtp, WS, fftpack_t)
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for forward Fourier transform by FFTPACK5
@@ -37,9 +37,9 @@
 !!
 !! ------------------------------------------------------------------
 !!
-!!      subroutine sph_RFFTMB_from_recv_t(ncomp, nnod_rtp, nidx_rtp,    &
-!!     &          irt_rtp_smp_stack, n_WR, irev_sr_rtp, WR, X_rtp,      &
-!!     &          fftpack_t)
+!!      subroutine sph_RFFTMB_from_recv(nnod_rtp, nidx_rtp,             &
+!!     &          irt_rtp_smp_stack, ncomp, n_WR, irev_sr_rtp,          &
+!!     &          WR, X_rtp, fftpack_t)
 !! ------------------------------------------------------------------
 !!
 !! wrapper subroutine for backward Fourier transform by FFTPACK5
@@ -80,21 +80,21 @@
 !>      Structure for each FFTPACK
       type work_each_fftpack
 !>        Data for multiple Fourier transform
-        real(kind = 8), pointer :: X(:)
+        real(kind = 8), allocatable :: X(:)
 !>        Work area for FFTPACK
-        real(kind = 8), pointer :: WK(:)
+        real(kind = 8), allocatable :: WK(:)
       end type work_each_fftpack
 !
 !>      Structure to use ISPACK
       type work_for_fftpack
 !>      Structure for each thread
-        type(work_each_fftpack), pointer :: smp(:)
+        type(work_each_fftpack), allocatable :: smp(:)
 !>        Maximum nuber of components for each SMP process
         integer(kind = kint) :: Mmax_smp
 !>        Size of work constant for FFTPACK
         integer(kind = kint) :: NSV
 !>        Work constatnts for FFTPACK
-        real(kind = 8), pointer :: WSV(:)
+        real(kind = 8), allocatable :: WSV(:)
 !>        flag for length of Fourier transform
         integer(kind = kint) :: iflag_fft_len =  -1
       end type work_for_fftpack
@@ -108,8 +108,8 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine init_sph_FFTPACK5_t                                    &
-     &         (ncomp, nidx_rtp, maxirt_rtp_smp, fftpack_t)
+      subroutine init_sph_FFTPACK5                                      &
+     &         (nidx_rtp, maxirt_rtp_smp, ncomp, fftpack_t)
 !
       integer(kind = kint), intent(in) :: nidx_rtp(3), maxirt_rtp_smp
 !
@@ -125,11 +125,11 @@
 !
       call alloc_work_4_FFTPACK(nidx_rtp(3), fftpack_t)
 !
-      end subroutine init_sph_FFTPACK5_t
+      end subroutine init_sph_FFTPACK5
 !
 ! ------------------------------------------------------------------
 !
-      subroutine finalize_sph_FFTPACK5_t(fftpack_t)
+      subroutine finalize_sph_FFTPACK5(fftpack_t)
 !
       type(work_for_fftpack), intent(inout) :: fftpack_t
 !
@@ -137,12 +137,12 @@
       call dealloc_const_4_FFTPACK(fftpack_t)
       call dealloc_work_4_FFTPACK(fftpack_t)
 !
-      end subroutine finalize_sph_FFTPACK5_t
+      end subroutine finalize_sph_FFTPACK5
 !
 ! ------------------------------------------------------------------
 !
-      subroutine verify_sph_FFTPACK5_t                                  &
-     &         (ncomp, nidx_rtp, maxirt_rtp_smp, fftpack_t)
+      subroutine verify_sph_FFTPACK5                                    &
+     &         (nidx_rtp, maxirt_rtp_smp, ncomp, fftpack_t)
 !
       integer(kind = kint), intent(in) :: nidx_rtp(3), maxirt_rtp_smp
 !
@@ -167,7 +167,7 @@
         call RFFTMI(nidx_rtp(3), fftpack_t%WSV, fftpack_t%NSV, ierr)
       end if
 !
-      if(ASSOCIATED(fftpack_t%smp(1)%WK) .eqv. .false.) then
+      if(allocated(fftpack_t%smp(1)%WK) .eqv. .false.) then
         call alloc_work_4_FFTPACK(nidx_rtp(3), fftpack_t)
       else if( (fftpack_t%Mmax_smp*nidx_rtp(3))                         &
      &      .gt. size(fftpack_t%smp(1)%WK,1)  ) then
@@ -175,14 +175,14 @@
         call alloc_work_4_FFTPACK(nidx_rtp(3), fftpack_t)
       end if
 !
-      end subroutine verify_sph_FFTPACK5_t
+      end subroutine verify_sph_FFTPACK5
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine sph_RFFTMF_to_send_t(ncomp, nnod_rtp, nidx_rtp,        &
-     &          irt_rtp_smp_stack, n_WS, irev_sr_rtp, X_rtp, WS,        &
-     &          fftpack_t)
+      subroutine sph_RFFTMF_to_send(nnod_rtp, nidx_rtp,                 &
+     &          irt_rtp_smp_stack, ncomp, n_WS, irev_sr_rtp,            &
+     &          X_rtp, WS, fftpack_t)
 !
       integer(kind = kint), intent(in) :: nnod_rtp
       integer(kind = kint), intent(in) :: nidx_rtp(3)
@@ -252,13 +252,13 @@
       end do
 !$omp end parallel do
 !
-      end subroutine sph_RFFTMF_to_send_t
+      end subroutine sph_RFFTMF_to_send
 !
 ! ------------------------------------------------------------------
 !
-      subroutine sph_RFFTMB_from_recv_t(ncomp, nnod_rtp, nidx_rtp,      &
-     &          irt_rtp_smp_stack, n_WR, irev_sr_rtp, WR, X_rtp,        &
-     &          fftpack_t)
+      subroutine sph_RFFTMB_from_recv(nnod_rtp, nidx_rtp,               &
+     &          irt_rtp_smp_stack, ncomp, n_WR, irev_sr_rtp,            &
+     &          WR, X_rtp, fftpack_t)
 !
       integer(kind = kint), intent(in) :: nnod_rtp
       integer(kind = kint), intent(in) :: nidx_rtp(3)
@@ -328,7 +328,7 @@
       end do
 !$omp end parallel do
 !
-      end subroutine sph_RFFTMB_from_recv_t
+      end subroutine sph_RFFTMB_from_recv
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------

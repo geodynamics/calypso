@@ -8,13 +8,18 @@
 !> @brief Load control data for sphrical dynamo
 !!
 !!@verbatim
-!!     subroutine s_set_control_sph_data(ierr)
+!!      subroutine s_set_control_sph_data(field_ctl, rj_fld, ierr)
+!!      subroutine ordering_sph_field_by_viz_comp(rj_fld)
+!!        type(ctl_array_c3), intent(in) :: field_ctl
+!!        type(phys_data), intent(inout) :: rj_fld
 !!@endverbatim
 !
       module set_control_sph_data
 !
       use m_precision
       use m_constants
+!
+      use t_phys_data
 !
       implicit  none
 !
@@ -26,13 +31,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_sph_data(ierr)
+      subroutine s_set_control_sph_data(field_ctl, rj_fld, ierr)
 !
       use m_machine_parameter
-      use m_ctl_data_4_fields
-      use m_sph_spectr_data
+      use t_read_control_arrays
       use cal_minmax_and_stacks
 !
+      type(ctl_array_c3), intent(in) :: field_ctl
+      type(phys_data), intent(inout) :: rj_fld
       integer (kind = kint), intent(inout) :: ierr
 !
 !
@@ -44,16 +50,18 @@
         ierr = 90
         return
       else
-        num_phys_rj = field_ctl%num
+        rj_fld%num_phys = field_ctl%num
       end if
 !
 !    set spectr data
 !
-      if ( num_phys_rj .ne. 0 ) then
-        call allocate_phys_rj_name
-        call ordering_sph_field_by_viz
+      if ( rj_fld%num_phys .ne. 0 ) then
+        call alloc_phys_name_type(rj_fld)
+        call ordering_sph_field_by_viz(field_ctl, rj_fld)
 !
-        if (iflag_debug .gt. 0) call check_rj_spectr_name
+        if (iflag_debug .gt. 0) then
+          call check_nodal_field_name_type(6, rj_fld)
+        end if
       end if
 !
       end subroutine s_set_control_sph_data
@@ -61,35 +69,46 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine ordering_sph_field_by_viz
+      subroutine ordering_sph_field_by_viz(field_ctl, rj_fld)
 !
-      use m_sph_spectr_data
+      use t_read_control_arrays
       use ordering_field_by_viz
 !
+      type(ctl_array_c3), intent(in) :: field_ctl
+      type(phys_data), intent(inout) :: rj_fld
 !
-      call s_ordering_field_by_viz(num_phys_rj, num_phys_rj_vis,        &
-     &    num_phys_comp_rj, phys_name_rj, iflag_monitor_rj)
 !
-      call set_istack_4_nodal_field(num_phys_rj, num_phys_rj_vis,       &
-     &    num_phys_comp_rj, ntot_phys_rj, ntot_comp_rj_vis,             &
-     &    istack_phys_comp_rj)
+      call s_ordering_field_by_viz                                      &
+     &   (field_ctl, rj_fld%num_phys, rj_fld%num_phys_viz,              &
+     &    rj_fld%num_component, rj_fld%phys_name, rj_fld%iflag_monitor)
+!
+      call set_istack_4_nodal_field                                     &
+     &   (rj_fld%num_phys, rj_fld%num_phys_viz,                         &
+     &    rj_fld%num_component, rj_fld%ntot_phys,                       &
+     &    rj_fld%ntot_phys_viz, rj_fld%istack_component)
 !
       end subroutine ordering_sph_field_by_viz
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine ordering_sph_field_by_viz_comp
+      subroutine ordering_sph_field_by_viz_comp(field_ctl, rj_fld)
 !
-      use m_sph_spectr_data
+      use t_read_control_arrays
       use ordering_field_by_viz
 !
+      type(ctl_array_c3), intent(in) :: field_ctl
+      type(phys_data), intent(inout) :: rj_fld
 !
-      call ordering_field_by_comp_viz(num_phys_rj, num_phys_rj_vis,     &
-     &    num_phys_comp_rj, phys_name_rj, iflag_monitor_rj)
 !
-      call set_istack_4_nodal_field(num_phys_rj, num_phys_rj_vis,       &
-     &    num_phys_comp_rj, ntot_phys_rj, ntot_comp_rj_vis,             &
-     &    istack_phys_comp_rj)
+      call ordering_field_by_comp_viz                                   &
+     &   (field_ctl, rj_fld%num_phys, rj_fld%num_phys_viz,              &
+     &    rj_fld%num_component, rj_fld%phys_name,                       &
+     &    rj_fld%iflag_monitor)
+!
+      call set_istack_4_nodal_field                                     &
+     &   (rj_fld%num_phys, rj_fld%num_phys_viz,                         &
+     &    rj_fld%num_component, rj_fld%ntot_phys,                       &
+     &    rj_fld%ntot_phys_viz, rj_fld%istack_component)
 !
       end subroutine ordering_sph_field_by_viz_comp
 !

@@ -17,6 +17,7 @@
 !
       use m_precision
       use m_constants
+      use m_machine_parameter
       use calypso_mpi
 !
       implicit none
@@ -114,8 +115,8 @@
       integer(kind = kint) :: iele, inum
 !
 !
-      write(*,*) 'Number of  ', trim(txt), ' for ', my_rank, ': ',      &
-     &            nele, size(x_ele,1)
+      if(i_debug .gt. 0) write(*,*) 'Number of  ', trim(txt),           &
+     &           ' for ', my_rank, ': ',   nele, size(x_ele,1)
       allocate(x_test(3*nele))
 !
 !$omp parallel do

@@ -8,7 +8,14 @@
 !> @brief set boundary conditions for magnetic field from control data
 !!
 !!@verbatim
-!!     subroutine s_set_control_4_magne
+!!      subroutine s_set_control_4_magne                                &
+!!     &         (cd_prop, node_bc_B_ctl, surf_bc_BN_ctl,               &
+!!     &          magne_nod, magne_surf)
+!!        type(conductive_property), intent(in)  :: cd_prop
+!!        type(ctl_array_c2r), intent(inout) :: node_bc_B_ctl
+!!        type(ctl_array_c2r), intent(inout) :: surf_bc_BN_ctl
+!!        type(boundary_condition_list), intent(inout) :: magne_nod
+!!        type(boundary_condition_list), intent(inout) :: magne_surf
 !!@endverbatim
 !
       module set_control_4_magne
@@ -23,24 +30,29 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_magne
+      subroutine s_set_control_4_magne                                  &
+     &         (cd_prop, node_bc_B_ctl, surf_bc_BN_ctl,                 &
+     &          magne_nod, magne_surf)
 !
       use m_machine_parameter
       use calypso_mpi
-      use m_control_parameter
-      use m_ctl_data_node_boundary
-      use m_ctl_data_surf_boundary
-      use m_node_phys_address
-      use m_bc_data_list
-      use m_surf_data_list
+      use t_physical_property
+      use t_read_control_arrays
+      use t_bc_data_list
       use set_node_group_types
       use set_surface_group_types
+!
+      type(conductive_property), intent(in)  :: cd_prop
+      type(ctl_array_c2r), intent(inout) :: node_bc_B_ctl
+      type(ctl_array_c2r), intent(inout) :: surf_bc_BN_ctl
+      type(boundary_condition_list), intent(inout) :: magne_nod
+      type(boundary_condition_list), intent(inout) :: magne_surf
 !
       integer (kind = kint) :: i
 !
 !
-      if (iflag_t_evo_4_magne .eq. id_no_evolution                      &
-     &       .and.  iflag_t_evo_4_vect_p .eq. id_no_evolution) then
+      if (      cd_prop%iflag_Bevo_scheme .eq. id_no_evolution          &
+     &   .and.  cd_prop%iflag_Aevo_scheme .eq. id_no_evolution) then
         magne_nod%num_bc =  0
         magne_surf%num_bc = 0
       else
@@ -54,7 +66,7 @@
      &       write(*,*) 'magne_nod%num_bc ',magne_nod%num_bc
       if (magne_nod%num_bc .gt. 0) then
 !
-        call allocate_nod_bc_list_magne
+        call alloc_bc_type_ctl(magne_nod)
 !
         magne_nod%bc_name(1:magne_nod%num_bc)                           &
      &      = node_bc_B_ctl%c2_tbl(1:magne_nod%num_bc)
@@ -83,7 +95,7 @@
           end do
         end if
 !
-        call deallocate_bc_magne_ctl
+        call dealloc_control_array_c2_r(node_bc_B_ctl)
       end if
 !
 !
@@ -91,7 +103,7 @@
      &           write(*,*) 'magne_surf%num_bc ',magne_surf%num_bc
       if (magne_surf%num_bc .gt. 0) then
 !
-        call allocate_magne_surf_ctl
+        call alloc_bc_type_ctl(magne_surf)
 !
         magne_surf%bc_name(1:magne_surf%num_bc)                         &
      &        = surf_bc_BN_ctl%c2_tbl(1:magne_surf%num_bc)
@@ -115,7 +127,7 @@
           end do
         end if
 !
-        call deallocate_bc_magne_sf_ctl
+        call dealloc_control_array_c2_r(surf_bc_BN_ctl)
       end if
 !
 !

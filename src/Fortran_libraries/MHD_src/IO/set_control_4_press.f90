@@ -9,7 +9,14 @@
 !> @brief set boundary conditions for pressure from control data
 !!
 !!@verbatim
-!!     subroutine s_set_control_4_press
+!!      subroutine s_set_control_4_press                                &
+!!     &         (fl_prop, node_bc_P_ctl, surf_bc_PN_ctl,               &
+!!     &          press_nod, wall_surf)
+!!        type(fluid_property), intent(in) :: fl_prop
+!!        type(ctl_array_c2r), intent(inout) :: node_bc_P_ctl
+!!        type(ctl_array_c2r), intent(inout) :: surf_bc_PN_ctl
+!!        type(boundary_condition_list), intent(inout) :: press_nod
+!!        type(boundary_condition_list), intent(inout) :: wall_surf
 !!@endverbatim
 !
       module set_control_4_press
@@ -24,23 +31,28 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_press
+      subroutine s_set_control_4_press                                  &
+     &         (fl_prop, node_bc_P_ctl, surf_bc_PN_ctl,                 &
+     &          press_nod, wall_surf)
 !
       use m_machine_parameter
       use calypso_mpi
-      use m_control_parameter
-      use m_ctl_data_node_boundary
-      use m_ctl_data_surf_boundary
-      use m_node_phys_address
-      use m_bc_data_list
-      use m_surf_data_list
+      use t_physical_property
+      use t_read_control_arrays
+      use t_bc_data_list
       use set_node_group_types
       use set_surface_group_types
+!
+      type(fluid_property), intent(in) :: fl_prop
+      type(ctl_array_c2r), intent(inout) :: node_bc_P_ctl
+      type(ctl_array_c2r), intent(inout) :: surf_bc_PN_ctl
+      type(boundary_condition_list), intent(inout) :: press_nod
+      type(boundary_condition_list), intent(inout) :: wall_surf
 !
       integer (kind = kint) :: i
 !
 !
-      if (iflag_t_evo_4_velo .eq. id_no_evolution) then
+      if (fl_prop%iflag_scheme .eq. id_no_evolution) then
         press_nod%num_bc = 0
         wall_surf%num_bc = 0
       else
@@ -54,7 +66,7 @@
      &    write(*,*) 'press_nod%num_bc ', press_nod%num_bc
       if(press_nod%num_bc .gt. 0) then
 !
-        call allocate_nod_bc_list_press
+        call alloc_bc_type_ctl(press_nod)
 !
         press_nod%bc_name(1:press_nod%num_bc)                           &
      &      = node_bc_P_ctl%c2_tbl(1:press_nod%num_bc)
@@ -77,14 +89,14 @@
           end do
         end if
 !
-        call deallocate_bc_press_ctl
+        call dealloc_control_array_c2_r(node_bc_P_ctl)
       end if
 !
 !
 !
       if (wall_surf%num_bc .gt. 0) then
 !
-        call allocate_press_surf_ctl
+        call alloc_bc_type_ctl(wall_surf)
 !
         wall_surf%bc_magnitude(1:wall_surf%num_bc)                      &
      &        =  surf_bc_PN_ctl%vect(1:wall_surf%num_bc)
@@ -98,7 +110,7 @@
      &       wall_surf%ibc_type(i) )
         end do
 !
-        call deallocate_bc_press_sf_ctl
+        call dealloc_control_array_c2_r(surf_bc_PN_ctl)
       end if
 !
       end subroutine s_set_control_4_press

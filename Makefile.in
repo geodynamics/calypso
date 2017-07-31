@@ -29,18 +29,38 @@ MPIRUN =      mpirun
 F90_LOCAL = @FC@
 MPIF90 = @MPIFC@
 
+CC =    @CC@
+MPICC = @MPICC@
+
 GMAKE = @GMAKE@
 AR = @ar_bin@
 RANLIB = @RANLIB@
 
 #
+# OPENMP_FCFLAGS OprnMP option for fortran compiler
+# FC_NAME_MANGLE definition for Fortran-C connection
+#    C routtine name mangle flag for Fortran connection
+#     -DFC_NAME_LOWER_USCORE, -DFC_NAME_UPPER, or -DFC_NAME_LOWER
+# XL_FORTRAN   Set "-WF," option for cpp preprocessor
+#
+OPENMP_FCFLAGS = @OPENMP_FCFLAGS@
+FC_NAME_MANGLE = @DFC_NAME_MANGLE@
+XL_FORTRAN =     @XL_FORTRAN@
+#
+#
 #  optimization flags
 #
 F90OPTFLAGS= @FCFLAGS@   @OPENMP_FCFLAGS@
+OPTFLAGS =   @CFLAGS@    @OPENMP_CFLAGS@
 #
 #   BLAS settings
 #
 BLAS_LIBS = @BLAS_LIBS@
+#
+#   libpng and zlib settings
+#
+ZLIB_CFLAGS = @ZLIB_CFLAGS@
+ZLIB_LIB =    @ZLIB_LIB@
 #
 #    FFTW3 settings
 #
@@ -83,6 +103,8 @@ makemake: $(MAKE_MOD_DEP)
 		MPICHBINDIR="$(MPICHBINDIR)" \
 		MPICHINCDIR="$(MPICHINCDIR)" \
 		BLAS_LIBS="$(BLAS_LIBS)" \
+		ZLIB_CFLAGS="$(ZLIB_CFLAGS)" \
+		ZLIB_LIB="$(ZLIB_LIB)"       \
 		FFTW3_CFLAGS="$(FFTW3_CFLAGS)" \
 		FFTW3_LIBS="$(FFTW3_LIBS)" \
 		HDF5_FFLAGS="$(HDF5_FFLAGS)" \
@@ -93,6 +115,7 @@ makemake: $(MAKE_MOD_DEP)
 		F90OPTFLAGS="$(F90OPTFLAGS)" \
 		F90LIB="$(F90LIB)" \
 		MPIF90="$(MPIF90)" \
+		MPICC="$(MPICC)"   \
 		AR="$(AR)" \
 		RANLIB="$(RANLIB)" \
 		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \

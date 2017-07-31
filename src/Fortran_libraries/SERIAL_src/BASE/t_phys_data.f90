@@ -14,17 +14,18 @@
 !!      subroutine dealloc_phys_name_type(fld)
 !!      subroutine dealloc_phys_data_type(fld)
 !!
-!!      subroutine link_field_name_type(org_fld, new_fld)
-!!      subroutine link_field_data_type(org_fld, new_fld)
+!!      subroutine copy_field_name_type(org_fld, new_fld)
+!!      subroutine copy_field_data_type(org_fld, new_fld)
 !!        type(phys_data), intent(in) :: org_fld
 !!        type(phys_data), intent(inout) :: new_fld
 !!
-!!      subroutine disconnect_phys_name_type(fld)
-!!      subroutine disconnect_phys_data_type(fld)
-!!        type(phys_data), intent(inout) :: fld
+!!      integer(kind = kint) function field_id_by_address(fld, i_ref)
+!!      character(len=kchara) function field_name_by_address(fld, i_ref)
+!!        type(phys_data), intent(in) :: fld
 !!
-!!      subroutine check_nodal_field_name_type(fld)
-!!      subroutine check_nodal_data(my_rank, fld, numdir, i_field)
+!!      subroutine check_all_field_data(my_rank, fld)
+!!      subroutine check_nodal_field_name_type(id_output, fld)
+!!      subroutine check_nodal_data(id_output, fld, numdir, i_field)
 !!        integer(kind = kint), intent(in) :: my_rank, numdir, i_field
 !!        type(phys_data), intent(in) :: fld
 !!@endverbatim
@@ -46,19 +47,19 @@
 !>       total number of component
         integer (kind=kint) :: ntot_phys
 !>       number of component for each field
-        integer (kind=kint), pointer :: num_component(:)
+        integer (kind=kint), allocatable :: num_component(:)
 !>       end address for each field
-        integer (kind=kint), pointer :: istack_component(:)
+        integer (kind=kint), allocatable :: istack_component(:)
 !>       FEM order of each field
-        integer (kind=kint), pointer :: iorder_eletype(:)
+        integer (kind=kint), allocatable :: iorder_eletype(:)
 !
 !>       field name
-        character (len=kchara), pointer :: phys_name(:)
+        character (len=kchara), allocatable :: phys_name(:)
 !
 !>       field data
-        real (kind=kreal), pointer ::   d_fld(:,:)
+        real (kind=kreal), allocatable ::   d_fld(:,:)
 !>       update flag for field data
-        integer (kind=kint), pointer :: iflag_update(:)
+        integer (kind=kint), allocatable :: iflag_update(:)
 !
 !>        number of field for visualizer
         integer (kind=kint) :: num_phys_viz
@@ -66,7 +67,7 @@
         integer (kind=kint) :: ntot_phys_viz
 !
 !>        flag to get average and RMS data
-        integer (kind=kint), pointer:: iflag_monitor(:)
+        integer (kind=kint), allocatable:: iflag_monitor(:)
       end type phys_data
 !
 ! -------------------------------------------------------------------
@@ -139,12 +140,12 @@
       end subroutine dealloc_phys_data_type
 !
 !  --------------------------------------------------------------------
-!  ---------------------------------------------------------------------
+! -------------------------------------------------------------------
 !
-      subroutine link_field_name_type(org_fld, new_fld)
+      subroutine copy_field_name_type(org_fld, new_fld)
 !
       type(phys_data), intent(in) :: org_fld
-      type(phys_data), intent(inout) :: new_fld
+      type(phys_data),intent(inout) :: new_fld
 !
 !
       new_fld%num_phys =  org_fld%num_phys
@@ -153,70 +154,108 @@
       new_fld%num_phys_viz =  org_fld%num_phys_viz
       new_fld%ntot_phys_viz = org_fld%ntot_phys_viz
 !
-      new_fld%num_component =>    org_fld%num_component
-      new_fld%istack_component => org_fld%istack_component
-      new_fld%iorder_eletype =>   org_fld%iorder_eletype
-      new_fld%iflag_monitor =>    org_fld%iflag_monitor
-      new_fld%phys_name =>        org_fld%phys_name
+      call alloc_phys_name_type(new_fld)
 !
-      end subroutine link_field_name_type
+      new_fld%num_component(1:new_fld%num_phys)                         &
+     &             = org_fld%num_component(1:new_fld%num_phys)
+      new_fld%phys_name(1:new_fld%num_phys)                             &
+     &             = org_fld%phys_name(1:new_fld%num_phys)
+      new_fld%iflag_monitor(1:new_fld%num_phys)                         &
+     &             = org_fld%iflag_monitor(1:new_fld%num_phys)
+      new_fld%istack_component(0:new_fld%num_phys)                      &
+     &             = org_fld%istack_component(0:new_fld%num_phys)
 !
-! -------------------------------------------------------------------
+      end subroutine copy_field_name_type
 !
-      subroutine link_field_data_type(org_fld, new_fld)
+! -----------------------------------------------------------------------
+!
+      subroutine copy_field_data_type(org_fld, new_fld)
 !
       type(phys_data), intent(in) :: org_fld
-      type(phys_data), intent(inout) :: new_fld
+      type(phys_data),intent(inout) :: new_fld
 !
+      call alloc_phys_data_type(org_fld%n_point, new_fld)
+      new_fld%iflag_update(1:new_fld%ntot_phys)                         &
+     &           = org_fld%iflag_update(1:new_fld%ntot_phys)
 !
-      call link_field_name_type(org_fld, new_fld)
+!$omp parallel workshare
+      new_fld%d_fld(1:new_fld%n_point,1:new_fld%ntot_phys)              &
+     &          = org_fld%d_fld(1:new_fld%n_point,1:new_fld%ntot_phys)
+!$omp end parallel workshare
 !
-      new_fld%n_point =       org_fld%n_point
+      end subroutine copy_field_data_type
 !
-      new_fld%d_fld =>        org_fld%d_fld
-      new_fld%iflag_update => org_fld%iflag_update
+! -----------------------------------------------------------------------
 !
-      end subroutine link_field_data_type
+      integer(kind = kint) function field_id_by_address(fld, i_ref)
 !
-! -------------------------------------------------------------------
+      type(phys_data), intent(in) :: fld
+      integer(kind = kint), intent(in) :: i_ref
+!
+      integer(kind = kint) :: i, i_start
+!
+      field_id_by_address = 0
+      do i = 1, fld%num_phys
+        i_start = fld%istack_component(i-1) + 1
+        if(i_start .eq. i_ref) then
+          field_id_by_address = i
+          exit
+        end if
+      end do
+!
+      end function field_id_by_address
+!
+! -----------------------------------------------------------------------
+!
+      character(len=kchara) function field_name_by_address(fld, i_ref)
+!
+      type(phys_data), intent(in) :: fld
+      integer(kind = kint), intent(in) :: i_ref
+!
+      integer(kind = kint) :: i, i_start
+!
+      write(field_name_by_address,'(a)') 'MISSING'
+      do i = 1, fld%num_phys
+        i_start = fld%istack_component(i-1) + 1
+        if(i_start .eq. i_ref) then
+          field_name_by_address = fld%phys_name(i)
+          exit
+        end if
+      end do
+!
+      end function field_name_by_address
+!
+! -----------------------------------------------------------------------
 !  --------------------------------------------------------------------
 !
-      subroutine disconnect_phys_name_type(fld)
+      subroutine check_all_field_data(my_rank, fld)
 !
-      type(phys_data), intent(inout) :: fld
-!
-!
-       nullify(fld%phys_name, fld%iorder_eletype, fld%iflag_monitor)
-       nullify(fld%num_component, fld%istack_component)
-!
-      end subroutine disconnect_phys_name_type
-!
-!  --------------------------------------------------------------------
-!
-      subroutine disconnect_phys_data_type(fld)
-!
-      type(phys_data), intent(inout) :: fld
+      integer(kind = kint), intent(in) :: my_rank
+      type(phys_data), intent(in) :: fld
 !
 !
-      nullify(fld%d_fld, fld%iflag_update)
+      call check_nodal_field_name_type((50+my_rank), fld)
+      call check_nodal_data                                             &
+     &   ((50+my_rank), fld, fld%ntot_phys, ione)
 !
-      end subroutine disconnect_phys_data_type
+      end subroutine check_all_field_data
 !
 !  --------------------------------------------------------------------
-!  --------------------------------------------------------------------
 !
-      subroutine check_nodal_field_name_type(fld)
+      subroutine check_nodal_field_name_type(id_output, fld)
 !
+      integer(kind = kint), intent(in) :: id_output
       type(phys_data), intent(in) :: fld
 !
 !
       integer(kind = kint) :: i
 !
-      write(*,*) 'fld%num_phys ',fld%num_phys
-      write(*,*) 'fld%num_phys_viz ',fld%num_phys_viz
-      write(*,*) 'id#, num_component, stack_component, field_name '
+      write(id_output,*) 'fld%num_phys ',fld%num_phys
+      write(id_output,*) 'fld%num_phys_viz ',fld%num_phys_viz
+      write(id_output,*)                                                &
+     &      'id#, num_component, stack_component, field_name '
       do i = 1, fld%num_phys
-        write(*,'(3i6,2x,a2,a)') i, fld%num_component(i),               &
+        write(id_output,'(3i6,2x,a2,a)') i, fld%num_component(i),       &
      &         fld%istack_component(i), '  ', trim(fld%phys_name(i))
       end do
 !
@@ -224,15 +263,15 @@
 !
 !   ---------------------------------------------------------------------
 !
-      subroutine check_nodal_data(my_rank, fld, numdir, i_field)
+      subroutine check_nodal_data(id_output, fld, numdir, i_field)
 !
-      integer(kind = kint), intent(in) :: my_rank, numdir, i_field
+      integer(kind = kint), intent(in) :: id_output, numdir, i_field
       type(phys_data), intent(in) :: fld
       integer(kind = kint) :: inod, nd
 !
-      write(50+my_rank,*) 'inod, nodal field: ', i_field, numdir
+      write(id_output,*) 'inod, nodal field: ', i_field, numdir
       do inod = 1, fld%n_point
-        write(50+my_rank,'(i16,1p10e25.14)')                            &
+        write(id_output,'(i16,1p10e25.14)')                             &
      &         inod, (fld%d_fld(inod,i_field+nd-1),nd=1, numdir)
       end do
 !

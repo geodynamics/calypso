@@ -120,7 +120,7 @@
       real (kind=kreal), intent(inout):: X_new(NB*nnod_new)
 !
 !
-      call resize_work_sph_SR(NB, npe_send, npe_recv,                   &
+      call resize_work_4_SR(NB, npe_send, npe_recv,                     &
      &    istack_send(npe_send), istack_recv(npe_recv))
 !
       if(iflag_SR .eq. iflag_import_rev) then
@@ -185,7 +185,7 @@
       real (kind=kreal), intent(inout):: X3_new(NB*nnod_new)
 !
 !
-      call resize_work_sph_SR( (3*NB), npe_send, npe_recv,              &
+      call resize_work_4_SR( (3*NB), npe_send, npe_recv,                &
      &    istack_send(npe_send), istack_recv(npe_recv))
 !
       if(iflag_SR .eq. iflag_import_rev) then
@@ -244,7 +244,7 @@
       integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
 !
 !
-      call resize_work_sph_SR(NB, npe_send, npe_recv,                   &
+      call resize_work_4_SR(NB, npe_send, npe_recv,                     &
      &    istack_send(npe_send), istack_recv(npe_recv))
 !
       call calypso_send_recv_check                                      &

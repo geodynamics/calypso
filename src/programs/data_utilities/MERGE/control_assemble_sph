@@ -11,13 +11,13 @@ begin assemble_control
   end data_files_def
 !
   begin new_data_files_def
-    num_new_domain_ctl           4
+    num_subdomain_ctl           4
 !
-    new_sph_mode_prefix        'sph_lm31t48r96c_4/in'
-    new_restart_prefix         'rst_4/rst'
+    sph_file_prefix            'sph_lm31t48r96c_4/in'
+    restart_file_prefix        'rst_4/rst'
 !
-    new_sph_files_fmt_ctl      'ascii'
-    new_rst_files_fmt_ctl      'ascii'
+    sph_file_fmt_ctl           'ascii'
+    restart_file_fmt_ctl       'ascii'
 !
     delete_original_data_flag       'YES'
   end new_data_files_def
@@ -29,6 +29,9 @@ begin assemble_control
       i_step_number_ctl     2000
       i_step_rst_ctl        800
     end time_step_ctl
+!
+    begin new_time_step_ctl
+    end new_time_step_ctl
   end control
 !
   begin newrst_magne_ctl

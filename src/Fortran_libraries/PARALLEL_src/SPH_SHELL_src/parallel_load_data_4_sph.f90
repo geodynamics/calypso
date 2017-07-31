@@ -6,9 +6,28 @@
 !>@brief Load spherical harmonics indexing data on multiple processes
 !!
 !!@verbatim
-!!      subroutine load_para_SPH_and_FEM_mesh
-!!      subroutine load_FEM_mesh_4_SPH
-!!      subroutine load_para_sph_mesh
+!!      subroutine load_para_SPH_and_FEM_mesh(sph, comms_sph, sph_grps, &
+!!     &          mesh, group, ele_mesh, mesh_file, gen_sph)
+!!      subroutine load_para_SPH_rj_mesh(sph, comms_sph, sph_grps)
+!!      subroutine load_para_sph_mesh(sph, bc_rtp_grp, sph_grps)
+!!        type(sph_grids), intent(inout) :: sph
+!!        type(sph_comm_tables), intent(inout) :: comms_sph
+!!        type(sph_group_data), intent(inout) ::  sph_grps
+!!        type(mesh_geometry), intent(inout) :: mesh
+!!        type(mesh_groups), intent(inout) ::   group
+!!        type(element_geometry), intent(inout) :: ele_mesh
+!!        type(field_IO_params), intent(inout) ::  mesh_file
+!!        type(construct_spherical_grid), intent(inout) :: gen_sph
+!!
+!!      subroutine load_para_rj_mesh                                    &
+!!     &         (sph_params, sph_rj, comm_rj, sph_grps)
+!!         type(sph_shell_parameters), intent(inout) :: sph_params
+!!         type(sph_rtp_grid), intent(inout) :: sph_rtp
+!!         type(sph_rtm_grid), intent(inout) :: sph_rtm
+!!         type(sph_rlm_grid), intent(inout) :: sph_rlm
+!!         type(sph_rj_grid), intent(inout) :: sph_rj
+!!         type(sph_comm_tbl), intent(inout) :: comm_rj
+!!         type(sph_group_data), intent(inout) ::  sph_grps
 !!@endverbatim
 !
       module parallel_load_data_4_sph
@@ -16,10 +35,21 @@
       use m_precision
       use m_constants
 !
+      use t_file_IO_parameter
+      use t_spheric_parameter
+      use t_sph_trans_comm_tbl
+      use t_spheric_mesh
+      use t_spheric_data_IO
+      use t_const_spherical_grid
+      use t_sph_local_parameter
+      use sph_file_MPI_IO_select
+      use set_loaded_data_4_sph
+!
       implicit none
 !
-      private :: count_interval_4_each_dir, self_comm_flag
-      private :: set_fem_center_mode_4_SPH
+      private :: load_FEM_mesh_4_SPH
+!
+      type(sph_file_data_type), save, private :: sph_file_l
 !
 ! -----------------------------------------------------------------------
 !
@@ -27,264 +57,218 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine load_para_SPH_and_FEM_mesh
+      subroutine load_para_SPH_and_FEM_mesh(sph, comms_sph, sph_grps,   &
+     &          mesh, group, ele_mesh, mesh_file, gen_sph)
 !
-      call load_para_sph_mesh
-      call load_FEM_mesh_4_SPH
+      use t_mesh_data
+!
+      type(sph_grids), intent(inout) :: sph
+      type(sph_comm_tables), intent(inout) :: comms_sph
+      type(sph_group_data), intent(inout) ::  sph_grps
+!
+      type(mesh_geometry), intent(inout) :: mesh
+      type(mesh_groups), intent(inout) ::   group
+      type(element_geometry), intent(inout) :: ele_mesh
+      type(field_IO_params), intent(inout) ::  mesh_file
+!
+      type(construct_spherical_grid), intent(inout) :: gen_sph
+!
+!
+      call load_para_sph_mesh(sph, comms_sph, sph_grps)
+!
+      call load_FEM_mesh_4_SPH                                          &
+     &   (sph%sph_params, sph%sph_rtp, sph%sph_rj,                      &
+     &    sph_grps%radial_rtp_grp, sph_grps%radial_rj_grp,              &
+     &    mesh, group, ele_mesh, mesh_file, gen_sph)
 !
       end subroutine load_para_SPH_and_FEM_mesh
 !
 ! -----------------------------------------------------------------------
+!
+      subroutine load_para_SPH_rj_mesh(sph, comms_sph, sph_grps)
+!
+      type(sph_grids), intent(inout) :: sph
+      type(sph_comm_tables), intent(inout) :: comms_sph
+      type(sph_group_data), intent(inout) ::  sph_grps
+!
+!
+      call load_para_rj_mesh                                            &
+     &   (sph%sph_params, sph%sph_rj, comms_sph%comm_rj, sph_grps)
+!
+      end subroutine load_para_SPH_rj_mesh
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine load_FEM_mesh_4_SPH
+      subroutine load_FEM_mesh_4_SPH                                    &
+     &         (sph_params, sph_rtp, sph_rj, radial_rtp_grp,            &
+     &          radial_rj_grp, mesh, group, ele_mesh, mesh_file,        &
+     &          gen_sph)
 !
       use calypso_mpi
       use t_mesh_data
+      use t_comm_table
+      use t_geometry_data
       use t_group_data
 !
-      use m_geometry_data
       use m_spheric_constants
-      use m_spheric_parameter
-      use load_mesh_data
+      use mpi_load_mesh_data
+      use copy_mesh_structures
       use const_FEM_mesh_sph_mhd
-      use copy_mesh_from_type
+      use gen_sph_grids_modes
       use mesh_IO_select
 !
-      type(mesh_geometry) :: mesh
-      type(mesh_groups) ::  group
+      type(sph_shell_parameters), intent(inout) :: sph_params
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_rj_grid), intent(in) :: sph_rj
+      type(group_data), intent(in) :: radial_rtp_grp
+      type(group_data), intent(in) :: radial_rj_grp
+!
+      type(mesh_geometry), intent(inout) :: mesh
+      type(mesh_groups), intent(inout) ::   group
+      type(element_geometry), intent(inout) :: ele_mesh
+      type(field_IO_params), intent(inout) ::  mesh_file
+!
+      type(construct_spherical_grid), intent(inout) :: gen_sph
+!
+      type(mesh_data) :: femmesh_s
 !
 !
 !  --  load FEM mesh data
-      if(check_exist_mesh(my_rank) .eq. 0) then
-        if (iflag_debug.gt.0) write(*,*) 'input_mesh'
-        call input_mesh(my_rank)
-        call set_fem_center_mode_4_SPH(node1%internal_node)
+      if(check_exist_mesh(mesh_file, my_rank) .eq. 0) then
+        if (iflag_debug.gt.0) write(*,*) 'mpi_input_mesh'
+        call mpi_input_mesh(mesh_file, nprocs, mesh, group,             &
+     &      ele_mesh%surf%nnod_4_surf, ele_mesh%edge%nnod_4_edge)
+        call set_fem_center_mode_4_SPH                                  &
+     &     (mesh%node%internal_node, sph_rtp, sph_params)
         return
       end if
 !
 !  --  Construct FEM mesh
-      if(iflag_shell_mode .eq. iflag_no_FEMMESH) then
-        if(iflag_rj_center .gt. 0) then
-          iflag_shell_mode =  iflag_MESH_w_center
+      if(sph_params%iflag_shell_mode .eq. iflag_no_FEMMESH) then
+        if(sph_rj%iflag_rj_center .gt. 0) then
+          sph_params%iflag_shell_mode =  iflag_MESH_w_center
         else
-          iflag_shell_mode = iflag_MESH_same
+          sph_params%iflag_shell_mode = iflag_MESH_same
         end if
       end if
 !
-      call const_FEM_mesh_4_sph_mhd(mesh, group)
-!      call compare_mesh_type_vs_1st(my_rank, mesh, group)
+      if (iflag_debug.gt.0) write(*,*) 'const_FEM_mesh_4_sph_mhd'
+      call const_FEM_mesh_4_sph_mhd                                     &
+     &   (sph_params, sph_rtp, sph_rj, radial_rtp_grp, radial_rj_grp,   &
+     &    femmesh_s%mesh, femmesh_s%group, mesh_file, gen_sph)
+!      call compare_mesh_type                                           &
+!     &   (my_rank, mesh%nod_comm, mesh%node, mesh%ele, femmesh_s%mesh)
+!      call compare_mesh_groups(group%nod_grp, femmesh_s%group)
 !
-      call set_mesh_from_type(mesh, group)
+      call set_mesh_data_from_type(femmesh_s%mesh, femmesh_s%group,     &
+     &      mesh%nod_comm, mesh%node, mesh%ele,                         &
+     &      ele_mesh%surf, ele_mesh%edge,                               &
+     &      group%nod_grp, group%ele_grp, group%surf_grp)
 !
       end subroutine load_FEM_mesh_4_SPH
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine load_para_sph_mesh
+      subroutine load_para_sph_mesh(sph, comms_sph, sph_grps)
 !
       use calypso_mpi
       use m_machine_parameter
 !
       use load_data_for_sph_IO
+      use set_from_recv_buf_rev
+!
+      type(sph_grids), intent(inout) :: sph
+      type(sph_comm_tables), intent(inout) :: comms_sph
+      type(sph_group_data), intent(inout) ::  sph_grps
+!
+      integer(kind = kint) :: ierr
 !
 !
       if (iflag_debug.gt.0) write(*,*) 'input_geom_rtp_sph_trans'
-      call input_geom_rtp_sph_trans(my_rank)
+      call sel_mpi_read_geom_rtp_file                                   &
+     &   (nprocs, my_rank, sph_file_l)
+      call input_geom_rtp_sph_trans(sph_file_l, sph%sph_rtp,            &
+     &    comms_sph%comm_rtp, sph_grps, sph%sph_params, ierr)
+      if(ierr .gt. 0) call calypso_mpi_abort(ierr, 'error in RTP mesh')
+!
+      call set_reverse_import_table(sph%sph_rtp%nnod_rtp,               &
+     &    comms_sph%comm_rtp%ntot_item_sr, comms_sph%comm_rtp%item_sr,  &
+     &    comms_sph%comm_rtp%irev_sr)
 !
       if (iflag_debug.gt.0) write(*,*) 'input_modes_rj_sph_trans'
-      call input_modes_rj_sph_trans(my_rank)
+      call sel_mpi_read_spectr_rj_file                                  &
+     &   (nprocs, my_rank, sph_file_l)
+      call input_modes_rj_sph_trans(sph_file_l, sph%sph_rj,             &
+     &    comms_sph%comm_rj, sph_grps, sph%sph_params, ierr)
+      if(ierr .gt. 0) call calypso_mpi_abort(ierr, 'error in RJ mesh')
+!
+      call set_reverse_import_table(sph%sph_rj%nnod_rj,                 &
+     &    comms_sph%comm_rj%ntot_item_sr, comms_sph%comm_rj%item_sr,    &
+     &    comms_sph%comm_rj%irev_sr)
+!
 !
       if (iflag_debug.gt.0) write(*,*) 'input_geom_rtm_sph_trans'
-      call input_geom_rtm_sph_trans(my_rank)
+      call sel_mpi_read_geom_rtm_file                                   &
+     &   (nprocs, my_rank, sph_file_l)
+      call input_geom_rtm_sph_trans(sph_file_l,                         &
+     &    sph%sph_rtm, comms_sph%comm_rtm, sph%sph_params, ierr)
+      if(ierr .gt. 0) call calypso_mpi_abort(ierr, 'error in RTM mesh')
+!
+      call set_reverse_import_table(sph%sph_rtm%nnod_rtm,               &
+     &    comms_sph%comm_rtm%ntot_item_sr, comms_sph%comm_rtm%item_sr,  &
+     &    comms_sph%comm_rtm%irev_sr)
 !
       if (iflag_debug.gt.0) write(*,*) 'input_modes_rlm_sph_trans'
-      call input_modes_rlm_sph_trans(my_rank)
+      call sel_mpi_read_modes_rlm_file                                  &
+     &   (nprocs, my_rank, sph_file_l)
+      call input_modes_rlm_sph_trans(sph_file_l,                        &
+     &    sph%sph_rlm, comms_sph%comm_rlm, sph%sph_params, ierr)
+      if(ierr .gt. 0) call calypso_mpi_abort(ierr, 'error in RLM mesh')
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_reverse_tables_4_SPH'
-      call set_reverse_tables_4_SPH
+      call set_reverse_import_table(sph%sph_rlm%nnod_rlm,               &
+     &    comms_sph%comm_rlm%ntot_item_sr, comms_sph%comm_rlm%item_sr,  &
+     &    comms_sph%comm_rlm%irev_sr)
+!
+      if (iflag_debug.gt.0) write(*,*) 'set_index_flags_4_SPH'
+      call set_index_flags_4_SPH(sph%sph_params,                        &
+     &    sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj,            &
+     &    comms_sph%comm_rtp, comms_sph%comm_rtm,                       &
+     &    comms_sph%comm_rlm, comms_sph%comm_rj)
 !
       end subroutine load_para_sph_mesh
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_reverse_tables_4_SPH
+      subroutine load_para_rj_mesh                                      &
+     &         (sph_params, sph_rj, comm_rj, sph_grps)
 !
       use calypso_mpi
       use m_machine_parameter
-      use m_spheric_parameter
-      use m_sph_trans_comm_table
-!
-      use count_num_sph_smp
-      use set_special_sph_lm_flags
-!
-      use set_from_recv_buf_rev
-!
-      integer(kind = kint) :: ierr
-!
-!
-      if (iflag_debug.gt.0) write(*,*) 's_count_num_sph_smp'
-      call s_count_num_sph_smp(ierr)
-!      if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message_Rsmp)
-!
-      call set_reverse_import_table(nnod_rtp, ntot_item_sr_rtp,         &
-     &    item_sr_rtp, irev_sr_rtp)
-      call set_reverse_import_table(nnod_rtm, ntot_item_sr_rtm,         &
-     &    item_sr_rtm, irev_sr_rtm)
-      call set_reverse_import_table(nnod_rlm, ntot_item_sr_rlm,         &
-     &    item_sr_rlm, irev_sr_rlm)
-      call set_reverse_import_table(nnod_rj, ntot_item_sr_rj,           &
-     &    item_sr_rj, irev_sr_rj)
-!
-      iflag_self_rtp = self_comm_flag(nneib_domain_rtp, id_domain_rtp)
-      iflag_self_rtm = self_comm_flag(nneib_domain_rtm, id_domain_rtm)
-      iflag_self_rlm = self_comm_flag(nneib_domain_rlm, id_domain_rlm)
-      iflag_self_rj =  self_comm_flag(nneib_domain_rj,  id_domain_rj)
-!
-      call count_interval_4_each_dir(ithree, nnod_rtp, idx_global_rtp,  &
-     &    istep_rtp)
-      call count_interval_4_each_dir(ithree, nnod_rtm, idx_global_rtm,  &
-     &    istep_rtm)
-      call count_interval_4_each_dir(itwo,   nnod_rlm, idx_global_rlm,  &
-     &    istep_rlm)
-      call count_interval_4_each_dir(itwo,   nnod_rj,  idx_global_rj,   &
-     &    istep_rj)
-!
-      m_folding = 2 * idx_gl_1d_rtp_p(2,2) / nidx_rtp(3)
-!
-      call set_special_degree_order_flags(nidx_rj(2), nidx_rlm(2),      &
-     &    idx_gl_1d_rj_j, idx_gl_1d_rlm_j, idx_rj_degree_zero,          &
-     &    idx_rj_degree_one,  ist_rtm_order_zero,                       &
-     &    ist_rtm_order_1s, ist_rtm_order_1c)
-!
-!
-      call set_sph_rj_center_flag(nnod_rj, nidx_rj, inod_rj_center)
-!
-      iflag_rj_center = 0
-      call MPI_allREDUCE(inod_rj_center, iflag_rj_center, ione,         &
-     &    CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, ierr_MPI)
-      if(iflag_rj_center .gt. 0) iflag_rj_center = 1
-!
-      end subroutine set_reverse_tables_4_SPH
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_fem_center_mode_4_SPH(internal_node)
-!
-      use calypso_mpi
-      use m_machine_parameter
-      use m_spheric_parameter
-      use m_spheric_constants
-!
-      integer(kind = kint), intent(in) :: internal_node
-!
-      integer(kind = kint) :: iflag_shell_local, nsample
-      integer(kind = kint) :: nnod_full_shell
-!
-!
-      nnod_full_shell = nnod_rtp * m_folding
-      nsample = internal_node
-      iflag_shell_mode = 0
-      if(nsample .le. nnod_full_shell) then
-        iflag_shell_local = iflag_MESH_same
-      else if(nsample .eq. nnod_full_shell+nidx_rtp(1)) then
-        iflag_shell_local = iflag_MESH_w_pole
-      else if(nsample .eq. nnod_full_shell+2*nidx_rtp(1)) then
-        iflag_shell_local = iflag_MESH_w_pole
-      else if(nsample .eq. nnod_full_shell+nidx_rtp(1)+1) then
-        iflag_shell_local = iflag_MESH_w_center
-      else if(nsample .eq. nnod_full_shell+2*nidx_rtp(1)+1) then
-        iflag_shell_local = iflag_MESH_w_center
-      end if
-!
-      if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_local',   &
-     &     my_rank, iflag_shell_local, internal_node, nnod_full_shell
-      call MPI_allreduce(iflag_shell_local, iflag_shell_mode, ione,     &
-     &    CALYPSO_INTEGER, MPI_MAX, CALYPSO_COMM, ierr_MPI)
-      if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_mode',    &
-     &     my_rank, iflag_shell_mode
-!
-      end subroutine set_fem_center_mode_4_SPH
-!
-! -----------------------------------------------------------------------
-!
-      subroutine load_para_rj_mesh
-!
-      use calypso_mpi
-      use m_machine_parameter
-      use m_spheric_parameter
 !
       use load_data_for_sph_IO
-      use count_num_sph_smp
       use set_special_sph_lm_flags
 !
       use set_from_recv_buf_rev
+!
+      type(sph_shell_parameters), intent(inout) :: sph_params
+      type(sph_rj_grid), intent(inout) :: sph_rj
+      type(sph_comm_tbl), intent(inout) :: comm_rj
+      type(sph_group_data), intent(inout) ::  sph_grps
 !
       integer(kind = kint) :: ierr
 !
 !
       if (iflag_debug.gt.0) write(*,*) 'input_modes_rj_sph_trans'
-      call input_modes_rj_sph_trans(my_rank)
+      call sel_mpi_read_spectr_rj_file(nprocs, my_rank, sph_file_l)
+      call input_modes_rj_sph_trans(sph_file_l,                         &
+     &    sph_rj, comm_rj, sph_grps, sph_params, ierr)
+      call set_reverse_import_table(sph_rj%nnod_rj,                     &
+     &    comm_rj%ntot_item_sr, comm_rj%item_sr, comm_rj%irev_sr)
 !
-      if (iflag_debug.gt.0) write(*,*) 's_count_num_sph_smp'
-      call s_count_num_sph_smp(ierr)
-!      if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message_Rsmp)
-!
-      call set_reverse_import_table(nnod_rj, ntot_item_sr_rj,           &
-     &    item_sr_rj, irev_sr_rj)
-      iflag_self_rj =  self_comm_flag(nneib_domain_rj,  id_domain_rj)
-!
-      call count_interval_4_each_dir(itwo,   nnod_rj,  idx_global_rj,   &
-     &    istep_rj)
-!
-      call set_sph_rj_center_flag(nnod_rj, nidx_rj, inod_rj_center)
-!
-      iflag_rj_center = 0
-      call MPI_allREDUCE(inod_rj_center, iflag_rj_center, ione,         &
-     &    CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, ierr_MPI)
-      if(iflag_rj_center .gt. 0) iflag_rj_center = 1
+      call set_index_flags_4_rj(sph_rj, comm_rj)
 !
       end subroutine load_para_rj_mesh
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine count_interval_4_each_dir(numdir, nnod, idx_global,    &
-     &    istep)
-!
-      integer(kind = kint), intent(in) :: numdir, nnod
-      integer(kind = kint), intent(in) :: idx_global(nnod,numdir)
-!
-      integer(kind = kint), intent(inout) :: istep(numdir)
-!
-      integer(kind = kint) :: nd, inod, iref
-!
-!
-      do nd = 1, numdir
-        iref = idx_global(1,nd)
-        do inod = 2, nnod
-          if(idx_global(inod,nd) .ne. iref) then
-            istep(nd) = inod - 1
-            exit
-          end if
-        end do
-      end do
-!
-      end subroutine count_interval_4_each_dir
-!
-! -----------------------------------------------------------------------
-!
-      integer function self_comm_flag(num_neib, id_neib)
-!
-      use calypso_mpi
-!
-      integer(kind = kint), intent(in) :: num_neib
-      integer(kind = kint), intent(in) :: id_neib(num_neib)
-!
-      self_comm_flag = 0
-      if(id_neib(num_neib) .eq. my_rank) self_comm_flag = 1
-!
-      end function self_comm_flag
 !
 ! -----------------------------------------------------------------------
 !

@@ -14,10 +14,10 @@
 !!     &          fdm2_fix_fld_ctr1, coef_p, mat00_3)
 !!      subroutine add_scalar_poisson_mat_no_fld(nri, mat00_3)
 !!
-!!      subroutine add_vector_poisson_mat_center(nri, jmax, r_CTR1,     &
-!!     &          fdm2_fix_fld_ctr1, coef_p, mat3)
-!!      subroutine add_scalar_poisson_mat_ctr1(nri, jmax, r_CTR1,       &
-!!     &          fdm2_fix_fld_ctr1, coef_p, mat3)
+!!      subroutine add_vector_poisson_mat_center(nri, jmax, g_sph_rj,   &
+!!     &          r_CTR1, fdm2_fix_fld_ctr1, coef_p, mat3)
+!!      subroutine add_scalar_poisson_mat_ctr1(nri, jmax, g_sph_rj,     &
+!!     &          r_CTR1, fdm2_fix_fld_ctr1, coef_p, mat3)
 !!@endverbatim
 !
 !!@n @param jmax         Number of local spherical harmonics mode
@@ -29,10 +29,7 @@
       module center_sph_matrices
 !
       use m_precision
-!
       use m_constants
-      use m_t_int_parameter
-      use m_schmidt_poly_on_rtm
 !
       implicit none
 !
@@ -80,8 +77,6 @@
       subroutine add_scalar_poisson_mat_fill_ctr(nri, r_CTR1,           &
      &          fdm2_fix_dr_center, fdm2_fix_fld_ctr1, coef_p, mat00_3)
 !
-      use m_fdm_coefs
-      use m_spheric_parameter
       integer(kind = kint), intent(in) :: nri
       real(kind = kreal), intent(in) :: r_CTR1(0:2)
       real(kind = kreal), intent(in) :: coef_p
@@ -150,10 +145,11 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine add_vector_poisson_mat_center(nri, jmax, r_CTR1,       &
-     &          fdm2_fix_fld_ctr1, coef_p, mat3)
+      subroutine add_vector_poisson_mat_center(nri, jmax, g_sph_rj,     &
+     &          r_CTR1, fdm2_fix_fld_ctr1, coef_p, mat3)
 !
       integer(kind = kint), intent(in) :: jmax, nri
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
       real(kind = kreal), intent(in) :: r_CTR1(0:2)
       real(kind = kreal), intent(in) :: coef_p
       real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)
@@ -173,10 +169,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine add_scalar_poisson_mat_ctr1(nri, jmax, r_CTR1,         &
-     &          fdm2_fix_fld_ctr1, coef_p, mat3)
+      subroutine add_scalar_poisson_mat_ctr1(nri, jmax, g_sph_rj,       &
+     &          r_CTR1, fdm2_fix_fld_ctr1, coef_p, mat3)
 !
       integer(kind = kint), intent(in) :: jmax, nri
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
       real(kind = kreal), intent(in) :: r_CTR1(0:2)
       real(kind = kreal), intent(in) :: coef_p
       real(kind = kreal), intent(in) :: fdm2_fix_fld_ctr1(-1:1,3)

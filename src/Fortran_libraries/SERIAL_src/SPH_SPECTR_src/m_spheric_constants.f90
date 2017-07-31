@@ -7,9 +7,10 @@
 !>@brief  Constants for spectr data
 !!
 !!@verbatim
-!!        igrid_Chebyshev =    2 :: Chebyshev collocation points
-!!        igrid_non_equidist = 1 :: non-equi-distance
-!!        igrid_equidistance = 0 :: equi-distance
+!!        igrid_half_Chebyshev = 3 :: half Chebyshev collocation points
+!!        igrid_Chebyshev =      2 :: Chebyshev collocation points
+!!        igrid_non_equidist =   1 :: non-equi-distance
+!!        igrid_equidistance =   0 :: equi-distance
 !!
 !!       spherical mesh type  -1: none, 0: Gauss points only
 !!                             1: include poles

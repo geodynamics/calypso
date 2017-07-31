@@ -109,21 +109,21 @@
 !
       if (ncomp_field .eq. n_sym_tensor) then
         do inod = 1, nnod
-          write(id_vtk,'(a)',advance='NO')                              &
-     &     vtk_each_vector(d_nod(inod,1), d_nod(inod,2), d_nod(inod,3))
-          write(id_vtk,'(a)',advance='NO')                              &
-     &     vtk_each_vector(d_nod(inod,2), d_nod(inod,4), d_nod(inod,5))
-          write(id_vtk,'(a)',advance='NO')                              &
-     &     vtk_each_vector(d_nod(inod,3), d_nod(inod,5), d_nod(inod,6))
+          write(id_vtk,'(1p3E23.12e3,a1)')                              &
+     &          d_nod(inod,1), d_nod(inod,2), d_nod(inod,3)
+          write(id_vtk,'(1p3E23.12e3,a1)')                              &
+     &          d_nod(inod,2), d_nod(inod,4), d_nod(inod,5)
+          write(id_vtk,'(1p3E23.12e3,a1)')                              &
+     &          d_nod(inod,3), d_nod(inod,5), d_nod(inod,6)
         end do
       else if(ncomp_field .eq. n_vector) then
         do inod = 1, nnod
-          write(id_vtk,'(a)',advance='NO')                              &
-     &     vtk_each_vector(d_nod(inod,1), d_nod(inod,2), d_nod(inod,3))
+          write(id_vtk,'(1p3E23.12e3,a1)')                              &
+     &          d_nod(inod,1), d_nod(inod,2), d_nod(inod,3)
         end do
       else
         do inod = 1, nnod
-          write(id_vtk,'(1p3E23.12e3,a1)') d_nod(inod,1)
+          write(id_vtk,'(1pE23.12e3,a1)') d_nod(inod,1)
         end do
       end if
 !
@@ -272,7 +272,7 @@
       read(id_vtk,*) tmpchara
       read(id_vtk,*) tmpchara
 !
-      read(id_vtk,'(a,i16,a)')  tmpchara, nnod
+      read(id_vtk,*)  tmpchara, nnod
 !
       end subroutine read_vtk_node_head
 !

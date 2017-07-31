@@ -28,7 +28,7 @@
 !
 !
       write(*,*) ' Choose data to take average'
-!      write(*,*)  ' 0: Spectrum data over l, m, and l-m '
+      write(*,*)  ' 0: Spectrum data over l, m, and l-m '
       write(*,*)  ' 1: Average over volume or sphere'
       write(*,*)  ' 2: One spectrum data '
       read(*,*) iflag_data_mode

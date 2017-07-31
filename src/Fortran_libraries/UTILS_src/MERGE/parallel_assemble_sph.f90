@@ -33,7 +33,7 @@
       implicit none
 !
       type rj_assemble_tbl
-        integer(kind = kint), pointer :: j_org_to_new(:)
+        integer(kind = kint), allocatable :: j_org_to_new(:)
         integer(kind = kint) :: icenter
       end type rj_assemble_tbl
 !
@@ -77,6 +77,7 @@
       subroutine set_mode_table_4_assemble(org_sph, new_sph, j_table)
 !
       use t_spheric_parameter
+      use t_spheric_rj_data
 !
       type(sph_grids), intent(in) :: org_sph
       type(sph_grids), intent(in) :: new_sph
@@ -90,8 +91,7 @@
         j_gl =     org_sph%sph_rj%idx_gl_1d_rj_j(j_org,1)
         l_gl = int(org_sph%sph_rj%idx_gl_1d_rj_j(j_org,2))
         m_gl = int(org_sph%sph_rj%idx_gl_1d_rj_j(j_org,3))
-        j_new = find_local_sph_mode_address_t                           &
-     &          (new_sph%sph_rj, l_gl, m_gl)
+        j_new = find_local_sph_address(new_sph%sph_rj, l_gl, m_gl)
         if(j_new .gt. 0) then
           j_table%j_org_to_new(j_org) = j_new
         else
@@ -99,9 +99,9 @@
         end if
       end do
 !
-      if(new_sph%inod_rj_center .gt. 0                                  &
-      &   .and. org_sph%inod_rj_center .gt. 0) then
-        j_table%icenter = new_sph%inod_rj_center
+      if(new_sph%sph_rj%inod_rj_center .gt. 0                           &
+      &   .and. org_sph%sph_rj%inod_rj_center .gt. 0) then
+        j_table%icenter = new_sph%sph_rj%inod_rj_center
       else
         j_table%icenter = 0
       end if
@@ -172,7 +172,7 @@
 !
 !$omp parallel
       do nd = 1, ntot_phys_rj
-        inod_org = org_sph%inod_rj_center
+        inod_org = org_sph%sph_rj%inod_rj_center
         inod_new = j_table%icenter
         d_rj(inod_new,nd) = d_rj_org(inod_org,nd)
       end do

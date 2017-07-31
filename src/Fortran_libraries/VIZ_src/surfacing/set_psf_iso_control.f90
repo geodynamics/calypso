@@ -27,8 +27,21 @@
       integer(kind = kint), parameter :: psf_ctl_file_code = 11
       integer(kind = kint), parameter :: iso_ctl_file_code = 11
 !
+!     Top level
+      character(len=kchara), parameter                                  &
+     &             :: hd_section_ctl = 'cross_section_ctl'
+      character(len=kchara), parameter                                  &
+     &             :: hd_isosurf_ctl = 'isosurface_ctl'
+!
+!      Deprecated labels
+      character(len=kchara), parameter                                  &
+     &             :: hd_psf_ctl = 'surface_rendering'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_ctl = 'isosurf_rendering'
+      private :: hd_section_ctl, hd_psf_ctl
+      private :: hd_isosurf_ctl, hd_iso_ctl
+!
       private :: psf_ctl_file_code, iso_ctl_file_code
-      private :: read_control_4_psf, read_control_4_iso
 !
 !  ---------------------------------------------------------------------
 !
@@ -59,7 +72,7 @@
 !
       use calypso_mpi
       use m_control_data_sections
-      use m_control_data_4_psf
+      use t_control_data_4_psf
       use m_control_params_4_psf
       use m_read_control_elements
       use t_psf_patch_data
@@ -81,13 +94,6 @@
 !
       integer(kind = kint) :: i_psf, ierr
 !
-!
-      call allocate_control_params_4_psf(num_psf)
-!
-      ctl_file_code = psf_ctl_file_code
-      do i_psf = 1, num_psf
-        call read_control_4_psf(i_psf)
-      end do
 !
       do i_psf = 1, num_psf
         call count_control_4_psf(i_psf, psf_ctl_struct(i_psf),          &
@@ -122,7 +128,7 @@
 !
       use calypso_mpi
       use m_control_data_sections
-      use m_control_data_4_iso
+      use t_control_data_4_iso
       use m_control_params_4_iso
       use m_read_control_elements
       use t_psf_patch_data
@@ -182,9 +188,10 @@
 !
       subroutine read_control_4_psf(i_psf)
 !
+      use calypso_mpi
       use m_read_control_elements
 !
-      use m_control_data_4_psf
+      use t_control_data_4_psf
       use m_control_params_4_psf
       use m_control_data_sections
 !
@@ -194,9 +201,19 @@
 !
       if(fname_psf_ctl(i_psf) .eq. 'NO_FILE') return
 !
-      open(psf_ctl_file_code, file=fname_psf_ctl(i_psf), status='old')
-      call read_control_data_4_psf(psf_ctl_struct(i_psf))
-      close(psf_ctl_file_code)
+      if(my_rank .eq. 0) then
+        ctl_file_code = psf_ctl_file_code
+        open(ctl_file_code, file=fname_psf_ctl(i_psf), status='old')
+!
+        call load_ctl_label_and_line
+        call read_psf_control_data                                      &
+     &     (hd_section_ctl, psf_ctl_struct(i_psf))
+        call read_psf_control_data(hd_psf_ctl, psf_ctl_struct(i_psf))
+!
+        close(ctl_file_code)
+      end if
+!
+      call bcast_psf_control_data(psf_ctl_struct(i_psf))
 !
       end subroutine read_control_4_psf
 !
@@ -204,9 +221,10 @@
 !
       subroutine read_control_4_iso(i_iso)
 !
+      use calypso_mpi
       use m_read_control_elements
 !
-      use m_control_data_4_iso
+      use t_control_data_4_iso
       use m_control_params_4_iso
       use m_control_data_sections
 !
@@ -215,9 +233,18 @@
 !
       if(fname_iso_ctl(i_iso) .eq. 'NO_FILE') return
 !
-      open(iso_ctl_file_code, file=fname_iso_ctl(i_iso), status='old')
-      call read_control_data_4_iso(iso_ctl_struct(i_iso))
-      close(iso_ctl_file_code)
+      if(my_rank .eq. 0) then
+        ctl_file_code = iso_ctl_file_code
+        open(ctl_file_code, file=fname_iso_ctl(i_iso), status='old')
+!
+        call load_ctl_label_and_line
+        call read_iso_control_data                                      &
+     &     (hd_isosurf_ctl, iso_ctl_struct(i_iso))
+        call read_iso_control_data(hd_iso_ctl, iso_ctl_struct(i_iso))
+        close(ctl_file_code)
+      end if
+!
+      call bcast_iso_control_data(iso_ctl_struct(i_iso))
 !
       end subroutine read_control_4_iso
 !

@@ -80,6 +80,9 @@
      &        psf_search(i)%edge_list, psf_list(i))
           call count_position_4_psf(psf_list(i),  psf_mesh(i)%node)
 !
+          psf_grp_list(i)%internod_on_nod = 0
+          psf_grp_list(i)%externod_on_nod = 0
+!
         else if ( id_section_method(i) .eq. 0) then
           call count_node_at_node_on_grp                                &
      &       (id_psf_group(i), internal_node, num_surf,                 &

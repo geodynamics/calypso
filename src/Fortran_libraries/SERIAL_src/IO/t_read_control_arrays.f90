@@ -75,7 +75,7 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st real
-        real(kind = kreal), pointer :: vect(:)
+        real(kind = kreal), allocatable :: vect(:)
       end type ctl_array_real
 !
 !>  Structure for two reals control array 
@@ -85,9 +85,9 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st real
-        real(kind = kreal), pointer :: vec1(:)
+        real(kind = kreal), allocatable :: vec1(:)
 !>     array for 2nd real
-        real(kind = kreal), pointer :: vec2(:)
+        real(kind = kreal), allocatable :: vec2(:)
       end type ctl_array_r2
 !
 !>  Structure for three reals control array 
@@ -97,11 +97,11 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st real
-        real(kind = kreal), pointer :: vec1(:)
+        real(kind = kreal), allocatable :: vec1(:)
 !>     array for 2nd real
-        real(kind = kreal), pointer :: vec2(:)
+        real(kind = kreal), allocatable :: vec2(:)
 !>     array for 3rd real
-        real(kind = kreal), pointer :: vec3(:)
+        real(kind = kreal), allocatable :: vec3(:)
       end type ctl_array_r3
 !
 !>  Structure for integer control array 
@@ -111,7 +111,7 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st real
-        integer(kind = kint), pointer :: ivec(:)
+        integer(kind = kint), allocatable :: ivec(:)
       end type ctl_array_int
 !
 !>  Structure for 2 integers control array 
@@ -121,9 +121,9 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st integer
-        integer(kind=kint), pointer :: int1(:)
+        integer(kind=kint), allocatable :: int1(:)
 !>     array for 2nd integer
-        integer(kind=kint), pointer :: int2(:)
+        integer(kind=kint), allocatable :: int2(:)
       end type ctl_array_i2
 !
 !>  Structure for character control array 
@@ -133,7 +133,7 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st character
-        character(len=kchara), pointer :: c_tbl(:)
+        character(len=kchara), allocatable :: c_tbl(:)
       end type ctl_array_chara
 !
 !>  Structure for two charactors control array 
@@ -143,9 +143,9 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st character
-        character(len=kchara), pointer :: c1_tbl(:)
+        character(len=kchara), allocatable :: c1_tbl(:)
 !>     array for 2nd character
-        character(len=kchara), pointer :: c2_tbl(:)
+        character(len=kchara), allocatable :: c2_tbl(:)
       end type ctl_array_c2
 !
 !>  Structure for three charactors control array 
@@ -155,11 +155,11 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st character
-        character(len=kchara), pointer :: c1_tbl(:)
+        character(len=kchara), allocatable :: c1_tbl(:)
 !>     array for 2nd character
-        character(len=kchara), pointer :: c2_tbl(:)
+        character(len=kchara), allocatable :: c2_tbl(:)
 !>     array for 3rd character
-        character(len=kchara), pointer :: c3_tbl(:)
+        character(len=kchara), allocatable :: c3_tbl(:)
       end type ctl_array_c3
 !
 !>  Structure for charactor and two reals control array 
@@ -169,11 +169,11 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for character
-        character(len=kchara), pointer :: c_tbl(:)
+        character(len=kchara), allocatable :: c_tbl(:)
 !>     array for 1st real
-        real(kind = kreal), pointer :: vec1(:)
+        real(kind = kreal), allocatable :: vec1(:)
 !>     array for 2nd real
-        real(kind = kreal), pointer :: vec2(:)
+        real(kind = kreal), allocatable :: vec2(:)
       end type ctl_array_cr2
 !
 !>  Structure for charactor and real control array 
@@ -183,9 +183,9 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st character
-        character(len=kchara), pointer :: c_tbl(:)
+        character(len=kchara), allocatable :: c_tbl(:)
 !>     array for 1st real
-        real(kind = kreal), pointer :: vect(:)
+        real(kind = kreal), allocatable :: vect(:)
       end type ctl_array_cr
 !
 !>  Structure for charactor and integer control array 
@@ -195,9 +195,9 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st character
-        character(len=kchara), pointer :: c_tbl(:)
+        character(len=kchara), allocatable :: c_tbl(:)
 !>     array for 1st real
-        integer(kind = kint), pointer :: ivec(:)
+        integer(kind = kint), allocatable :: ivec(:)
       end type ctl_array_ci
 !
 !>  Structure for two charactors and real control array 
@@ -207,11 +207,11 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st character
-        character(len=kchara), pointer :: c1_tbl(:)
+        character(len=kchara), allocatable :: c1_tbl(:)
 !>     array for 2nd character
-        character(len=kchara), pointer :: c2_tbl(:)
+        character(len=kchara), allocatable :: c2_tbl(:)
 !>     array for 1st real
-        real(kind = kreal), pointer :: vect(:)
+        real(kind = kreal), allocatable :: vect(:)
       end type ctl_array_c2r
 !
 !>  Structure for real, charactor, and integere control array 
@@ -221,11 +221,11 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st integer
-        integer(kind=kint), pointer :: ivec(:)
+        integer(kind=kint), allocatable :: ivec(:)
 !>     array for character
-        character(len=kchara), pointer :: c_tbl(:)
+        character(len=kchara), allocatable :: c_tbl(:)
 !>     array for 1st real
-        real(kind = kreal), pointer :: vect(:)
+        real(kind = kreal), allocatable :: vect(:)
       end type ctl_array_icr
 !
 !>  Structure for real and integer control array 
@@ -235,9 +235,9 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st integer
-        integer(kind=kint), pointer :: ivec(:)
+        integer(kind=kint), allocatable :: ivec(:)
 !>     array for 1st real
-        real(kind = kreal), pointer :: vect(:)
+        real(kind = kreal), allocatable :: vect(:)
       end type ctl_array_ir
 !
 !>  Structure for 1 real and 2 integers control array 
@@ -247,11 +247,11 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st integer
-        integer(kind=kint), pointer :: int1(:)
+        integer(kind=kint), allocatable :: int1(:)
 !>     array for 2nd integer
-        integer(kind=kint), pointer :: int2(:)
+        integer(kind=kint), allocatable :: int2(:)
 !>     array for 1st real
-        real(kind = kreal), pointer :: vect(:)
+        real(kind = kreal), allocatable :: vect(:)
       end type ctl_array_i2r
 !
 !>  Structure for 2 reals and 2 integeres control array 
@@ -261,24 +261,14 @@
 !>     array counter
         integer(kind=kint) :: icou = 0
 !>     array for 1st integer
-        integer(kind=kint), pointer :: int1(:)
+        integer(kind=kint), allocatable :: int1(:)
 !>     array for 2nd integer
-        integer(kind=kint), pointer :: int2(:)
+        integer(kind=kint), allocatable :: int2(:)
 !>     array for 1st real
-        real(kind = kreal), pointer :: vec1(:)
+        real(kind = kreal), allocatable :: vec1(:)
 !>     array for 2nd real
-        real(kind = kreal), pointer :: vec2(:)
+        real(kind = kreal), allocatable :: vec2(:)
       end type ctl_array_i2r2
-!
-      private :: alloc_control_array_real
-      private :: alloc_control_array_r2, alloc_control_array_r3
-      private :: alloc_control_array_int, alloc_control_array_i2
-      private :: alloc_control_array_chara, alloc_control_array_c2
-      private :: alloc_control_array_c_i
-      private :: alloc_control_array_c_r, alloc_control_array_c_r2
-      private :: alloc_control_array_c2_r, alloc_control_array_i_c_r
-      private :: alloc_control_array_i_r, alloc_control_array_i2_r
-      private :: alloc_control_array_i2_r2
 !
 !   --------------------------------------------------------------------
 !

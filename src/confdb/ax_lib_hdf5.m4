@@ -236,12 +236,19 @@ HDF5 support is being disabled (equivalent to --with-hdf5=no).
         CPPFLAGS=$HDF5_CPPFLAGS
         LIBS=$HDF5_LIBS
         LDFLAGS=$HDF5_LDFLAGS
+        
         AC_CHECK_HEADER([hdf5.h], [ac_cv_hadf5_h=yes], [ac_cv_hadf5_h=no])
         AC_CHECK_LIB([hdf5], [H5Fcreate], [ac_cv_libhdf5=yes],
                      [ac_cv_libhdf5=no])
         if test "$ac_cv_hadf5_h" = "no" && test "$ac_cv_libhdf5" = "no" ; then
           AC_MSG_WARN([Unable to compile HDF5 test program])
         fi
+                
+        AC_CHECK_FILE([libhdf5.a], [static_hdf5=yes], [static_hdf5=no])
+        if test "$static_hdf5" = "no" ; then
+          AC_MSG_WARN([No static HDF5 library found])
+        fi
+        
         dnl Look for HDF5's high level library
         AC_HAVE_LIBRARY([hdf5_hl], [HDF5_LIBS="$HDF5_LIBS -lhdf5_hl"], [], [])
 
@@ -306,8 +313,12 @@ HDF5 support is being disabled (equivalent to --with-hdf5=no).
             AC_SUBST([H5PFC])
 
             dnl Make Fortran link line by inserting Fortran libraries
-#            HDF5_PFLIBS=$(eval $H5PFC -show)
-            HDF5_PFLIBS=$(eval $H5PFC -show | cut -d " " -f 3-)
+            if test "$static_hdf5" = "yes" ; then
+#              HDF5_PFLIBS=$(eval $H5PFC -show)
+              HDF5_PFLIBS=$(eval $H5PFC -show | cut -d " " -f 3-)
+            else
+              HDF5_PFLIBS=$(eval $H5PFC -shlib -show  | cut -d " " -f 3-)
+            fi
         else
             AC_MSG_RESULT([no])
             with_hdf5_parallel_fortran="no"
@@ -320,6 +331,7 @@ HDF5 support is being disabled (equivalent to --with-hdf5=no).
 	AC_SUBST([HDF5_LDFLAGS])
 	AC_SUBST([HDF5_LIBS])
 	AC_SUBST([HDF5_FC])
+	AC_SUBST([HDF5_H5PFC])
 	AC_SUBST([HDF5_FFLAGS])
 	AC_SUBST([HDF5_FLIBS])
 	AC_SUBST([HDF5_PFLIBS])

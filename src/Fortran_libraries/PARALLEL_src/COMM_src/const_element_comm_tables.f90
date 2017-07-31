@@ -7,10 +7,10 @@
 !> @brief Belonged element list for each node
 !!
 !!@verbatim
-!!      subroutine const_ele_comm_tbl_global_id                         &
-!!     &         (mesh, ele_mesh, surf_mesh, edge_mesh)
-!!      subroutine dealloc_ele_comm_tbls_gl_nele                        &
-!!     &         (mesh, ele_mesh, surf_mesh, edge_mesh)
+!!      subroutine const_element_comm_tbls(mesh, ele_mesh)
+!!      subroutine dealloc_ele_comm_tbls_gl_nele(mesh, ele_mesh)
+!!        type(mesh_geometry), intent(inout) ::    mesh
+!!        type(element_geometry), intent(inout) :: ele_mesh
 !!
 !!      subroutine const_global_element_id(ele)
 !!      subroutine const_global_surface_id(surf, sf_comm)
@@ -33,11 +33,14 @@
       use t_belonged_element_4_node
       use t_next_node_ele_4_node
 !
+      use m_machine_parameter
+!
       implicit none
+!
+      type(belonged_table), save, private :: blng_tbl
 !
 !      private :: const_ele_comm_tbl, const_surf_comm_table
 !      private :: const_edge_comm_table
-!      private :: const_comm_table_by_connenct
 !
 !-----------------------------------------------------------------------
 !
@@ -45,60 +48,59 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine const_ele_comm_tbl_global_id                           &
-     &         (mesh, ele_mesh, surf_mesh, edge_mesh)
+      subroutine const_element_comm_tbls(mesh, ele_mesh)
 !
       use set_ele_id_4_node_type
 !
       type(mesh_geometry), intent(inout) :: mesh
-      type(element_comms), intent(inout) ::    ele_mesh
-      type(surface_geometry), intent(inout) :: surf_mesh
-      type(edge_geometry),    intent(inout) :: edge_mesh
+      type(element_geometry), intent(inout) :: ele_mesh
 !
 !
-      type(belonged_table) :: belongs
-!
-!
+      if(iflag_debug.gt.0) write(*,*)' const_global_numnod_list'
       call const_global_numnod_list(mesh%node)
 !
+      if(iflag_debug.gt.0) write(*,*)' const_ele_comm_tbl'
       call const_ele_comm_tbl(mesh%node, mesh%ele, mesh%nod_comm,       &
-     &    belongs, ele_mesh%ele_comm)
-      call const_global_numele_list(mesh%ele)
+     &    blng_tbl, ele_mesh%ele_comm)
+      call const_global_element_id(mesh%ele, ele_mesh%ele_comm)
 !
+      if(iflag_debug.gt.0) write(*,*)' const_surf_comm_table'
       call const_surf_comm_table(mesh%node, mesh%nod_comm,              &
-     &    surf_mesh%surf, belongs, surf_mesh%surf_comm)
-      call const_global_surface_id(surf_mesh%surf, surf_mesh%surf_comm)
+     &    ele_mesh%surf, blng_tbl, ele_mesh%surf_comm)
+      if(iflag_debug.gt.0) write(*,*)' const_global_surface_id'
+      call const_global_surface_id(ele_mesh%surf, ele_mesh%surf_comm)
+      call calypso_mpi_barrier
 !
+      if(iflag_debug.gt.0) write(*,*)' const_edge_comm_table'
       call const_edge_comm_table(mesh%node, mesh%nod_comm,              &
-     &    edge_mesh%edge, belongs, edge_mesh%edge_comm)
-      call const_global_edge_id(edge_mesh%edge, edge_mesh%edge_comm)
+     &    ele_mesh%edge, blng_tbl, ele_mesh%edge_comm)
+      if(iflag_debug.gt.0) write(*,*)' const_global_edge_id'
+      call const_global_edge_id(ele_mesh%edge, ele_mesh%edge_comm)
+      call calypso_mpi_barrier
 !
-      end subroutine const_ele_comm_tbl_global_id
+      end subroutine const_element_comm_tbls
 !
 !-----------------------------------------------------------------------
 !
-      subroutine dealloc_ele_comm_tbls_gl_nele                          &
-     &         (mesh, ele_mesh, surf_mesh, edge_mesh)
+      subroutine dealloc_ele_comm_tbls_gl_nele(mesh, ele_mesh)
 !
       type(mesh_geometry), intent(inout) :: mesh
-      type(element_comms), intent(inout) ::    ele_mesh
-      type(surface_geometry), intent(inout) :: surf_mesh
-      type(edge_geometry),    intent(inout) :: edge_mesh
+      type(element_geometry), intent(inout) :: ele_mesh
 !
 !
       call deallocate_type_comm_tbl(ele_mesh%ele_comm)
-      call deallocate_type_comm_tbl(surf_mesh%surf_comm)
-      call deallocate_type_comm_tbl(edge_mesh%edge_comm)
+      call deallocate_type_comm_tbl(ele_mesh%surf_comm)
+      call deallocate_type_comm_tbl(ele_mesh%edge_comm)
 !
       call dealloc_numnod_stack(mesh%node)
       call dealloc_numele_stack(mesh%ele)
-      call dealloc_numsurf_stack(surf_mesh%surf)
-      call dealloc_numedge_stack(edge_mesh%edge)
+      call dealloc_numsurf_stack(ele_mesh%surf)
+      call dealloc_numedge_stack(ele_mesh%edge)
 !
       end subroutine dealloc_ele_comm_tbls_gl_nele
 !
 !-----------------------------------------------------------------------
-!  ---------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
       subroutine const_global_numnod_list(node)
 !
@@ -187,11 +189,18 @@
 !
       call alloc_numedge_stack(nprocs, edge)
 !
+      if(iflag_debug.gt.0) write(*,*)                                   &
+     &          ' count_number_of_node_stack in edge'
       call count_number_of_node_stack                                   &
      &  (edge%numedge, edge%istack_numedge)
+!
+      if(iflag_debug.gt.0) write(*,*)                                   &
+     &          ' count_number_of_node_stack in edge'
       call count_number_of_node_stack                                   &
      &  (edge%internal_edge, edge%istack_interedge)
 !
+      if(iflag_debug.gt.0) write(*,*)                                   &
+     &          ' set_global_ele_id in edge'
       call set_global_ele_id                                            &
      &   (txt, edge%numedge, edge%istack_interedge,                     &
      &    edge%interior_edge, ed_comm, edge%iedge_global)
@@ -205,6 +214,7 @@
      &         (node, ele, nod_comm, belongs, ele_comm)
 !
       use set_ele_id_4_node_type
+      use const_element_comm_table
 !
       type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
@@ -217,7 +227,8 @@
 !
       call set_ele_id_4_node(node, ele, belongs%blng_ele)
       call belonged_ele_id_4_node(node, ele, belongs%host_ele)
-      call const_comm_table_by_connenct(txt, ele%numele,                &
+      call const_comm_table_by_connenct                                 &
+     &   (txt, ele%numele, ele%nnod_4_ele, ele%ie,                      &
      &    ele%interior_ele, ele%x_ele, node, nod_comm,                  &
      &    belongs%blng_ele, belongs%host_ele, ele_comm)
       call dealloc_iele_belonged(belongs%host_ele)
@@ -231,6 +242,7 @@
      &         (node, nod_comm, surf, belongs, surf_comm)
 !
       use set_ele_id_4_node_type
+      use const_element_comm_table
 !
       type(node_data), intent(in) :: node
       type(surface_data), intent(in) :: surf
@@ -243,7 +255,8 @@
 !
       call set_surf_id_4_node(node, surf, belongs%blng_surf)
       call belonged_surf_id_4_node(node, surf, belongs%host_surf)
-      call const_comm_table_by_connenct(txt, surf%numsurf,              &
+      call const_comm_table_by_connenct                                 &
+     &   (txt, surf%numsurf, surf%nnod_4_surf, surf%ie_surf,            &
      &    surf%interior_surf, surf%x_surf, node, nod_comm,              &
      &    belongs%blng_surf, belongs%host_surf, surf_comm)
       call dealloc_iele_belonged(belongs%host_surf)
@@ -257,6 +270,7 @@
      &         (node, nod_comm, edge, belongs, edge_comm)
 !
       use set_ele_id_4_node_type
+      use const_element_comm_table
 !
       type(node_data), intent(in) :: node
       type(edge_data), intent(in) :: edge
@@ -268,82 +282,23 @@
       character(len=kchara), parameter :: txt = 'edge'
 !
 !
+      if(iflag_debug.gt.0) write(*,*) ' set_edge_id_4_node in edge'
       call set_edge_id_4_node(node, edge, belongs%blng_edge)
+!
+      if(iflag_debug.gt.0) write(*,*)                                   &
+     &          ' belonged_edge_id_4_node in edge'
       call belonged_edge_id_4_node(node, edge, belongs%host_edge)
-      call const_comm_table_by_connenct(txt, edge%numedge,              &
+!
+      if(iflag_debug.gt.0) write(*,*)                                   &
+     &          ' const_comm_table_by_connenct in edge'
+      call const_comm_table_by_connenct                                 &
+     &    (txt, edge%numedge, edge%nnod_4_edge, edge%ie_edge,           &
      &    edge%interior_edge, edge%x_edge, node, nod_comm,              &
      &    belongs%blng_edge, belongs%host_edge, edge_comm)
       call dealloc_iele_belonged(belongs%host_edge)
       call dealloc_iele_belonged(belongs%blng_edge)
 !
       end subroutine const_edge_comm_table
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine const_comm_table_by_connenct                           &
-     &         (txt, numele, internal_flag, x_ele, node, nod_comm,      &
-     &          neib_e, host, e_comm)
-!
-      use const_element_comm_table
-      use const_global_element_ids
-!
-      character(len=kchara), intent(in) :: txt
-      integer(kind = kint), intent(in) :: numele
-      integer(kind = kint), intent(in) :: internal_flag(numele)
-      real(kind = kreal), intent(in)  :: x_ele(numele,3)
-!
-      type(node_data), intent(in) :: node
-      type(element_around_node), intent(in) :: host
-      type(element_around_node), intent(in) :: neib_e
-      type(communication_table), intent(in) :: nod_comm
-!
-      type(communication_table), intent(inout) :: e_comm
-!
-!
-      e_comm%num_neib = nod_comm%num_neib
-      call allocate_type_neib_id(e_comm)
-      call allocate_type_import_num(e_comm)
-!
-      call count_element_import_num(node%numnod, host%istack_4_node,    &
-     &    nod_comm%num_neib, nod_comm%id_neib,                          &
-     &    nod_comm%istack_import, nod_comm%item_import,                 &
-     &    e_comm%num_neib, e_comm%id_neib, e_comm%num_import,           &
-     &    e_comm%istack_import, e_comm%ntot_import)
-!
-      call allocate_element_rev_imports(e_comm%ntot_import)
-      call allocate_type_import_item(e_comm)
-!
-!
-      call set_element_import_item(node%numnod, numele,                 &
-     &    node%inod_global, x_ele, host%istack_4_node,                  &
-     &    host%iele_4_node, nod_comm%num_neib, nod_comm%istack_import,  &
-     &    nod_comm%item_import, e_comm%num_neib, e_comm%istack_import,  &
-     &    e_comm%item_import)
-!
-      call allocate_type_export_num(e_comm)
-!
-      call element_num_reverse_SR(e_comm%num_neib, e_comm%id_neib,      &
-     &    e_comm%num_import, e_comm%num_export, e_comm%istack_export,   &
-     &    e_comm%ntot_export)
-!
-      call allocate_element_rev_exports(e_comm%ntot_export)
-      call allocate_type_export_item(e_comm)
-!
-      call element_position_reverse_SR(e_comm%num_neib, e_comm%id_neib, &
-     &    e_comm%istack_import, e_comm%istack_export)
-!
-      call set_element_export_item(txt, node%numnod, numele,            &
-     &    node%inod_global, internal_flag, x_ele, neib_e%istack_4_node, &
-     &    neib_e%iele_4_node, nod_comm%num_neib,                        &
-     &    nod_comm%istack_export, nod_comm%item_export,                 &
-     &    e_comm%num_neib, e_comm%istack_export, e_comm%item_export)
-!
-      call deallocate_element_rev_list
-!
-      call check_element_position(txt, numele, x_ele, e_comm)
-!
-      end subroutine const_comm_table_by_connenct
 !
 !-----------------------------------------------------------------------
 !

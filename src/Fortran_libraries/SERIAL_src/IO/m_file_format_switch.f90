@@ -20,11 +20,11 @@
 !!        File format name
 !!          'ascii':   text (formatted) data
 !!          'gzip':    gziopped text (formatted) data
-!!          'binary':  binary (unformatted) data
+!!          'binary':  binary data
 !!
 !!          'merged_ascii': text (formatted) data in merged file 
 !!          'merged_gzip':  gziopped text (formatted) data in merged file
-!!          'merged_binary': binary (unformatted) data in merged file
+!!          'merged_binary': binary data in merged file
 !!@endverbatim
 !!
 !!@n @param  file_fmt       Structure for File format control

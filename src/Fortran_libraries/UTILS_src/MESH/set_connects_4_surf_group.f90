@@ -25,9 +25,10 @@
 !        type(surface_group_data), intent(in) :: sf_grp
 !        type(surface_node_grp_data), intent(inout) :: sf_nod
 !
-!      subroutine cal_surf_normal_at_nod(mesh, surf, sf_grp,            &
+!      subroutine cal_surf_normal_at_nod(node, ele, surf, sf_grp,       &
 !     &          sf_grp_v, sf_nod)
-!        type(mesh_geometry),          intent(in) :: mesh
+!        type(node_data),              intent(in) :: node
+!        type(element_data),           intent(in) :: ele
 !        type(surface_data),           intent(in) :: surf
 !        type(surface_group_data),     intent(in) :: sf_grp
 !        type(surface_group_geometry), intent(in) :: sf_grp_v
@@ -179,28 +180,29 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine cal_surf_normal_at_nod(mesh, surf, sf_grp,             &
+      subroutine cal_surf_normal_at_nod(node, ele, surf, sf_grp,        &
      &          sf_grp_v, sf_nod)
 !
-      use t_mesh_data
+      use t_geometry_data
       use t_surface_data
       use t_group_data
       use t_surface_group_geometry
       use t_surface_group_connect
       use set_norm_nod_4_surf_grp
 !
-      type(mesh_geometry),          intent(in) :: mesh
+      type(node_data),              intent(in) :: node
+      type(element_data),           intent(in) :: ele
       type(surface_data),           intent(in) :: surf
       type(surface_group_data),     intent(in) :: sf_grp
       type(surface_group_geometry), intent(in) :: sf_grp_v
       type(surface_node_grp_data), intent(inout) :: sf_nod
 !
 !
-      call allocate_work_norm_nod(mesh%node%numnod)
+      call allocate_work_norm_nod(node%numnod)
       call alloc_vect_surf_grp_nod(sf_nod)
 !
-      call cal_surf_grp_norm_node(mesh%ele%numele, mesh%ele%nnod_4_ele, &
-     &    surf%nnod_4_surf, surf%node_on_sf, mesh%ele%ie,               &
+      call cal_surf_grp_norm_node(ele%numele, ele%nnod_4_ele,           &
+     &    surf%nnod_4_surf, surf%node_on_sf, ele%ie,                    &
      &    sf_grp%num_grp, sf_grp%num_item, sf_grp%istack_grp,           &
      &    sf_grp%item_sf_grp, sf_grp_v%vnorm_sf_grp,                    &
      &    sf_grp_v%a_area_sf_grp, sf_nod%ntot_node_sf_grp,              &

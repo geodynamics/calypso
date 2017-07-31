@@ -81,7 +81,8 @@
       subroutine set_stack_of_segments(i_divide, i_quot, i_rest,        &
      &          istart, istack)
 !
-      integer(kind= kint), intent(in) :: i_divide, i_rest, i_quot, istart
+      integer(kind= kint), intent(in) :: i_divide, i_rest
+      integer(kind= kint), intent(in) :: i_quot, istart
       integer(kind= kint), intent(inout) :: istack(0:i_divide)
 !
       integer(kind = kint) :: inum

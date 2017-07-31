@@ -29,7 +29,7 @@
 !!        type(element_data),       intent(in) :: ele
 !!        type(element_around_node), intent(inout) :: neib_ele
 !!
-!!      subroutine const_next_nod_id_4_node_type(node, ele, neib_ele,   &
+!!      subroutine const_next_nod_id_4_node(node, ele, neib_ele,        &
 !!     &          neib_nod)
 !!        type(node_data),        intent(in) :: node
 !!        type(element_data),       intent(in) :: ele
@@ -225,7 +225,7 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine const_next_nod_id_4_node_type(node, ele, neib_ele,     &
+      subroutine const_next_nod_id_4_node(node, ele, neib_ele,          &
      &          neib_nod)
 !
       use m_machine_parameter
@@ -282,7 +282,7 @@
       neib_nod%iweight_next(1:neib_nod%ntot)                            &
      &     = - neib_nod%iweight_next(1:neib_nod%ntot)
 !
-      end subroutine const_next_nod_id_4_node_type
+      end subroutine const_next_nod_id_4_node
 !
 !-----------------------------------------------------------------------
 !

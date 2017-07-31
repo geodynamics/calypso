@@ -6,8 +6,6 @@
 !!@n      Modified by H. Matsui on Feb., 2012
 !
 !> @brief Neighbouring node and element list for each node
-!>     This routine is substitution of the following module
-!>@n        (module m_element_id_4_node)
 !!
 !!@verbatim
 !!      subroutine alloc_numele_belonged(numnod, neib_ele)
@@ -49,14 +47,14 @@
 !>   maximum number of belonged element list for each node
         integer (kind=kint) :: nmax
 !>   number of belonged element for each node
-        integer (kind=kint), pointer :: nele_4_node(:)
+        integer (kind=kint), allocatable :: nele_4_node(:)
 !>   end number of belonged element list for each node
-        integer (kind=kint), pointer :: istack_4_node(:)
+        integer (kind=kint), allocatable :: istack_4_node(:)
 !
 !>   local element ID of belonged element for each node
-        integer (kind=kint), pointer :: iele_4_node(:)
+        integer (kind=kint), allocatable :: iele_4_node(:)
 !>   node ID in belonged element for each node
-        integer (kind=kint), pointer :: iconn_4_node(:)
+        integer (kind=kint), allocatable :: iconn_4_node(:)
       end type element_around_node
 !
 !
@@ -69,14 +67,14 @@
 !>   maximum number of neighbouring node for each node
         integer (kind=kint) :: nmax
 !>   number of neighbouring node list for each node
-        integer (kind=kint), pointer :: nnod_next(:)
+        integer (kind=kint), allocatable :: nnod_next(:)
 !>   end number of neighbouring node list for each node
-        integer (kind=kint), pointer :: istack_next(:)
+        integer (kind=kint), allocatable :: istack_next(:)
 !
 !>   local node ID of neighbouring node for each node
-        integer (kind=kint), pointer :: inod_next(:)
+        integer (kind=kint), allocatable :: inod_next(:)
 !>   Weighting count for neighbouring node
-        integer (kind=kint), pointer :: iweight_next(:)
+        integer (kind=kint), allocatable :: iweight_next(:)
       end type next_nod_id_4_nod
 !
 !>   Structure of neighbouring node and element list for each node

@@ -9,8 +9,11 @@
 !!
 !!@verbatim
 !!      subroutine cal_gaunt_coriolis_rlm(l_truncation,                 &
-!!     &          jmax_rlm, idx_gl_1d_rlm_j)
-!!      subroutine interact_rot_coriolis_rlm(jmax_rlm)
+!!     &         (l_truncation, jmax_rlm, idx_gl_1d_rlm_j,              &
+!!     &          jgi_cor_rlm, jei_cor_rlm, gi_cor_rlm, ei_cor_rlm)
+!!      subroutine interact_rot_coriolis_rlm                            &
+!!     &         (jmax_rlm, g_sph_rlm, gi_cor_rlm, ei_cor_rlm,          &
+!!     &          sw_rlm, tw_rlm, sd_rlm, td_rlm, sr_rlm, tr_rlm)
 !!@endverbatim
 !!
 !!@param   l_truncation   Truncation level
@@ -22,6 +25,7 @@
       use m_precision
       use m_constants
       use m_machine_parameter
+      use t_gaunt_coriolis_rlm
 !
       implicit none
 !
@@ -32,15 +36,20 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine cal_gaunt_coriolis_rlm(l_truncation,                   &
-     &          jmax_rlm, idx_gl_1d_rlm_j)
+      subroutine cal_gaunt_coriolis_rlm                                 &
+     &         (l_truncation, jmax_rlm, idx_gl_1d_rlm_j,                &
+     &          jgi_cor_rlm, jei_cor_rlm, gi_cor_rlm, ei_cor_rlm)
 !
       use cal_gaunt_itgs
-      use m_gaunt_coriolis_rlm
 !
       integer(kind = kint), intent(in) :: l_truncation
       integer(kind = kint), intent(in) :: jmax_rlm
       integer(kind = kint), intent(in) :: idx_gl_1d_rlm_j(jmax_rlm,3)
+!
+      integer(kind = kint), intent(inout) :: jgi_cor_rlm(jmax_rlm,2)
+      integer(kind = kint), intent(inout) :: jei_cor_rlm(jmax_rlm,1)
+      real(kind = kreal), intent(inout) :: gi_cor_rlm(jmax_rlm,2)
+      real(kind = kreal), intent(inout) :: ei_cor_rlm(jmax_rlm,1)
 !
       integer(kind = kint) :: l3, m3, j3, l2, m2, j_rlm
       integer(kind = kint) :: l2_gl_k1, l2_gl_k2, l2_gl_l1
@@ -104,12 +113,23 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine interact_rot_coriolis_rlm(jmax_rlm)
-!
-      use m_schmidt_poly_on_rtm
-      use m_gaunt_coriolis_rlm
+      subroutine interact_rot_coriolis_rlm                              &
+     &         (jmax_rlm, g_sph_rlm, gi_cor_rlm, ei_cor_rlm,            &
+     &          sw_rlm, tw_rlm, sd_rlm, td_rlm, sr_rlm, tr_rlm)
 !
       integer(kind = kint), intent(in) :: jmax_rlm
+      real(kind = kreal), intent(in):: g_sph_rlm(jmax_rlm,17)
+!
+      real(kind = kreal), intent(in) :: gi_cor_rlm(jmax_rlm,2)
+      real(kind = kreal), intent(in) :: ei_cor_rlm(jmax_rlm,1)
+!
+      real(kind = kreal), intent(inout) :: sw_rlm(2,3,jmax_rlm)
+      real(kind = kreal), intent(inout) :: tw_rlm(2,4,jmax_rlm)
+      real(kind = kreal), intent(inout) :: sd_rlm(2,2,jmax_rlm)
+      real(kind = kreal), intent(inout) :: td_rlm(2,jmax_rlm)
+      real(kind = kreal), intent(inout) :: sr_rlm(2,jmax_rlm)
+      real(kind = kreal), intent(inout) :: tr_rlm(2,jmax_rlm)
+!
       integer(kind = kint) :: j3
 !
 !

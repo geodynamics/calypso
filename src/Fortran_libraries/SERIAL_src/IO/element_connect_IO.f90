@@ -7,15 +7,14 @@
 !>@brief Data IO routines for element connectivity
 !!
 !!@verbatim
-!!      subroutine write_element_info(id_file)
-!!      subroutine write_surface_4_element(id_file)
-!!      subroutine write_edge_4_element(id_file)
-!!      subroutine write_element_info_b(id_file)
+!!      subroutine write_element_info(id_file, ele_IO)
+!!      subroutine write_surface_4_element(id_file, sfed_IO)
+!!      subroutine write_edge_4_element(id_file, sfed_IO)
 !!
-!!      subroutine read_number_of_element(id_file)
-!!      subroutine read_element_info(id_file)
-!!      subroutine read_number_of_element_b(id_file)
-!!      subroutine read_element_info_b(id_file)
+!!      subroutine read_number_of_element(id_file, ele_IO)
+!!      subroutine read_element_info(id_file, ele_IO)
+!!        type(element_data), intent(inout) :: ele_IO
+!!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !!@endverbatim
 !!
 !!@param  id_file  File ID
@@ -23,8 +22,9 @@
       module element_connect_IO
 !
       use m_precision
-!
-      use m_read_mesh_data
+      use t_geometry_data
+      use t_surf_edge_IO
+      use t_read_mesh_data
 !
       implicit none
 !
@@ -38,162 +38,115 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine write_element_info(id_file)
+      subroutine write_element_info(id_file, ele_IO)
 !
       integer (kind = kint), intent(in) :: id_file
+      type(element_data), intent(inout) :: ele_IO
+!
       integer (kind = kint) :: i
 !
 !
-      write(id_file,'(i16)') numele_dummy
-      write(id_file,'(10i16)') i_ele_dummy(1:numele_dummy)
+      write(id_file,'(i16)') ele_IO%numele
+      write(id_file,'(10i16)') ele_IO%elmtyp(1:ele_IO%numele)
 !
-      do i=1, numele_dummy
-        write(id_file,'(28i16)') globalelmid_dummy(i),                  &
-     &    ie_dummy(i,1:nodelm_dummy(i))
+      do i=1, ele_IO%numele
+        write(id_file,'(28i16)') ele_IO%iele_global(i),                 &
+     &    ele_IO%ie(i,1:ele_IO%nodelm(i))
       end do
 !
-      call deallocate_ele_info_dummy
+      call deallocate_ele_connect_type(ele_IO)
 !
       end subroutine write_element_info
 !
 !------------------------------------------------------------------
 !
-      subroutine write_surface_4_element(id_file)
+      subroutine write_surface_4_element(id_file, sfed_IO)
 !
       integer (kind = kint), intent(in) :: id_file
+      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!
       integer(kind = kint) :: i
 !
-      write(id_file,'(2i16)') nsf_4_ele_IO, nsurf_in_ele_IO
+      write(id_file,'(2i16)') sfed_IO%nsf_4_ele, sfed_IO%nsurf_in_ele
 !
-      do i = 1, nsf_4_ele_IO
-        write(id_file,'(10i16)') i, isf_4_ele_IO(i,1:nsurf_in_ele_IO)
+      do i = 1, sfed_IO%nsf_4_ele
+        write(id_file,'(10i16)')                                        &
+     &        i, sfed_IO%isf_for_ele(i,1:sfed_IO%nsurf_in_ele)
       end do
 !
-      call deallocate_surface_connect_IO
+      call dealloc_surface_connect_IO(sfed_IO)
 !
       end subroutine write_surface_4_element
 !
 !------------------------------------------------------------------
 !
-      subroutine write_edge_4_element(id_file)
+      subroutine write_edge_4_element(id_file, sfed_IO)
 !
       integer (kind = kint), intent(in) :: id_file
+      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!
       integer(kind = kint) :: i
 !
-      write(id_file,'(2i16)') ned_4_ele_IO, nedge_in_ele_IO
+      write(id_file,'(2i16)') sfed_IO%ned_4_ele, sfed_IO%nedge_in_ele
 !
-      do i = 1, ned_4_ele_IO
-        write(id_file,'(15i16)') i, iedge_4_ele_IO(i,1:nedge_in_ele_IO)
+      do i = 1, sfed_IO%ned_4_ele
+        write(id_file,'(15i16)')                                        &
+     &         i, sfed_IO%iedge_for_ele(i,1:sfed_IO%nedge_in_ele)
       end do
 !
-      call deallocate_edge_connect_IO
+      call dealloc_edge_connect_IO(sfed_IO)
 !
       end subroutine write_edge_4_element
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine write_element_info_b(id_file)
-!
-      integer (kind = kint), intent(in) :: id_file
-      integer (kind = kint) :: i
-!
-!
-      write(id_file) numele_dummy
-!
-      write(id_file) i_ele_dummy(1:numele_dummy)
-!
-      write(id_file) globalelmid_dummy(1:numele_dummy)
-      write(id_file) (ie_dummy(i,1:nodelm_dummy(i)),i=1,numele_dummy)
-!
-      call deallocate_ele_info_dummy
-!
-      end subroutine write_element_info_b
-!
-!------------------------------------------------------------------
-!------------------------------------------------------------------
-!
-      subroutine read_number_of_element(id_file)
+      subroutine read_number_of_element(id_file, ele_IO)
 !
       use skip_comment_f
 !
       integer (kind = kint), intent(in) :: id_file
+      type(element_data), intent(inout) :: ele_IO
+!
 !
       call skip_comment(character_4_read,id_file)
 !
-      read(character_4_read,*) numele_dummy
-!       write(*,*) numele_dummy
+      read(character_4_read,*) ele_IO%numele
 !
       end subroutine read_number_of_element
 !
 !------------------------------------------------------------------
 !
-       subroutine read_element_info(id_file)
+      subroutine read_element_info(id_file, ele_IO)
 !
-       use set_nnod_4_ele_by_type
+      use set_nnod_4_ele_by_type
 !
-       integer (kind = kint), intent(in) :: id_file
-       integer (kind = kint) :: i
+      integer (kind = kint), intent(in) :: id_file
+      type(element_data), intent(inout) :: ele_IO
+!
+      integer (kind = kint) :: i
 !
 !
-       call allocate_ele_info_dummy
+       call alloc_element_types(ele_IO)
 !
-       read(id_file,*) (i_ele_dummy(i),i=1,numele_dummy)
+       read(id_file,*) (ele_IO%elmtyp(i),i=1,ele_IO%numele)
 !
-       nnod_4_ele_dummy = 0
-       do i = 1, numele_dummy
-         call s_set_nnod_4_ele_by_type(i_ele_dummy(i), nodelm_dummy(i))
-         nnod_4_ele_dummy = max(nnod_4_ele_dummy,nodelm_dummy(i))
+       ele_IO%nnod_4_ele = 0
+       do i = 1, ele_IO%numele
+         call s_set_nnod_4_ele_by_type                                  &
+     &      (ele_IO%elmtyp(i), ele_IO%nodelm(i))
+         ele_IO%nnod_4_ele = max(ele_IO%nnod_4_ele,ele_IO%nodelm(i))
        end do
 !
-       call allocate_connect_dummy
+       call alloc_ele_connectivity(ele_IO)
 !
-       do i=1, numele_dummy
+       do i=1, ele_IO%numele
 !
-        read(id_file,*) globalelmid_dummy(i),                           &
-     &                  ie_dummy(i,1:nodelm_dummy(i))
+        read(id_file,*) ele_IO%iele_global(i),                          &
+     &                  ele_IO%ie(i,1:ele_IO%nodelm(i))
        end do
 !
        end subroutine read_element_info
-!
-!------------------------------------------------------------------
-!------------------------------------------------------------------
-!
-       subroutine read_number_of_element_b(id_file)
-!
-      integer (kind = kint), intent(in) :: id_file
-!
-       read(id_file) numele_dummy
-!       write(*,*) numele_dummy
-!
-      end subroutine read_number_of_element_b
-!
-!------------------------------------------------------------------
-!
-       subroutine read_element_info_b(id_file)
-!
-       use set_nnod_4_ele_by_type
-!
-       integer (kind = kint), intent(in) :: id_file
-       integer (kind = kint) :: i
-!
-!
-       call allocate_ele_info_dummy
-!
-       read(id_file) (i_ele_dummy(i),i=1,numele_dummy)
-!
-       nnod_4_ele_dummy = 0
-       do i = 1, numele_dummy
-         call s_set_nnod_4_ele_by_type(i_ele_dummy(i), nodelm_dummy(i))
-         nnod_4_ele_dummy = max(nnod_4_ele_dummy,nodelm_dummy(i))
-       end do
-!
-       call allocate_connect_dummy
-!
-       read(id_file) globalelmid_dummy(1:numele_dummy)
-       read(id_file) (ie_dummy(i,1:nodelm_dummy(i)),i=1,numele_dummy)
-!
-       end subroutine read_element_info_b
 !
 !------------------------------------------------------------------
 !

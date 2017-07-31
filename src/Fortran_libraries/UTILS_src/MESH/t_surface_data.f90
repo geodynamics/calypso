@@ -6,9 +6,6 @@
 !
 !> @brief structure of surface data (geometry and connectivity)
 !!
-!> Substitution of
-!> @n      (module m_geometry_data)
-!!
 !!@verbatim
 !!      subroutine alloc_numsurf_stack(nprocs, surf)
 !!      subroutine allocate_inod_in_surf(surf)
@@ -35,8 +32,6 @@
 !!      subroutine dealloc_ele_4_surf_type(surf)
 !!        integer(kind = kint), intent(in) :: nele
 !!        type(surface_data), intent(inout) :: surf
-!!
-!!      subroutine link_new_surf_connect_type(surf_org, surf)
 !!@endverbatim
 !
       module t_surface_data
@@ -59,76 +54,76 @@
         integer(kind=kint) ::  numsurf_iso
 !
 !>        Stack list of number of surface
-        integer(kind=kint_gl), pointer  :: istack_numsurf(:)
+        integer(kind=kint_gl), allocatable  :: istack_numsurf(:)
 !>        Stack list of number of internal surface
-        integer(kind=kint_gl), pointer  :: istack_intersurf(:)
+        integer(kind=kint_gl), allocatable  :: istack_intersurf(:)
 !
 !>   local index for surface on each element
-        integer (kind=kint), pointer :: node_on_sf(:,:)
+        integer (kind=kint), allocatable :: node_on_sf(:,:)
 !>   local index for opposite surface on each element
-        integer (kind=kint), pointer :: node_on_sf_n(:,:)
+        integer (kind=kint), allocatable :: node_on_sf_n(:,:)
 !
 !>     smp stack for surface on  local PE
-        integer( kind=kint ), pointer :: istack_surf_smp(:)
+        integer( kind=kint ), allocatable :: istack_surf_smp(:)
 !>     maximum number of smp surface on local PE
         integer( kind=kint )  ::  max_surf_smp
 !>     maximum number of smp internal surface on local PE
         integer( kind=kint )  ::  max_internal_surf_smp
 !
 !>       global surface id (where i:surface id)
-        integer(kind=kint_gl), pointer  ::  isurf_global(:)
+        integer(kind=kint_gl), allocatable  ::  isurf_global(:)
 !
 !>   surface connectivity ie_surf(i:surface ID,j:surface index)
-        integer(kind=kint), pointer  :: ie_surf(:,:)
+        integer(kind=kint), allocatable  :: ie_surf(:,:)
 !
 !>   surface ID for element surface isf_4_ele(:,:)
 !>          ...i:element ID, j:surface ID
 !>@n          Positive: normal direction negative: reverse direction
-        integer(kind=kint), pointer  :: isf_4_ele(:,:)
+        integer(kind=kint), allocatable  :: isf_4_ele(:,:)
 !>   rotation ID for element surface isf_rot_ele(:,:)
 !>          ...i:element ID, j:surface ID
 !>@n          0: normal direction  1-4: rotation flag for reverse surface
-        integer(kind=kint), pointer  :: isf_rot_ele(:,:)
+        integer(kind=kint), allocatable  :: isf_rot_ele(:,:)
 !
 !>     external surface list
-        integer(kind=kint), pointer  ::  isf_external(:)
+        integer(kind=kint), allocatable  ::  isf_external(:)
 !>     isolated surface list
-        integer(kind=kint), pointer  ::  isf_isolate(:)
+        integer(kind=kint), allocatable  ::  isf_isolate(:)
 !
 !>   belonged element for surface(surface#,face#,
 !>                                1:element or 2:local surface)
-        integer(kind=kint), pointer  :: iele_4_surf(:,:,:)
+        integer(kind=kint), allocatable  :: iele_4_surf(:,:,:)
 !
 !>  integer flag for interior surface 1...interior, 0...exterior
-        integer(kind = kint), pointer :: interior_surf(:)
+        integer(kind = kint), allocatable :: interior_surf(:)
 !
 !>       position of center of surface
-        real(kind=kreal)  , pointer  :: x_surf(:,:)
+        real(kind=kreal)  , allocatable  :: x_surf(:,:)
 !>       distance from the center of surface
-        real(kind=kreal)  , pointer  :: r_surf(:)
+        real(kind=kreal)  , allocatable  :: r_surf(:)
 !>       1/r_surf
-        real(kind=kreal)  , pointer  :: ar_surf(:)
+        real(kind=kreal)  , allocatable  :: ar_surf(:)
 !>       longitude of center of surface
-        real(kind=kreal)  , pointer  :: phi_surf(:)
+        real(kind=kreal)  , allocatable  :: phi_surf(:)
 !>       colatitude of center of surface
-        real(kind=kreal)  , pointer  :: theta_surf(:)
+        real(kind=kreal)  , allocatable  :: theta_surf(:)
 !>       cylindorical radius of center of surface
-        real(kind=kreal)  , pointer  :: s_surf(:)
+        real(kind=kreal)  , allocatable  :: s_surf(:)
 !>       1 / s_surf
-        real(kind=kreal)  , pointer  :: as_surf(:)
+        real(kind=kreal)  , allocatable  :: as_surf(:)
 ! 
 !>       area of each surface
-        real (kind=kreal), pointer :: area_surf(:)
+        real (kind=kreal), allocatable :: area_surf(:)
 !>       1 / area_surf
-        real (kind=kreal), pointer :: a_area_surf(:)
+        real (kind=kreal), allocatable :: a_area_surf(:)
 !
 !>       normal vector for sach surface
-        real (kind=kreal), pointer :: vnorm_surf(:,:)
+        real (kind=kreal), allocatable :: vnorm_surf(:,:)
 !
 !>       normal vector for sach surface (spherical coordinate)
-        real (kind=kreal), pointer :: vnorm_surf_sph(:,:)
+        real (kind=kreal), allocatable :: vnorm_surf_sph(:,:)
 !>       normal vector for sach surface (cylindrical coordinate)
-        real (kind=kreal), pointer :: vnorm_surf_cyl(:,:)
+        real (kind=kreal), allocatable :: vnorm_surf_cyl(:,:)
       end type surface_data
 !
 !  ---------------------------------------------------------------------
@@ -438,29 +433,5 @@
       end subroutine dealloc_ele_4_surf_type
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine link_new_surf_connect_type(surf_org, surf)
-!
-      type(surface_data), intent(in) :: surf_org
-      type(surface_data), intent(inout) :: surf
-!
-!
-      surf%node_on_sf =>   surf_org%node_on_sf
-      surf%node_on_sf_n => surf_org%node_on_sf_n
-!
-      surf%numsurf =     surf_org%numsurf
-      surf%nnod_4_surf = surf_org%nnod_4_surf
-!
-      surf%ie_surf =>       surf_org%ie_surf
-      surf%isf_4_ele =>     surf_org%isf_4_ele
-      surf%interior_surf => surf_org%interior_surf
-!
-      surf%istack_surf_smp => surf_org%istack_surf_smp
-      surf%max_surf_smp =     surf_org%max_surf_smp
-!
-      end subroutine link_new_surf_connect_type
-!
-! ----------------------------------------------------------------------
 !
       end module t_surface_data

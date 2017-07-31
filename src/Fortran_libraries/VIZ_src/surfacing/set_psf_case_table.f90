@@ -24,6 +24,7 @@
 !
       subroutine set_sectioning_case_table
 !
+      use m_control_data_sections
       use m_mpi_flags_4_section
 !
       use m_intersection_data_0
@@ -44,6 +45,7 @@
 !
 !      integer(kind = kint) :: imark
 !
+      if ( (num_psf_ctl+num_iso_ctl) .le. 0) return
 !
       call allocate_flags_4_comm_psf
 !

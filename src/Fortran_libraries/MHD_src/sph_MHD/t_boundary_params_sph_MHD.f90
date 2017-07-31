@@ -81,13 +81,13 @@
 !>        Fixed data at center
         real(kind= kreal) :: CTR_fld
 !>        Fixed composition spectrum for ICB
-        real(kind= kreal), pointer :: ICB_fld(:)
+        real(kind= kreal), allocatable :: ICB_fld(:)
 !>        Fixed composition flux spectrum for ICB
-        real(kind= kreal), pointer :: ICB_flux(:)
+        real(kind= kreal), allocatable :: ICB_flux(:)
 !>        Fixed composition spectrum for CMB
-        real(kind= kreal), pointer :: CMB_fld(:)
+        real(kind= kreal), allocatable :: CMB_fld(:)
 !>        Fixed composition flux spectrum for CMB
-        real(kind= kreal), pointer :: CMB_flux(:)
+        real(kind= kreal), allocatable :: CMB_flux(:)
 !
 !>        Matrix to evaluate radial derivative at ICB with fixed field
         real(kind = kreal) :: fdm2_fix_fld_ICB(0:2,3)
@@ -220,10 +220,6 @@
 ! -----------------------------------------------------------------------
 !
       subroutine check_sph_boundary_spectra(label, jmax, j_rj, sph_bc)
-!
-      use m_spheric_parameter
-      use m_bc_data_list
-      use m_surf_data_list
 !
       integer(kind = kint), intent(in) :: jmax
       integer(kind = kint), intent(in) :: j_rj(jmax,3)

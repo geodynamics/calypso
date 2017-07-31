@@ -16,6 +16,8 @@
 !!      function each_field_data_buffer(ncomp, vect)
 !!      integer(kind = kint) function len_each_field_data_buf(ncomp)
 !!
+!!      subroutine read_arrays_for_stacks(file_id, num, istack_begin,   &
+!!      &         ntot, istack)
 !!      subroutine read_field_num_buffer(textbuf, nnod, num_field)
 !!      subroutine read_bufer_istack_nod_buffer                         &
 !!     &         (textbuf, nprocs, istack_nod)
@@ -25,15 +27,11 @@
 !!     &                            (textbuf, field_name)
 !!      subroutine read_each_field_data_buffer(textbuf ncomp, vect)
 !!
+!!      subroutine write_arrays_for_stacks(file_id, num, istack)
 !!      subroutine write_field_data(id_file, nnod, num_field, ntot_comp,&
 !!     &          ncomp_field, field_name, field_data)
 !!      subroutine read_field_data(id_file, nnod, num_field, ntot_comp, &
 !!     &          ncomp_field, field_name, field_data)
-!!
-!!      subroutine write_field_data_b(id_file, nnod, num_field,         &
-!!     &          ntot_comp, ncomp_field, field_name, field_data)
-!!      subroutine read_field_data_b(id_file,                           &
-!!     &          nnod, num_field, ntot_comp, field_name, field_data)
 !!@endverbatim
 !
       module field_data_IO
@@ -163,6 +161,49 @@
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
+      subroutine read_arrays_for_stacks(file_id, num, istack_begin,     &
+      &         ntot, istack)
+!
+      use skip_comment_f
+!
+      integer (kind = kint), intent(in) :: file_id
+      integer (kind = kint), intent(in) :: num, istack_begin
+      integer (kind = kint), intent(inout) :: ntot
+      integer (kind = kint), intent(inout) :: istack(0:num)
+!
+      integer (kind = kint) :: i, ii
+      character(len=255) :: character_4_read = ''
+!
+!
+      istack(0:num) = istack_begin-1
+!
+      if(num .gt. 0) then
+        character_4_read = ''
+        call skip_comment(character_4_read,file_id)
+        read(character_4_read,*,end=41) istack
+   41   continue
+!
+        ii = num+1
+        do i = num, 1, -1 
+          if ( istack(i-1) .eq. (istack_begin-1) ) ii = i
+        end do
+!
+        do i = ii-1, 1, -1
+         istack(i) = istack(i-1)
+        end do
+        istack(0) = istack_begin
+!
+        if ( ii .le. num ) then
+          read(file_id,*) (istack(i),i=ii,num)
+        end if
+      end if
+!
+      ntot = istack(num)
+!
+      end subroutine read_arrays_for_stacks
+!
+!------------------------------------------------------------------
+!
       subroutine read_field_istack_nod_buffer                           &
      &         (textbuf, nprocs, istack_nod)
 !
@@ -264,6 +305,19 @@
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
+      subroutine write_arrays_for_stacks(file_id, num, istack)
+!
+      integer (kind = kint), intent(in) :: file_id
+      integer (kind = kint), intent(in) :: num
+      integer (kind = kint), intent(in) :: istack(0:num)
+!
+!
+      if(num .gt. 0) write(file_id,'(8i16)') istack(1:num)
+!
+      end subroutine write_arrays_for_stacks
+!
+!------------------------------------------------------------------
+!
       subroutine write_field_data(id_file, nnod, num_field, ntot_comp,  &
      &          ncomp_field, field_name, field_data)
 !
@@ -333,59 +387,6 @@
       end do
 !
       end subroutine read_field_data
-!
-! -------------------------------------------------------------------
-! -------------------------------------------------------------------
-!
-      subroutine write_field_data_b(id_file, nnod, num_field,           &
-     &          ntot_comp, ncomp_field, field_name, field_data)
-!
-      integer(kind = kint), intent(in) :: id_file
-!
-      integer(kind = kint), intent(in) :: nnod
-      integer(kind = kint), intent(in) :: num_field
-      integer(kind = kint), intent(in) :: ntot_comp
-      integer(kind = kint), intent(in) :: ncomp_field(num_field)
-      character(len=kchara), intent(in) :: field_name(num_field)
-      real(kind = kreal), intent(in) :: field_data(nnod, ntot_comp)
-!
-      integer(kind = kint) :: i
-!
-!
-      write(id_file) nnod, num_field
-      write(id_file) ncomp_field(1:num_field)
-      write(id_file) field_name(1:num_field)
-!
-      do i = 1, ntot_comp
-        write(id_file) field_data(1:nnod,i)
-      end do
-!
-      end subroutine write_field_data_b
-!
-! -------------------------------------------------------------------
-!
-      subroutine read_field_data_b(id_file,                             &
-     &          nnod, num_field, ntot_comp, field_name, field_data)
-!
-      integer(kind = kint), intent(in) :: id_file
-!
-      integer(kind = kint), intent(in) :: nnod
-      integer(kind = kint), intent(in) :: num_field
-      integer(kind = kint), intent(in) :: ntot_comp
-!
-      character(len=kchara), intent(inout) :: field_name(num_field)
-      real(kind = kreal), intent(inout) :: field_data(nnod, ntot_comp)
-!
-      integer(kind = kint) :: i
-!
-!
-      read(id_file) field_name(1:num_field)
-!
-      do i = 1, ntot_comp
-        read(id_file) field_data(1:nnod,i)
-      end do
-!
-      end subroutine read_field_data_b
 !
 ! -------------------------------------------------------------------
 !

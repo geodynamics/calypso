@@ -9,6 +9,7 @@ LIB_PARA_FILE = libcalypso_parallel.a
 
 SUBDIRS = \
 COMM_src      \
+MPI_IO        \
 SPH_SHELL_src \
 CONST_SPH_GRID
 

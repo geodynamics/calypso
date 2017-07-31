@@ -3,8 +3,16 @@
 !
 !     Written by H. Matsui on March, 2013
 !
-!      subroutine s_ordering_sph_mesh_for_rtp(ip_r, ip_t,               &
-!     &          node, ele, nod_grp, nod_comm)
+!!      subroutine s_ordering_sph_mesh_for_rtp                          &
+!!     &         (nidx_rtp, ip_r, ip_t, stk_lc1d, sph_gl1d, stbl,       &
+!!     &          node, ele, nod_grp, nod_comm)
+!!        type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!!        type(sph_1d_global_index), intent(in) :: sph_gl1d
+!!        type(comm_table_make_sph), intent(in) :: stbl
+!!        type(node_data), intent(inout) :: node
+!!        type(element_data), intent(inout) :: ele
+!!        type(group_data), intent(inout) :: nod_grp
+!!        type(communication_table), intent(inout) :: nod_comm
 !
       module ordering_sph_mesh_to_rtp
 !
@@ -22,19 +30,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_ordering_sph_mesh_for_rtp(ip_r, ip_t,                &
+      subroutine s_ordering_sph_mesh_for_rtp                            &
+     &         (nidx_rtp, ip_r, ip_t, stk_lc1d, sph_gl1d, stbl,         &
      &          node, ele, nod_grp, nod_comm)
 !
       use t_geometry_data
       use t_comm_table
       use t_group_data
+      use t_sph_mesh_1d_connect
+      use t_sph_1d_global_index
 !
-      use m_spheric_parameter
-      use m_sph_1d_global_index
-      use m_sph_mesh_1d_connect
       use cal_sph_node_addresses
 !
+      integer(kind = kint), intent(in) :: nidx_rtp(3)
       integer(kind = kint), intent(in) :: ip_r, ip_t
+      type(sph_1d_index_stack), intent(in) :: stk_lc1d
+      type(sph_1d_global_index), intent(in) :: sph_gl1d
+      type(comm_table_make_sph), intent(in) :: stbl
+!
       type(node_data), intent(inout) :: node
       type(element_data), intent(inout) :: ele
       type(group_data), intent(inout) :: nod_grp
@@ -63,16 +76,17 @@
       inod = 0
       do m = 1, nidx_rtp(3)
         do l = 1, nidx_rtp(2)
-          l_gl = l + istack_idx_local_rtp_t(ip_t-1)
-          l_lc = irev_sph_t(l_gl,ip_t)
+          l_gl = l + stk_lc1d%istack_idx_local_rtp_t(ip_t-1)
+          l_lc = stbl%irev_sph_t(l_gl,ip_t)
           do k = 1, nidx_rtp(1)
-            kr = k + istack_idx_local_rtp_r(ip_r-1)
-            k_gl = idx_global_rtp_r(kr)
-            k_lc = irev_sph_r(k_gl,ip_r)
+            kr = k + stk_lc1d%istack_idx_local_rtp_r(ip_r-1)
+            k_gl = sph_gl1d%idx_global_rtp_r(kr)
+            k_lc = stbl%irev_sph_r(k_gl,ip_r)
 !
             inod = k + (l-1)*nidx_rtp(1)                                &
      &               + (m-1)*nidx_rtp(1)*nidx_rtp(2)
-            inod_org = sph_shell_node_id(ip_r, ip_t, k_lc, l_lc, m)
+            inod_org                                                    &
+     &           = sph_shell_node_id(ip_r, ip_t, k_lc, l_lc, m, stbl)
 !
             if(inod_old2new(inod_org) .gt. 0) write(*,*) 'wrong!!',     &
      &                                       inod, k_lc, l_lc, m

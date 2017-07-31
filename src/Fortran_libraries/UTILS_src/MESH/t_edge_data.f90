@@ -6,10 +6,6 @@
 !
 !> @brief Structure of edge geometry data
 !!
-!> Substitution of
-!> @n      (module m_geometry_data)
-!> @n      (module m_edgerime_geometry_data)
-!!
 !!@verbatim
 !!      subroutine alloc_numedge_stack(nprocs, edge)
 !!      subroutine allocate_inod_in_edge(edge)
@@ -46,11 +42,6 @@
 !!        integer(kind = kint), intent(in) :: nele
 !!        integer(kind = kint), intent(in) :: nsurf
 !!        type(edge_data), intent(inout) :: edge
-!!
-!!      subroutine link_new_edge_connect_type(edge_org, edge)
-!!      subroutine link_node_on_edge(edge_org, edge)
-!!        type(edge_data), intent(in) :: edge_org
-!!        type(edge_data), intent(inout) :: edge
 !!@endverbatim
 !
       module t_edge_data
@@ -71,82 +62,82 @@
         integer(kind=kint) ::  numedge_iso
 !
 !>        Stack list of number of edge
-        integer(kind=kint_gl), pointer  :: istack_numedge(:)
+        integer(kind=kint_gl), allocatable  :: istack_numedge(:)
 !>        Stack list of number of internal edge
-        integer(kind=kint_gl), pointer  :: istack_interedge(:)
+        integer(kind=kint_gl), allocatable  :: istack_interedge(:)
 !
 !>     local index for edge on each element
-        integer (kind=kint), pointer :: node_on_edge(:,:)
+        integer (kind=kint), allocatable :: node_on_edge(:,:)
 !>     local index for edge on each surface
-        integer (kind=kint), pointer :: node_on_edge_sf(:,:)
+        integer (kind=kint), allocatable :: node_on_edge_sf(:,:)
 !
 !>     smp stack for edge on  local PE
-        integer( kind=kint ), pointer :: istack_edge_smp(:)
+        integer( kind=kint ), allocatable :: istack_edge_smp(:)
 !>     maximum number of smp edge on local PE
         integer( kind=kint )  ::  max_edge_smp
 !>     maximum number of internal smp edge on local PE
         integer( kind=kint )  ::  max_internal_edge_smp
 !
 !>       global edge id (where i:edge id)
-        integer(kind=kint_gl), pointer  ::  iedge_global(:)
+        integer(kind=kint_gl), allocatable  ::  iedge_global(:)
 !
 !>   edge connectivity ie_edge(i:edge ID,j:surface index)
-        integer(kind=kint), pointer  :: ie_edge(:,:)
+        integer(kind=kint), allocatable  :: ie_edge(:,:)
 !>   edge ID for each surface
-        integer(kind=kint), pointer  :: iedge_4_sf(:,:)
+        integer(kind=kint), allocatable  :: iedge_4_sf(:,:)
 !>   edge ID for each element
-        integer(kind=kint), pointer  :: iedge_4_ele(:,:)
+        integer(kind=kint), allocatable  :: iedge_4_ele(:,:)
 !
 !>     isolated edge list
-        integer(kind=kint), pointer  ::  iedge_isolate(:)
+        integer(kind=kint), allocatable  ::  iedge_isolate(:)
 !>    integer flag for interior edge 1...interior, 0...exterior
-        integer(kind = kint), pointer :: interior_edge(:)
+        integer(kind = kint), allocatable :: interior_edge(:)
 !
 !>   total number of element list for edge
         integer(kind=kint) :: ntot_iele_4_edge
 !>   number of element list for each edge
-        integer(kind=kint), pointer :: num_iele_4_edge(:)
+        integer(kind=kint), allocatable :: num_iele_4_edge(:)
 !>   end address of element list for each edge
-        integer(kind=kint), pointer :: istack_iele_4_edge(:)
+        integer(kind=kint), allocatable :: istack_iele_4_edge(:)
 !>   element id list for each edge (negative: opposite direction)
-        integer(kind=kint), pointer  :: iele_4_edge(:,:)
+        integer(kind=kint), allocatable  :: iele_4_edge(:,:)
 !
 !>   total number of surface list for edge
         integer(kind=kint) :: ntot_isurf_4_edge
 !>   number of surface list for each edge
-        integer(kind=kint), pointer :: num_isurf_4_edge(:)
+        integer(kind=kint), allocatable :: num_isurf_4_edge(:)
 !>   end address of surface list for each edge
-        integer(kind=kint), pointer :: istack_isurf_4_edge(:)
+        integer(kind=kint), allocatable :: istack_isurf_4_edge(:)
 !>   surafce id list for each edge (negative: opposite direction)
-        integer(kind=kint), pointer  :: isurf_4_edge(:,:)
+        integer(kind=kint), allocatable  :: isurf_4_edge(:,:)
 !
 !>   position of center of edge
-        real(kind=kreal)  , pointer  :: x_edge(:,:)
+        real(kind=kreal)  , allocatable  :: x_edge(:,:)
 !
 !>   distance from the center of edge
-        real(kind=kreal)  , pointer  :: r_edge(:)
+        real(kind=kreal)  , allocatable  :: r_edge(:)
 !>   1/r_edge
-        real(kind=kreal)  , pointer  :: ar_edge(:)
+        real(kind=kreal)  , allocatable  :: ar_edge(:)
 !>   longitude of center of edge
-        real(kind=kreal)  , pointer  :: phi_edge(:)
+        real(kind=kreal)  , allocatable  :: phi_edge(:)
 !>   colatitude of center of edge
-        real(kind=kreal)  , pointer  :: theta_edge(:)
+        real(kind=kreal)  , allocatable  :: theta_edge(:)
 !>   cylindorical radius of center of edge
-        real(kind=kreal)  , pointer  :: s_edge(:)
+        real(kind=kreal)  , allocatable  :: s_edge(:)
 !>   1 / s_edge
-        real(kind=kreal)  , pointer  :: as_edge(:)
+        real(kind=kreal)  , allocatable  :: as_edge(:)
 !
 !>   length of each edge
-        real (kind=kreal), pointer :: edge_length(:)
+        real (kind=kreal), allocatable :: edge_length(:)
 !>   1 / edge_length
-        real (kind=kreal), pointer :: a_edge_length(:)
+        real (kind=kreal), allocatable :: a_edge_length(:)
 !
 !>   edge vector
-        real (kind=kreal), pointer :: edge_vect(:,:)
+        real (kind=kreal), allocatable :: edge_vect(:,:)
 !>   edge vector (spherical coordinate)
-        real (kind=kreal), pointer :: edge_vect_sph(:,:)
+        real (kind=kreal), allocatable :: edge_vect_sph(:,:)
 !>   edge vector (cylindrical coordinate)
-        real (kind=kreal), pointer :: edge_vect_cyl(:,:)
+        real (kind=kreal), allocatable :: edge_vect_cyl(:,:)
 !
       end type edge_data
 !
@@ -511,44 +502,6 @@
       deallocate( edge%num_isurf_4_edge, edge%istack_isurf_4_edge)
 !
       end subroutine dealloc_surf_4_edge_item_type
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      subroutine link_new_edge_connect_type(edge_org, edge)
-!
-      type(edge_data), intent(in) :: edge_org
-      type(edge_data), intent(inout) :: edge
-!
-!
-      edge%node_on_edge =>    edge_org%node_on_edge
-      edge%node_on_edge_sf => edge_org%node_on_edge_sf
-!
-      edge%numedge =       edge_org%numedge
-      edge%nnod_4_edge =   edge_org%nnod_4_edge
-!
-      edge%ie_edge =>       edge_org%ie_edge
-      edge%iedge_4_sf =>    edge_org%iedge_4_sf
-      edge%iedge_4_ele =>   edge_org%iedge_4_ele
-      edge%interior_edge => edge_org%interior_edge
-!
-      edge%istack_edge_smp => edge_org%istack_edge_smp
-      edge%max_edge_smp =     edge_org%max_edge_smp
-!
-      end subroutine link_new_edge_connect_type
-!
-! ----------------------------------------------------------------------
-!
-      subroutine link_node_on_edge(edge_org, edge)
-!
-      type(edge_data), intent(in) :: edge_org
-      type(edge_data), intent(inout) :: edge
-!
-!
-      edge%node_on_edge =>    edge_org%node_on_edge
-      edge%node_on_edge_sf => edge_org%node_on_edge_sf
-!
-      end subroutine link_node_on_edge
 !
 !  ---------------------------------------------------------------------
 !

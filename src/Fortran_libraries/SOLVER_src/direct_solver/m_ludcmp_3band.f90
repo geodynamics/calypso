@@ -19,8 +19,6 @@
 !
 !
 !      SUBROUTINE lubksb_3band(n, band_lu, i_pivot, x)
-!      subroutine lubksb_3band_mul(Msmp, Msmp_stack, mcomp, n,          &
-!     &          band_lu, i_pivot, x)
 !
 !c solve the set of n linear equations Ax=b. Here is a input,
 !c not at the matrix A but rather as its LU decompsition,
@@ -161,7 +159,7 @@
           end if
         end if
 !
-        if(band_lu(3,n).eq.0.0d0) band_lu(3,n) = TINY
+        if(band_lu(3,j).eq.0.0d0) band_lu(3,j) = TINY
         dum = 1.0d0/band_lu(3,j)
         if (j .lt. n) band_lu(4,j) = band_lu(4,j)*dum
 !

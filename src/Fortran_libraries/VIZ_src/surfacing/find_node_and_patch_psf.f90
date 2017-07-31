@@ -148,11 +148,6 @@
      &    iedge_4_ele, num_surf, surf_istack,                           &
      &    psf_search, psf_list, psf_mesh)
 !
-      do i_psf = 1, num_psf
-        call allocate_ele_connect_type(psf_mesh(i_psf)%patch)
-        call const_global_numele_list(psf_mesh(i_psf)%patch)
-      end do
-!
       if (iflag_debug.eq.1)  write(*,*) 'set_psf_patches'
       call set_psf_patches(num_psf, numele, numedge, nnod_4_ele, ie,    &
      &    iedge_4_ele, num_surf, num_surf_bc, surf_istack, surf_item,   &

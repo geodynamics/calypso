@@ -79,7 +79,7 @@
       integer (kind = kint) :: k, ii, ix, nd
 !
 !
-      call resize_work_4_SR(NB, NEIBPETOT,                              &
+      call resize_work_4_SR(NB, NEIBPETOT, NEIBPETOT,                   &
      &    STACK_EXPORT(NEIBPETOT), STACK_IMPORT(NEIBPETOT) )
 !
 !C
@@ -163,7 +163,7 @@
 !
 !
       NB3 = 3 * NB
-      call resize_work_4_SR(NB3, NEIBPETOT,                             &
+      call resize_work_4_SR(NB3, NEIBPETOT, NEIBPETOT,                  &
      &    STACK_EXPORT(NEIBPETOT), STACK_IMPORT(NEIBPETOT) )
 !
 !C

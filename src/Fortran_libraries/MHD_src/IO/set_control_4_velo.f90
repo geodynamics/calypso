@@ -9,7 +9,14 @@
 !> @brief set boundary conditions for velocity from control data
 !!
 !!@verbatim
-!!     subroutine s_set_control_4_velo
+!!      subroutine s_set_control_4_velo                                 &
+!!     &         (fl_prop, node_bc_U_ctl, surf_bc_ST_ctl,               &
+!!     &          velo_nod, torque_surf)
+!!        type(fluid_property), intent(in) :: fl_prop
+!!        type(ctl_array_c2r), intent(inout) :: node_bc_U_ctl
+!!        type(ctl_array_c2r), intent(inout) :: surf_bc_ST_ctl
+!!        type(boundary_condition_list), intent(inout) :: velo_nod
+!!        type(boundary_condition_list), intent(inout) :: torque_surf
 !!@endverbatim
 !
       module set_control_4_velo
@@ -24,24 +31,29 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_velo
+      subroutine s_set_control_4_velo                                   &
+     &         (fl_prop, node_bc_U_ctl, surf_bc_ST_ctl,                 &
+     &          velo_nod, torque_surf)
 !
       use m_machine_parameter
       use calypso_mpi
-      use m_control_parameter
-      use m_ctl_data_node_boundary
-      use m_ctl_data_surf_boundary
-      use m_node_phys_address
-      use m_bc_data_list
-      use m_surf_data_list
+      use t_physical_property
+      use t_read_control_arrays
+      use t_bc_data_list
       use set_node_group_types
       use set_surface_group_types
       use skip_comment_f
 !
+      type(fluid_property), intent(in) :: fl_prop
+      type(ctl_array_c2r), intent(inout) :: node_bc_U_ctl
+      type(ctl_array_c2r), intent(inout) :: surf_bc_ST_ctl
+      type(boundary_condition_list), intent(inout) :: velo_nod
+      type(boundary_condition_list), intent(inout) :: torque_surf
+!
       integer (kind = kint) :: i, iflag_4_hemi
 !
 !
-      if (iflag_t_evo_4_velo .eq. id_no_evolution) then
+      if (fl_prop%iflag_scheme .eq. id_no_evolution) then
         velo_nod%num_bc =    0
         torque_surf%num_bc = 0
       else
@@ -55,7 +67,7 @@
      &      write(*,*) 'velo_nod%num_bc ',velo_nod%num_bc
       if (velo_nod%num_bc .gt. 0) then
 !
-        call allocate_nod_bc_list_velo
+        call alloc_bc_type_ctl(velo_nod)
 !
         velo_nod%bc_name(1:velo_nod%num_bc)                             &
      &      = node_bc_U_ctl%c2_tbl(1:velo_nod%num_bc)
@@ -95,7 +107,7 @@
           end do
         end if
 !
-        call deallocate_bc_velo_ctl
+        call dealloc_control_array_c2_r(node_bc_U_ctl)
       end if
 !
 !
@@ -104,7 +116,7 @@
      &            write(*,*) 'torque_surf%num_bc', torque_surf%num_bc
       if(torque_surf%num_bc .gt. 0) then
 !
-        call allocate_velo_surf_ctl
+        call alloc_bc_type_ctl(torque_surf)
 !
         torque_surf%bc_name(1:torque_surf%num_bc)                       &
      &       = surf_bc_ST_ctl%c2_tbl(1:torque_surf%num_bc)
@@ -129,7 +141,7 @@
           end do
         end if
 !
-        call deallocate_bc_torque_ctl
+        call dealloc_control_array_c2_r(surf_bc_ST_ctl)
       end if
 !
       end subroutine s_set_control_4_velo

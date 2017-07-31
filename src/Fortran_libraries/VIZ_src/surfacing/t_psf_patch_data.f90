@@ -27,11 +27,11 @@
 !
       type psf_parameters
         integer(kind = kint) :: nele_grp_area
-        integer(kind = kint), pointer :: id_ele_grp_area(:)
+        integer(kind = kint), allocatable :: id_ele_grp_area(:)
 !
-        integer(kind = kint), pointer :: id_output(:)
-        integer(kind = kint), pointer :: icomp_output(:)
-        integer(kind = kint), pointer :: ncomp_org(:)
+        integer(kind = kint), allocatable :: id_output(:)
+        integer(kind = kint), allocatable :: icomp_output(:)
+        integer(kind = kint), allocatable :: ncomp_org(:)
       end type psf_parameters
 !
 !>
@@ -45,7 +45,7 @@
 !
         integer(kind = kint) :: ntot_comp
 !>        local temporal field data for psf
-        real(kind = kreal), pointer :: tmp_psf(:,:)
+        real(kind = kreal), allocatable :: tmp_psf(:,:)
       end type psf_local_data
 !
 !  ---------------------------------------------------------------------

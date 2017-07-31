@@ -57,4 +57,9 @@
       real, parameter :: rtwo =   2.0e0
       real, parameter :: rhalf =  0.5e0
 !
+!>      Turn OFF flag
+      integer (kind=kint), parameter :: id_turn_OFF = 0
+!>      Turn ON flag
+      integer (kind=kint), parameter :: id_turn_ON =  1
+!
       end module m_constants

@@ -8,10 +8,12 @@
 !>@brief  Ordering field data by visualization flag
 !!
 !!@verbatim
-!!      subroutine s_ordering_field_by_viz(num_phys, num_phys_viz,      &
+!!      subroutine s_ordering_field_by_viz                              &
+!!     &         (field_ctl, num_phys, num_phys_viz,                    &
 !!     &          num_component, phys_name, iflag_monitor)
-!!      subroutine ordering_field_by_comp_viz(num_phys, num_phys_viz,   &
-!!     &          num_component, phys_name,iflag_monitor)
+!!      subroutine ordering_field_by_comp_viz                           &
+!!     &         (field_ctl, num_phys, num_phys_viz,                    &
+!!     &          num_component, phys_name, iflag_monitor)
 !!
 !!      subroutine set_istack_4_nodal_field(num_phys, num_phys_viz,     &
 !!     &          num_component, ntot_phys, ntot_phys_viz,              &
@@ -35,12 +37,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_ordering_field_by_viz(num_phys, num_phys_viz,        &
+      subroutine s_ordering_field_by_viz                                &
+     &         (field_ctl, num_phys, num_phys_viz,                      &
      &          num_component, phys_name, iflag_monitor)
 !
-      use m_ctl_data_4_fields
+      use t_read_control_arrays
       use set_nodal_field_name
 !
+      type(ctl_array_c3), intent(in) :: field_ctl
       integer(kind = kint), intent(in) :: num_phys
       integer(kind = kint), intent(inout) :: num_phys_viz
       integer(kind = kint), intent(inout) :: num_component(num_phys)
@@ -94,12 +98,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine ordering_field_by_comp_viz(num_phys, num_phys_viz,     &
+      subroutine ordering_field_by_comp_viz                             &
+     &         (field_ctl, num_phys, num_phys_viz,                      &
      &          num_component, phys_name, iflag_monitor)
 !
-      use m_ctl_data_4_fields
+      use t_read_control_arrays
       use set_nodal_field_name
 !
+      type(ctl_array_c3), intent(in) :: field_ctl
       integer(kind = kint), intent(in) :: num_phys
       integer(kind = kint), intent(inout) :: num_phys_viz
       integer(kind = kint), intent(inout) :: num_component(num_phys)

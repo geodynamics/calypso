@@ -13,12 +13,14 @@
       module m_control_params_4_psf
 !
       use m_precision
+      use t_file_IO_parameter
 !
       implicit  none
 !
 !
-      character(len = kchara), target, allocatable :: psf_header(:)
-      integer(kind = kint), target, allocatable :: itype_psf_file(:)
+      character(len=kchara), parameter :: default_psf_prefix = 'psf'
+!
+      type(field_IO_params), allocatable :: psf_file_IO(:)
 !
       integer(kind = kint), allocatable :: id_section_method(:)
 !
@@ -27,13 +29,7 @@
 !
       integer(kind = kint), allocatable :: id_psf_group(:)
 !
-      character(len = kchara), parameter :: cflag_eq =  'equation'
-      character(len = kchara), parameter :: cflag_pln = 'plane'
-      character(len = kchara), parameter :: cflag_sph = 'sphere'
-      character(len = kchara), parameter :: cflag_elp = 'ellipsoid'
-      character(len = kchara), parameter :: cflag_hyp = 'hyperboloid'
-      character(len = kchara), parameter :: cflag_prb = 'paraboloid'
-      character(len = kchara), parameter :: cflag_grp = 'group'
+      private :: default_psf_prefix
 !
 !  ---------------------------------------------------------------------
 !
@@ -48,8 +44,7 @@
       integer(kind= kint), intent(in) :: num_psf
 !
 !
-      allocate(psf_header(num_psf))
-      allocate(itype_psf_file(num_psf))
+      allocate(psf_file_IO(num_psf))
 !
       allocate(id_section_method(num_psf))
 !
@@ -57,7 +52,7 @@
 !
       allocate(id_psf_group(num_psf))
 !
-      itype_psf_file =   iflag_sgl_udt
+      psf_file_IO(1:num_psf)%iflag_format = iflag_sgl_udt
       id_section_method =  0
       id_psf_group =       0
 !
@@ -72,7 +67,7 @@
      &          num_nod_phys, phys_nod_name, psf_fld, psf_param, ierr)
 !
       use m_error_IDs
-      use m_control_data_4_psf
+      use t_control_data_4_psf
       use m_file_format_switch
       use t_phys_data
       use t_psf_patch_data
@@ -94,15 +89,9 @@
 !
 !
       ierr = 0
-      if(psf%psf_file_head_ctl%iflag .gt. 0) then
-        psf_header(i_psf) =  psf%psf_file_head_ctl%charavalue
-      else
-        psf_header(i_psf) =  'psf'
-      end if
-!
-      call choose_para_fld_file_format                                  &
-     &   (psf%psf_output_type_ctl%charavalue,                           &
-     &    psf%psf_output_type_ctl%iflag, itype_psf_file(i_psf) )
+      call set_merged_ucd_file_ctl(default_psf_prefix,                  &
+     &    psf%psf_file_head_ctl, psf%psf_output_type_ctl,               &
+     &    psf_file_IO(i_psf))
 !
       call check_field_4_viz(num_nod_phys, phys_nod_name,               &
      &   psf%psf_out_field_ctl%num, psf%psf_out_field_ctl%c1_tbl,       &
@@ -127,11 +116,12 @@
      &          psf_fld, psf_param, ierr)
 !
       use m_error_IDs
-      use m_control_data_4_psf
+      use t_control_data_4_psf
       use t_phys_data
       use t_psf_patch_data
       use set_cross_section_coefs
       use set_area_4_viz
+      use set_coefs_of_sections
       use set_field_comp_for_viz
 !
       integer(kind = kint), intent(in) :: num_mat
@@ -152,51 +142,14 @@
       character(len = kchara) :: tmpchara
 !
 !
-      ierr = 0
-      tmpchara = psf%section_method_ctl%charavalue
+      call s_set_coefs_of_sections                                      &
+     &   (psf, id_section_method(i_psf), const_psf(1,i_psf), ierr)
 !
-      if(cmp_no_case(tmpchara, cflag_eq)) then
-        id_section_method(i_psf) = 1
-        call set_coefs_4_psf(psf%psf_coefs_ctl%num,                     &
-     &      psf%psf_coefs_ctl%c_tbl,  psf%psf_coefs_ctl%vect,           &
-     &      const_psf(1,i_psf) )
-        call deallocate_psf_coefs_ctl(psf)
-!
-      else if(cmp_no_case(tmpchara, cflag_pln)) then
-        id_section_method(i_psf) = 2
-        call set_coefs_4_plane(psf, const_psf(1,i_psf))
-        call deallocate_psf_center_ctl(psf)
-        call deallocate_psf_normal_ctl(psf)
-!
-      else if(cmp_no_case(tmpchara, cflag_sph)) then
-        id_section_method(i_psf) = 2
-        call set_coefs_4_sphere(psf, const_psf(1,i_psf))
-        call deallocate_psf_center_ctl(psf)
-!
-      else if(cmp_no_case(tmpchara, cflag_elp)) then
-        id_section_method(i_psf) = 3
-        call set_coefs_4_ellipsode(psf, const_psf(1,i_psf) )
-        call deallocate_psf_axis_ctl(psf)
-        call deallocate_psf_center_ctl(psf)
-!
-      else if(cmp_no_case(tmpchara, cflag_hyp)) then
-        id_section_method(i_psf) = 4
-        call set_coefs_4_hyperboloide(psf, const_psf(1,i_psf) )
-        call deallocate_psf_axis_ctl(psf)
-        call deallocate_psf_center_ctl(psf)
-!
-      else if(cmp_no_case(tmpchara, cflag_prb)) then
-        id_section_method(i_psf) = 5
-        call set_coefs_4_parabolic(psf, const_psf(1,i_psf) )
-        call deallocate_psf_axis_ctl(psf)
-        call deallocate_psf_center_ctl(psf)
-!
-      else if(cmp_no_case(tmpchara, cflag_grp)) then
+      if(ierr .gt. 0 .and. cmp_no_case(tmpchara, cflag_grp)) then
         id_section_method(i_psf) = 0
         call set_surf_grp_id_4_viz(num_surf, surf_name,                 &
      &      psf%psf_group_name_ctl%charavalue, id_psf_group(i_psf) )
-      else
-        ierr = ierr_VIZ
+      else if(ierr .gt. 0) then
         write(e_message,'(a)') 'Set cross section mode'
         return
       end if

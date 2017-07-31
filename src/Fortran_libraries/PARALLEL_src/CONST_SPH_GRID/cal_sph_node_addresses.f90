@@ -6,28 +6,28 @@
 !!
 !!      subroutine reset_local_sph_node_constants
 !!
-!!      subroutine set_intnod_shell
-!!      subroutine set_intnod_Spol
-!!      subroutine set_intnod_Npole
+!!      subroutine set_intnod_shell(stbl)
+!!      subroutine set_intnod_Spole(stbl)
+!!      subroutine set_intnod_Npole(stbl)
 !!      subroutine set_intnod_center
 !!
-!!      subroutine set_nnod_lc_shell(ip_r, ip_t)
+!!      subroutine set_nnod_lc_shell(ip_r, ip_t, stbl)
 !!      subroutine set_nnod_lc_Spole(intnod_input)
 !!      subroutine set_nnod_lc_Npole(intnod_input)
 !!      subroutine set_nnod_lc_center(intnod_input)
-!!      subroutine set_nnod_lc_ctr_sph(nnod_sph_ct)
+!!      subroutine set_nnod_lc_ctr_sph(nnod_sph_ct, stbl)
 !!      subroutine set_nnod_lc_ctr_Np(intnod_input)
 !!
-!!      subroutine set_nnod_gl_shell
-!!      subroutine set_nnod_gl_Spole
-!!      subroutine set_nnod_gl_Npole
+!!      subroutine set_nnod_gl_shell(stbl)
+!!      subroutine set_nnod_gl_Spole(stbl)
+!!      subroutine set_nnod_gl_Npole(stbl)
 !!      subroutine set_nnod_gl_center
 !!
 !!      subroutine cal_sph_local_numnod(numnod, internal_node)
 !!      subroutine check_local_sph_node_constants
 !!
 !!      integer(kind = kint) function sph_shell_node_id                 &
-!!     &           (ip_r, ip_t, kr, lt, mp)
+!!     &           (ip_r, ip_t, kr, lt, mp, stbl)
 !!      integer(kind = kint) function sph_s_pole_node_i( kr)
 !!      integer(kind = kint) function sph_n_pole_node_id(kr)
 !!      integer(kind = kint) function sph_center_node_id()
@@ -36,17 +36,18 @@
 !!      integer(kind = kint) function sph_center_np_node_id()
 !!
 !!      integer(kind = kint) function global_sph_shell_node_id          &
-!!                 (kr, lt, mp)
+!!                 (kr, lt, mp, stbl)
 !!      integer(kind = kint) function global_sph_s_pole_node_id(kr)
 !!      integer(kind = kint) function global_sph_n_pole_node_id(kr)
 !!      integer(kind = kint) function global_sph_center_node_id()
+!!        type(comm_table_make_sph), intent(in) :: stbl
 !
       module cal_sph_node_addresses
 !
       use m_precision
       use m_constants
       use m_machine_parameter
-      use m_sph_mesh_1d_connect
+      use t_sph_mesh_1d_connect
 !
       implicit none
 !
@@ -105,29 +106,36 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_intnod_shell
+      subroutine set_intnod_shell(stbl)
+!
+      type(comm_table_make_sph), intent(in) :: stbl
 !
 !
-      intnod_shell                                                      &
-     &      = nidx_local_fem(1)*nidx_local_fem(2)*nidx_local_fem(3)
+      intnod_shell =  stbl%nidx_local_fem(1)                            &
+     &              * stbl%nidx_local_fem(2)                            &
+     &              * stbl%nidx_local_fem(3)
 !
       end subroutine set_intnod_shell
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_intnod_Spole
+      subroutine set_intnod_Spole(stbl)
+!
+      type(comm_table_make_sph), intent(in) :: stbl
 !
 !
-      intnod_Spole = nidx_local_fem(1)
+      intnod_Spole = stbl%nidx_local_fem(1)
 !
       end subroutine set_intnod_Spole
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_intnod_Npole
+      subroutine set_intnod_Npole(stbl)
+!
+      type(comm_table_make_sph), intent(in) :: stbl
 !
 !
-      intnod_Npole = nidx_local_fem(1)
+      intnod_Npole = stbl%nidx_local_fem(1)
 !
       end subroutine set_intnod_Npole
 !
@@ -143,12 +151,14 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_nnod_lc_shell(ip_r, ip_t)
+      subroutine set_nnod_lc_shell(ip_r, ip_t, stbl)
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t
+      type(comm_table_make_sph), intent(in) :: stbl
 !
-      nnod_lc_shell = nnod_sph_r(ip_r)*nnod_sph_t(ip_t)                 &
-     &               *nidx_global_fem(3)
+!
+      nnod_lc_shell =  stbl%nnod_sph_r(ip_r) * stbl%nnod_sph_t(ip_t)    &
+     &               * stbl%nidx_global_fem(3)
 !
       end subroutine set_nnod_lc_shell
 !
@@ -184,11 +194,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_nnod_lc_ctr_sph(nnod_sph_ct)
+      subroutine set_nnod_lc_ctr_sph(nnod_sph_ct, stbl)
 !
       integer(kind = kint), intent(in) :: nnod_sph_ct
+      type(comm_table_make_sph), intent(in) :: stbl
 !
-      nnod_lc_ctr_sph = nnod_sph_ct*nidx_global_fem(3)
+!
+      nnod_lc_ctr_sph = nnod_sph_ct * stbl%nidx_global_fem(3)
 !
       end subroutine set_nnod_lc_ctr_sph
 !
@@ -205,29 +217,36 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_nnod_gl_shell
+      subroutine set_nnod_gl_shell(stbl)
+!
+      type(comm_table_make_sph), intent(in) :: stbl
 !
 !
-      nnod_gl_shell                                                     &
-     &     = nidx_global_fem(1)*nidx_global_fem(2)*nidx_global_fem(3)
+      nnod_gl_shell =  stbl%nidx_global_fem(1)                          &
+     &               * stbl%nidx_global_fem(2)                          &
+     &               * stbl%nidx_global_fem(3)
 !
       end subroutine set_nnod_gl_shell
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_nnod_gl_Spole
+      subroutine set_nnod_gl_Spole(stbl)
+!
+      type(comm_table_make_sph), intent(in) :: stbl
 !
 !
-      nnod_gl_Spole = nidx_global_fem(1)
+      nnod_gl_Spole = stbl%nidx_global_fem(1)
 !
       end subroutine set_nnod_gl_Spole
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_nnod_gl_Npole
+      subroutine set_nnod_gl_Npole(stbl)
+!
+      type(comm_table_make_sph), intent(in) :: stbl
 !
 !
-      nnod_gl_Npole = nidx_global_fem(1)
+      nnod_gl_Npole = stbl%nidx_global_fem(1)
 !
       end subroutine set_nnod_gl_Npole
 !
@@ -274,14 +293,17 @@
 ! -----------------------------------------------------------------------
 !
       integer(kind = kint) function sph_shell_node_id                   &
-     &                    (ip_r, ip_t, kr, lt, mp)
+     &                    (ip_r, ip_t, kr, lt, mp, stbl)
+!
+      type(comm_table_make_sph), intent(in) :: stbl
 !
       integer(kind = kint), intent(in) :: ip_r, ip_t
       integer(kind = kint), intent(in) :: kr, lt, mp
 !
 !
-      sph_shell_node_id = kr + (lt-1)*nnod_sph_r(ip_r)                  &
-     &                   + (mp-1)*nnod_sph_r(ip_r)*nnod_sph_t(ip_t)
+      sph_shell_node_id = kr + (lt-1) * stbl%nnod_sph_r(ip_r)           &
+     &                       + (mp-1) * stbl%nnod_sph_r(ip_r)           &
+     &                                * stbl%nnod_sph_t(ip_t)
 !
       end function sph_shell_node_id
 !
@@ -346,13 +368,16 @@
 ! -----------------------------------------------------------------------
 !
       integer(kind = kint) function global_sph_shell_node_id            &
-     &                    (kr, lt, mp)
+     &                    (kr, lt, mp, stbl)
+!
+      type(comm_table_make_sph), intent(in) :: stbl
 !
       integer(kind = kint), intent(in) :: kr, lt, mp
 !
 !
-      global_sph_shell_node_id = kr + (lt-1)*nidx_global_fem(1)         &
-     &                   + (mp-1)*nidx_global_fem(1)*nidx_global_fem(2)
+      global_sph_shell_node_id                                          &
+          = kr + (lt-1)*stbl%nidx_global_fem(1)                         &
+     &         + (mp-1)*stbl%nidx_global_fem(1)*stbl%nidx_global_fem(2)
 !
       end function global_sph_shell_node_id
 !

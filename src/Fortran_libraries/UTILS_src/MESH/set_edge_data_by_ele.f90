@@ -180,9 +180,11 @@
               if (      inod1 .eq. ie_edge(iedge,1)                     &
      &            .and. inod2 .eq. ie_edge(iedge,nnod_4_edge) ) then
                 iedge_4_sf(isurf,i) = iedge
+                exit
               else if ( inod1 .eq. ie_edge(iedge,nnod_4_edge)           &
      &            .and. inod2 .eq. ie_edge(iedge,1) ) then
                 iedge_4_sf(isurf,i) = -iedge
+                exit
               end if
             end if
           end do

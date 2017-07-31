@@ -10,6 +10,7 @@
 !!      subroutine overwrite_nodal_sph_2_xyz(node, nod_fld)
 !!      subroutine overwrite_nodal_cyl_2_xyz(node, nod_fld)
 !!      subroutine overwrite_nodal_xyz_2_sph(node, nod_fld)
+!!      subroutine overwrite_nodal_xyz_2_cyl(node, nod_fld)
 !!      subroutine overwrite_nodal_sph_2_cyl(node, nod_fld)
 !!        type(node_data), intent(in) ::    node
 !!        type(phys_data), intent(inout) :: nod_fld
@@ -107,6 +108,30 @@
 !$omp end parallel
 !
       end subroutine overwrite_nodal_xyz_2_sph
+!
+! -------------------------------------------------------------------
+!
+      subroutine overwrite_nodal_xyz_2_cyl(node, nod_fld)
+!
+      use t_geometry_data
+      use t_phys_data
+!
+      type(node_data), intent(in) ::    node
+      type(phys_data), intent(inout) :: nod_fld
+!
+      integer(kind = kint) :: i, i_fld, numdir
+!
+!
+!$omp parallel private(i,i_fld,numdir)
+      do i = 1, nod_fld%num_phys
+        i_fld =  nod_fld%istack_component(i-1) + 1
+        numdir = nod_fld%num_component(i)
+        call overwrite_nodal_xyz_2_cyl_smp                              &
+     &     (node, nod_fld%ntot_phys, i_fld, numdir, nod_fld%d_fld)
+      end do
+!$omp end parallel
+!
+      end subroutine overwrite_nodal_xyz_2_cyl
 !
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
@@ -222,6 +247,35 @@
       end if
 !
       end subroutine overwrite_nodal_xyz_2_sph_smp 
+!
+! -------------------------------------------------------------------
+!
+      subroutine overwrite_nodal_xyz_2_cyl_smp                          &
+     &         (node, ntot_comp, i_fld, numdir, d_nod)
+!
+      use cvt_xyz_vector_2_cyl_smp
+      use cvt_xyz_tensor_2_cyl_smp
+!
+      type(node_data), intent(in) :: node
+!
+      integer(kind = kint), intent(in) :: ntot_comp, i_fld, numdir
+      real(kind = kreal), intent(inout)                                 &
+     &                   :: d_nod(node%numnod,ntot_comp)
+!
+!
+      if     (numdir .eq. 6) then
+        call overwrite_cyl_tensor_smp                                   &
+     &       (np_smp, node%numnod, node%istack_nod_smp,                 &
+     &        d_nod(1,i_fld), node%xx(1:node%numnod,1),                 &
+     &        node%xx(1:node%numnod,2), node%ss, node%a_s)
+      else if(numdir .eq. 3) then
+        call overwrite_vector_2_cyl_smp                                 &
+     &       (np_smp, node%numnod, node%istack_nod_smp,                 &
+     &        d_nod(1,i_fld), node%xx(1:node%numnod,1),                 &
+     &        node%xx(1:node%numnod,2), node%ss, node%a_s)
+      end if
+!
+      end subroutine overwrite_nodal_xyz_2_cyl_smp
 !
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------

@@ -9,7 +9,14 @@
 !> @brief set boundary conditions for temperature from control data
 !!
 !!@verbatim
-!!     subroutine s_set_control_4_temp
+!!      subroutine s_set_control_4_temp                                 &
+!!     &         (ht_prop, node_bc_T_ctl, surf_bc_HF_ctl,               &
+!!     &          temp_nod, h_flux_surf)
+!!        type(scalar_property), intent(in) :: ht_prop
+!!        type(ctl_array_c2r), intent(inout) :: node_bc_T_ctl
+!!        type(ctl_array_c2r), intent(inout) :: surf_bc_HF_ctl
+!!        type(boundary_condition_list), intent(inout) :: temp_nod
+!!        type(boundary_condition_list), intent(inout) :: h_flux_surf
 !!@endverbatim
 !
       module set_control_4_temp
@@ -24,22 +31,28 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_temp
+      subroutine s_set_control_4_temp                                   &
+     &         (ht_prop, node_bc_T_ctl, surf_bc_HF_ctl,                 &
+     &          temp_nod, h_flux_surf)
 !
       use m_machine_parameter
       use calypso_mpi
-      use m_control_parameter
-      use m_ctl_data_node_boundary
-      use m_ctl_data_surf_boundary
-      use m_bc_data_list
-      use m_surf_data_list
+      use t_physical_property
+      use t_read_control_arrays
+      use t_bc_data_list
       use set_node_group_types
       use set_surface_group_types
+!
+      type(scalar_property), intent(in) :: ht_prop
+      type(ctl_array_c2r), intent(inout) :: node_bc_T_ctl
+      type(ctl_array_c2r), intent(inout) :: surf_bc_HF_ctl
+      type(boundary_condition_list), intent(inout) :: temp_nod
+      type(boundary_condition_list), intent(inout) :: h_flux_surf
 !
       integer(kind = kint) :: i
 !
 !
-      if (iflag_t_evo_4_temp .eq. id_no_evolution) then
+      if (ht_prop%iflag_scheme .eq. id_no_evolution) then
         temp_nod%num_bc =    0
         h_flux_surf%num_bc = 0
       else
@@ -53,7 +66,7 @@
      &          write(*,*)  'temp_nod%num_bc ',temp_nod%num_bc
       if(temp_nod%num_bc .gt. 0) then
 !
-        call allocate_nod_bc_list_temp
+        call alloc_bc_type_ctl(temp_nod)
 !
         temp_nod%bc_name(1:temp_nod%num_bc)                             &
      &        = node_bc_T_ctl%c2_tbl(1:temp_nod%num_bc)
@@ -79,14 +92,14 @@
           end do
         end if
 !
-        call deallocate_bc_temp_ctl
+        call dealloc_control_array_c2_r(node_bc_T_ctl)
       end if
 !
 !   set boundary conditions for heat flux
 !
       if (h_flux_surf%num_bc .gt. 0) then
 !
-        call allocate_temp_surf_ctl
+        call alloc_bc_type_ctl(h_flux_surf)
 !
         h_flux_surf%bc_name(1:h_flux_surf%num_bc)                       &
      &       = surf_bc_HF_ctl%c2_tbl(1:h_flux_surf%num_bc)
@@ -100,7 +113,7 @@
      &            h_flux_surf%ibc_type(i))
         end do
  !
-        call deallocate_bc_h_flux_ctl
+        call dealloc_control_array_c2_r(surf_bc_HF_ctl)
       end if
 !
       end subroutine s_set_control_4_temp

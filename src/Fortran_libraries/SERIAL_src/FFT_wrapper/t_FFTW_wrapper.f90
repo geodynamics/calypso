@@ -73,16 +73,16 @@
 !>      structure for working data for FFTW
       type working_FFTW
 !>        plan ID for backward transform
-        integer(kind = fftw_plan), pointer :: plan_backward(:)
+        integer(kind = fftw_plan), allocatable :: plan_backward(:)
 !>        plan ID for forward transform
-        integer(kind = fftw_plan), pointer :: plan_forward(:)
+        integer(kind = fftw_plan), allocatable :: plan_forward(:)
 !
 !>      normalization parameter for FFTW (= 1 / Nfft)
         real(kind = kreal) :: aNfft
 !>        real data for multiple Fourier transform
-        real(kind = kreal), pointer :: X_FFTW(:,:)
+        real(kind = kreal), allocatable :: X_FFTW(:,:)
 !>        spectrum data for multiple Fourier transform
-        complex(kind = fftw_complex), pointer :: C_FFTW(:,:)
+        complex(kind = fftw_complex), allocatable :: C_FFTW(:,:)
 !>        flag for number of components for Fourier transform
         integer(kind = kint) :: iflag_fft_len =  -1
       end type working_FFTW

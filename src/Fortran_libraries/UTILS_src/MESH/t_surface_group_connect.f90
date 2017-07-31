@@ -35,25 +35,25 @@
 !>   total number of node for surface group
         integer(kind=kint) :: ntot_node_sf_grp
 !>   number of node for each surface group
-        integer(kind=kint), pointer :: nnod_sf_grp(:)
+        integer(kind=kint), allocatable :: nnod_sf_grp(:)
 !>   end number of node for each surface group
-        integer(kind=kint), pointer :: inod_stack_sf_grp(:)
+        integer(kind=kint), allocatable :: inod_stack_sf_grp(:)
 !
 !>      end address of each element group for SMP process
-        integer( kind=kint ), pointer :: istack_surf_nod_smp(:)
+        integer( kind=kint ), allocatable :: istack_surf_nod_smp(:)
 !>      maximum number of element group for SMP process
         integer( kind=kint )  ::  max_sf_nod_4_smp
 !
 !>   local node ID for surface group
-        integer(kind=kint), pointer :: inod_surf_grp(:)
+        integer(kind=kint), allocatable :: inod_surf_grp(:)
 !>   local node ID on opposite surface
-        integer(kind=kint), pointer :: surf_node_n(:)
+        integer(kind=kint), allocatable :: surf_node_n(:)
 !>   number of surface for each node on surface group
-        integer(kind=kint), pointer :: num_sf_4_nod(:)
+        integer(kind=kint), allocatable :: num_sf_4_nod(:)
 !>   normal vector at each node for surface group
-        real(kind=kreal),   pointer :: surf_norm_nod(:,:)
+        real(kind=kreal),   allocatable :: surf_norm_nod(:,:)
 !>   multiply coefs at each node for surface group
-        real(kind=kreal),   pointer :: coef_sf_nod(:)
+        real(kind=kreal),   allocatable :: coef_sf_nod(:)
       end type surface_node_grp_data
 !
 !

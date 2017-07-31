@@ -12,13 +12,35 @@
       use m_precision
       use m_constants
       use m_machine_parameter
+!
+      use t_spheric_mesh
+      use t_spheric_parameter
+      use t_sph_trans_comm_tbl
+      use t_file_IO_parameter
+!
+      use t_ctl_data_4_platforms
+      use t_ctl_data_gen_sph_shell
+!
       use calypso_mpi
 !
       implicit none
 !
       integer(kind = kint), parameter :: id_check = 44
       character(len=kchara), parameter :: check_header = 'comm_errors'
-      private :: check_header
+!
+      character (len = kchara)                                          &
+     &         :: control_file_name = 'control_sph_shell'
+!
+!>      Structure for file settings
+      type(platform_data_control), save :: psph_test_plt
+!
+      type(parallel_sph_shell_control), save :: psph_test_ctl
+      type(sph_mesh_data), save :: sph_mesh_t
+      type(field_IO_params), save :: sph_file_param
+      type(field_IO_params), save ::  test_mesh_file
+!
+      private :: control_file_name, psph_test_ctl
+      private :: check_header, sph_mesh_t
 !
 ! ----------------------------------------------------------------------
 !
@@ -28,7 +50,6 @@
 !
       subroutine init_test_sph
 !
-      use m_read_ctl_gen_sph_shell
       use set_control_platform_data
       use parallel_load_data_4_sph
       use cmp_trans_sph_tests
@@ -43,12 +64,15 @@
 !
 !     --------------------- 
 !
-      call turn_off_debug_flag_by_ctl(my_rank)
-      call read_control_4_gen_shell_grids
-      call set_control_sph_mesh
+      call turn_off_debug_flag_by_ctl(my_rank, psph_test_plt)
+      call read_ctl_file_gen_shell_grids                                &
+     &   (control_file_name, psph_test_plt, psph_test_ctl)
+      call set_control_sph_mesh                                         &
+     &   (psph_test_plt, test_mesh_file, sph_file_param)
 !
       if (iflag_debug.gt.0) write(*,*) 'load_para_sph_mesh'
-      call load_para_sph_mesh
+      call load_para_sph_mesh                                           &
+     &   (sph_mesh_t%sph, sph_mesh_t%sph_comms, sph_mesh_t%sph_grps)
 !
        end subroutine init_test_sph
 !
@@ -68,8 +92,16 @@
       integer(kind = kint), parameter :: NB = 8
 !
 !
-      call allocate_idx_sph_recieve
-      call allocate_real_sph_test(ieight)
+      call allocate_idx_sph_recieve                                     &
+     &   (sph_mesh_t%sph%sph_rtp%nnod_rtp,                              &
+     &    sph_mesh_t%sph%sph_rtm%nnod_rtm,                              &
+     &    sph_mesh_t%sph%sph_rlm%nnod_rlm,                              &
+     &    sph_mesh_t%sph%sph_rj%nnod_rj)
+      call allocate_real_sph_test                                       &
+     &   (NB, sph_mesh_t%sph%sph_rtp%nnod_rtp,                          &
+     &        sph_mesh_t%sph%sph_rtm%nnod_rtm,                          &
+     &        sph_mesh_t%sph%sph_rlm%nnod_rlm,                          &
+     &        sph_mesh_t%sph%sph_rj%nnod_rj)
 !
       call add_int_suffix(my_rank, check_header, fname_tmp)
       call add_dat_extension(fname_tmp, file_name)
@@ -84,20 +116,31 @@
          write(id_check,*)  'USING IMPORT_REVERSE'
        end if
 !
-        call sph_indices_transfer(itype)
-        call check_missing_sph_indices(id_check)
-        call compare_transfer_sph_indices(id_check)
+        call sph_type_indices_transfer                                  &
+     &     (itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
+        call check_missing_sph_indices(id_check, sph_mesh_t%sph)
+        call compare_transfer_sph_indices(id_check, sph_mesh_t%sph)
 !
-        call sph_transfer_test_N(NB, itype)
-        call compare_transfer_sph_reals(NB, id_check)
-        call sph_transfer_test_6(itype)
-        call compare_transfer_sph_reals(isix, id_check)
-        call sph_transfer_test_3(itype)
-        call compare_transfer_sph_reals(ithree, id_check)
-        call sph_transfer_test_2(itype)
-        call compare_transfer_sph_reals(itwo, id_check)
-        call sph_transfer_test_1(itype)
-        call compare_transfer_sph_reals(ione, id_check)
+        call sph_transfer_test_N                                        &
+     &     (NB, itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
+        call compare_transfer_sph_reals(NB, id_check, sph_mesh_t%sph)
+!
+        call sph_transfer_test_6                                        &
+     &     (itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
+        call compare_transfer_sph_reals(isix, id_check, sph_mesh_t%sph)
+!
+        call sph_transfer_test_3                                        &
+     &     (itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
+        call compare_transfer_sph_reals                                 &
+     &     (ithree, id_check, sph_mesh_t%sph)
+!
+        call sph_transfer_test_2                                        &
+     &     (itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
+        call compare_transfer_sph_reals(itwo, id_check, sph_mesh_t%sph)
+!
+        call sph_transfer_test_1                                        &
+     &     (itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
+        call compare_transfer_sph_reals(ione, id_check, sph_mesh_t%sph)
       end do
 !
       close(id_check)

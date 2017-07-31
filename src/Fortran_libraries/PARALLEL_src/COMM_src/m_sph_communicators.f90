@@ -36,8 +36,6 @@
       integer(kind=kint) :: my_rank_rtp
 !>      number of processes for f(r,t,m) data communication
       integer(kind=kint) :: nprocs_rtp
-!>      maximum number of components for data transform for  f(r,t,p) 
-      integer(kind=kint) :: nmax_sr_rtp
 !
 !>     MPI communicator for f(r,j)  data communication
       integer :: CALYPSO_RJ_COMM
@@ -45,8 +43,6 @@
       integer(kind=kint) :: my_rank_rj
 !>      number of processes for f(r,j) data communication
       integer(kind=kint) :: nprocs_rj
-!>      maximum number of components for data transform for  f(r,j) 
-      integer(kind=kint) :: nmax_sr_rj
 !
 ! ----------------------------------------------------------------------
 !

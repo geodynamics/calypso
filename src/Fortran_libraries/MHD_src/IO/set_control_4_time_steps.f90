@@ -9,7 +9,12 @@
 !> @brief set parameters for time stepping
 !!
 !!@verbatim
-!!      subroutine s_set_control_4_time_steps
+!!      subroutine s_set_control_4_time_steps                           &
+!!     &         (flex_p, MHD_step, mr_ctl, tctl)
+!!        type(mhd_restart_control), intent(in) :: mr_ctl
+!!        type(MHD_step_param), intent(inout) :: MHD_step
+!!        type(flexible_stepping_parameter), intent(inout) :: flex_p
+!!        type(time_data_control), intent(inout) :: tctl
 !!@endverbatim
 !
       module set_control_4_time_steps
@@ -19,14 +24,18 @@
       use calypso_mpi
       use m_error_IDs
       use m_machine_parameter
-      use m_control_parameter
-      use m_ctl_data_4_time_steps
-      use m_t_step_parameter
-      use m_t_int_parameter
+      use m_MHD_step_parameter
+      use t_time_data
+      use t_step_parameter
+      use t_ctl_data_4_time_steps
+      use t_VIZ_step_parameter
+      use t_MHD_step_parameter
+      use t_flex_delta_t_data
 !
       implicit  none
 !
-      private :: set_monitor_param_4_flex_step
+      private :: set_flex_time_step_params
+      private :: set_flex_time_step_controls
       private :: set_fixed_time_step_controls
 !
 ! -----------------------------------------------------------------------
@@ -35,234 +44,246 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_time_steps
+      subroutine s_set_control_4_time_steps                             &
+     &         (flex_p, MHD_step, mr_ctl, tctl)
 !
-      use m_ctl_data_mhd_evo_scheme
+      use t_time_data
+      use t_ctl_data_mhd_evo_scheme
       use m_initial_field_control
       use cal_num_digits
       use skip_comment_f
 !
+      type(mhd_restart_control), intent(in) :: mr_ctl
+      type(flexible_stepping_parameter), intent(inout) :: flex_p
+      type(MHD_step_param), intent(inout) :: MHD_step
+      type(time_data_control), intent(inout) :: tctl
+!
 !
 !  control for restert
 !
-      call set_initial_field_id
+      call set_initial_field_id                                         &
+     &   (mr_ctl%restart_flag_ctl, tctl, MHD_step%init_d%time)
 !
-        iflag_flexible_step = iflag_fixed_step
-        if(flexible_step_ctl%iflag .gt. 0                               &
-     &     .and. yes_flag(flexible_step_ctl%charavalue)) then
-          iflag_flexible_step = iflag_flex_step
+        flex_p%iflag_flexible_step = iflag_fixed_step
+        if(tctl%flexible_step_ctl%iflag .gt. 0                          &
+     &     .and. yes_flag(tctl%flexible_step_ctl%charavalue)) then
+          flex_p%iflag_flexible_step = iflag_flex_step
         end if
 !
-        if (dt_ctl%iflag .eq. 0) then
+        if (tctl%dt_ctl%iflag .eq. 0) then
           e_message = 'Set delta t'
           call calypso_MPI_abort(ierr_evo, e_message)
         else
-          dt = dt_ctl%realvalue
-          ddt = 1.0d0 / dt
-          call cal_num_digit_real(dt, dt_fact, idt_digit)
+          MHD_step%init_d%dt = tctl%dt_ctl%realvalue
+          call cal_num_digit_real                                       &
+     &       (MHD_step%init_d%dt, flex_p%dt_fact, flex_p%idt_digit)
         end if
 !
-        if(iflag_flexible_step .eq. iflag_flex_step) then
-          if (min_delta_t_ctl%iflag .eq. 0) then
+        if(flex_p%iflag_flexible_step .eq. iflag_flex_step) then
+          if (tctl%min_delta_t_ctl%iflag .eq. 0) then
             e_message = 'Set maximum delta t'
             call calypso_MPI_abort(ierr_evo, e_message)
           else
-            dt_min = min_delta_t_ctl%realvalue
+            flex_p%dt_min = tctl%min_delta_t_ctl%realvalue
           end if
 !
-          if (max_delta_t_ctl%iflag .eq. 0) then
+          if (tctl%max_delta_t_ctl%iflag .eq. 0) then
             e_message = 'Set maximum delta t'
             call calypso_MPI_abort(ierr_evo, e_message)
           else
-            dt_max = max_delta_t_ctl%realvalue
+            flex_p%dt_max = tctl%max_delta_t_ctl%realvalue
           end if
 !
-          if (max_eps_to_shrink_ctl%iflag .eq. 0) then
+          if (tctl%max_eps_to_shrink_ctl%iflag .eq. 0) then
             e_message = 'Set maximum error to shrink delta t'
             call calypso_MPI_abort(ierr_evo, e_message)
           else
-            max_eps_to_shrink_dt = max_eps_to_shrink_ctl%realvalue
+            flex_p%max_eps_to_shrink                                    &
+     &                = tctl%max_eps_to_shrink_ctl%realvalue
           end if
 !
-          if (min_eps_to_expand_ctl%iflag .eq. 0) then
+          if (tctl%min_eps_to_expand_ctl%iflag .eq. 0) then
             e_message = 'Set minimum error to expand delta t'
             call calypso_MPI_abort(ierr_evo, e_message)
           else
-            min_eps_to_expand_dt = min_eps_to_expand_ctl%realvalue
+            flex_p%min_eps_to_expand                                    &
+     &                = tctl%min_eps_to_expand_ctl%realvalue
           end if
 !
-          istep_flex_to_max = izero
+          flex_p%istep_flex_to_max = izero
 !
-          if(dt .gt. zero) i_interval_flex_2_max = nint(dt_max / dt)
+          if(MHD_step%init_d%dt .gt. zero) then
+            flex_p%interval_flex_2_max                                  &
+     &                = nint(flex_p%dt_max / MHD_step%init_d%dt)
+          end if
         else
-          dt_max = dt
-          dt_min = dt
-          i_interval_flex_2_max = ione
-          istep_flex_to_max = izero
+          flex_p%dt_max = MHD_step%init_d%dt
+          flex_p%dt_min = MHD_step%init_d%dt
+          flex_p%interval_flex_2_max = ione
+          flex_p%istep_flex_to_max = izero
         end if
 !
 !   parameters for time evolution
 !
-      if(iflag_flexible_step .eq. iflag_flex_step) then
+      if(flex_p%iflag_flexible_step .eq. iflag_flex_step) then
         if (iflag_debug .ge. iflag_routine_msg)                         &
      &    write(*,*) 'set_flex_time_step_controls'
-        call set_flex_time_step_controls
+        call set_flex_time_step_controls(flex_p, tctl, MHD_step)
       else
         if (iflag_debug .ge. iflag_routine_msg)                         &
      &    write(*,*) 'set_fixed_time_step_controls'
-        call set_fixed_time_step_controls
+        call set_fixed_time_step_controls(tctl, MHD_step)
       end if
 !
-      if (i_step_number.eq.-1) then
-        if (elapsed_time_ctl%iflag .eq. 0) then
+      if (MHD_step%finish_d%i_end_step .eq. -1) then
+        if (tctl%elapsed_time_ctl%iflag .eq. 0) then
           e_message                                                     &
      &      = 'Set elapsed time to finish (second)'
           call calypso_MPI_abort(ierr_evo, e_message)
         else
-          elapsed_time  = elapsed_time_ctl%realvalue
+          MHD_step%finish_d%elapsed_time                                &
+     &      = tctl%elapsed_time_ctl%realvalue
         end if
       end if
 !
       if (iflag_debug .ge. iflag_routine_msg) then
-        write(*,*) 'dt', dt, dt_fact, idt_digit
-        write(*,*) 'i_step_init ',i_step_init
-        write(*,*) 'i_step_number ',i_step_number
-        write(*,*) 'istep_rst_start ', istep_rst_start
-        write(*,*) 'istep_rst_end ',  istep_rst_end
-        write(*,*) 'elapsed_time ',elapsed_time
-        write(*,*) 'i_step_check ',i_step_check
-        write(*,*) 'i_step_output_rst ',i_step_output_rst
-        write(*,*) 'i_step_output_ucd ',i_step_output_ucd
+        write(*,*) 'dt', MHD_step%init_d%dt,                            &
+     &            flex_p%dt_fact, flex_p%idt_digit
+        write(*,*) 'i_step_init ', MHD_step%init_d%i_time_step
+        write(*,*) 'i_step_number ', MHD_step%finish_d%i_end_step
+        write(*,*) 'elapsed_time ',  MHD_step%finish_d%elapsed_time
+        write(*,*) 'i_step_check ',  MHD_step%rms_step%increment
+        write(*,*) 'i_step_output_rst ', MHD_step%rst_step%increment
+        write(*,*) 'i_step_output_ucd ', MHD_step%ucd_step%increment
       end if
 !
       end subroutine s_set_control_4_time_steps
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_fixed_time_step_controls
+      subroutine set_fixed_time_step_controls(tctl, MHD_step)
 !
-      use set_fixed_time_step_params
+      type(time_data_control), intent(inout) :: tctl
+      type(MHD_step_param), intent(inout) :: MHD_step
 !
       integer(kind = kint) :: ierr
 !
-      call s_set_fixed_time_step_params(ierr, e_message)
+!
+      call s_set_fixed_time_step_params                                 &
+     &   (tctl, MHD_step%init_d, MHD_step%finish_d,                     &
+     &    MHD_step%rst_step, MHD_step%ucd_step, ierr, e_message)
+      call viz_fixed_time_step_params                                   &
+     &   (MHD_step%init_d%dt, tctl, MHD_step%viz_step)
       if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message)
 !
-      i_step_sgs_coefs = 1
-      if (iflag_dynamic_SGS .ne. id_SGS_DYNAMIC_OFF) then
-        call set_monitor_param_4_fixed_step                             &
-     &     (ione, i_step_sgs_coefs_ctl, delta_t_sgs_coefs_ctl,          &
-     &      i_step_sgs_output, delta_t_sgs_output)
-      end if
+      call set_output_step_4_fixed_step(ione, MHD_step%init_d%dt,       &
+     &    tctl%i_step_check_ctl, tctl%delta_t_check_ctl,                &
+     &    MHD_step%rms_step)
 !
-      call set_monitor_param_4_fixed_step                               &
-     &   (izero, i_step_monitor_ctl, delta_t_monitor_ctl,               &
-     &    i_step_output_monitor, delta_t_output_monitor)
+      call set_output_step_4_fixed_step(izero, MHD_step%init_d%dt,      &
+     &    tctl%i_step_sgs_coefs_ctl, tctl%delta_t_sgs_coefs_ctl,        &
+     &    MHD_step%sgs_IO_step)
 !
-      call set_monitor_param_4_fixed_step(izero,                        &
-     &    i_step_boundary_ctl, delta_t_boundary_ctl,                    &
-     &    i_step_output_boundary, delta_t_output_boundary)
+      call set_output_step_4_fixed_step(izero, MHD_step%init_d%dt,      &
+     &    tctl%i_step_monitor_ctl, tctl%delta_t_monitor_ctl,            &
+     &    MHD_step%point_step)
+!
+      call set_output_step_4_fixed_step(izero, MHD_step%init_d%dt,      &
+     &    tctl%i_step_boundary_ctl, tctl%delta_t_boundary_ctl,          &
+     &    MHD_step%boundary_step)
 !
       end subroutine set_fixed_time_step_controls
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_flex_time_step_controls
+      subroutine set_flex_time_step_controls(flex_p, tctl, MHD_step)
+!
+      type(flexible_stepping_parameter), intent(inout) :: flex_p
+      type(time_data_control), intent(inout) :: tctl
+      type(MHD_step_param), intent(inout) :: MHD_step
 !
 !
-      istep_rst_start   = 0
-      if (start_rst_step_ctl%iflag .gt. 0) then
-        istep_rst_start   = start_rst_step_ctl%intvalue
-      end if
+      call set_flex_time_step_params                                    &
+     &   (flex_p, tctl, MHD_step%init_d, MHD_step%finish_d,             &
+     &    MHD_step%rst_step, MHD_step%ucd_step)
 !
-      if (end_rst_step_ctl%iflag .eq. 0) then
-        e_message = 'Set time to finish'
-          call calypso_MPI_abort(ierr_evo, e_message)
-      else
-        istep_rst_end = end_rst_step_ctl%intvalue
-      end if
+      call set_output_step_4_flex_step(ione, flex_p%dt_max,             &
+     &    tctl%i_step_check_ctl, tctl%delta_t_check_ctl,                &
+     &    MHD_step%rms_step)
 !
-      call set_monitor_param_4_flex_step(ione, i_step_check_ctl,        &
-     &    delta_t_check_ctl, i_step_check, delta_t_step_check)
+      call set_output_step_4_flex_step(izero, flex_p%dt_max,            &
+     &    tctl%i_step_sgs_coefs_ctl, tctl%delta_t_sgs_coefs_ctl,        &
+     &    MHD_step%sgs_IO_step)
 !
+      call set_output_step_4_flex_step(izero, flex_p%dt_max,            &
+     &    tctl%i_step_monitor_ctl, tctl%delta_t_monitor_ctl,            &
+     &    MHD_step%point_step)
 !
-      call set_monitor_param_4_flex_step(ione, i_step_rst_ctl,          &
-     &    delta_t_rst_ctl, i_step_output_rst, delta_t_output_rst)
+      call set_output_step_4_flex_step(izero, flex_p%dt_max,            &
+     &    tctl%i_step_boundary_ctl, tctl%delta_t_boundary_ctl,          &
+     &    MHD_step%boundary_step)
 !
-      call set_monitor_param_4_flex_step(ione, i_step_ucd_ctl,          &
-     &    delta_t_field_ctl, i_step_output_ucd, delta_t_output_ucd)
-!
-      i_step_init =   istep_rst_start * i_step_output_rst
-      i_step_number = istep_rst_end *   i_step_output_rst
-!
-      call set_monitor_param_4_flex_step(izero, i_step_psf_ctl,         &
-     &    delta_t_psf_ctl, i_step_output_psf, delta_t_output_psf)
-!
-      call set_monitor_param_4_flex_step(izero, i_step_iso_ctl,         &
-     &    delta_t_iso_ctl, i_step_output_iso, delta_t_output_iso)
-!
-      call set_monitor_param_4_flex_step(izero, i_step_pvr_ctl,         &
-     &    delta_t_pvr_ctl, i_step_output_pvr, delta_t_output_pvr)
-!
-      call set_monitor_param_4_flex_step(izero, i_step_fline_ctl,       &
-     &    delta_t_fline_ctl, i_step_output_fline, delta_t_output_fline)
-!
-!
-      i_step_sgs_coefs = 1
-      if (iflag_dynamic_SGS .ne. id_SGS_DYNAMIC_OFF) then
-        call set_monitor_param_4_flex_step                              &
-     &     (ione, i_step_sgs_coefs_ctl, delta_t_sgs_coefs_ctl,          &
-     &      i_step_sgs_output, delta_t_sgs_output)
-      end if
-!
-      call set_monitor_param_4_flex_step                                &
-     &   (izero, i_step_monitor_ctl, delta_t_monitor_ctl,               &
-     &    i_step_output_monitor, delta_t_output_monitor)
-!
-      call set_monitor_param_4_flex_step(izero,                         &
-     &    i_step_boundary_ctl, delta_t_boundary_ctl,                    &
-     &    i_step_output_boundary, delta_t_output_boundary)
-!
-      if (istep_rst_end .eq. -1) then
-        if (elapsed_time_ctl%iflag .eq. 0) then
-          e_message                                                     &
-     &      = 'Set elapsed time to finish (second)'
-          call calypso_MPI_abort(ierr_evo, e_message)
-        else
-          elapsed_time  = elapsed_time_ctl%realvalue
-        end if
-      end if
+      call viz_flex_time_step_controls                                  &
+     &   (tctl, MHD_step%init_d%dt, MHD_step%viz_step)
 !
       end subroutine set_flex_time_step_controls
 !
 ! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
 !
-      subroutine set_monitor_param_4_flex_step(istep_def,               &
-     &          istep_ctl, delta_t_ctl, istep_out, dt_out)
+      subroutine set_flex_time_step_params(flex_p, tctl,                &
+     &          init_d, finish_d, rst_step, ucd_step)
 !
-      use t_control_elements
+      type(time_data), intent(inout) :: init_d
+      type(finish_data), intent(inout) :: finish_d
 !
-      integer(kind = kint), intent(in) :: istep_def
-      type(read_real_item), intent(in) :: delta_t_ctl
-      type(read_integer_item), intent(in) :: istep_ctl
+      type(flexible_stepping_parameter), intent(inout) :: flex_p
+      type(time_data_control), intent(inout) :: tctl
+      type(IO_step_param), intent(inout) :: rst_step, ucd_step
 !
-      integer(kind = kint), intent(inout) :: istep_out
-      real(kind = kreal), intent(inout) :: dt_out
+!>      Start step for restarting file
+      integer(kind=kint) :: istep_rst_start, istep_rst_end
 !
 !
-      if ( (istep_ctl%iflag+delta_t_ctl%iflag) .eq. 0) then
-        istep_out =   istep_def
-        dt_out = dble(istep_def) * dt_max
-      else if(delta_t_ctl%iflag .eq. 0) then
-        istep_out =   istep_ctl%intvalue
-        dt_out = dble(istep_out) * dt_max
-      else
-        dt_out =    delta_t_ctl%realvalue
-        istep_out = nint(dt_out / dt_max)
+      istep_rst_start   = 0
+      if (tctl%start_rst_step_ctl%iflag .gt. 0) then
+        istep_rst_start = tctl%start_rst_step_ctl%intvalue
       end if
 !
-      end subroutine set_monitor_param_4_flex_step
+      if (tctl%end_rst_step_ctl%iflag .eq. 0) then
+        e_message = 'Set time to finish'
+          call calypso_MPI_abort(ierr_evo, e_message)
+      else
+        istep_rst_end = tctl%end_rst_step_ctl%intvalue
+      end if
+!
+!
+      call set_output_step_4_flex_step(ione, flex_p%dt_max,             &
+     &    tctl%i_step_rst_ctl, tctl%delta_t_rst_ctl, rst_step)
+!
+      call set_output_step_4_flex_step(ione, flex_p%dt_max,             &
+     &   tctl%i_step_ucd_ctl, tctl%delta_t_field_ctl, ucd_step)
+!
+      init_d%i_time_step =  istep_rst_start * rst_step%increment
+      finish_d%i_end_step = istep_rst_end *   rst_step%increment
+      flex_p%time_to_finish = istep_rst_end * rst_step%delta_t
+!
+      if (istep_rst_end .eq. -1) then
+        if (tctl%elapsed_time_ctl%iflag .eq. 0) then
+          e_message                                                     &
+     &      = 'Set elapsed time to finish (second)'
+          call calypso_MPI_abort(ierr_evo, e_message)
+        else
+          finish_d%elapsed_time  = tctl%elapsed_time_ctl%realvalue
+        end if
+      end if
+!
+      if (iflag_debug .ge. iflag_routine_msg) then
+        write(*,*) 'istep_rst_start ', istep_rst_start
+        write(*,*) 'istep_rst_end ',  istep_rst_end
+        write(*,*) 'time_to_finish ',  flex_p%time_to_finish
+      end if
+!
+      end subroutine set_flex_time_step_params
 !
 ! -----------------------------------------------------------------------
 !

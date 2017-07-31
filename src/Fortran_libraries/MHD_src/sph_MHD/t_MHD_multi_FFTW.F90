@@ -199,7 +199,7 @@
       type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
 !
 !
-      if(ASSOCIATED(FFTW_t%X) .eqv. .false.) then
+      if(allocated(FFTW_t%X) .eqv. .false.) then
         call init_MHD_multi_FFTW_t(ncomp, ncomp_bwd, ncomp_fwd,         &
      &      nidx_rtp, irt_rtp_smp_stack, X_rtp, FFTW_t)
         return

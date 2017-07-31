@@ -26,18 +26,12 @@
 !!      subroutine deallocate_sf_grp_type_item(sf_grp)
 !!      subroutine deallocate_sf_grp_type_smp(grp)
 !!
-!!      subroutine link_group_type(grp_org, grp_new)
-!!      subroutine link_surf_group_type(sf_grp_org, sf_grp_new)
-!!      subroutine unlink_group_type(grp)
-!!      subroutine unlink_surf_group_type(sf_grp)
-!!
 !!      subroutine check_group_type_data(my_rank, grp)
 !!      subroutine check_surf_grp_type_data(my_rank, sf_grp)
 !!      subroutine check_grp_4_sheard_para(my_rank, grp)
 !!      subroutine check_surf_grp_4_sheard_para(my_rank, sf_grp)
-!!      subroutine compare_nod_grp_type_vs_1st(my_rank, grp_ref, grp)
-!!      subroutine compare_surf_grp_type_vs_1st                         &
-!!     &         (my_rank, sf_grp_ref, sf_grp)
+!!      subroutine compare_group_types(my_rank, grp_ref, grp)
+!!      subroutine compare_surface_grp_types(my_rank, sf_grp_ref, sf_grp)
 !!        integer(kind = kint), intent(in) :: my_rank
 !!        type(group_data), intent(in) :: grp
 !!        type(surface_group_data), intent(in) :: sf_grp
@@ -57,19 +51,19 @@
         integer (kind=kint) :: num_item
 !
 !>      number of in each group
-        integer (kind=kint), pointer :: nitem_grp(:)
+        integer (kind=kint), allocatable :: nitem_grp(:)
 !>      end address of each group
-        integer (kind=kint), pointer :: istack_grp(:)
+        integer (kind=kint), allocatable :: istack_grp(:)
 !>      local ID for group
-        integer (kind=kint), pointer :: item_grp(:)
+        integer (kind=kint), allocatable :: item_grp(:)
 !
 !>      group name
-        character (len=kchara), pointer :: grp_name(:)
+        character (len=kchara), allocatable :: grp_name(:)
 !
 !>      number of group for SMP process
         integer( kind=kint )  ::  num_grp_smp
 !>      end address of each group for SMP process
-        integer( kind=kint ), pointer :: istack_grp_smp(:)
+        integer( kind=kint ), allocatable :: istack_grp_smp(:)
 !>      maximum number of group for SMP process
         integer( kind=kint )  ::  max_grp_smp
       end type group_data
@@ -83,21 +77,21 @@
         integer (kind=kint) :: num_item
 !
 !>      number of surface in each surface group
-        integer (kind=kint), pointer :: nitem_grp(:)
+        integer (kind=kint), allocatable :: nitem_grp(:)
 !>      end address of each surface group
-        integer (kind=kint), pointer :: istack_grp(:)
+        integer (kind=kint), allocatable :: istack_grp(:)
 !>      local surface ID for surface group
 !>      surf_item(1,:):  local element ID
 !>      surf_item(2,:):  surface ID for each element
-        integer (kind=kint), pointer :: item_sf_grp(:,:)
+        integer (kind=kint), allocatable :: item_sf_grp(:,:)
 !
 !>      surface group name
-        character (len=kchara), pointer :: grp_name(:)
+        character (len=kchara), allocatable :: grp_name(:)
 !
 !>      number of surface group for SMP process
         integer( kind=kint )  ::  num_grp_smp
 !>      end address of each surface group for SMP process
-        integer( kind=kint ), pointer :: istack_grp_smp(:)
+        integer( kind=kint ), allocatable :: istack_grp_smp(:)
 !>      maximum number of surface group for SMP process
         integer( kind=kint )  ::  max_grp_smp
       end type surface_group_data
@@ -297,67 +291,6 @@
       end subroutine deallocate_sf_grp_type_smp
 !
 ! ----------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      subroutine link_group_type(grp_org, grp_new)
-!
-      type(group_data), intent(in) :: grp_org
-      type(group_data), intent(inout) :: grp_new
-!
-      grp_new%num_grp =  grp_org%num_grp
-      grp_new%num_item = grp_org%num_item
-!
-      grp_new%grp_name =>   grp_org%grp_name
-      grp_new%istack_grp => grp_org%istack_grp
-      grp_new%item_grp =>   grp_org%item_grp
-!
-      end subroutine link_group_type
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine link_surf_group_type(sf_grp_org, sf_grp_new)
-!
-      type(surface_group_data), intent(in) :: sf_grp_org
-      type(surface_group_data), intent(inout) :: sf_grp_new
-!
-      sf_grp_new%num_grp =  sf_grp_org%num_grp
-      sf_grp_new%num_item = sf_grp_org%num_item
-!
-      sf_grp_new%grp_name =>   sf_grp_org%grp_name
-      sf_grp_new%istack_grp => sf_grp_org%istack_grp
-      sf_grp_new%item_sf_grp => sf_grp_org%item_sf_grp
-!
-      end subroutine link_surf_group_type
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine unlink_group_type(grp)
-!
-      type(group_data), intent(inout) :: grp
-!
-      grp%num_grp =  0
-      grp%num_item = 0
-!
-      nullify(grp%grp_name, grp%istack_grp)
-      nullify(grp%item_grp)
-!
-      end subroutine unlink_group_type
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine unlink_surf_group_type(sf_grp)
-!
-      type(surface_group_data), intent(inout) :: sf_grp
-!
-      sf_grp%num_grp =  0
-      sf_grp%num_item = 0
-!
-      nullify(sf_grp%grp_name, sf_grp%istack_grp)
-      nullify(sf_grp%item_sf_grp)
-!
-      end subroutine unlink_surf_group_type
-!
-!  ---------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
       subroutine check_group_type_data(my_rank, grp)
@@ -402,7 +335,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine compare_nod_grp_type_vs_1st(my_rank, grp_ref, grp)
+      subroutine compare_group_types(my_rank, grp_ref, grp)
 !
       integer(kind = kint), intent(in) :: my_rank
       type(group_data), intent(in) :: grp_ref
@@ -429,12 +362,11 @@
      &       grp_ref%item_grp(i), grp%item_grp(i)
       end do
 !
-      end subroutine compare_nod_grp_type_vs_1st
+      end subroutine compare_group_types
 !
 !-----------------------------------------------------------------------
 !
-      subroutine compare_surf_grp_type_vs_1st                           &
-     &         (my_rank, sf_grp_ref, sf_grp)
+      subroutine compare_surface_grp_types(my_rank, sf_grp_ref, sf_grp)
 !
       integer(kind = kint), intent(in) :: my_rank
       type(surface_group_data), intent(in) :: sf_grp_ref
@@ -463,7 +395,7 @@
      &       sf_grp_ref%item_sf_grp(2,i), sf_grp%item_sf_grp(2,i)
       end do
 !
-      end subroutine compare_surf_grp_type_vs_1st
+      end subroutine compare_surface_grp_types
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

@@ -39,8 +39,14 @@
 !!   parturbation_composition:  C - C_0
 !!   perturbation_entropy:      S - S_0
 !!
-!!   filter_velo, filter_temp, filter_part_temp
-!!   filter_vecp, filter_magne, filter_composition
+!!   filter_velo, filter_vorticity
+!!   filter_temp, filter_part_temp, filter_composition
+!!   filter_vecp, filter_magne, filter_current
+!!
+!!   wide_filter_velo, wide_filter_vorticity
+!!   wide_filter_temp, wide_filter_composition
+!!   wide_filter_grad_temp, wide_filter_grad_composition
+!!   wide_filter_vecp, wide_filter_magne, wide_filter_current
 !!
 !!   kinetic_helicity, magnetic_helicity
 !!   current_helicity, cross_helicity
@@ -74,16 +80,26 @@
 !!   SGS_heat_flux, SGS_composit_flux
 !!   SGS_momentum_flux, SGS_maxwell_tensor
 !!   SGS_buoyancy,      SGS_composit_buoyancy
-!!   SGS_induct_tensor, SGS_vecp_induction
+!!   SGS_induct_tensor, SGS_vecp_induction, SGS_inertia
 !!
-!!   div_SGS_h_flux, div_SGS_m_flux
+!!   rot_SGS_inertia, div_SGS_inertia
+!!   rot_SGS_Lorentz, div_SGS_Lorentz
+!!
+!!   div_SGS_h_flux, div_SGS_m_flux, div_SGS_c_flux
 !!   SGS_Lorentz
 !!   SGS_induction
 !!   temp_4_SGS, comp_4_SGS
 !!
+!!
 !!   SGS_Lorentz_work      Reynolds_work
 !!   SGS_temp_gen          SGS_m_ene_gen
 !!   SGS_buoyancy_flux     SGS_comp_buoyancy_flux
+!!
+!!   geostrophic_balance
+!!   heat_flux_w_SGS, comp_flux_w_SGS
+!!   intertia_w_SGS, Lorentz_w_SGS
+!!   momentum_flux_w_SGS, maxwell_tensor_w_sgs
+!!   induction_w_SGS, vecp_induction_w_SGS
 !!
 !! termes for direct estimation
 !!   SGS_div_h_flux_true
@@ -147,13 +163,24 @@
 !
 !>        Field label for filtered velocity
 !!         @f$ \bar{u}_{i} @f$
-      character(len=kchara), parameter :: fhd_filter_v = 'filter_velo'
+      character(len=kchara), parameter                                  &
+     &            :: fhd_filter_velo = 'filter_velo'
+!>        Field label for filtered velocity
+!!         @f$ \bar{\omega}_{i} @f$
+      character(len=kchara), parameter                                  &
+     &            :: fhd_filter_vort = 'filter_vorticity'
 !>        Field label for filtered magnetic field
 !!         @f$ \bar{B}_{i} @f$
-      character(len=kchara), parameter :: fhd_filter_b = 'filter_magne'
+      character(len=kchara), parameter                                  &
+     &            :: fhd_filter_magne = 'filter_magne'
+!>        Field label for filtered magnetic field
+!!         @f$ \bar{B}_{i} @f$
+      character(len=kchara), parameter                                  &
+     &            :: fhd_filter_current = 'filter_current'
 !>        Field label for filtered vetor potential
 !!         @f$ \bar{A}_{i} @f$
-      character(len=kchara), parameter :: fhd_filter_a = 'filter_vecp'
+      character(len=kchara), parameter                                  &
+     &            :: fhd_filter_vecp = 'filter_vecp'
 !
 !>        Field label for viscous diffusion
 !!         @f$ \nu \partial_{j}\partial_{j} u_{i} @f$
@@ -195,6 +222,9 @@
 !>        Field label for compositinoal flux
 !!         @f$ u_{i} C @f$
       character(len=kchara), parameter :: fhd_c_flux =  'composite_flux'
+!>        Field label for perturbation of composition flux
+!!         @f$ u_{i} \Theta_C @f$
+      character(len=kchara), parameter :: fhd_pc_flux = 'part_c_flux'
 !
 !>        Field label for advection for momentum
 !!         @f$ u_{j} \partial_{j} u_{i} @f$
@@ -253,7 +283,7 @@
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_h_flux =          'SGS_heat_flux'
 !>        Field label for SGS compositional flux
-!!         @f$ \overline{u_{i}T} - \bar{u}_{i}\bar{T} @f$
+!!         @f$ \overline{u_{i}C} - \bar{u}_{i}\bar{C} @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_c_flux =          'SGS_composit_flux'
 !>        Field label for divergence of SGS Maxwell tensor
@@ -291,6 +321,62 @@
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_comp_buo = 'SGS_composit_buoyancy'
 !
+!
+!>        Field label for model coefficient of SGS heat flux
+!!         @f$ \overline{u_{i}T} - \bar{u}_{i}\bar{T} @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_Csim_SGS_h_flux = 'Csim_SGS_heat_flux'
+!>        Field label for model coefficient of SGS composition flux
+!!         @f$ \overline{u_{i}C} - \bar{u}_{i}\bar{C} @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_Csim_SGS_c_flux = 'Csim_SGS_composit_flux'
+!>        Field label for model coefficient of SGS inertia term
+!!         @f$ e_{ijk}\left(\overline{\omega_{j}u_{k}}
+!!            - \bar{\omega}_{j}\bar{u}_{k} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_Csim_SGS_m_flux = 'Csim_SGS_inertia'
+!>        Field label for model coefficient of SGS Lorentz force
+!!         @f$ e_{ijk}\left(\overline{\J_{j}B_{k}}
+!!            - \bar{J}_{j}\bar{B}_{k} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_Csim_SGS_Lorentz = 'Csim_SGS_Lorentz'
+!>        Field label for model coefficient of SGS induction
+!!         @f$ e_{ijk}\left(\overline{\u_{j}B_{k}}
+!!            - \bar{u}_{j}\bar{B}_{k} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_Csim_SGS_induction = 'Csim_SGS_vp_induction'
+!>        Field label for odel coefficient of SGS buoyancy
+      character(len=kchara), parameter                                  &
+     &             :: fhd_Csim_SGS_buoyancy =  'Csim_SGS_buoyancy'
+!>        Field label for odel coefficient of SGS compositional buoyancy
+      character(len=kchara), parameter                                  &
+     &             :: fhd_Csim_SGS_comp_buo = 'Csim_SGS_composit_buo'
+!
+!
+!>        Field label for SGS heat flux with wider filter
+!!         @f$ \overline{u_{i}T} - \bar{u}_{i}\bar{T} @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_wide_SGS_h_flux = 'wide_SGS_heat_flux'
+!>        Field label for SGS composition flux with wider filter
+!!         @f$ \overline{u_{i}C} - \bar{u}_{i}\bar{C} @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_wide_SGS_c_flux = 'wide_SGS_composit_flux'
+!>        Field label for SGS inertia term with wider filter
+!!         @f$ e_{ijk}\left(\overline{\omega_{j}u_{k}}
+!!            - \bar{\omega}_{j}\bar{u}_{k} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_wide_SGS_inertia = 'wide_SGS_inertia'
+!>        Field label for SGS Lorentz force with wider filter
+!!         @f$ e_{ijk}\left(\overline{\J_{j}B_{k}}
+!!            - \bar{J}_{j}\bar{B}_{k} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_wide_SGS_Lorentz = 'wide_SGS_Lorentz'
+!>        Field label for SGS induction with wider filter
+!!         @f$ e_{ijk}\left(\overline{\u_{j}B_{k}}
+!!            - \bar{u}_{j}\bar{B}_{k} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_wide_SGS_vp_induct = 'wide_SGS_vp_induction'
+!
 !  scalars
 !
 !>        Field label for pressure @f$ p @f$
@@ -315,6 +401,10 @@
 !!         @f$  C - C_{0} @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_part_light = 'parturbation_composition'
+!>        Field label for reference composition
+!!         @f$  C_{0} @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_ref_light =  'reference_composition'
 !
 !>        Field label for entropy
 !!         @f$ S @f$
@@ -416,6 +506,18 @@
 !!         @f$ u_{i} \partial_{i} C @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_composit_advect =    'composition_advect'
+!>        Field label for advection for perturbation of composition
+!!         @f$ u_{i} \partial_{i} \Theta_C @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_part_c_advect =     'part_c_advect'
+!>        Field label for divergence of composition flux
+!!         @f$ \partial_{i} \left( u_{i} C \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_div_c_flux =        'div_c_flux'
+!>        Field label for divergence of perturbation of compopstion flux
+!!         @f$ \partial_{i} \left( u_{i} \Theta_C \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_div_pc_flux =       'div_part_c_flux'
 !
 !   Energy fluxes
 !
@@ -452,6 +554,10 @@
 !!         @f$ \partial_{i} \left( \overline{u_{i}T} - \bar{u}_{i}\bar{T} \right) @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_div_SGS_h_flux =    'div_SGS_h_flux'
+!>        Field label for divergence of SGS heat flux
+!!         @f$ \partial_{i} \left( \overline{u_{i}C} - \bar{u}_{i}\bar{C} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_div_SGS_c_flux =    'div_SGS_c_flux'
 !>        Field label for energy flux of SGS induction
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_m_ene_gen =     'SGS_m_ene_gen'
@@ -471,12 +577,67 @@
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_comp_buo_flux = 'SGS_comp_buoyancy_flux'
 !
+!
+!>        Field label for geostrophic balance
+!!         @f$ -2 e_{ijk} \Omega_{j} u_{k} + \partial_{i} p @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_geostrophic =  'geostrophic_balance'
+!
+!>        Field label for heat flux
+!!         @f$ u_{i} T + (\overline{u_{i}T} - \bar{u}_{i}\bar{T}) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_h_flux_w_sgs =  'heat_flux_w_SGS'
+!>        Field label for compositinoal flux
+!!         @f$ u_{i} C + (\overline{u_{i}C} - \bar{u}_{i}\bar{C}) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_c_flux_w_sgs =  'comp_flux_w_SGS'
+!
+!>        Field label for advection for momentum
+!!         @f$ u_{j} \partial_{j} u_{i}
+!!           + e_{ijk}\left(\overline{\omega_{j}u_{k}}
+!!            - \bar{\omega}_{j}\bar{u}_{k} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_inertia_w_sgs = 'intertia_w_SGS'
+!>        Field label for Lorentz force
+!!         @f$ e_{ijk} J_{j} B_{k}
+!!           + e_{ijk}\left(\overline{B{j}u_{k}}
+!!            - \bar{J}_{j}\bar{B}_{k} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_Lorentz_w_sgs = 'Lorentz_w_SGS'
+!
+!>        Field label for inductino for vector potential
+!!         @f$ e_{ijk} u_{j} B_{k} @f$
+!!           + e_{ijk}\left(\overline{u{j}B_{k}}
+!!            - \bar{u}_{j}\bar{B}_{k} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_vp_induct_w_sgs = 'vecp_induction_w_SGS'
+!>        Field label for magnetic induction
+!!         @f$ e_{ijk} \partial_{j}\left(e_{klm}u_{l}B_{m} \right)@f$
+!!           + e_{ijk} \partial_{j}(e_{klm}\left(\overline{u{l}B_{m}}
+!!                              - \bar{u}_{l}\bar{B}_{m} \right)) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_mag_induct_w_sgs = 'induction_w_SGS'
+!
+!>        Field label for momentum flux
+!!         @f$ u_{i} u_{j}
+!!            + (\overline{u_{i}u_{j}} - \bar{u}_{i}\bar{u}_{j})@f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_mom_flux_w_sgs = 'momentum_flux_w_SGS'
+!>        Field label for momentum flux
+!!         @f$ B_{i} B_{j}
+!!            + (\overline{B_{i}B_{j}} - \bar{B}_{i}\bar{B}_{j})@f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_maxwell_t_w_sgs = 'maxwell_tensor_w_sgs'
+!
 !>        Field label for temperature flux
       character(len=kchara), parameter                                  &
      &             :: fhd_temp_generation =   'temp_generation'
 !>        Field label for perturbation temperature flux
       character(len=kchara), parameter                                  &
      &             :: fhd_part_temp_gen =     'part_temp_gen'
+!>        Field label for perturbation composition flux
+      character(len=kchara), parameter                                  &
+     &             :: fhd_part_comp_gen =     'part_comp_gen'
 !>        Field label for energy flux by viscous diffusion
 !!         @f$ u_{i} \left( \partial_{j}\partial_{j} u_{i} \right) @f$
       character(len=kchara), parameter                                  &
@@ -489,6 +650,10 @@
 !!         @f$ \partial_{i} \left( \overline{u_{i}T} - \bar{u}_{i}\bar{T} \right) @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_div_h_flux_true = 'SGS_div_h_flux_true'
+!>        Field label for true divergence of SGS heat flux
+!!         @f$ \partial_{i} \left( \overline{u_{i}C} - \bar{u}_{i}\bar{C} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_SGS_div_c_flux_true = 'SGS_div_c_flux_true'
 !>        Field label for work of true SGS Lorentz force
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_Lorentz_wk_true = 'SGS_Lorentz_work_true'
@@ -498,6 +663,9 @@
 !>        Field label for temperature generation by true SGS heat flux
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_temp_gen_true =   'SGS_temp_gen_true'
+!>        Field label for composition generation by true SGS compostion flux
+      character(len=kchara), parameter                                  &
+     &             :: fhd_SGS_comp_gen_true =   'SGS_comp_gen_true'
 !>        Field label for energy flux of true SGS induction
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_m_ene_gen_true =  'SGS_m_ene_gen_true'
@@ -516,6 +684,24 @@
 !!         @f$ \overline{u_{i}u_{j}} - \bar{u}_{i}\bar{u}_{j} @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_SGS_m_flux =    'SGS_momentum_flux'
+!>        Field label for SGS inertia term
+!!         @f$ e_{ijk}\left(\overline{\omega_{j}u_{k}}
+!!            - \bar{\omega}_{j}\bar{u}_{k} \right) @f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_SGS_inertia =     'SGS_inertia'
+!>        Field label for rotation of SGS inertia term
+      character(len=kchara), parameter                                  &
+     &             :: fhd_SGS_rot_inertia = 'rot_SGS_inertia'
+!>        Field label for divergence of SGS inertia term
+      character(len=kchara), parameter                                  &
+     &             :: fhd_SGS_div_inertia = 'div_SGS_inertia'
+!>        Field label for rotation of SGS Lorentz force
+      character(len=kchara), parameter                                  &
+     &             :: fhd_SGS_rot_Lorentz = 'rot_SGS_Lorentz'
+!>        Field label for divergence of SGS Lorentz force
+      character(len=kchara), parameter                                  &
+     &             :: fhd_SGS_div_Lorentz = 'div_SGS_Lorentz'
+!
 !>        Field label for SGS Maxwell tensor
 !!         @f$ \overline{B_{i}B_{j}} - \bar{B}_{i}\bar{B}_{j} @f$
       character(len=kchara), parameter                                  &
@@ -610,12 +796,23 @@
 !>        Field label for gradient of @f$ \tilde{C} @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_grad_composit = 'grad_composition'
+!>        Field label for gradient of perturbation of composition
+      character(len=kchara), parameter                                  &
+     &             :: fhd_grad_par_light = 'grad_part_composition'
+!>        Field label for gradient of reference temperature
+!!         @f$  \partial C_{0} / dz@f$
+!>         or @f$  \partial C_{0} / dr@f$
+      character(len=kchara), parameter                                  &
+     &             :: fhd_grad_ref_light = 'grad_reference_composition'
 !
 !  wider filtered field
 !
 !>        Field label for filtered velocity by wider filter
       character(len=kchara), parameter                                  &
      &             :: fhd_w_filter_velo = 'wide_filter_velo'
+!>        Field label for filtered vorticity by wider filter
+      character(len=kchara), parameter                                  &
+     &             :: fhd_w_filter_vort = 'wide_filter_vorticity'
 !>        Field label for filtered magnetic vector potential
 !!        by wider filter
       character(len=kchara), parameter                                  &
@@ -623,10 +820,23 @@
 !>        Field label for filtered magnetic field by wider filter
       character(len=kchara), parameter                                  &
      &             :: fhd_w_filter_magne = 'wide_filter_magne'
+!>        Field label for filtered current density by wider filter
+      character(len=kchara), parameter                                  &
+     &             :: fhd_w_filter_current = 'wide_filter_current'
 !
 !>        Field label for filtered temperature by wider filter
       character(len=kchara), parameter                                  &
-     &             :: fhd_w_filter_temp = 'wide_filter_temp'
+     &      :: fhd_w_filter_temp =      'wide_filter_temp'
+!>        Field label for filtered grad. of temperature by wider filter
+      character(len=kchara), parameter                                  &
+     &      :: fhd_w_filter_grad_temp = 'wide_filter_grad_temp'
+!
+!>        Field label for filtered compostiion by wider filter
+      character(len=kchara), parameter                                  &
+     &      :: fhd_w_filter_comp =    'wide_filter_composition'
+!>        Field label for filtered grad. of composition by wider filter
+      character(len=kchara), parameter                                  &
+     &      :: fhd_w_filter_grad_comp = 'wide_filter_grad_composition'
 !
 !  divergence of momentum equations
 !

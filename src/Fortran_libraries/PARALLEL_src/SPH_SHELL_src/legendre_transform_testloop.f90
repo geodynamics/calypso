@@ -10,16 +10,32 @@
 !!
 !!
 !!@verbatim
-!!      subroutine leg_backward_trans_test                              &
-!!     &         (ncomp, nvector, nscalar, n_WR, n_WS, WR, WS)
+!!      subroutine leg_backward_trans_test(ncomp, nvector, nscalar,     &
+!!     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,  &
+!!     &          n_WR, n_WS, WR, WS, WK_l_tst)
 !!        Input:  sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!        Output: vr_rtm   (Order: radius,theta,phi)
 !!
+!!        type(sph_rlm_grid), intent(in) :: sph_rlm
+!!        type(sph_rtm_grid), intent(in) :: sph_rtm
+!!        type(sph_comm_tbl), intent(in) :: comm_rlm, comm_rtm
+!!        type(legendre_4_sph_trans), intent(in) :: leg
+!!        type(index_4_sph_trans), intent(in) :: idx_trns
+!!        type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
+!!
 !!    Forward transforms
-!!      subroutine leg_forward_trans_test                               &
-!!     &         (ncomp, nvector, nscalar, n_WR, n_WS, WR, WS)
+!!      subroutine leg_forward_trans_test(ncomp, nvector, nscalar,      &
+!!     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,  &
+!!     &          n_WR, n_WS, WR, WS, WK_l_tst)
 !!        Input:  vr_rtm   (Order: radius,theta,phi)
 !!        Output: sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
+!!
+!!        type(sph_rtm_grid), intent(in) :: sph_rtm
+!!        type(sph_rlm_grid), intent(in) :: sph_rlm
+!!        type(sph_comm_tbl), intent(in) :: comm_rtm, comm_rlm
+!!        type(legendre_4_sph_trans), intent(in) :: leg
+!!        type(index_4_sph_trans), intent(in) :: idx_trns
+!!        type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
 !!@endverbatim
 !!
 !!@param   ncomp    Total number of components for spherical transform
@@ -31,6 +47,13 @@
 !
       use m_precision
 !
+      use t_spheric_rtm_data
+      use t_spheric_rlm_data
+      use t_sph_trans_comm_tbl
+      use t_schmidt_poly_on_rtm
+      use t_work_4_sph_trans
+      use t_legendre_work_testlooop
+!
       implicit none
 !
 ! -----------------------------------------------------------------------
@@ -39,58 +62,59 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine leg_backward_trans_test                                &
-     &         (ncomp, nvector, nscalar, n_WR, n_WS, WR, WS)
+      subroutine leg_backward_trans_test(ncomp, nvector, nscalar,       &
+     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,    &
+     &          n_WR, n_WS, WR, WS, WK_l_tst)
 !
-      use m_work_4_sph_trans_spin
       use legendre_bwd_trans_testloop
       use spherical_SRs_N
 !
+      type(sph_rlm_grid), intent(in) :: sph_rlm
+      type(sph_rtm_grid), intent(in) :: sph_rtm
+      type(sph_comm_tbl), intent(in) :: comm_rlm, comm_rtm
+      type(legendre_4_sph_trans), intent(in) :: leg
+      type(index_4_sph_trans), intent(in) :: idx_trns
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: n_WR, n_WS
+!
       real (kind=kreal), intent(inout):: WR(n_WR)
       real (kind=kreal), intent(inout):: WS(n_WS)
+      type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
 !
 !
-      call finish_send_recv_rj_2_rlm
-!$omp parallel workshare
-      WS(1:ncomp*ntot_item_sr_rtm) = 0.0d0
-!$omp end parallel workshare
-!
-      if(ncomp .gt. 0) then
         call legendre_b_trans_vector_test(ncomp, nvector, nscalar,      &
-     &      irev_sr_rlm, irev_sr_rtm, n_WR, n_WS, WR, WS)
-      end if
-!      if(nscalar .gt. 0) then
-!        call legendre_b_trans_scalar_test(ncomp, nvector, nscalar,      &
-!     &      irev_sr_rlm, irev_sr_rtm, n_WR, n_WS, WR, WS)
-!      end if
+     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns,             &
+     &      leg%asin_t_rtm, leg%g_sph_rlm,                              &
+     &      n_WR, n_WS, WR, WS, WK_l_tst)
 !
       end subroutine leg_backward_trans_test
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine leg_forward_trans_test                                 &
-     &         (ncomp, nvector, nscalar, n_WR, n_WS, WR, WS)
+      subroutine leg_forward_trans_test(ncomp, nvector, nscalar,        &
+     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,    &
+     &          n_WR, n_WS, WR, WS, WK_l_tst)
 !
       use legendre_fwd_trans_testloop
       use spherical_SRs_N
 !
+      type(sph_rtm_grid), intent(in) :: sph_rtm
+      type(sph_rlm_grid), intent(in) :: sph_rlm
+      type(sph_comm_tbl), intent(in) :: comm_rlm, comm_rtm
+      type(legendre_4_sph_trans), intent(in) :: leg
+      type(index_4_sph_trans), intent(in) :: idx_trns
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: n_WR, n_WS
+!
       real (kind=kreal), intent(inout):: WR(n_WR)
       real (kind=kreal), intent(inout):: WS(n_WS)
+      type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
 !
 !
-      call finish_send_recv_rtp_2_rtm
-!$omp parallel workshare
-      WS(1:ncomp*ntot_item_sr_rlm) = 0.0d0
-!$omp end parallel workshare
-!
-      if(ncomp .gt. 0) then
         call legendre_f_trans_vector_test(ncomp, nvector, nscalar,      &
-     &      irev_sr_rtm, irev_sr_rlm, n_WR, n_WS, WR, WS)
-      end if
+     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns,             &
+     &      leg%asin_t_rtm, leg%g_sph_rlm, leg%weight_rtm,              &
+     &      n_WR, n_WS, WR, WS, WK_l_tst)
 !
       end subroutine leg_forward_trans_test
 !

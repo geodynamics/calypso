@@ -32,8 +32,11 @@
       use m_constants
       use m_machine_parameter
       use t_FFT_selector
+      use t_schmidt_polynomial
 !
       implicit none
+!
+      type(legendre_polynomials), private :: leg_c
 !
 ! ----------------------------------------------------------------------
 !
@@ -44,7 +47,6 @@
       subroutine initialize_circle_transform(ltr, s_circ, z_circ)
 !
       use calypso_mpi
-      use m_schmidt_polynomial
       use m_circle_transform
 !
       integer(kind = kint), intent(in) :: ltr
@@ -62,21 +64,19 @@
       ar2_circle = ar_circle*ar_circle
 !
 !
-      nth = ltr_circle
-      call allocate_schmidt_polynomial
-!
-      call dschmidt(theta_circle)
+      call alloc_schmidt_polynomial(ltr_circle, leg_c)
+      call dschmidt(theta_circle, leg_c)
 !
       do l = 1, ltr_circle
         do m = -l, l
           j = l*(l+1) + m
           mm = abs(m)
-          P_circle(j) =     p(mm,l)
-          dPdt_circle(j) = dp(mm,l)
+          P_circle(j) =    leg_c%p(mm,l)
+          dPdt_circle(j) = leg_c%dp(mm,l)
         end do
       end do
 !
-      call deallocate_schmidt_polynomial
+      call dealloc_schmidt_polynomial(leg_c)
 !
       if(my_rank .gt. 0) return
 !

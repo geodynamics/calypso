@@ -44,12 +44,12 @@
       real(kind = kreal), intent(inout) :: X(NP)
 !
 !
-      if (comm_tbl%num_neib .gt. 0) then
+!      if (comm_tbl%num_neib .gt. 0) then
         call SOLVER_SEND_RECV                                           &
      &     (NP, comm_tbl%num_neib, comm_tbl%id_neib,                    &
      &      comm_tbl%istack_import, comm_tbl%item_import,               &
      &      comm_tbl%istack_export, comm_tbl%item_export, X(1) )
-      end if
+!      end if
 !
       end subroutine SOLVER_SEND_RECV_type
 !
@@ -66,12 +66,12 @@
       real(kind = kreal), intent(inout) :: X(3*NP)
 !
 !
-      if (comm_tbl%num_neib .gt. 0) then
+!      if (comm_tbl%num_neib .gt. 0) then
         call SOLVER_SEND_RECV_3                                         &
      &     (NP, comm_tbl%num_neib, comm_tbl%id_neib,                    &
      &      comm_tbl%istack_import, comm_tbl%item_import,               &
      &      comm_tbl%istack_export, comm_tbl%item_export, X(1) )
-      end if
+!      end if
 !
       end subroutine SOLVER_SEND_RECV_3_type
 !
@@ -88,12 +88,12 @@
       real(kind = kreal), intent(inout) :: X(6*NP)
 !
 !
-      if (comm_tbl%num_neib .gt. 0) then
+!      if (comm_tbl%num_neib .gt. 0) then
         call SOLVER_SEND_RECV_6                                         &
      &      (NP, comm_tbl%num_neib, comm_tbl%id_neib,                   &
      &      comm_tbl%istack_import, comm_tbl%item_import,               &
      &      comm_tbl%istack_export, comm_tbl%item_export, X(1) )
-      end if
+!      end if
 !
       end subroutine SOLVER_SEND_RECV_6_type
 !
@@ -110,12 +110,12 @@
       real(kind = kreal), intent(inout) :: X(NB*NP)
 !
 !
-      if (comm_tbl%num_neib .gt. 0) then
+!      if (comm_tbl%num_neib .gt. 0) then
         call SOLVER_SEND_RECV_N                                         &
      &      (NP, NB, comm_tbl%num_neib, comm_tbl%id_neib,               &
      &      comm_tbl%istack_import, comm_tbl%item_import,               &
      &      comm_tbl%istack_export, comm_tbl%item_export, X(1))
-      end if
+!      end if
 !
       end subroutine SOLVER_SEND_RECV_N_type
 !
@@ -133,12 +133,12 @@
       integer(kind = kint), intent(inout) :: iX(NP)
 !
 !
-      if (comm_tbl%num_neib .gt. 0) then
+!      if (comm_tbl%num_neib .gt. 0) then
         call SOLVER_SEND_RECV_i                                         &
      &      (NP, comm_tbl%num_neib, comm_tbl%id_neib,                   &
      &      comm_tbl%istack_import, comm_tbl%item_import,               &
      &      comm_tbl%istack_export, comm_tbl%item_export, iX(1))
-      end if
+!      end if
 !
       end subroutine SOLVER_SEND_RECV_int_type
 !
@@ -155,12 +155,12 @@
       integer(kind = kint_gl), intent(inout) :: i8X(NP)
 !
 !
-      if (comm_tbl%num_neib .gt. 0) then
+!      if (comm_tbl%num_neib .gt. 0) then
         call SOLVER_SEND_RECV_i8                                        &
      &      (NP, comm_tbl%num_neib, comm_tbl%id_neib,                   &
      &      comm_tbl%istack_import, comm_tbl%item_import,               &
      &      comm_tbl%istack_export, comm_tbl%item_export, i8X(1))
-      end if
+!      end if
 !
       end subroutine SOLVER_SEND_RECV_int8_type
 !

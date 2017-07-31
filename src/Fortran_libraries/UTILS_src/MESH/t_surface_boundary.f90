@@ -25,9 +25,9 @@
 !>     number of surface group
         integer (kind=kint) :: ngrp_sf
 !>     surface group ID for boundary condition
-        integer (kind=kint), pointer :: igrp_sf(:)
+        integer (kind=kint), allocatable :: igrp_sf(:)
 !>     field value for boundary condition
-        real (kind=kreal), pointer :: sf_apt(:)
+        real (kind=kreal), allocatable :: sf_apt(:)
       end type scalar_surf_BC_list
 !
 !> @brief Structure for vactor's boundary condition on surface
@@ -37,9 +37,9 @@
 !>     number of surface group
         integer (kind=kint) :: ngrp_sf(3)
 !>     surface group ID for boundary condition
-        integer (kind=kint), pointer :: id_grp_vect_sf(:,:)
+        integer (kind=kint), allocatable :: id_grp_vect_sf(:,:)
 !>     vector value for boundary condition
-        real (kind=kreal), pointer :: sf_apt(:,:)
+        real (kind=kreal), allocatable :: sf_apt(:,:)
       end type vector_surf_BC_list
 !
 !

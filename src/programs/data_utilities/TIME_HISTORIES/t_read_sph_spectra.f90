@@ -200,13 +200,12 @@
       write(*,*)  ' 1: volume average spectrum '
       read(*,*) sph_IN%iflag_vol_ave
 !
-!      write(*,*) ' Is data has old format?'
-!      write(*,*)  ' 1: yes '
-!      write(*,*)  ' 0: no  '
-!      read(*,*) sph_IN%iflag_old_fmt
-      sph_IN%iflag_old_fmt = 0
+      write(*,*) ' Is data has old format?'
+      write(*,*)  ' 1: yes '
+      write(*,*)  ' 0: no  '
+      read(*,*) sph_IN%iflag_old_fmt
 !
-      write(*,*) 'enter file prefix for averaging'
+      write(*,*) 'enter file header for averaging'
       read(*,*) input_header
 !
       end subroutine select_sph_ene_spec_data_file

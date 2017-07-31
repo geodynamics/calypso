@@ -296,14 +296,14 @@
       integer(kind = kint), intent(inout)                               &
      &                     :: iedge_flag(nedge_4_surf*numele)
 !
-      integer(kind = kint) :: iele, iedge, inod1, inod2, is1, is2
-      integer(kind = kint) :: jele, jedge, jnod1, jnod2, js1, js2
+      integer(kind = kint) :: inod(2), jnod(2)
       integer(kind = kint) :: ihash
       integer(kind = kint) :: ist, ied, k1, k2
 !      integer(kind= kint_gl) :: i1_gl, i2_gl
 !
 !
       iedge_flag = 0
+!!$omp parallel do private(ihash,ist,ied,k1,k2,inod,jnod)
       do ihash = 1, iend_edge_hash
         ist = istack_edge_hash(ihash-1)+1
         ied = istack_edge_hash(ihash)
@@ -313,22 +313,16 @@
           do k1 = ist, ied
             if(iedge_flag(k1) .eq. 0) then
               iedge_flag(k1) = k1
-              iele =  iedge_hash(k1,1)
-              iedge = iedge_hash(k1,2)
-              is1 = node_on_edge_l(1,iedge)
-              is2 = node_on_edge_l(2,iedge)
-              inod1 = ie(iele,is1)
-              inod2 = ie(iele,is2)
+              call set_2nodes_id_on_edge                                &
+     &            (iedge_hash(k1,1), iedge_hash(k1,2),                  &
+     &             numele, nnod_4_ele, ie, inod)
               do k2 = k1+1, ied
-                jele =  iedge_hash(k2,1)
-                jedge = iedge_hash(k2,2)
-                js1 = node_on_edge_l(1,jedge)
-                js2 = node_on_edge_l(2,jedge)
-                jnod1 = ie(jele,js1)
-                jnod2 = ie(jele,js2)
-                if ( (inod2-inod1) .eq. (jnod2-jnod1) ) then
+                call set_2nodes_id_on_edge                              &
+     &            (iedge_hash(k2,1), iedge_hash(k2,2),                  &
+     &             numele, nnod_4_ele, ie, jnod)
+                if ( (inod(2)-inod(1)) .eq. (jnod(2)-jnod(1)) ) then
                   iedge_flag(k2) = k1
-                else if ( (inod2-inod1) .eq. (jnod1-jnod2) ) then
+                else if( (inod(2)-inod(1)) .eq. (jnod(1)-jnod(2))) then
                   iedge_flag(k2) =-k1
                 end if
               end do
@@ -336,8 +330,33 @@
           end do
         end if
       end do
+!!$omp end parallel do
 !
       end subroutine mark_all_edges_by_ele
+!
+!------------------------------------------------------------------
+!
+      subroutine set_2nodes_id_on_edge                                  &
+     &         (iele, is, numele, nnod_4_ele, ie, inod)
+!
+      use m_geometry_constants
+!
+      integer(kind = kint), intent(in) :: iele, is
+      integer(kind = kint), intent(in) :: numele, nnod_4_ele
+      integer(kind = kint), intent(in) :: ie(numele,nnod_4_ele)
+!
+      integer(kind = kint), intent(inout) :: inod(2)
+!
+      integer(kind = kint) :: is1, is2
+!
+!
+      is1 = node_on_edge_l(1,is)
+      is2 = node_on_edge_l(2,is)
+!
+      inod(1) = ie(iele,is1)
+      inod(2) = ie(iele,is2)
+!
+      end subroutine set_2nodes_id_on_edge
 !
 !------------------------------------------------------------------
 !

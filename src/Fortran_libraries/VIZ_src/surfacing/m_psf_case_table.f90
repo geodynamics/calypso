@@ -178,7 +178,7 @@
 !>        Number of patches in one element
         integer(kind = kint) :: npatch
 !>        Local patch list in one element
-        integer(kind = kint), pointer :: iedge(:,:)
+        integer(kind = kint), allocatable :: iedge(:,:)
       end type psf_cases
 !
 !>      Structure for triangle patch list (instance)

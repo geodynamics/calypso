@@ -158,7 +158,7 @@
       real (kind=kreal), intent(inout):: X3_new(isix*nnod_new)
 !
 !
-      call resize_work_sph_SR((ithree*isix), npe_send, npe_recv,        &
+      call resize_work_4_SR((ithree*isix), npe_send, npe_recv,          &
      &    istack_send(npe_send), istack_recv(npe_recv))
 !
 !C-- SEND

@@ -10,7 +10,11 @@
 !!      Programmed by H. Matsui on June., 1994
 !!      modified by H. Matsui on Apr., 2009
 !!
-!!      subroutine set_radius_dat_4_sph_dynamo
+!!      subroutine set_radius_dat_4_sph_dynamo                          &
+!!     &         (nri, radius_1d_rj_r, radial_rj_grp, iflag_radial_grid,&
+!!     &          nlayer_ICB, nlayer_CMB, nlayer_2_center,              &
+!!     &          ar_1d_rj, r_ele_rj, ar_ele_rj, r_ICB, r_CMB, R_earth)
+!!        type(group_data), intent(in) :: radial_rj_grp
 !!***********************************************************************
 !!*
 !!*       ar_1d_rj(k,1)   : 1 / r
@@ -28,7 +32,9 @@
       use m_constants
       use m_machine_parameter
       use m_spheric_constants
-      use m_spheric_parameter
+!
+      use t_spheric_parameter
+      use t_group_data
 !
       implicit none
 !
@@ -38,30 +44,47 @@
 !
 !  -------------------------------------------------------------------
 !
-      subroutine set_radius_dat_4_sph_dynamo
+      subroutine set_radius_dat_4_sph_dynamo                            &
+     &         (nri, radius_1d_rj_r, radial_rj_grp, iflag_radial_grid,  &
+     &          nlayer_ICB, nlayer_CMB, nlayer_2_center,                &
+     &          ar_1d_rj, r_ele_rj, ar_ele_rj, r_ICB, r_CMB, R_earth)
 !
-      use m_group_data_sph_specr
       use set_radial_grid_sph_shell
       use skip_comment_f
+!
+      type(group_data), intent(in) :: radial_rj_grp
+!
+      integer(kind = kint), intent(in) :: nri
+      real(kind = kreal), intent(in) :: radius_1d_rj_r(nri)
+!
+      integer(kind = kint), intent(inout) :: iflag_radial_grid
+      integer(kind = kint), intent(inout) :: nlayer_ICB
+      integer(kind = kint), intent(inout) :: nlayer_CMB
+      integer(kind = kint), intent(inout) :: nlayer_2_center
+      real(kind = kreal), intent(inout) :: ar_1d_rj(nri,3)
+      real(kind = kreal), intent(inout) :: r_ele_rj(nri)
+      real(kind = kreal), intent(inout) :: ar_ele_rj(nri,3)
+      real(kind = kreal), intent(inout) :: R_earth(0:2)
+      real(kind = kreal), intent(inout) ::r_ICB, r_CMB
 !
       integer(kind = kint) :: k, kk
 !
 !
 !* --------  radius  --------------
 !
-      do k = 1, num_radial_grp_rj
-        if(     cmp_no_case(name_radial_grp_rj(k),                    &
+      do k = 1, radial_rj_grp%num_grp
+        if(     cmp_no_case(radial_rj_grp%grp_name(k),                  &
      &                      ICB_nod_grp_name)) then
-          kk = istack_radial_grp_rj(k-1) + 1
-          nlayer_ICB = item_radial_grp_rj(kk)
-        else if(cmp_no_case(name_radial_grp_rj(k),                    &
+          kk = radial_rj_grp%istack_grp(k-1) + 1
+          nlayer_ICB = radial_rj_grp%item_grp(kk)
+        else if(cmp_no_case(radial_rj_grp%grp_name(k),                  &
      &                      CMB_nod_grp_name)) then
-          kk = istack_radial_grp_rj(k-1) + 1
-          nlayer_CMB = item_radial_grp_rj(kk)
-        else if(cmp_no_case(name_radial_grp_rj(k),                    &
+          kk = radial_rj_grp%istack_grp(k-1) + 1
+          nlayer_CMB = radial_rj_grp%item_grp(kk)
+        else if(cmp_no_case(radial_rj_grp%grp_name(k),                  &
      &                      CTR_nod_grp_name)) then
-          kk = istack_radial_grp_rj(k-1) + 1
-          nlayer_2_center = item_radial_grp_rj(kk)
+          kk = radial_rj_grp%istack_grp(k-1) + 1
+          nlayer_2_center = radial_rj_grp%item_grp(kk)
         end if
       end do
 !
@@ -73,7 +96,7 @@
       R_earth(2) = one / R_earth(0)**2
 !
 !
-      call set_radial_distance_flag(nidx_rj(1), nlayer_ICB, nlayer_CMB, &
+      call set_radial_distance_flag(nri, nlayer_ICB, nlayer_CMB,        &
      &    r_ICB, r_CMB, radius_1d_rj_r, iflag_radial_grid)
 !
 !

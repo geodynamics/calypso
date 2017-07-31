@@ -14,6 +14,9 @@
 !      subroutine read_files_4_psf_ctl
 !      subroutine read_files_4_iso_ctl
 !
+!      subroutine bcast_files_4_psf_ctl
+!      subroutine bcast_files_4_iso_ctl
+!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!    array cross_section_ctl  1
 !!      file   cross_section_ctl   'ctl_psf_eq'
@@ -30,8 +33,8 @@
       use m_precision
 !
       use m_machine_parameter
-      use m_control_data_4_psf
-      use m_control_data_4_iso
+      use t_control_data_4_psf
+      use t_control_data_4_iso
 !
       implicit  none
 !
@@ -49,6 +52,20 @@
       character(len=kchara), parameter :: hd_viz_ctl = 'visual_control'
       integer (kind=kint) :: i_viz_ctl = 0
 !
+!     Top level
+      character(len=kchara), parameter                                  &
+     &             :: hd_section_ctl = 'cross_section_ctl'
+      character(len=kchara), parameter                                  &
+     &             :: hd_isosurf_ctl = 'isosurface_ctl'
+!
+!      Deprecated labels
+      character(len=kchara), parameter                                  &
+     &             :: hd_psf_ctl = 'surface_rendering'
+      character(len=kchara), parameter                                  &
+     &             :: hd_iso_ctl = 'isosurf_rendering'
+!
+      private :: hd_section_ctl, hd_psf_ctl
+      private :: hd_isosurf_ctl, hd_iso_ctl
       private :: hd_viz_ctl, i_viz_ctl
 !
 !   --------------------------------------------------------------------
@@ -163,7 +180,8 @@
         else if(right_begin_flag(hd_section_ctl) .gt. 0) then
           i_psf_ctl1 = i_psf_ctl1 + 1
           fname_psf_ctl(i_psf_ctl1) = 'NO_FILE'
-          call read_psf_control_data(psf_ctl_struct(i_psf_ctl1))
+          call read_psf_control_data                                    &
+     &       (hd_section_ctl, psf_ctl_struct(i_psf_ctl1))
 !
         else if(right_file_flag(hd_psf_ctl) .gt. 0) then
           call read_file_names_from_ctl_line(num_psf_ctl, i_psf_ctl2,   &
@@ -171,7 +189,8 @@
         else if(right_begin_flag(hd_psf_ctl) .gt. 0) then
           i_psf_ctl2 = i_psf_ctl2 + 1
           fname_psf_ctl(i_psf_ctl2) = 'NO_FILE'
-          call read_psf_control_data(psf_ctl_struct(i_psf_ctl2))
+          call read_psf_control_data                                    &
+     &        (hd_psf_ctl, psf_ctl_struct(i_psf_ctl2))
         end if
       end do
 !
@@ -206,7 +225,8 @@
         else if(right_begin_flag(hd_isosurf_ctl) .gt. 0) then
           i_iso_ctl1 = i_iso_ctl1 + 1
           fname_iso_ctl(i_iso_ctl1) = 'NO_FILE'
-          call read_control_data_4_iso(iso_ctl_struct(i_iso_ctl1))
+          call read_iso_control_data                                    &
+     &       (hd_isosurf_ctl, iso_ctl_struct(i_iso_ctl1))
 !
         else if(right_file_flag(hd_isosurf_ctl) .gt. 0                  &
      &     .or. right_file_flag(hd_iso_ctl) .gt. 0) then
@@ -216,12 +236,66 @@
      &     .or. right_begin_flag(hd_iso_ctl) .gt. 0) then
           i_iso_ctl2 = i_iso_ctl2 + 1
           fname_iso_ctl(i_iso_ctl2) = 'NO_FILE'
-          call read_control_data_4_iso(iso_ctl_struct(i_iso_ctl2))
+          call read_iso_control_data                                    &
+     &        (hd_iso_ctl, iso_ctl_struct(i_iso_ctl2))
         end if
 !
       end do
 !
       end subroutine read_files_4_iso_ctl
+!
+!   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+      subroutine bcast_files_4_psf_ctl
+!
+      use calypso_mpi
+      use t_control_data_4_psf
+!
+      integer (kind=kint) :: i_psf
+!
+!
+      call MPI_BCAST(num_psf_ctl,  ione,                                &
+     &               CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
+      if(num_psf_ctl .le. 0) return
+!
+      if(my_rank .gt. 0) call allocate_psf_ctl_stract
+!
+      call MPI_BCAST(fname_psf_ctl, (kchara*num_psf_ctl),               &
+     &               CALYPSO_CHARACTER, izero, CALYPSO_COMM, ierr_MPI)
+      do i_psf = 1, num_psf_ctl
+        if(fname_psf_ctl(i_psf) .eq. 'NO_FILE') then
+          call bcast_psf_control_data(psf_ctl_struct(i_psf))
+        end if
+      end do
+!
+      end subroutine bcast_files_4_psf_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine bcast_files_4_iso_ctl
+!
+      use calypso_mpi
+      use t_control_data_4_iso
+!
+      integer (kind=kint) :: i_iso
+!
+!
+      call MPI_BCAST(num_iso_ctl,  ione,                                &
+     &               CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
+      if(num_iso_ctl .le. 0) return
+!
+      if(my_rank .gt. 0) call allocate_iso_ctl_stract
+!
+      call MPI_BCAST(fname_iso_ctl, (kchara*num_iso_ctl),               &
+     &               CALYPSO_CHARACTER, izero, CALYPSO_COMM, ierr_MPI)
+      do i_iso = 1, num_iso_ctl
+        if(fname_iso_ctl(i_iso) .eq. 'NO_FILE') then
+          call bcast_iso_control_data(iso_ctl_struct(i_iso))
+        end if
+      end do
+!
+      end subroutine bcast_files_4_iso_ctl
 !
 !   --------------------------------------------------------------------
 !

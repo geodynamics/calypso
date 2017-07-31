@@ -9,21 +9,31 @@
 !> @brief set models for MHD simulation from control data
 !!
 !!@verbatim
-!!     subroutine s_set_control_4_model
-!!     subroutine s_set_control_4_crank
+!!      subroutine s_set_control_4_model(reft_ctl, refc_ctl,            &
+!!     &          mevo_ctl, evo_ctl, nmtr_ctl, MHD_prop)
+!!      subroutine s_set_control_4_crank                                &
+!!     &         (mevo_ctl, fl_prop, cd_prop, ht_prop, cp_prop)
+!!        type(reference_temperature_ctl), intent(in) :: reft_ctl
+!!        type(reference_temperature_ctl), intent(in) :: refc_ctl
+!!        type(mhd_evo_scheme_control), intent(in) :: mevo_ctl
+!!        type(mhd_evolution_control), intent(inout) :: evo_ctl
+!!        type(node_monitor_control), intent(inout) :: nmtr_ctl
+!!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!@endverbatim
 !
       module set_control_4_model
 !
       use m_precision
+      use m_constants
       use m_error_IDs
-!
       use m_machine_parameter
-      use m_control_parameter
-      use m_ctl_data_mhd_evo_scheme
-      use m_t_int_parameter
+!
+      use t_ctl_data_mhd_evo_scheme
+      use t_control_parameter
 !
       implicit  none
+!
+      private :: set_implicit_coefs
 !
 ! -----------------------------------------------------------------------
 !
@@ -31,212 +41,125 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_model
+      subroutine s_set_control_4_model(reft_ctl, refc_ctl,              &
+     &          mevo_ctl, evo_ctl, nmtr_ctl, MHD_prop)
 !
       use calypso_mpi
-      use m_t_step_parameter
       use m_phys_labels
-      use m_physical_property
-      use m_ctl_data_mhd_evolution
-      use m_ctl_data_temp_model
-      use m_ctl_data_node_monitor
+      use t_ctl_data_mhd_evolution
+      use t_ctl_data_temp_model
+      use t_ctl_data_node_monitor
+      use t_reference_scalar_param
       use node_monitor_IO
 !
+      type(reference_temperature_ctl), intent(in) :: reft_ctl
+      type(reference_temperature_ctl), intent(in) :: refc_ctl
+      type(mhd_evo_scheme_control), intent(in) :: mevo_ctl
+      type(mhd_evolution_control), intent(inout) :: evo_ctl
+      type(node_monitor_control), intent(inout) :: nmtr_ctl
+      type(MHD_evolution_param), intent(inout) :: MHD_prop
+!
       integer (kind = kint) :: i
+      character(len=kchara) :: tmpchara
 !
 !
 !  set time_evolution scheme
 !
-        if (i_scheme .eq. 0) then
-          e_message = 'Set time integration scheme'
-          call calypso_MPI_abort(ierr_evo, e_message)
-        else
-          if ( scheme_ctl .eq. 'explicit_Euler' ) then
-            iflag_scheme = id_explicit_euler
-            iflag_implicit_correct = 0
-          else if ( scheme_ctl .eq. '2nd_Adams_Bashforth' ) then
-            iflag_scheme = id_explicit_adams2
-            iflag_implicit_correct = 0
-          else if ( scheme_ctl .eq. 'Crank_Nicolson' ) then
-            iflag_scheme = id_Crank_nicolson
-          else if ( scheme_ctl .eq. 'Crank_Nicolson_consist' ) then
-            iflag_scheme = id_Crank_nicolson_cmass
-          end if
+      if (mevo_ctl%scheme_ctl%iflag .eq. 0) then
+        e_message = 'Set time integration scheme'
+        call calypso_MPI_abort(ierr_evo, e_message)
+      else
+        if (cmp_no_case(mevo_ctl%scheme_ctl%charavalue,                 &
+     &                    'explicit_Euler')) then
+          MHD_prop%iflag_all_scheme = id_explicit_euler
+        else if (cmp_no_case(mevo_ctl%scheme_ctl%charavalue,            &
+     &                         '2nd_Adams_Bashforth')) then
+          MHD_prop%iflag_all_scheme = id_explicit_adams2
+        else if (cmp_no_case(mevo_ctl%scheme_ctl%charavalue,            &
+     &                         'Crank_Nicolson')) then
+          MHD_prop%iflag_all_scheme = id_Crank_nicolson
+        else if (cmp_no_case(mevo_ctl%scheme_ctl%charavalue,            &
+     &                         'Crank_Nicolson_consist')) then
+          MHD_prop%iflag_all_scheme = id_Crank_nicolson_cmass
         end if
-!
-        if ( iflag_scheme .eq. id_Crank_nicolson                        &
-     &     .or. iflag_scheme .eq. id_Crank_nicolson_cmass) then
-          if (i_diff_correct.eq.0) then
-            iflag_implicit_correct = 0
-          else
-            if (   diffuse_correct_ctl .eq. 'On'                        &
-     &        .or. diffuse_correct_ctl .eq. 'on'                        &
-     &        .or. diffuse_correct_ctl .eq. 'ON') then
-              iflag_implicit_correct = iflag_scheme
-            end if
-          end if
-        end if
+      end if
 !
 !   set control for time evolution
 !
-        if (t_evo_field_ctl%icou .eq. 0) then
-          e_message = 'Set field for time integration'
-          call calypso_MPI_abort(ierr_evo, e_message)
-        else
-          num_field_to_evolve = t_evo_field_ctl%num
-          if (iflag_debug .ge. iflag_routine_msg)                       &
-     &    write(*,*) 'num_field_to_evolve ',num_field_to_evolve
+      if (evo_ctl%t_evo_field_ctl%icou .eq. 0) then
+        e_message = 'Set field for time integration'
+        call calypso_MPI_abort(ierr_evo, e_message)
+      end if
+!
+      do i = 1, evo_ctl%t_evo_field_ctl%num
+        tmpchara = evo_ctl%t_evo_field_ctl%c_tbl(i)
+        if (tmpchara .eq. fhd_velo ) then
+          MHD_prop%fl_prop%iflag_scheme =   MHD_prop%iflag_all_scheme
+        else if (tmpchara .eq. fhd_temp ) then
+          MHD_prop%ht_prop%iflag_scheme =   MHD_prop%iflag_all_scheme
+        else if (tmpchara .eq. fhd_light ) then
+          MHD_prop%cp_prop%iflag_scheme =   MHD_prop%iflag_all_scheme
+        else if (tmpchara .eq. fhd_magne ) then
+          MHD_prop%cd_prop%iflag_Bevo_scheme                            &
+     &          =  MHD_prop%iflag_all_scheme
+        else if (tmpchara .eq. fhd_vecp ) then
+          MHD_prop%cd_prop%iflag_Aevo_scheme                            &
+     &          = MHD_prop%iflag_all_scheme
         end if
+      end do
 !
-        if ( num_field_to_evolve .ne. 0 ) then
-          allocate( t_evo_name(num_field_to_evolve) )
+      if (evo_ctl%t_evo_field_ctl%num .gt. 0 ) then
+        call dealloc_t_evo_name_ctl(evo_ctl)
+      end if
 !
-          do i = 1, num_field_to_evolve
-            t_evo_name(i)  = t_evo_field_ctl%c_tbl(i)
-          end do
-!
-          call dealloc_t_evo_name_ctl
-!
-          if (iflag_debug .ge. iflag_routine_msg) then
-            write(*,*) 'num_field_to_evolve ',num_field_to_evolve
-            do i = 1, num_field_to_evolve
-              write(*,*) i, trim(t_evo_name(i))
-            end do
-          end if
-!
-         do i = 1, num_field_to_evolve
-           if ( t_evo_name(i) .eq. fhd_velo ) then
-            iflag_t_evo_4_velo = iflag_scheme
-           else if ( t_evo_name(i) .eq. fhd_temp ) then
-            iflag_t_evo_4_temp = iflag_scheme
-           else if ( t_evo_name(i) .eq. fhd_light ) then
-            iflag_t_evo_4_composit = iflag_scheme
-           else if ( t_evo_name(i) .eq. fhd_magne ) then
-            iflag_t_evo_4_magne = iflag_scheme
-           else if ( t_evo_name(i) .eq. fhd_vecp ) then
-            iflag_t_evo_4_vect_p = iflag_scheme
-           end if
-         end do
-!
-        end if
-!
-      if       (iflag_t_evo_4_velo     .eq. id_no_evolution             &
-     &    .and. iflag_t_evo_4_temp     .eq. id_no_evolution             &
-     &    .and. iflag_t_evo_4_composit .eq. id_no_evolution             &
-     &    .and. iflag_t_evo_4_magne    .eq. id_no_evolution             &
-     &    .and. iflag_t_evo_4_vect_p   .eq. id_no_evolution) then
+      if      (MHD_prop%fl_prop%iflag_scheme .eq. id_no_evolution       &
+     &   .and. MHD_prop%ht_prop%iflag_scheme .eq. id_no_evolution       &
+     &   .and. MHD_prop%cp_prop%iflag_scheme .eq. id_no_evolution       &
+     &   .and. MHD_prop%cd_prop%iflag_Bevo_scheme .eq. id_no_evolution  &
+     &   .and. MHD_prop%cd_prop%iflag_Aevo_scheme .eq. id_no_evolution) then
             e_message = 'Turn on field for time integration'
         call calypso_MPI_abort(ierr_evo, e_message)
       end if
 !
       if (iflag_debug .ge. iflag_routine_msg) then
-        write(*,*) 'iflag_t_evo_4_velo     ', iflag_t_evo_4_velo
-        write(*,*) 'iflag_t_evo_4_temp     ', iflag_t_evo_4_temp
-        write(*,*) 'iflag_t_evo_4_composit ', iflag_t_evo_4_composit
-        write(*,*) 'iflag_t_evo_4_magne    ', iflag_t_evo_4_magne
-        write(*,*) 'iflag_t_evo_4_vect_p   ', iflag_t_evo_4_vect_p
-        write(*,*) 'iflag_implicit_correct ', iflag_implicit_correct
+        write(*,*) 'iflag_t_evo_4_velo     ',                           &
+     &             MHD_prop%fl_prop%iflag_scheme
+        write(*,*) 'iflag_t_evo_4_temp     ',                           &
+     &             MHD_prop%ht_prop%iflag_scheme
+        write(*,*) 'iflag_t_evo_4_composit ',                           &
+     &             MHD_prop%cp_prop%iflag_scheme
+        write(*,*) 'iflag_t_evo_4_magne    ',                           &
+     &             MHD_prop%cd_prop%iflag_Bevo_scheme
+        write(*,*) 'iflag_t_evo_4_vect_p   ',                           &
+     &             MHD_prop%cd_prop%iflag_Aevo_scheme
       end if
 !
-!   set control for temperature 
+!   set control for reference temperature 
 !
-         if (i_ref_temp .eq. 0) then
-           iflag_4_ref_temp = id_no_ref_temp
-         else
-           if (ref_temp_ctl .eq. 'spherical_shell') then
-             iflag_4_ref_temp = id_sphere_ref_temp
-           else if (ref_temp_ctl .eq. 'sph_constant_heat') then
-             iflag_4_ref_temp = id_linear_r_ref_temp
-           else if (ref_temp_ctl .eq. 'linear_x') then
-             iflag_4_ref_temp = id_x_ref_temp
-           else if (ref_temp_ctl .eq. 'linear_y') then
-             iflag_4_ref_temp = id_y_ref_temp
-           else if (ref_temp_ctl .eq. 'linear_z') then
-             iflag_4_ref_temp = id_z_ref_temp
-           end if
-         end if
+      write(tmpchara,'(a)') 'Reference temperature'
+      call set_reference_scalar_ctl(tmpchara, reft_ctl,                 &
+     &    MHD_prop%ref_param_T, MHD_prop%takepito_T)
 !
-         if ( (i_low_temp_posi*i_low_temp_value) .eq. 0) then
-           if (iflag_4_ref_temp .eq. id_no_ref_temp) then
-             low_temp  = 0.0d0
-             depth_low_t  =  0.0d0
-           else
-              e_message                                                 &
-     &          = 'Set lower temperature and its position'
-             call calypso_MPI_abort(ierr_fld, e_message)
-           end if
-         else
-           low_temp  = low_temp_ctl
-           depth_low_t  = depth_low_t_ctl
-         end if
+!   set control for reference  
 !
-         if ( (i_high_temp_posi*i_high_temp_value) .eq. 0) then
-           if (iflag_4_ref_temp .eq. id_no_ref_temp) then
-             high_temp =  0.0d0
-             depth_high_t =  0.0d0
-           else
-              e_message                                                 &
-     &          = 'Set lower temperature and its position'
-             call calypso_MPI_abort(ierr_fld, e_message)
-           end if
-         else
-           high_temp = high_temp_ctl
-           depth_high_t = depth_high_t_ctl
-         end if
-!
-        if (iflag_debug .ge. iflag_routine_msg) then
-           write(*,*) 'iflag_4_ref_temp ',iflag_4_ref_temp
-           write(*,*) 'low_temp ',low_temp
-           write(*,*) 'high_temp ',high_temp
-           write(*,*) 'depth_low_t ',depth_low_t
-           write(*,*) 'depth_high_t ',depth_high_t
-        end if
+      write(tmpchara,'(a)') 'Reference temperature'
+      call set_reference_scalar_ctl(tmpchara, refc_ctl,                 &
+     &    MHD_prop%ref_param_C, MHD_prop%takepito_C)
 !
 !
-!
-        iflag_t_strat = id_turn_OFF
-        if (i_strat_ctl .gt. id_turn_OFF) then
-          if(stratified_ctl .eq. 'on' .or. stratified_ctl .eq. 'On'     &
-     &    .or. stratified_ctl .eq. 'ON' .or. stratified_ctl .eq. '1')   &
-     &     iflag_t_strat = id_turn_ON
-        end if
-!
-        if (iflag_t_strat .eq. id_turn_OFF) then
-          stratified_sigma = 0.0d0
-          stratified_width = 0.0d0
-          stratified_outer_r = 0.0d0
-        else
-          if ( (i_strat_sigma*i_strat_width*i_strat_outer) .eq. 0) then
-            e_message                                                   &
-     &        = 'Set parameteres for stratification'
-            call calypso_MPI_abort(ierr_fld, e_message)
-          else
-            stratified_sigma = stratified_sigma_ctl
-            stratified_width = stratified_width_ctl
-            stratified_outer_r = stratified_outer_r_ctl
-          end if
-        end if
-!
-        if (iflag_debug .ge. iflag_routine_msg) then
-           write(*,*) 'iflag_t_strat ',      iflag_t_strat
-           write(*,*) 'stratified_sigma ',   stratified_sigma
-           write(*,*) 'stratified_width ',   stratified_width
-           write(*,*) 'stratified_outer_r ', stratified_outer_r
-        end if
-!
-        if (group_4_monitor_ctl%icou .eq. 0) then
-          num_monitor = 0
-        else
-          num_monitor = group_4_monitor_ctl%num
-        end if
+      if (nmtr_ctl%group_4_monitor_ctl%icou .eq. 0) then
+        num_monitor = 0
+      else
+        num_monitor = nmtr_ctl%group_4_monitor_ctl%num
+      end if
 !
       if (num_monitor .ne. 0) then
         call allocate_monitor_group
 !
         do i = 1, num_monitor
-          monitor_grp(i) = group_4_monitor_ctl%c_tbl(i)
+          monitor_grp(i) = nmtr_ctl%group_4_monitor_ctl%c_tbl(i)
         end do
-        call dealloc_monitor_grp_ctl
+        call dealloc_control_array_chara(nmtr_ctl%group_4_monitor_ctl)
 !
         if (iflag_debug .ge. iflag_routine_msg) then
           do i = 1, num_monitor
@@ -249,66 +172,70 @@
       end subroutine s_set_control_4_model
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_crank
+      subroutine s_set_control_4_crank                                  &
+     &         (mevo_ctl, fl_prop, cd_prop, ht_prop, cp_prop)
 !
-!
-        if(iflag_t_evo_4_velo .ge. id_Crank_nicolson) then
-          if (i_coef_imp_v.eq.0) then
-            coef_imp_v = 0.5d0
-          else
-            coef_imp_v = coef_imp_v_ctl
-          end if
-        else
-          coef_imp_v = 0.0d0
-        end if
-!
-        if(iflag_t_evo_4_temp .ge. id_Crank_nicolson) then
-          if (i_coef_imp_t.eq.0) then
-            coef_imp_t = 0.5d0
-          else
-            coef_imp_t = coef_imp_t_ctl
-          end if
-        else
-          coef_imp_t = 0.0d0
-        end if
-!
-        if(iflag_t_evo_4_magne .ge. id_Crank_nicolson                   &
-     &      .or. iflag_t_evo_4_vect_p .ge. id_Crank_nicolson) then
-          if (i_coef_imp_b.eq.0) then
-            coef_imp_b = 0.5d0
-          else
-            coef_imp_b = coef_imp_b_ctl
-          end if
-        else
-          coef_imp_b = 0.0d0
-        end if
-!
-        if(iflag_t_evo_4_composit .ge. id_Crank_nicolson) then
-          if (i_coef_imp_c.eq.0) then
-            coef_imp_c = 0.5d0
-          else
-            coef_imp_c = coef_imp_c_ctl
-          end if
-        else
-          coef_imp_c = 0.0d0
-        end if
-!
-        coef_exp_v = 1.0d0 - coef_imp_v
-        coef_exp_t = 1.0d0 - coef_imp_t
-        coef_exp_b = 1.0d0 - coef_imp_b
-        coef_exp_c = 1.0d0 - coef_imp_c
+      type(mhd_evo_scheme_control), intent(in) :: mevo_ctl
+      type(fluid_property), intent(inout) :: fl_prop
+      type(conductive_property), intent(inout)  :: cd_prop
+      type(scalar_property), intent(inout) :: ht_prop, cp_prop
 !
 !
-        if (iflag_debug .ge. iflag_routine_msg) then
-          write(*,*) 'coef_imp_v ',coef_imp_v
-          write(*,*) 'coef_imp_t ',coef_imp_t
-          write(*,*) 'coef_imp_b ',coef_imp_b
-          write(*,*) 'coef_imp_c ',coef_imp_c
-        end if
+      call set_implicit_coefs(mevo_ctl%coef_imp_v_ctl,                  &
+     &    fl_prop%iflag_scheme, fl_prop%coef_imp, fl_prop%coef_exp)
+      call set_implicit_coefs(mevo_ctl%coef_imp_t_ctl,                  &
+     &    ht_prop%iflag_scheme, ht_prop%coef_imp, ht_prop%coef_exp)
+      call set_implicit_coefs(mevo_ctl%coef_imp_c_ctl,                  &
+     &    cp_prop%iflag_scheme, cp_prop%coef_imp, cp_prop%coef_exp)
+!
+      if(cd_prop%iflag_Bevo_scheme .ne. id_no_evolution) then
+        call set_implicit_coefs                                         &
+     &     (mevo_ctl%coef_imp_b_ctl, cd_prop%iflag_Bevo_scheme,         &
+     &      cd_prop%coef_imp, cd_prop%coef_exp)
+      else if(cd_prop%iflag_Aevo_scheme .ne. id_no_evolution) then
+        call set_implicit_coefs                                         &
+     &     (mevo_ctl%coef_imp_b_ctl, cd_prop%iflag_Aevo_scheme,         &
+     &      cd_prop%coef_imp, cd_prop%coef_exp)
+      end if
+!
+      if (iflag_debug .ge. iflag_routine_msg) then
+        write(*,*) 'coef_imp_v ', fl_prop%coef_imp
+        write(*,*) 'coef_imp_t ', ht_prop%coef_imp
+        write(*,*) 'coef_imp_b ', cd_prop%coef_imp
+        write(*,*) 'coef_imp_c ', cp_prop%coef_imp
+      end if
 !
       end subroutine s_set_control_4_crank
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_implicit_coefs                                     &
+     &         (coef_imp_ctl, iflag_scheme, coef_imp, coef_exp)
+!
+      use t_control_elements
+!
+      type(read_real_item), intent(in) :: coef_imp_ctl
+      integer(kind=kint), intent(in)  :: iflag_scheme
+      real(kind = kreal), intent(inout) :: coef_imp, coef_exp
+!
+!
+      if(iflag_scheme .ge. id_Crank_nicolson) then
+        if (coef_imp_ctl%iflag .eq. 0) then
+          coef_imp = half
+        else
+          coef_imp = coef_imp_ctl%realvalue
+        end if
+      else
+        coef_imp = zero
+      end if
+      coef_exp = one - coef_imp
+!
+      end subroutine set_implicit_coefs
+!
+! -----------------------------------------------------------------------
+!
 !
       end module set_control_4_model

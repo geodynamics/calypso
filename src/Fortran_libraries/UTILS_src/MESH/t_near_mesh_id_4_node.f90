@@ -37,15 +37,15 @@
 !>       Mimimum number of surrounding data
         integer(kind = kint) :: nmin
 !>       Number of surrounding data for each node
-        integer(kind = kint), pointer :: num_nod(:)
+        integer(kind = kint), allocatable :: num_nod(:)
 !>       Stack number of surrounding data for each node
-        integer(kind = kint), pointer :: istack_nod(:)
+        integer(kind = kint), allocatable :: istack_nod(:)
 !>       Surrounding data ID for each node
-        integer(kind = kint), pointer :: id_near_nod(:)
+        integer(kind = kint), allocatable :: id_near_nod(:)
 !>       distance from center node
-        integer(kind = kint), pointer :: idist(:)
+        integer(kind = kint), allocatable :: idist(:)
 !>       weighting of surrounded node
-        integer(kind = kint), pointer :: iweight(:)
+        integer(kind = kint), allocatable :: iweight(:)
       end type near_mesh
 !
 !

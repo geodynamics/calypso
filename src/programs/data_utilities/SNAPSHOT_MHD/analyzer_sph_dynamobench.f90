@@ -19,13 +19,15 @@
 !
       use m_machine_parameter
       use m_work_time
-      use m_control_parameter
-      use m_t_int_parameter
-      use m_t_step_parameter
+      use m_physical_property
+      use t_step_parameter
 !
       use SPH_analyzer_d_bench
 !
       implicit none
+!
+      character(len=kchara), parameter, private                         &
+     &                      :: snap_ctl_name = 'control_snapshot'
 !
 ! ----------------------------------------------------------------------
 !
@@ -35,7 +37,15 @@
 !
       subroutine initialize_sph_dynamobench
 !
-      use m_ctl_data_sph_MHD_noviz
+      use t_ctl_data_sph_MHD_psf
+      use m_ctl_data_sph_MHD
+      use m_spheric_parameter
+      use m_node_phys_data
+      use m_sph_spectr_data
+      use m_rms_4_sph_spectr
+      use m_sph_trans_arrays_MHD
+      use m_bc_data_list
+      use m_flexible_time_step
       use init_sph_MHD_elapsed_label
       use input_control_sph_MHD
 !
@@ -48,11 +58,14 @@
 !
       call start_eleps_time(1)
       call start_eleps_time(4)
-      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_snap_noviz'
-      call read_control_4_sph_snap_noviz
-!
+      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_noviz'
+      call read_control_4_sph_MHD_noviz(snap_ctl_name, DNS_MHD_ctl1)
+
       if (iflag_debug.eq.1) write(*,*) 'input_control_SPH_dynamobench'
-      call input_control_SPH_dynamobench
+      call input_control_SPH_dynamobench(MHD_files1, bc_sph_IO1,        &
+     &    DNS_MHD_ctl1, sph1, comms_sph1, sph_grps1, rj_fld1, nod_fld1, &
+     &    pwr1, flex_p1, MHD_step1, MHD_prop1, MHD_BC1, trns_WK1)
+      call copy_delta_t(MHD_step1%init_d, MHD_step1%time_d)
       call end_eleps_time(4)
 !
 !    precondition elaps start
@@ -62,7 +75,7 @@
 !        Initialize spherical transform dynamo
 !
       if(iflag_debug .gt. 0) write(*,*) 'SPH_init_sph_dbench'
-      call SPH_init_sph_dbench
+      call SPH_init_sph_dbench(MHD_files1, bc_sph_IO1, iphys)
       call calypso_MPI_barrier
 !
       call end_eleps_time(2)
@@ -74,28 +87,32 @@
 !
       subroutine evolution_sph_dynamobench
 !
+      integer(kind = kint) :: iflag
 !
 !*  -----------  set initial step data --------------
 !*
       call start_eleps_time(3)
-      i_step_MHD = i_step_init - 1
+      call s_initialize_time_step(MHD_step1%init_d, MHD_step1%time_d)
 !*
 !*  -------  time evelution loop start -----------
 !*
       do
-        i_step_MHD = i_step_MHD + 1
-        istep_max_dt = i_step_MHD
+        call add_one_step(MHD_step1%time_d)
 !
-        if( mod(i_step_MHD,i_step_output_rst) .ne. 0) cycle
+        iflag = output_IO_flag(MHD_step1%time_d%i_time_step,            &
+     &                         MHD_step1%rst_step)
+        if(MHD_step1%time_d%i_time_step .ne. 0) cycle
 !
 !*  ----------  time evolution by spectral methood -----------------
 !*
         if (iflag_debug.eq.1) write(*,*) 'SPH_analyze_dbench'
-        call SPH_analyze_dbench(i_step_MHD)
+        call SPH_analyze_dbench                                         &
+     &     (MHD_step1%time_d%i_time_step, MHD_files1)
 !*
 !*  -----------  exit loop --------------
 !*
-        if(i_step_MHD .ge. i_step_number) exit
+        if(MHD_step1%time_d%i_time_step                                 &
+     &        .ge. MHD_step1%finish_d%i_end_step) exit
       end do
 !
 !  time evolution end
@@ -105,7 +122,7 @@
 !      if (iflag_debug.eq.1) write(*,*) 'SPH_finalize_dbench'
 !      call SPH_finalize_dbench
 !
-      call copy_COMM_TIME_to_eleps(num_elapsed)
+      call copy_COMM_TIME_to_elaps(num_elapsed)
       call end_eleps_time(1)
 !
       call output_elapsed_times

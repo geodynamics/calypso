@@ -8,10 +8,26 @@
 !!        (Serial version)
 !!
 !!@verbatim
-!!      subroutine const_sph_rlm_modes(ip_rank)
-!!      subroutine const_sph_rtm_grids(ip_rank)
-!!
-!!      subroutine const_fem_mesh_for_sph(ip_rank)
+!!      subroutine const_sph_rlm_modes                                  &
+!!     &         (ip_rank, s3d_ranks, s3d_radius, sph_lcp, stk_lc1d,    &
+!!     &          sph_gl1d,  sph_rlm, comm_rlm)
+!!        type(spheric_global_rank), intent(in) :: s3d_ranks
+!!        type(spheric_global_radius), intent(in) :: s3d_radius
+!!        type(sph_local_parameters), intent(in) :: sph_lcp
+!!        type(sph_1d_index_stack), intent(in)  :: stk_lc1d
+!!        type(sph_1d_global_index), intent(in)  :: sph_gl1d
+!!        type(sph_rlm_grid), intent(inout) :: sph_rlm
+!!        type(sph_comm_tbl), intent(inout) :: comm_rlm
+!!      subroutine const_sph_rtm_grids                                  &
+!!     &         (ip_rank, s3d_ranks, s3d_radius, sph_lcp, stk_lc1d,    &
+!!     &          sph_gl1d, sph_rtm, comm_rtm)
+!!        type(spheric_global_rank), intent(in) :: s3d_ranks
+!!        type(spheric_global_radius), intent(in) :: s3d_radius
+!!        type(sph_local_parameters), intent(in) :: sph_lcp
+!!        type(sph_1d_index_stack), intent(in)  :: stk_lc1d
+!!        type(sph_1d_global_index), intent(in)  :: sph_gl1d
+!!        type(sph_rtm_grid), intent(inout) :: sph_rtm
+!!        type(sph_comm_tbl), intent(inout) :: comm_rtm
 !!@endverbatim
 !
       module gen_sph_grids_modes
@@ -22,7 +38,7 @@
       implicit none
 !
 !>      Integer flag to excluding FEM mesh
-      integer(kind = kint) :: iflag_excluding_FEM_mesh = 0
+      integer(kind = kint) :: iflag_output_mesh = 0
 !
       private :: const_comm_table_4_rlm, const_comm_table_4_rtm
 !
@@ -32,154 +48,151 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_sph_rlm_modes(ip_rank)
+      subroutine const_sph_rlm_modes                                    &
+     &         (ip_rank, s3d_ranks, s3d_radius, sph_lcp, stk_lc1d,      &
+     &          sph_gl1d,  sph_rlm, comm_rlm)
 !
-      use m_spheric_parameter
+      use t_spheric_rlm_data
+      use t_sph_trans_comm_tbl
+      use t_spheric_global_ranks
+      use t_sph_1d_global_index
+      use t_sph_local_parameter
+!
       use copy_sph_1d_global_index
       use set_local_sphere_param
       use set_local_sphere_by_global
 !
       integer(kind = kint), intent(in) :: ip_rank
+      type(spheric_global_rank), intent(in) :: s3d_ranks
+      type(spheric_global_radius), intent(in) :: s3d_radius
+      type(sph_local_parameters), intent(in) :: sph_lcp
+      type(sph_1d_index_stack), intent(in)  :: stk_lc1d
+      type(sph_1d_global_index), intent(in)  :: sph_gl1d
+!
+      type(sph_rlm_grid), intent(inout) :: sph_rlm
+      type(sph_comm_tbl), intent(inout) :: comm_rlm
 !
 !
-      call copy_gl_2_local_rlm_param(ip_rank)
+      call copy_gl_2_local_rlm_param                                    &
+     &   (ip_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rlm)
 !
-      call allocate_spheric_param_rlm
-      call allocate_sph_1d_index_rlm
+!      nnod_rlm = sph_rlm%nnod_rlm
+!      nidx_rlm(1:2) = sph_rlm%nidx_rlm(1:2)
+      call alloc_type_spheric_param_rlm(sph_rlm)
+      call alloc_type_sph_1d_index_rlm(sph_rlm)
 !
-      call copy_sph_1d_gl_idx_rlm
+      call copy_sph_1d_gl_idx_rlm(s3d_radius, sph_gl1d, sph_rlm)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'set_global_sph_4_rlm', ip_rank
-      call set_global_sph_4_rlm
+      call set_global_sph_4_rlm(s3d_ranks, stk_lc1d, sph_rlm)
 !
-      if(iflag_debug .gt. 0) call check_spheric_param_rlm(ip_rank)
+      if(iflag_debug .gt. 0) then
+        call check_type_spheric_param_rlm(ip_rank, sph_rlm)
+      end if
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'const_comm_table_4_rlm', ip_rank
-      call const_comm_table_4_rlm(ip_rank, nnod_rlm)
+      call const_comm_table_4_rlm                                       &
+     &   (ip_rank, s3d_ranks, sph_rlm, comm_rlm)
 !
       end subroutine const_sph_rlm_modes
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine const_sph_rtm_grids(ip_rank)
+      subroutine const_sph_rtm_grids                                    &
+     &         (ip_rank, s3d_ranks, s3d_radius, sph_lcp, stk_lc1d,      &
+     &          sph_gl1d, sph_rtm, comm_rtm)
 !
-      use m_spheric_parameter
+      use t_spheric_rtm_data
+      use t_sph_trans_comm_tbl
+      use t_spheric_global_ranks
+      use t_sph_1d_global_index
+      use t_sph_local_parameter
+!
       use copy_sph_1d_global_index
       use set_local_sphere_param
       use set_local_sphere_by_global
 !
       integer(kind = kint), intent(in) :: ip_rank
+      type(spheric_global_rank), intent(in) :: s3d_ranks
+      type(spheric_global_radius), intent(in) :: s3d_radius
+      type(sph_local_parameters), intent(in) :: sph_lcp
+      type(sph_1d_index_stack), intent(in)  :: stk_lc1d
+      type(sph_1d_global_index), intent(in)  :: sph_gl1d
+!
+      type(sph_rtm_grid), intent(inout) :: sph_rtm
+      type(sph_comm_tbl), intent(inout) :: comm_rtm
 !
 !
-      call copy_gl_2_local_rtm_param(ip_rank)
+      call copy_gl_2_local_rtm_param                                    &
+     &   (ip_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rtm)
 !
-      call allocate_spheric_param_rtm
-      call allocate_sph_1d_index_rtm
+      call alloc_type_spheric_param_rtm(sph_rtm)
+      call alloc_type_sph_1d_index_rtm(sph_rtm)
 !
-      call copy_sph_1d_gl_idx_rtm
+      call copy_sph_1d_gl_idx_rtm(s3d_radius, sph_gl1d, sph_rtm)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'set_global_sph_4_rtm', ip_rank
-      call set_global_sph_4_rtm
+      call set_global_sph_4_rtm(s3d_ranks, stk_lc1d, sph_rtm)
 !
-      if(iflag_debug .gt. 0)  call check_spheric_param_rtm(ip_rank)
+      if(iflag_debug .gt. 0) then
+        call check_type_spheric_param_rtm(ip_rank, sph_rtm)
+      end if
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'const_comm_table_4_rtm', ip_rank
-      call const_comm_table_4_rtm(ip_rank, nnod_rtm)
+      call const_comm_table_4_rtm                                       &
+     &   (ip_rank, s3d_ranks, sph_rtm, comm_rtm)
 !
       end subroutine const_sph_rtm_grids
 !
 ! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine const_fem_mesh_for_sph(ip_rank)
-!
-      use t_mesh_data
-      use t_comm_table
-      use t_geometry_data
-      use m_spheric_parameter
-      use m_gauss_points
-      use m_group_data_sph_specr
-      use set_local_index_table_sph
-      use set_local_sphere_by_global
-      use set_FEM_mesh_4_sph
-      use m_sph_mesh_1d_connect
-!
-      use m_node_id_spherical_IO
-      use m_read_mesh_data
-      use set_comm_table_4_IO
-      use set_node_data_4_IO
-      use set_element_data_4_IO
-      use set_group_types_4_IO
-      use mesh_IO_select
-!
-      integer(kind = kint), intent(in) :: ip_rank
-!
-      type(mesh_geometry) :: mesh
-      type(mesh_groups) ::  group
-!
-!
-      call copy_gl_2_local_rtp_param(ip_rank)
-      nidx_local_fem(1:3) = nidx_rtp(1:3)
-      nidx_local_fem(3) =   m_folding * nidx_local_fem(3)
-!
-      call s_const_FEM_mesh_for_sph(ip_rank, radius_1d_gl, mesh, group)
-!
-      call copy_comm_tbl_type_to_IO(ip_rank, mesh%nod_comm)
-      call copy_node_geometry_to_IO(mesh%node)
-      call copy_ele_connect_to_IO(mesh%ele)
-      call set_grp_data_type_to_IO(group)
-!
-      call dealloc_groups_data(group)
-      call deallocate_ele_connect_type(mesh%ele)
-      call deallocate_node_geometry_type(mesh%node)
-      call deallocate_type_comm_tbl(mesh%nod_comm)
-!
-      mesh_file_head = sph_file_head
-      call sel_write_mesh_file(ip_rank)
-!
-      write(*,'(a,i6,a)')                                               &
-     &          'FEM mesh for domain', ip_rank, ' is done.'
-!
-      end subroutine const_fem_mesh_for_sph
-!
-! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_comm_table_4_rlm(ip_rank, nnod_rlm)
+      subroutine const_comm_table_4_rlm                                 &
+     &         (ip_rank, s3d_ranks, sph_rlm, comm_rlm)
 !
-      use m_sph_trans_comm_table
+      use t_spheric_global_ranks
+      use t_spheric_rlm_data
+      use t_sph_trans_comm_tbl
       use set_comm_table_rtm_rlm
 !
       integer(kind = kint), intent(in) :: ip_rank
-      integer(kind = kint), intent(in) :: nnod_rlm
+      type(spheric_global_rank), intent(in) :: s3d_ranks
+      type(sph_rlm_grid), intent(in) :: sph_rlm
+      type(sph_comm_tbl), intent(inout) :: comm_rlm
 !
 !
-      call allocate_ncomm
+      call allocate_ncomm(s3d_ranks%ndomain_sph)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'count_comm_table_4_rlm', ip_rank
-      call count_comm_table_4_rlm
+      call count_comm_table_4_rlm                                       &
+     &   (s3d_ranks, sph_rlm%nnod_rlm, sph_rlm%idx_global_rlm)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'count_num_domain_rtm_rlm', ip_rank
-      call count_num_domain_rtm_rlm(nneib_domain_rlm)
+      call count_num_domain_rtm_rlm                                     &
+     &   (s3d_ranks%ndomain_sph, comm_rlm%nneib_domain)
 !
-      call allocate_sph_comm_stack_rlm
+      call alloc_type_sph_comm_stack(comm_rlm)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'set_comm_stack_rtm_rlm', ip_rank
-      call set_comm_stack_rtm_rlm(ip_rank, nneib_domain_rlm,            &
-     &    id_domain_rlm, istack_sr_rlm, ntot_item_sr_rlm)
+      call set_comm_stack_rtm_rlm(ip_rank, s3d_ranks%ndomain_sph,       &
+     &    comm_rlm%nneib_domain, comm_rlm%id_domain,                    &
+     &    comm_rlm%istack_sr, comm_rlm%ntot_item_sr)
 !
-      call allocate_sph_comm_item_rlm(nnod_rlm)
+      call alloc_type_sph_comm_item(sph_rlm%nnod_rlm, comm_rlm)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'set_comm_table_4_rlm', ip_rank
-      call set_comm_table_4_rlm
+      call set_comm_table_4_rlm                                         &
+     &   (s3d_ranks, sph_rlm%nnod_rlm, sph_rlm%idx_global_rlm,          &
+     &    comm_rlm%nneib_domain, comm_rlm%ntot_item_sr,                 &
+     &    comm_rlm%istack_sr, comm_rlm%item_sr)
       call deallocate_ncomm
 !
 !      call allocate_idx_gl_rlm_out
@@ -189,34 +202,46 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_comm_table_4_rtm(ip_rank, nnod_rtm)
+      subroutine const_comm_table_4_rtm                                 &
+     &         (ip_rank, s3d_ranks, sph_rtm, comm_rtm)
 !
-      use m_sph_trans_comm_table
+      use t_spheric_global_ranks
+      use t_spheric_rtm_data
+      use t_sph_trans_comm_tbl
       use set_comm_table_rtm_rlm
 !
       integer(kind = kint), intent(in) :: ip_rank
-      integer(kind = kint), intent(in) :: nnod_rtm
+      type(spheric_global_rank), intent(in) :: s3d_ranks
+      type(sph_rtm_grid), intent(in) :: sph_rtm
+      type(sph_comm_tbl), intent(inout) :: comm_rtm
+!
 !
 !      write(*,*) 'allocate_ncomm'
-      call allocate_ncomm
+      call allocate_ncomm(s3d_ranks%ndomain_sph)
 !
 !      write(*,*) 'count_comm_table_4_rtm'
-      call count_comm_table_4_rtm
+      call count_comm_table_4_rtm(s3d_ranks, sph_rtm%nnod_rtm,          &
+     &    sph_rtm%nidx_global_rtm, sph_rtm%idx_global_rtm)
 !
 !      write(*,*) 'count_num_domain_rtm_rlm'
-      call count_num_domain_rtm_rlm(nneib_domain_rtm)
+      call count_num_domain_rtm_rlm                                     &
+     &   (s3d_ranks%ndomain_sph, comm_rtm%nneib_domain)
 !
-!      write(*,*) 'allocate_sph_comm_stack_rtm'
-      call allocate_sph_comm_stack_rtm
+!      write(*,*) 'alloc_type_sph_comm_stack'
+      call alloc_type_sph_comm_stack(comm_rtm)
 !
 !      write(*,*) 'set_comm_stack_rtm_rlm'
-      call set_comm_stack_rtm_rlm(ip_rank, nneib_domain_rtm,            &
-     &    id_domain_rtm, istack_sr_rtm, ntot_item_sr_rtm)
+      call set_comm_stack_rtm_rlm(ip_rank, s3d_ranks%ndomain_sph,       &
+     &    comm_rtm%nneib_domain, comm_rtm%id_domain,                    &
+     &    comm_rtm%istack_sr, comm_rtm%ntot_item_sr)
 !
-      call allocate_sph_comm_item_rtm(nnod_rtm)
+      call alloc_type_sph_comm_item(sph_rtm%nnod_rtm, comm_rtm)
 !
 !      write(*,*) 'set_comm_table_4_rtm'
-      call set_comm_table_4_rtm
+      call set_comm_table_4_rtm(s3d_ranks, sph_rtm%nnod_rtm,            &
+     &    sph_rtm%nidx_global_rtm, sph_rtm%idx_global_rtm,              &
+     &    comm_rtm%nneib_domain, comm_rtm%ntot_item_sr,                 &
+     &    comm_rtm%istack_sr, comm_rtm%item_sr)
       call deallocate_ncomm
 !
 !      call allocate_idx_gl_rtm_out

@@ -8,11 +8,23 @@
 !!        from control data
 !!
 !!@verbatim
-!!      subroutine turn_off_debug_flag_by_ctl(my_rank)
-!!      subroutine set_control_smp_def(my_rank)
-!!      subroutine set_control_mesh_def
-!!      subroutine set_control_sph_mesh
-!!      subroutine set_control_restart_file_def(fld_IO)
+!!      subroutine turn_off_debug_flag_by_ctl(my_rank, plt)
+!!      subroutine set_control_smp_def(my_rank, plt)
+!!      subroutine set_control_mesh_def(plt, mesh_file)
+!!      subroutine set_control_sph_mesh(plt, mesh_file, sph_file_param)
+!!        type(field_IO_params), intent(inout) :: mesh_file
+!!        type(field_IO_params), intent(inout) :: sph_file_param
+!!      subroutine set_FEM_mesh_switch_4_SPH(plt, iflag_access_FEM)
+!!      subroutine set_control_restart_file_def(plt, file_IO)
+!!        type(platform_data_control), intent(in) :: plt
+!!        type(field_IO_params), intent(inout) :: file_IO
+!!
+!!      subroutine set_control_mesh_file_def                            &
+!!     &         (default_prefix, plt_ctl, mesh_file)
+!!      subroutine set_file_control_params(default_prefix,              &
+!!     &          file_prefix_ctl, file_format_ctl,  file_params)
+!!      subroutine set_parallel_file_ctl_params(default_prefix,         &
+!!     &          file_prefix_ctl, file_format_ctl,  file_params)
 !!@endverbatim
 !!
 !!@param my_rank  preocess ID
@@ -22,9 +34,12 @@
       use m_precision
 !
       use m_constants
-      use m_ctl_data_4_platforms
+      use t_ctl_data_4_platforms
+      use t_file_IO_parameter
 !
       implicit  none
+!
+      character(len=kchara), parameter :: default_rst_prefix = 'rst'
 !
 ! ----------------------------------------------------------------------
 !
@@ -32,22 +47,23 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine turn_off_debug_flag_by_ctl(my_rank)
+      subroutine turn_off_debug_flag_by_ctl(my_rank, plt)
 !
       use m_machine_parameter
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: my_rank
+      type(platform_data_control), intent(in) :: plt
 !
 !
       i_debug = 0
-      if(debug_flag_ctl%iflag .gt. 0) then
-        if     (no_flag(debug_flag_ctl%charavalue)) then
+      if(plt%debug_flag_ctl%iflag .gt. 0) then
+        if     (no_flag(plt%debug_flag_ctl%charavalue)) then
           i_debug =     iflag_minimum_msg
-        else if(yes_flag(debug_flag_ctl%charavalue)) then
+        else if(yes_flag(plt%debug_flag_ctl%charavalue)) then
           i_debug =     iflag_routine_msg
-        else if(cmp_no_case(debug_flag_ctl%charavalue,'Full')           &
-     &     .or. cmp_no_case(debug_flag_ctl%charavalue,'2')   ) then
+        else if(cmp_no_case(plt%debug_flag_ctl%charavalue,'Full')       &
+     &     .or. cmp_no_case(plt%debug_flag_ctl%charavalue,'2')   ) then
           i_debug =     iflag_full_msg
         end if
       end if
@@ -58,17 +74,21 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_control_smp_def(my_rank)
+      subroutine set_control_smp_def(my_rank, plt)
 !
       use m_machine_parameter
 !
       integer(kind = kint), intent(in) :: my_rank
+      type(platform_data_control), intent(in) :: plt
+!
       integer, external :: omp_get_max_threads
       integer :: np_smp4
 !
 !
       np_smp = 1
-      if(num_smp_ctl%iflag .gt. 0) np_smp = num_smp_ctl%intvalue
+      if(plt%num_smp_ctl%iflag .gt. 0) then
+        np_smp = plt%num_smp_ctl%intvalue
+      end if
 !
 #ifdef _OPENMP
       if (int(np_smp) .lt. omp_get_max_threads()) then
@@ -83,82 +103,166 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_control_mesh_def
+      subroutine set_control_mesh_def(plt, mesh_file)
 !
-      use m_read_mesh_data
+      use m_default_file_prefix
       use m_file_format_switch
-      use skip_comment_f
+!
+      type(platform_data_control), intent(in) :: plt
+      type(field_IO_params), intent(inout) :: mesh_file
 !
 !
-      if(mesh_extension_ctl%iflag .gt. 0) then
-        if     (cmp_no_case(mesh_extension_ctl%charavalue,'Off')        &
-     &     .or. cmp_no_case(mesh_extension_ctl%charavalue,'0') ) then
-          iflag_mesh_file_ext = 0
-        end if
-      end if
-!
-      if (mesh_file_prefix%iflag .gt. 0) then
-        mesh_file_head = mesh_file_prefix%charavalue
-      else
-        mesh_file_head = def_mesh_file_head
-      end if
-!
-!   set data format
-!
-      call choose_file_format(mesh_file_fmt_ctl, iflag_mesh_file_fmt)
+      call set_parallel_file_ctl_params(def_mesh_file_head,             &
+     &    plt%mesh_file_prefix, plt%mesh_file_fmt_ctl, mesh_file)
 !
       end subroutine set_control_mesh_def
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_control_sph_mesh
+      subroutine set_control_sph_mesh(plt, mesh_file, sph_file_param)
 !
-      use m_read_mesh_data
-      use m_control_params_sph_data
-      use m_node_id_spherical_IO
       use m_file_format_switch
+      use sph_file_IO_select
+!
+      type(platform_data_control), intent(in) :: plt
+      type(field_IO_params), intent(inout) :: mesh_file
+      type(field_IO_params), intent(inout) :: sph_file_param
 !
 !   set data format
 !
-      call choose_file_format(sph_file_fmt_ctl, iflag_sph_file_fmt)
-      call choose_file_format                                           &
-     &   (spectr_file_fmt_ctl, iflag_sph_spectr_fmt)
+      call choose_para_file_format                                      &
+     &  (plt%sph_file_fmt_ctl, iflag_sph_file_fmt)
+      call choose_para_file_format                                      &
+     &   (plt%spectr_field_fmt_ctl, sph_file_param%iflag_format)
 !
 !   set file header at once
 !
-      if(sph_file_prefix%iflag .gt. 0) then
-        sph_file_head =  sph_file_prefix%charavalue
-        mesh_file_head = sph_file_prefix%charavalue
-        iflag_mesh_file_ext = 1
-        iflag_mesh_file_fmt = iflag_sph_file_fmt
+      if(plt%sph_file_prefix%iflag .gt. 0) then
+        sph_file_head =  plt%sph_file_prefix%charavalue
+        call copy_mesh_format_and_prefix                                &
+     &     (plt%sph_file_prefix%charavalue,                             &
+     &      iflag_sph_file_fmt, mesh_file)
       end if
 !
-      iflag_sph_spec_output = spectr_file_head_ctl%iflag
-      if(iflag_sph_spec_output .gt. 0) then
-        spectr_file_head = spectr_file_head_ctl%charavalue
+      sph_file_param%iflag_IO = plt%spectr_field_file_prefix%iflag
+      if(sph_file_param%iflag_IO .gt. 0) then
+        sph_file_param%file_prefix                                      &
+     &         = plt%spectr_field_file_prefix%charavalue
       end if
 !
       end subroutine set_control_sph_mesh
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_control_restart_file_def(fld_IO)
+      subroutine set_FEM_mesh_switch_4_SPH(plt, iflag_access_FEM)
 !
-      use t_field_data_IO
-      use m_file_format_switch
+      use skip_comment_f
 !
-      type(field_IO), intent(inout) :: fld_IO
+      type(platform_data_control), intent(in) :: plt
+      integer(kind = kint), intent(inout) :: iflag_access_FEM
 !
 !
-      if (restart_file_prefix%iflag .gt. 0) then
-        fld_IO%file_prefix = restart_file_prefix%charavalue
+      iflag_access_FEM = 0
+      if(plt%FEM_mesh_output_switch%iflag .gt. 0) then
+        if(yes_flag(plt%FEM_mesh_output_switch%charavalue)) then
+          iflag_access_FEM = 1
+        end if
+      else if(plt%excluding_FEM_mesh_ctl%iflag .gt. 0) then
+        if(no_flag(plt%excluding_FEM_mesh_ctl%charavalue)) then
+          iflag_access_FEM = 1
+        end if
       end if
 !
-      call choose_para_file_format                                      &
-     &   (restart_file_fmt_ctl, fld_IO%iflag_file_fmt)
+      end subroutine set_FEM_mesh_switch_4_SPH
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_control_restart_file_def(plt, file_IO)
+!
+      use t_file_IO_parameter
+      use m_file_format_switch
+!
+      type(platform_data_control), intent(in) :: plt
+      type(field_IO_params), intent(inout) :: file_IO
+!
+!
+      call set_parallel_file_ctl_params(default_rst_prefix,             &
+     &    plt%restart_file_prefix, plt%restart_file_fmt_ctl,            &
+     &    file_IO)
 !
       end subroutine set_control_restart_file_def
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_control_mesh_file_def                              &
+     &         (default_prefix, plt_ctl, mesh_file)
+!
+      character(len=kchara), intent(in) :: default_prefix
+      type(platform_data_control), intent(in) :: plt_ctl
+      type(field_IO_params), intent(inout) :: mesh_file
+!
+!
+      call set_file_control_params(default_prefix,                      &
+     &    plt_ctl%mesh_file_prefix, plt_ctl%mesh_file_fmt_ctl,          &
+     &    mesh_file)
+!
+      end subroutine set_control_mesh_file_def
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_file_control_params(default_prefix,                &
+     &          file_prefix_ctl, file_format_ctl,  file_params)
+!
+      use t_control_elements
+      use m_file_format_switch
+!
+      character(len = kchara), intent(in) :: default_prefix
+      type(read_character_item), intent(in) :: file_prefix_ctl
+      type(read_character_item), intent(in) :: file_format_ctl
+!
+      type(field_IO_params), intent(inout) :: file_params
+!
+!
+      file_params%iflag_IO = file_prefix_ctl%iflag
+      if(file_params%iflag_IO .gt. 0) then
+        file_params%file_prefix = file_prefix_ctl%charavalue
+      else
+        file_params%file_prefix = default_prefix
+      end if
+!
+      call choose_file_format                                           &
+     &   (file_format_ctl, file_params%iflag_format)
+!
+      end subroutine set_file_control_params
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_parallel_file_ctl_params(default_prefix,           &
+     &          file_prefix_ctl, file_format_ctl, file_params)
+!
+      use t_control_elements
+      use m_file_format_switch
+!
+      character(len = kchara), intent(in) :: default_prefix
+      type(read_character_item), intent(in) :: file_prefix_ctl
+      type(read_character_item), intent(in) :: file_format_ctl
+!
+      type(field_IO_params), intent(inout) :: file_params
+!
+!
+      file_params%iflag_IO = file_prefix_ctl%iflag
+      if(file_params%iflag_IO .gt. 0) then
+        file_params%file_prefix = file_prefix_ctl%charavalue
+      else
+        file_params%file_prefix = default_prefix
+      end if
+!
+      call choose_para_file_format                                      &
+     &   (file_format_ctl, file_params%iflag_format)
+!
+      end subroutine set_parallel_file_ctl_params
+!
+! ----------------------------------------------------------------------
 !
       end module set_control_platform_data

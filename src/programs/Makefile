@@ -8,15 +8,24 @@ SPH_MHD \
 mesh_utilities \
 data_utilities
 
+
 LIBS_SPH_MHD = \
 '$$(LIB_CALYPSO)'  \
+'$$(LIB_CALYPSO_C)'  \
 '$$(LIB_FFTPACK)'
 
+LIBS_MESH_UTILS = \
+'$$(LIB_CALYPSO)'  \
+'$$(LIB_CALYPSO_C)'
 
 LIB_FILES_SPH_MHD = \
 '$$(LIB_CALYPSO_FILE)'   \
+'$$(LIB_CALYPSO_C_FILE)' \
 '$$(LIB_FFTPACK_FILE)'
 
+LIB_FILES_MESH_UTILS = \
+'$$(LIB_CALYPSO_FILE)'   \
+'$$(LIB_CALYPSO_C_FILE)'
 
 #
 #  -------------------------------------------------------------------------
@@ -69,6 +78,11 @@ lib_name:
 	@echo  $(LIBS_SPH_MHD)            >> $(MAKENAME)
 	@echo  LIB_FILES_SPH_MHD=  \\     >> $(MAKENAME)
 	@echo  $(LIB_FILES_SPH_MHD)       >> $(MAKENAME)
+	@echo  '#' >> $(MAKENAME)
+	@echo  LIBS_MESH_UTILS=  \\          >> $(MAKENAME)
+	@echo  $(LIBS_MESH_UTILS)            >> $(MAKENAME)
+	@echo  LIB_FILES_MESH_UTILS=  \\     >> $(MAKENAME)
+	@echo  $(LIB_FILES_MESH_UTILS)       >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \

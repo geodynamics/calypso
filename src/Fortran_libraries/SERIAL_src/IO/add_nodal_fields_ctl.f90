@@ -7,26 +7,20 @@
 !>@brief  Add require field name
 !!
 !!@verbatim
-!!      subroutine add_phys_name_tmp(fld_name)
+!!      subroutine add_phys_name_ctl(fld_name, field_ctl)
+!!        type(ctl_array_c3), intent(inout) :: field_ctl
 !!@endverbatim
 !
       module add_nodal_fields_ctl
 !
       use m_precision
+      use t_read_control_arrays
 !
       implicit  none
 !
+      type(ctl_array_c3), private :: field_tmp_ctl
 !
-      integer (kind = kint) :: num_nod_phys_tmp
-      character(len=kchara), allocatable :: phys_nod_name_tmp(:)
-      character(len=kchara), allocatable :: visualize_ctl_tmp(:)
-      character(len=kchara), allocatable :: monitor_ctl_tmp(:)
-!
-      private :: visualize_ctl_tmp, monitor_ctl_tmp
-      private :: num_nod_phys_tmp, phys_nod_name_tmp
-!
-      private :: copy_field_ctl_to_tmp, copy_field_ctl_from_tmp
-      private :: allocate_work_4_field_ctl, deallocate_work_4_field_ctl
+      private :: copy_field_ctl
 !
 ! -----------------------------------------------------------------------
 !
@@ -34,12 +28,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine add_phys_name_tmp(fld_name)
+      subroutine add_phys_name_ctl(fld_name, field_ctl)
 !
       use m_machine_parameter
-      use m_ctl_data_4_fields
 !
       character(len=kchara), intent(in) :: fld_name
+      type(ctl_array_c3), intent(inout) :: field_ctl
+!
       integer(kind = kint) :: i, iflag
 !
 !
@@ -53,14 +48,17 @@
 !
       if (iflag .gt. 0) return
 !
-      num_nod_phys_tmp = field_ctl%num
-      call allocate_work_4_field_ctl
-      call copy_field_ctl_to_tmp
-      call deallocate_phys_control
+      field_tmp_ctl%num = field_ctl%num
+      call alloc_control_array_c3(field_tmp_ctl)
+      call copy_field_ctl                                               &
+     &   (field_tmp_ctl%num, field_ctl, field_tmp_ctl)
+      call dealloc_control_array_c3(field_ctl)
 !
       field_ctl%num = field_ctl%num + 1
-      call copy_field_ctl_from_tmp
-      call deallocate_work_4_field_ctl
+      call alloc_control_array_c3(field_ctl)
+      call copy_field_ctl                                               &
+     &   (field_tmp_ctl%num, field_tmp_ctl, field_ctl)
+      call dealloc_control_array_c3(field_tmp_ctl)
 !
       field_ctl%c1_tbl(field_ctl%num) = fld_name
       field_ctl%c2_tbl(field_ctl%num) = 'Viz_off'
@@ -71,65 +69,27 @@
      &            ' is added at field ID ',   field_ctl%num
       end if
 !
-      end subroutine add_phys_name_tmp
+      end subroutine add_phys_name_ctl
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine allocate_work_4_field_ctl
+      subroutine copy_field_ctl(num_copy, org_field_ctl, tgt_field_ctl)
 !
-!
-      allocate( phys_nod_name_tmp(num_nod_phys_tmp) )
-      allocate( visualize_ctl_tmp(num_nod_phys_tmp) )
-      allocate( monitor_ctl_tmp(num_nod_phys_tmp)   )
-!
-      end subroutine allocate_work_4_field_ctl
-!
-! -----------------------------------------------------------------------
-!
-      subroutine deallocate_work_4_field_ctl
-!
-      deallocate( phys_nod_name_tmp )
-      deallocate( visualize_ctl_tmp )
-      deallocate( monitor_ctl_tmp   )
-!
-      end subroutine deallocate_work_4_field_ctl
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine copy_field_ctl_to_tmp
-!
-      use m_ctl_data_4_fields
-!
-      integer(kind = kint) :: i
-!
-      do i = 1, num_nod_phys_tmp
-        phys_nod_name_tmp(i) =  field_ctl%c1_tbl(i)
-        visualize_ctl_tmp(i) =  field_ctl%c2_tbl(i)
-        monitor_ctl_tmp(i) =    field_ctl%c3_tbl(i)
-      end do
-!
-      end subroutine copy_field_ctl_to_tmp
-!
-! -----------------------------------------------------------------------
-!
-      subroutine copy_field_ctl_from_tmp
-!
-      use m_ctl_data_4_fields
+      integer(kind = kint), intent(in) ::  num_copy
+      type(ctl_array_c3), intent(in) ::    org_field_ctl
+      type(ctl_array_c3), intent(inout) :: tgt_field_ctl
 !
       integer(kind = kint) :: i
 !
 !
-      call alloc_control_array_c3(field_ctl)
-!
-      do i = 1, num_nod_phys_tmp
-        field_ctl%c1_tbl(i) = phys_nod_name_tmp(i)
-        field_ctl%c2_tbl(i) =  visualize_ctl_tmp(i)
-        field_ctl%c3_tbl(i) =  monitor_ctl_tmp(i)
+      do i = 1, num_copy
+        tgt_field_ctl%c1_tbl(i) = org_field_ctl%c1_tbl(i)
+        tgt_field_ctl%c2_tbl(i) = org_field_ctl%c2_tbl(i)
+        tgt_field_ctl%c3_tbl(i) = org_field_ctl%c3_tbl(i)
       end do
 !
-      end subroutine copy_field_ctl_from_tmp
+      end subroutine copy_field_ctl
 !
 ! -----------------------------------------------------------------------
 !

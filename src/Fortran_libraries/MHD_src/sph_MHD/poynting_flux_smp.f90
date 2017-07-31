@@ -16,8 +16,8 @@
 !!     &          a_r_1d_rtp_r, cot_theta_1d_rtp, b_field, u_field,     &
 !!     &          grad_ux, grad_uy, grad_uz, magne_streach)
 !!
-!!      subroutine cal_rtp_magnetic_streach(np_smp, nnod,               &
-!!     &          inod_smp_stack, nri, jmax, a_r_1d_rtp_r,              &
+!!      subroutine cal_rtp_magnetic_streach_tmp(np_smp, nnod,           &
+!!     &          inod_smp_stack, nri, nth, a_r_1d_rtp_r,               &
 !!     &          cot_theta_1d_rtp, b_field, u_field,                   &
 !!     &          grad_ux, grad_uy, grad_uz, magne_streach)
 !!@endverbatim
@@ -112,15 +112,15 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_rtp_magnetic_streach(np_smp, nnod,                 &
-     &          inod_smp_stack, nri, jmax, a_r_1d_rtp_r,                &
+     &          inod_smp_stack, nri, nth, a_r_1d_rtp_r,                 &
      &          cot_theta_1d_rtp, b_field, u_field,                     &
      &          grad_ux, grad_uy, grad_uz, magne_streach)
 !
       integer (kind=kint), intent(in) :: np_smp, nnod
       integer (kind=kint), intent(in) :: inod_smp_stack(0:np_smp)
-      integer (kind=kint), intent(in) :: nri, jmax
+      integer (kind=kint), intent(in) :: nri, nth
       real (kind=kreal), intent(in) :: a_r_1d_rtp_r(nri)
-      real (kind=kreal), intent(in) :: cot_theta_1d_rtp(jmax)
+      real (kind=kreal), intent(in) :: cot_theta_1d_rtp(nth)
       real (kind=kreal), intent(in) :: grad_ux(nnod,3), grad_uy(nnod,3)
       real (kind=kreal), intent(in) :: grad_uz(nnod,3)
       real (kind=kreal), intent(in) :: u_field(nnod,3), b_field(nnod,3)
@@ -136,7 +136,7 @@
         do inod = ist, ied
           kr =   ione + mod( (inod-ione),nri)
           lnod = ione + (inod - kr) / nri
-          lt =   ione + mod( (lnod-ione),jmax)
+          lt =   ione + mod( (lnod-ione),nth)
 !
           magne_streach(inod,1) =  grad_ux(inod,1)*b_field(inod,1)      &
      &                           + grad_ux(inod,2)*b_field(inod,2)      &
@@ -167,15 +167,15 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_rtp_magnetic_streach_tmp(np_smp, nnod,             &
-     &          inod_smp_stack, nri, jmax, a_r_1d_rtp_r,                &
+     &          inod_smp_stack, nri, nth, a_r_1d_rtp_r,                 &
      &          cot_theta_1d_rtp, b_field, u_field,                     &
      &          grad_ux, grad_uy, grad_uz, magne_streach)
 !
       integer (kind=kint), intent(in) :: np_smp, nnod
       integer (kind=kint), intent(in) :: inod_smp_stack(0:np_smp)
-      integer (kind=kint), intent(in) :: nri, jmax
+      integer (kind=kint), intent(in) :: nri, nth
       real (kind=kreal), intent(in) :: a_r_1d_rtp_r(nri)
-      real (kind=kreal), intent(in) :: cot_theta_1d_rtp(jmax)
+      real (kind=kreal), intent(in) :: cot_theta_1d_rtp(nth)
       real (kind=kreal), intent(in) :: grad_ux(nnod,3), grad_uy(nnod,3)
       real (kind=kreal), intent(in) :: grad_uz(nnod,3)
       real (kind=kreal), intent(in) :: u_field(nnod,3), b_field(nnod,3)
@@ -191,7 +191,7 @@
         do inod = ist, ied
           kr =   ione + mod( (inod-ione),nri)
           lnod = ione + (inod - kr) / nri
-          lt =   ione + mod( (lnod-ione),jmax)
+          lt =   ione + mod( (lnod-ione),nth)
 !
 !          magne_streach(inod,1) =  grad_ux(inod,1)*b_field(inod,1)     &
 !     &                           + grad_ux(inod,2)*b_field(inod,2)     &

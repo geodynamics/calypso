@@ -7,8 +7,13 @@
 !>@brief  data at mid-depth of the shell at equator for dynamo benchmark
 !!
 !!@verbatim
-!!      subroutine set_mid_equator_point_global
-!!      subroutine mid_eq_transfer_dynamobench
+!!      subroutine set_mid_equator_point_global                         &
+!!     &         (sph_params, sph_rtp, sph_rj)
+!!      subroutine mid_eq_transfer_dynamobench(time, sph_rj, rj_fld)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
+!!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!        type(phys_data), intent(in) :: rj_fld
 !!@endverbatim
 !
       module m_field_at_mid_equator
@@ -17,7 +22,6 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_spheric_parameter
       use m_field_4_dynamobench
 !
       implicit none
@@ -31,46 +35,58 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_mid_equator_point_global
+      subroutine set_mid_equator_point_global                           &
+     &         (sph_params, sph_rtp, sph_rj)
 !
       use m_phys_labels
-!
       use m_field_on_circle
       use m_circle_transform
+      use t_spheric_parameter
+!
       use sph_MHD_circle_transform
+!
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_rj_grid), intent(in) ::  sph_rj
 !
       real(kind = kreal) :: r_MID
 !
 !
-      r_MID = half * (radius_1d_rj_r(nlayer_ICB)                        &
-     &              + radius_1d_rj_r(nlayer_CMB) )
+      r_MID = half * (sph_rj%radius_1d_rj_r(sph_params%nlayer_ICB)      &
+     &              + sph_rj%radius_1d_rj_r(sph_params%nlayer_CMB) )
 !
       s_circle = r_MID
       z_circle = zero
-      call set_circle_point_global
+      call const_circle_point_global                                    &
+     &   (sph_params%l_truncation, sph_rtp, sph_rj)
 !
       end subroutine set_mid_equator_point_global
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine mid_eq_transfer_dynamobench
+      subroutine mid_eq_transfer_dynamobench(time, sph_rj, rj_fld)
 !
       use calypso_mpi
-      use m_sph_phys_address
-!
       use m_field_on_circle
       use m_circle_transform
+      use t_spheric_rj_data
+      use t_phys_data
+!
       use sph_MHD_circle_transform
+!
+      real(kind=kreal), intent(in) :: time
+      type(sph_rj_grid), intent(in) :: sph_rj
+      type(phys_data), intent(in) :: rj_fld
 !
 !    spherical transfer
 !
-      call sph_transfer_on_circle
+      call sph_transfer_on_circle(sph_rj, rj_fld)
 !
       if(my_rank .gt. 0) return
 !
 !   Evaluate drift frequencty by velocity 
 !
-      call cal_drift_by_v44
+      call cal_drift_by_v44(time)
 !
 !   find local point for dynamobench
 !
@@ -82,10 +98,11 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_drift_by_v44
+      subroutine cal_drift_by_v44(time)
 !
-      use m_t_step_parameter
       use m_field_on_circle
+!
+      real(kind=kreal), intent(in) :: time
 !
       integer(kind = kint) :: j4c, j4s
       real(kind = kreal) :: vp44c, vp44s
@@ -120,9 +137,6 @@
       subroutine cal_field_4_dynamobench
 !
       use calypso_mpi
-      use m_spheric_parameter
-      use m_sph_spectr_data
-      use m_sph_phys_address
       use m_field_on_circle
       use m_circle_transform
 !

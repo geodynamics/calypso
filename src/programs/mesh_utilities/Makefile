@@ -15,7 +15,6 @@ main_generate_sph_grids.o \
 analyzer_gen_sph_grids.o
 
 MOD_TEST_SPH_GRID = \
-m_read_ctl_gen_sph_shell.o \
 cmp_trans_sph_indices.o \
 cmp_trans_sph_tests.o \
 \
@@ -45,7 +44,7 @@ target_task:
 	>> $(MAKENAME)
 	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_GEN_SPH)' \
 	'$$(MOD_GEN_SPH_GRID)' \
-	'-L. $$(LIB_CALYPSO)' \
+	'-L. $$(LIB_CALYPSO)  $$(LIB_CALYPSO_C)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo '$$(TARGET_TEST_SPH_GRID):' \
@@ -53,7 +52,7 @@ target_task:
 	>> $(MAKENAME)
 	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_TEST_SPH_GRID)' \
 	'$$(MOD_TEST_SPH_GRID)' \
-	'-L. $$(LIB_CALYPSO)' \
+	'-L. $$(LIB_CALYPSO)  $$(LIB_CALYPSO_C)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 

@@ -7,13 +7,15 @@
 !>@brief  field data on specific circle at (s,z)
 !!
 !!@verbatim
-!!      subroutine allocate_circle_field
+!!      subroutine allocate_circle_field(mphi_rtp, nidx_global_jmax)
 !!      subroutine deallocate_circle_field
 !!
 !!      subroutine write_field_data_on_circle(i_step, time)
 !!      subroutine read_field_data_on_circle(i_step, time, ierr)
 !!
-!!      subroutine open_read_field_data_on_circle
+!!      subroutine open_read_field_data_on_circle(sph_rtp, sph_rj)
+!!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!      subroutine close_field_data_on_circle
 !!@endverbatim
 !
@@ -23,7 +25,6 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_spheric_parameter
 !
       use t_phys_data
 !
@@ -85,17 +86,15 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine allocate_circle_field
+      subroutine allocate_circle_field(mphi_rtp, nidx_global_jmax)
 !
       use calypso_mpi
-      use m_spheric_parameter
-      use m_sph_spectr_data
       use m_circle_transform
 !
-      integer(kind = kint) :: num
+      integer(kind = kint), intent(in) :: mphi_rtp, nidx_global_jmax
 !
 !
-      if(mphi_circle .le. izero) mphi_circle = nidx_rtp(3)
+      if(mphi_circle .le. izero) mphi_circle = mphi_rtp
       allocate(v_rtp_circle(mphi_circle,6))
       v_rtp_circle = 0.0d0
 !
@@ -104,13 +103,11 @@
       vrtm_mag = 0.0d0
       vrtm_phase = 0.0d0
 !
-      num = nidx_global_rj(2)
-      allocate( d_rj_circ_lc(0:num,d_circle%ntot_phys) )
+      allocate( d_rj_circ_lc(0:nidx_global_jmax,d_circle%ntot_phys) )
       d_rj_circ_lc = 0.0d0
 !
       if(my_rank .eq. 0) then
-        num = nidx_global_rj(2)
-        allocate( d_rj_circle(0:num,d_circle%ntot_phys) )
+        allocate( d_rj_circle(0:nidx_global_jmax,d_circle%ntot_phys) )
 !
         d_rj_circle = 0.0d0
       end if
@@ -313,10 +310,16 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine open_read_field_data_on_circle
+      subroutine open_read_field_data_on_circle(sph_rtp, sph_rj)
 !
       use m_circle_transform
       use skip_comment_f
+!
+      use t_spheric_rtp_data
+      use t_spheric_rj_data
+!
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_rj_grid), intent(in) ::  sph_rj
 !
       character(len=255) :: tmpchara
       character(len=kchara) :: phi_name
@@ -343,7 +346,8 @@
       write(*,*) 'alloc_phys_name_type'
       call alloc_phys_name_type(d_circle)
       write(*,*) 'allocate_circle_field'
-      call allocate_circle_field
+      call allocate_circle_field                                        &
+     &   (sph_rtp%nidx_rtp(3), sph_rj%nidx_global_rj(2))
 !
       d_circle%num_component = 1
 !

@@ -109,8 +109,6 @@
 !>   temporal character for reading line
        character(len=255), private :: character_4_read
 !
-      private :: hd_begin, hd_end, hd_array, hd_file
-!
 !   --------------------------------------------------------------------
 !
       contains

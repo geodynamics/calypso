@@ -63,7 +63,7 @@
       integer(kind = kint) :: nneib_send, nneib_recv
 !
 !
-      call resize_work_4_SR(NB, nprocs-1, NP, ntot)
+      call resize_work_4_SR(NB, ione, nprocs-ione, NP, ntot)
 !
       nneib_send = 0
       nneib_recv = 0
@@ -159,7 +159,7 @@
       integer(kind = kint) :: nneib_send, nneib_recv
 !
 !
-      call resize_iwork_4_SR(nprocs-1, NB*NP, NB*ntot)
+      call resize_iwork_4_SR(ione, nprocs-ione, NB*NP, NB*ntot)
 !
       nneib_send = 0
       nneib_recv = 0
@@ -255,7 +255,7 @@
       integer(kind = kint) :: nneib_send, nneib_recv
 !
 !
-      call resize_i8work_sph_SR(ione, nprocs-1, NB*NP, NB*ntot)
+      call resize_i8work_4_SR(ione, nprocs-1, NB*NP, NB*ntot)
 !
       nneib_send = 0
       nneib_recv = 0

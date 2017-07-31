@@ -12,16 +12,16 @@
 !!      subroutine set_unit_mat_4_poisson(nri, jmax, kr_in, kr_out,     &
 !!     &          mat3)
 !!
-!!      subroutine add_scalar_poisson_mat_sph(nri, jmax, kr_in, kr_out, &
-!!     &          coef_p, mat3)
-!!         
-!!      subroutine add_vector_poisson_mat_sph(nri, jmax, kr_in, kr_out, &
-!!     &          kr_in, kr_out, coef_p, mat3)
-!!
-!!      subroutine add_scalar_r_diffuse_mat_sph(nri, jmax,              &
-!!     &          kr_in, kr_out, coef_p, val_r, dval_r, mat3)
-!!      subroutine add_vector_r_diffuse_mat_sph(nri, jmax,              &
-!!     &          kr_in, kr_out, coef_p, val_r, dval_r, mat3)
+!!      subroutine add_scalar_poisson_mat_sph(nri, jmax, ar_1d_rj,      &
+!!     &         g_sph_rj, kr_in, kr_out, coef_p,                       &
+!!     &         d1nod_mat_fdm_2, d2nod_mat_fdm_2, mat3)
+!!      subroutine add_vector_poisson_mat_sph(nri, jmax, ar_1d_rj,      &
+!!     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
+!!      subroutine add_scalar_r_diffuse_mat_sph(nri, jmax, ar_1d_rj,    &
+!!     &         g_sph_rj, kr_in, kr_out, coef_p, val_r, dval_r,        &
+!!     &         d1nod_mat_fdm_2, d2nod_mat_fdm_2, mat3)
+!!      subroutine add_vector_r_diffuse_mat_sph(nri, jmax, ar_1d_rj,    &
+!!     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
 !!
 !!    Format of band matrix
 !!               | a(2,1)  a(1,2)  ........     0         0     |
@@ -53,7 +53,6 @@
 !!@n @param kr_ed   End radial address to construct matrix
 !!@n @param kr_in    Radial address for inner boundary
 !!@n @param kr_out   Radial address for outer boundary
-!!@n @param coef_imp   Coefficient for contribution of implicit term
 !!@n @param coef_d     Coefficient of diffusiotn term
 !!@n @param coef_p     Coefficient of pressure gradient
 !!
@@ -66,9 +65,6 @@
 !
       use calypso_mpi
       use m_constants
-      use m_spheric_parameter
-      use m_schmidt_poly_on_rtm
-      use m_fdm_coefs
 !
       implicit none
 !
@@ -172,12 +168,17 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine add_scalar_poisson_mat_sph(nri, jmax, kr_in, kr_out,   &
-     &          coef_p, mat3)
+      subroutine add_scalar_poisson_mat_sph(nri, jmax, ar_1d_rj,        &
+     &          g_sph_rj, kr_in, kr_out, coef_p,                        &
+     &          d1nod_mat_fdm_2, d2nod_mat_fdm_2, mat3)
 !
       integer(kind = kint), intent(in) :: jmax, nri
       integer(kind = kint), intent(in) :: kr_in, kr_out
+      real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
       real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: d1nod_mat_fdm_2(nri,-1:1)
+      real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
 !
       real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
 !
@@ -205,12 +206,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine add_vector_poisson_mat_sph(nri, jmax, kr_in, kr_out,   &
-     &          coef_p, mat3)
+      subroutine add_vector_poisson_mat_sph(nri, jmax, ar_1d_rj,        &
+     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
 !
       integer(kind = kint), intent(in) :: jmax, nri
       integer(kind = kint), intent(in) :: kr_in, kr_out
+      real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
       real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
 !
       real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
 !
@@ -236,13 +240,18 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine add_scalar_r_diffuse_mat_sph(nri, jmax,                &
-     &          kr_in, kr_out, coef_p, val_r, dval_r, mat3)
+      subroutine add_scalar_r_diffuse_mat_sph(nri, jmax, ar_1d_rj,      &
+     &          g_sph_rj, kr_in, kr_out, coef_p, val_r, dval_r,         &
+     &          d1nod_mat_fdm_2, d2nod_mat_fdm_2, mat3)
 !
       integer(kind = kint), intent(in) :: jmax, nri
       integer(kind = kint), intent(in) :: kr_in, kr_out
+      real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
       real(kind = kreal), intent(in) :: coef_p
       real(kind = kreal), intent(in) :: val_r(nri), dval_r(nri)
+      real(kind = kreal), intent(in) :: d1nod_mat_fdm_2(nri,-1:1)
+      real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
 !
       real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
 !
@@ -273,13 +282,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine add_vector_r_diffuse_mat_sph(nri, jmax,                &
-     &          kr_in, kr_out, coef_p, val_r, dval_r, mat3)
+      subroutine add_vector_r_diffuse_mat_sph(nri, jmax, ar_1d_rj,      &
+     &         g_sph_rj, kr_in, kr_out, coef_p, d2nod_mat_fdm_2, mat3)
 !
       integer(kind = kint), intent(in) :: jmax, nri
       integer(kind = kint), intent(in) :: kr_in, kr_out
+      real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
+      real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
       real(kind = kreal), intent(in) :: coef_p
-      real(kind = kreal), intent(in) :: val_r(nri), dval_r(nri)
+      real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
 !
       real(kind = kreal), intent(inout) :: mat3(3,nri,jmax)
 !

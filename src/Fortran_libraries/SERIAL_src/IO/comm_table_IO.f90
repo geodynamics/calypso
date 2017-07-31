@@ -14,14 +14,6 @@
 !!     &          istack_sr, inod_sr)
 !!      subroutine write_send_recv_work(id_file, num_sr, ntot_sr, nwork,&
 !!     &          istack_sr, inod_sr, idx_work)
-!!
-!!      subroutine read_send_recv_item_b(id_file, ntot_sr, inod_sr)
-!!      subroutine read_send_recv_work_b(id_file, ntot_sr, nwork,       &
-!!     &          inod_sr, idx_work)
-!!      subroutine write_send_recv_data_b(id_file, num_sr, ntot_sr,     &
-!!     &          istack_sr, inod_sr)
-!!      subroutine write_send_recv_work_b(id_file, num_sr, ntot_sr,     &
-!!     &          nwork, istack_sr, inod_sr, idx_work)
 !!@endverbatim
 !
       module comm_table_IO
@@ -128,83 +120,6 @@
       end if
 !
       end subroutine write_send_recv_work
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine read_send_recv_item_b(id_file, ntot_sr, inod_sr)
-!
-      integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: ntot_sr
-      integer(kind = kint), intent(inout) :: inod_sr(ntot_sr)
-!
-      read(id_file) inod_sr(1:ntot_sr)
-!
-      end subroutine read_send_recv_item_b
-!
-! -----------------------------------------------------------------------
-!
-      subroutine read_send_recv_work_b(id_file, ntot_sr, nwork,         &
-     &          inod_sr, idx_work)
-!
-      integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: ntot_sr, nwork
-      integer(kind = kint), intent(inout) :: inod_sr(ntot_sr)
-      integer(kind = kint), intent(inout) :: idx_work(ntot_sr,nwork)
-!
-      integer(kind = kint) :: i
-!
-!
-      read(id_file) inod_sr(1:ntot_sr)
-      do i = 1, nwork
-        read(id_file,*) idx_work(1:ntot_sr,i)
-      end do
-!
-      end subroutine read_send_recv_work_b
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine write_send_recv_data_b(id_file, num_sr, ntot_sr,       &
-     &          istack_sr, inod_sr)
-!
-      integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: num_sr, ntot_sr
-      integer(kind = kint), intent(in) :: istack_sr(0:num_sr)
-      integer(kind = kint), intent(in) :: inod_sr(ntot_sr)
-!
-!
-      if (num_sr .gt. 0) then
-        write(id_file) istack_sr(1:num_sr)
-        write(id_file) inod_sr(1:ntot_sr)
-      end if
-!
-      end subroutine write_send_recv_data_b
-!
-! -----------------------------------------------------------------------
-!
-      subroutine write_send_recv_work_b(id_file, num_sr, ntot_sr,       &
-     &          nwork, istack_sr, inod_sr, idx_work)
-!
-      integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: num_sr, ntot_sr, nwork
-      integer(kind = kint), intent(in) :: istack_sr(0:num_sr)
-      integer(kind = kint), intent(in) :: inod_sr(ntot_sr)
-      integer(kind = kint), intent(in) :: idx_work(ntot_sr,nwork)
-!
-      integer(kind = kint) :: i
-!
-!
-      if (num_sr .gt. 0) then
-        write(id_file) istack_sr(1:num_sr)
-        write(id_file) inod_sr(1:ntot_sr)
-        do i = 1, nwork
-          write(id_file) idx_work(1:ntot_sr,i)
-        end do
-      end if
-!
-      end subroutine write_send_recv_work_b
 !
 ! -----------------------------------------------------------------------
 !

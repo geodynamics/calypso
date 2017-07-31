@@ -9,17 +9,17 @@
 !!
 !!@verbatim
 !! ------------------------------------------------------------------
-!!      subroutine init_sph_field_FFTW_t(nidx_rtp, irt_rtp_smp_stack,   &
+!!      subroutine init_sph_field_FFTW(nidx_rtp, irt_rtp_smp_stack,     &
 !!     &          FFTW_t)
-!!      subroutine finalize_sph_field_FFTW_t(FFTW_t)
-!!      subroutine verify_sph_field_FFTW_t(nnod_rtp, nidx_rtp,          &
+!!      subroutine finalize_sph_field_FFTW(FFTW_t)
+!!      subroutine verify_sph_field_FFTW(nnod_rtp, nidx_rtp,            &
 !!     &          irt_rtp_smp_stack, FFTW_t)
 !!
 !!   wrapper subroutine for initierize FFT by FFTW
 !! ------------------------------------------------------------------
 !!
-!!      subroutine sph_fld_fwd_FFTW_to_send_t                           &
-!!     &         (ncomp, nnod_rtp, nidx_rtp, irt_rtp_smp_stack,         &
+!!      subroutine sph_field_fwd_FFTW_to_send                           &
+!!     &         (nnod_rtp, nidx_rtp, irt_rtp_smp_stack, ncomp,         &
 !!     &          n_WS, irev_sr_rtp, X_rtp, WS, FFTW_t)
 !! ------------------------------------------------------------------
 !!
@@ -34,8 +34,8 @@
 !!
 !! ------------------------------------------------------------------
 !!
-!!      subroutine sph_fld_back_FFTW_from_recv_t                        &
-!!     &         (ncomp, nnod_rtp, nidx_rtp, irt_rtp_smp_stack,         &
+!!      subroutine sph_field_back_FFTW_from_recv                        &
+!!     &         (nnod_rtp, nidx_rtp, irt_rtp_smp_stack, ncomp,         &
 !!     &          n_WR, irev_sr_rtp, WR, X_rtp, FFTW_t)
 !! ------------------------------------------------------------------
 !!
@@ -84,7 +84,7 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine init_sph_field_FFTW_t(nidx_rtp, irt_rtp_smp_stack,     &
+      subroutine init_sph_field_FFTW(nidx_rtp, irt_rtp_smp_stack,       &
      &          FFTW_t)
 !
       integer(kind = kint), intent(in) :: nidx_rtp(3)
@@ -133,11 +133,11 @@
       end do
       FFTW_t%aNfft = one / dble(nidx_rtp(3))
 !
-      end subroutine init_sph_field_FFTW_t
+      end subroutine init_sph_field_FFTW
 !
 ! ------------------------------------------------------------------
 !
-      subroutine finalize_sph_field_FFTW_t(FFTW_t)
+      subroutine finalize_sph_field_FFTW(FFTW_t)
 !
       type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
 !
@@ -160,11 +160,11 @@
 !
       call dealloc_FFTW_plan(FFTW_t)
 !
-      end subroutine finalize_sph_field_FFTW_t
+      end subroutine finalize_sph_field_FFTW
 !
 ! ------------------------------------------------------------------
 !
-      subroutine verify_sph_field_FFTW_t(nnod_rtp, nidx_rtp,            &
+      subroutine verify_sph_field_FFTW(nnod_rtp, nidx_rtp,              &
      &          irt_rtp_smp_stack, FFTW_t)
 !
       integer(kind = kint), intent(in) :: nnod_rtp
@@ -173,23 +173,23 @@
       type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
 !
 !
-      if(ASSOCIATED(FFTW_t%X) .eqv. .false.) then
-        call init_sph_field_FFTW_t(nidx_rtp, irt_rtp_smp_stack, FFTW_t)
+      if(allocated(FFTW_t%X) .eqv. .false.) then
+        call init_sph_field_FFTW(nidx_rtp, irt_rtp_smp_stack, FFTW_t)
         return
       end if
 !
       if(size(FFTW_t%X) .ne. nnod_rtp) then
-        call finalize_sph_field_FFTW_t(FFTW_t)
-        call init_sph_field_FFTW_t(nidx_rtp, irt_rtp_smp_stack, FFTW_t)
+        call finalize_sph_field_FFTW(FFTW_t)
+        call init_sph_field_FFTW(nidx_rtp, irt_rtp_smp_stack, FFTW_t)
       end if
 !
-      end subroutine verify_sph_field_FFTW_t
+      end subroutine verify_sph_field_FFTW
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------
 !
-      subroutine sph_fld_fwd_FFTW_to_send_t                             &
-     &         (ncomp, nnod_rtp, nidx_rtp, irt_rtp_smp_stack,           &
+      subroutine sph_field_fwd_FFTW_to_send                             &
+     &         (nnod_rtp, nidx_rtp, irt_rtp_smp_stack, ncomp,           &
      &          n_WS, irev_sr_rtp, X_rtp, WS, FFTW_t)
 !
       integer(kind = kint), intent(in) :: nnod_rtp
@@ -256,12 +256,12 @@
 !$omp end parallel do
 !      elapsed_fftw(1:3) = elapsed_fftw(1:3) + rtmp(1:3) - dummy(1:3)
 !
-      end subroutine sph_fld_fwd_FFTW_to_send_t
+      end subroutine sph_field_fwd_FFTW_to_send
 !
 ! ------------------------------------------------------------------
 !
-      subroutine sph_fld_back_FFTW_from_recv_t                          &
-     &         (ncomp, nnod_rtp, nidx_rtp, irt_rtp_smp_stack,           &
+      subroutine sph_field_back_FFTW_from_recv                          &
+     &         (nnod_rtp, nidx_rtp, irt_rtp_smp_stack, ncomp,           &
      &          n_WR, irev_sr_rtp, WR, X_rtp, FFTW_t)
 !
       integer(kind = kint), intent(in) :: nnod_rtp
@@ -330,7 +330,7 @@
 !
 !      elapsed_fftw(1:3) = elapsed_fftw(1:3) + rtmp(1:3) - dummy(1:3)
 !
-      end subroutine sph_fld_back_FFTW_from_recv_t
+      end subroutine sph_field_back_FFTW_from_recv
 !
 ! ------------------------------------------------------------------
 ! ------------------------------------------------------------------

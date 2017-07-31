@@ -9,7 +9,7 @@
 !!
 !!@verbatim
 !!      subroutine sph_normalizations(l, m, idx_lm, g_lm)
-!!      subroutine idx28
+!!      subroutine idx28(ltr, jmax, idx, g)
 !!***********************************************************************
 !!*    subroutine for make indices for spherical harmonics
 !!*                                     97,12,19
@@ -48,7 +48,7 @@
 !!*
 !!***********************************************************************
 !!*
-!!      subroutine spheric(phi)
+!!      subroutine spheric(ltr, jmax, idx, phi, p, dp, Y)
 !!*************************************************************
 !!*     lead spherical harmonics
 !!*         and differential of spherical harmonics
@@ -57,7 +57,7 @@
 !!*************************************************************
 !!*
 !!*     required subroutine
-!!*         dschmidt.f
+!!*         dschmidt
 !!*
 !!*************************************************************
 !!*
@@ -79,7 +79,6 @@
       use m_precision
 !
       use m_constants
-      use m_spherical_harmonics
 !
       implicit none
 !
@@ -142,8 +141,12 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine idx28
+      subroutine idx28(ltr, jmax, idx, g)
 !*
+      integer(kind = kint) :: ltr, jmax
+      integer(kind = kint) :: idx(0:jmax,2)
+      real(kind = kreal) :: g(0:jmax,17)
+!
       integer(kind = kint) :: idx_lm(2)
       real(kind = kreal) :: g_lm(17)
       integer(kind = kint) :: l, m, j
@@ -151,7 +154,7 @@
 !
 !* -----  set index -----------------
 !*
-      do l = 0, ltr_tri_sph
+      do l = 0, ltr
         do m = -l, l
           j = l*(l+1) + m
           call sph_normalizations(l, m, idx_lm, g_lm)
@@ -165,42 +168,47 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine spheric(phi)
+      subroutine spheric(ltr, jmax, idx, phi, p, dp, Y)
 !*
-      use m_schmidt_polynomial
-!*
+      integer(kind = kint) :: ltr, jmax
+      integer(kind = kint) :: idx(0:jmax,2)
       real(kind= kreal), intent(in) :: phi
+      real(kind = kreal), intent(in) :: p(0:ltr,0:ltr)
+      real(kind = kreal), intent(in) :: dp(0:ltr,0:ltr)
+!
+      real(kind = kreal), intent(inout):: Y(0:jmax,0:3)
+!
       integer(kind = kint) :: j, l, m
 !
 !* ---------- lead spherical harmonics ----------
 !*
-      s(0,0) = one
-      s(0,1) = zero
-      s(0,2) = zero
-      s(0,3) = zero
+      Y(0,0) = one
+      Y(0,1) = zero
+      Y(0,2) = zero
+      Y(0,3) = zero
 !*
-      do 20 j = 1 ,jmax_tri_sph
+      do 20 j = 1, jmax
 !*
         l = idx(j,1)
         if ( idx(j,2) .lt. 0 ) then
           m = -idx(j,2)
-          s(j,0) = p(m,l) * sin( dble(m)*phi )
-          s(j,1) = p(m,l) * dble(m) * cos( dble(m)*phi )
-          s(j,2) = dp(m,l) * sin( dble(m)*phi )
-          s(j,3) = dp(m,l) * dble(m) * cos( dble(m)*phi )
+          Y(j,0) = p(m,l) * sin( dble(m)*phi )
+          Y(j,1) = p(m,l) * dble(m) * cos( dble(m)*phi )
+          Y(j,2) = dp(m,l) * sin( dble(m)*phi )
+          Y(j,3) = dp(m,l) * dble(m) * cos( dble(m)*phi )
 !*
         else if ( idx(j,2) .eq. 0 ) then
           m = idx(j,2)
-          s(j,0) = p(m,l)
-          s(j,1) = zero
-          s(j,2) = dp(m,l)
-          s(j,3) = zero
+          Y(j,0) = p(m,l)
+          Y(j,1) = zero
+          Y(j,2) = dp(m,l)
+          Y(j,3) = zero
         else
           m = idx(j,2)
-          s(j,0) = p(m,l) * cos( dble(m)*phi )
-          s(j,1) = - p(m,l) * dble(m) * sin( dble(m)*phi )
-          s(j,2) = dp(m,l) * cos( dble(m)*phi )
-          s(j,3) = - dp(m,l) * dble(m) * sin( dble(m)*phi )
+          Y(j,0) =   p(m,l) * cos( dble(m)*phi )
+          Y(j,1) = - p(m,l) * dble(m) * sin( dble(m)*phi )
+          Y(j,2) =   dp(m,l) * cos( dble(m)*phi )
+          Y(j,3) = - dp(m,l) * dble(m) * sin( dble(m)*phi )
         endif
 !*
   20  continue
