@@ -61,9 +61,9 @@
 !
       use field_IO_select
       use set_field_file_names
-!#ifdef ZLIB_IO
+#ifdef ZLIB_IO
       use gz_assembled_field_MPI_IO
-!#endif
+#endif
 !
       integer(kind = kint), intent(in) :: istep_fld
       integer(kind = kint), intent(in) :: nloop, nprocs_in
@@ -76,7 +76,7 @@
       character(len=kchara) :: file_name
 !
 !
-!#ifdef ZLIB_IO
+#ifdef ZLIB_IO
       if(nprocs_in .ne. nprocs) then
         do iloop = 1, nloop
           id_rank = my_rank + (iloop-1) * nprocs
@@ -98,7 +98,7 @@
           return
         end if
       end if
-!#endif
+#endif
 !
       do iloop = 1, nloop
         id_rank = my_rank + (iloop-1) * nprocs

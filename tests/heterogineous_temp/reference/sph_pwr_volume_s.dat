@@ -1,7 +1,11 @@
 radial_layers, truncation
-               0               4
+              65               4
 ICB_id, CMB_id
                1              65
+Lower boudary
+               1  5.38461538461538E-001
+Upper boundary
+              65  1.53846153846154E+000
 number of components
                2               2
     1    1

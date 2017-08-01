@@ -20,6 +20,9 @@
 !
       integer(kind = kint) :: ierr, i, icomp, itmp, istep, istep_ref
       integer(kind = kint) :: nfld, ltr_sph
+      integer(kind = kint) :: ICB_id, CMB_id
+      integer(kind = kint) :: kr_in, kr_out
+      real(kind = kreal) :: r_in, r_out
       character(len=255) :: tmpchara
 !
       character(len = kchara) :: fname_rms_vol = 'sph_pwr_volume_s.dat'
@@ -39,7 +42,11 @@
       read(id_file_rms,*)
       read(id_file_rms,*) itmp, ltr_sph
       read(id_file_rms,*)
+      read(id_file_rms,*) ICB_id, CMB_id
       read(id_file_rms,*)
+      read(id_file_rms,*) kr_in, r_in
+      read(id_file_rms,*)
+      read(id_file_rms,*) kr_out, r_out
       read(id_file_rms,*)
       read(id_file_rms,*) nfld, ntot_sph_spec
 !
@@ -70,7 +77,11 @@
       read(id_file_rms,*)
       read(id_file_rms,*) itmp, ltr_sph
       read(id_file_rms,*)
+      read(id_file_rms,*) ICB_id, CMB_id
       read(id_file_rms,*)
+      read(id_file_rms,*) kr_in, r_in
+      read(id_file_rms,*)
+      read(id_file_rms,*) kr_out, r_out
       read(id_file_rms,*)
       read(id_file_rms,*) nfld, ntot_sph_spec
 !
