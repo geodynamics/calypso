@@ -60,7 +60,7 @@ BLAS_LIBS = @BLAS_LIBS@
 #   libpng and zlib settings
 #
 ZLIB_CFLAGS = @ZLIB_CFLAGS@
-ZLIB_LIB =    @ZLIB_LIB@
+ZLIB_LIBS =   @ZLIB_LIBS@
 #
 #    FFTW3 settings
 #
@@ -103,8 +103,8 @@ makemake: $(MAKE_MOD_DEP)
 		MPICHBINDIR="$(MPICHBINDIR)" \
 		MPICHINCDIR="$(MPICHINCDIR)" \
 		BLAS_LIBS="$(BLAS_LIBS)" \
-		ZLIB_CFLAGS="$(ZLIB_CFLAGS)" \
-		ZLIB_LIB="$(ZLIB_LIB)"       \
+		ZLIB_CFLAGS="$(ZLIB_CFLAGS)"   \
+		ZLIB_LIBS="$(ZLIB_LIBS)"       \
 		FFTW3_CFLAGS="$(FFTW3_CFLAGS)" \
 		FFTW3_LIBS="$(FFTW3_LIBS)" \
 		HDF5_FFLAGS="$(HDF5_FFLAGS)" \

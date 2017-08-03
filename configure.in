@@ -57,6 +57,12 @@ else
 	F77=${FC}
 fi
 
+if test ${host_alias} = "powerpc64-bgq-linux"
+then
+  XL_FORTRAN="__bgq__"
+fi
+AC_SUBST(XL_FORTRAN)
+
 if test -z ${AR}
 then
 	ar_bin="ar"
@@ -126,6 +132,10 @@ if test ${USE_fftw3} = "yes"
 then
   enable_connect_to_c="yes"
 fi
+if test ${with_zlib} != "no"
+then
+  enable_connect_to_c="yes"
+fi
 AC_MSG_RESULT(enable_connect_to_c..."${enable_connect_to_c}")
 
 
@@ -163,12 +173,25 @@ then
 	AC_SUBST(FFTW3_LIBS)
 
 # Check zlib
-	AX_CHECK_ZLIB
-	if test -n "${LIBS}"; then
-		ZLIB_CFLAGS="${CPPFLAGS}"
-		ZLIB_LIB="${LDFLAGS} ${LIBS}"
+	if test ${with_zlib} != "no"
+	then
+		PKG_CHECK_MODULES([ZLIB], zlib, have_zlib=yes, AC_MSG_ERROR(Cannot find zlib))
+		echo "have_zlib=$have_zlib"
+		
+		if test ${have_zlib} = "yes"
+		then
+			PKGFLAGS_ZLIB="z"
+		else
+			AX_CHECK_ZLIB
+			if test -n "${LIBS}"
+			then
+				ZLIB_CFLAGS="${CPPFLAGS}"
+				ZLIB_LIBS="${LDFLAGS} ${LIBS}"
+			fi
+		fi
+		AC_SUBST(PKGFLAGS_ZLIB)
 		AC_SUBST(ZLIB_CFLAGS)
-		AC_SUBST(ZLIB_LIB)
+		AC_SUBST(ZLIB_LIBS)
 	fi
 fi
 
@@ -176,6 +199,9 @@ fi
 AC_MSG_RESULT()
 AC_MSG_RESULT(-----   Configuration summary   -------------------------------)
 AC_MSG_RESULT()
+AC_MSG_RESULT(  host:        "${host}")
+AC_MSG_RESULT(  host_alias:  "${host_alias}")
+AC_MSG_RESULT(XL_FORTRAN:    "${XL_FORTRAN}")
 if test -n "${OPENMP_FCFLAGS}"; then
         AC_MSG_RESULT(    Use OpenMP ...        yes)
 else
@@ -199,7 +225,7 @@ else
         AC_MSG_RESULT(    Use parallel HDF5 ...  no)
 fi
 AC_MSG_RESULT()
-if test -n "${ZLIB_LIB}"; then
+if test -n "${ZLIB_LIBS}"; then
         AC_MSG_RESULT(    Use zlib at ...       yes)
 else
         AC_MSG_RESULT(    Use zlib ...           no)

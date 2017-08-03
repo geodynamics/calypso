@@ -38,15 +38,51 @@ File prefix of spectrum data for restarting and snapshots \verb|[rst_prefix]| is
 \verb|[fld_prefix]| \\
 File prefix of field data for visualize snapshots \verb|[fld_prefix]| is defined by text. Step number and file extension are  added after this file prefix.
 
+\paragraph{\tt sph\_file\_fmt\_ctl}
+\label{href_t:sph_file_fmt_ctl}
+\verb|[sph_formayt]| \\
+File format of spherical harmonics indexing and FEM mesh file \verb|[sph_format]| is defined by text. Following data formats can be defined. Extensions of each data format is listed in Table \ref{table:mesh_format}.
+%
+\begin{description}
+\item{\tt ascii: }   Distributed ASCII data
+\item{\tt binary: }  Distributed binary data
+\item{\tt merged: }  Merged ASCII data
+\item{\tt merged\_bin: }   Merged binary data
+\item{\tt gzip: }            Compressed distributed ASCII data
+\item{\tt binary\_gz: }      Compressed distributed binary data
+\item{\tt merged\_gz: }      Compressed merged ASCII data
+\item{\tt merged\_bin\_gz: } Compressed merged binary data
+\end{description}
+%
+
+\paragraph{\tt restart\_file\_fmt\_ctl}
+\label{href_t:restart_file_fmt_ctl}
+\verb|[rst_format]| \\
+File format of restart files \verb|[rst_format]| is defined by text. Following data formats can be defined. Extensions of each data format is listed in Table \ref{table:restart_format}.
+%
+\begin{description}
+\item{\tt ascii: }   Distributed ASCII data
+\item{\tt binary: }  Distributed binary data
+\item{\tt merged: }  Merged ASCII data
+\item{\tt merged\_bin: }   Merged binary data
+\item{\tt gzip: }            Compressed distributed ASCII data
+\item{\tt binary\_gz: }      Compressed distributed binary data
+\item{\tt merged\_gz: }      Compressed merged ASCII data
+\item{\tt merged\_bin\_gz: } Compressed merged binary data
+\end{description}
+%
+
 \paragraph{\tt field\_file\_fmt\_ctl}
 \label{href_t:field_file_fmt_ctl}
 \verb|[fld_format]| \\
 Field data field format for visualize snapshots \verb|[fld_format]| is defined by text. The following formats are currently supported.
 %
 \begin{description}
-\item{\tt single\_HDF5}  Merged HDF5 file (Available if HDF5 library is linked)
-\item{\tt single\_VTK}   Merged VTK file (Default)
-\item{\tt VTK}           Distributed VTK file
+\item{\tt single\_HDF5: }  Merged HDF5 file (Available if HDF5 library is linked)
+\item{\tt single\_VTK: }   Merged VTK file (Default)
+\item{\tt VTK: }           Distributed VTK file
+\item{\tt single\_VTK\_gz: }   Compressed merged VTK file (Available if zlib library is linked)
+\item{\tt VTK\_gz: }           Compressed distributed VTK file (Available if zlib library is linked)
 \end{description}
 %
 

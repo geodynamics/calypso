@@ -30,7 +30,7 @@ FC_NAME_MANGLE = FC_NAME_LOWER_USCORE
 #   zlib and libpng settings
 #
 ZLIB_CFLAGS =
-ZLIB_LIB =
+ZLIB_LIBS =
 #
 #  -------------------------------------------------------------------------
 #
@@ -49,10 +49,10 @@ C_INCLUDE = -I.
 ifdef FC_NAME_MANGLE
   CPP_FLAGS = -DCONNECT_TO_C
 
-  ifdef ZLIB_LIB
+  ifdef ZLIB_LIBS
     CPP_FLAGS += -DZLIB_IO
     C_INCLUDE+= $$(ZLIB_CFLAGS) 
-    F90LIBS+= $$(ZLIB_LIB)
+    F90LIBS+= $$(ZLIB_LIBS)
   endif
 endif
 

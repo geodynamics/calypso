@@ -62,7 +62,7 @@ mod_list:
 		( cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
-		ZLIB_LIB='$(ZLIB_LIB)'       \
+		ZLIB_LIBS='$(ZLIB_LIBS)'     \
 		PNG_LIBS='$(PNG_LIBS)'       \
 		FFTW3_C='$(FFTW3_C)'   \
 		MAKENAME='$(MAKENAME)' \

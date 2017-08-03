@@ -9,26 +9,53 @@
 \label{fig:gen_sph_grid}
 \end{figure}
 %
-This program generates index table and a communication table for parallel spherical harmonics, table of integrals for Coriolis term, and FEM mesh information to generate visualization data (see Figure \ref{fig:gen_sph_grid}). This program needs control file for input. This program can perform with {\bf any} number of MPI processes less than the number of subdomains. The output files include the indexing tables. 
+This program generates index table and a communication table for parallel spherical harmonics, table of integrals for Coriolis term, and FEM mesh information to generate visualization data (see Figure \ref{fig:gen_sph_grid}). This program needs control file for input. This program can perform with {\bf any} number of MPI processes less than the number of subdomains, but is required to run with the SAME number of subdomains to generate MERGED data . The output files include the indexing tables. 
 
 %
 \begin{table}[htp]
 \caption{List of files for {\tt gen\_sph\_grid} }
 \begin{center} 
-\begin{tabular}{|c|c|c|}
+\begin{tabular}{|c|c|c|c|}
 \hline
- extension & Parallelization & I/O \\ \hline \hline
-\verb|control_sph_grid| & Single & Input \\ \hline
-\verb|[sph_prefix].[domain#].rj|  & Distributed & Output \\
-\verb|[sph_prefix].[domain#].rlm| & Distributed & Output \\
-\verb|[sph_prefix].[domain#].rtm| & Distributed & Output \\
-\verb|[sph_prefix].[domain#].rtp| & Distributed & Output \\ \hline
-\verb|[sph_prefix].[domain#].gfm| & Distributed & Output \\
-\verb|radial_info.dat| & Single & Output \\ \hline
+Files & extension & Parallelization & I/O \\ \hline \hline
+Control file & \verb|control_sph_grid| & Single & Input \\ \hline
+Index for $(r,j)$ & \verb|[sph_prefix].[rj_extension]|　& - & Output \\
+Index for $(r,l,m)$ & \verb|[sph_prefix].[rlm_extension]| & - & Output \\
+Index for $(r,t,m)$ & \verb|[sph_prefix].[rtm_extension]| & - & Output \\
+Index for $(r,t,p)$ & \verb|[sph_prefix].[rtp_extension]| & - & Output \\ \hline
+FEM mesh & \verb|[sph_prefix].[fem_extension]| & - & Output \\ \hline
+Radial point list & \verb|radial_info.dat| & Single & Output \\ \hline
 \end{tabular}
 \end{center}
 \label{table:gen_sph_grid}
 \end{table}
+%
+%
+\begin{table}[htp]
+\caption{data format flag {[\tt sph\_file\_fmt\_ctl]} and extensions.}
+\begin{center} 
+\begin{tabular}{|c||c|c|c|c|}
+\hline
+  \multicolumn{5}{|c|}{Distributed files} \\ \hline
+  \verb|[sph_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|gzip_bin| \\ \hline
+\verb|[rj_extension]|  & \verb|[#].rj|  & \verb|[#].brj| & \verb|[#].rj.gz|  & \verb|[#].brj.gz| \\
+\verb|[rlm_extension]| & \verb|[#].rlm| & \verb|[#].blm| & \verb|[#].rlm.gz| & \verb|[#].blm.gz| \\
+\verb|[rtm_extension]| & \verb|[#].rtm| & \verb|[#].btm| & \verb|[#].rtm.gz| & \verb|[#].btm.gz| \\
+\verb|[rtp_extension]| & \verb|[#].rtp| & \verb|[#].btp| & \verb|[#].rtp.gz| & \verb|[#].btp.gz| \\ \hline
+\verb|[fem_extension]| & \verb|[#].gfm| & \verb|[#].gfb| & \verb|[#].gfm.gz| & \verb|[#].gfb.gz| \\ \hline \hline
+  \multicolumn{5}{|c|}{Single file}  \\ \hline
+  \verb|[sph_file_fmt_ctl]| & \verb|merged| & \verb|merged_bin| & \verb|merged_gz| & \verb|merged_bin_gz| \\ \hline
+\verb|[rj_extension]|   & \verb|.rj|  & \verb|.brj| & \verb|.rj.gz|  & \verb|.brj.gz| \\
+\verb|[rlm_extension]| & \verb|.rlm| & \verb|.blm| & \verb|.rlm.gz| & \verb|.blm.gz| \\
+\verb|[rtm_extension]| & \verb|.rtm| & \verb|.btm| & \verb|.rtm.gz| & \verb|.btm.gz| \\
+\verb|[rtp_extension]| & \verb|.rtp| & \verb|.btp| & \verb|.rtp.gz| & \verb|.btp.gz| \\ \hline
+\verb|[fem_extension]| & \verb|.gfm| & \verb|.gfb| & \verb|.gfm.gz| & \verb|.gfb.gz| \\ \hline \hline
+  \multicolumn{5}{c}{{\tt [\#]} is the domain or process number} \\
+\end{tabular}
+\end{center}
+\label{table:mesh_format}
+\end{table}
+%
 %
 
 \subsection{Position of radial grid}
@@ -85,7 +112,9 @@ Control file ({\tt control\_sph\_shell}) consists the following items. Detailed 
 	\item \verb|num_subdomain_ctl        [Num_PE]|
 		\hyperref[href_t:num_subdomain_ctl]{(Detail)}
 	\item \verb|sph_file_prefix          [sph_prefix]|
-    		\hyperref[href_t:sph_file_prefix]{(Detail)}
+			\hyperref[href_t:sph_file_prefix]{(Detail)}
+	\item \verb|sph_file_fmt_ctl         [sph_format]|
+			\hyperref[href_t:sph_file_fmt_ctl]{(Detail)}
 	\end{itemize}
 %
 \item \verb|num_domain_ctl|
@@ -146,15 +175,15 @@ If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined
 \verb|gen_sph_grid| generates indexing table of the spherical transform. To perform spherical harmonics transform with distributed memory computers, data communication table is also included in these files. Calypso needs four indexing data for the spherical transform.
 %
 \begin{description}
-\item{\verb|[sph_prefix].[domain#].rj|} Indexing table for spectrum data $f(r,l,m)$ to calculate linear terms. In program,  spherical harmonics modes $(l,m)$ is indexed by $j = l(l+1) + m$. The spectrum data are decomposed by spherical harmonics modes $j$. Data communication table for Legendre transform is included. The data also have the radial index of the ICB and CMB.
-\item{\verb|[sph_prefix].[domain#].rlm|} Indexing table for spectrum data $f(r,l,m)$ for Legendre transform. The spectrum data are decomposed by radial direction $r$ and spherical harmonics order $m$. Data communication table to caricurate liner terms is included.
-\item{\verb|[sph_prefix].[domain#].rtm|} Indexing table for data $f(r,\theta,m)$ for Legendre transform. The data are decomposed by radial direction $r$ and spherical harmonics order $m$. Data communication table for backward Fourier transform is included.
-\item{\verb|[sph_prefix].[domain#].rtp|} Indexing table for data $f(r,\theta,m)$ for Fourier transform and field data $f(r,\theta,\phi)$. The data are decomposed by radial direction $r$ and meridional direction $\theta$. Data communication table for forward Legendre transform is included.
+\item{\verb|[sph_prefix].[rj_extension]|} Indexing table for spectrum data $f(r,l,m)$ to calculate linear terms. In program,  spherical harmonics modes $(l,m)$ is indexed by $j = l(l+1) + m$. The spectrum data are decomposed by spherical harmonics modes $j$. Data communication table for Legendre transform is included. The data also have the radial index of the ICB and CMB. Extension \verb|[rj_extension]| is listed in Table \ref{table:mesh_format}.
+\item{\verb|[sph_prefix].[rlm_extension]|} Indexing table for spectrum data $f(r,l,m)$ for Legendre transform. The spectrum data are decomposed by radial direction $r$ and spherical harmonics order $m$. Data communication table to caricurate liner terms is included. Extension \verb|[rlm_extension]| is listed in Table \ref{table:mesh_format}.
+\item{\verb|[sph_prefix].[rtm_extension]|} Indexing table for data $f(r,\theta,m)$ for Legendre transform. The data are decomposed by radial direction $r$ and spherical harmonics order $m$. Data communication table for backward Fourier transform is included. Extension \verb|[rtm_extension]| is listed in Table \ref{table:mesh_format}.
+\item{\verb|[sph_prefix].[rtp_extension]|} Indexing table for data $f(r,\theta,m)$ for Fourier transform and field data $f(r,\theta,\phi)$. The data are decomposed by radial direction $r$ and meridional direction $\theta$. Data communication table for forward Legendre transform is included. Extension \verb|[rtp_extension]| is listed in Table \ref{table:mesh_format}.
 \end{description}
 %
 
 \subsection{Finite element mesh data}
-Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written as GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. 
+Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written base on GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. The extension of the mesh file is listed in Table \ref{table:mesh_format}.
 
 \subsection{Radial grid data}
 The preprocessing program generates radius of each layer in \verb|radial_info.dat| if \verb|radial_grid_type_ctl| is set to \verb|Chebyshev| or \verb|equi_distance|. This file consists of blocks \verb|array r_layer| and \verb|array boundaries_ctl| for control file. This data may be useful if you want to modify radial grid spacing by yourself.
@@ -213,13 +242,13 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 \hline
  name & Parallelization & I/O \\ \hline \hline
 \verb|control_MHD| & Serial & Input \\ \hline
-\verb|[sph_prefix].[domain#].rj|  & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rlm| & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rtm| & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rtp| & Distributed & Input \\ \hline
-\verb|[sph_prefix].[domain#].gfm| & Distributed & Input \\ \hline
+\verb|[sph_prefix].[rj_extension]|  & - & Input \\
+\verb|[sph_prefix].[rlm_extension]| & - & Input \\
+\verb|[sph_prefix].[rtm_extension]| & - & Input \\
+\verb|[sph_prefix].[rtp_extension]| & - & Input \\ \hline
+\verb|[sph_prefix].[fem_extension]| & - & Input/Output \\ \hline
 \verb|[boundary_data_name]| & Single & Input \\ \hline
-\verb|[rst_prefix].[step#].[domain#].fst| &  Distributed & Input/Output  \\ \hline
+\verb|[rst_prefix].[step #].[rst_extension]| &  - & Input/Output  \\ \hline
 \verb|[vol_pwr_prefix]_s.dat| & Single & Output \\ \hline
 \verb|[vol_pwr_prefix]_l.dat| & Single & Output \\
 \verb|[vol_pwr_prefix]_m.dat| & Single & Output \\
@@ -240,6 +269,25 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 \label{table:sph_mhd}
 \end{table}
 %
+%
+\begin{table}[htp]
+\caption{data format flag {[\tt restart\_file\_fmt\_ctl]} and extensions for the restart file.}
+\begin{center} 
+\begin{tabular}{|c||c|c|c|c|}
+\hline
+  \multicolumn{5}{|c|}{Distributed files} \\ \hline
+  \verb|[sph_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|gzip_bin| \\ \hline
+\verb|[rst_extension]| & \verb|[#].fst| & \verb|[#].fsb| & \verb|[#].fst.gz| & \verb|[#].fsb.gz| \\ \hline \hline
+  \multicolumn{5}{|c|}{Single file}  \\ \hline
+  \verb|[sph_file_fmt_ctl]| & \verb|merged| & \verb|merged_bin| & \verb|merged_gz| & \verb|merged_bin_gz| \\ \hline
+\verb|[rst_extension]| & \verb|.fst| & \verb|.fsb| & \verb|.fst.gz| & \verb|.fsb.gz| \\ \hline \hline
+  \multicolumn{5}{c}{{\tt [\#]} is the domain or process number} \\
+\end{tabular}
+\end{center}
+\label{table:restart_format}
+\end{table}
+%
+%
 \newpage
 \subsection{Control file}
 The format of the control file \verb|control_MHD| is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking "(Detail)". \\
@@ -258,17 +306,21 @@ The format of the control file \verb|control_MHD| is described below. The detail
 	\item \verb|num_smp_ctl                 [Num_Threads]|
 		\hyperref[href_t:num_smp_ctl]{(Detail)}
 	\item \verb|sph_file_prefix             [sph_prefix]|
-    		\hyperref[href_t:sph_file_prefix]{(Detail)}
+			\hyperref[href_t:sph_file_prefix]{(Detail)}
 	\item \verb|boundary_data_file_name      [boundary_data_name]|
-    		\hyperref[href_t:boundary_data_file_name]{(Detail)}
+			\hyperref[href_t:boundary_data_file_name]{(Detail)}
 %
 	\item \verb|restart_file_prefix         [rst_prefix]|
-    		\hyperref[href_t:restart_file_prefix]{(Detail)}
+			\hyperref[href_t:restart_file_prefix]{(Detail)}
 	\item \verb|field_file_prefix           [fld_prefix]|
-    		\hyperref[href_t:field_file_prefix]{(Detail)}
+			\hyperref[href_t:field_file_prefix]{(Detail)}
 %
+	\item \verb|sph_file_fmt_ctl            [sph_format]|
+			\hyperref[href_t:sph_file_fmt_ctl]{(Detail)}
+	\item \verb|restart_file_fmt_ctl        [rst_format]|
+			\hyperref[href_t:restart_file_fmt_ctl]{(Detail)}
 	\item \verb|field_file_fmt_ctl          [fld_format]|
-    		\hyperref[href_t:field_file_fmt_ctl]{(Detail)}
+			\hyperref[href_t:field_file_fmt_ctl]{(Detail)}
 	\end{itemize}
 %
 \item \verb|model|
@@ -534,7 +586,7 @@ The format of the control file \verb|control_MHD| is described below. The detail
 \end{itemize}
 %
 \subsection{Spectrum data for restarting}
-Spectrum data is used for restarting data and generating field data by Data transform program \verb|sph_snapshot|, \verb|sph_zm_snapshot|, or \verb|sph_dynamobench|. This file is saved for each subdomain (MPI processes), then \verb|[step #]| and \verb|[domain #]| are added in the file name. The \verb|[step #]| is calculated by \verb|time step| / \verb|[ISTEP_RESTART]|.
+Spectrum data is used for restarting data and generating field data by Data transform program \verb|sph_snapshot|, \verb|sph_zm_snapshot|, or \verb|sph_dynamobench|. This file is saved for each subdomain (MPI processes), then \verb|[step #]| and \verb|[domain #]| are added in the file name. The \verb|[step #]| is calculated by \verb|time step| / \verb|[ISTEP_RESTART]|. Data format is defined by \verb|[restart_file_fmt_ctl]| as shown in Table \ref{table:restart_format}.
 
 \subsection{Thermal and compositional boundary condition data file}\label{sec:boundary_file}
 Thermal and compositional heterogeneity at boundaries are defined by a external file named  \verb|[boundary_data_name]|. In this file, temperature, composition, heat flux, or compositional flux at ICB or CMB can be defined by spherical harmonics coefficients. To use boundary conditions in \verb|[boundary_data_name]|, file name is defined by \verb|boundary_data_file_name| column in control file, and boundary condition type \verb|[type]| is set to \verb|fixed_file| or \verb|fixed_flux_file| in \verb|bc_temperature| or \verb|bc_composition| column. By setting \verb|fixed_file| or \verb|fixed_flux_file| in control file, boundary conditions are copied from the file \verb|[boundary_data_name]|.
@@ -606,15 +658,21 @@ CMB
 \caption{Checked visualization application}
 \label{table:Viz_app}
 \begin{center} 
-\begin{tabular}{|c|c|}
+\begin{tabular}{|c|c|c|}
 \hline
- Format & Application  \\ \hline \hline
-Distributed VTK & ParaView (\url{http://www.paraview.org})  \\ \hline
-Merged VTK & ParaView, VisIt (\url{https://wci.llnl.gov/codes/visit/}) \\
- & Mayavi (\url{http://mayavi.sourceforge.net/}) \\ \hline
-XDMF   & ParaView, VisIt   \\ \hline
+ \verb|fld_format| & Application  \\ \hline \hline
+\verb|VTK| & Distributed VTK & ParaView \\ \hline
+\verb|single_VTK| & Merged VTK & ParaView, VisIt, or Mayavi \\ \hline
+\verb|VTK_gz| & Compressed Distributed VTK & ParaView \\
+ & & after expanding by {\tt gzip} \\ \hline
+\verb|single_VTK_gz| & Compressed Merged VTK & ParaView, VisIt or Mayavi \\
+ & &  after expanding by {\tt gzip} \\ \hline
+\verb|single_HDF5| & XDMF   & ParaView, VisIt   \\ \hline
 \end{tabular}
 \end{center}
+More informations about ParaView is in \url{https://www.paraview.org}. \\
+More informations about VisIt is in \url{https://wci.llnl.gov/codes/visit/}. \\
+More informations about Mayavi is in \url{http://mayavi.sourceforge.net/}. \\
 \end{table}
 %
 
@@ -783,32 +841,32 @@ The format of the control file or block for cross sections is described below. T
 \label{href_i:cross_section_ctl}
 \begin{itemize}
 	\item \verb|section_file_prefix	[section_prefix]|
-    		\hyperref[href_t:section_file_prefix]{(Detail)}
+			\hyperref[href_t:section_file_prefix]{(Detail)}
 	\item \verb|surface_define|
-    		\hyperref[href_t:surface_define]{(Detail)}
+			\hyperref[href_t:surface_define]{(Detail)}
 		\begin{itemize}
 			\item \verb|section_method	[METHOD]|
-    				\hyperref[href_t:section_method]{(Detail)}
+					\hyperref[href_t:section_method]{(Detail)}
 			\item \verb|array coefs_ctl	[TERM]	[COEFFICIENT]|
-   		 		\hyperref[href_t:psf_coefs_ctl]{(Detail)}
+		 		\hyperref[href_t:psf_coefs_ctl]{(Detail)}
 			\item \verb|radius	[SIZE]|
-   		 		\hyperref[href_t:psf_radius]{(Detail)}
+		 		\hyperref[href_t:psf_radius]{(Detail)}
 			\item \verb|array normal_vector		[DIRECTION]	[COMPONENT]|
-    				\hyperref[href_t:psf_normal_vector]{(Detail)}
+				\hyperref[href_t:psf_normal_vector]{(Detail)}
 			\item \verb|array axial_length		[DIRECTION]	[COMPONENT]|
-    				\hyperref[href_t:psf_axial_length]{(Detail)}
+				\hyperref[href_t:psf_axial_length]{(Detail)}
 			\item \verb|array center_position	[DIRECTION]	[COMPONENT]|
-    				\hyperref[href_t:psf_center_position]{(Detail)}
+				\hyperref[href_t:psf_center_position]{(Detail)}
 %
 			\item \verb|array section_area_ctl		[AREA_NAME]|
-    				\hyperref[href_t:section_area_ctl]{(Detail)}
+				\hyperref[href_t:section_area_ctl]{(Detail)}
 	\end{itemize}
 %
 	\item \verb|output_field_define|
-    		\hyperref[href_t:output_field_define]{(Detail)}
+		\hyperref[href_t:output_field_define]{(Detail)}
 		\begin{itemize}
 			\item \verb|array output_field		[FIELD]	[COMPONENT]|
-    				\hyperref[href_t:psf_output_field]{(Detail)}
+				\hyperref[href_t:psf_output_field]{(Detail)}
 		\end{itemize}
 \end{itemize}
 
@@ -1100,13 +1158,13 @@ Simulation program outputs spectrum data as a whole field data. This program gen
 \hline
  name & Parallelization & I/O \\ \hline \hline
 \verb|control_snapshot| & Serial & Input \\ \hline
-\verb|[sph_prefix].[domain#].rj|  & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rlm| & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rtm| & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rtp| & Distributed & Input \\ \hline
-\verb|[sph_prefix].[domain#].gfm| & Distributed & Input \\ \hline
+\verb|[sph_prefix].[rj_extension]|  & - & Input \\
+\verb|[sph_prefix].[rlm_extension]| & - & Input \\
+\verb|[sph_prefix].[rtm_extension]| & - & Input \\
+\verb|[sph_prefix].[rtp_extension]| & - & Input \\ \hline
+\verb|[sph_prefix].[fem_extension]| & - & Input \\ \hline
 \verb|[boundary_data_name]| & Single & Input \\ \hline
-\verb|[rst_prefix].[step#].[domain#].fst| &  Distributed & Input  \\ \hline
+\verb|[rst_prefix].[step #].[rst_extension]| & - & Input  \\ \hline
 \verb|[vol_pwr_prefix].dat| & Single & Output \\ \hline
 \verb|[vol_pwr_prefix]_l.dat| & Single & Output \\
 \verb|[vol_pwr_prefix]_m.dat| & Single & Output \\
@@ -1154,17 +1212,17 @@ We recommend to output cross section data at $y = 0$ by using sectioning module 
 \hline
  name & Parallelization & I/O \\ \hline \hline
 \verb|control_MHD| & Serial & Input \\ \hline
-\verb|[sph_prefix].[domain#].rj|  & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rlm| & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rtm| & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rtp| & Distributed & Input \\ \hline
-\verb|[rst_prefix].0.[domain#].fst| &  Distributed & Input/Output  \\ \hline
+\verb|[sph_prefix].[rj_extension]|  & - & Input \\
+\verb|[sph_prefix].[rlm_extension]| & - & Input \\
+\verb|[sph_prefix].[rtm_extension]| & - & Input \\
+\verb|[sph_prefix].[rtp_extension]| & - & Input \\ \hline
+\verb|[rst_prefix].[step #].[rst_extension]| & - & Input/Output  \\ \hline
 \end{tabular}
 \end{center}
 \label{table:inital_fld}
 \end{table}
 %
-This program generates the spectrum data files \verb|[rst_prefix].0.[domain#].fst|. To use generated initial data file, please set 
+This program generates the spectrum data files \verb|[rst_prefix].[step #].[rst_extension]|. To use generated initial data file, please set 
  \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}} to be 0 and \hyperref[href_t:restart_file_ctl]{{\tt [INITIAL\_TYPE]}} to be \hyperref[href_t:restart_file_ctl]{{\tt start\_from\_rst\_file}}.
 
 \subsection{Definition of the initial field}
@@ -1311,17 +1369,17 @@ Then, the program  \verb|sph_initial_field| and  \verb|sph_add_initial_field| ar
 \hline
  name & Parallelization & I/O \\ \hline \hline
 \verb|control_MHD| & Serial & Input \\ \hline
-\verb|[sph_prefix].[domain#].rj|  & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rlm| & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rtm| & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rtp| & Distributed & Input \\ \hline
-\verb|[rst_prefix].[step #].[domain#].fst| &  Distributed & Input/Output  \\ \hline
+\verb|[sph_prefix].[rj_extension]|  & - & Input \\
+\verb|[sph_prefix].[rlm_extension]| & - & Input \\
+\verb|[sph_prefix].[rtm_extension]| & - & Input \\
+\verb|[sph_prefix].[rtp_extension]| & - & Input \\ \hline
+\verb|[rst_prefix].[step #].[rst_extension]| & - & Input/Output  \\ \hline
 \end{tabular}
 \end{center}
 \label{table:add_inital_fld}
 \end{table}
 %
-This program generates the spectrum data files \verb|[rst_prefix].[step#].[domain#].fst|. To use generated initial data file, set 
+This program generates the spectrum data files \verb|[rst_prefix].[step#].[rst_extension]|. To use generated initial data file, set 
  \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}} and \verb|[ISTEP_RESTART]| to be appropriate time step and increment, respectively.
 To read the original initial field data, \hyperref[href_t:restart_file_ctl]{{\tt [INITIAL\_TYPE]}} is set to be \hyperref[href_t:restart_file_ctl]{{\tt start\_from\_rst\_file}} in \verb|control_MHD|. In other words, the \verb|[step #]| in the file name, \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}}, and \verb|[ISTEP_RESTART]| in the control file should be the consistent.
 
@@ -1338,11 +1396,11 @@ This program is only used to check solution for dynamo benchmark by Christensen 
 \hline
  name & Parallelization & I/O \\ \hline \hline
 \verb|control_snapshot| & Serial & Input \\ \hline
-\verb|[sph_prefix].[domain#].rj|  & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rlm| & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rtm| & Distributed & Input \\
-\verb|[sph_prefix].[domain#].rtp| & Distributed & Input \\ \hline
-\verb|[rst_prefix].[step#].[domain#].fst| &  Distributed & Input  \\ \hline
+\verb|[sph_prefix].[rj_extension]|  & - & Input \\
+\verb|[sph_prefix].[rlm_extension]| & - & Input \\
+\verb|[sph_prefix].[rtm_extension]| & - & Input \\
+\verb|[sph_prefix].[rtp_extension]| & - & Input \\ \hline
+\verb|[rst_prefix].[step#].[rst_extension]| &  - & Input  \\ \hline
 \verb|dynamobench.dat| & Single & Output \\ \hline
 \end{tabular}
 \end{center}
@@ -1420,9 +1478,9 @@ Calypso uses distributed data files for simulations. This program is to generate
 \hline
  extension & Distributed? & I/O \\ \hline
 \verb|control_sph_assemble| & Serial & Input \\ \hline
-\verb|[sph_prefix].[domain#].rj| &  Distributed & Input \\
+\verb|[sph_prefix].[rj_extension]|  & - & Input \\  \hline
 \verb|[new_sph_prefix].[domain#].rj| &  Distributed & Input \\ \hline
-\verb|[rst_prefix].[step#].[domain#].fst| &  Distributed & Input  \\
+\verb|[rst_prefix].[step#].[rst_extension]| & - & Input  \\
 \verb|[new_rst_prefix].[step#].[domain#].fst| &  Distributed & Output \\ \hline
 \end{tabular}
 \end{center}
@@ -1441,9 +1499,14 @@ Control file consists the following groups. \\
 	\item \verb|num_subdomain_ctl           [Num_PE]|
 		\hyperref[href_t:num_subdomain_ctl]{(Detail)}
 	\item \verb|sph_file_prefix             [sph_prefix]|
-    		\hyperref[href_t:sph_file_prefix]{(Detail)}
+			\hyperref[href_t:sph_file_prefix]{(Detail)}
 	\item \verb|restart_file_prefix         [rst_prefix]|
-    		\hyperref[href_t:restart_file_prefix]{(Detail)}
+			\hyperref[href_t:restart_file_prefix]{(Detail)}
+%
+	\item \verb|sph_file_fmt_ctl         [sph_format]|
+			\hyperref[href_t:sph_file_fmt_ctl]{(Detail)}
+	\item \verb|restart_file_fmt_ctl        [rst_format]|
+			\hyperref[href_t:restart_file_fmt_ctl]{(Detail)}
 	\end{itemize}
 %
 \item \verb|new_data_files_def|
