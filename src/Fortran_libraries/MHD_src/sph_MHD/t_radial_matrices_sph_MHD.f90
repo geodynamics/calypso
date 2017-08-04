@@ -76,8 +76,6 @@
       type(sph_rj_grid), intent(in) :: sph_rj
       type(band_matrices_type), intent(inout) :: smat
 !
-      integer(kind = kint) :: nri, jmax
-!
       smat%n_vect =    2*sph_rj%nidx_rj(1)
       smat%n_comp =      sph_rj%nidx_rj(2)
       smat%n_band =      iseven
@@ -94,7 +92,7 @@
       smat%det =   0.0d0
       smat%i_pivot =   0
 !
-      smat%mat(4,1:2*nri,1:jmax) = 1.0d0
+      smat%mat(4,1:2*smat%n_vect,1:smat%n_comp) = 1.0d0
 !
       end subroutine alloc_press_vpol_mat_sph
 !

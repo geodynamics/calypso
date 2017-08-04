@@ -22,7 +22,7 @@
 !!      subroutine input_control_SPH_dynamobench                        &
 !!     &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,&
 !!     &           rj_fld, nod_fld, pwr, flex_p, MHD_step,              &
-!!     &           MHD_prop, MHD_BC, WK)
+!!     &           MHD_prop, MHD_BC, WK, cdat)
 !!        type(MHD_file_IO_params), intent(inout) :: MHD_files
 !!        type(sph_sgs_mhd_control), intent(inout) :: MHD_ctl
 !!        type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
@@ -42,6 +42,7 @@
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!        type(MHD_BC_lists), intent(inout) :: MHD_BC
+!!        type(circle_fld_maker), intent(inout) :: cdat
 !!@endverbatim
 !
 !
@@ -232,9 +233,10 @@
       subroutine input_control_SPH_dynamobench                          &
      &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,  &
      &           rj_fld, nod_fld, pwr, flex_p, MHD_step,                &
-     &           MHD_prop, MHD_BC, WK)
+     &           MHD_prop, MHD_BC, WK, cdat)
 !
       use t_ctl_data_MHD
+      use t_field_on_circle
       use set_control_sph_mhd
       use set_control_sph_data_MHD
       use parallel_load_data_4_sph
@@ -255,6 +257,7 @@
       type(MHD_evolution_param), intent(inout) :: MHD_prop
       type(MHD_BC_lists), intent(inout) :: MHD_BC
       type(works_4_sph_trans_MHD), intent(inout) :: WK
+      type(circle_fld_maker), intent(inout) :: cdat
 !
 !
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_SPH_MHD'
@@ -269,7 +272,7 @@
      &   (DMHD_ctl%psph_ctl%spctl, sph%sph_params, rj_fld, nod_fld)
       call set_ctl_params_dynamobench                                   &
      &   (DMHD_ctl%Dmodel_ctl%fld_ctl%field_ctl,                        &
-     &    DMHD_ctl%smonitor_ctl%meq_ctl)
+     &    DMHD_ctl%smonitor_ctl%meq_ctl, cdat%circle, cdat%d_circle)
 !
       if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
       call load_para_sph_mesh(sph, comms_sph, sph_grps)

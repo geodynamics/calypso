@@ -7,14 +7,16 @@
 !>@brief Evaluate dynamo benchmark results
 !!
 !!@verbatim
-!!      subroutine s_const_data_4_dynamobench(time, sph_params, sph_rj, &
-!!     &          sph_MHD_bc, leg, ipol, itor, rj_fld, pwr, WK_pwr)
+!!      subroutine s_const_data_4_dynamobench                           &
+!!     &         (time, sph_params, sph_rj, sph_MHD_bc, leg, ipol, itor,&
+!!     &          rj_fld, cdat, pwr, WK_pwr)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(phys_address), intent(in) :: ipol, itor
 !!        type(phys_data), intent(in) :: rj_fld
+!!        type(circle_fld_maker), intent(inout) :: cdat
 !!        type(sph_mean_squares), intent(inout) :: pwr
 !!        type(sph_mean_square_work), intent(inout) :: WK_pwr
 !!@endverbatim
@@ -33,8 +35,9 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine s_const_data_4_dynamobench(time, sph_params, sph_rj,   &
-     &          sph_MHD_bc, leg, ipol, itor, rj_fld, pwr, WK_pwr)
+      subroutine s_const_data_4_dynamobench                             &
+     &         (time, sph_params, sph_rj, sph_MHD_bc, leg, ipol, itor,  &
+     &          rj_fld, cdat, pwr, WK_pwr)
 !
       use m_field_at_mid_equator
 !
@@ -46,6 +49,7 @@
       use t_rms_4_sph_spectr
       use t_sum_sph_rms_data
       use t_boundary_data_sph_MHD
+      use t_field_on_circle
 !
       use calypso_mpi
       use cal_rms_fields_by_sph
@@ -59,12 +63,13 @@
       type(phys_address), intent(in) :: ipol, itor
       type(phys_data), intent(in) :: rj_fld
 !
+      type(circle_fld_maker), intent(inout) :: cdat
       type(sph_mean_squares), intent(inout) :: pwr
       type(sph_mean_square_work), intent(inout) :: WK_pwr
 !
 !
       if(iflag_debug.gt.0)  write(*,*) 'mid_eq_transfer_dynamobench'
-      call mid_eq_transfer_dynamobench(time, sph_rj, rj_fld)
+      call mid_eq_transfer_dynamobench(time, sph_rj, rj_fld, cdat)
 !
       pwr%v_spectr(1)%kr_inside =  sph_params%nlayer_ICB
       pwr%v_spectr(1)%kr_outside = sph_params%nlayer_CMB

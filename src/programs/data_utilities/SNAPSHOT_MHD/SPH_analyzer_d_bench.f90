@@ -9,11 +9,12 @@
 !!        Initialzation and evolution loop for dynamo benchmark check
 !!
 !!@verbatim
-!!      subroutine SPH_init_sph_dbench(MHD_files, bc_IO, iphys)
+!!      subroutine SPH_init_sph_dbench(MHD_files, bc_IO, iphys, cdat)
 !!        type(phys_address), intent(in) :: iphys
-!!      subroutine SPH_analyze_dbench(i_step, MHD_files)
+!!      subroutine SPH_analyze_dbench(i_step, MHD_files, cdat)
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(boundary_spectra), intent(in) :: bc_IO
+!!        type(phys_data), intent(inout) :: cdat
 !!      subroutine SPH_finalize_dbench
 !!@endverbatim
 !
@@ -25,6 +26,7 @@
       use m_radial_matrices_sph
       use t_phys_address
       use t_MHD_file_parameter
+      use t_field_on_circle
 !
       implicit none
 !
@@ -34,7 +36,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine SPH_init_sph_dbench(MHD_files, bc_IO, iphys)
+      subroutine SPH_init_sph_dbench(MHD_files, bc_IO, iphys, cdat)
 !
       use m_constants
       use m_array_for_send_recv
@@ -74,6 +76,7 @@
       type(boundary_spectra), intent(in) :: bc_IO
       type(phys_address), intent(in) :: iphys
 !
+      type(circle_fld_maker), intent(inout) :: cdat
 !
 !   Allocate spectr field data
 !
@@ -117,13 +120,13 @@
 !* -----  find mid-equator point -----------------
 !*
       call set_mid_equator_point_global                                 &
-     &   (sph1%sph_params, sph1%sph_rtp, sph1%sph_rj)
+     &   (sph1%sph_params, sph1%sph_rtp, sph1%sph_rj, cdat)
 !
       end subroutine SPH_init_sph_dbench
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine SPH_analyze_dbench(i_step, MHD_files)
+      subroutine SPH_analyze_dbench(i_step, MHD_files, cdat)
 !
       use m_work_time
       use m_physical_property
@@ -146,6 +149,9 @@
 !
       integer(kind = kint), intent(in) :: i_step
       type(MHD_file_IO_params), intent(in) :: MHD_files
+!
+      type(circle_fld_maker), intent(inout) :: cdat
+!
       integer(kind = kint) :: iflag
 !
 !
@@ -186,7 +192,8 @@
       if(iflag_debug.gt.0)  write(*,*) 'const_data_4_dynamobench'
       call s_const_data_4_dynamobench                                   &
      &   (MHD_step1%time_d%time, sph1%sph_params, sph1%sph_rj,          &
-     &    sph_MHD_bc1, trans_p1%leg, ipol, itor, rj_fld1, pwr1, WK_pwr)
+     &    sph_MHD_bc1, trans_p1%leg, ipol, itor, rj_fld1,               &
+     &    cdat, pwr1, WK_pwr)
       call output_field_4_dynamobench(i_step, MHD_step1%time_d%time,    &
      &   sph_MHD_bc1%sph_bc_U, sph_MHD_bc1%sph_bc_B, ipol)
       call end_elapsed_time(11)
