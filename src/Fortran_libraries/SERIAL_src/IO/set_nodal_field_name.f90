@@ -196,6 +196,9 @@
      &  .or. (phys_nod_name_ctl .eq. fhd_heat_source          )         &
      &  .or. (phys_nod_name_ctl .eq. fhd_light_source         )         &
      &  .or. (phys_nod_name_ctl .eq. fhd_entropy_source       )         &
+     &  .or. (phys_nod_name_ctl .eq. fhd_div_v                )         &
+     &  .or. (phys_nod_name_ctl .eq. fhd_div_b                )         &
+     &  .or. (phys_nod_name_ctl .eq. fhd_div_a                )         &
      &      )   iflag = 1
 !
       if (    (phys_nod_name_ctl .eq. fhd_ref_temp            )         &
@@ -213,6 +216,9 @@
       if (    (phys_nod_name_ctl .eq. fhd_filter_temp         )         &
      &   .or. (phys_nod_name_ctl .eq. fhd_filter_part_temp    )         &
      &   .or. (phys_nod_name_ctl .eq. fhd_filter_comp         )         &
+     &   .or. (phys_nod_name_ctl .eq. fhd_div_filter_v        )         &
+     &   .or. (phys_nod_name_ctl .eq. fhd_div_filter_b        )         &
+     &   .or. (phys_nod_name_ctl .eq. fhd_div_filter_a        )         &
      &   .or. (phys_nod_name_ctl .eq. fhd_SGS_temp            )         &
      &   .or. (phys_nod_name_ctl .eq. fhd_SGS_comp            )         &
      &      )   iflag = 1

@@ -4,11 +4,7 @@
 !      Written by H. Matsui on June, 2006
 !
 !!      subroutine set_search_mesh_list_4_psf(num_psf,                  &
-!!     &        numnod, numele, numsurf, numedge, nnod_4_edge, ie_edge, &
-!!     &        isf_4_ele, iedge_4_sf, interior_ele, inod_smp_stack,    &
-!!     &        iele_smp_stack, isurf_smp_stack, iedge_smp_stack,       &
-!!     &        num_ele_grp, ntot_ele_grp, istack_ele_grp, item_ele_grp,&
-!!     &        psf_param, psf_search)
+!!     &          node, ele, surf, edge, ele_grp, psf_param, psf_search)
 !
       module search_ele_list_for_psf
 !
@@ -30,52 +26,44 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_search_mesh_list_4_psf(num_psf,                    &
-     &        numnod, numele, numsurf, numedge, nnod_4_edge, ie_edge,   &
-     &        isf_4_ele, iedge_4_sf, interior_ele, inod_smp_stack,      &
-     &        iele_smp_stack, isurf_smp_stack, iedge_smp_stack,         &
-     &        num_ele_grp, ntot_ele_grp, istack_ele_grp, item_ele_grp,  &
-     &        psf_param, psf_search)
+     &          node, ele, surf, edge, ele_grp, psf_param, psf_search)
 !
       use m_geometry_constants
+      use t_geometry_data
+      use t_group_data
+      use t_surface_data
+      use t_edge_data
       use t_psf_patch_data
       use t_psf_geometry_list
 !
       integer(kind = kint), intent(in) :: num_psf
-      integer(kind = kint), intent(in) :: numnod, numele
-      integer(kind = kint), intent(in) :: numsurf, numedge
-      integer(kind = kint), intent(in) :: nnod_4_edge
-      integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
+      type(node_data), intent(in) :: node
+      type(element_data), intent(in) :: ele
+      type(surface_data), intent(in) :: surf
+      type(edge_data), intent(in) :: edge
+      type(group_data), intent(in) :: ele_grp
 !
-      integer(kind = kint), intent(in) :: isf_4_ele(numele,nsurf_4_ele)
-      integer(kind = kint), intent(in)                                  &
-     &              :: iedge_4_sf(numsurf,nedge_4_surf)
-      integer(kind = kint), intent(in) :: interior_ele(numele)
-!
-      integer(kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
-      integer(kind = kint), intent(in) :: iele_smp_stack(0:np_smp)
-      integer(kind = kint), intent(in) :: isurf_smp_stack(0:np_smp)
-      integer(kind = kint), intent(in) :: iedge_smp_stack(0:np_smp)
-!
-      integer(kind = kint), intent(in) :: num_ele_grp, ntot_ele_grp
-      integer(kind = kint), intent(in) :: istack_ele_grp(0:num_ele_grp)
-      integer(kind = kint), intent(in) :: item_ele_grp(ntot_ele_grp)
       type(psf_parameters), intent(in) :: psf_param(num_psf)
 !
       type(psf_search_lists), intent(inout) :: psf_search(num_psf)
 !
 !
-      call set_searched_element_list_4_psf(num_psf, numele,             &
-     &    interior_ele, iele_smp_stack, num_ele_grp, ntot_ele_grp,      &
-     &    istack_ele_grp, item_ele_grp, psf_param, psf_search)
+      call set_searched_element_list_4_psf                              &
+     &   (num_psf, ele%numele, ele%interior_ele, ele%istack_ele_smp,    &
+     &    ele_grp%num_grp, ele_grp%num_item,                            &
+     &    ele_grp%istack_grp, ele_grp%item_grp, psf_param, psf_search)
 !
-      call set_searched_surface_list_4_psf(num_psf, numele, numsurf,    &
-     &          isf_4_ele, isurf_smp_stack, psf_search)
+      call set_searched_surface_list_4_psf                              &
+     &   (num_psf, ele%numele, surf%numsurf, surf%isf_4_ele,            &
+     &    surf%istack_surf_smp, psf_search)
 !
-      call set_searched_edge_list_4_psf(num_psf, numsurf, numedge,      &
-     &          iedge_4_sf, iedge_smp_stack, psf_search)
+      call set_searched_edge_list_4_psf                                 &
+     &   (num_psf, surf%numsurf, edge%numedge, edge%iedge_4_sf,         &
+     &    edge%istack_edge_smp, psf_search)
 !
-      call set_searched_node_list_4_psf(num_psf, numnod, numedge,       &
-     &          nnod_4_edge, ie_edge, inod_smp_stack, psf_search)
+      call set_searched_node_list_4_psf                                 &
+     &   (num_psf, node%numnod, edge%numedge, edge%nnod_4_edge,         &
+     &    edge%ie_edge, node%istack_nod_smp, psf_search)
 !
       end subroutine set_search_mesh_list_4_psf
 !

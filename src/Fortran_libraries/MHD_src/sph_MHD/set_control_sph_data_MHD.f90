@@ -154,7 +154,7 @@
       use t_circle_transform
       use m_phys_labels
       use m_phys_constants
-      use m_field_at_mid_equator
+      use field_at_mid_equator
 !
       type(ctl_array_c3), intent(in) :: field_ctl
       type(mid_equator_control), intent(in) :: meq_ctl

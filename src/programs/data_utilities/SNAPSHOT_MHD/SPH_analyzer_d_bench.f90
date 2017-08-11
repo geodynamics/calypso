@@ -68,7 +68,7 @@
       use cal_rms_fields_by_sph
       use r_interpolate_sph_data
       use sph_mhd_rst_IO_control
-      use m_field_at_mid_equator
+      use field_at_mid_equator
       use check_dependency_for_MHD
       use input_control_sph_MHD
 !

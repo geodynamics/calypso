@@ -3,11 +3,14 @@
 !
 !      Written by H. Matsui on June, 2006
 !
-!!      subroutine set_const_4_crossections                             &
-!!     &          (num_psf, numnod, inod_smp_stack, xx, psf_list)
-!!      subroutine set_const_4_isosurfaces(num_iso, numnod,             &
-!!     &          inod_smp_stack, xx, radius, a_r, s_cyl, as_cyl,       &
-!!     &          num_phys, ntot_phys, istack_ncomp, d_nod, iso_list)
+!!      subroutine set_const_4_crossections(num_psf, node, psf_list)
+!!        type(node_data), intent(in) :: node
+!!        type(sectioning_list), intent(inout):: psf_list(num_psf)
+!!      subroutine set_const_4_isosurfaces                              &
+!!     &         (num_iso, node, nod_fld, iso_list)
+!!        type(node_data), intent(in) :: node
+!!        type(phys_data), intent(in) :: nod_fld
+!!        type(sectioning_list), intent(inout):: iso_list(num_iso)
 !
       module set_const_4_sections
 !
@@ -26,15 +29,14 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_const_4_crossections                               &
-     &          (num_psf, numnod, inod_smp_stack, xx, psf_list)
+      subroutine set_const_4_crossections(num_psf, node, psf_list)
 !
       use m_control_params_4_psf
+      use t_geometry_data
       use t_psf_geometry_list
 !
-      integer(kind = kint), intent(in) :: num_psf, numnod
-      integer(kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
-      real(kind = kreal), intent(in) :: xx(numnod,3)
+      integer(kind = kint), intent(in) :: num_psf
+      type(node_data), intent(in) :: node
 !
       type(sectioning_list), intent(inout):: psf_list(num_psf)
 !
@@ -43,7 +45,8 @@
 !
       do i_psf = 1, num_psf
         if (id_section_method(i_psf) .gt. 0) then
-          call set_constant_4_psf(i_psf, numnod, inod_smp_stack, xx,    &
+          call set_constant_4_psf                                       &
+     &       (i_psf, node%numnod, node%istack_nod_smp, node%xx,         &
      &        psf_list(i_psf)%ref_fld)
         end if
       end do
@@ -52,24 +55,17 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_const_4_isosurfaces(num_iso, numnod,               &
-     &          inod_smp_stack, xx, radius, a_r, s_cyl, as_cyl,         &
-     &          num_phys, ntot_phys, istack_ncomp, d_nod, iso_list)
+      subroutine set_const_4_isosurfaces                                &
+     &         (num_iso, node, nod_fld, iso_list)
 !
       use m_control_params_4_iso
+      use t_geometry_data
+      use t_phys_data
       use t_psf_geometry_list
 !
-      integer(kind = kint), intent(in) :: num_iso, numnod
-      integer(kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
-      real(kind = kreal), intent(in)  :: xx(numnod,3)
-      real(kind = kreal), intent(in)  :: radius(numnod)
-      real(kind = kreal), intent(in)  :: a_r(numnod)
-      real(kind = kreal), intent(in)  :: s_cyl(numnod)
-      real(kind = kreal), intent(in)  :: as_cyl(numnod)
-!
-      integer(kind = kint), intent(in) :: num_phys, ntot_phys
-      integer(kind = kint), intent(in) :: istack_ncomp(0:num_phys)
-      real(kind = kreal), intent(in)  :: d_nod(numnod,ntot_phys)
+      integer(kind = kint), intent(in) :: num_iso
+      type(node_data), intent(in) :: node
+      type(phys_data), intent(in) :: nod_fld
 !
       type(sectioning_list), intent(inout):: iso_list(num_iso)
 !
@@ -77,9 +73,11 @@
 !
 !
       do i_iso = 1, num_iso
-        call set_constant_4_iso(i_iso, numnod, inod_smp_stack,          &
-     &      xx, radius, a_r, s_cyl, as_cyl, num_phys, ntot_phys,        &
-     &      istack_ncomp, d_nod, iso_list(i_iso)%ref_fld)
+        call set_constant_4_iso                                         &
+     &     (i_iso, node%numnod, node%istack_nod_smp, node%xx,           &
+     &      node%rr, node%a_r, node%ss, node%a_s, nod_fld%num_phys,     &
+     &      nod_fld%ntot_phys,  nod_fld%istack_component,               &
+     &      nod_fld%d_fld, iso_list(i_iso)%ref_fld)
       end do
 !
       end subroutine set_const_4_isosurfaces

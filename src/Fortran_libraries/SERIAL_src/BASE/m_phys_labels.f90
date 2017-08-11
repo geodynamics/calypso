@@ -11,7 +11,7 @@
 !!
 !! field names 
 !!
-!!   velocity:     velocity    v
+!!   velocity:     velocity    u
 !!   temperature:  temperature T
 !!   pressure:     pressure    P
 !!   density:      density     \rho
@@ -22,6 +22,10 @@
 !!   magnetic_potential: potential       \phi
 !!   composition:        Composition anormally C
 !!   entropy:            Entropy               S
+!!
+!!   div_velocity: divergence of velocity          div u
+!!   div_magnetic: divergence of magnetic field    div B
+!!   div_vector_p: divergence of vector potential  div A
 !!
 !!   heat_source:            heat source              q_{T}
 !!   composition_source:     compositoin source       q_{T}
@@ -42,6 +46,8 @@
 !!   filter_velo, filter_vorticity
 !!   filter_temp, filter_part_temp, filter_composition
 !!   filter_vecp, filter_magne, filter_current
+!!
+!!   div_filter_velo, div_filter_magne, div_filter_vecp
 !!
 !!   wide_filter_velo, wide_filter_vorticity
 !!   wide_filter_temp, wide_filter_composition
@@ -161,6 +167,16 @@
       character(len=kchara), parameter                                  &
      &             :: fhd_poynting = 'poynting_flux'
 !
+!>        Field label for velocity
+!!         @f$ \partial_{i} u_{i} @f$
+      character(len=kchara), parameter :: fhd_div_v = 'div_velocity'
+!>        Field label for magnetic field
+!!         @f$ \partial_{i} B_{i} @f$
+      character(len=kchara), parameter :: fhd_div_b = 'div_magnetic'
+!>        Field label for magnetic vector potential
+!!         @f$ \partial_{i} A_{i} @f$
+      character(len=kchara), parameter :: fhd_div_a = 'div_vector_p'
+!
 !>        Field label for filtered velocity
 !!         @f$ \bar{u}_{i} @f$
       character(len=kchara), parameter                                  &
@@ -181,6 +197,19 @@
 !!         @f$ \bar{A}_{i} @f$
       character(len=kchara), parameter                                  &
      &            :: fhd_filter_vecp = 'filter_vecp'
+!
+!>        Field label for filtered velocity
+!!         @f$ \partial_{i} \bar{u}_{i} @f$
+      character(len=kchara), parameter                                  &
+     &                      :: fhd_div_filter_v = 'div_filter_velo'
+!>        Field label for filtered magnetic field
+!!         @f$ \partial_{i} \bar{B}_{i} @f$
+      character(len=kchara), parameter                                  &
+     &                      :: fhd_div_filter_b = 'div_filter_magne'
+!>        Field label for filtered magnetic vector potential
+!!         @f$ \partial_{i} \bar{A}_{i} @f$
+      character(len=kchara), parameter                                  &
+     &                      :: fhd_div_filter_a = 'div_filter_vecp'
 !
 !>        Field label for viscous diffusion
 !!         @f$ \nu \partial_{j}\partial_{j} u_{i} @f$

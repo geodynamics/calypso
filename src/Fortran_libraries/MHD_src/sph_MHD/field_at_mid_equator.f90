@@ -1,5 +1,5 @@
-!>@file   m_field_at_mid_equator.f90
-!!@brief  module m_field_at_mid_equator
+!>@file   field_at_mid_equator.f90
+!!@brief  module field_at_mid_equator
 !!
 !!@author H. Matsui
 !!@date Programmed on June., 2011
@@ -18,7 +18,7 @@
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!@endverbatim
 !
-      module m_field_at_mid_equator
+      module field_at_mid_equator
 !
       use m_precision
 !
@@ -181,4 +181,4 @@
 !
 ! ----------------------------------------------------------------------
 !
-      end module m_field_at_mid_equator
+      end module field_at_mid_equator

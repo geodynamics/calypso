@@ -103,6 +103,13 @@
           iphys%i_light_source = i0
         else if ( field_name(i) .eq. fhd_entropy_source ) then
           iphys%i_entropy_source = i0
+!
+        else if ( field_name(i) .eq. fhd_div_v ) then
+          iphys%i_div_v =    i0
+        else if ( field_name(i) .eq. fhd_div_b ) then
+          iphys%i_div_b =    i0
+        else if ( field_name(i) .eq. fhd_div_a ) then
+          iphys%i_div_a =    i0
         end if
 !
         if ( field_name(i) .eq. fhd_filter_velo ) then
@@ -121,6 +128,13 @@
           iphys%i_filter_par_t =   i0
         else if ( field_name(i) .eq. fhd_filter_comp ) then
           iphys%i_filter_comp =    i0
+!
+        else if ( field_name(i) .eq. fhd_div_filter_v ) then
+          iphys%i_div_filter_v =    i0
+        else if ( field_name(i) .eq. fhd_div_filter_b ) then
+          iphys%i_div_filter_b =    i0
+        else if ( field_name(i) .eq. fhd_div_filter_a ) then
+          iphys%i_div_filter_a =    i0
 !
         else if ( field_name(i) .eq. fhd_kinetic_helicity ) then
           iphys%i_k_heli = i0

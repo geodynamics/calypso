@@ -111,6 +111,19 @@
 !>        start address for reference entropy
 !!         @f$  S_{0} @f$
         integer (kind=kint) :: i_ref_entropy =     izero
+!>        start address for poynting flux
+!!         @f$  e_{ijk} E_{j} B_{k} @f$
+        integer (kind=kint) :: i_poynting =        izero
+!
+!>        start address for velocity
+!!         @f$ \partial_{i} u_{i} @f$
+        integer (kind=kint) :: i_div_v =           izero
+!>        start address for magnetic field
+!!         @f$ \partial_{i} B_{i} @f$
+        integer (kind=kint) :: i_div_b =           izero
+!>        start address for magnetic vector potential
+!!         @f$ \partial_{i} A_{i} @f$
+        integer (kind=kint) :: i_div_a =           izero
 !
 !>        Start address for filtered velocity
 !!         @f$ \bar{u}_{i} @f$
@@ -136,6 +149,16 @@
 !>        Start address for filtered conposition
 !!         @f$ \bar{C} @f$
         integer (kind=kint) :: i_filter_comp =     izero
+!
+!>        start address for filtered velocity
+!!         @f$ \partial_{i} \bar{u}_{i} @f$
+        integer (kind=kint) :: i_div_filter_v =    izero
+!>        start address for filtered magnetic field
+!!         @f$ \partial_{i} \bar{B}_{i} @f$
+        integer (kind=kint) :: i_div_filter_b =    izero
+!>        start address for filtered magnetic vector potential
+!!         @f$ \partial_{i} \bar{A}_{i} @f$
+        integer (kind=kint) :: i_div_filter_a =    izero
 !
 !>        start address for kinetic helicity
 !!         @f$ H_{u} = u_{i} \omega_{i} @f$
@@ -183,9 +206,6 @@
 !>        start address for energy flux by magnetic diffusion
 !!         @f$ B_{i} \left( \partial_{j}\partial_{j} B_{i} \right) @f$
         integer (kind=kint) :: i_mag_e_diffuse =   izero
-!>        start address for poynting flux
-!!         @f$  e_{ijk} E_{j} B_{k} @f$
-        integer (kind=kint) :: i_poynting =        izero
 !
 !>        start address for thermal diffusion
 !!         @f$ \kappa \partial_{i}\partial_{i} T @f$

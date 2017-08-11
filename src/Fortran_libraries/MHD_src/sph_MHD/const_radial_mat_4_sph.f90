@@ -80,7 +80,6 @@
       subroutine const_radial_mat_sph_snap(MHD_prop, sph_MHD_bc,        &
      &          sph_rj, r_2nd, leg, sph_MHD_mat)
 !
-      use m_radial_matrices_sph
       use t_boundary_data_sph_MHD
       use const_r_mat_4_scalar_sph
       use const_r_mat_w_center_sph

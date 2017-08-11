@@ -5,11 +5,14 @@
 !      Modified by H. Matsui on July, 2008
 !
 !
-!!      subroutine init_send_recv(nod_comm)
-!!
-!!      subroutine nod_fields_send_recv(nod_comm, nod_fld)
-!!        type(communication_table), intent(in) :: nod_comm
+!!      subroutine init_nod_send_recv(mesh)
+!!      subroutine nod_fields_send_recv(mesh, nod_fld)
+!!        type(mesh_geometry), intent(in) :: mesh
 !!        type(phys_data),intent(inout) :: nod_fld
+!!
+!!      subroutine init_send_recv(nod_comm)
+!!      subroutine fields_send_recv(nod_comm, nod_fld)
+!!        type(communication_table), intent(in) :: nod_comm
 !!
 !!      subroutine scalar_send_recv(id_phys, nod_comm, nod_fld)
 !!      subroutine vector_send_recv(id_phys, nod_comm, nod_fld)
@@ -28,7 +31,7 @@
       use m_precision
 !
       use calypso_mpi
-      use t_comm_table
+      use t_mesh_data
       use t_phys_data
 !
       implicit none
@@ -37,6 +40,35 @@
 !
       contains
 !
+! ----------------------------------------------------------------------
+!
+      subroutine init_nod_send_recv(mesh)
+!
+      type(mesh_geometry), intent(in) :: mesh
+!
+!
+      call init_send_recv(mesh%nod_comm)
+!
+      end subroutine init_nod_send_recv
+!
+! ----------------------------------------------------------------------
+!
+      subroutine nod_fields_send_recv(mesh, nod_fld)
+!
+      use m_machine_parameter
+      use m_phys_constants
+      use t_phys_data
+!
+      type(mesh_geometry), intent(in) :: mesh
+      type(phys_data),intent(inout) :: nod_fld
+      integer (kind=kint) :: i, ist
+!
+!
+      call fields_send_recv(mesh%nod_comm, nod_fld)
+!
+      end subroutine nod_fields_send_recv
+!
+! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
       subroutine init_send_recv(nod_comm)
@@ -58,9 +90,8 @@
       end subroutine init_send_recv
 !
 ! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
 !
-      subroutine nod_fields_send_recv(nod_comm, nod_fld)
+      subroutine fields_send_recv(nod_comm, nod_fld)
 !
       use m_machine_parameter
       use m_phys_constants
@@ -91,7 +122,7 @@
         end if
       end do
 !
-      end subroutine nod_fields_send_recv
+      end subroutine fields_send_recv
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

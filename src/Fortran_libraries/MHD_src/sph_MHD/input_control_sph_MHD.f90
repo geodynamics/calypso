@@ -10,14 +10,14 @@
 !!      subroutine input_control_SPH_MHD_psf(MHD_files, bc_IO, DMHD_ctl,&
 !!     &          sph, comms_sph, sph_grps, rj_fld, nod_fld, pwr,       &
 !!     &          flex_p, MHD_step, MHD_prop, MHD_BC, WK,               &
-!!     &          mesh, group, ele_mesh)
+!!     &          femmesh, ele_mesh)
 !!      subroutine input_control_4_SPH_MHD_nosnap(MHD_files, bc_IO,     &
 !!     &          DMHD_ctl, sph, comms_sph, sph_grps, rj_fld, pwr,      &
 !!     &          flex_p, MHD_step, MHD_prop, MHD_BC, WK)
 !!
 !!      subroutine input_control_4_SPH_make_init                        &
 !!     &         (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps, &
-!!     &          rj_fld, pwr, flex_p, MHD_step, mesh, group, ele_mesh, &
+!!     &          rj_fld, pwr, flex_p, MHD_step, femmesh, ele_mesh,     &
 !!     &          MHD_prop, MHD_BC, WK)
 !!      subroutine input_control_SPH_dynamobench                        &
 !!     &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,&
@@ -35,8 +35,7 @@
 !!        type(sph_mean_squares), intent(inout) :: pwr
 !!        type(SGS_paremeters), intent(inout) :: SGS_par
 !!        type(sph_filters_type), intent(inout) :: sph_filters(1)
-!!        type(mesh_geometry), intent(inout) :: mesh
-!!        type(mesh_groups), intent(inout) ::   group
+!!        type(mesh_data), intent(inout) :: femmesh
 !!        type(element_geometry), intent(inout) :: ele_mesh
 !!        type(flexible_stepping_parameter), intent(inout) :: flex_p
 !!        type(MHD_step_param), intent(inout) :: MHD_step
@@ -86,7 +85,7 @@
       subroutine input_control_SPH_MHD_psf(MHD_files, bc_IO, DMHD_ctl,  &
      &          sph, comms_sph, sph_grps, rj_fld, nod_fld, pwr,         &
      &          flex_p, MHD_step, MHD_prop, MHD_BC, WK,                 &
-     &          mesh, group, ele_mesh)
+     &          femmesh, ele_mesh)
 !
       use t_ctl_data_MHD
       use m_error_IDs
@@ -111,8 +110,7 @@
       type(MHD_BC_lists), intent(inout) :: MHD_BC
       type(works_4_sph_trans_MHD), intent(inout) :: WK
 !
-      type(mesh_geometry), intent(inout) :: mesh
-      type(mesh_groups), intent(inout) ::   group
+      type(mesh_data), intent(inout) :: femmesh
       type(element_geometry), intent(inout) :: ele_mesh
 !
 !
@@ -130,7 +128,8 @@
 !
       call select_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,      &
      &    sph, comms_sph, sph_grps, sph_maker1,                         &
-     &    mesh, group, ele_mesh, MHD_files%mesh_file_IO)
+     &    femmesh%mesh, femmesh%group, ele_mesh,                        &
+     &    MHD_files%mesh_file_IO)
 !
       call sph_boundary_IO_control(MHD_prop, MHD_BC, bc_IO)
 !
@@ -183,7 +182,7 @@
 !
       subroutine input_control_4_SPH_make_init                          &
      &         (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,   &
-     &          rj_fld, pwr, flex_p, MHD_step, mesh, group, ele_mesh,   &
+     &          rj_fld, pwr, flex_p, MHD_step, femmesh, ele_mesh,       &
      &          MHD_prop, MHD_BC, WK)
 !
       use t_ctl_data_MHD
@@ -201,8 +200,7 @@
       type(phys_data), intent(inout) :: rj_fld
       type(sph_mean_squares), intent(inout) :: pwr
 !
-      type(mesh_geometry), intent(inout) :: mesh
-      type(mesh_groups), intent(inout) ::   group
+      type(mesh_data), intent(inout) :: femmesh
       type(element_geometry), intent(inout) :: ele_mesh
       type(flexible_stepping_parameter), intent(inout) :: flex_p
       type(MHD_step_param), intent(inout) :: MHD_step
@@ -221,7 +219,8 @@
 !
       call select_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,      &
      &    sph, comms_sph, sph_grps, sph_maker1,                         &
-     &    mesh, group, ele_mesh, MHD_files%mesh_file_IO)
+     &    femmesh%mesh, femmesh%group, ele_mesh,                        &
+     &    MHD_files%mesh_file_IO)
 !
       call sph_boundary_IO_control(MHD_prop, MHD_BC, bc_IO)
 !

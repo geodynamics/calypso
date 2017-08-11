@@ -13,12 +13,9 @@
 !
       implicit none
 !
-!>     Structure for grid data
-!>        (position, connectivity, and communication)
-      type(mesh_geometry), save :: mesh1
-!>     Structure for group data
-      type(mesh_groups), save ::   group1
-!
+!>     Structure for FEM mesh data
+!!        (position, connectivity, communication, and groups)
+      type(mesh_data), save :: femmesh1
 !>     Structure for element data (communication)
       type(element_geometry), save :: ele_mesh1
 !

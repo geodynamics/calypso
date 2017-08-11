@@ -39,7 +39,7 @@
      &         (time, sph_params, sph_rj, sph_MHD_bc, leg, ipol, itor,  &
      &          rj_fld, cdat, pwr, WK_pwr)
 !
-      use m_field_at_mid_equator
+      use field_at_mid_equator
 !
       use t_spheric_parameter
       use t_spheric_rj_data

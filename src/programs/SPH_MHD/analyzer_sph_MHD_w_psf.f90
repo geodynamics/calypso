@@ -47,7 +47,6 @@
       use m_node_phys_data
       use m_sph_spectr_data
       use m_rms_4_sph_spectr
-      use m_cal_max_indices
       use m_bc_data_list
       use m_flexible_time_step
       use input_control_sph_MHD
@@ -68,7 +67,7 @@
       call input_control_SPH_MHD_psf(MHD_files1, bc_sph_IO1,            &
      &    DNS_MHD_ctl1, sph1, comms_sph1, sph_grps1, rj_fld1, nod_fld1, &
      &    pwr1, flex_p1, MHD_step1, MHD_prop1, MHD_BC1, trns_WK1,       &
-     &    mesh1, group1, ele_mesh1)
+     &    femmesh1, ele_mesh1)
       call copy_delta_t(MHD_step1%init_d, MHD_step1%time_d)
       call end_elapsed_time(4)
 !
@@ -77,7 +76,8 @@
       call start_elapsed_time(2)
       if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize_sph_MHD'
       call FEM_initialize_sph_MHD(MHD_files1%ucd_file_IO, MHD_step1,    &
-     &    mesh1, group1, ele_mesh1, iphys, nod_fld1, range)
+     &    femmesh1%mesh, femmesh1%group, ele_mesh1, iphys, nod_fld1,    &
+     &    range1, fem_ucd1)
 
 !
 !        Initialize spherical transform dynamo
@@ -88,7 +88,7 @@
 !        Initialize visualization
 !
       if(iflag_debug .gt. 0) write(*,*) 'init_visualize_surface'
-      call init_visualize_surface(mesh1, group1, ele_mesh1, nod_fld1)
+      call init_visualize_surface(femmesh1, ele_mesh1, nod_fld1)
 !
       call calypso_MPI_barrier
       call end_elapsed_time(2)
@@ -135,12 +135,12 @@
           if (iflag_debug.eq.1) write(*,*) 'SPH_to_FEM_bridge_MHD'
           call SPH_to_FEM_bridge_MHD                                    &
      &       (sph1%sph_params, sph1%sph_rtp, trns_WK1,                  &
-     &        mesh1, iphys, nod_fld1)
+     &        femmesh1%mesh, iphys, nod_fld1)
         end if
 !
         if (iflag_debug.eq.1) write(*,*) 'FEM_analyze_sph_MHD'
         call FEM_analyze_sph_MHD(MHD_files1%ucd_file_IO,                &
-     &      mesh1, nod_fld1, MHD_step1, visval)
+     &      femmesh1%mesh, nod_fld1, MHD_step1, visval, fem_ucd1)
 !
         call end_elapsed_time(4)
 !
@@ -151,7 +151,7 @@
           call start_elapsed_time(12)
           call visualize_surface                                        &
      &       (MHD_step1%viz_step, MHD_step1%time_d,                     &
-     &        mesh1, ele_mesh1, nod_fld1)
+     &        femmesh1, ele_mesh1, nod_fld1)
           call end_elapsed_time(12)
         end if
 !
@@ -165,7 +165,8 @@
       call end_elapsed_time(3)
 !
       if (iflag_debug.eq.1) write(*,*) 'FEM_finalize'
-      call FEM_finalize(MHD_files1%ucd_file_IO, MHD_step1)
+      call FEM_finalize                                                 &
+     &   (MHD_files1%ucd_file_IO, MHD_step1, range1, fem_ucd1)
 !
 !      if (iflag_debug.eq.1) write(*,*) 'SPH_finalize_MHD'
 !      call SPH_finalize_MHD
