@@ -57,10 +57,11 @@
       return
 !
    99 continue
+      close(id_pick_mode)
       open(id_pick_mode, file = pickup_sph_name, form='formatted',      &
      &    status='replace')
 !
-      write(id_pick_mode,'(a)')
+      write(id_pick_mode,'(a)')    '#'
       write(id_pick_mode,'(a)')    '# num_layers, num_spectr'
       write(id_pick_mode,'(2i16)')                                      &
      &                           picked%num_layer, picked%num_sph_mode
