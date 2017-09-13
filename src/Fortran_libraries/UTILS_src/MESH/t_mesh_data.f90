@@ -129,16 +129,16 @@
 !
 !
       call deallocate_surface_geom_type(ele_mesh%surf)
-      call deallocate_edge_geom_type(ele_mesh%edge)
+      call dealloc_edge_geometory(ele_mesh%edge)
 !
 !      call deallocate_iso_surface_type(ele_mesh%surf)
 !      call deallocate_ext_surface_type(ele_mesh%surf)
 !
-      call deallocate_edge_param_smp_type(ele_mesh%edge)
+      call dealloc_edge_param_smp(ele_mesh%edge)
       call deallocate_surf_param_smp_type(ele_mesh%surf)
 !
-      call deallocate_edge_4_ele_type(ele_mesh%edge)
-      call deallocate_edge_connect_type(ele_mesh%edge)
+      call dealloc_edge_4_ele(ele_mesh%edge)
+      call dealloc_edge_connect(ele_mesh%edge)
       call deallocate_surface_connect_type(ele_mesh%surf)
       call dealloc_ele_4_surf_type(ele_mesh%surf)
 !
@@ -159,7 +159,7 @@
       call deallocate_grp_type_smp(group%ele_grp)
       call deallocate_grp_type_smp(group%nod_grp)
 !
-      call deallocate_inod_in_edge_type(ele_mesh%edge)
+      call dealloc_inod_in_edge(ele_mesh%edge)
       call deallocate_inod_in_surf_type(ele_mesh%surf)
       call deallocate_ele_param_smp_type(mesh%ele)
       call deallocate_node_param_smp_type(mesh%node)
@@ -250,8 +250,8 @@
 !
 !
       call deallocate_type_comm_tbl(ele_mesh%edge_comm)
-      call deallocate_edge_connect_type(ele_mesh%edge)
-      call deallocate_edge_4_ele_type(ele_mesh%edge)
+      call dealloc_edge_connect(ele_mesh%edge)
+      call dealloc_edge_4_ele(ele_mesh%edge)
 !
       end subroutine dealloc_edge_mesh_type
 !

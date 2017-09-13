@@ -7,14 +7,14 @@
 !>@brief  Routine for doimain data IO using zlib
 !!
 !!@verbatim
-!!      subroutine read_domain_info_gz(my_rank_IO, comm_IO, ierr)
-!!      subroutine read_import_data_gz(comm_IO)
-!!      subroutine read_export_data_gz(comm_IO)
+!!      subroutine gz_read_domain_info(my_rank_IO, comm_IO, ierr)
+!!      subroutine gz_read_import_data(comm_IO)
+!!      subroutine gz_read_export_data(comm_IO)
 !!        type(communication_table), intent(inout) :: comm_IO
 !!
-!!      subroutine write_domain_info_gz(my_rank_IO, comm_IO)
-!!      subroutine write_import_data_gz(comm_IO)
-!!      subroutine write_export_data_gz(comm_IO)
+!!      subroutine gz_write_domain_info(my_rank_IO, comm_IO)
+!!      subroutine gz_write_import_data(comm_IO)
+!!      subroutine gz_write_export_data(comm_IO)
 !!        type(communication_table), intent(inout) :: comm_IO
 !!@endverbatim
 !
@@ -35,7 +35,7 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine read_domain_info_gz(my_rank_IO, comm_IO, ierr)
+      subroutine gz_read_domain_info(my_rank_IO, comm_IO, ierr)
 !
       use m_error_IDs
 !
@@ -64,11 +64,11 @@
         call read_gz_multi_int(comm_IO%num_neib, comm_IO%id_neib)
       end if
 !
-      end subroutine read_domain_info_gz
+      end subroutine gz_read_domain_info
 !
 !------------------------------------------------------------------
 !
-      subroutine read_import_data_gz(comm_IO)
+      subroutine gz_read_import_data(comm_IO)
 !
       type(communication_table), intent(inout) :: comm_IO
 !
@@ -88,11 +88,11 @@
         call allocate_type_import_item(comm_IO)
       end if
 !
-      end subroutine read_import_data_gz
+      end subroutine gz_read_import_data
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_export_data_gz(comm_IO)
+      subroutine gz_read_export_data(comm_IO)
 !
       type(communication_table), intent(inout) :: comm_IO
 !
@@ -112,12 +112,12 @@
         call allocate_type_export_item(comm_IO)
       end if
 !
-      end subroutine read_export_data_gz
+      end subroutine gz_read_export_data
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine write_domain_info_gz(my_rank_IO, comm_IO)
+      subroutine gz_write_domain_info(my_rank_IO, comm_IO)
 !
       use m_sph_modes_grid_labels
 !
@@ -140,11 +140,11 @@
 !
       call deallocate_type_neib_id(comm_IO)
 !
-      end subroutine write_domain_info_gz
+      end subroutine gz_write_domain_info
 !
 !------------------------------------------------------------------
 !
-      subroutine write_import_data_gz(comm_IO)
+      subroutine gz_write_import_data(comm_IO)
 !
       type(communication_table), intent(inout) :: comm_IO
 !
@@ -155,11 +155,11 @@
 !
       call deallocate_type_import(comm_IO)
 !
-      end subroutine write_import_data_gz
+      end subroutine gz_write_import_data
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_export_data_gz(comm_IO)
+      subroutine gz_write_export_data(comm_IO)
 !
       type(communication_table), intent(inout) :: comm_IO
 !
@@ -170,7 +170,7 @@
 !
       call deallocate_type_export(comm_IO)
 !
-      end subroutine write_export_data_gz
+      end subroutine gz_write_export_data
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

@@ -67,7 +67,7 @@
       sph_IO%numdir_sph =  3
 !
 !      write(*,*) '! domain and communication'
-      call read_domain_info_gz(my_rank_IO, comm_IO, ierr)
+      call gz_read_domain_info(my_rank_IO, comm_IO, ierr)
 !
 !      write(*,*) '! truncation level for spherical harmonics'
       call read_gl_resolution_sph_gz(sph_IO)
@@ -81,7 +81,7 @@
       call read_gl_nodes_sph_gz(sph_IO)
 !
 !      write(*,*) '! communication table between spectr data'
-      call read_import_data_gz(comm_IO)
+      call gz_read_import_data(comm_IO)
 !
 !      write(*,*) 'read_rtp_node_grp_data_gz'
       call read_group_data_gz(sph_grps_IO%bc_rtp_grp)
@@ -112,7 +112,7 @@
       sph_IO%numdir_sph =  2
 !
 !      write(*,*) '! domain and communication'
-      call read_domain_info_gz(my_rank_IO, comm_IO, ierr)
+      call gz_read_domain_info(my_rank_IO, comm_IO, ierr)
 !
 !      write(*,*) '! truncation level for spherical harmonics'
       call read_gl_resolution_sph_gz(sph_IO)
@@ -126,7 +126,7 @@
       call read_gl_nodes_sph_gz(sph_IO)
 !
 !      write(*,*) '! communication table between spectr data'
-      call read_import_data_gz(comm_IO)
+      call gz_read_import_data(comm_IO)
 !
 !      write(*,*) '! Group data'
       call read_group_data_gz(sph_grps_IO%radial_rj_grp)
@@ -148,13 +148,13 @@
 !
       sph_IO%numdir_sph =  3
 !
-      call read_domain_info_gz(my_rank_IO, comm_IO, ierr)
+      call gz_read_domain_info(my_rank_IO, comm_IO, ierr)
       call read_gl_resolution_sph_gz(sph_IO)
       call read_rank_4_sph_gz(sph_IO)
       call read_rtp_gl_1d_table_gz(sph_IO)
       call read_gl_nodes_sph_gz(sph_IO)
 !
-      call read_import_data_gz(comm_IO)
+      call gz_read_import_data(comm_IO)
 !
       end subroutine read_geom_rtm_data_gz
 !
@@ -172,13 +172,13 @@
 !
       sph_IO%numdir_sph =  2
 !
-      call read_domain_info_gz(my_rank_IO, comm_IO, ierr)
+      call gz_read_domain_info(my_rank_IO, comm_IO, ierr)
       call read_gl_resolution_sph_gz(sph_IO)
       call read_rank_4_sph_gz(sph_IO)
       call read_rj_gl_1d_table_gz(sph_IO)
       call read_gl_nodes_sph_gz(sph_IO)
 !
-      call read_import_data_gz(comm_IO)
+      call gz_read_import_data(comm_IO)
 !
       end subroutine read_spectr_modes_rlm_data_gz
 !
@@ -198,7 +198,7 @@
 !
       textbuf = hd_sph_para() // char(0)
       call gz_write_textbuf_no_lf
-      call write_domain_info_gz(my_rank_IO, comm_IO)
+      call gz_write_domain_info(my_rank_IO, comm_IO)
 !
 !
 !      write(*,*) '! truncation level for spherical harmonics'
@@ -215,7 +215,7 @@
 !
       textbuf = hd_rtp_comm() // char(0)
       call gz_write_textbuf_no_lf
-      call write_import_data_gz(comm_IO)
+      call gz_write_import_data(comm_IO)
 !
       textbuf = hd_grphd() // char(0)
       call gz_write_textbuf_no_lf
@@ -255,7 +255,7 @@
 !
       textbuf = hd_sph_para() // char(0)
       call gz_write_textbuf_no_lf
-      call write_domain_info_gz(my_rank_IO, comm_IO)
+      call gz_write_domain_info(my_rank_IO, comm_IO)
 !
 !      write(*,*) '! truncation level for spherical harmonics'
       call write_gl_resolution_sph_gz(sph_IO)
@@ -271,7 +271,7 @@
 !
       textbuf = hd_rj_comm() // char(0)
       call gz_write_textbuf_no_lf
-      call write_import_data_gz(comm_IO)
+      call gz_write_import_data(comm_IO)
 !
 !
       textbuf = hd_grphd() // char(0)
@@ -298,7 +298,7 @@
 !
       textbuf = hd_sph_para() // char(0)
       call gz_write_textbuf_no_lf
-      call write_domain_info_gz(my_rank_IO, comm_IO)
+      call gz_write_domain_info(my_rank_IO, comm_IO)
 !
 !      write(*,*) '! truncation level for spherical harmonics'
       call write_gl_resolution_sph_gz(sph_IO)
@@ -314,7 +314,7 @@
 !
       textbuf = hd_rtp_comm() // char(0)
       call gz_write_textbuf_no_lf
-      call write_import_data_gz(comm_IO)
+      call gz_write_import_data(comm_IO)
 !
       end subroutine write_geom_rtm_data_gz
 !
@@ -329,7 +329,7 @@
 !
       textbuf = hd_sph_para() // char(0)
       call gz_write_textbuf_no_lf
-      call write_domain_info_gz(my_rank_IO, comm_IO)
+      call gz_write_domain_info(my_rank_IO, comm_IO)
 !
 !      write(*,*) '! truncation level for spherical harmonics'
       call write_gl_resolution_sph_gz(sph_IO)
@@ -345,7 +345,7 @@
 !
       textbuf = hd_rj_comm() // char(0)
       call gz_write_textbuf_no_lf
-      call write_import_data_gz(comm_IO)
+      call gz_write_import_data(comm_IO)
 !
       end subroutine write_modes_rlm_data_gz
 !

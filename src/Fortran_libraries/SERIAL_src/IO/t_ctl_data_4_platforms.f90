@@ -45,6 +45,7 @@
 !!
 !!      memory_conservation_ctl     'YES'
 !!      FEM_mesh_output_switch      'NO'
+!!      FEM_surface_output_switch   'NO'
 !!
 !!      delete_original_data_flag       'YES'
 !!    end data_files_def
@@ -126,6 +127,7 @@
 !
         type(read_character_item) :: memory_conservation_ctl
         type(read_character_item) :: FEM_mesh_output_switch
+        type(read_character_item) :: FEM_surface_output_switch
 !
         type(read_character_item) :: del_org_data_ctl
 !
@@ -184,6 +186,8 @@
      &       :: hd_mem_conserve =   'memory_conservation_ctl'
       character(len=kchara), parameter                                  &
      &       :: hd_FEM_mesh_output = 'FEM_mesh_output_switch'
+      character(len=kchara), parameter                                  &
+     &       :: hd_FEM_surf_output = 'FEM_surface_output_switch'
 !
       character(len=kchara), parameter                                  &
      &       :: hd_del_org_data = 'delete_original_data_flag'
@@ -203,7 +207,8 @@
       private :: hd_coriolis_tri_int_name
       private :: hd_itp_sph_to_fem, hd_itp_fem_to_sph
       private :: hd_itp_files_fmt, hd_coriolis_file_fmt
-      private :: hd_spect_field_fmt, hd_FEM_mesh_output
+      private :: hd_spect_field_fmt
+      private :: hd_FEM_mesh_output, hd_FEM_surf_output
       private :: hd_exclude_FEM_mesh, hd_del_org_data
 !
 !  ---------------------------------------------------------------------
@@ -278,6 +283,8 @@
      &      plt%memory_conservation_ctl)
         call read_chara_ctl_type(hd_FEM_mesh_output,                    &
      &      plt%FEM_mesh_output_switch)
+        call read_chara_ctl_type(hd_FEM_surf_output,                    &
+     &      plt%FEM_surface_output_switch)
 !
         call read_chara_ctl_type(hd_exclude_FEM_mesh,                   &
      &      plt%excluding_FEM_mesh_ctl)

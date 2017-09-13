@@ -131,10 +131,10 @@
 !
       call alloc_numele_belonged(node%numnod, neib_ele)
 !
-      call count_iele_4_node(node%numnod, edge%numedge,            &
+      call count_iele_4_node(node%numnod, edge%numedge,                 &
      &    edge%nnod_4_edge, edge%ie_edge, ione, edge%numedge,           &
      &    neib_ele%nele_4_node)
-      call s_cal_minmax_and_stacks(node%numnod,                    &
+      call s_cal_minmax_and_stacks(node%numnod,                         &
      &    neib_ele%nele_4_node, izero, neib_ele%istack_4_node,          &
      &    neib_ele%ntot, neib_ele%nmax, neib_ele%nmin)
 !

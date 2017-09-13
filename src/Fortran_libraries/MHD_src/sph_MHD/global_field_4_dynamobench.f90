@@ -7,24 +7,22 @@
 !>@brief Evaluate global data for dynamo benchmark test
 !!
 !!@verbatim
-!!      subroutine copy_energy_4_dynamobench(pwr)
-!!      subroutine copy_icore_energy_4_dbench(pwr)
+!!      subroutine copy_energy_4_dynamobench(pwr, KE_bench, ME_bench)
+!!      subroutine copy_icore_energy_4_dbench(pwr, mene_icore)
 !!        type(sph_mean_squares), intent(in) :: pwr
 !!
 !!      subroutine pick_inner_core_rotation(idx_rj_degree_one, nidx_rj, &
 !!     &          nlayer_ICB, ar_1d_rj, it_velo,                        &
-!!     &          nnod_rj, ntot_phys_rj, d_rj)
+!!     &          nnod_rj, ntot_phys_rj, d_rj, rotate_icore)
 !!      subroutine pick_mag_torque_inner_core(idx_rj_degree_one,        &
 !!     &          nidx_rj, nlayer_ICB, radius_1d_rj_r, it_lorentz,      &
-!!     &          nnod_rj, ntot_phys_rj, d_rj)
+!!     &          nnod_rj, ntot_phys_rj, d_rj, m_torque_icore)
 !!@endverbatim
 !
       module global_field_4_dynamobench
 !
       use m_precision
-!
       use m_constants
-      use m_field_4_dynamobench
 !
       implicit none
 !
@@ -34,12 +32,14 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine copy_energy_4_dynamobench(pwr)
+      subroutine copy_energy_4_dynamobench(pwr, KE_bench, ME_bench)
 !
       use m_phys_labels
       use t_rms_4_sph_spectr
 !
       type(sph_mean_squares), intent(in) :: pwr
+      real(kind = kreal), intent(inout) :: KE_bench(3)
+      real(kind = kreal), intent(inout) :: ME_bench(3)
 !
       integer(kind = kint) :: i_fld, i_comp
 !
@@ -68,12 +68,13 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine copy_icore_energy_4_dbench(pwr)
+      subroutine copy_icore_energy_4_dbench(pwr, mene_icore)
 !
       use m_phys_labels
       use t_rms_4_sph_spectr
 !
       type(sph_mean_squares), intent(in) :: pwr
+      real(kind = kreal), intent(inout) :: mene_icore(3)
 !
       integer(kind = kint) :: i_fld, i_comp
 !
@@ -96,7 +97,7 @@
 !
       subroutine pick_inner_core_rotation(idx_rj_degree_one, nidx_rj,   &
      &          nlayer_ICB, ar_1d_rj, it_velo,                          &
-     &          nnod_rj, ntot_phys_rj, d_rj)
+     &          nnod_rj, ntot_phys_rj, d_rj, rotate_icore)
 !
       use calypso_mpi
 !
@@ -108,6 +109,8 @@
       integer(kind = kint), intent(in) :: it_velo
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real (kind=kreal), intent(in) :: d_rj(nnod_rj,ntot_phys_rj)
+!
+      real(kind = kreal), intent(inout) :: rotate_icore(-1:1)
 !
       integer(kind = kint) :: i, i10c_o
       real(kind = kreal) :: rotate_ic_local(-1:1)
@@ -132,7 +135,7 @@
 !
       subroutine pick_mag_torque_inner_core(idx_rj_degree_one,          &
      &          nidx_rj, nlayer_ICB, radius_1d_rj_r, it_lorentz,        &
-     &          nnod_rj, ntot_phys_rj, d_rj)
+     &          nnod_rj, ntot_phys_rj, d_rj, m_torque_icore)
 !
       use calypso_mpi
 !
@@ -143,6 +146,9 @@
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real(kind = kreal), intent(in) :: radius_1d_rj_r(nidx_rj(1))
       real (kind=kreal), intent(in) :: d_rj(nnod_rj,ntot_phys_rj)
+!
+      real(kind = kreal), intent(inout) :: m_torque_icore(-1:1)
+!
 !
       integer(kind = kint) :: i, i10c_o
       real(kind = kreal) :: m_torque_local(-1:1)

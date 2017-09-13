@@ -10,18 +10,18 @@
 !!        type(surface_data), intent(inout) :: surf
 !!        type(edge_data), intent(inout) :: edge
 !!
-!!      subroutine set_surf_connect_type(node, ele, surf)
+!!      subroutine set_surf_connectivity(node, ele, surf)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(inout) :: surf
-!!      subroutine set_edge_connect_type(node, ele, surf, edge)
+!!      subroutine set_edge_connectivity(node, ele, surf, edge)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(in) :: surf
 !!        type(edge_data), intent(inout) :: edge
 !!
-!!      subroutine set_surf_geometry_type(node, surf)
-!!      subroutine set_edge_geometry_type(node, edge)
+!!      subroutine set_surf_geometry(node, surf)
+!!      subroutine set_edge_geometry(node, edge)
 !!        type(node_data), intent(in) :: node
 !!        type(surface_data), intent(inout) :: surf
 !!        type(edge_data), intent(inout) :: edge
@@ -38,6 +38,9 @@
 !
       implicit  none
 !
+      private :: set_surf_connectivity, set_edge_connectivity
+      private :: set_surf_geometry, set_edge_geometry
+!
 ! ----------------------------------------------------------------------
 !
      contains
@@ -53,15 +56,15 @@
       type(edge_data), intent(inout) :: edge
 !
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_surf_connect_type'
-      call set_surf_connect_type(node, ele, surf)
-      if (iflag_debug.gt.0) write(*,*) 'set_edge_connect_type'
-      call set_edge_connect_type(node, ele, surf, edge)
+      if (iflag_debug.gt.0) write(*,*) 'set_surf_connectivity'
+      call set_surf_connectivity(node, ele, surf)
+      if (iflag_debug.gt.0) write(*,*) 'set_edge_connectivity'
+      call set_edge_connectivity(node, ele, surf, edge)
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_surf_geometry_type'
-      call set_surf_geometry_type(node, surf)
-      if (iflag_debug.gt.0) write(*,*) 'set_edge_geometry_type'
-      call set_edge_geometry_type(node, edge)
+      if (iflag_debug.gt.0) write(*,*) 'set_surf_geometry'
+      call set_surf_geometry(node, surf)
+      if (iflag_debug.gt.0) write(*,*) 'set_edge_geometry'
+      call set_edge_geometry(node, edge)
 !
       end subroutine set_surface_and_edge
 !
@@ -82,14 +85,14 @@
       call empty_edge_connect_type(ele, surf, edge)
 !
       call allocate_surface_geom_type(surf)
-      call allocate_edge_geom_type(edge)
+      call alloc_edge_geometory(edge)
 !
       end subroutine empty_surface_and_edge
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_surf_connect_type(node, ele, surf)
+      subroutine set_surf_connectivity(node, ele, surf)
 !
       use const_surface_data
       use set_size_4_smp_types
@@ -119,11 +122,11 @@
       call count_surf_size_smp_type(surf)
       call count_overlap_surf(node, surf)
 !
-      end subroutine set_surf_connect_type
+      end subroutine set_surf_connectivity
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_edge_connect_type(node, ele, surf, edge)
+      subroutine set_edge_connectivity(node, ele, surf, edge)
 !
       use const_edge_data
       use set_size_4_smp_types
@@ -152,12 +155,12 @@
       call count_edge_size_smp_type(edge)
       call count_overlap_edge(node, edge)
 !
-      end subroutine set_edge_connect_type
+      end subroutine set_edge_connectivity
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_surf_geometry_type(node, surf)
+      subroutine set_surf_geometry(node, surf)
 !
       use cal_mesh_position
 !
@@ -168,11 +171,11 @@
       call allocate_surface_geom_type(surf)
       call set_center_of_surface(node, surf)
 !
-      end subroutine set_surf_geometry_type
+      end subroutine set_surf_geometry
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_edge_geometry_type(node, edge)
+      subroutine set_edge_geometry(node, edge)
 !
       use cal_mesh_position
 !
@@ -180,10 +183,10 @@
       type(edge_data), intent(inout) :: edge
 !
 !
-      call allocate_edge_geom_type(edge)
+      call alloc_edge_geometory(edge)
       call set_center_of_edge(node, edge)
 !
-      end subroutine set_edge_geometry_type
+      end subroutine set_edge_geometry
 !
 ! ----------------------------------------------------------------------
 !

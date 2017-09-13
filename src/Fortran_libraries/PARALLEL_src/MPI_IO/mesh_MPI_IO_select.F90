@@ -36,6 +36,7 @@
       use MPI_mesh_file_IO
       use MPI_mesh_file_IO_b
       use set_mesh_file_names
+      use mesh_file_name_by_param
 !
 #ifdef ZLIB_IO
       use gz_MPI_mesh_file_IO

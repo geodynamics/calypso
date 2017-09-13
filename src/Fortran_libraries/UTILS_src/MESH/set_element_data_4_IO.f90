@@ -16,6 +16,7 @@
 !!        type(element_data), intent(in) :: ele
 !!        type(node_data), intent(inout) :: nod_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!      subroutine copy_ele_geometry_from_IO(nod_IO, sfed_IO, ele)
 !!@endverbatim
 !
       module set_element_data_4_IO
@@ -117,7 +118,7 @@
 !
       subroutine copy_ele_geometry_to_IO(ele, nod_IO, sfed_IO)
 !
-      type(element_data), intent(inout) :: ele
+      type(element_data), intent(in) :: ele
       type(node_data), intent(inout) :: nod_IO
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !
@@ -201,6 +202,35 @@
 !$omp end parallel do
 !
       end subroutine copy_ele_cyl_geom_to_IO
+!
+!------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      subroutine copy_ele_geometry_from_IO(nod_IO, sfed_IO, ele)
+!
+      type(node_data), intent(inout) :: nod_IO
+      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(element_data), intent(inout) :: ele
+!
+      integer(kind = kint) :: iele
+!
+!
+      ele%internal_ele = nod_IO%internal_node
+      call alloc_ele_geometry(ele)
+!
+!$omp parallel do
+      do iele = 1, ele%numele
+         ele%x_ele(iele,1) = nod_IO%xx(iele,1)
+         ele%x_ele(iele,2) = nod_IO%xx(iele,2)
+         ele%x_ele(iele,3) = nod_IO%xx(iele,3)
+         ele%volume_ele(iele) =  sfed_IO%ele_scalar(iele)
+      end do
+!$omp end parallel do
+!
+      call dealloc_node_geometry_base(nod_IO)
+      call dealloc_ele_scalar_IO(sfed_IO)
+!
+      end subroutine copy_ele_geometry_from_IO
 !
 !------------------------------------------------------------------
 !

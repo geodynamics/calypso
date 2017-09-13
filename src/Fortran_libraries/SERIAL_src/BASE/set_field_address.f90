@@ -9,6 +9,9 @@
 !> @brief Set start address for field data
 !!
 !!@verbatim
+!!      subroutine init_field_address(numnod, fld, iphys)
+!!        type(phys_data), intent(inout) :: fld
+!!        type(phys_address), intent(inout) :: iphys
 !!      subroutine set_field_addresses(istart_adress, num_field,        &
 !!     &          field_name, num_component, iphys)
 !!      integer(kind = kint), intent(in) :: istart_adress
@@ -29,6 +32,9 @@
 !
       use m_precision
 !
+      use t_phys_address
+      use t_phys_data
+!
       implicit none
 !
 ! -------------------------------------------------------------------
@@ -37,11 +43,25 @@
 !
 ! -------------------------------------------------------------------
 !
+      subroutine init_field_address(numnod, fld, iphys)
+!
+      integer(kind = kint), intent(in) :: numnod
+      type(phys_data), intent(inout) :: fld
+      type(phys_address), intent(inout) :: iphys
+!
+!
+      call alloc_phys_data_type(numnod, fld)
+      call set_field_addresses(ione, fld%num_phys,                      &
+     &    fld%phys_name, fld%num_component, iphys)
+!
+      end subroutine init_field_address
+!
+!  --------------------------------------------------------------------
+!
       subroutine set_field_addresses(istart_adress, num_field,          &
      &          field_name, num_component, iphys)
 !
       use m_phys_labels
-      use t_phys_address
 !
       integer(kind = kint), intent(in) :: istart_adress
       integer(kind = kint), intent(in) :: num_field

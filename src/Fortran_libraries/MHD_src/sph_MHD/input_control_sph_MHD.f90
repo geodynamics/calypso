@@ -19,10 +19,6 @@
 !!     &         (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps, &
 !!     &          rj_fld, pwr, flex_p, MHD_step, femmesh, ele_mesh,     &
 !!     &          MHD_prop, MHD_BC, WK)
-!!      subroutine input_control_SPH_dynamobench                        &
-!!     &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,&
-!!     &           rj_fld, nod_fld, pwr, flex_p, MHD_step,              &
-!!     &           MHD_prop, MHD_BC, WK, cdat)
 !!        type(MHD_file_IO_params), intent(inout) :: MHD_files
 !!        type(sph_sgs_mhd_control), intent(inout) :: MHD_ctl
 !!        type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
@@ -128,8 +124,7 @@
 !
       call select_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,      &
      &    sph, comms_sph, sph_grps, sph_maker1,                         &
-     &    femmesh%mesh, femmesh%group, ele_mesh,                        &
-     &    MHD_files%mesh_file_IO)
+     &    femmesh%mesh, femmesh%group, ele_mesh, MHD_files)
 !
       call sph_boundary_IO_control(MHD_prop, MHD_BC, bc_IO)
 !
@@ -219,64 +214,11 @@
 !
       call select_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,      &
      &    sph, comms_sph, sph_grps, sph_maker1,                         &
-     &    femmesh%mesh, femmesh%group, ele_mesh,                        &
-     &    MHD_files%mesh_file_IO)
+     &    femmesh%mesh, femmesh%group, ele_mesh, MHD_files)
 !
       call sph_boundary_IO_control(MHD_prop, MHD_BC, bc_IO)
 !
       end subroutine input_control_4_SPH_make_init
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine input_control_SPH_dynamobench                          &
-     &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,  &
-     &           rj_fld, nod_fld, pwr, flex_p, MHD_step,                &
-     &           MHD_prop, MHD_BC, WK, cdat)
-!
-      use t_ctl_data_MHD
-      use t_field_on_circle
-      use set_control_sph_mhd
-      use set_control_sph_data_MHD
-      use parallel_load_data_4_sph
-      use set_control_4_SPH_to_FEM
-!
-      type(MHD_file_IO_params), intent(inout) :: MHD_files
-      type(boundary_spectra), intent(inout) :: bc_IO
-      type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
-      type(sph_grids), intent(inout) :: sph
-      type(sph_comm_tables), intent(inout) :: comms_sph
-      type(sph_group_data), intent(inout) ::  sph_grps
-!
-      type(phys_data), intent(inout) :: rj_fld
-      type(phys_data), intent(inout) :: nod_fld
-      type(sph_mean_squares), intent(inout) :: pwr
-      type(flexible_stepping_parameter), intent(inout) :: flex_p
-      type(MHD_step_param), intent(inout) :: MHD_step
-      type(MHD_evolution_param), intent(inout) :: MHD_prop
-      type(MHD_BC_lists), intent(inout) :: MHD_BC
-      type(works_4_sph_trans_MHD), intent(inout) :: WK
-      type(circle_fld_maker), intent(inout) :: cdat
-!
-!
-      if (iflag_debug.eq.1) write(*,*) 'set_control_4_SPH_MHD'
-      call set_control_4_SPH_MHD                                        &
-     &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%Dmodel_ctl,          &
-     &    DMHD_ctl%smctl_ctl, DMHD_ctl%smonitor_ctl,                    &
-     &    DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl, sph_maker1%sph_tmp,     &
-     &    rj_fld, MHD_files, bc_IO, pwr, flex_p, MHD_step, MHD_prop,    &
-     &    MHD_BC, WK%WK_sph, sph_maker1%gen_sph)
-!
-      call s_set_control_4_SPH_to_FEM                                   &
-     &   (DMHD_ctl%psph_ctl%spctl, sph%sph_params, rj_fld, nod_fld)
-      call set_ctl_params_dynamobench                                   &
-     &   (DMHD_ctl%Dmodel_ctl%fld_ctl%field_ctl,                        &
-     &    DMHD_ctl%smonitor_ctl%meq_ctl, cdat%circle, cdat%d_circle)
-!
-      if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
-      call load_para_sph_mesh(sph, comms_sph, sph_grps)
-!
-      end subroutine input_control_SPH_dynamobench
 !
 ! ----------------------------------------------------------------------
 !

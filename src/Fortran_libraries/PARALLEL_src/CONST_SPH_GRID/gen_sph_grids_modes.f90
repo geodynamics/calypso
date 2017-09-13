@@ -37,9 +37,6 @@
 !
       implicit none
 !
-!>      Integer flag to excluding FEM mesh
-      integer(kind = kint) :: iflag_output_mesh = 0
-!
       private :: const_comm_table_4_rlm, const_comm_table_4_rtm
 !
 ! -----------------------------------------------------------------------

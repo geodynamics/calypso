@@ -97,7 +97,6 @@
       subroutine output_mesh(mesh_file, my_rank, mesh, group)
 !
       use mesh_IO_select
-      use set_comm_table_4_IO
       use set_element_data_4_IO
       use copy_mesh_structures
 !
@@ -152,7 +151,6 @@
 !
       subroutine set_mesh_geometry_data(mesh_IO, nod_comm, node, ele)
 !
-      use set_comm_table_4_IO
       use set_element_data_4_IO
       use copy_mesh_structures
 !

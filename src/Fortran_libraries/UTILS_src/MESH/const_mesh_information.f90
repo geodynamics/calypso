@@ -17,7 +17,7 @@
 !!     &         (my_rank, node, ele, nod_grp, ele_grp, surf_grp)
 !!
 !!      subroutine set_local_element_info(surf, edge)
-!!      subroutine set_nod_and_ele_infos(node, ele)
+!!      subroutine set_nod_and_ele_infosiflag_ele_mesh, (node, ele)
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::   group
 !!        type(element_geometry), intent(inout) :: ele_mesh
@@ -207,8 +207,8 @@
       call set_inod_in_surf(surf%nnod_4_surf,                           &
      &    surf%node_on_sf, surf%node_on_sf_n)
 !
-      if (iflag_debug.eq.1) write(*,*) 'allocate_inod_in_edge'
-      call allocate_inod_in_edge(edge)
+      if (iflag_debug.eq.1) write(*,*) 'alloc_inod_in_edge'
+      call alloc_inod_in_edge(edge)
       call copy_inod_in_edge(edge%nnod_4_edge,                          &
      &    edge%node_on_edge, edge%node_on_edge_sf)
 !
@@ -224,17 +224,22 @@
       type(node_data), intent(inout) :: node
       type(element_data), intent(inout) :: ele
 !
+      logical :: read_element
 !
-      call allocate_ele_geometry_type(ele)
+!
+      read_element = allocated(ele%x_ele)
+!
+      if(read_element .eqv. .false.) then
+        call alloc_ele_geometry(ele)
+        if (iflag_debug.eq.1) write(*,*) 'set_center_of_element'
+        call set_center_of_element(node, ele)
+      end if
 !
        if (iflag_debug.eq.1) write(*,*) 'count_size_4_smp_mesh_type'
       call count_size_4_smp_mesh_type(node, ele)
 !
        if (iflag_debug.eq.1) write(*,*) 'set_spherical_position'
       call set_spherical_position(node)
-!
-       if (iflag_debug.eq.1) write(*,*) 'set_center_of_element'
-      call set_center_of_element(node, ele)
 !
        if (iflag_debug.eq.1) write(*,*) 'count_overlap_ele'
       call count_overlap_ele(node, ele)
@@ -250,7 +255,7 @@
 !
 !
       geom%ele%numele = 0
-      call allocate_ele_geometry_type(geom%ele)
+      call alloc_ele_geometry(geom%ele)
 !
       if (iflag_debug.eq.1) write(*,*) 'allocate_node_param_smp_type'
       call allocate_node_param_smp_type(geom%node)

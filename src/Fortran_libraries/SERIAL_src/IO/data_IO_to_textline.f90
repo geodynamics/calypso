@@ -273,7 +273,7 @@
       function vector_textline(num, real_dat)
 !
       integer(kind = kint), intent(in) ::    num
-      integer(kind = kint), intent(in) ::    real_dat(num)
+      real(kind = kreal), intent(in) ::      real_dat(num)
 !
       character(len=num*25+1) :: vector_textline
 !

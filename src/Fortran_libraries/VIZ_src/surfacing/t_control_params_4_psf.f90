@@ -17,6 +17,8 @@
       implicit  none
 !
 !
+      character(len=kchara), parameter :: default_psf_prefix = 'psf'
+!
         character(len = kchara), allocatable :: psf_header(:)
         integer(kind = kint), allocatable :: itype_psf_file(:)
 !
@@ -25,7 +27,7 @@
 !
         real(kind = kreal), allocatable :: const_psf(:,:)
 !
-      integer(kind = kint), allocatable :: id_psf_group(:)
+        integer(kind = kint), allocatable :: id_psf_group(:)
 !
 !  ---------------------------------------------------------------------
 !
@@ -148,6 +150,7 @@
       call s_set_coefs_of_sections                                      &
      &   (psf, id_section_method(i_psf), const_psf(1,i_psf), ierr)
 !
+      tmpchara = psf%section_method_ctl%charavalue
       if(ierr .gt. 0 .and. cmp_no_case(tmpchara, cflag_grp)) then
         id_section_method(i_psf) = 0
         call set_surf_grp_id_4_viz(num_surf, surf_name,                 &

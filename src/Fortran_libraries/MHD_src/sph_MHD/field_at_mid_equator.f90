@@ -9,13 +9,16 @@
 !!@verbatim
 !!      subroutine set_mid_equator_point_global                         &
 !!     &         (sph_params, sph_rtp, sph_rj, cdat)
-!!      subroutine mid_eq_transfer_dynamobench                          &
-!!     &         (time, sph_rj, rj_fld, cdat)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(phys_data), intent(in) :: rj_fld
 !!        type(circle_fld_maker), intent(inout) :: cdat
+!!
+!!      subroutine cal_drift_by_v44(time, circle, ibench_velo,          &
+!!     &          t_prev, phase_vm4, phase_vm4_prev, omega_vm4)
+!!      subroutine cal_field_4_dynamobench(circle, d_circle,            &
+!!     &          ibench_velo, phi_zero, phi_prev, d_zero)
 !!@endverbatim
 !
       module field_at_mid_equator
@@ -24,15 +27,11 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_field_4_dynamobench
 !
       use t_field_on_circle
       use t_circle_transform
 !
       implicit none
-!
-      private :: cal_field_4_dynamobench
-      private :: cal_drift_by_v44
 !
 ! ----------------------------------------------------------------------
 !
@@ -66,46 +65,21 @@
       end subroutine set_mid_equator_point_global
 !
 ! ----------------------------------------------------------------------
-!
-      subroutine mid_eq_transfer_dynamobench                            &
-     &         (time, sph_rj, rj_fld, cdat)
-!
-      use calypso_mpi
-      use t_field_on_circle
-      use t_spheric_rj_data
-      use t_phys_data
-!
-      real(kind=kreal), intent(in) :: time
-      type(sph_rj_grid), intent(in) :: sph_rj
-      type(phys_data), intent(in) :: rj_fld
-      type(circle_fld_maker), intent(inout) :: cdat
-!
-!    spherical transfer
-!
-      call sph_transfer_on_circle(sph_rj, rj_fld, cdat)
-!
-      if(my_rank .gt. 0) return
-!
-!   Evaluate drift frequencty by velocity 
-!
-      call cal_drift_by_v44(time, cdat%circle)
-!
-!   find local point for dynamobench
-!
-      if(iflag_debug.gt.0)  write(*,*) 'cal_field_4_dynamobench'
-      call cal_field_4_dynamobench(cdat%circle, cdat%d_circle)
-!
-      end subroutine mid_eq_transfer_dynamobench
-!
-! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_drift_by_v44(time, circle)
+      subroutine cal_drift_by_v44(time, circle, ibench_velo,            &
+     &          t_prev, phase_vm4, phase_vm4_prev, omega_vm4)
 !
       use t_circle_transform
 !
       real(kind=kreal), intent(in) :: time
       type(fields_on_circle), intent(in) :: circle
+      integer(kind = kint), intent(in) :: ibench_velo
+!
+      real(kind = kreal), intent(inout) :: t_prev
+      real(kind = kreal), intent(inout) :: phase_vm4(2)
+      real(kind = kreal), intent(inout) :: phase_vm4_prev(2)
+      real(kind = kreal), intent(inout) :: omega_vm4(2)
 !
       integer(kind = kint) :: j4c, j4s
       real(kind = kreal) :: vp44c, vp44s
@@ -137,16 +111,21 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_field_4_dynamobench(circle, d_circle)
+      subroutine cal_field_4_dynamobench(circle, d_circle,              &
+     &          ibench_velo, phi_zero, phi_prev, d_zero)
 !
       use calypso_mpi
       use t_phys_data
 !
-      integer(kind = kint) :: nd, mphi, mp_next, icou
-      real(kind = kreal) :: coef
-!
       type(fields_on_circle), intent(in) :: circle
       type(phys_data), intent(in) :: d_circle
+      integer(kind = kint), intent(in) :: ibench_velo
+!
+      real(kind = kreal), intent(inout) :: phi_zero(4), phi_prev(4)
+      real(kind = kreal), intent(inout) :: d_zero(0:4,7)
+!
+      integer(kind = kint) :: nd, mphi, mp_next, icou
+      real(kind = kreal) :: coef
 !
 !
       icou = 0

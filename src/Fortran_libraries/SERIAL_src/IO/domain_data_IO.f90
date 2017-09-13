@@ -9,7 +9,7 @@
 !!@verbatim
 !!      subroutine read_domain_info(id_file, my_rank_IO, comm_IO, ierr)
 !!      subroutine read_import_data(id_file, comm_IO)
-!!      subroutine read_export_data(id_file)
+!!      subroutine read_export_data(id_file, comm_IO)
 !!        type(communication_table), intent(inout) :: comm_IO
 !!
 !!      subroutine write_domain_info(id_file, my_rank_IO, comm_IO)

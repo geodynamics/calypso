@@ -69,8 +69,8 @@
      &    edge_ele_tbl%istack_hash, edge_ele_tbl%iend_hash,             &
      &    edge_ele_tbl%iflag_hash, edge%numedge)
 !
-      call allocate_edge_connect_type(edge, surf%numsurf)
-      call allocate_edge_4_ele_type(edge, ele%numele)
+      call alloc_edge_connect(edge, surf%numsurf)
+      call alloc_edge_4_ele(edge, ele%numele)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_edges_connect_by_sf'
       call set_edges_connect_by_ele                                     &
@@ -151,11 +151,11 @@
 !
       edge%numedge = 0
       if (iflag_debug.eq.1) write(*,*) 'empty edge data'
-      call allocate_edge_connect_type(edge, surf%numsurf)
-      call allocate_edge_4_ele_type(edge, ele%numele)
+      call alloc_edge_connect(edge, surf%numsurf)
+      call alloc_edge_4_ele(edge, ele%numele)
 !
-      if (iflag_debug.eq.1) write(*,*) 'allocate_edge_param_smp_type'
-      call allocate_edge_param_smp_type(edge)
+      if (iflag_debug.eq.1) write(*,*) 'alloc_edge_param_smp'
+      call alloc_edge_param_smp(edge)
 !
       end subroutine empty_edge_connect_type
 !

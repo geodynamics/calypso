@@ -38,7 +38,8 @@
 !!        type(sph_rtm_grid), intent(inout) :: sph_rtm
 !!
 !!      subroutine mpi_gen_fem_mesh_for_sph                             &
-!!     &         (gen_sph, sph_params, sph_rj, sph_rtp, mesh_file)
+!!     &         (iflag_output_mesh, iflag_output_SURF,                 &
+!!     &          gen_sph, sph_params, sph_rj, sph_rtp, mesh_file)
 !!        type(construct_spherical_grid), intent(in) :: gen_sph
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
@@ -220,7 +221,8 @@
 ! ----------------------------------------------------------------------
 !
       subroutine mpi_gen_fem_mesh_for_sph                               &
-     &         (gen_sph, sph_params, sph_rj, sph_rtp, mesh_file)
+     &         (iflag_output_mesh, iflag_output_SURF,                   &
+     &          gen_sph, sph_params, sph_rj, sph_rtp, mesh_file)
 !
       use t_mesh_data
       use t_gauss_points
@@ -233,7 +235,11 @@
       use set_FEM_mesh_4_sph
       use mpi_load_mesh_data
       use sph_file_IO_select
+      use parallel_FEM_mesh_init
+      use set_nnod_4_ele_by_type
 !
+      integer(kind = kint), intent(in) :: iflag_output_mesh
+      integer(kind = kint), intent(in) :: iflag_output_SURF
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(construct_spherical_grid), intent(in) :: gen_sph
@@ -245,6 +251,7 @@
       type(group_data) :: radial_rj_grp_lc
       type(gauss_points) :: gauss_s
       type(comm_table_make_sph) :: stbl_s
+      type(element_geometry) :: ele_mesh
 !
 !
       if(iflag_output_mesh .eq. 0) return
@@ -275,6 +282,14 @@
         call mpi_output_mesh(mesh_file, femmesh%mesh, femmesh%group)
         write(*,'(a,i6,a)')                                             &
      &          'FEM mesh for domain', my_rank, ' is done.'
+      end if
+!
+      if(iflag_output_SURF .gt. 0) then
+        if(iflag_debug .gt. 0) write(*,*) 'FEM_mesh_init_with_IO'
+        call set_3d_nnod_4_sfed_by_ele(femmesh%mesh%ele%nnod_4_ele,     &
+     &    ele_mesh%surf%nnod_4_surf, ele_mesh%edge%nnod_4_edge)
+        call FEM_mesh_init_with_IO(iflag_output_SURF, mesh_file,        &
+     &      femmesh%mesh, femmesh%group, ele_mesh)
       end if
 !
       call dealloc_groups_data(femmesh%group)

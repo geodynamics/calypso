@@ -72,6 +72,18 @@
 !!      subroutine add_gfb_extension(file_header, file_name)
 !!                put ".gfb" at the end
 !!
+!!      subroutine add_gel_extension(file_header, file_name)
+!!                put ".gel" at the end
+!!      subroutine add_gsf_extension(file_header, file_name)
+!!                put ".gsf" at the end
+!!      subroutine add_ged_extension(file_header, file_name)
+!!                put ".ged" at the end
+!!      subroutine add_elb_extension(file_header, file_name)
+!!                put ".elb" at the end
+!!      subroutine add_sfb_extension(file_header, file_name)
+!!                put ".sfb" at the end
+!!      subroutine add_edb_extension(file_header, file_name)
+!!                put ".edb" at the end
 !!
 !!      subroutine add_rtp_extension(file_header, file_name)
 !!                put ".rtp" at the end
@@ -485,6 +497,85 @@ end subroutine add_fsb_extension
  1011 format (a,".gfb")
 !
       end subroutine add_gfb_extension
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine add_gel_extension(file_header, file_name)
+!
+      character(len=kchara), intent(in) :: file_header
+      character(len=kchara), intent(inout) :: file_name
+!
+       write(file_name,1011) trim(file_header)
+       file_name = trim(file_name)
+ 1011 format (a,".gel")
+!
+      end subroutine add_gel_extension
+!
+!-----------------------------------------------------------------------
+!
+      subroutine add_gsf_extension(file_header, file_name)
+!
+      character(len=kchara), intent(in) :: file_header
+      character(len=kchara), intent(inout) :: file_name
+!
+       write(file_name,1011) trim(file_header)
+       file_name = trim(file_name)
+ 1011 format (a,".gsf")
+!
+      end subroutine add_gsf_extension
+!
+!-----------------------------------------------------------------------
+!
+      subroutine add_ged_extension(file_header, file_name)
+!
+      character(len=kchara), intent(in) :: file_header
+      character(len=kchara), intent(inout) :: file_name
+!
+       write(file_name,1011) trim(file_header)
+       file_name = trim(file_name)
+ 1011 format (a,".ged")
+!
+      end subroutine add_ged_extension
+!
+!-----------------------------------------------------------------------
+!
+      subroutine add_elb_extension(file_header, file_name)
+!
+      character(len=kchara), intent(in) :: file_header
+      character(len=kchara), intent(inout) :: file_name
+!
+       write(file_name,1011) trim(file_header)
+       file_name = trim(file_name)
+ 1011 format (a,".elb")
+!
+      end subroutine add_elb_extension
+!
+!-----------------------------------------------------------------------
+!
+      subroutine add_sfb_extension(file_header, file_name)
+!
+      character(len=kchara), intent(in) :: file_header
+      character(len=kchara), intent(inout) :: file_name
+!
+       write(file_name,1011) trim(file_header)
+       file_name = trim(file_name)
+ 1011 format (a,".sfb")
+!
+      end subroutine add_sfb_extension
+!
+!-----------------------------------------------------------------------
+!
+      subroutine add_edb_extension(file_header, file_name)
+!
+      character(len=kchara), intent(in) :: file_header
+      character(len=kchara), intent(inout) :: file_name
+!
+       write(file_name,1011) trim(file_header)
+       file_name = trim(file_name)
+ 1011 format (a,".edb")
+!
+      end subroutine add_edb_extension
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

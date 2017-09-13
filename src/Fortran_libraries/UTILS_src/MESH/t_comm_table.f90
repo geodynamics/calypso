@@ -11,6 +11,9 @@
 !!      subroutine allocate_type_comm_tbl_item(comm_tbl)
 !!      subroutine deallocate_type_comm_tbl(comm_tbl)
 !!
+!!      subroutine empty_comm_table(comm_tbl)
+!!      subroutine copy_comm_tbl_type(comm_org, comm_new)
+!!
 !!      subroutine allocate_type_neib_id(comm_tbl)
 !!      subroutine allocate_type_import_num(comm_tbl)
 !!      subroutine allocate_type_export_num(comm_tbl)
@@ -112,6 +115,53 @@
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------
+!
+      subroutine empty_comm_table(comm_tbl)
+!
+      type(communication_table), intent(inout) :: comm_tbl
+!
+!
+      comm_tbl%num_neib = 0
+      call allocate_type_comm_tbl_num(comm_tbl)
+!
+      comm_tbl%ntot_import = 0
+      comm_tbl%ntot_export = 0
+      call allocate_type_comm_tbl_item(comm_tbl)
+!
+      end subroutine empty_comm_table
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine copy_comm_tbl_type(comm_org, comm_new)
+!
+      use copy_communication_table
+!
+      type(communication_table), intent(in) :: comm_org
+      type(communication_table), intent(inout) :: comm_new
+!
+!
+      comm_new%num_neib = comm_org%num_neib
+!
+      call allocate_type_comm_tbl_num(comm_new)
+!
+      call copy_num_communication                                       &
+     &   (comm_new%num_neib, comm_new%id_neib,                          &
+     &    comm_new%istack_import, comm_new%istack_export,               &
+     &    comm_new%ntot_import, comm_new%ntot_export, comm_org%id_neib, &
+     &    comm_org%istack_import, comm_org%istack_export)
+!
+      call allocate_type_comm_tbl_item(comm_new)
+!
+      call copy_communication_item                                      &
+     &   (comm_new%ntot_import, comm_new%ntot_export,                   &
+     &    comm_new%item_import, comm_new%item_export,                   &
+     &    comm_org%item_import, comm_org%item_export)
+!
+      end subroutine copy_comm_tbl_type
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
       subroutine allocate_type_neib_id(comm_tbl)
 !

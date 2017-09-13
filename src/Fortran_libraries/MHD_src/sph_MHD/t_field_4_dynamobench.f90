@@ -1,5 +1,5 @@
-!>@file   m_field_4_dynamobench.f90
-!!@brief  module m_field_4_dynamobench
+!>@file   t_field_4_dynamobench.f90
+!!@brief  module t_field_4_dynamobench
 !!
 !!@author H. Matsui
 !!@date    programmed by H.Matsui in June., 2011
@@ -10,13 +10,16 @@
 !!      subroutine open_dynamobench_monitor_file                        &
 !!     &         (sph_bc_U, sph_bc_B, ipol)
 !!      subroutine output_field_4_dynamobench                           &
-!!     &          (i_step, time, sph_bc_U, sph_bc_B, ipol)
+!!     &          (i_step, time, sph_bc_U, sph_bc_B, ipol, bench)
+!!        type(sph_boundary_type), intent(in) :: sph_bc_U, sph_bc_B
+!!        type(phys_address), intent(in) :: ipol
+!!        type(dynamobench_monitor), intent(in) :: bench
 !!@endverbatim
 !!
 !!@param i_step   time step
 !!@param time     time
 !
-      module m_field_4_dynamobench
+      module t_field_4_dynamobench
 !
       use m_precision
       use m_constants
@@ -33,44 +36,44 @@
      &      :: dynamobench_field_name = 'dynamobench_field.dat'
 !
 !
-!>      temperature address for spherical transform at equator
-      integer(kind = kint) :: ibench_temp =  1
-!>      velocity address for spherical transform at equator
-      integer(kind = kint) :: ibench_velo =  2
-!>      magnetic field address for spherical transform at equator
-      integer(kind = kint) :: ibench_magne = 5
+      type dynamobench_monitor
+!>        temperature address for spherical transform at equator
+        integer(kind = kint) :: ibench_temp =  1
+!>        velocity address for spherical transform at equator
+        integer(kind = kint) :: ibench_velo =  2
+!>        magnetic field address for spherical transform at equator
+        integer(kind = kint) :: ibench_magne = 5
 !
-!>      average kinetic energy (poloidal, toroidal, total)
-      real(kind = kreal) :: KE_bench(3)
-!>      average magnetic energy (poloidal, toroidal, total)
-      real(kind = kreal) :: ME_bench(3)
+!>        average kinetic energy (poloidal, toroidal, total)
+        real(kind = kreal) :: KE_bench(3)
+!>        average magnetic energy (poloidal, toroidal, total)
+        real(kind = kreal) :: ME_bench(3)
 !
-!>      time for previus monitoring of omega
-      real(kind = kreal) :: t_prev = zero
-!>      longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
-      real(kind = kreal) :: phi_zero(4) = (/zero,zero,zero,zero/)
-!>      longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
-!!      at previous monitoring
-      real(kind = kreal) :: phi_prev(4) = (/zero,zero,zero,zero/)
-!>      drift frequency
-      real(kind = kreal) :: drift(0:4)
-!>      mangetic energy in inner core
-      real(kind = kreal) :: mene_icore(3)
-!>      rotation rate for inner core
-      real(kind = kreal) :: rotate_icore(-1:1)
-!>      magnetic torque for inner core
-      real(kind = kreal) :: m_torque_icore(-1:1)
+!>        time for previus monitoring of omega
+        real(kind = kreal) :: t_prev = zero
+!>        longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
+        real(kind = kreal) :: phi_zero(4) = (/zero,zero,zero,zero/)
+!>        longitude where @f$ u_[r} = 0, \partial_{\phi} u_{r} > 0 @f$
+!!        at previous monitoring
+        real(kind = kreal) :: phi_prev(4) = (/zero,zero,zero,zero/)
+!>        mangetic energy in inner core
+        real(kind = kreal) :: mene_icore(3)
+!>        rotation rate for inner core
+        real(kind = kreal) :: rotate_icore(-1:1)
+!>        magnetic torque for inner core
+        real(kind = kreal) :: m_torque_icore(-1:1)
 !
-!>      phase of by @f$ V_{S4}^{4} @f$
-      real(kind = kreal) :: phase_vm4(2)      = (/zero,zero/)
-!>      phase of by @f$ V_{S4}^{4} @f$
-!!      at previous monitoring
-      real(kind = kreal) :: phase_vm4_prev(2) = (/zero,zero/)
-!>      drift frequency obtained by @f$ V_{S4}^{4} @f$
-      real(kind = kreal) :: omega_vm4(2)      = (/zero,zero/)
+!>        phase of by @f$ V_{S4}^{4} @f$
+        real(kind = kreal) :: phase_vm4(2)      = (/zero,zero/)
+!>        phase of by @f$ V_{S4}^{4} @f$
+!!        at previous monitoring
+        real(kind = kreal) :: phase_vm4_prev(2) = (/zero,zero/)
+!>        drift frequency obtained by @f$ V_{S4}^{4} @f$
+        real(kind = kreal) :: omega_vm4(2)      = (/zero,zero/)
 !
-!>      local point data
-      real(kind = kreal) :: d_zero(0:4,7)
+!>        local point data
+        real(kind = kreal) :: d_zero(0:4,7)
+      end type dynamobench_monitor
 !
       private :: id_dynamobench, dynamobench_field_name
       private :: open_dynamobench_monitor_file
@@ -135,12 +138,13 @@
 ! ----------------------------------------------------------------------
 !
       subroutine output_field_4_dynamobench                             &
-     &          (i_step, time, sph_bc_U, sph_bc_B, ipol)
+     &          (i_step, time, sph_bc_U, sph_bc_B, ipol, bench)
 !
       type(sph_boundary_type), intent(in) :: sph_bc_U, sph_bc_B
       type(phys_address), intent(in) :: ipol
       integer(kind = kint), intent(in) :: i_step
       real(kind = kreal), intent(in) :: time
+      type(dynamobench_monitor), intent(in) :: bench
 !
 !
       if(my_rank .ne. 0) return
@@ -149,41 +153,44 @@
 !
       write(id_dynamobench,'(i15,1pE25.15e3)', advance='NO')            &
      &     i_step, time
-      write(id_dynamobench,'(1p3E25.15e3)', advance='NO') KE_bench(1:3)
+      write(id_dynamobench,'(1p3E25.15e3)', advance='NO')               &
+     &     bench%KE_bench(1:3)
 !
       if(ipol%i_magne .gt. 0) then
         write(id_dynamobench,'(1p3E25.15e3)', advance='NO')             &
-     &     ME_bench(1:3)
+     &     bench%ME_bench(1:3)
       end if
 !
 !
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         write(id_dynamobench,'(1p3E25.15e3)', advance='NO')             &
-     &     mene_icore(1:3)
+     &     bench%mene_icore(1:3)
       end if
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         write(id_dynamobench,'(1pE25.15e3)', advance='NO')              &
-     &     rotate_icore(0)
+     &     bench%rotate_icore(0)
       end if
 !
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center                  &
      &   .and. sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         write(id_dynamobench,'(1pE25.15e3)', advance='NO')              &
-     &     m_torque_icore(0)
+     &     bench%m_torque_icore(0)
       end if
 !
-      write(id_dynamobench,'(1p4E25.15e3)', advance='NO') phi_zero(1:4)
+      write(id_dynamobench,'(1p4E25.15e3)', advance='NO')               &
+     &      bench%phi_zero(1:4)
       write(id_dynamobench,'(1p2E25.15e3)', advance='NO')               &
-     &      omega_vm4(1:2)
+     &      bench%omega_vm4(1:2)
 !
       if(ipol%i_magne .gt. 0) then
         write(id_dynamobench,'(1p2E25.15e3)', advance='NO')             &
-     &      d_zero(0,ibench_magne+1)
+     &      bench%d_zero(0,bench%ibench_magne+1)
       end if
 !
       write(id_dynamobench,'(1p2E25.15e3)')                             &
-     &     d_zero(0,ibench_velo+2), d_zero(0,ibench_temp)
+     &     bench%d_zero(0,bench%ibench_velo+2),                         &
+     &     bench%d_zero(0,bench%ibench_temp)
 !
       close(id_dynamobench)
 !
@@ -191,4 +198,4 @@
 !
 ! ----------------------------------------------------------------------
 !
-      end module m_field_4_dynamobench
+      end module t_field_4_dynamobench

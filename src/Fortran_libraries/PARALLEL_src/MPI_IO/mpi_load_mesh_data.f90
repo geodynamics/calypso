@@ -176,7 +176,6 @@
       subroutine mpi_output_mesh(mesh_file, mesh, group)
 !
       use mesh_MPI_IO_select
-      use set_comm_table_4_IO
       use set_element_data_4_IO
       use copy_mesh_structures
       use load_mesh_data

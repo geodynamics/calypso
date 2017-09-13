@@ -123,7 +123,7 @@
       type(edge_data),    intent(inout) :: edge
 !
 !
-      call allocate_edge_param_smp_type(edge)
+      call alloc_edge_param_smp(edge)
 !
       call count_number_4_smp( np_smp, ione, edge%numedge,              &
      &    edge%istack_edge_smp, edge%max_edge_smp )

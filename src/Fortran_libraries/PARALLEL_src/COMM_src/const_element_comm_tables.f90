@@ -7,6 +7,7 @@
 !> @brief Belonged element list for each node
 !!
 !!@verbatim
+!!      subroutine empty_element_comm_tbls(ele_mesh)
 !!      subroutine const_element_comm_tbls(mesh, ele_mesh)
 !!      subroutine dealloc_ele_comm_tbls_gl_nele(mesh, ele_mesh)
 !!        type(mesh_geometry), intent(inout) ::    mesh
@@ -45,6 +46,19 @@
 !-----------------------------------------------------------------------
 !
       contains
+!
+!-----------------------------------------------------------------------
+!
+      subroutine empty_element_comm_tbls(ele_mesh)
+!
+      type(element_geometry), intent(inout) :: ele_mesh
+!
+!
+      call empty_comm_table(ele_mesh%ele_comm)
+      call empty_comm_table(ele_mesh%surf_comm)
+      call empty_comm_table(ele_mesh%edge_comm)
+!
+      end subroutine empty_element_comm_tbls
 !
 !-----------------------------------------------------------------------
 !
@@ -94,7 +108,6 @@
 !
       call dealloc_numnod_stack(mesh%node)
       call dealloc_numele_stack(mesh%ele)
-      call dealloc_numsurf_stack(ele_mesh%surf)
       call dealloc_numedge_stack(ele_mesh%edge)
 !
       end subroutine dealloc_ele_comm_tbls_gl_nele
@@ -173,6 +186,8 @@
       call set_global_ele_id                                            &
      &   (txt, surf%numsurf, surf%istack_intersurf,                     &
      &    surf%interior_surf, sf_comm, surf%isurf_global)
+!
+      call dealloc_numsurf_stack(surf)
 !
       end subroutine const_global_surface_id
 !

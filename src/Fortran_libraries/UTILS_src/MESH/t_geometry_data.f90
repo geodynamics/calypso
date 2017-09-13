@@ -17,8 +17,8 @@
 !!      subroutine allocate_ele_connect_type(ele)
 !!      subroutine alloc_element_types(ele)
 !!      subroutine alloc_ele_connectivity(ele)
-!!      subroutine allocate_overlaped_ele_type(ele)
-!!      subroutine allocate_ele_geometry_type(ele)
+!!      subroutine alloc_overlaped_ele(ele)
+!!      subroutine alloc_ele_geometry(ele)
 !!      subroutine allocate_node_param_smp_type(node)
 !!      subroutine allocate_ele_param_smp_type(ele)
 !!        type(element_data), intent(inout) :: ele
@@ -30,7 +30,7 @@
 !!      subroutine deallocate_sph_node_geometry(node)
 !!
 !!      subroutine deallocate_ele_connect_type(ele)
-!!      subroutine deallocate_overlaped_ele_type(ele)
+!!      subroutine dealloc_overlaped_ele(ele)
 !!      subroutine deallocate_ele_geometry_type(ele)
 !!      subroutine deallocate_node_param_smp_type(node)
 !!      subroutine deallocate_ele_param_smp_type(ele)
@@ -280,7 +280,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_overlaped_ele_type(ele)
+      subroutine alloc_overlaped_ele(ele)
 !
       type(element_data), intent(inout) :: ele
 !
@@ -288,16 +288,16 @@
       allocate(ele%interior_ele(ele%numele) )
       if(ele%numele .gt. 0) ele%interior_ele = 1
 !
-      end subroutine allocate_overlaped_ele_type
+      end subroutine alloc_overlaped_ele
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_ele_geometry_type(ele)
+      subroutine alloc_ele_geometry(ele)
 !
       type(element_data), intent(inout) :: ele
 !
 !
-      call allocate_overlaped_ele_type(ele)
+      call alloc_overlaped_ele(ele)
 !
       allocate( ele%x_ele(ele%numele,3))
       allocate( ele%r_ele(ele%numele))
@@ -324,7 +324,7 @@
         ele%a_vol_ele = 0.0d0
       end if
 !
-      end subroutine allocate_ele_geometry_type
+      end subroutine alloc_ele_geometry
 !
 !  ---------------------------------------------------------------------
 !
@@ -424,14 +424,14 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_overlaped_ele_type(ele)
+      subroutine dealloc_overlaped_ele(ele)
 !
       type(element_data), intent(inout) :: ele
 !
 !
       deallocate(ele%interior_ele)
 !
-      end subroutine deallocate_overlaped_ele_type
+      end subroutine dealloc_overlaped_ele
 !
 !  ---------------------------------------------------------------------
 !
@@ -439,7 +439,7 @@
 !
       type(element_data), intent(inout) :: ele
 !
-      call deallocate_overlaped_ele_type(ele)
+      call dealloc_overlaped_ele(ele)
 !
       deallocate( ele%x_ele)
       deallocate( ele%r_ele)

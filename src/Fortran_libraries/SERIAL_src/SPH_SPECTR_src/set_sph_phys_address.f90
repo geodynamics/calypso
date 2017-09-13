@@ -45,10 +45,7 @@
 !
 !   set address of spectr fields
 !
-      call alloc_phys_data_type(sph_rj%nnod_rj, rj_fld)
-      call set_field_addresses(ione, rj_fld%num_phys,                   &
-     &    rj_fld%phys_name, rj_fld%num_component, ipol)
-!
+      call init_field_address(sph_rj%nnod_rj, rj_fld, ipol)
       call set_sph_vect_spec_address(ipol, idpdr, itor)
 !
       end subroutine set_sph_sprctr_data_address

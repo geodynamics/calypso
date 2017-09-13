@@ -35,7 +35,7 @@
       use m_work_time
 !
 !
-      num_elapsed = 81
+      num_elapsed = 84
       call allocate_elapsed_times
 !
       elapse_labels(1) = 'Total time                 '
@@ -113,6 +113,9 @@
       elapse_labels(71) = 'fieldline.    '
 !
       elapse_labels(81) = 'Filtering fields   '
+      elapse_labels(82) = 'Scale similarity   '
+      elapse_labels(83) = 'Dynamic scheme     '
+      elapse_labels(84) = 'SGS Buoyancy       '
 !
       elapse_labels(num_elapsed) = 'Communication time        '
 !

@@ -8,9 +8,9 @@
 !!       to FEM data for data visualization
 !!
 !!@verbatim
-!!      subroutine FEM_initialize_sph_MHD(ucd_param, MHD_step,          &
+!!      subroutine FEM_initialize_sph_MHD(MHD_files, MHD_step,          &
 !!     &          mesh, group, ele_mesh, iphys, nod_fld, range, fem_ucd)
-!!        type(field_IO_params), intent(in) :: ucd_param
+!!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(MHD_step_param), intent(in) :: MHD_step
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::   group
@@ -20,16 +20,16 @@
 !!        type(maximum_informations), intent(inout) :: range
 !!        type(ucd_file_data), intent(inout) :: fem_ucd
 !!      subroutine FEM_analyze_sph_MHD                                  &
-!!     &         (ucd_param, mesh, nod_fld, MHD_step, visval, fem_ucd)
-!!        type(field_IO_params), intent(in) :: ucd_param
+!!     &         (MHD_files, mesh, nod_fld, MHD_step, visval, fem_ucd)
+!!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(SGS_paremeters), intent(in) :: SGS_par
 !!        type(time_data), intent(in) :: time_d
 !!        type(mesh_geometry), intent(in) :: mesh
 !!        type(phys_data), intent(inout) :: nod_fld
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(ucd_file_data), intent(inout) :: fem_ucd
-!!      subroutine FEM_finalize(ucd_param, MHD_step, range, fem_ucd)
-!!        type(field_IO_params), intent(in) :: ucd_param
+!!      subroutine FEM_finalize(MHD_files, MHD_step, range, fem_ucd)
+!!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(MHD_step_param), intent(in) :: MHD_step
 !!
 !!      subroutine SPH_to_FEM_bridge_MHD                                &
@@ -61,7 +61,7 @@
       use t_phys_data
       use t_phys_address
       use t_MHD_step_parameter
-      use t_file_IO_parameter
+      use t_MHD_file_parameter
       use t_ucd_file
 !
       implicit none
@@ -72,19 +72,18 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine FEM_initialize_sph_MHD(ucd_param, MHD_step,            &
+      subroutine FEM_initialize_sph_MHD(MHD_files, MHD_step,            &
      &          mesh, group, ele_mesh, iphys, nod_fld, range, fem_ucd)
 !
       use m_array_for_send_recv
-      use t_FEM_phys_data
       use t_cal_max_indices
 !
+      use set_field_address
       use nod_phys_send_recv
       use node_monitor_IO
-      use const_mesh_information
-      use const_element_comm_tables
+      use parallel_FEM_mesh_init
 !
-      type(field_IO_params), intent(in) :: ucd_param
+      type(MHD_file_IO_params), intent(in) :: MHD_files
       type(MHD_step_param), intent(in) :: MHD_step
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
@@ -100,22 +99,12 @@
 !
 !  -------------------------------
 !
-      if (iflag_debug.gt.0 ) write(*,*) 'allocate_vector_for_solver'
-      call allocate_vector_for_solver(isix, mesh%node%numnod)
-!
-      if(iflag_debug.gt.0) write(*,*)' init_nod_send_recv'
-      call init_nod_send_recv(mesh)
-!
-!  -----    construct geometry informations
-!
-      if (iflag_debug .gt. 0) write(*,*) 'const_mesh_infos'
-      call const_mesh_infos(my_rank, mesh, group, ele_mesh)
-!
-      if(iflag_debug.gt.0) write(*,*)' const_element_comm_tbls'
-      call const_element_comm_tbls(mesh, ele_mesh)
+      if (iflag_debug.gt.0 ) write(*,*) 'FEM_mesh_initialization'
+      call FEM_mesh_init_with_IO(MHD_files%iflag_output_SURF,           &
+     &    MHD_files%mesh_file_IO, mesh, group, ele_mesh)
 !
       call deallocate_surface_geom_type(ele_mesh%surf)
-      call deallocate_edge_geom_type(ele_mesh%edge)
+      call dealloc_edge_geometory(ele_mesh%edge)
 !
 !  -------------------------------
 !
@@ -129,8 +118,8 @@
       end if
 !
       if(iflag_debug .gt. 0) write(*,*) 'output_grd_file_4_snapshot'
-      call output_grd_file_4_snapshot                                   &
-     &   (ucd_param, MHD_step%ucd_step, mesh, nod_fld, fem_ucd)
+      call output_grd_file_4_snapshot(MHD_files%ucd_file_IO,            &
+     &    MHD_step%ucd_step, mesh, nod_fld, fem_ucd)
 !
       end subroutine FEM_initialize_sph_MHD
 !
@@ -138,12 +127,12 @@
 !-----------------------------------------------------------------------
 !
       subroutine FEM_analyze_sph_MHD                                    &
-     &         (ucd_param, mesh, nod_fld, MHD_step, visval, fem_ucd)
+     &         (MHD_files, mesh, nod_fld, MHD_step, visval, fem_ucd)
 !
       use nod_phys_send_recv
       use output_viz_file_control
 !
-      type(field_IO_params), intent(in) :: ucd_param
+      type(MHD_file_IO_params), intent(in) :: MHD_files
       type(mesh_geometry), intent(in) :: mesh
       type(phys_data), intent(inout) :: nod_fld
 !
@@ -172,7 +161,7 @@
 !*  -----------  Output volume data --------------
 !*
       call s_output_ucd_file_control                                    &
-     &   (ucd_param, MHD_step%time_d%i_time_step,                       &
+     &   (MHD_files%ucd_file_IO, MHD_step%time_d%i_time_step,           &
      &    MHD_step%time_d, MHD_step%ucd_step, fem_ucd)
 !
       end subroutine FEM_analyze_sph_MHD
@@ -226,11 +215,11 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine FEM_finalize(ucd_param, MHD_step, range, fem_ucd)
+      subroutine FEM_finalize(MHD_files, MHD_step, range, fem_ucd)
 !
       use t_cal_max_indices
 !
-      type(field_IO_params), intent(in) :: ucd_param
+      type(MHD_file_IO_params), intent(in) :: MHD_files
       type(MHD_step_param), intent(in) :: MHD_step
 !
       type(maximum_informations), intent(inout) :: range
@@ -239,7 +228,7 @@
 !
      if(MHD_step%ucd_step%increment .gt. 0) then
        call dealloc_phys_range(range)
-       call finalize_output_ucd(ucd_param, fem_ucd)
+       call finalize_output_ucd(MHD_files%ucd_file_IO, fem_ucd)
      end if
 !
       end subroutine FEM_finalize

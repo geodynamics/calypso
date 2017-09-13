@@ -53,8 +53,8 @@
 !
       call open_rd_gzfile_f(file_name)
 !
-      call read_geometry_data_gz(my_rank_IO, fem_IO%mesh, ierr)
-      call read_mesh_groups_gz(fem_IO%group)
+      call gz_read_geometry_data(my_rank_IO, fem_IO%mesh, ierr)
+      call gz_read_mesh_groups(fem_IO%group)
 !
       call close_gzfile_f
 !
@@ -76,7 +76,7 @@
      &   'Read gzipped mesh file: ', trim(file_name)
 !
       call open_rd_gzfile_f(file_name)
-      call read_geometry_data_gz(my_rank_IO, mesh_IO, ierr)
+      call gz_read_geometry_data(my_rank_IO, mesh_IO, ierr)
       call close_gzfile_f
 !
       end subroutine gz_read_mesh_geometry
@@ -98,7 +98,7 @@
 !
       call open_rd_gzfile_f(file_name)
 !
-      call read_num_node_gz(my_rank_IO, mesh_IO, ierr)
+      call gz_read_num_node(my_rank_IO, mesh_IO, ierr)
       call close_gzfile_f
 !
       end subroutine gz_read_node_size
@@ -120,7 +120,7 @@
 !
       call open_rd_gzfile_f(file_name)
 !
-      call read_num_node_ele_gz(my_rank_IO, mesh_IO, ierr)
+      call gz_read_num_node_ele(my_rank_IO, mesh_IO, ierr)
       call close_gzfile_f
 !
       end subroutine gz_read_geometry_size
@@ -141,9 +141,9 @@
 !
       call open_wt_gzfile_f(file_name)
 !
-      call write_geometry_data_gz(my_rank_IO, fem_IO%mesh)
+      call gz_write_geometry_data(my_rank_IO, fem_IO%mesh)
 !
-      call write_mesh_groups_gz(fem_IO%group)
+      call gz_write_mesh_groups(fem_IO%group)
 !
       call close_gzfile_f
 !

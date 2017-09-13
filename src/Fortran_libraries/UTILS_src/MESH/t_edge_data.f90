@@ -8,15 +8,15 @@
 !!
 !!@verbatim
 !!      subroutine alloc_numedge_stack(nprocs, edge)
-!!      subroutine allocate_inod_in_edge(edge)
-!!      subroutine allocate_edge_connect_type(edge, nsurf)
-!!      subroutine allocate_edge_4_ele_type(edge, nele)
-!!      subroutine allocate_iso_edge_type(edge)
-!!      subroutine allocate_edge_geom_type(edge)
-!!      subroutine allocate_edge_vect_type(edge)
-!!      subroutine allocate_edge_vect_sph_type(edge)
-!!      subroutine allocate_edge_vect_cyl_type(edge)
-!!      subroutine allocate_edge_param_smp_type(edge)
+!!      subroutine alloc_inod_in_edge(edge)
+!!      subroutine alloc_edge_connect(edge, nsurf)
+!!      subroutine alloc_edge_4_ele(edge, nele)
+!!      subroutine alloc_isolate_edge(edge)
+!!      subroutine alloc_edge_geometory(edge)
+!!      subroutine alloc_edge_vect(edge)
+!!      subroutine alloc_edge_vect_sph(edge)
+!!      subroutine alloc_edge_vect_cyl(edge)
+!!      subroutine alloc_edge_param_smp(edge)
 !!
 !!      subroutine alloc_ele_4_edge_num_type(edge)
 !!      subroutine alloc_ele_4_edge_item_type(edge)
@@ -25,15 +25,15 @@
 !!
 !!
 !!      subroutine dealloc_numedge_stack(nprocs, edge)
-!!      subroutine deallocate_inod_in_edge_type(edge)
-!!      subroutine deallocate_edge_connect_type(edge)
-!!      subroutine deallocate_edge_4_ele_type(edge)
-!!      subroutine deallocate_iso_edge_type(edge)
-!!      subroutine deallocate_edge_geom_type(edge)
-!!      subroutine deallocate_edge_vect_type(edge)
-!!      subroutine deallocate_edge_vect_sph_type(edge)
-!!      subroutine deallocate_edge_vect_cyl_type(edge)
-!!      subroutine deallocate_edge_param_smp_type(edge)
+!!      subroutine dealloc_inod_in_edge(edge)
+!!      subroutine dealloc_edge_connect(edge)
+!!      subroutine dealloc_edge_4_ele(edge)
+!!      subroutine dealloc_isolate_edge(edge)
+!!      subroutine dealloc_edge_geometory(edge)
+!!      subroutine dealloc_edge_vect(edge)
+!!      subroutine dealloc_edge_vect_sph(edge)
+!!      subroutine dealloc_edge_vect_cyl(edge)
+!!      subroutine dealloc_edge_param_smp(edge)
 !!
 !!      subroutine dealloc_ele_4_edge_num_type(edge)
 !!      subroutine dealloc_ele_4_edge_item_type(edge)
@@ -162,7 +162,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_inod_in_edge(edge)
+      subroutine alloc_inod_in_edge(edge)
 !
       use m_geometry_constants
 !
@@ -172,11 +172,11 @@
       allocate ( edge%node_on_edge(edge%nnod_4_edge,nedge_4_ele) )
       allocate ( edge%node_on_edge_sf(edge%nnod_4_edge,nedge_4_surf) )
 !
-      end subroutine allocate_inod_in_edge
+      end subroutine alloc_inod_in_edge
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_edge_connect_type(edge, nsurf)
+      subroutine alloc_edge_connect(edge, nsurf)
 !
       use m_geometry_constants
 !
@@ -195,11 +195,11 @@
         edge%interior_edge = 0
       end if
 !
-      end subroutine allocate_edge_connect_type
+      end subroutine alloc_edge_connect
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_edge_4_ele_type(edge, nele)
+      subroutine alloc_edge_4_ele(edge, nele)
 !
       use m_geometry_constants
 !
@@ -210,11 +210,11 @@
       allocate( edge%iedge_4_ele(nele,nedge_4_ele) )
       if(nele .gt. 0) edge%iedge_4_ele = 0
 !
-      end subroutine allocate_edge_4_ele_type
+      end subroutine alloc_edge_4_ele
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_iso_edge_type(edge)
+      subroutine alloc_isolate_edge(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
@@ -222,11 +222,11 @@
       allocate( edge%iedge_isolate(edge%numedge_iso) )
       if (edge%numedge_iso .gt. 0) edge%iedge_isolate = 0
 !
-      end subroutine allocate_iso_edge_type
+      end subroutine alloc_isolate_edge
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_edge_geom_type(edge)
+      subroutine alloc_edge_geometory(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
@@ -252,11 +252,11 @@
         edge%as_edge =     0.0d0
       end if
 !
-      end subroutine allocate_edge_geom_type
+      end subroutine alloc_edge_geometory
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_edge_vect_type(edge)
+      subroutine alloc_edge_vect(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
@@ -270,33 +270,33 @@
         edge%edge_vect =     0.0d0
       end if
 !
-      end subroutine allocate_edge_vect_type
+      end subroutine alloc_edge_vect
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_edge_vect_sph_type(edge)
+      subroutine alloc_edge_vect_sph(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
       allocate( edge%edge_vect_sph(edge%numedge,3) )
       if(edge%numedge .gt. 0) edge%edge_vect_sph =     0.0d0
 !
-      end subroutine allocate_edge_vect_sph_type
+      end subroutine alloc_edge_vect_sph
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_edge_vect_cyl_type(edge)
+      subroutine alloc_edge_vect_cyl(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
       allocate( edge%edge_vect_cyl(edge%numedge,3) )
       if(edge%numedge .gt. 0) edge%edge_vect_cyl =     0.0d0
 !
-      end subroutine allocate_edge_vect_cyl_type
+      end subroutine alloc_edge_vect_cyl
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_edge_param_smp_type(edge)
+      subroutine alloc_edge_param_smp(edge)
 !
       use m_machine_parameter
 !
@@ -305,7 +305,7 @@
       allocate( edge%istack_edge_smp(0:np_smp))
       edge%istack_edge_smp = 0
 !
-      end subroutine allocate_edge_param_smp_type
+      end subroutine alloc_edge_param_smp
 !
 !-----------------------------------------------------------------------
 !
@@ -375,18 +375,18 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_inod_in_edge_type(edge)
+      subroutine dealloc_inod_in_edge(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
 !
       deallocate ( edge%node_on_edge, edge%node_on_edge_sf)
 !
-      end subroutine deallocate_inod_in_edge_type
+      end subroutine dealloc_inod_in_edge
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_edge_connect_type(edge)
+      subroutine dealloc_edge_connect(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
@@ -395,33 +395,33 @@
       deallocate( edge%iedge_global )
       deallocate( edge%interior_edge )
 !
-      end subroutine deallocate_edge_connect_type
+      end subroutine dealloc_edge_connect
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_edge_4_ele_type(edge)
+      subroutine dealloc_edge_4_ele(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
 !
       deallocate( edge%iedge_4_ele )
 !
-      end subroutine deallocate_edge_4_ele_type
+      end subroutine dealloc_edge_4_ele
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_iso_edge_type(edge)
+      subroutine dealloc_isolate_edge(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
 !
       deallocate( edge%iedge_isolate )
 !
-      end subroutine deallocate_iso_edge_type
+      end subroutine dealloc_isolate_edge
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_edge_geom_type(edge)
+      subroutine dealloc_edge_geometory(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
@@ -435,11 +435,11 @@
       deallocate( edge%s_edge )
       deallocate( edge%as_edge )
 !
-      end subroutine deallocate_edge_geom_type
+      end subroutine dealloc_edge_geometory
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_edge_vect_type(edge)
+      subroutine dealloc_edge_vect(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
@@ -447,37 +447,37 @@
       deallocate( edge%a_edge_length )
       deallocate( edge%edge_vect     )
 !
-      end subroutine deallocate_edge_vect_type
+      end subroutine dealloc_edge_vect
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_edge_vect_sph_type(edge)
+      subroutine dealloc_edge_vect_sph(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
       deallocate( edge%edge_vect_sph )
 !
-      end subroutine deallocate_edge_vect_sph_type
+      end subroutine dealloc_edge_vect_sph
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_edge_vect_cyl_type(edge)
+      subroutine dealloc_edge_vect_cyl(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
       deallocate( edge%edge_vect_cyl )
 !
-      end subroutine deallocate_edge_vect_cyl_type
+      end subroutine dealloc_edge_vect_cyl
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_edge_param_smp_type(edge)
+      subroutine dealloc_edge_param_smp(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
       deallocate( edge%istack_edge_smp )
 !
-      end subroutine deallocate_edge_param_smp_type
+      end subroutine dealloc_edge_param_smp
 !
 !-----------------------------------------------------------------------
 !

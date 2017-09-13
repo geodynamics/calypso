@@ -1,5 +1,5 @@
-!>@file   set_ctl_gen_shell_grids.f90
-!!@brief  module set_ctl_gen_shell_grids
+!>@file   t_ctl_params_gen_sph_shell.f90
+!!@brief  module t_ctl_params_gen_sph_shell
 !!
 !!@author H. Matsui
 !!@date Programmed on July, 2007
@@ -8,8 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine set_control_4_gen_shell_grids                        &
-!!     &         (plt, spctl, sdctl, sph, mesh_file, sph_file_param,    &
-!!     &          gen_sph, ierr)
+!!     &         (plt, spctl, sdctl, sph, sph_files, gen_sph, ierr)
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(sphere_data_control), intent(inout) :: spctl
 !!        type(sphere_domain_control), intent(inout) :: sdctl
@@ -25,7 +24,7 @@
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
 !!@endverbatim
 !
-      module set_ctl_gen_shell_grids
+      module t_ctl_params_gen_sph_shell
 !
       use m_precision
 !
@@ -38,6 +37,19 @@
       use t_const_spherical_grid
 !
       implicit  none
+!
+!>      Structure of file name and format for MHD
+      type gen_sph_file_IO_params
+!>        Integer flag to output surface data
+        integer(kind = kint) :: iflag_output_FEM = 0
+!>        Integer flag to output surface data
+        integer(kind = kint) :: iflag_output_SURF = 0
+!>        Structure of mesh file IO paramters
+        type(field_IO_params) :: mesh_file_IO
+!>        Structure of file name and format for spectr data file
+        type(field_IO_params) :: sph_file_IO
+      end type gen_sph_file_IO_params
+!
 !
       character(len=kchara), parameter :: cflag_SGS_r = 'SGS_r'
       character(len=kchara), parameter :: cflag_SGS_t = 'SGS_theta'
@@ -53,23 +65,20 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_control_4_gen_shell_grids                          &
-     &         (plt, spctl, sdctl, sph, mesh_file, sph_file_param,      &
-     &          gen_sph, ierr)
+     &         (plt, spctl, sdctl, sph, sph_files, gen_sph, ierr)
 !
       type(platform_data_control), intent(in) :: plt
       type(sphere_data_control), intent(inout) :: spctl
       type(sphere_domain_control), intent(inout) :: sdctl
       type(sph_grids), intent(inout) :: sph
-      type(field_IO_params), intent(inout) ::  mesh_file
-      type(field_IO_params), intent(inout) :: sph_file_param
+      type(gen_sph_file_IO_params), intent(inout) ::  sph_files
       type(construct_spherical_grid), intent(inout) :: gen_sph
       integer(kind = kint), intent(inout) :: ierr
 !
       integer(kind = kint) :: nprocs_check
 !
 !
-      call set_control_4_shell_filess                                   &
-     &   (plt, nprocs_check, mesh_file, sph_file_param)
+      call set_control_4_shell_filess(plt, nprocs_check, sph_files)
 !
       call set_control_4_shell_grids                                    &
      &   (nprocs_check, spctl, sdctl, sph, gen_sph, ierr)
@@ -80,14 +89,13 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_control_4_shell_filess                             &
-     &         (plt, nprocs_check, mesh_file, sph_file_param)
+     &         (plt, nprocs_check, sph_files)
 !
       use set_control_platform_data
       use gen_sph_grids_modes
 !
       type(platform_data_control), intent(in) :: plt
-      type(field_IO_params), intent(inout) ::  mesh_file
-      type(field_IO_params), intent(inout) :: sph_file_param
+      type(gen_sph_file_IO_params), intent(inout) ::  sph_files
       integer(kind = kint), intent(inout) :: nprocs_check
 !
 !
@@ -97,9 +105,9 @@
       end if
 !
       call turn_off_debug_flag_by_ctl(izero, plt)
-      call set_control_mesh_def(plt, mesh_file)
-      call set_FEM_mesh_switch_4_SPH(plt, iflag_output_mesh)
-      call set_control_sph_mesh(plt, mesh_file, sph_file_param)
+      call set_control_sph_mesh                                         &
+     &   (plt, sph_files%mesh_file_IO, sph_files%sph_file_IO,           &
+     &    sph_files%iflag_output_FEM, sph_files%iflag_output_SURF)
 !
       end subroutine set_control_4_shell_filess
 !
@@ -407,4 +415,4 @@
 !
 !  ---------------------------------------------------------------------
 !
-      end module set_ctl_gen_shell_grids
+      end module t_ctl_params_gen_sph_shell

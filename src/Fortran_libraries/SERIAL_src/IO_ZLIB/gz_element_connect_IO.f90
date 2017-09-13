@@ -7,11 +7,16 @@
 !> @brief Element data IO using zlib
 !!
 !!@verbatim
-!!      subroutine write_element_info_gz(ele_IO)
+!!      subroutine gz_write_element_info(ele_IO)
+!!      subroutine gz_write_surface_4_element(sfed_IO)
+!!      subroutine gz_write_edge_4_element(sfed_IO)
 !!
-!!      subroutine read_number_of_element_gz(ele_IO)
-!!      subroutine read_element_info_gz(ele_IO)
+!!      subroutine gz_read_number_of_element(ele_IO)
+!!      subroutine gz_read_element_info(ele_IO)
 !!        type(element_data), intent(inout) :: ele_IO
+!!      subroutine gz_read_surface_4_element(sfed_IO)
+!!      subroutine gz_read_edge_4_element(sfed_IO)
+!!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !!@endverbatim
 !
       module gz_element_connect_IO
@@ -19,6 +24,7 @@
       use m_precision
 !
       use t_geometry_data
+      use t_surf_edge_IO
       use skip_gz_comment
 !
       implicit none
@@ -31,7 +37,7 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine write_element_info_gz(ele_IO)
+      subroutine gz_write_element_info(ele_IO)
 !
       type(element_data), intent(inout) :: ele_IO
 !
@@ -52,12 +58,56 @@
 !
       call deallocate_ele_connect_type(ele_IO)
 !
-      end subroutine write_element_info_gz
+      end subroutine gz_write_element_info
+!
+!------------------------------------------------------------------
+!
+      subroutine gz_write_surface_4_element(sfed_IO)
+!
+      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!
+      integer(kind = kint) :: i
+!
+      write(textbuf,'(2i16,a1)')                                        &
+     &     sfed_IO%nsf_4_ele, sfed_IO%nsurf_in_ele, char(0)
+      call gz_write_textbuf_w_lf
+!
+      do i = 1, sfed_IO%nsf_4_ele
+        write(textbuf,'(6i16,a1)')                                      &
+     &         sfed_IO%isf_for_ele(i,1:sfed_IO%nsurf_in_ele), char(0)
+        call gz_write_textbuf_w_lf
+      end do
+!
+      call dealloc_surface_connect_IO(sfed_IO)
+!
+      end subroutine gz_write_surface_4_element
+!
+!------------------------------------------------------------------
+!
+      subroutine gz_write_edge_4_element(sfed_IO)
+!
+      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!
+      integer(kind = kint) :: i
+!
+      write(textbuf,'(2i16,a1)')                                        &
+     &      sfed_IO%ned_4_ele, sfed_IO%nedge_in_ele, char(0)
+      call gz_write_textbuf_w_lf
+!
+      do i = 1, sfed_IO%ned_4_ele
+        write(textbuf,'(12i16,a1)')                                     &
+     &        sfed_IO%iedge_for_ele(i,1:sfed_IO%nedge_in_ele), char(0)
+        call gz_write_textbuf_w_lf
+      end do
+!
+      call dealloc_edge_connect_IO(sfed_IO)
+!
+      end subroutine gz_write_edge_4_element
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_number_of_element_gz(ele_IO)
+      subroutine gz_read_number_of_element(ele_IO)
 !
       type(element_data), intent(inout) :: ele_IO
 !
@@ -65,11 +115,11 @@
       call skip_gz_comment_int(ele_IO%numele)
 !       write(*,*) ele_IO%numele
 !
-      end subroutine read_number_of_element_gz
+      end subroutine gz_read_number_of_element
 !
 !------------------------------------------------------------------
 !
-      subroutine read_element_info_gz(ele_IO)
+      subroutine gz_read_element_info(ele_IO)
 !
       use set_nnod_4_ele_by_type
 !
@@ -96,7 +146,48 @@
      &                 ele_IO%ie(i,1:ele_IO%nodelm(i))
        end do
 !
-      end subroutine read_element_info_gz
+      end subroutine gz_read_element_info
+!
+!------------------------------------------------------------------
+!
+      subroutine gz_read_surface_4_element(sfed_IO)
+!
+      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!
+      integer(kind = kint) :: i, nsf_4_ele, nsurf_in_ele
+!
+!
+      call skip_gz_comment_int(nsf_4_ele)
+      read(textbuf,*) nsf_4_ele, nsurf_in_ele
+      call alloc_surface_connect_IO(nsf_4_ele, nsurf_in_ele, sfed_IO)
+!
+      do i = 1, sfed_IO%nsf_4_ele
+        call get_one_line_from_gz_f
+        read(textbuf,*) sfed_IO%isf_for_ele(i,1:sfed_IO%nsurf_in_ele)
+      end do
+!
+      end subroutine gz_read_surface_4_element
+!
+!------------------------------------------------------------------
+!
+      subroutine gz_read_edge_4_element(sfed_IO)
+!
+      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!
+      integer(kind = kint) :: i, ned_4_ele, nedge_in_ele
+!
+!
+      call skip_gz_comment_int(ned_4_ele)
+      read(textbuf,*) ned_4_ele, nedge_in_ele
+      call alloc_edge_connect_IO(ned_4_ele, nedge_in_ele, sfed_IO)
+!
+      do i = 1, sfed_IO%ned_4_ele
+        call get_one_line_from_gz_f
+        read(textbuf,*)                                                 &
+     &         sfed_IO%iedge_for_ele(i,1:sfed_IO%nedge_in_ele)
+      end do
+!
+      end subroutine gz_read_edge_4_element
 !
 !------------------------------------------------------------------
 !

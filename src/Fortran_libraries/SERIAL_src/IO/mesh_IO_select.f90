@@ -7,9 +7,6 @@
 !>@brief  Choose mesh file to read
 !!
 !!@verbatim
-!!      subroutine set_mesh_file_name_by_param                          &
-!!     &         (mesh_file, my_rank_IO, mesh_file_name)
-!!
 !!      subroutine sel_read_mesh(mesh_file, my_rank_IO, fem_IO, ierr)
 !!        type(mesh_data), intent(inout) :: fem_IO
 !!
@@ -23,9 +20,6 @@
 !!
 !!      subroutine sel_write_mesh_file(mesh_file, my_rank_IO, fem_IO)
 !!        type(mesh_data), intent(inout) :: fem_IO
-!!
-!!      integer(kind = kint) function check_exist_mesh                  &
-!!     &                            (mesh_file, my_rank_IO)
 !!@endverbatim
 !
       module mesh_IO_select
@@ -36,6 +30,7 @@
       use t_mesh_data
       use m_file_format_switch
 !
+      use mesh_file_name_by_param
       use mesh_file_IO
       use mesh_file_IO_b
       use gz_mesh_file_IO
@@ -49,25 +44,6 @@
 !
       contains
 !
-!  ---------------------------------------------------------------------
-!
-      subroutine set_mesh_file_name_by_param                            &
-     &         (mesh_file, my_rank_IO, mesh_file_name)
-!
-      use set_mesh_file_names
-!
-      integer(kind= kint), intent(in) :: my_rank_IO
-      type(field_IO_params), intent(in) ::  mesh_file
-      character(len=kchara), intent(inout) :: mesh_file_name
-!
-!
-      call set_mesh_file_name                                           &
-     &   (mesh_file%file_prefix, mesh_file%iflag_format,                &
-     &    my_rank_IO, mesh_file_name)
-!
-      end subroutine set_mesh_file_name_by_param
-!
-!------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine sel_read_mesh(mesh_file, my_rank_IO, fem_IO, ierr)
@@ -225,26 +201,6 @@
       end if
 !
       end subroutine sel_write_mesh_file
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      integer(kind = kint) function check_exist_mesh                    &
-     &                            (mesh_file, my_rank_IO)
-!
-      use delete_data_files
-!
-      integer(kind= kint), intent(in) :: my_rank_IO
-      type(field_IO_params), intent(in) ::  mesh_file
-!
-!
-      call set_mesh_file_name_by_param                                  &
-     &   (mesh_file, my_rank_IO, file_name)
-!
-      check_exist_mesh = check_file_exist(file_name)
-!
-      return
-      end function check_exist_mesh
 !
 !  ---------------------------------------------------------------------
 !

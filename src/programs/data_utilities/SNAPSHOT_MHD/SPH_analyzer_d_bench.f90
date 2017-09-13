@@ -11,10 +11,11 @@
 !!@verbatim
 !!      subroutine SPH_init_sph_dbench(MHD_files, bc_IO, iphys, cdat)
 !!        type(phys_address), intent(in) :: iphys
-!!      subroutine SPH_analyze_dbench(i_step, MHD_files, cdat)
+!!      subroutine SPH_analyze_dbench(i_step, MHD_files, cdat, bench)
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(boundary_spectra), intent(in) :: bc_IO
 !!        type(phys_data), intent(inout) :: cdat
+!!        type(dynamobench_monitor), intent(inout) :: bench
 !!      subroutine SPH_finalize_dbench
 !!@endverbatim
 !
@@ -27,6 +28,7 @@
       use t_phys_address
       use t_MHD_file_parameter
       use t_field_on_circle
+      use t_field_4_dynamobench
 !
       implicit none
 !
@@ -126,7 +128,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine SPH_analyze_dbench(i_step, MHD_files, cdat)
+      subroutine SPH_analyze_dbench(i_step, MHD_files, cdat, bench)
 !
       use m_work_time
       use m_physical_property
@@ -134,11 +136,9 @@
       use m_sph_spectr_data
       use m_fdm_coefs
       use m_schmidt_poly_on_rtm
-      use m_field_4_dynamobench
       use m_sph_trans_arrays_MHD
       use m_rms_4_sph_spectr
 !
-!      use cal_nonlinear
       use cal_sol_sph_MHD_crank
       use adjust_reference_fields
       use lead_fields_4_sph_mhd
@@ -151,6 +151,7 @@
       type(MHD_file_IO_params), intent(in) :: MHD_files
 !
       type(circle_fld_maker), intent(inout) :: cdat
+      type(dynamobench_monitor), intent(inout) :: bench
 !
       integer(kind = kint) :: iflag
 !
@@ -193,9 +194,9 @@
       call s_const_data_4_dynamobench                                   &
      &   (MHD_step1%time_d%time, sph1%sph_params, sph1%sph_rj,          &
      &    sph_MHD_bc1, trans_p1%leg, ipol, itor, rj_fld1,               &
-     &    cdat, pwr1, WK_pwr)
+     &    cdat, pwr1, bench, WK_pwr)
       call output_field_4_dynamobench(i_step, MHD_step1%time_d%time,    &
-     &   sph_MHD_bc1%sph_bc_U, sph_MHD_bc1%sph_bc_B, ipol)
+     &   sph_MHD_bc1%sph_bc_U, sph_MHD_bc1%sph_bc_B, ipol, bench)
       call end_elapsed_time(11)
       call end_elapsed_time(4)
 !

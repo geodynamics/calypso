@@ -15,6 +15,7 @@
 !!        type(field_IO_params), intent(inout) :: mesh_file
 !!        type(field_IO_params), intent(inout) :: sph_file_param
 !!      subroutine set_FEM_mesh_switch_4_SPH(plt, iflag_access_FEM)
+!!      subroutine set_FEM_surface_output_flag(plt, iflag_output_SURF)
 !!      subroutine set_control_restart_file_def(plt, file_IO)
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(field_IO_params), intent(inout) :: file_IO
@@ -119,7 +120,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_control_sph_mesh(plt, mesh_file, sph_file_param)
+      subroutine set_control_sph_mesh(plt, mesh_file, sph_file_param,   &
+     &          iflag_access_FEM, iflag_output_SURF)
 !
       use m_file_format_switch
       use sph_file_IO_select
@@ -127,6 +129,11 @@
       type(platform_data_control), intent(in) :: plt
       type(field_IO_params), intent(inout) :: mesh_file
       type(field_IO_params), intent(inout) :: sph_file_param
+      integer(kind = kint), intent(inout) :: iflag_access_FEM
+      integer(kind = kint), intent(inout) :: iflag_output_SURF
+!
+!
+      call set_control_mesh_def(plt, mesh_file)
 !
 !   set data format
 !
@@ -149,6 +156,9 @@
         sph_file_param%file_prefix                                      &
      &         = plt%spectr_field_file_prefix%charavalue
       end if
+!
+      call set_FEM_mesh_switch_4_SPH(plt, iflag_access_FEM)
+      call set_FEM_surface_output_flag(plt, iflag_output_SURF)
 !
       end subroutine set_control_sph_mesh
 !
@@ -174,6 +184,25 @@
       end if
 !
       end subroutine set_FEM_mesh_switch_4_SPH
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_FEM_surface_output_flag(plt, iflag_output_SURF)
+!
+      use skip_comment_f
+!
+      type(platform_data_control), intent(in) :: plt
+      integer(kind = kint), intent(inout) :: iflag_output_SURF
+!
+!
+      iflag_output_SURF = 0
+!
+      if(plt%FEM_surface_output_switch%iflag .eq. 0) return
+      if(yes_flag(plt%FEM_surface_output_switch%charavalue)) then
+        iflag_output_SURF = 1
+      end if
+ 
+      end subroutine set_FEM_surface_output_flag
 !
 ! ----------------------------------------------------------------------
 !

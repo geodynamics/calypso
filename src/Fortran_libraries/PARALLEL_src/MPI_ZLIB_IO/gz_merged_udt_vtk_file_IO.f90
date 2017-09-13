@@ -184,11 +184,9 @@
 !
 !
       call calypso_mpi_barrier
-     if(my_rank .eq. 0) then
+      if(my_rank .eq. 0) then
         write(*,*) 'gzipped VTK field by MPI-IO: ', trim(gzip_name)
       end if
-!
-      call gz_write_vtk_phys_mpi(gzip_name, ucd, m_ucd)
 !
       call calypso_mpi_write_file_open(gzip_name, nprocs, id_vtk)
 !

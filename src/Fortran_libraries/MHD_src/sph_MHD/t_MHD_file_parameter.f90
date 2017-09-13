@@ -19,6 +19,10 @@
 !
 !>      Structure of file name and format for MHD
       type MHD_file_IO_params
+!>        Integer flag to output mesh data
+        integer(kind = kint) :: iflag_access_FEM = 0
+!>        Integer flag to output surface data
+        integer(kind = kint) :: iflag_output_SURF = 0
 !>        Structure of mesh file IO paramters
         type(field_IO_params) :: mesh_file_IO
 !>        Structure of file name and format for restart file

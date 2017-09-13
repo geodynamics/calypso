@@ -7,8 +7,8 @@
 !>@brief  Construct FEM mesh from spherical harmonics transform data
 !!
 !!@verbatim
-!!      subroutine const_FEM_mesh_4_sph_mhd                             &
-!!     &         (sph_params, sph_rtp, sph_rj, radial_rtp_grp,          &
+!!      subroutine const_FEM_mesh_4_sph_mhd(iflag_output_mesh,          &
+!!     &          sph_params, sph_rtp, sph_rj, radial_rtp_grp,          &
 !!     &          radial_rj_grp, mesh, group, mesh_file, gen_sph)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -52,8 +52,8 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine const_FEM_mesh_4_sph_mhd                               &
-     &         (sph_params, sph_rtp, sph_rj, radial_rtp_grp,            &
+      subroutine const_FEM_mesh_4_sph_mhd(iflag_output_mesh,            &
+     &          sph_params, sph_rtp, sph_rj, radial_rtp_grp,            &
      &          radial_rj_grp, mesh, group, mesh_file, gen_sph)
 !
       use calypso_mpi
@@ -65,6 +65,7 @@
       use mpi_load_mesh_data
       use sph_file_IO_select
 !
+      integer(kind = kint), intent(in) :: iflag_output_mesh
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_rj_grid), intent(in) :: sph_rj

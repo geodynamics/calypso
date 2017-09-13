@@ -9,14 +9,14 @@
 !!@verbatim
 !!      subroutine select_make_SPH_mesh                                 &
 !!     &         (iflag_make_SPH, sph, comms_sph, sph_grps, sph_maker,  &
-!!     &          mesh, group, ele_mesh, mesh_file)
+!!     &          mesh, group, ele_mesh, MHD_files)
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(sph_comm_tables), intent(inout) :: comms_sph
 !!        type(sph_group_data), intent(inout) ::  sph_grps
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::   group
 !!        type(element_geometry), intent(inout) :: ele_mesh
-!!        type(field_IO_params), intent(inout) ::  mesh_file
+!!        type(MHD_file_IO_params), intent(inout) ::  MHD_files
 !!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !!@endverbatim
 !
@@ -58,7 +58,7 @@
 !
       subroutine select_make_SPH_mesh                                   &
      &         (iflag_make_SPH, sph, comms_sph, sph_grps, sph_maker,    &
-     &          mesh, group, ele_mesh, mesh_file)
+     &          mesh, group, ele_mesh, MHD_files)
 !
       use m_error_IDs
       use parallel_load_data_4_sph
@@ -72,7 +72,7 @@
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
       type(element_geometry), intent(inout) :: ele_mesh
-      type(field_IO_params), intent(inout) ::  mesh_file
+      type(MHD_file_IO_params), intent(inout) ::  MHD_files
       type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !
       integer(kind = kint) :: iflag_lc
@@ -103,8 +103,9 @@
       call calypso_mpi_barrier
 !
       if (iflag_debug.eq.1) write(*,*) 'load_para_SPH_and_FEM_mesh'
-      call load_para_SPH_and_FEM_mesh(sph, comms_sph, sph_grps,         &
-     &    mesh, group, ele_mesh, mesh_file, sph_maker%gen_sph)
+      call load_para_SPH_and_FEM_mesh(MHD_files%iflag_access_FEM,       &
+     &    sph, comms_sph, sph_grps, mesh, group, ele_mesh,              &
+     &    MHD_files%mesh_file_IO, sph_maker%gen_sph)
 !
       end subroutine select_make_SPH_mesh
 !

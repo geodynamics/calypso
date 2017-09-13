@@ -26,6 +26,7 @@
       use t_ctl_data_4_platforms
       use t_ctl_data_gen_sph_shell
       use t_const_spherical_grid
+      use t_ctl_params_gen_sph_shell
 !
       implicit none
 !
@@ -39,16 +40,14 @@
 !
 !>       Structure of grid and spectr data for spherical spectr method
       type(sph_grids), save :: sph_const
-!>      Structure of spectr index file name and formats
-      type(field_IO_params), save :: sph_file_prm_const
 !>      Structure of mesh file name and formats
-      type(field_IO_params), save ::  fem_mesh_file
+      type(gen_sph_file_IO_params), save ::  sph_files1
 !
 !>      Structure to construct grid
       type(construct_spherical_grid), save :: gen_sph_G
 !
       private :: control_file_name, psph_gen_ctl
-      private :: sph_const, sph_file_prm_const
+      private :: sph_const
 !
 ! ----------------------------------------------------------------------
 !
@@ -58,7 +57,6 @@
 !
       subroutine init_gen_sph_grids
 !
-      use set_ctl_gen_shell_grids
 !
 !
       num_elapsed = 4
@@ -75,8 +73,7 @@
      &   (control_file_name, psph_gen_plt, psph_gen_ctl)
       call set_control_4_gen_shell_grids                                &
      &   (psph_gen_plt, psph_gen_ctl%spctl, psph_gen_ctl%sdctl,         &
-     &    sph_const, fem_mesh_file, sph_file_prm_const,                 &
-     &    gen_sph_G, ierr_MPI)
+     &    sph_const, sph_files1, gen_sph_G, ierr_MPI)
       if(ierr_MPI .gt. 0) call calypso_mpi_abort(ierr_MPI, e_message)
 !
       end subroutine init_gen_sph_grids
@@ -96,15 +93,16 @@
 !
       call start_elapsed_time(4)
       if(gen_sph_G%s3d_ranks%ndomain_sph .eq. nprocs) then
-        call mpi_gen_fem_mesh_for_sph(gen_sph_G,                        &
-     &      sph_const%sph_params, sph_const%sph_rj, sph_const%sph_rtp,  &
-     &      fem_mesh_file)
+        call mpi_gen_fem_mesh_for_sph                                   &
+     &     (sph_files1%iflag_output_FEM, sph_files1%iflag_output_SURF,  &
+     &      gen_sph_G, sph_const%sph_params, sph_const%sph_rj,          &
+     &      sph_const%sph_rtp, sph_files1%mesh_file_IO)
       else
         if(iflag_debug .gt. 0) write(*,*) 'para_gen_fem_mesh_for_sph'
-        call para_gen_fem_mesh_for_sph                                  &
-     &     (gen_sph_G%s3d_ranks%ndomain_sph, gen_sph_G,                 &
+        call para_gen_fem_mesh_for_sph(sph_files1%iflag_output_FEM,     &
+     &      gen_sph_G%s3d_ranks%ndomain_sph, gen_sph_G,                 &
      &      sph_const%sph_params, sph_const%sph_rj, sph_const%sph_rtp,  &
-     &      fem_mesh_file)
+     &      sph_files1%mesh_file_IO)
       end if
       call end_elapsed_time(4)
       call end_elapsed_time(1)
