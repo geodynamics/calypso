@@ -16,10 +16,7 @@ field:              Directory for field data files
 
 This example only run with 2 MPI processes. The simulation procedure is the following
 
-1: Run index generation program as
-[heterogineous_temp]$ [CALYPSO_DIR]/bin/gen_sph_grids
-
-2. Run simulation program
+1. Run simulation program
 [heterogineous_temp]$ mpirun -np 2 [CALYPSO_DIR]/bin/sph_mhd
 
 

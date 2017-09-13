@@ -27,7 +27,9 @@ begin MHD_control
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
 !
-    field_file_fmt_ctl          'VTK'
+    sph_file_fmt_ctl           'merged_bin'
+    restart_file_fmt_ctl       'merged_bin'
+    field_file_fmt_ctl         'merged_VTK'
   end data_files_def
 !
 !!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!

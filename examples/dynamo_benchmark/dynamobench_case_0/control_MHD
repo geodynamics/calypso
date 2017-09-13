@@ -25,7 +25,10 @@ begin MHD_control
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
 !
-    field_file_fmt_ctl          'VTK'
+!
+    sph_file_fmt_ctl           'ascii'
+    restart_file_fmt_ctl       'ascii'
+    field_file_fmt_ctl         'VTK'
   end data_files_def
 !
 !!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!
