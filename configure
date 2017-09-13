@@ -625,6 +625,9 @@ ac_includes_default="\
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+PKGFLAGS_ZLIB
+ZLIB_LIBS
+ZLIB_CFLAGS
 PKGFLAGS_FFTW3
 FFTW3_LIBS
 FFTW3_CFLAGS
@@ -647,6 +650,7 @@ F77
 HDF5_PFLIBS
 HDF5_FLIBS
 HDF5_FFLAGS
+HDF5_H5PFC
 HDF5_FC
 HDF5_LIBS
 HDF5_LDFLAGS
@@ -673,6 +677,7 @@ GMAKE
 ifGNUmake
 RANLIB
 ar_bin
+XL_FORTRAN
 ac_ct_FC
 FCFLAGS
 FC
@@ -770,6 +775,7 @@ enable_fftw3
 enable_dependency_tracking
 with_hdf5
 with_blas
+with_zlib
 '
       ac_precious_vars='build_alias
 host_alias
@@ -788,7 +794,9 @@ CPP
 F77
 FFLAGS
 FFTW3_CFLAGS
-FFTW3_LIBS'
+FFTW3_LIBS
+ZLIB_CFLAGS
+ZLIB_LIBS'
 
 
 # Initialize some variables set by options.
@@ -1421,6 +1429,9 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-hdf5=yes/no/PATH full path of h5pcc for parallel HDF5 configuration
   --with-blas=<lib>       use BLAS library <lib>
+  --with-zlib=DIR root directory path of zlib installation defaults to
+                    /usr/local or /usr if not found in /usr/local
+  --without-zlib to disable zlib usage completely
 
 Some influential environment variables:
   CC          C compiler command
@@ -1441,6 +1452,8 @@ Some influential environment variables:
   FFTW3_CFLAGS
               C compiler flags for FFTW3, overriding pkg-config
   FFTW3_LIBS  linker flags for FFTW3, overriding pkg-config
+  ZLIB_CFLAGS C compiler flags for ZLIB, overriding pkg-config
+  ZLIB_LIBS   linker flags for ZLIB, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -3422,6 +3435,84 @@ fi
 
 
 
+# SYNOPSIS
+#
+#   AX_CHECK_ZLIB()
+#
+# DESCRIPTION
+#
+#   This macro searches for an installed zlib library. If nothing was
+#   specified when calling configure, it searches first in /usr/local and
+#   then in /usr, /opt/local and /sw. If the --with-zlib=DIR is specified,
+#   it will try to find it in DIR/include/zlib.h and DIR/lib/libz.a. If
+#   --without-zlib is specified, the library is not searched at all.
+#
+#   If either the header file (zlib.h) or the library (libz) is not found,
+#   the configuration exits on error, asking for a valid zlib installation
+#   directory or --without-zlib.
+#
+#   The macro defines the symbol HAVE_LIBZ if the library is found. You
+#   should use autoheader to include a definition for this symbol in a
+#   config.h file. Sample usage in a C/C++ source is as follows:
+#
+#     #ifdef HAVE_LIBZ
+#     #include <zlib.h>
+#     #endif /* HAVE_LIBZ */
+#
+# LICENSE
+#
+#   Copyright (c) 2008 Loic Dachary <loic@senga.org>
+#   Copyright (c) 2010 Bastien Chevreux <bach@chevreux.org>
+#
+#   This program is free software; you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation; either version 2 of the License, or (at your
+#   option) any later version.
+#
+#   This program is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along
+#   with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+#   As a special exception, the respective Autoconf Macro's copyright owner
+#   gives unlimited permission to copy, distribute and modify the configure
+#   scripts that are the output of Autoconf when processing the Macro. You
+#   need not follow the terms of the GNU General Public License when using
+#   or distributing such scripts, even though portions of the text of the
+#   Macro appear in them. The GNU General Public License (GPL) does govern
+#   all other use of the material that constitutes the Autoconf Macro.
+#
+#   This special exception to the GPL applies to versions of the Autoconf
+#   Macro released by the Autoconf Archive. When you make and distribute a
+#   modified version of the Autoconf Macro, you may extend this special
+#   exception to the GPL to apply to your modified version as well.
+
+#serial 8
+
+# This is what autoupdate's m4 run will expand.  It fires
+# the warning (with _au_warn_XXX), outputs it into the
+# updated configure.ac (with AC_DIAGNOSE), and then outputs
+# the replacement expansion.
+
+
+# This is an auxiliary macro that is also run when
+# autoupdate runs m4.  It simply calls m4_warning, but
+# we need a wrapper so that each warning is emitted only
+# once.  We break the quoting in m4_warning's argument in
+# order to expand this macro's arguments, not AU_DEFUN's.
+
+
+# Finally, this is the expansion that is picked up by
+# autoconf.  It tells the user to run autoupdate, and
+# then outputs the replacement expansion.  We do not care
+# about autoupdate's warning because that contains
+# information on what to do *after* running autoupdate.
+
+
+
 # ===========================================================================
 #        http://www.gnu.org/software/autoconf-archive/ax_lib_hdf5.html
 #        ax_lib_hdf5.m4
@@ -4854,6 +4945,19 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+if test -z ${FC}
+then
+	FC=${F77}
+else
+	F77=${FC}
+fi
+
+if test ${host_alias} = "powerpc64-bgq-linux"
+then
+  XL_FORTRAN="__bgq__"
+fi
 
 
 if test -z ${AR}
@@ -6327,6 +6431,7 @@ $as_echo "yes (version $HDF5_VERSION)" >&6; }
         CPPFLAGS=$HDF5_CPPFLAGS
         LIBS=$HDF5_LIBS
         LDFLAGS=$HDF5_LDFLAGS
+
         ac_fn_c_check_header_mongrel "$LINENO" "hdf5.h" "ac_cv_header_hdf5_h" "$ac_includes_default"
 if test "x$ac_cv_header_hdf5_h" = xyes; then :
   ac_cv_hadf5_h=yes
@@ -6381,6 +6486,33 @@ fi
           { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Unable to compile HDF5 test program" >&5
 $as_echo "$as_me: WARNING: Unable to compile HDF5 test program" >&2;}
         fi
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for libhdf5.a" >&5
+$as_echo_n "checking for libhdf5.a... " >&6; }
+if ${ac_cv_file_libhdf5_a+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  test "$cross_compiling" = yes &&
+  as_fn_error $? "cannot check for file existence when cross compiling" "$LINENO" 5
+if test -r "libhdf5.a"; then
+  ac_cv_file_libhdf5_a=yes
+else
+  ac_cv_file_libhdf5_a=no
+fi
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_file_libhdf5_a" >&5
+$as_echo "$ac_cv_file_libhdf5_a" >&6; }
+if test "x$ac_cv_file_libhdf5_a" = xyes; then :
+  static_hdf5=yes
+else
+  static_hdf5=no
+fi
+
+        if test "$static_hdf5" = "no" ; then
+          { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: No static HDF5 library found" >&5
+$as_echo "$as_me: WARNING: No static HDF5 library found" >&2;}
+        fi
+
                 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lhdf5_hl" >&5
 $as_echo_n "checking for main in -lhdf5_hl... " >&6; }
 if ${ac_cv_lib_hdf5_hl_main+:} false; then :
@@ -6481,13 +6613,18 @@ $as_echo "$H5PFC" >&6; }
             with_hdf5_parallel_fortran="yes"
 
 
-            #            HDF5_PFLIBS=$(eval $H5PFC -show)
-            HDF5_PFLIBS=$(eval $H5PFC -show | cut -d " " -f 3-)
+                        if test "$static_hdf5" = "yes" ; then
+#              HDF5_PFLIBS=$(eval $H5PFC -show)
+              HDF5_PFLIBS=$(eval $H5PFC -show | cut -d " " -f 3-)
+            else
+              HDF5_PFLIBS=$(eval $H5PFC -shlib -show  | cut -d " " -f 3-)
+            fi
         else
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
             with_hdf5_parallel_fortran="no"
         fi
+
 
 
 
@@ -6509,6 +6646,8 @@ fi
 $as_echo "HDF5_LDFLAGS... \"${HDF5_LDFLAGS}\"" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: HDF5_PFLIBS... \"${HDF5_PFLIBS}\"" >&5
 $as_echo "HDF5_PFLIBS... \"${HDF5_PFLIBS}\"" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: HDF5_H5PFC...  \"${HDF5_H5PFC}\"" >&5
+$as_echo "HDF5_H5PFC...  \"${HDF5_H5PFC}\"" >&6; }
 
 # Check BLAS
 if test -n "${with_blas}"; then
@@ -8744,6 +8883,10 @@ if test ${USE_fftw3} = "yes"
 then
   enable_connect_to_c="yes"
 fi
+if test ${with_zlib} != "no"
+then
+  enable_connect_to_c="yes"
+fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: enable_connect_to_c...\"${enable_connect_to_c}\"" >&5
 $as_echo "enable_connect_to_c...\"${enable_connect_to_c}\"" >&6; }
 
@@ -9775,6 +9918,297 @@ fi
 
 
 
+
+# Check zlib
+	if test ${with_zlib} != "no"
+	then
+
+pkg_failed=no
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for ZLIB" >&5
+$as_echo_n "checking for ZLIB... " >&6; }
+
+if test -n "$PKG_CONFIG"; then
+    if test -n "$ZLIB_CFLAGS"; then
+        pkg_cv_ZLIB_CFLAGS="$ZLIB_CFLAGS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"zlib\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "zlib") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_ZLIB_CFLAGS=`$PKG_CONFIG --cflags "zlib" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+if test -n "$PKG_CONFIG"; then
+    if test -n "$ZLIB_LIBS"; then
+        pkg_cv_ZLIB_LIBS="$ZLIB_LIBS"
+    else
+        if test -n "$PKG_CONFIG" && \
+    { { $as_echo "$as_me:${as_lineno-$LINENO}: \$PKG_CONFIG --exists --print-errors \"zlib\""; } >&5
+  ($PKG_CONFIG --exists --print-errors "zlib") 2>&5
+  ac_status=$?
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; }; then
+  pkg_cv_ZLIB_LIBS=`$PKG_CONFIG --libs "zlib" 2>/dev/null`
+else
+  pkg_failed=yes
+fi
+    fi
+else
+	pkg_failed=untried
+fi
+
+
+
+if test $pkg_failed = yes; then
+
+if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
+        _pkg_short_errors_supported=yes
+else
+        _pkg_short_errors_supported=no
+fi
+        if test $_pkg_short_errors_supported = yes; then
+	        ZLIB_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "zlib"`
+        else
+	        ZLIB_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "zlib"`
+        fi
+	# Put the nasty error message in config.log where it belongs
+	echo "$ZLIB_PKG_ERRORS" >&5
+
+	as_fn_error $? "Cannot find zlib" "$LINENO" 5
+elif test $pkg_failed = untried; then
+	as_fn_error $? "Cannot find zlib" "$LINENO" 5
+else
+	ZLIB_CFLAGS=$pkg_cv_ZLIB_CFLAGS
+	ZLIB_LIBS=$pkg_cv_ZLIB_LIBS
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+	have_zlib=yes
+fi
+		echo "have_zlib=$have_zlib"
+
+		if test ${have_zlib} = "yes"
+		then
+			PKGFLAGS_ZLIB="z"
+		else
+			#
+# Handle user hints
+#
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if zlib is wanted" >&5
+$as_echo_n "checking if zlib is wanted... " >&6; }
+
+# Check whether --with-zlib was given.
+if test "${with_zlib+set}" = set; then :
+  withval=$with_zlib; if test "$withval" != no ; then
+  zlib_places="/usr/local /usr /opt/local /sw"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+  if test -d "$withval"
+  then
+    zlib_places="$withval $zlib_places"
+  else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Sorry, $withval does not exist, checking usual places" >&5
+$as_echo "$as_me: WARNING: Sorry, $withval does not exist, checking usual places" >&2;}
+  fi
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Checking zlib in usual places" >&5
+$as_echo "$as_me: WARNING: Checking zlib in usual places" >&2;}
+ zlib_places="/usr/local /usr /opt/local /sw"
+ { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+fi
+
+
+#
+# Locate zlib, if wanted
+#
+if test -n "${zlib_places}"
+then
+	# check the user supplied or any other more or less 'standard' place:
+	#   Most UNIX systems      : /usr/local and /usr
+	#   MacPorts / Fink on OSX : /opt/local respectively /sw
+	for ZLIB_HOME in ${zlib_places} ; do
+	  if test -f "${ZLIB_HOME}/include/zlib.h"; then break; fi
+	  ZLIB_HOME=""
+	done
+
+	# if zlib.h was nowhere to be found, give a notice and bail out
+	if test ! -n "${ZLIB_HOME}"; then
+          as_fn_error $? "No zlib.h in any include directory of ${zlib_places}: either specify a valid zlib installation with --with-zlib=DIR or disable zlib usage with --without-zlib" "$LINENO" 5
+	fi
+
+        ZLIB_OLD_LDFLAGS=$LDFLAGS
+        ZLIB_OLD_CPPFLAGS=$CPPFLAGS
+        LDFLAGS="$LDFLAGS -L${ZLIB_HOME}/lib"
+        CPPFLAGS="$CPPFLAGS -I${ZLIB_HOME}/include"
+
+        ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for inflateEnd in -lz" >&5
+$as_echo_n "checking for inflateEnd in -lz... " >&6; }
+if ${ac_cv_lib_z_inflateEnd+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lz  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char inflateEnd ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return inflateEnd ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_z_inflateEnd=yes
+else
+  ac_cv_lib_z_inflateEnd=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_inflateEnd" >&5
+$as_echo "$ac_cv_lib_z_inflateEnd" >&6; }
+if test "x$ac_cv_lib_z_inflateEnd" = xyes; then :
+  zlib_cv_libz=yes
+else
+  zlib_cv_libz=no
+fi
+
+        ac_fn_c_check_header_mongrel "$LINENO" "zlib.h" "ac_cv_header_zlib_h" "$ac_includes_default"
+if test "x$ac_cv_header_zlib_h" = xyes; then :
+  zlib_cv_zlib_h=yes
+else
+  zlib_cv_zlib_h=no
+fi
+
+
+        ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+        if test "$zlib_cv_libz" = "yes" -a "$zlib_cv_zlib_h" = "yes"
+        then
+                #
+                # If both library and header were found, use them
+                #
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for inflateEnd in -lz" >&5
+$as_echo_n "checking for inflateEnd in -lz... " >&6; }
+if ${ac_cv_lib_z_inflateEnd+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lz  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char inflateEnd ();
+#ifdef F77_DUMMY_MAIN
+
+#  ifdef __cplusplus
+     extern "C"
+#  endif
+   int F77_DUMMY_MAIN() { return 1; }
+
+#endif
+int
+main ()
+{
+return inflateEnd ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_lib_z_inflateEnd=yes
+else
+  ac_cv_lib_z_inflateEnd=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_inflateEnd" >&5
+$as_echo "$ac_cv_lib_z_inflateEnd" >&6; }
+if test "x$ac_cv_lib_z_inflateEnd" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBZ 1
+_ACEOF
+
+  LIBS="-lz $LIBS"
+
+fi
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking zlib in ${ZLIB_HOME}" >&5
+$as_echo_n "checking zlib in ${ZLIB_HOME}... " >&6; }
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: ok" >&5
+$as_echo "ok" >&6; }
+        else
+                #
+                # If either header or library was not found, revert and bomb
+                #
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking zlib in ${ZLIB_HOME}" >&5
+$as_echo_n "checking zlib in ${ZLIB_HOME}... " >&6; }
+                LDFLAGS="$ZLIB_OLD_LDFLAGS"
+                CPPFLAGS="$ZLIB_OLD_CPPFLAGS"
+                { $as_echo "$as_me:${as_lineno-$LINENO}: result: failed" >&5
+$as_echo "failed" >&6; }
+                as_fn_error $? "either specify a valid zlib installation with --with-zlib=DIR or disable zlib usage with --without-zlib" "$LINENO" 5
+        fi
+fi
+
+
+			if test -n "${LIBS}"
+			then
+				ZLIB_CFLAGS="${CPPFLAGS}"
+				ZLIB_LIBS="${LDFLAGS} ${LIBS}"
+			fi
+		fi
+
+
+
+	fi
 fi
 
 
@@ -9784,6 +10218,12 @@ $as_echo "" >&6; }
 $as_echo "-----   Configuration summary   -------------------------------" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: " >&5
 $as_echo "" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: host:        \"${host}\"" >&5
+$as_echo "host:        \"${host}\"" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: host_alias:  \"${host_alias}\"" >&5
+$as_echo "host_alias:  \"${host_alias}\"" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: XL_FORTRAN:    \"${XL_FORTRAN}\"" >&5
+$as_echo "XL_FORTRAN:    \"${XL_FORTRAN}\"" >&6; }
 if test -n "${OPENMP_FCFLAGS}"; then
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: Use OpenMP ...        yes" >&5
 $as_echo "Use OpenMP ...        yes" >&6; }
@@ -9815,6 +10255,15 @@ $as_echo "Use parallel HDF5 ... yes" >&6; }
 else
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: Use parallel HDF5 ...  no" >&5
 $as_echo "Use parallel HDF5 ...  no" >&6; }
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: " >&5
+$as_echo "" >&6; }
+if test -n "${ZLIB_LIBS}"; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: Use zlib at ...       yes" >&5
+$as_echo "Use zlib at ...       yes" >&6; }
+else
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: Use zlib ...           no" >&5
+$as_echo "Use zlib ...           no" >&6; }
 fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: " >&5
 $as_echo "" >&6; }
