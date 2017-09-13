@@ -7,9 +7,9 @@
  Here is the input files for the dynamo benchmark case 1.
 This example consists of the following files and directories.
 
-control_sph_shell:  control file for gen_sph_grids
 control_MHD:        control file for simulation
 control_snapshot:   control file for data analysis
+control_resolution:  control file for spatial resolution
 
 sph_lm31r48c_4:     Directory for spherical harmonics index table
 rst_4:              Directory for restart files

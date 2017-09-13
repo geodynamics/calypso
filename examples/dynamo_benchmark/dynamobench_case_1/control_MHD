@@ -32,6 +32,9 @@ begin MHD_control
 !
 !!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!
 !
+!  To Define by external file...
+!    file spherical_shell_ctl  'file name'
+!
 !  num_domain_ctl:   Parallelization information
 !    num_radial_domain_ctl:        Number of radial decompositoin
 !    num_horizontal_domain_ctl:    Number of horizontal decompositoin

@@ -7,8 +7,8 @@ To simplify the problem, only the thermal and compositional fields are evolved w
 
 This example consists of the following files and directories
 
-control_sph_shell:  control file for gen_sph_grids
 control_MHD:        control file for simulation
+control_resolution:  control file for spatial resolution
 
 sph_lm4r64c_2:     Directory for spherical harmonics index table
 rst_2:              Directory for restart files

@@ -1,9 +1,4 @@
 begin spherical_shell_ctl
-  begin data_files_def
-    num_subdomain_ctl    4
-    sph_file_prefix             'sph_lm31r48c_4/in'
-  end data_files_def
-!
   begin num_domain_ctl
     num_radial_domain_ctl         2
     num_horizontal_domain_ctl     2

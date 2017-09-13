@@ -1,34 +1,42 @@
-begin spherical_shell_ctl
+begin MHD_control
+!!!!! Define for files !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!  num_subdomain_ctl: number of subdomains
+!  mesh_file_head_ctl:  header of mesh file (Default: in.domain#)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
   begin data_files_def
-    num_subdomain_ctl    4
+    debug_flag_ctl            'OFF'
+    num_subdomain_ctl            4
+!
     sph_file_prefix             'sph_lm31r48c_4/in'
+    sph_file_fmt_ctl           'merged'
   end data_files_def
 !
-  begin num_domain_ctl
-    array num_domain_sph_grid  2
-      num_domain_sph_grid   radial         2     end
-      num_domain_sph_grid   meridional     2     end
-    end array num_domain_sph_grid
+!!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!
 !
-    array num_domain_legendre   2
-      num_domain_legendre   radial         2     end
-      num_domain_legendre   zonal          2     end
-    end array num_domain_legendre
+!  To Define by external file...
+!    file spherical_shell_ctl  'file name'
 !
-    array num_domain_spectr     1
-      num_domain_spectr      modes         4    end
-    end array num_domain_spectr
-  end num_domain_ctl
+!  num_domain_ctl:   Parallelization information
+!    num_radial_domain_ctl:        Number of radial decompositoin
+!    num_horizontal_domain_ctl:    Number of horizontal decompositoin
 !
-  begin num_grid_sph
-    truncation_level_ctl      31
+!   truncation_level_ctl: Truncation of spherical harmonics (Lmax)
+!   ngrid_meridonal_ctl:  Number of meridional grid points ( = 1.5 x (Lmax+1))
+!   num_horizontal_domain_ctl: Number of zonal grid points ( = 3 x (Lmax+1))
 !
-    ngrid_meridonal_ctl      48
-    ngrid_zonal_ctl          96
+!   radial_grid_type_ctl:  Definition for radial grid   
+!         explicit:        Set each radial grid explicitly
+!         Chebyshev:       Set Chebyshev collocation points
+!         equi_distance:   Set equi-diatance grid
 !
-    radial_grid_type_ctl   Chebyshev
-    num_fluid_grid_ctl     48
-    fluid_core_size_ctl   1.0
-    ICB_to_CMB_ratio_ctl  0.35
-  end num_grid_sph
-end spherical_shell_ctl
+!   num_fluid_grid_ctl:    Number of radial grids
+!   fluid_core_size_ctl    Size of fluid shell
+!   ICB_to_CMB_ratio_ctl   Aspect ratio (r_o / r_i)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+  file spherical_shell_ctl  'control_resolution'
+end MHD_control
