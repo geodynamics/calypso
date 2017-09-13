@@ -7,13 +7,9 @@
 !>@brief  control data for resolutions of spherical shell
 !!
 !!@verbatim
-!!      subroutine read_ctl_file_gen_shell_grids                        &
-!!     &         (file_name, plt, psph_ctl)
-!!      subroutine read_ctl_file_shell_in_MHD(psph_ctl)
-!!
-!!      subroutine read_parallel_shell_ctl                              &
-!!     &          (hd_block, iflag, plt, psph_ctl)
+!!      subroutine read_ctl_file_gen_shell_grids(psph_ctl)
 !!      subroutine read_parallel_shell_in_MHD_ctl(hd_block, psph_ctl)
+!!
 !!      subroutine bcast_parallel_shell_ctl(psph_ctl)
 !!        type(platform_data_control), intent(inout) :: plt
 !!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
@@ -118,7 +114,7 @@
 !
       implicit none
 !
-      integer (kind = kint), private :: control_file_code = 13
+      integer(kind = kint), private :: control_file_code = 13
 !
 !>      structure of parallel spherical shell data
       type parallel_sph_shell_control
@@ -136,7 +132,6 @@
         integer (kind=kint) :: ifile_sph_shell = 0
       end type parallel_sph_shell_control
 !
-!
 !   Top level
 !
       character(len=kchara), parameter                                  &
@@ -145,12 +140,9 @@
 !   Second level
 !
       character(len=kchara), parameter                                  &
-     &                    :: hd_platform = 'data_files_def'
-      character(len=kchara), parameter                                  &
      &                     :: hd_sph_def = 'shell_define_ctl'
       character(len=kchara), parameter                                  &
      &                     :: hd_domains_sph = 'num_domain_ctl'
-      integer (kind=kint) :: i_platform =   0
       integer(kind = kint) :: i_shell_def =   0
       integer(kind = kint) :: i_domains_sph = 0
 !
@@ -158,7 +150,6 @@
       character(len=kchara), parameter :: hd_shell_def = 'num_grid_sph'
 !
       private :: hd_sph_shell
-      private :: hd_platform, i_platform
       private :: hd_sph_def, hd_shell_def, i_shell_def
       private :: hd_domains_sph, i_domains_sph
       private :: read_parallel_shell_ctl
@@ -169,38 +160,7 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_ctl_file_gen_shell_grids                          &
-     &         (file_name, plt, psph_ctl)
-!
-      use calypso_mpi
-      use t_ctl_data_4_platforms
-      use bcast_4_platform_ctl
-      use bcast_4_sphere_ctl
-!
-      character(len=kchara), intent(in) :: file_name
-      type(platform_data_control), intent(inout) :: plt
-      type(parallel_sph_shell_control), intent(inout) :: psph_ctl
-!
-!
-      if(my_rank .eq. 0) then
-        ctl_file_code = control_file_code
-        open(ctl_file_code, file = file_name)
-!
-        call load_ctl_label_and_line
-        call read_parallel_shell_ctl                                    &
-     &     (hd_sph_shell, psph_ctl%iflag_sph_shell, plt, psph_ctl)
-!
-        close(ctl_file_code)
-      end if
-!
-      call bcast_ctl_data_4_platform(plt)
-      call bcast_parallel_shell_ctl(psph_ctl)
-!
-      end subroutine read_ctl_file_gen_shell_grids
-!
-! -----------------------------------------------------------------------
-!
-      subroutine read_ctl_file_shell_in_MHD(psph_ctl)
+      subroutine read_ctl_file_gen_shell_grids(psph_ctl)
 !
       use calypso_mpi
       use bcast_4_sphere_ctl
@@ -213,53 +173,17 @@
         open(ctl_file_code, file = psph_ctl%control_sph_file)
 !
         call load_ctl_label_and_line
-        call read_parallel_shell_in_MHD_ctl(hd_sph_shell, psph_ctl)
+        call read_parallel_shell_ctl(hd_sph_shell, psph_ctl)
 !
         close(ctl_file_code)
       end if
 !
       call bcast_parallel_shell_ctl(psph_ctl)
 !
-      end subroutine read_ctl_file_shell_in_MHD
+      end subroutine read_ctl_file_gen_shell_grids
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
-!
-      subroutine read_parallel_shell_ctl                                &
-     &          (hd_block, iflag, plt, psph_ctl)
-!
-      use t_ctl_data_4_platforms
-!
-      character(len=kchara), intent(in) :: hd_block
-!
-      integer(kind = kint), intent(inout) :: iflag
-      type(platform_data_control), intent(inout) :: plt
-      type(parallel_sph_shell_control), intent(inout) :: psph_ctl
-!
-!
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if(iflag .gt. 0) return
-      do
-        call load_ctl_label_and_line
-!
-        call find_control_end_flag(hd_block, iflag)
-        if(iflag .gt. 0) exit
-!
-!
-        call read_control_platforms(hd_platform, i_platform, plt)
-!
-        call read_control_shell_define                                  &
-     &     (hd_sph_def, i_shell_def, psph_ctl%spctl)
-        call read_control_shell_define                                  &
-     &     (hd_shell_def, i_shell_def, psph_ctl%spctl)
-!
-        call read_control_shell_domain                                  &
-     &     (hd_domains_sph, i_domains_sph, psph_ctl%sdctl)
-      end do
-!
-      end subroutine read_parallel_shell_ctl
-!
-!   --------------------------------------------------------------------
 !
       subroutine read_parallel_shell_in_MHD_ctl(hd_block, psph_ctl)
 !
@@ -273,7 +197,21 @@
       if(right_file_flag(hd_block) .gt. 0) then
         call read_file_name_from_ctl_line                               &
      &     (psph_ctl%ifile_sph_shell, psph_ctl%control_sph_file)
+        return
       end if
+!
+      call read_parallel_shell_ctl(hd_block, psph_ctl)
+!
+      end subroutine read_parallel_shell_in_MHD_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine read_parallel_shell_ctl(hd_block, psph_ctl)
+!
+      character(len=kchara), intent(in) :: hd_block
+!
+      type(parallel_sph_shell_control), intent(inout) :: psph_ctl
+!
 !
       if(right_begin_flag(hd_block) .eq. 0) return
       do
@@ -291,8 +229,9 @@
      &     (hd_domains_sph, i_domains_sph, psph_ctl%sdctl)
       end do
 !
-      end subroutine read_parallel_shell_in_MHD_ctl
+      end subroutine read_parallel_shell_ctl
 !
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine bcast_parallel_shell_ctl(psph_ctl)
@@ -309,6 +248,8 @@
      &    CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
       call MPI_BCAST(psph_ctl%control_sph_file , kchara,                &
      &    CALYPSO_CHARACTER, izero, CALYPSO_COMM, ierr_MPI)
+!
+      if(psph_ctl%iflag_sph_shell .eq. 0) return
 !
       call bcast_ctl_4_shell_define(psph_ctl%spctl)
       call bcast_ctl_ndomain_4_shell(psph_ctl%sdctl)

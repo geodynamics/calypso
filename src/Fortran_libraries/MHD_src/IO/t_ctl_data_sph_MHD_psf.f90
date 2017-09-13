@@ -56,7 +56,7 @@
       call bcast_sph_mhd_ctl_w_psf(DNS_MHD_ctl)
 !
       if(DNS_MHD_ctl%psph_ctl%ifile_sph_shell .gt. 0) then
-        call read_ctl_file_shell_in_MHD(DNS_MHD_ctl%psph_ctl)
+        call read_ctl_file_gen_shell_grids(DNS_MHD_ctl%psph_ctl)
       end if
 !
       end subroutine read_control_4_sph_MHD_w_psf
@@ -82,7 +82,7 @@
       call bcast_sph_mhd_ctl_data(DNS_MHD_ctl)
 !
       if(DNS_MHD_ctl%psph_ctl%ifile_sph_shell .gt. 0) then
-        call read_ctl_file_shell_in_MHD(DNS_MHD_ctl%psph_ctl)
+        call read_ctl_file_gen_shell_grids(DNS_MHD_ctl%psph_ctl)
       end if
 !
       end subroutine read_control_4_sph_MHD_noviz

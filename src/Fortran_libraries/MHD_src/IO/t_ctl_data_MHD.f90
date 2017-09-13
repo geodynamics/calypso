@@ -13,10 +13,10 @@
 !!@verbatim
 !!      subroutine read_sph_mhd_ctl_w_psf(MHD_ctl)
 !!      subroutine read_sph_mhd_ctl_noviz(MHD_ctl)
-!!      subroutine read_fem_mhd_control_data(MHD_ctl)
 !!
 !!      subroutine bcast_sph_mhd_ctl_w_psf(MHD_ctl)
 !!      subroutine bcast_sph_mhd_ctl_data(MHD_ctl)
+!!        type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
 !!@endverbatim
 !
       module t_ctl_data_MHD

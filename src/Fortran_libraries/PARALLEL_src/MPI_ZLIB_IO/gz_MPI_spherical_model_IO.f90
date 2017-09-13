@@ -135,6 +135,7 @@
       integer(kind = kint) ::  nvect
 !
 !
+      call gz_mpi_write_num_of_data(IO_param, sph_IO%numnod_sph)
       call gz_mpi_write_ele_connect(IO_param,                           &
      &    sph_IO%numnod_sph, sph_IO%numdir_sph,                         &
      &    sph_IO%inod_gl_sph, sph_IO%idx_gl_sph)

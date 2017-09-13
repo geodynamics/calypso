@@ -8,10 +8,9 @@
 !!
 !!@verbatim
 !!      subroutine set_control_4_gen_shell_grids                        &
-!!     &         (plt, spctl, sdctl, sph, sph_files, gen_sph, ierr)
+!!     &         (plt, psph_ctl, sph, sph_files, gen_sph, ierr)
 !!        type(platform_data_control), intent(in) :: plt
-!!        type(sphere_data_control), intent(inout) :: spctl
-!!        type(sphere_domain_control), intent(inout) :: sdctl
+!!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(field_IO_params), intent(inout) ::  mesh_file
 !!        type(field_IO_params), intent(inout) :: sph_file_param
@@ -31,6 +30,7 @@
       use t_spheric_parameter
       use t_file_IO_parameter
       use t_ctl_data_4_platforms
+      use t_ctl_data_gen_sph_shell
       use t_ctl_data_4_sphere_model
       use t_ctl_data_4_divide_sphere
       use t_spheric_global_ranks
@@ -65,11 +65,10 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_control_4_gen_shell_grids                          &
-     &         (plt, spctl, sdctl, sph, sph_files, gen_sph, ierr)
+     &         (plt, psph_ctl, sph, sph_files, gen_sph, ierr)
 !
       type(platform_data_control), intent(in) :: plt
-      type(sphere_data_control), intent(inout) :: spctl
-      type(sphere_domain_control), intent(inout) :: sdctl
+      type(parallel_sph_shell_control), intent(inout) :: psph_ctl
       type(sph_grids), intent(inout) :: sph
       type(gen_sph_file_IO_params), intent(inout) ::  sph_files
       type(construct_spherical_grid), intent(inout) :: gen_sph
@@ -81,7 +80,8 @@
       call set_control_4_shell_filess(plt, nprocs_check, sph_files)
 !
       call set_control_4_shell_grids                                    &
-     &   (nprocs_check, spctl, sdctl, sph, gen_sph, ierr)
+     &   (nprocs_check, psph_ctl%spctl, psph_ctl%sdctl,                 &
+     &    sph, gen_sph, ierr)
 !
       end subroutine set_control_4_gen_shell_grids
 !

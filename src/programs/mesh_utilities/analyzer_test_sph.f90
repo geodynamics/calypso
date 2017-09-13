@@ -18,8 +18,7 @@
       use t_sph_trans_comm_tbl
       use t_file_IO_parameter
 !
-      use t_ctl_data_4_platforms
-      use t_ctl_data_gen_sph_shell
+      use t_ctl_data_const_sph_mesh
       use t_ctl_params_gen_sph_shell
 !
       use calypso_mpi
@@ -33,14 +32,13 @@
      &         :: control_file_name = 'control_sph_shell'
 !
 !>      Structure for file settings
-      type(platform_data_control), save :: psph_test_plt
+      type(sph_mesh_generation_ctl), save :: SPH_TEST_ctl
 !
-      type(parallel_sph_shell_control), save :: psph_test_ctl
       type(sph_mesh_data), save :: sph_mesh_t
 !
       type(gen_sph_file_IO_params), save ::  test_sph_files
 !
-      private :: control_file_name, psph_test_ctl
+      private :: control_file_name, SPH_TEST_ctl
       private :: check_header, sph_mesh_t
 !
 ! ----------------------------------------------------------------------
@@ -65,10 +63,9 @@
 !
 !     --------------------- 
 !
-      call turn_off_debug_flag_by_ctl(my_rank, psph_test_plt)
-      call read_ctl_file_gen_shell_grids                                &
-     &   (control_file_name, psph_test_plt, psph_test_ctl)
-      call set_control_sph_mesh(psph_test_plt,                          &
+      call turn_off_debug_flag_by_ctl(my_rank, SPH_TEST_ctl%plt)
+      call read_control_4_const_shell(control_file_name, SPH_TEST_ctl)
+      call set_control_sph_mesh(SPH_TEST_ctl%plt,                       &
      &    test_sph_files%mesh_file_IO, test_sph_files%sph_file_IO,      &
      &    test_sph_files%iflag_output_FEM,                              &
      &    test_sph_files%iflag_output_SURF)

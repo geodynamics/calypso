@@ -23,8 +23,7 @@
       use t_spheric_parameter
       use t_sph_trans_comm_tbl
       use t_file_IO_parameter
-      use t_ctl_data_4_platforms
-      use t_ctl_data_gen_sph_shell
+      use t_ctl_data_const_sph_mesh
       use t_const_spherical_grid
       use t_ctl_params_gen_sph_shell
 !
@@ -35,8 +34,7 @@
 !
 !
 !>      Structure for file settings
-      type(platform_data_control), save :: psph_gen_plt
-      type(parallel_sph_shell_control), save :: psph_gen_ctl
+      type(sph_mesh_generation_ctl), save :: SPH_MAKE_ctl
 !
 !>       Structure of grid and spectr data for spherical spectr method
       type(sph_grids), save :: sph_const
@@ -46,8 +44,8 @@
 !>      Structure to construct grid
       type(construct_spherical_grid), save :: gen_sph_G
 !
-      private :: control_file_name, psph_gen_ctl
-      private :: sph_const
+      private :: control_file_name
+      private :: sph_const, SPH_MAKE_ctl
 !
 ! ----------------------------------------------------------------------
 !
@@ -56,7 +54,6 @@
 ! ----------------------------------------------------------------------
 !
       subroutine init_gen_sph_grids
-!
 !
 !
       num_elapsed = 4
@@ -69,10 +66,9 @@
 !
 !
       call start_elapsed_time(1)
-      call read_ctl_file_gen_shell_grids                                &
-     &   (control_file_name, psph_gen_plt, psph_gen_ctl)
+      call read_control_4_const_shell(control_file_name, SPH_MAKE_ctl)
       call set_control_4_gen_shell_grids                                &
-     &   (psph_gen_plt, psph_gen_ctl%spctl, psph_gen_ctl%sdctl,         &
+     &   (SPH_MAKE_ctl%plt, SPH_MAKE_ctl%psph_ctl,                      &
      &    sph_const, sph_files1, gen_sph_G, ierr_MPI)
       if(ierr_MPI .gt. 0) call calypso_mpi_abort(ierr_MPI, e_message)
 !
