@@ -224,19 +224,5 @@ begin MHD_control
   begin sph_monitor_ctl
     volume_average_prefix        'sph_ave_volume'
     volume_pwr_spectr_prefix     'sph_pwr_volume'
-!    layered_pwr_spectr_prefix    'sph_pwr_layer'
-!
-!    picked_sph_prefix     'picked_mode'
-!
-!    array pick_sph_degree_ctl  2
-!      pick_sph_degree_ctl   0
-!      pick_sph_degree_ctl   1
-!    end array pick_sph_degree_ctl
-!
-!    array pick_sph_spectr_ctl  2
-!      pick_sph_spectr_ctl   2  -2
-!      pick_sph_spectr_ctl   2   2
-!    end array pick_sph_spectr_ctl
-!
   end sph_monitor_ctl
 end MHD_control
