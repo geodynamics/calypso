@@ -30,6 +30,46 @@ begin MHD_control
     field_file_fmt_ctl          'VTK'
   end data_files_def
 !
+!!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!
+!
+!  num_domain_ctl:   Parallelization information
+!    num_radial_domain_ctl:        Number of radial decompositoin
+!    num_horizontal_domain_ctl:    Number of horizontal decompositoin
+!
+!   truncation_level_ctl: Truncation of spherical harmonics (Lmax)
+!   ngrid_meridonal_ctl:  Number of meridional grid points ( = 1.5 x (Lmax+1))
+!   num_horizontal_domain_ctl: Number of zonal grid points ( = 3 x (Lmax+1))
+!
+!   radial_grid_type_ctl:  Definition for radial grid   
+!         explicit:        Set each radial grid explicitly
+!         Chebyshev:       Set Chebyshev collocation points
+!         equi_distance:   Set equi-diatance grid
+!
+!   num_fluid_grid_ctl:    Number of radial grids
+!   fluid_core_size_ctl    Size of fluid shell
+!   ICB_to_CMB_ratio_ctl   Aspect ratio (r_o / r_i)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+  begin spherical_shell_ctl
+    begin num_domain_ctl
+      num_radial_domain_ctl         2
+      num_horizontal_domain_ctl     2
+    end num_domain_ctl
+!
+    begin num_grid_sph
+      truncation_level_ctl      31
+!
+      ngrid_meridonal_ctl      48
+      ngrid_zonal_ctl          96
+!
+      raidal_grid_type_ctl   Chebyshev
+      num_fluid_grid_ctl     48
+      fluid_core_size_ctl   1.0
+      ICB_to_CMB_ratio_ctl  0.35
+    end num_grid_sph
+  end spherical_shell_ctl
+!
   begin model
 !!!!!  physical values!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 ! available valuables 
@@ -264,32 +304,47 @@ begin MHD_control
       coef_imp_t_ctl          6.0e-1
       coef_imp_b_ctl          6.0e-1
       coef_imp_d_ctl          6.0e-1
-!      Legendre_trans_loop_ctl   'outer_field_loop'
     end time_loop_ctl
   end control
 !
-!   Long_loop, outer_field_loop...broken...
-!                   ('inner_radial_loop', 'outer_radial_loop', 'long_loop',
-!                    'original_loop', 'outer_field_loop'
 !
-  begin sph_monitor_ctl
+begin sph_monitor_ctl
     volume_average_prefix        'sph_ave_volume'
     volume_pwr_spectr_prefix     'sph_pwr_volume'
-!    layered_pwr_spectr_prefix    'sph_pwr_layer'
+    nusselt_number_prefix        'Nusselt'
 !
-    picked_sph_prefix     'picked_mode'
-    gauss_coefs_prefix    'gauss_coefs'
-    gauss_coefs_radius_ctl    2.91
+    begin layered_spectrum_ctl
+      layered_pwr_spectr_prefix    'sph_pwr_layer'
 !
-    array pick_sph_spectr_ctl  2
-      pick_sph_spectr_ctl   1   0
-      pick_sph_spectr_ctl   2   0
-    end array pick_sph_spectr_ctl
+       array spectr_layer_ctl  3
+         spectr_layer_ctl  1
+         spectr_layer_ctl  12
+         spectr_layer_ctl  24
+       end array spectr_layer_ctl    
+    end layered_spectrum_ctl
 !
-    array pick_gauss_coef_degree_ctl  1
-      pick_gauss_coef_degree_ctl   1
-    end array pick_gauss_coef_degree_ctl
+    begin pickup_spectr_ctl
+      picked_sph_prefix     'picked_mode'
 !
+      array pick_layer_ctl  2
+        pick_layer_ctl    8
+        pick_layer_ctl   16
+      end array pick_layer_ctl
+!
+      array pick_sph_spectr_ctl  2
+        pick_sph_spectr_ctl   1   0
+        pick_sph_spectr_ctl   2   0
+      end array pick_sph_spectr_ctl
+    end pickup_spectr_ctl
+!
+    begin gauss_coefficient_ctl
+      gauss_coefs_prefix    'gauss_coefs'
+      gauss_coefs_radius_ctl    2.91
+!
+      array pick_gauss_coef_degree_ctl  1
+        pick_gauss_coef_degree_ctl   1
+      end array pick_gauss_coef_degree_ctl
+    end gauss_coefficient_ctl
   end sph_monitor_ctl
 !
   begin visual_control
