@@ -119,13 +119,13 @@
 !
 !
       if (init_d%i_time_step .eq. -1) then
-        call sel_read_alloc_step_SPH_file(nprocs, my_rank,              &
-     &      init_d%i_time_step, fst_file_IO, sph_time_IO, sph_fst_IO)
+        rst_step%istep_file = init_d%i_time_step
       else
         rst_step%istep_file = init_d%i_time_step / rst_step%increment
-        call sel_read_alloc_step_SPH_file(nprocs, my_rank,              &
-     &      rst_step%istep_file, fst_file_IO, sph_time_IO, sph_fst_IO)
       end if
+!
+      call sel_read_alloc_step_SPH_file(nprocs, my_rank,                &
+     &    rst_step%istep_file, fst_file_IO, sph_time_IO, sph_fst_IO)
 !
       call set_sph_restart_from_IO(sph_fst_IO, rj_fld)
       call copy_time_step_data(sph_time_IO, init_d)

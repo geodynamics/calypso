@@ -35,7 +35,7 @@
 !!!           output all layer and volume average
 !!    array pick_layer_ctl  1
 !!      pick_layer_ctl  62
-!!    end array
+!!    end array pick_layer_ctl
 !!
 !!    array pick_sph_spectr_ctl  2
 !!      pick_sph_spectr_ctl   2  -2
