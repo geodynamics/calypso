@@ -140,7 +140,8 @@ An example of usage of the configure command is the following;
 % ./configure --prefix='/Users/matsui/local' \
 ? CFLAGS='-O -Wall -g' FCFLAGS='-O -Wall -g' \
 ? PKG_CONFIG_PATH='/Users/matsui/local/lib/pkgconfig' \
-? --enable-fftw3 --with-hdf5='/Users/matsui/local/bin/h5pcc'
+? --with-blas=yes --enable-fftw3 --with-zlib=/usr/local \
+? --with-hdf5='/Users/matsui/local/bin/h5pcc'
 
 \end{verbatim}
 

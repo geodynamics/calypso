@@ -56,6 +56,8 @@ Radial point list & \verb|radial_info.dat| & Single & Output \\ \hline
 \label{table:mesh_format}
 \end{table}
 %
+
+My favorite (recommend) data format is \verb|merged_gz|, because we can reduce the number of files in one directory and check the data by using \verb|gunzip -c| command.
 %
 
 \subsection{Position of radial grid}
@@ -104,73 +106,96 @@ Control file ({\tt control\_sph\_shell}) consists the following items. Detailed 
 \label{href_i:spherical_shell_ctl}
 \\
 %
-\begin{itemize}
-\item \verb|data_files_def|
-	\label{href_i:data_files_def2}
-	\hyperref[href_t:data_files_def]{(Detail)}
+\verb|MHD_control| (Header of the control file)
 	\begin{itemize}
-	\item \verb|num_subdomain_ctl        [Num_PE]|
-		\hyperref[href_t:num_subdomain_ctl]{(Detail)}
-	\item \verb|sph_file_prefix          [sph_prefix]|
+	\item \verb|data_files_def|
+		\label{href_i:data_files_def2}
+		\hyperref[href_t:data_files_def]{(Detail)}
+		\begin{itemize}
+		\item \verb|num_subdomain_ctl        [Num_PE]|
+			\hyperref[href_t:num_subdomain_ctl]{(Detail)}
+		\item \verb|sph_file_prefix          [sph_prefix]|
 			\hyperref[href_t:sph_file_prefix]{(Detail)}
-	\item \verb|sph_file_fmt_ctl         [sph_format]|
+		\item \verb|sph_file_fmt_ctl         [sph_format]|
 			\hyperref[href_t:sph_file_fmt_ctl]{(Detail)}
-	\end{itemize}
+		\end{itemize}
 %
-\item \verb|num_domain_ctl|
-	\label{href_i:num_domain_ctl}
-	\hyperref[href_t:num_domain_ctl]{(Detail)}
+	\item \verb|file spherical_shell_ctl	[resolution_file_name]|
+		\hyperref[href_t:file_spherical_shell_ctl]{(Detail)}
+	\item \verb|spherical_shell_ctl|
 	\begin{itemize}
-    \item \verb|num_radial_domain_ctl [Ndomain]|
-        \hyperref[href_t:num_radial_domain_ctl]{(Detail)}
-    \item \verb|num_horizontal_domain_ctl [Ndomain]|
-        \hyperref[href_t:num_horizontal_domain_ctl]{(Detail)}
-	\item \verb|array  num_domain_sph_grid  [Direction]  [Ndomain]|
-		\hyperref[href_t:num_domain_sph_grid]{(Detail)}
-	\item \verb|array  num_domain_legendre  [Direction]  [Ndomain]|
-	\hyperref[href_t:num_domain_legendre]{(Detail)}
-	\item \verb|array  num_domain_spectr    [Direction]  [Ndomain]|
-		\hyperref[href_t:num_domain_spectr]{(Detail)}
-	\end{itemize}
+		\item \verb|num_domain_ctl|
+			\label{href_i:num_domain_ctl}
+			\hyperref[href_t:num_domain_ctl]{(Detail)}
+			\begin{itemize}
+			\item \verb|num_radial_domain_ctl [Ndomain]|
+	    	    \hyperref[href_t:num_radial_domain_ctl]{(Detail)}
+			\item \verb|num_horizontal_domain_ctl [Ndomain]|
+				\hyperref[href_t:num_horizontal_domain_ctl]{(Detail)}
+			\item \verb|array  num_domain_sph_grid  [Direction]  [Ndomain]|
+				\hyperref[href_t:num_domain_sph_grid]{(Detail)}
+			\item \verb|array  num_domain_legendre  [Direction]  [Ndomain]|
+				\hyperref[href_t:num_domain_legendre]{(Detail)}
+			\item \verb|array  num_domain_spectr    [Direction]  [Ndomain]|
+				\hyperref[href_t:num_domain_spectr]{(Detail)}
+			\end{itemize}
 %
-\item \verb|num_grid_sph|
-	\label{href_i:num_grid_sph}
-	\hyperref[href_t:num_grid_sph]{(Detail)}
-	\begin{itemize}
-	\item \verb|truncation_level_ctl    [Lmax]|
-		\hyperref[href_t:truncation_level_ctl]{(Detail)}
-	\item \verb|ngrid_meridonal_ctl     [Ntheta]|
-		\hyperref[href_t:ngrid_meridonal_ctl]{(Detail)}
-	\item \verb|ngrid_zonal_ctl         [Nphi]|
-		\hyperref[href_t:ngrid_zonal_ctl]{(Detail)}
+		\item \verb|num_grid_sph|
+			\label{href_i:num_grid_sph}
+			\hyperref[href_t:num_grid_sph]{(Detail)}
+			\begin{itemize}
+	        \item \verb|truncation_level_ctl    [Lmax]|
+	            \hyperref[href_t:truncation_level_ctl]{(Detail)}
+			\item \verb|ngrid_meridonal_ctl     [Ntheta]|
+				\hyperref[href_t:ngrid_meridonal_ctl]{(Detail)}
+			\item \verb|ngrid_zonal_ctl         [Nphi]|
+				\hyperref[href_t:ngrid_zonal_ctl]{(Detail)}
 %
-	\item \verb|radial_grid_type_ctl   [explicit, Chebyshev, or equi_distance]| \label{href_i:radial_grid_type_ctl}
-		\hyperref[href_t:radial_grid_type_ctl]{(Detail)}
+			\item \verb|radial_grid_type_ctl|   \\
+				\verb|[explicit, Chebyshev, or equi_distance]| \label{href_i:radial_grid_type_ctl}
+				\hyperref[href_t:radial_grid_type_ctl]{(Detail)}
 %
-	\item \verb|num_fluid_grid_ctl     [Nr_shell]|
-		\hyperref[href_t:num_fluid_grid_ctl]{(Detail)}
-	\item \verb|fluid_core_size_ctl    [Length]|
-		\hyperref[href_t:fluid_core_size_ctl]{(Detail)}
-	\item \verb|ICB_to_CMB_ratio_ctl   [R_ratio]|
-		\hyperref[href_t:ICB_to_CMB_ratio_ctl]{(Detail)}
-	\item \verb|Min_radius_ctl         [Rmin]|
-		\hyperref[href_t:Min_radius_ctl]{(Detail)}    
-		\label{href_i:Min_radius_ctl}
-	\item \verb|Max_radius_ctl         [Rmax]|
-			\hyperref[href_t:Max_radius_ctl]{(Detail)}    
-		\label{href_i:Max_radius_ctl}
+			\item \verb|num_fluid_grid_ctl     [Nr_shell]|
+				\hyperref[href_t:num_fluid_grid_ctl]{(Detail)}
+			\item \verb|fluid_core_size_ctl    [Length]|
+				\hyperref[href_t:fluid_core_size_ctl]{(Detail)}
+			\item \verb|ICB_to_CMB_ratio_ctl   [R_ratio]|
+				\hyperref[href_t:ICB_to_CMB_ratio_ctl]{(Detail)}
+			\item \verb|Min_radius_ctl         [Rmin]|
+				\hyperref[href_t:Min_radius_ctl]{(Detail)}    
+				\label{href_i:Min_radius_ctl}
+			\item \verb|Max_radius_ctl         [Rmax]|
+				\hyperref[href_t:Max_radius_ctl]{(Detail)}    
+				\label{href_i:Max_radius_ctl}
 %
 \\
-	\item \verb|array r_layer          [Layer #]   [Radius]|
-		\hyperref[href_t:r_layer]{(Detail)}    
+			\item \verb|array r_layer  [Layer #]   [Radius]|
+				\hyperref[href_t:r_layer]{(Detail)}    
 %
-	\item \verb|array boundaries_ctl   [Boundary_name]  [Layer #]|
-		\hyperref[href_t:boundaries_ctl]{(Detail)}    
+			\item \verb|array boundaries_ctl   [Boundary_name]  [Layer #]|
+				\hyperref[href_t:boundaries_ctl]{(Detail)}    
+			\end{itemize}
+		\end{itemize}
 	\end{itemize}
-\end{itemize}
 
-If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined, the following arrays \verb|num_domain_sph_grid|, \verb|num_domain_legendre|, and \verb|num_domain_spectr| are not necessary. (see \hyperref[href_t:gen_w_innercore]{example} \verb|spherical_shell/with_inner_core|)
+If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined, the following arrays \verb|num_domain_sph_grid|, \verb|num_domain_legendre|, and \verb|num_domain_spectr| are not necessary. \\
+(see \hyperref[href_t:gen_w_innercore]{example} \verb|spherical_shell/with_inner_core|)
 
+The external file for resoultion and parallelization information \verb|[resolution_file_name]| needs the following contorl blocks:
+%
+	\begin{itemize}
+	\item \verb|spherical_shell_ctl|
+	\begin{itemize}
+		\item \verb|num_domain_ctl|
+			\hyperref[href_i:data_files_def2]{(Detail)} \\
+			\verb|...|
+%
+		\item \verb|num_grid_sph|
+			\hyperref[href_i:num_grid_sph]{(Detail)} \\
+			\verb|...|
+		\end{itemize}
+	\end{itemize}
+%
 \subsection{Spectrum index data}
 \verb|gen_sph_grid| generates indexing table of the spherical transform. To perform spherical harmonics transform with distributed memory computers, data communication table is also included in these files. Calypso needs four indexing data for the spherical transform.
 %
@@ -233,7 +258,7 @@ The name of the simulation program is {\tt sph\_mhd}. This program requires {\tt
 \label{fig:flow_2}
 \end{figure}
 %
-Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing data for spherical harmonics which starting with \verb|[sph_prefix]| are obtained by the preprocessing program \verb|gen_sph_grid|. The boundary condition data file \verb|[boundary_data_name]| is optionally required if boundary conditions for temperature and composition are not homogenous.
+Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing data for spherical harmonics which starting with \verb|[sph_prefix]| are obtained by the preprocessing program \verb|gen_sph_grid|. If these indexing data files do not exist, the spherical harmonics indexing data files are also generated by using information in \verb|spherical_shell_ctl| block. The boundary condition data file \verb|[boundary_data_name]| is optionally required if boundary conditions for temperature and composition are not homogenous.
 %
 \begin{table}[htp]
 \caption{List of files for simulation {\tt sph\_mhd} }
@@ -242,11 +267,11 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 \hline
  name & Parallelization & I/O \\ \hline \hline
 \verb|control_MHD| & Serial & Input \\ \hline
-\verb|[sph_prefix].[rj_extension]|  & - & Input \\
-\verb|[sph_prefix].[rlm_extension]| & - & Input \\
-\verb|[sph_prefix].[rtm_extension]| & - & Input \\
-\verb|[sph_prefix].[rtp_extension]| & - & Input \\ \hline
-\verb|[sph_prefix].[fem_extension]| & - & Input/Output \\ \hline
+\verb|[sph_prefix].[rj_extension]|  & - & Input / (Output) \\
+\verb|[sph_prefix].[rlm_extension]| & - & Input / (Output) \\
+\verb|[sph_prefix].[rtm_extension]| & - & Input / (Output) \\
+\verb|[sph_prefix].[rtp_extension]| & - & Input / (Output) \\ \hline
+\verb|[sph_prefix].[fem_extension]| & - & Input / (Output) \\ \hline
 \verb|[boundary_data_name]| & Single & Input \\ \hline
 \verb|[rst_prefix].[step #].[rst_extension]| &  - & Input/Output  \\ \hline
 \verb|[vol_pwr_prefix]_s.dat| & Single & Output \\ \hline
@@ -266,6 +291,7 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 \verb|[isosurface_prefix].[step#].[extension]| &  Single & Output  \\ \hline
 \end{tabular}
 \end{center}
+(Output): Marked files are generated if files do not exist.
 \label{table:sph_mhd}
 \end{table}
 %
@@ -321,6 +347,19 @@ The format of the control file \verb|control_MHD| is described below. The detail
 			\hyperref[href_t:restart_file_fmt_ctl]{(Detail)}
 	\item \verb|field_file_fmt_ctl          [fld_format]|
 			\hyperref[href_t:field_file_fmt_ctl]{(Detail)}
+	\end{itemize}
+%
+\item (\verb|file spherical_shell_ctl	[resolution_file_name]|)
+	\hyperref[href_t:file_spherical_shell_ctl]{(Detail)}
+\item (\verb|spherical_shell_ctl|)
+	\begin{itemize}
+	\item (\verb|num_domain_ctl|
+		\hyperref[href_i:data_files_def2]{(Detail)}) \\
+		(\verb|...|)
+%
+	\item (\verb|num_grid_sph|
+		\hyperref[href_i:num_grid_sph]{(Detail)}) \\
+		(\verb|...|)
 	\end{itemize}
 %
 \item \verb|model|
@@ -536,41 +575,77 @@ The format of the control file \verb|control_MHD| is described below. The detail
 %
 \item \verb|sph_monitor_ctl|
 	\label{href_i:sph_monitor_ctl}
-	\hyperref[href_t:sph_monitor_ctl]{(Detail)}
+		\hyperref[href_t:sph_monitor_ctl]{(Detail)}
 	\begin{itemize}
 	\item \verb|volume_average_prefix             [vol_ave_prefix]|
-    		\hyperref[href_t:volume_average_prefix]{(Detail)}
+			\hyperref[href_t:volume_average_prefix]{(Detail)}
 	\item \verb|volume_pwr_spectr_prefix          [vol_pwr_prefix]|
-    		\hyperref[href_t:volume_pwr_spectr_prefix]{(Detail)}
-	\item \verb|layered_pwr_spectr_prefix         [layer_pwr_prefix]| \\
-    		\hyperref[href_t:layered_pwr_spectr_prefix]{(Detail)}
-	\item \verb|picked_sph_prefix                 [picked_sph_prefix]| \\
-    		\hyperref[href_t:picked_sph_prefix]{(Detail)}
-	\item \verb|gauss_coefs_prefix                [gauss_coef_prefix]| \\
-    		\hyperref[href_t:gauss_coefs_prefix]{(Detail)}
-	\item \verb|gauss_coefs_radius_ctl            [gauss_coef_radius]| \\
-    		\hyperref[href_t:gauss_coefs_radius_ctl]{(Detail)}
+			\hyperref[href_t:volume_pwr_spectr_prefix]{(Detail)}
 	\item \verb|nusselt_number_prefix             [nusselt_number_prefix]| \\
-    		\hyperref[href_t:nusselt_number_prefix]{(Detail)}
-	\item \verb|array pick_layer_ctl              [Layer #]|
-    		\hyperref[href_t:pick_layer_ctl]{(Detail)}
-	\item \verb|array pick_sph_spectr_ctl         [Degree]  [Order]| \\
-    		\hyperref[href_t:pick_sph_spectr_ctl]{(Detail)}
-	\item \verb|array pick_sph_degree_ctl         [Degree]|
-    		\hyperref[href_t:pick_sph_degree_ctl]{(Detail)}
-	\item \verb|array pick_sph_order_ctl          [Order]|
-    		\hyperref[href_t:pick_sph_order_ctl]{(Detail)}
-	\item \verb|array pick_gauss_coefs_ctl        [Degree]   [Order]| \\
-    		\hyperref[href_t:pick_gauss_coefs_ctl]{(Detail)}
-	\item \verb|array pick_gauss_coef_degree_ctl  [Degree]|
-    		\hyperref[href_t:pick_gauss_coef_degree_ctl]{(Detail)}
-	\item \verb|array pick_gauss_coef_order_ctl   [Order]|
-    		\hyperref[href_t:pick_gauss_coef_order_ctl]{(Detail)}
+			\hyperref[href_t:nusselt_number_prefix]{(Detail)}
 %
-	\item \verb|nphi_mid_eq_ctl   [Nphi_mid_equator]|
-		\label{href_i:nphi_mid_eq_ctl}
-    		\hyperref[href_t:nphi_mid_eq_ctl]{(Detail)}
+	\item \verb|array volume_spectrum_ctl|
+		\hyperref[href_t:volume_spectrum_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|volume_spectrum_ctl|
+			\begin{itemize}
+			\item \verb|volume_average_prefix             [vol_ave_prefix]|
+					\hyperref[href_t:volume_average_prefix]{(Detail)}
+			\item \verb|volume_pwr_spectr_prefix          [vol_pwr_prefix]|
+					\hyperref[href_t:volume_pwr_spectr_prefix]{(Detail)}
+			\item \verb|inner_radius_ctl          [radius]|
+					\hyperref[href_t:inner_radius_ctl]{(Detail)}
+			\item \verb|outer_radius_ctl          [radius]|
+					\hyperref[href_t:outer_radius_ctl]{(Detail)}
+			\end{itemize}
+		\end{itemize}
 %
+	\item \verb|layered_spectrum_ctl|
+		\hyperref[href_t:layered_spectrum_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|layered_pwr_spectr_prefix         [layer_pwr_prefix]| \\
+			\hyperref[href_t:layered_pwr_spectr_prefix]{(Detail)}
+		\item \verb|array [spectr_layer_ctl]| \\
+			\hyperref[href_t:spectr_layer_ctl]{(Detail)}
+		\end{itemize}
+%
+	\item \verb|gauss_coefficient_ctl|
+		\hyperref[href_t:gauss_coefficient_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|gauss_coefs_prefix                [gauss_coef_prefix]| \\
+			\hyperref[href_t:gauss_coefs_prefix]{(Detail)}
+		\item \verb|gauss_coefs_radius_ctl            [gauss_coef_radius]| \\
+			\hyperref[href_t:gauss_coefs_radius_ctl]{(Detail)}
+			\item \verb|array pick_gauss_coefs_ctl        [Degree]   [Order]| \\
+			\hyperref[href_t:pick_gauss_coefs_ctl]{(Detail)}
+		\item \verb|array pick_gauss_coef_degree_ctl  [Degree]|
+			\hyperref[href_t:pick_gauss_coef_degree_ctl]{(Detail)}
+		\item \verb|array pick_gauss_coef_order_ctl   [Order]|
+			\hyperref[href_t:pick_gauss_coef_order_ctl]{(Detail)}
+		\end{itemize}
+%
+	\item \verb|pickup_spectr_ctl|
+		\hyperref[href_t:pickup_spectr_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|picked_sph_prefix                 [picked_sph_prefix]| \\
+			\hyperref[href_t:picked_sph_prefix]{(Detail)}
+		\item \verb|array pick_layer_ctl              [Layer #]|
+			\hyperref[href_t:pick_layer_ctl]{(Detail)}
+		\item \verb|array pick_sph_spectr_ctl         [Degree]  [Order]| \\
+			\hyperref[href_t:pick_sph_spectr_ctl]{(Detail)}
+		\item \verb|array pick_sph_degree_ctl         [Degree]|
+			\hyperref[href_t:pick_sph_degree_ctl]{(Detail)}
+		\item \verb|array pick_sph_order_ctl          [Order]|
+			\hyperref[href_t:pick_sph_order_ctl]{(Detail)}
+		\end{itemize}
+%
+	\item \verb|mid_equator_monitor_ctl|
+		\hyperref[href_t:mid_equator_monitor_ctl]{(Detail)}
+		\begin{itemize}
+		\item \verb|nphi_mid_eq_ctl   [Nphi_mid_equator]|
+			\label{href_i:nphi_mid_eq_ctl}
+			\hyperref[href_t:nphi_mid_eq_ctl]{(Detail)}
+		\end{itemize}
 	\end{itemize}
 %
 \item \verb|visual_control|
@@ -584,6 +659,8 @@ The format of the control file \verb|control_MHD| is described below. The detail
 %
     \end{itemize}
 \end{itemize}
+%
+\verb|spherical_shell_ctl| block is required if spherical harmonics indexing files are not exist.
 %
 \subsection{Spectrum data for restarting}
 Spectrum data is used for restarting data and generating field data by Data transform program \verb|sph_snapshot|, \verb|sph_zm_snapshot|, or \verb|sph_dynamobench|. This file is saved for each subdomain (MPI processes), then \verb|[step #]| and \verb|[domain #]| are added in the file name. The \verb|[step #]| is calculated by \verb|time step| / \verb|[ISTEP_RESTART]|. Data format is defined by \verb|[restart_file_fmt_ctl]| as shown in Table \ref{table:restart_format}.
@@ -1201,7 +1278,7 @@ We recommend to output cross section data at $y = 0$ by using sectioning module 
 \label{fig:flow_ini}
 \end{figure}
 %
- The initial fields for dynamo benchmark can set in the simulation program by setting \verb|[INITIAL_TYPE]| flag. This program is used to generate initial field by user.  The heat source $q_{T}$ and light element source $q_{C}$ are also defined by this program because $q_{T}$ and $q_{C}$ are defined as scalar fields.  The Fortran source file to define initial field \\
+ The initial fields for dynamo benchmark can set in the simulation program by setting \verb|[INITIAL_TYPE]| flag. This program is used to generate initial field by user.  The heat source $q_{T}$ and light element source $q_{C}$ are also defined by this program because $q_{T}$ and $q_{C}$ are defined as scalar fields. Spherical harmonics indexing data files are also generated by using information in \verb|spherical_shell_ctl| block if these indexing data files do not exist. The Fortran source file to define initial field \\
  \verb|const_sph_initial_spectr.f90| is saved in \verb|src/programs/data_utilities| \\
  \verb|/INITIAL_FIELD/| directory,  and please compile again after modifying this module. This program also needs the files listed in Table \ref{table:inital_fld}.
 %
@@ -1212,18 +1289,19 @@ We recommend to output cross section data at $y = 0$ by using sectioning module 
 \hline
  name & Parallelization & I/O \\ \hline \hline
 \verb|control_MHD| & Serial & Input \\ \hline
-\verb|[sph_prefix].[rj_extension]|  & - & Input \\
-\verb|[sph_prefix].[rlm_extension]| & - & Input \\
-\verb|[sph_prefix].[rtm_extension]| & - & Input \\
-\verb|[sph_prefix].[rtp_extension]| & - & Input \\ \hline
+\verb|[sph_prefix].[rj_extension]|  & - & Input/(Output) \\
+\verb|[sph_prefix].[rlm_extension]| & - & Input/(Output) \\
+\verb|[sph_prefix].[rtm_extension]| & - & Input/(Output) \\
+\verb|[sph_prefix].[rtp_extension]| & - & Input/(Output) \\ \hline
 \verb|[rst_prefix].[step #].[rst_extension]| & - & Input/Output  \\ \hline
 \end{tabular}
 \end{center}
+(Output): Marked files are generated if files do not exist.
 \label{table:inital_fld}
 \end{table}
 %
 This program generates the spectrum data files \verb|[rst_prefix].[step #].[rst_extension]|. To use generated initial data file, please set 
- \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}} to be 0 and \hyperref[href_t:restart_file_ctl]{{\tt [INITIAL\_TYPE]}} to be \hyperref[href_t:restart_file_ctl]{{\tt start\_from\_rst\_file}}.
+ \hyperref[href_t:i_step_init_ctl]{{\tt [ISTEP\_START]}} to be 0 and \hyperref[href_t:restart_file_ctl]{{\tt [INITIAL\_TYPE]}} to be \\\hyperref[href_t:restart_file_ctl]{{\tt start\_from\_rst\_file}}.
 
 \subsection{Definition of the initial field}
 \label{sec:def_initial}
@@ -1348,7 +1426,7 @@ Then, the program  \verb|sph_initial_field| and  \verb|sph_add_initial_field| ar
 
 \section{Initial field modification program \\
 ({\tt sph\_add\_initial\_field})}
-\label{sec:ad_initial_field}
+\label{sec:add_initial_field}
 %
 \begin{figure}[htbp]
 \begin{center}
@@ -1369,13 +1447,14 @@ Then, the program  \verb|sph_initial_field| and  \verb|sph_add_initial_field| ar
 \hline
  name & Parallelization & I/O \\ \hline \hline
 \verb|control_MHD| & Serial & Input \\ \hline
-\verb|[sph_prefix].[rj_extension]|  & - & Input \\
-\verb|[sph_prefix].[rlm_extension]| & - & Input \\
-\verb|[sph_prefix].[rtm_extension]| & - & Input \\
-\verb|[sph_prefix].[rtp_extension]| & - & Input \\ \hline
+\verb|[sph_prefix].[rj_extension]|  & - & Input / (Output) \\
+\verb|[sph_prefix].[rlm_extension]| & - & Input / (Output)  \\
+\verb|[sph_prefix].[rtm_extension]| & - & Input / (Output)  \\
+\verb|[sph_prefix].[rtp_extension]| & - & Input / (Output)  \\ \hline
 \verb|[rst_prefix].[step #].[rst_extension]| & - & Input/Output  \\ \hline
 \end{tabular}
 \end{center}
+(Output): Marked files are generated if files do not exist.
 \label{table:add_inital_fld}
 \end{table}
 %

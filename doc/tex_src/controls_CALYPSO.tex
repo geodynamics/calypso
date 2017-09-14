@@ -650,6 +650,32 @@ File prefix for mean square spectrum data averaged over the fluid shell \verb|[v
 Spectrum as a function of degree {l} is written in \verb|[vol_pwr_prefix])_l.dat|, spectrum as a function of order {m} is written in \verb|[vol_pwr_prefix]_m.dat|, and spectrum as a function of $(l-m)$ is written in \verb|[vol_pwr_prefix]_lm.dat|. This prefix is also used for the file name of the volume mean square data as \verb|[vol_pwr_prefix]_s.dat|.
 If this file prefix is not defined, volume spectrum data are not generated and volume mean square data is written as \verb|sph_pwr_volume_s.dat|.
 
+\paragraph{\tt nusselt\_number\_prefix}
+\label{href_t:gauss_coefs_prefix}
+\verb|[nusselt_number_prefix]| \\
+File prefix for Nusselt number data at ICB and CMB \verb|[nusselt_number_prefix]| is defined by Text. Program add {\tt .dat} extension after this file prefix. If this file prefix is not defined, Nusselt number data are not generated. \\
+{\bf CAUTION: Nusselt number is not evaluated if heat source exsists.}
+
+%
+\subsubsection{\tt volume\_spectrum\_ctl}
+\label{href_t:volume_spectrum_ctl}
+Volume average of power spectrum and mean square data between any radius range are defined in this block.
+
+\paragraph{\tt inner\_radius\_ctl}
+\label{href_t:inner_radius_ctl}
+\verb|[radius]| \\
+Inner boundary of the volume average \verb|[radius]| is defined. The closest radial grid point is chosen as a inner boundary of averaging.
+
+\paragraph{\tt outer\_radius\_ctl}
+\label{href_t:outer_radius_ctl}
+\verb|[radius]| \\
+Outer boundary of the volume average \verb|[radius]| is defined. The closest radial grid point is chosen as a outer boundary of averaging.
+
+%
+\subsubsection{\tt layered\_spectrum\_ctl}
+\label{href_t:layered_spectrum_ctl}
+Sphere average of power spectrum and mean square data are defined in this block.
+
 \paragraph{\tt layered\_pwr\_spectr\_prefix}
 \label{href_t:layered_pwr_spectr_prefix}
 \verb|[layer_pwr_prefix]| \\
@@ -657,10 +683,15 @@ File prefix for mean square spectrum data averaged over each sphere surface \ver
 
 Spectrum as a function of degree {l} is written in \verb|[layer_pwr_prefix]_l.dat|, spectrum as a function of order {m} is written in \verb|[layer_pwr_prefix]_m.dat|, and spectrum as a function of $(l-m)$ is written in \verb|[layer_pwr_prefix]_lm.dat|. If this file prefix is not defined, sphere averaged spectrum data are not generated. 
 
-\paragraph{\tt picked\_sph\_prefix}
-\label{href_t:picked_sph_prefix}
-\verb|[picked_sph_prefix]| \\
-File prefix for picked spectrum data \verb|[picked_sph_prefix]| is defined by Text. Program add {\tt .dat} extension after this file prefix. If this file prefix is not defined, picked spectrum data are not generated. 
+\paragraph{\tt array spectr\_layer\_ctl}
+\label{href_t:spectr_layer_ctl}
+\verb|[Layer #]|
+List of radial grid point number \verb|[Layer #]| to output power spectrum data by integer. If this array is not defined, layered mean square data are written for all radial grid points.
+
+%
+\subsubsection{\tt gauss\_coefficient\_ctl}
+\label{href_t:gauss_coefficient_ctl}
+Gauss coefficients data at specified radius are defined in this block.
 
 \paragraph{\tt gauss\_coefs\_prefix}
 \label{href_t:gauss_coefs_prefix}
@@ -672,16 +703,30 @@ File prefix for Gauss coefficients \verb|[gauss_coef_prefix]| is defined by Text
 \verb|[gauss_coef_radius]| \\
 Normalized radius to obtain Gauss coefficients \verb|[gauss_coef_radius]| is defined by real. Gauss coefficients are evaluated from the poloidal magnetic field at CMB by assuming electrically insulated mantle. Do not set \verb|[gauss_coef_radius]| less than the outer core radius $r_{o}$.
 
-\paragraph{\tt nusselt\_number\_prefix}
-\label{href_t:gauss_coefs_prefix}
-\verb|[nusselt_number_prefix]| \\
-File prefix for Nusselt number data at ICB and CMB \verb|[nusselt_number_prefix]| is defined by Text. Program add {\tt .dat} extension after this file prefix. If this file prefix is not defined, Nusselt number data are not generated. \\
-{\bf CAUTION: Nusselt number is not evaluated if heat source exsists.}
+\paragraph{\tt array pick\_gauss\_coefs\_ctl}
+\label{href_t:pick_gauss_coefs_ctl}
+\verb|[Degree]  [Order]| \\
+List of spherical harmonics mode $l$ and $m$ of Gauss coefficients to output. \verb|[Degree]| and \verb| [Order]| are defined by integer.
 
-\paragraph{\tt array spectr\_layer\_ctl}
-\label{href_t:spectr_layer_ctl}
-\verb|[Layer #]|
-List of radial grid point number \verb|[Layer #]| to output power spectrum data by integer. If this array is not defined, layered mean square data are written for all radial grid points.
+\paragraph{\tt array pick\_gauss\_coef\_degree\_ctl}
+\label{href_t:pick_gauss_coef_degree_ctl}
+\verb|[Degree]| \\
+Degrees $l$ to output Gauss coefficients are listed in \verb|[Degree]| by integer. All Gauss coefficients with listed $l$ is output in file.
+
+\paragraph{\tt array pick\_gauss\_coef\_order\_ctl}
+\label{href_t:pick_gauss_coef_order_ctl}
+\verb|[Order]| \\
+Orders $m$ to output Gauss coefficients are listed in \verb|[Order]| by integer. All Gauss coefficients with listed order $m$ is output in file.
+
+%
+\subsubsection{\tt pickup\_spectr\_ctl}
+\label{href_t:pickup_spectr_ctl}
+Spherical harmonic coefficients data output is defined in this block.
+
+\paragraph{\tt picked\_sph\_prefix}
+\label{href_t:picked_sph_prefix}
+\verb|[picked_sph_prefix]| \\
+File prefix for picked spectrum data \verb|[picked_sph_prefix]| is defined by Text. Program add {\tt .dat} extension after this file prefix. If this file prefix is not defined, picked spectrum data are not generated. 
 
 \paragraph{\tt array pick\_layer\_ctl}
 \label{href_t:pick_layer_ctl}
@@ -703,25 +748,16 @@ Degrees $l$ to output spectrum data are listed in \verb|[Degree]| by integer. Al
 \verb|[Order]| \\
 Order $m$ to output spectrum data are listed in \verb|[Order]| by integer. All spectrum data with listed order $m$ is output in file.
 
-\paragraph{\tt array pick\_gauss\_coefs\_ctl}
-\label{href_t:pick_gauss_coefs_ctl}
-\verb|[Degree]  [Order]| \\
-List of spherical harmonics mode $l$ and $m$ of Gauss coefficients to output. \verb|[Degree]| and \verb| [Order]| are defined by integer.
 
-\paragraph{\tt array pick\_gauss\_coef\_degree\_ctl}
-\label{href_t:pick_gauss_coef_degree_ctl}
-\verb|[Degree]| \\
-Degrees $l$ to output Gauss coefficients are listed in \verb|[Degree]| by integer. All Gauss coefficients with listed $l$ is output in file.
-
-\paragraph{\tt array pick\_gauss\_coef\_order\_ctl}
-\label{href_t:pick_gauss_coef_order_ctl}
-\verb|[Order]| \\
-Orders $m$ to output Gauss coefficients are listed in \verb|[Order]| by integer. All Gauss coefficients with listed order $m$ is output in file.
+\subsubsection{\tt mid\_equator\_monitor\_ctl}
+\label{href_t:mid_equator_monitor_ctl}
+Parameters to generate data at mid-depth of euqtorial plane are defined in this block.
 
 \paragraph{\tt nphi\_mid\_eq\_ctl}
 \label{href_t:nphi_mid_eq_ctl}
 \verb|[Nphi_mid_equator]| \\
 Number of grid points \verb|[Nphi_mid_equator]|in longitudinal direction to evaluate mid-depth of the shell in the equatorial plane for dynamo benchmark is defined as integer. If \verb|[Nphi_mid_equator]| is not defined or less than zero, \verb|[Nphi_mid_equator]| is set set number grid as the input spherical transform data. 
+
 
 %
 %
@@ -730,9 +766,6 @@ Number of grid points \verb|[Nphi_mid_equator]|in longitudinal direction to eval
 Visualization modules are defined in this block. Parameters for cross sections and isosurfaces are defined in this block. \\
 \hyperref[href_i:visual_control]{(Back to {\tt visual\_control})}
 
-
-%
-%
 %
 %
 \subsection{\tt cross\_section\_ctl}

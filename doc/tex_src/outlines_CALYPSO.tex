@@ -43,13 +43,13 @@ To perform simulations by Calypso, the following processes are required.
 %
 \begin{enumerate}
 \item Generate grids and spherical harmonics indexing information by \\
-\verb|gen_sph_grids|.
+\verb|gen_sph_grids| (if necessary).
 \item Make initial fields by \verb|sph_initial_field| (if necessary). 
 \item Perform the simulation by \verb|sph_mhd|.
 \item Convert the parallel spectra data by \verb|assemble_sph| to continue with changing number of processes (if necessary).
 \item Data analysis by \verb|sph_snapshot|, \verb|sph_snapshot|, or \verb|sph_dynamobench|.
 \item Update initial fields by \verb|sph_add_initial_field| for more simulations (if necessary).
-\item Evaluate time averages by \verb|t_ave_sph_mean_square|, \verb|t_ave_picked_sph_coefs|, or \verb|t_ave_nusselt| if necessary.
+\item Evaluate time averages by \verb|t_ave_sph_mean_square|, \verb|t_ave_picked_sph_coefs|, or \verb|t_ave_nusselt| (if necessary).
 \end{enumerate}
 %
 The simulation program \verb|sph_mhd| requires an indexing file for spherical transform.  \verb|sph_mhd| generates spectrum data and monitoring data, and field data in Cartesian coordinate as outputs. The data transform programs (\verb|sph_snapshot| and \verb|sph_zm_snapshot|) generate outputs data  from parallel spectra data. The flow of data is shown in Figure \ref{fig:flow_0}. 
@@ -75,6 +75,7 @@ The following rules are used in the control files. An example of a control file 
 \item The order of items and blocks can be changed.
 \item If an item consists of multiple data, these should be listed in one line.
 \item If an item does not belong in the block it is ignored.
+\item Some blockes can read from external file. The external file name is defined by `\verb|file [block name] [nexzternal file name]|'
 \item An array block starts with `\verb|begin array [name] [number of components]|' and ends with `\verb|end array [name]|'.
 \item If \verb|[number of components]| for an array is 0, `\verb|end array [name]|' on the next line is not needed.
 \item In Fortran program, character `\verb|/|' is recognized as an end of character valuable if text with `\verb|/|' ({\it e.g.} file prefix including file paths) is not enclosed by {\tt '} or {\tt "}.
