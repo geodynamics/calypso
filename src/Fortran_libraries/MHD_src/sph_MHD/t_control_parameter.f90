@@ -17,6 +17,7 @@
       use m_precision
       use t_physical_property
       use t_reference_scalar_param
+      use t_normalize_parameter
 !
       implicit  none
 !
@@ -45,6 +46,9 @@
         type(reference_scalar_param) :: ref_param_C
 !>        Takepiro stratified composition
         type(takepiro_model_param) :: takepito_C
+!
+!>        Structure for normalization parameters
+        type(coef_parameters_list) :: MHD_coef_list
       end type MHD_evolution_param
 !
 !

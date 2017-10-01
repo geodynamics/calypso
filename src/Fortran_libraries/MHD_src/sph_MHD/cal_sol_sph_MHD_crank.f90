@@ -33,7 +33,6 @@
 !
       use calypso_mpi
       use m_machine_parameter
-      use m_schmidt_poly_on_rtm
       use const_sph_radial_grad
       use const_sph_rotation
       use const_sph_diffusion
@@ -48,6 +47,7 @@
       use t_boundary_params_sph_MHD
       use t_radial_matrices_sph_MHD
       use t_coef_fdm2_MHD_boundaries
+      use t_work_4_sph_trans
 !
       implicit none
 !

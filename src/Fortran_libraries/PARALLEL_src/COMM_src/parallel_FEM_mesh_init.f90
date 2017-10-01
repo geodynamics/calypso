@@ -73,8 +73,8 @@
       call calypso_mpi_barrier
 !
 !  -------------------------------
-!      if (iflag_debug.gt.0) write(*,*) 'set_local_node_id_4_monitor'
-!      call set_local_node_id_4_monitor(mesh%node, group%nod_grp)
+!      if (iflag_debug.gt.0) write(*,*) 'set_local_nod_4_monitor'
+!      call set_local_nod_4_monitor(mesh, group)
 !
 !  ------  In itialize data communication for FEM data
 !
@@ -128,8 +128,8 @@
       type(element_geometry), intent(inout) :: ele_mesh
 !
 !  -------------------------------
-!      if (iflag_debug.gt.0) write(*,*) 'set_local_node_id_4_monitor'
-!      call set_local_node_id_4_monitor(mesh%node, group%nod_grp)
+!      if (iflag_debug.gt.0) write(*,*) 'set_local_nod_4_monitor'
+!      call set_local_nod_4_monitor(mesh, group)
 !
 !  ------  In itialize data communication for FEM data
 !

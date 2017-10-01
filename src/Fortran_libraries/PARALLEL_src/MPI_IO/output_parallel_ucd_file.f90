@@ -88,6 +88,7 @@
      &    then
         call deallocate_ucd_ele(ucd)
       end if
+      call calypso_mpi_barrier
 !
       if(mod(ucd_param%iflag_format,icent)/iten .eq. iflag_vtd/iten) then
         call deallocate_ucd_node(ucd)

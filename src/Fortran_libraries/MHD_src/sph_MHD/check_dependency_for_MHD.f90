@@ -46,7 +46,7 @@
      &         (node, MHD_prop, iphys, nod_fld)
 !
       use t_geometry_data
-      use set_field_address
+      use init_nodal_field_address
       use check_MHD_dependency_by_id
 !
       type(node_data), intent(in) :: node
@@ -56,8 +56,8 @@
       type(phys_data), intent(inout) :: nod_fld
 !
 !
-      if (iflag_debug.ge.1)  write(*,*) 'init_field_address'
-      call init_field_address(node%numnod, nod_fld, iphys)
+      if (iflag_debug.ge.1)  write(*,*) 'init_nod_fld_address'
+      call init_nod_fld_address(node, nod_fld, iphys)
 !
       call check_field_dependencies                                     &
      &   (MHD_prop%fl_prop, MHD_prop%cd_prop,                           &

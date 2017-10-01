@@ -14,7 +14,6 @@
 !
       use t_MHD_step_parameter
       use t_MHD_file_parameter
-      use t_sph_boundary_input_data
       use t_ucd_file
       use t_cal_max_indices
 !
@@ -25,8 +24,6 @@
 !
 !>      Structure of file name and format for MHD
       type(MHD_file_IO_params), save :: MHD_files1
-!>      Structures for boundary conditions
-      type(boundary_spectra), save :: bc_sph_IO1
 !
       type(ucd_file_data), save :: fem_ucd1
 !

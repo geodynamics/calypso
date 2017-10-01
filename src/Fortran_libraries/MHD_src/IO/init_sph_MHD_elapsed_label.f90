@@ -9,13 +9,8 @@
 !!@verbatim
 !!      subroutine set_sph_MHD_elapsed_label
 !!      subroutine reset_elapse_4_init_sph_mhd
-!!      subroutine write_resolution_data                                &
-!!     &         (sph_params, sph_rtp, sph_rtm, sph_rlm, sph_rj)
-!!        type(sph_shell_parameters), intent(in) :: sph_params
-!!        type(sph_rtp_grid), intent(in) :: sph_rtp
-!!        type(sph_rtm_grid), intent(in) :: sph_rtm
-!!        type(sph_rlm_grid), intent(in) :: sph_rlm
-!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!      subroutine write_resolution_data(sph)
+!!        type(sph_grids), intent(in) :: sph
 !!@endverbatim
 !
       module init_sph_MHD_elapsed_label
@@ -23,6 +18,8 @@
       use m_precision
 !
       implicit none
+!
+      private :: check_num_of_process_4_sph, write_resolution_info
 !
 ! ----------------------------------------------------------------------
 !
@@ -137,21 +134,51 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine write_resolution_data                                  &
-     &         (sph_params, sph_rtp, sph_rtm, sph_rlm, sph_rj)
+      subroutine write_resolution_data(sph)
 !
       use calypso_mpi
       use m_work_time
       use t_spheric_parameter
 !
-      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_grids), intent(in) :: sph
+!
+      integer(kind = kint) :: nproc_rj_IO(2),  nproc_rlm_IO(2)
+      integer(kind = kint) :: nproc_rtm_IO(3), nproc_rtp_IO(3)
+!
+!
+      call check_num_of_process_4_sph                                   &
+     &   (sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj,            &
+     &    nproc_rj_IO, nproc_rlm_IO, nproc_rtm_IO, nproc_rtp_IO)
+!
+      if(my_rank .ne. 0) return
+!
+      call write_resolution_info                                        &
+     &   (nprocs, sph%sph_params, sph%sph_rtp, sph%sph_rtm,             &
+     &    nproc_rj_IO, nproc_rlm_IO, nproc_rtm_IO, nproc_rtp_IO)
+!
+      end subroutine write_resolution_data
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine check_num_of_process_4_sph                             &
+     &         (sph_rtp, sph_rtm, sph_rlm, sph_rj,                      &
+     &          nproc_rj_IO, nproc_rlm_IO, nproc_rtm_IO, nproc_rtp_IO)
+!
+      use calypso_mpi
+      use m_work_time
+      use t_spheric_parameter
+!
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_rj_grid), intent(in) ::  sph_rj
 !
-      integer(kind = kint) :: nproc_rj_IO(2),  nproc_rlm_IO(2)
-      integer(kind = kint) :: nproc_rtm_IO(3), nproc_rtp_IO(3)
+      integer(kind = kint), intent(inout) :: nproc_rj_IO(2)
+      integer(kind = kint), intent(inout) :: nproc_rlm_IO(2)
+      integer(kind = kint), intent(inout) :: nproc_rtm_IO(3)
+      integer(kind = kint), intent(inout) :: nproc_rtp_IO(3)
+!
 !
 !
       call MPI_REDUCE(sph_rj%irank_sph_rj, nproc_rj_IO, itwo,           &
@@ -164,11 +191,32 @@
      &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
 !
       if(my_rank .ne. 0) return
-!
       nproc_rj_IO(1:2) =  nproc_rj_IO(1:2) +  1
       nproc_rlm_IO(1:2) = nproc_rlm_IO(1:2) + 1
       nproc_rtm_IO(1:3) = nproc_rtm_IO(1:3) + 1
       nproc_rtp_IO(1:3) = nproc_rtp_IO(1:3) + 1
+!
+      end subroutine check_num_of_process_4_sph
+!
+! ----------------------------------------------------------------------
+!
+      subroutine write_resolution_info                                  &
+     &         (nprocs, sph_params, sph_rtp, sph_rtm,                   &
+     &          nproc_rj_IO, nproc_rlm_IO, nproc_rtm_IO, nproc_rtp_IO)
+!
+      use m_work_time
+      use t_spheric_parameter
+!
+      integer(kind = kint), intent(in) :: nprocs
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_rtm_grid), intent(in) :: sph_rtm
+!
+      integer(kind = kint), intent(in) :: nproc_rj_IO(2)
+      integer(kind = kint), intent(in) :: nproc_rlm_IO(2)
+      integer(kind = kint), intent(in) :: nproc_rtm_IO(3)
+      integer(kind = kint), intent(in) :: nproc_rtp_IO(3)
+!
 !
       open(id_timer_file,file=time_file_name,position='append')
 !
@@ -198,7 +246,7 @@
 !
       close(id_timer_file)
 !
-      end subroutine write_resolution_data
+      end subroutine write_resolution_info
 !
 ! ----------------------------------------------------------------------
 !

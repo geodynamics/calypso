@@ -11,7 +11,7 @@
 !!     &         (sph_bc_U, sph_bc_B, ipol)
 !!      subroutine output_field_4_dynamobench                           &
 !!     &          (i_step, time, sph_bc_U, sph_bc_B, ipol, bench)
-!!        type(sph_boundary_type), intent(in) :: sph_bc_U, sph_bc_B
+!!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(phys_address), intent(in) :: ipol
 !!        type(dynamobench_monitor), intent(in) :: bench
 !!@endverbatim
@@ -25,7 +25,7 @@
       use m_constants
       use calypso_mpi
       use t_phys_address
-      use t_boundary_params_sph_MHD
+      use t_boundary_data_sph_MHD
 !
       implicit none
 !
@@ -138,9 +138,9 @@
 ! ----------------------------------------------------------------------
 !
       subroutine output_field_4_dynamobench                             &
-     &          (i_step, time, sph_bc_U, sph_bc_B, ipol, bench)
+     &          (i_step, time, sph_MHD_bc, ipol, bench)
 !
-      type(sph_boundary_type), intent(in) :: sph_bc_U, sph_bc_B
+      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(phys_address), intent(in) :: ipol
       integer(kind = kint), intent(in) :: i_step
       real(kind = kreal), intent(in) :: time
@@ -149,7 +149,8 @@
 !
       if(my_rank .ne. 0) return
 !
-      call open_dynamobench_monitor_file(sph_bc_U, sph_bc_B, ipol)
+      call open_dynamobench_monitor_file                                &
+     &   (sph_MHD_bc%sph_bc_U, sph_MHD_bc%sph_bc_B, ipol)
 !
       write(id_dynamobench,'(i15,1pE25.15e3)', advance='NO')            &
      &     i_step, time
@@ -162,18 +163,19 @@
       end if
 !
 !
-      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
+      if(sph_MHD_bc%sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         write(id_dynamobench,'(1p3E25.15e3)', advance='NO')             &
      &     bench%mene_icore(1:3)
       end if
 !
-      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
+      if(sph_MHD_bc%sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         write(id_dynamobench,'(1pE25.15e3)', advance='NO')              &
      &     bench%rotate_icore(0)
       end if
 !
-      if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center                  &
-     &   .and. sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
+      if(sph_MHD_bc%sph_bc_B%iflag_icb .eq. iflag_sph_fill_center       &
+     &   .and. sph_MHD_bc%sph_bc_U%iflag_icb .eq. iflag_rotatable_ic)   &
+     & then
         write(id_dynamobench,'(1pE25.15e3)', advance='NO')              &
      &     bench%m_torque_icore(0)
       end if

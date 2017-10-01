@@ -14,6 +14,7 @@
       use t_time_data
       use t_IO_step_parameter
       use t_VIZ_step_parameter
+      use t_flex_delta_t_data
 !
       implicit  none
 !
@@ -46,6 +47,9 @@
 !
 !>        Increment for visualizations
         type(VIZ_step_params) :: viz_step
+!
+!>        Flexible step information
+        type(flexible_stepping_parameter) :: flex_p
       end type MHD_step_param
 !
       end module  t_MHD_step_parameter

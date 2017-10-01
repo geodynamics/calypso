@@ -9,12 +9,14 @@
 !!
 !!@verbatim
 !!      subroutine s_set_control_4_normalize                            &
-!!     &        (fl_prop, cd_prop, ht_prop, cp_prop, dless_ctl, eqs_ctl)
+!!     &        (fl_prop, cd_prop, ht_prop, cp_prop, MHD_coef_list,     &
+!!     &         dless_ctl, eqs_ctl)
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(conductive_property), intent(in)  :: cd_prop
 !!        type(scalar_property), intent(in) :: ht_prop, cp_prop
 !!        type(dimless_control), intent(inout) :: dless_ctl
 !!        type(equations_control), intent(inout) :: eqs_ctl
+!!        type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !!@endverbatim
 !
       module set_control_4_normalize
@@ -27,6 +29,7 @@
       use t_physical_property
       use t_normalize_parameter
       use t_ctl_data_mhd_normalize
+      use t_normalize_parameter
 !
       implicit  none
 !
@@ -42,13 +45,14 @@
 ! -----------------------------------------------------------------------
 !
       subroutine s_set_control_4_normalize                              &
-     &        (fl_prop, cd_prop, ht_prop, cp_prop, dless_ctl, eqs_ctl)
-!
-      use m_normalize_parameter
+     &        (fl_prop, cd_prop, ht_prop, cp_prop, MHD_coef_list,       &
+     &         dless_ctl, eqs_ctl)
 !
       type(fluid_property), intent(in) :: fl_prop
       type(conductive_property), intent(in)  :: cd_prop
       type(scalar_property), intent(in) :: ht_prop, cp_prop
+!
+      type(coef_parameters_list), intent(inout) :: MHD_coef_list
       type(dimless_control), intent(inout) :: dless_ctl
       type(equations_control), intent(inout) :: eqs_ctl
 !
@@ -57,7 +61,7 @@
 !
 !   set dimensionless numbers
 !
-      call set_dimensionless_numbers(dless_ctl)
+      call set_dimensionless_numbers(dless_ctl, MHD_coef_list)
 !
       if (iflag_debug .ge. iflag_routine_msg) then
         write(*,*) 'num_dimless ', MHD_coef_list%dimless_list%num
@@ -74,7 +78,7 @@
         MHD_coef_list%coefs_t_diffuse%num = 0
         MHD_coef_list%coefs_h_source%num =  0
       else
-        call set_coefs_4_thermal_eq(eqs_ctl%heat_ctl)
+        call set_coefs_4_thermal_eq(eqs_ctl%heat_ctl, MHD_coef_list)
       end if
 !
 !    set coefficients for momentum equation
@@ -88,7 +92,8 @@
         MHD_coef_list%coefs_Coriolis%num =  0
         MHD_coef_list%coefs_Lorentz%num =   0
       else
-        call set_coefs_4_momentum_eq(fl_prop, eqs_ctl%mom_ctl)
+        call set_coefs_4_momentum_eq                                    &
+     &     (fl_prop, eqs_ctl%mom_ctl, MHD_coef_list)
       end if
 !
 !
@@ -101,7 +106,8 @@
         MHD_coef_list%coefs_m_diffuse%num = 0
         MHD_coef_list%coefs_induction%num = 0
       else
-        call set_coefs_4_induction_eq(cd_prop, eqs_ctl%induct_ctl)
+        call set_coefs_4_induction_eq                                   &
+     &     (cd_prop, eqs_ctl%induct_ctl, MHD_coef_list)
       end if
 !
 !    set normalization for composition
@@ -111,7 +117,8 @@
         MHD_coef_list%coefs_c_diffuse%num =   0
         MHD_coef_list%coefs_c_source%num =    0
       else
-        call set_coefs_4_composition_eq(eqs_ctl%comp_ctl)
+        call set_coefs_4_composition_eq                                 &
+     &     (eqs_ctl%comp_ctl, MHD_coef_list)
       end if
 !
       end subroutine s_set_control_4_normalize
@@ -119,11 +126,10 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_dimensionless_numbers(dless_ctl)
-!
-      use m_normalize_parameter
+      subroutine set_dimensionless_numbers(dless_ctl, MHD_coef_list)
 !
       type(dimless_control), intent(inout) :: dless_ctl
+      type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
 !
       if (dless_ctl%dimless%icou .eq. 0) then
@@ -141,12 +147,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_coefs_4_thermal_eq(heat_ctl)
+      subroutine set_coefs_4_thermal_eq(heat_ctl, MHD_coef_list)
 !
-      use m_normalize_parameter
       use t_ctl_data_termal_norm
 !
       type(heat_equation_control), intent(inout) :: heat_ctl
+      type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
 !
       if (heat_ctl%coef_4_adv_flux%icou .eq. 0) then
@@ -180,14 +186,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_coefs_4_momentum_eq(fl_prop, mom_ctl)
+      subroutine set_coefs_4_momentum_eq                                &
+     &         (fl_prop, mom_ctl, MHD_coef_list)
 !
-      use m_normalize_parameter
       use t_ctl_data_momentum_norm
       use t_physical_property
 !
       type(fluid_property), intent(in) :: fl_prop
       type(momentum_equation_control), intent(inout) :: mom_ctl
+      type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
 !
       if (mom_ctl%coef_4_intertia%icou .eq. 0) then
@@ -214,7 +221,7 @@
         MHD_coef_list%coefs_v_diffuse%num = mom_ctl%coef_4_viscous%num
       end if
 !
-      if(fl_prop%iflag_4_gravity .eq. id_turn_OFF                               &
+      if(fl_prop%iflag_4_gravity .eq. id_turn_OFF                       &
      &      .and. fl_prop%iflag_4_filter_gravity .eq. id_turn_OFF) then
         MHD_coef_list%coefs_buoyancy%num = 0
       else
@@ -282,13 +289,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_coefs_4_induction_eq(cd_prop, induct_ctl)
+      subroutine set_coefs_4_induction_eq                               &
+     &         (cd_prop, induct_ctl, MHD_coef_list)
 !
-      use m_normalize_parameter
       use t_ctl_data_induct_norm
 !
       type(conductive_property), intent(in)  :: cd_prop
       type(induction_equation_control), intent(inout) :: induct_ctl
+      type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
 !
       if (induct_ctl%coef_4_magne_evo%icou .eq. 0) then
@@ -339,12 +347,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_coefs_4_composition_eq(comp_ctl)
+      subroutine set_coefs_4_composition_eq(comp_ctl, MHD_coef_list)
 !
-      use m_normalize_parameter
       use t_ctl_data_termal_norm
 !
       type(heat_equation_control), intent(inout) :: comp_ctl
+      type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
 !
       if (comp_ctl%coef_4_adv_flux%icou .eq. 0) then

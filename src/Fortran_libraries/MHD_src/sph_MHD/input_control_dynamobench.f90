@@ -9,8 +9,8 @@
 !!@verbatim
 !!      subroutine input_control_SPH_dynamobench                        &
 !!     &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,&
-!!     &           rj_fld, nod_fld, pwr, flex_p, MHD_step,              &
-!!     &           MHD_prop, MHD_BC, WK, cdat, bench)
+!!     &           rj_fld, nod_fld, MHD_step, MHD_prop, MHD_BC,         &
+!!     &           WK, monitor, cdat, bench)
 !!        type(MHD_file_IO_params), intent(inout) :: MHD_files
 !!        type(sph_sgs_mhd_control), intent(inout) :: MHD_ctl
 !!        type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
@@ -20,15 +20,14 @@
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph1
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(phys_data), intent(inout) :: nod_fld
-!!        type(sph_mean_squares), intent(inout) :: pwr
 !!        type(SGS_paremeters), intent(inout) :: SGS_par
 !!        type(sph_filters_type), intent(inout) :: sph_filters(1)
 !!        type(mesh_data), intent(inout) :: femmesh
 !!        type(element_geometry), intent(inout) :: ele_mesh
-!!        type(flexible_stepping_parameter), intent(inout) :: flex_p
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!        type(MHD_BC_lists), intent(inout) :: MHD_BC
+!!        type(sph_mhd_monitor_data), intent(inout) :: monitor
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!        type(dynamobench_monitor), intent(inout) :: bench
 !!@endverbatim
@@ -58,6 +57,7 @@
       use t_select_make_SPH_mesh
       use t_flex_delta_t_data
       use t_field_4_dynamobench
+      use t_sph_mhd_monitor_data_IO
 !
       implicit none
 !
@@ -75,8 +75,8 @@
 !
       subroutine input_control_SPH_dynamobench                          &
      &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,  &
-     &           rj_fld, nod_fld, pwr, flex_p, MHD_step,                &
-     &           MHD_prop, MHD_BC, WK, cdat, bench)
+     &           rj_fld, nod_fld, MHD_step, MHD_prop, MHD_BC,           &
+     &           WK, monitor, cdat, bench)
 !
       use t_ctl_data_MHD
       use t_field_on_circle
@@ -94,12 +94,11 @@
 !
       type(phys_data), intent(inout) :: rj_fld
       type(phys_data), intent(inout) :: nod_fld
-      type(sph_mean_squares), intent(inout) :: pwr
-      type(flexible_stepping_parameter), intent(inout) :: flex_p
       type(MHD_step_param), intent(inout) :: MHD_step
       type(MHD_evolution_param), intent(inout) :: MHD_prop
       type(MHD_BC_lists), intent(inout) :: MHD_BC
       type(works_4_sph_trans_MHD), intent(inout) :: WK
+      type(sph_mhd_monitor_data), intent(inout) :: monitor
       type(circle_fld_maker), intent(inout) :: cdat
       type(dynamobench_monitor), intent(inout) :: bench
 !
@@ -109,11 +108,11 @@
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%Dmodel_ctl,          &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%smonitor_ctl,                    &
      &    DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl, sph_maker2%sph_tmp,     &
-     &    rj_fld, MHD_files, bc_IO, pwr, flex_p, MHD_step, MHD_prop,    &
-     &    MHD_BC, WK%WK_sph, sph_maker2%gen_sph)
+     &    rj_fld, MHD_files, bc_IO, MHD_step, MHD_prop,                 &
+     &    MHD_BC, WK%WK_sph, sph_maker2%gen_sph, monitor)
 !
       call s_set_control_4_SPH_to_FEM                                   &
-     &   (DMHD_ctl%psph_ctl%spctl, sph%sph_params, rj_fld, nod_fld)
+     &   (DMHD_ctl%psph_ctl%spctl, sph, rj_fld, nod_fld)
       call set_ctl_params_dynamobench                                   &
      &   (DMHD_ctl%Dmodel_ctl%fld_ctl%field_ctl,                        &
      &    DMHD_ctl%smonitor_ctl%meq_ctl, cdat%circle, cdat%d_circle,    &

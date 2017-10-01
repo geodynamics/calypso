@@ -35,40 +35,6 @@
       implicit none
 !
 !
-!>      Structure of mean square data on each surface
-      type sphere_mean_squares
-!>        Number of radial points for mean square
-        integer(kind=kint) :: nri_rms = 0
-!>        Number of radial points for mean square
-        integer(kind=kint) :: ltr
-!>        Number of component for mean square
-        integer (kind=kint) :: ntot_comp_sq
-!
-!>        Radial ID from layered mean square
-        integer(kind=kint), allocatable :: kr_rms(:)
-!>        Radius from layered mean square
-        real(kind = kreal), allocatable :: r_rms(:)
-!
-!>        Mean square spectrum for degree on spheres
-        real(kind = kreal), allocatable :: s_l(:,:,:)
-!>        Mean square spectrum for order on spheres
-        real(kind = kreal), allocatable :: s_m(:,:,:)
-!>        Mean square spectrum for l-m on spheres
-        real(kind = kreal), allocatable :: s_lm(:,:,:)
-!
-!>         Mean square on spheres
-        real(kind = kreal), allocatable :: s_sq(:,:)
-!>         Mean square of axis-symmetric component on spheres
-        real(kind = kreal), allocatable :: s_m0(:,:)
-!>        Ratio of axis-symmetric componbent to total mean square
-        real(kind = kreal), allocatable :: s_ratio_m0(:,:)
-!
-!>        Number of radial point for average
-        integer(kind = kint) :: nri_ave
-!>        Average over single sphere
-        real(kind = kreal), allocatable :: s_ave(:,:)
-      end type sphere_mean_squares
-!
 !
 !>      Structure of mean square data over volume
       type sph_vol_mean_squares
@@ -182,7 +148,6 @@
 !
         integer(kind = kint) :: num_vol_spectr = 1
         type(sph_vol_mean_squares), allocatable :: v_spectr(:)
-!v_spectr(1)%v_l
       end type sph_mean_squares
 !
 ! -----------------------------------------------------------------------
@@ -357,39 +322,6 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_sph_layer_mean_square                            &
-     &         (my_rank, ltr, ntot_comp_sq, s_rms)
-!
-      integer(kind = kint), intent(in) :: my_rank
-      integer(kind = kint), intent(in) :: ltr, ntot_comp_sq
-      type(sphere_mean_squares), intent(inout) :: s_rms
-!
-!
-      s_rms%ltr = ltr
-      s_rms%ntot_comp_sq = ntot_comp_sq
-      if(my_rank .gt. 0) return
-!
-      allocate(s_rms%s_l(s_rms%nri_rms,0:s_rms%ltr,ntot_comp_sq))
-      allocate(s_rms%s_m(s_rms%nri_rms,0:s_rms%ltr,ntot_comp_sq))
-      allocate(s_rms%s_lm(s_rms%nri_rms,0:s_rms%ltr,ntot_comp_sq))
-!
-      allocate(s_rms%s_sq(s_rms%nri_rms,ntot_comp_sq))
-      allocate(s_rms%s_m0(s_rms%nri_rms,ntot_comp_sq))
-      allocate(s_rms%s_ratio_m0(s_rms%nri_rms,ntot_comp_sq))
-      if(s_rms%nri_rms .gt. 0) then
-        s_rms%s_sq =       0.0d0
-        s_rms%s_m0 =       0.0d0
-        s_rms%s_ratio_m0 = 0.0d0
-!
-        s_rms%s_l =  0.0d0
-        s_rms%s_m =  0.0d0
-        s_rms%s_lm = 0.0d0
-      end if
-!
-      end subroutine alloc_sph_layer_mean_square
-!
-! -----------------------------------------------------------------------
-!
       subroutine alloc_sph_vol_mean_square                              &
      &         (my_rank, ltr, ntot_comp_sq, v_pwr)
 !
@@ -422,24 +354,6 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_sph_layer_ave                                    &
-     &         (idx_rj_degree_zero, nri_rj, s_rms)
-!
-      integer(kind = kint), intent(in) :: idx_rj_degree_zero
-      integer(kind = kint), intent(in) :: nri_rj
-      type(sphere_mean_squares), intent(inout) :: s_rms
-!
-!
-      if(idx_rj_degree_zero .eq. 0) return
-!
-      s_rms%nri_ave = nri_rj
-      allocate(s_rms%s_ave(0:s_rms%nri_ave,s_rms%ntot_comp_sq))
-      if(s_rms%nri_ave*s_rms%ntot_comp_sq .gt. 0)  s_rms%s_ave = 0.0d0
-!
-      end subroutine alloc_sph_layer_ave
-!
-! -----------------------------------------------------------------------
-!
       subroutine alloc_sph_vol_ave(idx_rj_degree_zero, v_pwr)
 !
       integer(kind = kint), intent(in) :: idx_rj_degree_zero
@@ -457,32 +371,6 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine dealloc_num_spec_layer(s_rms)
-!
-      type(sphere_mean_squares), intent(inout) :: s_rms
-!
-!
-      deallocate(s_rms%kr_rms, s_rms%r_rms)
-!
-      end subroutine dealloc_num_spec_layer
-!
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_sph_layer_mean_square(my_rank, s_rms)
-!
-      integer(kind = kint), intent(in) :: my_rank
-      type(sphere_mean_squares), intent(inout) :: s_rms
-!
-!
-      if(my_rank .gt. 0) return
-!
-      deallocate(s_rms%s_l, s_rms%s_m, s_rms%s_lm)
-      deallocate(s_rms%s_sq, s_rms%s_m0, s_rms%s_ratio_m0)
-!
-      end subroutine dealloc_sph_layer_mean_square
-!
-! -----------------------------------------------------------------------
-!
       subroutine dealloc_sph_vol_mean_square(my_rank, v_pwr)
 !
       integer(kind = kint), intent(in) :: my_rank
@@ -495,18 +383,6 @@
       deallocate(v_pwr%v_sq, v_pwr%v_m0, v_pwr%v_ratio_m0)
 !
       end subroutine dealloc_sph_vol_mean_square
-!
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_sph_layer_ave(idx_rj_degree_zero, s_rms)
-!
-      integer(kind = kint), intent(in) :: idx_rj_degree_zero
-      type(sphere_mean_squares), intent(inout) :: s_rms
-!
-!
-      if(idx_rj_degree_zero .gt. 0)  deallocate(s_rms%s_ave)
-!
-      end subroutine dealloc_sph_layer_ave
 !
 ! -----------------------------------------------------------------------
 !

@@ -7,8 +7,10 @@
 !>@brief  Swap array for phi componene
 !!
 !!@verbatim
-!!      subroutine swap_phi_from_trans(numdir, nnod_rtp, nidx_rtp, d_sph)
-!!      subroutine swap_phi_to_trans(numdir, nnod_rtp, nidx_rtp, v_prt)
+!!      subroutine swap_phi_order_from_trans                            &
+!!     &         (numdir, nnod_rtp, nidx_rtp, d_sph)
+!!      subroutine swap_phi_order_to_trans                              &
+!!     &         (numdir, nnod_rtp, nidx_rtp, v_prt)
 !!@endverbatim
 !
       module swap_phi_4_sph_trans
@@ -26,9 +28,8 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine swap_phi_from_trans(numdir, nnod_rtp, nidx_rtp, d_sph)
-!
-      use m_FFT_selector
+      subroutine swap_phi_order_from_trans                              &
+     &         (numdir, nnod_rtp, nidx_rtp, d_sph)
 !
       integer(kind = kint), intent(in) :: numdir, nnod_rtp
       integer(kind = kint), intent(in) :: nidx_rtp(3)
@@ -37,8 +38,6 @@
 !
       integer(kind = kint) :: i_mkl, i_klm, kr_lt, mphi, nd
 !
-!
-      if(iflag_FFT .ne. iflag_FFTW) return
 !
       allocate(v_tmp(nnod_rtp))
 !
@@ -60,14 +59,13 @@
 !
       deallocate(v_tmp)
 !
-      end subroutine swap_phi_from_trans
+      end subroutine swap_phi_order_from_trans
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine swap_phi_to_trans(numdir, nnod_rtp, nidx_rtp, v_prt)
-!
-      use m_FFT_selector
+      subroutine swap_phi_order_to_trans                                &
+     &         (numdir, nnod_rtp, nidx_rtp, v_prt)
 !
       integer(kind = kint), intent(in) :: numdir, nnod_rtp
       integer(kind = kint), intent(in) :: nidx_rtp(3)
@@ -76,8 +74,6 @@
 !
       integer(kind = kint) :: i_mkl, i_klm, kr_lt, mphi, nd
 !
-!
-      if(iflag_FFT .ne. iflag_FFTW) return
 !
       allocate(v_tmp(nnod_rtp))
 !
@@ -99,7 +95,7 @@
 !
       deallocate(v_tmp)
 !
-      end subroutine swap_phi_to_trans
+      end subroutine swap_phi_order_to_trans
 !
 !-----------------------------------------------------------------------
 !

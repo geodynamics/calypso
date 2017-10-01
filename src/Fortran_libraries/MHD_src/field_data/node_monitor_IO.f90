@@ -5,13 +5,17 @@
 !                                    on July 2000 (ver 1.1)
 !        Modified by H. Matsui on Aug., 2007
 !
+!!      subroutine set_local_nod_4_monitor(mesh, group)
+!!      subroutine output_monitor_control                               &
+!!     &         (istep, point_step, time_d, mesh, nod_fld)
+!!
 !!      subroutine allocate_monitor_group
 !!      subroutine allocate_monitor_local
 !!      subroutine deallocate_monitor_local
 !!
 !!      subroutine open_node_monitor_file(my_rank, nod_fld)
 !!      subroutine set_local_node_id_4_monitor(node, nod_grp)
-!!      subroutine output_monitor_control(time_d, node, nod_fld)
+!!        type(IO_step_param), intent(in) :: point_step
 !!        type(time_data), intent(in) :: time_d
 !!        type(node_data), intent(in) :: node
 !!        type(phys_data), intent(in) :: nod_fld
@@ -22,9 +26,9 @@
       use m_precision
 !
       use t_time_data
-      use t_geometry_data
-      use t_group_data
+      use t_mesh_data
       use t_phys_data
+      use t_IO_step_parameter
 !
       implicit none
 !
@@ -46,13 +50,50 @@
       private :: num_monitor_local, monitor_local
       private :: num_comp_phys_monitor, phys_name_monitor
       private :: allocate_monitor_local
-      private :: open_node_monitor_file
+      private :: open_node_monitor_file, output_nodal_monitor_data
 !
 !  ---------------------------------------------------------------------
 !
       contains
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine set_local_nod_4_monitor(mesh, group)
+!
+      type(mesh_geometry), intent(in) :: mesh
+      type(mesh_groups), intent(in) ::   group
+!
+!
+      call set_local_node_id_4_monitor(mesh%node, group%nod_grp)
+!
+      end subroutine set_local_nod_4_monitor
+!
+! -----------------------------------------------------------------------
+!
+      subroutine output_monitor_control                                 &
+     &         (istep, point_step, time_d, mesh, nod_fld)
+!
+      use calypso_mpi
+      use m_machine_parameter
+!
+      integer(kind = kint), intent(in) :: istep
+      type(time_data), intent(in) :: time_d
+      type(IO_step_param), intent(in) :: point_step
+      type(mesh_geometry), intent(in) :: mesh
+      type(phys_data), intent(in) :: nod_fld
+!
+!
+!
+      if(output_IO_flag(istep,point_step) .gt. 0) return
+      if(num_monitor .eq. 0 .or. num_monitor_local .eq. 0) return
+      if(iflag_debug.eq.1) write(*,*) 'output_nodal_monitor_data'
+!
+      call output_nodal_monitor_data(time_d, mesh%node, nod_fld)
+!
+      end subroutine output_monitor_control
+!
+!  ---------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
       subroutine allocate_monitor_group
 !
@@ -188,9 +229,10 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine output_monitor_control(time_d, node, nod_fld)
+      subroutine output_nodal_monitor_data(time_d, node, nod_fld)
 !
       use calypso_mpi
+      use m_machine_parameter
 !
       type(time_data), intent(in) :: time_d
       type(node_data), intent(in) :: node
@@ -198,8 +240,6 @@
 !
       integer (kind = kint) :: i, inod, i_fld, ist, ied
 !
-!
-      if (num_monitor .eq. 0 .or. num_monitor_local .eq. 0) return
 !
       call open_node_monitor_file(my_rank, nod_fld)
 !
@@ -222,7 +262,7 @@
 !
       close(id_monitor_file)
 !
-      end subroutine output_monitor_control
+      end subroutine output_nodal_monitor_data
 !
 !  ---------------------------------------------------------------------
 !

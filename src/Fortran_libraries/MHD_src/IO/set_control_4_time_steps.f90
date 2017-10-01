@@ -9,11 +9,9 @@
 !> @brief set parameters for time stepping
 !!
 !!@verbatim
-!!      subroutine s_set_control_4_time_steps                           &
-!!     &         (flex_p, MHD_step, mr_ctl, tctl)
+!!      subroutine s_set_control_4_time_steps(MHD_step, mr_ctl, tctl)
 !!        type(mhd_restart_control), intent(in) :: mr_ctl
 !!        type(MHD_step_param), intent(inout) :: MHD_step
-!!        type(flexible_stepping_parameter), intent(inout) :: flex_p
 !!        type(time_data_control), intent(inout) :: tctl
 !!@endverbatim
 !
@@ -34,6 +32,7 @@
 !
       implicit  none
 !
+      private :: set_control_flex_time_steps
       private :: set_flex_time_step_params
       private :: set_flex_time_step_controls
       private :: set_fixed_time_step_controls
@@ -44,8 +43,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_time_steps                             &
-     &         (flex_p, MHD_step, mr_ctl, tctl)
+      subroutine s_set_control_4_time_steps(MHD_step, mr_ctl, tctl)
 !
       use t_time_data
       use t_ctl_data_mhd_evo_scheme
@@ -54,7 +52,6 @@
       use skip_comment_f
 !
       type(mhd_restart_control), intent(in) :: mr_ctl
-      type(flexible_stepping_parameter), intent(inout) :: flex_p
       type(MHD_step_param), intent(inout) :: MHD_step
       type(time_data_control), intent(inout) :: tctl
 !
@@ -64,71 +61,28 @@
       call set_initial_field_id                                         &
      &   (mr_ctl%restart_flag_ctl, tctl, MHD_step%init_d%time)
 !
-        flex_p%iflag_flexible_step = iflag_fixed_step
+        MHD_step%flex_p%iflag_flexible_step = iflag_fixed_step
         if(tctl%flexible_step_ctl%iflag .gt. 0                          &
      &     .and. yes_flag(tctl%flexible_step_ctl%charavalue)) then
-          flex_p%iflag_flexible_step = iflag_flex_step
+          MHD_step%flex_p%iflag_flexible_step = iflag_flex_step
         end if
 !
-        if (tctl%dt_ctl%iflag .eq. 0) then
-          e_message = 'Set delta t'
-          call calypso_MPI_abort(ierr_evo, e_message)
-        else
-          MHD_step%init_d%dt = tctl%dt_ctl%realvalue
-          call cal_num_digit_real                                       &
-     &       (MHD_step%init_d%dt, flex_p%dt_fact, flex_p%idt_digit)
-        end if
+      if (tctl%dt_ctl%iflag .eq. 0) then
+        e_message = 'Set delta t'
+        call calypso_MPI_abort(ierr_evo, e_message)
+      else
+        MHD_step%init_d%dt = tctl%dt_ctl%realvalue
+      end if
 !
-        if(flex_p%iflag_flexible_step .eq. iflag_flex_step) then
-          if (tctl%min_delta_t_ctl%iflag .eq. 0) then
-            e_message = 'Set maximum delta t'
-            call calypso_MPI_abort(ierr_evo, e_message)
-          else
-            flex_p%dt_min = tctl%min_delta_t_ctl%realvalue
-          end if
-!
-          if (tctl%max_delta_t_ctl%iflag .eq. 0) then
-            e_message = 'Set maximum delta t'
-            call calypso_MPI_abort(ierr_evo, e_message)
-          else
-            flex_p%dt_max = tctl%max_delta_t_ctl%realvalue
-          end if
-!
-          if (tctl%max_eps_to_shrink_ctl%iflag .eq. 0) then
-            e_message = 'Set maximum error to shrink delta t'
-            call calypso_MPI_abort(ierr_evo, e_message)
-          else
-            flex_p%max_eps_to_shrink                                    &
-     &                = tctl%max_eps_to_shrink_ctl%realvalue
-          end if
-!
-          if (tctl%min_eps_to_expand_ctl%iflag .eq. 0) then
-            e_message = 'Set minimum error to expand delta t'
-            call calypso_MPI_abort(ierr_evo, e_message)
-          else
-            flex_p%min_eps_to_expand                                    &
-     &                = tctl%min_eps_to_expand_ctl%realvalue
-          end if
-!
-          flex_p%istep_flex_to_max = izero
-!
-          if(MHD_step%init_d%dt .gt. zero) then
-            flex_p%interval_flex_2_max                                  &
-     &                = nint(flex_p%dt_max / MHD_step%init_d%dt)
-          end if
-        else
-          flex_p%dt_max = MHD_step%init_d%dt
-          flex_p%dt_min = MHD_step%init_d%dt
-          flex_p%interval_flex_2_max = ione
-          flex_p%istep_flex_to_max = izero
-        end if
+      call set_control_flex_time_steps                                  &
+     &   (MHD_step%init_d, MHD_step%flex_p, tctl)
 !
 !   parameters for time evolution
 !
-      if(flex_p%iflag_flexible_step .eq. iflag_flex_step) then
+      if(MHD_step%flex_p%iflag_flexible_step .eq. iflag_flex_step) then
         if (iflag_debug .ge. iflag_routine_msg)                         &
      &    write(*,*) 'set_flex_time_step_controls'
-        call set_flex_time_step_controls(flex_p, tctl, MHD_step)
+        call set_flex_time_step_controls(tctl, MHD_step)
       else
         if (iflag_debug .ge. iflag_routine_msg)                         &
      &    write(*,*) 'set_fixed_time_step_controls'
@@ -148,7 +102,7 @@
 !
       if (iflag_debug .ge. iflag_routine_msg) then
         write(*,*) 'dt', MHD_step%init_d%dt,                            &
-     &            flex_p%dt_fact, flex_p%idt_digit
+     &            MHD_step%flex_p%dt_fact, MHD_step%flex_p%idt_digit
         write(*,*) 'i_step_init ', MHD_step%init_d%i_time_step
         write(*,*) 'i_step_number ', MHD_step%finish_d%i_end_step
         write(*,*) 'elapsed_time ',  MHD_step%finish_d%elapsed_time
@@ -158,6 +112,71 @@
       end if
 !
       end subroutine s_set_control_4_time_steps
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_control_flex_time_steps(init_d, flex_p, tctl)
+!
+      use t_time_data
+      use t_ctl_data_mhd_evo_scheme
+      use m_initial_field_control
+      use cal_num_digits
+      use skip_comment_f
+!
+      type(time_data), intent(in) :: init_d
+      type(flexible_stepping_parameter), intent(inout) :: flex_p
+      type(time_data_control), intent(inout) :: tctl
+!
+!
+      call cal_num_digit_real                                           &
+     &     (init_d%dt, flex_p%dt_fact, flex_p%idt_digit)
+!
+      if(flex_p%iflag_flexible_step .eq. iflag_flex_step) then
+        if (tctl%min_delta_t_ctl%iflag .eq. 0) then
+          e_message = 'Set maximum delta t'
+          call calypso_MPI_abort(ierr_evo, e_message)
+        else
+          flex_p%dt_min = tctl%min_delta_t_ctl%realvalue
+        end if
+!
+        if (tctl%max_delta_t_ctl%iflag .eq. 0) then
+          e_message = 'Set maximum delta t'
+          call calypso_MPI_abort(ierr_evo, e_message)
+        else
+          flex_p%dt_max = tctl%max_delta_t_ctl%realvalue
+        end if
+!
+        if (tctl%max_eps_to_shrink_ctl%iflag .eq. 0) then
+          e_message = 'Set maximum error to shrink delta t'
+          call calypso_MPI_abort(ierr_evo, e_message)
+        else
+          flex_p%max_eps_to_shrink                                      &
+     &              = tctl%max_eps_to_shrink_ctl%realvalue
+        end if
+!
+        if (tctl%min_eps_to_expand_ctl%iflag .eq. 0) then
+          e_message = 'Set minimum error to expand delta t'
+          call calypso_MPI_abort(ierr_evo, e_message)
+        else
+          flex_p%min_eps_to_expand                                      &
+     &              = tctl%min_eps_to_expand_ctl%realvalue
+        end if
+!
+        flex_p%istep_flex_to_max = izero
+!
+        if(init_d%dt .gt. zero) then
+          flex_p%interval_flex_2_max                                    &
+     &              = nint(flex_p%dt_max / init_d%dt)
+        end if
+      else
+        flex_p%dt_max = init_d%dt
+        flex_p%dt_min = init_d%dt
+        flex_p%interval_flex_2_max = ione
+        flex_p%istep_flex_to_max = izero
+      end if
+!
+      end subroutine set_control_flex_time_steps
 !
 ! -----------------------------------------------------------------------
 !
@@ -196,30 +215,29 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_flex_time_step_controls(flex_p, tctl, MHD_step)
+      subroutine set_flex_time_step_controls(tctl, MHD_step)
 !
-      type(flexible_stepping_parameter), intent(inout) :: flex_p
       type(time_data_control), intent(inout) :: tctl
       type(MHD_step_param), intent(inout) :: MHD_step
 !
 !
       call set_flex_time_step_params                                    &
-     &   (flex_p, tctl, MHD_step%init_d, MHD_step%finish_d,             &
+     &   (MHD_step%flex_p, tctl, MHD_step%init_d, MHD_step%finish_d,    &
      &    MHD_step%rst_step, MHD_step%ucd_step)
 !
-      call set_output_step_4_flex_step(ione, flex_p%dt_max,             &
+      call set_output_step_4_flex_step(ione, MHD_step%flex_p%dt_max,    &
      &    tctl%i_step_check_ctl, tctl%delta_t_check_ctl,                &
      &    MHD_step%rms_step)
 !
-      call set_output_step_4_flex_step(izero, flex_p%dt_max,            &
+      call set_output_step_4_flex_step(izero, MHD_step%flex_p%dt_max,   &
      &    tctl%i_step_sgs_coefs_ctl, tctl%delta_t_sgs_coefs_ctl,        &
      &    MHD_step%sgs_IO_step)
 !
-      call set_output_step_4_flex_step(izero, flex_p%dt_max,            &
+      call set_output_step_4_flex_step(izero, MHD_step%flex_p%dt_max,   &
      &    tctl%i_step_monitor_ctl, tctl%delta_t_monitor_ctl,            &
      &    MHD_step%point_step)
 !
-      call set_output_step_4_flex_step(izero, flex_p%dt_max,            &
+      call set_output_step_4_flex_step(izero, MHD_step%flex_p%dt_max,   &
      &    tctl%i_step_boundary_ctl, tctl%delta_t_boundary_ctl,          &
      &    MHD_step%boundary_step)
 !

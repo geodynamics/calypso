@@ -9,22 +9,21 @@
 !!
 !!@verbatim
 !!      subroutine FEM_initialize_sph_MHD(MHD_files, MHD_step,          &
-!!     &          mesh, group, ele_mesh, iphys, nod_fld, range, fem_ucd)
+!!     &          geofem, ele_mesh, iphys, nod_fld, range, fem_ucd)
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(MHD_step_param), intent(in) :: MHD_step
-!!        type(mesh_geometry), intent(inout) :: mesh
-!!        type(mesh_groups), intent(inout) ::   group
+!!        type(mesh_data), intent(inout) :: geofem
 !!        type(element_geometry), intent(inout) :: ele_mesh
 !!        type(phys_address), intent(inout) :: iphys
 !!        type(phys_data), intent(inout) :: nod_fld
 !!        type(maximum_informations), intent(inout) :: range
 !!        type(ucd_file_data), intent(inout) :: fem_ucd
 !!      subroutine FEM_analyze_sph_MHD                                  &
-!!     &         (MHD_files, mesh, nod_fld, MHD_step, visval, fem_ucd)
+!!     &         (MHD_files, geofem, nod_fld, MHD_step, visval, fem_ucd)
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(SGS_paremeters), intent(in) :: SGS_par
 !!        type(time_data), intent(in) :: time_d
-!!        type(mesh_geometry), intent(in) :: mesh
+!!        type(mesh_data), intent(in) :: geofem
 !!        type(phys_data), intent(inout) :: nod_fld
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(ucd_file_data), intent(inout) :: fem_ucd
@@ -73,20 +72,19 @@
 !-----------------------------------------------------------------------
 !
       subroutine FEM_initialize_sph_MHD(MHD_files, MHD_step,            &
-     &          mesh, group, ele_mesh, iphys, nod_fld, range, fem_ucd)
+     &          geofem, ele_mesh, iphys, nod_fld, range, fem_ucd)
 !
       use m_array_for_send_recv
       use t_cal_max_indices
 !
-      use set_field_address
+      use init_nodal_field_address
       use nod_phys_send_recv
       use node_monitor_IO
       use parallel_FEM_mesh_init
 !
       type(MHD_file_IO_params), intent(in) :: MHD_files
       type(MHD_step_param), intent(in) :: MHD_step
-      type(mesh_geometry), intent(inout) :: mesh
-      type(mesh_groups), intent(inout) ::   group
+      type(mesh_data), intent(inout) :: geofem
       type(element_geometry), intent(inout) :: ele_mesh
       type(phys_address), intent(inout) :: iphys
       type(phys_data), intent(inout) :: nod_fld
@@ -94,22 +92,22 @@
       type(ucd_file_data), intent(inout) :: fem_ucd
 !
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_local_node_id_4_monitor'
-      call set_local_node_id_4_monitor(mesh%node, group%nod_grp)
+      if (iflag_debug.gt.0) write(*,*) 'set_local_nod_4_monitor'
+      call set_local_nod_4_monitor(geofem%mesh, geofem%group)
 !
 !  -------------------------------
 !
       if (iflag_debug.gt.0 ) write(*,*) 'FEM_mesh_initialization'
       call FEM_mesh_init_with_IO(MHD_files%iflag_output_SURF,           &
-     &    MHD_files%mesh_file_IO, mesh, group, ele_mesh)
+     &    MHD_files%mesh_file_IO, geofem%mesh, geofem%group, ele_mesh)
 !
       call deallocate_surface_geom_type(ele_mesh%surf)
       call dealloc_edge_geometory(ele_mesh%edge)
 !
 !  -------------------------------
 !
-      if (iflag_debug.gt.0) write(*,*) 'init_field_address'
-      call init_field_address(mesh%node%numnod, nod_fld, iphys)
+      if (iflag_debug.gt.0) write(*,*) 'init_nod_fld_address'
+      call init_nod_fld_address(geofem%mesh%node, nod_fld, iphys)
 !
 !  connect grid data to volume output
 !
@@ -119,7 +117,7 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'output_grd_file_4_snapshot'
       call output_grd_file_4_snapshot(MHD_files%ucd_file_IO,            &
-     &    MHD_step%ucd_step, mesh, nod_fld, fem_ucd)
+     &    MHD_step%ucd_step, geofem%mesh, nod_fld, fem_ucd)
 !
       end subroutine FEM_initialize_sph_MHD
 !
@@ -127,13 +125,13 @@
 !-----------------------------------------------------------------------
 !
       subroutine FEM_analyze_sph_MHD                                    &
-     &         (MHD_files, mesh, nod_fld, MHD_step, visval, fem_ucd)
+     &         (MHD_files, geofem, nod_fld, MHD_step, visval, fem_ucd)
 !
       use nod_phys_send_recv
       use output_viz_file_control
 !
       type(MHD_file_IO_params), intent(in) :: MHD_files
-      type(mesh_geometry), intent(in) :: mesh
+      type(mesh_data), intent(in) :: geofem
       type(phys_data), intent(inout) :: nod_fld
 !
       integer (kind =kint), intent(inout) :: visval
@@ -156,7 +154,7 @@
 !*  ----------- Data communication  --------------
 !
       if (iflag_debug.gt.0) write(*,*) 'phys_send_recv_all'
-      call nod_fields_send_recv(mesh, nod_fld)
+      call nod_fields_send_recv(geofem%mesh, nod_fld)
 !
 !*  -----------  Output volume data --------------
 !*
@@ -191,7 +189,7 @@
 !*
       if (iflag_debug.gt.0) write(*,*) 'copy_forces_to_snapshot_rtp'
       call copy_forces_to_snapshot_rtp                                  &
-     &   (sph_params%m_folding, sph_rtp, WK%trns_MHD,                   &
+     &   (sph_params, sph_rtp, WK%trns_MHD,                             &
      &    mesh%node, iphys, nod_fld)
 !
       if (iflag_debug.gt.0) write(*,*) 'copy_snap_vec_fld_from_trans'

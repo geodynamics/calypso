@@ -8,23 +8,18 @@
 !!
 !!@verbatim
 !!      subroutine init_sph_transform_MHD                               &
-!!     &         (MHD_prop, sph_MHD_bc, ipol, idpdr, itor, iphys,       &
-!!     &          sph, comms_sph, omega_sph, trans_p, WK, rj_fld)
-!!      subroutine sel_sph_transform_MHD                                &
-!!     &         (ipol, fl_prop, sph_bc_U, sph, comms_sph, omega_sph,   &
-!!     &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,&
-!!     &          trans_p, trns_MHD, WK_sph, MHD_mul_FFTW,              &
-!!     &          gt_cor, cor_rlm, rj_fld)
+!!     &         (SPH_model, iphys, trans_p, WK, SPH_MHD)
+!!      subroutine sel_sph_transform_MHD(iflag_SGS, ipol,               &
+!!     &         MHD_prop, sph_MHD_bc, sph, comms_sph, omega_sph,       &
+!!     &         ncomp_max_trans, nvector_max_trans, nscalar_max_trans, &
+!!     &         trns_MHD, trns_SGS, WK_sph, MHD_mul_FFTW, SGS_mul_FFTW,&
+!!     &         trans_p, gt_cor, cor_rlm, rj_fld)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
-!!        type(sph_boundary_type), intent(in) :: sph_bc_U
-!!        type(phys_address), intent(in) :: ipol, idpdr, itor
-!!        type(sph_grids), intent(inout) :: sph
-!!        type(sph_comm_tables), intent(inout) :: comms_sph
 !!        type(parameters_4_sph_trans), intent(inout) :: trans_p
 !!        type(works_4_sph_trans_MHD), intent(inout) :: WK
 !!        type(gaunt_coriolis_rlm), intent(inout) :: gt_cor
 !!        type(coriolis_rlm_data), intent(inout) :: cor_rlm
-!!        type(phys_data), intent(inout) :: rj_fld
+!!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!@endverbatim
 !!
       module init_sphrical_transform_MHD
@@ -36,11 +31,9 @@
 !
       use calypso_mpi
 !
-      use t_control_parameter
-      use t_spheric_parameter
+      use t_SPH_MHD_model_data
+      use t_SPH_mesh_field_data
       use t_sph_trans_comm_tbl
-      use t_phys_address
-      use t_phys_data
       use t_addresses_sph_transform
       use t_poloidal_rotation
       use t_sph_trans_arrays_MHD
@@ -74,8 +67,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine init_sph_transform_MHD                                 &
-     &         (MHD_prop, sph_MHD_bc, ipol, idpdr, itor, iphys,         &
-     &          sph, comms_sph, omega_sph, trans_p, WK, rj_fld)
+     &         (SPH_model, iphys, trans_p, WK, SPH_MHD)
 !
       use set_address_sph_trans_MHD
       use set_address_sph_trans_snap
@@ -83,18 +75,12 @@
       use pole_sph_transform
       use MHD_FFT_selector
 !
-      type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-      type(phys_address), intent(in) :: ipol, idpdr, itor
       type(phys_address), intent(in) :: iphys
-!
-      type(sph_grids), intent(inout) :: sph
-      type(sph_comm_tables), intent(inout) :: comms_sph
-      type(sph_rotation), intent(in) :: omega_sph
+      type(SPH_MHD_model_data), intent(in) :: SPH_model
 !
       type(parameters_4_sph_trans), intent(inout) :: trans_p
       type(works_4_sph_trans_MHD), intent(inout) :: WK
-      type(phys_data), intent(inout) :: rj_fld
+      type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !
 !>      total number of components for spherical harmonics transform
       integer(kind = kint), save :: ncomp_max_trans = 0
@@ -104,41 +90,48 @@
       integer(kind = kint), save :: nscalar_max_trans = 0
 !
 !
-      call init_pole_transform(sph%sph_rtp)
+      call init_pole_transform(SPH_MHD%sph%sph_rtp)
 !
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &                     'set_addresses_trans_sph_MHD'
-      call set_addresses_trans_sph_MHD(MHD_prop, ipol, WK%trns_MHD,     &
+      call set_addresses_trans_sph_MHD                                  &
+     &   (SPH_model%MHD_prop, SPH_MHD%ipol, WK%trns_MHD,                &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans)
-      call set_addresses_snapshot_trans(ipol, iphys, WK%trns_snap,      &
+      call set_addresses_snapshot_trans                                 &
+     &   (SPH_MHD%ipol, iphys, WK%trns_snap,                            &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans)
-      call set_addresses_temporal_trans(ipol, iphys, WK%trns_tmp,       &
+      call set_addresses_temporal_trans                                 &
+     &   (SPH_MHD%ipol, iphys, WK%trns_tmp,                             &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans)
 !
       if(iflag_debug .ge. iflag_routine_msg) then
-        call check_address_trans_sph_MHD(ipol, idpdr, itor, iphys,      &
+        call check_address_trans_sph_MHD                                &
+     &     (SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%itor, iphys,           &
      &      WK%trns_MHD, ncomp_max_trans)
-        call check_address_trans_sph_snap(ipol, idpdr, itor, iphys,     &
+        call check_address_trans_sph_snap                               &
+     &     (SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%itor, iphys,           &
      &      WK%trns_snap)
-        call check_address_trans_sph_tmp(ipol, idpdr, itor, iphys,      &
+        call check_address_trans_sph_tmp                                &
+     &     (SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%itor, iphys,           &
      &      WK%trns_tmp)
       end if
 !
-      call alloc_sph_trans_address(sph%sph_rtp, WK)
+      call alloc_sph_trans_address(SPH_MHD%sph%sph_rtp, WK)
 !
-      call sel_sph_transform_MHD(izero, ipol, MHD_prop%fl_prop,         &
-     &    sph_MHD_bc%sph_bc_U, sph, comms_sph, omega_sph,               &
+      call sel_sph_transform_MHD(izero, SPH_MHD%ipol,                   &
+     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc,                     &
+     &    SPH_MHD%sph,  SPH_MHD%comms, SPH_model%omega_sph,             &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans,        &
      &    WK%trns_MHD, WK%trns_SGS, WK%WK_sph,                          &
      &    WK%MHD_mul_FFTW, WK%SGS_mul_FFTW, trans_p,                    &
-     &    WK%gt_cor, WK%cor_rlm, rj_fld)
+     &    WK%gt_cor, WK%cor_rlm, SPH_MHD%fld)
 !
       end subroutine init_sph_transform_MHD
 !
 !-----------------------------------------------------------------------
 !
       subroutine sel_sph_transform_MHD(iflag_SGS, ipol,                 &
-     &          fl_prop, sph_bc_U, sph, comms_sph, omega_sph,           &
+     &          MHD_prop, sph_MHD_bc, sph, comms_sph, omega_sph,        &
      &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,  &
      &          trns_MHD, trns_SGS, WK_sph, MHD_mul_FFTW, SGS_mul_FFTW, &
      &          trans_p, gt_cor, cor_rlm, rj_fld)
@@ -151,8 +144,8 @@
 !
       integer(kind = kint), intent(in) :: iflag_SGS
       type(phys_address), intent(in) :: ipol
-      type(fluid_property), intent(in) :: fl_prop
-      type(sph_boundary_type), intent(in) :: sph_bc_U
+      type(MHD_evolution_param), intent(in) :: MHD_prop
+      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !
       type(sph_grids), intent(inout) :: sph
       type(sph_comm_tables), intent(inout) :: comms_sph
@@ -182,12 +175,13 @@
       if (iflag_debug.eq.1) write(*,*) 'set_colatitude_rtp'
       call set_colatitude_rtp(sph%sph_rtp, sph%sph_rj, trans_p%leg)
       if (iflag_debug.eq.1) write(*,*) 'init_sum_coriolis_rlm'
-      call init_sum_coriolis_rlm(sph%sph_params%l_truncation,           &
-     &    sph%sph_rlm, sph_bc_U, trans_p%leg, gt_cor, cor_rlm)
+      call init_sum_coriolis_rlm                                        &
+     &   (sph%sph_params%l_truncation, sph%sph_rlm,                     &
+     &    sph_MHD_bc%sph_bc_U, trans_p%leg, gt_cor, cor_rlm)
 !
       if (iflag_debug.eq.1) write(*,*) 'select_legendre_transform'
-      call select_legendre_transform(sph, comms_sph,                    &
-     &    fl_prop, sph_bc_U, omega_sph, trans_p, gt_cor, ipol,          &
+      call select_legendre_transform(sph, comms_sph, MHD_prop%fl_prop,  &
+     &    sph_MHD_bc%sph_bc_U, omega_sph, trans_p, gt_cor, ipol,        &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans,        &
      &    rj_fld, trns_MHD, WK_sph, MHD_mul_FFTW, cor_rlm)
 !

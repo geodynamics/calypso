@@ -9,9 +9,6 @@
 !> @brief Set start address for field data
 !!
 !!@verbatim
-!!      subroutine init_field_address(numnod, fld, iphys)
-!!        type(phys_data), intent(inout) :: fld
-!!        type(phys_address), intent(inout) :: iphys
 !!      subroutine set_field_addresses(istart_adress, num_field,        &
 !!     &          field_name, num_component, iphys)
 !!      integer(kind = kint), intent(in) :: istart_adress
@@ -42,21 +39,6 @@
       contains
 !
 ! -------------------------------------------------------------------
-!
-      subroutine init_field_address(numnod, fld, iphys)
-!
-      integer(kind = kint), intent(in) :: numnod
-      type(phys_data), intent(inout) :: fld
-      type(phys_address), intent(inout) :: iphys
-!
-!
-      call alloc_phys_data_type(numnod, fld)
-      call set_field_addresses(ione, fld%num_phys,                      &
-     &    fld%phys_name, fld%num_component, iphys)
-!
-      end subroutine init_field_address
-!
-!  --------------------------------------------------------------------
 !
       subroutine set_field_addresses(istart_adress, num_field,          &
      &          field_name, num_component, iphys)

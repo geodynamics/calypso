@@ -19,7 +19,7 @@
 !
       use m_machine_parameter
       use m_work_time
-      use m_physical_property
+      use m_SPH_MHD_model_data
       use t_field_on_circle
       use t_field_4_dynamobench
       use t_step_parameter
@@ -44,13 +44,6 @@
 !
       use t_ctl_data_sph_MHD_psf
       use m_ctl_data_sph_MHD
-      use m_spheric_parameter
-      use m_node_phys_data
-      use m_sph_spectr_data
-      use m_rms_4_sph_spectr
-      use m_sph_trans_arrays_MHD
-      use m_bc_data_list
-      use m_flexible_time_step
       use init_sph_MHD_elapsed_label
       use input_control_dynamobench
 !
@@ -67,10 +60,11 @@
       call read_control_4_sph_MHD_noviz(snap_ctl_name, DNS_MHD_ctl1)
 
       if (iflag_debug.eq.1) write(*,*) 'input_control_SPH_dynamobench'
-      call input_control_SPH_dynamobench(MHD_files1, bc_sph_IO1,        &
-     &    DNS_MHD_ctl1, sph1, comms_sph1, sph_grps1, rj_fld1, nod_fld1, &
-     &    pwr1, flex_p1, MHD_step1, MHD_prop1, MHD_BC1, trns_WK1,       &
-     &    cdat1, bench1)
+      call input_control_SPH_dynamobench                                &
+     &   (MHD_files1, SPH_model1%bc_IO, DNS_MHD_ctl1, SPH_MHD1%sph,     &
+     &    SPH_MHD1%comms, SPH_MHD1%groups, SPH_MHD1%fld, FEM_d1%field,  &
+     &    MHD_step1, SPH_model1%MHD_prop, SPH_model1%MHD_BC,            &
+     &    SPH_WK1%trns_WK, SPH_WK1%monitor, cdat1, bench1)
       call copy_delta_t(MHD_step1%init_d, MHD_step1%time_d)
       call end_elapsed_time(4)
 !
@@ -81,8 +75,8 @@
 !        Initialize spherical transform dynamo
 !
       if(iflag_debug .gt. 0) write(*,*) 'SPH_init_sph_dbench'
-      call SPH_init_sph_dbench                                          &
-     &   (MHD_files1, bc_sph_IO1, iphys_nod1, cdat1)
+      call SPH_init_sph_dbench(MHD_files1, FEM_d1%iphys,                &
+     &    SPH_model1, SPH_MHD1, SPH_WK1, cdat1)
       call calypso_MPI_barrier
 !
       call end_elapsed_time(2)
@@ -113,8 +107,8 @@
 !*  ----------  time evolution by spectral methood -----------------
 !*
         if (iflag_debug.eq.1) write(*,*) 'SPH_analyze_dbench'
-        call SPH_analyze_dbench                                         &
-     &     (MHD_step1%time_d%i_time_step, MHD_files1, cdat1, bench1)
+        call SPH_analyze_dbench(MHD_step1%time_d%i_time_step,           &
+     &      MHD_files1, SPH_model1, SPH_MHD1, SPH_WK1, cdat1, bench1)
 !*
 !*  -----------  exit loop --------------
 !*

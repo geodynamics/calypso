@@ -48,20 +48,20 @@
 !
 !    For thermal
       if (my_rank .eq. 0) write(*,*) ''
-      call set_thermal_property                                         &
-     &   (iphys, depth_top, depth_bottom, MHD_prop%ht_prop)
+      call set_thermal_property(iphys, depth_top, depth_bottom,         &
+     &    MHD_prop%MHD_coef_list, MHD_prop%ht_prop)
 !
 !    For convection
-      call set_fluid_property                                           &
-     &   (depth_top, depth_bottom, MHD_prop%fl_prop)
+      call set_fluid_property(depth_top, depth_bottom,                  &
+     &    MHD_prop%MHD_coef_list, MHD_prop%fl_prop)
 !
 !   For Induction
-      call set_conductive_property                                      &
-     &   (depth_top, depth_bottom, MHD_prop%cd_prop)
+      call set_conductive_property(depth_top, depth_bottom,             &
+     &    MHD_prop%MHD_coef_list, MHD_prop%cd_prop)
 !
 !   For light element
-      call set_composition_property                                     &
-     &   (iphys, depth_top, depth_bottom, MHD_prop%cp_prop)
+      call set_composition_property(iphys, depth_top, depth_bottom,     &
+     &    MHD_prop%MHD_coef_list, MHD_prop%cp_prop)
       if (my_rank .eq. 0) write(*,*) ''
 !
       end subroutine set_material_property
@@ -69,12 +69,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_fluid_property                                     &
-     &         (depth_top, depth_bottom, fl_prop)
+     &         (depth_top, depth_bottom, MHD_coef_list, fl_prop)
 !
-      use m_normalize_parameter
       use construct_MHD_coefficient
 !
       real(kind = kreal), intent(in) :: depth_top, depth_bottom
+      type(coef_parameters_list), intent(inout) :: MHD_coef_list
       type(fluid_property), intent(inout) :: fl_prop
 !
 !    For convection
@@ -165,12 +165,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_conductive_property                                &
-     &         (depth_top, depth_bottom, cd_prop)
+     &         (depth_top, depth_bottom, MHD_coef_list, cd_prop)
 !
-      use m_normalize_parameter
       use construct_MHD_coefficient
 !
       real(kind = kreal), intent(in) :: depth_top, depth_bottom
+      type(coef_parameters_list), intent(inout) :: MHD_coef_list
       type(conductive_property), intent(inout) :: cd_prop
 !
 !   For Induction
@@ -232,13 +232,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_thermal_property                                   &
-     &         (iphys, depth_top, depth_bottom, ht_prop)
+     &         (iphys, depth_top, depth_bottom, MHD_coef_list, ht_prop)
 !
-      use m_normalize_parameter
       use construct_MHD_coefficient
 !
       type(phys_address), intent(in) :: iphys
       real(kind = kreal), intent(in) :: depth_top, depth_bottom
+      type(coef_parameters_list), intent(inout) :: MHD_coef_list
       type(scalar_property), intent(inout) :: ht_prop
 !
 !    For thermal
@@ -284,13 +284,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_composition_property                               &
-     &         (iphys, depth_top, depth_bottom, cp_prop)
+     &         (iphys, depth_top, depth_bottom, MHD_coef_list, cp_prop)
 !
-      use m_normalize_parameter
       use construct_MHD_coefficient
 !
       type(phys_address), intent(in) :: iphys
       real(kind = kreal), intent(in) :: depth_top, depth_bottom
+      type(coef_parameters_list), intent(inout) :: MHD_coef_list
       type(scalar_property), intent(inout) :: cp_prop
 !
 !   For light element

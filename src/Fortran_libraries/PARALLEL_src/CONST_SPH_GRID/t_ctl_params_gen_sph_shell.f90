@@ -134,8 +134,7 @@
       integer(kind = kint), intent(inout) :: ierr
 !
 !
-      call set_FEM_mesh_mode_4_SPH                                      &
-     &   (spctl, sph%sph_params%iflag_shell_mode)
+      call set_FEM_mesh_mode_4_SPH(spctl, sph%sph_params)
 !
       sph%sph_rtp%nidx_global_rtp(1) = 2
       sph%sph_rtp%nidx_global_rtp(2) = 2

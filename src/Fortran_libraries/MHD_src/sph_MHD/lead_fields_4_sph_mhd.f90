@@ -89,7 +89,7 @@
       use cal_buoyancies_sph_MHD
       use copy_MHD_4_sph_trans
       use cal_energy_flux_rtp
-      use swap_phi_4_sph_trans
+      use swap_phi_order_4_sph_trans
 !
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
@@ -115,13 +115,40 @@
      &      trans_p%leg, sph_MHD_mat%band_p_poisson, ipol, rj_fld)
       end if
 !
+      call lead_fields_by_sph_trans                                     &
+     &   (sph, comms_sph, MHD_prop, trans_p, ipol, WK, rj_fld)
 !
-      call swap_phi_from_trans(WK%trns_MHD%ncomp_rj_2_rtp,              &
-     &    sph%sph_rtp%nnod_rtp, sph%sph_rtp%nidx_rtp,                   &
-     &    WK%trns_MHD%fld_rtp)
-      call swap_phi_from_trans(WK%trns_MHD%ncomp_rtp_2_rj,              &
-     &    sph%sph_rtp%nnod_rtp, sph%sph_rtp%nidx_rtp,                   &
-     &    WK%trns_MHD%frc_rtp)
+      call gradients_of_vectors_sph                                     &
+     &   (sph, comms_sph, r_2nd, sph_MHD_bc, trans_p,                   &
+     &    ipol, WK%trns_MHD, WK%trns_tmp, WK%WK_sph, rj_fld)
+      call enegy_fluxes_4_sph_mhd                                       &
+     &   (sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc, trans_p, ipol,   &
+     &    WK%trns_MHD, WK%trns_snap, WK%WK_sph, rj_fld)
+!
+      end subroutine s_lead_fields_4_sph_mhd
+!
+! ----------------------------------------------------------------------
+!
+      subroutine lead_fields_by_sph_trans                               &
+     &         (sph, comms_sph, MHD_prop, trans_p, ipol, WK, rj_fld)
+!
+      use sph_transforms_4_MHD
+      use cal_buoyancies_sph_MHD
+      use copy_MHD_4_sph_trans
+      use cal_energy_flux_rtp
+      use swap_phi_order_4_sph_trans
+!
+      type(sph_grids), intent(in) :: sph
+      type(sph_comm_tables), intent(in) :: comms_sph
+      type(MHD_evolution_param), intent(in) :: MHD_prop
+      type(parameters_4_sph_trans), intent(in) :: trans_p
+      type(phys_address), intent(in) :: ipol
+!
+      type(works_4_sph_trans_MHD), intent(inout) :: WK
+      type(phys_data), intent(inout) :: rj_fld
+!
+!
+      call swap_phi_from_MHD_trans(sph%sph_rtp, WK%trns_MHD)
 !
       if    (sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_pole     &
      &  .or. sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_center)  &
@@ -139,14 +166,7 @@
      &      WK%trns_MHD%fld_pole, WK%trns_MHD%frc_pole)
       end if
 !
-      call gradients_of_vectors_sph                                     &
-     &   (sph, comms_sph, r_2nd, sph_MHD_bc, trans_p,                   &
-     &    ipol, WK%trns_MHD, WK%trns_tmp, WK%WK_sph, rj_fld)
-      call enegy_fluxes_4_sph_mhd                                       &
-     &   (sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc, trans_p, ipol,   &
-     &    WK%trns_MHD, WK%trns_snap, WK%WK_sph, rj_fld)
-!
-      end subroutine s_lead_fields_4_sph_mhd
+      end subroutine lead_fields_by_sph_trans
 !
 ! ----------------------------------------------------------------------
 !

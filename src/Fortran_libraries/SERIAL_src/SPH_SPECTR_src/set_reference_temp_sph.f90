@@ -130,8 +130,6 @@
      &         nidx_rj, r_ICB, r_CMB, kr_ICB, kr_CMB, r_1d_rj,          &
      &         reftemp_rj)
 !
-      use m_physical_property
-!
       real  (kind=kreal), intent(in) :: stratified_sigma
       real  (kind=kreal), intent(in) :: stratified_width
       real  (kind=kreal), intent(in) :: stratified_outer_r

@@ -8,9 +8,9 @@
 !!
 !!@verbatim
 !!      subroutine s_set_control_4_SPH_to_FEM                           &
-!!     &         (spctl, sph_params, rj_fld, nod_fld)
+!!     &         (spctl, sph, rj_fld, nod_fld)
 !!        type(sphere_data_control), intent(in) :: spctl
-!!        type(sph_shell_parameters), intent(inout) :: sph_params
+!!        type(sph_grids), intent(inout) :: sph
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(phys_data), intent(inout) :: nod_fld
 !!      subroutine sph_boundary_IO_control(MHD_prop, MHD_BC, bc_IO)
@@ -42,7 +42,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine s_set_control_4_SPH_to_FEM                             &
-     &         (spctl, sph_params, rj_fld, nod_fld)
+     &         (spctl, sph, rj_fld, nod_fld)
 !
       use t_ctl_data_MHD
       use t_ctl_data_4_sphere_model
@@ -52,12 +52,12 @@
       use set_controls_4_sph_shell
 !
       type(sphere_data_control), intent(in) :: spctl
-      type(sph_shell_parameters), intent(inout) :: sph_params
+      type(sph_grids), intent(inout) :: sph
       type(phys_data), intent(inout) :: rj_fld
       type(phys_data), intent(inout) :: nod_fld
 !
 !
-      call set_FEM_mesh_mode_4_SPH(spctl, sph_params%iflag_shell_mode)
+      call set_FEM_mesh_mode_4_SPH(spctl, sph%sph_params)
 !
       if (iflag_debug .ge. iflag_routine_msg)                           &
      &     write(*,*) 'copy_rj_spec_name_to_nod_fld'

@@ -163,16 +163,16 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_alloc_sph_rst_4_snap(i_step, rj_file_param,       &
-     &          fst_file_IO, sph_rj, ipol, rj_fld, rst_step, time_d)
+     &          fst_file_IO, sph, ipol, rj_fld, rst_step, time_d)
 !
-      use t_spheric_rj_data
+      use t_spheric_parameter
       use set_sph_restart_IO
       use r_interpolate_sph_data
 !
       integer(kind = kint), intent(in) :: i_step
       type(field_IO_params), intent(in) :: rj_file_param
       type(field_IO_params), intent(in) :: fst_file_IO
-      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(sph_grids), intent(in) ::  sph
       type(phys_address), intent(in) :: ipol
 !
       type(phys_data), intent(inout) :: rj_fld
@@ -193,7 +193,7 @@
         if (iflag_debug.gt.0)                                           &
      &            write(*,*) 'r_interpolate_sph_rst_from_IO'
         call r_interpolate_sph_rst_from_IO                              &
-     &     (sph_fst_IO, sph_rj, ipol, rj_fld)
+     &     (sph_fst_IO, sph%sph_rj, ipol, rj_fld)
       end if
 !
       call dealloc_phys_data_IO(sph_fst_IO)
