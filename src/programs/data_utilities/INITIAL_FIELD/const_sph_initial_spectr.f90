@@ -8,13 +8,14 @@
 !!
 !!@verbatim
 !!      subroutine sph_initial_spectrum                                 &
-!!     &         (fst_file_IO, sph_MHD_bc, SPH_MHD, rst_step)
+!!     &        (fst_file_IO, sph_MHD_bc, SPH_MHD, rst_step, sph_fst_IO)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(field_IO_params), intent(in) :: fst_file_IO
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(phys_address), intent(in) :: ipol, itor
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(IO_step_param), intent(inout) :: rst_step
+!!        type(field_IO), intent(inout) :: sph_fst_IO
 !!
 !!       Sample program to generate initial field
 !!       This program generates initial condition
@@ -98,6 +99,7 @@
       use t_SPH_mesh_field_data
       use t_file_IO_parameter
       use t_boundary_data_sph_MHD
+      use t_field_data_IO
 !
       implicit none
 !
@@ -125,7 +127,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine sph_initial_spectrum                                   &
-     &         (fst_file_IO, sph_MHD_bc, SPH_MHD, rst_step)
+     &        (fst_file_IO, sph_MHD_bc, SPH_MHD, rst_step, sph_fst_IO)
 !
       use m_initial_field_control
       use m_MHD_step_parameter
@@ -138,6 +140,7 @@
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(IO_step_param), intent(inout) :: rst_step
+      type(field_IO), intent(inout) :: sph_fst_IO
 !
       integer(kind = kint) :: iflag
 !
@@ -169,7 +172,7 @@
 !
 !  Copy initial field to restart IO data
       call copy_time_step_data(MHD_step1%init_d, MHD_step1%time_d)
-      call init_output_sph_restart_file(SPH_MHD%fld)
+      call set_sph_restart_num_to_IO(SPH_MHD%fld, sph_fst_IO)
 !
 !
       if(MHD_step1%init_d%i_time_step .eq. -1) then
@@ -177,8 +180,8 @@
       else
         iflag = set_IO_step_flag(MHD_step1%time_d%i_time_step,rst_step)
       end if
-      call output_sph_restart_control                                   &
-     &   (fst_file_IO, MHD_step1%time_d, SPH_MHD%fld, rst_step)
+      call output_sph_restart_control(fst_file_IO, MHD_step1%time_d,    &
+     &    SPH_MHD%fld, rst_step, sph_fst_IO)
 !
       end subroutine sph_initial_spectrum
 !

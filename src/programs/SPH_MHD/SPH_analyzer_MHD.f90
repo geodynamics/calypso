@@ -8,19 +8,21 @@
 !!
 !!@verbatim
 !!      subroutine SPH_initialize_MHD(MHD_files, SPH_model,             &
-!!     &          iphys, MHD_step, SPH_MHD)
+!!     &          iphys, MHD_step, sph_fst_IO, SPH_MHD)
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(phys_address), intent(in) :: iphys
 !!        type(SPH_MHD_model_data), intent(inout) :: SPH_model
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!        type(work_SPH_MHD), intent(inout) :: SPH_WK
+!!        type(field_IO), intent(inout) :: sph_fst_IO
 !!      subroutine SPH_analyze_MHD(i_step, MHD_files, SPH_model,        &
-!!     &          iflag_finish, MHD_step, SPH_MHD, SPH_WK)
+!!     &          iflag_finish, MHD_step, sph_fst_IO, SPH_MHD, SPH_WK)
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!        type(work_SPH_MHD), intent(inout) :: SPH_WK
+!!        type(field_IO), intent(inout) :: sph_fst_IO
 !!@endverbatim
 !
       module SPH_analyzer_MHD
@@ -35,6 +37,7 @@
       use t_SPH_mesh_field_data
       use t_boundary_data_sph_MHD
       use t_work_SPH_MHD
+      use t_field_data_IO
 !
       implicit none
 !
@@ -45,7 +48,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine SPH_initialize_MHD(MHD_files, SPH_model,               &
-     &          iphys, MHD_step, SPH_MHD, SPH_WK)
+     &          iphys, MHD_step, sph_fst_IO, SPH_MHD, SPH_WK)
 !
       use calypso_mpi
       use m_machine_parameter
@@ -77,6 +80,7 @@
       type(MHD_step_param), intent(inout) :: MHD_step
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(work_SPH_MHD), intent(inout) :: SPH_WK
+      type(field_IO), intent(inout) :: sph_fst_IO
 !
 !
 !   Allocate spectr field data
@@ -100,7 +104,7 @@
 !
       if(iflag_debug.gt.0) write(*,*)' sph_initial_data_control'
       call sph_initial_data_control                                     &
-     &   (MHD_files, SPH_model, SPH_MHD, MHD_step)
+     &   (MHD_files, SPH_model, SPH_MHD, MHD_step, sph_fst_IO)
       MHD_step%iflag_initial_step = 0
 !
       if(iflag_debug.gt.0) write(*,*)' sync_temp_by_per_temp_sph'
@@ -143,7 +147,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine SPH_analyze_MHD(i_step, MHD_files, SPH_model,          &
-     &          iflag_finish, MHD_step, SPH_MHD, SPH_WK)
+     &          iflag_finish, MHD_step, sph_fst_IO, SPH_MHD, SPH_WK)
 !
       use m_work_time
 !
@@ -163,6 +167,7 @@
       type(MHD_step_param), intent(inout) :: MHD_step
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(work_SPH_MHD), intent(inout) :: SPH_WK
+      type(field_IO), intent(inout) :: sph_fst_IO
 !
       integer(kind = kint) :: iflag
       real(kind = kreal) :: total_max
@@ -222,7 +227,7 @@
       if(iflag .eq. 0) then
         if(iflag_debug.gt.0) write(*,*) 'output_sph_restart_control'
         call output_sph_restart_control(MHD_files%fst_file_IO,          &
-     &     MHD_step%time_d, SPH_MHD%fld, MHD_step%rst_step)
+     &     MHD_step%time_d, SPH_MHD%fld, MHD_step%rst_step, sph_fst_IO)
       end if
 !
       total_time = MPI_WTIME() - total_start
@@ -233,7 +238,7 @@
         MHD_step%rst_step%istep_file = MHD_step%finish_d%i_end_step
         iflag_finish = 1
         call output_sph_restart_control(MHD_files%fst_file_IO,          &
-     &     MHD_step%time_d, SPH_MHD%fld, MHD_step%rst_step)
+     &     MHD_step%time_d, SPH_MHD%fld, MHD_step%rst_step, sph_fst_IO)
       end if
       call end_elapsed_time(10)
 !

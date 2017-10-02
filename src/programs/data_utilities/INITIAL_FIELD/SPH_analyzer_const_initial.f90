@@ -26,8 +26,11 @@
       use m_MHD_step_parameter
       use t_MHD_file_parameter
       use t_SPH_mesh_field_data
+      use t_field_data_IO
 !
       implicit none
+!
+      type(field_IO), save, private :: rst_IO1
 !
       private :: SPH_const_initial_field
 !
@@ -113,7 +116,7 @@
 !
       if(iflag_debug.gt.0) write(*,*)' sph_initial_spectrum'
       call sph_initial_spectrum(MHD_files1%fst_file_IO,                 &
-     &    SPH_model%sph_MHD_bc, SPH_MHD, MHD_step1%rst_step)
+     &    SPH_model%sph_MHD_bc, SPH_MHD, MHD_step1%rst_step, rst_IO1)
 !
       end subroutine SPH_const_initial_field
 !

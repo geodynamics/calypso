@@ -8,14 +8,15 @@
 !>@brief  I/O routines for restart data
 !!
 !!@verbatim
-!!      subroutine init_output_sph_restart_file(rj_fld)
 !!      subroutine output_sph_restart_control                           &
-!!     &         (fst_file_IO, time_d, rj_fld, rst_step)
+!!     &         (fst_file_IO, time_d, rj_fld, rst_step, sph_fst_IO)
 !!        type(field_IO_params), intent(in) :: fst_file_IO
 !!        type(phys_data), intent(in) :: rj_fld
 !!        type(IO_step_param), intent(in) :: rst_step
+!!        type(field_IO), intent(inout) :: sph_fst_IO
 !!
-!!      subroutine read_alloc_sph_restart_data(init_d, rj_fld, rst_step)
+!!      subroutine read_alloc_sph_restart_data                          &
+!!     &         (fst_file_IO, init_d, rj_fld, rst_step, sph_fst_IO)
 !!        type(time_data), intent(inout) :: init_d
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(IO_step_param), intent(inout) :: rst_step
@@ -53,6 +54,7 @@
       use t_phys_data
       use t_MHD_file_parameter
       use t_file_IO_parameter
+      use t_field_data_IO
       use t_time_data
 !
       use field_IO_select
@@ -61,8 +63,6 @@
 !
 !
       type(time_data), save, private :: sph_time_IO
-      type(field_IO), save, private :: sph_fst_IO
-      type(field_IO), save, private :: sph_out_IO
 !
 ! -----------------------------------------------------------------------
 !
@@ -70,22 +70,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_output_sph_restart_file(rj_fld)
-!
-      use m_initial_field_control
-      use set_sph_restart_IO
-!
-      type(phys_data), intent(in) :: rj_fld
-!
-!
-      call set_sph_restart_num_to_IO(rj_fld, sph_fst_IO)
-!
-      end subroutine init_output_sph_restart_file
-!
-! -----------------------------------------------------------------------
-!
       subroutine output_sph_restart_control                             &
-     &         (fst_file_IO, time_d, rj_fld, rst_step)
+     &         (fst_file_IO, time_d, rj_fld, rst_step, sph_fst_IO)
 !
       use set_sph_restart_IO
 !
@@ -93,6 +79,8 @@
       type(time_data), intent(in) :: time_d
       type(phys_data), intent(in) :: rj_fld
       type(IO_step_param), intent(in) :: rst_step
+!
+      type(field_IO), intent(inout) :: sph_fst_IO
 !
 !
       call copy_time_step_size_data(time_d, sph_time_IO)
@@ -107,7 +95,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_alloc_sph_restart_data                            &
-     &         (fst_file_IO, init_d, rj_fld, rst_step)
+     &         (fst_file_IO, init_d, rj_fld, rst_step, sph_fst_IO)
 !
       use set_sph_restart_IO
 !
@@ -116,6 +104,7 @@
       type(time_data), intent(inout) :: init_d
       type(phys_data), intent(inout) :: rj_fld
       type(IO_step_param), intent(inout) :: rst_step
+      type(field_IO), intent(inout) :: sph_fst_IO
 !
 !
       if (init_d%i_time_step .eq. -1) then
@@ -179,6 +168,8 @@
       type(IO_step_param), intent(inout) :: rst_step
       type(time_data), intent(inout) :: time_d
 !
+      type(field_IO) :: sph_fst_IO
+!
 !
       rst_step%istep_file = i_step / rst_step%increment
       call sel_read_alloc_step_SPH_file(nprocs, my_rank,                &
@@ -214,6 +205,8 @@
       type(field_IO_params), intent(in) :: sph_file_param
       integer(kind = kint), intent(in) :: i_step
       type(IO_step_param), intent(inout) :: ucd_step
+!
+      type(field_IO) :: sph_out_IO
 !
 !
       if(sph_file_param%iflag_IO .eq. 0) return
@@ -259,6 +252,8 @@
       type(phys_data), intent(inout) :: rj_fld
       type(IO_step_param), intent(inout) :: ucd_step
 !
+      type(field_IO) :: sph_out_IO
+!
 !
       ucd_step%istep_file = i_step / ucd_step%increment
       call sel_read_alloc_step_SPH_file(nprocs, my_rank,                &
@@ -276,7 +271,7 @@
      &    (sph_out_IO, sph_rj, ipol, rj_fld)
       end if
 !
-      call dealloc_merged_field_stack(sph_out_IO)
+!      call dealloc_merged_field_stack(sph_out_IO)
       call dealloc_phys_data_IO(sph_out_IO)
       call dealloc_phys_name_IO(sph_out_IO)
 !
