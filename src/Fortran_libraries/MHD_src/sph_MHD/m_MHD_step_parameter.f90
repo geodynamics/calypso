@@ -15,11 +15,8 @@
       use t_MHD_IO_data
       use t_MHD_step_parameter
       use t_MHD_file_parameter
-      use t_ucd_file
-      use t_cal_max_indices
 !
       implicit  none
-!
 !
 !
       type(MHD_step_param), save :: MHD_step1
