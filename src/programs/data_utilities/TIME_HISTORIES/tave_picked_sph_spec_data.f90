@@ -36,7 +36,8 @@
       write(*,*) 'Input start and end time'
       read(5,*) start_time, end_time
 !
-      call open_sph_spec_read(id_pick, evo_header, pick)
+      pick%file_prefix = evo_header
+      call open_sph_spec_read(id_pick, pick)
 !
       num = pick%num_sph_mode * pick%num_layer
       allocate( prev_spec(pick%ntot_comp_rj,num) )
@@ -94,7 +95,8 @@
 !
 !       Evaluate standard deviation
 !
-      call open_sph_spec_read(id_pick, evo_header, pick)
+      pick%file_prefix = evo_header
+      call open_sph_spec_read(id_pick, pick)
 !
       icou = 0
       do
@@ -147,8 +149,8 @@
         end do
       end do
 !
-      call write_sph_spec_monitor                                       &
-     &   (tave_header, izero, i_step, time, pick)
+      pick%file_prefix = tave_header
+      call write_sph_spec_monitor(izero, i_step, time, pick)
 !
 !    output standard deviation
 !
@@ -158,8 +160,8 @@
         end do
       end do
 !
-      call write_sph_spec_monitor                                       &
-     &   (sdev_header, izero, i_step, time, pick)
+      pick%file_prefix = sdev_header
+      call write_sph_spec_monitor(izero, i_step, time, pick)
 !
       call dealloc_pick_sph_monitor(pick)
       call dealloc_num_pick_layer(pick)

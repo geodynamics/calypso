@@ -47,8 +47,7 @@
       use t_spheric_parameter
       use t_mesh_data
       use t_phys_data
-      use t_spheric_mesh
-      use t_group_data
+      use t_spheric_group
       use t_rms_4_sph_spectr
       use t_file_IO_parameter
       use t_sph_trans_arrays_MHD

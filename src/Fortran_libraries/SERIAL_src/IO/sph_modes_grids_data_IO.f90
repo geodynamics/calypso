@@ -37,7 +37,7 @@
 !
       use t_comm_table
       use t_node_id_spherical_IO
-      use t_spheric_mesh
+      use t_spheric_group
       use domain_data_IO
       use spherical_model_IO
       use sph_global_1d_idx_IO

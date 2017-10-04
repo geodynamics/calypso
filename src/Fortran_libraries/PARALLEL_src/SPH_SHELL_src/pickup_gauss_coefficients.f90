@@ -9,7 +9,8 @@
 !!
 !!@verbatim
 !!      subroutine init_gauss_coefs_4_monitor                           &
-!!     &          (l_truncation, sph_rj, ipol, gauss_list, gauss_coef)
+!!     &          (sph_params, sph_rj, ipol, gauss_list, gauss_coef)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(phys_address), intent(in) :: ipol
 !!      subroutine cal_gauss_coefficients                               &
@@ -42,13 +43,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine init_gauss_coefs_4_monitor                             &
-     &          (l_truncation, sph_rj, ipol, gauss_list, gauss_coef)
+     &          (sph_params, sph_rj, ipol, gauss_list, gauss_coef)
 !
-      use t_spheric_rj_data
+      use t_spheric_parameter
       use t_pickup_sph_spectr_data
       use m_phys_labels
 !
-      integer(kind = kint), intent(in) :: l_truncation
+      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(phys_address), intent(in) :: ipol
 !
@@ -63,15 +64,15 @@
 !
       if (ipol%i_magne .gt. 0) then
         if(gauss_list%num_degree .eq. -9999) then
-          gauss_list%num_degree = l_truncation+1
+          gauss_list%num_degree = sph_params%l_truncation + 1
           call alloc_pick_sph_l(gauss_list)
-          do l = 0, l_truncation
+          do l = 0, sph_params%l_truncation
             gauss_list%idx_pick_l(l+1) = l
           end do
         end if
 !
         call const_picked_sph_address                                   &
-     &    (l_truncation, sph_rj, gauss_list, gauss_coef)
+     &    (sph_params%l_truncation, sph_rj, gauss_list, gauss_coef)
 !
       else
         gauss_coef%num_sph_mode = 0

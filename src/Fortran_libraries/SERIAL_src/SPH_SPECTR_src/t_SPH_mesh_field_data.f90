@@ -45,14 +45,25 @@
 !
       use m_precision
       use m_spheric_constants
-      use t_spheric_mesh
       use t_spheric_parameter
       use t_sph_trans_comm_tbl
+      use t_spheric_group
       use t_phys_address
       use t_phys_data
 !
       implicit none
 !
+!
+!
+!> Structure of spherical transform mesh information
+      type sph_mesh_data
+!>         spherical harmonics indexing data
+        type(sph_grids) ::       sph
+!>         communication tables for spherical transform
+        type(sph_comm_tables) :: sph_comms
+!>         grouping data for harmonics indices
+        type(sph_group_data) ::  sph_grps
+      end type sph_mesh_data
 !
 !
 !>      Structure of spetr grid and data

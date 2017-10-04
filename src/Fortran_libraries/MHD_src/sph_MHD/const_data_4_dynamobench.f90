@@ -79,8 +79,7 @@
       pwr%v_spectr(1)%kr_inside =  sph_params%nlayer_ICB
       pwr%v_spectr(1)%kr_outside = sph_params%nlayer_CMB
       call cal_mean_squre_in_shell                                      &
-     &   (sph_params%l_truncation, sph_rj, ipol, rj_fld, leg%g_sph_rj,  &
-     &    pwr, WK_pwr)
+     &   (sph_params, sph_rj, ipol, rj_fld, leg%g_sph_rj, pwr, WK_pwr)
       if(my_rank .eq. 0) then
         call copy_energy_4_dynamobench                                  &
      &     (pwr, bench%KE_bench, bench%ME_bench)
@@ -97,8 +96,7 @@
         pwr%v_spectr(1)%kr_inside =  izero
         pwr%v_spectr(1)%kr_outside = sph_params%nlayer_ICB
         call cal_mean_squre_in_shell                                    &
-     &     (sph_params%l_truncation, sph_rj, ipol, rj_fld,              &
-     &      leg%g_sph_rj, pwr, WK_pwr)
+     &    (sph_params, sph_rj, ipol, rj_fld, leg%g_sph_rj, pwr, WK_pwr)
         if(my_rank .eq. 0) then
           call copy_icore_energy_4_dbench(pwr, bench%mene_icore)
         end if

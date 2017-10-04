@@ -37,7 +37,6 @@
       use t_SPH_MHD_model_data
       use t_SPH_mesh_field_data
       use t_FEM_mesh_field_data
-      use t_spheric_mesh
       use t_rms_4_sph_spectr
       use t_file_IO_parameter
       use t_sph_trans_arrays_MHD

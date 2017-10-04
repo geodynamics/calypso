@@ -33,8 +33,8 @@
       use m_constants
       use calypso_mpi
 !
-      use t_spheric_mesh
       use t_sph_spectr_data
+      use t_SPH_mesh_field_data
 !
       implicit none
 !
@@ -47,8 +47,6 @@
 !
       subroutine share_org_sph_rj_data                                  &
      &         (org_sph_head, np_sph_org, org_sph_mesh)
-!
-      use t_spheric_rj_data
 !
       use new_SPH_restart
       use sph_file_MPI_IO_select

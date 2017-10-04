@@ -40,7 +40,7 @@
 !
       use t_comm_table
       use t_node_id_spherical_IO
-      use t_spheric_mesh
+      use t_spheric_group
       use t_calypso_mpi_IO_param
       use gz_MPI_ascii_data_IO
       use gz_MPI_domain_data_IO

@@ -33,7 +33,6 @@
 !
       use t_spheric_parameter
       use t_sph_trans_comm_tbl
-      use t_spheric_mesh
 !
       implicit none
 !

@@ -37,7 +37,6 @@
 !
       use t_SPH_MHD_model_data
       use t_SPH_mesh_field_data
-      use t_spheric_mesh
       use t_fdm_coefs
       use t_boundary_data_sph_MHD
       use t_sph_boundary_input_data

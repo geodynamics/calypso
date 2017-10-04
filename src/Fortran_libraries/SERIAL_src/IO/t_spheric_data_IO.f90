@@ -15,10 +15,9 @@
 !
       use m_precision
 !
-      use t_spheric_mesh
       use t_spheric_parameter
       use t_sph_trans_comm_tbl
-      use t_group_data
+      use t_spheric_group
       use t_node_id_spherical_IO
       use t_comm_table
 !

@@ -255,12 +255,10 @@
       call set_ctl_params_sph_spectr(smonitor_ctl, monitor%pwr)
 !
       call set_ctl_params_pick_sph                                      &
-     &   (smonitor_ctl%pspec_ctl, monitor%pickup_sph_head,              &
-     &    monitor%pick_list, monitor%pick_coef)
+     &   (smonitor_ctl%pspec_ctl, monitor%pick_list, monitor%pick_coef)
 !
       call set_ctl_params_pick_gauss                                    &
-     &   (smonitor_ctl%g_pwr, monitor%gauss_coefs_file_head,            &
-     &    monitor%gauss_list, monitor%gauss_coef)
+     &   (smonitor_ctl%g_pwr, monitor%gauss_list, monitor%gauss_coef)
 !
       call set_ctl_params_no_heat_Nu(smonitor_ctl%Nusselt_file_prefix,  &
      &    rj_fld, monitor%Nusselt)

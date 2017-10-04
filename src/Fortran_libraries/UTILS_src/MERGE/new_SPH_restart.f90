@@ -45,14 +45,10 @@
 !
       use calypso_mpi
       use t_time_data
-      use t_spheric_mesh
-      use t_sph_spectr_data
+      use t_SPH_mesh_field_data
       use t_file_IO_parameter
       use t_time_data
       use t_field_data_IO
-      use t_spheric_parameter
-      use t_sph_trans_comm_tbl
-      use t_group_data
 !
       implicit none
 !

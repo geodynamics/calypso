@@ -159,7 +159,6 @@
      &         (rj_file_param, l_truncation, sph_rj)
 !
       use t_file_IO_parameter
-      use t_spheric_mesh
       use t_spheric_data_IO
       use sph_file_MPI_IO_select
       use radial_interpolation
@@ -330,7 +329,7 @@
       use m_error_IDs
       use t_node_id_spherical_IO
       use t_comm_table
-      use t_spheric_mesh
+      use t_spheric_group
 !
       integer(kind = kint), intent(in) :: l_truncation
       type(sph_rj_grid), intent(in) ::  sph_rj

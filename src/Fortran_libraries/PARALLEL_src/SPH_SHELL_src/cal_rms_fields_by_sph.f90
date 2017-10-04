@@ -9,9 +9,9 @@
 !!@verbatim
 !!      subroutine init_rms_4_sph_spectr                                &
 !!     &         (sph_params, sph_rj, rj_fld, pwr, WK_pwr)
-!!      subroutine cal_mean_squre_in_shell(l_truncation,                &
+!!      subroutine cal_mean_squre_in_shell(sph_params,                  &
 !!     &          sph_rj, ipol, rj_fld, g_sph_rj, pwr, WK_pwr)
-!!      subroutine cal_correlate_in_shell(l_truncation,                 &
+!!      subroutine cal_correlate_in_shell(sph_params,                   &
 !!     &          sph_rj, rj_fld1, rj_fld2, g_sph_rj, cor, WK_pwr)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(phys_data), intent(in) :: rj_fld
@@ -26,7 +26,6 @@
       use m_machine_parameter
 !
       use t_spheric_parameter
-      use t_spheric_rj_data
       use t_phys_data
       use t_phys_address
       use t_sum_sph_rms_data
@@ -34,7 +33,7 @@
 !
       implicit none
 !
-      private :: find_radial_grid_index
+      private :: find_radial_grid_index, global_sum_sph_layerd_rms
 !
 ! -----------------------------------------------------------------------
 !
@@ -157,7 +156,7 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_mean_squre_in_shell(l_truncation,                  &
+      subroutine cal_mean_squre_in_shell(sph_params,                    &
      &          sph_rj, ipol, rj_fld, g_sph_rj, pwr, WK_pwr)
 !
       use calypso_mpi
@@ -166,10 +165,10 @@
       use cal_ave_4_rms_vector_sph
       use sum_sph_rms_data
 !
+      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(phys_data), intent(in) :: rj_fld
       type(phys_address), intent(in) :: ipol
-      integer(kind = kint), intent(in) :: l_truncation
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
 !
       type(sph_mean_squares), intent(inout) :: pwr
@@ -183,15 +182,15 @@
       call calypso_mpi_barrier
       if(iflag_debug .gt. 0) write(*,*) 'sum_sph_layerd_rms'
       call sum_sph_layerd_rms                                           &
-     &   (l_truncation, sph_rj, ipol, g_sph_rj, rj_fld,                 &
+     &   (sph_params%l_truncation, sph_rj, ipol, g_sph_rj, rj_fld,      &
      &    pwr%nri_rms, pwr%num_fld_sq, pwr%istack_comp_sq,              &
      &    pwr%id_field, pwr%kr_4_rms, pwr%num_vol_spectr,               &
      &    pwr%v_spectr, WK_pwr)
 !
       if(iflag_debug .gt. 0) write(*,*) 'global_sum_sph_layerd_rms'
       call global_sum_sph_layerd_rms                                    &
-     &    (l_truncation, pwr%nri_rms, pwr%ntot_comp_sq, WK_pwr,         &
-     &     pwr%shl_l, pwr%shl_m, pwr%shl_lm,                            &
+     &    (sph_params%l_truncation, pwr%nri_rms, pwr%ntot_comp_sq,      &
+     &     WK_pwr, pwr%shl_l, pwr%shl_m, pwr%shl_lm,                    &
      &     pwr%shl_sq, pwr%shl_m0, pwr%ratio_shl_m0,                    &
      &     pwr%num_vol_spectr, pwr%v_spectr)
 !
@@ -199,12 +198,13 @@
       call calypso_mpi_barrier
       if(my_rank .eq. 0) then
         if(iflag_debug .gt. 0) write(*,*) 'surf_ave_4_sph_rms_int'
-        call surf_ave_4_sph_rms_int                                     &
-     &     (l_truncation, sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,        &
+        call surf_ave_4_sph_rms_int(sph_params%l_truncation,            &
+     &      sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,                      &
      &      pwr%nri_rms, pwr%ntot_comp_sq, pwr%kr_4_rms,                &
      &      pwr%shl_l, pwr%shl_m, pwr%shl_lm, pwr%shl_sq, pwr%shl_m0)
         do i = 1, pwr%num_vol_spectr
-          call vol_ave_4_rms_sph(l_truncation, pwr%ntot_comp_sq,        &
+          call vol_ave_4_rms_sph                                        &
+     &       (sph_params%l_truncation, pwr%ntot_comp_sq,                &
      &        pwr%v_spectr(i)%avol, pwr%v_spectr(i)%v_l,                &
      &        pwr%v_spectr(i)%v_m, pwr%v_spectr(i)%v_lm,                &
      &        pwr%v_spectr(i)%v_sq, pwr%v_spectr(i)%v_m0)
@@ -218,7 +218,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_correlate_in_shell(l_truncation,                   &
+      subroutine cal_correlate_in_shell(sph_params,                     &
      &          sph_rj, rj_fld1, rj_fld2, g_sph_rj, cor, WK_pwr)
 !
       use calypso_mpi
@@ -229,7 +229,7 @@
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(phys_data), intent(in) :: rj_fld1, rj_fld2
-      integer(kind = kint), intent(in) :: l_truncation
+      type(sph_shell_parameters), intent(in) :: sph_params
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
 !
       type(sph_mean_squares), intent(inout) :: cor
@@ -243,15 +243,15 @@
       call calypso_mpi_barrier
       if(iflag_debug .gt. 0) write(*,*) 'sum_sph_layerd_correlate'
       call sum_sph_layerd_correlate                                     &
-     &   (l_truncation, sph_rj, g_sph_rj, rj_fld1, rj_fld2,             &
+     &   (sph_params%l_truncation, sph_rj, g_sph_rj, rj_fld1, rj_fld2,  &
      &    cor%nri_rms, cor%num_fld_sq, cor%istack_comp_sq,              &
      &    cor%id_field, cor%kr_4_rms, cor%num_vol_spectr,               &
      &    cor%v_spectr, WK_pwr)
 !
       if(iflag_debug .gt. 0) write(*,*) 'global_sum_sph_layerd_rms'
       call global_sum_sph_layerd_rms                                    &
-     &    (l_truncation, cor%nri_rms, cor%ntot_comp_sq, WK_pwr,         &
-     &     cor%shl_l, cor%shl_m, cor%shl_lm,                            &
+     &    (sph_params%l_truncation, cor%nri_rms, cor%ntot_comp_sq,      &
+     &     WK_pwr, cor%shl_l, cor%shl_m, cor%shl_lm,                    &
      &     cor%shl_sq, cor%shl_m0, cor%ratio_shl_m0,                    &
      &     cor%num_vol_spectr, cor%v_spectr)
 !
@@ -259,12 +259,13 @@
       call calypso_mpi_barrier
       if(my_rank .eq. 0) then
         if(iflag_debug .gt. 0) write(*,*) 'surf_ave_4_sph_rms_int'
-        call surf_ave_4_sph_rms_int                                     &
-     &     (l_truncation, sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,        &
+        call surf_ave_4_sph_rms_int(sph_params%l_truncation,            &
+     &      sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,                      &
      &      cor%nri_rms, cor%ntot_comp_sq, cor%kr_4_rms,                &
      &      cor%shl_l, cor%shl_m, cor%shl_lm, cor%shl_sq, cor%shl_m0)
         do i = 1, cor%num_vol_spectr
-          call vol_ave_4_rms_sph(l_truncation, cor%ntot_comp_sq,        &
+          call vol_ave_4_rms_sph                                        &
+     &       (sph_params%l_truncation, cor%ntot_comp_sq,                &
      &        cor%v_spectr(i)%avol, cor%v_spectr(i)%v_l,                &
      &        cor%v_spectr(i)%v_m, cor%v_spectr(i)%v_lm,                &
      &        cor%v_spectr(i)%v_sq, cor%v_spectr(i)%v_m0)

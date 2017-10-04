@@ -7,10 +7,9 @@
 !>@brief  Data arrays to monitoring spectrum data
 !!
 !!@verbatim
-!!      subroutine write_sph_spec_monitor                               &
-!!     &         (file_prefix, my_rank, i_step, time, picked)
+!!      subroutine write_sph_spec_monitor(my_rank, i_step, time, picked)
 !!
-!!      subroutine open_sph_spec_read(id_pick, file_prefix, picked)
+!!      subroutine open_sph_spec_read(id_pick, picked)
 !!      subroutine read_sph_spec_monitor                                &
 !!     &         (id_pick, i_step, time, picked, ierr)
 !!@endverbatim
@@ -40,25 +39,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine open_sph_spec_4_monitor(file_prefix, picked)
+      subroutine open_sph_spec_4_monitor(picked)
 !
       use set_parallel_file_name
       use write_field_labels
 !
       type(picked_spectrum_data), intent(in) :: picked
-      character(len = kchara), intent(in) :: file_prefix
 !
-      character(len = kchara) :: pickup_sph_name
+      character(len = kchara) :: file_name
 !
 !
-      call add_dat_extension(file_prefix, pickup_sph_name)
-      open(id_pick_mode, file = pickup_sph_name, form='formatted',      &
+      call add_dat_extension(picked%file_prefix, file_name)
+      open(id_pick_mode, file = file_name, form='formatted',            &
      &    status='old', position='append', err = 99)
       return
 !
    99 continue
       close(id_pick_mode)
-      open(id_pick_mode, file = pickup_sph_name, form='formatted',      &
+      open(id_pick_mode, file = file_name, form='formatted',            &
      &    status='replace')
 !
       write(id_pick_mode,'(a)')    '#'
@@ -82,10 +80,8 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine write_sph_spec_monitor                                 &
-     &         (file_prefix, my_rank, i_step, time, picked)
+      subroutine write_sph_spec_monitor(my_rank, i_step, time, picked)
 !
-      character(len = kchara), intent(in) :: file_prefix
       integer(kind = kint), intent(in) :: my_rank
       integer(kind = kint), intent(in) :: i_step
       real(kind = kreal), intent(in) :: time
@@ -98,7 +94,7 @@
       if(picked%num_sph_mode .eq. izero) return
       if(my_rank .gt. izero) return
 !
-      call open_sph_spec_4_monitor(file_prefix, picked)
+      call open_sph_spec_4_monitor(picked)
 !
       do inum = 1, picked%num_sph_mode
         do knum = 1, picked%num_layer
@@ -123,24 +119,23 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine open_sph_spec_read(id_pick, file_prefix, picked)
+      subroutine open_sph_spec_read(id_pick, picked)
 !
       use set_parallel_file_name
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_pick
-      character(len = kchara), intent(in) :: file_prefix
       type(picked_spectrum_data), intent(inout) :: picked
 !
 !
       integer(kind = kint) :: i
 !
-      character(len = kchara) :: pickup_sph_name
+      character(len = kchara) :: file_name
       character(len=255) :: tmpchara
 !
 !
-      call add_dat_extension(file_prefix, pickup_sph_name)
-      open(id_pick, file = pickup_sph_name)
+      call add_dat_extension(picked%file_prefix, file_name)
+      open(id_pick, file = file_name)
 !
       call skip_comment(tmpchara,id_pick)
       read(tmpchara,*) picked%num_layer, picked%num_sph_mode

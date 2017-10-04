@@ -13,7 +13,7 @@
       use m_constants
       use m_machine_parameter
 !
-      use t_spheric_mesh
+      use t_SPH_mesh_field_data
       use t_spheric_parameter
       use t_sph_trans_comm_tbl
       use t_file_IO_parameter
@@ -34,12 +34,12 @@
 !>      Structure for file settings
       type(sph_mesh_generation_ctl), save :: SPH_TEST_ctl
 !
-      type(sph_mesh_data), save :: sph_mesh_t
+      type(SPH_mesh_field_data), save :: SPH_TEST
 !
       type(gen_sph_file_IO_params), save ::  test_sph_files
 !
       private :: control_file_name, SPH_TEST_ctl
-      private :: check_header, sph_mesh_t
+      private :: check_header, SPH_TEST
 !
 ! ----------------------------------------------------------------------
 !
@@ -72,7 +72,7 @@
 !
       if (iflag_debug.gt.0) write(*,*) 'load_para_sph_mesh'
       call load_para_sph_mesh                                           &
-     &   (sph_mesh_t%sph, sph_mesh_t%sph_comms, sph_mesh_t%sph_grps)
+     &   (SPH_TEST%sph, SPH_TEST%comms, SPH_TEST%groups)
 !
        end subroutine init_test_sph
 !
@@ -93,15 +93,11 @@
 !
 !
       call allocate_idx_sph_recieve                                     &
-     &   (sph_mesh_t%sph%sph_rtp%nnod_rtp,                              &
-     &    sph_mesh_t%sph%sph_rtm%nnod_rtm,                              &
-     &    sph_mesh_t%sph%sph_rlm%nnod_rlm,                              &
-     &    sph_mesh_t%sph%sph_rj%nnod_rj)
-      call allocate_real_sph_test                                       &
-     &   (NB, sph_mesh_t%sph%sph_rtp%nnod_rtp,                          &
-     &        sph_mesh_t%sph%sph_rtm%nnod_rtm,                          &
-     &        sph_mesh_t%sph%sph_rlm%nnod_rlm,                          &
-     &        sph_mesh_t%sph%sph_rj%nnod_rj)
+     &   (SPH_TEST%sph%sph_rtp%nnod_rtp, SPH_TEST%sph%sph_rtm%nnod_rtm, &
+     &    SPH_TEST%sph%sph_rlm%nnod_rlm, SPH_TEST%sph%sph_rj%nnod_rj)
+      call allocate_real_sph_test(NB,                                   &
+     &    SPH_TEST%sph%sph_rtp%nnod_rtp, SPH_TEST%sph%sph_rtm%nnod_rtm, &
+     &    SPH_TEST%sph%sph_rlm%nnod_rlm, SPH_TEST%sph%sph_rj%nnod_rj)
 !
       call add_int_suffix(my_rank, check_header, fname_tmp)
       call add_dat_extension(fname_tmp, file_name)
@@ -117,30 +113,30 @@
        end if
 !
         call sph_type_indices_transfer                                  &
-     &     (itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
-        call check_missing_sph_indices(id_check, sph_mesh_t%sph)
-        call compare_transfer_sph_indices(id_check, sph_mesh_t%sph)
+     &     (itype, SPH_TEST%sph, SPH_TEST%comms)
+        call check_missing_sph_indices(id_check, SPH_TEST%sph)
+        call compare_transfer_sph_indices(id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_N                                        &
-     &     (NB, itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
-        call compare_transfer_sph_reals(NB, id_check, sph_mesh_t%sph)
+     &     (NB, itype, SPH_TEST%sph, SPH_TEST%comms)
+        call compare_transfer_sph_reals(NB, id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_6                                        &
-     &     (itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
-        call compare_transfer_sph_reals(isix, id_check, sph_mesh_t%sph)
+     &     (itype, SPH_TEST%sph, SPH_TEST%comms)
+        call compare_transfer_sph_reals(isix, id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_3                                        &
-     &     (itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
+     &     (itype, SPH_TEST%sph, SPH_TEST%comms)
         call compare_transfer_sph_reals                                 &
-     &     (ithree, id_check, sph_mesh_t%sph)
+     &     (ithree, id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_2                                        &
-     &     (itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
-        call compare_transfer_sph_reals(itwo, id_check, sph_mesh_t%sph)
+     &     (itype, SPH_TEST%sph, SPH_TEST%comms)
+        call compare_transfer_sph_reals(itwo, id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_1                                        &
-     &     (itype, sph_mesh_t%sph, sph_mesh_t%sph_comms)
-        call compare_transfer_sph_reals(ione, id_check, sph_mesh_t%sph)
+     &     (itype, SPH_TEST%sph, SPH_TEST%comms)
+        call compare_transfer_sph_reals(ione, id_check, SPH_TEST%sph)
       end do
 !
       close(id_check)

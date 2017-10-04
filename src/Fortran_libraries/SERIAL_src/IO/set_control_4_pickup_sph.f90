@@ -15,16 +15,15 @@
 !!        type(layerd_spectr_control), intent(inout) :: lp_ctl
 !!        type(sph_mean_squares), intent(inout) :: pwr
 !!      subroutine set_ctl_params_pick_sph                              &
-!!     &         (pspec_ctl, pickup_sph_head, pick_list, picked_sph)
+!!     &         (pspec_ctl, pick_list, picked_sph)
 !!        type(pick_spectr_control), intent(inout) :: pspec_ctl
 !!        type(pickup_mode_list), intent(inout) :: pick_list
 !!        type(picked_spectrum_data), intent(inout) :: picked_sph
 !!      subroutine set_ctl_params_pick_gauss                            &
-!!     &         (g_pwr, gauss_coefs_file_head, gauss_list, gauss_coef)
+!!     &         (g_pwr, gauss_list, gauss_coef)
 !!        type(gauss_spectr_control), intent(inout) :: g_pwr
 !!        type(pickup_mode_list), intent(inout) :: gauss_list
 !!        type(picked_spectrum_data), intent(inout) :: gauss_coef
-!!        character(len = kchara), intent(inout) :: gauss_coefs_file_head
 !!
 !!      subroutine set_ctl_params_no_heat_Nu                            &
 !!     &         (Nusselt_file_prefix, rj_fld, Nu_type)
@@ -169,7 +168,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_ctl_params_pick_sph                                &
-     &         (pspec_ctl, pickup_sph_head, pick_list, picked_sph)
+     &         (pspec_ctl, pick_list, picked_sph)
 !
       use t_ctl_data_pick_sph_spectr
       use t_pickup_sph_spectr_data
@@ -180,14 +179,14 @@
       type(pick_spectr_control), intent(inout) :: pspec_ctl
       type(pickup_mode_list), intent(inout) :: pick_list
       type(picked_spectrum_data), intent(inout) :: picked_sph
-      character(len = kchara), intent(inout) :: pickup_sph_head
 !
       integer(kind = kint) :: inum
 !
 !   Define spectr pick up
 !
       if(pspec_ctl%picked_mode_head_ctl%iflag .gt. 0) then
-        pickup_sph_head = pspec_ctl%picked_mode_head_ctl%charavalue
+        picked_sph%file_prefix                                          &
+     &        = pspec_ctl%picked_mode_head_ctl%charavalue
       else
         pick_list%num_modes =  0
         pick_list%num_degree = 0
@@ -259,7 +258,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_ctl_params_pick_gauss                              &
-     &         (g_pwr, gauss_coefs_file_head, gauss_list, gauss_coef)
+     &         (g_pwr, gauss_list, gauss_coef)
 !
       use t_ctl_data_pick_sph_spectr
       use t_pickup_sph_spectr_data
@@ -267,7 +266,6 @@
       type(gauss_spectr_control), intent(inout) :: g_pwr
       type(pickup_mode_list), intent(inout) :: gauss_list
       type(picked_spectrum_data), intent(inout) :: gauss_coef
-      character(len = kchara), intent(inout) :: gauss_coefs_file_head
 !
       integer(kind = kint) :: inum
 !
@@ -275,7 +273,7 @@
 !   set pickup gauss coefficients
 !
       if(g_pwr%gauss_coefs_prefix%iflag .gt. 0) then
-        gauss_coefs_file_head = g_pwr%gauss_coefs_prefix%charavalue
+        gauss_coef%file_prefix = g_pwr%gauss_coefs_prefix%charavalue
       else
         gauss_list%num_modes =  0
         gauss_list%num_degree = 0

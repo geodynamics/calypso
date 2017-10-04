@@ -7,11 +7,12 @@
 !>@brief  Data arrays to monitoring spectrum data
 !!
 !!@verbatim
-!!      subroutine init_sph_spec_4_monitor(l_truncation, sph_rj, rj_fld,&
+!!      subroutine init_sph_spec_4_monitor(sph_params, sph_rj, rj_fld,  &
 !!     &          pick_list, picked)
 !!      subroutine pickup_sph_spec_4_monitor(sph_rj, n_point,           &
 !!     &          num_phys_rj, ntot_phys_rj, istack_phys_comp_rj, d_rj, &
 !!     &          picked)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(pickup_mode_list), intent(inout) :: pick_list
 !!        type(picked_spectrum_data), intent(inout) :: picked
@@ -27,6 +28,7 @@
 !
       use m_precision
       use m_constants
+      use t_spheric_parameter
       use t_pickup_sph_spectr_data
 !
       implicit  none
@@ -37,7 +39,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_sph_spec_4_monitor(l_truncation, sph_rj, rj_fld,  &
+      subroutine init_sph_spec_4_monitor(sph_params, sph_rj, rj_fld,    &
      &          pick_list, picked)
 !
       use calypso_mpi
@@ -46,7 +48,7 @@
       use t_phys_data
       use pickup_sph_coefs
 !
-      integer(kind = kint), intent(in) :: l_truncation
+      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(phys_data), intent(in) :: rj_fld
 !
@@ -66,15 +68,15 @@
      &    rj_fld%num_component, rj_fld%iflag_monitor, picked)
 !
       if(pick_list%num_degree .eq. -9999) then
-        pick_list%num_degree = l_truncation+1
+        pick_list%num_degree = sph_params%l_truncation+ 1 
         call alloc_pick_sph_l(pick_list)
-        do l = 0, l_truncation
+        do l = 0, sph_params%l_truncation
           pick_list%idx_pick_l(l+1) = l
         end do
       end if
 !
       call const_picked_sph_address                                     &
-     &   (l_truncation, sph_rj, pick_list, picked)
+     &   (sph_params%l_truncation, sph_rj, pick_list, picked)
 !
       call set_sph_fld_id_4_monitor(rj_fld%num_phys,                    &
      &    rj_fld%num_component, rj_fld%iflag_monitor, picked)

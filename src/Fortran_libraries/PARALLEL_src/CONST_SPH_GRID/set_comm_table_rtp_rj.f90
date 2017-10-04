@@ -46,10 +46,9 @@
       use m_precision
       use m_machine_parameter
 !
-      use t_spheric_mesh
       use t_spheric_parameter
       use t_sph_trans_comm_tbl
-      use t_group_data
+      use t_spheric_group
       use t_spheric_data_IO
       use t_spheric_global_ranks
       use t_sph_local_parameter
