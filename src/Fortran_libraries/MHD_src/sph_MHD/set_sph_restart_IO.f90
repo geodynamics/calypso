@@ -222,6 +222,7 @@
 !
       subroutine set_sph_restart_from_IO(fld_IO, rj_fld)
 !
+      use calypso_mpi
       use m_phys_labels
       use copy_rj_phys_data_4_IO
 !
@@ -229,11 +230,14 @@
       type(phys_data), intent(inout) :: rj_fld
 !
       integer(kind = kint) :: i_fld, j_IO
+      integer(kind = kint) :: iflag
 !
 !
-      do i_fld = 1, rj_fld%num_phys
-        do j_IO = 1, fld_IO%num_field_IO
+      do j_IO = 1, fld_IO%num_field_IO
+        iflag = 0
+        do i_fld = 1, rj_fld%num_phys
           if (rj_fld%phys_name(i_fld) .eq. fld_IO%fld_name(j_IO)) then
+            iflag = 1
             if     (rj_fld%phys_name(i_fld) .eq. fhd_velo               &
  !    &         .or. rj_fld%phys_name(i_fld) .eq. fhd_vort              &
      &         .or. rj_fld%phys_name(i_fld) .eq. fhd_magne              &
@@ -268,6 +272,13 @@
             exit
           end if
         end do
+        if(iflag .eq. 0) then
+          if(my_rank .eq. 0) write(*,*) 'Field ',                       &
+     &        trim(fld_IO%fld_name(j_IO)),                              &
+     &        ' is not defined in the control file,',                   &
+     &        ' but exists in the restart file. Skip loading ',         &
+     &        trim(fld_IO%fld_name(j_IO)), ' and continue.'
+        end if
       end do
 !
       end subroutine set_sph_restart_from_IO
