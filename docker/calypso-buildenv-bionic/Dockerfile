@@ -8,10 +8,10 @@ RUN apt update && \
   cmake \
   doxygen \
   fftw-dev \
+  gfortran \
   git \
   libblas-dev \
   libhdf5-openmpi-dev \
   libopenmpi-dev \
-  ninja-build \
   openmpi-bin \
   openmpi-common
