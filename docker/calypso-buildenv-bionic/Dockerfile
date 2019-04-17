@@ -5,12 +5,11 @@ RUN apt update && \
   DEBCONF_NONINTERACTIVE_SEEN='true' \
   apt install --yes \
   build-essential \
-  cmake \
   doxygen \
-  fftw-dev \
   gfortran \
   git \
   libblas-dev \
+  libfftw3-dev \
   libhdf5-openmpi-dev \
   libopenmpi-dev \
   openmpi-bin \
