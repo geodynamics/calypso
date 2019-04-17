@@ -13,4 +13,5 @@ RUN apt update && \
   libhdf5-openmpi-dev \
   libopenmpi-dev \
   openmpi-bin \
-  openmpi-common
+  openmpi-common \
+  pkg-config
