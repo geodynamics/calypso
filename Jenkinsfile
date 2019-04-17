@@ -18,6 +18,7 @@ pipeline {
         sh '''
           cd build
           cmake \
+            -D CMAKE_Fortran_COMPILER=gfortran \
             ..
         '''
         sh '''
