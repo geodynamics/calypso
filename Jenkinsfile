@@ -15,36 +15,19 @@ pipeline {
   stages {
     stage('Build') {
       steps {
-        sh 'mkdir build'
         sh '''
-          cd build
-          cmake \
-            -D CMAKE_Fortran_COMPILER='gfortran' \
-            -D HDF5_INCLUDE_DIRS='/usr/include/hdf5/openmpi' \
-            -D HDF5_LIBRARY_DIRS='/usr/lib/x86_64-linux-gnu/hdf5/openmpi' \
-            ..
+          ./configure \
+            --enable-fftw3 \
+            --with-hdf5 \
+            --with-blas
         '''
-        sh '''
-          cd build
-          make
-        '''
+        sh 'make'
       }
     }
 
     stage('Test') {
       steps {
-        sh '''
-          cd build
-          ctest --no-compress-output -T Test
-        '''
-      }
-      post {
-        always {
-          xunit testTimeMargin: '3000',
-            thresholdMode: 1,
-            thresholds: [failed(), skipped()],
-            tools: [CTest(pattern: 'build/Testing/**/*.xml')]
-        }
+        sh 'make test'
       }
     }
   }
