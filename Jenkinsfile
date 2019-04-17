@@ -35,13 +35,13 @@ pipeline {
           ctest --no-compress-output -T Test
         '''
       }
-    }
-    post {
-      always {
-        xunit testTimeMargin: '3000',
-          thresholdMode: 1,
-          thresholds: [failed(), skipped()],
-          tools: [CTest(pattern: 'build/Testing/**/*.xml')]
+      post {
+        always {
+          xunit testTimeMargin: '3000',
+            thresholdMode: 1,
+            thresholds: [failed(), skipped()],
+            tools: [CTest(pattern: 'build/Testing/**/*.xml')]
+        }
       }
     }
   }
