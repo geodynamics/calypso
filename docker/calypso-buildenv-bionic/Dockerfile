@@ -5,7 +5,6 @@ RUN apt update && \
   DEBCONF_NONINTERACTIVE_SEEN='true' \
   apt install --yes \
   build-essential \
-  cmake \
   doxygen \
   gfortran \
   git \
