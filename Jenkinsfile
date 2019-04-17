@@ -19,7 +19,9 @@ pipeline {
         sh '''
           cd build
           cmake \
-            -D CMAKE_Fortran_COMPILER=gfortran \
+            -D CMAKE_Fortran_COMPILER='gfortran' \
+            -D HDF5_INCLUDE_DIRS='/usr/include/hdf5/openmpi' \
+            -D HDF5_LIBRARY_DIRS='/usr/lib/x86_64-linux-gnu/hdf5/openmpi' \
             ..
         '''
         sh '''
