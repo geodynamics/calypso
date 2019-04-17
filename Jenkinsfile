@@ -4,7 +4,7 @@ pipeline {
   agent {
     docker {
       image 'geodynamics/calypso-buildenv-bionic:latest'
-      alwaysPull
+      alwaysPull true
     }
   }
 
