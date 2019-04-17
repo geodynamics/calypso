@@ -18,12 +18,11 @@ pipeline {
         sh '''
           cd build
           cmake \
-            -G 'Ninja' \
             ..
         '''
         sh '''
           cd build
-          ninja
+          make
         '''
       }
     }
