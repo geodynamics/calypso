@@ -13,6 +13,5 @@ RUN apt update && \
   libblas-dev \
   libhdf5-openmpi-dev \
   libopenmpi-dev \
-  ninja-build \
   openmpi-bin \
   openmpi-common
