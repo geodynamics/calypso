@@ -13,7 +13,7 @@ pipeline {
   }
 
   stages {
-    stage('Build') {
+    stage('Build & Test') {
       steps {
         sh '''
           ./configure \
@@ -22,12 +22,6 @@ pipeline {
             --with-blas
         '''
         sh 'make'
-      }
-    }
-
-    stage('Test') {
-      steps {
-        sh 'make test'
       }
     }
   }
