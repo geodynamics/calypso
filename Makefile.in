@@ -100,6 +100,7 @@ makemake: $(MAKE_MOD_DEP)
 
 test:
 	echo "Test!!"; \
+	echo "# Test output test..."; \
 	cd $(TESTDIR) ; \
 		$(GMAKE) \
 		GMAKE="$(GMAKE)" \
