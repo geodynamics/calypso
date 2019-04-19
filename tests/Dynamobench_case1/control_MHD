@@ -17,7 +17,7 @@ begin MHD_control
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
   begin data_files_def
-    debug_flag_ctl            'ON'
+    debug_flag_ctl            'Off'
 !
     num_subdomain_ctl            4
     num_smp_ctl                  2
