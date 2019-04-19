@@ -22,6 +22,7 @@ pipeline {
             --with-blas \
             --with-zlib
         '''
+        export OMPI_MCA_btl_vader_single_copy_mechanism=none
         sh 'make'
       }
     }
