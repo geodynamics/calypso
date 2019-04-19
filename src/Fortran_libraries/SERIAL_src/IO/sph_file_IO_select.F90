@@ -25,7 +25,7 @@
 !!      integer(kind = kint) function check_exsist_rj_file(my_rank)
 !!      integer(kind = kint) function check_exsist_rtm_file(my_rank)
 !!      integer(kind = kint) function check_exsist_rlm_file(my_rank)
-!!@endverbatim
+!!@endverbatim 
 !!
 !!@param my_rank    Process ID
 !!@param file_name  file name for IO (.gz is appended in this module)
