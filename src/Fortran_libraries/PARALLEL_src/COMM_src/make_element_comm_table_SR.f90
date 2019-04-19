@@ -99,7 +99,7 @@
       do ip = 1, num_neib
         ist = istack_import(ip-1)
         num = (istack_import(ip  ) - istack_import(ip-1))
-        write(*,*) 'MPI_ISEND', my_rank
+        write(*,*) 'MPI_ISEND', my_rank, id_neib(ip), num
         call MPI_ISEND(item_import(ist+1), num,                         &
      &                 CALYPSO_INTEGER, id_neib(ip), 0,                 &
      &                 CALYPSO_COMM, req1(ip), ierr_MPI)
@@ -109,7 +109,7 @@
       do ip = 1, num_neib
         ist = istack_export(ip-1)
         num = (istack_export(ip  ) - istack_export(ip-1))
-        write(*,*) 'MPI_IRECV', my_rank
+        write(*,*) 'MPI_IRECV', my_rank, id_neib(ip), num
         call MPI_IRECV(item_local(ist+1), num,                          &
      &                 CALYPSO_INTEGER, id_neib(ip), 0,                 &
      &                 CALYPSO_COMM, req2(ip), ierr_MPI)
@@ -118,9 +118,9 @@
 
       write(*,*) 'MPI_WAITALL req2', my_rank
       call MPI_WAITALL(num_neib, req2(1), sta2(1,1), ierr_MPI)
-      write(*,*) 'MPI_WAITALL req1', my_rank
+      write(*,*) 'MPI_WAITALL req1', my_rank, ierr_MPI
       call MPI_WAITALL(num_neib, req1(1), sta1(1,1), ierr_MPI)
-      write(*,*) 'MPI_WAITALL end', my_rank
+      write(*,*) 'MPI_WAITALL end', my_rank, ierr_MPI
 !
       inod_local = 0
       do i = 1, istack_export(num_neib)
