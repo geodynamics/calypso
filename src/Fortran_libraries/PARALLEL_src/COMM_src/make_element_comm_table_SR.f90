@@ -128,7 +128,6 @@
         inod_local(inod) = item_local(i)
       end do
       call calypso_mpi_barrier
-      call calypso_mpi_abort(12, 'Forced twemination')
 !
       end subroutine local_node_id_reverse_SR
 !
