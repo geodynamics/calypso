@@ -23,6 +23,7 @@
       module const_element_comm_tables
 !
       use m_precision
+      use m_machine_parameter
       use calypso_mpi
       use t_next_node_ele_4_node
       use t_mesh_data
