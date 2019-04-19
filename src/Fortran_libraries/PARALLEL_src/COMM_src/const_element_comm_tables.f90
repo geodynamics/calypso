@@ -61,17 +61,24 @@
 !
       call const_global_numnod_list(mesh%node)
 !
+      call calypso_MPI_barrier
+      if(iflag_debug .gt. 0) write(*,*) 'const_ele_comm_tbl'
       call const_ele_comm_tbl(mesh%node, mesh%ele, mesh%nod_comm,       &
      &    belongs, ele_mesh%ele_comm)
       call const_global_numele_list(mesh%ele)
+      call calypso_MPI_barrier
 !
+      if(iflag_debug .gt. 0) write(*,*) 'const_surf_comm_table'
       call const_surf_comm_table(mesh%node, mesh%nod_comm,              &
      &    surf_mesh%surf, belongs, surf_mesh%surf_comm)
       call const_global_surface_id(surf_mesh%surf, surf_mesh%surf_comm)
+      call calypso_MPI_barrier
 !
+      if(iflag_debug .gt. 0) write(*,*) 'const_edge_comm_table'
       call const_edge_comm_table(mesh%node, mesh%nod_comm,              &
      &    edge_mesh%edge, belongs, edge_mesh%edge_comm)
       call const_global_edge_id(edge_mesh%edge, edge_mesh%edge_comm)
+      call calypso_MPI_barrier
 !
       end subroutine const_ele_comm_tbl_global_id
 !
