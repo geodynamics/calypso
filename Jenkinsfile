@@ -21,8 +21,7 @@ pipeline {
             --with-hdf5 \
             --with-blas
         '''
-        export OMPI_MCA_btl_vader_single_copy_mechanism=none
-        sh 'make'
+        sh 'export OMPI_MCA_btl_vader_single_copy_mechanism=none; make'
       }
     }
   }
