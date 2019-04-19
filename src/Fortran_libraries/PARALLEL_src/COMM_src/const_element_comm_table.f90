@@ -141,6 +141,7 @@
      &    wk_comm%xe_import, wk_comm%inod_export_e,                     &
      &    wk_comm%inod_export_l, wk_comm%xe_export)
       call calypso_mpi_barrier
+      call calypso_mpi_barrier(11, 'terminate after element_position_reverse_SR')
 !
       if(my_rank .eq. 0) write(*,*) 'set_element_export_item', my_rank
       call set_element_export_item(txt, node%numnod, numele,            &

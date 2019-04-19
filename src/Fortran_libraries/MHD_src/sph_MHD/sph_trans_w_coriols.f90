@@ -165,12 +165,10 @@
       call start_elapsed_time(19)
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &      'calypso_sph_comm_rtm_2_rtp_N'
-      if(my_rank .gt. 0) write(*,*) 'calypso_sph_comm_rtm_2_rtp_N'
       call calypso_sph_comm_N                                           &
      &   (ncomp_trans, comms_sph%comm_rtm, comms_sph%comm_rtp)
       call end_elapsed_time(19)
       SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
-      if(my_rank .gt. 0) write(*,*) 'calypso_sph_comm_rtm_2_rtp_N end'
 !
 !
       call start_elapsed_time(24)
