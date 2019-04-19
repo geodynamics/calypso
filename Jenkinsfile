@@ -19,7 +19,8 @@ pipeline {
           ./configure \
             --enable-fftw3 \
             --with-hdf5 \
-            --with-blas
+            --with-blas \
+            --with-zlib
         '''
         sh 'make'
       }
