@@ -14,6 +14,8 @@
 !      subroutine set_center_of_edge(nod, edge)
 !        type(node_data), intent(in) :: nod
 !        type(edge_data), intent(inout) :: edge
+!      subroutine find_subdomain_position_range(nod)
+!        type(node_data), intent(in) :: nod
 !
       module cal_mesh_position
 !
@@ -128,6 +130,20 @@
      &    edge%ar_edge, edge%s_edge, edge%as_edge)
 !
       end subroutine set_center_of_edge
+!
+! ----------------------------------------------------------------------
+!
+      subroutine find_subdomain_position_range(nod)
+!
+      use t_geometry_data
+!
+      type(node_data), intent(inout) :: nod
+!
+!  Evaluate range in local domain
+      nod%xyz_max_lc = maxval(nod%xx,DIM=1)
+      nod%xyz_min_lc = minval(nod%xx,DIM=1)
+!
+      end subroutine find_subdomain_position_range
 !
 ! ----------------------------------------------------------------------
 !

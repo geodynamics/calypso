@@ -21,6 +21,7 @@
 !!     &          label3, label4, label5, label6, label7)
 !!
 !!      subroutine write_multi_labels(id_file, nlabel, labels)
+!!      subroutine write_one_label_cont(id_file, label1)
 !!@endverbatim
 !!
 !
@@ -30,9 +31,6 @@
       use m_constants
 !
       implicit none
-!
-!
-      private :: write_one_label_cont
 !
 ! ----------------------------------------------------------------------
 !

@@ -7,18 +7,18 @@
 !> @brief ascii format data IO
 !!
 !!@verbatim
-!!      subroutine write_ucd_2_fld_file(my_rank, file_name, t_IO, ucd)
+!!      subroutine write_ucd_2_fld_file(id_rank, file_name, t_IO, ucd)
 !!        type(time_data), intent(in) :: t_IO
 !!        type(ucd_data), intent(in) :: ucd
 !!
-!!      subroutine read_ucd_2_fld_file(my_rank, file_name, t_IO, ucd)
+!!      subroutine read_ucd_2_fld_file(id_rank, file_name, t_IO, ucd)
 !!      subroutine read_alloc_ucd_2_fld_file                            &
-!!     &         (my_rank, file_name, t_IO, ucd)
+!!     &         (id_rank, file_name, t_IO, ucd)
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(ucd_data), intent(inout) :: ucd
 !!@endverbatim
 !!
-!!@param my_rank    process ID
+!!@param id_rank    process ID
 !!@param file_name  File name
 !!@param t_IO      Structure for time information
 !!@param ucd       Structure for FEM field data IO
@@ -48,24 +48,21 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine write_ucd_2_fld_file(my_rank, file_name, t_IO, ucd)
+      subroutine write_ucd_2_fld_file(id_rank, file_name, t_IO, ucd)
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(time_data), intent(in) :: t_IO
       type(ucd_data), intent(in) :: ucd
 !
-      integer(kind= kint) :: nnod4
 !
-!
-      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write ascii step data file: ', trim(file_name)
 !
       open(id_fld_file, file = file_name, form = 'formatted')
 !
-      nnod4 = int(ucd%nnod)
-      call write_step_data(id_fld_file, my_rank, t_IO)
-      call write_field_data(id_fld_file, nnod4, ucd%num_field,          &
+      call write_step_data(id_fld_file, id_rank, t_IO)
+      call write_field_data(id_fld_file, ucd%nnod, ucd%num_field,       &
      &    ucd%ntot_comp, ucd%num_comp, ucd%phys_name, ucd%d_ucd)
 !
       close (id_fld_file)
@@ -75,20 +72,19 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_ucd_2_fld_file(my_rank, file_name, t_IO, ucd)
+      subroutine read_ucd_2_fld_file(id_rank, file_name, t_IO, ucd)
 !
       use skip_comment_f
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
 !
       character(len=255) :: character_4_read
-      integer(kind= kint) :: nnod4
 !
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read ascii data file: ', trim(file_name)
 !
       open(id_fld_file, file = file_name, form = 'formatted')
@@ -96,11 +92,10 @@
       call read_step_data(id_fld_file, t_IO)
 !
       call skip_comment(character_4_read, id_fld_file)
-      read(character_4_read,*) nnod4, ucd%num_field
+      read(character_4_read,*) ucd%nnod, ucd%num_field
       read(id_fld_file,*) ucd%num_comp(1:ucd%num_field)
-      ucd%nnod = nnod4
 !
-      call read_field_data(id_fld_file, nnod4, ucd%num_field,           &
+      call read_field_data(id_fld_file, ucd%nnod, ucd%num_field,        &
      &          ucd%ntot_comp, ucd%num_comp, ucd%phys_name, ucd%d_ucd)
 !
       close (id_fld_file)
@@ -110,20 +105,19 @@
 !------------------------------------------------------------------
 !
       subroutine read_alloc_ucd_2_fld_file                              &
-     &         (my_rank, file_name, t_IO, ucd)
+     &         (id_rank, file_name, t_IO, ucd)
 !
       use skip_comment_f
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
 !
       character(len=255) :: character_4_read
-      integer(kind= kint) :: nnod4
 !
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read ascii data file: ', trim(file_name)
 !
       open(id_fld_file, file = file_name, form = 'formatted')
@@ -131,8 +125,7 @@
       call read_step_data(id_fld_file, t_IO)
 !
       call skip_comment(character_4_read, id_fld_file)
-      read(character_4_read,*) nnod4, ucd%num_field
-      ucd%nnod = nnod4
+      read(character_4_read,*) ucd%nnod, ucd%num_field
 !
       call allocate_ucd_phys_name(ucd)
       read(id_fld_file,*) ucd%num_comp(1:ucd%num_field)
@@ -141,8 +134,8 @@
       call allocate_ucd_phys_data(ucd)
 !
       call read_field_data(id_fld_file,                                 &
-     &          nnod4, ucd%num_field, ucd%ntot_comp,                    &
-     &          ucd%num_comp, ucd%phys_name, ucd%d_ucd)
+     &    ucd%nnod, ucd%num_field, ucd%ntot_comp,                       &
+     &    ucd%num_comp, ucd%phys_name, ucd%d_ucd)
 !
       close (id_fld_file)
 !

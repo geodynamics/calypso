@@ -5,8 +5,12 @@
 !
 !!      subroutine read_dimless_ctl(hd_block, iflag, dless_ctl)
 !!      subroutine read_coef_term_ctl(hd_block, iflag, eqs_ctl)
+!!
 !!      subroutine bcast_dimless_ctl(dless_ctl)
 !!      subroutine bcast_coef_term_ctl(eqs_ctl)
+!!
+!!      subroutine dealloc_dimless_ctl(dless_ctl)
+!!      subroutine dealloc_coef_term_ctl(eqs_ctl)
 !!
 !!   --------------------------------------------------------------------
 !!    example
@@ -159,7 +163,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
         call read_control_array_c_r(hd_dimless, dless_ctl%dimless)
@@ -182,7 +186,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
         call read_thermal_ctl(hd_thermal, i_thermal, eqs_ctl%heat_ctl)
@@ -223,6 +227,32 @@
       call bcast_thermal_ctl(eqs_ctl%comp_ctl)
 !
       end subroutine bcast_coef_term_ctl
+!
+!   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_dimless_ctl(dless_ctl)
+!
+      type(dimless_control), intent(inout) :: dless_ctl
+!
+!
+      call dealloc_control_array_c_r(dless_ctl%dimless)
+!
+      end subroutine dealloc_dimless_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_coef_term_ctl(eqs_ctl)
+!
+      type(equations_control), intent(inout) :: eqs_ctl
+!
+!
+      call dealloc_thermal_ctl(eqs_ctl%heat_ctl)
+      call dealloc_momentum_ctl(eqs_ctl%mom_ctl)
+      call dealloc_induction_ctl(eqs_ctl%induct_ctl)
+      call dealloc_thermal_ctl(eqs_ctl%comp_ctl)
+!
+      end subroutine dealloc_coef_term_ctl
 !
 !   --------------------------------------------------------------------
 !

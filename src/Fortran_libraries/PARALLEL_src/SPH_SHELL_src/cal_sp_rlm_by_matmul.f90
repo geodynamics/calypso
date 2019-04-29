@@ -375,6 +375,7 @@
       real(kind = kreal), intent(in) :: radius_1d_rlm_r(nidx_rlm(1))
       real(kind = kreal), intent(in) :: g_sph_rlm(nidx_rlm(2),17)
 !
+      integer(kind = kint), intent(in) :: ncomp, nvector
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: jst, n_jk_o, n_jk_e
 !
@@ -383,7 +384,6 @@
       real(kind = kreal), intent(inout) :: tor_e(2*nvector*nkr,n_jk_e)
       real(kind = kreal), intent(inout) :: tor_o(2*nvector*nkr,n_jk_o)
 !
-      integer(kind = kint), intent(in) :: ncomp, nvector
       integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
       integer(kind = kint), intent(in) :: n_WS
       real (kind=kreal), intent(inout):: WS(n_WS)
@@ -487,13 +487,13 @@
       integer(kind = kint), intent(in) :: istep_rlm(2)
       real(kind = kreal), intent(in) :: g_sph_rlm(nidx_rlm(2),17)
 !
+      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: jst, n_jk_o, n_jk_e
 !
       real(kind = kreal), intent(inout) :: scl_e(ncomp*nkr,n_jk_e)
       real(kind = kreal), intent(inout) :: scl_o(ncomp*nkr,n_jk_o)
 !
-      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
       integer(kind = kint), intent(in) :: n_WS
       real (kind=kreal), intent(inout):: WS(n_WS)

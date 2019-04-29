@@ -31,6 +31,17 @@
         integer(kind = kint) ::  iflag_format = 0
       end type field_IO_params
 !
+!>      FEM mesh IO flags
+      type FEM_file_IO_flags
+!>        Integer flag to output mesh data
+        integer(kind = kint) :: iflag_access_FEM = 0
+!>        Integer flag to output surface and edge mesh data
+        integer(kind = kint) :: iflag_output_SURF = 0
+!>        Integer flag to output mesh data for viewer
+        integer(kind = kint) :: iflag_output_VMESH = 0
+      end type FEM_file_IO_flags
+!
+!
 !  ---------------------------------------------------------------------
 !
       contains

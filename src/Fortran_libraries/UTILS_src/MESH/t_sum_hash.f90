@@ -21,16 +21,21 @@
 !
 !>      Structure for hash table
       type sum_hash_tbl
+!>        Total number of ID
+        integer(kind = kint_gl) :: ntot_id
 !>        Maximum address of sum of node ID
-        integer(kind = kint) :: iend_hash
+        integer(kind = kint_gl) :: iend_hash
 !>        Number of items at each level
-        integer(kind = kint), allocatable :: num_hash(:)
+        integer(kind = kint_gl), allocatable :: num_hash(:)
 !>        Stack of items at each level
-        integer(kind = kint), allocatable :: istack_hash(:)
+        integer(kind = kint_gl), allocatable :: istack_hash(:)
+!
+!>        Total number of list
+        integer(kind = kint_gl) :: ntot_list
 !>        item addresses
         integer(kind = kint), allocatable :: id_hash(:,:)
 !>        item flag
-        integer(kind = kint), allocatable :: iflag_hash(:)
+        integer(kind = kint_gl), allocatable :: iflag_hash(:)
       end type sum_hash_tbl
 !
 !------------------------------------------------------------------
@@ -47,11 +52,14 @@
       type(sum_hash_tbl), intent(inout) :: h_tbl
 !
 !
-      h_tbl%iend_hash = numnod*nnod_4_edge
-      allocate(h_tbl%num_hash(h_tbl%iend_hash))
-      allocate(h_tbl%istack_hash(0:h_tbl%iend_hash))
-      allocate(h_tbl%id_hash(num_4_ele*nele,2) )
-      allocate(h_tbl%iflag_hash(num_4_ele*nele) )
+      h_tbl%ntot_id =   int(numnod*nnod_4_edge, KIND(h_tbl%ntot_id))
+      h_tbl%iend_hash = h_tbl%ntot_id
+      allocate(h_tbl%num_hash(h_tbl%ntot_id))
+      allocate(h_tbl%istack_hash(0:h_tbl%ntot_id))
+!
+      h_tbl%ntot_list = int(num_4_ele*nele, KIND(h_tbl%iend_hash))
+      allocate(h_tbl%id_hash(h_tbl%ntot_list,2) )
+      allocate(h_tbl%iflag_hash(h_tbl%ntot_list) )
 !
 !
       call clear_sum_hash(h_tbl)

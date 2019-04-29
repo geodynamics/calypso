@@ -9,19 +9,27 @@
 !!@verbatim
 !!      subroutine mpi_read_surface_connection_b                        &
 !!     &         (IO_param, comm_IO, ele_IO, sfed_IO)
-!!      subroutine mpi_write_surface_connection_b                       &
-!!     &         (IO_param, comm_IO, ele_IO, sfed_IO)
 !!        type(communication_table), intent(inout) :: comm_IO
 !!        type(node_data), intent(inout) :: nod_IO
 !!        type(element_data), intent(inout) :: ele_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!      subroutine mpi_write_surface_connection_b                       &
+!!     &         (IO_param, comm_IO, ele_IO, sfed_IO)
+!!        type(communication_table), intent(inout) :: comm_IO
+!!        type(node_data), intent(in) :: nod_IO
+!!        type(element_data), intent(in) :: ele_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!
 !!      subroutine mpi_read_surface_geometry_b                          &
 !!     &         (IO_param, nod_IO, sfed_IO)
-!!      subroutine mpi_write_surface_geometry_b                         &
-!!     &         (IO_param, nod_IO, sfed_IO)
+!!        type(communication_table), intent(inout) :: comm_IO
 !!        type(node_data), intent(inout) :: nod_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!      subroutine mpi_write_surface_geometry_b                         &
+!!     &         (IO_param, nod_IO, sfed_IO)
+!!        type(communication_table), intent(inout) :: comm_IO
+!!        type(node_data), intent(in) :: nod_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!@endverbatim
 !
       module MPI_surface_data_IO_b
@@ -78,16 +86,15 @@
       use m_fem_mesh_labels
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(communication_table), intent(inout) :: comm_IO
-      type(element_data), intent(inout) :: ele_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(communication_table), intent(in) :: comm_IO
+      type(element_data), intent(in) :: ele_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
 !
       call mpi_write_domain_info_b(IO_param, comm_IO)
 !
       call mpi_write_element_info_b(IO_param, ele_IO)
       call mpi_write_surface_4_element_b(IO_param, sfed_IO)
-!
 !
       call mpi_write_import_data_b(IO_param, comm_IO)
       call mpi_write_export_data_b(IO_param, comm_IO)
@@ -120,8 +127,8 @@
      &         (IO_param, nod_IO, sfed_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
 !
       call mpi_write_geometry_info_b(IO_param, nod_IO)

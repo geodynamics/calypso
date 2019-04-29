@@ -9,14 +9,24 @@
 !!@verbatim
 !!      subroutine gz_mpi_read_edge_connect                             &
 !!     &         (IO_param, comm_IO, ele_IO, sfed_IO)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(communication_table), intent(inout) :: comm_IO
+!!        type(element_data), intent(inout) :: ele_IO
+!!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !!      subroutine gz_mpi_write_edge_connect                            &
 !!     &         (IO_param, comm_IO, ele_IO, sfed_IO)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(communication_table), intent(in) :: comm_IO
+!!        type(element_data), intent(in) :: ele_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!
 !!      subroutine gz_mpi_read_edge_geometry(IO_param, nod_IO, sfed_IO)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(node_data), intent(in) :: nod_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!      subroutine gz_mpi_write_edge_geometry(IO_param, nod_IO, sfed_IO)
-!!        type(communication_table), intent(inout) :: comm_IO
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !!        type(node_data), intent(inout) :: nod_IO
-!!        type(element_data), intent(inout) :: ele_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !!@endverbatim
 !
@@ -87,9 +97,9 @@
       use m_fem_mesh_labels
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(communication_table), intent(inout) :: comm_IO
-      type(element_data), intent(inout) :: ele_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(communication_table), intent(in) :: comm_IO
+      type(element_data), intent(in) :: ele_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
 !
       call gz_mpi_write_charahead                                       &
@@ -149,8 +159,8 @@
       subroutine gz_mpi_write_edge_geometry(IO_param, nod_IO, sfed_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
 !
       call gz_mpi_write_charahead                                       &

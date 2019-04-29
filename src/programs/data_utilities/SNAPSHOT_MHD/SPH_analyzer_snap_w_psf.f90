@@ -27,6 +27,8 @@
 !
       use m_precision
       use m_MHD_step_parameter
+      use m_work_time
+      use m_elapsed_labels_4_MHD
       use t_phys_address
       use t_MHD_file_parameter
       use t_SPH_MHD_model_data
@@ -115,8 +117,6 @@
       subroutine SPH_analyze_snap_psf(i_step, MHD_files, SPH_model,     &
      &          MHD_step, SPH_MHD, SPH_WK)
 !
-      use m_work_time
-!
       use cal_nonlinear
       use cal_sol_sph_MHD_crank
       use adjust_reference_fields
@@ -136,9 +136,9 @@
 !
 !
       call read_alloc_sph_rst_4_snap(i_step,                            &
-     &    MHD_files%org_rj_file_IO, MHD_files%fst_file_IO, SPH_MHD%sph, &
-     &    SPH_MHD%ipol, SPH_MHD%fld,                  &
-     &    MHD_step%rst_step, MHD_step%init_d)
+     &    MHD_files%org_rj_file_IO, MHD_files%fst_file_IO,              &
+     &    MHD_step%rst_step, SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld,    &
+     &    MHD_step%init_d)
 !
       call copy_time_data(MHD_step%init_d, MHD_step%time_d)
 !
@@ -155,45 +155,44 @@
 !
 !*  ----------------lead nonlinear term ... ----------
 !*
-      call start_elapsed_time(8)
+      if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+4)
       call nonlinear(SPH_WK%r_2nd, SPH_model,                           &
      &    SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
-      call end_elapsed_time(8)
+      if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+4)
 !
 !* ----  Update fields after time evolution ------------------------=
 !*
-      call start_elapsed_time(9)
+      if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+5)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
       call trans_per_temp_to_temp_sph(SPH_model,                        &
      &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%fld)
 !*
-      iflag = lead_field_data_flag(i_step, MHD_step)
-      if(iflag .eq. 0) then
+      if(lead_field_data_flag(i_step, MHD_step) .eq. 0) then
         if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
         call s_lead_fields_4_sph_mhd                                    &
      &     (SPH_MHD%sph, SPH_MHD%comms, SPH_WK%r_2nd,                   &
      &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%trans_p,   &
      &      SPH_MHD%ipol, SPH_WK%MHD_mats, SPH_WK%trns_WK, SPH_MHD%fld)
       end if
-      call end_elapsed_time(9)
+      if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+5)
 !
 !*  -----------  lead energy data --------------
 !*
-      call start_elapsed_time(4)
-      call start_elapsed_time(11)
+      if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+3)
+      if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+7)
       if(output_IO_flag(i_step, MHD_step%rms_step) .eq. 0) then
         if(iflag_debug.gt.0)  write(*,*) 'output_rms_sph_mhd_control'
         call output_rms_sph_mhd_control(MHD_step%time_d, SPH_MHD,       &
      &      SPH_model%sph_MHD_bc, SPH_WK%trans_p%leg, SPH_WK%monitor)
       end if
-      call end_elapsed_time(11)
+      if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+7)
 !
 !*  -----------  Output spectr data --------------
 !*
       if(iflag_debug.gt.0)  write(*,*) 'output_spectr_4_snap'
       call output_spectr_4_snap(i_step, MHD_step%time_d,                &
      &    MHD_files%sph_file_IO, SPH_MHD%fld, MHD_step%ucd_step)
-      call end_elapsed_time(4)
+      if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
 !
       end subroutine SPH_analyze_snap_psf
 !

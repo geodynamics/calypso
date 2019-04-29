@@ -67,12 +67,59 @@
         type(mul_sph_group_data), pointer :: sph_grp_IO
       end type multi_sph_file_data
 !
-      private :: alloc_multi_sph_group_IO, dealloc_multi_sph_group_IO
+      private :: alloc_multi_sph_group_IO
 !
 !------------------------------------------------------------------
 !
        contains
 !
+!------------------------------------------------------------------
+!
+      subroutine dealloc_rtp_grid_IO(sph_IO)
+!
+      type(sph_file_data_type), intent(inout) :: sph_IO
+!
+      call dealloc_import_table(sph_IO%comm_IO)
+      call dealloc_sph_grid_idx_IO(sph_IO%sph_IO)
+      call dealloc_sph_grid_group(sph_IO%sph_grp_IO)
+!
+      end subroutine dealloc_rtp_grid_IO
+!
+!------------------------------------------------------------------
+!
+      subroutine dealloc_rtm_grid_IO(sph_IO)
+!
+      type(sph_file_data_type), intent(inout) :: sph_IO
+!
+      call dealloc_import_table(sph_IO%comm_IO)
+      call dealloc_sph_grid_idx_IO(sph_IO%sph_IO)
+!
+      end subroutine dealloc_rtm_grid_IO
+!
+!------------------------------------------------------------------
+!
+      subroutine dealloc_rlm_mode_IO(sph_IO)
+!
+      type(sph_file_data_type), intent(inout) :: sph_IO
+!
+      call dealloc_import_table(sph_IO%comm_IO)
+      call dealloc_sph_mode_idx_IO(sph_IO%sph_IO)
+!
+      end subroutine dealloc_rlm_mode_IO
+!
+!------------------------------------------------------------------
+!
+      subroutine dealloc_rj_mode_IO(sph_IO)
+!
+      type(sph_file_data_type), intent(inout) :: sph_IO
+!
+      call dealloc_import_table(sph_IO%comm_IO)
+      call dealloc_sph_mode_idx_IO(sph_IO%sph_IO)
+      call dealloc_sph_mode_group(sph_IO%sph_grp_IO)
+!
+      end subroutine dealloc_rj_mode_IO
+!
+!------------------------------------------------------------------
 !------------------------------------------------------------------
 !
       subroutine alloc_multi_mesh_data_IO(nloop, sph_file)

@@ -14,7 +14,7 @@
 !!      subroutine allocate_ucd_phys_data(ucd)
 !!      subroutine alloc_merged_hdt5_array(nnod_hdf, ucd, m_ucd)
 !!
-!!      subroutine alloc_merged_ucd_stack(nprocs, m_ucd)
+!!      subroutine alloc_merged_ucd_stack(num_pe, m_ucd)
 !!
 !!      subroutine deallocate_ucd_node(ucd)
 !!      subroutine deallocate_ucd_ele(ucd)
@@ -183,15 +183,15 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_merged_ucd_stack(nprocs, m_ucd)
+      subroutine alloc_merged_ucd_stack(num_pe, m_ucd)
 !
-      integer(kind = kint), intent(in) :: nprocs
+      integer, intent(in) :: num_pe
       type(merged_ucd_data), intent(inout) :: m_ucd
 !
 !
-      allocate(m_ucd%istack_merged_nod(0:nprocs))
-      allocate(m_ucd%istack_merged_ele(0:nprocs))
-      allocate(m_ucd%istack_merged_intnod(0:nprocs))
+      allocate(m_ucd%istack_merged_nod(0:num_pe))
+      allocate(m_ucd%istack_merged_ele(0:num_pe))
+      allocate(m_ucd%istack_merged_intnod(0:num_pe))
 !
       m_ucd%istack_merged_nod =    0
       m_ucd%istack_merged_ele =    0

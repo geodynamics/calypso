@@ -16,6 +16,7 @@
 !!
 !!      subroutine bcast_sph_mhd_ctl_w_psf(MHD_ctl)
 !!      subroutine bcast_sph_mhd_ctl_data(MHD_ctl)
+!!      subroutine dealloc_sph_mhd_ctl_data(MHD_ctl)
 !!        type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
 !!@endverbatim
 !
@@ -30,6 +31,8 @@
       use t_ctl_data_4_sph_monitor
       use t_ctl_data_node_monitor
       use t_ctl_data_gen_sph_shell
+      use t_control_data_sections
+      use t_control_data_zm_vizs
 !
       implicit none
 !
@@ -46,7 +49,7 @@
         type(parallel_sph_shell_control) :: psph_ctl
 !
 !>        Control structure for MHD/model
-        type(mhd_DNS_model_control) :: Dmodel_ctl
+        type(mhd_DNS_model_control) :: model_ctl
 !>        Control structure for MHD/control
         type(sph_mhd_control_control) :: smctl_ctl
 !
@@ -54,6 +57,14 @@
         type(sph_monitor_control) :: smonitor_ctl
 !>        Structure for monitoring plave list
         type(node_monitor_control) :: nmtr_ctl
+!
+!>        Structures of setioning controls
+        type(section_controls) :: psf_ctls
+!>        Structures of isosurface controls
+        type(isosurf_controls) :: iso_ctls
+!
+!>        Structures of zonal mean controls
+        type(sph_zonal_means_controls) :: zm_ctls
       end type DNS_mhd_simulation_control
 !
 !   Top level of label
@@ -103,8 +114,6 @@
 !
       subroutine read_sph_mhd_ctl_w_psf(MHD_ctl)
 !
-      use m_control_data_sections
-!
       type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
 !
 !
@@ -113,7 +122,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_mhd_ctl, i_mhd_ctl)
+        i_mhd_ctl = find_control_end_flag(hd_mhd_ctl)
         if(i_mhd_ctl .gt. 0) exit
 !
 !
@@ -126,7 +135,7 @@
      &     (hd_sph_shell, MHD_ctl%psph_ctl)
 !
         call read_sph_mhd_model                                         &
-     &     (hd_model, i_model, MHD_ctl%Dmodel_ctl)
+     &     (hd_model, i_model, MHD_ctl%model_ctl)
         call read_sph_mhd_control                                       &
      &     (hd_control, i_control, MHD_ctl%smctl_ctl)
 !
@@ -135,7 +144,10 @@
         call read_sph_monitoring_ctl                                    &
      &     (hd_pick_sph, i_pick_sph, MHD_ctl%smonitor_ctl)
 !
-        call read_sections_control_data
+        call read_sections_control_data                                 &
+     &     (MHD_ctl%psf_ctls, MHD_ctl%iso_ctls)
+!
+        call read_zonal_mean_control(MHD_ctl%zm_ctls)
       end do
 !
       end subroutine read_sph_mhd_ctl_w_psf
@@ -152,7 +164,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_mhd_ctl, i_mhd_ctl)
+        i_mhd_ctl = find_control_end_flag(hd_mhd_ctl)
         if(i_mhd_ctl .gt. 0) exit
 !
 !
@@ -165,7 +177,7 @@
      &     (hd_sph_shell, MHD_ctl%psph_ctl)
 !
         call read_sph_mhd_model                                         &
-     &     (hd_model, i_model, MHD_ctl%Dmodel_ctl)
+     &     (hd_model, i_model, MHD_ctl%model_ctl)
         call read_sph_mhd_control                                       &
      &     (hd_control, i_control, MHD_ctl%smctl_ctl)
 !
@@ -182,14 +194,13 @@
 !
       subroutine bcast_sph_mhd_ctl_w_psf(MHD_ctl)
 !
-      use m_control_data_sections
-!
       type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
 !
 !
       call bcast_sph_mhd_ctl_data(MHD_ctl)
-      call bcast_files_4_psf_ctl
-      call bcast_files_4_iso_ctl
+      call bcast_files_4_psf_ctl(MHD_ctl%psf_ctls)
+      call bcast_files_4_iso_ctl(MHD_ctl%iso_ctls)
+      call bcast_zonal_mean_control(MHD_ctl%zm_ctls)
 !
       end subroutine bcast_sph_mhd_ctl_w_psf
 !
@@ -208,7 +219,7 @@
       call bcast_ctl_data_4_platform(MHD_ctl%plt)
       call bcast_ctl_data_4_platform(MHD_ctl%org_plt)
 !
-      call bcast_sph_mhd_model(MHD_ctl%Dmodel_ctl)
+      call bcast_sph_mhd_model(MHD_ctl%model_ctl)
       call bcast_sph_mhd_control(MHD_ctl%smctl_ctl)
 !
       call bcast_parallel_shell_ctl(MHD_ctl%psph_ctl)
@@ -217,6 +228,20 @@
       call bcast_sph_monitoring_ctl(MHD_ctl%smonitor_ctl)
 !
       end subroutine bcast_sph_mhd_ctl_data
+!
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_sph_mhd_ctl_data(MHD_ctl)
+!
+      type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
+!
+!
+      call dealloc_monitor_data_ctl(MHD_ctl%nmtr_ctl)
+      call dealloc_parallel_shell_ctl(MHD_ctl%psph_ctl)
+      call dealloc_sph_monitoring_ctl(MHD_ctl%smonitor_ctl)
+      call dealloc_sph_mhd_model(MHD_ctl%model_ctl)
+!
+      end subroutine dealloc_sph_mhd_ctl_data
 !
 !   --------------------------------------------------------------------
 !

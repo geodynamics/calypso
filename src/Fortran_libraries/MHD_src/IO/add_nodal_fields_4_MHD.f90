@@ -26,6 +26,7 @@
       use t_read_control_arrays
       use t_physical_property
       use add_nodal_fields_ctl
+      use calypso_mpi
 !
       implicit  none
 !
@@ -53,6 +54,7 @@
 !
 !    set work fields for reference temperature
 !
+      call calypso_mpi_barrier
       if (iflag_debug.eq.1) write(*,*) 'add_ctl_4_forces'
       call add_ctl_4_forces                                             &
      &   (MHD_prop%fl_prop, MHD_prop%ref_param_T, MHD_prop%ref_param_C, &
@@ -60,6 +62,7 @@
 !
 !     set work fields for adams-bashforth
 !
+      call calypso_mpi_barrier
       if (iflag_debug.eq.1) write(*,*) 'add_data_4_previous_step'
       call add_data_4_previous_step                                     &
      &   (MHD_prop%fl_prop, MHD_prop%cd_prop,                           &
@@ -67,6 +70,7 @@
 !
 !     set work fields for evolution check
 !
+      call calypso_mpi_barrier
       if (iflag_debug.eq.1) write(*,*) 'add_data_4_check_step'
       call add_data_4_check_step                                        &
      &   (MHD_prop%fl_prop, MHD_prop%cd_prop,                           &

@@ -7,7 +7,7 @@
 !> @brief gzipped data IO for 
 !!
 !!@verbatim
-!!      subroutine sel_write_SPH_assemble_field(nprocs_in, istep_fld,   &
+!!      subroutine sel_write_SPH_assemble_field(num_pe, istep_fld,      &
 !!     &          nloop, fst_IO_param, t_IO, fld_IO)
 !!        type(field_IO_params), intent(in) :: fst_IO_param
 !!        type(time_data), intent(inout) :: t_IO
@@ -56,7 +56,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sel_write_SPH_assemble_field(nprocs_in, istep_fld,     &
+      subroutine sel_write_SPH_assemble_field(num_pe, istep_fld,        &
      &          nloop, fst_IO_param, t_IO, fld_IO)
 !
       use field_IO_select
@@ -66,44 +66,46 @@
 #endif
 !
       integer(kind = kint), intent(in) :: istep_fld
-      integer(kind = kint), intent(in) :: nloop, nprocs_in
+      integer, intent(in) :: num_pe
+      integer(kind = kint), intent(in) :: nloop
       type(field_IO_params), intent(in) :: fst_IO_param
 !
       type(time_data), intent(inout) :: t_IO
       type(field_IO), intent(inout) :: fld_IO(nloop)
 !
-      integer(kind = kint) :: iloop, id_rank
+      integer :: id_rank
+      integer(kind = kint) :: iloop
       character(len=kchara) :: file_name
 !
 !
 #ifdef ZLIB_IO
-      if(nprocs_in .ne. nprocs) then
+      if(num_pe .ne. nprocs) then
         do iloop = 1, nloop
-          id_rank = my_rank + (iloop-1) * nprocs
+          id_rank = int(my_rank + (iloop-1) * nprocs)
 !
-          call set_SPH_fld_file_name                                    &
-     &       (fst_IO_param%file_prefix, fst_IO_param%iflag_format,      &
-     &        id_rank, istep_fld, file_name)
+          file_name = set_SPH_fld_file_name                             &
+     &            (fst_IO_param%file_prefix, fst_IO_param%iflag_format, &
+     &             id_rank, istep_fld)
         end do 
 !
         if(fst_IO_param%iflag_format                                    &
      &       .eq. iflag_single+id_gzip_bin_file_fmt) then
           call gz_write_step_asbl_fld_mpi_b                             &
-     &         (file_name, nprocs_in, id_rank, nloop, fld_IO, t_IO)
+     &         (file_name, num_pe, id_rank, nloop, fld_IO, t_IO)
           return
         else if(fst_IO_param%iflag_format                               &
      &       .eq. iflag_single+id_gzip_txt_file_fmt) then
           call gz_write_step_asbl_fld_mpi                               &
-     &         (file_name, nprocs_in, nloop, fld_IO, t_IO)
+     &         (file_name, num_pe, nloop, fld_IO, t_IO)
           return
         end if
       end if
 #endif
 !
       do iloop = 1, nloop
-        id_rank = my_rank + (iloop-1) * nprocs
+        id_rank = int(my_rank + (iloop-1) * nprocs)
 !
-        call sel_write_step_SPH_field_file(nprocs_in, id_rank,          &
+        call sel_write_step_SPH_field_file(num_pe, id_rank,             &
      &      istep_fld, fst_IO_param, t_IO, fld_IO(iloop))
       end do
 !

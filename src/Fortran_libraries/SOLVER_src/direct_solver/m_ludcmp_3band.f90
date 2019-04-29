@@ -83,7 +83,6 @@
       REAL(kind = kreal), intent(inout) :: d
 !
 !
-      REAL(kind = kreal), parameter :: TINY = 1.d-30
       INTEGER  (kind = kint) :: i, j, k
       INTEGER  (kind = kint) :: kst, ked
       REAL(kind = kreal) :: aamax,dum
@@ -159,7 +158,7 @@
           end if
         end if
 !
-        if(band_lu(3,j).eq.0.0d0) band_lu(3,j) = TINY
+        if(band_lu(3,j).eq.0.0d0) band_lu(3,j) = TINY*TINY
         dum = 1.0d0/band_lu(3,j)
         if (j .lt. n) band_lu(4,j) = band_lu(4,j)*dum
 !

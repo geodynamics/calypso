@@ -1,5 +1,20 @@
 Settings for Makefiles
 
+
+# -------------------------------------------------------------------------------
+# tacc stampede2
+# -------------------------------------------------------------------------------
+#
+./configure --prefix=/home1/02179/matsui/local \
+CC=icc FC=ifort F77=ifort CXX=icc AR=xiar MPICC=mpicc MPIFC=mpif90 \
+PKG_CONFIG=/usr/bin/pkg-config CFLAGS='-Os -Wall -g -xCORE-AVX2 -axMIC-AVX512' \
+FCFLAGS='-Os -xCORE-AVX2 -axMIC-AVX512 -warn all -g -nogen-interfaces'  \
+FFTW3_CFLAGS='$$(TACC_FFTW3_INC)' FFTW3_LIBS='-L$$(TACC_FFTW3_LIB) -lfftw3' \
+--with-blas=-mkl=sequential --enable-fftw3 --enable-libpng --with-hdf5 \
+--with-zlib=/usr/lib64 --without-pgplot --without-aquaterm \
+PKG_CONFIG_PATH='/usr/lib64/pkgconfig:/home/hmatsui/local/lib/pkgconfig'
+
+
 # -------------------------------------------------------------------------------
 # SR24000 (NIPR:sr1)
 # -------------------------------------------------------------------------------
@@ -23,7 +38,7 @@ PKG_CONFIG_PATH=/home0/matsui/local/lib/pkgconfig
 # Intel mac with gfortran-openmpi with self compiled FFTW3
 # -------------------------------------------------------------------------------
 #
-#./configure --prefix='/Users/matsui/local' FC=mpif90 CC=mpicc CFLAGS='-O3 -Wall -g'  FCFLAGS='-O3 -Wall -g' --with-blas  --enable-fftw3 --with-zlib=/usr --with-hdf5=/Users/matsui/local/bin/h5pcc  PKG_CONFIG_PATH='/Users/matsui/local/lib/pkgconfig:/usr/lib/pkgconfig'
+#./configure --prefix='/Users/matsui/local' FC=mpif90 CC=mpicc CFLAGS='-O3 -Wall -g'  FCFLAGS='-O3 -Wall -g' --with-blas  --enable-fftw3 --with-zlib=/usr --with-hdf5=/opt/local/bin/h5pcc  PKG_CONFIG_PATH='/opt/local/lib/pkgconfig:/usr/lib/pkgconfig'
 #
 #
 #  Makefile for geoynamo platform Calypso

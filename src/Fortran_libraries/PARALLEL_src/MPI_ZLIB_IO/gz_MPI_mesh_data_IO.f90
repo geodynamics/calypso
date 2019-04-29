@@ -10,13 +10,15 @@
 !!@verbatim
 !!      subroutine gz_mpi_write_geometry_data(IO_param, mesh_IO)
 !!      subroutine gz_mpi_write_mesh_groups(IO_param, mesh_group_IO)
-!!        type(mesh_geometry), intent(inout) :: mesh_IO
-!!        type(mesh_groups), intent(inout) ::   mesh_group_IO
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(mesh_geometry), intent(in) :: mesh_IO
+!!        type(mesh_groups), intent(in) ::   mesh_group_IO
 !!
 !!      subroutine gz_mpi_read_num_node(IO_param, mesh_IO)
 !!      subroutine gz_mpi_read_num_node_ele(IO_param, mesh_IO)
 !!      subroutine gz_mpi_read_geometry_data(IO_param, mesh_IO)
 !!      subroutine gz_mpi_read_mesh_groups(IO_param, mesh_group_IO)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
 !!        type(mesh_groups), intent(inout) ::   mesh_group_IO
 !!@endverbatim
@@ -48,7 +50,7 @@
       subroutine gz_mpi_write_geometry_data(IO_param, mesh_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
+      type(mesh_geometry), intent(in) :: mesh_IO
 !
 !
       call gz_mpi_write_charahead                                       &
@@ -80,7 +82,7 @@
       use gz_MPI_groups_IO
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_groups), intent(inout) ::   mesh_group_IO
+      type(mesh_groups), intent(in) ::   mesh_group_IO
 !
 !   write node group
       call gz_mpi_write_charahead                                       &

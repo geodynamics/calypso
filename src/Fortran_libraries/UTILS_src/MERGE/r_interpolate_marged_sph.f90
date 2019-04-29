@@ -7,7 +7,11 @@
 !>@brief Radial interpolation for assemble program
 !!
 !!@verbatim
-!!      subroutine allocate_radial_itp_tbl(nri_new)
+!!      subroutine const_r_interpolate_table                            &
+!!     &         (org_sph_mesh, new_sph_mesh, r_itp)
+!!      subroutine const_ICB_and_CMB_radius(org_sph_mesh, new_sph_mesh, &
+!!     &          nlayer_ICB_org, nlayer_CMB_org,                       &
+!!     &          nlayer_ICB_new, nlayer_CMB_new)
 !!      subroutine deallocate_radial_itp_tbl(nri_new)
 !!      subroutine sph_radial_interpolation_coef                        &
 !!     &         (nri_org, r_org, nri_new, r_new)
@@ -24,6 +28,9 @@
       module r_interpolate_marged_sph
 !
       use m_precision
+      use m_constants
+      use calypso_mpi
+      use t_SPH_mesh_field_data
 !
       implicit none
 !
@@ -46,12 +53,76 @@
         integer(kind = kint) :: kr_outer_domain = 0
       end type sph_radial_itp_data
 !
-      private :: extend_inner_core_scl_type
+      private :: sph_radial_interpolation_coef
+      private :: share_r_interpolation_tbl
+      private :: set_sph_boundary_4_merge
 !
 ! -----------------------------------------------------------------------
 !
       contains
 !
+! -----------------------------------------------------------------------
+!
+      subroutine const_r_interpolate_table                              &
+     &         (org_sph_mesh, new_sph_mesh, r_itp)
+!
+      type(sph_mesh_data), intent(in) :: org_sph_mesh
+      type(sph_mesh_data), intent(in) :: new_sph_mesh
+!
+      type(sph_radial_itp_data), intent(inout) :: r_itp
+!
+!
+      if(my_rank .eq. 0) then
+        call sph_radial_interpolation_coef                              &
+     &     (org_sph_mesh%sph%sph_rj%nidx_rj(1),                         &
+     &      org_sph_mesh%sph%sph_rj%radius_1d_rj_r,                     &
+     &      new_sph_mesh%sph%sph_rj%nidx_rj(1),                         &
+     &      new_sph_mesh%sph%sph_rj%radius_1d_rj_r, r_itp)
+      end if
+      call share_r_interpolation_tbl(new_sph_mesh, r_itp)
+!
+      end subroutine const_r_interpolate_table
+!
+! -----------------------------------------------------------------------
+!
+      subroutine const_ICB_and_CMB_radius(org_sph_mesh, new_sph_mesh,   &
+     &          nlayer_ICB_org, nlayer_CMB_org,                         &
+     &          nlayer_ICB_new, nlayer_CMB_new)
+!
+      type(sph_mesh_data), intent(in) :: org_sph_mesh
+      type(sph_mesh_data), intent(in) :: new_sph_mesh
+!
+      integer(kind = kint), intent(inout) :: nlayer_ICB_org
+      integer(kind = kint), intent(inout) :: nlayer_CMB_org
+      integer(kind = kint), intent(inout) :: nlayer_ICB_new
+      integer(kind = kint), intent(inout) :: nlayer_CMB_new
+!
+!
+      if(my_rank .eq. 0) then
+        call set_sph_boundary_4_merge(org_sph_mesh%sph_grps,            &
+     &      nlayer_ICB_org, nlayer_CMB_org)
+        call set_sph_boundary_4_merge(new_sph_mesh%sph_grps,            &
+     &      nlayer_ICB_new, nlayer_CMB_new)
+      end if
+!
+      call share_ICB_and_CMB_radius(nlayer_ICB_org, nlayer_CMB_org,     &
+     &   nlayer_ICB_new, nlayer_CMB_new)
+!
+      end subroutine const_ICB_and_CMB_radius
+!
+! -----------------------------------------------------------------------
+!
+      subroutine deallocate_radial_itp_tbl(r_itp)
+!
+      type(sph_radial_itp_data), intent(inout) :: r_itp
+!
+!
+      deallocate(r_itp%k_old2new_in, r_itp%k_old2new_out)
+      deallocate(r_itp%coef_old2new_in)
+!
+      end subroutine deallocate_radial_itp_tbl
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine allocate_radial_itp_tbl(nri_new, r_itp)
@@ -73,17 +144,97 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine deallocate_radial_itp_tbl(r_itp)
+      subroutine set_sph_boundary_4_merge(sph_grps,                     &
+     &          nlayer_ICB, nlayer_CMB)
 !
+      use t_spheric_parameter
+      use skip_comment_f
+!
+      type(sph_group_data), intent(in) ::  sph_grps
+      integer(kind = kint), intent(inout) :: nlayer_ICB, nlayer_CMB
+!
+      integer(kind = kint) :: k, kk
+      character(len = kchara) :: tmpchara
+!
+!
+      do k = 1, sph_grps%radial_rj_grp%num_grp
+        tmpchara = sph_grps%radial_rj_grp%grp_name(k)
+        if(cmp_no_case(tmpchara, ICB_nod_grp_name)) then
+          kk = sph_grps%radial_rj_grp%istack_grp(k-1) + 1
+          nlayer_ICB = sph_grps%radial_rj_grp%item_grp(kk)
+        else if(cmp_no_case(tmpchara, CMB_nod_grp_name)) then
+          kk = sph_grps%radial_rj_grp%istack_grp(k-1) + 1
+          nlayer_CMB = sph_grps%radial_rj_grp%item_grp(kk)
+        end if
+      end do
+!
+      end subroutine set_sph_boundary_4_merge
+!
+! -----------------------------------------------------------------------
+!
+      subroutine share_r_interpolation_tbl(new_sph_mesh, r_itp)
+!
+      type(sph_mesh_data), intent(in) :: new_sph_mesh
       type(sph_radial_itp_data), intent(inout) :: r_itp
 !
 !
-      deallocate(r_itp%k_old2new_in, r_itp%k_old2new_out)
-      deallocate(r_itp%coef_old2new_in)
+      call MPI_Bcast(r_itp%iflag_same_rgrid,                            &
+     &    1, CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_Bcast(new_sph_mesh%sph%sph_rj%nidx_rj(1),                &
+     &    1, CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      if(my_rank .eq. 0) write(*,*) 'iflag_same_rgrid: ',               &
+     &            r_itp%iflag_same_rgrid,                               &
+     &            new_sph_mesh%sph%sph_rj%nidx_rj(1)
 !
-      end subroutine deallocate_radial_itp_tbl
+      if(r_itp%iflag_same_rgrid .eq. 0) then
+        if(my_rank .ne. 0)  call allocate_radial_itp_tbl                &
+     &             (new_sph_mesh%sph%sph_rj%nidx_rj(1), r_itp)
+!
+        call MPI_Bcast(r_itp%nri_old2new, 1, CALYPSO_INTEGER,           &
+     &      0, CALYPSO_COMM, ierr_MPI)
+        call MPI_Bcast(r_itp%kr_inner_domain, 1, CALYPSO_INTEGER,       &
+     &      0, CALYPSO_COMM, ierr_MPI)
+        call MPI_Bcast(r_itp%kr_outer_domain, 1, CALYPSO_INTEGER,       &
+     &      0, CALYPSO_COMM, ierr_MPI)
+!
+        call MPI_Bcast(r_itp%k_old2new_in, int(r_itp%nri_old2new),      &
+     &      CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+        call MPI_Bcast(r_itp%k_old2new_out, int(r_itp%nri_old2new),     &
+     &      CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+        call MPI_Bcast(r_itp%coef_old2new_in, int(r_itp%nri_old2new),   &
+     &      CALYPSO_REAL, 0, CALYPSO_COMM, ierr_MPI)
+      end if
+!
+      end subroutine share_r_interpolation_tbl
 !
 ! -----------------------------------------------------------------------
+!
+      subroutine share_ICB_and_CMB_radius                               &
+     &         (nlayer_ICB_org, nlayer_CMB_org,                         &
+     &          nlayer_ICB_new, nlayer_CMB_new)
+!
+      integer(kind = kint), intent(inout) :: nlayer_ICB_org
+      integer(kind = kint), intent(inout) :: nlayer_CMB_org
+      integer(kind = kint), intent(inout) :: nlayer_ICB_new
+      integer(kind = kint), intent(inout) :: nlayer_CMB_new
+!
+!
+      call MPI_Bcast(nlayer_ICB_org, 1, CALYPSO_INTEGER, 0,             &
+     &    CALYPSO_COMM, ierr_MPI)
+      call MPI_Bcast(nlayer_CMB_org, 1, CALYPSO_INTEGER, 0,             &
+     &    CALYPSO_COMM, ierr_MPI)
+      call MPI_Bcast(nlayer_ICB_new, 1, CALYPSO_INTEGER, 0,             &
+     &    CALYPSO_COMM, ierr_MPI)
+      call MPI_Bcast(nlayer_CMB_new, 1, CALYPSO_INTEGER, 0,             &
+     &    CALYPSO_COMM, ierr_MPI)
+!
+      if(my_rank .eq. 0) then
+        write(*,*) 'nlayer_ICB_org: ', nlayer_ICB_org, nlayer_CMB_org
+        write(*,*) 'nlayer_ICB_new: ', nlayer_ICB_new, nlayer_CMB_new
+      end if
+!
+      end subroutine share_ICB_and_CMB_radius
+!
 ! -----------------------------------------------------------------------
 !
       subroutine sph_radial_interpolation_coef                          &
@@ -164,130 +315,15 @@
 !
       write(*,*) 'r_itp%kr_inner_domain', r_itp%kr_inner_domain
       write(*,*) 'r_itp%kr_outer_domain', r_itp%kr_outer_domain
-!      do k = 1, nri_new
-!        write(*,'(i5,1pe16.8,2i5,1p3e16.8)') k, r_new(k),             &
-!     &         r_itp%k_old2new_in(k), r_itp%k_old2new_out(k),         &
-!     &         r_org(k_old2new_in(k)),  r_org(k_old2new_out(k)),      &
-!     &         r_itp%coef_old2new_in(k)
-!      end do
+      do k = 1, nri_new
+        write(*,'(i5,1pe16.8,2i5,1p3e16.8)') k, r_new(k),             &
+     &         r_itp%k_old2new_in(k), r_itp%k_old2new_out(k),         &
+     &         r_org(r_itp%k_old2new_in(k)),                          &
+     &         r_org(r_itp%k_old2new_out(k)),                         &
+     &         r_itp%coef_old2new_in(k)
+      end do
 !
       end subroutine sph_radial_interpolation_coef
-!
-! -----------------------------------------------------------------------
-!
-      subroutine extend_potential_magne(sph, r_itp, sph_phys)
-!
-      use extend_potential_field_t
-!
-      use m_phys_labels
-      use t_sph_spectr_data
-      use t_spheric_parameter
-!
-      type(sph_grids), intent(in) :: sph
-      type(sph_radial_itp_data), intent(in) :: r_itp
-      type(phys_data), intent(inout) :: sph_phys
-!
-      integer(kind = kint) :: is_magne
-      integer(kind = kint) :: i
-!
-!
-      is_magne = 0
-      do i = 1, sph_phys%num_phys
-        if(sph_phys%phys_name(i) .eq. fhd_magne) then
-          is_magne = sph_phys%istack_component(i-1) + 1
-          exit
-        end if
-      end do
-      if(is_magne .eq. 0) return
-!
-      call extend_potential_magne_type(is_magne, sph_phys%ntot_phys,    &
-     &    sph, r_itp%kr_inner_domain, r_itp%kr_outer_domain,            &
-     &    sph_phys%d_fld)
-!
-      end subroutine extend_potential_magne
-!
-! -----------------------------------------------------------------------
-!
-      subroutine extend_inner_core_scalar                               &
-     &         (field_name, sph, r_itp, sph_phys)
-!
-      use t_sph_spectr_data
-      use t_spheric_parameter
-!
-      character(len = kchara), intent(in) :: field_name
-      type(sph_grids), intent(in) :: sph
-      type(sph_radial_itp_data), intent(in) :: r_itp
-      type(phys_data), intent(inout) :: sph_phys
-!
-!
-      integer(kind = kint) :: is_field
-      integer(kind = kint) :: i
-!
-!
-      is_field = 0
-      do i = 1, sph_phys%num_phys
-        if(sph_phys%phys_name(i) .eq. field_name) then
-          is_field = sph_phys%istack_component(i-1) + 1
-          exit
-        end if
-      end do
-      if(is_field .eq. 0) return
-!
-      call extend_inner_core_scl_type(is_field, sph_phys%ntot_phys, &
-     &    sph, r_itp%kr_inner_domain, sph_phys%d_fld)
-!
-      end subroutine extend_inner_core_scalar
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine extend_potential_magne_type(is_magne,  ntot_phys_rj,   &
-     &         sph, kr_inner_domain, kr_outer_domain, d_rj)
-!
-      use extend_potential_field_t
-!
-      use m_phys_labels
-      use t_sph_spectr_data
-      use t_spheric_parameter
-!
-      type(sph_grids), intent(in) :: sph
-      integer(kind = kint), intent(in) :: kr_outer_domain
-      integer(kind = kint), intent(in) :: kr_inner_domain
-      integer(kind = kint), intent(in) :: is_magne, ntot_phys_rj
-      real(kind= kreal), intent(inout)                                  &
-     &                  :: d_rj(sph%sph_rj%nnod_rj,ntot_phys_rj)
-!
-!
-      if(kr_outer_domain .lt. sph%sph_rj%nidx_rj(1)) then
-        call ext_outside_potential_t(sph%sph_rj,                        &
-     &      kr_outer_domain, d_rj(1,is_magne))
-      end if
-      if(kr_inner_domain .gt. 1) then
-        call ext_inside_potential_t(sph%sph_rj,                         &
-     &      kr_inner_domain, d_rj(1,is_magne))
-      end if
-!
-      end subroutine extend_potential_magne_type
-!
-! -----------------------------------------------------------------------
-!
-      subroutine extend_inner_core_scl_type(is_field, ntot_phys_rj,     &
-     &          sph, kr_inner_domain, d_rj)
-!
-      use extend_potential_field_t
-!
-      type(sph_grids), intent(in) :: sph
-      integer(kind = kint), intent(in):: kr_inner_domain
-      integer(kind = kint), intent(in) :: is_field, ntot_phys_rj
-      real(kind= kreal), intent(inout)                                  &
-     &                  :: d_rj(sph%sph_rj%nnod_rj,ntot_phys_rj)
-!
-!
-      if(kr_inner_domain .le. 1) return
-        call ext_inside_scalar_t(sph%sph_rj,                            &
-     &      kr_inner_domain, d_rj(1,is_field))
-!
-      end subroutine extend_inner_core_scl_type
 !
 ! -----------------------------------------------------------------------
 !

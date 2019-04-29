@@ -13,8 +13,8 @@
 !!     &         (ht_prop, node_bc_T_ctl, surf_bc_HF_ctl,               &
 !!     &          temp_nod, h_flux_surf)
 !!        type(scalar_property), intent(in) :: ht_prop
-!!        type(ctl_array_c2r), intent(inout) :: node_bc_T_ctl
-!!        type(ctl_array_c2r), intent(inout) :: surf_bc_HF_ctl
+!!        type(ctl_array_c2r), intent(in) :: node_bc_T_ctl
+!!        type(ctl_array_c2r), intent(in) :: surf_bc_HF_ctl
 !!        type(boundary_condition_list), intent(inout) :: temp_nod
 !!        type(boundary_condition_list), intent(inout) :: h_flux_surf
 !!@endverbatim
@@ -44,8 +44,8 @@
       use set_surface_group_types
 !
       type(scalar_property), intent(in) :: ht_prop
-      type(ctl_array_c2r), intent(inout) :: node_bc_T_ctl
-      type(ctl_array_c2r), intent(inout) :: surf_bc_HF_ctl
+      type(ctl_array_c2r), intent(in) :: node_bc_T_ctl
+      type(ctl_array_c2r), intent(in) :: surf_bc_HF_ctl
       type(boundary_condition_list), intent(inout) :: temp_nod
       type(boundary_condition_list), intent(inout) :: h_flux_surf
 !
@@ -91,8 +91,6 @@
      &         temp_nod%bc_magnitude(i), trim(temp_nod%bc_name(i))
           end do
         end if
-!
-        call dealloc_control_array_c2_r(node_bc_T_ctl)
       end if
 !
 !   set boundary conditions for heat flux
@@ -112,8 +110,6 @@
           call set_bc_group_types_sph_center(surf_bc_HF_ctl%c1_tbl(i),  &
      &            h_flux_surf%ibc_type(i))
         end do
- !
-        call dealloc_control_array_c2_r(surf_bc_HF_ctl)
       end if
 !
       end subroutine s_set_control_4_temp

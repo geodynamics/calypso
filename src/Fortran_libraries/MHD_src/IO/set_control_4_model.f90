@@ -16,8 +16,8 @@
 !!        type(reference_temperature_ctl), intent(in) :: reft_ctl
 !!        type(reference_temperature_ctl), intent(in) :: refc_ctl
 !!        type(mhd_evo_scheme_control), intent(in) :: mevo_ctl
-!!        type(mhd_evolution_control), intent(inout) :: evo_ctl
-!!        type(node_monitor_control), intent(inout) :: nmtr_ctl
+!!        type(mhd_evolution_control), intent(in) :: evo_ctl
+!!        type(node_monitor_control), intent(in) :: nmtr_ctl
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!@endverbatim
 !
@@ -55,8 +55,9 @@
       type(reference_temperature_ctl), intent(in) :: reft_ctl
       type(reference_temperature_ctl), intent(in) :: refc_ctl
       type(mhd_evo_scheme_control), intent(in) :: mevo_ctl
-      type(mhd_evolution_control), intent(inout) :: evo_ctl
-      type(node_monitor_control), intent(inout) :: nmtr_ctl
+      type(mhd_evolution_control), intent(in) :: evo_ctl
+      type(node_monitor_control), intent(in) :: nmtr_ctl
+!
       type(MHD_evolution_param), intent(inout) :: MHD_prop
 !
       integer (kind = kint) :: i
@@ -108,15 +109,12 @@
         end if
       end do
 !
-      if (evo_ctl%t_evo_field_ctl%num .gt. 0 ) then
-        call dealloc_t_evo_name_ctl(evo_ctl)
-      end if
-!
       if      (MHD_prop%fl_prop%iflag_scheme .eq. id_no_evolution       &
      &   .and. MHD_prop%ht_prop%iflag_scheme .eq. id_no_evolution       &
      &   .and. MHD_prop%cp_prop%iflag_scheme .eq. id_no_evolution       &
      &   .and. MHD_prop%cd_prop%iflag_Bevo_scheme .eq. id_no_evolution  &
-     &   .and. MHD_prop%cd_prop%iflag_Aevo_scheme .eq. id_no_evolution) then
+     &   .and. MHD_prop%cd_prop%iflag_Aevo_scheme .eq. id_no_evolution) &
+     & then
             e_message = 'Turn on field for time integration'
         call calypso_MPI_abort(ierr_evo, e_message)
       end if
@@ -159,7 +157,6 @@
         do i = 1, num_monitor
           monitor_grp(i) = nmtr_ctl%group_4_monitor_ctl%c_tbl(i)
         end do
-        call dealloc_control_array_chara(nmtr_ctl%group_4_monitor_ctl)
 !
         if (iflag_debug .ge. iflag_routine_msg) then
           do i = 1, num_monitor
@@ -167,7 +164,6 @@
           end do
         end if
       end if
-!
 !
       end subroutine s_set_control_4_model
 !

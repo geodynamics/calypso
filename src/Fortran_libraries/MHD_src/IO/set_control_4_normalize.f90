@@ -9,13 +9,13 @@
 !!
 !!@verbatim
 !!      subroutine s_set_control_4_normalize                            &
-!!     &        (fl_prop, cd_prop, ht_prop, cp_prop, MHD_coef_list,     &
-!!     &         dless_ctl, eqs_ctl)
+!!     &        (fl_prop, cd_prop, ht_prop, cp_prop,                    &
+!!     &         dless_ctl, eqs_ctl, MHD_coef_list)
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(conductive_property), intent(in)  :: cd_prop
 !!        type(scalar_property), intent(in) :: ht_prop, cp_prop
-!!        type(dimless_control), intent(inout) :: dless_ctl
-!!        type(equations_control), intent(inout) :: eqs_ctl
+!!        type(dimless_control), intent(in) :: dless_ctl
+!!        type(equations_control), intent(in) :: eqs_ctl
 !!        type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !!@endverbatim
 !
@@ -45,16 +45,16 @@
 ! -----------------------------------------------------------------------
 !
       subroutine s_set_control_4_normalize                              &
-     &        (fl_prop, cd_prop, ht_prop, cp_prop, MHD_coef_list,       &
-     &         dless_ctl, eqs_ctl)
+     &        (fl_prop, cd_prop, ht_prop, cp_prop,                      &
+     &         dless_ctl, eqs_ctl, MHD_coef_list)
 !
       type(fluid_property), intent(in) :: fl_prop
       type(conductive_property), intent(in)  :: cd_prop
       type(scalar_property), intent(in) :: ht_prop, cp_prop
+      type(dimless_control), intent(in) :: dless_ctl
+      type(equations_control), intent(in) :: eqs_ctl
 !
       type(coef_parameters_list), intent(inout) :: MHD_coef_list
-      type(dimless_control), intent(inout) :: dless_ctl
-      type(equations_control), intent(inout) :: eqs_ctl
 !
       integer (kind = kint) :: i
 !
@@ -128,7 +128,7 @@
 !
       subroutine set_dimensionless_numbers(dless_ctl, MHD_coef_list)
 !
-      type(dimless_control), intent(inout) :: dless_ctl
+      type(dimless_control), intent(in) :: dless_ctl
       type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
 !
@@ -151,7 +151,7 @@
 !
       use t_ctl_data_termal_norm
 !
-      type(heat_equation_control), intent(inout) :: heat_ctl
+      type(heat_equation_control), intent(in) :: heat_ctl
       type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
 !
@@ -193,7 +193,7 @@
       use t_physical_property
 !
       type(fluid_property), intent(in) :: fl_prop
-      type(momentum_equation_control), intent(inout) :: mom_ctl
+      type(momentum_equation_control), intent(in) :: mom_ctl
       type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
 !
@@ -295,7 +295,7 @@
       use t_ctl_data_induct_norm
 !
       type(conductive_property), intent(in)  :: cd_prop
-      type(induction_equation_control), intent(inout) :: induct_ctl
+      type(induction_equation_control), intent(in) :: induct_ctl
       type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
 !
@@ -351,7 +351,7 @@
 !
       use t_ctl_data_termal_norm
 !
-      type(heat_equation_control), intent(inout) :: comp_ctl
+      type(heat_equation_control), intent(in) :: comp_ctl
       type(coef_parameters_list), intent(inout) :: MHD_coef_list
 !
 !
@@ -392,7 +392,7 @@
 !
       use t_read_control_arrays
 !
-      type(ctl_array_cr), intent(inout) :: coef_ctl
+      type(ctl_array_cr), intent(in) :: coef_ctl
       type(list_of_dimless), intent(inout) :: dimless_list
 !
 !
@@ -404,8 +404,6 @@
       dimless_list%value(1:dimless_list%num)                           &
      &             = coef_ctl%vect(1:dimless_list%num)
 !
-      call dealloc_control_array_c_r(coef_ctl)
-!
       end subroutine copy_dimless_from_ctl
 !
 ! -----------------------------------------------------------------------
@@ -414,7 +412,7 @@
 !
       use t_read_control_arrays
 !
-      type(ctl_array_cr), intent(inout) :: coef_ctl
+      type(ctl_array_cr), intent(in) :: coef_ctl
       type(powers_4_coefficients), intent(inout) :: coef_list
 !
 !
@@ -423,8 +421,6 @@
 !
       coef_list%name(1:coef_list%num) = coef_ctl%c_tbl(1:coef_list%num)
       coef_list%power(1:coef_list%num) = coef_ctl%vect(1:coef_list%num)
-!
-      call dealloc_control_array_c_r(coef_ctl)
 !
       end subroutine copy_power_and_names_from_ctl
 !

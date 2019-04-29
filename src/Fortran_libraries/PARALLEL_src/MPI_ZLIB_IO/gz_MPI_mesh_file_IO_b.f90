@@ -8,20 +8,20 @@
 !!
 !!@verbatim
 !!      subroutine gz_mpi_read_mesh_file_b                              &
-!!     &         (nprocs_in, my_rank_IO, file_name, fem_IO)
+!!     &         (num_pe, id_rank, file_name, fem_IO)
 !!        type(mesh_data), intent(inout) :: fem_IO
 !!
 !!      subroutine gz_mpi_read_mesh_geometry_b                          &
-!!     &         (nprocs_in, my_rank_IO, file_name, mesh_IO)
+!!     &         (num_pe, id_rank, file_name, mesh_IO)
 !!      subroutine gz_mpi_read_node_size_b                              &
-!!     &         (nprocs_in, my_rank_IO, file_name, mesh_IO)
+!!     &         (num_pe, id_rank, file_name, mesh_IO)
 !!      subroutine gz_mpi_read_geometry_size_b                          &
-!!     &         (nprocs_in, my_rank_IO, file_name, mesh_IO)
+!!     &         (num_pe, id_rank, file_name, mesh_IO)
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
 !!
 !!      subroutine gz_mpi_write_mesh_file_b                             &
-!!     &         (nprocs_in, my_rank_IO, file_name, fem_IO)
-!!        type(mesh_data), intent(inout) :: fem_IO
+!!     &         (num_pe, id_rank, file_name, fem_IO)
+!!        type(mesh_data), intent(in) :: fem_IO
 !!@endverbatim
 !
       module gz_MPI_mesh_file_IO_b
@@ -46,13 +46,13 @@
 !  ---------------------------------------------------------------------
 !
       subroutine gz_mpi_read_mesh_file_b                                &
-     &         (nprocs_in, my_rank_IO, file_name, fem_IO)
+     &         (num_pe, id_rank, file_name, fem_IO)
 !
       use m_machine_parameter
       use gz_MPI_binary_datum_IO
       use MPI_binary_head_IO
 !
-      integer(kind = kint), intent(in) :: nprocs_in, my_rank_IO
+      integer, intent(in) :: num_pe, id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(mesh_data), intent(inout) :: fem_IO
@@ -62,7 +62,7 @@
      &   'Read gzipped binary merged mesh file: ', trim(file_name)
 !
       call open_read_gz_mpi_file_b                                      &
-     &   (file_name, nprocs_in, my_rank_IO, IO_param)
+     &   (file_name, num_pe, id_rank, IO_param)
 !
       call gz_mpi_read_geometry_data_b(IO_param, fem_IO%mesh)
       call gz_mpi_read_mesh_groups_b(IO_param, fem_IO%group)
@@ -74,12 +74,12 @@
 !  ---------------------------------------------------------------------
 !
       subroutine gz_mpi_read_mesh_geometry_b                            &
-     &         (nprocs_in, my_rank_IO, file_name, mesh_IO)
+     &         (num_pe, id_rank, file_name, mesh_IO)
 !
       use gz_MPI_binary_datum_IO
       use MPI_binary_head_IO
 !
-      integer(kind = kint), intent(in) :: nprocs_in, my_rank_IO
+      integer, intent(in) :: num_pe, id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
@@ -89,7 +89,7 @@
      &   'Read gzipped binary merged mesh file: ', trim(file_name)
 !
       call open_read_gz_mpi_file_b                                      &
-     &   (file_name, nprocs_in, my_rank_IO, IO_param)
+     &   (file_name, num_pe, id_rank, IO_param)
       call gz_mpi_read_geometry_data_b(IO_param, mesh_IO)
       call close_mpi_file(IO_param)
 !
@@ -98,13 +98,13 @@
 !  ---------------------------------------------------------------------
 !
       subroutine gz_mpi_read_node_size_b                                &
-     &         (nprocs_in, my_rank_IO, file_name, mesh_IO)
+     &         (num_pe, id_rank, file_name, mesh_IO)
 !
       use gz_MPI_binary_datum_IO
       use gz_MPI_domain_data_IO_b
       use MPI_binary_head_IO
 !
-      integer(kind = kint), intent(in) :: nprocs_in, my_rank_IO
+      integer, intent(in) :: num_pe, id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
@@ -114,7 +114,7 @@
      &   'Read gzipped binary merged mesh file: ', trim(file_name)
 !
       call open_read_gz_mpi_file_b                                      &
-     &   (file_name, nprocs_in, my_rank_IO, IO_param)
+     &   (file_name, num_pe, id_rank, IO_param)
       call gz_mpi_read_num_node_b(IO_param, mesh_IO)
       call close_mpi_file(IO_param)
 !
@@ -123,13 +123,13 @@
 !------------------------------------------------------------------
 !
       subroutine gz_mpi_read_geometry_size_b                            &
-     &         (nprocs_in, my_rank_IO, file_name, mesh_IO)
+     &         (num_pe, id_rank, file_name, mesh_IO)
 !
       use gz_MPI_binary_datum_IO
       use gz_MPI_domain_data_IO_b
       use MPI_binary_head_IO
 !
-      integer(kind = kint), intent(in) :: nprocs_in, my_rank_IO
+      integer, intent(in) :: num_pe, id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
@@ -139,7 +139,7 @@
      &   'Read gzipped binary merged mesh file: ', trim(file_name)
 !
       call open_read_gz_mpi_file_b                                      &
-     &   (file_name, nprocs_in, my_rank_IO, IO_param)
+     &   (file_name, num_pe, id_rank, IO_param)
       call gz_mpi_read_num_node_ele_b(IO_param, mesh_IO)
       call close_mpi_file(IO_param)
 !
@@ -149,22 +149,22 @@
 !------------------------------------------------------------------
 !
       subroutine gz_mpi_write_mesh_file_b                               &
-     &         (nprocs_in, my_rank_IO, file_name, fem_IO)
+     &         (num_pe, id_rank, file_name, fem_IO)
 !
       use m_machine_parameter
       use gz_MPI_binary_datum_IO
       use MPI_binary_head_IO
 !
-      integer(kind = kint), intent(in) :: nprocs_in, my_rank_IO
+      integer, intent(in) :: num_pe, id_rank
       character(len=kchara), intent(in) :: file_name
-      type(mesh_data), intent(inout) :: fem_IO
+      type(mesh_data), intent(in) :: fem_IO
 !
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Write gzipped binary merged mesh file: ', trim(file_name)
 !
       call open_write_gz_mpi_file_b                                     &
-     &   (file_name, nprocs_in, my_rank_IO, IO_param)
+     &   (file_name, num_pe, id_rank, IO_param)
       call gz_mpi_write_geometry_data_b(IO_param, fem_IO%mesh)
       call gz_mpi_write_mesh_groups_b(IO_param, fem_IO%group)
 !

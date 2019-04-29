@@ -20,10 +20,6 @@
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph1
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(phys_data), intent(inout) :: nod_fld
-!!        type(SGS_paremeters), intent(inout) :: SGS_par
-!!        type(sph_filters_type), intent(inout) :: sph_filters(1)
-!!        type(mesh_data), intent(inout) :: femmesh
-!!        type(element_geometry), intent(inout) :: ele_mesh
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!        type(MHD_BC_lists), intent(inout) :: MHD_BC
@@ -82,7 +78,7 @@
       use set_control_sph_mhd
       use set_control_sph_data_MHD
       use parallel_load_data_4_sph
-      use set_control_4_SPH_to_FEM
+      use set_control_nodal_data
 !
       type(MHD_file_IO_params), intent(inout) :: MHD_files
       type(boundary_spectra), intent(inout) :: bc_IO
@@ -104,21 +100,24 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_SPH_MHD'
       call set_control_4_SPH_MHD                                        &
-     &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%Dmodel_ctl,          &
-     &    DMHD_ctl%smctl_ctl, DMHD_ctl%smonitor_ctl,                    &
-     &    DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl, sph_maker2%sph_tmp,     &
-     &    rj_fld, MHD_files, bc_IO, MHD_step, MHD_prop,                 &
-     &    MHD_BC, WK%WK_sph, sph_maker2%gen_sph, monitor)
+     &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
+     &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
+     &    sph_maker2%sph_tmp, MHD_files, bc_IO, MHD_step, MHD_prop,     &
+     &    MHD_BC, WK%WK_sph, sph_maker2%gen_sph)
 !
-      call s_set_control_4_SPH_to_FEM                                   &
-     &   (DMHD_ctl%psph_ctl%spctl, sph, rj_fld, nod_fld)
+      call set_control_SPH_MHD_w_viz                                    &
+     &   (DMHD_ctl%model_ctl, DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, &
+     &    MHD_prop, sph, rj_fld, nod_fld, monitor)
+!
       call set_ctl_params_dynamobench                                   &
-     &   (DMHD_ctl%Dmodel_ctl%fld_ctl%field_ctl,                        &
+     &   (DMHD_ctl%model_ctl%fld_ctl%field_ctl,                         &
      &    DMHD_ctl%smonitor_ctl%meq_ctl, cdat%circle, cdat%d_circle,    &
      &    bench)
 !
       if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
       call load_para_sph_mesh(sph, comms_sph, sph_grps)
+!
+      call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
       end subroutine input_control_SPH_dynamobench
 !

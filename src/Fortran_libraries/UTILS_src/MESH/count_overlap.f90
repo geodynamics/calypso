@@ -7,10 +7,12 @@
 !> @brief Check overlapped element
 !!
 !!@verbatim
+!!      integer(kind = kint) function count_interier_element            &
+!!     &                            (internal_node, numele, ie)
 !!      subroutine set_overlap_flag(np_smp, inum_smp_stack,             &
 !!     &          internal_node, numele, ie, internal_n, interior_flag)
 !!
-!!      subroutine set_original_domiain_by_comm(my_rank, nnod,          &
+!!      subroutine set_original_domiain_by_comm(id_rank, nnod,          &
 !!     &          num_neib, ntot_import, id_neib, istack_import,        &
 !!     &          item_import, idomain_nod)
 !!      subroutine set_original_domiain_by_node(nnod, nele, ie,         &
@@ -29,6 +31,27 @@
 !
 ! ----------------------------------------------------------------------
 !
+      integer(kind = kint) function count_interier_element              &
+     &                            (internal_node, numele, ie)
+!
+      integer(kind = kint), intent(in) :: internal_node, numele
+      integer(kind = kint), intent(in) :: ie(numele,1)
+!
+      integer (kind = kint) :: icou, iele
+!
+!
+      icou = 0
+!$omp parallel do private(iele) reduction(+:icou)
+      do iele = 1, numele
+        if(ie(iele,1) .le. internal_node) icou = icou + 1
+      end do
+!$omp end parallel do
+      count_interier_element = icou
+!
+      end function count_interier_element
+!
+! ----------------------------------------------------------------------
+!
       subroutine set_overlap_flag(np_smp, inum_smp_stack,               &
      &          internal_node, numele, ie, internal_n, interior_flag)
 !
@@ -41,6 +64,7 @@
       integer(kind = kint), intent(inout) :: interior_flag(numele)
 !
       integer (kind = kint) :: ip, inod, inum
+!
 !
 !$omp parallel do private(inum, inod)
       do ip = 1, np_smp
@@ -64,11 +88,11 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_original_domiain_by_comm(my_rank, nnod,            &
+      subroutine set_original_domiain_by_comm(id_rank, nnod,            &
      &          num_neib, ntot_import, id_neib, istack_import,          &
      &          item_import, idomain_nod)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: nnod
       integer(kind = kint), intent(in) :: num_neib, ntot_import
       integer(kind = kint), intent(in) :: id_neib(num_neib)
@@ -92,7 +116,7 @@
       end do
 !
       do inod = 1, nnod
-        if(idomain_nod(inod) .eq. -1) idomain_nod(inod) = my_rank
+        if(idomain_nod(inod) .eq. -1) idomain_nod(inod) = id_rank
       end do
 !
       end subroutine set_original_domiain_by_comm

@@ -36,13 +36,13 @@
       call select_sph_ene_spec_data_file(sph_IN_t, input_header)
 !
       if(iflag_data_mode .eq. 0) then
-        call add_dat_extension(input_header, fname_org_rms)
+        fname_org_rms = add_dat_extension(input_header)
         write(fname_org_rms_l, '(a,a6)')                                &
      &                        trim(input_header), '_l.dat'
       else if(iflag_data_mode .eq. 1) then
-        call add_dat_extension(input_header, fname_org_rms)
+        fname_org_rms = add_dat_extension(input_header)
       else if(iflag_data_mode .eq. 2) then
-        call add_dat_extension(input_header, fname_org_rms_l)
+        fname_org_rms_l = add_dat_extension(input_header)
       end if
 !
       write(*,*) 'Input start and end time'

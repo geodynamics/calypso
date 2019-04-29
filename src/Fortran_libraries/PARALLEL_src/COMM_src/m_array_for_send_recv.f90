@@ -76,6 +76,8 @@
        integer(kind = kint), intent(in) :: NB, NP
 !
 !
+       if(allocated(x_vec)) return
+!
        allocate(x_vec(NB*NP))
        allocate(b_vec(NB*NP))
        isize_solver_vect = NB*NP
@@ -105,6 +107,7 @@
        integer(kind = kint), intent(in) :: NP
 !
 !
+       if(allocated(ix_vec)) return
        allocate(ix_vec(NP))
        ix_vec  = 0
 !
@@ -126,6 +129,7 @@
        integer(kind = kint), intent(in) :: NP
 !
 !
+       if(allocated(i8x_vec)) return
        allocate(i8x_vec(NP))
        i8x_vec  = 0
 !

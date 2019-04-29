@@ -10,8 +10,8 @@
 !!@verbatim
 !!      subroutine mpi_write_geometry_data(IO_param, mesh_IO)
 !!      subroutine mpi_write_mesh_groups(IO_param, mesh_group_IO)
-!!        type(mesh_geometry), intent(inout) :: mesh_IO
-!!        type(mesh_groups), intent(inout) ::   mesh_group_IO
+!!        type(mesh_geometry), intent(in) :: mesh_IO
+!!        type(mesh_groups), intent(in) ::   mesh_group_IO
 !!
 !!      subroutine mpi_read_num_node(IO_param, mesh_IO)
 !!      subroutine mpi_read_num_node_ele(IO_param, mesh_IO)
@@ -48,7 +48,7 @@
       subroutine mpi_write_geometry_data(IO_param, mesh_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
+      type(mesh_geometry), intent(in) :: mesh_IO
 !
 !
       call mpi_write_charahead                                          &
@@ -80,7 +80,7 @@
       use MPI_groups_IO
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_groups), intent(inout) ::   mesh_group_IO
+      type(mesh_groups), intent(in) ::   mesh_group_IO
 !
 !   write node group
       call mpi_write_charahead                                          &

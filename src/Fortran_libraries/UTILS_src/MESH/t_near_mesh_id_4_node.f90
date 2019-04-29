@@ -15,9 +15,9 @@
 !!      subroutine dealloc_num_4_near_node(near_tbl)
 !!      subroutine dealloc_near_node(near_tbl)
 !!
-!!      subroutine check_near_nodes_list(my_rank, numnod, near_tbl)
-!!      subroutine check_near_elements(my_rank, numnod, near_tbl)
-!!        integer(kind = kint), intent(in) :: my_rank
+!!      subroutine check_near_nodes_list(id_rank, numnod, near_tbl)
+!!      subroutine check_near_elements(id_rank, numnod, near_tbl)
+!!        integer, intent(in) :: id_rank
 !!        type(near_mesh), intent(in) :: near_tbl
 !!@endverbatim
 !
@@ -156,50 +156,50 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_near_nodes_list(my_rank, numnod, near_tbl)
+      subroutine check_near_nodes_list(id_rank, numnod, near_tbl)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: numnod
       type(near_mesh), intent(in) :: near_tbl
 !
       integer(kind = kint) :: inod, ist, ied
 !
 !
-      write(50+my_rank,*) 'max and min. of near node ID for node ',     &
+      write(50+id_rank,*) 'max and min. of near node ID for node ',     &
      &                    near_tbl%nmax, near_tbl%nmin
       do inod = 1, numnod
         ist = near_tbl%istack_nod(inod-1) + 1
         ied = near_tbl%istack_nod(inod)
-        write(50+my_rank,*) 'near node ID for node num_nod',      &
+        write(50+id_rank,*) 'near node ID for node num_nod',      &
      &                     inod, ist, ied, near_tbl%num_nod(inod)
-        write(50+my_rank,'(8i16)') near_tbl%id_near_nod(ist:ied)
-        write(50+my_rank,*) 'iweight '
-        write(50+my_rank,'(8i16)') near_tbl%iweight(ist:ied)
-        write(50+my_rank,*) 'idist '
-        write(50+my_rank,'(8i16)') near_tbl%idist(ist:ied)
+        write(50+id_rank,'(8i16)') near_tbl%id_near_nod(ist:ied)
+        write(50+id_rank,*) 'iweight '
+        write(50+id_rank,'(8i16)') near_tbl%iweight(ist:ied)
+        write(50+id_rank,*) 'idist '
+        write(50+id_rank,'(8i16)') near_tbl%idist(ist:ied)
       end do
 !
       end subroutine check_near_nodes_list
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_near_elements(my_rank, numnod, near_tbl)
+      subroutine check_near_elements(id_rank, numnod, near_tbl)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: numnod
       type(near_mesh), intent(in) :: near_tbl
 !
       integer(kind = kint) :: inod, ist, ied
 !
 !
-      write(50+my_rank,*) 'max and min. of near node ID for node ',     &
+      write(50+id_rank,*) 'max and min. of near node ID for node ',     &
      &                    near_tbl%nmax, near_tbl%nmin
       do inod = 1, numnod
         ist = near_tbl%istack_nod(inod-1) + 1
         ied = near_tbl%istack_nod(inod)
-        write(50+my_rank,*) 'near node ID for node num_nod',      &
+        write(50+id_rank,*) 'near node ID for node num_nod',      &
      &                     inod, ist, ied, near_tbl%num_nod(inod)
-        write(50+my_rank,'(8i16)') near_tbl%id_near_nod(ist:ied)
+        write(50+id_rank,'(8i16)') near_tbl%id_near_nod(ist:ied)
       end do
 !
       end subroutine check_near_elements

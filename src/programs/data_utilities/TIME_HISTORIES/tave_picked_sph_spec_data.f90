@@ -75,7 +75,7 @@
 !
           icou = icou + 1
           write(*,*) 'step ', i_step,                                   &
-     &        ' is added for time average: count is  ', icou
+     &        ' is added for time average: count is  ', icou, time
         end if
         prev_time = time
 !
@@ -83,7 +83,7 @@
       end do
       close(id_pick)
 !
-      acou = one / (end_time - true_start)
+      acou = one / (time - true_start)
       do ipick = 1, pick%num_sph_mode*pick%num_layer
         do nd = 1, pick%ntot_comp_rj
           ave_spec(nd,ipick) = ave_spec(nd,ipick) * acou
@@ -134,7 +134,7 @@
       end do
       close(id_pick)
 !
-      acou = one / (end_time - true_start)
+      acou = one / (time - true_start)
       do ipick = 1, pick%num_sph_mode*pick%num_layer
         do nd = 1, pick%ntot_comp_rj
           sdev_spec(nd,ipick) = sqrt(sdev_spec(nd,ipick)) * acou
@@ -150,7 +150,7 @@
       end do
 !
       pick%file_prefix = tave_header
-      call write_sph_spec_monitor(izero, i_step, time, pick)
+      call write_sph_spec_monitor(0, i_step, time, pick)
 !
 !    output standard deviation
 !
@@ -161,7 +161,7 @@
       end do
 !
       pick%file_prefix = sdev_header
-      call write_sph_spec_monitor(izero, i_step, time, pick)
+      call write_sph_spec_monitor(0, i_step, time, pick)
 !
       call dealloc_pick_sph_monitor(pick)
       call dealloc_num_pick_layer(pick)

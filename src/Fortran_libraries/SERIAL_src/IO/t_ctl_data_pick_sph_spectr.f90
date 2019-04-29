@@ -8,15 +8,8 @@
 !> @brief Control data for spectr data monitoring
 !!
 !!@verbatim
-!!      subroutine dealloc_num_pick_layer_ctl(pspec_ctl)
-!!
-!!      subroutine dealloc_pick_sph_ctl(pspec_ctl)
-!!      subroutine dealloc_pick_sph_l_ctl(pspec_ctl)
-!!      subroutine dealloc_pick_sph_m_ctl(pspec_ctl)
-!!
-!!      subroutine dealloc_pick_gauss_ctl(g_pwr)
-!!      subroutine dealloc_pick_gauss_l_ctl(g_pwr)
-!!      subroutine dealloc_pick_gauss_m_ctl(g_pwr)
+!!      subroutine dealloc_pick_spectr_control(pspec_ctl)
+!!      subroutine dealloc_gauss_spectr_control(g_pwr)
 !!
 !!      subroutine read_pickup_spectr_ctl(hd_block, iflag, pspec_ctl)
 !!        type(pick_spectr_control), intent(inout) :: pspec_ctl
@@ -178,75 +171,35 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine dealloc_num_pick_layer_ctl(pspec_ctl)
+      subroutine dealloc_pick_spectr_control(pspec_ctl)
 !
       type(pick_spectr_control), intent(inout) :: pspec_ctl
 !
-      call dealloc_control_array_int(pspec_ctl%idx_pick_layer_ctl)
-!
-      end subroutine dealloc_num_pick_layer_ctl
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_pick_sph_ctl(pspec_ctl)
-!
-      type(pick_spectr_control), intent(inout) :: pspec_ctl
 !
       call dealloc_control_array_i2(pspec_ctl%idx_pick_sph_ctl)
-!
-      end subroutine dealloc_pick_sph_ctl
-!
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_pick_sph_l_ctl(pspec_ctl)
-!
-      type(pick_spectr_control), intent(inout) :: pspec_ctl
-!
-      call dealloc_control_array_int(pspec_ctl%idx_pick_sph_l_ctl)
-!
-      end subroutine dealloc_pick_sph_l_ctl
-!
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_pick_sph_m_ctl(pspec_ctl)
-!
-      type(pick_spectr_control), intent(inout) :: pspec_ctl
-!
       call dealloc_control_array_int(pspec_ctl%idx_pick_sph_m_ctl)
+      call dealloc_control_array_int(pspec_ctl%idx_pick_sph_l_ctl)
+      call dealloc_control_array_int(pspec_ctl%idx_pick_layer_ctl)
 !
-      end subroutine dealloc_pick_sph_m_ctl
+      pspec_ctl%picked_mode_head_ctl%iflag = 0
+!
+      end subroutine dealloc_pick_spectr_control
 !
 ! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
 !
-      subroutine dealloc_pick_gauss_ctl(g_pwr)
+      subroutine dealloc_gauss_spectr_control(g_pwr)
 !
       type(gauss_spectr_control), intent(inout) :: g_pwr
+!
 !
       call dealloc_control_array_i2(g_pwr%idx_gauss_ctl)
-!
-      end subroutine dealloc_pick_gauss_ctl
-!
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_pick_gauss_l_ctl(g_pwr)
-!
-      type(gauss_spectr_control), intent(inout) :: g_pwr
-!
       call dealloc_control_array_int(g_pwr%idx_gauss_l_ctl)
-!
-      end subroutine dealloc_pick_gauss_l_ctl
-!
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_pick_gauss_m_ctl(g_pwr)
-!
-      type(gauss_spectr_control), intent(inout) :: g_pwr
-!
       call dealloc_control_array_int(g_pwr%idx_gauss_m_ctl)
 !
-      end subroutine dealloc_pick_gauss_m_ctl
+      g_pwr%gauss_coefs_radius_ctl%iflag = 0
+      g_pwr%gauss_coefs_prefix%iflag =     0
+!
+      end subroutine dealloc_gauss_spectr_control
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -264,7 +217,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
 !
@@ -299,7 +252,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
 !

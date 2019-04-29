@@ -264,33 +264,33 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_spheric_global_stack(my_rank, stk_lc1d)
+      subroutine check_spheric_global_stack(id_rank, stk_lc1d)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(sph_1d_index_stack), intent(in) :: stk_lc1d
 !
-      write(my_rank+50,*) 'istack_idx_local_rtp_r',                     &
+      write(id_rank+50,*) 'istack_idx_local_rtp_r',                     &
      &     stk_lc1d%istack_idx_local_rtp_r
-      write(my_rank+50,*) 'istack_idx_local_rtp_t',                     &
+      write(id_rank+50,*) 'istack_idx_local_rtp_t',                     &
      &     stk_lc1d%istack_idx_local_rtp_t
-      write(my_rank+50,*) 'istack_idx_local_rtp_p',                     &
+      write(id_rank+50,*) 'istack_idx_local_rtp_p',                     &
      &     stk_lc1d%istack_idx_local_rtp_p
 !
-      write(my_rank+50,*) 'istack_idx_local_rtm_r',                     &
+      write(id_rank+50,*) 'istack_idx_local_rtm_r',                     &
      &     stk_lc1d%istack_idx_local_rtm_r
-      write(my_rank+50,*) 'istack_idx_local_rtm_t',                     &
+      write(id_rank+50,*) 'istack_idx_local_rtm_t',                     &
      &     stk_lc1d%istack_idx_local_rtm_t
-      write(my_rank+50,*) 'istack_idx_local_rtm_m',                     &
+      write(id_rank+50,*) 'istack_idx_local_rtm_m',                     &
      &     stk_lc1d%istack_idx_local_rtm_m
 !
-      write(my_rank+50,*) 'istack_idx_local_rlm_r',                     &
+      write(id_rank+50,*) 'istack_idx_local_rlm_r',                     &
      &     stk_lc1d%istack_idx_local_rlm_r
-      write(my_rank+50,*) 'istack_idx_local_rlm_j',                     &
+      write(id_rank+50,*) 'istack_idx_local_rlm_j',                     &
      &     stk_lc1d%istack_idx_local_rlm_j
 !
-      write(my_rank+50,*) 'istack_idx_local_rj_r',                      &
+      write(id_rank+50,*) 'istack_idx_local_rj_r',                      &
      &     stk_lc1d%istack_idx_local_rj_r
-      write(my_rank+50,*) 'istack_idx_local_rj_j',                      &
+      write(id_rank+50,*) 'istack_idx_local_rj_j',                      &
      &     stk_lc1d%istack_idx_local_rj_j
 !
       end subroutine check_spheric_global_stack

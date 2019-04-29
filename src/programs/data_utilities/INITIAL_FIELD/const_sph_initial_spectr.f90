@@ -142,7 +142,7 @@
       type(IO_step_param), intent(inout) :: rst_step
       type(field_IO), intent(inout) :: sph_fst_IO
 !
-      integer(kind = kint) :: iflag
+      integer(kind = kint) :: i_step
 !
 !  Set initial velocity if velocity is exist
       call set_initial_velocity(sph_MHD_bc%sph_bc_U,                    &
@@ -176,12 +176,12 @@
 !
 !
       if(MHD_step1%init_d%i_time_step .eq. -1) then
-        rst_step%istep_file = MHD_step1%init_d%i_time_step
+        i_step = MHD_step1%init_d%i_time_step
       else
-        iflag = set_IO_step_flag(MHD_step1%time_d%i_time_step,rst_step)
+        i_step = MHD_step1%time_d%i_time_step
       end if
-      call output_sph_restart_control(fst_file_IO, MHD_step1%time_d,    &
-     &    SPH_MHD%fld, rst_step, sph_fst_IO)
+      call output_sph_restart_control(i_step, fst_file_IO,              &
+     &    MHD_step1%time_d, SPH_MHD%fld, rst_step, sph_fst_IO)
 !
       end subroutine sph_initial_spectrum
 !
@@ -196,7 +196,8 @@
       type(phys_address), intent(in) :: ipol, itor
       type(phys_data), intent(inout) :: rj_fld
 !
-      integer ( kind = kint) :: inod, jj, k
+      integer :: jj, k
+      integer ( kind = kint) :: inod
 !      real (kind = kreal) :: rr
       real (kind = kreal) :: pi, xr, shell
 !      real(kind = kreal), parameter :: A_light = 0.1d0
@@ -247,7 +248,8 @@
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
 !
-      integer ( kind = kint) :: inod, k, jj, i_center
+      integer :: jj, k
+      integer ( kind = kint) :: inod, i_center
       real (kind = kreal) :: pi, rr, xr, shell
       real(kind = kreal), parameter :: A_temp = 0.1d0
 !
@@ -324,7 +326,8 @@
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
 !
-      integer (kind = kint) :: inod, k, jj, i_center
+      integer :: jj, k
+      integer (kind = kint) :: inod, i_center
       real (kind = kreal) :: pi, rr, xr, shell
       real(kind = kreal), parameter :: A_light = 0.1d0
 !
@@ -395,7 +398,8 @@
       type(phys_data), intent(inout) :: rj_fld
 !
       real (kind = kreal) :: pi, rr
-      integer(kind = kint) :: is, it, k, js, jt, is_ICB, is_CMB
+      integer(kind = kint) :: is, it, is_ICB, is_CMB
+      integer :: js, jt, k
 !
 !
       if(ipol%i_magne .eq. izero) return
@@ -424,7 +428,7 @@
         end do
 !
 !   Fill potential field if inner core exist
-        is_ICB = local_sph_data_address(sph, sph_bc_B%kr_in, js)
+        is_ICB = local_sph_data_address(sph, int(sph_bc_B%kr_in), js)
         do k = 1, sph_bc_B%kr_in-1
           is = local_sph_data_address(sph, k, js)
           rr = radius_1d_rj_r(sph, k) / sph_bc_B%r_ICB(0)
@@ -434,7 +438,7 @@
         end do
 !
 !   Fill potential field if external of the core exist
-        is_CMB = local_sph_data_address(sph, sph_bc_B%kr_out, js)
+        is_CMB = local_sph_data_address(sph, int(sph_bc_B%kr_out), js)
         do k = sph_bc_B%kr_out+1, nidx_rj(sph,1)
           is = local_sph_data_address(sph, k, js)
           rr = radius_1d_rj_r(sph, k) / sph_bc_B%r_CMB(0)
@@ -472,7 +476,8 @@
       type(phys_data), intent(inout) :: rj_fld
 !
       real (kind = kreal) :: rr, q
-      integer(kind = kint) :: inod, k, jj, i_center
+      integer(kind = kint) :: inod, i_center
+      integer :: jj, k
 !
 !
       if(ipol%i_heat_source .eq. izero) return
@@ -519,7 +524,8 @@
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
 !
-      integer(kind = kint) :: k, jj, inod, i_center
+      integer(kind = kint) :: inod, i_center
+      integer :: jj, k
 !
 !
       if(ipol%i_light_source .eq. izero) return
@@ -564,7 +570,8 @@
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
 !
-      integer ( kind = kint) :: inod, k, jj, i_center
+      integer ( kind = kint) :: inod, i_center
+      integer :: jj, k
       real (kind = kreal) :: temp_CMB = 0.0d0
 !
 !
@@ -575,7 +582,7 @@
 !
 !   set reference temperature if (l = m = 0) mode is there
       if (jj .gt. 0) then
-        inod = local_sph_data_address(sph, sph_bc_T%kr_out, jj)
+        inod = local_sph_data_address(sph, int(sph_bc_T%kr_out), jj)
         temp_CMB = rj_fld%d_fld(inod,ipol%i_temp)
 !
         do k = 1, nidx_rj(sph,1)
@@ -608,7 +615,8 @@
       type(phys_data), intent(inout) :: rj_fld
 !
       real (kind = kreal) :: rr, q
-      integer(kind = kint) :: inod, k, jj
+      integer(kind = kint) :: inod
+      integer :: jj, k
 !
 !
       if(ipol%i_heat_source .eq. izero) return
@@ -650,7 +658,8 @@
       type(phys_data), intent(inout) :: rj_fld
 !
       real (kind = kreal) :: rr, q, T_ICB, f_ICB
-      integer(kind = kint) :: inod, k, jj, i_center
+      integer(kind = kint) :: inod, i_center
+      integer :: jj, k
 !
 !
       if(ipol%i_heat_source*ipol%i_temp .eq. izero) return
@@ -705,7 +714,8 @@
       type(phys_data), intent(inout) :: rj_fld
 !
       real (kind = kreal) :: rr, q, T_ICB, f_ICB
-      integer(kind = kint) :: inod, k, jj, i_center
+      integer(kind = kint) :: inod, i_center
+      integer :: jj, k
 !
 !
       if(ipol%i_heat_source .eq. izero) return
@@ -762,11 +772,10 @@
 !!   Wrapper routines from mesh strucutres. Do not edit.
 !-----------------------------------------------------------------------
 !
-      integer(kind = kint) function find_local_sph_mode_address         &
-     &                            (sph, l, m)
+      integer function find_local_sph_mode_address(sph, l, m)
 !
       type(sph_grids), intent(in) :: sph
-      integer(kind = 4), intent(in) :: l, m
+      integer, intent(in) :: l, m
 !
 !
       find_local_sph_mode_address                                       &
@@ -780,7 +789,7 @@
      &                            (sph, kr, j_lc)
 !
       type(sph_grids), intent(in) :: sph
-      integer(kind = kint), intent(in) :: kr, j_lc
+      integer :: kr, j_lc
 !
 !
       local_sph_data_address                                            &
@@ -793,7 +802,7 @@
       real(kind = kreal) function radius_1d_rj_r(sph, kr)
 !
       type(sph_grids), intent(in) :: sph
-      integer(kind = kint), intent(in) :: kr
+      integer, intent(in) :: kr
 !
       radius_1d_rj_r = sph%sph_rj%radius_1d_rj_r(kr)
 !
@@ -801,41 +810,41 @@
 !
 !-----------------------------------------------------------------------
 !
-      real(kind = kreal) function r_CMB(sph)
+      real function r_CMB(sph)
 !
       type(sph_grids), intent(in) :: sph
 !
-      r_CMB = sph%sph_params%radius_CMB
+      r_CMB = int(sph%sph_params%radius_CMB)
 !
       end function r_CMB
 !
 !-----------------------------------------------------------------------
 !
-      real(kind = kreal) function r_ICB(sph)
+      real function r_ICB(sph)
 !
       type(sph_grids), intent(in) :: sph
 !
-      r_ICB = sph%sph_params%radius_ICB
+      r_ICB = int(sph%sph_params%radius_ICB)
 !
       end function r_ICB
 !
 !-----------------------------------------------------------------------
 !
-      integer(kind = kint) function nlayer_CMB(sph)
+      integer function nlayer_CMB(sph)
 !
       type(sph_grids), intent(in) :: sph
 !
-      nlayer_CMB = sph%sph_params%nlayer_CMB
+      nlayer_CMB = int(sph%sph_params%nlayer_CMB)
 !
       end function nlayer_CMB
 !
 !-----------------------------------------------------------------------
 !
-      integer(kind = kint) function nlayer_ICB(sph)
+      integer function nlayer_ICB(sph)
 !
       type(sph_grids), intent(in) :: sph
 !
-      nlayer_ICB = sph%sph_params%nlayer_ICB
+      nlayer_ICB = int(sph%sph_params%nlayer_ICB)
 !
       end function nlayer_ICB
 !
@@ -854,7 +863,7 @@
       integer(kind = kint) function nidx_rj(sph, nd)
 !
       type(sph_grids), intent(in) :: sph
-      integer(kind = kint), intent(in) :: nd
+      integer, intent(in) :: nd
 !
       nidx_rj = sph%sph_rj%nidx_rj(nd)
 !

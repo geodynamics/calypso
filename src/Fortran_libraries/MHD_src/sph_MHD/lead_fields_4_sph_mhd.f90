@@ -87,7 +87,6 @@
 !
       use sph_transforms_4_MHD
       use cal_buoyancies_sph_MHD
-      use copy_MHD_4_sph_trans
       use cal_energy_flux_rtp
       use swap_phi_order_4_sph_trans
 !
@@ -116,7 +115,7 @@
       end if
 !
       call lead_fields_by_sph_trans                                     &
-     &   (sph, comms_sph, MHD_prop, trans_p, ipol, WK, rj_fld)
+     &   (sph, comms_sph, MHD_prop, trans_p, WK, rj_fld)
 !
       call gradients_of_vectors_sph                                     &
      &   (sph, comms_sph, r_2nd, sph_MHD_bc, trans_p,                   &
@@ -130,11 +129,10 @@
 ! ----------------------------------------------------------------------
 !
       subroutine lead_fields_by_sph_trans                               &
-     &         (sph, comms_sph, MHD_prop, trans_p, ipol, WK, rj_fld)
+     &         (sph, comms_sph, MHD_prop, trans_p, WK, rj_fld)
 !
       use sph_transforms_4_MHD
       use cal_buoyancies_sph_MHD
-      use copy_MHD_4_sph_trans
       use cal_energy_flux_rtp
       use swap_phi_order_4_sph_trans
 !
@@ -142,7 +140,6 @@
       type(sph_comm_tables), intent(in) :: comms_sph
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(parameters_4_sph_trans), intent(in) :: trans_p
-      type(phys_address), intent(in) :: ipol
 !
       type(works_4_sph_trans_MHD), intent(inout) :: WK
       type(phys_data), intent(inout) :: rj_fld
@@ -155,15 +152,14 @@
      &      then
         if (iflag_debug.eq.1) write(*,*) 'sph_pole_trans_4_MHD'
         call sph_pole_trans_4_MHD                                       &
-     &     (sph, comms_sph, trans_p, ipol, rj_fld, WK%trns_MHD)
+     &     (sph, comms_sph, trans_p, rj_fld, WK%trns_MHD%backward)
 !
         if (iflag_debug.eq.1) write(*,*) 'cal_nonlinear_pole_MHD'
         call cal_nonlinear_pole_MHD                                     &
      &     (sph%sph_rtp, MHD_prop%fl_prop, MHD_prop%cd_prop,            &
      &      MHD_prop%ht_prop, MHD_prop%cp_prop,                         &
      &      WK%trns_MHD%f_trns, WK%trns_MHD%b_trns,                     &
-     &      WK%trns_MHD%ncomp_rj_2_rtp, WK%trns_MHD%ncomp_rtp_2_rj,     &
-     &      WK%trns_MHD%fld_pole, WK%trns_MHD%frc_pole)
+     &      WK%trns_MHD%backward, WK%trns_MHD%forward)
       end if
 !
       end subroutine lead_fields_by_sph_trans
@@ -246,7 +242,7 @@
       if (iflag_debug.eq.1) write(*,*)                                  &
      &                          'sph_forward_trans_snapshot_MHD'
       call sph_forward_trans_snapshot_MHD                               &
-     &   (sph, comms_sph, trans_p, trns_snap, ipol, WK_sph, rj_fld)
+     &   (sph, comms_sph, trans_p, trns_snap%forward, WK_sph, rj_fld)
       call calypso_mpi_barrier
 !
       end subroutine enegy_fluxes_4_sph_mhd
@@ -283,17 +279,15 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'sph_back_trans_snapshot_MHD'
       call sph_back_trans_snapshot_MHD(sph, comms_sph, trans_p,         &
-     &    ipol, rj_fld, trns_snap, WK_sph)
+     &    rj_fld, trns_snap%backward, WK_sph)
 !
 !      Evaluate fields for output in grid space
       if (iflag_debug.eq.1) write(*,*) 's_cal_energy_flux_rtp'
       call s_cal_energy_flux_rtp                                        &
      &   (sph%sph_rtp, MHD_prop%fl_prop, MHD_prop%cd_prop,              &
-     &    MHD_prop%ref_param_T, MHD_prop%ref_param_C,                   &
+     &    MHD_prop%ref_param_T, MHD_prop%ref_param_C, trans_p%leg,      &
      &    trns_MHD%f_trns, trns_snap%b_trns, trns_snap%f_trns,          &
-     &    trns_MHD%ncomp_rtp_2_rj, trns_snap%ncomp_rj_2_rtp,            &
-     &    trns_snap%ncomp_rtp_2_rj, trns_MHD%frc_rtp,                   &
-     &    trns_snap%fld_rtp, trns_snap%frc_rtp)
+     &    trns_MHD%forward, trns_snap%backward, trns_snap%forward)
 !
       end subroutine cal_sph_enegy_fluxes
 !
@@ -319,15 +313,14 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      if (iflag_debug.eq.1) write(*,*) 'copy_velo_to_grad_v_rtp'
-      call copy_velo_to_grad_v_rtp                                      &
-     &   (sph%sph_rtp, trns_MHD%b_trns, trns_tmp%f_trns,                &
-     &    trns_MHD%ncomp_rj_2_rtp, trns_tmp%ncomp_rtp_2_rj,             &
-     &    trns_MHD%fld_rtp, trns_tmp%frc_rtp)
+      if (iflag_debug.eq.1) write(*,*) 'copy_vectors_rtp_4_grad'
+      call copy_vectors_rtp_4_grad                                      &
+     &   (sph, trns_MHD%b_trns, trns_tmp%f_trns,                        &
+     &    trns_MHD%backward, trns_tmp%forward)
 !
-      if (iflag_debug.eq.1) write(*,*) 'sph_forward_trans_tmp_snap_MHD'
-      call sph_forward_trans_tmp_snap_MHD                               &
-     &   (sph, comms_sph, trans_p, trns_tmp, ipol, WK_sph, rj_fld)
+      if (iflag_debug.eq.1) write(*,*) 'sph_forward_trans_snapshot_MHD'
+      call sph_forward_trans_snapshot_MHD                               &
+     &   (sph, comms_sph, trans_p, trns_tmp%forward, WK_sph, rj_fld)
 !
       if (iflag_debug.eq.1) write(*,*) 'cal_grad_of_velocities_sph'
       call cal_grad_of_velocities_sph(sph%sph_rj, r_2nd,                &

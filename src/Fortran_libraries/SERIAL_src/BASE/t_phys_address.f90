@@ -344,6 +344,9 @@
 !>        start address for divergence of SGS inertia term
         integer (kind=kint) :: i_SGS_div_Lorentz =    izero
 !
+!
+!      SGS terms by wider filter
+!
 !>        start address for SGS heat flux by wider filter
 !!         @f$ \overline{u_{i}T} - \bar{u}_{i}\bar{T} @f$
         integer (kind=kint) :: i_wide_SGS_h_flux =      izero
@@ -353,8 +356,38 @@
 !>        start address for SGS inertia term  by wider filter
         integer (kind=kint) :: i_wide_SGS_inertia =    izero
 !>        start address for SGS Lorentz force wih wider filter
-!!         @f$ \partial_{i} \left( \overline{B_{i}B_{j}} - \bar{B}_{i}\bar{B}_{j} \right) @f$
+!!         @f$ \partial_{i} \left( \overline{B_{i}B_{j}}
+!!            - \bar{B}_{i}\bar{B}_{j} \right) @f$
         integer (kind=kint) :: i_wide_SGS_Lorentz =     izero
+!>        start address for SGS induction for vector potential by wider filter
+!!         @f$e_{ijk}\left(\overline{u_{j}B_{k}} - \bar{u}_{j}\bar{B}_{k} \right) @f$
+        integer (kind=kint) :: i_wide_SGS_vp_induct =   izero
+!
+!
+!      SGS terms by double filtering
+!
+!>        start address for SGS heat flux with wider filter
+!!         @f$ \overline{\overline{u_{i}T}}
+!!            - \bar{\bar{u}}_{i}\bar{\bar{T}} @f$
+        integer (kind=kint) :: i_dbl_SGS_h_flux =      izero
+!>        start address for SGS composition flux with wider filter
+!!         @f$ \overline{\overline{u_{i}C}}
+!!            - \bar{\bar{u}}_{i}\bar{\bar{C}} @f$
+        integer (kind=kint) :: i_dbl_SGS_c_flux =      izero
+!>        start address for SGS inertia term with wider filter
+!!         @f$ e_{ijk}\left(\overline{\overline{\omega_{j}u_{k}}}
+!!            - \bar{\bar{\omega}}_{j}\bar{\bar{u}}_{k} \right) @f$
+        integer (kind=kint) :: i_dbl_SGS_inertia =    izero
+!>        start address for SGS Lorentz force with wider filter
+!!         @f$ e_{ijk}\left(\overline{\overline{\J_{j}B_{k}}}
+!!            - \bar{\bar{J}}_{j}\bar{\bar{B}}_{k} \right) @f$
+        integer (kind=kint) :: i_dbl_SGS_Lorentz =     izero
+!>        start address for SGS induction with wider filter
+!!         @f$ e_{ijk}\left(\overline{\overline{\u_{j}B_{k}}}
+!!            - \bar{\bar{u}}_{j}\bar{\bar{B}}_{k} \right) @f$
+        integer (kind=kint) :: i_dbl_SGS_vp_induct =   izero
+!
+!   model coefficient
 !
 !>        start address for model coefficient of SGS heat flux
 !!         @f$ \overline{u_{i}T} - \bar{u}_{i}\bar{T} @f$
@@ -390,9 +423,6 @@
 !>        start address for SGS induction for vector potential
 !!         @f$e_{ijk}\left(\overline{u_{j}B_{k}} - \bar{u}_{j}\bar{B}_{k} \right) @f$
         integer (kind=kint) :: i_SGS_vp_induct =   izero
-!>        start address for SGS induction for vector potential by wider filter
-!!         @f$e_{ijk}\left(\overline{u_{j}B_{k}} - \bar{u}_{j}\bar{B}_{k} \right) @f$
-        integer (kind=kint) :: i_wide_SGS_vp_induct =   izero
 !
 !>        start address for SGS buoyancy
         integer (kind=kint) :: i_SGS_buoyancy =   izero
@@ -485,6 +515,24 @@
 !!            + (\overline{B_{i}B_{j}} - \bar{B}_{i}\bar{B}_{j})@f$
       integer (kind=kint) :: i_maxwell_t_w_sgs = izero
 !
+!  Square of each component of fields
+!
+!>        Square of velocity @f$ u_{i}^{2} @f$
+      integer (kind=kint) :: i_square_v = izero
+!>        Square of vorticity @f$ \omega_{i}^{2} @f$
+      integer (kind=kint) :: i_square_w = izero
+!>        Square of magnetic field @f$ B_{i}^{2} @f$
+      integer (kind=kint) :: i_square_b = izero
+!>        Square of magnetic vector potential @f$ A_{i}^{2} @f$
+      integer (kind=kint) :: i_square_a = izero
+!>        Square of current density @f$ J_{i}^{2} @f$
+      integer (kind=kint) :: i_square_j = izero
+!>        Square of temperature @f$ T^{2} @f$
+      integer (kind=kint) :: i_square_t = izero
+!>        Square of composition @f$ C^{2} @f$
+      integer (kind=kint) :: i_square_c = izero
+!
+!    Gradient of fields
 !>        start address for gradient of @f$ u_{x} @f$
         integer (kind=kint) :: i_grad_vx = izero
 !>        start address for gradient of @f$ u_{y} @f$
@@ -520,12 +568,50 @@
         integer (kind=kint) :: i_grad_t =           izero
 !>        start address for gradient of @f$ \Theta @f$
         integer (kind=kint) :: i_grad_part_t =      izero
-!>        start address for gradient of @f$ \tilde{T} @f$
-        integer (kind=kint) :: i_grad_filter_temp = izero
-!>        start address for gradient of @f$ \tilde{C} @f$
+!>        start address for gradient of @f$ C @f$
         integer (kind=kint) :: i_grad_composit =    izero
 !>        start address for gradient of perturbation of composition
         integer (kind=kint) :: i_grad_part_c =      izero
+!
+!
+!    Gradient of filtered fields
+!>        start address for gradient of @f$ \tilde{u}_{x} @f$
+        integer (kind=kint) :: i_grad_filter_vx = izero
+!>        start address for gradient of @f$ \tilde{u}_{y} @f$
+        integer (kind=kint) :: i_grad_filter_vy = izero
+!>        start address for gradient of @f$ \tilde{u}_{z} @f$
+        integer (kind=kint) :: i_grad_filter_vz = izero
+!>        start address for gradient of @f$ \tilde{\omega}_{x} @f$
+        integer (kind=kint) :: i_grad_filter_wx = izero
+!>        start address for gradient of @f$ \tilde{\omega}_{y} @f$
+        integer (kind=kint) :: i_grad_filter_wy = izero
+!>        start address for gradient of @f$ \tilde{\omega}_{z} @f$
+        integer (kind=kint) :: i_grad_filter_wz = izero
+!>        start address for gradient of @f$ \tilde{A}_{x} @f$
+        integer (kind=kint) :: i_grad_filter_ax = izero
+!>        start address for gradient of @f$ \tilde{A}_{y} @f$
+        integer (kind=kint) :: i_grad_filter_ay = izero
+!>        start address for gradient of @f$ \tilde{A}_{z} @f$
+        integer (kind=kint) :: i_grad_filter_az = izero
+!>        start address for gradient of @f$ \tilde{B}_{x} @f$
+        integer (kind=kint) :: i_grad_filter_bx = izero
+!>        start address for gradient of @f$ \tilde{B}_{y} @f$
+        integer (kind=kint) :: i_grad_filter_by = izero
+!>        start address for gradient of @f$ \tilde{B}_{z} @f$
+        integer (kind=kint) :: i_grad_filter_bz = izero
+!>        start address for gradient of @f$ \tilde{J}_{x} @f$
+        integer (kind=kint) :: i_grad_filter_jx = izero
+!>        start address for gradient of @f$ \tilde{J}_{y} @f$
+        integer (kind=kint) :: i_grad_filter_jy = izero
+!>        start address for gradient of @f$ \tilde{J}_{z} @f$
+        integer (kind=kint) :: i_grad_filter_jz = izero
+!
+!>        start address for gradient of @f$ \tilde{T} @f$
+        integer (kind=kint) :: i_grad_filter_temp = izero
+!>        start address for gradient of @f$ \tilde{C} @f$
+        integer (kind=kint) :: i_grad_filter_comp = izero
+!
+!
 !
 !>        start address for SGS term by scale similarity method
         integer (kind=kint) :: i_sgs_simi =        izero
@@ -542,6 +628,8 @@
 !>        start address for composition variation
 !!        to obatin commutation error
         integer (kind=kint) :: i_sgs_composit =    izero
+!
+!  wider filtered field
 !
 !>        start address for filtered velocity by wider filter
         integer (kind=kint) :: i_wide_fil_velo  =  izero
@@ -566,6 +654,32 @@
 !>        start address for filtered grad. of composition
 !!        by wider filter
         integer (kind=kint) :: i_wide_fil_grad_c  =  izero
+!
+!  double filtered field
+!
+!>        start address for filtered velocity by double filtering
+        integer (kind=kint) :: i_dbl_fil_velo  =  izero
+!>        start address for filtered vorticity by double filtering
+        integer (kind=kint) :: i_dbl_fil_vort  =  izero
+!>        start address for filtered magnetic vector potential
+!!        by double filtering
+        integer (kind=kint) :: i_dbl_fil_vecp =     izero
+!>        start address for filtered magnetic field by double filtering
+        integer (kind=kint) :: i_dbl_fil_magne =  izero
+!>        start address for filtered current density by double filtering
+        integer (kind=kint) :: i_dbl_fil_current =  izero
+!
+!>        start address for filtered temperature by double filtering
+        integer (kind=kint) :: i_dbl_fil_temp  =  izero
+!>        start address for filtered grad. of temperature
+!!        by double filtering
+        integer (kind=kint) :: i_dbl_fil_grad_t  =  izero
+!
+!>        start address for filtered compostiion by double filtering
+        integer (kind=kint) :: i_dbl_fil_comp  =  izero
+!>        start address for filtered grad. of composition
+!>        by double filtering
+        integer (kind=kint) :: i_dbl_fil_grad_c  =  izero
 !
 !
 !  divergence of momentum equations
@@ -664,6 +778,12 @@
         integer (kind=kint) :: i_temp_scale =       izero
 !>        start address for composition length scale
         integer (kind=kint) :: i_comp_scale =       izero
+!
+!
+!>        start address for viscosity   @f$ \mu @f$
+        integer (kind=kint) :: i_viscosity =   izero
+!>        start address for thermal diffusivity @f$ k @f$
+        integer (kind=kint) :: i_T_conductivity =   izero
 !
 !>        start address for kinetic viscosity
         integer (kind=kint) :: i_K_viscosity =   izero

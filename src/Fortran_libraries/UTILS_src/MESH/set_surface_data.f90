@@ -3,19 +3,19 @@
 !
 !      Written by H. Matsui
 !
-!!      subroutine count_all_surfaces(numele, isurf_flag, numsurf)
+!!      subroutine count_all_surfaces(ntot_list, isurf_flag, numsurf)
 !!      subroutine set_all_surfaces(numele, numsurf, nnod_4_ele,        &
-!!     &          nnod_4_surf, ie, node_on_sf, isurf_hash, isurf_flag,  &
-!!     &          ie_surf, isf_4_ele)
+!!     &          nnod_4_surf, ie, node_on_sf, ntot_list,               &
+!!     &          isurf_hash, isurf_flag,  ie_surf, isf_4_ele)
 !!
 !!      subroutine set_surf_rotation_flag(numele, numsurf, nnod_4_ele,  &
 !!     &          nnod_4_surf, ie, ie_surf, isf_4_ele, isf_rot_ele)
 !!
 !!      subroutine count_part_surface                                   &
-!!     &         (numele, nele_grp, isurf_flag, numsurf_part)
+!!     &         (nele_grp, ntot_list, isurf_flag, numsurf_part)
 !!      subroutine set_part_surface                                     &
 !!     &         (numele, nele_grp,  numsurf_part, isf_4_ele,           &
-!!     &          isurf_hash, isurf_flag, isf_part)
+!!     &          ntot_list, isurf_hash, isurf_flag, isf_part)
 !
       module set_surface_data
 !
@@ -30,19 +30,18 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine count_all_surfaces(numele, isurf_flag, numsurf)
+      subroutine count_all_surfaces(ntot_list, isurf_flag, numsurf)
 !
-      integer(kind = kint), intent(in) :: numele
-      integer(kind = kint), intent(in)                                  &
-     &                     :: isurf_flag(nsurf_4_ele*numele)
+      integer(kind = kint_gl), intent(in) :: ntot_list
+      integer(kind = kint_gl), intent(in) :: isurf_flag(ntot_list)
 !
       integer(kind = kint), intent(inout) :: numsurf
 !
-      integer(kind = kint) :: k1
+      integer(kind = kint_gl) :: k1
 !
 !
       numsurf = 0
-      do k1 = 1, nsurf_4_ele*numele
+      do k1 = 1, ntot_list
         if (isurf_flag(k1) .gt. 0) numsurf = numsurf + 1
       end do
 !
@@ -51,8 +50,8 @@
 !------------------------------------------------------------------
 !
       subroutine set_all_surfaces(numele, numsurf, nnod_4_ele,          &
-     &          nnod_4_surf, ie, node_on_sf, isurf_hash, isurf_flag,    &
-     &          ie_surf, isf_4_ele)
+     &          nnod_4_surf, ie, node_on_sf, ntot_list,                 &
+     &          isurf_hash, isurf_flag,  ie_surf, isf_4_ele)
 !
       integer(kind = kint), intent(in) :: numsurf, nnod_4_surf
       integer(kind = kint), intent(in) :: numele, nnod_4_ele
@@ -60,23 +59,23 @@
       integer(kind = kint), intent(in)                                  &
      &                  :: node_on_sf(nnod_4_surf,nsurf_4_ele)
 !
-      integer(kind = kint), intent(in)                                  &
-     &                     :: isurf_hash(nsurf_4_ele*numele,2)
-      integer(kind = kint), intent(in)                                  &
-     &                     :: isurf_flag(nsurf_4_ele*numele)
+      integer(kind = kint_gl), intent(in) :: ntot_list
+      integer(kind = kint), intent(in) :: isurf_hash(ntot_list,2)
+      integer(kind = kint_gl), intent(in) :: isurf_flag(ntot_list)
 !
       integer(kind = kint), intent(inout)                               &
      &      :: ie_surf(numsurf,nnod_4_surf)
       integer(kind = kint), intent(inout)                               &
      &      :: isf_4_ele(numele,nsurf_4_ele)
 !
-      integer(kind = kint) :: k1, k2
+      integer(kind = kint_gl) :: k1
+      integer(kind = kint) :: k2
       integer(kind = kint) :: i, iele, is, isurf
       integer(kind = kint) :: j, jele, js
 !
 !
       isurf = 0
-      do k1 = 1, nsurf_4_ele*numele
+      do k1 = 1, ntot_list
         if (isurf_flag(k1) .gt. 0) then
           isurf = isurf + 1
 !
@@ -93,11 +92,11 @@
 !
 !
 !
-      do k1 = 1, nsurf_4_ele*numele
+      do k1 = 1, ntot_list
 !
         if (isurf_flag(k1) .lt. 0) then
 !
-          k2 = -isurf_flag(k1)
+          k2 = int(-isurf_flag(k1), KIND(k2))
           iele = isurf_hash(k1,1)
           is =   isurf_hash(k1,2)
           jele = isurf_hash(k2,1)
@@ -157,18 +156,19 @@
 ! ----------------------------------------------------------------------
 !
       subroutine count_part_surface                                     &
-     &         (numele, nele_grp, isurf_flag, numsurf_part)
+     &         (nele_grp, ntot_list, isurf_flag, numsurf_part)
 !
-      integer(kind = kint), intent(in) :: numele, nele_grp
+      integer(kind = kint), intent(in) :: nele_grp
 !
-      integer(kind = kint), intent(in)                                  &
-     &                     :: isurf_flag(nsurf_4_ele*numele)
+      integer(kind = kint_gl), intent(in) :: ntot_list
+      integer(kind = kint_gl), intent(in) :: isurf_flag(ntot_list)
 !
       integer(kind = kint), intent(inout) :: numsurf_part
 !
-      integer(kind = kint) :: k1
+      integer(kind = kint_gl) :: k1
 !
 !
+      numsurf_part = 0
       do k1 = 1, nsurf_4_ele*nele_grp
         if (isurf_flag(k1) .eq. 0) numsurf_part = numsurf_part + 1
       end do
@@ -179,20 +179,19 @@
 !
       subroutine set_part_surface                                       &
      &         (numele, nele_grp,  numsurf_part, isf_4_ele,             &
-     &          isurf_hash, isurf_flag, isf_part)
+     &          ntot_list, isurf_hash, isurf_flag, isf_part)
 !
       integer(kind = kint), intent(in) :: numele, nele_grp
       integer(kind = kint), intent(in) :: numsurf_part
       integer(kind = kint), intent(in) :: isf_4_ele(numele,nsurf_4_ele)
 !
-      integer(kind = kint), intent(in)                                  &
-     &                     :: isurf_hash(nsurf_4_ele*numele,2)
-      integer(kind = kint), intent(in)                                  &
-     &                     :: isurf_flag(nsurf_4_ele*numele)
+      integer(kind = kint_gl), intent(in) :: ntot_list
+      integer(kind = kint), intent(in) :: isurf_hash(ntot_list,2)
+      integer(kind = kint_gl), intent(in) :: isurf_flag(ntot_list)
 !
       integer(kind = kint), intent(inout) :: isf_part(numsurf_part)
 !
-      integer(kind = kint) :: k1
+      integer(kind = kint_gl) :: k1
       integer(kind = kint) :: iele, is, inum
 !
 !

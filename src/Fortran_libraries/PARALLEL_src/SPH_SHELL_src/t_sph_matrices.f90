@@ -21,7 +21,7 @@
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(band_matrices_type), intent(inout) :: smat
 !!
-!!      subroutine check_radial_band_mat(my_rank, sph_rj, smat)
+!!      subroutine check_radial_band_mat(id_rank, sph_rj, smat)
 !!@endverbatim
 !
       module t_sph_matrices
@@ -228,28 +228,28 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine check_radial_band_mat(my_rank, sph_rj, smat)
+      subroutine check_radial_band_mat(id_rank, sph_rj, smat)
 !
       use t_spheric_rj_data
       use check_sph_radial_mat
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(band_matrices_type), intent(in) :: smat
 !
 !
-      write(50+my_rank,'(a,a)') 'Matrix ', trim(smat%mat_name)
+      write(50+id_rank,'(a,a)') 'Matrix ', trim(smat%mat_name)
 !
       if(smat%n_band .eq. ithree) then
-        call check_radial_3band_mat(my_rank, smat%n_vect, smat%n_comp,  &
+        call check_radial_3band_mat(id_rank, smat%n_vect, smat%n_comp,  &
      &      sph_rj%idx_gl_1d_rj_j, sph_rj%radius_1d_rj_r, smat%mat)
 !
       else if(smat%n_band .eq. ifive) then
-        call check_radial_5band_mat(my_rank, smat%n_vect, smat%n_comp,  &
+        call check_radial_5band_mat(id_rank, smat%n_vect, smat%n_comp,  &
      &      sph_rj%idx_gl_1d_rj_j, sph_rj%radius_1d_rj_r, smat%mat)
 !
       else if(smat%n_band .eq. iseven) then
-        call check_radial_7band_mat(my_rank, smat%n_vect, smat%n_comp,  &
+        call check_radial_7band_mat(id_rank, smat%n_vect, smat%n_comp,  &
      &      sph_rj%idx_gl_1d_rj_j, sph_rj%radius_1d_rj_r, smat%mat)
       end if
 !

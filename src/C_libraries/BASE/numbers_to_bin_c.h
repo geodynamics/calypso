@@ -12,7 +12,8 @@
 
 /*  prototypes */
 
-void byte_swap(int lengh_byte, char *array);
+void byte_swap_4(int lengh_byte, char *array);
+void byte_swap_8(int lengh_byte, char *array);
 
 void uchar_2binarray(unsigned char hex, int bin[8]);
 void uchar_2bin(unsigned char hex, char bin[8]);

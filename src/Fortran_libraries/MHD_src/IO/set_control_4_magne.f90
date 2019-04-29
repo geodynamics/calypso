@@ -12,8 +12,8 @@
 !!     &         (cd_prop, node_bc_B_ctl, surf_bc_BN_ctl,               &
 !!     &          magne_nod, magne_surf)
 !!        type(conductive_property), intent(in)  :: cd_prop
-!!        type(ctl_array_c2r), intent(inout) :: node_bc_B_ctl
-!!        type(ctl_array_c2r), intent(inout) :: surf_bc_BN_ctl
+!!        type(ctl_array_c2r), intent(in) :: node_bc_B_ctl
+!!        type(ctl_array_c2r), intent(in) :: surf_bc_BN_ctl
 !!        type(boundary_condition_list), intent(inout) :: magne_nod
 !!        type(boundary_condition_list), intent(inout) :: magne_surf
 !!@endverbatim
@@ -43,8 +43,8 @@
       use set_surface_group_types
 !
       type(conductive_property), intent(in)  :: cd_prop
-      type(ctl_array_c2r), intent(inout) :: node_bc_B_ctl
-      type(ctl_array_c2r), intent(inout) :: surf_bc_BN_ctl
+      type(ctl_array_c2r), intent(in) :: node_bc_B_ctl
+      type(ctl_array_c2r), intent(in) :: surf_bc_BN_ctl
       type(boundary_condition_list), intent(inout) :: magne_nod
       type(boundary_condition_list), intent(inout) :: magne_surf
 !
@@ -94,8 +94,6 @@
      &         magne_nod%bc_magnitude(i), trim(magne_nod%bc_name(i))
           end do
         end if
-!
-        call dealloc_control_array_c2_r(node_bc_B_ctl)
       end if
 !
 !
@@ -126,10 +124,7 @@
      &         magne_surf%bc_magnitude(i), trim(magne_surf%bc_name(i))
           end do
         end if
-!
-        call dealloc_control_array_c2_r(surf_bc_BN_ctl)
       end if
-!
 !
       end subroutine s_set_control_4_magne
 !

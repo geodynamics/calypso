@@ -8,8 +8,10 @@
 !!
 !!@verbatim
 !!      subroutine gz_write_element_info(ele_IO)
+!!        type(element_data), intent(in) :: ele_IO
 !!      subroutine gz_write_surface_4_element(sfed_IO)
 !!      subroutine gz_write_edge_4_element(sfed_IO)
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!
 !!      subroutine gz_read_number_of_element(ele_IO)
 !!      subroutine gz_read_element_info(ele_IO)
@@ -39,7 +41,7 @@
 !
       subroutine gz_write_element_info(ele_IO)
 !
-      type(element_data), intent(inout) :: ele_IO
+      type(element_data), intent(in) :: ele_IO
 !
       integer (kind = kint) :: i
 !
@@ -56,15 +58,13 @@
         call gz_write_textbuf_w_lf
       end do
 !
-      call deallocate_ele_connect_type(ele_IO)
-!
       end subroutine gz_write_element_info
 !
 !------------------------------------------------------------------
 !
       subroutine gz_write_surface_4_element(sfed_IO)
 !
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
       integer(kind = kint) :: i
 !
@@ -78,15 +78,13 @@
         call gz_write_textbuf_w_lf
       end do
 !
-      call dealloc_surface_connect_IO(sfed_IO)
-!
       end subroutine gz_write_surface_4_element
 !
 !------------------------------------------------------------------
 !
       subroutine gz_write_edge_4_element(sfed_IO)
 !
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
       integer(kind = kint) :: i
 !
@@ -99,8 +97,6 @@
      &        sfed_IO%iedge_for_ele(i,1:sfed_IO%nedge_in_ele), char(0)
         call gz_write_textbuf_w_lf
       end do
-!
-      call dealloc_edge_connect_IO(sfed_IO)
 !
       end subroutine gz_write_edge_4_element
 !

@@ -186,7 +186,7 @@
 !
       subroutine init_reference_temps(ref_param, takepiro,              &
      &          sph_params, sph_rj, i_ref, i_gref,                      &
-     &          ref_fld, rj_fld, sph_bc_S)
+     &          reftemp, rj_fld, sph_bc_S)
 !
       use t_boundary_params_sph_MHD
       use t_reference_scalar_param
@@ -199,14 +199,14 @@
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) ::  sph_rj
 !
-      type(reference_temperature), intent(inout) :: ref_fld
+      type(reference_temperature), intent(inout) :: reftemp
       type(phys_data), intent(inout) :: rj_fld
       type(sph_boundary_type), intent(inout) :: sph_bc_S
 !
 !      Set reference temperature and adjust boundary conditions
 !
       if(iflag_debug .gt. 0) write(*,*) 'alloc_reft_rj_data'
-      call alloc_reft_rj_data(sph_rj%nidx_rj(1), ref_fld)
+      call alloc_reft_rj_data(sph_rj%nidx_rj(1), reftemp)
 !
       if (ref_param%iflag_reference .eq. id_sphere_ref_temp) then
         if(iflag_debug .gt. 0) write(*,*) 'set_ref_temp_sph_mhd'
@@ -214,29 +214,29 @@
      &   (ref_param%low_value, ref_param%depth_top,                     &
      &    ref_param%high_value, ref_param%depth_bottom,                 &
      &    sph_rj%nidx_rj, sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj,       &
-     &    ref_fld%t_rj)
+     &    reftemp%t_rj)
         call adjust_sph_temp_bc_by_reftemp                              &
      &     (sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj(1),               &
-     &      ref_fld%t_rj, sph_bc_S)
+     &      reftemp%t_rj, sph_bc_S)
 !
       else if(ref_param%iflag_reference .eq. id_takepiro_temp) then
         call set_stratified_sph_mhd(takepiro%stratified_sigma,          &
      &    takepiro%stratified_width, takepiro%stratified_outer_r,       &
      &    sph_rj%nidx_rj, sph_params%radius_ICB, sph_params%radius_CMB, &
      &    sph_params%nlayer_ICB, sph_params%nlayer_CMB,                 &
-     &    sph_rj%radius_1d_rj_r, ref_fld%t_rj)
+     &    sph_rj%radius_1d_rj_r, reftemp%t_rj)
 !!        call adjust_sph_temp_bc_by_reftemp                            &
 !!     &     (sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj(1),             &
-!!     &      ref_fld%t_rj, sph_bc_S)
+!!     &      reftemp%t_rj, sph_bc_S)
 !
       else
         call no_ref_temp_sph_mhd(ref_param%depth_top,                   &
      &      ref_param%depth_bottom, sph_rj%nidx_rj(1),                  &
-     &      sph_params%radius_ICB, sph_params%radius_CMB, ref_fld%t_rj)
+     &      sph_params%radius_ICB, sph_params%radius_CMB, reftemp%t_rj)
       end if
 !
 !      call set_reftemp_4_sph(sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj,&
-!     &    ref_fld%t_rj, i_ref, i_gref,                                 &
+!     &    reftemp%t_rj, i_ref, i_gref,                                 &
 !     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       end subroutine init_reference_temps

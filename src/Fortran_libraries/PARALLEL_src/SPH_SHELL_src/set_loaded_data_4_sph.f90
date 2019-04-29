@@ -102,7 +102,7 @@
 !
       sph_rj%iflag_rj_center = 0
       call MPI_allREDUCE                                                &
-     &   (sph_rj%inod_rj_center, sph_rj%iflag_rj_center, ione,          &
+     &   (sph_rj%inod_rj_center, sph_rj%iflag_rj_center, 1,             &
      &    CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       if(sph_rj%iflag_rj_center .gt. 0) sph_rj%iflag_rj_center = 1
 !
@@ -134,7 +134,7 @@
 !
       sph_rj%iflag_rj_center = 0
       call MPI_allREDUCE                                                &
-     &   (sph_rj%inod_rj_center, sph_rj%iflag_rj_center, ione,          &
+     &   (sph_rj%inod_rj_center, sph_rj%iflag_rj_center, 1,             &
      &    CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       if(sph_rj%iflag_rj_center .gt. 0) sph_rj%iflag_rj_center = 1
 !
@@ -182,7 +182,7 @@
       if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_local',   &
      &     my_rank, iflag_shell_local, internal_node, nnod_full_shell
       call MPI_allreduce(iflag_shell_local, sph_param%iflag_shell_mode, &
-     &    ione, CALYPSO_INTEGER, MPI_MAX, CALYPSO_COMM, ierr_MPI)
+     &    1, CALYPSO_INTEGER, MPI_MAX, CALYPSO_COMM, ierr_MPI)
       if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_mode',    &
      &     my_rank, sph_param%iflag_shell_mode
 !

@@ -13,7 +13,7 @@
 !!
 !!      subroutine write_rtp_gl_1d_table(id_file, sph_IO)
 !!      subroutine write_rj_gl_1d_table(id_file, sph_IO)
-!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
 !!@endverbatim
 !
       module sph_global_1d_idx_IO
@@ -123,7 +123,7 @@
       use m_sph_modes_grid_labels
 !
       integer(kind = kint), intent(in) :: id_file
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
       integer(kind = kint) :: i
 !
@@ -152,11 +152,6 @@
      &         sph_IO%idx_gl_3(i,1:sph_IO%ncomp_table_1d(3))
       end do
 !
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
-      call dealloc_idx_sph_1d3_IO(sph_IO)
-!
       end subroutine write_rtp_gl_1d_table
 !
 ! ----------------------------------------------------------------------
@@ -166,7 +161,7 @@
       use m_sph_modes_grid_labels
 !
       integer(kind = kint), intent(in) :: id_file
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
       integer(kind = kint) :: i
 !
@@ -186,10 +181,6 @@
         write(id_file,'(8i16)')                                         &
      &          sph_IO%idx_gl_2(i,1:sph_IO%ncomp_table_1d(2))
       end do
-!
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
 !
       end subroutine write_rj_gl_1d_table
 !

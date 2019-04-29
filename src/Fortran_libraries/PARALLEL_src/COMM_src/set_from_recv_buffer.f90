@@ -23,6 +23,8 @@
 !!
 !!      subroutine set_from_recv_buf_int(nnod_new,                      &
 !!     &          nnod_recv, inod_import, iWR, iX_new)
+!!      subroutine set_from_recv_buf_i8(nnod_new,                       &
+!!     &          nnod_recv, inod_import, i8WR, i8X_new)
 !!@endverbatim
 !!
 !!@n @param  NB    Number of components for communication
@@ -276,6 +278,30 @@
 !$omp end parallel do
 !
       end subroutine set_from_recv_buf_int
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_from_recv_buf_i8(nnod_new,                         &
+     &          nnod_recv, inod_import, i8WR, i8X_new)
+!
+      integer(kind = kint), intent(in) :: nnod_new, nnod_recv
+      integer(kind = kint), intent(in) :: inod_import(nnod_recv)
+!
+      integer(kind = kint_gl), intent(in):: i8WR(nnod_recv)
+!
+      integer(kind = kint_gl), intent(inout):: i8X_new(nnod_new)
+!
+      integer (kind = kint) :: k, j
+!
+!
+!$omp parallel do private(k,j)
+      do k= 1, nnod_recv
+        j = inod_import(k)
+        i8X_new(j  ) = i8WR(k  )
+      end do
+!$omp end parallel do
+!
+      end subroutine set_from_recv_buf_i8
 !
 ! ----------------------------------------------------------------------
 !

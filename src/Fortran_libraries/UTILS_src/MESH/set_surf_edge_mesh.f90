@@ -98,7 +98,7 @@
       use set_size_4_smp_types
 !      use check_geometries
 !
-!      integer(kind = kint), intent(in) :: my_rank
+!      integer, intent(in) :: id_rank
       type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
 !
@@ -113,9 +113,9 @@
         if (iflag_debug.eq.1) write(*,*) 'construct_surface_data'
         call construct_surface_data(node, ele, surf)
 !
-!        call check_surface_data(my_rank, ele, surf)
-!        call check_external_surface(my_rank, surf)
-!        call check_iso_surface(my_rank, surf)
+!        call check_surface_data(id_rank, ele, surf)
+!        call check_external_surface(id_rank, surf)
+!        call check_iso_surface(id_rank, surf)
       end if
 !
       if (iflag_debug.eq.1) write(*,*) 'count_overlap_surf_type'

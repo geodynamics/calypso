@@ -16,6 +16,7 @@
 !!
 !!      subroutine dealloc_num_surf_grp_nod_smp(sf_nod)
 !!      subroutine dealloc_surf_grp_nod(sf_nod)
+!!      subroutine dealloc_vect_surf_grp_nod(sf_nod)
 !!        type(surface_node_grp_data), intent(in) :: sf_nod
 !!
 !!       subroutine check_surface_node_id(id_check, sf_nod)
@@ -144,12 +145,22 @@
       type(surface_node_grp_data), intent(inout) :: sf_nod
 !
 !
-      deallocate ( sf_nod%inod_surf_grp )
-      deallocate ( sf_nod%surf_node_n, sf_nod%num_sf_4_nod  )
-      deallocate (sf_nod%surf_norm_nod, sf_nod%coef_sf_nod)
-      deallocate ( sf_nod%inod_stack_sf_grp, sf_nod%nnod_sf_grp )
+      deallocate(sf_nod%inod_surf_grp)
+      deallocate(sf_nod%surf_node_n, sf_nod%num_sf_4_nod)
+      deallocate(sf_nod%inod_stack_sf_grp, sf_nod%nnod_sf_grp)
 !
       end subroutine dealloc_surf_grp_nod
+!
+!-----------------------------------------------------------------------
+!
+      subroutine dealloc_vect_surf_grp_nod(sf_nod)
+!
+      type(surface_node_grp_data), intent(inout) :: sf_nod
+!
+!
+      deallocate(sf_nod%surf_norm_nod, sf_nod%coef_sf_nod)
+!
+      end subroutine dealloc_vect_surf_grp_nod
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

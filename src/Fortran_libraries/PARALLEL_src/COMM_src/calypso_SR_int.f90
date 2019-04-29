@@ -13,6 +13,12 @@
 !!     &                       npe_recv, irecv_self,                    &
 !!     &                       id_pe_recv, istack_recv, inod_import,    &
 !!     &                       irev_import, iX_org, iX_new)
+!!      subroutine calypso_send_recv_int8(iflag_SR, nnod_org, nnod_new, &
+!!     &                       npe_send, isend_self,                    &
+!!     &                       id_pe_send, istack_send, inod_export,    &
+!!     &                       npe_recv, irecv_self,                    &
+!!     &                       id_pe_recv, istack_recv, inod_import,    &
+!!     &                       irev_import, i8X_org, i8X_new)
 !!@endverbatim
 !!
 !!@n @param  iflag_SR    import table mode
@@ -109,6 +115,66 @@
       call calypso_send_recv_fin(npe_send, isend_self)
 !
       end subroutine calypso_send_recv_int
+!
+! ----------------------------------------------------------------------
+!
+      subroutine calypso_send_recv_int8(iflag_SR, nnod_org, nnod_new,   &
+     &                       npe_send, isend_self,                      &
+     &                       id_pe_send, istack_send, inod_export,      &
+     &                       npe_recv, irecv_self,                      &
+     &                       id_pe_recv, istack_recv, inod_import,      &
+     &                       irev_import, i8X_org, i8X_new)
+!
+      use calypso_mpi
+      use m_solver_SR
+      use calypso_SR_core
+      use set_to_send_buffer
+      use select_copy_from_recv
+!
+      integer(kind = kint), intent(in) :: iflag_SR
+      integer(kind = kint), intent(in) :: nnod_org
+      integer(kind = kint), intent(in) :: nnod_new
+!
+      integer(kind = kint), intent(in) :: npe_send, isend_self
+      integer(kind = kint), intent(in) :: id_pe_send(npe_send)
+      integer(kind = kint), intent(in) :: istack_send(0:npe_send)
+      integer(kind = kint), intent(in)                                  &
+     &                      :: inod_export( istack_send(npe_send) )
+      integer(kind = kint), intent(in) :: irev_import(nnod_new)
+!
+      integer(kind = kint), intent(in) :: npe_recv, irecv_self
+      integer(kind = kint), intent(in) :: id_pe_recv(npe_recv)
+      integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
+      integer(kind = kint), intent(in)                                  &
+     &                      :: inod_import( istack_recv(npe_recv) )
+!
+      integer(kind = kint_gl), intent(in):: i8X_org(nnod_org)
+!
+      integer(kind = kint_gl), intent(inout):: i8X_new(nnod_new)
+!
+!
+      call resize_i8work_4_SR(npe_send, npe_recv,                       &
+     &    istack_send(npe_send), istack_recv(npe_recv))
+!
+!C-- SEND
+!
+      call set_to_send_buf_i8(nnod_org,                                 &
+     &    istack_send(npe_send), inod_export, i8X_org, i8WS)
+!C
+!C-- COMM
+      call calypso_send_recv_i8core                                     &
+     &             (npe_send, isend_self, id_pe_send, istack_send,      &
+     &              npe_recv, irecv_self, id_pe_recv, istack_recv)
+!
+!C-- RECV
+      call sel_cppy_from_recv_buf_i8(iflag_SR, nnod_new,                &
+     &    istack_recv(npe_recv), inod_import, irev_import,              &
+     &    i8WR(1), i8X_new)
+!
+!C-- WAIT
+      call calypso_send_recv_fin(npe_send, isend_self)
+!
+      end subroutine calypso_send_recv_int8
 !
 ! ----------------------------------------------------------------------
 !

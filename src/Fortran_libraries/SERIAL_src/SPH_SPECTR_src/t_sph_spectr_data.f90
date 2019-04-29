@@ -14,10 +14,10 @@
 !!      subroutine dealloc_phys_rj_name_t(sph_phys)
 !!
 !!      subroutine check_rj_spectr_name_t(sph_phys)
-!!      subroutine check_rj_spectr_data_t(my_rank, sph_phys)
+!!      subroutine check_rj_spectr_data_t(id_rank, sph_phys)
 !!@endverbatim
 !!
-!!@n @param my_rank process ID
+!!@n @param id_rank process ID
 !
       module t_sph_spectr_data
 !
@@ -101,28 +101,30 @@
 !
       type(sph_phys_data), intent(in) :: sph_phys
 !
+      integer(kind = kint), parameter :: id_six = 6
 !
-      write(*,*) 'sph_phys%rj_fld'
-      call check_nodal_field_name_type(6,sph_phys%rj_fld)
+      write(*,*) 'check_nodal_field_name_type for sph_phys%rj_fld'
+      call check_nodal_field_name_type(id_six, sph_phys%rj_fld)
 !
       end subroutine check_rj_spectr_name_t
 !
 !  --------------------------------------------------------------------
 !
-      subroutine check_rj_spectr_data_t(my_rank, sph_phys)
+      subroutine check_rj_spectr_data_t(id_rank, sph_phys)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(sph_phys_data), intent(in) :: sph_phys
 !
-      integer(kind = kint) :: i_fld
+      integer(kind = kint) :: i_fld, id
 !
 !
-      write(*,*) 'sph_phys%rj_fld'
-      call check_nodal_field_name_type((50+my_rank),sph_phys%rj_fld)
+      write(*,*) 'check_nodal_field_name_type for sph_phys%rj_fld'
+      id = 50+id_rank
+      call check_nodal_field_name_type(id,sph_phys%rj_fld)
 !
-      write(50+my_rank,*) 'sph_phys%rj_fld'
+      write(id,*) 'sph_phys%rj_fld'
       do i_fld = 1, sph_phys%rj_fld%num_phys
-        call check_nodal_data((50+my_rank), sph_phys%rj_fld,            &
+        call check_nodal_data(id, sph_phys%rj_fld,                      &
      &      sph_phys%rj_fld%ntot_phys,                                  &
      &      sph_phys%rj_fld%istack_component(i_fld-1)+1)
       end do

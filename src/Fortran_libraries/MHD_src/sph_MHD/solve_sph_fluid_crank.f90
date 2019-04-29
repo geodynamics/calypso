@@ -102,7 +102,7 @@
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
       integer(kind = kint) :: j
-      integer(kind = kint), parameter :: id_offset = 100
+      integer, parameter :: id_offset = 100
       integer(kind = kint), parameter :: id_file = 50 + id_offset
 !
 !
@@ -120,7 +120,7 @@
      &      band_p_poisson%lu(1:band_p_poisson%n_band_lu,               &
      &                        1:band_p_poisson%n_vect,j))
         write(id_file,*) 'RHS for average pressure'
-        call check_scalar_coefs(id_file, 0, 0, sph_rj,                  &
+        call check_scalar_coefs(id_file, izero, izero, sph_rj,          &
      &      is_press, n_point, ntot_phys_rj, d_rj)
       end if
 !
@@ -129,7 +129,7 @@
 !
       if(i_debug*j .gt. 0) then
         write(id_file,*) 'Solution of average pressure'
-        call check_scalar_coefs(id_file, 0, 0, sph_rj,                  &
+        call check_scalar_coefs(id_file, izero, izero, sph_rj,          &
      &      is_press, n_point, ntot_phys_rj, d_rj)
         close(id_file)
       end if
@@ -235,7 +235,7 @@
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
       integer(kind = kint) :: j,k,inod
-      integer(kind = 4) :: l4, m4
+      integer :: l4, m4
 !
 !
       l4 = int(l)
@@ -271,7 +271,7 @@
         if(d_rj(inod,is_field) .ne. d_rj(inod,is_field)) then
           j = sph_rj%idx_global_rj(inod,2)
           k = sph_rj%idx_global_rj(inod,1)
-          call get_dgree_order_by_full_j(j, l, m)
+          call get_degree_order_by_full_j(j, l, m)
           write(50+my_rank,*) 'Broken', inod, k, j, l, m,  &
      &              d_rj(inod,is_field)
         end if

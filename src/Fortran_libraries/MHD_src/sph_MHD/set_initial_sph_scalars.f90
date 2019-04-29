@@ -63,7 +63,8 @@
 !
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
-      integer ( kind = kint) :: inod, k, jj
+      integer(kind = kint) :: inod
+      integer :: k, jj
 !
 !
 !$omp parallel do
@@ -116,8 +117,8 @@
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
-      integer(kind = 4) ::  m
-      integer(kind = kint) :: inod, k, jj
+      integer :: m, k, jj
+      integer(kind = kint) :: inod
       real (kind = kreal) :: pi, xr, shell
 !
 !
@@ -162,8 +163,8 @@
 !
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
-      integer(kind = 4) :: m
-      integer ( kind = kint) :: inod, k, jj
+      integer :: m, k, jj
+      integer(kind = kint) :: inod
       real (kind = kreal) :: pi, xr, shell
 !
 !
@@ -222,7 +223,8 @@
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
-      integer ( kind = kint) :: inod, j, k, jj
+      integer :: k, jj
+      integer(kind = kint) :: inod, j
       real (kind = kreal) :: pi, xr, shell
 !
 !
@@ -265,7 +267,8 @@
 !
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
-      integer( kind = kint) :: inod, j, k, jj
+      integer :: k, jj
+      integer( kind = kint) :: inod, j
       real (kind = kreal) :: pi, xr, shell
 !
 !

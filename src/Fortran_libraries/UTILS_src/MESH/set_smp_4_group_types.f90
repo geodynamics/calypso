@@ -48,7 +48,7 @@
 !
       grp%num_grp_smp = np_smp * grp%num_grp
 !
-      call allocate_grp_type_smp(grp)
+      call alloc_group_smp(grp)
 !
       call set_group_size_4_smp(np_smp, grp%num_grp, grp%istack_grp,    &
      &    grp%istack_grp_smp, grp%max_grp_smp)
@@ -66,7 +66,7 @@
 !
       sf_grp%num_grp_smp = np_smp * sf_grp%num_grp
 !
-      call allocate_sf_grp_type_smp(sf_grp)
+      call alloc_sf_group_smp(sf_grp)
 !
       call set_group_size_4_smp(np_smp,                                 &
      &    sf_grp%num_grp, sf_grp%istack_grp,                            &

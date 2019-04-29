@@ -96,7 +96,7 @@
       if ( iflag_debug.gt.0 ) write(*,*) 'check_sph_vol_ms_file'
       iflag = check_sph_vol_ms_file(my_rank, sph%sph_params,            &
      &                              sph%sph_rj, monitor%pwr)
-      call MPI_Bcast(iflag, ione, CALYPSO_INTEGER, izero,               &
+      call MPI_Bcast(iflag, 1, CALYPSO_INTEGER, 0,                      &
      &               CALYPSO_COMM, ierr_MPI)
       if(iflag .gt. 0) then
         call calypso_mpi_barrier
@@ -114,7 +114,7 @@
 !
       if ( iflag_debug.gt.0 ) write(*,*) 'check_gauss_coefs_file'
       iflag = check_gauss_coefs_file(my_rank, monitor%gauss_coef)
-      call MPI_Bcast(iflag, ione, CALYPSO_INTEGER, izero,               &
+      call MPI_Bcast(iflag, 1, CALYPSO_INTEGER, 0,                      &
      &               CALYPSO_COMM, ierr_MPI)
       if(iflag .gt. 0) then
         call calypso_mpi_barrier

@@ -7,6 +7,10 @@
 !>@brief  Initialize spherical harmonics transform
 !!
 !!@verbatim
+!!      subroutine const_conatitude_rtp(sph_rtm, sph_rtp, leg)
+!!        type(sph_rtm_grid), intent(in) :: sph_rtm
+!!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!        type(legendre_4_sph_trans), intent(inout) :: leg
 !!      subroutine const_sin_theta_rtp(leg, sph_rtm, sph_rtp)
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(sph_rtm_grid), intent(in) ::    sph_rtm
@@ -31,11 +35,31 @@
 !
       implicit none
 !
-      private :: set_sin_theta_rtp
+      private :: set_colatitude_rtp, set_sin_theta_rtp
 !
 ! -----------------------------------------------------------------------
 !
       contains
+!
+! -----------------------------------------------------------------------
+!
+      subroutine const_conatitude_rtp(sph_rtm, sph_rtp, leg)
+!
+      use t_spheric_rtp_data
+      use t_spheric_rtm_data
+      use t_schmidt_poly_on_rtm
+!
+      type(sph_rtm_grid), intent(in) ::    sph_rtm
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(legendre_4_sph_trans), intent(inout) :: leg
+!
+!
+      call alloc_gauss_colatitude_rtp(sph_rtp%nidx_rtp(2), leg)
+      call set_colatitude_rtp                                           &
+     &   (sph_rtp%nidx_rtp(2), sph_rtm%nidx_rtm(2), leg%g_colat_rtm,    &
+     &    sph_rtp%idx_gl_1d_rtp_t, leg%g_colat_rtp)
+!
+      end subroutine const_conatitude_rtp
 !
 ! -----------------------------------------------------------------------
 !
@@ -158,6 +182,30 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine set_colatitude_rtp                                     &
+     &         (nth_rtp, nth_rtm, g_colat_rtm, idx_gl_1d_rtp_t,         &
+     &          g_colat_rtp)
+!
+      integer(kind = kint), intent(in) :: nth_rtp, nth_rtm
+      integer(kind = kint), intent(in) :: idx_gl_1d_rtp_t(nth_rtp)
+      real(kind= kreal), intent(in) :: g_colat_rtm(nth_rtm)
+!
+      real(kind= kreal), intent(inout) :: g_colat_rtp(nth_rtp)
+!
+      integer(kind = kint) :: l_rtp, l_rtm
+!
+!
+!$omp parallel do private(l_rtm)
+      do l_rtp = 1, nth_rtp
+        l_rtm = idx_gl_1d_rtp_t(l_rtp)
+        g_colat_rtp(l_rtp) = g_colat_rtm(l_rtm)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_colatitude_rtp
+!
+! -----------------------------------------------------------------------
+!
       subroutine set_sin_theta_rtp                                      &
      &         (nth_rtp, nth_rtm, g_colat_rtm, idx_gl_1d_rtp_t,         &
      &          cos_theta_1d_rtp, sin_theta_1d_rtp, cot_theta_1d_rtp)
@@ -170,14 +218,14 @@
       real(kind= kreal), intent(inout) :: sin_theta_1d_rtp(nth_rtp)
       real(kind= kreal), intent(inout) :: cot_theta_1d_rtp(nth_rtp)
 !
-      integer(kind = kint) :: l_rtp, l_gl
+      integer(kind = kint) :: l_rtp, l_rtm
 !
 !
-!$omp parallel do private(l_gl)
+!$omp parallel do private(l_rtm)
       do l_rtp = 1, nth_rtp
-        l_gl = idx_gl_1d_rtp_t(l_rtp)
-        cos_theta_1d_rtp(l_rtp) = cos(g_colat_rtm(l_gl))
-        sin_theta_1d_rtp(l_rtp) = sin(g_colat_rtm(l_gl))
+        l_rtm = idx_gl_1d_rtp_t(l_rtp)
+        cos_theta_1d_rtp(l_rtp) = cos(g_colat_rtm(l_rtm))
+        sin_theta_1d_rtp(l_rtp) = sin(g_colat_rtm(l_rtm))
         cot_theta_1d_rtp(l_rtp) = cos_theta_1d_rtp(l_rtp)               &
      &                           / sin_theta_1d_rtp(l_rtp)
       end do

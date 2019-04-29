@@ -37,7 +37,6 @@
       implicit none
 !
       private :: set_udt_local_nodes
-      private :: count_udt_elements
       private :: set_udt_local_connect
       private :: set_udt_global_connect
 !
@@ -66,6 +65,8 @@
       subroutine const_udt_local_connect(internal_node,                 &
      &          nele, nnod_ele, ie, ucd)
 !
+      use count_overlap
+!
       integer(kind=kint), intent(in)  :: internal_node
       integer(kind=kint), intent(in)  :: nele, nnod_ele
       integer(kind=kint), intent(in)  :: ie(nele, nnod_ele)
@@ -73,11 +74,11 @@
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      call count_udt_elements(internal_node, nele, nnod_ele,            &
-     &    ie, ucd)
+      ucd%nnod_4_ele = nnod_ele
+      ucd%nele = count_interier_element(internal_node, nele, ie(1,1))
       call allocate_ucd_ele(ucd)
 !
-      call set_udt_local_connect(internal_node, nele, nnod_ele,        &
+      call set_udt_local_connect(internal_node, nele, nnod_ele,         &
      &    ie, ucd)
 !
       end subroutine const_udt_local_connect
@@ -87,6 +88,8 @@
       subroutine const_udt_global_connect(internal_node,                &
      &          nele, nnod_ele, iele_global, ie, ucd)
 !
+      use count_overlap
+!
       integer(kind=kint), intent(in)  :: internal_node
       integer(kind=kint), intent(in)  :: nele, nnod_ele
       integer(kind=kint_gl), intent(in)  :: iele_global(nele)
@@ -95,8 +98,8 @@
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      call count_udt_elements(internal_node, nele, nnod_ele,            &
-     &    ie, ucd)
+      ucd%nnod_4_ele = nnod_ele
+      ucd%nele = count_interier_element(internal_node, nele, ie(1,1))
       call allocate_ucd_ele(ucd)
 !
       call set_udt_global_connect(internal_node, nele, nnod_ele,        &
@@ -129,32 +132,6 @@
       end subroutine set_udt_local_nodes
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine count_udt_elements(internal_node, nele, nnod_ele, ie,  &
-     &          ucd)
-!
-      integer(kind=kint), intent(in)  :: internal_node
-      integer(kind=kint), intent(in)  :: nele, nnod_ele
-      integer(kind=kint), intent(in)  :: ie(nele, nnod_ele)
-!
-      type(ucd_data), intent(inout) :: ucd
-!
-      integer(kind = kint) :: iele, icou
-!
-!
-      ucd%nnod_4_ele = nnod_ele
-!
-      icou = 0
-!$omp parallel do reduction(+:icou)
-      do iele = 1, nele
-        if(ie(iele,1) .le. internal_node) icou = icou + 1
-      end do
-!$omp end parallel do
-      ucd%nele = icou
-!
-      end subroutine count_udt_elements
-!
 !-----------------------------------------------------------------------
 !
       subroutine set_udt_local_connect(internal_node,                   &

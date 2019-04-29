@@ -22,12 +22,12 @@
 !!        type(sph_rtp_grid), intent(in)  :: sph_rtp
 !!      subroutine check_type_spheric_para_gl_part(sph)
 !!        type(sph_grids), intent(in) :: sph
-!!      subroutine check_type_spheric_parameter(my_rank, sph)
-!!        integer(kind = kint), intent(in) :: my_rank
+!!      subroutine check_type_spheric_parameter(id_rank, sph)
+!!        integer, intent(in) :: id_rank
 !!        type(sph_grids), intent(in) :: sph
 !!@endverbatim
 !!
-!!@n @param  my_rank     Running rank ID
+!!@n @param  id_rank     Running rank ID
 !!
       module t_spheric_parameter
 !
@@ -187,15 +187,15 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine check_type_spheric_parameter(my_rank, sph)
+      subroutine check_type_spheric_parameter(id_rank, sph)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(sph_grids), intent(in) :: sph
 !
-      call check_type_spheric_param_rtp(my_rank, sph%sph_rtp)
-      call check_type_spheric_param_rtm(my_rank, sph%sph_rtm)
-      call check_type_spheric_param_rlm(my_rank, sph%sph_rlm)
-      call check_type_spheric_param_rj(my_rank, sph%sph_rj)
+      call check_type_spheric_param_rtp(id_rank, sph%sph_rtp)
+      call check_type_spheric_param_rtm(id_rank, sph%sph_rtm)
+      call check_type_spheric_param_rlm(id_rank, sph%sph_rlm)
+      call check_type_spheric_param_rj(id_rank, sph%sph_rj)
 !
       end subroutine check_type_spheric_parameter
 !

@@ -7,12 +7,13 @@
 !>@brief  control ID data for surfacing module
 !!
 !!@verbatim
-!!      subroutine deallocate_cont_dat_4_psf(psf)
-!!        type(psf_ctl), intent(inout) :: psf
+!!      subroutine init_psf_ctl_stract(psf_c)
+!!      subroutine deallocate_cont_dat_4_psf(psf_c)
+!!        type(psf_ctl), intent(inout) :: psf_c
 !!
-!!      subroutine read_psf_control_data(psf)
-!!      subroutine bcast_psf_control_data(psf)
-!!        type(psf_ctl), intent(inout) :: psf
+!!      subroutine read_psf_control_data(psf_c)
+!!      subroutine bcast_psf_control_data(psf_c)
+!!        type(psf_ctl), intent(inout) :: psf_c
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!! example of control for Kemo's surface rendering
@@ -238,106 +239,121 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_cont_dat_4_psf(psf)
+      subroutine init_psf_ctl_stract(psf_c)
 !
-      type(psf_ctl), intent(inout) :: psf
+      type(psf_ctl), intent(inout) :: psf_c
+!
+      psf_c%radius_psf_ctl%realvalue = 0.0d0
+      psf_c%psf_out_field_ctl%num = 0
+      psf_c%psf_area_ctl%num =      0
+!
+      end subroutine init_psf_ctl_stract
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine deallocate_cont_dat_4_psf(psf_c)
+!
+      type(psf_ctl), intent(inout) :: psf_c
 !
 !
-      call dealloc_control_array_c2(psf%psf_out_field_ctl)
-      psf%psf_out_field_ctl%num =  0
-      psf%psf_out_field_ctl%icou = 0
+      call dealloc_control_array_c2(psf_c%psf_out_field_ctl)
+      psf_c%psf_out_field_ctl%num =  0
+      psf_c%psf_out_field_ctl%icou = 0
 !
-      call dealloc_control_array_chara(psf%psf_area_ctl)
-      psf%psf_area_ctl%num =  0
-      psf%psf_area_ctl%icou = 0
+      call dealloc_control_array_chara(psf_c%psf_area_ctl)
+      psf_c%psf_area_ctl%num =  0
+      psf_c%psf_area_ctl%icou = 0
 !
-      call dealloc_control_array_c_r(psf%psf_coefs_ctl)
-      psf%psf_coefs_ctl%num =  0
-      psf%psf_coefs_ctl%icou = 0
+      call dealloc_control_array_c_r(psf_c%psf_coefs_ctl)
+      psf_c%psf_coefs_ctl%num =  0
+      psf_c%psf_coefs_ctl%icou = 0
 !
-      call dealloc_control_array_c_r(psf%psf_normal_ctl)
-      psf%psf_normal_ctl%num =  0
-      psf%psf_normal_ctl%icou = 0
+      call dealloc_control_array_c_r(psf_c%psf_normal_ctl)
+      psf_c%psf_normal_ctl%num =  0
+      psf_c%psf_normal_ctl%icou = 0
 !
-      call dealloc_control_array_c_r(psf%psf_center_ctl)
-      psf%psf_center_ctl%num =  0
-      psf%psf_center_ctl%icou = 0
+      call dealloc_control_array_c_r(psf_c%psf_center_ctl)
+      psf_c%psf_center_ctl%num =  0
+      psf_c%psf_center_ctl%icou = 0
 !
-      call dealloc_control_array_c_r(psf%psf_axis_ctl)
-      psf%psf_axis_ctl%num =  0
-      psf%psf_axis_ctl%icou = 0
+      call dealloc_control_array_c_r(psf_c%psf_axis_ctl)
+      psf_c%psf_axis_ctl%num =  0
+      psf_c%psf_axis_ctl%icou = 0
 !
       end subroutine deallocate_cont_dat_4_psf
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine read_psf_control_data(hd_block, psf)
+      subroutine read_psf_control_data(hd_block, psf_c)
 !
       character(len=kchara), intent(in) :: hd_block
 !
-      type(psf_ctl), intent(inout) :: psf
+      type(psf_ctl), intent(inout) :: psf_c
 !
 !
       if(right_begin_flag(hd_block) .eq. 0) return
-      if (psf%i_psf_ctl.gt.0) return
+      if (psf_c%i_psf_ctl.gt.0) return
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, psf%i_psf_ctl)
-        if(psf%i_psf_ctl .gt. 0) exit
+        psf_c%i_psf_ctl = find_control_end_flag(hd_block)
+        if(psf_c%i_psf_ctl .gt. 0) exit
 !
         if(right_begin_flag(hd_surface_define) .gt. 0) then
-          call  read_section_def_control(psf)
+          call  read_section_def_control(psf_c)
         end if
 !
         if(right_begin_flag(hd_output_field) .gt. 0) then
-          call  read_psf_output_ctl(psf)
+          call  read_psf_output_ctl(psf_c)
         end if
 !
 !
         call read_chara_ctl_type(hd_psf_file_prefix,                    &
-     &      psf%psf_file_head_ctl)
+     &      psf_c%psf_file_head_ctl)
         call read_chara_ctl_type(hd_psf_file_head,                      &
-     &      psf%psf_file_head_ctl)
+     &      psf_c%psf_file_head_ctl)
         call read_chara_ctl_type(hd_psf_out_type,                       &
-     &      psf%psf_output_type_ctl)
+     &      psf_c%psf_output_type_ctl)
       end do
 !
       end subroutine read_psf_control_data
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_section_def_control(psf)
+      subroutine read_section_def_control(psf_c)
 !
-      type(psf_ctl), intent(inout) :: psf
+      type(psf_ctl), intent(inout) :: psf_c
 !
 !
-      if(psf%i_surface_define.gt.0) return
+      if(psf_c%i_surface_define.gt.0) return
 !
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_surface_define,                   &
-     &         psf%i_surface_define)
-        if(psf%i_surface_define .gt. 0) exit
+        psf_c%i_surface_define                                          &
+     &       = find_control_end_flag(hd_surface_define)
+        if(psf_c%i_surface_define .gt. 0) exit
 !
 !
-        call read_control_array_c_r(hd_coefs_ctl, psf%psf_coefs_ctl)
-        call read_control_array_c_r(hd_center_ctl, psf%psf_center_ctl)
-        call read_control_array_c_r(hd_normal_ctl, psf%psf_normal_ctl)
-        call read_control_array_c_r(hd_axis_ctl, psf%psf_axis_ctl)
+        call read_control_array_c_r(hd_coefs_ctl, psf_c%psf_coefs_ctl)
+        call read_control_array_c_r                                     &
+     &     (hd_center_ctl, psf_c%psf_center_ctl)
+        call read_control_array_c_r                                     &
+     &     (hd_normal_ctl, psf_c%psf_normal_ctl)
+        call read_control_array_c_r(hd_axis_ctl, psf_c%psf_axis_ctl)
 !
-        call read_control_array_c1(hd_psf_area, psf%psf_area_ctl)
+        call read_control_array_c1(hd_psf_area, psf_c%psf_area_ctl)
 !
-        call read_psf_plot_area_ctl(psf)
+        call read_psf_plot_area_ctl(psf_c)
 !
 !
-        call read_real_ctl_type(hd_radius, psf%radius_psf_ctl)
+        call read_real_ctl_type(hd_radius, psf_c%radius_psf_ctl)
 !
         call read_chara_ctl_type(hd_section_method,                     &
-     &      psf%section_method_ctl)
-        call read_chara_ctl_type(hd_group_name, psf%psf_group_name_ctl)
+     &      psf_c%section_method_ctl)
+        call read_chara_ctl_type                                        &
+     &      (hd_group_name, psf_c%psf_group_name_ctl)
       end do
 !
       end subroutine read_section_def_control
@@ -345,40 +361,40 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_psf_output_ctl(psf)
+      subroutine read_psf_output_ctl(psf_c)
 !
-      type(psf_ctl), intent(inout) :: psf
+      type(psf_ctl), intent(inout) :: psf_c
 !
 !
-      if (psf%i_output_field .gt. 0) return
+      if (psf_c%i_output_field .gt. 0) return
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_output_field, psf%i_output_field)
-        if(psf%i_output_field .gt. 0) exit
+        psf_c%i_output_field = find_control_end_flag(hd_output_field)
+        if(psf_c%i_output_field .gt. 0) exit
 !
         call read_control_array_c2                                      &
-     &     (hd_psf_result_field, psf%psf_out_field_ctl)
+     &     (hd_psf_result_field, psf_c%psf_out_field_ctl)
       end do
 !
       end subroutine read_psf_output_ctl
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_psf_plot_area_ctl(psf)
+      subroutine read_psf_plot_area_ctl(psf_c)
 !
-      type(psf_ctl), intent(inout) :: psf
+      type(psf_ctl), intent(inout) :: psf_c
 !
 !
       if(right_begin_flag(hd_plot_area) .eq. 0) return
-      if (psf%i_plot_area.gt.0) return
+      if (psf_c%i_plot_area.gt.0) return
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_plot_area, psf%i_plot_area)
-        if(psf%i_plot_area .gt. 0) exit
+        psf_c%i_plot_area = find_control_end_flag(hd_plot_area)
+        if(psf_c%i_plot_area .gt. 0) exit
 !
-        call read_control_array_c1(hd_plot_grp, psf%psf_area_ctl)
+        call read_control_array_c1(hd_plot_grp, psf_c%psf_area_ctl)
       end do
 !
       end subroutine read_psf_plot_area_ctl
@@ -386,54 +402,54 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_psf_control_data(psf)
+      subroutine bcast_psf_control_data(psf_c)
 !
       use calypso_mpi
       use bcast_control_arrays
 !
-      type(psf_ctl), intent(inout) :: psf
+      type(psf_ctl), intent(inout) :: psf_c
 !
 !
-      call MPI_BCAST(psf%i_psf_ctl,  ione,                              &
-     &              CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(psf%i_output_field,  ione,                         &
-     &              CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(psf_c%i_psf_ctl,  1,                               &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(psf_c%i_output_field,  1,                          &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
-      call bcast_ctl_array_c2(psf%psf_out_field_ctl)
+      call bcast_ctl_array_c2(psf_c%psf_out_field_ctl)
 !
-      call bcast_ctl_type_c1(psf%psf_file_head_ctl)
-      call bcast_ctl_type_c1(psf%psf_output_type_ctl)
+      call bcast_ctl_type_c1(psf_c%psf_file_head_ctl)
+      call bcast_ctl_type_c1(psf_c%psf_output_type_ctl)
 !
-      call bcast_section_def_control(psf)
+      call bcast_section_def_control(psf_c)
 !
       end subroutine bcast_psf_control_data
 !
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_section_def_control(psf)
+      subroutine bcast_section_def_control(psf_c)
 !
       use calypso_mpi
       use bcast_control_arrays
 !
-      type(psf_ctl), intent(inout) :: psf
+      type(psf_ctl), intent(inout) :: psf_c
 !
 !
-      call MPI_BCAST(psf%i_surface_define,  ione,                       &
-     &              CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(psf%i_plot_area,  ione,                            &
-     &              CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(psf_c%i_surface_define,  1,                        &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(psf_c%i_plot_area,  1,                             &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
-      call bcast_ctl_array_cr(psf%psf_coefs_ctl)
-      call bcast_ctl_array_cr(psf%psf_center_ctl)
-      call bcast_ctl_array_cr(psf%psf_normal_ctl)
-      call bcast_ctl_array_cr(psf%psf_axis_ctl)
+      call bcast_ctl_array_cr(psf_c%psf_coefs_ctl)
+      call bcast_ctl_array_cr(psf_c%psf_center_ctl)
+      call bcast_ctl_array_cr(psf_c%psf_normal_ctl)
+      call bcast_ctl_array_cr(psf_c%psf_axis_ctl)
 !
-      call bcast_ctl_array_c1(psf%psf_area_ctl)
+      call bcast_ctl_array_c1(psf_c%psf_area_ctl)
 !
-      call bcast_ctl_type_r1(psf%radius_psf_ctl)
+      call bcast_ctl_type_r1(psf_c%radius_psf_ctl)
 !
-      call bcast_ctl_type_c1(psf%section_method_ctl)
-      call bcast_ctl_type_c1(psf%psf_group_name_ctl)
+      call bcast_ctl_type_c1(psf_c%section_method_ctl)
+      call bcast_ctl_type_c1(psf_c%psf_group_name_ctl)
 !
       end subroutine bcast_section_def_control
 !

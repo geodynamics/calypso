@@ -16,9 +16,9 @@
 !!      subroutine dealloc_sph_gl_bc_param(sph_dbc)
 !!
 !!      subroutine check_spheric_global_param                           &
-!!     &         (my_rank, s3d_ranks, sph_lcp)
+!!     &         (id_rank, s3d_ranks, sph_lcp)
 !!      subroutine check_nidx_local(ip_rank, sph_lc1)
-!!      subroutine check_sph_gl_bc_param(my_rank, sph_dbc)
+!!      subroutine check_sph_gl_bc_param(id_rank, sph_dbc)
 !
 !
       module t_sph_local_parameter
@@ -256,46 +256,46 @@
 ! -----------------------------------------------------------------------
 !
       subroutine check_spheric_global_param                             &
-     &         (my_rank, s3d_ranks, sph_lcp)
+     &         (id_rank, s3d_ranks, sph_lcp)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(spheric_global_rank), intent(in) :: s3d_ranks
       type(sph_local_parameters), intent(in) :: sph_lcp
 !
       integer(kind = kint) :: i
 !
 !
-      write(my_rank+50,*) 'ndomain_rtp ', s3d_ranks%ndomain_rtp(1:3)
-      write(my_rank+50,*) 'ndomain_rtm ', s3d_ranks%ndomain_rtm(1:3)
-      write(my_rank+50,*) 'ndomain_rlm ', s3d_ranks%ndomain_rlm(1:2)
-      write(my_rank+50,*) 'ndomain_rj ',  s3d_ranks%ndomain_rj(1:2)
-      write(my_rank+50,*) 'ndomain_sph ',  s3d_ranks%ndomain_sph
+      write(id_rank+50,*) 'ndomain_rtp ', s3d_ranks%ndomain_rtp(1:3)
+      write(id_rank+50,*) 'ndomain_rtm ', s3d_ranks%ndomain_rtm(1:3)
+      write(id_rank+50,*) 'ndomain_rlm ', s3d_ranks%ndomain_rlm(1:2)
+      write(id_rank+50,*) 'ndomain_rj ',  s3d_ranks%ndomain_rj(1:2)
+      write(id_rank+50,*) 'ndomain_sph ',  s3d_ranks%ndomain_sph
 !
-      write(my_rank+50,*)                                               &
+      write(id_rank+50,*)                                               &
      &   'i, nnod_local_rtp, nidx_local_rtp'
       do i = 1, s3d_ranks%ndomain_sph
-        write(my_rank+50,*) i, sph_lcp%nnod_local_rtp(i),               &
+        write(id_rank+50,*) i, sph_lcp%nnod_local_rtp(i),               &
      &                         sph_lcp%nidx_local_rtp(i,1:3)
       end do
 !
-      write(my_rank+50,*)                                               &
+      write(id_rank+50,*)                                               &
      &   'i, nnod_local_rtm, nidx_local_rtm'
       do i = 1, s3d_ranks%ndomain_sph
-        write(my_rank+50,*) i, sph_lcp%nnod_local_rtm(i),               &
+        write(id_rank+50,*) i, sph_lcp%nnod_local_rtm(i),               &
      &                         sph_lcp%nidx_local_rtm(i,1:3)
       end do
 !
-      write(my_rank+50,*)                                               &
+      write(id_rank+50,*)                                               &
      &   'i, nnod_local_rlm, nidx_local_rlm'
       do i = 1, s3d_ranks%ndomain_sph
-        write(my_rank+50,*) i, sph_lcp%nnod_local_rlm(i),               &
+        write(id_rank+50,*) i, sph_lcp%nnod_local_rlm(i),               &
      &                         sph_lcp% nidx_local_rlm(i,1:2)
       end do
 !
-      write(my_rank+50,*)                                               &
+      write(id_rank+50,*)                                               &
      &   'i, nnod_local_rj, nidx_local_rj'
       do i = 1, s3d_ranks%ndomain_sph
-        write(my_rank+50,*) i, sph_lcp%nnod_local_rj(i),                &
+        write(id_rank+50,*) i, sph_lcp%nnod_local_rj(i),                &
      &                         sph_lcp%nidx_local_rj(i,1:2)
       end do
 !
@@ -327,23 +327,23 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_sph_gl_bc_param(my_rank, sph_dbc)
+      subroutine check_sph_gl_bc_param(id_rank, sph_dbc)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(sph_local_default_BC), intent(in) :: sph_dbc
 !
 !
-      write(my_rank+50,*) 'nidx_local_rtm_OC',                          &
+      write(id_rank+50,*) 'nidx_local_rtm_OC',                          &
      &                   sph_dbc%nidx_local_rtm_OC
-      write(my_rank+50,*) 'nidx_local_rtm_IC',                          &
+      write(id_rank+50,*) 'nidx_local_rtm_IC',                          &
      &                   sph_dbc%nidx_local_rtm_IC
-      write(my_rank+50,*) 'nidx_local_rtm_MT',                          &
+      write(id_rank+50,*) 'nidx_local_rtm_MT',                          &
      &                   sph_dbc%nidx_local_rtm_MT
-      write(my_rank+50,*) 'ist_idx_local_rtm_OC',                       &
+      write(id_rank+50,*) 'ist_idx_local_rtm_OC',                       &
      &                   sph_dbc%ist_idx_local_rtm_OC
-      write(my_rank+50,*) 'ist_idx_local_rtm_IC',                       &
+      write(id_rank+50,*) 'ist_idx_local_rtm_IC',                       &
      &                   sph_dbc%ist_idx_local_rtm_IC
-      write(my_rank+50,*) 'ist_idx_local_rtm_MT',                       &
+      write(id_rank+50,*) 'ist_idx_local_rtm_MT',                       &
      &                   sph_dbc%ist_idx_local_rtm_MT
 !
       end subroutine check_sph_gl_bc_param

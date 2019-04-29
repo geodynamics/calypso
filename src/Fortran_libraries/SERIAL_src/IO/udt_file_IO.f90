@@ -7,20 +7,20 @@
 !> @brief UCD format data IO
 !!
 !!@verbatim
-!!      subroutine write_ucd_file(my_rank, file_name, ucd)
-!!      subroutine write_udt_file(my_rank, file_name, ucd)
-!!      subroutine write_grd_file(my_rank, file_name, ucd)
+!!      subroutine write_ucd_file(id_rank, file_name, ucd)
+!!      subroutine write_udt_file(id_rank, file_name, ucd)
+!!      subroutine write_grd_file(id_rank, file_name, ucd)
 !!
-!!      subroutine read_udt_file(my_rank, file_name, ucd)
-!!      subroutine read_and_alloc_udt_params(my_rank, file_name, ucd)
-!!      subroutine read_and_alloc_udt_file(my_rank, file_name, ucd)
+!!      subroutine read_udt_file(id_rank, file_name, ucd)
+!!      subroutine read_and_alloc_udt_params(id_rank, file_name, ucd)
+!!      subroutine read_and_alloc_udt_file(id_rank, file_name, ucd)
 !!      subroutine read_and_alloc_ucd_file                              &
-!!     &         (my_rank, file_name, nnod_ele, ucd)
-!!      subroutine read_grd_file(my_rank, file_name, nnod_ele, ucd)
+!!     &         (id_rank, file_name, nnod_ele, ucd)
+!!      subroutine read_grd_file(id_rank, file_name, nnod_ele, ucd)
 !!        type(ucd_data), intent(inout) :: ucd
 !!@endverbatim
 !!
-!!@param my_rank  process ID
+!!@param id_rank  process ID
 !!@param file_name    file name
 !!@param ucd      Structure for FEM field data IO
 !
@@ -48,16 +48,16 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine write_ucd_file(my_rank, file_name, ucd)
+      subroutine write_ucd_file(id_rank, file_name, ucd)
 !
       use set_parallel_file_name
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(ucd_data), intent(in) :: ucd
 !
 !
-      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii UCD file: ', trim(file_name)
 !
       open(id_ucd_file,file=file_name, form='formatted')
@@ -69,16 +69,16 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine write_udt_file(my_rank, file_name, ucd)
+      subroutine write_udt_file(id_rank, file_name, ucd)
 !
       use set_parallel_file_name
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(ucd_data), intent(in) :: ucd
 !
 !
-      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii UCD field: ', trim(file_name)
 !
       open(id_ucd_file,file=file_name, form='formatted')
@@ -89,16 +89,16 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine write_grd_file(my_rank, file_name, ucd)
+      subroutine write_grd_file(id_rank, file_name, ucd)
 !
       use set_parallel_file_name
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(ucd_data), intent(in) :: ucd
 !
 !
-      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write ascii UCD mesh: ', trim(file_name)
 !
       open (id_ucd_file, file=file_name, status='replace')
@@ -141,16 +141,16 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine read_udt_file(my_rank, file_name, ucd)
+      subroutine read_udt_file(id_rank, file_name, ucd)
 !
       use udt_data_IO
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read ascii UDT data: ', trim(file_name)
       open (id_ucd_file, file=file_name, status='old')
 !
@@ -168,16 +168,16 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine read_and_alloc_udt_params(my_rank, file_name, ucd)
+      subroutine read_and_alloc_udt_params(id_rank, file_name, ucd)
 !
       use udt_data_IO
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read ascii UDT data: ', trim(file_name)
 !
       open (id_ucd_file, file=file_name, status='old')
@@ -197,16 +197,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_and_alloc_udt_file(my_rank, file_name, ucd)
+      subroutine read_and_alloc_udt_file(id_rank, file_name, ucd)
 !
       use udt_data_IO
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read ascii UDT data: ', trim(file_name)
 !
       open (id_ucd_file, file=file_name, status='old')
@@ -230,16 +230,17 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_and_alloc_ucd_file                                &
-     &         (my_rank, file_name, nnod_ele, ucd)
+     &         (id_rank, file_name, nnod_ele, ucd)
 !
       use udt_data_IO
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank, nnod_ele
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: nnod_ele
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read ascii UCD data: ', trim(file_name)
 !
       open (id_ucd_file, file=file_name, status='old')
@@ -265,15 +266,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_grd_file(my_rank, file_name, nnod_ele, ucd)
+      subroutine read_grd_file(id_rank, file_name, nnod_ele, ucd)
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind=kint), intent(in) :: my_rank, nnod_ele
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: nnod_ele
       type(ucd_data), intent(inout) :: ucd
 !
 !
-!
-      if(my_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read ascii PSF grid data: ', trim(file_name)
 !
       open(id_ucd_file, file=file_name, form='formatted',               &

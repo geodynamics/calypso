@@ -118,10 +118,10 @@
       end if
 !
 !
-      call set_output_step_4_fixed_step(ione, init_d%dt,                &
+      call output_step_4_fixed_step_ctl(ione, init_d%dt,                &
      &    tctl%i_step_rst_ctl, tctl%delta_t_rst_ctl, rst_step)
 !
-      call set_output_step_4_fixed_step(ione, init_d%dt,                &
+      call output_step_4_fixed_step_ctl(ione, init_d%dt,                &
      &    tctl%i_step_ucd_ctl, tctl%delta_t_field_ctl, ucd_step)
 !
       if (finish_d%i_end_step .eq. -1) then

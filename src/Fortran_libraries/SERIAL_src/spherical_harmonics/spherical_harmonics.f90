@@ -70,7 +70,7 @@
 !!*
 !!*************************************************************
 !!
-!!      subroutine get_dgree_order_by_full_j(j, l, m)
+!!      subroutine get_degree_order_by_full_j(j, l, m)
 !!      integer(kind = kint) function get_idx_by_full_degree_order(l, m)
 !!@endverbatim
 !*
@@ -218,15 +218,15 @@
 !*
 !  ---------------------------------------------------------------------
 !
-      subroutine get_dgree_order_by_full_j(j, l, m)
+      subroutine get_degree_order_by_full_j(j, l, m)
 !
       integer(kind = kint), intent(in) :: j
       integer(kind = kint), intent(inout) :: l, m
 !
-      l = int(aint(sqrt(real(j))))
+      l = int(aint(sqrt(real(j))), KIND(l))
       m = j - l*(l+1)
 !
-      end subroutine get_dgree_order_by_full_j
+      end subroutine get_degree_order_by_full_j
 !
 !  ---------------------------------------------------------------------
 !

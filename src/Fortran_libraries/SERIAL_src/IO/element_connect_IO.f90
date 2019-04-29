@@ -8,8 +8,10 @@
 !!
 !!@verbatim
 !!      subroutine write_element_info(id_file, ele_IO)
+!!        type(element_data), intent(in) :: ele_IO
 !!      subroutine write_surface_4_element(id_file, sfed_IO)
 !!      subroutine write_edge_4_element(id_file, sfed_IO)
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!
 !!      subroutine read_number_of_element(id_file, ele_IO)
 !!      subroutine read_element_info(id_file, ele_IO)
@@ -44,7 +46,7 @@
       subroutine write_element_info(id_file, ele_IO)
 !
       integer (kind = kint), intent(in) :: id_file
-      type(element_data), intent(inout) :: ele_IO
+      type(element_data), intent(in) :: ele_IO
 !
       integer (kind = kint) :: i
 !
@@ -57,8 +59,6 @@
      &    ele_IO%ie(i,1:ele_IO%nodelm(i))
       end do
 !
-      call deallocate_ele_connect_type(ele_IO)
-!
       end subroutine write_element_info
 !
 !------------------------------------------------------------------
@@ -66,7 +66,7 @@
       subroutine write_surface_4_element(id_file, sfed_IO)
 !
       integer (kind = kint), intent(in) :: id_file
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
       integer(kind = kint) :: i
 !
@@ -77,8 +77,6 @@
      &        sfed_IO%isf_for_ele(i,1:sfed_IO%nsurf_in_ele)
       end do
 !
-      call dealloc_surface_connect_IO(sfed_IO)
-!
       end subroutine write_surface_4_element
 !
 !------------------------------------------------------------------
@@ -86,7 +84,7 @@
       subroutine write_edge_4_element(id_file, sfed_IO)
 !
       integer (kind = kint), intent(in) :: id_file
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
       integer(kind = kint) :: i
 !
@@ -96,8 +94,6 @@
         write(id_file,'(12i16)')                                        &
      &         sfed_IO%iedge_for_ele(i,1:sfed_IO%nedge_in_ele)
       end do
-!
-      call dealloc_edge_connect_IO(sfed_IO)
 !
       end subroutine write_edge_4_element
 !

@@ -89,8 +89,8 @@
            WS(6*k-1)= X(ii-1)
            WS(6*k  )= X(ii  )
         enddo
-        call MPI_ISEND(WS(6*istart+1), 6*inum, CALYPSO_REAL,            &
-     &                 NEIBPE(neib), 0, CALYPSO_COMM, req1(neib),       &
+        call MPI_ISEND(WS(6*istart+1), int(6*inum), CALYPSO_REAL,       &
+     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM, req1(neib),  &
      &                 ierr_MPI)
       enddo
 
@@ -99,12 +99,12 @@
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1)
         inum  = STACK_IMPORT(neib  ) - istart
-        call MPI_IRECV(WR(6*istart+1), 6*inum, CALYPSO_REAL,            &
-     &                 NEIBPE(neib), 0, CALYPSO_COMM, req2(neib),       &
+        call MPI_IRECV(WR(6*istart+1), int(6*inum), CALYPSO_REAL,       &
+     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM, req2(neib),  &
      &                 ierr_MPI)
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req2(1), sta2(1,1), ierr_MPI)
+      call MPI_WAITALL (int(NEIBPETOT), req2(1), sta2(1,1), ierr_MPI)
    
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1)
@@ -120,7 +120,7 @@
       enddo
       enddo
 
-      call MPI_WAITALL (NEIBPETOT, req1(1), sta1(1,1), ierr_MPI)
+      call MPI_WAITALL (int(NEIBPETOT), req1(1), sta1(1,1), ierr_MPI)
 
       end subroutine SOLVER_SEND_RECV_6
 !

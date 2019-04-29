@@ -7,10 +7,11 @@
 !>@brief  Set control parameters for spherical harmonics dynamo from IO
 !!
 !!@verbatim
-!!     subroutine s_set_control_sph_data_MHD                            &
-!!     &         (MHD_prop, plt, field_ctl, mevo_ctl,                   &
-!!     &          rj_org_param, rst_org_param, fst_file_IO,             &
-!!     &          rj_fld, bc_IO, WK_sph)
+!!      subroutine set_control_sph_mhd_fields                           &
+!!     &        (MHD_prop, field_ctl, rj_fld)
+!!      subroutine s_set_control_sph_data_MHD                           &
+!!     &         (MHD_prop, plt, mevo_ctl, rj_org_param, rst_org_param, &
+!!     &          fst_file_IO, bc_IO, WK_sph)
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(platform_data_control), intent(in) :: plt
@@ -41,10 +42,56 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine set_control_sph_mhd_fields                             &
+     &        (MHD_prop, field_ctl, rj_fld)
+!
+      use calypso_mpi
+      use m_error_IDs
+      use m_machine_parameter
+!
+      use t_control_parameter
+      use t_read_control_arrays
+      use t_phys_data
+!
+      use add_nodal_fields_4_MHD
+      use add_sph_MHD_fields_2_ctl
+      use set_control_sph_data
+!
+      type(MHD_evolution_param), intent(in) :: MHD_prop
+      type(ctl_array_c3), intent(inout) :: field_ctl
+!
+      type(phys_data), intent(inout) :: rj_fld
+!
+      integer(kind = kint) :: ierr
+!
+!   set physical values
+!
+      if(field_ctl%icou .eq. 0) then
+        call calypso_MPI_abort(ierr_fld, 'Set field for simulation')
+      end if
+      if (iflag_debug.eq.1) write(*,*)                                  &
+     &    'original number of field ', field_ctl%num
+!
+      if(field_ctl%num .le. 0) return
+!
+!     add fields for simulation
+      call add_field_name_4_mhd(MHD_prop, field_ctl)
+      call add_field_name_4_sph_mhd                                     &
+     &     (MHD_prop%fl_prop, MHD_prop%cd_prop,                         &
+     &      MHD_prop%ht_prop, MHD_prop%cp_prop, field_ctl)
+!
+!    set nodal data
+!
+      if (iflag_debug.gt.0) write(*,*) 's_set_control_sph_data'
+      call s_set_control_sph_data(field_ctl, rj_fld, ierr)
+!
+      end subroutine set_control_sph_mhd_fields
+!
+! -----------------------------------------------------------------------
+!
       subroutine s_set_control_sph_data_MHD                             &
-     &         (MHD_prop, plt, field_ctl, mevo_ctl,                     &
-     &          rj_org_param, rst_org_param, fst_file_IO,               &
-     &          rj_fld, bc_IO, WK_sph)
+     &         (MHD_prop, plt, mevo_ctl, rj_org_param, rst_org_param,   &
+     &          fst_file_IO, bc_IO, WK_sph)
 !
       use calypso_mpi
       use m_error_IDs
@@ -72,12 +119,10 @@
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(platform_data_control), intent(in) :: plt
-      type(ctl_array_c3), intent(inout) :: field_ctl
       type(mhd_evo_scheme_control), intent(in) :: mevo_ctl
       type(field_IO_params), intent(in) :: rj_org_param, rst_org_param
 !
       type(field_IO_params), intent(inout) :: fst_file_IO
-      type(phys_data), intent(inout) :: rj_fld
       type(boundary_spectra), intent(inout) :: bc_IO
       type(spherical_trns_works), intent(inout) :: WK_sph
 !
@@ -87,29 +132,6 @@
 !
       if( (rj_org_param%iflag_IO*rst_org_param%iflag_IO) .gt. 0)        &
      &   fst_file_IO%file_prefix = rst_org_param%file_prefix
-!
-!   set physical values
-!
-      if(field_ctl%icou .eq. 0) then
-        call calypso_MPI_abort(ierr_fld, 'Set field for simulation')
-      end if
-      if (iflag_debug.eq.1) write(*,*)                                  &
-     &    'original number of field ', field_ctl%num
-!
-      if ( field_ctl%num .ne. 0 ) then
-!
-!     add fields for simulation
-        call add_field_name_4_mhd(MHD_prop, field_ctl)
-        call add_field_name_4_sph_mhd                                   &
-     &     (MHD_prop%fl_prop, MHD_prop%cd_prop,                         &
-     &      MHD_prop%ht_prop, MHD_prop%cp_prop, field_ctl)
-!
-!    set nodal data
-!
-        if (iflag_debug.gt.0) write(*,*) 's_set_control_sph_data'
-        call s_set_control_sph_data(field_ctl, rj_fld, ierr)
-      end if
-!
 !
       if(mevo_ctl%leg_vector_len%iflag .gt. 0) then
         nvector_legendre = mevo_ctl%leg_vector_len%intvalue
@@ -138,6 +160,7 @@
 !
       end subroutine s_set_control_sph_data_MHD
 !
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine set_ctl_params_pick_circle                             &

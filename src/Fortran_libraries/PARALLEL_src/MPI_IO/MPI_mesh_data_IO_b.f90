@@ -9,9 +9,11 @@
 !!
 !!@verbatim
 !!      subroutine mpi_write_geometry_data_b(IO_param, mesh_IO)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(mesh_geometry), intent(in) :: mesh_IO
 !!      subroutine mpi_write_mesh_groups_b(IO_param, mesh_group_IO)
-!!        type(mesh_geometry), intent(inout) :: mesh_IO
-!!        type(mesh_groups), intent(inout) ::   mesh_group_IO
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(mesh_groups), intent(in) :: mesh_group_IO
 !!
 !!      subroutine mpi_read_geometry_data_b(IO_param, mesh_IO)
 !!      subroutine mpi_read_mesh_groups_b(IO_param, mesh_group_IO)
@@ -49,7 +51,7 @@
       use MPI_element_data_IO_b
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_geometry), intent(inout) :: mesh_IO
+      type(mesh_geometry), intent(in) :: mesh_IO
 !
 !
       call mpi_write_domain_info_b(IO_param, mesh_IO%nod_comm)
@@ -69,7 +71,7 @@
       use MPI_groups_IO_b
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(mesh_groups), intent(inout) ::   mesh_group_IO
+      type(mesh_groups), intent(in) ::   mesh_group_IO
 !
 !
 !   write node group

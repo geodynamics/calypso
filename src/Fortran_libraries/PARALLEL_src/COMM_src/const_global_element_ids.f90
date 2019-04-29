@@ -8,6 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine count_number_of_node_stack(nnod, istack_nod_list)
+!!      subroutine count_number_of_node_stack4(nnod, istack_nod_list)
 !!      subroutine set_global_ele_id(txt, nele, istack_internal_e,      &
 !!     &         internal_flag, e_comm, iele_global)
 !!      subroutine check_element_position(txt, nele, x_ele, e_comm)
@@ -42,8 +43,8 @@
       allocate(nnod_list_gl(nprocs))
       nnod_list_gl = 0
 !
-      call MPI_Allgather(nnod, ione, CALYPSO_INTEGER,                   &
-     &    nnod_list_gl, ione, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
+      call MPI_Allgather(nnod, 1, CALYPSO_INTEGER,                      &
+     &    nnod_list_gl, 1, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
 !
       istack_nod_list(0) = 0
       do ip = 1, nprocs
@@ -54,6 +55,34 @@
 !
       end subroutine count_number_of_node_stack
 !
+!-----------------------------------------------------------------------
+!
+      subroutine count_number_of_node_stack4(nnod, istack_nod_list)
+!
+      integer(kind = kint) :: nnod
+      integer(kind = kint), intent(inout) :: istack_nod_list(0:nprocs)
+!
+      integer(kind = kint), allocatable :: nnod_list_gl(:)
+!
+      integer(kind = kint) :: ip
+!
+!
+      allocate(nnod_list_gl(nprocs))
+      nnod_list_gl = 0
+!
+      call MPI_Allgather(nnod, 1, CALYPSO_INTEGER,                      &
+     &    nnod_list_gl, 1, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
+!
+      istack_nod_list(0) = 0
+      do ip = 1, nprocs
+        istack_nod_list(ip) = istack_nod_list(ip-1) + nnod_list_gl(ip)
+      end do
+!
+      deallocate(nnod_list_gl)
+!
+      end subroutine count_number_of_node_stack4
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine set_global_ele_id(txt, nele, istack_internal_e,        &
@@ -109,10 +138,9 @@
       type(communication_table), intent(in) :: e_comm
 !
 !
-      real(kind = kreal), parameter :: tiny = 1.0d-14
       real(kind = kreal) :: dx, dy, dz
       real(kind = kreal), allocatable :: x_test(:)
-      integer(kind = kint) :: iele, inum
+      integer(kind = kint) :: iele, inum, iflag, iflag_gl
 !
 !
       if(i_debug .gt. 0) write(*,*) 'Number of  ', trim(txt),           &
@@ -138,16 +166,22 @@
 !
       call SOLVER_SEND_RECV_3_type(nele, e_comm, x_test(1))
 !
+      iflag = 0
       do iele = 1, nele
         dx = x_test(3*iele-2) - x_ele(iele,1)
         dy = x_test(3*iele-1) - x_ele(iele,2)
         dz = x_test(3*iele  ) - x_ele(iele,3)
-        if(     (abs(dx) .ge. tiny)  .or. (abs(dy) .ge. tiny)           &
-     &     .or. (abs(dz) .ge. tiny)) then
+        if(     (abs(dx) .ge. TINY)  .or. (abs(dy) .ge. TINY)           &
+     &     .or. (abs(dz) .ge. TINY)) then
           write(*,*) 'wrong ', trim(txt), ' position at: ',             &
      &         my_rank, iele, x_ele(iele,1:3), dx, dy, dz
         end if
       end do
+!
+      call mpi_Allreduce(iflag, iflag_gl, 1, CALYPSO_INTEGER, MPI_SUM,  &
+     &     CALYPSO_COMM, ierr_MPI)
+      if(iflag_gl .eq. 0 .and. my_rank .eq. 0) write(*,*)               &
+     &     trim(txt), ' position is successfully syncronizad'
 !
       deallocate(x_test)
 !

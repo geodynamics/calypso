@@ -7,10 +7,11 @@
 !>@brief Copy FEM mesh data from IO structure
 !!
 !!@verbatim
-!!      subroutine input_mesh(mesh_file, my_rank, mesh, group,          &
-!!     &          nnod_4_surf, nnod_4_edge, ierr)
-!!      subroutine input_mesh_geometry(mesh_file, my_rank, mesh, ierr)
-!!      subroutine output_mesh(mesh_file, my_rank, mesh, group)
+!!      subroutine input_mesh(mesh_file, id_rank, fem, ele_mesh, ierr)
+!!        type(mesh_data), intent(inout) :: fem
+!!        type(element_geometry), intent(inout) :: ele_mesh
+!!      subroutine input_mesh_geometry(mesh_file, id_rank, mesh, ierr)
+!!      subroutine output_mesh(mesh_file, id_rank, mesh, group)
 !!        type(field_IO_params), intent(in) ::  mesh_file
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::   group
@@ -18,7 +19,11 @@
 !!      subroutine set_mesh                                             &
 !!     &         (mesh, group, nnod_4_surf, nnod_4_edge)
 !!      subroutine set_mesh_geometry_data(mesh_IO, nod_comm, node, ele)
+!!      subroutine set_node_geometry_data(mesh_IO, node)
 !!      subroutine set_zero_mesh_data(mesh, nnod_4_surf, nnod_4_edge)
+!!        type(mesh_geometry), intent(inout) :: mesh
+!!      subroutine set_zero_node_data(node)
+!!        type(node_data), intent(inout) :: node
 !!
 !!      subroutine set_grp_data_from_IO(nod_grp, ele_grp, surf_grp)
 !!      subroutine set_grp_data_to_IO(nod_grp, ele_grp, surf_grp)
@@ -49,35 +54,42 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine input_mesh(mesh_file, my_rank, mesh, group,            &
-     &          nnod_4_surf, nnod_4_edge, ierr)
+      subroutine input_mesh(mesh_file, id_rank, fem, ele_mesh, ierr)
 !
       use mesh_IO_select
       use set_nnod_4_ele_by_type
+      use cal_minmax_and_stacks
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(field_IO_params), intent(in) ::  mesh_file
 !
-      type(mesh_geometry), intent(inout) :: mesh
-      type(mesh_groups), intent(inout) ::   group
-      integer(kind = kint), intent(inout) :: nnod_4_surf, nnod_4_edge
+      type(mesh_data), intent(inout) :: fem
+      type(element_geometry), intent(inout) :: ele_mesh
       integer(kind = kint), intent(inout) :: ierr
 !
-      type(mesh_data) :: fem_IO_i
 !
+      call sel_read_mesh(mesh_file, id_rank, fem, ierr)
 !
-      call sel_read_mesh(mesh_file, my_rank, fem_IO_i, ierr)
-      call set_mesh(fem_IO_i, mesh, group, nnod_4_surf, nnod_4_edge)
+      call s_cal_numbers_from_stack(fem%group%nod_grp%num_grp,          &
+     &    fem%group%nod_grp%nitem_grp, fem%group%nod_grp%istack_grp)
+      call s_cal_numbers_from_stack(fem%group%ele_grp%num_grp,          &
+     &    fem%group%ele_grp%nitem_grp, fem%group%ele_grp%istack_grp)
+      call s_cal_numbers_from_stack(fem%group%surf_grp%num_grp,         &
+     &    fem%group%surf_grp%nitem_grp, fem%group%surf_grp%istack_grp)
+!
+      call alloc_sph_node_geometry(fem%mesh%node)
+      call set_3D_nnod_4_sfed_by_ele(fem%mesh%ele%nnod_4_ele,           &
+     &    ele_mesh%surf%nnod_4_surf, ele_mesh%edge%nnod_4_edge)
 !
       end subroutine input_mesh
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine input_mesh_geometry(mesh_file, my_rank, mesh, ierr)
+      subroutine input_mesh_geometry(mesh_file, id_rank, mesh, ierr)
 !
       use mesh_IO_select
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(field_IO_params), intent(in) ::  mesh_file
       type(mesh_geometry), intent(inout) :: mesh
       integer(kind = kint), intent(inout) :: ierr
@@ -85,7 +97,7 @@
       type(mesh_geometry) :: mesh_IO_i
 !
 !
-      call sel_read_mesh_geometry(mesh_file, my_rank, mesh_IO_i, ierr)
+      call sel_read_mesh_geometry(mesh_file, id_rank, mesh_IO_i, ierr)
       call set_mesh_geometry_data(mesh_IO_i,                            &
      &    mesh%nod_comm, mesh%node, mesh%ele)
 !
@@ -94,13 +106,13 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine output_mesh(mesh_file, my_rank, mesh, group)
+      subroutine output_mesh(mesh_file, id_rank, mesh, group)
 !
       use mesh_IO_select
       use set_element_data_4_IO
       use copy_mesh_structures
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(field_IO_params), intent(in) ::  mesh_file
 !
       type(mesh_geometry), intent(inout) :: mesh
@@ -117,7 +129,10 @@
      &   (group%nod_grp, group%ele_grp, group%surf_grp, fem_IO_i%group)
 !
 !       save mesh information
-      call sel_write_mesh_file(mesh_file, my_rank, fem_IO_i)
+      call sel_write_mesh_file(mesh_file, id_rank, fem_IO_i)
+!
+      call dealloc_mesh_geometry_base(fem_IO_i%mesh)
+      call dealloc_groups_data(fem_IO_i%group)
 !
       end subroutine output_mesh
 !
@@ -164,13 +179,28 @@
       call copy_node_geometry_types(mesh_IO%node, node)
       call copy_ele_connect_from_IO(mesh_IO%ele, ele)
 !
-      call deallocate_type_comm_tbl(mesh_IO%nod_comm)
-      call dealloc_node_geometry_base(mesh_IO%node)
-      call deallocate_ele_connect_type(mesh_IO%ele)
+      call dealloc_mesh_geometry_base(mesh_IO)
 !
-      call allocate_sph_node_geometry(node)
+      call alloc_sph_node_geometry(node)
 !
       end subroutine set_mesh_geometry_data
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine set_node_geometry_data(mesh_IO, node)
+!
+      use set_element_data_4_IO
+      use copy_mesh_structures
+!
+      type(mesh_geometry), intent(inout) :: mesh_IO
+      type(node_data), intent(inout) ::           node
+!
+!
+      call copy_node_geometry_types(mesh_IO%node, node)
+!
+      call dealloc_node_geometry_IO(mesh_IO)
+!
+      end subroutine set_node_geometry_data
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
@@ -187,12 +217,12 @@
       mesh%nod_comm%num_neib =    izero
       mesh%nod_comm%ntot_import = izero
       mesh%nod_comm%ntot_export = izero
-      call allocate_type_comm_tbl_num(mesh%nod_comm)
-      call allocate_type_comm_tbl_item(mesh%nod_comm)
+      call alloc_comm_table_num(mesh%nod_comm)
+      call alloc_comm_table_item(mesh%nod_comm)
 !
       mesh%node%numnod =        izero
       mesh%node%internal_node = izero
-      call allocate_node_geometry_type(mesh%node)
+      call alloc_node_geometry_w_sph(mesh%node)
 !
       mesh%ele%numele = izero
       mesh%ele%first_ele_type = izero
@@ -202,6 +232,21 @@
      &   (mesh%ele%nnod_4_ele, nnod_4_surf, nnod_4_edge)
 !
       end subroutine set_zero_mesh_data
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine set_zero_node_data(node)
+!
+      use t_geometry_data
+!
+      type(node_data), intent(inout) :: node
+!
+!
+      node%numnod =        izero
+      node%internal_node = izero
+      call alloc_node_geometry_w_sph(node)
+!
+      end subroutine set_zero_node_data
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------

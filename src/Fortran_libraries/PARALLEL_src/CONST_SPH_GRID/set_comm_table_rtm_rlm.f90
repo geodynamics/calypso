@@ -28,7 +28,7 @@
 !!        type(spheric_global_rank), intent(in) :: s3d_ranks
 !!
 !!      subroutine count_num_domain_rtm_rlm(ndomain_sph, nneib_domain)
-!!      subroutine set_comm_stack_rtm_rlm(ip_rank, ndomain_sph,         &
+!!      subroutine set_comm_stack_rtm_rlm(id_rank, ndomain_sph,         &
 !!     &          nneib_domain, id_domain, istack_sr, ntot_item_sr)
 !!@endverbatim
 !
@@ -282,11 +282,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_comm_stack_rtm_rlm(ip_rank, ndomain_sph,           &
+      subroutine set_comm_stack_rtm_rlm(id_rank, ndomain_sph,           &
      &          nneib_domain, id_domain, istack_sr, ntot_item_sr)
 !
       integer(kind = kint), intent(in) :: ndomain_sph
-      integer(kind = kint), intent(in) :: ip_rank
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: nneib_domain
       integer(kind = kint), intent(inout) :: ntot_item_sr
       integer(kind = kint), intent(inout) :: id_domain(nneib_domain)
@@ -299,7 +299,7 @@
       icou =       0
       ineib_tgt = -1
       do ip = 1, ndomain_sph
-        irank_tgt = mod( (ip_rank+ip),ndomain_sph )
+        irank_tgt = mod( (id_rank+ip),ndomain_sph )
         if (ncomm(irank_tgt) .gt. 0) then
           icou = icou + 1
           ineib_tgt(irank_tgt) = icou

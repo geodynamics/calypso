@@ -154,7 +154,7 @@
       character(len=kchara) :: fmt_txt
 !
       integer(kind = MPI_OFFSET_KIND) :: ioffset
-      integer(kind = kint) :: ilength
+      integer :: ilength
       integer(kind = kint_gl) :: i, num
 !
 !
@@ -191,7 +191,7 @@
 !
       integer, intent(in) ::  id_vtk
 !
-      integer(kind = kint), parameter :: ilength = 3*25 + 1
+      integer, parameter :: ilength = 3*25 + 1
       character(len=ilength), target :: textbuf_n(3*nnod)
       character(len=ilength), pointer :: charatmp
       character(len=kchara), parameter :: fmt_txt = '(6(1pE25.15e3),a1)'
@@ -247,7 +247,7 @@
       integer(kind = kint_gl) :: iele
 !
       integer(kind = MPI_OFFSET_KIND) :: ioffset
-      integer(kind = kint) :: ilength
+      integer :: ilength
 !
 !
       ie0(1:nnod_ele) = 0
@@ -279,7 +279,7 @@
 !
       integer, intent(in) ::  id_vtk
 !
-      integer(kind = kint), parameter :: ilength = 5 + 1
+      integer, parameter :: ilength = 5 + 1
       character(len=ilength), target :: textbuf_n(nele)
 !
       integer(kind = kint) :: icellid

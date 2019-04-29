@@ -9,12 +9,13 @@
 !!@verbatim
 !!      subroutine bcast_ctl_data_4_platform(plt)
 !!        type(platform_data_control), intent(inout) :: plt
+!!      subroutine bcast_FEM_mesh_control(Fmesh_ctl)
+!!        type(FEM_mesh_control), intent(inout) :: Fmesh_ctl
 !!@endverbatim
 !
       module bcast_4_platform_ctl
 !
       use m_precision
-      use t_ctl_data_4_platforms
 !
 !
 !  ---------------------------------------------------------------------
@@ -25,6 +26,7 @@
 !
       subroutine bcast_ctl_data_4_platform(plt)
 !
+      use t_ctl_data_4_platforms
       use bcast_control_arrays
 !
       type(platform_data_control), intent(inout) :: plt
@@ -56,14 +58,29 @@
       call bcast_ctl_type_c1(plt%coriolis_file_fmt_ctl)
 !
       call bcast_ctl_type_c1(plt%debug_flag_ctl)
-      call bcast_ctl_type_c1(plt%memory_conservation_ctl)
-      call bcast_ctl_type_c1(plt%FEM_mesh_output_switch)
-      call bcast_ctl_type_c1(plt%FEM_surface_output_switch)
 !
-      call bcast_ctl_type_c1(plt%excluding_FEM_mesh_ctl)
       call bcast_ctl_type_c1(plt%del_org_data_ctl)
 !
       end subroutine bcast_ctl_data_4_platform
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine bcast_FEM_mesh_control(Fmesh_ctl)
+!
+      use t_ctl_data_4_FEM_mesh
+      use bcast_control_arrays
+!
+      type(FEM_mesh_control), intent(inout) :: Fmesh_ctl
+!
+!
+      call bcast_ctl_type_c1(Fmesh_ctl%memory_conservation_ctl)
+      call bcast_ctl_type_c1(Fmesh_ctl%FEM_mesh_output_switch)
+      call bcast_ctl_type_c1(Fmesh_ctl%FEM_surface_output_switch)
+      call bcast_ctl_type_c1(Fmesh_ctl%FEM_viewer_output_switch)
+!
+      call bcast_ctl_type_i1(Fmesh_ctl%FEM_sleeve_level_ctl)
+!
+      end subroutine bcast_FEM_mesh_control
 !
 !  ---------------------------------------------------------------------
 !

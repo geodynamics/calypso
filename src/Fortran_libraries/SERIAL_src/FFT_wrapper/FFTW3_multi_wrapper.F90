@@ -129,12 +129,12 @@
       integer(kind = 4) :: Nfft4, howmany, idist_r, idist_c
 !
 !
-      Nfft4 = int(Nfft)
+      Nfft4 = int(Nfft,KIND(Nfft4))
       do ip = 1, Nsmp
         ist = Nstacksmp(ip-1) + 1
-        howmany = int(Nstacksmp(ip  ) - Nstacksmp(ip-1))
-        idist_r = int(Nfft)
-        idist_c = int(Nfft)/2+1
+        howmany = int(Nstacksmp(ip  ) - Nstacksmp(ip-1), KIND(howmany))
+        idist_r = int(Nfft, KIND(idist_r))
+        idist_c = int(Nfft, KIND(idist_c))/2 + 1
 !
 #ifdef FFTW3_C
         call kemo_fftw_plan_many_dft_r2c                                &

@@ -14,12 +14,12 @@
 !!        type(sph_trans_2d_table), intent(inout) :: s2d_tbl
 !!
 !!      subroutine check_2d_sph_indices                                 &
-!!     &         (my_rank, nphi, ltr, jmax, s2d_tbl)
+!!     &         (id_rank, nphi, ltr, jmax, s2d_tbl)
 !!      subroutine check_2d_sph_trans_table                             &
-!!     &         (my_rank, ntheta, nphi, s2d_tbl)
+!!     &         (id_rank, ntheta, nphi, s2d_tbl)
 !!@endverbatim
 !!
-!!@param my_rank  Process ID
+!!@param id_rank  Process ID
 !!@param ntheta   Number of meridional grids
 !!@param nphi     Number of zonal grids
 !!@param ltr      Truncation degree
@@ -107,45 +107,45 @@
 ! -----------------------------------------------------------------------
 !
       subroutine check_2d_sph_indices                                   &
-     &         (my_rank, nphi, ltr, jmax, s2d_tbl)
+     &         (id_rank, nphi, ltr, jmax, s2d_tbl)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: nphi, jmax, ltr
       type(sph_trans_2d_table), intent(in) :: s2d_tbl
 !
       integer(kind = kint) :: m, j, l
 !
 !
-      write(my_rank+50,*) 'zonal wave numbers after FFT'
-      write(my_rank+50,*) 'm, mdx_ispack(m)'
+      write(id_rank+50,*) 'zonal wave numbers after FFT'
+      write(id_rank+50,*) 'm, mdx_ispack(m)'
       do m = 1, nphi
-        write(my_rank+50,*) m, s2d_tbl%mdx_ispack(m)
+        write(id_rank+50,*) m, s2d_tbl%mdx_ispack(m)
       end do
 !
-      write(my_rank+50,*) 'zonal wave numbers before Legendre trans.'
-      write(my_rank+50,*) 'm, s2d_tbl%mdx_4_lgd(m)'
+      write(id_rank+50,*) 'zonal wave numbers before Legendre trans.'
+      write(id_rank+50,*) 'm, s2d_tbl%mdx_4_lgd(m)'
       do m = 0, nphi
-        write(my_rank+50,*) m, s2d_tbl%mdx_4_lgd(m)
+        write(id_rank+50,*) m, s2d_tbl%mdx_4_lgd(m)
       end do
 !
-      write(my_rank+50,*) 'spectr data after Legendre transform'
-      write(my_rank+50,*) 'j, s2d_tbl%jtbl_fsph(j,1:3)'
+      write(id_rank+50,*) 'spectr data after Legendre transform'
+      write(id_rank+50,*) 'j, s2d_tbl%jtbl_fsph(j,1:3)'
       do j = 0, jmax
-        write(my_rank+50,*) j, s2d_tbl%jtbl_fsph(j,1:3)
+        write(id_rank+50,*) j, s2d_tbl%jtbl_fsph(j,1:3)
       end do
 !
-      write(my_rank+50,*) 'spectr data ordering for linear terms'
-      write(my_rank+50,*) 'j, s2d_tbl%jtbl_fsph(j,1:3)'
+      write(id_rank+50,*) 'spectr data ordering for linear terms'
+      write(id_rank+50,*) 'j, s2d_tbl%jtbl_fsph(j,1:3)'
       do j = 0, jmax
-        write(my_rank+50,*) j, s2d_tbl%jtbl_rj(j,1:3)
+        write(id_rank+50,*) j, s2d_tbl%jtbl_rj(j,1:3)
       end do
 !
-      write(my_rank+50,*) 'spectr data for final distribution'
-      write(my_rank+50,*) 'j, l, m'
+      write(id_rank+50,*) 'spectr data for final distribution'
+      write(id_rank+50,*) 'j, l, m'
       do l = 0, ltr
         do m = -l, l
           j = l*(l+1) + m
-          write(my_rank+50,*) j, l, m
+          write(id_rank+50,*) j, l, m
         end do
       end do
 !
@@ -154,26 +154,26 @@
 ! -----------------------------------------------------------------------
 !
       subroutine check_2d_sph_trans_table                               &
-     &         (my_rank, ntheta, nphi, s2d_tbl)
+     &         (id_rank, ntheta, nphi, s2d_tbl)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: ntheta, nphi
       type(sph_trans_2d_table), intent(in) :: s2d_tbl
 !
       integer(kind = kint) :: m
 !
-      write(my_rank+50,*) 'zonal wave number and tranfer table'
-      write(my_rank+50,*) 'm, mspec_4_ispack(m), jdx_fsph(m)'
+      write(id_rank+50,*) 'zonal wave number and tranfer table'
+      write(id_rank+50,*) 'm, mspec_4_ispack(m), jdx_fsph(m)'
       do m = -ntheta, ntheta
-        write(my_rank+50,*) m, s2d_tbl%mspec_4_ispack(m),               &
+        write(id_rank+50,*) m, s2d_tbl%mspec_4_ispack(m),               &
      &                         s2d_tbl%jdx_fsph(m)
       end do
 !
-      write(my_rank+50,*)                                               &
+      write(id_rank+50,*)                                               &
      &        'tranfer table from zonal spectr for Lag. trans.'
-      write(my_rank+50,*) 'm0, mtbl_fft_2_lgd, mdx_4_lgd(m0)'
+      write(id_rank+50,*) 'm0, mtbl_fft_2_lgd, mdx_4_lgd(m0)'
       do m = 0, nphi
-        write(my_rank+50,*) m, s2d_tbl%mtbl_fft_2_lgd(m),               &
+        write(id_rank+50,*) m, s2d_tbl%mtbl_fft_2_lgd(m),               &
      &                         s2d_tbl%mdx_4_lgd(m)
       end do
 !

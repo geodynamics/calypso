@@ -289,7 +289,7 @@
 !
 !
       read(id_vtk,*) tmpchara, nele, nums
-      nnod_ele = int(nums / nele) - 1
+      nnod_ele = int(nums/nele,KIND(nnod_ele)) - 1
 !
       end subroutine read_vtk_connect_head
 !

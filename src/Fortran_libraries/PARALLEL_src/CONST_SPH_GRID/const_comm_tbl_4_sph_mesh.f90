@@ -3,17 +3,17 @@
 !
 !     Written by H. Matsui on March, 2013
 !
-!!      subroutine count_neib_4_sph_mesh(ip_rank, ip_r, ip_t,           &
+!!      subroutine count_neib_4_sph_mesh(id_rank, ip_r, ip_t,           &
 !!     &          s3d_ranks, stbl, nod_comm)
-!!      subroutine count_neib_4_sph_center_mesh(ip_rank, ip_r, ip_t,    &
+!!      subroutine count_neib_4_sph_center_mesh(id_rank, ip_r, ip_t,    &
 !!     &          s3d_ranks, stbl, nod_comm)
 !!        type(spheric_global_rank), intent(in) :: s3d_ranks
 !!        type(comm_table_make_sph), intent(in) :: stbl
 !!        type(communication_table), intent(inout) :: nod_comm
 !!
-!!      subroutine set_neib_4_sph_mesh(ip_rank, ip_r, ip_t,             &
+!!      subroutine set_neib_4_sph_mesh(id_rank, ip_r, ip_t,             &
 !!     &          s3d_ranks, stbl, nod_comm)
-!!      subroutine set_neib_4_sph_center_mesh(ip_rank, ip_r, ip_t,      &
+!!      subroutine set_neib_4_sph_center_mesh(id_rank, ip_r, ip_t,      &
 !!     &          s3d_ranks, stbl, nod_comm)
 !!        type(spheric_global_rank), intent(in) :: s3d_ranks
 !!        type(comm_table_make_sph), intent(in) :: stbl
@@ -56,12 +56,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine count_neib_4_sph_mesh(ip_rank, ip_r, ip_t,             &
+      subroutine count_neib_4_sph_mesh(id_rank, ip_r, ip_t,             &
      &          s3d_ranks, stbl, nod_comm)
 !
       type(spheric_global_rank), intent(in) :: s3d_ranks
       type(comm_table_make_sph), intent(in) :: stbl
-      integer(kind = kint), intent(in) :: ip_rank, ip_r, ip_t
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: ip_r, ip_t
 !
       type(communication_table), intent(inout) :: nod_comm
 !
@@ -71,7 +72,7 @@
 !
       nod_comm%num_neib = 0
       do jp = 1, stbl%ntot_domain-1
-        j_rank = mod((ip_rank+jp),stbl%ntot_domain)
+        j_rank = mod((id_rank+jp),stbl%ntot_domain)
         jp_r = s3d_ranks%iglobal_rank_rtp(1,j_rank) + 1
         jp_t = s3d_ranks%iglobal_rank_rtp(2,j_rank) + 1
         if(     stbl%iflag_neib_r(jp_r,ip_r).ne.izero                   &
@@ -84,12 +85,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine count_neib_4_sph_center_mesh(ip_rank, ip_r, ip_t,      &
+      subroutine count_neib_4_sph_center_mesh(id_rank, ip_r, ip_t,      &
      &          s3d_ranks, stbl, nod_comm)
 !
       type(spheric_global_rank), intent(in) :: s3d_ranks
       type(comm_table_make_sph), intent(in) :: stbl
-      integer(kind = kint), intent(in) :: ip_rank, ip_r, ip_t
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: ip_r, ip_t
 !
       type(communication_table), intent(inout) :: nod_comm
 !
@@ -100,7 +102,7 @@
       if(stbl%iflag_center_r(ip_r) .eq. izero) return
 !
       do jp = 1, stbl%ntot_domain-1
-        j_rank = mod((ip_rank+jp),stbl%ntot_domain)
+        j_rank = mod((id_rank+jp),stbl%ntot_domain)
         jp_r = s3d_ranks%iglobal_rank_rtp(1,j_rank) + 1
         jp_t = s3d_ranks%iglobal_rank_rtp(2,j_rank) + 1
         if(     stbl%iflag_neib_r(jp_r,ip_r).gt.izero                   &
@@ -114,12 +116,13 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_neib_4_sph_mesh(ip_rank, ip_r, ip_t,               &
+      subroutine set_neib_4_sph_mesh(id_rank, ip_r, ip_t,               &
      &          s3d_ranks, stbl, nod_comm)
 !
       type(spheric_global_rank), intent(in) :: s3d_ranks
       type(comm_table_make_sph), intent(in) :: stbl
-      integer(kind = kint), intent(in) :: ip_rank, ip_r, ip_t
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: ip_r, ip_t
 !
       type(communication_table), intent(inout) :: nod_comm
 !
@@ -129,7 +132,7 @@
 !
       icou = 0
       do jp = 1, stbl%ntot_domain-1
-        j_rank = mod((ip_rank+jp),stbl%ntot_domain)
+        j_rank = mod((id_rank+jp),stbl%ntot_domain)
         jp_r = s3d_ranks%iglobal_rank_rtp(1,j_rank) + 1
         jp_t = s3d_ranks%iglobal_rank_rtp(2,j_rank) + 1
 !
@@ -145,13 +148,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_neib_4_sph_center_mesh(ip_rank, ip_r, ip_t,        &
+      subroutine set_neib_4_sph_center_mesh(id_rank, ip_r, ip_t,        &
      &          s3d_ranks, stbl, nod_comm)
       use set_comm_tbl_4_pole_mesh
 !
       type(spheric_global_rank), intent(in) :: s3d_ranks
       type(comm_table_make_sph), intent(in) :: stbl
-      integer(kind = kint), intent(in) :: ip_rank, ip_r, ip_t
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: ip_r, ip_t
 !
       type(communication_table), intent(inout) :: nod_comm
 !
@@ -163,7 +167,7 @@
 !
       icou = nod_comm%num_neib
       do jp = 1, stbl%ntot_domain-1
-        j_rank = mod((ip_rank+jp),stbl%ntot_domain)
+        j_rank = mod((id_rank+jp),stbl%ntot_domain)
         jp_r = s3d_ranks%iglobal_rank_rtp(1,j_rank) + 1
         jp_t = s3d_ranks%iglobal_rank_rtp(2,j_rank) + 1
         if(     stbl%iflag_neib_r(jp_r,ip_r).gt.izero                   &

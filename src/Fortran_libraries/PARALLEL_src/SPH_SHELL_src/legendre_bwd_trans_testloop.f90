@@ -310,12 +310,12 @@
       integer(kind = kint), intent(in) :: mp_rlm, mn_rlm
       integer(kind = kint), intent(in) :: nl_rtm
 !
+      integer(kind = kint), intent(in) :: ncomp, nvector
       real(kind = kreal), intent(inout) :: symp_r(nl_rtm,ncomp*nkr)
       real(kind = kreal), intent(in) ::    asmp_p(nl_rtm,2*nvector*nkr)
       real(kind = kreal), intent(inout) :: asmp_r(nl_rtm,ncomp*nkr)
       real(kind = kreal), intent(in) ::    symp_p(nl_rtm,2*nvector*nkr)
 !
-      integer(kind = kint), intent(in) :: ncomp, nvector
       integer(kind = kint), intent(in) :: irev_sr_rtm(nnod_rtm)
       integer(kind = kint), intent(in) :: n_WS
       real (kind=kreal), intent(inout):: WS(n_WS)
@@ -425,13 +425,13 @@
       integer(kind = kint), intent(in) :: istep_rtm(3)
       integer(kind = kint), intent(in) :: nidx_rlm(2)
 !
+      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: mp_rlm
       integer(kind = kint), intent(in) :: nl_rtm
       real(kind = kreal), intent(in) :: symp(nl_rtm,ncomp*nkr)
       real(kind = kreal), intent(in) :: asmp(nl_rtm,ncomp*nkr)
 !
-      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: irev_sr_rtm(nnod_rtm)
       integer(kind = kint), intent(in) :: n_WS
       real (kind=kreal), intent(inout):: WS(n_WS)

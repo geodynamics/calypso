@@ -7,26 +7,29 @@
 !> @brief Routines for speherical grid data IO
 !!
 !!@verbatim
-!!      subroutine read_geom_rtp_data(id_file, my_rank_IO,              &
+!!      subroutine read_geom_rtp_data(id_file, id_rank,                 &
 !!     &          comm_IO, sph_IO, sph_grps_IO, ierr)
-!!      subroutine read_spectr_modes_rj_data(id_file, my_rank_IO,       &
+!!      subroutine read_spectr_modes_rj_data(id_file, id_rank,          &
 !!     &          comm_IO, sph_IO, sph_grps_IO, ierr)
 !!      subroutine read_geom_rtm_data                                   &
-!!     &         (id_file, my_rank_IO, comm_IO, sph_IO, ierr)
+!!     &         (id_file, id_rank, comm_IO, sph_IO, ierr)
 !!      subroutine read_spectr_modes_rlm_data                           &
-!!     &         (id_file, my_rank_IO, comm_IO, sph_IO, ierr)
-!!
-!!      subroutine write_geom_rtp_data                                  &
-!!     &         (id_file, my_rank_IO, comm_IO, sph_IO, sph_grps_IO)
-!!      subroutine write_spectr_modes_rj_data                           &
-!!     &         (id_file, my_rank_IO, comm_IO, sph_IO, sph_grps_IO)
-!!      subroutine write_geom_rtm_data                                  &
-!!     &         (id_file, my_rank_IO, comm_IO, sph_IO)
-!!      subroutine write_modes_rlm_data                                 &
-!!     &         (id_file, my_rank_IO, comm_IO, sph_IO)
+!!     &         (id_file, id_rank, comm_IO, sph_IO, ierr)
 !!        type(communication_table), intent(inout) :: comm_IO
 !!        type(sph_IO_data), intent(inout) :: sph_IO
 !!        type(sph_group_data), intent(inout) :: sph_grps_IO
+!!
+!!      subroutine write_geom_rtp_data                                  &
+!!     &         (id_file, id_rank, comm_IO, sph_IO, sph_grps_IO)
+!!      subroutine write_spectr_modes_rj_data                           &
+!!     &         (id_file, id_rank, comm_IO, sph_IO, sph_grps_IO)
+!!      subroutine write_geom_rtm_data                                  &
+!!     &         (id_file, id_rank, comm_IO, sph_IO)
+!!      subroutine write_modes_rlm_data                                 &
+!!     &         (id_file, id_rank, comm_IO, sph_IO)
+!!        type(communication_table), intent(in) :: comm_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
+!!        type(sph_group_data), intent(in) :: sph_grps_IO
 !!@endverbatim
 !
       module sph_modes_grids_data_IO
@@ -50,14 +53,14 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine read_geom_rtp_data(id_file, my_rank_IO,                &
+      subroutine read_geom_rtp_data(id_file, id_rank,                   &
      &          comm_IO, sph_IO, sph_grps_IO, ierr)
 !
       use groups_IO
 !
       integer(kind = kint), intent(in) :: id_file
 !
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       type(communication_table), intent(inout) :: comm_IO
       type(sph_IO_data), intent(inout) :: sph_IO
       type(sph_group_data), intent(inout) :: sph_grps_IO
@@ -67,7 +70,7 @@
       sph_IO%numdir_sph =  3
 !
 !      write(*,*) '! domain and communication'
-      call read_domain_info(id_file, my_rank_IO, comm_IO, ierr)
+      call read_domain_info(id_file, id_rank, comm_IO, ierr)
       if(ierr .ne. 0) return
 !
 !      write(*,*) '! truncation level for spherical harmonics'
@@ -94,14 +97,14 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine read_spectr_modes_rj_data(id_file, my_rank_IO,         &
+      subroutine read_spectr_modes_rj_data(id_file, id_rank,            &
      &          comm_IO, sph_IO, sph_grps_IO, ierr)
 !
       use groups_IO
 !
       integer(kind = kint), intent(in) :: id_file
 !
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       type(communication_table), intent(inout) :: comm_IO
       type(sph_IO_data), intent(inout) :: sph_IO
       type(sph_group_data), intent(inout) :: sph_grps_IO
@@ -111,7 +114,7 @@
       sph_IO%numdir_sph =  2
 !
 !      write(*,*) '! domain and communication'
-      call read_domain_info(id_file, my_rank_IO, comm_IO, ierr)
+      call read_domain_info(id_file, id_rank, comm_IO, ierr)
       if(ierr .ne. 0) return
 !
 !      write(*,*) '! truncation level for spherical harmonics'
@@ -137,11 +140,11 @@
 !------------------------------------------------------------------
 !
       subroutine read_geom_rtm_data                                     &
-     &         (id_file, my_rank_IO, comm_IO, sph_IO, ierr)
+     &         (id_file, id_rank, comm_IO, sph_IO, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
 !
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       type(communication_table), intent(inout) :: comm_IO
       type(sph_IO_data), intent(inout) :: sph_IO
       integer(kind = kint), intent(inout) :: ierr
@@ -149,7 +152,7 @@
 !
       sph_IO%numdir_sph =  3
 !
-      call read_domain_info(id_file, my_rank_IO, comm_IO, ierr)
+      call read_domain_info(id_file, id_rank, comm_IO, ierr)
       if(ierr .ne. 0) return
 !
       call read_gl_resolution_sph(id_file, sph_IO)
@@ -164,11 +167,11 @@
 !------------------------------------------------------------------
 !
       subroutine read_spectr_modes_rlm_data                             &
-     &         (id_file, my_rank_IO, comm_IO, sph_IO, ierr)
+     &         (id_file, id_rank, comm_IO, sph_IO, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
 !
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       type(communication_table), intent(inout) :: comm_IO
       type(sph_IO_data), intent(inout) :: sph_IO
       integer(kind = kint), intent(inout) :: ierr
@@ -176,7 +179,7 @@
 !
       sph_IO%numdir_sph =  2
 !
-      call read_domain_info(id_file, my_rank_IO, comm_IO, ierr)
+      call read_domain_info(id_file, id_rank, comm_IO, ierr)
       if(ierr .ne. 0) return
 !
       call read_gl_resolution_sph(id_file, sph_IO)
@@ -192,19 +195,20 @@
 !------------------------------------------------------------------
 !
       subroutine write_geom_rtp_data                                    &
-     &         (id_file, my_rank_IO, comm_IO, sph_IO, sph_grps_IO)
+     &         (id_file, id_rank, comm_IO, sph_IO, sph_grps_IO)
 !
       use groups_IO
 !
-      type(communication_table), intent(inout) :: comm_IO
-      type(sph_IO_data), intent(inout) :: sph_IO
-      type(sph_group_data), intent(inout) :: sph_grps_IO
+      type(communication_table), intent(in) :: comm_IO
+      type(sph_IO_data), intent(in) :: sph_IO
+      type(sph_group_data), intent(in) :: sph_grps_IO
 !
-      integer(kind = kint), intent(in) :: id_file, my_rank_IO
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: id_file
 !
 !
       write(id_file,'(a)', advance='NO') hd_sph_para()
-      call write_domain_info(id_file, my_rank_IO, comm_IO)
+      call write_domain_info(id_file, id_rank, comm_IO)
 !
 !      write(*,*) '! truncation level for spherical harmonics'
       call write_gl_resolution_sph(id_file, sph_IO)
@@ -213,6 +217,7 @@
 !
 !      write(*,*) '! global ID for each direction'
       call write_rtp_gl_1d_table(id_file, sph_IO)
+!
 !
       write(id_file,'(a)', advance='NO') hd_rtp_glbl()
       call write_gl_nodes_sph(id_file, sph_IO)
@@ -236,26 +241,25 @@
       write(id_file,'(a)', advance='NO') hd_pgrphd()
       call write_grp_data(id_file, sph_grps_IO%zonal_rtp_grp)
 !
-!      write(*,*) 'finish!!'
-!
       end subroutine write_geom_rtp_data
 !
 !------------------------------------------------------------------
 !
       subroutine write_spectr_modes_rj_data                             &
-     &         (id_file, my_rank_IO, comm_IO, sph_IO, sph_grps_IO)
+     &         (id_file, id_rank, comm_IO, sph_IO, sph_grps_IO)
 !
       use groups_IO
 !
-      type(communication_table), intent(inout) :: comm_IO
-      type(sph_IO_data), intent(inout) :: sph_IO
-      type(sph_group_data), intent(inout) :: sph_grps_IO
+      type(communication_table), intent(in) :: comm_IO
+      type(sph_IO_data), intent(in) :: sph_IO
+      type(sph_group_data), intent(in) :: sph_grps_IO
 !
-      integer(kind = kint), intent(in) :: id_file, my_rank_IO
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: id_file
 !
 !
       write(id_file,'(a)', advance='NO') hd_sph_para()
-      call write_domain_info(id_file, my_rank_IO, comm_IO)
+      call write_domain_info(id_file, id_rank, comm_IO)
 !
 !      write(*,*) '! truncation level for spherical harmonics'
       call write_gl_resolution_sph(id_file, sph_IO)
@@ -283,16 +287,17 @@
 !------------------------------------------------------------------
 !
       subroutine write_geom_rtm_data                                    &
-     &         (id_file, my_rank_IO, comm_IO, sph_IO)
+     &         (id_file, id_rank, comm_IO, sph_IO)
 !
-      type(communication_table), intent(inout) :: comm_IO
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(communication_table), intent(in) :: comm_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
-      integer(kind = kint), intent(in) :: id_file, my_rank_IO
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: id_file
 !
 !
       write(id_file,'(a)', advance='NO') hd_sph_para()
-      call write_domain_info(id_file, my_rank_IO, comm_IO)
+      call write_domain_info(id_file, id_rank, comm_IO)
 !      write(*,*) '! truncation level for spherical harmonics'
       call write_gl_resolution_sph(id_file, sph_IO)
 !      write(*,*) '! segment ID for each direction'
@@ -312,16 +317,17 @@
 !------------------------------------------------------------------
 !
       subroutine write_modes_rlm_data                                   &
-     &         (id_file, my_rank_IO, comm_IO, sph_IO)
+     &         (id_file, id_rank, comm_IO, sph_IO)
 !
-      integer(kind = kint), intent(in) :: id_file, my_rank_IO
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: id_file
 !
-      type(communication_table), intent(inout) :: comm_IO
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(communication_table), intent(in) :: comm_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
 !
       write(id_file,'(a)', advance='NO') hd_sph_para()
-      call write_domain_info(id_file, my_rank_IO, comm_IO)
+      call write_domain_info(id_file, id_rank, comm_IO)
 !      write(id_file,*) '! truncation level for spherical harmonics'
       call write_gl_resolution_sph(id_file, sph_IO)
 !      write(id_file,*) '! segment ID for each direction'

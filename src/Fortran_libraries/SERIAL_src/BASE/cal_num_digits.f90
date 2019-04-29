@@ -36,7 +36,7 @@
       integer(kind = kint), intent(inout) :: i_exp, i_digit
 !
 !
-      i_exp = int( aint( log10(x_input) ))
+      i_exp = int( aint( log10(x_input) ), KIND(i_exp))
 !
       if(x_input .ge. one) then
         i_digit = nint(x_input * ten**(-i_exp))
@@ -60,7 +60,7 @@
       integer(kind = kint), intent(inout) :: i_exp
 !
 !
-      i_exp = int( aint( log10(x_input) ))
+      i_exp = int( aint( log10(x_input) ),KIND(i_exp))
 !
       if(x_input .ge. one) then
         r_digit = x_input * ten**(-i_exp)

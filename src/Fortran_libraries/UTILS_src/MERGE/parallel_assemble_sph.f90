@@ -17,9 +17,6 @@
 !!     &          r_itp, j_table, ntot_phys_rj, d_rj_org, d_rj_new)
 !!      subroutine copy_field_data_sph_center(org_sph, new_sph, j_table,&
 !!     &          ntot_phys_rj, d_rj_org, d_rj)
-!!      subroutine mul_sph_magne(b_sph_ratio, nnod_rj,                  &
-!!     &          num_phys_rj, ntot_phys_rj, istack_phys_comp_rj,       &
-!!     &          phys_name_rj, d_rj)
 !!@endverbatim
 !!
 !!@param   istep  TIme step number
@@ -230,40 +227,5 @@
       end subroutine r_itp_field_data_sph_assemble
 !
 ! -----------------------------------------------------------------------
-!
-      subroutine mul_sph_magne(b_sph_ratio, nnod_rj,                    &
-     &          num_phys_rj, ntot_phys_rj, istack_phys_comp_rj,         &
-     &          phys_name_rj, d_rj)
-!
-      use m_phys_labels
-!
-      real(kind = kreal), intent(in) :: b_sph_ratio
-      integer(kind = kint), intent(in) :: nnod_rj
-      integer(kind = kint), intent(in) :: num_phys_rj, ntot_phys_rj
-      integer(kind = kint), intent(in)                                  &
-     &      :: istack_phys_comp_rj(0:num_phys_rj)
-      character(len=kchara) :: phys_name_rj(num_phys_rj)
-      real(kind = kreal), intent(inout) :: d_rj(nnod_rj, ntot_phys_rj)
-!
-      integer(kind = kint) :: nd, i, ist, ied, inod
-!
-!
-      do i = 1, num_phys_rj
-        if(    phys_name_rj(i) .eq. fhd_magne                           &
-     &    .or. phys_name_rj(i) .eq. fhd_mag_potential                   &
-     &    .or. phys_name_rj(i) .eq. fhd_pre_uxb) then
-          ist = istack_phys_comp_rj(i-1)
-          ied = istack_phys_comp_rj(i  )
-          do nd = ist+1, ied
-            do inod = 1, nnod_rj
-              d_rj(inod,nd) = b_sph_ratio * d_rj(inod,nd)
-            end do
-          end do
-        end if
-      end do
-!
-      end subroutine mul_sph_magne
-!
-! -------------------------------------------------------------------
 !
       end module parallel_assemble_sph

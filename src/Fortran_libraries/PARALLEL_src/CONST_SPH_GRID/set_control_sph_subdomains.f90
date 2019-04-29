@@ -10,7 +10,7 @@
 !!@verbatim
 !!      subroutine set_subdomains_4_sph_shell                           &
 !!     &         (nprocs_check, sdctl, s3d_ranks, ierr, e_message)
-!!        type(sphere_domain_control), intent(inout) :: sdctl
+!!        type(sphere_domain_control), intent(in) :: sdctl
 !!        type(spheric_global_rank), intent(inout) :: s3d_ranks
 !!@endverbatim
 !
@@ -56,9 +56,9 @@
       use m_error_IDs
       use skip_comment_f
 !
-      integer(kind = kint), intent(in) :: nprocs_check
+      integer, intent(in) :: nprocs_check
+      type(sphere_domain_control), intent(in) :: sdctl
 !
-      type(sphere_domain_control), intent(inout) :: sdctl
       type(spheric_global_rank), intent(inout) :: s3d_ranks
       integer(kind = kint), intent(inout) :: ierr
       character(len = kchara), intent(inout) :: e_message
@@ -89,16 +89,6 @@
      &    .or. cmp_no_case(sdctl%inner_decomp_ctl%charavalue, radius2)  &
      &    .or. cmp_no_case(sdctl%inner_decomp_ctl%charavalue, radius3)) &
      &   s3d_ranks%iflag_radial_inner_domain = 1
-      end if
-!
-      if (sdctl%ndomain_sph_grid_ctl%num .gt. 0) then
-        call dealloc_ndomain_rtp_ctl(sdctl)
-      end if
-      if (sdctl%ndomain_legendre_ctl%num .gt. 0) then
-        call dealloc_ndomain_rtm_ctl(sdctl)
-      end if
-      if(sdctl%ndomain_spectr_ctl%num .gt. 0) then
-        call dealloc_ndomain_rj_ctl(sdctl)
       end if
 !
       call check_sph_domains(nprocs_check, s3d_ranks, ierr, e_message)

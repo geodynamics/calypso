@@ -30,91 +30,28 @@
       subroutine set_sph_MHD_elapsed_label
 !
       use m_work_time
+      use m_elapsed_labels_SEND_RECV
+      use m_elapsed_labels_SPH_TRNS
+      use m_elapsed_labels_4_MHD
+      use m_elapsed_labels_4_VIZ
+      use m_elapsed_labels_gen_SPH
+      use const_element_comm_table
 !
 !
-      num_elapsed = 84
-      call allocate_elapsed_times
+      call elapsed_label_4_MHD
+      call elapsed_label_4_SPH_MHD
 !
-      elapse_labels(1) = 'Total time                 '
-      elapse_labels(2) = 'Initialization time        '
-      elapse_labels(3) = 'Time evolution loop time   '
-      elapse_labels(4) = 'Data IO time               '
-      elapse_labels(5) = 'Evolution excluding IO     '
+      call elpsed_label_4_sph_trns
+!      call elpsed_label_4_sph_detail
 !
-      elapse_labels( 6) = 'Linear time               '
-      elapse_labels( 7) = 'Solver time               '
-      elapse_labels( 8) = 'Nonlinear terms           '
-
-      elapse_labels( 9) = 'Obtain field to output    '
-      elapse_labels(10) = 'output_sph_restart_control'
-      elapse_labels(11) = 'output_rms_sph_mhd_control'
-      elapse_labels(12) = 'Visualizatio time         '
+      call elpsed_label_calypso_send_recv
+!      call elapsed_label_4_Legendre_trans
 !
-      elapse_labels(13) = 'Coriolis term             '
-      elapse_labels(14) = 'sph backward transform    '
-      elapse_labels(15) = 'cal nonlinear terms       '
-      elapse_labels(16) = 'sph forward transform     '
-      elapse_labels(17) = 'obtain explicit terms     '
+      call elpsed_label_4_VIZ
+      call elapsed_label_4_SGS_model
+!      call elapsed_label_4_ele_comm_tbl
 !
-      elapse_labels(18) = 'transfer rj  => rlm        '
-      elapse_labels(19) = 'transfer rtm => rtp        '
-      elapse_labels(20) = 'transfer rtp => rtm        '
-      elapse_labels(21) = 'transfer rlm => rj         '
-      elapse_labels(22) = 'Legendre backward transform'
-      elapse_labels(23) = 'Legendre forward transform '
-      elapse_labels(24) = 'Fourier transform          '
-!
-      elapse_labels(25) = 'order_b_trans_vector    '
-      elapse_labels(26) = 'clear_b_trans_vector    '
-      elapse_labels(27) = 'legendre_b_trans_vector '
-      elapse_labels(28) = 'back_b_trans_vector     '
-      elapse_labels(29) = 'order_f_trans_vector    '
-      elapse_labels(30) = 'clear_f_trans_vector    '
-      elapse_labels(31) = 'legendre_f_trans_vector '
-      elapse_labels(32) = 'back_f_trans_vector     '
-!
-      elapse_labels(33) = 'copy_FFT_real       '
-      elapse_labels(34) = 'dfftw_execute       '
-      elapse_labels(35) = 'copy_FFT_complex    '
-!
-      elapse_labels(36) = 'set_to_send_buf_N    '
-      elapse_labels(37) = 'calypso_send_recv_core    '
-      elapse_labels(38) = 'set_from_recv_buf_rev_N    '
-      elapse_labels(39) = 'unused    '
-      elapse_labels(40) = 'unused    '
-!
-      elapse_labels(41) = 'Copy P_lm for bwd. trans.   '
-      elapse_labels(42) = 'Copy spectrum for bwd. trans.    '
-      elapse_labels(43) = 'mat product for bwd. trans.    '
-      elapse_labels(44) = 'Copy fields to bwd. trans.    '
-      elapse_labels(45) = 'Equator for bwd. trans.    '
-      elapse_labels(46) = 'Copy P_lm for fwd. trans.    '
-      elapse_labels(47) = 'Copy field for fwd. trans.    '
-      elapse_labels(48) = 'mat product for fwd. trans.    '
-      elapse_labels(49) = 'Copy spectrum to fwd. trans.    '
-!
-      elapse_labels(51) = 'copy_mhd_spectr_to_send.   '
-      elapse_labels(52) = 'copy_mhd_field_from_trans.    '
-      elapse_labels(53) = 'copy_mhd_spectr_from_recv.    '
-!
-      elapse_labels(60) = 'Sectioning initialization.    '
-      elapse_labels(61) = 'Isosurfaceing initialization.    '
-      elapse_labels(62) = 'Volume rendering initialization.    '
-      elapse_labels(63) = 'fieldline initialization.    '
-!
-      elapse_labels(65) = 'Sectioning.    '
-      elapse_labels(66) = 'Isosurfaceing.    '
-      elapse_labels(67) = 'Volume rendering.    '
-      elapse_labels(68) = 'fieldline.    '
-!
-      elapse_labels(71) = 'fieldline.    '
-!
-      elapse_labels(81) = 'Filtering fields   '
-      elapse_labels(82) = 'Scale similarity   '
-      elapse_labels(83) = 'Dynamic scheme     '
-      elapse_labels(84) = 'SGS Buoyancy       '
-!
-      elapse_labels(num_elapsed) = 'Communication time        '
+      call elpsed_label_gen_sph_grid
 !
       end subroutine set_sph_MHD_elapsed_label
 !
@@ -123,12 +60,19 @@
       subroutine reset_elapse_4_init_sph_mhd
 !
       use m_work_time
+      use m_elapsed_labels_SEND_RECV
+      use m_elapsed_labels_SPH_TRNS
+      use m_elapsed_labels_4_MHD
+      use m_elapsed_labels_4_VIZ
 !
-      integer(kind = kint) :: i
 !
-      do i = 3, 54
-        call reset_elapsed_time(i)
-      end do
+      call reset_elapse_after_init_SPH
+      call reset_elapse_after_init_SDT
+      call reset_elapse_after_init_SR
+      call reset_elapse_after_init_SPH_MHD
+      call reset_elapse_after_init_SGS
+      call reset_elapse_after_init_LEG
+      call reset_elapse_after_init_VIZ
 !
       end subroutine reset_elapse_4_init_sph_mhd
 !
@@ -181,13 +125,13 @@
 !
 !
 !
-      call MPI_REDUCE(sph_rj%irank_sph_rj, nproc_rj_IO, itwo,           &
+      call MPI_REDUCE(sph_rj%irank_sph_rj, nproc_rj_IO, 2,              &
      &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE(sph_rlm%irank_sph_rlm, nproc_rlm_IO, itwo,        &
+      call MPI_REDUCE(sph_rlm%irank_sph_rlm, nproc_rlm_IO, 2,           &
      &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE(sph_rtm%irank_sph_rtm, nproc_rtm_IO, ithree,      &
+      call MPI_REDUCE(sph_rtm%irank_sph_rtm, nproc_rtm_IO, 3,           &
      &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE(sph_rtp%irank_sph_rtp, nproc_rtp_IO, ithree,      &
+      call MPI_REDUCE(sph_rtp%irank_sph_rtp, nproc_rtp_IO, 3,           &
      &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
 !
       if(my_rank .ne. 0) return
@@ -201,13 +145,15 @@
 ! ----------------------------------------------------------------------
 !
       subroutine write_resolution_info                                  &
-     &         (nprocs, sph_params, sph_rtp, sph_rtm,                   &
+     &         (num_pe, sph_params, sph_rtp, sph_rtm,                   &
      &          nproc_rj_IO, nproc_rlm_IO, nproc_rtm_IO, nproc_rtp_IO)
 !
       use m_work_time
       use t_spheric_parameter
+      use set_parallel_file_name
 !
-      integer(kind = kint), intent(in) :: nprocs
+      character(len=kchara) ::  file_name
+      integer, intent(in) :: num_pe
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -218,7 +164,8 @@
       integer(kind = kint), intent(in) :: nproc_rtp_IO(3)
 !
 !
-      open(id_timer_file,file=time_file_name,position='append')
+      file_name = add_dat_extension(time_file_prefix)
+      open(id_timer_file,file=file_name,position='append')
 !
       write(id_timer_file,*)
       write(id_timer_file,*) '=========================================='
@@ -233,7 +180,7 @@
       write(id_timer_file,*) 'N_phi:                 ',                 &
      &                      sph_rtp%nidx_rtp(3)
 !
-      write(id_timer_file,*) 'Total MPI processes: ',  nprocs
+      write(id_timer_file,*) 'Total MPI processes: ',  num_pe
       write(id_timer_file,*)                                            &
      &   'Processes for spetr (r, l and m):        ', nproc_rj_IO(1:2)
       write(id_timer_file,*)                                            &

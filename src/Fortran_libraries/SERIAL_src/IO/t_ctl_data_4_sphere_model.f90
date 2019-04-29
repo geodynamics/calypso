@@ -8,6 +8,8 @@
 !!
 !!@verbatim
 !!      subroutine read_control_shell_define(hd_block, iflag, spctl)
+!!      subroutine dealloc_control_shell_define(spctl)
+!!      subroutine reset_control_shell_define(spctl)
 !!        type(sphere_data_control), intent(inout) :: spctl
 !!
 !! =======================================================
@@ -222,7 +224,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
 !
@@ -273,6 +275,50 @@
       end do
 !
       end subroutine read_control_shell_define
+!
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_control_shell_define(spctl)
+!
+      type(sphere_data_control), intent(inout) :: spctl
+!
+!
+      call dealloc_control_array_i2(spctl%radial_layer_list_ctl)
+      call dealloc_control_array_i2(spctl%med_layer_list_ctl)
+      call dealloc_control_array_c_i(spctl%radial_grp_ctl)
+      call dealloc_control_array_i_r(spctl%radius_ctl)
+!
+      end subroutine dealloc_control_shell_define
+!
+!   --------------------------------------------------------------------
+!
+      subroutine reset_control_shell_define(spctl)
+!
+      type(sphere_data_control), intent(inout) :: spctl
+!
+!
+      spctl%ltr_ctl%iflag =          0
+      spctl%phi_symmetry_ctl%iflag = 0
+!
+      spctl%sph_grid_type_ctl%iflag = 0
+      spctl%sph_coef_type_ctl%iflag = 0
+!
+      spctl%ngrid_elevation_ctl%iflag = 0
+      spctl%ngrid_azimuth_ctl%iflag =   0
+!
+      spctl%radial_grid_type_ctl%iflag = 0
+      spctl%num_fluid_grid_ctl%iflag =   0
+      spctl%Min_radius_ctl%iflag =       0
+      spctl%ICB_radius_ctl%iflag =       0
+      spctl%CMB_radius_ctl%iflag =       0
+      spctl%Max_radius_ctl%iflag =       0
+      spctl%fluid_core_size_ctl%iflag =  0
+      spctl%ICB_to_CMB_ratio_ctl%iflag = 0
+!
+      spctl%num_radial_layer_ctl%iflag = 0
+      spctl%num_med_layer_ctl%iflag =    0
+!
+      end subroutine reset_control_shell_define
 !
 !   --------------------------------------------------------------------
 !

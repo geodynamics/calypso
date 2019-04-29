@@ -5,6 +5,7 @@
 !
 !!      subroutine read_induction_ctl(hd_block, iflag, induct_ctl)
 !!      subroutine bcast_induction_ctl(induct_ctl)
+!!      subroutine dealloc_induction_ctl(induct_ctl)
 !!        type(induction_equation_control), intent(inout) :: induct_ctl
 !!
 !!   --------------------------------------------------------------------
@@ -92,7 +93,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
 !
@@ -123,6 +124,20 @@
       call bcast_ctl_array_cr(induct_ctl%coef_4_induction)
 !
       end subroutine bcast_induction_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_induction_ctl(induct_ctl)
+!
+      type(induction_equation_control), intent(inout) :: induct_ctl
+!
+!
+      call dealloc_control_array_c_r(induct_ctl%coef_4_magne_evo)
+      call dealloc_control_array_c_r(induct_ctl%coef_4_mag_potential)
+      call dealloc_control_array_c_r(induct_ctl%coef_4_mag_diffuse)
+      call dealloc_control_array_c_r(induct_ctl%coef_4_induction)
+!
+      end subroutine dealloc_induction_ctl
 !
 !   --------------------------------------------------------------------
 !

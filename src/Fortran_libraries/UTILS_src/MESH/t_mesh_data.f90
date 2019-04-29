@@ -7,20 +7,20 @@
 !
 !     Written by H. Matsui on Dec., 2008
 !
-!!      subroutine dealloc_mesh_infomations(nod_comm,                   &
-!!     &          node, ele, surf, edge, nod_grp, ele_grp, surf_grp,    &
-!!     &          tbls_ele_grp, tbls_sf_grp, surf_nod_grp)
+!!      subroutine dealloc_mesh_infos_w_normal(mesh, group, ele_mesh)
+!!      subroutine dealloc_mesh_infomations(mesh, group, ele_mesh)
 !!      subroutine dealloc_nod_ele_infos(node, ele, surf, edge,         &
 !!     &          nod_grp, ele_grp, surf_grp, nod_comm)
 !!      subroutine dealloc_mesh_infos(mesh, group)
 !!
 !!      subroutine dealloc_mesh_type(mesh)
+!!      subroutine dealloc_mesh_geometry_base(mesh)
 !!      subroutine dealloc_groups_data(group)
 !!
 !!      subroutine dealloc_ele_surf_edge_type(ele_mesh)
 !!      subroutine check_smp_size_surf_edge_type(ele_mesh)
 !!
-!!      subroutine compare_mesh_groups(my_rank, group_ref, group)
+!!      subroutine compare_mesh_groups(id_rank, group_ref, group)
 !!        type(mesh_groups), intent(in) :: group_ref, group
 !
       module t_mesh_data
@@ -111,6 +111,21 @@
 !
 !------------------------------------------------------------------
 !
+      subroutine dealloc_mesh_infos_w_normal(mesh, group, ele_mesh)
+!
+      type(mesh_geometry), intent(inout) :: mesh
+      type(mesh_groups), intent(inout) ::   group
+      type(element_geometry), intent(inout) :: ele_mesh
+!
+!
+      call dealloc_vect_surf_grp_nod(group%surf_nod_grp)
+!
+      call dealloc_mesh_infomations(mesh, group, ele_mesh)
+!
+      end subroutine dealloc_mesh_infos_w_normal
+!
+! ----------------------------------------------------------------------
+!
       subroutine dealloc_mesh_infomations(mesh, group, ele_mesh)
 !
       type(mesh_geometry), intent(inout) :: mesh
@@ -131,8 +146,8 @@
       call deallocate_surface_geom_type(ele_mesh%surf)
       call dealloc_edge_geometory(ele_mesh%edge)
 !
-!      call deallocate_iso_surface_type(ele_mesh%surf)
-!      call deallocate_ext_surface_type(ele_mesh%surf)
+      call deallocate_iso_surface_type(ele_mesh%surf)
+      call deallocate_ext_surface_type(ele_mesh%surf)
 !
       call dealloc_edge_param_smp(ele_mesh%edge)
       call deallocate_surf_param_smp_type(ele_mesh%surf)
@@ -155,9 +170,9 @@
       type(element_geometry), intent(inout) :: ele_mesh
 !
 !
-      call deallocate_sf_grp_type_smp(group%surf_grp)
-      call deallocate_grp_type_smp(group%ele_grp)
-      call deallocate_grp_type_smp(group%nod_grp)
+      call dealloc_sf_group_smp(group%surf_grp)
+      call dealloc_group_smp(group%ele_grp)
+      call dealloc_group_smp(group%nod_grp)
 !
       call dealloc_inod_in_edge(ele_mesh%edge)
       call deallocate_inod_in_surf_type(ele_mesh%surf)
@@ -178,13 +193,8 @@
       type(mesh_groups), intent(inout) ::   group
 !
 !
-      call deallocate_ele_connect_type(mesh%ele)
-      call deallocate_node_geometry_type(mesh%node)
-      call deallocate_type_comm_tbl(mesh%nod_comm)
-!
-      call deallocate_grp_type(group%nod_grp)
-      call deallocate_grp_type(group%ele_grp)
-      call deallocate_sf_grp_type(group%surf_grp)
+      call dealloc_mesh_type(mesh)
+      call dealloc_groups_data(group)
 !
       end subroutine dealloc_mesh_infos
 !
@@ -196,9 +206,9 @@
       type(mesh_groups), intent(inout) :: group
 !
 !
-      call deallocate_grp_type(group%nod_grp)
-      call deallocate_grp_type(group%ele_grp)
-      call deallocate_sf_grp_type(group%surf_grp)
+      call dealloc_group(group%nod_grp)
+      call dealloc_group(group%ele_grp)
+      call dealloc_sf_group(group%surf_grp)
 !
       end subroutine dealloc_groups_data
 !
@@ -211,10 +221,35 @@
 !
 !
       call deallocate_ele_connect_type(mesh%ele)
-      call deallocate_node_geometry_type(mesh%node)
-      call deallocate_type_comm_tbl(mesh%nod_comm)
+      call dealloc_node_geometry_w_sph(mesh%node)
+      call dealloc_comm_table(mesh%nod_comm)
 !
       end subroutine dealloc_mesh_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_mesh_geometry_base(mesh)
+!
+      type(mesh_geometry), intent(inout) :: mesh
+!
+!
+      call deallocate_ele_connect_type(mesh%ele)
+      call dealloc_node_geometry_base(mesh%node)
+      call dealloc_comm_table(mesh%nod_comm)
+!
+      end subroutine dealloc_mesh_geometry_base
+!
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_node_geometry_IO(mesh)
+!
+      type(mesh_geometry), intent(inout) :: mesh
+!
+!
+      call dealloc_node_geometry_base(mesh%node)
+      call dealloc_neib_id(mesh%nod_comm)
+!
+      end subroutine dealloc_node_geometry_IO
 !
 !   --------------------------------------------------------------------
 !
@@ -223,7 +258,7 @@
       type(element_geometry), intent(inout) :: ele_mesh
 !
 !
-      call deallocate_type_comm_tbl(ele_mesh%ele_comm)
+      call dealloc_comm_table(ele_mesh%ele_comm)
 !
       call dealloc_surf_mesh_type(ele_mesh)
       call dealloc_edge_mesh_type(ele_mesh)
@@ -237,7 +272,7 @@
       type(element_geometry), intent(inout) :: ele_mesh
 !
 !
-      call deallocate_type_comm_tbl(ele_mesh%surf_comm)
+      call dealloc_comm_table(ele_mesh%surf_comm)
       call deallocate_surface_connect_type(ele_mesh%surf)
 !
       end subroutine dealloc_surf_mesh_type
@@ -249,7 +284,7 @@
       type(element_geometry), intent(inout) :: ele_mesh
 !
 !
-      call deallocate_type_comm_tbl(ele_mesh%edge_comm)
+      call dealloc_comm_table(ele_mesh%edge_comm)
       call dealloc_edge_connect(ele_mesh%edge)
       call dealloc_edge_4_ele(ele_mesh%edge)
 !
@@ -258,17 +293,17 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine check_smp_size_type(my_rank, mesh)
+      subroutine check_smp_size_type(id_rank, mesh)
 !
       type(mesh_geometry) :: mesh
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
 !
-       write(*,*) 'PE: ', my_rank,                                      &
+       write(*,*) 'PE: ', id_rank,                                      &
      &        'mesh%node%istack_nod_smp: ', mesh%node%istack_nod_smp
-       write(*,*) 'PE: ', my_rank,                                      &
+       write(*,*) 'PE: ', id_rank,                                      &
      &        'mesh%node%istack_nod_smp: ', mesh%node%istack_nod_smp
-       write(*,*) 'PE: ', my_rank,                                      &
+       write(*,*) 'PE: ', id_rank,                                      &
      &        'mesh%ele%istack_ele_smp: ', mesh%ele%istack_ele_smp
 !
       end subroutine check_smp_size_type
@@ -290,18 +325,18 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine compare_mesh_groups(my_rank, group_ref, group)
+      subroutine compare_mesh_groups(id_rank, group_ref, group)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(mesh_groups), intent(in) :: group_ref, group
 !
 !
       call compare_group_types                                         &
-     &   (my_rank, group_ref%nod_grp, group%nod_grp)
+     &   (id_rank, group_ref%nod_grp, group%nod_grp)
       call compare_group_types                                         &
-     &   (my_rank, group_ref%ele_grp, group%ele_grp)
+     &   (id_rank, group_ref%ele_grp, group%ele_grp)
       call compare_surface_grp_types                                   &
-     &   (my_rank, group_ref%surf_grp, group%surf_grp)
+     &   (id_rank, group_ref%surf_grp, group%surf_grp)
 !
       end subroutine compare_mesh_groups
 !

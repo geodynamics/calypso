@@ -31,7 +31,7 @@ exit (EXIT_FAILURE);                                        \
 void open_wt_rawfile(const char *file_name, int *ierr){
     *ierr = 0;
     if ((fp = fopen(file_name, "w")) == NULL) {
-        fprintf(stderr, "Cannot open file!\n");
+        fprintf(stderr, "Cannot open file!: %s\n", file_name);
         *ierr = 1;                    /* terminate with error message */
     }
     return;
@@ -40,7 +40,7 @@ void open_wt_rawfile(const char *file_name, int *ierr){
 void open_ad_rawfile(const char *file_name, int *ierr){
     *ierr = 0;
     if ((fp = fopen(file_name, "a")) == NULL) {
-        fprintf(stderr, "Cannot open file!\n");
+        fprintf(stderr, "Cannot open file!: %s\n", file_name);
         *ierr = 1;                    /* terminate with error message */
     }
     return;
@@ -49,7 +49,7 @@ void open_ad_rawfile(const char *file_name, int *ierr){
 void open_rd_rawfile(const char *file_name, int *ierr){
     *ierr = 0;
     if ((fp = fopen(file_name, "r")) == NULL) {
-        fprintf(stderr, "Cannot open file!\n");
+        fprintf(stderr, "Cannot open file!: %s\n", file_name);
         *ierr = 1;                    /* terminate with error message */
     }
     return;
@@ -65,9 +65,16 @@ void rawseek_go_fwd_f(int *ioffset, int *ierr){
     return;
 }
 
-void rawread_f(int *iflag_swap, int *ilength, char *textbuf, int *lenchara){
+void rawread_32bit_f(int *iflag_swap, int *ilength, char *textbuf, int *lenchara){
     *lenchara =  fread(textbuf, sizeof(char), *ilength, fp);
-    if(*iflag_swap == IFLAG_SWAP) {byte_swap(*ilength, textbuf);};
+    if(*iflag_swap == IFLAG_SWAP) {byte_swap_4(*ilength, textbuf);};
+    return;
+}
+
+void rawread_64bit_f(int *iflag_swap, int *ilength, char *textbuf, int *lenchara){
+    int i;
+    *lenchara =  fread(textbuf, sizeof(char), *ilength, fp);
+    if(*iflag_swap == IFLAG_SWAP) {byte_swap_8(*ilength, textbuf);};
     return;
 }
 
@@ -373,9 +380,15 @@ void gzseek_go_fwd_f(int *ioffset, int *ierr){
     *ierr =  (int)ierr_z;
 }
 
-void gzread_f(int *iflag_swap, int *ilength, char *textbuf, int *ierr){
+void gzread_32bit_f(int *iflag_swap, int *ilength, char *textbuf, int *ierr){
     *ierr =  gzread(file_gz, textbuf, (uInt) *ilength);
-    if(*iflag_swap == IFLAG_SWAP) {byte_swap(*ilength, textbuf);};
+    if(*iflag_swap == IFLAG_SWAP) {byte_swap_4(*ilength, textbuf);};
+    return;
+}
+
+void gzread_64bit_f(int *iflag_swap, int *ilength, char *textbuf, int *ierr){
+    *ierr =  gzread(file_gz, textbuf, (uInt) *ilength);
+    if(*iflag_swap == IFLAG_SWAP) {byte_swap_8(*ilength, textbuf);};
     return;
 }
 

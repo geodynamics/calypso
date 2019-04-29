@@ -21,16 +21,14 @@
       use m_constants
 !
       use calypso_mpi
+      use t_buffer_4_gzip
       use m_calypso_mpi_IO
       use vtk_data_to_buffer
 !
       implicit none
 !
-      character(len=1), allocatable :: gzip_buf(:)
-!
       private :: gz_write_vtk_scalar_mpi
       private :: gz_write_vtk_tensor_mpi, gz_write_vtk_vecotr_mpi
-      private :: gz_write_vtk_connect_mpi, gz_write_vtk_celltype_mpi
 !
 !  ---------------------------------------------------------------------
 !
@@ -106,6 +104,7 @@
      &          istack_merged_intnod, istack_merged_ele)
 !
       use m_phys_constants
+      use zlib_cvt_vtk_data
 !
       integer(kind = kint_gl), intent(inout) :: ioff_gl
       integer(kind = kint_gl), intent(in)                               &
@@ -119,6 +118,7 @@
 !
       integer, intent(in) ::  id_vtk
 !
+      type(buffer_4_gzip) :: zbuf
       integer(kind = kint_gl) :: nt_nod, nt_ele
 !
 !
@@ -140,15 +140,18 @@
       call gz_write_vtk_header_mpi                                      &
      &   (id_vtk, ioff_gl, vtk_connect_head(nt_ele, nnod_ele))
 !
-      call gz_write_vtk_connect_mpi                                     &
-     &   (id_vtk, ioff_gl, nele, nnod_ele, ie)
+      call defleate_vtk_connect(nele, ie, nnod_ele, zbuf)
+      call calypso_gz_mpi_seek_write(id_vtk, ioff_gl, zbuf)
+      call dealloc_zip_buffer(zbuf)
 !
 !       Element type
 !
       call gz_write_vtk_header_mpi                                      &
      &   (id_vtk, ioff_gl, vtk_cell_type_head(nt_ele))
 !
-      call gz_write_vtk_celltype_mpi(id_vtk, ioff_gl, nele, nnod_ele)
+      call defleate_vtk_celltype(nele, nnod_ele, zbuf)
+      call calypso_gz_mpi_seek_write(id_vtk, ioff_gl, zbuf)
+      call dealloc_zip_buffer(zbuf)
 !
       end subroutine gz_write_vtk_mesh_mpi
 !
@@ -157,31 +160,27 @@
 !
       subroutine gz_write_vtk_header_mpi(id_vtk, ioff_gl, header_txt)
 !
+      use zlib_convert_text
+!
       integer(kind = kint_gl), intent(inout) :: ioff_gl
       character(len=*), intent(in) :: header_txt
 !
       integer, intent(in) ::  id_vtk
 !
-      integer(kind = kint) :: ilen_gz, ilen_gzipped, ilength
+      type(buffer_4_gzip) :: zbuf
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
-!
       if(my_rank .eq. 0) then
-        ilength = len(header_txt)
-        ilen_gz = int(real(ilength) *1.01) + 24
-        allocate(gzip_buf(ilen_gz))
-        call gzip_defleat_once                                          &
-     &     (ilength, header_txt, ilen_gz, ilen_gzipped, gzip_buf(1))
+        call defleate_characters(len(header_txt), header_txt, zbuf)
 !
         ioffset = int(ioff_gl)
-        call calypso_mpi_seek_write_chara                               &
-     &    (id_vtk, ioffset, ilen_gzipped, gzip_buf(1))
-        deallocate(gzip_buf)
+        call calypso_mpi_seek_write_gz(id_vtk, ioffset, zbuf)
+        call dealloc_zip_buffer(zbuf)
       end if
-      call MPI_BCAST(ilen_gzipped, ione, CALYPSO_INTEGER, izero,        &
-     &    CALYPSO_COMM, ierr_MPI)
-      ioff_gl = ioff_gl + ilen_gzipped
+      call MPI_BCAST(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,          &
+     &    0, CALYPSO_COMM, ierr_MPI)
+      ioff_gl = ioff_gl + zbuf%ilen_gzipped
 !
       end subroutine gz_write_vtk_header_mpi
 !
@@ -191,6 +190,8 @@
       subroutine gz_write_vtk_scalar_mpi(id_vtk, ioff_gl,               &
      &          nnod, vect, istack_merged_intnod)
 !
+      use zlib_cvt_vtk_data
+!
       integer(kind = kint_gl), intent(inout) :: ioff_gl
       integer(kind = kint_gl), intent(in)                               &
      &         :: istack_merged_intnod(0:nprocs)
@@ -199,36 +200,17 @@
 !
       integer, intent(in) ::  id_vtk
 !
-      integer(kind = kint) :: ilen_gz, ilen_gzipped, ilength
-      integer(kind = kint_gl) :: inod, num
+      type(buffer_4_gzip) :: zbuf
+      integer(kind = kint_gl) :: num
 !
 !
       num = istack_merged_intnod(my_rank+1)                             &
      &     - istack_merged_intnod(my_rank)
 !
-      ilength = len(vtk_each_scalar(zero))
-      ilen_gz = int(real(num*ilength) * 1.01) + 24
-      allocate(gzip_buf(ilen_gz))
-      if(num .eq. 1) then
-        call gzip_defleat_once(ilength, vtk_each_scalar(vect(1)),       &
-     &      ilen_gz, ilen_gzipped, gzip_buf(1))
+      call defleate_vtk_scalar(nnod, num, vect, zbuf)
 !
-      else if(num .gt. 1) then
-        call gzip_defleat_begin(ilength,  vtk_each_scalar(vect(1)),     &
-     &      ilen_gz, ilen_gzipped, gzip_buf(1))
-        do inod = 2, num-1
-          call gzip_defleat_cont(ilength, vtk_each_scalar(vect(inod)),  &
-     &      ilen_gz, ilen_gzipped)
-        end do
-        call gzip_defleat_last(ilength, vtk_each_scalar(vect(num)),     &
-     &      ilen_gz, ilen_gzipped)
-      else
-        ilen_gzipped = 0
-      end if
-!
-      call calypso_gz_mpi_seek_write                                    &
-     &   (id_vtk, ioff_gl, ilen_gzipped, gzip_buf(1))
-      deallocate(gzip_buf)
+      call calypso_gz_mpi_seek_write(id_vtk, ioff_gl, zbuf)
+      call dealloc_zip_buffer(zbuf)
 !
       end subroutine gz_write_vtk_scalar_mpi
 !
@@ -236,6 +218,9 @@
 !
       subroutine gz_write_vtk_vecotr_mpi(id_vtk, ioff_gl,               &
      &          nnod, vect, istack_merged_intnod)
+!
+      use t_buffer_4_gzip
+      use zlib_cvt_vtk_data
 !
       integer(kind = kint_gl), intent(inout) :: ioff_gl
       integer(kind = kint_gl), intent(in)                               &
@@ -245,40 +230,17 @@
 !
       integer, intent(in) ::  id_vtk
 !
-      integer(kind = kint) :: ilen_gz, ilen_gzipped, ilength
-      integer(kind = kint_gl) :: inod, num
+      type(buffer_4_gzip) :: zbuf
+      integer(kind = kint_gl) :: num
 !
 !
       num = istack_merged_intnod(my_rank+1)                             &
      &     - istack_merged_intnod(my_rank)
 !
-      ilength = len(vtk_each_vector(zero, zero, zero))
-      ilen_gz = int(real(num*ilength) * 1.01) + 24
-      allocate(gzip_buf(ilen_gz))
-      if(num .eq. 1) then
-        call gzip_defleat_once(ilength,                                 &
-     &      vtk_each_vector(vect(1,1),vect(1,2),vect(1,3)),             &
-     &      ilen_gz, ilen_gzipped, gzip_buf(1))
+      call defleate_vtk_vector(nnod, num, vect, zbuf)
 !
-      else if(num .gt. 1) then
-        call gzip_defleat_begin(ilength,                                &
-     &      vtk_each_vector(vect(1,1),vect(1,2),vect(1,3)),             &
-     &      ilen_gz, ilen_gzipped, gzip_buf(1))
-        do inod = 2, num-1
-          call gzip_defleat_cont(ilength,                               &
-     &      vtk_each_vector(vect(inod,1),vect(inod,2),vect(inod,3)),    &
-     &      ilen_gz, ilen_gzipped)
-        end do
-        call gzip_defleat_last(ilength,                                 &
-     &    vtk_each_vector(vect(num,1),vect(num,2),vect(num,3)),         &
-     &    ilen_gz, ilen_gzipped)
-      else
-        ilen_gzipped = 0
-      end if
-!
-      call calypso_gz_mpi_seek_write                                    &
-     &   (id_vtk, ioff_gl, ilen_gzipped, gzip_buf(1))
-      deallocate(gzip_buf)
+      call calypso_gz_mpi_seek_write(id_vtk, ioff_gl, zbuf)
+      call dealloc_zip_buffer(zbuf)
 !
       end subroutine gz_write_vtk_vecotr_mpi
 !
@@ -286,6 +248,8 @@
 !
       subroutine gz_write_vtk_tensor_mpi(id_vtk, ioff_gl,               &
      &          nnod, vect, istack_merged_intnod)
+!
+      use zlib_cvt_vtk_data
 !
       integer(kind = kint_gl), intent(inout) :: ioff_gl
       integer(kind = kint_gl), intent(in)                               &
@@ -295,182 +259,35 @@
 !
       integer, intent(in) ::  id_vtk
 !
+      type(buffer_4_gzip) :: zbuf
       integer(kind = MPI_OFFSET_KIND) :: ioffset
-      integer(kind = kint) :: ip, ilen_gz, ilen_gzipped, ilength
-      integer(kind = kint) :: ilen_gzipped_list(nprocs)
-      integer(kind = kint_gl) :: inod, num
+      integer(kind = kint_gl) ::  num
+      integer(kind = kint) :: ip
+      integer(kind = kint_gl) :: ilen_gzipped_list(nprocs)
 !
 !
       num = istack_merged_intnod(my_rank+1)                             &
      &     - istack_merged_intnod(my_rank)
 !
-      ilength = len(vtk_each_vector(zero, zero, zero))
-      ilen_gz = int(real(3*num*ilength) * 1.01) + 24
-      allocate(gzip_buf(ilen_gz))
-      if(num .eq. 1) then
-        call gzip_defleat_begin(ilength,                                &
-     &      vtk_each_vector(vect(1,1),vect(1,2),vect(1,3)),             &
-     &      ilen_gz, ilen_gzipped, gzip_buf(1))
-        call gzip_defleat_cont(ilength,                                 &
-     &      vtk_each_vector(vect(1,2),vect(1,4),vect(1,5)),             &
-     &      ilen_gz, ilen_gzipped)
-        call gzip_defleat_last(ilength,                                 &
-     &      vtk_each_vector(vect(1,3),vect(1,5),vect(1,6)),             &
-     &      ilen_gz, ilen_gzipped)
+      call defleate_vtk_tensor(nnod, num, vect, zbuf)
 !
-      else if(num .gt. 1) then
-        call gzip_defleat_begin(ilength,                                &
-     &      vtk_each_vector(vect(1,1),vect(1,2),vect(1,3)),             &
-     &      ilen_gz, ilen_gzipped, gzip_buf(1))
-        call gzip_defleat_cont(ilength,                                 &
-     &      vtk_each_vector(vect(1,2),vect(1,4),vect(1,5)),             &
-     &      ilen_gz, ilen_gzipped)
-        call gzip_defleat_cont(ilength,                                 &
-     &      vtk_each_vector(vect(1,3),vect(1,5),vect(1,6)),             &
-     &      ilen_gz, ilen_gzipped)
-!
-        do inod = 2, num-1
-          call gzip_defleat_cont(ilength,                               &
-     &      vtk_each_vector(vect(inod,1),vect(inod,2),vect(inod,3)),    &
-     &      ilen_gz, ilen_gzipped)
-          call gzip_defleat_cont(ilength,                               &
-     &      vtk_each_vector(vect(inod,2),vect(inod,4),vect(inod,5)),    &
-     &      ilen_gz, ilen_gzipped)
-          call gzip_defleat_cont(ilength,                               &
-     &      vtk_each_vector(vect(inod,3),vect(inod,5),vect(inod,6)),    &
-     &      ilen_gz, ilen_gzipped)
-        end do
-        call gzip_defleat_cont(ilength,                                 &
-     &    vtk_each_vector(vect(num,1),vect(num,2),vect(num,3)),         &
-     &    ilen_gz, ilen_gzipped)
-        call gzip_defleat_cont(ilength,                                 &
-     &    vtk_each_vector(vect(num,2),vect(num,4),vect(num,5)),         &
-     &    ilen_gz, ilen_gzipped)
-        call gzip_defleat_last(ilength,                                 &
-     &    vtk_each_vector(vect(num,3),vect(num,5),vect(num,6)),         &
-     &    ilen_gz, ilen_gzipped)
-      else
-        ilen_gzipped = 0
-      end if
-!
-      call MPI_Allgather(ilen_gzipped, ione, CALYPSO_INTEGER,           &
-     &    ilen_gzipped_list(1), ione, CALYPSO_INTEGER,                  &
+      call MPI_Allgather(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,      &
+     &    ilen_gzipped_list(1), 1, CALYPSO_GLOBAL_INT,                  &
      &    CALYPSO_COMM, ierr_MPI)
       ioffset = int(ioff_gl)
       do ip = 1, my_rank
         ioffset = ioffset + ilen_gzipped_list(ip)
       end do
 !
-      if(ilen_gzipped .gt. 0) then
-        call calypso_mpi_seek_write_chara                               &
-     &    (id_vtk, ioffset, ilen_gzipped, gzip_buf(1))
+      if(zbuf%ilen_gzipped .gt. 0) then
+        call calypso_mpi_seek_write_gz(id_vtk, ioffset, zbuf)
       end if
       do ip = 1, nprocs
         ioff_gl = ioff_gl + ilen_gzipped_list(ip)
       end do
-      deallocate(gzip_buf)
+      call dealloc_zip_buffer(zbuf)
 !
       end subroutine gz_write_vtk_tensor_mpi
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine gz_write_vtk_connect_mpi(id_vtk, ioff_gl,              &
-     &          nele, nnod_ele, ie)
-!
-      use m_phys_constants
-!
-      integer(kind = kint_gl), intent(inout) :: ioff_gl
-      integer(kind = kint), intent(in) :: nnod_ele
-      integer(kind = kint_gl), intent(in) :: nele
-      integer(kind = kint_gl), intent(in) :: ie(nele,nnod_ele)
-!
-      integer, intent(in) ::  id_vtk
-!
-      integer(kind = kint_gl) :: ie0(nnod_ele)
-      integer(kind = kint_gl) :: iele
-!
-      integer(kind = kint) :: ilen_gz, ilen_gzipped, ilength
-!
-!
-      ie0(1:nnod_ele) = 0
-      ilength = len(vtk_each_connect(nnod_ele, ie0))
-      ilen_gz = int(real(nele*ilength) * 1.01) + 24
-      allocate(gzip_buf(ilen_gz))
-      if(nele .eq. 1) then
-        ie0(1:nnod_ele) = ie(1,1:nnod_ele) - 1
-        call gzip_defleat_once(ilength,                                 &
-     &      vtk_each_connect(nnod_ele, ie0),                            &
-     &      ilen_gz, ilen_gzipped, gzip_buf(1))
-!
-      else if(nele .gt. 1) then
-        ie0(1:nnod_ele) = ie(1,1:nnod_ele) - 1
-        call gzip_defleat_begin(ilength,                                &
-     &      vtk_each_connect(nnod_ele, ie0),                            &
-     &      ilen_gz, ilen_gzipped, gzip_buf(1))
-        do iele = 2, nele-1
-          ie0(1:nnod_ele) = ie(iele,1:nnod_ele) - 1
-          call gzip_defleat_cont(ilength,                               &
-     &      vtk_each_connect(nnod_ele, ie0),                            &
-     &      ilen_gz, ilen_gzipped)
-        end do
-        ie0(1:nnod_ele) = ie(nele,1:nnod_ele) - 1
-        call gzip_defleat_last(ilength,                                 &
-     &    vtk_each_connect(nnod_ele, ie0),                              &
-     &    ilen_gz, ilen_gzipped)
-      else
-        ilen_gzipped = 0
-      end if
-!
-      call calypso_gz_mpi_seek_write                                    &
-     &   (id_vtk, ioff_gl, ilen_gzipped, gzip_buf(1))
-      deallocate(gzip_buf)
-!
-      end subroutine gz_write_vtk_connect_mpi
-!
-! -----------------------------------------------------------------------
-!
-      subroutine gz_write_vtk_celltype_mpi                              &
-     &         (id_vtk, ioff_gl, nele, nnod_ele)
-!
-      integer(kind = kint_gl), intent(inout) :: ioff_gl
-      integer(kind = kint), intent(in) :: nnod_ele
-      integer(kind = kint_gl), intent(in) :: nele
-!
-      integer, intent(in) ::  id_vtk
-!
-      integer(kind = kint_gl) :: iele
-      integer(kind = kint) :: icellid
-!
-      integer(kind = kint) :: ilen_gz, ilen_gzipped, ilength
-!
-!
-      icellid = vtk_cell_type(nnod_ele)
-      ilength = len(vtk_each_cell_type(icellid))
-      ilen_gz = int(real(nele*ilength) * 1.01) + 24
-      allocate(gzip_buf(ilen_gz))
-      if(nele .eq. 1) then
-        call gzip_defleat_once(ilength, vtk_each_cell_type(icellid),    &
-     &      ilen_gz, ilen_gzipped, gzip_buf(1))
-!
-      else if(nele .gt. 1) then
-        call gzip_defleat_begin(ilength, vtk_each_cell_type(icellid),   &
-     &      ilen_gz, ilen_gzipped, gzip_buf(1))
-        do iele = 2, nele-1
-          call gzip_defleat_cont(ilength, vtk_each_cell_type(icellid),  &
-     &        ilen_gz, ilen_gzipped)
-        end do
-        call gzip_defleat_last(ilength, vtk_each_cell_type(icellid),    &
-     &      ilen_gz, ilen_gzipped)
-      else
-        ilen_gzipped = 0
-      end if
-!
-      call calypso_gz_mpi_seek_write                                    &
-     &   (id_vtk, ioff_gl, ilen_gzipped, gzip_buf(1))
-      deallocate(gzip_buf)
-!
-      end subroutine gz_write_vtk_celltype_mpi
 !
 ! -----------------------------------------------------------------------
 !

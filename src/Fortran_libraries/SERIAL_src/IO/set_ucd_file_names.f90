@@ -12,26 +12,28 @@
 !!      subroutine delete_para_ucd_file(file_prefix, itype_file,        &
 !!     &          nprocs, istep_ucd)
 !!
-!!      subroutine set_parallel_ucd_file_name(file_prefix, itype_file,  &
-!!     &          my_rank, istep_ucd, file_name)
-!!      subroutine set_parallel_grd_file_name(file_prefix, itype_file,  &
-!!     &          my_rank, file_name)
+!!      character(len=kchara) function set_parallel_ucd_file_name       &
+!!     &                  (file_prefix, itype_file, id_rank, istep_ucd)
+!!      character(len=kchara) function set_parallel_grd_file_name       &
+!!     &                    (file_prefix, itype_file, id_rank)
 !!
-!!      subroutine set_single_ucd_file_name(file_prefix, itype_file,    &
-!!     &          istep_ucd, file_name)
-!!      subroutine set_single_grd_file_name(file_prefix, itype_file,    &
-!!     &          file_name)
+!!      character(len=kchara) function set_single_ucd_file_name         &
+!!     &                    (file_prefix, itype_file, istep_ucd)
+!!      character(len=kchara) function                                  &
+!!     &          set_single_grd_file_name(file_prefix, itype_file)
 !!
-!!      subroutine set_merged_hdf_mesh_file_name(file_prefix, file_name)
-!!      subroutine set_merged_hdf_field_file_name(file_prefix,          &
-!!      &         istep_ucd, file_name)
-!!      subroutine set_merged_snap_xdmf_file_name(file_prefix,          &
-!!     &          istep_ucd, file_name)
-!!      subroutine set_merged_xdmf_file_name(file_prefix, file_name)
+!!      character(len=kchara) function                                  &
+!!     &          set_merged_hdf_mesh_file_name(file_prefix)
+!!      character(len=kchara) function                                  &
+!!     &         set_merged_hdf_field_file_name(file_prefix, istep_ucd)
+!!      character(len=kchara) function                                  &
+!!     &          set_merged_snap_xdmf_file_name(file_prefix, istep_ucd)
+!!      character(len=kchara) function                                  &
+!!     &                     set_merged_xdmf_file_name(file_prefix)
 !!@endverbatim
 !!
 !!@param nprocs     number of subdomains
-!!@param my_rank    subdomain ID
+!!@param id_rank    subdomain ID
 !!@param istep      Step number for VTK data
 !
 !
@@ -56,16 +58,17 @@
       use delete_data_files
 !
       character(len=kchara), intent(in) :: file_prefix
-      integer(kind=kint), intent(in) :: itype_file, nprocs, istep_ucd
+      integer, intent(in) :: nprocs
+      integer(kind = kint), intent(in) :: itype_file, istep_ucd
 !
-      integer(kind=kint) :: my_rank, ip
+      integer :: ip, id_rank
       character(len=kchara) :: file_name
 !
 !
       do ip = 1, nprocs
-        my_rank = ip - 1
-        call set_parallel_ucd_file_name(file_prefix,                    &
-     &      itype_file, my_rank, istep_ucd, file_name)
+        id_rank = ip - 1
+        file_name = set_parallel_ucd_file_name                          &
+     &            (file_prefix,  itype_file, id_rank, istep_ucd)
 !
         call delete_file_by_f(file_name)
       end do
@@ -75,229 +78,233 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine set_parallel_ucd_file_name(file_prefix, itype_file,    &
-     &          my_rank, istep_ucd, file_name)
+      character(len=kchara) function set_parallel_ucd_file_name         &
+     &                  (file_prefix, itype_file, id_rank, istep_ucd)
 !
       use set_parallel_file_name
+      use set_mesh_extensions
+      use set_ucd_extensions
 !
-      integer(kind=kint), intent(in) :: itype_file, my_rank, istep_ucd
+      integer, intent(in) :: id_rank
+      integer(kind=kint), intent(in) :: itype_file, istep_ucd
       character(len=kchara), intent(in) ::    file_prefix
-      character(len=kchara), intent(inout) :: file_name
-      character(len=kchara) :: fname_tmp
+      character(len=kchara) :: fname_tmp, file_name
 !
 !
-      call add_int_suffix(istep_ucd, file_prefix, fname_tmp)
+      fname_tmp = add_int_suffix(istep_ucd, file_prefix)
 !
-      if (my_rank .ge. 0                                                &
+      if (id_rank .ge. 0                                                &
      &      .and. (itype_file/icent) .eq. (iflag_para/icent)) then
-        call add_int_suffix(my_rank, fname_tmp, file_name)
+        file_name = add_process_id(id_rank, fname_tmp)
       else
         file_name = fname_tmp
       end if
 !
       if(mod(itype_file,iten) .eq. iflag_bin) then
-        call add_flb_extension(file_name, fname_tmp)
+        fname_tmp = add_flb_extension(file_name)
         file_name = fname_tmp
         return
       else if(mod(itype_file,icent)/iten .eq. iflag_vtk/iten) then
-        call add_vtk_extension(file_name, fname_tmp)
+        fname_tmp = add_vtk_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
-        call add_vtd_extension(file_name, fname_tmp)
+        fname_tmp = add_vtd_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_ucd/iten) then
-        call add_ucd_extension(file_name, fname_tmp)
+        fname_tmp = add_ucd_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
-        call add_udt_extension(file_name, fname_tmp)
+        fname_tmp = add_udt_extension(file_name)
       else
-        call add_fld_extension(file_name, fname_tmp)
+        fname_tmp = add_fld_extension(file_name)
       end if
 !
       if (   mod(itype_file,iten) .eq. iflag_gzip) then
-        call add_gzip_extension(fname_tmp, file_name)
+        file_name = add_gzip_extension(fname_tmp)
       else
         file_name = fname_tmp
       end if
+      set_parallel_ucd_file_name = file_name
 !
-      end subroutine set_parallel_ucd_file_name
+      end function set_parallel_ucd_file_name
 !
 !------------------------------------------------------------------
 !
-      subroutine set_parallel_grd_file_name(file_prefix, itype_file,    &
-     &          my_rank, file_name)
+      character(len=kchara) function set_parallel_grd_file_name         &
+     &                    (file_prefix, itype_file, id_rank)
 !
       use set_parallel_file_name
+      use set_ucd_extensions
 !
-      integer(kind=kint), intent(in) :: itype_file, my_rank
+      integer, intent(in) :: id_rank
+      integer(kind=kint), intent(in) :: itype_file
       character(len=kchara), intent(in) ::    file_prefix
-      character(len=kchara), intent(inout) :: file_name
-      character(len=kchara) :: fname_tmp
+      character(len=kchara) :: fname_tmp, file_name
 !
 !
-      call add_int_suffix(izero, file_prefix, fname_tmp)
+      fname_tmp = add_int_suffix(izero, file_prefix)
 !
-      if (my_rank .ge. 0                                                &
+      if (id_rank .ge. 0                                                &
      &     .and. itype_file/icent .eq. iflag_para/icent) then
-        call add_int_suffix(my_rank, fname_tmp, file_name)
+        file_name = add_process_id(id_rank, fname_tmp)
       else
         file_name = fname_tmp
       end if
 !
       if     (mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
-        call add_vtg_extension(file_name, fname_tmp)
+        fname_tmp = add_vtg_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
-        call add_grd_extension(file_name, fname_tmp)
+        fname_tmp = add_grd_extension(file_name)
       else
         fname_tmp = file_name
       end if
 !
       if (   mod(itype_file,iten) .eq. iflag_gzip) then
-        call add_gzip_extension(fname_tmp, file_name)
+        file_name = add_gzip_extension(fname_tmp)
       else
         file_name = fname_tmp
       end if
+      set_parallel_grd_file_name = file_name
 !
-      end subroutine set_parallel_grd_file_name
+      end function set_parallel_grd_file_name
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine set_single_ucd_file_name(file_prefix, itype_file,      &
-     &          istep_ucd, file_name)
+      character(len=kchara) function set_single_ucd_file_name           &
+     &                    (file_prefix, itype_file, istep_ucd)
 !
       use set_parallel_file_name
+      use set_mesh_extensions
+      use set_ucd_extensions
 !
       integer(kind=kint), intent(in) :: itype_file, istep_ucd
       character(len=kchara), intent(in) ::    file_prefix
-      character(len=kchara), intent(inout) :: file_name
-      character(len=kchara) :: fname_tmp
+      character(len=kchara) :: fname_tmp, file_name
 !
 !
-      call add_int_suffix(istep_ucd, file_prefix, file_name)
+      file_name = add_int_suffix(istep_ucd, file_prefix)
 !
       if (    mod(itype_file,icent)/iten .eq. iflag_vtk/iten) then
-        call add_vtk_extension(file_name, fname_tmp)
+        fname_tmp = add_vtk_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
-        call add_vtd_extension(file_name, fname_tmp)
+        fname_tmp = add_vtd_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_ucd/iten) then
-        call add_ucd_extension(file_name, fname_tmp)
+        fname_tmp = add_ucd_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
-        call add_udt_extension(file_name, fname_tmp)
+        fname_tmp = add_udt_extension(file_name)
       else
-        call add_fld_extension(file_name, fname_tmp)
+        fname_tmp = add_fld_extension(file_name)
       end if
 !
       if (   mod(itype_file,iten) .eq. iflag_gzip) then
-        call add_gzip_extension(fname_tmp, file_name)
+        file_name = add_gzip_extension(fname_tmp)
       else
         file_name = fname_tmp
       end if
+      set_single_ucd_file_name = file_name
 !
-      end subroutine set_single_ucd_file_name
+      end function set_single_ucd_file_name
 !
 !------------------------------------------------------------------
 !
-      subroutine set_single_grd_file_name(file_prefix, itype_file,      &
-     &          file_name)
+      character(len=kchara) function                                    &
+     &          set_single_grd_file_name(file_prefix, itype_file)
 !
       use set_parallel_file_name
+      use set_ucd_extensions
 !
       integer(kind=kint), intent(in) :: itype_file
       character(len=kchara), intent(in) ::    file_prefix
-      character(len=kchara), intent(inout) :: file_name
-      character(len=kchara) :: fname_tmp
+      character(len=kchara) :: fname_tmp, file_name
 !
 !
-      call add_int_suffix(izero, file_prefix, file_name)
+      file_name = add_int_suffix(izero, file_prefix)
 !
       if     (mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
-        call add_vtg_extension(file_name, fname_tmp)
+        fname_tmp = add_vtg_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
-        call add_grd_extension(file_name, fname_tmp)
+        fname_tmp = add_grd_extension(file_name)
       else
         fname_tmp = file_name
       end if
 !
       if (   mod(itype_file,iten) .eq. iflag_gzip) then
-        call add_gzip_extension(fname_tmp, file_name)
+        file_name = add_gzip_extension(fname_tmp)
       else
         file_name = fname_tmp
       end if
+      set_single_grd_file_name = file_name
 !
-      end subroutine set_single_grd_file_name
+      end function set_single_grd_file_name
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine set_merged_hdf_mesh_file_name(file_prefix, file_name)
+      character(len=kchara) function                                    &
+     &          set_merged_hdf_mesh_file_name(file_prefix)
 !
-      use set_parallel_file_name
+      use set_ucd_extensions
 !
       character(len=kchara), intent(in) ::    file_prefix
-      character(len=kchara), intent(inout) :: file_name
       character(len=kchara) :: fname_tmp
 !
 !
-      call add_mesh_suffix(file_prefix, fname_tmp)
-      fname_tmp = trim(fname_tmp)
-      call add_hdf_extension(fname_tmp, file_name)
+      fname_tmp = add_mesh_suffix(file_prefix)
+      set_merged_hdf_mesh_file_name = add_hdf_extension(fname_tmp)
 !
-      end subroutine set_merged_hdf_mesh_file_name
+      end function set_merged_hdf_mesh_file_name
 !
 !------------------------------------------------------------------
 !
-      subroutine set_merged_hdf_field_file_name(file_prefix,            &
-      &         istep_ucd, file_name)
+      character(len=kchara) function                                    &
+     &         set_merged_hdf_field_file_name(file_prefix, istep_ucd)
 !
       use set_parallel_file_name
+      use set_ucd_extensions
 !
       character(len=kchara), intent(in) ::    file_prefix
       integer(kind=kint), intent(in) :: istep_ucd
-      character(len=kchara), intent(inout) :: file_name
-      character(len=kchara) :: fname_tmp, fname_tmp2
+      character(len=kchara) :: fname_tmp
 !
 !
-      call add_field_suffix(file_prefix, fname_tmp)
-      fname_tmp = trim(fname_tmp)
-      call add_int_suffix(istep_ucd, fname_tmp, fname_tmp2)
-      fname_tmp2 = trim(fname_tmp2)
-      call add_hdf_extension(fname_tmp2, file_name)
+      fname_tmp = add_field_suffix(file_prefix)
+      fname_tmp = add_int_suffix(istep_ucd, fname_tmp)
+      set_merged_hdf_field_file_name = add_hdf_extension(fname_tmp)
 !
-      end subroutine set_merged_hdf_field_file_name
+      end function set_merged_hdf_field_file_name
 !
 !------------------------------------------------------------------
 !
-      subroutine set_merged_snap_xdmf_file_name(file_prefix,            &
-     &          istep_ucd, file_name)
+      character(len=kchara) function                                    &
+     &          set_merged_snap_xdmf_file_name(file_prefix, istep_ucd)
 !
       use set_parallel_file_name
+      use set_ucd_extensions
 !
       character(len=kchara), intent(in) ::    file_prefix
       integer(kind=kint), intent(in) :: istep_ucd
-      character(len=kchara), intent(inout) :: file_name
+!
       character(len=kchara) :: fname_tmp
 !
 !
-      call add_int_suffix(istep_ucd, file_prefix, fname_tmp)
-      fname_tmp = trim(fname_tmp)
-      call add_xdmf_extension(fname_tmp, file_name)
+      fname_tmp = trim(add_int_suffix(istep_ucd, file_prefix))
+      set_merged_snap_xdmf_file_name = add_xdmf_extension(fname_tmp)
 !
-      end subroutine set_merged_snap_xdmf_file_name
+      end function set_merged_snap_xdmf_file_name
 !
 !------------------------------------------------------------------
 !
-      subroutine set_merged_xdmf_file_name(file_prefix, file_name)
+      character(len=kchara) function                                    &
+     &                     set_merged_xdmf_file_name(file_prefix)
 !
-      use set_parallel_file_name
+      use set_ucd_extensions
 !
-      character(len=kchara), intent(in) ::    file_prefix
-      character(len=kchara), intent(inout) :: file_name
+      character(len=kchara), intent(in) ::file_prefix
       character(len=kchara) :: fname_tmp
 !
 !
-      call add_xdmf_suffix(file_prefix, fname_tmp)
-      fname_tmp = trim(fname_tmp)
-      call add_xdmf_extension(fname_tmp, file_name)
+      fname_tmp = add_solution_suffix(file_prefix)
+      set_merged_xdmf_file_name = add_xdmf_extension(fname_tmp)
 !
-      end subroutine set_merged_xdmf_file_name
+      end function set_merged_xdmf_file_name
 !
 !------------------------------------------------------------------
 !

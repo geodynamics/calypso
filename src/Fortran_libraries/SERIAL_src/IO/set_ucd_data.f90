@@ -124,7 +124,7 @@
       subroutine link_numnod_stacks_2_output(nprocs, istack_numnod,     &
      &          istack_internod, istack_interele, m_ucd)
 !
-      integer(kind = kint), intent(in) :: nprocs
+      integer, intent(in) :: nprocs
       integer(kind = kint_gl), intent(in), target                       &
      &                        :: istack_numnod(0:nprocs)
       integer(kind = kint_gl), intent(in), target                       &

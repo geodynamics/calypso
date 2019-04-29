@@ -12,15 +12,15 @@
 !!
 !!      subroutine alloc_num_spec_layer(nri_in, pwr)
 !!      subroutine alloc_rms_name_sph_spec(nfld_in, pwr)
-!!      subroutine alloc_rms_4_sph_spectr(my_rank, ltr, pwr)
+!!      subroutine alloc_rms_4_sph_spectr(id_rank, ltr, pwr)
 !!      subroutine alloc_ave_4_sph_spectr                               &
 !!     &         (idx_rj_degree_zero, nri_rj, pwr)
 !!
-!!      subroutine dealloc_rms_4_sph_spectr(my_rank, pwr)
+!!      subroutine dealloc_rms_4_sph_spectr(id_rank, pwr)
 !!      subroutine dealloc_ave_4_sph_spectr(idx_rj_degree_zero, pwr)
 !!@endverbatim
 !!
-!!@n @param my_rank       Process ID
+!!@n @param id_rank       Process ID
 !!@n @param istep         time step number
 !!@n @param time          time
 !!
@@ -219,9 +219,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_rms_4_sph_spectr(my_rank, ltr, pwr)
+      subroutine alloc_rms_4_sph_spectr(id_rank, ltr, pwr)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: ltr
       type(sph_mean_squares), intent(inout) :: pwr
 !
@@ -230,10 +230,10 @@
       pwr%ntot_comp_sq = pwr%istack_comp_sq(pwr%num_fld_sq)
       do i = 1, pwr%num_vol_spectr
         call alloc_sph_vol_mean_square                                  &
-     &     (my_rank, ltr, pwr%ntot_comp_sq, pwr%v_spectr(i))
+     &     (id_rank, ltr, pwr%ntot_comp_sq, pwr%v_spectr(i))
       end do
 !
-      if(my_rank .gt. 0) return
+      if(id_rank .gt. 0) return
 !
       allocate(pwr%shl_l(pwr%nri_rms,0:ltr,pwr%ntot_comp_sq))
       allocate(pwr%shl_m(pwr%nri_rms,0:ltr,pwr%ntot_comp_sq))
@@ -279,20 +279,20 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine dealloc_rms_4_sph_spectr(my_rank, pwr)
+      subroutine dealloc_rms_4_sph_spectr(id_rank, pwr)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(sph_mean_squares), intent(inout) :: pwr
 !
       integer(kind = kint) :: i
 !
       do i = 1, pwr%num_vol_spectr
-        call dealloc_sph_vol_mean_square(my_rank, pwr%v_spectr(i))
+        call dealloc_sph_vol_mean_square(id_rank, pwr%v_spectr(i))
       end do
 !
       deallocate(pwr%r_4_rms, pwr%kr_4_rms)
 !
-      if(my_rank .gt. 0) return
+      if(id_rank .gt. 0) return
       deallocate(pwr%shl_l, pwr%shl_m, pwr%shl_lm)
       deallocate(pwr%shl_sq, pwr%shl_m0, pwr%ratio_shl_m0)
 !
@@ -323,16 +323,16 @@
 ! -----------------------------------------------------------------------
 !
       subroutine alloc_sph_vol_mean_square                              &
-     &         (my_rank, ltr, ntot_comp_sq, v_pwr)
+     &         (id_rank, ltr, ntot_comp_sq, v_pwr)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: ltr, ntot_comp_sq
       type(sph_vol_mean_squares), intent(inout) :: v_pwr
 !
 !
       v_pwr%ltr = ltr
       v_pwr%ntot_comp_sq = ntot_comp_sq
-      if(my_rank .gt. 0) return
+      if(id_rank .gt. 0) return
 !
       allocate( v_pwr%v_l(0:v_pwr%ltr,v_pwr%ntot_comp_sq) )
       allocate( v_pwr%v_m(0:v_pwr%ltr,v_pwr%ntot_comp_sq) )
@@ -371,13 +371,13 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine dealloc_sph_vol_mean_square(my_rank, v_pwr)
+      subroutine dealloc_sph_vol_mean_square(id_rank, v_pwr)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(sph_vol_mean_squares), intent(inout) :: v_pwr
 !
 !
-      if(my_rank .gt. 0) return
+      if(id_rank .gt. 0) return
 !
       deallocate(v_pwr%v_l, v_pwr%v_m, v_pwr%v_lm)
       deallocate(v_pwr%v_sq, v_pwr%v_m0, v_pwr%v_ratio_m0)

@@ -64,7 +64,8 @@
       integer(kind = kint) :: ierr = 0
 !
 !
-      call ele_mesh_file_name_by_param(mesh_file, my_rank, file_name)
+      file_name = set_ele_comm_file_name                                &
+     &        (mesh_file%file_prefix, mesh_file%iflag_format, my_rank)
 !
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
@@ -99,13 +100,16 @@
 !
       subroutine sel_mpi_read_surf_mesh(mesh_file, surf_mesh_IO)
 !
+      use set_mesh_file_names
+!
       type(field_IO_params), intent(in) ::  mesh_file
       type(surf_edge_IO_file), intent(inout) :: surf_mesh_IO
 !
       integer(kind = kint) :: ierr = 0
 !
 !
-      call surf_mesh_file_name_by_param(mesh_file, my_rank, file_name)
+      file_name = set_surf_mesh_file_name                               &
+     &        (mesh_file%file_prefix, mesh_file%iflag_format, my_rank)
 !
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
@@ -140,13 +144,16 @@
 !
       subroutine sel_mpi_read_edge_mesh(mesh_file, edge_mesh_IO)
 !
+      use set_mesh_file_names
+!
       type(field_IO_params), intent(in) ::  mesh_file
       type(surf_edge_IO_file), intent(inout) :: edge_mesh_IO
 !
       integer(kind = kint) :: ierr = 0
 !
 !
-      call edge_mesh_file_name_by_param(mesh_file, my_rank, file_name)
+      file_name = set_edge_mesh_file_name                               &
+     &        (mesh_file%file_prefix, mesh_file%iflag_format, my_rank)
 !
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
@@ -186,7 +193,8 @@
       type(surf_edge_IO_file), intent(inout) :: ele_mesh_IO
 !
 !
-      call ele_mesh_file_name_by_param(mesh_file, my_rank, file_name)
+      file_name = set_ele_comm_file_name                                &
+     &        (mesh_file%file_prefix, mesh_file%iflag_format, my_rank)
 !
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
@@ -211,17 +219,23 @@
         call sel_write_ele_mesh_file(mesh_file, my_rank, ele_mesh_IO)
       end if
 !
+      call dealloc_comm_table(ele_mesh_IO%comm)
+!      call dealloc_ele_geometry_data(ele_mesh_IO)
+!
       end subroutine sel_mpi_write_ele_mesh_file
 !
 !  ---------------------------------------------------------------------
 !
       subroutine sel_mpi_write_surf_mesh_file(mesh_file, surf_mesh_IO)
 !
+      use set_mesh_file_names
+!
       type(field_IO_params), intent(in) ::  mesh_file
       type(surf_edge_IO_file), intent(inout) :: surf_mesh_IO
 !
 !
-      call surf_mesh_file_name_by_param(mesh_file, my_rank, file_name)
+      file_name = set_surf_mesh_file_name                               &
+     &        (mesh_file%file_prefix, mesh_file%iflag_format, my_rank)
 !
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
@@ -246,17 +260,23 @@
         call sel_write_surf_mesh_file(mesh_file, my_rank, surf_mesh_IO)
       end if
 !
+      call dealloc_surface_mesh_IO(surf_mesh_IO)
+!      call dealloc_surf_geometry_data(surf_mesh_IO)
+!
       end subroutine sel_mpi_write_surf_mesh_file
 !
 !  ---------------------------------------------------------------------
 !
       subroutine sel_mpi_write_edge_mesh_file(mesh_file, edge_mesh_IO)
 !
+      use set_mesh_file_names
+!
       type(field_IO_params), intent(in) ::  mesh_file
       type(surf_edge_IO_file), intent(inout) :: edge_mesh_IO
 !
 !
-      call edge_mesh_file_name_by_param(mesh_file, my_rank, file_name)
+      file_name = set_edge_mesh_file_name                               &
+     &        (mesh_file%file_prefix, mesh_file%iflag_format, my_rank)
 !
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
@@ -280,6 +300,9 @@
       else
         call sel_write_edge_mesh_file(mesh_file, my_rank, edge_mesh_IO)
       end if
+!
+      call dealloc_edge_mesh_IO(edge_mesh_IO)
+!      call dealloc_surf_geometry_data(edge_mesh_IO)
 !
       end subroutine sel_mpi_write_edge_mesh_file
 !

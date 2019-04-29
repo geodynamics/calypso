@@ -131,7 +131,7 @@
       integer (kind=kint) :: nd
 !
 !
-        do nd = 1, numdir
+      do nd = 1, numdir
 !$omp workshare
           vector(ist:ied,nd) = zero
 !$omp end workshare nowait

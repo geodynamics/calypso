@@ -5,6 +5,12 @@
 !!@date Programmed in July, 2007
 !
 !> @brief Structure of group data for spherical shell model
+!!
+!!@verbatim
+!!      subroutine dealloc_sph_grid_group(sph_grps)
+!!      subroutine dealloc_sph_mode_group(sph_grps)
+!!        type(sph_group_data), intent(inout) :: sph_grps
+!!@endverbatim
 !
       module t_spheric_group
 !
@@ -32,5 +38,36 @@
         type(group_data) :: sphere_rj_grp
       end type sph_group_data
 !
+!------------------------------------------------------------------
+!
+       contains
+!
+!------------------------------------------------------------------
+!
+      subroutine dealloc_sph_grid_group(sph_grps)
+!
+      type(sph_group_data), intent(inout) :: sph_grps
+!
+!
+      call dealloc_group(sph_grps%bc_rtp_grp)
+      call dealloc_group(sph_grps%radial_rtp_grp)
+      call dealloc_group(sph_grps%theta_rtp_grp)
+      call dealloc_group(sph_grps%zonal_rtp_grp)
+!
+      end subroutine dealloc_sph_grid_group
+!
+! -----------------------------------------------------------------------
+!
+      subroutine dealloc_sph_mode_group(sph_grps)
+!
+      type(sph_group_data), intent(inout) :: sph_grps
+!
+!
+      call dealloc_group(sph_grps%radial_rj_grp)
+      call dealloc_group(sph_grps%sphere_rj_grp)
+!
+      end subroutine dealloc_sph_mode_group
+!
+! -----------------------------------------------------------------------
 !
       end module t_spheric_group

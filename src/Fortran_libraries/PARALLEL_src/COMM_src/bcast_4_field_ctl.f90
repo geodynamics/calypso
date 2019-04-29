@@ -38,17 +38,6 @@
 !!        quad_field_name_ctl  maxwell_tensor
 !!        quad_field_name_ctl  vecp_induction
 !!      end array quad_field_name_ctl
-!!
-!!      array linear_field_name_ctl    7
-!!        linear_field_name_ctl  velocity
-!!        linear_field_name_ctl  pressure
-!!        linear_field_name_ctl  vorticity
-!!        linear_field_name_ctl  temperature
-!!        linear_field_name_ctl  magnetic_field
-!!        linear_field_name_ctl  current_density
-!!        linear_field_name_ctl  magnetic_potential
-!!        linear_field_name_ctl  composition
-!!      end array linear_field_name_ctl
 !!    end phys_values_ctl
 !!
 !! ---------------------------------------------------------------------
@@ -75,9 +64,7 @@
 !
 !
       call bcast_ctl_array_c3(fld_ctl%field_ctl)
-!
       call bcast_ctl_array_c1(fld_ctl%quad_phys)
-      call bcast_ctl_array_c1(fld_ctl%linear_phys)
 !
       end subroutine bcast_phys_data_ctl
 !

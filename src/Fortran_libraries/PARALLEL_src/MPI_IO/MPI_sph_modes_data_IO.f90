@@ -15,6 +15,10 @@
 !!     &         (IO_param, comm_IO, sph_IO)
 !!      subroutine mpi_read_modes_rlm_data                              &
 !!     &         (IO_param, comm_IO, sph_IO)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(communication_table), intent(inout) :: comm_IO
+!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_group_data), intent(inout) :: sph_grps_IO
 !!
 !!      subroutine mpi_write_geom_rtp_data                              &
 !!     &         (IO_param, comm_IO, sph_IO, sph_grps_IO)
@@ -24,13 +28,12 @@
 !!     &         (IO_param, comm_IO, sph_IO)
 !!      subroutine mpi_write_modes_rlm_data                             &
 !!     &         (IO_param, comm_IO, sph_IO)
-!!        type(communication_table), intent(inout) :: comm_IO
-!!        type(sph_IO_data), intent(inout) :: sph_IO
-!!        type(sph_group_data), intent(inout) :: sph_grps_IO
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(communication_table), intent(in) :: comm_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
+!!        type(sph_group_data), intent(in) :: sph_grps_IO
 !!@endverbatim
 !!
-!!@param nprocs_in  Number of subdomain
-!!@param id_rank    Domain ID
 !
       module MPI_sph_modes_data_IO
 !
@@ -194,9 +197,9 @@
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
-      type(communication_table), intent(inout) :: comm_IO
-      type(sph_IO_data), intent(inout) :: sph_IO
-      type(sph_group_data), intent(inout) :: sph_grps_IO
+      type(communication_table), intent(in) :: comm_IO
+      type(sph_IO_data), intent(in) :: sph_IO
+      type(sph_group_data), intent(in) :: sph_grps_IO
 !
 !
       call mpi_write_charahead                                          &
@@ -207,6 +210,7 @@
       call mpi_write_rank_4_sph(IO_param, sph_IO)
 !
       call mpi_write_rtp_gl_1d_table(IO_param, sph_IO)
+!
 !
       call mpi_write_charahead                                          &
      &   (IO_param, len(hd_rtp_glbl()), hd_rtp_glbl())
@@ -243,9 +247,9 @@
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
-      type(communication_table), intent(inout) :: comm_IO
-      type(sph_IO_data), intent(inout) :: sph_IO
-      type(sph_group_data), intent(inout) :: sph_grps_IO
+      type(communication_table), intent(in) :: comm_IO
+      type(sph_IO_data), intent(in) :: sph_IO
+      type(sph_group_data), intent(in) :: sph_grps_IO
 !
 !
       call mpi_write_charahead                                          &
@@ -256,6 +260,7 @@
       call mpi_write_rank_4_sph(IO_param, sph_IO)
 !
       call mpi_write_rj_gl_1d_table(IO_param, sph_IO)
+!
 !
       call mpi_write_charahead                                          &
      &   (IO_param, len(hd_rj_glbl()), hd_rj_glbl())
@@ -284,8 +289,8 @@
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
-      type(communication_table), intent(inout) :: comm_IO
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(communication_table), intent(in) :: comm_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
 !
       call mpi_write_charahead                                          &
@@ -296,6 +301,7 @@
       call mpi_write_rank_4_sph(IO_param, sph_IO)
 !
       call mpi_write_rtp_gl_1d_table(IO_param, sph_IO)
+!
 !
       call mpi_write_charahead                                          &
      &   (IO_param, len(hd_rtp_glbl()), hd_rtp_glbl())
@@ -314,13 +320,14 @@
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
-      type(communication_table), intent(inout) :: comm_IO
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(communication_table), intent(in) :: comm_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
 !
       call mpi_write_charahead                                          &
      &   (IO_param, len(hd_sph_para()), hd_sph_para())
       call mpi_write_domain_info(IO_param, comm_IO)
+!
       call mpi_write_gl_reso_sph(IO_param, sph_IO)
       call mpi_write_rank_4_sph(IO_param, sph_IO)
 !

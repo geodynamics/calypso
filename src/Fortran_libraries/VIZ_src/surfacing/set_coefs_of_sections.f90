@@ -4,7 +4,7 @@
 !        programmed by H.Matsui on May. 2006
 !
 !!      subroutine s_set_coefs_of_sections                              &
-!!     &         (psf, id_section_method, const_psf, ierr)
+!!     &         (psf_c, id_section_method, const_psf, ierr)
 !!      real(kind = kreal) function side_of_plane(const_psf, xx)
 !!      subroutine cal_normal_of_plane(const_psf, xx, normal)
 !
@@ -30,14 +30,14 @@
 !  ---------------------------------------------------------------------
 !
       subroutine s_set_coefs_of_sections                                &
-     &         (psf, id_section_method, const_psf, ierr)
+     &         (psf_c, id_section_method, const_psf, ierr)
 !
       use m_error_IDs
       use t_control_data_4_psf
       use t_psf_patch_data
       use set_cross_section_coefs
 !
-      type(psf_ctl), intent(inout) :: psf
+      type(psf_ctl), intent(in) :: psf_c
 !
       integer(kind = kint), intent(inout)  :: id_section_method
       real(kind = kreal), intent(inout) :: const_psf(10)
@@ -47,33 +47,33 @@
 !
 !
       ierr = 0
-      tmpchara = psf%section_method_ctl%charavalue
+      tmpchara = psf_c%section_method_ctl%charavalue
 !
       if(cmp_no_case(tmpchara, cflag_eq)) then
         id_section_method = 1
-        call set_coefs_4_psf(psf%psf_coefs_ctl%num,                     &
-     &      psf%psf_coefs_ctl%c_tbl,  psf%psf_coefs_ctl%vect,           &
+        call set_coefs_4_psf(psf_c%psf_coefs_ctl%num,                   &
+     &      psf_c%psf_coefs_ctl%c_tbl,  psf_c%psf_coefs_ctl%vect,       &
      &      const_psf(1) )
 !
       else if(cmp_no_case(tmpchara, cflag_pln)) then
         id_section_method = 2
-        call set_coefs_4_plane(psf, const_psf(1))
+        call set_coefs_4_plane(psf_c, const_psf(1))
 !
       else if(cmp_no_case(tmpchara, cflag_sph)) then
         id_section_method = 2
-        call set_coefs_4_sphere(psf, const_psf(1))
+        call set_coefs_4_sphere(psf_c, const_psf(1))
 !
       else if(cmp_no_case(tmpchara, cflag_elp)) then
         id_section_method = 3
-        call set_coefs_4_ellipsode(psf, const_psf(1) )
+        call set_coefs_4_ellipsode(psf_c, const_psf(1) )
 !
       else if(cmp_no_case(tmpchara, cflag_hyp)) then
         id_section_method = 4
-        call set_coefs_4_hyperboloide(psf, const_psf(1) )
+        call set_coefs_4_hyperboloide(psf_c, const_psf(1) )
 !
       else if(cmp_no_case(tmpchara, cflag_prb)) then
         id_section_method = 5
-        call set_coefs_4_parabolic(psf, const_psf(1) )
+        call set_coefs_4_parabolic(psf_c, const_psf(1) )
       else
         ierr = ierr_VIZ
         write(e_message,'(a)') 'Set cross section mode'

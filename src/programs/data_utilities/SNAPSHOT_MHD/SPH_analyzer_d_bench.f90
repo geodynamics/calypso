@@ -32,6 +32,8 @@
 !
       use m_precision
       use m_MHD_step_parameter
+      use m_work_time
+      use m_elapsed_labels_4_MHD
       use t_MHD_file_parameter
       use t_SPH_MHD_model_data
       use t_SPH_mesh_field_data
@@ -136,8 +138,6 @@
       subroutine SPH_analyze_dbench(i_step, MHD_files, SPH_model,       &
      &          SPH_MHD, SPH_WK, cdat, bench)
 !
-      use m_work_time
-!
       use cal_sol_sph_MHD_crank
       use adjust_reference_fields
       use lead_fields_4_sph_mhd
@@ -159,8 +159,8 @@
 !
 !
       call read_alloc_sph_rst_4_snap(i_step,                            &
-     &    MHD_files%org_rj_file_IO, MHD_files%fst_file_IO, SPH_MHD%sph, &
-     &    SPH_MHD%ipol, SPH_MHD%fld, MHD_step1%rst_step,                &
+     &    MHD_files%org_rj_file_IO, MHD_files%fst_file_IO,              &
+     &    MHD_step1%rst_step, SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld,   &
      &    MHD_step1%init_d)
       call copy_time_data(MHD_step1%init_d, MHD_step1%time_d)
 !
@@ -176,25 +176,24 @@
 !
 !* ----  Update fields after time evolution ------------------------=
 !*
-      call start_elapsed_time(9)
+      if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+5)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
       call trans_per_temp_to_temp_sph(SPH_model,                        &
      &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%fld)
 !*
-      iflag = lead_field_data_flag(i_step, MHD_step1)
-      if(iflag .eq. 0) then
+      if(lead_field_data_flag(i_step, MHD_step1) .eq. 0) then
         if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
         call s_lead_fields_4_sph_mhd                                    &
      &     (SPH_MHD%sph, SPH_MHD%comms, SPH_WK%r_2nd,                   &
      &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%trans_p,   &
      &      SPH_MHD%ipol, SPH_WK%MHD_mats, SPH_WK%trns_WK, SPH_MHD%fld)
       end if
-      call end_elapsed_time(9)
+      if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+5)
 !
 !*  -----------  lead mid-equator field --------------
 !*
-      call start_elapsed_time(4)
-      call start_elapsed_time(11)
+      if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+3)
+      if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+7)
       if(iflag_debug.gt.0)  write(*,*) 'const_data_4_dynamobench'
       call s_const_data_4_dynamobench                                   &
      &   (MHD_step1%time_d%time, SPH_MHD%sph%sph_params,                &
@@ -203,8 +202,8 @@
      &    cdat, SPH_WK%monitor%pwr, bench, SPH_WK%monitor%WK_pwr)
       call output_field_4_dynamobench(i_step, MHD_step1%time_d%time,    &
      &   SPH_model%sph_MHD_bc, SPH_MHD%ipol, bench)
-      call end_elapsed_time(11)
-      call end_elapsed_time(4)
+      if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+7)
+      if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
 !
       end subroutine SPH_analyze_dbench
 !

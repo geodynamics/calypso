@@ -32,6 +32,7 @@
       character(len=kchara), parameter                                  &
      &                      :: hd_tsr_cyl = 'cylindrical_sym_tensor'
 !
+      character(len=kchara), parameter :: hd_amplitude = 'amplitude'
       character(len=kchara), parameter :: hd_magnitude = 'magnitude'
       character(len=kchara), parameter :: hd_norm =      'norm'
 !
@@ -129,7 +130,7 @@
 !
       private :: hd_scl, hd_vec, hd_tsr, hd_ats
       private :: hd_vec_sph, hd_vec_cyl, hd_tsr_sph, hd_tsr_cyl
-      private :: hd_magnitude, hd_norm
+      private :: hd_amplitude, hd_magnitude, hd_norm
       private :: hd_tsr_mag, hd_tsr_norm, hd_ats_mag, hd_ats_norm
       private :: hd_vec_x, hd_vec_y, hd_vec_z
       private :: hd_vec_r, hd_vec_t, hd_vec_p, hd_vec_s
@@ -199,7 +200,8 @@
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1200) trim(phys_name)
 !
-      else if(cmp_no_case(comp_name, hd_magnitude)                      &
+      else if(cmp_no_case(comp_name, hd_amplitude)                      &
+     &   .or. cmp_no_case(comp_name, hd_magnitude)                      &
      &   .or. cmp_no_case(comp_name, hd_norm)) then
         icomp =     icomp_NORM
         ncomp =     ncomp_SCALAR

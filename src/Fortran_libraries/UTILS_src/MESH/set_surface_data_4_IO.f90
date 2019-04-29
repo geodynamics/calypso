@@ -20,8 +20,8 @@
 !!     &         (ele_IO, sfed_IO, surf, nele)
 !!      subroutine copy_surf_geometry_from_IO(nod_IO, sfed_IO, surf)
 !!        integer(kind = kint), intent(in) :: nele
-!!        type(element_data), intent(inout) :: ele_IO
-!!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!        type(element_data), intent(in) :: ele_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!        type(surface_data), intent(inout) :: surf
 !!@endverbatim
 !
@@ -196,8 +196,8 @@
       use m_geometry_constants
 !
       integer(kind = kint), intent(in) :: nele
-      type(element_data), intent(inout) :: ele_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(element_data), intent(in) :: ele_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
       type(surface_data), intent(inout) :: surf
 !
 !
@@ -219,17 +219,14 @@
      &        = sfed_IO%isf_for_ele(1:nele,1:nsurf_4_ele)
 !$omp end workshare
 !
-      call dealloc_surface_connect_IO(sfed_IO)
-      call deallocate_ele_connect_type(ele_IO)
-!
       end subroutine copy_surf_connect_from_IO
 !
 !------------------------------------------------------------------
 !
       subroutine copy_surf_geometry_from_IO(nod_IO, sfed_IO, surf)
 !
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
       type(surface_data), intent(inout) :: surf
 !
       integer(kind = kint) :: isurf
@@ -253,10 +250,6 @@
         surf%vnorm_surf(isurf,3) = sfed_IO%ele_vector(isurf,3)
       end do
 !omp end parallel do
-!
-      call dealloc_node_geometry_base(nod_IO)
-      call dealloc_ele_vector_IO(sfed_IO)
-      call dealloc_ele_scalar_IO(sfed_IO)
 !
       end subroutine copy_surf_geometry_from_IO
 !

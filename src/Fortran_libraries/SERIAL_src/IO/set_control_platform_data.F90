@@ -8,14 +8,21 @@
 !!        from control data
 !!
 !!@verbatim
-!!      subroutine turn_off_debug_flag_by_ctl(my_rank, plt)
-!!      subroutine set_control_smp_def(my_rank, plt)
+!!      subroutine turn_off_debug_flag_by_ctl(id_rank, plt)
+!!      subroutine set_control_smp_def(id_rank, plt)
 !!      subroutine set_control_mesh_def(plt, mesh_file)
-!!      subroutine set_control_sph_mesh(plt, mesh_file, sph_file_param)
+!!      subroutine set_control_sph_mesh(plt, Fmesh_ctl,                 &
+!!     &          mesh_file, sph_file_param, FEM_mesh_flags)
+!!        type(platform_data_control), intent(in) :: plt
+!!        type(FEM_mesh_control), intent(in) :: Fmesh_ctl
 !!        type(field_IO_params), intent(inout) :: mesh_file
 !!        type(field_IO_params), intent(inout) :: sph_file_param
-!!      subroutine set_FEM_mesh_switch_4_SPH(plt, iflag_access_FEM)
-!!      subroutine set_FEM_surface_output_flag(plt, iflag_output_SURF)
+!!        type(FEM_file_IO_flags), intent(inout) :: FEM_mesh_flags
+!!      subroutine set_FEM_mesh_switch_4_SPH(Fmesh_ctl, iflag_access_FEM)
+!!      subroutine set_FEM_surface_output_flag                          &
+!!     &         (Fmesh_ctl, iflag_output_SURF)
+!!        type(FEM_mesh_control), intent(in) :: Fmesh_ctl
+!!      subroutine set_FEM_viewer_output_flag(plt, iflag_output_VMESH)
 !!      subroutine set_control_restart_file_def(plt, file_IO)
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(field_IO_params), intent(inout) :: file_IO
@@ -28,7 +35,7 @@
 !!     &          file_prefix_ctl, file_format_ctl,  file_params)
 !!@endverbatim
 !!
-!!@param my_rank  preocess ID
+!!@param id_rank  preocess ID
 !
       module set_control_platform_data
 !
@@ -36,6 +43,7 @@
 !
       use m_constants
       use t_ctl_data_4_platforms
+      use t_ctl_data_4_FEM_mesh
       use t_file_IO_parameter
 !
       implicit  none
@@ -48,12 +56,12 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine turn_off_debug_flag_by_ctl(my_rank, plt)
+      subroutine turn_off_debug_flag_by_ctl(id_rank, plt)
 !
       use m_machine_parameter
       use skip_comment_f
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(platform_data_control), intent(in) :: plt
 !
 !
@@ -69,17 +77,17 @@
         end if
       end if
 !
-      if(my_rank .eq. 0) iflag_debug = i_debug
+      if(id_rank .eq. 0) iflag_debug = i_debug
 !
       end subroutine turn_off_debug_flag_by_ctl
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_control_smp_def(my_rank, plt)
+      subroutine set_control_smp_def(id_rank, plt)
 !
       use m_machine_parameter
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(platform_data_control), intent(in) :: plt
 !
       integer, external :: omp_get_max_threads
@@ -92,10 +100,10 @@
       end if
 !
 #ifdef _OPENMP
-      if (int(np_smp) .lt. omp_get_max_threads()) then
-        if(my_rank .eq. 0) write(*,*)                                   &
+      np_smp4 = int(np_smp)
+      if(np_smp4 .lt. omp_get_max_threads()) then
+        if(id_rank .eq. 0) write(*,*)                                   &
      &               'Number of SMP threads is chenged to', np_smp
-        np_smp4 = int(np_smp)
         call omp_set_num_threads(np_smp4)
       end if
 #endif
@@ -120,27 +128,27 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_control_sph_mesh(plt, mesh_file, sph_file_param,   &
-     &          iflag_access_FEM, iflag_output_SURF)
+      subroutine set_control_sph_mesh(plt, Fmesh_ctl,                   &
+     &          mesh_file, sph_file_param, FEM_mesh_flags)
 !
       use m_file_format_switch
       use sph_file_IO_select
 !
       type(platform_data_control), intent(in) :: plt
+      type(FEM_mesh_control), intent(in) :: Fmesh_ctl
       type(field_IO_params), intent(inout) :: mesh_file
       type(field_IO_params), intent(inout) :: sph_file_param
-      integer(kind = kint), intent(inout) :: iflag_access_FEM
-      integer(kind = kint), intent(inout) :: iflag_output_SURF
+      type(FEM_file_IO_flags), intent(inout) :: FEM_mesh_flags
 !
 !
       call set_control_mesh_def(plt, mesh_file)
 !
 !   set data format
 !
-      call choose_para_file_format                                      &
-     &  (plt%sph_file_fmt_ctl, iflag_sph_file_fmt)
-      call choose_para_file_format                                      &
-     &   (plt%spectr_field_fmt_ctl, sph_file_param%iflag_format)
+      iflag_sph_file_fmt                                                &
+     &     = choose_para_file_format(plt%sph_file_fmt_ctl)
+      sph_file_param%iflag_format                                       &
+     &     = choose_para_file_format(plt%spectr_field_fmt_ctl)
 !
 !   set file header at once
 !
@@ -157,28 +165,28 @@
      &         = plt%spectr_field_file_prefix%charavalue
       end if
 !
-      call set_FEM_mesh_switch_4_SPH(plt, iflag_access_FEM)
-      call set_FEM_surface_output_flag(plt, iflag_output_SURF)
+      call set_FEM_mesh_switch_4_SPH                                    &
+     &    (Fmesh_ctl, FEM_mesh_flags%iflag_access_FEM)
+      call set_FEM_surface_output_flag                                  &
+     &    (Fmesh_ctl, FEM_mesh_flags%iflag_output_SURF)
+      call set_FEM_viewer_output_flag                                   &
+     &    (Fmesh_ctl, FEM_mesh_flags%iflag_output_VMESH)
 !
       end subroutine set_control_sph_mesh
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_FEM_mesh_switch_4_SPH(plt, iflag_access_FEM)
+      subroutine set_FEM_mesh_switch_4_SPH(Fmesh_ctl, iflag_access_FEM)
 !
       use skip_comment_f
 !
-      type(platform_data_control), intent(in) :: plt
+      type(FEM_mesh_control), intent(in) :: Fmesh_ctl
       integer(kind = kint), intent(inout) :: iflag_access_FEM
 !
 !
       iflag_access_FEM = 0
-      if(plt%FEM_mesh_output_switch%iflag .gt. 0) then
-        if(yes_flag(plt%FEM_mesh_output_switch%charavalue)) then
-          iflag_access_FEM = 1
-        end if
-      else if(plt%excluding_FEM_mesh_ctl%iflag .gt. 0) then
-        if(no_flag(plt%excluding_FEM_mesh_ctl%charavalue)) then
+      if(Fmesh_ctl%FEM_mesh_output_switch%iflag .gt. 0) then
+        if(yes_flag(Fmesh_ctl%FEM_mesh_output_switch%charavalue)) then
           iflag_access_FEM = 1
         end if
       end if
@@ -187,22 +195,43 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_FEM_surface_output_flag(plt, iflag_output_SURF)
+      subroutine set_FEM_surface_output_flag                            &
+     &         (Fmesh_ctl, iflag_output_SURF)
 !
       use skip_comment_f
 !
-      type(platform_data_control), intent(in) :: plt
+      type(FEM_mesh_control), intent(in) :: Fmesh_ctl
       integer(kind = kint), intent(inout) :: iflag_output_SURF
 !
 !
       iflag_output_SURF = 0
 !
-      if(plt%FEM_surface_output_switch%iflag .eq. 0) return
-      if(yes_flag(plt%FEM_surface_output_switch%charavalue)) then
+      if(Fmesh_ctl%FEM_surface_output_switch%iflag .eq. 0) return
+      if(yes_flag(Fmesh_ctl%FEM_surface_output_switch%charavalue)) then
         iflag_output_SURF = 1
       end if
  
       end subroutine set_FEM_surface_output_flag
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_FEM_viewer_output_flag                             &
+     &         (Fmesh_ctl, iflag_output_VMESH)
+!
+      use skip_comment_f
+!
+      type(FEM_mesh_control), intent(in) :: Fmesh_ctl
+      integer(kind = kint), intent(inout) :: iflag_output_VMESH
+!
+!
+      iflag_output_VMESH = 0
+!
+      if(Fmesh_ctl%FEM_viewer_output_switch%iflag .eq. 0) return
+      if(yes_flag(Fmesh_ctl%FEM_viewer_output_switch%charavalue)) then
+        iflag_output_VMESH = 1
+      end if
+ 
+      end subroutine set_FEM_viewer_output_flag
 !
 ! ----------------------------------------------------------------------
 !
@@ -260,8 +289,7 @@
         file_params%file_prefix = default_prefix
       end if
 !
-      call choose_file_format                                           &
-     &   (file_format_ctl, file_params%iflag_format)
+      file_params%iflag_format = choose_file_format(file_format_ctl)
 !
       end subroutine set_file_control_params
 !
@@ -287,8 +315,8 @@
         file_params%file_prefix = default_prefix
       end if
 !
-      call choose_para_file_format                                      &
-     &   (file_format_ctl, file_params%iflag_format)
+      file_params%iflag_format                                          &
+     &     = choose_para_file_format(file_format_ctl)
 !
       end subroutine set_parallel_file_ctl_params
 !

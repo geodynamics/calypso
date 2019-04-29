@@ -19,6 +19,10 @@
 !!      subroutine check_vis_control_flag(visualize_ctl, iflag_viz)
 !!      subroutine check_monitor_control_flag(iflag, monitor_ctl,       &
 !!     &          iflag_fld_monitor)
+!!
+!!      subroutine set_vis_control_flag(iflag_viz, visualize_ctl)
+!!      subroutine set_monitor_control_flag                             &
+!!     &         (iflag_fld_monitor, monitor_ctl)
 !!@endverbatim
 !
       module set_nodal_field_name
@@ -27,6 +31,14 @@
       use m_phys_labels
 !
       implicit  none
+!
+      character(len = kchara), parameter :: cflag_viz_on =  'Viz_On'
+      character(len = kchara), parameter :: cflag_viz_off = 'Viz_Off'
+!
+      character(len = kchara), parameter                                &
+     &                        :: cflag_monitor_on =  'Monitor_On'
+      character(len = kchara), parameter                                &
+     &                        :: cflag_monitor_off = 'Monitor_Off'
 !
 ! -----------------------------------------------------------------------
 !
@@ -60,7 +72,6 @@
      &  .or. (phys_nod_name_ctl .eq. fhd_grad_composit      )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_grad_par_light     )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_grad_ref_light     )           &
-     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_temp   )           &
      &      )   iflag = 1
 !
       if (   (phys_nod_name_ctl .eq. fhd_filter_velo        )           &
@@ -68,6 +79,13 @@
      &  .or. (phys_nod_name_ctl .eq. fhd_filter_vecp        )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_filter_magne       )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_filter_current     )           &
+     &      )   iflag = 1
+!
+      if (   (phys_nod_name_ctl .eq. fhd_square_v           )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_square_w           )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_square_b           )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_square_a           )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_square_j           )           &
      &      )   iflag = 1
 !
       if (   (phys_nod_name_ctl .eq. fhd_grad_v_1           )           &
@@ -85,6 +103,25 @@
      &  .or. (phys_nod_name_ctl .eq. fhd_grad_j_1           )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_grad_j_2           )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_grad_j_3           )           &
+     &      )   iflag = 1
+!
+      if (   (phys_nod_name_ctl .eq. fhd_grad_filter_v_1    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_v_2    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_v_3    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_w_1    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_w_2    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_w_3    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_a_1    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_a_2    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_a_3    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_b_1    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_b_2    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_b_3    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_j_1    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_j_2    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_j_3    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_temp   )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_grad_filter_comp   )           &
      &      )   iflag = 1
 !
       if (   (phys_nod_name_ctl .eq. fhd_viscous            )           &
@@ -120,15 +157,10 @@
 !
       if (   (phys_nod_name_ctl .eq. fhd_div_SGS_m_flux     )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_SGS_inertia        )           &
-     &  .or. (phys_nod_name_ctl .eq. fhd_wide_SGS_inertia   )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_SGS_h_flux         )           &
-     &  .or. (phys_nod_name_ctl .eq. fhd_wide_SGS_h_flux    )           &
-     &  .or. (phys_nod_name_ctl .eq. fhd_wide_SGS_c_flux    )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_SGS_c_flux         )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_SGS_Lorentz        )           &
-     &  .or. (phys_nod_name_ctl .eq. fhd_wide_SGS_Lorentz   )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_SGS_induction      )           &
-     &  .or. (phys_nod_name_ctl .eq. fhd_wide_SGS_vp_induct )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_SGS_vp_induct      )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_SGS_buoyancy       )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_SGS_comp_buo       )           &
@@ -152,6 +184,31 @@
      &  .or. (phys_nod_name_ctl .eq. fhd_w_filter_vecp     )            &
      &  .or. (phys_nod_name_ctl .eq. fhd_w_filter_magne    )            &
      &  .or. (phys_nod_name_ctl .eq. fhd_w_filter_current  )            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_w_filter_grad_temp)            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_w_filter_grad_comp)            &
+     &       )  iflag = 1
+!
+      if (   (phys_nod_name_ctl .eq. fhd_d_filter_velo     )            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_d_filter_vort     )            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_d_filter_vecp     )            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_d_filter_magne    )            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_d_filter_current  )            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_d_filter_grad_temp)            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_d_filter_grad_comp)            &
+     &       )  iflag = 1
+!
+      if (   (phys_nod_name_ctl .eq. fhd_wide_SGS_inertia   )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_wide_SGS_h_flux    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_wide_SGS_c_flux    )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_wide_SGS_vp_induct )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_wide_SGS_Lorentz   )           &
+     &       )  iflag = 1
+!
+      if (   (phys_nod_name_ctl .eq. fhd_dbl_SGS_inertia   )            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_dbl_SGS_h_flux    )            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_dbl_SGS_c_flux    )            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_dbl_SGS_vp_induct )            &
+     &  .or. (phys_nod_name_ctl .eq. fhd_dbl_SGS_Lorentz   )            &
      &       )  iflag = 1
 !
       if (   (phys_nod_name_ctl .eq. fhd_pre_mom            )           &
@@ -223,6 +280,10 @@
      &   .or. (phys_nod_name_ctl .eq. fhd_SGS_comp            )         &
      &      )   iflag = 1
 !
+      if (    (phys_nod_name_ctl .eq. fhd_square_t            )         &
+     &   .or. (phys_nod_name_ctl .eq. fhd_square_c            )         &
+     &      )   iflag = 1
+!
       if (    (phys_nod_name_ctl .eq. fhd_kinetic_helicity    )         &
      &   .or. (phys_nod_name_ctl .eq. fhd_magnetic_helicity   )         &
      &   .or. (phys_nod_name_ctl .eq. fhd_current_helicity    )         &
@@ -282,6 +343,8 @@
 !
       if (    (phys_nod_name_ctl .eq. fhd_w_filter_temp      )          &
      &   .or. (phys_nod_name_ctl .eq. fhd_w_filter_comp      )          &
+     &   .or. (phys_nod_name_ctl .eq. fhd_d_filter_temp      )          &
+     &   .or. (phys_nod_name_ctl .eq. fhd_d_filter_comp      )          &
      &       ) iflag = 1
 !
       if (    (phys_nod_name_ctl .eq. fhd_Csim_SGS_h_flux    )          &
@@ -397,8 +460,11 @@
       character(len = kchara), intent(in) :: visualize_ctl
       integer (kind = kint), intent(inout) :: iflag_viz
 !
-      iflag_viz = 0
-      if (cmp_no_case(visualize_ctl, 'Viz_On'))  iflag_viz = 1
+      if (cmp_no_case(visualize_ctl, cflag_viz_on)) then
+        iflag_viz = 1
+      else
+        iflag_viz = 0
+      end if
 !
       end subroutine check_vis_control_flag
 !
@@ -414,10 +480,45 @@
       integer (kind = kint), intent(inout) :: iflag_fld_monitor
 !
       if (iflag .eq. 0) return
-      iflag_fld_monitor = 0
-      if (cmp_no_case(monitor_ctl, 'Monitor_On')) iflag_fld_monitor = 1
+      if(cmp_no_case(monitor_ctl, cflag_monitor_on)) then
+        iflag_fld_monitor = 1
+      else
+        iflag_fld_monitor = 0
+      end if
 !
       end subroutine check_monitor_control_flag
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_vis_control_flag(iflag_viz, visualize_ctl)
+!
+      integer (kind = kint), intent(in) :: iflag_viz
+      character(len = kchara), intent(inout) :: visualize_ctl
+!
+      if(iflag_viz .gt. 0) then
+        visualize_ctl = cflag_viz_on
+      else
+        visualize_ctl = cflag_viz_off
+      end if
+!
+      end subroutine set_vis_control_flag
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_monitor_control_flag                               &
+     &         (iflag_fld_monitor, monitor_ctl)
+!
+      integer (kind = kint), intent(in) :: iflag_fld_monitor
+      character(len = kchara), intent(inout) :: monitor_ctl
+!
+      if(iflag_fld_monitor .gt. 0) then
+        monitor_ctl = cflag_monitor_on
+      else
+        monitor_ctl = cflag_monitor_off
+      end if
+!
+      end subroutine set_monitor_control_flag
 !
 ! -----------------------------------------------------------------------
 !

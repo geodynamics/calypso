@@ -36,6 +36,9 @@
 !!      subroutine sel_cppy_from_recv_buf_int(iflag_SR, nnod_new,       &
 !!     &                       ntot_import, inod_import, irev_import,   &
 !!     &                       iWR, iX_new)
+!!      subroutine sel_cppy_from_recv_buf_i8(iflag_SR, nnod_new,        &
+!!     &                       ntot_import, inod_import, irev_import,   &
+!!     &                       i8WR, i8X_new)
 !!@endverbatim
 !!
 !!@n @param  iflag_SR    import table mode
@@ -350,6 +353,36 @@
       end if
 !
       end subroutine sel_cppy_from_recv_buf_int
+!
+! ----------------------------------------------------------------------
+!
+      subroutine sel_cppy_from_recv_buf_i8(iflag_SR, nnod_new,          &
+     &                       ntot_import, inod_import, irev_import,     &
+     &                       i8WR, i8X_new)
+!
+      use set_from_recv_buffer
+      use set_from_recv_buf_rev
+!
+      integer(kind = kint), intent(in) :: iflag_SR
+      integer(kind = kint), intent(in) :: nnod_new
+!
+      integer(kind = kint), intent(in) :: ntot_import
+      integer(kind = kint), intent(in) :: inod_import(ntot_import)
+      integer(kind = kint), intent(in) :: irev_import(nnod_new)
+      integer(kind = kint_gl), intent(inout):: i8WR(ntot_import+1)
+!
+      integer(kind = kint_gl), intent(inout):: i8X_new(nnod_new)
+!
+!C-- RECV
+      if(iflag_SR .eq. iflag_import_rev) then
+        call set_from_recv_buf_rev_i8(nnod_new,                         &
+     &      ntot_import, irev_import, i8WR(1), i8X_new)
+      else
+        call set_from_recv_buf_i8(nnod_new,                             &
+     &      ntot_import, inod_import, i8WR(1), i8X_new)
+      end if
+!
+      end subroutine sel_cppy_from_recv_buf_i8
 !
 ! ----------------------------------------------------------------------
 !

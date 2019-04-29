@@ -7,34 +7,22 @@
 !> @brief Data for merged UCD file output
 !!
 !!@verbatim
-!!      subroutine allocate_merged_ucd_num(m_ucd)
-!!      subroutine allocate_merged_ucd_data(numnod, ntot_comp)
-!!      subroutine deallocate_merged_ucd_data(m_ucd)
-!!
-!!      subroutine set_node_double_address                              &
-!!     &         (NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,          &
-!!     &          STACK_EXPORT, NOD_EXPORT)
 !!      subroutine update_ele_by_double_address                         &
-!!     &         (istack_internod, m_ucd, ucd)
+!!     &         (istack_internod, dbl_id, m_ucd, ucd)
+!!        type(merged_ucd_data), intent(in) :: m_ucd
+!!        type(ucd_data), intent(inout) :: ucd
+!!        type(parallel_double_numbering), intent(inout) :: dbl_id
 !!@endverbatim
 !
       module m_merged_ucd_data
 !
       use m_precision
       use m_constants
+      use t_para_double_numbering
 !
       use calypso_mpi
 !
       implicit none
-!
-!>        number of node for each subdomain
-      integer(kind = kint) :: nnod_ucd_local
-!>        local node ID
-      integer(kind = kint), allocatable :: inod_local_ucd(:)
-!>        belonged subdomains ID for each node
-      integer(kind = kint), allocatable :: ihome_pe_ucd(:)
-!
-      private :: nnod_ucd_local, ihome_pe_ucd, inod_local_ucd
 !
 ! -----------------------------------------------------------------------
 !
@@ -42,87 +30,17 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine allocate_merged_ucd_data(numnod)
-!
-      use m_phys_constants
-!
-      integer(kind = kint), intent(in) :: numnod
-!
-!
-      nnod_ucd_local = numnod
-      allocate(inod_local_ucd(nnod_ucd_local))
-      allocate(ihome_pe_ucd(nnod_ucd_local))
-      if(nnod_ucd_local .gt. 0) then
-        inod_local_ucd = 0
-        ihome_pe_ucd =   0
-      end if
-!
-      end subroutine allocate_merged_ucd_data
-!
-! -----------------------------------------------------------------------
-!
-      subroutine deallocate_merged_ucd_data(m_ucd)
-!
-      use t_ucd_data
-!
-      type(merged_ucd_data), intent(inout) :: m_ucd
-!
-!
-      deallocate(inod_local_ucd, ihome_pe_ucd)
-!
-      call disconnect_merged_ucd_stack(m_ucd)
-!
-      end subroutine deallocate_merged_ucd_data
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine set_node_double_address                                &
-     &         (NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,            &
-     &          STACK_EXPORT, NOD_EXPORT)
-!
-      use t_ucd_data
-      use solver_SR_int
-!
-      integer(kind=kint ), intent(in) :: NEIBPETOT
-      integer(kind=kint ), intent(in) :: NEIBPE(NEIBPETOT)
-      integer(kind=kint ), intent(in) :: STACK_IMPORT(0:NEIBPETOT)
-      integer(kind=kint ), intent(in)                                   &
-     &        :: NOD_IMPORT(STACK_IMPORT(NEIBPETOT))
-      integer(kind=kint ), intent(in) :: STACK_EXPORT(0:NEIBPETOT)
-      integer(kind=kint ), intent(in)                                   &
-     &        :: NOD_EXPORT(STACK_EXPORT(NEIBPETOT))
-!
-      integer(kind = kint) :: inod
-!
-!$omp parallel do
-      do inod = 1, nnod_ucd_local
-        inod_local_ucd(inod) = inod
-        ihome_pe_ucd(inod) =   my_rank + 1
-      end do
-!$omp end parallel do
-!
-      call solver_send_recv_i(nnod_ucd_local, NEIBPETOT, NEIBPE,        &
-     &            STACK_IMPORT, NOD_IMPORT, STACK_EXPORT, NOD_EXPORT,   &
-     &            inod_local_ucd)
-      call solver_send_recv_i(nnod_ucd_local, NEIBPETOT, NEIBPE,        &
-     &            STACK_IMPORT, NOD_IMPORT, STACK_EXPORT, NOD_EXPORT,   &
-     &            ihome_pe_ucd)
-!
-      end subroutine set_node_double_address
-!
-! -----------------------------------------------------------------------
-!
       subroutine update_ele_by_double_address                           &
-     &         (istack_internod, m_ucd, ucd)
+     &         (istack_internod, dbl_id, m_ucd, ucd)
 !
       use t_ucd_data
 !
       integer(kind = kint_gl), intent(in) :: istack_internod(0:nprocs)
+      type(parallel_double_numbering), intent(in) :: dbl_id
       type(merged_ucd_data), intent(in) :: m_ucd
       type(ucd_data), intent(inout) :: ucd
 !
-      integer(kind = kint) :: ip, k1
+      integer(kind = kint) :: ip, irank, k1
       integer(kind = kint_gl) :: inod, iele
 !
       do ip = 1, nprocs
@@ -135,12 +53,12 @@
 !
 !$omp parallel private(iele)
       do k1 = 1, ucd%nnod_4_ele
-!$omp do private(inod,ip)
+!$omp do private(inod,irank)
         do iele = 1, ucd%nele
           inod = ucd%ie(iele,k1)
-          ip = ihome_pe_ucd(inod)
-          ucd%ie(iele,k1) = m_ucd%istack_merged_intnod(ip-1)            &
-     &                 + inod_local_ucd(inod)
+          irank = dbl_id%irank_home(inod)
+          ucd%ie(iele,k1) = m_ucd%istack_merged_intnod(irank)           &
+     &                 + dbl_id%inod_local(inod)
         end do
 !$omp end do nowait
       end do

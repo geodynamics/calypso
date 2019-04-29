@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine set_control_4_gen_shell_grids                        &
-!!     &         (plt, psph_ctl, sph, sph_files, gen_sph, ierr)
+!!     &         (id_rank, plt, psph_ctl, sph, sph_files, gen_sph, ierr)
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !!        type(sph_grids), intent(inout) :: sph
@@ -16,9 +16,10 @@
 !!        type(field_IO_params), intent(inout) :: sph_file_param
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
 !!      subroutine set_control_4_shell_grids(nprocs_check,              &
-!!     &          spctl, sdctl, sph, gen_sph, ierr)
+!!     &          Fmesh_ctl, spctl, sdctl, sph, gen_sph, ierr)
+!!        type(FEM_mesh_control), intent(in) :: Fmesh_ctl
 !!        type(sphere_data_control), intent(inout) :: spctl
-!!        type(sphere_domain_control), intent(inout) :: sdctl
+!!        type(sphere_domain_control), intent(in) :: sdctl
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
 !!@endverbatim
@@ -30,6 +31,7 @@
       use t_spheric_parameter
       use t_file_IO_parameter
       use t_ctl_data_4_platforms
+      use t_ctl_data_4_FEM_mesh
       use t_ctl_data_gen_sph_shell
       use t_ctl_data_4_sphere_model
       use t_ctl_data_4_divide_sphere
@@ -40,10 +42,8 @@
 !
 !>      Structure of file name and format for MHD
       type gen_sph_file_IO_params
-!>        Integer flag to output surface data
-        integer(kind = kint) :: iflag_output_FEM = 0
-!>        Integer flag to output surface data
-        integer(kind = kint) :: iflag_output_SURF = 0
+!>        FEM mesh IO flags
+        type(FEM_file_IO_flags) :: FEM_mesh_flags
 !>        Structure of mesh file IO paramters
         type(field_IO_params) :: mesh_file_IO
 !>        Structure of file name and format for spectr data file
@@ -55,7 +55,7 @@
       character(len=kchara), parameter :: cflag_SGS_t = 'SGS_theta'
 !
       private :: cflag_SGS_r, cflag_SGS_t
-      private :: set_control_4_shell_filess
+      private :: set_control_4_shell_files
       private :: set_ctl_radius_4_shell, set_control_4_SGS_shell
 !
 !  ---------------------------------------------------------------------
@@ -65,8 +65,9 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_control_4_gen_shell_grids                          &
-     &         (plt, psph_ctl, sph, sph_files, gen_sph, ierr)
+     &         (id_rank, plt, psph_ctl, sph, sph_files, gen_sph, ierr)
 !
+      integer, intent(in) :: id_rank
       type(platform_data_control), intent(in) :: plt
       type(parallel_sph_shell_control), intent(inout) :: psph_ctl
       type(sph_grids), intent(inout) :: sph
@@ -74,47 +75,52 @@
       type(construct_spherical_grid), intent(inout) :: gen_sph
       integer(kind = kint), intent(inout) :: ierr
 !
-      integer(kind = kint) :: nprocs_check
+      integer :: nprocs_check
 !
 !
-      call set_control_4_shell_filess(plt, nprocs_check, sph_files)
+      call set_control_4_shell_files                                    &
+     &   (id_rank, plt, psph_ctl%Fmesh_ctl, nprocs_check, sph_files)
 !
       call set_control_4_shell_grids                                    &
-     &   (nprocs_check, psph_ctl%spctl, psph_ctl%sdctl,                 &
-     &    sph, gen_sph, ierr)
+     &   (nprocs_check, psph_ctl%Fmesh_ctl, psph_ctl%spctl,             &
+     &    psph_ctl%sdctl, sph, gen_sph, ierr)
+      call dealloc_parallel_shell_ctl(psph_ctl)
+      call reset_control_shell_define(psph_ctl%spctl)
 !
       end subroutine set_control_4_gen_shell_grids
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine set_control_4_shell_filess                             &
-     &         (plt, nprocs_check, sph_files)
+      subroutine set_control_4_shell_files                              &
+     &         (id_rank, plt, Fmesh_ctl, nprocs_check, sph_files)
 !
       use set_control_platform_data
       use gen_sph_grids_modes
 !
+      integer, intent(in) :: id_rank
       type(platform_data_control), intent(in) :: plt
+      type(FEM_mesh_control), intent(in) :: Fmesh_ctl
       type(gen_sph_file_IO_params), intent(inout) ::  sph_files
-      integer(kind = kint), intent(inout) :: nprocs_check
+      integer, intent(inout) :: nprocs_check
 !
 !
       nprocs_check = 1
       if(plt%ndomain_ctl%iflag .gt. 0) then
-        nprocs_check = plt%ndomain_ctl%intvalue
+        nprocs_check = int(plt%ndomain_ctl%intvalue)
       end if
 !
-      call turn_off_debug_flag_by_ctl(izero, plt)
-      call set_control_sph_mesh                                         &
-     &   (plt, sph_files%mesh_file_IO, sph_files%sph_file_IO,           &
-     &    sph_files%iflag_output_FEM, sph_files%iflag_output_SURF)
+      call turn_off_debug_flag_by_ctl(id_rank, plt)
+      call set_control_sph_mesh(plt, Fmesh_ctl,                         &
+     &    sph_files%mesh_file_IO, sph_files%sph_file_IO,                &
+     &    sph_files%FEM_mesh_flags)
 !
-      end subroutine set_control_4_shell_filess
+      end subroutine set_control_4_shell_files
 !
 !  ---------------------------------------------------------------------
 !
       subroutine set_control_4_shell_grids(nprocs_check,                &
-     &          spctl, sdctl, sph, gen_sph, ierr)
+     &          Fmesh_ctl, spctl, sdctl, sph, gen_sph, ierr)
 !
       use m_constants
       use m_machine_parameter
@@ -126,9 +132,10 @@
       use set_control_sph_subdomains
       use skip_comment_f
 !
-      integer(kind = kint), intent(in) :: nprocs_check
-      type(sphere_data_control), intent(inout) :: spctl
-      type(sphere_domain_control), intent(inout) :: sdctl
+      integer, intent(in) :: nprocs_check
+      type(FEM_mesh_control), intent(in) :: Fmesh_ctl
+      type(sphere_data_control), intent(in) :: spctl
+      type(sphere_domain_control), intent(in) :: sdctl
       type(sph_grids), intent(inout) :: sph
       type(construct_spherical_grid), intent(inout) :: gen_sph
       integer(kind = kint), intent(inout) :: ierr
@@ -166,6 +173,7 @@
 !
       call set_subdomains_4_sph_shell                                   &
      &    (nprocs_check, sdctl, gen_sph%s3d_ranks, ierr, e_message)
+!
       if (ierr .gt. 0) return
 !
 !
@@ -192,6 +200,14 @@
         write(*,*) "Grid has less than Nyquist's sampling theorem"
       end if
 !
+!
+      gen_sph%num_FEM_sleeve = 1
+      if(Fmesh_ctl%FEM_sleeve_level_ctl%iflag .gt. 0) then
+        gen_sph%num_FEM_sleeve                                          &
+     &        = Fmesh_ctl%FEM_sleeve_level_ctl%intvalue
+      end if
+      if(gen_sph%num_FEM_sleeve .lt. 1) gen_sph%num_FEM_sleeve = 1
+!
       end subroutine set_control_4_shell_grids
 !
 !  ---------------------------------------------------------------------
@@ -205,7 +221,7 @@
       use const_sph_radial_grid
       use skip_comment_f
 !
-      type(sphere_data_control), intent(inout) :: spctl
+      type(sphere_data_control), intent(in) :: spctl
       type(sph_shell_parameters), intent(inout) :: sph_params
       type(sph_rtp_grid), intent(inout) :: sph_rtp
       type(sph_rj_grid), intent(inout) :: sph_rj
@@ -215,6 +231,7 @@
 !
       integer(kind = kint) :: i, kr, icou
       real(kind = kreal) :: ICB_to_CMB_ratio, fluid_core_size
+      real(kind = kreal) :: r_in, r_out
 !
 !
       sph_params%iflag_radial_grid =  igrid_Chebyshev
@@ -279,8 +296,6 @@
             kr = spctl%radius_ctl%ivec(i)
             s3d_radius%radius_1d_gl(kr) = spctl%radius_ctl%vect(i)
           end do
-!
-          call dealloc_control_array_i_r(spctl%radius_ctl)
         end if
 !
         sph_params%nlayer_2_center = -1
@@ -304,7 +319,6 @@
             end if
           end do
 !
-          call dealloc_control_array_c_i(spctl%radial_grp_ctl)
         end if
 !
 !   Set radial grid by Chebyshev, equaidistance, or half Chebyshev
@@ -329,20 +343,21 @@
         end if
 !
         if(spctl%Min_radius_ctl%iflag.eq.0) then
-          spctl%Min_radius_ctl%realvalue = sph_params%radius_ICB
-        end if
-        if(spctl%Max_radius_ctl%iflag.eq.0) then
-          spctl%Max_radius_ctl%realvalue = sph_params%radius_CMB
+          r_in = sph_params%radius_ICB
+        else
+          r_in = spctl%Min_radius_ctl%realvalue
         end if
 !
-        if(spctl%Min_radius_ctl%realvalue .eq. zero) then
-          sph_rj%iflag_rj_center = 1
+        if(spctl%Max_radius_ctl%iflag.eq.0) then
+          r_out = sph_params%radius_CMB
+        else
+          r_out = spctl%Max_radius_ctl%realvalue
         end if
+!
+        if(r_in .eq. zero)  sph_rj%iflag_rj_center = 1
 !
         call count_set_radial_grid(spctl%num_fluid_grid_ctl%intvalue,   &
-     &      spctl%Min_radius_ctl%realvalue,                             &
-     &      spctl%Max_radius_ctl%realvalue, sph_params, sph_rtp,        &
-     &      s3d_radius)
+     &      r_in,  r_out, sph_params, sph_rtp, s3d_radius)
       end if
 !
 !       Check whole sphere model
@@ -355,7 +370,7 @@
         end if
 !
         if(spctl%Min_radius_ctl%iflag .ne. 0                            &
-     &     .and. spctl%Min_radius_ctl%realvalue .ne. zero) then
+     &     .and. r_in .ne. zero) then
           write(*,*)                                                    &
      &     'Set minimum radius to be zero for whole sphere'
           ierr = ierr_mesh
@@ -382,7 +397,7 @@
       use t_control_1D_layering
 !
       type(sph_grids), intent(in) :: sph
-      type(sphere_data_control), intent(inout) :: spctl
+      type(sphere_data_control), intent(in) :: spctl
       type(layering_group_list), intent(inout) :: r_layer_grp
       type(layering_group_list), intent(inout) :: med_layer_grp
 !

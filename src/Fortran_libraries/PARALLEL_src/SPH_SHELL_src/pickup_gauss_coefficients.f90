@@ -106,6 +106,7 @@
 !
       type(picked_spectrum_data), intent(inout) :: gauss_coef
 !
+      integer(kind = kint_gl) :: num64
       integer(kind = kint) :: inum, j, l, inod
       real(kind = kreal) :: rcmb_to_Re, ricb_to_Rref
       real(kind = kreal) :: r_4_gauss_coefs, a2r_4_gauss
@@ -153,9 +154,9 @@
 !$omp end parallel do
       end if
 !
-      call MPI_allREDUCE(gauss_coef%d_rj_lc, gauss_coef%d_rj_gl,        &
-     &    gauss_coef%num_sph_mode, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, &
-     &    ierr_MPI)
+      num64 = int(gauss_coef%num_sph_mode,KIND(num64))
+      call calypso_mpi_allreduce_real                                   &
+     &   (gauss_coef%d_rj_lc, gauss_coef%d_rj_gl, num64, MPI_SUM)
 !
       end subroutine cal_gauss_coefficients
 !

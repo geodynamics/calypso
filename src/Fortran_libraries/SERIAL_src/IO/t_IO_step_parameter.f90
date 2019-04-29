@@ -8,30 +8,35 @@
 !> @brief Parameteres for time steppings
 !!
 !!@verbatim
-!!      subroutine set_output_step_4_fixed_step(istep_def, dt,          &
+!!      subroutine output_step_4_fixed_step_ctl(istep_def, dt,          &
 !!     &          istep_ctl, delta_t_ctl, IO_step)
-!!      subroutine set_output_step_4_flex_step                          &
+!!      subroutine output_step_4_flex_step_ctl                          &
 !!     &         (istep_def, dt_max, step_ctl, delta_t_ctl, IO_step)
 !!        type(read_integer_item), intent(inout) :: step_ctl
 !!        type(read_real_item), intent(inout) :: delta_t_ctl
 !!        type(IO_step_param), intent(inout) :: IO_step
-!!      subroutine accum_output_flag(i_step, IO_step, i_flag)
 !!      integer(kind = kint) function output_IO_flag(i_step, IO_step)
 !!        type(IO_step_param), intent(in) :: IO_step
-!!      integer(kind = kint) function set_IO_step_flag(i_step, IO_step)
+!!      integer(kind = kint) function set_IO_step(i_step, IO_step)
 !!        type(IO_step_param), intent(inout) :: IO_step
-!!
-!!      subroutine accum_flag_to_visualization(i_step, IO_step, visval)
-!!        type(IO_step_param), intent(in) :: IO_step
+!!      subroutine set_IO_step_flag(i_step, IO_step)
+!!        type(IO_step_param), intent(inout) :: IO_step
 !!
 !!      subroutine set_monitor_param_4_fixed_step(istep_def, istep_ctl, &
 !!     &          delta_t_ctl, istep_out, dt_out)
 !!      subroutine set_monitor_param_4_flex_step(istep_def, dt_max,     &
 !!     &          istep_ctl, delta_t_ctl, istep_out, dt_out)
 !!      integer(kind = kint) function output_flag(i_step, increment)
-!!      subroutine set_viz_file_step(istep_ref, i_step_viz, iviz, i_cnt)
-!!      subroutine set_viz_flex_file_step(time_d, IO_step, iviz)
-!!end@verbatim
+!!
+!!      integer(kind = kint) function iflag_viz_flex_step               &
+!!     &                            (time_d, IO_step)
+!!        type(time_data), intent(in) :: time_d
+!!        type(IO_step_param), intent(in) :: IO_step
+!!      subroutine istep_file_w_fix_dt(i_step, IO_step)
+!!      subroutine istep_file_w_flex_dt(time_d, IO_step)
+!!        type(time_data), intent(in) :: time_d
+!!        type(IO_step_param), intent(inout) :: IO_step
+!!@endverbatim
 !!
       module  t_IO_step_parameter
 !
@@ -57,19 +62,6 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine accum_output_flag(i_step, IO_step, i_flag)
-!
-      integer (kind =kint), intent(in) :: i_step
-      type(IO_step_param), intent(in) :: IO_step
-      integer (kind =kint), intent(inout) :: i_flag
-!
-!
-      i_flag = i_flag * output_flag(i_step, IO_step%increment)
-!
-      end subroutine accum_output_flag
-!
-!-----------------------------------------------------------------------
-!
       integer(kind = kint) function output_IO_flag(i_step, IO_step)
 !
       integer (kind =kint), intent(in) :: i_step
@@ -82,41 +74,40 @@
 !
 !-----------------------------------------------------------------------
 !
-      integer(kind = kint) function set_IO_step_flag(i_step, IO_step)
+      integer(kind = kint) function set_IO_step(i_step, IO_step)
+!
+      integer (kind =kint), intent(in) :: i_step
+      type(IO_step_param), intent(in) :: IO_step
+!
+!
+      if(IO_step%increment .eq. 0) then
+         set_IO_step = 0
+       else if(i_step .eq. -1) then
+         set_IO_step = -1
+       else
+         set_IO_step = i_step / IO_step%increment
+       end if
+!
+      end function set_IO_step
+!
+!-----------------------------------------------------------------------
+!
+      subroutine set_IO_step_flag(i_step, IO_step)
 !
       integer (kind =kint), intent(in) :: i_step
       type(IO_step_param), intent(inout) :: IO_step
 !
 !
-      set_IO_step_flag = output_flag(i_step, IO_step%increment)
       if(IO_step%increment .gt. 0) then
          IO_step%istep_file = i_step / IO_step%increment
        end if
 !
-      end function set_IO_step_flag
+      end subroutine set_IO_step_flag
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine accum_flag_to_visualization(i_step, IO_step, visval)
-!
-      integer (kind =kint), intent(in) :: i_step
-      integer(kind=kint ), intent(inout) :: visval
-      type(IO_step_param), intent(inout) :: IO_step
-!
-      integer(kind=kint ) :: iflag
-!
-!
-      call set_viz_file_step(i_step, IO_step%increment,                 &
-     &    iflag, IO_step%istep_file)
-      visval = visval * iflag
-!
-      end subroutine accum_flag_to_visualization
-!
-!-----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine set_output_step_4_fixed_step(istep_def, dt,            &
+      subroutine output_step_4_fixed_step_ctl(istep_def, dt,            &
      &          istep_ctl, delta_t_ctl, IO_step)
 !
       use t_control_elements
@@ -140,11 +131,11 @@
         IO_step%delta_t = dble(IO_step%increment) * dt
       end if
 !
-      end subroutine set_output_step_4_fixed_step
+      end subroutine output_step_4_fixed_step_ctl
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_output_step_4_flex_step(istep_def, dt_max,         &
+      subroutine output_step_4_flex_step_ctl(istep_def, dt_max,         &
      &          istep_ctl, delta_t_ctl, IO_step)
 !
       use t_control_elements
@@ -168,7 +159,7 @@
         IO_step%increment = nint(IO_step%delta_t / dt_max)
       end if
 !
-      end subroutine set_output_step_4_flex_step
+      end subroutine output_step_4_flex_step_ctl
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -178,64 +169,77 @@
       integer (kind = kint), intent(in) :: i_step, increment
 !
 !
-      if ( increment .eq. 0) then
-        output_flag = ione
-      else
-        output_flag = mod(i_step,increment)
-      end if
+      output_flag = ione
+      if(increment .eq. 0) return
+!
+      output_flag = mod(i_step,increment)
 !
       end function output_flag
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
-      subroutine set_viz_file_step(istep_ref, i_step_viz, iviz, i_cnt)
+      integer(kind = kint) function iflag_viz_flex_step                 &
+     &                            (time_d, IO_step)
 !
-      integer(kind = kint), intent(in) :: istep_ref, i_step_viz
-      integer(kind = kint), intent(inout) :: iviz, i_cnt
+      use t_time_data
+!
+      type(time_data), intent(in) :: time_d
+      type(IO_step_param), intent(in) :: IO_step
+!
+      real(kind= kreal) :: t_next
+      integer(kind = kint) :: i_now, i_next
 !
 !
-      if(i_step_viz .eq. izero) then
-        iviz =  ione
-        i_cnt =-ione
-      else 
-        iviz = mod(istep_ref,i_step_viz)
-        if (iviz .eq. izero) then
-          i_cnt = istep_ref / i_step_viz
-        else 
-          i_cnt = -ione
-        end if
+      iflag_viz_flex_step = 1
+      if (IO_step%delta_t .eq. zero) return
+!
+      t_next = time_d%time + time_d%dt
+      i_next = int(t_next / IO_step%delta_t,KIND(i_next))
+      i_now =  int(time_d%time / IO_step%delta_t,KIND(i_now))
+      if(i_next .ne. i_now) iflag_viz_flex_step = 0
+!
+      end function iflag_viz_flex_step
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine istep_file_w_fix_dt(i_step, IO_step)
+!
+      integer(kind = kint), intent(in) :: i_step
+      type(IO_step_param), intent(inout) :: IO_step
+!
+!
+      IO_step%istep_file = -ione
+      if(IO_step%increment .eq. izero) return
+      if (mod(i_step,IO_step%increment) .eq. izero) then
+        IO_step%istep_file = i_step / IO_step%increment
       end if
 !
-      end subroutine set_viz_file_step
+      end subroutine istep_file_w_fix_dt
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_viz_flex_file_step(time_d, IO_step, iviz)
+      subroutine istep_file_w_flex_dt(time_d, IO_step)
 !
       use t_time_data
 !
       type(time_data), intent(in) :: time_d
       type(IO_step_param), intent(inout) :: IO_step
-      integer(kind = kint), intent(inout) :: iviz
 !
-      integer(kind = kint) :: istep, iref
+      real(kind= kreal) :: t_next
+      integer(kind = kint) :: i_now, i_next
 !
 !
-      istep = int(time_d%time / time_d%dt)
-      if (IO_step%delta_t .eq. zero) then
-        iviz =   ione
-        IO_step%istep_file = -ione
-      else
-         iref =  int(IO_step%delta_t / time_d%dt)
-         iviz = mod(istep, iref)
-        if (iviz .eq. izero) then
-          IO_step%istep_file = istep / iref
-        else 
-          IO_step%istep_file = -ione
-        end if
-      end if
+      IO_step%istep_file = -ione
+      if(IO_step%delta_t .eq. zero) return
 !
-      end subroutine set_viz_flex_file_step
+      t_next = time_d%time + time_d%dt
+      i_next = int(t_next / IO_step%delta_t, KIND(i_next))
+      i_now =  int(time_d%time / IO_step%delta_t, KIND(i_now))
+      if(i_next .ne. i_now) IO_step%istep_file = i_next
+!
+      end subroutine istep_file_w_flex_dt
 !
 ! -----------------------------------------------------------------------
 !

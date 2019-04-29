@@ -8,11 +8,11 @@
 !!
 !!@verbatim
 !!      subroutine dealloc_ndomain_rtp_ctl(sdctl)
-!!      subroutine dealloc_ndomain_rtm_ctl(sdctl)
-!!      subroutine dealloc_ndomain_rj_ctl(sdctl)
 !!
 !!      subroutine read_control_shell_domain(hd_block, iflag, sdctl)
 !!        type(sphere_domain_control), intent(inout) :: sdctl
+!!      subroutine write_control_shell_domain                           &
+!!     &         (id_file, hd_block, sdctl, level)
 !!
 !!  ---------------------------------------------------------------------
 !!    example of control data
@@ -107,29 +107,12 @@
 !
       type(sphere_domain_control), intent(inout) :: sdctl
 !
+!
       call dealloc_control_array_c_i(sdctl%ndomain_sph_grid_ctl)
-!
-      end subroutine dealloc_ndomain_rtp_ctl
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine dealloc_ndomain_rtm_ctl(sdctl)
-!
-      type(sphere_domain_control), intent(inout) :: sdctl
-!
       call dealloc_control_array_c_i(sdctl%ndomain_legendre_ctl)
-!
-      end subroutine dealloc_ndomain_rtm_ctl
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine dealloc_ndomain_rj_ctl(sdctl)
-!
-      type(sphere_domain_control), intent(inout) :: sdctl
-!
       call dealloc_control_array_c_i(sdctl%ndomain_spectr_ctl)
 !
-      end subroutine dealloc_ndomain_rj_ctl
+      end subroutine dealloc_ndomain_rtp_ctl
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
@@ -150,7 +133,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag =  find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
         call read_chara_ctl_type                                        &
@@ -170,6 +153,50 @@
       end do
 !
       end subroutine read_control_shell_domain
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine write_control_shell_domain                             &
+     &         (id_file, hd_block, sdctl, level)
+!
+      use m_read_control_elements
+      use write_control_elements
+      use write_control_arrays
+!
+      integer(kind = kint), intent(in) :: id_file
+      character(len=kchara), intent(in) :: hd_block
+      type(sphere_domain_control), intent(in) :: sdctl
+!
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
+!
+!
+      maxlen = max(maxlen, len_trim(hd_inner_decomp))
+      maxlen = max(maxlen, len_trim(hd_num_radial_domain))
+      maxlen = max(maxlen, len_trim(hd_num_horiz_domain))
+!
+      write(id_file,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_file, level, hd_block)
+!
+      call write_chara_ctl_type(id_file, level, maxlen,                 &
+     &    hd_inner_decomp, sdctl%inner_decomp_ctl)
+!
+      call write_integer_ctl_type(id_file, level, maxlen,               &
+     &    hd_num_radial_domain, sdctl%num_radial_domain_ctl)
+      call write_integer_ctl_type(id_file, level, maxlen,               &
+     &    hd_num_horiz_domain, sdctl%num_horiz_domain_ctl)
+!
+      call write_control_array_c_i(id_file, level,                      &
+     &    hd_ndomain_rtp, sdctl%ndomain_sph_grid_ctl)
+      call write_control_array_c_i(id_file, level,                      &
+     &    hd_ndomain_rtm, sdctl%ndomain_legendre_ctl)
+      call write_control_array_c_i(id_file, level,                      &
+     &    hd_ndomain_rj, sdctl%ndomain_spectr_ctl)
+!
+      level =  write_end_flag_for_ctl(id_file, level, hd_block)
+!
+      end subroutine write_control_shell_domain
 !
 !  ---------------------------------------------------------------------
 !

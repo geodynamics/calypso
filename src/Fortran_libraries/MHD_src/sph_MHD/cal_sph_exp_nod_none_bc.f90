@@ -89,21 +89,29 @@
       real(kind = kreal) :: d1s_dr1
 !
 !
-!$omp parallel do private(inod,i_p1,i_p2,j,d1s_dr1)
+!$omp parallel
+!$omp do private(inod,j)
+      do j = 1, jmax
+        inod = j + (kr_in-1) * jmax
+        d_rj(inod,is_grad+1) = d_rj(inod,is_fld)
+        d_rj(inod,is_grad+2) = zero
+      end do
+!$omp end do
+!
+!$omp do private(inod,i_p1,i_p2,j,d1s_dr1)
       do j = 1, jmax
         inod = j + (kr_in-1) * jmax
         i_p1 = inod + jmax
         i_p2 = i_p1 + jmax
 !
-        d1s_dr1 =  fdm2_fix_fld_ICB( 0,2) * d_rj(inod,is_fld)           &
-     &           + fdm2_fix_fld_ICB( 1,2) * d_rj(i_p1,is_fld)           &
-     &           + fdm2_fix_fld_ICB( 2,2) * d_rj(i_p2,is_fld)
+        d1s_dr1 =  fdm2_fix_fld_ICB( 0,2) * d_rj(inod,is_grad+1)        &
+     &           + fdm2_fix_fld_ICB( 1,2) * d_rj(i_p1,is_grad+1)        &
+     &           + fdm2_fix_fld_ICB( 2,2) * d_rj(i_p2,is_grad+1)
 !
         d_rj(inod,is_grad  ) = d1s_dr1 * g_sph_rj(j,13) * r_ICB(0)**2
-        d_rj(inod,is_grad+1) = d_rj(inod,is_fld)
-        d_rj(inod,is_grad+2) = zero
       end do
-!$omp end parallel do
+!$omp end do
+!$omp end parallel
 !
       end subroutine cal_sph_nod_nobc_in_grad2
 !
@@ -245,21 +253,29 @@
       real(kind = kreal) :: d1s_dr1
 !
 !
-!$omp parallel do private(inod,i_n1,i_n2,j,d1s_dr1)
+!$omp parallel
+!$omp do private(inod,j)
+      do j = 1, jmax
+        inod = j + (kr_out-1) * jmax
+        d_rj(inod,is_grad+1) = d_rj(inod,is_fld  )
+        d_rj(inod,is_grad+2) = zero
+      end do
+!$omp end do
+!
+!$omp do private(inod,i_n1,i_n2,j,d1s_dr1)
       do j = 1, jmax
         inod = j + (kr_out-1) * jmax
         i_n1 = inod - jmax
         i_n2 = i_n1 - jmax
 !
-        d1s_dr1 =  fdm2_fix_fld_CMB(2,2) * d_rj(i_n2,is_fld)            &
-     &           + fdm2_fix_fld_CMB(1,2) * d_rj(i_n1,is_fld)            &
-     &           + fdm2_fix_fld_CMB(0,2) * d_rj(inod,is_fld)
+        d1s_dr1 =  fdm2_fix_fld_CMB(2,2) * d_rj(i_n2,is_grad+1)         &
+     &           + fdm2_fix_fld_CMB(1,2) * d_rj(i_n1,is_grad+1)         &
+     &           + fdm2_fix_fld_CMB(0,2) * d_rj(inod,is_grad+1)
 !
         d_rj(inod,is_grad  ) = d1s_dr1 * g_sph_rj(j,13) * r_CMB(0)**2
-        d_rj(inod,is_grad+1) = d_rj(inod,is_fld  )
-        d_rj(inod,is_grad+2) = zero
       end do
-!$omp end parallel do
+!$omp end do
+!$omp end parallel
 !
       end subroutine cal_sph_nod_nobc_out_grad2
 !

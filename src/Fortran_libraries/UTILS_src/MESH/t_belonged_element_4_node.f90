@@ -9,11 +9,27 @@
 !!@verbatim
 !!      subroutine set_belonged_id_4_node(mesh, surf, edge, belongs)
 !!      subroutine dealloc_belonged_id_4_node(belongs)
+!!
+!!      subroutine alloc_x_ref_ele(node, belongs)
+!!      subroutine alloc_x_ref_surf(node, belongs)
+!!      subroutine alloc_x_ref_edge(node, belongs)
+!!      subroutine dealloc_x_ref_ele(belongs)
+!!      subroutine dealloc_x_ref_surf(belongs)
+!!      subroutine adelloc_x_ref_edge(belongs)
+!!        type(belonged_table), intent(inout) :: belongs
+!!
+!!      subroutine sort_inod_4_ele_by_position                          &
+!!     &         (nd, numele, x_ele, node, neib_e, x_ref_ele)
+!!        integer(kind = kint), intent(in) :: nd
+!!        type(node_data), intent(in) :: node
+!!      type(element_data), intent(in) :: ele
+!!        type(element_around_node), intent(inout) :: neib_e
 !!@endverbatim
 !
       module t_belonged_element_4_node
 !
       use m_precision
+      use m_constants
       use t_next_node_ele_4_node
 !
       implicit none
@@ -26,6 +42,13 @@
         type(element_around_node) :: blng_surf
 !>   Structure of belonged edge list for each node
         type(element_around_node) :: blng_edge
+!
+!>   x-position of element list after sorting
+        real(kind = kreal), allocatable :: x_ref_ele(:)
+!>   x-position of surface list after sorting
+        real(kind = kreal), allocatable :: x_ref_surf(:)
+!>   x-position of edge list after sorting
+        real(kind = kreal), allocatable :: x_ref_edge(:)
 !
 !>   Structure of belonged element list for each node
         type(element_around_node) :: host_ele
@@ -72,6 +95,92 @@
       call dealloc_iele_belonged(belongs%host_edge)
 !
       end subroutine dealloc_belonged_id_4_node
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine alloc_x_ref_ele(node, belongs)
+!
+      use t_geometry_data
+!
+      type(node_data), intent(in) :: node
+      type(belonged_table), intent(inout) :: belongs
+!
+      integer(kind = kint) :: num
+!
+      num = belongs%blng_ele%istack_4_node(node%numnod)
+      allocate(belongs%x_ref_ele(num))
+!
+      if(num .gt. 0) belongs%x_ref_ele = 0.0d0
+!
+      end subroutine alloc_x_ref_ele
+!
+!-----------------------------------------------------------------------
+!
+      subroutine alloc_x_ref_surf(node, belongs)
+!
+      use t_geometry_data
+!
+      type(node_data), intent(in) :: node
+      type(belonged_table), intent(inout) :: belongs
+!
+      integer(kind = kint) :: num
+!
+      num = belongs%blng_surf%istack_4_node(node%numnod)
+      allocate(belongs%x_ref_surf(num))
+!
+      if(num .gt. 0) belongs%x_ref_surf = 0.0d0
+!
+      end subroutine alloc_x_ref_surf
+!
+!-----------------------------------------------------------------------
+!
+      subroutine alloc_x_ref_edge(node, belongs)
+!
+      use t_geometry_data
+!
+      type(node_data), intent(in) :: node
+      type(belonged_table), intent(inout) :: belongs
+!
+      integer(kind = kint) :: num
+!
+      num = belongs%blng_edge%istack_4_node(node%numnod)
+      allocate(belongs%x_ref_edge(num))
+!
+      if(num .gt. 0) belongs%x_ref_edge = 0.0d0
+!
+      end subroutine alloc_x_ref_edge
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine dealloc_x_ref_ele(belongs)
+!
+      type(belonged_table), intent(inout) :: belongs
+!
+      deallocate(belongs%x_ref_ele)
+!
+      end subroutine dealloc_x_ref_ele
+!
+!-----------------------------------------------------------------------
+!
+      subroutine dealloc_x_ref_surf(belongs)
+!
+      type(belonged_table), intent(inout) :: belongs
+!
+      deallocate(belongs%x_ref_surf)
+!
+      end subroutine dealloc_x_ref_surf
+!
+!-----------------------------------------------------------------------
+!
+      subroutine dealloc_x_ref_edge(belongs)
+!
+      type(belonged_table), intent(inout) :: belongs
+!
+      deallocate(belongs%x_ref_edge)
+!
+      end subroutine dealloc_x_ref_edge
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -173,6 +282,47 @@
      &    host_edge%iconn_4_node)
 !
       end subroutine belonged_edge_id_4_node
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine sort_inod_4_ele_by_position                            &
+     &         (nd, numele, x_ele, node, neib_e, x_ref_ele)
+!
+      use t_geometry_data
+      use quicksort
+!
+      integer(kind = kint), intent(in) :: nd
+      integer(kind = kint), intent(in) :: numele
+      real(kind = kreal), intent(in) :: x_ele(numele,3)
+!
+      type(node_data), intent(in) :: node
+!
+      type(element_around_node), intent(inout) :: neib_e
+      real(kind = kreal), intent(inout)                                 &
+     &           :: x_ref_ele(neib_e%istack_4_node(node%numnod))
+!
+      integer(kind = kint) :: inod, jst, jed, num, jnum, jele
+!
+!
+!$omp parallel do private(inod,jst,jed,num,jnum,jele)
+      do inod = 1, node%numnod
+        jst = neib_e%istack_4_node(inod-1) + 1
+        jed = neib_e%istack_4_node(inod)
+        num = neib_e%istack_4_node(inod) - neib_e%istack_4_node(inod-1)
+        do jnum = jst, jed
+          jele = neib_e%iele_4_node(jnum)
+          x_ref_ele(jnum) = x_ele(jele,nd)
+        end do
+ !
+        if(num .gt. 1) then
+          call quicksort_real_w_index(num, x_ref_ele(jst), ione, num,   &
+     &        neib_e%iele_4_node(jst))
+        end if
+      end do
+!$omp end parallel do
+!
+      end subroutine sort_inod_4_ele_by_position
 !
 !-----------------------------------------------------------------------
 !

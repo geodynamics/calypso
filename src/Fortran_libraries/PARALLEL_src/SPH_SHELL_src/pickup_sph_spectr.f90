@@ -257,7 +257,7 @@
      &    ione, num_pickup, idx_pick_lc(1))
 !
       do icou = 1, num_pickup
-        call get_dgree_order_by_full_j(idx_pick_gl(icou,1),             &
+        call get_degree_order_by_full_j(idx_pick_gl(icou,1),            &
      &      idx_pick_gl(icou,2), idx_pick_gl(icou,3))
       end do
 !

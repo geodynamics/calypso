@@ -14,10 +14,13 @@
 !!      subroutine dealloc_psf_search_list(list)
 !!      subroutine dealloc_mark_ele_psf(search)
 !!
-!!      subroutine alloc_ref_field_4_psf(numnod, psf_list)
-!!      subroutine alloc_nnod_psf(np_smp, numedge, psf_list)
+!!      subroutine alloc_ref_field_4_psf(node, psf_list)
+!!       type(node_data), intent(in) :: node
+!!      subroutine alloc_nnod_psf(np_smp, edge, psf_list)
+!!        type(edge_data), intent(in) :: edge
 !!      subroutine alloc_inod_psf(psf_list)
-!!      subroutine alloc_nnod_grp_psf(np_smp, numnod, psf_g_list)
+!!      subroutine alloc_nnod_grp_psf(np_smp, node, psf_g_list)
+!!       type(node_data), intent(in) :: node
 !!      subroutine alloc_inod_grp_psf(psf_g_list)
 !!      subroutine dealloc_ref_field_4_psf(psf_list)
 !!      subroutine dealloc_nnod_psf(psf_list)
@@ -186,33 +189,38 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine alloc_ref_field_4_psf(numnod, psf_list)
+      subroutine alloc_ref_field_4_psf(node, psf_list)
 !
-      integer(kind= kint), intent(in) :: numnod
+      use t_geometry_data
+!
+      type(node_data), intent(in) :: node
       type(sectioning_list), intent(inout) :: psf_list
 !
 !
-      allocate(psf_list%ref_fld(numnod) )
-      if(numnod .gt. 0) psf_list%ref_fld = 0.0d0
+      allocate(psf_list%ref_fld(node%numnod) )
+      if(node%numnod .gt. 0) psf_list%ref_fld = 0.0d0
 !
       end subroutine alloc_ref_field_4_psf
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine alloc_nnod_psf(np_smp, numedge, psf_list)
+      subroutine alloc_nnod_psf(np_smp, edge, psf_list)
 !
-      integer(kind= kint), intent(in) :: np_smp, numedge
+      use t_edge_data
+!
+      integer(kind= kint), intent(in) :: np_smp
+      type(edge_data), intent(in) :: edge
       type(sectioning_list), intent(inout) :: psf_list
 !
 !
       allocate(psf_list%istack_inter_n_on_e_smp(0:np_smp))
       allocate(psf_list%istack_exter_n_on_e_smp(0:np_smp))
-      allocate(psf_list%id_n_on_e(numedge))
+      allocate(psf_list%id_n_on_e(edge%numedge))
 !
       psf_list%istack_inter_n_on_e_smp = 0
       psf_list%istack_exter_n_on_e_smp = 0
-      if(numedge .gt. 0)  psf_list%id_n_on_e = 0
+      if(edge%numedge .gt. 0)  psf_list%id_n_on_e = 0
 !
       end subroutine alloc_nnod_psf
 !
@@ -238,19 +246,22 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine alloc_nnod_grp_psf(np_smp, numnod, psf_g_list)
+      subroutine alloc_nnod_grp_psf(np_smp, node, psf_g_list)
 !
-      integer(kind= kint), intent(in) :: np_smp, numnod
+      use t_geometry_data
+!
+      integer(kind= kint), intent(in) :: np_smp
+      type(node_data), intent(in) :: node
       type(grp_section_list), intent(inout) :: psf_g_list
 !
 !
       allocate(psf_g_list%istack_inter_n_on_n_smp(0:np_smp))
       allocate(psf_g_list%istack_exter_n_on_n_smp(0:np_smp))
-      allocate(psf_g_list%id_n_on_n(numnod))
+      allocate(psf_g_list%id_n_on_n(node%numnod))
 !
       psf_g_list%istack_inter_n_on_n_smp = 0
       psf_g_list%istack_exter_n_on_n_smp = 0
-      if(numnod .gt. 0) psf_g_list%id_n_on_n = 0
+      if(node%numnod .gt. 0) psf_g_list%id_n_on_n = 0
 !
       end subroutine alloc_nnod_grp_psf
 !

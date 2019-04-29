@@ -21,7 +21,7 @@
 !!
 !!      subroutine check_sph_domains                                    &
 !!     &         (nprocs_check, s3d_ranks, ierr, e_message)
-!!      subroutine check_sph_ranks(my_rank, nprocs_check)
+!!      subroutine check_sph_ranks(id_rank, nprocs_check)
 !!      subroutine check_sph_1d_domain_id(nprocs_check)
 !!@endverbatim
 !
@@ -189,7 +189,7 @@
 !
       use m_error_IDs
 !
-      integer(kind = kint), intent(in) :: nprocs_check
+      integer, intent(in) :: nprocs_check
 !
       integer(kind = kint), intent(inout) :: ierr
       character(len = kchara), intent(inout) :: e_message
@@ -242,32 +242,32 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_sph_ranks(my_rank, s3d_ranks)
+      subroutine check_sph_ranks(id_rank, s3d_ranks)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(spheric_global_rank), intent(in) :: s3d_ranks
 !
       integer(kind = kint) :: i
 !
 !
-      write(my_rank+50,*) 'i, iglobal_rank_rtp'
+      write(id_rank+50,*) 'i, iglobal_rank_rtp'
       do i = 0, s3d_ranks%ndomain_sph-1
-        write(my_rank+50,*) i, s3d_ranks%iglobal_rank_rtp(1:3,i)
+        write(id_rank+50,*) i, s3d_ranks%iglobal_rank_rtp(1:3,i)
       end do
 !
-      write(my_rank+50,*) 'i, iglobal_rank_rtm'
+      write(id_rank+50,*) 'i, iglobal_rank_rtm'
       do i = 0, s3d_ranks%ndomain_sph-1
-        write(my_rank+50,*) i, s3d_ranks%iglobal_rank_rtm(1:3,i)
+        write(id_rank+50,*) i, s3d_ranks%iglobal_rank_rtm(1:3,i)
       end do
 !
-      write(my_rank+50,*) 'i, iglobal_rank_rlm'
+      write(id_rank+50,*) 'i, iglobal_rank_rlm'
       do i = 0, s3d_ranks%ndomain_sph-1
-        write(my_rank+50,*) i, s3d_ranks%iglobal_rank_rlm(1:2,i)
+        write(id_rank+50,*) i, s3d_ranks%iglobal_rank_rlm(1:2,i)
       end do
 !
-      write(my_rank+50,*) 'i, iglobal_rank_rj'
+      write(id_rank+50,*) 'i, iglobal_rank_rj'
       do i = 0, s3d_ranks%ndomain_sph-1
-        write(my_rank+50,*) i, s3d_ranks%iglobal_rank_rj(1:2,i)
+        write(id_rank+50,*) i, s3d_ranks%iglobal_rank_rj(1:2,i)
       end do
 !
       end subroutine check_sph_ranks

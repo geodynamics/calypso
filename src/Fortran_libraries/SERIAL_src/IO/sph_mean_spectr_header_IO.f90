@@ -24,7 +24,6 @@
 !!      subroutine set_sph_rms_labels(num_rms_comp, rms_name, labels)
 !!@endverbatim
 !!
-!!@n @param my_rank       Process ID
 !!@n @param istep         time step number
 !!@n @param time          time
 !!

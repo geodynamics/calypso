@@ -4,13 +4,24 @@
 !      Written by H. Matsui on June, 2006
 !
 !!      subroutine set_search_mesh_list_4_psf(num_psf,                  &
-!!     &          node, ele, surf, edge, ele_grp, psf_param, psf_search)
+!!     &          mesh, ele_mesh, group, psf_param, psf_search)
+!!        type(mesh_geometry), intent(in) :: mesh
+!!        type(element_geometry), intent(in) :: ele_mesh
+!!        type(mesh_groups), intent(in) :: group
+!!        type(psf_parameters), intent(in) :: psf_param(num_psf)
+!!        type(psf_search_lists), intent(inout) :: psf_search(num_psf)
 !
       module search_ele_list_for_psf
 !
       use m_precision
 !
       use m_machine_parameter
+      use t_mesh_data
+      use t_geometry_data
+      use t_surface_data
+      use t_edge_data
+      use t_group_data
+      use t_psf_geometry_list
 !
       implicit none
 !
@@ -26,22 +37,15 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_search_mesh_list_4_psf(num_psf,                    &
-     &          node, ele, surf, edge, ele_grp, psf_param, psf_search)
+     &          mesh, ele_mesh, group, psf_param, psf_search)
 !
       use m_geometry_constants
-      use t_geometry_data
-      use t_group_data
-      use t_surface_data
-      use t_edge_data
       use t_psf_patch_data
-      use t_psf_geometry_list
 !
       integer(kind = kint), intent(in) :: num_psf
-      type(node_data), intent(in) :: node
-      type(element_data), intent(in) :: ele
-      type(surface_data), intent(in) :: surf
-      type(edge_data), intent(in) :: edge
-      type(group_data), intent(in) :: ele_grp
+      type(mesh_geometry), intent(in) :: mesh
+      type(element_geometry), intent(in) :: ele_mesh
+      type(mesh_groups), intent(in) :: group
 !
       type(psf_parameters), intent(in) :: psf_param(num_psf)
 !
@@ -49,44 +53,32 @@
 !
 !
       call set_searched_element_list_4_psf                              &
-     &   (num_psf, ele%numele, ele%interior_ele, ele%istack_ele_smp,    &
-     &    ele_grp%num_grp, ele_grp%num_item,                            &
-     &    ele_grp%istack_grp, ele_grp%item_grp, psf_param, psf_search)
+     &   (num_psf, mesh%ele, group%ele_grp, psf_param, psf_search)
 !
       call set_searched_surface_list_4_psf                              &
-     &   (num_psf, ele%numele, surf%numsurf, surf%isf_4_ele,            &
-     &    surf%istack_surf_smp, psf_search)
+     &   (num_psf, mesh%ele, ele_mesh%surf, psf_search)
 !
       call set_searched_edge_list_4_psf                                 &
-     &   (num_psf, surf%numsurf, edge%numedge, edge%iedge_4_sf,         &
-     &    edge%istack_edge_smp, psf_search)
+     &   (num_psf, ele_mesh%surf, ele_mesh%edge, psf_search)
 !
       call set_searched_node_list_4_psf                                 &
-     &   (num_psf, node%numnod, edge%numedge, edge%nnod_4_edge,         &
-     &    edge%ie_edge, node%istack_nod_smp, psf_search)
+     &   (num_psf, mesh%node, ele_mesh%edge, psf_search)
 !
       end subroutine set_search_mesh_list_4_psf
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine set_searched_element_list_4_psf(num_psf,               &
-     &          numele, interior_ele, iele_smp_stack, num_ele_grp,      &
-     &          ntot_ele_grp, istack_ele_grp, item_ele_grp,             &
-     &          psf_param, psf_search)
+      subroutine set_searched_element_list_4_psf                        &
+     &         (num_psf, ele, ele_grp, psf_param, psf_search)
 !
-      use t_psf_geometry_list
       use t_psf_patch_data
       use set_element_list_for_psf
 !
       integer(kind = kint), intent(in) :: num_psf
-      integer(kind = kint), intent(in) :: numele
-      integer(kind = kint), intent(in) :: interior_ele(numele)
-      integer(kind = kint), intent(in) :: iele_smp_stack(0:np_smp)
+      type(element_data), intent(in) :: ele
 !
-      integer(kind = kint), intent(in) :: num_ele_grp, ntot_ele_grp
-      integer(kind = kint), intent(in) :: istack_ele_grp(0:num_ele_grp)
-      integer(kind = kint), intent(in) :: item_ele_grp(ntot_ele_grp)
+      type(group_data), intent(in) :: ele_grp
       type(psf_parameters), intent(in) :: psf_param(num_psf)
 !
       type(psf_search_lists), intent(inout) :: psf_search(num_psf)
@@ -94,20 +86,21 @@
       integer(kind = kint) :: i
 !
 !
-      call allocate_work_4_mark_psf(numele)
+      call allocate_work_4_mark_psf(ele%numele)
 !
       do i = 1, num_psf
         call alloc_num_psf_search_list(np_smp, psf_search(i)%elem_list)
 !
-        call mark_element_list_4_psf(numele, interior_ele,              &
-     &      num_ele_grp, ntot_ele_grp, istack_ele_grp, item_ele_grp,    &
+        call mark_element_list_4_psf                                    &
+     &     (ele%numele, ele%interior_ele, ele_grp%num_grp,              &
+     &      ele_grp%num_item, ele_grp%istack_grp, ele_grp%item_grp,     &
      &      psf_param(i)%nele_grp_area, psf_param(i)%id_ele_grp_area)
         call count_element_list_4_psf                                   &
-     &     (iele_smp_stack, psf_search(i)%elem_list)
+     &     (ele%istack_ele_smp, psf_search(i)%elem_list)
 !
         call alloc_psf_search_list(psf_search(i)%elem_list)
         call set_element_list_4_psf                                     &
-     &     (iele_smp_stack, psf_search(i)%elem_list)
+     &     (ele%istack_ele_smp, psf_search(i)%elem_list)
       end do
 !
       call deallocate_work_4_mark_psf
@@ -116,37 +109,35 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_searched_surface_list_4_psf(num_psf, numele,       &
-     &          numsurf, isf_4_ele, isurf_smp_stack, psf_search)
+      subroutine set_searched_surface_list_4_psf                        &
+     &         (num_psf, ele, surf, psf_search)
 !
       use m_geometry_constants
-      use t_psf_geometry_list
       use set_surface_list_for_psf
 !
       integer(kind = kint), intent(in) :: num_psf
-      integer(kind = kint), intent(in) :: numele, numsurf
-      integer(kind = kint), intent(in) :: isf_4_ele(numele,nsurf_4_ele)
-      integer(kind = kint), intent(in) :: isurf_smp_stack(0:np_smp)
+      type(element_data), intent(in) :: ele
+      type(surface_data), intent(in) :: surf
 !
       type(psf_search_lists), intent(inout) :: psf_search(num_psf)
 !
       integer(kind = kint) :: i, ist_smp
 !
 !
-      call allocate_work_4_mark_surf_psf(numsurf)
+      call allocate_work_4_mark_surf_psf(surf%numsurf)
 !
       do i = 1, num_psf
         call alloc_num_psf_search_list(np_smp, psf_search(i)%surf_list)
 !
         ist_smp = (i-1)*np_smp
-        call mark_surface_list_4_psf(numele, numsurf, isf_4_ele,        &
-     &      psf_search(i)%elem_list)
+        call mark_surface_list_4_psf(ele%numele,                        &
+     &      surf%numsurf, surf%isf_4_ele, psf_search(i)%elem_list)
         call count_surf_list_4_psf                                      &
-     &      (isurf_smp_stack, psf_search(i)%surf_list)
+     &     (surf%istack_surf_smp, psf_search(i)%surf_list)
 !
         call alloc_psf_search_list(psf_search(i)%surf_list)
         call set_surface_list_4_psf                                     &
-     &      (isurf_smp_stack, psf_search(i)%surf_list)
+     &     (surf%istack_surf_smp, psf_search(i)%surf_list)
       end do
 !
       call deallocate_work_4_mark_surf_psf
@@ -155,38 +146,35 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_searched_edge_list_4_psf(num_psf, numsurf,         &
-     &          numedge, iedge_4_sf, iedge_smp_stack, psf_search)
+      subroutine set_searched_edge_list_4_psf                           &
+     &         (num_psf, surf, edge, psf_search)
 !
       use m_geometry_constants
-      use t_psf_geometry_list
       use set_edge_list_for_psf
 !
       integer(kind = kint), intent(in) :: num_psf
-      integer(kind = kint), intent(in) :: numsurf, numedge
-      integer(kind = kint), intent(in)                                  &
-     &              :: iedge_4_sf(numsurf,nedge_4_surf)
-      integer(kind = kint), intent(in) :: iedge_smp_stack(0:np_smp)
+      type(surface_data), intent(in) :: surf
+      type(edge_data), intent(in) :: edge
 !
       type(psf_search_lists), intent(inout) :: psf_search(num_psf)
 !
       integer(kind = kint) :: i, ist_smp
 !
 !
-      call allocate_work_4_mark_edge_psf(numedge)
+      call allocate_work_4_mark_edge_psf(edge%numedge)
 !
       do i = 1, num_psf
         call alloc_num_psf_search_list(np_smp, psf_search(i)%edge_list)
 !
         ist_smp = (i-1)*np_smp
-        call mark_edge_list_4_psf(numsurf, numedge, iedge_4_sf,         &
-     &      psf_search(i)%surf_list)
+        call mark_edge_list_4_psf(surf%numsurf,                         &
+     &      edge%numedge, edge%iedge_4_sf, psf_search(i)%surf_list)
         call count_edge_list_4_psf                                      &
-     &     (iedge_smp_stack, psf_search(i)%edge_list)
+     &     (edge%istack_edge_smp, psf_search(i)%edge_list)
 !
         call alloc_psf_search_list(psf_search(i)%edge_list)
         call set_edge_list_4_psf                                        &
-     &     (iedge_smp_stack, psf_search(i)%edge_list)
+     &     (edge%istack_edge_smp, psf_search(i)%edge_list)
       end do
 !
       call deallocate_work_4_mark_edge_psf
@@ -195,36 +183,35 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_searched_node_list_4_psf(num_psf, numnod, numedge, &
-     &          nnod_4_edge, ie_edge, inod_smp_stack, psf_search)
+      subroutine set_searched_node_list_4_psf                           &
+     &         (num_psf, node, edge, psf_search)
 !
-      use t_psf_geometry_list
       use set_node_list_for_psf
 !
       integer(kind = kint), intent(in) :: num_psf
-      integer(kind = kint), intent(in) :: numedge, numnod, nnod_4_edge
-      integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
-      integer(kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
+      type(node_data), intent(in) :: node
+      type(edge_data), intent(in) :: edge
 !
       type(psf_search_lists), intent(inout) :: psf_search(num_psf)
 !
       integer(kind = kint) :: i, ist_smp
 !
 !
-      call allocate_work_4_mark_node_psf(numnod)
+      call allocate_work_4_mark_node_psf(node%numnod)
 !
       do i = 1, num_psf
         call alloc_num_psf_search_list(np_smp, psf_search(i)%node_list)
 !
         ist_smp = (i-1)*np_smp
-        call mark_node_list_4_psf(numnod, numedge, nnod_4_edge,         &
-     &      ie_edge, psf_search(i)%edge_list)
+        call mark_node_list_4_psf                                       &
+     &     (node%numnod, edge%numedge, edge%nnod_4_edge,                &
+     &      edge%ie_edge, psf_search(i)%edge_list)
         call count_node_list_4_psf                                      &
-     &     (inod_smp_stack, psf_search(i)%node_list)
+     &     (node%istack_nod_smp, psf_search(i)%node_list)
 !
         call alloc_psf_search_list(psf_search(i)%node_list)
         call set_node_list_4_psf                                        &
-     &     (inod_smp_stack, psf_search(i)%node_list)
+     &     (node%istack_nod_smp, psf_search(i)%node_list)
       end do
 !
       call deallocate_work_4_mark_node_psf

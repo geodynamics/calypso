@@ -7,7 +7,6 @@
 !!     &         (NB, nnod_rtp, nnod_rtm, nnod_rlm, nnod_rj)
 !      subroutine deallocate_real_sph_test
 !
-!!      subroutine set_tesh_sph_elapsed_label
 !!      subroutine sph_transfer_test_1(itype, sph, comms_sph)
 !!      subroutine sph_transfer_test_2(itype, sph, comms_sph)
 !!      subroutine sph_transfer_test_3(itype, sph, comms_sph)
@@ -84,37 +83,6 @@
       end subroutine deallocate_real_sph_test
 !
 ! -----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine set_tesh_sph_elapsed_label
-!
-      use m_work_time
-!
-      integer(kind = kint) :: i
-!
-!
-      num_elapsed = 39
-      call allocate_elapsed_times
-!
-      elapse_labels(1) = 'Total time                 '
-      elapse_labels(2) = 'Initialization time        '
-      elapse_labels(3) = 'Time evolution loop time   '
-      elapse_labels(4) = 'Data IO time               '
-      elapse_labels(5) = 'Evolution excluding IO     '
-!
-      do i = 6, 35
-        elapse_labels(i) = 'unused    '
-      end do
-!
-      elapse_labels(36) = 'set_to_send_buf_N    '
-      elapse_labels(37) = 'calypso_send_recv_core    '
-      elapse_labels(38) = 'set_from_recv_buf_rev_N    '
-!
-      elapse_labels(num_elapsed) = 'Communication time        '
-!
-      end subroutine set_tesh_sph_elapsed_label
-!
-! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine sph_transfer_test_1(itype, sph, comms_sph)

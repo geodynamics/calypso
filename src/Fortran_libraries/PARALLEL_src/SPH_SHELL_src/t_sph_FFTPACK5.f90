@@ -359,9 +359,11 @@
       integer(kind = kint), intent(in) :: nfft
       type(work_for_fftpack), intent(inout) :: fftpack_t
 !
+      integer(kind = kint) :: itmp
+!
       fftpack_t%iflag_fft_len = nfft
-      fftpack_t%NSV = Nfft                                              &
-     &                + int ( log ( real(Nfft) ) / log(two) ) + ifour
+      itmp = int(log(real(Nfft)) / log(two),KIND(itmp))
+      fftpack_t%NSV = nfft + itmp + ifour
       allocate(fftpack_t%WSV(fftpack_t%NSV) )
       fftpack_t%WSV = 0.0d0
 !

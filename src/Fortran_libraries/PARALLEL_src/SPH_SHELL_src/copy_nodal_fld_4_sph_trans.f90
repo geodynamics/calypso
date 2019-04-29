@@ -16,13 +16,6 @@
 !!      subroutine copy_nod_tsr_from_trans_wpole(sph_rtp, m_folding,    &
 !!     &          ncomp_trans, i_trns, d_rtp, v_pole, i_field,          &
 !!     &          node, nod_fld)
-!!
-!!      subroutine copy_nod_scl_from_sph_trans                          &
-!!     &         (sph_rtp, m_folding, d_rtp, i_field, node, nod_fld)
-!!      subroutine copy_nod_vec_from_sph_trans                          &
-!!     &         (sph_rtp, m_folding, d_rtp, i_field, node, nod_fld)
-!!      subroutine copy_nod_tsr_from_sph_trans                          &
-!!     &         (sph_rtp, m_folding, d_rtp, i_field, node, nod_fld)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(node_data), intent(in) :: node
 !!        type(phys_data),intent(inout) :: nod_fld
@@ -62,6 +55,7 @@
      &          ncomp_trans, i_trns, d_rtp, v_pole, i_field,            &
      &          node, nod_fld)
 !
+      use copy_field_4_sph_trans
       use copy_pole_field_sph_trans
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -77,8 +71,11 @@
       type(phys_data),intent(inout) :: nod_fld
 !
 !
-      call copy_nod_scl_from_sph_trans                                  &
-     &   (sph_rtp, m_folding, d_rtp(1,i_trns), i_field, node, nod_fld)
+!$omp parallel
+      call copy_scalar_from_trans_smp(sph_rtp%nnod_rtp, m_folding,      &
+     &    node%numnod, d_rtp(1,i_trns), nod_fld%d_fld(1,i_field))
+!$omp end parallel
+!
       call copy_pole_scl_fld_from_trans                                 &
      &   (m_folding, sph_rtp, node, v_pole(1,i_trns), i_field, nod_fld)
 !
@@ -90,6 +87,8 @@
      &          ncomp_trans, i_trns, d_rtp, v_pole, i_field,            &
      &          node, nod_fld)
 !
+      use copy_field_4_sph_trans
+      use cvt_sph_vector_2_xyz_smp
       use copy_pole_field_sph_trans
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -105,8 +104,17 @@
       type(phys_data),intent(inout) :: nod_fld
 !
 !
-      call copy_nod_vec_from_sph_trans                                  &
-     &   (sph_rtp, m_folding, d_rtp(1,i_trns), i_field, node, nod_fld)
+!$omp parallel
+      call copy_vector_from_trans_smp(sph_rtp%nnod_rtp, m_folding,      &
+     &    node%numnod, d_rtp(1,i_trns), nod_fld%d_fld(1,i_field))
+!$omp end parallel
+!
+!$omp parallel
+      call overwrite_sph_vect_2_xyz_smp(np_smp, node%numnod,            &
+     &    node%istack_nod_smp, nod_fld%d_fld(1,i_field),                &
+     &    node%theta(1), node%phi(1))
+!$omp end parallel
+!
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
      &    v_pole(1,i_trns), i_field, nod_fld)
 !
@@ -118,6 +126,8 @@
      &          ncomp_trans, i_trns, d_rtp, v_pole, i_field,            &
      &          node, nod_fld)
 !
+      use copy_field_4_sph_trans
+      use cvt_sph_tensor_2_xyz_smp
       use copy_pole_field_sph_trans
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -133,100 +143,22 @@
       type(phys_data),intent(inout) :: nod_fld
 !
 !
-      call copy_nod_tsr_from_sph_trans                                  &
-     &   (sph_rtp, m_folding, d_rtp(1,i_trns), i_field, node, nod_fld)
-      call copy_pole_tsr_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    v_pole(1,i_trns), i_field, nod_fld)
-!
-      end subroutine copy_nod_tsr_from_trans_wpole
-!
-! -------------------------------------------------------------------
-! -------------------------------------------------------------------
-!
-      subroutine copy_nod_scl_from_sph_trans                            &
-     &         (sph_rtp, m_folding, d_rtp, i_field, node, nod_fld)
-!
-      use copy_field_4_sph_trans
-!
-      type(sph_rtp_grid), intent(in) :: sph_rtp
-      integer(kind = kint), intent(in) :: m_folding
-      integer(kind = kint), intent(in) :: i_field
-      real(kind = kreal), intent(in) :: d_rtp(sph_rtp%nnod_rtp)
-!
-      type(node_data), intent(in) :: node
-      type(phys_data),intent(inout) :: nod_fld
-!
-!
-!$omp parallel
-      call copy_scalar_from_trans_smp(sph_rtp%nnod_rtp, m_folding,      &
-     &    sph_rtp%istack_inod_rtp_smp, node%numnod, d_rtp,              &
-     &    nod_fld%d_fld(1,i_field))
-!$omp end parallel
-!
-      end subroutine copy_nod_scl_from_sph_trans
-!
-! -------------------------------------------------------------------
-!
-      subroutine copy_nod_vec_from_sph_trans                            &
-     &         (sph_rtp, m_folding, d_rtp, i_field, node, nod_fld)
-!
-      use copy_field_4_sph_trans
-      use cvt_sph_vector_2_xyz_smp
-!
-      type(sph_rtp_grid), intent(in) :: sph_rtp
-      integer(kind = kint), intent(in) :: m_folding
-      integer(kind = kint), intent(in) :: i_field
-      real(kind = kreal), intent(in) :: d_rtp(sph_rtp%nnod_rtp,3)
-!
-      type(node_data), intent(in) :: node
-      type(phys_data),intent(inout) :: nod_fld
-!
-!
-!$omp parallel
-      call copy_vector_from_trans_smp(sph_rtp%nnod_rtp, m_folding,      &
-     &    sph_rtp%istack_inod_rtp_smp, node%numnod, d_rtp,              &
-     &    nod_fld%d_fld(1,i_field))
-!$omp end parallel
-!
-!$omp parallel
-      call overwrite_sph_vect_2_xyz_smp(np_smp, node%numnod,            &
-     &    sph_rtp%istack_inod_rtp_smp, nod_fld%d_fld(1,i_field),        &
-     &    node%theta(1), node%phi(1))
-!$omp end parallel
-!
-      end subroutine copy_nod_vec_from_sph_trans
-!
-! -------------------------------------------------------------------
-!
-      subroutine copy_nod_tsr_from_sph_trans                            &
-     &         (sph_rtp, m_folding, d_rtp, i_field, node, nod_fld)
-!
-      use copy_field_4_sph_trans
-      use cvt_sph_tensor_2_xyz_smp
-!
-      type(sph_rtp_grid), intent(in) :: sph_rtp
-      integer(kind = kint), intent(in) :: m_folding
-      integer(kind = kint), intent(in) :: i_field
-      real(kind = kreal), intent(in) :: d_rtp(sph_rtp%nnod_rtp,6)
-!
-      type(node_data), intent(in) :: node
-      type(phys_data),intent(inout) :: nod_fld
-!
-!
 !$omp parallel
       call copy_tensor_from_trans_smp(sph_rtp%nnod_rtp, m_folding,      &
-     &    sph_rtp%istack_inod_rtp_smp, node%numnod, d_rtp,              &
-     &    nod_fld%d_fld(1,i_field))
+     &    node%numnod, d_rtp(1,i_trns), nod_fld%d_fld(1,i_field))
 !$omp end parallel
 !
 !$omp parallel
       call overwrite_xyz_tensor_by_sph_smp(np_smp, node%numnod,         &
-     &    sph_rtp%istack_inod_rtp_smp, nod_fld%d_fld(1,i_field),        &
+     &    node%istack_nod_smp, nod_fld%d_fld(1,i_field),                &
      &    node%xx(1,1), node%xx(1,2), node%xx(1,3),                     &
      &    node%rr(1), node%ss(1), node%a_r(1), node%a_s(1))
 !$omp end parallel
 !
-      end subroutine copy_nod_tsr_from_sph_trans
+      call copy_pole_tsr_fld_from_trans(m_folding, sph_rtp, node,       &
+     &    v_pole(1,i_trns), i_field, nod_fld)
+!
+      end subroutine copy_nod_tsr_from_trans_wpole
 !
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------

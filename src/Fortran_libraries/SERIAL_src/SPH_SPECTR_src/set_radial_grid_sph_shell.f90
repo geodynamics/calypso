@@ -72,7 +72,7 @@
       if(r_min .ge. r_ICB) then
         ngrid_icore = 0
       else
-        ngrid_icore = int(aint((r_ICB - r_min) /  dr))
+        ngrid_icore = int(aint((r_ICB - r_min)/dr), KIND(ngrid_icore))
       end if
       if(ngrid_icore .lt. 0) ngrid_icore = 0
 !      r_min = r_ICB - dr * dble(ngrid_icore)
@@ -80,7 +80,7 @@
       if(r_max .le. r_CMB) then
         ngrid_ext = 0
       else
-        ngrid_ext =   int(aint((r_max - r_CMB) /  dr)) + 1
+        ngrid_ext = int(aint((r_max - r_CMB)/dr), KIND(ngrid_ext)) + 1
       end if
       if(ngrid_ext .lt. 0) ngrid_ext = 0
 !      r_max =  r_CMB + dr * dble(ngrid_ext)

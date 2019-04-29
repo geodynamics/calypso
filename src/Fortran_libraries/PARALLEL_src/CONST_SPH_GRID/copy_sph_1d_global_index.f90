@@ -29,7 +29,7 @@
 !!        type(sph_1d_global_index), intent(in) :: sph_gl1d
 !!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!
-!!      subroutine add_center_mode_rj(ip_rank, sph_gl1d, sph_rj)
+!!      subroutine add_center_mode_rj(id_rank, sph_gl1d, sph_rj)
 !!        type(sph_1d_global_index), intent(in) :: sph_gl1d
 !!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!@endverbatim
@@ -184,9 +184,9 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine add_center_mode_rj(ip_rank, sph_gl1d, sph_rj)
+      subroutine add_center_mode_rj(id_rank, sph_gl1d, sph_rj)
 !
-      integer(kind = kint), intent(in) :: ip_rank
+      integer, intent(in) :: id_rank
       type(sph_1d_global_index), intent(in) :: sph_gl1d
       type(sph_rj_grid), intent(inout) :: sph_rj
 !
@@ -199,7 +199,7 @@
       do i = 1, sph_rj%nidx_rj(2)
         j = i - 1 + sph_rj%ist_rj(2)
         if(sph_gl1d%idx_global_rj_j(j,1) .eq. 0) then
-          write(*,*) 'Add center mode at domain ', ip_rank
+          write(*,*) 'Add center mode at domain ', id_rank
           sph_rj%nnod_rj = sph_rj%nnod_rj + 1
           sph_rj%inod_rj_center = 1
           exit

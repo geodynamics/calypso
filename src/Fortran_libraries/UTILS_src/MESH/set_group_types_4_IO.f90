@@ -33,7 +33,7 @@
 !
 !
       new_group%num_grp =  org_group%num_grp
-      call allocate_grp_type_num(new_group)
+      call alloc_group_num(new_group)
 !
       do igrp = 1, new_group%num_grp
         new_group%grp_name(igrp) =   org_group%grp_name(igrp)
@@ -45,11 +45,11 @@
       new_group%num_item = org_group%num_item
 !
       if (new_group%num_item .gt. 0) then
-        call allocate_grp_type_item(new_group)
+        call alloc_group_item(new_group)
         new_group%item_grp(1:new_group%num_item)                        &
      &        = org_group%item_grp(1:new_group%num_item)
       else
-        call allocate_grp_type_item(new_group)
+        call alloc_group_item(new_group)
       end if
 !
       end subroutine set_gruop_stracture
@@ -65,7 +65,7 @@
 !
 !
       new_sf_grp%num_grp = org_sf_grp%num_grp
-      call allocate_sf_grp_type_num(new_sf_grp)
+      call alloc_sf_group_num(new_sf_grp)
 !
       do igrp = 1, new_sf_grp%num_grp
         new_sf_grp%grp_name(igrp) =   org_sf_grp%grp_name(igrp)
@@ -75,7 +75,7 @@
       end do
 !
       new_sf_grp%num_item = org_sf_grp%num_item
-      call allocate_sf_grp_type_item(new_sf_grp)
+      call alloc_sf_group_item(new_sf_grp)
 !
       if (new_sf_grp%num_item .gt. 0) then
         new_sf_grp%item_sf_grp(1,1:new_sf_grp%num_item)                 &

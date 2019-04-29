@@ -8,11 +8,11 @@
 !!  including node and element position, connectivities
 !!
 !!@verbatim
-!!      subroutine alloc_numnod_stack(nprocs, node)
-!!      subroutine alloc_numele_stack(nprocs, ele)
-!!      subroutine allocate_node_geometry_type(node)
+!!      subroutine alloc_numnod_stack(num_pe, node)
+!!      subroutine alloc_numele_stack(num_pe, ele)
+!!      subroutine alloc_node_geometry_w_sph(node)
 !!      subroutine alloc_node_geometry_base(node)
-!!      subroutine allocate_sph_node_geometry(node)
+!!      subroutine alloc_sph_node_geometry(node)
 !!
 !!      subroutine allocate_ele_connect_type(ele)
 !!      subroutine alloc_element_types(ele)
@@ -25,7 +25,7 @@
 !!
 !!      subroutine dealloc_numnod_stack(node)
 !!      subroutine dealloc_numele_stack(ele)
-!!      subroutine deallocate_node_geometry_type(node)
+!!      subroutine dealloc_node_geometry_w_sph(node)
 !!      subroutine dealloc_node_geometry_base(node)
 !!      subroutine deallocate_sph_node_geometry(node)
 !!
@@ -36,8 +36,8 @@
 !!      subroutine deallocate_ele_param_smp_type(ele)
 !!        type(element_data), intent(inout) :: ele
 !!
-!!      subroutine check_nod_size_smp_type(node, my_rank)
-!!      subroutine check_ele_size_smp_type(ele, my_rank)
+!!      subroutine check_nod_size_smp_type(node, id_rank)
+!!      subroutine check_ele_size_smp_type(ele, id_rank)
 !!@endverbatim
 !
       module t_geometry_data
@@ -86,6 +86,16 @@
         real(kind=kreal)  , allocatable  :: ss(:)
 !>       1 / a_s_cylinder
         real(kind=kreal)  , allocatable  :: a_s(:)
+!
+!
+!>       Minimum position at subdomain
+        real(kind = kreal) :: xyz_min_lc(3)
+!>       Maximum position at subdomain
+        real(kind = kreal) :: xyz_max_lc(3)
+!>       Minimum position at whole domain
+        real(kind = kreal) :: xyz_min_gl(3)
+!>       Minimum position at whole domain
+        real(kind = kreal) :: xyz_max_gl(3)
       end type node_data
 !
 !
@@ -110,7 +120,7 @@
 !>       maximum internal smp number of element on local PE
         integer( kind=kint )  ::  max_internal_ele_smp
 !
-!>       element connectivity  (where i:nodal order j:element id)
+!>       element connectivity  (where i:element id j:node id)
         integer(kind=kint), allocatable  :: ie(:,:)
 !
 !>       element type id   (where i:element id)
@@ -158,14 +168,14 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine alloc_numnod_stack(nprocs, node)
+      subroutine alloc_numnod_stack(num_pe, node)
 !
-      integer(kind = kint), intent(in) :: nprocs
+      integer, intent(in) :: num_pe
       type(node_data), intent(inout) :: node
 !
 !
-      allocate(node%istack_numnod(0:nprocs))
-      allocate(node%istack_internod(0:nprocs))
+      allocate(node%istack_numnod(0:num_pe))
+      allocate(node%istack_internod(0:num_pe))
       node%istack_numnod =   0
       node%istack_internod = 0
 !
@@ -173,14 +183,14 @@
 !
 ! ------------------------------------------------------
 !
-      subroutine alloc_numele_stack(nprocs, ele)
+      subroutine alloc_numele_stack(num_pe, ele)
 !
-      integer(kind = kint), intent(in) :: nprocs
+      integer, intent(in) :: num_pe
       type(element_data), intent(inout) :: ele
 !
 !
-      allocate(ele%istack_numele(0:nprocs))
-      allocate(ele%istack_interele(0:nprocs))
+      allocate(ele%istack_numele(0:num_pe))
+      allocate(ele%istack_interele(0:num_pe))
       ele%istack_numele =   0
       ele%istack_interele = 0
 !
@@ -188,14 +198,14 @@
 !
 ! ------------------------------------------------------
 !
-      subroutine allocate_node_geometry_type(node)
+      subroutine alloc_node_geometry_w_sph(node)
 !
       type(node_data), intent(inout) :: node
 !
       call alloc_node_geometry_base(node)
-      call allocate_sph_node_geometry(node)
+      call alloc_sph_node_geometry(node)
 !
-      end subroutine allocate_node_geometry_type
+      end subroutine alloc_node_geometry_w_sph
 !
 !  ---------------------------------------------------------------------
 !
@@ -215,7 +225,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_sph_node_geometry(node)
+      subroutine alloc_sph_node_geometry(node)
 !
       type(node_data), intent(inout) :: node
 !
@@ -235,7 +245,7 @@
         node%theta = 0.0d00
       end if
 !
-      end subroutine allocate_sph_node_geometry
+      end subroutine alloc_sph_node_geometry
 !
 !  ---------------------------------------------------------------------
 !
@@ -380,14 +390,14 @@
 !
 ! ------------------------------------------------------
 !
-      subroutine deallocate_node_geometry_type(node)
+      subroutine dealloc_node_geometry_w_sph(node)
 !
       type(node_data), intent(inout) :: node
 !
       call deallocate_sph_node_geometry(node)
       call dealloc_node_geometry_base(node)
 !
-      end subroutine deallocate_node_geometry_type
+      end subroutine dealloc_node_geometry_w_sph
 !
 !  ---------------------------------------------------------------------
 !
@@ -479,32 +489,32 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine check_nod_size_smp_type(node, my_rank)
+      subroutine check_nod_size_smp_type(node, id_rank)
 !
       use m_machine_parameter
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(node_data), intent(in) :: node
 !
        write(*,*) 'np_smp: ', np_smp
-       write(*,*) 'PE: ', my_rank,                                      &
+       write(*,*) 'PE: ', id_rank,                                      &
      &           'istack_nod_smp ', node%istack_nod_smp
-       write(*,*) 'PE: ', my_rank,                                      &
+       write(*,*) 'PE: ', id_rank,                                      &
      &           'istack_internal_smp ', node%istack_internal_smp
 !
       end subroutine check_nod_size_smp_type
 !
 !-----------------------------------------------------------------------
 !
-      subroutine check_ele_size_smp_type(ele, my_rank)
+      subroutine check_ele_size_smp_type(ele, id_rank)
 !
       use m_machine_parameter
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(element_data), intent(in) :: ele
 !
        write(*,*) 'np_smp: ', np_smp
-       write(*,*) 'PE: ', my_rank,                                      &
+       write(*,*) 'PE: ', id_rank,                                      &
      &           'istack_ele_smp ', ele%istack_ele_smp
 !
       end subroutine check_ele_size_smp_type

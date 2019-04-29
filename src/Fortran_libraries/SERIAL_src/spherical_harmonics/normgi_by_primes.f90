@@ -99,7 +99,7 @@
 !
       call conut_prims_normgi(m1,l1,m2,l2,m3,l3)
 !
-      is = int((l1+l2+l3)/2)
+      is = int((l1+l2+l3)/2, KIND(is))
 !*
       itmax =  min((l1-m1), (l3-m3), (l2+l3-m1))
       itmin = -min((l2-l3+m1), (l1+m1), izero)
@@ -226,7 +226,7 @@
       integer(kind = kint) :: i, j, NUMBER
 !
 !
-      is = int((l1+l2+l3)/2)
+      is = int((l1+l2+l3)/2, KIND(is))
 !
       itmax =  min((l1-m1), (l3-m3), (l2+l3-m1))
       itmin = -min((l2-l3+m1), (l1+m1), izero)

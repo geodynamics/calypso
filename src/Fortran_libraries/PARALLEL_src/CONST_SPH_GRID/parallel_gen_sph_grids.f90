@@ -8,7 +8,6 @@
 !!
 !!@verbatim
 !!      subroutine para_gen_sph_grids(sph, gen_sph)
-!!      subroutine deallocate_gen_mesh_params(gen_sph)
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
 !!        type(sph_grids), intent(inout) :: sph
 !!@endverbatim
@@ -53,8 +52,8 @@
 !
       subroutine para_gen_sph_grids(sph, gen_sph)
 !
+      use m_elapsed_labels_gen_SPH
       use set_global_spherical_param
-      use para_gen_sph_grids_modes
       use mpi_gen_sph_grids_modes
       use set_comm_table_rtp_rj
       use const_global_sph_grids_modes
@@ -84,94 +83,47 @@
      &    gen_sph%s3d_ranks, gen_sph%sph_lcp,                           &
      &    gen_sph%stk_lc1d, gen_sph%sph_gl1d)
 !
-      call start_elapsed_time(2)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+1)
       allocate(comm_rlm_mul(gen_sph%s3d_ranks%ndomain_sph))
 !
-      if(gen_sph%s3d_ranks%ndomain_sph .eq. nprocs) then
         if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rlm_grids'
-        call mpi_gen_sph_rlm_grids                                      &
-     &     (gen_sph, sph%sph_params, sph%sph_rlm, comm_rlm_mul)
-      else
-        call para_gen_sph_rlm_grids(gen_sph%s3d_ranks%ndomain_sph,      &
-     &      gen_sph, sph%sph_params, sph%sph_rlm, comm_rlm_mul)
-      end if
+      call mpi_gen_sph_rlm_grids                                        &
+     &   (gen_sph, sph%sph_params, sph%sph_rlm, comm_rlm_mul)
       call bcast_comm_stacks_sph                                        &
-     &  (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
-      call end_elapsed_time(2)
+     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+1)
 !
-      if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rj_modes'
-      call start_elapsed_time(3)
-      if(gen_sph%s3d_ranks%ndomain_sph .eq. nprocs) then
-        call mpi_gen_sph_rj_modes(comm_rlm_mul,                         &
-     &      gen_sph, sph%sph_params, sph%sph_rlm, sph%sph_rj)
-      else
-        call para_gen_sph_rj_modes                                      &
-     &     (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul,                &
-     &      gen_sph, sph%sph_params, sph%sph_rlm, sph%sph_rj)
-      end if
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
+      call mpi_gen_sph_rj_modes(comm_rlm_mul, sph%sph_params,           &
+     &    gen_sph, sph%sph_rlm, sph%sph_rj)
       call dealloc_comm_stacks_sph                                      &
      &   (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
       deallocate(comm_rlm_mul)
-      call end_elapsed_time(3)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
 !
-      call start_elapsed_time(2)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+1)
       allocate(comm_rtm_mul(gen_sph%s3d_ranks%ndomain_sph))
 !
-      if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rtm_grids'
-      if(gen_sph%s3d_ranks%ndomain_sph .eq. nprocs) then
-        call mpi_gen_sph_rtm_grids                                      &
+      if(iflag_debug .gt. 0) write(*,*) 'mpi_gen_sph_rtm_grids'
+      call mpi_gen_sph_rtm_grids                                        &
      &     (gen_sph, sph%sph_params, sph%sph_rtm, comm_rtm_mul)
-      else
-        call para_gen_sph_rtm_grids(gen_sph%s3d_ranks%ndomain_sph,      &
-     &      gen_sph, sph%sph_params, sph%sph_rtm, comm_rtm_mul)
-      end if
       call bcast_comm_stacks_sph                                        &
      &   (gen_sph%s3d_ranks%ndomain_sph, comm_rtm_mul)
-      call end_elapsed_time(2)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+1)
 !
-      call start_elapsed_time(3)
-      if(gen_sph%s3d_ranks%ndomain_sph .eq. nprocs) then
-        call mpi_gen_sph_rtp_grids(comm_rtm_mul,                        &
-     &      gen_sph, sph%sph_params, sph%sph_rtp, sph%sph_rtm)
-      else
-        if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rtp_grids'
-        call para_gen_sph_rtp_grids                                     &
-     &     (gen_sph%s3d_ranks%ndomain_sph, comm_rtm_mul,                &
-     &      gen_sph, sph%sph_params, sph%sph_rtp, sph%sph_rtm)
-      end if
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
+      call mpi_gen_sph_rtp_grids(comm_rtm_mul, sph%sph_params,          &
+     &    gen_sph, sph%sph_rtp, sph%sph_rtm)
       call dealloc_comm_stacks_sph                                      &
      &   (gen_sph%s3d_ranks%ndomain_sph, comm_rtm_mul)
 !
       deallocate(comm_rtm_mul)
       call calypso_MPI_barrier
-      call end_elapsed_time(3)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
 !
       end subroutine para_gen_sph_grids
 !
 ! ----------------------------------------------------------------------
-!
-      subroutine deallocate_gen_mesh_params(gen_sph)
-!
-      type(construct_spherical_grid), intent(inout) :: gen_sph
-!
-!
-      call dealloc_sph_ranks(gen_sph%s3d_ranks)
-      call dealloc_sph_1d_domain_id(gen_sph%s3d_ranks)
-!
-      call dealloc_sph_gl_parameter(gen_sph%sph_lcp)
-!
-      call dealloc_sph_1d_global_idx(gen_sph%sph_gl1d)
-      call dealloc_sph_1d_global_stack(gen_sph%stk_lc1d)
-!
-      call dealloc_radius_1d_gl(gen_sph%s3d_radius)
-!
-      call dealloc_layering_group(gen_sph%med_layer_grp)
-      call dealloc_layering_group(gen_sph%r_layer_grp)
-      call dealloc_layering_group(gen_sph%added_radial_grp)
-!
-      end subroutine deallocate_gen_mesh_params
-!
-! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine bcast_comm_stacks_sph(ndomain_sph, comm_sph)
@@ -179,7 +131,9 @@
       integer(kind = kint), intent(in) :: ndomain_sph
       type(sph_comm_tbl), intent(inout) :: comm_sph(ndomain_sph)
 !
-      integer(kind = kint) :: ip, iroot
+      integer :: iroot
+      integer(kind = kint_gl) :: num64
+      integer(kind = kint) :: ip
       integer(kind = kint) :: iflag, i
       type(sph_comm_tbl) :: comm_tmp
 !
@@ -195,12 +149,13 @@
         end if
       end do
 !
-      call MPI_allREDUCE(nneib_rtm_lc(1), nneib_rtm_gl(1),              &
-     &      ndomain_sph, CALYPSO_INTEGER, MPI_SUM,                      &
-     &      CALYPSO_COMM, ierr_MPI)
+!
+      num64 = int(ndomain_sph,KIND(num64))
+      call calypso_mpi_allreduce_int                                    &
+     &   (nneib_rtm_lc(1), nneib_rtm_gl(1), num64, MPI_SUM)
 !
       do ip = 1, ndomain_sph
-        iroot = mod(ip-1,nprocs)
+        iroot = int(mod(ip-1,nprocs))
         comm_tmp%nneib_domain = nneib_rtm_gl(ip)
         call alloc_type_sph_comm_stack(comm_tmp)
 !

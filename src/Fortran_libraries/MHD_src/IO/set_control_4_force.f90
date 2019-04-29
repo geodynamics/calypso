@@ -9,10 +9,10 @@
 !!@verbatim
 !!      subroutine s_set_control_4_force                                &
 !!     &         (frc_ctl, g_ctl, cor_ctl, mcv_ctl, fl_prop, cd_prop)
-!!        type(forces_control), intent(inout) :: frc_ctl
-!!        type(gravity_control), intent(inout) :: g_ctl
-!!        type(coriolis_control), intent(inout) :: cor_ctl
-!!        type(magneto_convection_control), intent(inout) :: mcv_ctl
+!!        type(forces_control), intent(in) :: frc_ctl
+!!        type(gravity_control), intent(in) :: g_ctl
+!!        type(coriolis_control), intent(in) :: cor_ctl
+!!        type(magneto_convection_control), intent(in) :: mcv_ctl
 !!        type(fluid_property), intent(inout) :: fl_prop
 !!        type(conductive_property), intent(inout) :: cd_prop
 !!@endverbatim
@@ -40,10 +40,10 @@
       use t_ctl_data_mhd_forces
       use skip_comment_f
 !
-      type(forces_control), intent(inout) :: frc_ctl
-      type(gravity_control), intent(inout) :: g_ctl
-      type(coriolis_control), intent(inout) :: cor_ctl
-      type(magneto_convection_control), intent(inout) :: mcv_ctl
+      type(forces_control), intent(in) :: frc_ctl
+      type(gravity_control), intent(in) :: g_ctl
+      type(coriolis_control), intent(in) :: cor_ctl
+      type(magneto_convection_control), intent(in) :: mcv_ctl
 !
       type(fluid_property), intent(inout) :: fl_prop
       type(conductive_property), intent(inout) :: cd_prop
@@ -73,7 +73,6 @@
         call alloc_force_list(fl_prop)
         fl_prop%name_force(1:fl_prop%num_force)                         &
      &          = frc_ctl%force_names%c_tbl(1:fl_prop%num_force)
-        call dealloc_name_force_ctl(frc_ctl)
 !
         do i = 1, fl_prop%num_force
           tmpchara = fl_prop%name_force(i)
@@ -205,7 +204,6 @@
               if(cmp_no_case(g_ctl%gravity_vector%c_tbl(i),'Z')         &
      &            ) fl_prop%grav(3) = - g_ctl%gravity_vector%vect(i)
             end do
-            call dealloc_control_array_c_r(g_ctl%gravity_vector)
           end if
         end if
       end if
@@ -227,9 +225,7 @@
           if(cmp_no_case(cor_ctl%system_rotation%c_tbl(i),'Z')          &
      &       )  fl_prop%sys_rot(3) = cor_ctl%system_rotation%vect(i)
         end do
-        call dealloc_control_array_c_r(cor_ctl%system_rotation)
       end if
-!
 !
 !  setting for external mangnetic field
 !
@@ -256,7 +252,6 @@
             if(cmp_no_case(mcv_ctl%ext_magne%c_tbl(i),'Z')              &
      &            ) cd_prop%ex_magne(3) = mcv_ctl%ext_magne%vect(i)
           end do
-          call dealloc_control_array_c_r(mcv_ctl%ext_magne)
         end if
       end if
 !
@@ -277,7 +272,6 @@
           write(*,'(a, 1p3E25.15e3)') 'rotation:', fl_prop%sys_rot(1:3)
         end if
       end if
-!
 !
       end subroutine s_set_control_4_force
 !

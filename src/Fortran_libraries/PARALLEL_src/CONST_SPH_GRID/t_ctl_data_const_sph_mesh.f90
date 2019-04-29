@@ -42,19 +42,17 @@
 !
 !   Top level of label
 !
-      character(len=kchara) :: hd_mhd_ctl = 'MHD_control'
-      integer (kind=kint) :: i_mhd_ctl = 0
+      character(len=kchara), parameter, private                         &
+     &                    :: hd_mhd_ctl = 'MHD_control'
+      integer(kind=kint), private :: i_mhd_ctl = 0
 !
 !   2nd level for MHD
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                    :: hd_platform = 'data_files_def'
-      character(len=kchara), parameter                                  &
-     &      :: hd_sph_shell = 'spherical_shell_ctl'
-      integer (kind=kint) :: i_platform =     0
-!
-      private :: hd_mhd_ctl, i_mhd_ctl
-      private :: hd_platform, i_platform, hd_sph_shell
+      character(len=kchara), parameter, private                         &
+     &                    :: hd_sph_shell = 'spherical_shell_ctl'
+      integer(kind=kint), private  :: i_platform = 0
 !
       private :: read_sph_shell_define_ctl, bcast_sph_shell_define_ctl
 !
@@ -101,9 +99,8 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_mhd_ctl, i_mhd_ctl)
+        i_mhd_ctl = find_control_end_flag(hd_mhd_ctl)
         if(i_mhd_ctl .gt. 0) exit
-!
 !
         call read_control_platforms                                     &
      &     (hd_platform, i_platform, gen_SPH_ctl%plt)

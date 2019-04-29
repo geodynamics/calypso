@@ -54,7 +54,7 @@
      &   (field_tmp_ctl%num, field_ctl, field_tmp_ctl)
       call dealloc_control_array_c3(field_ctl)
 !
-      field_ctl%num = field_ctl%num + 1
+      field_ctl%num = field_tmp_ctl%num + 1
       call alloc_control_array_c3(field_ctl)
       call copy_field_ctl                                               &
      &   (field_tmp_ctl%num, field_tmp_ctl, field_ctl)
@@ -64,7 +64,7 @@
       field_ctl%c2_tbl(field_ctl%num) = 'Viz_off'
       field_ctl%c3_tbl(field_ctl%num) = 'Monitor_off'
 !
-      if(iflag_debug .eq. iflag_full_msg) then
+      if(iflag_debug .gt. 0) then
         write(*,*) trim(field_ctl%c1_tbl(field_ctl%num) ),              &
      &            ' is added at field ID ',   field_ctl%num
       end if

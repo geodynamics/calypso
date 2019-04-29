@@ -60,23 +60,30 @@
 !
       ist  = kr_in * nidx_rj(2) + 1
       ied = (kr_out-1) * nidx_rj(2)
-!$omp parallel do private(inod,i_p1,i_n1,j,k,d1sdr)
+!$omp parallel
+!$omp do private(inod)
+      do inod = ist, ied
+        d_rj(inod,is_grad+1) = d_rj(inod,is_fld)
+        d_rj(inod,is_grad+2) = zero
+      end do
+!$omp end do
+!
+!$omp do private(inod,i_p1,i_n1,j,k,d1sdr)
       do inod = ist, ied
         i_p1 = inod + nidx_rj(2)
         i_n1 = inod - nidx_rj(2)
         j = mod((inod-1),nidx_rj(2)) + 1
         k = 1 + (inod- j) / nidx_rj(2)
 !
-        d1sdr =  d1nod_mat_fdm_2(k,-1) * d_rj(i_n1,is_fld)              &
-     &         + d1nod_mat_fdm_2(k, 0) * d_rj(inod,is_fld)              &
-     &         + d1nod_mat_fdm_2(k, 1) * d_rj(i_p1,is_fld)
+        d1sdr =  d1nod_mat_fdm_2(k,-1) * d_rj(i_n1,is_grad+1)           &
+     &         + d1nod_mat_fdm_2(k, 0) * d_rj(inod,is_grad+1)           &
+     &         + d1nod_mat_fdm_2(k, 1) * d_rj(i_p1,is_grad+1)
 !
         d_rj(inod,is_grad  ) = d1sdr * g_sph_rj(j,13)                   &
-     &                   * radius_1d_rj_r(k)**2
-        d_rj(inod,is_grad+1) = d_rj(inod,is_fld)
-        d_rj(inod,is_grad+2) = zero
+     &                       * radius_1d_rj_r(k)**2
       end do
-!$omp end parallel do
+!$omp end do
+!$omp end parallel
 !
       end subroutine cal_sph_nod_gradient_2
 !

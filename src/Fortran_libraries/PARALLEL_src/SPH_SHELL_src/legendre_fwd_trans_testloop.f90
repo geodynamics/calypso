@@ -393,12 +393,12 @@
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: jst, n_jk_o, n_jk_e
 !
+      integer(kind = kint), intent(in) :: ncomp, nvector
       real(kind = kreal), intent(inout) :: pol_e(ncomp*nkr,n_jk_e)
       real(kind = kreal), intent(inout) :: pol_o(ncomp*nkr,n_jk_o)
       real(kind = kreal), intent(inout) :: tor_e(2*nvector*nkr,n_jk_e)
       real(kind = kreal), intent(inout) :: tor_o(2*nvector*nkr,n_jk_o)
 !
-      integer(kind = kint), intent(in) :: ncomp, nvector
       integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
       integer(kind = kint), intent(in) :: n_WS
       real (kind=kreal), intent(inout):: WS(n_WS)
@@ -505,10 +505,10 @@
       integer(kind = kint), intent(in) :: kst, nkr
       integer(kind = kint), intent(in) :: jst, n_jk_o, n_jk_e
 !
+      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       real(kind = kreal), intent(inout) :: scl_e(ncomp*nkr,n_jk_e)
       real(kind = kreal), intent(inout) :: scl_o(ncomp*nkr,n_jk_o)
 !
-      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
       integer(kind = kint), intent(in) :: n_WS
       real (kind=kreal), intent(inout):: WS(n_WS)

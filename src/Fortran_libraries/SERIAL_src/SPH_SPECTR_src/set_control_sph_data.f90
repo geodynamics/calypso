@@ -41,6 +41,7 @@
       type(phys_data), intent(inout) :: rj_fld
       integer (kind = kint), intent(inout) :: ierr
 !
+      integer(kind = kint), parameter :: id_six = 6
 !
 !   set physical values
 !
@@ -60,7 +61,8 @@
         call ordering_sph_field_by_viz(field_ctl, rj_fld)
 !
         if (iflag_debug .gt. 0) then
-          call check_nodal_field_name_type(6, rj_fld)
+          write(*,*) 'check_nodal_field_name_type for rj_fld'
+          call check_nodal_field_name_type(id_six, rj_fld)
         end if
       end if
 !

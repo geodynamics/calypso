@@ -333,7 +333,7 @@
 !
       real(kind = kreal) :: ratio, al
       integer(kind = kint) :: inod, j, j_gl, k
-      integer(kind = 4) :: l_gl, m_gl
+      integer :: l_gl, m_gl
 !
 !
 !$omp parallel do private(j_gl,l_gl,m_gl,j,inod,ratio,al)
@@ -379,7 +379,7 @@
 !
       real(kind = kreal) :: ratio, ar_gauss, al1
       integer(kind = kint) :: inod, j, j_gl, k
-      integer(kind = 4) :: l_gl, m_gl
+      integer :: l_gl, m_gl
 !
 !
       ar_gauss = one / r_gauss

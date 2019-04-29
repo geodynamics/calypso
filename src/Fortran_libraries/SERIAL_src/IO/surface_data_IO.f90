@@ -8,20 +8,24 @@
 !!
 !!@verbatim
 !!      subroutine read_surface_connection                              &
-!!     &         (id_file, my_rank_IO, comm_IO, ele_IO, sfed_IO, ierr)
-!!      subroutine write_surface_connection                             &
-!!     &         (id_file, my_rank_IO, comm_IO, ele_IO, sfed_IO)
+!!     &         (id_file, id_rank, comm_IO, ele_IO, sfed_IO, ierr)
 !!        type(communication_table), intent(inout) :: comm_IO
-!!        type(node_data), intent(inout) :: nod_IO
 !!        type(element_data), intent(inout) :: ele_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!      subroutine write_surface_connection                             &
+!!     &         (id_file, id_rank, comm_IO, ele_IO, sfed_IO)
+!!        type(communication_table), intent(in) :: comm_IO
+!!        type(element_data), intent(in) :: ele_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!
 !!      subroutine read_surface_geometry(id_file, nod_IO, sfed_IO)
+!!        type(node_data), intent(inout) :: nod_IO
+!!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !!      subroutine write_surface_geometry(id_file, nod_IO, sfed_IO)
 !!      subroutine write_surface_geometry_sph(id_file, nod_IO, sfed_IO)
 !!      subroutine write_surface_geometry_cyl(id_file, nod_IO, sfed_IO)
-!!        type(node_data), intent(inout) :: nod_IO
-!!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!        type(node_data), intent(in) :: nod_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!@endverbatim
 !
       module surface_data_IO
@@ -43,14 +47,14 @@
 !------------------------------------------------------------------
 !
       subroutine read_surface_connection                                &
-     &         (id_file, my_rank_IO, comm_IO, ele_IO, sfed_IO, ierr)
+     &         (id_file, id_rank, comm_IO, ele_IO, sfed_IO, ierr)
 !
       use m_fem_mesh_labels
       use domain_data_IO
       use element_connect_IO
 !
       integer (kind = kint), intent(in) :: id_file
-      integer (kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       type(communication_table), intent(inout) :: comm_IO
       type(element_data), intent(inout) :: ele_IO
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
@@ -63,7 +67,7 @@
 !      write(id_file,'(a)') '!' 
 !      write(id_file,'(a)', advance='NO') hd_fem_para()
 !
-      call read_domain_info(id_file, my_rank_IO, comm_IO, ierr)
+      call read_domain_info(id_file, id_rank, comm_IO, ierr)
 !
 !      write(id_file,'(a)') '!'
 !      write(id_file,'(a)') '!  2  surface connectivity'
@@ -103,22 +107,22 @@
 !------------------------------------------------------------------
 !
       subroutine write_surface_connection                               &
-     &         (id_file, my_rank_IO, comm_IO, ele_IO, sfed_IO)
+     &         (id_file, id_rank, comm_IO, ele_IO, sfed_IO)
 !
       use m_fem_mesh_labels
       use domain_data_IO
       use element_connect_IO
 !
       integer (kind = kint), intent(in) :: id_file
-      integer (kind = kint), intent(in) :: my_rank_IO
-      type(communication_table), intent(inout) :: comm_IO
-      type(element_data), intent(inout) :: ele_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      integer, intent(in) :: id_rank
+      type(communication_table), intent(in) :: comm_IO
+      type(element_data), intent(in) :: ele_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
 !
       write(id_file,'(a)', advance='NO') hd_surf_para()
       write(id_file,'(a)', advance='NO') hd_fem_para()
-      call write_domain_info(id_file, my_rank_IO, comm_IO)
+      call write_domain_info(id_file, id_rank, comm_IO)
 !
       write(id_file,'(a)', advance='NO') hd_surf_connect()
       call write_element_info(id_file, ele_IO)
@@ -177,8 +181,8 @@
       use node_geometry_IO
 !
       integer (kind = kint), intent(in) :: id_file
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
 !
       write(id_file,'(a)', advance='NO') hd_surf_point()
@@ -199,8 +203,8 @@
       use node_geometry_IO
 !
       integer (kind = kint), intent(in) :: id_file
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
 !
       write(id_file,'(a)') '!'
@@ -230,8 +234,8 @@
       use node_geometry_IO
 !
       integer (kind = kint), intent(in) :: id_file
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
 !
       write(id_file,'(a)') '!'

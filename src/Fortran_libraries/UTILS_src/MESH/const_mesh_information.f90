@@ -12,9 +12,9 @@
 !!        type(mesh_groups), intent(inout) ::   group
 !!        type(element_geometry), intent(inout) :: ele_mesh
 !!
-!!      subroutine const_mesh_infos(my_rank, mesh, group, ele_mesh)
+!!      subroutine const_mesh_infos(id_rank, mesh, group, ele_mesh)
 !!      subroutine const_nod_ele_infos                                  &
-!!     &         (my_rank, node, ele, nod_grp, ele_grp, surf_grp)
+!!     &         (id_rank, node, ele, nod_grp, ele_grp, surf_grp)
 !!
 !!      subroutine set_local_element_info(surf, edge)
 !!      subroutine set_nod_and_ele_infosiflag_ele_mesh, (node, ele)
@@ -112,45 +112,51 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine const_mesh_infos(my_rank, mesh, group, ele_mesh)
+      subroutine const_mesh_infos(id_rank, mesh, group, ele_mesh)
 !
       use const_surface_data
       use set_surf_edge_mesh
       use set_connects_4_surf_group
 !      use check_surface_groups
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
       type(element_geometry), intent(inout) :: ele_mesh
 !
-!
+!     initial const info in node and element data structure
+!     like center of element
+!     also initial smp processor address depends on multiprocessing
        if (iflag_debug.gt.0) write(*,*) 'const_nod_ele_infos'
-      call const_nod_ele_infos(my_rank, mesh%node, mesh%ele,            &
+      call const_nod_ele_infos(id_rank, mesh%node, mesh%ele,            &
      &    group%nod_grp, group%ele_grp, group%surf_grp)
 !
+!     allocate and set node info for surface and edge
       if (iflag_debug.gt.0) write(*,*) 'set_local_element_info'
       call set_local_element_info(ele_mesh%surf, ele_mesh%edge)
 !
+!     set connectivity and geometry for surface and edge
       if (iflag_debug.gt.0) write(*,*) 'set_surface_and_edge'
       call set_surface_and_edge                                         &
      &   (mesh%node, mesh%ele, ele_mesh%surf, ele_mesh%edge)
 !
+!     set connection relation of element and surface
       if (iflag_debug.gt.0) write(*,*) 'const_ele_list_4_surface'
       call const_ele_list_4_surface(mesh%ele, ele_mesh%surf)
 !
-!
+!     connectivity for surface group data and node info for each of them
+!     also the smp info for surface group data
       if (iflag_debug.gt.0) write(*,*) 'set_node_4_surf_group'
       call set_node_4_surf_group(mesh%node, mesh%ele,                   &
      &    ele_mesh%surf, group%surf_grp, group%surf_nod_grp)
-!       call check_surface_node_id(my_rank, group%surf_nod_grp)
+!       call check_surface_node_id(id_rank, group%surf_nod_grp)
 !
 !      if (iflag_debug.gt.0) then
 !        call check_surf_nod_4_sheard_para                              &
-!     &     (my_rank, group%surf_grp%num_grp, group%surf_nod_grp)
+!     &     (id_rank, group%surf_grp%num_grp, group%surf_nod_grp)
 !      end if
 !
-!
+!     set surface and element group conectivity
        if (iflag_debug.eq.1) write(*,*) 'const_group_connectiviy_1st'
       call const_group_type_info                                        &
      &   (mesh%node, mesh%ele, ele_mesh%surf, ele_mesh%edge,            &
@@ -162,11 +168,11 @@
 ! ----------------------------------------------------------------------
 !
       subroutine const_nod_ele_infos                                    &
-     &         (my_rank, node, ele, nod_grp, ele_grp, surf_grp)
+     &         (id_rank, node, ele, nod_grp, ele_grp, surf_grp)
 !
       use set_smp_4_group_types
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(node_data), intent(inout) :: node
       type(element_data), intent(inout) :: ele
 !
@@ -178,16 +184,16 @@
       if (iflag_debug.gt.0) write(*,*) 'set_nod_and_ele_infos'
       call set_nod_and_ele_infos(node, ele)
 !      if (iflag_debug.gt.0) then
-!        call check_nod_size_smp_type(mesh%node, my_rank)
+!        call check_nod_size_smp_type(node, id_rank)
 !      end if
 !
        if (iflag_debug.gt.0) write(*,*) 'count_num_groups_smp'
       call count_num_groups_smp(nod_grp, ele_grp, surf_grp)
 !
 !       if (iflag_debug.gt.0) then
-!         call check_grp_4_sheard_para(my_rank, nod_grp)
-!         call check_grp_4_sheard_para(my_rank, ele_grp)
-!         call check_surf_grp_4_sheard_para(my_rank, surf_grp)
+!         call check_grp_4_sheard_para(id_rank, nod_grp)
+!         call check_grp_4_sheard_para(id_rank, ele_grp)
+!         call check_surf_grp_4_sheard_para(id_rank, surf_grp)
 !       end if
 !
       end subroutine const_nod_ele_infos
@@ -240,6 +246,8 @@
 !
        if (iflag_debug.eq.1) write(*,*) 'set_spherical_position'
       call set_spherical_position(node)
+!
+      call find_subdomain_position_range(node)
 !
        if (iflag_debug.eq.1) write(*,*) 'count_overlap_ele'
       call count_overlap_ele(node, ele)

@@ -9,11 +9,13 @@
 !!@verbatim
 !!      subroutine mpi_read_rtp_gl_1d_table(IO_param, sph_IO)
 !!      subroutine mpi_read_rj_gl_1d_table(IO_param, sph_IO)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(sph_IO_data), intent(inout) :: sph_IO
 !!
 !!      subroutine mpi_write_rtp_gl_1d_table(IO_param, sph_IO)
 !!      subroutine mpi_write_rj_gl_1d_table(IO_param, sph_IO)
 !!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
-!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
 !!@endverbatim
 !
       module MPI_sph_gl_1d_idx_IO
@@ -26,12 +28,10 @@
       use m_sph_modes_grid_labels
       use MPI_domain_data_IO
       use MPI_ascii_data_IO
-      use MPI_vectors_IO
+      use MPI_position_IO
 !
       implicit none
 !
-      integer(kind = kint_gl), allocatable :: idx_gl_tmp(:)
-      private :: idx_gl_tmp
       private :: mpi_read_1d_gl_address, mpi_write_1d_gl_address
 !
 ! -----------------------------------------------------------------------
@@ -55,17 +55,12 @@
       call mpi_skip_read(IO_param, len(hd_rgrid()))
       call mpi_read_num_of_data(IO_param, sph_IO%ist_sph(1))
       call mpi_read_num_of_data(IO_param, sph_IO%ied_sph(1))
-      call mpi_read_num_of_data(IO_param, sph_IO%nidx_sph(1))
 !
+      call mpi_read_num_of_data(IO_param, sph_IO%nidx_sph(1))
       call alloc_idx_sph_1d1_IO(sph_IO)
 !
-      allocate(idx_gl_tmp(sph_IO%nidx_sph(1)))
-      call mpi_read_node_position(IO_param,                             &
-     &   sph_IO%nidx_sph(1), sph_IO%ncomp_table_1d(1),                  &
-     &   idx_gl_tmp, sph_IO%r_gl_1)
-      sph_IO%idx_gl_1(1:sph_IO%nidx_sph(1))                             &
-     &       = int(idx_gl_tmp(1:sph_IO%nidx_sph(1)))
-      deallocate(idx_gl_tmp)
+      call mpi_read_radial_position(IO_param,                           &
+     &    sph_IO%nidx_sph(1), sph_IO%idx_gl_1, sph_IO%r_gl_1)
 !
 !
       call mpi_skip_read(IO_param, len(hd_tgrid()))
@@ -108,18 +103,12 @@
       call mpi_skip_read(IO_param, len(hd_rgrid()))
       call mpi_read_num_of_data(IO_param, sph_IO%ist_sph(1))
       call mpi_read_num_of_data(IO_param, sph_IO%ied_sph(1))
-      call mpi_read_num_of_data(IO_param, sph_IO%nidx_sph(1))
 !
+      call mpi_read_num_of_data(IO_param, sph_IO%nidx_sph(1))
       call alloc_idx_sph_1d1_IO(sph_IO)
 !
-      allocate(idx_gl_tmp(sph_IO%nidx_sph(1)))
-      call mpi_read_node_position(IO_param,                             &
-     &   sph_IO%nidx_sph(1), sph_IO%ncomp_table_1d(1),                  &
-     &   idx_gl_tmp, sph_IO%r_gl_1)
-!
-      sph_IO%idx_gl_1(1:sph_IO%nidx_sph(1))                             &
-     &       = int(idx_gl_tmp(1:sph_IO%nidx_sph(1)))
-      deallocate(idx_gl_tmp)
+      call mpi_read_radial_position(IO_param,                             &
+     &   sph_IO%nidx_sph(1), sph_IO%idx_gl_1, sph_IO%r_gl_1)
 !
 !
       call mpi_skip_read(IO_param, len(hd_jmode()))
@@ -140,7 +129,7 @@
       subroutine mpi_write_rtp_gl_1d_table(IO_param, sph_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
 !
       call mpi_write_charahead                                          &
@@ -149,12 +138,9 @@
       call mpi_write_num_of_data(IO_param, sph_IO%ist_sph(1))
       call mpi_write_num_of_data(IO_param, sph_IO%ied_sph(1))
 !
-      allocate(idx_gl_tmp(sph_IO%nidx_sph(1)))
-      idx_gl_tmp(1:sph_IO%nidx_sph(1))                                  &
-     &       =  sph_IO%idx_gl_1(1:sph_IO%nidx_sph(1))
-      call mpi_write_node_position(IO_param,                            &
-     &   sph_IO%nidx_sph(1), ione, idx_gl_tmp, sph_IO%r_gl_1)
-      deallocate(idx_gl_tmp)
+      call mpi_write_num_of_data(IO_param, sph_IO%nidx_sph(1))
+      call mpi_write_radial_position(IO_param,                          &
+     &    sph_IO%nidx_sph(1), sph_IO%idx_gl_1, sph_IO%r_gl_1)
 !
 !
       call mpi_write_charahead                                          &
@@ -178,12 +164,6 @@
      &    sph_IO%nidx_sph(3), sph_IO%ncomp_table_1d(3),                 &
      &    sph_IO%idx_gl_3)
 !
-!
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
-      call dealloc_idx_sph_1d3_IO(sph_IO)
-!
       end subroutine mpi_write_rtp_gl_1d_table
 !
 ! ----------------------------------------------------------------------
@@ -191,7 +171,7 @@
       subroutine mpi_write_rj_gl_1d_table(IO_param, sph_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
 !
       call mpi_write_charahead                                          &
@@ -200,13 +180,9 @@
       call mpi_write_num_of_data(IO_param, sph_IO%ist_sph(1))
       call mpi_write_num_of_data(IO_param, sph_IO%ied_sph(1))
 !
-      allocate(idx_gl_tmp(sph_IO%nidx_sph(1)))
-      idx_gl_tmp(1:sph_IO%nidx_sph(1))                                  &
-     &       =  sph_IO%idx_gl_1(1:sph_IO%nidx_sph(1))
-      call mpi_write_node_position(IO_param,                            &
-     &    sph_IO%nidx_sph(1), sph_IO%ncomp_table_1d(1),                 &
-     &    idx_gl_tmp, sph_IO%r_gl_1)
-      deallocate(idx_gl_tmp)
+      call mpi_write_num_of_data(IO_param, sph_IO%nidx_sph(1))
+      call mpi_write_radial_position(IO_param,                            &
+     &    sph_IO%nidx_sph(1), sph_IO%idx_gl_1, sph_IO%r_gl_1)
 !
 !
       call mpi_write_charahead                                          &
@@ -218,10 +194,6 @@
       call mpi_write_1d_gl_address(IO_param,                            &
      &    sph_IO%nidx_sph(2), sph_IO%ncomp_table_1d(2),                 &
      &    sph_IO%idx_gl_2)
-!
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
 !
       end subroutine mpi_write_rj_gl_1d_table
 !
@@ -237,16 +209,18 @@
 !
       integer(kind = kint) :: idx_tmp(numdir)
 
-      integer(kind = kint) :: i, led, ilength, n_item
+      integer(kind = kint) :: i, led, n_item
+      integer ::  ilength
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
+      n_item = int(IO_param%nprocs_in, KIND(n_item))
       call mpi_skip_read                                                &
-     &   (IO_param, len_multi_int_textline(IO_param%nprocs_in))
+     &   (IO_param, len_multi_int_textline(n_item))
 !
       IO_param%istack_merged(0) = 0
       do i = 1, IO_param%nprocs_in
-        n_item = int(IO_param%istack_merged(i))
+        n_item = int(IO_param%istack_merged(i),KIND(n_item))
         if(n_item .le. 0) then
           led = ione
         else if(n_item .gt. 0) then
@@ -287,9 +261,11 @@
       integer(kind=kint), intent(in) :: nnod, numdir
       integer(kind=kint), intent(in) :: idx(nnod, numdir)
 !
-      integer(kind = kint) :: i, led, ilength
+      integer(kind = kint_gl) :: led
+      integer(kind = kint) :: i
       integer(kind = kint) :: idx_tmp(numdir)
       integer(kind = MPI_OFFSET_KIND) :: ioffset
+      integer :: ilength
 !
 !
       call mpi_write_num_of_data(IO_param, nnod)
@@ -310,7 +286,7 @@
 !
       if(nnod .le. 0) then
         call calypso_mpi_seek_write_chara                               &
-     &     (IO_param%id_file, ioffset, ione, char(10))
+     &     (IO_param%id_file, ioffset, 1, char(10))
       else
         do i = 1, nnod
           idx_tmp(1:numdir) = idx(i,1:numdir)

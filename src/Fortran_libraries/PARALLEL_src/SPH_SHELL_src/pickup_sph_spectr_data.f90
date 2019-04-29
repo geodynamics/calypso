@@ -111,7 +111,8 @@
       type(picked_spectrum_data), intent(inout) :: picked
 !
       integer(kind = kint) :: inum, knum, j, k, nd, i_fld, j_fld
-      integer(kind = kint) :: inod, ipick, num, icou, jcou, kst, ncomp
+      integer(kind = kint) :: inod, ipick, icou, jcou, kst, ncomp
+      integer(kind = kint_gl) :: num64
 !
 !
       if(picked%num_sph_mode * picked%num_layer .eq. 0) return
@@ -183,9 +184,10 @@
       end do
 !!$omp end parallel
 !
-      num = picked%ntot_comp_rj * picked%num_layer*picked%num_sph_mode
-      call MPI_allREDUCE(picked%d_rj_lc, picked%d_rj_gl,                &
-     &    num, CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      num64 = picked%ntot_comp_rj * picked%num_layer                    &
+     &       * picked%num_sph_mode
+      call calypso_mpi_allreduce_real                                   &
+     &   (picked%d_rj_lc, picked%d_rj_gl, num64, MPI_SUM)
 !
       end subroutine pickup_sph_spec_4_monitor
 !

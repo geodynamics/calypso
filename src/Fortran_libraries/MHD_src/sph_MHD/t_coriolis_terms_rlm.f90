@@ -14,11 +14,13 @@
 !!     &         (l_truncation, sph_rlm, sph_bc_U, leg, gt_cor, cor_rlm)
 !!
 !!      subroutine sum_coriolis_rlm(ncomp_trans, sph_rlm, comm_rlm,     &
-!!     &          fl_prop, sph_bc_U, omega_sph, trns_MHD, leg, gt_cor,  &
+!!     &          fl_prop, sph_bc_U, omega_sph, b_trns, leg, gt_cor,    &
 !!     &          n_WR, WR, cor_rlm)
+!!        type(phys_address), intent(in) :: b_trns
 !!      subroutine copy_coriolis_terms_rlm                              &
 !!     &         (ncomp_trans, sph_rlm, comm_rlm, fl_prop,              &
-!!     &          trns_MHD, cor_rlm, n_WS, WS)
+!!     &          f_trns, cor_rlm, n_WS, WS)
+!!        type(phys_address), intent(in) :: f_trns
 !!
 !!      subroutine dealloc_d_coriolis_rlm(cor_rlm)
 !!
@@ -188,7 +190,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine sum_coriolis_rlm(ncomp_trans, sph_rlm, comm_rlm,       &
-     &          fl_prop, sph_bc_U, omega_sph, trns_MHD, leg, gt_cor,    &
+     &          fl_prop, sph_bc_U, omega_sph, b_trns, leg, gt_cor,      &
      &          n_WR, WR, cor_rlm)
 !
       use t_physical_property
@@ -200,7 +202,7 @@
       type(fluid_property), intent(in) :: fl_prop
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_rotation), intent(in) :: omega_sph
-      type(address_4_sph_trans), intent(in) :: trns_MHD 
+      type(phys_address), intent(in) :: b_trns
       type(legendre_4_sph_trans), intent(in) :: leg
 !
       type(gaunt_coriolis_rlm), intent(in) :: gt_cor
@@ -213,7 +215,7 @@
 !
       if(fl_prop%iflag_4_coriolis .eq. id_turn_OFF) return
 !
-      call sum_rot_coriolis_rlm_10(trns_MHD%b_trns,                     &
+      call sum_rot_coriolis_rlm_10(b_trns,                              &
      &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%a_r_1d_rlm_r,     &
      &    leg%g_sph_rlm, omega_sph%ws_rlm, fl_prop%coef_cor,            &
      &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sw_rlm, gt_cor%tw_rlm, &
@@ -223,7 +225,7 @@
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call inner_core_rot_z_coriolis_rlm                              &
-     &     (trns_MHD%b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,        &
+     &     (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                 &
      &      sph_rlm%radius_1d_rlm_r, omega_sph%ws_rlm,                  &
      &      fl_prop%coef_cor, ncomp_trans, n_WR, comm_rlm%irev_sr, WR,  &
      &      cor_rlm%idx_rlm_ICB, cor_rlm%idx_rlm_degree_one,            &
@@ -231,21 +233,21 @@
       end if
 !
 !      call sum_div_coriolis_rlm_10                                     &
-!     &   (trns_MHD%b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,         &
+!     &   (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                  &
 !     &    sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,               &
 !     &    omega_sph%ws_rlm, fl_prop%coef_cor,                          &
 !     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sd_rlm, gt_cor%td_rlm,&
 !     &    ncomp_trans, n_WR, comm_rlm%irev_sr, WR,                     &
 !     &    cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_div_cor))
 !      call sum_r_coriolis_bc_rlm_10                                    &
-!     &   (trns_MHD%b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,         &
+!     &   (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                  &
 !     &    sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,               &
 !     &    omega_sph%ws_rlm, fl_prop%coef_cor,                          &
 !     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sr_rlm, gt_cor%tr_rlm,&
 !     &    ncomp_trans, kr_in_U_rlm, n_WR, comm_rlm%irev_sr,            &
 !     &    WR, cor_rlm%d_cor_in_rlm)
 !      call sum_r_coriolis_bc_rlm_10                                    &
-!     &   (trns_MHD%b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,         &
+!     &   (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                  &
 !     &    sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,               &
 !     &    omega_sph%ws_rlm, fl_prop%coef_cor,                          &
 !     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sr_rlm, gt_cor%tr_rlm,&
@@ -258,7 +260,7 @@
 !
       subroutine copy_coriolis_terms_rlm                                &
      &         (ncomp_trans, sph_rlm, comm_rlm, fl_prop,                &
-     &          trns_MHD, cor_rlm, n_WS, WS)
+     &          f_trns, cor_rlm, n_WS, WS)
 !
       use m_sph_communicators
       use m_sel_spherical_SRs
@@ -267,7 +269,7 @@
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_comm_tbl), intent(in) :: comm_rlm
       type(fluid_property), intent(in) :: fl_prop
-      type(address_4_sph_trans), intent(in) :: trns_MHD
+      type(phys_address), intent(in) :: f_trns
       type(coriolis_rlm_data), intent(in) :: cor_rlm
 !
       integer(kind = kint), intent(in) :: ncomp_trans, n_WS
@@ -280,14 +282,12 @@
      &   (ncomp_trans, sph_rlm%nnod_rlm, n_WS,                          &
      &    comm_rlm%nneib_domain, comm_rlm%istack_sr, comm_rlm%item_sr,  &
      &    cor_rlm%ncomp_coriolis_rlm, cor_rlm%ip_rlm_rot_cor,           &
-     &    trns_MHD%f_trns%i_rot_Coriolis, cor_rlm%d_cor_rlm(1,1),       &
-     &    WS(1))
+     &    f_trns%i_rot_Coriolis, cor_rlm%d_cor_rlm(1,1), WS(1))
       call sel_calypso_to_send_scalar                                   &
      &   (ncomp_trans, sph_rlm%nnod_rlm, n_WS,                          &
      &    comm_rlm%nneib_domain, comm_rlm%istack_sr, comm_rlm%item_sr,  &
      &    cor_rlm%ncomp_coriolis_rlm, cor_rlm%it_rlm_rot_cor,           &
-     &    (trns_MHD%f_trns%i_rot_Coriolis+2), cor_rlm%d_cor_rlm(1,1),   &
-     &    WS(1))
+     &    (f_trns%i_rot_Coriolis+2), cor_rlm%d_cor_rlm(1,1), WS(1))
 !
       end subroutine copy_coriolis_terms_rlm
 !

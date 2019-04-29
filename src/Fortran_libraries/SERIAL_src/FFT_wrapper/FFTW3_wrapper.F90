@@ -117,7 +117,7 @@
      &              :: C_FFTW(Nfft/2+1,Ncomp)
 !
       integer(kind = kint) :: j
-      integer(kind = 4) :: Nfft4
+      integer :: Nfft4
 !
 !
       Nfft4 = int(Nfft)

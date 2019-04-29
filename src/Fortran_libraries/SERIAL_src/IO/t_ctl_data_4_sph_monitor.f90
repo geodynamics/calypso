@@ -9,7 +9,7 @@
 !!
 !!@verbatim
 !!      subroutine read_sph_monitoring_ctl(hd_block, iflag, smonitor_ctl)
-!!      subroutine dealloc_vol_sopectr_ctl(smonitor_ctl)
+!!      subroutine dealloc_sph_monitoring_ctl(smonitor_ctl)
 !!
 !! -----------------------------------------------------------------
 !!
@@ -140,7 +140,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
         call read_gauss_spectr_ctl                                      &
@@ -200,15 +200,25 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine dealloc_vol_sopectr_ctl(smonitor_ctl)
+      subroutine dealloc_sph_monitoring_ctl(smonitor_ctl)
 !
       type(sph_monitor_control), intent(inout) :: smonitor_ctl
 !
 !
+      call dealloc_num_spec_layer_ctl(smonitor_ctl%lp_ctl)
+      call dealloc_pick_spectr_control(smonitor_ctl%pspec_ctl)
+      call dealloc_gauss_spectr_control(smonitor_ctl%g_pwr)
+      call reset_mid_equator_control(smonitor_ctl%meq_ctl)
+!
+      smonitor_ctl%volume_average_prefix%iflag = 0
+      smonitor_ctl%volume_pwr_spectr_prefix%iflag = 0
+      smonitor_ctl%Nusselt_file_prefix%iflag = 0
+!
+      if(smonitor_ctl%num_vspec_ctl .le. 0) return
       deallocate(smonitor_ctl%v_pwr)
       smonitor_ctl%num_vspec_ctl = 0
 !
-      end subroutine dealloc_vol_sopectr_ctl
+      end subroutine dealloc_sph_monitoring_ctl
 !
 !  ---------------------------------------------------------------------
 !

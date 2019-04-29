@@ -9,7 +9,7 @@
 !!
 !!@verbatim
 !!      subroutine const_sph_rj_modes                                   &
-!!     &         (ip_rank, ndomain_sph, comm_rlm_mul, added_radial_grp, &
+!!     &         (id_rank, num_pe, comm_rlm_mul, added_radial_grp,      &
 !!     &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,   &
 !!     &          sph_params, sph_rj, sph_rlm, sph_file, sph_lcx)
 !!        type(spheric_global_rank), intent(in) :: s3d_ranks
@@ -23,8 +23,7 @@
 !!        type(sph_rlm_grid), intent(inout) :: sph_rlm
 !!        type(sph_file_data_type), intent(inout) :: sph_file
 !!        type(sph_local_1d_index), intent(inout) :: sph_lcx
-!!      subroutine const_sph_rtp_grids                                  &
-!!     &         (ip_rank, ndomain_sph, comm_rtm_mul,                   &
+!!      subroutine const_sph_rtp_grids(id_rank, num_pe, comm_rtm_mul,   &
 !!     &          added_radial_grp, r_layer_grp, med_layer_grp,         &
 !!     &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,   &
 !!     &          sph_params, sph_rtp, sph_rtm, sph_file, sph_lcx)
@@ -79,12 +78,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine allocate_domain_sr_tmp(ndomain_sph)
+      subroutine allocate_domain_sr_tmp(num_pe)
 !
-      integer(kind = kint), intent(in) :: ndomain_sph
+      integer, intent(in) :: num_pe
 !
-      allocate( id_domain_tmp(ndomain_sph) )
-      allocate( nnod_sr_tmp(ndomain_sph) )
+      allocate( id_domain_tmp(num_pe) )
+      allocate( nnod_sr_tmp(num_pe) )
       id_domain_tmp = 0
       nnod_sr_tmp = 0
 !
@@ -103,7 +102,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine const_sph_rj_modes                                     &
-     &         (ip_rank, ndomain_sph, comm_rlm_mul, added_radial_grp,   &
+     &         (id_rank, num_pe, comm_rlm_mul, added_radial_grp,        &
      &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
      &          sph_params, sph_rj, sph_rlm, sph_file, sph_lcx)
 !
@@ -113,10 +112,10 @@
       use set_local_sphere_param
       use set_local_sphere_by_global
 !
-      integer(kind = kint), intent(in) :: ip_rank
-      integer(kind = kint), intent(in) :: ndomain_sph
+      integer, intent(in) :: id_rank
+      integer, intent(in) :: num_pe
       type(sph_shell_parameters), intent(in) :: sph_params
-      type(sph_comm_tbl), intent(in) :: comm_rlm_mul(ndomain_sph)
+      type(sph_comm_tbl), intent(in) :: comm_rlm_mul(num_pe)
       type(layering_group_list), intent(in) :: added_radial_grp
       type(spheric_global_rank), intent(in) :: s3d_ranks
       type(spheric_global_radius), intent(in) :: s3d_radius
@@ -133,11 +132,11 @@
 !
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
-     &                'copy_gl_2_local_rj_param', ip_rank
+     &                'copy_gl_2_local_rj_param', id_rank
       call copy_gl_2_local_rj_param                                     &
-     &   (ip_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rj)
+     &   (id_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rj)
 !
-      call add_center_mode_rj(ip_rank, sph_gl1d, sph_rj)
+      call add_center_mode_rj(id_rank, sph_gl1d, sph_rj)
 !      nnod_rj = sph_rj%nnod_rj
 !      nidx_rj(1:2) = sph_rj%nidx_rj(1:2)
 !
@@ -147,35 +146,39 @@
       call copy_sph_1d_gl_idx_rj(s3d_radius, sph_gl1d, sph_rj)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
-     &                 'set_global_sph_rj_id', ip_rank
+     &                 'set_global_sph_rj_id', id_rank
       call set_global_sph_rj_id(s3d_ranks, stk_lc1d, sph_rj)
 !
       if(iflag_debug .gt. 0) then
-        call check_type_spheric_param_rj(ip_rank, sph_rj)
+        call check_type_spheric_param_rj(id_rank, sph_rj)
       end if
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
-     &                 'const_comm_table_4_rj', ip_rank
-      call const_comm_table_4_rj(ip_rank, ndomain_sph, comm_rlm_mul,    &
+     &                 'const_comm_table_4_rj', id_rank
+      call const_comm_table_4_rj(id_rank, num_pe, comm_rlm_mul,    &
      &   s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,            &
      &   sph_rj, sph_rlm, comm_rj_lc, sph_lcx)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
-     &                  'set_sph_rj_groups', ip_rank
+     &                  'set_sph_rj_groups', id_rank
       call set_sph_rj_groups(sph_params, sph_rj, added_radial_grp,      &
      &    sph_grp_lc%radial_rj_grp, sph_grp_lc%sphere_rj_grp)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
-     &                 'output_modes_rj_sph_trans', ip_rank
+     &                 'output_modes_rj_sph_trans', id_rank
       call output_modes_rj_sph_trans(sph_params,                        &
      &    sph_rj, comm_rj_lc, sph_grp_lc, sph_file)
+!
+      call dealloc_type_sph_1d_index_rj(sph_rj)
+      call dealloc_spheric_param_rj(sph_rj)
+      call dealloc_type_sph_comm_item(comm_rj_lc)
+      call dealloc_sph_mode_group(sph_grp_lc)
 !
       end subroutine const_sph_rj_modes
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine const_sph_rtp_grids                                    &
-     &         (ip_rank, ndomain_sph, comm_rtm_mul,                     &
+      subroutine const_sph_rtp_grids(id_rank, num_pe, comm_rtm_mul,     &
      &          added_radial_grp, r_layer_grp, med_layer_grp,           &
      &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
      &          sph_params, sph_rtp, sph_rtm, sph_file, sph_lcx)
@@ -186,11 +189,11 @@
       use set_local_sphere_param
       use set_local_sphere_by_global
 !
-      integer(kind = kint), intent(in) :: ip_rank
-      integer(kind = kint), intent(in) :: ndomain_sph
+      integer, intent(in) :: id_rank
+      integer, intent(in) :: num_pe
 !
       type(sph_shell_parameters), intent(in) :: sph_params
-      type(sph_comm_tbl), intent(in) :: comm_rtm_mul(ndomain_sph)
+      type(sph_comm_tbl), intent(in) :: comm_rtm_mul(num_pe)
       type(layering_group_list), intent(in) :: added_radial_grp
       type(layering_group_list), intent(in) :: r_layer_grp
       type(layering_group_list), intent(in) :: med_layer_grp
@@ -209,9 +212,9 @@
 !
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
-     &                'copy_gl_2_local_rtp_param', ip_rank
+     &                'copy_gl_2_local_rtp_param', id_rank
       call copy_gl_2_local_rtp_param                                    &
-     &   (ip_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rtp)
+     &   (id_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rtp)
 !
       call alloc_type_spheric_param_rtp(sph_rtp)
       call alloc_type_sph_1d_index_rtp(sph_rtp)
@@ -219,44 +222,48 @@
       call copy_sph_1d_gl_idx_rtp(s3d_radius, sph_gl1d, sph_rtp)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
-     &                 'set_global_sph_rtp_id', ip_rank
+     &                 'set_global_sph_rtp_id', id_rank
       call set_global_sph_rtp_id(s3d_ranks, stk_lc1d, sph_rtp)
 !
       if(iflag_debug .gt. 0) then
-        write(*,*) 'check_spheric_param_rtp', ip_rank
-        call check_type_spheric_param_rtp(ip_rank, sph_rtp)
+        write(*,*) 'check_spheric_param_rtp', id_rank
+        call check_type_spheric_param_rtp(id_rank, sph_rtp)
       end if
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
-     &                 'const_comm_table_4_rtp', ip_rank
-      call const_comm_table_4_rtp(ip_rank, ndomain_sph, comm_rtm_mul,   &
+     &                 'const_comm_table_4_rtp', id_rank
+      call const_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,   &
      &    s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,           &
      &    sph_rtp, sph_rtm, comm_rtp_lc, sph_lcx)
 !
-      if(iflag_debug .gt. 0) write(*,*) 'set_sph_rtp_groups', ip_rank
+      if(iflag_debug .gt. 0) write(*,*) 'set_sph_rtp_groups', id_rank
       call set_sph_rtp_groups(sph_params, sph_rtp,                      &
      &    added_radial_grp, r_layer_grp, med_layer_grp,                 &
      &    sph_grp_lc%bc_rtp_grp, sph_grp_lc%radial_rtp_grp,             &
      &    sph_grp_lc%theta_rtp_grp, sph_grp_lc%zonal_rtp_grp)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
-     &                 'output_geom_rtp_sph_trans', ip_rank
+     &                 'output_geom_rtp_sph_trans', id_rank
       call output_geom_rtp_sph_trans(sph_params,                        &
      &    sph_rtp, comm_rtp_lc, sph_grp_lc, sph_file)
+!
+      call dealloc_type_sph_1d_index_rtp(sph_rtp)
+      call dealloc_type_spheric_param_rtp(sph_rtp)
+      call dealloc_type_sph_comm_item(comm_rtp_lc)
+      call dealloc_sph_grid_group(sph_grp_lc)
 !
       end subroutine const_sph_rtp_grids
 !
 ! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_comm_table_4_rj                                  &
-     &         (ip_rank, ndomain_sph, comm_rlm_mul,                     &
+      subroutine const_comm_table_4_rj(id_rank, num_pe, comm_rlm_mul,   &
      &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
      &          sph_rj, sph_rlm, comm_rj, sph_lcx)
 !
-      integer(kind = kint), intent(in) :: ip_rank
-      integer(kind = kint), intent(in) :: ndomain_sph
-      type(sph_comm_tbl), intent(in) :: comm_rlm_mul(ndomain_sph)
+      integer, intent(in) :: id_rank
+      integer, intent(in) :: num_pe
+      type(sph_comm_tbl), intent(in) :: comm_rlm_mul(num_pe)
       type(spheric_global_rank), intent(in) :: s3d_ranks
       type(spheric_global_radius), intent(in) :: s3d_radius
       type(sph_local_parameters), intent(in) :: sph_lcp
@@ -271,11 +278,11 @@
       integer(kind = kint) :: icou
 !
 !
-      call allocate_domain_sr_tmp(ndomain_sph)
+      call allocate_domain_sr_tmp(num_pe)
 !
       comm_rj%nneib_domain = 0
       call count_comm_table_4_rj                                        &
-     &   (ip_rank, ndomain_sph, comm_rlm_mul, comm_rj)
+     &   (id_rank, num_pe, comm_rlm_mul, comm_rj)
 !
       call alloc_type_sph_comm_stack(comm_rj)
 !
@@ -287,7 +294,7 @@
       call alloc_type_sph_comm_item(sph_rj%nnod_rj,  comm_rj)
 !
       icou = 0
-      call set_comm_table_4_rj(ip_rank, ndomain_sph, comm_rlm_mul,      &
+      call set_comm_table_4_rj(id_rank, num_pe, comm_rlm_mul,           &
      &    s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,           &
      &    sph_rj, sph_rlm, comm_rj, sph_lcx, icou)
 !
@@ -295,15 +302,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_comm_table_4_rtp                                 &
-     &         (ip_rank, ndomain_sph, comm_rtm_mul,                     &
+      subroutine const_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,  &
      &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
      &          sph_rtp, sph_rtm, comm_rtp, sph_lcx)
 !
-      integer(kind = kint), intent(in) :: ip_rank
-      integer(kind = kint), intent(in) :: ndomain_sph
+      integer, intent(in) :: id_rank
+      integer, intent(in) :: num_pe
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(sph_comm_tbl), intent(in) :: comm_rtm_mul(ndomain_sph)
+      type(sph_comm_tbl), intent(in) :: comm_rtm_mul(num_pe)
       type(spheric_global_rank), intent(in) :: s3d_ranks
       type(spheric_global_radius), intent(in) :: s3d_radius
       type(sph_local_parameters), intent(in) :: sph_lcp
@@ -317,9 +323,9 @@
       integer(kind = kint) :: icou
 !
 !
-      call allocate_domain_sr_tmp(ndomain_sph)
+      call allocate_domain_sr_tmp(num_pe)
 !
-      call count_comm_table_4_rtp(ip_rank, ndomain_sph, comm_rtm_mul,   &
+      call count_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,   &
      &    comm_rtp%nneib_domain)
 !
       call alloc_type_sph_comm_stack(comm_rtp)
@@ -336,7 +342,7 @@
       call alloc_type_sph_comm_item(sph_rtp%nnod_rtp, comm_rtp)
 !
       icou = 0
-      call set_comm_table_4_rtp(ip_rank, ndomain_sph, comm_rtm_mul,     &
+      call set_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,          &
      &    s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,           &
      &    sph_rtp, sph_rtm, comm_rtp, sph_lcx, icou)
 !
@@ -346,25 +352,26 @@
 ! -----------------------------------------------------------------------
 !
       subroutine count_comm_table_4_rj                                  &
-     &         (ip_rank, ndomain_sph, comm_rlm, comm_rj)
+     &         (id_rank, num_pe, comm_rlm, comm_rj)
 !
-      integer(kind = kint), intent(in) :: ip_rank
-      integer(kind = kint), intent(in) :: ndomain_sph
-      type(sph_comm_tbl), intent(in) :: comm_rlm(ndomain_sph)
+      integer, intent(in) :: id_rank
+      integer, intent(in) :: num_pe
+      type(sph_comm_tbl), intent(in) :: comm_rlm(num_pe)
 !
       type(sph_comm_tbl), intent(inout) :: comm_rj
 !
-      integer(kind = kint) :: ip1, jp, id_org_rank, ip_org
+      integer(kind = kint) :: jp
       integer(kind = kint) :: iflag_jp
+      integer :: id_org_rank, ip_org, ip1
 !
 !
-      do ip1 = 1, ndomain_sph
-        id_org_rank = mod((ip_rank+ip1),ndomain_sph)
+      do ip1 = 1, num_pe
+        id_org_rank = mod((id_rank+ip1),num_pe)
         ip_org = id_org_rank + 1
 !
         iflag_jp = 0
         do jp = 1, comm_rlm(ip_org)%nneib_domain
-          if(comm_rlm(ip_org)%id_domain(jp) .eq. ip_rank) then
+          if(comm_rlm(ip_org)%id_domain(jp) .eq. id_rank) then
             iflag_jp = jp
             exit
           end if
@@ -382,8 +389,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_comm_table_4_rj                                    &
-     &         (ip_rank, ndomain_sph, comm_rlm_mul,                     &
+      subroutine set_comm_table_4_rj(id_rank, num_pe, comm_rlm_mul,     &
      &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
      &          sph_rj, sph_rlm, comm_rj, sph_lcx, icou)
 !
@@ -391,10 +397,10 @@
 !
       use gen_sph_grids_modes
 !
-      integer(kind = kint), intent(in) :: ip_rank
-      integer(kind = kint), intent(in) :: ndomain_sph
+      integer, intent(in) :: id_rank
+      integer, intent(in) :: num_pe
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(sph_comm_tbl), intent(in) :: comm_rlm_mul(ndomain_sph)
+      type(sph_comm_tbl), intent(in) :: comm_rlm_mul(num_pe)
       type(spheric_global_rank), intent(in) :: s3d_ranks
       type(spheric_global_radius), intent(in) :: s3d_radius
       type(sph_local_parameters), intent(in) :: sph_lcp
@@ -411,26 +417,27 @@
 !
       integer(kind = kint) :: jst, jed, j, jnod, k_tmp, j_tmp
       integer(kind = kint) :: k_glb, j_glb
-      integer(kind = kint) :: ip1, jp, id_org_rank, ip_org
+      integer(kind = kint) :: jp
       integer(kind = kint) :: iflag_jp
+      integer :: id_org_rank, ip_org, ip1
 !
 !
       call set_local_idx_table_rj(sph_rj, sph_lcx)
 !
-      do ip1 = 1, ndomain_sph
-        id_org_rank = mod((ip_rank+ip1),ndomain_sph)
+      do ip1 = 1, num_pe
+        id_org_rank = int(mod((id_rank+ip1),num_pe))
         ip_org = id_org_rank + 1
 !
         iflag_jp = 0
         do jp = 1, comm_rlm_mul(ip_org)%nneib_domain
-          if(comm_rlm_mul(ip_org)%id_domain(jp) .eq. ip_rank) then
+          if(comm_rlm_mul(ip_org)%id_domain(jp) .eq. id_rank) then
             iflag_jp = jp
             exit
           end if
         end do
         if(iflag_jp .eq. 0) cycle
 !
-        call const_sph_rlm_modes (id_org_rank,                          &
+        call const_sph_rlm_modes(id_org_rank,                           &
      &     s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,          &
      &      sph_rlm, comm_rlm_lc)
 !
@@ -457,28 +464,29 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine count_comm_table_4_rtp(ip_rank, ndomain_sph, comm_rtm, &
+      subroutine count_comm_table_4_rtp(id_rank, num_pe, comm_rtm,      &
      &          nneib_domain_rtp)
 !
-      integer(kind = kint), intent(in) :: ip_rank
-      integer(kind = kint), intent(in) :: ndomain_sph
-      type(sph_comm_tbl), intent(in) :: comm_rtm(ndomain_sph)
+      integer, intent(in) :: id_rank
+      integer, intent(in) :: num_pe
+      type(sph_comm_tbl), intent(in) :: comm_rtm(num_pe)
 !
       integer(kind = kint), intent(inout) :: nneib_domain_rtp
 !
-      integer(kind = kint) :: ip1, jp, id_org_rank, ip_org
+      integer(kind = kint) :: jp
       integer(kind = kint) :: iflag_jp
+      integer :: id_org_rank, ip_org, ip1
 !
 !
       nneib_domain_rtp = 0
 !
-      do ip1 = 1, ndomain_sph
-        id_org_rank = mod((ip_rank+ip1),ndomain_sph)
+      do ip1 = 1, num_pe
+        id_org_rank = int(mod((id_rank+ip1),num_pe))
         ip_org = id_org_rank + 1
 !
         iflag_jp = 0
         do jp = 1, comm_rtm(ip_org)%nneib_domain
-          if(comm_rtm(ip_org)%id_domain(jp) .eq. ip_rank) then
+          if(comm_rtm(ip_org)%id_domain(jp) .eq. id_rank) then
             iflag_jp = jp
             exit
           end if
@@ -496,17 +504,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_comm_table_4_rtp                                   &
-     &         (ip_rank, ndomain_sph, comm_rtm_mul,                     &
+      subroutine set_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,    &
      &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
      &          sph_rtp, sph_rtm, comm_rtp, sph_lcx, icou)
 !
       use gen_sph_grids_modes
 !
-      integer(kind = kint), intent(in) :: ip_rank
-      integer(kind = kint), intent(in) :: ndomain_sph
+      integer, intent(in) :: id_rank
+      integer, intent(in) :: num_pe
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(sph_comm_tbl), intent(in) :: comm_rtm_mul(ndomain_sph)
+      type(sph_comm_tbl), intent(in) :: comm_rtm_mul(num_pe)
       type(spheric_global_rank), intent(in) :: s3d_ranks
       type(spheric_global_radius), intent(in) :: s3d_radius
       type(sph_local_parameters), intent(in) :: sph_lcp
@@ -522,18 +529,19 @@
 !
       integer(kind = kint) :: jst, jed, j, jnod
       integer(kind = kint) :: k_tmp, l_tmp, m_tmp, k_glb, l_glb, m_glb
-      integer(kind = kint) :: ip1, jp, id_org_rank, ip_org, iflag_jp
+      integer(kind = kint) :: jp, iflag_jp
+      integer :: id_org_rank, ip_org, ip1
 !
 !
       call set_local_idx_table_rtp(sph_rtp, sph_lcx)
 !
-      do ip1 = 1, ndomain_sph
-        id_org_rank = mod((ip_rank+ip1),ndomain_sph)
+      do ip1 = 1, num_pe
+        id_org_rank = int(mod((id_rank+ip1),num_pe))
         ip_org = id_org_rank + 1
 !
         iflag_jp = 0
         do jp = 1, comm_rtm_mul(ip_org)%nneib_domain
-          if(comm_rtm_mul(ip_org)%id_domain(jp) .eq. ip_rank) then
+          if(comm_rtm_mul(ip_org)%id_domain(jp) .eq. id_rank) then
             iflag_jp = jp
             exit
           end if

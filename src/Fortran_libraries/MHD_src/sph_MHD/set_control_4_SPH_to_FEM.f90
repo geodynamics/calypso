@@ -7,12 +7,6 @@
 !>@brief  Load mesh and filtering data for MHD simulation
 !!
 !!@verbatim
-!!      subroutine s_set_control_4_SPH_to_FEM                           &
-!!     &         (spctl, sph, rj_fld, nod_fld)
-!!        type(sphere_data_control), intent(in) :: spctl
-!!        type(sph_grids), intent(inout) :: sph
-!!        type(phys_data), intent(inout) :: rj_fld
-!!        type(phys_data), intent(inout) :: nod_fld
 !!      subroutine sph_boundary_IO_control(MHD_prop, MHD_BC, bc_IO)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(MHD_BC_lists), intent(in) :: MHD_BC
@@ -40,40 +34,6 @@
       contains
 !
 ! ----------------------------------------------------------------------
-!
-      subroutine s_set_control_4_SPH_to_FEM                             &
-     &         (spctl, sph, rj_fld, nod_fld)
-!
-      use t_ctl_data_MHD
-      use t_ctl_data_4_sphere_model
-!
-      use ordering_field_by_viz
-      use node_monitor_IO
-      use set_controls_4_sph_shell
-!
-      type(sphere_data_control), intent(in) :: spctl
-      type(sph_grids), intent(inout) :: sph
-      type(phys_data), intent(inout) :: rj_fld
-      type(phys_data), intent(inout) :: nod_fld
-!
-!
-      call set_FEM_mesh_mode_4_SPH(spctl, sph%sph_params)
-!
-      if (iflag_debug .ge. iflag_routine_msg)                           &
-     &     write(*,*) 'copy_rj_spec_name_to_nod_fld'
-      call copy_field_name_type(rj_fld, nod_fld)
-!
-      if (iflag_debug .ge. iflag_routine_msg)                           &
-     &     call check_nodal_field_name_type(6, nod_fld)
-!
-      call count_field_4_monitor                                        &
-     &   (rj_fld%num_phys, rj_fld%num_component,                        &
-     &    rj_fld%iflag_monitor, num_field_monitor, ntot_comp_monitor)
-!
-      end subroutine s_set_control_4_SPH_to_FEM
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
 !
       subroutine sph_boundary_IO_control(MHD_prop, MHD_BC, bc_IO)
 !

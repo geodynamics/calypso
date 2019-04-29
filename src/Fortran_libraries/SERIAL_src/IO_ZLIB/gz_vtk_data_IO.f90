@@ -325,7 +325,7 @@
 !
       call get_one_line_from_gz_f
       read(textbuf,*) tmpchara, nele, nums
-      nnod_ele = int(nums / nele) - 1
+      nnod_ele = int(nums/nele, KIND(nnod_ele)) - 1
 !
       end subroutine read_gz_vtk_connect_head
 !

@@ -30,7 +30,7 @@
 !
       implicit none
 !
-      private :: check_whole_num_of_elements
+!      private :: check_whole_num_of_elements
 !
 !-----------------------------------------------------------------------
 !
@@ -62,9 +62,9 @@
       integer(kind = kint) :: iflag_ele_mesh
 !
 !
-      iflag_ele_mesh =  check_exist_ele_mesh(mesh_file, izero)          &
-     &                + check_exist_surf_mesh(mesh_file, izero)         &
-     &                + check_exist_edge_mesh(mesh_file, izero)
+      iflag_ele_mesh =  check_exist_ele_mesh(mesh_file, 0)              &
+     &                + check_exist_surf_mesh(mesh_file, 0)             &
+     &                + check_exist_edge_mesh(mesh_file, 0)
       if(iflag_ele_mesh .eq. 0) then
         if(iflag_debug.gt.0) write(*,*) 'mpi_load_element_surface_edge'
         call mpi_load_element_surface_edge                              &
@@ -73,38 +73,14 @@
       call calypso_mpi_barrier
 !
 !  -------------------------------
-!      if (iflag_debug.gt.0) write(*,*) 'set_local_nod_4_monitor'
-!      call set_local_nod_4_monitor(mesh, group)
 !
-!  ------  In itialize data communication for FEM data
-!
-      if (iflag_debug.gt.0 ) write(*,*) 'allocate_vector_for_solver'
-      call allocate_vector_for_solver(n_sym_tensor, mesh%node%numnod)
-!
-      if(iflag_debug.gt.0) write(*,*)' init_nod_send_recv'
-      call init_nod_send_recv(mesh)
-!
-!  -----    construct geometry informations
-!
-      if (iflag_debug .gt. 0) write(*,*) 'const_mesh_infos'
-      call const_mesh_infos(my_rank, mesh, group, ele_mesh)
-!
-      if(iflag_ele_mesh .eq. 0) return
-!
-      if(iflag_debug.gt.0) write(*,*)' const_element_comm_tbls'
-      call const_element_comm_tbls(mesh, ele_mesh)
-!
-      if(i_debug .eq. iflag_full_msg) then
-        call check_whole_num_of_elements(mesh%ele)
-      end if
+      if (iflag_debug.gt.0) write(*,*) 'FEM_mesh_initialization'
+      call FEM_mesh_initialization(mesh, group, ele_mesh)
 !
       if(iflag_ele_mesh .ne. 0 .and. iflag_output_SURF .gt. 0) then
         call mpi_output_element_surface_edge                            &
      &         (mesh_file, mesh, ele_mesh, ele_mesh_IO)
       end if
-!
-!      call deallocate_surface_geom_type(ele_mesh%surf)
-!      call dealloc_edge_geometory(ele_mesh%edge)
 !
       end subroutine FEM_mesh_init_with_IO
 !
@@ -141,18 +117,15 @@
 !
 !  -----    construct geometry informations
 !
-      if (iflag_debug .gt. 0) write(*,*) 'const_mesh_infos'
+      if (iflag_debug .gt. 0) write(*,*) 'const_mesh_infos tako'
       call const_mesh_infos(my_rank, mesh, group, ele_mesh)
 !
-      if(iflag_debug.gt.0) write(*,*)' const_element_comm_tbls'
+      if(iflag_debug.gt.0) write(*,*) ' const_element_comm_tbls'
       call const_element_comm_tbls(mesh, ele_mesh)
 !
       if(i_debug .eq. iflag_full_msg) then
         call check_whole_num_of_elements(mesh%ele)
       end if
-!
-!      call deallocate_surface_geom_type(ele_mesh%surf)
-!      call dealloc_edge_geometory(ele_mesh%edge)
 !
       end subroutine FEM_mesh_initialization
 !

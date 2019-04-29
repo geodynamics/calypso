@@ -14,6 +14,7 @@
 !!      subroutine get_one_line_from_gz_f
 !!      subroutine skip_gz_comment_int(int_input)
 !!      subroutine skip_gz_comment_int2(int_input, int_input2)
+!!      subroutine skip_gz_comment_int8_int(i8_input, int_input2)
 !!      subroutine skip_gz_comment_real(real_input)
 !!      subroutine skip_gz_comment_real2(real_input, real_input2)
 !!      subroutine skip_gz_comment_chara(chara_input)
@@ -42,10 +43,10 @@
 !
       integer(kind = 4), parameter :: nbuf = 65535
       integer (kind =kint) :: num_word, nchara
-      character(len=nbuf) :: textbuf, tbuf2
+      character(len=nbuf) :: textbuf
       character(len=1), private :: chara_flag
 !
-      private :: nchara, tbuf2
+      private :: nchara
       private :: skip_gz_comment_get_nword
 !
 !------------------------------------------------------------------
@@ -62,7 +63,7 @@
       character(len=kchara) :: file_name
 !
 !
-      call add_null_character(gzip_name, file_name)
+      file_name = add_null_character(gzip_name)
       call open_wt_gzfile(file_name)
 !
       end subroutine open_wt_gzfile_f
@@ -77,7 +78,7 @@
       character(len=kchara) :: file_name
 !
 !
-      call add_null_character(gzip_name, file_name)
+      file_name = add_null_character(gzip_name)
       call open_ad_gzfile(file_name)
 !
       end subroutine open_ad_gzfile_f
@@ -92,7 +93,7 @@
       character(len=kchara) :: file_name
 !
 !
-      call add_null_character(gzip_name, file_name)
+      file_name = add_null_character(gzip_name)
       call open_rd_gzfile(file_name)
 !
       end subroutine open_rd_gzfile_f
@@ -162,6 +163,19 @@
       read(textbuf,*) int_input, int_input2
 !
       end subroutine skip_gz_comment_int2
+!
+!------------------------------------------------------------------
+!
+      subroutine skip_gz_comment_int8_int(i8_input, int_input2)
+!
+      integer(kind = kint_gl), intent(inout) :: i8_input
+      integer(kind = kint), intent(inout) :: int_input2
+!
+!
+      call skip_gz_comment_get_nword
+      read(textbuf,*) i8_input, int_input2
+!
+      end subroutine skip_gz_comment_int8_int
 !
 !------------------------------------------------------------------
 !
@@ -235,6 +249,7 @@
 !
       subroutine skip_gz_comment_get_nword
 !
+!      character(len=nbuf) :: tbuf2
 !
       do
         call get_one_line_from_gz_f

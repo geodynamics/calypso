@@ -7,17 +7,15 @@
 !> @brief Array for speherical harmonics indexing IO
 !!
 !!@verbatim
+!!      subroutine dealloc_sph_grid_idx_IO(sph_IO)
+!!      subroutine dealloc_sph_mode_idx_IO(sph_IO)
+!!
 !!      subroutine alloc_num_idx_sph_IO(sph_IO)
 !!      subroutine alloc_nod_id_sph_IO(sph_IO)
 !!      subroutine alloc_idx_sph_1d1_IO(sph_IO)
 !!      subroutine alloc_idx_sph_1d2_IO(sph_IO)
 !!      subroutine alloc_idx_sph_1d3_IO(sph_IO)
-!!
-!!      subroutine dealloc_num_idx_sph_IO(sph_IO)
-!!      subroutine dealloc_nod_id_sph_IO(sph_IO)
-!!      subroutine dealloc_idx_sph_1d1_IO(sph_IO)
-!!      subroutine dealloc_idx_sph_1d2_IO(sph_IO)
-!!      subroutine dealloc_idx_sph_1d3_IO(sph_IO)
+!!        type(sph_IO_data), intent(inout) :: sph_IO
 !!@endverbatim
 !
       module t_node_id_spherical_IO
@@ -67,10 +65,44 @@
         real(kind = kreal), allocatable :: r_gl_1(:)
       end type sph_IO_data
 !
+      private :: dealloc_num_idx_sph_IO, dealloc_idx_sph_1d1_IO
+      private :: dealloc_idx_sph_1d2_IO, dealloc_idx_sph_1d3_IO
+      private :: dealloc_nod_id_sph_IO
+!
 ! -----------------------------------------------------------------------
 !
       contains
 !
+! -----------------------------------------------------------------------
+!
+      subroutine dealloc_sph_grid_idx_IO(sph_IO)
+!
+      type(sph_IO_data), intent(inout) :: sph_IO
+!
+!
+      call dealloc_num_idx_sph_IO(sph_IO)
+      call dealloc_idx_sph_1d1_IO(sph_IO)
+      call dealloc_idx_sph_1d2_IO(sph_IO)
+      call dealloc_idx_sph_1d3_IO(sph_IO)
+      call dealloc_nod_id_sph_IO(sph_IO)
+!
+      end subroutine dealloc_sph_grid_idx_IO
+!
+! -----------------------------------------------------------------------
+!
+      subroutine dealloc_sph_mode_idx_IO(sph_IO)
+!
+      type(sph_IO_data), intent(inout) :: sph_IO
+!
+!
+      call dealloc_num_idx_sph_IO(sph_IO)
+      call dealloc_idx_sph_1d1_IO(sph_IO)
+      call dealloc_idx_sph_1d2_IO(sph_IO)
+      call dealloc_nod_id_sph_IO(sph_IO)
+!
+      end subroutine dealloc_sph_mode_idx_IO
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine alloc_num_idx_sph_IO(sph_IO)

@@ -159,6 +159,7 @@
       type(maximum_informations), intent(inout) :: range
 !
       integer(kind = kint) :: nd, inod_min, inod_max
+      integer(kind = kint_gl) :: num64
 !
 !
 !$omp parallel workshare
@@ -175,21 +176,16 @@
       end do
 !$omp end parallel do
 !
-      call MPI_allREDUCE (range%phys_max_lc, range%phys_max,            &
-     &    range%ntot_comp, CALYPSO_REAL, MPI_MAX,                       &
-     &    CALYPSO_COMM, ierr_MPI)
+      num64 = int(range%ntot_comp,KIND(num64))
+      call calypso_mpi_allreduce_real                                   &
+     &   (range%phys_max_lc, range%phys_max, num64, MPI_MAX)
+      call calypso_mpi_allreduce_real                                   &
+     &   (range%phys_min_lc, range%phys_min, num64, MPI_MIN)
 !
-      call MPI_allREDUCE (range%phys_min_lc, range%phys_min,                  &
-     &    range%ntot_comp, CALYPSO_REAL, MPI_MIN,                       &
-     &    CALYPSO_COMM, ierr_MPI)
-!
-      call MPI_allREDUCE (range%inod_max_lc, range%node_max,            &
-     &    range%ntot_comp, CALYPSO_GLOBAL_INT, MPI_SUM,                 &
-     &    CALYPSO_COMM, ierr_MPI)
-!
-      call MPI_allREDUCE (range%inod_min_lc, range%node_min,            &
-     &    range%ntot_comp, CALYPSO_GLOBAL_INT, MPI_SUM,                 &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_int8                                   &
+     &   (range%inod_max_lc, range%node_max, num64, MPI_SUM)
+      call calypso_mpi_allreduce_int8                                   &
+     &   (range%inod_min_lc, range%node_min, num64, MPI_SUM)
 !
       end subroutine cal_max_indices
 !

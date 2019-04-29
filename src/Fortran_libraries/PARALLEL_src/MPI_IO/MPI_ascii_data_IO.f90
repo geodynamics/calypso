@@ -8,12 +8,12 @@
 !!
 !!@verbatim
 !!      subroutine open_write_mpi_file                                  &
-!!     &         (file_name, nprocs_in, my_rank_IO, IO_param)
+!!     &         (file_name, num_pe, id_rank, IO_param)
 !!        Substitution of open_wt_gzfile_b
 !!      subroutine open_append_mpi_file                                 &
-!!     &         (file_name, nprocs_in, my_rank_IO, IO_param)
+!!     &         (file_name, num_pe, id_rank, IO_param)
 !!      subroutine open_read_mpi_file                                   &
-!!     &         (file_name, nprocs_in, my_rank_IO, IO_param)
+!!     &         (file_name, num_pe, id_rank, IO_param)
 !!        Substitution of open_rd_gzfile_b
 !!      subroutine close_mpi_file(IO_param)
 !!
@@ -49,15 +49,15 @@
 ! -----------------------------------------------------------------------
 !
       subroutine open_write_mpi_file                                    &
-     &         (file_name, nprocs_in, my_rank_IO, IO_param)
+     &         (file_name, num_pe, id_rank, IO_param)
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind = kint), intent(in) :: nprocs_in, my_rank_IO
+      integer, intent(in) :: num_pe, id_rank
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
 !
-      call alloc_istack_merge(my_rank_IO, nprocs_in, IO_param)
+      call alloc_istack_merge(id_rank, num_pe, IO_param)
       call calypso_mpi_write_file_open                                  &
      &   (file_name, IO_param%nprocs_in, IO_param%id_file)
       IO_param%ioff_gl = izero
@@ -67,15 +67,15 @@
 !  ---------------------------------------------------------------------
 !
       subroutine open_append_mpi_file                                   &
-     &         (file_name, nprocs_in, my_rank_IO, IO_param)
+     &         (file_name, num_pe, id_rank, IO_param)
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind = kint), intent(in) :: nprocs_in, my_rank_IO
+      integer, intent(in) :: num_pe, id_rank
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
 !
-      call alloc_istack_merge(my_rank_IO, nprocs_in, IO_param)
+      call alloc_istack_merge(id_rank, num_pe, IO_param)
       call calypso_mpi_write_file_open                                  &
      &   (file_name, IO_param%nprocs_in, IO_param%id_file)
       call MPI_File_get_byte_offset(IO_param%id_file, IO_param%ioff_gl)
@@ -85,14 +85,14 @@
 !  ---------------------------------------------------------------------
 !
       subroutine open_read_mpi_file                                     &
-     &         (file_name, nprocs_in, my_rank_IO, IO_param)
+     &         (file_name, num_pe, id_rank, IO_param)
 !
       character(len=kchara), intent(in) :: file_name
-      integer(kind = kint), intent(in) :: nprocs_in, my_rank_IO
+      integer, intent(in) :: num_pe, id_rank
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
 !
-      call alloc_istack_merge(my_rank_IO, nprocs_in, IO_param)
+      call alloc_istack_merge(id_rank, num_pe, IO_param)
       call calypso_mpi_read_file_open(file_name, IO_param%id_file)
       IO_param%ioff_gl = izero
 !
@@ -117,7 +117,7 @@
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
-      integer(kind = kint), intent(in) :: ilength
+      integer, intent(in) :: ilength
       character(len=ilength), intent(in) :: chara_dat
 !
       integer(kind = MPI_OFFSET_KIND) :: ioffset
@@ -142,8 +142,8 @@
 !
       call set_numbers_2_head_node(num, IO_param)
       call mpi_write_charahead(IO_param,                                &
-     &    len_multi_int_textline(IO_param%nprocs_in),                   &
-     &    int_stack8_textline(IO_param%nprocs_in,                       &
+     &    len_byte_stack_textline(IO_param%nprocs_in),                  &
+     &    byte_stack_textline(IO_param%nprocs_in,                       &
      &                        IO_param%istack_merged))
 !
       end subroutine mpi_write_num_of_data
@@ -153,13 +153,13 @@
       subroutine mpi_write_stack_over_domain(IO_param, num)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      integer(kind=kint), intent(in) :: num
+      integer(kind = kint_gl), intent(in) :: num
 !
 !
-      call set_istack_4_parallell_data(num, IO_param)
+      call istack64_4_parallel_data(num, IO_param)
       call mpi_write_charahead(IO_param,                                &
-     &    len_multi_int_textline(IO_param%nprocs_in),                   &
-     &    int_stack8_textline(IO_param%nprocs_in,                       &
+     &    len_byte_stack_textline(IO_param%nprocs_in),                  &
+     &    byte_stack_textline(IO_param%nprocs_in,                       &
      &                        IO_param%istack_merged))
 !
       end subroutine mpi_write_stack_over_domain
@@ -172,15 +172,15 @@
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       integer(kind=kint), intent(inout) :: num
 !
-      integer(kind = kint) :: ilength
+      integer :: ilength
 !
 !
-      ilength = len_multi_int_textline(IO_param%nprocs_in)
-      call read_int8_stack_textline                                     &
+      ilength = len_byte_stack_textline(IO_param%nprocs_in)
+      call read_byte_stack_textline                                     &
          (mpi_read_charahead(IO_param, ilength),                        &
      &    IO_param%nprocs_in, IO_param%istack_merged)
 !
-      if(IO_param%id_rank .le. IO_param%nprocs_in) then
+      if(IO_param%id_rank .lt. IO_param%nprocs_in) then
         num = int(IO_param%istack_merged(IO_param%id_rank+1))
       else
         num = 0
@@ -193,7 +193,7 @@
       function  mpi_read_charahead(IO_param, ilength)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      integer(kind = kint), intent(in) :: ilength
+      integer, intent(in) :: ilength
       character(len=ilength) :: mpi_read_charahead
 !
       integer(kind = MPI_OFFSET_KIND) :: ioffset
@@ -207,7 +207,7 @@
 !
       IO_param%ioff_gl = IO_param%ioff_gl + ilength
       call MPI_BCAST(mpi_read_charahead, ilength, CALYPSO_CHARACTER,    &
-     &    izero, CALYPSO_COMM, ierr_MPI)
+     &    0, CALYPSO_COMM, ierr_MPI)
 !
       end function mpi_read_charahead
 !
@@ -217,7 +217,7 @@
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
-      integer(kind = kint), intent(in) :: ilength
+      integer, intent(in) :: ilength
       character(len=ilength) :: mpi_read_characters
 !
       integer(kind = MPI_OFFSET_KIND) :: ioffset
@@ -238,7 +238,7 @@
       subroutine mpi_skip_read(IO_param, ilength)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      integer(kind=kint), intent(in) :: ilength
+      integer, intent(in) :: ilength
 !
 !
       IO_param%ioff_gl = IO_param%ioff_gl + ilength

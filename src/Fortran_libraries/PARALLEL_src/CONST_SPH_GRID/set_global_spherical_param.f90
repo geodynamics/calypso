@@ -26,12 +26,12 @@
 !!      subroutine set_gl_rank_2d                                       &
 !!     &         (iner_r_flag, nproc, ndomain_2d, id_gl_rank)
 !!
-!!      integer(kind= kint) function set_rank_by_1b_sph_rank            &
+!!      integer(kind = kint) function set_rank_by_1b_sph_rank            &
 !!     &                  (iner_r_flag, ndomain_3d, ip_r, ip_t, ip_p)
-!!      integer(kind= kint) function set_rank_by_1b_rj_rank             &
+!!      integer(kind = kint) function set_rank_by_1b_rj_rank             &
 !!     &                  (iner_r_flag, ndomain_2d, ip_r, ip_j)
 !!
-!!      subroutine check_spheric_global_numnod(my_rank)
+!!      subroutine check_spheric_global_numnod(id_rank)
 !
       module set_global_spherical_param
 !
@@ -220,7 +220,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer(kind= kint) function set_rank_by_1b_sph_rank              &
+      integer(kind = kint) function set_rank_by_1b_sph_rank              &
      &                  (iner_r_flag, ndomain_3d, ip_r, ip_t, ip_p)
 !
       integer(kind = kint), intent(in) :: iner_r_flag
@@ -242,7 +242,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer(kind= kint) function set_rank_by_1b_rj_rank               &
+      integer(kind = kint) function set_rank_by_1b_rj_rank               &
      &                  (iner_r_flag, ndomain_2d, ip_r, ip_j)
 !
       integer(kind = kint), intent(in) :: iner_r_flag
@@ -261,15 +261,15 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_spheric_global_numnod(my_rank)
+      subroutine check_spheric_global_numnod(id_rank)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
 !
 !
-      write(my_rank+50,*) 'nnod_global_rtp ', nnod_global_rtp
-      write(my_rank+50,*) 'nnod_global_rtm ', nnod_global_rtm
-      write(my_rank+50,*) 'nnod_global_rlm ', nnod_global_rlm
-      write(my_rank+50,*) 'nnod_global_rj ',  nnod_global_rj
+      write(id_rank+50,*) 'nnod_global_rtp ', nnod_global_rtp
+      write(id_rank+50,*) 'nnod_global_rtm ', nnod_global_rtm
+      write(id_rank+50,*) 'nnod_global_rlm ', nnod_global_rlm
+      write(id_rank+50,*) 'nnod_global_rj ',  nnod_global_rj
 !
       end subroutine check_spheric_global_numnod
 !

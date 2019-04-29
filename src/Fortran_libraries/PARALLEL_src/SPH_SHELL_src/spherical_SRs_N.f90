@@ -252,6 +252,7 @@
       subroutine calypso_sph_to_send_N(NB, nnod_org,                    &
      &          comm_sph, n_WS, X_org, WS)
 !
+      use m_elapsed_labels_SEND_RECV
       use set_to_send_buffer
 !
       type(sph_comm_tbl), intent(in) :: comm_sph
@@ -261,11 +262,11 @@
       real (kind=kreal), intent(inout):: WS(NB*comm_sph%ntot_item_sr)
 !
 !
-      call start_elapsed_time(36)
+      if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+1)
       call set_to_send_buf_N(NB, nnod_org,                              &
      &    comm_sph%istack_sr(comm_sph%nneib_domain), comm_sph%item_sr,  &
      &    X_org, WS(1))
-      call end_elapsed_time(36)
+      if(iflag_CSR_time) call end_elapsed_time(ist_elapsed_CSR+1)
 !
       end subroutine calypso_sph_to_send_N
 !

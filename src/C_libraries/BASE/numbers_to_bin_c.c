@@ -3,7 +3,7 @@
 
 #include "numbers_to_bin_c.h"
 
-void byte_swap(int lengh_byte, char *array){
+void byte_swap_4(int lengh_byte, char *array){
     int i;
     unsigned char tmp0, tmp1;
 
@@ -16,6 +16,30 @@ void byte_swap(int lengh_byte, char *array){
         array[4*i+3] = tmp0; 
     };
 
+    return;
+}
+
+void byte_swap_8(int lengh_byte, char *array){
+    int i;
+    unsigned char tmp0, tmp1, tmp2, tmp3;
+    
+    for(i = 0; i < lengh_byte/8; i++){
+        tmp0 = array[8*i  ]; 
+        tmp1 = array[8*i+1]; 
+        tmp2 = array[8*i+2]; 
+        tmp3 = array[8*i+3]; 
+        
+        array[8*i  ] = array[8*i+7]; 
+        array[8*i+1] = array[8*i+6]; 
+        array[8*i+2] = array[8*i+5]; 
+        array[8*i+3] = array[8*i+4]; 
+
+        array[8*i+4] = tmp3; 
+        array[8*i+5] = tmp2; 
+        array[8*i+6] = tmp1; 
+        array[8*i+7] = tmp0; 
+    };
+    
     return;
 }
 

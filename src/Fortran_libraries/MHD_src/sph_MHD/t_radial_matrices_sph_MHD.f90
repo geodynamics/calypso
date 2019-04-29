@@ -12,7 +12,7 @@
 !!
 !!      subroutine allocate_press_vpol_mat_sph(sph_rj, sph_MHD_mat)
 !!      subroutine check_velocity_matrices_sph                          &
-!!     &         (my_rank, sph_rj, sph_MHD_mat)
+!!     &         (id_rank, sph_rj, sph_MHD_mat)
 !!        type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
 !!@endverbatim
 !!
@@ -137,11 +137,11 @@
 ! -----------------------------------------------------------------------
 !
       subroutine check_velocity_matrices_sph                            &
-     &         (my_rank, sph_rj, sph_MHD_mat)
+     &         (id_rank, sph_rj, sph_MHD_mat)
 !
       use check_sph_radial_mat
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(sph_rj_grid), intent(in) :: sph_rj
       type(MHD_radial_matrices), intent(in) :: sph_MHD_mat
 !
@@ -155,11 +155,11 @@
       end do
 !
       call check_radial_7band_mat                                       &
-     &   (my_rank, (2*sph_rj%nidx_rj(1)), sph_rj%nidx_rj(2),            &
+     &   (id_rank, (2*sph_rj%nidx_rj(1)), sph_rj%nidx_rj(2),            &
      &    sph_rj%idx_gl_1d_rj_j, rr, sph_MHD_mat%band_vsp_evo%mat)
 !
       call check_radial_band_mat                                        &
-     &   (my_rank, sph_rj, sph_MHD_mat%band_vt_evo)
+     &   (id_rank, sph_rj, sph_MHD_mat%band_vt_evo)
 !
       end subroutine check_velocity_matrices_sph
 !

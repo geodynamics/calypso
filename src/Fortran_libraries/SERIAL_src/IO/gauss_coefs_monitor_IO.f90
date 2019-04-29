@@ -8,16 +8,16 @@
 !!
 !!@verbatim
 !!      subroutine write_gauss_coefs_4_monitor                          &
-!!     &         (my_rank, i_step, time, gauss)
+!!     &         (id_rank, i_step, time, gauss)
 !!     integer(kind = kint) function check_gauss_coefs_file             &
-!!     &                           (my_rank, gauss)
+!!     &                           (id_rank, gauss)
 !!
 !!      subroutine open_gauss_coefs_read_monitor(id_pick, gauss)
 !!      subroutine read_gauss_coefs_4_monitor(id_pick, i_step, time,    &
 !!     &          gauss, ierr)
 !!@endverbatim
 !!
-!!@n @param  my_rank   Process ID
+!!@n @param  id_rank   Process ID
 !!@n @param  i_step    time step
 !!@n @param  time      time
 !!@n @param  id_pick   file ID
@@ -52,7 +52,7 @@
       character(len = kchara) :: file_name
 !
 !
-      call add_dat_extension(gauss%file_prefix, file_name)
+      file_name = add_dat_extension(gauss%file_prefix)
       open(id_gauss_coef, file = file_name,                             &
      &    form='formatted', status='old', position='append', err = 99)
       return
@@ -136,9 +136,9 @@
 ! -----------------------------------------------------------------------
 !
       subroutine write_gauss_coefs_4_monitor                            &
-     &         (my_rank, i_step, time, gauss)
+     &         (id_rank, i_step, time, gauss)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       integer(kind = kint), intent(in) :: i_step
       real(kind = kreal), intent(in) :: time
       type(picked_spectrum_data), intent(in) :: gauss
@@ -147,7 +147,7 @@
 !
 !
       if(gauss%num_sph_mode .eq. izero) return
-      if(my_rank .gt. izero) return
+      if(id_rank .gt. izero) return
 !
       call open_gauss_coefs_4_monitor(gauss)
 !
@@ -166,11 +166,11 @@
 ! -----------------------------------------------------------------------
 !
      integer(kind = kint) function check_gauss_coefs_file               &
-     &                           (my_rank, gauss)
+     &                           (id_rank, gauss)
 !
       use set_parallel_file_name
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(picked_spectrum_data), intent(in) :: gauss
 !!
       character(len = kchara) :: file_name
@@ -178,9 +178,9 @@
 !
       check_gauss_coefs_file = 0
       if(gauss%num_sph_mode .eq. izero) return
-      if(my_rank .gt. izero) return
+      if(id_rank .gt. izero) return
 !
-      call add_dat_extension(gauss%file_prefix, file_name)
+      file_name = add_dat_extension(gauss%file_prefix)
       open(id_gauss_coef, file = file_name,                             &
      &    form='formatted', status='old', err = 99)
 !
@@ -211,7 +211,7 @@
       character(len=255) :: tmpchara
 !
 !
-      call add_dat_extension(gauss%file_prefix, file_name)
+      file_name = add_dat_extension(gauss%file_prefix)
       open(id_pick, file = file_name)
 !
       call skip_comment(tmpchara,id_pick)

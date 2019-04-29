@@ -231,7 +231,7 @@
       nnod = int(m_ucd%istack_merged_intnod(my_rank+1)                  &
      &         - m_ucd%istack_merged_intnod(my_rank)  )
 !
-      call set_merged_hdf_mesh_file_name(file_prefix, file_name)
+      file_name = set_merged_hdf_mesh_file_name(file_prefix)
 !
 ! Remove our own counts from the offset
 !
@@ -390,8 +390,7 @@
 !
 ! Setup the filename
 !
-      call set_merged_hdf_field_file_name                               &
-     &   (file_prefix, cur_step, file_name)
+      file_name = set_merged_hdf_field_file_name(file_prefix, cur_step)
 !
 ! Progress update
 !
@@ -518,8 +517,8 @@
       if (my_rank .ne. 0) return
 !
 ! Get the XDMF file location/name
-      call set_merged_snap_xdmf_file_name                               &
-     &   (file_prefix, istep_hdf5, xdmf_dir_file)
+      xdmf_dir_file                                                     &
+     &    = set_merged_snap_xdmf_file_name(file_prefix, istep_hdf5)
 ! Open the XDMF file to append
       call parallel_write_xdmf_file(file_prefix, xdmf_dir_file,         &
      &    istep_hdf5, t_IO, ucd, m_ucd)
@@ -543,7 +542,7 @@
       if (my_rank .ne. 0) return
 !
 ! Get the XDMF file location/name
-      call set_merged_xdmf_file_name(file_prefix, xdmf_dir_file)
+      xdmf_dir_file = set_merged_xdmf_file_name(file_prefix)
 ! Open the XDMF file to append
       call parallel_write_xdmf_file(file_prefix, xdmf_dir_file,         &
      &    istep_hdf5, t_IO, ucd, m_ucd)
@@ -601,14 +600,14 @@
 !
 !
 !   Get the mesh file name
-      call set_merged_hdf_mesh_file_name(file_prefix, mesh_dir_file)
-      call delete_directory_name(mesh_dir_file, mesh_file_name)
+      mesh_dir_file =  set_merged_hdf_mesh_file_name(file_prefix)
+      mesh_file_name = delete_directory_name(mesh_dir_file)
 !
 !  Append field entry
       call real_to_str(t_IO%time, time_str)
-      call set_merged_hdf_field_file_name                               &
-     &   (file_prefix, istep_hdf5, field_dir_file)
-      call delete_directory_name(field_dir_file, field_file_name)
+      field_dir_file                                                    &
+     &      = set_merged_hdf_field_file_name(file_prefix, istep_hdf5)
+      field_file_name = delete_directory_name(field_dir_file)
       write(id_xdmf, '(2a)')                                            &
      &         '    <Grid Name="CellTime" GridType="Collection" ',      &
      &         'CollectionType="Temporal">'

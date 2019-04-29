@@ -84,7 +84,7 @@
      &     .or. check_exsist_rlm_file(my_rank) .ne. 0                   &
      &     .or. check_exsist_rj_file(my_rank) .ne.  0) iflag_lc = 1
       end if
-      call MPI_BCAST(iflag_lc, ione, CALYPSO_INTEGER, izero,            &
+      call MPI_BCAST(iflag_lc, 1, CALYPSO_INTEGER, 0,                   &
      &    CALYPSO_COMM, ierr_MPI)
 !
       if(iflag_lc .eq. 0) then
@@ -95,14 +95,15 @@
       else
         if (my_rank.eq.0) write(*,*) 'Make spherical harmonics table'
         call para_gen_sph_grids(sph_maker%sph_tmp, sph_maker%gen_sph)
-        call deallocate_gen_mesh_params(sph_maker%gen_sph)
+        call dealloc_gen_mesh_params(sph_maker%gen_sph)
       end if
       call calypso_mpi_barrier
 !
       if (iflag_debug.eq.1) write(*,*) 'load_para_SPH_and_FEM_mesh'
-      call load_para_SPH_and_FEM_mesh(MHD_files%iflag_access_FEM,       &
-     &    sph, comms_sph, sph_grps, geofem%mesh, geofem%group,          &
-     &    ele_mesh, MHD_files%mesh_file_IO, sph_maker%gen_sph)
+      call load_para_SPH_and_FEM_mesh(MHD_files%FEM_mesh_flags,         &
+     &    sph, comms_sph, sph_grps, geofem, ele_mesh,                   &
+     &    MHD_files%mesh_file_IO, sph_maker%gen_sph)
+      call dealloc_gen_sph_fem_mesh_param(sph_maker%gen_sph)
 !
       end subroutine select_make_SPH_mesh
 !

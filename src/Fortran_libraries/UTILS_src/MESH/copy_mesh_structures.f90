@@ -7,9 +7,13 @@
 !>@brief Copy FEM mesh structures
 !!
 !!@verbatim
-!!      subroutine set_mesh_data_from_type(mesh, group, tgt_comm,       &
-!!     &          tgt_node, tgt_ele, tgt_surf, tgt_edge,                &
-!!     &          tgt_nod_grp, tgt_ele_grp, tgt_surf_grp)
+!!      subroutine set_mesh_data_from_type                              &
+!!     &         (mesh, group, tgt_mesh, tgt_e_mesh, tgt_grp)
+!!        type(mesh_geometry), intent(inout) :: mesh
+!!        type(mesh_groups), intent(inout) :: group
+!!        type(mesh_geometry), intent(inout) :: tgt_mesh
+!!        type(element_geometry), intent(inout) :: tgt_e_mesh
+!!        type(mesh_groups), intent(inout) :: tgt_grp
 !!
 !!      subroutine copy_node_geometry_types(org_node, new_node)
 !!      subroutine copy_node_sph_to_xx(org_node, new_node)
@@ -44,9 +48,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_mesh_data_from_type(mesh, group, tgt_comm,         &
-     &          tgt_node, tgt_ele, tgt_surf, tgt_edge,                  &
-     &          tgt_nod_grp, tgt_ele_grp, tgt_surf_grp)
+      subroutine set_mesh_data_from_type                                &
+     &         (mesh, group, tgt_mesh, tgt_e_mesh, tgt_grp)
 !
       use t_mesh_data
       use t_comm_table
@@ -60,35 +63,28 @@
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) :: group
 !
-      type(communication_table), intent(inout) :: tgt_comm
-      type(node_data), intent(inout) :: tgt_node
-      type(element_data), intent(inout) :: tgt_ele
-      type(surface_data), intent(inout) :: tgt_surf
-      type(edge_data), intent(inout) :: tgt_edge
-!
-      type(group_data), intent(inout) :: tgt_nod_grp
-      type(group_data), intent(inout) :: tgt_ele_grp
-      type(surface_group_data), intent(inout) :: tgt_surf_grp
+      type(mesh_geometry), intent(inout) :: tgt_mesh
+      type(element_geometry), intent(inout) :: tgt_e_mesh
+      type(mesh_groups), intent(inout) :: tgt_grp
 !
 !
-      call copy_comm_tbl_types(mesh%nod_comm, tgt_comm)
+      call copy_comm_tbl_types(mesh%nod_comm, tgt_mesh%nod_comm)
 !
-      call copy_node_geometry_types(mesh%node, tgt_node)
-      call copy_element_connect_types(mesh%ele, tgt_ele)
+      call copy_node_geometry_types(mesh%node, tgt_mesh%node)
+      call copy_element_connect_types(mesh%ele, tgt_mesh%ele)
 !
 !
-      call copy_group_data(group%nod_grp, tgt_nod_grp)
-      call copy_group_data(group%ele_grp, tgt_ele_grp)
-      call copy_surface_group(group%surf_grp, tgt_surf_grp)
+      call copy_group_data(group%nod_grp, tgt_grp%nod_grp)
+      call copy_group_data(group%ele_grp, tgt_grp%ele_grp)
+      call copy_surface_group(group%surf_grp, tgt_grp%surf_grp)
 !
-      call allocate_sph_node_geometry(tgt_node)
-!      call alloc_ele_geometry(tgt_ele)
-      call set_3D_nnod_4_sfed_by_ele(tgt_ele%nnod_4_ele,                &
-     &    tgt_surf%nnod_4_surf, tgt_edge%nnod_4_edge)
+      call alloc_sph_node_geometry(tgt_mesh%node)
+!      call alloc_ele_geometry(tgt_mesh%ele)
+      call set_3D_nnod_4_sfed_by_ele(tgt_mesh%ele%nnod_4_ele,           &
+     &    tgt_e_mesh%surf%nnod_4_surf, tgt_e_mesh%edge%nnod_4_edge)
 !
       call dealloc_groups_data(group)
-      call deallocate_ele_connect_type(mesh%ele)
-      call dealloc_node_geometry_base(mesh%node)
+      call dealloc_mesh_geometry_base(mesh)
 !
       end subroutine set_mesh_data_from_type
 !
@@ -196,8 +192,8 @@
       new_ele%numele =         org_ele%numele
       new_ele%first_ele_type = org_ele%first_ele_type
 !
-      call set_nnod_4_ele_by_eletype                                    &
-     &   (new_ele%first_ele_type, new_ele%nnod_4_ele)
+      new_ele%nnod_4_ele                                                &
+     &      = set_nnod_4_ele_by_eletype(new_ele%first_ele_type)
 !
       call allocate_ele_connect_type(new_ele)
 !
@@ -233,7 +229,7 @@
 !
 !
       new_comm%num_neib =    org_comm%num_neib
-      call allocate_type_comm_tbl_num(new_comm)
+      call alloc_comm_table_num(new_comm)
 !
       if(new_comm%num_neib .gt. 0) then
         new_comm%id_neib(1:new_comm%num_neib)                           &
@@ -250,7 +246,7 @@
       new_comm%ntot_import = org_comm%ntot_import
       new_comm%ntot_export = org_comm%ntot_export
 !
-      call allocate_type_comm_tbl_item(new_comm)
+      call alloc_comm_table_item(new_comm)
 !
       if(new_comm%ntot_import .gt. 0) then
         new_comm%item_import(1:new_comm%ntot_import)                    &
@@ -277,7 +273,7 @@
       new_grp%num_grp =     org_grp%num_grp
       new_grp%num_item = org_grp%num_item
 !
-      call allocate_grp_type_num(new_grp)
+      call alloc_group_num(new_grp)
 !
       if (new_grp%num_grp .gt. 0) then
         new_grp%grp_name(1:new_grp%num_grp)                             &
@@ -286,7 +282,7 @@
      &          =  org_grp%istack_grp(0:new_grp%num_grp)
       end if
 !
-      call allocate_grp_type_item(new_grp)
+      call alloc_group_item(new_grp)
 !
       if (new_grp%num_item .gt. 0) then
         new_grp%item_grp(1:new_grp%num_item)                            &
@@ -308,7 +304,7 @@
       new_sf_grp%num_grp = org_sf_grp%num_grp
       new_sf_grp%num_item = org_sf_grp%num_item
 !
-      call allocate_sf_grp_type_num(new_sf_grp)
+      call alloc_sf_group_num(new_sf_grp)
 !
       if(new_sf_grp%num_grp .gt. 0) then
         new_sf_grp%grp_name(1:new_sf_grp%num_grp)                       &
@@ -317,7 +313,7 @@
      &     =  org_sf_grp%istack_grp(0:new_sf_grp%num_grp)
       end if
 !
-      call allocate_sf_grp_type_item(new_sf_grp)
+      call alloc_sf_group_item(new_sf_grp)
 !
       if(new_sf_grp%num_item .gt. 0) then
         new_sf_grp%item_sf_grp(1,1:new_sf_grp%num_item)                 &

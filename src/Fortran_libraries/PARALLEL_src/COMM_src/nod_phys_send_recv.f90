@@ -61,7 +61,6 @@
 !
       type(mesh_geometry), intent(in) :: mesh
       type(phys_data),intent(inout) :: nod_fld
-      integer (kind=kint) :: i, ist
 !
 !
       call fields_send_recv(mesh%nod_comm, nod_fld)
@@ -195,9 +194,7 @@
        end do
 !$omp end parallel do
 !
-      START_SRtime= MPI_WTIME()
       call SOLVER_SEND_RECV_type(numnod, nod_comm, x_vec(1))
-      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
 !$omp parallel do
       do inod=1, numnod
@@ -229,9 +226,7 @@
       end do
 !$omp end parallel do
 !
-      START_SRtime= MPI_WTIME()
       call SOLVER_SEND_RECV_3_type(numnod, nod_comm, x_vec(1))
-      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
 !$omp parallel do
       do inod=1, numnod
@@ -268,9 +263,7 @@
       end do
 !$omp end parallel do
 !
-      START_SRtime= MPI_WTIME()
       call SOLVER_SEND_RECV_6_type(numnod, nod_comm, x_vec(1))
-      SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
 !$omp parallel do
       do inod=1, numnod

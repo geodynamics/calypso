@@ -14,6 +14,8 @@
 !!      subroutine write_geometry_info(id_file, nod_IO)
 !!      subroutine write_scalar_in_element(id_file, nod_IO, sfed_IO)
 !!      subroutine write_vector_in_element(id_file, nod_IO, sfed_IO)
+!!        type(node_data), intent(in) :: nod_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!
 !!      subroutine read_number_of_node(id_file, nod_IO)
 !!      subroutine read_geometry_info(id_file, nod_IO)
@@ -79,7 +81,7 @@
       subroutine write_geometry_info(id_file, nod_IO)
 !
       integer (kind = kint), intent(in) :: id_file
-      type(node_data), intent(inout) :: nod_IO
+      type(node_data), intent(in) :: nod_IO
 !
       integer (kind = kint) :: i
 !
@@ -91,8 +93,6 @@
      &        nod_IO%xx(i,1:3)
       end do
 !
-      call dealloc_node_geometry_base(nod_IO)
-!
       end subroutine write_geometry_info
 !
 !------------------------------------------------------------------
@@ -100,8 +100,8 @@
       subroutine write_scalar_in_element(id_file, nod_IO, sfed_IO)
 !
       integer (kind = kint), intent(in) :: id_file
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
       integer(kind = kint) :: i
 !
@@ -110,8 +110,6 @@
         write(id_file,'(1p3e23.15)') sfed_IO%ele_scalar(i)
       end do
 !
-      call dealloc_ele_scalar_IO(sfed_IO)
-!
       end subroutine write_scalar_in_element
 !
 !------------------------------------------------------------------
@@ -119,8 +117,8 @@
       subroutine write_vector_in_element(id_file, nod_IO, sfed_IO)
 !
       integer (kind = kint), intent(in) :: id_file
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
       integer(kind = kint) :: i
 !
@@ -128,8 +126,6 @@
       do i = 1, nod_IO%numnod
         write(id_file,'(1p3e23.15)') sfed_IO%ele_vector(i,1:3)
       end do
-!
-      call dealloc_ele_vector_IO(sfed_IO)
 !
       end subroutine write_vector_in_element
 !

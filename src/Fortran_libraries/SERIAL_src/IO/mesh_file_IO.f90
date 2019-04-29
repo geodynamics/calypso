@@ -7,23 +7,23 @@
 !> @brief ASCII mesh file IO
 !!
 !!@verbatim
-!!      subroutine read_mesh_file(my_rank_IO, file_name, fem_IO, ierr)
+!!      subroutine read_mesh_file(id_rank, file_name, fem_IO, ierr)
 !!        type(mesh_data), intent(inout) :: fem_IO
 !!
 !!      subroutine read_mesh_geometry                                   &
-!!     &         (my_rank_IO, file_name, mesh_IO, ierr)
-!!      subroutine read_node_size(my_rank_IO, file_name, mesh_IO, ierr)
+!!     &         (id_rank, file_name, mesh_IO, ierr)
+!!      subroutine read_node_size(id_rank, file_name, mesh_IO, ierr)
 !!      subroutine read_geometry_size                                   &
-!!     &         (my_rank_IO, file_name, mesh_IO, ierr)
+!!     &         (id_rank, file_name, mesh_IO, ierr)
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
 !!
-!!      subroutine write_mesh_file(my_rank_IO, file_name, fem_IO)
-!!        type(mesh_data), intent(inout) :: fem_IO
+!!      subroutine write_mesh_file(id_rank, file_name, fem_IO)
+!!        type(mesh_data), intent(in) :: fem_IO
 !!
 !!      subroutine write_node_position_sph                              &
-!!     &         (my_rank_IO, file_prefix, mesh_IO)
+!!     &         (id_rank, file_prefix, mesh_IO)
 !!      subroutine write_node_position_cyl                              &
-!!     &         (my_rank_IO, file_prefix, mesh_IO)
+!!     &         (id_rank, file_prefix, mesh_IO)
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
 !!@endverbatim
 !
@@ -47,23 +47,23 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_mesh_file(my_rank_IO, file_name, fem_IO, ierr)
+      subroutine read_mesh_file(id_rank, file_name, fem_IO, ierr)
 !
       use mesh_data_IO
 !
-      integer(kind=kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(mesh_data), intent(inout) :: fem_IO
       integer(kind = kint), intent(inout) :: ierr
 !
 !
-      if(my_rank_IO.eq.0 .or. i_debug .gt. 0) write(*,*)                &
+      if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read ascii mesh file: ', trim(file_name)
 !
       open(input_file_code, file = file_name, form = 'formatted')
 !
-      call read_geometry_data(input_file_code, my_rank_IO,              &
+      call read_geometry_data(input_file_code, id_rank,                 &
      &    fem_IO%mesh, ierr)
       call read_mesh_groups(input_file_code, fem_IO%group)
       close(input_file_code)
@@ -73,22 +73,22 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_mesh_geometry                                     &
-     &         (my_rank_IO, file_name, mesh_IO, ierr)
+     &         (id_rank, file_name, mesh_IO, ierr)
 !
       use mesh_data_IO
 !
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
       integer(kind = kint), intent(inout) :: ierr
 !
 !
-      if(my_rank_IO.eq.0 .or. i_debug .gt. 0) write(*,*)                &
+      if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read ascii mesh file: ', trim(file_name)
 !
       open(input_file_code, file = file_name, form = 'formatted')
-      call read_geometry_data(input_file_code, my_rank_IO,              &
+      call read_geometry_data(input_file_code, id_rank,                 &
      &   mesh_IO, ierr)
       close(input_file_code)
 !
@@ -97,22 +97,22 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_node_size(my_rank_IO, file_name, mesh_IO, ierr)
+      subroutine read_node_size(id_rank, file_name, mesh_IO, ierr)
 !
       use mesh_data_IO
 !
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
       integer(kind = kint), intent(inout) :: ierr
 !
 !
-      if(my_rank_IO.eq.0 .or. i_debug .gt. 0) write(*,*)                &
+      if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read ascii mesh file: ', trim(file_name)
 !
       open(input_file_code, file = file_name, form = 'formatted')
-      call read_num_node(input_file_code, my_rank_IO, mesh_IO, ierr)
+      call read_num_node(input_file_code, id_rank, mesh_IO, ierr)
       close(input_file_code)
 !
 !
@@ -121,23 +121,23 @@
 !------------------------------------------------------------------
 !
       subroutine read_geometry_size                                     &
-     &         (my_rank_IO, file_name, mesh_IO, ierr)
+     &         (id_rank, file_name, mesh_IO, ierr)
 !
       use mesh_data_IO
 !
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
       integer(kind = kint), intent(inout) :: ierr
 !
 !
-      if(my_rank_IO.eq.0 .or. i_debug .gt. 0) write(*,*)                &
+      if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read ascii mesh file: ', trim(file_name)
 !
       open(input_file_code, file = file_name, form = 'formatted')
       call read_num_node_ele                                            &
-     &   (input_file_code, my_rank_IO, mesh_IO, ierr)
+     &   (input_file_code, id_rank, mesh_IO, ierr)
       close(input_file_code)
 !
       end subroutine read_geometry_size
@@ -145,22 +145,22 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine write_mesh_file(my_rank_IO, file_name, fem_IO)
+      subroutine write_mesh_file(id_rank, file_name, fem_IO)
 !
       use mesh_data_IO
 !
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
-      type(mesh_data), intent(inout) :: fem_IO
+      type(mesh_data), intent(in) :: fem_IO
 !
 !
-      if(my_rank_IO.eq.0 .or. i_debug .gt. 0) write(*,*)                &
+      if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                &
      &   'Write ascii mesh file: ', trim(file_name)
 !
       open(input_file_code, file = file_name, form = 'formatted')
 !
-      call write_geometry_data(input_file_code, my_rank_IO, fem_IO%mesh)
+      call write_geometry_data(input_file_code, id_rank, fem_IO%mesh)
       call write_mesh_groups(input_file_code, fem_IO%group)
 !
       close(input_file_code)
@@ -170,12 +170,12 @@
 !  ---------------------------------------------------------------------
 !
       subroutine write_node_position_sph                                &
-     &         (my_rank_IO, file_prefix, mesh_IO)
+     &         (id_rank, file_prefix, mesh_IO)
 !
       use mesh_data_IO
       use set_parallel_file_name
 !
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_prefix
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
@@ -183,27 +183,29 @@
       character(len=kchara) :: file_name
 !
 !
-      call add_int_suffix(my_rank_IO, file_prefix, file_name)
+      file_name = add_process_id(id_rank, file_prefix)
 !
-      if(my_rank_IO.eq.0 .or. i_debug .gt. 0) write(*,*)                &
+      if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Write ascii mesh file: ', trim(file_name)
 !
       open(input_file_code, file = file_name, form = 'formatted')
       call output_node_sph_geometry                                     &
-         (input_file_code, my_rank_IO, mesh_IO)
+         (input_file_code, id_rank, mesh_IO)
       close(input_file_code)
+!
+      call dealloc_node_geometry_IO(mesh_IO)
 !
       end subroutine write_node_position_sph
 !
 !  ---------------------------------------------------------------------
 !
       subroutine write_node_position_cyl                                &
-     &         (my_rank_IO, file_prefix, mesh_IO)
+     &         (id_rank, file_prefix, mesh_IO)
 !
       use mesh_data_IO
       use set_parallel_file_name
 !
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_prefix
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
@@ -211,15 +213,17 @@
       character(len=kchara) :: file_name
 !
 !
-      call add_int_suffix(my_rank_IO, file_prefix, file_name)
+      file_name = add_process_id(id_rank, file_prefix)
 !
-      if(my_rank_IO.eq.0 .or. i_debug .gt. 0) write(*,*)                &
+      if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Write ascii mesh file: ', trim(file_name)
 !
       open(input_file_code, file = file_name, form = 'formatted')
       call output_node_cyl_geometry                                     &
-         (input_file_code, my_rank_IO, mesh_IO)
+         (input_file_code, id_rank, mesh_IO)
       close(input_file_code)
+!
+      call dealloc_node_geometry_IO(mesh_IO)
 !
       end subroutine write_node_position_cyl
 !

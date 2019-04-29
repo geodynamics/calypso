@@ -105,6 +105,7 @@
       call init_legendre_rtm(sph%sph_params%l_truncation,               &
      &    sph%sph_rj, sph%sph_rtm, sph%sph_rlm, idx_trns, leg)
 !
+      call const_conatitude_rtp(sph%sph_rtm, sph%sph_rtp, leg)
       call const_sin_theta_rtp(leg, sph%sph_rtm, sph%sph_rtp)
 !
       call set_sym_legendre_stack(sph%sph_rtm%nidx_rtm(3),              &

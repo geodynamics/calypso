@@ -25,7 +25,7 @@
 !!        type(phys_data), intent(in) :: nod_fld
 !!
 !!      subroutine link_output_ucd_file_once                            &
-!!     &         (my_rank, istep_ucd, nod_fld, ucd_param, t_IO)
+!!     &         (istep_ucd, nod_fld, ucd_param, t_IO)
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(time_data), intent(in) :: t_IO
@@ -151,14 +151,14 @@
 !-----------------------------------------------------------------------
 !
       subroutine link_output_ucd_file_once                              &
-     &         (my_rank, istep_ucd, nod_fld, ucd_param, t_IO)
+     &         (istep_ucd, nod_fld, ucd_param, t_IO)
 !
       use t_phys_data
 !
       use set_ucd_data_to_type
       use ucd_IO_select
 !
-      integer(kind = kint),  intent(in) :: my_rank, istep_ucd
+      integer(kind = kint),  intent(in) :: istep_ucd
       type(field_IO_params), intent(in) :: ucd_param
 !
       type(phys_data), intent(in) :: nod_fld

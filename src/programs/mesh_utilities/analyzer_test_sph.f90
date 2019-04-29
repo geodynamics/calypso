@@ -12,6 +12,8 @@
       use m_precision
       use m_constants
       use m_machine_parameter
+      use m_work_time
+      use m_elapsed_labels_SEND_RECV
 !
       use t_SPH_mesh_field_data
       use t_spheric_parameter
@@ -59,16 +61,19 @@
         write(*,*) 'Input file: mesh data'
       end if
 !
-      call set_tesh_sph_elapsed_label
+      call init_elapse_time_by_TOTAL
+      call elpsed_label_calypso_send_recv
+      call elpsed_label_field_send_recv
+!
 !
 !     --------------------- 
 !
       call turn_off_debug_flag_by_ctl(my_rank, SPH_TEST_ctl%plt)
       call read_control_4_const_shell(control_file_name, SPH_TEST_ctl)
-      call set_control_sph_mesh(SPH_TEST_ctl%plt,                       &
+      call set_control_sph_mesh                                         &
+     &   (SPH_TEST_ctl%plt, SPH_TEST_ctl%psph_ctl%Fmesh_ctl,            &
      &    test_sph_files%mesh_file_IO, test_sph_files%sph_file_IO,      &
-     &    test_sph_files%iflag_output_FEM,                              &
-     &    test_sph_files%iflag_output_SURF)
+     &    test_sph_files%FEM_mesh_flags)
 !
       if (iflag_debug.gt.0) write(*,*) 'load_para_sph_mesh'
       call load_para_sph_mesh                                           &
@@ -99,8 +104,8 @@
      &    SPH_TEST%sph%sph_rtp%nnod_rtp, SPH_TEST%sph%sph_rtm%nnod_rtm, &
      &    SPH_TEST%sph%sph_rlm%nnod_rlm, SPH_TEST%sph%sph_rj%nnod_rj)
 !
-      call add_int_suffix(my_rank, check_header, fname_tmp)
-      call add_dat_extension(fname_tmp, file_name)
+      fname_tmp = add_process_id(my_rank, check_header)
+      file_name = add_dat_extension(fname_tmp)
       write(*,*) 'error check result: ', trim(file_name)
       open(id_check, file=file_name)
 !
@@ -143,6 +148,8 @@
 !
       call deallocate_real_sph_test
       call deallocate_idx_sph_recieve
+!
+      call output_elapsed_times
 !
       if (iflag_debug.eq.1) write(*,*) 'exit analyze_test_sph'
 !

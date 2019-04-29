@@ -228,7 +228,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
         call read_chara_ctl_type(hd_rst_flag, mr_ctl%restart_flag_ctl)
@@ -255,7 +255,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
         call read_chara_ctl_type(hd_scheme, mevo_ctl%scheme_ctl)

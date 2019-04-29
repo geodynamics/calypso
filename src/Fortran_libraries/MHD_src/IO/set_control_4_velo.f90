@@ -13,8 +13,8 @@
 !!     &         (fl_prop, node_bc_U_ctl, surf_bc_ST_ctl,               &
 !!     &          velo_nod, torque_surf)
 !!        type(fluid_property), intent(in) :: fl_prop
-!!        type(ctl_array_c2r), intent(inout) :: node_bc_U_ctl
-!!        type(ctl_array_c2r), intent(inout) :: surf_bc_ST_ctl
+!!        type(ctl_array_c2r), intent(in) :: node_bc_U_ctl
+!!        type(ctl_array_c2r), intent(in) :: surf_bc_ST_ctl
 !!        type(boundary_condition_list), intent(inout) :: velo_nod
 !!        type(boundary_condition_list), intent(inout) :: torque_surf
 !!@endverbatim
@@ -45,8 +45,8 @@
       use skip_comment_f
 !
       type(fluid_property), intent(in) :: fl_prop
-      type(ctl_array_c2r), intent(inout) :: node_bc_U_ctl
-      type(ctl_array_c2r), intent(inout) :: surf_bc_ST_ctl
+      type(ctl_array_c2r), intent(in) :: node_bc_U_ctl
+      type(ctl_array_c2r), intent(in) :: surf_bc_ST_ctl
       type(boundary_condition_list), intent(inout) :: velo_nod
       type(boundary_condition_list), intent(inout) :: torque_surf
 !
@@ -106,8 +106,6 @@
      &         velo_nod%bc_magnitude(i), trim(velo_nod%bc_name(i))
           end do
         end if
-!
-        call dealloc_control_array_c2_r(node_bc_U_ctl)
       end if
 !
 !
@@ -140,8 +138,6 @@
      &                 trim(torque_surf%bc_name(i))
           end do
         end if
-!
-        call dealloc_control_array_c2_r(surf_bc_ST_ctl)
       end if
 !
       end subroutine s_set_control_4_velo

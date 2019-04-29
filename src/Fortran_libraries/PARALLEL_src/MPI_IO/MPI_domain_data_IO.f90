@@ -17,7 +17,7 @@
 !!      subroutine mpi_write_import_data(IO_param, comm_IO)
 !!      subroutine mpi_write_export_data(IO_param, comm_IO)
 !!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
-!!        type(communication_table), intent(inout) :: comm_IO
+!!        type(communication_table), intent(in) :: comm_IO
 !!
 !!      subroutine mpi_read_int_stack(IO_param, num, istack, ntot)
 !!      subroutine mpi_read_comm_table(IO_param, ncolumn, num, int_dat)
@@ -66,7 +66,7 @@
 !
       call mpi_read_num_of_data(IO_param, comm_IO%num_neib)
 !
-      call allocate_type_neib_id(comm_IO)
+      call alloc_neighbouring_id(comm_IO)
 !
       call mpi_read_int_vector                                          &
      &   (IO_param, comm_IO%num_neib, comm_IO%id_neib)
@@ -85,13 +85,13 @@
 !
 !
       call mpi_read_num_of_data(IO_param, num_tmp)
-      call allocate_type_import_num(comm_IO)
+      call alloc_import_num(comm_IO)
 !
-      call mpi_read_int_stack(IO_param,                                 &
-     &    comm_IO%num_neib, comm_IO%istack_import, comm_IO%ntot_import)
+      call mpi_read_int_stack(IO_param, comm_IO%num_neib,               &
+     &    comm_IO%istack_import, comm_IO%ntot_import)
 !
       call mpi_read_num_of_data(IO_param, comm_IO%ntot_import)
-      call allocate_type_import_item(comm_IO)
+      call alloc_import_item(comm_IO)
 !
       call mpi_read_comm_table                                          &
      &   (IO_param, ione, comm_IO%ntot_import, comm_IO%item_import)
@@ -109,13 +109,13 @@
 !
 !
       call mpi_read_num_of_data(IO_param, num_tmp)
-      call allocate_type_export_num(comm_IO)
+      call alloc_export_num(comm_IO)
 !
-      call mpi_read_int_stack(IO_param,                                 &
-     &    comm_IO%num_neib, comm_IO%istack_export, comm_IO%ntot_export)
+      call mpi_read_int_stack(IO_param, comm_IO%num_neib,               &
+     &    comm_IO%istack_export, comm_IO%ntot_export)
 !
       call mpi_read_num_of_data(IO_param, comm_IO%ntot_export)
-      call allocate_type_export_item(comm_IO)
+      call alloc_export_item(comm_IO)
 !
       call mpi_read_comm_table                                          &
      &     (IO_param, ione, comm_IO%ntot_export, comm_IO%item_export)
@@ -128,16 +128,17 @@
       subroutine mpi_write_domain_info(IO_param, comm_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(communication_table), intent(inout) :: comm_IO
+      type(communication_table), intent(in) :: comm_IO
+!
+      integer(kind = kint) :: nlength
 !
 !
+      nlength = int(IO_param%nprocs_in,KIND(nlength))
       call mpi_write_charahead(IO_param, len_int_txt,                   &
-     &    integer_textline(IO_param%nprocs_in))
+     &    integer_textline(nlength))
 !
       call mpi_write_int_vector                                         &
      &   (IO_param, comm_IO%num_neib, comm_IO%id_neib)
-!
-      call deallocate_type_neib_id(comm_IO)
 !
       end subroutine mpi_write_domain_info
 !
@@ -147,16 +148,13 @@
       subroutine mpi_write_import_data(IO_param, comm_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(communication_table), intent(inout) :: comm_IO
+      type(communication_table), intent(in) :: comm_IO
 !
 !
       call mpi_write_int_stack                                          &
      &   (IO_param, comm_IO%num_neib, comm_IO%istack_import)
-!
       call mpi_write_comm_table                                         &
      &   (IO_param, ione, comm_IO%ntot_import, comm_IO%item_import)
-!
-      call deallocate_type_import(comm_IO)
 !
       end subroutine mpi_write_import_data
 !
@@ -165,20 +163,18 @@
       subroutine mpi_write_export_data(IO_param, comm_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(communication_table), intent(inout) :: comm_IO
+      type(communication_table), intent(in) :: comm_IO
 !
 !
       call mpi_write_int_stack                                          &
      &   (IO_param, comm_IO%num_neib, comm_IO%istack_export)
-!
       call mpi_write_comm_table                                         &
      &   (IO_param, ione, comm_IO%ntot_export, comm_IO%item_export)
 !
-      call deallocate_type_export(comm_IO)
-!
       end subroutine mpi_write_export_data
 !
-! -----------------------------------------------------------------------! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
       subroutine mpi_write_int_stack(IO_param, num, istack)
 !
@@ -200,7 +196,8 @@
       integer(kind=kint), intent(in) :: num
       integer(kind=kint), intent(in) :: int_dat(num)
 !
-      integer(kind = kint) :: ilength, i
+      integer(kind = kint) :: i, nlength
+      integer :: ilength
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
@@ -209,13 +206,14 @@
       ilength = len_multi_int_textline(num)
       IO_param%istack_merged(0) = 0
       do i = 1, IO_param%nprocs_in
+        nlength = int(IO_param%istack_merged(i),KIND(nlength))
         IO_param%istack_merged(i) = IO_param%istack_merged(i-1)         &
-     &         + len_multi_int_textline(int(IO_param%istack_merged(i)))
+     &                             + len_multi_int_textline(nlength)
       end do
 !
       call mpi_write_charahead(IO_param,                                &
-     &    len_multi_int_textline(IO_param%nprocs_in),                   &
-     &    int_stack8_textline(IO_param%nprocs_in,                       &
+     &    len_byte_stack_textline(IO_param%nprocs_in),                  &
+     &    byte_stack_textline(IO_param%nprocs_in,                       &
      &                        IO_param%istack_merged))
 !
       ioffset = IO_param%ioff_gl                                        &
@@ -224,7 +222,7 @@
      &         + IO_param%istack_merged(IO_param%nprocs_in)
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
         call calypso_mpi_seek_write_chara(IO_param%id_file, ioffset,    &
-     &     ilength, multi_int_textline(num, int_dat))
+     &      ilength, multi_int_textline(num, int_dat))
 !
       end subroutine mpi_write_int_vector
 !
@@ -253,16 +251,18 @@
       integer(kind=kint), intent(in) :: num
       integer(kind=kint), intent(inout) :: int_dat(num)
 !
-      integer(kind = kint) :: ilength, i
+      integer(kind = kint) :: i, nlength
+      integer ::  ilength
 !
 !
       call mpi_skip_read                                               &
-     &   (IO_param, len_multi_int_textline(IO_param%nprocs_in))
+     &   (IO_param, len_byte_stack_textline(IO_param%nprocs_in))
 !
       IO_param%istack_merged(0) = 0
       do i = 1, IO_param%nprocs_in
+        nlength = int(IO_param%istack_merged(i),KIND(nlength))
         IO_param%istack_merged(i) = IO_param%istack_merged(i-1)         &
-     &         + len_multi_int_textline(int(IO_param%istack_merged(i)))
+     &                             + len_multi_int_textline(nlength)
       end do
 !
       if(IO_param%id_rank .lt. IO_param%nprocs_in) then
@@ -284,12 +284,13 @@
       integer(kind=kint), intent(in) :: num, ncolumn
       integer(kind=kint), intent(inout) :: int_dat(num)
 !
-      integer(kind = kint) :: i, nrest, n_item, ilength, led, loop
+      integer(kind = kint) :: i, nrest, n_item, led, loop
       integer(kind = MPI_OFFSET_KIND) :: ioffset
+      integer :: ilength
 !
 !
       call mpi_skip_read                                                &
-     &   (IO_param, len_multi_int_textline(IO_param%nprocs_in))
+     &   (IO_param, len_byte_stack_textline(IO_param%nprocs_in))
 !
       IO_param%istack_merged(0) = 0
       do i = 1, IO_param%nprocs_in
@@ -343,7 +344,8 @@
       integer(kind=kint), intent(in) :: num, ncolumn
       integer(kind=kint), intent(in) :: int_dat(num)
 !
-      integer(kind = kint) :: i, nrest, loop, led
+      integer(kind = kint_gl) :: led
+      integer(kind = kint) :: i, nrest, loop
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
@@ -368,7 +370,7 @@
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
       if(num .le. 0) then
         call calypso_mpi_seek_write_chara                               &
-     &     (IO_param%id_file, ioffset, ione, char(10))
+     &     (IO_param%id_file, ioffset, 1, char(10))
       else
         do i = 0, (num-1)/ncolumn - 1
           call calypso_mpi_seek_write_chara(IO_param%id_file, ioffset,  &

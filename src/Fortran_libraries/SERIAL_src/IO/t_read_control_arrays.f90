@@ -532,6 +532,7 @@
 !
       if(array_real%num .le. 0) return
       deallocate(array_real%vect)
+      array_real%num = 0
 !
       end subroutine dealloc_control_array_real
 !
@@ -544,6 +545,7 @@
 !
       if(array_r2%num .le. 0) return
       deallocate(array_r2%vec1, array_r2%vec2)
+      array_r2%num = 0
 !
       end subroutine dealloc_control_array_r2
 !
@@ -556,6 +558,7 @@
 !
       if(array_r3%num .le. 0) return
       deallocate(array_r3%vec1, array_r3%vec2, array_r3%vec3)
+      array_r3%num = 0
 !
       end subroutine dealloc_control_array_r3
 !
@@ -568,6 +571,7 @@
 !
       if(array_int%num .le. 0) return
       deallocate(array_int%ivec)
+      array_int%num = 0
 !
       end subroutine dealloc_control_array_int
 !
@@ -580,6 +584,7 @@
 !
       if(array_i2%num .le. 0) return
       deallocate(array_i2%int1, array_i2%int2)
+      array_i2%num = 0
 !
       end subroutine dealloc_control_array_i2
 !
@@ -592,6 +597,7 @@
 !
       if(array_chara%num .le. 0) return
       deallocate(array_chara%c_tbl)
+      array_chara%num = 0
 !
       end subroutine dealloc_control_array_chara
 !
@@ -604,6 +610,7 @@
 !
       if(array_c2%num .le. 0) return
       deallocate(array_c2%c1_tbl, array_c2%c2_tbl)
+      array_c2%num = 0
 !
       end subroutine dealloc_control_array_c2
 !
@@ -616,6 +623,7 @@
 !
       if(array_c3%num .le. 0) return
       deallocate(array_c3%c1_tbl, array_c3%c2_tbl, array_c3%c3_tbl)
+      array_c3%num = 0
 !
       end subroutine dealloc_control_array_c3
 !
@@ -628,6 +636,7 @@
 !
       if(array_cr%num .le. 0) return
       deallocate( array_cr%c_tbl, array_cr%vect)
+      array_cr%num = 0
 !
       end subroutine dealloc_control_array_c_r
 !
@@ -640,6 +649,7 @@
 !
       if(array_ci%num .le. 0) return
       deallocate( array_ci%c_tbl, array_ci%ivec)
+      array_ci%num = 0
 !
       end subroutine dealloc_control_array_c_i
 !
@@ -652,6 +662,7 @@
 !
       if(array_cr2%num .le. 0) return
       deallocate(array_cr2%c_tbl, array_cr2%vec1, array_cr2%vec2)
+      array_cr2%num = 0
 !
       end subroutine dealloc_control_array_c_r2
 !
@@ -664,6 +675,7 @@
 !
       if(array_c2r%num .le. 0) return
       deallocate( array_c2r%c1_tbl, array_c2r%c2_tbl, array_c2r%vect)
+      array_c2r%num = 0
 !
       end subroutine dealloc_control_array_c2_r
 !
@@ -676,6 +688,7 @@
 !
       if(array_icr%num .le. 0) return
       deallocate( array_icr%ivec, array_icr%c_tbl, array_icr%vect)
+      array_icr%num = 0
 !
       end subroutine dealloc_control_array_i_c_r
 !
@@ -688,6 +701,7 @@
 !
       if(array_ir%num .le. 0) return
       deallocate( array_ir%ivec, array_ir%vect)
+      array_ir%num = 0
 !
       end subroutine dealloc_control_array_i_r
 !
@@ -700,6 +714,7 @@
 !
       if(array_i2r%num .le. 0) return
       deallocate( array_i2r%int1, array_i2r%int2, array_i2r%vect)
+      array_i2r%num = 0
 !
       end subroutine dealloc_control_array_i2_r
 !
@@ -713,6 +728,7 @@
       if(array_i2r2%num .le. 0) return
       deallocate( array_i2r2%int1, array_i2r2%int2)
       deallocate( array_i2r2%vec1, array_i2r2%vec2)
+      array_i2r2%num = 0
 !
       end subroutine dealloc_control_array_i2_r2
 !
@@ -844,7 +860,7 @@
       call find_control_array_flag(label, array_c2%num)
       if(array_c2%num.gt.0 .and. array_c2%icou.eq.0) then
         call alloc_control_array_c2(array_c2)
-        call read_control_array_chara2_list(label, array_c2%num,       &
+        call read_control_array_chara2_list(label, array_c2%num,        &
      &      array_c2%icou, array_c2%c1_tbl, array_c2%c2_tbl)
       end if
 !

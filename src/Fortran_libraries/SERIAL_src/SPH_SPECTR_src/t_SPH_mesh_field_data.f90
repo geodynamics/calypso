@@ -6,7 +6,6 @@
 !!
 !!@brief  indexing table of speherical harmonics transform
 !!
-!!@n @param  my_rank     Running rank ID
 !!@n @param   l          Sphrical harmonics degree
 !!@n @param   m          Sphrical harmonics order
 !!

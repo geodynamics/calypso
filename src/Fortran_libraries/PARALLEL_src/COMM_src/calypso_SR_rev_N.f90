@@ -68,6 +68,7 @@
 !
       use calypso_mpi
       use m_solver_SR
+      use m_elapsed_labels_SEND_RECV
       use calypso_SR_core
       use set_to_send_buffer
       use set_from_recv_buf_rev
@@ -96,21 +97,21 @@
 !
 !C-- SEND
 !
-      call start_elapsed_time(36)
+      if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+1)
       call set_to_send_buf_N(NB, nnod_org, istack_send(npe_send),       &
      &    inod_export, X_org, WS)
-      call end_elapsed_time(36)
+      if(iflag_CSR_time) call end_elapsed_time(ist_elapsed_CSR+1)
 !C
-      call start_elapsed_time(37)
+      if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+2)
       call calypso_send_recv_core                                       &
      &         (NB, npe_send, isend_self, id_pe_send, istack_send,      &
      &              npe_recv, irecv_self, id_pe_recv, istack_recv)
-      call end_elapsed_time(37)
+      if(iflag_CSR_time) call end_elapsed_time(ist_elapsed_CSR+2)
 !
-      call start_elapsed_time(38)
+      if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+3)
       call set_from_recv_buf_rev_N(NB, nnod_new,                        &
      &    istack_recv(npe_recv), irev_import, WR, X_new)
-      call end_elapsed_time(38)
+      if(iflag_CSR_time) call end_elapsed_time(ist_elapsed_CSR+3)
 !
       end subroutine calypso_send_recv_rev_N
 !

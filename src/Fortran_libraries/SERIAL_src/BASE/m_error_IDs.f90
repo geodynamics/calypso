@@ -51,6 +51,9 @@
 !>     Error ID in PVR module
       integer(kind = kint), parameter :: ierr_PVR = 621
 !
+!>     Error ID in LIC PVR module
+      integer(kind = kint), parameter :: ierr_LIC = 631
+!
 !
 !
 !>     Error ID for FEM element

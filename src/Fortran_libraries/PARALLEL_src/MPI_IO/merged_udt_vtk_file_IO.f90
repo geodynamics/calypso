@@ -37,6 +37,7 @@
       use m_field_file_format
 !
       use t_ucd_data
+      use t_para_double_numbering
 !
       use set_ucd_file_names
 !
@@ -44,6 +45,9 @@
 !
 !>      file ID for VTK file
       integer(kind = kint), parameter, private :: id_vtk_file = 16
+!
+!>      Structure of double numbering
+      type(parallel_double_numbering), private, save :: dbl_id1
 !
 !-----------------------------------------------------------------------
 !
@@ -70,14 +74,12 @@
 !
       call link_nnod_stacks_2_ucd(nprocs, node, ele, m_ucd)
 !
-      call allocate_merged_ucd_data(node%numnod)
-      call set_node_double_address                                      &
-     &   (nod_comm%num_neib, nod_comm%id_neib,                          &
-     &    nod_comm%istack_import, nod_comm%item_import,                 &
-     &    nod_comm%istack_export, nod_comm%item_export)
+      call alloc_double_numbering(node%numnod, dbl_id1)
+      call set_para_double_numbering                                    &
+     &   (node%internal_node, nod_comm, dbl_id1)
 !
       call update_ele_by_double_address                                 &
-     &   (node%istack_internod, m_ucd, ucd)
+     &   (node%istack_internod, dbl_id1, m_ucd, ucd)
 !
       if(iflag_format .eq. iflag_sgl_hdf5) then
         call parallel_init_hdf5(ucd, m_ucd)
@@ -99,7 +101,8 @@
       if(iflag_format .eq. iflag_sgl_hdf5) then
         call parallel_finalize_hdf5(m_ucd)
       end if
-      call deallocate_merged_ucd_data(m_ucd)
+      call dealloc_double_numbering(dbl_id1)
+      call disconnect_merged_ucd_stack(m_ucd)
 !
       end subroutine finalize_merged_ucd
 !

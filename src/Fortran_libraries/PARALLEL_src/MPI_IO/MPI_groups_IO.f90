@@ -9,11 +9,15 @@
 !!@verbatim
 !!      subroutine mpi_read_group_data(IO_param, group_IO)
 !!      subroutine mpi_read_surf_grp_data(IO_param, surf_grp_IO)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(group_data), intent(inout) :: group_IO
+!!        type(surface_group_data), intent(inout) :: surf_grp_IO
 !!
 !!      subroutine mpi_write_grp_data(IO_param, group_IO)
 !!      subroutine mpi_write_surf_grp_data(IO_param, surf_grp_IO)
-!!        type(group_data), intent(inout) :: group_IO
-!!        type(surface_group_data), intent(inout) :: surf_grp_IO
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(group_data), intent(in) :: group_IO
+!!        type(surface_group_data), intent(in) :: surf_grp_IO
 !!@endverbatim
 !
       module MPI_groups_IO
@@ -48,17 +52,17 @@
 !
       call read_integer_textline                                        &
      &   (mpi_read_charahead(IO_param, len_int_txt), group_IO%num_grp)
-      call allocate_grp_type_num(group_IO)
+      call alloc_group_num(group_IO)
 !
       if(group_IO%num_grp .le. 0) then
         group_IO%num_item = 0
-        call allocate_grp_type_item(group_IO)
+        call alloc_group_item(group_IO)
       else
         call mpi_read_num_of_data(IO_param, num_tmp)
         call mpi_read_int_stack(IO_param, group_IO%num_grp,             &
      &      group_IO%istack_grp, group_IO%num_item)
 !
-        call allocate_grp_type_item(group_IO)
+        call alloc_group_item(group_IO)
 !
         do i = 1, group_IO%num_grp
           call read_field_name_mpi                                      &
@@ -70,7 +74,6 @@
           call mpi_read_comm_table                                      &
      &       (IO_param, ieight, num, group_IO%item_grp(ist:ied))
         end do
-!
       end if
 !
       end subroutine mpi_read_group_data
@@ -88,18 +91,18 @@
       call read_integer_textline                                        &
      &   (mpi_read_charahead(IO_param, len_int_txt),                    &
      &    surf_grp_IO%num_grp)
-      call allocate_sf_grp_type_num(surf_grp_IO)
+      call alloc_sf_group_num(surf_grp_IO)
 !
       if(surf_grp_IO%num_grp .le. 0) then
-        call allocate_sf_grp_type_num(surf_grp_IO)
+        call alloc_sf_group_num(surf_grp_IO)
         surf_grp_IO%num_item = 0
-        call allocate_sf_grp_type_item(surf_grp_IO)
+        call alloc_sf_group_item(surf_grp_IO)
       else
         call mpi_read_num_of_data(IO_param, num_tmp)
         call mpi_read_int_stack(IO_param, surf_grp_IO%num_grp,          &
      &      surf_grp_IO%istack_grp, surf_grp_IO%num_item)
 !
-        call allocate_sf_grp_type_item(surf_grp_IO)
+        call alloc_sf_group_item(surf_grp_IO)
 !
         do i = 1, surf_grp_IO%num_grp
           call read_field_name_mpi(IO_param%id_file, IO_param%ioff_gl,  &
@@ -120,7 +123,7 @@
       subroutine mpi_write_grp_data(IO_param, group_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(group_data), intent(inout) :: group_IO
+      type(group_data), intent(in) :: group_IO
 !
       integer(kind = kint) :: i, ist, ied, num
 !
@@ -141,7 +144,6 @@
         call mpi_write_comm_table                                       &
      &     (IO_param, ieight, num, group_IO%item_grp(ist:ied))
       end do
-      call deallocate_grp_type(group_IO)
 !
       end subroutine mpi_write_grp_data
 !
@@ -150,7 +152,7 @@
       subroutine mpi_write_surf_grp_data(IO_param, surf_grp_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(surface_group_data), intent(inout) :: surf_grp_IO
+      type(surface_group_data), intent(in) :: surf_grp_IO
 !
       integer(kind = kint) :: i, num
 !

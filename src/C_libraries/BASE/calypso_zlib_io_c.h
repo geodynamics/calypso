@@ -36,7 +36,8 @@ void open_rd_rawfile(const char *file_name, int *ierr);
 void close_rawfile();
 
 void rawseek_go_fwd_f(int *ioffset, int *ierr);
-void rawread_f(int *iflag_swap, int *ilength, char *textbuf, int *lenchara);
+void rawread_32bit_f(int *iflag_swap, int *ilength, char *textbuf, int *lenchara);
+void rawread_64bit_f(int *iflag_swap, int *ilength, char *textbuf, int *lenchara);
 void rawwrite_f(int *ilength, char *textbuf, int *lenchara);
 
 void open_wt_gzfile(const char *gz_file_name);
@@ -51,7 +52,8 @@ void write_compress_txt(int *num_buffer, char *input_txt);
 void write_compress_txt_nolf(int *num_buffer, char *input_txt);
 
 void gzseek_go_fwd_f(int *ioffset, int *ierr);
-void gzread_f(int *iflag_swap, int *ilength, char *textbuf, int *ierr);
+void gzread_32bit_f(int *iflag_swap, int *ilength, char *textbuf, int *ierr);
+void gzread_64bit_f(int *iflag_swap, int *ilength, char *textbuf, int *ierr);
 void gzwrite_f(int *ilength, char *textbuf, int *ierr);
 
 void get_one_line_from_gz(int *num_buffer, int *num_word, int *nchara, char *line_buf);

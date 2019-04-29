@@ -9,12 +9,15 @@
 !!@verbatim
 !!      subroutine set_3D_nnod_4_ele_by_type(itype,                     &
 !!     &          nnod_4_ele, nnod_4_surf, nnod_4_edge)
-!!      subroutine set_nnod_4_ele_by_eletype(itype, nnod_4_ele)
+!!      integer(kind = kint) function set_nnod_4_ele_by_eletype(itype)
 !!      subroutine set_3D_nnod_4_sfed_by_ele                            &
 !!     &         (nnod_4_ele, nnod_4_surf, nnod_4_edge)
 !!      subroutine set_3D_nnod_4_sfed_by_ele,                           &
 !!     &         (nnod_4_ele, nnod_4_surf, nnod_4_edge)
 !!      subroutine s_set_nnod_4_ele_by_type(itype, nnod_4_ele)
+!!
+!!      integer(kind = kint) function                                   &
+!!     &              set_cube_eletype_from_num(nnod_4_ele)
 !!@endverbatim
 !
       module set_nnod_4_ele_by_type
@@ -40,31 +43,32 @@
       integer(kind = kint), intent(inout) :: nnod_4_edge
 !
 !
-      call set_nnod_4_ele_by_eletype(itype, nnod_4_ele)
-      call set_3D_nnod_4_sfed_by_ele                                   &
+      nnod_4_ele = set_nnod_4_ele_by_eletype(itype)
+      call set_3D_nnod_4_sfed_by_ele                                    &
      &   (nnod_4_ele, nnod_4_surf, nnod_4_edge)
 !
       end subroutine set_3D_nnod_4_ele_by_type
 !
 !------------------------------------------------------------------
 !
-      subroutine set_nnod_4_ele_by_eletype(itype, nnod_4_ele)
+      integer(kind = kint) function set_nnod_4_ele_by_eletype(itype)
 !
       use m_geometry_constants
 !
       integer(kind = kint), intent(in) :: itype
-      integer(kind = kint), intent(inout) :: nnod_4_ele
 !
 !
       if (itype .eq. 332) then
-        nnod_4_ele =  num_t_quad
+        set_nnod_4_ele_by_eletype =  num_t_quad
       else if (itype .eq. 333) then
-        nnod_4_ele =  num_t_lag
+        set_nnod_4_ele_by_eletype =  num_t_lag
       else if (itype .eq. 331) then
-        nnod_4_ele =  num_t_linear
+        set_nnod_4_ele_by_eletype =  num_t_linear
+      else
+        set_nnod_4_ele_by_eletype =  num_t_linear
       end if
 !
-      end subroutine set_nnod_4_ele_by_eletype
+      end function set_nnod_4_ele_by_eletype
 !
 !------------------------------------------------------------------
 !
@@ -91,6 +95,7 @@
 !
       end subroutine set_3D_nnod_4_sfed_by_ele
 !
+!------------------------------------------------------------------
 !------------------------------------------------------------------
 !
       subroutine s_set_nnod_4_ele_by_type(itype, nnod_4_ele)
@@ -160,6 +165,28 @@
       end if
 !
       end subroutine s_set_nnod_4_ele_by_type
+!
+!------------------------------------------------------------------
+!
+      integer(kind = kint) function                                     &
+     &              set_cube_eletype_from_num(nnod_4_ele)
+!
+      use m_geometry_constants
+!
+      integer(kind = kint), intent(in) :: nnod_4_ele
+!
+!
+      if (nnod_4_ele .eq. num_t_quad) then
+        set_cube_eletype_from_num =  332
+      else if (nnod_4_ele .eq. num_t_lag) then
+        set_cube_eletype_from_num =  333
+      else if (nnod_4_ele .eq. num_t_linear) then
+        set_cube_eletype_from_num =  331
+      else
+        set_cube_eletype_from_num =  331
+      end if
+!
+      end function set_cube_eletype_from_num
 !
 !------------------------------------------------------------------
 !

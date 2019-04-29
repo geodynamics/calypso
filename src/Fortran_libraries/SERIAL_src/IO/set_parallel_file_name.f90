@@ -7,126 +7,58 @@
 !>@brief  Set file extension
 !!
 !!@verbatim
-!!      subroutine delete_directory_name(dir_file_name, file_name)
+!!      character(len = kchara) function delete_directory_name          &
+!!     &                               (dir_file_name)
 !!
-!!      subroutine add_int_suffix(int_id, file_header, file_name)
+!!      character(len = kchara) function add_process_id                 &
+!!     &                               (id_rank, file_head)
+!!      character(len = kchara) function add_int_suffix                 &
+!!     &                               (int_id, file_head)
 !!
-!!      subroutine add_dat_extension(file_header, file_name)
+!!      character(len = kchara) function add_dat_extension(file_head)
 !!                put ".dat" at the end
-!!      subroutine add_udt_extension(file_header, file_name)
-!!                put ".udt" at the end
 !!
-!!      subroutine add_vtk_extension(file_header, file_name)
-!!                put ".vtk" at the end
-!!      subroutine add_pvtk_extension(file_header, file_name)
-!!                put ".pvtk" at the end
-!!      subroutine add_vtd_extension(file_header, file_name)
-!!                put ".vtd" at the end
-!!      subroutine add_vtg_extension(file_header, file_name)
-!!                put ".vtg" at the end
-!!
-!!      subroutine add_hdf_extension(file_header, file_name)
-!!                put ".h5" at the end
-!!      subroutine add_xdmf_extension(file_header, file_name)
-!!                put ".xdmf" at the end
-!!      subroutine add_mesh_suffix(file_header, file_name)
-!!                put ".mesh" at the end
-!!      subroutine add_field_suffix(file_header, file_name)
-!!                put ".field" at the end
-!!      subroutine add_xdmf_suffix(file_header, file_name)
-!!                put ".solution" at the end
-!!
-!!      subroutine add_grd_extension(file_header, file_name)
-!!                put ".grd" at the end
-!!      subroutine add_ucd_extension(file_header, file_name)
-!!                put ".inp" at the end
-!!
-!!      subroutine add_dx_extension(file_header, file_name)
-!!                put ".dx" at the end
-!!      subroutine add_node_extension(file_header, file_name)
-!!                put ".node.dat" at the end
-!!      subroutine add_connect_extension(file_header, file_name)
-!!                put ".connect.dat" at the end
-!!
-!!      subroutine add_fld_extension(file_header, file_name)
-!!                put ".fld" at the end
-!!      subroutine add_flb_extension(file_header, file_name)
-!!                put ".flb" at the end
-!!      subroutine add_fst_extension(file_header, file_name)
-!!                put ".fst" at the end
-!!      subroutine add_fsb_extension(file_header, file_name)
-!!                put ".fsb"
-!!      subroutine add_elaps_postfix(file_header, file_name)
+!!      character(len = kchara) function add_elaps_postfix(file_head)
 !!                put ".elps" at the end
 !!
-!!      subroutine add_gzip_extension(file_header, file_name)
+!!      character(len = kchara) function add_gzip_extension(file_head)
 !!                put ".gz"
-!!      subroutine add_null_character(file_header, file_name)
+!!      character(len = kchara) function add_null_character(file_head)
 !!                put null character at the end
 !!
-!!      subroutine add_ksm_extension(file_header, file_name)
-!!                put ".ksm" at the end
+!!      character(len=kchara) function                                  &
+!!     &                     add_2chara_extension(file_head, extension)
+!!      character(len=kchara) function                                  &
+!!     &                     add_3chara_extension(file_head, extension)
 !!
-!!      subroutine add_gfm_extension(file_header, file_name)
-!!                put ".gfm" at the end
-!!      subroutine add_gfb_extension(file_header, file_name)
-!!                put ".gfb" at the end
-!!
-!!      subroutine add_gel_extension(file_header, file_name)
-!!                put ".gel" at the end
-!!      subroutine add_gsf_extension(file_header, file_name)
-!!                put ".gsf" at the end
-!!      subroutine add_ged_extension(file_header, file_name)
-!!                put ".ged" at the end
-!!      subroutine add_elb_extension(file_header, file_name)
-!!                put ".elb" at the end
-!!      subroutine add_sfb_extension(file_header, file_name)
-!!                put ".sfb" at the end
-!!      subroutine add_edb_extension(file_header, file_name)
-!!                put ".edb" at the end
-!!
-!!      subroutine add_rtp_extension(file_header, file_name)
-!!                put ".rtp" at the end
-!!      subroutine add_rtm_extension(file_header, file_name)
-!!                put ".rtm" at the end
-!!      subroutine add_rlm_extension(file_header, file_name)
-!!                put ".rlm" at the end
-!!      subroutine add_rj_extension(file_header, file_name)
-!!                put ".rj" at the end
-!!
-!!      subroutine add_btp_extension(file_header, file_name)
-!!                put ".btp" at the end
-!!      subroutine add_btm_extension(file_header, file_name)
-!!                put ".btm" at the end
-!!      subroutine add_blm_extension(file_header, file_name)
-!!                put ".blm" at the end
-!!      subroutine add_brj_extension(file_header, file_name)
-!!                put ".brj" at the end
-!!
-!!      subroutine add_left_label(file_header, file_name)
+!!       character(len=kchara) function add_left_label(file_head)
 !!                put "_left" at the end
-!!      subroutine add_right_label(file_header, file_name)
+!!       character(len=kchara) function add_right_label(file_head)
 !!                put "_right" at the end
 !!
 !!      subroutine add_index_after_name(int_id, chara_head, chara_name)
 !!      subroutine int_to_str(int_val, int_string)
 !!      subroutine lint_to_str(lint_val, int_string)
 !!      subroutine real_to_str(real_val, real_string)
+!!
+!!      character(len = kchara) function set_rayleigh_file_name         &
+!!     &                               (dir, int_id, postfix)
+!!               set file name as "[dir]/[int_id]_[postfix]"
 !!@endverbatim
 !!
 !!@n @param dir_file_name    file name (header) including directory name
-!!@n @param file_header      file prefix
 !!@n @param int_id           integer to be added at the end of prefix
 !!@n @param file_name        output file name
 !!@n @param int_val          integer to be tranfered to character
 !!@n @param int_string       output character
 !
-
       module set_parallel_file_name
 !
       use m_precision
 !
       implicit  none
+!
+      character(len=2), parameter, private :: gz_ext =  "gz"
 !
 !-----------------------------------------------------------------------
 !
@@ -134,10 +66,10 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine delete_directory_name(dir_file_name, file_name)
+      character(len = kchara) function delete_directory_name            &
+     &                               (dir_file_name)
 !
       character(len=kchara), intent(in) :: dir_file_name
-      character(len=kchara), intent(inout) :: file_name
 !
       integer(kind = kint) :: i, len, len_name, idir_flag
       character(len=kchara) :: fmt_txt
@@ -154,560 +86,144 @@
       len = len_name - idir_flag
 !
       write(fmt_txt,'(a2,i4,a1)') '(a',len,')'
-      write(file_name,fmt_txt) dir_file_name(idir_flag+1:len_name)
+      write(delete_directory_name,fmt_txt)                              &
+     &                            dir_file_name(idir_flag+1:len_name)
 !
-      end subroutine delete_directory_name
+      end function delete_directory_name
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine add_int_suffix(int_id, file_header, file_name)
+      character(len = kchara) function add_process_id                   &
+     &                               (id_rank, file_head)
+!
+      integer, intent(in) :: id_rank
+      character(len=kchara), intent(in) :: file_head
+!
+      integer(kind = kint) :: int_id
+!
+!
+      int_id = int(id_rank, KIND(int_id))
+      add_process_id = add_int_suffix(int_id, file_head)
+!
+      end function add_process_id
+!
+!-----------------------------------------------------------------------
+!
+      character(len = kchara) function add_int_suffix                   &
+     &                               (int_id, file_head)
 !
       integer(kind = kint), intent(in) :: int_id
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
+      character(len=kchara), intent(in) :: file_head
 !
       character(len=kchara) :: chara_head
 !
 !
-      write(chara_head,1000) trim(file_header)
-      call add_index_after_name(int_id, chara_head, file_name)
+      write(chara_head,1000) trim(file_head)
+      call add_index_after_name(int_id, chara_head, add_int_suffix)
 !
  1000 format (a,".")
 !
-      end subroutine add_int_suffix
+      end function add_int_suffix
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine add_dat_extension(file_header, file_name)
+      character(len = kchara) function add_dat_extension(file_head)
 !
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
+      character(len=kchara), intent(in) :: file_head
 !
-       write(file_name,1011) trim(file_header)
+       write(add_dat_extension,1011) trim(file_head)
  1011 format (a,".dat")
 !
-      end subroutine add_dat_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_udt_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".udt")
-!
-      end subroutine add_udt_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_vtk_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".vtk")
-!
-      end subroutine add_vtk_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_pvtk_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".pvtk")
-!
-      end subroutine add_pvtk_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_vtd_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".vtd")
-!
-      end subroutine add_vtd_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_vtg_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".vtg")
-!
-      end subroutine add_vtg_extension
+      end function add_dat_extension
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine add_hdf_extension(file_header, file_name)
+      character(len = kchara) function add_elaps_postfix(file_head)
 !
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
+      character(len=kchara), intent(in) :: file_head
 !
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".h5")
-!
-      end subroutine add_hdf_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_xdmf_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-      write(file_name,1011) trim(file_header)
-1011 format (a,".xdmf")
-!
-      end subroutine add_xdmf_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_mesh_suffix(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-      write(file_name,1011) trim(file_header)
-1011 format (a,".mesh")
-!
-      end subroutine add_mesh_suffix
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_field_suffix(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-      write(file_name,1011) trim(file_header)
-1011 format (a,".field")
-!
-      end subroutine add_field_suffix
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_xdmf_suffix(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-      write(file_name,1011) trim(file_header)
-1011 format (a,".solution")
-!
-      end subroutine add_xdmf_suffix
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine add_grd_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-      write(file_name,1011) trim(file_header)
- 1011 format (a,".grd")
-!
-      end subroutine add_grd_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_ucd_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".inp")
-!
-      end subroutine add_ucd_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_dx_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".dx")
-!
-      end subroutine add_dx_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_node_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".node.dat")
-!
-      end subroutine add_node_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_connect_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".connect.dat")
-!
-      end subroutine add_connect_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_fld_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".fld")
-!
-      end subroutine add_fld_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_flb_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".flb")
-!
-      end subroutine add_flb_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_fst_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
- 1011 format (a,".fst")
-!
-      end subroutine add_fst_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_fsb_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-      write(file_name,1011) trim(file_header)
- 1011 format (a,".fsb")
-!
-end subroutine add_fsb_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_elaps_postfix(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
+       write(add_elaps_postfix,1011) trim(file_head)
  1011 format (a,".elps")
 !
-      end subroutine add_elaps_postfix
+      end function add_elaps_postfix
 !
 !-----------------------------------------------------------------------
 !
-      subroutine add_gzip_extension(file_header, file_name)
+      character(len = kchara) function add_gzip_extension(file_head)
 !
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
+      character(len=kchara), intent(in) :: file_head
 !
-       write(file_name,1011) trim(file_header), ".gz"
- 1011 format (a,a3)
+      add_gzip_extension = add_2chara_extension(file_head, gz_ext)
 !
-      end subroutine add_gzip_extension
+      end function add_gzip_extension
 !
 !-----------------------------------------------------------------------
 !
-      subroutine add_null_character(file_header, file_name)
+      character(len = kchara) function add_null_character(file_head)
 !
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
+      character(len=kchara), intent(in) :: file_head
 !
-      write(file_name,1011) trim(file_header), char(0)
-      1011 format (a,a1)
+      write(add_null_character,1011) trim(file_head), char(0)
+ 1011 format (a,a1)
 !
-      end subroutine add_null_character
+      end function add_null_character
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine add_ksm_extension(file_header, file_name)
+      character(len=kchara) function                                    &
+     &                     add_2chara_extension(file_head, extension)
 !
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
+      character(len=kchara), intent(in) :: file_head
+      character(len=2), intent(in) :: extension
 !
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".ksm")
+       write(add_2chara_extension,'(a,a1,a2)')                          &
+     &                   trim(file_head), '.', trim(extension)
 !
-      end subroutine add_ksm_extension
+      end function add_2chara_extension
+!
+!-----------------------------------------------------------------------
+!
+      character(len=kchara) function                                    &
+     &                     add_3chara_extension(file_head, extension)
+!
+      character(len=kchara), intent(in) :: file_head
+      character(len=3), intent(in) :: extension
+!
+       write(add_3chara_extension,'(a,a1,a3)')                          &
+     &                   trim(file_head), '.', trim(extension)
+!
+      end function add_3chara_extension
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine add_gfm_extension(file_header, file_name)
+       character(len=kchara) function add_left_label(file_head)
 !
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
+      character(len=kchara), intent(in) :: file_head
+      character(len=kchara) :: file_name
 !
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".gfm")
-!
-      end subroutine add_gfm_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_gfb_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".gfb")
-!
-      end subroutine add_gfb_extension
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine add_gel_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".gel")
-!
-      end subroutine add_gel_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_gsf_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".gsf")
-!
-      end subroutine add_gsf_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_ged_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".ged")
-!
-      end subroutine add_ged_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_elb_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".elb")
-!
-      end subroutine add_elb_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_sfb_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".sfb")
-!
-      end subroutine add_sfb_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_edb_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".edb")
-!
-      end subroutine add_edb_extension
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine add_rtp_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".rtp")
-!
-      end subroutine add_rtp_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_rtm_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".rtm")
-!
-      end subroutine add_rtm_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_rlm_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".rlm")
-!
-      end subroutine add_rlm_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_rj_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".rj")
-!
-      end subroutine add_rj_extension
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine add_btp_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".btp")
-!
-      end subroutine add_btp_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_btm_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".btm")
-!
-      end subroutine add_btm_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_blm_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".blm")
-!
-      end subroutine add_blm_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_brj_extension(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
- 1011 format (a,".brj")
-!
-      end subroutine add_brj_extension
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_left_label(file_header, file_name)
-!
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
-!
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
+       write(file_name,1011) trim(file_head)
+       add_left_label = trim(file_name)
  1011 format (a,"_left")
 !
-      end subroutine add_left_label
+      end function add_left_label
 !
 !-----------------------------------------------------------------------
 !
-      subroutine add_right_label(file_header, file_name)
+       character(len=kchara) function add_right_label(file_head)
 !
-      character(len=kchara), intent(in) :: file_header
-      character(len=kchara), intent(inout) :: file_name
+      character(len=kchara), intent(in) :: file_head
+      character(len=kchara) :: file_name
 !
-       write(file_name,1011) trim(file_header)
-       file_name = trim(file_name)
+       write(file_name,1011) trim(file_head)
+       add_right_label = trim(file_name)
  1011 format (a,"_right")
 !
-      end subroutine add_right_label
+      end function add_right_label
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -769,6 +285,23 @@ end subroutine add_fsb_extension
       write(real_string,'(a)') trim(adjustl(tmp_string))
 !
       end subroutine real_to_str
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      character(len = kchara) function set_rayleigh_file_name           &
+     &                               (dir, int_id, postfix)
+!
+      integer(kind = kint), intent(in) :: int_id
+      character(len=kchara), intent(in) :: dir, postfix
+!
+!
+      write(set_rayleigh_file_name,1000)                                &
+     &                        trim(dir), int_id, trim(postfix)
+!
+ 1000 format(a, '/', i8.8, '_', a)
+!
+      end function set_rayleigh_file_name
 !
 !-----------------------------------------------------------------------
 !

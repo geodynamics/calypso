@@ -7,13 +7,13 @@
 !>@brief  Evaluate Coriolis term on spherical grid
 !!
 !!@verbatim
+!!      subroutine alloc_sphere_ave_coriolis(sph_rj)
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!      subroutine dealloc_sphere_ave_coriolis
 !!
-!!      subroutine set_colatitude_rtp(sph_rtp, sph_rj, leg)
-!!        type(legendre_4_sph_trans), intent(in) :: leg
-!!      subroutine cal_wz_coriolis_rtp(nnod, nidx_rtp, coef_cor,        &
-!!     &          velo_rtp, coriolis_rtp)
-!!      subroutine cal_wz_div_coriolis_rtp(nnod, nidx_rtp,              &
+!!      subroutine cal_wz_coriolis_rtp(nnod, nidx_rtp, g_colat_rtp,     &
+!!     &          coef_cor, velo_rtp, coriolis_rtp)
+!!      subroutine cal_wz_div_coriolis_rtp(nnod, nidx_rtp, g_colat_rtp, &
 !!     &          coef_cor, velo_rtp, div_coriolis_rtp)
 !!      subroutine subtract_sphere_ave_coriolis(sph_rtp, sph_rj,        &
 !!     &          is_coriolis, ntot_phys_rj, d_rj, coriolis_rtp)
@@ -41,15 +41,11 @@
 !
       implicit none
 !
-!>      @f$ \theta @f$ on spherical grid
-      real(kind = kreal), allocatable :: theta_1d_rtp(:)
-!
 !>     sphere average of radial coriolis force (local)
       real(kind = kreal), allocatable :: sphere_ave_coriolis_l(:)
 !>     sphere average of radial coriolis force
       real(kind = kreal), allocatable :: sphere_ave_coriolis_g(:)
 !
-      private :: alloc_sphere_ave_coriolis
       private :: sphere_ave_coriolis_l, sphere_ave_coriolis_g
       private :: clear_rj_degree0_scalar_smp
 !
@@ -59,22 +55,17 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_sphere_ave_coriolis(sph_rtp, sph_rj)
+      subroutine alloc_sphere_ave_coriolis(sph_rj)
 !
-      type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_rj_grid), intent(in) ::  sph_rj
 !
       integer(kind = kint) :: num
 !
 !
-      num = sph_rtp%nidx_rtp(2)
-      allocate(theta_1d_rtp(num))
-!
       num = sph_rj%nidx_rj(1)
       allocate(sphere_ave_coriolis_l(num))
       allocate(sphere_ave_coriolis_g(num))
 !
-      theta_1d_rtp = 0.0d0
       sphere_ave_coriolis_l = 0.0d0
       sphere_ave_coriolis_g = 0.0d0
 !
@@ -85,40 +76,18 @@
       subroutine dealloc_sphere_ave_coriolis
 !
       deallocate(sphere_ave_coriolis_l, sphere_ave_coriolis_g)
-      deallocate(theta_1d_rtp)
 !
       end subroutine dealloc_sphere_ave_coriolis
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_colatitude_rtp(sph_rtp, sph_rj, leg)
-!
-      use t_schmidt_poly_on_rtm
-!
-      type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(sph_rj_grid), intent(in) ::  sph_rj
-      type(legendre_4_sph_trans), intent(in) :: leg
-!
-      integer(kind = kint) :: l_rtp, l_rtm
-!
-!
-      call alloc_sphere_ave_coriolis(sph_rtp, sph_rj)
-!
-      do l_rtp = 1, sph_rtp%nidx_rtp(2)
-        l_rtm = sph_rtp%idx_gl_1d_rtp_t(l_rtp)
-        theta_1d_rtp(l_rtp) = leg%g_colat_rtm(l_rtm)
-      end do
-!
-      end subroutine set_colatitude_rtp
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cal_wz_coriolis_rtp(nnod, nidx_rtp, coef_cor,          &
-     &          velo_rtp, coriolis_rtp)
+      subroutine cal_wz_coriolis_rtp(nnod, nidx_rtp, g_colat_rtp,       &
+     &          coef_cor, velo_rtp, coriolis_rtp)
 !
       integer(kind = kint), intent(in) :: nnod
       integer(kind = kint), intent(in) :: nidx_rtp(3)
+      real(kind = kreal), intent(in) :: g_colat_rtp(nidx_rtp(2))
       real(kind = kreal), intent(in) :: coef_cor
       real(kind = kreal), intent(in) :: velo_rtp(nnod,3)
 !
@@ -135,8 +104,8 @@
             inod = kr + (l_rtp-1) * nidx_rtp(1)                         &
      &                + (mphi-1)  * nidx_rtp(1)*nidx_rtp(2)
 !
-            omega(1) =  cos( theta_1d_rtp(l_rtp) )
-            omega(2) = -sin( theta_1d_rtp(l_rtp) )
+            omega(1) =  cos( g_colat_rtp(l_rtp) )
+            omega(2) = -sin( g_colat_rtp(l_rtp) )
             omega(3) = zero
 !
             coriolis_rtp(inod,1) = - coef_cor                           &
@@ -157,11 +126,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_wz_div_coriolis_rtp(nnod, nidx_rtp,                &
+      subroutine cal_wz_div_coriolis_rtp(nnod, nidx_rtp, g_colat_rtp,   &
      &          coef_cor, velo_rtp, div_coriolis_rtp)
 !
       integer(kind = kint), intent(in) :: nnod
       integer(kind = kint), intent(in) :: nidx_rtp(3)
+      real(kind = kreal), intent(in) :: g_colat_rtp(nidx_rtp(2))
       real(kind = kreal), intent(in) :: coef_cor
       real(kind = kreal), intent(in) :: velo_rtp(nnod,3)
 !
@@ -178,8 +148,8 @@
             inod = kr + (l_rtp-1) * nidx_rtp(1)                         &
      &                + (mphi-1)  * nidx_rtp(1)*nidx_rtp(2)
 !
-            omega(1) =  cos( theta_1d_rtp(l_rtp) )
-            omega(2) = -sin( theta_1d_rtp(l_rtp) )
+            omega(1) =  cos( g_colat_rtp(l_rtp) )
+            omega(2) = -sin( g_colat_rtp(l_rtp) )
             omega(3) = zero
 !
             div_coriolis_rtp(inod)                                      &
@@ -209,6 +179,7 @@
      &           :: coriolis_rtp(sph_rtp%nnod_rtp,3)
 !
       integer(kind = kint) :: mphi, l_rtp, kr, k_gl, inod
+      integer(kind = kint_gl) :: num64
 !
 !
       if(sph_rj%idx_rj_degree_zero .gt. 0) then
@@ -222,9 +193,9 @@
       call clear_rj_degree0_scalar_smp                                  &
      &   (sph_rj, is_coriolis, sph_rj%nnod_rj, ntot_phys_rj, d_rj)
 !
-      call MPI_Allreduce(sphere_ave_coriolis_l, sphere_ave_coriolis_g,  &
-     &    sph_rj%nidx_rj(1), CALYPSO_REAL, MPI_SUM,                     &
-     &    CALYPSO_COMM, ierr_MPI)
+      num64 = int(sph_rj%nidx_rj(1),KIND(num64))
+      call calypso_mpi_allreduce_real                                   &
+     &   (sphere_ave_coriolis_l, sphere_ave_coriolis_g, num64, MPI_SUM)
 !
 !
 !$omp do private(mphi,l_rtp,kr,k_gl,inod)

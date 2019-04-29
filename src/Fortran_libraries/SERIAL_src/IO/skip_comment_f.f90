@@ -22,6 +22,13 @@
 !!          returns 1, othewwise returns 0
 !!      logical function yes_flag(control)
 !!      logical function no_flag(control)
+!!
+!!      integer(kind = kint) function iflag_divide(charaname)
+!!      integer(kind = kint) function max_len_of_charaarray(num, carray)
+!!      subroutine write_ctl_chara_cont(id_file, charaname)
+!!      subroutine write_ctl_chara_lf(id_file, charaname)
+!!      subroutine write_spaces(id_file, nspace)
+!!      subroutine write_space_4_parse(id_file, level)
 !!@endverbatim
 !
       module skip_comment_f
@@ -227,5 +234,100 @@
       end function no_flag
 !
 !-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      integer(kind = kint) function iflag_divide(charaname)
+!
+      character(len=kchara), intent(in) :: charaname
+!
+      integer(kind = kint) :: i
+!
+      iflag_divide = 0
+      do i = 1, len_trim(charaname)
+        if(charaname(i:i).eq.'/' .or. charaname(i:i).eq.','             &
+     &     .or. charaname(i:i).eq.';') then
+          iflag_divide = 1
+          exit
+        end if
+      end do
+!
+      end function iflag_divide
+!
+! ----------------------------------------------------------------------
+!
+      integer(kind = kint) function max_len_of_charaarray(num, carray)
+!
+      integer(kind = kint), intent(in) :: num
+      character(len = kchara), intent(in) :: carray(num)
+!
+      integer(kind = kint) :: i, ilen, maxlen
+!
+      maxlen = 0
+      do i = 1, num
+        ilen = len_trim(carray(i)) + 2*iflag_divide(carray(i))
+        maxlen = max(maxlen,ilen)
+      end do
+      max_len_of_charaarray = maxlen
+!
+      end function max_len_of_charaarray
+!
+! ----------------------------------------------------------------------
+!
+      subroutine write_ctl_chara_cont(id_file, charaname)
+!
+      integer(kind = kint), intent(in) :: id_file
+      character(len=kchara), intent(in) :: charaname
+!
+!
+      if(iflag_divide(charaname) .gt. 0) then
+        write(id_file,'(a1,a,a1,a2)',advance='no')                      &
+     &                char(39), trim(charaname), char(39), '  '
+      else
+        write(id_file,'(a,a2)',advance='no') trim(charaname), '  '
+      end if
+!
+      end subroutine write_ctl_chara_cont
+!
+! ----------------------------------------------------------------------
+!
+      subroutine write_ctl_chara_lf(id_file, charaname)
+!
+      integer(kind = kint), intent(in) :: id_file
+      character(len=kchara), intent(in) :: charaname
+!
+!
+      if(iflag_divide(charaname) .gt. 0) then
+        write(id_file,'(a1,a,a1)') char(39), trim(charaname), char(39)
+      else
+        write(id_file,'(a)') trim(charaname)
+      end if
+!
+      end subroutine write_ctl_chara_lf
+!
+! ----------------------------------------------------------------------
+!
+      subroutine write_spaces(id_file, nspace)
+!
+      integer(kind = kint), intent(in) :: id_file, nspace
+      integer(kind = kint) :: i
+!
+!
+      do i = 1, nspace
+        write(id_file,'(a1)',advance='no') char(32)
+      end do
+!
+      end subroutine write_spaces
+!
+! ----------------------------------------------------------------------
+!
+      subroutine write_space_4_parse(id_file, level)
+!
+      integer(kind = kint), intent(in) :: id_file, level
+!
+      call write_spaces(id_file, (2*level))
+!
+      end subroutine write_space_4_parse
+!
+! ----------------------------------------------------------------------
 !
       end module skip_comment_f

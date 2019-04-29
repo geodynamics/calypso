@@ -5,6 +5,7 @@
 !
 !!      subroutine read_bc_4_node_ctl(hd_block, iflag, nbc_ctl)
 !!      subroutine bcast_bc_4_node_ctl(nbc_ctl)
+!!      subroutine dealloc_bc_4_node_ctl(nbc_ctl)
 !!        type(node_bc_control), intent(inout) :: nbc_ctl
 !!
 !! ------------------------------------------------------------------
@@ -205,7 +206,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
 !
@@ -248,6 +249,24 @@
       call bcast_ctl_array_c2r(nbc_ctl%node_bc_J_ctl)
 !
       end subroutine bcast_bc_4_node_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_bc_4_node_ctl(nbc_ctl)
+!
+      type(node_bc_control), intent(inout) :: nbc_ctl
+!
+!
+      call dealloc_control_array_c2_r(nbc_ctl%node_bc_T_ctl)
+      call dealloc_control_array_c2_r(nbc_ctl%node_bc_U_ctl)
+      call dealloc_control_array_c2_r(nbc_ctl%node_bc_P_ctl)
+      call dealloc_control_array_c2_r(nbc_ctl%node_bc_C_ctl)
+      call dealloc_control_array_c2_r(nbc_ctl%node_bc_B_ctl)
+      call dealloc_control_array_c2_r(nbc_ctl%node_bc_MP_ctl)
+      call dealloc_control_array_c2_r(nbc_ctl%node_bc_A_ctl)
+      call dealloc_control_array_c2_r(nbc_ctl%node_bc_J_ctl)
+!
+      end subroutine dealloc_bc_4_node_ctl
 !
 !   --------------------------------------------------------------------
 !

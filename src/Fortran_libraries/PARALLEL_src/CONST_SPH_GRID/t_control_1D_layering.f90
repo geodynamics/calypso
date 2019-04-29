@@ -16,7 +16,7 @@
 !!     &         (name_prefix, istart, iend, num_layer_ctl, layering)
 !!        type(read_integer_item), intent(in) :: istart, iend
 !!        type(read_integer_item), intent(in) :: num_layer_ctl
-!!        type(ctl_array_i2), intent(inout) :: layer_list_ctl
+!!        type(ctl_array_i2), intent(in) :: layer_list_ctl
 !!        type(layering_group_list), intent(inout) :: layering
 !!@endverbatim
 !
@@ -81,7 +81,7 @@
       use set_parallel_file_name
 !
       character(len=kchara), intent(in) :: name_prefix
-      type(ctl_array_i2), intent(inout) :: layer_list_ctl
+      type(ctl_array_i2), intent(in) :: layer_list_ctl
       type(layering_group_list), intent(inout) :: layering
 !
       integer(kind = kint) :: i
@@ -94,8 +94,6 @@
         layering%istart(i) =  layer_list_ctl%int1(i)
         layering%iend(i) =    layer_list_ctl%int2(i)
       end do
-!
-      call dealloc_control_array_i2(layer_list_ctl)
 !
       end subroutine set_group_by_layering_list
 !

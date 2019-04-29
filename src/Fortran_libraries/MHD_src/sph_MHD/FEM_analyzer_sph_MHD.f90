@@ -31,10 +31,8 @@
 !!        type(MHD_step_param), intent(in) :: MHD_step
 !!        type(MHD_IO_data), intent(inout) :: MHD_IO
 !!
-!!      subroutine SPH_to_FEM_bridge_MHD                                &
-!!     &         (sph_params, sph_rtp, WK, mesh, iphys, nod_fld)
-!!        type(sph_shell_parameters), intent(in) :: sph_params
-!!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!      subroutine SPH_to_FEM_bridge_MHD(sph, WK, mesh, nod_fld)
+!!        type(sph_grids), intent(in) :: sph
 !!        type(works_4_sph_trans_MHD), intent(in) :: WK
 !!        type(mesh_geometry), intent(in) :: mesh
 !!        type(phys_address), intent(in) :: iphys
@@ -96,7 +94,8 @@
 !  -------------------------------
 !
       if (iflag_debug.gt.0 ) write(*,*) 'FEM_mesh_initialization'
-      call FEM_mesh_init_with_IO(MHD_files%iflag_output_SURF,           &
+      call FEM_mesh_init_with_IO                                        &
+     &   (MHD_files%FEM_mesh_flags%iflag_output_SURF,                   &
      &    MHD_files%mesh_file_IO, geofem%mesh, geofem%group, ele_mesh)
 !
       call deallocate_surface_geom_type(ele_mesh%surf)
@@ -136,18 +135,15 @@
       type(MHD_step_param), intent(inout) :: MHD_step
       type(MHD_IO_data), intent(inout) :: MHD_IO
 !
-      integer(kind = kint) :: iflag
-!
 !
 !*  ----------   Count steps for visualization
 !*
-!*
-      visval = 1
-      visval = viz_file_step_4_fix(MHD_step%time_d%i_time_step,         &
+      visval = iflag_vizs_w_fix_step(MHD_step%time_d%i_time_step,       &
      &                             MHD_step%viz_step)
-      iflag = lead_field_data_flag(MHD_step%time_d%i_time_step,         &
-     &                             MHD_step)
-      if(iflag .ne. 0) return
+      call istep_viz_w_fix_dt(MHD_step%time_d%i_time_step,              &
+     &                             MHD_step%viz_step)
+      if(lead_field_data_flag(MHD_step%time_d%i_time_step,MHD_step)     &
+     &  .ne. 0) return
 !
 !*  ----------- Data communication  --------------
 !
@@ -165,39 +161,34 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine SPH_to_FEM_bridge_MHD                                  &
-     &         (sph_params, sph_rtp, WK, mesh, iphys, nod_fld)
+      subroutine SPH_to_FEM_bridge_MHD(sph, WK, mesh, nod_fld)
 !
       use t_spheric_parameter
       use t_sph_trans_arrays_MHD
 !
-      use copy_snap_4_sph_trans
-      use copy_MHD_4_sph_trans
-      use coordinate_convert_4_sph
+      use set_address_sph_trans_snap
 !
-      type(sph_shell_parameters), intent(in) :: sph_params
-      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_grids), intent(in) :: sph
       type(works_4_sph_trans_MHD), intent(in) :: WK
       type(mesh_geometry), intent(in) :: mesh
-      type(phys_address), intent(in) :: iphys
 !
       type(phys_data), intent(inout) :: nod_fld
 !*
 !*  -----------  data transfer to FEM array --------------
 !*
-      if (iflag_debug.gt.0) write(*,*) 'copy_forces_to_snapshot_rtp'
-      call copy_forces_to_snapshot_rtp                                  &
-     &   (sph_params, sph_rtp, WK%trns_MHD,                             &
-     &    mesh%node, iphys, nod_fld)
+      call calypso_mpi_barrier
+      if (iflag_debug.gt.0) write(*,*) 'copy_force_from_transform MHD'
+      call copy_force_from_transform(sph%sph_params, sph%sph_rtp,       &
+     &    WK%trns_MHD%forward, mesh, nod_fld)
 !
-      if (iflag_debug.gt.0) write(*,*) 'copy_snap_vec_fld_from_trans'
-      call copy_snap_vec_fld_from_trans                                 &
-     &   (sph_params%m_folding, sph_rtp, WK%trns_snap,                  &
-     &    mesh%node, iphys, nod_fld)
-      if (iflag_debug.gt.0) write(*,*) 'copy_snap_vec_force_from_trans'
-      call copy_snap_vec_force_from_trans                               &
-     &   (sph_params%m_folding, sph_rtp, WK%trns_snap,                  &
-     &    mesh%node, iphys, nod_fld)
+      call calypso_mpi_barrier
+      if (iflag_debug.gt.0) write(*,*) 'copy_field_from_transform SNAP'
+      call copy_field_from_transform(sph%sph_params, sph%sph_rtp,       &
+     &    WK%trns_snap%backward, mesh, nod_fld)
+      call calypso_mpi_barrier
+      if (iflag_debug.gt.0) write(*,*) 'copy_force_from_transform SNAP'
+      call copy_force_from_transform(sph%sph_params, sph%sph_rtp,       &
+     &    WK%trns_snap%forward, mesh, nod_fld)
 !
       end subroutine SPH_to_FEM_bridge_MHD
 !

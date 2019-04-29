@@ -6,6 +6,7 @@
 !
 !!      subroutine read_bc_4_surf_ctl(hd_block, iflag, sbc_ctl)
 !!      subroutine bcast_bc_4_surf_ctl(sbc_ctl)
+!!      subroutine dealloc_bc_4_surf_ctl(sbc_ctl)
 !!        type(surf_bc_control), intent(inout) :: sbc_ctl
 !
 ! ------------------------------------------------------------------
@@ -211,7 +212,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
 !
@@ -257,6 +258,27 @@
       call bcast_ctl_array_c2r(sbc_ctl%surf_bc_INF_ctl)
 !
       end subroutine bcast_bc_4_surf_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_bc_4_surf_ctl(sbc_ctl)
+!
+      use bcast_control_arrays
+!
+      type(surf_bc_control), intent(inout) :: sbc_ctl
+!
+!
+      call dealloc_control_array_c2_r(sbc_ctl%surf_bc_HF_ctl)
+      call dealloc_control_array_c2_r(sbc_ctl%surf_bc_ST_ctl)
+      call dealloc_control_array_c2_r(sbc_ctl%surf_bc_PN_ctl)
+      call dealloc_control_array_c2_r(sbc_ctl%surf_bc_BN_ctl)
+      call dealloc_control_array_c2_r(sbc_ctl%surf_bc_JN_ctl)
+      call dealloc_control_array_c2_r(sbc_ctl%surf_bc_AN_ctl)
+      call dealloc_control_array_c2_r(sbc_ctl%surf_bc_MPN_ctl)
+      call dealloc_control_array_c2_r(sbc_ctl%surf_bc_CF_ctl)
+      call dealloc_control_array_c2_r(sbc_ctl%surf_bc_INF_ctl)
+!
+      end subroutine dealloc_bc_4_surf_ctl
 !
 !   --------------------------------------------------------------------
 !

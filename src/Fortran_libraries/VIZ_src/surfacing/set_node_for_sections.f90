@@ -61,7 +61,7 @@
           inod1 = ie_edge(iedge,1)
           inod2 = ie_edge(iedge,2)
           c0 = psf_list%ref_fld(inod1) * psf_list%ref_fld(inod2)
-          if (c0 .le. zero) then
+          if(c0 .le. zero) then
             num_item(ip) = num_item(ip) + 1
             if(interior_edge(iedge) .gt. 0) then
               inter_item(ip) = inter_item(ip) + 1
@@ -131,7 +131,7 @@
             else
               jcou = jcou + 1
               psf_list%iedge_ext_nod(jcou) = iedge
-              psf_list%id_n_on_e(iedge) = icou                          &
+              psf_list%id_n_on_e(iedge) = jcou                          &
      &                                   + psf_list%internod_on_edge
             end if
           end if

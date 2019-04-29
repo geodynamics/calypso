@@ -13,6 +13,11 @@
 !!      subroutine calypso_MPI_abort(icode, message)
 !!
 !!      subroutine calypso_MPI_barrier
+!!
+!!      subroutine calypso_mpi_bcast_real(buffer, count, root)
+!!      subroutine calypso_mpi_bcast_int(buffer, count, root)
+!!      subroutine calypso_mpi_bcast_int8(buffer, count, root)
+!!      subroutine calypso_mpi_bcast_character(buffer, count, root)
 !!@endverbatim
 !!
 !!@n @param  icode       error code
@@ -22,6 +27,7 @@
 !
 !      use mpi
       use m_precision
+      use m_constants
 !
       implicit none
 !
@@ -39,11 +45,13 @@
 !
 !>     integer size for MPI
       integer :: CALYPSO_GLOBAL_INT
+!>     4-byte integer size for MPI
+      integer :: CALYPSO_FOUR_INT
 !
 !>      process ID (start from 0)
-      integer(kind=kint) :: my_rank
+      integer :: my_rank
 !>      total number of processes
-      integer(kind=kint) :: nprocs
+      integer :: nprocs
 !
 !>      error flag for MPI
       integer :: ierr_MPI
@@ -56,17 +64,14 @@
 !
       subroutine calypso_MPI_init
 !
-      integer :: nprocs4, my_rank4
-!
 !
       call  MPI_INIT(ierr_MPI)
       call  MPI_COMM_DUP (MPI_COMM_WORLD, CALYPSO_COMM, ierr_MPI)
-      call  MPI_COMM_SIZE(CALYPSO_COMM, nprocs4, ierr_MPI)
-      call  MPI_COMM_RANK(CALYPSO_COMM, my_rank4, ierr_MPI)
-      nprocs =  nprocs4
-      my_rank = my_rank4
+      call  MPI_COMM_SIZE(CALYPSO_COMM, nprocs, ierr_MPI)
+      call  MPI_COMM_RANK(CALYPSO_COMM, my_rank, ierr_MPI)
 !
       CALYPSO_CHARACTER = MPI_CHARACTER
+      CALYPSO_FOUR_INT =  MPI_INTEGER 
 !
       if(kint .eq. 4) then
         CALYPSO_INTEGER = MPI_INTEGER
@@ -136,5 +141,202 @@
       end subroutine  calypso_MPI_barrier
 !
 !  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_bcast_real(buffer, count, root)
+!
+      integer, intent(in) :: root
+      integer(kind = kint_gl), intent(in) :: count
+      real(kind = kreal), intent(inout) :: buffer(count)
+!
+      integer(kind = kint_gl) :: ist
+      integer :: ilen_in
+!
+!
+      ist = 0
+      do
+        ilen_in = int(min(count-ist, huge_20))
+        call MPI_BCAST(buffer(ist+1), ilen_in, CALYPSO_REAL,            &
+     &      root, CALYPSO_COMM, ierr_MPI)
+        ist = ist + ilen_in
+        if(ist .ge. count) exit
+      end do
+!
+      end subroutine calypso_mpi_bcast_real
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_bcast_int(buffer, count, root)
+!
+      integer, intent(in) :: root
+      integer(kind = kint_gl), intent(in) :: count
+      integer(kind = kint), intent(inout) :: buffer(count)
+!
+      integer(kind = kint_gl) :: ist
+      integer :: ilen_in
+!
+!
+      ist = 0
+      do
+        ilen_in = int(min(count-ist, huge_20))
+        call MPI_BCAST(buffer(ist+1), ilen_in, CALYPSO_INTEGER,         &
+     &      root, CALYPSO_COMM, ierr_MPI)
+        ist = ist + ilen_in
+        if(ist .ge. count) exit
+      end do
+!
+      end subroutine calypso_mpi_bcast_int
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_bcast_int8(buffer, count, root)
+!
+      integer, intent(in) :: root
+      integer(kind = kint_gl), intent(in) :: count
+      integer(kind = kint_gl), intent(inout) :: buffer(count)
+!
+      integer(kind = kint_gl) :: ist
+      integer :: ilen_in
+!
+!
+      ist = 0
+      do
+        ilen_in = int(min(count-ist, huge_20))
+        call MPI_BCAST(buffer(ist+1), ilen_in, CALYPSO_GLOBAL_INT,      &
+     &      root, CALYPSO_COMM, ierr_MPI)
+        ist = ist + ilen_in
+        if(ist .ge. count) exit
+      end do
+!
+      end subroutine calypso_mpi_bcast_int8
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_bcast_character(buffer, count, root)
+!
+      integer, intent(in) :: root
+      integer(kind = kint_gl), intent(in) :: count
+      character(len = 1), intent(inout) :: buffer(count)
+!
+      integer(kind = kint_gl) :: ist
+      integer :: ilen_in
+!
+!
+      ist = 0
+      do
+        ilen_in = int(min(count-ist, huge_20))
+        call MPI_BCAST(buffer(ist+1), ilen_in, CALYPSO_CHARACTER,       &
+     &      root, CALYPSO_COMM, ierr_MPI)
+        ist = ist + ilen_in
+        if(ist .ge. count) exit
+      end do
+!
+      end subroutine calypso_mpi_bcast_character
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_reduce_real                                &
+     &         (r_local, r_global, count, operation, destination)
+!
+      integer, intent(in) :: operation, destination
+      integer(kind = kint_gl), intent(in) :: count
+      real(kind = kreal), intent(in) ::    r_local(count)
+      real(kind = kreal), intent(inout) :: r_global(count)
+!
+      integer(kind = kint_gl) :: ist
+      integer :: ilen_in
+!
+!
+      ist = 0
+      do
+        ilen_in = int(min(count-ist, huge_20))
+        call MPI_Reduce(r_local(ist+1), r_global(ist+1), ilen_in,       &
+     &      CALYPSO_REAL, operation, destination,                       &
+     &      CALYPSO_COMM, ierr_MPI)
+        ist = ist + ilen_in
+        if(ist .ge. count) exit
+      end do
+!
+      end subroutine calypso_mpi_reduce_real
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_allreduce_real                             &
+     &         (r_local, r_global, count, operation)
+!
+      integer, intent(in) :: operation
+      integer(kind = kint_gl), intent(in) :: count
+      real(kind = kreal), intent(in) ::    r_local(count)
+      real(kind = kreal), intent(inout) :: r_global(count)
+!
+      integer(kind = kint_gl) :: ist
+      integer :: ilen_in
+!
+!
+      ist = 0
+      do
+        ilen_in = int(min(count-ist, huge_20))
+        call MPI_allREDUCE(r_local(ist+1), r_global(ist+1), ilen_in,    &
+     &      CALYPSO_REAL, operation, CALYPSO_COMM, ierr_MPI)
+        ist = ist + ilen_in
+        if(ist .ge. count) exit
+      end do
+!
+      end subroutine calypso_mpi_allreduce_real
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_allreduce_int                              &
+     &         (r_local, r_global, count, operation)
+!
+      integer, intent(in) :: operation
+      integer(kind = kint_gl), intent(in) :: count
+      integer(kind = kint), intent(in) ::    r_local(count)
+      integer(kind = kint), intent(inout) :: r_global(count)
+!
+      integer(kind = kint_gl) :: ist
+      integer :: ilen_in
+!
+!
+      ist = 0
+      do
+        ilen_in = int(min(count-ist, huge_20))
+        call MPI_allREDUCE(r_local(ist+1), r_global(ist+1), ilen_in,    &
+     &      CALYPSO_INTEGER, operation, CALYPSO_COMM, ierr_MPI)
+        ist = ist + ilen_in
+        if(ist .ge. count) exit
+      end do
+!
+      end subroutine calypso_mpi_allreduce_int
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_allreduce_int8                             &
+     &         (r_local, r_global, count, operation)
+!
+      integer, intent(in) :: operation
+      integer(kind = kint_gl), intent(in) :: count
+      integer(kind = kint_gl), intent(in) ::    r_local(count)
+      integer(kind = kint_gl), intent(inout) :: r_global(count)
+!
+      integer(kind = kint_gl) :: ist
+      integer :: ilen_in
+!
+!
+      ist = 0
+      do
+        ilen_in = int(min(count-ist, huge_20))
+        call MPI_allREDUCE(r_local(ist+1), r_global(ist+1), ilen_in,    &
+     &      CALYPSO_GLOBAL_INT, operation, CALYPSO_COMM, ierr_MPI)
+        ist = ist + ilen_in
+        if(ist .ge. count) exit
+      end do
+!
+      end subroutine calypso_mpi_allreduce_int8
+!
+!  ---------------------------------------------------------------------
+!
 !
       end module calypso_mpi

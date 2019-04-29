@@ -54,6 +54,17 @@
 !>      takepiro model flag
       integer (kind=kint), parameter :: id_takepiro_temp = 1000
 !
+!
+      character(len = kchara), parameter                                &
+     &               :: label_sph_shell = 'spherical_shell'
+      character(len = kchara), parameter                                &
+     &               :: label_sph_const_heat = 'sph_constant_heat'
+      character(len = kchara), parameter :: label_takepiro = 'takepiro'
+!
+      character(len = kchara), parameter :: label_linear_x = 'linear_x'
+      character(len = kchara), parameter :: label_linear_y = 'linear_y'
+      character(len = kchara), parameter :: label_linear_z = 'linear_z'
+!
       type reference_scalar_param
 !>      temperature setting
         integer (kind=kint) :: iflag_reference
@@ -132,17 +143,17 @@
         ref_param%iflag_reference = id_no_ref_temp
       else
         tmpchara = ref_temp_ctl%charavalue
-        if (cmp_no_case(tmpchara, 'spherical_shell')) then
+        if (cmp_no_case(tmpchara, label_sph_shell)) then
           ref_param%iflag_reference = id_sphere_ref_temp
-        else if (cmp_no_case(tmpchara, 'takepiro')) then
+        else if (cmp_no_case(tmpchara, label_takepiro)) then
           ref_param%iflag_reference = id_takepiro_temp
-        else if (cmp_no_case(tmpchara, 'sph_constant_heat')) then
+        else if (cmp_no_case(tmpchara, label_sph_const_heat)) then
           ref_param%iflag_reference = id_linear_r_ref_temp
-        else if (cmp_no_case(tmpchara, 'linear_x')) then
+        else if (cmp_no_case(tmpchara, label_linear_x)) then
           ref_param%iflag_reference = id_x_ref_temp
-        else if (cmp_no_case(tmpchara, 'linear_y')) then
+        else if (cmp_no_case(tmpchara, label_linear_y)) then
           ref_param%iflag_reference = id_y_ref_temp
-        else if (cmp_no_case(tmpchara, 'linear_z')) then
+        else if (cmp_no_case(tmpchara, label_linear_z)) then
           ref_param%iflag_reference = id_z_ref_temp
         end if
       end if

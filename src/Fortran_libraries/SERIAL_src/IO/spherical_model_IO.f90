@@ -15,7 +15,7 @@
 !!      subroutine write_rank_4_sph(id_file, sph_IO)
 !!      subroutine write_gl_resolution_sph(id_file, sph_IO)
 !!      subroutine write_gl_nodes_sph(id_file, sph_IO)
-!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
 !!@endverbatim
 !
       module spherical_model_IO
@@ -129,7 +129,7 @@
       subroutine write_gl_nodes_sph(id_file, sph_IO)
 !
       integer(kind = kint), intent(in) :: id_file
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
       integer(kind = kint) :: i
 !
@@ -139,8 +139,6 @@
         write(id_file,'(20i16)') sph_IO%inod_gl_sph(i),                &
      &                sph_IO%idx_gl_sph(i,1:sph_IO%numdir_sph)
       end do
-!
-      call dealloc_nod_id_sph_IO(sph_IO)
 !
       end subroutine write_gl_nodes_sph
 !

@@ -90,7 +90,6 @@
       real(kind = kreal), intent(inout) :: d
 !
 !      real(kind = kreal) :: a(n,n)
-      real(kind = kreal), parameter :: TINY = 1.d-30
       real(kind = kreal) :: aamax,dum,sum
       integer(kind = kint), allocatable :: idx_org(:)
       real(kind = kreal), allocatable :: vv(:)
@@ -187,8 +186,8 @@
         indx(j) = imax
 !
         k = i - j + nb2+1
-        if(band_lu(nb2+1,j).eq.0.0d0) band_lu(nb2+1,j) = TINY
-!        if(a(j,j).eq.0.0d0) a(j,j) = TINY
+        if(band_lu(nb2+1,j).eq.0.0d0) band_lu(nb2+1,j) = TINY*TINY
+!        if(a(j,j).eq.0.0d0) a(j,j) = TINY*TINY
         if(j .ne. n) then
 !          dum = 1.0d0 / a(j,j)
           dum = 1.0d0 / band_lu(nb2+1,j)

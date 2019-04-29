@@ -8,10 +8,10 @@
 !!
 !!@verbatim
 !!      subroutine dealloc_phys_control(fld_ctl)
-!!      subroutine dealloc_quad_phys_control(fld_ctl)
-!!      subroutine dealloc_linear_phys_control(fld_ctl)
 !!
 !!      subroutine read_phys_data_control(hd_block, iflag, fld_ctl)
+!!      subroutine write_phys_data_control                              &
+!!     &         (id_file, hd_block, fld_ctl, level)
 !!
 !! ---------------------------------------------------------------------
 !!
@@ -42,17 +42,6 @@
 !!        quad_field_name_ctl  maxwell_tensor
 !!        quad_field_name_ctl  vecp_induction
 !!      end array quad_field_name_ctl
-!!
-!!      array linear_field_name_ctl    7
-!!        linear_field_name_ctl  velocity
-!!        linear_field_name_ctl  pressure
-!!        linear_field_name_ctl  vorticity
-!!        linear_field_name_ctl  temperature
-!!        linear_field_name_ctl  magnetic_field
-!!        linear_field_name_ctl  current_density
-!!        linear_field_name_ctl  magnetic_potential
-!!        linear_field_name_ctl  composition
-!!      end array linear_field_name_ctl
 !!    end phys_values_ctl
 !!
 !! ---------------------------------------------------------------------
@@ -80,12 +69,6 @@
 !!@n       quad_phys%num:   Number of field
 !!@n       quad_phys%c_tbl: Name list of field
         type(ctl_array_chara) :: quad_phys
-!
-!>        Structure for list of field on linear elements
-!!@n       linear_phys%icou:  Read flag for 'linear_field_name_ctl'
-!!@n       linear_phys%num:   Number of field
-!!@n       linear_phys%c_tbl: Name list of field
-        type(ctl_array_chara) :: linear_phys
       end type field_control
 !
 !   4th level for fields
@@ -97,11 +80,8 @@
 !
       character(len=kchara), parameter                                  &
      &      :: hd_quad_field =   'quad_field_name_ctl'
-      character(len=kchara), parameter                                  &
-     &      :: hd_linear_field = 'linear_field_name_ctl'
 !
-      private :: hd_field_list
-      private :: hd_quad_field, hd_linear_field
+      private :: hd_field_list, hd_quad_field
 !
 ! -----------------------------------------------------------------------
 !
@@ -109,33 +89,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine dealloc_phys_control(fld_ctl)
+      subroutine dealloc_phys_control(fld_ctl)
 !
       type(field_control), intent(inout) :: fld_ctl
 !
-       call dealloc_control_array_c3(fld_ctl%field_ctl)
-!
-       end subroutine dealloc_phys_control
-!
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_quad_phys_control(fld_ctl)
-!
-      type(field_control), intent(inout) :: fld_ctl
-!
+      call dealloc_control_array_c3(fld_ctl%field_ctl)
       call dealloc_control_array_chara(fld_ctl%quad_phys)
 !
-      end subroutine dealloc_quad_phys_control
-!
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_linear_phys_control(fld_ctl)
-!
-      type(field_control), intent(inout) :: fld_ctl
-!
-      call dealloc_control_array_chara(fld_ctl%linear_phys)
-!
-      end subroutine dealloc_linear_phys_control
+      end subroutine dealloc_phys_control
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -157,17 +118,44 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
         call read_control_array_c3(hd_field_list, fld_ctl%field_ctl)
-!
         call read_control_array_c1(hd_quad_field, fld_ctl%quad_phys)
-        call read_control_array_c1                                      &
-     &     (hd_linear_field, fld_ctl%linear_phys)
       end do
 !
       end subroutine read_phys_data_control
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_phys_data_control                                &
+     &         (id_file, hd_block, fld_ctl, level)
+!
+      use m_machine_parameter
+      use m_read_control_elements
+      use write_control_elements
+      use write_control_arrays
+!
+      integer(kind = kint), intent(in) :: id_file
+      character(len=kchara), intent(in) :: hd_block
+      type(field_control), intent(in) :: fld_ctl
+!
+      integer(kind = kint), intent(inout) :: level
+!
+!
+      write(id_file,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_file, level, hd_block)
+!
+      call write_control_array_c3                                       &
+     &   (id_file, level, hd_field_list, fld_ctl%field_ctl)
+!
+      call write_control_array_c1                                       &
+     &   (id_file, level, hd_quad_field, fld_ctl%quad_phys)
+!
+      level =  write_end_flag_for_ctl(id_file, level, hd_block)
+!
+      end subroutine write_phys_data_control
 !
 !   --------------------------------------------------------------------
 !

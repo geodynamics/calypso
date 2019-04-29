@@ -9,22 +9,22 @@
 !!
 !!@verbatim
 !!      subroutine write_step_field_file                                &
-!!     &         (file_name, my_rank, t_IO, fld_IO)
+!!     &         (file_name, id_rank, t_IO, fld_IO)
 !!        type(time_data), intent(in) :: t_IO
 !!        type(field_IO), intent(in) :: fld_IO
 !!
 !!      subroutine read_and_allocate_field_file                         &
-!!     &         (file_name, my_rank, fld_IO)
+!!     &         (file_name, id_rank, fld_IO)
 !!
 !!      subroutine read_step_field_file                                 &
-!!     &         (file_name, my_rank, t_IO, fld_IO)
+!!     &         (file_name, id_rank, t_IO, fld_IO)
 !!      subroutine read_and_alloc_step_field                            &
-!!     &         (file_name, my_rank, t_IO, fld_IO)
+!!     &         (file_name, id_rank, t_IO, fld_IO)
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(field_IO), intent(inout) :: fld_IO
 !!
 !!      subroutine read_and_allocate_step_head                          &
-!!     &         (file_name, my_rank, t_IO, fld_IO)
+!!     &         (file_name, id_rank, t_IO, fld_IO)
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(field_IO), intent(inout) :: fld_IO
 !!@endverbatim
@@ -49,24 +49,26 @@
 !------------------------------------------------------------------
 !
       subroutine write_step_field_file                                  &
-     &         (file_name, my_rank, t_IO, fld_IO)
+     &         (file_name, id_rank, t_IO, fld_IO)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      use transfer_to_long_integers
+!
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(time_data), intent(in) :: t_IO
       type(field_IO), intent(in) :: fld_IO
 !
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) then
+      if(id_rank.eq.0 .or. i_debug .gt. 0) then
         write(*,*) 'Write ascii data file: ', trim(file_name)
       end if
 !
       open(id_phys_file, file = file_name, form = 'formatted')
 !
-      call write_step_data(id_phys_file, my_rank, t_IO)
-      call write_field_data(id_phys_file,                               &
-     &    fld_IO%nnod_IO, fld_IO%num_field_IO, fld_IO%ntot_comp_IO,     &
+      call write_step_data(id_phys_file, id_rank, t_IO)
+      call write_field_data(id_phys_file, cast_long(fld_IO%nnod_IO),    &
+     &    fld_IO%num_field_IO, fld_IO%ntot_comp_IO,                     &
      &    fld_IO%num_comp_IO, fld_IO%fld_name, fld_IO%d_IO)
 !
       close (id_phys_file)
@@ -77,18 +79,19 @@
 !------------------------------------------------------------------
 !
       subroutine read_and_allocate_field_file                           &
-     &         (file_name, my_rank, fld_IO)
+     &         (file_name, id_rank, fld_IO)
 !
       use skip_comment_f
+      use transfer_to_long_integers
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
       type(field_IO), intent(inout) :: fld_IO
 !
       character(len=255) :: character_4_read
 !
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) then
+      if(id_rank.eq.0 .or. i_debug .gt. 0) then
         write(*,*) 'Read ascii data file: ', trim(file_name)
       end if
 !
@@ -103,8 +106,8 @@
       call cal_istack_phys_comp_IO(fld_IO)
       call alloc_phys_data_IO(fld_IO)
 !
-      call read_field_data(id_phys_file,                                &
-     &    fld_IO%nnod_IO, fld_IO%num_field_IO, fld_IO%ntot_comp_IO,     &
+      call read_field_data(id_phys_file, cast_long(fld_IO%nnod_IO),     &
+     &    fld_IO%num_field_IO, fld_IO%ntot_comp_IO,                     &
      &    fld_IO%num_comp_IO, fld_IO%fld_name, fld_IO%d_IO)
       close (id_phys_file)
 !
@@ -114,11 +117,12 @@
 !------------------------------------------------------------------
 !
       subroutine read_step_field_file                                   &
-     &         (file_name, my_rank, t_IO, fld_IO)
+     &         (file_name, id_rank, t_IO, fld_IO)
 !
       use skip_comment_f
+      use transfer_to_long_integers
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(time_data), intent(inout) :: t_IO
@@ -127,7 +131,7 @@
       character(len=255) :: character_4_read
 !
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) then
+      if(id_rank.eq.0 .or. i_debug .gt. 0) then
         write(*,*) 'Read ascii data file: ', trim(file_name)
       end if
 !
@@ -139,8 +143,8 @@
       read(character_4_read,*) fld_IO%nnod_IO, fld_IO%num_field_IO
       read(id_phys_file,*) fld_IO%num_comp_IO(1:fld_IO%num_field_IO)
 !
-      call read_field_data(id_phys_file,                                &
-     &    fld_IO%nnod_IO, fld_IO%num_field_IO, fld_IO%ntot_comp_IO,     &
+      call read_field_data(id_phys_file, cast_long(fld_IO%nnod_IO),     &
+     &    fld_IO%num_field_IO, fld_IO%ntot_comp_IO,                     &
      &    fld_IO%num_comp_IO, fld_IO%fld_name, fld_IO%d_IO)
       close (id_phys_file)
 !
@@ -149,11 +153,12 @@
 !------------------------------------------------------------------
 !
       subroutine read_and_alloc_step_field                              &
-     &         (file_name, my_rank, t_IO, fld_IO)
+     &         (file_name, id_rank, t_IO, fld_IO)
 !
       use skip_comment_f
+      use transfer_to_long_integers
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(time_data), intent(inout) :: t_IO
@@ -162,7 +167,7 @@
       character(len=255) :: character_4_read
 !
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) then
+      if(id_rank.eq.0 .or. i_debug .gt. 0) then
         write(*,*) 'Read ascii data file: ', trim(file_name)
       end if
 !
@@ -179,8 +184,8 @@
       call cal_istack_phys_comp_IO(fld_IO)
       call alloc_phys_data_IO(fld_IO)
 !
-      call read_field_data(id_phys_file,                                &
-     &    fld_IO%nnod_IO, fld_IO%num_field_IO, fld_IO%ntot_comp_IO,     &
+      call read_field_data(id_phys_file, cast_long(fld_IO%nnod_IO),     &
+     &    fld_IO%num_field_IO, fld_IO%ntot_comp_IO,                     &
      &    fld_IO%num_comp_IO, fld_IO%fld_name, fld_IO%d_IO)
       close (id_phys_file)
 !
@@ -189,11 +194,12 @@
 !------------------------------------------------------------------
 !
       subroutine read_and_allocate_step_head                            &
-     &         (file_name, my_rank, t_IO, fld_IO)
+     &         (file_name, id_rank, t_IO, fld_IO)
 !
       use skip_comment_f
+      use transfer_to_long_integers
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
       type(time_data), intent(inout) :: t_IO
@@ -202,7 +208,7 @@
       character(len=255) :: character_4_read
 !
 !
-      if(my_rank.eq.0 .or. i_debug .gt. 0) then
+      if(id_rank.eq.0 .or. i_debug .gt. 0) then
         write(*,*) 'Read ascii data file: ', trim(file_name)
       end if
 !

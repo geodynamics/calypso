@@ -17,7 +17,7 @@
 !!      subroutine gz_mpi_write_gl_reso_sph(IO_param, sph_IO)
 !!      subroutine gz_mpi_write_gl_nodes_sph(IO_param, sph_IO)
 !!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
-!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
 !!@endverbatim
 !
       module gz_MPI_spherical_model_IO
@@ -98,7 +98,7 @@
       subroutine gz_mpi_write_rank_4_sph(IO_param, sph_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
 !
       call gz_mpi_write_charahead                                       &
@@ -113,7 +113,7 @@
       subroutine gz_mpi_write_gl_reso_sph(IO_param, sph_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
 !
       call gz_mpi_write_charahead                                       &
@@ -130,17 +130,13 @@
       subroutine gz_mpi_write_gl_nodes_sph(IO_param, sph_IO)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(sph_IO_data), intent(inout) :: sph_IO
-!
-      integer(kind = kint) ::  nvect
+      type(sph_IO_data), intent(in) :: sph_IO
 !
 !
       call gz_mpi_write_num_of_data(IO_param, sph_IO%numnod_sph)
       call gz_mpi_write_ele_connect(IO_param,                           &
      &    sph_IO%numnod_sph, sph_IO%numdir_sph,                         &
      &    sph_IO%inod_gl_sph, sph_IO%idx_gl_sph)
-!
-      call dealloc_nod_id_sph_IO(sph_IO)
 !
       end subroutine gz_mpi_write_gl_nodes_sph
 !

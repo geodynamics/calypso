@@ -8,25 +8,40 @@
 !!       in MHD dynamo simulation
 !!
 !!@verbatim
-!!      subroutine set_addresses_snapshot_trans(ipol, iphys, trns_snap, &
+!!      subroutine set_addresses_snapshot_trans                         &
+!!     &         (SPH_MHD, iphys, trns_snap,                            &
 !!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(address_4_sph_trans), intent(inout) :: trns_snap
+!!      subroutine set_addresses_temporal_trans                         &
+!!     &         (SPH_MHD, iphys, trns_tmp,                             &
+!!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+!!        type(phys_address), intent(in) :: ipol
+!!        type(address_4_sph_trans), intent(inout) :: trns_tmp
+!!
+!!      subroutine copy_field_from_transform                            &
+!!     &         (sph_params, sph_rtp, backward, mesh, nod_fld)
+!!      subroutine copy_force_from_transform                            &
+!!     &         (sph_params, sph_rtp, forward, mesh, nod_fld)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
+!!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!        type(address_each_sph_trans), intent(in) :: forward
+!!        type(mesh_geometry), intent(in) :: mesh
+!!        type(phys_data), intent(inout) :: nod_fld
 !!@endverbatim
 !
       module set_address_sph_trans_snap
 !
       use m_precision
+      use m_machine_parameter
 !
       use t_phys_address
+      use t_SPH_mesh_field_data
       use t_addresses_sph_transform
+      use t_mesh_data
+      use t_spheric_parameter
 !
       implicit none
-!
-      private :: b_trans_address_vector_snap
-      private :: b_trans_address_scalar_snap
-      private :: f_trans_address_vector_snap
-      private :: f_trans_address_scalar_snap
 !
 !-----------------------------------------------------------------------
 !
@@ -34,397 +49,179 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_addresses_snapshot_trans(ipol, iphys, trns_snap,   &
+      subroutine set_addresses_snapshot_trans                           &
+     &         (SPH_MHD, iphys, trns_snap,                              &
      &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
-      type(phys_address), intent(in) :: ipol, iphys
+      use address_bwd_sph_trans_snap
+      use address_fwd_sph_trans_snap
+!
+      type(SPH_mesh_field_data), intent(in) :: SPH_MHD
+      type(phys_address), intent(in) :: iphys
       type(address_4_sph_trans), intent(inout) :: trns_snap
       integer(kind = kint), intent(inout) :: ncomp_sph_trans
       integer(kind = kint), intent(inout) :: nvector_sph_trans
       integer(kind = kint), intent(inout) :: nscalar_sph_trans
 !
-      integer(kind = kint) :: nscltsr_rtp_2_rj, nscltsr_rj_2_rtp
+!
+      if(iflag_debug .gt. 0) then
+        write(*,*)                                                      &
+     &       'Spherical transform field table for snapshot (trns_snap)'
+        write(*,*) 'Address for backward transform: ',                  &
+     &             'transform, poloidal, toroidal, grid data'
+      end if
+!
+      call b_trans_address_vector_snap(SPH_MHD%ipol, SPH_MHD%itor,      &
+     &    iphys, trns_snap%b_trns, trns_snap%backward)
+      call b_trans_address_scalar_snap(SPH_MHD%ipol, SPH_MHD%itor,      &
+     &    iphys, trns_snap%b_trns, trns_snap%backward)
+      trns_snap%backward%num_tensor = 0
+!
+     if(iflag_debug .gt. 0) then
+        write(*,*) 'Address for forward transform: ',                   &
+     &             'transform, poloidal, toroidal, grid data'
+      end if
+!
+      call f_trans_address_vector_snap(SPH_MHD%ipol, SPH_MHD%itor,      &
+     &    iphys, trns_snap%f_trns, trns_snap%forward)
+      call f_trans_address_scalar_snap(SPH_MHD%ipol, SPH_MHD%itor,      &
+     &    iphys, trns_snap%f_trns, trns_snap%forward)
+       trns_snap%forward%num_tensor = 0
+!
+      call count_num_fields_each_trans(trns_snap%backward,              &
+     &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+      call count_num_fields_each_trans(trns_snap%forward,               &
+     &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
 !
-      call b_trans_address_vector_snap(ipol, iphys,                     &
-     &    trns_snap%nvector_rj_2_rtp, trns_snap%b_trns)
-      call b_trans_address_scalar_snap(ipol, iphys,                     &
-     &    trns_snap%nvector_rj_2_rtp, trns_snap%nscalar_rj_2_rtp,       &
-     &    trns_snap%b_trns)
-      trns_snap%ntensor_rj_2_rtp = 0
+      if(iflag_debug .gt. 0) then
+        write(*,*) 'ncomp_sph_trans ', ncomp_sph_trans
+        write(*,*) 'nvector_rj_2_rtp ', trns_snap%backward%num_vector
+        write(*,*) 'nscalar_rj_2_rtp ', trns_snap%backward%num_scalar
 !
-      call f_trans_address_vector_snap                                  &
-     &   (ipol, iphys, trns_snap%nvector_rtp_2_rj, trns_snap%f_trns)
-      call f_trans_address_scalar_snap(ipol, iphys,                     &
-     &    trns_snap%nvector_rtp_2_rj, trns_snap%nscalar_rtp_2_rj,       &
-     &    trns_snap%f_trns)
-       trns_snap%ntensor_rtp_2_rj = 0
-!
-!
-      nscltsr_rj_2_rtp                                                  &
-     &      = trns_snap%nscalar_rj_2_rtp + 6*trns_snap%ntensor_rj_2_rtp
-      trns_snap%ncomp_rj_2_rtp                                          &
-     &      = 3*trns_snap%nvector_rj_2_rtp + nscltsr_rj_2_rtp
-!
-      nscltsr_rtp_2_rj                                                  &
-     &      = trns_snap%nscalar_rtp_2_rj + 6*trns_snap%ntensor_rtp_2_rj
-      trns_snap%ncomp_rtp_2_rj                                          &
-     &      = 3*trns_snap%nvector_rtp_2_rj + nscltsr_rtp_2_rj
-!
-!
-      ncomp_sph_trans = max(ncomp_sph_trans, trns_snap%ncomp_rtp_2_rj)
-      ncomp_sph_trans = max(ncomp_sph_trans, trns_snap%ncomp_rj_2_rtp)
-!
-      nvector_sph_trans                                                 &
-     &       = max(nvector_sph_trans, trns_snap%nvector_rj_2_rtp)
-      nvector_sph_trans                                                 &
-     &       = max(nvector_sph_trans, trns_snap%nvector_rtp_2_rj)
-      nscalar_sph_trans = max(nscalar_sph_trans, nscltsr_rtp_2_rj)
-      nscalar_sph_trans = max(nscalar_sph_trans, nscltsr_rj_2_rtp)
+        write(*,*) 'nvector_rtp_2_rj ', trns_snap%forward%num_vector
+        write(*,*) 'nscalar_rtp_2_rj ', trns_snap%forward%num_scalar
+      end if
 !
       end subroutine set_addresses_snapshot_trans
 !
 !-----------------------------------------------------------------------
 !
-      subroutine check_address_trans_sph_snap                           &
-     &         (ipol, idpdr, itor, iphys, trns_snap)
+      subroutine set_addresses_temporal_trans                           &
+     &         (SPH_MHD, iphys, trns_tmp,                               &
+     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
-      use check_address_sph_trans
+      use address_bwd_sph_trans_stmp
+      use address_fwd_sph_trans_stmp
 !
-      type(phys_address), intent(in) :: ipol, idpdr, itor
+      type(SPH_mesh_field_data), intent(in) :: SPH_MHD
       type(phys_address), intent(in) :: iphys
-      type(address_4_sph_trans), intent(in) :: trns_snap
+      type(address_4_sph_trans), intent(inout) :: trns_tmp
+      integer(kind = kint), intent(inout) :: ncomp_sph_trans
+      integer(kind = kint), intent(inout) :: nvector_sph_trans
+      integer(kind = kint), intent(inout) :: nscalar_sph_trans
 !
 !
-      write(*,*) 'addresses of spherical transform for snapshot'
+      if(iflag_debug .gt. 0) then
+        write(*,*) 'Spherical transform field table ',                  &
+     &             'for intermediate of snapshot'
+        write(*,*) 'Address for backward transform: ',                  &
+     &             'transform, poloidal, toroidal, grid data'
+      end if
 !
-      call check_add_trans_sph_MHD                                      &
-     &   (ipol, idpdr, itor, iphys, trns_snap%b_trns, trns_snap%f_trns, &
-     &    trns_snap%ncomp_rj_2_rtp, trns_snap%nvector_rj_2_rtp,         &
-     &    trns_snap%nscalar_rj_2_rtp, trns_snap%ncomp_rtp_2_rj,         &
-     &    trns_snap%nvector_rtp_2_rj, trns_snap%nscalar_rtp_2_rj)
+      call b_trans_address_vector_stmp(trns_tmp%backward)
+      call b_trans_address_scalar_stmp(trns_tmp%backward)
+      trns_tmp%backward%num_tensor = 0
 !
-      end subroutine check_address_trans_sph_snap
+     if(iflag_debug .gt. 0) then
+        write(*,*) 'Address for forward transform: ',                   &
+     &             'transform, poloidal, toroidal, grid data'
+      end if
+!
+      call f_trans_address_vector_stmp(trns_tmp%forward)
+      call f_trans_address_scalar_stmp(SPH_MHD%ipol, SPH_MHD%itor,      &
+     &   iphys, trns_tmp%f_trns, trns_tmp%forward)
+      trns_tmp%forward%num_tensor = 0
+!
+      call count_num_fields_each_trans(trns_tmp%backward,               &
+     &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+      call count_num_fields_each_trans(trns_tmp%forward,                &
+     &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+!
+!
+      if(iflag_debug .gt. 0) then
+        write(*,*) 'ncomp_sph_trans ', ncomp_sph_trans
+        write(*,*) 'nvector_rj_2_rtp ', trns_tmp%backward%num_vector
+        write(*,*) 'nscalar_rj_2_rtp ', trns_tmp%backward%num_scalar
+!
+        write(*,*) 'nvector_rtp_2_rj ', trns_tmp%forward%num_vector
+        write(*,*) 'nscalar_rtp_2_rj ', trns_tmp%forward%num_scalar
+      end if
+!
+      end subroutine set_addresses_temporal_trans
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine b_trans_address_vector_snap                            &
-     &         (ipol, iphys, nvector_snap_rj_2_rtp, bs_trns)
+      subroutine copy_field_from_transform                              &
+     &         (sph_params, sph_rtp, backward, mesh, nod_fld)
 !
-      type(phys_address), intent(in) :: ipol, iphys
-      integer(kind = kint), intent(inout) :: nvector_snap_rj_2_rtp
-      type(phys_address), intent(inout) :: bs_trns
+      use copy_fields_from_sph_trans
+!
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(address_each_sph_trans), intent(in) :: backward
+      type(mesh_geometry), intent(in) :: mesh
+      type(phys_data), intent(inout) :: nod_fld
+!
+      integer(kind = kint) :: i, inum
 !
 !
-      nvector_snap_rj_2_rtp = 0
-!      if(b_trns%i_velo .eq. 0) then
-        call add_vec_trans_flag_snap(ipol%i_velo, iphys%i_velo,         &
-     &      nvector_snap_rj_2_rtp, bs_trns%i_velo)
-!      end if
-!      if(b_trns%i_vort .eq. 0) then
-        call add_vec_trans_flag_snap(ipol%i_vort, iphys%i_vort,         &
-     &      nvector_snap_rj_2_rtp, bs_trns%i_vort)
-!      end if
-!      if(b_trns%i_magne .eq. 0) then
-        call add_vec_trans_flag_snap(ipol%i_magne, iphys%i_magne,       &
-     &      nvector_snap_rj_2_rtp, bs_trns%i_magne)
-!      end if
-!      if(b_trns%i_current .eq. 0) then
-        call add_vec_trans_flag_snap(ipol%i_current, iphys%i_current,   &
-     &      nvector_snap_rj_2_rtp, bs_trns%i_current)
-!      end if
+      do i = 1, backward%num_vector
+        call copy_vector_from_snap_trans                                &
+     &    (backward%ifld_trns(i), backward%ifld_rtp(i),                 &
+     &     sph_params%m_folding, sph_rtp, backward, mesh%node, nod_fld)
+      end do
 !
-      call add_vec_trans_flag_snap(ipol%i_v_diffuse, iphys%i_v_diffuse, &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_v_diffuse)
-      call add_vec_trans_flag_snap(ipol%i_w_diffuse, iphys%i_w_diffuse, &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_w_diffuse)
-      call add_vec_trans_flag_snap                                      &
-     &   (ipol%i_vp_diffuse, iphys%i_vp_diffuse,                        &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_vp_diffuse)
-      call add_vec_trans_flag_snap(ipol%i_b_diffuse, iphys%i_b_diffuse, &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_b_diffuse)
+      do inum = 1, backward%num_scalar
+        i = inum + backward%num_vector
+        call copy_scalar_from_snap_trans                                &
+     &    (backward%ifld_trns(i), backward%ifld_rtp(i),                 &
+     &     sph_params%m_folding, sph_rtp, backward, mesh%node, nod_fld)
+      end do
 !
-      call add_vec_trans_flag_snap                                      &
-     &   (ipol%i_rot_inertia, iphys%i_rot_inertia,                      &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_rot_inertia)
-      call add_vec_trans_flag_snap(ipol%i_rot_Coriolis,                 &
-     &    iphys%i_rot_Coriolis, nvector_snap_rj_2_rtp,                  &
-     &    bs_trns%i_rot_Coriolis)
-      call add_vec_trans_flag_snap                                      &
-     &   (ipol%i_rot_Lorentz, iphys%i_rot_Lorentz,                      &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_rot_Lorentz)
-      call add_vec_trans_flag_snap(ipol%i_rot_buoyancy,                 &
-     &    iphys%i_rot_buoyancy, nvector_snap_rj_2_rtp,                  &
-     &    bs_trns%i_rot_buoyancy)
-      call add_vec_trans_flag_snap(ipol%i_rot_comp_buo,                 &
-     &    iphys%i_rot_comp_buo, nvector_snap_rj_2_rtp,                  &
-     &    bs_trns%i_rot_comp_buo)
-!
-      call add_vec_trans_flag_snap(ipol%i_SGS_inertia,                  &
-     &    iphys%i_SGS_inertia, nvector_snap_rj_2_rtp,                   &
-     &    bs_trns%i_SGS_inertia)
-      call add_vec_trans_flag_snap(ipol%i_SGS_Lorentz,                  &
-     &    iphys%i_SGS_Lorentz, nvector_snap_rj_2_rtp,                   &
-     &    bs_trns%i_SGS_Lorentz)
-      call add_vec_trans_flag_snap(ipol%i_SGS_vp_induct,                &
-     &    iphys%i_SGS_vp_induct, nvector_snap_rj_2_rtp,                 &
-     &    bs_trns%i_SGS_vp_induct)
-      call add_vec_trans_flag_snap(ipol%i_SGS_h_flux,                   &
-     &    iphys%i_SGS_h_flux, nvector_snap_rj_2_rtp,                    &
-     &    bs_trns%i_SGS_h_flux)
-      call add_vec_trans_flag_snap(ipol%i_SGS_c_flux,                   &
-     &    iphys%i_SGS_c_flux, nvector_snap_rj_2_rtp,                    &
-     &    bs_trns%i_SGS_c_flux)
-!
-      call add_vec_trans_flag_snap(ipol%i_buoyancy,                     &
-     &    iphys%i_buoyancy, nvector_snap_rj_2_rtp, bs_trns%i_buoyancy)
-      call add_vec_trans_flag_snap(ipol%i_comp_buo,                     &
-     &    iphys%i_comp_buo, nvector_snap_rj_2_rtp, bs_trns%i_comp_buo)
-!
-      call add_vec_trans_flag_snap(ipol%i_geostrophic,                  &
-     &    iphys%i_geostrophic, nvector_snap_rj_2_rtp,                   &
-     &    bs_trns%i_geostrophic)
-!
-      call add_vec_trans_flag_snap(ipol%i_h_flux_w_sgs,                 &
-     &    iphys%i_h_flux_w_sgs, nvector_snap_rj_2_rtp,                  &
-     &    bs_trns%i_h_flux_w_sgs)
-      call add_vec_trans_flag_snap(ipol%i_c_flux_w_sgs,                 &
-     &    iphys%i_c_flux_w_sgs, nvector_snap_rj_2_rtp,                  &
-     &    bs_trns%i_c_flux_w_sgs)
-      call add_vec_trans_flag_snap(ipol%i_inertia_w_sgs,                &
-     &    iphys%i_inertia_w_sgs, nvector_snap_rj_2_rtp,                 &
-     &    bs_trns%i_inertia_w_sgs)
-      call add_vec_trans_flag_snap(ipol%i_Lorentz_w_sgs,                &
-     &    iphys%i_Lorentz_w_sgs, nvector_snap_rj_2_rtp,                 &
-     &    bs_trns%i_Lorentz_w_sgs)
-      call add_vec_trans_flag_snap(ipol%i_vp_induct_w_sgs,              &
-     &    iphys%i_vp_induct_w_sgs, nvector_snap_rj_2_rtp,               &
-     &    bs_trns%i_vp_induct_w_sgs)
-      call add_vec_trans_flag_snap(ipol%i_mag_induct_w_sgs,             &
-     &    iphys%i_mag_induct_w_sgs, nvector_snap_rj_2_rtp,              &
-     &    bs_trns%i_mag_induct_w_sgs)
-!
-      call add_vec_trans_flag_snap(ipol%i_SGS_rot_inertia,              &
-     &    iphys%i_SGS_rot_inertia, nvector_snap_rj_2_rtp,               &
-     &    bs_trns%i_SGS_rot_inertia)
-      call add_vec_trans_flag_snap(ipol%i_SGS_rot_Lorentz,              &
-     &    iphys%i_SGS_rot_Lorentz, nvector_snap_rj_2_rtp,               &
-     &    bs_trns%i_SGS_rot_Lorentz)
-      call add_vec_trans_flag_snap(ipol%i_SGS_induction,                &
-     &    iphys%i_SGS_induction, nvector_snap_rj_2_rtp,                 &
-     &    bs_trns%i_SGS_induction)
-!
-      call add_vec_trans_flag_snap                                      &
-     &   (ipol%i_press_grad, iphys%i_press_grad,                        &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_press_grad)
-      call add_vec_trans_flag_snap(ipol%i_induction, iphys%i_induction, &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_induction)
-!
-      call add_vec_trans_flag_snap(ipol%i_grad_t, iphys%i_grad_t,       &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_grad_t)
-      call add_vec_trans_flag_snap(ipol%i_grad_composit,                &
-     &    iphys%i_grad_composit, nvector_snap_rj_2_rtp,                 &
-     &    bs_trns%i_grad_composit)
-!
-      call add_vec_trans_flag_snap(ipol%i_grad_vx, iphys%i_grad_vx,     &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_grad_vx)
-      call add_vec_trans_flag_snap(ipol%i_grad_vy, iphys%i_grad_vy,     &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_grad_vy)
-      call add_vec_trans_flag_snap(ipol%i_grad_vz, iphys%i_grad_vz,     &
-     &    nvector_snap_rj_2_rtp, bs_trns%i_grad_vz)
-!
-      end subroutine b_trans_address_vector_snap
+      end subroutine copy_field_from_transform
 !
 !-----------------------------------------------------------------------
 !
-      subroutine b_trans_address_scalar_snap(ipol, iphys,               &
-     &          nvector_snap_rj_2_rtp, nscalar_snap_rj_2_rtp, bs_trns)
+      subroutine copy_force_from_transform                              &
+     &         (sph_params, sph_rtp, forward, mesh, nod_fld)
 !
-      type(phys_address), intent(in) :: ipol, iphys
-      integer(kind = kint), intent(in) :: nvector_snap_rj_2_rtp
-      integer(kind = kint), intent(inout) :: nscalar_snap_rj_2_rtp
-      type(phys_address), intent(inout) :: bs_trns
+      use copy_fields_from_sph_trans
 !
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(address_each_sph_trans), intent(in) :: forward
+      type(mesh_geometry), intent(in) :: mesh
+      type(phys_data), intent(inout) :: nod_fld
 !
-      nscalar_snap_rj_2_rtp = 0
-!      if(b_trns%i_temp.eq.0 .or. ipol%i_par_temp.gt.0) then
-        call add_scl_trans_flag_snap(ipol%i_temp, iphys%i_temp,         &
-     &    nvector_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                 &
-     &    bs_trns%i_temp)
-!      end if
-!      if(b_trns%i_light .eq. 0) then
-        call add_scl_trans_flag_snap(ipol%i_light, iphys%i_light,       &
-     &    nvector_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                 &
-     &    bs_trns%i_light)
-!      end if
-!
-      call add_scl_trans_flag_snap(ipol%i_press, iphys%i_press,         &
-     &    nvector_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                 &
-     &    bs_trns%i_press)
-      call add_scl_trans_flag_snap(ipol%i_par_temp, iphys%i_par_temp,   &
-     &    nvector_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                 &
-     &    bs_trns%i_par_temp)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_filter_temp, iphys%i_filter_temp,                      &
-     &    nvector_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                 &
-     &    bs_trns%i_filter_temp)
-      call add_scl_trans_flag_snap(ipol%i_t_diffuse, iphys%i_t_diffuse, &
-     &    nvector_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                 &
-     &    bs_trns%i_t_diffuse)
-      call add_scl_trans_flag_snap(ipol%i_c_diffuse, iphys%i_c_diffuse, &
-     &    nvector_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                 &
-     &    bs_trns%i_c_diffuse)
-!
-      call add_scl_trans_flag_snap(ipol%i_h_advect, iphys%i_h_advect,   &
-     &    nvector_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                 &
-     &    bs_trns%i_h_advect)
-      call add_scl_trans_flag_snap(ipol%i_c_advect, iphys%i_c_advect,   &
-     &    nvector_snap_rj_2_rtp, nscalar_snap_rj_2_rtp,                 &
-     &    bs_trns%i_c_advect)
-!
-      call add_scl_trans_flag_snap(ipol%i_div_Coriolis,                 &
-     &    iphys%i_div_Coriolis, nvector_snap_rj_2_rtp,                  &
-     &    nscalar_snap_rj_2_rtp, bs_trns%i_div_Coriolis)
-!
-      call add_scl_trans_flag_snap(ipol%i_SGS_div_inertia,              &
-     &    iphys%i_SGS_div_inertia, nvector_snap_rj_2_rtp,               &
-     &    nscalar_snap_rj_2_rtp, bs_trns%i_SGS_div_inertia)
-      call add_scl_trans_flag_snap(ipol%i_SGS_div_Lorentz,              &
-     &    iphys%i_SGS_div_Lorentz, nvector_snap_rj_2_rtp,               &
-     &    nscalar_snap_rj_2_rtp, bs_trns%i_SGS_div_Lorentz)
-      call add_scl_trans_flag_snap(ipol%i_SGS_div_h_flux,               &
-     &    iphys%i_SGS_div_h_flux, nvector_snap_rj_2_rtp,                &
-     &    nscalar_snap_rj_2_rtp, bs_trns%i_SGS_div_h_flux)
-      call add_scl_trans_flag_snap(ipol%i_SGS_div_c_flux,               &
-     &    iphys%i_SGS_div_c_flux, nvector_snap_rj_2_rtp,                &
-     &    nscalar_snap_rj_2_rtp, bs_trns%i_SGS_div_c_flux)
-!
-      end subroutine b_trans_address_scalar_snap
-!
-!-----------------------------------------------------------------------
-!
-      subroutine f_trans_address_vector_snap                            &
-     &         (ipol, iphys, nvector_snap_rtp_2_rj, fs_trns)
-!
-      type(phys_address), intent(in) :: ipol, iphys
-      integer(kind = kint), intent(inout) :: nvector_snap_rtp_2_rj
-      type(phys_address), intent(inout) :: fs_trns
-!
-      nvector_snap_rtp_2_rj = 0
-      call add_vec_trans_flag_snap(ipol%i_coriolis, iphys%i_coriolis,   &
-     &    nvector_snap_rtp_2_rj, fs_trns%i_coriolis)
-      call add_vec_trans_flag_snap(ipol%i_electric, iphys%i_electric,   &
-     &    nvector_snap_rtp_2_rj, fs_trns%i_electric)
-      call add_vec_trans_flag_snap(ipol%i_poynting, iphys%i_poynting,   &
-     &    nvector_snap_rtp_2_rj, fs_trns%i_poynting)
-      call add_vec_trans_flag_snap                                      &
-     &   (ipol%i_mag_stretch, iphys%i_mag_stretch,                      &
-     &    nvector_snap_rtp_2_rj, fs_trns%i_mag_stretch)
-!
-      end subroutine f_trans_address_vector_snap
-!
-!-----------------------------------------------------------------------
-!
-      subroutine f_trans_address_scalar_snap(ipol, iphys,               &
-     &          nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj, fs_trns)
-!
-      type(phys_address), intent(in) :: ipol, iphys
-      integer(kind = kint), intent(in) :: nvector_snap_rtp_2_rj
-      integer(kind = kint), intent(inout) :: nscalar_snap_rtp_2_rj
-      type(phys_address), intent(inout) :: fs_trns
+      integer(kind = kint) :: i, inum
 !
 !
-      nscalar_snap_rtp_2_rj = 0
-      call add_scl_trans_flag_snap(ipol%i_me_gen, iphys%i_me_gen,       &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_me_gen)
-      call add_scl_trans_flag_snap(ipol%i_ujb, iphys%i_ujb,             &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj, fs_trns%i_ujb)
-      call add_scl_trans_flag_snap(ipol%i_nega_ujb, iphys%i_nega_ujb,   &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_nega_ujb)
+      do i = 1, forward%num_vector
+        call copy_vector_from_snap_force                                &
+     &     (forward%ifld_trns(i), forward%ifld_rtp(i),                  &
+     &      sph_params%m_folding, sph_rtp, forward, mesh%node, nod_fld)
+      end do
 !
-      call add_scl_trans_flag_snap(ipol%i_buo_gen, iphys%i_buo_gen,     &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_buo_gen)
-      call add_scl_trans_flag_snap(ipol%i_c_buo_gen, iphys%i_c_buo_gen, &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_c_buo_gen)
-      call add_scl_trans_flag_snap(ipol%i_f_buo_gen, iphys%i_f_buo_gen, &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_f_buo_gen)
+      do inum = 1, forward%num_scalar
+        i = inum + forward%num_vector
+        call copy_scalar_from_snap_force                                &
+     &     (forward%ifld_trns(i), forward%ifld_rtp(i),                  &
+     &      sph_params%m_folding, sph_rtp, forward, mesh%node, nod_fld)
+      end do
 !
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_reynolds_wk, iphys%i_reynolds_wk,                      &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_reynolds_wk)
-!
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_SGS_Lor_wk, iphys%i_SGS_Lor_wk,                        &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_SGS_Lor_wk)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_SGS_me_gen, iphys%i_SGS_me_gen,                        &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_SGS_me_gen)
-!
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_SGS_buo_wk, iphys%i_SGS_buo_wk,                        &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_SGS_buo_wk)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_SGS_comp_buo_wk, iphys%i_SGS_comp_buo_wk,              &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_SGS_comp_buo_wk)
-!
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_Csim_SGS_h_flux, iphys%i_Csim_SGS_h_flux,              &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_Csim_SGS_h_flux)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_Csim_SGS_c_flux, iphys%i_Csim_SGS_c_flux,              &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_Csim_SGS_c_flux)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_Csim_SGS_m_flux, iphys%i_Csim_SGS_m_flux,              &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_Csim_SGS_m_flux)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_Csim_SGS_Lorentz, iphys%i_Csim_SGS_Lorentz,            &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_Csim_SGS_Lorentz)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_Csim_SGS_induction, iphys%i_Csim_SGS_induction,        &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_Csim_SGS_induction)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_Csim_SGS_buoyancy, iphys%i_Csim_SGS_buoyancy,          &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_Csim_SGS_buoyancy)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_Csim_SGS_comp_buo, iphys%i_Csim_SGS_comp_buo,          &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_Csim_SGS_comp_buo)
-!
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_velo_scale, iphys%i_velo_scale,                        &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_velo_scale)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_magne_scale, iphys%i_magne_scale,                      &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_magne_scale)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_temp_scale, iphys%i_temp_scale,                        &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_temp_scale)
-      call add_scl_trans_flag_snap                                      &
-     &   (ipol%i_comp_scale, iphys%i_comp_scale,                        &
-     &    nvector_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                 &
-     &    fs_trns%i_comp_scale)
-!
-      end subroutine f_trans_address_scalar_snap
+      end subroutine copy_force_from_transform
 !
 !-----------------------------------------------------------------------
 !

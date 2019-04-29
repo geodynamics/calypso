@@ -9,10 +9,11 @@
 !!@verbatim
 !!      subroutine read_rtp_gl_1d_table_gz(sph_IO)
 !!      subroutine read_rj_gl_1d_table_gz(sph_IO)
+!!        type(sph_IO_data), intent(inout) :: sph_IO
 !!
 !!      subroutine write_rtp_gl_1d_table_gz(sph_IO)
 !!      subroutine write_rj_gl_1d_table_gz(sph_IO)
-!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
 !!@endverbatim
 !
       module gz_sph_global_1d_idx_IO
@@ -120,7 +121,7 @@
 !
       use m_sph_modes_grid_labels
 !
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
       character(len=kchara) :: fmt_txt
       integer(kind = kint) :: i
@@ -170,11 +171,6 @@
         call gz_write_textbuf_w_lf
       end do
 !
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
-      call dealloc_idx_sph_1d3_IO(sph_IO)
-!
       end subroutine write_rtp_gl_1d_table_gz
 !
 ! ----------------------------------------------------------------------
@@ -183,7 +179,7 @@
 !
       use m_sph_modes_grid_labels
 !
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
       character(len=kchara) :: fmt_txt
       integer(kind = kint) :: i
@@ -216,10 +212,6 @@
      &          sph_IO%idx_gl_2(i,1:sph_IO%ncomp_table_1d(2)), char(0)
         call gz_write_textbuf_w_lf
       end do
-!
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
 !
       end subroutine write_rj_gl_1d_table_gz
 !

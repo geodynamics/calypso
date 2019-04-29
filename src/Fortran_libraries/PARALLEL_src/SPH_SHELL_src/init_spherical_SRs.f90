@@ -151,7 +151,7 @@
       endtime(1) = MPI_WTIME() - starttime
 !
       endtime(1) = MPI_WTIME() - starttime
-      call MPI_allREDUCE (endtime(0), etime_item_import(0), itwo,       &
+      call MPI_allREDUCE (endtime(0), etime_item_import(0), 2,          &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       etime_item_import(0:1) = etime_item_import(0:1) / dble(nprocs)
 !
@@ -199,7 +199,7 @@
       call all_sph_SR_core_N(NB, comms_sph)
       endtime(1) = MPI_WTIME() - starttime
 !
-      call MPI_allREDUCE (endtime(0), etime_send_recv(0), ithree,       &
+      call MPI_allREDUCE (endtime(0), etime_send_recv(0), 3,            &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       etime_shortest = etime_send_recv(0)

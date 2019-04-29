@@ -56,10 +56,10 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
       real(kind = kreal)  :: dat_1(ntot_comp)
 !
-      integer(kind = kint) :: ilen_n
+      integer :: ilen_n
       character(len=16+ntot_comp*23+1), target :: textbuf_n(nnod)
 !
-      ilen_n = 16+ntot_comp*23+1
+      ilen_n = int(16+ntot_comp*23+1)
       nt_nod = istack_merged_intnod(nprocs)
       num = istack_merged_intnod(my_rank+1)                             &
      &     - istack_merged_intnod(my_rank)
@@ -112,7 +112,7 @@
 !
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
-      integer(kind = kint), parameter :: ilen_n = 16+n_vector*23+1
+      integer, parameter :: ilen_n = 16+n_vector*23+1
       character(len=ilen_n), target  :: textbuf_n(nnod)
 !
 !
@@ -160,13 +160,13 @@
 !
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
-      integer(kind = kint) :: ilen_e
+      integer :: ilen_e
       character(len=16+3+6+16*nnod_ele+1), target :: textbuf_e(nele)
 !
 !
       nt_ele = istack_merged_ele(nprocs)
 !
-      ilen_e = 16+3+6+16*nnod_ele+1
+      ilen_e = int(16+3+6+16*nnod_ele+1)
       ioffset = ioff_gl + ilen_e * istack_merged_ele(my_rank)
       ioff_gl = ioff_gl + ilen_e * nt_ele
 !

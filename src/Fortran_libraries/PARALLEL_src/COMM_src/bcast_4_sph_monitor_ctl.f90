@@ -53,8 +53,8 @@
       call bcast_mid_eq_monitor_ctl(smonitor_ctl%meq_ctl)
 !
 !
-      call MPI_BCAST(smonitor_ctl%num_vspec_ctl, ione,                  &
-     &               CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(smonitor_ctl%num_vspec_ctl, 1,                     &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
       if(smonitor_ctl%num_vspec_ctl .gt. 0 .and. my_rank .gt. 0) then
         allocate(smonitor_ctl%v_pwr(smonitor_ctl%num_vspec_ctl))
       end if

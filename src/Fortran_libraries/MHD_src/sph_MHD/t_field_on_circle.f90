@@ -193,6 +193,7 @@
 !
       integer(kind = kint) :: j, j_gl, i_in, i_ot, num, ncomp
       integer(kind = kint) :: ist_comp, jst_comp, nd, ifld, jfld
+      integer(kind = kint_gl) :: num64
 !
 !
 !    pickup spectrum for circle point
@@ -224,11 +225,11 @@
 !
 !    collect data to rank 0
 !
-      num = d_circle%ntot_phys * (nidx_global_rj(2) + 1)
+      num64 = d_circle%ntot_phys * (nidx_global_rj(2) + 1)
       if(my_rank .eq. 0) circle%d_rj_circle =   zero
-      call MPI_Reduce                                                   &
-     &   (circle%d_rj_circ_lc(0,1), circle%d_rj_circle(0,1), num,       &
-     &    CALYPSO_REAL, MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_reduce_real                                      &
+     &   (circle%d_rj_circ_lc(0,1), circle%d_rj_circle(0,1), num64,     &
+     &    MPI_SUM, 0)
 !
       end subroutine collect_spectr_for_circle
 !

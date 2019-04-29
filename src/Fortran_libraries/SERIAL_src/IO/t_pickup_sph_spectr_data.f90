@@ -22,7 +22,6 @@
 !!      subroutine dealloc_gauss_coef_monitor(gauss)
 !!@endverbatim
 !!
-!!@n @param  my_rank   Process ID
 !!@n @param  i_step    time step
 !!@n @param  time      time
 !!@n @param  id_pick   file ID

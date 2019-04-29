@@ -13,7 +13,7 @@
 !!      subroutine allocate_monitor_local
 !!      subroutine deallocate_monitor_local
 !!
-!!      subroutine open_node_monitor_file(my_rank, nod_fld)
+!!      subroutine open_node_monitor_file(id_rank, nod_fld)
 !!      subroutine set_local_node_id_4_monitor(node, nod_grp)
 !!        type(IO_step_param), intent(in) :: point_step
 !!        type(time_data), intent(in) :: time_d
@@ -124,19 +124,19 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine open_node_monitor_file(my_rank, nod_fld)
+      subroutine open_node_monitor_file(id_rank, nod_fld)
 !
       use set_parallel_file_name
 !
-      integer (kind=kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(phys_data), intent(in) :: nod_fld
 !
       character(len=kchara) :: fname_tmp, file_name
       integer (kind=kint) :: i, j
 !
 !
-      call add_int_suffix(my_rank, node_monitor_head, fname_tmp)
-      call add_dat_extension(fname_tmp, file_name)
+      fname_tmp = add_process_id(id_rank, node_monitor_head)
+      file_name = add_dat_extension(fname_tmp)
       open (id_monitor_file,file=file_name, status='old',               &
      &    position='append', err = 99)
       return

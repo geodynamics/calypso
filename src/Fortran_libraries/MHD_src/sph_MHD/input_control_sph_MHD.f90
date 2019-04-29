@@ -68,6 +68,7 @@
       use set_control_sph_mhd
       use sph_file_IO_select
       use set_control_4_SPH_to_FEM
+      use set_control_nodal_data
 !
       type(MHD_file_IO_params), intent(inout) :: MHD_files
       type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
@@ -83,19 +84,22 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_SPH_MHD'
       call set_control_4_SPH_MHD                                        &
-     &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%Dmodel_ctl,          &
-     &    DMHD_ctl%smctl_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%nmtr_ctl, &
-     &    DMHD_ctl%psph_ctl, sph_maker1%sph_tmp, SPH_MHD%fld,           &
-     &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, WK%WK_sph, sph_maker1%gen_sph, monitor)
+     &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
+     &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
+     &    sph_maker1%sph_tmp, MHD_files, SPH_model%bc_IO, MHD_step,     &
+     &    SPH_model%MHD_prop, SPH_model%MHD_BC, WK%WK_sph,              &
+     &    sph_maker1%gen_sph)
 !
-      call s_set_control_4_SPH_to_FEM(DMHD_ctl%psph_ctl%spctl,          &
-     &    SPH_MHD%sph, SPH_MHD%fld, FEM_dat%field)
-!
+      call set_control_SPH_MHD_w_viz                                    &
+     &   (DMHD_ctl%model_ctl, DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, &
+     &    SPH_model%MHD_prop, SPH_MHD%sph, SPH_MHD%fld, FEM_dat%field,  &
+     &    monitor)
 !
       call select_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,      &
      &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, sph_maker1,       &
      &    FEM_dat%geofem, FEM_dat%ele_mesh, MHD_files)
+!
+      call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
       call sph_boundary_IO_control                                      &
      &   (SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_model%bc_IO)
@@ -125,15 +129,21 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_SPH_MHD'
       call set_control_4_SPH_MHD                                        &
-     &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%Dmodel_ctl,          &
-     &    DMHD_ctl%smctl_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%nmtr_ctl, &
-     &    DMHD_ctl%psph_ctl, sph_maker1%sph_tmp, SPH_MHD%fld,           &
-     &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, WK%WK_sph, sph_maker1%gen_sph, monitor)
+     &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
+     &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
+     &    sph_maker1%sph_tmp, MHD_files, SPH_model%bc_IO, MHD_step,     &
+     &    SPH_model%MHD_prop, SPH_model%MHD_BC, WK%WK_sph,              &
+     &    sph_maker1%gen_sph)
+!
+      call set_control_SPH_MHD_noviz                                    &
+     &   (DMHD_ctl%model_ctl, DMHD_ctl%smonitor_ctl,                    &
+     &    SPH_model%MHD_prop, SPH_MHD%fld, monitor)
 !
       if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
       call load_para_sph_mesh                                           &
      &   (SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups)
+!
+      call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
       call sph_boundary_IO_control                                      &
      &    (SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_model%bc_IO)
@@ -165,15 +175,22 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'set_control_4_SPH_MHD'
       call set_control_4_SPH_MHD                                        &
-     &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%Dmodel_ctl,          &
-     &    DMHD_ctl%smctl_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%nmtr_ctl, &
-     &    DMHD_ctl%psph_ctl, sph_maker1%sph_tmp, SPH_MHD%fld,           &
-     &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, WK%WK_sph, sph_maker1%gen_sph, monitor)
+     &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
+     &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
+     &    sph_maker1%sph_tmp, MHD_files, SPH_model%bc_IO, MHD_step,     &
+     &    SPH_model%MHD_prop, SPH_model%MHD_BC, WK%WK_sph,              &
+     &    sph_maker1%gen_sph)
+!
+      call set_control_SPH_MHD_w_viz                                    &
+     &   (DMHD_ctl%model_ctl, DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, &
+     &    SPH_model%MHD_prop, SPH_MHD%sph, SPH_MHD%fld, FEM_dat%field,  &
+     &    monitor)
 !
       call select_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,      &
      &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, sph_maker1,       &
      &    FEM_dat%geofem, FEM_dat%ele_mesh, MHD_files)
+!
+      call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
       call sph_boundary_IO_control                                      &
      &   (SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_model%bc_IO)

@@ -8,26 +8,32 @@
 !>@brief  Routines for ASCII mesh data IO
 !!
 !!@verbatim
-!!      subroutine write_geometry_data(id_file, my_rank_IO, mesh_IO)
+!!      subroutine write_geometry_data(id_file, id_rank, mesh_IO)
 !!      subroutine write_mesh_groups(id_file, mesh_group_IO)
+!!        type(mesh_geometry), intent(in) :: mesh_IO
+!!        type(mesh_groups), intent(in) ::   mesh_group_IO
 !!
-!!      subroutine read_num_node(id_file, my_rank_IO, mesh_IO, ierr)
-!!      subroutine read_num_node_ele(id_file, my_rank_IO, mesh_IO, ierr)
-!!      subroutine read_geometry_data(id_file, my_rank_IO, mesh_IO, ierr)
+!!      subroutine read_num_node(id_file, id_rank, mesh_IO, ierr)
+!!      subroutine read_num_node_ele(id_file, id_rank, mesh_IO, ierr)
+!!      subroutine read_geometry_data(id_file, id_rank, mesh_IO, ierr)
 !!      subroutine read_mesh_groups(id_file, mesh_group_IO)
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
 !!        type(mesh_groups), intent(inout) ::   mesh_group_IO
 !!
 !!      subroutine write_filter_geometry                                &
-!!     &         (id_file, my_rank_IO, comm_IO, nod_IO)
+!!     &         (id_file, id_rank, comm_IO, nod_IO)
+!!        type(node_data), intent(in) :: nod_IO
+!!        type(communication_table), intent(in) :: comm_IO
 !!      subroutine read_filter_geometry                                 &
-!!     &         (id_file, my_rank_IO, comm_IO, nod_IO, ierr)
+!!     &         (id_file, id_rank, comm_IO, nod_IO, ierr)
+!!        type(node_data), intent(inout) :: nod_IO
+!!        type(communication_table), intent(inout) :: comm_IO
 !!
 !!      subroutine output_node_sph_geometry                             &
-!!     &         (id_file, my_rank_IO, mesh_IO)
+!!     &         (id_file, id_rank, mesh_IO)
 !!      subroutine output_node_cyl_geometry                             &
-!!     &         (id_file, my_rank_IO, mesh_IO)
-!!        type(mesh_geometry), intent(inout) :: mesh_IO
+!!     &         (id_file, id_rank, mesh_IO)
+!!        type(mesh_geometry), intent(in) :: mesh_IO
 !!@endverbatim
 !
       module mesh_data_IO
@@ -49,17 +55,17 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine write_geometry_data(id_file, my_rank_IO, mesh_IO)
+      subroutine write_geometry_data(id_file, id_rank, mesh_IO)
 !
       use m_fem_mesh_labels
 !
       integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: my_rank_IO
-      type(mesh_geometry), intent(inout) :: mesh_IO
+      integer, intent(in) :: id_rank
+      type(mesh_geometry), intent(in) :: mesh_IO
 !
 !
       write(id_file,'(a)', advance='NO') hd_fem_para()
-      call write_domain_info(id_file, my_rank_IO, mesh_IO%nod_comm)
+      call write_domain_info(id_file, id_rank, mesh_IO%nod_comm)
 !
       write(id_file,'(a)', advance='NO') hd_fem_node()
       call write_geometry_info(id_file, mesh_IO%node)
@@ -86,7 +92,7 @@
       use groups_IO
 !
       integer(kind = kint), intent(in) :: id_file
-      type(mesh_groups), intent(inout) ::   mesh_group_IO
+      type(mesh_groups), intent(in) ::   mesh_group_IO
 !
 !
 !   write node group
@@ -106,17 +112,17 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_num_node(id_file, my_rank_IO, mesh_IO, ierr)
+      subroutine read_num_node(id_file, id_rank, mesh_IO, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
       integer(kind = kint), intent(inout) :: ierr
 !
 !        write(*,*) 'read_domain_info'
       call read_domain_info                                             &
-     &   (id_file, my_rank_IO, mesh_IO%nod_comm, ierr)
+     &   (id_file, id_rank, mesh_IO%nod_comm, ierr)
       if(ierr .ne. 0) return
 !        write(*,*) 'read_number_of_node'
       call read_number_of_node(id_file, mesh_IO%node)
@@ -125,16 +131,16 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine read_num_node_ele(id_file, my_rank_IO, mesh_IO, ierr)
+      subroutine read_num_node_ele(id_file, id_rank, mesh_IO, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
       integer(kind = kint), intent(inout) :: ierr
 !
 !
-      call read_num_node(id_file, my_rank_IO, mesh_IO, ierr)
+      call read_num_node(id_file, id_rank, mesh_IO, ierr)
       if(ierr .ne. 0) return
 !
       call read_geometry_info(id_file, mesh_IO%node)
@@ -148,17 +154,17 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine read_geometry_data(id_file, my_rank_IO, mesh_IO, ierr)
+      subroutine read_geometry_data(id_file, id_rank, mesh_IO, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
 !
       type(mesh_geometry), intent(inout) :: mesh_IO
       integer(kind = kint), intent(inout) :: ierr
 !
 !
 !        write(*,*) 'read_number_of_element'
-      call read_num_node_ele(id_file, my_rank_IO, mesh_IO, ierr)
+      call read_num_node_ele(id_file, id_rank, mesh_IO, ierr)
       if(ierr .ne. 0) return
 !
 !  ----  read element data -------
@@ -201,20 +207,20 @@
 !------------------------------------------------------------------
 !
       subroutine write_filter_geometry                                  &
-     &         (id_file, my_rank_IO, comm_IO, nod_IO)
+     &         (id_file, id_rank, comm_IO, nod_IO)
 !
       use m_fem_mesh_labels
       use domain_data_IO
       use node_geometry_IO
 !
       integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: my_rank_IO
-      type(node_data), intent(inout) :: nod_IO
-      type(communication_table), intent(inout) :: comm_IO
+      integer, intent(in) :: id_rank
+      type(node_data), intent(in) :: nod_IO
+      type(communication_table), intent(in) :: comm_IO
 !
 !
       write(id_file,'(a)', advance='NO') hd_fem_para()
-      call write_domain_info(id_file, my_rank_IO, comm_IO)
+      call write_domain_info(id_file, id_rank, comm_IO)
 !
       write(id_file,'(a)', advance='NO') hd_fem_node()
       call write_geometry_info(id_file, nod_IO)
@@ -231,13 +237,13 @@
 !------------------------------------------------------------------
 !
       subroutine read_filter_geometry                                   &
-     &         (id_file, my_rank_IO, comm_IO, nod_IO, ierr)
+     &         (id_file, id_rank, comm_IO, nod_IO, ierr)
 !
       use domain_data_IO
       use node_geometry_IO
 !
       integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
 !
       type(communication_table), intent(inout) :: comm_IO
       type(node_data), intent(inout) :: nod_IO
@@ -245,7 +251,7 @@
 !
 !
 !      write(*,*) 'read_domain_info'
-      call read_domain_info(id_file, my_rank_IO, comm_IO, ierr)
+      call read_domain_info(id_file, id_rank, comm_IO, ierr)
 !
 !      write(*,*) 'read_geometry_info'
       call read_number_of_node(id_file, nod_IO)
@@ -264,18 +270,18 @@
 !------------------------------------------------------------------
 !
       subroutine output_node_sph_geometry                               &
-     &         (id_file, my_rank_IO, mesh_IO)
+     &         (id_file, id_rank, mesh_IO)
 !
       use m_fem_mesh_labels
 !
       integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: my_rank_IO
-      type(mesh_geometry), intent(inout) :: mesh_IO
+      integer, intent(in) :: id_rank
+      type(mesh_geometry), intent(in) :: mesh_IO
 !
 !
       write(id_file,'(a)', advance='NO') hd_fem_para_sph()
       write(id_file,'(a)', advance='NO') hd_fem_para()
-      call write_domain_info(id_file, my_rank_IO, mesh_IO%nod_comm)
+      call write_domain_info(id_file, id_rank, mesh_IO%nod_comm)
 !
       write(id_file,'(a)', advance='NO') hd_fem_node_sph()
       call write_geometry_info(id_file, mesh_IO%node)
@@ -285,20 +291,20 @@
 !  ---------------------------------------------------------------------
 !
       subroutine output_node_cyl_geometry                               &
-     &         (id_file, my_rank_IO, mesh_IO)
+     &         (id_file, id_rank, mesh_IO)
 !
       use m_fem_mesh_labels
 !
       integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: my_rank_IO
-      type(mesh_geometry), intent(inout) :: mesh_IO
+      integer, intent(in) :: id_rank
+      type(mesh_geometry), intent(in) :: mesh_IO
 !
 !
       write(id_file,'(a)', advance='NO') hd_fem_para_cyl()
       write(id_file,'(a)', advance='NO') hd_fem_para()
 !
 !
-      call write_domain_info(id_file, my_rank_IO, mesh_IO%nod_comm)
+      call write_domain_info(id_file, id_rank, mesh_IO%nod_comm)
 !
       write(id_file,'(a)', advance='NO') hd_fem_node_cyl()
       call write_geometry_info(id_file, mesh_IO%node)

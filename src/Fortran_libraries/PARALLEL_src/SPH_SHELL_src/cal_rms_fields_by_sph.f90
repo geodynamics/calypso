@@ -309,17 +309,19 @@
       type(sph_vol_mean_squares), intent(inout)                         &
      &                         :: v_pwr(num_vol_spectr)
 !
-      integer(kind = kint) :: num, i
+      integer(kind = kint) :: i
+      integer(kind = kint_gl) :: num64
 !
 !
-      num = ntot_rms_rj * (l_truncation + 1)
+      num64 = ntot_rms_rj * (l_truncation + 1)
       do i = 1, num_vol_spectr
-        call MPI_REDUCE(WK_pwr%vol_l_local(0,1,i), v_pwr(i)%v_l,        &
-     &    num, CALYPSO_REAL, MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
-        call MPI_REDUCE(WK_pwr%vol_m_local(0,1,i), v_pwr(i)%v_m,        &
-     &    num, CALYPSO_REAL, MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
-        call MPI_REDUCE(WK_pwr%vol_lm_local(0,1,i), v_pwr(i)%v_lm,      &
-     &    num, CALYPSO_REAL, MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_reduce_real                                    &
+     &     (WK_pwr%vol_l_local(0,1,i), v_pwr(i)%v_l, num64, MPI_SUM, 0)
+        call calypso_mpi_reduce_real                                    &
+     &     (WK_pwr%vol_m_local(0,1,i), v_pwr(i)%v_m, num64, MPI_SUM, 0)
+        call calypso_mpi_reduce_real                                    &
+     &     (WK_pwr%vol_lm_local(0,1,i), v_pwr(i)%v_lm,                  &
+     &      num64, MPI_SUM, 0)
 !
         if(my_rank .eq. 0) then
           call sum_sph_vol_rms_all_modes(l_truncation, ntot_rms_rj,     &
@@ -331,13 +333,13 @@
       end do
 !
       if(nri_rms .le. 0) return
-      num = ntot_rms_rj * nri_rms * (l_truncation + 1)
-      call MPI_REDUCE (WK_pwr%shl_l_local, rms_sph_l, num,              &
-     &    CALYPSO_REAL, MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE (WK_pwr%shl_m_local, rms_sph_m, num,              &
-     &    CALYPSO_REAL, MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE (WK_pwr%shl_lm_local, rms_sph_lm, num,            &
-     &    CALYPSO_REAL, MPI_SUM, izero, CALYPSO_COMM, ierr_MPI)
+      num64 = ntot_rms_rj * nri_rms * (l_truncation + 1)
+      call calypso_mpi_reduce_real                                      &
+     &   (WK_pwr%shl_l_local, rms_sph_l, num64, MPI_SUM, 0)
+      call calypso_mpi_reduce_real                                      &
+     &   (WK_pwr%shl_m_local, rms_sph_m, num64, MPI_SUM, 0)
+      call calypso_mpi_reduce_real                                      &
+     &   (WK_pwr%shl_lm_local, rms_sph_lm, num64, MPI_SUM, 0)
 !
       if(my_rank .gt. 0) return
       call sum_sph_rms_all_modes(l_truncation, nri_rms, ntot_rms_rj,    &

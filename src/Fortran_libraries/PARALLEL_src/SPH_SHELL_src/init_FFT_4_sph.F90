@@ -180,7 +180,7 @@
       if(iflag_debug .gt. 0) write(*,*) 'finalize_sph_FFT_select'
       call finalize_sph_FFT_select(WK_FFTs)
 !
-      call MPI_allREDUCE (endtime, etime_fft, ione,                     &
+      call MPI_allREDUCE (endtime, etime_fft, 1,                        &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
       etime_fft = etime_fft / dble(nprocs)
 !

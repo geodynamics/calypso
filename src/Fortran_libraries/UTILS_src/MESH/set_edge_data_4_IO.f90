@@ -21,9 +21,9 @@
 !!      subroutine copy_edge_connect_from_IO                            &
 !!     &          (ele_IO, sfed_IO, edge, nele, nsurf)
 !!      subroutine copy_edge_geometry_from_IO(nod_IO, sfed_IO, edge)
-!!        type(node_data), intent(inout) :: nod_IO
-!!        type(element_data), intent(inout) :: ele_IO
-!!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!        type(node_data), intent(in) :: nod_IO
+!!        type(element_data), intent(in) :: ele_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!        type(edge_data), intent(inout) :: edge
 !!@endverbatim
 !
@@ -206,8 +206,8 @@
       use m_geometry_constants
 !
       integer(kind = kint), intent(in) :: nele, nsurf
-      type(element_data), intent(inout) :: ele_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(element_data), intent(in) :: ele_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
       type(edge_data), intent(inout) :: edge
 !
       integer(kind = kint) :: iele, isurf, iedge
@@ -233,10 +233,6 @@
      &        = sfed_IO%iedge_for_ele(iele,1:nedge_4_ele)
       end do
 !
-      call dealloc_surface_connect_IO(sfed_IO)
-      call deallocate_ele_connect_type(ele_IO)
-      call dealloc_edge_connect_IO(sfed_IO)
-!
       end subroutine copy_edge_connect_from_IO
 !
 !------------------------------------------------------------------
@@ -244,8 +240,8 @@
       subroutine copy_edge_geometry_from_IO(nod_IO, sfed_IO, edge)
 !
       type(edge_data), intent(inout) :: edge
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
       integer(kind = kint) :: iedge
 !
@@ -264,10 +260,6 @@
         edge%edge_vect(iedge,3) = sfed_IO%ele_vector(iedge,3)
       end do
 !omp end parallel do
-!
-      call dealloc_node_geometry_base(nod_IO)
-      call dealloc_ele_vector_IO(sfed_IO)
-      call dealloc_ele_scalar_IO(sfed_IO)
 !
       end subroutine copy_edge_geometry_from_IO
 !

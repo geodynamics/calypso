@@ -42,6 +42,8 @@
       use t_SPH_mesh_field_data
       use t_FEM_mesh_field_data
       use t_work_SPH_MHD
+      use t_viz_sections
+      use t_SPH_MHD_zonal_mean_viz
 !
       implicit  none
 !
@@ -57,5 +59,11 @@
 !
 !>      Structure of FEM mesh and field structures
       type(FEM_mesh_field_data), save :: FEM_d1
+!
+!>      Structure of sectioning and isosurfaceing modules
+      type(surfacing_modules), save :: viz_psfs1
+!
+!>      Structures of zonal mean controls
+      type(sph_zonal_mean_sectioning), save :: zmeans1
 !
       end module m_SPH_MHD_model_data

@@ -7,15 +7,15 @@
 !>@brief  time and time step data for data IO
 !!
 !!@verbatim
-!!      function step_data_buffer(my_rank, t_IO)
+!!      function step_data_buffer(id_rank, t_IO)
 !!      subroutine read_step_data_buffer(textbuf, id_rank, t_IO)
 !!
-!!      subroutine write_step_data(id_file, my_rank, t_IO)
+!!      subroutine write_step_data(id_file, id_rank, t_IO)
 !!      subroutine read_step_data(id_file, t_IO)
 !!        type(time_data), intent(inout) :: t_IO
 !!@endverbatim
 !!
-!!@n @param  my_rank   Process ID
+!!@n @param  id_rank   Process ID
 !!@n @param  id_file   file ID for data IO
 !
       module time_data_IO
@@ -32,10 +32,10 @@
       character(len=19), parameter :: TIME_HD2 = '!  time step number'
       character(len=16), parameter :: TIME_HD3 = '!  time, Delta t'
 !
-      integer(kind = kint), parameter :: l_hd = 12 + 19 + 16 + 3
-      integer(kind = kint), parameter :: l_dt = 2*16 + 2*25 + 3
+      integer, parameter :: l_hd = 12 + 19 + 16 + 3
+      integer, parameter :: l_dt = 2*16 + 2*25 + 3
 !
-      integer(kind = kint), parameter :: len_step_data_buf = l_hd+l_dt
+      integer, parameter :: len_step_data_buf = l_hd+l_dt
 !
       private :: TIME_HD1, TIME_HD2, TIME_HD3
       private :: l_hd, l_dt
@@ -46,9 +46,9 @@
 !
 ! -------------------------------------------------------------------
 !
-      function step_data_buffer(my_rank, t_IO)
+      function step_data_buffer(id_rank, t_IO)
 !
-      integer(kind = kint), intent(in) :: my_rank
+      integer, intent(in) :: id_rank
       type(time_data), intent(in) :: t_IO
 !
       character(len=len_step_data_buf) :: step_data_buffer
@@ -57,7 +57,7 @@
       character(len=2*25) :: buf_time
 !
 !
-      write(buf_pe,'(i16)')      my_rank
+      write(buf_pe,'(i16)')      id_rank
       write(buf_step,'(i16)')         t_IO%i_time_step
       write(buf_time,'(1p2E25.15e3)') t_IO%time, t_IO%dt
 !
@@ -94,14 +94,15 @@
 ! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
-      subroutine write_step_data(id_file, my_rank, t_IO)
+      subroutine write_step_data(id_file, id_rank, t_IO)
 !
-      integer(kind = kint), intent(in) :: id_file, my_rank
+      integer(kind = kint), intent(in) :: id_file
+      integer, intent(in) :: id_rank
       type(time_data), intent(in) :: t_IO
 !
 !
       write(id_file,'(a)'   )   TIME_HD1
-      write(id_file,'(i16)') my_rank
+      write(id_file,'(i16)') id_rank
       write(id_file,'(a)'   )   TIME_HD2
       write(id_file,'(i16)') t_IO%i_time_step
       write(id_file,'(a)'   )   TIME_HD3

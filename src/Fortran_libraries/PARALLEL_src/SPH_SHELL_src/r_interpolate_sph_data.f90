@@ -173,8 +173,9 @@
       call set_sph_mesh_file_fmt_prefix                                 &
      &   (rj_file_param%iflag_format, rj_file_param%file_prefix)
       call sel_mpi_read_spectr_rj_file(nprocs, my_rank, sph_file)
-      call copy_original_sph_rj_from_IO(l_truncation, sph_rj,           &
-     &   sph_file%comm_IO, sph_file%sph_IO, sph_file%sph_grp_IO)
+      call copy_original_sph_rj_from_IO                                 &
+     &   (l_truncation, sph_rj, sph_file%sph_IO)
+      call dealloc_rj_mode_IO(sph_file)
 !
       call const_radial_itp_table(nri_org, r_org,                       &
      &    sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                     &
@@ -323,20 +324,16 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_original_sph_rj_from_IO(l_truncation, sph_rj,     &
-     &          comm_IO, sph_IO, sph_grps_IO)
+      subroutine copy_original_sph_rj_from_IO                           &
+     &         (l_truncation, sph_rj, sph_IO)
 !
       use m_error_IDs
       use t_node_id_spherical_IO
-      use t_comm_table
-      use t_spheric_group
 !
       integer(kind = kint), intent(in) :: l_truncation
       type(sph_rj_grid), intent(in) ::  sph_rj
 !
-      type(communication_table), intent(inout) :: comm_IO
-      type(sph_IO_data), intent(inout) :: sph_IO
-      type(sph_group_data), intent(inout) :: sph_grps_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
 !
       if(sph_rj%irank_sph_rj(1).ne.sph_IO%sph_rank(1)                   &
@@ -367,18 +364,6 @@
       call allocate_original_sph_data
 !
       r_org(1:n_rj_org) = sph_IO%r_gl_1(1:n_rj_org)
-!
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_nod_id_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
-!
-!
-      call deallocate_type_import(comm_IO)
-      call deallocate_type_neib_id(comm_IO)
-!
-      call deallocate_grp_type(sph_grps_IO%radial_rj_grp)
-      call deallocate_grp_type(sph_grps_IO%sphere_rj_grp)
 !
       end subroutine copy_original_sph_rj_from_IO
 !

@@ -7,6 +7,15 @@
 !>@brief Data arry for mesh_data_IO
 !!
 !!@verbatim
+!!      subroutine dealloc_surface_mesh_IO(surf_mesh_IO)
+!!        type(surf_edge_IO_file), intent(inout) :: surf_mesh_IO
+!!      subroutine dealloc_edge_mesh_IO(edge_mesh_IO)
+!!        type(surf_edge_IO_file), intent(inout) :: edge_mesh_IO
+!!      subroutine dealloc_ele_geometry_data(ele_mesh_IO)
+!!        type(surf_edge_IO_file), intent(inout) :: ele_mesh_IO
+!!      subroutine dealloc_surf_geometry_data(surf_mesh_IO)
+!!        type(surf_edge_IO_file), intent(inout) :: surf_mesh_IO
+!!
 !!      subroutine alloc_multi_mesh_data_IO(nloop, mesh_IO)
 !!      subroutine alloc_multi_mesh_group_IO(mesh_IO, mesh_grp_IO)
 !!      subroutine dealloc_multi_mesh_data_IO(mesh_IO)
@@ -75,6 +84,59 @@
 !
        contains
 !
+!------------------------------------------------------------------
+!
+      subroutine dealloc_surface_mesh_IO(surf_mesh_IO)
+!
+      type(surf_edge_IO_file), intent(inout) :: surf_mesh_IO
+!
+!
+      call dealloc_comm_table(surf_mesh_IO%comm)
+      call deallocate_ele_connect_type(surf_mesh_IO%ele)
+      call dealloc_surface_connect_IO(surf_mesh_IO%sfed)
+!
+      end subroutine dealloc_surface_mesh_IO
+!
+!------------------------------------------------------------------
+!
+      subroutine dealloc_edge_mesh_IO(edge_mesh_IO)
+!
+      type(surf_edge_IO_file), intent(inout) :: edge_mesh_IO
+!
+!
+      call dealloc_comm_table(edge_mesh_IO%comm)
+      call deallocate_ele_connect_type(edge_mesh_IO%ele)
+      call dealloc_surface_connect_IO(edge_mesh_IO%sfed)
+      call dealloc_edge_connect_IO(edge_mesh_IO%sfed)
+!
+      end subroutine dealloc_edge_mesh_IO
+!
+!------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      subroutine dealloc_ele_geometry_data(ele_mesh_IO)
+!
+      type(surf_edge_IO_file), intent(inout) :: ele_mesh_IO
+!
+!
+      call dealloc_node_geometry_base(ele_mesh_IO%node)
+      call dealloc_ele_scalar_IO(ele_mesh_IO%sfed)
+!
+      end subroutine dealloc_ele_geometry_data
+!
+!------------------------------------------------------------------
+!
+      subroutine dealloc_surf_geometry_data(surf_mesh_IO)
+!
+      type(surf_edge_IO_file), intent(inout) :: surf_mesh_IO
+!
+      call dealloc_node_geometry_base(surf_mesh_IO%node)
+      call dealloc_ele_vector_IO(surf_mesh_IO%sfed)
+      call dealloc_ele_scalar_IO(surf_mesh_IO%sfed)
+!
+      end subroutine dealloc_surf_geometry_data
+!
+!------------------------------------------------------------------
 !------------------------------------------------------------------
 !
       subroutine alloc_multi_mesh_data_IO(nloop, mesh_IO)

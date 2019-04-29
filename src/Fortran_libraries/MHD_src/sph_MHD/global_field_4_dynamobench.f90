@@ -126,7 +126,7 @@
         end if
       end do
 !
-      call MPI_allREDUCE (rotate_ic_local, rotate_icore, ithree,        &
+      call MPI_allREDUCE (rotate_ic_local, rotate_icore, 3,             &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine pick_inner_core_rotation
@@ -165,7 +165,7 @@
         end if
       end do
 !
-      call MPI_allREDUCE (m_torque_local, m_torque_icore, ithree,       &
+      call MPI_allREDUCE (m_torque_local, m_torque_icore, 3,            &
      &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine pick_mag_torque_inner_core

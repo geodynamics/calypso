@@ -67,16 +67,17 @@
 !
       integer(kind=kint), intent(in) :: iflag_fmt, nprocs
       character(len=kchara), intent(in) :: file_head
-      integer(kind = kint) :: ip, my_rank
+!
+      integer :: ip, id_rank
       character(len=kchara) :: file_name, fname_tmp
 !
 !
-      do ip = 1, nprocs
-        my_rank = ip - 1
-        call add_int_suffix(my_rank, file_head, fname_tmp)
+      do ip = 1, int(nprocs)
+        id_rank = ip - 1
+        fname_tmp = add_process_id(id_rank, file_head)
 !
         if(iflag_fmt .eq. id_gzip_txt_file_fmt) then
-          call add_gzip_extension(fname_tmp, file_name)
+          file_name =  add_gzip_extension(fname_tmp)
         else
           file_name = fname_tmp
         end if

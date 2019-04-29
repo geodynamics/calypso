@@ -3,12 +3,12 @@
 !
 !        programmed by H.Matsui on May. 2006
 !
-!!      subroutine deallocate_cont_dat_4_iso(iso)
-!!        type(iso_ctl), intent(inout) :: iso
+!!      subroutine deallocate_cont_dat_4_iso(iso_c)
+!!        type(iso_ctl), intent(inout) :: iso_c
 !!
-!!      subroutine read_iso_control_data(hd_block, iso)
-!!      subroutine bcast_iso_control_data(iso)
-!!        type(iso_ctl), intent(inout) :: iso
+!!      subroutine read_iso_control_data(hd_block, iso_c)
+!!      subroutine bcast_iso_control_data(iso_c)
+!!        type(iso_ctl), intent(inout) :: iso_c
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!     example of control for Kemo's surface rendering
@@ -172,129 +172,128 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_cont_dat_4_iso(iso)
+      subroutine deallocate_cont_dat_4_iso(iso_c)
 !
-      type(iso_ctl), intent(inout) :: iso
+      type(iso_ctl), intent(inout) :: iso_c
 !
 !
-      call dealloc_control_array_c2(iso%iso_out_field_ctl)
-      iso%iso_out_field_ctl%num =  0
-      iso%iso_out_field_ctl%icou = 0
+      call dealloc_control_array_c2(iso_c%iso_out_field_ctl)
+      iso_c%iso_out_field_ctl%num =  0
+      iso_c%iso_out_field_ctl%icou = 0
 !
-      call dealloc_control_array_chara(iso%iso_area_ctl)
-      iso%iso_area_ctl%num =  0
-      iso%iso_area_ctl%icou = 0
+      call dealloc_control_array_chara(iso_c%iso_area_ctl)
+      iso_c%iso_area_ctl%num =  0
+      iso_c%iso_area_ctl%icou = 0
 !
       end subroutine deallocate_cont_dat_4_iso
 !
 !  ---------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_iso_control_data(hd_block, iso)
+      subroutine read_iso_control_data(hd_block, iso_c)
 !
       character(len=kchara), intent(in) :: hd_block
 !
-      type(iso_ctl), intent(inout) :: iso
+      type(iso_ctl), intent(inout) :: iso_c
 !
 !
       if(right_begin_flag(hd_block) .eq. 0) return
-      if (iso%i_iso_ctl.gt.0) return
+      if (iso_c%i_iso_ctl.gt.0) return
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iso%i_iso_ctl)
-        if(iso%i_iso_ctl .gt. 0) exit
+        iso_c%i_iso_ctl = find_control_end_flag(hd_block)
+        if(iso_c%i_iso_ctl .gt. 0) exit
 !
-        call read_iso_result_control(iso)
-        call read_iso_define_data(iso)
+        call read_iso_result_control(iso_c)
+        call read_iso_define_data(iso_c)
 !
 !
         call read_chara_ctl_type(hd_isosurf_prefix,                     &
-     &      iso%iso_file_head_ctl)
+     &      iso_c%iso_file_head_ctl)
         call read_chara_ctl_type(hd_iso_file_head,                      &
-     &      iso%iso_file_head_ctl)
+     &      iso_c%iso_file_head_ctl)
         call read_chara_ctl_type(hd_iso_out_type,                       &
-     &      iso%iso_output_type_ctl)
+     &      iso_c%iso_output_type_ctl)
       end do
 !
       end subroutine read_iso_control_data
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_iso_define_data(iso)
+      subroutine read_iso_define_data(iso_c)
 !
-      type(iso_ctl), intent(inout) :: iso
+      type(iso_ctl), intent(inout) :: iso_c
 !
 !
       if(right_begin_flag(hd_iso_define) .eq. 0) return
-      if (iso%i_iso_define.gt.0) return
+      if (iso_c%i_iso_define.gt.0) return
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_iso_define, iso%i_iso_define)
-        if(iso%i_iso_define .gt. 0) exit
+        iso_c%i_iso_define = find_control_end_flag(hd_iso_define)
+        if(iso_c%i_iso_define .gt. 0) exit
 !
-        call  read_iso_plot_area_ctl(iso)
+        call  read_iso_plot_area_ctl(iso_c)
 !
 !
-        call read_chara_ctl_type(hd_iso_field, iso%isosurf_data_ctl)
-        call read_chara_ctl_type(hd_iso_comp, iso%isosurf_comp_ctl)
+        call read_chara_ctl_type(hd_iso_field, iso_c%isosurf_data_ctl)
+        call read_chara_ctl_type(hd_iso_comp, iso_c%isosurf_comp_ctl)
 !
-        call read_real_ctl_type(hd_iso_value, iso%isosurf_value_ctl)
+        call read_real_ctl_type(hd_iso_value, iso_c%isosurf_value_ctl)
 !
-        call read_control_array_c1(hd_iso_area, iso%iso_area_ctl)
+        call read_control_array_c1(hd_iso_area, iso_c%iso_area_ctl)
       end do
 !
       end subroutine read_iso_define_data
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_iso_result_control(iso)
+      subroutine read_iso_result_control(iso_c)
 !
-      type(iso_ctl), intent(inout) :: iso
+      type(iso_ctl), intent(inout) :: iso_c
 !
 !
       if      (right_begin_flag(hd_field_on_iso) .eq. 0                 &
      &   .and. right_begin_flag(hd_iso_result) .eq. 0) return
-      if (iso%i_iso_result.gt.0) return
+      if (iso_c%i_iso_result.gt.0) return
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_field_on_iso, iso%i_iso_result)
-        if(iso%i_iso_result .gt. 0) exit
-        call find_control_end_flag(hd_iso_result, iso%i_iso_result)
-        if(iso%i_iso_result .gt. 0) exit
+        iso_c%i_iso_result = find_control_end_flag(hd_field_on_iso)
+        if(iso_c%i_iso_result .gt. 0) exit
+        iso_c%i_iso_result = find_control_end_flag(hd_iso_result)
+        if(iso_c%i_iso_result .gt. 0) exit
 !
         call read_control_array_c2                                      &
-     &     (hd_iso_result_field, iso%iso_out_field_ctl)
+     &     (hd_iso_result_field, iso_c%iso_out_field_ctl)
 !
         call read_chara_ctl_type(hd_result_type,                        &
-     &      iso%iso_result_type_ctl)
+     &      iso_c%iso_result_type_ctl)
 !
         call read_real_ctl_type(hd_result_value,                        &
-     &      iso%result_value_iso_ctl)
+     &      iso_c%result_value_iso_ctl)
       end do
 !
       end subroutine read_iso_result_control
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_iso_plot_area_ctl(iso)
+      subroutine read_iso_plot_area_ctl(iso_c)
 !
-      type(iso_ctl), intent(inout) :: iso
+      type(iso_ctl), intent(inout) :: iso_c
 !
 !
       if(right_begin_flag(hd_iso_plot_area) .eq. 0) return
-      if (iso%i_iso_plot_area.gt.0) return
+      if (iso_c%i_iso_plot_area.gt.0) return
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_iso_plot_area,                    &
-     &      iso%i_iso_plot_area)
-        if(iso%i_iso_plot_area .gt. 0) exit
+        iso_c%i_iso_plot_area = find_control_end_flag(hd_iso_plot_area)
+        if(iso_c%i_iso_plot_area .gt. 0) exit
 !
-        call read_control_array_c1(hd_iso_area, iso%iso_area_ctl)
-        call read_control_array_c1(hd_iso_plot_grp, iso%iso_area_ctl)
+        call read_control_array_c1(hd_iso_area, iso_c%iso_area_ctl)
+        call read_control_array_c1(hd_iso_plot_grp, iso_c%iso_area_ctl)
       end do
 !
       end subroutine read_iso_plot_area_ctl
@@ -302,38 +301,38 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_iso_control_data(iso)
+      subroutine bcast_iso_control_data(iso_c)
 !
       use calypso_mpi
       use bcast_control_arrays
 !
-      type(iso_ctl), intent(inout) :: iso
+      type(iso_ctl), intent(inout) :: iso_c
 !
 !
-      call MPI_BCAST(iso%i_iso_ctl,  ione,                              &
-     &              CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(iso%i_iso_define,  ione,                           &
-     &              CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(iso%i_iso_result,  ione,                           &
-     &              CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(iso%i_iso_plot_area,  ione,                        &
-     &              CALYPSO_INTEGER, izero, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(iso_c%i_iso_ctl,  1,                               &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(iso_c%i_iso_define,  1,                            &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(iso_c%i_iso_result,  1,                            &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(iso_c%i_iso_plot_area,  1,                         &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
-      call bcast_ctl_type_c1(iso%iso_file_head_ctl)
-      call bcast_ctl_type_c1(iso%iso_file_head_ctl)
-      call bcast_ctl_type_c1(iso%iso_output_type_ctl)
+      call bcast_ctl_type_c1(iso_c%iso_file_head_ctl)
+      call bcast_ctl_type_c1(iso_c%iso_file_head_ctl)
+      call bcast_ctl_type_c1(iso_c%iso_output_type_ctl)
 !
-      call bcast_ctl_type_c1(iso%isosurf_data_ctl)
-      call bcast_ctl_type_c1(iso%isosurf_comp_ctl)
+      call bcast_ctl_type_c1(iso_c%isosurf_data_ctl)
+      call bcast_ctl_type_c1(iso_c%isosurf_comp_ctl)
 !
-      call bcast_ctl_type_r1(iso%isosurf_value_ctl)
+      call bcast_ctl_type_r1(iso_c%isosurf_value_ctl)
 !
-      call bcast_ctl_array_c1(iso%iso_area_ctl)
-      call bcast_ctl_array_c2(iso%iso_out_field_ctl)
+      call bcast_ctl_array_c1(iso_c%iso_area_ctl)
+      call bcast_ctl_array_c2(iso_c%iso_out_field_ctl)
 !
-      call bcast_ctl_type_c1(iso%iso_result_type_ctl)
+      call bcast_ctl_type_c1(iso_c%iso_result_type_ctl)
 !
-      call bcast_ctl_type_r1(iso%result_value_iso_ctl)
+      call bcast_ctl_type_r1(iso_c%result_value_iso_ctl)
 !
       end subroutine bcast_iso_control_data
 !

@@ -13,6 +13,8 @@
 !!      subroutine read_layerd_spectr_ctl(hd_block, iflag, lp_ctl)
 !!      subroutine dealloc_num_spec_layer_ctl(lp_ctl)
 !!        type(layerd_spectr_control), intent(inout) :: lp_ctl
+!!      subroutine reset_mid_equator_control(meq_ctl)
+!!        type(mid_equator_control), intent(inout) :: meq_ctl
 !!      subroutine read_mid_eq_monitor_ctl(hd_block, iflag, meq_ctl)
 !!        type(mid_equator_control), intent(inout) :: meq_ctl
 !!
@@ -184,7 +186,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
         call read_chara_ctl_type(hd_vol_pwr, v_pwr%volume_spec_file_ctl)
@@ -210,7 +212,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
 !
@@ -241,7 +243,26 @@
 !
       call dealloc_control_array_int(lp_ctl%idx_spec_layer_ctl)
 !
+      lp_ctl%layered_pwr_spectr_prefix%iflag = 0
+      lp_ctl%degree_spectr_switch%iflag =  0
+      lp_ctl%order_spectr_switch%iflag =   0
+      lp_ctl%diff_lm_spectr_switch%iflag = 0
+      lp_ctl%axis_spectr_switch%iflag =    0
+!
       end subroutine dealloc_num_spec_layer_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine reset_mid_equator_control(meq_ctl)
+!
+      type(mid_equator_control), intent(inout) :: meq_ctl
+!
+      meq_ctl%pick_circle_coord_ctl%iflag = 0
+      meq_ctl%nphi_mid_eq_ctl%iflag = 0
+      meq_ctl%pick_s_ctl%iflag =    0
+      meq_ctl%pick_z_ctl%iflag =    0
+!
+      end subroutine reset_mid_equator_control
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -259,7 +280,7 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
 !

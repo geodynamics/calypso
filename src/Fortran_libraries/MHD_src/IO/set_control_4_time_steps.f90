@@ -9,10 +9,10 @@
 !> @brief set parameters for time stepping
 !!
 !!@verbatim
-!!      subroutine s_set_control_4_time_steps(MHD_step, mr_ctl, tctl)
+!!      subroutine s_set_control_4_time_steps(mr_ctl, tctl, MHD_step)
 !!        type(mhd_restart_control), intent(in) :: mr_ctl
+!!        type(time_data_control), intent(in) :: tctl
 !!        type(MHD_step_param), intent(inout) :: MHD_step
-!!        type(time_data_control), intent(inout) :: tctl
 !!@endverbatim
 !
       module set_control_4_time_steps
@@ -43,7 +43,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_set_control_4_time_steps(MHD_step, mr_ctl, tctl)
+      subroutine s_set_control_4_time_steps(mr_ctl, tctl, MHD_step)
 !
       use t_time_data
       use t_ctl_data_mhd_evo_scheme
@@ -52,8 +52,8 @@
       use skip_comment_f
 !
       type(mhd_restart_control), intent(in) :: mr_ctl
+      type(time_data_control), intent(in) :: tctl
       type(MHD_step_param), intent(inout) :: MHD_step
-      type(time_data_control), intent(inout) :: tctl
 !
 !
 !  control for restert
@@ -75,7 +75,7 @@
       end if
 !
       call set_control_flex_time_steps                                  &
-     &   (MHD_step%init_d, MHD_step%flex_p, tctl)
+     &   (tctl, MHD_step%init_d, MHD_step%flex_p)
 !
 !   parameters for time evolution
 !
@@ -116,7 +116,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_control_flex_time_steps(init_d, flex_p, tctl)
+      subroutine set_control_flex_time_steps(tctl, init_d, flex_p)
 !
       use t_time_data
       use t_ctl_data_mhd_evo_scheme
@@ -124,9 +124,9 @@
       use cal_num_digits
       use skip_comment_f
 !
+      type(time_data_control), intent(in) :: tctl
       type(time_data), intent(in) :: init_d
       type(flexible_stepping_parameter), intent(inout) :: flex_p
-      type(time_data_control), intent(inout) :: tctl
 !
 !
       call cal_num_digit_real                                           &
@@ -182,7 +182,7 @@
 !
       subroutine set_fixed_time_step_controls(tctl, MHD_step)
 !
-      type(time_data_control), intent(inout) :: tctl
+      type(time_data_control), intent(in) :: tctl
       type(MHD_step_param), intent(inout) :: MHD_step
 !
       integer(kind = kint) :: ierr
@@ -195,19 +195,19 @@
      &   (MHD_step%init_d%dt, tctl, MHD_step%viz_step)
       if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message)
 !
-      call set_output_step_4_fixed_step(ione, MHD_step%init_d%dt,       &
+      call output_step_4_fixed_step_ctl(ione, MHD_step%init_d%dt,       &
      &    tctl%i_step_check_ctl, tctl%delta_t_check_ctl,                &
      &    MHD_step%rms_step)
 !
-      call set_output_step_4_fixed_step(izero, MHD_step%init_d%dt,      &
+      call output_step_4_fixed_step_ctl(izero, MHD_step%init_d%dt,      &
      &    tctl%i_step_sgs_coefs_ctl, tctl%delta_t_sgs_coefs_ctl,        &
      &    MHD_step%sgs_IO_step)
 !
-      call set_output_step_4_fixed_step(izero, MHD_step%init_d%dt,      &
+      call output_step_4_fixed_step_ctl(izero, MHD_step%init_d%dt,      &
      &    tctl%i_step_monitor_ctl, tctl%delta_t_monitor_ctl,            &
      &    MHD_step%point_step)
 !
-      call set_output_step_4_fixed_step(izero, MHD_step%init_d%dt,      &
+      call output_step_4_fixed_step_ctl(izero, MHD_step%init_d%dt,      &
      &    tctl%i_step_boundary_ctl, tctl%delta_t_boundary_ctl,          &
      &    MHD_step%boundary_step)
 !
@@ -217,27 +217,27 @@
 !
       subroutine set_flex_time_step_controls(tctl, MHD_step)
 !
-      type(time_data_control), intent(inout) :: tctl
+      type(time_data_control), intent(in) :: tctl
       type(MHD_step_param), intent(inout) :: MHD_step
 !
 !
       call set_flex_time_step_params                                    &
-     &   (MHD_step%flex_p, tctl, MHD_step%init_d, MHD_step%finish_d,    &
+     &   (tctl, MHD_step%flex_p, MHD_step%init_d, MHD_step%finish_d,    &
      &    MHD_step%rst_step, MHD_step%ucd_step)
 !
-      call set_output_step_4_flex_step(ione, MHD_step%flex_p%dt_max,    &
+      call output_step_4_flex_step_ctl(ione, MHD_step%flex_p%dt_max,    &
      &    tctl%i_step_check_ctl, tctl%delta_t_check_ctl,                &
      &    MHD_step%rms_step)
 !
-      call set_output_step_4_flex_step(izero, MHD_step%flex_p%dt_max,   &
+      call output_step_4_flex_step_ctl(izero, MHD_step%flex_p%dt_max,   &
      &    tctl%i_step_sgs_coefs_ctl, tctl%delta_t_sgs_coefs_ctl,        &
      &    MHD_step%sgs_IO_step)
 !
-      call set_output_step_4_flex_step(izero, MHD_step%flex_p%dt_max,   &
+      call output_step_4_flex_step_ctl(izero, MHD_step%flex_p%dt_max,   &
      &    tctl%i_step_monitor_ctl, tctl%delta_t_monitor_ctl,            &
      &    MHD_step%point_step)
 !
-      call set_output_step_4_flex_step(izero, MHD_step%flex_p%dt_max,   &
+      call output_step_4_flex_step_ctl(izero, MHD_step%flex_p%dt_max,   &
      &    tctl%i_step_boundary_ctl, tctl%delta_t_boundary_ctl,          &
      &    MHD_step%boundary_step)
 !
@@ -248,14 +248,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_flex_time_step_params(flex_p, tctl,                &
+      subroutine set_flex_time_step_params(tctl, flex_p,                &
      &          init_d, finish_d, rst_step, ucd_step)
 !
+      type(time_data_control), intent(in) :: tctl
       type(time_data), intent(inout) :: init_d
       type(finish_data), intent(inout) :: finish_d
 !
       type(flexible_stepping_parameter), intent(inout) :: flex_p
-      type(time_data_control), intent(inout) :: tctl
       type(IO_step_param), intent(inout) :: rst_step, ucd_step
 !
 !>      Start step for restarting file
@@ -275,10 +275,10 @@
       end if
 !
 !
-      call set_output_step_4_flex_step(ione, flex_p%dt_max,             &
+      call output_step_4_flex_step_ctl(ione, flex_p%dt_max,             &
      &    tctl%i_step_rst_ctl, tctl%delta_t_rst_ctl, rst_step)
 !
-      call set_output_step_4_flex_step(ione, flex_p%dt_max,             &
+      call output_step_4_flex_step_ctl(ione, flex_p%dt_max,             &
      &   tctl%i_step_ucd_ctl, tctl%delta_t_field_ctl, ucd_step)
 !
       init_d%i_time_step =  istep_rst_start * rst_step%increment

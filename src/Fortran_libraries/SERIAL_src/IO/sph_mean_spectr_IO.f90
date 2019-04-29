@@ -29,7 +29,6 @@
 !!     &          ltr, ntot_rms_rj, nri_rms, kr_rms, r_rms, rms_sph_x)
 !!@endverbatim
 !!
-!!@n @param my_rank       Process ID
 !!@n @param istep         time step number
 !!@n @param time          time
 !!

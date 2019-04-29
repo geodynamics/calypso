@@ -10,35 +10,35 @@
 !!      subroutine copy_sph_node_4_rtp_from_IO(sph_IO, rtp, l_truncation)
 !!        integer(kind = kint), intent(inout) :: l_truncation
 !!        type(sph_rtp_grid), intent(inout) :: rtp
-!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
 !!      subroutine copy_sph_node_4_rtm_from_IO(sph_IO, rtm, l_truncation)
 !!        integer(kind = kint), intent(inout) :: l_truncation
 !!        type(sph_rtm_grid), intent(inout) :: rtm
-!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
 !!      subroutine copy_sph_node_4_rlm_from_IO(sph_IO, rlm, l_truncation)
 !!        integer(kind = kint), intent(inout) :: l_truncation
 !!        type(sph_rlm_grid), intent(inout) :: rlm
-!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
 !!      subroutine copy_sph_node_4_rj_from_IO(sph_IO, rj, l_truncation)
 !!        integer(kind = kint), intent(inout) :: l_truncation
 !!        type(sph_rj_grid), intent(inout) :: rj
-!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
 !!
 !!      subroutine copy_sph_node_4_rtp_to_IO(l_truncation, rtp, sph_IO)
 !!        integer(kind = kint), intent(in) :: l_truncation
-!!        type(sph_rtp_grid), intent(inout) :: rtp
+!!        type(sph_rtp_grid), intent(in) :: rtp
 !!        type(sph_IO_data), intent(inout) :: sph_IO
 !!      subroutine copy_sph_node_4_rtm_to_IO(l_truncation, rtm, sph_IO)
 !!        integer(kind = kint), intent(in) :: l_truncation
-!!        type(sph_rtm_grid), intent(inout) :: rtm
+!!        type(sph_rtm_grid), intent(in) :: rtm
 !!        type(sph_IO_data), intent(inout) :: sph_IO
 !!      subroutine copy_sph_node_4_rlm_to_IO(l_truncation, rlm, sph_IO)
 !!        integer(kind = kint), intent(in) :: l_truncation
-!!        type(sph_rlm_grid), intent(inout) :: rlm
+!!        type(sph_rlm_grid), intent(in) :: rlm
 !!        type(sph_IO_data), intent(inout) :: sph_IO
 !!      subroutine copy_sph_node_4_rj_to_IO(l_truncation, rj, sph_IO)
 !!        integer(kind = kint), intent(in) :: l_truncation
-!!        type(sph_rj_grid), intent(inout) :: rj
+!!        type(sph_rj_grid), intent(in) :: rj
 !!        type(sph_IO_data), intent(inout) :: sph_IO
 !!@endverbatim
 !
@@ -64,7 +64,7 @@
 !
       integer(kind = kint), intent(inout) :: l_truncation
       type(sph_rtp_grid), intent(inout) :: rtp
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
       integer(kind = kint) :: i
 !
@@ -77,6 +77,7 @@
       rtp%nidx_rtp(1:ithree) = sph_IO%nidx_sph(1:ithree)
       rtp%ist_rtp(1:ithree) =  sph_IO%ist_sph(1:ithree)
       rtp%ied_rtp(1:ithree) =  sph_IO%ied_sph(1:ithree)
+      rtp%nnod_med =           sph_IO%nidx_sph(1)*sph_IO%nidx_sph(2)
 !
       call alloc_type_spheric_param_rtp(rtp)
       call alloc_type_sph_1d_index_rtp(rtp)
@@ -105,12 +106,6 @@
      &       = sph_IO%idx_gl_3(1:rtp%nidx_rtp(3),2)
 !$omp end parallel workshare
 !
-      call dealloc_nod_id_sph_IO(sph_IO)
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
-      call dealloc_idx_sph_1d3_IO(sph_IO)
-!
       end subroutine copy_sph_node_4_rtp_from_IO
 !
 ! ----------------------------------------------------------------------
@@ -121,7 +116,7 @@
 !
       integer(kind = kint), intent(inout) :: l_truncation
       type(sph_rtm_grid), intent(inout) :: rtm
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
       integer(kind = kint) :: i
 !
@@ -162,12 +157,6 @@
      &      = sph_IO%idx_gl_3(1:rtm%nidx_rtm(3),2)
 !$omp end parallel workshare
 !
-      call dealloc_nod_id_sph_IO(sph_IO)
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
-      call dealloc_idx_sph_1d3_IO(sph_IO)
-!
       end subroutine copy_sph_node_4_rtm_from_IO
 !
 ! ----------------------------------------------------------------------
@@ -178,7 +167,7 @@
 !
       integer(kind = kint), intent(inout) :: l_truncation
       type(sph_rlm_grid), intent(inout) :: rlm
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
       integer(kind = kint) :: i
 !
@@ -216,11 +205,6 @@
      &       = sph_IO%idx_gl_2(1:rlm%nidx_rlm(2),3)
 !$omp end parallel workshare
 !
-      call dealloc_nod_id_sph_IO(sph_IO)
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
-!
       end subroutine copy_sph_node_4_rlm_from_IO
 !
 ! ----------------------------------------------------------------------
@@ -231,7 +215,7 @@
 !
       integer(kind = kint), intent(inout) :: l_truncation
       type(sph_rj_grid), intent(inout) :: rj
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
       integer(kind = kint) :: i
 !
@@ -272,11 +256,6 @@
      &      = sph_IO%idx_gl_2(1:rj%nidx_rj(2),3)
 !$omp end parallel workshare
 !
-      call dealloc_nod_id_sph_IO(sph_IO)
-      call dealloc_num_idx_sph_IO(sph_IO)
-      call dealloc_idx_sph_1d1_IO(sph_IO)
-      call dealloc_idx_sph_1d2_IO(sph_IO)
-!
       end subroutine copy_sph_node_4_rj_from_IO
 !
 ! ----------------------------------------------------------------------
@@ -287,7 +266,7 @@
       use t_spheric_rtp_data
 !
       integer(kind = kint), intent(in) :: l_truncation
-      type(sph_rtp_grid), intent(inout) :: rtp
+      type(sph_rtp_grid), intent(in) :: rtp
       type(sph_IO_data), intent(inout) :: sph_IO
 !
       integer(kind = kint) :: i
@@ -354,9 +333,6 @@
      &        = rtp%idx_gl_1d_rtp_p(1:rtp%nidx_rtp(3),2)
 !$omp end parallel workshare
 !
-      call dealloc_type_sph_1d_index_rtp(rtp)
-      call dealloc_type_spheric_param_rtp(rtp)
-!
       end subroutine copy_sph_node_4_rtp_to_IO
 !
 ! ----------------------------------------------------------------------
@@ -364,7 +340,7 @@
       subroutine copy_sph_node_4_rtm_to_IO(l_truncation, rtm, sph_IO)
 !
       integer(kind = kint), intent(in) :: l_truncation
-      type(sph_rtm_grid), intent(inout) :: rtm
+      type(sph_rtm_grid), intent(in) :: rtm
       type(sph_IO_data), intent(inout) :: sph_IO
 !
       integer(kind = kint) :: i
@@ -426,9 +402,6 @@
      &       = rtm%idx_gl_1d_rtm_m(1:rtm%nidx_rtm(3),2)
 !$omp end parallel workshare
 !
-      call dealloc_type_sph_1d_index_rtm(rtm)
-      call dealloc_type_spheric_param_rtm(rtm)
-!
       end subroutine copy_sph_node_4_rtm_to_IO
 !
 ! ----------------------------------------------------------------------
@@ -438,7 +411,7 @@
       use t_spheric_rlm_data
 !
       integer(kind = kint), intent(in) :: l_truncation
-      type(sph_rlm_grid), intent(inout) :: rlm
+      type(sph_rlm_grid), intent(in) :: rlm
       type(sph_IO_data), intent(inout) :: sph_IO
 !
       integer(kind = kint) :: i
@@ -492,9 +465,6 @@
      &       = rlm%idx_gl_1d_rlm_j(1:rlm%nidx_rlm(2),3)
 !$omp end parallel workshare
 !
-      call dealloc_type_sph_1d_index_rlm(rlm)
-      call dealloc_type_spheric_param_rlm(rlm)
-!
       end subroutine copy_sph_node_4_rlm_to_IO
 !
 ! ----------------------------------------------------------------------
@@ -504,7 +474,7 @@
       use t_spheric_rj_data
 !
       integer(kind = kint), intent(in) :: l_truncation
-      type(sph_rj_grid), intent(inout) :: rj
+      type(sph_rj_grid), intent(in) :: rj
       type(sph_IO_data), intent(inout) :: sph_IO
 !
       integer(kind = kint) :: i
@@ -562,9 +532,6 @@
       sph_IO%idx_gl_2(1:rj%nidx_rj(2),3)                                &
      &      = rj%idx_gl_1d_rj_j(1:rj%nidx_rj(2),3)
 !$omp end parallel workshare
-!
-      call dealloc_type_sph_1d_index_rj(rj)
-      call dealloc_spheric_param_rj(rj)
 !
       end subroutine copy_sph_node_4_rj_to_IO
 !

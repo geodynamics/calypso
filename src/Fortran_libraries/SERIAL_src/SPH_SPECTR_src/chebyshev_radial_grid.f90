@@ -117,7 +117,7 @@
 !
 !
 !      Set grid by equidistance grid
-      if(k .eq. nri/2) k = int(aint((r - r_min) /  dr)) + nri/2
+      if(k .eq. nri/2) k = int(aint((r - r_min)/dr), KIND(k)) + nri/2
       ngrid_icore = k-1
       if(ngrid_icore .lt. 0) ngrid_icore = 0
 !

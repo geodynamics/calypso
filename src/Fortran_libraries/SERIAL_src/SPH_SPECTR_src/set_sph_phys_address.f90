@@ -88,6 +88,23 @@
      &    itor%i_wide_fil_magne, idpdr%i_wide_fil_magne)
       call set_vect_sph_address(ipol%i_wide_fil_current,                &
      &    itor%i_wide_fil_current, idpdr%i_wide_fil_current)
+      call set_vect_sph_address(ipol%i_wide_fil_grad_t,                 &
+     &    itor%i_wide_fil_grad_t, idpdr%i_wide_fil_grad_t)
+      call set_vect_sph_address(ipol%i_wide_fil_grad_c,                 &
+     &    itor%i_wide_fil_grad_c, idpdr%i_wide_fil_grad_c)
+!
+      call set_vect_sph_address(ipol%i_dbl_fil_velo,                    &
+     &    itor%i_dbl_fil_velo, idpdr%i_dbl_fil_velo)
+      call set_vect_sph_address(ipol%i_dbl_fil_vort,                    &
+     &    itor%i_dbl_fil_vort, idpdr%i_dbl_fil_vort)
+      call set_vect_sph_address(ipol%i_dbl_fil_magne,                   &
+     &    itor%i_dbl_fil_magne, idpdr%i_dbl_fil_magne)
+      call set_vect_sph_address(ipol%i_dbl_fil_current,                 &
+     &    itor%i_dbl_fil_current, idpdr%i_dbl_fil_current)
+      call set_vect_sph_address(ipol%i_dbl_fil_grad_t,                  &
+     &    itor%i_dbl_fil_grad_t, idpdr%i_dbl_fil_grad_t)
+      call set_vect_sph_address(ipol%i_dbl_fil_grad_c,                  &
+     &    itor%i_dbl_fil_grad_c, idpdr%i_dbl_fil_grad_c)
 !
       call set_vect_sph_address(ipol%i_v_diffuse, itor%i_v_diffuse,     &
      &    idpdr%i_v_diffuse)
@@ -159,6 +176,39 @@
      &    itor%i_grad_part_c, idpdr%i_grad_part_c)
 !
 !
+      call set_vect_sph_address(ipol%i_grad_filter_vx,                  &
+     &    itor%i_grad_filter_vx,  idpdr%i_grad_filter_vx)
+      call set_vect_sph_address(ipol%i_grad_filter_vy,                  &
+     &    itor%i_grad_filter_vy,  idpdr%i_grad_filter_vy)
+      call set_vect_sph_address(ipol%i_grad_filter_vz,                  &
+     &    itor%i_grad_filter_vz,  idpdr%i_grad_filter_vz)
+      call set_vect_sph_address(ipol%i_grad_filter_wx,                  &
+     &    itor%i_grad_filter_wx,  idpdr%i_grad_filter_wx)
+      call set_vect_sph_address(ipol%i_grad_filter_wy,                  &
+     &    itor%i_grad_filter_wy,  idpdr%i_grad_filter_wy)
+      call set_vect_sph_address(ipol%i_grad_filter_wz,                  &
+     &    itor%i_grad_filter_wz,  idpdr%i_grad_filter_wz)
+!
+      call set_vect_sph_address(ipol%i_grad_filter_ax,                  &
+     &    itor%i_grad_filter_ax,  idpdr%i_grad_filter_ax)
+      call set_vect_sph_address(ipol%i_grad_filter_ay,                  &
+     &    itor%i_grad_filter_ay,  idpdr%i_grad_filter_ay)
+      call set_vect_sph_address(ipol%i_grad_filter_az,                  &
+     &    itor%i_grad_filter_az,  idpdr%i_grad_filter_az)
+      call set_vect_sph_address(ipol%i_grad_filter_bx,                  &
+     &    itor%i_grad_filter_bx,  idpdr%i_grad_filter_bx)
+      call set_vect_sph_address(ipol%i_grad_filter_by,                  &
+     &    itor%i_grad_filter_by,  idpdr%i_grad_filter_by)
+      call set_vect_sph_address(ipol%i_grad_filter_bz,                  &
+     &    itor%i_grad_filter_bz,  idpdr%i_grad_filter_bz)
+      call set_vect_sph_address(ipol%i_grad_filter_vx,                  &
+     &    itor%i_grad_filter_jx,  idpdr%i_grad_filter_jx)
+      call set_vect_sph_address(ipol%i_grad_filter_vy,                  &
+     &    itor%i_grad_filter_jy,  idpdr%i_grad_filter_jy)
+      call set_vect_sph_address(ipol%i_grad_filter_vz,                  &
+     &    itor%i_grad_filter_jz,  idpdr%i_grad_filter_jz)
+!
+!
       call set_vect_sph_address(ipol%i_grad_vx, itor%i_grad_vx,         &
      &    idpdr%i_grad_vx)
       call set_vect_sph_address(ipol%i_grad_vy, itor%i_grad_vy,         &
@@ -191,6 +241,7 @@
       call set_vect_sph_address(ipol%i_grad_jz, itor%i_grad_jz,         &
      &    idpdr%i_grad_jz)
 !
+!
       call set_vect_sph_address(ipol%i_SGS_h_flux,                      &
      &    itor%i_SGS_h_flux, idpdr%i_SGS_h_flux)
       call set_vect_sph_address(ipol%i_SGS_c_flux,                      &
@@ -212,6 +263,17 @@
      &    itor%i_wide_SGS_Lorentz, idpdr%i_wide_SGS_Lorentz)
       call set_vect_sph_address(ipol%i_wide_SGS_vp_induct,              &
      &    itor%i_wide_SGS_vp_induct, idpdr%i_wide_SGS_vp_induct)
+!
+      call set_vect_sph_address(ipol%i_dbl_SGS_h_flux,                  &
+     &    itor%i_dbl_SGS_h_flux, idpdr%i_dbl_SGS_h_flux)
+      call set_vect_sph_address(ipol%i_dbl_SGS_c_flux,                  &
+     &    itor%i_dbl_SGS_c_flux, idpdr%i_dbl_SGS_c_flux)
+      call set_vect_sph_address(ipol%i_dbl_SGS_inertia,                 &
+     &    itor%i_dbl_SGS_inertia, idpdr%i_dbl_SGS_inertia)
+      call set_vect_sph_address(ipol%i_dbl_SGS_Lorentz,                 &
+     &    itor%i_dbl_SGS_Lorentz, idpdr%i_dbl_SGS_Lorentz)
+      call set_vect_sph_address(ipol%i_dbl_SGS_vp_induct,               &
+     &    itor%i_dbl_SGS_vp_induct, idpdr%i_dbl_SGS_vp_induct)
 !
       call set_vect_sph_address(ipol%i_SGS_div_m_flux,                  &
      &    itor%i_SGS_div_m_flux, idpdr%i_SGS_div_m_flux)

@@ -11,9 +11,10 @@
 !!@n        Modified by H. Matsui on Oct., 2012
 !!
 !!@verbatim
-!!      subroutine read_sph_mhd_model(hd_block, iflag, model_ctl)
-!!      subroutine bcast_sph_mhd_model(model_ctl)
-!!        type(mhd_DNS_model_control), intent(inout) :: model_ctl
+!!      subroutine read_sph_mhd_model(hd_block, iflag, Dmodel_ctl)
+!!      subroutine bcast_sph_mhd_model(Dmodel_ctl)
+!!      subroutine dealloc_sph_mhd_model(Dmodel_ctl)
+!!        type(mhd_DNS_model_control), intent(inout) :: Dmodel_ctl
 !!@endverbatim
 !
       module t_ctl_data_MHD_model
@@ -146,12 +147,12 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine read_sph_mhd_model(hd_block, iflag, model_ctl)
+      subroutine read_sph_mhd_model(hd_block, iflag, Dmodel_ctl)
 !
       character(len=kchara), intent(in) :: hd_block
 !
       integer(kind = kint), intent(inout) :: iflag
-      type(mhd_DNS_model_control), intent(inout) :: model_ctl
+      type(mhd_DNS_model_control), intent(inout) :: Dmodel_ctl
 !
 !
       if(right_begin_flag(hd_block) .eq. 0) return
@@ -159,41 +160,41 @@
       do
         call load_ctl_label_and_line
 !
-        call find_control_end_flag(hd_block, iflag)
+        iflag = find_control_end_flag(hd_block)
         if(iflag .gt. 0) exit
 !
         call read_phys_data_control                                     &
-     &     (hd_phys_values, i_phys_values, model_ctl%fld_ctl)
+     &     (hd_phys_values, i_phys_values, Dmodel_ctl%fld_ctl)
 !
         call read_mhd_time_evo_ctl                                      &
-     &     (hd_time_evo, i_time_evo, model_ctl%evo_ctl)
+     &     (hd_time_evo, i_time_evo, Dmodel_ctl%evo_ctl)
         call read_mhd_layer_ctl                                         &
-     &     (hd_layers_ctl, i_layers_ctl, model_ctl%earea_ctl)
+     &     (hd_layers_ctl, i_layers_ctl, Dmodel_ctl%earea_ctl)
 !
         call read_bc_4_node_ctl                                         &
-     &     (hd_boundary_condition, i_bc_4_node, model_ctl%nbc_ctl)
+     &     (hd_boundary_condition, i_bc_4_node, Dmodel_ctl%nbc_ctl)
         call read_bc_4_node_ctl                                         &
-     &     (hd_bc_4_node, i_bc_4_node, model_ctl%nbc_ctl)
+     &     (hd_bc_4_node, i_bc_4_node, Dmodel_ctl%nbc_ctl)
         call read_bc_4_surf_ctl                                         &
-     &     (hd_bc_4_surf, i_bc_4_surf, model_ctl%sbc_ctl)
+     &     (hd_bc_4_surf, i_bc_4_surf, Dmodel_ctl%sbc_ctl)
 !
         call read_forces_ctl                                            &
-     &     (hd_forces_ctl, i_forces_ctl, model_ctl%frc_ctl)
+     &     (hd_forces_ctl, i_forces_ctl, Dmodel_ctl%frc_ctl)
         call read_dimless_ctl                                           &
-     &     (hd_dimless_ctl, i_dimless_ctl, model_ctl%dless_ctl)
+     &     (hd_dimless_ctl, i_dimless_ctl, Dmodel_ctl%dless_ctl)
         call read_coef_term_ctl                                         &
-     &     (hd_coef_term_ctl, i_coef_term_ctl, model_ctl%eqs_ctl)
+     &     (hd_coef_term_ctl, i_coef_term_ctl, Dmodel_ctl%eqs_ctl)
 !
         call read_gravity_ctl                                           &
-     &     (hd_gravity_ctl, i_gravity_ctl, model_ctl%g_ctl)
+     &     (hd_gravity_ctl, i_gravity_ctl, Dmodel_ctl%g_ctl)
         call read_coriolis_ctl                                          &
-     &     (hd_coriolis_ctl, i_coriolis_ctl, model_ctl%cor_ctl)
+     &     (hd_coriolis_ctl, i_coriolis_ctl, Dmodel_ctl%cor_ctl)
         call read_magneto_ctl                                           &
-     &     (hd_magneto_ctl, i_magneto_ctl, model_ctl%mcv_ctl)
+     &     (hd_magneto_ctl, i_magneto_ctl, Dmodel_ctl%mcv_ctl)
         call read_reftemp_ctl                                           &
-     &     (hd_temp_def, i_temp_def, model_ctl%reft_ctl)
+     &     (hd_temp_def, i_temp_def, Dmodel_ctl%reft_ctl)
         call read_reftemp_ctl                                           &
-     &     (hd_comp_def, i_comp_def, model_ctl%refc_ctl)
+     &     (hd_comp_def, i_comp_def, Dmodel_ctl%refc_ctl)
       end do
 !
       end subroutine read_sph_mhd_model
@@ -201,30 +202,53 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_sph_mhd_model(model_ctl)
+      subroutine bcast_sph_mhd_model(Dmodel_ctl)
 !
       use bcast_4_field_ctl
 !
-      type(mhd_DNS_model_control), intent(inout) :: model_ctl
+      type(mhd_DNS_model_control), intent(inout) :: Dmodel_ctl
 !
 !
-      call bcast_phys_data_ctl(model_ctl%fld_ctl)
-      call bcast_mhd_time_evo_ctl(model_ctl%evo_ctl)
-      call bcast_mhd_layer_ctl(model_ctl%earea_ctl)
+      call bcast_phys_data_ctl(Dmodel_ctl%fld_ctl)
+      call bcast_mhd_time_evo_ctl(Dmodel_ctl%evo_ctl)
+      call bcast_mhd_layer_ctl(Dmodel_ctl%earea_ctl)
 !
-      call bcast_bc_4_node_ctl(model_ctl%nbc_ctl)
-      call bcast_bc_4_surf_ctl(model_ctl%sbc_ctl)
+      call bcast_bc_4_node_ctl(Dmodel_ctl%nbc_ctl)
+      call bcast_bc_4_surf_ctl(Dmodel_ctl%sbc_ctl)
 !
-      call bcast_dimless_ctl(model_ctl%dless_ctl)
-      call bcast_coef_term_ctl(model_ctl%eqs_ctl)
-      call bcast_forces_ctl(model_ctl%frc_ctl)
-      call bcast_gravity_ctl(model_ctl%g_ctl)
-      call bcast_coriolis_ctl(model_ctl%cor_ctl)
-      call bcast_magneto_ctl(model_ctl%mcv_ctl)
-      call bcast_ref_scalar_ctl(model_ctl%reft_ctl)
-      call bcast_ref_scalar_ctl(model_ctl%refc_ctl)
+      call bcast_dimless_ctl(Dmodel_ctl%dless_ctl)
+      call bcast_coef_term_ctl(Dmodel_ctl%eqs_ctl)
+      call bcast_forces_ctl(Dmodel_ctl%frc_ctl)
+      call bcast_gravity_ctl(Dmodel_ctl%g_ctl)
+      call bcast_coriolis_ctl(Dmodel_ctl%cor_ctl)
+      call bcast_magneto_ctl(Dmodel_ctl%mcv_ctl)
+      call bcast_ref_scalar_ctl(Dmodel_ctl%reft_ctl)
+      call bcast_ref_scalar_ctl(Dmodel_ctl%refc_ctl)
 !
       end subroutine bcast_sph_mhd_model
+!
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_sph_mhd_model(Dmodel_ctl)
+!
+      type(mhd_DNS_model_control), intent(inout) :: Dmodel_ctl
+!
+!
+      call dealloc_phys_control(Dmodel_ctl%fld_ctl)
+      call dealloc_t_evo_name_ctl(Dmodel_ctl%evo_ctl)
+      call dealloc_ele_area_grp_ctl(Dmodel_ctl%earea_ctl)
+!
+      call dealloc_bc_4_node_ctl(Dmodel_ctl%nbc_ctl)
+      call dealloc_bc_4_surf_ctl(Dmodel_ctl%sbc_ctl)
+!
+      call dealloc_dimless_ctl(Dmodel_ctl%dless_ctl)
+      call dealloc_coef_term_ctl(Dmodel_ctl%eqs_ctl)
+      call dealloc_name_force_ctl(Dmodel_ctl%frc_ctl)
+      call dealloc_gravity_ctl(Dmodel_ctl%g_ctl)
+      call dealloc_coriolis_ctl(Dmodel_ctl%cor_ctl)
+      call dealloc_magneto_ctl(Dmodel_ctl%mcv_ctl)
+!
+      end subroutine dealloc_sph_mhd_model
 !
 !   --------------------------------------------------------------------
 !

@@ -15,7 +15,7 @@
 !!      subroutine write_rank_4_sph_gz(sph_IO)
 !!      subroutine write_gl_resolution_sph_gz(sph_IO)
 !!      subroutine write_gl_nodes_sph_gz(sph_IO)
-!!        type(sph_IO_data), intent(inout) :: sph_IO
+!!        type(sph_IO_data), intent(in) :: sph_IO
 !!@endverbatim
 !
       module gz_spherical_model_IO
@@ -130,7 +130,7 @@
 !
       subroutine write_gl_nodes_sph_gz(sph_IO)
 !
-      type(sph_IO_data), intent(inout) :: sph_IO
+      type(sph_IO_data), intent(in) :: sph_IO
 !
       integer(kind = kint) :: i
       character(len=kchara) :: fmt_txt
@@ -146,8 +146,6 @@
      &      sph_IO%idx_gl_sph(i,1:sph_IO%numdir_sph), char(0)
         call gz_write_textbuf_w_lf
       end do
-!
-      call dealloc_nod_id_sph_IO(sph_IO)
 !
       end subroutine write_gl_nodes_sph_gz
 !

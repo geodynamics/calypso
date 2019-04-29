@@ -56,35 +56,31 @@
 !   set hash data for edge elements using sum of local node ID
 !
       if (iflag_debug.eq.1) write(*,*) 'const_edge_hash_4_ele'
-      call const_edge_hash_4_ele(nod%numnod, ele%numele,                &
-     &    ele%nnod_4_ele, edge%nnod_4_edge, ele%ie,                     &
-     &    edge_ele_tbl%num_hash, edge_ele_tbl%istack_hash,              &
-     &    edge_ele_tbl%iend_hash, edge_ele_tbl%id_hash,                 &
-     &    edge_ele_tbl%iflag_hash)
+      call const_edge_hash_4_ele(ele, edge_ele_tbl)
 !
 !
       if (iflag_debug.eq.1) write(*,*) 'count_num_edges_by_ele'
       call count_num_edges_by_ele                                       &
-     &   (nod%numnod, ele%numele, edge%nnod_4_edge,                     &
+     &   (edge_ele_tbl%ntot_id, edge_ele_tbl%ntot_list,                 &
      &    edge_ele_tbl%istack_hash, edge_ele_tbl%iend_hash,             &
      &    edge_ele_tbl%iflag_hash, edge%numedge)
 !
       call alloc_edge_connect(edge, surf%numsurf)
       call alloc_edge_4_ele(edge, ele%numele)
 !
-      if (iflag_debug.eq.1) write(*,*) 'set_edges_connect_by_sf'
-      call set_edges_connect_by_ele                                     &
-     &   (nod%numnod, ele%numele, edge%numedge,                         &
+      if (iflag_debug.eq.1) write(*,*) 'set_edges_connect_by_ele'
+      call set_edges_connect_by_ele(ele%numele, edge%numedge,           &
      &    ele%nnod_4_ele, edge%nnod_4_edge, ele%ie,                     &
+     &    edge_ele_tbl%ntot_id, edge_ele_tbl%ntot_list,                 &
      &    edge_ele_tbl%istack_hash, edge_ele_tbl%iend_hash,             &
      &    edge_ele_tbl%id_hash, edge_ele_tbl%iflag_hash,                &
      &    edge%ie_edge, edge%iedge_4_ele, edge%node_on_edge)
 !
-      if (iflag_debug.eq.1) write(*,*) 'set_edges_connect_4_ele'
+      if (iflag_debug.eq.1) write(*,*) 'set_edges_connect_4_sf'
       call set_edges_connect_4_sf                                       &
-     &   (nod%numnod, ele%numele, surf%numsurf, edge%numedge,           &
-     &    surf%nnod_4_surf, edge%nnod_4_edge,                           &
-     &    surf%ie_surf, edge%iedge_4_ele,                               &
+     &   (ele%numele, surf%numsurf, edge%numedge, surf%nnod_4_surf,     &
+     &    edge%nnod_4_edge, surf%ie_surf, edge%iedge_4_ele,             &
+     &    edge_ele_tbl%ntot_id, edge_ele_tbl%ntot_list,                 &
      &    edge_ele_tbl%istack_hash, edge_ele_tbl%id_hash,               &
      &    edge_ele_tbl%iflag_hash, edge%ie_edge, edge%iedge_4_sf)
 !
@@ -160,5 +156,66 @@
       end subroutine empty_edge_connect_type
 !
 ! ----------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      subroutine const_edge_hash_4_ele(ele, edge_ele_tbl)
+!
+      use set_edge_hash_by_ele
+!
+      type(element_data), intent(in) :: ele
+!
+      type(sum_hash_tbl), intent(inout) :: edge_ele_tbl
+!
+!
+      call count_edge_hash_4_ele(ele%numele, ele%nnod_4_ele, ele%ie,    &
+     &    edge_ele_tbl%ntot_id, edge_ele_tbl%ntot_list,                 &
+     &    edge_ele_tbl%num_hash, edge_ele_tbl%istack_hash,              &
+     &    edge_ele_tbl%iend_hash)
+!
+      call set_edge_hash_4_ele(ele%numele, ele%nnod_4_ele, ele%ie,      &
+     &    edge_ele_tbl%ntot_id, edge_ele_tbl%ntot_list,                 &
+     &    edge_ele_tbl%num_hash, edge_ele_tbl%istack_hash,              &
+     &    edge_ele_tbl%id_hash)
+!
+      call mark_all_edges_by_ele(ele%numele, ele%nnod_4_ele, ele%ie,    &
+     &    edge_ele_tbl%ntot_id, edge_ele_tbl%ntot_list,                 &
+     &    edge_ele_tbl%istack_hash, edge_ele_tbl%iend_hash,             &
+     &    edge_ele_tbl%id_hash, edge_ele_tbl%iflag_hash)
+!
+      end subroutine const_edge_hash_4_ele
+!
+!------------------------------------------------------------------
+!
+      subroutine const_part_edge_hash_4_ele                             &
+     &         (ele, numele_part, iele_part, edge_ele_tbl)
+!
+      use set_edge_hash_by_ele
+!
+      integer(kind = kint), intent(in) :: numele_part
+      integer(kind = kint), intent(in) :: iele_part(numele_part)
+      type(element_data), intent(in) :: ele
+!
+      type(sum_hash_tbl), intent(inout) :: edge_ele_tbl
+!
+!
+      call count_part_edge_hash_4_ele                                   &
+     &   (ele%numele, ele%nnod_4_ele, ele%ie, numele_part, iele_part,   &
+     &    edge_ele_tbl%ntot_id, edge_ele_tbl%num_hash,                  &
+     &    edge_ele_tbl%istack_hash, edge_ele_tbl%iend_hash)
+!
+      call set_part_edge_hash_4_ele                                     &
+     &   (ele%numele, ele%nnod_4_ele, ele%ie, numele_part, iele_part,   &
+     &    edge_ele_tbl%ntot_id, edge_ele_tbl%ntot_list,                 &
+     &    edge_ele_tbl%num_hash, edge_ele_tbl%istack_hash,              &
+     &    edge_ele_tbl%id_hash)
+!
+      call mark_all_edges_by_ele(ele%numele, ele%nnod_4_ele, ele%ie,    &
+     &    edge_ele_tbl%ntot_id, edge_ele_tbl%ntot_list,                 &
+     &    edge_ele_tbl%istack_hash, edge_ele_tbl%iend_hash,             &
+     &    edge_ele_tbl%id_hash, edge_ele_tbl%iflag_hash)
+!
+      end subroutine const_part_edge_hash_4_ele
+!
+!------------------------------------------------------------------
 !
       end module const_edge_data

@@ -111,13 +111,11 @@
 !
 !
       if( (ucd_param%iflag_format/icent) .eq. 1) then
-        call set_single_ucd_file_name                                   &
-     &     (ucd_param%file_prefix, ucd_param%iflag_format,              &
-     &      istep_ucd, file_name)
+        file_name = set_single_ucd_file_name(ucd_param%file_prefix,     &
+     &             ucd_param%iflag_format, istep_ucd)
       else
-        call set_parallel_ucd_file_name                                 &
-     &     (ucd_param%file_prefix, ucd_param%iflag_format,              &
-     &      my_rank, istep_ucd, file_name)
+        file_name = set_parallel_ucd_file_name(ucd_param%file_prefix,   &
+     &             ucd_param%iflag_format, my_rank, istep_ucd)
       end if
 !
       if      (ucd_param%iflag_format .eq. iflag_sgl_vtk) then
@@ -195,8 +193,8 @@
 !
 !
       if( (ucd_param%iflag_format/icent) .eq. 1) then
-        call set_single_grd_file_name                                   &
-     &     (ucd_param%file_prefix, ucd_param%iflag_format, file_name)
+        file_name = set_single_grd_file_name                            &
+     &            (ucd_param%file_prefix, ucd_param%iflag_format)
       end if
 !
       if(ucd_param%iflag_format .eq. iflag_sgl_vtd) then

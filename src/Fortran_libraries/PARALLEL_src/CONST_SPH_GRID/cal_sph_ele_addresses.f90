@@ -33,9 +33,9 @@
 !!     &                            (lt, mp, stbl)
 !!      integer(kind = kint) function sph_exter_ctr_shell_ele_id        &
 !!     &                            (ip_t, lt, mp, stbl)
-!!      integer(kind= kint) function sph_inter_ctr_spole_ele_id(mp)
-!!      integer(kind= kint) function sph_inter_ctr_npole_ele_id(mp)
-!!      integer(kind= kint) function sph_exter_ctr_npole_ele_id(mp)
+!!      integer(kind = kint) function sph_inter_ctr_spole_ele_id(mp)
+!!      integer(kind = kint) function sph_inter_ctr_npole_ele_id(mp)
+!!      integer(kind = kint) function sph_exter_ctr_npole_ele_id(mp)
 !!
 !!      integer(kind = kint_gl) function global_sph_shell_ele_id        &
 !!                                     (kr, lt, mp, stbl)
@@ -45,8 +45,8 @@
 !!     &                               (kr, mp, stbl)
 !!      integer(kind = kint_gl) function global_ctr_shell_ele_id        &
 !!     &                               (lt, mp, stbl)
-!!      integer(kind= kint_gl) function global_ctr_spole_ele_id(mp)
-!!      integer(kind= kint_gl) function global_ctr_npole_ele_id(mp)
+!!      integer(kind = kint_gl) function global_ctr_spole_ele_id(mp)
+!!      integer(kind = kint_gl) function global_ctr_npole_ele_id(mp)
 !!@endverbatim
 !!
 !
@@ -331,7 +331,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer(kind= kint) function sph_inter_ctr_spole_ele_id(mp)
+      integer(kind = kint) function sph_inter_ctr_spole_ele_id(mp)
 !
       integer(kind = kint), intent(in) :: mp
 !
@@ -344,7 +344,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer(kind= kint) function sph_inter_ctr_npole_ele_id(mp)
+      integer(kind = kint) function sph_inter_ctr_npole_ele_id(mp)
 !
       integer(kind = kint), intent(in) :: mp
 !
@@ -357,7 +357,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer(kind= kint) function sph_exter_ctr_npole_ele_id(mp)
+      integer(kind = kint) function sph_exter_ctr_npole_ele_id(mp)
 !
       integer(kind = kint), intent(in) :: mp
 !
@@ -436,7 +436,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer(kind= kint_gl) function global_ctr_spole_ele_id(mp)
+      integer(kind = kint_gl) function global_ctr_spole_ele_id(mp)
 !
       integer(kind = kint), intent(in) :: mp
 !
@@ -449,7 +449,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer(kind= kint_gl) function global_ctr_npole_ele_id(mp)
+      integer(kind = kint_gl) function global_ctr_npole_ele_id(mp)
 !
       integer(kind = kint), intent(in) :: mp
 !

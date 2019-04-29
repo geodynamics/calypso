@@ -8,16 +8,22 @@
 !!
 !!@verbatim
 !!      subroutine gz_read_edge_connection                              &
-!!     &         (my_rank_IO, comm_IO, ele_IO, sfed_IO, ierr)
-!!      subroutine gz_write_edge_connection                             &
-!!     &         (my_rank_IO, comm_IO, ele_IO, sfed_IO)
-!!
-!!      subroutine gz_read_edge_geometry(nod_IO, sfed_IO)
-!!      subroutine gz_write_edge_geometry(nod_IO, sfed_IO)
+!!     &         (id_rank, comm_IO, ele_IO, sfed_IO, ierr)
 !!        type(communication_table), intent(inout) :: comm_IO
-!!        type(node_data), intent(inout) :: nod_IO
 !!        type(element_data), intent(inout) :: ele_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!      subroutine gz_write_edge_connection                             &
+!!     &         (id_rank, comm_IO, ele_IO, sfed_IO)
+!!        type(communication_table), intent(in) :: comm_IO
+!!        type(element_data), intent(in) :: ele_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
+!!
+!!      subroutine gz_read_edge_geometry(nod_IO, sfed_IO)
+!!        type(node_data), intent(inout) :: nod_IO
+!!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!!      subroutine gz_write_edge_geometry(nod_IO, sfed_IO)
+!!        type(node_data), intent(in) :: nod_IO
+!!        type(surf_edge_IO_data), intent(in) :: sfed_IO
 !!@endverbatim
 !
 !
@@ -40,13 +46,13 @@
 !------------------------------------------------------------------
 !
       subroutine gz_read_edge_connection                                &
-     &         (my_rank_IO, comm_IO, ele_IO, sfed_IO, ierr)
+     &         (id_rank, comm_IO, ele_IO, sfed_IO, ierr)
 !
       use m_fem_mesh_labels
       use gz_domain_data_IO
       use gz_element_connect_IO
 !
-      integer (kind = kint), intent(in) :: my_rank_IO
+      integer, intent(in) :: id_rank
       type(communication_table), intent(inout) :: comm_IO
       type(element_data), intent(inout) :: ele_IO
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
@@ -59,7 +65,7 @@
 !      write(id_file,'(a,a1)') '!' , char(0)
 !      write(id_file,'(a,a1)', advance='NO') hd_fem_para(), char(0)
 !
-      call gz_read_domain_info(my_rank_IO, comm_IO, ierr)
+      call gz_read_domain_info(id_rank, comm_IO, ierr)
 !
 !      write(id_file,'(a,a1)') '!', char(0)
 !      write(id_file,'(a,a1)') '!  2  edge connectivity', char(0)
@@ -102,16 +108,16 @@
 !------------------------------------------------------------------
 !
       subroutine gz_write_edge_connection                               &
-     &         (my_rank_IO, comm_IO, ele_IO, sfed_IO)
+     &         (id_rank, comm_IO, ele_IO, sfed_IO)
 !
       use m_fem_mesh_labels
       use gz_domain_data_IO
       use gz_element_connect_IO
 !
-      integer (kind = kint), intent(in) :: my_rank_IO
-      type(communication_table), intent(inout) :: comm_IO
-      type(element_data), intent(inout) :: ele_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      integer, intent(in) :: id_rank
+      type(communication_table), intent(in) :: comm_IO
+      type(element_data), intent(in) :: ele_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
 !
       textbuf = hd_edge_para() // char(0)
@@ -119,7 +125,7 @@
       textbuf = hd_fem_para() // char(0)
       call gz_write_textbuf_no_lf
 !
-      call gz_write_domain_info(my_rank_IO, comm_IO)
+      call gz_write_domain_info(id_rank, comm_IO)
 !
       textbuf = hd_edge_connect() // char(0)
       call gz_write_textbuf_no_lf
@@ -135,7 +141,6 @@
       call gz_write_textbuf_no_lf
 !
       call gz_write_edge_4_element(sfed_IO)
-!
 !
 !
       textbuf = hd_edge_import() // char(0)
@@ -190,8 +195,8 @@
 !
       use gz_node_geometry_IO
 !
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
 !
 !
       textbuf = hd_edge_point() // char(0)

@@ -96,7 +96,7 @@
       type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
 !
       integer(kind = kint) :: ip, ist, j_st, nd_st
-      integer(kind = 4) :: Nfft4, howmany, idist_r, idist_c
+      integer :: Nfft4, howmany, idist_r, idist_c
       integer, parameter :: IONE_4 = 1
       integer, parameter :: inembed = 0
       integer, parameter :: istride = 1

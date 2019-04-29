@@ -8,15 +8,17 @@
 !!@n     $omp parallel is required to use these routines
 !!
 !!@verbatim
-!!      subroutine copy_velo_to_grad_v_rtp(sph_rtp, b_trns, ft_trns,    &
-!!     &          ncomp_rj_2_rtp, ncomp_tmp_rtp_2_rj, fld_rtp, frt_rtp)
-!!      subroutine cal_grad_of_velocities_sph                           &
-!!     &         (sph_rj, r_2nd, sph_bc_U, g_sph_rj, ipol, rj_fld)
+!!      subroutine copy_vectors_rtp_4_grad                              &
+!!     &         (sph, b_trns, fn_trns, trns_b_MHD, trns_f_ngSGS)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(sph_boundary_type), intent(in)  :: sph_bc_U
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_data), intent(inout) :: rj_fld
+!!      subroutine copy_vect_to_grad_vect_rtp                           &
+!!     &         (sph_rtp, ib_vect, if_grad_vx, if_grad_vy, if_grad_vz, &
+!!     &          ncomp_rj_2_rtp, ncomp_rtp_2_rj, fld_rtp, frc_rtp)
+!!      subroutine sel_scalar_from_trans(sph_rtp, v_rtp, d_sph)
 !!@endverbatim
 !
       module sph_poynting_flux_smp
@@ -24,9 +26,12 @@
       use m_precision
       use m_machine_parameter
 !
+      use t_spheric_parameter
+      use t_spheric_rtp_data
       use t_phys_address
+      use t_addresses_sph_transform
 !
-      private :: copy_grad_vect_to_m_stretch, sel_scalar_from_trans
+      private :: copy_grad_vect_to_m_stretch
 !
 ! -----------------------------------------------------------------------
 !
@@ -34,37 +39,77 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_velo_to_grad_v_rtp(sph_rtp, b_trns, ft_trns,      &
-     &          ncomp_rj_2_rtp, ncomp_tmp_rtp_2_rj, fld_rtp, frt_rtp)
+      subroutine copy_vectors_rtp_4_grad                                &
+     &         (sph, b_trns, fn_trns, trns_b_MHD, trns_f_ngSGS)
 !
-      use t_spheric_rtp_data
-      use t_phys_address
+      type(sph_grids), intent(in) :: sph
+      type(phys_address), intent(in) :: b_trns, fn_trns
+!
+      type(address_each_sph_trans), intent(in) :: trns_b_MHD
+      type(address_each_sph_trans), intent(inout) :: trns_f_ngSGS
+!
+!
+      if(b_trns%i_velo .gt. 0) then
+        call copy_vect_to_grad_vect_rtp(sph%sph_rtp, b_trns%i_velo,     &
+     &      fn_trns%i_grad_vx, fn_trns%i_grad_vy, fn_trns%i_grad_vz,    &
+     &      trns_b_MHD%ncomp, trns_f_ngSGS%ncomp,                       &
+     &      trns_b_MHD%fld_rtp, trns_f_ngSGS%fld_rtp)
+      end if
+      if(b_trns%i_vort .gt. 0) then
+        call copy_vect_to_grad_vect_rtp(sph%sph_rtp, b_trns%i_vort,     &
+     &      fn_trns%i_grad_wx, fn_trns%i_grad_wy, fn_trns%i_grad_wz,    &
+     &      trns_b_MHD%ncomp, trns_f_ngSGS%ncomp,                       &
+     &      trns_b_MHD%fld_rtp, trns_f_ngSGS%fld_rtp)
+      end if
+      if(b_trns%i_vecp .gt. 0) then
+        call copy_vect_to_grad_vect_rtp(sph%sph_rtp, b_trns%i_vecp,     &
+     &      fn_trns%i_grad_ax, fn_trns%i_grad_ay, fn_trns%i_grad_az,    &
+     &      trns_b_MHD%ncomp, trns_f_ngSGS%ncomp,                       &
+     &      trns_b_MHD%fld_rtp, trns_f_ngSGS%fld_rtp)
+      end if
+      if(b_trns%i_magne .gt. 0) then
+        call copy_vect_to_grad_vect_rtp(sph%sph_rtp, b_trns%i_magne,    &
+     &      fn_trns%i_grad_bx, fn_trns%i_grad_by, fn_trns%i_grad_bz,    &
+     &      trns_b_MHD%ncomp, trns_f_ngSGS%ncomp,                       &
+     &      trns_b_MHD%fld_rtp, trns_f_ngSGS%fld_rtp)
+      end if
+      if(b_trns%i_current .gt. 0) then
+        call copy_vect_to_grad_vect_rtp(sph%sph_rtp, b_trns%i_current,  &
+     &      fn_trns%i_grad_jx, fn_trns%i_grad_jy, fn_trns%i_grad_jz,    &
+     &      trns_b_MHD%ncomp, trns_f_ngSGS%ncomp,                       &
+     &      trns_b_MHD%fld_rtp, trns_f_ngSGS%fld_rtp)
+      end if
+!
+      end subroutine copy_vectors_rtp_4_grad
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine copy_vect_to_grad_vect_rtp                             &
+     &         (sph_rtp, ib_vect, if_grad_vx, if_grad_vy, if_grad_vz,   &
+     &          ncomp_rj_2_rtp, ncomp_rtp_2_rj, fld_rtp, frc_rtp)
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(phys_address), intent(in) :: b_trns
-      type(phys_address), intent(in) :: ft_trns
+      integer(kind = kint), intent(in) :: ib_vect
+      integer(kind = kint), intent(in) :: if_grad_vx, if_grad_vy
+      integer(kind = kint), intent(in) :: if_grad_vz
       integer(kind = kint), intent(in) :: ncomp_rj_2_rtp
-      integer(kind = kint), intent(in) :: ncomp_tmp_rtp_2_rj
+      integer(kind = kint), intent(in) :: ncomp_rtp_2_rj
+!
       real(kind = kreal), intent(in)                                    &
-     &                   :: fld_rtp(sph_rtp%nnod_rtp,ncomp_rj_2_rtp)
+     &           :: fld_rtp(sph_rtp%nnod_rtp,ncomp_rj_2_rtp)
       real(kind = kreal), intent(inout)                                 &
-     &                   :: frt_rtp(sph_rtp%nnod_rtp,ncomp_tmp_rtp_2_rj)
+     &           :: frc_rtp(sph_rtp%nnod_rtp,ncomp_rtp_2_rj)
 !
 !
-      if(ft_trns%i_grad_vx.gt.0) then
-        call sel_scalar_from_trans(sph_rtp,                             &
-     &      fld_rtp(1,b_trns%i_velo  ), frt_rtp(1,ft_trns%i_grad_vx) )
-      end if
-      if(ft_trns%i_grad_vy.gt.0) then
-        call sel_scalar_from_trans(sph_rtp,                             &
-     &      fld_rtp(1,b_trns%i_velo+1), frt_rtp(1,ft_trns%i_grad_vy) )
-      end if
-      if(ft_trns%i_grad_vz.gt.0) then
-        call sel_scalar_from_trans(sph_rtp,                             &
-     &      fld_rtp(1,b_trns%i_velo+2), frt_rtp(1,ft_trns%i_grad_vz) )
-      end if
+      if(if_grad_vx .gt. 0) call sel_scalar_from_trans                  &
+     &     (sph_rtp, fld_rtp(1,ib_vect  ), frc_rtp(1,if_grad_vx) )
+      if(if_grad_vy .gt. 0) call sel_scalar_from_trans                  &
+     &      (sph_rtp, fld_rtp(1,ib_vect+1), frc_rtp(1,if_grad_vy) )
+      if(if_grad_vz .gt. 0) call sel_scalar_from_trans                  &
+     &      (sph_rtp, fld_rtp(1,ib_vect+2), frc_rtp(1,if_grad_vz) )
 !
-      end subroutine copy_velo_to_grad_v_rtp
+      end subroutine copy_vect_to_grad_vect_rtp
 !
 ! -----------------------------------------------------------------------
 !
@@ -116,7 +161,7 @@
 !
 !$omp parallel
       call copy_scalar_from_trans_smp(sph_rtp%nnod_rtp, ione,           &
-     &    sph_rtp%istack_inod_rtp_smp, sph_rtp%nnod_rtp, v_rtp, d_sph)
+     &    sph_rtp%nnod_rtp, v_rtp, d_sph)
 !$omp end parallel
 !
       end subroutine sel_scalar_from_trans

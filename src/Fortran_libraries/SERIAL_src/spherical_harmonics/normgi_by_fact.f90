@@ -64,7 +64,7 @@
       real(kind = kreal) :: ssqu, tsum, tfac
 !
 !
-      is = int((l1+l2+l3)/2)
+      is = int((l1+l2+l3)/2, KIND(is))
 !*
       itmax =  min((l1-m1), (l3-m3), (l2+l3-m1))
       itmin = -min((l2-l3+m1), (l1+m1), izero)
@@ -183,7 +183,7 @@
       real(kind = kreal) :: tfp1, tfp2, tfn1, tfn2, tfn3, tfn4
 !
 !
-      is = int((l1+l2+l3)/2)
+      is = int((l1+l2+l3)/2, KIND(is))
 !*
       itmax =  min((l1-m1), (l3-m3), (l2+l3-m1))
       itmin = -min((l2-l3+m1), (l1+m1), izero)

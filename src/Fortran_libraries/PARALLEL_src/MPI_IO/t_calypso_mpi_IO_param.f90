@@ -7,15 +7,32 @@
 !> @brief Base parameter structure for MPI-IO
 !!
 !!@verbatim
-!!      subroutine alloc_istack_merge(id_rank_IO, nprocs_IO, IO_param)
+!!      subroutine alloc_istack_merge(id_rank, nprocs_in, IO_param)
 !!      subroutine dealloc_istack_merge(IO_param)
 !!
-!!      subroutine mpi_write_chara_array_mul(id_file, nprocs_in, nloop, &
-!!     &          ioff_gl, istack_merged, c_array)
-!!      subroutine mpi_read_chara_array_mul(id_file, nprocs_in, nloop,  &
-!!     &          ioff_gl, istack_merged, c_array)
+!!      integer(kind = kint) function rank_in_multi_domain(iloop)
+!!      integer(kind = kint) function num_loop_4_multi_domain(nprocs_in)
+!!      subroutine copy_istack_4_parallell_data(istack8, IO_param)
+!!      subroutine mul_istack_4_parallell_vect(nvect, IO_param)
+!!      subroutine set_numbers_2_head_node(num_local, IO_param)
+!!
+!!      subroutine istack64_4_parallel_data(num_local, IO_param)
+!!      subroutine set_istack_over_subdomains                           &
+!!     &         (nprocs_in, nloop, num_local, istack_merged)
+!!      subroutine set_istack_4_fixed_num(num_local, IO_param)
+!!
 !!      subroutine set_istack_by_chara_length                           &
 !!     &         (nprocs_in, nloop, c_array, istack_merged)
+!!      subroutine set_istack_by_i8_buffer                              &
+!!     &         (nprocs_in, nloop, i8_array, istack_merged)
+!!      subroutine set_istack_by_int_buffer                             &
+!!     &         (nprocs_in, nloop, i_array, istack_merged)
+!!      subroutine set_istack_by_int2d_buffer                           &
+!!     &         (nprocs_in, nloop, iv_array, istack_merged)
+!!      subroutine set_istack_by_real_buffer                            &
+!!     &         (nprocs_in, nloop, r_array, istack_merged)
+!!      subroutine set_istack_by_vector_buffer                          &
+!!     &         (nprocs_in, nloop, v_array, istack_merged)
 !!@endverbatim
 !
       module t_calypso_mpi_IO_param
@@ -30,39 +47,39 @@
 !
 !>      Structure for real array for MPI-IO
       type realarray_IO
-        integer(kind = kint) :: num
+        integer(kind = kint_gl) :: num
         real(kind = kreal), allocatable :: r_IO(:)
       end type realarray_IO
 !
 !>      Structure for 2D vectr array for MPI-IO
       type vectarray_IO
-        integer(kind = kint) :: n1
+        integer(kind = kint_gl) :: n1
         integer(kind = kint) :: n2
         real(kind = kreal), allocatable :: v_IO(:,:)
       end type vectarray_IO
 !
 !>      Structure for integer array for MPI-IO
       type intarray_IO
-        integer(kind = kint) :: num
+        integer(kind = kint_gl) :: num
         integer(kind = kint), allocatable :: i_IO(:)
       end type intarray_IO
 !
 !>      Structure for integer vector array for MPI-IO
       type ivecarray_IO
-        integer(kind = kint) :: n1
+        integer(kind = kint_gl) :: n1
         integer(kind = kint) :: n2
         integer(kind = kint), allocatable :: iv_IO(:,:)
       end type ivecarray_IO
 !
 !>      Structure for 8-byte integer array for MPI-IO
       type int8array_IO
-        integer(kind = kint) :: num
+        integer(kind = kint_gl) :: num
         integer(kind = kint_gl), allocatable :: i8_IO(:)
       end type int8array_IO
 !
 !>      Structure for 8-byte integer array for MPI-IO
       type charaarray_IO
-        integer(kind = kint) :: num
+        integer(kind = kint_gl) :: num
         character(len = 1), allocatable :: c_IO(:)
       end type charaarray_IO
 !
@@ -70,10 +87,12 @@
       type calypso_MPI_IO_params
 !>        File ID for MPI-IO
         integer ::  id_file
+!>        Byte swap flag for binary data
+        integer ::  iflag_bin_swap = -1
 !>        process ID for MPI-IO
-        integer(kind=kint) ::  id_rank
+        integer ::  id_rank
 !>        number of subdomains (not equal to number of processes)
-        integer(kind=kint) ::  nprocs_in
+        integer ::  nprocs_in
 !>        maximum number of loops for subdomains in one process
         integer(kind=kint) ::  nloop = 1
 !
@@ -107,17 +126,17 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine alloc_istack_merge(id_rank_IO, nprocs_IO, IO_param)
+      subroutine alloc_istack_merge(id_rank, nprocs_in, IO_param)
 !
-      integer(kind = kint), intent(in) :: nprocs_IO, id_rank_IO
+      integer, intent(in) :: nprocs_in, id_rank
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
 !
-      IO_param%id_rank =   id_rank_IO
-      IO_param%nprocs_in = nprocs_IO
+      IO_param%id_rank =   id_rank
+      IO_param%nprocs_in = nprocs_in
       IO_param%nloop = (IO_param%nprocs_in - 1) / nprocs
 
-      if( (IO_param%nloop*nprocs + my_rank) .lt. nprocs_IO) then
+      if( (IO_param%nloop*nprocs + my_rank) .lt. nprocs_in) then
         IO_param%nloop = IO_param%nloop + 1
       end if
       if(i_debug .gt. 0) write(*,*) 'IO_param%nloop',                   &
@@ -207,7 +226,7 @@
 !
       integer(kind = kint) function num_loop_4_multi_domain(nprocs_in)
 !
-      integer(kind = kint), intent(in) :: nprocs_in
+      integer, intent(in) :: nprocs_in
       integer(kind = kint) :: id_rank, nloop
 !
       nloop = (nprocs_in - 1) / nprocs
@@ -259,26 +278,25 @@
       integer(kind = kint) :: num_global(nprocs)
 !
 !
-      call MPI_Allgather(num_local, ione, CALYPSO_INTEGER,              &
-     &    num_global, ione, CALYPSO_INTEGER, CALYPSO_COMM,              &
-     &    ierr_MPI)
+      call MPI_Allgather(num_local, 1, CALYPSO_INTEGER,                 &
+     &    num_global, 1, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
       IO_param%istack_merged(1:nprocs) = num_global(1:nprocs)
 !
       end subroutine set_numbers_2_head_node
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_istack_4_parallell_data(num_local, IO_param)
+      subroutine istack64_4_parallel_data(num_local, IO_param)
 !
-      integer(kind = kint), intent(in) :: num_local
+      integer(kind = kint_gl), intent(in) :: num_local
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
-      integer(kind = kint) :: num_global(nprocs)
+      integer(kind = kint_gl) :: num_global(nprocs)
       integer(kind = kint) :: ip
 !
 !
-      call MPI_Allgather(num_local, ione, CALYPSO_INTEGER,              &
-     &    num_global, ione, CALYPSO_INTEGER, CALYPSO_COMM,              &
+      call MPI_Allgather(num_local, 1, CALYPSO_GLOBAL_INT,              &
+     &    num_global, 1, CALYPSO_GLOBAL_INT, CALYPSO_COMM,              &
      &    ierr_MPI)
 !
       IO_param%istack_merged(0) = 0
@@ -287,20 +305,22 @@
      &                              + num_global(ip)
       end do
 !
-      end subroutine set_istack_4_parallell_data
+      end subroutine istack64_4_parallel_data
 !
 !  ---------------------------------------------------------------------
 !
       subroutine set_istack_over_subdomains                             &
      &         (nprocs_in, nloop, num_local, istack_merged)
 !
-      integer(kind = kint), intent(in) :: nloop, nprocs_in
-      integer(kind = kint), intent(in) :: num_local(nloop)
+      integer, intent(in) :: nprocs_in
+      integer(kind = kint), intent(in) :: nloop
+      integer(kind = kint_gl), intent(in) :: num_local(nloop)
       integer(kind = kint_gl), intent(inout)                            &
      &                         :: istack_merged(0:nprocs_in)
 !
-      integer(kind = kint) :: num_lc(0:nprocs_in)
-      integer(kind = kint) :: num_gl(0:nprocs_in)
+      integer(kind = kint_gl) :: num64
+      integer(kind = kint_gl) :: num_lc(0:nprocs_in)
+      integer(kind = kint_gl) :: num_gl(0:nprocs_in)
       integer(kind = kint) :: iloop, ip
 !
 !
@@ -314,8 +334,8 @@
         num_lc(ip) = num_local(iloop)
       end do
 !
-      call MPI_allREDUCE(num_lc, num_gl, nprocs_in,                     &
-     &    CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      num64 = int(nprocs_in,KIND(num64))
+      call calypso_mpi_allreduce_int8(num_lc, num_gl, num64, MPI_SUM)
 !
       istack_merged(0) = 0
       do ip = 1, nprocs_in
@@ -346,12 +366,13 @@
       subroutine set_istack_by_chara_length                             &
      &         (nprocs_in, nloop, c_array, istack_merged)
 !
-      integer(kind = kint), intent(in) :: nloop, nprocs_in
+      integer, intent(in) :: nprocs_in
+      integer(kind = kint), intent(in) :: nloop
       type(charaarray_IO), intent(inout) ::  c_array(nloop)
       integer(kind = kint_gl), intent(inout)                            &
      &                         :: istack_merged(0:nprocs_in)
 !
-      integer(kind = kint) :: num_local(nloop)
+      integer(kind = kint_gl) :: num_local(nloop)
 !
 !
       num_local(1:nloop) = c_array(1:nloop)%num
@@ -365,12 +386,13 @@
       subroutine set_istack_by_i8_buffer                                &
      &         (nprocs_in, nloop, i8_array, istack_merged)
 !
-      integer(kind = kint), intent(in) :: nloop, nprocs_in
+      integer, intent(in) :: nprocs_in
+      integer(kind = kint), intent(in) :: nloop
       type(int8array_IO), intent(inout) ::  i8_array(nloop)
       integer(kind = kint_gl), intent(inout)                            &
      &                         :: istack_merged(0:nprocs_in)
 !
-      integer(kind = kint) :: num_local(nloop)
+      integer(kind = kint_gl) :: num_local(nloop)
 !
 !
       num_local(1:nloop) = i8_array(1:nloop)%num * kint_gl
@@ -384,12 +406,13 @@
       subroutine set_istack_by_int_buffer                               &
      &         (nprocs_in, nloop, i_array, istack_merged)
 !
-      integer(kind = kint), intent(in) :: nloop, nprocs_in
+      integer, intent(in) :: nprocs_in
+      integer(kind = kint), intent(in) :: nloop
       type(intarray_IO), intent(inout) ::  i_array(nloop)
       integer(kind = kint_gl), intent(inout)                            &
      &                         :: istack_merged(0:nprocs_in)
 !
-      integer(kind = kint) :: num_local(nloop)
+      integer(kind = kint_gl) :: num_local(nloop)
 !
 !
       num_local(1:nloop) = i_array(1:nloop)%num * kint
@@ -403,12 +426,13 @@
       subroutine set_istack_by_int2d_buffer                             &
      &         (nprocs_in, nloop, iv_array, istack_merged)
 !
-      integer(kind = kint), intent(in) :: nloop, nprocs_in
+      integer, intent(in) :: nprocs_in
+      integer(kind = kint), intent(in) :: nloop
       type(ivecarray_IO), intent(inout) ::  iv_array(nloop)
       integer(kind = kint_gl), intent(inout)                            &
      &                         :: istack_merged(0:nprocs_in)
 !
-      integer(kind = kint) :: num_local(nloop)
+      integer(kind = kint_gl) :: num_local(nloop)
 !
 !
       num_local(1:nloop) = iv_array(1:nloop)%n1                         &
@@ -423,12 +447,13 @@
       subroutine set_istack_by_real_buffer                              &
      &         (nprocs_in, nloop, r_array, istack_merged)
 !
-      integer(kind = kint), intent(in) :: nloop, nprocs_in
+      integer, intent(in) :: nprocs_in
+      integer(kind = kint), intent(in) :: nloop
       type(realarray_IO), intent(inout) ::  r_array(nloop)
       integer(kind = kint_gl), intent(inout)                            &
      &                         :: istack_merged(0:nprocs_in)
 !
-      integer(kind = kint) :: num_local(nloop)
+      integer(kind = kint_gl) :: num_local(nloop)
 !
 !
       num_local(1:nloop) = r_array(1:nloop)%num * kreal
@@ -442,12 +467,13 @@
       subroutine set_istack_by_vector_buffer                            &
      &         (nprocs_in, nloop, v_array, istack_merged)
 !
-      integer(kind = kint), intent(in) :: nloop, nprocs_in
+      integer, intent(in) :: nprocs_in
+      integer(kind = kint), intent(in) :: nloop
       type(vectarray_IO), intent(inout) ::  v_array(nloop)
       integer(kind = kint_gl), intent(inout)                            &
      &                         :: istack_merged(0:nprocs_in)
 !
-      integer(kind = kint) :: num_local(nloop)
+      integer(kind = kint_gl) :: num_local(nloop)
 !
 !
       num_local(1:nloop) = v_array(1:nloop)%n1                          &

@@ -11,7 +11,8 @@
   #define open_ad_rawfile           open_ad_rawfile_
   #define open_rd_rawfile           open_rd_rawfile_
   #define close_rawfile             close_rawfile_
-  #define rawread_f                 rawread_f_
+  #define rawread_32bit_f           rawread_32bit_f_
+  #define rawread_64bit_f           rawread_64bit_f_
   #define rawwrite_f                rawwrite_f_
   #define rawseek_go_fwd_f          rawseek_go_fwd_f_
 
@@ -23,7 +24,8 @@
   #define write_compress_txt        write_compress_txt_
   #define write_compress_txt_nolf   write_compress_txt_nolf_
   #define gzseek_go_fwd_f           gzseek_go_fwd_f_
-  #define gzread_f                  gzread_f_
+  #define gzread_32bit_f            gzread_32bit_f_
+  #define gzread_64bit_f            gzread_64bit_f_
   #define gzwrite_f                 gzwrite_f_
   #define get_one_line_from_gz      get_one_line_from_gz_
   #define compress_file             compress_file_
@@ -37,8 +39,16 @@
   #define gzip_infleat_cont         gzip_infleat_cont_
   #define gzip_infleat_last         gzip_infleat_last_
 
-  #define write_png_rgba_c          write_png_rgba_c_
-  #define write_png_rgb_c           write_png_rgb_c_
+  #define write_png_rgba_c           write_png_rgba_c_
+  #define write_png_rgb_c            write_png_rgb_c_
+  #define read_png_file_c            read_png_file_c_
+  #define copy_rgb_from_png_c        copy_rgb_from_png_c_
+  #define copy_rgba_from_png_c       copy_rgba_from_png_c_
+  #define copy_grayscale_from_png_c  copy_grayscale_from_png_c
+  #define copy_grayalpha_from_png_c  copy_grayalpha_from_png_c
+  #define read_BMP_c                 read_BMP_c_
+  #define copy_rgb_from_BMP_c        copy_rgb_from_BMP_c_
+  #define copy_rgba_from_BMP_c       copy_rgba_from_BMP_c_
 
   #define kemo_fftw_plan_dft_r2c_1d    kemo_fftw_plan_dft_r2c_1d_
   #define kemo_fftw_plan_dft_c2r_1d    kemo_fftw_plan_dft_c2r_1d_
@@ -55,7 +65,8 @@
   #define open_ad_rawfile           OPEN_AD_RAWFILE
   #define open_rd_rawfile           OPEN_RD_RAWFILE
   #define close_rawfile             CLOSE_RAWFILE
-  #define rawread_f                 RAWREAD_F
+  #define rawread_32bit_f           RAWREAD_32BIT_F
+  #define rawread_64bit_f           RAWREAD_64BIT_F
   #define rawwrite_f                RAWWRITE_F
   #define rawseek_go_fwd_f          RAWSEEK_GO_FWD_F
 
@@ -67,7 +78,8 @@
   #define write_compress_txt        WRITE_COMPRESS_TXT
   #define write_compress_txt_nolf   WRITE_COMPRESS_TXT_NOLF
   #define gzseek_go_fwd_f           GZSEEK_GO_FWD_F
-  #define gzread_f                  GZREAD_F
+  #define gzread_32bit_f            GZREAD_32BIT_F
+  #define gzread_64bit_f            GZREAD_64BIT_F
   #define gzwrite_f                 GZWRITE_F
   #define get_one_line_from_gz      GET_ONE_LINE_FROM_GZ
   #define compress_file             COMPRESS_FILE
@@ -81,8 +93,16 @@
   #define gzip_infleat_cont         GZIP_INFLEAT_CONT
   #define gzip_infleat_last         GZIP_INFLEAT_LAST
 
-  #define write_png_rgba_c          WRITE_PNG_RGBA_C
-  #define write_png_rgb_c           WRITE_PNG_RGB_C
+  #define write_png_rgba_c           WRITE_PNG_RGBA_C
+  #define write_png_rgb_c            WRITE_PNG_RGB_C
+  #define read_png_file_c            READ_PNG_FILE_C
+  #define copy_rgb_from_png_c        COPY_RGB_FROM_PNG_C
+  #define copy_rgba_from_png_c       COPY_RGBA_FROM_PNG_C
+  #define copy_grayscale_from_png_c  COPY_GRAYSCALE_FROM_PNG_C
+  #define copy_grayalpha_from_png_c  COPY_GRAYALPHA_FROM_PNG_C
+  #define read_BMP_c                 READ_BMP_C
+  #define copy_rgb_from_BMP_c        COPY_RGB_FROM_BMP_C
+  #define copy_rgba_from_BMP_c       COPY_RGBA_FROM_BMP_C
 
   #define kemo_fftw_plan_dft_r2c_1d    KEMO_FFTW_PLAN_DFT_R2C_1D
   #define kemo_fftw_plan_dft_c2r_1d    KEMO_FFTW_PLAN_DFT_C2R_1D
@@ -99,7 +119,8 @@
   #define open_ad_rawfile           OPEN_AD_RAWFILE
   #define open_rd_rawfile           OPEN_RD_RAWFILE
   #define close_rawfile             CLOSE_RAWFILE
-  #define rawread_f                 RAWREAD_F
+  #define rawread_32bit_f           RAWREAD_32BIT_F
+  #define rawread_64bit_f           RAWREAD_64BIT_F
   #define rawwrite_f                RAWWRITE_F
   #define rawseek_go_fwd_f          RAWSEEK_GO_FWD_F
 
@@ -111,7 +132,8 @@
   #define write_compress_txt        WRITE_COMPRESS_TXT
   #define write_compress_txt_nolf   WRITE_COMPRESS_TXT_NOLF
   #define gzseek_go_fwd_f           GZSEEK_GO_FWD_F
-  #define gzread_f                  GZREAD_F
+  #define gzread_32bit_f            GZREAD_32BIT_F
+  #define gzread_64bit_f            GZREAD_64BIT_F
   #define gzwrite_f                 GZWRITE_F
   #define get_one_line_from_gz      GET_ONE_LINE_FROM_GZ
   #define compress_file             COMPRESS_FILE
@@ -125,8 +147,16 @@
   #define gzip_infleat_cont         GZIP_INFLEAT_CONT
   #define gzip_infleat_last         GZIP_INFLEAT_LAST
 
-  #define write_png_rgba_c          WRITE_PNG_RGBA_C
-  #define write_png_rgb_c           WRITE_PNG_RGB_C
+  #define write_png_rgba_c           WRITE_PNG_RGBA_C
+  #define write_png_rgb_c            WRITE_PNG_RGB_C
+  #define read_png_file_c            READ_PNG_FILE_C
+  #define copy_rgb_from_png_c        COPY_RGB_FROM_PNG_C
+  #define copy_rgba_from_png_c       COPY_RGBA_FROM_PNG_C
+  #define copy_grayscale_from_png_c  COPY_GRAYSCALE_FROM_PNG_C
+  #define copy_grayalpha_from_png_c  COPY_GRAYALPHA_FROM_PNG_C
+  #define read_BMP_c                 READ_BMP_C
+  #define copy_rgb_from_BMP_c        COPY_RGB_FROM_BMP_C
+  #define copy_rgba_from_BMP_c       COPY_RGBA_FROM_BMP_C
 
   #define kemo_fftw_plan_dft_r2c_1d    KEMO_FFTW_PLAN_DFT_R2C_1D
   #define kemo_fftw_plan_dft_c2r_1d    KEMO_FFTW_PLAN_DFT_C2R_1D
@@ -143,7 +173,8 @@
   #define open_ad_rawfile           open_ad_rawfile
   #define open_rd_rawfile           open_rd_rawfile
   #define close_rawfile             close_rawfile
-  #define rawread_f                 rawread_f
+  #define rawread_32bit_f           rawread_32bit_f
+  #define rawread_64bit_f           rawread_64bit_f
   #define rawwrite_f                rawwrite_f
   #define rawseek_go_fwd_f          rawseek_go_fwd_f
 
@@ -155,7 +186,8 @@
   #define write_compress_txt        write_compress_txt
   #define write_compress_txt_nolf   write_compress_txt_nolf
   #define gzseek_go_fwd_f           gzseek_go_fwd_f
-  #define gzread_f                  gzread_f
+  #define gzread_32bit_f            gzread_32bit_f
+  #define gzread_64bit_f            gzread_64bit_f
   #define gzwrite_f                 gzwrite_f
   #define get_one_line_from_gz      get_one_line_from_gz
   #define compress_file             compress_file
@@ -169,8 +201,16 @@
   #define gzip_infleat_cont         gzip_infleat_cont
   #define gzip_infleat_last         gzip_infleat_last
 
-  #define write_png_rgba_c          write_png_rgba_c
-  #define write_png_rgb_c           write_png_rgb_c
+  #define write_png_rgba_c           write_png_rgba_c
+  #define write_png_rgb_c            write_png_rgb_c
+  #define read_png_file_c            read_png_file_c
+  #define copy_rgb_from_png_c        copy_rgb_from_png_c
+  #define copy_rgba_from_png_c       copy_rgba_from_png_c
+  #define copy_grayscale_from_png_c  copy_grayscale_from_png_c
+  #define copy_grayalpha_from_png_c  copy_grayalpha_from_png_c
+  #define read_BMP_c                 read_BMP_c
+  #define copy_rgb_from_BMP_c        copy_rgb_from_BMP_c
+  #define copy_rgba_from_BMP_c       copy_rgba_from_BMP_c
 
   #define kemo_fftw_plan_dft_r2c_1d    kemo_fftw_plan_dft_r2c_1d
   #define kemo_fftw_plan_dft_c2r_1d    kemo_fftw_plan_dft_c2r_1d

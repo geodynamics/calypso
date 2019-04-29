@@ -300,7 +300,7 @@
       real(kind = kreal), intent(inout) :: bc_data(sph_rj%nidx_rj(2))
 !
       integer(kind = kint) :: inum, j
-      integer(kind = 4) :: l, m
+      integer :: l, m
 !
 !
       do inum = 1, bc%num_bc_mode
