@@ -44,9 +44,9 @@
       integer :: ilen_line, ilen_used, ilen_in
 !
 !
-      ilen_line = len(vtk_each_vector(zero, zero, zero))
+      ilen_line = len(vtk_each_scalar(zero))
       zbuf%ilen_gz                                                      &
-     &      = int(real(3*num*ilen_line) * 1.01 + 24,KIND(zbuf%ilen_gz))
+     &      = int(real(num*ilen_line) * 1.01 + 24,KIND(zbuf%ilen_gz))
       call alloc_zip_buffer(zbuf)
 !
       if(num .eq. 1) then
