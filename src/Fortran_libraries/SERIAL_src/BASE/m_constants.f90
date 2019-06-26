@@ -62,9 +62,8 @@
       real(kind = kreal), parameter :: TINY9 =  1.0D-9
 !
 !>      Huge value
-      integer(kind = kint), parameter :: huge_30 = 1073741824
-      integer(kind = kint), parameter :: huge_20 = 1048576
-      integer(kind = kint), parameter :: huge_14 = 16384
+      integer(kind = kint_gl), parameter :: huge_30 = 1073741824
+      integer(kind = kint_gl), parameter :: huge_20 = 1048576
 !
 !>      Turn OFF flag
       integer (kind=kint), parameter :: id_turn_OFF = 0

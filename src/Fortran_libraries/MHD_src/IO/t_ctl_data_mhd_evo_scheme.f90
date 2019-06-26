@@ -7,8 +7,12 @@
 !> @brief Set initial data for spectrum dynamos
 !!
 !!@verbatim
-!!      subroutine read_restart_ctl
-!!      subroutine read_time_loop_ctl
+!!      subroutine read_restart_ctl(id_control, hd_block, mr_ctl, c_buf)
+!!      subroutine read_time_loop_ctl                                   &
+!!     &         (id_control, hd_block, mevo_ctl, c_buf)
+!!        type(mhd_restart_control), intent(inout) :: mr_ctl
+!!        type(mhd_evo_scheme_control), intent(inout) :: mevo_ctl
+!!        type(buffer_for_control), intent(inout)  :: c_buf
 !!
 !! !!!!  control for initial and restart data  !!!!!!!!!!!!!!!!!!!!!!!!!!
 !!   no_data:             No initial values
@@ -92,6 +96,7 @@
       module t_ctl_data_mhd_evo_scheme
 !
       use m_precision
+      use m_machine_parameter
       use t_control_elements
 !
       implicit  none
@@ -100,6 +105,8 @@
 !>   control flage for restart data
       type mhd_restart_control
         type(read_character_item) :: restart_flag_ctl
+!
+        integer (kind=kint) :: i_restart_file =   0
       end type mhd_restart_control
 !
       type mhd_evo_scheme_control
@@ -136,6 +143,8 @@
         type(read_character_item) :: SR_routine
 !
         type(read_integer_item) :: leg_vector_len
+!
+        integer (kind=kint) :: i_time_loop =      0
       end type mhd_evo_scheme_control
 !
 !    4th level for restart
@@ -211,101 +220,105 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_restart_ctl(hd_block, iflag, mr_ctl)
+      subroutine read_restart_ctl(id_control, hd_block, mr_ctl, c_buf)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(mhd_restart_control), intent(inout) :: mr_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(mr_ctl%i_restart_file .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-        call read_chara_ctl_type(hd_rst_flag, mr_ctl%restart_flag_ctl)
+        call read_chara_ctl_type(c_buf, hd_rst_flag,                    &
+     &      mr_ctl%restart_flag_ctl)
       end do
+      mr_ctl%i_restart_file = 1
 !
       end subroutine read_restart_ctl
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_time_loop_ctl(hd_block, iflag, mevo_ctl)
+      subroutine read_time_loop_ctl                                     &
+     &         (id_control, hd_block, mevo_ctl, c_buf)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(mhd_evo_scheme_control), intent(inout) :: mevo_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(mevo_ctl%i_time_loop .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-        call read_chara_ctl_type(hd_scheme, mevo_ctl%scheme_ctl)
-        call read_chara_ctl_type(hd_diff_correct,                       &
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_scheme, mevo_ctl%scheme_ctl)
+        call read_chara_ctl_type(c_buf, hd_diff_correct,                &
      &      mevo_ctl%diffuse_correct)
-        call read_chara_ctl_type(hd_method_4_velo,                      &
+        call read_chara_ctl_type(c_buf, hd_method_4_velo,               &
      &      mevo_ctl%method_4_CN)
-        call read_chara_ctl_type(hd_precond_4_crank,                    &
+        call read_chara_ctl_type(c_buf, hd_precond_4_crank,             &
      &      mevo_ctl%precond_4_CN)
-        call read_chara_ctl_type(hd_sph_transform_mode,                 &
+        call read_chara_ctl_type(c_buf, hd_sph_transform_mode,          &
      &      mevo_ctl%Legendre_trans_type)
-        call read_chara_ctl_type(hd_FFT_package, mevo_ctl%FFT_library)
-        call read_chara_ctl_type(hd_import_mode, mevo_ctl%import_mode)
-        call read_chara_ctl_type(hd_SR_routine,                         &
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_FFT_package, mevo_ctl%FFT_library)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_import_mode, mevo_ctl%import_mode)
+        call read_chara_ctl_type(c_buf, hd_SR_routine,                  &
      &      mevo_ctl%SR_routine)
 !
         call read_real_ctl_type                                         &
-     &     (hd_eps_4_velo,  mevo_ctl%eps_4_velo_ctl)
+     &     (c_buf, hd_eps_4_velo,  mevo_ctl%eps_4_velo_ctl)
         call read_real_ctl_type                                         &
-     &     (hd_eps_4_magne, mevo_ctl%eps_4_magne_ctl)
+     &     (c_buf, hd_eps_4_magne, mevo_ctl%eps_4_magne_ctl)
         call read_real_ctl_type                                         &
-     &     (hd_coef_imp_v,  mevo_ctl%coef_imp_v_ctl)
+     &     (c_buf, hd_coef_imp_v,  mevo_ctl%coef_imp_v_ctl)
         call read_real_ctl_type                                         &
-     &     (hd_coef_imp_t,  mevo_ctl%coef_imp_t_ctl)
+     &     (c_buf, hd_coef_imp_t,  mevo_ctl%coef_imp_t_ctl)
         call read_real_ctl_type                                         &
-     &     (hd_coef_imp_b,  mevo_ctl%coef_imp_b_ctl)
+     &     (c_buf, hd_coef_imp_b,  mevo_ctl%coef_imp_b_ctl)
         call read_real_ctl_type                                         &
-     &     (hd_coef_imp_c,  mevo_ctl%coef_imp_c_ctl)
+     &     (c_buf, hd_coef_imp_c,  mevo_ctl%coef_imp_c_ctl)
         call read_real_ctl_type                                         &
-     &     (hd_eps_crank,   mevo_ctl%eps_crank_ctl)
+     &     (c_buf, hd_eps_crank,   mevo_ctl%eps_crank_ctl)
         call read_real_ctl_type                                         &
-     &     (hd_eps_B_crank, mevo_ctl%eps_B_crank_ctl)
+     &     (c_buf, hd_eps_B_crank, mevo_ctl%eps_B_crank_ctl)
 !
         call read_chara_ctl_type                                        &
-     &     (hd_iflag_supg,   mevo_ctl%iflag_supg_ctl)
+     &     (c_buf, hd_iflag_supg,   mevo_ctl%iflag_supg_ctl)
         call read_chara_ctl_type                                        &
-     &     (hd_iflag_v_supg, mevo_ctl%iflag_supg_v_ctl)
+     &     (c_buf, hd_iflag_v_supg, mevo_ctl%iflag_supg_v_ctl)
         call read_chara_ctl_type                                        &
-     &     (hd_iflag_t_supg, mevo_ctl%iflag_supg_t_ctl)
+     &     (c_buf, hd_iflag_t_supg, mevo_ctl%iflag_supg_t_ctl)
         call read_chara_ctl_type                                        &
-     &     (hd_iflag_b_supg, mevo_ctl%iflag_supg_b_ctl)
+     &     (c_buf, hd_iflag_b_supg, mevo_ctl%iflag_supg_b_ctl)
         call read_chara_ctl_type                                        &
-     &     (hd_iflag_c_supg, mevo_ctl%iflag_supg_c_ctl)
+     &     (c_buf, hd_iflag_c_supg, mevo_ctl%iflag_supg_c_ctl)
 !
-        call read_integer_ctl_type(hd_num_multi_pass,                   &
+        call read_integer_ctl_type(c_buf, hd_num_multi_pass,            &
      &      mevo_ctl%num_multi_pass_ctl)
-        call read_integer_ctl_type(hd_maxiter, mevo_ctl%maxiter_ctl)
-        call read_integer_ctl_type(hd_legendre_vect_len,                &
+        call read_integer_ctl_type(c_buf, hd_maxiter,                   &
+     &      mevo_ctl%maxiter_ctl)
+        call read_integer_ctl_type(c_buf, hd_legendre_vect_len,         &
      &      mevo_ctl%leg_vector_len)
       end do
+      mevo_ctl%i_time_loop = 1
 !
       end subroutine read_time_loop_ctl
 !
@@ -320,6 +333,9 @@
 !
 !
       call bcast_ctl_type_c1(mr_ctl%restart_flag_ctl)
+!
+      call MPI_BCAST(mr_ctl%i_restart_file, 1,                          &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine bcast_restart_ctl
 !
@@ -359,6 +375,9 @@
       call bcast_ctl_type_i1(mevo_ctl%num_multi_pass_ctl)
       call bcast_ctl_type_i1(mevo_ctl%maxiter_ctl)
       call bcast_ctl_type_i1(mevo_ctl%leg_vector_len)
+!
+      call MPI_BCAST(mevo_ctl%i_time_loop, 1,                           &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine bcast_time_loop_ctl
 !

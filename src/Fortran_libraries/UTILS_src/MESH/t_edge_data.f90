@@ -18,12 +18,6 @@
 !!      subroutine alloc_edge_vect_cyl(edge)
 !!      subroutine alloc_edge_param_smp(edge)
 !!
-!!      subroutine alloc_ele_4_edge_num_type(edge)
-!!      subroutine alloc_ele_4_edge_item_type(edge)
-!!      subroutine alloc_surf_4_edge_num_type(edge)
-!!      subroutine alloc_surf_4_edge_item_type(edge)
-!!
-!!
 !!      subroutine dealloc_numedge_stack(edge)
 !!      subroutine dealloc_inod_in_edge(edge)
 !!      subroutine dealloc_edge_connect(edge)
@@ -34,11 +28,6 @@
 !!      subroutine dealloc_edge_vect_sph(edge)
 !!      subroutine dealloc_edge_vect_cyl(edge)
 !!      subroutine dealloc_edge_param_smp(edge)
-!!
-!!      subroutine dealloc_ele_4_edge_num_type(edge)
-!!      subroutine dealloc_ele_4_edge_item_type(edge)
-!!      subroutine dealloc_surf_4_edge_num_type(edge)
-!!      subroutine dealloc_surf_4_edge_item_type(edge)
 !!        integer(kind = kint), intent(in) :: nele
 !!        integer(kind = kint), intent(in) :: nsurf
 !!        type(edge_data), intent(inout) :: edge
@@ -92,24 +81,6 @@
         integer(kind=kint), allocatable  ::  iedge_isolate(:)
 !>    integer flag for interior edge 1...interior, 0...exterior
         integer(kind = kint), allocatable :: interior_edge(:)
-!
-!>   total number of element list for edge
-        integer(kind=kint) :: ntot_iele_4_edge
-!>   number of element list for each edge
-        integer(kind=kint), allocatable :: num_iele_4_edge(:)
-!>   end address of element list for each edge
-        integer(kind=kint), allocatable :: istack_iele_4_edge(:)
-!>   element id list for each edge (negative: opposite direction)
-        integer(kind=kint), allocatable  :: iele_4_edge(:,:)
-!
-!>   total number of surface list for edge
-        integer(kind=kint) :: ntot_isurf_4_edge
-!>   number of surface list for each edge
-        integer(kind=kint), allocatable :: num_isurf_4_edge(:)
-!>   end address of surface list for each edge
-        integer(kind=kint), allocatable :: istack_isurf_4_edge(:)
-!>   surafce id list for each edge (negative: opposite direction)
-        integer(kind=kint), allocatable  :: isurf_4_edge(:,:)
 !
 !>   position of center of edge
         real(kind=kreal)  , allocatable  :: x_edge(:,:)
@@ -307,60 +278,6 @@
 !
       end subroutine alloc_edge_param_smp
 !
-!-----------------------------------------------------------------------
-!
-      subroutine alloc_ele_4_edge_num_type(edge)
-!
-      type(edge_data), intent(inout) :: edge
-!
-!
-      allocate( edge%num_iele_4_edge(edge%numedge) )
-      allocate( edge%istack_iele_4_edge(0:edge%numedge) )
-      if (edge%numedge .gt. 0) edge%num_iele_4_edge =    0
-      edge%istack_iele_4_edge = 0
-!
-      end subroutine alloc_ele_4_edge_num_type
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine alloc_ele_4_edge_item_type(edge)
-!
-      type(edge_data), intent(inout) :: edge
-!
-!
-      edge%ntot_iele_4_edge = edge%istack_iele_4_edge(edge%numedge)
-      allocate( edge%iele_4_edge(edge%ntot_iele_4_edge,2) )
-      if (edge%ntot_iele_4_edge .gt. 0) edge%iele_4_edge = 0
-!
-      end subroutine alloc_ele_4_edge_item_type
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine alloc_surf_4_edge_num_type(edge)
-!
-      type(edge_data), intent(inout) :: edge
-!
-!
-      allocate( edge%num_isurf_4_edge(edge%numedge) )
-      allocate( edge%istack_isurf_4_edge(0:edge%numedge) )
-      if (edge%numedge .gt. 0) edge%num_isurf_4_edge =    0
-      edge%istack_isurf_4_edge = 0
-!
-      end subroutine alloc_surf_4_edge_num_type
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine alloc_surf_4_edge_item_type(edge)
-!
-      type(edge_data), intent(inout) :: edge
-!
-!
-      edge%ntot_isurf_4_edge = edge%istack_isurf_4_edge(edge%numedge)
-      allocate( edge%isurf_4_edge(edge%ntot_isurf_4_edge,2) )
-      if (edge%ntot_isurf_4_edge .gt. 0) edge%isurf_4_edge = 0
-!
-      end subroutine alloc_surf_4_edge_item_type
-!
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
@@ -480,29 +397,5 @@
       end subroutine dealloc_edge_param_smp
 !
 !-----------------------------------------------------------------------
-!
-      subroutine dealloc_ele_4_edge_item_type(edge)
-!
-      type(edge_data), intent(inout) :: edge
-!
-!
-      deallocate( edge%iele_4_edge )
-      deallocate( edge%num_iele_4_edge, edge%istack_iele_4_edge)
-!
-      end subroutine dealloc_ele_4_edge_item_type
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine dealloc_surf_4_edge_item_type(edge)
-!
-      type(edge_data), intent(inout) :: edge
-!
-!
-      deallocate( edge%isurf_4_edge )
-      deallocate( edge%num_isurf_4_edge, edge%istack_isurf_4_edge)
-!
-      end subroutine dealloc_surf_4_edge_item_type
-!
-!  ---------------------------------------------------------------------
 !
       end module t_edge_data

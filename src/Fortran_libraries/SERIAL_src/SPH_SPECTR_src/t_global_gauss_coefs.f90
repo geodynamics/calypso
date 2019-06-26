@@ -7,9 +7,7 @@
 !>@brief Gauss coefficients data for output
 !!
 !!@verbatim
-!!      subroutine alloc_gauss_coef_monitor(d_gauss)
 !!      subroutine alloc_gauss_global_coefs(d_gauss)
-!!      subroutine dealloc_gauss_coef_monitor(d_gauss)
 !!      subroutine dealloc_gauss_global_coefs(d_gauss)
 !!
 !!      subroutine read_gauss_global_coefs(d_gauss)

@@ -149,7 +149,6 @@
       integer(kind = kint_gl) :: ioff_gl
 !
 !
-      call calypso_mpi_barrier
      if(my_rank .eq. 0) then
         write(*,*) 'gzipped VTK data by MPI-IO: ', trim(gzip_name)
       end if
@@ -183,7 +182,6 @@
       integer(kind = kint_gl) :: ioff_gl
 !
 !
-      call calypso_mpi_barrier
       if(my_rank .eq. 0) then
         write(*,*) 'gzipped VTK field by MPI-IO: ', trim(gzip_name)
       end if
@@ -214,7 +212,6 @@
       integer(kind = kint_gl) :: ioff_gl
 !
 !
-      call calypso_mpi_barrier
       if(my_rank .eq. 0) then
         write(*,*) 'gzipped VTK grid by MPI-IO: ', trim(gzip_name)
       end if

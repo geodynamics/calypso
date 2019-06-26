@@ -25,8 +25,7 @@
 !!        type(sectioning_list), intent(inout) :: iso_list(num_iso)
 !!        type(psf_local_data), intent(inout) :: iso_mesh(num_iso)
 !!
-!!      subroutine set_nodes_4_psf                                      &
-!!      &        (num_psf, node, edge, nod_comm, edge_comm,             &
+!!      subroutine set_nodes_4_psf(num_psf, node, edge, nod_comm,       &
 !!      &         sf_grp, sf_grp_nod, psf_def, psf_search,              &
 !!      &         psf_list, psf_grp_list, psf_mesh)
 !!        type(node_data), intent(in) :: node
@@ -34,17 +33,16 @@
 !!        type(surface_group_data), intent(in) :: sf_grp
 !!        type(surface_node_grp_data), intent(in) :: sf_grp_nod
 !!        type(communication_table), intent(in) :: nod_comm
-!!        type(communication_table), intent(in) :: edge_comm
 !!        type(section_define), intent(in) :: psf_def(num_psf)
 !!        type(psf_search_lists), intent(in) :: psf_search(num_psf)
 !!        type(sectioning_list), intent(inout) :: psf_list(num_psf)
 !!        type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
 !!        type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
-!!      subroutine set_nodes_4_iso(num_iso, node, edge, edge_comm,      &
+!!      subroutine set_nodes_4_iso(num_iso, node, edge, nod_comm,       &
 !!     &          iso_search, iso_list, iso_mesh)
 !!        type(node_data), intent(in) :: node
 !!        type(edge_data), intent(in) :: edge
-!!        type(communication_table), intent(in) :: edge_comm
+!!        type(communication_table), intent(in) :: nod_comm
 !!        type(psf_search_lists), intent(in) :: iso_search(num_iso)
 !!        type(sectioning_list), intent(inout) :: iso_list(num_iso)
 !!        type(psf_local_data), intent(inout) :: iso_mesh(num_iso)
@@ -154,8 +152,7 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine set_nodes_4_psf                                        &
-      &        (num_psf, node, edge, nod_comm, edge_comm,               &
+      subroutine set_nodes_4_psf(num_psf, node, edge, nod_comm,         &
       &         sf_grp, sf_grp_nod, psf_def, psf_search,                &
       &         psf_list, psf_grp_list, psf_mesh)
 !
@@ -181,7 +178,6 @@
       type(surface_node_grp_data), intent(in) :: sf_grp_nod
 !
       type(communication_table), intent(in) :: nod_comm
-      type(communication_table), intent(in) :: edge_comm
 !
       type(section_define), intent(in) :: psf_def(num_psf)
       type(psf_search_lists), intent(in) :: psf_search(num_psf)
@@ -190,6 +186,7 @@
       type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !
       integer(kind = kint) :: i, ist, num, igrp, inod
+!
 !
       do i = 1, num_psf
         if(psf_def(i)%id_section_method .gt. 0) then
@@ -201,8 +198,13 @@
      &       (node%numnod, edge%numedge, edge%nnod_4_edge,              &
      &        edge%ie_edge, node%xx, psf_def(i)%const_psf, psf_list(i))
 !
-          call psf_global_nod_id_on_edge(edge_comm, edge%numedge,       &
-     &       psf_mesh(i)%node%istack_internod, psf_list(i)%id_n_on_e)
+          call alloc_iedge_global_psf(psf_list(i))
+          call const_edge_comm_table_4_psf                              &
+     &       (node, nod_comm, edge, psf_list(i))
+!
+          call psf_global_nod_id_on_edge(edge%numedge,                  &
+     &        psf_mesh(i)%node%istack_internod, psf_list(i))
+          call dealloc_iedge_global_psf(psf_list(i))
 !
           call set_position_4_psf(node%numnod,                          &
      &        edge%numedge, edge%nnod_4_edge, edge%ie_edge,             &
@@ -242,7 +244,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_nodes_4_iso(num_iso, node, edge, edge_comm,        &
+      subroutine set_nodes_4_iso(num_iso, node, edge, nod_comm,         &
      &          iso_search, iso_list, iso_mesh)
 !
       use calypso_mpi
@@ -260,7 +262,7 @@
 !
       type(node_data), intent(in) :: node
       type(edge_data), intent(in) :: edge
-      type(communication_table), intent(in) :: edge_comm
+      type(communication_table), intent(in) :: nod_comm
 !
       type(psf_search_lists), intent(in) :: iso_search(num_iso)
       type(sectioning_list), intent(inout) :: iso_list(num_iso)
@@ -281,8 +283,13 @@
         call set_node_on_edge_int_linear_psf(node%numnod, edge%numedge, &
      &      edge%nnod_4_edge, edge%ie_edge, iso_list(i))
 !
-        call psf_global_nod_id_on_edge(edge_comm, edge%numedge,         &
-     &      iso_mesh(i)%node%istack_internod, iso_list(i)%id_n_on_e)
+        call alloc_iedge_global_psf(iso_list(i))
+        call const_edge_comm_table_4_psf                                &
+     &       (node, nod_comm, edge, iso_list(i))
+!
+        call psf_global_nod_id_on_edge(edge%numedge,                    &
+     &      iso_mesh(i)%node%istack_internod, iso_list(i))
+        call dealloc_iedge_global_psf(iso_list(i))
 !
 !
         call set_position_4_psf                                         &

@@ -8,15 +8,13 @@
 !>@brief Structure for cross sectioning
 !!
 !!@verbatim
-!!      subroutine SECTIONING_initialize                                &
-!!     &         (femmesh, ele_mesh, nod_fld, psf_ctls, psf)
-!!        type(mesh_data), intent(in) :: femmesh
-!!        type(element_geometry), intent(in) :: ele_mesh
+!!      subroutine SECTIONING_initialize(fem, nod_fld, psf_ctls, psf)
+!!        type(mesh_data), intent(in) :: fem
 !!        type(phys_data), intent(in) :: nod_fld
 !!      subroutine SECTIONING_visualize                                 &
-!!     &         (istep_psf, time_d, ele_mesh, nod_fld, psf)
+!!     &         (istep_psf, time_d, fem, nod_fld, psf)
 !!        type(time_data), intent(in) :: time_d
-!!        type(element_geometry), intent(in) :: ele_mesh
+!!        type(mesh_data), intent(in) :: fem
 !!        type(phys_data), intent(in) :: nod_fld
 !!      subroutine dealloc_psf_field_type(psf)
 !!@endverbatim
@@ -87,8 +85,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine SECTIONING_initialize                                  &
-     &         (femmesh, ele_mesh, nod_fld, psf_ctls, psf)
+      subroutine SECTIONING_initialize(fem, nod_fld, psf_ctls, psf)
 !
       use m_geometry_constants
 !
@@ -100,8 +97,7 @@
       use set_fields_for_psf
       use output_4_psf
 !
-      type(mesh_data), intent(in) :: femmesh
-      type(element_geometry), intent(in) :: ele_mesh
+      type(mesh_data), intent(in) :: fem
       type(phys_data), intent(in) :: nod_fld
 !
       type(section_controls), intent(inout) :: psf_ctls
@@ -118,16 +114,13 @@
       if (iflag_debug.eq.1) write(*,*) 'alloc_psf_field_type'
       call alloc_psf_field_type(psf)
 !
-      call calypso_mpi_barrier
       if (iflag_debug.eq.1) write(*,*) 'set_psf_control'
-      call set_psf_control(psf%num_psf, femmesh%group, nod_fld,         &
+      call set_psf_control(psf%num_psf, fem%group, nod_fld,             &
      &    psf_ctls, psf%psf_param, psf%psf_def,                         &
      &    psf%psf_mesh, psf%psf_file_IO)
 !
-      call calypso_mpi_barrier
       if (iflag_debug.eq.1) write(*,*) 'set_search_mesh_list_4_psf'
-      call set_search_mesh_list_4_psf                                   &
-     &   (psf%num_psf, femmesh%mesh, ele_mesh, femmesh%group,           &
+      call set_search_mesh_list_4_psf(psf%num_psf, fem%mesh, fem%group, &
      &    psf%psf_param, psf%psf_search)
 !
 !
@@ -135,17 +128,15 @@
         call allocate_node_param_smp_type(psf%psf_mesh(i_psf)%node)
         call allocate_ele_param_smp_type(psf%psf_mesh(i_psf)%patch)
 !
-        call alloc_ref_field_4_psf                                      &
-     &     (femmesh%mesh%node, psf%psf_list(i_psf))
+        call alloc_ref_field_4_psf(fem%mesh%node, psf%psf_list(i_psf))
       end do
 !
       if (iflag_debug.eq.1) write(*,*) 'set_const_4_crossections'
       call set_const_4_crossections                                     &
-     &   (psf%num_psf, psf%psf_def, femmesh%mesh%node, psf%psf_list)
+     &   (psf%num_psf, psf%psf_def, fem%mesh%node, psf%psf_list)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_node_and_patch_psf'
-      call set_node_and_patch_psf                                       &
-     &   (psf%num_psf, femmesh%mesh, ele_mesh, femmesh%group,           &
+      call set_node_and_patch_psf(psf%num_psf, fem%mesh, fem%group,     &
      &    psf%psf_case_tbls, psf%psf_def, psf%psf_search, psf%psf_list, &
      &    psf%psf_grp_list, psf%psf_mesh)
 !
@@ -155,14 +146,12 @@
       call output_section_mesh(psf%num_psf, psf%psf_file_IO,            &
      &    psf%psf_mesh, psf%psf_out, psf%psf_out_m)
 !
-!      call calypso_mpi_barrier
-!
       end subroutine SECTIONING_initialize
 !
 !  ---------------------------------------------------------------------
 !
       subroutine SECTIONING_visualize                                   &
-     &         (istep_psf, time_d, ele_mesh, nod_fld, psf)
+     &         (istep_psf, time_d, fem, nod_fld, psf)
 !
       use set_fields_for_psf
       use set_ucd_data_to_type
@@ -171,7 +160,7 @@
       integer(kind = kint), intent(in) :: istep_psf
 !
       type(time_data), intent(in) :: time_d
-      type(element_geometry), intent(in) :: ele_mesh
+      type(mesh_data), intent(in) :: fem
       type(phys_data), intent(in) :: nod_fld
 !
       type(sectioning_module), intent(inout) :: psf
@@ -179,11 +168,11 @@
 !
       if (psf%num_psf.le.0 .or. istep_psf.le.0) return
 !
-      call set_field_4_psf(psf%num_psf, ele_mesh%edge, nod_fld,         &
+      call set_field_4_psf(psf%num_psf, fem%mesh%edge, nod_fld,         &
      &    psf%psf_def, psf%psf_param, psf%psf_list, psf%psf_grp_list,   &
      &    psf%psf_mesh)
 !
-      if (iflag_debug.eq.1) write(*,*) 'output_section_mesh'
+      if (iflag_debug.eq.1) write(*,*) 'output_section_data'
       call output_section_data                                          &
      &   (psf%num_psf, psf%psf_file_IO, istep_psf, time_d,              &
      &    psf%psf_time_IO, psf%psf_out, psf%psf_out_m)

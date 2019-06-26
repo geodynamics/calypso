@@ -135,7 +135,7 @@
       integer(kind = kint_gl), intent(in) :: int8_dat(num)
       type(binary_IO_flags), intent(inout) :: bflag
 !
-      integer(kind = kint) :: ist
+      integer(kind = kint_gl) :: ist
       integer :: lbyte, ilength
 !
 !
@@ -195,7 +195,7 @@
       character(len=kchara), intent(in) :: chara_dat(num)
       type(binary_IO_flags), intent(inout) :: bflag
 !
-      integer(kind = kint) ::  ist
+      integer(kind = kint_gl) ::  ist
       integer :: lbyte, ilength
 !
 !
@@ -222,7 +222,7 @@
       real(kind = kreal), intent(in) :: real_dat(num)
       type(binary_IO_flags), intent(inout) :: bflag
 !
-      integer(kind = kint) :: ist
+      integer(kind = kint_gl) :: ist
       integer :: lbyte, ilength
 !
 !
@@ -320,7 +320,8 @@
       integer(kind = kint_gl), intent(inout) :: int8_dat(num)
       type(binary_IO_flags), intent(inout) :: bflag
 !
-      integer(kind = kint) :: lbyte, ilength, ist
+      integer(kind = kint) :: lbyte, ilength
+      integer(kind = kint_gl) :: ist
 !
 !
       ist = 0
@@ -383,7 +384,8 @@
       character(len=kchara), intent(inout) :: chara_dat(num)
       type(binary_IO_flags), intent(inout) :: bflag
 !
-      integer(kind = kint) :: lbyte, ilength, ist
+      integer(kind = kint) :: lbyte, ilength
+      integer(kind = kint_gl) :: ist
 !
 !
       ist = 0
@@ -409,7 +411,8 @@
       real(kind = kreal), intent(inout) :: real_dat(num)
       type(binary_IO_flags), intent(inout) :: bflag
 !
-      integer(kind = kint) :: lbyte, ilength, ist
+      integer(kind = kint) :: lbyte, ilength
+      integer(kind = kint_gl) :: ist
 !
 !
       ist = 0

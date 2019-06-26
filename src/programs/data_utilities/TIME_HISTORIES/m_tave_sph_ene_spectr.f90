@@ -103,6 +103,7 @@
      &    sph_IN%nri_sph, ltr, sph_IN%ntot_sph_spec, ave_spec_l,        &
      &    sph_IN%spectr_IO)
 !
+!  Output average
       write(file_name, '(a6,a)') 't_ave_', trim(fname_org)
       open(id_file_rms, file=file_name)
       call select_output_sph_pwr_head(id_file_rms, sph_IN)

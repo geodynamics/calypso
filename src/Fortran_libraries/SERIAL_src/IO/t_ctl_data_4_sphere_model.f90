@@ -7,7 +7,8 @@
 !>@brief  control data for resolutions of spherical shell
 !!
 !!@verbatim
-!!      subroutine read_control_shell_define(hd_block, iflag, spctl)
+!!      subroutine read_control_shell_define                            &
+!!     &         (id_control, hd_block, spctl, c_buf)
 !!      subroutine dealloc_control_shell_define(spctl)
 !!      subroutine reset_control_shell_define(spctl)
 !!        type(sphere_data_control), intent(inout) :: spctl
@@ -83,7 +84,9 @@
 !
       use m_precision
       use t_control_elements
-      use t_read_control_arrays
+      use t_control_array_charaint
+      use t_control_array_integer2
+      use t_control_array_intreal
 !
       implicit  none
 !
@@ -146,6 +149,8 @@
         type(ctl_array_i2) :: radial_layer_list_ctl
 !>        Number of moridional layering for outer core
         type(ctl_array_i2) :: med_layer_list_ctl
+!
+        integer(kind = kint) :: i_shell_def =   0
       end type sphere_data_control
 !
 !   labels of shell define
@@ -207,72 +212,79 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_control_shell_define(hd_block, iflag, spctl)
+      subroutine read_control_shell_define                              &
+     &         (id_control, hd_block, spctl, c_buf)
 !
       use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(sphere_data_control), intent(inout) :: spctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if(iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(spctl%i_shell_def .gt. 0) return
       do
-        call load_ctl_label_and_line
-!
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
 !
-        call read_control_array_i_r                                     &
-     &     (hd_numlayer_shell, spctl%radius_ctl)
+        call read_control_array_i_r(id_control,                         &
+     &      hd_numlayer_shell, spctl%radius_ctl, c_buf)
 !
-        call read_control_array_c_i(hd_bc_sph, spctl%radial_grp_ctl)
+        call read_control_array_c_i(id_control,                         &
+     &      hd_bc_sph, spctl%radial_grp_ctl, c_buf)
 !
 !
         call read_chara_ctl_type                                        &
-     &     (hd_sph_c_type, spctl%sph_coef_type_ctl)
+     &     (c_buf, hd_sph_c_type, spctl%sph_coef_type_ctl)
         call read_chara_ctl_type                                        &
-     &     (hd_sph_g_type, spctl%sph_grid_type_ctl)
+     &     (c_buf, hd_sph_g_type, spctl%sph_grid_type_ctl)
         call read_chara_ctl_type                                        &
-     &     (hd_r_grid_type, spctl%radial_grid_type_ctl)
+     &     (c_buf, hd_r_grid_type, spctl%radial_grid_type_ctl)
 !
         call read_integer_ctl_type                                      &
-     &     (hd_phi_symmetry, spctl%phi_symmetry_ctl)
-        call read_integer_ctl_type(hd_sph_truncate, spctl%ltr_ctl)
+     &     (c_buf, hd_phi_symmetry, spctl%phi_symmetry_ctl)
         call read_integer_ctl_type                                      &
-     &     (hd_ntheta_shell, spctl%ngrid_elevation_ctl)
+     &     (c_buf, hd_sph_truncate, spctl%ltr_ctl)
         call read_integer_ctl_type                                      &
-     &     (hd_nphi_shell, spctl%ngrid_azimuth_ctl)
+     &     (c_buf, hd_ntheta_shell, spctl%ngrid_elevation_ctl)
+        call read_integer_ctl_type                                      &
+     &     (c_buf, hd_nphi_shell, spctl%ngrid_azimuth_ctl)
 !
         call read_integer_ctl_type                                      &
-     &     (hd_n_fluid_grid, spctl%num_fluid_grid_ctl)
+     &     (c_buf, hd_n_fluid_grid, spctl%num_fluid_grid_ctl)
 !
-!
-        call read_real_ctl_type(hd_Min_radius, spctl%Min_radius_ctl)
-        call read_real_ctl_type(hd_ICB_radius, spctl%ICB_radius_ctl)
-        call read_real_ctl_type(hd_CMB_radius, spctl%CMB_radius_ctl)
-        call read_real_ctl_type(hd_Max_radius, spctl%Max_radius_ctl)
 !
         call read_real_ctl_type                                         &
-     &     (hd_shell_size, spctl%fluid_core_size_ctl)
+     &     (c_buf, hd_Min_radius, spctl%Min_radius_ctl)
         call read_real_ctl_type                                         &
-     &     (hd_shell_ratio, spctl%ICB_to_CMB_ratio_ctl)
+     &     (c_buf, hd_ICB_radius, spctl%ICB_radius_ctl)
+        call read_real_ctl_type                                         &
+     &     (c_buf, hd_CMB_radius, spctl%CMB_radius_ctl)
+        call read_real_ctl_type                                         &
+     &     (c_buf, hd_Max_radius, spctl%Max_radius_ctl)
+!
+        call read_real_ctl_type                                         &
+     &     (c_buf, hd_shell_size, spctl%fluid_core_size_ctl)
+        call read_real_ctl_type                                         &
+     &     (c_buf, hd_shell_ratio, spctl%ICB_to_CMB_ratio_ctl)
 !
         call read_integer_ctl_type                                      &
-     &     (hd_num_radial_grp, spctl%num_radial_layer_ctl)
+     &     (c_buf, hd_num_radial_grp, spctl%num_radial_layer_ctl)
         call read_integer_ctl_type                                      &
-     &     (hd_num_med_grp, spctl%num_med_layer_ctl)
+     &     (c_buf, hd_num_med_grp, spctl%num_med_layer_ctl)
 !
-        call read_control_array_i2                                      &
-     &     (hd_list_radial_grp, spctl%radial_layer_list_ctl)
-        call read_control_array_i2                                      &
-     &     (hd_list_med_grp, spctl%med_layer_list_ctl)
+        call read_control_array_i2(id_control,                          &
+     &      hd_list_radial_grp, spctl%radial_layer_list_ctl, c_buf)
+        call read_control_array_i2(id_control,                          &
+     &      hd_list_med_grp, spctl%med_layer_list_ctl, c_buf)
       end do
+      spctl%i_shell_def = 1
 !
       end subroutine read_control_shell_define
 !

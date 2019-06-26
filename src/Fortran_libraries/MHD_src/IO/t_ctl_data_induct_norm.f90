@@ -1,9 +1,15 @@
-!t_ctl_data_induct_norm.f90
-!      module t_ctl_data_induct_norm
-!
-!        programmed by H.Matsui on March. 2006
-!
-!!      subroutine read_induction_ctl(hd_block, iflag, induct_ctl)
+!>@file   t_ctl_data_induct_norm.f90
+!!@brief  module t_ctl_data_induct_norm
+!!
+!!@author H. Matsui
+!>@brief   Control read induction term
+!!@date   programmed by H.Matsui and H.Okuda
+!!@n                                    on July 2000 (ver 1.1)
+!!@n        Modified by H. Matsui on Merch, 2006
+!!
+!!@verbatim
+!!      subroutine read_induction_ctl                                   &
+!!     &         (id_control, hd_block, induct_ctl, c_buf)
 !!      subroutine bcast_induction_ctl(induct_ctl)
 !!      subroutine dealloc_induction_ctl(induct_ctl)
 !!        type(induction_equation_control), intent(inout) :: induct_ctl
@@ -25,11 +31,13 @@
 !!        end array
 !!      end  induction
 !!   --------------------------------------------------------------------
+!!@endverbatim
 !
       module t_ctl_data_induct_norm
 !
       use m_precision
-      use t_read_control_arrays
+      use m_machine_parameter
+      use t_control_array_charareal
 !
       implicit  none
 !
@@ -58,6 +66,8 @@
 !!@n        coef_4_induction%c_tbl:  Name of number 
 !!@n        coef_4_induction%vect:   Power of the number
         type(ctl_array_cr) :: coef_4_induction
+!
+        integer (kind=kint) :: i_induct_ctl =    0
       end type induction_equation_control
 !
 !   5th level for coefs for induction
@@ -76,36 +86,35 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_induction_ctl(hd_block, iflag, induct_ctl)
+      subroutine read_induction_ctl                                     &
+     &         (id_control, hd_block, induct_ctl, c_buf)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(induction_equation_control), intent(inout) :: induct_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(induct_ctl%i_induct_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-!
-        call read_control_array_c_r                                     &
-     &     (hd_n_magne, induct_ctl%coef_4_magne_evo)
-        call read_control_array_c_r                                     &
-     &     (hd_n_mag_p, induct_ctl%coef_4_mag_potential)
-        call read_control_array_c_r                                     &
-     &     (hd_n_m_diff, induct_ctl%coef_4_mag_diffuse)
-        call read_control_array_c_r                                     &
-     &     (hd_n_induct, induct_ctl%coef_4_induction)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_magne, induct_ctl%coef_4_magne_evo, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_mag_p, induct_ctl%coef_4_mag_potential, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_m_diff, induct_ctl%coef_4_mag_diffuse, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_induct, induct_ctl%coef_4_induction, c_buf)
       end do
+      induct_ctl%i_induct_ctl = 1
 !
       end subroutine read_induction_ctl
 !
@@ -123,6 +132,9 @@
       call bcast_ctl_array_cr(induct_ctl%coef_4_mag_diffuse)
       call bcast_ctl_array_cr(induct_ctl%coef_4_induction)
 !
+      call MPI_BCAST(induct_ctl%i_induct_ctl, 1,                        &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_induction_ctl
 !
 !   --------------------------------------------------------------------
@@ -136,6 +148,8 @@
       call dealloc_control_array_c_r(induct_ctl%coef_4_mag_potential)
       call dealloc_control_array_c_r(induct_ctl%coef_4_mag_diffuse)
       call dealloc_control_array_c_r(induct_ctl%coef_4_induction)
+!
+      induct_ctl%i_induct_ctl = 0
 !
       end subroutine dealloc_induction_ctl
 !

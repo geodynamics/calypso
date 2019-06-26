@@ -11,8 +11,10 @@
 !!@n        Modified by H. Matsui on Oct., 2012
 !!
 !!@verbatim
-!!      subroutine read_sph_mhd_ctl_w_psf(MHD_ctl)
-!!      subroutine read_sph_mhd_ctl_noviz(MHD_ctl)
+!!      subroutine read_sph_mhd_ctl_w_psf                               &
+!!     &         (id_control, hd_block, MHD_ctl, c_buf)
+!!      subroutine read_sph_mhd_ctl_noviz                               &
+!!     &         (id_control, hd_block, MHD_ctl, c_buf)
 !!
 !!      subroutine bcast_sph_mhd_ctl_w_psf(MHD_ctl)
 !!      subroutine bcast_sph_mhd_ctl_data(MHD_ctl)
@@ -25,6 +27,7 @@
       use m_precision
 !
       use m_machine_parameter
+      use t_read_control_elements
       use t_ctl_data_4_platforms
       use t_ctl_data_MHD_model
       use t_ctl_data_SPH_MHD_control
@@ -32,6 +35,7 @@
       use t_ctl_data_node_monitor
       use t_ctl_data_gen_sph_shell
       use t_control_data_sections
+      use t_control_data_isosurfaces
       use t_control_data_zm_vizs
 !
       implicit none
@@ -65,12 +69,9 @@
 !
 !>        Structures of zonal mean controls
         type(sph_zonal_means_controls) :: zm_ctls
+!
+        integer (kind=kint) :: i_mhd_ctl = 0
       end type DNS_mhd_simulation_control
-!
-!   Top level of label
-!
-      character(len=kchara) :: hd_mhd_ctl = 'MHD_control'
-      integer (kind=kint) :: i_mhd_ctl = 0
 !
 !   2nd level for MHD
 !
@@ -89,22 +90,9 @@
       character(len=kchara), parameter                                  &
      &      :: hd_monitor_data = 'monitor_data_ctl'
 !
-      integer (kind=kint) :: i_platform =     0
-      integer (kind=kint) :: i_org_data =     0
-      integer (kind=kint) :: i_new_data =     0
-      integer (kind=kint) :: i_model =        0
-      integer (kind=kint) :: i_control =      0
-      integer (kind=kint) :: i_pick_sph =     0
-      integer (kind=kint) :: i_monitor_data = 0
-!
-      private :: hd_mhd_ctl, i_mhd_ctl
-!      private :: hd_platform, i_platform
-!      private :: hd_org_data, i_org_data
-!      private :: hd_new_data, i_new_data
-!      private :: hd_sph_shell
-!      private :: hd_model, hd_control, i_model, i_control
-!      private :: hd_pick_sph, i_pick_sph
-!      private :: hd_monitor_data, i_monitor_data
+      private :: hd_platform, hd_org_data, hd_new_data
+      private :: hd_sph_shell, hd_model, hd_control
+      private :: hd_pick_sph, hd_monitor_data
 !
 ! ----------------------------------------------------------------------
 !
@@ -112,80 +100,91 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine read_sph_mhd_ctl_w_psf(MHD_ctl)
+      subroutine read_sph_mhd_ctl_w_psf                                 &
+     &         (id_control, hd_block, MHD_ctl, c_buf)
+!
+      use read_sections_control_data
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
 !
       type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_mhd_ctl) .eq. 0) return
-      if (i_mhd_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(MHD_ctl%i_mhd_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
-!
-        i_mhd_ctl = find_control_end_flag(hd_mhd_ctl)
-        if(i_mhd_ctl .gt. 0) exit
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
 !
         call read_control_platforms                                     &
-     &     (hd_platform, i_platform, MHD_ctl%plt)
+     &     (id_control, hd_platform, MHD_ctl%plt, c_buf)
         call read_control_platforms                                     &
-     &     (hd_org_data, i_org_data, MHD_ctl%org_plt)
+     &     (id_control, hd_org_data, MHD_ctl%org_plt, c_buf)
 !
         call read_parallel_shell_in_MHD_ctl                             &
-     &     (hd_sph_shell, MHD_ctl%psph_ctl)
+     &     (id_control, hd_sph_shell, MHD_ctl%psph_ctl, c_buf)
 !
         call read_sph_mhd_model                                         &
-     &     (hd_model, i_model, MHD_ctl%model_ctl)
+     &     (id_control, hd_model, MHD_ctl%model_ctl, c_buf)
         call read_sph_mhd_control                                       &
-     &     (hd_control, i_control, MHD_ctl%smctl_ctl)
+     &     (id_control, hd_control, MHD_ctl%smctl_ctl, c_buf)
 !
         call read_monitor_data_ctl                                      &
-     &     (hd_monitor_data, i_monitor_data, MHD_ctl%nmtr_ctl)
+     &     (id_control, hd_monitor_data, MHD_ctl%nmtr_ctl, c_buf)
         call read_sph_monitoring_ctl                                    &
-     &     (hd_pick_sph, i_pick_sph, MHD_ctl%smonitor_ctl)
+     &     (id_control, hd_pick_sph, MHD_ctl%smonitor_ctl, c_buf)
 !
-        call read_sections_control_data                                 &
-     &     (MHD_ctl%psf_ctls, MHD_ctl%iso_ctls)
+        call s_read_sections_control_data                               &
+     &     (id_control, MHD_ctl%psf_ctls, MHD_ctl%iso_ctls, c_buf)
 !
-        call read_zonal_mean_control(MHD_ctl%zm_ctls)
+        call read_zonal_mean_control                                    &
+     &     (id_control, MHD_ctl%zm_ctls, c_buf)
       end do
+      MHD_ctl%i_mhd_ctl = 1
 !
       end subroutine read_sph_mhd_ctl_w_psf
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_sph_mhd_ctl_noviz(MHD_ctl)
+      subroutine read_sph_mhd_ctl_noviz                                 &
+     &         (id_control, hd_block, MHD_ctl, c_buf)
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
 !
       type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_mhd_ctl) .eq. 0) return
-      if (i_mhd_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(MHD_ctl%i_mhd_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
-!
-        i_mhd_ctl = find_control_end_flag(hd_mhd_ctl)
-        if(i_mhd_ctl .gt. 0) exit
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
 !
         call read_control_platforms                                     &
-     &     (hd_platform, i_platform, MHD_ctl%plt)
+     &     (id_control, hd_platform, MHD_ctl%plt, c_buf)
         call read_control_platforms                                     &
-     &     (hd_org_data, i_org_data, MHD_ctl%org_plt)
+     &     (id_control, hd_org_data, MHD_ctl%org_plt, c_buf)
 !
         call read_parallel_shell_in_MHD_ctl                             &
-     &     (hd_sph_shell, MHD_ctl%psph_ctl)
+     &     (id_control, hd_sph_shell, MHD_ctl%psph_ctl, c_buf)
 !
         call read_sph_mhd_model                                         &
-     &     (hd_model, i_model, MHD_ctl%model_ctl)
+     &     (id_control, hd_model, MHD_ctl%model_ctl, c_buf)
         call read_sph_mhd_control                                       &
-     &     (hd_control, i_control, MHD_ctl%smctl_ctl)
+     &     (id_control, hd_control, MHD_ctl%smctl_ctl, c_buf)
 !
         call read_monitor_data_ctl                                      &
-     &     (hd_monitor_data, i_monitor_data, MHD_ctl%nmtr_ctl)
+     &     (id_control, hd_monitor_data, MHD_ctl%nmtr_ctl, c_buf)
         call read_sph_monitoring_ctl                                    &
-     &     (hd_pick_sph, i_pick_sph, MHD_ctl%smonitor_ctl)
+     &     (id_control, hd_pick_sph, MHD_ctl%smonitor_ctl, c_buf)
       end do
+      MHD_ctl%i_mhd_ctl = 1
 !
       end subroutine read_sph_mhd_ctl_noviz
 !
@@ -227,6 +226,9 @@
       call bcast_monitor_data_ctl(MHD_ctl%nmtr_ctl)
       call bcast_sph_monitoring_ctl(MHD_ctl%smonitor_ctl)
 !
+      call MPI_BCAST(MHD_ctl%i_mhd_ctl, 1,                              &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_sph_mhd_ctl_data
 !
 !   --------------------------------------------------------------------
@@ -240,6 +242,8 @@
       call dealloc_parallel_shell_ctl(MHD_ctl%psph_ctl)
       call dealloc_sph_monitoring_ctl(MHD_ctl%smonitor_ctl)
       call dealloc_sph_mhd_model(MHD_ctl%model_ctl)
+!
+      MHD_ctl%i_mhd_ctl = 0
 !
       end subroutine dealloc_sph_mhd_ctl_data
 !

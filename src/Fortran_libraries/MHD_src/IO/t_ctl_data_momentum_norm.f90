@@ -1,9 +1,15 @@
-!t_ctl_data_momentum_norm.f90
-!      module t_ctl_data_momentum_norm
-!
-!        programmed by H.Matsui on March. 2006
-!
-!!      subroutine read_momentum_ctl(hd_block, iflag, mom_ctl)
+!>@file   t_ctl_data_momentum_norm.f90
+!!@brief  module t_ctl_data_momentum_norm
+!!
+!!@author H. Matsui
+!>@brief   Control for momentum equation
+!!@date   programmed by H.Matsui and H.Okuda
+!!@n                                    on July 2000 (ver 1.1)
+!!@n        Modified by H. Matsui on Merch, 2006
+!!
+!!@verbatim
+!!      subroutine read_momentum_ctl                                    &
+!!     &         (id_control, hd_block, mom_ctl, c_buf)
 !!      subroutine bcast_momentum_ctl(mom_ctl)
 !!      subroutine dealloc_momentum_ctl(mom_ctl)
 !!        type(momentum_equation_control), intent(inout) :: mom_ctl
@@ -41,12 +47,14 @@
 !!    end array
 !!  end  momentum
 !!   --------------------------------------------------------------------
+!!@endverbatim
 !
 !
       module t_ctl_data_momentum_norm
 !
       use m_precision
-      use t_read_control_arrays
+      use m_machine_parameter
+      use t_control_array_charareal
 !
       implicit  none
 !
@@ -84,6 +92,8 @@
 !!@n        coef_4_Lorentz%c_tbl:  Name of number 
 !!@n        coef_4_Lorentz%vect:   Power of the number
         type(ctl_array_cr) :: coef_4_Lorentz
+!
+        integer (kind=kint) :: i_momentum = 0
       end type momentum_equation_control
 !
 !   5th level for coefs for momentum
@@ -107,39 +117,42 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_momentum_ctl(hd_block, iflag, mom_ctl)
+      subroutine read_momentum_ctl                                      &
+     &         (id_control, hd_block, mom_ctl, c_buf)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(momentum_equation_control), intent(inout) :: mom_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(mom_ctl%i_momentum .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_mom, mom_ctl%coef_4_intertia, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_press, mom_ctl%coef_4_grad_p, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_v_diff, mom_ctl%coef_4_viscous, c_buf)
 !
-!
-        call read_control_array_c_r(hd_n_mom, mom_ctl%coef_4_intertia)
-        call read_control_array_c_r(hd_n_press, mom_ctl%coef_4_grad_p)
-        call read_control_array_c_r                                     &
-       &   (hd_n_v_diff, mom_ctl%coef_4_viscous)
-!
-        call read_control_array_c_r                                     &
-       &   (hd_n_buo, mom_ctl%coef_4_termal_buo)
-        call read_control_array_c_r                                     &
-       &   (hd_n_c_buo, mom_ctl%coef_4_comp_buo)
-        call read_control_array_c_r(hd_n_cor, mom_ctl%coef_4_Coriolis)
-        call read_control_array_c_r(hd_n_lor, mom_ctl%coef_4_Lorentz)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_buo, mom_ctl%coef_4_termal_buo, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_c_buo, mom_ctl%coef_4_comp_buo, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_cor, mom_ctl%coef_4_Coriolis, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_lor, mom_ctl%coef_4_Lorentz, c_buf)
       end do
+      mom_ctl%i_momentum = 1
 !
       end subroutine read_momentum_ctl
 !
@@ -161,6 +174,9 @@
       call bcast_ctl_array_cr(mom_ctl%coef_4_Coriolis)
       call bcast_ctl_array_cr(mom_ctl%coef_4_Lorentz)
 !
+      call MPI_BCAST(mom_ctl%i_momentum, 1,                             &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_momentum_ctl
 !
 !   --------------------------------------------------------------------
@@ -178,6 +194,7 @@
       call dealloc_control_array_c_r(mom_ctl%coef_4_comp_buo)
       call dealloc_control_array_c_r(mom_ctl%coef_4_Coriolis)
       call dealloc_control_array_c_r(mom_ctl%coef_4_Lorentz)
+      mom_ctl%i_momentum = 0
 !
       end subroutine dealloc_momentum_ctl
 !

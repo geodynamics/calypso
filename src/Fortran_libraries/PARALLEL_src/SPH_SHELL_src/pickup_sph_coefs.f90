@@ -7,7 +7,8 @@
 !> @brief Pick spectr data to output
 !!
 !!@verbatim
-!!      subroutine init_sph_radial_monitor_list(sph_rj, picked)
+!!      subroutine init_sph_radial_monitor_list                         &
+!!     &         (sph_rj, picked, iflag_center)
 !!      subroutine count_sph_labels_4_monitor                           &
 !!     &       (num_phys_rj, num_phys_comp_rj, iflag_monitor_rj, picked)
 !!      subroutine set_sph_fld_id_4_monitor                             &
@@ -34,29 +35,34 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_sph_radial_monitor_list(sph_rj, picked)
+      subroutine init_sph_radial_monitor_list                           &
+     &         (sph_rj, picked, iflag_center)
 !
       use calypso_mpi
       use quicksort
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(picked_spectrum_data), intent(inout) :: picked
+      integer(kind = kint), intent(inout) :: iflag_center
 !
       integer(kind = kint) :: k, knum
 !
 !
       if(picked%num_layer .le. 0) then
-        picked%num_layer = sph_rj%nidx_rj(1) + sph_rj%iflag_rj_center
+        picked%num_layer = sph_rj%nidx_rj(1)
 !
         call alloc_num_pick_layer(picked)
 !
         do k = 1, picked%num_layer
-          picked%id_radius(k) = k - sph_rj%iflag_rj_center
+          picked%id_radius(k) = k
         end do
       end if
       call quicksort_int(picked%num_layer, picked%id_radius,            &
      &    ione, picked%num_layer)
 !
+      iflag_center = 0
+      if(sph_rj%iflag_rj_center.gt.0 .and. picked%id_radius(1).eq.1)    &
+     &     iflag_center = 1
 !
       do knum = 1, picked%num_layer
         k = picked%id_radius(knum)

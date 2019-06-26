@@ -121,7 +121,6 @@
 !
       call mpi_read_element_type                                        &
      &   (IO_param, iten, ele_IO%numele, ele_IO%elmtyp)
-      call calypso_mpi_barrier
 !
       ele_IO%nnod_4_ele = 0
       do i = 1, ele_IO%numele
@@ -136,7 +135,6 @@
       call mpi_read_ele_connect                                         &
      &   (IO_param, ele_IO%numele, ele_IO%nnod_4_ele,                   &
      &    ele_IO%iele_global, ele_IO%ie)
-      call calypso_mpi_barrier
 !
       end subroutine mpi_read_element_info
 !

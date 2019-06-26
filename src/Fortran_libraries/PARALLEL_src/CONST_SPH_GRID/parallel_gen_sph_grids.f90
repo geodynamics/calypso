@@ -118,7 +118,6 @@
      &   (gen_sph%s3d_ranks%ndomain_sph, comm_rtm_mul)
 !
       deallocate(comm_rtm_mul)
-      call calypso_MPI_barrier
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
 !
       end subroutine para_gen_sph_grids
@@ -139,7 +138,6 @@
 !
 !
 !      if(i_debug .gt. 0) write(*,*) 'barrier', my_rank
-      call calypso_MPI_barrier
       if(my_rank .eq. 0) write(*,*) 'barrier finished'
 !
       call allocate_nneib_sph_rtm_tmp(ndomain_sph)

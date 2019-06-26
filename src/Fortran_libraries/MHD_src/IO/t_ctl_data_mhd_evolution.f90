@@ -4,17 +4,19 @@
 !!@author H. Matsui
 !!@date Programmed in March. 2006
 !
-!>@brief  Control brog for field definition
+!>@brief  Control data of time integration flags
 !!
 !!@verbatim
 !!      subroutine dealloc_t_evo_name_ctl(evo_ctl)
-!!      subroutine read_mhd_time_evo_ctl(evo_ctl)
+!!      subroutine read_mhd_time_evo_ctl                                &
+!!     &         (id_control, hd_block, evo_ctl, c_buf)
 !!      subroutine bcast_mhd_time_evo_ctl(hd_block, iflag, evo_ctl)
 !!      subroutine bcast_mhd_time_evo_ctl(evo_ctl)
 !!        type(mhd_evolution_control), intent(inout) :: evo_ctl
 !!
 !!      subroutine dealloc_ele_area_grp_ctl(earea_ctl)
-!!      subroutine read_mhd_layer_ctl(hd_block, iflag, earea_ctl)
+!!      subroutine read_mhd_layer_ctl                                   &
+!!     &         (id_control, hd_block, earea_ctl, c_buf)
 !!      subroutine bcast_mhd_layer_ctl(earea_ctl)
 !!        type(mhd_evo_area_control), intent(inout) :: earea_ctl
 !!
@@ -54,8 +56,8 @@
       use m_precision
 !
       use m_machine_parameter
-      use m_read_control_elements
-      use t_read_control_arrays
+      use t_read_control_elements
+      use t_control_array_character
       use skip_comment_f
 !
       implicit  none
@@ -67,6 +69,8 @@
 !!@n       t_evo_field_ctl%num:   Number of field
 !!@n       t_evo_field_ctl%c_tbl: Name list of field
         type(ctl_array_chara) :: t_evo_field_ctl
+!
+        integer (kind=kint) :: i_time_evo =      0
       end type mhd_evolution_control
 ! 
 !
@@ -81,6 +85,8 @@
 !!@n       evo_conduct_group_ctl%num:   Number of groups
 !!@n       evo_conduct_group_ctl%c_tbl: Name list of groups
         type(ctl_array_chara) :: evo_conduct_group_ctl
+!
+        integer (kind=kint) :: i_layers_ctl =    0
       end type mhd_evo_area_control
 !
 !   4th level for time evolution
@@ -108,6 +114,7 @@
       type(mhd_evolution_control), intent(inout) :: evo_ctl
 !
       call dealloc_control_array_chara(evo_ctl%t_evo_field_ctl)
+      evo_ctl%i_time_evo = 0
 !
       end subroutine dealloc_t_evo_name_ctl
 !
@@ -119,57 +126,60 @@
 !
       call dealloc_control_array_chara(earea_ctl%evo_fluid_group_ctl)
       call dealloc_control_array_chara(earea_ctl%evo_conduct_group_ctl)
+      earea_ctl%i_layers_ctl = 0
 !
       end subroutine dealloc_ele_area_grp_ctl
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_mhd_time_evo_ctl(hd_block, iflag, evo_ctl)
+      subroutine read_mhd_time_evo_ctl                                  &
+     &         (id_control, hd_block, evo_ctl, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(mhd_evolution_control), intent(inout) :: evo_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(evo_ctl%i_time_evo .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-        call read_control_array_c1                                      &
-     &     (hd_t_evo_field, evo_ctl%t_evo_field_ctl)
+        call read_control_array_c1(id_control,                          &
+     &      hd_t_evo_field, evo_ctl%t_evo_field_ctl, c_buf)
       end do
+      evo_ctl%i_time_evo = 1
 !
       end subroutine read_mhd_time_evo_ctl
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_mhd_layer_ctl(hd_block, iflag, earea_ctl)
+      subroutine read_mhd_layer_ctl                                     &
+     &         (id_control, hd_block, earea_ctl, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(mhd_evo_area_control), intent(inout) :: earea_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(earea_ctl%i_layers_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-        call read_control_array_c1                                      &
-     &      (hd_fluid_grp, earea_ctl%evo_fluid_group_ctl)
-        call read_control_array_c1                                      &
-     &      (hd_conduct_grp, earea_ctl%evo_conduct_group_ctl)
+        call read_control_array_c1(id_control,                          &
+     &      hd_fluid_grp, earea_ctl%evo_fluid_group_ctl, c_buf)
+        call read_control_array_c1(id_control,                          &
+     &      hd_conduct_grp, earea_ctl%evo_conduct_group_ctl, c_buf)
       end do
+      earea_ctl%i_layers_ctl = 1
 !
       end subroutine read_mhd_layer_ctl
 !
@@ -185,6 +195,9 @@
 !
       call bcast_ctl_array_c1(evo_ctl%t_evo_field_ctl)
 !
+      call MPI_BCAST(evo_ctl%i_time_evo, 1,                             &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_mhd_time_evo_ctl
 !
 !   --------------------------------------------------------------------
@@ -198,6 +211,9 @@
 !
       call bcast_ctl_array_c1(earea_ctl%evo_fluid_group_ctl)
       call bcast_ctl_array_c1(earea_ctl%evo_conduct_group_ctl)
+!
+      call MPI_BCAST(earea_ctl%i_layers_ctl, 1,                         &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine bcast_mhd_layer_ctl
 !

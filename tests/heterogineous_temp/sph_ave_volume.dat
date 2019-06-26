@@ -1,0 +1,14 @@
+radial_layers, truncation
+              65               4
+ICB_id, CMB_id
+               1              65
+Lower boudary
+               1  5.38461538461538E-001
+Upper boundary
+              65  1.53846153846154E+000
+number of components
+               2               2
+    1    1
+t_step    time    temperature    composition    
+             50  5.00000000000000E-003  1.30583642438603E-002  1.11810413206170E-001
+            100  1.00000000000000E-002  1.44430549063105E-002  1.56245926256841E-001

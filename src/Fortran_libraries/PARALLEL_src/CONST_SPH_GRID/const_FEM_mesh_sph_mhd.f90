@@ -12,14 +12,13 @@
 !!     &          mesh, group, mesh_file, gen_sph)
 !!      subroutine base_FEM_mesh_sph_mhd                                &
 !!     &         (FEM_mesh_flags, sph_params, sph_rtp, sph_rj,          &
-!!     &          mesh, group, ele_mesh, gen_sph)
+!!     &          mesh, group, gen_sph)
 !!        type(FEM_file_IO_flags), intent(in) :: FEM_mesh_flags
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::  group
-!!        type(element_geometry), intent(inout) :: ele_mesh
 !!        type(field_IO_params), intent(inout) ::  mesh_file
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
 !!@endverbatim
@@ -77,18 +76,17 @@
 !
       type(construct_spherical_grid), intent(inout) :: gen_sph
 !
-      type(element_geometry) :: ele_mesh
 !      type(parallel_make_vierwer_mesh) :: par_view
 !      integer(kind = kint) :: i_level
 !
 !
       call base_FEM_mesh_sph_mhd(sph_params, sph_rtp, sph_rj,           &
-     &    mesh, group, ele_mesh, gen_sph)
+     &    mesh, group, gen_sph)
 !
 !! Increase sleeve size
 !      do i_level = 2, gen_sph%num_FEM_sleeve
 !        if(my_rank .eq. 0) write(*,*) 'extend sleeve:', i_level
-!        call para_sleeve_extension(mesh, group, ele_mesh)
+!        call para_sleeve_extension(mesh, group)
 !      end do
 !
 ! Output mesh data
@@ -102,7 +100,6 @@
 !          call pickup_surface_mesh_para(mesh_file, par_view)
 !        end if
       end if
-      call calypso_mpi_barrier
 !
       end subroutine const_FEM_mesh_4_sph_mhd
 !
@@ -110,7 +107,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine base_FEM_mesh_sph_mhd(sph_params, sph_rtp, sph_rj,     &
-     &          mesh, group, ele_mesh, gen_sph)
+     &          mesh, group, gen_sph)
 !
       use calypso_mpi
       use set_FEM_mesh_4_sph
@@ -123,7 +120,6 @@
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::  group
-      type(element_geometry), intent(inout) :: ele_mesh
 !
       type(construct_spherical_grid), intent(inout) :: gen_sph
 !
@@ -142,7 +138,7 @@
 !     &          sph_params%iflag_shell_mode, iflag_MESH_w_center
       call s_const_FEM_mesh_for_sph                                     &
      &   (my_rank, sph_rtp%nidx_rtp, sph_rj%radius_1d_rj_r, gauss_SF,   &
-     &    sph_params, sph_rtp, gen_sph, mesh, group, ele_mesh, stbl_SF)
+     &    sph_params, sph_rtp, gen_sph, mesh, group, stbl_SF)
 !
       call dealloc_nnod_nele_sph_mesh(stbl_SF)
       call dealloc_gauss_colatitude(gauss_SF)

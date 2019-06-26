@@ -7,12 +7,9 @@
 !>@brief Copy FEM mesh data from IO structure
 !!
 !!@verbatim
-!!      subroutine mpi_input_mesh                                       &
-!!     &         (mesh_file, num_pe, fem, ele_mesh)
+!!      subroutine mpi_input_mesh(mesh_file, num_pe, fem)
 !!        type(mesh_data), intent(inout) :: fem
-!!        type(element_geometry), intent(inout) :: ele_mesh
-!!      subroutine mpi_input_mesh_geometry                              &
-!!     &         (mesh_file, num_pe, mesh, nnod_4_surf, nnod_4_edge)
+!!      subroutine mpi_input_mesh_geometry(mesh_file, num_pe, mesh)
 !!        type(field_IO_params), intent(in) ::  mesh_file
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!      subroutine mpi_input_node_geometry(mesh_file, num_pe, node)
@@ -51,8 +48,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine mpi_input_mesh                                         &
-     &         (mesh_file, num_pe, fem, ele_mesh)
+      subroutine mpi_input_mesh(mesh_file, num_pe, fem)
 !
       use mesh_MPI_IO_select
       use set_nnod_4_ele_by_type
@@ -62,18 +58,18 @@
       type(field_IO_params), intent(in) ::  mesh_file
 !
       type(mesh_data), intent(inout) :: fem
-      type(element_geometry), intent(inout) :: ele_mesh
 !
       type(mesh_data) :: fem_IO_m
 !
 !
       if(my_rank .lt. num_pe) then
-        call sel_mpi_read_mesh(nprocs, my_rank, mesh_file, fem_IO_m)
-        call set_mesh(fem_IO_m, fem%mesh, fem%group,                    &
-     &      ele_mesh%surf%nnod_4_surf, ele_mesh%edge%nnod_4_edge)
+        call sel_mpi_read_mesh                                          &
+     &     (nprocs, my_rank, mesh_file, fem_IO_m%mesh, fem_IO_m%group)
+        call set_mesh(fem_IO_m, fem%mesh, fem%group)
       else
-        call set_zero_mesh_data(fem%mesh,                               &
-     &      ele_mesh%surf%nnod_4_surf, ele_mesh%edge%nnod_4_edge)
+        call set_zero_mesh_data                                         &
+     &     (fem%mesh%nod_comm, fem%mesh%node, fem%mesh%ele,             &
+     &      fem%mesh%surf, fem%mesh%edge)
       end if
 !
       if(num_pe .ge. nprocs) return
@@ -85,8 +81,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine mpi_input_mesh_geometry                                &
-     &         (mesh_file, num_pe, mesh, nnod_4_surf, nnod_4_edge)
+      subroutine mpi_input_mesh_geometry(mesh_file, num_pe, mesh)
 !
       use mesh_MPI_IO_select
       use load_mesh_data
@@ -95,7 +90,6 @@
       type(field_IO_params), intent(in) ::  mesh_file
 !
       type(mesh_geometry), intent(inout) :: mesh
-      integer(kind = kint), intent(inout) :: nnod_4_surf, nnod_4_edge
 !
       type(mesh_geometry) :: mesh_IO_m
 !
@@ -106,7 +100,8 @@
         call set_mesh_geometry_data(mesh_IO_m,                          &
      &      mesh%nod_comm, mesh%node, mesh%ele)
       else
-        call set_zero_mesh_data(mesh, nnod_4_surf, nnod_4_edge)
+        call set_zero_mesh_data                                         &
+     &     (mesh%nod_comm, mesh%node, mesh%ele, mesh%surf, mesh%edge)
       end if
 !
       end subroutine mpi_input_mesh_geometry
@@ -239,7 +234,10 @@
 !
 !       save mesh information
       call sel_mpi_write_mesh_file                                      &
-     &   (nprocs, my_rank, mesh_file, fem_IO_m)
+     &   (nprocs, my_rank, mesh_file, fem_IO_m%mesh, fem_IO_m%group)
+!
+      call dealloc_mesh_geometry_base(fem_IO_m%mesh)
+      call dealloc_groups_data(fem_IO_m%group)
 !
       end subroutine mpi_output_mesh
 !

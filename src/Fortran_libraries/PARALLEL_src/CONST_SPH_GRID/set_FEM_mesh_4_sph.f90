@@ -6,7 +6,7 @@
 !!      subroutine s_const_FEM_mesh_for_sph                             &
 !!     &         (id_rank, nidx_rtp, r_global, gauss,                   &
 !!     &          s3d_ranks, stk_lc1d, sph_gl1d, sph_params, sph_rtp,   &
-!!     &          radial_rj_grp, mesh, group, ele_mesh, stbl)
+!!     &          radial_rj_grp, mesh, group, stbl)
 !!        type(gauss_points), intent(in) :: gauss
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -17,7 +17,6 @@
 !!        type(comm_table_make_sph), intent(inout) :: stbl
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::  group
-!!        type(element_geometry), intent(inout) :: ele_mesh
 !
       module set_FEM_mesh_4_sph
 !
@@ -37,7 +36,7 @@
 !
       subroutine s_const_FEM_mesh_for_sph                               &
      &         (id_rank, nidx_rtp, r_global, gauss, sph_params,         &
-     &          sph_rtp, gen_sph, mesh, group, ele_mesh, stbl)
+     &          sph_rtp, gen_sph, mesh, group, stbl)
 !
       use t_spheric_parameter
       use t_gauss_points
@@ -68,7 +67,6 @@
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::  group
-      type(element_geometry), intent(inout) :: ele_mesh
 !
       integer(kind = kint) :: ip_r, ip_t
 !
@@ -106,7 +104,7 @@
      &    mesh%node%xx(1:mesh%node%numnod,3))
 !
       call set_3D_nnod_4_sfed_by_ele(mesh%ele%nnod_4_ele,               &
-     &    ele_mesh%surf%nnod_4_surf, ele_mesh%edge%nnod_4_edge)
+     &    mesh%surf%nnod_4_surf, mesh%edge%nnod_4_edge)
 !
       end subroutine s_const_FEM_mesh_for_sph
 !

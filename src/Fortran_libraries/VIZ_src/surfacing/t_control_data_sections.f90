@@ -1,31 +1,28 @@
+!>@file   t_control_data_sections.f90
+!!@brief  module t_control_data_sections
+!!
+!!@date  Programmed by H.Matsui in May, 2006
 !
-!      module t_control_data_sections
-!
-!      Written by H. Matsui on July, 2006
-!
-!      subroutine alloc_psf_ctl_stract(psf_ctls)
-!
-!      subroutine dealloc_psf_ctl_stract(psf_ctls)
-!      subroutine dealloc_iso_ctl_stract(iso_ctls)
-!
-!      subroutine read_sections_control_data(psf_ctls, iso_ctls)
-!
-!      subroutine read_files_4_psf_ctl(psf_ctls)
-!      subroutine read_files_4_iso_ctl(iso_ctls)
-!
-!      subroutine bcast_files_4_psf_ctl(psf_ctls)
-!      subroutine bcast_files_4_iso_ctl(iso_ctls)
-!
+!>@brief control data for cross sections
+!!
+!!@verbatim
+!!      subroutine alloc_psf_ctl_stract(psf_ctls)
+!!      subroutine dealloc_psf_ctl_stract(psf_ctls)
+!!
+!!      subroutine read_files_4_psf_ctl                                 &
+!!     &         (id_control, hd_block, psf_ctls, c_buf)
+!!      subroutine bcast_files_4_psf_ctl(psf_ctls)
+!!        type(section_controls), intent(inout) :: psf_ctls
+!!
+!!      subroutine read_control_4_psf_file                              &
+!!     &         (id_control, fname_psf_ctl, psf_ctl_struct)
+!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!    array cross_section_ctl  1
 !!      file   cross_section_ctl   'ctl_psf_eq'
 !!    end array cross_section_ctl
-!!
-!!    array isosurface_ctl     2
-!!      file   isosurface_ctl   'ctl_iso_p_n1e4'
-!!      file   isosurface_ctl   'ctl_iso_p_p1e4'
-!!    end array isosurface_ctl
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!@endverbatim
 !
       module t_control_data_sections
 !
@@ -33,7 +30,6 @@
 !
       use m_machine_parameter
       use t_control_data_4_psf
-      use t_control_data_4_iso
 !
       implicit  none
 !
@@ -44,34 +40,15 @@
         type(psf_ctl), allocatable :: psf_ctl_struct(:)
       end type section_controls
 !
-      type isosurf_controls
-        integer(kind = kint) :: num_iso_ctl = 0
-        character(len = kchara), allocatable :: fname_iso_ctl(:)
-        type(iso_ctl), allocatable :: iso_ctl_struct(:)
-      end type isosurf_controls
+      private :: append_new_section_control
+      private :: dup_control_4_psfs, dealloc_cont_dat_4_psfs
 !
-!   entry label
-!
-      character(len=kchara), parameter :: hd_viz_ctl = 'visual_control'
-      integer (kind=kint) :: i_viz_ctl = 0
-!
-!     Top level
       character(len=kchara), parameter                                  &
      &             :: hd_section_ctl = 'cross_section_ctl'
-      character(len=kchara), parameter                                  &
-     &             :: hd_isosurf_ctl = 'isosurface_ctl'
-!
 !      Deprecated labels
       character(len=kchara), parameter                                  &
      &             :: hd_psf_ctl = 'surface_rendering'
-      character(len=kchara), parameter                                  &
-     &             :: hd_iso_ctl = 'isosurf_rendering'
-!
       private :: hd_section_ctl, hd_psf_ctl
-      private :: hd_isosurf_ctl, hd_iso_ctl
-      private :: hd_viz_ctl, i_viz_ctl
-!
-      private :: alloc_iso_ctl_stract
 !
 !   --------------------------------------------------------------------
 !
@@ -95,172 +72,65 @@
       end subroutine alloc_psf_ctl_stract
 !
 !  ---------------------------------------------------------------------
-!
-      subroutine alloc_iso_ctl_stract(iso_ctls)
-!
-      type(isosurf_controls), intent(inout) :: iso_ctls
-!
-      allocate(iso_ctls%fname_iso_ctl(iso_ctls%num_iso_ctl))
-      allocate(iso_ctls%iso_ctl_struct(iso_ctls%num_iso_ctl))
-!
-      end subroutine alloc_iso_ctl_stract
-!
-!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine dealloc_psf_ctl_stract(psf_ctls)
 !
       type(section_controls), intent(inout) :: psf_ctls
 !
-      deallocate(psf_ctls%psf_ctl_struct)
-      deallocate(psf_ctls%fname_psf_ctl)
+      if(allocated(psf_ctls%fname_psf_ctl)) then
+        deallocate(psf_ctls%psf_ctl_struct)
+        deallocate(psf_ctls%fname_psf_ctl)
+      end if
+      psf_ctls%num_psf_ctl = 0
 !
       end subroutine dealloc_psf_ctl_stract
 !
 !  ---------------------------------------------------------------------
-!
-      subroutine dealloc_iso_ctl_stract(iso_ctls)
-!
-      type(isosurf_controls), intent(inout) :: iso_ctls
-!
-      deallocate(iso_ctls%iso_ctl_struct)
-      deallocate(iso_ctls%fname_iso_ctl)
-!
-      end subroutine dealloc_iso_ctl_stract
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      subroutine read_sections_control_data(psf_ctls, iso_ctls)
-!
-      use m_read_control_elements
-      use skip_comment_f
-!
-      type(section_controls), intent(inout) :: psf_ctls
-      type(isosurf_controls), intent(inout) :: iso_ctls
-!
-!
-      if(right_begin_flag(hd_viz_ctl) .eq. 0) return
-      if (i_viz_ctl .gt. 0) return
-      do
-        call load_ctl_label_and_line
-!
-        i_viz_ctl = find_control_end_flag(hd_viz_ctl)
-        if(i_viz_ctl .eq. 1) exit
-!
-        call find_control_array_flag(hd_psf_ctl, psf_ctls%num_psf_ctl)
-        call read_files_4_psf_ctl(psf_ctls)
-        call find_control_array_flag                                    &
-     &     (hd_section_ctl, psf_ctls%num_psf_ctl)
-        call read_files_4_psf_ctl(psf_ctls)
-!
-        call find_control_array_flag(hd_iso_ctl, iso_ctls%num_iso_ctl)
-        call read_files_4_iso_ctl(iso_ctls)
-        call find_control_array_flag                                    &
-     &     (hd_isosurf_ctl, iso_ctls%num_iso_ctl)
-        call read_files_4_iso_ctl(iso_ctls)
-      end do
-!
-      end subroutine read_sections_control_data
-!
-!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_files_4_psf_ctl(psf_ctls)
+      subroutine read_files_4_psf_ctl                                   &
+     &         (id_control, hd_block, psf_ctls, c_buf)
 !
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
       type(section_controls), intent(inout) :: psf_ctls
-      integer (kind=kint) :: i_psf_ctl1 = 0, i_psf_ctl2 = 0
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(psf_ctls%num_psf_ctl .le. 0) return
-      if((i_psf_ctl1+i_psf_ctl2) .gt. 0) return
-!
+      if(allocated(psf_ctls%fname_psf_ctl)) return
+      psf_ctls%num_psf_ctl = 0
       call alloc_psf_ctl_stract(psf_ctls)
+!
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_array_flag(c_buf, hd_block)) exit
 !
-        call find_control_end_array_flag(hd_psf_ctl,                    &
-     &      psf_ctls%num_psf_ctl, i_psf_ctl2)
-        if(i_psf_ctl2 .ge. psf_ctls%num_psf_ctl) exit
-        call find_control_end_array_flag(hd_section_ctl,                &
-     &      psf_ctls%num_psf_ctl, i_psf_ctl1)
-        if(i_psf_ctl1 .ge. psf_ctls%num_psf_ctl) exit
+        if(check_file_flag(c_buf, hd_block)) then
+          call append_new_section_control(psf_ctls)
+          psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl)                  &
+     &        = third_word(c_buf)
 !
-        if(right_file_flag(hd_section_ctl) .gt. 0) then
-          call read_file_names_from_ctl_line                            &
-     &       (psf_ctls%num_psf_ctl, i_psf_ctl1, psf_ctls%fname_psf_ctl)
-        else if(right_begin_flag(hd_section_ctl) .gt. 0) then
-          i_psf_ctl1 = i_psf_ctl1 + 1
-          psf_ctls%fname_psf_ctl(i_psf_ctl1) = 'NO_FILE'
-          call read_psf_control_data                                    &
-     &       (hd_section_ctl, psf_ctls%psf_ctl_struct(i_psf_ctl1))
+          write(*,'(3a,i4,a)', ADVANCE='NO') 'Read file for ',          &
+     &        trim(hd_block), ' No. ', psf_ctls%num_psf_ctl, '... '
+          call read_control_4_psf_file(id_control+2,                    &
+     &        psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl),             &
+     &        psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl))
+        else if(check_begin_flag(c_buf, hd_block)) then
+          call append_new_section_control(psf_ctls)
+          psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl) = 'NO_FILE'
 !
-        else if(right_file_flag(hd_psf_ctl) .gt. 0) then
-          call read_file_names_from_ctl_line                            &
-     &       (psf_ctls%num_psf_ctl, i_psf_ctl2, psf_ctls%fname_psf_ctl)
-        else if(right_begin_flag(hd_psf_ctl) .gt. 0) then
-          i_psf_ctl2 = i_psf_ctl2 + 1
-          psf_ctls%fname_psf_ctl(i_psf_ctl2) = 'NO_FILE'
-          call read_psf_control_data                                    &
-     &        (hd_psf_ctl, psf_ctls%psf_ctl_struct(i_psf_ctl2))
+          write(*,*) 'Control for', trim(hd_block), ' No. ',            &
+     &              psf_ctls%num_psf_ctl, ' is included'
+          call read_psf_control_data(id_control, hd_block,              &
+     &        psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl), c_buf)
         end if
       end do
 !
       end subroutine read_files_4_psf_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine read_files_4_iso_ctl(iso_ctls)
-!
-      use m_read_control_elements
-      use skip_comment_f
-!
-      type(isosurf_controls), intent(inout) :: iso_ctls
-!
-      integer (kind=kint) :: i_iso_ctl1 = 0, i_iso_ctl2 = 0
-!
-!
-      if(iso_ctls%num_iso_ctl .le. 0) return
-      if ((i_iso_ctl1+i_iso_ctl2) .gt. 0) return
-!
-      call alloc_iso_ctl_stract(iso_ctls)
-      do
-        call load_ctl_label_and_line
-!
-        call find_control_end_array_flag(hd_isosurf_ctl,                &
-     &      iso_ctls%num_iso_ctl, i_iso_ctl1)
-        if(i_iso_ctl1 .ge. iso_ctls%num_iso_ctl) exit
-        call find_control_end_array_flag(hd_iso_ctl,                    &
-     &      iso_ctls%num_iso_ctl, i_iso_ctl2)
-        if(i_iso_ctl2 .ge. iso_ctls%num_iso_ctl) exit
-!
-        if(right_file_flag(hd_isosurf_ctl) .gt. 0) then
-          call read_file_names_from_ctl_line                            &
-     &       (iso_ctls%num_iso_ctl, i_iso_ctl1, iso_ctls%fname_iso_ctl)
-        else if(right_begin_flag(hd_isosurf_ctl) .gt. 0) then
-          i_iso_ctl1 = i_iso_ctl1 + 1
-          iso_ctls%fname_iso_ctl(i_iso_ctl1) = 'NO_FILE'
-          call read_iso_control_data                                    &
-     &       (hd_isosurf_ctl, iso_ctls%iso_ctl_struct(i_iso_ctl1))
-!
-        else if(right_file_flag(hd_isosurf_ctl) .gt. 0                  &
-     &     .or. right_file_flag(hd_iso_ctl) .gt. 0) then
-          call read_file_names_from_ctl_line                            &
-     &       (iso_ctls%num_iso_ctl, i_iso_ctl2, iso_ctls%fname_iso_ctl)
-        else if(right_begin_flag(hd_isosurf_ctl) .gt. 0                 &
-     &     .or. right_begin_flag(hd_iso_ctl) .gt. 0) then
-          i_iso_ctl2 = i_iso_ctl2 + 1
-          iso_ctls%fname_iso_ctl(i_iso_ctl2) = 'NO_FILE'
-          call read_iso_control_data                                    &
-     &        (hd_iso_ctl, iso_ctls%iso_ctl_struct(i_iso_ctl2))
-        end if
-!
-      end do
-!
-      end subroutine read_files_4_iso_ctl
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
@@ -284,41 +154,107 @@
      &   (psf_ctls%fname_psf_ctl, int(kchara*psf_ctls%num_psf_ctl),     &
      &    CALYPSO_CHARACTER, 0, CALYPSO_COMM, ierr_MPI)
       do i_psf = 1, psf_ctls%num_psf_ctl
-        if(psf_ctls%fname_psf_ctl(i_psf) .eq. 'NO_FILE') then
-          call bcast_psf_control_data(psf_ctls%psf_ctl_struct(i_psf))
-        end if
+        call bcast_psf_control_data(psf_ctls%psf_ctl_struct(i_psf))
       end do
 !
       end subroutine bcast_files_4_psf_ctl
 !
 !   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
 !
-      subroutine bcast_files_4_iso_ctl(iso_ctls)
+      subroutine append_new_section_control(psf_ctls)
 !
-      use calypso_mpi
-      use t_control_data_4_iso
+      type(section_controls), intent(inout) :: psf_ctls
 !
-      type(isosurf_controls), intent(inout) :: iso_ctls
-      integer (kind=kint) :: i_iso
+      type(section_controls) :: tmp_psf_c
 !
 !
-      call MPI_BCAST(iso_ctls%num_iso_ctl,  1,                          &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      if(iso_ctls%num_iso_ctl .le. 0) return
+      tmp_psf_c%num_psf_ctl = psf_ctls%num_psf_ctl
+      call alloc_psf_ctl_stract(tmp_psf_c)
+      call dup_control_4_psfs                                           &
+     &    (tmp_psf_c%num_psf_ctl, psf_ctls, tmp_psf_c)
 !
-      if(my_rank .gt. 0) call alloc_iso_ctl_stract(iso_ctls)
+      call dealloc_cont_dat_4_psfs                                      &
+     &   (psf_ctls%num_psf_ctl, psf_ctls%psf_ctl_struct)
+      call dealloc_psf_ctl_stract(psf_ctls)
 !
-      call MPI_BCAST                                                    &
-     &   (iso_ctls%fname_iso_ctl, int(kchara*iso_ctls%num_iso_ctl),     &
-     &    CALYPSO_CHARACTER, 0, CALYPSO_COMM, ierr_MPI)
-      do i_iso = 1, iso_ctls%num_iso_ctl
-        if(iso_ctls%fname_iso_ctl(i_iso) .eq. 'NO_FILE') then
-          call bcast_iso_control_data(iso_ctls%iso_ctl_struct(i_iso))
-        end if
+      psf_ctls%num_psf_ctl = tmp_psf_c%num_psf_ctl + 1
+      call alloc_psf_ctl_stract(psf_ctls)
+!
+      call dup_control_4_psfs                                           &
+     &   (tmp_psf_c%num_psf_ctl, tmp_psf_c, psf_ctls)
+!
+      call dealloc_cont_dat_4_psfs                                      &
+     &   (tmp_psf_c%num_psf_ctl, tmp_psf_c%psf_ctl_struct)
+      call dealloc_psf_ctl_stract(tmp_psf_c)
+!
+      end subroutine append_new_section_control
+!
+! -----------------------------------------------------------------------
+!
+      subroutine dup_control_4_psfs                                     &
+     &         (num_psf, org_psf_ctls, new_psf_ctls)
+!
+      integer(kind = kint), intent(in) :: num_psf
+      type(section_controls), intent(in) :: org_psf_ctls
+      type(section_controls), intent(inout) :: new_psf_ctls
+!
+      integer(kind = kint) :: i
+!
+      do i = 1, num_psf
+        call dup_control_4_psf(org_psf_ctls%psf_ctl_struct(i),          &
+            new_psf_ctls%psf_ctl_struct(i))
+        new_psf_ctls%fname_psf_ctl(i) = org_psf_ctls%fname_psf_ctl(i)
       end do
 !
-      end subroutine bcast_files_4_iso_ctl
+      end subroutine dup_control_4_psfs
 !
-!   --------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine dealloc_cont_dat_4_psfs(num_psf, psf_c)
+!
+      integer(kind = kint), intent(in) :: num_psf
+      type(psf_ctl), intent(inout) :: psf_c(num_psf)
+!
+      integer(kind = kint) :: i
+!
+      do i = 1, num_psf
+        call dealloc_cont_dat_4_psf(psf_c(i))
+      end do
+!
+      end subroutine dealloc_cont_dat_4_psfs
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine read_control_4_psf_file                                &
+     &         (id_control, fname_psf_ctl, psf_ctl_struct)
+!
+      use t_read_control_elements
+      use t_control_data_4_psf
+!
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len = kchara), intent(in) :: fname_psf_ctl
+      type(psf_ctl), intent(inout) :: psf_ctl_struct
+!
+      type(buffer_for_control) :: c_buf1
+!
+!
+      write(*,*) 'Section control file: ', trim(fname_psf_ctl)
+      open(id_control, file=fname_psf_ctl, status='old')
+!
+      do
+        call load_one_line_from_control(id_control, c_buf1)
+        call read_psf_control_data(id_control, hd_section_ctl,          &
+     &      psf_ctl_struct, c_buf1)
+        call read_psf_control_data(id_control, hd_psf_ctl,              &
+     &      psf_ctl_struct, c_buf1)
+        if(psf_ctl_struct%i_psf_ctl .gt. 0) exit
+      end do
+      close(id_control)
+!
+      end subroutine read_control_4_psf_file
+!
+!  ---------------------------------------------------------------------
 !
       end module t_control_data_sections

@@ -7,7 +7,8 @@
 !> @brief Control input routine for data file headers
 !!
 !!@verbatim
-!!      subroutine read_FEM_mesh_control(hd_block, iflag, Fmesh_ctl)
+!!      subroutine read_FEM_mesh_control                                &
+!!     &         (id_control, hd_block, Fmesh_ctl, c_buf)
 !!        type(FEM_mesh_control), intent(inout) :: Fmesh_ctl
 !!      subroutine write_FEM_mesh_control                               &
 !!     &         (id_file, hd_block, Fmesh_ctl, level)
@@ -50,6 +51,8 @@
 !
         type(read_integer_item) ::   FEM_sleeve_level_ctl
         type(read_character_item) :: FEM_element_overlap_ctl
+!
+        integer(kind=kint) :: i_FEM_mesh =   0
       end type FEM_mesh_control
 !
 !   file and domain controls
@@ -74,42 +77,43 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_FEM_mesh_control(hd_block, iflag, Fmesh_ctl)
+      subroutine read_FEM_mesh_control                                  &
+     &         (id_control, hd_block, Fmesh_ctl, c_buf)
 !
       use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(FEM_mesh_control), intent(inout) :: Fmesh_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if(iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(Fmesh_ctl%i_FEM_mesh .gt. 0) return
       do
-        call load_ctl_label_and_line
-!
-        iflag =  find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
 !
-        call read_chara_ctl_type(hd_mem_conserve,                       &
+        call read_chara_ctl_type(c_buf, hd_mem_conserve,                &
      &      Fmesh_ctl%memory_conservation_ctl)
-        call read_chara_ctl_type(hd_FEM_mesh_output,                    &
+        call read_chara_ctl_type(c_buf, hd_FEM_mesh_output,             &
      &      Fmesh_ctl%FEM_mesh_output_switch)
-        call read_chara_ctl_type(hd_FEM_surf_output,                    &
+        call read_chara_ctl_type(c_buf, hd_FEM_surf_output,             &
      &      Fmesh_ctl%FEM_surface_output_switch)
-        call read_chara_ctl_type(hd_FEM_viewer_output,                  &
+        call read_chara_ctl_type(c_buf, hd_FEM_viewer_output,           &
      &      Fmesh_ctl%FEM_viewer_output_switch)
 !
         call read_integer_ctl_type                                      &
-     &     (hd_sleeve_level, Fmesh_ctl%FEM_sleeve_level_ctl)
+     &     (c_buf, hd_sleeve_level, Fmesh_ctl%FEM_sleeve_level_ctl)
 !
         call read_chara_ctl_type                                        &
-     &     (hd_ele_overlap, Fmesh_ctl%FEM_element_overlap_ctl)
+     &     (c_buf, hd_ele_overlap, Fmesh_ctl%FEM_element_overlap_ctl)
        end do
+       Fmesh_ctl%i_FEM_mesh = 1
 !
       end subroutine read_FEM_mesh_control
 !
@@ -119,7 +123,7 @@
      &         (id_file, hd_block, Fmesh_ctl, level)
 !
       use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file

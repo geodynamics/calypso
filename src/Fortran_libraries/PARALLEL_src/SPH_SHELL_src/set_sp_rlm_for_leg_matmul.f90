@@ -65,7 +65,7 @@
       integer(kind = kint), intent(in) :: ncomp
       integer(kind = kint), intent(in) :: n_WR
       integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real(kind = kreal), intent(in) :: WR(n_WR)
 !
       integer(kind = kint), intent(in) :: nvec_jk
       real(kind = kreal), intent(inout) :: pol_e(nvec_jk)
@@ -121,7 +121,7 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
       integer(kind = kint), intent(in) :: n_WR
       integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real(kind = kreal), intent(in):: WR(n_WR)
 !
       integer(kind = kint), intent(in) :: nscl_jk
       real(kind = kreal), intent(inout) :: scl_e(nscl_jk)
@@ -169,7 +169,7 @@
       integer(kind = kint), intent(in) :: ncomp
       integer(kind = kint), intent(in) :: n_WR
       integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real(kind = kreal), intent(in) :: WR(n_WR)
 !
       real(kind = kreal), intent(inout) :: pol_e(n_jk_e,nkr)
       real(kind = kreal), intent(inout) :: dpoldt_e(n_jk_e,nkr)
@@ -244,7 +244,7 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
       integer(kind = kint), intent(in) :: n_WR
       integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real(kind = kreal), intent(in):: WR(n_WR)
 !
       real(kind = kreal), intent(inout) :: scl_e(n_jk_e,nkr)
       real(kind = kreal), intent(inout) :: scl_o(n_jk_o,nkr)
@@ -295,7 +295,7 @@
       integer(kind = kint), intent(in) :: ncomp, nvector
       integer(kind = kint), intent(in) :: n_WR
       integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real (kind=kreal), intent(in):: WR(n_WR)
 !
       real(kind = kreal), intent(inout) :: pol_e(n_jk_e,ncomp*nkr)
       real(kind = kreal), intent(inout) :: tor_e(n_jk_e,2*nvector*nkr)
@@ -365,7 +365,7 @@
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: n_WR
       integer(kind = kint), intent(in) :: irev_sr_rlm(nnod_rlm)
-      real (kind=kreal), intent(inout):: WR(n_WR)
+      real(kind = kreal), intent(in) :: WR(n_WR)
 !
       real(kind = kreal), intent(inout) :: scl_e(n_jk_e,ncomp*nkr)
       real(kind = kreal), intent(inout) :: scl_o(n_jk_o,ncomp*nkr)

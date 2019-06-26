@@ -332,7 +332,6 @@
       end if
       IO_param%ioff_gl = IO_param%ioff_gl                               &
      &         + IO_param%istack_merged(IO_param%nprocs_in)
-      call calypso_mpi_barrier
 !
       end subroutine mpi_read_comm_table
 !

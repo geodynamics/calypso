@@ -33,7 +33,8 @@
 !
       implicit none
 !
-      private :: find_radial_grid_index, global_sum_sph_layerd_rms
+      private :: find_radial_grid_index, global_sum_sph_layerd_square
+      private :: global_sum_sph_volume_square
 !
 ! -----------------------------------------------------------------------
 !
@@ -70,6 +71,7 @@
         end do
       end if
 !
+
       do i = 1, pwr%num_vol_spectr
         call find_radial_grid_index(sph_rj, sph_params%nlayer_ICB,      &
      &      pwr%v_spectr(i)%r_inside, pwr%v_spectr(i)%kr_inside)
@@ -105,6 +107,7 @@
       call quicksort_int                                                &
      &   (pwr%nri_rms, pwr%kr_4_rms, ione, pwr%nri_rms)
 !
+      call set_domains_4_spectr_output(sph_rj, pwr)
       call alloc_rms_4_sph_spectr                                       &
      &   (my_rank, sph_params%l_truncation, pwr)
       call alloc_ave_4_sph_spectr                                       &
@@ -149,7 +152,7 @@
      &        pwr%v_spectr(i)%kr_inside, pwr%v_spectr(i)%kr_outside,    &
      &        pwr%v_spectr(i)%r_inside,  pwr%v_spectr(i)%r_outside
         end do
-      end if
+     end if
 !
       end subroutine init_rms_4_sph_spectr
 !
@@ -179,7 +182,6 @@
 !
       if(pwr%ntot_comp_sq .eq. 0) return
 !
-      call calypso_mpi_barrier
       if(iflag_debug .gt. 0) write(*,*) 'sum_sph_layerd_rms'
       call sum_sph_layerd_rms                                           &
      &   (sph_params%l_truncation, sph_rj, ipol, g_sph_rj, rj_fld,      &
@@ -187,32 +189,19 @@
      &    pwr%id_field, pwr%kr_4_rms, pwr%num_vol_spectr,               &
      &    pwr%v_spectr, WK_pwr)
 !
-      if(iflag_debug .gt. 0) write(*,*) 'global_sum_sph_layerd_rms'
-      call global_sum_sph_layerd_rms                                    &
-     &    (sph_params%l_truncation, pwr%nri_rms, pwr%ntot_comp_sq,      &
-     &     WK_pwr, pwr%shl_l, pwr%shl_m, pwr%shl_lm,                    &
-     &     pwr%shl_sq, pwr%shl_m0, pwr%ratio_shl_m0,                    &
+      if(iflag_debug .gt. 0) write(*,*) 'global_sum_sph_layerd_square'
+      call global_sum_sph_layerd_square                                 &
+     &    (sph_params%l_truncation, WK_pwr, pwr)
+      call global_sum_sph_volume_square                                 &
+     &    (sph_params%l_truncation, pwr%ntot_comp_sq, WK_pwr,           &
      &     pwr%num_vol_spectr, pwr%v_spectr)
-!
-!
-      call calypso_mpi_barrier
-      if(my_rank .eq. 0) then
-        if(iflag_debug .gt. 0) write(*,*) 'surf_ave_4_sph_rms_int'
-        call surf_ave_4_sph_rms_int(sph_params%l_truncation,            &
-     &      sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,                      &
-     &      pwr%nri_rms, pwr%ntot_comp_sq, pwr%kr_4_rms,                &
-     &      pwr%shl_l, pwr%shl_m, pwr%shl_lm, pwr%shl_sq, pwr%shl_m0)
-        do i = 1, pwr%num_vol_spectr
-          call vol_ave_4_rms_sph                                        &
-     &       (sph_params%l_truncation, pwr%ntot_comp_sq,                &
-     &        pwr%v_spectr(i)%avol, pwr%v_spectr(i)%v_l,                &
-     &        pwr%v_spectr(i)%v_m, pwr%v_spectr(i)%v_lm,                &
-     &        pwr%v_spectr(i)%v_sq, pwr%v_spectr(i)%v_m0)
-        end do
-      end if
 !
       if(iflag_debug .gt. 0) write(*,*) 'cal_volume_average_sph'
       call cal_volume_average_sph(sph_rj, rj_fld, pwr)
+!
+      call sum_mean_square_on_sphere(sph_params, sph_rj, pwr)
+      call sum_mean_square_on_volume(sph_params, pwr%ntot_comp_sq,      &
+     &    pwr%num_vol_spectr, pwr%v_spectr)
 !
       end subroutine cal_mean_squre_in_shell
 !
@@ -240,7 +229,6 @@
 !
       if(cor%ntot_comp_sq .eq. 0) return
 !
-      call calypso_mpi_barrier
       if(iflag_debug .gt. 0) write(*,*) 'sum_sph_layerd_correlate'
       call sum_sph_layerd_correlate                                     &
      &   (sph_params%l_truncation, sph_rj, g_sph_rj, rj_fld1, rj_fld2,  &
@@ -248,39 +236,24 @@
      &    cor%id_field, cor%kr_4_rms, cor%num_vol_spectr,               &
      &    cor%v_spectr, WK_pwr)
 !
-      if(iflag_debug .gt. 0) write(*,*) 'global_sum_sph_layerd_rms'
-      call global_sum_sph_layerd_rms                                    &
-     &    (sph_params%l_truncation, cor%nri_rms, cor%ntot_comp_sq,      &
-     &     WK_pwr, cor%shl_l, cor%shl_m, cor%shl_lm,                    &
-     &     cor%shl_sq, cor%shl_m0, cor%ratio_shl_m0,                    &
+      if(iflag_debug .gt. 0) write(*,*) 'global_sum_sph_layerd_square'
+      call global_sum_sph_layerd_square                                 &
+     &    (sph_params%l_truncation, WK_pwr, cor)
+      call global_sum_sph_volume_square                                 &
+     &    (sph_params%l_truncation, cor%ntot_comp_sq, WK_pwr,           &
      &     cor%num_vol_spectr, cor%v_spectr)
 !
-!
-      call calypso_mpi_barrier
-      if(my_rank .eq. 0) then
-        if(iflag_debug .gt. 0) write(*,*) 'surf_ave_4_sph_rms_int'
-        call surf_ave_4_sph_rms_int(sph_params%l_truncation,            &
-     &      sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,                      &
-     &      cor%nri_rms, cor%ntot_comp_sq, cor%kr_4_rms,                &
-     &      cor%shl_l, cor%shl_m, cor%shl_lm, cor%shl_sq, cor%shl_m0)
-        do i = 1, cor%num_vol_spectr
-          call vol_ave_4_rms_sph                                        &
-     &       (sph_params%l_truncation, cor%ntot_comp_sq,                &
-     &        cor%v_spectr(i)%avol, cor%v_spectr(i)%v_l,                &
-     &        cor%v_spectr(i)%v_m, cor%v_spectr(i)%v_lm,                &
-     &        cor%v_spectr(i)%v_sq, cor%v_spectr(i)%v_m0)
-        end do
-      end if
+      call sum_mean_square_on_sphere(sph_params, sph_rj, cor)
+      call sum_mean_square_on_volume(sph_params, cor%ntot_comp_sq,      &
+     &    cor%num_vol_spectr, cor%v_spectr)
 !
       end subroutine cal_correlate_in_shell
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine global_sum_sph_layerd_rms                              &
-     &         (l_truncation, nri_rms, ntot_rms_rj, WK_pwr,             &
-     &          rms_sph_l, rms_sph_m, rms_sph_lm,                       &
-     &          rms_sph, rms_sph_m0, ratio_sph_m0, num_vol_spectr, v_pwr)
+      subroutine global_sum_sph_layerd_square                           &
+     &         (l_truncation, WK_pwr, pwr)
 !
       use calypso_mpi
 !
@@ -288,22 +261,37 @@
       use radial_int_for_sph_spec
 !
       integer(kind = kint), intent(in) :: l_truncation
-      integer(kind = kint), intent(in) :: nri_rms
-      integer(kind = kint), intent(in) :: ntot_rms_rj
       type(sph_mean_square_work), intent(in) :: WK_pwr
 !
-      real(kind = kreal), intent(inout)                                 &
-     &          :: rms_sph_l(nri_rms,0:l_truncation,ntot_rms_rj)
-      real(kind = kreal), intent(inout)                                 &
-     &          :: rms_sph_m(nri_rms,0:l_truncation,ntot_rms_rj)
-      real(kind = kreal), intent(inout)                                 &
-     &          :: rms_sph_lm(nri_rms,0:l_truncation,ntot_rms_rj)
+      type(sph_mean_squares), intent(inout) :: pwr
 !
-      real(kind = kreal), intent(inout) :: rms_sph(nri_rms,ntot_rms_rj)
-      real(kind = kreal), intent(inout)                                 &
-     &          :: rms_sph_m0(nri_rms,ntot_rms_rj)
-      real(kind = kreal), intent(inout)                                 &
-     &          :: ratio_sph_m0(nri_rms,ntot_rms_rj)
+      integer(kind = kint_gl) :: num64
+!
+!
+      if(pwr%nri_rms .le. 0) return
+      num64 = pwr%ntot_comp_sq * pwr%nri_rms * (l_truncation + 1)
+      call calypso_mpi_reduce_real(WK_pwr%shl_l_local, pwr%shl_l,       &
+     &    num64, MPI_SUM, pwr%irank_l)
+      call calypso_mpi_reduce_real(WK_pwr%shl_m_local, pwr%shl_m,       &
+     &    num64, MPI_SUM, pwr%irank_m)
+      call calypso_mpi_reduce_real(WK_pwr%shl_lm_local, pwr%shl_lm,     &
+     &    num64, MPI_SUM, pwr%irank_lm)
+!
+      end subroutine global_sum_sph_layerd_square
+!
+! -----------------------------------------------------------------------
+!
+      subroutine global_sum_sph_volume_square                           &
+     &         (l_truncation, ntot_rms_rj, WK_pwr,                      &
+     &          num_vol_spectr, v_pwr)
+!
+      use calypso_mpi
+!
+      use radial_int_for_sph_spec
+!
+      integer(kind = kint), intent(in) :: l_truncation
+      integer(kind = kint), intent(in) :: ntot_rms_rj
+      type(sph_mean_square_work), intent(in) :: WK_pwr
 !
       integer(kind = kint), intent(in) :: num_vol_spectr
       type(sph_vol_mean_squares), intent(inout)                         &
@@ -315,40 +303,141 @@
 !
       num64 = ntot_rms_rj * (l_truncation + 1)
       do i = 1, num_vol_spectr
-        call calypso_mpi_reduce_real                                    &
-     &     (WK_pwr%vol_l_local(0,1,i), v_pwr(i)%v_l, num64, MPI_SUM, 0)
-        call calypso_mpi_reduce_real                                    &
-     &     (WK_pwr%vol_m_local(0,1,i), v_pwr(i)%v_m, num64, MPI_SUM, 0)
-        call calypso_mpi_reduce_real                                    &
-     &     (WK_pwr%vol_lm_local(0,1,i), v_pwr(i)%v_lm,                  &
-     &      num64, MPI_SUM, 0)
+        call calypso_mpi_reduce_real(WK_pwr%vol_l_local(0,1,i),         &
+     &      v_pwr(i)%v_l, num64, MPI_SUM, v_pwr(i)%irank_l)
 !
-        if(my_rank .eq. 0) then
-          call sum_sph_vol_rms_all_modes(l_truncation, ntot_rms_rj,     &
-     &      v_pwr(i)%v_l, v_pwr(i)%v_sq)
-          call pick_axis_sph_vol_pwr                                    &
-     &     (l_truncation, ntot_rms_rj, v_pwr(i)%v_m, v_pwr(i)%v_sq,     &
-     &      v_pwr(i)%v_m0, v_pwr(i)%v_ratio_m0)
+        call calypso_mpi_reduce_real(WK_pwr%vol_m_local(0,1,i),         &
+     &      v_pwr(i)%v_m, num64, MPI_SUM, v_pwr(i)%irank_m)
+!
+        call calypso_mpi_reduce_real(WK_pwr%vol_lm_local(0,1,i),        &
+     &      v_pwr(i)%v_lm, num64, MPI_SUM, v_pwr(i)%irank_lm)
+      end do
+!
+      end subroutine global_sum_sph_volume_square
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine sum_mean_square_on_sphere(sph_params, sph_rj, pwr)
+!
+      use calypso_mpi
+      use cal_ave_4_rms_vector_sph
+!
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(sph_mean_squares), intent(inout) :: pwr
+!
+!
+      if(my_rank .eq. pwr%irank_m) then
+        call sum_sph_rms_all_modes                                      &
+     &     (sph_params%l_truncation, pwr%nri_rms, pwr%ntot_comp_sq,     &
+     &      pwr%shl_m, pwr%shl_sq)
+        call pick_axis_sph_power                                        &
+     &     (sph_params%l_truncation, pwr%nri_rms, pwr%ntot_comp_sq,     &
+     &      pwr%shl_m, pwr%shl_sq, pwr%shl_m0, pwr%ratio_shl_m0)
+!
+        call surf_ave_4_sph_rms(sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,  &
+     &        pwr%nri_rms, pwr%ntot_comp_sq, pwr%kr_4_rms, pwr%shl_sq)
+        call surf_ave_4_sph_rms(sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,  &
+     &        pwr%nri_rms, pwr%ntot_comp_sq, pwr%kr_4_rms, pwr%shl_m0)
+!
+      else if(my_rank .eq. pwr%irank_l) then
+        call sum_sph_rms_all_modes                                      &
+     &     (sph_params%l_truncation, pwr%nri_rms, pwr%ntot_comp_sq,     &
+     &      pwr%shl_l, pwr%shl_sq)
+        call surf_ave_4_sph_rms(sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,  &
+     &        pwr%nri_rms, pwr%ntot_comp_sq, pwr%kr_4_rms, pwr%shl_sq)
+!
+      else if(my_rank .eq. pwr%irank_lm) then
+        call sum_sph_rms_all_modes                                      &
+     &     (sph_params%l_truncation, pwr%nri_rms, pwr%ntot_comp_sq,     &
+     &      pwr%shl_lm, pwr%shl_sq)
+        call surf_ave_4_sph_rms(sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,  &
+     &        pwr%nri_rms, pwr%ntot_comp_sq, pwr%kr_4_rms, pwr%shl_sq)
+      end if
+!
+      if(my_rank .eq. pwr%irank_m) then
+        call surf_ave_4_sph_rms_int(sph_params%l_truncation,            &
+     &        sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,                    &
+     &        pwr%nri_rms, pwr%ntot_comp_sq, pwr%kr_4_rms, pwr%shl_m)
+      end if
+      if(my_rank .eq. pwr%irank_l) then
+        call surf_ave_4_sph_rms_int(sph_params%l_truncation,            &
+     &      sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,                      &
+     &      pwr%nri_rms, pwr%ntot_comp_sq, pwr%kr_4_rms, pwr%shl_l)
+      end if
+      if(my_rank .eq. pwr%irank_lm) then
+        call surf_ave_4_sph_rms_int(sph_params%l_truncation,            &
+     &      sph_rj%nidx_rj(1), sph_rj%a_r_1d_rj_r,                      &
+     &      pwr%nri_rms, pwr%ntot_comp_sq, pwr%kr_4_rms, pwr%shl_lm)
+      end if
+!
+      end subroutine sum_mean_square_on_sphere
+!
+! -----------------------------------------------------------------------
+!
+      subroutine sum_mean_square_on_volume                              &
+     &         (sph_params, ntot_rms_rj, num_vol_spectr, v_pwr)
+!
+      use calypso_mpi
+!
+      use cal_ave_4_rms_vector_sph
+!
+      type(sph_shell_parameters), intent(in) :: sph_params
+      integer(kind = kint), intent(in) :: ntot_rms_rj
+!
+      integer(kind = kint), intent(in) :: num_vol_spectr
+      type(sph_vol_mean_squares), intent(inout)                         &
+     &                         :: v_pwr(num_vol_spectr)
+!
+      integer(kind = kint) :: i
+!
+!
+      do i = 1, num_vol_spectr
+!
+        if(my_rank .eq. v_pwr(i)%irank_m) then
+          call sum_sph_vol_rms_all_modes(sph_params%l_truncation,       &
+     &        ntot_rms_rj, v_pwr(i)%v_m, v_pwr(i)%v_sq)
+          call pick_axis_sph_vol_pwr(sph_params%l_truncation,           &
+     &        ntot_rms_rj, v_pwr(i)%v_m, v_pwr(i)%v_sq,                 &
+     &        v_pwr(i)%v_m0, v_pwr(i)%v_ratio_m0)
+!
+          call vol_ave_4_rms_sph                                        &
+     &         (ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_sq)
+          call vol_ave_4_rms_sph                                        &
+     &         (ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_m0)
+!
+        else if(my_rank .eq. v_pwr(i)%irank_l) then
+          call sum_sph_vol_rms_all_modes(sph_params%l_truncation,       &
+     &        ntot_rms_rj, v_pwr(i)%v_l, v_pwr(i)%v_sq)
+          call vol_ave_4_rms_sph                                        &
+     &         (ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_sq)
+!
+        else if(my_rank .eq. v_pwr(i)%irank_lm) then
+          call sum_sph_vol_rms_all_modes(sph_params%l_truncation,       &
+     &        ntot_rms_rj, v_pwr(i)%v_lm, v_pwr(i)%v_sq)
+          call vol_ave_4_rms_sph                                        &
+     &         (ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_sq)
+        end if
+!
+!
+        if(my_rank .eq. v_pwr(i)%irank_m) then
+          call vol_ave_4_rms_sph_int(sph_params%l_truncation,           &
+     &        ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_m)
+        end if
+        if(my_rank .eq. v_pwr(i)%irank_l) then
+          call vol_ave_4_rms_sph_int(sph_params%l_truncation,           &
+     &        ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_l)
+        end if
+        if(my_rank .eq. v_pwr(i)%irank_lm) then
+          call vol_ave_4_rms_sph_int(sph_params%l_truncation,           &
+     &        ntot_rms_rj, v_pwr(i)%avol, v_pwr(i)%v_lm)
         end if
       end do
 !
-      if(nri_rms .le. 0) return
-      num64 = ntot_rms_rj * nri_rms * (l_truncation + 1)
-      call calypso_mpi_reduce_real                                      &
-     &   (WK_pwr%shl_l_local, rms_sph_l, num64, MPI_SUM, 0)
-      call calypso_mpi_reduce_real                                      &
-     &   (WK_pwr%shl_m_local, rms_sph_m, num64, MPI_SUM, 0)
-      call calypso_mpi_reduce_real                                      &
-     &   (WK_pwr%shl_lm_local, rms_sph_lm, num64, MPI_SUM, 0)
+      end subroutine sum_mean_square_on_volume
 !
-      if(my_rank .gt. 0) return
-      call sum_sph_rms_all_modes(l_truncation, nri_rms, ntot_rms_rj,    &
-     &    rms_sph_l, rms_sph)
-      call pick_axis_sph_power(l_truncation, nri_rms, ntot_rms_rj,      &
-     &    rms_sph_m, rms_sph, rms_sph_m0, ratio_sph_m0)
-!
-      end subroutine global_sum_sph_layerd_rms
-!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine find_radial_grid_index                                 &
@@ -393,6 +482,68 @@
       end if
 !
       end subroutine find_radial_grid_index
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_domains_4_spectr_output(sph_rj, pwr)
+!
+      use calypso_mpi
+!
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(sph_mean_squares), intent(inout) :: pwr
+!
+      integer :: ip_ave, ip_lc
+      integer(kind = kint) :: icou, i
+      real(kind = kreal) :: rinc
+!
+!
+      icou = 1 + 3 * pwr%num_vol_spectr
+      if(pwr%nri_ave .gt. 0) icou = icou + 3
+      rinc = dble(nprocs-1) / dble(icou)
+!
+      ip_lc = 0
+      if(sph_rj%idx_rj_degree_zero .gt. 0)  ip_lc = my_rank
+      call MPI_allREDUCE(ip_lc, ip_ave, 1, CALYPSO_FOUR_INT,            &
+     &    MPI_SUM, CALYPSO_COMM, ierr_MPI)
+!
+      pwr%irank_m = -1
+      pwr%irank_l = -1
+      pwr%irank_lm = -1
+      do i = 1, pwr%num_vol_spectr
+        pwr%v_spectr(i)%irank_m =  -1
+        pwr%v_spectr(i)%irank_l =  -1
+        pwr%v_spectr(i)%irank_lm = -1
+      end do
+!
+      icou = 0
+      if(pwr%iflag_layer_rms_spec .gt. izero)  then
+        pwr%irank_m =  mod(int((icou+1)*rinc)+ip_ave, nprocs)
+        pwr%irank_l =  mod(int((icou+2)*rinc)+ip_ave, nprocs)
+        pwr%irank_lm = mod(int((icou+3)*rinc)+ip_ave, nprocs)
+        icou = icou + 3
+      end if
+      do i = 1, pwr%num_vol_spectr
+        pwr%v_spectr(i)%irank_m                                         &
+     &        =  mod(int((icou+1)*rinc)+ip_ave, nprocs)
+        pwr%v_spectr(i)%irank_l                                         &
+     &        =  mod(int((icou+2)*rinc)+ip_ave, nprocs)
+        pwr%v_spectr(i)%irank_lm                                        &
+     &        = mod(int((icou+3)*rinc)+ip_ave, nprocs)
+        icou = icou + 3
+      end do
+!
+      if(iflag_debug .le. 0) return
+!
+      write(*,*) 'ip_ave', ip_ave, rinc
+      write(*,*) 'Layers, irank_l, irank_m, irank_lm'
+      write(*,*) pwr%irank_l, pwr%irank_m, pwr%irank_lm
+      write(*,*) 'Volumes, irank_l, irank_m, irank_lm'
+      do i = 1, pwr%num_vol_spectr
+        write(*,*) i, pwr%v_spectr(i)%irank_l,                          &
+     &      pwr%v_spectr(i)%irank_m, pwr%v_spectr(i)%irank_lm
+      end do
+!
+      end subroutine set_domains_4_spectr_output
 !
 ! -----------------------------------------------------------------------
 !

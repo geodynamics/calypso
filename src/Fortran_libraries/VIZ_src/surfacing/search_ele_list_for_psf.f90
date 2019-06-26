@@ -1,15 +1,18 @@
-!search_ele_list_for_psf.f90
-!      module search_ele_list_for_psf
+!>@file   search_ele_list_for_psf.f90
+!!@brief  module search_ele_list_for_psf
+!!
+!!@date  Programmed by H.Matsui in June, 2006
 !
-!      Written by H. Matsui on June, 2006
-!
-!!      subroutine set_search_mesh_list_4_psf(num_psf,                  &
-!!     &          mesh, ele_mesh, group, psf_param, psf_search)
+!>@brief set elememnt list for sections
+!!
+!!@verbatim
+!!      subroutine set_search_mesh_list_4_psf                           &
+!!     &         (num_psf, mesh, group, psf_param, psf_search)
 !!        type(mesh_geometry), intent(in) :: mesh
-!!        type(element_geometry), intent(in) :: ele_mesh
 !!        type(mesh_groups), intent(in) :: group
 !!        type(psf_parameters), intent(in) :: psf_param(num_psf)
 !!        type(psf_search_lists), intent(inout) :: psf_search(num_psf)
+!!@endverbatim
 !
       module search_ele_list_for_psf
 !
@@ -36,15 +39,14 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_search_mesh_list_4_psf(num_psf,                    &
-     &          mesh, ele_mesh, group, psf_param, psf_search)
+      subroutine set_search_mesh_list_4_psf                             &
+     &         (num_psf, mesh, group, psf_param, psf_search)
 !
       use m_geometry_constants
       use t_psf_patch_data
 !
       integer(kind = kint), intent(in) :: num_psf
       type(mesh_geometry), intent(in) :: mesh
-      type(element_geometry), intent(in) :: ele_mesh
       type(mesh_groups), intent(in) :: group
 !
       type(psf_parameters), intent(in) :: psf_param(num_psf)
@@ -56,13 +58,13 @@
      &   (num_psf, mesh%ele, group%ele_grp, psf_param, psf_search)
 !
       call set_searched_surface_list_4_psf                              &
-     &   (num_psf, mesh%ele, ele_mesh%surf, psf_search)
+     &   (num_psf, mesh%ele, mesh%surf, psf_search)
 !
       call set_searched_edge_list_4_psf                                 &
-     &   (num_psf, ele_mesh%surf, ele_mesh%edge, psf_search)
+     &   (num_psf, mesh%surf, mesh%edge, psf_search)
 !
       call set_searched_node_list_4_psf                                 &
-     &   (num_psf, mesh%node, ele_mesh%edge, psf_search)
+     &   (num_psf, mesh%node, mesh%edge, psf_search)
 !
       end subroutine set_search_mesh_list_4_psf
 !

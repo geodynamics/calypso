@@ -12,18 +12,21 @@
 !!
 !!      subroutine surf_ave_4_sph_rms_int(l_truncation, nri,            &
 !!     &          a_r_1d_rj_r, nri_rms, ntot_rms_rj, kr_for_rms,        &
-!!     &          rms_sph_l, rms_sph_m, rms_sph_lm, rms_sph, rms_sph_m0)
-!!      subroutine vol_ave_4_rms_sph(l_truncation, ntot_rms_rj, avol,   &
-!!     &          rms_sph_vol_l, rms_sph_vol_m, rms_sph_vol_lm,         &
-!!     &          rms_sph_vol, rms_sph_vol_m0)
+!!     &          rms_sph_l)
+!!      subroutine surf_ave_4_sph_rms(nri, a_r_1d_rj_r,                 &
+!!     &          nri_rms, ntot_rms_rj, kr_for_rms, rms_sph)
+!!
+!!      subroutine vol_ave_4_rms_sph_int(l_truncation, ntot_rms_rj,     &
+!!     &          avol, sq_sph_vol_l)
+!!      subroutine vol_ave_4_rms_sph(ntot_rms_rj, avol, rms_sph_vol)
 !!
 !!      subroutine sum_sph_vol_rms_all_modes(ltr, ntot_rms,             &
-!!     &          rms_sph_vl, rms_v_sph)
+!!     &          sq_sph_vl, sq_v_sph)
 !!      subroutine sum_sph_rms_all_modes(ltr, nri_rms, ntot_rms,        &
 !!     &          rms_sph_l, rms_sph)
 !!
 !!      subroutine pick_axis_sph_vol_pwr(ltr, ntot_rms,                 &
-!!     &          rms_sph_vm, rms_v_sph, rms_v_sph_m0, ratio_v_sph_m0)
+!!     &          rms_sph_vm, sq_v_sph, rms_v_sph_m0, ratio_v_sph_m0)
 !!      subroutine pick_axis_sph_power(ltr, nri_rms, ntot_rms,          &
 !!     &          rms_sph_m, rms_sph, rms_sph_m0, ratio_sph_m0)
 !!@endverbatim
@@ -70,7 +73,7 @@
 !
       subroutine surf_ave_4_sph_rms_int(l_truncation, nri,              &
      &          a_r_1d_rj_r, nri_rms, ntot_rms_rj, kr_for_rms,          &
-     &          rms_sph_l, rms_sph_m, rms_sph_lm, rms_sph, rms_sph_m0)
+     &          rms_sph_l)
 !
       integer(kind = kint), intent(in) :: nri, l_truncation
       integer(kind = kint), intent(in) :: nri_rms, ntot_rms_rj
@@ -79,14 +82,6 @@
 !
       real(kind = kreal), intent(inout)                                 &
      &           :: rms_sph_l(nri_rms,0:l_truncation,ntot_rms_rj)
-      real(kind = kreal), intent(inout)                                 &
-     &           :: rms_sph_m(nri_rms,0:l_truncation,ntot_rms_rj)
-      real(kind = kreal), intent(inout)                                 &
-     &           :: rms_sph_lm(nri_rms,0:l_truncation,ntot_rms_rj)
-      real(kind = kreal), intent(inout)                                 &
-     &           :: rms_sph(nri_rms,ntot_rms_rj)
-      real(kind = kreal), intent(inout)                                 &
-     &           :: rms_sph_m0(nri_rms,ntot_rms_rj)
 !
       integer(kind = kint) :: lm, k, kg, icou
 !
@@ -100,14 +95,7 @@
           do lm = 0, l_truncation
             rms_sph_l(k,lm,icou) =  rms_sph_l(k,lm,icou)                &
      &                              * a_r_1d_rj_r(kg)**2
-            rms_sph_m(k,lm,icou) =  rms_sph_m(k,lm,icou)                &
-     &                              * a_r_1d_rj_r(kg)**2
-            rms_sph_lm(k,lm,icou) = rms_sph_lm(k,lm,icou)               &
-     &                              * a_r_1d_rj_r(kg)**2
           end do
-!
-          rms_sph(k,icou) =    rms_sph(k,icou) * a_r_1d_rj_r(kg)**2
-          rms_sph_m0(k,icou) = rms_sph_m0(k,icou) * a_r_1d_rj_r(kg)**2
         end do
       end do
 !$omp end parallel do
@@ -116,39 +104,73 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine vol_ave_4_rms_sph(l_truncation, ntot_rms_rj, avol,     &
-     &          rms_sph_vol_l, rms_sph_vol_m, rms_sph_vol_lm,           &
-     &          rms_sph_vol, rms_sph_vol_m0)
+      subroutine surf_ave_4_sph_rms(nri, a_r_1d_rj_r,                   &
+     &          nri_rms, ntot_rms_rj, kr_for_rms, rms_sph)
+!
+      integer(kind = kint), intent(in) :: nri
+      real(kind = kreal), intent(in) :: a_r_1d_rj_r(nri)
+      integer(kind = kint), intent(in) :: nri_rms, ntot_rms_rj
+      integer(kind=kint), intent(in) :: kr_for_rms(nri_rms)
+!
+      real(kind = kreal), intent(inout)                                 &
+     &           :: rms_sph(nri_rms,ntot_rms_rj)
+!
+      integer(kind = kint) :: k, kg, icou
+!
+!
+      if(nri_rms .le. 0) return
+!
+!$omp parallel do private(k,kg,icou)
+      do icou = 1, ntot_rms_rj
+        do k = 1, nri_rms
+          kg = kr_for_rms(k)
+          rms_sph(k,icou) =    rms_sph(k,icou) * a_r_1d_rj_r(kg)**2
+        end do
+      end do
+!$omp end parallel do
+!
+      end subroutine surf_ave_4_sph_rms
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine vol_ave_4_rms_sph_int(l_truncation, ntot_rms_rj,       &
+     &          avol, rms_sph_vol_l)
 !
       integer(kind = kint), intent(in) :: l_truncation, ntot_rms_rj
       real(kind = kreal), intent(in) :: avol
 !
       real(kind = kreal), intent(inout)                                 &
      &           :: rms_sph_vol_l(0:l_truncation,ntot_rms_rj)
-      real(kind = kreal), intent(inout)                                 &
-     &           :: rms_sph_vol_m(0:l_truncation,ntot_rms_rj)
-      real(kind = kreal), intent(inout)                                 &
-     &           :: rms_sph_vol_lm(0:l_truncation,ntot_rms_rj)
-      real(kind = kreal), intent(inout) :: rms_sph_vol(ntot_rms_rj)
-      real(kind = kreal), intent(inout) :: rms_sph_vol_m0(ntot_rms_rj)
 !
       integer(kind = kint) :: lm, icou
 !
-!
-!$omp parallel do private(icou)
-      do icou = 1, ntot_rms_rj
-        rms_sph_vol(icou) =    avol * rms_sph_vol(icou)
-        rms_sph_vol_m0(icou) = avol * rms_sph_vol_m0(icou)
-      end do
-!$omp end parallel do
 !
 !$omp parallel do private(icou,lm)
       do icou = 1, ntot_rms_rj
         do lm = 0, l_truncation
           rms_sph_vol_l(lm,icou) =  avol * rms_sph_vol_l(lm,icou)
-          rms_sph_vol_m(lm,icou) =  avol * rms_sph_vol_m(lm,icou)
-          rms_sph_vol_lm(lm,icou) = avol * rms_sph_vol_lm(lm,icou)
         end do
+      end do
+!$omp end parallel do
+!
+      end subroutine vol_ave_4_rms_sph_int
+!
+! -----------------------------------------------------------------------
+!
+      subroutine vol_ave_4_rms_sph(ntot_rms_rj, avol, rms_sph_vol)
+!
+      integer(kind = kint), intent(in) :: ntot_rms_rj
+      real(kind = kreal), intent(in) :: avol
+!
+      real(kind = kreal), intent(inout) :: rms_sph_vol(ntot_rms_rj)
+!
+      integer(kind = kint) :: icou
+!
+!
+!$omp parallel do private(icou)
+      do icou = 1, ntot_rms_rj
+        rms_sph_vol(icou) =    avol * rms_sph_vol(icou)
       end do
 !$omp end parallel do
 !
@@ -212,11 +234,11 @@
 ! -----------------------------------------------------------------------
 !
       subroutine pick_axis_sph_vol_pwr(ltr, ntot_rms,                   &
-     &          rms_sph_vm, rms_v_sph, rms_v_sph_m0, ratio_v_sph_m0)
+     &          rms_sph_vm, sq_v_sph, rms_v_sph_m0, ratio_v_sph_m0)
 !
       integer(kind = kint), intent(in) :: ltr, ntot_rms
       real(kind = kreal), intent(in) :: rms_sph_vm(0:ltr,ntot_rms)
-      real(kind = kreal), intent(in) :: rms_v_sph(ntot_rms)
+      real(kind = kreal), intent(in) :: sq_v_sph(ntot_rms)
 !
       real(kind = kreal), intent(inout) :: rms_v_sph_m0(ntot_rms)
       real(kind = kreal), intent(inout) :: ratio_v_sph_m0(ntot_rms)
@@ -227,10 +249,10 @@
 !$omp parallel do private(nd)
       do nd = 1, ntot_rms
         rms_v_sph_m0(nd) = rms_sph_vm(0,nd)
-        if(rms_v_sph(nd) .eq. zero) then
+        if(sq_v_sph(nd) .eq. zero) then
           ratio_v_sph_m0(nd) = zero
         else
-          ratio_v_sph_m0(nd) = sqrt(rms_v_sph_m0(nd) / rms_v_sph(nd))
+          ratio_v_sph_m0(nd) = sqrt(rms_v_sph_m0(nd) / sq_v_sph(nd))
         end if
       end do
 !$omp end parallel do

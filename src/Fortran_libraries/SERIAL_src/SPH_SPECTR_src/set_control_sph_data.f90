@@ -34,7 +34,7 @@
       subroutine s_set_control_sph_data(field_ctl, rj_fld, ierr)
 !
       use m_machine_parameter
-      use t_read_control_arrays
+      use t_control_array_character3
       use cal_minmax_and_stacks
 !
       type(ctl_array_c3), intent(in) :: field_ctl
@@ -73,7 +73,7 @@
 !
       subroutine ordering_sph_field_by_viz(field_ctl, rj_fld)
 !
-      use t_read_control_arrays
+      use t_control_array_character3
       use ordering_field_by_viz
 !
       type(ctl_array_c3), intent(in) :: field_ctl
@@ -95,7 +95,7 @@
 !
       subroutine ordering_sph_field_by_viz_comp(field_ctl, rj_fld)
 !
-      use t_read_control_arrays
+      use t_control_array_character3
       use ordering_field_by_viz
 !
       type(ctl_array_c3), intent(in) :: field_ctl

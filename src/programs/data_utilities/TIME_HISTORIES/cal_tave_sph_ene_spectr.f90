@@ -36,7 +36,6 @@
 !
       use m_precision
       use m_constants
-!      use m_tave_sph_ene_spectr
 !
       implicit none
 !

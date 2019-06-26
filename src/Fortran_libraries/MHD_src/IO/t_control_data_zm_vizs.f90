@@ -7,7 +7,7 @@
 !> @brief Control data structure for zonal mean visualization controls
 !!
 !!@verbatim
-!!      subroutine read_zonal_mean_control(zm_ctls)
+!!      subroutine read_zonal_mean_control(id_control, zm_ctls, c_buf)
 !!      subroutine bcast_zonal_mean_control(viz_ctls)
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -37,6 +37,8 @@
         type(section_controls) :: zm_psf_ctls
 !>        Structures of zonal RMS sectioning controls
         type(section_controls) :: zRMS_psf_ctls
+!
+        integer (kind=kint) :: i_viz_ctl = 0
       end type sph_zonal_means_controls
 !
 !
@@ -44,7 +46,6 @@
 !
       character(len=kchara), parameter                                  &
      &                    :: hd_zm_viz_ctl = 'zonal_mean_control'
-      integer (kind=kint) :: i_viz_ctl = 0
 !
 !     lavel for volume rendering
 !
@@ -55,7 +56,7 @@
      &             :: hd_zRMS_section = 'zonal_RMS_section_ctl'
 !
       private :: hd_zm_section, hd_zRMS_section
-      private :: hd_zm_viz_ctl, i_viz_ctl
+      private :: hd_zm_viz_ctl
       private :: read_single_section_ctl
 !
 !   --------------------------------------------------------------------
@@ -64,27 +65,28 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_zonal_mean_control(zm_ctls)
+      subroutine read_zonal_mean_control(id_control, zm_ctls, c_buf)
 !
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       type(sph_zonal_means_controls), intent(inout) :: zm_ctls
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_zm_viz_ctl) .eq. 0) return
-      if (i_viz_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_zm_viz_ctl) .eqv. .FALSE.) return
+      if(zm_ctls%i_viz_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_zm_viz_ctl)) exit
 !
-        i_viz_ctl = find_control_end_flag(hd_zm_viz_ctl)
-        if(i_viz_ctl .eq. 1) exit
-!
-        call read_single_section_ctl                                &
-     &     (hd_zm_section, zm_ctls%zm_psf_ctls)
-        call read_single_section_ctl                                &
-     &     (hd_zRMS_section, zm_ctls%zRMS_psf_ctls)
+        call read_single_section_ctl(id_control, hd_zm_section,         &
+     &      zm_ctls%zm_psf_ctls, c_buf)
+        call read_single_section_ctl(id_control, hd_zRMS_section,       &
+     &      zm_ctls%zRMS_psf_ctls, c_buf)
       end do
+      zm_ctls%i_viz_ctl = 1
 !
       end subroutine read_zonal_mean_control
 !
@@ -103,33 +105,40 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_single_section_ctl(hd_section, psf_ctls)
+      subroutine read_single_section_ctl                                &
+     &          (id_control, hd_section, psf_ctls, c_buf)
 !
-      use m_read_control_elements
+      use t_read_control_elements
+      use t_control_data_sections
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: hd_section
       type(section_controls), intent(inout) :: psf_ctls
-!
-      integer(kind=kint) :: i_psf_ctl = 0
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
       if(psf_ctls%num_psf_ctl .gt. 0) return
-!      call check_read_control_header
-!      call check_read_control_buffer
 !
-      if(right_file_flag(hd_section) .gt. 0) then
+      if(check_file_flag(c_buf, hd_section)) then
         psf_ctls%num_psf_ctl = 1
         call alloc_psf_ctl_stract(psf_ctls)
-        call read_file_names_from_ctl_line                            &
-     &     (psf_ctls%num_psf_ctl, i_psf_ctl, psf_ctls%fname_psf_ctl)
-      else if(right_begin_flag(hd_section) .gt. 0) then
-        i_psf_ctl = i_psf_ctl + 1
+        psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl)                    &
+     &                                  = third_word(c_buf)
+!
+        write(*,'(3a)', ADVANCE='NO') 'Read file for ',                 &
+     &                               trim(hd_section), '... '
+        call read_control_4_psf_file(id_control+2,                      &
+     &      psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl),               &
+     &      psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl))
+      else if(check_begin_flag(c_buf, hd_section)) then
         psf_ctls%num_psf_ctl = 1
         call alloc_psf_ctl_stract(psf_ctls)
-        psf_ctls%fname_psf_ctl(i_psf_ctl) = 'NO_FILE'
-        call read_psf_control_data                                    &
-     &     (hd_section, psf_ctls%psf_ctl_struct(i_psf_ctl))
+        psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl) = 'NO_FILE'
+!
+        write(*,*) 'Control for', trim(hd_section), ' is included'
+        call read_psf_control_data(id_control, hd_section,              &
+     &      psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl), c_buf)
       end if
 !
       end subroutine read_single_section_ctl

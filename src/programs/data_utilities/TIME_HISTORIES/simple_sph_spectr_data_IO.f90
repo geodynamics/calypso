@@ -4,7 +4,7 @@
 !! @date   Programmed in  Nov., 2007
 !!
 !
-!> @brief Time average spherical harmonics spectrum data
+!> @brief Time spectrum data IO for utilities
 !!
 !!@verbatim
 !!      integer(kind = kint) function  read_volume_pwr_sph              &

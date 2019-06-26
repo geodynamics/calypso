@@ -68,8 +68,6 @@
 !
       subroutine write_gz_vtk_fields_head(nnod)
 !
-      use calypso_mpi
-!
       integer(kind=kint_gl), intent(in) :: nnod
 !
 !
@@ -234,12 +232,11 @@
       integer(kind=kint ), intent(inout) :: iflag_end, ncomp_field
       character(len=kchara), intent(inout) :: field_name
 !
-      integer(kind = kint) :: nchara
       character(len=kchara)  :: vtk_fld_type
 !
 !
       call get_one_line_from_gz_f
-      if(nchara .eq. izero) go to 99
+      if(len_trim(textbuf) .eq. izero) go to 99
 !
       read(textbuf,*) vtk_fld_type, field_name
       if(vtk_fld_type .eq. 'TENSORS') then

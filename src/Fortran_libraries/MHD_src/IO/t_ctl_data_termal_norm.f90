@@ -8,8 +8,10 @@
 !>@brief  Thermal equation parameters to read
 !!
 !!@verbatim
-!!      subroutine read_thermal_ctl(hd_block, iflag, heat_ctl)
-!!      subroutine read_composition_eq_ctl(hd_block, iflag, comp_ctl)
+!!      subroutine read_thermal_ctl                                     &
+!!     &         (id_control, hd_block, heat_ctl, c_buf)
+!!      subroutine read_composition_eq_ctl                              &
+!!     &         (id_control, hd_block, comp_ctl, c_buf)
 !!      subroutine bcast_thermal_ctl(heat_ctl)
 !!      subroutine dealloc_thermal_ctl(heat_ctl)
 !!        type(heat_equation_control), intent(inout) :: heat_ctl
@@ -57,7 +59,8 @@
       module t_ctl_data_termal_norm
 !
       use m_precision
-      use t_read_control_arrays
+      use m_machine_parameter
+      use t_control_array_charareal
 !
       implicit  none
 !
@@ -78,6 +81,8 @@
 !!@n        coef_4_source%c_tbl:  Name of number 
 !!@n        coef_4_source%vect:   Power of the number
         type(ctl_array_cr) :: coef_4_source
+!
+        integer (kind=kint) :: i_diff_adv = 0
       end type heat_equation_control
 !
 !   5th level for coefs for thermal
@@ -104,67 +109,65 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_thermal_ctl(hd_block, iflag, heat_ctl)
+      subroutine read_thermal_ctl                                       &
+     &         (id_control, hd_block, heat_ctl, c_buf)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(heat_equation_control), intent(inout) :: heat_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(heat_ctl%i_diff_adv .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-!
-        call read_control_array_c_r                                     &
-     &     (hd_n_thermal, heat_ctl%coef_4_adv_flux)
-        call read_control_array_c_r                                     &
-     &     (hd_n_t_diff, heat_ctl%coef_4_diffuse)
-        call read_control_array_c_r                                     &
-     &     (hd_n_h_src, heat_ctl%coef_4_source)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_thermal, heat_ctl%coef_4_adv_flux, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_t_diff, heat_ctl%coef_4_diffuse, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_h_src, heat_ctl%coef_4_source, c_buf)
       end do
+      heat_ctl%i_diff_adv = 1
 !
       end subroutine read_thermal_ctl
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_composition_eq_ctl(hd_block, iflag, comp_ctl)
+      subroutine read_composition_eq_ctl                                &
+     &         (id_control, hd_block, comp_ctl, c_buf)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(heat_equation_control), intent(inout) :: comp_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(comp_ctl%i_diff_adv .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-!
-        call read_control_array_c_r                                     &
-     &     (hd_n_dscalar, comp_ctl%coef_4_adv_flux)
-        call read_control_array_c_r                                     &
-     &     (hd_n_dsc_diff, comp_ctl%coef_4_diffuse)
-        call read_control_array_c_r                                     &
-     &     (hd_n_dsc_src, comp_ctl%coef_4_source)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_dscalar, comp_ctl%coef_4_adv_flux, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_dsc_diff, comp_ctl%coef_4_diffuse, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_n_dsc_src, comp_ctl%coef_4_source, c_buf)
       end do
+      comp_ctl%i_diff_adv = 1
 !
       end subroutine read_composition_eq_ctl
 !
@@ -182,6 +185,9 @@
       call bcast_ctl_array_cr(heat_ctl%coef_4_diffuse)
       call bcast_ctl_array_cr(heat_ctl%coef_4_source)
 !
+      call MPI_BCAST(heat_ctl%i_diff_adv, 1,                            &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_thermal_ctl
 !
 ! -----------------------------------------------------------------------
@@ -194,6 +200,7 @@
       call dealloc_control_array_c_r(heat_ctl%coef_4_adv_flux)
       call dealloc_control_array_c_r(heat_ctl%coef_4_diffuse)
       call dealloc_control_array_c_r(heat_ctl%coef_4_source)
+      heat_ctl%i_diff_adv = 0
 !
       end subroutine dealloc_thermal_ctl
 !

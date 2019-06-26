@@ -41,7 +41,7 @@
      &         (field_ctl, num_phys, num_phys_viz,                      &
      &          num_component, phys_name, iflag_monitor)
 !
-      use t_read_control_arrays
+      use t_control_array_character3
       use set_nodal_field_name
 !
       type(ctl_array_c3), intent(in) :: field_ctl
@@ -102,7 +102,7 @@
      &         (field_ctl, num_phys, num_phys_viz,                      &
      &          num_component, phys_name, iflag_monitor)
 !
-      use t_read_control_arrays
+      use t_control_array_character3
       use set_nodal_field_name
 !
       type(ctl_array_c3), intent(in) :: field_ctl

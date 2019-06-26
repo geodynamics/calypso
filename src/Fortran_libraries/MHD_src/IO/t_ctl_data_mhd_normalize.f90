@@ -1,16 +1,26 @@
-!t_ctl_data_mhd_normalize.f90
-!      module t_ctl_data_mhd_normalize
-!
-!        programmed by H.Matsui on March. 2006
-!
-!!      subroutine read_dimless_ctl(hd_block, iflag, dless_ctl)
-!!      subroutine read_coef_term_ctl(hd_block, iflag, eqs_ctl)
+!>@file   t_ctl_data_mhd_normalize.f90
+!!@brief  module t_ctl_data_mhd_normalize
+!!
+!!@author H. Matsui
+!>@brief   Control for normalizations of MHD dynamo
+!!@date   programmed by H.Matsui and H.Okuda
+!!@n                                    on July 2000 (ver 1.1)
+!!@n        Modified by H. Matsui on Merch, 2006
+!!
+!!@verbatim
+!!      subroutine read_dimless_ctl                                     &
+!!     &         (id_control, hd_block, dless_ctl, c_buf)
+!!      subroutine read_coef_term_ctl                                   &
+!!     &         (id_control, hd_block, eqs_ctl, c_buf)
 !!
 !!      subroutine bcast_dimless_ctl(dless_ctl)
 !!      subroutine bcast_coef_term_ctl(eqs_ctl)
 !!
 !!      subroutine dealloc_dimless_ctl(dless_ctl)
 !!      subroutine dealloc_coef_term_ctl(eqs_ctl)
+!!        type(dimless_control), intent(inout) :: dless_ctl
+!!        type(equations_control), intent(inout) :: eqs_ctl
+!!        type(buffer_for_control), intent(inout)  :: c_buf
 !!
 !!   --------------------------------------------------------------------
 !!    example
@@ -83,15 +93,17 @@
 !!    end  coefficients_ctl
 !!
 !!   --------------------------------------------------------------------
+!!@endverbatim
 !
       module t_ctl_data_mhd_normalize
 !
       use m_precision
 !
       use m_machine_parameter
-      use m_read_control_elements
+      use calypso_mpi
       use skip_comment_f
-      use t_read_control_arrays
+      use t_read_control_elements
+      use t_control_array_charareal
       use t_ctl_data_momentum_norm
       use t_ctl_data_induct_norm
       use t_ctl_data_termal_norm
@@ -105,6 +117,8 @@
 !!@n        dimless%c_tbl:  Name of each number 
 !!@n        dimless%vect:   valus of each number
         type(ctl_array_cr) :: dimless
+!
+        integer (kind=kint) :: i_dimless_ctl =   0
       end type dimless_control
 !
 !>      Structure for coefficients of governing equations
@@ -117,6 +131,8 @@
         type(heat_equation_control) :: heat_ctl
 !>        Structure for coefficients of heat and composition equation
         type(heat_equation_control) :: comp_ctl
+!
+        integer(kind = kint) :: i_coef_term_ctl = 0
       end type equations_control
 !
 !   4th level for dimensionless numbers
@@ -126,23 +142,14 @@
 !   4th level for coefficients
 !
       character(len=kchara), parameter :: hd_momentum = 'momentum'
-      integer (kind=kint) :: i_momentum = 0
-!
       character(len=kchara), parameter :: hd_thermal = 'thermal'
-      integer (kind=kint) :: i_thermal = 0
-!
       character(len=kchara), parameter                                  &
      &        :: hd_dsc_diff_adv = 'composition'
-      integer (kind=kint) :: i_dsc_diff_adv = 0
-!
       character(len=kchara), parameter :: hd_induction = 'induction'
-      integer (kind=kint) :: i_induct_ctl =    0
 !
       private :: hd_dimless
-      private :: hd_momentum, i_momentum
-      private :: hd_thermal, i_thermal
-      private :: hd_dsc_diff_adv, i_dsc_diff_adv
-      private :: hd_induction, i_induct_ctl
+      private :: hd_momentum, hd_induction
+      private :: hd_thermal, hd_dsc_diff_adv
 !
 !   --------------------------------------------------------------------
 !
@@ -150,53 +157,57 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_dimless_ctl(hd_block, iflag, dless_ctl)
+      subroutine read_dimless_ctl                                       &
+     &         (id_control, hd_block, dless_ctl, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(dimless_control), intent(inout) :: dless_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(dless_ctl%i_dimless_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-        call read_control_array_c_r(hd_dimless, dless_ctl%dimless)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_dimless, dless_ctl%dimless, c_buf)
       end do
+      dless_ctl%i_dimless_ctl = 1
 !
       end subroutine read_dimless_ctl
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_coef_term_ctl(hd_block, iflag, eqs_ctl)
+      subroutine read_coef_term_ctl                                     &
+     &         (id_control, hd_block, eqs_ctl, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(equations_control), intent(inout) :: eqs_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(eqs_ctl%i_coef_term_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-        call read_thermal_ctl(hd_thermal, i_thermal, eqs_ctl%heat_ctl)
+        call read_thermal_ctl                                           &
+     &     (id_control, hd_thermal, eqs_ctl%heat_ctl, c_buf)
         call read_momentum_ctl                                          &
-     &     (hd_momentum, i_momentum, eqs_ctl%mom_ctl)
+     &     (id_control, hd_momentum, eqs_ctl%mom_ctl, c_buf)
         call read_induction_ctl                                         &
-     &     (hd_induction, i_induct_ctl, eqs_ctl%induct_ctl)
+     &     (id_control, hd_induction, eqs_ctl%induct_ctl, c_buf)
         call read_composition_eq_ctl                                    &
-     &     (hd_dsc_diff_adv, i_dsc_diff_adv, eqs_ctl%comp_ctl)
+     &     (id_control, hd_dsc_diff_adv, eqs_ctl%comp_ctl, c_buf)
       end do
+      eqs_ctl%i_coef_term_ctl = 1
 !
       end subroutine read_coef_term_ctl
 !
@@ -212,6 +223,9 @@
 !
       call bcast_ctl_array_cr(dless_ctl%dimless)
 !
+      call MPI_BCAST(dless_ctl%i_dimless_ctl, 1,                        &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_dimless_ctl
 !
 !   --------------------------------------------------------------------
@@ -226,6 +240,9 @@
       call bcast_induction_ctl(eqs_ctl%induct_ctl)
       call bcast_thermal_ctl(eqs_ctl%comp_ctl)
 !
+      call MPI_BCAST(eqs_ctl%i_coef_term_ctl, 1,                        &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_coef_term_ctl
 !
 !   --------------------------------------------------------------------
@@ -237,6 +254,7 @@
 !
 !
       call dealloc_control_array_c_r(dless_ctl%dimless)
+      dless_ctl%i_dimless_ctl = 0
 !
       end subroutine dealloc_dimless_ctl
 !
@@ -251,6 +269,8 @@
       call dealloc_momentum_ctl(eqs_ctl%mom_ctl)
       call dealloc_induction_ctl(eqs_ctl%induct_ctl)
       call dealloc_thermal_ctl(eqs_ctl%comp_ctl)
+!
+      eqs_ctl%i_coef_term_ctl = 0
 !
       end subroutine dealloc_coef_term_ctl
 !

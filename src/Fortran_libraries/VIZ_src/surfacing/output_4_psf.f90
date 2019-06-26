@@ -66,22 +66,23 @@
 !
 !
       do i_psf = 1, num_psf
-          call link_nnod_stacks_2_ucd(nprocs, psf_mesh(i_psf)%node,     &
-     &        psf_mesh(i_psf)%patch, psf_out_m(i_psf))
+        call link_nnod_stacks_2_ucd                                     &
+     &     (nprocs, psf_mesh(i_psf)%node, psf_out_m(i_psf))
+        call link_nele_stacks_2_ucd                                     &
+     &     (nprocs, psf_mesh(i_psf)%patch, psf_out_m(i_psf))
 
-          call link_node_data_2_ucd                                     &
-     &         (psf_mesh(i_psf)%node, psf_out(i_psf))
-          call link_ele_data_2_ucd                                      &
-     &         (psf_mesh(i_psf)%patch, psf_out(i_psf))
-          call link_field_data_to_ucd                                   &
-     &         (psf_mesh(i_psf)%field, psf_out(i_psf))
+        call link_node_data_2_ucd                                       &
+     &     (psf_mesh(i_psf)%node, psf_out(i_psf))
+        call link_ele_data_2_ucd                                        &
+     &     (psf_mesh(i_psf)%patch, psf_out(i_psf))
+        call link_field_data_to_ucd                                     &
+     &     (psf_mesh(i_psf)%field, psf_out(i_psf))
       end do
 !
       do i_psf = 1, num_psf
-          call sel_write_parallel_ucd_mesh                              &
+        call sel_write_parallel_ucd_mesh                                &
      &       (psf_file_IO(i_psf), psf_out(i_psf), psf_out_m(i_psf))
       end do
-      call calypso_mpi_barrier
 !
       end subroutine output_section_mesh
 !
@@ -112,7 +113,6 @@
         call sel_write_parallel_ucd_file(istep_psf, psf_file_IO(i_psf), &
      &      t_IO, psf_out(i_psf), psf_out_m(i_psf))
       end do
-      call calypso_mpi_barrier
 !
       end subroutine output_section_data
 !
@@ -143,26 +143,27 @@
       call copy_time_step_size_data(time_d, t_IO)
 !
       do i_iso = 1, num_iso
-          call link_nnod_stacks_2_ucd(nprocs, iso_mesh(i_iso)%node,     &
-     &        iso_mesh(i_iso)%patch, iso_out_m(i_iso))
+        call link_nnod_stacks_2_ucd                                     &
+     &     (nprocs, iso_mesh(i_iso)%node, iso_out_m(i_iso))
+        call link_nele_stacks_2_ucd                                     &
+     &     (nprocs, iso_mesh(i_iso)%patch, iso_out_m(i_iso))
 !
-          call link_node_data_2_ucd                                     &
-     &       (iso_mesh(i_iso)%node, iso_out(i_iso))
-          call link_ele_data_2_ucd                                      &
-     &       (iso_mesh(i_iso)%patch, iso_out(i_iso))
-          call link_field_data_to_ucd                                   &
-     &       (iso_mesh(i_iso)%field, iso_out(i_iso))
+        call link_node_data_2_ucd                                       &
+     &     (iso_mesh(i_iso)%node, iso_out(i_iso))
+        call link_ele_data_2_ucd                                        &
+     &     (iso_mesh(i_iso)%patch, iso_out(i_iso))
+        call link_field_data_to_ucd                                     &
+     &     (iso_mesh(i_iso)%field, iso_out(i_iso))
       end do
 !
       do i_iso = 1, num_iso
-          call sel_write_parallel_ucd_file                              &
-     &       (istep_iso, iso_file_IO(i_iso), t_IO,                      &
-     &        iso_out(i_iso), iso_out_m(i_iso))
-          call disconnect_merged_ucd_mesh                               &
-     &       (iso_out(i_iso), iso_out_m(i_iso))
+        call sel_write_parallel_ucd_file                                &
+     &     (istep_iso, iso_file_IO(i_iso), t_IO,                        &
+     &      iso_out(i_iso), iso_out_m(i_iso))
+        call disconnect_merged_ucd_mesh                                 &
+     &     (iso_out(i_iso), iso_out_m(i_iso))
       end do
 !
-      call calypso_mpi_barrier
 !
       end subroutine output_isosurface
 !

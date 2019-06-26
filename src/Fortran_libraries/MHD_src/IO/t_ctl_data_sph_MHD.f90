@@ -20,7 +20,7 @@
       use m_precision
 !
       use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use calypso_mpi
       use skip_comment_f
 !

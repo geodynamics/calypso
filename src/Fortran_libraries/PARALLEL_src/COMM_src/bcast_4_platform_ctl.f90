@@ -61,6 +61,9 @@
 !
       call bcast_ctl_type_c1(plt%del_org_data_ctl)
 !
+      call MPI_BCAST(plt%i_platform, 1,                                 &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_ctl_data_4_platform
 !
 !  ---------------------------------------------------------------------

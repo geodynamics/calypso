@@ -15,7 +15,7 @@
 !
       use m_precision
       use t_phys_data
-      use t_read_control_arrays
+      use t_control_array_character3
 !
       implicit  none
 !

@@ -51,8 +51,7 @@
 !
 !
       psf_node%internal_node =   psf_list%internod_on_edge
-      psf_node%numnod =          psf_node%internal_node                 &
-     &                         + psf_list%externod_on_edge
+      psf_node%numnod =          psf_list%totalnod_on_edge
       call count_number_4_smp(np_smp, ione, psf_node%internal_node,     &
      &    psf_node%istack_internal_smp, max_4_smp)
       call count_number_4_smp(np_smp, ione, psf_node%numnod,            &

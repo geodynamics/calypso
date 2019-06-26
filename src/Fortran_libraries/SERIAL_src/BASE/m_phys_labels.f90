@@ -811,19 +811,19 @@
 !
 !  Square of each component of fields
 !
-!>        Square of velocity @f$ u_{i}^{2} @f$
+!>        Square of velocity @f$ u^{2} @f$
       character(len=kchara), parameter                                  &
      &      :: fhd_square_v = 'square_velocity'
-!>        Square of vorticity @f$ \omega_{i}^{2} @f$
+!>        Square of vorticity @f$ \omega^{2} @f$
       character(len=kchara), parameter                                  &
      &      :: fhd_square_w = 'square_vorticity'
-!>        Square of magnetic field @f$ B_{i}^{2} @f$
+!>        Square of magnetic field @f$ B^{2} @f$
       character(len=kchara), parameter                                  &
      &      :: fhd_square_b = 'square_magne'
-!>        Square of magnetic vector potential @f$ A_{i}^{2} @f$
+!>        Square of magnetic vector potential @f$ A^{2} @f$
       character(len=kchara), parameter                                  &
      &      :: fhd_square_a = 'square_vector_p'
-!>        Square of current density @f$ J_{i}^{2} @f$
+!>        Square of current density @f$ J^{2} @f$
       character(len=kchara), parameter                                  &
      &      :: fhd_square_j = 'square_current'
 !>        Square of temperature @f$ T^{2} @f$

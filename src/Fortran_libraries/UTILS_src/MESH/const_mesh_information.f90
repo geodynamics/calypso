@@ -7,12 +7,11 @@
 !> @brief Construct mesh strucuture informations
 !!
 !!@verbatim
-!!      subroutine empty_mesh_info(mesh, group, ele_mesh)
+!!      subroutine empty_mesh_info(mesh, group)
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::   group
-!!        type(element_geometry), intent(inout) :: ele_mesh
 !!
-!!      subroutine const_mesh_infos(id_rank, mesh, group, ele_mesh)
+!!      subroutine const_mesh_infos(id_rank, mesh, group)
 !!      subroutine const_nod_ele_infos                                  &
 !!     &         (id_rank, node, ele, nod_grp, ele_grp, surf_grp)
 !!
@@ -20,7 +19,6 @@
 !!      subroutine set_nod_and_ele_infosiflag_ele_mesh, (node, ele)
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::   group
-!!        type(element_geometry), intent(inout) :: ele_mesh
 !!        type(node_data), intent(inout) :: node
 !!        type(element_data), intent(inout) :: ele
 !!        type(surface_data), intent(inout) :: surf
@@ -69,7 +67,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine empty_mesh_info(mesh, group, ele_mesh)
+      subroutine empty_mesh_info(mesh, group)
 !
       use set_smp_4_group_types
       use set_connects_4_ele_group
@@ -78,15 +76,13 @@
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
-      type(element_geometry), intent(inout) :: ele_mesh
 !
 !
       if (iflag_debug.eq.1) write(*,*) 'empty_nod_and_ele_type_infos'
       call empty_nod_and_ele_type_infos(mesh)
 !
 !
-      call empty_surface_and_edge                                       &
-     &   (mesh%ele, ele_mesh%surf, ele_mesh%edge)
+      call empty_surface_and_edge(mesh%ele, mesh%surf, mesh%edge)
 !
       group%nod_grp%num_grp_smp =  0
       group%ele_grp%num_grp_smp =  0
@@ -112,7 +108,7 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine const_mesh_infos(id_rank, mesh, group, ele_mesh)
+      subroutine const_mesh_infos(id_rank, mesh, group)
 !
       use const_surface_data
       use set_surf_edge_mesh
@@ -122,7 +118,6 @@
       integer, intent(in) :: id_rank
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
-      type(element_geometry), intent(inout) :: ele_mesh
 !
 !     initial const info in node and element data structure
 !     like center of element
@@ -133,22 +128,22 @@
 !
 !     allocate and set node info for surface and edge
       if (iflag_debug.gt.0) write(*,*) 'set_local_element_info'
-      call set_local_element_info(ele_mesh%surf, ele_mesh%edge)
+      call set_local_element_info(mesh%surf, mesh%edge)
 !
 !     set connectivity and geometry for surface and edge
       if (iflag_debug.gt.0) write(*,*) 'set_surface_and_edge'
       call set_surface_and_edge                                         &
-     &   (mesh%node, mesh%ele, ele_mesh%surf, ele_mesh%edge)
+     &   (mesh%node, mesh%ele, mesh%surf, mesh%edge)
 !
 !     set connection relation of element and surface
       if (iflag_debug.gt.0) write(*,*) 'const_ele_list_4_surface'
-      call const_ele_list_4_surface(mesh%ele, ele_mesh%surf)
+      call const_ele_list_4_surface(mesh%ele, mesh%surf)
 !
 !     connectivity for surface group data and node info for each of them
 !     also the smp info for surface group data
       if (iflag_debug.gt.0) write(*,*) 'set_node_4_surf_group'
       call set_node_4_surf_group(mesh%node, mesh%ele,                   &
-     &    ele_mesh%surf, group%surf_grp, group%surf_nod_grp)
+     &    mesh%surf, group%surf_grp, group%surf_nod_grp)
 !       call check_surface_node_id(id_rank, group%surf_nod_grp)
 !
 !      if (iflag_debug.gt.0) then
@@ -159,7 +154,7 @@
 !     set surface and element group conectivity
        if (iflag_debug.eq.1) write(*,*) 'const_group_connectiviy_1st'
       call const_group_type_info                                        &
-     &   (mesh%node, mesh%ele, ele_mesh%surf, ele_mesh%edge,            &
+     &   (mesh%node, mesh%ele, mesh%surf, mesh%edge,                    &
      &    group%ele_grp, group%surf_grp,                                &
      &    group%tbls_ele_grp, group%tbls_surf_grp)
 !

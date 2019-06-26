@@ -251,7 +251,6 @@
      &        'Wrong iele_ht_node at ', inum, ip, iele_ht_node(inum)
         end do
       end do
-      call calypso_mpi_barrier
       write(*,*) 'element list checked'
 !
       do ip = 1, num_neib
@@ -287,7 +286,6 @@
           end do
         end do
       end do
-      call calypso_mpi_barrier
       write(*,*) 'last iclu', istack_import_e(num_neib_e), icou
 !
       end subroutine  set_element_import_item_e

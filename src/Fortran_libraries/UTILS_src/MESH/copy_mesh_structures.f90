@@ -8,11 +8,10 @@
 !!
 !!@verbatim
 !!      subroutine set_mesh_data_from_type                              &
-!!     &         (mesh, group, tgt_mesh, tgt_e_mesh, tgt_grp)
+!!     &         (mesh, group, tgt_mesh, tgt_grp)
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) :: group
 !!        type(mesh_geometry), intent(inout) :: tgt_mesh
-!!        type(element_geometry), intent(inout) :: tgt_e_mesh
 !!        type(mesh_groups), intent(inout) :: tgt_grp
 !!
 !!      subroutine copy_node_geometry_types(org_node, new_node)
@@ -49,7 +48,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_mesh_data_from_type                                &
-     &         (mesh, group, tgt_mesh, tgt_e_mesh, tgt_grp)
+     &         (mesh, group, tgt_mesh, tgt_grp)
 !
       use t_mesh_data
       use t_comm_table
@@ -64,7 +63,6 @@
       type(mesh_groups), intent(inout) :: group
 !
       type(mesh_geometry), intent(inout) :: tgt_mesh
-      type(element_geometry), intent(inout) :: tgt_e_mesh
       type(mesh_groups), intent(inout) :: tgt_grp
 !
 !
@@ -81,7 +79,7 @@
       call alloc_sph_node_geometry(tgt_mesh%node)
 !      call alloc_ele_geometry(tgt_mesh%ele)
       call set_3D_nnod_4_sfed_by_ele(tgt_mesh%ele%nnod_4_ele,           &
-     &    tgt_e_mesh%surf%nnod_4_surf, tgt_e_mesh%edge%nnod_4_edge)
+     &    tgt_mesh%surf%nnod_4_surf, tgt_mesh%edge%nnod_4_edge)
 !
       call dealloc_groups_data(group)
       call dealloc_mesh_geometry_base(mesh)

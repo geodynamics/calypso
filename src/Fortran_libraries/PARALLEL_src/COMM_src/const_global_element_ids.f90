@@ -31,7 +31,7 @@
 !
       subroutine count_number_of_node_stack(nnod, istack_nod_list)
 !
-      integer(kind = kint) :: nnod
+      integer(kind = kint), intent(in) :: nnod
       integer(kind = kint_gl), intent(inout)                            &
      &            :: istack_nod_list(0:nprocs)
 !
@@ -59,7 +59,7 @@
 !
       subroutine count_number_of_node_stack4(nnod, istack_nod_list)
 !
-      integer(kind = kint) :: nnod
+      integer(kind = kint), intent(in) :: nnod
       integer(kind = kint), intent(inout) :: istack_nod_list(0:nprocs)
 !
       integer(kind = kint), allocatable :: nnod_list_gl(:)

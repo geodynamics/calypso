@@ -97,7 +97,7 @@
 !
       call select_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,      &
      &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, sph_maker1,       &
-     &    FEM_dat%geofem, FEM_dat%ele_mesh, MHD_files)
+     &    FEM_dat%geofem, MHD_files)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
@@ -188,7 +188,7 @@
 !
       call select_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,      &
      &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, sph_maker1,       &
-     &    FEM_dat%geofem, FEM_dat%ele_mesh, MHD_files)
+     &    FEM_dat%geofem, MHD_files)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !

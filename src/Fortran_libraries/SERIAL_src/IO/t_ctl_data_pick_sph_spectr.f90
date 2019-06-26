@@ -11,10 +11,12 @@
 !!      subroutine dealloc_pick_spectr_control(pspec_ctl)
 !!      subroutine dealloc_gauss_spectr_control(g_pwr)
 !!
-!!      subroutine read_pickup_spectr_ctl(hd_block, iflag, pspec_ctl)
+!!      subroutine read_pickup_spectr_ctl                               &
+!!     &         (id_control, hd_block, iflag, pspec_ctl, c_buf)
 !!        type(pick_spectr_control), intent(inout) :: pspec_ctl
 !!
-!!      subroutine read_gauss_spectr_ctl(g_pwr)
+!!      subroutine read_gauss_spectr_ctl                                &
+!!     &         (id_control, hd_block, iflag, g_pwr, c_buf)
 !!        type(gauss_spectr_control), intent(inout) :: g_pwr
 !!
 !! -----------------------------------------------------------------
@@ -74,8 +76,10 @@
 !
       use m_precision
 !
+      use t_read_control_elements
       use t_control_elements
-      use t_read_control_arrays
+      use t_control_array_integer
+      use t_control_array_integer2
       use skip_comment_f
 !
       implicit  none
@@ -204,70 +208,74 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_pickup_spectr_ctl(hd_block, iflag, pspec_ctl)
+      subroutine read_pickup_spectr_ctl                                 &
+     &         (id_control, hd_block, iflag, pspec_ctl, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
       integer(kind = kint), intent(inout) :: iflag
       type(pick_spectr_control), intent(inout) :: pspec_ctl
+      type(buffer_for_control), intent(inout) :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if (iflag .gt. 0) return
       do
-        call load_ctl_label_and_line
-!
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
 !
-        call read_control_array_i1                                      &
-     &     (hd_pick_layer, pspec_ctl%idx_pick_layer_ctl)
+        call read_control_array_i1(id_control,                          &
+     &      hd_pick_layer, pspec_ctl%idx_pick_layer_ctl, c_buf)
 !
-        call read_control_array_i2                                      &
-     &     (hd_pick_sph_lm, pspec_ctl%idx_pick_sph_ctl)
-        call read_control_array_i1                                      &
-     &     (hd_pick_sph_l, pspec_ctl%idx_pick_sph_l_ctl)
-        call read_control_array_i1                                      &
-     &     (hd_pick_sph_m, pspec_ctl%idx_pick_sph_m_ctl)
+        call read_control_array_i2(id_control,                          &
+     &      hd_pick_sph_lm, pspec_ctl%idx_pick_sph_ctl, c_buf)
+        call read_control_array_i1(id_control,                          &
+     &      hd_pick_sph_l, pspec_ctl%idx_pick_sph_l_ctl, c_buf)
+        call read_control_array_i1(id_control,                          &
+     &      hd_pick_sph_m, pspec_ctl%idx_pick_sph_m_ctl, c_buf)
 !
-        call read_chara_ctl_type                                        &
-     &     (hd_picked_mode_head, pspec_ctl%picked_mode_head_ctl)
+        call read_chara_ctl_type(c_buf, hd_picked_mode_head,            &
+     &      pspec_ctl%picked_mode_head_ctl)
       end do
+      iflag = 1
 !
       end subroutine read_pickup_spectr_ctl
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gauss_spectr_ctl(hd_block, iflag, g_pwr)
+      subroutine read_gauss_spectr_ctl                                  &
+     &         (id_control, hd_block, iflag, g_pwr, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
       integer(kind = kint), intent(inout) :: iflag
       type(gauss_spectr_control), intent(inout) :: g_pwr
+      type(buffer_for_control), intent(inout) :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if (iflag .gt. 0) return
       do
-        call load_ctl_label_and_line
-!
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
 !
-        call read_control_array_i2                                      &
-     &     (hd_pick_gauss_lm, g_pwr%idx_gauss_ctl)
-        call read_control_array_i1                                      &
-     &     (hd_pick_gauss_l, g_pwr%idx_gauss_l_ctl)
-        call read_control_array_i1                                      &
-     &     (hd_pick_gauss_m, g_pwr%idx_gauss_m_ctl)
+        call read_control_array_i2(id_control,                          &
+     &      hd_pick_gauss_lm, g_pwr%idx_gauss_ctl, c_buf)
+        call read_control_array_i1(id_control,                          &
+     &      hd_pick_gauss_l, g_pwr%idx_gauss_l_ctl, c_buf)
+        call read_control_array_i1(id_control,                          &
+     &      hd_pick_gauss_m, g_pwr%idx_gauss_m_ctl, c_buf)
 !
-        call read_real_ctl_type(hd_gauss_coefs_r,                       &
+        call read_real_ctl_type(c_buf, hd_gauss_coefs_r,                &
      &      g_pwr%gauss_coefs_radius_ctl)
-        call read_chara_ctl_type(hd_gauss_coefs_head,                   &
+        call read_chara_ctl_type(c_buf, hd_gauss_coefs_head,            &
      &      g_pwr%gauss_coefs_prefix)
       end do
+      iflag = 1
 !
       end subroutine read_gauss_spectr_ctl
 !

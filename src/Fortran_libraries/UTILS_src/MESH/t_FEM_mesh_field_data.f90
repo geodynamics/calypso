@@ -32,9 +32,6 @@
 !>       Structure for FEM mesh data
 !!         (position, connectivity, communication, and groups)
         type(mesh_data) :: geofem
-!>       Structure for element data (communication)
-       type(element_geometry) :: ele_mesh
-!
 !
 !>       Structure for nodal field data
         type(phys_data) :: field

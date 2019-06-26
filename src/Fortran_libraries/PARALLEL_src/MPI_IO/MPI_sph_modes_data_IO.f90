@@ -96,7 +96,6 @@
 !
       call mpi_skip_read(IO_param, len(hd_pgrphd()))
       call mpi_read_group_data(IO_param, sph_grps_IO%zonal_rtp_grp)
-      call calypso_mpi_barrier
 !
       end subroutine mpi_read_geom_rtp_data
 !

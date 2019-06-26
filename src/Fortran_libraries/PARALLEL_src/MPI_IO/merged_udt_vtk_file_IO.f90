@@ -60,9 +60,10 @@
 !
       use t_geometry_data
       use t_comm_table
-      use m_merged_ucd_data
       use hdf5_file_IO
       use set_ucd_data_to_type
+      use pickup_internal_element
+      use const_global_element_ids
 !
       integer(kind = kint), intent(in) :: iflag_format
       type(node_data), intent(in) :: node
@@ -72,14 +73,27 @@
       type(merged_ucd_data), intent(inout) :: m_ucd
 !
 !
-      call link_nnod_stacks_2_ucd(nprocs, node, ele, m_ucd)
+      call link_nnod_stacks_2_ucd(nprocs, node, m_ucd)
+      call alloc_merged_ucd_ele_stack(nprocs, m_ucd)
+!
+      ucd%nele = num_internal_element_4_IO                              &
+     &         (node%internal_node, ele%numele, ele%nnod_4_ele, ele%ie)
+      call count_number_of_node_stack                                   &
+     &   (int(ucd%nele), m_ucd%istack_merged_ele)
+!
 !
       call alloc_double_numbering(node%numnod, dbl_id1)
       call set_para_double_numbering                                    &
      &   (node%internal_node, nod_comm, dbl_id1)
 !
-      call update_ele_by_double_address                                 &
-     &   (node%istack_internod, dbl_id1, m_ucd, ucd)
+      ucd%nnod_4_ele = ele%nnod_4_ele
+      call allocate_ucd_ele(ucd)
+!
+      call set_internal_element_4_IO                                    &
+     &   (nprocs, node%istack_internod, node%numnod,                    &
+     &    node%internal_node,  ele%numele, ele%nnod_4_ele, ele%ie,      &
+     &    dbl_id1%inod_local, dbl_id1%irank_home,                       &
+     &    ucd%nele, ucd%nnod_4_ele, ucd%ie)
 !
       if(iflag_format .eq. iflag_sgl_hdf5) then
         call parallel_init_hdf5(ucd, m_ucd)
@@ -91,7 +105,6 @@
 !
       subroutine finalize_merged_ucd(iflag_format, m_ucd)
 !
-      use m_merged_ucd_data
       use hdf5_file_IO
 !
       integer(kind = kint), intent(in) :: iflag_format
@@ -102,7 +115,8 @@
         call parallel_finalize_hdf5(m_ucd)
       end if
       call dealloc_double_numbering(dbl_id1)
-      call disconnect_merged_ucd_stack(m_ucd)
+      call unlink_merged_ucd_nod_stack(m_ucd)
+      call dealloc_merged_ucd_ele_stack(m_ucd)
 !
       end subroutine finalize_merged_ucd
 !
@@ -122,7 +136,6 @@
       integer(kind = kint_gl) :: ioff_gl
 !
 !
-      call calypso_mpi_barrier
       if(my_rank .eq. 0) then
         write(*,*) 'UCD data by MPI-IO: ', trim(file_name)
       end if
@@ -159,7 +172,6 @@
       integer(kind = kint_gl) :: ioff_gl
 !
 !
-      call calypso_mpi_barrier
      if(my_rank .eq. 0) then
         write(*,*) 'UCD field by MPI-IO: ', trim(file_name)
       end if
@@ -190,7 +202,6 @@
       integer(kind = kint_gl) :: ioff_gl
 !
 !
-      call calypso_mpi_barrier
       if(my_rank .eq. 0) then
         write(*,*) 'UCD grid by MPI-IO: ', trim(file_name)
       end if
@@ -224,7 +235,6 @@
       integer(kind = kint_gl) :: ioff_gl
 !
 !
-      call calypso_mpi_barrier
      if(my_rank .eq. 0) then
         write(*,*) 'VTK by MPI-IO: ', trim(file_name)
       end if
@@ -259,7 +269,6 @@
       integer(kind = kint_gl) :: ioff_gl
 !
 !
-      call calypso_mpi_barrier
      if(my_rank .eq. 0) then
         write(*,*) 'VTK field by MPI-IO: ', trim(file_name)
       end if
@@ -290,7 +299,6 @@
       integer(kind = kint_gl) :: ioff_gl
 !
 !
-      call calypso_mpi_barrier
      if(my_rank .eq. 0) then
         write(*,*) 'VTK grid by MPI-IO: ', trim(file_name)
       end if

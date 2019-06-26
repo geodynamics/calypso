@@ -11,6 +11,8 @@
 !!
 !!      subroutine calypso_mpi_write_file_open                          &
 !!     &         (file_name, num_pe, id_mpi_file)
+!!      subroutine calypso_mpi_append_file_open                         &
+!!     &         (file_name, num_pe, id_mpi_file, ioff_gl)
 !!      subroutine calypso_mpi_read_file_open(file_name, id_mpi_file)
 !!      subroutine calypso_close_mpi_file(id_mpi_file)
 !!
@@ -112,6 +114,26 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine calypso_mpi_append_file_open                           &
+     &         (file_name, num_pe, id_mpi_file, ioff_gl)
+!
+      character(len=kchara), intent(in) :: file_name
+      integer, intent(in) :: num_pe
+      integer, intent(inout) :: id_mpi_file
+      integer(kind = kint_gl), intent(inout) :: ioff_gl
+!
+!
+      call init_mpi_IO_status
+      call MPI_FILE_OPEN(CALYPSO_COMM, file_name,                       &
+     &    MPI_MODE_RDWR+MPI_MODE_APPEND+MPI_MODE_CREATE,                &
+     &    MPI_INFO_NULL, id_mpi_file, ierr_MPI)
+!
+      call MPI_FILE_GET_SIZE(id_mpi_file, ioff_gl, ierr_MPI)
+!
+      end subroutine calypso_mpi_append_file_open
+!
+!  ---------------------------------------------------------------------
+!
       subroutine calypso_mpi_read_file_open(file_name, id_mpi_file)
 !
       character(len=kchara), intent(in) :: file_name
@@ -119,7 +141,6 @@
 !
 !
       call init_mpi_IO_status
-      call calypso_mpi_barrier
       call MPI_FILE_OPEN                                                &
      &   (CALYPSO_COMM, file_name, MPI_MODE_RDONLY,                     &
      &    MPI_INFO_NULL, id_mpi_file, ierr_MPI)
@@ -135,7 +156,6 @@
 !
 !
       call MPI_FILE_CLOSE(id_mpi_file, ierr_MPI)
-      call calypso_mpi_barrier
       call deallocate_mpi_IO_status
 !
       end subroutine calypso_close_mpi_file

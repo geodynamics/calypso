@@ -8,7 +8,7 @@
 !!@verbatim
 !!      subroutine load_para_SPH_and_FEM_mesh                           &
 !!     &         (FEM_mesh_flags, sph, comms_sph, sph_grps,             &
-!!     &          fem, ele_mesh, mesh_file, gen_sph)
+!!     &          fem, mesh_file, gen_sph)
 !!      subroutine load_para_SPH_rj_mesh(sph, comms_sph, sph_grps)
 !!      subroutine load_para_sph_mesh(sph, bc_rtp_grp, sph_grps)
 !!        type(FEM_file_IO_flags), intent(in) :: FEM_mesh_flags
@@ -18,7 +18,6 @@
 !!        type(mesh_data), intent(inout) :: fem
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::   group
-!!        type(element_geometry), intent(inout) :: ele_mesh
 !!        type(field_IO_params), intent(inout) ::  mesh_file
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
 !!
@@ -62,7 +61,7 @@
 !
       subroutine load_para_SPH_and_FEM_mesh                             &
      &         (FEM_mesh_flags, sph, comms_sph, sph_grps,               &
-     &          fem, ele_mesh, mesh_file, gen_sph)
+     &          fem, mesh_file, gen_sph)
 !
       use calypso_mpi
       use t_mesh_data
@@ -76,7 +75,6 @@
       type(sph_group_data), intent(inout) ::  sph_grps
 !
       type(mesh_data), intent(inout) :: fem
-      type(element_geometry), intent(inout) :: ele_mesh
       type(field_IO_params), intent(inout) ::  mesh_file
 !
       type(construct_spherical_grid), intent(inout) :: gen_sph
@@ -94,14 +92,14 @@
 !  --  load FEM mesh data
       if(check_exist_mesh(mesh_file, my_rank) .eq. 0) then
         if (iflag_debug.gt.0) write(*,*) 'mpi_input_mesh'
-        call mpi_input_mesh(mesh_file, nprocs, fem, ele_mesh)
+        call mpi_input_mesh(mesh_file, nprocs, fem)
         call set_fem_center_mode_4_SPH                                  &
      &     (fem%mesh%node%internal_node, sph%sph_rtp, sph%sph_params)
       else
 !  --  Construct FEM mesh
         call load_FEM_mesh_4_SPH(FEM_mesh_flags,                        &
      &      sph%sph_params, sph%sph_rtp, sph%sph_rj,                    &
-     &      fem, ele_mesh, mesh_file, gen_sph)
+     &      fem, mesh_file, gen_sph)
       end if
 !
       end subroutine load_para_SPH_and_FEM_mesh
@@ -125,7 +123,7 @@
 !
       subroutine load_FEM_mesh_4_SPH                                    &
      &         (FEM_mesh_flags, sph_params, sph_rtp, sph_rj,            &
-     &          fem, ele_mesh, mesh_file, gen_sph)
+     &          fem, mesh_file, gen_sph)
 !
       use calypso_mpi
       use t_mesh_data
@@ -146,7 +144,6 @@
       type(sph_rj_grid), intent(in) :: sph_rj
 !
       type(mesh_data), intent(inout) ::   fem
-      type(element_geometry), intent(inout) :: ele_mesh
       type(field_IO_params), intent(inout) ::  mesh_file
 !
       type(construct_spherical_grid), intent(inout) :: gen_sph
@@ -167,7 +164,6 @@
       call const_FEM_mesh_4_sph_mhd                                     &
      &   (FEM_mesh_flags, sph_params, sph_rtp, sph_rj,                  &
      &    femmesh_s%mesh, femmesh_s%group, mesh_file, gen_sph)
-      call calypso_mpi_barrier
 !      call compare_mesh_type                                           &
 !     &   (my_rank, fem%mesh%nod_comm, mesh%node, mesh%ele,             &
 !     &    femmesh_s%mesh)
@@ -176,10 +172,8 @@
       if (iflag_debug.gt.0) write(*,*) 'set_mesh_data_from_type'
       femmesh_s%mesh%ele%first_ele_type                                 &
      &   = set_cube_eletype_from_num(femmesh_s%mesh%ele%nnod_4_ele)
-      call set_mesh_data_from_type(femmesh_s%mesh, femmesh_s%group,     &
-     &    fem%mesh, ele_mesh, fem%group)
-      call calypso_mpi_barrier
-      if (iflag_debug.gt.0) write(*,*) 'set_mesh_data_from_type end'
+      call set_mesh_data_from_type                                      &
+     &   (femmesh_s%mesh, femmesh_s%group, fem%mesh, fem%group)
 !
       end subroutine load_FEM_mesh_4_SPH
 !

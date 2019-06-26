@@ -295,7 +295,6 @@
      &        multi_int_textline(numdir, idx_tmp))
         end do
       end if
-      call calypso_mpi_barrier
 !
       end subroutine mpi_write_1d_gl_address
 !

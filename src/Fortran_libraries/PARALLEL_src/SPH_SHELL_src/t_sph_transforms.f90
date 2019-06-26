@@ -180,7 +180,6 @@
 !
       call finish_send_recv_sph(comms_sph%comm_rtm)
 !
-      call calypso_mpi_barrier
       if(iflag_debug .gt. 0) write(*,*) 'v_pole'
       v_pole(1:sph%sph_rtp%nnod_pole,1:ncomp_trans) = zero
       ncomp_pole = ncomp_trans * sph%sph_rtp%nnod_pole

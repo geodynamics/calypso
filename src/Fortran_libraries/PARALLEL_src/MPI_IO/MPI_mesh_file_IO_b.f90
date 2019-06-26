@@ -8,8 +8,9 @@
 !!
 !!@verbatim
 !!      subroutine mpi_read_mesh_file_b                                 &
-!!     &         (num_pe, id_rank, file_name, fem_IO)
-!!        type(mesh_data), intent(inout) :: fem_IO
+!!     &         (num_pe, id_rank, file_name, mesh_IO, group_IO)
+!!        type(mesh_geometry), intent(inout) :: mesh_IO
+!!        type(mesh_groups), intent(inout) ::   group_IO
 !!      subroutine mpi_read_mesh_geometry_b(num_pe, id_rank, mesh_IO)
 !!      subroutine mpi_read_node_size_b                                 &
 !!     &         (num_pe, id_rank, file_name, mesh_IO)
@@ -18,8 +19,9 @@
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
 !!
 !!      subroutine mpi_write_mesh_file_b                                &
-!!     &         (num_pe, id_rank, file_name, fem_IO)
-!!        type(mesh_data), intent(in) :: fem_IO
+!!     &         (num_pe, id_rank, file_name, mesh_IO, group_IO)
+!!        type(mesh_geometry), intent(in) :: mesh_IO
+!!        type(mesh_groups), intent(in) ::   group_IO
 !!@endverbatim
 !
       module MPI_mesh_file_IO_b
@@ -43,7 +45,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine mpi_read_mesh_file_b                                   &
-     &         (num_pe, id_rank, file_name, fem_IO)
+     &         (num_pe, id_rank, file_name, mesh_IO, group_IO)
 !
       use MPI_mesh_data_IO_b
       use MPI_groups_IO_b
@@ -51,7 +53,8 @@
       integer, intent(in) :: num_pe, id_rank
       character(len=kchara), intent(in) :: file_name
 !
-      type(mesh_data), intent(inout) :: fem_IO
+      type(mesh_geometry), intent(inout) :: mesh_IO
+      type(mesh_groups), intent(inout) ::   group_IO
 !
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
@@ -60,8 +63,8 @@
       call open_read_mpi_file_b                                         &
      &   (file_name, num_pe, id_rank, IO_param)
 !
-      call mpi_read_geometry_data_b(IO_param, fem_IO%mesh)
-      call mpi_read_mesh_groups_b(IO_param, fem_IO%group)
+      call mpi_read_geometry_data_b(IO_param, mesh_IO)
+      call mpi_read_mesh_groups_b(IO_param, group_IO)
 !
       call close_mpi_file(IO_param)
 !
@@ -142,15 +145,15 @@
 !------------------------------------------------------------------
 !
       subroutine mpi_write_mesh_file_b                                  &
-     &         (num_pe, id_rank, file_name, fem_IO)
+     &         (num_pe, id_rank, file_name, mesh_IO, group_IO)
 !
       use m_machine_parameter
       use MPI_mesh_data_IO_b
 !
       integer, intent(in) :: num_pe, id_rank
       character(len=kchara), intent(in) :: file_name
-!
-      type(mesh_data), intent(in) :: fem_IO
+      type(mesh_geometry), intent(in) :: mesh_IO
+      type(mesh_groups), intent(in) ::   group_IO
 !
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
@@ -158,8 +161,8 @@
 !
       call open_write_mpi_file_b                                        &
      &   (file_name, num_pe, id_rank, IO_param)
-      call mpi_write_geometry_data_b(IO_param, fem_IO%mesh)
-      call mpi_write_mesh_groups_b(IO_param, fem_IO%group)
+      call mpi_write_geometry_data_b(IO_param, mesh_IO)
+      call mpi_write_mesh_groups_b(IO_param, group_IO)
       call close_mpi_file(IO_param)
 !
       end subroutine mpi_write_mesh_file_b

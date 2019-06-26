@@ -3,13 +3,15 @@
 !
 !        programmed by H.Matsui on March. 2006
 !!
-!!      subroutine read_forces_ctl(hd_block, iflag, frc_ctl)
+!!      subroutine read_forces_ctl(id_control, hd_block, frc_ctl, c_buf)
 !!        type(forces_control), intent(inout) :: frc_ctl
-!!      subroutine read_gravity_ctl(hd_block, iflag, g_ctl)
+!!      subroutine read_gravity_ctl(id_control, hd_block, g_ctl, c_buf)
 !!        type(forces_control), intent(inout) :: g_ctl
-!!      subroutine read_coriolis_ctl(hd_block, iflag, cor_ctl)
+!!      subroutine read_coriolis_ctl                                    &
+!!     &         (id_control, hd_block, cor_ctl, c_buf)
 !!        type(coriolis_control), intent(inout) :: cor_ctl
-!!      subroutine read_magneto_ctl(hd_block, iflag, mcv_ctl)
+!!      subroutine read_magneto_ctl                                     &
+!!     &         (id_control, hd_block, mcv_ctl, c_buf)
 !!        type(magneto_convection_control), intent(inout) :: mcv_ctl
 !!
 !!      subroutine bcast_forces_ctl(frc_ctl)
@@ -86,9 +88,10 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use t_control_elements
-      use t_read_control_arrays
+      use t_control_array_character
+      use t_control_array_charareal
       use calypso_mpi
       use skip_comment_f
       use bcast_control_arrays
@@ -101,6 +104,8 @@
 !>        Structure for constant force list
 !!@n        force_names%c_tbl: Name of force
         type(ctl_array_chara) :: force_names
+!
+        integer (kind=kint) :: i_forces_ctl =    0
       end type forces_control
 !
 !>      Structure for gravity definistion
@@ -111,6 +116,8 @@
 !!@n        gravity_vector%c_tbl:  Direction of gravity vector
 !!@n        gravity_vector%vect:   Amplitude of gravity vector
         type(ctl_array_cr) :: gravity_vector
+!
+        integer (kind=kint) :: i_gravity_ctl =   0
       end type gravity_control
 !
 !>      Structure for Coriolis force
@@ -119,6 +126,8 @@
 !!@n        system_rotation%c_tbl:  Direction of rotation vector
 !!@n        system_rotation%vect:   Amplitude of rotation vector
         type(ctl_array_cr) :: system_rotation
+!
+        integer (kind=kint) :: i_coriolis_ctl =  0
       end type coriolis_control
 !
 !>      Structure for Coriolis force
@@ -130,6 +139,8 @@
 !!@n        ext_magne%c_tbl:  Direction of external magnetic field
 !!@n        ext_magne%vect:   Amplitude of external magnetic field
         type(ctl_array_cr) :: ext_magne
+!
+        integer (kind=kint) :: i_magneto_ctl =   0
       end type magneto_convection_control
 !
 !   4th level for forces
@@ -167,100 +178,106 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_forces_ctl(hd_block, iflag, frc_ctl)
+      subroutine read_forces_ctl(id_control, hd_block, frc_ctl, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(forces_control), intent(inout) :: frc_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(frc_ctl%i_forces_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-        call read_control_array_c1(hd_num_forces, frc_ctl%force_names)
+        call read_control_array_c1(id_control, hd_num_forces,           &
+     &      frc_ctl%force_names, c_buf)
       end do
+      frc_ctl%i_forces_ctl = 1
 !
       end subroutine read_forces_ctl
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_gravity_ctl(hd_block, iflag, g_ctl)
+      subroutine read_gravity_ctl(id_control, hd_block, g_ctl, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(gravity_control), intent(inout) :: g_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(g_ctl%i_gravity_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
+        call read_control_array_c_r(id_control,                         &
+     &      hd_gravity_vect, g_ctl%gravity_vector, c_buf)
 !
-        call read_control_array_c_r                                     &
-     &     (hd_gravity_vect, g_ctl%gravity_vector)
-!
-        call read_chara_ctl_type(hd_gravity_type, g_ctl%gravity)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_gravity_type, g_ctl%gravity)
       end do
+      g_ctl%i_gravity_ctl = 1
 !
       end subroutine read_gravity_ctl
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_coriolis_ctl(hd_block, iflag, cor_ctl)
+      subroutine read_coriolis_ctl                                      &
+     &         (id_control, hd_block, cor_ctl, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(coriolis_control), intent(inout) :: cor_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(cor_ctl%i_coriolis_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
-!
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
 !
-        call read_control_array_c_r                                     &
-     &     (hd_rotation_vec, cor_ctl%system_rotation)
+        call read_control_array_c_r(id_control, hd_rotation_vec,        &
+     &      cor_ctl%system_rotation, c_buf)
       end do
+      cor_ctl%i_coriolis_ctl = 1
 !
       end subroutine read_coriolis_ctl
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_magneto_ctl(hd_block, iflag, mcv_ctl)
+      subroutine read_magneto_ctl                                       &
+     &         (id_control, hd_block, mcv_ctl, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(magneto_convection_control), intent(inout) :: mcv_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(mcv_ctl%i_magneto_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
+        call read_control_array_c_r(id_control, hd_magne_vect,          &
+     &      mcv_ctl%ext_magne, c_buf)
 !
-        call read_control_array_c_r(hd_magne_vect, mcv_ctl%ext_magne)
-!
-        call read_chara_ctl_type(hd_magneto_cv, mcv_ctl%magneto_cv)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_magneto_cv, mcv_ctl%magneto_cv)
       end do
+      mcv_ctl%i_magneto_ctl = 1
 !
       end subroutine read_magneto_ctl
 !
@@ -274,6 +291,9 @@
 !
       call bcast_ctl_array_c1(frc_ctl%force_names)
 !
+      call MPI_BCAST(frc_ctl%i_forces_ctl, 1,                           &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_forces_ctl
 !
 !   --------------------------------------------------------------------
@@ -286,6 +306,9 @@
       call bcast_ctl_array_cr(g_ctl%gravity_vector)
       call bcast_ctl_type_c1(g_ctl%gravity)
 !
+      call MPI_BCAST(g_ctl%i_gravity_ctl, 1,                            &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_gravity_ctl
 !
 !   --------------------------------------------------------------------
@@ -296,6 +319,9 @@
 !
 !
       call bcast_ctl_array_cr(cor_ctl%system_rotation)
+!
+      call MPI_BCAST(cor_ctl%i_coriolis_ctl, 1,                         &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine bcast_coriolis_ctl
 !
@@ -309,6 +335,9 @@
       call bcast_ctl_array_cr(mcv_ctl%ext_magne)
       call bcast_ctl_type_c1(mcv_ctl%magneto_cv)
 !
+      call MPI_BCAST(mcv_ctl%i_magneto_ctl, 1,                          &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_magneto_ctl
 !
 !   --------------------------------------------------------------------
@@ -320,6 +349,7 @@
 !
 !
       call dealloc_control_array_chara(frc_ctl%force_names)
+      frc_ctl%i_forces_ctl = 0
 !
       end subroutine dealloc_name_force_ctl
 !
@@ -332,6 +362,7 @@
 !
       call dealloc_control_array_c_r(g_ctl%gravity_vector)
       g_ctl%gravity%iflag = 0
+      g_ctl%i_gravity_ctl = 0
 !
       end subroutine dealloc_gravity_ctl
 !
@@ -343,6 +374,7 @@
 !
 !
       call dealloc_control_array_c_r(cor_ctl%system_rotation)
+      cor_ctl%i_coriolis_ctl = 0
 !
       end subroutine dealloc_coriolis_ctl
 !
@@ -355,6 +387,7 @@
 !
       call dealloc_control_array_c_r(mcv_ctl%ext_magne)
       mcv_ctl%magneto_cv%iflag = 0
+      mcv_ctl%i_magneto_ctl = 0
 !
       end subroutine dealloc_magneto_ctl
 !

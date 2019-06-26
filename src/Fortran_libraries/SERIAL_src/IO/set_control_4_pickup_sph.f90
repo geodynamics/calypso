@@ -81,6 +81,7 @@
       pwr%v_spectr(1)%r_inside =  -1.0
       pwr%v_spectr(1)%r_outside = -1.0
 !
+!
       do j = 2, num_vspec
         i = j - 1
         pwr%v_spectr(j)%iflag_volume_rms_spec                           &

@@ -7,18 +7,17 @@
 !
 !     Written by H. Matsui on Dec., 2008
 !
-!!      subroutine dealloc_mesh_infos_w_normal(mesh, group, ele_mesh)
-!!      subroutine dealloc_mesh_infomations(mesh, group, ele_mesh)
-!!      subroutine dealloc_nod_ele_infos(node, ele, surf, edge,         &
-!!     &          nod_grp, ele_grp, surf_grp, nod_comm)
+!!      subroutine dealloc_mesh_infos_w_normal(mesh, group)
+!!      subroutine dealloc_mesh_infomations(mesh, group)
+!!      subroutine dealloc_nod_ele_infos(mesh, group)
 !!      subroutine dealloc_mesh_infos(mesh, group)
 !!
 !!      subroutine dealloc_mesh_type(mesh)
 !!      subroutine dealloc_mesh_geometry_base(mesh)
 !!      subroutine dealloc_groups_data(group)
-!!
-!!      subroutine dealloc_ele_surf_edge_type(ele_mesh)
-!!      subroutine check_smp_size_surf_edge_type(ele_mesh)
+!!      subroutine dealloc_ele_surf_edge_type(mesh)
+!!      subroutine check_mesh_smp_size(id_rank, mesh)
+!!      subroutine check_surf_edge_smp_size(mesh)
 !!
 !!      subroutine compare_mesh_groups(id_rank, group_ref, group)
 !!        type(mesh_groups), intent(in) :: group_ref, group
@@ -49,6 +48,11 @@
         type(node_data) ::           node
 !>     Structure for element position and connectivity
         type(element_data) ::        ele
+!
+!>     Structure for surface position and connectivity
+        type(surface_data) ::        surf
+!>     Structure for edge position and connectivity
+        type(edge_data) ::           edge
       end type mesh_geometry
 !
 !>     Structure for group data (node, element, surface, and infinity)
@@ -84,53 +88,30 @@
         type(mesh_groups) ::   group
       end type mesh_data
 !
-!
-!>     Structure for element, surface, and edge mesh
-!!        (position, connectivity, and communication)
-      type element_geometry
-!>     Structure for element communication
-        type(communication_table) :: ele_comm
-!
-!>     Structure for surface communication
-        type(communication_table) :: surf_comm
-!>     Structure for surface position and connectivity
-        type(surface_data) ::        surf
-!
-!>     Structure for edge communication
-        type(communication_table) :: edge_comm
-!>     Structure for edge position and connectivity
-        type(edge_data) ::           edge
-      end type element_geometry
-!
-!
-      private :: dealloc_surf_mesh_type, dealloc_edge_mesh_type
-!
 !------------------------------------------------------------------
 !
        contains
 !
 !------------------------------------------------------------------
 !
-      subroutine dealloc_mesh_infos_w_normal(mesh, group, ele_mesh)
+      subroutine dealloc_mesh_infos_w_normal(mesh, group)
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
-      type(element_geometry), intent(inout) :: ele_mesh
 !
 !
       call dealloc_vect_surf_grp_nod(group%surf_nod_grp)
 !
-      call dealloc_mesh_infomations(mesh, group, ele_mesh)
+      call dealloc_mesh_infomations(mesh, group)
 !
       end subroutine dealloc_mesh_infos_w_normal
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_mesh_infomations(mesh, group, ele_mesh)
+      subroutine dealloc_mesh_infomations(mesh, group)
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
-      type(element_geometry), intent(inout) :: ele_mesh
 !
 !
       call dealloc_grp_connect(group%tbls_surf_grp%edge)
@@ -143,39 +124,38 @@
       call dealloc_grp_connect(group%tbls_ele_grp%node)
 !
 !
-      call deallocate_surface_geom_type(ele_mesh%surf)
-      call dealloc_edge_geometory(ele_mesh%edge)
+      call deallocate_surface_geom_type(mesh%surf)
+      call dealloc_edge_geometory(mesh%edge)
 !
-      call deallocate_iso_surface_type(ele_mesh%surf)
-      call deallocate_ext_surface_type(ele_mesh%surf)
+      call deallocate_iso_surface_type(mesh%surf)
+      call deallocate_ext_surface_type(mesh%surf)
 !
-      call dealloc_edge_param_smp(ele_mesh%edge)
-      call deallocate_surf_param_smp_type(ele_mesh%surf)
+      call dealloc_edge_param_smp(mesh%edge)
+      call deallocate_surf_param_smp_type(mesh%surf)
 !
-      call dealloc_edge_4_ele(ele_mesh%edge)
-      call dealloc_edge_connect(ele_mesh%edge)
-      call deallocate_surface_connect_type(ele_mesh%surf)
-      call dealloc_ele_4_surf_type(ele_mesh%surf)
+      call dealloc_edge_4_ele(mesh%edge)
+      call dealloc_edge_connect(mesh%edge)
+      call deallocate_surface_connect_type(mesh%surf)
+      call dealloc_ele_4_surf_type(mesh%surf)
 !
-      call dealloc_nod_ele_infos(mesh, group, ele_mesh)
+      call dealloc_nod_ele_infos(mesh, group)
 !
       end subroutine dealloc_mesh_infomations
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_nod_ele_infos(mesh, group, ele_mesh)
+      subroutine dealloc_nod_ele_infos(mesh, group)
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
-      type(element_geometry), intent(inout) :: ele_mesh
 !
 !
       call dealloc_sf_group_smp(group%surf_grp)
       call dealloc_group_smp(group%ele_grp)
       call dealloc_group_smp(group%nod_grp)
 !
-      call dealloc_inod_in_edge(ele_mesh%edge)
-      call deallocate_inod_in_surf_type(ele_mesh%surf)
+      call dealloc_inod_in_edge(mesh%edge)
+      call deallocate_inod_in_surf_type(mesh%surf)
       call deallocate_ele_param_smp_type(mesh%ele)
       call deallocate_node_param_smp_type(mesh%node)
 !
@@ -253,49 +233,24 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine dealloc_ele_surf_edge_type(ele_mesh)
+      subroutine dealloc_ele_surf_edge_type(mesh)
 !
-      type(element_geometry), intent(inout) :: ele_mesh
+      type(mesh_geometry), intent(inout) :: mesh
 !
 !
-      call dealloc_comm_table(ele_mesh%ele_comm)
+      call deallocate_surface_connect_type(mesh%surf)
 !
-      call dealloc_surf_mesh_type(ele_mesh)
-      call dealloc_edge_mesh_type(ele_mesh)
+      call dealloc_edge_connect(mesh%edge)
+      call dealloc_edge_4_ele(mesh%edge)
 !
       end subroutine dealloc_ele_surf_edge_type
 !
 !------------------------------------------------------------------
-!
-      subroutine dealloc_surf_mesh_type(ele_mesh)
-!
-      type(element_geometry), intent(inout) :: ele_mesh
-!
-!
-      call dealloc_comm_table(ele_mesh%surf_comm)
-      call deallocate_surface_connect_type(ele_mesh%surf)
-!
-      end subroutine dealloc_surf_mesh_type
-!
 !------------------------------------------------------------------
 !
-      subroutine dealloc_edge_mesh_type(ele_mesh)
+      subroutine check_mesh_smp_size(id_rank, mesh)
 !
-      type(element_geometry), intent(inout) :: ele_mesh
-!
-!
-      call dealloc_comm_table(ele_mesh%edge_comm)
-      call dealloc_edge_connect(ele_mesh%edge)
-      call dealloc_edge_4_ele(ele_mesh%edge)
-!
-      end subroutine dealloc_edge_mesh_type
-!
-!------------------------------------------------------------------
-!------------------------------------------------------------------
-!
-      subroutine check_smp_size_type(id_rank, mesh)
-!
-      type(mesh_geometry) :: mesh
+      type(mesh_geometry), intent(in) :: mesh
 !
       integer, intent(in) :: id_rank
 !
@@ -306,21 +261,21 @@
        write(*,*) 'PE: ', id_rank,                                      &
      &        'mesh%ele%istack_ele_smp: ', mesh%ele%istack_ele_smp
 !
-      end subroutine check_smp_size_type
+      end subroutine check_mesh_smp_size
 !
 !-----------------------------------------------------------------------
 !
-      subroutine check_smp_size_surf_edge_type(ele_mesh)
+      subroutine check_surf_edge_smp_size(mesh)
 !
-      type(element_geometry), intent(inout) :: ele_mesh
+      type(mesh_geometry), intent(in) :: mesh
 !
 !
-      write(*,*) 'ele_mesh%surfistack_surf_smp ',                       &
-     &           ele_mesh%surf%istack_surf_smp
-      write(*,*) 'ele_mesh%edge%istack_edge_smp ',                      &
-     &           ele_mesh%edge%istack_edge_smp
+      write(*,*) 'mesh%surfistack_surf_smp ',                           &
+     &           mesh%surf%istack_surf_smp
+      write(*,*) 'mesh%edge%istack_edge_smp ',                          &
+     &           mesh%edge%istack_edge_smp
 !
-      end subroutine check_smp_size_surf_edge_type
+      end subroutine check_surf_edge_smp_size
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

@@ -291,25 +291,21 @@
       type(sph_comm_tbl), intent(in) :: comm_rj
 !
 !
-      call calypso_MPI_Barrier
       if(my_rank .eq. 0) write(*,*) 'check rtp -> rtm'
       call check_calypso_send_recv_N                                    &
      &   (NB, comm_rtp%nneib_domain, comm_rtp%iflag_self,               &
      &    comm_rtp%istack_sr, comm_rtm%nneib_domain,                    &
      &    comm_rtm%iflag_self, comm_rtm%istack_sr)
-      call calypso_MPI_Barrier
       if(my_rank .eq. 0) write(*,*) 'check rtm -> rtp'
       call check_calypso_send_recv_N                                    &
      &   (NB, comm_rtm%nneib_domain, comm_rtm%iflag_self,               &
      &    comm_rtm%istack_sr, comm_rtp%nneib_domain,                    &
      &    comm_rtp%iflag_self, comm_rtp%istack_sr)
-      call calypso_MPI_Barrier
       if(my_rank .eq. 0) write(*,*) 'check rj -> rlm'
       call check_calypso_send_recv_N                                    &
      &    (NB, comm_rj%nneib_domain, comm_rj%iflag_self,                &
      &     comm_rj%istack_sr, comm_rlm%nneib_domain,                    &
      &     comm_rlm%iflag_self, comm_rlm%istack_sr)
-      call calypso_MPI_Barrier
       if(my_rank .eq. 0) write(*,*) 'check rlm -> rj'
       call check_calypso_send_recv_N                                    &
      &   (NB, comm_rlm%nneib_domain, comm_rlm%iflag_self,               &

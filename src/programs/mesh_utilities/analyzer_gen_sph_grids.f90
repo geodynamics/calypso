@@ -50,7 +50,6 @@
       type(sph_comm_tables), save, private :: comms_sph
       type(sph_group_data), save, private ::  sph_grps
       type(mesh_data), save, private :: geofem
-      type(element_geometry), save, private :: ele_mesh
 !
 !
       private :: control_file_name
@@ -111,7 +110,7 @@
       if(iflag_debug .gt. 0) write(*,*) 'load_para_SPH_and_FEM_mesh'
       call load_para_SPH_and_FEM_mesh                                   &
      &   (sph_files1%FEM_mesh_flags, sph_const, comms_sph, sph_grps,    &
-     &    geofem, ele_mesh, sph_files1%mesh_file_IO, gen_sph_G)
+     &    geofem, sph_files1%mesh_file_IO, gen_sph_G)
       call calypso_MPI_barrier
 !
       call dealloc_gen_sph_fem_mesh_param(gen_sph_G)
@@ -120,10 +119,8 @@
       if(sph_files1%FEM_mesh_flags%iflag_output_SURF .eq. 0) goto 99
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+4)
-      if(iflag_debug .gt. 0) write(*,*) 'FEM_mesh_init_with_IO'
-      call FEM_mesh_init_with_IO                                        &
-     &   (sph_files1%FEM_mesh_flags%iflag_output_SURF,                  &
-     &    sph_files1%mesh_file_IO, geofem%mesh, geofem%group, ele_mesh)
+      if(iflag_debug .gt. 0) write(*,*) 'FEM_mesh_initialization'
+      call FEM_mesh_initialization(geofem%mesh, geofem%group)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+4)
       call end_elapsed_time(ied_total_elapsed)
 !

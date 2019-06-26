@@ -126,8 +126,8 @@
       subroutine set_ctl_params_dynamobench                             &
      &         (fld_ctl, meq_ctl, circle, d_circle, bench)
 !
-      use t_ctl_data_sph_vol_spectr
-      use t_read_control_arrays
+      use t_mid_equator_control
+      use t_control_array_character3
       use t_phys_data
       use t_circle_transform
       use m_phys_labels

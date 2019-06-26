@@ -23,7 +23,6 @@
       use m_machine_parameter
       use m_phys_labels
       use t_control_parameter
-      use t_read_control_arrays
       use t_physical_property
       use add_nodal_fields_ctl
       use calypso_mpi
@@ -41,6 +40,7 @@
 !
       subroutine add_field_name_4_mhd(MHD_prop, field_ctl)
 !
+      use t_control_array_character3
       use t_reference_scalar_param
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
@@ -54,7 +54,6 @@
 !
 !    set work fields for reference temperature
 !
-      call calypso_mpi_barrier
       if (iflag_debug.eq.1) write(*,*) 'add_ctl_4_forces'
       call add_ctl_4_forces                                             &
      &   (MHD_prop%fl_prop, MHD_prop%ref_param_T, MHD_prop%ref_param_C, &
@@ -62,7 +61,6 @@
 !
 !     set work fields for adams-bashforth
 !
-      call calypso_mpi_barrier
       if (iflag_debug.eq.1) write(*,*) 'add_data_4_previous_step'
       call add_data_4_previous_step                                     &
      &   (MHD_prop%fl_prop, MHD_prop%cd_prop,                           &
@@ -70,7 +68,6 @@
 !
 !     set work fields for evolution check
 !
-      call calypso_mpi_barrier
       if (iflag_debug.eq.1) write(*,*) 'add_data_4_check_step'
       call add_data_4_check_step                                        &
      &   (MHD_prop%fl_prop, MHD_prop%cd_prop,                           &
@@ -83,6 +80,7 @@
       subroutine add_ctl_4_ref_temp                                     &
      &        (ref_param_T, ref_param_C, field_ctl)
 !
+      use t_control_array_character3
       use t_reference_scalar_param
 !
       type(reference_scalar_param), intent(in) :: ref_param_T
@@ -108,6 +106,7 @@
       subroutine add_ctl_4_forces                                       &
      &         (fl_prop, ref_param_T, ref_param_C, field_ctl)
 !
+      use t_control_array_character3
       use t_reference_scalar_param
 !
       type(fluid_property), intent(in) :: fl_prop
@@ -140,6 +139,8 @@
       subroutine add_work_area_4_potentials                             &
      &         (fl_prop, cd_prop, field_ctl)
 !
+      use t_control_array_character3
+!
       type(fluid_property), intent(in) :: fl_prop
       type(conductive_property), intent(in) :: cd_prop
       type(ctl_array_c3), intent(inout) :: field_ctl
@@ -160,6 +161,8 @@
 !
       subroutine add_data_4_previous_step                               &
      &         (fl_prop, cd_prop, ht_prop, cp_prop, field_ctl)
+!
+      use t_control_array_character3
 !
       type(fluid_property), intent(in) :: fl_prop
       type(conductive_property), intent(in) :: cd_prop
@@ -191,6 +194,8 @@
 !
       subroutine add_data_4_check_step                                  &
      &         (fl_prop, cd_prop,  ht_prop, cp_prop, field_ctl)
+!
+      use t_control_array_character3
 !
       type(fluid_property), intent(in) :: fl_prop
       type(conductive_property), intent(in) :: cd_prop

@@ -172,7 +172,6 @@
      &        vector_textline(ione, vec_tmp))
         end do
       end if
-      call calypso_mpi_barrier
 !
       end subroutine mpi_write_scalar
 !
@@ -214,7 +213,6 @@
      &        vector_textline(numdir, vec_tmp))
         end do
       end if
-      call calypso_mpi_barrier
 !
       end subroutine mpi_write_vector
 !

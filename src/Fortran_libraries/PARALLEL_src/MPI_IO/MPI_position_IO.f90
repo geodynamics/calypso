@@ -181,7 +181,6 @@
      &       int8_and_vector_textline(id_global(inod), numdir, xx_tmp))
         end do
       end if
-      call calypso_mpi_barrier
 !
       end subroutine mpi_write_node_position
 !
@@ -223,7 +222,6 @@
      &        int8_and_vector_textline(int8_tmp, ione, rr(i)))
         end do
       end if
-      call calypso_mpi_barrier
 !
       end subroutine mpi_write_radial_position
 !

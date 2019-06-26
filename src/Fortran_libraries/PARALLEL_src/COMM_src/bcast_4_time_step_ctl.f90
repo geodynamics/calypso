@@ -83,6 +83,9 @@
 !
       call bcast_ctl_type_c1(tctl%flexible_step_ctl)
 !
+      call MPI_BCAST(tctl%i_tstep, 1,                                   &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_ctl_data_4_time_step
 !
 !   --------------------------------------------------------------------

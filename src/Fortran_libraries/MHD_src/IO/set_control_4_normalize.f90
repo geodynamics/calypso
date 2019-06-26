@@ -390,7 +390,7 @@
 !
       subroutine copy_dimless_from_ctl(coef_ctl, dimless_list)
 !
-      use t_read_control_arrays
+      use t_control_array_charareal
 !
       type(ctl_array_cr), intent(in) :: coef_ctl
       type(list_of_dimless), intent(inout) :: dimless_list
@@ -410,7 +410,7 @@
 !
       subroutine copy_power_and_names_from_ctl(coef_ctl, coef_list)
 !
-      use t_read_control_arrays
+      use t_control_array_charareal
 !
       type(ctl_array_cr), intent(in) :: coef_ctl
       type(powers_4_coefficients), intent(inout) :: coef_list

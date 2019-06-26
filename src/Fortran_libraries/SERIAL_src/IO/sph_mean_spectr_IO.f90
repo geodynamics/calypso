@@ -74,11 +74,13 @@
      &          num_rms_rj, ntot_rms_rj, num_rms_comp_rj, rms_name_rj,  &
      &          nri, nlayer_ICB, nlayer_CMB, kr_inner, kr_outer)
       close(id_file)
+!      write(*,*) 'Checked ', trim(fname_rms),                          &
+!     &     check_sph_vol_mean_sq_file
 !
       return
 !
    99 continue
-      write(*,*) 'No mean suare file'
+      write(*,*) 'No mean suare file: ', trim(fname_rms)
       check_sph_vol_mean_sq_file = 0
 !
       end function check_sph_vol_mean_sq_file

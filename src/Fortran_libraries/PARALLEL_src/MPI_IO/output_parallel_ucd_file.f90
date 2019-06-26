@@ -81,14 +81,12 @@
       end if
 !
       call sel_write_parallel_ucd_mesh(ucd_param, ucd, m_ucd)
-      call calypso_mpi_barrier
 !
       if(   mod(ucd_param%iflag_format,icent)/iten .eq. iflag_udt/iten  &
      & .or. mod(ucd_param%iflag_format,icent)/iten .eq. iflag_vtd/iten) &
      &    then
         call deallocate_ucd_ele(ucd)
       end if
-      call calypso_mpi_barrier
 !
       if(mod(ucd_param%iflag_format,icent)/iten .eq. iflag_vtd/iten) then
         call deallocate_ucd_node(ucd)
@@ -135,7 +133,6 @@
       call copy_time_step_size_data(time_d, t_IO)
       call sel_write_parallel_ucd_file                                  &
      &   (istep_ucd, ucd_param, t_IO, ucd, m_ucd)
-      call calypso_mpi_barrier
 !
       call deallocate_ucd_node(ucd)
 !

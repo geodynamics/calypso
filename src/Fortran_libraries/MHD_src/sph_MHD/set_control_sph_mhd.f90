@@ -77,7 +77,6 @@
      &         (Dmodel_ctl, psph_ctl, smonitor_ctl,                     &
      &          MHD_prop, sph, rj_fld, nod_fld, monitor)
 !
-      use t_read_control_arrays
       use t_phys_data
       use t_sph_mhd_monitor_data_IO
 !
@@ -126,7 +125,6 @@
       subroutine set_control_SPH_MHD_noviz(Dmodel_ctl, smonitor_ctl,    &
      &          MHD_prop, rj_fld, monitor)
 !
-      use t_read_control_arrays
       use t_phys_data
       use t_sph_mhd_monitor_data_IO
 !

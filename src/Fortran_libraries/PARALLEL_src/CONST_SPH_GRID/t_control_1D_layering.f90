@@ -77,7 +77,7 @@
       subroutine set_group_by_layering_list                             &
      &         (name_prefix, layer_list_ctl, layering)
 !
-      use t_read_control_arrays
+      use t_control_array_integer2
       use set_parallel_file_name
 !
       character(len=kchara), intent(in) :: name_prefix

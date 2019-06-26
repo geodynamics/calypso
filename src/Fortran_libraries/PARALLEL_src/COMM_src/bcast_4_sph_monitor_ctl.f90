@@ -38,8 +38,9 @@
 !
       type(sph_monitor_control), intent(inout) :: smonitor_ctl
 !
-      integer(kind = kint) :: i
 !
+      call MPI_BCAST(smonitor_ctl%i_pick_sph, 1,                        &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       call bcast_ctl_type_c1(smonitor_ctl%volume_average_prefix)
       call bcast_ctl_type_c1(smonitor_ctl%volume_pwr_spectr_prefix)
@@ -59,9 +60,14 @@
         allocate(smonitor_ctl%v_pwr(smonitor_ctl%num_vspec_ctl))
       end if
 !
-      do i = 1, smonitor_ctl%num_vspec_ctl
-        call bcast_each_vol_spectr_ctl(smonitor_ctl%v_pwr(i))
-      end do
+      call bcast_each_vol_spectr_ctl                                    &
+     &   (smonitor_ctl%num_vspec_ctl, smonitor_ctl%v_pwr)
+!
+!      do i = 1, smonitor_ctl%num_vspec_ctl
+!        write(*,*) my_rank, 'bcast_each_vol_spectr_ctl result', i,   &
+!     &            smonitor_ctl%v_pwr(i)%inner_radius_ctl%realvalue,  &
+!     &            smonitor_ctl%v_pwr(i)%outer_radius_ctl%realvalue
+!      end do
 !
       end subroutine bcast_sph_monitoring_ctl
 !
@@ -102,15 +108,20 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine bcast_each_vol_spectr_ctl(v_pwr)
+      subroutine bcast_each_vol_spectr_ctl(num_vspec_ctl, v_pwr)
 !
-      type(volume_spectr_control), intent(inout) :: v_pwr
+      integer(kind = kint), intent(in) :: num_vspec_ctl
+      type(volume_spectr_control), intent(inout)                        &
+     &                            :: v_pwr(num_vspec_ctl)
 !
+      integer(kind = kint) :: i
 !
-      call bcast_ctl_type_c1(v_pwr%volume_spec_file_ctl)
-      call bcast_ctl_type_c1(v_pwr%volume_ave_file_ctl)
-      call bcast_ctl_type_r1(v_pwr%inner_radius_ctl)
-      call bcast_ctl_type_r1(v_pwr%outer_radius_ctl)
+      do i = 1, num_vspec_ctl
+        call bcast_ctl_type_c1(v_pwr(i)%volume_spec_file_ctl)
+        call bcast_ctl_type_c1(v_pwr(i)%volume_ave_file_ctl)
+        call bcast_ctl_type_r1(v_pwr(i)%inner_radius_ctl)
+        call bcast_ctl_type_r1(v_pwr(i)%outer_radius_ctl)
+      end do
 !
       end subroutine bcast_each_vol_spectr_ctl
 !
@@ -136,6 +147,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine bcast_mid_eq_monitor_ctl(meq_ctl)
+!
+      use t_mid_equator_control
 !
       type(mid_equator_control), intent(inout) :: meq_ctl
 !

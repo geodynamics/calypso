@@ -14,13 +14,12 @@
       module add_nodal_fields_ctl
 !
       use m_precision
-      use t_read_control_arrays
+      use t_control_elements
+      use t_control_array_character3
 !
       implicit  none
 !
-      type(ctl_array_c3), private :: field_tmp_ctl
-!
-      private :: copy_field_ctl
+      type(read_chara3_item), private :: field_tmp_ctl
 !
 ! -----------------------------------------------------------------------
 !
@@ -46,23 +45,14 @@
         end if
       end do
 !
-      if (iflag .gt. 0) return
+      if(iflag .gt. 0) return
 !
-      field_tmp_ctl%num = field_ctl%num
-      call alloc_control_array_c3(field_tmp_ctl)
-      call copy_field_ctl                                               &
-     &   (field_tmp_ctl%num, field_ctl, field_tmp_ctl)
-      call dealloc_control_array_c3(field_ctl)
+      field_tmp_ctl%iflag = 1
+      field_tmp_ctl%charavalue(1) = fld_name
+      field_tmp_ctl%charavalue(2) = 'Viz_off'
+      field_tmp_ctl%charavalue(3) = 'Monitor_off'
 !
-      field_ctl%num = field_tmp_ctl%num + 1
-      call alloc_control_array_c3(field_ctl)
-      call copy_field_ctl                                               &
-     &   (field_tmp_ctl%num, field_tmp_ctl, field_ctl)
-      call dealloc_control_array_c3(field_tmp_ctl)
-!
-      field_ctl%c1_tbl(field_ctl%num) = fld_name
-      field_ctl%c2_tbl(field_ctl%num) = 'Viz_off'
-      field_ctl%c3_tbl(field_ctl%num) = 'Monitor_off'
+      call append_control_array_c3(field_tmp_ctl, field_ctl)
 !
       if(iflag_debug .gt. 0) then
         write(*,*) trim(field_ctl%c1_tbl(field_ctl%num) ),              &
@@ -70,26 +60,6 @@
       end if
 !
       end subroutine add_phys_name_ctl
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine copy_field_ctl(num_copy, org_field_ctl, tgt_field_ctl)
-!
-      integer(kind = kint), intent(in) ::  num_copy
-      type(ctl_array_c3), intent(in) ::    org_field_ctl
-      type(ctl_array_c3), intent(inout) :: tgt_field_ctl
-!
-      integer(kind = kint) :: i
-!
-!
-      do i = 1, num_copy
-        tgt_field_ctl%c1_tbl(i) = org_field_ctl%c1_tbl(i)
-        tgt_field_ctl%c2_tbl(i) = org_field_ctl%c2_tbl(i)
-        tgt_field_ctl%c3_tbl(i) = org_field_ctl%c3_tbl(i)
-      end do
-!
-      end subroutine copy_field_ctl
 !
 ! -----------------------------------------------------------------------
 !

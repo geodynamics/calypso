@@ -9,9 +9,10 @@
 !!@verbatim
 !!      subroutine dealloc_phys_control(fld_ctl)
 !!
-!!      subroutine read_phys_data_control(hd_block, iflag, fld_ctl)
+!!      subroutine read_phys_data_control                               &
+!!     &         (id_control, hd_block, fld_ctl, c_buf)
 !!      subroutine write_phys_data_control                              &
-!!     &         (id_file, hd_block, fld_ctl, level)
+!!     &         (id_control, hd_block, fld_ctl, level)
 !!
 !! ---------------------------------------------------------------------
 !!
@@ -50,7 +51,9 @@
       module t_ctl_data_4_fields
 !
       use m_precision
-      use t_read_control_arrays
+      use m_machine_parameter
+      use t_control_array_character
+      use t_control_array_character3
 !
       implicit  none
 !
@@ -69,6 +72,8 @@
 !!@n       quad_phys%num:   Number of field
 !!@n       quad_phys%c_tbl: Name list of field
         type(ctl_array_chara) :: quad_phys
+!
+        integer (kind=kint) :: i_phys_values =   0
       end type field_control
 !
 !   4th level for fields
@@ -101,59 +106,59 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_phys_data_control(hd_block, iflag, fld_ctl)
+      subroutine read_phys_data_control                                 &
+     &         (id_control, hd_block, fld_ctl, c_buf)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(field_control), intent(inout) :: fld_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(fld_ctl%i_phys_values .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-        call read_control_array_c3(hd_field_list, fld_ctl%field_ctl)
-        call read_control_array_c1(hd_quad_field, fld_ctl%quad_phys)
+        call read_control_array_c3                                      &
+     &     (id_control, hd_field_list, fld_ctl%field_ctl, c_buf)
+        call read_control_array_c1                                      &
+     &     (id_control, hd_quad_field, fld_ctl%quad_phys, c_buf)
       end do
+      fld_ctl%i_phys_values = 1
 !
       end subroutine read_phys_data_control
 !
 !   --------------------------------------------------------------------
 !
       subroutine write_phys_data_control                                &
-     &         (id_file, hd_block, fld_ctl, level)
+     &         (id_control, hd_block, fld_ctl, level)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use write_control_elements
-      use write_control_arrays
 !
-      integer(kind = kint), intent(in) :: id_file
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
       type(field_control), intent(in) :: fld_ctl
 !
       integer(kind = kint), intent(inout) :: level
 !
 !
-      write(id_file,'(a1)') '!'
-      level = write_begin_flag_for_ctl(id_file, level, hd_block)
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
       call write_control_array_c3                                       &
-     &   (id_file, level, hd_field_list, fld_ctl%field_ctl)
+     &   (id_control, level, hd_field_list, fld_ctl%field_ctl)
 !
       call write_control_array_c1                                       &
-     &   (id_file, level, hd_quad_field, fld_ctl%quad_phys)
+     &   (id_control, level, hd_quad_field, fld_ctl%quad_phys)
 !
-      level =  write_end_flag_for_ctl(id_file, level, hd_block)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_phys_data_control
 !

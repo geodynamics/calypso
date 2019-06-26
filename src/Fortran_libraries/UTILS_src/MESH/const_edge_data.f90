@@ -8,8 +8,6 @@
 !!
 !!@verbatim
 !!      subroutine construct_edge_data(nod, ele, surf, edge)
-!!      subroutine const_element_list_4_edge(ele, edge)
-!!      subroutine const_surface_list_4_edge(surf, edge)
 !!      subroutine empty_edge_connect_type(ele, surf, edge)
 !!        type(node_data),    intent(in) :: nod
 !!        type(element_data), intent(in) :: ele
@@ -87,51 +85,6 @@
       call dealloc_sum_hash(edge_ele_tbl)
 !
       end subroutine construct_edge_data
-!
-!------------------------------------------------------------------
-!
-      subroutine const_element_list_4_edge(ele, edge)
-!
-      use set_element_list_4_surface
-!
-      type(element_data), intent(in) :: ele
-      type(edge_data), intent(inout) :: edge
-!
-      call alloc_ele_4_edge_num_type(edge)
-      call count_ele_list_4_edge(ele%numele, edge%numedge, nedge_4_ele, &
-     &    edge%iedge_4_ele, edge%ntot_iele_4_edge,                      &
-     &    edge%num_iele_4_edge, edge%istack_iele_4_edge)
-!
-      call alloc_ele_4_edge_item_type(edge)
-      call set_ele_list_4_edge(ele%numele, edge%numedge, nedge_4_ele,   &
-     &    edge%iedge_4_ele, edge%ntot_iele_4_edge,                      &
-     &    edge%num_iele_4_edge, edge%istack_iele_4_edge,                &
-     &    edge%iele_4_edge)
-!
-      end subroutine const_element_list_4_edge
-!
-!------------------------------------------------------------------
-!
-      subroutine const_surface_list_4_edge(surf, edge)
-!
-      use set_element_list_4_surface
-!
-      type(surface_data), intent(in) :: surf
-      type(edge_data), intent(inout) :: edge
-!
-!
-      call alloc_surf_4_edge_num_type(edge)
-      call count_ele_list_4_edge(surf%numsurf, edge%numedge,            &
-     &    nedge_4_surf, edge%iedge_4_sf, edge%ntot_isurf_4_edge,        &
-     &    edge%num_isurf_4_edge, edge%istack_isurf_4_edge)
-!
-      call alloc_surf_4_edge_item_type(edge)
-      call set_ele_list_4_edge(surf%numsurf, edge%numedge,              &
-     &    nedge_4_surf, edge%iedge_4_sf, edge%ntot_isurf_4_edge,        &
-     &    edge%num_isurf_4_edge, edge%istack_isurf_4_edge,              &
-     &    edge%isurf_4_edge)
-!
-      end subroutine const_surface_list_4_edge
 !
 !------------------------------------------------------------------
 ! ----------------------------------------------------------------------

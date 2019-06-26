@@ -22,14 +22,20 @@
 !
       use t_ctl_data_MHD
       use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use calypso_mpi
       use skip_comment_f
 !
       implicit none
 !
-      integer(kind=kint), parameter :: control_file_code = 11
-      private :: control_file_code
+      integer(kind=kint), parameter :: ctl_file_code = 11
+!
+!   Top level of label
+!
+      character(len=kchara) :: hd_mhd_ctl = 'MHD_control'
+!
+      private :: hd_mhd_ctl
+      private :: ctl_file_code
 !
 ! ----------------------------------------------------------------------
 !
@@ -42,22 +48,22 @@
       character(len=kchara), intent(in) :: file_name
       type(DNS_mhd_simulation_control), intent(inout) :: DNS_MHD_ctl
 !
+      type(buffer_for_control) :: c_buf1
+!
 !
       if(my_rank .eq. 0) then
-        ctl_file_code = control_file_code
-        open ( ctl_file_code, file = file_name, status='old' )
+        open(ctl_file_code, file = file_name, status='old' )
 !
-        call load_ctl_label_and_line
-        call read_sph_mhd_ctl_w_psf(DNS_MHD_ctl)
-!
+        do
+          call load_one_line_from_control(ctl_file_code, c_buf1)
+          call read_sph_mhd_ctl_w_psf                                   &
+     &       (ctl_file_code, hd_mhd_ctl, DNS_MHD_ctl, c_buf1)
+          if(DNS_MHD_ctl%i_mhd_ctl .gt. 0) exit
+        end do
         close(ctl_file_code)
       end if
 !
       call bcast_sph_mhd_ctl_w_psf(DNS_MHD_ctl)
-!
-      if(DNS_MHD_ctl%psph_ctl%ifile_sph_shell .gt. 0) then
-        call read_ctl_file_gen_shell_grids(DNS_MHD_ctl%psph_ctl)
-      end if
 !
       end subroutine read_control_4_sph_MHD_w_psf
 !
@@ -68,22 +74,22 @@
       character(len=kchara), intent(in) :: file_name
       type(DNS_mhd_simulation_control), intent(inout) :: DNS_MHD_ctl
 !
+      type(buffer_for_control) :: c_buf1
+!
 !
       if(my_rank .eq. 0) then
-        ctl_file_code = control_file_code
-        open ( ctl_file_code, file = file_name, status='old' )
+        open(ctl_file_code, file = file_name, status='old' )
 !
-        call load_ctl_label_and_line
-        call read_sph_mhd_ctl_noviz(DNS_MHD_ctl)
-!
+        do
+          call load_one_line_from_control(ctl_file_code, c_buf1)
+          call read_sph_mhd_ctl_noviz                                   &
+     &       (ctl_file_code, hd_mhd_ctl, DNS_MHD_ctl, c_buf1)
+          if(DNS_MHD_ctl%i_mhd_ctl .gt. 0) exit
+        end do
         close(ctl_file_code)
       end if
 !
       call bcast_sph_mhd_ctl_data(DNS_MHD_ctl)
-!
-      if(DNS_MHD_ctl%psph_ctl%ifile_sph_shell .gt. 0) then
-        call read_ctl_file_gen_shell_grids(DNS_MHD_ctl%psph_ctl)
-      end if
 !
       end subroutine read_control_4_sph_MHD_noviz
 !

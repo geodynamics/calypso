@@ -129,7 +129,6 @@
 !
       call gz_mpi_skip_header(IO_param, len(hd_jgrphd()))
       call gz_mpi_read_group_data(IO_param, sph_grps_IO%sphere_rj_grp)
-      call calypso_mpi_barrier
 !
       end subroutine gz_mpi_read_spectr_rj_data
 !

@@ -8,11 +8,16 @@
 !!
 !!@verbatim
 !!      subroutine init_psf_ctl_stract(psf_c)
-!!      subroutine deallocate_cont_dat_4_psf(psf_c)
+!!      subroutine dealloc_cont_dat_4_psf(psf_c)
 !!        type(psf_ctl), intent(inout) :: psf_c
+!!      subroutine dup_control_4_psf(org_psf_c, new_psf_c)
+!!        type(psf_ctl), intent(in) :: org_psf_c
+!!        type(psf_ctl), intent(inout) :: new_psf_c
 !!
-!!      subroutine read_psf_control_data(psf_c)
+!!      subroutine read_psf_control_data                                &
+!!     &         (id_control, hd_block, psf_c, c_buf)
 !!      subroutine bcast_psf_control_data(psf_c)
+!!      subroutine read_section_def_control(id_control, psf_c, c_buf)
 !!        type(psf_ctl), intent(inout) :: psf_c
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -118,10 +123,12 @@
 !
       use m_constants
       use m_machine_parameter
-      use m_read_control_elements
       use skip_comment_f
+      use t_read_control_elements
       use t_control_elements
-      use t_read_control_arrays
+      use t_control_array_character
+      use t_control_array_charareal
+      use t_control_array_character2
 !
       implicit  none
 !
@@ -251,10 +258,22 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_cont_dat_4_psf(psf_c)
+      subroutine dealloc_cont_dat_4_psf(psf_c)
 !
       type(psf_ctl), intent(inout) :: psf_c
 !
+!
+      psf_c%psf_file_head_ctl%iflag =   0
+      psf_c%psf_output_type_ctl%iflag = 0
+      psf_c%section_method_ctl%iflag =  0
+!
+      psf_c%radius_psf_ctl%iflag =      0
+      psf_c%psf_group_name_ctl%iflag =  0
+!
+      psf_c%i_psf_ctl =        0
+      psf_c%i_surface_define = 0
+      psf_c%i_output_field =   0
+      psf_c%i_plot_area =      0
 !
       call dealloc_control_array_c2(psf_c%psf_out_field_ctl)
       psf_c%psf_out_field_ctl%num =  0
@@ -280,122 +299,173 @@
       psf_c%psf_axis_ctl%num =  0
       psf_c%psf_axis_ctl%icou = 0
 !
-      end subroutine deallocate_cont_dat_4_psf
+      end subroutine dealloc_cont_dat_4_psf
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine dup_control_4_psf(org_psf_c, new_psf_c)
+!
+      use copy_control_elements
+!
+      type(psf_ctl), intent(in) :: org_psf_c
+      type(psf_ctl), intent(inout) :: new_psf_c
+!
+!
+      call copy_chara_ctl(org_psf_c%psf_file_head_ctl,                  &
+     &                    new_psf_c%psf_file_head_ctl)
+      call copy_chara_ctl(org_psf_c%psf_output_type_ctl,                &
+     &                    new_psf_c%psf_output_type_ctl)
+      call copy_chara_ctl(org_psf_c%section_method_ctl,                 &
+     &                    new_psf_c%section_method_ctl)
+!
+      call dup_control_array_c_r(org_psf_c%psf_coefs_ctl,               &
+     &                           new_psf_c%psf_coefs_ctl)
+      call dup_control_array_c_r(org_psf_c%psf_normal_ctl,              &
+     &                           new_psf_c%psf_normal_ctl)
+      call dup_control_array_c_r(org_psf_c%psf_center_ctl,              &
+     &                           new_psf_c%psf_center_ctl)
+      call dup_control_array_c_r(org_psf_c%psf_axis_ctl,                &
+     &                           new_psf_c%psf_axis_ctl)
+!
+      call copy_real_ctl(org_psf_c%radius_psf_ctl,                      &
+     &                    new_psf_c%radius_psf_ctl)
+      call copy_chara_ctl(org_psf_c%psf_group_name_ctl,                 &
+     &                    new_psf_c%psf_group_name_ctl)
+!
+      call dup_control_array_c2(org_psf_c%psf_out_field_ctl,            &
+     &                          new_psf_c%psf_out_field_ctl)
+      call dup_control_array_c1(org_psf_c%psf_area_ctl,                 &
+     &                          new_psf_c%psf_area_ctl)
+!
+      new_psf_c%i_psf_ctl =        org_psf_c%i_psf_ctl
+      new_psf_c%i_surface_define = org_psf_c%i_surface_define
+      new_psf_c%i_output_field =   org_psf_c%i_output_field
+      new_psf_c%i_plot_area =      org_psf_c%i_plot_area
+!
+      end subroutine dup_control_4_psf
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine read_psf_control_data(hd_block, psf_c)
+      subroutine read_psf_control_data                                  &
+     &         (id_control, hd_block, psf_c, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
       type(psf_ctl), intent(inout) :: psf_c
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (psf_c%i_psf_ctl.gt.0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(psf_c%i_psf_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        psf_c%i_psf_ctl = find_control_end_flag(hd_block)
-        if(psf_c%i_psf_ctl .gt. 0) exit
-!
-        if(right_begin_flag(hd_surface_define) .gt. 0) then
-          call  read_section_def_control(psf_c)
+        if(check_begin_flag(c_buf, hd_surface_define)) then
+          call  read_section_def_control(id_control, psf_c, c_buf)
         end if
 !
-        if(right_begin_flag(hd_output_field) .gt. 0) then
-          call  read_psf_output_ctl(psf_c)
+        if(check_begin_flag(c_buf, hd_output_field)) then
+          call  read_psf_output_ctl(id_control, psf_c, c_buf)
         end if
 !
-!
-        call read_chara_ctl_type(hd_psf_file_prefix,                    &
+        call read_chara_ctl_type(c_buf, hd_psf_file_prefix,             &
      &      psf_c%psf_file_head_ctl)
-        call read_chara_ctl_type(hd_psf_file_head,                      &
+        call read_chara_ctl_type(c_buf, hd_psf_file_head,               &
      &      psf_c%psf_file_head_ctl)
-        call read_chara_ctl_type(hd_psf_out_type,                       &
+        call read_chara_ctl_type(c_buf, hd_psf_out_type,                &
      &      psf_c%psf_output_type_ctl)
       end do
+      psf_c%i_psf_ctl = 1
 !
       end subroutine read_psf_control_data
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_section_def_control(psf_c)
+      subroutine read_section_def_control(id_control, psf_c, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       type(psf_ctl), intent(inout) :: psf_c
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
       if(psf_c%i_surface_define.gt.0) return
 !
       do
-        call load_ctl_label_and_line
-!
-        psf_c%i_surface_define                                          &
-     &       = find_control_end_flag(hd_surface_define)
-        if(psf_c%i_surface_define .gt. 0) exit
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_surface_define)) exit
 !
 !
-        call read_control_array_c_r(hd_coefs_ctl, psf_c%psf_coefs_ctl)
-        call read_control_array_c_r                                     &
-     &     (hd_center_ctl, psf_c%psf_center_ctl)
-        call read_control_array_c_r                                     &
-     &     (hd_normal_ctl, psf_c%psf_normal_ctl)
-        call read_control_array_c_r(hd_axis_ctl, psf_c%psf_axis_ctl)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_coefs_ctl, psf_c%psf_coefs_ctl, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_center_ctl, psf_c%psf_center_ctl, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_normal_ctl, psf_c%psf_normal_ctl, c_buf)
+        call read_control_array_c_r(id_control,                         &
+     &      hd_axis_ctl, psf_c%psf_axis_ctl, c_buf)
 !
-        call read_control_array_c1(hd_psf_area, psf_c%psf_area_ctl)
+        call read_control_array_c1(id_control,                          &
+     &      hd_psf_area, psf_c%psf_area_ctl, c_buf)
 !
-        call read_psf_plot_area_ctl(psf_c)
+        call read_psf_plot_area_ctl(id_control, psf_c, c_buf)
 !
 !
-        call read_real_ctl_type(hd_radius, psf_c%radius_psf_ctl)
+        call read_real_ctl_type                                         &
+     &     (c_buf, hd_radius, psf_c%radius_psf_ctl)
 !
-        call read_chara_ctl_type(hd_section_method,                     &
+        call read_chara_ctl_type(c_buf, hd_section_method,              &
      &      psf_c%section_method_ctl)
         call read_chara_ctl_type                                        &
-     &      (hd_group_name, psf_c%psf_group_name_ctl)
+     &     (c_buf, hd_group_name, psf_c%psf_group_name_ctl)
       end do
+      psf_c%i_surface_define = 1
 !
       end subroutine read_section_def_control
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_psf_output_ctl(psf_c)
+      subroutine read_psf_output_ctl(id_control, psf_c, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       type(psf_ctl), intent(inout) :: psf_c
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
       if (psf_c%i_output_field .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_output_field)) exit
 !
-        psf_c%i_output_field = find_control_end_flag(hd_output_field)
-        if(psf_c%i_output_field .gt. 0) exit
-!
-        call read_control_array_c2                                      &
-     &     (hd_psf_result_field, psf_c%psf_out_field_ctl)
+        call read_control_array_c2(id_control,                          &
+     &      hd_psf_result_field, psf_c%psf_out_field_ctl, c_buf)
       end do
+      psf_c%i_output_field = 1
 !
       end subroutine read_psf_output_ctl
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_psf_plot_area_ctl(psf_c)
+      subroutine read_psf_plot_area_ctl(id_control, psf_c, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       type(psf_ctl), intent(inout) :: psf_c
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_plot_area) .eq. 0) return
-      if (psf_c%i_plot_area.gt.0) return
+      if(check_begin_flag(c_buf, hd_plot_area) .eqv. .FALSE.) return
+      if(psf_c%i_plot_area .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_plot_area)) exit
 !
-        psf_c%i_plot_area = find_control_end_flag(hd_plot_area)
-        if(psf_c%i_plot_area .gt. 0) exit
-!
-        call read_control_array_c1(hd_plot_grp, psf_c%psf_area_ctl)
+        call read_control_array_c1(id_control, hd_plot_grp,             &
+     &      psf_c%psf_area_ctl, c_buf)
       end do
+      psf_c%i_plot_area = 1
 !
       end subroutine read_psf_plot_area_ctl
 !

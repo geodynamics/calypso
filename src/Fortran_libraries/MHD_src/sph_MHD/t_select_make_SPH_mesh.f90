@@ -7,14 +7,12 @@
 !>@brief  Load mesh and filtering data for MHD simulation
 !!
 !!@verbatim
-!!      subroutine select_make_SPH_mesh                                 &
-!!     &         (iflag_make_SPH, sph, comms_sph, sph_grps, sph_maker,  &
-!!     &          geofem, ele_mesh, MHD_files)
+!!      subroutine select_make_SPH_mesh(iflag_make_SPH,                 &
+!!     &          sph, comms_sph, sph_grps, sph_maker, fem, MHD_files)
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(sph_comm_tables), intent(inout) :: comms_sph
 !!        type(sph_group_data), intent(inout) ::  sph_grps
-!!        type(mesh_data), intent(inout) ::   geofem
-!!        type(element_geometry), intent(inout) :: ele_mesh
+!!        type(mesh_data), intent(inout) ::   fem
 !!        type(MHD_file_IO_params), intent(inout) ::  MHD_files
 !!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !!@endverbatim
@@ -54,9 +52,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine select_make_SPH_mesh                                   &
-     &         (iflag_make_SPH, sph, comms_sph, sph_grps, sph_maker,    &
-     &          geofem, ele_mesh, MHD_files)
+      subroutine select_make_SPH_mesh(iflag_make_SPH,                   &
+     &          sph, comms_sph, sph_grps, sph_maker, fem, MHD_files)
 !
       use m_error_IDs
       use parallel_load_data_4_sph
@@ -67,15 +64,12 @@
       type(sph_comm_tables), intent(inout) :: comms_sph
       type(sph_group_data), intent(inout) ::  sph_grps
 !
-      type(mesh_data), intent(inout) ::   geofem
-      type(element_geometry), intent(inout) :: ele_mesh
+      type(mesh_data), intent(inout) ::   fem
       type(MHD_file_IO_params), intent(inout) ::  MHD_files
       type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !
       integer(kind = kint) :: iflag_lc
 !
-!
-      call calypso_mpi_barrier
 !
       if(my_rank .eq. izero) then
         iflag_lc = 0
@@ -97,11 +91,10 @@
         call para_gen_sph_grids(sph_maker%sph_tmp, sph_maker%gen_sph)
         call dealloc_gen_mesh_params(sph_maker%gen_sph)
       end if
-      call calypso_mpi_barrier
 !
       if (iflag_debug.eq.1) write(*,*) 'load_para_SPH_and_FEM_mesh'
-      call load_para_SPH_and_FEM_mesh(MHD_files%FEM_mesh_flags,         &
-     &    sph, comms_sph, sph_grps, geofem, ele_mesh,                   &
+      call load_para_SPH_and_FEM_mesh                                   &
+     &   (MHD_files%FEM_mesh_flags, sph, comms_sph, sph_grps, fem,      &
      &    MHD_files%mesh_file_IO, sph_maker%gen_sph)
       call dealloc_gen_sph_fem_mesh_param(sph_maker%gen_sph)
 !

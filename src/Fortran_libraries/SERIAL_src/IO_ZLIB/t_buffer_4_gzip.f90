@@ -28,6 +28,7 @@
       use m_precision
       use m_constants
       use m_machine_parameter
+      use transfer_to_long_integers
 !
       implicit none
 !
@@ -95,8 +96,8 @@
 !
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer :: nline, ilen_tmp
+      integer(kind = kint_gl) :: ist, ilen_tmp
+      integer :: nline
       integer :: ilen_in, ilen_used, ilen_line
 !
 !
@@ -105,9 +106,9 @@
 !
       ist = 0
       zbuf%ilen_gzipped = 0
-      ilen_tmp = int(dble(huge_30) * 1.01 + 24)
+      ilen_tmp = int(dble(huge_30) * 1.01 + 24,KIND(ilen_tmp))
       do
-        nline = int(min((num - ist), huge_30/kint_gl))
+        nline = int(min((num - ist), huge_30/cast_long(kint_gl)))
         ilen_in = int(min(zbuf%ilen_gz-zbuf%ilen_gzipped, ilen_tmp))
         ilen_line = nline * kint_gl
 !
@@ -130,8 +131,8 @@
 !
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer :: nline, ilen_tmp
+      integer(kind = kint_gl) :: ist, ilen_tmp
+      integer :: nline
       integer :: ilen_in, ilen_used, ilen_line
 !
 !
@@ -140,9 +141,9 @@
 !
       ist = 0
       zbuf%ilen_gzipped = 0
-      ilen_tmp = int(dble(huge_30) * 1.01 + 24)
+      ilen_tmp = int(dble(huge_30) * 1.01 + 24,KIND(ilen_tmp))
       do
-        nline = int(min((num - ist), huge_30/kreal))
+        nline = int(min((num - ist), huge_30/cast_long(kreal)))
         ilen_in = int(min(zbuf%ilen_gz-zbuf%ilen_gzipped, ilen_tmp))
         ilen_line = nline * kreal
 !
@@ -165,8 +166,8 @@
 !
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer :: nline, ilen_tmp
+      integer(kind = kint_gl) :: ist, ilen_tmp
+      integer :: nline
       integer :: ilen_in, ilen_used, ilen_line
 !
 !
@@ -175,9 +176,9 @@
 !
       ist = 0
       zbuf%ilen_gzipped = 0
-      ilen_tmp = int(dble(huge_30) * 1.01 + 24)
+      ilen_tmp = int(dble(huge_30) * 1.01 + 24,KIND(ilen_tmp))
       do
-        nline = int(min((num - ist), huge_30/kchara))
+        nline = int(min((num - ist), huge_30/cast_long(kchara)))
         ilen_in = int(min(zbuf%ilen_gz-zbuf%ilen_gzipped, ilen_tmp))
         ilen_line = nline * kchara
 !
@@ -225,16 +226,16 @@
       integer(kind = kint_gl), intent(inout) :: int8_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer :: nline, ilen_tmp
+      integer(kind = kint_gl) :: ist, ilen_tmp
+      integer :: nline
       integer :: ilen_in, ilen_used, ilen_line
 !
 !
       ist = 0
       zbuf%ilen_gzipped = 0
-      ilen_tmp = int(dble(huge_30) * 1.01 + 24)
+      ilen_tmp = int(dble(huge_30) * 1.01 + 24,KIND(ilen_tmp))
       do
-        nline = int(min((num - ist), huge_30/kint_gl))
+        nline = int(min((num - ist), huge_30/cast_long(kint_gl)))
         ilen_in = int(min(zbuf%ilen_gz-zbuf%ilen_gzipped, ilen_tmp))
         ilen_line = nline * kint_gl
 !
@@ -259,16 +260,16 @@
       real(kind = kreal), intent(inout) :: real_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer :: nline, ilen_tmp
+      integer(kind = kint_gl) :: ist, ilen_tmp
+      integer :: nline
       integer :: ilen_in, ilen_used, ilen_line
 !
 !
       ist = 0
       zbuf%ilen_gzipped = 0
-      ilen_tmp = int(dble(huge_30) * 1.01 + 24)
+      ilen_tmp = int(dble(huge_30) * 1.01 + 24,KIND(ilen_tmp))
       do
-        nline = int(min((num - ist), huge_30/kreal))
+        nline = int(min((num - ist), huge_30/cast_long(kreal)))
         ilen_in = int(min(zbuf%ilen_gz-zbuf%ilen_gzipped, ilen_tmp))
         ilen_line = nline * kreal
 !
@@ -293,16 +294,16 @@
       character(len=kchara), intent(inout) :: chara_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer :: nline, ilen_tmp
+      integer(kind = kint_gl) :: ist, ilen_tmp
+      integer :: nline
       integer :: ilen_in, ilen_used, ilen_line
 !
 !
       ist = 0
       zbuf%ilen_gzipped = 0
-      ilen_tmp = int(dble(huge_30) * 1.01 + 24)
+      ilen_tmp = int(dble(huge_30) * 1.01 + 24,KIND(ilen_tmp))
       do
-        nline = int(min((num - ist), huge_30/kchara))
+        nline = int(min((num - ist), huge_30/cast_long(kchara)))
         ilen_in = int(min(zbuf%ilen_gz-zbuf%ilen_gzipped, ilen_tmp))
         ilen_line = nline * kchara
 !

@@ -136,7 +136,6 @@
      &    e_comm%num_neib, e_comm%id_neib, e_comm%num_import,           &
      &    e_comm%istack_import, e_comm%ntot_import)
       if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+1)
-!      call calypso_mpi_barrier
 !
       call alloc_element_rev_imports(node%numnod,                       &
      &    nod_comm%ntot_export, e_comm%ntot_import, wk_comm)
@@ -150,7 +149,6 @@
      &    nod_comm%istack_export, nod_comm%item_export,                 &
      &    wk_comm%item_local, wk_comm%inod_local)
       if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+2)
-!      call calypso_mpi_barrier
 !
 !      write(*,*) 'set_element_import_item', my_rank
       if(iflag_ecomm_time) call start_elapsed_time(ist_elapsed+3)
@@ -163,7 +161,6 @@
      &    wk_comm%inod_import_e, wk_comm%inod_import_l,                 &
      &    wk_comm%xe_import)
       if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+3)
-!      call calypso_mpi_barrier
 !
       call alloc_export_num(e_comm)
 !
@@ -173,7 +170,6 @@
      &    e_comm%num_import, e_comm%num_export, e_comm%istack_export,   &
      &    e_comm%ntot_export)
       if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+4)
-!      call calypso_mpi_barrier
 !
       call alloc_element_rev_exports(e_comm%ntot_export, wk_comm)
       call alloc_export_item(e_comm)
@@ -186,7 +182,6 @@
      &    wk_comm%xe_import, wk_comm%inod_export_e,                     &
      &    wk_comm%inod_export_l, wk_comm%xe_export)
       if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+5)
-!      call calypso_mpi_barrier
 !
 !      write(*,*) 'set_element_export_item', my_rank
       if(iflag_ecomm_time) call start_elapsed_time(ist_elapsed+6)
@@ -207,7 +202,6 @@
      &    e_comm%num_neib, e_comm%istack_export,                        &
      &    wk_comm%inod_export_e, wk_comm%xe_export, e_comm%item_export)
       if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+7)
-!      call calypso_mpi_barrier
 !
 !
       call dealloc_element_rev_exports(wk_comm)
@@ -217,7 +211,6 @@
       if(iflag_ecomm_time) call start_elapsed_time(ist_elapsed+8)
       call check_element_position(txt, numele, x_ele, e_comm)
       if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+8)
-!      call calypso_mpi_barrier
 !
       end subroutine const_comm_table_by_connenct
 !

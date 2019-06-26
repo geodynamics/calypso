@@ -12,7 +12,7 @@
 !!        type(sectioning_list), intent(inout) :: psf_list(num_psf)
 !!        type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !!      subroutine set_node_and_patch_psf                               &
-!!     &         (num_psf, mesh, ele_mesh, group, psf_case_tbls,        &
+!!     &         (num_psf, mesh, group, psf_case_tbls,                  &
 !!     &          psf_def, psf_search, psf_list, psf_grp_list, psf_mesh)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
@@ -20,17 +20,14 @@
 !!        type(surface_group_data), intent(in) :: sf_grp
 !!        type(surface_node_grp_data), intent(in) :: sf_grp_nod
 !!        type(communication_table), intent(in) :: nod_comm
-!!        type(communication_table), intent(in) :: edge_comm
 !!        type(psf_cases), intent(in) :: psf_case_tbls
 !!        type(psf_search_lists), intent(inout) :: psf_search(num_psf)
 !!        type(sectioning_list), intent(inout) :: psf_list(num_psf)
 !!        type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
 !!        type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
-!!      subroutine set_node_and_patch_iso                               &
-!!     &         (num_iso, mesh, ele_mesh, psf_case_tbls,               &
+!!      subroutine set_node_and_patch_iso(num_iso, mesh, psf_case_tbls, &
 !!     &          iso_search, iso_list, iso_mesh)
 !!        type(mesh_geometry), intent(in) :: mesh
-!!        type(element_geometry), intent(in) :: ele_mesh
 !!        type(psf_cases), intent(in) :: psf_case_tbls
 !!        type(psf_search_lists), intent(inout) :: iso_search(num_iso)
 !!        type(sectioning_list), intent(inout):: iso_list(num_iso)
@@ -78,7 +75,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_node_and_patch_psf                                 &
-     &         (num_psf, mesh, ele_mesh, group, psf_case_tbls,          &
+     &         (num_psf, mesh, group, psf_case_tbls,                    &
      &          psf_def, psf_search, psf_list, psf_grp_list, psf_mesh)
 !
       use m_geometry_constants
@@ -96,7 +93,6 @@
 !
       integer(kind = kint), intent(in) :: num_psf
       type(mesh_geometry), intent(in) :: mesh
-      type(element_geometry), intent(in) :: ele_mesh
       type(mesh_groups), intent(in) ::   group
 !
       type(psf_cases), intent(in) :: psf_case_tbls
@@ -113,14 +109,13 @@
 !
       do i_psf = 1, num_psf
         if (iflag_debug.eq.1) write(*,*) 'alloc_nnod_psf'
-        call alloc_nnod_psf                                             &
-     &     (np_smp, ele_mesh%edge, psf_list(i_psf))
+        call alloc_nnod_psf(np_smp, mesh%edge, psf_list(i_psf))
         call alloc_nnod_grp_psf                                         &
      &     (np_smp, mesh%node, psf_grp_list(i_psf))
       end do
 !
       if (iflag_debug.eq.1)  write(*,*) 'count_nodes_4_psf'
-      call count_nodes_4_psf(num_psf, mesh%node, ele_mesh%edge,         &
+      call count_nodes_4_psf(num_psf, mesh%node, mesh%edge,             &
      &    group%surf_grp, group%surf_nod_grp,                           &
      &    psf_def, psf_search, psf_list, psf_grp_list, psf_mesh)
 !
@@ -133,20 +128,20 @@
       end do
 !
       if (iflag_debug.eq.1)  write(*,*) 'set_nodes_4_psf'
-      call set_nodes_4_psf(num_psf, mesh%node, ele_mesh%edge,           &
-     &    mesh%nod_comm, ele_mesh%edge_comm,                            &
+      call set_nodes_4_psf                                              &
+     &   (num_psf, mesh%node, mesh%edge, mesh%nod_comm,                 &
      &    group%surf_grp, group%surf_nod_grp, psf_def, psf_search,      &
      &    psf_list, psf_grp_list, psf_mesh)
 !
       if (iflag_debug.eq.1)  write(*,*) 'count_psf_patches'
       do i_psf = 1, num_psf
         call count_psf_patches(mesh%node, mesh%ele,                     &
-     &      ele_mesh%edge, group%surf_grp, psf_case_tbls,               &
+     &      mesh%edge, group%surf_grp, psf_case_tbls,                   &
      &      psf_def(i_psf), psf_search(i_psf), psf_list(i_psf),         &
      &      psf_mesh(i_psf)%patch, ntot_failed(i_psf))
 !
         if (iflag_debug.eq.1)  write(*,*) 'set_psf_patches'
-        call set_psf_patches(mesh%ele, ele_mesh%edge, group%surf_grp,   &
+        call set_psf_patches(mesh%ele, mesh%edge, group%surf_grp,       &
      &     psf_case_tbls, psf_def(i_psf), psf_search(i_psf),            &
      &     psf_list(i_psf), psf_grp_list(i_psf), psf_mesh(i_psf)%patch)
 !
@@ -168,8 +163,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_node_and_patch_iso                                 &
-     &         (num_iso, mesh, ele_mesh, psf_case_tbls,                 &
+      subroutine set_node_and_patch_iso(num_iso, mesh, psf_case_tbls,   &
      &          iso_search, iso_list, iso_mesh)
 !
       use m_geometry_constants
@@ -184,7 +178,6 @@
 !
       integer(kind = kint), intent(in) :: num_iso
       type(mesh_geometry), intent(in) :: mesh
-      type(element_geometry), intent(in) :: ele_mesh
       type(psf_cases), intent(in) :: psf_case_tbls
 !
       type(psf_search_lists), intent(inout) :: iso_search(num_iso)
@@ -195,19 +188,18 @@
 !
 !
       call count_nodes_4_iso                                            &
-     &   (num_iso, ele_mesh%edge, iso_search, iso_list, iso_mesh)
+     &   (num_iso, mesh%edge, iso_search, iso_list, iso_mesh)
 !
-      call set_nodes_4_iso                                              &
-     &   (num_iso, mesh%node, ele_mesh%edge, ele_mesh%edge_comm,        &
-     &    iso_search, iso_list, iso_mesh)
+      call set_nodes_4_iso(num_iso, mesh%node, mesh%edge,               &
+     &    mesh%nod_comm, iso_search, iso_list, iso_mesh)
 !
 !
       do i_iso = 1, num_iso
         call count_iso_patches                                          &
-     &     (mesh%node, mesh%ele, ele_mesh%edge, psf_case_tbls,          &
+     &     (mesh%node, mesh%ele, mesh%edge, psf_case_tbls,              &
      &      iso_search(i_iso), iso_list(i_iso), iso_mesh(i_iso)%patch)
 !
-        call set_iso_patches(ele_mesh%edge, psf_case_tbls,              &
+        call set_iso_patches(mesh%edge, psf_case_tbls,                  &
      &      iso_search(i_iso), iso_list(i_iso), iso_mesh(i_iso)%patch)
 !
         call dealloc_mark_ele_psf(iso_search(i_iso))

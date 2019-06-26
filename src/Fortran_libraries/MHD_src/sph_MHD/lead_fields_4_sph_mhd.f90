@@ -243,7 +243,6 @@
      &                          'sph_forward_trans_snapshot_MHD'
       call sph_forward_trans_snapshot_MHD                               &
      &   (sph, comms_sph, trans_p, trns_snap%forward, WK_sph, rj_fld)
-      call calypso_mpi_barrier
 !
       end subroutine enegy_fluxes_4_sph_mhd
 !

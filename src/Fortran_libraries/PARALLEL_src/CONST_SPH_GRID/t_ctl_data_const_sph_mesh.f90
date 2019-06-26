@@ -20,31 +20,32 @@
       use m_precision
 !
       use m_machine_parameter
-      use m_read_control_elements
       use calypso_mpi
       use skip_comment_f
 !
+      use t_read_control_elements
       use t_ctl_data_4_platforms
       use t_ctl_data_gen_sph_shell
 !
       implicit none
 !
 !
+      integer(kind=kint), parameter, private :: control_file_code = 11
+!
       type sph_mesh_generation_ctl
 !>        Structure for file settings
         type(platform_data_control) :: plt
 !>        Control structure for parallel spherical shell
         type(parallel_sph_shell_control) :: psph_ctl
+!
+        integer(kind=kint) :: i_sph_mesh_ctl = 0
       end type sph_mesh_generation_ctl
 !
-      integer(kind=kint), parameter :: control_file_code = 11
-      private :: control_file_code
 !
 !   Top level of label
 !
       character(len=kchara), parameter, private                         &
      &                    :: hd_mhd_ctl = 'MHD_control'
-      integer(kind=kint), private :: i_mhd_ctl = 0
 !
 !   2nd level for MHD
 !
@@ -52,7 +53,6 @@
      &                    :: hd_platform = 'data_files_def'
       character(len=kchara), parameter, private                         &
      &                    :: hd_sph_shell = 'spherical_shell_ctl'
-      integer(kind=kint), private  :: i_platform = 0
 !
       private :: read_sph_shell_define_ctl, bcast_sph_shell_define_ctl
 !
@@ -67,46 +67,51 @@
       character(len=kchara), intent(in) :: file_name
       type(sph_mesh_generation_ctl), intent(inout) :: gen_SPH_ctl
 !
+      type(buffer_for_control) :: c_buf1
+!
 !
       if(my_rank .eq. 0) then
-        ctl_file_code = control_file_code
-        open ( ctl_file_code, file = file_name, status='old' )
+        open(control_file_code, file = file_name, status='old' )
 !
-        call load_ctl_label_and_line
-        call read_sph_shell_define_ctl(gen_SPH_ctl)
+        do
+          call load_one_line_from_control(control_file_code, c_buf1)
+          call read_sph_shell_define_ctl                                &
+     &       (control_file_code, hd_mhd_ctl, gen_SPH_ctl, c_buf1)
+          if(gen_SPH_ctl%i_sph_mesh_ctl .gt. 0) exit
+        end do
 !
-        close(ctl_file_code)
+        close(control_file_code)
       end if
 !
       call bcast_sph_shell_define_ctl(gen_SPH_ctl)
-!
-      if(gen_SPH_ctl%psph_ctl%ifile_sph_shell .gt. 0) then
-        call read_ctl_file_gen_shell_grids(gen_SPH_ctl%psph_ctl)
-      end if
 !
       end subroutine read_control_4_const_shell
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine read_sph_shell_define_ctl(gen_SPH_ctl)
+      subroutine read_sph_shell_define_ctl                              &
+     &         (id_control, hd_block, gen_SPH_ctl, c_buf)
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
 !
       type(sph_mesh_generation_ctl), intent(inout) :: gen_SPH_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_mhd_ctl) .eq. 0) return
-      if(i_mhd_ctl .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(gen_SPH_ctl%i_sph_mesh_ctl .gt. 0) return
       do
-        call load_ctl_label_and_line
-!
-        i_mhd_ctl = find_control_end_flag(hd_mhd_ctl)
-        if(i_mhd_ctl .gt. 0) exit
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
         call read_control_platforms                                     &
-     &     (hd_platform, i_platform, gen_SPH_ctl%plt)
+     &     (id_control, hd_platform, gen_SPH_ctl%plt, c_buf)
         call read_parallel_shell_in_MHD_ctl                             &
-     &     (hd_sph_shell, gen_SPH_ctl%psph_ctl)
+     &     (id_control, hd_sph_shell, gen_SPH_ctl%psph_ctl, c_buf)
       end do
+      gen_SPH_ctl%i_sph_mesh_ctl = 1
 !
       end subroutine read_sph_shell_define_ctl
 !
@@ -121,6 +126,9 @@
 !
       call bcast_ctl_data_4_platform(gen_SPH_ctl%plt)
       call bcast_parallel_shell_ctl(gen_SPH_ctl%psph_ctl)
+!
+      call MPI_BCAST(gen_SPH_ctl%i_sph_mesh_ctl, 1,                     &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine bcast_sph_shell_define_ctl
 !

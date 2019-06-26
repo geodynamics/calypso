@@ -86,6 +86,8 @@
      &        = psf_list%istack_inter_n_on_e_smp(np_smp)
       psf_list%externod_on_edge                                         &
      &        = psf_list%istack_exter_n_on_e_smp(np_smp)
+      psf_list%totalnod_on_edge                                         &
+     &        = psf_list%internod_on_edge + psf_list%externod_on_edge
 !
       end subroutine count_node_on_edge_4_psf
 !
@@ -109,8 +111,6 @@
       real(kind= kreal) :: c0
 !
 !
-      psf_list%id_n_on_e(1:numedge) =    izero
-!
 !$omp parallel do                                                       &
 !$omp& private(ist,ied,inum,icou,jcou,iedge,inod1,inod2,c0)
       do ip = 1, np_smp
@@ -127,23 +127,14 @@
             if(interior_edge(iedge) .gt. 0) then
               icou = icou + 1
               psf_list%iedge_int_nod(icou) = iedge
-              psf_list%id_n_on_e(iedge) = icou
             else
               jcou = jcou + 1
               psf_list%iedge_ext_nod(jcou) = iedge
-              psf_list%id_n_on_e(iedge) = jcou                          &
-     &                                   + psf_list%internod_on_edge
             end if
           end if
         end do
       end do
 !$omp end parallel do
-!
-!       write(40+my_rank,*) 'inum_e, psf_list%id_n_on_e(inum)'
-!      do inum = 1, numedge
-!         if ( psf_list%id_n_on_e(inum).ne.0 )                          &
-!     &     write(40+my_rank,*) inum, psf_list%id_n_on_e(inum)
-!      end do
 !
       end subroutine set_node_on_edge_4_psf
 !

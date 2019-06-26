@@ -8,8 +8,9 @@
 !!
 !!@verbatim
 !!      subroutine gz_mpi_read_mesh_file_b                              &
-!!     &         (num_pe, id_rank, file_name, fem_IO)
-!!        type(mesh_data), intent(inout) :: fem_IO
+!!     &         (num_pe, id_rank, file_name, mesh_IO, group_IO)
+!!        type(mesh_geometry), intent(inout) :: mesh_IO
+!!        type(mesh_groups), intent(inout) ::   group_IO
 !!
 !!      subroutine gz_mpi_read_mesh_geometry_b                          &
 !!     &         (num_pe, id_rank, file_name, mesh_IO)
@@ -20,8 +21,9 @@
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
 !!
 !!      subroutine gz_mpi_write_mesh_file_b                             &
-!!     &         (num_pe, id_rank, file_name, fem_IO)
-!!        type(mesh_data), intent(in) :: fem_IO
+!!     &         (num_pe, id_rank, file_name, mesh_IO, group_IO)
+!!        type(mesh_geometry), intent(in) :: mesh_IO
+!!        type(mesh_groups), intent(in) ::   group_IO
 !!@endverbatim
 !
       module gz_MPI_mesh_file_IO_b
@@ -46,7 +48,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine gz_mpi_read_mesh_file_b                                &
-     &         (num_pe, id_rank, file_name, fem_IO)
+     &         (num_pe, id_rank, file_name, mesh_IO, group_IO)
 !
       use m_machine_parameter
       use gz_MPI_binary_datum_IO
@@ -55,7 +57,8 @@
       integer, intent(in) :: num_pe, id_rank
       character(len=kchara), intent(in) :: file_name
 !
-      type(mesh_data), intent(inout) :: fem_IO
+      type(mesh_geometry), intent(inout) :: mesh_IO
+      type(mesh_groups), intent(inout) ::   group_IO
 !
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
@@ -64,8 +67,8 @@
       call open_read_gz_mpi_file_b                                      &
      &   (file_name, num_pe, id_rank, IO_param)
 !
-      call gz_mpi_read_geometry_data_b(IO_param, fem_IO%mesh)
-      call gz_mpi_read_mesh_groups_b(IO_param, fem_IO%group)
+      call gz_mpi_read_geometry_data_b(IO_param, mesh_IO)
+      call gz_mpi_read_mesh_groups_b(IO_param, group_IO)
 !
       call close_mpi_file(IO_param)
 !
@@ -149,7 +152,7 @@
 !------------------------------------------------------------------
 !
       subroutine gz_mpi_write_mesh_file_b                               &
-     &         (num_pe, id_rank, file_name, fem_IO)
+     &         (num_pe, id_rank, file_name, mesh_IO, group_IO)
 !
       use m_machine_parameter
       use gz_MPI_binary_datum_IO
@@ -157,7 +160,8 @@
 !
       integer, intent(in) :: num_pe, id_rank
       character(len=kchara), intent(in) :: file_name
-      type(mesh_data), intent(in) :: fem_IO
+      type(mesh_geometry), intent(in) :: mesh_IO
+      type(mesh_groups), intent(in) ::   group_IO
 !
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
@@ -165,8 +169,8 @@
 !
       call open_write_gz_mpi_file_b                                     &
      &   (file_name, num_pe, id_rank, IO_param)
-      call gz_mpi_write_geometry_data_b(IO_param, fem_IO%mesh)
-      call gz_mpi_write_mesh_groups_b(IO_param, fem_IO%group)
+      call gz_mpi_write_geometry_data_b(IO_param, mesh_IO)
+      call gz_mpi_write_mesh_groups_b(IO_param, group_IO)
 !
       call close_mpi_file(IO_param)
 !

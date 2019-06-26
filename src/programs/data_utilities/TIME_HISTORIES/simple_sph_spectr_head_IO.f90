@@ -4,7 +4,7 @@
 !! @date   Programmed in  Nov., 2007
 !!
 !
-!> @brief Time average spherical harmonics spectrum data
+!> @brief Header output for spectrum data
 !!
 !!@verbatim
 !!      subroutine input_sph_pwr_vol_head(id_file, sph_IN)

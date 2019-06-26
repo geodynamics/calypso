@@ -276,7 +276,7 @@
 !
       subroutine choose_file_format_array(num, files_fmt, id_files_fmt)
 !
-      use t_read_control_arrays
+      use t_control_array_character
 !
       integer(kind= kint), intent(in) :: num
       type(ctl_array_chara), intent(in) :: files_fmt

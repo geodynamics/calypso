@@ -1,9 +1,14 @@
-!t_ctl_data_node_monitor.f90
-!      module t_ctl_data_node_monitor
+!>@file   t_ctl_data_node_monitor.f90
+!!@brief  module t_ctl_data_node_monitor
+!!
+!!@author H. Matsui
+!!@date Programmed in March. 2006
 !
-!        programmed by H.Matsui on March. 2006
-!
-!!      subroutine read_monitor_data_ctl(hd_block, iflag, nmtr_ctl)
+!>@brief  Control data of node monitoring
+!!
+!!@verbatim
+!!      subroutine read_monitor_data_ctl                                &
+!!     &         (id_control, hd_block, nmtr_ctl, c_buf)
 !!      subroutine bcast_monitor_data_ctl(nmtr_ctl)
 !!      subroutine dealloc_monitor_data_ctl(nmtr_ctl)
 !!        type(node_monitor_control), intent(inout) :: nmtr_ctl
@@ -27,11 +32,15 @@
 !!  end  monitor_data_ctl
 !!
 !!   --------------------------------------------------------------------
+!!@endverbatim
 !
       module t_ctl_data_node_monitor
 !
       use m_precision
-      use t_read_control_arrays
+      use m_machine_parameter
+      use t_control_array_character
+      use t_control_array_integer2
+      use t_control_array_real3
 !
       implicit  none
 !
@@ -49,6 +58,8 @@
 !>        Structure for monitoring plave list
 !!@n       group_4_monitor_ctl%c_tbl: Name of node group to monitor field
         type(ctl_array_chara) :: group_4_monitor_ctl
+!
+        integer (kind=kint) :: i_monitor_data = 0
       end type node_monitor_control
 !
 !   3rd level for monitor data
@@ -66,33 +77,33 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_monitor_data_ctl(hd_block, iflag, nmtr_ctl)
+      subroutine read_monitor_data_ctl                                  &
+     &         (id_control, hd_block, nmtr_ctl, c_buf)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(node_monitor_control), intent(inout) :: nmtr_ctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(nmtr_ctl%i_monitor_data .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
-!
-        call read_control_array_c1                                      &
-     &     (hd_monitor_grp, nmtr_ctl%group_4_monitor_ctl)
-        call read_control_array_r3                                      &
-     &     (hd_monitor_position, nmtr_ctl%xx_4_monitor_ctl)
-        call read_control_array_i2                                      &
-     &     (hd_monitor_node, nmtr_ctl%node_4_monitor_ctl)
+        call read_control_array_c1(id_control,                          &
+     &      hd_monitor_grp, nmtr_ctl%group_4_monitor_ctl, c_buf)
+        call read_control_array_r3(id_control,                          &
+     &      hd_monitor_position, nmtr_ctl%xx_4_monitor_ctl, c_buf)
+        call read_control_array_i2(id_control,                          &
+     &      hd_monitor_node, nmtr_ctl%node_4_monitor_ctl, c_buf)
       end do
+      nmtr_ctl%i_monitor_data = 1
 !
       end subroutine read_monitor_data_ctl
 !
@@ -109,6 +120,9 @@
       call bcast_ctl_array_r3(nmtr_ctl%xx_4_monitor_ctl)
       call bcast_ctl_array_i2(nmtr_ctl%node_4_monitor_ctl)
 !
+      call MPI_BCAST(nmtr_ctl%i_monitor_data, 1,                        &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
       end subroutine bcast_monitor_data_ctl
 !
 !   --------------------------------------------------------------------
@@ -121,6 +135,7 @@
       call dealloc_control_array_chara(nmtr_ctl%group_4_monitor_ctl)
       call dealloc_control_array_r3(nmtr_ctl%xx_4_monitor_ctl)
       call dealloc_control_array_i2(nmtr_ctl%node_4_monitor_ctl)
+      nmtr_ctl%i_monitor_data = 0
 !
       end subroutine dealloc_monitor_data_ctl
 !

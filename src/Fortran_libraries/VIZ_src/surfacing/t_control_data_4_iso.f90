@@ -1,12 +1,20 @@
-!
-!      module t_control_data_4_iso
-!
-!        programmed by H.Matsui on May. 2006
-!
-!!      subroutine deallocate_cont_dat_4_iso(iso_c)
-!!        type(iso_ctl), intent(inout) :: iso_c
+!>@file   t_control_data_4_iso.f90
+!!@brief  module t_control_data_4_iso
 !!
-!!      subroutine read_iso_control_data(hd_block, iso_c)
+!!@date  Programmed by H.Matsui in May, 2006
+!
+!>@brief control data for each isosurface
+!!
+!!@verbatim
+!!      subroutine init_iso_ctl_stract(iso_c)
+!!      subroutine dealloc_cont_dat_4_iso(iso_c)
+!!        type(iso_ctl), intent(inout) :: iso_c
+!!      subroutine dup_control_4_iso(org_iso_c, new_iso_c)
+!!        type(iso_ctl), intent(in) :: org_iso_c
+!!        type(iso_ctl), intent(inout) :: new_iso_c
+!!
+!!      subroutine read_iso_control_data                                &
+!!     &         (id_control, hd_block, iso_c, c_buf)
 !!      subroutine bcast_iso_control_data(iso_c)
 !!        type(iso_ctl), intent(inout) :: iso_c
 !
@@ -60,20 +68,21 @@
 !!    isosurf_comp: component for isosurface
 !!           x, y, z, radial, elevation, azimuth, cylinder_r, norm
 !!    isosurf_value:  value for isosurface
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!@endverbatim
+!
       module t_control_data_4_iso
 !
       use m_precision
 !
       use m_constants
       use m_machine_parameter
-      use m_read_control_elements
       use skip_comment_f
+      use t_read_control_elements
       use t_control_elements
-      use t_read_control_arrays
+      use t_control_array_character
+      use t_control_array_character2
 !
       implicit  none
-!
 !
       type iso_ctl
 !>        Structure for file prefix
@@ -172,10 +181,37 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_cont_dat_4_iso(iso_c)
+      subroutine init_iso_ctl_stract(iso_c)
 !
       type(iso_ctl), intent(inout) :: iso_c
 !
+!
+      iso_c%isosurf_value_ctl%realvalue =    0.0d0
+      iso_c%result_value_iso_ctl%realvalue = 0.0d0
+      iso_c%iso_out_field_ctl%num = 0
+      iso_c%iso_area_ctl%num =      0
+!
+      end subroutine init_iso_ctl_stract
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine dealloc_cont_dat_4_iso(iso_c)
+!
+      type(iso_ctl), intent(inout) :: iso_c
+!
+!
+      iso_c%iso_file_head_ctl%iflag =    0
+      iso_c%iso_output_type_ctl%iflag =  0
+      iso_c%isosurf_data_ctl%iflag =     0
+      iso_c%isosurf_comp_ctl%iflag =     0
+      iso_c%isosurf_value_ctl%iflag =    0
+      iso_c%result_value_iso_ctl%iflag = 0
+      iso_c%iso_result_type_ctl%iflag =  0
+!
+      iso_c%i_iso_ctl =         0
+      iso_c%i_iso_define =      0
+      iso_c%i_iso_result =      0
+      iso_c%i_iso_plot_area =   0
 !
       call dealloc_control_array_c2(iso_c%iso_out_field_ctl)
       iso_c%iso_out_field_ctl%num =  0
@@ -185,116 +221,171 @@
       iso_c%iso_area_ctl%num =  0
       iso_c%iso_area_ctl%icou = 0
 !
-      end subroutine deallocate_cont_dat_4_iso
+      end subroutine dealloc_cont_dat_4_iso
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine dup_control_4_iso(org_iso_c, new_iso_c)
+!
+      use copy_control_elements
+!
+      type(iso_ctl), intent(in) :: org_iso_c
+      type(iso_ctl), intent(inout) :: new_iso_c
+!
+!
+      call copy_chara_ctl(org_iso_c%iso_file_head_ctl,                  &
+     &                    new_iso_c%iso_file_head_ctl)
+      call copy_chara_ctl(org_iso_c%iso_output_type_ctl,                &
+     &                    new_iso_c%iso_output_type_ctl)
+!
+      call copy_chara_ctl(org_iso_c%isosurf_data_ctl,                   &
+     &                    new_iso_c%isosurf_data_ctl)
+      call copy_chara_ctl(org_iso_c%isosurf_comp_ctl,                   &
+     &                    new_iso_c%isosurf_comp_ctl)
+      call copy_chara_ctl(org_iso_c%iso_result_type_ctl,                &
+     &                    new_iso_c%iso_result_type_ctl)
+!
+      call copy_real_ctl(org_iso_c%isosurf_value_ctl,                   &
+     &                   new_iso_c%isosurf_value_ctl)
+      call copy_real_ctl(org_iso_c%result_value_iso_ctl,                &
+     &                   new_iso_c%result_value_iso_ctl)
+!
+      call dup_control_array_c2(org_iso_c%iso_out_field_ctl,            &
+     &                          new_iso_c%iso_out_field_ctl)
+      call dup_control_array_c1(org_iso_c%iso_area_ctl,                 &
+     &                          new_iso_c%iso_area_ctl)
+!
+      new_iso_c%i_iso_ctl =       org_iso_c%i_iso_ctl
+      new_iso_c%i_iso_define =    org_iso_c%i_iso_define
+      new_iso_c%i_iso_result =    org_iso_c%i_iso_result
+      new_iso_c%i_iso_plot_area = org_iso_c%i_iso_plot_area
+!
+      end subroutine dup_control_4_iso
 !
 !  ---------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine read_iso_control_data(hd_block, iso_c)
+      subroutine read_iso_control_data                                  &
+     &         (id_control, hd_block, iso_c, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
-!
       type(iso_ctl), intent(inout) :: iso_c
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iso_c%i_iso_ctl.gt.0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(iso_c%i_iso_ctl.gt.0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iso_c%i_iso_ctl = find_control_end_flag(hd_block)
-        if(iso_c%i_iso_ctl .gt. 0) exit
+        call read_iso_result_control(id_control, hd_field_on_iso,       &
+     &      iso_c, c_buf)
+        call read_iso_result_control(id_control, hd_iso_result,         &
+     &      iso_c, c_buf)
+        call read_iso_define_data                                       &
+     &     (id_control, hd_iso_define, iso_c, c_buf)
 !
-        call read_iso_result_control(iso_c)
-        call read_iso_define_data(iso_c)
-!
-!
-        call read_chara_ctl_type(hd_isosurf_prefix,                     &
+        call read_chara_ctl_type(c_buf, hd_isosurf_prefix,              &
      &      iso_c%iso_file_head_ctl)
-        call read_chara_ctl_type(hd_iso_file_head,                      &
+        call read_chara_ctl_type(c_buf, hd_iso_file_head,               &
      &      iso_c%iso_file_head_ctl)
-        call read_chara_ctl_type(hd_iso_out_type,                       &
+        call read_chara_ctl_type(c_buf, hd_iso_out_type,                &
      &      iso_c%iso_output_type_ctl)
       end do
+      iso_c%i_iso_ctl = 1
 !
       end subroutine read_iso_control_data
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_iso_define_data(iso_c)
+      subroutine read_iso_define_data                                   &
+     &         (id_control, hd_block, iso_c, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
       type(iso_ctl), intent(inout) :: iso_c
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_iso_define) .eq. 0) return
-      if (iso_c%i_iso_define.gt.0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(iso_c%i_iso_define .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iso_c%i_iso_define = find_control_end_flag(hd_iso_define)
-        if(iso_c%i_iso_define .gt. 0) exit
+        call read_iso_plot_area_ctl(id_control, hd_iso_plot_area,       &
+     &      iso_c, c_buf)
 !
-        call  read_iso_plot_area_ctl(iso_c)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_iso_field, iso_c%isosurf_data_ctl)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_iso_comp, iso_c%isosurf_comp_ctl)
 !
+        call read_real_ctl_type                                         &
+     &     (c_buf, hd_iso_value, iso_c%isosurf_value_ctl)
 !
-        call read_chara_ctl_type(hd_iso_field, iso_c%isosurf_data_ctl)
-        call read_chara_ctl_type(hd_iso_comp, iso_c%isosurf_comp_ctl)
-!
-        call read_real_ctl_type(hd_iso_value, iso_c%isosurf_value_ctl)
-!
-        call read_control_array_c1(hd_iso_area, iso_c%iso_area_ctl)
+        call read_control_array_c1                                      &
+     &     (id_control, hd_iso_area, iso_c%iso_area_ctl, c_buf)
       end do
+      iso_c%i_iso_define = 1
 !
       end subroutine read_iso_define_data
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_iso_result_control(iso_c)
+      subroutine read_iso_result_control                                &
+     &         (id_control, hd_block, iso_c, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
       type(iso_ctl), intent(inout) :: iso_c
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if      (right_begin_flag(hd_field_on_iso) .eq. 0                 &
-     &   .and. right_begin_flag(hd_iso_result) .eq. 0) return
-      if (iso_c%i_iso_result.gt.0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(iso_c%i_iso_result .gt. 0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iso_c%i_iso_result = find_control_end_flag(hd_field_on_iso)
-        if(iso_c%i_iso_result .gt. 0) exit
-        iso_c%i_iso_result = find_control_end_flag(hd_iso_result)
-        if(iso_c%i_iso_result .gt. 0) exit
+        call read_control_array_c2(id_control,                          &
+     &      hd_iso_result_field, iso_c%iso_out_field_ctl, c_buf)
 !
-        call read_control_array_c2                                      &
-     &     (hd_iso_result_field, iso_c%iso_out_field_ctl)
-!
-        call read_chara_ctl_type(hd_result_type,                        &
+        call read_chara_ctl_type(c_buf, hd_result_type,                 &
      &      iso_c%iso_result_type_ctl)
 !
-        call read_real_ctl_type(hd_result_value,                        &
+        call read_real_ctl_type(c_buf, hd_result_value,                 &
      &      iso_c%result_value_iso_ctl)
       end do
+      iso_c%i_iso_result = 1
 !
       end subroutine read_iso_result_control
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_iso_plot_area_ctl(iso_c)
+      subroutine read_iso_plot_area_ctl                                 &
+     &         (id_control, hd_block, iso_c, c_buf)
 !
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
       type(iso_ctl), intent(inout) :: iso_c
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_iso_plot_area) .eq. 0) return
-      if (iso_c%i_iso_plot_area.gt.0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(iso_c%i_iso_plot_area.gt.0) return
       do
-        call load_ctl_label_and_line
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
-        iso_c%i_iso_plot_area = find_control_end_flag(hd_iso_plot_area)
-        if(iso_c%i_iso_plot_area .gt. 0) exit
-!
-        call read_control_array_c1(hd_iso_area, iso_c%iso_area_ctl)
-        call read_control_array_c1(hd_iso_plot_grp, iso_c%iso_area_ctl)
+        call read_control_array_c1(id_control,                          &
+     &      hd_iso_area, iso_c%iso_area_ctl, c_buf)
+        call read_control_array_c1(id_control,                          &
+     &      hd_iso_plot_grp, iso_c%iso_area_ctl, c_buf)
       end do
+      iso_c%i_iso_plot_area = 1
 !
       end subroutine read_iso_plot_area_ctl
 !

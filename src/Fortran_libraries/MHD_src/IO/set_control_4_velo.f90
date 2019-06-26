@@ -38,7 +38,7 @@
       use m_machine_parameter
       use calypso_mpi
       use t_physical_property
-      use t_read_control_arrays
+      use t_control_array_chara2real
       use t_bc_data_list
       use set_node_group_types
       use set_surface_group_types

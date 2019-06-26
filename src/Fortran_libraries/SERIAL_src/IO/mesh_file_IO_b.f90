@@ -7,8 +7,10 @@
 !>@brief  Mesh file IO for binary format
 !!
 !!@verbatim
-!!      subroutine read_mesh_file_b(id_rank, file_name, fem_IO, ierr)
-!!        type(mesh_data), intent(inout) :: fem_IO
+!!      subroutine read_mesh_file_b                                     &
+!!     &         (id_rank, file_name, mesh_IO, group_IO, ierr)
+!!        type(mesh_geometry), intent(inout) :: mesh_IO
+!!        type(mesh_groups), intent(inout) ::   group_IO
 !!
 !!      subroutine read_mesh_geometry_b                                 &
 !!     &         (id_rank, file_name, mesh_IO, ierr)
@@ -18,8 +20,10 @@
 !!     &         (id_rank, file_name, mesh_IO, ierr)
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
 !!
-!!      subroutine write_mesh_file_b(id_rank, file_name, fem_IO, ierr)
-!!        type(mesh_data), intent(in) :: fem_IO
+!!      subroutine write_mesh_file_b                                    &
+!!     &         (id_rank, file_name, mesh_IO, group_IO, ierr)
+!!        type(mesh_geometry), intent(in) :: mesh_IO
+!!        type(mesh_groups), intent(in) ::   group_IO
 !!@endverbatim
 !
       module mesh_file_IO_b
@@ -41,12 +45,14 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_mesh_file_b(id_rank, file_name, fem_IO, ierr)
+      subroutine read_mesh_file_b                                       &
+     &         (id_rank, file_name, mesh_IO, group_IO, ierr)
 !
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
-      type(mesh_data), intent(inout) :: fem_IO
+      type(mesh_geometry), intent(inout) :: mesh_IO
+      type(mesh_groups), intent(inout) ::   group_IO
       integer(kind = kint), intent(inout) :: ierr
 !
 !
@@ -56,10 +62,10 @@
       call open_read_binary_file(file_name, id_rank, bin_meshflags)
       if(bin_meshflags%ierr_IO .ne. 0) return
 !
-      call read_geometry_data_b(id_rank, bin_meshflags, fem_IO%mesh)
+      call read_geometry_data_b(id_rank, bin_meshflags, mesh_IO)
       if(bin_meshflags%ierr_IO .ne. 0) return
 !
-      call read_mesh_groups_b(bin_meshflags, fem_IO%group)
+      call read_mesh_groups_b(bin_meshflags, group_IO)
 !
       call close_binary_file
       ierr = bin_meshflags%ierr_IO
@@ -137,12 +143,14 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine write_mesh_file_b(id_rank, file_name, fem_IO, ierr)
+      subroutine write_mesh_file_b                                      &
+     &         (id_rank, file_name, mesh_IO, group_IO, ierr)
 !
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
+      type(mesh_geometry), intent(in) :: mesh_IO
+      type(mesh_groups), intent(in) ::   group_IO
 !
-      type(mesh_data), intent(in) :: fem_IO
       integer(kind = kint), intent(inout) :: ierr
 !
 !
@@ -151,9 +159,9 @@
 !
       call open_write_binary_file(file_name, bin_meshflags)
       if(bin_meshflags%ierr_IO .ne. 0) ierr = ierr_file
-      call write_geometry_data_b(id_rank, fem_IO%mesh, bin_meshflags)
+      call write_geometry_data_b(id_rank, mesh_IO, bin_meshflags)
       if(bin_meshflags%ierr_IO .ne. 0) ierr = ierr_file
-      call write_mesh_groups_b(fem_IO%group, bin_meshflags)
+      call write_mesh_groups_b(group_IO, bin_meshflags)
       if(bin_meshflags%ierr_IO .ne. 0) ierr = ierr_file
       call close_binary_file
 !

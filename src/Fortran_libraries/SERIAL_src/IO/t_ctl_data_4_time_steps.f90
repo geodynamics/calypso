@@ -9,10 +9,11 @@
 !!
 !!@verbatim
 !!
-!!      subroutine read_control_time_step_data(hd_block, iflag, tctl)
+!!      subroutine read_control_time_step_data                          &
+!!     &         (id_control, hd_block, tctl, c_buf)
 !!        type(platform_data_control), intent(inout) :: tctl
 !!      subroutine write_control_time_step_data                         &
-!!     &         (id_file, hd_block, tctl, level)
+!!     &         (id_control, hd_block, tctl, level)
 !!        type(platform_data_control), intent(in) :: tctl
 !!
 !! ------------------------------------------------------------------
@@ -152,6 +153,7 @@
       module t_ctl_data_4_time_steps
 !
       use m_precision
+      use m_machine_parameter
       use t_control_elements
 !
       implicit  none
@@ -237,6 +239,8 @@
         type(read_real_item) :: delta_t_sgs_coefs_ctl
 !>   time interval to output boundary data
         type(read_real_item) :: delta_t_boundary_ctl
+!
+        integer (kind=kint) :: i_tstep =      0
       end type time_data_control
 !
 !   4th level for time steps
@@ -348,117 +352,128 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_control_time_step_data(hd_block, iflag, tctl)
+      subroutine read_control_time_step_data                            &
+     &         (id_control, hd_block, tctl, c_buf)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(time_data_control), intent(inout) :: tctl
+      type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
-      if(right_begin_flag(hd_block) .eq. 0) return
-      if (iflag .gt. 0) return
+      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
+      if(tctl%i_tstep .gt. 0) return
       do
-        call load_ctl_label_and_line
-!
-        iflag = find_control_end_flag(hd_block)
-        if(iflag .gt. 0) exit
+        call load_one_line_from_control(id_control, c_buf)
+        if(check_end_flag(c_buf, hd_block)) exit
 !
 !
-        call read_real_ctl_type(hd_elapsed_time, tctl%elapsed_time_ctl)
+        call read_real_ctl_type                                         &
+     &     (c_buf, hd_elapsed_time, tctl%elapsed_time_ctl)
 !
-        call read_real_ctl_type(hd_dt, tctl%dt_ctl)
-        call read_real_ctl_type(hd_time_init, tctl%time_init_ctl)
+        call read_real_ctl_type(c_buf, hd_dt, tctl%dt_ctl)
+        call read_real_ctl_type                                         &
+     &     (c_buf, hd_time_init, tctl%time_init_ctl)
 !
-        call read_real_ctl_type(hd_min_delta_t, tctl%min_delta_t_ctl)
-        call read_real_ctl_type(hd_max_delta_t, tctl%max_delta_t_ctl)
-        call read_real_ctl_type(hd_max_eps_to_shrink,                   &
+        call read_real_ctl_type(c_buf, hd_min_delta_t,                  &
+     &      tctl%min_delta_t_ctl)
+        call read_real_ctl_type(c_buf, hd_max_delta_t,                  &
+     &      tctl%max_delta_t_ctl)
+        call read_real_ctl_type(c_buf, hd_max_eps_to_shrink,            &
      &      tctl%max_eps_to_shrink_ctl)
-        call read_real_ctl_type(hd_min_eps_to_expand,                   &
+        call read_real_ctl_type(c_buf, hd_min_eps_to_expand,            &
      &      tctl%min_eps_to_expand_ctl)
 !
-        call read_real_ctl_type(hd_delta_t_check,                       &
+        call read_real_ctl_type(c_buf, hd_delta_t_check,                &
      &      tctl%delta_t_check_ctl)
-        call read_real_ctl_type(hd_delta_t_rst, tctl%delta_t_rst_ctl)
-        call read_real_ctl_type(hd_delta_t_psf, tctl%delta_t_psf_ctl)
-        call read_real_ctl_type(hd_delta_t_iso, tctl%delta_t_iso_ctl)
-        call read_real_ctl_type(hd_delta_t_pvr, tctl%delta_t_pvr_ctl)
-        call read_real_ctl_type(hd_delta_t_fline,                       &
+        call read_real_ctl_type(c_buf, hd_delta_t_rst,                  &
+     &      tctl%delta_t_rst_ctl)
+        call read_real_ctl_type(c_buf, hd_delta_t_psf,                  &
+     &      tctl%delta_t_psf_ctl)
+        call read_real_ctl_type(c_buf, hd_delta_t_iso,                  &
+     &      tctl%delta_t_iso_ctl)
+        call read_real_ctl_type(c_buf, hd_delta_t_pvr,                  &
+     &      tctl%delta_t_pvr_ctl)
+        call read_real_ctl_type(c_buf, hd_delta_t_fline,                &
      &      tctl%delta_t_fline_ctl)
-        call read_real_ctl_type(hd_delta_t_lic, tctl%delta_t_lic_ctl)
+        call read_real_ctl_type(c_buf, hd_delta_t_lic,                  &
+     &      tctl%delta_t_lic_ctl)
 !
-        call read_real_ctl_type(hd_delta_t_ucd, tctl%delta_t_field_ctl)
-        call read_real_ctl_type(hd_delta_t_monitor,                     &
+        call read_real_ctl_type(c_buf, hd_delta_t_ucd,                  &
+     &      tctl%delta_t_field_ctl)
+        call read_real_ctl_type(c_buf, hd_delta_t_monitor,              &
      &      tctl%delta_t_monitor_ctl)
-        call read_real_ctl_type(hd_delta_t_sgs_coefs,                   &
+        call read_real_ctl_type(c_buf, hd_delta_t_sgs_coefs,            &
      &      tctl%delta_t_sgs_coefs_ctl)
-        call read_real_ctl_type(hd_delta_t_boundary,                    &
+        call read_real_ctl_type(c_buf, hd_delta_t_boundary,             &
      &      tctl%delta_t_boundary_ctl)
 !
 !
-        call read_integer_ctl_type(hd_i_step_init,                      &
+        call read_integer_ctl_type(c_buf, hd_i_step_init,               &
      &      tctl%i_step_init_ctl)
-        call read_integer_ctl_type(hd_i_step_number,                    &
+        call read_integer_ctl_type(c_buf, hd_i_step_number,             &
      &      tctl%i_step_number_ctl)
-        call read_integer_ctl_type(hd_i_finish_number,                  &
+        call read_integer_ctl_type(c_buf, hd_i_finish_number,           &
      &      tctl%i_step_number_ctl)
 !
-        call read_integer_ctl_type(hd_i_step_check,                     &
+        call read_integer_ctl_type(c_buf, hd_i_step_check,              &
      &      tctl%i_step_check_ctl)
-        call read_integer_ctl_type(hd_i_step_rst, tctl%i_step_rst_ctl)
-        call read_integer_ctl_type(hd_i_step_section,                   &
+        call read_integer_ctl_type(c_buf, hd_i_step_rst,                &
+     &      tctl%i_step_rst_ctl)
+        call read_integer_ctl_type(c_buf, hd_i_step_section,            &
      &      tctl%i_step_psf_ctl)
-        call read_integer_ctl_type(hd_i_step_isosurf,                   &
+        call read_integer_ctl_type(c_buf, hd_i_step_isosurf,            &
      &      tctl%i_step_iso_ctl)
-        call read_integer_ctl_type(hd_i_step_psf,                       &
+        call read_integer_ctl_type(c_buf, hd_i_step_psf,                &
      &      tctl%i_step_psf_ctl)
-        call read_integer_ctl_type(hd_i_step_iso,                       &
+        call read_integer_ctl_type(c_buf, hd_i_step_iso,                &
      &      tctl%i_step_iso_ctl)
-        call read_integer_ctl_type(hd_i_step_pvr,                       &
+        call read_integer_ctl_type(c_buf, hd_i_step_pvr,                &
      &      tctl%i_step_pvr_ctl)
-        call read_integer_ctl_type(hd_i_step_fline,                     &
+        call read_integer_ctl_type(c_buf, hd_i_step_fline,              &
      &      tctl%i_step_fline_ctl)
-        call read_integer_ctl_type(hd_i_step_lic,                       &
+        call read_integer_ctl_type(c_buf, hd_i_step_lic,                &
      &      tctl%i_step_lic_ctl)
 !
-        call read_integer_ctl_type(hd_i_step_ucd, tctl%i_step_ucd_ctl)
-        call read_integer_ctl_type(hd_i_step_monitor,                   &
+        call read_integer_ctl_type(c_buf, hd_i_step_ucd,                &
+     &      tctl%i_step_ucd_ctl)
+        call read_integer_ctl_type(c_buf, hd_i_step_monitor,            &
      &      tctl%i_step_monitor_ctl)
 !
-        call read_integer_ctl_type(hd_i_step_sgs_coefs,                 &
+        call read_integer_ctl_type(c_buf, hd_i_step_sgs_coefs,          &
      &      tctl%i_step_sgs_coefs_ctl)
-        call read_integer_ctl_type(hd_i_step_boundary,                  &
+        call read_integer_ctl_type(c_buf, hd_i_step_boundary,           &
      &      tctl%i_step_boundary_ctl)
 !
-        call read_integer_ctl_type(hd_i_diff_steps,                     &
+        call read_integer_ctl_type(c_buf, hd_i_diff_steps,              &
      &      tctl%i_diff_steps_ctl)
 !
-        call read_integer_ctl_type(hd_start_rst_step,                   &
+        call read_integer_ctl_type(c_buf, hd_start_rst_step,            &
      &      tctl%start_rst_step_ctl)
-        call read_integer_ctl_type(hd_end_rst_step,                     &
+        call read_integer_ctl_type(c_buf, hd_end_rst_step,              &
      &      tctl%end_rst_step_ctl)
 !
 !
-        call read_chara_ctl_type(hd_flexible_step,                      &
+        call read_chara_ctl_type(c_buf, hd_flexible_step,               &
      &      tctl%flexible_step_ctl)
       end do
+      tctl%i_tstep = 1
 !
       end subroutine read_control_time_step_data
 !
 !   --------------------------------------------------------------------
 !
       subroutine write_control_time_step_data                           &
-     &         (id_file, hd_block, tctl, level)
+     &         (id_control, hd_block, tctl, level)
 !
-      use m_machine_parameter
-      use m_read_control_elements
+      use t_read_control_elements
       use write_control_elements
 !
-      integer(kind = kint), intent(in) :: id_file
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
       type(time_data_control), intent(in) :: tctl
 !
@@ -506,104 +521,104 @@
       maxlen = max(maxlen, len_trim(hd_end_rst_step))
       maxlen = max(maxlen, len_trim(hd_flexible_step))
 !
-      write(id_file,'(a1)') '!'
-      level = write_begin_flag_for_ctl(id_file, level, hd_block)
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
 !
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_elapsed_time, tctl%elapsed_time_ctl)
 !
-      write(id_file,'(a1)') '!'
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      write(id_control,'(a1)') '!'
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_init, tctl%i_step_init_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_finish_number, tctl%i_step_number_ctl)
 !
-      write(id_file,'(a1)') '!'
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      write(id_control,'(a1)') '!'
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_check, tctl%i_step_check_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_rst, tctl%i_step_rst_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_section, tctl%i_step_psf_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_isosurf,  tctl%i_step_iso_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_psf, tctl%i_step_psf_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_iso, tctl%i_step_iso_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_pvr, tctl%i_step_pvr_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_fline, tctl%i_step_fline_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_lic, tctl%i_step_lic_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_ucd, tctl%i_step_ucd_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_monitor, tctl%i_step_monitor_ctl)
 !
-      write(id_file,'(a1)') '!'
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      write(id_control,'(a1)') '!'
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_dt, tctl%dt_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_time_init, tctl%time_init_ctl)
 !
-      write(id_file,'(a1)') '!'
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      write(id_control,'(a1)') '!'
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_min_delta_t, tctl%min_delta_t_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_max_delta_t, tctl%max_delta_t_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_max_eps_to_shrink, tctl%max_eps_to_shrink_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_min_eps_to_expand, tctl%min_eps_to_expand_ctl)
 !
-      write(id_file,'(a1)') '!'
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      write(id_control,'(a1)') '!'
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_check, tctl%delta_t_check_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_rst, tctl%delta_t_rst_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_psf, tctl%delta_t_psf_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_iso, tctl%delta_t_iso_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_pvr, tctl%delta_t_pvr_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_fline, tctl%delta_t_fline_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_lic, tctl%delta_t_lic_ctl)
 !
 !
-      write(id_file,'(a1)') '!'
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      write(id_control,'(a1)') '!'
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_ucd, tctl%delta_t_field_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_monitor, tctl%delta_t_monitor_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_sgs_coefs, tctl%delta_t_sgs_coefs_ctl)
-      call write_real_ctl_type(id_file, level, maxlen,                  &
+      call write_real_ctl_type(id_control, level, maxlen,               &
      &    hd_delta_t_boundary, tctl%delta_t_boundary_ctl)
 !
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_sgs_coefs, tctl%i_step_sgs_coefs_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_step_boundary, tctl%i_step_boundary_ctl)
 !
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_i_diff_steps, tctl%i_diff_steps_ctl)
 !
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_start_rst_step, tctl%start_rst_step_ctl)
-      call write_integer_ctl_type(id_file, level, maxlen,               &
+      call write_integer_ctl_type(id_control, level, maxlen,            &
      &    hd_end_rst_step, tctl%end_rst_step_ctl)
 !
-      write(id_file,'(a1)') '!'
-      call write_chara_ctl_type(id_file, level, maxlen,                 &
+      write(id_control,'(a1)') '!'
+      call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_flexible_step, tctl%flexible_step_ctl)
 !
-      level =  write_end_flag_for_ctl(id_file, level, hd_block)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_control_time_step_data
 !

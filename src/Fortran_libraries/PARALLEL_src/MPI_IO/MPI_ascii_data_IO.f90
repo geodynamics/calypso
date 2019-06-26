@@ -76,9 +76,8 @@
 !
 !
       call alloc_istack_merge(id_rank, num_pe, IO_param)
-      call calypso_mpi_write_file_open                                  &
-     &   (file_name, IO_param%nprocs_in, IO_param%id_file)
-      call MPI_File_get_byte_offset(IO_param%id_file, IO_param%ioff_gl)
+      call calypso_mpi_append_file_open(file_name, IO_param%nprocs_in,  &
+     &     IO_param%id_file, IO_param%ioff_gl)
 !
       end subroutine open_append_mpi_file
 !
