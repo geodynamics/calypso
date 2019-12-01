@@ -1,0 +1,91 @@
+cal_add_smp.o: $(BASEDIR)/cal_add_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_inverse_small_matrix.o: $(BASEDIR)/cal_inverse_small_matrix.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_matrix_vector_smp.o: $(BASEDIR)/cal_matrix_vector_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_minmax_and_stacks.o: $(BASEDIR)/cal_minmax_and_stacks.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_num_digits.o: $(BASEDIR)/cal_num_digits.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_products_smp.o: $(BASEDIR)/cal_products_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_subtract_smp.o: $(BASEDIR)/cal_subtract_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+compare_indices.o: $(BASEDIR)/compare_indices.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+coordinate_converter.o: $(BASEDIR)/coordinate_converter.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+copy_between_two_fields.o: $(BASEDIR)/copy_between_two_fields.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+copy_field_smp.o: $(BASEDIR)/copy_field_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+copy_nodal_fields.o: $(BASEDIR)/copy_nodal_fields.f90 m_precision.o m_machine_parameter.o t_phys_data.o delete_field_smp.o copy_field_smp.o cal_add_smp.o cal_subtract_smp.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_cyl_asym_t_2_xyz_smp.o: $(BASEDIR)/cvt_cyl_asym_t_2_xyz_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_cyl_tensor_2_xyz_smp.o: $(BASEDIR)/cvt_cyl_tensor_2_xyz_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_cyl_vector_2_xyz_smp.o: $(BASEDIR)/cvt_cyl_vector_2_xyz_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_nodal_and_sph_field.o: $(BASEDIR)/cvt_nodal_and_sph_field.f90 m_precision.o m_constants.o cvt_xyz_vector_2_sph_smp.o copy_between_two_fields.o cvt_sph_vector_2_xyz_smp.o cvt_xyz_tensor_2_sph_smp.o cvt_sph_tensor_2_xyz_smp.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_sph_asym_t_2_xyz_smp.o: $(BASEDIR)/cvt_sph_asym_t_2_xyz_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_sph_tensor_2_cyl_smp.o: $(BASEDIR)/cvt_sph_tensor_2_cyl_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_sph_tensor_2_xyz_smp.o: $(BASEDIR)/cvt_sph_tensor_2_xyz_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_sph_vector_2_cyl_smp.o: $(BASEDIR)/cvt_sph_vector_2_cyl_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_sph_vector_2_xyz_smp.o: $(BASEDIR)/cvt_sph_vector_2_xyz_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_xyz_tensor_2_cyl_smp.o: $(BASEDIR)/cvt_xyz_tensor_2_cyl_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_xyz_tensor_2_sph_smp.o: $(BASEDIR)/cvt_xyz_tensor_2_sph_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_xyz_vector_2_cyl_smp.o: $(BASEDIR)/cvt_xyz_vector_2_cyl_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cvt_xyz_vector_2_sph_smp.o: $(BASEDIR)/cvt_xyz_vector_2_sph_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+delete_field_smp.o: $(BASEDIR)/delete_field_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_constants.o: $(BASEDIR)/m_constants.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_error_IDs.o: $(BASEDIR)/m_error_IDs.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_machine_parameter.o: $(BASEDIR)/m_machine_parameter.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_phys_constants.o: $(BASEDIR)/m_phys_constants.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_phys_labels.o: $(BASEDIR)/m_phys_labels.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_precision.o: $(BASEDIR)/m_precision.f90
+	$(F90) -c $(F90OPTFLAGS) $<
+m_t_step_parameter.o: $(BASEDIR)/m_t_step_parameter.f90 m_precision.o t_time_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
+mag_of_field_smp.o: $(BASEDIR)/mag_of_field_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+overwrite_prod_const_smp.o: $(BASEDIR)/overwrite_prod_const_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+overwrite_products_smp.o: $(BASEDIR)/overwrite_products_smp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+primefac.o: $(BASEDIR)/primefac.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+quicksort.o: $(BASEDIR)/quicksort.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_field_address.o: $(BASEDIR)/set_field_address.f90 m_precision.o t_phys_address.o t_phys_data.o m_phys_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+solver_33_array.o: $(BASEDIR)/solver_33_array.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_group_data.o: $(BASEDIR)/t_group_data.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_phys_address.o: $(BASEDIR)/t_phys_address.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_phys_data.o: $(BASEDIR)/t_phys_data.f90 m_precision.o t_phys_address.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_time_data.o: $(BASEDIR)/t_time_data.f90 m_precision.o m_constants.o m_machine_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
+transfer_to_long_integers.o: $(BASEDIR)/transfer_to_long_integers.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

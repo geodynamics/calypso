@@ -29,7 +29,7 @@
 !
       subroutine elpsed_label_gen_sph_grid
 !
-      integer(kind = kint), parameter :: num_append = 4
+      integer(kind = kint), parameter :: num_append = 5
 !
 !
       call append_elapsed_times                                         &
@@ -43,8 +43,8 @@
      &      = 'Generation of FEM mesh data'
       elps1%labels(ist_elapsed_GSP+4)                                   &
      &      = 'Generation of surface FEM mesh data'
-!      elps1%labels(ist_elapsed_GSP+5)                                  &
-!     &      = 'Generation of viewer data'
+      elps1%labels(ist_elapsed_GSP+5)                                   &
+     &      = 'Generation of viewer data'
 !
       iflag_GSP_time = .TRUE.
 !

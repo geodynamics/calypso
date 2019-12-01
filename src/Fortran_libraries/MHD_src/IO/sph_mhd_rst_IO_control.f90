@@ -29,12 +29,12 @@
 !!        type(IO_step_param), intent(in) :: rst_step
 !!        type(phys_data), intent(inout) :: rj_fld
 !!      subroutine output_spectr_4_snap(i_step, time_d,                 &
-!!     &          sph_file_param, rj_fld, ucd_step)
+!!     &          sph_file_IO, rj_fld, ucd_step)
 !!      subroutine read_alloc_sph_spectr                                &
-!!     &         (i_step, ucd_step, rj_file_param, sph_file_param,      &
+!!     &         (i_step, ucd_step, rj_file_param, sph_file_IO,         &
 !!     &          sph_rj, ipol, rj_fld, time_d)
 !!        type(field_IO_params), intent(in) :: rj_file_param
-!!        type(field_IO_params), intent(in) :: sph_file_param
+!!        type(field_IO_params), intent(in) :: sph_file_IO
 !!        type(phys_data), intent(in) :: rj_fld
 !!@endverbatim
 !!
@@ -199,14 +199,14 @@
 ! -----------------------------------------------------------------------
 !
       subroutine output_spectr_4_snap(i_step, time_d,                   &
-     &          sph_file_param, rj_fld, ucd_step)
+     &          sph_file_IO, rj_fld, ucd_step)
 !
       use copy_rj_phys_data_4_IO
       use const_global_element_ids
 !
       type(time_data), intent(in) :: time_d
       type(phys_data), intent(in) :: rj_fld
-      type(field_IO_params), intent(in) :: sph_file_param
+      type(field_IO_params), intent(in) :: sph_file_IO
       integer(kind = kint), intent(in) :: i_step
       type(IO_step_param), intent(in) :: ucd_step
 !
@@ -214,7 +214,7 @@
       integer(kind = kint) :: istep_udt
 !
 !
-      if(sph_file_param%iflag_IO .eq. 0) return
+      if(sph_file_IO%iflag_IO .eq. 0) return
       if(output_IO_flag(i_step,ucd_step) .ne. 0) return
       istep_udt = set_IO_step(i_step, ucd_step)
 !
@@ -230,7 +230,7 @@
      &   (sph_out_IO%nnod_IO, sph_out_IO%istack_numnod_IO)
 !
       call sel_write_step_SPH_field_file(nprocs, my_rank,               &
-     &    istep_udt, sph_file_param, sph_time_IO, sph_out_IO)
+     &    istep_udt, sph_file_IO, sph_time_IO, sph_out_IO)
 !
       call dealloc_merged_field_stack(sph_out_IO)
       call dealloc_phys_data_IO(sph_out_IO)
@@ -241,7 +241,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_alloc_sph_spectr                                  &
-     &         (i_step, ucd_step, rj_file_param, sph_file_param,        &
+     &         (i_step, ucd_step, rj_file_param, sph_file_IO,           &
      &          sph_rj, ipol, rj_fld, time_d)
 !
       use t_spheric_rj_data
@@ -250,7 +250,7 @@
 !
       integer(kind = kint), intent(in) :: i_step
       type(IO_step_param), intent(in) :: ucd_step
-      type(field_IO_params), intent(in) :: sph_file_param
+      type(field_IO_params), intent(in) :: sph_file_IO
       type(field_IO_params), intent(in) :: rj_file_param
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(phys_address), intent(in) :: ipol
@@ -264,7 +264,7 @@
 !
       istep_udt = set_IO_step(i_step, ucd_step)
       call sel_read_alloc_step_SPH_file(nprocs, my_rank,                &
-     &    istep_udt, sph_file_param, sph_time_IO, sph_out_IO)
+     &    istep_udt, sph_file_IO, sph_time_IO, sph_out_IO)
 !
       call copy_time_step_data(sph_time_IO, time_d)
 !

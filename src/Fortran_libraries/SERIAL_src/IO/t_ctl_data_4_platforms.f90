@@ -40,6 +40,8 @@
 !!
 !!      spectr_field_file_prefix    'sph_spectr/spectr'
 !!
+!!      rayleigh_spectr_dir            'Checkpoints/'
+!!      rayleigh_field_dir             'Spherical3D/'
 !!
 !!      mesh_file_fmt_ctl           'ascii'
 !!      restart_file_fmt_ctl        'ascii'
@@ -114,6 +116,9 @@
         type(read_character_item) :: interpolate_sph_to_fem_ctl
         type(read_character_item) :: interpolate_fem_to_sph_ctl
 !
+        type(read_character_item) :: rayleigh_spectr_dir
+        type(read_character_item) :: rayleigh_field_dir
+!
         type(read_character_item) :: mesh_file_fmt_ctl
         type(read_character_item) :: sph_file_fmt_ctl
         type(read_character_item) :: restart_file_fmt_ctl
@@ -148,6 +153,11 @@
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_sph_files_header = 'sph_file_prefix'
+!
+      character(len=kchara), parameter, private                         &
+     &       :: hd_rayleigh_spectr_dir = 'rayleigh_spectr_dir'
+      character(len=kchara), parameter, private                         &
+     &       :: hd_rayleigh_field_dir =  'rayleigh_field_dir'
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_coriolis_tri_int_name = 'coriolis_int_file_name'
@@ -232,6 +242,11 @@
      &      plt%interpolate_sph_to_fem_ctl)
         call read_chara_ctl_type(c_buf, hd_itp_fem_to_sph,              &
      &      plt%interpolate_fem_to_sph_ctl)
+!
+        call read_chara_ctl_type(c_buf, hd_rayleigh_spectr_dir,         &
+     &       plt%rayleigh_spectr_dir)
+        call read_chara_ctl_type(c_buf, hd_rayleigh_field_dir,          &
+     &       plt%rayleigh_field_dir)
 !
         call read_chara_ctl_type(c_buf, hd_mesh_file_fmt,               &
      &      plt%mesh_file_fmt_ctl)
@@ -320,6 +335,11 @@
      &    hd_sph_files_header, plt%sph_file_prefix)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_rayleigh_spectr_dir, plt%rayleigh_spectr_dir)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_rayleigh_field_dir, plt%rayleigh_field_dir)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_coriolis_tri_int_name, plt%coriolis_int_file_name)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_bc_data_file_name, plt%bc_data_file_name_ctl)
@@ -368,6 +388,9 @@
       plt%spectr_field_file_prefix%iflag = 0
 !
       plt%sph_file_prefix%iflag =            0
+      plt%rayleigh_spectr_dir%iflag =        0
+      plt%rayleigh_field_dir%iflag =         0
+!
       plt%coriolis_int_file_name%iflag =     0
       plt%bc_data_file_name_ctl%iflag =      0
       plt%interpolate_sph_to_fem_ctl%iflag = 0

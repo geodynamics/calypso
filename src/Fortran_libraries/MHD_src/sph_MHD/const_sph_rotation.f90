@@ -112,7 +112,8 @@
      &          fdm2_free_ICB, fdm2_free_CMB, g_sph_rj,                 &
      &          is_velo, is_vort, rj_fld)
 !
-      use select_exp_velocity_bc
+      use select_exp_velocity_ICB
+      use select_exp_velocity_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -125,9 +126,12 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      call sel_bc_sph_vorticity                                         &
-     &   (sph_rj, r_2nd, sph_bc_U, fdm2_free_ICB, fdm2_free_CMB,        &
-     &    g_sph_rj, is_velo, is_vort, rj_fld)
+      call sel_ICB_sph_vorticity                                        &
+     &   (sph_rj, r_2nd, sph_bc_U, fdm2_free_ICB, g_sph_rj,             &
+     &    is_velo, is_vort, rj_fld)
+      call sel_CMB_sph_vorticity                                        &
+     &   (sph_rj, sph_bc_U, fdm2_free_CMB, g_sph_rj,                    &
+     &    is_velo, is_vort, rj_fld)
 !
       call cal_sph_nod_vect_rot2(sph_bc_U%kr_in, sph_bc_U%kr_out,       &
      &    sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj,                    &
@@ -141,7 +145,8 @@
       subroutine const_sph_current(sph_rj, r_2nd, sph_bc_B, g_sph_rj,   &
      &          is_magne, is_current, rj_fld)
 !
-      use select_exp_magne_bc
+      use select_exp_magne_ICB
+      use select_exp_magne_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -152,8 +157,10 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      call sel_bc_sph_current(sph_rj, r_2nd, sph_bc_B,                  &
-     &    g_sph_rj, is_magne, is_current, rj_fld)
+      call sel_ICB_sph_current(sph_rj, r_2nd, sph_bc_B, g_sph_rj,       &
+     &    is_magne, is_current, rj_fld)
+      call sel_CMB_sph_current(sph_rj, sph_bc_B, g_sph_rj,              &
+     &    is_magne, is_current, rj_fld)
 !
       call cal_sph_nod_vect_rot2(sph_bc_B%kr_in, sph_bc_B%kr_out,       &
      &    sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj,                    &
@@ -167,7 +174,8 @@
       subroutine const_sph_rotation_uxb(sph_rj, r_2nd, sph_bc_B,        &
      &          g_sph_rj, is_fld, is_rot, rj_fld)
 !
-      use select_exp_magne_bc
+      use select_exp_magne_ICB
+      use select_exp_magne_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -178,8 +186,10 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      call sel_bc_sph_rotation_uxb                                      &
-     &   (sph_rj, r_2nd, sph_bc_B, g_sph_rj, is_fld, is_rot, rj_fld)
+      call sel_ICB_sph_rotation_uxb(sph_rj, r_2nd, sph_bc_B, g_sph_rj,  &
+     &    is_fld, is_rot, rj_fld)
+      call sel_CMB_sph_rotation_uxb(sph_rj, sph_bc_B, g_sph_rj,         &
+     &    is_fld, is_rot, rj_fld)
 !
       call cal_sph_nod_vect_w_div_rot2(sph_bc_B%kr_in, sph_bc_B%kr_out, &
      &    sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj, r_2nd%fdm(1)%dmat, &
@@ -226,7 +236,8 @@
      &          sph_bc_U, fdm2_free_ICB, fdm2_free_CMB, g_sph_rj,       &
      &          is_fld, is_rot, rj_fld)
 !
-      use select_exp_velocity_bc
+      use select_exp_velocity_ICB
+      use select_exp_velocity_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -239,9 +250,12 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      call sel_bc_sph_vorticity                                         &
-     &   (sph_rj, r_2nd, sph_bc_U, fdm2_free_ICB, fdm2_free_CMB,        &
-     &    g_sph_rj, is_fld, is_rot, rj_fld)
+      call sel_ICB_sph_vorticity                                        &
+     &   (sph_rj, r_2nd, sph_bc_U, fdm2_free_ICB, g_sph_rj,             &
+     &    is_fld, is_rot, rj_fld)
+      call sel_CMB_sph_vorticity                                        &
+     &   (sph_rj, sph_bc_U, fdm2_free_CMB, g_sph_rj,                    &
+     &    is_fld, is_rot, rj_fld)
 !
       call cal_sph_nod_vect_w_div_rot2(sph_bc_U%kr_in, sph_bc_U%kr_out, &
      &    sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj, r_2nd%fdm(1)%dmat, &
@@ -259,7 +273,8 @@
      &          rj_fld)
 !
       use cal_sph_exp_rotation
-      use select_exp_velocity_bc
+      use select_exp_velocity_ICB
+      use select_exp_velocity_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -272,9 +287,10 @@
 !
       type(phys_data), intent(inout) :: rj_fld
 !
-      integer(kind = kint) :: idp_diffuse
+      integer(kind = kint) :: it_velo, idp_diffuse
 !
 !
+      it_velo = is_velo + 2
       idp_diffuse = is_viscous + 1
 !
       call cal_sph_nod_diffuse_by_rot2(sph_bc_U%kr_in, sph_bc_U%kr_out, &
@@ -283,9 +299,12 @@
      &    is_vort, is_viscous, rj_fld%n_point, rj_fld%ntot_phys,        &
      &    rj_fld%d_fld)
 !
-      call sel_bc_sph_viscous_diffusion(sph_rj, r_2nd, sph_bc_U,        &
-     &    fdm2_free_ICB, fdm2_free_CMB, g_sph_rj, coef_diffuse,         &
-     &    is_velo, is_vort, is_viscous, idp_diffuse, rj_fld)
+      call sel_ICB_sph_viscous_diffusion(sph_rj, r_2nd,                 &
+     &    sph_bc_U, fdm2_free_ICB, g_sph_rj, coef_diffuse,              &
+     &    is_velo, it_velo, is_viscous, idp_diffuse, rj_fld)
+      call sel_CMB_sph_viscous_diffusion                                &
+     &   (sph_rj, sph_bc_U, fdm2_free_CMB, g_sph_rj, coef_diffuse,      &
+     &    is_velo, is_viscous, idp_diffuse, rj_fld)
 !
       end subroutine const_sph_viscous_by_vort2
 !
@@ -296,7 +315,8 @@
      &         (sph_rj, r_2nd, sph_bc_B, g_sph_rj, coef_diffuse,        &
      &          is_magne, is_current, is_ohmic, rj_fld)
 !
-      use select_exp_magne_bc
+      use select_exp_magne_ICB
+      use select_exp_magne_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -320,9 +340,12 @@
      &    is_current, is_ohmic, rj_fld%n_point, rj_fld%ntot_phys,       &
      &    rj_fld%d_fld)
 !
-      call sel_bc_sph_magnetic_diffusion(sph_rj, r_2nd, sph_bc_B,       &
-     &    g_sph_rj, coef_diffuse, is_magne, is_ohmic, idp_diffuse,      &
-     &    rj_fld)
+      call sel_ICB_sph_magnetic_diffusion                               &
+     &   (sph_rj, r_2nd, sph_bc_B, g_sph_rj, coef_diffuse,              &
+     &    is_magne, is_ohmic, idp_diffuse, rj_fld)
+      call sel_CMB_sph_magnetic_diffusion                               &
+     &   (sph_rj, sph_bc_B, g_sph_rj, coef_diffuse,                     &
+     &    is_magne, is_ohmic, idp_diffuse, rj_fld)
 !
       end subroutine const_sph_mag_diffuse_by_j
 !

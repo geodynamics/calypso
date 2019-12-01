@@ -1,0 +1,99 @@
+bcast_4_field_ctl.o: $(COMMDIR)/bcast_4_field_ctl.f90 m_precision.o t_ctl_data_4_fields.o bcast_control_arrays.o
+	$(F90) -c $(F90OPTFLAGS) $<
+bcast_4_platform_ctl.o: $(COMMDIR)/bcast_4_platform_ctl.f90 m_precision.o t_ctl_data_4_platforms.o bcast_control_arrays.o t_ctl_data_4_FEM_mesh.o
+	$(F90) -c $(F90OPTFLAGS) $<
+bcast_4_sph_monitor_ctl.o: $(COMMDIR)/bcast_4_sph_monitor_ctl.f90 m_precision.o calypso_mpi.o t_ctl_data_4_sph_monitor.o t_ctl_data_sph_vol_spectr.o t_ctl_data_pick_sph_spectr.o bcast_control_arrays.o t_mid_equator_control.o
+	$(F90) -c $(F90OPTFLAGS) $<
+bcast_4_time_step_ctl.o: $(COMMDIR)/bcast_4_time_step_ctl.f90 m_precision.o t_ctl_data_4_time_steps.o bcast_control_arrays.o
+	$(F90) -c $(F90OPTFLAGS) $<
+bcast_control_arrays.o: $(COMMDIR)/bcast_control_arrays.f90 m_precision.o m_constants.o calypso_mpi.o t_control_elements.o t_control_array_real.o transfer_to_long_integers.o t_control_array_real2.o t_control_array_real3.o t_control_array_integer.o t_control_array_integer2.o t_control_array_character.o t_control_array_character2.o t_control_array_character3.o t_control_array_charareal.o t_control_array_charaint.o t_control_array_charareal2.o t_control_array_chara2real.o t_control_array_intchrreal.o t_control_array_intreal.o t_control_array_int2real.o t_control_array_int2real2.o t_control_array_charaint3.o
+	$(F90) -c $(F90OPTFLAGS) $<
+bcast_file_IO_parameter.o: $(COMMDIR)/bcast_file_IO_parameter.f90 m_precision.o m_constants.o calypso_mpi.o t_file_IO_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
+calypso_SR.o: $(COMMDIR)/calypso_SR.f90 m_precision.o m_constants.o calypso_mpi.o m_solver_SR.o calypso_SR_core.o set_to_send_buffer.o select_copy_from_recv.o set_to_send_buf_tri.o
+	$(F90) -c $(F90OPTFLAGS) $<
+calypso_SR_2.o: $(COMMDIR)/calypso_SR_2.f90 m_precision.o m_constants.o calypso_mpi.o m_solver_SR.o calypso_SR_core.o set_to_send_buffer.o select_copy_from_recv.o set_to_send_buf_tri.o
+	$(F90) -c $(F90OPTFLAGS) $<
+calypso_SR_3.o: $(COMMDIR)/calypso_SR_3.f90 m_precision.o m_constants.o calypso_mpi.o m_solver_SR.o calypso_SR_core.o set_to_send_buffer.o select_copy_from_recv.o set_to_send_buf_tri.o
+	$(F90) -c $(F90OPTFLAGS) $<
+calypso_SR_6.o: $(COMMDIR)/calypso_SR_6.f90 m_precision.o m_constants.o calypso_mpi.o m_solver_SR.o calypso_SR_core.o set_to_send_buffer.o select_copy_from_recv.o set_to_send_buf_tri.o
+	$(F90) -c $(F90OPTFLAGS) $<
+calypso_SR_N.o: $(COMMDIR)/calypso_SR_N.f90 m_precision.o calypso_mpi.o m_solver_SR.o calypso_SR_core.o set_to_send_buffer.o set_from_recv_buffer.o set_to_send_buf_tri.o set_from_recv_buff_tri.o
+	$(F90) -c $(F90OPTFLAGS) $<
+calypso_SR_core.o: $(COMMDIR)/calypso_SR_core.f90 m_precision.o calypso_mpi.o m_solver_SR.o
+	$(F90) -c $(F90OPTFLAGS) $<
+calypso_SR_int.o: $(COMMDIR)/calypso_SR_int.f90 m_precision.o calypso_mpi.o m_solver_SR.o calypso_SR_core.o set_to_send_buffer.o select_copy_from_recv.o
+	$(F90) -c $(F90OPTFLAGS) $<
+calypso_SR_rev_N.o: $(COMMDIR)/calypso_SR_rev_N.f90 m_precision.o m_work_time.o calypso_mpi.o m_solver_SR.o m_elapsed_labels_SEND_RECV.o calypso_SR_core.o set_to_send_buffer.o set_from_recv_buf_rev.o set_to_send_buf_tri.o set_from_recv_buf_rev_tri.o
+	$(F90) -c $(F90OPTFLAGS) $<
+calypso_mpi.o: $(COMMDIR)/calypso_mpi.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+calypso_solver_SR.o: $(COMMDIR)/calypso_solver_SR.f90 m_precision.o m_constants.o set_from_recv_buf_rev.o select_calypso_SR.o calypso_SR_6.o calypso_SR_3.o calypso_SR_2.o calypso_SR.o calypso_SR_int.o
+	$(F90) -c $(F90OPTFLAGS) $<
+const_element_comm_table.o: $(COMMDIR)/const_element_comm_table.f90 m_precision.o m_constants.o calypso_mpi.o m_solver_SR.o m_work_time.o t_geometry_data.o t_comm_table.o t_belonged_element_4_node.o find_element_comm_table.o const_global_element_ids.o set_element_export_item.o make_element_comm_table_SR.o
+	$(F90) -c $(F90OPTFLAGS) $<
+const_element_comm_tables.o: $(COMMDIR)/const_element_comm_tables.f90 m_precision.o calypso_mpi.o t_next_node_ele_4_node.o t_mesh_data.o t_geometry_data.o t_surface_data.o t_edge_data.o t_comm_table.o t_belonged_element_4_node.o m_machine_parameter.o set_ele_id_4_node_type.o const_global_element_ids.o const_element_comm_table.o
+	$(F90) -c $(F90OPTFLAGS) $<
+const_global_element_ids.o: $(COMMDIR)/const_global_element_ids.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_comm_table.o solver_SR_type.o
+	$(F90) -c $(F90OPTFLAGS) $<
+field_to_send_buffer.o: $(COMMDIR)/field_to_send_buffer.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+find_element_comm_table.o: $(COMMDIR)/find_element_comm_table.f90 m_precision.o m_constants.o calypso_mpi.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_array_for_send_recv.o: $(COMMDIR)/m_array_for_send_recv.f90 m_precision.o calypso_mpi.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_elapsed_labels_SEND_RECV.o: $(COMMDIR)/m_elapsed_labels_SEND_RECV.f90 m_precision.o m_work_time.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_sel_spherical_SRs.o: $(COMMDIR)/m_sel_spherical_SRs.f90 m_precision.o m_work_time.o m_elapsed_labels_SEND_RECV.o select_copy_from_recv.o m_solver_SR.o skip_comment_f.o calypso_solver_SR.o set_to_send_buffer.o calypso_SR_core.o set_from_recv_buf_rev.o field_to_send_buffer.o set_from_recv_buffer.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_solver_SR.o: $(COMMDIR)/m_solver_SR.f90 m_precision.o calypso_mpi.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_sph_communicators.o: $(COMMDIR)/m_sph_communicators.f90 m_precision.o calypso_mpi.o m_machine_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_work_time.o: $(COMMDIR)/m_work_time.f90 m_precision.o m_constants.o t_work_time.o calypso_mpi.o
+	$(F90) -c $(F90OPTFLAGS) $<
+make_element_comm_table_SR.o: $(COMMDIR)/make_element_comm_table_SR.f90 m_precision.o m_constants.o calypso_mpi.o m_solver_SR.o
+	$(F90) -c $(F90OPTFLAGS) $<
+nod_phys_send_recv.o: $(COMMDIR)/nod_phys_send_recv.f90 m_precision.o calypso_mpi.o t_mesh_data.o t_phys_data.o m_machine_parameter.o m_phys_constants.o m_solver_SR.o m_array_for_send_recv.o m_work_time.o solver_SR_type.o
+	$(F90) -c $(F90OPTFLAGS) $<
+parallel_FEM_mesh_init.o: $(COMMDIR)/parallel_FEM_mesh_init.f90 m_precision.o m_constants.o m_machine_parameter.o m_phys_constants.o calypso_mpi.o t_mesh_data.o t_file_IO_parameter.o t_read_mesh_data.o m_array_for_send_recv.o nod_phys_send_recv.o node_monitor_IO.o const_mesh_information.o const_element_comm_tables.o mesh_file_name_by_param.o t_geometry_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
+select_calypso_SR.o: $(COMMDIR)/select_calypso_SR.f90 m_precision.o m_constants.o m_solver_SR.o select_copy_from_recv.o calypso_SR_N.o calypso_SR_rev_N.o calypso_mpi.o calypso_SR_core.o
+	$(F90) -c $(F90OPTFLAGS) $<
+select_copy_from_recv.o: $(COMMDIR)/select_copy_from_recv.f90 m_precision.o m_constants.o set_from_recv_buffer.o set_from_recv_buf_rev.o set_from_recv_buff_tri.o set_from_recv_buf_rev_tri.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_ctl_parallel_platform.o: $(COMMDIR)/set_ctl_parallel_platform.f90 m_precision.o m_error_IDs.o t_ctl_data_4_platforms.o m_constants.o m_machine_parameter.o calypso_mpi.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_element_export_item.o: $(COMMDIR)/set_element_export_item.f90 m_precision.o m_constants.o calypso_mpi.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_from_recv_buf_rev.o: $(COMMDIR)/set_from_recv_buf_rev.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_from_recv_buf_rev_tri.o: $(COMMDIR)/set_from_recv_buf_rev_tri.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_from_recv_buff_tri.o: $(COMMDIR)/set_from_recv_buff_tri.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_from_recv_buffer.o: $(COMMDIR)/set_from_recv_buffer.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_to_send_buf_tri.o: $(COMMDIR)/set_to_send_buf_tri.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_to_send_buffer.o: $(COMMDIR)/set_to_send_buffer.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+solver_SR.o: $(COMMDIR)/solver_SR.f90 m_precision.o m_constants.o calypso_mpi.o m_solver_SR.o
+	$(F90) -c $(F90OPTFLAGS) $<
+solver_SR_3.o: $(COMMDIR)/solver_SR_3.f90 m_precision.o m_constants.o calypso_mpi.o m_solver_SR.o
+	$(F90) -c $(F90OPTFLAGS) $<
+solver_SR_6.o: $(COMMDIR)/solver_SR_6.f90 m_precision.o m_constants.o calypso_mpi.o m_solver_SR.o
+	$(F90) -c $(F90OPTFLAGS) $<
+solver_SR_N.o: $(COMMDIR)/solver_SR_N.f90 m_precision.o calypso_mpi.o m_solver_SR.o
+	$(F90) -c $(F90OPTFLAGS) $<
+solver_SR_int.o: $(COMMDIR)/solver_SR_int.f90 m_precision.o m_constants.o calypso_mpi.o m_solver_SR.o
+	$(F90) -c $(F90OPTFLAGS) $<
+solver_SR_type.o: $(COMMDIR)/solver_SR_type.f90 m_precision.o m_work_time.o m_elapsed_labels_SEND_RECV.o t_comm_table.o solver_SR.o solver_SR_3.o solver_SR_6.o solver_SR_N.o solver_SR_int.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_para_double_numbering.o: $(COMMDIR)/t_para_double_numbering.f90 m_precision.o m_constants.o calypso_mpi.o t_ucd_data.o t_comm_table.o solver_SR_type.o t_geometry_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_viewer_group.o: $(COMMDIR)/t_viewer_group.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_work_time.o: $(COMMDIR)/t_work_time.f90 m_precision.o m_constants.o calypso_mpi.o set_parallel_file_name.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

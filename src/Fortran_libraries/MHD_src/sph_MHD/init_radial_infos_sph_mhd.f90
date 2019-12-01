@@ -132,17 +132,16 @@
       if(iflag_debug.gt.0) write(*,*) 's_set_bc_sph_mhd'
       call s_set_bc_sph_mhd                                             &
      &   (bc_IO, sph%sph_params, sph%sph_rj, sph_grps%radial_rj_grp,    &
-     &    MHD_prop, MHD_BC, CTR_nod_grp_name, CTR_sf_grp_name,          &
-     &    sph_MHD_bc)
+     &    MHD_prop, MHD_BC, sph_MHD_bc)
 !
       call init_reference_temps                                         &
      &   (MHD_prop%ref_param_T, MHD_prop%takepito_T,                    &
      &    sph%sph_params, sph%sph_rj, ipol%i_ref_t, ipol%i_gref_t,      &
-     &    ref_temp, rj_fld, sph_MHD_bc%sph_bc_T)
+     &    ref_temp, rj_fld, sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T)
       call init_reference_temps                                         &
      &   (MHD_prop%ref_param_C, MHD_prop%takepito_C,                    &
      &    sph%sph_params, sph%sph_rj, ipol%i_ref_c, ipol%i_gref_c,      &
-     &    ref_comp, rj_fld, sph_MHD_bc%sph_bc_C)
+     &    ref_comp, rj_fld, sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C)
 !
       end subroutine init_r_infos_sph_mhd
 !
@@ -186,9 +185,10 @@
 !
       subroutine init_reference_temps(ref_param, takepiro,              &
      &          sph_params, sph_rj, i_ref, i_gref,                      &
-     &          reftemp, rj_fld, sph_bc_S)
+     &          reftemp, rj_fld, sph_bc_S, bcs_S)
 !
       use t_boundary_params_sph_MHD
+      use t_boundary_sph_spectr
       use t_reference_scalar_param
       use set_reference_sph_mhd
       use set_reference_temp_sph
@@ -198,10 +198,11 @@
       type(takepiro_model_param), intent(in) :: takepiro
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) ::  sph_rj
+      type(sph_boundary_type), intent(in) :: sph_bc_S
 !
       type(reference_temperature), intent(inout) :: reftemp
+      type(sph_scalar_boundary_data), intent(inout) :: bcs_S
       type(phys_data), intent(inout) :: rj_fld
-      type(sph_boundary_type), intent(inout) :: sph_bc_S
 !
 !      Set reference temperature and adjust boundary conditions
 !
@@ -217,7 +218,8 @@
      &    reftemp%t_rj)
         call adjust_sph_temp_bc_by_reftemp                              &
      &     (sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj(1),               &
-     &      reftemp%t_rj, sph_bc_S)
+     &      reftemp%t_rj, sph_bc_S, bcs_S%ICB_Sspec, bcs_S%CMB_Sspec,   &
+     &      bcs_S%ICB_Sevo, bcs_S%CMB_Sevo)
 !
       else if(ref_param%iflag_reference .eq. id_takepiro_temp) then
         call set_stratified_sph_mhd(takepiro%stratified_sigma,          &
@@ -227,7 +229,8 @@
      &    sph_rj%radius_1d_rj_r, reftemp%t_rj)
 !!        call adjust_sph_temp_bc_by_reftemp                            &
 !!     &     (sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj(1),             &
-!!     &      reftemp%t_rj, sph_bc_S)
+!!     &      reftemp%t_rj, sph_bc_S, bcs_S%ICB_Sspec, bcs_S%CMB_Sspec, &
+!!     &      bcs_S%ICB_Sevo, bcs_S%CMB_Sevo)
 !
       else
         call no_ref_temp_sph_mhd(ref_param%depth_top,                   &

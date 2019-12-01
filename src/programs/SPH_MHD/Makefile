@@ -44,7 +44,10 @@ mod_list:
 
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(SPH_MHD_MAINDIR)' $(SOURCES)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(SPH_MHD_MAINDIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *~ *.mod *.diag *.L

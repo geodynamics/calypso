@@ -32,6 +32,11 @@
 !>      fixed z-component defined by external file
       integer(kind = kint), parameter :: iflag_bc_file_z = -3
 !
+!>      evolved boundary defined by external file
+      integer(kind = kint), parameter :: iflag_bc_evo_field = -50
+!>      evolved boundary defined by external file
+      integer(kind = kint), parameter :: iflag_bc_evo_flux =  -51
+!
 !>      flag for fixed flux
       integer(kind = kint), parameter :: iflag_bc_fix_flux =   11
 !>      flag for fixed flux by external file

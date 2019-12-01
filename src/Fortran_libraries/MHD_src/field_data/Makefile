@@ -3,8 +3,8 @@
 #
 
 MHD_SNAPSHOT_DIR = $$(MHD_SRCDIR)/field_data
-SRC_SPH_SNAPSHOT = $(shell ls *.f90)
-MOD_SPH_SNAPSHOT = $(addsuffix .o,$(basename $(SRC_SPH_SNAPSHOT)) )
+SOURCES = $(shell ls *.f90)
+MOD_SPH_SNAPSHOT = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #
 #  -------------------------------------------------------------------------
@@ -24,7 +24,10 @@ mod_list:
 
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(MHD_SNAPSHOT_DIR)' $(SRC_SPH_SNAPSHOT)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(MHD_SNAPSHOT_DIR)' $(SOURCES)
 
 
 clean:

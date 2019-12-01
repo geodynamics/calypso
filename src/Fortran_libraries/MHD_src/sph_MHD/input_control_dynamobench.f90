@@ -105,8 +105,8 @@
      &    sph_maker2%sph_tmp, MHD_files, bc_IO, MHD_step, MHD_prop,     &
      &    MHD_BC, WK%WK_sph, sph_maker2%gen_sph)
 !
-      call set_control_SPH_MHD_w_viz                                    &
-     &   (DMHD_ctl%model_ctl, DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, &
+      call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
+     &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
      &    MHD_prop, sph, rj_fld, nod_fld, monitor)
 !
       call set_ctl_params_dynamobench                                   &
@@ -115,7 +115,8 @@
      &    bench)
 !
       if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
-      call load_para_sph_mesh(sph, comms_sph, sph_grps)
+      call load_para_sph_mesh                                           &
+     &   (MHD_files%sph_file_param, sph, comms_sph, sph_grps)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !

@@ -167,12 +167,15 @@
       integer(kind = kint), intent(inout) :: l_truncation
       type(sph_rj_grid), intent(inout) ::  sph_rj
 !
+      type(field_IO_params) :: sph_file_param
       type(sph_file_data_type) :: sph_file
 !
 !
       call set_sph_mesh_file_fmt_prefix                                 &
-     &   (rj_file_param%iflag_format, rj_file_param%file_prefix)
-      call sel_mpi_read_spectr_rj_file(nprocs, my_rank, sph_file)
+     &   (rj_file_param%iflag_format, rj_file_param%file_prefix,        &
+     &    sph_file_param)
+      call sel_mpi_read_spectr_rj_file                                  &
+     &   (nprocs, my_rank, sph_file_param, sph_file)
       call copy_original_sph_rj_from_IO                                 &
      &   (l_truncation, sph_rj, sph_file%sph_IO)
       call dealloc_rj_mode_IO(sph_file)

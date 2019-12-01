@@ -45,7 +45,10 @@ mod_list:
 
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(MERGE_SRCDIR)' $(SOURCES)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(MERGE_SRCDIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *~ *.mod *.diag *.L

@@ -3,8 +3,8 @@
 #
 
 FFT_WRAP_DIR = $$(CORE_SRCDIR)/FFT_wrapper
-SRC_FFT_WRAP = $(shell ls *.f90 *.F90)
-MOD_FFT_WRAP = $(addsuffix .o,$(basename $(SRC_FFT_WRAP)) )
+SOURCES = $(shell ls *.f90 *.F90)
+MOD_FFT_WRAP = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #
 #  -------------------------------------------------------------------------
@@ -27,7 +27,10 @@ mod_list:
 
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(FFT_WRAP_DIR)' $(SRC_FFT_WRAP)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(FFT_WRAP_DIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *.mod *~ *.par *.diag *.a

@@ -3,6 +3,9 @@
 #
 
 C_BASE_DIR =     $$(C_SRCDIR)/BASE
+SRC_BASE_C = $(shell ls *.c)
+INC_BASE_C = $(addsuffix .h,$(basename $(SRC_BASE_C)) )
+OBJ_BASE_C = $(addsuffix .o,$(basename $(SRC_BASE_C)) )
 
 OBJ_BASE_C = \
  calypso_param_c.o \
@@ -29,45 +32,20 @@ mod_list:
 
 
 module:
-	@echo \
-	calypso_param_c.o: \
-	'$$(C_BASE_DIR)'/calypso_param_c.c \
-	calypso_param_c.h \
-	>> $(MAKENAME)
-	@echo '	''$$(CC)' -c '$$(OPTFLAGS) $$(C_INCLUDE) $$<' \
-	>> $(MAKENAME)
-	
-	@echo \
-	numbers_to_bin_c.o: \
-	'$$(C_BASE_DIR)'/numbers_to_bin_c.c \
-	numbers_to_bin_c.h \
-	>> $(MAKENAME)
-	@echo '	''$$(CC)' -c '$$(OPTFLAGS) $$(C_INCLUDE)' \
-	'$$(C_BASE_DIR)'/numbers_to_bin_c.c \
-	>> $(MAKENAME)
-	
-	@echo \
-	calypso_zlib_io_c.o: \
-	'$$(C_BASE_DIR)'/calypso_zlib_io_c.c \
-	calypso_zlib_io_c.h \
-	calypso_param_c.o \
-	numbers_to_bin_c.o \
-	>> $(MAKENAME)
-	@echo '	''$$(CC)' -c '$$(OPTFLAGS) $$(C_INCLUDE)' \
-	'$$(C_BASE_DIR)'/calypso_zlib_io_c.c \
-	>> $(MAKENAME)
+	@cat Makefile.depends >> $(MAKENAME)
 
-
-includes:
-	@for sources in `ls *.h`; do \
+depends:
+	echo 'Construct dependencies in C_libraries/BASE'
+	@echo '#' > $(MAKENAME).tmp
+	@for sources in $(SRC_BASE_C) ; do \
 		( \
-		echo 'copy include files for ' $$sources ; \
-		echo $$sources': $$(C_BASE_DIR)/'$$sources \
-		>> $(MAKENAME); \
-		echo '	cp $$(C_BASE_DIR)/'$$sources . \
-		>> $(MAKENAME) \
+		cd $(MAKEDIR); \
+		$(CC) $(DEPFLAGS) $(OPTFLAGS_GL) $(C_INCLUDE) $(MHDDIR)/C_libraries/BASE/$$sources >> $(MAKENAME).tmp; \
+		echo '	''$$(CC)' -c '$$(OPTFLAGS) $$(C_INCLUDE) $$<' >> $(MAKENAME).tmp \
 		) \
 	done
+	@sed -e 's@'$(MHDDIR)/C_libraries'@'$$\(C_SRCDIR\)'@g' $(MAKENAME).tmp > $(MHDDIR)/C_libraries/BASE/Makefile.depends
+	@rm $(MAKENAME).tmp
 
 clean:
 	rm -f *.o $(TARGET) *.mod *~

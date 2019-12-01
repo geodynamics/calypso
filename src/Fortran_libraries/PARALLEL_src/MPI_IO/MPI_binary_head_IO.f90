@@ -38,7 +38,7 @@
 !!      subroutine mpi_read_mul_charahead_b(IO_param, num, chara_dat)
 !!        Substitution of gz_read_mul_character_b
 !!      subroutine mpi_read_mul_realhead_b(IO_param, num, real_dat)
-!!
+!!      subroutine mpi_read_int4head_b(IO_param, int4_dat)
 !!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !!@endverbatim
 !
@@ -86,7 +86,7 @@
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
 !
-      call open_read_mpi_file                                          &
+      call open_read_mpi_file                                           &
      &   (file_name, num_pe, id_rank, IO_param)
       call calypso_mpi_seek_read_endian                                 &
      &   (IO_param%id_file, IO_param%iflag_bin_swap, IO_param%ioff_gl)
@@ -155,6 +155,7 @@
       type(tmp_i8_array)  :: tmp64
 !
 !
+      if(num .le. 0) return
       call dup_from_short_array(num, int_dat, tmp64)
       call mpi_write_mul_int8head_b(IO_param, tmp64%n1, tmp64%id_a)
       call dealloc_1d_i8array(tmp64)
@@ -170,6 +171,7 @@
       integer(kind = kint_gl), intent(in) :: i8stack(0:num)
 !
 !
+      if(num .le. 0) return
       call mpi_write_mul_int8head_b(IO_param, num, i8stack(1))
 !
       end subroutine mpi_write_i8stack_head_b
@@ -185,6 +187,7 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
         call calypso_mpi_seek_write_int8                                &
@@ -207,6 +210,7 @@
       integer(kind=kint_gl) :: num64
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
         num64 = num
@@ -228,6 +232,7 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
         call calypso_mpi_seek_write_real                                &
@@ -304,6 +309,7 @@
       type(tmp_i8_array)  :: tmp64
 !
 !
+      if(num .le. 0) return
       call alloc_1d_i8array(num, tmp64)
       call mpi_read_mul_int8head_b(IO_param, tmp64%n1, tmp64%id_a)
       call dup_to_short_array(tmp64, int_dat)
@@ -320,6 +326,7 @@
 !
 !
       i8stack(0) = 0
+      if(num .le. 0) return
       call mpi_read_mul_int8head_b(IO_param, num, i8stack(1))
 !
       end subroutine mpi_read_i8stack_head_b
@@ -336,6 +343,7 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
         call calypso_mpi_seek_read_int8                                 &
@@ -363,6 +371,7 @@
       integer(kind = kint_gl) :: ilen_64
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
         call calypso_mpi_seek_read_mul_chara(IO_param%id_file, ioffset, &
@@ -387,6 +396,7 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
         call calypso_mpi_seek_read_real                                 &
@@ -398,6 +408,24 @@
       call calypso_mpi_bcast_real(real_dat, num, 0)
 !
       end subroutine mpi_read_mul_realhead_b
+!
+! -----------------------------------------------------------------------
+!
+      subroutine mpi_read_int4head_b(IO_param, int4_dat)
+!
+      type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!
+      integer, intent(inout) :: int4_dat
+!
+      integer(kind = MPI_OFFSET_KIND) :: ioffset
+!
+!
+      ioffset = IO_param%ioff_gl
+      call calypso_mpi_seek_read_int4head                               &
+     &   (IO_param%id_file, int4_dat, ioffset)
+      IO_param%ioff_gl = ioffset
+!
+      end subroutine mpi_read_int4head_b
 !
 ! -----------------------------------------------------------------------
 !

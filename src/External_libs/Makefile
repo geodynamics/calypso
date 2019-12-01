@@ -71,23 +71,23 @@ module:
 		GMAKE='$(GMAKE)' \
 		MAKEDIR='$(MAKEDIR)' \
 		MAKENAME='$(MAKENAME)' \
-		MAKE_MOD_DEP='$(MAKE_MOD_DEP)' \
 		module; \
 		) \
 	done
 
-includes:
+depends:
 	@for dir in $(SUBDIRS) ; do \
 		( \
-		echo 'copy C include files for ' $$dir ; \
+		echo 'generate compile commands for ' $$dir ; \
 		cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
+		MAKEDIR='$(MAKEDIR)' \
 		MAKENAME='$(MAKENAME)' \
-		includes; \
+		MAKE_MOD_DEP='$(MAKE_MOD_DEP)' \
+		depends; \
 		) \
 	done
-
 
 clean:
 	@for dir in $(SUBDIRS); do \

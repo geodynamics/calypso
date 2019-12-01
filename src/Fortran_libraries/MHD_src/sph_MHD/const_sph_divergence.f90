@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine const_sph_scalar_advect                              &
-!!     &         (sph_rj, r_2nd, sph_bc, fdm2_center, g_sph_rj,         &
+!!     &         (sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center, g_sph_rj,  &
 !!     &          is_flux, is_advect, rj_fld)
 !!      subroutine const_sph_div_force(sph_rj, r_2nd, sph_bc_U,         &
 !!     &          g_sph_rj, is_fld, is_div, rj_fld)
@@ -16,6 +16,7 @@
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(sph_boundary_type), intent(in) :: sph_bc
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
+!!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
 !!        type(phys_data), intent(inout) :: rj_fld
 !!@endverbatim
@@ -36,6 +37,7 @@
       use t_phys_data
       use t_fdm_coefs
       use t_boundary_params_sph_MHD
+      use t_boundary_sph_spectr
       use t_coef_fdm2_MHD_boundaries
 !
       implicit none
@@ -47,15 +49,17 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_sph_scalar_advect                                &
-     &         (sph_rj, r_2nd, sph_bc, fdm2_center, g_sph_rj,           &
+     &         (sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center, g_sph_rj,    &
      &          is_flux, is_advect, rj_fld)
 !
       use cal_sph_exp_rotation
-      use select_exp_scalar_bc
+      use select_exp_scalar_ICB
+      use select_exp_scalar_CMB
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
 !
       integer(kind = kint), intent(in) :: is_flux, is_advect
@@ -68,7 +72,10 @@
      &    sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj, r_2nd%fdm(1)%dmat, &
      &    is_flux, is_advect, rj_fld%n_point, rj_fld%ntot_phys,         &
      &    rj_fld%d_fld)
-      call sel_bc_sph_scalar_advect(sph_rj, sph_bc, fdm2_center,        &
+!
+      call sel_ICB_sph_scalar_advect(sph_rj, sph_bc, bcs_S%ICB_Sspec,   &
+     &    fdm2_center, g_sph_rj, is_flux, is_advect, rj_fld)
+      call sel_CMB_sph_scalar_advect(sph_rj, sph_bc, bcs_S%CMB_Sspec,   &
      &    g_sph_rj, is_flux, is_advect, rj_fld)
 !
       end subroutine const_sph_scalar_advect

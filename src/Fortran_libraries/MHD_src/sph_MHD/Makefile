@@ -3,8 +3,8 @@
 #
 
 MHD_SPH_DIR = $$(MHD_SRCDIR)/sph_MHD
-SRC_SPH_MHD = $(shell ls *.f90 *.F90)
-MOD_SPH_MHD = $(addsuffix .o,$(basename $(SRC_SPH_MHD)) )
+SOURCES = $(shell ls *.f90 *.F90)
+MOD_SPH_MHD = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #
 #  -------------------------------------------------------------------------
@@ -24,7 +24,10 @@ mod_list:
 
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(MHD_SPH_DIR)' $(SRC_SPH_MHD)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(MHD_SPH_DIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *.mod *~ *.par *.diag *.a

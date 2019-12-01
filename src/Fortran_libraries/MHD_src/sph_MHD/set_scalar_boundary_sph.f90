@@ -11,7 +11,7 @@
 !!
 !!@verbatim
 !!      subroutine set_fixed_scalar_sph(n_point, jmax,                  &
-!!     &          kr_bc_st, kr_bc_ed, is_fld, fixed_bc,                 &
+!!     &          kr_bc_st, kr_bc_ed, is_fld, fixed_bc, S_CTR,          &
 !!     &          ntot_phys_rj, d_rj)
 !!
 !!      subroutine adjust_in_fixed_flux_sph                             &
@@ -68,7 +68,7 @@
 !
       subroutine set_fixed_scalar_sph                                   &
      &         (jmax, inod_rj_center, idx_rj_degree_zero,               &
-     &          kr_bc_st, kr_bc_ed, is_fld, fixed_bc,                   &
+     &          kr_bc_st, kr_bc_ed, is_fld, fixed_bc, S_CTR,            &
      &          n_point, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: is_fld
@@ -76,6 +76,7 @@
       integer(kind = kint), intent(in) :: idx_rj_degree_zero
       integer(kind = kint), intent(in) :: jmax, kr_bc_st, kr_bc_ed
       real(kind = kreal), intent(in) :: fixed_bc(jmax)
+      real(kind = kreal), intent(in) :: S_CTR
 !
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
@@ -96,7 +97,7 @@
       if(idx_rj_degree_zero .eq. 0) return
       if(kr_bc_st .ne. ione) return
 !
-      d_rj(inod_rj_center,is_fld) = fixed_bc(idx_rj_degree_zero)
+      d_rj(inod_rj_center,is_fld) = S_CTR
 !
       end subroutine set_fixed_scalar_sph
 !

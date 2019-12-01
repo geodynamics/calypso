@@ -30,6 +30,8 @@
       use t_const_spherical_grid
       use t_ctl_params_gen_sph_shell
 !
+      use para_const_kemoview_mesh
+!
       implicit none
 !
       character (len = kchara)                                          &
@@ -51,6 +53,7 @@
       type(sph_group_data), save, private ::  sph_grps
       type(mesh_data), save, private :: geofem
 !
+      type(parallel_make_vierwer_mesh), save, private :: para_v1
 !
       private :: control_file_name
       private :: sph_const, SPH_MAKE_ctl
@@ -101,30 +104,45 @@
 !  ========= Generate spherical harmonics table ========================
 !
       if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_grids'
-      call para_gen_sph_grids(sph_const, gen_sph_G)
+      call para_gen_sph_grids                                           &
+     &   (sph_files1%sph_file_param, sph_const, gen_sph_G)
       call dealloc_gen_mesh_params(gen_sph_G)
 !
       if(sph_files1%FEM_mesh_flags%iflag_access_FEM .eq. 0) goto 99
 !
+!  ========= Generate FEM mesh ===========================
+!
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+3)
       if(iflag_debug .gt. 0) write(*,*) 'load_para_SPH_and_FEM_mesh'
       call load_para_SPH_and_FEM_mesh                                   &
-     &   (sph_files1%FEM_mesh_flags, sph_const, comms_sph, sph_grps,    &
+     &   (sph_files1%FEM_mesh_flags, sph_files1%sph_file_param,         &
+     &    sph_const, comms_sph, sph_grps,                               &
      &    geofem, sph_files1%mesh_file_IO, gen_sph_G)
       call calypso_MPI_barrier
 !
       call dealloc_gen_sph_fem_mesh_param(gen_sph_G)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+3)
 !
-      if(sph_files1%FEM_mesh_flags%iflag_output_SURF .eq. 0) goto 99
+!  ========= Generate viewer mesh ===========================
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+4)
-      if(iflag_debug .gt. 0) write(*,*) 'FEM_mesh_initialization'
-      call FEM_mesh_initialization(geofem%mesh, geofem%group)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+4)
-      call end_elapsed_time(ied_total_elapsed)
+      if(sph_files1%FEM_mesh_flags%iflag_output_VMESH .gt. 0) then
+        if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+5)
+        if(iflag_debug .gt. 0) write(*,*) 'pickup_surface_mesh'
+        call pickup_surface_mesh(sph_files1%mesh_file_IO, para_v1)
+        if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+5)
+      end if
+!
+!  ========= Generate FEM surface and edge mesh =======================
+!
+!      if(sph_files1%FEM_mesh_flags%iflag_output_SURF .eq. 0) goto 99
+!
+!      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+4)
+!      if(iflag_debug .gt. 0) write(*,*) 'FEM_mesh_initialization'
+!      call FEM_mesh_initialization(geofem%mesh, geofem%group)
+!      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+4)
 !
   99  continue
+      call end_elapsed_time(ied_total_elapsed)
 !
       call output_elapsed_times
       call calypso_MPI_barrier

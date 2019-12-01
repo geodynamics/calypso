@@ -139,8 +139,8 @@
       if( (IO_param%nloop*nprocs + my_rank) .lt. nprocs_in) then
         IO_param%nloop = IO_param%nloop + 1
       end if
-      if(i_debug .gt. 0) write(*,*) 'IO_param%nloop',                   &
-     &                                   my_rank, IO_param%nloop
+!      if(i_debug .gt. 0) write(*,*) 'IO_param%nloop',                  &
+!     &                                   my_rank, IO_param%nloop
 !
       allocate(IO_param%r_array(IO_param%nloop))
       allocate(IO_param%v_array(IO_param%nloop))

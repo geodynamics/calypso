@@ -7,7 +7,8 @@
 !>@brief  Main loop to generate spherical harmonics indices
 !!
 !!@verbatim
-!!      subroutine para_gen_sph_grids(sph, gen_sph)
+!!      subroutine para_gen_sph_grids(sph_file_param, sph, gen_sph)
+!!        type(field_IO_params), intent(in) :: sph_file_param
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
 !!        type(sph_grids), intent(inout) :: sph
 !!@endverbatim
@@ -26,6 +27,7 @@
       use t_const_spherical_grid
       use t_sph_local_parameter
       use t_sph_mesh_1d_connect
+      use t_file_IO_parameter
 !
       implicit none
 !
@@ -50,7 +52,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine para_gen_sph_grids(sph, gen_sph)
+      subroutine para_gen_sph_grids(sph_file_param, sph, gen_sph)
 !
       use m_elapsed_labels_gen_SPH
       use set_global_spherical_param
@@ -59,6 +61,7 @@
       use const_global_sph_grids_modes
       use const_sph_radial_grid
 !
+      type(field_IO_params), intent(in) :: sph_file_param
       type(sph_grids), intent(inout) :: sph
       type(construct_spherical_grid), intent(inout) :: gen_sph
 !
@@ -87,14 +90,15 @@
       allocate(comm_rlm_mul(gen_sph%s3d_ranks%ndomain_sph))
 !
         if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rlm_grids'
-      call mpi_gen_sph_rlm_grids                                        &
-     &   (gen_sph, sph%sph_params, sph%sph_rlm, comm_rlm_mul)
+      call mpi_gen_sph_rlm_grids(sph_file_param,                        &
+     &    gen_sph, sph%sph_params, sph%sph_rlm, comm_rlm_mul)
       call bcast_comm_stacks_sph                                        &
      &   (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+1)
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
-      call mpi_gen_sph_rj_modes(comm_rlm_mul, sph%sph_params,           &
+      call mpi_gen_sph_rj_modes                                         &
+     &   (sph_file_param, comm_rlm_mul, sph%sph_params,                 &
      &    gen_sph, sph%sph_rlm, sph%sph_rj)
       call dealloc_comm_stacks_sph                                      &
      &   (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
@@ -105,14 +109,15 @@
       allocate(comm_rtm_mul(gen_sph%s3d_ranks%ndomain_sph))
 !
       if(iflag_debug .gt. 0) write(*,*) 'mpi_gen_sph_rtm_grids'
-      call mpi_gen_sph_rtm_grids                                        &
-     &     (gen_sph, sph%sph_params, sph%sph_rtm, comm_rtm_mul)
+      call mpi_gen_sph_rtm_grids(sph_file_param,                        &
+     &    gen_sph, sph%sph_params, sph%sph_rtm, comm_rtm_mul)
       call bcast_comm_stacks_sph                                        &
      &   (gen_sph%s3d_ranks%ndomain_sph, comm_rtm_mul)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+1)
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
-      call mpi_gen_sph_rtp_grids(comm_rtm_mul, sph%sph_params,          &
+      call mpi_gen_sph_rtp_grids                                        &
+     &   (sph_file_param, comm_rtm_mul, sph%sph_params,                 &
      &    gen_sph, sph%sph_rtp, sph%sph_rtm)
       call dealloc_comm_stacks_sph                                      &
      &   (gen_sph%s3d_ranks%ndomain_sph, comm_rtm_mul)

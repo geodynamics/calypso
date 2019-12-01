@@ -7,8 +7,9 @@
 !>@brief  Load mesh and filtering data for MHD simulation
 !!
 !!@verbatim
-!!      subroutine select_make_SPH_mesh(iflag_make_SPH,                 &
+!!      subroutine select_make_SPH_mesh(iflag_make_SPH, sph_file_param, &
 !!     &          sph, comms_sph, sph_grps, sph_maker, fem, MHD_files)
+!!        type(field_IO_params), intent(in) :: sph_file_param
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(sph_comm_tables), intent(inout) :: comms_sph
 !!        type(sph_group_data), intent(inout) ::  sph_grps
@@ -52,7 +53,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine select_make_SPH_mesh(iflag_make_SPH,                   &
+      subroutine select_make_SPH_mesh(iflag_make_SPH, sph_file_param,   &
      &          sph, comms_sph, sph_grps, sph_maker, fem, MHD_files)
 !
       use m_error_IDs
@@ -60,6 +61,7 @@
       use parallel_gen_sph_grids
 !
       integer(kind = kint), intent(in) :: iflag_make_SPH
+      type(field_IO_params), intent(in) :: sph_file_param
       type(sph_grids), intent(inout) :: sph
       type(sph_comm_tables), intent(inout) :: comms_sph
       type(sph_group_data), intent(inout) ::  sph_grps
@@ -73,10 +75,11 @@
 !
       if(my_rank .eq. izero) then
         iflag_lc = 0
-        if     (check_exsist_rtp_file(my_rank) .ne. 0                   &
-     &     .or. check_exsist_rtm_file(my_rank) .ne. 0                   &
-     &     .or. check_exsist_rlm_file(my_rank) .ne. 0                   &
-     &     .or. check_exsist_rj_file(my_rank) .ne.  0) iflag_lc = 1
+        if     (check_exsist_rtp_file(my_rank, sph_file_param) .ne. 0   &
+     &     .or. check_exsist_rtm_file(my_rank, sph_file_param) .ne. 0   &
+     &     .or. check_exsist_rlm_file(my_rank, sph_file_param) .ne. 0   &
+     &     .or. check_exsist_rj_file(my_rank, sph_file_param) .ne.  0)  &
+     &    iflag_lc = 1
       end if
       call MPI_BCAST(iflag_lc, 1, CALYPSO_INTEGER, 0,                   &
      &    CALYPSO_COMM, ierr_MPI)
@@ -88,13 +91,15 @@
      &     'Set parameters for spherical shell')
       else
         if (my_rank.eq.0) write(*,*) 'Make spherical harmonics table'
-        call para_gen_sph_grids(sph_maker%sph_tmp, sph_maker%gen_sph)
+        call para_gen_sph_grids                                         &
+     &     (sph_file_param, sph_maker%sph_tmp, sph_maker%gen_sph)
         call dealloc_gen_mesh_params(sph_maker%gen_sph)
       end if
 !
       if (iflag_debug.eq.1) write(*,*) 'load_para_SPH_and_FEM_mesh'
       call load_para_SPH_and_FEM_mesh                                   &
-     &   (MHD_files%FEM_mesh_flags, sph, comms_sph, sph_grps, fem,      &
+     &   (MHD_files%FEM_mesh_flags, sph_file_param,                     &
+     &    sph, comms_sph, sph_grps, fem,                                &
      &    MHD_files%mesh_file_IO, sph_maker%gen_sph)
       call dealloc_gen_sph_fem_mesh_param(sph_maker%gen_sph)
 !

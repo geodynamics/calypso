@@ -204,6 +204,12 @@
       call add_field_name_4_sph_trns(ipol%i_grad_jz, fhd_grad_j_3,      &
      &     n_vector, ipol%i_grad_jz, itor%i_grad_jz, iphys%i_grad_jz,   &
      &    b_trns%i_grad_jz, trns_back)
+!
+      call add_field_name_4_sph_trns_snap                               &
+     &   (fhd_truncated_B, n_vector, ipol%i_truncated_B,                &
+     &    itor%i_truncated_B, iphys%i_truncated_B,                      &
+     &    b_trns%i_truncated_B, trns_back)
+!
       trns_back%num_vector = trns_back%nfield
 !
       end subroutine b_trans_address_vector_snap

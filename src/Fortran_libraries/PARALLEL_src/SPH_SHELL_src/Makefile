@@ -3,8 +3,8 @@
 #
 
 SPH_COMMDIR = $$(PARA_SRCDIR)/SPH_SHELL_src
-SRC_COMM_SPH = $(shell ls *.f90 *.F90)
-MOD_COMM_SPH = $(addsuffix .o,$(basename $(SRC_COMM_SPH)) )
+SOURCES = $(shell ls *.f90 *.F90)
+MOD_COMM_SPH = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #
 #  -------------------------------------------------------------------------
@@ -24,7 +24,10 @@ mod_list:
 
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(SPH_COMMDIR)' $(SRC_COMM_SPH)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(SPH_COMMDIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *.mod *~ *.par *.diag *.a

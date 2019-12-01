@@ -1,0 +1,5 @@
+gauss_integration.o: $(GAUSSDIR)/gauss_integration.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_gauss_points.o: $(GAUSSDIR)/t_gauss_points.f90 m_precision.o m_constants.o gauss_integration.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

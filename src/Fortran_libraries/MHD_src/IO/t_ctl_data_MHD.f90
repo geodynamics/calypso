@@ -36,7 +36,7 @@
       use t_ctl_data_gen_sph_shell
       use t_control_data_sections
       use t_control_data_isosurfaces
-      use t_control_data_zm_vizs
+      use t_control_data_dynamo_vizs
 !
       implicit none
 !
@@ -68,7 +68,7 @@
         type(isosurf_controls) :: iso_ctls
 !
 !>        Structures of zonal mean controls
-        type(sph_zonal_means_controls) :: zm_ctls
+        type(sph_dynamo_viz_controls) :: zm_ctls
 !
         integer (kind=kint) :: i_mhd_ctl = 0
       end type DNS_mhd_simulation_control
@@ -90,9 +90,17 @@
       character(len=kchara), parameter                                  &
      &      :: hd_monitor_data = 'monitor_data_ctl'
 !
+      character(len=kchara), parameter                                  &
+     &                    :: hd_dynamo_viz_ctl = 'dynamo_vizs_control'
+!
+!>      Here is the old label
+      character(len=kchara), parameter                                  &
+     &                    :: hd_zm_viz_ctl = 'zonal_mean_control'
+!
       private :: hd_platform, hd_org_data, hd_new_data
       private :: hd_sph_shell, hd_model, hd_control
       private :: hd_pick_sph, hd_monitor_data
+      private :: hd_dynamo_viz_ctl, hd_zm_viz_ctl
 !
 ! ----------------------------------------------------------------------
 !
@@ -140,8 +148,10 @@
         call s_read_sections_control_data                               &
      &     (id_control, MHD_ctl%psf_ctls, MHD_ctl%iso_ctls, c_buf)
 !
-        call read_zonal_mean_control                                    &
-     &     (id_control, MHD_ctl%zm_ctls, c_buf)
+        call read_dynamo_viz_control                                    &
+     &     (id_control, hd_dynamo_viz_ctl, MHD_ctl%zm_ctls, c_buf)
+      call read_dynamo_viz_control                                    &
+	 &     (id_control, hd_zm_viz_ctl, MHD_ctl%zm_ctls, c_buf)
       end do
       MHD_ctl%i_mhd_ctl = 1
 !
@@ -199,7 +209,7 @@
       call bcast_sph_mhd_ctl_data(MHD_ctl)
       call bcast_files_4_psf_ctl(MHD_ctl%psf_ctls)
       call bcast_files_4_iso_ctl(MHD_ctl%iso_ctls)
-      call bcast_zonal_mean_control(MHD_ctl%zm_ctls)
+      call bcast_dynamo_viz_control(MHD_ctl%zm_ctls)
 !
       end subroutine bcast_sph_mhd_ctl_w_psf
 !

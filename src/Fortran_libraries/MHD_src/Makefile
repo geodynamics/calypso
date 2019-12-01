@@ -70,12 +70,24 @@ mod_list:
 
 module:
 	@for dir in $(SUBDIRS); do \
-		( cd $${dir};  \
+		( echo 'generate compile list for ' $$dir ; \
+		cd $${dir};  \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		MAKENAME='$(MAKENAME)' \
+		module; \
+		) \
+	done
+
+depends:
+	@for dir in $(SUBDIRS); do \
+		( \
+		echo 'generate dependencies for ' $$dir ; \
+		cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKE_MOD_DEP='$(MAKE_MOD_DEP)' \
-		MAKENAME='$(MAKENAME)' \
-		module; \
+		depends; \
 		) \
 	done
 

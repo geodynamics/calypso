@@ -67,17 +67,20 @@
       type(field_IO_params), intent(in) :: sph_mesh_file
       type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
 !
+      type(field_IO_params) :: sph_file_param
       type(sph_file_data_type) :: sph_file
       integer :: id_rank, ip
       integer(kind = kint) :: iloop, ierr
 !
 !
-      sph_file_head = sph_mesh_file%file_prefix
-      iflag_sph_file_fmt = sph_mesh_file%iflag_format
+      call set_sph_mesh_file_fmt_prefix                                 &
+     &   (sph_mesh_file%iflag_format, sph_mesh_file%file_prefix,        &
+     &    sph_file_param)
       do iloop = 0, (num_pe-1) / nprocs
         id_rank = my_rank + iloop * nprocs
         ip = id_rank + 1
-        call sel_mpi_read_spectr_rj_file(num_pe, id_rank, sph_file)
+        call sel_mpi_read_spectr_rj_file                                &
+     &     (num_pe, id_rank, sph_file_param, sph_file)
 !
         if(id_rank .lt. num_pe) then
           call input_modes_rj_sph_trans(sph_file,                       &

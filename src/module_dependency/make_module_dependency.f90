@@ -300,14 +300,7 @@
       call alloc_mod_list
 !
       open(id_makefile, file = fname_makefile)
-!
-      do
-        read (id_makefile,'(a)', end=99, err=98) tmpchara
-      end do
-!
-  99  continue
-      backspace(id_makefile)
-  98  continue
+!      open(id_makefile, file = fname_makefile, position='append')
 !
       do i = 1, num_file
         call make_module_dependency(dirname, filenames(i))

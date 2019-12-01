@@ -13,7 +13,6 @@
 !!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(field_IO_params), intent(inout) ::  mesh_file
-!!        type(field_IO_params), intent(inout) :: sph_file_param
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
 !!      subroutine set_control_4_shell_grids(nprocs_check,              &
 !!     &          Fmesh_ctl, spctl, sdctl, sph, gen_sph, ierr)
@@ -44,6 +43,8 @@
       type gen_sph_file_IO_params
 !>        FEM mesh IO flags
         type(FEM_file_IO_flags) :: FEM_mesh_flags
+!>        Structure of mesh file IO paramters
+        type(field_IO_params) :: sph_file_param
 !>        Structure of mesh file IO paramters
         type(field_IO_params) :: mesh_file_IO
 !>        Structure of file name and format for spectr data file
@@ -112,8 +113,8 @@
 !
       call turn_off_debug_flag_by_ctl(id_rank, plt)
       call set_control_sph_mesh(plt, Fmesh_ctl,                         &
-     &    sph_files%mesh_file_IO, sph_files%sph_file_IO,                &
-     &    sph_files%FEM_mesh_flags)
+     &    sph_files%sph_file_param, sph_files%mesh_file_IO,             &
+     &    sph_files%sph_file_IO, sph_files%FEM_mesh_flags)
 !
       end subroutine set_control_4_shell_files
 !
@@ -229,7 +230,8 @@
       type(layering_group_list), intent(inout) :: added_radial_grp
       integer(kind = kint), intent(inout) :: ierr
 !
-      integer(kind = kint) :: i, kr, icou
+      integer(kind = kint) :: i, kr, icou, nele
+      integer(kind = kint) :: increment_cheby = 1
       real(kind = kreal) :: ICB_to_CMB_ratio, fluid_core_size
       real(kind = kreal) :: r_in, r_out
 !
@@ -356,8 +358,26 @@
 !
         if(r_in .eq. zero)  sph_rj%iflag_rj_center = 1
 !
-        call count_set_radial_grid(spctl%num_fluid_grid_ctl%intvalue,   &
-     &      r_in,  r_out, sph_params, sph_rtp, s3d_radius)
+        increment_cheby = 1
+        if(spctl%increment_cheby_ctl%iflag .gt. 0) then
+          increment_cheby = spctl%increment_cheby_ctl%intvalue
+          if(increment_cheby .le. 0) increment_cheby = 1
+        end if
+!
+        if(sph_params%iflag_radial_grid .eq. igrid_half_Chebyshev       &
+     &     .or. sph_params%iflag_radial_grid .eq. igrid_Chebyshev) then
+          nele = sph_params%nlayer_CMB-sph_params%nlayer_ICB
+          if(mod(nele,increment_cheby) .ne. 0) then
+            write(*,*) 'Chebyshev increment should be ',                &
+     &                 'devisor of (# fluid grid - 1)'
+            ierr = ierr_mesh
+            return
+          end if
+        end if
+!
+        call count_set_radial_grid                                      &
+     &     (spctl%num_fluid_grid_ctl%intvalue, r_in, r_out,             &
+     &      increment_cheby, sph_params, sph_rtp, s3d_radius)
       end if
 !
 !       Check whole sphere model

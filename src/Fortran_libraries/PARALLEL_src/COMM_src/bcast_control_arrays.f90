@@ -21,6 +21,8 @@
 !!        type(read_int3_item), intent(inout) :: int3_item
 !!      subroutine bcast_ctl_type_c3(chara3_item)
 !!        type(read_chara3_item), intent(inout) :: chara3_item
+!!      subroutine bcast_ctl_type_c_i3(ci3_item)
+!!        type(read_chara_int3_item), intent(inout) :: ci3_item
 !!
 !!      subroutine bcast_ctl_array_r1(array_real)
 !!        type(ctl_array_real), intent(inout) :: array_real
@@ -54,6 +56,8 @@
 !!        type(ctl_array_i2r), intent(inout) :: array_i2r
 !!      subroutine bcast_ctl_array_i2r2(array_i2r2)
 !!        type(ctl_array_i2r2), intent(inout) :: array_i2r2
+!!      subroutine bcast_ctl_array_ci3(array_ci3)
+!!        type(ctl_array_ci3), intent(inout) :: array_ci3
 !!@endverbatim
 !!
 !!@n @param  label           label for control items
@@ -73,6 +77,7 @@
 !!@n @param  array_ir        structures for array
 !!@n @param  array_i2r       structures for array
 !!@n @param  array_i2r2      structures for array
+!!@n @param  array_ci3       structures for array
 !!
       module bcast_control_arrays
 !
@@ -198,6 +203,24 @@
      &               CALYPSO_CHARACTER, 0, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine bcast_ctl_type_c3
+!
+!   --------------------------------------------------------------------
+!
+      subroutine bcast_ctl_type_c_i3(ci3_item)
+!
+      type(read_chara_int3_item), intent(inout) :: ci3_item
+!
+!
+      if(nprocs .eq. 1) return
+!
+      call MPI_BCAST(ci3_item%iflag, 1,                                 &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(ci3_item%charavalue, kchara,                       &
+     &               CALYPSO_CHARACTER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(ci3_item%intvalue, 3,                              &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
+      end subroutine bcast_ctl_type_c_i3
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
@@ -364,9 +387,9 @@
 !
       if(nprocs .eq. 1) return
 !
-      call MPI_BCAST(array_c2%num,  1,                                 &
+      call MPI_BCAST(array_c2%num,  1,                                  &
      &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(array_c2%icou, 1,                                 &
+      call MPI_BCAST(array_c2%icou, 1,                                  &
      &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       if(my_rank .ne. 0) call alloc_control_array_c2(array_c2)
@@ -390,9 +413,9 @@
 !
       if(nprocs .eq. 1) return
 !
-      call MPI_BCAST(array_c3%num,  1,                                 &
+      call MPI_BCAST(array_c3%num,  1,                                  &
      &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(array_c3%icou, 1,                                 &
+      call MPI_BCAST(array_c3%icou, 1,                                  &
      &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       if(my_rank .ne. 0) call alloc_control_array_c3(array_c3)
@@ -418,9 +441,9 @@
 !
       if(nprocs .eq. 1) return
 !
-      call MPI_BCAST(array_cr%num,  1,                                 &
+      call MPI_BCAST(array_cr%num,  1,                                  &
      &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(array_cr%icou, 1,                                 &
+      call MPI_BCAST(array_cr%icou, 1,                                  &
      &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       if(my_rank .ne. 0) call alloc_control_array_c_r(array_cr)
@@ -444,9 +467,9 @@
 !
       if(nprocs .eq. 1) return
 !
-      call MPI_BCAST(array_ci%num,  1,                                 &
+      call MPI_BCAST(array_ci%num,  1,                                  &
      &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(array_ci%icou, 1,                                 &
+      call MPI_BCAST(array_ci%icou, 1,                                  &
      &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       if(my_rank .ne. 0) call alloc_control_array_c_i(array_ci)
@@ -625,6 +648,36 @@
      &   (array_i2r2%vec2, cast_long(array_i2r2%num), 0)
 !
       end subroutine bcast_ctl_array_i2r2
+!
+!   --------------------------------------------------------------------
+!
+      subroutine bcast_ctl_array_ci3(array_ci3)
+!
+      use t_control_array_charaint3
+      use transfer_to_long_integers
+!
+      type(ctl_array_ci3), intent(inout) :: array_ci3
+!
+!
+      if(nprocs .eq. 1) return
+!
+      call MPI_BCAST(array_ci3%num,  1,                                 &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(array_ci3%icou, 1,                                 &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
+      if(my_rank .ne. 0) call alloc_control_array_c_i3(array_ci3)
+!
+      call calypso_mpi_bcast_character                                  &
+     &   (array_ci3%c_tbl, cast_long(array_ci3%num*kchara), 0)
+      call calypso_mpi_bcast_int                                        &
+     &   (array_ci3%ivec1, cast_long(array_ci3%num), 0)
+      call calypso_mpi_bcast_int                                        &
+     &   (array_ci3%ivec2, cast_long(array_ci3%num), 0)
+      call calypso_mpi_bcast_int                                        &
+     &   (array_ci3%ivec3, cast_long(array_ci3%num), 0)
+!
+      end subroutine bcast_ctl_array_ci3
 !
 !   --------------------------------------------------------------------
 !

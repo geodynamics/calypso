@@ -79,6 +79,7 @@
      &  .or. (phys_nod_name_ctl .eq. fhd_filter_vecp        )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_filter_magne       )           &
      &  .or. (phys_nod_name_ctl .eq. fhd_filter_current     )           &
+     &  .or. (phys_nod_name_ctl .eq. fhd_truncated_B        )           &
      &      )   iflag = 1
 !
       if (   (phys_nod_name_ctl .eq. fhd_square_v           )           &

@@ -3,8 +3,8 @@
 #
 
 COMMDIR = $$(PARA_SRCDIR)/COMM_src
-SRC_COMM = $(shell ls *.f90 *.F90)
-MOD_COMM = $(addsuffix .o,$(basename $(SRC_COMM)) )
+SOURCES = $(shell ls *.f90 *.F90)
+MOD_COMM = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #
 #  -------------------------------------------------------------------------
@@ -24,7 +24,10 @@ mod_list:
 
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(COMMDIR)' $(SRC_COMM)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(COMMDIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *.mod *~ *.par *.diag *.a

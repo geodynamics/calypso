@@ -77,6 +77,7 @@
       type(tmp_i8_array)  :: tmp64
 !
 !
+      if(num .le. 0) return
       call dup_from_short_array(cast_long(num), int_dat, tmp64)
       call gz_mpi_write_mul_int8head_b(IO_param, tmp64%n1, tmp64%id_a)
       call dealloc_1d_i8array(tmp64)
@@ -109,6 +110,7 @@
       integer(kind = kint_gl), intent(in) :: i8stack(0:num)
 !
 !
+      if(num .le. 0) return
       call gz_mpi_write_mul_int8head_b(IO_param, num, i8stack(1))
 !
       end subroutine gz_mpi_write_i8stack_head_b
@@ -124,6 +126,7 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         call defleate_int8_vector_b(num, int8_dat, zbuf)
 !
@@ -149,6 +152,7 @@
       integer(kind = kint_gl) :: num64
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         num64 = num
         call defleate_1d_character_b(num64, chara_dat, zbuf)
@@ -175,6 +179,7 @@
       integer(kind = kint_gl) :: num64
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         num64 = num
         call defleate_1d_vector_b(num64, real_dat, zbuf)
@@ -233,6 +238,7 @@
       type(tmp_i8_array)  :: tmp64
 !
 !
+      if(num .le. 0) return
       call alloc_1d_i8array(cast_long(num), tmp64)
       call gz_mpi_read_mul_int8head_b(IO_param, tmp64%n1, tmp64%id_a)
       call dup_to_short_array(tmp64, int_dat)
@@ -266,6 +272,7 @@
 !
 !
       i8stack(0) = 0
+      if(num .le. 0) return
       call gz_mpi_read_mul_int8head_b(IO_param, num, i8stack(1))
 !
       end subroutine gz_mpi_read_i8stack_head_b
@@ -283,6 +290,7 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
         zbuf%ilen_gz = int(dble(num*kint_gl)*1.01+24, KIND(zbuf%ilen_gz))
@@ -316,6 +324,7 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
         zbuf%ilen_gz = int(real(num*kchara)*1.01+24,KIND(zbuf%ilen_gz))
@@ -346,6 +355,7 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
+      if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
         zbuf%ilen_gz = int(dble(num*kreal)*1.01+24, KIND(zbuf%ilen_gz))

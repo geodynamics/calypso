@@ -1,0 +1,17 @@
+FFTPACK5_wrapper.o: $(FFT_WRAP_DIR)/FFTPACK5_wrapper.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+FFTW3_multi_wrapper.o: $(FFT_WRAP_DIR)/FFTW3_multi_wrapper.F90 m_precision.o m_constants.o
+	$(F90) -c $(F90FLAGS) $<
+FFTW3_wrapper.o: $(FFT_WRAP_DIR)/FFTW3_wrapper.F90 m_precision.o m_constants.o
+	$(F90) -c $(F90FLAGS) $<
+m_FFT_selector.o: $(FFT_WRAP_DIR)/m_FFT_selector.f90 m_precision.o skip_comment_f.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_FFTPACK5_wrapper.o: $(FFT_WRAP_DIR)/t_FFTPACK5_wrapper.f90 m_precision.o m_constants.o FFTPACK5_wrapper.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_FFTW_wrapper.o: $(FFT_WRAP_DIR)/t_FFTW_wrapper.f90 m_precision.o m_constants.o FFTW3_wrapper.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_FFT_selector.o: $(FFT_WRAP_DIR)/t_FFT_selector.F90 m_precision.o m_machine_parameter.o m_FFT_selector.o t_FFTPACK5_wrapper.o t_FFTW_wrapper.o t_multi_FFTW_wrapper.o
+	$(F90) -c $(F90FLAGS) $<
+t_multi_FFTW_wrapper.o: $(FFT_WRAP_DIR)/t_multi_FFTW_wrapper.f90 m_precision.o m_constants.o FFTW3_multi_wrapper.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

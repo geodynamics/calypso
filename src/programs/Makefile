@@ -2,6 +2,8 @@
 #
 #
 
+PROG_DIR = $$(MHDDIR)/programs
+
 SUBDIRS = \
 SPH_MHD \
 \
@@ -32,7 +34,7 @@ LIB_FILES_MESH_UTILS = \
 #
 
 dir_list:
-	@echo 'PROG_DIR = $$(MHDDIR)/programs'     >> $(MAKENAME)
+	@echo 'PROG_DIR = $(PROG_DIR)'     >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( \
@@ -111,16 +113,24 @@ mod_list:
 module:
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
+		echo 'generate compile list for ' $$dir ; \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
-		MAKE_MOD_DEP='$(MAKE_MOD_DEP)' \
 		MAKENAME='$(MAKENAME)' \
 		module; \
 		) \
 	done
 
-includes:
-
+depends:
+	@for dir in $(SUBDIRS); do \
+		( cd $${dir};  \
+		echo 'generate dependencies for ' $$dir ; \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		MAKE_MOD_DEP='$(MAKE_MOD_DEP)' \
+		depends; \
+		) \
+	done
 
 clean:
 	@for dir in $(SUBDIRS); do \

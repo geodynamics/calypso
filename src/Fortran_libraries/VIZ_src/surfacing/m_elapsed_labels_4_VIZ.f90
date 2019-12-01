@@ -57,7 +57,7 @@
 !
 !
       call reset_elapse_after_init_VIZ_top
-      call reset_elapse_after_init_PVR
+!      call reset_elapse_after_init_PVR
       call reset_elapse_after_init_LIC
 !
       end subroutine reset_elapse_after_init_VIZ
@@ -98,20 +98,37 @@
 !
       subroutine elpsed_label_4_PVR
 !
-      integer(kind = kint), parameter :: num_append = 4
+      integer(kind = kint), parameter :: num_append = 12
 !
 !
       call append_elapsed_times                                         &
      &   (num_append, ist_elapsed_PVR, ied_elapsed_PVR)
 !
-      elps1%labels(ist_elapsed_PVR+1)                                  &
+      elps1%labels(ist_elapsed_PVR+1)                                   &
      &                    = 'Volume rendering w/o file output   '
-      elps1%labels(ist_elapsed_PVR+2)                                  &
+      elps1%labels(ist_elapsed_PVR+2)                                   &
      &                    = 'Volume rendering file output   '
-      elps1%labels(ist_elapsed_PVR+3)                                  &
+      elps1%labels(ist_elapsed_PVR+3)                                   &
      &                    = 'V. Rendering ray trace   '
-      elps1%labels(ist_elapsed_PVR+4)                                  &
+      elps1%labels(ist_elapsed_PVR+4)                                   &
      &                    = 'V. Rendering subimage composit   '
+!
+      elps1%labels(ist_elapsed_PVR+5)                                  &
+     &                    = 'bcast_pvr_controls  '
+      elps1%labels(ist_elapsed_PVR+6)                                  &
+     &                    = 'set_pvr_controls  '
+      elps1%labels(ist_elapsed_PVR+7)                                  &
+     &                    = 'each_PVR_initialize  '
+      elps1%labels(ist_elapsed_PVR+8)                                  &
+     &                    = 's_const_comm_tbl_img_output  '
+      elps1%labels(ist_elapsed_PVR+9)                                  &
+     &                    = 's_const_comm_tbl_img_composit  '
+      elps1%labels(ist_elapsed_PVR+10)                                  &
+     &                    = 'calypso_SR_type_int pvr_init  '
+      elps1%labels(ist_elapsed_PVR+11)                                  &
+     &                    = 'calypso_SR_type_1 pvr_init '
+      elps1%labels(ist_elapsed_PVR+12)                                  &
+     &                    = 'set_image_stacking_and_recv  '
 !
       iflag_PVR_time = .TRUE.
 !

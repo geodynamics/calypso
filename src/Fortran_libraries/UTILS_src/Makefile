@@ -84,11 +84,23 @@ module:
 	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
+		echo 'generate compilie list for ' $$dir ; \
+		$(GMAKE) \
+		GMAKE='$(GMAKE)' \
+		MAKENAME='$(MAKENAME)' \
+		module; \
+		) \
+	done
+
+depends:
+	@echo '' >> $(MAKENAME)
+	@for dir in $(SUBDIRS); do \
+		( cd $${dir};  \
+		echo 'generate dependencies for ' $$dir ; \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKE_MOD_DEP='$(MAKE_MOD_DEP)' \
-		MAKENAME='$(MAKENAME)' \
-		module; \
+		depends; \
 		) \
 	done
 

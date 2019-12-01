@@ -67,4 +67,7 @@ mod_list:
 	@echo  '#'  >> $(MAKENAME)
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(GEN_SPH_GRIDDIR)' $(SOURCES)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(GEN_SPH_GRIDDIR)' $(SOURCES)

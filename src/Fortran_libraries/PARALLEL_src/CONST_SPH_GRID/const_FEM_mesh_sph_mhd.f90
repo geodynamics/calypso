@@ -8,8 +8,8 @@
 !!
 !!@verbatim
 !!      subroutine const_FEM_mesh_4_sph_mhd                             &
-!!     &         (FEM_mesh_flags, sph_params, sph_rtp, sph_rj,          &
-!!     &          mesh, group, mesh_file, gen_sph)
+!!     &        (FEM_mesh_flags, mesh_file, sph_params, sph_rtp, sph_rj,&
+!!     &         mesh, group, mesh_file, gen_sph)
 !!      subroutine base_FEM_mesh_sph_mhd                                &
 !!     &         (FEM_mesh_flags, sph_params, sph_rtp, sph_rj,          &
 !!     &          mesh, group, gen_sph)
@@ -56,8 +56,8 @@
 !-----------------------------------------------------------------------
 !
       subroutine const_FEM_mesh_4_sph_mhd                               &
-     &         (FEM_mesh_flags, sph_params, sph_rtp, sph_rj,            &
-     &          mesh, group, mesh_file, gen_sph)
+     &        (FEM_mesh_flags, mesh_file, sph_params, sph_rtp, sph_rj,  &
+     &         mesh, group, gen_sph)
 !
       use calypso_mpi
       use mpi_load_mesh_data
@@ -66,13 +66,13 @@
 !      use parallel_sleeve_extension
 !
       type(FEM_file_IO_flags), intent(in) :: FEM_mesh_flags
+      type(field_IO_params), intent(in) ::  mesh_file
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_rj_grid), intent(in) :: sph_rj
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::  group
-      type(field_IO_params), intent(inout) ::  mesh_file
 !
       type(construct_spherical_grid), intent(inout) :: gen_sph
 !
@@ -91,13 +91,12 @@
 !
 ! Output mesh data
       if(FEM_mesh_flags%iflag_access_FEM .gt. 0) then
-        mesh_file%file_prefix = sph_file_head
         call mpi_output_mesh(mesh_file, mesh, group)
         write(*,'(a,i6,a)')                                             &
      &          'FEM mesh for domain', my_rank, ' is done.'
 !!
 !        if(FEM_mesh_flags%iflag_output_VMESH .gt. 0) then
-!          call pickup_surface_mesh_para(mesh_file, par_view)
+!          call pickup_surface_mesh(mesh_file, par_view)
 !        end if
       end if
 !
@@ -124,8 +123,7 @@
       type(construct_spherical_grid), intent(inout) :: gen_sph
 !
 !
-      call const_global_sph_FEM                                         &
-     &   (sph_rtp, sph_rj, gen_sph%radial_rtp_grp_lc, gen_sph)
+      call const_global_sph_FEM(sph_rtp, sph_rj, gen_sph)
 !
       call const_gauss_colatitude(sph_rtp%nidx_global_rtp(2), gauss_SF)
 !
@@ -148,20 +146,18 @@
 !-----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_global_sph_FEM                                   &
-     &         (sph_rtp, sph_rj, radial_rtp_grp, gen_sph)
+      subroutine const_global_sph_FEM(sph_rtp, sph_rj, gen_sph)
 !
       use set_sph_1d_domain_id
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(group_data), intent(in) :: radial_rtp_grp
 !
       type(construct_spherical_grid), intent(inout) :: gen_sph
 !
 !
       if(iflag_debug .gt. 0) write(*,*) 'const_global_rtp_mesh'
-      call const_global_rtp_mesh(sph_rtp, radial_rtp_grp,               &
+      call const_global_rtp_mesh(sph_rtp, gen_sph%radial_rtp_grp_lc,    &
      &    gen_sph%s3d_ranks, sph_dbc_SF, gen_sph%sph_lcp,               &
      &    gen_sph%stk_lc1d, gen_sph%sph_gl1d)
 !

@@ -43,7 +43,7 @@
         integer(kind=kint) :: icou = 0
 !>     array for 1st character
         character(len=kchara), allocatable :: c_tbl(:)
-!>     array for 1st real
+!>     array for 1st integer
         integer(kind = kint), allocatable :: ivec(:)
       end type ctl_array_ci
 !

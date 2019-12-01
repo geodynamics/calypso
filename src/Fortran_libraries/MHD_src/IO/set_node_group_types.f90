@@ -33,7 +33,14 @@
 !>      control name for fixed field by external file
       character(len = kchara), parameter :: fixed_file =    'file'
 !>      control name for fixed field by external file
-      character(len = kchara), parameter :: fixed_file_bc = 'fixed_file'
+      character(len = kchara), parameter                                &
+     &                           :: fixed_file_bc = 'fixed_file'
+!>      control name for evolved field by external file
+      character(len = kchara), parameter                                &
+     &                           :: evo_field_file_bc = 'evolved_field'
+!>      control name for evolved flux by external file
+      character(len = kchara), parameter                                &
+     &                           :: evo_flux_file_bc =  'evolved_flux'
 !>      control name for fixed field in SGS model
       character(len = kchara), parameter :: fixed_SGS =  'sgs'
 !
@@ -136,6 +143,8 @@
       else if(cmp_no_case(bc_type_ctl, fixed_file)                      &
      &   .or. cmp_no_case(bc_type_ctl, fixed_file_bc)) then
         ibc_type =  iflag_bc_file_s
+      else if (cmp_no_case(bc_type_ctl, evo_field_file_bc)) then
+        ibc_type = iflag_bc_evo_field
       end if
 !
       end subroutine set_bc_group_types_scalar
@@ -166,6 +175,12 @@
       else if (cmp_no_case(bc_type_ctl, bc_file_z)                      &
      &    .or. cmp_no_case(bc_type_ctl, fix_file_z)) then
         ibc_type = iflag_bc_file_z
+!
+      else if (cmp_no_case(bc_type_ctl, fixed_file)                     &
+     &    .or. cmp_no_case(bc_type_ctl, fixed_file_bc)) then
+        ibc_type = iflag_bc_file_s
+      else if (cmp_no_case(bc_type_ctl, evo_field_file_bc)) then
+        ibc_type = iflag_bc_evo_field
       end if
 !
       end subroutine set_bc_group_types_vector
@@ -284,6 +299,8 @@
         ibc_type = iflag_bc_fix_flux
       else if (cmp_no_case(bc_type_ctl, flux_file_bc)) then
         ibc_type = iflag_bc_file_flux
+      else if (cmp_no_case(bc_type_ctl, evo_flux_file_bc)) then
+        ibc_type = iflag_bc_evo_flux
       end if
 !
       end subroutine set_bc_group_types_fluxes

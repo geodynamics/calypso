@@ -4,7 +4,8 @@
 !        programmed by H.Matsui on July, 2007
 !
 !!      subroutine count_set_radial_grid                                &
-!!     &          (nele, rmin, rmax, sph_param, sph_rtp, s3d_radius)
+!!     &         (nele, rmin, rmax, increment_cheby,                    &
+!!     &          sph_param, sph_rtp, s3d_radius)
 !!        type(sph_shell_parameters), intent(inout) :: sph_param
 !!        type(sph_rtp_grid), intent(inout) :: sph_rtp
 !!        type(spheric_global_radius), intent(inout) :: s3d_radius
@@ -32,13 +33,14 @@
 !  ---------------------------------------------------------------------
 !
       subroutine count_set_radial_grid                                  &
-     &          (nele, rmin, rmax, sph_param, sph_rtp, s3d_radius)
+     &         (nele, rmin, rmax, increment_cheby,                      &
+     &          sph_param, sph_rtp, s3d_radius)
 !
       use chebyshev_radial_grid
       use half_chebyshev_radial_grid
       use set_radial_grid_sph_shell
 !
-      integer(kind = kint), intent(in) :: nele
+      integer(kind = kint), intent(in) :: nele, increment_cheby
       real(kind = kreal), intent(in) :: rmin, rmax
 !
       type(sph_shell_parameters), intent(inout) :: sph_param
@@ -82,6 +84,13 @@
      &      sph_param%nlayer_ICB, sph_param%nlayer_CMB,                 &
      &      sph_param%radius_ICB, sph_param%radius_CMB,                 &
      &      s3d_radius%radius_1d_gl)
+      end if
+!
+      if(sph_param%iflag_radial_grid .eq. igrid_half_Chebyshev          &
+     &    .or. sph_param%iflag_radial_grid .eq. igrid_Chebyshev) then
+        call adjust_chebyshev_shell(sph_rtp%nidx_global_rtp(1),         &
+     &      sph_param%nlayer_ICB, sph_param%nlayer_CMB,                 &
+     &      increment_cheby, s3d_radius%radius_1d_gl)
       end if
 !
       end subroutine count_set_radial_grid

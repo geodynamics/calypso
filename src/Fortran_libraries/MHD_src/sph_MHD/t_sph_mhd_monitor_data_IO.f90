@@ -63,6 +63,9 @@
         type(sph_mean_squares) :: pwr
 !>        Work area of mean square data
         type(sph_mean_square_work) :: WK_pwr
+!
+!
+        integer(kind = kint) :: ltr_crust
       end type sph_mhd_monitor_data
 !
 !  --------------------------------------------------------------------

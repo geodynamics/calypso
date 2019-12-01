@@ -8,8 +8,14 @@
 !!
 !!
 !!@verbatim
-!!      subroutine alloc_vsp_bc_array(jmax, sph_MHD_bc)
-!!      subroutine dealloc_vsp_bc_array(sph_MHD_bc)
+!!      subroutine set_MHD_evolved_boundaries                           &
+!!     &         (time_d, sph, MHD_prop, sph_MHD_bc)
+!!      subroutine set_cv_evolved_boundaries                            &
+!!     &         (time_d, sph, MHD_prop, sph_MHD_bc)
+!!        type(time_data), intent(in) :: time_d
+!!        type(sph_grids), intent(in) :: sph
+!!        type(MHD_evolution_param), intent(in) :: MHD_prop
+!!        type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
 !!@endverbatim
 !!
 !!@n @param jmax    number of modes for spherical harmonics @f$L*(L+2)@f$
@@ -20,23 +26,15 @@
 !
       use m_precision
       use t_boundary_params_sph_MHD
+      use t_boundary_sph_spectr
       use t_coef_fdm2_MHD_boundaries
       use t_coef_fdm4_MHD_boundaries
+      use t_time_data
+      use t_spheric_parameter
+      use t_control_parameter
 !
       implicit none
 !
-!
-!>      Structure for boundary velocity spectr
-      type sph_velocity_BC_spectr
-!>        Fixed poloidal velocity spectrum for ICB
-        real(kind= kreal), allocatable :: vp_ICB_bc(:)
-!>        Fixed toroidal velocity spectrum for ICB
-        real(kind= kreal), allocatable :: vt_ICB_bc(:)
-!>        Fixed poloidal velocity spectrum for CMB
-        real(kind= kreal), allocatable :: vp_CMB_bc(:)
-!>        Fixed toroidal velocity spectrum for CMB
-        real(kind= kreal), allocatable :: vt_CMB_bc(:)
-      end type sph_velocity_BC_spectr
 !
 !>      Structure for boundary conditions
       type sph_MHD_boundary_data
@@ -49,9 +47,14 @@
 !>        Structure for basic compositional boundary condition parameters
         type(sph_boundary_type) :: sph_bc_C
 !
-!>        Structure for boundary velocity spectr
-        type(sph_velocity_BC_spectr) :: bc_Uspectr
-!
+!>        Structure for boundary velocity field spectr
+        type(sph_vector_boundary_data) :: bcs_U
+!>        Structure for boundary magnetic field spectr
+        type(sph_vector_boundary_data) :: bcs_B
+!>        Structure for boundary temperature spectr
+        type(sph_scalar_boundary_data) :: bcs_T
+!>        Structure for boundary composition spectr
+        type(sph_scalar_boundary_data) :: bcs_C
 !
 !>        Structure for FDM matrix of center
         type(fdm2_center_mat) :: fdm2_center
@@ -71,42 +74,62 @@
         type(fdm4_CMB_vpol) :: fdm4_free_CMB
       end type sph_MHD_boundary_data
 !
-! -----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
       contains
 !
-! -----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
-      subroutine alloc_vsp_bc_array(jmax, bc_Uspectr)
+      subroutine set_MHD_evolved_boundaries                             &
+     &         (time_d, sph, MHD_prop, sph_MHD_bc)
 !
-      integer(kind= kint), intent(in) :: jmax
-      type(sph_velocity_BC_spectr), intent(inout) :: bc_Uspectr
+      use set_evoluved_boundaries
 !
-      allocate(bc_Uspectr%vp_ICB_bc(jmax))
-      allocate(bc_Uspectr%vt_ICB_bc(jmax))
-      allocate(bc_Uspectr%vp_CMB_bc(jmax))
-      allocate(bc_Uspectr%vt_CMB_bc(jmax))
+      type(time_data), intent(in) :: time_d
+      type(sph_grids), intent(in) :: sph
+      type(MHD_evolution_param), intent(in) :: MHD_prop
 !
-      if(jmax .le. 0) return
-      bc_Uspectr%vp_ICB_bc = 0.0d0
-      bc_Uspectr%vt_ICB_bc = 0.0d0
-      bc_Uspectr%vp_CMB_bc = 0.0d0
-      bc_Uspectr%vt_CMB_bc = 0.0d0
+      type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
 !
-      end subroutine alloc_vsp_bc_array
 !
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
+      call set_cv_evolved_boundaries(time_d, sph, MHD_prop, sph_MHD_bc)
 !
-      subroutine dealloc_vsp_bc_array(bc_Uspectr)
+      if(MHD_prop%cd_prop%iflag_Bevo_scheme .gt. id_no_evolution) then
+        call set_evo_vector_boundaries(time_d%time, sph%sph_rj,         &
+     &      sph_MHD_bc%sph_bc_B, sph_MHD_bc%bcs_B)
+      end if
 !
-      type(sph_velocity_BC_spectr), intent(inout) :: bc_Uspectr
+      end subroutine set_MHD_evolved_boundaries
 !
-      deallocate(bc_Uspectr%vp_ICB_bc, bc_Uspectr%vt_ICB_bc)
-      deallocate(bc_Uspectr%vp_CMB_bc, bc_Uspectr%vt_CMB_bc)
+! ----------------------------------------------------------------------
 !
-      end subroutine dealloc_vsp_bc_array
+      subroutine set_cv_evolved_boundaries                              &
+     &         (time_d, sph, MHD_prop, sph_MHD_bc)
 !
-! -----------------------------------------------------------------------
+      use set_evoluved_boundaries
+!
+      type(time_data), intent(in) :: time_d
+      type(sph_grids), intent(in) :: sph
+      type(MHD_evolution_param), intent(in) :: MHD_prop
+!
+      type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
+!
+!
+      if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
+        call set_evo_vector_boundaries(time_d%time, sph%sph_rj,         &
+     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U)
+      end if
+      if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
+        call set_evo_scalar_boundaries(time_d%time, sph%sph_rj,         &
+     &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T)
+      end if
+      if(MHD_prop%cp_prop%iflag_scheme .gt. id_no_evolution) then
+        call set_evo_scalar_boundaries(time_d%time, sph%sph_rj,         &
+     &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C)
+      end if
+!
+      end subroutine set_cv_evolved_boundaries
+!
+! ----------------------------------------------------------------------
 !
       end module t_boundary_data_sph_MHD

@@ -1,0 +1,21 @@
+cal_tave_sph_ene_spectr.o: $(SPH_UTILS_DIR)/cal_tave_sph_ene_spectr.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+compare_sph_mean_square.o: $(SPH_UTILS_DIR)/compare_sph_mean_square.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_tave_sph_ene_spectr.o: $(SPH_UTILS_DIR)/m_tave_sph_ene_spectr.f90 m_precision.o m_constants.o t_read_sph_spectra.o sph_mean_square_IO_select.o cal_tave_sph_ene_spectr.o
+	$(F90) -c $(F90OPTFLAGS) $<
+simple_sph_spectr_data_IO.o: $(SPH_UTILS_DIR)/simple_sph_spectr_data_IO.f90 m_precision.o m_constants.o t_read_sph_spectra.o write_field_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+simple_sph_spectr_head_IO.o: $(SPH_UTILS_DIR)/simple_sph_spectr_head_IO.f90 m_precision.o m_constants.o t_read_sph_spectra.o skip_comment_f.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_mean_square_IO_select.o: $(SPH_UTILS_DIR)/sph_mean_square_IO_select.f90 m_precision.o t_read_sph_spectra.o simple_sph_spectr_head_IO.o simple_sph_spectr_data_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_average_sph_ene_spec.o: $(SPH_UTILS_DIR)/t_average_sph_ene_spec.f90 m_precision.o m_tave_sph_ene_spectr.o t_read_sph_spectra.o set_parallel_file_name.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_picked_sph_spectr_data_IO.o: $(SPH_UTILS_DIR)/t_picked_sph_spectr_data_IO.f90 m_precision.o m_constants.o t_pickup_sph_spectr_data.o m_monitor_file_labels.o write_field_labels.o set_parallel_file_name.o skip_comment_f.o spherical_harmonics.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_read_sph_spectra.o: $(SPH_UTILS_DIR)/t_read_sph_spectra.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+tave_picked_sph_spec_data.o: $(SPH_UTILS_DIR)/tave_picked_sph_spec_data.f90 m_precision.o m_constants.o t_picked_sph_spectr_data_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

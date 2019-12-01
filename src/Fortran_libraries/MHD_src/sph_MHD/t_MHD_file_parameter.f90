@@ -21,6 +21,8 @@
       type MHD_file_IO_params
 !>        FEM mesh IO flags
         type(FEM_file_IO_flags) :: FEM_mesh_flags
+!>        Structure of spectr index file IO paramters
+        type(field_IO_params) :: sph_file_param
 !>        Structure of mesh file IO paramters
         type(field_IO_params) :: mesh_file_IO
 !>        Structure of file name and format for restart file

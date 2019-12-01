@@ -42,6 +42,8 @@
 !!     &         (c_buf, label, iflag_dat, int1, int2, vect)
 !!      subroutine read_int2real2_ctl_item                              &
 !!     &         (c_buf, label, iflag_dat, int1, int2, vec1, vec2)
+!!      subroutine read_charaine3_ctl_item                              &
+!!     &         (c_buf, label, iflag_dat, chara, ivec1, ivec2, ivec3)
 !!@endverbatim
 !!
 !!@n @param  label      label for control items
@@ -488,6 +490,31 @@
       iflag_dat = 1
 !
        end subroutine read_int2real2_ctl_item
+!
+!   --------------------------------------------------------------------
+!
+      subroutine read_charaine3_ctl_item                                &
+     &         (c_buf, label, iflag_dat, chara, ivec1, ivec2, ivec3)
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      integer(kind = kint), intent(inout) :: iflag_dat
+      character(len=kchara), intent(inout) :: chara
+      integer(kind = kint), intent(inout) :: ivec1, ivec2, ivec3
+!
+       character(len=kchara) :: tmpchara
+!
+!
+      if(iflag_dat.gt.0 .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, chara, ivec1, ivec2, ivec3
+      if (iflag_debug .gt. 0)  write(*,'(a,a7,2i16)')                   &
+     &         trim(c_buf%header_chara), ' chara:  ', trim(chara)
+      if (iflag_debug .gt. 0)  write(*,'(a,a7,1p2e23.15)')              &
+     &         trim(c_buf%header_chara), ' int: ', ivec1, ivec2, ivec3
+      iflag_dat = 1
+!
+       end subroutine read_charaine3_ctl_item
 !
 !   --------------------------------------------------------------------
 !

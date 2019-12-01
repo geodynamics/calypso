@@ -149,9 +149,6 @@
       if(mevo_ctl%import_mode%iflag .gt. 0) then
         call set_import_table_ctl(mevo_ctl%import_mode%charavalue)
       end if
-      if(mevo_ctl%SR_routine%iflag .gt. 0) then
-        call set_sph_comm_routine_ctl(mevo_ctl%SR_routine%charavalue)
-      end if
 !
       if (plt%bc_data_file_name_ctl%iflag .gt. 0) then
         bc_IO%file_name = plt%bc_data_file_name_ctl%charavalue

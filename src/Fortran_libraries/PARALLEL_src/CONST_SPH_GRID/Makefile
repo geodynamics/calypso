@@ -3,8 +3,8 @@
 #
 
 SPH_GRID_SRCDIR = $$(PARA_SRCDIR)/CONST_SPH_GRID
-SRC_SPH_GRID = $(shell ls *.f90)
-MOD_SPH_GRID = $(addsuffix .o,$(basename $(SRC_SPH_GRID)) )
+SOURCES = $(shell ls *.f90)
+MOD_SPH_GRID = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #
 #  -------------------------------------------------------------------------
@@ -33,7 +33,10 @@ mod_list:
 
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(SPH_GRID_SRCDIR)' $(SRC_SPH_GRID)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(SPH_GRID_SRCDIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *.mod $(EXE) $(LIB) *~

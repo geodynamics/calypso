@@ -1,0 +1,23 @@
+cal_gaunt_itgs.o: $(SPH_DIR)/cal_gaunt_itgs.f90 m_precision.o m_constants.o normgi.o normei.o
+	$(F90) -c $(F90OPTFLAGS) $<
+factorials.o: $(SPH_DIR)/factorials.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+legendre.o: $(SPH_DIR)/legendre.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+normei.o: $(SPH_DIR)/normei.f90 m_precision.o m_constants.o normgi.o
+	$(F90) -c $(F90OPTFLAGS) $<
+normgi.o: $(SPH_DIR)/normgi.f90 m_precision.o normgi_by_primes.o
+	$(F90) -c $(F90OPTFLAGS) $<
+normgi_by_fact.o: $(SPH_DIR)/normgi_by_fact.f90 m_precision.o quicksort.o factorials.o
+	$(F90) -c $(F90OPTFLAGS) $<
+normgi_by_primes.o: $(SPH_DIR)/normgi_by_primes.f90 m_precision.o m_constants.o quicksort.o primefac.o
+	$(F90) -c $(F90OPTFLAGS) $<
+schmidt.o: $(SPH_DIR)/schmidt.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+schmidt_fix_m.o: $(SPH_DIR)/schmidt_fix_m.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+spherical_harmonics.o: $(SPH_DIR)/spherical_harmonics.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_schmidt_polynomial.o: $(SPH_DIR)/t_schmidt_polynomial.f90 m_precision.o legendre.o schmidt.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

@@ -43,6 +43,17 @@
 !!        quad_field_name_ctl  maxwell_tensor
 !!        quad_field_name_ctl  vecp_induction
 !!      end array quad_field_name_ctl
+!!
+!!      array scalar_field_ctl
+!!        scalar_field_ctl  temperature   501
+!!        scalar_field_ctl  pressure      601
+!!      end array scalar_field_ctl
+!!
+!!      array vector_field_ctl
+!!        vector_field_ctl  velocity            1   2   3
+!!        vector_field_ctl  vorticity         201 202 203
+!!        vector_field_ctl  magnetic_field    301 302 303
+!!      end array vector_field_ctl
 !!    end phys_values_ctl
 !!
 !! ---------------------------------------------------------------------
@@ -54,10 +65,12 @@
       use m_machine_parameter
       use t_control_array_character
       use t_control_array_character3
+      use t_control_array_charaint
+      use t_control_array_charaint3
 !
       implicit  none
 !
-!>      Structure for field information control
+!>      Structure of field information control
       type field_control
 !>        Structure for list of field
 !!@n       field_ctl%icou:  Read flag for 'nod_value_ctl'
@@ -70,8 +83,20 @@
 !>        Structure for list of field on quadrature elements
 !!@n       quad_phys%icou:  Read flag for 'quad_field_name_ctl'
 !!@n       quad_phys%num:   Number of field
-!!@n       quad_phys%c_tbl: Name list of field
+!!@n       quad_phys%c_tbl: Name of field
         type(ctl_array_chara) :: quad_phys
+!
+!>        Structure for list of scalar field
+!!@n       quad_phys%icou:  Read flag for 'quad_field_name_ctl'
+!!@n       quad_phys%num:   Number of field
+!!@n       quad_phys%c_tbl: Name of field
+        type(ctl_array_ci) :: scalar_phys
+!
+!>        Structure for list of vector field
+!!@n       quad_phys%icou:  Read flag for 'quad_field_name_ctl'
+!!@n       quad_phys%num:   Number of field
+!!@n       quad_phys%c_tbl: Name of field
+        type(ctl_array_ci3) :: vector_phys
 !
         integer (kind=kint) :: i_phys_values =   0
       end type field_control
@@ -85,6 +110,11 @@
 !
       character(len=kchara), parameter                                  &
      &      :: hd_quad_field =   'quad_field_name_ctl'
+!
+      character(len=kchara), parameter                                  &
+     &      :: hd_scalar_field =   'scalar_field_ctl'
+      character(len=kchara), parameter                                  &
+     &      :: hd_vector_field =   'vector_field_ctl'
 !
       private :: hd_field_list, hd_quad_field
 !
@@ -100,6 +130,9 @@
 !
       call dealloc_control_array_c3(fld_ctl%field_ctl)
       call dealloc_control_array_chara(fld_ctl%quad_phys)
+!
+      call dealloc_control_array_c_i(fld_ctl%scalar_phys)
+      call dealloc_control_array_c_i3(fld_ctl%vector_phys)
 !
       end subroutine dealloc_phys_control
 !
@@ -129,6 +162,11 @@
      &     (id_control, hd_field_list, fld_ctl%field_ctl, c_buf)
         call read_control_array_c1                                      &
      &     (id_control, hd_quad_field, fld_ctl%quad_phys, c_buf)
+!
+        call read_control_array_c_i                                     &
+     &     (id_control, hd_scalar_field, fld_ctl%scalar_phys, c_buf)
+        call read_control_array_c_i3                                    &
+     &     (id_control, hd_vector_field, fld_ctl%vector_phys, c_buf)
       end do
       fld_ctl%i_phys_values = 1
 !
@@ -157,6 +195,11 @@
 !
       call write_control_array_c1                                       &
      &   (id_control, level, hd_quad_field, fld_ctl%quad_phys)
+!
+      call write_control_array_c_i                                      &
+     &   (id_control, level, hd_scalar_field, fld_ctl%scalar_phys)
+      call write_control_array_c_i3                                     &
+     &   (id_control, level, hd_vector_field, fld_ctl%vector_phys)
 !
       level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !

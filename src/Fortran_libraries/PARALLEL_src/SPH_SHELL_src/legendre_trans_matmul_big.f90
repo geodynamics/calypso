@@ -14,14 +14,6 @@
 !!     &         (ncomp, nvector, nscalar,                              &
 !!     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,  &
 !!     &          n_WR, n_WS, WR, WS, WK_l_bsm)
-!!      subroutine leg_backward_trans_dgemm_big                         &
-!!     &         (ncomp, nvector, nscalar,                              &
-!!     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,  &
-!!     &          n_WR, n_WS, WR, WS, WK_l_bsm)
-!!      subroutine leg_backward_trans_matprod_big                       &
-!!     &         (ncomp, nvector, nscalar,                              &
-!!     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,  &
-!!     &          n_WR, n_WS, WR, WS, WK_l_bsm)
 !!        Input:  sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!        Output: vr_rtm   (Order: radius,theta,phi)
 !!
@@ -33,15 +25,7 @@
 !!
 !!    Forward transforms
 !!      subroutine leg_forward_trans_matmul_big                         &
-!!     &         (ncomp, nvector, nscalar,                              &
-!!     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,  &
-!!     &          n_WR, n_WS, WR, WS, WK_l_bsm)
-!!      subroutine leg_forward_trans_dgemm_big                          &
-!!     &         (ncomp, nvector, nscalar,                              &
-!!     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,  &
-!!     &          n_WR, n_WS, WR, WS, WK_l_bsm)
-!!      subroutine leg_forward_trans_matprod_big                        &
-!!     &         (ncomp, nvector, nscalar,                              &
+!!     &         (iflag_matmul, ncomp, nvector, nscalar,                &
 !!     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,  &
 !!     &          n_WR, n_WS, WR, WS, WK_l_bsm)
 !!        Input:  vr_rtm   (Order: radius,theta,phi)
@@ -79,12 +63,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine leg_backward_trans_matmul_big                          &
-     &         (ncomp, nvector, nscalar,                                &
+     &         (iflag_matmul, ncomp, nvector, nscalar,                  &
      &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,    &
      &          n_WR, n_WS, WR, WS, WK_l_bsm)
 !
       use leg_b_trans_sym_matmul_big
 !
+      integer(kind = kint), intent(in) :: iflag_matmul
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_comm_tbl), intent(in) :: comm_rtm, comm_rlm
@@ -99,7 +84,8 @@
 !
 !
       if(ncomp .le. 0) return
-        call leg_bwd_trans_sym_matmul_big(ncomp, nvector, nscalar,      &
+        call leg_bwd_trans_sym_matmul_big                               &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
      &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns,             &
      &      leg%asin_t_rtm, leg%g_sph_rlm, n_WR, n_WS, WR, WS,          &
      &      WK_l_bsm)
@@ -109,12 +95,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine leg_forward_trans_matmul_big                           &
-     &         (ncomp, nvector, nscalar,                                &
+     &         (iflag_matmul, ncomp, nvector, nscalar,                  &
      &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,    &
      &          n_WR, n_WS, WR, WS, WK_l_bsm)
 !
       use leg_f_trans_sym_matmul_big
 !
+      integer(kind = kint), intent(in) :: iflag_matmul
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_comm_tbl), intent(in) :: comm_rtm, comm_rlm
@@ -129,134 +116,13 @@
 !
 !
       if(ncomp .le. 0) return
-        call leg_fwd_trans_sym_matmul_big(ncomp, nvector, nscalar,      &
+        call leg_fwd_trans_sym_matmul_big                               &
+     &     (iflag_matmul, ncomp, nvector, nscalar,                      &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns,             &
      &      leg%asin_t_rtm, leg%g_sph_rlm, leg%weight_rtm,              &
      &      n_WR, n_WS, WR, WS, WK_l_bsm)
 !
       end subroutine leg_forward_trans_matmul_big
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine leg_backward_trans_dgemm_big                           &
-     &         (ncomp, nvector, nscalar,                                &
-     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,    &
-     &          n_WR, n_WS, WR, WS, WK_l_bsm)
-!
-      use leg_b_trans_sym_matmul_big
-!
-      type(sph_rlm_grid), intent(in) :: sph_rlm
-      type(sph_rtm_grid), intent(in) :: sph_rtm
-      type(sph_comm_tbl), intent(in) :: comm_rtm, comm_rlm
-      type(legendre_4_sph_trans), intent(in) :: leg
-      type(index_4_sph_trans), intent(in) :: idx_trns
-      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
-      integer(kind = kint), intent(in) :: n_WR, n_WS
-!
-      real (kind=kreal), intent(inout):: WR(n_WR)
-      real (kind=kreal), intent(inout):: WS(n_WS)
-      type(leg_trns_bsym_mul_work), intent(inout) :: WK_l_bsm
-!
-!
-      if(ncomp .le. 0) return
-        call leg_bwd_trans_sym_dgemm_big(ncomp, nvector, nscalar,       &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns,             &
-     &      leg%asin_t_rtm, leg%g_sph_rlm, n_WR, n_WS, WR, WS,          &
-     &      WK_l_bsm)
-!
-      end subroutine leg_backward_trans_dgemm_big
-!
-! -----------------------------------------------------------------------
-!
-      subroutine leg_forward_trans_dgemm_big                            &
-     &         (ncomp, nvector, nscalar,                                &
-     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,    &
-     &          n_WR, n_WS, WR, WS, WK_l_bsm)
-!
-      use leg_f_trans_sym_matmul_big
-!
-      type(sph_rtm_grid), intent(in) :: sph_rtm
-      type(sph_rlm_grid), intent(in) :: sph_rlm
-      type(sph_comm_tbl), intent(in) :: comm_rtm, comm_rlm
-      type(legendre_4_sph_trans), intent(in) :: leg
-      type(index_4_sph_trans), intent(in) :: idx_trns
-      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
-      integer(kind = kint), intent(in) :: n_WR, n_WS
-!
-      real (kind=kreal), intent(inout):: WR(n_WR)
-      real (kind=kreal), intent(inout):: WS(n_WS)
-      type(leg_trns_bsym_mul_work), intent(inout) :: WK_l_bsm
-!
-!
-      if(ncomp .le. 0) return
-        call leg_fwd_trans_sym_dgemm_big(ncomp, nvector, nscalar,       &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns,             &
-     &      leg%asin_t_rtm, leg%g_sph_rlm, leg%weight_rtm,              &
-     &      n_WR, n_WS, WR, WS, WK_l_bsm)
-!
-      end subroutine leg_forward_trans_dgemm_big
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine leg_backward_trans_matprod_big                         &
-     &         (ncomp, nvector, nscalar,                                &
-     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,    &
-     &          n_WR, n_WS, WR, WS, WK_l_bsm)
-!
-      use leg_b_trans_sym_matmul_big
-!
-      type(sph_rlm_grid), intent(in) :: sph_rlm
-      type(sph_rtm_grid), intent(in) :: sph_rtm
-      type(sph_comm_tbl), intent(in) :: comm_rtm, comm_rlm
-      type(legendre_4_sph_trans), intent(in) :: leg
-      type(index_4_sph_trans), intent(in) :: idx_trns
-      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
-      integer(kind = kint), intent(in) :: n_WR, n_WS
-!
-      real (kind=kreal), intent(inout):: WR(n_WR)
-      real (kind=kreal), intent(inout):: WS(n_WS)
-      type(leg_trns_bsym_mul_work), intent(inout) :: WK_l_bsm
-!
-!
-      if(ncomp .le. 0) return
-        call leg_bwd_trans_sym_matprod_big(ncomp, nvector, nscalar,     &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns,             &
-     &      leg%asin_t_rtm, leg%g_sph_rlm, n_WR, n_WS, WR, WS,          &
-     &      WK_l_bsm)
-!
-      end subroutine leg_backward_trans_matprod_big
-!
-! -----------------------------------------------------------------------
-!
-      subroutine leg_forward_trans_matprod_big                          &
-     &         (ncomp, nvector, nscalar,                                &
-     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,    &
-     &          n_WR, n_WS, WR, WS, WK_l_bsm)
-!
-      use leg_f_trans_sym_matmul_big
-!
-      type(sph_rtm_grid), intent(in) :: sph_rtm
-      type(sph_rlm_grid), intent(in) :: sph_rlm
-      type(sph_comm_tbl), intent(in) :: comm_rtm, comm_rlm
-      type(legendre_4_sph_trans), intent(in) :: leg
-      type(index_4_sph_trans), intent(in) :: idx_trns
-      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
-      integer(kind = kint), intent(in) :: n_WR, n_WS
-!
-      real (kind=kreal), intent(inout):: WR(n_WR)
-      real (kind=kreal), intent(inout):: WS(n_WS)
-      type(leg_trns_bsym_mul_work), intent(inout) :: WK_l_bsm
-!
-!
-      if(ncomp .le. 0) return
-        call leg_fwd_trans_sym_matprod_big(ncomp, nvector, nscalar,     &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns,             &
-     &      leg%asin_t_rtm, leg%g_sph_rlm, leg%weight_rtm,              &
-     &      n_WR, n_WS, WR, WS, WK_l_bsm)
-!
-      end subroutine leg_forward_trans_matprod_big
 !
 ! -----------------------------------------------------------------------
 !

@@ -116,14 +116,15 @@
             do jj = 1, nj_rlm/2
               je_rlm = 2*jj + jst - 1
               jo_rlm = 2*jj + jst
+              ie_rlm = 1 + (je_rlm-1) * sph_rlm%istep_rlm(2)            &
+     &                   + (k_rlm-1) *  sph_rlm%istep_rlm(1)
+              io_rlm = 1 + (jo_rlm-1) * sph_rlm%istep_rlm(2)            &
+     &                   + (k_rlm-1)  * sph_rlm%istep_rlm(1)
+!
               gme = dble(sph_rlm%idx_gl_1d_rlm_j(je_rlm,3))
               gmo = dble(sph_rlm%idx_gl_1d_rlm_j(jo_rlm,3))
 !
               do nd = 1, nvector
-                ie_rlm = 1 + (je_rlm-1) * sph_rlm%istep_rlm(2)          &
-     &                     + (k_rlm-1) *  sph_rlm%istep_rlm(1)
-                io_rlm = 1 + (jo_rlm-1) * sph_rlm%istep_rlm(2)          &
-     &                     + (k_rlm-1)  * sph_rlm%istep_rlm(1)
                 ie_send = 3*nd-2                                        &
      &                   + (comm_rlm%irev_sr(ie_rlm) - 1) * ncomp
                 io_send = 3*nd-2                                        &
@@ -160,11 +161,11 @@
 !   the last even l-m
             do jj = nj_rlm/2+1, (nj_rlm+1)/2
               je_rlm = 2*jj + jst - 1
+              ie_rlm = 1 + (je_rlm-1) * sph_rlm%istep_rlm(2)            &
+     &                   + (k_rlm-1) *  sph_rlm%istep_rlm(1)
               gme = dble(sph_rlm%idx_gl_1d_rlm_j(je_rlm,3))
 !
               do nd = 1, nvector
-                ie_rlm = 1 + (je_rlm-1) * sph_rlm%istep_rlm(2)          &
-     &                     + (k_rlm-1) *  sph_rlm%istep_rlm(1)
                 ie_send = 3*nd-2                                        &
      &                   + (comm_rlm%irev_sr(ie_rlm) - 1) * ncomp
 !
@@ -250,11 +251,12 @@
             do jj = 1, nj_rlm/2
               je_rlm = 2*jj + jst - 1
               jo_rlm = 2*jj + jst
+!
+              ie_rlm = 1 + (je_rlm-1) * sph_rlm%istep_rlm(2)            &
+     &                   + (k_rlm-1) *  sph_rlm%istep_rlm(1)
+              io_rlm = 1 + (jo_rlm-1) * sph_rlm%istep_rlm(2)            &
+     &                   + (k_rlm-1) *  sph_rlm%istep_rlm(1)
               do nd = 1, nscalar
-                ie_rlm = 1 + (je_rlm-1) * sph_rlm%istep_rlm(2)          &
-     &                     + (k_rlm-1) *  sph_rlm%istep_rlm(1)
-                io_rlm = 1 + (jo_rlm-1) * sph_rlm%istep_rlm(2)          &
-     &                     + (k_rlm-1) *  sph_rlm%istep_rlm(1)
                 ie_send = nd + 3*nvector                                &
      &                       + (comm_rlm%irev_sr(ie_rlm) - 1) * ncomp
                 io_send = nd + 3*nvector                                &
@@ -281,6 +283,8 @@
 !   the last even l-m
             do jj = nj_rlm/2+1, (nj_rlm+1)/2
               je_rlm = 2*jj + jst - 1
+              ie_rlm = 1 + (je_rlm-1) * sph_rlm%istep_rlm(2)            &
+     &                   + (k_rlm-1) *  sph_rlm%istep_rlm(1)
               do nd = 1, nscalar
                 call set_vr_rtm_scalar_symmetry                         &
      &             (sph_rtm%nnod_rtm, sph_rtm%nidx_rtm,                 &
@@ -289,8 +293,6 @@
      &              comm_rtm%irev_sr, n_WR, WR,                         &
      &              WK_l_sml%symp(1,ip), WK_l_sml%asmp(1,ip))
 !
-                ie_rlm = 1 + (je_rlm-1) * sph_rlm%istep_rlm(2)          &
-     &                     + (k_rlm-1) *  sph_rlm%istep_rlm(1)
                 ie_send = nd + 3*nvector                                &
      &                       + (comm_rlm%irev_sr(ie_rlm) - 1) * ncomp
                 call cal_scalar_sp_rlm_dotprod                          &

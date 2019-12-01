@@ -7,11 +7,12 @@
 !>@brief  Evaluate pressure and energy fluxes for snapshots
 !!
 !!@verbatim
-!!      subroutine s_lead_fields_4_sph_mhd                              &
-!!     &         (sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc, trans_p, &
+!!      subroutine s_lead_fields_4_sph_mhd(sph, comms_sph,              &
+!!     &          monitor, r_2nd, MHD_prop, sph_MHD_bc, trans_p,        &
 !!     &          ipol, sph_MHD_mat, WK, rj_fld)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
+!!        type(sph_mhd_monitor_data), intent(in) :: monitor
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
@@ -22,8 +23,9 @@
 !!        type(phys_data), intent(inout) :: rj_fld
 !!
 !!      subroutine cal_sph_enegy_fluxes                                 &
-!!     &         (sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc, trans_p, &
-!!     &          ipol, trns_MHD, trns_snap,  WK_sph, rj_fld)
+!!     &         (ltr_crust, sph, comms_sph, r_2nd, MHD_prop,           &
+!!     &          sph_MHD_bc trans_p, ipol, trns_MHD, trns_snap,        &
+!!     &          WK_sph, rj_fld)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(fdm_matrices), intent(in) :: r_2nd
@@ -69,6 +71,7 @@
       use t_sph_transforms
       use t_boundary_data_sph_MHD
       use t_radial_matrices_sph_MHD
+      use t_sph_mhd_monitor_data_IO
 !
       implicit none
 !
@@ -81,8 +84,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine s_lead_fields_4_sph_mhd                                &
-     &         (sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc, trans_p,   &
+      subroutine s_lead_fields_4_sph_mhd(sph, comms_sph,                &
+     &          monitor, r_2nd, MHD_prop, sph_MHD_bc, trans_p,          &
      &          ipol, sph_MHD_mat, WK, rj_fld)
 !
       use sph_transforms_4_MHD
@@ -92,6 +95,7 @@
 !
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
+      type(sph_mhd_monitor_data), intent(in) :: monitor
       type(fdm_matrices), intent(in) :: r_2nd
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
@@ -120,9 +124,9 @@
       call gradients_of_vectors_sph                                     &
      &   (sph, comms_sph, r_2nd, sph_MHD_bc, trans_p,                   &
      &    ipol, WK%trns_MHD, WK%trns_tmp, WK%WK_sph, rj_fld)
-      call enegy_fluxes_4_sph_mhd                                       &
-     &   (sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc, trans_p, ipol,   &
-     &    WK%trns_MHD, WK%trns_snap, WK%WK_sph, rj_fld)
+      call enegy_fluxes_4_sph_mhd(monitor%ltr_crust, sph, comms_sph,    &
+     &    r_2nd, MHD_prop, sph_MHD_bc, trans_p,                         &
+     &    ipol, WK%trns_MHD, WK%trns_snap, WK%WK_sph, rj_fld)
 !
       end subroutine s_lead_fields_4_sph_mhd
 !
@@ -213,14 +217,15 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine enegy_fluxes_4_sph_mhd                                 &
-     &         (sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc,            &
-     &          trans_p, ipol, trns_MHD, trns_snap, WK_sph, rj_fld)
+      subroutine enegy_fluxes_4_sph_mhd(ltr_crust, sph, comms_sph,      &
+     &          r_2nd, MHD_prop, sph_MHD_bc, trans_p,                   &
+     &          ipol, trns_MHD, trns_snap, WK_sph, rj_fld)
 !
       use sph_transforms_snapshot
       use cal_energy_flux_rtp
       use cal_energy_flux_rj
 !
+      integer(kind = kint), intent(in) :: ltr_crust
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
       type(fdm_matrices), intent(in) :: r_2nd
@@ -236,8 +241,8 @@
 !
 !
       call cal_sph_enegy_fluxes                                         &
-     &   (sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc, trans_p,         &
-     &    ipol, trns_MHD, trns_snap,  WK_sph, rj_fld)
+     &   (ltr_crust, sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc,       &
+     &    trans_p, ipol, trns_MHD, trns_snap,  WK_sph, rj_fld)
 !
       if (iflag_debug.eq.1) write(*,*)                                  &
      &                          'sph_forward_trans_snapshot_MHD'
@@ -249,14 +254,15 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine cal_sph_enegy_fluxes                                   &
-     &         (sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc, trans_p,   &
+      subroutine cal_sph_enegy_fluxes(ltr_crust, sph, comms_sph,        &
+     &          r_2nd, MHD_prop, sph_MHD_bc, trans_p,                   &
      &          ipol, trns_MHD, trns_snap,  WK_sph, rj_fld)
 !
       use sph_transforms_snapshot
       use cal_energy_flux_rtp
       use cal_energy_flux_rj
 !
+      integer(kind = kint), intent(in) :: ltr_crust
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
       type(fdm_matrices), intent(in) :: r_2nd
@@ -270,11 +276,10 @@
       type(spherical_trns_works), intent(inout) :: WK_sph
       type(phys_data), intent(inout) :: rj_fld
 !
-!
 !      Evaluate fields for output in spectrum space
       if (iflag_debug.eq.1) write(*,*) 's_cal_energy_flux_rj'
       call s_cal_energy_flux_rj                                         &
-     &   (sph%sph_rj, r_2nd, sph_MHD_bc, ipol, rj_fld)
+     &   (ltr_crust, sph%sph_rj, r_2nd, sph_MHD_bc, ipol, rj_fld)
 !
       if (iflag_debug.eq.1) write(*,*) 'sph_back_trans_snapshot_MHD'
       call sph_back_trans_snapshot_MHD(sph, comms_sph, trans_p,         &

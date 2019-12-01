@@ -217,9 +217,12 @@
       integer(kind=kint), intent(inout) :: istack(0:num)
       integer(kind=kint), intent(inout) :: ntot
 !
+      integer(kind = kint) :: ist
+!
 !
       istack(0) = 0
-      call gz_mpi_read_int_vector(IO_param, num, istack(1))
+      ist = min(1,num)
+      call gz_mpi_read_int_vector(IO_param, num, istack(ist))
       ntot = istack(num)
 !
       end subroutine gz_mpi_read_int_stack

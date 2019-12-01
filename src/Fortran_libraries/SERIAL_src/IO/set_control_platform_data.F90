@@ -12,11 +12,12 @@
 !!      subroutine set_control_smp_def(id_rank, plt)
 !!      subroutine set_control_mesh_def(plt, mesh_file)
 !!      subroutine set_control_sph_mesh(plt, Fmesh_ctl,                 &
-!!     &          mesh_file, sph_file_param, FEM_mesh_flags)
+!!     &         sph_file_param, mesh_file, sph_file_IO, FEM_mesh_flags)
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(FEM_mesh_control), intent(in) :: Fmesh_ctl
-!!        type(field_IO_params), intent(inout) :: mesh_file
 !!        type(field_IO_params), intent(inout) :: sph_file_param
+!!        type(field_IO_params), intent(inout) :: mesh_file
+!!        type(field_IO_params), intent(inout) :: sph_file_IO
 !!        type(FEM_file_IO_flags), intent(inout) :: FEM_mesh_flags
 !!      subroutine set_FEM_mesh_switch_4_SPH(Fmesh_ctl, iflag_access_FEM)
 !!      subroutine set_FEM_surface_output_flag                          &
@@ -129,15 +130,16 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_control_sph_mesh(plt, Fmesh_ctl,                   &
-     &          mesh_file, sph_file_param, FEM_mesh_flags)
+     &         sph_file_param, mesh_file, sph_file_IO, FEM_mesh_flags)
 !
       use m_file_format_switch
       use sph_file_IO_select
 !
       type(platform_data_control), intent(in) :: plt
       type(FEM_mesh_control), intent(in) :: Fmesh_ctl
-      type(field_IO_params), intent(inout) :: mesh_file
       type(field_IO_params), intent(inout) :: sph_file_param
+      type(field_IO_params), intent(inout) :: mesh_file
+      type(field_IO_params), intent(inout) :: sph_file_IO
       type(FEM_file_IO_flags), intent(inout) :: FEM_mesh_flags
 !
 !
@@ -145,23 +147,23 @@
 !
 !   set data format
 !
-      iflag_sph_file_fmt                                                &
-     &     = choose_para_file_format(plt%sph_file_fmt_ctl)
       sph_file_param%iflag_format                                       &
+     &     = choose_para_file_format(plt%sph_file_fmt_ctl)
+      sph_file_IO%iflag_format                                          &
      &     = choose_para_file_format(plt%spectr_field_fmt_ctl)
 !
 !   set file header at once
 !
       if(plt%sph_file_prefix%iflag .gt. 0) then
-        sph_file_head =  plt%sph_file_prefix%charavalue
+        sph_file_param%file_prefix =  plt%sph_file_prefix%charavalue
         call copy_mesh_format_and_prefix                                &
      &     (plt%sph_file_prefix%charavalue,                             &
-     &      iflag_sph_file_fmt, mesh_file)
+     &      sph_file_param%iflag_format, mesh_file)
       end if
 !
-      sph_file_param%iflag_IO = plt%spectr_field_file_prefix%iflag
-      if(sph_file_param%iflag_IO .gt. 0) then
-        sph_file_param%file_prefix                                      &
+      sph_file_IO%iflag_IO = plt%spectr_field_file_prefix%iflag
+      if(sph_file_IO%iflag_IO .gt. 0) then
+        sph_file_IO%file_prefix                                         &
      &         = plt%spectr_field_file_prefix%charavalue
       end if
 !

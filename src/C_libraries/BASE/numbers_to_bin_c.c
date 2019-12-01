@@ -144,3 +144,36 @@ double round_2_3digit(double value){
     rounded_3 =  ((double) i_round3) * pow(10.0,(double) i_log10);
     return rounded_3;
 }
+
+void find_order_digit(double d_in, double *d_out, int *i_digit){
+	*d_out = d_in;
+	*i_digit = 0;
+	
+	if(d_in == 0.0){
+		return;
+	} else if (fabs(*d_out) < 1.0){
+		*d_out = d_in;
+		while (fabs(*d_out) < 1.0){
+			*i_digit = *i_digit - 1;
+			*d_out = *d_out * 10.0;
+		};
+	} else {
+		while (fabs(*d_out) >= 10.0){
+			*i_digit = *i_digit + 1;
+			*d_out = *d_out * 0.1;
+		};
+	}
+	return;
+}
+
+double const_from_digit_order(double d_in, int  i_digit){
+	int i;
+	double d_out = d_in;
+	if(i_digit < 0){
+		for(i=0;i< (-i_digit);i++) d_out = d_out * 0.1;
+	}
+	else {
+		for(i=0;i<i_digit;i++) d_out = d_out * 10.0;
+	}
+	return d_out;
+}

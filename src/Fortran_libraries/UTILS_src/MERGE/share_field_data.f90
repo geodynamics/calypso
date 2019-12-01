@@ -162,7 +162,7 @@
       end if
 !
       num = fld_IO%ntot_comp_IO * fld_IO%nnod_IO
-      call MPI_Bcast(fld_IO%d_IO, 1, CALYPSO_REAL,                      &
+      call MPI_Bcast(fld_IO%d_IO, num, CALYPSO_REAL,                    &
      &    irank_org, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine share_each_field_IO_data

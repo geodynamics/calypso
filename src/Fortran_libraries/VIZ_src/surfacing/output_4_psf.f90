@@ -82,6 +82,7 @@
       do i_psf = 1, num_psf
         call sel_write_parallel_ucd_mesh                                &
      &       (psf_file_IO(i_psf), psf_out(i_psf), psf_out_m(i_psf))
+        call calypso_mpi_barrier
       end do
 !
       end subroutine output_section_mesh
@@ -112,6 +113,7 @@
       do i_psf = 1, num_psf
         call sel_write_parallel_ucd_file(istep_psf, psf_file_IO(i_psf), &
      &      t_IO, psf_out(i_psf), psf_out_m(i_psf))
+        call calypso_mpi_barrier
       end do
 !
       end subroutine output_section_data
@@ -162,6 +164,7 @@
      &      iso_out(i_iso), iso_out_m(i_iso))
         call disconnect_merged_ucd_mesh                                 &
      &     (iso_out(i_iso), iso_out_m(i_iso))
+        call calypso_mpi_barrier
       end do
 !
 !

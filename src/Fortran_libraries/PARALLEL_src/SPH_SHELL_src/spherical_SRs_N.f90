@@ -295,11 +295,12 @@
       subroutine finish_send_recv_sph(comm_sph)
 !
       use m_sel_spherical_SRs
+      use select_calypso_SR
 !
       type(sph_comm_tbl), intent(in) :: comm_sph
 !
 !
-      call finish_sph_send_recv                                         &
+      call finish_calypso_send_recv                                     &
      &   (comm_sph%nneib_domain, comm_sph%iflag_self)
 !
       end subroutine finish_send_recv_sph

@@ -3,8 +3,8 @@
 #
 
 PSF_SECTION_DIR = $$(VIZ_SRCDIR)/surfacing
-SRC_SURFACING = $(shell ls *.f90)
-MOD_SURFACING = $(addsuffix .o,$(basename $(SRC_SURFACING)) )
+SOURCES = $(shell ls *.f90)
+MOD_SURFACING = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #
 #  --------------------------------------------------------------------
@@ -32,7 +32,10 @@ mod_list:
 
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(PSF_SECTION_DIR)' $(SRC_SURFACING)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(PSF_SECTION_DIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *.mod *~ *.par *.diag *.a

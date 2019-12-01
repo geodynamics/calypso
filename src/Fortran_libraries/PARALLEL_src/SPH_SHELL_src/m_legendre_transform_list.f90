@@ -25,7 +25,7 @@
       implicit none
 !
 !>      Number of LEgendre transform types
-      integer(kind = kint), parameter :: ntype_Leg_trans_loop =   15
+      integer(kind = kint), parameter :: maxindex_Leg_trans_loop = 16
 !
 !>      Character flag to perform Legendre transform 
 !@n     using original array order
@@ -51,6 +51,7 @@
 !@n     with inneromst Legendre polynomial loop
       character(len = kchara), parameter                                &
      &           :: leg_sym_spin_loop = 'symmetric_outer_radial_loop'
+!
 !>      Character flag to perform Legendre transform 
 !@n     with mutmul function
       character(len = kchara), parameter                                &
@@ -63,6 +64,7 @@
 !@n     with self matrix product
       character(len = kchara), parameter                                &
      &           :: leg_matprod = 'matproduct'
+!
 !>      Chalacter flag to perform Legendre transform 
 !@n     with symmetry and mutmul function
       character(len = kchara), parameter                                &
@@ -75,6 +77,7 @@
 !@n     with symmetry and  self matrix product
       character(len = kchara), parameter                                &
      &           :: leg_sym_matprod = 'symmetric_matproduct'
+!
 !>      Chalacter flag to perform Legendre transform 
 !@n     with symmetry and mutmul function
       character(len = kchara), parameter                                &
@@ -87,58 +90,61 @@
 !@n     with symmetry and  self matrix product
       character(len = kchara), parameter                                &
      &           :: leg_sym_matprod_big = 'symmetric_matproduct_big'
+!
 !>      Character flag to perform Legendre transform 
 !@n     with testing loop
       character(len = kchara), parameter                                &
      &           :: leg_test_loop =    'test_loop'
 !
+!>      Chalacter flag to perform Legendre transform 
+!@n     with symmetry and mutmul function
+      character(len = kchara), parameter                                &
+     &           :: leg_sym_mat_jt =  'Pjt_matmul_theta_OMP'
+!>      Character flag to perform Legendre transform 
+!@n     with symmetry and dgemm in BLAS
+      character(len = kchara), parameter                                &
+     &           :: leg_sym_dgemm_jt =   'Pjt_BLAS_w_theta_OMP'
+!
+!>      Chalacter flag to perform Legendre transform 
+!@n     with symmetry and mutmul function
+      character(len = kchara), parameter                                &
+     &           :: leg_sym_mat_tj =  'Ptj_matmul_theta_OMP'
+!>      Character flag to perform Legendre transform 
+!@n     with symmetry and dgemm in BLAS
+      character(len = kchara), parameter                                &
+     &           :: leg_dgemm_tj =   'Ptj_BLAS_w_theta_OMP'
 !
 !>      integer flag to run elpse time check for legendre transform
       integer(kind = kint), parameter :: iflag_leg_undefined = -1
-!>      integer flag to perform Legendre transform 
-!@n     using original array order
-      integer(kind = kint), parameter :: iflag_leg_orginal_loop = 1
-!>      integer flag to perform Legendre transform 
-!@n     using blocked loop
-      integer(kind = kint), parameter :: iflag_leg_blocked =      2
-!>      integer flag to perform Legendre transform 
-!!@n    using longer loop for original array order 
-      integer(kind = kint), parameter :: iflag_leg_krloop_inner = 3
-!>      integer flag to perform Legendre transform 
-!@n     with inneromst Legendre polynomial loop
-      integer(kind = kint), parameter :: iflag_leg_krloop_outer = 4
 !>      integer flag to perform Legendre transform with symmetry
-      integer(kind = kint), parameter :: iflag_leg_symmetry =     5
+      integer(kind = kint), parameter :: iflag_leg_symmetry =      1
 !>      integer flag to perform Legendre transform 
 !@n     with symmetry and inneromst Legendre polynomial loop
-      integer(kind = kint), parameter :: iflag_leg_sym_spin_loop = 6
-!>      integer flag to perform Legendre transform 
-!@n     with mutmul function
-      integer(kind = kint), parameter :: iflag_leg_matmul =        7
-!>      integer flag to perform Legendre transform 
-!@n     with dgemm in BLAS
-      integer(kind = kint), parameter :: iflag_leg_dgemm =         8
-!>      integer flag to perform Legendre transform 
-!@n     with self matrix product
-      integer(kind = kint), parameter :: iflag_leg_matprod =       9
+      integer(kind = kint), parameter :: iflag_leg_sym_spin_loop = 2
 !>      integer flag to perform Legendre transform 
 !@n     with symmetry and mutmul function
-      integer(kind = kint), parameter :: iflag_leg_sym_matmul =   10
+      integer(kind = kint), parameter :: iflag_leg_sym_matmul =    3
 !>      integer flag to perform Legendre transform 
 !@n     with symmetry and dgemm in BLAS
-      integer(kind = kint), parameter :: iflag_leg_sym_dgemm =    11
-!>      integer flag to perform Legendre transform 
-!@n     with symmetry and  self matrix product
-      integer(kind = kint), parameter :: iflag_leg_sym_matprod =  12
+      integer(kind = kint), parameter :: iflag_leg_sym_dgemm =    13
 !>      integer flag to perform Legendre transform 
 !@n     with symmetry and mutmul function
-      integer(kind = kint), parameter :: iflag_leg_sym_matmul_big =  13
+      integer(kind = kint), parameter :: iflag_leg_sym_matmul_big =  4
 !>      integer flag to perform Legendre transform 
 !@n     with symmetry and dgemm in BLAS
-      integer(kind = kint), parameter :: iflag_leg_sym_dgemm_big =   14
+      integer(kind = kint), parameter :: iflag_leg_sym_dgemm_big = 14
 !>      integer flag to perform Legendre transform 
 !@n     with symmetry and  self matrix product
-      integer(kind = kint), parameter :: iflag_leg_sym_matprod_big = 15
+      integer(kind = kint), parameter :: iflag_leg_sym_mat_jt = 5
+!>      integer flag to perform Legendre transform 
+!@n     with symmetry and  self matrix product
+      integer(kind = kint), parameter :: iflag_leg_sym_dgemm_jt = 15
+!>      integer flag to perform Legendre transform 
+!@n     with symmetry and  self matrix product
+      integer(kind = kint), parameter :: iflag_leg_sym_mat_tj = 6
+!>      integer flag to perform Legendre transform 
+!@n     with symmetry and  self matrix product
+      integer(kind = kint), parameter :: iflag_leg_sym_dgemm_tj = 16
 !>      integer flag to perform Legendre transform 
 !@n     with testing loop
       integer(kind = kint), parameter :: iflag_leg_test_loop =   99
@@ -159,38 +165,33 @@
 !
       if(     cmp_no_case(tranx_loop_ctl, leg_test_loop)) then
         set_legendre_trans_mode_ctl = iflag_leg_test_loop
-      else if(cmp_no_case(tranx_loop_ctl, leg_krloop_inner)) then
-        set_legendre_trans_mode_ctl = iflag_leg_krloop_inner
-      else if(cmp_no_case(tranx_loop_ctl, leg_krloop_outer)) then
-        set_legendre_trans_mode_ctl = iflag_leg_krloop_outer
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_org_loop)) then
         set_legendre_trans_mode_ctl = iflag_leg_symmetry
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_spin_loop)) then
         set_legendre_trans_mode_ctl = iflag_leg_sym_spin_loop
-      else if(cmp_no_case(tranx_loop_ctl, leg_matmul)) then
-        set_legendre_trans_mode_ctl = iflag_leg_matmul
-      else if(cmp_no_case(tranx_loop_ctl, leg_dgemm)) then
-        set_legendre_trans_mode_ctl = iflag_leg_dgemm
-      else if(cmp_no_case(tranx_loop_ctl, leg_matprod)) then
-        set_legendre_trans_mode_ctl = iflag_leg_matprod
+!
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_matmul)) then
         set_legendre_trans_mode_ctl = iflag_leg_sym_matmul
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_dgemm)) then
         set_legendre_trans_mode_ctl = iflag_leg_sym_dgemm
-      else if(cmp_no_case(tranx_loop_ctl, leg_sym_matprod)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_matprod
-      else if(cmp_no_case(tranx_loop_ctl, leg_blocked_loop)) then
-        set_legendre_trans_mode_ctl = iflag_leg_blocked
-      else if(cmp_no_case(tranx_loop_ctl, leg_orginal_loop)) then
-        set_legendre_trans_mode_ctl = iflag_leg_orginal_loop
+!
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_matmul_big)) then
         set_legendre_trans_mode_ctl = iflag_leg_sym_matmul_big
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_dgemm_big)) then
         set_legendre_trans_mode_ctl = iflag_leg_sym_dgemm_big
-      else if(cmp_no_case(tranx_loop_ctl, leg_sym_matprod_big)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_matprod_big
+!
+      else if(cmp_no_case(tranx_loop_ctl, leg_sym_mat_jt)) then
+        set_legendre_trans_mode_ctl = iflag_leg_sym_mat_jt
+      else if(cmp_no_case(tranx_loop_ctl, leg_sym_dgemm_jt)) then
+        set_legendre_trans_mode_ctl = iflag_leg_sym_dgemm_jt
+!
+      else if(cmp_no_case(tranx_loop_ctl, leg_sym_mat_tj)) then
+        set_legendre_trans_mode_ctl = iflag_leg_sym_mat_tj
+      else if(cmp_no_case(tranx_loop_ctl, leg_dgemm_tj)) then
+        set_legendre_trans_mode_ctl = iflag_leg_sym_dgemm_tj
+!
       else
-        set_legendre_trans_mode_ctl = iflag_leg_orginal_loop
+        set_legendre_trans_mode_ctl = iflag_leg_symmetry
       end if
 !
       end function set_legendre_trans_mode_ctl
@@ -206,36 +207,31 @@
       character(len=kchara) :: tmpchara
 !
 !
-      if     (id_legendre .eq. iflag_leg_orginal_loop) then
-        write(tmpchara,'(a)') trim(leg_orginal_loop)
-      else if(id_legendre .eq. iflag_leg_blocked) then
-        write(tmpchara,'(a)') trim(leg_blocked_loop)
-      else if(id_legendre .eq. iflag_leg_krloop_inner) then
-        write(tmpchara,'(a)') trim(leg_krloop_inner)
-      else if(id_legendre .eq. iflag_leg_krloop_outer) then
-        write(tmpchara,'(a)') trim(leg_krloop_outer)
-      else if(id_legendre .eq. iflag_leg_symmetry) then
+      if(id_legendre .eq. iflag_leg_symmetry) then
         write(tmpchara,'(a)') trim(leg_sym_org_loop)
        else if(id_legendre .eq. iflag_leg_sym_spin_loop) then
         write(tmpchara,'(a)') trim(leg_sym_spin_loop)
-      else if(id_legendre .eq. iflag_leg_matmul) then
-        write(tmpchara,'(a)') trim(leg_matmul)
-      else if(id_legendre .eq. iflag_leg_dgemm) then
-        write(tmpchara,'(a)') trim(leg_dgemm)
-      else if(id_legendre .eq. iflag_leg_matprod) then
-        write(tmpchara,'(a)') trim(leg_matprod)
+!
       else if(id_legendre .eq. iflag_leg_sym_matmul) then
         write(tmpchara,'(a)') trim(leg_sym_matmul)
       else if(id_legendre .eq. iflag_leg_sym_dgemm) then
         write(tmpchara,'(a)') trim(leg_sym_dgemm)
-      else if(id_legendre .eq. iflag_leg_sym_matprod) then
-        write(tmpchara,'(a)') trim(leg_sym_matprod)
+!
       else if(id_legendre .eq. iflag_leg_sym_matmul_big) then
         write(tmpchara,'(a)') trim(leg_sym_matmul_big)
       else if(id_legendre .eq. iflag_leg_sym_dgemm_big) then
         write(tmpchara,'(a)') trim(leg_sym_dgemm_big)
-      else if(id_legendre .eq. iflag_leg_sym_matprod_big) then
-        write(tmpchara,'(a)') trim(leg_sym_matprod_big)
+!
+      else if(id_legendre .eq. iflag_leg_sym_mat_jt) then
+        write(tmpchara,'(a)') trim(leg_sym_mat_jt)
+      else if(id_legendre .eq. iflag_leg_sym_dgemm_jt) then
+        write(tmpchara,'(a)') trim(leg_sym_dgemm_jt)
+!
+      else if(id_legendre .eq. iflag_leg_sym_mat_tj) then
+        write(tmpchara,'(a)') trim(leg_sym_mat_tj)
+      else if(id_legendre .eq. iflag_leg_sym_dgemm_tj) then
+        write(tmpchara,'(a)') trim(leg_dgemm_tj)
+!
       else if(id_legendre .eq. iflag_leg_test_loop) then
         write(tmpchara,'(a)') trim(leg_test_loop)
       end if

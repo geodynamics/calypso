@@ -62,7 +62,10 @@ mod_list:
 
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(INIT_SPECTR_DIR)' $(SOURCES)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(INIT_SPECTR_DIR)' $(SOURCES)
 
 clean:
 	rm -f *.o *~ *.mod *.diag *.L

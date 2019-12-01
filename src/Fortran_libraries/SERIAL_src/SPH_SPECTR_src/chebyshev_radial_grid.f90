@@ -9,6 +9,9 @@
 !!@verbatim
 !!      subroutine set_chebyshev_distance_shell(num_layer, nlayer_ICB,  &
 !!     &          nlayer_CMB, r_ICB, r_CMB, r_grid)
+!!      subroutine adjust_chebyshev_shell                               &
+!!     &         (num_layer, nlayer_ICB, nlayer_CMB, increment, r_grid)
+!!
 !!      subroutine count_chebyshev_ext_layers(nri, r_ICB, r_CMB,        &
 !!     &          r_min, r_max, ntot_shell, nlayer_ICB, nlayer_CMB)
 !!@endverbatim
@@ -78,6 +81,51 @@
       end do
 !
       end subroutine set_chebyshev_distance_shell
+!
+!  -------------------------------------------------------------------
+!
+      subroutine adjust_chebyshev_shell                                 &
+     &         (num_layer, nlayer_ICB, nlayer_CMB, increment, r_grid)
+!
+      integer(kind = kint), intent(in) :: num_layer
+      integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
+      integer(kind = kint), intent(in) :: increment
+!
+      real(kind = kreal), intent(inout) :: r_grid(num_layer)
+!
+      integer(kind = kint) :: k, kk, kst, ked, nri
+      real(kind = kreal) :: r1, r2
+!
+!
+      if(increment .le. 1) return
+      nri = nlayer_CMB - nlayer_ICB
+!
+      do k = nlayer_ICB, nlayer_CMB-increment, increment
+        if(nlayer_ICB .eq. 0) then
+          r1 = 0.0d0
+        else
+          r1 = r_grid(k)
+        end if
+        r2 = r_grid(k+increment)
+!
+        do kk = 1, increment-1
+          r_grid(k+kk) = r1 + (r2 - r1) * dble(kk) / dble(increment)
+        end do
+      end do
+!
+      ked = min(num_layer, nlayer_CMB + nri/2)
+      do k = nlayer_CMB+1, ked
+        kk = 2*nlayer_CMB - k
+        r_grid(k) = 2.0d0 * r_grid(nlayer_CMB) - r_grid(kk)
+      end do
+!
+      kst = max(ione, nlayer_ICB-nri/itwo)
+      do k = kst, nlayer_ICB-1
+        kk = 2*nlayer_ICB - k
+        r_grid(k) = 2.0d0 * r_grid(nlayer_ICB) - r_grid(kk)
+      end do
+!
+      end subroutine adjust_chebyshev_shell
 !
 !  -------------------------------------------------------------------
 !  -------------------------------------------------------------------

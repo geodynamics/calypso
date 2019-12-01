@@ -37,7 +37,7 @@
 !
       private :: all_sph_send_recv_N, all_sph_SR_core_N
       private :: check_spherical_SRs_N, check_calypso_sph_buffer_N
-      private :: sel_sph_import_table, sel_sph_comm_routine
+      private :: sel_sph_import_table
 !
 ! ----------------------------------------------------------------------
 !
@@ -89,18 +89,6 @@
         end if
       end if
 !
-      iflag_sph_commN = iflag_send_recv
-!      call sel_sph_comm_routine(NB, comms_sph)
-      if(my_rank .eq. 0) then
-        write(*,'(a,i4)', advance='no')                                 &
-     &   'Selected communication routine: ', iflag_sph_commN
-        if(iflag_sph_commN .eq. iflag_send_recv) then
-          write(*,'(3a)') ' (', trim(hd_sendrecv), ') '
-        else if(iflag_sph_commN .eq. iflag_alltoallv) then
-          write(*,'(3a)') ' (', trim(hd_all2allv), ') '
-        end if
-      end if
-!
       end subroutine init_sph_send_recv_N
 !
 !-----------------------------------------------------------------------
@@ -134,6 +122,12 @@
 !
       if(iflag_sph_SRN .ne. iflag_import_UNDEFINED) return
 !
+      iflag_sph_SRN = iflag_import_rev
+      starttime = MPI_WTIME()
+      call all_sph_send_recv_N(NB, comms_sph,                           &
+     &    nnod_rtp, nnod_rtm, nnod_rlm, nnod_rj,                        &
+     &    X_rtp, X_rtm, X_rlm, X_rj)
+!
       if(my_rank .eq. 0) write(*,*) 'test  send_recv with reg. import'
       iflag_sph_SRN = iflag_import_item
       starttime = MPI_WTIME()
@@ -166,57 +160,6 @@
         write(*,*) '1: Time by rev. import list: ',etime_item_import(1)
 !
       end subroutine sel_sph_import_table
-!
-! ----------------------------------------------------------------------
-!
-      subroutine sel_sph_comm_routine(NB, comms_sph)
-!
-      use m_sph_communicators
-      use calypso_mpi
-      use set_from_recv_buf_rev
-!
-      integer (kind=kint), intent(in) :: NB
-      type(sph_comm_tables), intent(in) :: comms_sph
-!
-      real(kind = kreal) :: starttime, endtime(0:2)
-      real(kind = kreal) :: etime_send_recv(0:2) =   0.0d0
-      real(kind = kreal) :: etime_shortest
-!
-      integer (kind=kint) :: i
-!
-!
-      if(iflag_sph_commN .ne. iflag_SR_UNDEFINED) return
-!
-      endtime(0:2) = 0.0d0
-!
-      iflag_sph_commN = iflag_send_recv
-      starttime = MPI_WTIME()
-      call all_sph_SR_core_N(NB, comms_sph)
-      endtime(0) = MPI_WTIME() - starttime
-!
-      iflag_sph_commN = iflag_alltoallv
-      starttime = MPI_WTIME()
-      call all_sph_SR_core_N(NB, comms_sph)
-      endtime(1) = MPI_WTIME() - starttime
-!
-      call MPI_allREDUCE (endtime(0), etime_send_recv(0), 3,            &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
-!
-      etime_shortest = etime_send_recv(0)
-      iflag_sph_commN = iflag_send_recv
-      do i = 1, 1
-        if(etime_send_recv(i) .le. etime_shortest                       &
-     &          .and. etime_send_recv(i) .gt. 0.0) then
-          etime_shortest = etime_send_recv(i)
-          iflag_sph_commN = i
-        end if
-      end do
-!
-      if(my_rank .gt. 0) return
-        write(*,*) '0: Time by MPI_ISEND_IRECV: ', etime_send_recv(0)
-        write(*,*) '1: Time by MPI_AllToAllV: ',   etime_send_recv(1)
-!
-      end subroutine sel_sph_comm_routine
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

@@ -89,8 +89,8 @@ $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
 	$(F90_LOCAL) $< -o $@
 
 depends: $(MAKE_MOD_DEP)
+	echo "# Construct Makefile"; \
 	cd $(MHDDIR) ; \
-		echo 'Construct dependencies'; \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MHDDIR='$(MHDDIR)' \
@@ -100,7 +100,7 @@ depends: $(MAKE_MOD_DEP)
 		OPTFLAGS='$(OPTFLAGS)' \
 		depends
 
-makemake:
+makemake: $(MAKE_MOD_DEP)
 	echo "# Construct Makefile"; \
 	cd $(MHDDIR) ; \
 		$(GMAKE) \

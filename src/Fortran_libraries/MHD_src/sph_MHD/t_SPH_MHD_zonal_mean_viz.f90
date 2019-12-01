@@ -7,7 +7,7 @@
 !!     &         (fem, nod_fld, zm_ctls, zmeans)
 !!        type(mesh_data), intent(in) :: fem
 !!        type(phys_data), intent(in) :: nod_fld
-!!        type(sph_zonal_means_controls), intent(inout) :: zm_ctls
+!!        type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
 !!        type(sph_zonal_mean_sectioning), intent(inout) :: zmeans
 !!      subroutine SPH_MHD_zmean_sections(viz_step, time_d,             &
 !!     &          sph, fem, WK, nod_fld, zmeans)
@@ -66,12 +66,12 @@
       subroutine init_zonal_mean_sections                               &
      &         (fem, nod_fld, zm_ctls, zmeans)
 !
-      use t_control_data_zm_vizs
+      use t_control_data_dynamo_vizs
 !
       type(mesh_data), intent(in) :: fem
       type(phys_data), intent(in) :: nod_fld
 !
-      type(sph_zonal_means_controls), intent(inout) :: zm_ctls
+      type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
       type(sph_zonal_mean_sectioning), intent(inout) :: zmeans
 !
 !

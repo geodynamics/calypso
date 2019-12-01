@@ -11,22 +11,16 @@
 !!
 !!@verbatim
 !!    Backward transforms
-!!      subroutine leg_backward_trans_spin(ncomp, nvector, nscalar,     &
+!!      subroutine leg_backward_trans_sym_spin(ncomp, nvector, nscalar, &
 !!     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,  &
-!!     &          n_WR, n_WS, WR, WS, WK_l_mtl)
+!!     &          n_WR, n_WS, WR, WS, WK_l_sml)
 !!        Input:  sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!        Output: vr_rtm   (Order: radius,theta,phi)
 !!
 !!    Forward transforms
-!!      subroutine leg_forward_trans_spin(ncomp, nvector, nscalar,      &
-!!     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,  &
-!!     &          n_WR, n_WS, WR, WS, WK_l_mtl)
 !!        Input:  vr_rtm   (Order: radius,theta,phi)
 !!        Output: sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!
-!!      subroutine leg_backward_trans_sym_spin(ncomp, nvector, nscalar, &
-!!     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,  &
-!!     &          n_WR, n_WS, WR, WS, WK_l_sml)
 !!      subroutine leg_forward_trans_sym_spin(ncomp, nvector, nscalar,  &
 !!     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,  &
 !!     &          n_WR, n_WS, WR, WS, WK_l_sml)
@@ -62,70 +56,6 @@
 !
       contains
 !
-! -----------------------------------------------------------------------
-!
-      subroutine leg_backward_trans_spin(ncomp, nvector, nscalar,       &
-     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,    &
-     &          n_WR, n_WS, WR, WS, WK_l_mtl)
-!
-      use legendre_bwd_trans_spin
-!
-      type(sph_rlm_grid), intent(in) :: sph_rlm
-      type(sph_rtm_grid), intent(in) :: sph_rtm
-      type(sph_comm_tbl), intent(in) :: comm_rlm, comm_rtm
-      type(legendre_4_sph_trans), intent(in) :: leg
-      type(index_4_sph_trans), intent(in) :: idx_trns
-      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
-      integer(kind = kint), intent(in) :: n_WR, n_WS
-!
-      real (kind=kreal), intent(inout):: WR(n_WR)
-      real (kind=kreal), intent(inout):: WS(n_WS)
-      type(leg_trns_matmul_work), intent(inout) :: WK_l_mtl
-!
-!
-        call legendre_b_trans_vector_spin(ncomp, nvector,               &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns,             &
-     &      leg%asin_t_rtm, leg%g_sph_rlm, leg%P_jl, leg%dPdt_jl,       &
-     &      n_WR, n_WS, WR, WS, WK_l_mtl)
-        call legendre_b_trans_scalar_spin(ncomp, nvector, nscalar,      &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns, leg%P_jl,   &
-     &      n_WR, n_WS, WR, WS, WK_l_mtl)
-!
-      end subroutine leg_backward_trans_spin
-!
-! -----------------------------------------------------------------------
-!
-      subroutine leg_forward_trans_spin(ncomp, nvector, nscalar,        &
-     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,    &
-     &          n_WR, n_WS, WR, WS, WK_l_mtl)
-!
-      use legendre_fwd_trans_spin
-!
-      type(sph_rtm_grid), intent(in) :: sph_rtm
-      type(sph_rlm_grid), intent(in) :: sph_rlm
-      type(sph_comm_tbl), intent(in) :: comm_rlm, comm_rtm
-      type(legendre_4_sph_trans), intent(in) :: leg
-      type(index_4_sph_trans), intent(in) :: idx_trns
-      integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
-      integer(kind = kint), intent(in) :: n_WR, n_WS
-!
-      real (kind=kreal), intent(inout):: WR(n_WR)
-      real (kind=kreal), intent(inout):: WS(n_WS)
-      type(leg_trns_matmul_work), intent(inout) :: WK_l_mtl
-!
-!
-        call legendre_f_trans_vector_spin(ncomp, nvector,               &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns,             &
-     &      leg%asin_t_rtm, leg%g_sph_rlm, leg%weight_rtm,              &
-     &      leg%P_rtm, leg%dPdt_rtm, n_WR, n_WS, WR, WS, WK_l_mtl)
-        call legendre_f_trans_scalar_spin(ncomp, nvector, nscalar,      &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns,             &
-     &      leg%g_sph_rlm, leg%weight_rtm, leg%P_rtm,                   &
-     &      n_WR, n_WS, WR, WS, WK_l_mtl)
-!
-      end subroutine leg_forward_trans_spin
-!
-! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine leg_backward_trans_sym_spin(ncomp, nvector, nscalar,   &

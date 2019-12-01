@@ -85,6 +85,10 @@
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,             &
      &      sph_bc_U%r_ICB, fdm2_center%dmat_fix_fld, coef_p,           &
      &      band_p_poisson%mat)
+!      else if(sph_bc_U%iflag_icb .eq. iflag_free_sph) then
+!      else if(sph_bc_U%iflag_icb .eq. iflag_evolve_field) then
+!      else if(sph_bc_U%iflag_icb .eq. iflag_fixed_field) then
+!      else if(sph_bc_U%iflag_icb .eq. iflag_fixed_velo) then
       else
         call add_icb_scalar_poisson_mat                                 &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,             &
@@ -164,22 +168,28 @@
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,             &
      &      sph_bc%r_ICB, fdm2_center%dmat_fix_fld, coef,               &
      &      band_s_evo%mat)
-      else if (sph_bc%iflag_icb .eq. iflag_fixed_flux) then
+      else if (sph_bc%iflag_icb .eq. iflag_fixed_flux                   &
+     &    .or. sph_bc%iflag_icb .eq. iflag_evolve_flux) then
         call add_fix_flux_icb_poisson_mat                               &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,             &
      &      sph_bc%kr_in, sph_bc%r_ICB, sph_bc%fdm2_fix_dr_ICB, coef,   &
      &      band_s_evo%mat)
+!      else if (sph_bc%iflag_icb .eq. iflag_fixed_field                 &
+!     &    .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
       else
         call set_fix_fld_icb_poisson_mat                                &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                       &
      &      sph_bc%kr_in, band_s_evo%mat)
       end if
 !
-      if (sph_bc%iflag_cmb .eq. iflag_fixed_flux) then
+      if (sph_bc%iflag_cmb .eq. iflag_fixed_flux                        &
+     &    .or. sph_bc%iflag_cmb .eq. iflag_evolve_flux) then
         call add_fix_flux_cmb_poisson_mat                               &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), g_sph_rj,             &
      &      sph_bc%kr_out, sph_bc%r_CMB, sph_bc%fdm2_fix_dr_CMB, coef,  &
      &      band_s_evo%mat)
+!      else if (sph_bc%iflag_cmb .eq. iflag_fixed_field                 &
+!     &    .or. sph_bc%iflag_cmb .eq. iflag_evolve_field) then
       else
         call set_fix_fld_cmb_poisson_mat                                &
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                       &

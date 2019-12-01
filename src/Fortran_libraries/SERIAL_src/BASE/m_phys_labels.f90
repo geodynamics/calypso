@@ -47,6 +47,8 @@
 !!   filter_temp, filter_part_temp, filter_composition
 !!   filter_vecp, filter_magne, filter_current
 !!
+!!   truncated_magnetic_field
+!!
 !!   div_filter_velo, div_filter_magne, div_filter_vecp
 !!
 !!   wide_filter_velo, wide_filter_vorticity
@@ -204,6 +206,10 @@
 !!         @f$ \bar{A}_{i} @f$
       character(len=kchara), parameter                                  &
      &            :: fhd_filter_vecp = 'filter_vecp'
+!>        Field label for filtered vetor potential
+!!         @f$ \bar{A}_{i} @f$
+      character(len=kchara), parameter                                  &
+     &            :: fhd_truncated_B = 'truncated_magnetic_field'
 !
 !>        Field label for filtered velocity
 !!         @f$ \partial_{i} \bar{u}_{i} @f$

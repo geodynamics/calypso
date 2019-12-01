@@ -48,7 +48,9 @@
 !!    end array r_layer
 !!
 !!    radial_grid_type_ctl   Chebyshev
-!!     num_fluid_grid_ctl  5
+!!     num_fluid_grid_ctl      10
+!!     increment_of_chebyshev   2
+!!
 !!     fluid_core_size_ctl   0.35
 !!     ICB_to_CMB_ratio_ctl  1.0
 !!     Min_radius_ctl      0.0
@@ -121,9 +123,11 @@
 !
 !>        Grid spacing type
         type(read_character_item) :: radial_grid_type_ctl
-!>        Minimum radius of the simulation domain @f$ R_{c} @f$
+!>        Number of element in fluid (number of grid - 1)
         type(read_integer_item) :: num_fluid_grid_ctl
-!>        ICB radius     @f$ R_{i} @f$
+!>        Increment between chebyshev points
+        type(read_integer_item) :: increment_cheby_ctl
+!>        Minimum radius of the simulation domain @f$ R_{c} @f$
         type(read_real_item) :: Min_radius_ctl
 !>        ICB radius     @f$ R_{i} @f$
         type(read_real_item) :: ICB_radius_ctl
@@ -175,6 +179,8 @@
      &      ::  hd_r_grid_type = 'radial_grid_type_ctl'
       character(len=kchara), parameter                                  &
      &      ::  hd_n_fluid_grid = 'num_fluid_grid_ctl'
+      character(len=kchara), parameter                                  &
+     &      ::  hd_cheby_increment = 'increment_of_chebyshev'
       character(len=kchara), parameter                                  &
      &      ::  hd_Min_radius =  'Min_radius_ctl'
       character(len=kchara), parameter                                  &
@@ -258,6 +264,8 @@
 !
         call read_integer_ctl_type                                      &
      &     (c_buf, hd_n_fluid_grid, spctl%num_fluid_grid_ctl)
+        call read_integer_ctl_type                                      &
+     &     (c_buf, hd_cheby_increment, spctl%increment_cheby_ctl)
 !
 !
         call read_real_ctl_type                                         &
@@ -320,6 +328,7 @@
 !
       spctl%radial_grid_type_ctl%iflag = 0
       spctl%num_fluid_grid_ctl%iflag =   0
+      spctl%increment_cheby_ctl%iflag =  0
       spctl%Min_radius_ctl%iflag =       0
       spctl%ICB_radius_ctl%iflag =       0
       spctl%CMB_radius_ctl%iflag =       0

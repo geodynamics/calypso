@@ -1,0 +1,7 @@
+copy_MHD_4_pole_trans.o: $(MHD_SNAPSHOT_DIR)/copy_MHD_4_pole_trans.f90 m_precision.o m_constants.o t_spheric_rtp_data.o t_geometry_data.o t_phys_address.o t_phys_data.o m_machine_parameter.o copy_pole_field_sph_trans.o
+	$(F90) -c $(F90OPTFLAGS) $<
+node_monitor_IO.o: $(MHD_SNAPSHOT_DIR)/node_monitor_IO.f90 m_precision.o t_time_data.o t_mesh_data.o t_phys_data.o t_IO_step_parameter.o calypso_mpi.o m_machine_parameter.o set_parallel_file_name.o
+	$(F90) -c $(F90OPTFLAGS) $<
+pole_energy_flux_sph.o: $(MHD_SNAPSHOT_DIR)/pole_energy_flux_sph.f90 m_precision.o m_constants.o t_physical_property.o t_spheric_rtp_data.o t_geometry_data.o t_phys_address.o t_phys_data.o m_machine_parameter.o products_at_poles.o t_reference_scalar_param.o pole_poynting_flux_smp.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

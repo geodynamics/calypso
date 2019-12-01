@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine set_control_SPH_MHD_w_viz                            &
-!!     &         (Dmodel_ctl, psph_ctl, smonitor_ctl,                   &
+!!     &         (Dmodel_ctl, psph_ctl, smonitor_ctl, zm_ctls,          &
 !!     &          MHD_prop, sph, rj_fld, nod_fld, monitor)
 !!      subroutine set_control_SPH_MHD_noviz(Dmodel_ctl, smonitor_ctl,  &
 !!     &          MHD_prop, rj_fld, monitor)
@@ -41,6 +41,10 @@
 !!        type(MHD_BC_lists), intent(inout) :: MHD_BC
 !!      subroutine set_control_SPH_MHD_monitors                         &
 !!     &         (smonitor_ctl, rj_fld, monitor)
+!!      subroutine set_crustal_filtering_control                        &
+!!     &         (crust_truncation_c, monitor)
+!!        type(phys_data), intent(in) :: crust_truncation_c
+!!        type(sph_mhd_monitor_data), intent(inout) :: monitor
 !!@endverbatim
 !
       module set_control_sph_mhd
@@ -61,6 +65,7 @@
       use t_ctl_data_4_sph_monitor
       use t_ctl_data_node_monitor
       use t_ctl_data_gen_sph_shell
+      use t_control_data_dynamo_vizs
       use t_sph_transforms
       use t_bc_data_list
       use t_flex_delta_t_data
@@ -74,7 +79,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine set_control_SPH_MHD_w_viz                              &
-     &         (Dmodel_ctl, psph_ctl, smonitor_ctl,                     &
+     &         (Dmodel_ctl, psph_ctl, smonitor_ctl, zm_ctls,            &
      &          MHD_prop, sph, rj_fld, nod_fld, monitor)
 !
       use t_phys_data
@@ -90,6 +95,7 @@
       type(mhd_DNS_model_control), intent(inout) :: Dmodel_ctl
       type(sph_monitor_control), intent(in) :: smonitor_ctl
       type(parallel_sph_shell_control), intent(inout) :: psph_ctl
+      type(sph_dynamo_viz_controls), intent(in) :: zm_ctls
       type(sph_grids), intent(inout) :: sph
       type(phys_data), intent(inout) :: rj_fld
       type(phys_data), intent(inout) :: nod_fld
@@ -111,6 +117,8 @@
 !   set_pickup modes
       call set_control_SPH_MHD_monitors(smonitor_ctl, rj_fld, monitor)
 !
+      call set_crustal_filtering_control                                &
+     &   (zm_ctls%crust_filter_ctl, monitor)
 !
       call set_FEM_mesh_mode_4_SPH(psph_ctl%spctl, sph%sph_params)
 !
@@ -200,8 +208,8 @@
       call check_control_num_domains(plt)
       call set_control_smp_def(my_rank, plt)
       call set_control_sph_mesh(plt, psph_ctl%Fmesh_ctl,                &
-     &    MHD_files%mesh_file_IO, MHD_files%sph_file_IO,                &
-     &    MHD_files%FEM_mesh_flags)
+     &    MHD_files%sph_file_param, MHD_files%mesh_file_IO,             &
+     &    MHD_files%sph_file_IO, MHD_files%FEM_mesh_flags)
       call set_control_restart_file_def(plt, MHD_files%fst_file_IO)
       call set_merged_ucd_file_define(plt, MHD_files%ucd_file_IO)
       call set_control_org_sph_files(org_plt, MHD_files)
@@ -349,6 +357,26 @@
      &    rj_fld, monitor%Nusselt)
 !
       end subroutine set_control_SPH_MHD_monitors
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_crustal_filtering_control(crust_c, monitor)
+!
+      use t_control_data_dynamo_vizs
+      use t_sph_mhd_monitor_data_IO
+!
+      use set_control_4_pickup_sph
+!
+      type(clust_filtering_ctl), intent(in) :: crust_c
+      type(sph_mhd_monitor_data), intent(inout) :: monitor
+!
+!
+      monitor%ltr_crust = 1
+      if(crust_c%crust_truncation_ctl%iflag .gt. 0) then
+        monitor%ltr_crust = crust_c%crust_truncation_ctl%intvalue
+      end if
+!
+      end subroutine set_crustal_filtering_control
 !
 ! ----------------------------------------------------------------------
 !

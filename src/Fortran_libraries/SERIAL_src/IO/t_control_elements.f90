@@ -58,6 +58,9 @@
 !!      subroutine read_int2real2_ctl_type(c_buf, label, i2r2_item)
 !!        type(buffer_for_control), intent(in)  :: c_buf
 !!        type(read_int2_real2_item), intent(inout) :: i2r2_item
+!!      subroutine read_charaint3_ctl_type(c_buf, label, ci3_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_chara_int3_item), intent(inout) :: ci3_item
 !!
 !!      subroutine write_real_ctl_type                                  &
 !!     &         (id_file, level, maxlen, label, real_item)
@@ -80,6 +83,9 @@
 !!      subroutine write_character3_ctl_type                            &
 !!     &         (id_file, level, label, chara3_item)
 !!        type(read_chara3_item), intent(in) :: chara3_item
+!!      subroutine write_charaint3_ctl_type                             &
+!!     &         (id_file, level, label, ci3_item)
+!!        type(read_chara_int3_item), intent(in) :: ci3_item
 !!@endverbatim
 !!
 !!@n @param  label   Read label for control items
@@ -248,7 +254,15 @@
         real(kind = kreal) ::    realvalue(2)
       end type read_int2_real2_item
 !
-!
+!>        structure of control item with character and three integers
+      type read_chara_int3_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read character items
+        character(len=kchara) ::  charavalue
+!>        array for read integer items
+        integer(kind = kint) ::  intvalue(3)
+      end type read_chara_int3_item
 !
 !   --------------------------------------------------------------------
 !
@@ -533,6 +547,23 @@
        end subroutine read_int2real2_ctl_type
 !
 !   --------------------------------------------------------------------
+!
+      subroutine read_charaint3_ctl_type(c_buf, label, ci3_item)
+!
+      use read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_chara_int3_item), intent(inout) :: ci3_item
+!
+!
+      call read_charaine3_ctl_item(c_buf, label, ci3_item%iflag,        &
+     &    ci3_item%charavalue, ci3_item%intvalue(1),                    &
+     &    ci3_item%intvalue(2), ci3_item%intvalue(3))
+!
+       end subroutine read_charaint3_ctl_type
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine write_real_ctl_type                                    &
@@ -673,6 +704,26 @@
      &    chara3_item%charavalue(3))
 !
        end subroutine write_character3_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_charaint3_ctl_type                               &
+     &         (id_file, level, label, ci3_item)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      character(len=kchara), intent(in) :: label
+      type(read_chara_int3_item), intent(in) :: ci3_item
+!
+!
+      if(ci3_item%iflag .eq. 0) return
+!
+      call write_chara_int3_ctl_item(id_file, level, label,             &
+     &    ci3_item%charavalue, ci3_item%intvalue(1),                    &
+     &    ci3_item%intvalue(2), ci3_item%intvalue(3))
+!
+       end subroutine write_charaint3_ctl_type
 !
 !   --------------------------------------------------------------------
 !

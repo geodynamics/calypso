@@ -140,7 +140,6 @@
         type(read_character_item) :: Legendre_trans_type
         type(read_character_item) :: FFT_library
         type(read_character_item) :: import_mode
-        type(read_character_item) :: SR_routine
 !
         type(read_integer_item) :: leg_vector_len
 !
@@ -199,8 +198,6 @@
       character(len=kchara), parameter                                  &
      &      :: hd_import_mode =  'import_table_mode_ctl'
       character(len=kchara), parameter                                  &
-     &      :: hd_SR_routine =   'send_recv_routine_ctl'
-      character(len=kchara), parameter                                  &
      &      :: hd_legendre_vect_len = 'Legendre_vector_length_ctl'
 !
       private :: hd_rst_flag
@@ -212,7 +209,7 @@
       private :: hd_coef_imp_b, hd_coef_imp_c, hd_eps_crank
       private :: hd_method_4_velo, hd_precond_4_crank
       private :: hd_sph_transform_mode, hd_legendre_vect_len
-      private :: hd_FFT_package, hd_import_mode, hd_SR_routine
+      private :: hd_FFT_package, hd_import_mode
 !
 !   --------------------------------------------------------------------
 !
@@ -280,8 +277,6 @@
      &     (c_buf, hd_FFT_package, mevo_ctl%FFT_library)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_import_mode, mevo_ctl%import_mode)
-        call read_chara_ctl_type(c_buf, hd_SR_routine,                  &
-     &      mevo_ctl%SR_routine)
 !
         call read_real_ctl_type                                         &
      &     (c_buf, hd_eps_4_velo,  mevo_ctl%eps_4_velo_ctl)
@@ -355,7 +350,6 @@
       call bcast_ctl_type_c1(mevo_ctl%Legendre_trans_type)
       call bcast_ctl_type_c1(mevo_ctl%FFT_library)
       call bcast_ctl_type_c1(mevo_ctl%import_mode)
-      call bcast_ctl_type_c1(mevo_ctl%SR_routine)
 !
       call bcast_ctl_type_r1(mevo_ctl%eps_4_velo_ctl)
       call bcast_ctl_type_r1(mevo_ctl%eps_4_magne_ctl)

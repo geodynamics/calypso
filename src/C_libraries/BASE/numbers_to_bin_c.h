@@ -21,4 +21,8 @@ void dec2bin(int dec, char *bin);
 int charhex2bin(char *hex, char *bin);
 
 double round_2_3digit(double value);
+
+void find_order_digit(double d_in, double *d_out, int *i_digit);
+double const_from_digit_order(double d_in, int  i_digit);
+
 #endif

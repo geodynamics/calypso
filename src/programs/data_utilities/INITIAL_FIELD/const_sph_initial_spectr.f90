@@ -444,7 +444,7 @@
           rr = radius_1d_rj_r(sph, k) / sph_bc_B%r_CMB(0)
 !   Substitute poloidal mangetic field
           rj_fld%d_fld(is,ipol%i_magne)                                 &
-     &       =  rj_fld%d_fld(is_ICB,ipol%i_magne) * rr**(-ione)
+     &       =  rj_fld%d_fld(is_CMB,ipol%i_magne) * rr**(-ione)
         end do
       end if
 !

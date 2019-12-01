@@ -85,4 +85,7 @@ mod_list:
 	@echo  $(MOD_SPH_ENE_CHECK)       >> $(MAKENAME)
 
 module:
-	@$(MAKE_MOD_DEP) '$(MAKENAME)' '$$(SPH_UTILS_DIR)' $(SOURCES)
+	@cat Makefile.depends >> $(MAKENAME)
+
+depends:
+	@$(MAKE_MOD_DEP) Makefile.depends '$$(SPH_UTILS_DIR)' $(SOURCES)

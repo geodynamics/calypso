@@ -131,6 +131,9 @@
         else if ( field_name(i) .eq. fhd_filter_comp ) then
           iphys%i_filter_comp =    i0
 !
+        else if ( field_name(i) .eq. fhd_truncated_B) then
+          iphys%i_truncated_B =    i0
+!
         else if ( field_name(i) .eq. fhd_div_filter_v ) then
           iphys%i_div_filter_v =    i0
         else if ( field_name(i) .eq. fhd_div_filter_b ) then

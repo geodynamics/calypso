@@ -49,6 +49,7 @@
       call bcast_ctl_type_i1(spctl%ngrid_azimuth_ctl)
 !
       call bcast_ctl_type_i1(spctl%num_fluid_grid_ctl)
+      call bcast_ctl_type_i1(spctl%increment_cheby_ctl)
 !
 !
       call bcast_ctl_type_r1(spctl%Min_radius_ctl)

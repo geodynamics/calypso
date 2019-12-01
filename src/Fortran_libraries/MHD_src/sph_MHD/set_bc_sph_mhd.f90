@@ -8,8 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine s_set_bc_sph_mhd(bc_IO, sph_params, sph_rj,          &
-!!     &          radial_rj_grp, MHD_prop, MHD_BC,                      &
-!!     &          CTR_nod_grp_name, CTR_sf_grp_name, sph_MHD_bc)
+!!     &          radial_rj_grp, MHD_prop, MHD_BC, sph_MHD_bc)
 !!        type(boundary_spectra), intent(in) :: bc_IO
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(MHD_BC_lists), intent(in) :: MHD_BC
@@ -35,6 +34,7 @@
       use t_boundary_params_sph_MHD
       use t_spheric_rj_data
       use t_bc_data_list
+      use t_sph_boundary_input_data
 !
       implicit none
 !
@@ -47,10 +47,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine s_set_bc_sph_mhd(bc_IO, sph_params, sph_rj,            &
-     &          radial_rj_grp, MHD_prop, MHD_BC,                        &
-     &          CTR_nod_grp_name, CTR_sf_grp_name, sph_MHD_bc)
+     &          radial_rj_grp, MHD_prop, MHD_BC, sph_MHD_bc)
 !
-      use m_phys_labels
       use set_bc_flag_sph_velo
       use set_bc_sph_scalars
 !
@@ -67,9 +65,6 @@
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(MHD_BC_lists), intent(in) :: MHD_BC
 !
-      character(len=kchara), intent(in) :: CTR_nod_grp_name
-      character(len=kchara), intent(in) :: CTR_sf_grp_name
-!
       type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
 !
       integer(kind = kint) :: kst, ked
@@ -77,10 +72,11 @@
 !
       if (MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_velo_sph'
-        call set_sph_bc_velo_sph(sph_rj, radial_rj_grp,                 &
+        call set_sph_bc_velo_sph(bc_IO, sph_rj, radial_rj_grp,          &
      &      sph_params%radius_ICB, sph_params%radius_CMB,               &
      &      MHD_BC%velo_BC%nod_BC, MHD_BC%velo_BC%surf_BC,              &
-     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bc_Uspectr)
+     &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%bcs_U)
+!
 !
         call cal_fdm_coefs_4_BCs                                        &
      &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                   &
@@ -101,11 +97,12 @@
      &     (sph_rj%radius_1d_rj_r(kst:ked), sph_MHD_bc%fdm2_free_CMB)
       end if
 !
+!
       if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_temp_sph'
         call set_sph_bc_temp_sph(bc_IO, sph_rj, radial_rj_grp,          &
      &      MHD_BC%temp_BC%nod_BC, MHD_BC%temp_BC%surf_BC,              &
-     &      sph_MHD_bc%sph_bc_T)
+     &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T)
         call cal_fdm_coefs_4_BCs                                        &
      &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                   &
      &      sph_MHD_bc%sph_bc_T)
@@ -113,10 +110,10 @@
 !
       if(MHD_prop%cd_prop%iflag_Bevo_scheme .gt. id_no_evolution) then
         if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_magne_sph'
-        call set_sph_bc_magne_sph(sph_rj, radial_rj_grp,                &
+        call set_sph_bc_magne_sph(bc_IO, sph_rj, radial_rj_grp,         &
      &      CTR_nod_grp_name, CTR_sf_grp_name,                          &
      &      MHD_BC%magne_BC%nod_BC, MHD_BC%magne_BC%surf_BC,            &
-     &      sph_MHD_bc%sph_bc_B)
+     &      sph_MHD_bc%sph_bc_B, sph_MHD_bc%bcs_B)
         call cal_fdm_coefs_4_BCs                                        &
      &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                   &
      &      sph_MHD_bc%sph_bc_B)
@@ -126,7 +123,7 @@
         if(iflag_debug .gt. 0) write(*,*) 'set_sph_bc_composition_sph'
         call set_sph_bc_composition_sph(bc_IO, sph_rj, radial_rj_grp,   &
      &      MHD_BC%light_BC%nod_BC, MHD_BC%light_BC%surf_BC,            &
-     &      sph_MHD_bc%sph_bc_C)
+     &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C)
         call cal_fdm_coefs_4_BCs                                        &
      &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                   &
      &      sph_MHD_bc%sph_bc_C)
@@ -161,17 +158,6 @@
      &          sph_MHD_bc%sph_bc_C%iflag_icb
         write(*,*) 'sph_bc_C%iflag_cmb', sph_MHD_bc%sph_bc_C%kr_out,    &
      &          sph_MHD_bc%sph_bc_C%iflag_cmb
-!
-        if(MHD_prop%ht_prop%iflag_scheme .gt. id_no_evolution) then
-          call check_sph_boundary_spectra(fhd_temp,                     &
-     &        sph_rj%nidx_rj(2), sph_rj%idx_gl_1d_rj_j,                 &
-     &        sph_MHD_bc%sph_bc_T)
-        end if
-        if(MHD_prop%cp_prop%iflag_scheme .gt. id_no_evolution) then
-          call check_sph_boundary_spectra(fhd_light,                    &
-     &        sph_rj%nidx_rj(2), sph_rj%idx_gl_1d_rj_j,                 &
-     &        sph_MHD_bc%sph_bc_C)
-        end if
       end if
 !
       if (iflag_debug .eq. iflag_full_msg) then
@@ -199,11 +185,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_sph_bc_magne_sph(sph_rj, radial_rj_grp,            &
-     &          CTR_nod_grp_name, CTR_sf_grp_name,                      &
-     &          magne_nod, magne_surf, sph_bc_B)
+      subroutine set_sph_bc_magne_sph(bc_IO, sph_rj, radial_rj_grp,     &
+     &        CTR_nod_grp_name, CTR_sf_grp_name, magne_nod, magne_surf, &
+     &        sph_bc_B, bcs_B)
 !
       use set_bc_sph_scalars
+      use set_sph_bc_data_by_file
 !
       character(len=kchara), intent(in) :: CTR_nod_grp_name
       character(len=kchara), intent(in) :: CTR_sf_grp_name
@@ -211,8 +198,10 @@
       type(group_data), intent(in) :: radial_rj_grp
       type(boundary_condition_list), intent(in) :: magne_nod
       type(boundary_condition_list), intent(in) :: magne_surf
+      type(boundary_spectra), intent(in) :: bc_IO
 !
       type(sph_boundary_type), intent(inout) :: sph_bc_B
+      type(sph_vector_boundary_data), intent(inout) :: bcs_B
 !
       integer(kind = kint) :: i
       integer(kind = kint) :: igrp_icb, igrp_cmb
@@ -221,9 +210,10 @@
       call find_both_sides_of_boundaries(sph_rj, radial_rj_grp,         &
      &    magne_nod, magne_surf, sph_bc_B, igrp_icb, igrp_cmb)
 !
+      call alloc_sph_vector_bcs_data(sph_rj%nidx_rj(2), bcs_B)
+!
       sph_bc_B%iflag_icb = iflag_sph_insulator
       sph_bc_B%iflag_cmb = iflag_sph_insulator
-!
 !
       i = abs(igrp_icb)
       if(igrp_icb .lt. 0) then
@@ -249,6 +239,14 @@
 !
         else if(magne_nod%ibc_type(i) .eq. iflag_pseudo_vacuum) then
             sph_bc_B%iflag_icb =  iflag_radial_magne
+        else if(magne_nod%ibc_type(i) .eq. iflag_bc_file_s) then
+          call set_fixed_vector_bc_by_file(fhd_magne, sph_rj, bc_IO,    &
+     &        sph_bc_B%icb_grp_name, sph_bc_B%iflag_icb,                &
+     &        bcs_B%ICB_Vspec)
+        else if(magne_nod%ibc_type(i) .eq. iflag_bc_evo_field) then
+          call set_evolved_vector_bc_by_file(fhd_magne, sph_rj, bc_IO,  &
+     &        sph_bc_B%icb_grp_name, sph_bc_B%iflag_icb,                &
+     &        bcs_B%ICB_Vevo)
         end if
       end if
 !
@@ -261,6 +259,14 @@
       else
         if(magne_nod%ibc_type(i) .eq. iflag_pseudo_vacuum) then
           sph_bc_B%iflag_cmb =  iflag_radial_magne
+        else if(magne_nod%ibc_type(i) .eq. iflag_bc_file_s) then
+          call set_fixed_vector_bc_by_file(fhd_magne, sph_rj, bc_IO,    &
+     &        sph_bc_B%cmb_grp_name, sph_bc_B%iflag_cmb,                &
+     &        bcs_B%CMB_Vspec)
+        else if(magne_nod%ibc_type(i) .eq. iflag_bc_evo_field) then
+          call set_evolved_vector_bc_by_file(fhd_magne, sph_rj, bc_IO,  &
+     &        sph_bc_B%cmb_grp_name, sph_bc_B%iflag_cmb,                &
+     &        bcs_B%CMB_Vevo)
         end if
       end if
 !

@@ -38,6 +38,17 @@
 !!        quad_field_name_ctl  maxwell_tensor
 !!        quad_field_name_ctl  vecp_induction
 !!      end array quad_field_name_ctl
+!!
+!!      array scalar_field_ctl
+!!        scalar_field_ctl  temperature   501
+!!        scalar_field_ctl  pressure      601
+!!      end array scalar_field_ctl
+!!
+!!      array vector_field_ctl
+!!        vector_field_ctl  velocity            1   2   3
+!!        vector_field_ctl  vorticity         201 202 203
+!!        vector_field_ctl  magnetic_field    301 302 303
+!!      end array vector_field_ctl
 !!    end phys_values_ctl
 !!
 !! ---------------------------------------------------------------------
@@ -65,6 +76,9 @@
 !
       call bcast_ctl_array_c3(fld_ctl%field_ctl)
       call bcast_ctl_array_c1(fld_ctl%quad_phys)
+!
+      call bcast_ctl_array_ci(fld_ctl%scalar_phys)
+      call bcast_ctl_array_ci3(fld_ctl%vector_phys)
 !
       call MPI_BCAST(fld_ctl%i_phys_values, 1,                          &
      &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)

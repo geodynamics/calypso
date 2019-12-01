@@ -93,13 +93,13 @@
          call set_bc_group_types_sph_velo(node_bc_U_ctl%c1_tbl(i),      &
      &       velo_nod%ibc_type(i))
 !
-          if(cmp_no_case(node_bc_U_ctl%c1_tbl(i), 'vr_0')               &
-     &       ) velo_nod%ibc_type(i) = iflag_no_vr
-          if(cmp_no_case(node_bc_U_ctl%c1_tbl(i), 'special')            &
-     &       ) velo_nod%ibc_type(i) = iflag_bc_special
+         if(cmp_no_case(node_bc_U_ctl%c1_tbl(i), 'vr_0'))               &
+     &       velo_nod%ibc_type(i) = iflag_no_vr
+         if(cmp_no_case(node_bc_U_ctl%c1_tbl(i), 'special'))            &
+     &       velo_nod%ibc_type(i) = iflag_bc_special
         end do
 !
-        if (iflag_debug .eq. iflag_full_msg) then
+        if(iflag_debug .gt. 0) then
           write(*,*) 'i, velo_nod'
           do i = 1, velo_nod%num_bc
             write(*,*)  i, velo_nod%ibc_type(i),                        &
@@ -130,7 +130,7 @@
      &       torque_surf%ibc_type(i))
         end do
 !
-        if (iflag_debug .eq. iflag_full_msg) then
+        if (iflag_debug .gt. 0) then
           write(*,*) 'i, torque_surf'
           do i = 1, torque_surf%num_bc
             write(*,*)  i, torque_surf%ibc_type(i),                     &

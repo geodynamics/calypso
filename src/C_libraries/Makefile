@@ -12,8 +12,6 @@ OBJS_C= $$(OBJ_BASE_C)
 SUBDIRS = \
 BASE
 
-LIBDIRS = $(SUBDIRS)
-
 #
 #  -------------------------------------------------------------------------
 #
@@ -47,7 +45,7 @@ libtarget:
 	@echo  '$$(LIB_CALYPSO_C_FILE): $(OBJS_C)' >> $(MAKENAME)
 
 lib_archve:
-	@for dir in $(LIBDIRS); do \
+	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
@@ -74,26 +72,31 @@ mod_list:
 module:
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
-		echo 'generate compile commands for ' $$dir ; \
+		echo 'copy compile commands for ' $$dir ; \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
-		MAKE_MOD_DEP='$(MAKE_MOD_DEP)' \
 		MAKENAME='$(MAKENAME)' \
 		module \
 		) \
 	done
 
-includes:
+depends:
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
-		echo 'generate symbolic link commands for ' $$dir ; \
+		echo 'generate dependencies for ' $$dir ; \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
+		MAKE_MOD_DEP='$(MAKE_MOD_DEP)' \
+		MHDDIR='$(MHDDIR)' \
+		MAKEDIR='$(MAKEDIR)' \
 		MAKENAME='$(MAKENAME)' \
-		includes \
+		CC="$(CC)"   \
+		DEPFLAGS='$(DEPFLAGS)' \
+		OPTFLAGS='$(OPTFLAGS)' \
+		C_INCLUDE='$(C_INCLUDE)' \
+		depends \
 		) \
 	done
-
 
 clean:
 	@for dir in $(SUBDIRS); do \

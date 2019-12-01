@@ -8,9 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine set_import_table_ctl(import_ctl)
-!!      subroutine set_sph_comm_routine_ctl(send_recv_ctl)
 !!
-!!      subroutine finish_sph_send_recv(npe_send, isend_self)
 !!      subroutine check_calypso_sph_buf_N                              &
 !!     &         (NB, npe_send, istack_send, npe_recv, istack_recv)
 !!      subroutine sel_calypso_sph_comm_N            ,                  &
@@ -65,33 +63,9 @@
       character(len = kchara), parameter                                &
      &                       :: hd_import_rev =  'reversed_table'
 !
-!>      Character flag to use FFTW3
-      character(len = kchara), parameter                                &
-     &                       :: hd_sendrecv = 'SEND_RECV'
-!>      Character flag to use single transforms in FFTW3
-      character(len = kchara), parameter                                &
-     &                       :: hd_all2allv =  'AllToAllv'
-!>      Character flag to use single transforms in FFTW3
-      character(len = kchara), parameter                                &
-     &                       :: hd_all2all =  'AllToAll'
-!
-!
-!
-!>      Undefined flag
-      integer(kind = kint), parameter :: iflag_SR_UNDEFINED = -1
-!>      Integer flag to use MPI_Isend and MPI_IRecv
-      integer(kind = kint), parameter :: iflag_send_recv = 0
-!>      Integer flag to use MPI_AllToAllv
-      integer(kind = kint), parameter :: iflag_alltoallv = 1
-!!>      Integer flag to use MPI_AllToAll
-!      integer(kind = kint), parameter :: iflag_alltoall =  2
-!
 !
 !>      Data communication mode for arbitrary size data
       integer(kind = kint) :: iflag_sph_SRN =   iflag_import_UNDEFINED
-!
-!>      Data communication mode for arbitrary size data
-      integer(kind = kint) :: iflag_sph_commN = iflag_SR_UNDEFINED
 !
 !>      Data communication mode for six components data
       integer(kind = kint) :: iflag_sph_SR6 = iflag_import_item
@@ -130,41 +104,6 @@
       end subroutine set_import_table_ctl
 !
 ! ------------------------------------------------------------------
-!
-      subroutine set_sph_comm_routine_ctl(send_recv_ctl)
-!
-      use m_solver_SR
-      use skip_comment_f
-!
-      character(len = kchara), intent(in) :: send_recv_ctl
-!
-!
-      if(cmp_no_case(send_recv_ctl, hd_sendrecv)     ) then
-        iflag_sph_commN = iflag_send_recv
-!      else if(cmp_no_case(send_recv_ctl, hd_all2allv)) then
-!        iflag_sph_commN = iflag_alltoallv
-      else
-        iflag_sph_commN = iflag_SR_UNDEFINED
-      end if
-!
-      end subroutine set_sph_comm_routine_ctl
-!
-!-----------------------------------------------------------------------
-!
-      subroutine finish_sph_send_recv(npe_send, isend_self)
-!
-      use m_solver_SR
-      use select_calypso_SR
-!
-      integer(kind = kint), intent(in) :: npe_send, isend_self
-!
-!
-      if(iflag_sph_commN .ne. iflag_send_recv) return
-      call finish_calypso_send_recv(npe_send, isend_self)
-!
-      end subroutine finish_sph_send_recv
-!
-! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
       subroutine check_calypso_sph_buf_N                                &

@@ -49,6 +49,8 @@
 !!     &         (id_file, level, label, maxlen, chara1, chara2)
 !!      subroutine write_character3_ctl_item                            &
 !!     &         (id_file, level, label, maxlen, chara1, chara2, chara3)
+!!       subroutine write_chara_int3_ctl_item(id_file, level, label,    &
+!!     &           chara_data, ivec1, ivec2, ivec3)
 !!
 !!      subroutine write_file_name_for_ctl_line                         &
 !!     &         (id_file, level, label, fname)
@@ -491,6 +493,24 @@
       call write_ctl_chara_lf(id_file, chara3)
 !
       end subroutine write_character3_ctl_item
+!
+!   --------------------------------------------------------------------
+!
+       subroutine write_chara_int3_ctl_item(id_file, level, label,      &
+     &           chara_data, ivec1, ivec2, ivec3)
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      character(len=kchara), intent(in) :: label
+      character(len=kchara), intent(in) :: chara_data
+      integer (kind=kint), intent(in) :: ivec1, ivec2, ivec3
+!
+!
+      call write_space_4_parse(id_file, level)
+      call write_ctl_chara_cont(id_file, label)
+      call write_ctl_chara_cont(id_file, chara_data)
+      write(id_file,'(3i16)')  ivec1, ivec2, ivec3
+!
+      end subroutine write_chara_int3_ctl_item
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------

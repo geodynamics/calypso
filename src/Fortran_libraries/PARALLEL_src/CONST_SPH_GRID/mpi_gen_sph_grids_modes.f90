@@ -9,28 +9,34 @@
 !!
 !!
 !!@verbatim
-!!      subroutine mpi_gen_sph_rlm_grids                                &
-!!     &         (gen_sph, sph_params, sph_rlm, comm_rlm_mul)
+!!      subroutine mpi_gen_sph_rlm_grids(sph_file_param,                &
+!!     &         gen_sph, sph_params, sph_rlm, comm_rlm_mul)
+!!        type(field_IO_params), intent(in) :: sph_file_param
 !!        type(construct_spherical_grid), intent(in) :: gen_sph
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rlm_grid), intent(inout) :: sph_rlm
 !!        type(sph_comm_tbl), intent(inout) :: comm_rlm_mul(nprocs)
-!!      subroutine mpi_gen_sph_rtm_grids                                &
+!!      subroutine mpi_gen_sph_rtm_grids(sph_file_param,                &
 !!     &         (gen_sph, sph_params, sph_rtm, comm_rtm_mul)
+!!        type(field_IO_params), intent(in) :: sph_file_param
 !!        type(construct_spherical_grid), intent(in) :: gen_sph
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rtm_grid), intent(inout) :: sph_rtm
 !!        type(sph_comm_tbl), intent(inout) :: comm_rtm_mul(nprocs)
 !!
-!!      subroutine mpi_gen_sph_rj_modes(comm_rlm_mul, sph_params,       &
+!!      subroutine mpi_gen_sph_rj_modes                                 &
+!!     &         (sph_file_param, comm_rlm_mul, sph_params,             &
 !!     &          gen_sph, sph_rlm, sph_rj)
+!!        type(field_IO_params), intent(in) :: sph_file_param
 !!        type(sph_comm_tbl), intent(in) :: comm_rlm_mul(nprocs)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rlm_grid), intent(inout) :: sph_rlm
 !!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
-!!      subroutine mpi_gen_sph_rtp_grids(comm_rtm_mul, sph_params,      &
+!!      subroutine mpi_gen_sph_rtp_grids                                &
+!!     &         (sph_file_param, comm_rtm_mul, sph_params,             &
 !!     &          gen_sph, sph_rtp, sph_rtm)
+!!        type(field_IO_params), intent(in) :: sph_file_param
 !!        type(sph_comm_tbl), intent(in) :: comm_rtm_mul(nprocs)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
@@ -68,14 +74,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine mpi_gen_sph_rlm_grids                                  &
-     &         (gen_sph, sph_params, sph_rlm, comm_rlm_mul)
+      subroutine mpi_gen_sph_rlm_grids(sph_file_param,                  &
+     &          gen_sph, sph_params, sph_rlm, comm_rlm_mul)
 !
       use set_comm_table_rtp_rj
       use load_data_for_sph_IO
       use gen_sph_grids_modes
       use sph_file_MPI_IO_select
 !
+      type(field_IO_params), intent(in) :: sph_file_param
       type(construct_spherical_grid), intent(in) :: gen_sph
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rlm_grid), intent(inout) :: sph_rlm
@@ -101,7 +108,8 @@
       call dealloc_type_sph_1d_index_rlm(sph_rlm)
       call dealloc_type_spheric_param_rlm(sph_rlm)
 !
-      call sel_mpi_write_modes_rlm_file(nprocs, my_rank, sph_file_m)
+      call sel_mpi_write_modes_rlm_file                                 &
+     &   (nprocs, my_rank, sph_file_param, sph_file_m)
       call dealloc_rlm_mode_IO(sph_file_m)
 !
       write(*,'(a,i6,a)') 'Spherical transform table for domain',       &
@@ -111,14 +119,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine mpi_gen_sph_rtm_grids                                  &
-     &         (gen_sph, sph_params, sph_rtm, comm_rtm_mul)
+      subroutine mpi_gen_sph_rtm_grids(sph_file_param,                  &
+     &          gen_sph, sph_params, sph_rtm, comm_rtm_mul)
 !
       use set_comm_table_rtp_rj
       use load_data_for_sph_IO
       use gen_sph_grids_modes
       use sph_file_MPI_IO_select
 !
+      type(field_IO_params), intent(in) :: sph_file_param
       type(construct_spherical_grid), intent(in) :: gen_sph
       type(sph_shell_parameters), intent(in) :: sph_params
 !
@@ -146,7 +155,8 @@
       call dealloc_type_sph_1d_index_rtm(sph_rtm)
       call dealloc_type_spheric_param_rtm(sph_rtm)
 !
-      call sel_mpi_write_geom_rtm_file(nprocs, my_rank, sph_file_m)
+      call sel_mpi_write_geom_rtm_file                                  &
+     &   (nprocs, my_rank, sph_file_param, sph_file_m)
       call dealloc_rtm_grid_IO(sph_file_m)
 !
       write(*,'(a,i6,a)') 'Legendre transform table rtm',               &
@@ -156,12 +166,14 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine mpi_gen_sph_rj_modes(comm_rlm_mul, sph_params,         &
+      subroutine mpi_gen_sph_rj_modes                                   &
+     &         (sph_file_param, comm_rlm_mul, sph_params,               &
      &          gen_sph, sph_rlm, sph_rj)
 !
       use set_comm_table_rtp_rj
       use sph_file_MPI_IO_select
 !
+      type(field_IO_params), intent(in) :: sph_file_param
       type(sph_comm_tbl), intent(in) :: comm_rlm_mul(nprocs)
 !
       type(sph_shell_parameters), intent(in) :: sph_params
@@ -180,7 +192,8 @@
      &    gen_sph%sph_lcp, gen_sph%stk_lc1d, gen_sph%sph_gl1d,          &
      &    sph_params, sph_rj, sph_rlm, sph_file_m, sph_lcx_m)
 !
-      call sel_mpi_write_spectr_rj_file(nprocs, my_rank, sph_file_m)
+      call sel_mpi_write_spectr_rj_file                                 &
+     &   (nprocs, my_rank, sph_file_param, sph_file_m)
       call dealloc_rj_mode_IO(sph_file_m)
 !
       write(*,'(a,i6,a)') 'Spherical modes for domain',                 &
@@ -191,12 +204,14 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine mpi_gen_sph_rtp_grids(comm_rtm_mul, sph_params,        &
+      subroutine mpi_gen_sph_rtp_grids                                  &
+     &         (sph_file_param, comm_rtm_mul, sph_params,               &
      &          gen_sph, sph_rtp, sph_rtm)
 !
       use set_comm_table_rtp_rj
       use sph_file_MPI_IO_select
 !
+      type(field_IO_params), intent(in) :: sph_file_param
       type(sph_comm_tbl), intent(in) :: comm_rtm_mul(nprocs)
 !
       type(sph_shell_parameters), intent(in) :: sph_params
@@ -214,7 +229,8 @@
      &    gen_sph%sph_lcp, gen_sph%stk_lc1d, gen_sph%sph_gl1d,          &
      &    sph_params, sph_rtp, sph_rtm, sph_file_m, sph_lcx_m)
 !
-      call sel_mpi_write_geom_rtp_file(nprocs, my_rank, sph_file_m)
+      call sel_mpi_write_geom_rtp_file                                  &
+     &   (nprocs, my_rank, sph_file_param, sph_file_m)
 !
       call dealloc_rtp_grid_IO(sph_file_m)
 !
