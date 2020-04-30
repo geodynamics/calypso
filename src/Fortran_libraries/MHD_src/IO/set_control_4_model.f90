@@ -94,16 +94,16 @@
 !
       do i = 1, evo_ctl%t_evo_field_ctl%num
         tmpchara = evo_ctl%t_evo_field_ctl%c_tbl(i)
-        if (tmpchara .eq. fhd_velo ) then
+        if (tmpchara .eq. velocity%name ) then
           MHD_prop%fl_prop%iflag_scheme =   MHD_prop%iflag_all_scheme
-        else if (tmpchara .eq. fhd_temp ) then
+        else if (tmpchara .eq. temperature%name ) then
           MHD_prop%ht_prop%iflag_scheme =   MHD_prop%iflag_all_scheme
-        else if (tmpchara .eq. fhd_light ) then
+        else if (tmpchara .eq. composition%name ) then
           MHD_prop%cp_prop%iflag_scheme =   MHD_prop%iflag_all_scheme
-        else if (tmpchara .eq. fhd_magne ) then
+        else if (tmpchara .eq. magnetic_field%name ) then
           MHD_prop%cd_prop%iflag_Bevo_scheme                            &
      &          =  MHD_prop%iflag_all_scheme
-        else if (tmpchara .eq. fhd_vecp ) then
+        else if (tmpchara .eq. vector_potential%name ) then
           MHD_prop%cd_prop%iflag_Aevo_scheme                            &
      &          = MHD_prop%iflag_all_scheme
         end if

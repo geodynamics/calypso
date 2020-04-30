@@ -1,9 +1,9 @@
 !>@file   cvt_sph_tensor_2_cyl_smp.f90
-!!@brief  module cvt_sph_tensor_2_cyl_smp
+!!        module cvt_sph_tensor_2_cyl_smp
 !!
 !!@author H. Matsui
 !!@date Programmed in March, 2009
-!
+!!
 !>@brief Convert symmetric tensor from Cartesian coordinate
 !!       to cylindrical coordinate
 !!

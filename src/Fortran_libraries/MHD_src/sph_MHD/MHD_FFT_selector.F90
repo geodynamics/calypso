@@ -26,7 +26,7 @@
 !!        type(sph_comm_tbl), intent(in)  :: comm_rtp
 !!        type(work_for_FFTs), intent(inout) :: WK_FFTs
 !!        type(work_for_sgl_FFTW), intent(inout) :: MHD_mul_FFTW
-!!        type(address_each_sph_trans), intent(inout) :: trns_fwd
+!!        type(spherical_transform_data), intent(inout) :: trns_fwd
 !! ------------------------------------------------------------------
 !!
 !!   wrapper subroutine for FFT in ISPACK
@@ -183,7 +183,7 @@
 !
       integer(kind = kint), intent(in) :: ncomp_fwd, n_WS
       real (kind=kreal), intent(inout) :: WS(n_WS)
-      type(address_each_sph_trans), intent(inout) :: trns_fwd
+      type(spherical_transform_data), intent(inout) :: trns_fwd
       type(work_for_FFTs), intent(inout) :: WK_FFTs
       type(work_for_sgl_FFTW), intent(inout) :: MHD_mul_FFTW
 !

@@ -70,6 +70,7 @@
 !
       use m_precision
       use m_constants
+      use m_fftw_parameters
 !
       use FFTW3_multi_wrapper
 !

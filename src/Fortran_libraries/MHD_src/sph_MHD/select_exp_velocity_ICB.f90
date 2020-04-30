@@ -10,30 +10,32 @@
 !!      subroutine sel_ICB_grad_vp_and_vorticity(sph_rj, r_2nd,         &
 !!     &          sph_bc_U, ICB_Uspec, fdm2_free_ICB, g_sph_rj,         &
 !!     &          is_velo, is_vort, rj_fld)
-!!        Input:    ipol%i_velo, itor%i_velo
-!!        Solution: idpdr%i_velo, ipol%i_vort, itor%i_vort, idpdr%i_vort
+!!        Address for input:    is_velo, is_velo+2
+!!        Address for solution: is_velo+1, 
+!!                              is_vort, is_vort+2, is_vort+1
 !!      subroutine sel_ICB_grad_poloidal_moment                         &
 !!     &         (sph_rj, r_2nd, sph_bc_U, ICB_Uspec, fdm2_free_ICB,    &
 !!     &          is_fld, rj_fld)
-!!        Input:    is_fld, is_fld+2
-!!        Solution: is_fld+1
+!!        Address for input:    is_fld, is_fld+2
+!!        Address for solution: is_fld+1
 !!
 !!      subroutine sel_ICB_sph_vorticity                                &
 !!     &         (sph_rj, r_2nd, sph_bc_U, fdm2_free_ICB, g_sph_rj,     &
 !!     &          is_fld, is_rot, rj_fld)
-!!        Input:    ipol%i_velo, itor%i_velo
-!!        Solution: ipol%i_vort, itor%i_vort, idpdr%i_vort
+!!        Address for input:    is_fld, is_fld+2
+!!        Address for solution: is_rot, is_rot+2, is_rot+1
 !!
 !!      subroutine sel_ICB_sph_viscous_diffusion(sph_rj, r_2nd,         &
 !!     &          sph_bc_U, fdm2_free_ICB, g_sph_rj, coef_diffuse,      &
-!!     &          is_velo, it_velo, is_viscous, ids_viscous, rj_fld)
-!!        Input:    ipol%i_velo, itor%i_velo
-!!        Solution: ipol%i_v_diffuse, itor%i_v_diffuse, idpdr%i_v_diffuse
+!!     &          is_velo, is_viscous, rj_fld)
+!!        Address for input:    is_velo, is_velo+2
+!!        Address for solution: is_viscous, is_viscous+2, is_viscous+1
 !!      subroutine sel_ICB_sph_vort_diffusion(sph_rj, r_2nd,            &
 !!     &          sph_bc_U, fdm2_free_ICB, g_sph_rj, coef_diffuse,      &
 !!     &          is_vort, is_w_diffuse, rj_fld)
-!!        Input:    ipol%i_vort, itor%i_vort
-!!        Solution: ipol%i_w_diffuse, itor%i_w_diffuse, idpdr%i_w_diffuse
+!!        Address for input:    is_vort, is_vort+2
+!!        Address for solution: is_w_diffuse, is_w_diffuse+2,
+!!                              is_w_diffuse+1
 !!          type(sph_rj_grid), intent(in) :: sph_rj
 !!          type(sph_boundary_type), intent(in) :: sph_bc_U
 !!          type(sph_vector_BC_coef), intent(in) :: ICB_Uspec
@@ -232,7 +234,7 @@
 !
       subroutine sel_ICB_sph_viscous_diffusion(sph_rj, r_2nd,           &
      &          sph_bc_U, fdm2_free_ICB, g_sph_rj, coef_diffuse,        &
-     &          is_velo, it_velo, is_viscous, ids_viscous, rj_fld)
+     &          is_velo, is_viscous, rj_fld)
 !
       use cal_sph_exp_fixed_scalar
       use cal_inner_core_rotation
@@ -243,14 +245,14 @@
       type(fdm_matrices), intent(in) :: r_2nd
       type(fdm2_free_slip), intent(in) :: fdm2_free_ICB
 !
-      integer(kind = kint), intent(in) :: is_velo, it_velo
-      integer(kind = kint), intent(in) :: is_viscous, ids_viscous
+      integer(kind = kint), intent(in) :: is_velo
+      integer(kind = kint), intent(in) :: is_viscous
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
       real(kind = kreal), intent(in) :: coef_diffuse
 !
       type(phys_data), intent(inout) :: rj_fld
 !
-      integer(kind = kint) :: it_diffuse
+      integer(kind = kint) :: it_velo, it_viscous, ids_viscous
 !
 !
       if(sph_bc_U%iflag_icb .eq. iflag_sph_fill_center) then
@@ -285,16 +287,19 @@
      &      coef_diffuse, is_velo, is_viscous,                          &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
+
+      ids_viscous = is_viscous + 1
       call cal_dsdr_sph_no_bc_in_2(sph_rj%nidx_rj(2), sph_bc_U%kr_in,   &
      &    sph_bc_U%fdm2_fix_fld_ICB, is_viscous, ids_viscous,           &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
 !   Ovewrite rotatable inner core 
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        it_diffuse =  is_viscous + 2
+        it_velo =     is_velo + 2
+        it_viscous =  is_viscous + 2
         call cal_icore_viscous_drag_explicit                            &
      &     (sph_bc_U%kr_in, sph_bc_U%fdm1_fix_fld_ICB, sph_rj,          &
-     &      coef_diffuse, it_velo, it_diffuse, rj_fld)
+     &      coef_diffuse, it_velo, it_viscous, rj_fld)
       end if
 !
       end subroutine sel_ICB_sph_viscous_diffusion

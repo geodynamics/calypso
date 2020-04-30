@@ -31,11 +31,11 @@
 !
       if(b_ratio.eq.0.0d0 .or. b_ratio.eq.1.0d0) return
       do i = 1, fld%num_phys
-        if (    fld%phys_name(i) .eq. fhd_vecp                          &
-     &     .or. fld%phys_name(i) .eq. fhd_magne                         &
-     &     .or. fld%phys_name(i) .eq. fhd_mag_potential                 &
-     &     .or. fld%phys_name(i) .eq. fhd_pre_uxb                       &
-     &     .or. fld%phys_name(i) .eq. fhd_chk_uxb) then
+        if (    fld%phys_name(i) .eq. vector_potential%name             &
+     &     .or. fld%phys_name(i) .eq. magnetic_field%name               &
+     &     .or. fld%phys_name(i) .eq. magnetic_potential%name           &
+     &     .or. fld%phys_name(i) .eq. previous_induction%name           &
+     &     .or. fld%phys_name(i) .eq. check_induction%name) then
         jst = fld%istack_component(i-1) + 1
         jed = fld%istack_component(i)
 !$omp parallel

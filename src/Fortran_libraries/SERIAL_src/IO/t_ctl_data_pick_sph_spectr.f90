@@ -4,7 +4,7 @@
 !! @author H. Matsui
 !! @date   Programmed in 2016
 !!
-!
+!!
 !> @brief Control data for spectr data monitoring
 !!
 !!@verbatim

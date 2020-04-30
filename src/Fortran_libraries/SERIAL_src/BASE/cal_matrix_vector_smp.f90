@@ -1,10 +1,10 @@
 !>@file   cal_matrix_vector_smp.f90
-!!@brief  module cal_matrix_vector_smp
+!!        module cal_matrix_vector_smp
 !!
 !!@date  Programmed by H.Matsui on July, 2009
-!
+!!
 !>@brief Make products of constant matrix with vector at each node
-!!@n     need $omp parallel to use these routines 
+!!       need $omp parallel to use these routines 
 !!
 !!@verbatim
 !!      subroutine cal_matvec_33_on_node(np_smp, nnod, istack_smp,      &

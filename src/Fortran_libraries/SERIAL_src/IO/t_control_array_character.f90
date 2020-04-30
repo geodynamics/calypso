@@ -1,10 +1,10 @@
 !>@file   t_control_array_character.f90
-!!@brief  module t_control_array_character
+!!        module t_control_array_character
 !!
 !!@author H. Matsui
 !!@date Programmed in June, 2014
-!
-!>@brief  Subroutines to read control arrays
+!!
+!>@brief  Subroutines to read character control arrays
 !!
 !!@verbatim
 !!      subroutine alloc_control_array_chara(array_chara)

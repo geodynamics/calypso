@@ -1,9 +1,9 @@
 !>@file   t_control_array_character3.f90
-!!@brief  module t_control_array_character3
+!!        module t_control_array_character3
 !!
 !!@author H. Matsui
 !!@date Programmed in June, 2014
-!
+!!
 !>@brief  Structure of control array input with 3 words
 !!
 !!@verbatim

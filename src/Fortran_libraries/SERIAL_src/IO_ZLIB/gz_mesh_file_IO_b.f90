@@ -37,14 +37,14 @@
       use m_machine_parameter
 !
       use t_mesh_data
+      use t_buffer_4_gzip
       use binary_IO
       use gz_mesh_data_IO_b
       use gz_binary_IO
-      use skip_gz_comment
 !
       implicit none
 !
-      type(binary_IO_flags) :: gz_meshflags
+      type(buffer_4_gzip), private :: zbuf_mesh
 !
 !  ---------------------------------------------------------------------
 !
@@ -54,6 +54,8 @@
 !
       subroutine gz_read_mesh_file_b                                    &
      &         (id_rank, file_name, mesh_IO, group_IO, ierr)
+!
+      use gzip_file_access
 !
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
@@ -66,16 +68,16 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary mesh file: ', trim(file_name)
 !
-      call open_rd_gzfile_b(file_name, id_rank, gz_meshflags)
-      if(gz_meshflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(file_name, id_rank, zbuf_mesh)
+      if(zbuf_mesh%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_geometry_data_b(id_rank, gz_meshflags, mesh_IO)
-      if(gz_meshflags%ierr_IO .ne. 0) goto 99
-      call gz_read_mesh_groups_b(gz_meshflags, group_IO)
+      call gz_read_geometry_data_b(id_rank, zbuf_mesh, mesh_IO)
+      if(zbuf_mesh%ierr_zlib .ne. 0) go to 99
+      call gz_read_mesh_groups_b(zbuf_mesh, group_IO)
 !
   99  continue
-      call close_gzfile_f
-      ierr = gz_meshflags%ierr_IO
+      call close_gzfile_b
+      ierr = zbuf_mesh%ierr_zlib
 !
       end subroutine gz_read_mesh_file_b
 !
@@ -84,6 +86,8 @@
       subroutine gz_read_mesh_geometry_b                                &
      &         (id_rank, file_name, mesh_IO, ierr)
 !
+      use gzip_file_access
+!
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
 !
@@ -94,21 +98,23 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary mesh file: ', trim(file_name)
 !
-      call open_rd_gzfile_b(file_name, id_rank, gz_meshflags)
-      if(gz_meshflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(file_name, id_rank, zbuf_mesh)
+      if(zbuf_mesh%ierr_zlib .ne. 0) goto 99
 !
-      call gz_read_geometry_data_b(id_rank, gz_meshflags, mesh_IO)
+      call gz_read_geometry_data_b(id_rank, zbuf_mesh, mesh_IO)
 !
   99  continue
-      call close_gzfile_f
-      ierr = gz_meshflags%ierr_IO
+      call close_gzfile_b
+      ierr = zbuf_mesh%ierr_zlib
 !
       end subroutine gz_read_mesh_geometry_b
 !
 !  ---------------------------------------------------------------------
 !
-       subroutine gz_read_node_size_b                                   &
-      &         (id_rank, file_name, mesh_IO, ierr)
+      subroutine gz_read_node_size_b                                    &
+     &         (id_rank, file_name, mesh_IO, ierr)
+!
+      use gzip_file_access
 !
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
@@ -120,21 +126,23 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary mesh file: ', trim(file_name)
 !
-      call open_rd_gzfile_b(file_name, id_rank, gz_meshflags)
-      if(gz_meshflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(file_name, id_rank, zbuf_mesh)
+      if(zbuf_mesh%ierr_zlib .ne. 0) goto 99
 !
-      call gz_read_num_node_b(id_rank, gz_meshflags, mesh_IO)
+      call gz_read_num_node_b(id_rank, zbuf_mesh, mesh_IO)
 !
   99  continue
-      call close_gzfile_f
-      ierr = gz_meshflags%ierr_IO
+      call close_gzfile_b
+      ierr = zbuf_mesh%ierr_zlib
 !
       end subroutine gz_read_node_size_b
 !
 !------------------------------------------------------------------
 !
-       subroutine gz_read_geometry_size_b                               &
-      &         (id_rank, file_name, mesh_IO, ierr)
+      subroutine gz_read_geometry_size_b                                &
+     &         (id_rank, file_name, mesh_IO, ierr)
+!
+      use gzip_file_access
 !
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
@@ -146,14 +154,14 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary mesh file: ', trim(file_name)
 !
-      call open_rd_gzfile_b(file_name, id_rank, gz_meshflags)
-      if(gz_meshflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(file_name, id_rank, zbuf_mesh)
+      if(zbuf_mesh%ierr_zlib .ne. 0) goto 99
 !
-      call gz_read_num_node_ele_b(id_rank, gz_meshflags, mesh_IO)
+      call gz_read_num_node_ele_b(id_rank, zbuf_mesh, mesh_IO)
 !
   99  continue
-      call close_gzfile_f
-      ierr = gz_meshflags%ierr_IO
+      call close_gzfile_b
+      ierr = zbuf_mesh%ierr_zlib
 !
       end subroutine gz_read_geometry_size_b
 !
@@ -162,6 +170,8 @@
 !
       subroutine gz_write_mesh_file_b                                   &
      &         (id_rank, file_name, mesh_IO, group_IO)
+!
+      use gzip_file_access
 !
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
@@ -172,10 +182,10 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Write gzipped binary mesh file: ', trim(file_name)
 !
-      call open_wt_gzfile_b(file_name, gz_meshflags)
-      call gz_write_geometry_data_b(id_rank, mesh_IO, gz_meshflags)
-      call gz_write_mesh_groups_b(group_IO, gz_meshflags)
-      call close_gzfile_f
+      call open_wt_gzfile_b(file_name, zbuf_mesh)
+      call gz_write_geometry_data_b(id_rank, mesh_IO, zbuf_mesh)
+      call gz_write_mesh_groups_b(group_IO, zbuf_mesh)
+      call close_gzfile_b
 !
       end subroutine gz_write_mesh_file_b
 !

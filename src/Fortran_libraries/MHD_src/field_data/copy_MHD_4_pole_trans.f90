@@ -56,47 +56,57 @@
 !
 !
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_velo), iphys%i_velo, nod_fld)
+     &    fls_pl(1,bs_trns%base%i_velo), iphys%base%i_velo, nod_fld)
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_vort), iphys%i_vort, nod_fld)
+     &    fls_pl(1,bs_trns%base%i_vort), iphys%base%i_vort, nod_fld)
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_magne), iphys%i_magne, nod_fld)
+     &    fls_pl(1,bs_trns%base%i_magne), iphys%base%i_magne, nod_fld)
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_current), iphys%i_current, nod_fld)
+     &    fls_pl(1,bs_trns%base%i_current), iphys%base%i_current,       &
+     &    nod_fld)
 !
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_v_diffuse), iphys%i_v_diffuse, nod_fld)
+     &    fls_pl(1,bs_trns%diffusion%i_v_diffuse),                      &
+     &    iphys%diffusion%i_v_diffuse, nod_fld)
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_w_diffuse), iphys%i_w_diffuse, nod_fld)
+     &    fls_pl(1,bs_trns%diffusion%i_w_diffuse),                      &
+     &    iphys%diffusion%i_w_diffuse, nod_fld)
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_vp_diffuse), iphys%i_vp_diffuse, nod_fld)
+     &    fls_pl(1,bs_trns%diffusion%i_vp_diffuse),                     &
+     &    iphys%diffusion%i_vp_diffuse, nod_fld)
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_b_diffuse), iphys%i_b_diffuse, nod_fld)
+     &    fls_pl(1,bs_trns%diffusion%i_b_diffuse),                      &
+     &    iphys%diffusion%i_b_diffuse, nod_fld)
 !
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_induction), iphys%i_induction, nod_fld)
+     &    fls_pl(1,bs_trns%forces%i_induction),                         &
+     &    iphys%forces%i_induction, nod_fld)
 !
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_grad_t), iphys%i_grad_t, nod_fld)
+     &    fls_pl(1,bs_trns%grad_fld%i_grad_temp),                       &
+     &    iphys%grad_fld%i_grad_temp, nod_fld)
       call copy_pole_vec_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_grad_composit),                            &
-     &    iphys%i_grad_composit, nod_fld)
+     &    fls_pl(1,bs_trns%grad_fld%i_grad_composit),                   &
+     &    iphys%grad_fld%i_grad_composit, nod_fld)
 !
 !
 !
       call copy_pole_scl_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_temp), iphys%i_temp, nod_fld)
+     &    fls_pl(1,bs_trns%base%i_temp), iphys%base%i_temp, nod_fld)
       call copy_pole_scl_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_light), iphys%i_light, nod_fld)
+     &    fls_pl(1,bs_trns%base%i_light), iphys%base%i_light, nod_fld)
 !
       call copy_pole_scl_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_press), iphys%i_press, nod_fld)
+     &    fls_pl(1,bs_trns%base%i_press), iphys%base%i_press, nod_fld)
       call copy_pole_scl_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_par_temp), iphys%i_par_temp, nod_fld)
+     &    fls_pl(1,bs_trns%base%i_per_temp),                            &
+     &    iphys%base%i_per_temp, nod_fld)
       call copy_pole_scl_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_t_diffuse), iphys%i_t_diffuse, nod_fld)
+     &    fls_pl(1,bs_trns%diffusion%i_t_diffuse),                      &
+     &    iphys%diffusion%i_t_diffuse, nod_fld)
       call copy_pole_scl_fld_from_trans(m_folding, sph_rtp, node,       &
-     &    fls_pl(1,bs_trns%i_c_diffuse), iphys%i_c_diffuse, nod_fld)
+     &    fls_pl(1,bs_trns%diffusion%i_c_diffuse),                      &
+     &    iphys%diffusion%i_c_diffuse, nod_fld)
 !
       end subroutine copy_snap_vec_from_pole_trans
 !

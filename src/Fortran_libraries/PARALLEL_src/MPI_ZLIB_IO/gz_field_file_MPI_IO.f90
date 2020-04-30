@@ -97,7 +97,6 @@
      &         (file_name, num_pe, id_rank, t_IO, fld_IO)
 !
       use gz_field_data_IO
-      use skip_gz_comment
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -140,7 +139,6 @@
      &         (file_name, num_pe, id_rank, t_IO, fld_IO)
 !
       use gz_field_data_IO
-      use skip_gz_comment
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -194,7 +192,6 @@
      &         (file_name, num_pe, id_rank, t_IO, fld_IO)
 !
       use gz_field_data_IO
-      use skip_gz_comment
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank

@@ -10,30 +10,30 @@
 !!      subroutine sel_ICB_grad_bp_and_current                          &
 !!     &         (sph_rj, r_2nd, sph_bc_B, ICB_Bspec, g_sph_rj,         &
 !!     &          is_magne, is_current, rj_fld)
-!!        Input:    ipol%i_magne, itor%i_magne
-!!        Solution: idpdr%i_magne,
-!!                  ipol%i_current, itor%i_current, idpdr%i_current
+!!        Address for input:    is_magne, is_magne+2
+!!        Address for solution: is_magne+1,
+!!                              is_current, is_current+2, is_current+1
 !!      subroutine sel_ICB_grad_poloidal_magne                          &
 !!     &         (sph_rj, r_2nd, sph_bc_B, ICB_Bspec, g_sph_rj,         &
 !!     &          is_magne, rj_fld)
-!!        Input:    ipol%i_magne, itor%i_magne
-!!        Solution: idpdr%i_magne
+!!        Address for input:    is_magne, is_magne+2
+!!        Address for solution: is_magne+1
 !!
 !!      subroutine sel_ICB_sph_current                                  &
 !!     &         (sph_rj, r_2nd, sph_bc_B, g_sph_rj,                    &
 !!     &          is_magne, is_current, rj_fld)
-!!        Input:    ipol%i_magne, itor%i_magne
-!!        Solution: ipol%i_current, itor%i_current, idpdr%i_current
+!!        Address for input:    is_magne, is_magne+2
+!!        Address for solution: is_current, is_current+2, is_current+1
 !!      subroutine sel_ICB_sph_rotation_uxb                             &
 !!     &         (sph_rj, r_2nd, sph_bc_B, g_sph_rj,                    &
 !!     &          is_fld, is_rot, rj_fld)
-!!        Input:    is_fld, it_fld
-!!        Solution: is_rot, it_rot, ids_rot
+!!        Address for input:    is_fld, it_fld
+!!        Address for solution: is_rot, it_rot, ids_rot
 !!      subroutine sel_ICB_sph_magnetic_diffusion                       &
 !!     &         (sph_rj, r_2nd, sph_bc_B, g_sph_rj, coef_diffuse,      &
-!!     &          is_magne, is_ohmic, ids_ohmic, rj_fld)
-!!        Input:    ipol%i_magne, itor%i_magne
-!!        Solution: ipol%i_b_diffuse, itor%i_b_diffuse, idpdr%i_b_diffuse
+!!     &          is_magne, is_ohmic, rj_fld)
+!!        Address for input:    is_magne, is_magne+2
+!!        Address for solution: is_ohmic, is_ohmic+2, is_ohmic+1 
 !!          type(sph_boundary_type), intent(in) :: sph_bc_B
 !!          type(sph_rj_grid), intent(in) :: sph_rj
 !!          type(fdm_matrices), intent(in) :: r_2nd
@@ -254,7 +254,7 @@
 !
       subroutine sel_ICB_sph_magnetic_diffusion                         &
      &         (sph_rj, r_2nd, sph_bc_B, g_sph_rj, coef_diffuse,        &
-     &          is_magne, is_ohmic, ids_ohmic, rj_fld)
+     &          is_magne, is_ohmic, rj_fld)
 !
       use cal_sph_exp_fixed_scalar
 !
@@ -262,11 +262,13 @@
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       integer(kind = kint), intent(in) :: is_magne
-      integer(kind = kint), intent(in) :: is_ohmic, ids_ohmic
+      integer(kind = kint), intent(in) :: is_ohmic
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
       real(kind = kreal), intent(in) :: coef_diffuse
 !
       type(phys_data), intent(inout) :: rj_fld
+!
+      integer(kind = kint) :: ids_ohmic
 !
 !
       if(sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
@@ -302,6 +304,7 @@
      &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), r_2nd%fdm(1)%dmat,    &
      &      is_ohmic, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       else
+        ids_ohmic = is_ohmic + 1
         call cal_dsdr_sph_no_bc_in_2(sph_rj%nidx_rj(2), sph_bc_B%kr_in, &
      &      sph_bc_B%fdm2_fix_fld_ICB, is_ohmic, ids_ohmic,             &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)

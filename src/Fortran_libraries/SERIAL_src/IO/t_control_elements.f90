@@ -1,9 +1,9 @@
 !>@file   t_control_elements.f90
-!!@brief  module t_control_elements
+!!        module t_control_elements
 !!
 !!@author H. Matsui
 !!@date Programmed in Apr., 2012
-!
+!!
 !>@brief  Structure for reading control items
 !!
 !!@verbatim

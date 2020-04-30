@@ -13,13 +13,13 @@
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(parameters_4_sph_trans), intent(in) :: trans_p
 !!        type(phys_data), intent(inout) :: rj_fld
-!!        type(address_each_sph_trans), intent(inout) :: trns_bwd
+!!        type(spherical_transform_data), intent(inout) :: trns_bwd
 !!        type(spherical_trns_works), intent(inout) :: WK_sph
 !!      subroutine sph_forward_trans_snapshot_MHD                       &
 !!     &         (sph, comms_sph, trans_p, trns_fwd, WK_sph, rj_fld)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
-!!        type(address_each_sph_trans), intent(in) :: trns_fwd
+!!        type(spherical_transform_data), intent(in) :: trns_fwd
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(spherical_trns_works), intent(inout) :: WK_sph
 !!@endverbatim
@@ -67,7 +67,7 @@
       type(parameters_4_sph_trans), intent(in) :: trans_p
 !
       type(phys_data), intent(inout) :: rj_fld
-      type(address_each_sph_trans), intent(inout) :: trns_bwd
+      type(spherical_transform_data), intent(inout) :: trns_bwd
       type(spherical_trns_works), intent(inout) :: WK_sph
 !
       integer(kind = kint) :: nscalar_trans
@@ -104,7 +104,7 @@
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
       type(parameters_4_sph_trans), intent(in) :: trans_p
-      type(address_each_sph_trans), intent(in) :: trns_fwd
+      type(spherical_transform_data), intent(in) :: trns_fwd
 !
       type(spherical_trns_works), intent(inout) :: WK_sph
       type(phys_data), intent(inout) :: rj_fld

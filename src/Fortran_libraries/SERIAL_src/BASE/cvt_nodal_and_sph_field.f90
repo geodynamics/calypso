@@ -1,9 +1,9 @@
 !>@file   cvt_nodal_and_sph_field.f90
-!!@brief  module cvt_nodal_and_sph_field
+!!        module cvt_nodal_and_sph_field
 !!
 !!@author H. Matsui
 !!@date Programmed in Nov., 2011
-!
+!!
 !>@brief Convert vector and tensor between spherical grid and FEM grid
 !!
 !!@verbatim

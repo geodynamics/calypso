@@ -61,7 +61,6 @@
       use t_sph_boundary_input_data
 !
       use set_control_sph_mhd
-      use set_sph_phys_address
       use const_fdm_coefs
       use adjust_reference_fields
       use set_bc_sph_mhd
@@ -88,9 +87,8 @@
 !
 !   Allocate spectr field data
 !
-      call set_sph_MHD_sprctr_data                                      &
-     &   (SPH_MHD%sph%sph_rj, SPH_model%MHD_prop,                       &
-     &    SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%itor, SPH_MHD%fld)
+      call set_sph_MHD_sprctr_data(SPH_MHD%sph, SPH_model%MHD_prop,     &
+     &    SPH_MHD%fld, SPH_MHD%ipol)
 !
       if (iflag_debug.gt.0 ) write(*,*) 'allocate_vector_for_solver'
       call allocate_vector_for_solver                                   &
@@ -103,7 +101,10 @@
 ! ---------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
-      call init_r_infos_sph_mhd_evo(SPH_model, SPH_WK%r_2nd, SPH_MHD)
+      call init_r_infos_sph_mhd_evo(SPH_WK%r_2nd, SPH_model%bc_IO,      &
+     &    SPH_MHD%groups, SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph,  &
+     &    SPH_model%omega_sph, SPH_model%ref_temp, SPH_model%ref_comp,  &
+     &    SPH_MHD%fld, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 !
 !  -------------------------------
 !
@@ -155,8 +156,6 @@
       type(circle_fld_maker), intent(inout) :: cdat
       type(dynamobench_monitor), intent(inout) :: bench
 !
-      integer(kind = kint) :: iflag
-!
 !
       call read_alloc_sph_rst_4_snap(i_step,                            &
      &    MHD_files%org_rj_file_IO, MHD_files%fst_file_IO,              &
@@ -165,28 +164,27 @@
       call copy_time_data(MHD_step1%init_d, MHD_step1%time_d)
 !
       call sync_temp_by_per_temp_sph(SPH_model,                         &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%fld)
+     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !* obtain linear terms for starting
 !*
       if(iflag_debug .gt. 0) write(*,*) 'set_sph_field_to_start'
       call set_sph_field_to_start(SPH_MHD%sph%sph_rj, SPH_WK%r_2nd,     &
      &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%trans_p%leg, &
-     &    SPH_MHD%ipol, SPH_MHD%itor, SPH_MHD%fld)
+     &    SPH_MHD%ipol, SPH_MHD%fld)
 !
 !* ----  Update fields after time evolution ------------------------=
 !*
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+5)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
       call trans_per_temp_to_temp_sph(SPH_model,                        &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%fld)
+     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
 !*
       if(lead_field_data_flag(i_step, MHD_step1) .eq. 0) then
         if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
-        call s_lead_fields_4_sph_mhd                                    &
-     &     (SPH_MHD%sph, SPH_MHD%comms, SPH_WK%monitor, SPH_WK%r_2nd,   &
+        call s_lead_fields_4_sph_mhd(SPH_WK%monitor, SPH_WK%r_2nd,      &
      &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%trans_p,   &
-     &      SPH_MHD%ipol, SPH_WK%MHD_mats, SPH_WK%trns_WK, SPH_MHD%fld)
+     &      SPH_WK%MHD_mats, SPH_WK%trns_WK, SPH_MHD)
       end if
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+5)
 !
@@ -198,8 +196,8 @@
       call s_const_data_4_dynamobench                                   &
      &   (MHD_step1%time_d%time, SPH_MHD%sph%sph_params,                &
      &    SPH_MHD%sph%sph_rj, SPH_model%sph_MHD_bc, SPH_WK%trans_p%leg, &
-     &    SPH_MHD%ipol, SPH_MHD%itor, SPH_MHD%fld,                      &
-     &    cdat, SPH_WK%monitor%pwr, bench, SPH_WK%monitor%WK_pwr)
+     &    SPH_MHD%ipol, SPH_MHD%fld, cdat, SPH_WK%monitor%pwr,          &
+     &    bench, SPH_WK%monitor%WK_pwr)
       call output_field_4_dynamobench(i_step, MHD_step1%time_d%time,    &
      &   SPH_model%sph_MHD_bc, SPH_MHD%ipol, bench)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+7)

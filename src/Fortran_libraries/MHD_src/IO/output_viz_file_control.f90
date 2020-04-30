@@ -50,7 +50,7 @@
         write(*,*) 'i_udt: ', output_IO_flag(i_step, MHD_step%ucd_step)
         write(*,*) 'i_monitor: ',                                       &
      &            output_IO_flag(i_step, MHD_step%point_step)
-        write(*,*) 'i_rms: ',                                           &
+        write(*,*) 'i_step_rms: ',                                      &
      &            output_IO_flag(i_step, MHD_step%rms_step)
         write(*,*) 'i_model_coef: ',                                    &
      &            output_IO_flag(i_step, MHD_step%sgs_IO_step)

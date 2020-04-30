@@ -1,10 +1,10 @@
 !>@file   copy_field_smp.f90
-!!@brief  module copy_field_smp
+!!        module copy_field_smp
 !!
 !!@author H. Matsui
 !!@date Programmed in June, 2009
-!
-!> @brief subroutine to copy field data
+!!
+!>@brief subroutine to copy field data
 !!
 !!@verbatim
 !!      subroutine copy_nod_scalar_smp(nnod, scalar, copied)

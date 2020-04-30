@@ -28,13 +28,11 @@ load_data_for_sph_IO.o: $(SPH_SPECTR_DIR)/load_data_for_sph_IO.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_spheric_constants.o: $(SPH_SPECTR_DIR)/m_spheric_constants.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-output_sph_m_square_file.o: $(SPH_SPECTR_DIR)/output_sph_m_square_file.f90 m_precision.o m_constants.o t_time_data.o m_phys_labels.o t_spheric_parameter.o t_rms_4_sph_spectr.o sph_mean_spectr_IO.o set_parallel_file_name.o
+output_sph_m_square_file.o: $(SPH_SPECTR_DIR)/output_sph_m_square_file.f90 m_precision.o m_constants.o t_time_data.o t_spheric_parameter.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o t_energy_label_parameters.o sph_mean_spectr_header_IO.o m_phys_labels.o sph_mean_spectr_IO.o set_parallel_file_name.o
 	$(F90) -c $(F90OPTFLAGS) $<
 radial_int_for_sph_spec.o: $(SPH_SPECTR_DIR)/radial_int_for_sph_spec.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 schmidt_poly_on_rtm_grid.o: $(SPH_SPECTR_DIR)/schmidt_poly_on_rtm_grid.f90 m_precision.o m_constants.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_spheric_rj_data.o t_gauss_points.o t_work_4_sph_trans.o t_schmidt_poly_on_rtm.o spherical_harmonics.o m_machine_parameter.o schmidt_fix_m.o
-	$(F90) -c $(F90OPTFLAGS) $<
-set_control_sph_data.o: $(SPH_SPECTR_DIR)/set_control_sph_data.f90 m_precision.o m_constants.o t_phys_data.o m_machine_parameter.o t_control_array_character3.o cal_minmax_and_stacks.o ordering_field_by_viz.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_radial_grid_sph_shell.o: $(SPH_SPECTR_DIR)/set_radial_grid_sph_shell.f90 m_precision.o m_constants.o chebyshev_radial_grid.o half_chebyshev_radial_grid.o m_spheric_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -46,7 +44,7 @@ set_reference_temp_sph.o: $(SPH_SPECTR_DIR)/set_reference_temp_sph.f90 m_precisi
 	$(F90) -c $(F90OPTFLAGS) $<
 set_special_sph_lm_flags.o: $(SPH_SPECTR_DIR)/set_special_sph_lm_flags.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_sph_phys_address.o: $(SPH_SPECTR_DIR)/set_sph_phys_address.f90 m_precision.o m_constants.o t_phys_address.o t_spheric_rj_data.o t_phys_data.o set_field_address.o
+single_pt_sph_mean_square.o: $(SPH_SPECTR_DIR)/single_pt_sph_mean_square.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_SPH_mesh_field_data.o: $(SPH_SPECTR_DIR)/t_SPH_mesh_field_data.f90 m_precision.o m_spheric_constants.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_spheric_group.o t_phys_address.o t_phys_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -56,7 +54,7 @@ t_global_gauss_coefs.o: $(SPH_SPECTR_DIR)/t_global_gauss_coefs.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_node_id_spherical_IO.o: $(SPH_SPECTR_DIR)/t_node_id_spherical_IO.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_rms_4_sph_spectr.o: $(SPH_SPECTR_DIR)/t_rms_4_sph_spectr.f90 m_precision.o
+t_rms_4_sph_spectr.o: $(SPH_SPECTR_DIR)/t_rms_4_sph_spectr.f90 m_precision.o t_sph_volume_mean_square.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_schmidt_poly_on_gauss.o: $(SPH_SPECTR_DIR)/t_schmidt_poly_on_gauss.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -65,6 +63,8 @@ t_schmidt_poly_on_rtm.o: $(SPH_SPECTR_DIR)/t_schmidt_poly_on_rtm.f90 m_precision
 t_sph_spectr_data.o: $(SPH_SPECTR_DIR)/t_sph_spectr_data.f90 m_precision.o t_phys_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_sph_trans_comm_tbl.o: $(SPH_SPECTR_DIR)/t_sph_trans_comm_tbl.f90 m_precision.o t_spheric_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_volume_mean_square.o: $(SPH_SPECTR_DIR)/t_sph_volume_mean_square.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_spheric_group.o: $(SPH_SPECTR_DIR)/t_spheric_group.f90 m_precision.o t_group_data.o
 	$(F90) -c $(F90OPTFLAGS) $<

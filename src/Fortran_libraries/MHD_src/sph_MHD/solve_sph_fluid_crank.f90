@@ -9,18 +9,18 @@
 !!@verbatim
 !!      subroutine solve_velo_by_vort_sph_crank                         &
 !!     &         (sph_rj, band_vp_evo, band_vt_evo,                     &
-!!     &          is_velo, it_velo, n_point, ntot_phys_rj, d_rj)
-!!        Input address:    is_velo, it_velo
-!!        Solution address: is_velo, it_velo
+!!     &          is_velo, n_point, ntot_phys_rj, d_rj)
+!!        Input address:    is_velo, is_velo+2
+!!        Solution address: is_velo, is_velo+2
 !!
 !!      subroutine solve_pressure_by_div_v(sph_rj, band_p_poisson,      &
 !!     &          is_press, n_point, ntot_phys_rj, d_rj)
 !!
 !!      subroutine solve_magne_sph_crank                                &
-!!     &         (sph_rj, band_bp_evo, band_bt_evo, is_magne, it_magne, &
+!!     &         (sph_rj, band_bp_evo, band_bt_evo, is_magne,           &
 !!     &          n_point, ntot_phys_rj, d_rj)
-!!        Input address:    is_magne, it_magne
-!!        Solution address: is_magne, it_magne
+!!        Input address:    is_magne, is_magne+2
+!!        Solution address: is_magne, is_magne+2
 !!
 !!      subroutine solve_scalar_sph_crank                               &
 !!     &         (sph_rj, band_s_evo, band_s00_evo, is_field,           &
@@ -56,11 +56,11 @@
 !
       subroutine solve_velo_by_vort_sph_crank                           &
      &         (sph_rj, band_vp_evo, band_vt_evo,                       &
-     &          is_velo, it_velo, n_point, ntot_phys_rj, d_rj)
+     &          is_velo, n_point, ntot_phys_rj, d_rj)
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       integer(kind = kint), intent(in) ::  n_point, ntot_phys_rj
-      integer(kind = kint), intent(in) :: is_velo, it_velo
+      integer(kind = kint), intent(in) :: is_velo
       type(band_matrices_type), intent(in) :: band_vp_evo
       type(band_matrices_type), intent(in) :: band_vt_evo
 !
@@ -75,15 +75,15 @@
 !        do k = 1, sph_bc_U%kr_out
 !          inod = (k-1) * sph_rj%nidx_rj(2) + j
 !          write(my_rank+70,*) k, j, inod,                              &
-!     &                 d_rj(inod,is_velo), d_rj(inod,it_velo)
+!     &                 d_rj(inod,is_velo), d_rj(inod,is_velo+2)
 !        end do
 !      end do
 !
-      call lubksb_5band_mul_t                                           &
-     &   (np_smp, sph_rj%istack_rj_j_smp, band_vp_evo, d_rj(1,is_velo))
+      call lubksb_5band_mul_t(np_smp, sph_rj%istack_rj_j_smp,           &
+     &                        band_vp_evo, d_rj(1,is_velo)  )
 !
-      call lubksb_3band_mul_t                                           &
-     &   (np_smp, sph_rj%istack_rj_j_smp, band_vt_evo, d_rj(1,it_velo))
+      call lubksb_3band_mul_t(np_smp, sph_rj%istack_rj_j_smp,           &
+     &                        band_vt_evo, d_rj(1,is_velo+2))
 !
 !
       end subroutine solve_velo_by_vort_sph_crank
@@ -139,23 +139,23 @@
 ! -----------------------------------------------------------------------
 !
       subroutine solve_magne_sph_crank                                  &
-     &         (sph_rj, band_bp_evo, band_bt_evo, is_magne, it_magne,   &
+     &         (sph_rj, band_bp_evo, band_bt_evo, is_magne,             &
      &          n_point, ntot_phys_rj, d_rj)
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(band_matrices_type), intent(in) :: band_bp_evo
       type(band_matrices_type), intent(in) :: band_bt_evo
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
-      integer(kind = kint), intent(in) :: is_magne, it_magne
+      integer(kind = kint), intent(in) :: is_magne
 !
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
 !
       call lubksb_3band_mul_t(np_smp, sph_rj%istack_rj_j_smp,           &
-     &    band_bp_evo, d_rj(1,is_magne) )
+     &    band_bp_evo, d_rj(1,is_magne  ))
 !
       call lubksb_3band_mul_t(np_smp, sph_rj%istack_rj_j_smp,           &
-     &    band_bt_evo, d_rj(1,it_magne) )
+     &    band_bt_evo, d_rj(1,is_magne+2))
 !
       end subroutine solve_magne_sph_crank
 !

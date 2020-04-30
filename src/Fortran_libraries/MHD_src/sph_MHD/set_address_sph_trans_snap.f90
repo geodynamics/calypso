@@ -8,15 +8,13 @@
 !!       in MHD dynamo simulation
 !!
 !!@verbatim
-!!      subroutine set_addresses_snapshot_trans                         &
-!!     &         (SPH_MHD, iphys, trns_snap,                            &
+!!      subroutine set_addresses_snapshot_trans(ipol, iphys, trns_snap, &
 !!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(address_4_sph_trans), intent(inout) :: trns_snap
-!!      subroutine set_addresses_temporal_trans                         &
-!!     &         (SPH_MHD, iphys, trns_tmp,                             &
+!!      subroutine set_addresses_temporal_trans(ipol, iphys, trns_tmp,  &
 !!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
-!!        type(phys_address), intent(in) :: ipol
+!!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(address_4_sph_trans), intent(inout) :: trns_tmp
 !!
 !!      subroutine copy_field_from_transform                            &
@@ -25,7 +23,7 @@
 !!     &         (sph_params, sph_rtp, forward, mesh, nod_fld)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
-!!        type(address_each_sph_trans), intent(in) :: forward
+!!        type(spherical_transform_data), intent(in) :: forward
 !!        type(mesh_geometry), intent(in) :: mesh
 !!        type(phys_data), intent(inout) :: nod_fld
 !!@endverbatim
@@ -36,8 +34,7 @@
       use m_machine_parameter
 !
       use t_phys_address
-      use t_SPH_mesh_field_data
-      use t_addresses_sph_transform
+      use t_sph_trans_arrays_MHD
       use t_mesh_data
       use t_spheric_parameter
 !
@@ -49,15 +46,12 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_addresses_snapshot_trans                           &
-     &         (SPH_MHD, iphys, trns_snap,                              &
+      subroutine set_addresses_snapshot_trans(ipol, iphys, trns_snap,   &
      &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
-      use address_bwd_sph_trans_snap
-      use address_fwd_sph_trans_snap
+      use address_sph_trans_snap
 !
-      type(SPH_mesh_field_data), intent(in) :: SPH_MHD
-      type(phys_address), intent(in) :: iphys
+      type(phys_address), intent(in) :: ipol, iphys
       type(address_4_sph_trans), intent(inout) :: trns_snap
       integer(kind = kint), intent(inout) :: ncomp_sph_trans
       integer(kind = kint), intent(inout) :: nvector_sph_trans
@@ -67,26 +61,13 @@
       if(iflag_debug .gt. 0) then
         write(*,*)                                                      &
      &       'Spherical transform field table for snapshot (trns_snap)'
-        write(*,*) 'Address for backward transform: ',                  &
-     &             'transform, poloidal, toroidal, grid data'
       end if
 !
-      call b_trans_address_vector_snap(SPH_MHD%ipol, SPH_MHD%itor,      &
-     &    iphys, trns_snap%b_trns, trns_snap%backward)
-      call b_trans_address_scalar_snap(SPH_MHD%ipol, SPH_MHD%itor,      &
-     &    iphys, trns_snap%b_trns, trns_snap%backward)
-      trns_snap%backward%num_tensor = 0
+      call bwd_trans_address_snap                                       &
+     &   (ipol, iphys, trns_snap%b_trns, trns_snap%backward)
 !
-     if(iflag_debug .gt. 0) then
-        write(*,*) 'Address for forward transform: ',                   &
-     &             'transform, poloidal, toroidal, grid data'
-      end if
-!
-      call f_trans_address_vector_snap(SPH_MHD%ipol, SPH_MHD%itor,      &
-     &    iphys, trns_snap%f_trns, trns_snap%forward)
-      call f_trans_address_scalar_snap(SPH_MHD%ipol, SPH_MHD%itor,      &
-     &    iphys, trns_snap%f_trns, trns_snap%forward)
-       trns_snap%forward%num_tensor = 0
+      call fwd_trans_address_snap                                       &
+     &   (ipol, iphys, trns_snap%f_trns, trns_snap%forward)
 !
       call count_num_fields_each_trans(trns_snap%backward,              &
      &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
@@ -107,15 +88,12 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_addresses_temporal_trans                           &
-     &         (SPH_MHD, iphys, trns_tmp,                               &
+      subroutine set_addresses_temporal_trans(ipol, iphys, trns_tmp,    &
      &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
-      use address_bwd_sph_trans_stmp
-      use address_fwd_sph_trans_stmp
+      use add_diff_vect_to_sph_trans
 !
-      type(SPH_mesh_field_data), intent(in) :: SPH_MHD
-      type(phys_address), intent(in) :: iphys
+      type(phys_address), intent(in) :: ipol, iphys
       type(address_4_sph_trans), intent(inout) :: trns_tmp
       integer(kind = kint), intent(inout) :: ncomp_sph_trans
       integer(kind = kint), intent(inout) :: nvector_sph_trans
@@ -129,8 +107,12 @@
      &             'transform, poloidal, toroidal, grid data'
       end if
 !
-      call b_trans_address_vector_stmp(trns_tmp%backward)
-      call b_trans_address_scalar_stmp(trns_tmp%backward)
+      trns_tmp%backward%nfield = 0
+      call alloc_sph_trns_field_name(trns_tmp%backward)
+      trns_tmp%backward%num_vector = trns_tmp%backward%nfield
+!
+      trns_tmp%backward%num_scalar                                      &
+     &     = trns_tmp%backward%nfield - trns_tmp%backward%num_vector
       trns_tmp%backward%num_tensor = 0
 !
      if(iflag_debug .gt. 0) then
@@ -138,9 +120,13 @@
      &             'transform, poloidal, toroidal, grid data'
       end if
 !
-      call f_trans_address_vector_stmp(trns_tmp%forward)
-      call f_trans_address_scalar_stmp(SPH_MHD%ipol, SPH_MHD%itor,      &
-     &   iphys, trns_tmp%f_trns, trns_tmp%forward)
+      trns_tmp%forward%nfield = 0
+      call alloc_sph_trns_field_name(trns_tmp%forward)
+      trns_tmp%forward%num_vector = trns_tmp%forward%nfield
+!
+      call add_diff_vect_scalar_trns_snap                               &
+     &   (ipol%diff_vector, iphys%diff_vector,                          &
+     &    trns_tmp%f_trns%diff_vector, trns_tmp%forward)
       trns_tmp%forward%num_tensor = 0
 !
       call count_num_fields_each_trans(trns_tmp%backward,               &
@@ -170,7 +156,7 @@
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(address_each_sph_trans), intent(in) :: backward
+      type(spherical_transform_data), intent(in) :: backward
       type(mesh_geometry), intent(in) :: mesh
       type(phys_data), intent(inout) :: nod_fld
 !
@@ -201,7 +187,7 @@
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(address_each_sph_trans), intent(in) :: forward
+      type(spherical_transform_data), intent(in) :: forward
       type(mesh_geometry), intent(in) :: mesh
       type(phys_data), intent(inout) :: nod_fld
 !

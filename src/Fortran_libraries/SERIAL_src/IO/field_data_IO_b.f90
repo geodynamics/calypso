@@ -7,16 +7,17 @@
 !> @brief Output merged binary field file using MPI-IO
 !!
 !!@verbatim
-!!      subroutine write_step_data_b(id_rank, t_IO, bflag)
+!!      subroutine write_step_data_b(id_rank, t_IO, bbuf)
 !!      subroutine write_field_data_b(num_field, field_name,            &
-!!     &          ncomp_field, nnod64, ntot_comp, d_nod, bflag)
+!!     &          ncomp_field, nnod64, ntot_comp, d_nod, bbuf)
 !!        type(time_data), intent(in) :: t_IO
+!!        type(binary_IO_buffer), intent(inout) :: bbuf
 !!
 !!      subroutine read_step_data_b                                     &
-!!     &         (bflag, t_IO, istack_merged, num_field)
+!!     &         (bbuf, t_IO, istack_merged, num_field)
 !!      subroutine read_field_data_b                                    &
-!!     &         (bflag, num_field, field_name, nnod64, ntot_comp, vect)
-!!        type(binary_IO_flags), intent(inout) :: bflag
+!!     &         (bbuf, num_field, field_name, nnod64, ntot_comp, vect)
+!!        type(binary_IO_buffer), intent(inout) :: bbuf
 !!        type(time_data), intent(inout) :: t_IO
 !!@endverbatim
 !
@@ -26,8 +27,9 @@
       use m_constants
       use m_machine_parameter
 !
-      use binary_IO
       use t_time_data
+      use t_binary_IO_buffer
+      use binary_IO
 !
       implicit none
 !
@@ -37,32 +39,31 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_step_data_b(id_rank, t_IO, bflag)
+      subroutine write_step_data_b(id_rank, t_IO, bbuf)
 !
       integer, intent(in) :: id_rank
       type(time_data), intent(in) :: t_IO
-      type(binary_IO_flags), intent(inout) :: bflag
+      type(binary_IO_buffer), intent(inout) :: bbuf
 !
       integer(kind = kint) :: irank_write
 !
 !
       irank_write = int(id_rank,KIND(irank_write))
-      call write_one_integer_b(irank_write, bflag)
-      if(bflag%ierr_IO .ne. 0) return
-      call write_one_integer_b(t_IO%i_time_step, bflag)
-      if(bflag%ierr_IO .ne. 0) return
+      call write_one_integer_b(irank_write, bbuf)
+      if(bbuf%ierr_bin .ne. 0) return
+      call write_one_integer_b(t_IO%i_time_step, bbuf)
+      if(bbuf%ierr_bin .ne. 0) return
 !
-      call write_one_real_b(t_IO%time, bflag)
-      if(bflag%ierr_IO .ne. 0) return
-      call write_one_real_b(t_IO%dt, bflag)
-      if(bflag%ierr_IO .ne. 0) return
+      call write_one_real_b(t_IO%time, bbuf)
+      if(bbuf%ierr_bin .ne. 0) return
+      call write_one_real_b(t_IO%dt, bbuf)
 !
       end subroutine write_step_data_b
 !
 ! -----------------------------------------------------------------------
 !
       subroutine write_field_data_b(num_field, field_name,              &
-     &          ncomp_field, nnod64, ntot_comp, d_nod, bflag)
+     &          ncomp_field, nnod64, ntot_comp, d_nod, bbuf)
 !
       use m_phys_constants
       use transfer_to_long_integers
@@ -72,25 +73,25 @@
       integer(kind=kint), intent(in) :: ncomp_field(num_field)
       character(len=kchara), intent(in) :: field_name(num_field)
       real(kind = kreal), intent(in) :: d_nod(nnod64,ntot_comp)
-      type(binary_IO_flags), intent(inout) :: bflag
+      type(binary_IO_buffer), intent(inout) :: bbuf
 !
       integer(kind = kint_gl), parameter :: ione64 = 1
       integer(kind = kint_gl) :: istack_merged(1)
 !
 !
       istack_merged(1) = nnod64
-      call write_mul_int8_b(ione64, istack_merged, bflag)
-      if(bflag%ierr_IO .ne. 0) return
-      call write_one_integer_b(num_field, bflag)
-      if(bflag%ierr_IO .ne. 0) return
+      call write_mul_int8_b(ione64, istack_merged, bbuf)
+      if(bbuf%ierr_bin .ne. 0) return
+      call write_one_integer_b(num_field, bbuf)
+      if(bbuf%ierr_bin .ne. 0) return
       call write_mul_integer_b                                          &
-     &   (cast_long(num_field), ncomp_field, bflag)
-      if(bflag%ierr_IO .ne. 0) return
+     &   (cast_long(num_field), ncomp_field, bbuf)
+      if(bbuf%ierr_bin .ne. 0) return
 !
-      call write_mul_character_b(num_field, field_name, bflag)
-      if(bflag%ierr_IO .ne. 0) return
-      call write_2d_vector_b(nnod64, ntot_comp, d_nod, bflag)
-      if(bflag%ierr_IO .ne. 0) return
+      call write_mul_character_b(num_field, field_name, bbuf)
+      if(bbuf%ierr_bin .ne. 0) return
+      call write_2d_vector_b(nnod64, ntot_comp, d_nod, bbuf)
+      if(bbuf%ierr_bin .ne. 0) return
 !
       end subroutine write_field_data_b
 !
@@ -98,9 +99,9 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_step_data_b                                       &
-     &         (bflag, t_IO, istack_merged, num_field)
+     &         (bbuf, t_IO, istack_merged, num_field)
 !
-      type(binary_IO_flags), intent(inout) :: bflag
+      type(binary_IO_buffer), intent(inout) :: bbuf
       type(time_data), intent(inout) :: t_IO
 !
       integer(kind=kint_gl), intent(inout) :: istack_merged(1)
@@ -110,19 +111,19 @@
       integer(kind = kint_gl), parameter :: ione64 = 1
 !
 !
-      call read_one_integer_b(bflag, irank_read)
-      if(bflag%ierr_IO .ne. 0) return
-      call read_one_integer_b(bflag, t_IO%i_time_step)
-      if(bflag%ierr_IO .ne. 0) return
-      call read_one_real_b(bflag, t_IO%time)
-      if(bflag%ierr_IO .ne. 0) return
-      call read_one_real_b(bflag, t_IO%dt)
-      if(bflag%ierr_IO .ne. 0) return
+      call read_one_integer_b(bbuf, irank_read)
+      if(bbuf%ierr_bin .gt. 0) return
+      call read_one_integer_b(bbuf, t_IO%i_time_step)
+      if(bbuf%ierr_bin .gt. 0) return
+      call read_one_real_b(bbuf, t_IO%time)
+      if(bbuf%ierr_bin .ne. 0) return
+      call read_one_real_b(bbuf, t_IO%dt)
+      if(bbuf%ierr_bin .ne. 0) return
 !
-      call read_mul_int8_b(bflag, ione64, istack_merged)
-      if(bflag%ierr_IO .ne. 0) return
+      call read_mul_int8_b(bbuf, ione64, istack_merged)
+      if(bbuf%ierr_bin .ne. 0) return
 !
-      call read_one_integer_b(bflag, num_field)
+      call read_one_integer_b(bbuf, num_field)
 !
       end subroutine read_step_data_b
 !
@@ -130,20 +131,20 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_field_data_b                                      &
-     &         (bflag, num_field, field_name, nnod64, ntot_comp, vect)
+     &         (bbuf, num_field, field_name, nnod64, ntot_comp, vect)
 !
-      type(binary_IO_flags), intent(inout) :: bflag
+      type(binary_IO_buffer), intent(inout) :: bbuf
       integer(kind = kint_gl), intent(in) :: nnod64
       integer(kind=kint), intent(in) :: num_field, ntot_comp
       character(len=kchara), intent(inout) :: field_name(num_field)
       real(kind = kreal), intent(inout) :: vect(nnod64,ntot_comp)
 !
 !
-      call read_mul_character_b(bflag, num_field, field_name)
-      if(bflag%ierr_IO .ne. 0) return
+      call read_mul_character_b(bbuf, num_field, field_name)
+      if(bbuf%ierr_bin .ne. 0) return
 !
-      call read_2d_vector_b(bflag, nnod64, ntot_comp, vect)
-      if(bflag%ierr_IO .ne. 0) return
+      call read_2d_vector_b(bbuf, nnod64, ntot_comp, vect)
+      if(bbuf%ierr_bin .ne. 0) return
 !
       end subroutine read_field_data_b
 !

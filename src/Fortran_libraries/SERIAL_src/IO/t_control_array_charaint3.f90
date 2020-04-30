@@ -1,10 +1,10 @@
 !>@file   t_control_array_charaint3.f90
-!!@brief  module t_control_array_charaint3
+!!        module t_control_array_charaint3
 !!
 !!@author H. Matsui
 !!@date Programmed in June, 2014
-!
-!>@brief  Subroutines to read control arrays
+!!
+!>@brief  Subroutines to read char-int-int-int control arrays
 !!
 !!@verbatim
 !!      subroutine alloc_control_array_c_i3(array_ci3)

@@ -1,10 +1,10 @@
 !>@file   primefac.f90
-!!@brief  module primefac
+!!        module primefac
 !!
 !!@author  MADISON ACADEMIC COMPUTING CENTER
 !!@date    FORTRAN 77 VERSION 88.09
 !!@n       Modified in March, 2013
-!
+!!
 !> @brief  DECOMPOSE A NUMBER INTO ITS PRIME FACTORS.
 !!
 !!@verbatim

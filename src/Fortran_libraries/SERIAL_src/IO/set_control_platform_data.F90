@@ -1,10 +1,10 @@
 !>@file   set_control_platform_data.f90
-!!@brief  module set_control_platform_data
+!!        module set_control_platform_data
 !!
 !!@author H. Matsui
 !!@date Programmed in 2009
-!
-!>@brief  Set file headers and number of processor and threds
+!!
+!>@brief  Set file headers and number of processor and threads
 !!        from control data
 !!
 !!@verbatim
@@ -91,8 +91,10 @@
       integer, intent(in) :: id_rank
       type(platform_data_control), intent(in) :: plt
 !
+#ifdef _OPENMP
       integer, external :: omp_get_max_threads
       integer :: np_smp4
+#endif
 !
 !
       np_smp = 1

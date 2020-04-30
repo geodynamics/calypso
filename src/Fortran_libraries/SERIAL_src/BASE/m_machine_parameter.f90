@@ -5,7 +5,7 @@
 !! @author H. Matsui
 !! @date Written on May, 2003
 !!
-!!> @brief  Parameters for computer
+!> @brief  Parameters for computer
 !
       module m_machine_parameter
 !

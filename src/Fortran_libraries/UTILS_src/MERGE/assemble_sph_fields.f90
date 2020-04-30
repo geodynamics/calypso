@@ -170,7 +170,7 @@
 !
       is_magne = 0
       do i = 1, sph_phys%num_phys
-        if(sph_phys%phys_name(i) .eq. fhd_magne) then
+        if(sph_phys%phys_name(i) .eq. magnetic_field%name) then
           is_magne = sph_phys%istack_component(i-1) + 1
           exit
         end if

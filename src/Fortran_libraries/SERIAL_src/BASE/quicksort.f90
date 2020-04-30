@@ -1,12 +1,12 @@
 !>@file   quicksort.f90
-!!@brief  module quicksort
+!!        module quicksort
 !!
 !!@author H. Okuda and H. Matsui
 !!@date  Programmed by H. Okuda in 2000
 !!@n     Modified by H. Matsui in Mar. 2005
 !!@n     Modified by H. Matsui in July, 2006
-!
-!>@brief  quick sort subroutines
+!!
+!>@brief  Quick sort subroutines
 !!
 !!@verbatim
 !!      recursive subroutine quicksort_int(n,ix,l,r)

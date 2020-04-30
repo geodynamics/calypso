@@ -1,8 +1,8 @@
 !>@file   cal_inverse_small_matrix.f90
-!!@brief  module cal_inverse_small_matrix
+!!        module cal_inverse_small_matrix
 !!
 !!@date  Programmed by H.Matsui on July, 2009
-!
+!!
 !>@brief evaluate invert matrix for small matrix
 !!
 !!@verbatim

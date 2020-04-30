@@ -48,6 +48,9 @@
 !>     4-byte integer size for MPI
       integer :: CALYPSO_FOUR_INT
 !
+!>     logical size for MPI
+      integer :: CALYPSO_LOGICAL
+!
 !>      process ID (start from 0)
       integer :: my_rank
 !>      total number of processes
@@ -72,6 +75,7 @@
 !
       CALYPSO_CHARACTER = MPI_CHARACTER
       CALYPSO_FOUR_INT =  MPI_INTEGER 
+      CALYPSO_LOGICAL =   MPI_LOGICAL
 !
       if(kint .eq. 4) then
         CALYPSO_INTEGER = MPI_INTEGER

@@ -25,6 +25,7 @@
       use t_control_data_4_merge
       use t_control_param_assemble
       use t_spectr_data_4_assemble
+      use t_check_and_make_SPH_mesh
 !
       use new_SPH_restart
       use parallel_assemble_sph
@@ -35,7 +36,6 @@
 !
       implicit none
 !
-      type(control_data_4_merge), save :: mgd_ctl_s
       type(control_param_assemble), save :: asbl_param_s
       type(spectr_data_4_assemble), save :: sph_asbl_s
       type(time_data), save :: init_t
@@ -57,16 +57,24 @@
       use share_spectr_index_data
       use count_nnod_4_asseble_sph
 !
-      integer(kind = kint) :: ip, jp
+      type(control_data_4_merge) :: mgd_ctl_s
+      type(sph_grid_maker_in_sim) :: sph_maker_s
+!      integer(kind = kint) :: ip, jp
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
 !
       if(my_rank .eq. 0) call read_control_assemble_sph(mgd_ctl_s)
       call bcast_merge_control_data(mgd_ctl_s)
-      call set_control_4_newsph(mgd_ctl_s, asbl_param_s, sph_asbl_s)
+      call set_control_4_newsph                                         &
+     &   (mgd_ctl_s, asbl_param_s, sph_asbl_s, sph_maker_s)
 !
       call alloc_spectr_data_4_assemble(sph_asbl_s)
+!
+!  Check and construct spherical shell grid data
+!
+      call check_and_make_SPH_mesh(mgd_ctl_s%psph_ctl%iflag_sph_shell,  &
+     &    asbl_param_s%new_mesh_file, sph_maker_s)
 !
 !  set original spectr data
 !

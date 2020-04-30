@@ -77,14 +77,8 @@
 !
 !>        address for spectr data (poloidal component for vector)
         type(phys_address) :: ipol
-!>        address for radial gradient for poloidal component
-        type(phys_address) :: idpdr
-!>        address for toroidal component
-        type(phys_address) :: itor
-!
 !>        Structure for field data
         type(phys_data) :: fld
       end type SPH_mesh_field_data
-!
 !
       end module t_SPH_mesh_field_data

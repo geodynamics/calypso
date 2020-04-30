@@ -1,9 +1,9 @@
 !>@file   t_ctl_data_4_platforms.f90
-!!@brief  module t_ctl_data_4_platforms
+!!        module t_ctl_data_4_platforms
 !!
 !!@author H. Matsui
 !!@date Programmed in July, 2007
-!
+!!
 !> @brief Control input routine for data file headers
 !!
 !!@verbatim

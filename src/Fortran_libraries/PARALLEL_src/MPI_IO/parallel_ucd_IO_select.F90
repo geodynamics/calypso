@@ -98,7 +98,7 @@
       use merged_udt_vtk_file_IO
 !
       use gz_merged_udt_vtk_file_IO
-      use gz_write_ucd_to_vtk_file
+      use gz_vtk_file_IO
       use hdf5_file_IO
 !
       integer(kind=kint), intent(in) :: istep_ucd
@@ -140,11 +140,11 @@
       else if(ucd_param%iflag_format .eq. iflag_vtk_gz) then
         call write_gz_parallel_vtk_file(my_rank, nprocs, istep_ucd,     &
      &      ucd_param%file_prefix)
-        call write_ucd_data_2_gz_vtk(my_rank, file_name, ucd)
+        call write_gz_vtk_file(my_rank, file_name, ucd)
       else if (ucd_param%iflag_format .eq. iflag_vtd_gz) then
         call write_gz_parallel_vtk_file(my_rank, nprocs, istep_ucd,     &
      &      ucd_param%file_prefix)
-        call write_ucd_data_2_gz_vtk_phys(my_rank, file_name, ucd)
+        call write_gz_vtk_phys(my_rank, file_name, ucd)
 #endif
 !
 #ifdef HDF5_IO
@@ -182,7 +182,6 @@
       use merged_udt_vtk_file_IO
 !
       use gz_merged_udt_vtk_file_IO
-      use gz_write_ucd_to_vtk_file
       use hdf5_file_IO
 !
       type(field_IO_params), intent(in) :: ucd_param

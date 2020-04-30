@@ -15,9 +15,8 @@
 !!        type(sph_mhd_monitor_data), intent(inout) :: monitor
 !!
 !!      subroutine set_control_4_SPH_MHD(plt, org_plt,                  &
-!!     &          Dmodel_ctl, smctl_ctl, nmtr_ctl, psph_ctl,            &
-!!     &          sph_gen, MHD_files, bc_IO, MHD_step, MHD_prop,        &
-!!     &          MHD_BC, WK_sph, gen_sph)
+!!     &          Dmodel_ctl, smctl_ctl, nmtr_ctl, psph_ctl, MHD_files, &
+!!     &          bc_IO, MHD_step, MHD_prop, MHD_BC, WK_sph, sph_maker)
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(platform_data_control), intent(in) :: org_plt
 !!        type(mhd_DNS_model_control), intent(in) :: Dmodel_ctl
@@ -25,14 +24,13 @@
 !!        type(sph_monitor_control), intent(in) :: smonitor_ctl
 !!        type(node_monitor_control), intent(in) :: nmtr_ctl
 !!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
-!!        type(sph_grids), intent(inout) :: sph_gen
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(MHD_file_IO_params), intent(inout) :: MHD_files
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!        type(MHD_BC_lists), intent(inout) :: MHD_BC
 !!        type(spherical_trns_works), intent(inout) :: WK_sph
-!!        type(construct_spherical_grid), intent(inout) :: gen_sph
+!!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !!      subroutine set_control_SPH_MHD_bcs                              &
 !!     &         (MHD_prop, nbc_ctl, sbc_ctl, MHD_BC)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
@@ -86,10 +84,10 @@
       use t_sph_mhd_monitor_data_IO
 !
       use set_control_sph_data_MHD
-      use set_control_nodal_data
+      use set_control_field_data
       use set_controls_4_sph_shell
+      use set_nodal_field_name
       use node_monitor_IO
-      use ordering_field_by_viz
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(mhd_DNS_model_control), intent(inout) :: Dmodel_ctl
@@ -105,8 +103,8 @@
 !
 !
 !       set nodal field list
-      if (iflag_debug.gt.0) write(*,*) 's_set_control_nodal_data'
-      call s_set_control_nodal_data                                     &
+      if (iflag_debug.gt.0) write(*,*) 's_set_control_field_data'
+      call s_set_control_field_data                                     &
      &   (Dmodel_ctl%fld_ctl%field_ctl, nod_fld, ierr)
 !
 !       set spectr field list
@@ -121,10 +119,8 @@
      &   (zm_ctls%crust_filter_ctl, monitor)
 !
       call set_FEM_mesh_mode_4_SPH(psph_ctl%spctl, sph%sph_params)
-!
       call count_field_4_monitor                                        &
-     &   (rj_fld%num_phys, rj_fld%num_component,                        &
-     &    rj_fld%iflag_monitor, num_field_monitor, ntot_comp_monitor)
+     &   (rj_fld, num_field_monitor, ntot_comp_monitor)
 !
       end subroutine set_control_SPH_MHD_w_viz
 !
@@ -159,13 +155,13 @@
 ! ----------------------------------------------------------------------
 !
       subroutine set_control_4_SPH_MHD(plt, org_plt,                    &
-     &          Dmodel_ctl, smctl_ctl, nmtr_ctl, psph_ctl,              &
-     &          sph_gen, MHD_files, bc_IO, MHD_step, MHD_prop,          &
-     &          MHD_BC, WK_sph, gen_sph)
+     &          Dmodel_ctl, smctl_ctl, nmtr_ctl, psph_ctl, MHD_files,   &
+     &          bc_IO, MHD_step, MHD_prop, MHD_BC, WK_sph, sph_maker)
 !
       use t_spheric_parameter
       use t_phys_data
       use t_rms_4_sph_spectr
+      use t_check_and_make_SPH_mesh
       use t_sph_trans_arrays_MHD
       use t_const_spherical_grid
       use t_sph_boundary_input_data
@@ -190,14 +186,13 @@
       type(sph_mhd_control_control), intent(in) :: smctl_ctl
       type(node_monitor_control), intent(in) :: nmtr_ctl
       type(parallel_sph_shell_control), intent(in) :: psph_ctl
-      type(sph_grids), intent(inout) :: sph_gen
       type(MHD_file_IO_params), intent(inout) :: MHD_files
       type(boundary_spectra), intent(inout) :: bc_IO
       type(MHD_step_param), intent(inout) :: MHD_step
       type(MHD_evolution_param), intent(inout) :: MHD_prop
       type(MHD_BC_lists), intent(inout) :: MHD_BC
       type(spherical_trns_works), intent(inout) :: WK_sph
-      type(construct_spherical_grid), intent(inout) :: gen_sph
+      type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !
       integer(kind = kint) :: ierr
 !
@@ -224,7 +219,7 @@
         if (iflag_debug.gt.0) write(*,*) 'set_control_4_shell_grids'
         call set_control_4_shell_grids                                  &
      &     (nprocs, psph_ctl%Fmesh_ctl, psph_ctl%spctl, psph_ctl%sdctl, &
-     &      sph_gen, gen_sph, ierr)
+     &      sph_maker%sph_tmp, sph_maker%gen_sph, ierr)
       end if
 !
 !   set forces
@@ -237,8 +232,7 @@
 !   set parameters for general information
 !
       if (iflag_debug.gt.0) write(*,*) 's_set_control_sph_data_MHD'
-      call s_set_control_sph_data_MHD                                   &
-     &   (MHD_prop, plt, smctl_ctl%mevo_ctl,                            &
+      call s_set_control_sph_data_MHD(plt, smctl_ctl%mevo_ctl,          &
      &    MHD_files%org_rj_file_IO, MHD_files%org_rst_file_IO,          &
      &    MHD_files%fst_file_IO, bc_IO, WK_sph)
 !

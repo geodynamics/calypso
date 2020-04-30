@@ -52,11 +52,12 @@
       character(len=kchara) :: tmpchara
 !
 !
-      fl_prop%iflag_4_gravity =        id_turn_OFF
-      fl_prop%iflag_4_coriolis =       id_turn_OFF
-      fl_prop%iflag_4_lorentz =        id_turn_OFF
-      fl_prop%iflag_4_composit_buo =   id_turn_OFF
-      fl_prop%iflag_4_filter_gravity = id_turn_OFF
+      fl_prop%iflag_4_gravity =         id_turn_OFF
+      fl_prop%iflag_4_coriolis =        id_turn_OFF
+      fl_prop%iflag_4_lorentz =         id_turn_OFF
+      fl_prop%iflag_4_composit_buo =    id_turn_OFF
+      fl_prop%iflag_4_filter_gravity =  id_turn_OFF
+      fl_prop%iflag_4_filter_comp_buo = id_turn_OFF
 !
       if (fl_prop%iflag_scheme .eq. id_no_evolution) then
         fl_prop%num_force = 0
@@ -130,6 +131,10 @@
      &       .or. cmp_no_case(tmpchara, 'Filtered_buoyancy')            &
      &       ) fl_prop%iflag_4_filter_gravity =  id_FORCE_ele_int
 !
+          if(   cmp_no_case(tmpchara, 'Filtered_compositional_gravity') &
+     &     .or. cmp_no_case(tmpchara,'Filtered_compositional_buoyancy') &
+     &       ) fl_prop%iflag_4_filter_comp_buo = id_FORCE_ele_int
+!
           if (cmp_no_case(tmpchara, 'Coriolis')                         &
      &        )  fl_prop%iflag_4_coriolis = id_FORCE_ele_int
 !
@@ -174,7 +179,8 @@
 !
       fl_prop%i_grav = iflag_no_gravity
       iflag = fl_prop%iflag_4_gravity + fl_prop%iflag_4_composit_buo    &
-     &       + fl_prop%iflag_4_filter_gravity
+     &       + fl_prop%iflag_4_filter_gravity                           &
+     &       + fl_prop%iflag_4_filter_comp_buo
       if (iflag .gt. 0) then
         if (g_ctl%gravity%iflag .eq. 0) then
           fl_prop%i_grav = iflag_self_r_g

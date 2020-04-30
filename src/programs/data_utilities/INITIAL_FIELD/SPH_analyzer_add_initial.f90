@@ -23,6 +23,7 @@
       use m_elapsed_labels_SEND_RECV
       use m_ctl_data_sph_MHD
       use m_SPH_MHD_model_data
+      use m_SPH_MHD_structure
       use m_MHD_step_parameter
       use t_MHD_file_parameter
       use t_SPH_mesh_field_data
@@ -87,7 +88,7 @@
       subroutine SPH_add_initial_field(SPH_model, SPH_MHD)
 !
       use set_control_sph_mhd
-      use set_sph_phys_address
+      use set_control_field_data
       use const_sph_initial_spectr
       use set_reference_sph_mhd
       use set_bc_sph_mhd
@@ -106,13 +107,16 @@
 !
 !   Allocate spectr field data
 !
-      call set_sph_sprctr_data_address(SPH_MHD%sph%sph_rj,              &
-     &    SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%itor, SPH_MHD%fld)
+      call init_field_data                                              &
+     &   (SPH_MHD%sph%sph_rj%nnod_rj, SPH_MHD%fld, SPH_MHD%ipol)
 !
 ! ---------------------------------
 !
-      if (iflag_debug.gt.0) write(*,*) 'init_r_infos_make_sph_initial'
-      call init_r_infos_make_sph_initial(SPH_model, SPH_MHD)
+      if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd'
+      call init_r_infos_sph_mhd(SPH_model%bc_IO,                        &
+     &    SPH_MHD%groups, SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph,  &
+     &    SPH_model%omega_sph, SPH_model%ref_temp, SPH_model%ref_comp,  &
+     &    SPH_MHD%fld, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 !
 ! ---------------------------------
 !

@@ -145,10 +145,11 @@
         end if
 !
       else if(ibc_type .eq. iflag_bc_file_s) then
-        call set_fixed_vector_bc_by_file(fhd_velo, sph_rj, bc_IO,       &
+        call set_fixed_vector_bc_by_file(velocity%name, sph_rj, bc_IO,  &
      &      sph_bc_U%icb_grp_name, sph_bc_U%iflag_icb, ICB_Uspec)
       else if(ibc_type .eq. iflag_bc_evo_field) then
-        call set_evolved_vector_bc_by_file(fhd_velo, sph_rj, bc_IO,     &
+        call set_evolved_vector_bc_by_file                              &
+     &     (velocity%name, sph_rj, bc_IO,                               &
      &      sph_bc_U%icb_grp_name, sph_bc_U%iflag_icb, ICB_Uevo)
       end if
 !
@@ -199,10 +200,11 @@
         end if
 !
       else if(ibc_type .eq. iflag_bc_file_s) then
-        call set_fixed_vector_bc_by_file(fhd_velo, sph_rj, bc_IO,       &
+        call set_fixed_vector_bc_by_file(velocity%name, sph_rj, bc_IO,  &
      &      sph_bc_U%cmb_grp_name, sph_bc_U%iflag_cmb, CMB_Uspec)
       else if(ibc_type .eq. iflag_bc_evo_field) then
-        call set_evolved_vector_bc_by_file(fhd_velo, sph_rj, bc_IO,     &
+        call set_evolved_vector_bc_by_file                              &
+     &     (velocity%name, sph_rj, bc_IO,                               &
      &      sph_bc_U%cmb_grp_name, sph_bc_U%iflag_cmb, CMB_Uevo)
       end if
 !

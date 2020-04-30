@@ -1,11 +1,11 @@
 !>@file   cal_subtract_smp.f90
-!!@brief  module cal_subtract_smp
+!!        module cal_subtract_smp
 !!
 !!@author H. Matsui
 !!@date Programmed...when??
-!
+!!
 !>@brief subroutines to subtract field data
-!!@n      Need $omp parallel to use these routines
+!!        Need $omp parallel to use these routines
 !!
 !!@verbatim
 !!      subroutine subtract_scalars_smp(nnod, source, subt, sol)

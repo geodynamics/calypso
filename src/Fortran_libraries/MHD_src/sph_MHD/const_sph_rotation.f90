@@ -10,42 +10,42 @@
 !!      subroutine const_sph_vorticity(sph_rj, r_2nd, sph_bc_U,         &
 !!     &          fdm2_free_ICB, fdm2_free_CMB, g_sph_rj,               &
 !!     &          is_velo, is_vort, rj_fld)
-!!        Input:    ipol%i_velo, itor%i_velo
-!!        Solution: ipol%i_vort, itor%i_vort, idpdr%i_vort
+!!        Address for input:    is_velo, is_velo+2
+!!        Address for solution: is_vort, is_vort+2, is_vort+1
 !!
 !!      subroutine const_sph_current(sph_rj, r_2nd, sph_bc_B, g_sph_rj, &
 !!     &          is_magne, is_current, rj_fld)
-!!        Input:    ipol%i_magne, itor%i_magne
-!!        Solution: ipol%i_current, itor%i_current, idpdr%i_current
+!!        Address for input:    is_magne, is_magne+2
+!!        Address for solution: is_current, is_current+2, is_current+1
 !!
 !!      subroutine const_sph_rotation_uxb(sph_rj, r_2nd, sph_bc_B,      &
 !!     &          g_sph_rj, is_fld, is_rot, rj_fld)
-!!        Input:    is_fld, it_fld
-!!        Solution: is_rot, it_rot, ids_rot
+!!        Address for input:    is_fld, it_fld
+!!        Address for solution: is_rot, it_rot, ids_rot
 !!
 !!      subroutine const_sph_rotation_no_bc(sph_rj, r_2nd, sph_bc,      &
 !!     &          g_sph_rj, is_fld, is_rot, rj_fld)
-!!        Input:    is_fld, it_fld
-!!        Solution: is_rot, it_rot, ids_rot
+!!        Address for input:    is_fld, it_fld
+!!        Address for solution: is_rot, it_rot, ids_rot
 !!
 !!      subroutine const_sph_force_rot2(sph_rj, r_2nd,                  &
 !!     &          sph_bc_U, fdm2_free_ICB, fdm2_free_CMB, g_sph_rj,     &
 !!     &          is_fld, is_rot, rj_fld)
-!!        Input:    is_fld, it_fld
-!!        Solution: is_rot, it_rot, ids_rot
+!!        Address for input:    is_fld, it_fld
+!!        Address for solution: is_rot, it_rot, ids_rot
 !!
 !!      subroutine const_sph_viscous_by_vort2                           &
 !!     &         (sph_rj, r_2nd, sph_bc_U, fdm2_free_ICB, fdm2_free_CMB,&
 !!     &          g_sph_rj, coef_diffuse, is_velo, is_vort, is_viscous, &
 !!     &          rj_fld)
-!!        Input:    ipol%i_vort, itor%i_vort
-!!        Solution: ipol%i_v_diffuse, itor%i_v_diffuse, idpdr%i_v_diffuse
+!!        Address for input:    is_velo, is_vort, is_vort+2
+!!        Address for solution: is_viscous, is_viscous+2, is_viscous+1
 !!
 !!      subroutine const_sph_mag_diffuse_by_j                           &
 !!     &         (sph_rj, r_2nd, sph_bc_B, g_sph_rj, coef_diffuse,      &
 !!     &          is_magne, is_current, is_ohmic, rj_fld)
-!!        Input:    ipol%i_current, itor%i_current
-!!        Solution: ipol%i_b_diffuse, itor%i_b_diffuse, idpdr%i_b_diffuse
+!!        Address for input:    is_magne, is_current, is_current+2
+!!        Address for solution: is_ohmic, is_ohmic+2, is_ohmic+1
 !!
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
@@ -287,11 +287,6 @@
 !
       type(phys_data), intent(inout) :: rj_fld
 !
-      integer(kind = kint) :: it_velo, idp_diffuse
-!
-!
-      it_velo = is_velo + 2
-      idp_diffuse = is_viscous + 1
 !
       call cal_sph_nod_diffuse_by_rot2(sph_bc_U%kr_in, sph_bc_U%kr_out, &
      &    sph_rj%nidx_rj, sph_rj%ar_1d_rj, g_sph_rj,                    &
@@ -301,10 +296,10 @@
 !
       call sel_ICB_sph_viscous_diffusion(sph_rj, r_2nd,                 &
      &    sph_bc_U, fdm2_free_ICB, g_sph_rj, coef_diffuse,              &
-     &    is_velo, it_velo, is_viscous, idp_diffuse, rj_fld)
+     &    is_velo, is_viscous, rj_fld)
       call sel_CMB_sph_viscous_diffusion                                &
      &   (sph_rj, sph_bc_U, fdm2_free_CMB, g_sph_rj, coef_diffuse,      &
-     &    is_velo, is_viscous, idp_diffuse, rj_fld)
+     &    is_velo, is_viscous, rj_fld)
 !
       end subroutine const_sph_viscous_by_vort2
 !
@@ -328,10 +323,6 @@
 !
       type(phys_data), intent(inout) :: rj_fld
 !
-      integer(kind = kint) :: idp_diffuse
-!
-!
-      idp_diffuse = is_ohmic + 1
 !
       call cal_sph_nod_diffuse_by_rot2                                  &
      &   (sph_bc_B%kr_in, sph_bc_B%kr_out,                              &
@@ -342,10 +333,10 @@
 !
       call sel_ICB_sph_magnetic_diffusion                               &
      &   (sph_rj, r_2nd, sph_bc_B, g_sph_rj, coef_diffuse,              &
-     &    is_magne, is_ohmic, idp_diffuse, rj_fld)
+     &    is_magne, is_ohmic, rj_fld)
       call sel_CMB_sph_magnetic_diffusion                               &
      &   (sph_rj, sph_bc_B, g_sph_rj, coef_diffuse,                     &
-     &    is_magne, is_ohmic, idp_diffuse, rj_fld)
+     &    is_magne, is_ohmic, rj_fld)
 !
       end subroutine const_sph_mag_diffuse_by_j
 !

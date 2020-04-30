@@ -143,22 +143,22 @@
           ir_21 = irev_sr_rlm(i21) - 1
           ir_12 = irev_sr_rlm(i12) - 1
 !
-          sp_dvp_k1 = WR(b_trns%i_velo+1+NB*ir_11)
-          sp_dvp_k2 = WR(b_trns%i_velo+1+NB*ir_21)
-          sp_wp_l1 =  WR(b_trns%i_vort+  NB*ir_12)
-          sp_vp_k1 =  WR(b_trns%i_velo+  NB*ir_11)
-          sp_vp_k2 =  WR(b_trns%i_velo+  NB*ir_21)
+          sp_dvp_k1 = WR(b_trns%base%i_velo+1 + NB*ir_11)
+          sp_dvp_k2 = WR(b_trns%base%i_velo+1 + NB*ir_21)
+          sp_wp_l1 =  WR(b_trns%base%i_vort +  NB*ir_12)
+          sp_vp_k1 =  WR(b_trns%base%i_velo +  NB*ir_11)
+          sp_vp_k2 =  WR(b_trns%base%i_velo +  NB*ir_21)
 !
           sp_d2vp_l1 = (a_r_1d_rlm_r(k_rlm)*a_r_1d_rlm_r(k_rlm)         &
-     &        * g_sph_rlm(j_rlm,3)*WR(b_trns%i_velo+  NB*ir_12)         &
-     &                           - WR(b_trns%i_vort+2+NB*ir_12) )
-          sp_vp_l1 = WR(b_trns%i_velo+NB*ir_12)
-          sp_wp_k1 = WR(b_trns%i_vort+NB*ir_11)
-          sp_wp_k2 = WR(b_trns%i_vort+NB*ir_21)
-          sp_dwp_k1 = (WR(b_trns%i_vort+1+NB*ir_11)                     &
-     &         - two*a_r_1d_rlm_r(k_rlm)*WR(b_trns%i_vort+NB*ir_11))
-          sp_dwp_k2 = (WR(b_trns%i_vort+1+NB*ir_21)                     &
-     &         - two*a_r_1d_rlm_r(k_rlm)*WR(b_trns%i_vort+NB*ir_21))
+     &        * g_sph_rlm(j_rlm,3)*WR(b_trns%base%i_velo +  NB*ir_12)   &
+     &                           - WR(b_trns%base%i_vort+2 + NB*ir_12))
+          sp_vp_l1 = WR(b_trns%base%i_velo+NB*ir_12)
+          sp_wp_k1 = WR(b_trns%base%i_vort+NB*ir_11)
+          sp_wp_k2 = WR(b_trns%base%i_vort+NB*ir_21)
+          sp_dwp_k1 = (WR(b_trns%base%i_vort+1+NB*ir_11)                &
+     &       - two*a_r_1d_rlm_r(k_rlm)*WR(b_trns%base%i_vort+NB*ir_11))
+          sp_dwp_k2 = (WR(b_trns%base%i_vort+1+NB*ir_21)                &
+     &       - two*a_r_1d_rlm_r(k_rlm)*WR(b_trns%base%i_vort+NB*ir_21))
 !
           d_rotp_cor_rlm(i_rlm)                                         &
      &     =  sw_rlm(1,1,j_rlm) * omega_rlm(k_rlm,0) * sp_dvp_k1        &
@@ -236,11 +236,11 @@
           ir_21 = irev_sr_rlm(i21) - 1
           ir_12 = irev_sr_rlm(i12) - 1
 !
-          sp_wt_l1 =        WR(b_trns%i_vort+2+NB*ir_12)
-          sp_wp_k1 = half * WR(b_trns%i_vort+  NB*ir_11)
-          sp_wp_k2 = half * WR(b_trns%i_vort+  NB*ir_21)
-          sp_dwp_k1 =       WR(b_trns%i_vort+1+NB*ir_11)
-          sp_dwp_k2 =       WR(b_trns%i_vort+1+NB*ir_21)
+          sp_wt_l1 =        WR(b_trns%base%i_vort+2+NB*ir_12)
+          sp_wp_k1 = half * WR(b_trns%base%i_vort+  NB*ir_11)
+          sp_wp_k2 = half * WR(b_trns%base%i_vort+  NB*ir_21)
+          sp_dwp_k1 =       WR(b_trns%base%i_vort+1+NB*ir_11)
+          sp_dwp_k2 =       WR(b_trns%base%i_vort+1+NB*ir_21)
 !
           d_div_cor_rlm(i_rlm)                                          &
      &     =  td_rlm(1,j_rlm) *   omega_rlm(k_rlm,1) * sp_wt_l1         &
@@ -269,8 +269,8 @@
           i11 =  j11 + (k_rlm-1)*nidx_rlm(2)
           ir_11 = irev_sr_rlm(i11)
 !
-          sp_wp_k1 = half * WR(b_trns%i_vort+  NB*ir_11)
-          sp_dwp_k1 =       WR(b_trns%i_vort+1+NB*ir_11)
+          sp_wp_k1 = half * WR(b_trns%base%i_vort +   NB*ir_11)
+          sp_dwp_k1 =       WR(b_trns%base%i_vort + 1+NB*ir_11)
 !
           d_div_cor_rlm(i_rlm)                                          &
      &       =  four*(two/three) * sp_wp_k1                             &
@@ -330,9 +330,9 @@
         ir_21 = irev_sr_rlm(i21) - 1
         ir_12 = irev_sr_rlm(i12) - 1
 !
-        sp_dwp_l1 = WR(b_trns%i_velo+1+NB*ir_12)
-        sp_vt_k1 =  WR(b_trns%i_velo+2+NB*ir_11)
-        sp_vt_k2 =  WR(b_trns%i_velo+2+NB*ir_21)
+        sp_dwp_l1 = WR(b_trns%base%i_velo+1 + NB*ir_12)
+        sp_vt_k1 =  WR(b_trns%base%i_velo+2 + NB*ir_11)
+        sp_vt_k2 =  WR(b_trns%base%i_velo+2 + NB*ir_21)
 !
         d_cor_bc(j_rlm)                                                 &
      &       =  sr_rlm(1,j_rlm) * omega_rlm(kr,1) * sp_dwp_l1           &
@@ -353,7 +353,7 @@
         i11 =  j11 + (kr-1)*nidx_rlm(2)
         ir_11 = irev_sr_rlm(i11)
 !
-        sp_vt_k1 = WR(b_trns%i_velo+2+NB*ir_11)
+        sp_vt_k1 = WR(b_trns%base%i_velo+2 + NB*ir_11)
 !
 !        d_cor_bc(j_rlm) = -four*pi*(two/three)                         &
 !     &                   * omega_rlm(kr,1) * sp_vt_k1
@@ -402,8 +402,8 @@
       ir_11s = irev_sr_rlm(i11s) - 1
       ir_11c = irev_sr_rlm(i11c) - 1
 !
-      sp_wp_11s = WR(b_trns%i_vort+NB*ir_11s)
-      sp_wp_11c = WR(b_trns%i_vort+NB*ir_11c)
+      sp_wp_11s = WR(b_trns%base%i_vort + NB*ir_11s)
+      sp_wp_11c = WR(b_trns%base%i_vort + NB*ir_11c)
 !
       dp_rot_cor_rlm(i10c) = zero
       dp_rot_cor_rlm(i11s)                                              &

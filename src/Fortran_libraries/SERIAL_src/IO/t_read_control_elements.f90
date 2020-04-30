@@ -1,10 +1,10 @@
 !>@file   t_read_control_elements.f90
-!!@brief  module t_read_control_elements
+!!        module t_read_control_elements
 !!
 !!@author H. Matsui
 !!@date Programmed in Jan., 2005
-!
-!>@brief  Subroutines to read control data
+!!
+!>        Subroutines to read control data
 !!
 !!@verbatim
 !!      subroutine load_one_line_from_control(id_control, c_buf)

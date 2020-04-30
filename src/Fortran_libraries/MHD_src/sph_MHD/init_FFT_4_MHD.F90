@@ -32,7 +32,7 @@
       use t_spheric_rtp_data
       use t_sph_transforms
       use t_sph_trans_comm_tbl
-      use t_addresses_sph_transform
+      use t_sph_trans_arrays_MHD
       use t_sph_multi_FFTW
       use t_sph_FFT_selector
 !

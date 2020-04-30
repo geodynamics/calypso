@@ -33,15 +33,15 @@
 !
       use t_time_data
       use t_field_data_IO
+      use t_buffer_4_gzip
       use gz_field_data_IO_b
       use gz_binary_IO
       use binary_IO
-      use skip_gz_comment
       use transfer_to_long_integers
 !
       implicit none
 !
-      type(binary_IO_flags), private :: gz_fldflags
+      type(buffer_4_gzip), private :: zbuf_fld
 !
 !  ---------------------------------------------------------------------
 !
@@ -51,6 +51,8 @@
 !
       subroutine gz_write_step_fld_file_b                               &
      &         (gzip_name, id_rank, t_IO, fld_IO)
+!
+      use gzip_file_access
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
@@ -62,16 +64,16 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Write gzipped binary data file: ', trim(gzip_name)
 !
-      call open_wt_gzfile_b(gzip_name, gz_fldflags)
+      call open_wt_gzfile_b(gzip_name, zbuf_fld)
 !
       call gz_write_step_data_b(id_rank,                                &
-     &    t_IO%i_time_step, t_IO%time, t_IO%dt, gz_fldflags)
+     &    t_IO%i_time_step, t_IO%time, t_IO%dt, zbuf_fld)
       call gz_write_field_data_b                                        &
      &   (cast_long(fld_IO%nnod_IO), fld_IO%num_field_IO,               &
      &    fld_IO%ntot_comp_IO, fld_IO%num_comp_IO, fld_IO%fld_name,     &
-     &    fld_IO%d_IO, gz_fldflags)
+     &    fld_IO%d_IO, zbuf_fld)
 !
-      call close_gzfile_f
+      call close_gzfile_b
 !
       end subroutine gz_write_step_fld_file_b
 !
@@ -79,6 +81,8 @@
 !
       subroutine gz_read_step_field_file_b                              &
      &         (gzip_name, id_rank, t_IO, fld_IO)
+!
+      use gzip_file_access
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
@@ -92,24 +96,24 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary data file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_b(gzip_name, id_rank, gz_fldflags)
-      if(gz_fldflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(gzip_name, id_rank, zbuf_fld)
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_step_data_b(gz_fldflags,                             &
-     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
+      call gz_read_step_data_b                                          &
+     &   (zbuf_fld, id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,      &
      &    istack_merged, fld_IO%num_field_IO)
-      if(gz_fldflags%ierr_IO .ne. 0) goto 99
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_mul_integer_b(gz_fldflags,                           &
-     &    cast_long(fld_IO%num_field_IO), fld_IO%num_comp_IO)
-      if(gz_fldflags%ierr_IO .ne. 0) goto 99
+      call gz_read_mul_integer_b                                        &
+     &   (zbuf_fld, cast_long(fld_IO%num_field_IO), fld_IO%num_comp_IO)
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_field_data_b(gz_fldflags,                            &
-     &    cast_long(fld_IO%nnod_IO), fld_IO%num_field_IO,               &
+      call gz_read_field_data_b                                         &
+     &   (zbuf_fld, cast_long(fld_IO%nnod_IO), fld_IO%num_field_IO,     &
      &    fld_IO%ntot_comp_IO, fld_IO%fld_name, fld_IO%d_IO)
-      if(gz_fldflags%ierr_IO .ne. 0) goto 99
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
-      call close_gzfile_f
+      call close_gzfile_b
       return
 !
   99  continue
@@ -122,6 +126,8 @@
       subroutine gz_rd_alloc_st_fld_file_b                              &
      &         (gzip_name, id_rank, t_IO, fld_IO)
 !
+      use gzip_file_access
+!
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
 !
@@ -134,27 +140,28 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary data file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_b(gzip_name, id_rank, gz_fldflags)
-      if(gz_fldflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(gzip_name, id_rank, zbuf_fld)
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_step_data_b(gz_fldflags,                             &
-     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
+      call gz_read_step_data_b                                          &
+     &   (zbuf_fld, id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,      &
      &    istack_merged, fld_IO%num_field_IO)
-      if(gz_fldflags%ierr_IO .ne. 0) goto 99
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
       call alloc_phys_name_IO(fld_IO)
-      call gz_read_mul_integer_b(gz_fldflags,                           &
-     &    cast_long(fld_IO%num_field_IO), fld_IO%num_comp_IO)
-      if(gz_fldflags%ierr_IO .ne. 0) goto 99
+      call gz_read_mul_integer_b                                        &
+     &   (zbuf_fld, cast_long(fld_IO%num_field_IO), fld_IO%num_comp_IO)
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
       fld_IO%nnod_IO = int(istack_merged(1),KIND(fld_IO%nnod_IO))
       call cal_istack_phys_comp_IO(fld_IO)
       call alloc_phys_data_IO(fld_IO)
-      call gz_read_field_data_b(gz_fldflags,                            &
-     &    cast_long(fld_IO%nnod_IO), fld_IO%num_field_IO,               &
+      call gz_read_field_data_b                                         &
+     &   (zbuf_fld, cast_long(fld_IO%nnod_IO), fld_IO%num_field_IO,     &
      &    fld_IO%ntot_comp_IO, fld_IO%fld_name, fld_IO%d_IO)
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
-      call close_gzfile_f
+      call close_gzfile_b
       return
 !
   99  continue
@@ -167,6 +174,8 @@
       subroutine gz_rd_alloc_st_fld_head_b                              &
      &         (gzip_name, id_rank, t_IO, fld_IO)
 !
+      use gzip_file_access
+!
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
 !
@@ -179,20 +188,20 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary data file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_b(gzip_name, id_rank, gz_fldflags)
-      if(gz_fldflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(gzip_name, id_rank, zbuf_fld)
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_step_data_b(gz_fldflags,                             &
-     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
+      call gz_read_step_data_b                                          &
+     &   (zbuf_fld, id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,      &
      &    istack_merged, fld_IO%num_field_IO)
-      if(gz_fldflags%ierr_IO .ne. 0) goto 99
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
       call alloc_phys_name_IO(fld_IO)
-      call gz_read_mul_integer_b(gz_fldflags,                           &
-     &    cast_long(fld_IO%num_field_IO), fld_IO%num_comp_IO)
-      if(gz_fldflags%ierr_IO .ne. 0) goto 99
+      call gz_read_mul_integer_b                                        &
+     &   (zbuf_fld, cast_long(fld_IO%num_field_IO), fld_IO%num_comp_IO)
+      if(zbuf_fld%ierr_zlib .ne. 0) go to 99
 !
-      call close_gzfile_f
+      call close_gzfile_b
 !
       call cal_istack_phys_comp_IO(fld_IO)
       return

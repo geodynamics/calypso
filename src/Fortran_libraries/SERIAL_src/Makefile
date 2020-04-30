@@ -8,9 +8,12 @@ LIB_MESH =       -lcalypso_core
 LIB_MESH_FILE = libcalypso_core.a
 
 SUBDIRS = \
+Fortran2003          \
+\
 BASE                 \
 IO                   \
 IO_ZLIB              \
+Fields               \
 spherical_harmonics  \
 gauss_integration    \
 FFT_wrapper          \
@@ -59,11 +62,13 @@ lib_archve:
 mod_list:
 	@echo  MOD_CORE= \\ >> $(MAKENAME)
 	@echo  \
+	'$$(MOD_F2003)'       \
 	'$$(MOD_BASE)'     \
 	'$$(MOD_IO)'       \
 	'$$(MOD_BINARY_IO)'  \
 	'$$(MOD_ZLIB_IO)'    \
 	'$$(MOD_MPI_IO)'     \
+	'$$(MOD_FIELDS)'     \
 	'$$(MOD_GAUSS)'    \
 	'$$(MOD_SPH)'      \
 	'$$(MOD_FFT_WRAP)' \

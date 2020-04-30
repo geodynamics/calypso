@@ -9,7 +9,7 @@
 !!
 !!@verbatim
 !!      subroutine set_material_property                                &
-!!     &         (iphys, depth_top, depth_bottom, MHD_prop)
+!!     &         (depth_top, depth_bottom, iphys, MHD_prop)
 !!        type(phys_address), intent(in) :: iphys
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!@endverbatim
@@ -37,7 +37,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_material_property                                  &
-     &         (iphys, depth_top, depth_bottom, MHD_prop)
+     &         (depth_top, depth_bottom, iphys, MHD_prop)
 !
       use construct_MHD_coefficient
 !
@@ -108,14 +108,15 @@
         fl_prop%acoef_press = one / fl_prop%coef_press
         fl_prop%coef_nega_v = - fl_prop%coef_velo
 !
-        if (fl_prop%iflag_4_gravity .gt. id_turn_OFF                    &
+        if     (fl_prop%iflag_4_gravity .gt. id_turn_OFF                &
      &     .or. fl_prop%iflag_4_filter_gravity .gt. id_turn_OFF) then
           call construct_coefficient(fl_prop%coef_buo,                  &
      &       MHD_coef_list%dimless_list, MHD_coef_list%coefs_buoyancy,  &
      &      depth_top, depth_bottom)
         end if
 !
-        if (fl_prop%iflag_4_composit_buo .gt. id_turn_OFF) then
+        if     (fl_prop%iflag_4_composit_buo .gt. id_turn_OFF           &
+     &     .or. fl_prop%iflag_4_filter_comp_buo .gt. id_turn_OFF) then
           call construct_coefficient(fl_prop%coef_comp_buo,             &
      &       MHD_coef_list%dimless_list, MHD_coef_list%coefs_comp_buo,  &
      &       depth_top, depth_bottom)
@@ -273,7 +274,7 @@
      &              ht_prop%coef_advect
           write(*,*) 'coefficient for thermal diffusion:   ',           &
      &              ht_prop%coef_diffuse
-          if(iphys%i_heat_source .gt. 0) write(*,*)                     &
+          if(iphys%base%i_heat_source .gt. 0) write(*,*)                &
      &         'coefficient for heat source:         ',                 &
      &              ht_prop%coef_source
         end if
@@ -326,7 +327,7 @@
      &              cp_prop%coef_advect
           write(*,*) 'coefficient for composite diffusion: ',           &
      &              cp_prop%coef_diffuse
-          if(iphys%i_light_source .gt. 0) write(*,*)                    &
+          if(iphys%base%i_light_source .gt. 0) write(*,*)               &
      &         'coefficient for light element source:',                 &
      &              cp_prop%coef_source
         end if

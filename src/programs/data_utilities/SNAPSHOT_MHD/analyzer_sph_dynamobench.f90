@@ -22,6 +22,7 @@
       use m_elapsed_labels_4_MHD
       use m_elapsed_labels_SEND_RECV
       use m_SPH_MHD_model_data
+      use m_SPH_MHD_structure
       use t_field_on_circle
       use t_field_4_dynamobench
       use t_step_parameter

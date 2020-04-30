@@ -1,10 +1,10 @@
-!>@file   init_sph_MHD_elapsed_label.f90
+!>@file   init_sph_MHD_elapsed_label.F90
 !!@brief  module init_sph_MHD_elapsed_label
 !!
 !!@author H. Matsui
 !!@date Programmed in April, 2013
 !
-!>@brief  Initialize elepsed time monitoring
+!>@brief  Initialize elepsed time monitoring 
 !!
 !!@verbatim
 !!      subroutine set_sph_MHD_elapsed_label
@@ -163,6 +163,10 @@
       integer(kind = kint), intent(in) :: nproc_rtm_IO(3)
       integer(kind = kint), intent(in) :: nproc_rtp_IO(3)
 !
+#ifdef _OPENMP
+      integer, external :: omp_get_max_threads
+#endif
+!
 !
       file_name = add_dat_extension(time_file_prefix)
       open(id_timer_file,file=file_name,position='append')
@@ -181,6 +185,11 @@
      &                      sph_rtp%nidx_rtp(3)
 !
       write(id_timer_file,*) 'Total MPI processes: ',  num_pe
+#ifdef _OPENMP
+        write(id_timer_file,*) 'Total OopenMP threads: ',               &
+     &                        omp_get_max_threads()
+#endif
+!
       write(id_timer_file,*)                                            &
      &   'Processes for spetr (r, l and m):        ', nproc_rj_IO(1:2)
       write(id_timer_file,*)                                            &

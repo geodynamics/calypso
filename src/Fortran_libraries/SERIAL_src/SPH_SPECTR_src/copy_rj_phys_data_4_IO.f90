@@ -39,7 +39,7 @@
 !
       implicit none
 !
-      private :: copy_each_sph_solenoid_to_IO
+!      private :: copy_each_sph_solenoid_to_IO
       private :: copy_each_sph_solenoid_from_IO
 !
 ! -------------------------------------------------------------------
@@ -111,7 +111,7 @@
      &      = fld_IO%fld_name(1:rj_fld%num_phys)
       rj_fld%num_component(1:rj_fld%num_phys)                           &
      &      = fld_IO%num_comp_IO(1:rj_fld%num_phys)
-      rj_fld%iflag_monitor(1:rj_fld%num_phys) = 1
+      rj_fld%flag_monitor(1:rj_fld%num_phys) = .TRUE.
 !
       do i_fld = 1, rj_fld%num_phys
         if(rj_fld%num_component(i_fld) .eq. 2) then

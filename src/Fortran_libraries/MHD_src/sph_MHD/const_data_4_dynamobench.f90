@@ -8,13 +8,13 @@
 !!
 !!@verbatim
 !!      subroutine s_const_data_4_dynamobench                           &
-!!     &         (time, sph_params, sph_rj, sph_MHD_bc, leg, ipol, itor,&
+!!     &         (time, sph_params, sph_rj, sph_MHD_bc, leg, ipol,      &
 !!     &          rj_fld, cdat, pwr, bench, WK_pwr)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(legendre_4_sph_trans), intent(in) :: leg
-!!        type(phys_address), intent(in) :: ipol, itor
+!!        type(phys_address), intent(in) :: ipol
 !!        type(phys_data), intent(in) :: rj_fld
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!        type(dynamobench_monitor), intent(inout) :: bench
@@ -37,7 +37,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine s_const_data_4_dynamobench                             &
-     &         (time, sph_params, sph_rj, sph_MHD_bc, leg, ipol, itor,  &
+     &         (time, sph_params, sph_rj, sph_MHD_bc, leg, ipol,        &
      &          rj_fld, cdat, pwr, bench, WK_pwr)
 !
       use field_at_mid_equator
@@ -63,7 +63,7 @@
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(legendre_4_sph_trans), intent(in) :: leg
-      type(phys_address), intent(in) :: ipol, itor
+      type(phys_address), intent(in) :: ipol
       type(phys_data), intent(in) :: rj_fld
 !
       type(circle_fld_maker), intent(inout) :: cdat
@@ -88,7 +88,7 @@
       if(sph_MHD_bc%sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call pick_inner_core_rotation(sph_rj%idx_rj_degree_one,         &
      &      sph_rj%nidx_rj, sph_params%nlayer_ICB, sph_rj%ar_1d_rj,     &
-     &      itor%i_velo, rj_fld%n_point, rj_fld%ntot_phys,              &
+     &      ipol%base%i_velo, rj_fld%n_point, rj_fld%ntot_phys,         &
      &      rj_fld%d_fld, bench%rotate_icore)
       end if
 !
@@ -108,7 +108,7 @@
         call pick_mag_torque_inner_core                                 &
      &     (sph_rj%idx_rj_degree_one,  sph_rj%nidx_rj,                  &
      &      sph_params%nlayer_ICB, sph_rj%radius_1d_rj_r,               &
-     &      itor%i_lorentz, rj_fld%n_point, rj_fld%ntot_phys,           &
+     &      ipol%forces%i_lorentz, rj_fld%n_point, rj_fld%ntot_phys,    &
      &      rj_fld%d_fld, bench%m_torque_icore)
       end if
 !

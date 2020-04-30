@@ -16,78 +16,19 @@
 !!      subroutine alloc_ave_4_sph_spectr                               &
 !!     &         (idx_rj_degree_zero, nri_rj, pwr)
 !!
-!!      subroutine dealloc_rms_4_sph_spectr(id_rank, pwr)
+!!      subroutine dealloc_rms_4_sph_spectr(pwr)
 !!      subroutine dealloc_ave_4_sph_spectr(idx_rj_degree_zero, pwr)
 !!@endverbatim
 !!
 !!@n @param id_rank       Process ID
-!!@n @param istep         time step number
-!!@n @param time          time
-!!
-!!@n @param id_file       file ID for output
-!!@n @param fname_rms     file name for output
-!!@n @param mode_label    data label for degree or order of harmonics
 !
       module t_rms_4_sph_spectr
 !
       use m_precision
 !
+      use t_sph_volume_mean_square
+!
       implicit none
-!
-!
-!
-!>      Structure of mean square data over volume
-      type sph_vol_mean_squares
-!>        File prefix for volume mean square file
-        character(len = kchara) :: fhead_rms_v
-!>        File prefix for volume average file
-        character(len = kchara) :: fhead_ave
-!
-!>        MPI rank for l-spectr data output
-        integer :: irank_l
-!>        MPI rank for m-spectr data output
-        integer :: irank_m
-!>        MPI rank for l-m -spectr data output
-        integer :: irank_lm
-!
-!>        Output flag for volume mean square data
-        integer(kind = kint) :: iflag_volume_rms_spec
-!>        Output flag for volume average data
-        integer(kind = kint) :: iflag_volume_ave_sph
-!
-!>        Number of radial points for mean square
-        integer(kind=kint) :: ltr
-!>        Number of component for mean square
-        integer (kind=kint) :: ntot_comp_sq
-!
-!>        Radius for inner boundary
-        real(kind=kreal) :: r_inside
-!>        Radius for outer boundary
-        real(kind=kreal) :: r_outside
-!>        Radial address for inner boundary
-        integer (kind=kint) :: kr_inside
-!>        Radial address for outer boundary
-        integer (kind=kint) :: kr_outside
-!
-!>        Volume mean square spectrum for degree
-        real(kind = kreal), allocatable :: v_l(:,:)
-!>        Volume mean square spectrum for order
-        real(kind = kreal), allocatable :: v_m(:,:)
-!>        Volume mean square spectrum for l-m
-        real(kind = kreal), allocatable :: v_lm(:,:)
-!
-!>        Volume mean square
-        real(kind = kreal), allocatable :: v_sq(:)
-!>        Volume mean square of axis-symmetric component
-        real(kind = kreal), allocatable :: v_m0(:)
-!>        Ratio of axis-symmetric componbent to total mean square
-        real(kind = kreal), allocatable :: v_ratio_m0(:)
-!
-!>        Volume average
-        real(kind = kreal), allocatable :: v_ave(:)
-!>        1 / volume
-        real(kind = kreal) :: avol
-      end type sph_vol_mean_squares
 !
 !
 !>      Structure of mean square data
@@ -103,11 +44,11 @@
 !>        Field ID for mean square
         integer (kind=kint), allocatable :: id_field(:)
 !>        Number of each component for mean square
-        integer (kind=kint), allocatable :: num_comp_sq(:)
+        integer (kind=kint), pointer :: num_comp_sq(:)
 !>        End ID of each field for mean square
         integer (kind=kint), allocatable :: istack_comp_sq(:)
 !>        Field name for mean square
-        character (len=kchara), allocatable :: pwr_name(:)
+        character (len=kchara), pointer :: pwr_name(:)
 !
 !
 !>        File prefix for layered mean square file
@@ -267,8 +208,11 @@
       pwr%ntot_comp_sq = pwr%istack_comp_sq(pwr%num_fld_sq)
 !
       do i = 1, pwr%num_vol_spectr
-        call alloc_sph_vol_mean_square                                  &
-     &     (id_rank, ltr, pwr%ntot_comp_sq, pwr%v_spectr(i))
+        call alloc_sph_vol_mean_square(id_rank, ltr,                    &
+     &      pwr%num_fld_sq, pwr%ntot_comp_sq, pwr%v_spectr(i))
+!
+        pwr%v_spectr(i)%num_comp_sq =>    pwr%num_comp_sq
+        pwr%v_spectr(i)%pwr_name =>       pwr%pwr_name
       end do
 !
       if(id_rank .eq. pwr%irank_l) then
@@ -334,25 +278,28 @@
       end subroutine alloc_ave_4_sph_spectr
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
-      subroutine dealloc_rms_4_sph_spectr(id_rank, pwr)
+      subroutine dealloc_rms_4_sph_spectr(pwr)
 !
-      integer, intent(in) :: id_rank
       type(sph_mean_squares), intent(inout) :: pwr
 !
       integer(kind = kint) :: i
 !
       do i = 1, pwr%num_vol_spectr
-        call dealloc_sph_vol_mean_square(id_rank, pwr%v_spectr(i))
+        nullify(pwr%v_spectr(i)%num_comp_sq)
+        nullify(pwr%v_spectr(i)%pwr_name)
+!
+        call dealloc_sph_vol_mean_square(pwr%v_spectr(i))
       end do
 !
       deallocate(pwr%r_4_rms, pwr%kr_4_rms)
 !
 !
-        deallocate(pwr%shl_l)
-        deallocate(pwr%shl_lm)
-        deallocate(pwr%shl_m, pwr%shl_m0, pwr%ratio_shl_m0)
-        deallocate(pwr%shl_sq)
+      deallocate(pwr%shl_l)
+      deallocate(pwr%shl_lm)
+      deallocate(pwr%shl_m, pwr%shl_m0, pwr%ratio_shl_m0)
+      deallocate(pwr%shl_sq)
 !
       deallocate(pwr%num_comp_sq, pwr%istack_comp_sq)
       deallocate(pwr%pwr_name, pwr%id_field)
@@ -376,103 +323,6 @@
       deallocate(pwr%shl_ave)
 !
       end subroutine dealloc_ave_4_sph_spectr
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine alloc_sph_vol_mean_square                              &
-     &         (id_rank, ltr, ntot_comp_sq, v_pwr)
-!
-      integer, intent(in) :: id_rank
-      integer(kind = kint), intent(in) :: ltr, ntot_comp_sq
-      type(sph_vol_mean_squares), intent(inout) :: v_pwr
-!
-!
-      v_pwr%ltr = ltr
-      v_pwr%ntot_comp_sq = ntot_comp_sq
-!
-      if(id_rank .eq. v_pwr%irank_l) then
-        allocate( v_pwr%v_l(0:v_pwr%ltr,v_pwr%ntot_comp_sq) )
-        v_pwr%v_l = 0.0d0
-      else
-        allocate( v_pwr%v_l(0,0) )
-      end if
-!
-      if(id_rank .eq. v_pwr%irank_lm) then
-        allocate( v_pwr%v_lm(0:v_pwr%ltr,v_pwr%ntot_comp_sq) )
-        v_pwr%v_lm = 0.0d0
-      else
-        allocate( v_pwr%v_lm(0,0) )
-      end if
-!
-      if(id_rank .eq. v_pwr%irank_m) then
-        allocate( v_pwr%v_m(0:v_pwr%ltr,v_pwr%ntot_comp_sq) )
-        v_pwr%v_m =  0.0d0
-!
-        allocate( v_pwr%v_m0(v_pwr%ntot_comp_sq) )
-        v_pwr%v_m0 = 0.0d0
-!
-        allocate( v_pwr%v_ratio_m0(v_pwr%ntot_comp_sq) )
-        v_pwr%v_ratio_m0 = 0.0d0
-      else
-        allocate( v_pwr%v_m(0,0) )
-        allocate( v_pwr%v_m0(0) )
-        allocate( v_pwr%v_ratio_m0(0) )
-      end if
-!
-      if(     id_rank.eq.v_pwr%irank_l .or. id_rank.eq.v_pwr%irank_m    &
-     &   .or. id_rank.eq.v_pwr%irank_lm) then
-        allocate( v_pwr%v_sq(v_pwr%ntot_comp_sq) )
-        v_pwr%v_sq =       0.0d0
-      else
-        allocate( v_pwr%v_sq(0) )
-      end if
-!
-      end subroutine alloc_sph_vol_mean_square
-!
-! -----------------------------------------------------------------------
-!
-      subroutine alloc_sph_vol_ave(idx_rj_degree_zero, v_pwr)
-!
-      integer(kind = kint), intent(in) :: idx_rj_degree_zero
-      type(sph_vol_mean_squares), intent(inout) :: v_pwr
-!
-!
-      if(idx_rj_degree_zero .eq. 0) return
-!
-      allocate(v_pwr%v_ave(v_pwr%ntot_comp_sq))
-!
-      if(v_pwr%ntot_comp_sq .gt. 0) v_pwr%v_ave = 0.0d0
-!
-      end subroutine alloc_sph_vol_ave
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_sph_vol_mean_square(id_rank, v_pwr)
-!
-      integer, intent(in) :: id_rank
-      type(sph_vol_mean_squares), intent(inout) :: v_pwr
-!
-!
-        deallocate(v_pwr%v_l)
-        deallocate(v_pwr%v_lm)
-        deallocate(v_pwr%v_m, v_pwr%v_m0, v_pwr%v_ratio_m0)
-        deallocate(v_pwr%v_sq)
-!
-      end subroutine dealloc_sph_vol_mean_square
-!
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_sph_vol_ave(idx_rj_degree_zero, v_pwr)
-!
-      integer(kind = kint), intent(in) :: idx_rj_degree_zero
-      type(sph_vol_mean_squares), intent(inout) :: v_pwr
-!
-!
-      if(idx_rj_degree_zero .gt. 0)  deallocate(v_pwr%v_ave)
-!
-      end subroutine dealloc_sph_vol_ave
 !
 ! -----------------------------------------------------------------------
 !

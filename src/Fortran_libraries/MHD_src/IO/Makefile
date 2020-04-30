@@ -3,7 +3,7 @@
 #
 
 MHD_IO_DIR = $$(MHD_SRCDIR)/IO
-SOURCES = $(shell ls *.f90)
+SOURCES = $(shell ls *.f90 *.F90)
 MOD_MHD_IO = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #

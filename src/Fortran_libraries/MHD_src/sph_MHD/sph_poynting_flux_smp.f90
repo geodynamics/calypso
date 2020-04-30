@@ -45,37 +45,52 @@
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: b_trns, fn_trns
 !
-      type(address_each_sph_trans), intent(in) :: trns_b_MHD
-      type(address_each_sph_trans), intent(inout) :: trns_f_ngSGS
+      type(spherical_transform_data), intent(in) :: trns_b_MHD
+      type(spherical_transform_data), intent(inout) :: trns_f_ngSGS
 !
 !
-      if(b_trns%i_velo .gt. 0) then
-        call copy_vect_to_grad_vect_rtp(sph%sph_rtp, b_trns%i_velo,     &
-     &      fn_trns%i_grad_vx, fn_trns%i_grad_vy, fn_trns%i_grad_vz,    &
+      if(b_trns%base%i_velo .gt. 0) then
+        call copy_vect_to_grad_vect_rtp                                 &
+     &     (sph%sph_rtp, b_trns%base%i_velo,                            &
+     &      fn_trns%diff_vector%i_grad_vx,                              &
+     &      fn_trns%diff_vector%i_grad_vy,                              &
+     &      fn_trns%diff_vector%i_grad_vz,                              &
      &      trns_b_MHD%ncomp, trns_f_ngSGS%ncomp,                       &
      &      trns_b_MHD%fld_rtp, trns_f_ngSGS%fld_rtp)
       end if
-      if(b_trns%i_vort .gt. 0) then
-        call copy_vect_to_grad_vect_rtp(sph%sph_rtp, b_trns%i_vort,     &
-     &      fn_trns%i_grad_wx, fn_trns%i_grad_wy, fn_trns%i_grad_wz,    &
+      if(b_trns%base%i_vort .gt. 0) then
+        call copy_vect_to_grad_vect_rtp(sph%sph_rtp,                    &
+     &      b_trns%base%i_vort,                                         &
+     &      fn_trns%diff_vector%i_grad_wx,                              &
+     &      fn_trns%diff_vector%i_grad_wy,                              &
+     &      fn_trns%diff_vector%i_grad_wz,                              &
      &      trns_b_MHD%ncomp, trns_f_ngSGS%ncomp,                       &
      &      trns_b_MHD%fld_rtp, trns_f_ngSGS%fld_rtp)
       end if
-      if(b_trns%i_vecp .gt. 0) then
-        call copy_vect_to_grad_vect_rtp(sph%sph_rtp, b_trns%i_vecp,     &
-     &      fn_trns%i_grad_ax, fn_trns%i_grad_ay, fn_trns%i_grad_az,    &
+      if(b_trns%base%i_vecp .gt. 0) then
+        call copy_vect_to_grad_vect_rtp(sph%sph_rtp,                    &
+     &      b_trns%base%i_vecp,                                         &
+     &      fn_trns%diff_vector%i_grad_ax,                              &
+     &      fn_trns%diff_vector%i_grad_ay,                              &
+     &      fn_trns%diff_vector%i_grad_az,                              &
      &      trns_b_MHD%ncomp, trns_f_ngSGS%ncomp,                       &
      &      trns_b_MHD%fld_rtp, trns_f_ngSGS%fld_rtp)
       end if
-      if(b_trns%i_magne .gt. 0) then
-        call copy_vect_to_grad_vect_rtp(sph%sph_rtp, b_trns%i_magne,    &
-     &      fn_trns%i_grad_bx, fn_trns%i_grad_by, fn_trns%i_grad_bz,    &
+      if(b_trns%base%i_magne .gt. 0) then
+        call copy_vect_to_grad_vect_rtp(sph%sph_rtp,                    &
+     &      b_trns%base%i_magne,                                        &
+     &      fn_trns%diff_vector%i_grad_bx,                              &
+     &      fn_trns%diff_vector%i_grad_by,                              &
+     &      fn_trns%diff_vector%i_grad_bz,                              &
      &      trns_b_MHD%ncomp, trns_f_ngSGS%ncomp,                       &
      &      trns_b_MHD%fld_rtp, trns_f_ngSGS%fld_rtp)
       end if
-      if(b_trns%i_current .gt. 0) then
-        call copy_vect_to_grad_vect_rtp(sph%sph_rtp, b_trns%i_current,  &
-     &      fn_trns%i_grad_jx, fn_trns%i_grad_jy, fn_trns%i_grad_jz,    &
+      if(b_trns%base%i_current .gt. 0) then
+        call copy_vect_to_grad_vect_rtp(sph%sph_rtp,                    &
+     &      b_trns%base%i_current,                                      &
+     &      fn_trns%diff_vector%i_grad_jx,                              &
+     &      fn_trns%diff_vector%i_grad_jy,                              &
+     &      fn_trns%diff_vector%i_grad_jz,                              &
      &      trns_b_MHD%ncomp, trns_f_ngSGS%ncomp,                       &
      &      trns_b_MHD%fld_rtp, trns_f_ngSGS%fld_rtp)
       end if
@@ -131,17 +146,20 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      if(ipol%i_mag_stretch .eq. 0) return
+      if(ipol%forces%i_mag_stretch .eq. 0) return
 !
       call copy_grad_vect_to_m_stretch                                  &
      &   (ipol,  rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call const_sph_gradient_no_bc(sph_rj, r_2nd, sph_bc_U, g_sph_rj,  &
-     &   (ipol%i_mag_stretch  ), ipol%i_grad_vx, rj_fld)
+     &   (ipol%forces%i_mag_stretch  ), ipol%diff_vector%i_grad_vx,     &
+     &    rj_fld)
       call const_sph_gradient_no_bc(sph_rj, r_2nd, sph_bc_U, g_sph_rj,  &
-     &   (ipol%i_mag_stretch+1), ipol%i_grad_vy, rj_fld)
+     &   (ipol%forces%i_mag_stretch+1), ipol%diff_vector%i_grad_vy,     &
+     &    rj_fld)
       call const_sph_gradient_no_bc(sph_rj, r_2nd, sph_bc_U, g_sph_rj,  &
-     &   (ipol%i_mag_stretch+2), ipol%i_grad_vz, rj_fld)
+     &   (ipol%forces%i_mag_stretch+2), ipol%diff_vector%i_grad_vz,     &
+     &    rj_fld)
 !
       end subroutine cal_grad_of_velocities_sph
 !
@@ -176,12 +194,15 @@
       real (kind=kreal), intent(inout) :: d_rj(nnod,ntot_phys_rj)
 !
 !
-      if(ipol%i_mag_stretch .eq. 0) return
+      if(ipol%forces%i_mag_stretch .eq. 0) return
 !
 !$omp parallel workshare
-      d_rj(1:nnod,ipol%i_mag_stretch  ) = d_rj(1:nnod,ipol%i_grad_vx)
-      d_rj(1:nnod,ipol%i_mag_stretch+1) = d_rj(1:nnod,ipol%i_grad_vy)
-      d_rj(1:nnod,ipol%i_mag_stretch+2) = d_rj(1:nnod,ipol%i_grad_vz)
+      d_rj(1:nnod,ipol%forces%i_mag_stretch  )                          &
+     &     = d_rj(1:nnod,ipol%diff_vector%i_grad_vx)
+      d_rj(1:nnod,ipol%forces%i_mag_stretch+1)                          &
+     &     = d_rj(1:nnod,ipol%diff_vector%i_grad_vy)
+      d_rj(1:nnod,ipol%forces%i_mag_stretch+2)                          &
+     &     = d_rj(1:nnod,ipol%diff_vector%i_grad_vz)
 !$omp end parallel workshare
 !
       end subroutine copy_grad_vect_to_m_stretch

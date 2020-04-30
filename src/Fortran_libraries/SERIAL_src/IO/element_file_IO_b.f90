@@ -35,12 +35,13 @@
 !
       use m_file_format_switch
       use t_read_mesh_data
+      use t_binary_IO_buffer
       use set_mesh_file_names
       use binary_IO
 !
       implicit none
 !
-      type(binary_IO_flags), private :: bin_emeshflags
+      type(binary_IO_buffer), private :: bbuf_emesh
 !
 !------------------------------------------------------------------
 !
@@ -62,13 +63,17 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Read binary element comm file: ', trim(file_name)
 !
-      call open_read_binary_file(file_name, id_rank, bin_emeshflags)
+      call open_read_binary_file(file_name, id_rank, bbuf_emesh)
+      if(bbuf_emesh%ierr_bin .ne. 0) goto 99
       call read_element_comm_table_b                                    &
-     &   (id_rank, bin_emeshflags, ele_mesh_IO%comm)
+     &   (id_rank, bbuf_emesh, ele_mesh_IO%comm)
+      if(bbuf_emesh%ierr_bin .gt. 0) go to 99
 !      call read_element_geometry_b                                     &
-!     &   (bin_emeshflags, ele_mesh_IO%node, ele_mesh_IO%sfed)
+!     &   (bbuf_emesh, ele_mesh_IO%node, ele_mesh_IO%sfed)
+!
+  99  continue
       call close_binary_file
-      ierr = bin_emeshflags%ierr_IO
+      ierr = bbuf_emesh%ierr_bin
 !
       end subroutine input_element_file_b
 !
@@ -88,13 +93,17 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Read binary surface mesh file: ', trim(file_name)
 !
-      call open_read_binary_file(file_name, id_rank, bin_emeshflags)
-      call read_surface_connection_b(id_rank, bin_emeshflags,           &
+      call open_read_binary_file(file_name, id_rank, bbuf_emesh)
+      if(bbuf_emesh%ierr_bin .ne. 0) goto 99
+      call read_surface_connection_b(id_rank, bbuf_emesh,               &
      &    surf_mesh_IO%comm, surf_mesh_IO%ele, surf_mesh_IO%sfed)
+      if(bbuf_emesh%ierr_bin .gt. 0) go to 99
 !      call read_surface_geometry_b                                     &
-!     &   (bin_emeshflags, surf_mesh_IO%node, surf_mesh_IO%sfed)
+!     &   (bbuf_emesh, surf_mesh_IO%node, surf_mesh_IO%sfed)
+!
+  99  continue
       call close_binary_file
-      ierr = bin_emeshflags%ierr_IO
+      ierr = bbuf_emesh%ierr_bin
 !
       end subroutine input_surface_file_b
 !
@@ -114,13 +123,17 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Read binary edge mesh file: ', trim(file_name)
 !
-      call open_read_binary_file(file_name, id_rank, bin_emeshflags)
-      call read_edge_connection_b(id_rank, bin_emeshflags,              &
+      call open_read_binary_file(file_name, id_rank, bbuf_emesh)
+      if(bbuf_emesh%ierr_bin .ne. 0) goto 99
+      call read_edge_connection_b(id_rank, bbuf_emesh,                  &
      &    edge_mesh_IO%comm, edge_mesh_IO%ele, edge_mesh_IO%sfed)
+      if(bbuf_emesh%ierr_bin .gt. 0) go to 99
 !      call read_edge_geometry_b                                        &
-!     &    (bin_emeshflags, edge_mesh_IO%node, edge_mesh_IO%sfed)
+!     &    (bbuf_emesh, edge_mesh_IO%node, edge_mesh_IO%sfed)
+!
+  99  continue
       call close_binary_file
-      ierr = bin_emeshflags%ierr_IO
+      ierr = bbuf_emesh%ierr_bin
 !
       end subroutine input_edge_file_b
 !
@@ -141,15 +154,17 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Write binary element comm file: ', trim(file_name)
 !
-      call open_write_binary_file(file_name, bin_emeshflags)
-      if(bin_emeshflags%ierr_IO .ne. 0) ierr = ierr_file
+      call open_write_binary_file(file_name, bbuf_emesh)
+      if(bbuf_emesh%ierr_bin .gt. 0) go to 99
       call write_element_comm_table_b                                   &
-     &   (id_rank, ele_mesh_IO%comm, bin_emeshflags)
-      if(bin_emeshflags%ierr_IO .ne. 0) ierr = ierr_file
+     &   (id_rank, ele_mesh_IO%comm, bbuf_emesh)
+      if(bbuf_emesh%ierr_bin .gt. 0) go to 99
 !      call write_element_geometry_b                                    &
-!     &   (ele_mesh_IO%node, ele_mesh_IO%sfed, bin_emeshflags)
-!      if(bin_emeshflags%ierr_IO .ne. 0) ierr = ierr_file
+!     &   (ele_mesh_IO%node, ele_mesh_IO%sfed, bbuf_emesh)
+!
+  99  continue
       call close_binary_file
+      ierr = bbuf_emesh%ierr_bin
 !
       end subroutine output_element_file_b
 !
@@ -169,15 +184,16 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Write binary surface mesh file: ', trim(file_name)
 !
-      call open_write_binary_file(file_name, bin_emeshflags)
-      if(bin_emeshflags%ierr_IO .ne. 0) ierr = ierr_file
+      call open_write_binary_file(file_name, bbuf_emesh)
+      if(bbuf_emesh%ierr_bin .gt. 0) go to 99
       call write_surface_connection_b(id_rank, surf_mesh_IO%comm,       &
-     &    surf_mesh_IO%ele, surf_mesh_IO%sfed, bin_emeshflags)
-      if(bin_emeshflags%ierr_IO .ne. 0) ierr = ierr_file
+     &    surf_mesh_IO%ele, surf_mesh_IO%sfed, bbuf_emesh)
+      if(bbuf_emesh%ierr_bin .ne. 0) go to 99
 !      call write_surface_geometry_b                                    &
-!     &   (surf_mesh_IO%node, surf_mesh_IO%sfed, bin_flags)
-!      if(bin_emeshflags%ierr_IO .ne. 0) ierr = ierr_file
+!     &   (surf_mesh_IO%node, surf_mesh_IO%sfed, bbuf_emesh)
+  99  continue
       call close_binary_file
+      ierr = bbuf_emesh%ierr_bin
 !
       end subroutine output_surface_file_b
 !
@@ -197,15 +213,16 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Write binary edge mesh file: ', trim(file_name)
 !
-      call open_write_binary_file(file_name, bin_emeshflags)
-      if(bin_emeshflags%ierr_IO .ne. 0) ierr = ierr_file
+      call open_write_binary_file(file_name, bbuf_emesh)
+      if(bbuf_emesh%ierr_bin .gt. 0) go to 99
       call write_edge_connection_b(id_rank, edge_mesh_IO%comm,          &
-     &    edge_mesh_IO%ele, edge_mesh_IO%sfed, bin_emeshflags)
-      if(bin_emeshflags%ierr_IO .ne. 0) ierr = ierr_file
+     &    edge_mesh_IO%ele, edge_mesh_IO%sfed, bbuf_emesh)
+      if(bbuf_emesh%ierr_bin .gt. 0) go to 99
 !      call write_edge_geometry_b                                       &
-!     &   (edge_mesh_IO%node, edge_mesh_IO%sfed, bin_emeshflags)
-!      if(bin_emeshflags%ierr_IO .ne. 0) ierr = ierr_file
+!     &   (edge_mesh_IO%node, edge_mesh_IO%sfed, bbuf_emesh)
+  99  continue
       call close_binary_file
+      ierr = bbuf_emesh%ierr_bin
 !
       end subroutine output_edge_file_b
 !

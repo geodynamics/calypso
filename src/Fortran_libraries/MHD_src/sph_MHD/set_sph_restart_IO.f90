@@ -15,6 +15,9 @@
 !!      subroutine set_sph_restart_from_IO(fld_IO)
 !!        type(field_IO), intent(in) :: fld_IO
 !!        type(phys_data), intent(inout) :: rj_fld
+!!
+!!      logical function check_vector_4_restart(field_name)
+!!      logical function check_scalar_4_restart(field_name)
 !!@endverbatim
 !
       module set_sph_restart_IO
@@ -76,29 +79,8 @@
 !
       fld_IO%num_field_IO = 0
        do i_fld = 1, rj_fld%num_phys
-         if   ( rj_fld%phys_name(i_fld) .eq. fhd_velo                   &
-!     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_vort                  &
-!     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_press                 &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_temp                   &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_light                  &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_magne                  &
-!     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_mag_potential         &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy                &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_mom                &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_uxb                &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_heat               &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_composit           &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_heat_source            &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_light_source           &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy_source         &
-!
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_h_flux        &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_c_flux        &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_m_flux        &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_Lorentz       &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_induction     &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_buoyancy      &
-     &     .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_comp_buo      &
+         if(    check_vector_4_restart(rj_fld%phys_name(i_fld))         &
+     &     .or. check_scalar_4_restart(rj_fld%phys_name(i_fld))         &
      &     ) then
            fld_IO%num_field_IO = fld_IO%num_field_IO + 1
          end if
@@ -121,35 +103,13 @@
       icou = 0
       fld_IO%istack_comp_IO(0) = 0
       do i_fld = 1, rj_fld%num_phys
-        if         (rj_fld%phys_name(i_fld) .eq. fhd_velo               &
-!     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_vort              &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_magne              &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_mom            &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_uxb            &
-     &         ) then
+        if(check_vector_4_restart(rj_fld%phys_name(i_fld))) then
           icou = icou + 1
           fld_IO%fld_name(icou) = rj_fld%phys_name(i_fld)
           fld_IO%num_comp_IO(icou) = n_vector
           fld_IO%istack_comp_IO(icou) = fld_IO%istack_comp_IO(icou-1)   &
      &                                 + fld_IO%num_comp_IO(icou)
-        else if    (rj_fld%phys_name(i_fld) .eq. fhd_temp               &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_light              &
-!     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_press             &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy            &
-!     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_mag_potential     &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_heat           &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_composit       &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_heat_source        &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_light_source       &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy_source     &
-!
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_h_flux    &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_c_flux    &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_m_flux    &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_Lorentz   &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_induction &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_buoyancy  &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_comp_buo  &
+        else if(check_scalar_4_restart(rj_fld%phys_name(i_fld))         &
      &         ) then
           icou = icou + 1
           fld_IO%fld_name(icou) = rj_fld%phys_name(i_fld)
@@ -179,34 +139,12 @@
       do i_fld = 1, rj_fld%num_phys
         do j_IO = 1, fld_IO%num_field_IO
           if (rj_fld%phys_name(i_fld) .eq. fld_IO%fld_name(j_IO)) then
-            if     (rj_fld%phys_name(i_fld) .eq. fhd_velo               &
-!     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_vort              &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_magne              &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_mom            &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_uxb            &
-     &         ) then
+            if(check_vector_4_restart(rj_fld%phys_name(i_fld))) then
               call copy_each_sph_vector_to_IO                           &
      &           (rj_fld, fld_IO, i_fld, j_IO)
 !
-            else if(rj_fld%phys_name(i_fld) .eq. fhd_temp               &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_light              &
-!     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_press             &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy            &
-!     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_mag_potential     &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_heat           &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_composit       &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_heat_source        &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_light_source       &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy_source     &
-!
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_h_flux    &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_c_flux    &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_m_flux    &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_Lorentz   &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_induction &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_buoyancy  &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_comp_buo  &
-     &         ) then
+            else if(check_scalar_4_restart(rj_fld%phys_name(i_fld))     &
+     &            ) then
               call copy_each_sph_field_to_IO                            &
      &           (rj_fld, fld_IO, i_fld, j_IO)
             end if
@@ -238,34 +176,12 @@
         do i_fld = 1, rj_fld%num_phys
           if (rj_fld%phys_name(i_fld) .eq. fld_IO%fld_name(j_IO)) then
             iflag = 1
-            if     (rj_fld%phys_name(i_fld) .eq. fhd_velo               &
- !    &         .or. rj_fld%phys_name(i_fld) .eq. fhd_vort              &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_magne              &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_mom            &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_uxb            &
-     &         ) then
+            if(check_vector_4_restart(rj_fld%phys_name(i_fld))) then
               call copy_each_sph_vector_from_IO                         &
      &           (fld_IO, rj_fld, i_fld, j_IO)
 !
-            else if(rj_fld%phys_name(i_fld) .eq. fhd_temp               &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_light              &
-!     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_press             &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy            &
-!     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_mag_potential     &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_heat           &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_composit       &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_heat_source        &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_light_source       &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy_source     &
-!
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_h_flux    &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_c_flux    &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_m_flux    &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_Lorentz   &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_induction &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_buoyancy  &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_Csim_SGS_comp_buo  &
-     &         ) then
+            else if(check_scalar_4_restart(rj_fld%phys_name(i_fld))     &
+     &             ) then
               call copy_each_sph_field_from_IO                          &
      &           (fld_IO, rj_fld, i_fld, j_IO)
             end if
@@ -284,5 +200,50 @@
       end subroutine set_sph_restart_from_IO
 !
 ! -------------------------------------------------------------------
+! -------------------------------------------------------------------
+!
+      logical function check_vector_4_restart(field_name)
+!
+      use m_phys_labels
+!
+      character(len = kchara), intent(in) :: field_name
+!
+!
+      check_vector_4_restart                                            &
+     &   =    (field_name .eq. velocity%name)                           &
+!     &   .or. (field_name .eq. vorticity%name)                         &
+     &   .or. (field_name .eq. magnetic_field%name)                     &
+!
+     &   .or. (field_name .eq. previous_momentum%name)                  &
+     &   .or. (field_name .eq. previous_induction%name)
+!
+      end function check_vector_4_restart
+!
+! ----------------------------------------------------------------------
+!
+      logical function check_scalar_4_restart(field_name)
+!
+      use m_phys_labels
+!
+      character(len = kchara), intent(in) :: field_name
+!
+!
+      check_scalar_4_restart                                            &
+     &   =    (field_name .eq. temperature%name)                        &
+     &   .or. (field_name .eq. composition%name)                        &
+     &   .or. (field_name .eq. entropy%name)                            &
+!     &   .or. (field_name .eq. pressure%name)                          &
+!     &   .or. (field_name .eq. magnetic_potential%name)                &
+!
+     &   .or. (field_name .eq. previous_heat%name)                      &
+     &   .or. (field_name .eq. previous_composition%name)               &
+!
+     &   .or. (field_name .eq. heat_source%name)                        &
+     &   .or. (field_name .eq. composition_source%name)                 &
+     &   .or. (field_name .eq. entropy_source%name)
+!
+      end function check_scalar_4_restart
+!
+! ----------------------------------------------------------------------
 !
       end module set_sph_restart_IO

@@ -34,78 +34,76 @@
       type(phys_data), intent(inout) :: nod_fld
 !
 !
-      if((iphys%i_chk_mom_2*iphys%i_chk_mom) .gt. izero) then
+      if(iphys%check_fld2%i_pre_mom .gt. izero) then
         call copy_vector_component(nod_fld,                             &
-     &      iphys%i_chk_mom, iphys%i_chk_mom_2)
+     &      iphys%check_fld1%i_pre_mom, iphys%check_fld2%i_pre_mom)
       end if
 !
-      if((iphys%i_chk_press_2*iphys%i_chk_press) .gt. izero) then
+      if(iphys%check_fld2%i_pre_press .gt. izero) then
         call copy_scalar_component(nod_fld,                             &
-     &      iphys%i_chk_press, iphys%i_chk_press_2)
+     &      iphys%check_fld1%i_pre_press, iphys%check_fld2%i_pre_press)
       end if
 !
 !
-      if((iphys%i_chk_uxb_2*iphys%i_chk_uxb) .gt. izero) then
+      if(iphys%check_fld2%i_pre_uxb .gt. izero) then
         call copy_vector_component(nod_fld,                             &
-     &      iphys%i_chk_uxb, iphys%i_chk_uxb_2)
+     &      iphys%check_fld1%i_pre_uxb, iphys%check_fld2%i_pre_uxb)
       end if
 !
-      if((iphys%i_chk_potential_2*iphys%i_chk_potential) .gt. izero)    &
-     &      then
+      if(iphys%check_fld2%i_pre_phi .gt. izero) then
         call copy_scalar_component(nod_fld,                             &
-     &      iphys%i_chk_potential, iphys%i_chk_potential_2)
+     &      iphys%check_fld1%i_pre_phi, iphys%check_fld2%i_pre_phi)
       end if
 !
 !
-      if((iphys%i_chk_heat_2*iphys%i_chk_heat) .gt. izero) then
+      if(iphys%check_fld2%i_pre_heat .gt. izero) then
         call copy_scalar_component(nod_fld,                             &
-     &      iphys%i_chk_heat, iphys%i_chk_heat_2)
+     &      iphys%check_fld1%i_pre_heat, iphys%check_fld2%i_pre_heat)
       end if
 !
-      if((iphys%i_chk_composit_2*iphys%i_chk_composit) .gt. izero) then
+      if(iphys%check_fld2%i_pre_composit .gt. izero) then
         call copy_scalar_component(nod_fld,                             &
-     &      iphys%i_chk_composit, iphys%i_chk_composit_2)
+     &      iphys%check_fld1%i_pre_composit,                            &
+     &      iphys%check_fld2%i_pre_composit)
       end if
 !
 !
 !
-      if( (iphys%i_chk_mom*iphys%i_velo) .gt. izero) then
+      if(iphys%check_fld1%i_pre_mom .gt. izero) then
         call copy_vector_component(nod_fld,                             &
-     &      iphys%i_velo, iphys%i_chk_mom)
+     &      iphys%base%i_velo, iphys%check_fld1%i_pre_mom)
       end if
 !
-      if( (iphys%i_chk_press*iphys%i_press) .gt. izero) then
+      if(iphys%check_fld1%i_pre_press .gt. izero) then
         call copy_scalar_component(nod_fld,                             &
-     &      iphys%i_press, iphys%i_chk_press)
+     &      iphys%base%i_press, iphys%check_fld1%i_pre_press)
       end if
 !
 !
-      if(cd_prop%iflag_Aevo_scheme .gt. id_no_evolution) then
-        if( (iphys%i_chk_uxb*iphys%i_vecp) .gt. izero) then
+      if(iphys%check_fld1%i_pre_uxb .gt. izero) then
+        if(cd_prop%iflag_Aevo_scheme .gt. id_no_evolution) then
           call copy_vector_component(nod_fld,                           &
-     &        iphys%i_vecp, iphys%i_chk_uxb)
-        end if
-      else
-        if( (iphys%i_chk_uxb*iphys%i_magne) .gt. izero) then
+     &        iphys%base%i_vecp, iphys%check_fld1%i_pre_uxb)
+        else
           call copy_vector_component(nod_fld,                           &
-     &        iphys%i_magne, iphys%i_chk_uxb)
+     &        iphys%base%i_magne, iphys%check_fld1%i_pre_uxb)
         end if
       end if
 !
-      if( (iphys%i_chk_potential*iphys%i_mag_p) .gt. izero) then
+      if(iphys%check_fld1%i_pre_phi .gt. izero) then
         call copy_scalar_component(nod_fld,                             &
-     &      iphys%i_mag_p, iphys%i_chk_potential)
+     &      iphys%base%i_mag_p, iphys%check_fld1%i_pre_phi)
       end if
 !
 !
-      if( (iphys%i_chk_heat*iphys%i_temp) .gt. izero) then
+      if(iphys%check_fld1%i_pre_heat .gt. izero) then
         call copy_scalar_component(nod_fld,                             &
-     &      iphys%i_temp, iphys%i_chk_heat)
+     &      iphys%base%i_temp, iphys%check_fld1%i_pre_heat)
       end if
 !
-      if( (iphys%i_chk_composit*iphys%i_light) .gt. izero) then
+      if(iphys%check_fld1%i_pre_composit .gt. izero) then
         call copy_scalar_component(nod_fld,                             &
-     &      iphys%i_light, iphys%i_chk_composit)
+     &      iphys%base%i_light, iphys%check_fld1%i_pre_composit)
       end if
 !
       end subroutine s_copy_field_data_for_dt_check

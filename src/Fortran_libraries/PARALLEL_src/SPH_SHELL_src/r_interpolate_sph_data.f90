@@ -145,8 +145,8 @@
       integer(kind = kint) :: i
 !
       do i = 1, rj_fld%num_phys
-        if(rj_fld%phys_name(i) .eq. fhd_magne) then
-          ipol%i_magne = rj_fld%istack_component(i-1) + 1
+        if(rj_fld%phys_name(i) .eq. magnetic_field%name) then
+          ipol%base%i_magne = rj_fld%istack_component(i-1) + 1
           exit
         end if
       end do
@@ -208,21 +208,21 @@
       do i_fld = 1, rj_fld%ntot_phys
         do j_fld = 1, fld_IO%num_field_IO
           if(rj_fld%phys_name(i_fld) .eq. fld_IO%fld_name(j_fld)) then
-            if     (rj_fld%phys_name(i_fld) .eq. fhd_velo               &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_vort               &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_press              &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_temp               &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_light              &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_magne              &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_mag_potential      &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy            &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_mom            &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_uxb            &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_heat           &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_pre_composit       &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_heat_source        &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_light_source       &
-     &         .or. rj_fld%phys_name(i_fld) .eq. fhd_entropy_source     &
+            if    (rj_fld%phys_name(i_fld) .eq. velocity%name           &
+     &        .or. rj_fld%phys_name(i_fld) .eq. vorticity%name          &
+     &        .or. rj_fld%phys_name(i_fld) .eq. pressure%name           &
+     &        .or. rj_fld%phys_name(i_fld) .eq. temperature%name        &
+     &        .or. rj_fld%phys_name(i_fld) .eq. composition%name        &
+     &        .or. rj_fld%phys_name(i_fld) .eq. magnetic_field%name     &
+     &        .or. rj_fld%phys_name(i_fld) .eq. magnetic_potential%name &
+     &        .or. rj_fld%phys_name(i_fld) .eq. entropy%name            &
+     &        .or. rj_fld%phys_name(i_fld) .eq. previous_momentum%name  &
+     &        .or. rj_fld%phys_name(i_fld) .eq. previous_induction%name &
+     &        .or. rj_fld%phys_name(i_fld) .eq. previous_heat%name      &
+     &        .or. rj_fld%phys_name(i_fld) .eq. previous_composition%name &
+     &        .or. rj_fld%phys_name(i_fld) .eq. heat_source%name        &
+     &        .or. rj_fld%phys_name(i_fld) .eq. composition_source%name &
+     &        .or. rj_fld%phys_name(i_fld) .eq. entropy_source%name     &
      &         ) then
               call set_org_rj_phys_data_from_IO                         &
      &           (j_fld, fld_IO, n_rj_org, d_rj_org)
@@ -237,12 +237,12 @@
         end do
       end do
 !
-      if (ipol%i_magne .gt. 0) then
-        call ext_outside_potential(kr_outside, ipol%i_magne,            &
+      if (ipol%base%i_magne .gt. 0) then
+        call ext_outside_potential(kr_outside, ipol%base%i_magne,       &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
      &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-        call ext_inside_potential(kr_inside, ipol%i_magne,              &
+        call ext_inside_potential(kr_inside, ipol%base%i_magne,         &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
      &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
@@ -282,12 +282,12 @@
         end do
       end do
 !
-      if (ipol%i_magne .gt. 0) then
-        call ext_outside_potential(kr_outside, ipol%i_magne,            &
+      if (ipol%base%i_magne .gt. 0) then
+        call ext_outside_potential(kr_outside, ipol%base%i_magne,       &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
      &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-        call ext_inside_potential(kr_inside, ipol%i_magne,              &
+        call ext_inside_potential(kr_inside, ipol%base%i_magne,         &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
      &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
@@ -310,16 +310,17 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      write(*,*) ' ipol%i_magne', ipol%i_magne, kr_outside, kr_inside
-      if (ipol%i_magne .gt. 0) then
+      write(*,*) ' ipol%base%i_magne', ipol%base%i_magne,               &
+     &          kr_outside, kr_inside
+      if (ipol%base%i_magne .gt. 0) then
         call gauss_to_poloidal_out                                      &
      &     (kr_outside, d_gauss%ltr_w, d_gauss%r_gauss,                 &
-     &      d_gauss%w_gauss, d_gauss%index_w, ipol%i_magne, sph_rj,     &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &      d_gauss%w_gauss, d_gauss%index_w, ipol%base%i_magne,        &
+     &      sph_rj, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         call gauss_to_poloidal_in                                       &
      &     (kr_inside, d_gauss%ltr_w, d_gauss%r_gauss,                  &
-     &      d_gauss%w_gauss, d_gauss%index_w, ipol%i_magne, sph_rj,     &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &      d_gauss%w_gauss, d_gauss%index_w, ipol%base%i_magne,        &
+     &      sph_rj, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
 !
       end subroutine set_poloidal_b_by_gauss_coefs

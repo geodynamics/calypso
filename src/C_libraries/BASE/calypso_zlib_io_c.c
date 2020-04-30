@@ -6,7 +6,7 @@
 #include <string.h>
 #include "calypso_zlib_io_c.h"
 
-FILE *fp;
+FILE *fp_z;
 gzFile file_gz;
 
 z_stream strm_gl;
@@ -30,7 +30,7 @@ exit (EXIT_FAILURE);                                        \
 
 void open_wt_rawfile(const char *file_name, int *ierr){
     *ierr = 0;
-    if ((fp = fopen(file_name, "w")) == NULL) {
+    if ((fp_z = fopen(file_name, "w")) == NULL) {
         fprintf(stderr, "Cannot open file!: %s\n", file_name);
         *ierr = 1;                    /* terminate with error message */
     }
@@ -39,7 +39,7 @@ void open_wt_rawfile(const char *file_name, int *ierr){
 
 void open_ad_rawfile(const char *file_name, int *ierr){
     *ierr = 0;
-    if ((fp = fopen(file_name, "a")) == NULL) {
+    if ((fp_z = fopen(file_name, "a")) == NULL) {
         fprintf(stderr, "Cannot open file!: %s\n", file_name);
         *ierr = 1;                    /* terminate with error message */
     }
@@ -48,38 +48,61 @@ void open_ad_rawfile(const char *file_name, int *ierr){
 
 void open_rd_rawfile(const char *file_name, int *ierr){
     *ierr = 0;
-    if ((fp = fopen(file_name, "r")) == NULL) {
+    if ((fp_z = fopen(file_name, "r")) == NULL) {
         fprintf(stderr, "Cannot open file!: %s\n", file_name);
         *ierr = 1;                    /* terminate with error message */
     }
     return;
 }
 
-void close_rawfile(){
-    fclose(fp);
+void close_rawfile(void){
+    fclose(fp_z);
     return;
 }
 
-void rawseek_go_fwd_f(int *ioffset, int *ierr){
-    *ierr = fseek(fp, *ioffset, SEEK_CUR);
+void rawseek_go_fwd(int *ioffset, int *ierr){
+    *ierr = fseek(fp_z, *ioffset, SEEK_CUR);
     return;
 }
 
-void rawread_32bit_f(int *iflag_swap, int *ilength, char *textbuf, int *lenchara){
-    *lenchara =  fread(textbuf, sizeof(char), *ilength, fp);
-    if(*iflag_swap == IFLAG_SWAP) {byte_swap_4(*ilength, textbuf);};
-    return;
-}
-
-void rawread_64bit_f(int *iflag_swap, int *ilength, char *textbuf, int *lenchara){
+void rawread_32bit(int *iflag_swap, int *ilength, void *buf, int *lenchara){
+    *lenchara = (int) fread((char *) buf, sizeof(char), *ilength, fp_z);
+    /*
     int i;
-    *lenchara =  fread(textbuf, sizeof(char), *ilength, fp);
-    if(*iflag_swap == IFLAG_SWAP) {byte_swap_8(*ilength, textbuf);};
+    printf("iflag_swap %d\n", *iflag_swap);
+    printf("original_32:\n");
+    for(i=0;i<*ilength;i++){printf("%x ", (char *) buf)[i]);};
+    printf("\n");
+    */
+    if(*iflag_swap == IFLAG_SWAP) {byte_swap_4(*ilength, (char *) buf);};
+    /*
+    printf("converted_32:\n");
+    for(i=0;i<*ilength;i++){printf("%x ", (char *) buf[i]);};
+    printf("\n");
+    */
     return;
 }
 
-void rawwrite_f(int *ilength, char *textbuf, int *lenchara){
-    *lenchara =  fwrite(textbuf, sizeof(char), *ilength, fp);
+void rawread_64bit(int *iflag_swap, int *ilength, void *buf, int *lenchara){
+    *lenchara = (int) fread((char *) buf, sizeof(char), *ilength, fp_z);
+    /*
+     int i;
+    printf("iflag_swap %d\n", *iflag_swap);
+    printf("original_64:\n");
+    for(i=0;i<*ilength;i++){printf("%x ", (char *) buf[i]);};
+    printf("\n");
+    */
+    if(*iflag_swap == IFLAG_SWAP) {byte_swap_8(*ilength, (char *) buf);};
+    /*
+    printf("converted_64:\n");
+    for(i=0;i<*ilength;i++){printf("%x ", (char *) buf[i]);};
+    printf("\n");
+    */
+    return;
+}
+
+void rawwrite(int *ilength, void *buf, int *lenchara){
+    *lenchara = (int) fwrite((char *) buf, sizeof(char), *ilength, fp_z);
     return;
 }
 
@@ -111,7 +134,7 @@ void open_rd_gzfile(const char *gz_file_name){
 	return;
 }
 
-void close_gzfile(){
+void close_gzfile(void){
 	int iret;
 	
 	if ((iret = gzclose(file_gz)) != Z_OK){
@@ -131,11 +154,11 @@ int open_rd_gzfile_w_flag(const char *gz_file_name){
 	return 0;
 }
 
-int check_gzfile_eof(){
+int check_gzfile_eof(void){
     return gzeof(file_gz);
 }
 
-void write_compress_txt(int *num_buffer, char *input_txt){
+void write_compress_txt(int *nchara, char *input_txt){
 	int writelen, num_txt;
 	
 	
@@ -144,8 +167,8 @@ void write_compress_txt(int *num_buffer, char *input_txt){
 	input_txt[num_txt+1] = '\0';
 	num_txt = num_txt + 1;
 	/*
-	fprintf(stderr,"num_buffer: %d, num_txt %d,\n",
-			*num_buffer, num_txt);
+	fprintf(stderr,"nchara: %d, num_txt %d,\n",
+			*nchara, num_txt);
 	*/
 	writelen = gzwrite(file_gz, input_txt, num_txt);
 	if (writelen != num_txt) {
@@ -153,11 +176,11 @@ void write_compress_txt(int *num_buffer, char *input_txt){
 		exit(1);
 	}
 	
-	/*memset(input_txt, '\0', *num_buffer*sizeof(char));*/
+	/*memset(input_txt, '\0', *nchara*sizeof(char));*/
 	return;
 }
 
-void write_compress_txt_nolf(int *num_buffer, char *input_txt){
+void write_compress_txt_nolf(int *nchara, char *input_txt){
 	int writelen, num_txt;
 	
 	num_txt = (int) strlen(input_txt);
@@ -168,7 +191,7 @@ void write_compress_txt_nolf(int *num_buffer, char *input_txt){
 		exit(1);
 	}
 	
-	memset(input_txt, '\0', sizeof(*num_buffer));
+	memset(input_txt, '\0', sizeof(*nchara));
 	return;
 }
 
@@ -191,7 +214,7 @@ static void strm_inflate_init (z_stream *strm)
     return;
 }
 
-void gzip_defleat_once(int *len_buf, const char *buf, int *len_gzipbuf, 
+void gzip_defleat_once(const int *len_buf, const void *buf, const int *len_gzipbuf, 
                        int *len_gzipped, char *gzipbuf)
 {
     z_stream strm;
@@ -208,7 +231,7 @@ void gzip_defleat_once(int *len_buf, const char *buf, int *len_gzipbuf,
     return;
 }
 
-void gzip_defleat_begin(int *len_buf, const char *buf, int *len_gzipbuf, 
+void gzip_defleat_begin(const int *len_buf, const void *buf, const int *len_gzipbuf, 
                         int *len_gzipped, char *gzipbuf)
 {
     
@@ -222,7 +245,8 @@ void gzip_defleat_begin(int *len_buf, const char *buf, int *len_gzipbuf,
     return;
 }
 
-void gzip_defleat_cont(int *len_buf, const char *buf, int *len_gzipbuf, int *len_gzipped)
+void gzip_defleat_cont(const int *len_buf, const void *buf, const int *len_gzipbuf,
+                       int *len_gzipped)
 {
     uInt avail_out_current;
     
@@ -235,7 +259,8 @@ void gzip_defleat_cont(int *len_buf, const char *buf, int *len_gzipbuf, int *len
     return;
 }
 
-void gzip_defleat_last(int *len_buf, const char *buf, int *len_gzipbuf, int *len_gzipped)
+void gzip_defleat_last(const int *len_buf, const void *buf, const int *len_gzipbuf,
+                       int *len_gzipped)
 {
     uInt avail_out_current;
     
@@ -250,8 +275,8 @@ void gzip_defleat_last(int *len_buf, const char *buf, int *len_gzipbuf, int *len
     return;
 }
 
-void gzip_infleat_once(int *len_gzipbuf, const char *gzipbuf, int *len_buf, 
-                       char *buf, int *len_gzipped)
+void gzip_infleat_once(const int *len_gzipbuf, const char *gzipbuf, const int *len_buf, 
+                       void *buf, int *len_gzipped)
 {
     z_stream strm;
     
@@ -262,13 +287,13 @@ void gzip_infleat_once(int *len_gzipbuf, const char *gzipbuf, int *len_buf,
     strm.next_out = (unsigned char *) buf;
     CALL_ZLIB (inflate (& strm, Z_NO_FLUSH));
     *len_gzipped = *len_gzipbuf - strm.avail_in;
-/*    printf("compressed size:%d %d %d \n",*len_buf, *len_gzipbuf, *len_gzipped);*/
+/*    printf("compressed size:%d %d %d \n",*len_buf, *len_gzipbuf, *len_gzipped); */
     inflateEnd (& strm);
     return;
 }
 
-void gzip_infleat_begin(int *len_gzipbuf, const char *gzipbuf, int *len_buf, 
-                        char *buf, int *len_gzipped)
+void gzip_infleat_begin(const int *len_gzipbuf, const char *gzipbuf, const int *len_buf, 
+                        void *buf, int *len_gzipped)
 {
     
     strm_inflate_init (& strm_gl);
@@ -281,7 +306,8 @@ void gzip_infleat_begin(int *len_gzipbuf, const char *gzipbuf, int *len_buf,
     return;
 }
 
-void gzip_infleat_cont(int *len_gzipbuf, int *len_buf, const char *buf, int *len_gzipped)
+void gzip_infleat_cont(const int *len_gzipbuf, const int *len_buf, 
+                       void *buf, int *len_gzipped)
 {
     uInt avail_in_current;
     
@@ -295,7 +321,8 @@ void gzip_infleat_cont(int *len_gzipbuf, int *len_buf, const char *buf, int *len
     return;
 }
 
-void gzip_infleat_last(int *len_gzipbuf, int *len_buf, const char *buf, int *len_gzipped)
+void gzip_infleat_last(const int *len_gzipbuf, const int *len_buf,
+                       void *buf, int *len_gzipped)
 {
     uInt avail_in_current;
     
@@ -380,20 +407,23 @@ void gzseek_go_fwd_f(int *ioffset, int *ierr){
     *ierr =  (int)ierr_z;
 }
 
-void gzread_32bit_f(int *iflag_swap, int *ilength, char *textbuf, int *ierr){
+void gzread_32bit_f(const int *iflag_swap, int *ilength, char *textbuf, int *ierr){
     *ierr =  gzread(file_gz, textbuf, (uInt) *ilength);
+    *ierr = *ierr - *ilength;
     if(*iflag_swap == IFLAG_SWAP) {byte_swap_4(*ilength, textbuf);};
     return;
 }
 
-void gzread_64bit_f(int *iflag_swap, int *ilength, char *textbuf, int *ierr){
+void gzread_64bit_f(const int *iflag_swap, int *ilength, char *textbuf, int *ierr){
     *ierr =  gzread(file_gz, textbuf, (uInt) *ilength);
+    *ierr = *ierr - *ilength;
     if(*iflag_swap == IFLAG_SWAP) {byte_swap_8(*ilength, textbuf);};
     return;
 }
 
-void gzwrite_f(int *ilength, char *textbuf, int *ierr){
-    *ierr =  gzwrite(file_gz, textbuf, (uInt) *ilength);
+void gzwrite_f(int *ilength, void *buf, int *ierr){
+    *ierr = gzwrite(file_gz, buf, (uInt) *ilength);
+    *ierr = *ierr - *ilength;
     return;
 }
 

@@ -1,11 +1,11 @@
 !>@file   cal_num_digits.f90
-!!@brief  module cal_num_digits
+!!        module cal_num_digits
 !!
 !!@author H. Matsui
 !!@date Programmed in Nov., 2009
-!
+!!
 !>@brief  subtract constant from field data
-!!@n      need $omp parallel to use these routines
+!!        need $omp parallel to use these routines
 !!
 !!@verbatim
 !!      subroutine cal_num_digit_int(x_input, i_digit, i_exp)

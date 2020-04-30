@@ -23,7 +23,7 @@
 !!     &          is_temp, is_grad_t, ids_grad_t,                       &
 !!     &          is_par_temp, is_grad_part_t, ids_grad_part_t,         &
 !!     &          n_point, ntot_phys_rj, d_rj)
-!!        d_rj(inod,ipol%i_temp):        T => \Theta = T - T0
+!!        d_rj(inod,is_tempp):        T => \Theta = T - T0
 !!        d_rj(inod,is_par_temp):    \Theta = T - T0
 !!        d_rj(inod,is_grad_t):      T => d \Theta / dr
 !!        d_rj(inod,is_grad_part_t): d \Theta / dr
@@ -33,8 +33,7 @@
 !!     &          is_temp, is_grad_t, ids_grad_t,                       &
 !!     &          is_par_temp, is_grad_part_t, ids_grad_part_t,         &
 !!     &          n_point, ntot_phys_rj, d_rj)
-!!        type(phys_address), intent(in) :: ipol, idpdr
-!!        d_rj(inod,ipol%i_temp):        \Theta = T - T0 => T
+!!        d_rj(inod,is_temp):        \Theta = T - T0 => T
 !!        d_rj(inod,is_par_temp):    \Theta = T - T0
 !!        d_rj(inod,is_grad_t):      d \Theta / dr   => dT / dr
 !!        d_rj(inod,is_grad_part_t): d \Theta / dr

@@ -37,13 +37,13 @@
       use m_machine_parameter
 !
       use t_spheric_data_IO
+      use t_buffer_4_gzip
       use gz_sph_modes_data_IO_b
       use binary_IO
-      use skip_gz_comment
 !
       implicit none
 !
-      type(binary_IO_flags), private :: gz_sphflags
+      type(buffer_4_gzip), private :: zbuf_sph
 !
 !------------------------------------------------------------------
 !
@@ -55,6 +55,7 @@
      &         (file_name, id_rank, sph_file, ierr)
 !
       use gz_groups_IO_b
+      use gzip_file_access
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -65,15 +66,15 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read gzipped binary grid file: ', trim(file_name)
-      call open_rd_gzfile_b(file_name, id_rank, gz_sphflags)
-      if(gz_sphflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(file_name, id_rank, zbuf_sph)
+      if(zbuf_sph%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_geom_rtp_data_b(id_rank, gz_sphflags,                &
+      call gz_read_geom_rtp_data_b(id_rank, zbuf_sph,                   &
      &    sph_file%comm_IO, sph_file%sph_IO, sph_file%sph_grp_IO)
 !
   99  continue
-      call close_gzfile_f
-      ierr = gz_sphflags%ierr_IO
+      call close_gzfile_b
+      ierr = zbuf_sph%ierr_zlib
 !
       end subroutine gz_read_geom_rtp_file_b
 !
@@ -83,6 +84,7 @@
      &         (file_name, id_rank, sph_file, ierr)
 !
       use gz_groups_IO_b
+      use gzip_file_access
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -93,15 +95,15 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read gzipped binary spectr modes file: ', trim(file_name)
-      call open_rd_gzfile_b(file_name, id_rank, gz_sphflags)
-      if(gz_sphflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(file_name, id_rank, zbuf_sph)
+      if(zbuf_sph%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_spectr_modes_rj_data_b(id_rank, gz_sphflags,         &
+      call gz_read_spectr_modes_rj_data_b(id_rank, zbuf_sph,            &
      &    sph_file%comm_IO, sph_file%sph_IO, sph_file%sph_grp_IO)
 !
   99  continue
-      call close_gzfile_f
-      ierr = gz_sphflags%ierr_IO
+      call close_gzfile_b
+      ierr = zbuf_sph%ierr_zlib
 !
       end subroutine gz_read_spectr_modes_rj_file_b
 !
@@ -109,6 +111,8 @@
 !
       subroutine gz_read_geom_rtm_file_b                                &
      &         (file_name, id_rank, sph_file, ierr)
+!
+      use gzip_file_access
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -119,15 +123,15 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read gzipped binary grid file: ', trim(file_name)
-      call open_rd_gzfile_b(file_name, id_rank, gz_sphflags)
-      if(gz_sphflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(file_name, id_rank, zbuf_sph)
+      if(zbuf_sph%ierr_zlib .ne. 0) go to 99
 !
       call gz_read_geom_rtm_data_b                                      &
-     &   (id_rank, gz_sphflags, sph_file%comm_IO, sph_file%sph_IO)
+     &   (id_rank, zbuf_sph, sph_file%comm_IO, sph_file%sph_IO)
 !
   99  continue
-      call close_gzfile_f
-      ierr = gz_sphflags%ierr_IO
+      call close_gzfile_b
+      ierr = zbuf_sph%ierr_zlib
 !
       end subroutine gz_read_geom_rtm_file_b
 !
@@ -135,6 +139,8 @@
 !
       subroutine gz_read_modes_rlm_file_b                               &
      &         (file_name, id_rank, sph_file, ierr)
+!
+      use gzip_file_access
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -145,15 +151,15 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read gzipped binary spectr modes file: ', trim(file_name)
-      call open_rd_gzfile_b(file_name, id_rank, gz_sphflags)
-      if(gz_sphflags%ierr_IO .ne. 0) goto 99
+      call open_rd_gzfile_b(file_name, id_rank, zbuf_sph)
+      if(zbuf_sph%ierr_zlib .ne. 0) go to 99
 !
       call gz_read_modes_rlm_data_b                                     &
-     &   (id_rank, gz_sphflags, sph_file%comm_IO, sph_file%sph_IO)
+     &   (id_rank, zbuf_sph, sph_file%comm_IO, sph_file%sph_IO)
 !
   99  continue
-      call close_gzfile_f
-      ierr = gz_sphflags%ierr_IO
+      call close_gzfile_b
+      ierr = zbuf_sph%ierr_zlib
 !
       end subroutine gz_read_modes_rlm_file_b
 !
@@ -164,6 +170,7 @@
      &         (file_name, id_rank, sph_file)
 !
       use gz_groups_IO_b
+      use gzip_file_access
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -172,10 +179,10 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write gzipped binary grid file: ', trim(file_name)
-      call open_wt_gzfile_b(file_name, gz_sphflags)
+      call open_wt_gzfile_b(file_name, zbuf_sph)
       call gz_write_geom_rtp_data_b(id_rank, sph_file%comm_IO,          &
-     &    sph_file%sph_IO, sph_file%sph_grp_IO, gz_sphflags)
-      call close_gzfile_f
+     &    sph_file%sph_IO, sph_file%sph_grp_IO, zbuf_sph)
+      call close_gzfile_b
 !
       end subroutine gz_write_geom_rtp_file_b
 !
@@ -185,6 +192,7 @@
      &         (file_name, id_rank, sph_file)
 !
       use gz_groups_IO_b
+      use gzip_file_access
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -193,10 +201,10 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'gzipped binary spectr modes file: ', trim(file_name)
-      call open_wt_gzfile_b(file_name, gz_sphflags)
+      call open_wt_gzfile_b(file_name, zbuf_sph)
       call gz_write_spectr_modes_rj_data_b(id_rank, sph_file%comm_IO,   &
-     &    sph_file%sph_IO, sph_file%sph_grp_IO, gz_sphflags)
-      call close_gzfile_f
+     &    sph_file%sph_IO, sph_file%sph_grp_IO, zbuf_sph)
+      call close_gzfile_b
 !
       end subroutine gz_write_spectr_modes_rj_file_b
 !
@@ -205,6 +213,8 @@
       subroutine gz_write_geom_rtm_file_b                               &
      &         (file_name, id_rank, sph_file)
 !
+      use gzip_file_access
+!
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
       type(sph_file_data_type), intent(in) :: sph_file
@@ -212,10 +222,10 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write gzipped binary grid file: ', trim(file_name)
-      call open_wt_gzfile_b(file_name, gz_sphflags)
+      call open_wt_gzfile_b(file_name, zbuf_sph)
       call gz_write_geom_rtm_data_b                                     &
-     &   (id_rank, sph_file%comm_IO, sph_file%sph_IO, gz_sphflags)
-      call close_gzfile_f
+     &   (id_rank, sph_file%comm_IO, sph_file%sph_IO, zbuf_sph)
+      call close_gzfile_b
 !
       end subroutine gz_write_geom_rtm_file_b
 !
@@ -224,6 +234,8 @@
       subroutine gz_write_modes_rlm_file_b                              &
      &         (file_name, id_rank, sph_file)
 !
+      use gzip_file_access
+!
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
       type(sph_file_data_type), intent(in) :: sph_file
@@ -231,10 +243,10 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write gzipped binary spectr modes file: ', trim(file_name)
-      call open_wt_gzfile_b(file_name, gz_sphflags)
+      call open_wt_gzfile_b(file_name, zbuf_sph)
       call gz_write_modes_rlm_data_b                                    &
-     &   (id_rank, sph_file%comm_IO, sph_file%sph_IO, gz_sphflags)
-      call close_gzfile_f
+     &   (id_rank, sph_file%comm_IO, sph_file%sph_IO, zbuf_sph)
+      call close_gzfile_b
 !
       end subroutine gz_write_modes_rlm_file_b
 !

@@ -42,7 +42,7 @@
 !!          d_rj = rj_fld%d_fld
 !!      Integer flag for monitoring output
 !!       for spectr data @f$ f(r,j) @f$
-!!          iflag_monitor_rj = rj_fld%iflag_monitor
+!!          flag_monitor_rj = rj_fld%flag_monitor
 !!      Number of fields for visualization output
 !!       @f$ f(r,\theta,\phi) @f$
 !!          num_phys_rj_vis = rj_fld%num_phys_viz
@@ -103,8 +103,8 @@
 !
       integer(kind = kint), parameter :: id_six = 6
 !
-      write(*,*) 'check_nodal_field_name_type for sph_phys%rj_fld'
-      call check_nodal_field_name_type(id_six, sph_phys%rj_fld)
+      write(*,*) 'check_nodal_field_name for sph_phys%rj_fld'
+      call check_nodal_field_name(id_six, sph_phys%rj_fld)
 !
       end subroutine check_rj_spectr_name_t
 !
@@ -118,9 +118,9 @@
       integer(kind = kint) :: i_fld, id
 !
 !
-      write(*,*) 'check_nodal_field_name_type for sph_phys%rj_fld'
+      write(*,*) 'check_nodal_field_name for sph_phys%rj_fld'
       id = 50+id_rank
-      call check_nodal_field_name_type(id,sph_phys%rj_fld)
+      call check_nodal_field_name(id,sph_phys%rj_fld)
 !
       write(id,*) 'sph_phys%rj_fld'
       do i_fld = 1, sph_phys%rj_fld%num_phys

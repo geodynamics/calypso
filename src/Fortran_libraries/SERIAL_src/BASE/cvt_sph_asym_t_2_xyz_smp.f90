@@ -1,9 +1,9 @@
 !>@file   cvt_sph_asym_t_2_xyz_smp.f90
-!!@brief  module cvt_sph_asym_t_2_xyz_smp
+!!        module cvt_sph_asym_t_2_xyz_smp
 !!
 !!@author H. Matsui
 !!@date Programmed in March, 2009
-!
+!!
 !>@brief Convert anti-symmetric tensor from spherical coordinate
 !!       to Cartesian coordinate
 !!

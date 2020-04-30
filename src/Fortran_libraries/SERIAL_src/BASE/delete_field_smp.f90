@@ -1,9 +1,9 @@
 !>@file   delete_field_smp.f90
-!!@brief  module delete_field_smp
+!!        module delete_field_smp
 !!
 !!@author H. Matsui
 !!@date Programmed in May., 2009
-!
+!!
 !>@brief Clear field to zero
 !!
 !!@verbatim

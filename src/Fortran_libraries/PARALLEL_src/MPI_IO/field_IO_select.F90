@@ -101,8 +101,8 @@
       integer, intent(in) :: id_rank, num_pe
       integer(kind = kint), intent(in) :: istep_fld
       type(field_IO_params), intent(in) :: file_IO
-      type(time_data), intent(inout) :: t_IO
-      type(field_IO), intent(inout) :: fld_IO
+      type(time_data), intent(in) :: t_IO
+      type(field_IO), intent(in) :: fld_IO
 !
       character(len=kchara) :: file_name
 !
@@ -125,8 +125,8 @@
       integer, intent(in) :: id_rank, num_pe
       integer(kind = kint), intent(in) :: istep_fld
       type(field_IO_params), intent(in) :: file_IO
-      type(time_data), intent(inout) :: t_IO
-      type(field_IO), intent(inout) :: fld_IO
+      type(time_data), intent(in) :: t_IO
+      type(field_IO), intent(in) :: fld_IO
 !
       character(len=kchara) :: file_name
 !
@@ -298,7 +298,7 @@
       integer, intent(in) :: id_rank, num_pe
       type(field_IO_params), intent(in) :: file_IO
       type(time_data), intent(in) :: t_IO
-      type(field_IO), intent(inout) :: fld_IO
+      type(field_IO), intent(in) :: fld_IO
 !
       integer(kind = kint) :: ierr = 0
 !

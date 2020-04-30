@@ -13,7 +13,7 @@
 !!        type(field_IO_params), intent(in) :: fst_file_IO
 !!        type(phys_data), intent(in) :: rj_fld
 !!        type(IO_step_param), intent(in) :: rst_step
-!!        type(field_IO), intent(inout) :: sph_fst_IO
+!!        type(field_IO), intent(in) :: sph_fst_IO
 !!
 !!      subroutine read_alloc_sph_restart_data                          &
 !!     &         (fst_file_IO, init_d, rj_fld, rst_step, sph_fst_IO)
@@ -80,7 +80,6 @@
       type(time_data), intent(in) :: time_d
       type(phys_data), intent(in) :: rj_fld
       type(IO_step_param), intent(in) :: rst_step
-!
       type(field_IO), intent(inout) :: sph_fst_IO
 !
       integer(kind = kint) :: istep_rst

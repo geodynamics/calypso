@@ -1,9 +1,9 @@
 !>@file   copy_nodal_fields.f90
-!!@brief  module copy_nodal_fields
+!!        module copy_nodal_fields
 !!
 !!@author H. Matsui
 !!@date Programmed in ??
-!
+!!
 !>@brief Copy fields in structure
 !!
 !!@verbatim

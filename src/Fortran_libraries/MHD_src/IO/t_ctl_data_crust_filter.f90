@@ -13,10 +13,11 @@
 !!      subroutine reset_crustal_filtering_ctl(crust_filter_c)
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!  begin dynamo_vizs_control
 !!    begin crustal_filtering_ctl
 !!      truncation_degree_ctl        13
 !!    end crustal_filtering_ctl
-!!  end hd_dynamo_viz_ctl
+!!  end dynamo_vizs_control
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim

@@ -7,35 +7,30 @@
 !> @brief Output routine for gzipped VTK data segments
 !!
 !!@verbatim
-!!      subroutine write_gz_vtk_fields_head(nnod)
-!!      subroutine write_gz_vtk_each_field_head(ncomp_field, field_name)
-!!
-!!      subroutine write_gz_vtk_each_field(ntot_nod, ncomp_field, nnod,&
-!!     &          d_nod)
-!!
-!!      subroutine write_gz_vtk_node_head(nnod)
-!!
-!!      subroutine write_gz_vtk_connect_head(nele, nnod_ele)
-!!      subroutine write_gz_vtk_cell_type(nele, nnod_ele)
-!!
-!!      subroutine write_gz_vtk_connect_data(ntot_ele, nnod_ele,        &
-!!     &          nele, ie)
+!!      subroutine write_gz_vtk_fields_head(nnod, zbuf)
+!!      subroutine write_gz_vtk_each_field_head                         &
+!!     &         (ncomp_field, field_name, zbuf)
+!!      subroutine write_gz_vtk_each_field                              &
+!!     &         (ntot_nod, ncomp_field, nnod, d_nod, zbuf)
+!!      subroutine write_gz_vtk_node_head(nnod, zbuf)
+!!      subroutine write_gz_vtk_connect_head(nele, nnod_ele, zbuf)
+!!      subroutine write_gz_vtk_cell_type(nele, nnod_ele, zbuf)
+!!      subroutine write_gz_vtk_connect_data                            &
+!!     &         (ntot_ele, nnod_ele, nele, ie, zbuf)
+!!       type(buffer_4_gzip), intent(inout) :: zbuf
 !!
 !!
-!!      subroutine read_gz_vtk_fields_head(nnod)
-!!      subroutine read_gz_vtk_each_field_head(iflag_end,               &
-!!     &          ncomp_field, field_name)
-!!
-!!      subroutine read_gz_vtk_each_field(ntot_nod, ncomp_field, nnod,&
-!!     &          d_nod)
-!!
-!!      subroutine read_gz_vtk_node_head(nnod)
-!!
-!!      subroutine read_gz_vtk_connect_head(nele, nnod_ele)
-!!      subroutine read_gz_vtk_cell_type(nele)
-!!
-!!      subroutine read_gz_vtk_connect_data(ntot_ele, nnod_ele,         &
-!!     &          nele, ie)
+!!      subroutine read_gz_vtk_fields_head(nnod, zbuf)
+!!      subroutine read_gz_vtk_each_field_head                          &
+!!     &         (iflag_end, ncomp_field, field_name, zbuf)
+!!      subroutine read_gz_vtk_each_field                               &
+!!     &         (ntot_nod, ncomp_field, nnod, d_nod, zbuf)
+!!      subroutine read_gz_vtk_node_head(nnod, zbuf)
+!!      subroutine read_gz_vtk_connect_head(nele, nnod_ele, zbuf)
+!!      subroutine read_gz_vtk_cell_type(nele, zbuf)
+!!      subroutine read_gz_vtk_connect_data                             &
+!!     &         (ntot_ele, nnod_ele, nele, ie, zbuf)
+!!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!@endverbatim
 !!
 !!@n @param iflag_end              Integer flag for the end of file
@@ -55,7 +50,7 @@
       use m_precision
       use m_constants
 !
-      use skip_gz_comment
+      use t_buffer_4_gzip
       use vtk_data_to_buffer
 !
       implicit none
@@ -66,70 +61,81 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine write_gz_vtk_fields_head(nnod)
+      subroutine write_gz_vtk_fields_head(nnod, zbuf)
+!
+      use gzip_file_access
 !
       integer(kind=kint_gl), intent(in) :: nnod
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
-      textbuf =  vtk_fields_head(nnod) // char(0)
-      call gz_write_textbuf_no_lf
+      zbuf%fixbuf(1) =  vtk_fields_head(nnod) // char(0)
+      call gz_write_textbuf_no_lf(zbuf)
 !
       end subroutine write_gz_vtk_fields_head
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_gz_vtk_each_field_head(ncomp_field, field_name)
+      subroutine write_gz_vtk_each_field_head                           &
+     &         (ncomp_field, field_name, zbuf)
 !
       use m_phys_constants
+      use gzip_file_access
 !
       integer(kind=kint ), intent(in) :: ncomp_field
       character(len=kchara), intent(in) :: field_name
 !
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
 !
       if (ncomp_field .eq. n_scalar) then
-        textbuf = vtk_scalar_head(field_name) // char(0)
+        zbuf%fixbuf(1) = vtk_scalar_head(field_name) // char(0)
       else if (ncomp_field .eq. n_vector) then
-        textbuf =  vtk_vector_head(field_name) // char(0)
+        zbuf%fixbuf(1) =  vtk_vector_head(field_name) // char(0)
       else if (ncomp_field .eq. n_sym_tensor) then
-        textbuf =  vtk_tensor_head(field_name) // char(0)
+        zbuf%fixbuf(1) =  vtk_tensor_head(field_name) // char(0)
       end if
-      call gz_write_textbuf_no_lf
+      call gz_write_textbuf_no_lf(zbuf)
 !
       end subroutine write_gz_vtk_each_field_head
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_gz_vtk_each_field(ntot_nod, ncomp_field, nnod,   &
-     &          d_nod)
+      subroutine write_gz_vtk_each_field                                &
+     &         (ntot_nod, ncomp_field, nnod, d_nod, zbuf)
 !
       use m_phys_constants
+      use gzip_file_access
 !
       integer(kind=kint), intent(in) :: ncomp_field
       integer(kind=kint_gl), intent(in) :: ntot_nod, nnod
       real(kind = kreal), intent(in) :: d_nod(ntot_nod,ncomp_field)
+!
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint_gl) :: inod
 !
 !
       if (ncomp_field .eq. n_sym_tensor) then
         do inod = 1, nnod
-          write(textbuf,'(3a,a1)')                                      &
+          write(zbuf%fixbuf(1),'(3a,a1)')                               &
      &    vtk_each_vector(d_nod(inod,1), d_nod(inod,2), d_nod(inod,3)), &
      &    vtk_each_vector(d_nod(inod,2), d_nod(inod,4), d_nod(inod,5)), &
      &    vtk_each_vector(d_nod(inod,3), d_nod(inod,5), d_nod(inod,6)), &
      &    char(0)
-          call gz_write_textbuf_no_lf
+          call gz_write_textbuf_no_lf(zbuf)
         end do
       else if(ncomp_field .eq. n_vector) then
         do inod = 1, nnod
-          textbuf = vtk_each_vector(d_nod(inod,1), d_nod(inod,2),       &
+          zbuf%fixbuf(1)                                                &
+     &            = vtk_each_vector(d_nod(inod,1), d_nod(inod,2),       &
      &                              d_nod(inod,3)) // char(0)
-          call gz_write_textbuf_no_lf
+          call gz_write_textbuf_no_lf(zbuf)
         end do
       else
         do inod = 1, nnod
-          textbuf = vtk_each_scalar(d_nod(inod,1)) // char(0)
-          call gz_write_textbuf_no_lf
+          zbuf%fixbuf(1) = vtk_each_scalar(d_nod(inod,1)) // char(0)
+          call gz_write_textbuf_no_lf(zbuf)
         end do
       end if
 !
@@ -138,38 +144,49 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine write_gz_vtk_node_head(nnod)
+      subroutine write_gz_vtk_node_head(nnod, zbuf)
+!
+      use gzip_file_access
 !
       integer(kind = kint_gl), intent(in) :: nnod
 !
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      textbuf =  vtk_node_head(nnod) // char(0)
-      call gz_write_textbuf_no_lf
+!
+      zbuf%fixbuf(1) =  vtk_node_head(nnod) // char(0)
+      call gz_write_textbuf_no_lf(zbuf)
 !
       end subroutine write_gz_vtk_node_head
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine write_gz_vtk_connect_head(nele, nnod_ele)
+      subroutine write_gz_vtk_connect_head(nele, nnod_ele, zbuf)
+!
+      use gzip_file_access
 !
       integer(kind = kint), intent(in) :: nnod_ele
       integer(kind = kint_gl), intent(in) :: nele
 !
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      textbuf =  vtk_connect_head(nele, nnod_ele) // char(0)
-      call gz_write_textbuf_no_lf
+!
+      zbuf%fixbuf(1) =  vtk_connect_head(nele, nnod_ele) // char(0)
+      call gz_write_textbuf_no_lf(zbuf)
 !
       end subroutine write_gz_vtk_connect_head
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_gz_vtk_cell_type(nele, nnod_ele)
+      subroutine write_gz_vtk_cell_type(nele, nnod_ele, zbuf)
 !
       use m_geometry_constants
+      use gzip_file_access
 !
       integer(kind = kint), intent(in) :: nnod_ele
       integer(kind = kint_gl), intent(in) :: nele
+!
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint) :: icellid
       integer(kind = kint_gl) :: iele
@@ -177,24 +194,28 @@
 !
       icellid = vtk_cell_type(nnod_ele)
 !
-      textbuf = vtk_cell_type_head(nele) // char(0)
-      call gz_write_textbuf_no_lf
+      zbuf%fixbuf(1) = vtk_cell_type_head(nele) // char(0)
+      call gz_write_textbuf_no_lf(zbuf)
 !
       do iele = 1, nele
-        textbuf =  vtk_each_cell_type(icellid) // char(0)
-        call gz_write_textbuf_no_lf
+        zbuf%fixbuf(1) =  vtk_each_cell_type(icellid) // char(0)
+        call gz_write_textbuf_no_lf(zbuf)
       end do
 !
       end subroutine write_gz_vtk_cell_type
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_gz_vtk_connect_data(ntot_ele, nnod_ele,          &
-     &          nele, ie)
+      subroutine write_gz_vtk_connect_data                              &
+     &         (ntot_ele, nnod_ele, nele, ie, zbuf)
+!
+      use gzip_file_access
 !
       integer(kind = kint), intent(in) :: nnod_ele
       integer(kind = kint_gl), intent(in) :: ntot_ele, nele
       integer(kind = kint_gl), intent(in) :: ie(ntot_ele,nnod_ele)
+!
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint_gl) :: iele
       integer(kind = kint_gl), dimension(nnod_ele) :: ie0
@@ -202,8 +223,8 @@
 !
       do iele = 1, nele
         ie0(1:nnod_ele) = ie(iele,1:nnod_ele) - 1
-        textbuf =  vtk_each_connect(nnod_ele,ie0) // char(0)
-        call gz_write_textbuf_no_lf
+        zbuf%fixbuf(1) =  vtk_each_connect(nnod_ele,ie0) // char(0)
+        call gz_write_textbuf_no_lf(zbuf)
       end do
 !
       end subroutine write_gz_vtk_connect_data
@@ -212,39 +233,45 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gz_vtk_fields_head(nnod)
+      subroutine read_gz_vtk_fields_head(nnod, zbuf)
+!
+      use skip_gz_comment
 !
       integer(kind=kint_gl), intent(inout) :: nnod
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
       character(len=kchara)  :: label
 !
 !
-      call skip_gz_comment_chara_lint(label, nnod)
+      call skip_gz_comment_chara_lint(label, nnod, zbuf)
 !
       end subroutine read_gz_vtk_fields_head
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gz_vtk_each_field_head(iflag_end,                 &
-     &          ncomp_field, field_name)
+      subroutine read_gz_vtk_each_field_head                            &
+     &         (iflag_end, ncomp_field, field_name, zbuf)
 !
       use m_phys_constants
+      use gzip_file_access
 !
       integer(kind=kint ), intent(inout) :: iflag_end, ncomp_field
       character(len=kchara), intent(inout) :: field_name
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
       character(len=kchara)  :: vtk_fld_type
 !
 !
-      call get_one_line_from_gz_f
-      if(len_trim(textbuf) .eq. izero) go to 99
+      call get_one_line_text_from_gz(zbuf)
+      if(len_trim(zbuf%fixbuf(1)) .eq. izero) go to 99
 !
-      read(textbuf,*) vtk_fld_type, field_name
+      read(zbuf%fixbuf(1),*) vtk_fld_type, field_name
       if(vtk_fld_type .eq. 'TENSORS') then
         ncomp_field = n_sym_tensor
       else if(vtk_fld_type .eq. 'VECTORS') then
         ncomp_field = n_vector
       else
-        call get_one_line_from_gz_f
+        call get_one_line_text_from_gz(zbuf)
         ncomp_field = n_scalar
       end if
       iflag_end = izero
@@ -258,14 +285,17 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gz_vtk_each_field(ntot_nod, ncomp_field, nnod,   &
-     &          d_nod)
+      subroutine read_gz_vtk_each_field                                 &
+     &         (ntot_nod, ncomp_field, nnod, d_nod, zbuf)
 !
       use m_phys_constants
+      use gzip_file_access
 !
       integer(kind=kint), intent(in) :: ncomp_field
       integer(kind=kint_gl), intent(in) :: ntot_nod, nnod
+!
       real(kind = kreal), intent(inout) :: d_nod(ntot_nod,ncomp_field)
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint_gl) :: inod
       real(kind = kreal) :: rtmp
@@ -273,17 +303,17 @@
 !
       if (ncomp_field .eq. n_sym_tensor) then
         do inod = 1, nnod
-          call get_one_line_from_gz_f
-          read(textbuf,*) d_nod(inod,1:3)
-          call get_one_line_from_gz_f
-          read(textbuf,*) rtmp, d_nod(inod,4:5)
-          call get_one_line_from_gz_f
-          read(textbuf,*) rtmp, rtmp, d_nod(inod,6)
+          call get_one_line_text_from_gz(zbuf)
+          read(zbuf%fixbuf(1),*) d_nod(inod,1:3)
+          call get_one_line_text_from_gz(zbuf)
+          read(zbuf%fixbuf(1),*) rtmp, d_nod(inod,4:5)
+          call get_one_line_text_from_gz(zbuf)
+          read(zbuf%fixbuf(1),*) rtmp, rtmp, d_nod(inod,6)
         end do
       else
         do inod = 1, nnod
-          call get_one_line_from_gz_f
-          read(textbuf,*) d_nod(inod,1:ncomp_field)
+          call get_one_line_text_from_gz(zbuf)
+          read(zbuf%fixbuf(1),*) d_nod(inod,1:ncomp_field)
         end do
       end if
 !
@@ -292,73 +322,87 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gz_vtk_node_head(nnod)
+      subroutine read_gz_vtk_node_head(nnod, zbuf)
+!
+      use gzip_file_access
+      use skip_gz_comment
 !
       integer(kind = kint), intent(inout) :: nnod
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
       character(len=kchara) :: tmpchara
 !
 !
-      call skip_gz_comment_chara(tmpchara)
-      call get_one_line_from_gz_f
-      call get_one_line_from_gz_f
+      call skip_gz_comment_chara(tmpchara, zbuf)
+      call get_one_line_text_from_gz(zbuf)
+      call get_one_line_text_from_gz(zbuf)
 !
-      call get_one_line_from_gz_f
-      read(textbuf,'(a,i16,a)')  tmpchara, nnod
+      call get_one_line_text_from_gz(zbuf)
+      read(zbuf%fixbuf(1),'(a,i16,a)')  tmpchara, nnod
 !
       end subroutine read_gz_vtk_node_head
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gz_vtk_connect_head(nele, nnod_ele)
+      subroutine read_gz_vtk_connect_head(nele, nnod_ele, zbuf)
+!
+      use gzip_file_access
 !
       integer(kind = kint), intent(inout) :: nnod_ele
       integer(kind = kint_gl), intent(inout) :: nele
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint_gl) :: nums
       character(len=kchara) :: tmpchara
 !
 !
-      call get_one_line_from_gz_f
-      read(textbuf,*) tmpchara, nele, nums
+      call get_one_line_text_from_gz(zbuf)
+      read(zbuf%fixbuf(1),*) tmpchara, nele, nums
       nnod_ele = int(nums/nele, KIND(nnod_ele)) - 1
 !
       end subroutine read_gz_vtk_connect_head
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gz_vtk_cell_type(nele)
+      subroutine read_gz_vtk_cell_type(nele, zbuf)
+!
+      use gzip_file_access
 !
       integer(kind = kint_gl), intent(in) :: nele
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint_gl) :: iele
 !
 !
-      call get_one_line_from_gz_f
+      call get_one_line_text_from_gz(zbuf)
 !
       do iele = 1, nele
-        call get_one_line_from_gz_f
+        call get_one_line_text_from_gz(zbuf)
       end do
 !
       end subroutine read_gz_vtk_cell_type
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gz_vtk_connect_data(ntot_ele, nnod_ele,           &
-     &          nele, ie)
+      subroutine read_gz_vtk_connect_data                               &
+     &         (ntot_ele, nnod_ele, nele, ie, zbuf)
+!
+      use gzip_file_access
 !
       integer(kind = kint_gl), intent(in) :: ntot_ele, nnod_ele
       integer(kind = kint), intent(in) :: nele
+!
       integer(kind = kint), intent(inout) :: ie(ntot_ele,nnod_ele)
+      type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint_gl) :: iele
       integer(kind = kint) :: itmp
 !
 !
       do iele = 1, nele
-        call get_one_line_from_gz_f
-        read(textbuf,*) itmp, ie(iele,1:nnod_ele)
+        call get_one_line_text_from_gz(zbuf)
+        read(zbuf%fixbuf(1),*) itmp, ie(iele,1:nnod_ele)
         ie(iele,1:nnod_ele) = ie(iele,1:nnod_ele) + 1
       end do
 !

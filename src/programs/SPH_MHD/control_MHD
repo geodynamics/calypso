@@ -94,33 +94,33 @@ begin MHD_control
 !   electric_field, poynting_flux
 !   composition, perturbation_temp
 !
-!   filter_velo, filter_temp, filter_part_temp
-!   filter_vecp, filter_magne
+!   filter_velocity, filter_temperature, filter_pert_temperature
+!   filter_vector_potential, filter_magne
 !
 !   kinetic_helicity, magnetic_helicity
 !   current_helicity, cross_helicity
 !
 !   buoyancy_flux, Lorentz_work, mag_tension_work
 !   magnetic_ene_generation, work_against_Lorentz
-!   temp_generation, part_temp_gen
-!   vis_ene_diffuse, mag_ene_diffuse
+!   temp_generation, pert_temp_generation
+!   viscous_ene_diffusion, magnetic_ene_diffusion
 !
 !   thermal_diffusion, viscous_diffusion
-!   diffuse_vector_p, magnetic_diffusion
+!   vector_potential_diffusion, magnetic_diffusion
 !   magnetic_tension, Lorentz_force
 !   Coriolis_force, buoyancy
 !
 !
-!   heat_flux, part_h_flux
+!   heat_flux, pert_heat_flux
 !   momentum_flux, maxwell_tensor
 !   magnetic_induction, vecp_induction
 !
-!   heat_advect, part_h_advect
+!   heat_advect, pert_heat_advect
 !   inertia,  
-!   div_h_flux, div_part_h_flux
-!   div_m_flux, div_maxwell_t
+!   div_heat_flux, div_pert_heat_flux
+!   div_momentum_flux, div_maxwell_tensor
 !
-!   induction_tensor, div_induct_t
+!   induction_tensor, div_induction_tensor
 !
 !   SGS_heat_flux
 !   SGS_momentum_flux, SGS_maxwell_tensor
@@ -131,14 +131,14 @@ begin MHD_control
 !   SGS_induction, 
 !
 !   SGS_Lorentz_work Reynolds_work
-!   SGS_temp_gen     SGS_m_ene_gen
+!   SGS_temp_flux_gen     SGS_mag_induction_flux
 !
 ! termes for direct estimation
 !   SGS_div_h_flux_true
-!   SGS_div_m_flux_true, SGS_Lorentz_true, SGS_mag_induct_true
+!   SGS_div_m_flux_true, SGS_Lorentz_true, SGS_mag_induction_true
 !
 !   SGS_Lorentz_work_true   Reynolds_work_true
-!   SGS_temp_gen_true       SGS_m_ene_gen_true
+!   SGS_temp_flux_gen_true  SGS_mag_induction_flux_true
 !   
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl

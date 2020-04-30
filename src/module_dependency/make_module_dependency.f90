@@ -28,8 +28,11 @@
       character(len=25), parameter, private :: command_cpp              &
      &   = '	$(F90) -c $(F90FLAGS) $<'
 !
-      integer :: num_exclude = 2
-      character(len=31) ::  exclude_list(2) = (/'hdf5','mpi '/)
+      integer, parameter :: num_exclude = 3
+      character(len=31) ::  exclude_list(num_exclude)                   &
+     &                    = (/'ISO_C_BINDING',                          &
+     &                        'hdf5         ',                          &
+     &                        'mpi          '/)
 !
       private :: num_exclude
       private :: extend_mod_list, const_module_list

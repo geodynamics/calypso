@@ -3,7 +3,7 @@
 #
 
 MPI_ZLIB_IO_DIR = $$(PARA_SRCDIR)/MPI_ZLIB_IO
-SOURCES = $(shell ls *.f90 *.F90)
+SOURCES = $(shell ls *.f90)
 MOD_MPI_ZLIB_IO = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #

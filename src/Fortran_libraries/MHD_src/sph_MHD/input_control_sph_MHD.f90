@@ -42,7 +42,7 @@
       use t_sph_trans_arrays_MHD
       use t_sph_boundary_input_data
       use t_bc_data_list
-      use t_select_make_SPH_mesh
+      use t_check_and_make_SPH_mesh
       use t_flex_delta_t_data
       use t_sph_mhd_monitor_data_IO
 !
@@ -68,7 +68,7 @@
       use set_control_sph_mhd
       use sph_file_IO_select
       use set_control_4_SPH_to_FEM
-      use set_control_nodal_data
+      use parallel_load_data_4_sph
 !
       type(MHD_file_IO_params), intent(inout) :: MHD_files
       type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
@@ -86,19 +86,25 @@
       call set_control_4_SPH_MHD                                        &
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
-     &    sph_maker1%sph_tmp, MHD_files, SPH_model%bc_IO, MHD_step,     &
-     &    SPH_model%MHD_prop, SPH_model%MHD_BC, WK%WK_sph,              &
-     &    sph_maker1%gen_sph)
+     &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
+     &    SPH_model%MHD_BC, WK%WK_sph, sph_maker1)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
      &     SPH_model%MHD_prop, SPH_MHD%sph, SPH_MHD%fld, FEM_dat%field, &
      &    monitor)
 !
-      call select_make_SPH_mesh                                         &
-     &   (DMHD_ctl%psph_ctl%iflag_sph_shell, MHD_files%sph_file_param,  &
-     &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, sph_maker1,       &
-     &    FEM_dat%geofem, MHD_files)
+!  Check and construct spherical shell table
+      call check_and_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,   &
+     &    MHD_files%sph_file_param, sph_maker1)
+!
+!  Load spherical shell table
+      if (iflag_debug.eq.1) write(*,*) 'load_para_SPH_and_FEM_mesh'
+      call load_para_SPH_and_FEM_mesh                                   &
+     &   (MHD_files%FEM_mesh_flags, MHD_files%sph_file_param,           &
+     &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, FEM_dat%geofem,   &
+     &    MHD_files%mesh_file_IO, sph_maker1%gen_sph)
+      call dealloc_gen_sph_fem_mesh_param(sph_maker1%gen_sph)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
@@ -132,9 +138,8 @@
       call set_control_4_SPH_MHD                                        &
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
-     &    sph_maker1%sph_tmp, MHD_files, SPH_model%bc_IO, MHD_step,     &
-     &    SPH_model%MHD_prop, SPH_model%MHD_BC, WK%WK_sph,              &
-     &    sph_maker1%gen_sph)
+     &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
+     &    SPH_model%MHD_BC, WK%WK_sph, sph_maker1)
 !
       call set_control_SPH_MHD_noviz                                    &
      &   (DMHD_ctl%model_ctl, DMHD_ctl%smonitor_ctl,                    &
@@ -178,19 +183,25 @@
       call set_control_4_SPH_MHD                                        &
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
-     &    sph_maker1%sph_tmp, MHD_files, SPH_model%bc_IO, MHD_step,     &
-     &    SPH_model%MHD_prop, SPH_model%MHD_BC, WK%WK_sph,              &
-     &    sph_maker1%gen_sph)
+     &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
+     &    SPH_model%MHD_BC, WK%WK_sph, sph_maker1)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
      &    SPH_model%MHD_prop, SPH_MHD%sph, SPH_MHD%fld, FEM_dat%field,  &
      &    monitor)
 !
-      call select_make_SPH_mesh                                         &
-     &   (DMHD_ctl%psph_ctl%iflag_sph_shell, MHD_files%sph_file_param,  &
-     &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, sph_maker1,       &
-     &    FEM_dat%geofem, MHD_files)
+!  Check and construct spherical shell table
+      call check_and_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,   &
+     &    MHD_files%sph_file_param, sph_maker1)
+!
+!  Load spherical shell table
+      if (iflag_debug.eq.1) write(*,*) 'load_para_SPH_and_FEM_mesh'
+      call load_para_SPH_and_FEM_mesh                                   &
+     &   (MHD_files%FEM_mesh_flags, MHD_files%sph_file_param,           &
+     &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, FEM_dat%geofem,   &
+     &    MHD_files%mesh_file_IO, sph_maker1%gen_sph)
+      call dealloc_gen_sph_fem_mesh_param(sph_maker1%gen_sph)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !

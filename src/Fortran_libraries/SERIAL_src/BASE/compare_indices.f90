@@ -1,9 +1,9 @@
 !>@file   compare_indices.f90
-!!@brief  module compare_indices
+!!        module compare_indices
 !!
 !!@author H. Matsui
 !!@date    programmed by H.Matsui on Apr., 2006
-!
+!!
 !>@brief compare integers if these are same
 !!
 !!@verbatim

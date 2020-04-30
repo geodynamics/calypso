@@ -4,7 +4,7 @@
 !! @author H. Matsui
 !! @date   Programmed in 2012
 !!
-!
+!!
 !> @brief Monitoring section IO for Control data
 !!
 !!@verbatim

@@ -92,6 +92,8 @@
 !
       subroutine gz_mpi_write_int8_vector_b(IO_param, num, int8_dat)
 !
+      use data_convert_by_zlib
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint_gl), intent(in) :: int8_dat(num)
@@ -120,6 +122,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine gz_mpi_write_1d_vector_b(IO_param, num, real_dat)
+!
+      use data_convert_by_zlib
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       integer(kind = kint_gl), intent(in) :: num
@@ -209,6 +213,8 @@
 !
       subroutine gz_mpi_read_int8_vector_b(IO_param, num, int8_dat)
 !
+      use data_convert_by_zlib
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
       integer(kind = kint_gl), intent(in) :: num
@@ -237,6 +243,7 @@
         call calypso_mpi_seek_read_gz(IO_param%id_file, ioffset, zbuf)
 !
         call infleate_int8_vector_b(num, int8_dat, zbuf)
+        call dealloc_zip_buffer(zbuf)
 !
         if(IO_param%iflag_bin_swap .eq. iendian_FLIP) then
           l8_byte = num * kint_gl
@@ -249,6 +256,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine gz_mpi_read_1d_vector_b(IO_param, num, real_dat)
+!
+      use data_convert_by_zlib
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
@@ -278,6 +287,7 @@
         call calypso_mpi_seek_read_gz(IO_param%id_file, ioffset, zbuf)
 !
         call infleate_1d_vector_b(num, real_dat, zbuf)
+        call dealloc_zip_buffer(zbuf)
 !
         if(IO_param%iflag_bin_swap .eq. iendian_FLIP) then
           l8_byte = num * kreal

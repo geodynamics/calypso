@@ -13,7 +13,7 @@
 !!      subroutine normalize_sph_average_grad                           &
 !!     &         (is_fld, idx_rj_degree_zero, nidx_rj,                  &
 !!     &          n_point, ntot_phys_rj, d_rj)
-!!      subroutine cal_sph_nod_vect_dr_2(kr_in, kr_out, is_fld, is_dr,  &
+!!      subroutine cal_sph_nod_vect_dr_2(kr_in, kr_out, is_fld,         &
 !!     &          nidx_rj, d1nod_mat_fdm_2, n_point, ntot_phys_rj, d_rj)
 !!@endverbatim
 !!
@@ -119,11 +119,11 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine cal_sph_nod_vect_dr_2(kr_in, kr_out, is_fld, is_dr,    &
+      subroutine cal_sph_nod_vect_dr_2(kr_in, kr_out, is_fld,           &
      &          nidx_rj, d1nod_mat_fdm_2, n_point, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: kr_in, kr_out
-      integer(kind = kint), intent(in) :: is_fld, is_dr
+      integer(kind = kint), intent(in) :: is_fld
       integer(kind = kint), intent(in) :: nidx_rj(2)
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       real(kind = kreal), intent(in)                                    &
@@ -133,8 +133,10 @@
 !
       integer(kind = kint) :: inod, i_p1, i_n1, j, k
       integer(kind = kint) :: ist, ied
+      integer(kind = kint) :: is_dr
 !
 !
+      is_dr = is_fld + 1
       ist  = kr_in * nidx_rj(2) + 1
       ied = (kr_out-1) * nidx_rj(2)
 !$omp parallel do private(inod,i_p1,i_n1,j,k)

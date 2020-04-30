@@ -10,9 +10,9 @@
 !!      subroutine init_sph_radial_monitor_list                         &
 !!     &         (sph_rj, picked, iflag_center)
 !!      subroutine count_sph_labels_4_monitor                           &
-!!     &       (num_phys_rj, num_phys_comp_rj, iflag_monitor_rj, picked)
+!!     &       (num_phys_rj, num_phys_comp_rj, flag_monitor_rj, picked)
 !!      subroutine set_sph_fld_id_4_monitor                             &
-!!     &       (num_phys_rj, num_phys_comp_rj, iflag_monitor_rj, picked)
+!!     &       (num_phys_rj, num_phys_comp_rj, flag_monitor_rj, picked)
 !!      subroutine set_sph_labels_4_monitor                             &
 !!     &        (num_phys_rj, num_phys_comp_rj, phys_name_rj, picked)
 !!@endverbatim
@@ -79,13 +79,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine count_sph_labels_4_monitor                             &
-     &        (num_phys_rj, num_phys_comp_rj, iflag_monitor_rj, picked)
+     &        (num_phys_rj, num_phys_comp_rj, flag_monitor_rj, picked)
 !
       use m_phys_labels
 !
       integer(kind = kint), intent(in) :: num_phys_rj
       integer(kind = kint), intent(in) :: num_phys_comp_rj(num_phys_rj)
-      integer(kind = kint), intent(in) :: iflag_monitor_rj(num_phys_rj)
+      logical, intent(in) :: flag_monitor_rj(num_phys_rj)
 !
       type(picked_spectrum_data), intent(inout) :: picked
 !
@@ -95,7 +95,7 @@
       picked%num_field_rj = 0
       picked%ntot_comp_rj = 0
       do i_fld = 1, num_phys_rj
-        if(iflag_monitor_rj(i_fld) .gt. 0) then
+        if(flag_monitor_rj(i_fld)) then
           picked%num_field_rj = picked%num_field_rj + 1
           picked%ntot_comp_rj = picked%ntot_comp_rj                     &
      &                        + num_phys_comp_rj(i_fld)
@@ -107,11 +107,11 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_sph_fld_id_4_monitor                               &
-     &        (num_phys_rj, num_phys_comp_rj, iflag_monitor_rj, picked)
+     &        (num_phys_rj, num_phys_comp_rj, flag_monitor_rj, picked)
 !
       integer(kind = kint), intent(in) :: num_phys_rj
       integer(kind = kint), intent(in) :: num_phys_comp_rj(num_phys_rj)
-      integer(kind = kint), intent(in) :: iflag_monitor_rj(num_phys_rj)
+      logical, intent(in) :: flag_monitor_rj(num_phys_rj)
 !
       type(picked_spectrum_data), intent(inout) :: picked
 !
@@ -121,7 +121,7 @@
       j_fld = 0
       picked%istack_comp_rj(0) = 0
       do i_fld = 1, num_phys_rj
-        if(iflag_monitor_rj(i_fld) .gt. 0) then
+        if(flag_monitor_rj(i_fld)) then
           j_fld = j_fld + 1
           picked%istack_comp_rj(j_fld) = picked%istack_comp_rj(j_fld-1) &
      &                                 + num_phys_comp_rj(i_fld)

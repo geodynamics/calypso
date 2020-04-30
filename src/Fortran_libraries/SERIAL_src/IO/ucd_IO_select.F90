@@ -49,7 +49,7 @@
 #ifdef ZLIB_IO
       use gz_udt_file_IO
       use gz_ucd_field_file_IO
-      use gz_write_ucd_to_vtk_file
+      use gz_vtk_file_IO
 #endif
 !
       use t_file_IO_parameter
@@ -106,9 +106,9 @@
 !
 #ifdef ZLIB_IO
       else if(ucd_param%iflag_format .eq. iflag_vtk_gz) then
-        call write_ucd_data_2_gz_vtk(id_rank, file_name, ucd)
+        call write_gz_vtk_file(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_vtd_gz) then
-        call write_ucd_data_2_gz_vtk_phys(id_rank, file_name, ucd)
+        call write_gz_vtk_phys(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_ucd_gz) then
         call write_gz_ucd_file(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_udt_gz) then
@@ -158,9 +158,9 @@
 !
 #ifdef ZLIB_IO
       else if(ucd_param%iflag_format .eq. iflag_vtk_gz) then
-        call write_ucd_data_2_gz_vtk(id_rank, file_name, ucd)
+        call write_gz_vtk_file(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_vtd_gz) then
-        call write_ucd_data_2_gz_vtk_phys(id_rank, file_name, ucd)
+        call write_gz_vtk_phys(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_ucd_gz) then
         call write_gz_ucd_file(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_udt_gz) then
@@ -206,7 +206,7 @@
 !
 #ifdef ZLIB_IO
       else if(ucd_param%iflag_format .eq. iflag_vtd_gz) then
-        call write_ucd_data_2_gz_vtk_grid(id_rank, file_name, ucd)
+        call write_gz_vtk_grid(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_udt_gz) then
         call write_gz_grd_file(id_rank, file_name, ucd)
 #endif

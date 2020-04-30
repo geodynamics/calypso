@@ -1,9 +1,9 @@
 !>@file   solver_33_array.f90
-!!@brief  module solver_33_array
+!!        module solver_33_array
 !!
 !!@author H. Matsui
 !!@date    programmed by H.Matsui on July, 2006
-!
+!!
 !>@brief Solve linear equation for vector
 !!
 !!@verbatim

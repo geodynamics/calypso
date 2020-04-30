@@ -1,10 +1,10 @@
 !>@file   t_control_array_charareal.f90
-!!@brief  module t_control_array_charareal
+!!        module t_control_array_charareal
 !!
 !!@author H. Matsui
 !!@date Programmed in June, 2014
-!
-!>@brief  Subroutines to read control arrays
+!!
+!>@brief  Subroutines to read char-real control arrays
 !!
 !!@verbatim
 !!      subroutine alloc_control_array_c_r(array_cr)

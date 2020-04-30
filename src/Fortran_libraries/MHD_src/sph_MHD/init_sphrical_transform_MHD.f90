@@ -35,7 +35,6 @@
       use t_SPH_MHD_model_data
       use t_SPH_mesh_field_data
       use t_sph_trans_comm_tbl
-      use t_addresses_sph_transform
       use t_poloidal_rotation
       use t_sph_trans_arrays_MHD
       use t_schmidt_poly_on_rtm
@@ -99,11 +98,13 @@
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &                     'set_addresses_trans_sph_MHD'
       call set_addresses_trans_sph_MHD                                  &
-     &   (SPH_model%MHD_prop, SPH_MHD, iphys, WK%trns_MHD,              &
+     &   (SPH_model%MHD_prop, SPH_MHD%ipol, iphys, WK%trns_MHD,         &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans)
-      call set_addresses_snapshot_trans(SPH_MHD, iphys, WK%trns_snap,   &
+      call set_addresses_snapshot_trans                                 &
+     &   (SPH_MHD%ipol, iphys, WK%trns_snap,                            &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans)
-      call set_addresses_temporal_trans(SPH_MHD, iphys, WK%trns_tmp,    &
+      call set_addresses_temporal_trans                                 &
+     &   (SPH_MHD%ipol, iphys, WK%trns_tmp,                             &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans)
 !
       call alloc_sph_trans_address(SPH_MHD%sph%sph_rtp, WK)

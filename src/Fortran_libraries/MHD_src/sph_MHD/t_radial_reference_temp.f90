@@ -24,13 +24,13 @@
       implicit  none
 !
 !>      Structure of reference temperature
-      type reference_temperature
+      type reference_field
 !>      Number of radial points for reference temperature
         integer(kind = kint) :: nri_reft_rj
 !
 !>    reference temerature spectr @f$ f(r,j) @f$
         real (kind=kreal), allocatable :: t_rj(:,:)
-      end type reference_temperature
+      end type reference_field
 !
 ! -----------------------------------------------------------------------
 !
@@ -41,7 +41,7 @@
       subroutine alloc_reft_rj_data(nri_rj, ref_temp)
 !
       integer(kind = kint), intent(in) :: nri_rj
-      type(reference_temperature), intent(inout) :: ref_temp
+      type(reference_field), intent(inout) :: ref_temp
 !
       ref_temp%nri_reft_rj = nri_rj
       allocate( ref_temp%t_rj(ref_temp%nri_reft_rj,0:2))
@@ -53,7 +53,7 @@
 !
       subroutine dealloc_reft_rj_data(ref_temp)
 !
-      type(reference_temperature), intent(inout) :: ref_temp
+      type(reference_field), intent(inout) :: ref_temp
 !
       deallocate( ref_temp%t_rj )
 !

@@ -62,7 +62,6 @@ mod_list:
 		GMAKE='$(GMAKE)' \
 		ZLIB_LIBS='$(ZLIB_LIBS)'     \
 		PNG_LIBS='$(PNG_LIBS)'       \
-		FFTW3_C='$(FFTW3_C)'   \
 		MAKENAME='$(MAKENAME)' \
 		mod_list \
 		) \

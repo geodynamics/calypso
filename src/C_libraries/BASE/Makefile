@@ -35,7 +35,7 @@ module:
 	@cat Makefile.depends >> $(MAKENAME)
 
 depends:
-	echo 'Construct dependencies in C_libraries/BASE'
+	@echo 'Construct dependencies in C_libraries/BASE'
 	@echo '#' > $(MAKENAME).tmp
 	@for sources in $(SRC_BASE_C) ; do \
 		( \

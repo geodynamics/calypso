@@ -1,10 +1,10 @@
 gz_MPI_ascii_data_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_ascii_data_IO.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_calypso_mpi_IO.o t_calypso_mpi_IO_param.o t_buffer_4_gzip.o data_IO_to_textline.o zlib_convert_text.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_MPI_binary_data_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_binary_data_IO.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_buffer_4_gzip.o t_calypso_mpi_IO_param.o m_calypso_mpi_IO.o gz_MPI_binary_head_IO.o transfer_to_long_integers.o
+gz_MPI_binary_data_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_binary_data_IO.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_buffer_4_gzip.o t_calypso_mpi_IO_param.o m_calypso_mpi_IO.o gz_MPI_binary_head_IO.o transfer_to_long_integers.o data_convert_by_zlib.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_MPI_binary_datum_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_binary_datum_IO.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_calypso_mpi_IO.o t_calypso_mpi_IO_param.o gz_MPI_binary_data_IO.o gz_MPI_binary_head_IO.o MPI_ascii_data_IO.o m_error_IDs.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_MPI_binary_head_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_binary_head_IO.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_calypso_mpi_IO.o t_calypso_mpi_IO_param.o t_buffer_4_gzip.o transfer_to_long_integers.o binary_IO.o
+gz_MPI_binary_head_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_binary_head_IO.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_calypso_mpi_IO.o t_calypso_mpi_IO_param.o t_buffer_4_gzip.o data_convert_by_zlib.o transfer_to_long_integers.o binary_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_MPI_domain_data_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_domain_data_IO.f90 m_precision.o m_constants.o t_comm_table.o t_calypso_mpi_IO_param.o t_buffer_4_gzip.o gz_MPI_ascii_data_IO.o data_IO_to_textline.o m_error_IDs.o zlib_cvt_ascii_comm_tbl.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -74,7 +74,7 @@ gz_MPI_viewer_mesh_file_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_viewer_mesh_file_IO.f90 
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_field_data_MPI_IO.o: $(MPI_ZLIB_IO_DIR)/gz_field_data_MPI_IO.f90 m_precision.o m_constants.o calypso_mpi.o m_calypso_mpi_IO.o t_buffer_4_gzip.o field_data_IO.o data_IO_to_textline.o zlib_convert_ascii_vector.o zlib_convert_text.o field_data_MPI_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_field_file_MPI_IO.o: $(MPI_ZLIB_IO_DIR)/gz_field_file_MPI_IO.f90 m_precision.o m_constants.o calypso_mpi.o m_calypso_mpi_IO.o t_time_data.o t_field_data_IO.o gz_field_data_IO.o skip_gz_comment.o m_phys_constants.o time_data_IO.o field_data_IO.o gz_field_data_MPI_IO.o transfer_to_long_integers.o m_error_IDs.o field_data_MPI_IO.o
+gz_field_file_MPI_IO.o: $(MPI_ZLIB_IO_DIR)/gz_field_file_MPI_IO.f90 m_precision.o m_constants.o calypso_mpi.o m_calypso_mpi_IO.o t_time_data.o t_field_data_IO.o gz_field_data_IO.o m_phys_constants.o time_data_IO.o field_data_IO.o gz_field_data_MPI_IO.o transfer_to_long_integers.o m_error_IDs.o field_data_MPI_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_field_file_MPI_IO_b.o: $(MPI_ZLIB_IO_DIR)/gz_field_file_MPI_IO_b.f90 m_precision.o m_constants.o calypso_mpi.o m_machine_parameter.o m_calypso_mpi_IO.o t_time_data.o t_field_data_IO.o t_calypso_mpi_IO_param.o m_error_IDs.o MPI_binary_head_IO.o gz_MPI_binary_datum_IO.o MPI_ascii_data_IO.o field_file_MPI_IO.o gz_MPI_binary_data_IO.o gz_MPI_binary_head_IO.o m_phys_constants.o field_data_IO.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<

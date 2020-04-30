@@ -1,9 +1,9 @@
 !>@file   t_ctl_data_4_divide_sphere.f90
-!!@brief  module t_ctl_data_4_divide_sphere
+!!        module t_ctl_data_4_divide_sphere
 !!
 !!@author H. Matsui
 !!@date Programmed in July, 2007
-!
+!!
 !>@brief  Control data for domain decomposition for spherical transform
 !!
 !!@verbatim

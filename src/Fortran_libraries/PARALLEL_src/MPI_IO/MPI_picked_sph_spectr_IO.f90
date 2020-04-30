@@ -239,7 +239,6 @@
       character(len=kchara), intent(in) :: file_name
       type(picked_spectrum_data), intent(in) :: picked
 !
-      integer(kind = kint) :: i
       integer(kind = kint), parameter :: id_pick_mode = 23
 !
 !

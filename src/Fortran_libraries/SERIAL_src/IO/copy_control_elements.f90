@@ -1,10 +1,10 @@
 !>@file   copy_control_elements.f90
-!!@brief  module copy_control_elements
+!!        module copy_control_elements
 !!
 !!@author H. Matsui
 !!@date Programmed in Apr., 2012
-!
-!>@brief  Structure for reading control items
+!!
+!>@brief  Subroutines to copy control items
 !!
 !!@verbatim
 !!      subroutine copy_real_ctl(org_r1, new_r1)

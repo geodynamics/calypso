@@ -88,8 +88,11 @@
         integer (kind=kint) :: iflag_4_gravity = id_turn_OFF
 !>        Force flag for compositional buoyancy
         integer (kind=kint) :: iflag_4_composit_buo = id_turn_OFF
+!
 !>        Force flag for filtered thermal buoyancy
-        integer (kind=kint) :: iflag_4_filter_gravity = id_turn_OFF
+        integer (kind=kint) :: iflag_4_filter_gravity =  id_turn_OFF
+!>        Force flag for filtered compositional buoyancy
+        integer (kind=kint) :: iflag_4_filter_comp_buo = id_turn_OFF
 !
 !>       coefficient for Coriolis force
         real  (kind=kreal) :: coef_cor = zero

@@ -1,9 +1,9 @@
 !>@file   t_control_array_integer2.f90
-!!@brief  module t_control_array_integer2
+!!        module t_control_array_integer2
 !!
 !!@author H. Matsui
 !!@date Programmed in June, 2014
-!
+!!
 !>@brief  Subroutines to read control arrays
 !!
 !!@verbatim

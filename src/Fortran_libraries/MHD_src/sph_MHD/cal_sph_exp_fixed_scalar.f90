@@ -367,8 +367,8 @@
         i_n1 = inod - jmax
         i_n2 = i_n1 - jmax
 !
-        d_rj(inod,is_grd) = fdm2_fix_fld_CMB(2,2) * d_rj(i_n2,is_fld) &
-     &                    + fdm2_fix_fld_CMB(1,2) * d_rj(i_n1,is_fld) &
+        d_rj(inod,is_grd) = fdm2_fix_fld_CMB(2,2) * d_rj(i_n2,is_fld)   &
+     &                    + fdm2_fix_fld_CMB(1,2) * d_rj(i_n1,is_fld)   &
      &                    + fdm2_fix_fld_CMB(0,2) * d_rj(inod,is_fld)
       end do
 !$omp end parallel do

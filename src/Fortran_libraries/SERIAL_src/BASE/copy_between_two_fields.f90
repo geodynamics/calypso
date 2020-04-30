@@ -1,9 +1,9 @@
 !>@file   copy_between_two_fields.f90
-!!@brief  module copy_between_two_fields
+!!        module copy_between_two_fields
 !!
 !!@author H. Matsui
 !!@date    programmed by H.Matsui on Apr., 2006
-!
+!!
 !>@brief copy fields between two data arrays
 !!
 !!@verbatim

@@ -73,7 +73,7 @@
       call init_sph_radial_monitor_list(sph_rj, picked, iflag_center)
 !
       call count_sph_labels_4_monitor(rj_fld%num_phys,                  &
-     &    rj_fld%num_component, rj_fld%iflag_monitor, picked)
+     &    rj_fld%num_component, rj_fld%flag_monitor, picked)
 !
       if(pick_list%num_degree .eq. -9999) then
         pick_list%num_degree = sph_params%l_truncation+ 1 
@@ -87,7 +87,7 @@
      &    sph_params%l_truncation, sph_rj, pick_list, picked)
 !
       call set_sph_fld_id_4_monitor(rj_fld%num_phys,                    &
-     &    rj_fld%num_component, rj_fld%iflag_monitor, picked)
+     &    rj_fld%num_component, rj_fld%flag_monitor, picked)
 !
       if(my_rank .ne. 0) return
       call set_sph_labels_4_monitor                                     &

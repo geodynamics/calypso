@@ -1,6 +1,6 @@
 assemble_sph_fields.o: $(MERGE_DIR)/assemble_sph_fields.f90 m_precision.o m_constants.o calypso_mpi.o t_sph_spectr_data.o t_SPH_mesh_field_data.o share_spectr_index_data.o share_field_data.o parallel_assemble_sph.o extend_potential_field_t.o m_phys_labels.o t_spheric_parameter.o r_interpolate_marged_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<
-bcast_4_assemble_sph_ctl.o: $(MERGE_DIR)/bcast_4_assemble_sph_ctl.f90 m_precision.o calypso_mpi.o t_control_data_4_merge.o m_machine_parameter.o bcast_4_platform_ctl.o bcast_control_arrays.o bcast_4_field_ctl.o bcast_4_time_step_ctl.o
+bcast_4_assemble_sph_ctl.o: $(MERGE_DIR)/bcast_4_assemble_sph_ctl.f90 m_precision.o calypso_mpi.o t_control_data_4_merge.o m_machine_parameter.o t_ctl_data_gen_sph_shell.o bcast_4_platform_ctl.o bcast_control_arrays.o bcast_4_field_ctl.o bcast_4_time_step_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
 count_nnod_4_asseble_sph.o: $(MERGE_DIR)/count_nnod_4_asseble_sph.f90 m_precision.o m_constants.o calypso_mpi.o t_SPH_mesh_field_data.o t_field_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -12,7 +12,7 @@ parallel_assemble_sph.o: $(MERGE_DIR)/parallel_assemble_sph.f90 m_precision.o m_
 	$(F90) -c $(F90OPTFLAGS) $<
 r_interpolate_marged_sph.o: $(MERGE_DIR)/r_interpolate_marged_sph.f90 m_precision.o m_constants.o calypso_mpi.o t_SPH_mesh_field_data.o t_spheric_parameter.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_control_newsph.o: $(MERGE_DIR)/set_control_newsph.f90 m_precision.o m_constants.o calypso_mpi.o t_file_IO_parameter.o t_control_param_assemble.o t_spectr_data_4_assemble.o bcast_file_IO_parameter.o m_error_IDs.o t_control_data_4_merge.o m_file_format_switch.o set_control_platform_data.o new_SPH_restart.o skip_comment_f.o
+set_control_newsph.o: $(MERGE_DIR)/set_control_newsph.f90 m_precision.o m_constants.o calypso_mpi.o t_file_IO_parameter.o t_control_param_assemble.o t_spectr_data_4_assemble.o bcast_file_IO_parameter.o m_error_IDs.o t_control_data_4_merge.o t_check_and_make_SPH_mesh.o t_ctl_params_gen_sph_shell.o m_file_format_switch.o set_control_platform_data.o new_SPH_restart.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_merged_restart_data.o: $(MERGE_DIR)/set_merged_restart_data.f90 m_precision.o m_phys_labels.o t_phys_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -22,7 +22,7 @@ share_spectr_index_data.o: $(MERGE_DIR)/share_spectr_index_data.f90 m_precision.
 	$(F90) -c $(F90OPTFLAGS) $<
 t_assembled_field_IO.o: $(MERGE_DIR)/t_assembled_field_IO.F90 m_precision.o m_constants.o calypso_mpi.o t_file_IO_parameter.o t_time_data.o t_field_data_IO.o m_calypso_mpi_IO.o field_IO_select.o set_field_file_names.o gz_assembled_field_MPI_IO.o
 	$(F90) -c $(F90FLAGS) $<
-t_control_data_4_merge.o: $(MERGE_DIR)/t_control_data_4_merge.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_ctl_data_4_platforms.o t_ctl_data_4_fields.o t_ctl_data_4_time_steps.o t_control_elements.o skip_comment_f.o
+t_control_data_4_merge.o: $(MERGE_DIR)/t_control_data_4_merge.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_ctl_data_4_platforms.o t_ctl_data_4_fields.o t_ctl_data_4_time_steps.o t_control_elements.o t_ctl_data_gen_sph_shell.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_param_assemble.o: $(MERGE_DIR)/t_control_param_assemble.f90 m_precision.o m_constants.o t_file_IO_parameter.o t_ctl_data_4_platforms.o set_control_platform_data.o parallel_ucd_IO_select.o t_ctl_data_4_time_steps.o t_control_elements.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<

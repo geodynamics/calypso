@@ -22,6 +22,8 @@
 !
 !>  kind parameter for long integer for global index (  8 byte )
       integer, parameter   ::  kint_gl = 8
+!>  kind parameter for 4-byte integer type variable  (  4 byte )
+      integer, parameter   ::  kint_4b = 4
 !
       end module m_precision
 

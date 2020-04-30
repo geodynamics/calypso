@@ -18,6 +18,7 @@
 !
       use m_precision
 !
+      use t_spheric_rtp_data
       use t_phys_address
       use t_addresses_sph_transform
       use t_sph_multi_FFTW
@@ -28,25 +29,26 @@
 !
       implicit none
 !
+!>      strucutre of spherical transform data addresses
+      type address_4_sph_trans
+!>        strucutre of backward spherical transform data addresses
+        type(spherical_transform_data) :: backward
+!>        strucutre of forward spherical transform data addresses
+        type(spherical_transform_data) :: forward
+!
+!>        addresses of fields for backward transform
+        type(phys_address) :: b_trns
+!>        addresses of forces for forward transform
+        type(phys_address) :: f_trns
+!
+!>        Work area of Fourier transform for MHD
+        type(work_for_sgl_FFTW) :: mul_FFTW
+      end type address_4_sph_trans
+!
 !>      strucutres for spherical transform for MHD dynamo
       type works_4_sph_trans_MHD
 !>        strucutres for spherical transform for MHD
         type(address_4_sph_trans) :: trns_MHD
-!
-!>        strucutres for spherical transform for SGS model
-        type(address_4_sph_trans) :: trns_SGS
-!>        strucutres for spherical transform for dynamic SGS model
-        type(address_4_sph_trans) :: trns_DYNS
-!>        strucutres for spherical transform for model coefficients
-        type(address_4_sph_trans) :: trns_Csim
-!
-!>        strucutres for spherical transform for intermediate
-!!        nonlinear radient model
-        type(address_4_sph_trans) :: trns_ngTMP
-!>        strucutres for spherical transform for scale similarity
-        type(address_4_sph_trans) :: trns_SIMI
-!>        strucutres for spherical transform for dynamic SGS model
-        type(address_4_sph_trans) :: trns_DYNG
 !
 !>        strucutres for spherical transform for snapshot output
         type(address_4_sph_trans) :: trns_snap
@@ -62,6 +64,9 @@
         type(coriolis_rlm_data) :: cor_rlm
       end type works_4_sph_trans_MHD
 !
+      private :: alloc_nonlinear_data, dealloc_nonlinear_data
+      private :: alloc_nonlinear_pole, dealloc_nonlinear_pole
+!
 !-----------------------------------------------------------------------
 !
       contains
@@ -69,8 +74,6 @@
 !-----------------------------------------------------------------------
 !
       subroutine alloc_sph_trans_address(sph_rtp, WK)
-!
-      use t_spheric_rtp_data
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(works_4_sph_trans_MHD), intent(inout) :: WK
@@ -83,23 +86,6 @@
       call alloc_nonlinear_pole(sph_rtp, WK%trns_MHD)
       call alloc_nonlinear_pole(sph_rtp, WK%trns_snap)
 !
-!
-      call alloc_nonlinear_data(sph_rtp, wk%trns_SGS)
-      call alloc_nonlinear_data(sph_rtp, wk%trns_DYNS)
-      call alloc_nonlinear_data(sph_rtp, wk%trns_Csim)
-!
-      call alloc_nonlinear_pole(sph_rtp, WK%trns_SGS)
-      call alloc_nonlinear_pole(sph_rtp, WK%trns_DYNS)
-!
-!
-      call alloc_nonlinear_data(sph_rtp, wk%trns_ngTMP)
-      call alloc_nonlinear_data(sph_rtp, wk%trns_SIMI)
-      call alloc_nonlinear_data(sph_rtp, wk%trns_DYNG)
-!
-      call alloc_nonlinear_pole(sph_rtp, wk%trns_ngTMP)
-      call alloc_nonlinear_pole(sph_rtp, wk%trns_SIMI)
-      call alloc_nonlinear_pole(sph_rtp, wk%trns_DYNG)
-!
       end subroutine alloc_sph_trans_address
 !
 !-----------------------------------------------------------------------
@@ -107,23 +93,6 @@
       subroutine dealloc_sph_trans_address(WK)
 !
       type(works_4_sph_trans_MHD), intent(inout) :: WK
-!
-!
-      call dealloc_nonlinear_data(WK%trns_Csim)
-      call dealloc_nonlinear_data(WK%trns_DYNS)
-      call dealloc_nonlinear_data(WK%trns_SGS)
-!
-      call dealloc_nonlinear_pole(WK%trns_DYNS)
-      call dealloc_nonlinear_pole(WK%trns_SGS)
-!
-!
-      call dealloc_nonlinear_pole(WK%trns_ngTMP)
-      call dealloc_nonlinear_pole(WK%trns_SIMI)
-      call dealloc_nonlinear_pole(WK%trns_DYNG)
-!
-      call dealloc_nonlinear_data(WK%trns_ngTMP)
-      call dealloc_nonlinear_data(WK%trns_SIMI)
-      call dealloc_nonlinear_data(WK%trns_DYNG)
 !
 !
       call dealloc_nonlinear_pole(WK%trns_snap)
@@ -134,6 +103,57 @@
       call dealloc_nonlinear_data(WK%trns_MHD)
 !
       end subroutine dealloc_sph_trans_address
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine alloc_nonlinear_data(sph_rtp, trns)
+!
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(address_4_sph_trans), intent(inout) :: trns
+!
+!
+      call alloc_sph_trns_field_data(sph_rtp, trns%backward)
+      call alloc_sph_trns_field_data(sph_rtp, trns%forward)
+!
+      end subroutine alloc_nonlinear_data
+!
+!-----------------------------------------------------------------------
+!
+      subroutine alloc_nonlinear_pole(sph_rtp, trns)
+!
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(address_4_sph_trans), intent(inout) :: trns
+!
+!
+      call alloc_sph_trns_pole_data(sph_rtp, trns%backward)
+      call alloc_sph_trns_pole_data(sph_rtp, trns%forward)
+!
+      end subroutine alloc_nonlinear_pole
+!
+!-----------------------------------------------------------------------
+!
+      subroutine dealloc_nonlinear_data(trns)
+!
+      type(address_4_sph_trans), intent(inout) :: trns
+!
+!
+      call dealloc_sph_trns_field_dats(trns%backward)
+      call dealloc_sph_trns_field_dats(trns%forward)
+!
+      end subroutine dealloc_nonlinear_data
+!
+!-----------------------------------------------------------------------
+!
+      subroutine dealloc_nonlinear_pole(trns)
+!
+      type(address_4_sph_trans), intent(inout) :: trns
+!
+!
+      call dealloc_sph_trns_pole_data(trns%backward)
+      call dealloc_sph_trns_pole_data(trns%forward)
+!
+      end subroutine dealloc_nonlinear_pole
 !
 !-----------------------------------------------------------------------
 !

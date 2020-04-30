@@ -4,7 +4,7 @@
 !!@author H. Matsui
 !!@date        programmed by H.Matsui in July, 2007
 !
-!> @brief BAse routines for spectr indexing data IO
+!> @brief Base routines for spectr indexing data IO
 !!
 !!@verbatim
 !!      subroutine read_rtp_gl_1d_table(id_file, sph_IO)

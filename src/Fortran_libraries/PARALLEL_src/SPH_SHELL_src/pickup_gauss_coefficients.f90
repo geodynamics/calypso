@@ -65,7 +65,7 @@
       gauss_coef%num_field_rj = 1
       gauss_coef%ntot_comp_rj = 1
 !
-      if (ipol%i_magne .gt. 0) then
+      if (ipol%base%i_magne .gt. 0) then
         if(gauss_list%num_degree .eq. -9999) then
           gauss_list%num_degree = sph_params%l_truncation + 1
           call alloc_pick_sph_l(gauss_list)
@@ -83,7 +83,7 @@
         call dealloc_pick_sph_mode(gauss_list)
       end if
 !
-      gauss_coef%spectr_name(1) = fhd_magne
+      gauss_coef%spectr_name(1) = magnetic_field%name
       gauss_coef%istack_comp_rj(1) = 1
       gauss_coef%ifield_monitor_rj(1) = 1
       call alloc_gauss_coef_monitor_lc(gauss_coef)
@@ -124,7 +124,7 @@
           l = gauss_coef%idx_out(inum,1)
           i = gauss_coef%idx_out(inum,4)                                &
      &          + (sph_params%nlayer_CMB-1) * sph_rj%nidx_rj(2)
-          d_rj_out(inum) = rj_fld%d_fld(i,ipol%i_magne)                 &
+          d_rj_out(inum) = rj_fld%d_fld(i,ipol%base%i_magne)            &
      &                    * dble(l) * rcmb_to_Re**l *a2r_4_gauss
         end do
 !$omp end parallel do
@@ -137,7 +137,7 @@
           l = gauss_coef%idx_out(inum,1)
           i = gauss_coef%idx_out(inum,4)                                &
      &          + (sph_params%nlayer_ICB-1) * sph_rj%nidx_rj(2)
-          d_rj_out(inum) = - rj_fld%d_fld(i,ipol%i_magne)               &
+          d_rj_out(inum) = - rj_fld%d_fld(i,ipol%base%i_magne)          &
      &                  * dble(l+1) * a2r_4_gauss * ricb_to_Rref**(l-1)
         end do
 !$omp end parallel do
@@ -216,13 +216,13 @@
       Nu_type%r_CMB_Nu = r_out
 !
       inod_ICB = idx_rj_degree_zero + (kr_in-1) * nidx_rj(2)
-      temp_ICB = d_rj(inod_ICB,ipol%i_temp)
-!      dTdr_ICB = half*d_rj(inod_ICB,ipol%i_grad_t)                     &
+      temp_ICB = d_rj(inod_ICB,ipol%base%i_temp)
+!      dTdr_ICB = half*d_rj(inod_ICB,ipol%grad_fld%i_grad_temp)         &
 !     &           * a_r_1d_rj_r(kr_in)**2
 !
       inod_CMB = idx_rj_degree_zero + (kr_out-1) * nidx_rj(2)
-      temp_CMB = d_rj(inod_CMB,ipol%i_temp)
-!      dTdr_CMB = half*d_rj(inod_CMB,ipol%i_grad_t)                     &
+      temp_CMB = d_rj(inod_CMB,ipol%base%i_temp)
+!      dTdr_CMB = half*d_rj(inod_CMB,ipol%grad_fld%i_grad_temp)         &
 !     &          * a_r_1d_rj_r(kr_out)**2
 !
       c1 = (Nu_type%r_CMB_Nu*temp_CMB - Nu_type%r_ICB_Nu*temp_ICB)      &
@@ -235,8 +235,10 @@
 !      Nu_type%Nu_ICB = dTdr_ICB / dTdr_diff_ICB
 !      Nu_type%Nu_CMB = dTdr_CMB / dTdr_diff_CMB
 !
-      Nu_type%Nu_ICB = - half*d_rj(inod_ICB,ipol%i_grad_t) / c2
-      Nu_type%Nu_CMB = - half*d_rj(inod_CMB,ipol%i_grad_t) / c2
+      Nu_type%Nu_ICB                                                    &
+     &     = - half*d_rj(inod_ICB,ipol%grad_fld%i_grad_temp) / c2
+      Nu_type%Nu_CMB                                                    &
+     &     = - half*d_rj(inod_CMB,ipol%grad_fld%i_grad_temp) / c2
 !
       end subroutine cal_no_heat_source_Nu
 !

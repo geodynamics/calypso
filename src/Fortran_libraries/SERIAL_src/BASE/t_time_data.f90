@@ -1,9 +1,9 @@
 !>@file   t_time_data.f90
-!!@brief  module t_time_data
+!!        module t_time_data
 !!
 !!@author H. Matsui
 !!@date Programmed in Oct., 2007
-!
+!!
 !>@brief  time and time step data for data IO
 !!
 !!@verbatim

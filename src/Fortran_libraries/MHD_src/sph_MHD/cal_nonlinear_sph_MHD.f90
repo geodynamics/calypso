@@ -10,30 +10,32 @@
 !!      subroutine nonlinear_terms_in_rtp(sph_rtp, MHD_prop, leg,       &
 !!     &          b_trns, f_trns, trns_b_MHD, trns_f_MHD)
 !!       Input ::  trns_b_MHD%fld_rtp(1,ib_fld)
-!!               ib_fld = i_velo, i_vort, i_magne, i_current,
-!!                        i_temp, i_light
+!!               ib_fld = i_velo, base%i_vort, 
+!!                        base%i_magne, base%i_current,
+!!                        base%i_temp, base%i_light
 !!       Output :: trns_f_MHD%fld_rtp(1,if_frc)
-!!               if_frc = i_m_advect, i_lorentz, i_vp_induct, 
-!!                        i_h_flux, i_c_flux, i_Coriolis
+!!               if_frc = forces%i_m_advect, forces%i_lorentz, 
+!!                        forces%i_vp_induct, forces%i_h_flux, 
+!!                        forces%i_c_flux, forces%i_coriolis
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(phys_address), intent(in) :: b_trns, f_trns
-!!        type(address_each_sph_trans), intent(in) :: trns_b_MHD
-!!        type(address_each_sph_trans), intent(inout) :: trns_f_MHD
+!!        type(spherical_transform_data), intent(in) :: trns_b_MHD
+!!        type(spherical_transform_data), intent(inout) :: trns_f_MHD
 !!      subroutine add_ref_advect_sph_MHD(sph_rj, sph_MHD_bc, MHD_prop, &
 !!     &          leg, ref_temp, ref_comp, ipol, rj_fld)
 !!       Input ::  rj_fld(1,is_fld)
-!!               is_fld = i_velo, i_h_advect, i_c_advect
+!!               is_fld = i_velo, forces%i_h_advect, forces%i_c_advect
 !!       Output :: rj_fld(1,is_fld)
-!!               is_fld = i_h_advect, i_c_advect
+!!               is_fld = forces%i_h_advect, forces%i_c_advect
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(phys_address), intent(in) :: ipol
-!!        type(reference_temperature), intent(in) :: ref_temp
-!!        type(reference_temperature), intent(in) :: ref_comp
+!!        type(reference_field), intent(in) :: ref_temp
+!!        type(reference_field), intent(in) :: ref_comp
 !!        type(phys_data), intent(inout) :: rj_fld
 !!      subroutine add_reference_advect_sph                             &
 !!     &         (kr_in, kr_out, nidx_rj, ar_1d_rj, g_sph_rj,           &
@@ -82,59 +84,59 @@
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(legendre_4_sph_trans), intent(in) :: leg
       type(phys_address), intent(in) :: b_trns, f_trns
-      type(address_each_sph_trans), intent(in) :: trns_b_MHD
-      type(address_each_sph_trans), intent(inout) :: trns_f_MHD
+      type(spherical_transform_data), intent(in) :: trns_b_MHD
+      type(spherical_transform_data), intent(inout) :: trns_f_MHD
 !
 !
 !$omp parallel
-      if(f_trns%i_m_advect .gt. 0) then
+      if(f_trns%forces%i_m_advect .gt. 0) then
         call cal_cross_prod_w_coef_smp                                  &
      &     (sph_rtp%nnod_rtp, MHD_prop%fl_prop%coef_velo,               &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_vort),                        &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_velo),                        &
-     &      trns_f_MHD%fld_rtp(1,f_trns%i_m_advect) )
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_vort),                   &
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_velo),                   &
+     &      trns_f_MHD%fld_rtp(1,f_trns%forces%i_m_advect) )
       end if
 !
-      if(f_trns%i_lorentz .gt. 0) then
+      if(f_trns%forces%i_lorentz .gt. 0) then
         call cal_cross_prod_w_coef_smp                                  &
      &     (sph_rtp%nnod_rtp, MHD_prop%fl_prop%coef_lor,                &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_current),                     &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_magne),                       &
-     &      trns_f_MHD%fld_rtp(1,f_trns%i_lorentz) )
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_current),                &
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_magne),                  &
+     &      trns_f_MHD%fld_rtp(1,f_trns%forces%i_lorentz) )
       end if
 !
 !
 !
-      if(f_trns%i_vp_induct .gt. 0) then
+      if(f_trns%forces%i_vp_induct .gt. 0) then
         call cal_cross_prod_w_coef_smp                                  &
      &     (sph_rtp%nnod_rtp, MHD_prop%cd_prop%coef_induct,             &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_velo),                        &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_magne),                       &
-     &      trns_f_MHD%fld_rtp(1,f_trns%i_vp_induct) )
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_velo),                   &
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_magne),                  &
+     &      trns_f_MHD%fld_rtp(1,f_trns%forces%i_vp_induct) )
       end if
 !
 !
-      if(f_trns%i_h_flux .gt. 0) then
+      if(f_trns%forces%i_h_flux .gt. 0) then
         call cal_vec_scalar_prod_w_coef_smp                             &
      &     (sph_rtp%nnod_rtp, MHD_prop%ht_prop%coef_advect,             &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_velo),                        &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_temp),                        &
-     &      trns_f_MHD%fld_rtp(1,f_trns%i_h_flux) )
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_velo),                   &
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_temp),                   &
+     &      trns_f_MHD%fld_rtp(1,f_trns%forces%i_h_flux) )
       end if
 !
-      if(f_trns%i_c_flux .gt. 0) then
+      if(f_trns%forces%i_c_flux .gt. 0) then
         call cal_vec_scalar_prod_w_coef_smp                             &
      &     (sph_rtp%nnod_rtp, MHD_prop%cp_prop%coef_advect,             &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_velo),                        &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_light),                       &
-     &      trns_f_MHD%fld_rtp(1,f_trns%i_c_flux) )
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_velo),                   &
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_light),                  &
+     &      trns_f_MHD%fld_rtp(1,f_trns%forces%i_c_flux) )
       end if
 !
-      if(f_trns%i_Coriolis .gt. 0) then
+      if(f_trns%forces%i_coriolis .gt. 0) then
         call cal_wz_coriolis_rtp(sph_rtp%nnod_rtp, sph_rtp%nidx_rtp,    &
      &      leg%g_colat_rtp, MHD_prop%fl_prop%coef_cor,                 &
-     &      trns_b_MHD%fld_rtp(1,b_trns%i_velo),                        &
-     &      trns_f_MHD%fld_rtp(1,f_trns%i_Coriolis))
+     &      trns_b_MHD%fld_rtp(1,b_trns%base%i_velo),                   &
+     &      trns_f_MHD%fld_rtp(1,f_trns%forces%i_coriolis))
       end if
 !$omp end parallel
 !
@@ -151,8 +153,8 @@
       type(legendre_4_sph_trans), intent(in) :: leg
       type(phys_address), intent(in) :: ipol
 !
-      type(reference_temperature), intent(in) :: ref_temp
-      type(reference_temperature), intent(in) :: ref_comp
+      type(reference_field), intent(in) :: ref_temp
+      type(reference_field), intent(in) :: ref_comp
 !
       type(phys_data), intent(inout) :: rj_fld
 !
@@ -161,11 +163,13 @@
         call add_reference_advect_sph(sph_MHD_bc%sph_bc_T,              &
      &      MHD_prop%ht_prop, MHD_prop%ref_param_T,                     &
      &      sph_rj%nidx_rj, sph_rj%ar_1d_rj, leg%g_sph_rj,              &
-     &      ipol%i_h_advect, ipol%i_velo, ref_temp%t_rj, rj_fld)
+     &      ipol%forces%i_h_advect, ipol%base%i_velo,                   &
+     &      ref_temp%t_rj, rj_fld)
         call add_reference_advect_sph(sph_MHD_bc%sph_bc_C,              &
      &      MHD_prop%cp_prop, MHD_prop%ref_param_C,                     &
      &      sph_rj%nidx_rj, sph_rj%ar_1d_rj, leg%g_sph_rj,              &
-     &      ipol%i_c_advect, ipol%i_velo, ref_comp%t_rj, rj_fld)
+     &      ipol%forces%i_c_advect, ipol%base%i_velo,                   &
+     &      ref_comp%t_rj, rj_fld)
 !
       end subroutine add_ref_advect_sph_MHD
 !

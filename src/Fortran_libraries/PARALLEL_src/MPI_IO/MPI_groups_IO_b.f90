@@ -45,7 +45,6 @@
 !
       integer(kind = kint_gl) :: num64
 !
-      integer i
 !
       call mpi_read_one_inthead_b(IO_param, group_IO%num_grp)
       call alloc_group_num(group_IO)

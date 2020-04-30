@@ -1,11 +1,11 @@
-!>@file   cal_add_smp.f90
-!!@brief  module cal_add_smp
+!> @file   cal_add_smp.f90
+!!        module cal_add_smp
 !!
 !!@author H. Matsui
 !!@date Programmed...when??
-!
+!!
 !>@brief subroutines to add two field data
-!!@n      Need $omp parallel to use these routines
+!!       Need $omp parallel to use these routines
 !!
 !!@verbatim
 !!      subroutine add_scalars_smp(nnod, scalar1, scalar2, added)

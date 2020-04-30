@@ -1,9 +1,9 @@
 !>@file   cal_minmax_and_stacks.f90
-!!@brief  module cal_minmax_and_stacks
+!!        module cal_minmax_and_stacks
 !!
 !!@author H. Matsui
 !!@date Programmed. 2005
-!
+!!
 !>@brief  Set end points of listed data
 !!
 !!@verbatim

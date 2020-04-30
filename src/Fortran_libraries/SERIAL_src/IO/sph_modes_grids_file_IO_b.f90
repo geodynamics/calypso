@@ -37,12 +37,13 @@
       use m_machine_parameter
 !
       use t_spheric_data_IO
+      use t_binary_IO_buffer
       use sph_modes_grids_data_IO_b
       use binary_IO
 !
       implicit none
 !
-      type(binary_IO_flags), private :: bin_sphflags
+      type(binary_IO_buffer), private :: bbuf_sph
 !
 !------------------------------------------------------------------
 !
@@ -64,11 +65,14 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read binary grid file: ', trim(file_name)
-      call open_read_binary_file(file_name, id_rank, bin_sphflags)
-      call read_geom_rtp_data_b(id_rank, bin_sphflags,                  &
+      call open_read_binary_file(file_name, id_rank, bbuf_sph)
+      if(bbuf_sph%ierr_bin .ne. 0) goto 99
+      call read_geom_rtp_data_b(id_rank, bbuf_sph,                      &
      &    sph_file%comm_IO, sph_file%sph_IO, sph_file%sph_grp_IO)
+!
+  99  continue
       call close_binary_file
-      ierr = bin_sphflags%ierr_IO
+      ierr = bbuf_sph%ierr_bin
 !
       end subroutine read_geom_rtp_file_b
 !
@@ -88,11 +92,14 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read binary spectr modes file: ', trim(file_name)
-      call open_read_binary_file(file_name, id_rank, bin_sphflags)
-      call read_spectr_modes_rj_data_b(id_rank, bin_sphflags,           &
+      call open_read_binary_file(file_name, id_rank, bbuf_sph)
+      if(bbuf_sph%ierr_bin .ne. 0) goto 99
+      call read_spectr_modes_rj_data_b(id_rank, bbuf_sph,               &
      &    sph_file%comm_IO, sph_file%sph_IO, sph_file%sph_grp_IO)
+!
+  99  continue
       call close_binary_file
-      ierr = bin_sphflags%ierr_IO
+      ierr = bbuf_sph%ierr_bin
 !
       end subroutine read_spectr_modes_rj_file_b
 !
@@ -110,11 +117,14 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read binary grid file: ', trim(file_name)
-      call open_read_binary_file(file_name, id_rank, bin_sphflags)
+      call open_read_binary_file(file_name, id_rank, bbuf_sph)
+      if(bbuf_sph%ierr_bin .ne. 0) goto 99
       call read_geom_rtm_data_b                                         &
-     &   (id_rank, bin_sphflags, sph_file%comm_IO, sph_file%sph_IO)
+     &   (id_rank, bbuf_sph, sph_file%comm_IO, sph_file%sph_IO)
+!
+  99  continue
       call close_binary_file
-      ierr = bin_sphflags%ierr_IO
+      ierr = bbuf_sph%ierr_bin
 !
       end subroutine read_geom_rtm_file_b
 !
@@ -132,11 +142,14 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read binary spectr modes file: ', trim(file_name)
-      call open_read_binary_file(file_name, id_rank, bin_sphflags)
+      call open_read_binary_file(file_name, id_rank, bbuf_sph)
+      if(bbuf_sph%ierr_bin .ne. 0) goto 99
       call read_modes_rlm_data_b                                        &
-     &   (id_rank, bin_sphflags, sph_file%comm_IO, sph_file%sph_IO)
+     &   (id_rank, bbuf_sph, sph_file%comm_IO, sph_file%sph_IO)
+!
+  99  continue
       call close_binary_file
-      ierr = bin_sphflags%ierr_IO
+      ierr = bbuf_sph%ierr_bin
 !
       end subroutine read_modes_rlm_file_b
 !
@@ -156,12 +169,14 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write binary grid file: ', trim(file_name)
-      call open_write_binary_file(file_name, bin_sphflags)
-      if(bin_sphflags%ierr_IO .ne. 0) ierr = ierr_file
+      call open_write_binary_file(file_name, bbuf_sph)
+      if(bbuf_sph%ierr_bin .gt. 0) go to 99
       call write_geom_rtp_data_b(id_rank, sph_file%comm_IO,             &
-     &    sph_file%sph_IO, sph_file%sph_grp_IO, bin_sphflags)
-      if(bin_sphflags%ierr_IO .ne. 0) ierr = ierr_file
+     &    sph_file%sph_IO, sph_file%sph_grp_IO, bbuf_sph)
+!
+  99  continue
       call close_binary_file
+      ierr = bbuf_sph%ierr_bin
 !
       end subroutine write_geom_rtp_file_b
 !
@@ -180,12 +195,14 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'binary spectr modes file: ', trim(file_name)
-      call open_write_binary_file(file_name, bin_sphflags)
-      if(bin_sphflags%ierr_IO .ne. 0) ierr = ierr_file
+      call open_write_binary_file(file_name, bbuf_sph)
+      if(bbuf_sph%ierr_bin .gt. 0) go to 99
       call write_spectr_modes_rj_data_b(id_rank, sph_file%comm_IO,      &
-     &    sph_file%sph_IO, sph_file%sph_grp_IO, bin_sphflags)
-      if(bin_sphflags%ierr_IO .ne. 0) ierr = ierr_file
+     &    sph_file%sph_IO, sph_file%sph_grp_IO, bbuf_sph)
+!
+  99  continue
       call close_binary_file
+      ierr = bbuf_sph%ierr_bin
 !
       end subroutine write_spectr_modes_rj_file_b
 !
@@ -202,12 +219,14 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write binary grid file: ', trim(file_name)
-      call open_write_binary_file(file_name, bin_sphflags)
-      if(bin_sphflags%ierr_IO .ne. 0) ierr = ierr_file
+      call open_write_binary_file(file_name, bbuf_sph)
+      if(bbuf_sph%ierr_bin .gt. 0) go to 99
       call write_geom_rtm_data_b                                        &
-     &   (id_rank, sph_file%comm_IO, sph_file%sph_IO, bin_sphflags)
-      if(bin_sphflags%ierr_IO .ne. 0) ierr = ierr_file
+     &   (id_rank, sph_file%comm_IO, sph_file%sph_IO, bbuf_sph)
+!
+  99  continue
       call close_binary_file
+      ierr = bbuf_sph%ierr_bin
 !
       end subroutine write_geom_rtm_file_b
 !
@@ -224,12 +243,14 @@
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write binary spectr modes file: ', trim(file_name)
-      call open_write_binary_file(file_name, bin_sphflags)
-      if(bin_sphflags%ierr_IO .ne. 0) ierr = ierr_file
+      call open_write_binary_file(file_name, bbuf_sph)
+      if(bbuf_sph%ierr_bin .gt. 0) go to 99
       call write_modes_rlm_data_b                                       &
-     &   (id_rank, sph_file%comm_IO, sph_file%sph_IO, bin_sphflags)
-      if(bin_sphflags%ierr_IO .ne. 0) ierr = ierr_file
+     &   (id_rank, sph_file%comm_IO, sph_file%sph_IO, bbuf_sph)
+!
+  99  continue
       call close_binary_file
+      ierr = bbuf_sph%ierr_bin
 !
       end subroutine write_modes_rlm_file_b
 !

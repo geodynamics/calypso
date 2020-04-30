@@ -70,8 +70,8 @@
       integer(kind = kint), intent(in) :: nloop
       type(field_IO_params), intent(in) :: fst_IO_param
 !
-      type(time_data), intent(inout) :: t_IO
-      type(field_IO), intent(inout) :: fld_IO(nloop)
+      type(time_data), intent(in) :: t_IO
+      type(field_IO), intent(in) :: fld_IO(nloop)
 !
       integer :: id_rank
       integer(kind = kint) :: iloop

@@ -1,10 +1,10 @@
 !>@file   t_ctl_data_4_time_steps.f90
-!!@brief  module t_ctl_data_4_time_steps
+!!        module t_ctl_data_4_time_steps
 !!
 !!@author H. Matsui
 !!@date Programmed in Sep., 2006
 !!@n    Modified in Nov., 2006
-!
+!!
 !> @brief Control input routine for time step parameters
 !!
 !!@verbatim

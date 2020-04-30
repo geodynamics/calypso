@@ -70,9 +70,9 @@
       call s_cal_numbers_from_stack                                     &
      &   (fld%num_phys, fld%num_component, fld%istack_component)
 !
-!        write(*,*) 'MPI_Bcast iflag_monitor', ip
-      call MPI_Bcast(fld%iflag_monitor, int(fld%num_phys),              &
-     &    CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!        write(*,*) 'MPI_Bcast flag_monitor', ip
+      call MPI_Bcast(fld%flag_monitor, int(fld%num_phys),               &
+     &    CALYPSO_LOGICAL, 0, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine share_phys_field_names
 !

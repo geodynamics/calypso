@@ -1,9 +1,9 @@
 !>@file   m_error_IDs.f90
-!!@brief  module m_error_IDs
+!!        module m_error_IDs
 !!
 !!@author H. Matsui
 !!@date Programmed in Sep., 2007
-!
+!!
 !>@brief List of Error IDs
 !
       module m_error_IDs

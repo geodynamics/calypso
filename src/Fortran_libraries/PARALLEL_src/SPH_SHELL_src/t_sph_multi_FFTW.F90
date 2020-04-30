@@ -112,17 +112,10 @@
         howmany = int(ncomp_fwd * (irt_rtp_smp_stack(ip  )              &
      &                           - irt_rtp_smp_stack(ip-1)))
 !
-#ifdef FFTW3_C
-        call kemo_fftw_plan_many_dft_r2c                                &
-     &     (FFTW_t%plan_fwd(ip), IONE_4, Nfft4, howmany,                &
-     &      FFTW_t%X(1,ist), inembed, istride, idist_r,                 &
-     &      FFTW_t%C(1,ist), inembed, istride, idist_c, FFTW_ESTIMATE)
-#else
         call dfftw_plan_many_dft_r2c                                    &
      &     (FFTW_t%plan_fwd(ip), IONE_4, Nfft4, howmany,                &
      &      FFTW_t%X(1,ist), inembed, istride, idist_r,                 &
      &      FFTW_t%C(1,ist), inembed, istride, idist_c, FFTW_ESTIMATE)
-#endif
       end do
 !
       do ip = 1, np_smp
@@ -130,17 +123,10 @@
         howmany = int(ncomp_bwd*(irt_rtp_smp_stack(ip  )                &
      &                         - irt_rtp_smp_stack(ip-1)))
 !
-#ifdef FFTW3_C
-        call kemo_fftw_plan_many_dft_c2r                                &
-     &     (FFTW_t%plan_bwd(ip), IONE_4, Nfft4, howmany,                &
-     &      FFTW_t%C(1,ist), inembed, istride, idist_c,                 &
-     &      FFTW_t%X(1,ist), inembed, istride, idist_r, FFTW_ESTIMATE)
-#else
         call dfftw_plan_many_dft_c2r                                    &
      &     (FFTW_t%plan_bwd(ip), IONE_4, Nfft4, howmany,                &
      &      FFTW_t%C(1,ist), inembed, istride, idist_c,                 &
      &      FFTW_t%X(1,ist), inembed, istride, idist_r, FFTW_ESTIMATE)
-#endif
       end do
       FFTW_t%aNfft = one / dble(nidx_rtp(3))
 !
@@ -155,19 +141,11 @@
       integer(kind = kint) :: j
 !
 !
-#ifdef FFTW3_C
-      do j = 1, np_smp
-        call kemo_fftw_destroy_plan(FFTW_t%plan_fwd(j))
-        call kemo_fftw_destroy_plan(FFTW_t%plan_bwd(j))
-        call kemo_fftw_cleanup
-      end do
-#else
       do j = 1, np_smp
         call dfftw_destroy_plan(FFTW_t%plan_fwd(j))
         call dfftw_destroy_plan(FFTW_t%plan_bwd(j))
         call dfftw_cleanup
       end do
-#endif
 !
       call dealloc_FFTW_plan(FFTW_t)
 !
@@ -232,13 +210,8 @@
         ied = ncomp_fwd*irt_rtp_smp_stack(ip)
 !
 !        call cpu_time(dummy(2))
-#ifdef FFTW3_C
-        call kemo_fftw_execute_dft_r2c(FFTW_t%plan_fwd(ip),             &
-     &      X_rtp(1,ist), FFTW_t%C(1,ist))
-#else
         call dfftw_execute_dft_r2c(FFTW_t%plan_fwd(ip),                 &
      &      X_rtp(1,ist), FFTW_t%C(1,ist))
-#endif
 !
 !      call cpu_time(rtmp(2))
 !   normalization
@@ -322,13 +295,8 @@
 !        call cpu_time(rtmp(3))
 !
 !        call cpu_time(dummy(2))
-#ifdef FFTW3_C
-        call kemo_fftw_execute_dft_c2r(FFTW_t%plan_bwd(ip),             &
-     &       FFTW_t%C(1,ist), X_rtp(1,ist))
-#else
         call dfftw_execute_dft_c2r(FFTW_t%plan_bwd(ip),                 &
      &       FFTW_t%C(1,ist), X_rtp(1,ist))
-#endif
 !       call cpu_time(rtmp(2))
       end do
 !$omp end parallel do

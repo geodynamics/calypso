@@ -1,9 +1,9 @@
 !>@file   t_ctl_data_4_sphere_model.f90
-!!@brief  module t_ctl_data_4_sphere_model
+!!        module t_ctl_data_4_sphere_model
 !!
 !!@author H. Matsui
 !!@date Programmed in July, 2007
-!
+!!
 !>@brief  control data for resolutions of spherical shell
 !!
 !!@verbatim

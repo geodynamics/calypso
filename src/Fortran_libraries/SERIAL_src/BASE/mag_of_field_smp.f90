@@ -1,12 +1,12 @@
-!> @file  mag_of_field_smp.f90
+!>@file  mag_of_field_smp.f90
 !!      module mag_of_field_smp
 !!
 !! @author  H. Matsui
 !! @date Programmed in June, 2005
 !! @n    Modified in Apr., 2013
-!
-!> @brief Evaluate amplitude of field or lengh scale of field
-!!@n      Need $omp parallel to use these routines
+!!
+!>@brief Evaluate amplitude of field or lengh scale of field
+!!      Need $omp parallel to use these routines
 !!
 !!@verbatim
 !!      subroutine nodal_lscale_by_rot_smp(np_smp, nnod,                &

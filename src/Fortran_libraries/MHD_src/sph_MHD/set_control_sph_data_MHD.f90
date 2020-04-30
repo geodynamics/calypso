@@ -10,7 +10,7 @@
 !!      subroutine set_control_sph_mhd_fields                           &
 !!     &        (MHD_prop, field_ctl, rj_fld)
 !!      subroutine s_set_control_sph_data_MHD                           &
-!!     &         (MHD_prop, plt, mevo_ctl, rj_org_param, rst_org_param, &
+!!     &         (plt, mevo_ctl, rj_org_param, rst_org_param,           &
 !!     &          fst_file_IO, bc_IO, WK_sph)
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
@@ -22,12 +22,6 @@
 !!        type(boundary_spectra), intent(inout) :: bc_IO
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(spherical_trns_works), intent(inout) :: WK_sph
-!!      subroutine set_ctl_params_pick_circle                           &
-!!     &         (field_ctl, meq_ctl, circle, d_circle)
-!!        type(ctl_array_c3), intent(in) :: field_ctl
-!!        type(mid_equator_control), intent(in) :: meq_ctl
-!!        type(fields_on_circle), intent(inout) :: circle
-!!        type(phys_data), intent(inout) :: d_circle
 !!@endverbatim
 !
       module set_control_sph_data_MHD
@@ -55,7 +49,7 @@
 !
       use add_nodal_fields_4_MHD
       use add_sph_MHD_fields_2_ctl
-      use set_control_sph_data
+      use set_control_field_data
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(ctl_array_c3), intent(inout) :: field_ctl
@@ -80,17 +74,19 @@
      &     (MHD_prop%fl_prop, MHD_prop%cd_prop,                         &
      &      MHD_prop%ht_prop, MHD_prop%cp_prop, field_ctl)
 !
+      call add_dependent_field(MHD_prop, field_ctl)
+!
 !    set nodal data
 !
-      if (iflag_debug.gt.0) write(*,*) 's_set_control_sph_data'
-      call s_set_control_sph_data(field_ctl, rj_fld, ierr)
+      if (iflag_debug.gt.0) write(*,*) 's_set_control_field_data'
+      call s_set_control_field_data(field_ctl, rj_fld, ierr)
 !
       end subroutine set_control_sph_mhd_fields
 !
 ! -----------------------------------------------------------------------
 !
       subroutine s_set_control_sph_data_MHD                             &
-     &         (MHD_prop, plt, mevo_ctl, rj_org_param, rst_org_param,   &
+     &         (plt, mevo_ctl, rj_org_param, rst_org_param,             &
      &          fst_file_IO, bc_IO, WK_sph)
 !
       use calypso_mpi
@@ -111,12 +107,10 @@
       use t_sph_boundary_input_data
 !
       use skip_comment_f
-      use set_control_sph_data
       use add_nodal_fields_4_MHD
       use add_sph_MHD_fields_2_ctl
       use sph_mhd_rst_IO_control
 !
-      type(MHD_evolution_param), intent(in) :: MHD_prop
       type(platform_data_control), intent(in) :: plt
       type(mhd_evo_scheme_control), intent(in) :: mevo_ctl
       type(field_IO_params), intent(in) :: rj_org_param, rst_org_param
@@ -155,68 +149,6 @@
       end if
 !
       end subroutine s_set_control_sph_data_MHD
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine set_ctl_params_pick_circle                             &
-     &         (field_ctl, meq_ctl, circle, d_circle)
-!
-      use t_ctl_data_sph_vol_spectr
-      use t_mid_equator_control
-      use t_control_array_character3
-      use t_circle_transform
-      use t_phys_data
-      use ordering_field_by_viz
-      use skip_comment_f
-!
-      type(ctl_array_c3), intent(in) :: field_ctl
-      type(mid_equator_control), intent(in) :: meq_ctl
-      type(fields_on_circle), intent(inout) :: circle
-      type(phys_data), intent(inout) :: d_circle
-!
-      character(len = kchara) :: tmpchara
-!
-!
-      circle%iflag_circle_coord = iflag_circle_sph
-      if (meq_ctl%pick_circle_coord_ctl%iflag .ne. 0) then
-        tmpchara = meq_ctl%pick_circle_coord_ctl%charavalue
-        if(    cmp_no_case(tmpchara,'spherical')                        &
-     &    .or. cmp_no_case(tmpchara,'rtp')) then
-          circle%iflag_circle_coord = iflag_circle_sph
-        else if(cmp_no_case(tmpchara,'cyrindrical')                     &
-      &    .or. cmp_no_case(tmpchara,'spz')) then
-          circle%iflag_circle_coord = iflag_circle_cyl
-        end if
-      end if
-!
-      circle%mphi_circle = -1
-      if(meq_ctl%nphi_mid_eq_ctl%iflag .gt. 0) then
-        circle%mphi_circle = meq_ctl%nphi_mid_eq_ctl%intvalue
-      end if
-!
-      circle%s_circle = 7.0d0/13.0d0 + 0.5d0
-      if(meq_ctl%pick_s_ctl%iflag .gt. 0) then
-        circle%s_circle = meq_ctl%pick_s_ctl%realvalue
-      end if
-!
-      circle%z_circle = 0.0d0
-      if(meq_ctl%pick_z_ctl%iflag .gt. 0) then
-        circle%z_circle = meq_ctl%pick_z_ctl%realvalue
-      end if
-!
-      d_circle%num_phys = field_ctl%num
-      call alloc_phys_name_type(d_circle)
-      call s_ordering_field_by_viz(field_ctl, d_circle%num_phys,        &
-     &    d_circle%num_phys_viz, d_circle%num_component,                &
-     &    d_circle%phys_name, d_circle%iflag_monitor)
-!
-      call set_istack_4_nodal_field(d_circle%num_phys,                  &
-     &    d_circle%num_phys_viz, d_circle%num_component,                &
-     &    d_circle%ntot_phys, d_circle%ntot_phys_viz,                   &
-     &    d_circle%istack_component)
-!
-      end subroutine set_ctl_params_pick_circle
 !
 ! -----------------------------------------------------------------------
 !

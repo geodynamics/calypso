@@ -1,9 +1,9 @@
 !>@file   t_ctl_data_4_fields.f90
-!!@brief  module t_ctl_data_4_fields
+!!        module t_ctl_data_4_fields
 !!
 !!@author H. Matsui
 !!@date Programmed in March. 2006
-!
+!!
 !>@brief  Control brog for field definition
 !!
 !!@verbatim

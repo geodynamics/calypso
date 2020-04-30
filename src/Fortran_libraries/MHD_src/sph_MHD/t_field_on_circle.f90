@@ -191,7 +191,7 @@
 !
       type(fields_on_circle), intent(inout) :: circle
 !
-      integer(kind = kint) :: j, j_gl, i_in, i_ot, num, ncomp
+      integer(kind = kint) :: j, j_gl, i_in, i_ot, ncomp
       integer(kind = kint) :: ist_comp, jst_comp, nd, ifld, jfld
       integer(kind = kint_gl) :: num64
 !

@@ -1,11 +1,11 @@
 !>@file   overwrite_prod_const_smp.f90
-!!@brief  module overwrite_prod_const_smp
+!!        module overwrite_prod_const_smp
 !!
 !!@author H. Matsui
 !!@date Programmed in May 2009
-!
+!!
 !>@brief subroutines to obatine products and overwrite to original data
-!!@n     $omp parallel is required to use these routines
+!!       $omp parallel is required to use these routines
 !!
 !!@verbatim
 !!      subroutine ovwrt_coef_prod_scalar_smp(np_smp, nnod,             &

@@ -8,10 +8,12 @@
 !!
 !!@verbatim
 !!      subroutine bcast_ctl_param_newsph(asbl_param, sph_asbl)
-!!      subroutine set_control_4_newsph(mgd_ctl, asbl_param, sph_asbl)
+!!      subroutine set_control_4_newsph                                 &
+!!     &         (mgd_ctl, asbl_param, sph_asbl, sph_maker)
 !!        type(control_data_4_merge), intent(in) :: mgd_ctl
 !!        type(control_param_assemble), intent(inout) :: asbl_param
 !!        type(spectr_data_4_assemble), intent(inout) :: sph_asbl
+!!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !!@endverbatim
 !
       module set_control_newsph
@@ -81,10 +83,13 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine set_control_4_newsph(mgd_ctl, asbl_param, sph_asbl)
+      subroutine set_control_4_newsph                                   &
+     &         (mgd_ctl, asbl_param, sph_asbl, sph_maker)
 !
       use m_error_IDs
       use t_control_data_4_merge
+      use t_check_and_make_SPH_mesh
+      use t_ctl_params_gen_sph_shell
       use m_file_format_switch
       use set_control_platform_data
       use new_SPH_restart
@@ -93,6 +98,9 @@
       type(control_data_4_merge), intent(in) :: mgd_ctl
       type(control_param_assemble), intent(inout) :: asbl_param
       type(spectr_data_4_assemble), intent(inout) :: sph_asbl
+      type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
+!
+      integer(kind = kint) :: ierr
 !
 !
       if (mgd_ctl%source_plt%ndomain_ctl%iflag .gt. 0) then
@@ -147,6 +155,17 @@
 !
       call set_assemble_step_4_rst(mgd_ctl%t_mge_ctl, asbl_param)
       call set_control_new_step(mgd_ctl%t2_mge_ctl, asbl_param)
+!
+!   set spherical shell parameters
+!
+      if(mgd_ctl%psph_ctl%iflag_sph_shell .gt. 0) then
+        if (iflag_debug.gt.0) write(*,*) 'set_control_4_shell_grids'
+        call set_control_4_shell_grids                                  &
+     &     (nprocs, mgd_ctl%psph_ctl%Fmesh_ctl,                         &
+     &      mgd_ctl%psph_ctl%spctl, mgd_ctl%psph_ctl%sdctl,             &
+     &      sph_maker%sph_tmp, sph_maker%gen_sph, ierr)
+      end if
+!
 !
       if(my_rank .eq. 0) write(*,*)                                     &
      &          'istep_start, istep_end, increment_step',               &

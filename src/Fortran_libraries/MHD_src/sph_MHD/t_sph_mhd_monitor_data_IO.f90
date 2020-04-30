@@ -7,11 +7,11 @@
 !>@brief  I/O routines for mean square and averaga data
 !!
 !!@verbatim
-!!      subroutine open_sph_vol_rms_file_mhd                            &
-!!     &         (sph, ipol, rj_fld, monitor)
+!!      subroutine open_sph_vol_rms_file_mhd(sph, ipol, rj_fld, monitor)
 !!      subroutine output_rms_sph_mhd_control                           &
 !!     &         (time_d, SPH_MHD, sph_MHD_bc, leg, monitor)
 !!      subroutine init_rms_4_sph_spectr_4_mhd(sph, rj_fld, monitor)
+!!        type(energy_label_param), intent(in) :: ene_labels
 !!        type(time_data), intent(in) :: time_d
 !!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        type(legendre_4_sph_trans), intent(in) :: leg
@@ -35,6 +35,7 @@
       use t_IO_step_parameter
       use t_rms_4_sph_spectr
       use t_sum_sph_rms_data
+      use t_energy_label_parameters
 !
       use pickup_sph_spectr_data
       use output_sph_m_square_file
@@ -64,6 +65,8 @@
 !>        Work area of mean square data
         type(sph_mean_square_work) :: WK_pwr
 !
+!>        Structure of label for energies
+        type(energy_label_param) :: ene_labels
 !
         integer(kind = kint) :: ltr_crust
       end type sph_mhd_monitor_data
@@ -91,14 +94,12 @@
       integer(kind = kint) :: iflag
 !
 !
-      if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr'
-      call init_rms_4_sph_spectr                                        &
-     &   (sph%sph_params, sph%sph_rj, rj_fld,                           &
-     &    monitor%pwr, monitor%WK_pwr)
+      call init_rms_4_sph_spectr_4_mhd(sph, rj_fld, monitor)
 !
       if ( iflag_debug.gt.0 ) write(*,*) 'check_sph_vol_ms_file'
-      iflag = check_sph_vol_ms_file(my_rank, sph%sph_params,            &
-     &                              sph%sph_rj, monitor%pwr)
+      iflag = check_sph_vol_ms_file(my_rank, monitor%ene_labels,        &
+     &                              sph%sph_params, sph%sph_rj,         &
+     &                              monitor%pwr)
       call MPI_Bcast(iflag, 1, CALYPSO_INTEGER, 0,                      &
      &               CALYPSO_COMM, ierr_MPI)
       if(iflag .gt. 0) then
@@ -151,7 +152,8 @@
      &    sph_MHD_bc%sph_bc_U, leg, SPH_MHD%ipol, SPH_MHD%fld,          &
      &    monitor%pwr, monitor%WK_pwr, monitor%Nusselt)
 !
-      call output_sph_monitor_data(time_d, SPH_MHD%sph%sph_params,      &
+      call output_sph_monitor_data                                      &
+     &   (monitor%ene_labels, time_d, SPH_MHD%sph%sph_params,           &
      &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld,                &
      &    monitor%pwr, monitor%pick_coef, monitor%gauss_coef,           &
      &    monitor%Nusselt)
@@ -163,6 +165,7 @@
 !
       subroutine init_rms_4_sph_spectr_4_mhd(sph, rj_fld, monitor)
 !
+      use t_energy_label_parameters
       use cal_rms_fields_by_sph
 !
       type(sph_grids), intent(in) :: sph
@@ -172,6 +175,7 @@
 !
 !
       if(iflag_debug .gt. 0) write(*,*) 'init_rms_4_sph_spectr'
+      call init_energy_labels_base(monitor%ene_labels)
       call init_rms_4_sph_spectr                                        &
      &   (sph%sph_params, sph%sph_rj, rj_fld,                           &
      &    monitor%pwr, monitor%WK_pwr)

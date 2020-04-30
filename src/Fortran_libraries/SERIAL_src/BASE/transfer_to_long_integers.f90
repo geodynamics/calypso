@@ -1,10 +1,10 @@
 !>@file  transfer_to_long_integers.f90
-!!       module transfer_to_long_integers
+!!        module transfer_to_long_integers
 !!
 !!@author H. Matsui
 !!@date   Programmed in Mar., 2018
-!
-!> @brief Cast 4byte integer to 8byte integers
+!!
+!>@brief Cast 4byte integer to 8byte integers
 !!
 !!@verbatim
 !!      integer(kind = kint_gl) function cast_long(i_in)

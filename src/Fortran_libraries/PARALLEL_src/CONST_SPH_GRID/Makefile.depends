@@ -1,5 +1,7 @@
 bcast_4_sphere_ctl.o: $(SPH_GRID_SRCDIR)/bcast_4_sphere_ctl.f90 m_precision.o t_ctl_data_4_sphere_model.o t_ctl_data_4_divide_sphere.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
+bcast_comm_stacks_sph.o: $(SPH_GRID_SRCDIR)/bcast_comm_stacks_sph.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_sph_trans_comm_tbl.o
+	$(F90) -c $(F90OPTFLAGS) $<
 cal_sph_ele_addresses.o: $(SPH_GRID_SRCDIR)/cal_sph_ele_addresses.f90 m_precision.o m_constants.o t_sph_mesh_1d_connect.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_sph_ele_connects.o: $(SPH_GRID_SRCDIR)/cal_sph_ele_connects.f90 m_precision.o m_constants.o t_geometry_data.o t_sph_mesh_1d_connect.o cal_sph_node_addresses.o cal_sph_ele_addresses.o
@@ -79,6 +81,8 @@ set_sph_tranform_ordering.o: $(SPH_GRID_SRCDIR)/set_sph_tranform_ordering.f90 m_
 set_stack_4_sph_groups.o: $(SPH_GRID_SRCDIR)/set_stack_4_sph_groups.f90 m_precision.o m_constants.o t_spheric_parameter.o t_group_data.o t_control_1D_layering.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_2d_sph_trans_table.o: $(SPH_GRID_SRCDIR)/t_2d_sph_trans_table.f90 m_precision.o t_spheric_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_check_and_make_SPH_mesh.o: $(SPH_GRID_SRCDIR)/t_check_and_make_SPH_mesh.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_work_time.o t_spheric_parameter.o t_const_spherical_grid.o t_file_IO_parameter.o m_error_IDs.o parallel_gen_sph_grids.o sph_file_IO_select.o m_elapsed_labels_gen_SPH.o set_global_spherical_param.o mpi_gen_sph_grids_modes.o set_comm_table_rtp_rj.o const_global_sph_grids_modes.o const_sph_radial_grid.o bcast_comm_stacks_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_const_spherical_grid.o: $(SPH_GRID_SRCDIR)/t_const_spherical_grid.f90 m_precision.o t_spheric_global_ranks.o t_sph_1d_global_index.o t_sph_local_parameter.o t_control_1D_layering.o t_group_data.o
 	$(F90) -c $(F90OPTFLAGS) $<

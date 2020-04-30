@@ -282,12 +282,13 @@
      &   (ncomp_trans, sph_rlm%nnod_rlm, n_WS,                          &
      &    comm_rlm%nneib_domain, comm_rlm%istack_sr, comm_rlm%item_sr,  &
      &    cor_rlm%ncomp_coriolis_rlm, cor_rlm%ip_rlm_rot_cor,           &
-     &    f_trns%i_rot_Coriolis, cor_rlm%d_cor_rlm(1,1), WS(1))
+     &    f_trns%rot_forces%i_Coriolis, cor_rlm%d_cor_rlm(1,1), WS(1))
       call sel_calypso_to_send_scalar                                   &
      &   (ncomp_trans, sph_rlm%nnod_rlm, n_WS,                          &
      &    comm_rlm%nneib_domain, comm_rlm%istack_sr, comm_rlm%item_sr,  &
      &    cor_rlm%ncomp_coriolis_rlm, cor_rlm%it_rlm_rot_cor,           &
-     &    (f_trns%i_rot_Coriolis+2), cor_rlm%d_cor_rlm(1,1), WS(1))
+     &    (f_trns%rot_forces%i_Coriolis+2), cor_rlm%d_cor_rlm(1,1),     &
+     &    WS(1))
 !
       end subroutine copy_coriolis_terms_rlm
 !

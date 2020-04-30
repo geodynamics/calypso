@@ -22,6 +22,7 @@
       use m_elapsed_labels_SEND_RECV
       use m_SPH_MHD_model_data
       use m_MHD_step_parameter
+      use m_SPH_MHD_structure
       use t_viz_sections
       use t_SPH_MHD_zonal_mean_viz
 !
@@ -69,7 +70,7 @@
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+1)
       if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize_sph_MHD'
       call FEM_initialize_sph_MHD(MHD_files1, MHD_step1,                &
-     &    FEM_d1%geofem, FEM_d1%iphys, FEM_d1%field, MHD_IO1)
+     &    FEM_d1%geofem, FEM_d1%field, FEM_d1%iphys, MHD_IO1)
 !
 !        Initialize spherical transform dynamo
 !

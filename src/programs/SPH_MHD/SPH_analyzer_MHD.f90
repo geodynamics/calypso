@@ -59,7 +59,6 @@
       use t_sph_boundary_input_data
 !
       use set_control_sph_mhd
-      use set_sph_phys_address
       use const_fdm_coefs
       use set_initial_sph_dynamo
       use adjust_reference_fields
@@ -88,14 +87,16 @@
 !
 !   Allocate spectr field data
 !
-      call set_sph_MHD_sprctr_data                                      &
-     &   (SPH_MHD%sph%sph_rj, SPH_model%MHD_prop,                       &
-     &    SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%itor, SPH_MHD%fld)
+      call set_sph_MHD_sprctr_data(SPH_MHD%sph, SPH_model%MHD_prop,     &
+     &    SPH_MHD%fld, SPH_MHD%ipol)
 !
 ! ---------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
-      call init_r_infos_sph_mhd_evo(SPH_model, SPH_WK%r_2nd, SPH_MHD)
+      call init_r_infos_sph_mhd_evo(SPH_WK%r_2nd, SPH_model%bc_IO,      &
+     &    SPH_MHD%groups, SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph,  &
+     &    SPH_model%omega_sph, SPH_model%ref_temp, SPH_model%ref_comp,  &
+     &    SPH_MHD%fld, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 !
 ! ---------------------------------
 !
@@ -107,12 +108,13 @@
 !
       if(iflag_debug.gt.0) write(*,*)' sph_initial_data_control'
       call sph_initial_data_control                                     &
-     &   (MHD_files, SPH_model, SPH_MHD, MHD_step, sph_fst_IO)
+     &   (MHD_files, SPH_model, SPH_MHD%sph, SPH_MHD%ipol, MHD_step,    &
+     &    SPH_MHD%fld, sph_fst_IO)
       MHD_step%iflag_initial_step = 0
 !
       if(iflag_debug.gt.0) write(*,*)' sync_temp_by_per_temp_sph'
       call sync_temp_by_per_temp_sph(SPH_model,                         &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%fld)
+     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !  -------------------------------
 !
@@ -132,7 +134,7 @@
       call set_sph_field_to_start                                       &
      &   (SPH_MHD%sph%sph_rj, SPH_WK%r_2nd, SPH_model%MHD_prop,         &
      &    SPH_model%sph_MHD_bc, SPH_WK%trans_p%leg,                     &
-     &    SPH_MHD%ipol, SPH_MHD%itor, SPH_MHD%fld)
+     &    SPH_MHD%ipol, SPH_MHD%fld)
 !
 !* obtain nonlinear terms for starting
 !
@@ -184,7 +186,7 @@
       if(iflag_debug.gt.0) write(*,*) 'sel_explicit_sph'
       call sel_explicit_sph(i_step, MHD_step%time_d%dt,                 &
      &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_MHD%sph%sph_rj, &
-     &    SPH_MHD%ipol, SPH_MHD%itor, SPH_MHD%fld)
+     &    SPH_MHD%ipol, SPH_MHD%fld)
 !*
 !*  ----------  time evolution by inplicit method ----------
 !*
@@ -196,8 +198,7 @@
       call s_cal_sol_sph_MHD_crank                                      &
      &   (MHD_step%time_d%dt, SPH_MHD%sph%sph_rj, SPH_WK%r_2nd,         &
      &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%trans_p%leg, &
-     &    SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%itor, SPH_WK%MHD_mats,   &
-     &    SPH_MHD%fld)
+     &    SPH_MHD%ipol, SPH_WK%MHD_mats, SPH_MHD%fld)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+3)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+2)
 !*
@@ -214,14 +215,13 @@
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+5)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
       call trans_per_temp_to_temp_sph(SPH_model,                        &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%fld)
+     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
 !*
       if(lead_field_data_flag(i_step, MHD_step) .eq. 0) then
         if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
-        call s_lead_fields_4_sph_mhd                                    &
-     &     (SPH_MHD%sph, SPH_MHD%comms, SPH_WK%monitor, SPH_WK%r_2nd,   &
+        call s_lead_fields_4_sph_mhd(SPH_WK%monitor, SPH_WK%r_2nd,      &
      &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%trans_p,   &
-     &      SPH_MHD%ipol, SPH_WK%MHD_mats, SPH_WK%trns_WK, SPH_MHD%fld)
+     &      SPH_WK%MHD_mats, SPH_WK%trns_WK, SPH_MHD)
       end if
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+5)
 !
@@ -267,7 +267,7 @@
 !
       if(iflag_debug.gt.0) write(*,*) 'sync_temp_by_per_temp_sph'
       call sync_temp_by_per_temp_sph(SPH_model,                         &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%idpdr, SPH_MHD%fld)
+     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
 !
       if(i_step .ge. MHD_step%finish_d%i_end_step                       &
      &    .and. MHD_step%finish_d%i_end_step .gt. 0) then

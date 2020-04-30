@@ -277,10 +277,10 @@
           call extend_potential_magne(new_sph, r_itp, new_phys)
 !            write(*,*) 'extend_inner_core_scalar'
           call extend_inner_core_scalar                                 &
-     &      (fhd_temp, new_sph, r_itp, new_phys)
+     &       (temperature%name, new_sph, r_itp, new_phys)
 !            write(*,*) 'extend_inner_core_scalar'
           call extend_inner_core_scalar                                 &
-     &        (fhd_light, new_sph, r_itp, new_phys)
+     &       (composition%name, new_sph, r_itp, new_phys)
         end if
 !
         call rescale_4_magne(b_ratio, new_phys)

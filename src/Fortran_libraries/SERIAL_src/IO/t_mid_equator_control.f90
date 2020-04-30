@@ -4,7 +4,7 @@
 !! @author H. Matsui
 !! @date   Programmed in 2012
 !!
-!
+!!
 !> @brief control date for volume averaged spectr data
 !!
 !!@verbatim

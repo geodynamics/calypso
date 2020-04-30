@@ -31,6 +31,7 @@
        subroutine bcast_merge_control_data(mgd_ctl)
 !
       use m_machine_parameter
+      use t_ctl_data_gen_sph_shell
       use bcast_4_platform_ctl
       use bcast_control_arrays
 !
@@ -39,6 +40,8 @@
 !
       call bcast_ctl_data_4_platform(mgd_ctl%source_plt)
       call bcast_ctl_data_4_platform(mgd_ctl%assemble_plt)
+!
+      call bcast_parallel_shell_ctl(mgd_ctl%psph_ctl)
 !
       call bcast_merge_field_data(mgd_ctl)
       call bcast_merge_step_data(mgd_ctl)

@@ -1,9 +1,9 @@
 !>@file   cvt_sph_vector_2_xyz_smp.f90
-!!@brief  module cvt_sph_vector_2_xyz_smp
+!!        module cvt_sph_vector_2_xyz_smp
 !!
 !!@author H. Matsui
 !!@date Programmed in June, 2005
-!
+!!
 !>@brief Convert vector from spherical coordinate
 !!       to Cartesian coordinate
 !!

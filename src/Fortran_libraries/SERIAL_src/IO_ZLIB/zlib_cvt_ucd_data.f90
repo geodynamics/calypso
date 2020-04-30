@@ -34,6 +34,8 @@
       subroutine defleate_ucd_vector(nnod, num, ntot_comp, vect,        &
      &          istack_merged_intnod, zbuf)
 !
+      use gzip_defleate
+!
       integer(kind = kint_gl), intent(in) :: istack_merged_intnod
       integer(kind = kint_gl), intent(in) :: nnod, num
       integer(kind=kint), intent(in) :: ntot_comp
@@ -44,7 +46,7 @@
       integer(kind = kint_gl) :: inod_gl, inod, ist
       integer :: nline
       integer(kind = kint_gl) :: ilen_tmp
-      integer :: ilen_line, ilen_used, ilen_in
+      integer :: ilen_line, ilen_in
 !
       real(kind = kreal)  :: dat_1(ntot_comp)
 !
@@ -55,19 +57,18 @@
       zbuf%ilen_gz                                                      &
      &      = int(real(num*ilen_line) * 1.01 + 24, KIND(zbuf%ilen_gz))
       call alloc_zip_buffer(zbuf)
+      zbuf%ilen_gzipped = 0
 !
       if(num .eq. 1) then
         ilen_in = int(zbuf%ilen_gz)
         inod_gl = 1 + istack_merged_intnod
         dat_1(1:ntot_comp) = vect(1,1:ntot_comp)
-        call gzip_defleat_once(ilen_line,                               &
+        call gzip_defleat_char_once(ilen_line,                          &
      &      ucd_each_field(inod_gl, ntot_comp, dat_1),                  &
-     &      ilen_in, ilen_used, zbuf%gzip_buf(1))
-        zbuf%ilen_gzipped = ilen_used
+     &      ilen_in, zbuf, zbuf%gzip_buf(1))
 !
       else if(num .gt. 1) then
         ist = 0
-        zbuf%ilen_gzipped = 0
         ilen_tmp = int(dble(huge_30)*1.01+24,KIND(ilen_tmp))
         do
           nline = int(min((num - ist), huge_30/ilen_line))
@@ -75,24 +76,20 @@
 !
           inod_gl = ist+1 + istack_merged_intnod
           dat_1(1:ntot_comp) = vect(ist+1,1:ntot_comp)
-          call gzip_defleat_begin(ilen_line,                            &
+          call gzip_defleat_char_begin(ilen_line,                       &
      &        ucd_each_field(inod_gl, ntot_comp, dat_1),                &
-     &        ilen_in, ilen_used, zbuf%gzip_buf(zbuf%ilen_gzipped+1))
+     &        ilen_in, zbuf, zbuf%gzip_buf(zbuf%ilen_gzipped+1))
 !
           do inod = ist+2, ist+nline-1
             inod_gl =    inod + istack_merged_intnod
             dat_1(1:ntot_comp) = vect(inod,1:ntot_comp)
-            call gzip_defleat_cont(ilen_line,                           &
-     &          ucd_each_field(inod_gl, ntot_comp, dat_1),              &
-     &          ilen_in, ilen_used)
+            call gzip_defleat_char_cont(ilen_line,                      &
+     &          ucd_each_field(inod_gl, ntot_comp, dat_1), zbuf)
           end do
           inod_gl = ist + nline + istack_merged_intnod
           dat_1(1:ntot_comp) = vect(ist+nline,1:ntot_comp)
-          call gzip_defleat_last(ilen_line,                             &
-     &        ucd_each_field(inod_gl, ntot_comp, dat_1),                &
-     &        ilen_in, ilen_used)
-!
-          zbuf%ilen_gzipped = zbuf%ilen_gzipped + ilen_used
+          call gzip_defleat_char_last(ilen_line,                        &
+     &        ucd_each_field(inod_gl, ntot_comp, dat_1), zbuf)
           ist = ist + nline
           if(ist .ge. num) exit
         end do
@@ -107,6 +104,8 @@
       subroutine defleate_ucd_connect                                   &
      &         (nele, ie, nnod_ele, istack_merged_ele, zbuf)
 !
+      use gzip_defleate
+!
       integer(kind = kint_gl), intent(in) :: istack_merged_ele
       integer(kind = kint_gl), intent(in) :: nele
       integer(kind = kint), intent(in) :: nnod_ele
@@ -118,7 +117,7 @@
       integer :: nline
       integer(kind = kint_gl) :: ie0(nnod_ele)
       integer(kind = kint_gl) :: ilen_tmp
-      integer  :: ilen_line, ilen_used, ilen_in
+      integer  :: ilen_line, ilen_in
 !
 !
       iele_gl = 1
@@ -127,19 +126,18 @@
       zbuf%ilen_gz                                                      &
      &      = int(dble(nele*ilen_line) * 1.01 + 24,KIND(zbuf%ilen_gz))
       call alloc_zip_buffer(zbuf)
+      zbuf%ilen_gzipped = 0
 !
       if(nele .eq. 1) then
         ilen_in = int(zbuf%ilen_gz)
         iele_gl = 1
         ie0(1:nnod_ele) = ie(1,1:nnod_ele)
-        call gzip_defleat_once(ilen_line,                               &
+        call gzip_defleat_char_once(ilen_line,                          &
      &      ucd_each_connect(iele_gl, nnod_ele, ie0),                   &
-     &      ilen_in, ilen_used, zbuf%gzip_buf(1))
-        zbuf%ilen_gzipped = ilen_used
+     &      ilen_in, zbuf, zbuf%gzip_buf(1))
 !
       else if(nele .gt. 1) then
         ist = 0
-        zbuf%ilen_gzipped = 0
         ilen_tmp = int(dble(huge_30)*1.01+24,KIND(ilen_tmp))
         do
           nline = int(min((nele - ist), huge_30/ilen_line))
@@ -147,24 +145,20 @@
 !
           iele_gl = ist+1 + istack_merged_ele
           ie0(1:nnod_ele) = ie(ist+1,1:nnod_ele)
-          call gzip_defleat_begin(ilen_line,                            &
+          call gzip_defleat_char_begin(ilen_line,                       &
      &      ucd_each_connect(iele_gl, nnod_ele, ie0),                   &
-     &        ilen_in, ilen_used, zbuf%gzip_buf(zbuf%ilen_gzipped+1))
+     &        ilen_in, zbuf, zbuf%gzip_buf(zbuf%ilen_gzipped+1))
           do i = ist+2, ist+nline-1
             iele_gl = i + istack_merged_ele
             ie0(1:nnod_ele) = ie(i,1:nnod_ele)
-            call gzip_defleat_cont(ilen_line,                           &
-     &          ucd_each_connect(iele_gl, nnod_ele, ie0),               &
-     &          ilen_in, ilen_used)
+            call gzip_defleat_char_cont(ilen_line,                      &
+     &          ucd_each_connect(iele_gl, nnod_ele, ie0), zbuf)
           end do
 !
           iele_gl = ist+nline + istack_merged_ele
           ie0(1:nnod_ele) = ie(ist+nline,1:nnod_ele)
-          call gzip_defleat_last(ilen_line,                             &
-     &      ucd_each_connect(iele_gl, nnod_ele, ie0),                   &
-     &        ilen_in, ilen_used)
-!
-          zbuf%ilen_gzipped = zbuf%ilen_gzipped + ilen_used
+          call gzip_defleat_char_last(ilen_line,                        &
+     &        ucd_each_connect(iele_gl, nnod_ele, ie0), zbuf)
           ist = ist + nline
           if(ist .ge. nele) exit
         end do

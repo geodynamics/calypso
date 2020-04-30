@@ -1,9 +1,9 @@
 !>@file   m_phys_constants.f90
-!!@brief  module m_phys_constants
+!!        module m_phys_constants
 !!
 !!@author H. Matsui and H. Okuda
 !!@date Programmed by H. Matsui on MAy., 2009
-!
+!!
 !> @brief Constants for physical data
 !!
       module m_phys_constants

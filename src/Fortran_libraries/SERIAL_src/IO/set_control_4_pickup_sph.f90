@@ -4,7 +4,7 @@
 !! @author H. Matsui
 !! @date   Programmed in 2012
 !!
-!
+!!
 !> @brief Set control parameter for monitoring spectrum
 !!
 !!@verbatim
@@ -49,7 +49,6 @@
       use t_ctl_data_4_sph_monitor
       use t_pickup_sph_spectr_data
       use t_rms_4_sph_spectr
-      use output_sph_m_square_file
       use skip_comment_f
 !
       type(sph_monitor_control), intent(in) :: smonitor_ctl
@@ -340,7 +339,7 @@
 !    Turn On Nusselt number if temperature gradient is there
       Nu_type%iflag_no_source_Nu = 0
       do i = 1, rj_fld%num_phys
-        if(rj_fld%phys_name(i) .eq. fhd_grad_temp) then
+        if(rj_fld%phys_name(i) .eq. grad_temp%name) then
           Nu_type%iflag_no_source_Nu = 1
           exit
         end if
@@ -355,7 +354,7 @@
 !
 !    Turn Off Nusselt number if heat source is there
       do i = 1, rj_fld%num_phys
-        if(rj_fld%phys_name(i) .eq. fhd_heat_source) then
+        if(rj_fld%phys_name(i) .eq. heat_source%name) then
           Nu_type%iflag_no_source_Nu = 0
           exit
         end if

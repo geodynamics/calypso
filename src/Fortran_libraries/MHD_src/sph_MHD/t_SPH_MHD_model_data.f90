@@ -57,9 +57,9 @@
         type(sph_rotation) :: omega_sph
 !
 !>        Structure of reference temperature
-        type(reference_temperature) :: ref_temp
+        type(reference_field) :: ref_temp
 !>        Structure of reference temperature
-        type(reference_temperature) :: ref_comp
+        type(reference_field) :: ref_comp
 !
 !
 !>        Structure of boundary condition data

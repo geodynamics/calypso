@@ -1,10 +1,10 @@
-!> @file  coordinate_converter.f90
+!>@file  coordinate_converter.f90
 !!      module coordinate_converter
 !!
-!! @author  H. Matsui
-!! @date Programmed in Dec., 1997
-!
-!> @brief transfer position between Cartesian and spherical coordinates
+!!@author  H. Matsui
+!!@date Programmed in Dec., 1997
+!!
+!>@brief transfer position between Cartesian and spherical coordinates
 !!
 !!********************************************************************
 !!

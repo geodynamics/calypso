@@ -76,26 +76,9 @@
 !
       use m_precision
       use m_constants
+      use m_fftw_parameters
 !
       implicit none
-!
-!>      plan ID for fftw
-      integer, parameter :: fftw_plan =    8
-!>      data size of complex for FFTW3
-      integer, parameter :: fftw_complex = 8
-!
-!>      Unit imaginary number
-      complex(kind = fftw_complex), parameter :: iu = (0.0d0,1.0d0)
-!
-!>      estimation flag for FFTW
-      integer(kind = 4), parameter :: FFTW_ESTIMATE = 64
-!>      Meajor flag for FFTW
-      integer(kind = 4), parameter :: FFTW_MEASURE = 0
-!
-      real(kind = kreal) :: elapsed_fftw(3) = (/0.0,0.0,0.0/)
-!
-      private :: iu
-      private :: FFTW_ESTIMATE
 !
 ! ------------------------------------------------------------------
 !
@@ -122,17 +105,10 @@
 !
       Nfft4 = int(Nfft)
       do j = 1, Ncomp
-#ifdef FFTW3_C
-        call kemo_fftw_plan_dft_r2c_1d(plan_forward(j), Nfft4,          &
-     &      X_FFTW(1,j), C_FFTW(1,j) , FFTW_ESTIMATE)
-        call kemo_fftw_plan_dft_c2r_1d(plan_backward(j), Nfft4,         &
-     &      C_FFTW(1,j), X_FFTW(1,j) , FFTW_ESTIMATE)
-#else
         call dfftw_plan_dft_r2c_1d(plan_forward(j), Nfft4,              &
      &      X_FFTW(1,j), C_FFTW(1,j) , FFTW_ESTIMATE)
         call dfftw_plan_dft_c2r_1d(plan_backward(j), Nfft4,             &
      &      C_FFTW(1,j), X_FFTW(1,j) , FFTW_ESTIMATE)
-#endif
       end do
       aNfft = one / dble(Nfft)
 !
@@ -151,15 +127,9 @@
 !
 !
       do j = 1, Ncomp
-#ifdef FFTW3_C
-        call kemo_fftw_destroy_plan(plan_forward(j))
-        call kemo_fftw_destroy_plan(plan_backward(j))
-        call kemo_fftw_cleanup
-#else
         call dfftw_destroy_plan(plan_forward(j))
         call dfftw_destroy_plan(plan_backward(j))
         call dfftw_cleanup
-#endif
       end do
 !
       end subroutine destroy_FFTW_smp
@@ -196,11 +166,7 @@
 !
 !        call cpu_time(dummy(ip,2))
         do j = ist, ied
-#ifdef FFTW3_C
-          call kemo_fftw_execute(plan_forward(j))
-#else
           call dfftw_execute(plan_forward(j))
-#endif
         end do
 !        call cpu_time(rtmp(ip,2))
 !
@@ -264,11 +230,7 @@
 !
 !        call cpu_time(dummy(ip,2))
         do j = ist, ied
-#ifdef FFTW3_C
-          call kemo_fftw_execute(plan_backward(j))
-#else
           call dfftw_execute(plan_backward(j))
-#endif
         end do
 !        call cpu_time(rtmp(ip,2))
 !

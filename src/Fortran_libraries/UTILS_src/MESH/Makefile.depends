@@ -36,8 +36,6 @@ find_grp_ele_id_4_node.o: $(MESHDIR)/find_grp_ele_id_4_node.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 find_node_4_group.o: $(MESHDIR)/find_node_4_group.f90 m_precision.o m_constants.o quicksort.o
 	$(F90) -c $(F90OPTFLAGS) $<
-init_nodal_field_address.o: $(MESHDIR)/init_nodal_field_address.f90 m_precision.o t_geometry_data.o t_phys_address.o t_phys_data.o set_field_address.o
-	$(F90) -c $(F90OPTFLAGS) $<
 load_element_mesh_data.o: $(MESHDIR)/load_element_mesh_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_mesh_data.o t_read_mesh_data.o t_file_IO_parameter.o set_surface_data_4_IO.o set_surface_data.o set_edge_data_4_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 load_mesh_data.o: $(MESHDIR)/load_mesh_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_file_IO_parameter.o t_mesh_data.o t_comm_table.o t_geometry_data.o t_surface_data.o t_edge_data.o t_group_data.o mesh_IO_select.o set_nnod_4_ele_by_type.o cal_minmax_and_stacks.o set_element_data_4_IO.o copy_mesh_structures.o set_group_types_4_IO.o

@@ -1,11 +1,11 @@
 !>@file   m_t_step_parameter.f90
-!!@brief  module m_t_step_parameter
+!!        module m_t_step_parameter
 !!
 !!@author H. Matsui and H. Okuda
 !!@date Programmed in July., 2001
 !!@n    Modified by H. Matsui in 2003
-!
-!> @brief Parameteres for time steppings
+!!
+!>@brief Parameteres for time steppings
 !
       module m_t_step_parameter
 !

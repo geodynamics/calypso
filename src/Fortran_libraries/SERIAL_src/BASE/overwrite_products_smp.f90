@@ -1,11 +1,11 @@
 !>@file   overwrite_products_smp.f90
-!!@brief  module overwrite_products_smp
+!!        module overwrite_products_smp
 !!
 !!@author H. Matsui
 !!@date  programmed by H.Matsui on May., 2009
-!
+!!
 !>@brief subroutines to obatine products of two fields
-!>@n      need $omp parallel to use these routines
+!>        need $omp parallel to use these routines
 !
 !!@verbatim
 !!      subroutine ovwrt_scalar_prod_no_coef_smp(np_smp, nnod,          &

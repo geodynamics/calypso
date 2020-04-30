@@ -1,10 +1,10 @@
 !>@file   read_control_elements.f90
-!!@brief  module read_control_elements
+!!        module read_control_elements
 !!
 !!@author H. Matsui
 !!@date Programmed in Jan., 2005
-!
-!>@brief  Subroutines to read control data
+!!
+!>@brief  Subroutines to read control items
 !!
 !!@verbatim
 !!      subroutine read_real_ctl_item                                   &

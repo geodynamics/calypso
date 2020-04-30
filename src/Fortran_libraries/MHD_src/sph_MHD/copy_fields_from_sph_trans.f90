@@ -20,7 +20,7 @@
 !!      subroutine copy_tensor_from_snap_force(i_trns, i_field,         &
 !!     &          m_folding, sph_rtp, forward, node, nod_fld)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
-!!        type(address_each_sph_trans), intent(in) :: forward
+!!        type(spherical_transform_data), intent(in) :: forward
 !!        type(node_data), intent(in) :: node
 !!        type(phys_data), intent(inout) :: nod_fld
 !!@endverbatim
@@ -53,7 +53,7 @@
       integer(kind = kint), intent(in) :: i_field, i_trns
       integer(kind = kint), intent(in) :: m_folding
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(address_each_sph_trans), intent(in) :: backward
+      type(spherical_transform_data), intent(in) :: backward
       type(node_data), intent(in) :: node
       type(phys_data), intent(inout) :: nod_fld
 !
@@ -75,7 +75,7 @@
       integer(kind = kint), intent(in) :: i_field, i_trns
       integer(kind = kint), intent(in) :: m_folding
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(address_each_sph_trans), intent(in) :: backward
+      type(spherical_transform_data), intent(in) :: backward
       type(node_data), intent(in) :: node
       type(phys_data), intent(inout) :: nod_fld
 !
@@ -97,7 +97,7 @@
       integer(kind = kint), intent(in) :: i_field, i_trns
       integer(kind = kint), intent(in) :: m_folding
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(address_each_sph_trans), intent(in) :: backward
+      type(spherical_transform_data), intent(in) :: backward
       type(node_data), intent(in) :: node
       type(phys_data), intent(inout) :: nod_fld
 !
@@ -120,7 +120,7 @@
       integer(kind = kint), intent(in) :: i_field, i_trns
       integer(kind = kint), intent(in) :: m_folding
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(address_each_sph_trans), intent(in) :: forward
+      type(spherical_transform_data), intent(in) :: forward
       type(node_data), intent(in) :: node
       type(phys_data), intent(inout) :: nod_fld
 !
@@ -142,7 +142,7 @@
       integer(kind = kint), intent(in) :: i_field, i_trns
       integer(kind = kint), intent(in) :: m_folding
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(address_each_sph_trans), intent(in) :: forward
+      type(spherical_transform_data), intent(in) :: forward
       type(node_data), intent(in) :: node
       type(phys_data), intent(inout) :: nod_fld
 !
@@ -164,7 +164,7 @@
       integer(kind = kint), intent(in) :: i_field, i_trns
       integer(kind = kint), intent(in) :: m_folding
       type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(address_each_sph_trans), intent(in) :: forward
+      type(spherical_transform_data), intent(in) :: forward
       type(node_data), intent(in) :: node
       type(phys_data), intent(inout) :: nod_fld
 !

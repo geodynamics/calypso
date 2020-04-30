@@ -93,7 +93,6 @@ module:
 	done
 
 depends:
-	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		echo 'generate dependencies for ' $$dir ; \

@@ -3,7 +3,7 @@
 #
 
 COMMDIR = $$(PARA_SRCDIR)/COMM_src
-SOURCES = $(shell ls *.f90 *.F90)
+SOURCES = $(shell ls *.f90)
 MOD_COMM = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #

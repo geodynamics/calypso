@@ -49,7 +49,7 @@
       use t_sph_trans_arrays_MHD
       use t_sph_boundary_input_data
       use t_bc_data_list
-      use t_select_make_SPH_mesh
+      use t_check_and_make_SPH_mesh
       use t_flex_delta_t_data
       use t_field_4_dynamobench
       use t_sph_mhd_monitor_data_IO
@@ -78,7 +78,6 @@
       use set_control_sph_mhd
       use set_control_sph_data_MHD
       use parallel_load_data_4_sph
-      use set_control_nodal_data
 !
       type(MHD_file_IO_params), intent(inout) :: MHD_files
       type(boundary_spectra), intent(inout) :: bc_IO
@@ -102,8 +101,8 @@
       call set_control_4_SPH_MHD                                        &
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
-     &    sph_maker2%sph_tmp, MHD_files, bc_IO, MHD_step, MHD_prop,     &
-     &    MHD_BC, WK%WK_sph, sph_maker2%gen_sph)
+     &    MHD_files, bc_IO, MHD_step, MHD_prop, MHD_BC, WK%WK_sph,      &
+     &    sph_maker2)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
@@ -152,9 +151,12 @@
       end if
 !
       do ifld = 1, fld_ctl%num
-        if(fld_ctl%c1_tbl(ifld) .eq. fhd_temp) bench%ibench_temp =   1
-        if(fld_ctl%c1_tbl(ifld) .eq. fhd_velo) bench%ibench_velo =   1
-        if(fld_ctl%c1_tbl(ifld) .eq. fhd_magne) bench%ibench_magne = 1
+        if(fld_ctl%c1_tbl(ifld) .eq. temperature%name)                  &
+     &                                   bench%ibench_temp =   1
+        if(fld_ctl%c1_tbl(ifld) .eq. velocity%name)                     &
+     &                                   bench%ibench_velo =   1
+        if(fld_ctl%c1_tbl(ifld) .eq. magnetic_field%name)               &
+     &                                   bench%ibench_magne = 1
       end do
 !
       d_circle%num_phys = bench%ibench_velo + bench%ibench_temp         &
@@ -165,7 +167,7 @@
       if(bench%ibench_temp .gt. 0) then
         ifld = ifld + 1
         bench%ibench_temp = d_circle%istack_component(ifld-1) + 1
-        d_circle%phys_name(ifld) =     fhd_temp
+        d_circle%phys_name(ifld) =     temperature%name
         d_circle%num_component(ifld) = n_scalar
         d_circle%istack_component(ifld)                                 &
      &        = d_circle%istack_component(ifld-1) + n_scalar
@@ -173,7 +175,7 @@
       if(bench%ibench_velo .gt. 0) then
         ifld = ifld + 1
         bench%ibench_velo = d_circle%istack_component(ifld-1) + 1
-        d_circle%phys_name(ifld) =     fhd_velo
+        d_circle%phys_name(ifld) =     velocity%name
         d_circle%num_component(ifld) = n_vector
         d_circle%istack_component(ifld)                                 &
      &        = d_circle%istack_component(ifld-1) + n_vector
@@ -181,12 +183,12 @@
       if(bench%ibench_magne .gt. 0) then
         ifld = ifld + 1
         bench%ibench_magne = d_circle%istack_component(ifld-1) + 1
-        d_circle%phys_name(ifld) =     fhd_magne
+        d_circle%phys_name(ifld) =     magnetic_field%name
         d_circle%num_component(ifld) = n_vector
         d_circle%istack_component(ifld)                                 &
      &        = d_circle%istack_component(ifld-1) + n_vector
       end if
-      d_circle%iflag_monitor = ione
+      d_circle%flag_monitor = .TRUE.
       d_circle%ntot_phys =     d_circle%istack_component(ifld)
       d_circle%num_phys_viz =  d_circle%num_phys
       d_circle%ntot_phys_viz = d_circle%ntot_phys

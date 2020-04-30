@@ -149,7 +149,7 @@
 !
       j = 0
       do i = 1, nod_fld%num_phys
-        if (nod_fld%iflag_monitor(i) .eq. 1 ) then
+        if(nod_fld%flag_monitor(i)) then
           j = j + 1
           num_comp_phys_monitor(j) = nod_fld%num_component(i)
           phys_name_monitor(j) =     nod_fld%phys_name(i)
@@ -250,7 +250,7 @@
         write(id_monitor_file,'(1p3e25.15e3)',                          &
      &             advance='NO') node%xx(inod,1:3)
         do i_fld = 1, nod_fld%num_phys
-          if(nod_fld%iflag_monitor(i_fld) .gt. 0) then
+          if(nod_fld%flag_monitor(i_fld)) then
             ist = nod_fld%istack_component(i_fld-1) + 1
             ied = nod_fld%istack_component(i_fld)
             write(id_monitor_file,'(1p6E25.15e3)',                      &
