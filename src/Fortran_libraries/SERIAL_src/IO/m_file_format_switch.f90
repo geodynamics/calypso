@@ -50,7 +50,9 @@
       integer(kind = kint), parameter :: iflag_single =  100
 !
 !>      Integer flag for Rayleigh data
-      integer(kind = kint), parameter :: id_rayleigh = 105
+      integer(kind = kint), parameter :: id_rayleigh =   105
+!>      Integer flag for Rayleigh Ver.0.9x data
+      integer(kind = kint), parameter :: id_rayleigh99 = 195
 !
 !>      ascii flag
       character(len = kchara), parameter :: hd_ascii1 = "ascii"
@@ -236,6 +238,9 @@
 !
 !>      Rayleigh data flag
       character(len = kchara), parameter :: hd_rayleigh = "Rayleigh"
+!>      Rayleigh Ver. 0.9 data flag
+      character(len = kchara), parameter                                &
+     &                        :: hd_rayleigh99 = "Rayleigh_09"
 !
       private :: set_file_format, set_parallel_file_format
 !
@@ -401,6 +406,8 @@
      &     .or. cmp_no_case(file_fmt_ctl, hd_merged_bin_gz15)           &
      &     .or. cmp_no_case(file_fmt_ctl, hd_merged_bin_gz16) ) then
            id_file_fmt = id_gzip_bin_file_fmt + iflag_single
+        else if(cmp_no_case(file_fmt_ctl, hd_rayleigh99)) then
+           id_file_fmt = id_rayleigh99
         else if(cmp_no_case(file_fmt_ctl, hd_rayleigh)) then
            id_file_fmt = id_rayleigh
         else

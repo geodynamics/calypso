@@ -40,10 +40,6 @@
 !!      subroutine int_to_str(int_val, int_string)
 !!      subroutine lint_to_str(lint_val, int_string)
 !!      subroutine real_to_str(real_val, real_string)
-!!
-!!      character(len = kchara) function set_rayleigh_file_name         &
-!!     &                               (dir, int_id, postfix)
-!!               set file name as "[dir]/[int_id]_[postfix]"
 !!@endverbatim
 !!
 !!@n @param dir_file_name    file name (header) including directory name
@@ -285,23 +281,6 @@
       write(real_string,'(a)') trim(adjustl(tmp_string))
 !
       end subroutine real_to_str
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      character(len = kchara) function set_rayleigh_file_name           &
-     &                               (dir, int_id, postfix)
-!
-      integer(kind = kint), intent(in) :: int_id
-      character(len=kchara), intent(in) :: dir, postfix
-!
-!
-      write(set_rayleigh_file_name,1000)                                &
-     &                        trim(dir), int_id, trim(postfix)
-!
- 1000 format(a, '/', i8.8, '_', a)
-!
-      end function set_rayleigh_file_name
 !
 !-----------------------------------------------------------------------
 !

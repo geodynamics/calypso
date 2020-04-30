@@ -164,6 +164,7 @@
      &     (nprocs, mgd_ctl%psph_ctl%Fmesh_ctl,                         &
      &      mgd_ctl%psph_ctl%spctl, mgd_ctl%psph_ctl%sdctl,             &
      &      sph_maker%sph_tmp, sph_maker%gen_sph, ierr)
+        if(ierr .gt. 0) call calypso_mpi_abort(ierr, e_message)
       end if
 !
 !

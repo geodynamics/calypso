@@ -3,7 +3,7 @@
 #
 
 F2003DIR = $$(CORE_SRCDIR)/Fortran2003
-SOURCES = $(shell ls *.f03)
+SOURCES = $(shell ls *.f90)
 MOD_F2003 = $(addsuffix .o,$(basename $(SOURCES)) )
 
 #
