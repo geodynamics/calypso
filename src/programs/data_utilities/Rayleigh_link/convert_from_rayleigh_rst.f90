@@ -80,7 +80,8 @@
       call init_fftpack_4_cheby(rayleigh_WK%nri_tgt, fcheby_WK, ierr)
 !
       do i_fld = 1, new_sph_phys%num_phys
-        if(my_rank .eq. 0) write(*,*) 'set_rayleigh_rst_file_name', i_fld
+!        if(my_rank .eq. 0) write(*,*)                                  &
+!     &      'set_rayleigh_rst_file_name', i_fld
 !
         call set_rayleigh_rst_file_name(ra_rst%i_version,               &
      &      org_fld_file%file_prefix, istep,                            &

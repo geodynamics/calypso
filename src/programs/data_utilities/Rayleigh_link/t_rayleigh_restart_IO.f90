@@ -58,7 +58,7 @@
         integer :: iflag_swap = 0
 !
 !>        truncation degree
-        integer(kind = kint) :: i_version_from_file
+        integer :: i_version_from_file
 !>        truncation degree
         integer(kind = kint) :: ltr_org
 !
