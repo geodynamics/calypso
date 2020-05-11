@@ -35,6 +35,7 @@
 !
       private :: add_work_area_4_potentials, add_ctl_4_forces
       private :: add_data_4_previous_step, add_data_4_check_step
+      private :: add_field_ctl_4_evo_magne
 !
 ! -----------------------------------------------------------------------
 !
@@ -52,9 +53,12 @@
       type(ctl_array_c3), intent(inout) :: field_ctl
 !
 !
-      call add_field_ctl_4_check_evo(MHD_prop%cd_prop, field_ctl)
+      call add_field_ctl_4_check_evo(field_ctl)
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &    'add_field_ctl_4_check_evo end'
+      call add_field_ctl_4_evo_magne(MHD_prop%cd_prop, field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_field_ctl_4_evo_magne end'
 !
       call add_field_ctl_4_field_products(field_ctl)
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
@@ -289,6 +293,29 @@
 !      end if
 !
       end subroutine add_data_4_check_step
+!
+! -----------------------------------------------------------------------
+!
+      subroutine add_field_ctl_4_evo_magne(cd_prop, field_ctl)
+!
+      use t_physical_property
+      use t_explicit_term_labels
+      use t_base_field_labels
+      use add_nodal_fields_ctl
+!
+      type(conductive_property), intent(in) :: cd_prop
+      type(ctl_array_c3), intent(inout) :: field_ctl
+!
+!
+      if(cd_prop%iflag_Aevo_scheme .gt. id_no_evolution) then
+        if(check_field_list_ctl(check_induction%name, field_ctl))       &
+     &     call add_phys_name_ctl(vector_potential%name, field_ctl)
+      else
+        if(check_field_list_ctl(check_induction%name, field_ctl))       &
+     &     call add_phys_name_ctl(magnetic_field%name, field_ctl)
+      end if
+!
+      end subroutine add_field_ctl_4_evo_magne
 !
 ! -----------------------------------------------------------------------
 !

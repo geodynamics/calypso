@@ -9,7 +9,7 @@
 !!@verbatim
 !!      integer(kind= kint) function choose_file_format(file_fmt)
 !!      integer(kind= kint) function choose_para_file_format(file_fmt)
-!!        type(read_integer_item), intent(in) :: file_fmt
+!!        type(read_character_item), intent(in) :: file_fmt
 !!      subroutine choose_file_format_array(num, files_fmt, id_files_fmt)
 !!        type(ctl_array_chara), intent(in) :: files_fmt
 !!
@@ -252,7 +252,7 @@
 !
       integer(kind= kint) function choose_file_format(file_fmt)
 !
-      use t_control_elements
+      use t_control_array_character
 !
       type(read_character_item), intent(in) :: file_fmt
 !
@@ -266,7 +266,7 @@
 !
       integer(kind= kint) function choose_para_file_format(file_fmt)
 !
-      use t_control_elements
+      use t_control_array_character
 !
       type(read_character_item), intent(in) :: file_fmt
 !

@@ -7,11 +7,22 @@
 !>@brief  Subroutines to read char-int-int-int control arrays
 !!
 !!@verbatim
+!!      subroutine read_charaint3_ctl_type(c_buf, label, ci3_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_chara_int3_item), intent(inout) :: ci3_item
+!!      subroutine write_charaint3_ctl_type                             &
+!!     &         (id_file, level, label, ci3_item)
+!!        type(read_chara_int3_item), intent(in) :: ci3_item
+!!      subroutine copy_charaint3_ctl(org_ci3, new_ci3)
+!!        type(read_chara_int3_item), intent(in) :: org_ci3
+!!        type(read_chara_int3_item), intent(inout) :: new_ci3
+!!
 !!      subroutine alloc_control_array_c_i3(array_ci3)
 !!      subroutine dealloc_control_array_c_i3(array_ci3)
 !!      subroutine read_control_array_c_i3                              &
 !!     &         (id_control, label, array_ci3, c_buf)
 !!        type(ctl_array_ci3), intent(inout) :: array_ci3
+!!        type(buffer_for_control), intent(in)  :: c_buf
 !!      subroutine write_control_array_c_i3                             &
 !!     &         (id_control, level, label, array_ci3)
 !!        type(ctl_array_ci3), intent(in) :: array_ci3
@@ -31,9 +42,19 @@
       module t_control_array_charaint3
 !
       use m_precision
-      use t_control_elements
+      use m_machine_parameter
 !
       implicit none
+!
+!>        structure of control item with character and three integers
+      type read_chara_int3_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read character items
+        character(len=kchara) ::  charavalue
+!>        array for read integer items
+        integer(kind = kint) ::  intvalue(3)
+      end type read_chara_int3_item
 !
 !>  Structure for charactor and integer control array 
       type ctl_array_ci3
@@ -55,6 +76,67 @@
 !
       contains
 !
+!   --------------------------------------------------------------------
+!
+      subroutine read_charaint3_ctl_type(c_buf, label, ci3_item)
+!
+      use t_read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_chara_int3_item), intent(inout) :: ci3_item
+!
+       character(len=kchara) :: tmpchara
+!
+!
+      if(ci3_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, ci3_item%charavalue,           &
+     &                         ci3_item%intvalue(1:3)
+      if (iflag_debug .gt. 0)  write(*,'(a,a7,2i16)')                   &
+     &       trim(c_buf%header_chara), ' ci3_item%charavalue:  ',       &
+     &       trim(ci3_item%charavalue)
+      if (iflag_debug .gt. 0)  write(*,'(a,a7,1p2e23.15)')              &
+     &       trim(c_buf%header_chara), ' int: ', ci3_item%intvalue(1:3)
+      ci3_item%iflag = 1
+!
+      end subroutine read_charaint3_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_charaint3_ctl_type                               &
+     &         (id_file, level, label, ci3_item)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      character(len=kchara), intent(in) :: label
+      type(read_chara_int3_item), intent(in) :: ci3_item
+!
+!
+      if(ci3_item%iflag .eq. 0) return
+!
+      call write_chara_int3_ctl_item(id_file, level, label,             &
+     &    ci3_item%charavalue, ci3_item%intvalue(1),                    &
+     &    ci3_item%intvalue(2), ci3_item%intvalue(3))
+!
+       end subroutine write_charaint3_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_charaint3_ctl(org_ci3, new_ci3)
+!
+      type(read_chara_int3_item), intent(in) :: org_ci3
+      type(read_chara_int3_item), intent(inout) :: new_ci3
+!
+!
+      new_ci3%iflag =          org_ci3%iflag
+      new_ci3%charavalue =     org_ci3%charavalue
+      new_ci3%intvalue(1:3) =  org_ci3%intvalue(1:3)
+!
+       end subroutine copy_charaint3_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_c_i3(array_ci3)

@@ -34,7 +34,6 @@
 !
       use calypso_mpi
       use t_ctl_data_temp_model
-      use t_control_elements
 !
       implicit  none
 !
@@ -102,7 +101,6 @@
 !
       use calypso_mpi
       use t_ctl_data_temp_model
-      use t_control_elements
 !
       character(len = kchara), intent(in) :: charaflag
       type(reference_temperature_ctl), intent(in) :: ref_ctl
@@ -127,6 +125,8 @@
 !
       subroutine set_linear_ref_scalar_ctl                              &
      &         (ref_temp_ctl, low_temp_ctl, high_temp_ctl, ref_param)
+!
+      use t_control_array_character
 !
       type(read_character_item), intent(in) :: ref_temp_ctl
       type(reference_point_control), intent(in) :: low_temp_ctl
@@ -205,7 +205,7 @@
 !
       use calypso_mpi
       use t_ctl_data_temp_model
-      use t_control_elements
+      use t_control_array_character
 !
       type(read_character_item), intent(in) :: stratified_ctl
       type(takepiro_model_control), intent(in) :: takepiro_ctl

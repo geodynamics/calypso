@@ -64,6 +64,7 @@
       use field_IO_select
       use share_spectr_index_data
       use count_nnod_4_asseble_sph
+      use rayleigh_restart_IO
 !
       use share_field_data
 !
@@ -83,7 +84,10 @@
 !
 !  set original Rayleigh spectr data
 !
-      ra_rst_s%i_version = asbl_param_s%org_fld_file%iflag_format
+      ra_rst_s%i_version = 1
+      if(asbl_param_s%org_fld_file%iflag_format .eq. id_Rayleigh99)     &
+     & ra_rst_s%i_version = 0
+!
       call init_rayleigh_restart_params(asbl_param_s%istep_start,       &
      &    asbl_param_s%org_fld_file, ra_rst_s)
         if(my_rank .eq. 0) call check_rayleigh_rst_params(6, ra_rst_s)

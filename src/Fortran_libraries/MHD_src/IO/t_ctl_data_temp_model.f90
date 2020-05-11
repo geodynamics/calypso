@@ -78,7 +78,8 @@
 !
       use m_machine_parameter
       use t_read_control_elements
-      use t_control_elements
+      use t_control_array_character
+      use t_control_array_real
       use skip_comment_f
       use bcast_control_arrays
 !

@@ -158,14 +158,8 @@ t_sph_FFT_selector.o: $(SPH_COMMDIR)/t_sph_FFT_selector.F90 m_precision.o m_mach
 	$(F90) -c $(F90FLAGS) $<
 t_sph_ISPACK_FFT.o: $(SPH_COMMDIR)/t_sph_ISPACK_FFT.f90 m_precision.o m_constants.o m_machine_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_sph_center_matrix.o: $(SPH_COMMDIR)/t_sph_center_matrix.f90 m_precision.o m_machine_parameter.o t_sph_matrix.o t_spheric_rj_data.o m_ludcmp_3band.o m_ludcmp_band.o lubksb_357band.o check_sph_radial_mat.o
-	$(F90) -c $(F90OPTFLAGS) $<
 t_sph_field_FFTW.o: $(SPH_COMMDIR)/t_sph_field_FFTW.F90 m_precision.o m_constants.o m_machine_parameter.o t_sph_single_FFTW.o
 	$(F90) -c $(F90FLAGS) $<
-t_sph_matrices.o: $(SPH_COMMDIR)/t_sph_matrices.f90 m_precision.o m_machine_parameter.o t_spheric_rj_data.o ludcmp_357band_mul.o lubksb_357band_mul.o check_sph_radial_mat.o
-	$(F90) -c $(F90OPTFLAGS) $<
-t_sph_matrix.o: $(SPH_COMMDIR)/t_sph_matrix.f90 m_precision.o m_machine_parameter.o t_spheric_rj_data.o m_ludcmp_3band.o m_ludcmp_band.o lubksb_357band.o check_sph_radial_mat.o
-	$(F90) -c $(F90OPTFLAGS) $<
 t_sph_multi_FFTW.o: $(SPH_COMMDIR)/t_sph_multi_FFTW.F90 m_precision.o m_constants.o m_machine_parameter.o t_sph_single_FFTW.o
 	$(F90) -c $(F90FLAGS) $<
 t_sph_single_FFTW.o: $(SPH_COMMDIR)/t_sph_single_FFTW.F90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o

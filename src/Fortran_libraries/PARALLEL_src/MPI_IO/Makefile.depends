@@ -96,7 +96,7 @@ mpi_load_mesh_data.o: $(MPI_IO_DIR)/mpi_load_mesh_data.f90 m_precision.o m_const
 	$(F90) -c $(F90OPTFLAGS) $<
 output_parallel_ucd_file.o: $(MPI_IO_DIR)/output_parallel_ucd_file.f90 m_precision.o calypso_mpi.o t_file_IO_parameter.o t_time_data.o t_ucd_data.o m_field_file_format.o t_geometry_data.o t_comm_table.o t_phys_data.o merged_udt_vtk_file_IO.o parallel_ucd_IO_select.o set_ucd_data_to_type.o ucd_IO_select.o
 	$(F90) -c $(F90OPTFLAGS) $<
-parallel_ucd_IO_select.o: $(MPI_IO_DIR)/parallel_ucd_IO_select.F90 m_precision.o m_file_format_switch.o m_field_file_format.o calypso_mpi.o t_file_IO_parameter.o t_time_data.o t_ucd_data.o t_ctl_data_4_platforms.o t_control_elements.o ucd_IO_select.o write_ucd_to_vtk_file.o merged_udt_vtk_file_IO.o gz_merged_udt_vtk_file_IO.o gz_vtk_file_IO.o hdf5_file_IO.o skip_comment_f.o
+parallel_ucd_IO_select.o: $(MPI_IO_DIR)/parallel_ucd_IO_select.F90 m_precision.o m_file_format_switch.o m_field_file_format.o calypso_mpi.o t_file_IO_parameter.o t_time_data.o t_ucd_data.o t_ctl_data_4_platforms.o t_control_array_character.o ucd_IO_select.o write_ucd_to_vtk_file.o merged_udt_vtk_file_IO.o gz_merged_udt_vtk_file_IO.o gz_vtk_file_IO.o hdf5_file_IO.o skip_comment_f.o
 	$(F90) -c $(F90FLAGS) $<
 sph_file_MPI_IO_select.o: $(MPI_IO_DIR)/sph_file_MPI_IO_select.F90 m_precision.o calypso_mpi.o m_file_format_switch.o t_spheric_data_IO.o t_file_IO_parameter.o set_parallel_file_name.o set_mesh_file_names.o sph_file_IO_select.o MPI_sph_modes_file_IO.o MPI_sph_modes_file_IO_b.o gz_MPI_sph_modes_file_IO.o gz_MPI_sph_modes_file_IO_b.o
 	$(F90) -c $(F90FLAGS) $<

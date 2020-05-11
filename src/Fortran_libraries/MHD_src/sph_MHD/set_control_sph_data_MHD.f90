@@ -119,8 +119,6 @@
       type(boundary_spectra), intent(inout) :: bc_IO
       type(spherical_trns_works), intent(inout) :: WK_sph
 !
-      integer(kind = kint) :: ierr
-!
 !   overwrite restart header for magnetic field extension
 !
       if( (rj_org_param%iflag_IO*rst_org_param%iflag_IO) .gt. 0)        &

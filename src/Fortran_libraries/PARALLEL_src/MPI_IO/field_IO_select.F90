@@ -9,8 +9,8 @@
 !> @brief read and write restart file
 !!
 !!@verbatim
-!!      integer(kind = kint) function check_step_FEM_field_file         &
-!!     &                            (id_rank, istep_fld, file_IO)
+!!      logical function check_step_FEM_field_file                      &
+!!     &                (id_rank, istep_fld, file_IO)
 !!
 !!      subroutine sel_write_step_FEM_field_file                        &
 !!     &         (num_pe, id_rank, istep_fld, file_IO, t_IO, fld_IO)
@@ -70,8 +70,8 @@
 !
 !------------------------------------------------------------------
 !
-      integer(kind = kint) function check_step_FEM_field_file           &
-     &                            (id_rank, istep_fld, file_IO)
+      logical function check_step_FEM_field_file                        &
+     &                (id_rank, istep_fld, file_IO)
 !
       use set_field_file_names
       use delete_data_files

@@ -148,7 +148,7 @@ m_SPH_MHD_structure.o: $(MHD_SPH_DIR)/m_SPH_MHD_structure.f90 m_precision.o t_SP
 	$(F90) -c $(F90OPTFLAGS) $<
 m_elapsed_labels_4_MHD.o: $(MHD_SPH_DIR)/m_elapsed_labels_4_MHD.f90 m_precision.o m_work_time.o
 	$(F90) -c $(F90OPTFLAGS) $<
-m_initial_field_control.o: $(MHD_SPH_DIR)/m_initial_field_control.f90 m_precision.o calypso_mpi.o m_error_IDs.o m_machine_parameter.o t_control_elements.o t_ctl_data_4_time_steps.o skip_comment_f.o
+m_initial_field_control.o: $(MHD_SPH_DIR)/m_initial_field_control.f90 m_precision.o calypso_mpi.o m_error_IDs.o m_machine_parameter.o t_control_array_character.o t_ctl_data_4_time_steps.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 material_property.o: $(MHD_SPH_DIR)/material_property.f90 m_precision.o m_constants.o t_phys_address.o t_control_parameter.o t_physical_property.o calypso_mpi.o construct_MHD_coefficient.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -292,7 +292,13 @@ t_radial_matrices_sph_MHD.o: $(MHD_SPH_DIR)/t_radial_matrices_sph_MHD.f90 m_prec
 	$(F90) -c $(F90OPTFLAGS) $<
 t_radial_reference_temp.o: $(MHD_SPH_DIR)/t_radial_reference_temp.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_reference_scalar_param.o: $(MHD_SPH_DIR)/t_reference_scalar_param.f90 m_precision.o m_error_IDs.o m_machine_parameter.o calypso_mpi.o t_ctl_data_temp_model.o t_control_elements.o
+t_reference_scalar_param.o: $(MHD_SPH_DIR)/t_reference_scalar_param.f90 m_precision.o m_error_IDs.o m_machine_parameter.o calypso_mpi.o t_ctl_data_temp_model.o t_control_array_character.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_center_matrix.o: $(MHD_SPH_DIR)/t_sph_center_matrix.f90 m_precision.o m_machine_parameter.o t_sph_matrix.o t_spheric_rj_data.o m_ludcmp_3band.o m_ludcmp_band.o lubksb_357band.o check_sph_radial_mat.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_matrices.o: $(MHD_SPH_DIR)/t_sph_matrices.f90 m_precision.o m_machine_parameter.o t_spheric_rj_data.o ludcmp_357band_mul.o lubksb_357band_mul.o check_sph_radial_mat.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_matrix.o: $(MHD_SPH_DIR)/t_sph_matrix.f90 m_precision.o m_machine_parameter.o t_spheric_rj_data.o m_ludcmp_3band.o m_ludcmp_band.o lubksb_357band.o check_sph_radial_mat.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_sph_mhd_monitor_data_IO.o: $(MHD_SPH_DIR)/t_sph_mhd_monitor_data_IO.f90 m_precision.o calypso_mpi.o m_machine_parameter.o t_SPH_mesh_field_data.o t_schmidt_poly_on_rtm.o t_rms_4_sph_spectr.o t_sum_sph_rms_data.o t_pickup_sph_spectr_data.o t_no_heat_Nusselt.o t_IO_step_parameter.o t_energy_label_parameters.o pickup_sph_spectr_data.o output_sph_m_square_file.o m_error_IDs.o pickup_gauss_coefficients.o cal_rms_fields_by_sph.o MPI_sph_gauss_coefs_IO.o t_time_data.o t_boundary_data_sph_MHD.o cal_write_sph_monitor_data.o
 	$(F90) -c $(F90OPTFLAGS) $<

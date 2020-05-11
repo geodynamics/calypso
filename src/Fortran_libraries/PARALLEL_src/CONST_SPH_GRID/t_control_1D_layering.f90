@@ -14,7 +14,6 @@
 !!     &         (name_prefix, layer_list_ctl, layering)
 !!      subroutine set_group_by_equidivide                            &
 !!     &         (name_prefix, istart, iend, num_layer_ctl, layering)
-!!        type(read_integer_item), intent(in) :: istart, iend
 !!        type(read_integer_item), intent(in) :: num_layer_ctl
 !!        type(ctl_array_i2), intent(in) :: layer_list_ctl
 !!        type(layering_group_list), intent(inout) :: layering
@@ -102,7 +101,7 @@
       subroutine set_group_by_equidivide                                &
      &         (name_prefix, istart, iend, num_layer_ctl, layering)
 !
-      use t_control_elements
+      use t_control_array_integer
       use set_parallel_file_name
       use cal_minmax_and_stacks
 !

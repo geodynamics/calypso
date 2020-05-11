@@ -7,11 +7,22 @@
 !>@brief  Subroutines to read control arrays
 !!
 !!@verbatim
+!!      subroutine read_real_ctl_type(c_buf, label, real_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_real_item), intent(inout) :: real_item
+!!      subroutine write_real_ctl_type                                  &
+!!     &         (id_file, level, maxlen, label, real_item)
+!!        type(read_real_item), intent(in) :: real_item
+!!      subroutine copy_real_ctl(org_r1, new_r1)
+!!        type(read_real_item), intent(in) :: org_r1
+!!        type(read_real_item), intent(inout) :: new_r1
+!!
 !!      subroutine alloc_control_array_real(array_real)
 !!      subroutine dealloc_control_array_real(array_real)
 !!      subroutine read_control_array_r1                                &
 !!     &         (id_control, label, array_real, c_buf)
 !!        type(ctl_array_real), intent(inout) :: array_real
+!!        type(buffer_for_control), intent(in)  :: c_buf
 !!      subroutine write_control_array_r1                               &
 !!     &         (id_control, level, label, array_real)
 !!        type(ctl_array_real), intent(in) :: array_real
@@ -31,9 +42,17 @@
       module t_control_array_real
 !
       use m_precision
-      use t_control_elements
+      use m_machine_parameter
 !
       implicit none
+!
+!>        structure of control real item
+      type read_real_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read real item
+        real(kind = kreal) ::    realvalue
+      end type read_real_item
 !
 !>  Structure for real control array 
       type ctl_array_real
@@ -49,6 +68,61 @@
 !
       contains
 !
+!   --------------------------------------------------------------------
+!
+      subroutine read_real_ctl_type(c_buf, label, real_item)
+!
+      use t_read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_real_item), intent(inout) :: real_item
+!
+      character(len=kchara) :: tmpchara
+!
+!
+      if(real_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, real_item%realvalue
+      if (iflag_debug .gt. 0)  write(*,*) trim(c_buf%header_chara),     &
+     &                       real_item%realvalue
+      real_item%iflag = 1
+!
+      end subroutine read_real_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_real_ctl_type                                    &
+     &         (id_file, level, maxlen, label, real_item)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      integer(kind = kint), intent(in) :: maxlen
+      character(len=kchara), intent(in) :: label
+      type(read_real_item), intent(in) :: real_item
+!
+!
+      if(real_item%iflag .eq. 0) return
+      call write_real_ctl_item                                          &
+     &   (id_file, level, maxlen, label, real_item%realvalue)
+!
+      end subroutine write_real_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_real_ctl(org_r1, new_r1)
+!
+      type(read_real_item), intent(in) :: org_r1
+      type(read_real_item), intent(inout) :: new_r1
+!
+!
+      new_r1%iflag =     org_r1%iflag
+      new_r1%realvalue = org_r1%realvalue
+!
+      end subroutine copy_real_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_real(array_real)

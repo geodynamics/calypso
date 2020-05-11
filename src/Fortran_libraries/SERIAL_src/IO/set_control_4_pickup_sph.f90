@@ -328,7 +328,7 @@
       use m_phys_labels
       use t_no_heat_Nusselt
       use t_phys_data
-      use t_control_elements
+      use t_control_array_character
 !
       type(read_character_item), intent(in) :: Nusselt_file_prefix
       type(phys_data), intent(in) :: rj_fld

@@ -24,6 +24,8 @@ t_picked_sph_spectr_data_IO.o \
 tave_picked_sph_spec_data.o
 
 MOD_SPH_ENE_CHECK = \
+m_precision.o \
+skip_comment_f.o \
 compare_sph_mean_square.o
 
 

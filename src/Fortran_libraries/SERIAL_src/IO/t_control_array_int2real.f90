@@ -7,11 +7,22 @@
 !>@brief  Subroutines to read int-int-real control arrays
 !!
 !!@verbatim
+!!      subroutine read_int2real_ctl_type(c_buf, label, i2r_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_int2_real_item), intent(inout) :: i2r_item
+!!      subroutine write_int2real_ctl_type                              &
+!!     &         (id_file, level, label, i2r_item)
+!!        type(read_int2_real_item), intent(in) :: i2r_item
+!!      subroutine copy_int2real_ctl(org_i2r, new_i2r)
+!!        type(read_int2_real_item), intent(in) :: org_i2r
+!!        type(read_int2_real_item), intent(inout) :: new_i2r
+!!
 !!      subroutine alloc_control_array_i2_r(array_i2r)
 !!      subroutine dealloc_control_array_i2_r(array_i2r)
 !!      subroutine read_control_array_i2_r                              &
 !!     &         (id_control, label, array_i2r, c_buf)
 !!        type(ctl_array_i2r), intent(inout) :: array_i2r
+!!        type(buffer_for_control), intent(in)  :: c_buf
 !!      subroutine write_control_array_i2_r                             &
 !!     &         (id_control, level, label, array_i2r)
 !!        type(ctl_array_i2r), intent(in) :: array_i2r
@@ -31,9 +42,19 @@
       module t_control_array_int2real
 !
       use m_precision
-      use t_control_elements
+      use m_machine_parameter
 !
       implicit none
+!
+!>        structure of control item with three characters
+      type read_int2_real_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read integer items
+        integer(kind = kint) ::  intvalue(2)
+!>        array for read real item
+        real(kind = kreal) ::    realvalue
+      end type read_int2_real_item
 !
 !>  Structure for 1 real and 2 integers control array 
       type ctl_array_i2r
@@ -53,6 +74,66 @@
 !
       contains
 !
+!   --------------------------------------------------------------------
+!
+      subroutine read_int2real_ctl_type(c_buf, label, i2r_item)
+!
+      use t_read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_int2_real_item), intent(inout) :: i2r_item
+!
+      character(len=kchara) :: tmpchara
+!
+!
+      if(i2r_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, i2r_item%intvalue(1:2),        &
+     &                         i2r_item%realvalue
+      if (iflag_debug .gt. 0)  write(*,'(a,a7,2i16)')                   &
+     &      trim(c_buf%header_chara), ' int:  ', i2r_item%intvalue(1:2)
+      if (iflag_debug .gt. 0)  write(*,'(a,a7,1pe23.15)')               &
+     &      trim(c_buf%header_chara), ' real: ', i2r_item%realvalue
+      i2r_item%iflag = 1
+!
+      end subroutine read_int2real_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_int2real_ctl_type                                &
+     &         (id_file, level, label, i2r_item)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      character(len=kchara), intent(in) :: label
+      type(read_int2_real_item), intent(in) :: i2r_item
+!
+!
+      if(i2r_item%iflag .eq. 0) return
+!
+      call write_i2_r_ctl_item(id_file, level, label,                   &
+     &    i2r_item%intvalue(1),  i2r_item%intvalue(2),                  &
+     &    i2r_item%realvalue)
+!
+       end subroutine write_int2real_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_int2real_ctl(org_i2r, new_i2r)
+!
+      type(read_int2_real_item), intent(in) :: org_i2r
+      type(read_int2_real_item), intent(inout) :: new_i2r
+!
+!
+      new_i2r%iflag =         org_i2r%iflag
+      new_i2r%intvalue(1:2) = org_i2r%intvalue(1:2)
+      new_i2r%realvalue =     org_i2r%realvalue
+!
+       end subroutine copy_int2real_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_i2_r(array_i2r)

@@ -51,7 +51,7 @@
       use m_precision
 !
       use t_read_control_elements
-      use t_control_elements
+      use t_control_array_character
       use t_ctl_data_sph_vol_spectr
       use t_ctl_data_pick_sph_spectr
       use t_mid_equator_control

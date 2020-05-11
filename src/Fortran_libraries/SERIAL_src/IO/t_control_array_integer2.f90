@@ -7,11 +7,22 @@
 !>@brief  Subroutines to read control arrays
 !!
 !!@verbatim
+!!      subroutine read_integer2_ctl_type(c_buf, label, int2_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_int2_item), intent(inout) :: int2_item
+!!      subroutine write_integer2_ctl_type                              &
+!!     &         (id_file, level, label, int2_item)
+!!        type(read_int2_item), intent(in) :: int2_item
+!!      subroutine copy_integer2_ctl(org_i2, new_i2)
+!!        type(read_int2_item), intent(in) :: org_i2
+!!        type(read_int2_item), intent(inout) :: new_i2
+!!
 !!      subroutine alloc_control_array_i2(array_i2)
 !!      subroutine dealloc_control_array_i2(array_i2)
 !!      subroutine read_control_array_i2                                &
 !!     &         (id_control, label, array_i2, c_buf)
 !!        type(ctl_array_i2), intent(inout) :: array_i2
+!!        type(buffer_for_control), intent(inout)  :: c_buf
 !!      subroutine write_control_array_i2                               &
 !!     &         (id_control, level, label, array_i2)
 !!        type(ctl_array_i2), intent(in) :: array_i2
@@ -34,9 +45,17 @@
       module t_control_array_integer2
 !
       use m_precision
-      use t_control_elements
+      use m_machine_parameter
 !
       implicit none
+!
+!>        structure of control integer item
+      type read_int2_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read integer item
+        integer(kind = kint) ::  intvalue(2)
+      end type read_int2_item
 !
 !>  Structure for 2 integers control array 
       type ctl_array_i2
@@ -55,6 +74,59 @@
 !
       contains
 !
+!   --------------------------------------------------------------------
+!
+      subroutine read_integer2_ctl_type(c_buf, label, int2_item)
+!
+      use t_read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_int2_item), intent(inout) :: int2_item
+!
+      character(len=kchara) :: tmpchara
+!
+!
+      if(int2_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, int2_item%intvalue(1:2)
+      if (iflag_debug .gt. 0)  write(*,'(a,a2,2i6)')                    &
+     &          trim(c_buf%header_chara), ': ', int2_item%intvalue(1:2)
+      int2_item%iflag = 1
+!
+      end subroutine read_integer2_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_integer2_ctl_type                                &
+     &         (id_file, level, label, int2_item)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      character(len=kchara), intent(in) :: label
+      type(read_int2_item), intent(in) :: int2_item
+!
+!
+      if(int2_item%iflag .eq. 0) return
+      call write_integer2_ctl_item(id_file, level, label,               &
+     &    int2_item%intvalue(1), int2_item%intvalue(2))
+!
+       end subroutine write_integer2_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_integer2_ctl(org_i2, new_i2)
+!
+      type(read_int2_item), intent(in) :: org_i2
+      type(read_int2_item), intent(inout) :: new_i2
+!
+      new_i2%iflag =         org_i2%iflag
+      new_i2%intvalue(1:2) = org_i2%intvalue(1:2)
+!
+      end subroutine copy_integer2_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_i2(array_i2)

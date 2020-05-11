@@ -7,14 +7,10 @@
 !>@brief  Choose mesh file to read
 !!
 !!@verbatim
-!!      integer(kind = kint) function check_exist_mesh                  &
-!!     &                            (mesh_file, id_rank)
-!!      integer(kind = kint) function check_exist_ele_mesh              &
-!!     &                            (mesh_file, id_rank)
-!!      integer(kind = kint) function check_exist_surf_mesh             &
-!!     &                            (mesh_file, id_rank)
-!!      integer(kind = kint) function check_exist_edge_mesh             &
-!!     &                            (mesh_file, id_rank)
+!!      logical function check_exist_mesh(mesh_file, id_rank)
+!!      logical function check_exist_ele_mesh(mesh_file, id_rank)
+!!      logical function check_exist_surf_mesh(mesh_file, id_rank)
+!!      logical function check_exist_edge_mesh(mesh_file, id_rank)
 !!@endverbatim
 !
       module mesh_file_name_by_param
@@ -32,8 +28,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      integer(kind = kint) function check_exist_mesh                    &
-     &                            (mesh_file, id_rank)
+      logical function check_exist_mesh(mesh_file, id_rank)
 !
       use set_mesh_file_names
       use delete_data_files
@@ -54,8 +49,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      integer(kind = kint) function check_exist_ele_mesh                &
-     &                            (mesh_file, id_rank)
+      logical function check_exist_ele_mesh(mesh_file, id_rank)
 !
       use set_mesh_file_names
       use delete_data_files
@@ -76,8 +70,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      integer(kind = kint) function check_exist_surf_mesh               &
-     &                            (mesh_file, id_rank)
+      logical function check_exist_surf_mesh(mesh_file, id_rank)
 !
       use set_mesh_file_names
       use delete_data_files
@@ -98,8 +91,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      integer(kind = kint) function check_exist_edge_mesh               &
-     &                            (mesh_file, id_rank)
+      logical function check_exist_edge_mesh(mesh_file, id_rank)
 !
       use set_mesh_file_names
       use delete_data_files

@@ -4,7 +4,7 @@ check_base_forces.o: $(FIELDIR)/check_base_forces.f90 m_precision.o m_constants.
 	$(F90) -c $(F90OPTFLAGS) $<
 check_energy_fluxes.o: $(FIELDIR)/check_energy_fluxes.f90 m_precision.o m_constants.o t_base_field_labels.o t_base_force_labels.o t_energy_flux_labels.o t_control_array_character3.o t_diffusion_term_labels.o add_nodal_fields_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
-check_workarea_4_explicit.o: $(FIELDIR)/check_workarea_4_explicit.f90 m_precision.o t_control_array_character3.o t_physical_property.o t_explicit_term_labels.o t_base_field_labels.o add_nodal_fields_ctl.o
+check_workarea_4_explicit.o: $(FIELDIR)/check_workarea_4_explicit.f90 m_precision.o t_control_array_character3.o t_explicit_term_labels.o t_base_field_labels.o add_nodal_fields_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_div_force_labels.o: $(FIELDIR)/m_div_force_labels.f90 m_precision.o m_phys_constants.o t_base_force_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -7,11 +7,22 @@
 !>@brief  Subroutines to read character control arrays
 !!
 !!@verbatim
+!!      subroutine read_chara_ctl_type(c_buf, label, chara_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_character_item), intent(inout) :: chara_item
+!!      subroutine write_chara_ctl_type                                 &
+!!     &         (id_file, level, maxlen, label, chara_item)
+!!        type(read_character_item), intent(in) :: chara_item
+!!      subroutine copy_chara_ctl(org_c1, new_c1)
+!!        type(read_character_item), intent(in) :: org_c1
+!!        type(read_character_item), intent(inout) :: new_c1
+!!
 !!      subroutine alloc_control_array_chara(array_chara)
 !!      subroutine dealloc_control_array_chara(array_chara)
 !!      subroutine read_control_array_c1                                &
 !!     &         (id_control, label, array_chara, c_buf)
 !!        type(ctl_array_chara), intent(inout) :: array_chara
+!!        type(buffer_for_control), intent(in)  :: c_buf
 !!      subroutine write_control_array_c1                               &
 !!     &         (id_control, level, label, array_chara)
 !!        type(ctl_array_chara), intent(in) :: array_chara
@@ -32,9 +43,17 @@
       module t_control_array_character
 !
       use m_precision
-      use t_control_elements
+      use m_machine_parameter
 !
       implicit none
+!
+!>        structure of control character item
+      type read_character_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read character item
+        character(len=kchara) :: charavalue
+      end type read_character_item
 !
 !>  Structure for character control array 
       type ctl_array_chara
@@ -50,6 +69,61 @@
 !
       contains
 !
+!   --------------------------------------------------------------------
+!
+      subroutine read_chara_ctl_type(c_buf, label, chara_item)
+!
+      use t_read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_character_item), intent(inout) :: chara_item
+!
+      character(len=kchara) :: tmpchara
+!
+!
+      if(chara_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, chara_item%charavalue
+      if (iflag_debug .gt. 0)  write(*,*) trim(c_buf%header_chara),     &
+     &                       ': ', trim(chara_item%charavalue)
+      chara_item%iflag = 1
+!
+       end subroutine read_chara_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_chara_ctl_type                                   &
+     &         (id_file, level, maxlen, label, chara_item)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      integer(kind = kint), intent(in) :: maxlen
+      character(len=kchara), intent(in) :: label
+      type(read_character_item), intent(in) :: chara_item
+!
+!
+      if(chara_item%iflag .eq. 0) return
+      call write_character_ctl_item                                     &
+     &   (id_file, level, maxlen, label, chara_item%charavalue)
+!
+       end subroutine write_chara_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_chara_ctl(org_c1, new_c1)
+!
+      type(read_character_item), intent(in) :: org_c1
+      type(read_character_item), intent(inout) :: new_c1
+!
+!
+      new_c1%iflag =      org_c1%iflag
+      new_c1%charavalue = org_c1%charavalue
+!
+       end subroutine copy_chara_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_chara(array_chara)

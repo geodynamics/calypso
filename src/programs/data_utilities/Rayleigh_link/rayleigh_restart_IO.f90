@@ -7,34 +7,83 @@
 !>@brief  Set file extension
 !!
 !!@verbatim
+!!      character(len = kchara) function sel_rayleigh_file_name         &
+!!     &                               (i_version, dir, int_id, postfix)
+!!      subroutine sel_read_rayleigh_rst_params(dir, i_step, ra_rst)
+!!        type(rayleigh_restart), intent(inout) :: ra_rst
+!!          Version 0.99: "[dir]/[int_id]_[field_flag]"
+!!          Version 1.x:  "[dir]/[int_id]/[field_flag]"
+!!
 !!      subroutine init_rayleigh_restart_input                          &
 !!     &         (i_version, dir, i_step, fld_IO)
 !!        type(field_IO), intent(inout) :: fld_IO
-!!      subroutine find_rayleigh_restart_address                        &
-!!     &          (nri, ltr, kr, l, m, ioffset1, ioffset2)
+!!      subroutine set_rayleigh_rst_file_name(i_version, dir, i_step,   &
+!!     &          field_name, iflag_ncomp, file_name)
 !!@endverbatim
 !
       module rayleigh_restart_IO
 !
       use m_precision
       use m_constants
+!
       use t_field_data_IO
       use t_rayleigh_restart_IO
+      use t_base_field_labels
+      use t_explicit_term_labels
+!
       use set_parallel_file_name
 !
       implicit  none
 !
-      private :: count_rayleigh_restart_field
       private :: set_rayleigh_restart_field
-      private :: count_scalar_field_4_raylegh
-      private :: count_vector_field_4_raylegh
-      private :: add_scalar_field_4_raylegh
-      private :: add_vector_field_4_raylegh
+      private :: check_raylegh_rst_field
 !
 !-----------------------------------------------------------------------
 !
       contains
 !
+!-----------------------------------------------------------------------
+!
+      character(len = kchara) function sel_rayleigh_file_name           &
+     &                               (i_version, dir, int_id, postfix)
+!
+      use rayleigh99_rst_param_IO
+!
+      integer(kind = kint), intent(in) :: i_version, int_id
+      character(len=kchara), intent(in) :: dir, postfix
+!
+!
+      if(i_version .lt. 1) then
+        sel_rayleigh_file_name                                          &
+     &      = set_rayleigh99_file_name(dir, int_id, postfix)
+      else
+        sel_rayleigh_file_name                                          &
+     &      = set_rayleigh_file_name(dir, int_id, postfix)
+      end if
+!
+      end function sel_rayleigh_file_name
+!
+!-----------------------------------------------------------------------
+!
+      subroutine sel_read_rayleigh_rst_params(dir, i_step, ra_rst)
+!
+      use rayleigh99_rst_param_IO
+!
+      integer(kind = kint), intent(in) :: i_step
+      character(len = kchara), intent(in) :: dir
+!
+      type(rayleigh_restart), intent(inout) :: ra_rst
+!
+!
+      if(ra_rst%i_version .lt. 1) then
+        call read_rayleigh99_restart_params(dir, i_step, ra_rst)
+      else
+        call read_rayleigh_restart_params(dir, i_step, ra_rst)
+      end if
+!
+      end subroutine sel_read_rayleigh_rst_params
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine init_rayleigh_restart_input                            &
@@ -51,17 +100,14 @@
 !
 !
       if(my_rank .eq. 0) then
-        call count_rayleigh_restart_field                               &
+        call set_rayleigh_restart_field                                 &
      &     (i_version, dir, i_step, fld_IO)
       end if
+!
       call MPI_Bcast(fld_IO%num_field_IO, 1,                            &
      &    CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      if(my_rank .ne. 0) call alloc_phys_name_IO(fld_IO)
 !
-      call alloc_phys_name_IO(fld_IO)
-!
-      if(my_rank .eq. 0) then
-        call set_rayleigh_restart_field(i_version, dir, i_step, fld_IO)
-      end if
       ilength = int(fld_IO%num_field_IO * kchara)
       call MPI_Bcast(fld_IO%fld_name, ilength,                          &
      &    CALYPSO_CHARACTER, 0, CALYPSO_COMM, ierr_MPI)
@@ -76,209 +122,123 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine count_rayleigh_restart_field                           &
-     &         (i_version, dir, i_step, fld_IO)
+      logical function check_raylegh_rst_field                          &
+     &                (i_version, dir, i_step, sclchar)
+!
+      use delete_data_files
 !
       integer(kind = kint), intent(in) :: i_version, i_step
       character(len = kchara), intent(in) :: dir
+      character(len = kchara), intent(in) :: sclchar
 !
-      type(field_IO), intent(inout) :: fld_IO
+      character(len = kchara) :: file1
 !
 !
-      fld_IO%num_field_IO                                               &
-     &     = count_vector_field_4_raylegh(i_version, dir, i_step,       &
-     &                                    wchar, zchar)
-      fld_IO%num_field_IO = fld_IO%num_field_IO                         &
-     &     + count_scalar_field_4_raylegh(i_version, dir, i_step,       &
-     &                                    pchar)
-      fld_IO%num_field_IO = fld_IO%num_field_IO                         &
-     &     + count_scalar_field_4_raylegh(i_version, dir, i_step,       &
-     &                                    tchar)
-      fld_IO%num_field_IO = fld_IO%num_field_IO                         &
-      &    + count_vector_field_4_raylegh(i_version, dir, i_step,       &
-     &                                    cchar, achar)
+      file1 = sel_rayleigh_file_name(i_version, dir, i_step, sclchar)
+      check_raylegh_rst_field = check_file_exist(file1)
 !
-      fld_IO%num_field_IO = fld_IO%num_field_IO                         &
-     &     + count_vector_field_4_raylegh(i_version, dir, i_step,       &
-     &                                    wabchar, zabchar)
-!      fld_IO%num_field_IO = fld_IO%num_field_IO                        &
-!     &     + count_scalar_field_4_raylegh(i_version, dir, i_step,      &
-!     &                                    pabchar)
-      fld_IO%num_field_IO = fld_IO%num_field_IO                         &
-     &     + count_scalar_field_4_raylegh(i_version, dir, i_step,       &
-     &                                    tabchar)
-      fld_IO%num_field_IO = fld_IO%num_field_IO                         &
-     &     + count_vector_field_4_raylegh(i_version, dir, i_step,       &
-     &                                    cabchar, aabchar)
+      end function check_raylegh_rst_field
 !
-      end subroutine count_rayleigh_restart_field
-!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine set_rayleigh_restart_field                             &
      &         (i_version, dir, i_step, fld_IO)
 !
-      use m_phys_labels
-!
       integer(kind = kint), intent(in) :: i_version, i_step
       character(len = kchara), intent(in) :: dir
 !
       type(field_IO), intent(inout) :: fld_IO
 !
-      integer(kind = kint) :: icou
+!
+      fld_IO%num_field_IO = 0
+      call alloc_phys_name_IO(fld_IO)
+!
+      if(     check_raylegh_rst_field(i_version, dir, i_step, wchar)    &
+     &  .and. check_raylegh_rst_field(i_version, dir, i_step, zchar))   &
+     &   call append_phys_name_IO(velocity%name, n_solenoid, fld_IO)
+      if(     check_raylegh_rst_field(i_version, dir, i_step, cchar)    &
+     &  .and. check_raylegh_rst_field(i_version, dir, i_step, achar))   &
+     &   call append_phys_name_IO(magnetic_field%name, n_solenoid,      &
+     &                            fld_IO)
+      if(check_raylegh_rst_field(i_version, dir, i_step, pchar))        &
+     &   call append_phys_name_IO(pressure%name, n_scalar, fld_IO)
+      if(check_raylegh_rst_field(i_version, dir, i_step, tchar))        &
+     &   call append_phys_name_IO(temperature%name, n_scalar, fld_IO)
 !
 !
-      icou = 0
-      call add_vector_field_4_raylegh(i_version, dir, i_step,           &
-     &    wchar, zchar, velocity%name, icou, fld_IO)
-      call add_scalar_field_4_raylegh(i_version, dir, i_step,           &
-     &    pchar, pressure%name, icou, fld_IO)
-      call add_scalar_field_4_raylegh(i_version, dir, i_step,           &
-     &    tchar, temperature%name, icou, fld_IO)
-      call add_vector_field_4_raylegh(i_version, dir, i_step,           &
-     &    cchar, achar, magnetic_field%name, icou, fld_IO)
-!
-!
-      call add_vector_field_4_raylegh(i_version, dir, i_step,           &
-     &    wabchar, zabchar, previous_momentum%name, icou, fld_IO)
-!      call add_scalar_field_4_raylegh(i_version, dir, i_step,          &
-!     &    pabchar, previous_pressure%name, icou, fld_IO)
-      call add_scalar_field_4_raylegh(i_version, dir, i_step,           &
-     &    tabchar, previous_heat%name, icou, fld_IO)
-      call add_vector_field_4_raylegh(i_version, dir, i_step,           &
-     &    cabchar, aabchar, previous_induction%name, icou, fld_IO)
+      if(     check_raylegh_rst_field(i_version, dir, i_step, wabchar)  &
+     &  .and. check_raylegh_rst_field(i_version, dir, i_step, zabchar)) &
+     &    call append_phys_name_IO(previous_momentum%name, n_solenoid,  &
+     &                             fld_IO)
+      if(     check_raylegh_rst_field(i_version, dir, i_step, cabchar)  &
+     &  .and. check_raylegh_rst_field(i_version, dir, i_step, aabchar)) &
+     &    call append_phys_name_IO(previous_induction%name, n_solenoid, &
+     &                             fld_IO)
+!      if(check_raylegh_rst_field(i_version, dir, i_step, pabchar))     &
+!     &   call append_phys_name_IO(previous_pressure%name, n_scalar,    &
+!     &                            fld_IO)
+      if(check_raylegh_rst_field(i_version, dir, i_step, tabchar))      &
+     &   call append_phys_name_IO(previous_heat%name, n_scalar, fld_IO)
 !
       end subroutine set_rayleigh_restart_field
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
 !
-      integer(kind= kint) function count_scalar_field_4_raylegh         &
-     &                  (i_version, dir, i_step, sclchar)
-!
-      use delete_data_files
-      use sel_read_rayleigh_restart
+      subroutine set_rayleigh_rst_file_name(i_version, dir, i_step,     &
+     &          field_name, iflag_ncomp, file_name)
 !
       integer(kind = kint), intent(in) :: i_version, i_step
       character(len = kchara), intent(in) :: dir
-      character(len = kchara), intent(in) :: sclchar
+      character(len = kchara), intent(in) :: field_name
 !
-      character(len = kchara) :: file1
+      integer(kind = kint), intent(inout) :: iflag_ncomp
+      character(len = kchara), intent(inout) :: file_name(2)
 !
+      if(field_name .eq. velocity%name) then
+        iflag_ncomp = 2
+        file_name(1) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         wchar)
+        file_name(2) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         zchar)
+      else if(field_name .eq. pressure%name) then
+        iflag_ncomp = 1
+        file_name(1) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         pchar)
+      else if(field_name .eq. temperature%name) then
+        iflag_ncomp = 1
+        file_name(1) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         tchar)
+      else if(field_name .eq. magnetic_field%name) then
+        iflag_ncomp = 2
+        file_name(1) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         cchar)
+        file_name(2) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         achar)
 !
-      file1 = sel_rayleigh_file_name(i_version, dir, i_step, sclchar)
-      if(check_file_exist(file1) .eq. 0) then
-        count_scalar_field_4_raylegh = 1
-      else
-        count_scalar_field_4_raylegh = 0
+      else if(field_name .eq. previous_momentum%name) then
+        iflag_ncomp = 2
+        file_name(1) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         wabchar)
+        file_name(2) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         zabchar)
+!      else if(field_name .eq. previous_pressure%name) then
+!        iflag_ncomp = 1
+!        file_name(1) =  sel_rayleigh_file_name(i_version, dir, i_step, &
+!     &                                         cchar)
+      else if(field_name .eq. previous_heat%name) then
+        iflag_ncomp = 1
+        file_name(1) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         tabchar)
+      else if(field_name .eq. previous_induction%name) then
+        iflag_ncomp = 2
+        file_name(1) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         cabchar)
+        file_name(2) =  sel_rayleigh_file_name(i_version, dir, i_step,  &
+     &                                         aabchar)
       end if
 !
-      end function count_scalar_field_4_raylegh
-!
-!-----------------------------------------------------------------------
-!
-      integer(kind= kint) function count_vector_field_4_raylegh         &
-     &                  (i_version, dir, i_step, polchar, torchar)
-!
-      use delete_data_files
-      use sel_read_rayleigh_restart
-!
-      integer(kind = kint), intent(in) :: i_version, i_step
-      character(len = kchara), intent(in) :: dir
-      character(len = kchara), intent(in) :: polchar
-      character(len = kchara), intent(in) :: torchar
-!
-      character(len = kchara) :: file1, file2
-!
-!
-      file1 = sel_rayleigh_file_name(i_version, dir, i_step, polchar)
-      file2 = sel_rayleigh_file_name(i_version, dir, i_step, torchar)
-      if((check_file_exist(file1)+check_file_exist(file2)) .eq. 0) then
-        count_vector_field_4_raylegh = 1
-      else
-        count_vector_field_4_raylegh = 0
-      end if
-!
-      end function count_vector_field_4_raylegh
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine add_scalar_field_4_raylegh                             &
-     &         (i_version, dir, i_step, sclchar, fhd_fld, icou, fld_IO)
-!
-      use m_phys_constants
-      use delete_data_files
-      use sel_read_rayleigh_restart
-!
-      integer(kind = kint), intent(in) :: i_version, i_step
-      character(len = kchara), intent(in) :: dir
-      character(len = kchara), intent(in) :: sclchar
-      character(len = kchara), intent(in) :: fhd_fld
-      integer(kind = kint), intent(inout) :: icou
-      type(field_IO), intent(inout) :: fld_IO
-!
-      character(len = kchara) :: file1
-!
-!
-      file1 = sel_rayleigh_file_name(i_version, dir, i_step, sclchar)
-      if(check_file_exist(file1) .eq. 0) then
-        icou = icou + 1
-        fld_IO%fld_name(icou) =    fhd_fld
-        fld_IO%num_comp_IO(icou) = n_scalar
-      end if
-!
-      end subroutine add_scalar_field_4_raylegh
-!
-!-----------------------------------------------------------------------
-!
-      subroutine add_vector_field_4_raylegh(i_version, dir, i_step,     &
-     &          polchar, torchar, fhd_fld, icou, fld_IO)
-!
-      use m_phys_constants
-      use delete_data_files
-      use sel_read_rayleigh_restart
-!
-      integer(kind = kint), intent(in) :: i_version, i_step
-      character(len = kchara), intent(in) :: dir
-      character(len = kchara), intent(in) :: polchar
-      character(len = kchara), intent(in) :: torchar
-      character(len = kchara), intent(in) :: fhd_fld
-      integer(kind = kint), intent(inout) :: icou
-      type(field_IO), intent(inout) :: fld_IO
-!
-      character(len = kchara) :: file1, file2
-!
-!
-      file1 = sel_rayleigh_file_name(i_version, dir, i_step, polchar)
-      file2 = sel_rayleigh_file_name(i_version, dir, i_step, torchar)
-      if((check_file_exist(file1)+check_file_exist(file2)) .eq. 0) then
-        icou = icou + 1
-        fld_IO%fld_name(icou) =    fhd_fld
-        fld_IO%num_comp_IO(icou) = n_solenoid
-      end if
-!
-      end subroutine add_vector_field_4_raylegh
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine find_rayleigh_restart_address                          &
-     &          (nri, ltr, kr, l, m, ioffset1, ioffset2)
-!
-      integer(kind = kint), intent(in) :: nri, ltr, kr, l, m
-      integer(kind = kint_gl), intent(inout) :: ioffset1, ioffset2
-!
-      integer(kind = kint_gl) :: jmax_h, ioffset
-!
-      jmax_h = 1 + ltr*(ltr+3) / 2
-      ioffset = (l - m + 1) + m * (2*ltr +3 - m) / 2
-      ioffset1 = ioffset + (kr - 1) * jmax_h
-      ioffset2 = ioffset1 + jmax_h * nri
-      ioffset1 = (ioffset1 - 1) * kreal
-      ioffset2 = (ioffset2 - 1) * kreal
-!
-      end subroutine find_rayleigh_restart_address
+      end subroutine set_rayleigh_rst_file_name
 !
 !-----------------------------------------------------------------------
 !

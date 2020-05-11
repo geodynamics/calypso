@@ -7,11 +7,22 @@
 !>@brief  Subroutines to read char-char-real control arrays
 !!
 !!@verbatim
+!!      subroutine read_char2real_ctl_type(c_buf, label, c2r_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_chara2_real_item), intent(inout) :: c2r_item
+!!      subroutine write_char2real_ctl_type                             &
+!!     &         (id_file, level, label, c2r_item)
+!!        type(read_chara2_real_item), intent(in) :: c2r_item
+!!      subroutine copy_char2real_ctl(org_c2r, new_c2r)
+!!        type(read_chara2_real_item), intent(in) :: org_c2r
+!!        type(read_chara2_real_item), intent(inout) :: new_c2r
+!!
 !!      subroutine alloc_control_array_c2_r(array_c2r)
 !!      subroutine dealloc_control_array_c2_r(array_c2r)
 !!      subroutine read_control_array_c2_r                              &
 !!     &         (id_control, label, array_c2r, c_buf)
 !!        type(ctl_array_c2r), intent(inout) :: array_c2r
+!!        type(buffer_for_control), intent(in)  :: c_buf
 !!      subroutine write_control_array_c2_r                             &
 !!     &         (id_control, level, label, array_c2r)
 !!        type(ctl_array_c2r), intent(in) :: array_c2r
@@ -32,9 +43,19 @@
       module t_control_array_chara2real
 !
       use m_precision
-      use t_control_elements
+      use m_machine_parameter
 !
       implicit none
+!
+!>        structure of control item with three characters
+      type read_chara2_real_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read character items
+        character(len=kchara) ::  charavalue(2)
+!>        array for read real item
+        real(kind = kreal) ::    realvalue
+      end type read_chara2_real_item
 !
 !>  Structure for two charactors and real control array 
       type ctl_array_c2r
@@ -54,6 +75,68 @@
 !
       contains
 !
+!   --------------------------------------------------------------------
+!
+      subroutine read_char2real_ctl_type(c_buf, label, c2r_item)
+!
+      use t_read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_chara2_real_item), intent(inout) :: c2r_item
+!
+       character(len=kchara) :: tmpchara
+!
+!
+      if(c2r_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, c2r_item%charavalue(1:2),      &
+     &                         c2r_item%realvalue
+      if (iflag_debug .gt. 0)  write(*,'(a,a4,a)')                      &
+     &         trim(c_buf%header_chara), ' 1: ', c2r_item%charavalue(1)
+      if (iflag_debug .gt. 0)  write(*,'(a,a4,a)')                      &
+     &         trim(c_buf%header_chara), ' 2: ', c2r_item%charavalue(2)
+      if (iflag_debug .gt. 0)  write(*,'(a,a7,1pe23.15)')               &
+     &         trim(c_buf%header_chara), ' real: ', c2r_item%realvalue
+      c2r_item%iflag = 1
+!
+      end subroutine read_char2real_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_char2real_ctl_type                               &
+     &         (id_file, level, label, c2r_item)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      character(len=kchara), intent(in) :: label
+      type(read_chara2_real_item), intent(in) :: c2r_item
+!
+!
+      if(c2r_item%iflag .eq. 0) return
+!
+      call write_chara2_real_ctl_item(id_file, level, label,            &
+     &    c2r_item%charavalue(1), c2r_item%charavalue(2),               &
+     &    c2r_item%realvalue)
+!
+       end subroutine write_char2real_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_char2real_ctl(org_c2r, new_c2r)
+!
+      type(read_chara2_real_item), intent(in) :: org_c2r
+      type(read_chara2_real_item), intent(inout) :: new_c2r
+!
+!
+      new_c2r%iflag =            org_c2r%iflag
+      new_c2r%charavalue(1:2) =  org_c2r%charavalue(1:2)
+      new_c2r%realvalue =        org_c2r%realvalue
+!
+      end subroutine copy_char2real_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_c2_r(array_c2r)

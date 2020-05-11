@@ -17,6 +17,8 @@
 !!        type(read_real2_item), intent(inout) :: real2_item
 !!      subroutine bcast_ctl_type_r3(real3_item)
 !!        type(read_real3_item), intent(inout) :: real3_item
+!!      subroutine bcast_ctl_type_i2(int2_item)
+!!        type(read_int2_item), intent(inout) :: int2_item
 !!      subroutine bcast_ctl_type_i3(int3_item)
 !!        type(read_int3_item), intent(inout) :: int3_item
 !!      subroutine bcast_ctl_type_c3(chara3_item)
@@ -34,6 +36,8 @@
 !!        type(ctl_array_int), intent(inout) :: array_int
 !!      subroutine bcast_ctl_array_i2(array_i2)
 !!        type(ctl_array_i2), intent(inout) :: array_i2
+!!      subroutine bcast_ctl_array_i3(array_i3)
+!!        type(ctl_array_i3), intent(inout) :: array_i3
 !!      subroutine bcast_ctl_array_c1(array_chara)
 !!        type(ctl_array_chara), intent(inout) :: array_chara
 !!      subroutine bcast_ctl_array_c2(array_c2)
@@ -84,7 +88,6 @@
       use m_precision
       use m_constants
       use calypso_mpi
-      use t_control_elements
 !
       implicit none
 !
@@ -95,6 +98,8 @@
 !   --------------------------------------------------------------------
 !
       subroutine bcast_ctl_type_r1(real_item)
+!
+      use t_control_array_real
 !
       type(read_real_item), intent(inout) :: real_item
 !
@@ -112,6 +117,8 @@
 !
       subroutine bcast_ctl_type_i1(int_item)
 !
+      use t_control_array_integer
+!
       type(read_integer_item), intent(inout) :: int_item
 !
 !
@@ -127,6 +134,8 @@
 !   --------------------------------------------------------------------
 !
       subroutine bcast_ctl_type_c1(chara_item)
+!
+      use t_control_array_character
 !
       type(read_character_item), intent(inout) :: chara_item
 !
@@ -144,6 +153,8 @@
 !
       subroutine bcast_ctl_type_r2(real2_item)
 !
+      use t_control_array_real2
+!
       type(read_real2_item), intent(inout) :: real2_item
 !
 !
@@ -160,6 +171,8 @@
 !
       subroutine bcast_ctl_type_r3(real3_item)
 !
+      use t_control_array_real3
+!
       type(read_real3_item), intent(inout) :: real3_item
 !
 !
@@ -174,7 +187,27 @@
 !
 !   --------------------------------------------------------------------
 !
+      subroutine bcast_ctl_type_i2(int2_item)
+!
+      use t_control_array_integer2
+!
+      type(read_int2_item), intent(inout) :: int2_item
+!
+!
+      if(nprocs .eq. 1) return
+!
+      call MPI_BCAST(int2_item%iflag, 1,                                &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(int2_item%intvalue, 2,                             &
+     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
+      end subroutine bcast_ctl_type_i2
+!
+!   --------------------------------------------------------------------
+!
       subroutine bcast_ctl_type_i3(int3_item)
+!
+      use t_control_array_integer3
 !
       type(read_int3_item), intent(inout) :: int3_item
 !
@@ -192,6 +225,8 @@
 !
       subroutine bcast_ctl_type_c3(chara3_item)
 !
+      use t_control_array_character3
+!
       type(read_chara3_item), intent(inout) :: chara3_item
 !
 !
@@ -207,6 +242,8 @@
 !   --------------------------------------------------------------------
 !
       subroutine bcast_ctl_type_c_i3(ci3_item)
+!
+      use t_control_array_charaint3
 !
       type(read_chara_int3_item), intent(inout) :: ci3_item
 !
@@ -350,6 +387,34 @@
      &   (array_i2%int2, cast_long(array_i2%num), 0)
 !
       end subroutine bcast_ctl_array_i2
+!
+!   --------------------------------------------------------------------
+!
+      subroutine bcast_ctl_array_i3(array_i3)
+!
+      use t_control_array_integer3
+      use transfer_to_long_integers
+!
+      type(ctl_array_i3), intent(inout) :: array_i3
+!
+!
+      if(nprocs .eq. 1) return
+!
+      call MPI_BCAST(array_i3%num,  1,                                  &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(array_i3%icou, 1,                                  &
+     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+!
+      if(my_rank .ne. 0) call alloc_control_array_i3(array_i3)
+!
+      call calypso_mpi_bcast_int                                        &
+     &   (array_i3%int1, cast_long(array_i3%num), 0)
+      call calypso_mpi_bcast_int                                        &
+     &   (array_i3%int2, cast_long(array_i3%num), 0)
+      call calypso_mpi_bcast_int                                        &
+     &   (array_i3%int3, cast_long(array_i3%num), 0)
+!
+      end subroutine bcast_ctl_array_i3
 !
 !   --------------------------------------------------------------------
 !
@@ -541,7 +606,7 @@
 !
       subroutine bcast_ctl_array_icr(array_icr)
 !
-      use t_control_array_intchrreal
+      use t_control_array_intcharreal
       use transfer_to_long_integers
 !
       type(ctl_array_icr), intent(inout) :: array_icr

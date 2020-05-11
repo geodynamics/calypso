@@ -125,7 +125,7 @@
       use m_machine_parameter
       use skip_comment_f
       use t_read_control_elements
-      use t_control_elements
+      use t_control_array_real
       use t_control_array_character
       use t_control_array_charareal
       use t_control_array_character2
@@ -304,8 +304,6 @@
 !  ---------------------------------------------------------------------
 !
       subroutine dup_control_4_psf(org_psf_c, new_psf_c)
-!
-      use copy_control_elements
 !
       type(psf_ctl), intent(in) :: org_psf_c
       type(psf_ctl), intent(inout) :: new_psf_c

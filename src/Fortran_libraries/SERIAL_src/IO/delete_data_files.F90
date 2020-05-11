@@ -12,7 +12,7 @@
 !!      subroutine delete_file_by_f(file_name)
 !!      subroutine delete_parallel_files(iflag_fmt, nprocs, file_head)
 !!
-!!      integer(kind = kint) function check_file_exist(file_name)
+!!      logical function check_file_exist(file_name)
 !!@endverbatim
 !!
 !!@n @param  file_name   file name
@@ -90,9 +90,7 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      integer(kind = kint) function check_file_exist(file_name)
-!
-      use m_error_IDs
+      logical function check_file_exist(file_name)
 !
       character(len=kchara), intent(in) :: file_name
       integer(kind = kint), parameter :: id_file = 255
@@ -101,11 +99,11 @@
       open (id_file, file=file_name, status='old', err=99)
       close(id_file)
 !
-      check_file_exist = 0
+      check_file_exist = .TRUE.
       return
 !
   99  continue
-      check_file_exist = ierr_file
+      check_file_exist = .FALSE.
       return
 !
       end function check_file_exist

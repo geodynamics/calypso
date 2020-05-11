@@ -22,7 +22,7 @@
       use t_ctl_data_4_platforms
       use t_ctl_data_4_fields
       use t_ctl_data_4_time_steps
-      use t_control_elements
+      use t_control_array_real
       use t_ctl_data_gen_sph_shell
       use skip_comment_f
 !
@@ -141,7 +141,7 @@
 !
       do
         call load_one_line_from_control(control_file_code, c_buf1)
-        call read_merge_control_data(control_file_code, hd_assemble,  &
+        call read_merge_control_data(control_file_code, hd_assemble,    &
      &      mgd_ctl, c_buf1)
         if(mgd_ctl%i_assemble .gt. 0) exit
       end do

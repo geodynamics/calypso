@@ -15,7 +15,6 @@
       module add_nodal_fields_ctl
 !
       use m_precision
-      use t_control_elements
       use t_control_array_character3
 !
       implicit  none

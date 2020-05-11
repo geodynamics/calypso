@@ -57,21 +57,19 @@
 !
       type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !
-      integer(kind = kint) :: iflag_lc
+      logical :: iflag_lc
 !
 !
       if(my_rank .eq. izero) then
-        iflag_lc = 0
-        if     (check_exsist_rtp_file(my_rank, sph_file_param) .ne. 0   &
-     &     .or. check_exsist_rtm_file(my_rank, sph_file_param) .ne. 0   &
-     &     .or. check_exsist_rlm_file(my_rank, sph_file_param) .ne. 0   &
-     &     .or. check_exsist_rj_file(my_rank, sph_file_param) .ne.  0)  &
-     &    iflag_lc = 1
+        iflag_lc =    check_exsist_rtp_file(my_rank, sph_file_param)    &
+     &          .and. check_exsist_rtm_file(my_rank, sph_file_param)    &
+     &          .and. check_exsist_rlm_file(my_rank, sph_file_param)    &
+     &          .and. check_exsist_rj_file(my_rank, sph_file_param)
       end if
-      call MPI_BCAST(iflag_lc, 1, CALYPSO_INTEGER, 0,                   &
-     &    CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(iflag_lc, 1, CALYPSO_LOGICAL, 0,                   &
+     &               CALYPSO_COMM, ierr_MPI)
 !
-      if(iflag_lc .eq. 0) then
+      if(iflag_lc) then
         if(my_rank.eq.0) write(*,*) 'spherical harmonics table exists'
       else if(iflag_make_SPH .eq. 0) then
         call calypso_mpi_abort(ierr_file,                               &

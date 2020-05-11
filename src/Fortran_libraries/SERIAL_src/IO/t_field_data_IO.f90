@@ -12,8 +12,11 @@
 !!        type(multi_field_IO), intent(inout) :: mul_f
 !!
 !!      subroutine alloc_phys_name_IO(fld_IO)
+!!      subroutine append_phys_name_IO                                  &
+!!     &         (field_name, num_component, fld_IO)
 !!      subroutine alloc_phys_data_IO(fld_IO)
 !!      subroutine alloc_merged_field_stack(num_pe, fld_IO)
+!!        type(field_IO), intent(inout) :: fld_IO
 !!
 !!      subroutine dealloc_phys_IO(fld_IO)
 !!      subroutine dealloc_phys_name_IO(fld_IO)
@@ -22,7 +25,11 @@
 !!
 !!      subroutine cal_istack_phys_comp_IO(fld_IO)
 !!
+!!      subroutine copy_phys_name_IO(num, org_fld_IO, new_fld_IO)
+!!        type(field_IO), intent(in) :: org_fld_IO
+!!        type(field_IO), intent(inout) :: new_fld_IO
 !!      subroutine check_field_name_4_IO(id_field, fld_IO)
+!!        type(field_IO), intent(in) :: fld_IO
 !!@endverbatim
 !!
 !
@@ -117,6 +124,39 @@
 !
 ! -------------------------------------------------------------------
 !
+      subroutine append_phys_name_IO                                    &
+     &         (field_name, num_component, fld_IO)
+!
+      character(len = kchara), intent(in) :: field_name
+      integer(kind = kint), intent(in) :: num_component
+      type(field_IO), intent(inout) :: fld_IO
+!
+      type(field_IO) :: tmp_IO
+!
+!
+      tmp_IO%num_field_IO = fld_IO%num_field_IO
+      call alloc_phys_name_IO(tmp_IO)
+!
+      call copy_phys_name_IO(fld_IO%num_field_IO, fld_IO, tmp_IO)
+      call dealloc_phys_name_IO(fld_IO)
+!
+      fld_IO%num_field_IO = fld_IO%num_field_IO + 1
+      call alloc_phys_name_IO(fld_IO)
+      call copy_phys_name_IO(tmp_IO%num_field_IO, tmp_IO, fld_IO)
+!
+      fld_IO%fld_name(fld_IO%num_field_IO) = field_name
+      fld_IO%num_comp_IO(fld_IO%num_field_IO) = num_component
+      fld_IO%istack_comp_IO(fld_IO%num_field_IO)                        &
+     &   = fld_IO%istack_comp_IO(fld_IO%num_field_IO-1)                 &
+     &    + fld_IO%num_comp_IO(fld_IO%num_field_IO)
+      fld_IO%ntot_comp_IO = fld_IO%istack_comp_IO(fld_IO%num_field_IO)
+!
+      call dealloc_phys_name_IO(tmp_IO)
+!
+      end subroutine append_phys_name_IO
+!
+! -------------------------------------------------------------------
+!
       subroutine alloc_phys_data_IO(fld_IO)
 !
       type(field_IO), intent(inout) :: fld_IO
@@ -197,18 +237,42 @@
 !
       subroutine cal_istack_phys_comp_IO(fld_IO)
 !
-      use m_constants
-      use cal_minmax_and_stacks
-!
       type(field_IO), intent(inout) :: fld_IO
 !
+      integer(kind = kint) :: inum
 !
-      call s_cal_total_and_stacks                                       &
-     &   (fld_IO%num_field_IO, fld_IO%num_comp_IO, izero,               &
-     &    fld_IO%istack_comp_IO, fld_IO%ntot_comp_IO)
+!
+      fld_IO%istack_comp_IO(0) = 0
+      do inum = 1, fld_IO%num_field_IO
+        fld_IO%istack_comp_IO(inum) = fld_IO%istack_comp_IO(inum-1)     &
+     &                               + fld_IO%num_comp_IO(inum)
+      end do
+      fld_IO%ntot_comp_IO = fld_IO%istack_comp_IO(fld_IO%num_field_IO)
 !
       end subroutine cal_istack_phys_comp_IO
 !
+! -------------------------------------------------------------------
+!
+      subroutine copy_phys_name_IO(num, org_fld_IO, new_fld_IO)
+!
+      integer(kind = kint), intent(in) :: num
+      type(field_IO), intent(in) :: org_fld_IO
+      type(field_IO), intent(inout) :: new_fld_IO
+!
+!
+      new_fld_IO%istack_comp_IO(0) = org_fld_IO%istack_comp_IO(0)
+      if(num .le. 0) return
+!
+!$omp parallel workshare
+      new_fld_IO%fld_name(1:num) = org_fld_IO%fld_name(1:num)
+      new_fld_IO%num_comp_IO(1:num) = org_fld_IO%num_comp_IO(1:num)
+      new_fld_IO%istack_comp_IO(1:num)                                  &
+     &     = org_fld_IO%istack_comp_IO(1:num)
+!$omp end parallel workshare
+!
+      end subroutine copy_phys_name_IO
+!
+! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
       subroutine check_field_name_4_IO(id_field, fld_IO)

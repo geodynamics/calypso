@@ -7,11 +7,22 @@
 !>@brief  Subroutines to read char-char control arrays
 !!
 !!@verbatim
+!!      subroutine read_character2_ctl_type(c_buf, label, chara2_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_chara2_item), intent(inout) :: chara2_item
+!!      subroutine write_character2_ctl_type                            &
+!!     &         (id_file, level, label, chara2_item)
+!!        type(read_chara2_item), intent(in) :: chara2_item
+!!      subroutine copy_character2_ctl(org_c2, new_c2)
+!!        type(read_chara2_item), intent(in) :: org_c2
+!!        type(read_chara2_item), intent(inout) :: new_c2
+!!
 !!      subroutine alloc_control_array_c2(array_c2)
 !!      subroutine dealloc_control_array_c2(array_c2)
 !!      subroutine read_control_array_c2                                &
 !!     &         (id_control, label, array_c2, c_buf)
 !!        type(ctl_array_c2), intent(inout) :: array_c2
+!!        type(buffer_for_control), intent(in)  :: c_buf
 !!      subroutine write_control_array_c2                               &
 !!     &         (id_control, level, label, array_c2)
 !!        type(ctl_array_c2), intent(in) :: array_c2
@@ -32,9 +43,17 @@
       module t_control_array_character2
 !
       use m_precision
-      use t_control_elements
+      use m_machine_parameter
 !
       implicit none
+!
+!>        structure of control item with three characters
+      type read_chara2_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read character items
+        character(len=kchara) ::  charavalue(2)
+      end type read_chara2_item
 !
 !>  Structure for three charactors control array 
       type ctl_array_c2
@@ -52,6 +71,69 @@
 !
       contains
 !
+!   --------------------------------------------------------------------
+!
+      subroutine read_character2_ctl_type(c_buf, label, chara2_item)
+!
+      use t_read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_chara2_item), intent(inout) :: chara2_item
+!
+       character(len=kchara) :: tmpchara
+!
+!
+      if(chara2_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, chara2_item%charavalue(1:2)
+      if (iflag_debug .gt. 0)  write(*,'(a,a4,a)')                      &
+     &      trim(c_buf%header_chara), ' 1: ', chara2_item%charavalue(1)
+      if (iflag_debug .gt. 0)  write(*,'(a,a4,a)')                      &
+     &      trim(c_buf%header_chara), ' 2: ', chara2_item%charavalue(2)
+      chara2_item%iflag = 1
+!
+      end subroutine read_character2_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_character2_ctl_type                              &
+     &         (id_file, level, label, chara2_item)
+!
+      use m_constants
+      use skip_comment_f
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      character(len=kchara), intent(in) :: label
+      type(read_chara2_item), intent(in) :: chara2_item
+!
+      integer(kind = kint) :: maxlen(0:1)
+!
+      maxlen(0) = len_trim(label)
+      maxlen(1)                                                         &
+     &     = max_len_of_charaarray(ione, chara2_item%charavalue(1))
+!
+      if(chara2_item%iflag .eq. 0) return
+      call write_character2_ctl_item(id_file, level, label, maxlen,     &
+     &    chara2_item%charavalue(1), chara2_item%charavalue(2))
+!
+       end subroutine write_character2_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_character2_ctl(org_c2, new_c2)
+!
+      type(read_chara2_item), intent(in) :: org_c2
+      type(read_chara2_item), intent(inout) :: new_c2
+!
+!
+      new_c2%iflag =           org_c2%iflag
+      new_c2%charavalue(1:2) = org_c2%charavalue(1:2)
+!
+       end subroutine copy_character2_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_c2(array_c2)

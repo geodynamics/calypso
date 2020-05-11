@@ -100,7 +100,7 @@
       use calypso_mpi
       use m_error_IDs
       use m_machine_parameter
-      use t_control_elements
+      use t_control_array_character
       use t_ctl_data_4_time_steps
       use skip_comment_f
 !

@@ -7,11 +7,22 @@
 !>@brief  Subroutines to read control arrays
 !!
 !!@verbatim
+!!      subroutine read_real3_ctl_type(c_buf, label, real3_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_real3_item), intent(inout) :: real3_item
+!!      subroutine write_real3_ctl_type                                 &
+!!     &         (id_file, level, label, real3_item)
+!!        type(read_real3_item), intent(in) :: real3_item
+!!      subroutine copy_real3_ctl(org_r3, new_r3)
+!!        type(read_real3_item), intent(in) :: org_r3
+!!        type(read_real3_item), intent(inout) :: new_r3
+!!
 !!      subroutine alloc_control_array_r3(array_r3)
 !!      subroutine dealloc_control_array_r3(array_r3)
 !!      subroutine read_control_array_r3                                &
 !!     &         (id_control, label, array_r3, c_buf)
 !!        type(ctl_array_r3), intent(inout) :: array_r3
+!!        type(buffer_for_control), intent(in)  :: c_buf
 !!      subroutine write_control_array_r3                               &
 !!     &         (id_control, level, label, array_r3)
 !!        type(ctl_array_r3), intent(in) :: array_r3
@@ -34,9 +45,17 @@
       module t_control_array_real3
 !
       use m_precision
-      use t_control_elements
+      use m_machine_parameter
 !
       implicit none
+!
+!>        structure of control item with three reals
+      type read_real3_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read real items
+        real(kind = kreal) ::    realvalue(3)
+      end type read_real3_item
 !
 !>  Structure for three reals control array 
       type ctl_array_r3
@@ -56,6 +75,61 @@
 !
       contains
 !
+!   --------------------------------------------------------------------
+!
+      subroutine read_real3_ctl_type(c_buf, label, real3_item)
+!
+      use t_read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_real3_item), intent(inout) :: real3_item
+!
+       character(len=kchara) :: tmpchara
+!
+!
+      if(real3_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, real3_item%realvalue(1:3)
+      if (iflag_debug .gt. 0)  write(*,'(a,a2,1p3e16.7)')               &
+     &        trim(c_buf%header_chara), ': ', real3_item%realvalue(1:3)
+      real3_item%iflag = 1
+!
+       end subroutine read_real3_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_real3_ctl_type                                   &
+     &         (id_file, level, label, real3_item)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      character(len=kchara), intent(in) :: label
+      type(read_real3_item), intent(in) :: real3_item
+!
+!
+      if(real3_item%iflag .eq. 0) return
+      call write_real3_ctl_item(id_file, level, label,                  &
+     &    real3_item%realvalue(1), real3_item%realvalue(2),             &
+     &    real3_item%realvalue(3))
+!
+       end subroutine write_real3_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_real3_ctl(org_r3, new_r3)
+!
+      type(read_real3_item), intent(in) :: org_r3
+      type(read_real3_item), intent(inout) :: new_r3
+!
+!
+      new_r3%iflag =          org_r3%iflag
+      new_r3%realvalue(1:3) = org_r3%realvalue(1:3)
+!
+       end subroutine copy_real3_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_r3(array_r3)

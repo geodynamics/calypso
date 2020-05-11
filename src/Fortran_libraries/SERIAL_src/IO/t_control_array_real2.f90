@@ -7,11 +7,22 @@
 !>@brief  Subroutines to read control arrays
 !!
 !!@verbatim
+!!      subroutine read_real2_ctl_type(c_buf, label, real2_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_real2_item), intent(inout) :: real2_item
+!!      subroutine write_real2_ctl_type                                 &
+!!     &         (id_file, level, label, real2_item)
+!!        type(read_real2_item), intent(in) :: real2_item
+!!      subroutine copy_real2_ctl(org_r2, new_r2)
+!!        type(read_real2_item), intent(inout) :: org_r2
+!!        type(read_real2_item), intent(inout) :: new_r2
+!!
 !!      subroutine alloc_control_array_r2(array_r2)
 !!      subroutine dealloc_control_array_r2(array_r2)
 !!      subroutine read_control_array_r2                                &
 !!     &         (id_control, label, array_r2, c_buf)
 !!        type(ctl_array_r2), intent(inout) :: array_r2
+!!        type(buffer_for_control), intent(in)  :: c_buf
 !!      subroutine write_control_array_r2                               &
 !!     &         (id_control, level, label, array_r2)
 !!        type(ctl_array_r2), intent(in) :: array_r2
@@ -32,9 +43,17 @@
       module t_control_array_real2
 !
       use m_precision
-      use t_control_elements
+      use m_machine_parameter
 !
       implicit none
+!
+!>        structure of control item with two reals
+      type read_real2_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read real items
+        real(kind = kreal) ::    realvalue(2)
+      end type read_real2_item
 !
 !>  Structure for two reals control array 
       type ctl_array_r2
@@ -52,6 +71,60 @@
 !
       contains
 !
+!   --------------------------------------------------------------------
+!
+      subroutine read_real2_ctl_type(c_buf, label, real2_item)
+!
+      use t_read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_real2_item), intent(inout) :: real2_item
+!
+      character(len=kchara) :: tmpchara
+!
+!
+      if(real2_item%iflag.gt.0 .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, real2_item%realvalue(1:2)
+      if (iflag_debug .gt. 0)  write(*,'(a,a2,1p3e16.7)')               &
+     &        trim(c_buf%header_chara), ': ', real2_item%realvalue(1:2)
+      real2_item%iflag = 1
+!
+       end subroutine read_real2_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_real2_ctl_type                                   &
+     &         (id_file, level, label, real2_item)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      character(len=kchara), intent(in) :: label
+      type(read_real2_item), intent(in) :: real2_item
+!
+!
+      if(real2_item%iflag .eq. 0) return
+      call write_real2_ctl_item(id_file, level, label,                  &
+     &    real2_item%realvalue(1), real2_item%realvalue(2))
+!
+       end subroutine write_real2_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_real2_ctl(org_r2, new_r2)
+!
+      type(read_real2_item), intent(in) :: org_r2
+      type(read_real2_item), intent(inout) :: new_r2
+!
+!
+      new_r2%iflag =          org_r2%iflag
+      new_r2%realvalue(1:2) = org_r2%realvalue(1:2)
+!
+       end subroutine copy_real2_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_r2(array_r2)

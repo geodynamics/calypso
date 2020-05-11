@@ -276,7 +276,7 @@
       subroutine set_file_control_params(default_prefix,                &
      &          file_prefix_ctl, file_format_ctl,  file_params)
 !
-      use t_control_elements
+      use t_control_array_character
       use m_file_format_switch
 !
       character(len = kchara), intent(in) :: default_prefix
@@ -302,7 +302,7 @@
       subroutine set_parallel_file_ctl_params(default_prefix,           &
      &          file_prefix_ctl, file_format_ctl, file_params)
 !
-      use t_control_elements
+      use t_control_array_character
       use m_file_format_switch
 !
       character(len = kchara), intent(in) :: default_prefix

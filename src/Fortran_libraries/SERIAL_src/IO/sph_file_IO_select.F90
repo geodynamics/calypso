@@ -30,14 +30,10 @@
 !!     &         (id_rank, file_param, sph_file, ierr)
 !!        type(sph_file_data_type), intent(in) :: sph_file
 !!
-!!      integer(kind = kint) function                                   &
-!!     &                    check_exsist_rtp_file(id_rank, file_param)
-!!      integer(kind = kint) function                                   &
-!!     &                    check_exsist_rj_file(id_rank, file_param)
-!!      integer(kind = kint) function                                   &
-!!     &                    check_exsist_rtm_file(id_rank, file_param)
-!!      integer(kind = kint) function                                   &
-!!     &                    check_exsist_rlm_file(id_rank, file_param)
+!!      logical function check_exsist_rtp_file(id_rank, file_param)
+!!      logical function check_exsist_rj_file(id_rank, file_param)
+!!      logical function check_exsist_rtm_file(id_rank, file_param)
+!!      logical function check_exsist_rlm_file(id_rank, file_param)
 !!@endverbatim
 !!
 !!@param id_rank    Process ID
@@ -361,8 +357,7 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      integer(kind = kint) function                                     &
-     &                    check_exsist_rtp_file(id_rank, file_param)
+      logical function check_exsist_rtp_file(id_rank, file_param)
 !
       use delete_data_files
 !
@@ -378,8 +373,7 @@
 !
 !------------------------------------------------------------------
 !
-      integer(kind = kint) function                                     &
-     &                    check_exsist_rj_file(id_rank, file_param)
+      logical function check_exsist_rj_file(id_rank, file_param)
 !
       use delete_data_files
 !
@@ -395,8 +389,7 @@
 !
 !------------------------------------------------------------------
 !
-      integer(kind = kint) function                                     &
-     &                    check_exsist_rtm_file(id_rank, file_param)
+      logical function check_exsist_rtm_file(id_rank, file_param)
 !
       use delete_data_files
 !
@@ -412,8 +405,7 @@
 !
 !------------------------------------------------------------------
 !
-      integer(kind = kint) function                                     &
-     &                    check_exsist_rlm_file(id_rank, file_param)
+      logical function check_exsist_rlm_file(id_rank, file_param)
 !
       use delete_data_files
 !

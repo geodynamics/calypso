@@ -7,11 +7,22 @@
 !>@brief  Structure of control array input with 3 words
 !!
 !!@verbatim
+!!      subroutine read_character3_ctl_type(c_buf, label, chara3_item)
+!!        type(buffer_for_control), intent(in)  :: c_buf
+!!        type(read_chara3_item), intent(inout) :: chara3_item
+!!      subroutine write_character3_ctl_type                            &
+!!     &         (id_file, level, label, chara3_item)
+!!        type(read_chara3_item), intent(in) :: chara3_item
+!!      subroutine copy_character3_ctl(org_c3, new_c3)
+!!        type(read_chara3_item), intent(in) :: org_c3
+!!        type(read_chara3_item), intent(inout) :: new_c3
+!!
 !!      subroutine alloc_control_array_c3(array_c3)
 !!      subroutine dealloc_control_array_c3(array_c3)
 !!      subroutine read_control_array_c3                                &
 !!     &         (id_control, label, array_c3, c_buf)
 !!        type(ctl_array_c3), intent(inout) :: array_c3
+!!        type(buffer_for_control), intent(inout)  :: c_buf
 !!      subroutine write_control_array_c3                               &
 !!     &         (id_control, level, label, array_c3)
 !!        type(ctl_array_c3), intent(in) :: array_c3
@@ -31,9 +42,17 @@
       module t_control_array_character3
 !
       use m_precision
-      use t_control_elements
+      use m_machine_parameter
 !
       implicit none
+!
+!>        structure of control item with three characters
+      type read_chara3_item
+!>        read flag (If item is read iflag = 1)
+        integer(kind = kint) ::  iflag = 0
+!>        array for read character items
+        character(len=kchara) ::  charavalue(3)
+      end type read_chara3_item
 !
 !>  Structure for three charactors control array 
       type ctl_array_c3
@@ -53,6 +72,75 @@
 !
       contains
 !
+!   --------------------------------------------------------------------
+!
+      subroutine read_character3_ctl_type(c_buf, label, chara3_item)
+!
+      use t_read_control_elements
+!
+      type(buffer_for_control), intent(in)  :: c_buf
+      character(len=kchara), intent(in) :: label
+      type(read_chara3_item), intent(inout) :: chara3_item
+!
+       character(len=kchara) :: tmpchara
+!
+!
+      if(chara3_item%iflag.gt.0                                         &
+     &      .or. c_buf%header_chara.ne.label) return
+!
+      read(c_buf%ctl_buffer,*) tmpchara, chara3_item%charavalue(1:3)
+      if (iflag_debug .gt. 0)  write(*,'(a,a4,a)')                      &
+     &      trim(c_buf%header_chara), ' 1: ', chara3_item%charavalue(1)
+      if (iflag_debug .gt. 0)  write(*,'(a,a4,a)')                      &
+     &      trim(c_buf%header_chara), ' 2: ', chara3_item%charavalue(2)
+      if (iflag_debug .gt. 0)  write(*,'(a,a4,a)')                      &
+     &      trim(c_buf%header_chara), ' 3: ', chara3_item%charavalue(3)
+      chara3_item%iflag = 1
+!
+      end subroutine read_character3_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_character3_ctl_type                              &
+     &         (id_file, level, label, chara3_item)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_file, level
+      character(len=kchara), intent(in) :: label
+      type(read_chara3_item), intent(in) :: chara3_item
+!
+      integer(kind = kint) :: i
+      integer(kind = kint) :: maxlen(0:2)
+!
+!
+      if(chara3_item%iflag .eq. 0) return
+!
+      maxlen(0) = len_trim(label)
+      do i = 1, 2
+        maxlen(i) = len_trim(chara3_item%charavalue(i))                 &
+     &           + iflag_divide(chara3_item%charavalue(i))
+      end do
+      call write_character3_ctl_item(id_file, level, label, maxlen,     &
+     &    chara3_item%charavalue(1), chara3_item%charavalue(2),         &
+     &    chara3_item%charavalue(3))
+!
+       end subroutine write_character3_ctl_type
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_character3_ctl(org_c3, new_c3)
+!
+      type(read_chara3_item), intent(in) :: org_c3
+      type(read_chara3_item), intent(inout) :: new_c3
+!
+!
+      new_c3%iflag =           org_c3%iflag
+      new_c3%charavalue(1:3) = org_c3%charavalue(1:3)
+!
+       end subroutine copy_character3_ctl
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine alloc_control_array_c3(array_c3)

@@ -30,7 +30,6 @@
       module t_read_control_elements
 !
       use m_precision
-      use m_machine_parameter
 !
       implicit none
 !

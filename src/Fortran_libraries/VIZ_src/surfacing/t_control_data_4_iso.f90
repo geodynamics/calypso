@@ -78,7 +78,8 @@
       use m_machine_parameter
       use skip_comment_f
       use t_read_control_elements
-      use t_control_elements
+      use t_control_array_character
+      use t_control_array_real
       use t_control_array_character
       use t_control_array_character2
 !
@@ -226,8 +227,6 @@
 !  ---------------------------------------------------------------------
 !
       subroutine dup_control_4_iso(org_iso_c, new_iso_c)
-!
-      use copy_control_elements
 !
       type(iso_ctl), intent(in) :: org_iso_c
       type(iso_ctl), intent(inout) :: new_iso_c

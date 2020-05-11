@@ -78,7 +78,8 @@
       use m_precision
 !
       use t_read_control_elements
-      use t_control_elements
+      use t_control_array_character
+      use t_control_array_real
       use t_control_array_integer
       use skip_comment_f
 !
@@ -173,8 +174,6 @@
 ! -----------------------------------------------------------------------
 !
       subroutine copy_volume_spectr_control(org_vpwr, new_vpwr)
-!
-      use copy_control_elements
 !
       type(volume_spectr_control), intent(in) :: org_vpwr
       type(volume_spectr_control), intent(inout) :: new_vpwr

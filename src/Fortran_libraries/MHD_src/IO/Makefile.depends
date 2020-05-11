@@ -1,4 +1,4 @@
-add_nodal_fields_4_MHD.o: $(MHD_IO_DIR)/add_nodal_fields_4_MHD.f90 m_precision.o m_machine_parameter.o m_phys_labels.o t_control_parameter.o t_physical_property.o add_nodal_fields_ctl.o calypso_mpi.o check_base_forces.o check_base_field.o check_workarea_4_explicit.o t_control_array_character3.o t_reference_scalar_param.o
+add_nodal_fields_4_MHD.o: $(MHD_IO_DIR)/add_nodal_fields_4_MHD.f90 m_precision.o m_machine_parameter.o m_phys_labels.o t_control_parameter.o t_physical_property.o add_nodal_fields_ctl.o calypso_mpi.o check_base_forces.o check_base_field.o check_workarea_4_explicit.o t_control_array_character3.o t_reference_scalar_param.o t_explicit_term_labels.o t_base_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 add_sph_MHD_fields_2_ctl.o: $(MHD_IO_DIR)/add_sph_MHD_fields_2_ctl.f90 m_precision.o m_phys_labels.o t_control_array_character3.o t_physical_property.o add_nodal_fields_ctl.o m_rot_force_labels.o m_div_force_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -18,7 +18,7 @@ set_control_4_force.o: $(MHD_IO_DIR)/set_control_4_force.f90 m_precision.o m_con
 	$(F90) -c $(F90OPTFLAGS) $<
 set_control_4_magne.o: $(MHD_IO_DIR)/set_control_4_magne.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_physical_property.o t_control_array_chara2real.o t_bc_data_list.o set_node_group_types.o set_surface_group_types.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_control_4_model.o: $(MHD_IO_DIR)/set_control_4_model.f90 m_precision.o m_constants.o m_error_IDs.o m_machine_parameter.o t_ctl_data_mhd_evo_scheme.o t_control_parameter.o calypso_mpi.o m_phys_labels.o t_ctl_data_mhd_evolution.o t_ctl_data_temp_model.o t_ctl_data_node_monitor.o t_reference_scalar_param.o node_monitor_IO.o t_control_elements.o
+set_control_4_model.o: $(MHD_IO_DIR)/set_control_4_model.f90 m_precision.o m_constants.o m_error_IDs.o m_machine_parameter.o t_ctl_data_mhd_evo_scheme.o t_control_parameter.o calypso_mpi.o m_phys_labels.o t_ctl_data_mhd_evolution.o t_ctl_data_temp_model.o t_ctl_data_node_monitor.o t_reference_scalar_param.o node_monitor_IO.o t_control_array_real.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_control_4_normalize.o: $(MHD_IO_DIR)/set_control_4_normalize.f90 m_precision.o m_machine_parameter.o calypso_mpi.o m_error_IDs.o t_physical_property.o t_normalize_parameter.o t_ctl_data_mhd_normalize.o t_ctl_data_termal_norm.o t_ctl_data_momentum_norm.o t_ctl_data_induct_norm.o t_control_array_charareal.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -48,15 +48,15 @@ t_ctl_data_MHD_model.o: $(MHD_IO_DIR)/t_ctl_data_MHD_model.f90 m_precision.o m_m
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_SPH_MHD_control.o: $(MHD_IO_DIR)/t_ctl_data_SPH_MHD_control.f90 m_precision.o calypso_mpi.o m_machine_parameter.o t_read_control_elements.o t_ctl_data_4_time_steps.o t_ctl_data_mhd_evo_scheme.o skip_comment_f.o bcast_4_time_step_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_crust_filter.o: $(MHD_IO_DIR)/t_ctl_data_crust_filter.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_control_elements.o t_control_data_sections.o t_read_control_elements.o skip_comment_f.o bcast_control_arrays.o
+t_ctl_data_crust_filter.o: $(MHD_IO_DIR)/t_ctl_data_crust_filter.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_control_array_integer.o t_control_data_sections.o t_read_control_elements.o skip_comment_f.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_induct_norm.o: $(MHD_IO_DIR)/t_ctl_data_induct_norm.f90 m_precision.o m_machine_parameter.o t_control_array_charareal.o t_read_control_elements.o skip_comment_f.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_mhd_evo_scheme.o: $(MHD_IO_DIR)/t_ctl_data_mhd_evo_scheme.f90 m_precision.o m_machine_parameter.o t_control_elements.o t_read_control_elements.o skip_comment_f.o bcast_control_arrays.o
+t_ctl_data_mhd_evo_scheme.o: $(MHD_IO_DIR)/t_ctl_data_mhd_evo_scheme.f90 m_precision.o m_machine_parameter.o t_control_array_character.o t_control_array_real.o t_control_array_integer.o t_read_control_elements.o skip_comment_f.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_mhd_evolution.o: $(MHD_IO_DIR)/t_ctl_data_mhd_evolution.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_control_array_character.o skip_comment_f.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_mhd_forces.o: $(MHD_IO_DIR)/t_ctl_data_mhd_forces.f90 m_precision.o m_constants.o m_machine_parameter.o t_read_control_elements.o t_control_elements.o t_control_array_character.o t_control_array_charareal.o calypso_mpi.o skip_comment_f.o bcast_control_arrays.o
+t_ctl_data_mhd_forces.o: $(MHD_IO_DIR)/t_ctl_data_mhd_forces.f90 m_precision.o m_constants.o m_machine_parameter.o t_read_control_elements.o t_control_array_character.o t_control_array_charareal.o calypso_mpi.o skip_comment_f.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_mhd_normalize.o: $(MHD_IO_DIR)/t_ctl_data_mhd_normalize.f90 m_precision.o m_machine_parameter.o calypso_mpi.o skip_comment_f.o t_read_control_elements.o t_control_array_charareal.o t_ctl_data_momentum_norm.o t_ctl_data_induct_norm.o t_ctl_data_termal_norm.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -72,7 +72,7 @@ t_ctl_data_sph_MHD_psf.o: $(MHD_IO_DIR)/t_ctl_data_sph_MHD_psf.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_surf_boundary.o: $(MHD_IO_DIR)/t_ctl_data_surf_boundary.f90 m_precision.o m_machine_parameter.o t_control_array_chara2real.o t_read_control_elements.o skip_comment_f.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_temp_model.o: $(MHD_IO_DIR)/t_ctl_data_temp_model.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_control_elements.o skip_comment_f.o bcast_control_arrays.o
+t_ctl_data_temp_model.o: $(MHD_IO_DIR)/t_ctl_data_temp_model.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_control_array_character.o t_control_array_real.o skip_comment_f.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_termal_norm.o: $(MHD_IO_DIR)/t_ctl_data_termal_norm.f90 m_precision.o m_machine_parameter.o t_control_array_charareal.o t_read_control_elements.o skip_comment_f.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<

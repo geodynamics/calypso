@@ -38,8 +38,6 @@
 !!      subroutine mpi_read_mul_charahead_b(IO_param, num, chara_dat)
 !!        Substitution of gz_read_mul_character_b
 !!      subroutine mpi_read_mul_realhead_b(IO_param, num, real_dat)
-!!      subroutine mpi_read_int4head_b(IO_param, int4_dat)
-!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !!@endverbatim
 !
       module MPI_binary_head_IO
@@ -408,24 +406,6 @@
       call calypso_mpi_bcast_real(real_dat, num, 0)
 !
       end subroutine mpi_read_mul_realhead_b
-!
-! -----------------------------------------------------------------------
-!
-      subroutine mpi_read_int4head_b(IO_param, int4_dat)
-!
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-!
-      integer, intent(inout) :: int4_dat
-!
-      integer(kind = MPI_OFFSET_KIND) :: ioffset
-!
-!
-      ioffset = IO_param%ioff_gl
-      call calypso_mpi_seek_read_int4head                               &
-     &   (IO_param%id_file, int4_dat, ioffset)
-      IO_param%ioff_gl = ioffset
-!
-      end subroutine mpi_read_int4head_b
 !
 ! -----------------------------------------------------------------------
 !

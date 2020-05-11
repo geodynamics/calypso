@@ -153,7 +153,8 @@
       subroutine init_rayleigh_restart_params                           &
      &         (istep_start, org_fld_file, ra_rst)
 !
-      use sel_read_rayleigh_restart
+      use rayleigh_restart_IO
+      use MPI_read_rayleigh_restart
 !
       integer(kind = kint), intent(in) :: istep_start
       type(field_IO_params), intent(in) :: org_fld_file
@@ -167,45 +168,7 @@
       end if
       call calypso_mpi_barrier
 !
-      call MPI_Bcast(ra_rst%i_version_from_file, 1,                     &
-     &    CALYPSO_FOUR_INT, 0, CALYPSO_COMM, ierr_MPI)
-!      if(my_rank .eq. 0) write(*,*) 'MPI_Bcast ra_rst%iflag_swap' 
-      call MPI_Bcast(ra_rst%iflag_swap, 1,                              &
-     &    CALYPSO_FOUR_INT, 0, CALYPSO_COMM, ierr_MPI)
-!
-!      if(my_rank .eq. 0) write(*,*) 'MPI_Bcast ra_rst%ltr_org' 
-      call MPI_Bcast(ra_rst%ltr_org, 1,                                 &
-     &    CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-!      if(my_rank .eq. 0) write(*,*) 'MPI_Bcast ra_rst%iflag_rtype' 
-      call MPI_Bcast(ra_rst%iflag_rtype, 1,                             &
-     &    CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-!
-!      if(my_rank .eq. 0) write(*,*) 'MPI_Bcast ra_rst%nri_org' 
-      call MPI_Bcast(ra_rst%nri_org, 1,                                 &
-     &    CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-!
-      if(my_rank .ne. 0) call alloc_rayleigh_radial_grid(ra_rst)
-      call calypso_mpi_barrier
-!
-!      if(my_rank .eq. 0) write(*,*) 'MPI_Bcast ra_rst%nri_org' 
-      call MPI_Bcast(ra_rst%r_org, ra_rst%nri_org,                      &
-     &    CALYPSO_REAL, 0, CALYPSO_COMM, ierr_MPI)
-!
-!      if(my_rank .eq. 0) write(*,*) 'MPI_Bcast ra_rst%time_org' 
-      call MPI_Bcast(ra_rst%time_org, 1,                                &
-     &    CALYPSO_REAL, 0, CALYPSO_COMM, ierr_MPI)
-!      if(my_rank .eq. 0) write(*,*) 'MPI_Bcast ra_rst%dt_org' 
-      call MPI_Bcast(ra_rst%dt_org, 1,                                  &
-     &    CALYPSO_REAL, 0, CALYPSO_COMM, ierr_MPI)
-!      if(my_rank .eq. 0) write(*,*) 'MPI_Bcast ra_rst%dt_new' 
-      call MPI_Bcast(ra_rst%dt_new, 1,                                  &
-     &    CALYPSO_REAL, 0, CALYPSO_COMM, ierr_MPI)
-!      if(my_rank .eq. 0) write(*,*) 'MPI_Bcast ra_rst%new_dt_org' 
-      call MPI_Bcast(ra_rst%new_dt_org, 1,                              &
-     &    CALYPSO_REAL, 0, CALYPSO_COMM, ierr_MPI)
-!      if(my_rank .eq. 0) write(*,*) 'MPI_Bcast ra_rst%i_step_org' 
-      call MPI_Bcast(ra_rst%i_step_org, 1,                              &
-     &    CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call bcast_rayleigh_restart_param(ra_rst)
 !
       end subroutine init_rayleigh_restart_params
 !

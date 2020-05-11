@@ -65,7 +65,7 @@
       subroutine set_merged_ucd_file_ctl(default_prefix,                &
      &          file_prefix_ctl, file_format_ctl, ucd_param)
 !
-      use t_control_elements
+      use t_control_array_character
 !
       character(len = kchara), intent(in) :: default_prefix
       type(read_character_item), intent(in) :: file_prefix_ctl
@@ -226,7 +226,6 @@
       subroutine choose_para_fld_file_format(file_fmt_ctl, i_file_fmt,  &
      &          id_field_file_format)
 !
-      use t_control_elements
       use skip_comment_f
 !
       integer(kind= kint), intent(in) :: i_file_fmt

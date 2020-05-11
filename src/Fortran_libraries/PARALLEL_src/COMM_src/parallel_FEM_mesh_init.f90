@@ -43,17 +43,12 @@
       use m_array_for_send_recv
 !
       use nod_phys_send_recv
-      use node_monitor_IO
       use const_mesh_information
       use const_element_comm_tables
       use mesh_file_name_by_param
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
-!
-!  -------------------------------
-!      if (iflag_debug.gt.0) write(*,*) 'set_local_nod_4_monitor'
-!      call set_local_nod_4_monitor(mesh, group)
 !
 !  ------  In itialize data communication for FEM data
 !

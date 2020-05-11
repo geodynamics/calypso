@@ -17,6 +17,11 @@
 !!      subroutine change_2_upper_case(string)
 !!      subroutine change_2_lower_case(string)
 !!
+!!      real(kind = kreal) function compare_data(data, ref)
+!!        real(kind = kreal), intent(in) :: data, ref
+!!           Compare two reals
+!!              if ref = 0.0 then compare_data = data
+!!              else compare_data = abs((data - ref) / ref)
 !!      logical function cmp_no_case(cmp_chara, ref_chara)
 !!          if ref_chara and cmp_chara are same ignoreing case,
 !!          returns 1, othewwise returns 0
@@ -172,6 +177,7 @@
       end subroutine change_2_lower_case
 !
 !-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
       logical function cmp_no_case(cmp_chara, ref_chara)
 !
@@ -197,6 +203,20 @@
       return
 !
       end function cmp_no_case
+!
+!-----------------------------------------------------------------------
+!
+      real(kind = kreal) function compare_data(data, ref)
+!
+      real(kind = kreal), intent(in) :: data, ref
+!
+      if(ref .eq. 0.0d0) then
+        compare_data = abs(data)
+      else
+        compare_data = abs((data - ref) / ref)
+      end if
+!
+      end function compare_data
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

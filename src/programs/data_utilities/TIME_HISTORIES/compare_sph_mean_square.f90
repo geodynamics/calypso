@@ -14,6 +14,7 @@
       program compare_sph_mean_square
 !
       use m_precision
+      use skip_comment_f
 !
       implicit none
 !
@@ -34,7 +35,7 @@
       character(len = kchara), allocatable :: ene_sph_spec_name(:)
       real(kind = kreal), allocatable :: spectr_t(:)
       real(kind = kreal), allocatable :: spectr_ref(:)
-      real(kind = kreal), allocatable :: diff(:)
+      real(kind = kreal) :: diff
       real(kind = kreal) :: time, time_ref
 !
       open (id_file_rms,file=fname_rms_vol)
@@ -53,7 +54,6 @@
       allocate( ene_sph_spec_name(ntot_sph_spec) )
       allocate( spectr_t(ntot_sph_spec) )
       allocate( spectr_ref(ntot_sph_spec) )
-      allocate( diff(ntot_sph_spec) )
 !
 !    Evaluate time average
 !
@@ -104,24 +104,22 @@
       close(id_file_rms)
 !
 !
-      do icomp = 1, ntot_sph_spec
-        diff(icomp) = abs(spectr_t(icomp) - spectr_ref(icomp))          &
-     &               / spectr_ref(icomp)
-      end do
-!
       ierr = 0
       if(istep .ne. istep_ref) then
           write(*,*) 'time step error'
       end if
-      diff(1) = abs(time-time_ref)/time_ref
-      if(diff(1) .gt. 1.d-9) then
+!
+      diff = compare_data(time, time_ref)
+      if(diff .gt. 1.d-9) then
           write(*,*) 'Large error in time: ',                           &
-     &                time, time_ref, diff(1)
+     &                time, time_ref, diff
       end if
+
       do icomp = 1, ntot_sph_spec
-        if(diff(icomp) .gt. 1.d-9) then
+        diff = compare_data(spectr_t(icomp), spectr_ref(icomp))
+        if(diff .gt. 1.d-9) then
           write(*,*) 'Large error in ', trim(ene_sph_spec_name(icomp)), &
-     &           ': ', spectr_t(icomp), spectr_ref(icomp), diff(icomp)
+     &           ': ', spectr_t(icomp), spectr_ref(icomp), diff
           ierr = 1
           exit
         end if

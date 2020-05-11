@@ -37,7 +37,8 @@
       module t_ctl_data_4_FEM_mesh
 !
       use m_precision
-      use t_control_elements
+      use t_control_array_character
+      use t_control_array_integer
 !
       implicit  none
 !

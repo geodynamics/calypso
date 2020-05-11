@@ -86,7 +86,7 @@ t_check_and_make_SPH_mesh.o: $(SPH_GRID_SRCDIR)/t_check_and_make_SPH_mesh.f90 m_
 	$(F90) -c $(F90OPTFLAGS) $<
 t_const_spherical_grid.o: $(SPH_GRID_SRCDIR)/t_const_spherical_grid.f90 m_precision.o t_spheric_global_ranks.o t_sph_1d_global_index.o t_sph_local_parameter.o t_control_1D_layering.o t_group_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_1D_layering.o: $(SPH_GRID_SRCDIR)/t_control_1D_layering.f90 m_precision.o t_control_array_integer2.o set_parallel_file_name.o t_control_elements.o cal_minmax_and_stacks.o
+t_control_1D_layering.o: $(SPH_GRID_SRCDIR)/t_control_1D_layering.f90 m_precision.o t_control_array_integer2.o set_parallel_file_name.o t_control_array_integer.o cal_minmax_and_stacks.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_const_sph_mesh.o: $(SPH_GRID_SRCDIR)/t_ctl_data_const_sph_mesh.f90 m_precision.o m_machine_parameter.o calypso_mpi.o skip_comment_f.o t_read_control_elements.o t_ctl_data_4_platforms.o t_ctl_data_gen_sph_shell.o bcast_4_platform_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
