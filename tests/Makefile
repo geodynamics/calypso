@@ -36,6 +36,7 @@ heterogineous_temp
 all: test
 
 test: 
+	echo "# Test output test..."; \
 	for dir in $(SUBDIRS) ; do \
 	echo "# Test in $${dir} directory..."; \
 		( cd $${dir}; \
