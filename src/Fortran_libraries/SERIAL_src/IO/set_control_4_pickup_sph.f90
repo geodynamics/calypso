@@ -57,6 +57,19 @@
       if(no_flag(diff_lm_spectr_switch%charavalue))                     &
      &                                             iflag_spectr_lm = 0
 !
+!   set pickup layer for mean square data
+      nri_rms = 0
+      if(idx_spec_layer_ctl%num .gt. 0) then
+        nri_rms = idx_spec_layer_ctl%num
+        call allocate_num_spec_layer
+!
+        do inum = 1, nri_rms
+          kr_for_rms(inum) = idx_spec_layer_ctl%ivec(inum)
+        end do
+!
+        call deallocate_num_spec_layer_ctl
+      end if
+!
 !
       if(picked_mode_head_ctl%iflag .gt. 0) then
         pickup_sph_head = picked_mode_head_ctl%charavalue
@@ -105,19 +118,6 @@
         num_pick_sph_l = -9999
       else 
         call allocate_pick_sph_l
-      end if
-!
-!   set pickup layer
-      nri_rms = 0
-      if(idx_spec_layer_ctl%num .gt. 0) then
-      nri_rms = idx_spec_layer_ctl%num
-      call allocate_num_spec_layer
-!
-      do inum = 1, nri_rms
-        kr_for_rms(inum) = idx_spec_layer_ctl%ivec(inum)
-      end do
-!
-        call deallocate_num_spec_layer_ctl
       end if
 !
 !   set pickup layer
