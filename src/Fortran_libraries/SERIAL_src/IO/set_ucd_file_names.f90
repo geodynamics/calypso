@@ -22,6 +22,8 @@
 !!      character(len=kchara) function                                  &
 !!     &          set_single_grd_file_name(file_prefix, itype_file)
 !!
+!!      character(len=kchara) function set_parallel_vtk_file_name       &
+!!     &                  (file_prefix, id_rank, istep_ucd)
 !!      character(len=kchara) function                                  &
 !!     &          set_merged_hdf_mesh_file_name(file_prefix)
 !!      character(len=kchara) function                                  &
@@ -93,8 +95,11 @@
 !
       fname_tmp = add_int_suffix(istep_ucd, file_prefix)
 !
-      if (id_rank .ge. 0                                                &
-     &      .and. (itype_file/icent) .eq. (iflag_para/icent)) then
+      if(     mod(itype_file,icent)/iten .eq. iflag_ucd_bin/iten        &
+     &   .or. mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
+        file_name = fname_tmp
+      else if(id_rank .ge. 0                                            &
+     &        .and. (itype_file/icent) .eq. (iflag_para/icent)) then
         file_name = add_process_id(id_rank, fname_tmp)
       else
         file_name = fname_tmp
@@ -112,6 +117,10 @@
         fname_tmp = add_ucd_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
         fname_tmp = add_udt_extension(file_name)
+      else if(mod(itype_file,icent)/iten .eq. iflag_ucd_bin/iten) then
+        fname_tmp = add_psf_extension(file_name)
+      else if(mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
+        fname_tmp = add_sdt_extension(file_name)
       else
         fname_tmp = add_fld_extension(file_name)
       end if
@@ -141,7 +150,9 @@
 !
       fname_tmp = add_int_suffix(izero, file_prefix)
 !
-      if (id_rank .ge. 0                                                &
+      if(     mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
+        file_name = fname_tmp
+      else if(id_rank .ge. 0                                            &
      &     .and. itype_file/icent .eq. iflag_para/icent) then
         file_name = add_process_id(id_rank, fname_tmp)
       else
@@ -152,6 +163,8 @@
         fname_tmp = add_vtg_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
         fname_tmp = add_grd_extension(file_name)
+      else if(mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
+        fname_tmp = add_sgd_extension(file_name)
       else
         fname_tmp = file_name
       end if
@@ -176,7 +189,7 @@
       use set_ucd_extensions
 !
       integer(kind=kint), intent(in) :: itype_file, istep_ucd
-      character(len=kchara), intent(in) ::    file_prefix
+      character(len=kchara), intent(in) :: file_prefix
       character(len=kchara) :: fname_tmp, file_name
 !
 !
@@ -190,6 +203,10 @@
         fname_tmp = add_ucd_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
         fname_tmp = add_udt_extension(file_name)
+      else if(mod(itype_file,icent)/iten .eq. iflag_ucd_bin/iten) then
+        fname_tmp = add_psf_extension(file_name)
+      else if(mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
+        fname_tmp = add_sdt_extension(file_name)
       else
         fname_tmp = add_fld_extension(file_name)
       end if
@@ -222,6 +239,8 @@
         fname_tmp = add_vtg_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
         fname_tmp = add_grd_extension(file_name)
+      else if(mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
+        fname_tmp = add_sgd_extension(file_name)
       else
         fname_tmp = file_name
       end if
@@ -234,6 +253,28 @@
       set_single_grd_file_name = file_name
 !
       end function set_single_grd_file_name
+!
+!------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      character(len=kchara) function set_parallel_vtk_file_name         &
+     &                  (file_prefix, id_rank, istep_ucd)
+!
+      use set_parallel_file_name
+      use set_mesh_extensions
+      use set_ucd_extensions
+!
+      integer, intent(in) :: id_rank
+      integer(kind=kint), intent(in) :: istep_ucd
+      character(len=kchara), intent(in) :: file_prefix
+      character(len=kchara) :: fname_tmp, file_name
+!
+!
+      fname_tmp = add_int_suffix(istep_ucd, file_prefix)
+      file_name = add_process_id(id_rank, fname_tmp)
+      set_parallel_vtk_file_name = add_vtk_extension(file_name)
+!
+      end function set_parallel_vtk_file_name
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------

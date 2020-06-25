@@ -226,8 +226,7 @@
 !
       if (iflag_debug.gt.0) write(*,*) 's_set_control_4_force'
       call s_set_control_4_force(Dmodel_ctl%frc_ctl, Dmodel_ctl%g_ctl,  &
-     &    Dmodel_ctl%cor_ctl, Dmodel_ctl%mcv_ctl,                       &
-     &    MHD_prop%fl_prop, MHD_prop%cd_prop)
+     &    Dmodel_ctl%cor_ctl, Dmodel_ctl%mcv_ctl, MHD_prop)
 !
 !   set parameters for general information
 !

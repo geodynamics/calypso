@@ -430,7 +430,7 @@
 !
       subroutine set_base_force_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout) :: n_comps(nforce_base)
+      integer(kind = kint_4b), intent(inout) :: n_comps(nforce_base)
       character(len = kchara), intent(inout) :: names(nforce_base)
       character(len = kchara), intent(inout) :: maths(nforce_base)
 !

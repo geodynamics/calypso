@@ -18,68 +18,6 @@
       implicit  none
 !
 !
-      character(len=kchara), parameter :: hd_scl = 'scalar'
-      character(len=kchara), parameter :: hd_vec = 'vector'
-      character(len=kchara), parameter :: hd_tsr = 'sym_tensor'
-      character(len=kchara), parameter :: hd_ats = 'asym_tensor'
-!
-      character(len=kchara), parameter                                  &
-     &                      :: hd_vec_sph = 'spherical_vector'
-      character(len=kchara), parameter                                  &
-     &                      :: hd_vec_cyl = 'cylindrical_vector'
-      character(len=kchara), parameter                                  &
-     &                      :: hd_tsr_sph = 'spherical_sym_tensor'
-      character(len=kchara), parameter                                  &
-     &                      :: hd_tsr_cyl = 'cylindrical_sym_tensor'
-!
-      character(len=kchara), parameter :: hd_amplitude = 'amplitude'
-      character(len=kchara), parameter :: hd_magnitude = 'magnitude'
-      character(len=kchara), parameter :: hd_norm =      'norm'
-!
-      character(len=kchara), parameter :: hd_vec_x = 'x'
-      character(len=kchara), parameter :: hd_vec_y = 'y'
-      character(len=kchara), parameter :: hd_vec_z = 'z'
-      character(len=kchara), parameter :: hd_vec_r = 'r'
-      character(len=kchara), parameter :: hd_vec_t = 'theta'
-      character(len=kchara), parameter :: hd_vec_p = 'phi'
-      character(len=kchara), parameter :: hd_vec_s = 's'
-      character(len=kchara), parameter :: hd_vec_rd = 'radial'
-      character(len=kchara), parameter :: hd_vec_ev = 'elevation'
-      character(len=kchara), parameter :: hd_vec_az = 'azimuth'
-      character(len=kchara), parameter :: hd_vec_cl = 'cylinder_r'
-!
-      character(len=kchara), parameter                                  &
-     &                      :: hd_tsr_mag =  'norm_sym_tensor'
-      character(len=kchara), parameter                                  &
-     &                      :: hd_tsr_norm = 'mag_sym_tensor'
-      character(len=kchara), parameter                                  &
-     &                      :: hd_ats_mag =  'norm_asym_tensor'
-      character(len=kchara), parameter                                  &
-     &                      :: hd_ats_norm = 'mag_asym_tensor'
-!
-      character(len=kchara), parameter :: hd_tsr_xx = 'xx'
-      character(len=kchara), parameter :: hd_tsr_xy = 'xy'
-      character(len=kchara), parameter :: hd_tsr_xz = 'xz'
-      character(len=kchara), parameter :: hd_tsr_yy = 'yy'
-      character(len=kchara), parameter :: hd_tsr_yz = 'yz'
-      character(len=kchara), parameter :: hd_tsr_zz = 'zz'
-!
-      character(len=kchara), parameter :: hd_tsr_rr = 'rr'
-      character(len=kchara), parameter :: hd_tsr_rt = 'rt'
-      character(len=kchara), parameter :: hd_tsr_rp = 'rp'
-      character(len=kchara), parameter :: hd_tsr_tt = 'tt'
-      character(len=kchara), parameter :: hd_tsr_tp = 'tp'
-      character(len=kchara), parameter :: hd_tsr_pp = 'pp'
-!
-      character(len=kchara), parameter :: hd_tsr_ss =     'ss'
-      character(len=kchara), parameter :: hd_tsr_sp =     'sp'
-      character(len=kchara), parameter :: hd_tsr_sz =     'sz'
-      character(len=kchara), parameter :: hd_tsr_pp_cyl = 'pp_cyl'
-      character(len=kchara), parameter :: hd_tsr_pz =     'pz'
-      character(len=kchara), parameter :: hd_tsr_zz_cyl = 'zz_cyl'
-!
-!
-!
       integer(kind = kint), parameter :: ncomp_SCALAR =      1
       integer(kind = kint), parameter :: ncomp_VECTOR =      3
       integer(kind = kint), parameter :: ncomp_SYM_TENSOR =  6
@@ -128,19 +66,6 @@
       integer(kind = kint), parameter :: icomp_PZ =     235
       integer(kind = kint), parameter :: icomp_ZZ_cyl = 236
 !
-      private :: hd_scl, hd_vec, hd_tsr, hd_ats
-      private :: hd_vec_sph, hd_vec_cyl, hd_tsr_sph, hd_tsr_cyl
-      private :: hd_amplitude, hd_magnitude, hd_norm
-      private :: hd_tsr_mag, hd_tsr_norm, hd_ats_mag, hd_ats_norm
-      private :: hd_vec_x, hd_vec_y, hd_vec_z
-      private :: hd_vec_r, hd_vec_t, hd_vec_p, hd_vec_s
-      private :: hd_vec_rd, hd_vec_ev, hd_vec_az, hd_vec_cl
-      private :: hd_tsr_xx, hd_tsr_xy, hd_tsr_xz, hd_tsr_yy
-      private :: hd_tsr_yz, hd_tsr_zz, hd_tsr_rr, hd_tsr_rt
-      private :: hd_tsr_rp, hd_tsr_tt, hd_tsr_tp, hd_tsr_pp
-      private :: hd_tsr_ss, hd_tsr_sp, hd_tsr_sz, hd_tsr_pz
-      private :: hd_tsr_pp_cyl, hd_tsr_zz_cyl
-!
 !  ---------------------------------------------------------------------
 !
       contains
@@ -150,6 +75,10 @@
       subroutine s_set_components_flags(comp_name, phys_name,           &
      &          icomp, ncomp, ncomp_org, rst_name)
 !
+      use t_field_labels
+      use t_multi_flag_labels
+      use m_component_flags
+      use m_more_component_flags
       use skip_comment_f
 !
       character(len=kchara), intent(in) :: comp_name, phys_name
@@ -159,194 +88,189 @@
 !
 !
 !
-      if     (cmp_no_case(comp_name, hd_scl))then
+      call init_more_componnet_flags()
+      if     (cmp_no_case(comp_name, scalar%name))then
         icomp =     icomp_SCALAR
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SCALAR
         write(rst_name,1000) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_vec)) then
+      else if(cmp_no_case(comp_name, vector%name)) then
         icomp =     icomp_VECTOR
         ncomp =     ncomp_VECTOR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1000) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr)) then
+      else if(cmp_no_case(comp_name, sym_tensor%name)) then
         icomp =     icomp_SYM_TENSOR
         ncomp =     ncomp_SYM_TENSOR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1000) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_ats)) then
+      else if(cmp_no_case(comp_name, asym_tensor%name)) then
         icomp =     icomp_ASYM_TENSOR
         ncomp =     ncomp_ASYM_TENSOR
         ncomp_org = ncomp_ASYM_TENSOR
         write(rst_name,1000) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_vec_sph)) then
+      else if(cmp_no_case(comp_name, spherical_vector%name)) then
         icomp =     icomp_SPH_VECTOR
         ncomp =     ncomp_VECTOR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1100) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_vec_cyl)) then
+      else if(cmp_no_case(comp_name, cylindrical_vector%name)) then
         icomp =     icomp_CYL_VECTOR
         ncomp =     ncomp_VECTOR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1200) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_sph)) then
+      else if(cmp_no_case(comp_name, spherical_sym_tensor%name)) then
         icomp =     icomp_SPHL_SYM_TENSOR
         ncomp =     ncomp_SYM_TENSOR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1100) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_cyl)) then
+      else if(cmp_no_case(comp_name, cylindrical_sym_tensor%name)) then
         icomp =     icomp_CYL_SYM_TENSOR
         ncomp =     ncomp_SYM_TENSOR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1200) trim(phys_name)
 !
-      else if(cmp_no_case(comp_name, hd_amplitude)                      &
-     &   .or. cmp_no_case(comp_name, hd_magnitude)                      &
-     &   .or. cmp_no_case(comp_name, hd_norm)) then
+      else if(check_mul_flags(comp_name, magnitude_flags)) then
         icomp =     icomp_NORM
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1300) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_vec_x)) then
+      else if(cmp_no_case(comp_name, V_x%name)) then
         icomp =     icomp_X
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1001) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_vec_y)) then
+      else if(cmp_no_case(comp_name, V_y%name)) then
         icomp =     icomp_Y
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1002) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_vec_z)) then
+      else if(cmp_no_case(comp_name, V_z%name)) then
         icomp =     icomp_Z
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1003) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_vec_rd)                         &
-     &   .or. cmp_no_case(comp_name, hd_vec_r)) then
+      else if(check_mul_flags(comp_name, radial_flags)) then
         icomp =     icomp_RADIAL
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1011) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_vec_ev)                         &
-     &   .or. cmp_no_case(comp_name, hd_vec_t)) then
+      else if(check_mul_flags(comp_name, theta_flags)) then
         icomp =     icomp_THETA
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1012) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_vec_az)                         &
-     &   .or. cmp_no_case(comp_name, hd_vec_p)) then
+      else if(check_mul_flags(comp_name, phi_flags)) then
         icomp =     icomp_PHI
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1013) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_vec_cl)                         &
-     &   .or. cmp_no_case(comp_name, hd_vec_s)) then
+      else if(check_mul_flags(comp_name, cyrindrical_r_flags)) then
         icomp =     icomp_CYLINDER_R
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1014) trim(phys_name)
 !
-      else if(cmp_no_case(comp_name, hd_tsr_mag)                        &
-     &   .or. cmp_no_case(comp_name, hd_tsr_norm)) then
+      else if(check_mul_flags(comp_name, sym_tensor_magnitude_flags)    &
+     &        ) then
         icomp =     icomp_NORM_SYM_TENSOR
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1300) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_ats_mag)                        &
-     &   .or. cmp_no_case(comp_name, hd_ats_norm)) then
+      else if(check_mul_flags(comp_name, asym_tensor_magnitude_flags)   &
+     &        ) then
         icomp =     icomp_NORM_ASYM_TENSOR
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_ASYM_TENSOR
         write(rst_name,1300) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_xx)) then
+      else if(cmp_no_case(comp_name, T_xx%name)) then
         icomp =     icomp_XX
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1061) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_xy)) then
+      else if(cmp_no_case(comp_name, T_xy%name)) then
         icomp =     icomp_XY
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1062) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_xz)) then
+      else if(cmp_no_case(comp_name, T_xz%name)) then
         icomp =     icomp_XZ
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1063) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_yy)) then
+      else if(cmp_no_case(comp_name, T_yy%name)) then
         icomp =     icomp_YY
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1064) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_yz)) then
+      else if(cmp_no_case(comp_name, T_yz%name)) then
         icomp =     icomp_YZ
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1065) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_zz)) then
+      else if(cmp_no_case(comp_name, T_zz%name)) then
         icomp =     icomp_ZZ
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1066) trim(phys_name)
 !
-      else if(cmp_no_case(comp_name, hd_tsr_rr)) then
+      else if(cmp_no_case(comp_name, T_rr%name)) then
         icomp =     icomp_RR
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1221) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_rt)) then
+      else if(cmp_no_case(comp_name, T_rt%name)) then
         icomp =     icomp_RT
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1222) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_rp)) then
+      else if(cmp_no_case(comp_name, T_rp%name)) then
         icomp =     icomp_RP
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1223) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_tt)) then
+      else if(cmp_no_case(comp_name, T_tt%name)) then
         icomp =     icomp_TT
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1224) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_tp)) then
+      else if(cmp_no_case(comp_name, T_tp%name)) then
         icomp =     icomp_TP
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1225) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_pp)) then
+      else if(cmp_no_case(comp_name, T_pp%name)) then
         icomp =     icomp_PP
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1226) trim(phys_name)
 !
-      else if(cmp_no_case(comp_name, hd_tsr_ss)) then
+      else if(cmp_no_case(comp_name, T_ss%name)) then
         icomp =     icomp_SS
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1231) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_sp)) then
+      else if(cmp_no_case(comp_name, T_sp%name)) then
         icomp =     icomp_SP
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1232) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_sz)) then
+      else if(cmp_no_case(comp_name, T_sz%name)) then
         icomp =     icomp_SZ
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1233) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_pp_cyl)) then
+      else if(cmp_no_case(comp_name, T_pp%name)) then
         icomp =     icomp_PP_cyl
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1234) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_pz)) then
+      else if(cmp_no_case(comp_name, T_pz%name)) then
         icomp =     icomp_PZ
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1235) trim(phys_name)
-      else if(cmp_no_case(comp_name, hd_tsr_zz_cyl)) then
+      else if(cmp_no_case(comp_name, T_zz%name)) then
         icomp =     icomp_ZZ_cyl
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
@@ -358,6 +282,7 @@
         ncomp_org = 1
         write(rst_name,1000) trim(phys_name)
       end if
+      call dealloc_more_componnet_flags
 !
  1000 format (a)
  1100 format (a, "_sph")

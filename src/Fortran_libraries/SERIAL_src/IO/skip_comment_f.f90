@@ -16,6 +16,7 @@
 !!
 !!      subroutine change_2_upper_case(string)
 !!      subroutine change_2_lower_case(string)
+!!      character(len=kchara) function fill_from_null(input)
 !!
 !!      real(kind = kreal) function compare_data(data, ref)
 !!        real(kind = kreal), intent(in) :: data, ref
@@ -175,6 +176,28 @@
       end do
 !
       end subroutine change_2_lower_case
+!
+!-----------------------------------------------------------------------
+!
+      character(len=kchara) function fill_from_null(input)
+!
+      character(len=*), intent(in) :: input
+!
+      integer(kind = kint) :: icou, inull
+!
+      inull = kchara + 1
+      do icou = 1, kchara
+        fill_from_null(icou:icou) = input(icou:icou)
+        if(input(icou:icou) .eq. char(0)) then
+          inull = icou
+          exit
+        end if
+      end do
+      do icou = inull, kchara
+        fill_from_null(icou:icou) = char(32)
+      end do
+!
+      end function fill_from_null
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

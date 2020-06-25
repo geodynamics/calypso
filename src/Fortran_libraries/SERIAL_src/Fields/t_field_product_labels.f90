@@ -363,7 +363,7 @@
 !
       subroutine set_field_product_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout) :: n_comps(nfid_product)
+      integer(kind = kint_4b), intent(inout) :: n_comps(nfid_product)
       character(len = kchara), intent(inout) :: names(nfid_product)
       character(len = kchara), intent(inout) :: maths(nfid_product)
 !

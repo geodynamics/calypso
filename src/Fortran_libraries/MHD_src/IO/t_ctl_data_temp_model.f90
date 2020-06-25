@@ -33,6 +33,8 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
 !!    begin temperature_define
+!!      filtered_advection_ctl    Off
+!!
 !!      ref_temp_ctl              spherical_shell
 !!      begin low_temp_ctl
 !!           depth         1.5384615384615384
@@ -52,6 +54,8 @@
 !!    end  temperature_define
 !!
 !!    begin composition_define
+!!      filtered_advection_ctl    Off
+!!
 !!      ref_comp_ctl              spherical_shell
 !!      begin low_comp_ctl
 !!           depth         1.5384615384615384
@@ -102,6 +106,7 @@
       end type takepiro_model_control
 !
       type reference_temperature_ctl
+        type(read_character_item) :: filterd_advect_ctl
         type(read_character_item) :: reference_ctl
         type(read_character_item) :: stratified_ctl
 !
@@ -121,6 +126,8 @@
       character(len=kchara), parameter                                  &
      &       :: hd_high_temp =   'high_temp_ctl'
 !
+      character(len=kchara), parameter                                  &
+     &       :: hd_filterd_advection = 'filtered_advection_ctl'
       character(len=kchara), parameter                                  &
      &       :: hd_ref_comp =    'ref_comp_ctl'
       character(len=kchara), parameter                                  &
@@ -149,6 +156,7 @@
       character(len=kchara), parameter                                  &
      &       :: hd_comp_value = 'composition'
 !
+      private :: hd_filterd_advection
       private :: hd_ref_temp, hd_ref_comp
       private :: hd_strat_ctl, hd_strat_sigma
       private :: hd_strat_width, hd_strat_outer
@@ -191,7 +199,9 @@
      &      reft_ctl%takepiro_ctl, c_buf)
 !
         call read_chara_ctl_type                                        &
-     &     (c_buf, hd_ref_temp,  reft_ctl%reference_ctl)
+     &     (c_buf, hd_filterd_advection, reft_ctl%filterd_advect_ctl)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_ref_temp, reft_ctl%reference_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_strat_ctl, reft_ctl%stratified_ctl)
       end do
@@ -227,6 +237,8 @@
 !
 !
         call read_chara_ctl_type                                        &
+     &     (c_buf, hd_filterd_advection, refc_ctl%filterd_advect_ctl)
+        call read_chara_ctl_type                                        &
      &     (c_buf, hd_ref_comp, refc_ctl%reference_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_strat_ctl, refc_ctl%stratified_ctl)
@@ -246,6 +258,7 @@
       call bcast_ref_value_ctl(refs_ctl%high_ctl)
       call bcast_takepiro_ctl(refs_ctl%takepiro_ctl)
 !
+      call bcast_ctl_type_c1(refs_ctl%filterd_advect_ctl)
       call bcast_ctl_type_c1(refs_ctl%reference_ctl)
       call bcast_ctl_type_c1(refs_ctl%stratified_ctl)
 !

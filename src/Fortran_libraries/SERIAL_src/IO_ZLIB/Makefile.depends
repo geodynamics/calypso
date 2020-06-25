@@ -44,6 +44,12 @@ gz_node_geometry_IO.o: $(ZLIB_IO_DIR)/gz_node_geometry_IO.f90 m_precision.o t_ge
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_node_geometry_IO_b.o: $(ZLIB_IO_DIR)/gz_node_geometry_IO_b.f90 m_precision.o m_phys_constants.o t_geometry_data.o t_surf_edge_IO.o t_buffer_4_gzip.o binary_IO.o transfer_to_long_integers.o gz_binary_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
+gz_read_psf_binary_data.o: $(ZLIB_IO_DIR)/gz_read_psf_binary_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_buffer_4_gzip.o gz_binary_IO.o transfer_to_long_integers.o
+	$(F90) -c $(F90OPTFLAGS) $<
+gz_read_psf_binary_file.o: $(ZLIB_IO_DIR)/gz_read_psf_binary_file.f90 m_precision.o m_constants.o m_machine_parameter.o t_buffer_4_gzip.o t_ucd_data.o gz_binary_IO.o gzip_file_access.o gz_read_udt_from_bin_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
+gz_read_udt_from_bin_data.o: $(ZLIB_IO_DIR)/gz_read_udt_from_bin_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_buffer_4_gzip.o t_ucd_data.o gz_binary_IO.o gzip_file_access.o gz_read_psf_binary_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
 gz_rst_data_IO_by_fld.o: $(ZLIB_IO_DIR)/gz_rst_data_IO_by_fld.f90 m_precision.o m_machine_parameter.o t_time_data.o t_field_data_IO.o gz_field_data_IO.o set_parallel_file_name.o transfer_to_long_integers.o skip_gz_comment.o set_restart_data.o gzip_file_access.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_sph_global_1d_idx_IO.o: $(ZLIB_IO_DIR)/gz_sph_global_1d_idx_IO.f90 m_precision.o t_node_id_spherical_IO.o t_buffer_4_gzip.o gzip_file_access.o skip_gz_comment.o m_sph_modes_grid_labels.o
@@ -70,11 +76,15 @@ gz_ucd_data_IO.o: $(ZLIB_IO_DIR)/gz_ucd_data_IO.f90 m_precision.o m_constants.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_ucd_field_file_IO.o: $(ZLIB_IO_DIR)/gz_ucd_field_file_IO.f90 m_precision.o m_machine_parameter.o m_field_file_format.o t_time_data.o t_ucd_data.o gz_field_data_IO.o set_ucd_file_names.o skip_gz_comment.o gz_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_udt_file_IO.o: $(ZLIB_IO_DIR)/gz_udt_file_IO.f90 m_precision.o m_constants.o m_machine_parameter.o m_field_file_format.o t_ucd_data.o set_ucd_file_names.o gz_ucd_data_IO.o skip_gz_comment.o
+gz_udt_file_IO.o: $(ZLIB_IO_DIR)/gz_udt_file_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_ucd_data.o t_buffer_4_gzip.o skip_gz_comment.o gz_udt_type_data_IO.o gz_ucd_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_vtk_data_IO.o: $(ZLIB_IO_DIR)/gz_vtk_data_IO.f90 m_precision.o m_constants.o t_buffer_4_gzip.o vtk_data_to_buffer.o gzip_file_access.o m_phys_constants.o m_geometry_constants.o skip_gz_comment.o
+gz_udt_to_VTK_data_IO.o: $(ZLIB_IO_DIR)/gz_udt_to_VTK_data_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_ucd_data.o gz_vtk_data_IO.o vtk_data_to_buffer.o skip_comment_f.o copy_between_two_fields.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_vtk_file_IO.o: $(ZLIB_IO_DIR)/gz_vtk_file_IO.f90 m_precision.o m_constants.o m_machine_parameter.o m_field_file_format.o t_ucd_data.o t_buffer_4_gzip.o gz_vtk_data_IO.o set_parallel_file_name.o set_ucd_file_names.o set_ucd_extensions.o skip_gz_comment.o gzip_file_access.o m_phys_constants.o
+gz_udt_type_data_IO.o: $(ZLIB_IO_DIR)/gz_udt_type_data_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_ucd_data.o gz_ucd_data_IO.o ucd_data_to_buffer.o skip_gz_comment.o gzip_file_access.o
+	$(F90) -c $(F90OPTFLAGS) $<
+gz_vtk_data_IO.o: $(ZLIB_IO_DIR)/gz_vtk_data_IO.f90 m_precision.o m_constants.o m_phys_constants.o t_buffer_4_gzip.o vtk_data_to_buffer.o gzip_file_access.o m_geometry_constants.o skip_gz_comment.o
+	$(F90) -c $(F90OPTFLAGS) $<
+gz_vtk_file_IO.o: $(ZLIB_IO_DIR)/gz_vtk_file_IO.f90 m_precision.o m_constants.o m_machine_parameter.o m_field_file_format.o t_ucd_data.o t_buffer_4_gzip.o gz_udt_to_VTK_data_IO.o set_parallel_file_name.o set_ucd_file_names.o set_ucd_extensions.o skip_gz_comment.o gzip_file_access.o
 	$(F90) -c $(F90OPTFLAGS) $<
 input_old_file_sel_4_zlib.o: $(ZLIB_IO_DIR)/input_old_file_sel_4_zlib.F90 m_precision.o m_file_format_switch.o t_file_IO_parameter.o t_time_data.o t_field_data_IO.o gz_rst_data_IO_by_fld.o gz_field_file_IO.o field_file_IO.o set_field_file_names.o rst_data_IO_by_fld.o set_parallel_file_name.o
 	$(F90) -c $(F90FLAGS) $<

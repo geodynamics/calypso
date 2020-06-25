@@ -63,7 +63,7 @@
       icou = 0
       ist_true = -1
       pre_time = sph_IN%time
-      write(*,'(a5,i12,a30,i12)',advance="NO")                          &
+      write(*,'(a6,i12,a30,i12)',advance="NO")                          &
      &       'step= ', sph_IN%i_step,                                   &
      &       ' averaging finished. Count=  ', icou
       do
@@ -88,7 +88,7 @@
           end if
         end if
 !
-        write(*,'(59a1,a5,i12,a30,i12)',advance="NO") (char(8),i=1,59), &
+        write(*,'(60a1,a6,i12,a30,i12)',advance="NO") (char(8),i=1,60), &
      &       'step= ', sph_IN%i_step,                                   &
      &       ' averaging finished. Count=   ', icou
         if (sph_IN%time .ge. end_time) exit
@@ -142,7 +142,7 @@
       ist_true = -1
       pre_time = sph_IN%time
       sigma_spec_l = 0.0d0
-      write(*,'(a5,i12,a30,i12)',advance="NO")                          &
+      write(*,'(a6,i12,a30,i12)',advance="NO")                          &
      &       'step= ', sph_IN%i_step,                                   &
      &       ' deviation finished. Count=  ', icou
       do
@@ -168,7 +168,7 @@
           end if
         end if
 !
-        write(*,'(59a1,a5,i12,a30,i12)',advance="NO") (char(8),i=1,59), &
+        write(*,'(60a1,a6,i12,a30,i12)',advance="NO") (char(8),i=1,60), &
      &       'step= ', sph_IN%i_step,                                   &
      &       ' deviation finished. Count=   ', icou
         if (sph_IN%time .ge. end_time) exit

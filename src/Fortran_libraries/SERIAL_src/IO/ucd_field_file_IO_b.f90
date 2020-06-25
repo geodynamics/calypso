@@ -43,7 +43,10 @@
 !
       implicit none
 !
-      type(binary_IO_buffer), private :: bbuf_ucd
+      integer(kind = kint), parameter :: id_read_fld =  21
+      integer(kind = kint), parameter :: id_write_fld = 22
+      type(binary_IO_buffer) :: bbuf_ucd
+      private :: id_read_fld, id_write_fld, bbuf_ucd
 !
 !------------------------------------------------------------------
 !
@@ -64,6 +67,7 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write binary data file: ', trim(file_name)
 !
+      bbuf_ucd%id_binary = id_write_fld
       call open_write_binary_file(file_name, bbuf_ucd)
       if(bbuf_ucd%ierr_bin .gt. 0) go to 99
 !
@@ -75,7 +79,7 @@
       if(bbuf_ucd%ierr_bin .gt. 0) go to 99
 !
       99  continue
-      call close_binary_file
+      call close_binary_file(bbuf_ucd)
       ierr = bbuf_ucd%ierr_bin
 !
       end subroutine write_ucd_2_fld_file_b
@@ -98,6 +102,7 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read binary data file: ', trim(file_name)
 !
+      bbuf_ucd%id_binary = id_read_fld
       call open_read_binary_file(file_name, id_rank, bbuf_ucd)
       if(bbuf_ucd%ierr_bin .ne. 0) goto 99
       call read_step_data_b                                             &
@@ -113,7 +118,7 @@
      &    ucd%nnod, ucd%ntot_comp, ucd%d_ucd)
       if(bbuf_ucd%ierr_bin .ne. 0) go to 99
 !
-      call close_binary_file
+      call close_binary_file(bbuf_ucd)
       ierr = 0
       return
 
@@ -140,6 +145,7 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read binary data file: ', trim(file_name)
 !
+      bbuf_ucd%id_binary = id_read_fld
       call open_read_binary_file(file_name, id_rank, bbuf_ucd)
       if(bbuf_ucd%ierr_bin .ne. 0) goto 99
       call read_step_data_b                                             &
@@ -161,7 +167,7 @@
      &    ucd%nnod, ucd%ntot_comp, ucd%d_ucd)
       if(bbuf_ucd%ierr_bin .ne. 0) goto 99
 !
-      call close_binary_file
+      call close_binary_file(bbuf_ucd)
       ierr = 0
       return
 !
@@ -188,6 +194,7 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read binary data file: ', trim(file_name)
 !
+      bbuf_ucd%id_binary = id_read_fld
       call open_read_binary_file(file_name, id_rank, bbuf_ucd)
       if(bbuf_ucd%ierr_bin .ne. 0) goto 99
       call read_step_data_b                                             &
@@ -201,7 +208,7 @@
      &   (bbuf_ucd, cast_long(ucd%num_field), ucd%num_comp)
       if(bbuf_ucd%ierr_bin .gt. 0) go to 99
 !
-      call close_binary_file
+      call close_binary_file(bbuf_ucd)
       ierr = 0
 !
       call cal_istack_ucd_component(ucd)

@@ -11,25 +11,22 @@
 !!     &          ncomp_out, name_out, zbuf)
 !!      subroutine write_gz_ucd_field_data(ntot_nod, ncomp_dat, nnod,   &
 !!     &          inod_out, dat_out, zbuf)
+!!      subroutine write_gz_udt_mesh_header                             &
+!!     &         (nnod_output, nele_out, ncomp_output, zbuf)
+!!      subroutine write_gz_ucd_mesh_connect                            &
+!!     &         (ntot_ele, nnod_ele, nele, iele_gl, ie_gl, zbuf)
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!
 !!      subroutine read_gz_udt_field_num(num_input, zbuf)
 !!      subroutine read_gz_udt_field_name                               &
 !!     &         (num_input, ncomp_in, name_in, zbuf)
-!!      subroutine read_gz_udt_field_header                             &
-!!     &         (num_input, ncomp_in, name_in, zbuf)
 !!      subroutine read_gz_udt_field_data                               &
 !!     &         (nnod_in, ncomp_dat, dat_in, zbuf)
 !!      subroutine read_gz_udt_mesh_header                              &
 !!     &         (nnod_input, nele_in, ncomptot_in, zbuf)
-!!      subroutine read_gz_ucd_mesh_data(nnod_in, nele_in,              &
-!!     &          nnod_ele, inod_gl, iele_gl, xx_in, ie_in, zbuf)
-!!        type(buffer_4_gzip), intent(inout) :: zbuf
-!!
-!!      subroutine write_gz_udt_mesh_header                             &
-!!     &         (nnod_output, nele_out, ncomp_output, zbuf)
-!!      subroutine write_gz_ucd_mesh_connect                            &
-!!     &         (ntot_ele, nnod_ele, nele, iele_gl, ie_gl, zbuf)
+!!      subroutine read_gz_ucd_node_data(nnod_in, inod_gl, xx_in, zbuf)
+!!      subroutine read_gz_ucd_ele_connect                              &
+!!     &         (nele_in, nnod_ele, iele_gl, ie_in, zbuf)
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!@endverbatim
 !
@@ -109,6 +106,57 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
+      subroutine write_gz_udt_mesh_header                               &
+     &         (nnod_output, nele_out, ncomp_output, zbuf)
+!
+      use gzip_file_access
+!
+      integer(kind = kint_gl), intent(in) :: nnod_output, nele_out
+      integer(kind = kint), intent(in) :: ncomp_output
+!
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+!
+      zbuf%fixbuf(1)                                                    &
+     &        = ucd_connect_head(nnod_output, nele_out, ncomp_output)   &
+     &         // char(0)
+      call gz_write_textbuf_no_lf(zbuf)
+!
+      end subroutine write_gz_udt_mesh_header
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine write_gz_ucd_mesh_connect                              &
+     &         (ntot_ele, nnod_ele, nele, iele_gl, ie_gl, zbuf)
+!
+      use m_geometry_constants
+      use gzip_file_access
+!
+      integer(kind=kint), intent(in) :: nnod_ele
+      integer(kind=kint_gl), intent(in) :: ntot_ele, nele
+      integer(kind=kint_gl), intent(in) :: iele_gl(ntot_ele)
+      integer(kind=kint_gl), intent(in) :: ie_gl(ntot_ele,nnod_ele)
+!
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer(kind = kint_gl) :: iele
+      integer(kind = kint_gl) :: ie0(nnod_ele)
+!
+!
+      do iele = 1, nele
+        ie0(1:nnod_ele) = ie_gl(iele,1:nnod_ele)
+        zbuf%fixbuf(1)                                                  &
+     &          = ucd_each_connect(iele_gl(iele), nnod_ele, ie0)        &
+     &           // char(0)
+        call gz_write_textbuf_no_lf(zbuf)
+      end do
+!
+      end subroutine  write_gz_ucd_mesh_connect
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
       subroutine read_gz_udt_field_num(num_input, zbuf)
 !
       use gzip_file_access
@@ -155,24 +203,6 @@
       end do
 !
       end subroutine read_gz_udt_field_name
-!
-! ----------------------------------------------------------------------
-!
-      subroutine read_gz_udt_field_header                               &
-     &         (num_input, ncomp_in, name_in, zbuf)
-!
-      use gzip_file_access
-!
-      integer(kind = kint), intent(inout) :: num_input
-      integer(kind = kint), intent(inout) :: ncomp_in(num_input)
-      character(len = kchara), intent(inout) :: name_in(num_input)
-      type(buffer_4_gzip), intent(inout) :: zbuf
-!
-!
-      call get_one_line_text_from_gz(zbuf)
-      call read_gz_udt_field_name(num_input, ncomp_in, name_in, zbuf)
-!
-      end subroutine read_gz_udt_field_header
 !
 ! ----------------------------------------------------------------------
 !
@@ -230,23 +260,17 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine read_gz_ucd_mesh_data(nnod_in, nele_in,                &
-     &          nnod_ele, inod_gl, iele_gl, xx_in, ie_in, zbuf)
+      subroutine read_gz_ucd_node_data(nnod_in, inod_gl, xx_in, zbuf)
 !
       use gzip_file_access
 !
-      integer(kind=kint), intent(in) :: nnod_ele
-      integer(kind=kint_gl), intent(in) :: nnod_in, nele_in
+      integer(kind=kint_gl), intent(in) :: nnod_in
 !
-      integer(kind=kint_gl), intent(inout) :: iele_gl(nele_in)
-      integer(kind=kint_gl), intent(inout) :: ie_in(nele_in,nnod_ele)
       integer(kind=kint_gl), intent(inout) :: inod_gl(nnod_in)
       real(kind = kreal), intent(inout) :: xx_in(nnod_in,3)
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint_gl) :: inod, iele
-      integer(kind = kint) :: itmp
-      character(len=kchara) :: tmpchara
+      integer(kind = kint_gl) :: inod
 !
 !
       do inod = 1, nnod_in
@@ -254,64 +278,38 @@
         read(zbuf%fixbuf(1),*) inod_gl(inod), xx_in(inod,1:3)
       end do
 !
-      do iele = 1, nele_in
-        call get_one_line_text_from_gz(zbuf)
-        read(zbuf%fixbuf(1),*) iele_gl(iele), itmp, tmpchara,           &
-     &                        ie_in(iele,1:nnod_ele)
-      end do
-!
-      end subroutine  read_gz_ucd_mesh_data
+      end subroutine read_gz_ucd_node_data
 !
 ! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
 !
-      subroutine write_gz_udt_mesh_header                               &
-     &         (nnod_output, nele_out, ncomp_output, zbuf)
+      subroutine read_gz_ucd_ele_connect                                &
+     &         (nele_in, nnod_ele, iele_gl, ie_in, zbuf)
 !
-      use gzip_file_access
-!
-      integer(kind = kint_gl), intent(in) :: nnod_output, nele_out
-      integer(kind = kint), intent(in) :: ncomp_output
-!
-      type(buffer_4_gzip), intent(inout) :: zbuf
-!
-!
-      zbuf%fixbuf(1)                                                    &
-     &        = ucd_connect_head(nnod_output, nele_out, ncomp_output)   &
-     &         // char(0)
-      call gz_write_textbuf_no_lf(zbuf)
-!
-      end subroutine write_gz_udt_mesh_header
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine write_gz_ucd_mesh_connect                              &
-     &         (ntot_ele, nnod_ele, nele, iele_gl, ie_gl, zbuf)
-!
-      use m_geometry_constants
       use gzip_file_access
 !
       integer(kind=kint), intent(in) :: nnod_ele
-      integer(kind=kint_gl), intent(in) :: ntot_ele, nele
-      integer(kind=kint_gl), intent(in) :: iele_gl(ntot_ele)
-      integer(kind=kint_gl), intent(in) :: ie_gl(ntot_ele,nnod_ele)
+      integer(kind=kint_gl), intent(in) :: nele_in
 !
+      integer(kind=kint_gl), intent(inout) :: iele_gl(nele_in)
+      integer(kind=kint_gl), intent(inout) :: ie_in(nele_in,nnod_ele)
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint_gl) :: iele
-      integer(kind = kint_gl) :: ie0(nnod_ele)
+      integer(kind = kint) :: itmp
+      character(len=kchara) :: eleflag
 !
 !
-      do iele = 1, nele
-        ie0(1:nnod_ele) = ie_gl(iele,1:nnod_ele)
-        zbuf%fixbuf(1)                                                  &
-     &          = ucd_each_connect(iele_gl(iele), nnod_ele, ie0)        &
-     &           // char(0)
-        call gz_write_textbuf_no_lf(zbuf)
+      do iele = 1, nele_in
+        call get_one_line_text_from_gz(zbuf)
+        read(zbuf%fixbuf(1),*) iele_gl(iele), itmp, eleflag,            &
+     &                        ie_in(iele,1:nnod_ele)
       end do
 !
-      end subroutine  write_gz_ucd_mesh_connect
+      if((nnod_ele_by_ucd_eletype(eleflag) .ne. nnod_ele)) then
+        write(*,*) 'Error in element type'
+      end if
+!
+      end subroutine  read_gz_ucd_ele_connect
 !
 ! ----------------------------------------------------------------------
 !

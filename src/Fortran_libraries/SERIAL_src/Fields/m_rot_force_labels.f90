@@ -140,12 +140,9 @@
 !
       subroutine set_rot_force_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout)                               &
-     &                        :: n_comps(nrot_force)
-      character(len = kchara), intent(inout)                            &
-     &                        :: names(nrot_force)
-      character(len = kchara), intent(inout)                            &
-     &                        :: maths(nrot_force)
+      integer(kind = kint_4b), intent(inout) :: n_comps(nrot_force)
+      character(len = kchara), intent(inout) :: names(nrot_force)
+      character(len = kchara), intent(inout) :: maths(nrot_force)
 !
 !
       call set_field_labels(rot_inertia,                                &

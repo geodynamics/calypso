@@ -1,4 +1,4 @@
-!>@file  binary_IO.f90
+!>@file  binary_IO.F90
 !!       module binary_IO
 !!
 !!@author H. Matsui
@@ -65,22 +65,13 @@
       subroutine open_write_binary_file(file_name, bbuf)
 !
       use set_parallel_file_name
-      use binary_file_access
 !
       character(len=kchara), intent(in) :: file_name
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      character(len=kchara) :: file_name_w_null
 !
-!
-#ifdef ZLIB_IO
-      file_name_w_null = add_null_character(file_name)
-      call open_wt_rawfile_f(file_name_w_null, bbuf)
-      if(bbuf%ierr_bin .gt. 0) return
-#else
-      open(bbuf%id_binary, file = file_name, form='unformatted')
-#endif
-!
+      open(bbuf%id_binary, file = file_name,                            &
+     &     FORM='UNFORMATTED', ACCESS='STREAM')
       call write_endian_flag(bbuf)
 !
       end subroutine open_write_binary_file
@@ -90,21 +81,13 @@
       subroutine open_append_binary_file(file_name, bbuf)
 !
       use set_parallel_file_name
-      use binary_file_access
 !
       character(len=kchara), intent(in) :: file_name
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      character(len=kchara) :: file_name_w_null
 !
-!
-#ifdef ZLIB_IO
-      file_name_w_null = add_null_character(file_name)
-      call open_ad_rawfile_f(file_name_w_null, bbuf)
-#else
-      open(bbuf%id_binary, file = file_name, form='unformatted',        &
-     &      position='append')
-#endif
+      open(bbuf%id_binary, file = file_name, STATUS = 'OLD',            &
+     &     FORM='UNFORMATTED', ACCESS='STREAM', POSITION='APPEND')
 !
       end subroutine open_append_binary_file
 !
@@ -113,39 +96,26 @@
       subroutine open_read_binary_file(file_name, id_rank, bbuf)
 !
       use set_parallel_file_name
-      use binary_file_access
 !
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      character(len=kchara) :: file_name_w_null
-!
 !
       bbuf%ierr_bin = 0
-#ifdef ZLIB_IO
-      file_name_w_null = add_null_character(file_name)
-      call open_rd_rawfile_f(file_name_w_null, bbuf)
-      if(bbuf%ierr_bin .gt. 0) return
-#else
-      open(bbuf%id_binary, file = file_name, form='unformatted')
-#endif
-!
+      open(bbuf%id_binary, file = file_name, STATUS = 'OLD',            &
+     &     FORM='UNFORMATTED', ACCESS='STREAM')
       call read_endian_flag(bbuf, id_rank)
 !
       end subroutine open_read_binary_file
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine close_binary_file
+      subroutine close_binary_file(bbuf)
 !
-      use binary_file_access
+      type(binary_IO_buffer), intent(in) :: bbuf
 !
-#ifdef ZLIB_IO
-      call close_rawfile_f
-#else
       close(bbuf%id_binary)
-#endif
 !
       end subroutine close_binary_file
 !
@@ -153,27 +123,13 @@
 !
       subroutine seek_forward_binary_file(len_byte, bbuf)
 !
-      use binary_file_access
-!
       integer(kind = kint_gl), intent(in) :: len_byte
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer :: ilength
       character(len=1) :: tmpchara(len_byte)
-      integer(kind = kint_gl) :: ist
 !
 !
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((len_byte - ist), huge_20))
-        call rawseek_go_fwd_f(ilength, bbuf)
-        ist = ist + ilength
-        if(ist .ge. len_byte) exit
-      end do
-#else
       read(bbuf%id_binary) tmpchara(1:len_byte)
-#endif
 !
       end subroutine seek_forward_binary_file
 !
@@ -248,30 +204,12 @@
 !
       subroutine write_mul_int_to_32bit(num, int4_dat, bbuf)
 !
-      use binary_file_access
-!
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint_4b), intent(in) :: int4_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint) :: ist
-      integer:: ilength
 !
-!
-      if(num .le. 0) return
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((num - ist), huge_20))
-!
-        call rawwrite_int4_f(ilength, int4_dat(ist+1), bbuf)
-        ist = ist + ilength
-        if(bbuf%ierr_bin .ne. 0) return
-        if(ist .ge. num) exit
-      end do
-#else
-      write(bbuf%id_binary)  int4_dat(1:num)
-#endif
+      if(num .gt. 0) write(bbuf%id_binary) int4_dat(1:num)
 !
       end subroutine write_mul_int_to_32bit
 !
@@ -279,30 +217,12 @@
 !
       subroutine write_mul_int8_b(num, int_gl_dat, bbuf)
 !
-      use binary_file_access
-!
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint_gl), intent(in) :: int_gl_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint) :: ist
-      integer:: ilength
 !
-!
-      if(num .le. 0) return
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((num - ist), huge_20))
-!
-        call rawwrite_int8_f(ilength, int_gl_dat(ist+1), bbuf)
-        ist = ist + ilength
-        if(bbuf%ierr_bin .ne. 0) return
-        if(ist .ge. num) exit
-      end do
-#else
-      write(bbuf%id_binary)  int_gl_dat(1:num)
-#endif
+      if(num .gt. 0) write(bbuf%id_binary)  int_gl_dat(1:num)
 !
       end subroutine write_mul_int8_b
 !
@@ -343,32 +263,12 @@
 !
       subroutine write_mul_character_b(num, chara_dat, bbuf)
 !
-      use binary_file_access
-!
       integer(kind = kint), intent(in) :: num
       character(len=kchara), intent(in) :: chara_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer:: lbyte, ilength
 !
-!
-      if(num .le. 0) return
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((num - ist), huge_20))
-        lbyte = ilength *  kchara
-!
-        call rawwrite_chara_f(lbyte, chara_dat(ist+1), bbuf)
-        ist = ist + ilength
-        if(bbuf%ierr_bin .ne. 0) return
-        if(ist .ge. num) exit
-      end do
-#else
-      write(bbuf%id_binary)  chara_dat(1:num)
-#endif
-      return
+      if(num .gt. 0) write(bbuf%id_binary) chara_dat(1:num)
 !
       end subroutine write_mul_character_b
 !
@@ -376,32 +276,12 @@
 !
       subroutine write_mul_one_character_b(num, chara_dat, bbuf)
 !
-      use binary_file_access
-!
       integer(kind = kint_gl), intent(in) :: num
       character(len=1), intent(in) :: chara_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer:: lbyte, ilength
 !
-!
-      if(num .le. 0) return
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((num - ist), huge_20))
-        lbyte = ilength
-!
-        call rawwrite_chara_f(lbyte, chara_dat(ist+1), bbuf)
-        ist = ist + ilength
-        if(bbuf%ierr_bin .ne. 0) return
-        if(ist .ge. num) exit
-      end do
-#else
-      write(bbuf%id_binary)  chara_dat(1:num)
-#endif
-      return
+      if(num .gt. 0) write(bbuf%id_binary)  chara_dat(1:num)
 !
       end subroutine write_mul_one_character_b
 !
@@ -409,31 +289,12 @@
 !
       subroutine write_1d_vector_b(num, real_dat, bbuf)
 !
-      use binary_file_access
-!
       integer(kind = kint_gl), intent(in) :: num
       real(kind = kreal), intent(in) :: real_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer:: ilength
 !
-!
-      if(num .le. 0) return
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((num - ist), huge_20))
-!
-        call rawwrite_real_f(ilength, real_dat(ist+1), bbuf)
-        ist = ist + ilength
-        if(bbuf%ierr_bin .ne. 0) return
-        if(ist .ge. num) exit
-      end do
-#else
-      write(bbuf%id_binary)  real_dat(1:num)
-#endif
-      return
+      if(num .gt. 0) write(bbuf%id_binary)  real_dat(1:num)
 !
       end subroutine write_1d_vector_b
 !
@@ -487,17 +348,16 @@
       type(binary_IO_buffer), intent(inout) :: bbuf
       integer, intent(in) :: id_rank
 !
-      integer(kind = kint_gl), parameter :: ione64 = 1
       integer :: int_dat(1)
 !
       bbuf%iflag_swap = iendian_KEEP
-      call read_mul_int_from_32bit(bbuf, ione64, int_dat)
+      read(bbuf%id_binary, err=99, end=99)  int_dat(1)
 !
-#ifdef ZLIB_IO
       bbuf%iflag_swap = endian_check(id_rank, int_dat(1))
-#else
-      bbuf%iflag_swap = iendian_KEEP
-#endif
+      return
+!
+  99  continue
+      bbuf%ierr_bin = ierr_file
 !
       end subroutine read_endian_flag
 !
@@ -553,31 +413,24 @@
 !
       subroutine read_mul_int_from_32bit(bbuf, num, int_dat)
 !
-      use binary_file_access
-!
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint_4b), intent(inout) :: int_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer:: ilength
+      integer(kind = kint_gl) :: l8_byte
 !
 !
       if(num .le. 0) return
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((num - ist), huge_20))
-!
-        call rawread_int4_f(ilength, int_dat(ist+1), bbuf)
-        ist = ist + ilength
-        if(bbuf%ierr_bin .ne. 0) return
-        if(ist .ge. num) exit
-      end do
-#else
       read(bbuf%id_binary, err=99, end=99)  int_dat(1:num)
-#endif
+!
+      if(bbuf%iflag_swap .eq. iendian_FLIP) then
+        l8_byte = num * kint_4b
+        call byte_swap_32bit_f(l8_byte, int_dat(1))
+      end if
       return
+!
+  99  continue
+      bbuf%ierr_bin = ierr_file
 !
       end subroutine read_mul_int_from_32bit
 !
@@ -585,31 +438,24 @@
 !
       subroutine read_mul_int8_b(bbuf, num, int_gl_dat)
 !
-      use binary_file_access
-!
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint_gl), intent(inout) :: int_gl_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer:: ilength
+      integer(kind = kint_gl) :: l8_byte
 !
 !
       if(num .le. 0) return
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((num - ist), huge_20))
-!
-        call rawread_int8_f(ilength, int_gl_dat(ist+1), bbuf)
-        ist = ist + ilength
-        if(bbuf%ierr_bin .ne. 0) return
-        if(ist .ge. num) exit
-      end do
-#else
       read(bbuf%id_binary, err=99, end=99)  int_gl_dat(1:num)
-#endif
+!
+      if(bbuf%iflag_swap .eq. iendian_FLIP) then
+        l8_byte = num * kint_gl
+        call byte_swap_64bit_f(l8_byte, int_gl_dat(1))
+      end if
       return
+!
+  99  continue
+      bbuf%ierr_bin = ierr_file
 !
       end subroutine read_mul_int8_b
 !
@@ -656,32 +502,24 @@
 !
       subroutine read_mul_character_b(bbuf, num, chara_dat)
 !
-      use binary_file_access
-!
       integer(kind = kint), intent(in) :: num
       character(len=kchara), intent(inout) :: chara_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer:: lbyte, ilength
+      integer(kind = kint_gl) :: l8_byte
 !
 !
       if(num .le. 0) return
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((num - ist), huge_20))
-        lbyte = ilength *  kchara
-!
-        call rawread_chara_f(lbyte, chara_dat(ist+1), bbuf)
-        ist = ist + ilength
-        if(bbuf%ierr_bin .ne. 0) return
-        if(ist .ge. num) exit
-      end do
-#else
       read(bbuf%id_binary, err=99, end=99)  chara_dat(1:num)
-#endif
+!
+      if(bbuf%iflag_swap .eq. iendian_FLIP) then
+        l8_byte = num * kchara
+        call byte_swap_64bit_f(l8_byte, chara_dat(1))
+      end if
       return
+!
+  99  continue
+      bbuf%ierr_bin = ierr_file
 !
       end subroutine read_mul_character_b
 !
@@ -689,32 +527,21 @@
 !
       subroutine read_mul_one_character_b(bbuf, num, chara_dat)
 !
-      use binary_file_access
-!
       integer(kind = kint_gl), intent(in) :: num
       character(len=1), intent(inout) :: chara_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer:: lbyte, ilength
-!
 !
       if(num .le. 0) return
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((num - ist), huge_20))
-        lbyte = ilength
-!
-        call rawread_chara_f(lbyte, chara_dat(ist+1), bbuf)
-        ist = ist + ilength
-        if(bbuf%ierr_bin .ne. 0) return
-        if(ist .ge. num) exit
-      end do
-#else
       read(bbuf%id_binary, err=99, end=99)  chara_dat(1:num)
-#endif
+!
+      if(bbuf%iflag_swap .eq. iendian_FLIP) then
+        call byte_swap_64bit_f(num, chara_dat(1))
+      end if
       return
+!
+  99  continue
+      bbuf%ierr_bin = ierr_file
 !
       end subroutine read_mul_one_character_b
 !
@@ -722,30 +549,20 @@
 !
       subroutine read_1d_vector_b(bbuf, num, real_dat)
 !
-      use binary_file_access
-!
       integer(kind = kint_gl), intent(in) :: num
       real(kind = kreal), intent(inout) :: real_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint_gl) :: ist
-      integer:: ilength
+      integer(kind = kint_gl) :: l8_byte
 !
 !
       if(num .le. 0) return
-#ifdef ZLIB_IO
-      ist = 0
-      do
-        ilength = int(min((num - ist), huge_20))
-!
-        call rawread_real_f(ilength, real_dat(ist+1), bbuf)
-        ist = ist + ilength
-        if(bbuf%ierr_bin .ne. 0) go to 99
-        if(ist .ge. num) exit
-      end do
-#else
       read(bbuf%id_binary, err=99, end=99)  real_dat(1:num)
-#endif
+!
+      if(bbuf%iflag_swap .eq. iendian_FLIP) then
+        l8_byte = num * kreal
+        call byte_swap_64bit_f(l8_byte, real_dat(1))
+      end if
       return
 !
   99  continue

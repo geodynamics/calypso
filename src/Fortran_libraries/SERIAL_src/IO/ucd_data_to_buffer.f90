@@ -13,6 +13,9 @@
 !!
 !!      function ucd_connect_head(nnod, nele, ncomp)
 !!      function ucd_each_connect(iele_gl, nnod_ele, ie0)
+!!
+!!      character(len=6) function ucd_eletype(nnod_ele)
+!!      integer(kind = kint) function nnod_ele_by_ucd_eletype(eletype)
 !!@endverbatim
 !
       module ucd_data_to_buffer
@@ -22,9 +25,11 @@
 !
       implicit  none
 !
-      character(len=*), parameter :: UCD_HEX = '  hex '
-      character(len=*), parameter :: UCD_TRI = '  tri '
-      character(len=*), parameter :: UCD_LNE = ' line '
+      character(len=3), parameter :: UCD_HEX = 'hex'
+      character(len=3), parameter :: UCD_TRI = 'tri'
+      character(len=4), parameter :: UCD_LNE = 'line'
+!
+      private :: UCD_HEX, UCD_TRI, UCD_LNE
 !
 ! ----------------------------------------------------------------------
 !
@@ -109,21 +114,60 @@
       integer(kind = kint_gl), intent(in) :: ie0(nnod_ele)
 !
       character(len=16+3+6+16*nnod_ele+1) :: ucd_each_connect
-      character(len=6) :: eleflag
       character(len=kchara) :: fmt_txt
 !
-!
-      if(nnod_ele.eq.num_t_linear)    write(eleflag,'(a6)') UCD_HEX
-      if(nnod_ele.eq.num_triangle)    write(eleflag,'(a6)') UCD_TRI
-      if(nnod_ele.eq.num_linear_edge) write(eleflag,'(a6)') UCD_LNE
 !
       write(fmt_txt,'(a11,i3,a9)')                                      &
      &                      '(i16,i3,a6,', nnod_ele, '(i16),a1)'
 !
       write(ucd_each_connect,fmt_txt) iele_gl, ione,                    &
-     &       eleflag, ie0(1:nnod_ele), char(10)
+     &        ucd_eletype(nnod_ele), ie0(1:nnod_ele), char(10)
 !
       end function ucd_each_connect
+!
+! ----------------------------------------------------------------------
+!
+      character(len=6) function ucd_eletype(nnod_ele)
+!
+      use m_geometry_constants
+!
+      integer(kind = kint), intent(in) :: nnod_ele
+!
+!
+      if(nnod_ele.eq.num_t_linear) then
+        ucd_eletype = '  '// UCD_HEX // ' '
+      else if(nnod_ele.eq.num_triangle) then
+        ucd_eletype = '  '// UCD_TRI // ' '
+      else if(nnod_ele.eq.num_linear_edge) then
+        ucd_eletype = ' '// UCD_LNE // ' '
+      else
+        ucd_eletype = '  '// UCD_HEX // ' '
+      end if
+!
+      end function ucd_eletype
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      integer(kind = kint) function nnod_ele_by_ucd_eletype(eletype)
+!
+      use m_geometry_constants
+      use skip_comment_f
+!
+      character(len = kchara), intent(in) :: eletype
+!
+!
+      if     (cmp_no_case(eletype, UCD_HEX)) then
+        nnod_ele_by_ucd_eletype = num_t_linear
+      else if(cmp_no_case(eletype, UCD_TRI)) then
+        nnod_ele_by_ucd_eletype = num_triangle
+      else if(cmp_no_case(eletype, UCD_LNE)) then
+        nnod_ele_by_ucd_eletype = num_linear_edge
+      else
+        nnod_ele_by_ucd_eletype = num_t_linear
+      end if
+!
+      end function nnod_ele_by_ucd_eletype
 !
 ! ----------------------------------------------------------------------
 !

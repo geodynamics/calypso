@@ -8,9 +8,9 @@
 !!
 !!@verbatim
 !!      subroutine swap_phi_order_from_trans                            &
-!!     &         (numdir, nnod_rtp, nidx_rtp, d_sph)
+!!     &         (numdir, nnod_rtp, nidx_rtp, v_tmp, d_sph)
 !!      subroutine swap_phi_order_to_trans                              &
-!!     &         (numdir, nnod_rtp, nidx_rtp, v_prt)
+!!     &         (numdir, nnod_rtp, nidx_rtp, v_tmp, v_prt)
 !!@endverbatim
 !
       module swap_phi_4_sph_trans
@@ -20,8 +20,6 @@
 !
       implicit  none
 ! 
-      real(kind = kreal), allocatable, private :: v_tmp(:)
-!
 ! -------------------------------------------------------------------
 !
       contains
@@ -29,17 +27,16 @@
 ! -------------------------------------------------------------------
 !
       subroutine swap_phi_order_from_trans                              &
-     &         (numdir, nnod_rtp, nidx_rtp, d_sph)
+     &         (numdir, nnod_rtp, nidx_rtp, v_tmp, d_sph)
 !
       integer(kind = kint), intent(in) :: numdir, nnod_rtp
       integer(kind = kint), intent(in) :: nidx_rtp(3)
 !
+      real(kind = kreal), intent(inout) :: v_tmp(nnod_rtp)
       real(kind = kreal), intent(inout) :: d_sph(nnod_rtp,numdir)
 !
       integer(kind = kint) :: i_mkl, i_klm, kr_lt, mphi, nd
 !
-!
-      allocate(v_tmp(nnod_rtp))
 !
       do nd = 1, numdir
 !$omp parallel workshare
@@ -57,25 +54,22 @@
 !$omp end parallel do
       end do
 !
-      deallocate(v_tmp)
-!
       end subroutine swap_phi_order_from_trans
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine swap_phi_order_to_trans                                &
-     &         (numdir, nnod_rtp, nidx_rtp, v_prt)
+     &         (numdir, nnod_rtp, nidx_rtp, v_tmp, v_prt)
 !
       integer(kind = kint), intent(in) :: numdir, nnod_rtp
       integer(kind = kint), intent(in) :: nidx_rtp(3)
 !
+      real(kind = kreal), intent(inout) :: v_tmp(nnod_rtp)
       real(kind = kreal), intent(inout) :: v_prt(nnod_rtp,numdir)
 !
       integer(kind = kint) :: i_mkl, i_klm, kr_lt, mphi, nd
 !
-!
-      allocate(v_tmp(nnod_rtp))
 !
       do nd = 1, numdir
 !$omp parallel workshare
@@ -92,8 +86,6 @@
         end do
 !$omp end parallel do
       end do
-!
-      deallocate(v_tmp)
 !
       end subroutine swap_phi_order_to_trans
 !

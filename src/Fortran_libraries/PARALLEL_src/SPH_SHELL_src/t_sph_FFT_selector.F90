@@ -114,8 +114,7 @@
 !
 !
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW                                      &
-     &   .or. iflag_FFT .eq. iflag_FFTW_FIELD) then
+      if(iflag_FFT .eq. iflag_FFTW) then
         if(my_rank .eq. 0) write(*,*) 'Use FFTW'
         call init_sph_field_FFTW                                        &
      &     (sph_rtp%nidx_rtp, sph_rtp%istack_rtp_rt_smp,                &
@@ -144,8 +143,7 @@
 !
 !
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW                                      &
-     &   .or. iflag_FFT .eq. iflag_FFTW_FIELD) then
+      if(iflag_FFT .eq. iflag_FFTW) then
         if(iflag_debug .gt. 0) write(*,*) 'Finalize FFTW'
         call finalize_sph_field_FFTW(WK_FFTs%sph_fld_FFTW)
         return
@@ -175,8 +173,7 @@
 !
 !
 #ifdef FFTW3
-      if(     iflag_FFT .eq. iflag_FFTW                                 &
-     &   .or. iflag_FFT .eq. iflag_FFTW_FIELD) then
+      if(     iflag_FFT .eq. iflag_FFTW) then
         if(iflag_debug .gt. 0) write(*,*) 'Use FFTW'
         call verify_sph_field_FFTW                                      &
      &     (sph_rtp%nnod_rtp, sph_rtp%nidx_rtp,                         &
@@ -216,8 +213,7 @@
 !
 !
 #ifdef FFTW3
-      if(     iflag_FFT .eq. iflag_FFTW                                 &
-     &   .or. iflag_FFT .eq. iflag_FFTW_FIELD) then
+      if(     iflag_FFT .eq. iflag_FFTW) then
         call sph_field_fwd_FFTW_to_send                                 &
      &     (sph_rtp%nnod_rtp, sph_rtp%nidx_rtp,                         &
      &      sph_rtp%istack_rtp_rt_smp, ncomp, n_WS, comm_rtp%irev_sr,   &
@@ -257,8 +253,7 @@
 !
 !
 #ifdef FFTW3
-      if(     iflag_FFT .eq. iflag_FFTW                                 &
-     &   .or. iflag_FFT .eq. iflag_FFTW_FIELD) then
+      if(     iflag_FFT .eq. iflag_FFTW) then
         call sph_field_back_FFTW_from_recv                              &
      &     (sph_rtp%nnod_rtp, sph_rtp%nidx_rtp,                         &
      &      sph_rtp%istack_rtp_rt_smp, ncomp, n_WR, comm_rtp%irev_sr,   &

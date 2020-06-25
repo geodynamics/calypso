@@ -1,0 +1,84 @@
+ Average elapsed time
+  1. Total time:    2.27403050000E+00
+  2. Generation of spherical transform table:    1.00360725000E+00
+  3. Generation of spherical mode and grid:    1.26701000000E+00
+ 
+ Minimum and maximum elapsed time
+  1. Total time:    2.26635400000E+00   2.29703800000E+00
+  2. Generation of spherical transform table:    1.00271900000E+00   1.00395900000E+00
+  3. Generation of spherical mode and grid:    1.25913900000E+00   1.29060900000E+00
+
+ ==========================================
+ Truncation level:                31
+ Longitudinal symmetry:            1
+ N_r for fluid shell:             48
+ N_theta:                         48
+ N_phi:                           96
+ Total MPI processes:            4
+ Total OopenMP threads:            2
+ Processes for spetr (r, l and m):                   1           4
+ Processes for Legendre trans. (r, l, m):            2           2
+ Processes for Legendre trans. (r, t, m):            2           1           2
+ Processes for physical space. (r, t, p):            2           2           1
+
+ Average elapsed time
+  1. Total time:    2.04746112500E+01
+  2. Initialization time:    3.31457500000E+00
+  3. Time evolution loop time:    1.44757780000E+01
+  4. Data IO time:    3.10939950000E+00
+  6. Evolution excluding IO:    1.38996680000E+01
+  7. Linear time:    9.11745500000E-01
+  8. Solver time:    8.36527750000E-01
+  9. Nonlinear terms:    1.29878357500E+01
+ 10. Obtain field to output:    1.40358000000E-01
+ 11. output_sph_restart_control:    1.53021250000E-01
+ 12. output_rms_sph_mhd_control:    1.50128750000E-01
+ 13. Coriolis term:    1.30807000000E-01
+ 14. sph backward transform:    4.66744925000E+00
+ 15. cal nonlinear terms:    8.06429750000E-01
+ 16. sph forward transform:    7.21473425000E+00
+ 17. obtain explicit terms:    2.22095000000E-01
+ 18. transfer rj  => rlm:    1.36487750000E-01
+ 19. transfer rtm => rtp:    4.03600000000E-01
+ 20. transfer rtp => rtm:    5.70596000000E-01
+ 21. transfer rlm => rj:    5.31885250000E-01
+ 22. Legendre backward transform:    1.78007975000E+00
+ 23. Legendre forward transform:    2.81297550000E+00
+ 24. Fourier transform:    5.27254950000E+00
+ 42. set_to_send_buf_N:    1.89740250000E-01
+ 43. calypso_send_recv_core:    1.63431225000E+00
+ 44. set_from_recv_buf_rev_N:    1.99004500000E-01
+ 45. Sectioning initialization.:    6.49999999980E-06
+ 46. Isosurfaceing initialization.:    1.05000000001E-05
+ 80. Communication for field:    1.71412500000E-02
+ 
+ Minimum and maximum elapsed time
+  1. Total time:    2.04744950000E+01   2.04747310000E+01
+  2. Initialization time:    3.31457300000E+00   3.31457600000E+00
+  3. Time evolution loop time:    1.44757000000E+01   1.44759100000E+01
+  4. Data IO time:    3.09334700000E+00   3.12276800000E+00
+  6. Evolution excluding IO:    1.38787200000E+01   1.39225550000E+01
+  7. Linear time:    8.95273000000E-01   9.28407000000E-01
+  8. Solver time:    8.20160000000E-01   8.53267000000E-01
+  9. Nonlinear terms:    1.29502350000E+01   1.30126040000E+01
+ 10. Obtain field to output:    1.32192000000E-01   1.48728000000E-01
+ 11. output_sph_restart_control:    1.37652000000E-01   1.65774000000E-01
+ 12. output_rms_sph_mhd_control:    1.45336000000E-01   1.54528000000E-01
+ 13. Coriolis term:    1.25406000000E-01   1.34304000000E-01
+ 14. sph backward transform:    4.48409500000E+00   4.87464700000E+00
+ 15. cal nonlinear terms:    7.49050000000E-01   8.70997000000E-01
+ 16. sph forward transform:    6.98449300000E+00   7.44469700000E+00
+ 17. obtain explicit terms:    2.20358000000E-01   2.24396000000E-01
+ 18. transfer rj  => rlm:    1.17882000000E-01   1.52336000000E-01
+ 19. transfer rtm => rtp:    3.60721000000E-01   4.46833000000E-01
+ 20. transfer rtp => rtm:    4.97211000000E-01   6.22725000000E-01
+ 21. transfer rlm => rj:    2.46077000000E-01   8.40465000000E-01
+ 22. Legendre backward transform:    1.68327100000E+00   1.87035900000E+00
+ 23. Legendre forward transform:    2.73937700000E+00   2.86173800000E+00
+ 24. Fourier transform:    5.11764600000E+00   5.45484500000E+00
+ 42. set_to_send_buf_N:    1.86121000000E-01   1.91420000000E-01
+ 43. calypso_send_recv_core:    1.29103900000E+00   2.00843300000E+00
+ 44. set_from_recv_buf_rev_N:    1.97555000000E-01   2.01617000000E-01
+ 45. Sectioning initialization.:    5.99999999995E-06   7.00000000009E-06
+ 46. Isosurfaceing initialization.:    9.99999999962E-06   1.10000000006E-05
+ 80. Communication for field:    6.59300000001E-03   3.00360000000E-02

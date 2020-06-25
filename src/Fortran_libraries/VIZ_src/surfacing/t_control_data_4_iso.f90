@@ -17,7 +17,11 @@
 !!     &         (id_control, hd_block, iso_c, c_buf)
 !!      subroutine bcast_iso_control_data(iso_c)
 !!        type(iso_ctl), intent(inout) :: iso_c
-!
+!!
+!!      integer(kind = kint) function num_label_iso_ctl()
+!!      integer(kind = kint) function num_label_iso_ctl_w_dpl()
+!!      subroutine set_label_iso_ctl(names)
+!!      subroutine set_label_iso_ctl_w_dpl(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!     example of control for Kemo's surface rendering
 !!
@@ -44,13 +48,12 @@
 !!        output_field    magnetic_field   radial   end
 !!      end array output_field
 !!    end field_on_isosurf
-!!
 !!  end isosurface_ctl
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
 !!    iso_output_type:
-!!           ucd, OpenDX
+!!           ucd, ucd_gz, iso
 !!
 !!    result_type:  (Original name: display_method)
 !!                   specified_fields
@@ -79,48 +82,24 @@
       use skip_comment_f
       use t_read_control_elements
       use t_control_array_character
-      use t_control_array_real
-      use t_control_array_character
-      use t_control_array_character2
+      use t_control_data_4_iso_def
+      use t_control_data_4_fld_on_psf
 !
       implicit  none
 !
       type iso_ctl
+!>        Structure of isosurface define control
+        type(iso_define_ctl) :: iso_def_c
+!>        Structure of fields on isosurface control
+        type(field_on_psf_ctl) :: fld_on_iso_c
+!
 !>        Structure for file prefix
         type(read_character_item) :: iso_file_head_ctl
 !>        Structure for data field format
         type(read_character_item) :: iso_output_type_ctl
 !
-!>        Structure for field name for isosurface
-        type(read_character_item) :: isosurf_data_ctl
-!>        Structure for component name for isosurface
-        type(read_character_item) :: isosurf_comp_ctl
-!
-!>        Structure for isosurface value
-        type(read_real_item) :: isosurf_value_ctl
-!
-!>        Structure for single number for isosurface
-        type(read_real_item) :: result_value_iso_ctl
-!
-!>        Structure for result type
-        type(read_character_item) :: iso_result_type_ctl
-!
-!>      Structure for list of output field
-!!@n      iso_out_field_ctl%c1_tbl: Name of field
-!!@n      iso_out_field_ctl%c2_tbl: Name of component
-        type(ctl_array_c2) :: iso_out_field_ctl
-!
-!>      Structure for element group list for isosurfacing
-!!@n      iso_area_ctl%c_tbl: Name of element group
-        type(ctl_array_chara) :: iso_area_ctl
-!
 !     Top level
         integer (kind=kint) :: i_iso_ctl = 0
-!     2nd level for isosurface_ctl
-        integer (kind=kint) :: i_iso_define =    0
-        integer (kind=kint) :: i_iso_result =    0
-!     3nd level for isosurf_define
-        integer (kind=kint) :: i_iso_plot_area = 0
       end type iso_ctl
 !
 !     2nd level for isosurface_ctl
@@ -133,26 +112,6 @@
       character(len=kchara), parameter                                  &
      &             :: hd_field_on_iso =   'field_on_isosurf'
 !
-!     3nd level for isosurf_define
-      character(len=kchara), parameter                                  &
-     &             :: hd_iso_field =     'isosurf_field'
-      character(len=kchara), parameter                                  &
-     &             :: hd_iso_comp =      'isosurf_component'
-      character(len=kchara), parameter                                  &
-     &             :: hd_iso_value =     'isosurf_value'
-!
-      character(len=kchara), parameter                                  &
-     &                  :: hd_iso_area = 'isosurf_area_ctl'
-!
-!     3rd level for field_on_isosurf
-      character(len=kchara), parameter                                  &
-     &             :: hd_result_type =       'result_type'
-      character(len=kchara), parameter                                  &
-     &             :: hd_iso_result_field = 'output_field'
-      character(len=kchara), parameter                                  &
-     &             :: hd_result_value =      'result_value'
-!
-!
 !      Deprecated labels
 !
       character(len=kchara), parameter                                  &
@@ -160,21 +119,13 @@
       character(len=kchara), parameter                                  &
      &             :: hd_iso_result = 'isosurf_result_define'
 !
-      character(len=kchara), parameter                                  &
-     &             :: hd_iso_plot_area = 'plot_area_ctl'
-      character(len=kchara), parameter                                  &
-     &             :: hd_iso_plot_grp  = 'chosen_ele_grp_ctl'
+      integer(kind = kint), parameter :: n_label_iso_ctl = 4
+      integer(kind = kint), parameter :: n_label_iso_ctl_w_dpl = 6
 !
-      private :: hd_iso_plot_grp, hd_result_type, hd_iso_area
-      private :: hd_result_value, hd_iso_plot_area, hd_iso_value
-      private :: hd_iso_comp, hd_iso_field
       private :: hd_iso_result, hd_field_on_iso
       private :: hd_iso_define, hd_iso_out_type
       private :: hd_isosurf_prefix, hd_iso_file_head
-      private :: hd_iso_result_field
-!
-      private :: read_iso_define_data
-      private :: read_iso_result_control, read_iso_plot_area_ctl
+      private :: n_label_iso_ctl, n_label_iso_ctl_w_dpl
 !
 !  ---------------------------------------------------------------------
 !
@@ -187,10 +138,8 @@
       type(iso_ctl), intent(inout) :: iso_c
 !
 !
-      iso_c%isosurf_value_ctl%realvalue =    0.0d0
-      iso_c%result_value_iso_ctl%realvalue = 0.0d0
-      iso_c%iso_out_field_ctl%num = 0
-      iso_c%iso_area_ctl%num =      0
+      call init_iso_define_control(iso_c%iso_def_c)
+      call init_fld_on_psf_control(iso_c%fld_on_iso_c)
 !
       end subroutine init_iso_ctl_stract
 !
@@ -203,24 +152,11 @@
 !
       iso_c%iso_file_head_ctl%iflag =    0
       iso_c%iso_output_type_ctl%iflag =  0
-      iso_c%isosurf_data_ctl%iflag =     0
-      iso_c%isosurf_comp_ctl%iflag =     0
-      iso_c%isosurf_value_ctl%iflag =    0
-      iso_c%result_value_iso_ctl%iflag = 0
-      iso_c%iso_result_type_ctl%iflag =  0
 !
       iso_c%i_iso_ctl =         0
-      iso_c%i_iso_define =      0
-      iso_c%i_iso_result =      0
-      iso_c%i_iso_plot_area =   0
 !
-      call dealloc_control_array_c2(iso_c%iso_out_field_ctl)
-      iso_c%iso_out_field_ctl%num =  0
-      iso_c%iso_out_field_ctl%icou = 0
-!
-      call dealloc_control_array_chara(iso_c%iso_area_ctl)
-      iso_c%iso_area_ctl%num =  0
-      iso_c%iso_area_ctl%icou = 0
+      call dealloc_iso_define_control(iso_c%iso_def_c)
+      call dealloc_fld_on_psf_control(iso_c%fld_on_iso_c)
 !
       end subroutine dealloc_cont_dat_4_iso
 !
@@ -237,27 +173,12 @@
       call copy_chara_ctl(org_iso_c%iso_output_type_ctl,                &
      &                    new_iso_c%iso_output_type_ctl)
 !
-      call copy_chara_ctl(org_iso_c%isosurf_data_ctl,                   &
-     &                    new_iso_c%isosurf_data_ctl)
-      call copy_chara_ctl(org_iso_c%isosurf_comp_ctl,                   &
-     &                    new_iso_c%isosurf_comp_ctl)
-      call copy_chara_ctl(org_iso_c%iso_result_type_ctl,                &
-     &                    new_iso_c%iso_result_type_ctl)
-!
-      call copy_real_ctl(org_iso_c%isosurf_value_ctl,                   &
-     &                   new_iso_c%isosurf_value_ctl)
-      call copy_real_ctl(org_iso_c%result_value_iso_ctl,                &
-     &                   new_iso_c%result_value_iso_ctl)
-!
-      call dup_control_array_c2(org_iso_c%iso_out_field_ctl,            &
-     &                          new_iso_c%iso_out_field_ctl)
-      call dup_control_array_c1(org_iso_c%iso_area_ctl,                 &
-     &                          new_iso_c%iso_area_ctl)
-!
       new_iso_c%i_iso_ctl =       org_iso_c%i_iso_ctl
-      new_iso_c%i_iso_define =    org_iso_c%i_iso_define
-      new_iso_c%i_iso_result =    org_iso_c%i_iso_result
-      new_iso_c%i_iso_plot_area = org_iso_c%i_iso_plot_area
+!
+      call dup_iso_define_control                                       &
+     &   (org_iso_c%iso_def_c, new_iso_c%iso_def_c)
+      call dup_fld_on_psf_control                                       &
+     &   (org_iso_c%fld_on_iso_c, new_iso_c%fld_on_iso_c)
 !
       end subroutine dup_control_4_iso
 !
@@ -279,12 +200,13 @@
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_flag(c_buf, hd_block)) exit
 !
-        call read_iso_result_control(id_control, hd_field_on_iso,       &
-     &      iso_c, c_buf)
-        call read_iso_result_control(id_control, hd_iso_result,         &
-     &      iso_c, c_buf)
+        call read_fld_on_psf_control(id_control, hd_field_on_iso,       &
+     &      iso_c%fld_on_iso_c, c_buf)
+        call read_fld_on_psf_control(id_control, hd_iso_result,         &
+     &      iso_c%fld_on_iso_c, c_buf)
+!
         call read_iso_define_data                                       &
-     &     (id_control, hd_iso_define, iso_c, c_buf)
+     &     (id_control, hd_iso_define, iso_c%iso_def_c, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_isosurf_prefix,              &
      &      iso_c%iso_file_head_ctl)
@@ -296,97 +218,6 @@
       iso_c%i_iso_ctl = 1
 !
       end subroutine read_iso_control_data
-!
-!   --------------------------------------------------------------------
-!
-      subroutine read_iso_define_data                                   &
-     &         (id_control, hd_block, iso_c, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-      type(iso_ctl), intent(inout) :: iso_c
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(iso_c%i_iso_define .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_iso_plot_area_ctl(id_control, hd_iso_plot_area,       &
-     &      iso_c, c_buf)
-!
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_iso_field, iso_c%isosurf_data_ctl)
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_iso_comp, iso_c%isosurf_comp_ctl)
-!
-        call read_real_ctl_type                                         &
-     &     (c_buf, hd_iso_value, iso_c%isosurf_value_ctl)
-!
-        call read_control_array_c1                                      &
-     &     (id_control, hd_iso_area, iso_c%iso_area_ctl, c_buf)
-      end do
-      iso_c%i_iso_define = 1
-!
-      end subroutine read_iso_define_data
-!
-!   --------------------------------------------------------------------
-!
-      subroutine read_iso_result_control                                &
-     &         (id_control, hd_block, iso_c, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-      type(iso_ctl), intent(inout) :: iso_c
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(iso_c%i_iso_result .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_control_array_c2(id_control,                          &
-     &      hd_iso_result_field, iso_c%iso_out_field_ctl, c_buf)
-!
-        call read_chara_ctl_type(c_buf, hd_result_type,                 &
-     &      iso_c%iso_result_type_ctl)
-!
-        call read_real_ctl_type(c_buf, hd_result_value,                 &
-     &      iso_c%result_value_iso_ctl)
-      end do
-      iso_c%i_iso_result = 1
-!
-      end subroutine read_iso_result_control
-!
-!   --------------------------------------------------------------------
-!
-      subroutine read_iso_plot_area_ctl                                 &
-     &         (id_control, hd_block, iso_c, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-      type(iso_ctl), intent(inout) :: iso_c
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(iso_c%i_iso_plot_area.gt.0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_control_array_c1(id_control,                          &
-     &      hd_iso_area, iso_c%iso_area_ctl, c_buf)
-        call read_control_array_c1(id_control,                          &
-     &      hd_iso_plot_grp, iso_c%iso_area_ctl, c_buf)
-      end do
-      iso_c%i_iso_plot_area = 1
-!
-      end subroutine read_iso_plot_area_ctl
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
@@ -401,31 +232,60 @@
 !
       call MPI_BCAST(iso_c%i_iso_ctl,  1,                               &
      &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(iso_c%i_iso_define,  1,                            &
-     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(iso_c%i_iso_result,  1,                            &
-     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(iso_c%i_iso_plot_area,  1,                         &
-     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       call bcast_ctl_type_c1(iso_c%iso_file_head_ctl)
       call bcast_ctl_type_c1(iso_c%iso_file_head_ctl)
       call bcast_ctl_type_c1(iso_c%iso_output_type_ctl)
 !
-      call bcast_ctl_type_c1(iso_c%isosurf_data_ctl)
-      call bcast_ctl_type_c1(iso_c%isosurf_comp_ctl)
-!
-      call bcast_ctl_type_r1(iso_c%isosurf_value_ctl)
-!
-      call bcast_ctl_array_c1(iso_c%iso_area_ctl)
-      call bcast_ctl_array_c2(iso_c%iso_out_field_ctl)
-!
-      call bcast_ctl_type_c1(iso_c%iso_result_type_ctl)
-!
-      call bcast_ctl_type_r1(iso_c%result_value_iso_ctl)
+      call bcast_iso_define_control(iso_c%iso_def_c)
+      call bcast_fld_on_psf_control(iso_c%fld_on_iso_c)
 !
       end subroutine bcast_iso_control_data
 !
 !   --------------------------------------------------------------------
+!   --------------------------------------------------------------------
+!
+      integer(kind = kint) function num_label_iso_ctl()
+      num_label_iso_ctl = n_label_iso_ctl
+      return
+      end function num_label_iso_ctl
+!
+! ----------------------------------------------------------------------
+!
+      integer(kind = kint) function num_label_iso_ctl_w_dpl()
+      num_label_iso_ctl_w_dpl = n_label_iso_ctl_w_dpl
+      return
+      end function num_label_iso_ctl_w_dpl
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_label_iso_ctl(names)
+!
+      character(len = kchara), intent(inout)                            &
+     &                         :: names(n_label_iso_ctl)
+!
+!
+      call set_control_labels(hd_isosurf_prefix, names( 1))
+      call set_control_labels(hd_iso_out_type,   names( 2))
+      call set_control_labels(hd_iso_define,     names( 3))
+      call set_control_labels(hd_field_on_iso,   names( 4))
+!
+      end subroutine set_label_iso_ctl
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine set_label_iso_ctl_w_dpl(names)
+!
+      character(len = kchara), intent(inout)                            &
+     &                         :: names(n_label_iso_ctl_w_dpl)
+!
+!
+      call set_label_iso_ctl(names(1))
+      call set_control_labels(hd_iso_file_head,  names( 5))
+      call set_control_labels(hd_iso_result,     names( 6))
+!
+      end subroutine set_label_iso_ctl_w_dpl
+!
+!  ---------------------------------------------------------------------
 !
       end module t_control_data_4_iso

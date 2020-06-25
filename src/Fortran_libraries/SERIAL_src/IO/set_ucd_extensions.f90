@@ -14,6 +14,13 @@
 !!      character(len = kchara) function add_grd_extension(file_head)
 !!                put ".grd" at the end
 !!
+!!      character(len = kchara) function add_sdt_extension(file_head)
+!!                put ".sdt" at the end
+!!      character(len = kchara) function add_psf_extension(file_head)
+!!                put ".psf" at the end
+!!      character(len = kchara) function add_sgd_extension(file_head)
+!!                put ".sgd" at the end
+!!
 !!      character(len = kchara) function add_pvtk_extension(file_head)
 !!                put ".pvtk" at the end
 !!      character(len = kchara) function add_vtk_extension(file_head)
@@ -55,6 +62,10 @@
       character(len=3), parameter, private :: udt_ext = "udt"
       character(len=3), parameter, private :: grd_ext = "grd"
 !
+      character(len=3), parameter, private :: psf_ext = "psf"
+      character(len=3), parameter, private :: sdt_ext = "sdt"
+      character(len=3), parameter, private :: sgd_ext = "sgd"
+!
       character(len=3), parameter, private :: vtk_ext = "vtk"
       character(len=3), parameter, private :: vtd_ext = "vtd"
       character(len=3), parameter, private :: vtg_ext = "vtg"
@@ -92,6 +103,37 @@
       add_grd_extension = add_3chara_extension(file_head, grd_ext)
 !
       end function add_grd_extension
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      character(len = kchara) function add_sdt_extension(file_head)
+!
+      character(len=kchara), intent(in) :: file_head
+!
+      add_sdt_extension = add_3chara_extension(file_head, sdt_ext)
+!
+      end function add_sdt_extension
+!
+!-----------------------------------------------------------------------
+!
+      character(len = kchara) function add_psf_extension(file_head)
+!
+      character(len=kchara), intent(in) :: file_head
+!
+      add_psf_extension = add_3chara_extension(file_head, psf_ext)
+!
+      end function add_psf_extension
+!
+!-----------------------------------------------------------------------
+!
+      character(len = kchara) function add_sgd_extension(file_head)
+!
+      character(len=kchara), intent(in) :: file_head
+!
+      add_sgd_extension = add_3chara_extension(file_head, sgd_ext)
+!
+      end function add_sgd_extension
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

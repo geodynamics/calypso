@@ -85,8 +85,8 @@
           write(*,'(3a,i4,a)', ADVANCE='NO') 'Read file for ',          &
      &        trim(hd_block), ' No. ', iso_ctls%num_iso_ctl, '... '
           call read_control_4_iso_file(id_control+2,                    &
-&             iso_ctls%fname_iso_ctl(iso_ctls%num_iso_ctl),             &
-&             iso_ctls%iso_ctl_struct(iso_ctls%num_iso_ctl))
+     &        iso_ctls%fname_iso_ctl(iso_ctls%num_iso_ctl),             &
+     &        iso_ctls%iso_ctl_struct(iso_ctls%num_iso_ctl))
         else if(check_begin_flag(c_buf, hd_block)) then
           call append_new_isosurface_control(iso_ctls)
           iso_ctls%fname_iso_ctl(iso_ctls%num_iso_ctl) = 'NO_FILE'
@@ -183,10 +183,8 @@
       integer(kind = kint) :: i
 !
       do i = 1, num_iso
-        if(org_iso_ctls%fname_iso_ctl(i) .eq. 'NO_FILE') then
-          call dup_control_4_iso(org_iso_ctls%iso_ctl_struct(i),        &
-              new_iso_ctls%iso_ctl_struct(i))
-        end if
+        call dup_control_4_iso(org_iso_ctls%iso_ctl_struct(i),          &
+            new_iso_ctls%iso_ctl_struct(i))
         new_iso_ctls%fname_iso_ctl(i) = org_iso_ctls%fname_iso_ctl(i)
       end do
 !

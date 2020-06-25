@@ -11,6 +11,9 @@
 !!      subroutine alloc_force_list(num, fl_prop)
 !!      subroutine dealloc_force_list(fl_prop)
 !!        type(fluid_property), intent(inout) :: fl_prop
+!!      subroutine set_reference_scalar_ctl(ref_ctl, scl_prop)
+!!        type(reference_temperature_ctl), intent(in) :: ref_ctl
+!!        type(scalar_property), intent(inout) :: scl_prop
 !!@endverbatim
 !
       module t_physical_property
@@ -31,7 +34,6 @@
       integer (kind=kint), parameter :: id_Crank_nicolson =   3
 !>      Scheme ID for Crank-Nicolson Scheme with consistent mass matrix
       integer (kind=kint), parameter :: id_Crank_nicolson_cmass = 4
-!>      TIme evolution schme flag
 !
 !
 !>     flag for no gravity
@@ -48,14 +50,6 @@
       integer (kind=kint), parameter :: id_FORCE_ele_int =  1
 !>      Turn ON and evaluate at node flag
       integer (kind=kint), parameter :: id_FORCE_at_node =  2
-!
-!>      Turn ON and evaluate implicitly over elements flag
-      integer (kind=kint), parameter :: id_Coriolis_ele_imp = 11
-!>      Turn ON and evaluate implicitly at node flag
-      integer (kind=kint), parameter :: id_Coriolis_nod_imp = 12
-!
-!>      Turn ON and including magnetic pressure
-      integer (kind=kint), parameter :: id_Lorentz_w_Emag = 2
 !
 !   Coefficients
 !
@@ -80,19 +74,25 @@
 !>       coefficient for viscous diffusion
         real  (kind=kreal) :: coef_diffuse
 !
+!>        Force flag for Filtered inertia term
+        logical :: iflag_4_inertia = .TRUE.
 !>        Force flag for Coriolis force
-        integer (kind=kint) :: iflag_4_coriolis = id_turn_OFF
+        logical :: iflag_4_coriolis = .FALSE.
 !>        Force flag for Lorentz force
-        integer (kind=kint) :: iflag_4_lorentz = id_turn_OFF
+        logical :: iflag_4_lorentz = .FALSE.
 !>        Force flag for thermal buoyancy
-        integer (kind=kint) :: iflag_4_gravity = id_turn_OFF
+        logical :: iflag_4_gravity = .FALSE.
 !>        Force flag for compositional buoyancy
-        integer (kind=kint) :: iflag_4_composit_buo = id_turn_OFF
+        logical :: iflag_4_composit_buo = .FALSE.
 !
+!>        Force flag for Filtered inertia term
+        logical :: iflag_4_filter_inertia = .FALSE.
+!>        Force flag for Filtered Lorentz force
+        logical :: iflag_4_filter_lorentz = .FALSE.
 !>        Force flag for filtered thermal buoyancy
-        integer (kind=kint) :: iflag_4_filter_gravity =  id_turn_OFF
+        logical :: iflag_4_filter_gravity =  .FALSE.
 !>        Force flag for filtered compositional buoyancy
-        integer (kind=kint) :: iflag_4_filter_comp_buo = id_turn_OFF
+        logical :: iflag_4_filter_comp_buo = .FALSE.
 !
 !>       coefficient for Coriolis force
         real  (kind=kreal) :: coef_cor = zero
@@ -110,9 +110,15 @@
 !>       rotation vector for Coriolis force
         real (kind=kreal) :: sys_rot(3) = (/zero, zero, one/)
 !
+!>        Buoyancy model for FEM
+        integer(kind = kint) :: iflag_FEM_gravity = id_FORCE_ele_int
+!>        Coriolis force model for FEM
+        integer(kind = kint) :: iflag_FEM_coriolis = id_FORCE_ele_int
+!>        Coriolis force model for FEM
+        logical :: iflag_coriolis_implicit = .FALSE.
 !
 !>        Number of forces
-        integer(kind=kint) :: num_force
+        integer(kind = kint) :: num_force
 !>        Name of forces
         character(len=kchara), allocatable :: name_force(:)
       end type fluid_property
@@ -144,6 +150,11 @@
         integer (kind=kint) :: iflag_magneto_cv = id_turn_OFF
 !>       external magnetic field (Constant)
         real (kind=kreal) :: ex_magne(3) = (/zero, zero, zero/)
+!
+!>        Force flag for induction
+        logical :: iflag_4_induction = .FALSE.
+!>        Force flag for Filtered induction
+        logical :: iflag_4_filter_induction = .FALSE.
       end type conductive_property
 !
 !>      Structure for thermal property
@@ -164,6 +175,11 @@
         real  (kind=kreal) :: coef_diffuse
 !>       coefficient for heat source term
         real  (kind=kreal) :: coef_source = zero
+!
+!>        Force flag for advection
+        logical :: iflag_4_advection = .FALSE.
+!>        Force flag for Filtered advection
+        logical :: iflag_4_filter_advection = .FALSE.
       end type scalar_property
 !
 !  ---------------------------------------------------------------------
@@ -193,5 +209,52 @@
       end subroutine dealloc_force_list
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine set_filtered_advection_ctl                             &
+     &         (filterd_advect_ctl, scl_prop)
+!
+      use t_control_array_character
+      use skip_comment_f
+!
+      type(read_character_item), intent(in) :: filterd_advect_ctl
+      type(scalar_property), intent(inout) :: scl_prop
+!
+!
+      if(scl_prop%iflag_scheme .eq. id_no_evolution) return
+      scl_prop%iflag_4_advection = .TRUE.
+!
+      if(filterd_advect_ctl%iflag .gt. 0                                &
+     &   .and. yes_flag(filterd_advect_ctl%charavalue)) then
+        scl_prop%iflag_4_advection = .FALSE.
+        scl_prop%iflag_4_filter_advection = .TRUE.
+      end if
+!
+      end subroutine set_filtered_advection_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_filtered_induction_ctl                             &
+     &         (filterd_induction_ctl, cd_prop)
+!
+      use t_control_array_character
+      use skip_comment_f
+!
+      type(read_character_item), intent(in) :: filterd_induction_ctl
+      type(conductive_property), intent(inout) :: cd_prop
+!
+!
+      if((cd_prop%iflag_Bevo_scheme .eq. id_no_evolution)               &
+     &   .and. (cd_prop%iflag_Aevo_scheme .eq. id_no_evolution)) return
+      cd_prop%iflag_4_induction = .TRUE.
+!
+      if(filterd_induction_ctl%iflag .gt. 0                             &
+     &   .and. yes_flag(filterd_induction_ctl%charavalue)) then
+        cd_prop%iflag_4_induction = .FALSE.
+        cd_prop%iflag_4_filter_induction = .TRUE.
+      end if
+!
+      end subroutine set_filtered_induction_ctl
+!
+! -----------------------------------------------------------------------
 !
       end module t_physical_property

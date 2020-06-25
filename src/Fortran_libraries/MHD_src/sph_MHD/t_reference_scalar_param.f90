@@ -110,7 +110,7 @@
 !
 !
       if(iflag_debug .ge. iflag_routine_msg) write(*,*) trim(charaflag)
-!
+!z
       call set_linear_ref_scalar_ctl                                    &
      &   (ref_ctl%reference_ctl, ref_ctl%low_ctl, ref_ctl%high_ctl,     &
      &    ref_param)

@@ -9,7 +9,7 @@
 !!@verbatim
 !!      subroutine sph_back_trans_4_MHD(sph, comms_sph, fl_prop,        &
 !!     &          sph_bc_U, omega_sph, trans_p, gt_cor, rj_fld,         &
-!!     &          b_trns, trns_bwd, WK_sph, MHD_mul_FFTW, cor_rlm)
+!!     &          b_trns, trns_bwd, WK_sph, cor_rlm)
 !!        Input ::  rj_fld
 !!        Output :: trns_MHD, cor_rlm
 !!      subroutine sph_pole_trans_4_MHD                                 &
@@ -29,11 +29,10 @@
 !!        type(spherical_transform_data), intent(inout) :: trns_bwd
 !!        type(spherical_transform_data), intent(inout) :: trns_fwd
 !!        type(spherical_trns_works), intent(inout) :: WK_sph
-!!        type(work_for_sgl_FFTW), intent(inout) :: MHD_mul_FFTW
 !!        type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !!      subroutine sph_forward_trans_4_MHD                              &
 !!     &         (sph, comms_sph, fl_prop, trans_p, cor_rlm, f_trns,    &
-!!     &          trns_fwd, WK_sph, MHD_mul_FFTW, rj_fld)
+!!     &          trns_fwd, WK_sph, rj_fld)
 !!        Input :: trns_fwd, cor_rlm
 !!        Output ::  rj_fld
 !!        type(sph_grids), intent(inout) :: sph
@@ -44,7 +43,6 @@
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_address), intent(in) :: f_trns
 !!        type(spherical_transform_data), intent(inout) :: trns_fwd
-!!        type(work_for_sgl_FFTW), intent(inout) :: MHD_mul_FFTW
 !!        type(spherical_trns_works), intent(inout) :: WK_sph
 !!        type(phys_data), intent(inout) :: rj_fld
 !!
@@ -94,7 +92,7 @@
 !
       subroutine sph_back_trans_4_MHD(sph, comms_sph, fl_prop,          &
      &          sph_bc_U, omega_sph, trans_p, gt_cor, rj_fld,           &
-     &          b_trns, trns_bwd, WK_sph, MHD_mul_FFTW, cor_rlm)
+     &          b_trns, trns_bwd, WK_sph, cor_rlm)
 !
       use m_solver_SR
       use sph_trans_w_coriols
@@ -113,11 +111,10 @@
 !
       type(spherical_transform_data), intent(inout) :: trns_bwd
       type(spherical_trns_works), intent(inout) :: WK_sph
-      type(work_for_sgl_FFTW), intent(inout) :: MHD_mul_FFTW
       type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !
 !
-      call check_calypso_sph_comm_buf_N(trns_bwd%ncomp,                &
+      call check_calypso_sph_comm_buf_N(trns_bwd%ncomp,                 &
      &   comms_sph%comm_rj, comms_sph%comm_rlm)
       call check_calypso_sph_comm_buf_N(trns_bwd%ncomp,                 &
      &   comms_sph%comm_rtm, comms_sph%comm_rtp)
@@ -130,7 +127,7 @@
       call sph_b_trans_w_coriolis                                       &
      &   (sph, comms_sph, fl_prop, sph_bc_U, omega_sph,                 &
      &    b_trns, trans_p, gt_cor, n_WS, n_WR, WS(1), WR(1),            &
-     &    trns_bwd, WK_sph, MHD_mul_FFTW, cor_rlm)
+     &    trns_bwd, WK_sph, cor_rlm)
 !
       end subroutine sph_back_trans_4_MHD
 !
@@ -138,7 +135,7 @@
 !
       subroutine sph_forward_trans_4_MHD                                &
      &         (sph, comms_sph, fl_prop, trans_p, cor_rlm, f_trns,      &
-     &          trns_fwd, WK_sph, MHD_mul_FFTW, rj_fld)
+     &          trns_fwd, WK_sph, rj_fld)
 !
       use m_solver_SR
       use sph_trans_w_coriols
@@ -154,7 +151,6 @@
 !
       type(spherical_transform_data), intent(inout) :: trns_fwd
       type(spherical_trns_works), intent(inout) :: WK_sph
-      type(work_for_sgl_FFTW), intent(inout) :: MHD_mul_FFTW
       type(phys_data), intent(inout) :: rj_fld
 !
 !
@@ -166,7 +162,7 @@
       if(trns_fwd%ncomp .eq. 0) return
       call sph_f_trans_w_coriolis                                       &
      &   (sph, comms_sph, fl_prop, trans_p, cor_rlm, f_trns,            &
-     &    trns_fwd, n_WS, n_WR, WS(1), WR(1), WK_sph, MHD_mul_FFTW)
+     &    trns_fwd, n_WS, n_WR, WS(1), WR(1), WK_sph)
 !
       call mhd_spectr_from_recvbuf                                      &
      &   (trns_fwd, comms_sph%comm_rj, n_WR, WR(1), rj_fld)

@@ -99,11 +99,10 @@
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
       integer(kind = kint) :: itmp_IO(1)
-      integer(kind = kint_gl), parameter :: ione64 = 1
 !
 !
       itmp_IO(1) = int(IO_param%nprocs_in,KIND(itmp_IO(1)))
-      call mpi_write_mul_inthead_b(IO_param, ione64, itmp_IO)
+      call mpi_write_mul_inthead_b(IO_param, ione, itmp_IO)
 !
       end subroutine mpi_write_process_id_b
 !
@@ -115,11 +114,10 @@
       integer(kind = kint), intent(in) :: int_dat
 !
       integer(kind = kint) :: itmp_IO(1)
-      integer(kind = kint_gl), parameter :: ione64 = 1
 !
 !
       itmp_IO(1) = int_dat
-      call mpi_write_mul_inthead_b(IO_param, ione64, itmp_IO)
+      call mpi_write_mul_inthead_b(IO_param, ione, itmp_IO)
 !
       end subroutine mpi_write_one_inthead_b
 !
@@ -147,14 +145,14 @@
       use transfer_to_long_integers
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      integer(kind = kint_gl), intent(in) :: num
+      integer(kind = kint), intent(in) :: num
       integer(kind = kint), intent(in) :: int_dat(num)
 !
       type(tmp_i8_array)  :: tmp64
 !
 !
       if(num .le. 0) return
-      call dup_from_short_array(num, int_dat, tmp64)
+      call dup_from_short_array(cast_long(num), int_dat, tmp64)
       call mpi_write_mul_int8head_b(IO_param, tmp64%n1, tmp64%id_a)
       call dealloc_1d_i8array(tmp64)
 !

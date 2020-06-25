@@ -447,7 +447,7 @@
 !
       subroutine set_work_4_explicit_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout) :: n_comps(nexp_work)
+      integer(kind = kint_4b), intent(inout) :: n_comps(nexp_work)
       character(len = kchara), intent(inout) :: names(nexp_work)
       character(len = kchara), intent(inout) :: maths(nexp_work)
 !
@@ -484,7 +484,7 @@
 !
       subroutine set_check_fields_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout) :: n_comps(ncheck_fld)
+      integer(kind = kint_4b), intent(inout) :: n_comps(ncheck_fld)
       character(len = kchara), intent(inout) :: names(ncheck_fld)
       character(len = kchara), intent(inout) :: maths(ncheck_fld)
 !

@@ -17,6 +17,7 @@
 !!      subroutine gz_write_mul_integer_b(num, int_dat, zbuf)
 !!      subroutine gz_write_integer_stack_b(num, istack, zbuf)
 !!      subroutine gz_write_mul_character_b(num, chara_dat, zbuf)
+!!      subroutine gz_write_mul_one_character_b(num, chara_dat, zbuf)
 !!      subroutine gz_write_1d_vector_b(num, real_dat, zbuf)
 !!      subroutine gz_write_2d_vector_b(n1, n2, real_dat, zbuf)
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
@@ -28,6 +29,7 @@
 !!      subroutine gz_read_mul_integer_b(zbuf, num, int_dat)
 !!      subroutine gz_read_integer_stack_b(zbuf, num, istack, ntot)
 !!      subroutine gz_read_mul_character_b(zbuf, num, chara_dat)
+!!      subroutine gz_read_mul_one_character_b(zbuf, num, chara_dat)
 !!      subroutine gz_read_1d_vector_b(zbuf, num, real_dat)
 !!      subroutine gz_read_2d_vector_b(zbuf, n1, n2, real_dat)
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
@@ -229,6 +231,33 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine gz_write_mul_one_character_b(num, chara_dat, zbuf)
+!
+      use gzip_file_access
+!
+      integer(kind = kint_gl), intent(in) :: num
+      character(len=1), intent(in) :: chara_dat(num)
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer(kind = kint_gl) ::  ist
+      integer :: ilength
+!
+!
+      ist = 0
+      do
+        ilength = int(min((num - ist), huge_20))
+!
+        call gzwrite_chara_f(ilength, chara_dat(ist+1), zbuf)
+        ist = ist + ilength
+        if(zbuf%ierr_zlib .ne. 0) return
+        if(ist .ge. num) exit
+      end do
+      return
+!
+      end subroutine gz_write_mul_one_character_b
+!
+! -----------------------------------------------------------------------
+!
       subroutine gz_write_1d_vector_b(num, real_dat, zbuf)
 !
       use gzip_file_access
@@ -404,7 +433,7 @@
       character(len=kchara), intent(inout) :: chara_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer(kind = kint) :: lbyte, ilength
+      integer :: lbyte, ilength
       integer(kind = kint_gl) :: ist
 !
 !
@@ -420,6 +449,32 @@
       end do
 !
       end subroutine gz_read_mul_character_b
+!
+! -----------------------------------------------------------------------
+!
+      subroutine gz_read_mul_one_character_b(zbuf, num, chara_dat)
+!
+      use gzip_file_access
+!
+      integer(kind = kint_gl), intent(in) :: num
+      character(len=1), intent(inout) :: chara_dat(num)
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer :: ilength
+      integer(kind = kint_gl) :: ist
+!
+!
+      ist = 0
+      do
+        ilength = int(min((num - ist), huge_20))
+!
+        call gzread_chara_f(ilength, chara_dat(ist+1), zbuf)
+        if(zbuf%ierr_zlib .ne. 0) return
+        ist = ist + ilength
+        if(ist .ge. num) exit
+      end do
+!
+      end subroutine gz_read_mul_one_character_b
 !
 ! -----------------------------------------------------------------------
 !

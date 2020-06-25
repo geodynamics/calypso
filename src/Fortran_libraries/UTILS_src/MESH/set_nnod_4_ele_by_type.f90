@@ -18,6 +18,8 @@
 !!
 !!      integer(kind = kint) function                                   &
 !!     &              set_cube_eletype_from_num(nnod_4_ele)
+!!      integer(kind = kint) function                                   &
+!!     &              linear_eletype_from_num(nnod_4_ele)
 !!@endverbatim
 !
       module set_nnod_4_ele_by_type
@@ -187,6 +189,29 @@
       end if
 !
       end function set_cube_eletype_from_num
+!
+!------------------------------------------------------------------
+!
+      integer(kind = kint) function                                     &
+     &              linear_eletype_from_num(nnod_4_ele)
+!
+      use m_geometry_constants
+!
+      integer(kind = kint), intent(in) :: nnod_4_ele
+!
+!
+      linear_eletype_from_num =  331
+      if(nnod_4_ele .eq. num_t_linear) then
+        linear_eletype_from_num =  331
+      else if(nnod_4_ele .eq. num_linear_sf) then
+        linear_eletype_from_num =  221
+      else if(nnod_4_ele .eq. num_linear_edge) then
+        linear_eletype_from_num =  111
+      else if(nnod_4_ele .eq. num_triangle) then
+        linear_eletype_from_num =  211
+      end if
+!
+      end function linear_eletype_from_num
 !
 !------------------------------------------------------------------
 !

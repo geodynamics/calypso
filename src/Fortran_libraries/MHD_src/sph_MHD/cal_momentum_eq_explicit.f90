@@ -109,7 +109,7 @@
      &      dt, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
 !
-      call explicit_scalars_sph_SGS_adams                               &
+      call explicit_scalars_sph_adams                                   &
      &   (dt, sph_rj, MHD_prop%ht_prop, MHD_prop%cp_prop,               &
      &    sph_MHD_bc%sph_bc_T, sph_MHD_bc%sph_bc_C,                     &
      &    ipol%base, ipol%exp_work, ipol%forces, ipol%diffusion,        &

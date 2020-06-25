@@ -260,8 +260,7 @@
       call mpi_write_i8stack_head_b(IO_param_l, num64, istack_merged)
 !
       call mpi_write_one_inthead_b(IO_param_l, num_field)
-      num64 = num_field
-      call mpi_write_mul_inthead_b(IO_param_l, num64, ncomp_field)
+      call mpi_write_mul_inthead_b(IO_param_l,num_field, ncomp_field)
 !
       call mpi_write_mul_charahead_b(IO_param_l, num_field, field_name)
 !

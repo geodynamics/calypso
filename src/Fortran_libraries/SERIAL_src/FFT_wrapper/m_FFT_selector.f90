@@ -42,9 +42,9 @@
 !>      integer flag to use single transforms in FFTW3
       integer(kind = kint), parameter :: iflag_FFTW_SINGLE = 3
 !>      integer flag to use FFTW3 for each component
-      integer(kind = kint), parameter :: iflag_FFTW_FIELD =  4
+!      integer(kind = kint), parameter :: iflag_FFTW_FIELD =  4
 !>      integer flag to use ISPACK
-      integer(kind = kint), parameter :: iflag_ISPACK =      5
+      integer(kind = kint), parameter :: iflag_ISPACK =      4
 !
       integer(kind = kint) :: iflag_FFT = iflag_UNDEFINED_FFT
 !
@@ -74,9 +74,9 @@
       else if(cmp_no_case(FFT_library_ctl, hd_FFTW_S)                   &
      &     .or. cmp_no_case(FFT_library_ctl, hd_FFTW3_S)) then
         iflag_FFT = iflag_FFTW_SINGLE
-      else if(cmp_no_case(FFT_library_ctl, hd_FFTW_F)                   &
-     &     .or. cmp_no_case(FFT_library_ctl, hd_FFTW3_F)) then
-        iflag_FFT = iflag_FFTW_FIELD
+!      else if(cmp_no_case(FFT_library_ctl, hd_FFTW_F)                  &
+!     &     .or. cmp_no_case(FFT_library_ctl, hd_FFTW3_F)) then
+!        iflag_FFT = iflag_FFTW_FIELD
       end if
 !
       end subroutine set_fft_library_ctl

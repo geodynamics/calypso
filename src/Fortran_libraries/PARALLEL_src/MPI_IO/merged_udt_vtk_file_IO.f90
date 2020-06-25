@@ -25,6 +25,10 @@
 !!      subroutine write_vtk_file_mpi(file_name, ucd, m_ucd)
 !!      subroutine write_vtk_phys_mpi(file_name, ucd, m_ucd)
 !!      subroutine write_vtk_grid_mpi(file_name, ucd, m_ucd)
+!!
+!!      subroutine write_ucd_file_mpi_b(file_name, ucd, m_ucd)
+!!      subroutine write_ucd_phys_mpi_b(file_name, ucd, m_ucd)
+!!      subroutine write_ucd_grid_mpi_b(file_name, ucd, m_ucd)
 !!        type(ucd_data), intent(in) :: ucd
 !!        type(merged_ucd_data), intent(in) :: m_ucd
 !!@endverbatim
@@ -38,6 +42,7 @@
 !
       use t_ucd_data
       use t_para_double_numbering
+      use t_calypso_mpi_IO_param
 !
       use set_ucd_file_names
 !
@@ -48,6 +53,8 @@
 !
 !>      Structure of double numbering
       type(parallel_double_numbering), private, save :: dbl_id1
+!
+      type(calypso_MPI_IO_params), private, save :: IO_param
 !
 !-----------------------------------------------------------------------
 !
@@ -313,6 +320,92 @@
       call calypso_close_mpi_file(id_vtk)
 !
       end subroutine write_vtk_grid_mpi
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine write_ucd_file_mpi_b(file_name, ucd, m_ucd)
+!
+      use MPI_binary_head_IO
+      use MPI_ascii_data_IO
+      use ucd_file_MPI_IO
+!
+      character(len=kchara), intent(in) :: file_name
+!
+      type(ucd_data), intent(in) :: ucd
+      type(merged_ucd_data), intent(in) :: m_ucd
+!
+!
+      if(my_rank .eq. 0) write(*,*)                                     &
+     &    'write binary data by MPI-IO: ', trim(file_name) 
+      call open_write_mpi_file_b                                        &
+     &   (file_name, nprocs, my_rank, IO_param)
+!
+      call write_ucd_mesh_data_mpi_b                                    &
+     &   (IO_param, ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie, &
+     &    m_ucd%istack_merged_intnod)
+      call write_ucd_data_mpi_b(IO_param,                               &
+     &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
+     &    ucd%phys_name, ucd%d_ucd, m_ucd%istack_merged_intnod)
+!
+      call close_mpi_file(IO_param)
+!
+      end subroutine write_ucd_file_mpi_b
+!
+! -----------------------------------------------------------------------
+!
+      subroutine write_ucd_phys_mpi_b(file_name, ucd, m_ucd)
+!
+      use MPI_binary_head_IO
+      use MPI_ascii_data_IO
+      use ucd_file_MPI_IO
+!
+      character(len=kchara), intent(in) :: file_name
+!
+      type(ucd_data), intent(in) :: ucd
+      type(merged_ucd_data), intent(in) :: m_ucd
+!
+!
+      if(my_rank .eq. 0) write(*,*)                                     &
+     &    'write binary data by MPI-IO: ', trim(file_name) 
+      call open_write_mpi_file_b                                        &
+     &   (file_name, nprocs, my_rank, IO_param)
+!
+      call write_ucd_data_mpi_b(IO_param,                               &
+     &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
+     &    ucd%phys_name, ucd%d_ucd, m_ucd%istack_merged_intnod)
+!
+      call close_mpi_file(IO_param)
+!
+      end subroutine write_ucd_phys_mpi_b
+!
+! -----------------------------------------------------------------------
+!
+      subroutine write_ucd_grid_mpi_b(file_name, ucd, m_ucd)
+!
+      use MPI_binary_head_IO
+      use MPI_ascii_data_IO
+      use ucd_file_MPI_IO
+!
+      character(len=kchara), intent(in) :: file_name
+      type(ucd_data), intent(in) :: ucd
+      type(merged_ucd_data), intent(in) :: m_ucd
+!
+      type(calypso_MPI_IO_params) :: IO_param
+!
+!
+      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &  'Write gzipped binary merged mesh file: ', trim(file_name)
+!
+      call open_write_mpi_file_b                                        &
+     &   (file_name, nprocs, my_rank, IO_param)
+!
+      call write_ucd_mesh_data_mpi_b                                    &
+     &   (IO_param, ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie, &
+     &    m_ucd%istack_merged_intnod)
+      call close_mpi_file(IO_param)
+!
+      end subroutine write_ucd_grid_mpi_b
 !
 ! -----------------------------------------------------------------------
 !

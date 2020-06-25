@@ -338,7 +338,7 @@
 !
       subroutine set_base_diffusion_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout) :: n_comps(ndiffusion)
+      integer(kind = kint_4b), intent(inout) :: n_comps(ndiffusion)
       character(len = kchara), intent(inout) :: names(ndiffusion)
       character(len = kchara), intent(inout) :: maths(ndiffusion)
 !
@@ -366,7 +366,7 @@
 !
       subroutine set_base_diffusivity_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout) :: n_comps(ndiffusivities)
+      integer(kind = kint_4b), intent(inout) :: n_comps(ndiffusivities)
       character(len = kchara), intent(inout) :: names(ndiffusivities)
       character(len = kchara), intent(inout) :: maths(ndiffusivities)
 !

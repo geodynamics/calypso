@@ -292,7 +292,7 @@
 !
       subroutine set_differnce_vector_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout) :: n_comps(ngrad_vector)
+      integer(kind = kint_4b), intent(inout) :: n_comps(ngrad_vector)
       character(len = kchara), intent(inout) :: names(ngrad_vector)
       character(len = kchara), intent(inout) :: maths(ngrad_vector)
 !

@@ -76,7 +76,6 @@
       use set_address_sph_trans_MHD
       use set_address_sph_trans_snap
       use pole_sph_transform
-      use MHD_FFT_selector
 !
       type(phys_address), intent(in) :: iphys
       type(SPH_MHD_model_data), intent(in) :: SPH_model
@@ -98,13 +97,17 @@
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &                     'set_addresses_trans_sph_MHD'
       call set_addresses_trans_sph_MHD                                  &
-     &   (SPH_model%MHD_prop, SPH_MHD%ipol, iphys, WK%trns_MHD,         &
+     &   (SPH_MHD%ipol, iphys, WK%trns_MHD,                             &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans)
+!
       call set_addresses_snapshot_trans                                 &
      &   (SPH_MHD%ipol, iphys, WK%trns_snap,                            &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans)
-      call set_addresses_temporal_trans                                 &
-     &   (SPH_MHD%ipol, iphys, WK%trns_tmp,                             &
+      call set_addresses_ene_flux_trans                                 &
+     &   (SPH_MHD%ipol, iphys, WK%trns_eflux,                           &
+     &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans)
+      call set_addresses_diff_vect_trans                                &
+     &   (SPH_MHD%ipol, iphys, WK%trns_difv,                            &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans)
 !
       call alloc_sph_trans_address(SPH_MHD%sph%sph_rtp, WK)
@@ -149,7 +152,7 @@
      &    sph, comms_sph, trans_p%leg, trans_p%idx_trns)
       call init_fourier_transform_4_MHD                                 &
      &   (ncomp_max_trans, sph%sph_rtp, comms_sph%comm_rtp,             &
-     &    WK%trns_MHD, WK%WK_sph, WK%trns_MHD%mul_FFTW)
+     &    WK%trns_MHD, WK%WK_sph)
 !
       if (iflag_debug.eq.1) write(*,*) 'alloc_sphere_ave_coriolis'
       call alloc_sphere_ave_coriolis(sph%sph_rj)
@@ -255,10 +258,10 @@
         starttime = MPI_WTIME()
         call sph_back_trans_4_MHD(sph, comms_sph, fl_prop, sph_bc_U,    &
      &      omega_sph, trans_p, gt_cor, rj_fld, trns_MHD%b_trns,        &
-     &      trns_MHD%backward, WK_sph, trns_MHD%mul_FFTW, cor_rlm)
+     &      trns_MHD%backward, WK_sph, cor_rlm)
         call sph_forward_trans_4_MHD(sph, comms_sph, fl_prop,           &
      &      trans_p, cor_rlm, trns_MHD%f_trns, trns_MHD%forward,        &
-     &      WK_sph, trns_MHD%mul_FFTW, rj_fld)
+     &      WK_sph, rj_fld)
         endtime(WK_sph%WK_leg%id_legendre) = MPI_WTIME() - starttime
 !
         call sel_finalize_legendre_trans(WK_sph%WK_leg)

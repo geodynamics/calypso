@@ -213,7 +213,7 @@
       type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !
 !
-      if(fl_prop%iflag_4_coriolis .eq. id_turn_OFF) return
+      if(fl_prop%iflag_4_coriolis .eqv. .FALSE.) return
 !
       call sum_rot_coriolis_rlm_10(b_trns,                              &
      &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%a_r_1d_rlm_r,     &
@@ -276,7 +276,7 @@
       real(kind = kreal), intent(inout) :: WS(n_WS)
 !
 !
-      if(fl_prop%iflag_4_coriolis .eq. id_turn_OFF) return
+      if(fl_prop%iflag_4_coriolis .eqv. .FALSE.) return
 !
       call sel_calypso_to_send_scalar                                   &
      &   (ncomp_trans, sph_rlm%nnod_rlm, n_WS,                          &

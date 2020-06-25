@@ -15,6 +15,8 @@
 !!        type(base_force_address), intent(in) :: ipol_div_frc
 !!        type(phys_data), intent(inout) :: rj_fld
 !!
+!!      subroutine add_div_advection_to_force                           &
+!!     &         (is_press, is_div, nnod_rj, ntot_phys_rj, d_rj)
 !!      subroutine add_term_to_div_force                                &
 !!     &          (is_press, is_div, nnod_rj, ntot_phys_rj, d_rj)
 !!@endverbatim
@@ -29,7 +31,6 @@
 !
       private :: set_DMHD_terms_to_div_force
       private :: set_MHD_terms_to_div_force, set_div_cv_terms_to_force
-      private :: set_div_advection_to_force
 !
 ! ----------------------------------------------------------------------
 !
@@ -42,6 +43,7 @@
 !
       use t_physical_property
       use t_phys_data
+      use copy_nodal_fields
 !
       type(fluid_property), intent(in) :: fl_prop
       type(base_field_address), intent(in) :: ipol_base
@@ -50,69 +52,79 @@
 !
 !
 !$omp parallel
-      if(      fl_prop%iflag_4_gravity  .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_composit_buo .ne. id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_coriolis .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_lorentz  .ne. id_turn_OFF) then
+      if(      fl_prop%iflag_4_inertia                                  &
+     &   .and. fl_prop%iflag_4_gravity                                  &
+     &   .and. fl_prop%iflag_4_composit_buo                             &
+     &   .and. fl_prop%iflag_4_coriolis                                 &
+     &   .and. fl_prop%iflag_4_lorentz) then
         call set_DMHD_terms_to_div_force                                &
      &     (ipol_base%i_press, ipol_div_frc,                            &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      else if( fl_prop%iflag_4_gravity  .ne.     id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_composit_buo .eq. id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_coriolis .ne.     id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_lorentz  .ne.     id_turn_OFF) then
+      else if( fl_prop%iflag_4_inertia                                  &
+     &   .and. fl_prop%iflag_4_gravity                                  &
+     &   .and. (fl_prop%iflag_4_composit_buo .eqv. .FALSE.)             &
+     &   .and. fl_prop%iflag_4_coriolis                                 &
+     &   .and. fl_prop%iflag_4_lorentz) then
         call set_MHD_terms_to_div_force                                 &
      &     (ipol_base%i_press, ipol_div_frc, ipol_div_frc%i_buoyancy,   &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      else if( fl_prop%iflag_4_gravity  .eq.     id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_composit_buo .ne. id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_coriolis .ne.     id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_lorentz  .ne.     id_turn_OFF) then
+      else if( fl_prop%iflag_4_inertia                                  &
+     &   .and.(fl_prop%iflag_4_gravity .eqv.      .FALSE.)              &
+     &   .and. fl_prop%iflag_4_composit_buo                             &
+     &   .and. fl_prop%iflag_4_coriolis                                 &
+     &   .and. fl_prop%iflag_4_lorentz) then
         call set_MHD_terms_to_div_force                                 &
      &     (ipol_base%i_press, ipol_div_frc, ipol_div_frc%i_comp_buo,   &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      else if( fl_prop%iflag_4_gravity  .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_composit_buo .ne. id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_coriolis .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_lorentz  .eq. id_turn_OFF) then
+      else if( fl_prop%iflag_4_inertia                                  &
+     &   .and. fl_prop%iflag_4_gravity                                  &
+     &   .and. fl_prop%iflag_4_composit_buo                             &
+     &   .and. fl_prop%iflag_4_coriolis                                 &
+     &   .and. (fl_prop%iflag_4_lorentz  .eqv. .FALSE.)) then
         call set_div_dcv_terms_to_force                                 &
      &     (ipol_base%i_press, ipol_div_frc,                            &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      else if( fl_prop%iflag_4_gravity  .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_composit_buo .eq. id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_coriolis .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_lorentz  .eq. id_turn_OFF) then
+      else if( fl_prop%iflag_4_inertia                                  &
+     &   .and. fl_prop%iflag_4_gravity                                  &
+     &   .and. (fl_prop%iflag_4_composit_buo .eqv. .FALSE.)             &
+     &   .and. fl_prop%iflag_4_coriolis                                 &
+     &   .and. (fl_prop%iflag_4_lorentz  .eqv. .FALSE.)) then
         call set_div_cv_terms_to_force                                  &
      &     (ipol_base%i_press, ipol_div_frc, ipol_div_frc%i_buoyancy,   &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      else if( fl_prop%iflag_4_gravity  .eq. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_composit_buo .ne. id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_coriolis .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_lorentz  .eq. id_turn_OFF) then
+      else if( fl_prop%iflag_4_inertia                                  &
+     &   .and.(fl_prop%iflag_4_gravity  .eqv. .FALSE.)                  &
+     &   .and. fl_prop%iflag_4_composit_buo                             &
+     &   .and. fl_prop%iflag_4_coriolis                                 &
+     &   .and. (fl_prop%iflag_4_lorentz  .eqv. .FALSE.)) then
         call set_div_cv_terms_to_force                                  &
      &     (ipol_base%i_press, ipol_div_frc, ipol_div_frc%i_comp_buo,   &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       else
+        call clear_field_data(rj_fld, n_scalar, ipol_base%i_press)
 !
-        call set_div_advection_to_force(ipol_base%i_press,              &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+!        if(fl_prop%iflag_4_inertia) then
+!          call add_div_advection_to_force                              &
+!     &       (ipol_base%i_press, ipol_div_frc%i_m_advect,              &
+!     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+!        end if
 !
-        if(fl_prop%iflag_4_coriolis .ne. id_turn_OFF) then
+        if(fl_prop%iflag_4_coriolis) then
           call add_term_to_div_force                                    &
      &       (ipol_base%i_press, ipol_div_frc%i_Coriolis,               &
      &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         end if
-        if(fl_prop%iflag_4_lorentz .ne. id_turn_OFF) then
+        if(fl_prop%iflag_4_lorentz) then
           call add_term_to_div_force                                    &
      &       (ipol_base%i_press, ipol_div_frc%i_lorentz,                &
      &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         end if
-        if(fl_prop%iflag_4_gravity .ne. id_turn_OFF) then
+        if(fl_prop%iflag_4_gravity) then
           call add_term_to_div_force                                    &
      &       (ipol_base%i_press, ipol_div_frc%i_buoyancy,               &
      &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         end if
-        if(fl_prop%iflag_4_composit_buo .ne. id_turn_OFF) then
+        if(fl_prop%iflag_4_composit_buo) then
           call add_term_to_div_force                                    &
      &       (ipol_base%i_press, ipol_div_frc%i_comp_buo,               &
      &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
@@ -137,7 +149,7 @@
 !
 !$omp do private (inod)
       do inod = 1, nnod_rj
-        d_rj(inod,is_press) = -  d_rj(inod,ipol_div_frc%i_m_flux)       &
+        d_rj(inod,is_press) = -  d_rj(inod,ipol_div_frc%i_m_advect)     &
      &                         + d_rj(inod,ipol_div_frc%i_Coriolis)     &
      &                         + d_rj(inod,ipol_div_frc%i_lorentz)      &
      &                         + d_rj(inod,ipol_div_frc%i_buoyancy)     &
@@ -163,7 +175,7 @@
 !
 !$omp do private (inod)
       do inod = 1, nnod_rj
-        d_rj(inod,is_press) = -  d_rj(inod,ipol_div_frc%i_m_flux)       &
+        d_rj(inod,is_press) = -  d_rj(inod,ipol_div_frc%i_m_advect)     &
      &                         + d_rj(inod,ipol_div_frc%i_Coriolis)     &
      &                         + d_rj(inod,ipol_div_frc%i_lorentz)      &
      &                         + d_rj(inod,is_div_buo)
@@ -187,7 +199,7 @@
 !
 !$omp do private (inod)
       do inod = 1, nnod_rj
-        d_rj(inod,is_press) = -  d_rj(inod,ipol_div_frc%i_m_flux)       &
+        d_rj(inod,is_press) = -  d_rj(inod,ipol_div_frc%i_m_advect)     &
      &                         + d_rj(inod,ipol_div_frc%i_Coriolis)     &
      &                         + d_rj(inod,ipol_div_frc%i_buoyancy)     &
      &                         + d_rj(inod,ipol_div_frc%i_comp_buo)
@@ -212,7 +224,7 @@
 !
 !$omp do private (inod)
       do inod = 1, nnod_rj
-        d_rj(inod,is_press) = -  d_rj(inod,ipol_div_frc%i_m_flux)       &
+        d_rj(inod,is_press) = -  d_rj(inod,ipol_div_frc%i_m_advect)     &
      &                         + d_rj(inod,ipol_div_frc%i_Coriolis)     &
      &                         + d_rj(inod,is_div_buo)
       end do
@@ -223,11 +235,10 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_div_advection_to_force                             &
-     &         (is_press, nnod_rj, ntot_phys_rj, d_rj)
+      subroutine add_div_advection_to_force                             &
+     &         (is_press, is_div, nnod_rj, ntot_phys_rj, d_rj)
 !
-!      type(base_force_address), intent(in) :: ipol_div_frc
-      integer(kind = kint), intent(in) :: is_press
+      integer(kind = kint), intent(in) :: is_press, is_div
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !
@@ -236,12 +247,11 @@
 !
 !$omp do private (inod)
       do inod = 1, nnod_rj
-!        d_rj(inod,is_press) = - d_rj(inod,ipol%div_forces%i_m_flux)
-        d_rj(inod,is_press) = zero
+        d_rj(inod,is_press) = d_rj(inod,is_press) - d_rj(inod,is_div)
       end do
 !$omp end do nowait
 !
-      end subroutine set_div_advection_to_force
+      end subroutine add_div_advection_to_force
 !
 ! ----------------------------------------------------------------------
 !

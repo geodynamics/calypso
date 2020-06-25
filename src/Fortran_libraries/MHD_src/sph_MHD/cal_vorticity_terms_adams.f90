@@ -29,16 +29,12 @@
 !!        type(explicit_term_address), intent(in) :: ipol_exp
 !!        type(base_force_address), intent(in) :: ipol_rot_frc
 !!
-!!      subroutine set_rot_advection_to_force                           &
-!!     &         (ipol_exp, ipol_rot_frc, nnod_rj, ntot_phys_rj, d_rj)
-!!      subroutine add_coriolis_to_vort_force                           &
-!!     &         (ipol_exp, ipol_rot_frc, nnod_rj, ntot_phys_rj, d_rj)
+!!      subroutine add_rot_advection_to_force                           &
+!!     &         (is_exp, is_rot_inertia, nnod_rj, ntot_phys_rj, d_rj)
 !!      subroutine add_buoyancy_to_vort_force                           &
-!!     &         (ipol_exp, is_rot_buo, nnod_rj, ntot_phys_rj, d_rj)
-!!      subroutine add_lorentz_to_vort_force                            &
-!!     &         (ipol_exp, nnod_rj, ntot_phys_rj, d_rj)
-!!        type(explicit_term_address), intent(in) :: ipol_exp
-!!        type(base_force_address), intent(in) :: ipol_rot_frc
+!!     &         (is_exp, is_rot_buo, nnod_rj, ntot_phys_rj, d_rj)
+!!      subroutine add_each_force_to_rot_forces                         &
+!!     &         (is_exp, is_rot_force, nnod_rj, ntot_phys_rj, d_rj)
 !!
 !!      subroutine set_ini_adams_inertia                                &
 !!     &         (fl_prop, ipol_exp, nnod_rj, ntot_phys_rj, d_rj)
@@ -216,102 +212,57 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_rot_advection_to_force                             &
-     &         (ipol_exp, ipol_rot_frc, nnod_rj, ntot_phys_rj, d_rj)
+      subroutine add_rot_advection_to_force                             &
+     &         (is_exp, is_rot_inertia, nnod_rj, ntot_phys_rj, d_rj)
 !
-      type(explicit_term_address), intent(in) :: ipol_exp
-      type(base_force_address), intent(in) :: ipol_rot_frc
+      integer(kind = kint), intent(in) :: is_exp, is_rot_inertia
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !
-      integer(kind = kint) :: inod
 !
+!$omp workshare
+      d_rj(1:nnod_rj,is_exp  ) = d_rj(1:nnod_rj,is_exp  )               &
+     &                        - d_rj(1:nnod_rj,is_rot_inertia  )
+      d_rj(1:nnod_rj,is_exp+2) = d_rj(1:nnod_rj,is_exp+2)               &
+     &                        - d_rj(1:nnod_rj,is_rot_inertia+2)
+!$omp end workshare nowait
 !
-!$omp do private (inod)
-      do inod = 1, nnod_rj
-        d_rj(inod,ipol_exp%i_forces  )                                  &
-     &        = - d_rj(inod,ipol_rot_frc%i_m_advect  )
-        d_rj(inod,ipol_exp%i_forces+2)                                  &
-     &        = - d_rj(inod,ipol_rot_frc%i_m_advect+2)
-      end do
-!$omp end do nowait
-!
-      end subroutine set_rot_advection_to_force
-!
-! ----------------------------------------------------------------------
-!
-      subroutine add_coriolis_to_vort_force                             &
-     &         (ipol_exp, ipol_rot_frc, nnod_rj, ntot_phys_rj, d_rj)
-!
-      type(explicit_term_address), intent(in) :: ipol_exp
-      type(base_force_address), intent(in) :: ipol_rot_frc
-      integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
-      real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
-!
-      integer(kind = kint) :: inod
-!
-!
-!$omp do private (inod)
-      do inod = 1, nnod_rj
-        d_rj(inod,ipol_exp%i_forces  )                                  &
-     &        =  d_rj(inod,ipol_exp%i_forces  )                         &
-     &         + d_rj(inod,ipol_rot_frc%i_Coriolis  )
-        d_rj(inod,ipol_exp%i_forces+2)                                  &
-     &        =  d_rj(inod,ipol_exp%i_forces+2)                         &
-     &         + d_rj(inod,ipol_rot_frc%i_Coriolis+2)
-      end do
-!$omp end do nowait
-!
-      end subroutine add_coriolis_to_vort_force
+      end subroutine add_rot_advection_to_force
 !
 ! ----------------------------------------------------------------------
 !
       subroutine add_buoyancy_to_vort_force                             &
-     &         (ipol_exp, is_rot_buo, nnod_rj, ntot_phys_rj, d_rj)
+     &         (is_exp, is_rot_buo, nnod_rj, ntot_phys_rj, d_rj)
 !
-      type(explicit_term_address), intent(in) :: ipol_exp
-      integer(kind = kint), intent(in) :: is_rot_buo
+      integer(kind = kint), intent(in) :: is_exp, is_rot_buo
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !
-      integer(kind = kint) :: inod
-!
-!
-!$omp do private (inod)
-      do inod = 1, nnod_rj
-        d_rj(inod,ipol_exp%i_forces+2)                                  &
-     &        =  d_rj(inod,ipol_exp%i_forces+2)                         &
-     &         + d_rj(inod,is_rot_buo+2)
-       end do
-!$omp end do nowait
+!$omp workshare
+      d_rj(1:nnod_rj,is_exp+2) = d_rj(1:nnod_rj,is_exp+2)               &
+     &                        + d_rj(1:nnod_rj,is_rot_buo+2)
+!$omp end workshare nowait
 !
       end subroutine add_buoyancy_to_vort_force
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine add_lorentz_to_vort_force                              &
-     &         (ipol_exp, ipol_rot_frc, nnod_rj, ntot_phys_rj, d_rj)
+      subroutine add_each_force_to_rot_forces                           &
+     &         (is_exp, is_rot_force, nnod_rj, ntot_phys_rj, d_rj)
 !
-      type(explicit_term_address), intent(in) :: ipol_exp
-      type(base_force_address), intent(in) :: ipol_rot_frc
+      integer(kind = kint), intent(in) :: is_exp, is_rot_force
       integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
       real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !
-      integer(kind = kint) :: inod
 !
+!$omp workshare
+      d_rj(1:nnod_rj,is_exp  ) = d_rj(1:nnod_rj,is_exp  )               &
+     &                       + d_rj(1:nnod_rj,is_rot_force  )
+      d_rj(1:nnod_rj,is_exp+2) = d_rj(1:nnod_rj,is_exp+2)               &
+     &                       + d_rj(1:nnod_rj,is_rot_force+2)
+!$omp end workshare nowait
 !
-!$omp do private (inod)
-      do inod = 1, nnod_rj
-        d_rj(inod,ipol_exp%i_forces  )                                  &
-     &        =  d_rj(inod,ipol_exp%i_forces  )                         &
-     &         + d_rj(inod,ipol_rot_frc%i_lorentz  )
-        d_rj(inod,ipol_exp%i_forces+2)                                  &
-     &        =  d_rj(inod,ipol_exp%i_forces+2)                         &
-     &         + d_rj(inod,ipol_rot_frc%i_lorentz+2)
-       end do
-!$omp end do nowait
-!
-      end subroutine add_lorentz_to_vort_force
+      end subroutine add_each_force_to_rot_forces
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

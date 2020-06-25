@@ -12,10 +12,14 @@
 !!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(address_4_sph_trans), intent(inout) :: trns_snap
-!!      subroutine set_addresses_temporal_trans(ipol, iphys, trns_tmp,  &
+!!      subroutine set_addresses_ene_flux_trans(ipol, iphys, trns_eflux,&
 !!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !!        type(phys_address), intent(in) :: ipol, iphys
-!!        type(address_4_sph_trans), intent(inout) :: trns_tmp
+!!        type(address_4_sph_trans), intent(inout) :: trns_eflux
+!!      subroutine set_addresses_diff_vect_trans(ipol, iphys, trns_difv,&
+!!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+!!        type(phys_address), intent(in) :: ipol, iphys
+!!        type(address_4_sph_trans), intent(inout) :: trns_difv
 !!
 !!      subroutine copy_field_from_transform                            &
 !!     &         (sph_params, sph_rtp, backward, mesh, nod_fld)
@@ -59,8 +63,8 @@
 !
 !
       if(iflag_debug .gt. 0) then
-        write(*,*)                                                      &
-     &       'Spherical transform field table for snapshot (trns_snap)'
+        write(*,*)  'Spherical transform field table ',                 &
+     &              'for snapshot (trns_snap)'
       end if
 !
       call bwd_trans_address_snap                                       &
@@ -88,13 +92,54 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_addresses_temporal_trans(ipol, iphys, trns_tmp,    &
+      subroutine set_addresses_ene_flux_trans(ipol, iphys, trns_eflux,  &
      &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
-      use add_diff_vect_to_sph_trans
+      use address_sph_trans_snap
 !
       type(phys_address), intent(in) :: ipol, iphys
-      type(address_4_sph_trans), intent(inout) :: trns_tmp
+      type(address_4_sph_trans), intent(inout) :: trns_eflux
+      integer(kind = kint), intent(inout) :: ncomp_sph_trans
+      integer(kind = kint), intent(inout) :: nvector_sph_trans
+      integer(kind = kint), intent(inout) :: nscalar_sph_trans
+!
+!
+      if(iflag_debug .gt. 0) then
+        write(*,*)  'Spherical transform field table ',                 &
+     &              'for energy flux (trns_eflux)'
+      end if
+!
+      call bwd_trans_address_ene_flux                                   &
+     &   (ipol, iphys, trns_eflux%b_trns, trns_eflux%backward)
+      call fwd_trans_address_ene_flux                                   &
+     &   (ipol, iphys, trns_eflux%f_trns, trns_eflux%forward)
+!
+      call count_num_fields_each_trans(trns_eflux%backward,             &
+     &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+      call count_num_fields_each_trans(trns_eflux%forward,              &
+     &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+!
+!
+      if(iflag_debug .gt. 0) then
+        write(*,*) 'ncomp_sph_trans ', ncomp_sph_trans
+        write(*,*) 'nvector_rj_2_rtp ', trns_eflux%backward%num_vector
+        write(*,*) 'nscalar_rj_2_rtp ', trns_eflux%backward%num_scalar
+!
+        write(*,*) 'nvector_rtp_2_rj ', trns_eflux%forward%num_vector
+        write(*,*) 'nscalar_rtp_2_rj ', trns_eflux%forward%num_scalar
+      end if
+!
+      end subroutine set_addresses_ene_flux_trans
+!
+!-----------------------------------------------------------------------
+!
+      subroutine set_addresses_diff_vect_trans(ipol, iphys, trns_difv,  &
+     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+!
+      use address_sph_trans_snap
+!
+      type(phys_address), intent(in) :: ipol, iphys
+      type(address_4_sph_trans), intent(inout) :: trns_difv
       integer(kind = kint), intent(inout) :: ncomp_sph_trans
       integer(kind = kint), intent(inout) :: nvector_sph_trans
       integer(kind = kint), intent(inout) :: nscalar_sph_trans
@@ -102,49 +147,31 @@
 !
       if(iflag_debug .gt. 0) then
         write(*,*) 'Spherical transform field table ',                  &
-     &             'for intermediate of snapshot'
-        write(*,*) 'Address for backward transform: ',                  &
-     &             'transform, poloidal, toroidal, grid data'
+     &             'for intermediate of snapshot (trns_difv)'
       end if
 !
-      trns_tmp%backward%nfield = 0
-      call alloc_sph_trns_field_name(trns_tmp%backward)
-      trns_tmp%backward%num_vector = trns_tmp%backward%nfield
+      call bwd_trans_address_diff_vect                                  &
+     &   (ipol, iphys, trns_difv%b_trns, trns_difv%backward)
+      call fwd_trans_address_diff_vect                                  &
+     &   (ipol, iphys, trns_difv%f_trns, trns_difv%forward)
 !
-      trns_tmp%backward%num_scalar                                      &
-     &     = trns_tmp%backward%nfield - trns_tmp%backward%num_vector
-      trns_tmp%backward%num_tensor = 0
 !
-     if(iflag_debug .gt. 0) then
-        write(*,*) 'Address for forward transform: ',                   &
-     &             'transform, poloidal, toroidal, grid data'
-      end if
-!
-      trns_tmp%forward%nfield = 0
-      call alloc_sph_trns_field_name(trns_tmp%forward)
-      trns_tmp%forward%num_vector = trns_tmp%forward%nfield
-!
-      call add_diff_vect_scalar_trns_snap                               &
-     &   (ipol%diff_vector, iphys%diff_vector,                          &
-     &    trns_tmp%f_trns%diff_vector, trns_tmp%forward)
-      trns_tmp%forward%num_tensor = 0
-!
-      call count_num_fields_each_trans(trns_tmp%backward,               &
+      call count_num_fields_each_trans(trns_difv%backward,              &
      &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
-      call count_num_fields_each_trans(trns_tmp%forward,                &
+      call count_num_fields_each_trans(trns_difv%forward,               &
      &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
 !
       if(iflag_debug .gt. 0) then
         write(*,*) 'ncomp_sph_trans ', ncomp_sph_trans
-        write(*,*) 'nvector_rj_2_rtp ', trns_tmp%backward%num_vector
-        write(*,*) 'nscalar_rj_2_rtp ', trns_tmp%backward%num_scalar
+        write(*,*) 'nvector_rj_2_rtp ', trns_difv%backward%num_vector
+        write(*,*) 'nscalar_rj_2_rtp ', trns_difv%backward%num_scalar
 !
-        write(*,*) 'nvector_rtp_2_rj ', trns_tmp%forward%num_vector
-        write(*,*) 'nscalar_rtp_2_rj ', trns_tmp%forward%num_scalar
+        write(*,*) 'nvector_rtp_2_rj ', trns_difv%forward%num_vector
+        write(*,*) 'nscalar_rtp_2_rj ', trns_difv%forward%num_scalar
       end if
 !
-      end subroutine set_addresses_temporal_trans
+      end subroutine set_addresses_diff_vect_trans
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

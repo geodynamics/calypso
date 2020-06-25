@@ -8,8 +8,7 @@
 !!       in MHD dynamo simulation
 !!
 !!@verbatim
-!!      subroutine set_addresses_trans_sph_MHD                          &
-!!     &         (MHD_prop, ipol, iphys, trns_MHD,                      &
+!!      subroutine set_addresses_trans_sph_MHD(ipol, iphys, trns_MHD,   &
 !!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(phys_address), intent(in) :: ipol, iphys
@@ -53,13 +52,13 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_addresses_trans_sph_MHD                            &
-     &         (MHD_prop, ipol, iphys, trns_MHD,                        &
+      subroutine set_addresses_trans_sph_MHD(ipol, iphys, trns_MHD,     &
+!     &         (MHD_prop, ipol, iphys, trns_MHD,                       &
      &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
       use address_sph_trans_MHD
 !
-      type(MHD_evolution_param), intent(in) :: MHD_prop
+!      type(MHD_evolution_param), intent(in) :: MHD_prop
       type(phys_address), intent(in) :: ipol, iphys
       type(address_4_sph_trans), intent(inout) :: trns_MHD
       integer(kind = kint), intent(inout) :: ncomp_sph_trans
@@ -71,10 +70,10 @@
         write(*,*) 'Spherical transform field table for MHD'
       end if
 !
-      call bwd_trans_address_MHD(MHD_prop, ipol, iphys,                 &
-     &    trns_MHD%b_trns, trns_MHD%backward)
-      call fwd_trans_address_MHD(MHD_prop, ipol, iphys,                 &
-     &    trns_MHD%f_trns, trns_MHD%forward)
+      call bwd_trans_address_MHD                                        &
+     &   (ipol, iphys, trns_MHD%b_trns, trns_MHD%backward)
+      call fwd_trans_address_MHD                                        &
+     &   (ipol, iphys, trns_MHD%f_trns, trns_MHD%forward)
 !
       ncomp_sph_trans =   0
       nvector_sph_trans = 0

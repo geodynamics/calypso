@@ -329,7 +329,7 @@
 !
       subroutine set_divergence_field_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout) :: n_comps(ndiv_vector)
+      integer(kind = kint_4b), intent(inout) :: n_comps(ndiv_vector)
       character(len = kchara), intent(inout) :: names(ndiv_vector)
       character(len = kchara), intent(inout) :: maths(ndiv_vector)
 !
@@ -347,7 +347,7 @@
 !
       subroutine set_gradient_field_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout) :: n_comps(ngrad_scalar)
+      integer(kind = kint_4b), intent(inout) :: n_comps(ngrad_scalar)
       character(len = kchara), intent(inout) :: names(ngrad_scalar)
       character(len = kchara), intent(inout) :: maths(ngrad_scalar)
 !

@@ -16,6 +16,9 @@
 !!     &  = field_def(name = 'velocity',                                &
 !!     &              math = '$u_{i}$',                                 &
 !!     &              n_comp = n_vector)
+!!
+!!      subroutine set_field_labels(field, n_comps, field_names, maths)
+!!        type(field_def), intent(in) :: field
 !!@endverbatim
 !
       module t_field_labels
@@ -45,13 +48,13 @@
       subroutine set_field_labels(field, n_comps, field_names, maths)
 !
       type(field_def), intent(in) :: field
-      integer(kind = kint), intent(inout) :: n_comps
+      integer(kind = kint_4b), intent(inout) :: n_comps
       character(len = kchara), intent(inout) :: field_names
       character(len = kchara), intent(inout) :: maths
 !
       integer(kind = kint) :: i, icou
 !
-      n_comps = field%n_comp
+      n_comps = int(field%n_comp,KIND(n_comps))
       write(field_names, '(a,a1)') trim(field%name) // char(0)
 !
       icou = 0

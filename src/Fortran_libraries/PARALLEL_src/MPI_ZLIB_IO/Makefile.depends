@@ -78,9 +78,9 @@ gz_field_file_MPI_IO.o: $(MPI_ZLIB_IO_DIR)/gz_field_file_MPI_IO.f90 m_precision.
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_field_file_MPI_IO_b.o: $(MPI_ZLIB_IO_DIR)/gz_field_file_MPI_IO_b.f90 m_precision.o m_constants.o calypso_mpi.o m_machine_parameter.o m_calypso_mpi_IO.o t_time_data.o t_field_data_IO.o t_calypso_mpi_IO_param.o m_error_IDs.o MPI_binary_head_IO.o gz_MPI_binary_datum_IO.o MPI_ascii_data_IO.o field_file_MPI_IO.o gz_MPI_binary_data_IO.o gz_MPI_binary_head_IO.o m_phys_constants.o field_data_IO.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_merged_udt_vtk_file_IO.o: $(MPI_ZLIB_IO_DIR)/gz_merged_udt_vtk_file_IO.f90 m_precision.o m_constants.o calypso_mpi.o m_field_file_format.o t_ucd_data.o set_ucd_file_names.o gz_ucd_file_MPI_IO.o gz_vtk_file_MPI_IO.o
+gz_merged_udt_vtk_file_IO.o: $(MPI_ZLIB_IO_DIR)/gz_merged_udt_vtk_file_IO.f90 m_precision.o m_constants.o calypso_mpi.o m_field_file_format.o t_ucd_data.o t_calypso_mpi_IO_param.o set_ucd_file_names.o gz_ucd_file_MPI_IO.o gz_vtk_file_MPI_IO.o t_time_data.o m_error_IDs.o gz_MPI_binary_datum_IO.o MPI_ascii_data_IO.o m_machine_parameter.o MPI_binary_head_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_ucd_file_MPI_IO.o: $(MPI_ZLIB_IO_DIR)/gz_ucd_file_MPI_IO.f90 m_precision.o m_constants.o calypso_mpi.o m_calypso_mpi_IO.o t_buffer_4_gzip.o vtk_data_to_buffer.o ucd_data_to_buffer.o gz_vtk_file_MPI_IO.o m_phys_constants.o zlib_cvt_ucd_data.o
+gz_ucd_file_MPI_IO.o: $(MPI_ZLIB_IO_DIR)/gz_ucd_file_MPI_IO.f90 m_precision.o m_constants.o calypso_mpi.o m_calypso_mpi_IO.o t_buffer_4_gzip.o vtk_data_to_buffer.o ucd_data_to_buffer.o t_calypso_mpi_IO_param.o gz_MPI_binary_head_IO.o gz_MPI_binary_datum_IO.o gz_field_file_MPI_IO_b.o m_machine_parameter.o m_phys_constants.o MPI_binary_head_IO.o set_nnod_4_ele_by_type.o gz_vtk_file_MPI_IO.o zlib_cvt_ucd_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_vtk_file_MPI_IO.o: $(MPI_ZLIB_IO_DIR)/gz_vtk_file_MPI_IO.f90 m_precision.o m_constants.o calypso_mpi.o t_buffer_4_gzip.o m_calypso_mpi_IO.o vtk_data_to_buffer.o m_phys_constants.o zlib_cvt_vtk_data.o zlib_convert_text.o
 	$(F90) -c $(F90OPTFLAGS) $<

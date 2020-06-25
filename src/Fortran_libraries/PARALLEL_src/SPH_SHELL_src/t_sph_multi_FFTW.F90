@@ -10,7 +10,7 @@
 !!@verbatim
 !! ------------------------------------------------------------------
 !!      subroutine init_MHD_multi_FFTW(ncomp, ncomp_fwd, ncomp_bwd,     &
-!!     &          nidx_rtp, irt_rtp_smp_stack, FFTW_t)
+!!     &          nnod_rtp, nidx_rtp, irt_rtp_smp_stack, FFTW_t)
 !!      subroutine finalize_MHD_multi_FFTW(FFTW_t)
 !!      subroutine verify_MHD_multi_FFTW(ncomp, ncomp_fwd, ncomp_bwd,   &
 !!     &          nnod_rtp, nidx_rtp, irt_rtp_smp_stack, FFTW_t)
@@ -85,10 +85,10 @@
 ! ------------------------------------------------------------------
 !
       subroutine init_MHD_multi_FFTW(ncomp, ncomp_fwd, ncomp_bwd,       &
-     &          nidx_rtp, irt_rtp_smp_stack, FFTW_t)
+     &          nnod_rtp, nidx_rtp, irt_rtp_smp_stack, FFTW_t)
 !
       integer(kind = kint), intent(in) :: ncomp, ncomp_fwd, ncomp_bwd
-      integer(kind = kint), intent(in) :: nidx_rtp(3)
+      integer(kind = kint), intent(in) :: nnod_rtp, nidx_rtp(3)
       integer(kind = kint), intent(in) :: irt_rtp_smp_stack(0:np_smp)
       type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
 !
@@ -100,6 +100,7 @@
       integer, parameter :: istride = 1
 !
 !
+      call alloc_tmp_ordering_FFTW(nnod_rtp, FFTW_t)
 !
       Nfft4 = int(nidx_rtp(3))
       idist_r = int(nidx_rtp(3))
@@ -148,6 +149,7 @@
       end do
 !
       call dealloc_FFTW_plan(FFTW_t)
+      call dealloc_tmp_ordering_FFTW(FFTW_t)
 !
       end subroutine finalize_MHD_multi_FFTW
 !
@@ -165,14 +167,14 @@
 !
       if(allocated(FFTW_t%X) .eqv. .false.) then
         call init_MHD_multi_FFTW(ncomp, ncomp_fwd, ncomp_bwd,           &
-     &      nidx_rtp, irt_rtp_smp_stack, FFTW_t)
+     &      nnod_rtp, nidx_rtp, irt_rtp_smp_stack, FFTW_t)
         return
       end if
 !
       if(size(FFTW_t%X) .ne. nnod_rtp*ncomp) then
         call finalize_MHD_multi_FFTW(FFTW_t)
         call init_MHD_multi_FFTW(ncomp, ncomp_fwd, ncomp_bwd,           &
-     &      nidx_rtp, irt_rtp_smp_stack, FFTW_t)
+     &      nnod_rtp, nidx_rtp, irt_rtp_smp_stack, FFTW_t)
       end if
 !
       end subroutine verify_MHD_multi_FFTW

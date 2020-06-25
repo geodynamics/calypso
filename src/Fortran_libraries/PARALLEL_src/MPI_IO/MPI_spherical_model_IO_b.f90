@@ -117,9 +117,8 @@
       integer(kind = kint_gl) :: num64
 !
 !
-      num64 = sph_IO%numdir_sph
       call mpi_write_mul_inthead_b                                      &
-     &   (IO_param, num64, sph_IO%nidx_gl_sph)
+     &   (IO_param, sph_IO%numdir_sph, sph_IO%nidx_gl_sph)
       call mpi_write_one_inthead_b(IO_param, sph_IO%ltr_gl)
 !
       end subroutine mpi_write_gl_reso_sph_b

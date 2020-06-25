@@ -7,6 +7,8 @@
 !!@verbatim
 !!      subroutine alloc_sph_trans_address(sph_rtp, WK)
 !!      subroutine dealloc_sph_trans_address(WK)
+!!      subroutine alloc_sph_trans_area_snap(sph_rtp, WK)
+!!      subroutine dealloc_sph_trans_area_snap(WK)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(works_4_sph_trans_MHD), intent(inout) :: WK
 !!@endverbatim
@@ -40,9 +42,6 @@
         type(phys_address) :: b_trns
 !>        addresses of forces for forward transform
         type(phys_address) :: f_trns
-!
-!>        Work area of Fourier transform for MHD
-        type(work_for_sgl_FFTW) :: mul_FFTW
       end type address_4_sph_trans
 !
 !>      strucutres for spherical transform for MHD dynamo
@@ -52,8 +51,10 @@
 !
 !>        strucutres for spherical transform for snapshot output
         type(address_4_sph_trans) :: trns_snap
+!>        strucutres for spherical transform for energy flux output
+        type(address_4_sph_trans) :: trns_eflux
 !>        strucutres for spherical transform for intermediate snapshot
-        type(address_4_sph_trans) :: trns_tmp
+        type(address_4_sph_trans) :: trns_difv
 !
 !>        Work structures for various spherical harmonics trasform
         type(spherical_trns_works) :: WK_sph
@@ -80,11 +81,7 @@
 !
 !
       call alloc_nonlinear_data(sph_rtp, wk%trns_MHD)
-      call alloc_nonlinear_data(sph_rtp, WK%trns_snap)
-      call alloc_nonlinear_data(sph_rtp, wk%trns_tmp)
-!
       call alloc_nonlinear_pole(sph_rtp, WK%trns_MHD)
-      call alloc_nonlinear_pole(sph_rtp, WK%trns_snap)
 !
       end subroutine alloc_sph_trans_address
 !
@@ -95,14 +92,47 @@
       type(works_4_sph_trans_MHD), intent(inout) :: WK
 !
 !
-      call dealloc_nonlinear_pole(WK%trns_snap)
       call dealloc_nonlinear_pole(WK%trns_MHD)
-!
-      call dealloc_nonlinear_data(WK%trns_tmp)
-      call dealloc_nonlinear_data(WK%trns_snap)
       call dealloc_nonlinear_data(WK%trns_MHD)
 !
       end subroutine dealloc_sph_trans_address
+!
+!-----------------------------------------------------------------------
+!
+      subroutine alloc_sph_trans_area_snap(sph_rtp, WK)
+!
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(works_4_sph_trans_MHD), intent(inout) :: WK
+!
+!
+      call alloc_nonlinear_data(sph_rtp, WK%trns_snap)
+      call alloc_nonlinear_pole(sph_rtp, WK%trns_snap)
+!
+      call alloc_nonlinear_data(sph_rtp, wk%trns_difv)
+      call alloc_nonlinear_pole(sph_rtp, wk%trns_difv)
+!
+      call alloc_nonlinear_data(sph_rtp, WK%trns_eflux)
+      call alloc_nonlinear_pole(sph_rtp, WK%trns_eflux)
+!
+      end subroutine alloc_sph_trans_area_snap
+!
+!-----------------------------------------------------------------------
+!
+      subroutine dealloc_sph_trans_area_snap(WK)
+!
+      type(works_4_sph_trans_MHD), intent(inout) :: WK
+!
+!
+      call dealloc_nonlinear_pole(WK%trns_difv)
+      call dealloc_nonlinear_data(WK%trns_difv)
+!
+      call dealloc_nonlinear_pole(WK%trns_snap)
+      call dealloc_nonlinear_data(WK%trns_snap)
+!
+      call dealloc_nonlinear_pole(WK%trns_eflux)
+      call dealloc_nonlinear_data(WK%trns_eflux)
+!
+      end subroutine dealloc_sph_trans_area_snap
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

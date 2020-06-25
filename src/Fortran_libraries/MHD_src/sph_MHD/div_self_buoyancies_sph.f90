@@ -8,9 +8,10 @@
 !!
 !!@verbatim
 !!      subroutine sel_div_buoyancies_sph_MHD                           &
-!!     &         (sph_rj, ipol_base, ipol_grd, ipol_div_frc,            &
-!!     &          fl_prop, ref_param_T, ref_param_C, sph_bc_U, rj_fld)
-!!        type(fluid_property), intent(in) :: fl_prop
+!!     &         (iflag_4_gravity, iflag_4_composit_buo,                &
+!!     &          sph_rj, ipol_base, ipol_grd, ipol_div_frc,            &
+!!     &          coef_buo, coef_comp_buo, sph_bc_U,                    &
+!!     &          ref_param_T, ref_param_C, rj_fld)
 !!        type(reference_scalar_param), intent(in) :: ref_param_T
 !!        type(reference_scalar_param), intent(in) :: ref_param_C
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
@@ -45,10 +46,11 @@
 !-----------------------------------------------------------------------
 !
       subroutine sel_div_buoyancies_sph_MHD                             &
-     &         (sph_rj, ipol_base, ipol_grd, ipol_div_frc,              &
-     &          fl_prop, ref_param_T, ref_param_C, sph_bc_U, rj_fld)
+     &         (iflag_4_gravity, iflag_4_composit_buo,                  &
+     &          sph_rj, ipol_base, ipol_grd, ipol_div_frc,              &
+     &          coef_buo, coef_comp_buo, sph_bc_U,                      &
+     &          ref_param_T, ref_param_C, rj_fld)
 !
-      use t_physical_property
       use t_reference_scalar_param
       use t_spheric_rj_data
       use t_base_field_labels
@@ -57,7 +59,8 @@
       use t_phys_data
       use t_boundary_params_sph_MHD
 !
-      type(fluid_property), intent(in) :: fl_prop
+      logical, intent(in) :: iflag_4_gravity, iflag_4_composit_buo
+      real(kind = kreal), intent(in) :: coef_buo, coef_comp_buo
       type(reference_scalar_param), intent(in) :: ref_param_T
       type(reference_scalar_param), intent(in) :: ref_param_C
       type(sph_rj_grid), intent(in) ::  sph_rj
@@ -71,49 +74,52 @@
       integer(kind = kint) :: igrad_temp, igrad_comp
 !
 !
-      if    (ref_param_T%iflag_reference .eq. id_sphere_ref_temp        &
-     &  .or. ref_param_T%iflag_reference .eq. id_takepiro_temp) then
-        ipol_temp =  ipol_base%i_per_temp
-        igrad_temp = ipol_grd%i_grad_per_t
-      else
-        ipol_temp =  ipol_base%i_temp
-        igrad_temp = ipol_grd%i_grad_temp
+      if(iflag_4_gravity) then
+        if    (ref_param_T%iflag_reference .eq. id_sphere_ref_temp      &
+     &    .or. ref_param_T%iflag_reference .eq. id_takepiro_temp) then
+          ipol_temp =  ipol_base%i_per_temp
+          igrad_temp = ipol_grd%i_grad_per_t
+        else
+          ipol_temp =  ipol_base%i_temp
+          igrad_temp = ipol_grd%i_grad_temp
+        end if
       end if
 !
-      if    (ref_param_C%iflag_reference .eq. id_sphere_ref_temp        &
-     &  .or. ref_param_C%iflag_reference .eq. id_takepiro_temp) then
-        ipol_comp =  ipol_base%i_per_light
-        igrad_comp = ipol_grd%i_grad_per_c
-      else
-        ipol_comp =  ipol_base%i_light
-        igrad_comp = ipol_grd%i_grad_composit
+      if(iflag_4_composit_buo) then
+        if    (ref_param_C%iflag_reference .eq. id_sphere_ref_temp      &
+     &    .or. ref_param_C%iflag_reference .eq. id_takepiro_temp) then
+          ipol_comp =  ipol_base%i_per_light
+          igrad_comp = ipol_grd%i_grad_per_c
+        else
+          ipol_comp =  ipol_base%i_light
+          igrad_comp = ipol_grd%i_grad_composit
+        end if
       end if
 !
-      if ((fl_prop%iflag_4_gravity * fl_prop%iflag_4_composit_buo)      &
-     &      .gt. id_turn_OFF) then
+      if(iflag_4_gravity .and. iflag_4_composit_buo) then
         if (iflag_debug.ge.1) write(*,*)                                &
      &        'cal_div_double_buoyancy_sph_MHD', ipol_temp
         call cal_div_double_buoyancy_sph_MHD                            &
-     &     (sph_bc_U%kr_in, sph_bc_U%kr_out, fl_prop%coef_buo,          &
-     &      ipol_temp, igrad_temp, fl_prop%coef_comp_buo,               &
+     &     (sph_bc_U%kr_in, sph_bc_U%kr_out, coef_buo,                  &
+     &      ipol_temp, igrad_temp, coef_comp_buo,                       &
      &      ipol_comp, igrad_comp, ipol_div_frc%i_buoyancy,             &
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      else if (fl_prop%iflag_4_gravity .gt. id_turn_OFF) then
+      else if(iflag_4_gravity) then
         if (iflag_debug.ge.1)  write(*,*)                               &
      &    'cal_div_buoyancy_sph_MHD by pert. temperature'
         call cal_div_buoyancy_sph_MHD                                   &
-     &     (sph_bc_U%kr_in, sph_bc_U%kr_out, fl_prop%coef_buo,          &
+     &     (sph_bc_U%kr_in, sph_bc_U%kr_out, coef_buo,                  &
      &      ipol_temp, igrad_temp, ipol_div_frc%i_buoyancy,             &
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      else if (fl_prop%iflag_4_composit_buo .gt. id_turn_OFF) then
+      else if(iflag_4_composit_buo) then
         if (iflag_debug.ge.1)  write(*,*)                               &
      &      'cal_div_buoyancy_sph_MHD by composition'
         call cal_div_buoyancy_sph_MHD                                   &
-     &     (sph_bc_U%kr_in, sph_bc_U%kr_out, fl_prop%coef_comp_buo,     &
+     &     (sph_bc_U%kr_in, sph_bc_U%kr_out, coef_comp_buo,             &
      &      ipol_comp, igrad_comp, ipol_div_frc%i_buoyancy,             &
      &      sph_rj%nidx_rj, sph_rj%radius_1d_rj_r,                      &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)

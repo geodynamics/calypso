@@ -38,13 +38,9 @@ RANLIB = @RANLIB@
 
 #
 # OPENMP_FCFLAGS OprnMP option for fortran compiler
-# FC_NAME_MANGLE definition for Fortran-C connection
-#    C routtine name mangle flag for Fortran connection
-#     -DFC_NAME_LOWER_USCORE, -DFC_NAME_UPPER, or -DFC_NAME_LOWER
 # XL_FORTRAN   Set "-WF," option for cpp preprocessor
 #
 OPENMP_FCFLAGS = @OPENMP_FCFLAGS@
-FC_NAME_MANGLE = @DFC_NAME_MANGLE@
 XL_FORTRAN =     @XL_FORTRAN@
 #
 #
@@ -88,18 +84,6 @@ $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
 	fi
 	$(F90_LOCAL) $< -o $@
 
-depends: $(MAKE_MOD_DEP)
-	echo "# Construct Makefile"; \
-	cd $(MHDDIR) ; \
-		$(GMAKE) \
-		GMAKE='$(GMAKE)' \
-		MHDDIR='$(MHDDIR)' \
-		MAKEDIR='$(MAKEDIR)' \
-		CC="$(CC)"   \
-		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
-		OPTFLAGS='$(OPTFLAGS)' \
-		depends
-
 makemake: $(MAKE_MOD_DEP)
 	echo "# Construct Makefile"; \
 	cd $(MHDDIR) ; \
@@ -122,7 +106,6 @@ makemake: $(MAKE_MOD_DEP)
 		HDF5_FFLAGS="$(HDF5_FFLAGS)" \
 		HDF5_LDFLAGS="$(HDF5_LDFLAGS)" \
 		HDF5_FLIBS="$(HDF5_FLIBS)" \
-		FC_NAME_MANGLE="$(FC_NAME_MANGLE)" \
 		OPTFLAGS="$(OPTFLAGS)" \
 		F90OPTFLAGS="$(F90OPTFLAGS)" \
 		F90LIB="$(F90LIB)" \
@@ -130,6 +113,7 @@ makemake: $(MAKE_MOD_DEP)
 		MPICC="$(MPICC)"   \
 		AR="$(AR)" \
 		RANLIB="$(RANLIB)" \
+		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
 		makemake
 
 test:

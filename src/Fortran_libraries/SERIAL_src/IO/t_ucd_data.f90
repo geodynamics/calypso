@@ -44,8 +44,11 @@
 !!     &          ncomp_new_field, tmp, ucd)
 !!      subroutine append_new_ucd_field_data(ncomp_new_field, d_tmp,    &
 !!     &          tmp, ucd)
-!!
 !!        type(ucd_data), intent(inout) :: ucd
+!!
+!!      subroutine check_read_ucd_data(ucd_b)
+!!      subroutine compare_read_ucd_data(ucd_b, ucd_z)
+!!        type(ucd_data), intent(in) :: ucd_b, ucd_z
 !!@endverbatim
 !
       module t_ucd_data
@@ -510,6 +513,87 @@
      &          (tmp%ntot_comp+1), ucd%nnod, ucd%ntot_comp, ucd%d_ucd)
 !
       end subroutine append_new_ucd_field_data
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine check_read_ucd_data(ucd_b)
+!
+      type(ucd_data), intent(in) :: ucd_b
+!
+!
+      write(*,*) 'ucd_b%nnod', ucd_b%nnod
+      write(*,*) 'xx_1', ucd_b%xx(1,1:3)
+      write(*,*) 'xx_2', ucd_b%xx(2,1:3)
+      write(*,*) 'xx_3', ucd_b%xx(3,1:3)
+      write(*,*) 'xx_1', ucd_b%xx(ucd_b%nnod-2,1:3)
+      write(*,*) 'xx_2', ucd_b%xx(ucd_b%nnod-1,1:3)
+      write(*,*) 'xx_3', ucd_b%xx(ucd_b%nnod,  1:3)
+!
+      write(*,*) 'ucd_b%nele', ucd_b%nele
+      write(*,*) 'ie_1', ucd_b%ie(1,1:3)
+      write(*,*) 'ie_2', ucd_b%ie(2,1:3)
+      write(*,*) 'ie_3', ucd_b%ie(3,1:3)
+      write(*,*) 'ie_1', ucd_b%ie(ucd_b%nele-2,1:3)
+      write(*,*) 'ie_2', ucd_b%ie(ucd_b%nele-1,1:3)
+      write(*,*) 'ie_3', ucd_b%ie(ucd_b%nele,  1:3)
+!
+      write(*,*) 'ucd_b%num_field', ucd_b%num_field, ucd_b%ntot_comp
+      write(*,*) 'ucd_b%num_comp', ucd_b%num_comp
+      write(*,*) 'ucd_b%phys_name: ', ucd_b%phys_name
+      write(*,*) 'ucd_b%d_ucd', ucd_b%d_ucd(1:3,1)
+!
+      end subroutine check_read_ucd_data
+!
+! -----------------------------------------------------------------------
+!
+      subroutine compare_read_ucd_data(ucd_b, ucd_z)
+!
+      type(ucd_data), intent(in) :: ucd_b, ucd_z
+!
+      integer(kind = kint_gl) :: i
+      integer(kind = kint) :: nd
+!
+!
+      if(ucd_z%nnod_4_ele .ne. ucd_b%nnod_4_ele) write(*,*)             &
+     &    'Wrong element type', ucd_z%nnod_4_ele, ucd_b%nnod_4_ele
+      if(ucd_z%nele .ne. ucd_b%nele) write(*,*)                         &
+     &    'Wrong num of element', ucd_z%nele, ucd_b%nele
+      write(*,*) 'Check connectivity'
+      do nd = 1, ucd_z%nnod_4_ele
+        do i = 1, ucd_z%nele
+          if(ucd_b%ie(i,nd) .ne. ucd_z%ie(i,nd)) then
+            write(*,*) 'Wrong connectivity at ', nd, i,                 &
+     &                ucd_z%ie(i,nd), ucd_b%ie(i,nd)
+          end if
+        end do
+      end do
+!
+      if(ucd_z%nnod .ne. ucd_b%nnod) write(*,*)                         &
+     &    'Wrong num of node', ucd_z%nnod, ucd_b%nnod
+      write(*,*) 'Check position'
+      do nd = 1, 3
+        do i = 1, ucd_z%nnod
+          if(ucd_b%xx(i,nd) .ne. ucd_z%xx(i,nd)) then
+            write(*,*) 'Wrong position at ', nd, i,                     &
+     &                ucd_z%xx(i,nd), ucd_b%xx(i,nd)
+          end if
+        end do
+      end do
+!
+      if(ucd_z%ntot_comp .ne. ucd_b%ntot_comp) write(*,*)               &
+     &    'Wrong num of total comps.', ucd_z%ntot_comp, ucd_b%ntot_comp
+      write(*,*) 'Check field'
+      do nd = 1, ucd_z%ntot_comp
+        do i = 1, ucd_z%nnod
+          if(ucd_z%d_ucd(i,nd) .ne. ucd_b%d_ucd(i,nd)) then
+            write(*,*) 'Wrong field at ', nd, i,                        &
+     &                ucd_z%d_ucd(i,nd), ucd_b%d_ucd(i,nd)
+          end if
+        end do
+      end do
+!
+      end subroutine compare_read_ucd_data
 !
 ! -----------------------------------------------------------------------
 !

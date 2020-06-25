@@ -7,10 +7,13 @@
 !>@brief Evaluate nonlinear terms by pseudo spectram scheme
 !!
 !!@verbatim
-!!      subroutine sum_forces_to_explicit(fl_prop, ipol, rj_fld)
-!!      subroutine licv_forces_to_explicit(fl_prop, ipol, rj_fld)
+!!      subroutine sum_forces_to_explicit                               &
+!!     &         (fl_prop, ipol_exp, ipol_rot_frc, rj_fld)
+!!      subroutine licv_forces_to_explicit                              &
+!!     &         (fl_prop, ipol_exp, ipol_rot_frc, rj_fld)
 !!        type(fluid_property), intent(in) :: fl_prop
-!!        type(phys_address), intent(in) :: ipol
+!!        type(explicit_term_address), intent(in) :: ipol_exp
+!!        type(base_force_address), intent(in) :: ipol_rot_frc
 !!        type(phys_data), intent(inout) :: rj_fld
 !!@endverbatim
 !
@@ -25,6 +28,8 @@
 !
       use t_physical_property
       use t_phys_address
+      use t_base_force_labels
+      use t_explicit_term_labels
       use t_phys_data
 !
       implicit none
@@ -35,67 +40,78 @@
 !*
 !*   ------------------------------------------------------------------
 !
-      subroutine sum_forces_to_explicit(fl_prop, ipol, rj_fld)
+      subroutine sum_forces_to_explicit                                 &
+     &         (fl_prop, ipol_exp, ipol_rot_frc, rj_fld)
 !
+      use copy_nodal_fields
       use cal_vorticity_terms_adams
 !
       type(fluid_property), intent(in) :: fl_prop
-      type(phys_address), intent(in) :: ipol
+      type(explicit_term_address), intent(in) :: ipol_exp
+      type(base_force_address), intent(in) :: ipol_rot_frc
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      if(      fl_prop%iflag_4_gravity  .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_coriolis .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_lorentz  .ne. id_turn_OFF) then
+      if(       fl_prop%iflag_4_inertia                                 &
+     &   .and.  fl_prop%iflag_4_gravity                                 &
+     &   .and.  fl_prop%iflag_4_coriolis                                &
+     &   .and.  fl_prop%iflag_4_lorentz) then
         call set_MHD_terms_to_force                                     &
-     &     (ipol%exp_work, ipol%rot_forces, ipol%rot_forces%i_buoyancy, &
+     &     (ipol_exp, ipol_rot_frc, ipol_rot_frc%i_buoyancy,            &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      else if( fl_prop%iflag_4_gravity  .eq.     id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_composit_buo .ne. id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_coriolis .ne.     id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_lorentz  .ne.     id_turn_OFF) then
+      else if(  fl_prop%iflag_4_inertia                                 &
+     &   .and. (fl_prop%iflag_4_gravity  .eqv.   .FALSE.)               &
+     &   .and.  fl_prop%iflag_4_composit_buo                            &
+     &   .and.  fl_prop%iflag_4_coriolis                                &
+     &   .and.  fl_prop%iflag_4_lorentz) then
         call set_MHD_terms_to_force                                     &
-     &     (ipol%exp_work, ipol%rot_forces, ipol%rot_forces%i_comp_buo, &
+     &     (ipol_exp, ipol_rot_frc, ipol_rot_frc%i_comp_buo,            &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      else if( fl_prop%iflag_4_gravity  .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_coriolis .ne. id_turn_OFF                &
-     &   .and. fl_prop%iflag_4_lorentz  .eq. id_turn_OFF) then
+      else if(  fl_prop%iflag_4_inertia                                 &
+     &   .and.  fl_prop%iflag_4_gravity                                 &
+     &   .and.  fl_prop%iflag_4_coriolis                                &
+     &   .and. (fl_prop%iflag_4_lorentz  .eqv. .FALSE.)) then
         call set_rot_cv_terms_to_force                                  &
-     &     (ipol%exp_work, ipol%rot_forces, ipol%rot_forces%i_buoyancy, &
+     &     (ipol_exp, ipol_rot_frc, ipol_rot_frc%i_buoyancy,            &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      else if( fl_prop%iflag_4_gravity  .eq.     id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_composit_buo .ne. id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_coriolis .ne.     id_turn_OFF            &
-     &   .and. fl_prop%iflag_4_lorentz  .eq.     id_turn_OFF) then
+      else if(  fl_prop%iflag_4_inertia                                 &
+     &   .and. (fl_prop%iflag_4_gravity  .eqv.  .FALSE.)                &
+     &   .and.  fl_prop%iflag_4_composit_buo                            &
+     &   .and.  fl_prop%iflag_4_coriolis                                &
+     &   .and. (fl_prop%iflag_4_lorentz  .eqv.  .FALSE.)) then
         call set_rot_cv_terms_to_force                                  &
-     &     (ipol%exp_work, ipol%rot_forces, ipol%rot_forces%i_comp_buo, &
+     &     (ipol_exp, ipol_rot_frc, ipol_rot_frc%i_comp_buo,            &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       else
+        call clear_field_data                                           &
+     &     (rj_fld, n_vector, ipol_exp%i_forces)
+!
 !$omp parallel
-        if(ipol%rot_forces%i_m_advect .gt. 0) then
-          call set_rot_advection_to_force                               &
-     &     (ipol%exp_work, ipol%rot_forces,                             &
+        if(fl_prop%iflag_4_inertia) then
+          call add_rot_advection_to_force                               &
+     &     (ipol_exp%i_forces, ipol_rot_frc%i_m_advect,                 &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         end if
-        if(fl_prop%iflag_4_coriolis .gt. id_turn_OFF) then
-          call add_coriolis_to_vort_force                               &
-     &       (ipol%exp_work, ipol%rot_forces,                           &
+!
+        if(fl_prop%iflag_4_coriolis) then
+          call add_each_force_to_rot_forces                             &
+     &       (ipol_exp%i_forces, ipol_rot_frc%i_Coriolis,               &
      &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         end if
-        if(fl_prop%iflag_4_lorentz .gt.  id_turn_OFF) then
-          call add_lorentz_to_vort_force                                &
-     &       (ipol%exp_work, ipol%rot_forces,                           &
+        if(fl_prop%iflag_4_lorentz) then
+          call add_each_force_to_rot_forces                             &
+     &       (ipol_exp%i_forces, ipol_rot_frc%i_lorentz,                &
      &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         end if
 !
-        if(fl_prop%iflag_4_gravity .gt.  id_turn_OFF) then
+        if(fl_prop%iflag_4_gravity) then
           call add_buoyancy_to_vort_force                               &
-     &       (ipol%exp_work, ipol%rot_forces%i_buoyancy,                &
+     &       (ipol_exp%i_forces, ipol_rot_frc%i_buoyancy,               &
      &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         end if
-        if(fl_prop%iflag_4_composit_buo .gt. id_turn_OFF) then
+        if(fl_prop%iflag_4_composit_buo) then
           call add_buoyancy_to_vort_force                               &
-     &       (ipol%exp_work, ipol%rot_forces%i_comp_buo,                &
+     &       (ipol_exp%i_forces, ipol_rot_frc%i_comp_buo,               &
      &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         end if
 !$omp end parallel
@@ -106,31 +122,32 @@
 !*   ------------------------------------------------------------------
 !*   ------------------------------------------------------------------
 !*
-      subroutine licv_forces_to_explicit(fl_prop, ipol, rj_fld)
+      subroutine licv_forces_to_explicit                                &
+     &         (fl_prop, ipol_exp, ipol_rot_frc, rj_fld)
 !
       use m_phys_constants
-      use copy_nodal_fields
       use cal_vorticity_terms_adams
 !
       type(fluid_property), intent(in) :: fl_prop
-      type(phys_address), intent(in) :: ipol
+      type(explicit_term_address), intent(in) :: ipol_exp
+      type(base_force_address), intent(in) :: ipol_rot_frc
 !
       type(phys_data), intent(inout) :: rj_fld
 !
 !
 !$omp parallel
-      if(fl_prop%iflag_4_coriolis .ne. id_turn_OFF) then
-        call add_coriolis_to_vort_force                                 &
-     &     (ipol%exp_work, ipol%rot_forces,                             &
+      if(fl_prop%iflag_4_coriolis) then
+        call add_each_force_to_rot_forces                               &
+     &     (ipol_exp%i_forces, ipol_rot_frc%i_Coriolis,                 &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
-      if(fl_prop%iflag_4_gravity .ne.  id_turn_OFF) then
+      if(fl_prop%iflag_4_gravity) then
         call add_buoyancy_to_vort_force                                 &
-     &     (ipol%exp_work, ipol%rot_forces%i_buoyancy,                  &
+     &     (ipol_exp%i_forces, ipol_rot_frc%i_buoyancy,                 &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      else if(fl_prop%iflag_4_composit_buo .ne. id_turn_OFF) then
+      else if(fl_prop%iflag_4_composit_buo) then
         call add_buoyancy_to_vort_force                                 &
-     &     (ipol%exp_work, ipol%rot_forces%i_comp_buo,                  &
+     &     (ipol_exp%i_forces, ipol_rot_frc%i_comp_buo,                 &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       end if
 !$omp end parallel

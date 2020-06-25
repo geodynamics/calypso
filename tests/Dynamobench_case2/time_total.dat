@@ -1,0 +1,77 @@
+
+ ==========================================
+ Truncation level:                31
+ Longitudinal symmetry:            1
+ N_r for fluid shell:             48
+ N_theta:                         48
+ N_phi:                           96
+ Total MPI processes:            4
+ Total OopenMP threads:            2
+ Processes for spetr (r, l and m):                   1           4
+ Processes for Legendre trans. (r, l, m):            2           2
+ Processes for Legendre trans. (r, t, m):            2           1           2
+ Processes for physical space. (r, t, p):            2           2           1
+
+ Average elapsed time
+  1. Total time:    8.61753840000E+01
+  2. Initialization time:    1.69459615000E+01
+  3. Time evolution loop time:    6.20211050000E+01
+  4. Data IO time:    1.49322122500E+01
+  6. Evolution excluding IO:    5.37266832500E+01
+  9. Nonlinear terms:    5.11849780000E+01
+ 10. Obtain field to output:    5.19478000000E-01
+ 11. output_sph_restart_control:    7.02080650000E+00
+ 12. output_rms_sph_mhd_control:    2.67693500000E-01
+ 13. Coriolis term:    5.50281750000E-01
+ 14. sph backward transform:    1.98105527500E+01
+ 15. cal nonlinear terms:    3.31735175000E+00
+ 16. sph forward transform:    2.73365105000E+01
+ 17. obtain explicit terms:    5.24865750000E-01
+ 18. transfer rj  => rlm:    7.06533500000E-01
+ 19. transfer rtm => rtp:    2.06271400000E+00
+ 20. transfer rtp => rtm:    2.63391375000E+00
+ 21. transfer rlm => rj:    2.12974300000E+00
+ 22. Legendre backward transform:    5.82576575000E+00
+ 23. Legendre forward transform:    8.70734475000E+00
+ 24. Fourier transform:    2.35853695000E+01
+ 42. set_to_send_buf_N:    6.42200500000E-01
+ 43. calypso_send_recv_core:    7.49391075000E+00
+ 44. set_from_recv_buf_rev_N:    8.17745000000E-01
+ 45. Sectioning initialization.:    1.14125000000E-03
+ 46. Isosurfaceing initialization.:    1.17499999996E-05
+ 47. Volume rendering initialization.:    2.57500000007E-05
+ 48. fieldline initialization.:    1.59050000000E-03
+ 49. LIC rendering initialization.:    6.72250000001E-04
+ 80. Communication for field:    4.14415000000E-02
+ 
+ Minimum and maximum elapsed time
+  1. Total time:    8.61747490000E+01   8.61756480000E+01
+  2. Initialization time:    1.69459510000E+01   1.69459720000E+01
+  3. Time evolution loop time:    6.20205230000E+01   6.20214070000E+01
+  4. Data IO time:    1.47348590000E+01   1.51199710000E+01
+  6. Evolution excluding IO:    5.35117790000E+01   5.39367920000E+01
+  9. Nonlinear terms:    5.09042930000E+01   5.14605520000E+01
+ 10. Obtain field to output:    4.94398000000E-01   5.41158000000E-01
+ 11. output_sph_restart_control:    6.82856200000E+00   7.21381100000E+00
+ 12. output_rms_sph_mhd_control:    2.56482000000E-01   2.84995000000E-01
+ 13. Coriolis term:    5.31841000000E-01   5.75340000000E-01
+ 14. sph backward transform:    1.93608590000E+01   2.01587140000E+01
+ 15. cal nonlinear terms:    2.96990000000E+00   3.66762700000E+00
+ 16. sph forward transform:    2.65195190000E+01   2.80442820000E+01
+ 17. obtain explicit terms:    4.78486000000E-01   5.69545000000E-01
+ 18. transfer rj  => rlm:    6.10161000000E-01   7.67584000000E-01
+ 19. transfer rtm => rtp:    1.98681800000E+00   2.26219600000E+00
+ 20. transfer rtp => rtm:    2.15178200000E+00   3.00266100000E+00
+ 21. transfer rlm => rj:    1.81542100000E+00   2.47715700000E+00
+ 22. Legendre backward transform:    5.55902000000E+00   5.99144800000E+00
+ 23. Legendre forward transform:    8.48013700000E+00   8.93818000000E+00
+ 24. Fourier transform:    2.33583380000E+01   2.39201290000E+01
+ 42. set_to_send_buf_N:    5.95560000000E-01   6.82821000000E-01
+ 43. calypso_send_recv_core:    6.68846800000E+00   8.12722100000E+00
+ 44. set_from_recv_buf_rev_N:    7.89353000000E-01   8.47612000000E-01
+ 45. Sectioning initialization.:    5.18000000000E-04   1.75700000000E-03
+ 46. Isosurfaceing initialization.:    9.99999999962E-06   1.40000000002E-05
+ 47. Volume rendering initialization.:    2.39999999998E-05   2.69999999993E-05
+ 48. fieldline initialization.:    9.19000000000E-04   2.62700000000E-03
+ 49. LIC rendering initialization.:    4.95000000001E-04   1.12600000000E-03
+ 80. Communication for field:    1.92530000000E-02   6.21460000000E-02

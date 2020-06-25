@@ -85,11 +85,15 @@
 !
       integer(kind = kint) :: i
 !
-      if (num_sr .gt. 0) then
+      if(num_sr .gt. 0) then
         write(id_file,'(8i16)') istack_sr(1:num_sr)
-        do i = 1, ntot_sr
-          write(id_file,'(i16)') inod_sr(i)
-        end do
+        if(ntot_sr .gt. 0) then
+          do i = 1, ntot_sr
+            write(id_file,'(i16)') inod_sr(i)
+          end do
+        else
+          write(id_file,'(a)')
+        end if
       else
         write(id_file,'(a)')
       end if

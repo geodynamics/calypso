@@ -8,27 +8,44 @@
 !> @brief Output VTK file
 !!
 !!@verbatim
-!!      subroutine write_vtk_file(file_name, id_vtk,                    &
-!!     &          nnod, nele, nnod_ele, xx, ie, num_field,  ntot_comp,  &
-!!     &          ncomp_field, field_name, d_nod)
-!!      subroutine write_vtk_phys(file_name, id_vtk,                    &
-!!     &          nnod, num_field, ntot_comp, ncomp_field,              &
-!!     &          field_name, d_nod)
-!!      subroutine write_vtk_grid(file_name, id_vtk,                    &
-!!     &          nnod, nele, nnod_ele, xx, ie)
+!!      subroutine write_parallel_vtk_file                              &
+!!     &         (id_rank, nprocs, istep, file_prefix)
+!!
+!!      subroutine write_vtk_file(id_rank, file_name, ucd)
+!!      subroutine write_vtk_phys(id_rank, file_name, ucd)
+!!      subroutine write_vtk_grid(id_rank, file_name, ucd)
+!!        integer, intent(in) :: id_rank
+!!        character(len=kchara), intent(in) :: file_name
+!!        type(ucd_data), intent(in) :: ucd
+!!
+!!      subroutine read_vtk_file(id_rank, file_name, ucd)
+!!      subroutine read_vtk_phys(id_rank, file_name, ucd)
+!!      subroutine read_vtk_grid(id_rank, file_name, ucd)
+!!        integer, intent(in) :: id_rank
+!!        character(len=kchara), intent(in) :: file_name
+!!        type(ucd_data), intent(inout) :: ucd
+!!
+!!      subroutine read_alloc_vtk_file(id_rank, file_name, ucd)
+!!      subroutine read_alloc_vtk_phys(id_rank, file_name, ucd)
+!!      subroutine read_alloc_vtk_grid(id_rank, file_name, ucd)
+!!        integer, intent(in) :: id_rank
+!!        character(len=kchara), intent(in) :: file_name
+!!        type(ucd_data), intent(inout) :: ucd
 !!@endverbatim
 !
       module vtk_file_IO
 !
       use m_precision
       use m_constants
+      use m_machine_parameter
 !
-      use vtk_data_IO
+      use udt_to_VTK_data_IO
       use t_ucd_data
 !
       implicit none
 !
-      private :: write_vtk_data, write_vtk_mesh
+!>      file ID for VTK file
+      integer(kind = kint), parameter, private :: id_vtk_file = 16
 !
 !  ---------------------------------------------------------------------
 !
@@ -36,115 +53,222 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine write_vtk_file(file_name, id_vtk, ucd)
+      subroutine write_parallel_vtk_file                                &
+     &         (id_rank, nprocs, istep, file_prefix)
 !
-      integer(kind = kint), intent(in) ::  id_vtk
+      use set_parallel_file_name
+      use set_ucd_file_names
+      use set_ucd_extensions
+!
+      character(len=kchara), intent(in) :: file_prefix
+      integer, intent(in) :: id_rank, nprocs
+      integer(kind = kint), intent(in) :: istep
+!
+      character(len=kchara)  :: file_name, fname_tmp
+      character(len=kchara) :: fname_nodir
+      integer :: ip
+!
+!
+      if(id_rank .gt. 0) return
+!
+      fname_nodir = delete_directory_name(file_prefix)
+      fname_tmp =   add_int_suffix(istep, file_prefix)
+      file_name =   add_pvtk_extension(fname_tmp)
+!
+      write(*,*) 'Write parallel VTK file: ', trim(file_name)
+      open(id_vtk_file, file=file_name)
+!
+      write(id_vtk_file,'(a)') '<File version="pvtk-1.0"'
+      write(id_vtk_file,'(a)')                                          &
+     &     '       dataType="vtkUnstructuredGrid"'
+      write(id_vtk_file,'(a,i6,a)')                                     &
+     &     '       numberOfPieces="', nprocs, '" >'
+      do ip = 0, nprocs-1
+        file_name = set_parallel_vtk_file_name(fname_nodir, ip, istep)
+        write(id_vtk_file,'(3a)') '   <Piece fileName="',               &
+     &                       trim(file_name), '" />'
+      end do
+      write(id_vtk_file,'(a)') '</File>'
+!
+      close(id_vtk_file)
+!
+      end subroutine write_parallel_vtk_file
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine write_vtk_file(id_rank, file_name, ucd)
+!
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
-!
       type(ucd_data), intent(in) :: ucd
 !
 !
-      open(id_vtk, file=file_name, form='formatted', status ='unknown')
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Write ascii VTK file: ', trim(file_name)
 !
-      call write_vtk_mesh(id_vtk, ucd%nnod, ucd%nele, ucd%nnod_4_ele,   &
-     &    ucd%xx, ucd%ie)
-!
-      call write_vtk_data(id_vtk, ucd%nnod, ucd%num_field,              &
-     &    ucd%ntot_comp, ucd%num_comp, ucd%phys_name, ucd%d_ucd)
-!
-      close(id_vtk)
+      open(id_vtk_file, file=file_name, form='formatted',               &
+     &     status ='unknown')
+      call write_ucd_mesh_to_VTK(id_vtk_file, ucd)
+      call write_ucd_field_to_VTK(id_vtk_file, ucd)
+      close(id_vtk_file)
 !
       end subroutine write_vtk_file
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_vtk_phys(file_name, id_vtk, ucd)
+      subroutine write_vtk_phys(id_rank, file_name, ucd)
 !
-      integer(kind = kint), intent(in) ::  id_vtk
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
-!
       type(ucd_data), intent(in) :: ucd
 !
 !
-      open(id_vtk, file=file_name, form='formatted', status ='unknown')
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Write ascii VTK fields: ', trim(file_name)
 !
-      call write_vtk_data                                               &
-     &   (id_vtk, ucd%nnod, ucd%num_field, ucd%ntot_comp,               &
-     &    ucd%num_comp, ucd%phys_name, ucd%d_ucd)
-!
-      close(id_vtk)
+      open(id_vtk_file, file=file_name, form='formatted',               &
+     &     status ='unknown')
+      call write_ucd_field_to_VTK(id_vtk_file, ucd)
+      close(id_vtk_file)
 !
       end subroutine write_vtk_phys
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_vtk_grid(file_name, id_vtk, ucd)
+      subroutine write_vtk_grid(id_rank, file_name, ucd)
 !
-      integer(kind = kint), intent(in) ::  id_vtk
+      integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: file_name
-!
       type(ucd_data), intent(in) :: ucd
 !
 !
-      open(id_vtk, file=file_name, form='formatted', status ='unknown')
-      call write_vtk_mesh(id_vtk, ucd%nnod, ucd%nele, ucd%nnod_4_ele,   &
-     &    ucd%xx, ucd%ie)
-      close(id_vtk)
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Write ascii VTK mesh: ', trim(file_name)
+!
+      open(id_vtk_file, file=file_name, form='formatted',               &
+     &     status ='unknown')
+      call write_ucd_mesh_to_VTK(id_vtk_file, ucd)
+      close(id_vtk_file)
 !
       end subroutine write_vtk_grid
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine write_vtk_data(id_vtk, nnod, num_field, ntot_comp,     &
-     &          ncomp_field, field_name, d_nod)
+      subroutine read_vtk_file(id_rank, file_name, ucd)
 !
-      integer(kind=kint_gl), intent(in) :: nnod
-      integer(kind=kint), intent(in) :: num_field, ntot_comp
-      integer(kind=kint), intent(in) :: ncomp_field(num_field)
-      character(len=kchara), intent(in) :: field_name(num_field)
-      real(kind = kreal), intent(in) :: d_nod(nnod,ntot_comp)
-!
-      integer(kind = kint), intent(in) ::  id_vtk
-!
-      integer(kind = kint) :: icou, j
+      integer, intent(in) :: id_rank
+      character(len=kchara), intent(in) :: file_name
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      call write_vtk_fields_head(id_vtk, nnod)
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii VTK file: ', trim(file_name)
 !
-      IF(ntot_comp .ge. 1) then
-        icou = 1
-        do j = 1, num_field
-          call write_vtk_each_field_head(id_vtk, ncomp_field(j),        &
-     &        field_name(j) )
-          call write_vtk_each_field(id_vtk, nnod, ncomp_field(j),       &
-     &        nnod, d_nod(1,icou) )
-          icou = icou + ncomp_field(j)
-        end do
-      end if
+      open(id_vtk_file, file=file_name,                                 &
+     &    form='formatted', status ='old')
+      call read_ucd_mesh_from_VTK(id_vtk_file, ucd)
+      call read_udt_field_from_VTK(id_vtk_file, ucd)
+      close(id_vtk_file)
 !
-      end subroutine write_vtk_data
+      end subroutine read_vtk_file
+!
+!-----------------------------------------------------------------------
+!
+      subroutine read_vtk_phys(id_rank, file_name, ucd)
+!
+      character(len=kchara), intent(in) :: file_name
+      integer, intent(in) :: id_rank
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii VTK fields: ', trim(file_name)
+!
+      open(id_vtk_file, file=file_name,                                 &
+     &    form='formatted', status ='old')
+      call read_udt_field_from_VTK(id_vtk_file, ucd)
+      close(id_vtk_file)
+!
+      end subroutine read_vtk_phys
+!
+!-----------------------------------------------------------------------
+!
+      subroutine read_vtk_grid(id_rank, file_name, ucd)
+!
+      character(len=kchara), intent(in) :: file_name
+      integer, intent(in) :: id_rank
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii VTK mesh: ', trim(file_name)
+!
+      open(id_vtk_file, file=file_name,                                 &
+     &    form='formatted', status ='old')
+      call read_ucd_mesh_from_VTK(id_vtk_file, ucd)
+      close(id_vtk_file)
+!
+      end subroutine read_vtk_grid
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
-      subroutine write_vtk_mesh(id_vtk, nnod, nele, nnod_ele,  xx, ie)
+      subroutine read_alloc_vtk_file(id_rank, file_name, ucd)
 !
-      use m_phys_constants
-!
-      integer(kind = kint), intent(in) :: nnod_ele
-      integer(kind = kint_gl), intent(in) :: nnod, nele
-      integer(kind = kint_gl), intent(in) :: ie(nele,nnod_ele)
-      real(kind = kreal), intent(in) :: xx(nnod,3)
-!
-      integer(kind = kint), intent(in) ::  id_vtk
+      integer, intent(in) :: id_rank
+      character(len=kchara), intent(in) :: file_name
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      call write_vtk_node_head(id_vtk, nnod)
-      call write_vtk_each_field(id_vtk, nnod, ithree, nnod, xx)
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii VTK file: ', trim(file_name)
 !
-      call write_vtk_connect_data(id_vtk, nele, nnod_ele, nele, ie)
+      open(id_vtk_file, file=file_name,                                 &
+     &    form='formatted', status ='old')
+      call read_alloc_ucd_mesh_from_VTK(id_vtk_file, ucd)
+      call read_alloc_udt_field_from_VTK(id_vtk_file, ucd)
+      close(id_vtk_file)
 !
-      end subroutine write_vtk_mesh
+      end subroutine read_alloc_vtk_file
+!
+!-----------------------------------------------------------------------
+!
+      subroutine read_alloc_vtk_phys(id_rank, file_name, ucd)
+!
+      character(len=kchara), intent(in) :: file_name
+      integer, intent(in) :: id_rank
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii VTK fields: ', trim(file_name)
+!
+      open(id_vtk_file, file=file_name,                                 &
+     &    form='formatted', status ='old')
+      call read_alloc_udt_field_from_VTK(id_vtk_file, ucd)
+      close(id_vtk_file)
+!
+      end subroutine read_alloc_vtk_phys
+!
+!-----------------------------------------------------------------------
+!
+      subroutine read_alloc_vtk_grid(id_rank, file_name, ucd)
+!
+      character(len=kchara), intent(in) :: file_name
+      integer, intent(in) :: id_rank
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
+     &     'Read ascii VTK mesh: ', trim(file_name)
+!
+      open(id_vtk_file, file=file_name,                                 &
+     &    form='formatted', status ='old')
+      call read_alloc_ucd_mesh_from_VTK(id_vtk_file, ucd)
+      close(id_vtk_file)
+!
+      end subroutine read_alloc_vtk_grid
 !
 ! -----------------------------------------------------------------------
 !

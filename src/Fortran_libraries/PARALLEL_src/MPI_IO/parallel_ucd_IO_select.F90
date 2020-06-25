@@ -82,9 +82,9 @@
         ucd_param%file_prefix = file_prefix_ctl%charavalue
       end if
 !
-      call choose_para_fld_file_format                                  &
-     &   (file_format_ctl%charavalue, file_format_ctl%iflag,            &
-     &    ucd_param%iflag_format)
+      ucd_param%iflag_format                                            &
+     &        = choose_para_fld_file_format(file_format_ctl%charavalue, &
+     &                                      file_format_ctl%iflag)
 !
       end subroutine set_merged_ucd_file_ctl
 !
@@ -94,7 +94,7 @@
      &         (istep_ucd, ucd_param, t_IO, ucd, m_ucd)
 !
       use ucd_IO_select
-      use write_ucd_to_vtk_file
+      use vtk_file_IO
       use merged_udt_vtk_file_IO
 !
       use gz_merged_udt_vtk_file_IO
@@ -110,15 +110,10 @@
       character(len=kchara) :: file_name
 !
 !
-      if( (ucd_param%iflag_format/icent) .eq. 1) then
-        file_name = set_single_ucd_file_name(ucd_param%file_prefix,     &
-     &             ucd_param%iflag_format, istep_ucd)
-      else
-        file_name = set_parallel_ucd_file_name(ucd_param%file_prefix,   &
-     &             ucd_param%iflag_format, my_rank, istep_ucd)
-      end if
+      file_name = set_parallel_ucd_file_name(ucd_param%file_prefix,     &
+     &           ucd_param%iflag_format, my_rank, istep_ucd)
 !
-      if      (ucd_param%iflag_format .eq. iflag_sgl_vtk) then
+      if(ucd_param%iflag_format .eq. iflag_sgl_vtk) then
         call write_vtk_file_mpi(file_name, ucd, m_ucd)
       else if (ucd_param%iflag_format .eq. iflag_sgl_vtd) then
         call write_vtk_phys_mpi(file_name, ucd, m_ucd)
@@ -127,7 +122,21 @@
       else if (ucd_param%iflag_format .eq. iflag_sgl_udt) then
         call write_ucd_phys_mpi(file_name, ucd, m_ucd)
 !
+      else if(ucd_param%iflag_format .eq. iflag_ucd_bin                 &
+     &   .or. ucd_param%iflag_format .eq. iflag_sgl_ucd_bin) then
+        call write_ucd_file_mpi_b(file_name, ucd, m_ucd)
+      else if(ucd_param%iflag_format .eq. iflag_udt_bin                 &
+     &   .or. ucd_param%iflag_format .eq. iflag_sgl_udt_bin) then
+        call write_ucd_phys_mpi_b(file_name, ucd, m_ucd)
+!
 #ifdef ZLIB_IO
+      else if(ucd_param%iflag_format .eq. iflag_ucd_bin_gz              &
+     &   .or. ucd_param%iflag_format .eq. iflag_sgl_ucd_bin_gz) then
+        call gz_write_ucd_file_mpi_b(file_name, ucd, m_ucd)
+      else if(ucd_param%iflag_format .eq. iflag_udt_bin_gz              &
+     &   .or. ucd_param%iflag_format .eq. iflag_sgl_udt_bin_gz) then
+        call gz_write_ucd_phys_mpi_b(file_name, ucd, m_ucd)
+!
       else if (ucd_param%iflag_format .eq. iflag_sgl_vtk_gz) then
         call gz_write_vtk_file_mpi(file_name, ucd, m_ucd)
       else if (ucd_param%iflag_format .eq. iflag_sgl_vtd_gz) then
@@ -160,11 +169,11 @@
       else if(ucd_param%iflag_format .eq. iflag_vtk) then
         call write_parallel_vtk_file                                    &
      &     (my_rank, nprocs, istep_ucd, ucd_param%file_prefix)
-        call write_udt_data_2_vtk_file(my_rank, file_name, ucd)
+        call write_vtk_file(my_rank, file_name, ucd)
       else if (ucd_param%iflag_format .eq. iflag_vtd) then
         call write_parallel_vtk_file                                    &
      &     (my_rank, nprocs, istep_ucd, ucd_param%file_prefix)
-        call write_udt_data_2_vtk_phys(my_rank, file_name, ucd)
+        call write_vtk_phys(my_rank, file_name, ucd)
       else
         call sel_write_ucd_file                                         &
      &     (my_rank, istep_ucd, ucd_param, t_IO, ucd)
@@ -178,7 +187,6 @@
       subroutine sel_write_parallel_ucd_mesh(ucd_param, ucd, m_ucd)
 !
       use ucd_IO_select
-      use write_ucd_to_vtk_file
       use merged_udt_vtk_file_IO
 !
       use gz_merged_udt_vtk_file_IO
@@ -191,17 +199,23 @@
       character(len=kchara) :: file_name
 !
 !
-      if( (ucd_param%iflag_format/icent) .eq. 1) then
-        file_name = set_single_grd_file_name                            &
-     &            (ucd_param%file_prefix, ucd_param%iflag_format)
-      end if
+      file_name = set_parallel_grd_file_name                            &
+     &        (ucd_param%file_prefix, ucd_param%iflag_format, my_rank)
 !
       if(ucd_param%iflag_format .eq. iflag_sgl_vtd) then
         call write_vtk_grid_mpi(file_name, ucd, m_ucd)
       else if(ucd_param%iflag_format .eq. iflag_sgl_udt) then
         call write_ucd_grid_mpi(file_name, ucd, m_ucd)
 !
+      else if(ucd_param%iflag_format .eq. iflag_udt_bin                 &
+     &   .or. ucd_param%iflag_format .eq. iflag_sgl_udt_bin) then
+        call write_ucd_grid_mpi_b(file_name, ucd, m_ucd)
+!
 #ifdef ZLIB_IO
+      else if(ucd_param%iflag_format .eq. iflag_udt_bin_gz              &
+     &   .or. ucd_param%iflag_format .eq. iflag_sgl_udt_bin_gz) then
+        call gz_write_ucd_grid_mpi_b(file_name, ucd, m_ucd)
+!
       else if (ucd_param%iflag_format .eq. iflag_sgl_vtd_gz) then
         call gz_write_vtk_grid_mpi(file_name, ucd, m_ucd)
       else if(ucd_param%iflag_format .eq. iflag_sgl_udt_gz) then
@@ -221,113 +235,5 @@
       end subroutine sel_write_parallel_ucd_mesh
 !
 !------------------------------------------------------------------
-!------------------------------------------------------------------
-!
-      subroutine choose_para_fld_file_format(file_fmt_ctl, i_file_fmt,  &
-     &          id_field_file_format)
-!
-      use skip_comment_f
-!
-      integer(kind= kint), intent(in) :: i_file_fmt
-      character(len=kchara), intent(in) :: file_fmt_ctl
-      integer(kind= kint), intent(inout) :: id_field_file_format
-!
-!
-      if (i_file_fmt .eq. 0) then
-        id_field_file_format = iflag_sgl_vtk
-        return
-      end if
-!
-      if     (cmp_no_case(file_fmt_ctl, 'merged_UDT_ascii')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_UDT')                   &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_ascii')                 &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_merged_UDT')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_merged')                 &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged')                       &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_UDT_ascii')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_single_UDT')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_ascii')                 &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_single')                 &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single')          ) then
-           id_field_file_format = iflag_sgl_udt
-      else if(cmp_no_case(file_fmt_ctl, 'merged_UDT_gzip')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_UDT_gz')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_gzip')                  &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_gz')                    &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_merged_UDT')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_merged_UDT')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_merged')                  &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_merged')                    &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_UDT_gzip')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_UDT_gz')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_single_UDT')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_single_UDT')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_gzip')                  &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_gz')                    &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_sigle')                   &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_single')             ) then
-           id_field_file_format = iflag_sgl_udt + iflag_gzip
-!
-      else if(cmp_no_case(file_fmt_ctl, 'merged_UCD_ascii')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_merged_UCD')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_UCD')                   &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_UCD_ascii')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_single_UCD')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_UCD')       ) then
-           id_field_file_format = iflag_sgl_ucd
-      else if(cmp_no_case(file_fmt_ctl, 'merged_UCD_gzip')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_UCD_gz')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_merged_UCD')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_merged_UCD')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_UCD_gzip')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_UCD_gz')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_single_UCD')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_single_UCD')     ) then
-           id_field_file_format = iflag_sgl_ucd + iflag_gzip
-!
-      else if(cmp_no_case(file_fmt_ctl, 'merged_VTD_ascii')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_merged_VTD')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_VTD')                   &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_VTD_ascii')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_single_VTD')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_VTD')       ) then
-           id_field_file_format = iflag_sgl_vtd
-      else if(cmp_no_case(file_fmt_ctl, 'merged_VTD_gzip')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_VTD_gz')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_merged_VTD')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_merged_VTD')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_VTD_gzip')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_VTD_gz')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_single_VTD')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_single_VTD')     ) then
-           id_field_file_format = iflag_sgl_vtd + iflag_gzip
-!
-      else if(cmp_no_case(file_fmt_ctl, 'merged_VTK_ascii')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_merged_VTK')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_VTK')                   &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_VTK_ascii')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_single_VTK')             &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_VTK')        ) then
-           id_field_file_format = iflag_sgl_vtk
-      else if(cmp_no_case(file_fmt_ctl, 'merged_VTK_gzip')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'merged_VTK_gz')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_merged_VTK')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_merged_VTK')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_VTK_gzip')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_VTK_gz')                &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_single_VTK')              &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_single_VTK')     ) then
-           id_field_file_format = iflag_sgl_vtk + iflag_gzip
-      else if(cmp_no_case(file_fmt_ctl, 'merged_HDF5')                  &
-     &   .or. cmp_no_case(file_fmt_ctl, 'single_HDF5')       ) then
-           id_field_file_format = iflag_sgl_hdf5
-      else
-        call choose_ucd_file_format(file_fmt_ctl, i_file_fmt,           &
-     &          id_field_file_format)
-      end if
-!
-      end subroutine choose_para_fld_file_format
-!
-! -----------------------------------------------------------------------
 !
       end module parallel_ucd_IO_select

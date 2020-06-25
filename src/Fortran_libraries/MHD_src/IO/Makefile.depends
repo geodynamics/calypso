@@ -10,11 +10,13 @@ m_boundary_condition_IDs.o: $(MHD_IO_DIR)/m_boundary_condition_IDs.f90 m_precisi
 	$(F90) -c $(F90OPTFLAGS) $<
 m_ctl_data_sph_MHD.o: $(MHD_IO_DIR)/m_ctl_data_sph_MHD.f90 m_precision.o t_ctl_data_MHD.o
 	$(F90) -c $(F90OPTFLAGS) $<
+m_force_control_labels.o: $(MHD_IO_DIR)/m_force_control_labels.f90 m_precision.o t_base_force_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
 output_viz_file_control.o: $(MHD_IO_DIR)/output_viz_file_control.f90 m_machine_parameter.o m_precision.o m_constants.o t_IO_step_parameter.o t_MHD_step_parameter.o t_time_data.o t_flex_delta_t_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_control_4_composition.o: $(MHD_IO_DIR)/set_control_4_composition.f90 m_precision.o calypso_mpi.o m_machine_parameter.o t_physical_property.o t_control_array_chara2real.o t_bc_data_list.o set_node_group_types.o set_surface_group_types.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_control_4_force.o: $(MHD_IO_DIR)/set_control_4_force.f90 m_precision.o m_constants.o calypso_mpi.o m_error_IDs.o m_machine_parameter.o t_physical_property.o t_ctl_data_mhd_forces.o skip_comment_f.o
+set_control_4_force.o: $(MHD_IO_DIR)/set_control_4_force.f90 m_precision.o m_constants.o m_error_IDs.o m_machine_parameter.o m_force_control_labels.o t_control_parameter.o t_ctl_data_mhd_forces.o skip_comment_f.o t_physical_property.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_control_4_magne.o: $(MHD_IO_DIR)/set_control_4_magne.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_physical_property.o t_control_array_chara2real.o t_bc_data_list.o set_node_group_types.o set_surface_group_types.o
 	$(F90) -c $(F90OPTFLAGS) $<

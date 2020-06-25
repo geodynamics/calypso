@@ -8,19 +8,20 @@
 !!
 !!
 !!@verbatim
-!!      subroutine choose_ucd_file_format(file_fmt_ctl, i_file_fmt,     &
-!!     &          id_field_file_format)
-!!      subroutine input_ucd_file_format_code(iflag_psf_fmt, file_head)
+!!      integer(kind = kint) function choose_para_fld_file_format       &
+!!     &                            (file_fmt_ctl, i_file_fmt)
+!!      integer(kind = kint) function choose_ucd_file_format            &
+!!     &                            (file_fmt_ctl, i_file_fmt)
 !!
 !! ------------------------------------------------------------------
 !!   flag lists for field data
 !!
 !!  Distributed data file
 !!   ASCII   data file
-!!     UCD file:             ucd_ascii
-!!     splitted UCD file:    udt_ascii
-!!     VTK file:             vtk_ascii
-!!     splitted VTK file:    vtd_ascii
+!!     UCD file:             ucd
+!!     splitted UCD file:    udt
+!!     VTK file:             vtk
+!!     splitted VTK file:    vtd
 !!   BINARY  data file
 !!     splitted file:        binary
 !!
@@ -32,17 +33,17 @@
 !!
 !!  Merged data file
 !!   ASCII   data file
-!!     UCD file:             single_ucd_ascii
-!!     splitted UCD file:    single_udt_ascii
-!!     VTK file:             single_vtk_ascii
-!!     splitted VTK file:    single_vtd_ascii
-!!     HDF5 file:            merged_HDF5
+!!     UCD file:             merged_ucd
+!!     splitted UCD file:    merged_udt
+!!     VTK file:             merged_vtk
+!!     splitted VTK file:    merged_vtd
+!!     HDF5 file:            HDF5
 !!
 !!   GZIPPED data file
-!!     UCD file:             single_ucd_gzip
-!!     splitted UCD file:    single_udt_gzip
-!!     VTK file:             single_vtk_gzip
-!!     splitted VTK file:    single_vtd_gzip
+!!     UCD file:             merged_ucd_gzip
+!!     splitted UCD file:    merged_udt_gzip
+!!     VTK file:             merged_vtk_gzip
+!!     splitted VTK file:    merged_vtd_gzip
 !!
 !! ------------------------------------------------------------------
 !!@endverbatim
@@ -55,8 +56,11 @@
 !
       use m_precision
       use m_file_format_switch
+      use m_field_file_format_labels
+      use m_merged_field_fmt_labels
+      use t_multi_flag_labels
 !
-      implicit    none
+      implicit none
 !
 !>      Integer flag for origianl ascii data format
       integer(kind = kint), parameter :: iflag_ascii                    &
@@ -67,6 +71,9 @@
 !>      Integer flag for origianl gzipped ascii data format
       integer(kind = kint), parameter :: iflag_gzip                     &
      &                     = id_gzip_txt_file_fmt
+!>      Integer flag for gzipped binary data
+      integer(kind = kint), parameter :: iflag_bin_gz                   &
+     &                     = id_gzip_bin_file_fmt
 !
 !>      Integer flag for origianl ascii data format
       integer(kind = kint), parameter :: iflag_fld =       0
@@ -81,6 +88,18 @@
 !!         (Separated by FEM mesh part and field part)
       integer(kind = kint), parameter :: iflag_vtd =      40
 !
+!>      Integer flag for UCD data
+      integer(kind = kint), parameter :: iflag_ucd_bin =  70
+!>      Integer flag for UCD data
+!!         (Separated by FEM mesh part and field part)
+      integer(kind = kint), parameter :: iflag_udt_bin =  80
+!
+!>      Integer flag for merged binary data
+      integer(kind = kint), parameter :: iflag_sgl_bin =  101
+!>      Integer flag for merged binary data
+      integer(kind = kint), parameter :: iflag_sgl_ucd_bin =  170
+!>      Integer flag for merged binary data
+      integer(kind = kint), parameter :: iflag_sgl_udt_bin =  180
 !
 !>      Integer flag for merged UCD data
       integer(kind = kint), parameter :: iflag_sgl_ucd =  110
@@ -95,6 +114,7 @@
 !>      Integer flag for HDF file data
       integer(kind = kint), parameter :: iflag_sgl_hdf5 = 150
 !
+!
 !>      Integer flag for gzipped ascii original data
       integer(kind = kint), parameter :: iflag_fld_gz =       3
 !>      Integer flag for gzipped UCD data
@@ -107,9 +127,23 @@
 !>      Integer flag for gzipped VTK data
 !!         (Separated by FEM mesh part and field part)
       integer(kind = kint), parameter :: iflag_vtd_gz =      43
-!>      Integer flag for merged amd gzipped UCD data
+!
+!>      Integer flag for UCD data
+      integer(kind = kint), parameter :: iflag_ucd_bin_gz =  73
+!>      Integer flag for UCD data
+!!         (Separated by FEM mesh part and field part)
+      integer(kind = kint), parameter :: iflag_udt_bin_gz =  83
+!
+!>      Integer flag for merged gzipped binary data
+      integer(kind = kint), parameter :: iflag_sgl_bin_gz = 103
+!>      Integer flag for merged binary field and grid data
+      integer(kind = kint), parameter :: iflag_sgl_ucd_bin_gz =  173
+!>      Integer flag for merged binary field data
+      integer(kind = kint), parameter :: iflag_sgl_udt_bin_gz =  183
+!
+!>      Integer flag for merged gzipped UCD data
       integer(kind = kint), parameter :: iflag_sgl_ucd_gz = 113
-!>      Integer flag for merged amd gzipped UCD data
+!>      Integer flag for merged gzipped UCD data
 !!         (Separated by FEM mesh part and field part)
       integer(kind = kint), parameter :: iflag_sgl_udt_gz = 123
 !>      Integer flag for merged amd gzipped VTK data
@@ -124,110 +158,117 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine choose_ucd_file_format(file_fmt_ctl, i_file_fmt,       &
-     &          id_field_file_format)
+      integer(kind = kint) function choose_para_fld_file_format         &
+     &                            (file_fmt_ctl, i_file_fmt)
 !
       use skip_comment_f
 !
       integer(kind= kint), intent(in) :: i_file_fmt
       character(len=kchara), intent(in) :: file_fmt_ctl
-      integer(kind= kint), intent(inout) :: id_field_file_format
 !
+!
+      call init_mgd_field_type_flags
 !
       if (i_file_fmt .eq. 0) then
-        id_field_file_format = iflag_fld
+        choose_para_fld_file_format = iflag_sgl_vtk
         return
       end if
 !
-      if     (cmp_no_case(file_fmt_ctl, 'binary')                       &
-     &   .or. cmp_no_case(file_fmt_ctl, 'bin')         ) then
-           id_field_file_format = iflag_udt
-      else if(cmp_no_case(file_fmt_ctl, 'field_ascii')                  &
-     &   .or. cmp_no_case(file_fmt_ctl, 'field')                        &
-     &   .or. cmp_no_case(file_fmt_ctl, 'fld_ascii')                    &
-     &   .or. cmp_no_case(file_fmt_ctl, 'fld')                          &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_field')                  &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii_fld')                    &
-     &   .or. cmp_no_case(file_fmt_ctl, 'ascii')                        &
-     &   .or. cmp_no_case(file_fmt_ctl, 'text')        ) then
-           id_field_file_format = iflag_fld
-      else if(cmp_no_case(file_fmt_ctl, 'field_gzip')                   &
-     &   .or. cmp_no_case(file_fmt_ctl, 'field_gz')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'fld_gzip')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'fld_gz')                       &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_field')                   &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_field')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_fld')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_fld')                       &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip')                         &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz')         ) then
-           id_field_file_format = iflag_fld + iflag_gzip
-      else if(cmp_no_case(file_fmt_ctl, 'UDT_ascii')                    &
-     &   .or. cmp_no_case(file_fmt_ctl, 'UDT')        ) then
-           id_field_file_format = iflag_udt
-      else if(cmp_no_case(file_fmt_ctl, 'UDT_gzip')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'UDT_gz')                       &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_UDT')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_UDT')     ) then
-           id_field_file_format = iflag_udt + iflag_gzip
+      if     (check_mul_flags(file_fmt_ctl, mgd_udt_labels)) then
+        choose_para_fld_file_format = iflag_sgl_udt
+      else if(check_mul_flags(file_fmt_ctl, mgd_udt_gz_labels)) then
+        choose_para_fld_file_format = iflag_sgl_udt_gz
 !
-      else if(cmp_no_case(file_fmt_ctl, 'UCD_ascii')                    &
-     &   .or. cmp_no_case(file_fmt_ctl, 'UCD')        ) then
-           id_field_file_format = iflag_ucd
-      else if(cmp_no_case(file_fmt_ctl, 'UCD_gzip')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'UCD_gz')                       &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_UCD')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_UCD')     ) then
-           id_field_file_format = iflag_ucd + iflag_gzip
+      else if(check_mul_flags(file_fmt_ctl, mgd_ucd_labels)) then
+        choose_para_fld_file_format = iflag_sgl_ucd
+      else if(check_mul_flags(file_fmt_ctl, mgd_ucd_gz_labels)) then
+        choose_para_fld_file_format = iflag_sgl_ucd_gz
 !
-      else if(cmp_no_case(file_fmt_ctl, 'VTD_ascii')                    &
-     &   .or. cmp_no_case(file_fmt_ctl, 'VTD')        ) then
-           id_field_file_format = iflag_vtd
-      else if(cmp_no_case(file_fmt_ctl, 'VTD_gzip')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'VTD_gz')                       &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_VTD')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_VTD')     ) then
-           id_field_file_format = iflag_vtd + iflag_gzip
+      else if(check_mul_flags(file_fmt_ctl, mgd_vtd_labels)) then
+        choose_para_fld_file_format = iflag_sgl_vtd
+      else if(check_mul_flags(file_fmt_ctl, mgd_vtd_gz_labels)) then
+        choose_para_fld_file_format = iflag_sgl_vtd_gz
 !
-      else if(cmp_no_case(file_fmt_ctl, 'VTK_ascii')                    &
-     &   .or. cmp_no_case(file_fmt_ctl, 'VTK')        ) then
-           id_field_file_format = iflag_vtk
-      else if(cmp_no_case(file_fmt_ctl, 'VTK_gzip')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'VTK_gz')                       &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gzip_VTK')                     &
-     &   .or. cmp_no_case(file_fmt_ctl, 'gz_VTK')     ) then
-           id_field_file_format = iflag_vtk + iflag_gzip
+      else if(check_mul_flags(file_fmt_ctl, mgd_vtk_labels)) then
+        choose_para_fld_file_format = iflag_sgl_vtk
+      else if(check_mul_flags(file_fmt_ctl, mgd_vtk_gz_labels)) then
+        choose_para_fld_file_format = iflag_sgl_vtk_gz
+!
+!      else if(check_mul_flags(file_fmt_ctl, mgd_iso_labels)) then
+!        choose_para_fld_file_format = iflag_sgl_ucd_bin
+!      else if(check_mul_flags(file_fmt_ctl, mgd_iso_gz_labels)) then
+!        choose_para_fld_file_format = iflag_sgl_ucd_bin_gz
+!
+!      else if(check_mul_flags(file_fmt_ctl, mgd_psf_labels)) then
+!        choose_para_fld_file_format = iflag_sgl_udt_bin
+!      else if(check_mul_flags(file_fmt_ctl, mgd_psf_gz_labels)) then
+!        choose_para_fld_file_format = iflag_sgl_udt_bin_gz
+!
+      else if(check_mul_flags(file_fmt_ctl, mgd_hdf_labels)) then
+        choose_para_fld_file_format = iflag_sgl_hdf5
+!
       else
-           id_field_file_format = iflag_udt
+        choose_para_fld_file_format                                     &
+     &        = choose_ucd_file_format(file_fmt_ctl, i_file_fmt)
       end if
+      call dealloc_mgd_field_type_flags
 !
-      end subroutine choose_ucd_file_format
+      end function choose_para_fld_file_format
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine input_ucd_file_format_code(iflag_psf_fmt, file_head)
+      integer(kind = kint) function choose_ucd_file_format              &
+     &                            (file_fmt_ctl, i_file_fmt)
 !
-      integer(kind = kint), intent(inout) :: iflag_psf_fmt
-      character(len=kchara), intent(inout) :: file_head
+      use skip_comment_f
+!
+      integer(kind= kint), intent(in) :: i_file_fmt
+      character(len=kchara), intent(in) :: file_fmt_ctl
 !
 !
-      write(*,*) 'Choose psf format'
-      write(*,*) iflag_ucd, ': UCD'
-      write(*,*) iflag_udt, ': UDT'
-      write(*,*) iflag_vtk, ': VTK'
-!      write(*,*) iflag_vtd, ': VTD'
-      write(*,*) iflag_ucd_gz, ': gzipped_UCD'
-      write(*,*) iflag_udt_gz, ': gzipped_UDT'
-      write(*,*) iflag_vtk_gz, ': gzipped_VTK'
-!      write(*,*) iflag_vtd_gz, ': gzipped_VTD'
+      if (i_file_fmt .eq. 0) then
+        choose_ucd_file_format = iflag_fld
+        return
+      end if
 !
-      read(*,*)  iflag_psf_fmt
-      write(*,*) 'input file format code: ', iflag_psf_fmt
+      if     (check_mul_flags(file_fmt_ctl, field_ascii_labels)) then
+           choose_ucd_file_format = iflag_fld
+      else if(check_mul_flags(file_fmt_ctl, field_gz_labels)) then
+           choose_ucd_file_format = iflag_fld + iflag_gzip
+      else if(check_mul_flags(file_fmt_ctl, udt_flags)) then
+           choose_ucd_file_format = iflag_udt
+      else if(check_mul_flags(file_fmt_ctl, udt_gz_flags)) then
+           choose_ucd_file_format = iflag_udt + iflag_gzip
 !
-      write(*,*) 'input file prefix'
-      read(*,*) file_head
+      else if(check_mul_flags(file_fmt_ctl, ucd_flags)) then
+           choose_ucd_file_format = iflag_ucd
+      else if(check_mul_flags(file_fmt_ctl, ucd_gz_flags)) then
+           choose_ucd_file_format = iflag_ucd + iflag_gzip
 !
-      end subroutine input_ucd_file_format_code
+      else if(check_mul_flags(file_fmt_ctl, vtd_flags)) then
+           choose_ucd_file_format = iflag_vtd
+      else if(check_mul_flags(file_fmt_ctl, vtd_gz_flags)) then
+           choose_ucd_file_format = iflag_vtd + iflag_gzip
+!
+      else if(check_mul_flags(file_fmt_ctl, vtk_flags)) then
+           choose_ucd_file_format = iflag_vtk
+      else if(check_mul_flags(file_fmt_ctl, vtk_gz_flags)) then
+           choose_ucd_file_format = iflag_vtk + iflag_gzip
+!
+!      else if(check_mul_flags(file_fmt_ctl, iso_flags)) then
+!           choose_ucd_file_format = iflag_ucd_bin
+!      else if(check_mul_flags(file_fmt_ctl, iso_gz_flags)) then
+!           choose_ucd_file_format = iflag_ucd_bin + iflag_gzip
+!
+!      else if(check_mul_flags(file_fmt_ctl, psf_flags)) then
+!           choose_ucd_file_format = iflag_udt_bin
+!      else if(check_mul_flags(file_fmt_ctl, psf_gz_flags)) then
+!           choose_ucd_file_format = iflag_udt_bin + iflag_gzip
+      else
+           choose_ucd_file_format = iflag_udt
+      end if
+!
+      end function choose_ucd_file_format
 !
 ! -----------------------------------------------------------------------
 !

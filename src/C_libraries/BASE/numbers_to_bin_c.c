@@ -43,6 +43,32 @@ void byte_swap_8(int lengh_byte, char *array){
     return;
 }
 
+void swap_4byte(char *buf8){
+    int j;
+    char tmpbuf[4];
+    
+    for(j=0;j<4;j++){tmpbuf[j] = buf8[j];};
+    for(j=0;j<4;j++){buf8[j] =   buf8[j+4];};
+    for(j=0;j<4;j++){buf8[j+4] = tmpbuf[j];};
+    /*
+     long tako = 16;
+     char *ctako;
+     ctako = (char *) &tako;
+     printf("ctako ");
+     for(i=0;i<8;i++){printf("%d ", ctako[i]);};
+     printf("\n");
+     */
+    
+    return;
+}
+
+void swap_fortran_64bit(int *ilength, char *buf){
+    int i;
+    for(i=0;i<*ilength/8;i++){swap_4byte((char *) &buf[8*i]);}
+    return;
+}
+
+
 void uchar_2bin(unsigned char hex, char bin[9]){
 	int itmp;
 	char rev[9];

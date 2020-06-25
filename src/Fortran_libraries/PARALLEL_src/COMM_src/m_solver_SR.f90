@@ -183,8 +183,7 @@
       integer(kind = kint) , intent(in)   ::  NPE_SEND, NPE_RECV
 !
 !
-      if ( (allocated(req1) .eqv. .true.)                               &
-     &    .and. (size(req1) .lt. NPE_SEND)) then
+      if (allocated(req1) .and. (size(req1) .lt. NPE_SEND)) then
         deallocate (sta1, req1)
       end if
       if (allocated(req1) .neqv. .true.) then
@@ -192,8 +191,7 @@
         allocate (req1(NPE_SEND))
       end if
 !
-      if ( (allocated(req2) .eqv. .true.)                               &
-     &    .and. (size(req2) .lt. NPE_RECV)) then
+      if (allocated(req2) .and. (size(req2) .lt. NPE_RECV)) then
         deallocate (sta2, req2)
       end if
       if (allocated(req2) .neqv. .true.) then
@@ -209,8 +207,8 @@
 !
       integer(kind=kint), intent(in)   ::  NB, NTOT_SEND
 !
-      if ( (allocated(WS) .eqv. .true.)                                 &
-     &    .and. (size(WS) .lt. (NB*NTOT_SEND)) ) deallocate (WS)
+      if(allocated(WS) .and. (size(WS) .lt. (NB*NTOT_SEND)) )           &
+     &                                 deallocate(WS)
       if (allocated(WS) .eqv. .false.) allocate (WS(NB*NTOT_SEND))
       n_WS = size(WS)
 !
@@ -223,9 +221,9 @@
       integer(kind=kint), intent(in) ::  NB, NTOT_RECV
 !
 !
-      if ( (allocated(WR) .eqv. .true.)                                 &
-     &    .and. (size(WR) .lt. (NB*NTOT_RECV)) ) deallocate (WR)
-      if (allocated(WR) .eqv. .false.) allocate (WR(NB*NTOT_RECV))
+      if(allocated(WR) .and. (size(WR) .lt. (NB*NTOT_RECV)) )           &
+     &                              deallocate (WR)
+      if(allocated(WR) .eqv. .false.) allocate (WR(NB*NTOT_RECV))
       n_WR = size(WR)
 !
       end subroutine resize_wrecv_SR
@@ -237,8 +235,8 @@
 !
       integer(kind=kint), intent(in) :: NTOT_SEND
 !
-      if ( (allocated(iWS) .eqv. .true.)                                &
-     &    .and. (size(iWS) .lt. (NTOT_SEND)) ) deallocate (iWS)
+      if(allocated(iWS) .and. (size(iWS) .lt. (NTOT_SEND)) )            &
+     &                                deallocate (iWS)
       if (allocated(iWS) .eqv. .false.) allocate (iWS(NTOT_SEND))
       n_iWS = size(iWS)
 !
@@ -251,8 +249,8 @@
       integer(kind=kint), intent(in) :: NTOT_RECV
 !
 !
-      if ( (allocated(iWR) .eqv. .true.)                                &
-     &    .and. (size(iWR) .lt. (NTOT_RECV)) ) deallocate (iWR)
+      if (allocated(iWR) .and. (size(iWR) .lt. (NTOT_RECV)) )           &
+     &                                deallocate (iWR)
       if (allocated(iWR) .eqv. .false.) allocate (iWR(NTOT_RECV))
       n_iWR = size(iWR)
 !
@@ -265,9 +263,9 @@
 !
       integer(kind=kint), intent(in) :: NTOT_SEND
 !
-      if ( (allocated(i8WS) .eqv. .true.)                               &
-     &    .and. (size(i8WS) .lt. (NTOT_SEND)) ) deallocate (i8WS)
-      if (allocated(i8WS) .eqv. .false.) allocate (i8WS(NTOT_SEND))
+      if(allocated(i8WS) .and. (size(i8WS) .lt. (NTOT_SEND)) )          &
+     &                                deallocate (i8WS)
+      if(allocated(i8WS) .eqv. .false.) allocate (i8WS(NTOT_SEND))
       n_i8WS = size(i8WS)
 !
       end subroutine resize_i8send_SR
@@ -279,9 +277,9 @@
       integer(kind=kint), intent(in) :: NTOT_RECV
 !
 !
-      if ( (allocated(i8WR) .eqv. .true.)                               &
-     &    .and. (size(i8WR) .lt. (NTOT_RECV)) ) deallocate (i8WR)
-      if (allocated(i8WR) .eqv. .false.) allocate (i8WR(NTOT_RECV))
+      if(allocated(i8WR) .and. (size(i8WR) .lt. (NTOT_RECV)) )          &
+     &                                deallocate (i8WR)
+      if(allocated(i8WR) .eqv. .false.) allocate (i8WR(NTOT_RECV))
       n_i8WR = size(i8WR)
 !
       end subroutine resize_i8recv_SR

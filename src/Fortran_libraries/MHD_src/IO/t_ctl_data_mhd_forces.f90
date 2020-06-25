@@ -44,7 +44,8 @@
 !!      2: radial (propotional to radius)
 !! !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!    begin gravity_define
-!!      gravity_type_ctl     radial
+!!      FEM_gravity_model_ctl    element
+!!      gravity_type_ctl          radial
 !!
 !! !!!! direction of gravity (opposite direction to that of buoyancy)
 !!      array gravity_vec  3
@@ -57,6 +58,9 @@
 !! !!!! direction of rotation vector for Coriolis force !!!!!!!!!!!!!
 !!
 !!    begin Coriolis_define
+!!      FEM_Coriolis_model_ctl       element
+!!      FEM_Coriolis_implicit_ctl    On
+!!
 !!      array rotation_vec   3
 !!        rotation_vec  x   0.000    end
 !!        rotation_vec  y   0.000    end
@@ -71,14 +75,16 @@
 !!    array ext_magne_vec:   0...off  more than 1...On
 !!     ext_magne_vec: external field (constant)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!    begin Magneto_convection_def
+!!    begin magnetic_induciton_ctl
+!!      filtered_induction_ctl   Off
+!!
 !!      magneto_cv_ctl    On
 !!      array ext_magne_vec   3
 !!        ext_magne_vec  x     0.000   end
 !!        ext_magne_vec  y     1.000   end
 !!        ext_magne_vec  z     0.000   end
 !!      end array ext_magne_vec
-!!    end  Magneto_convection_def
+!!    end  magnetic_induciton_ctl
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
 !
@@ -110,6 +116,11 @@
 !
 !>      Structure for gravity definistion
       type gravity_control
+!>        Coliolis force modeling in FEM
+!!@n        element: Coriolis force in element
+!!@n        node:    Coriolis force at node
+        type(read_character_item) :: FEM_gravity_model
+!>        Gravity type
         type(read_character_item) :: gravity
 !
 !>        Structure for constant gravity vector
@@ -122,6 +133,13 @@
 !
 !>      Structure for Coriolis force
       type coriolis_control
+!>        Coliolis force modeling in FEM
+!!@n        element: Coriolis force in element
+!!@n        node:    Coriolis force at node
+        type(read_character_item) :: FEM_coriolis_model
+!>        Use implicit scheme for Coliolis force modeling in FEM
+!!@n        On: Coriolis force is solved implicitly
+        type(read_character_item) :: FEM_coriolis_implicit
 !>        Structure for rotation of system
 !!@n        system_rotation%c_tbl:  Direction of rotation vector
 !!@n        system_rotation%vect:   Amplitude of rotation vector
@@ -132,6 +150,8 @@
 !
 !>      Structure for Coriolis force
       type magneto_convection_control
+!>        Structure for filtered induction flag
+        type(read_character_item) :: filterd_induction_ctl
 !>        Structure for magnetoconvection definition
         type(read_character_item) :: magneto_cv
 !
@@ -151,6 +171,8 @@
 !   4th level for time steps
 !
       character(len=kchara), parameter                                  &
+     &        :: hd_FEM_gravity_mode = 'FEM_gravity_model_ctl'
+      character(len=kchara), parameter                                  &
      &        :: hd_gravity_type = 'gravity_type_ctl'
       character(len=kchara), parameter                                  &
      &        :: hd_gravity_vect = 'gravity_vec'
@@ -158,10 +180,16 @@
 !   4th level for time steps
 !
       character(len=kchara), parameter                                  &
-     &        :: hd_rotation_vec =   'rotation_vec'
+     &        :: hd_FEM_Coriolis_model = 'FEM_Coriolis_model_ctl'
+      character(len=kchara), parameter                                  &
+     &        :: hd_FEM_Coriolis_imp =   'FEM_Coriolis_implicit_ctl'
+      character(len=kchara), parameter                                  &
+     &        :: hd_rotation_vec =        'rotation_vec'
 !
 !   4th level for external magnetic field
 !
+      character(len=kchara), parameter                                  &
+     &        :: hd_filetered_induction = 'filtered_induction_ctl'
       character(len=kchara), parameter                                  &
      &        :: hd_magneto_cv = 'magneto_cv_ctl'
       character(len=kchara), parameter                                  &
@@ -170,7 +198,10 @@
 !
       private :: hd_num_forces
       private :: hd_gravity_type, hd_gravity_vect
+      private :: hd_FEM_gravity_mode, hd_FEM_Coriolis_model
+      private :: hd_FEM_Coriolis_imp
       private :: hd_magneto_cv, hd_magne_vect
+      private :: hd_filetered_induction
 !
 !   --------------------------------------------------------------------
 !
@@ -222,6 +253,8 @@
 !
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_gravity_type, g_ctl%gravity)
+        call read_chara_ctl_type(c_buf, hd_FEM_gravity_mode,            &
+     &      g_ctl%FEM_gravity_model)
       end do
       g_ctl%i_gravity_ctl = 1
 !
@@ -245,6 +278,10 @@
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_flag(c_buf, hd_block)) exit
 !
+        call read_chara_ctl_type(c_buf, hd_FEM_Coriolis_model,          &
+     &      cor_ctl%FEM_coriolis_model)
+        call read_chara_ctl_type(c_buf, hd_FEM_Coriolis_imp,            &
+     &      cor_ctl%FEM_coriolis_implicit)
 !
         call read_control_array_c_r(id_control, hd_rotation_vec,        &
      &      cor_ctl%system_rotation, c_buf)
@@ -276,6 +313,8 @@
 !
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_magneto_cv, mcv_ctl%magneto_cv)
+        call read_chara_ctl_type(c_buf, hd_filetered_induction,         &
+     &      mcv_ctl%filterd_induction_ctl)
       end do
       mcv_ctl%i_magneto_ctl = 1
 !
@@ -334,6 +373,7 @@
 !
       call bcast_ctl_array_cr(mcv_ctl%ext_magne)
       call bcast_ctl_type_c1(mcv_ctl%magneto_cv)
+      call bcast_ctl_type_c1(mcv_ctl%filterd_induction_ctl)
 !
       call MPI_BCAST(mcv_ctl%i_magneto_ctl, 1,                          &
      &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
@@ -386,8 +426,9 @@
 !
 !
       call dealloc_control_array_c_r(mcv_ctl%ext_magne)
-      mcv_ctl%magneto_cv%iflag = 0
-      mcv_ctl%i_magneto_ctl = 0
+      mcv_ctl%filterd_induction_ctl%iflag = 0
+      mcv_ctl%magneto_cv%iflag =            0
+      mcv_ctl%i_magneto_ctl =               0
 !
       end subroutine dealloc_magneto_ctl
 !

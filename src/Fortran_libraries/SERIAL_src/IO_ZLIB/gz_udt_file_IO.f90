@@ -10,13 +10,17 @@
 !!      subroutine write_gz_ucd_file(id_rank, gzip_name, ucd)
 !!      subroutine write_gz_udt_file(id_rank, gzip_name, ucd)
 !!      subroutine write_gz_grd_file(id_rank, gzip_name, ucd)
+!!        type(ucd_data), intent(in) :: ucd
 !!
 !!      subroutine read_gz_udt_file(id_rank, gzip_name, ucd)
-!!      subroutine read_alloc_gz_udt_head(id_rank, gzip_name, ucd)
+!!      subroutine read_gz_ucd_file(id_rank, gzip_name, ucd)
+!!      subroutine read_gz_ucd_grd(id_rank, gzip_name, ucd)
+!!        type(ucd_data), intent(inout) :: ucd
+!!
+!!      subroutine read_alloc_gz_udt_params(id_rank, gzip_name, ucd)
 !!      subroutine read_alloc_gz_udt_file(id_rank, gzip_name, ucd)
-!!      subroutine read_alloc_gz_ucd_file                               &
-!!     &         (id_rank, gzip_name, nnod_ele, ucd)
-!!      subroutine read_gz_ucd_grd(id_rank, gzip_name, nnod_ele, ucd)
+!!      subroutine read_alloc_gz_ucd_file(id_rank, gzip_name, ucd)
+!!      subroutine read_alloc_gz_ucd_grd(id_rank, gzip_name, ucd)
 !!        type(ucd_data), intent(inout) :: ucd
 !!@endverbatim
 !!
@@ -29,18 +33,13 @@
       use m_precision
       use m_constants
       use m_machine_parameter
-      use m_field_file_format
 !
       use t_ucd_data
-!
-      use set_ucd_file_names
-      use gz_ucd_data_IO
+      use t_buffer_4_gzip
 !
       implicit none
 !
       type(buffer_4_gzip), private :: zbuf_ucd
-!
-      private :: write_gz_udt_type_fields, write_gz_ucd_type_mesh
 !
 !-----------------------------------------------------------------------
 !
@@ -51,6 +50,7 @@
       subroutine write_gz_ucd_file(id_rank, gzip_name, ucd)
 !
       use skip_gz_comment
+      use gz_udt_type_data_IO
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
@@ -72,6 +72,7 @@
       subroutine write_gz_udt_file(id_rank, gzip_name, ucd)
 !
       use skip_gz_comment
+      use gz_udt_type_data_IO
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
@@ -92,6 +93,7 @@
       subroutine write_gz_grd_file(id_rank, gzip_name, ucd)
 !
       use skip_gz_comment
+      use gz_udt_type_data_IO
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
@@ -113,6 +115,7 @@
       subroutine read_gz_udt_file(id_rank, gzip_name, ucd)
 !
       use skip_gz_comment
+      use gz_udt_type_data_IO
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
@@ -123,23 +126,59 @@
      &     'Read gzipped data file: ', trim(gzip_name)
 !
       call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-!
-      call read_gz_udt_field_header                                     &
-     &   (ucd%num_field, ucd%num_comp, ucd%phys_name, zbuf_ucd)
-!
-      call cal_istack_ucd_component(ucd)
-!
-      call read_gz_udt_field_data                                       &
-     &   (ucd%nnod, ucd%ntot_comp, ucd%d_ucd, zbuf_ucd)
+      call read_gz_udt_field(ucd, zbuf_ucd)
       call close_gzfile_a(zbuf_ucd)
 !
       end subroutine read_gz_udt_file
 !
 !-----------------------------------------------------------------------
 !
-      subroutine read_alloc_gz_udt_head(id_rank, gzip_name, ucd)
+      subroutine read_gz_ucd_file(id_rank, gzip_name, ucd)
 !
       use skip_gz_comment
+      use gz_udt_type_data_IO
+!
+      character(len=kchara), intent(in) :: gzip_name
+      integer, intent(in) :: id_rank
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
+     &     'Read gzipped UCD data file: ', trim(gzip_name)
+      call open_rd_gzfile_a(gzip_name, zbuf_ucd)
+      call read_gz_ucd_mesh_data(ucd, zbuf_ucd)
+      call read_gz_udt_field(ucd, zbuf_ucd)
+      call close_gzfile_a(zbuf_ucd)
+!
+      end subroutine read_gz_ucd_file
+!
+!-----------------------------------------------------------------------
+!
+      subroutine read_gz_ucd_grd(id_rank, gzip_name, ucd)
+!
+      use skip_gz_comment
+      use gz_udt_type_data_IO
+!
+      character(len=kchara), intent(in) :: gzip_name
+      integer, intent(in) :: id_rank
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
+     &     'Read gzipped UCD grid file: ', trim(gzip_name)
+      call open_rd_gzfile_a(gzip_name, zbuf_ucd)
+      call read_gz_ucd_mesh_data(ucd, zbuf_ucd)
+      call close_gzfile_a(zbuf_ucd)
+!
+      end subroutine read_gz_ucd_grd
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine read_alloc_gz_udt_params(id_rank, gzip_name, ucd)
+!
+      use skip_gz_comment
+      use gz_udt_type_data_IO
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
@@ -150,25 +189,18 @@
      &     'Read gzipped data file: ', trim(gzip_name)
 !
       call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-!
-      call read_gz_udt_field_num(ucd%num_field, zbuf_ucd)
-      call allocate_ucd_phys_name(ucd)
-!
-      call read_gz_udt_field_name                                       &
-     &   (ucd%num_field, ucd%num_comp, ucd%phys_name, zbuf_ucd)
-!
+      call read_alloc_gz_udt_field(ucd, zbuf_ucd)
       call close_gzfile_a(zbuf_ucd)
 !
-      call cal_istack_ucd_component(ucd)
-      call allocate_ucd_phys_data(ucd)
-!
-      end subroutine read_alloc_gz_udt_head
+      end subroutine read_alloc_gz_udt_params
 !
 !-----------------------------------------------------------------------
 !
       subroutine read_alloc_gz_udt_file(id_rank, gzip_name, ucd)
 !
       use skip_gz_comment
+      use gz_udt_type_data_IO
+      use gz_ucd_data_IO
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
@@ -178,16 +210,7 @@
       if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
      &     'Read gzipped data file: ', trim(gzip_name)
       call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-!
-      call read_gz_udt_field_num(ucd%num_field, zbuf_ucd)
-      call allocate_ucd_phys_name(ucd)
-!
-      call read_gz_udt_field_name                                       &
-     &   (ucd%num_field, ucd%num_comp, ucd%phys_name, zbuf_ucd)
-!
-      call cal_istack_ucd_component(ucd)
-      call allocate_ucd_phys_data(ucd)
-!
+      call read_alloc_gz_udt_field(ucd, zbuf_ucd)
       call read_gz_udt_field_data                                       &
      &   (ucd%nnod, ucd%ntot_comp, ucd%d_ucd, zbuf_ucd)
       call close_gzfile_a(zbuf_ucd)
@@ -196,40 +219,22 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine read_alloc_gz_ucd_file                                 &
-     &         (id_rank, gzip_name, nnod_ele, ucd)
+      subroutine read_alloc_gz_ucd_file(id_rank, gzip_name, ucd)
 !
       use skip_gz_comment
+      use gz_udt_type_data_IO
+      use gz_ucd_data_IO
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
-      integer(kind = kint), intent(in) :: nnod_ele
       type(ucd_data), intent(inout) :: ucd
 !
 !
       if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
      &     'Read gzipped UCD data file: ', trim(gzip_name)
       call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-!
-      call read_gz_udt_mesh_header                                      &
-     &   (ucd%nnod, ucd%nele, ucd%ntot_comp, zbuf_ucd)
-      ucd%nnod_4_ele = nnod_ele
-!
-      call allocate_ucd_node(ucd)
-      call allocate_ucd_ele(ucd)
-!
-      call read_gz_ucd_mesh_data(ucd%nnod, ucd%nele, ucd%nnod_4_ele,    &
-     &    ucd%inod_global, ucd%iele_global, ucd%xx, ucd%ie, zbuf_ucd)
-!
-      call read_gz_udt_field_num(ucd%num_field, zbuf_ucd)
-      call allocate_ucd_phys_name(ucd)
-!
-      call read_gz_udt_field_name                                       &
-     &   (ucd%num_field, ucd%num_comp, ucd%phys_name, zbuf_ucd)
-!
-      call cal_istack_ucd_component(ucd)
-      call allocate_ucd_phys_data(ucd)
-!
+      call read_alloc_gz_ucd_mesh_data(ucd, zbuf_ucd)
+      call read_alloc_gz_udt_field(ucd, zbuf_ucd)
       call read_gz_udt_field_data                                       &
      &   (ucd%nnod, ucd%ntot_comp, ucd%d_ucd, zbuf_ucd)
       call close_gzfile_a(zbuf_ucd)
@@ -238,13 +243,13 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine read_gz_ucd_grd(id_rank, gzip_name, nnod_ele, ucd)
+      subroutine read_alloc_gz_ucd_grd(id_rank, gzip_name, ucd)
 !
       use skip_gz_comment
+      use gz_udt_type_data_IO
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
-      integer(kind = kint), intent(in) :: nnod_ele
       type(ucd_data), intent(inout) :: ucd
 !
 !
@@ -252,56 +257,11 @@
       if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
      &     'Read gzipped UCD grid file: ', trim(gzip_name)
       call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-!
-      call read_gz_udt_mesh_header                                      &
-     &   (ucd%nnod, ucd%nele, ucd%ntot_comp, zbuf_ucd)
-      ucd%nnod_4_ele = nnod_ele
-!
-      call allocate_ucd_node(ucd)
-      call allocate_ucd_ele(ucd)
-!
-      call read_gz_ucd_mesh_data(ucd%nnod, ucd%nele, ucd%nnod_4_ele,    &
-     &    ucd%inod_global, ucd%iele_global, ucd%xx, ucd%ie, zbuf_ucd)
+      call read_alloc_gz_ucd_mesh_data(ucd, zbuf_ucd)
       call close_gzfile_a(zbuf_ucd)
 !
-      end subroutine read_gz_ucd_grd
+      end subroutine read_alloc_gz_ucd_grd
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine write_gz_udt_type_fields(ucd, zbuf)
-!
-      type(ucd_data), intent(in) :: ucd
-      type(buffer_4_gzip), intent(inout) :: zbuf
-!
-!
-      if(ucd%num_field .gt. 0) then
-        call write_gz_udt_field_header(ucd%num_field,                   &
-     &      ucd%num_comp, ucd%phys_name, zbuf)
-        call write_gz_ucd_field_data(ucd%nnod, ucd%ntot_comp,           &
-     &      ucd%nnod, ucd%inod_global, ucd%d_ucd, zbuf)
-      end if
-!
-      end subroutine write_gz_udt_type_fields
-!
-!-----------------------------------------------------------------------
-!
-      subroutine write_gz_ucd_type_mesh(ucd, zbuf)
-!
-      type(ucd_data), intent(in) :: ucd
-      type(buffer_4_gzip), intent(inout) :: zbuf
-!
-!
-      call write_gz_udt_mesh_header                                     &
-     &   (ucd%nnod, ucd%nele, ucd%ntot_comp, zbuf)
-!
-      call write_gz_ucd_field_data(ucd%nnod, ithree, ucd%nnod,          &
-     &    ucd%inod_global, ucd%xx, zbuf)
-      call write_gz_ucd_mesh_connect(ucd%nele, ucd%nnod_4_ele,          &
-     &    ucd%nele, ucd%iele_global, ucd%ie, zbuf)
-!
-      end subroutine write_gz_ucd_type_mesh
-!
-! -----------------------------------------------------------------------
 !
       end module gz_udt_file_IO

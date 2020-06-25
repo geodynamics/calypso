@@ -17,9 +17,12 @@
 !!      subroutine read_psf_control_data                                &
 !!     &         (id_control, hd_block, psf_c, c_buf)
 !!      subroutine bcast_psf_control_data(psf_c)
-!!      subroutine read_section_def_control(id_control, psf_c, c_buf)
 !!        type(psf_ctl), intent(inout) :: psf_c
 !!
+!!      integer(kind = kint) function num_label_psf_ctl()
+!!      integer(kind = kint) function num_label_psf_ctl_w_dpl()
+!!      subroutine set_label_psf_ctl(names)
+!!      subroutine set_label_psf_ctl_w_dpl(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!! example of control for Kemo's surface rendering
 !!
@@ -129,62 +132,27 @@
       use t_control_array_character
       use t_control_array_charareal
       use t_control_array_character2
+      use t_control_data_4_psf_def
+      use t_control_data_4_fld_on_psf
 !
       implicit  none
 !
 !
       type psf_ctl
+!>        Structure of cross section definition
+        type(psf_define_ctl) :: psf_def_c
+!>        Structure of fields on isosurface control
+        type(field_on_psf_ctl) :: fld_on_psf_c
+!
 !>        Structure for file prefix
         type(read_character_item) :: psf_file_head_ctl
 !>        Structure for data field format
         type(read_character_item) :: psf_output_type_ctl
 !
-!>        Structure for cross section type
-        type(read_character_item) :: section_method_ctl
-!
-!
-!>      Structure for coefficients for sueface equation
-!!@n      psf_coefs_ctl%c_tbl: 
-!!@n      psf_coefs_ctl%vect:  coefficients
-        type(ctl_array_cr) :: psf_coefs_ctl
-!
-!>      Structure for definition of normal vector of plnae sruface
-!!@n      psf_normal_ctl%c_tbl: direction of axis
-!!@n      psf_normal_ctl%vect:  position
-        type(ctl_array_cr) :: psf_normal_ctl
-!
-!>      Structure for definition of center
-!!@n      psf_center_ctl%c_tbl: direction of center
-!!@n      psf_center_ctl%vect:  position
-        type(ctl_array_cr) :: psf_center_ctl
-!
-!>      Structure for definition of elipsoid
-!!@n      psf_axis_ctl%c_tbl: direction of axis
-!!@n      psf_axis_ctl%vect:  vector component
-        type(ctl_array_cr) :: psf_axis_ctl
-!
-!>        Structure for radius
-        type(read_real_item) :: radius_psf_ctl
-!
-!>        Surface group name for section
-        type(read_character_item) :: psf_group_name_ctl
-!
-!>      Structure for list of output field
-!!@n      psf_out_field_ctl%c1_tbl: Name of field
-!!@n      psf_out_field_ctl%c2_tbl: Name of component
-        type(ctl_array_c2) :: psf_out_field_ctl
-!
-!>      Structure for element group list for Parallel Sectioning
-!!@n      psf_area_ctl%c_tbl: Name of element group
-        type(ctl_array_chara) :: psf_area_ctl
-!
 !     Top level
         integer (kind=kint) :: i_psf_ctl = 0
 !     2nd level for cross_section_ctl
-        integer (kind=kint) :: i_surface_define = 0
         integer (kind=kint) :: i_output_field =   0
-!     3rd level for surface_define
-        integer (kind=kint) :: i_plot_area =      0
       end type psf_ctl
 !
 !
@@ -198,47 +166,17 @@
       character(len=kchara), parameter                                  &
      &                  :: hd_output_field = 'output_field_define'
 !
-!     3rd level for surface_define
-      character(len=kchara), parameter                                  &
-     &                  :: hd_section_method =  'section_method'
-      character(len=kchara), parameter                                  &
-     &                  :: hd_radius =          'radius'
-      character(len=kchara), parameter                                  &
-     &                  :: hd_group_name =      'group_name'
-!
-      character(len=kchara), parameter                                  &
-     &                  :: hd_normal_ctl = 'normal_vector'
-      character(len=kchara), parameter                                  &
-     &                  :: hd_center_ctl = 'center_position'
-      character(len=kchara), parameter                                  &
-     &                  :: hd_axis_ctl = 'axial_length'
-      character(len=kchara), parameter                                  &
-     &                  :: hd_coefs_ctl = 'coefs_ctl'
-!
-      character(len=kchara), parameter                                  &
-     &                  :: hd_psf_area = 'section_area_ctl'
-!
-!     3rd level for output_field_define
-      character(len=kchara), parameter                                  &
-     &                  :: hd_psf_result_field = 'output_field'
-!
-!
+!       Deprecated flag
       character(len=kchara), parameter                                  &
      &                  :: hd_psf_file_head =   'psf_file_head'
 !
-      character(len=kchara), parameter                                  &
-     &                  :: hd_plot_area =       'plot_area_ctl'
-      character(len=kchara), parameter                                  &
-     &                  :: hd_plot_grp = 'chosen_ele_grp_ctl'
+      integer(kind = kint), parameter :: n_label_psf_ctl = 4
+      integer(kind = kint), parameter :: n_label_psf_ctl_w_dpl = 5
 !
       private :: hd_psf_file_head, hd_psf_file_prefix
       private :: hd_psf_out_type, hd_output_field
-      private :: hd_section_method, hd_psf_area
-      private :: hd_radius, hd_plot_area
-      private :: hd_group_name, hd_center_ctl, hd_axis_ctl
-      private :: hd_coefs_ctl, hd_plot_grp, hd_psf_result_field
-!
-      private :: read_psf_output_ctl, read_psf_plot_area_ctl
+      private :: hd_surface_define
+      private :: n_label_psf_ctl, n_label_psf_ctl_w_dpl
 !
 !  ---------------------------------------------------------------------
 !
@@ -250,9 +188,8 @@
 !
       type(psf_ctl), intent(inout) :: psf_c
 !
-      psf_c%radius_psf_ctl%realvalue = 0.0d0
-      psf_c%psf_out_field_ctl%num = 0
-      psf_c%psf_area_ctl%num =      0
+      call init_psf_def_ctl_stract(psf_c%psf_def_c)
+      call init_fld_on_psf_control(psf_c%fld_on_psf_c)
 !
       end subroutine init_psf_ctl_stract
 !
@@ -263,41 +200,14 @@
       type(psf_ctl), intent(inout) :: psf_c
 !
 !
+      call dealloc_cont_dat_4_psf_def(psf_c%psf_def_c)
+      call dealloc_fld_on_psf_control(psf_c%fld_on_psf_c)
+!
       psf_c%psf_file_head_ctl%iflag =   0
       psf_c%psf_output_type_ctl%iflag = 0
-      psf_c%section_method_ctl%iflag =  0
-!
-      psf_c%radius_psf_ctl%iflag =      0
-      psf_c%psf_group_name_ctl%iflag =  0
 !
       psf_c%i_psf_ctl =        0
-      psf_c%i_surface_define = 0
       psf_c%i_output_field =   0
-      psf_c%i_plot_area =      0
-!
-      call dealloc_control_array_c2(psf_c%psf_out_field_ctl)
-      psf_c%psf_out_field_ctl%num =  0
-      psf_c%psf_out_field_ctl%icou = 0
-!
-      call dealloc_control_array_chara(psf_c%psf_area_ctl)
-      psf_c%psf_area_ctl%num =  0
-      psf_c%psf_area_ctl%icou = 0
-!
-      call dealloc_control_array_c_r(psf_c%psf_coefs_ctl)
-      psf_c%psf_coefs_ctl%num =  0
-      psf_c%psf_coefs_ctl%icou = 0
-!
-      call dealloc_control_array_c_r(psf_c%psf_normal_ctl)
-      psf_c%psf_normal_ctl%num =  0
-      psf_c%psf_normal_ctl%icou = 0
-!
-      call dealloc_control_array_c_r(psf_c%psf_center_ctl)
-      psf_c%psf_center_ctl%num =  0
-      psf_c%psf_center_ctl%icou = 0
-!
-      call dealloc_control_array_c_r(psf_c%psf_axis_ctl)
-      psf_c%psf_axis_ctl%num =  0
-      psf_c%psf_axis_ctl%icou = 0
 !
       end subroutine dealloc_cont_dat_4_psf
 !
@@ -309,36 +219,18 @@
       type(psf_ctl), intent(inout) :: new_psf_c
 !
 !
+      call dup_control_4_psf_def(org_psf_c%psf_def_c,                   &
+     &                           new_psf_c%psf_def_c)
+      call dup_fld_on_psf_control(org_psf_c%fld_on_psf_c,               &
+     &                            new_psf_c%fld_on_psf_c)
+!
       call copy_chara_ctl(org_psf_c%psf_file_head_ctl,                  &
      &                    new_psf_c%psf_file_head_ctl)
       call copy_chara_ctl(org_psf_c%psf_output_type_ctl,                &
      &                    new_psf_c%psf_output_type_ctl)
-      call copy_chara_ctl(org_psf_c%section_method_ctl,                 &
-     &                    new_psf_c%section_method_ctl)
-!
-      call dup_control_array_c_r(org_psf_c%psf_coefs_ctl,               &
-     &                           new_psf_c%psf_coefs_ctl)
-      call dup_control_array_c_r(org_psf_c%psf_normal_ctl,              &
-     &                           new_psf_c%psf_normal_ctl)
-      call dup_control_array_c_r(org_psf_c%psf_center_ctl,              &
-     &                           new_psf_c%psf_center_ctl)
-      call dup_control_array_c_r(org_psf_c%psf_axis_ctl,                &
-     &                           new_psf_c%psf_axis_ctl)
-!
-      call copy_real_ctl(org_psf_c%radius_psf_ctl,                      &
-     &                    new_psf_c%radius_psf_ctl)
-      call copy_chara_ctl(org_psf_c%psf_group_name_ctl,                 &
-     &                    new_psf_c%psf_group_name_ctl)
-!
-      call dup_control_array_c2(org_psf_c%psf_out_field_ctl,            &
-     &                          new_psf_c%psf_out_field_ctl)
-      call dup_control_array_c1(org_psf_c%psf_area_ctl,                 &
-     &                          new_psf_c%psf_area_ctl)
 !
       new_psf_c%i_psf_ctl =        org_psf_c%i_psf_ctl
-      new_psf_c%i_surface_define = org_psf_c%i_surface_define
       new_psf_c%i_output_field =   org_psf_c%i_output_field
-      new_psf_c%i_plot_area =      org_psf_c%i_plot_area
 !
       end subroutine dup_control_4_psf
 !
@@ -362,11 +254,13 @@
         if(check_end_flag(c_buf, hd_block)) exit
 !
         if(check_begin_flag(c_buf, hd_surface_define)) then
-          call  read_section_def_control(id_control, psf_c, c_buf)
+          call read_section_def_control(id_control, hd_surface_define,  &
+     &                                  psf_c%psf_def_c, c_buf)
         end if
 !
         if(check_begin_flag(c_buf, hd_output_field)) then
-          call  read_psf_output_ctl(id_control, psf_c, c_buf)
+          call read_fld_on_psf_control(id_control, hd_output_field,     &
+     &                                 psf_c%fld_on_psf_c, c_buf)
         end if
 !
         call read_chara_ctl_type(c_buf, hd_psf_file_prefix,             &
@@ -379,93 +273,6 @@
       psf_c%i_psf_ctl = 1
 !
       end subroutine read_psf_control_data
-!
-!   --------------------------------------------------------------------
-!
-      subroutine read_section_def_control(id_control, psf_c, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      type(psf_ctl), intent(inout) :: psf_c
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(psf_c%i_surface_define.gt.0) return
-!
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_surface_define)) exit
-!
-!
-        call read_control_array_c_r(id_control,                         &
-     &      hd_coefs_ctl, psf_c%psf_coefs_ctl, c_buf)
-        call read_control_array_c_r(id_control,                         &
-     &      hd_center_ctl, psf_c%psf_center_ctl, c_buf)
-        call read_control_array_c_r(id_control,                         &
-     &      hd_normal_ctl, psf_c%psf_normal_ctl, c_buf)
-        call read_control_array_c_r(id_control,                         &
-     &      hd_axis_ctl, psf_c%psf_axis_ctl, c_buf)
-!
-        call read_control_array_c1(id_control,                          &
-     &      hd_psf_area, psf_c%psf_area_ctl, c_buf)
-!
-        call read_psf_plot_area_ctl(id_control, psf_c, c_buf)
-!
-!
-        call read_real_ctl_type                                         &
-     &     (c_buf, hd_radius, psf_c%radius_psf_ctl)
-!
-        call read_chara_ctl_type(c_buf, hd_section_method,              &
-     &      psf_c%section_method_ctl)
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_group_name, psf_c%psf_group_name_ctl)
-      end do
-      psf_c%i_surface_define = 1
-!
-      end subroutine read_section_def_control
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine read_psf_output_ctl(id_control, psf_c, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      type(psf_ctl), intent(inout) :: psf_c
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if (psf_c%i_output_field .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_output_field)) exit
-!
-        call read_control_array_c2(id_control,                          &
-     &      hd_psf_result_field, psf_c%psf_out_field_ctl, c_buf)
-      end do
-      psf_c%i_output_field = 1
-!
-      end subroutine read_psf_output_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine read_psf_plot_area_ctl(id_control, psf_c, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      type(psf_ctl), intent(inout) :: psf_c
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_plot_area) .eqv. .FALSE.) return
-      if(psf_c%i_plot_area .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_plot_area)) exit
-!
-        call read_control_array_c1(id_control, hd_plot_grp,             &
-     &      psf_c%psf_area_ctl, c_buf)
-      end do
-      psf_c%i_plot_area = 1
-!
-      end subroutine read_psf_plot_area_ctl
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
@@ -483,44 +290,57 @@
       call MPI_BCAST(psf_c%i_output_field,  1,                          &
      &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
-      call bcast_ctl_array_c2(psf_c%psf_out_field_ctl)
-!
       call bcast_ctl_type_c1(psf_c%psf_file_head_ctl)
       call bcast_ctl_type_c1(psf_c%psf_output_type_ctl)
 !
-      call bcast_section_def_control(psf_c)
+      call bcast_section_def_control(psf_c%psf_def_c)
+      call bcast_fld_on_psf_control(psf_c%fld_on_psf_c)
 !
       end subroutine bcast_psf_control_data
 !
 !   --------------------------------------------------------------------
-!
-      subroutine bcast_section_def_control(psf_c)
-!
-      use calypso_mpi
-      use bcast_control_arrays
-!
-      type(psf_ctl), intent(inout) :: psf_c
-!
-!
-      call MPI_BCAST(psf_c%i_surface_define,  1,                        &
-     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(psf_c%i_plot_area,  1,                             &
-     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-!
-      call bcast_ctl_array_cr(psf_c%psf_coefs_ctl)
-      call bcast_ctl_array_cr(psf_c%psf_center_ctl)
-      call bcast_ctl_array_cr(psf_c%psf_normal_ctl)
-      call bcast_ctl_array_cr(psf_c%psf_axis_ctl)
-!
-      call bcast_ctl_array_c1(psf_c%psf_area_ctl)
-!
-      call bcast_ctl_type_r1(psf_c%radius_psf_ctl)
-!
-      call bcast_ctl_type_c1(psf_c%section_method_ctl)
-      call bcast_ctl_type_c1(psf_c%psf_group_name_ctl)
-!
-      end subroutine bcast_section_def_control
-!
 !   --------------------------------------------------------------------
+!
+      integer(kind = kint) function num_label_psf_ctl()
+      num_label_psf_ctl = n_label_psf_ctl
+      return
+      end function num_label_psf_ctl
+!
+! ----------------------------------------------------------------------
+!
+      integer(kind = kint) function num_label_psf_ctl_w_dpl()
+      num_label_psf_ctl_w_dpl = n_label_psf_ctl_w_dpl
+      return
+      end function num_label_psf_ctl_w_dpl
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_label_psf_ctl(names)
+!
+      character(len = kchara), intent(inout)                            &
+     &                         :: names(n_label_psf_ctl)
+!
+!
+      call set_control_labels(hd_psf_file_prefix, names( 1))
+      call set_control_labels(hd_psf_out_type,    names( 2))
+      call set_control_labels(hd_surface_define,  names( 3))
+      call set_control_labels(hd_output_field,    names( 4))
+!
+      end subroutine set_label_psf_ctl
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine set_label_psf_ctl_w_dpl(names)
+!
+      character(len = kchara), intent(inout)                            &
+     &                         :: names(n_label_psf_ctl_w_dpl)
+!
+!
+      call set_label_psf_ctl(names(1))
+      call set_control_labels(hd_psf_file_head,  names( 5))
+!
+      end subroutine set_label_psf_ctl_w_dpl
+!
+!  ---------------------------------------------------------------------
 !
       end module t_control_data_4_psf

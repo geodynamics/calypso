@@ -182,12 +182,15 @@
      &     (perturbation_composition%name, field_ctl)
       end if
 !
-      if (fl_prop%iflag_4_coriolis .gt. id_turn_OFF)                    &
+      if(fl_prop%iflag_4_coriolis)                                      &
      &  call add_phys_name_ctl(Coriolis_force%name, field_ctl)
-      if (fl_prop%iflag_4_gravity .eq. id_FORCE_at_node)                &
-     &  call add_phys_name_ctl(buoyancy%name, field_ctl)
-      if (fl_prop%iflag_4_composit_buo .eq. id_FORCE_at_node)           &
-     &  call add_phys_name_ctl(composite_buoyancy%name, field_ctl)
+!
+      if(fl_prop%iflag_FEM_gravity .eq. id_FORCE_at_node) then
+        if(fl_prop%iflag_4_gravity)                                     &
+     &    call add_phys_name_ctl(buoyancy%name, field_ctl)
+        if(fl_prop%iflag_4_composit_buo)                                &
+     &    call add_phys_name_ctl(composite_buoyancy%name, field_ctl)
+      end if
 !
       end subroutine add_ctl_4_forces
 !

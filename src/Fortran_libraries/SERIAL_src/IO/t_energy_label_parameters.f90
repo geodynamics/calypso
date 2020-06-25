@@ -21,7 +21,7 @@
       module t_energy_label_parameters
 !
       use m_precision
-      use m_phys_labels
+!      use m_phys_labels
 !
       use t_spheric_parameter
       use t_rms_4_sph_spectr
@@ -31,8 +31,6 @@
 !
 !
       integer(kind = kint), parameter :: n_fld_ene = 2
-      character(len=kchara), parameter :: fld_lebel_4_ene(2)            &
-     &                         = (/velocity%name, magnetic_field%name/)
       character(len=kchara), parameter :: ene_lebel_base(2)             &
      &                    = (/'K_ene     ', 'M_ene     '/)
 !
@@ -43,7 +41,7 @@
          character(len=kchara), allocatable :: label(:,:)
       end type energy_label_param
 !
-      private :: n_fld_ene, fld_lebel_4_ene, ene_lebel_base
+      private :: n_fld_ene, ene_lebel_base
       private :: set_sph_energy_labels
 !
 ! -----------------------------------------------------------------------
@@ -64,8 +62,9 @@
       ene_labels%n_fld_4_ene = n_fld_ene
       call alloc_energy_labels(ene_labels)
 !
+      ene_labels%field_name(1) = trim(velocity%name)
+      ene_labels%field_name(2) = trim(magnetic_field%name)
       do i = 1, n_fld_ene
-        ene_labels%field_name(i) = trim(fld_lebel_4_ene(i))
         call add_vector_power_sph_label(ene_lebel_base(i),              &
      &      ene_labels%label(1,i), ene_labels%label(2,i),               &
      &      ene_labels%label(3,i))

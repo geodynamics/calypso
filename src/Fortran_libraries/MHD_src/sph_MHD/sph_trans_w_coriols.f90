@@ -12,10 +12,10 @@
 !!      subroutine sph_b_trans_w_coriolis                               &
 !!     &         (sph, comms_sph, fl_prop, sph_bc_U, omega_sph, b_trns, &
 !!     &          trans_p, gt_cor, n_WS, n_WR, WS, WR, trns_bwd,        &
-!!     &          WK_sph, MHD_mul_FFTW, cor_rlm)
+!!     &          WK_sph, cor_rlm)
 !!      subroutine sph_f_trans_w_coriolis                               &
 !!     &         (sph, comms_sph, fl_prop, trans_p, cor_rlm, f_trns,    &
-!!     &          trns_fwd, n_WS, n_WR, WS, WR, WK_sph, MHD_mul_FFTW)
+!!     &          trns_fwd, n_WS, n_WR, WS, WR, WK_sph)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(fluid_property), intent(in) :: fl_prop
@@ -27,22 +27,6 @@
 !!        type(spherical_transform_data), intent(inout) :: trns_bwd
 !!        type(spherical_transform_data), intent(inout) :: trns_fwd
 !!        type(spherical_trns_works), intent(inout) :: WK_sph
-!!        type(work_for_sgl_FFTW), intent(inout) :: MHD_mul_FFTW
-!!
-!!      subroutine sph_b_transform_SGS                                  &
-!!     &         (sph, comms_sph, trans_p, n_WS, n_WR, WS, WR,          &
-!!     &          trns_bwd, WK_sph, SGS_mul_FFTW)
-!!      subroutine sph_f_transform_SGS                                  &
-!!     &         (sph, comms_sph, trans_p, trns_fwd,                    &
-!!     &          n_WS, n_WR, WS, WR, WK_sph, SGS_mul_FFTW)
-!!        type(sph_grids), intent(in) :: sph
-!!        type(sph_comm_tables), intent(in) :: comms_sph
-!!        type(sph_rotation), intent(in) :: omega_sph
-!!        type(parameters_4_sph_trans), intent(in) :: trans_p
-!!        type(spherical_transform_data), intent(inout) :: trns_bwd
-!!        type(spherical_transform_data), intent(inout) :: trns_fwd
-!!        type(spherical_trns_works), intent(inout) :: WK_sph
-!!        type(work_for_sgl_FFTW), intent(inout) :: MHD_mul_FFTW
 !!
 !!      subroutine sph_b_trans_licv(sph_rlm, comm_rlm, comm_rj,         &
 !!     &          fl_prop, sph_bc_U, omega_sph, leg, gt_cor,            &
@@ -92,7 +76,6 @@
       use m_elapsed_labels_SPH_TRNS
       use m_elapsed_labels_4_MHD
       use m_machine_parameter
-      use MHD_FFT_selector
       use spherical_SRs_N
 !
       use t_physical_property
@@ -121,7 +104,9 @@
       subroutine sph_b_trans_w_coriolis                                 &
      &         (sph, comms_sph, fl_prop, sph_bc_U, omega_sph, b_trns,   &
      &          trans_p, gt_cor, n_WS, n_WR, WS, WR, trns_bwd,          &
-     &          WK_sph, MHD_mul_FFTW, cor_rlm)
+     &          WK_sph, cor_rlm)
+!
+      use t_sph_FFT_selector
 !
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
@@ -136,7 +121,6 @@
       real(kind = kreal), intent(inout) :: WS(n_WS), WR(n_WR)
       type(spherical_transform_data), intent(inout) :: trns_bwd
       type(spherical_trns_works), intent(inout) :: WK_sph
-      type(work_for_sgl_FFTW), intent(inout) :: MHD_mul_FFTW
       type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !
 !
@@ -175,11 +159,11 @@
 !
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
-      if(iflag_debug .gt. 0) write(*,*) 'back_MHD_FFT_sel_from_recv',   &
+      if(iflag_debug .gt. 0) write(*,*) 'back_FFT_select_from_recv',    &
      &        trns_bwd%ncomp, trns_bwd%num_vector, trns_bwd%num_scalar
-      call back_MHD_FFT_sel_from_recv                                   &
+      call back_FFT_select_from_recv                                    &
      &   (sph%sph_rtp, comms_sph%comm_rtp, trns_bwd%ncomp,              &
-     &    n_WR, WR, trns_bwd%fld_rtp, WK_sph%WK_FFTs, MHD_mul_FFTW)
+     &    n_WR, WR, trns_bwd%fld_rtp, WK_sph%WK_FFTs)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !
       if(iflag_debug .gt. 0) write(*,*) 'finish_send_recv_rtm_2_rtp'
@@ -191,7 +175,9 @@
 !
       subroutine sph_f_trans_w_coriolis                                 &
      &         (sph, comms_sph, fl_prop, trans_p, cor_rlm, f_trns,      &
-     &          trns_fwd, n_WS, n_WR, WS, WR, WK_sph, MHD_mul_FFTW)
+     &          trns_fwd, n_WS, n_WR, WS, WR, WK_sph)
+!
+      use t_sph_FFT_selector
 !
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
@@ -204,13 +190,12 @@
       real(kind = kreal), intent(inout) :: WS(n_WS), WR(n_WR)
       type(spherical_transform_data), intent(inout) :: trns_fwd
       type(spherical_trns_works), intent(inout) :: WK_sph
-      type(work_for_sgl_FFTW), intent(inout) :: MHD_mul_FFTW
 !
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
-      call fwd_MHD_FFT_sel_to_send                                      &
+      call fwd_FFT_select_to_send                                       &
      &   (sph%sph_rtp, comms_sph%comm_rtp, trns_fwd%ncomp,              &
-     &    n_WS, trns_fwd, WS, WK_sph%WK_FFTs, MHD_mul_FFTW)
+     &    n_WS, trns_fwd%fld_rtp, WS, WK_sph%WK_FFTs)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+3)
@@ -243,110 +228,6 @@
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+4)
 !
       end subroutine sph_f_trans_w_coriolis
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine sph_b_transform_SGS                                    &
-     &         (sph, comms_sph, trans_p, n_WS, n_WR, WS, WR,            &
-     &          trns_bwd, WK_sph, SGS_mul_FFTW)
-!
-      type(sph_grids), intent(in) :: sph
-      type(sph_comm_tables), intent(in) :: comms_sph
-      type(parameters_4_sph_trans), intent(in) :: trans_p
-!
-!
-      integer(kind = kint), intent(in) :: n_WS, n_WR
-      real(kind = kreal), intent(inout) :: WS(n_WS), WR(n_WR)
-      type(spherical_transform_data), intent(inout) :: trns_bwd
-      type(spherical_trns_works), intent(inout) :: WK_sph
-      type(work_for_sgl_FFTW), intent(inout) :: SGS_mul_FFTW
-!
-!
-      if(iflag_debug .gt. 0) write(*,*) 'calypso_sph_comm_rj_2_rlm_N'
-      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+1)
-      call calypso_sph_comm_N                                           &
-     &   (trns_bwd%ncomp, comms_sph%comm_rj, comms_sph%comm_rlm)
-      call finish_send_recv_sph(comms_sph%comm_rj)
-      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+1)
-!
-      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+5)
-      if(iflag_debug .gt. 0) write(*,*) 'sel_backward_legendre_trans',  &
-     &         trns_bwd%ncomp, trns_bwd%num_vector, trns_bwd%num_scalar
-      call sel_backward_legendre_trans                                  &
-     &   (trns_bwd%ncomp, trns_bwd%num_vector, trns_bwd%num_scalar,     &
-     &    sph%sph_rlm, sph%sph_rtm, comms_sph%comm_rlm,                 &
-     &    comms_sph%comm_rtm, trans_p%leg, trans_p%idx_trns,            &
-     &    n_WR, n_WS, WR, WS, WK_sph%WK_leg)
-      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+5)
-!
-!
-      if(iflag_debug .gt. 0) write(*,*)                                 &
-     &      'calypso_sph_comm_rtm_2_rtp_N'
-      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+2)
-      call calypso_sph_comm_N                                           &
-     &   (trns_bwd%ncomp, comms_sph%comm_rtm, comms_sph%comm_rtp)
-      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+2)
-!
-!
-      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
-      if(iflag_debug .gt. 0) write(*,*) 'back_MHD_FFT_sel_from_recv',   &
-     &    trns_bwd%ncomp, trns_bwd%num_vector, trns_bwd%num_scalar
-      call back_MHD_FFT_sel_from_recv                                   &
-     &   (sph%sph_rtp, comms_sph%comm_rtp, trns_bwd%ncomp,              &
-     &    n_WR, WR, trns_bwd%fld_rtp, WK_sph%WK_FFTs, SGS_mul_FFTW)
-      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
-!
-      if(iflag_debug .gt. 0) write(*,*) 'finish_send_recv_rtm_2_rtp'
-      call finish_send_recv_sph(comms_sph%comm_rtm)
-!
-      end subroutine sph_b_transform_SGS
-!
-! -----------------------------------------------------------------------
-!
-      subroutine sph_f_transform_SGS                                    &
-     &         (sph, comms_sph, trans_p, trns_fwd,                      &
-     &          n_WS, n_WR, WS, WR, WK_sph, SGS_mul_FFTW)
-!
-      type(sph_grids), intent(in) :: sph
-      type(sph_comm_tables), intent(in) :: comms_sph
-      type(parameters_4_sph_trans), intent(in) :: trans_p
-!
-      integer(kind = kint), intent(in) :: n_WS, n_WR
-      real(kind = kreal), intent(inout) :: WS(n_WS), WR(n_WR)
-      type(spherical_transform_data), intent(inout) :: trns_fwd
-      type(spherical_trns_works), intent(inout) :: WK_sph
-      type(work_for_sgl_FFTW), intent(inout) :: SGS_mul_FFTW
-!
-!
-      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
-      call fwd_MHD_FFT_sel_to_send                                      &
-     &   (sph%sph_rtp, comms_sph%comm_rtp, trns_fwd%ncomp,              &
-     &    n_WS, trns_fwd, WS, WK_sph%WK_FFTs, SGS_mul_FFTW)
-      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
-!
-      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+3)
-      call calypso_sph_comm_N                                           &
-     &   (trns_fwd%ncomp, comms_sph%comm_rtp, comms_sph%comm_rtm)
-      call finish_send_recv_sph(comms_sph%comm_rtp)
-      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+3)
-!
-      if(iflag_debug .gt. 0) write(*,*) 'sel_forward_legendre_trans'
-      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+6)
-      call sel_forward_legendre_trans                                   &
-     &   (trns_fwd%ncomp, trns_fwd%num_vector, trns_fwd%num_scalar,     &
-     &    sph%sph_rtm, sph%sph_rlm, comms_sph%comm_rtm,                 &
-     &    comms_sph%comm_rlm, trans_p%leg, trans_p%idx_trns,            &
-     &    n_WR, n_WS, WR, WS, WK_sph%WK_leg)
-      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+6)
-!
-      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+4)
-      call calypso_sph_comm_N                                           &
-     &   (trns_fwd%ncomp, comms_sph%comm_rlm, comms_sph%comm_rj)
-      call finish_send_recv_sph(comms_sph%comm_rlm)
-      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+4)
-!
-      end subroutine sph_f_transform_SGS
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

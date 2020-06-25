@@ -7,7 +7,7 @@
 !>@brief Time integration for momentum equation by explicit scheme
 !!
 !!@verbatim
-!!      subroutine explicit_scalars_sph_SGS_adams                       &
+!!      subroutine explicit_scalars_sph_adams                           &
 !!     &         (dt, sph_rj, ht_prop, cp_prop, sph_bc_T, sph_bc_C,     &
 !!     &          ipol_base, ipol_exp, ipol_frc, ipol_dif, rj_fld)
 !!      subroutine explicit_scalars_sph_euler                           &
@@ -49,7 +49,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine explicit_scalars_sph_SGS_adams                         &
+      subroutine explicit_scalars_sph_adams                             &
      &         (dt, sph_rj, ht_prop, cp_prop, sph_bc_T, sph_bc_C,       &
      &          ipol_base, ipol_exp, ipol_frc, ipol_dif, rj_fld)
 !
@@ -111,7 +111,7 @@
      &      dt, cp_prop%coef_exp, cp_prop%coef_source, sph_rj, rj_fld)
       end if
 !
-      end subroutine explicit_scalars_sph_SGS_adams
+      end subroutine explicit_scalars_sph_adams
 !
 ! ----------------------------------------------------------------------
 !

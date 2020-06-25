@@ -245,12 +245,9 @@
 !
       subroutine set_div_force_labels(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout)                               &
-     &                        :: n_comps(ndiv_force)
-      character(len = kchara), intent(inout)                            &
-     &                        :: names(ndiv_force)
-      character(len = kchara), intent(inout)                            &
-     &                        :: maths(ndiv_force)
+      integer(kind = kint_4b), intent(inout) :: n_comps(ndiv_force)
+      character(len = kchara), intent(inout) :: names(ndiv_force)
+      character(len = kchara), intent(inout) :: maths(ndiv_force)
 !
 !
       call set_field_labels(div_inertia,                                &

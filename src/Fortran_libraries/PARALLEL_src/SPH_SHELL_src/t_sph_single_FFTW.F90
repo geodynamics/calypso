@@ -13,6 +13,9 @@
 !!      subroutine finalize_sph_single_FFTW(FFTW_t)
 !!      subroutine verify_sph_single_FFTW(nidx_rtp, FFTW_t)
 !!
+!!      subroutine alloc_tmp_ordering_FFTW(nnod_rtp, FFTW_t)
+!!      subroutine dealloc_tmp_ordering_FFTW(FFTW_t)
+!!
 !!   wrapper subroutine for initierize FFT by FFTW
 !! ------------------------------------------------------------------
 !!
@@ -86,6 +89,9 @@
         real(kind = kreal), allocatable :: X(:,:)
 !>        spectrum data for multiple Fourier transform
         complex(kind = fftw_complex), allocatable :: C(:,:)
+!
+!>        temporal area for ordering
+        real(kind = kreal), allocatable :: v_tmp(:)
       end type work_for_sgl_FFTW
 !
       private :: alloc_FFTW_plan
@@ -326,6 +332,30 @@
       deallocate(FFTW_t%X, FFTW_t%C)
 !
       end subroutine dealloc_FFTW_plan
+!
+! ------------------------------------------------------------------
+!
+      subroutine alloc_tmp_ordering_FFTW(nnod_rtp, FFTW_t)
+!
+      integer(kind = kint), intent(in) :: nnod_rtp
+      type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
+!
+!
+      allocate(FFTW_t%v_tmp(nnod_rtp))
+      FFTW_t%v_tmp = 0.0d0
+!
+      end subroutine alloc_tmp_ordering_FFTW
+!
+! ------------------------------------------------------------------
+!
+      subroutine dealloc_tmp_ordering_FFTW(FFTW_t)
+!
+      type(work_for_sgl_FFTW), intent(inout) :: FFTW_t
+!
+!
+      deallocate(FFTW_t%v_tmp)
+!
+      end subroutine dealloc_tmp_ordering_FFTW
 !
 ! ------------------------------------------------------------------
 !

@@ -1,0 +1,79 @@
+
+ ==========================================
+ Truncation level:                 4
+ Longitudinal symmetry:            1
+ N_r for fluid shell:             64
+ N_theta:                         12
+ N_phi:                           24
+ Total MPI processes:            2
+ Total OopenMP threads:            2
+ Processes for spetr (r, l and m):                   1           2
+ Processes for Legendre trans. (r, l, m):            2           1
+ Processes for Legendre trans. (r, t, m):            2           1           1
+ Processes for physical space. (r, t, p):            2           1           1
+
+ Average elapsed time
+  1. Total time:    8.96097000000E-01
+  2. Initialization time:    1.79062000000E-01
+  3. Time evolution loop time:    6.26359500000E-01
+  4. Data IO time:    1.11193500000E-01
+  6. Evolution excluding IO:    5.98912500000E-01
+  7. Linear time:    1.64272500000E-01
+  8. Solver time:    1.50820000000E-01
+  9. Nonlinear terms:    4.34581500000E-01
+ 10. Obtain field to output:    6.94950000000E-03
+ 11. output_sph_restart_control:    7.86600000000E-03
+ 12. output_rms_sph_mhd_control:    5.03300000000E-03
+ 13. Coriolis term:    8.46499999999E-04
+ 14. sph backward transform:    1.92723500000E-01
+ 15. cal nonlinear terms:    2.97250000000E-02
+ 16. sph forward transform:    1.50599500000E-01
+ 17. obtain explicit terms:    3.88595000000E-02
+ 18. transfer rj  => rlm:    2.47455000000E-02
+ 19. transfer rtm => rtp:    1.48660000000E-02
+ 20. transfer rtp => rtm:    1.48115000000E-02
+ 21. transfer rlm => rj:    2.57135000000E-02
+ 22. Legendre backward transform:    5.80000000000E-02
+ 23. Legendre forward transform:    3.33560000000E-02
+ 24. Fourier transform:    1.21208500000E-01
+ 42. set_to_send_buf_N:    2.71785000000E-02
+ 43. calypso_send_recv_core:    7.89835000000E-02
+ 44. set_from_recv_buf_rev_N:    2.65125000000E-02
+ 45. Sectioning initialization.:    5.49999999999E-06
+ 46. Isosurfaceing initialization.:    1.00000000000E-05
+ 75. Generation of spherical transform table:    4.23540000000E-02
+ 76. Generation of spherical mode and grid:    1.28385000000E-02
+ 80. Communication for field:    3.45650000000E-03
+ 
+ Minimum and maximum elapsed time
+  1. Total time:    8.96079000000E-01   8.96115000000E-01
+  2. Initialization time:    1.79060000000E-01   1.79064000000E-01
+  3. Time evolution loop time:    6.26353000000E-01   6.26366000000E-01
+  4. Data IO time:    1.10388000000E-01   1.11999000000E-01
+  6. Evolution excluding IO:    5.98258000000E-01   5.99567000000E-01
+  7. Linear time:    1.57064000000E-01   1.71481000000E-01
+  8. Solver time:    1.43677000000E-01   1.57963000000E-01
+  9. Nonlinear terms:    4.28033000000E-01   4.41130000000E-01
+ 10. Obtain field to output:    6.78700000000E-03   7.11200000000E-03
+ 11. output_sph_restart_control:    7.03400000000E-03   8.69800000000E-03
+ 12. output_rms_sph_mhd_control:    2.00000000000E-03   8.06600000000E-03
+ 13. Coriolis term:    8.13999999999E-04   8.79000000000E-04
+ 14. sph backward transform:    1.91508000000E-01   1.93939000000E-01
+ 15. cal nonlinear terms:    2.86860000000E-02   3.07640000000E-02
+ 16. sph forward transform:    1.43734000000E-01   1.57465000000E-01
+ 17. obtain explicit terms:    3.85790000000E-02   3.91400000000E-02
+ 18. transfer rj  => rlm:    1.68030000000E-02   3.26880000000E-02
+ 19. transfer rtm => rtp:    1.45910000000E-02   1.51410000000E-02
+ 20. transfer rtp => rtm:    1.45710000000E-02   1.50520000000E-02
+ 21. transfer rlm => rj:    1.79890000000E-02   3.34380000000E-02
+ 22. Legendre backward transform:    5.68410000000E-02   5.91590000000E-02
+ 23. Legendre forward transform:    3.27490000000E-02   3.39630000000E-02
+ 24. Fourier transform:    1.16079000000E-01   1.26338000000E-01
+ 42. set_to_send_buf_N:    2.63800000000E-02   2.79770000000E-02
+ 43. calypso_send_recv_core:    6.33000000000E-02   9.46670000000E-02
+ 44. set_from_recv_buf_rev_N:    2.63850000000E-02   2.66400000000E-02
+ 45. Sectioning initialization.:    4.99999999998E-06   6.00000000001E-06
+ 46. Isosurfaceing initialization.:    8.00000000001E-06   1.20000000000E-05
+ 75. Generation of spherical transform table:    4.21060000000E-02   4.26020000000E-02
+ 76. Generation of spherical mode and grid:    1.26330000000E-02   1.30440000000E-02
+ 80. Communication for field:    2.54000000000E-04   6.65900000000E-03

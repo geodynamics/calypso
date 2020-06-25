@@ -15,6 +15,10 @@
 !!     &          coef_cor, velo_rtp, coriolis_rtp)
 !!      subroutine cal_wz_div_coriolis_rtp(nnod, nidx_rtp, g_colat_rtp, &
 !!     &          coef_cor, velo_rtp, div_coriolis_rtp)
+!!
+!!      subroutine cal_wz_coriolis_pole                                 &
+!!     &         (nnod_pole,  coef_cor, velo_pole, coriolis_pole)
+!!
 !!      subroutine subtract_sphere_ave_coriolis(sph_rtp, sph_rj,        &
 !!     &          is_coriolis, ntot_phys_rj, d_rj, coriolis_rtp)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -97,7 +101,7 @@
       real(kind = kreal) :: omega(3)
 !
 !
-!$omp do private(mphi,l_rtp,kr,inod,omega)
+!$omp parallel do private(mphi,l_rtp,kr,inod,omega)
       do mphi = 1, nidx_rtp(3)
         do l_rtp = 1, nidx_rtp(2)
           do kr = 1, nidx_rtp(1)
@@ -120,7 +124,7 @@
           end do
         end do
       end do
-!$omp end do nowait
+!$omp end parallel do
 !
       end subroutine cal_wz_coriolis_rtp
 !
@@ -162,6 +166,40 @@
 !
       end subroutine cal_wz_div_coriolis_rtp
 !
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine cal_wz_coriolis_pole                                   &
+     &         (nnod_pole,  coef_cor, velo_pole, coriolis_pole)
+!
+      integer(kind = kint), intent(in) :: nnod_pole
+      real(kind = kreal), intent(in) :: coef_cor
+      real(kind = kreal), intent(in) :: velo_pole(nnod_pole,3)
+!
+      real(kind = kreal), intent(inout) :: coriolis_pole(nnod_pole,3)
+!
+      integer(kind = kint) :: inod
+      real(kind = kreal), parameter :: omega(3) = (/zero, zero, one/)
+!
+!
+!$omp parallel do private(inod)
+      do inod = 1, nnod_pole
+            coriolis_pole(inod,1) = - coef_cor                          &
+!     &                         * ( omega(2)*velo_pole(inod,3)          &
+     &                         * ( -omega(3)*velo_pole(inod,2) )
+            coriolis_pole(inod,2) = - coef_cor                          &
+     &                         * ( omega(3)*velo_pole(inod,1) )
+!     &                           - omega(1)*velo_pole(inod,3) )
+            coriolis_pole(inod,3) = zero
+!            coriolis_pole(inod,3) = - coef_cor                         &
+!     &                         * ( omega(1)*velo_pole(inod,2)          &
+!     &                           - omega(2)*velo_pole(inod,1) )
+      end do
+!$omp end parallel do
+!
+      end subroutine cal_wz_coriolis_pole
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine subtract_sphere_ave_coriolis(sph_rtp, sph_rj,          &

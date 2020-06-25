@@ -137,12 +137,16 @@
       write(tmpchara,'(a)') 'Reference temperature'
       call set_reference_scalar_ctl(tmpchara, reft_ctl,                 &
      &    MHD_prop%ref_param_T, MHD_prop%takepito_T)
+      call set_filtered_advection_ctl                                   &
+     &   (reft_ctl%filterd_advect_ctl, MHD_prop%ht_prop)
 !
 !   set control for reference  
 !
-      write(tmpchara,'(a)') 'Reference temperature'
+      write(tmpchara,'(a)') 'Reference composition'
       call set_reference_scalar_ctl(tmpchara, refc_ctl,                 &
      &    MHD_prop%ref_param_C, MHD_prop%takepito_C)
+      call set_filtered_advection_ctl                                   &
+     &   (refc_ctl%filterd_advect_ctl, MHD_prop%cp_prop)
 !
 !
       if (nmtr_ctl%group_4_monitor_ctl%icou .eq. 0) then

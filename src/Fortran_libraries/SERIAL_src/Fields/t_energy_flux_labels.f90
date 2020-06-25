@@ -313,7 +313,7 @@
 !
       subroutine set_energy_flux_names(n_comps, names, maths)
 !
-      integer(kind = kint), intent(inout) :: n_comps(nene_flux)
+      integer(kind = kint_4b), intent(inout) :: n_comps(nene_flux)
       character(len = kchara), intent(inout) :: names(nene_flux)
       character(len = kchara), intent(inout) :: maths(nene_flux)
 !

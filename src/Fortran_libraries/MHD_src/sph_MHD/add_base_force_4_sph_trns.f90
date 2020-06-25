@@ -9,16 +9,17 @@
 !!
 !!@verbatim
 !!      subroutine add_base_force_4_MHD_sph_trns                        &
-!!     &         (fl_prop, cd_prop, ht_prop, cp_prop,                   &
-!!     &          ipol_frc, iphys_frc, f_trns_frc, trns)
+!!     &         (ipol_frc, iphys_frc, f_trns_frc, trns)
+!!      subroutine add_base_force_sph_trns_snap                         &
+!!     &         (ipol_frc, iphys_frc, f_trns_frc, trns)
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(conductive_property), intent(in) :: cd_prop
 !!        type(scalar_property), intent(in) :: ht_prop, cp_prop
 !!        type(base_force_address), intent(in) :: ipol_frc, iphys_frc
 !!        type(base_force_address), intent(inout) :: f_trns_frc
 !!        type(spherical_transform_data), intent(inout) :: trns
-!!      subroutine add_rot_coriolis_MHD_sph_trns(fl_prop,               &
-!!     &          ipol_rot_frc, iphys_rot_frc, f_trns_rot_frc, trns)
+!!      subroutine add_rot_coriolis_MHD_sph_trns                        &
+!!     &         (ipol_rot_frc, iphys_rot_frc, f_trns_rot_frc, trns)
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(base_force_address), intent(in) :: ipol_rot_frc
 !!        type(base_force_address), intent(in) :: iphys_rot_frc
@@ -76,70 +77,98 @@
 !-----------------------------------------------------------------------
 !
       subroutine add_base_force_4_MHD_sph_trns                          &
-     &         (fl_prop, cd_prop, ht_prop, cp_prop,                     &
-     &          ipol_frc, iphys_frc, f_trns_frc, trns)
+!     &         (fl_prop, cd_prop, ht_prop, cp_prop,                    &
+     &         (ipol_frc, iphys_frc, f_trns_frc, trns)
 !
       use add_field_to_sph_trans_list
 !
-      type(fluid_property), intent(in) :: fl_prop
-      type(conductive_property), intent(in) :: cd_prop
-      type(scalar_property), intent(in) :: ht_prop, cp_prop
+!      type(fluid_property), intent(in) :: fl_prop
+!      type(conductive_property), intent(in) :: cd_prop
+!      type(scalar_property), intent(in) :: ht_prop, cp_prop
       type(base_force_address), intent(in) :: ipol_frc, iphys_frc
 !
       type(base_force_address), intent(inout) :: f_trns_frc
       type(spherical_transform_data), intent(inout) :: trns
 !
 !   advection
-      if(fl_prop%iflag_scheme .gt. id_no_evolution) then
-        call add_field_4_sph_trns_by_pol(inertia,                       &
-     &      ipol_frc%i_m_advect, iphys_frc%i_m_advect,                  &
-     &      f_trns_frc%i_m_advect, trns)
+!      if(fl_prop%iflag_scheme .gt. id_no_evolution) then
+!        if(fl_prop%iflag_4_inertia) then
+          call add_field_4_sph_trns_by_pol(inertia,                    &
+     &        ipol_frc%i_m_advect, iphys_frc%i_m_advect,               &
+     &        f_trns_frc%i_m_advect, trns)
+!        end if
 !   Coriolis force
-        if(fl_prop%iflag_4_coriolis .gt. id_turn_OFF) then
+!        if(fl_prop%iflag_4_coriolis) then
           call add_field_4_sph_trns_by_pol(Coriolis_force,              &
      &        ipol_frc%i_coriolis, iphys_frc%i_coriolis,                &
      &        f_trns_frc%i_coriolis, trns)
-        end if
+!        end if
 !   Lorentz force
-        if(fl_prop%iflag_4_lorentz .gt. id_turn_OFF) then
+!        if(fl_prop%iflag_4_lorentz) then
           call add_field_4_sph_trns_by_pol(Lorentz_force,               &
      &        ipol_frc%i_lorentz, iphys_frc%i_lorentz,                  &
      &        f_trns_frc%i_lorentz, trns)
-        end if
-      end if
+!        end if
+!      end if
 !
 !   induction
-      if(cd_prop%iflag_Bevo_scheme .gt. id_no_evolution) then
+!      if((cd_prop%iflag_Bevo_scheme .gt. id_no_evolution)              &
+!     &    .and. cd_prop%iflag_4_induction) then
         call add_field_4_sph_trns_by_pol(vecp_induction,                &
      &      ipol_frc%i_vp_induct, iphys_frc%i_vp_induct,                &
      &      f_trns_frc%i_vp_induct, trns)
-      end if
+!      end if
 !
 !   heat flux
-      if(ht_prop%iflag_scheme .gt. id_no_evolution) then
+!      if((ht_prop%iflag_scheme .gt. id_no_evolution)                   &
+!     &     .and. ht_prop%iflag_4_advection) then
         call add_field_4_sph_trns_by_pol(heat_flux,                     &
      &      ipol_frc%i_h_flux, iphys_frc%i_h_flux, f_trns_frc%i_h_flux, &
      &      trns)
-      end if
+!      end if
 !
 !   composition flux
-      if(cp_prop%iflag_scheme .gt. id_no_evolution) then
+!      if((cp_prop%iflag_scheme .gt. id_no_evolution)                   &
+!     &     .and. cp_prop%iflag_4_advection) then
         call add_field_4_sph_trns_by_pol(composite_flux,                &
      &      ipol_frc%i_c_flux, iphys_frc%i_c_flux, f_trns_frc%i_c_flux, &
      &      trns)
-      end if
+!      end if
 !
       end subroutine add_base_force_4_MHD_sph_trns
 !
 !-----------------------------------------------------------------------
 !
-      subroutine add_rot_coriolis_MHD_sph_trns(fl_prop,                 &
-     &          ipol_rot_frc, iphys_rot_frc, f_trns_rot_frc, trns)
+      subroutine add_base_force_sph_trns_snap                           &
+     &         (ipol_frc, iphys_frc, f_trns_frc, trns)
+!
+      use add_field_to_sph_trans_list
+!
+      type(base_force_address), intent(in) :: ipol_frc, iphys_frc
+!
+      type(base_force_address), intent(inout) :: f_trns_frc
+      type(spherical_transform_data), intent(inout) :: trns
+!
+!
+      call add_field_4_sph_trns_by_pol(pert_heat_flux,                  &
+     &    ipol_frc%i_ph_flux, iphys_frc%i_ph_flux,                      &
+     &    f_trns_frc%i_ph_flux, trns)
+      call add_field_4_sph_trns_by_pol(pert_comp_flux,                  &
+     &    ipol_frc%i_pc_flux, iphys_frc%i_pc_flux,                      &
+     &    f_trns_frc%i_pc_flux, trns)
+!
+      end subroutine add_base_force_sph_trns_snap
+!
+!-----------------------------------------------------------------------
+!
+!      subroutine add_rot_coriolis_MHD_sph_trns(fl_prop,                &
+      subroutine add_rot_coriolis_MHD_sph_trns                          &
+     &         (ipol_rot_frc, iphys_rot_frc, f_trns_rot_frc, trns)
 !
       use m_rot_force_labels
       use add_field_to_sph_trans_list
 !
-      type(fluid_property), intent(in) :: fl_prop
+!      type(fluid_property), intent(in) :: fl_prop
       type(base_force_address), intent(in) :: ipol_rot_frc
       type(base_force_address), intent(in) :: iphys_rot_frc
 !
@@ -147,16 +176,16 @@
       type(spherical_transform_data), intent(inout) :: trns
 !
 !   rotation of Coriolis force
-      if(fl_prop%iflag_scheme .gt. id_no_evolution) then
-        if(fl_prop%iflag_4_coriolis .gt. id_turn_OFF) then
-          call add_field_4_sph_trns_by_pol(rot_Coriolis_force,          &
-     &        ipol_rot_frc%i_Coriolis, iphys_rot_frc%i_Coriolis,        &
-     &        f_trns_rot_frc%i_Coriolis, trns)
-        end if
-      end if
+!      if(fl_prop%iflag_scheme .gt. id_no_evolution                     &
+!     &      .and. fl_prop%iflag_4_coriolis) then
+        call add_field_4_sph_trns_by_pol(rot_Coriolis_force,            &
+     &      ipol_rot_frc%i_Coriolis, iphys_rot_frc%i_Coriolis,          &
+     &      f_trns_rot_frc%i_Coriolis, trns)
+!      end if
 !
       end subroutine add_rot_coriolis_MHD_sph_trns
 !
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine add_div_coriolis_MHD_sph_trns                          &
