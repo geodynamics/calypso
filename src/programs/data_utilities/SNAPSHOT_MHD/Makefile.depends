@@ -10,4 +10,6 @@ main_sph_dynamobench.o: $(SPH_SNAP_MAINDIR)/main_sph_dynamobench.f90 m_precision
 	$(F90) -c $(F90OPTFLAGS) $<
 main_sph_snapshot_w_psf.o: $(SPH_SNAP_MAINDIR)/main_sph_snapshot_w_psf.f90 m_precision.o calypso_mpi.o analyzer_sph_snap_w_psf.o
 	$(F90) -c $(F90OPTFLAGS) $<
+psf_file_to_VTK.o: $(SPH_SNAP_MAINDIR)/psf_file_to_VTK.f90 m_precision.o m_constants.o m_field_file_format.o m_section_file_extensions.o t_file_IO_parameter.o t_ucd_data.o ucd_IO_select.o
+	$(F90) -c $(F90OPTFLAGS) $<
 

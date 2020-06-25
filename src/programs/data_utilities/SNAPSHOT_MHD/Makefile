@@ -5,8 +5,8 @@
 SPH_SNAP_MAINDIR =   $$(DATA_UTILS_DIR)/SNAPSHOT_MHD
 
 TARGET_SPH_SNAP =    sph_snapshot
-
-TARGET_SPH_D_BENCH =    sph_dynamobench
+TARGET_SPH_D_BENCH = sph_dynamobench
+TARGET_PSF_2_VTK =   psf_to_vtk
 
 
 SOURCES = $(shell ls *.f90)
@@ -21,6 +21,9 @@ main_sph_dynamobench.o \
 analyzer_sph_dynamobench.o \
 SPH_analyzer_d_bench.o
 
+MOD_PSF_2_VTK = \
+psf_file_to_VTK.o
+
 
 #
 #  -------------------------------------------------------------------------
@@ -30,14 +33,16 @@ dir_list:
 	@echo 'SPH_SNAP_MAINDIR = $(SPH_SNAP_MAINDIR)' >> $(MAKENAME)
 
 target_list:
-	@echo 'TARGET_SPH_D_BENCH =    $$(BUILDDIR)/$(TARGET_SPH_D_BENCH)'   >> $(MAKENAME)
-	@echo 'TARGET_SPH_SNAP = $$(BUILDDIR)/$(TARGET_SPH_SNAP)'>> $(MAKENAME)
+	@echo 'TARGET_SPH_D_BENCH = $$(BUILDDIR)/$(TARGET_SPH_D_BENCH)'   >> $(MAKENAME)
+	@echo 'TARGET_SPH_SNAP =    $$(BUILDDIR)/$(TARGET_SPH_SNAP)'>> $(MAKENAME)
+	@echo 'TARGET_PSF_2_VTK =    $$(BUILDDIR)/$(TARGET_PSF_2_VTK)'>> $(MAKENAME)
 	@echo >> $(MAKENAME)
 
 target_task:
 	@echo sph_snapshots: \
 	 '$$(TARGET_SPH_D_BENCH)'    \
 	 '$$(TARGET_SPH_SNAP)' \
+	 '$$(TARGET_PSF_2_VTK)' \
 	>> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo '$$(TARGET_SPH_SNAP):  $$(MOD_SPH_SNAP_MAIN)  $$(LIB_FILES_SPH_MHD)' \
@@ -52,6 +57,12 @@ target_task:
 	'-L. $$(LIBS_SPH_MHD)  $$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	
+	@echo '$$(TARGET_PSF_2_VTK):  $$(MOD_PSF_2_VTK)  $$(LIB_FILES_SPH_MHD)' \
+	>> $(MAKENAME)
+	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_PSF_2_VTK)' '$$(MOD_PSF_2_VTK)' \
+	'-L. $$(LIBS_SPH_MHD)  $$(F90LIBS)' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
+	
 	@echo '' >> $(MAKENAME)
 
 
@@ -62,6 +73,8 @@ mod_list:
 	@echo  $(MOD_SPH_SNAP_MAIN) >> $(MAKENAME)
 	@echo  MOD_SPH_D_BENCH_MAIN=  \\ >> $(MAKENAME)
 	@echo  $(MOD_SPH_D_BENCH_MAIN) >> $(MAKENAME)
+	@echo  MOD_PSF_2_VTK=  \\ >> $(MAKENAME)
+	@echo  $(MOD_PSF_2_VTK) >> $(MAKENAME)
 	@echo  '#' >> $(MAKENAME)
 
 
