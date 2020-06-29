@@ -57,6 +57,23 @@ In Version 1.2, the following features are implemented:
 \item The time and time step information in the restart data can be modifield by  \verb|assemble_mhd|. See section \ref{sec:add_initial_field}
 \end{itemize}
 
+\subsection{Updates for Ver 2.0}
+In Version 2.0, there are a number of changes as;
+\begin{itemize}
+\item Start using Fortran structures to reduce global instances.
+\item Using MPI-IO for data IO to generate a single date file from MPI processes
+\item Include interface to zlib library (\url{https://www.zlib.net}) for data IO with data compression. zlib is pre-installed in MacOS and most of Linux distributions.
+\item Calypso now support various format of data IO (ascii, binary, gzipped ascii, and gzipped binary) through MPI-IO.
+\item Include spherical harmonics index generator into simulation program. Consequently, we can start program without preprocessing.
+\item Modules to generate longitudinal average data is included into the simulation program.
+\item Number of array information is not required to define "array" block in control files.
+\item Block layout of the control file is changed for spatial resolution and spherical harmonic data IO.
+\end{itemize}
+
+
+
+
+
 
 \section{Acknowledgements}
 \label{section:acknowledgements}
