@@ -48,6 +48,8 @@ cvt_xyz_vector_2_cyl_smp.o: $(BASEDIR)/cvt_xyz_vector_2_cyl_smp.f90 m_precision.
 	$(F90) -c $(F90OPTFLAGS) $<
 cvt_xyz_vector_2_sph_smp.o: $(BASEDIR)/cvt_xyz_vector_2_sph_smp.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
+delete_field_smp.o: $(BASEDIR)/delete_field_smp.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
 m_constants.o: $(BASEDIR)/m_constants.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_error_IDs.o: $(BASEDIR)/m_error_IDs.f90 m_precision.o
