@@ -10,7 +10,7 @@
 !>        Output command list for source with .f90 extension
 !>	$(F90) -c $(F90OPTFLAGS) $<
 !>        Output command list for source with .F90 extension
-!>	$(F90) -c $(F90FLAGS) $<
+!>	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 !>
 !>
 !>     Warning: To use this program, module name
@@ -25,8 +25,8 @@
       character(len=64), allocatable :: mod_name(:)
       character(len=28), parameter, private :: command                  &
      &   = '	$(F90) -c $(F90OPTFLAGS) $<'
-      character(len=25), parameter, private :: command_cpp              &
-     &   = '	$(F90) -c $(F90FLAGS) $<'
+      character(len=43), parameter, private :: command_cpp              &
+     &   = '	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<'
 !
       integer, parameter :: num_exclude = 3
       character(len=31) ::  exclude_list(num_exclude)                   &
@@ -184,7 +184,7 @@
       write(id_makefile,'(a1)',advance='no') char(10)
 !
       if(iflag_cpp .eq. 1) then
-        write(id_makefile,'(a25,a1)',advance='no')                      &
+        write(id_makefile,'(a43,a1)',advance='no')                      &
      &         command_cpp, char(10)
       else
         write(id_makefile,'(a28,a1)',advance='no') command, char(10)
