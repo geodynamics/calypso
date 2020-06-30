@@ -22,6 +22,7 @@ pipeline {
             --with-blas \
             --with-zlib
         '''
+        sh 'ls src/Fortran_libraries/MHD_src/IO/'
         sh 'export OMPI_MCA_btl_vader_single_copy_mechanism=none; make'
       }
     }
