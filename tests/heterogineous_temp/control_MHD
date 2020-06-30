@@ -97,14 +97,14 @@ begin MHD_control
 !
     begin boundary_condition
       array bc_temperature  2
-        bc_temperature  fixed_flux_file  CMB  0.000
         bc_temperature  fixed_file       ICB  1.000
+        bc_temperature  fixed_flux_file  CMB  0.000
       end array bc_temperature
 !
       array bc_velocity    0
 !
       array bc_composition      2
-        bc_composition  fixed_flux_file        ICB 0.000
+        bc_composition  fixed_flux_file       ICB  0.000
         bc_composition  fixed_file            CMB  1.000
       end array bc_composition
 !
