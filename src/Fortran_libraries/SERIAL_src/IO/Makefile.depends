@@ -10,8 +10,8 @@ comm_table_IO.o: $(IO_DIR)/comm_table_IO.f90 m_precision.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 data_IO_to_textline.o: $(IO_DIR)/data_IO_to_textline.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-delete_data_files.o: $(IO_DIR)/delete_data_files.f90 m_precision.o m_file_format_switch.o set_parallel_file_name.o
-	$(F90) -c $(F90OPTFLAGS) $<
+delete_data_files.o: $(IO_DIR)/delete_data_files.F90 m_precision.o m_file_format_switch.o set_parallel_file_name.o
+	$(F90) -c $(F90FLAGS) $<
 domain_data_IO.o: $(IO_DIR)/domain_data_IO.f90 m_precision.o m_constants.o t_comm_table.o field_data_IO.o comm_table_IO.o m_error_IDs.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 domain_data_IO_b.o: $(IO_DIR)/domain_data_IO_b.f90 m_precision.o t_comm_table.o t_binary_IO_buffer.o binary_IO.o transfer_to_long_integers.o m_error_IDs.o
