@@ -8,16 +8,19 @@ Calypso consists of programs shown in Table \ref{table:controls}.
 \hline
 Program & Control file name & Type \\ \hline
 \verb|gen_sph_grids|          & \verb|control_sph_shell| &  Parallel    \\
+\verb|check_sph_grids|        & \verb|control_sph_shell| &  Parallel    \\ \hline
 \verb|sph_mhd|                & \verb|control_MHD| &        Parallel  \\ \hline
 \verb|sph_initial_field|      & \verb|control_MHD| &        Parallel  \\
 \verb|sph_add_initial_field|  & \verb|control_MHD| &        Parallel  \\
-\verb|sph_snapshot|           & \verb|control_snapshot| &   Parallel  \\ \hline
-\verb|sph_zm_snapshot|        & \verb|control_snapshot| &   Parallel  \\
-\verb|sph_dynamobench|        & \verb|control_snapshot| &   Parallel  \\ \hline
 \verb|assemble_sph|           & \verb|control_assemble_sph| & Parallel  \\ \hline
-\verb|t_ave_sph_mean_square|  & N/A & Serial  \\ \hline
-\verb|t_ave_picked_sph_coefs| & N/A & Serial  \\ \hline
+\verb|sph_snapshot|           & \verb|control_snapshot| &   Parallel  \\
+\verb|sph_dynamobench|        & \verb|control_snapshot| &   Parallel  \\ \hline
+\verb|psf_to_vtk|             & N/A & Serial  \\ \hline
+% \verb|sph_ene_check|          & N/A & Serial  \\
+\verb|t_ave_sph_mean_square|  & N/A & Serial  \\
+\verb|t_ave_picked_sph_coefs| & N/A & Serial  \\
 \verb|t_ave_nusselt|          & N/A & Serial  \\ \hline
+% \verb|make_f90depends|        & N/A & Serial  \\ \hline
 \end{tabular}
 \end{center}
 \label{table:controls}
@@ -76,8 +79,7 @@ The following rules are used in the control files. An example of a control file 
 \item If an item consists of multiple data, these should be listed in one line.
 \item If an item does not belong in the block it is ignored.
 \item Some blockes can read from external file. The external file name is defined by `\verb|file [block name] [nexzternal file name]|'
-\item An array block starts with `\verb|begin array [name] [number of components]|' and ends with `\verb|end array [name]|'.
-\item If \verb|[number of components]| for an array is 0, `\verb|end array [name]|' on the next line is not needed.
+\item An array block starts with `\verb|begin array [name]|' and ends with `\verb|end array [name]|'.
 \item In Fortran program, character `\verb|/|' is recognized as an end of character valuable if text with `\verb|/|' ({\it e.g.} file prefix including file paths) is not enclosed by {\tt '} or {\tt "}.
 \item Calypso's control file input is limited to 255 characters for each line.
 \end{itemize}
@@ -86,29 +88,32 @@ The following rules are used in the control files. An example of a control file 
 \begin{center}
 %
 \begin{verbatim}
-begin spherical_shell_ctl
-!
+begin MHD_control
   begin data_files_def
-    num_subdomain_ctl    4
+    debug_flag_ctl            'OFF'
+    num_subdomain_ctl            4
 !
-    sph_file_prefix             'sph_shell/in'
+    sph_file_prefix             'sph_lm31r48c_4/in'
+    sph_file_fmt_ctl           'merged'
   end data_files_def
 !
-  begin num_grid_sph
-    truncation_level_ctl     4
-    ngrid_meridonal_ctl     12
-    ngrid_zonal_ctl         24
+  begin spherical_shell_ctl
+    begin num_grid_sph
+      truncation_level_ctl     4
+      ngrid_meridonal_ctl     12
+      ngrid_zonal_ctl         24
 !
-    radial_grid_type_ctl   explicit
-    array r_layer       4
-      r_layer    1  0.5384615384615
-      r_layer    2  0.5384615384615
-      r_layer    3  1.038461538462
-      r_layer    4  1.538461538462
-    end array r_layer
+      radial_grid_type_ctl   explicit
+      array r_layer
+        r_layer    1  0.5384615384615
+        r_layer    2  0.5384615384615
+        r_layer    3  1.038461538462
+        r_layer    4  1.538461538462
+      end array r_layer
 !
-  end num_grid_sph
-end spherical_shell_ctl
+    end num_grid_sph
+  end spherical_shell_ctl
+end MHD_control
 \end{verbatim}
 %
 \caption{Example of Control file}
