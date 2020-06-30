@@ -1,20 +1,37 @@
-FILE(GLOB ASSEMBLE_SPH_SRC_FILES MERGE/*.[fF]90)
-ADD_EXECUTABLE(assemble_sph ${ASSEMBLE_SPH_SRC_FILES})
-TARGET_LINK_LIBRARIES(assemble_sph calypso)
+SET(SRC_NEWSPH MERGE/main_assemble_sph.f90 MERGE/analyzer_assemble_sph.f90)
+ADD_EXECUTABLE(assemble_sph ${SRC_NEWSPH})
+TARGET_LINK_LIBRARIES(assemble_sph calypso calypso_c)
 
-SET(MOD_SPH_SNAP_NOVIZ_MAIN_SRC_FILES SNAPSHOT_MHD/main_sph_snapshot_noviz.f90 SNAPSHOT_MHD/analyzer_noviz_sph_snap.f90 SNAPSHOT_MHD/SPH_analyzer_snap.f90)
-ADD_EXECUTABLE(sph_snapshot ${MOD_SPH_SNAP_NOVIZ_MAIN_SRC_FILES})
-TARGET_LINK_LIBRARIES(sph_snapshot calypso fftpack.5d)
+SET(SRC_SPH_SNAP_MAIN SNAPSHOT_MHD/main_sph_snapshot_w_psf.f90 SNAPSHOT_MHD/analyzer_sph_snap_w_psf.f90 SNAPSHOT_MHD/SPH_analyzer_snap_w_psf.f90)
+ADD_EXECUTABLE(sph_snapshot ${SRC_SPH_SNAP_MAIN})
+TARGET_LINK_LIBRARIES(sph_snapshot calypso calypso_c fftpack.5d)
 
-SET(MOD_SPH_ZM_SNAP_NOVIZ_MAIN_SRC_FILES SNAPSHOT_MHD/main_sph_zm_snap_w_psf.f90 SNAPSHOT_MHD/analyzer_sph_zm_snap_w_psf.f90 SNAPSHOT_MHD/SPH_analyzer_snap.f90 SNAPSHOT_MHD/SPH_analyzer_zm_snap_w_psf.f90)
-ADD_EXECUTABLE(sph_zm_snapshot ${MOD_SPH_ZM_SNAP_NOVIZ_MAIN_SRC_FILES})
-TARGET_LINK_LIBRARIES(sph_zm_snapshot calypso fftpack.5d)
+SET(SRC_SPH_D_BENCH_MAIN SNAPSHOT_MHD/main_sph_dynamobench.f90 SNAPSHOT_MHD/analyzer_sph_dynamobench.f90 SNAPSHOT_MHD/SPH_analyzer_d_bench.f90)
+ADD_EXECUTABLE(sph_dynamobench ${SRC_SPH_D_BENCH_MAIN})
+TARGET_LINK_LIBRARIES(sph_dynamobench calypso calypso_c fftpack.5d)
 
-SET(MOD_SPH_D_BENCH_MAIN_SRC_FILES SNAPSHOT_MHD/main_sph_dynamobench.f90 SNAPSHOT_MHD/analyzer_sph_dynamobench.f90 SNAPSHOT_MHD/SPH_analyzer_d_bench.f90)
-ADD_EXECUTABLE(sph_dynamobench ${MOD_SPH_D_BENCH_MAIN_SRC_FILES})
-TARGET_LINK_LIBRARIES(sph_dynamobench calypso fftpack.5d)
+ADD_EXECUTABLE(psf_to_vtk SNAPSHOT_MHD/psf_file_to_VTK.f90)
+TARGET_LINK_LIBRARIES(psf_to_vtk calypso calypso_c)
 
-SET(MOD_SPH_INITIAL INITIAL_FIELD/main_sph_initial_fld.f90 INITIAL_FIELD/analyzer_sph_initial_fld.f90 INITIAL_FIELD/SPH_analyzer_const_initial.f90 INITIAL_FIELD/const_sph_initial_spectr.f90)
-ADD_EXECUTABLE(sph_initial_field ${MOD_SPH_INITIAL})
-TARGET_LINK_LIBRARIES(sph_initial_field calypso fftpack.5d)
+SET(SRC_SPH_INITIAL INITIAL_FIELD/main_sph_initial_fld.f90 INITIAL_FIELD/SPH_analyzer_const_initial.f90 INITIAL_FIELD/const_sph_initial_spectr.f90)
+ADD_EXECUTABLE(sph_initial_field ${SRC_SPH_INITIAL})
+TARGET_LINK_LIBRARIES(sph_initial_field calypso calypso_c fftpack.5d)
 
+SET(SRC_SPH_ADD_INITIAL INITIAL_FIELD/main_sph_add_initial_fld.f90 INITIAL_FIELD/SPH_analyzer_add_initial.f90 INITIAL_FIELD/const_sph_initial_spectr.f90)
+ADD_EXECUTABLE(sph_add_initial_field ${SRC_SPH_ADD_INITIAL})
+TARGET_LINK_LIBRARIES(sph_add_initial_field calypso calypso_c fftpack.5d)
+
+
+SET(SRC_TAVE_SPH_ENE_SPEC TIME_HISTORIES/t_average_sph_ene_spec.f90 TIME_HISTORIES/t_read_sph_spectra.f90 TIME_HISTORIES/m_tave_sph_ene_spectr.f90 TIME_HISTORIES/sph_mean_square_IO_select.f90 TIME_HISTORIES/simple_sph_spectr_head_IO.f90 TIME_HISTORIES/simple_sph_spectr_data_IO.f90 TIME_HISTORIES/cal_tave_sph_ene_spectr.f90)
+ADD_EXECUTABLE(t_ave_sph_mean_square ${SRC_TAVE_SPH_ENE_SPEC})
+TARGET_LINK_LIBRARIES(t_ave_sph_mean_square calypso)
+
+SET(SRC_T_AVE_PICK_SPH TIME_HISTORIES/t_picked_sph_spectr_data_IO.f90 TIME_HISTORIES/tave_picked_sph_spec_data.f90)
+ADD_EXECUTABLE(t_ave_picked_sph_coefs ${SRC_T_AVE_PICK_SPH})
+TARGET_LINK_LIBRARIES(t_ave_picked_sph_coefs calypso)
+
+ADD_EXECUTABLE(t_ave_nusselt TIME_HISTORIES/t_average_nusselt.f90)
+TARGET_LINK_LIBRARIES(t_ave_nusselt calypso)
+
+ADD_EXECUTABLE(sph_ene_check TIME_HISTORIES/compare_sph_mean_square.f90)
+TARGET_LINK_LIBRARIES(sph_ene_check calypso)

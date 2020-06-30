@@ -2,9 +2,13 @@
 # refer to the root source directory of the project as ${CALYPSO_SOURCE_DIR} and 
 # to the root binary directory of the project as ${CALYPSO_BINARY_DIR}. 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
-PROJECT(CALYPSO Fortran, c)
+PROJECT(CALYPSO Fortran)
+# Set the Rayleigh version
+SET(VERSION 2.0a)
+
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/src/cmake/Modules/")
-ENABLE_LANGUAGE(Fortran)
+
+ENABLE_LANGUAGE(Fortran C)
 ENABLE_LANGUAGE(c)
 
 SET(CMAKE_Fortran_MODULE_DIRECTORY "${CALYPSO_BINARY_DIR}/include")
@@ -30,6 +34,7 @@ SET (CMAKE_Fortran_FLAGS ${CMAKE_Fortran_FLAGS} ${OpenMP_Fortran_FLAGS})
 # Look for FFTW3 and use it if available
 FIND_PACKAGE(FFTW)
 IF (FFTW_FOUND)
+    message(STATUS "FFTW is found")
     ADD_DEFINITIONS(-DFFTW3)
     INCLUDE_DIRECTORIES(${FFTW_INCLUDES})
 ENDIF(FFTW_FOUND)
@@ -37,17 +42,26 @@ ENDIF(FFTW_FOUND)
 # Find HDF5 - if it's not parallel then don't use it at all
 FIND_PACKAGE(HDF5 COMPONENTS Fortran)
 IF (HDF5_FOUND AND HDF5_IS_PARALLEL)
+    message(STATUS "HDF5 Ver. ${HDF5_VERSION} is found")
     ADD_DEFINITIONS(-DHDF5_IO)
     ADD_DEFINITIONS(${HDF5_DEFINITIONS})
     INCLUDE_DIRECTORIES(${HDF5_INCLUDE_DIRS})
 ENDIF(HDF5_FOUND AND HDF5_IS_PARALLEL)
 
+# Find BLAS
+FIND_PACKAGE(BLAS)
+IF (BLAS_FOUND)
+    message(STATUS "BLAS is found as ${BLA_VENDOR}")
+    ADD_DEFINITIONS(-DBLAS)
+ENDIF(BLAS_FOUND)
+
 # Find zlib
 FIND_PACKAGE(ZLIB)
 IF (ZLIB_FOUND)
+    message(STATUS "zlib Ver. ${ZLIB_VERSION_STRING} is found")
     ADD_DEFINITIONS(-DZLIB_IO)
     INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIRS})
-ENDIF(ZLIB_FOUND AND HDF5_IS_PARALLEL)
+ENDIF(ZLIB_FOUND)
 
 # Recurse into the "src" subdirectory
 ADD_SUBDIRECTORY (src) 

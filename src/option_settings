@@ -38,8 +38,10 @@ PKG_CONFIG_PATH=/home0/matsui/local/lib/pkgconfig
 # Intel mac with gfortran-openmpi with self compiled FFTW3
 # -------------------------------------------------------------------------------
 #
-#./configure --prefix='/Users/matsui/local' FC=mpif90 CC=mpicc CFLAGS='-O3 -Wall -g'  FCFLAGS='-O3 -Wall -g' --with-blas  --enable-fftw3 --with-zlib=/usr --with-hdf5=/Users/matsui/local/bin/h5pcc  PKG_CONFIG_PATH='/Users/matsui/local/lib/pkgconfig:/usr/lib/pkgconfig'
-#
+ ./configure --prefix='/Users/matsui/local' FC=mpif90 CC=mpicc \
+CFLAGS='-O3 -Wall -g' FCFLAGS='-O3 -Wall -g' \
+--with-blas --enable-fftw3 --with-zlib=/usr --with-hdf5=/opt/local/bin/h5pcc \
+PKG_CONFIG_PATH='/opt/local/lib/pkgconfig:/usr/lib/pkgconfig'#
 #
 #  Makefile for geoynamo platform Calypso
 #    Written by H. Matsui
