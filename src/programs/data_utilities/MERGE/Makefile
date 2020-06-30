@@ -30,7 +30,8 @@ target_task:
 	@echo '$$(TARGET_NEWSPH)': '$$(MOD_NEWSPH)' \
 	'$$(LIB_CALYPSO_FILE)' \
 	>> $(MAKENAME)
-	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_NEWSPH)' '$$(MOD_NEWSPH)' \
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_NEWSPH)' '$$(MOD_NEWSPH)' \
 	'-L. $$(LIB_CALYPSO) $$(LIB_CALYPSO_C)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)

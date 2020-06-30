@@ -58,7 +58,8 @@ target_task:
 	@echo '$$(TARGET_TAVE_SPH_ENE_SPEC)': '$$(MOD_TAVE_SPH_ENE_SPEC)' \
 	'$$(LIB_FILES_SPH_MHD)' \
 	>> $(MAKENAME)
-	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_TAVE_SPH_ENE_SPEC)' \
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_TAVE_SPH_ENE_SPEC)' \
 	'$$(MOD_TAVE_SPH_ENE_SPEC)' \
 	'-L. $$(LIBS_SPH_MHD)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
@@ -66,7 +67,8 @@ target_task:
 	@echo '$$(TARGET_T_AVE_PICK_SPH_SPEC)': '$$(MOD_T_AVE_PICK_SPH)' \
 	'$$(LIB_FILES_SPH_MHD)' \
 	>> $(MAKENAME)
-	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_T_AVE_PICK_SPH_SPEC)' \
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_T_AVE_PICK_SPH_SPEC)' \
 	'$$(MOD_T_AVE_PICK_SPH)' \
 	'-L. $$(LIBS_SPH_MHD)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
@@ -74,7 +76,8 @@ target_task:
 	@echo '$$(TARGET_T_AVE_NUSSELT)': '$$(MOD_T_AVE_NUSSELT)' \
 	'$$(LIB_FILES_SPH_MHD)' \
 	>> $(MAKENAME)
-	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_T_AVE_NUSSELT)' \
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_T_AVE_NUSSELT)' \
 	'$$(MOD_T_AVE_NUSSELT)' \
 	'-L. $$(LIBS_SPH_MHD)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
@@ -82,7 +85,8 @@ target_task:
 	@echo '$$(TARGET_SPH_ENE_CHECK)': '$$(MOD_SPH_ENE_CHECK)' \
 	'$$(LIB_FILES_SPH_MHD)' \
 	>> $(MAKENAME)
-	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_SPH_ENE_CHECK)' \
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_SPH_ENE_CHECK)' \
 	'$$(MOD_SPH_ENE_CHECK)' \
 	'-L. $$(LIBS_SPH_MHD)' \
 	'$$(F90LIBS)' >> $(MAKENAME)

@@ -39,7 +39,8 @@ target_task:
 	@echo '$$(TARGET_CVT_RAYLEIGH_SPH)': '$$(MOD_CVT_RAYLEIGH_SPH)' \
 	'$$(LIB_FILES_SPH_MHD)' \
 	>> $(MAKENAME)
-	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_CVT_RAYLEIGH_SPH)' '$$(MOD_CVT_RAYLEIGH_SPH)' \
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_CVT_RAYLEIGH_SPH)' '$$(MOD_CVT_RAYLEIGH_SPH)' \
 	'-L. $$(LIBS_SPH_MHD)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)

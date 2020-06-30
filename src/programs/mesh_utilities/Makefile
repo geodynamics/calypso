@@ -42,7 +42,8 @@ target_task:
 	@echo '$$(TARGET_GEN_SPH)': '$$(MOD_GEN_SPH_GRID)' \
 	'$$(LIB_CALYPSO_FILE)' \
 	>> $(MAKENAME)
-	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_GEN_SPH)' \
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_GEN_SPH)' \
 	'$$(MOD_GEN_SPH_GRID)' \
 	'-L. $$(LIB_CALYPSO)  $$(LIB_CALYPSO_C)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
@@ -50,7 +51,8 @@ target_task:
 	@echo '$$(TARGET_TEST_SPH_GRID):' \
 	'$$(MOD_TEST_SPH_GRID) $$(LIB_CALYPSO_FILE)' \
 	>> $(MAKENAME)
-	@echo '	''$$(F90)' '$$(F90FLAGS)' -o '$$(TARGET_TEST_SPH_GRID)' \
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_TEST_SPH_GRID)' \
 	'$$(MOD_TEST_SPH_GRID)' \
 	'-L. $$(LIB_CALYPSO)  $$(LIB_CALYPSO_C)' \
 	'$$(F90LIBS)' >> $(MAKENAME)

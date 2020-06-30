@@ -10,8 +10,6 @@ MOD_SPH_GRID = $(addsuffix .o,$(basename $(SOURCES)) )
 #  -------------------------------------------------------------------------
 #
 
-.f90.o:; $(F90) -c $(F90FLAGS) $<
-
 dir_list:
 	@echo 'SPH_GRID_SRCDIR = $(SPH_GRID_SRCDIR)'   >> $(MAKENAME)
 
