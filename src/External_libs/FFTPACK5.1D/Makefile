@@ -7,7 +7,7 @@ FFTPACK_DIR = $$(EXT_DIR)/FFTPACK5.1D
 LIB_FFTPACK =       -lfftpack.5d
 LIB_FFTPACK_FILE = libfftpack.5d.a
 
-FFTPACKFLAG = $(subst '-warn all','',$(F90OPTFLAGS),$(F90CPPFLAGS)
+FFTPACKFLAG = $(subst '-warn all','',$(F90OPTFLAGS))
 
 SOURCES = $(shell ls *.f90)
 
@@ -19,7 +19,7 @@ fftpack5.1d.o
 #
 
 dir_list:
-	@echo FFTPACKFLAG =  '$$(subst ''-warn all'','' '',$$(F90OPTFLAGS),$$(F90CPPFLAGS))' >> $(MAKENAME)
+	@echo FFTPACKFLAG =  '$$(subst ''-warn all'','' '',$$(F90OPTFLAGS))' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo 'FFTPACK_DIR =  $(FFTPACK_DIR)'   >> $(MAKENAME)
 
