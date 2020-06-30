@@ -1,6 +1,6 @@
 !
 begin isosurface_ctl
-  isosurface_file_prefix    'isosurfaces/temp0_7'
+  isosurface_file_prefix    'Isosurfaces/temp0_7'
 !
   begin isosurf_define
     isosurf_field        temperature
