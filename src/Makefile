@@ -149,8 +149,6 @@ makemake:
 	@echo 'F90OPTFLAGS = $(F90OPTFLAGS)  $$(F_INCLUDE)' >> $(MAKENAME)
 	@echo 'F90CPPFLAGS = $(FORTRAN_C_CONNECT)'          >> $(MAKENAME)
 	@echo 'OPTFLAGS =    $(OPTFLAGS) ' >> $(MAKENAME)
-	@echo '' >> $(MAKENAME)
-	@echo 'F90FLAGS = $$(F90OPTFLAGS) $$(F90CPPFLAGS)'  >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo '# Libralies and includes settting' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
