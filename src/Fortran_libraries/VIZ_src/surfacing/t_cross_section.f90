@@ -87,6 +87,8 @@
 !
       subroutine SECTIONING_initialize(fem, nod_fld, psf_ctls, psf)
 !
+      use m_work_time
+      use m_elapsed_labels_4_VIZ
       use m_geometry_constants
 !
       use calypso_mpi
@@ -131,6 +133,7 @@
         call alloc_ref_field_4_psf(fem%mesh%node, psf%psf_list(i_psf))
       end do
 !
+      if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+1)
       if (iflag_debug.eq.1) write(*,*) 'set_const_4_crossections'
       call set_const_4_crossections                                     &
      &   (psf%num_psf, psf%psf_def, fem%mesh%node, psf%psf_list)
@@ -141,10 +144,13 @@
      &    psf%psf_grp_list, psf%psf_mesh)
 !
       call alloc_psf_field_data(psf%num_psf, psf%psf_mesh)
+      if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+1)
 !
       if (iflag_debug.eq.1) write(*,*) 'output_section_mesh'
+      if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+3)
       call output_section_mesh(psf%num_psf, psf%psf_file_IO,            &
      &    psf%psf_mesh, psf%psf_out, psf%psf_out_m)
+      if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+3)
 !
       end subroutine SECTIONING_initialize
 !
@@ -153,6 +159,8 @@
       subroutine SECTIONING_visualize                                   &
      &         (istep_psf, time_d, fem, nod_fld, psf)
 !
+      use m_work_time
+      use m_elapsed_labels_4_VIZ
       use set_fields_for_psf
       use set_ucd_data_to_type
       use output_4_psf
@@ -168,14 +176,18 @@
 !
       if (psf%num_psf.le.0 .or. istep_psf.le.0) return
 !
+      if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+2)
       call set_field_4_psf(psf%num_psf, fem%mesh%edge, nod_fld,         &
      &    psf%psf_def, psf%psf_param, psf%psf_list, psf%psf_grp_list,   &
      &    psf%psf_mesh)
+      if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+2)
 !
       if (iflag_debug.eq.1) write(*,*) 'output_section_data'
+      if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+3)
       call output_section_data                                          &
      &   (psf%num_psf, psf%psf_file_IO, istep_psf, time_d,              &
      &    psf%psf_time_IO, psf%psf_out, psf%psf_out_m)
+      if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+3)
 !
       end subroutine SECTIONING_visualize
 !

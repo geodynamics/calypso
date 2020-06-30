@@ -64,6 +64,8 @@
       elps1%labels(ist_elapsed_MHD+3) = 'Data IO time               '
       elps1%labels(ist_elapsed_MHD+4) = 'Visualizatio time          '
 !
+      elps1%labels(ist_elapsed_MHD+4) = 'Field data IO time         '
+!
       iflag_MHD_time = .TRUE.
 !
       end subroutine elapsed_label_4_MHD

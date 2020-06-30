@@ -30,11 +30,22 @@
       integer(kind = kint), save :: ist_elapsed_LIC =   0
       integer(kind = kint), save :: ied_elapsed_LIC =   0
 !
+      logical, save :: iflag_PSF_time = .FALSE.
+      integer(kind = kint), save :: ist_elapsed_PSF =   0
+      integer(kind = kint), save :: ied_elapsed_PSF =   0
+!
+      logical, save :: iflag_ISO_time = .FALSE.
+      integer(kind = kint), save :: ist_elapsed_ISO =   0
+      integer(kind = kint), save :: ied_elapsed_ISO =   0
+!
       private :: elpsed_label_4_VIZ_outline
       private :: elpsed_label_4_PVR, elpsed_label_4_LIC
       private :: reset_elapse_after_init_VIZ_top
+!
       private :: reset_elapse_after_init_PVR
       private :: reset_elapse_after_init_LIC
+      private :: reset_elapse_after_init_PSF
+      private :: reset_elapse_after_init_ISO
 !
 ! ----------------------------------------------------------------------
 !
@@ -49,6 +60,9 @@
       call elpsed_label_4_PVR
       call elpsed_label_4_LIC
 !
+      call elpsed_label_4_PSF
+      call elpsed_label_4_ISO
+!
       end subroutine elpsed_label_4_VIZ
 !
 ! ----------------------------------------------------------------------
@@ -59,6 +73,9 @@
       call reset_elapse_after_init_VIZ_top
 !      call reset_elapse_after_init_PVR
       call reset_elapse_after_init_LIC
+!
+      call reset_elapse_after_init_PSF
+      call reset_elapse_after_init_ISO
 !
       end subroutine reset_elapse_after_init_VIZ
 !
@@ -158,6 +175,48 @@
       end subroutine elpsed_label_4_LIC
 !
 !-----------------------------------------------------------------------
+!
+      subroutine elpsed_label_4_PSF
+!
+      integer(kind = kint), parameter :: num_append = 3
+!
+!
+      call append_elapsed_times                                         &
+     &   (num_append, ist_elapsed_PSF, ied_elapsed_PSF)
+!
+      elps1%labels(ist_elapsed_PSF+1)                                   &
+     &                    = 'Find Section patch   '
+      elps1%labels(ist_elapsed_PSF+2)                                   &
+     &                    = 'Interpolate data on Section   '
+      elps1%labels(ist_elapsed_PSF+3)                                   &
+     &                    = 'Output Sectioning data   '
+!
+      iflag_PSF_time = .TRUE.
+!
+      end subroutine elpsed_label_4_PSF
+!
+!-----------------------------------------------------------------------
+!
+      subroutine elpsed_label_4_ISO
+!
+      integer(kind = kint), parameter :: num_append = 3
+!
+!
+      call append_elapsed_times                                         &
+     &   (num_append, ist_elapsed_ISO, ied_elapsed_ISO)
+!
+      elps1%labels(ist_elapsed_ISO+1)                                   &
+     &                    = 'Find Isosurface patch   '
+      elps1%labels(ist_elapsed_ISO+2)                                   &
+     &                    = 'Interpolate data on isosurface   '
+      elps1%labels(ist_elapsed_ISO+3)                                   &
+     &                    = 'Output Isosurface data   '
+!
+      iflag_ISO_time = .TRUE.
+!
+      end subroutine elpsed_label_4_ISO
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine reset_elapse_after_init_VIZ_top
@@ -187,6 +246,26 @@
       call reset_elapsed_times(ist_elapsed_LIC+1, ied_elapsed_LIC)
 !
       end subroutine reset_elapse_after_init_LIC
+!
+!-----------------------------------------------------------------------
+!
+      subroutine reset_elapse_after_init_PSF
+!
+!
+      if(iflag_PSF_time .eqv. .FALSE.) return
+      call reset_elapsed_times(ist_elapsed_PSF+2, ist_elapsed_PSF+2)
+!
+      end subroutine reset_elapse_after_init_PSF
+!
+!-----------------------------------------------------------------------
+!
+      subroutine reset_elapse_after_init_ISO
+!
+!
+      if(iflag_ISO_time .eqv. .FALSE.) return
+      call reset_elapsed_times(ist_elapsed_ISO+2, ist_elapsed_ISO+2)
+!
+      end subroutine reset_elapse_after_init_ISO
 !
 !-----------------------------------------------------------------------
 !
