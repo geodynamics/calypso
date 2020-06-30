@@ -283,5 +283,6 @@ begin MHD_control
 !
   begin sph_monitor_ctl
     volume_pwr_spectr_prefix     'sph_pwr_volume'
+    volume_average_prefix        'sph_ave_volume'
   end sph_monitor_ctl
 end MHD_control
