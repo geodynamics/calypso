@@ -85,7 +85,7 @@
       type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
       type(phys_data), intent(inout) :: rj_fld
 !
-!      integer(kind = kint) :: j, k, inod
+!      integer(kind = kint) :: i, j, k, inod
 !
 !*-----  time evolution   -------------
 !*

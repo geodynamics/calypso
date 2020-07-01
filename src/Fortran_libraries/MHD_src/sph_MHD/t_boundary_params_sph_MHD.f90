@@ -80,12 +80,8 @@
 !
 !>        Fixed data at center
         real(kind= kreal) :: CTR_fld
-!>        Fixed composition spectrum for ICB
-        real(kind= kreal), allocatable :: ICB_fld(:)
 !>        Fixed composition flux spectrum for ICB
         real(kind= kreal), allocatable :: ICB_flux(:)
-!>        Fixed composition spectrum for CMB
-        real(kind= kreal), allocatable :: CMB_fld(:)
 !>        Fixed composition flux spectrum for CMB
         real(kind= kreal), allocatable :: CMB_flux(:)
 !
