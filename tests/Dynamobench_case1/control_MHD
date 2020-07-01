@@ -282,4 +282,9 @@ begin MHD_control
       Legendre_trans_loop_ctl   'SYMMETRIC_MATMUL'
     end time_loop_ctl
   end control
+!
+  begin sph_monitor_ctl
+    volume_average_prefix        'sph_ave_volume'
+    volume_pwr_spectr_prefix     'sph_pwr_volume'
+  end sph_monitor_ctl
 end MHD_control
