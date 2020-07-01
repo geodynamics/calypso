@@ -18,9 +18,9 @@ pipeline {
         sh '''
           ./configure \
             --enable-fftw3 \
-            --with-hdf5 \
-            --with-blas \
-            --with-zlib
+            --without-hdf5 \
+            --without-blas \
+            --without-zlib
         '''
         sh '''
         # Fix OpenMPI issue in Docker : https://github.com/open-mpi/ompi/issues/4948
