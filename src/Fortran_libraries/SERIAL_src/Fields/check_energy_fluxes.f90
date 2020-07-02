@@ -47,54 +47,53 @@
 !
 !
       if( (field_name .eq. inertia_work%name) ) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(inertia%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(inertia, field_ctl)
       else if( (field_name .eq. work_against_Lorentz%name)              &
      &    .or. (field_name .eq. Lorentz_work%name)) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
-        call add_phys_name_ctl(current_density%name, field_ctl)
-        call add_phys_name_ctl(Lorentz_force%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
+        call add_phys_name_ctl(current_density, field_ctl)
+        call add_phys_name_ctl(Lorentz_force, field_ctl)
       else if( (field_name .eq. mag_tension_work%name)) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(magnetic_tension%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(magnetic_tension, field_ctl)
 !
       else if( (field_name .eq. buoyancy_flux%name)) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(temperature%name, field_ctl)
-        call add_phys_name_ctl(buoyancy%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(temperature, field_ctl)
+        call add_phys_name_ctl(buoyancy, field_ctl)
       else if( (field_name .eq. composite_buoyancy_flux%name)) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(composition%name, field_ctl)
-        call add_phys_name_ctl(composite_buoyancy%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(composition, field_ctl)
+        call add_phys_name_ctl(composite_buoyancy, field_ctl)
 !
       else if( (field_name .eq. magnetic_ene_generation%name)) then
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
-        call add_phys_name_ctl(magnetic_induction%name, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
+        call add_phys_name_ctl(magnetic_induction, field_ctl)
       else if( (field_name .eq. magnetic_stretch_flux%name)) then
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
-        call add_phys_name_ctl(magnetic_stretch%name, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
+        call add_phys_name_ctl(magnetic_stretch, field_ctl)
 !
       else if( (field_name .eq. temp_generation%name)) then
-        call add_phys_name_ctl(temperature%name, field_ctl)
-        call add_phys_name_ctl(heat_advect%name, field_ctl)
+        call add_phys_name_ctl(temperature, field_ctl)
+        call add_phys_name_ctl(heat_advect, field_ctl)
       else if( (field_name .eq. pert_temp_generation%name)) then
-        call add_phys_name_ctl(perturbation_temp%name, field_ctl)
-        call add_phys_name_ctl(pert_heat_advect%name, field_ctl)
+        call add_phys_name_ctl(perturbation_temp, field_ctl)
+        call add_phys_name_ctl(pert_heat_advect, field_ctl)
       else if( (field_name .eq. comp_generation%name)) then
-        call add_phys_name_ctl(composition%name, field_ctl)
-        call add_phys_name_ctl(composition_advect%name, field_ctl)
+        call add_phys_name_ctl(composition, field_ctl)
+        call add_phys_name_ctl(composition_advect, field_ctl)
       else if( (field_name .eq. pert_comp_generation%name)) then
-        call add_phys_name_ctl(perturbation_composition%name,           &
-     &                         field_ctl)
-        call add_phys_name_ctl(pert_comp_advect%name, field_ctl)
+        call add_phys_name_ctl(perturbation_composition, field_ctl)
+        call add_phys_name_ctl(pert_comp_advect, field_ctl)
 !
       else if( (field_name .eq. viscous_ene_diffusion%name)) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(viscous_diffusion%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(viscous_diffusion, field_ctl)
       else if( (field_name .eq. magnetic_ene_diffusion%name)) then
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
-        call add_phys_name_ctl(magnetic_diffusion%name, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
+        call add_phys_name_ctl(magnetic_diffusion, field_ctl)
       end if
 !
       end subroutine add_energy_fluxes_ctl

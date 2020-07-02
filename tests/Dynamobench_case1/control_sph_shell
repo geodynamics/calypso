@@ -11,7 +11,7 @@ begin MHD_control
     num_subdomain_ctl            4
 !
     sph_file_prefix             'sph_lm31r48c_4/in'
-!    sph_file_fmt_ctl           'merged'
+    sph_file_fmt_ctl           'merged'
   end data_files_def
 !
 !!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!

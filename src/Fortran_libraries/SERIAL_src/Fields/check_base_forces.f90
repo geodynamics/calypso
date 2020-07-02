@@ -42,72 +42,71 @@
 !
 !
       if(check_field_list_ctl(magnetic_induction%name, field_ctl)) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
-        call add_phys_name_ctl(vecp_induction%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
+        call add_phys_name_ctl(vecp_induction, field_ctl)
       end if
 !
       if(check_field_list_ctl(pressure_gradient%name, field_ctl))       &
-        call add_phys_name_ctl(pressure%name, field_ctl)
+        call add_phys_name_ctl(pressure, field_ctl)
       if(check_field_list_ctl(inertia%name, field_ctl)) then
-        call add_phys_name_ctl(vorticity%name, field_ctl)
-        call add_phys_name_ctl(pressure%name, field_ctl)
+        call add_phys_name_ctl(vorticity, field_ctl)
+        call add_phys_name_ctl(pressure, field_ctl)
       end if
 !
       if(check_field_list_ctl(Lorentz_force%name, field_ctl)) then
-        call add_phys_name_ctl(current_density%name, field_ctl)
-        call add_phys_name_ctl(pressure%name, field_ctl)
+        call add_phys_name_ctl(current_density, field_ctl)
+        call add_phys_name_ctl(pressure, field_ctl)
       end if
 !
       if(check_field_list_ctl(buoyancy%name, field_ctl))                &
-        call add_phys_name_ctl(temperature%name, field_ctl)
+        call add_phys_name_ctl(temperature, field_ctl)
       if(check_field_list_ctl(composite_buoyancy%name, field_ctl))      &
-        call add_phys_name_ctl(composition%name, field_ctl)
+        call add_phys_name_ctl(composition, field_ctl)
 !
       if(      check_field_list_ctl(Coriolis_force%name, field_ctl)     &
      &    .or. check_field_list_ctl(momentum_flux%name, field_ctl))     &
-        call add_phys_name_ctl(velocity%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
       if(      check_field_list_ctl(magnetic_tension%name, field_ctl)   &
       &    .or. check_field_list_ctl(maxwell_tensor%name, field_ctl))   &
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
 !
       if(      check_field_list_ctl(vecp_induction%name, field_ctl)     &
      &    .or. check_field_list_ctl(induction_tensor%name, field_ctl)   &
      &      ) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
       end if
       if(check_field_list_ctl(magnetic_stretch%name, field_ctl)) then
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
-        call add_phys_name_ctl(grad_v_1%name, field_ctl)
-        call add_phys_name_ctl(grad_v_2%name, field_ctl)
-        call add_phys_name_ctl(grad_v_3%name, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
+        call add_phys_name_ctl(grad_v_1, field_ctl)
+        call add_phys_name_ctl(grad_v_2, field_ctl)
+        call add_phys_name_ctl(grad_v_3, field_ctl)
       end if
 !
       if(      check_field_list_ctl(heat_advect%name, field_ctl)        &
      &    .or. check_field_list_ctl(heat_flux%name, field_ctl)          &
      &      ) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(temperature%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(temperature, field_ctl)
       end if
       if(      check_field_list_ctl(pert_heat_advect%name, field_ctl)   &
      &    .or. check_field_list_ctl(pert_heat_flux%name, field_ctl)     &
      &      ) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(perturbation_temp%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(perturbation_temp, field_ctl)
       end if
       if(      check_field_list_ctl(composition_advect%name, field_ctl) &
      &    .or. check_field_list_ctl(composite_flux%name, field_ctl)     &
      &      ) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(composition%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(composition, field_ctl)
       end if
       if(      check_field_list_ctl(pert_comp_advect%name, field_ctl)   &
      &    .or. check_field_list_ctl(pert_comp_flux%name, field_ctl)     &
      &      ) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(perturbation_composition%name,           &
-     &                         field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(perturbation_composition, field_ctl)
       end if
 !
       end subroutine add_field_ctl_4_forces
@@ -123,16 +122,16 @@
 !
 !
       if    (check_field_list_ctl(rot_inertia%name, field_ctl))         &
-     &   call add_phys_name_ctl(inertia%name, field_ctl)
+     &   call add_phys_name_ctl(inertia, field_ctl)
       if    (check_field_list_ctl(rot_Coriolis_force%name, field_ctl))  &
-     &   call add_phys_name_ctl(Coriolis_force%name, field_ctl)
+     &   call add_phys_name_ctl(Coriolis_force, field_ctl)
       if(check_field_list_ctl(rot_Lorentz_force%name, field_ctl))       &
-     &   call add_phys_name_ctl(Lorentz_force%name, field_ctl)
+     &   call add_phys_name_ctl(Lorentz_force, field_ctl)
 !
       if(check_field_list_ctl(rot_buoyancy%name, field_ctl))            &
-     &   call add_phys_name_ctl(buoyancy%name, field_ctl)
+     &   call add_phys_name_ctl(buoyancy, field_ctl)
       if(check_field_list_ctl(rot_composite_buoyancy%name, field_ctl))  &
-     &   call add_phys_name_ctl(composite_buoyancy%name, field_ctl)
+     &   call add_phys_name_ctl(composite_buoyancy, field_ctl)
 !
       end subroutine add_field_ctl_4_rot_forces
 !
@@ -148,33 +147,33 @@
 !
 !
       if(check_field_list_ctl(div_inertia%name, field_ctl))             &
-     &   call add_phys_name_ctl(inertia%name, field_ctl)
+     &   call add_phys_name_ctl(inertia, field_ctl)
       if(check_field_list_ctl(div_Coriolis_force%name, field_ctl))      &
-     &   call add_phys_name_ctl(Coriolis_force%name, field_ctl)
+     &   call add_phys_name_ctl(Coriolis_force, field_ctl)
       if(check_field_list_ctl(div_Lorentz_force%name, field_ctl))       &
-     &   call add_phys_name_ctl(Lorentz_force%name, field_ctl)
+     &   call add_phys_name_ctl(Lorentz_force, field_ctl)
 !
       if(check_field_list_ctl(div_buoyancy%name, field_ctl))            &
-        call add_phys_name_ctl(buoyancy%name, field_ctl)
+        call add_phys_name_ctl(buoyancy, field_ctl)
       if(check_field_list_ctl(div_composite_buoyancy%name, field_ctl))  &
-        call add_phys_name_ctl(composite_buoyancy%name, field_ctl)
+        call add_phys_name_ctl(composite_buoyancy, field_ctl)
 !
       if(check_field_list_ctl(div_momentum_flux%name, field_ctl))       &
-        call add_phys_name_ctl(momentum_flux%name, field_ctl)
+        call add_phys_name_ctl(momentum_flux, field_ctl)
       if(check_field_list_ctl(div_maxwell_tensor%name, field_ctl))      &
-        call add_phys_name_ctl(maxwell_tensor%name, field_ctl)
+        call add_phys_name_ctl(maxwell_tensor, field_ctl)
       if(check_field_list_ctl(div_induction_tensor%name, field_ctl))    &
-        call add_phys_name_ctl(induction_tensor%name, field_ctl)
+        call add_phys_name_ctl(induction_tensor, field_ctl)
 !
       if(check_field_list_ctl(div_heat_flux%name, field_ctl))           &
-        call add_phys_name_ctl(div_pert_heat_flux%name, field_ctl)
+        call add_phys_name_ctl(div_pert_heat_flux, field_ctl)
       if(check_field_list_ctl(pert_heat_flux%name, field_ctl))          &
-        call add_phys_name_ctl(div_composition_flux%name, field_ctl)
+        call add_phys_name_ctl(div_composition_flux, field_ctl)
       if(check_field_list_ctl(composite_flux%name, field_ctl))          &
-        call add_phys_name_ctl(induction_tensor%name, field_ctl)
+        call add_phys_name_ctl(induction_tensor, field_ctl)
       if(check_field_list_ctl(div_pert_composition_flux%name,           &
      &                        field_ctl))                               &
-        call add_phys_name_ctl(pert_comp_flux%name, field_ctl)
+        call add_phys_name_ctl(pert_comp_flux, field_ctl)
 !
       end subroutine add_field_ctl_4_div_forces
 !
@@ -191,58 +190,58 @@
 !
       if(check_field_list_ctl(rest_of_geostrophic%name,                 &
      &                        field_ctl)) then
-        call add_phys_name_ctl(Coriolis_force%name, field_ctl)
-        call add_phys_name_ctl(pressure_gradient%name, field_ctl)
+        call add_phys_name_ctl(Coriolis_force, field_ctl)
+        call add_phys_name_ctl(pressure_gradient, field_ctl)
       end if
 !
       if(check_field_list_ctl(poynting_flux%name, field_ctl)) then
-        call add_phys_name_ctl(electric_field%name, field_ctl)
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
+        call add_phys_name_ctl(electric_field, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
       end if
       if(check_field_list_ctl(electric_field%name, field_ctl)) then
-        call add_phys_name_ctl(vecp_induction%name, field_ctl)
-        call add_phys_name_ctl(current_density%name, field_ctl)
+        call add_phys_name_ctl(vecp_induction, field_ctl)
+        call add_phys_name_ctl(current_density, field_ctl)
       end if
 !
       if(check_field_list_ctl(truncated_magnetic_field%name,            &
      &                        field_ctl))                               &
-     &   call add_phys_name_ctl(magnetic_field%name, field_ctl)
+     &   call add_phys_name_ctl(magnetic_field, field_ctl)
 !
       if(check_field_list_ctl(kinetic_helicity%name, field_ctl)) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(vorticity%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(vorticity, field_ctl)
       end if
       if(check_field_list_ctl(magnetic_helicity%name, field_ctl)) then
-        call add_phys_name_ctl(vector_potential%name, field_ctl)
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
+        call add_phys_name_ctl(vector_potential, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
       end if
       if(check_field_list_ctl(current_helicity%name, field_ctl)) then
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
-        call add_phys_name_ctl(current_density%name, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
+        call add_phys_name_ctl(current_density, field_ctl)
       end if
       if(check_field_list_ctl(cross_helicity%name, field_ctl)) then
-        call add_phys_name_ctl(velocity%name, field_ctl)
-        call add_phys_name_ctl(magnetic_field%name, field_ctl)
+        call add_phys_name_ctl(velocity, field_ctl)
+        call add_phys_name_ctl(magnetic_field, field_ctl)
       end if
 !
       if(      check_field_list_ctl(square_velocity%name, field_ctl)    &
      &    .or. check_field_list_ctl(velocity_scale%name, field_ctl))    &
-     &   call add_phys_name_ctl(velocity%name, field_ctl)
+     &   call add_phys_name_ctl(velocity, field_ctl)
       if(check_field_list_ctl(square_vorticity%name, field_ctl))        &
-     &   call add_phys_name_ctl(vorticity%name, field_ctl)
+     &   call add_phys_name_ctl(vorticity, field_ctl)
       if(      check_field_list_ctl(square_magne%name, field_ctl)       &
      &    .or. check_field_list_ctl(magnetic_scale%name, field_ctl))    &
-     &   call add_phys_name_ctl(magnetic_field%name, field_ctl)
+     &   call add_phys_name_ctl(magnetic_field, field_ctl)
       if(check_field_list_ctl(square_vector_potential%name, field_ctl)) &
-     &   call add_phys_name_ctl(vector_potential%name, field_ctl)
+     &   call add_phys_name_ctl(vector_potential, field_ctl)
       if(check_field_list_ctl(square_current%name, field_ctl))          &
-     &   call add_phys_name_ctl(current_density%name, field_ctl)
+     &   call add_phys_name_ctl(current_density, field_ctl)
       if(      check_field_list_ctl(square_temperature%name, field_ctl) &
      &    .or. check_field_list_ctl(temperature_scale%name, field_ctl)) &
-     &   call add_phys_name_ctl(temperature%name, field_ctl)
+     &   call add_phys_name_ctl(temperature, field_ctl)
       if(      check_field_list_ctl(square_composition%name, field_ctl) &
      &    .or. check_field_list_ctl(composition_scale%name, field_ctl)) &
-     &   call add_phys_name_ctl(composition%name, field_ctl)
+     &   call add_phys_name_ctl(composition, field_ctl)
 !
       end subroutine add_field_ctl_4_field_products
 !
@@ -259,21 +258,21 @@
 !
 !
       if(check_field_list_ctl(div_viscousity%name, field_ctl))          &
-     &   call add_phys_name_ctl(viscous_diffusion%name, field_ctl)
+     &   call add_phys_name_ctl(viscous_diffusion, field_ctl)
 !
       if(check_field_list_ctl(viscous_diffusion%name, field_ctl))       &
-     &   call add_phys_name_ctl(velocity%name, field_ctl)
+     &   call add_phys_name_ctl(velocity, field_ctl)
       if(check_field_list_ctl(vorticity_diffusion%name, field_ctl))     &
-     &   call add_phys_name_ctl(vorticity%name, field_ctl)
+     &   call add_phys_name_ctl(vorticity, field_ctl)
       if(check_field_list_ctl(magnetic_diffusion%name, field_ctl))      &
-     &   call add_phys_name_ctl(magnetic_field%name, field_ctl)
+     &   call add_phys_name_ctl(magnetic_field, field_ctl)
       if(check_field_list_ctl(vector_potential_diffusion%name,          &
      &                        field_ctl))                               &
-     &   call add_phys_name_ctl(vector_potential%name, field_ctl)
+     &   call add_phys_name_ctl(vector_potential, field_ctl)
       if(check_field_list_ctl(thermal_diffusion%name, field_ctl))       &
-     &   call add_phys_name_ctl(temperature%name, field_ctl)
+     &   call add_phys_name_ctl(temperature, field_ctl)
       if(check_field_list_ctl(composition_diffusion%name, field_ctl))  &
-     &   call add_phys_name_ctl(composition%name, field_ctl)
+     &   call add_phys_name_ctl(composition, field_ctl)
 !
       end subroutine add_field_ctl_4_diffusions
 !
