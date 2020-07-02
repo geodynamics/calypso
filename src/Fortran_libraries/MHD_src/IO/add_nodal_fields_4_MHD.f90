@@ -45,6 +45,7 @@
 !
       subroutine add_dependent_field(MHD_prop, field_ctl)
 !
+      use check_energy_fluxes
       use check_base_forces
       use check_base_field
       use check_workarea_4_explicit
@@ -60,6 +61,9 @@
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &    'add_field_ctl_4_evo_magne end'
 !
+      call add_field_ctl_4_ene_flux(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_field_ctl_4_ene_flux end'
       call add_field_ctl_4_field_products(field_ctl)
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &    'add_field_ctl_4_field_products end'
