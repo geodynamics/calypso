@@ -245,12 +245,12 @@
             sph_bc_B%iflag_icb =  iflag_radial_magne
         else if(magne_nod%ibc_type(i) .eq. iflag_bc_file_s) then
           call set_fixed_vector_bc_by_file                              &
-     &       (magnetic_field%name, sph_rj, bc_IO,                       &
+     &       (magnetic_field, sph_rj, bc_IO,                            &
      &        sph_bc_B%icb_grp_name, sph_bc_B%iflag_icb,                &
      &        bcs_B%ICB_Vspec)
         else if(magne_nod%ibc_type(i) .eq. iflag_bc_evo_field) then
           call set_evolved_vector_bc_by_file                            &
-     &       (magnetic_field%name, sph_rj, bc_IO,                       &
+     &       (magnetic_field, sph_rj, bc_IO,                            &
      &        sph_bc_B%icb_grp_name, sph_bc_B%iflag_icb,                &
      &        bcs_B%ICB_Vevo)
         end if
@@ -267,12 +267,12 @@
           sph_bc_B%iflag_cmb =  iflag_radial_magne
         else if(magne_nod%ibc_type(i) .eq. iflag_bc_file_s) then
           call set_fixed_vector_bc_by_file                              &
-     &       (magnetic_field%name, sph_rj, bc_IO,                       &
+     &       (magnetic_field, sph_rj, bc_IO,                            &
      &        sph_bc_B%cmb_grp_name, sph_bc_B%iflag_cmb,                &
      &        bcs_B%CMB_Vspec)
         else if(magne_nod%ibc_type(i) .eq. iflag_bc_evo_field) then
           call set_evolved_vector_bc_by_file                            &
-     &       (magnetic_field%name, sph_rj, bc_IO,                       &
+     &       (magnetic_field, sph_rj, bc_IO,                            &
      &        sph_bc_B%cmb_grp_name, sph_bc_B%iflag_cmb,                &
      &        bcs_B%CMB_Vevo)
         end if

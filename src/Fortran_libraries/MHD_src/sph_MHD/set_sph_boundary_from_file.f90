@@ -8,7 +8,8 @@
 !!
 !!@verbatim
 !!      integer(kind = kint) function num_comp_bc_data(label)
-!!      logical function find_bc_label(label, field_name, postfix)
+!!      logical function find_bc_label(field, label, postfix)
+!!        type(field_def), intent(in) :: field
 !!@endverbatim
 !
       module set_sph_boundary_from_file
@@ -16,6 +17,7 @@
       use m_precision
       use m_phys_labels
       use t_spheric_rj_data
+      use t_field_labels
 !
       implicit  none
 !
@@ -77,11 +79,11 @@
       character(len = kchara), intent(in) :: label, postfix
 !
       find_scalar_bc_label                                              &
-     &     =    find_bc_label(label, temperature%name, postfix)         &
-     &     .or. find_bc_label(label, composition%name, postfix)         &
-     &     .or. find_bc_label(label, entropy%name, postfix)             &
-     &     .or. find_bc_label(label, heat_flux%name, postfix)           &
-     &     .or. find_bc_label(label, composite_flux%name, postfix)
+     &     =    find_bc_label(temperature,    label, postfix)           &
+     &     .or. find_bc_label(composition,    label, postfix)           &
+     &     .or. find_bc_label(entropy,        label, postfix)           &
+     &     .or. find_bc_label(heat_flux,      label, postfix)           &
+     &     .or. find_bc_label(composite_flux, label, postfix)
 !
       end function find_scalar_bc_label
 !
@@ -92,23 +94,24 @@
       character(len = kchara), intent(in) :: label, postfix
 !
       find_vector_bc_label                                              &
-     &     =    find_bc_label(label, velocity%name, postfix)            &
-     &     .or. find_bc_label(label, vorticity%name, postfix)           &
-     &     .or. find_bc_label(label, magnetic_field%name, postfix)
+     &     =    find_bc_label(velocity,       label, postfix)           &
+     &     .or. find_bc_label(vorticity,      label, postfix)           &
+     &     .or. find_bc_label(magnetic_field, label, postfix)
 !
       end function find_vector_bc_label
 !
 ! -----------------------------------------------------------------------
 !
-      logical function find_bc_label(label, field_name, postfix)
+      logical function find_bc_label(field, label, postfix)
 !
       use skip_comment_f
 !
-      character(len = kchara), intent(in) :: label, field_name, postfix
+      type(field_def), intent(in) :: field
+      character(len = kchara), intent(in) :: label, postfix
 !
       character(len = kchara) :: tmpchara
 !
-      write(tmpchara,'(a,a)') trim(field_name), trim(postfix)
+      write(tmpchara,'(a,a)') trim(field%name), trim(postfix)
       find_bc_label = cmp_no_case(label, tmpchara)
 !
       end function find_bc_label
