@@ -110,75 +110,59 @@ Control file ({\tt control\_sph\_shell}) consists the following items. Detailed 
 \verb|spherical_shell_ctl|
 \label{href_i:spherical_shell_ctl}
 \\
+\\
 %
-\verb|MHD_control| (Header of the control file)
+Block {\tt MHD\_control} (Top block of the control file)
 	\begin{itemize}
-	\item \verb|data_files_def|
-		\label{href_i:data_files_def2}
-		\hyperref[href_t:data_files_def]{(Detail)}
-		\begin{itemize}
-		\item \verb|num_subdomain_ctl        [Num_PE]|
-			\hyperref[href_t:num_subdomain_ctl]{(Detail)}
-		\item \verb|sph_file_prefix          [sph_prefix]|
-			\hyperref[href_t:sph_file_prefix]{(Detail)}
-		\item \verb|sph_file_fmt_ctl         [sph_format]|
-			\hyperref[href_t:sph_file_fmt_ctl]{(Detail)}
+	\item Block \hyperref[href_t:data_files_def]{\tt data\_files\_def}
+%
+		\begin{itemize} \label{href_i:data_files_def2}
+		\item \hyperref[href_t:num_subdomain_ctl]{\tt num\_subdomain\_ctl    [Num\_PE]}
+		\item \hyperref[href_t:sph_file_prefix]{\tt sph\_file\_prefix    [sph\_prefix]}
+		\item \hyperref[href_t:sph_file_fmt_ctl]{\tt sph\_file\_fmt\_ctl    [sph\_format]}
 		\end{itemize}
 %
-	\item \verb|file spherical_shell_ctl	[resolution_file_name]|
-		\hyperref[href_t:file_spherical_shell_ctl]{(Detail)}
-	\item \verb|spherical_shell_ctl|
-	\begin{itemize}
-		\item \verb|num_domain_ctl|
-			\label{href_i:num_domain_ctl}
-			\hyperref[href_t:num_domain_ctl]{(Detail)}
-			\begin{itemize}
-			\item \verb|num_radial_domain_ctl [Ndomain]|
-	    	    \hyperref[href_t:num_radial_domain_ctl]{(Detail)}
-			\item \verb|num_horizontal_domain_ctl [Ndomain]|
-				\hyperref[href_t:num_horizontal_domain_ctl]{(Detail)}
-			\item \verb|array  num_domain_sph_grid  [Direction]  [Ndomain]|
-				\hyperref[href_t:num_domain_sph_grid]{(Detail)}
-			\item \verb|array  num_domain_legendre  [Direction]  [Ndomain]|
-				\hyperref[href_t:num_domain_legendre]{(Detail)}
-			\item \verb|array  num_domain_spectr    [Direction]  [Ndomain]|
-				\hyperref[href_t:num_domain_spectr]{(Detail)}
+	\item File \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl    [resolution\_file\_name]}
+	\item or Block \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
+%
+		\begin{itemize}
+		\item Block \hyperref[href_t:num_domain_ctl]{\tt num\_domain\_ctl}
+			\begin{itemize} \label{href_i:num_domain_ctl}
+			\item \hyperref[href_t:num_radial_domain_ctl]{\tt num\_radial\_domain\_ctl [Ndomain]}
+			\item \hyperref[href_t:num_horizontal_domain_ctl]{\tt num\_horizontal\_domain\_ctl [Ndomain]}
+%
+            \item {\color{magenta} Array \hyperref[href_t:num_domain_sph_grid]
+				{\tt num\_domain\_sph\_grid    [Direction]    [Ndomain]} \\
+				(Depricated)}
+			\item {\color{magenta} Array \hyperref[href_t:num_domain_legendre]
+				{\tt num\_domain\_legendre    [Direction]    [Ndomain]} \\
+				(Depricated)}
+			\item {\color{magenta} Array \hyperref[href_t:num_domain_spectr]
+				{\tt num\_domain\_spectr      [Direction]    [Ndomain]} \\
+				(Depricated)}
 			\end{itemize}
 %
-		\item \verb|num_grid_sph|
-			\label{href_i:num_grid_sph}
-			\hyperref[href_t:num_grid_sph]{(Detail)}
-			\begin{itemize}
-	        \item \verb|truncation_level_ctl    [Lmax]|
-	            \hyperref[href_t:truncation_level_ctl]{(Detail)}
-			\item \verb|ngrid_meridonal_ctl     [Ntheta]|
-				\hyperref[href_t:ngrid_meridonal_ctl]{(Detail)}
-			\item \verb|ngrid_zonal_ctl         [Nphi]|
-				\hyperref[href_t:ngrid_zonal_ctl]{(Detail)}
+		\item Block \hyperref[href_t:num_grid_sph]{\tt num\_grid\_sph}
+			\begin{itemize} \label{href_i:num_grid_sph}
+	        \item \hyperref[href_t:truncation_level_ctl]{\tt truncation\_level\_ctl	[Lmax]}
+			\item \hyperref[href_t:ngrid_meridonal_ctl]{\tt ngrid\_meridonal\_ctl [Ntheta]}
+			\item \hyperref[href_t:ngrid_zonal_ctl]{\tt ngrid\_zonal\_ctl [Nphi]}
 %
-			\item \verb|radial_grid_type_ctl|   \\
+			\item \hyperref[href_t:radial_grid_type_ctl]{\tt radial\_grid\_type\_ctl} \\
 				\verb|[explicit, Chebyshev, or equi_distance]| \label{href_i:radial_grid_type_ctl}
-				\hyperref[href_t:radial_grid_type_ctl]{(Detail)}
 %
-			\item \verb|num_fluid_grid_ctl     [Nr_shell]|
-				\hyperref[href_t:num_fluid_grid_ctl]{(Detail)}
-			\item \verb|fluid_core_size_ctl    [Length]|
-				\hyperref[href_t:fluid_core_size_ctl]{(Detail)}
-			\item \verb|ICB_to_CMB_ratio_ctl   [R_ratio]|
-				\hyperref[href_t:ICB_to_CMB_ratio_ctl]{(Detail)}
-			\item \verb|Min_radius_ctl         [Rmin]|
-				\hyperref[href_t:Min_radius_ctl]{(Detail)}    
+			\item \hyperref[href_t:num_fluid_grid_ctl]{\tt num\_fluid\_grid\_ctl  [Nr\_shell]}
+			\item \hyperref[href_t:fluid_core_size_ctl]{\tt fluid\_core\_size\_ctl  [Length]}
+			\item \hyperref[href_t:ICB_to_CMB_ratio_ctl]{\tt ICB\_to\_CMB\_ratio\_ctl  [R\_ratio]}
+			\item \hyperref[href_t:Min_radius_ctl]{\tt Min\_radius\_ctl  [Rmin]}    
 				\label{href_i:Min_radius_ctl}
-			\item \verb|Max_radius_ctl         [Rmax]|
-				\hyperref[href_t:Max_radius_ctl]{(Detail)}    
+			\item \hyperref[href_t:Max_radius_ctl]{\tt Max\_radius\_ctl  [Rmax]}    
 				\label{href_i:Max_radius_ctl}
 %
 \\
-			\item \verb|array r_layer  [Layer #]   [Radius]|
-				\hyperref[href_t:r_layer]{(Detail)}    
+			\item Array \hyperref[href_t:r_layer]{\tt r\_layer  [Layer \#]  [Radius]}    
 %
-			\item \verb|array boundaries_ctl   [Boundary_name]  [Layer #]|
-				\hyperref[href_t:boundaries_ctl]{(Detail)}    
+			\item Array \hyperref[href_t:boundaries_ctl]{\tt boundaries\_ctl  [Boundary\_name]  [Layer \#]}    
 			\end{itemize}
 		\end{itemize}
 	\end{itemize}
@@ -189,15 +173,10 @@ If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined
 The external file for resoultion and parallelization information \verb|[resolution_file_name]| needs the following contorl blocks:
 %
 	\begin{itemize}
-	\item \verb|spherical_shell_ctl|
-	\begin{itemize}
-		\item \verb|num_domain_ctl|
-			\hyperref[href_i:data_files_def2]{(Detail)} \\
-			\verb|...|
-%
-		\item \verb|num_grid_sph|
-			\hyperref[href_i:num_grid_sph]{(Detail)} \\
-			\verb|...|
+	\item Block \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
+		\begin{itemize}
+		\item Block \hyperref[href_i:num_domain_ctl]{\tt num\_domain\_ctl}
+		\item Block \hyperref[href_i:num_grid_sph]{\tt num\_grid\_sph}
 		\end{itemize}
 	\end{itemize}
 %
@@ -328,9 +307,9 @@ The format of the control file \verb|control_MHD| is described below. The detail
 \label{href_i:MHD_control}
 %
 \begin{itemize}
-\item \verb|data_files_def|
+\item \hyperref[href_t:data_files_def]{\tt data\_files\_def}
 	\label{href_i:data_files_def}
-	\hyperref[href_t:data_files_def]{(Detail)}
+%
 	\begin{itemize}
 	\item \verb|num_subdomain_ctl           [Num_PE]|
 		\hyperref[href_t:num_subdomain_ctl]{(Detail)}

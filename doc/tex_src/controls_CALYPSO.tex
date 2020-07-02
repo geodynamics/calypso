@@ -1,7 +1,7 @@
 \section{Definition of parameters for control files}
 \label{section:def_control}
 
-\subsection{\tt data\_files\_def}
+\subsection{Block {\tt data\_files\_def}}
 \label{href_t:data_files_def}
 File names and number of processes and threads are defined in this block. \\
 \hyperref[href_i:MHD_control]{(Back to {\tt control\_MHD})} \\
@@ -84,6 +84,128 @@ Field data field format for visualize snapshots \verb|[fld_format]| is defined b
 \item{\tt single\_VTK\_gz: }   Compressed merged VTK file (Available if zlib library is linked)
 \item{\tt VTK\_gz: }           Compressed distributed VTK file (Available if zlib library is linked)
 \end{description}
+%
+%
+%
+%
+
+\subsection{\tt spherical\_shell\_ctl}
+\label{href_t:spherical_shell_ctl}
+Configuration of the spherical shell and parallelization are defined by in this block. This block can be stored in an external file.
+%
+\subsubsection{\tt num\_domain\_ctl}
+\label{href_t:num_domain_ctl}
+Parallelization is defined in this block. Domain decomposition is defined for spectrum data, field data, and Legendre transform. \\
+\hyperref[href_i:num_domain_ctl]{(Back to {\tt control\_sph\_shell})}
+
+\paragraph{\tt num\_radial\_domain\_ctl}
+\label{href_t:num_radial_domain_ctl}
+\verb|[Ndomain]| \\
+Number of subdomains in the radial direction for the spherical grid $(r, \theta, \phi)$ and spherical transforms $(r, \theta, m)$ and $(r, l, m)$.
+
+\paragraph{\tt num\_horizontal\_domain\_ctl}
+\label{href_t:num_horizontal_domain_ctl} 
+\verb|[Ndomain]| \\
+Number of subdomains in the horizontal direction. The number will be the number of subdomains for the meridional directios for the spherical grid $(r, \theta, \phi)$ and Fourier transform $(r, \theta, m)$. For Legendre transform $(r, \theta, m)$ and $(r, l, m)$, the number will be the number of subdomains for the h.armonics ordedr $m$.
+
+
+\paragraph{\color{magenta} \tt num\_domain\_sph\_grid    [Direction]    [Ndomain]}
+\label{href_t:num_domain_sph_grid} 
+{\color{magenta} (Depricated)}\\
+ Definition of number of subdomains for physical data in spherical coordinate $(r, \theta, \phi)$. Direction {\tt  radial} or {\tt meridional} is set in \verb|[Direction]|, and number of subdomains \verb|[Ndomain]| are defined in the integer field.
+
+\paragraph{\color{magenta} \tt num\_domain\_legendre    [Direction]    [Ndomain]}
+\label{href_t:num_domain_legendre}
+{\color{magenta} (Depricated)}\\
+ Definition of number of subdomains for Legendre transform between $(r, \theta, m)$ and $(r, l, m)$. Direction {\tt  radial} or {\tt zonal} is set in \verb|[Direction]|, and number of subdomains \verb|[Ndomain]| are defined in the integer field.
+
+\paragraph{\color{magenta} \tt num\_domain\_spectr    [Direction]    [Ndomain]}
+\label{href_t:num_domain_spectr}
+{\color{magenta} (Depricated)}\\
+Definition of number of subdomains for spectrum data in $(r, l, m)$. Direction {\tt  modes} is set in the \verb|[Direction]| field, and number of subdomains \verb|[Ndomain]| are defined in the integer field.
+
+
+\subsubsection{\tt num\_grid\_sph}
+\label{href_t:num_grid_sph}
+Spatial resolution of the spherical shell is defined in this block. \\
+\hyperref[href_i:num_grid_sph]{(Back to {\tt control\_sph\_shell})}
+
+\paragraph{\tt truncation\_level\_ctl}
+\label{href_t:truncation_level_ctl}
+\verb|[Lmax]| \\
+Truncation level $L$ is defined by integer. Spherical harmonics is truncated by triangular $0 \le l \le L$ and $0 <m < l$.
+
+\paragraph{\tt ngrid\_meridonal\_ctl}
+\label{href_t:ngrid_meridonal_ctl}
+\verb|[Ntheta]| \\
+Number of grid in the meridional direction \verb|[Ntheta]| is defined by integer.
+
+\paragraph{\tt ngrid\_zonal\_ctl}
+\label{href_t:ngrid_zonal_ctl}
+\verb|[Nphi]| \\
+Number of grid in the zonal direction \verb|[Nphi]| is defined by integer.
+
+\paragraph{\tt raidal\_grid\_type\_ctl}
+\label{href_t:radial_grid_type_ctl}
+\verb|[explicit, Chebyshev, or equi_distance]| \\
+Type of the radial grid spacing is defined by text. The following types are supported in Calypso.
+%
+\begin{description}
+	\item{\tt explicit}  Equi-distance grid
+	\item{\tt Chebyshev} Chebyshev collocation points
+	\item{\tt equi\_distance} Set explicitly by \verb|r_layer| array
+\end{description}
+%
+
+\paragraph{\tt num\_fluid\_grid\_ctl}
+\label{href_t:num_fluid_grid_ctl}
+\verb|[Nr_shell]| \\
+(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
+Number of layer in the fluid shell \verb|[Nr_shell]| is defined by integer. Number of grids including CMB and ICB will be (\verb|[Nr_shell]| + 1).
+
+\paragraph{\tt fluid\_core\_size\_ctl}
+\label{href_t:fluid_core_size_ctl}
+\verb|[Length]| \\
+(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
+Size of the outer core \verb|[Length]| ($ = r_{o}-r_{i}$) is defined by real.
+
+\paragraph{\tt ICB\_to\_CMB\_ratio\_ctl}
+\label{href_t:ICB_to_CMB_ratio_ctl} 
+\verb|[R_ratio]| \\
+(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
+Ratio of the inner core radius to outer core \verb|[R_ratio]| ($ = r_{i} / r_{o}$) is defined by real.
+
+\paragraph{\tt Min\_radius\_ctl}
+\label{href_t:Min_radius_ctl}
+\verb|[Rmin]| \\
+(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
+Minimum radius of the domains \verb|[Rmin]| is defined by real. If this value is not defined, ICB becomes inner boundary of the domain.
+
+\paragraph{\tt Max\_radius\_ctl }
+\label{href_t:Max_radius_ctl} 
+\verb|[Rmax]| \\
+(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
+Maximum radius of the domains \verb|[Rmax]| is defined by real. If this value is not defined, CMB becomes outer boundary of the domain.
+
+\paragraph{\tt r\_layer}
+\label{href_t:r_layer}
+\verb|[Layer #]   [Radius]| \\
+(This option works with \verb|[radial_grid_type_ctl]| is {\tt explicit}.)
+List of the radial grid points in the simulation domain. Index of the radial point \verb|[Layer #]| is defined by integer, and radius \verb|[Radius]| is defined by real.
+
+\paragraph{\tt array boundaries\_ctl}
+\verb|[Boundary_name]  [Layer #]| \\
+\label{href_t:boundaries_ctl} 
+(This option works with \verb|[radial_grid_type_ctl]| is {\tt explicit}.)
+Boundaries of the simulation domain is defined by \verb|[Layer #]| in \verb|[r_layer]| array. The following boundary name can be defined for \verb|[Boundary_name]|.
+%
+\begin{description}
+	\item{\tt to\_Center} Inner boundary of the domain to fill the center.
+	\item{\tt ICB} ICB
+	\item{\tt CMB} CMB
+\end{description}
+%
+%
 %
 
 \subsection{\tt phys\_values\_ctl}
@@ -995,122 +1117,7 @@ Isosurface value is defined as real value \verb|VALUE|.
 \label{href_t:iso_output_field}
 Field informations for cross section are defined in this array. Name of the output fields is defined by \verb|[FIELD]|, and component of the fields is defined by \verb|[COMPONENT]|. Labels of the field name are listed in Table \ref{table:fields}, and labels of the component are listed in Table \ref{table:components}. \\
 %
-
 %
-%
-%
-%
-\subsection{\tt num\_domain\_ctl}
-\label{href_t:num_domain_ctl}
-Parallelization is defined in this block. Domain decomposition is defined for spectrum data, field data, and Legendre transform. \\
-\hyperref[href_i:num_domain_ctl]{(Back to {\tt control\_sph\_shell})}
-
-\paragraph{\tt num\_radial\_domain\_ctl}
-\label{href_t:num_radial_domain_ctl}
-\verb|[Ndomain]| \\
-Number of subdomains in the radial direction for the spherical grid $(r, \theta, \phi)$ and spherical transforms $(r, \theta, m)$ and $(r, l, m)$.
-
-\paragraph{\tt num\_horizontal\_domain\_ctl}
-\label{href_t:num_horizontal_domain_ctl} 
-\verb|[Ndomain]| \\
-Number of subdomains in the horizontal direction. The number will be the number of subdomains for the meridional directios for the spherical grid $(r, \theta, \phi)$ and Fourier transform $(r, \theta, m)$. For Legendre transform $(r, \theta, m)$ and $(r, l, m)$, the number will be the number of subdomains for the h.armonics ordedr $m$.
-
-
-\paragraph{\tt num\_domain\_sph\_grid}
-\label{href_t:num_domain_sph_grid} 
-\verb|[Direction]| \verb|[Ndomain]| \\
- Definition of number of subdomains for physical data in spherical coordinate $(r, \theta, \phi)$. Direction {\tt  radial} or {\tt meridional} is set in \verb|[Direction]|, and number of subdomains \verb|[Ndomain]| are defined in the integer field.
-
-\paragraph{\tt num\_domain\_legendre}
-\label{href_t:num_domain_legendre}
-\verb|[Direction]| \verb|[Ndomain]| \\
- Definition of number of subdomains for Legendre transform between $(r, \theta, m)$ and $(r, l, m)$. Direction {\tt  radial} or {\tt zonal} is set in \verb|[Direction]|, and number of subdomains \verb|[Ndomain]| are defined in the integer field.
-
-\paragraph{\tt num\_domain\_spectr}
-\label{href_t:num_domain_spectr}
-\verb|[Direction]| \verb|[Ndomain]| \\
-Definition of number of subdomains for spectrum data in $(r, l, m)$. Direction {\tt  modes} is set in the \verb|[Direction]| field, and number of subdomains \verb|[Ndomain]| are defined in the integer field.
-
-
-\subsection{\tt num\_grid\_sph}
-\label{href_t:num_grid_sph}
-Spatial resolution of the spherical shell is defined in this block. \\
-\hyperref[href_i:num_grid_sph]{(Back to {\tt control\_sph\_shell})}
-
-\paragraph{\tt truncation\_level\_ctl}
-\label{href_t:truncation_level_ctl}
-\verb|[Lmax]| \\
-Truncation level $L$ is defined by integer. Spherical harmonics is truncated by triangular $0 \le l \le L$ and $0 <m < l$.
-
-\paragraph{\tt ngrid\_meridonal\_ctl}
-\label{href_t:ngrid_meridonal_ctl}
-\verb|[Ntheta]| \\
-Number of grid in the meridional direction \verb|[Ntheta]| is defined by integer.
-
-\paragraph{\tt ngrid\_zonal\_ctl}
-\label{href_t:ngrid_zonal_ctl}
-\verb|[Nphi]| \\
-Number of grid in the zonal direction \verb|[Nphi]| is defined by integer.
-
-\paragraph{\tt raidal\_grid\_type\_ctl}
-\label{href_t:radial_grid_type_ctl}
-\verb|[explicit, Chebyshev, or equi_distance]| \\
-Type of the radial grid spacing is defined by text. The following types are supported in Calypso.
-%
-\begin{description}
-	\item{\tt explicit}  Equi-distance grid
-	\item{\tt Chebyshev} Chebyshev collocation points
-	\item{\tt equi\_distance} Set explicitly by \verb|r_layer| array
-\end{description}
-%
-
-\paragraph{\tt num\_fluid\_grid\_ctl}
-\label{href_t:num_fluid_grid_ctl}
-\verb|[Nr_shell]| \\
-(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
-Number of layer in the fluid shell \verb|[Nr_shell]| is defined by integer. Number of grids including CMB and ICB will be (\verb|[Nr_shell]| + 1).
-
-\paragraph{\tt fluid\_core\_size\_ctl}
-\label{href_t:fluid_core_size_ctl}
-\verb|[Length]| \\
-(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
-Size of the outer core \verb|[Length]| ($ = r_{o}-r_{i}$) is defined by real.
-
-\paragraph{\tt ICB\_to\_CMB\_ratio\_ctl}
-\label{href_t:ICB_to_CMB_ratio_ctl} 
-\verb|[R_ratio]| \\
-(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
-Ratio of the inner core radius to outer core \verb|[R_ratio]| ($ = r_{i} / r_{o}$) is defined by real.
-
-\paragraph{\tt Min\_radius\_ctl}
-\label{href_t:Min_radius_ctl}
-\verb|[Rmin]| \\
-(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
-Minimum radius of the domains \verb|[Rmin]| is defined by real. If this value is not defined, ICB becomes inner boundary of the domain.
-
-\paragraph{\tt Max\_radius\_ctl }
-\label{href_t:Max_radius_ctl} 
-\verb|[Rmax]| \\
-(This option works with \verb|radial_grid_type_ctl| is {\tt explicit} or {\tt Chebyshev}.)
-Maximum radius of the domains \verb|[Rmax]| is defined by real. If this value is not defined, CMB becomes outer boundary of the domain.
-
-\paragraph{\tt r\_layer}
-\label{href_t:r_layer}
-\verb|[Layer #]   [Radius]| \\
-(This option works with \verb|[radial_grid_type_ctl]| is {\tt explicit}.)
-List of the radial grid points in the simulation domain. Index of the radial point \verb|[Layer #]| is defined by integer, and radius \verb|[Radius]| is defined by real.
-
-\paragraph{\tt array boundaries\_ctl}
-\verb|[Boundary_name]  [Layer #]| \\
-\label{href_t:boundaries_ctl} 
-(This option works with \verb|[radial_grid_type_ctl]| is {\tt explicit}.)
-Boundaries of the simulation domain is defined by \verb|[Layer #]| in \verb|[r_layer]| array. The following boundary name can be defined for \verb|[Boundary_name]|.
-%
-\begin{description}
-	\item{\tt to\_Center} Inner boundary of the domain to fill the center.
-	\item{\tt ICB} ICB
-	\item{\tt CMB} CMB
-\end{description}
 %
 
 \subsection{\tt new\_data\_files\_def}
