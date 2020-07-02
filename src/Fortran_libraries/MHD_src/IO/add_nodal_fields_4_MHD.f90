@@ -309,10 +309,10 @@
 !
 !
       if(cd_prop%iflag_Aevo_scheme .gt. id_no_evolution) then
-        if(check_field_list_ctl(check_induction%name, field_ctl))       &
+        if(check_field_list_ctl(check_induction, field_ctl))            &
      &     call add_phys_name_ctl(vector_potential, field_ctl)
       else
-        if(check_field_list_ctl(check_induction%name, field_ctl))       &
+        if(check_field_list_ctl(check_induction, field_ctl))            &
      &     call add_phys_name_ctl(magnetic_field, field_ctl)
       end if
 !

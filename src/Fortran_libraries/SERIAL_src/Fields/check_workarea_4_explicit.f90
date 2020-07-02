@@ -34,30 +34,30 @@
       type(ctl_array_c3), intent(inout) :: field_ctl
 !
 !
-      if(check_field_list_ctl(check_momentum_2%name, field_ctl))        &
+      if(check_field_list_ctl(check_momentum_2, field_ctl))             &
      &   call add_phys_name_ctl(check_momentum, field_ctl)
-      if(check_field_list_ctl(check_induction_2%name, field_ctl))       &
+      if(check_field_list_ctl(check_induction_2, field_ctl))            &
      &   call add_phys_name_ctl(check_induction, field_ctl)
-      if(check_field_list_ctl(check_heat_2%name, field_ctl))            &
+      if(check_field_list_ctl(check_heat_2, field_ctl))                 &
      &   call add_phys_name_ctl(check_heat, field_ctl)
-      if(check_field_list_ctl(check_composition_2%name, field_ctl))     &
+      if(check_field_list_ctl(check_composition_2, field_ctl))          &
      &   call add_phys_name_ctl(check_composition, field_ctl)
-      if(check_field_list_ctl(check_pressure_2%name, field_ctl))        &
+      if(check_field_list_ctl(check_pressure_2, field_ctl))             &
      &   call add_phys_name_ctl(check_pressure, field_ctl)
-      if(check_field_list_ctl(check_potential_2%name, field_ctl))       &
+      if(check_field_list_ctl(check_potential_2, field_ctl))            &
      &   call add_phys_name_ctl(check_potential, field_ctl)
 !
 !
-      if(check_field_list_ctl(check_momentum%name, field_ctl))          &
+      if(check_field_list_ctl(check_momentum, field_ctl))               &
      &   call add_phys_name_ctl(velocity, field_ctl)
 !
-      if(check_field_list_ctl(check_heat%name, field_ctl))              &
+      if(check_field_list_ctl(check_heat, field_ctl))                   &
      &   call add_phys_name_ctl(temperature, field_ctl)
-      if(check_field_list_ctl(check_composition%name, field_ctl))       &
+      if(check_field_list_ctl(check_composition, field_ctl))            &
      &   call add_phys_name_ctl(composition, field_ctl)
-      if(check_field_list_ctl(check_pressure%name, field_ctl))          &
+      if(check_field_list_ctl(check_pressure, field_ctl))               &
      &   call add_phys_name_ctl(pressure, field_ctl)
-      if(check_field_list_ctl(check_potential%name, field_ctl))         &
+      if(check_field_list_ctl(check_potential, field_ctl))              &
      &   call add_phys_name_ctl(magnetic_potential, field_ctl)
 !
       end subroutine add_field_ctl_4_check_evo
