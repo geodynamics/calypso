@@ -18,6 +18,7 @@
 !!     &              n_comp = n_vector)
 !!
 !!      subroutine set_field_labels(field, n_comps, field_names, maths)
+!!      logical function cmp_field_no_case(cmp_chara, field)
 !!        type(field_def), intent(in) :: field
 !!@endverbatim
 !
@@ -68,5 +69,22 @@
       end subroutine set_field_labels
 !
 ! ----------------------------------------------------------------------
+!
+      logical function cmp_field_no_case(cmp_chara, field)
+!
+      use skip_comment_f
+!
+      type(field_def), intent(in) :: field
+      character(len=kchara), intent(in) :: cmp_chara
+!
+      character(len=kchara)  :: field_name
+!
+!
+      write(field_name,'(a)')  trim(field%name)
+      cmp_field_no_case = cmp_no_case(cmp_chara, field_name)
+!
+      end function cmp_field_no_case
+!
+!-----------------------------------------------------------------------
 !
       end module t_field_labels

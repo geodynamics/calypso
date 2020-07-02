@@ -30,7 +30,7 @@ t_energy_flux_labels.o: $(FIELDIR)/t_energy_flux_labels.f90 m_precision.o m_phys
 	$(F90) -c $(F90OPTFLAGS) $<
 t_explicit_term_labels.o: $(FIELDIR)/t_explicit_term_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_field_labels.o: $(FIELDIR)/t_field_labels.f90 m_precision.o m_constants.o m_phys_constants.o
+t_field_labels.o: $(FIELDIR)/t_field_labels.f90 m_precision.o m_constants.o m_phys_constants.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_field_product_labels.o: $(FIELDIR)/t_field_product_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<

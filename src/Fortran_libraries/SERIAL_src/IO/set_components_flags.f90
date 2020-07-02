@@ -89,42 +89,43 @@
 !
 !
       call init_more_componnet_flags()
-      if     (cmp_no_case(comp_name, scalar%name))then
+      if     (cmp_field_no_case(comp_name, scalar))then
         icomp =     icomp_SCALAR
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SCALAR
         write(rst_name,1000) trim(phys_name)
-      else if(cmp_no_case(comp_name, vector%name)) then
+      else if(cmp_field_no_case(comp_name, vector)) then
         icomp =     icomp_VECTOR
         ncomp =     ncomp_VECTOR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1000) trim(phys_name)
-      else if(cmp_no_case(comp_name, sym_tensor%name)) then
+      else if(cmp_field_no_case(comp_name, sym_tensor)) then
         icomp =     icomp_SYM_TENSOR
         ncomp =     ncomp_SYM_TENSOR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1000) trim(phys_name)
-      else if(cmp_no_case(comp_name, asym_tensor%name)) then
+      else if(cmp_field_no_case(comp_name, asym_tensor)) then
         icomp =     icomp_ASYM_TENSOR
         ncomp =     ncomp_ASYM_TENSOR
         ncomp_org = ncomp_ASYM_TENSOR
         write(rst_name,1000) trim(phys_name)
-      else if(cmp_no_case(comp_name, spherical_vector%name)) then
+      else if(cmp_field_no_case(comp_name, spherical_vector)) then
         icomp =     icomp_SPH_VECTOR
         ncomp =     ncomp_VECTOR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1100) trim(phys_name)
-      else if(cmp_no_case(comp_name, cylindrical_vector%name)) then
+      else if(cmp_field_no_case(comp_name, cylindrical_vector)) then
         icomp =     icomp_CYL_VECTOR
         ncomp =     ncomp_VECTOR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1200) trim(phys_name)
-      else if(cmp_no_case(comp_name, spherical_sym_tensor%name)) then
+      else if(cmp_field_no_case(comp_name, spherical_sym_tensor)) then
         icomp =     icomp_SPHL_SYM_TENSOR
         ncomp =     ncomp_SYM_TENSOR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1100) trim(phys_name)
-      else if(cmp_no_case(comp_name, cylindrical_sym_tensor%name)) then
+      else if(cmp_field_no_case(comp_name, cylindrical_sym_tensor))     &
+     &    then
         icomp =     icomp_CYL_SYM_TENSOR
         ncomp =     ncomp_SYM_TENSOR
         ncomp_org = ncomp_SYM_TENSOR
@@ -135,17 +136,17 @@
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1300) trim(phys_name)
-      else if(cmp_no_case(comp_name, V_x%name)) then
+      else if(cmp_field_no_case(comp_name, V_x)) then
         icomp =     icomp_X
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1001) trim(phys_name)
-      else if(cmp_no_case(comp_name, V_y%name)) then
+      else if(cmp_field_no_case(comp_name, V_y)) then
         icomp =     icomp_Y
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
         write(rst_name,1002) trim(phys_name)
-      else if(cmp_no_case(comp_name, V_z%name)) then
+      else if(cmp_field_no_case(comp_name, V_z)) then
         icomp =     icomp_Z
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_VECTOR
@@ -183,94 +184,94 @@
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_ASYM_TENSOR
         write(rst_name,1300) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_xx%name)) then
+      else if(cmp_field_no_case(comp_name, T_xx)) then
         icomp =     icomp_XX
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1061) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_xy%name)) then
+      else if(cmp_field_no_case(comp_name, T_xy)) then
         icomp =     icomp_XY
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1062) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_xz%name)) then
+      else if(cmp_field_no_case(comp_name, T_xz)) then
         icomp =     icomp_XZ
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1063) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_yy%name)) then
+      else if(cmp_field_no_case(comp_name, T_yy)) then
         icomp =     icomp_YY
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1064) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_yz%name)) then
+      else if(cmp_field_no_case(comp_name, T_yz)) then
         icomp =     icomp_YZ
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1065) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_zz%name)) then
+      else if(cmp_field_no_case(comp_name, T_zz)) then
         icomp =     icomp_ZZ
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1066) trim(phys_name)
 !
-      else if(cmp_no_case(comp_name, T_rr%name)) then
+      else if(cmp_field_no_case(comp_name, T_rr)) then
         icomp =     icomp_RR
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1221) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_rt%name)) then
+      else if(cmp_field_no_case(comp_name, T_rt)) then
         icomp =     icomp_RT
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1222) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_rp%name)) then
+      else if(cmp_field_no_case(comp_name, T_rp)) then
         icomp =     icomp_RP
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1223) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_tt%name)) then
+      else if(cmp_field_no_case(comp_name, T_tt)) then
         icomp =     icomp_TT
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1224) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_tp%name)) then
+      else if(cmp_field_no_case(comp_name, T_tp)) then
         icomp =     icomp_TP
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1225) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_pp%name)) then
+      else if(cmp_field_no_case(comp_name, T_pp)) then
         icomp =     icomp_PP
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1226) trim(phys_name)
 !
-      else if(cmp_no_case(comp_name, T_ss%name)) then
+      else if(cmp_field_no_case(comp_name, T_ss)) then
         icomp =     icomp_SS
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1231) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_sp%name)) then
+      else if(cmp_field_no_case(comp_name, T_sp)) then
         icomp =     icomp_SP
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1232) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_sz%name)) then
+      else if(cmp_field_no_case(comp_name, T_sz)) then
         icomp =     icomp_SZ
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1233) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_pp%name)) then
+      else if(cmp_field_no_case(comp_name, T_pp)) then
         icomp =     icomp_PP_cyl
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1234) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_pz%name)) then
+      else if(cmp_field_no_case(comp_name, T_pz)) then
         icomp =     icomp_PZ
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
         write(rst_name,1235) trim(phys_name)
-      else if(cmp_no_case(comp_name, T_zz%name)) then
+      else if(cmp_field_no_case(comp_name, T_zz)) then
         icomp =     icomp_ZZ_cyl
         ncomp =     ncomp_SCALAR
         ncomp_org = ncomp_SYM_TENSOR
