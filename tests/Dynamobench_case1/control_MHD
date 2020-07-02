@@ -27,9 +27,9 @@ begin MHD_control
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
 !
-!    sph_file_fmt_ctl           'merged'
-!    restart_file_fmt_ctl       'merged'
-!    field_file_fmt_ctl         'merged_VTK'
+    sph_file_fmt_ctl           'merged'
+    restart_file_fmt_ctl       'merged'
+    field_file_fmt_ctl         'merged_VTK'
   end data_files_def
 !
 !!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!
@@ -278,8 +278,6 @@ begin MHD_control
       coef_imp_t_ctl          6.0e-1
       coef_imp_b_ctl          6.0e-1
       coef_imp_d_ctl          6.0e-1
-      FFT_library_ctl           'FFTPACK'
-      Legendre_trans_loop_ctl   'SYMMETRIC_MATMUL'
     end time_loop_ctl
   end control
 !
