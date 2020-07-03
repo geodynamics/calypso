@@ -191,8 +191,8 @@ The external file for resoultion and parallelization information \verb|[resoluti
 \end{description}
 %
 
-\subsection{Finite element mesh data}
-Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written base on GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. The extension of the mesh file is listed in Table \ref{table:mesh_format}.
+\subsection{Finite element mesh data (optional)}
+Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written based on GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. The extension of the mesh file is listed in Table \ref{table:mesh_format}. This mesh data is used to generate 
 
 \subsection{Radial grid data}
 The preprocessing program generates radius of each layer in \verb|radial_info.dat| if \verb|radial_grid_type_ctl| is set to \verb|Chebyshev| or \verb|equi_distance|. This file consists of blocks \verb|array r_layer| and \verb|array boundaries_ctl| for control file. This data may be useful if you want to modify radial grid spacing by yourself.
