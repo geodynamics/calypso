@@ -100,36 +100,61 @@
       implicit  none
 !
 !
+!>      Structure of parallel and file information
       type platform_data_control
+!>        Structure of number of subdomain control
         type(read_integer_item) :: ndomain_ctl
+!>        Structure of number of OpenMP threads
         type(read_integer_item) :: num_smp_ctl
 !
-        type(read_character_item) :: mesh_file_prefix
-!
-        type(read_character_item) :: field_file_prefix
-        type(read_character_item) :: restart_file_prefix
-        type(read_character_item) :: spectr_field_file_prefix
-!
-        type(read_character_item) :: sph_file_prefix
-!
-        type(read_character_item) :: coriolis_int_file_name
-        type(read_character_item) :: bc_data_file_name_ctl
-        type(read_character_item) :: interpolate_sph_to_fem_ctl
-        type(read_character_item) :: interpolate_fem_to_sph_ctl
-!
-        type(read_character_item) :: rayleigh_spectr_dir
-        type(read_character_item) :: rayleigh_field_dir
-!
-        type(read_character_item) :: mesh_file_fmt_ctl
-        type(read_character_item) :: sph_file_fmt_ctl
-        type(read_character_item) :: restart_file_fmt_ctl
-        type(read_character_item) :: field_file_fmt_ctl
-        type(read_character_item) :: itp_file_fmt_ctl
-        type(read_character_item) :: spectr_field_fmt_ctl
-        type(read_character_item) :: coriolis_file_fmt_ctl
-!
+!>        Structure of debug flag
         type(read_character_item) :: debug_flag_ctl
 !
+!>        Structure of spherical harmonics index file prefix
+        type(read_character_item) :: sph_file_prefix
+!>        Structure of FEM mesh prefix
+        type(read_character_item) :: mesh_file_prefix
+!
+!>        Structure of restart file prefix
+        type(read_character_item) :: restart_file_prefix
+!>        Structure of field file prefix
+        type(read_character_item) :: field_file_prefix
+!>        Structure of spectr field data file prefix
+        type(read_character_item) :: spectr_field_file_prefix
+!
+!>        Structure of Gaunt integral data file prefix
+        type(read_character_item) :: coriolis_int_file_name
+!>        Structure of boundary condition data file prefix
+        type(read_character_item) :: bc_data_file_name_ctl
+!
+!>        Structure of interpolation table file prefix
+!!        from spherical shell to FEM
+        type(read_character_item) :: interpolate_sph_to_fem_ctl
+!>        Structure of interpolation table file prefix
+!!        from FEM to spherical shell
+        type(read_character_item) :: interpolate_fem_to_sph_ctl
+!
+!>        Structure of Rayleigh spectr data directory name
+        type(read_character_item) :: rayleigh_spectr_dir
+!>        Structure of Rayleigh field data directory name
+        type(read_character_item) :: rayleigh_field_dir
+!
+!>        Structure of spherical harmonics index file format
+        type(read_character_item) :: sph_file_fmt_ctl
+!>        Structure of FEM mesh format
+        type(read_character_item) :: mesh_file_fmt_ctl
+!>        Structure of restart file format
+        type(read_character_item) :: restart_file_fmt_ctl
+!>        Structure of spectr field data file format
+        type(read_character_item) :: field_file_fmt_ctl
+!>        Structure of spectr field data file format
+        type(read_character_item) :: spectr_field_fmt_ctl
+!>        Structure of interpolation table file format
+        type(read_character_item) :: itp_file_fmt_ctl
+!>        Structure of Gaunt integral data file format
+        type(read_character_item) :: coriolis_file_fmt_ctl
+!
+!>        Structure of delete original data flag
         type(read_character_item) :: del_org_data_ctl
 !
         integer(kind = kint) :: i_platform =     0
@@ -140,20 +165,20 @@
       character(len=kchara), parameter, private                         &
      &       :: hd_num_subdomain = 'num_subdomain_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_num_smp =   'num_smp_ctl'
+     &       :: hd_num_smp =       'num_smp_ctl'
 !
       character(len=kchara), parameter, private                         &
-     &       :: hd_mesh_header = 'mesh_file_prefix'
+     &       :: hd_mesh_header =   'mesh_file_prefix'
 !
       character(len=kchara), parameter, private                         &
-     &       :: hd_udt_header =   'field_file_prefix'
+     &       :: hd_udt_header =    'field_file_prefix'
       character(len=kchara), parameter, private                         &
-     &       :: hd_rst_header =   'restart_file_prefix'
+     &       :: hd_rst_header =    'restart_file_prefix'
       character(len=kchara), parameter, private                         &
-     &       :: hd_spectr_header =   'spectr_field_file_prefix'
+     &       :: hd_spectr_header = 'spectr_field_file_prefix'
 !
       character(len=kchara), parameter, private                         &
-     &       :: hd_sph_files_header = 'sph_file_prefix'
+     &       :: hd_sph_files_header =    'sph_file_prefix'
 !
       character(len=kchara), parameter, private                         &
      &       :: hd_rayleigh_spectr_dir = 'rayleigh_spectr_dir'
@@ -163,32 +188,32 @@
       character(len=kchara), parameter, private                         &
      &       :: hd_coriolis_tri_int_name = 'coriolis_int_file_name'
       character(len=kchara), parameter, private                         &
-     &       :: hd_bc_data_file_name = 'boundary_data_file_name'
+     &       :: hd_bc_data_file_name =     'boundary_data_file_name'
       character(len=kchara), parameter, private                         &
-     &       :: hd_itp_sph_to_fem =  'interpolate_sph_to_fem_ctl'
+     &       :: hd_itp_sph_to_fem =        'interpolate_sph_to_fem_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_itp_fem_to_sph =  'interpolate_fem_to_sph_ctl'
+     &       :: hd_itp_fem_to_sph =        'interpolate_fem_to_sph_ctl'
 !
       character(len=kchara), parameter, private                         &
-     &       :: hd_mesh_file_fmt =  'mesh_file_fmt_ctl'
+     &       :: hd_mesh_file_fmt =      'mesh_file_fmt_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_rst_files_fmt =  'restart_file_fmt_ctl'
+     &       :: hd_rst_files_fmt =      'restart_file_fmt_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_udt_files_fmt =  'field_file_fmt_ctl'
+     &       :: hd_udt_files_fmt =      'field_file_fmt_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_sph_files_fmt =  'sph_file_fmt_ctl'
+     &       :: hd_sph_files_fmt =      'sph_file_fmt_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_itp_files_fmt =  'itp_file_fmt_ctl'
+     &       :: hd_itp_files_fmt =      'itp_file_fmt_ctl'
       character(len=kchara), parameter, private                         &
-     &       :: hd_spect_field_fmt =  'spectr_field_fmt_ctl'
+     &       :: hd_spect_field_fmt =    'spectr_field_fmt_ctl'
       character(len=kchara), parameter, private                         &
      &       :: hd_coriolis_file_fmt =  'coriolis_file_fmt_ctl'
 !
       character(len=kchara), parameter, private                         &
-     &       :: hd_debug_flag_ctl =  'debug_flag_ctl'
+     &       :: hd_debug_flag_ctl =     'debug_flag_ctl'
 !
       character(len=kchara), parameter, private                         &
-     &       :: hd_del_org_data = 'delete_original_data_flag'
+     &       :: hd_del_org_data =       'delete_original_data_flag'
 !
 !  ---------------------------------------------------------------------
 !

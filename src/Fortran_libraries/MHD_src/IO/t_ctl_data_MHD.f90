@@ -12,14 +12,14 @@
 !!
 !!@verbatim
 !!      subroutine read_sph_mhd_ctl_w_psf                               &
-!!     &         (id_control, hd_block, MHD_ctl, c_buf)
+!!     &         (id_control, hd_block, DMHD_ctl, c_buf)
 !!      subroutine read_sph_mhd_ctl_noviz                               &
-!!     &         (id_control, hd_block, MHD_ctl, c_buf)
+!!     &         (id_control, hd_block, DMHD_ctl, c_buf)
 !!
-!!      subroutine bcast_sph_mhd_ctl_w_psf(MHD_ctl)
-!!      subroutine bcast_sph_mhd_ctl_data(MHD_ctl)
-!!      subroutine dealloc_sph_mhd_ctl_data(MHD_ctl)
-!!        type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
+!!      subroutine bcast_sph_mhd_ctl_w_psf(DMHD_ctl)
+!!      subroutine bcast_sph_mhd_ctl_data(DMHD_ctl)
+!!      subroutine dealloc_sph_mhd_ctl_data(DMHD_ctl)
+!!        type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
 !!@endverbatim
 !
       module t_ctl_data_MHD
@@ -34,8 +34,7 @@
       use t_ctl_data_4_sph_monitor
       use t_ctl_data_node_monitor
       use t_ctl_data_gen_sph_shell
-      use t_control_data_sections
-      use t_control_data_isosurfaces
+      use t_control_data_surfacings
       use t_control_data_dynamo_vizs
 !
       implicit none
@@ -62,10 +61,8 @@
 !>        Structure for monitoring plave list
         type(node_monitor_control) :: nmtr_ctl
 !
-!>        Structures of setioning controls
-        type(section_controls) :: psf_ctls
-!>        Structures of isosurface controls
-        type(isosurf_controls) :: iso_ctls
+!>        Structures of visualization controls
+        type(surfacing_controls) :: surfacing_ctls
 !
 !>        Structures of zonal mean controls
         type(sph_dynamo_viz_controls) :: zm_ctls
@@ -90,6 +87,7 @@
       character(len=kchara), parameter                                  &
      &      :: hd_monitor_data = 'monitor_data_ctl'
 !
+      character(len=kchara), parameter :: hd_viz_ctl = 'visual_control'
       character(len=kchara), parameter                                  &
      &                    :: hd_dynamo_viz_ctl = 'dynamo_vizs_control'
 !
@@ -100,7 +98,7 @@
       private :: hd_platform, hd_org_data, hd_new_data
       private :: hd_sph_shell, hd_model, hd_control
       private :: hd_pick_sph, hd_monitor_data
-      private :: hd_dynamo_viz_ctl, hd_zm_viz_ctl
+      private :: hd_viz_ctl, hd_dynamo_viz_ctl, hd_zm_viz_ctl
 !
 ! ----------------------------------------------------------------------
 !
@@ -109,151 +107,148 @@
 ! ----------------------------------------------------------------------
 !
       subroutine read_sph_mhd_ctl_w_psf                                 &
-     &         (id_control, hd_block, MHD_ctl, c_buf)
-!
-      use read_sections_control_data
+     &         (id_control, hd_block, DMHD_ctl, c_buf)
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
+      type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(MHD_ctl%i_mhd_ctl .gt. 0) return
+      if(DMHD_ctl%i_mhd_ctl .gt. 0) return
       do
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_flag(c_buf, hd_block)) exit
 !
 !
         call read_control_platforms                                     &
-     &     (id_control, hd_platform, MHD_ctl%plt, c_buf)
+     &     (id_control, hd_platform, DMHD_ctl%plt, c_buf)
         call read_control_platforms                                     &
-     &     (id_control, hd_org_data, MHD_ctl%org_plt, c_buf)
+     &     (id_control, hd_org_data, DMHD_ctl%org_plt, c_buf)
 !
         call read_parallel_shell_in_MHD_ctl                             &
-     &     (id_control, hd_sph_shell, MHD_ctl%psph_ctl, c_buf)
+     &     (id_control, hd_sph_shell, DMHD_ctl%psph_ctl, c_buf)
 !
         call read_sph_mhd_model                                         &
-     &     (id_control, hd_model, MHD_ctl%model_ctl, c_buf)
+     &     (id_control, hd_model, DMHD_ctl%model_ctl, c_buf)
         call read_sph_mhd_control                                       &
-     &     (id_control, hd_control, MHD_ctl%smctl_ctl, c_buf)
+     &     (id_control, hd_control, DMHD_ctl%smctl_ctl, c_buf)
 !
         call read_monitor_data_ctl                                      &
-     &     (id_control, hd_monitor_data, MHD_ctl%nmtr_ctl, c_buf)
+     &     (id_control, hd_monitor_data, DMHD_ctl%nmtr_ctl, c_buf)
         call read_sph_monitoring_ctl                                    &
-     &     (id_control, hd_pick_sph, MHD_ctl%smonitor_ctl, c_buf)
+     &     (id_control, hd_pick_sph, DMHD_ctl%smonitor_ctl, c_buf)
 !
-        call s_read_sections_control_data                               &
-     &     (id_control, MHD_ctl%psf_ctls, MHD_ctl%iso_ctls, c_buf)
+        call read_surfacing_controls                                    &
+     &     (id_control, hd_viz_ctl, DMHD_ctl%surfacing_ctls, c_buf)
 !
         call read_dynamo_viz_control                                    &
-     &     (id_control, hd_dynamo_viz_ctl, MHD_ctl%zm_ctls, c_buf)
-      call read_dynamo_viz_control                                    &
-	 &     (id_control, hd_zm_viz_ctl, MHD_ctl%zm_ctls, c_buf)
+     &     (id_control, hd_dynamo_viz_ctl, DMHD_ctl%zm_ctls, c_buf)
+        call read_dynamo_viz_control                                    &
+     &     (id_control, hd_zm_viz_ctl, DMHD_ctl%zm_ctls, c_buf)
       end do
-      MHD_ctl%i_mhd_ctl = 1
+      DMHD_ctl%i_mhd_ctl = 1
 !
       end subroutine read_sph_mhd_ctl_w_psf
 !
 !   --------------------------------------------------------------------
 !
       subroutine read_sph_mhd_ctl_noviz                                 &
-     &         (id_control, hd_block, MHD_ctl, c_buf)
+     &         (id_control, hd_block, DMHD_ctl, c_buf)
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
+      type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(MHD_ctl%i_mhd_ctl .gt. 0) return
+      if(DMHD_ctl%i_mhd_ctl .gt. 0) return
       do
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_flag(c_buf, hd_block)) exit
 !
 !
         call read_control_platforms                                     &
-     &     (id_control, hd_platform, MHD_ctl%plt, c_buf)
+     &     (id_control, hd_platform, DMHD_ctl%plt, c_buf)
         call read_control_platforms                                     &
-     &     (id_control, hd_org_data, MHD_ctl%org_plt, c_buf)
+     &     (id_control, hd_org_data, DMHD_ctl%org_plt, c_buf)
 !
         call read_parallel_shell_in_MHD_ctl                             &
-     &     (id_control, hd_sph_shell, MHD_ctl%psph_ctl, c_buf)
+     &     (id_control, hd_sph_shell, DMHD_ctl%psph_ctl, c_buf)
 !
         call read_sph_mhd_model                                         &
-     &     (id_control, hd_model, MHD_ctl%model_ctl, c_buf)
+     &     (id_control, hd_model, DMHD_ctl%model_ctl, c_buf)
         call read_sph_mhd_control                                       &
-     &     (id_control, hd_control, MHD_ctl%smctl_ctl, c_buf)
+     &     (id_control, hd_control, DMHD_ctl%smctl_ctl, c_buf)
 !
         call read_monitor_data_ctl                                      &
-     &     (id_control, hd_monitor_data, MHD_ctl%nmtr_ctl, c_buf)
+     &     (id_control, hd_monitor_data, DMHD_ctl%nmtr_ctl, c_buf)
         call read_sph_monitoring_ctl                                    &
-     &     (id_control, hd_pick_sph, MHD_ctl%smonitor_ctl, c_buf)
+     &     (id_control, hd_pick_sph, DMHD_ctl%smonitor_ctl, c_buf)
       end do
-      MHD_ctl%i_mhd_ctl = 1
+      DMHD_ctl%i_mhd_ctl = 1
 !
       end subroutine read_sph_mhd_ctl_noviz
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_sph_mhd_ctl_w_psf(MHD_ctl)
+      subroutine bcast_sph_mhd_ctl_w_psf(DMHD_ctl)
 !
-      type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
+      type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
 !
 !
-      call bcast_sph_mhd_ctl_data(MHD_ctl)
-      call bcast_files_4_psf_ctl(MHD_ctl%psf_ctls)
-      call bcast_files_4_iso_ctl(MHD_ctl%iso_ctls)
-      call bcast_dynamo_viz_control(MHD_ctl%zm_ctls)
+      call bcast_sph_mhd_ctl_data(DMHD_ctl)
+      call bcast_surfacing_controls(DMHD_ctl%surfacing_ctls)
+      call bcast_dynamo_viz_control(DMHD_ctl%zm_ctls)
 !
       end subroutine bcast_sph_mhd_ctl_w_psf
 !
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_sph_mhd_ctl_data(MHD_ctl)
+      subroutine bcast_sph_mhd_ctl_data(DMHD_ctl)
 !
       use bcast_4_platform_ctl
       use bcast_4_field_ctl
       use bcast_4_sph_monitor_ctl
       use bcast_4_sphere_ctl
 !
-      type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
+      type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
 !
 !
-      call bcast_ctl_data_4_platform(MHD_ctl%plt)
-      call bcast_ctl_data_4_platform(MHD_ctl%org_plt)
+      call bcast_ctl_data_4_platform(DMHD_ctl%plt)
+      call bcast_ctl_data_4_platform(DMHD_ctl%org_plt)
 !
-      call bcast_sph_mhd_model(MHD_ctl%model_ctl)
-      call bcast_sph_mhd_control(MHD_ctl%smctl_ctl)
+      call bcast_sph_mhd_model(DMHD_ctl%model_ctl)
+      call bcast_sph_mhd_control(DMHD_ctl%smctl_ctl)
 !
-      call bcast_parallel_shell_ctl(MHD_ctl%psph_ctl)
+      call bcast_parallel_shell_ctl(DMHD_ctl%psph_ctl)
 !
-      call bcast_monitor_data_ctl(MHD_ctl%nmtr_ctl)
-      call bcast_sph_monitoring_ctl(MHD_ctl%smonitor_ctl)
+      call bcast_monitor_data_ctl(DMHD_ctl%nmtr_ctl)
+      call bcast_sph_monitoring_ctl(DMHD_ctl%smonitor_ctl)
 !
-      call MPI_BCAST(MHD_ctl%i_mhd_ctl, 1,                              &
+      call MPI_BCAST(DMHD_ctl%i_mhd_ctl, 1,                             &
      &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine bcast_sph_mhd_ctl_data
 !
 !   --------------------------------------------------------------------
 !
-      subroutine dealloc_sph_mhd_ctl_data(MHD_ctl)
+      subroutine dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
-      type(DNS_mhd_simulation_control), intent(inout) :: MHD_ctl
+      type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
 !
 !
-      call dealloc_monitor_data_ctl(MHD_ctl%nmtr_ctl)
-      call dealloc_parallel_shell_ctl(MHD_ctl%psph_ctl)
-      call dealloc_sph_monitoring_ctl(MHD_ctl%smonitor_ctl)
-      call dealloc_sph_mhd_model(MHD_ctl%model_ctl)
+      call dealloc_monitor_data_ctl(DMHD_ctl%nmtr_ctl)
+      call dealloc_parallel_shell_ctl(DMHD_ctl%psph_ctl)
+      call dealloc_sph_monitoring_ctl(DMHD_ctl%smonitor_ctl)
+      call dealloc_sph_mhd_model(DMHD_ctl%model_ctl)
 !
-      MHD_ctl%i_mhd_ctl = 0
+      DMHD_ctl%i_mhd_ctl = 0
 !
       end subroutine dealloc_sph_mhd_ctl_data
 !

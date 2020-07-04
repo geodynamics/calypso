@@ -11,9 +11,9 @@
 !!@n        Modified by H. Matsui on Oct., 2012
 !!
 !!@verbatim
-!!      subroutine read_control_4_sph_MHD_w_psf(file_name, DNS_MHD_ctl)
-!!      subroutine read_control_4_sph_MHD_noviz(file_name, DNS_MHD_ctl)
-!!        type(DNS_mhd_simulation_control), intent(inout) :: DNS_MHD_ctl
+!!      subroutine read_control_4_sph_MHD_w_psf(file_name, DMHD_ctl)
+!!      subroutine read_control_4_sph_MHD_noviz(file_name, DMHD_ctl)
+!!        type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
 !!@endverbatim
 !
       module t_ctl_data_sph_MHD_psf
@@ -43,10 +43,12 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine read_control_4_sph_MHD_w_psf(file_name, DNS_MHD_ctl)
+      subroutine read_control_4_sph_MHD_w_psf(file_name, DMHD_ctl)
+!
+      use t_control_data_surfacings
 !
       character(len=kchara), intent(in) :: file_name
-      type(DNS_mhd_simulation_control), intent(inout) :: DNS_MHD_ctl
+      type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
 !
       type(buffer_for_control) :: c_buf1
 !
@@ -57,22 +59,25 @@
         do
           call load_one_line_from_control(ctl_file_code, c_buf1)
           call read_sph_mhd_ctl_w_psf                                   &
-     &       (ctl_file_code, hd_mhd_ctl, DNS_MHD_ctl, c_buf1)
-          if(DNS_MHD_ctl%i_mhd_ctl .gt. 0) exit
+     &       (ctl_file_code, hd_mhd_ctl, DMHD_ctl, c_buf1)
+          if(DMHD_ctl%i_mhd_ctl .gt. 0) exit
         end do
         close(ctl_file_code)
+!
+        call section_step_ctls_to_time_ctl                              &
+     &     (DMHD_ctl%surfacing_ctls, DMHD_ctl%smctl_ctl%tctl)
       end if
 !
-      call bcast_sph_mhd_ctl_w_psf(DNS_MHD_ctl)
+      call bcast_sph_mhd_ctl_w_psf(DMHD_ctl)
 !
       end subroutine read_control_4_sph_MHD_w_psf
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine read_control_4_sph_MHD_noviz(file_name, DNS_MHD_ctl)
+      subroutine read_control_4_sph_MHD_noviz(file_name, DMHD_ctl)
 !
       character(len=kchara), intent(in) :: file_name
-      type(DNS_mhd_simulation_control), intent(inout) :: DNS_MHD_ctl
+      type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
 !
       type(buffer_for_control) :: c_buf1
 !
@@ -83,13 +88,13 @@
         do
           call load_one_line_from_control(ctl_file_code, c_buf1)
           call read_sph_mhd_ctl_noviz                                   &
-     &       (ctl_file_code, hd_mhd_ctl, DNS_MHD_ctl, c_buf1)
-          if(DNS_MHD_ctl%i_mhd_ctl .gt. 0) exit
+     &       (ctl_file_code, hd_mhd_ctl, DMHD_ctl, c_buf1)
+          if(DMHD_ctl%i_mhd_ctl .gt. 0) exit
         end do
         close(ctl_file_code)
       end if
 !
-      call bcast_sph_mhd_ctl_data(DNS_MHD_ctl)
+      call bcast_sph_mhd_ctl_data(DMHD_ctl)
 !
       end subroutine read_control_4_sph_MHD_noviz
 !

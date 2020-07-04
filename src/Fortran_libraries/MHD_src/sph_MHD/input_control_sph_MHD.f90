@@ -106,6 +106,7 @@
      &    MHD_files%mesh_file_IO, sph_maker1%gen_sph)
       call dealloc_gen_sph_fem_mesh_param(sph_maker1%gen_sph)
 !
+      call dealloc_surfacing_controls(DMHD_ctl%surfacing_ctls)
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
       call sph_boundary_IO_control                                      &

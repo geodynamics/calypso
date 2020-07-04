@@ -61,13 +61,12 @@
 !
       call bcast_ctl_type_i1(tctl%i_step_check_ctl)
       call bcast_ctl_type_i1(tctl%i_step_rst_ctl)
-      call bcast_ctl_type_i1(tctl%i_step_psf_ctl)
-      call bcast_ctl_type_i1(tctl%i_step_iso_ctl)
+!
       call bcast_ctl_type_i1(tctl%i_step_psf_ctl)
       call bcast_ctl_type_i1(tctl%i_step_iso_ctl)
       call bcast_ctl_type_i1(tctl%i_step_pvr_ctl)
-      call bcast_ctl_type_i1(tctl%i_step_fline_ctl)
       call bcast_ctl_type_i1(tctl%i_step_lic_ctl)
+      call bcast_ctl_type_i1(tctl%i_step_fline_ctl)
 !
       call bcast_ctl_type_i1(tctl%i_step_ucd_ctl)
       call bcast_ctl_type_i1(tctl%i_step_monitor_ctl)

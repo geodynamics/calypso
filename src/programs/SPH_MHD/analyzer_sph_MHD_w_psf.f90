@@ -83,7 +83,7 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'init_visualize_surface'
       call init_visualize_surface(FEM_d1%geofem, FEM_d1%field,          &
-     &    DNS_MHD_ctl1%psf_ctls, DNS_MHD_ctl1%iso_ctls, viz_psfs1)
+     &    DNS_MHD_ctl1%surfacing_ctls, viz_psfs1)
 !
       call init_zonal_mean_sections                                     &
      &   (FEM_d1%geofem, FEM_d1%field, DNS_MHD_ctl1%zm_ctls, zmeans1)
