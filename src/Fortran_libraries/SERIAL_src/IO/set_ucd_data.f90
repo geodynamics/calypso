@@ -13,10 +13,10 @@
 !!      subroutine link_num_field_2_output(numnod, ntot_comp_vis, ucd)
 !!
 !!      subroutine link_numnod_stacks_2_output                          &
-!!     &         (nprocs, istack_numnod, istack_internod, m_ucd)
+!!     &         (nprocs, istack_numnod, istack_internod, ucd)
 !!      subroutine link_numele_stacks_2_output                          &
-!!     &          (nprocs, istack_interele, m_ucd)
-!!        type(merged_ucd_data), intent(inout) :: m_ucd
+!!     &          (nprocs, istack_interele, ucd)
+!!        type(ucd_data), intent(inout) :: ucd
 !!@endverbatim
 !
       module set_ucd_data
@@ -122,7 +122,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine link_numnod_stacks_2_output                            &
-     &         (nprocs, istack_numnod, istack_internod, m_ucd)
+     &         (nprocs, istack_numnod, istack_internod, ucd)
 !
       integer, intent(in) :: nprocs
       integer(kind = kint_gl), intent(in), target                       &
@@ -130,27 +130,27 @@
       integer(kind = kint_gl), intent(in), target                       &
      &                        :: istack_internod(0:nprocs)
 !
-      type(merged_ucd_data), intent(inout) :: m_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      m_ucd%istack_merged_nod  =>   istack_numnod
-      m_ucd%istack_merged_intnod => istack_internod
+      ucd%istack_merged_nod  =>   istack_numnod
+      ucd%istack_merged_intnod => istack_internod
 !
       end subroutine link_numnod_stacks_2_output
 !
 !-----------------------------------------------------------------------
 !
       subroutine link_numele_stacks_2_output                            &
-     &          (nprocs, istack_interele, m_ucd)
+     &          (nprocs, istack_interele, ucd)
 !
       integer, intent(in) :: nprocs
       integer(kind = kint_gl), intent(in), target                       &
      &                        :: istack_interele(0:nprocs)
 !
-      type(merged_ucd_data), intent(inout) :: m_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      m_ucd%istack_merged_ele =>    istack_interele
+      ucd%istack_merged_ele =>    istack_interele
 !
       end subroutine link_numele_stacks_2_output
 !

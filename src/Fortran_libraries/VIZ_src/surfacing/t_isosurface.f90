@@ -70,7 +70,6 @@
 !
 !>        Structure of isosurface output (used by master process)
         type(ucd_data), allocatable :: iso_out(:)
-        type(merged_ucd_data), allocatable :: iso_out_m(:)
       end type isosurface_module
 !
       private :: alloc_iso_field_type
@@ -172,7 +171,7 @@
       if(iflag_ISO_time) call start_elapsed_time(ist_elapsed_ISO+3)
       call output_isosurface                                            &
      &   (iso%num_iso, iso%iso_file_IO, istep_iso, time_d,              &
-     &    iso%iso_mesh, iso%iso_time_IO, iso%iso_out, iso%iso_out_m)
+     &    iso%iso_mesh, iso%iso_time_IO, iso%iso_out)
 !
       call dealloc_psf_field_data(iso%num_iso, iso%iso_mesh)
       call dealloc_psf_node_and_patch                                   &
@@ -196,7 +195,7 @@
 !
       deallocate(iso%iso_mesh, iso%iso_list)
       deallocate(iso%iso_search, iso%iso_param, iso%iso_def)
-      deallocate(iso%iso_file_IO, iso%iso_out, iso%iso_out_m)
+      deallocate(iso%iso_file_IO, iso%iso_out)
 !
       end subroutine dealloc_iso_field_type
 !
@@ -218,7 +217,6 @@
 !
       allocate(iso%iso_file_IO(iso%num_iso))
       allocate(iso%iso_out(iso%num_iso))
-      allocate(iso%iso_out_m(iso%num_iso))
 !
       iso%iso_file_IO(1:iso%num_iso)%iflag_format = iflag_sgl_ucd
 !

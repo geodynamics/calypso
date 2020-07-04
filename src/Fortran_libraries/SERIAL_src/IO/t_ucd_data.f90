@@ -12,10 +12,9 @@
 !!      subroutine allocate_ucd_ele(ucd)
 !!      subroutine allocate_ucd_phys_name(ucd)
 !!      subroutine allocate_ucd_phys_data(ucd)
-!!      subroutine alloc_merged_hdt5_array(nnod_hdf, ucd, m_ucd)
 !!
-!!      subroutine alloc_merged_ucd_nod_stack(num_pe, m_ucd)
-!!      subroutine alloc_merged_ucd_ele_stack(num_pe, m_ucd)
+!!      subroutine alloc_merged_ucd_nod_stack(num_pe, ucd)
+!!      subroutine alloc_merged_ucd_ele_stack(num_pe, ucd)
 !!
 !!      subroutine deallocate_ucd_node(ucd)
 !!      subroutine deallocate_ucd_ele(ucd)
@@ -23,20 +22,18 @@
 !!      subroutine deallocate_ucd_phys_name(ucd)
 !!      subroutine deallocate_ucd_data(ucd)
 !!      subroutine deallocate_ucd_mesh(ucd)
-!!      subroutine deallocate_parallel_ucd_mesh(ucd, m_ucd)
+!!      subroutine deallocate_parallel_ucd_mesh(ucd)
 !!
 !!      subroutine disconnect_ucd_node(ucd)
 !!      subroutine disconnect_ucd_data(ucd)
 !!      subroutine disconnect_ucd_mesh(ucd)
-!!      subroutine disconnect_merged_ucd_mesh(ucd, m_ucd)
+!!      subroutine disconnect_merged_ucd_mesh(ucd)
 !!
-!!      subroutine unlink_merged_ucd_nod_stack(m_ucd)
-!!      subroutine unlink_merged_ucd_ele_stack(m_ucd)
+!!      subroutine unlink_merged_ucd_nod_stack(ucd)
+!!      subroutine unlink_merged_ucd_ele_stack(ucd)
 !!
-!!      subroutine dealloc_merged_ucd_nod_stack(m_ucd)
-!!      subroutine dealloc_merged_ucd_ele_stack(m_ucd)
-!!      subroutine dealloc_merged_hdt5_ele_list(m_ucd)
-!!      subroutine dealloc_merged_hdt5_array(m_ucd)
+!!      subroutine dealloc_merged_ucd_nod_stack(ucd)
+!!      subroutine dealloc_merged_ucd_ele_stack(ucd)
 !!
 !!      subroutine cal_istack_ucd_component(ucd)
 !!
@@ -62,6 +59,13 @@
 !
 !>        Structure for FEM field data IO
       type ucd_data
+!>        end point for number of node for each subdomain
+        integer(kind = kint_gl), pointer :: istack_merged_nod(:)
+!>        end point for number of element for each subdomain
+        integer(kind = kint_gl), pointer :: istack_merged_ele(:)
+!>        end point for number of internal node for each subdomain
+        integer(kind = kint_gl), pointer :: istack_merged_intnod(:)
+!
 !>        number of nodes for field data
         integer(kind = kint_gl) :: nnod
 !>        number of elements for field data
@@ -90,24 +94,6 @@
 !>        field data for IO
         real (kind=kreal), pointer :: d_ucd(:,:)
       end type ucd_data
-!
-!
-!>        Structure for numbers of FEM mesh for merged IO
-      type merged_ucd_data
-!>        end point for number of node for each subdomain
-        integer(kind = kint_gl), pointer :: istack_merged_nod(:)
-!>        end point for number of element for each subdomain
-        integer(kind = kint_gl), pointer :: istack_merged_ele(:)
-!>        end point for number of internal node for each subdomain
-        integer(kind = kint_gl), pointer :: istack_merged_intnod(:)
-!
-!>        number of components for HDF data output
-        integer(kind = kint) :: ncomp_hdf5
-!>        Real work array for HDF data output
-        real(kind=kreal), pointer :: fld_hdf5(:)
-!>        Integer array for HDF data output
-        integer(kind = 4), pointer :: ie_hdf5(:)
-      end type merged_ucd_data
 !
 ! -----------------------------------------------------------------------
 !
@@ -190,45 +176,31 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_merged_ucd_nod_stack(num_pe, m_ucd)
+      subroutine alloc_merged_ucd_nod_stack(num_pe, ucd)
 !
       integer, intent(in) :: num_pe
-      type(merged_ucd_data), intent(inout) :: m_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      allocate(m_ucd%istack_merged_nod(0:num_pe))
-      allocate(m_ucd%istack_merged_intnod(0:num_pe))
-      m_ucd%istack_merged_nod =    0
-      m_ucd%istack_merged_intnod = 0
+      allocate(ucd%istack_merged_nod(0:num_pe))
+      allocate(ucd%istack_merged_intnod(0:num_pe))
+      ucd%istack_merged_nod =    0
+      ucd%istack_merged_intnod = 0
 !
       end subroutine alloc_merged_ucd_nod_stack
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_merged_ucd_ele_stack(num_pe, m_ucd)
+      subroutine alloc_merged_ucd_ele_stack(num_pe, ucd)
 !
       integer, intent(in) :: num_pe
-      type(merged_ucd_data), intent(inout) :: m_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      allocate(m_ucd%istack_merged_ele(0:num_pe))
-      m_ucd%istack_merged_ele =    0
+      allocate(ucd%istack_merged_ele(0:num_pe))
+      ucd%istack_merged_ele =    0
 !
       end subroutine alloc_merged_ucd_ele_stack
-!
-! -----------------------------------------------------------------------
-!
-      subroutine alloc_merged_hdt5_array(nnod_hdf, ucd, m_ucd)
-!
-      integer(kind = kint), intent(in) :: nnod_hdf
-      type(ucd_data), intent(in) :: ucd
-      type(merged_ucd_data), intent(inout) :: m_ucd
-!
-!
-      allocate( m_ucd%fld_hdf5(9*nnod_hdf) )
-      allocate( m_ucd%ie_hdf5(ucd%nnod_4_ele*ucd%nele) )
-!
-      end subroutine alloc_merged_hdt5_array
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -302,17 +274,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine deallocate_parallel_ucd_mesh(ucd, m_ucd)
+      subroutine deallocate_parallel_ucd_mesh(ucd)
 !
       type(ucd_data), intent(inout) :: ucd
-      type(merged_ucd_data), intent(inout) :: m_ucd
 !
 !
       call deallocate_ucd_data(ucd)
       call deallocate_ucd_ele(ucd)
       call deallocate_ucd_node(ucd)
-      call dealloc_merged_ucd_nod_stack(m_ucd)
-      call dealloc_merged_ucd_ele_stack(m_ucd)
+      call dealloc_merged_ucd_nod_stack(ucd)
+      call dealloc_merged_ucd_ele_stack(ucd)
 !
       end subroutine deallocate_parallel_ucd_mesh
 !
@@ -356,90 +327,66 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine disconnect_merged_ucd_mesh(ucd, m_ucd)
+      subroutine disconnect_merged_ucd_mesh(ucd)
 !
       type(ucd_data), intent(inout) :: ucd
-      type(merged_ucd_data), intent(inout) :: m_ucd
 !
 !
       call disconnect_ucd_data(ucd)
       call deallocate_ucd_ele(ucd)
       call disconnect_ucd_node(ucd)
-      call unlink_merged_ucd_nod_stack(m_ucd)
-      call unlink_merged_ucd_ele_stack(m_ucd)
+      call unlink_merged_ucd_nod_stack(ucd)
+      call unlink_merged_ucd_ele_stack(ucd)
 !
       end subroutine disconnect_merged_ucd_mesh
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine unlink_merged_ucd_nod_stack(m_ucd)
+      subroutine unlink_merged_ucd_nod_stack(ucd)
 !
-      type(merged_ucd_data), intent(inout) :: m_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      nullify(m_ucd%istack_merged_nod)
-      nullify(m_ucd%istack_merged_intnod)
+      nullify(ucd%istack_merged_nod)
+      nullify(ucd%istack_merged_intnod)
 !
       end subroutine unlink_merged_ucd_nod_stack
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine unlink_merged_ucd_ele_stack(m_ucd)
+      subroutine unlink_merged_ucd_ele_stack(ucd)
 !
-      type(merged_ucd_data), intent(inout) :: m_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      nullify(m_ucd%istack_merged_ele)
+      nullify(ucd%istack_merged_ele)
 !
       end subroutine unlink_merged_ucd_ele_stack
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine dealloc_merged_ucd_nod_stack(m_ucd)
+      subroutine dealloc_merged_ucd_nod_stack(ucd)
 !
-      type(merged_ucd_data), intent(inout) :: m_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      deallocate(m_ucd%istack_merged_nod)
-      deallocate(m_ucd%istack_merged_intnod)
+      deallocate(ucd%istack_merged_nod)
+      deallocate(ucd%istack_merged_intnod)
 !
       end subroutine dealloc_merged_ucd_nod_stack
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine dealloc_merged_ucd_ele_stack(m_ucd)
+      subroutine dealloc_merged_ucd_ele_stack(ucd)
 !
-      type(merged_ucd_data), intent(inout) :: m_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      deallocate(m_ucd%istack_merged_ele)
+      deallocate(ucd%istack_merged_ele)
 !
       end subroutine dealloc_merged_ucd_ele_stack
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_merged_hdt5_ele_list(m_ucd)
-!
-      type(merged_ucd_data), intent(inout) :: m_ucd
-!
-!
-      deallocate(m_ucd%ie_hdf5)
-!
-      end subroutine dealloc_merged_hdt5_ele_list
-!
-! -----------------------------------------------------------------------
-!
-      subroutine dealloc_merged_hdt5_array(m_ucd)
-!
-      type(merged_ucd_data), intent(inout) :: m_ucd
-!
-!
-      deallocate(m_ucd%fld_hdf5)
-!
-      end subroutine dealloc_merged_hdt5_array
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

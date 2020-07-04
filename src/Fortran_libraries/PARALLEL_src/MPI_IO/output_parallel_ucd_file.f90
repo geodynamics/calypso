@@ -1,9 +1,3 @@
-!output_parallel_ucd_file.f90
-!      module output_parallel_ucd_file
-!
-!        programmed by H.Matsui on July, 2006
-!        Modified by H.Matsui on May, 2009
-!
 !>@file   output_parallel_ucd_file.f90
 !!@brief  module output_parallel_ucd_file
 !!
@@ -14,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine link_output_grd_file                                 &
-!!     &         (node, ele, nod_comm, nod_fld, ucd_param, ucd, m_ucd)
+!!     &         (node, ele, nod_comm, nod_fld, ucd_param, ucd)
 !!      subroutine output_udt_one_snapshot(istep_ucd, ucd_param, time_d,&
 !!     &          node, ele, nod_comm, nod_fld)
 !!        type(field_IO_params), intent(in) :: ucd_param
@@ -30,9 +24,9 @@
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(time_data), intent(in) :: t_IO
 !!
-!!      subroutine finalize_ucd_file_output(ucd_param, m_ucd)
+!!      subroutine finalize_ucd_file_output(ucd_param)
 !!        type(field_IO_params), intent(in) :: ucd_param
-!!        type(merged_ucd_data), intent(inout) :: m_ucd
+!!@endverbatim
 !
       module output_parallel_ucd_file
 !
@@ -52,7 +46,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine link_output_grd_file                                   &
-     &         (node, ele, nod_comm, nod_fld, ucd_param, ucd, m_ucd)
+     &         (node, ele, nod_comm, nod_fld, ucd_param, ucd)
 !
       use t_geometry_data
       use t_comm_table
@@ -68,7 +62,6 @@
       type(phys_data), intent(in) :: nod_fld
 !
       type(ucd_data), intent(inout) :: ucd
-      type(merged_ucd_data), intent(inout) :: m_ucd
 !
 !
       call link_num_field_2_ucd(nod_fld, ucd)
@@ -77,10 +70,10 @@
 !
       if (ucd_param%iflag_format/icent .eq. iflag_single/icent) then
         call init_merged_ucd                                            &
-     &     (ucd_param%iflag_format, node, ele, nod_comm, ucd, m_ucd)
+     &     (ucd_param%iflag_format, node, ele, nod_comm, ucd)
       end if
 !
-      call sel_write_parallel_ucd_mesh(ucd_param, ucd, m_ucd)
+      call sel_write_parallel_ucd_mesh(ucd_param, ucd)
 !
       if(   mod(ucd_param%iflag_format,icent)/iten .eq. iflag_udt/iten  &
      & .or. mod(ucd_param%iflag_format,icent)/iten .eq. iflag_vtd/iten) &
@@ -118,7 +111,6 @@
 !
       type(time_data) :: t_IO
       type(ucd_data) :: ucd
-      type(merged_ucd_data) :: m_ucd
 !
 !
       call link_num_field_2_ucd(nod_fld, ucd)
@@ -127,12 +119,12 @@
 !
       if (ucd_param%iflag_format/icent .eq. iflag_single/icent) then
         call init_merged_ucd                                            &
-     &     (ucd_param%iflag_format, node, ele, nod_comm, ucd, m_ucd)
+     &     (ucd_param%iflag_format, node, ele, nod_comm, ucd)
       end if
 !
       call copy_time_step_size_data(time_d, t_IO)
       call sel_write_parallel_ucd_file                                  &
-     &   (istep_ucd, ucd_param, t_IO, ucd, m_ucd)
+     &   (istep_ucd, ucd_param, t_IO, ucd)
 !
       call deallocate_ucd_node(ucd)
 !
@@ -141,7 +133,7 @@
 !
       if (ucd_param%iflag_format/icent .ne. iflag_single/icent) return
 !
-      call finalize_merged_ucd(ucd_param%iflag_format, m_ucd)
+      call finalize_merged_ucd(ucd_param%iflag_format, ucd)
 !
       end subroutine output_udt_one_snapshot
 !
@@ -175,17 +167,17 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine finalize_ucd_file_output(ucd_param, m_ucd)
+      subroutine finalize_ucd_file_output(ucd_param, ucd)
 !
       use merged_udt_vtk_file_IO
 !
       type(field_IO_params), intent(in) :: ucd_param
-      type(merged_ucd_data), intent(inout) :: m_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
       if (ucd_param%iflag_format/icent .ne. iflag_single/icent) return
 !
-      call finalize_merged_ucd(ucd_param%iflag_format, m_ucd)
+      call finalize_merged_ucd(ucd_param%iflag_format, ucd)
 !
       end subroutine finalize_ucd_file_output
 !

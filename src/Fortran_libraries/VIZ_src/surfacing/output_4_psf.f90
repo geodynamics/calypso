@@ -9,24 +9,22 @@
 !!
 !!@verbatim
 !!      subroutine output_section_mesh                                  &
-!!     &         (num_psf, psf_file_IO, psf_mesh, psf_out, psf_out_m)
+!!     &         (num_psf, psf_file_IO, psf_mesh, psf_out)
 !!      subroutine output_section_data(num_psf, psf_file_IO, istep_psf, &
-!!     &          time_d, t_IO, psf_out, psf_out_m)
+!!     &          time_d, t_IO, psf_out)
 !!        type(time_data), intent(in) :: time_d
 !!        type(psf_local_data), intent(in) :: psf_mesh(num_psf)
 !!        type(field_IO_params), intent(in) :: ucd_param(num_psf)
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(ucd_data), intent(inout) ::        psf_out(num_psf)
-!!        type(merged_ucd_data), intent(inout) :: psf_out_m(num_psf)
 !!
 !!      subroutine output_isosurface(num_iso, iso_file_IO, istep_iso,   &
-!!     &          time_d, iso_mesh, t_IO, iso_out, iso_out_m)
+!!     &          time_d, iso_mesh, t_IO, iso_out)
 !!        type(time_data), intent(in) :: time_d
 !!        type(psf_local_data), intent(in) :: iso_mesh(num_iso)
 !!        type(field_IO_params), intent(in) :: iso_file_IO(num_iso)
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(ucd_data), intent(inout) :: iso_out(num_iso)
-!!        type(merged_ucd_data), intent(inout) :: iso_out_m(num_iso)
 !!@endverbatim
 !
       module output_4_psf
@@ -49,7 +47,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine output_section_mesh                                    &
-     &         (num_psf, psf_file_IO, psf_mesh, psf_out, psf_out_m)
+     &         (num_psf, psf_file_IO, psf_mesh, psf_out)
 !
       use set_ucd_data_to_type
       use parallel_ucd_IO_select
@@ -60,16 +58,15 @@
       type(field_IO_params), intent(in) :: psf_file_IO(num_psf)
 !
       type(ucd_data), intent(inout) ::        psf_out(num_psf)
-      type(merged_ucd_data), intent(inout) :: psf_out_m(num_psf)
 !
       integer(kind= kint) :: i_psf
 !
 !
       do i_psf = 1, num_psf
         call link_nnod_stacks_2_ucd                                     &
-     &     (nprocs, psf_mesh(i_psf)%node, psf_out_m(i_psf))
+     &     (nprocs, psf_mesh(i_psf)%node, psf_out(i_psf))
         call link_nele_stacks_2_ucd                                     &
-     &     (nprocs, psf_mesh(i_psf)%patch, psf_out_m(i_psf))
+     &     (nprocs, psf_mesh(i_psf)%patch, psf_out(i_psf))
 
         call link_node_data_2_ucd                                       &
      &     (psf_mesh(i_psf)%node, psf_out(i_psf))
@@ -81,7 +78,7 @@
 !
       do i_psf = 1, num_psf
         call sel_write_parallel_ucd_mesh                                &
-     &       (psf_file_IO(i_psf), psf_out(i_psf), psf_out_m(i_psf))
+     &       (psf_file_IO(i_psf), psf_out(i_psf))
         call calypso_mpi_barrier
       end do
 !
@@ -90,7 +87,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine output_section_data(num_psf, psf_file_IO, istep_psf,   &
-     &          time_d, t_IO, psf_out, psf_out_m)
+     &          time_d, t_IO, psf_out)
 !
       use set_ucd_data_to_type
       use parallel_ucd_IO_select
@@ -103,7 +100,6 @@
 !
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) ::        psf_out(num_psf)
-      type(merged_ucd_data), intent(inout) :: psf_out_m(num_psf)
 !
       integer(kind= kint) :: i_psf
 !
@@ -111,8 +107,8 @@
       call copy_time_step_size_data(time_d, t_IO)
 !
       do i_psf = 1, num_psf
-        call sel_write_parallel_ucd_file(istep_psf, psf_file_IO(i_psf), &
-     &      t_IO, psf_out(i_psf), psf_out_m(i_psf))
+        call sel_write_parallel_ucd_file                                &
+     &     (istep_psf, psf_file_IO(i_psf), t_IO, psf_out(i_psf))
         call calypso_mpi_barrier
       end do
 !
@@ -122,7 +118,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine output_isosurface(num_iso, iso_file_IO, istep_iso,     &
-     &          time_d, iso_mesh, t_IO, iso_out, iso_out_m)
+     &          time_d, iso_mesh, t_IO, iso_out)
 !
       use set_ucd_data_to_type
       use parallel_ucd_IO_select
@@ -137,7 +133,6 @@
       type(field_IO_params), intent(in) :: iso_file_IO(num_iso)
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: iso_out(num_iso)
-      type(merged_ucd_data), intent(inout) :: iso_out_m(num_iso)
 !
       integer(kind= kint) :: i_iso
 !
@@ -146,9 +141,9 @@
 !
       do i_iso = 1, num_iso
         call link_nnod_stacks_2_ucd                                     &
-     &     (nprocs, iso_mesh(i_iso)%node, iso_out_m(i_iso))
+     &     (nprocs, iso_mesh(i_iso)%node, iso_out(i_iso))
         call link_nele_stacks_2_ucd                                     &
-     &     (nprocs, iso_mesh(i_iso)%patch, iso_out_m(i_iso))
+     &     (nprocs, iso_mesh(i_iso)%patch, iso_out(i_iso))
 !
         call link_node_data_2_ucd                                       &
      &     (iso_mesh(i_iso)%node, iso_out(i_iso))
@@ -160,10 +155,8 @@
 !
       do i_iso = 1, num_iso
         call sel_write_parallel_ucd_file                                &
-     &     (istep_iso, iso_file_IO(i_iso), t_IO,                        &
-     &      iso_out(i_iso), iso_out_m(i_iso))
-        call disconnect_merged_ucd_mesh                                 &
-     &     (iso_out(i_iso), iso_out_m(i_iso))
+     &     (istep_iso, iso_file_IO(i_iso), t_IO, iso_out(i_iso))
+        call disconnect_merged_ucd_mesh(iso_out(i_iso))
         call calypso_mpi_barrier
       end do
 !

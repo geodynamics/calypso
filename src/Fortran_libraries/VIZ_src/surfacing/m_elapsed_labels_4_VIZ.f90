@@ -84,7 +84,7 @@
 !
       subroutine elpsed_label_4_VIZ_outline
 !
-      integer(kind = kint), parameter :: num_append = 10
+      integer(kind = kint), parameter :: num_append = 11
 !
 !
       call append_elapsed_times                                         &
@@ -106,6 +106,8 @@
       elps1%labels(ist_elapsed_VIZ+ 8) = 'Volume rendering.    '
       elps1%labels(ist_elapsed_VIZ+ 9) = 'fieldline.    '
       elps1%labels(ist_elapsed_VIZ+10) = 'LIC rendering.    '
+!
+      elps1%labels(ist_elapsed_VIZ+11) = 'VTK output in viz module'
 !
       iflag_VIZ_time = .TRUE.
 !

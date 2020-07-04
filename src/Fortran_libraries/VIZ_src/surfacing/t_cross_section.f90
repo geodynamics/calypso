@@ -74,7 +74,6 @@
 !
 !>        Structure for cross sectioning output (used by master process)
         type(ucd_data), allocatable :: psf_out(:)
-        type(merged_ucd_data), allocatable :: psf_out_m(:)
       end type sectioning_module
 !
       private :: alloc_psf_field_type
@@ -149,7 +148,7 @@
       if (iflag_debug.eq.1) write(*,*) 'output_section_mesh'
       if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+3)
       call output_section_mesh(psf%num_psf, psf%psf_file_IO,            &
-     &    psf%psf_mesh, psf%psf_out, psf%psf_out_m)
+     &    psf%psf_mesh, psf%psf_out)
       if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+3)
 !
       end subroutine SECTIONING_initialize
@@ -184,9 +183,8 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'output_section_data'
       if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+3)
-      call output_section_data                                          &
-     &   (psf%num_psf, psf%psf_file_IO, istep_psf, time_d,              &
-     &    psf%psf_time_IO, psf%psf_out, psf%psf_out_m)
+      call output_section_data(psf%num_psf, psf%psf_file_IO,            &
+     &    istep_psf, time_d, psf%psf_time_IO, psf%psf_out)
       if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+3)
 !
       end subroutine SECTIONING_visualize
@@ -211,7 +209,6 @@
 !
       allocate(psf%psf_file_IO(psf%num_psf))
       allocate(psf%psf_out(psf%num_psf))
-      allocate(psf%psf_out_m(psf%num_psf))
 !
       do i_psf = 1, psf%num_psf
         call alloc_coefficients_4_psf(psf%psf_def(i_psf))
@@ -233,8 +230,7 @@
       integer(kind = kint) :: i_psf
 !
       do i_psf = 1, psf%num_psf
-        call disconnect_merged_ucd_mesh                                 &
-    &      (psf%psf_out(i_psf), psf%psf_out_m(i_psf))
+        call disconnect_merged_ucd_mesh(psf%psf_out(i_psf))
 !
         call dealloc_inod_grp_psf(psf%psf_grp_list(i_psf))
         call dealloc_coefficients_4_psf(psf%psf_def(i_psf))
@@ -248,8 +244,7 @@
 !
       deallocate(psf%psf_mesh, psf%psf_list, psf%psf_grp_list)
       deallocate(psf%psf_search, psf%psf_file_IO)
-      deallocate(psf%psf_out, psf%psf_out_m)
-      deallocate(psf%psf_param)
+      deallocate(psf%psf_out, psf%psf_param)
 !
       end subroutine dealloc_psf_field_type
 !

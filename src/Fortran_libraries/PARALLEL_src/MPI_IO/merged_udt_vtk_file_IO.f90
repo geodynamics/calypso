@@ -9,28 +9,26 @@
 !!
 !!@verbatim
 !!      subroutine init_merged_ucd                                      &
-!!     &         (iflag_format, node, ele, nod_comm, ucd, m_ucd)
+!!     &         (iflag_format, node, ele, nod_comm, ucd)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(ucd_data), intent(inout) :: ucd
-!!        type(merged_ucd_data), intent(inout) :: m_ucd
-!!      subroutine finalize_merged_ucd(iflag_format, m_ucd)
-!!        type(merged_ucd_data), intent(inout) :: m_ucd
+!!      subroutine finalize_merged_ucd(iflag_format, ucd)
+!!        type(ucd_data), intent(inout) :: ucd
 !!
-!!      subroutine write_ucd_file_mpi(file_name, ucd, m_ucd)
-!!      subroutine write_ucd_phys_mpi(file_name, ucd, m_ucd)
-!!      subroutine write_ucd_grid_mpi(file_name, ucd, m_ucd)
+!!      subroutine write_ucd_file_mpi(file_name, ucd)
+!!      subroutine write_ucd_phys_mpi(file_name, ucd)
+!!      subroutine write_ucd_grid_mpi(file_name, ucd)
 !!
-!!      subroutine write_vtk_file_mpi(file_name, ucd, m_ucd)
-!!      subroutine write_vtk_phys_mpi(file_name, ucd, m_ucd)
-!!      subroutine write_vtk_grid_mpi(file_name, ucd, m_ucd)
+!!      subroutine write_vtk_file_mpi(file_name, ucd)
+!!      subroutine write_vtk_phys_mpi(file_name, ucd)
+!!      subroutine write_vtk_grid_mpi(file_name, ucd)
 !!
-!!      subroutine write_ucd_file_mpi_b(file_name, ucd, m_ucd)
-!!      subroutine write_ucd_phys_mpi_b(file_name, ucd, m_ucd)
-!!      subroutine write_ucd_grid_mpi_b(file_name, ucd, m_ucd)
+!!      subroutine write_ucd_file_mpi_b(file_name, ucd)
+!!      subroutine write_ucd_phys_mpi_b(file_name, ucd)
+!!      subroutine write_ucd_grid_mpi_b(file_name, ucd)
 !!        type(ucd_data), intent(in) :: ucd
-!!        type(merged_ucd_data), intent(in) :: m_ucd
 !!@endverbatim
 !
       module merged_udt_vtk_file_IO
@@ -63,7 +61,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine init_merged_ucd                                        &
-     &         (iflag_format, node, ele, nod_comm, ucd, m_ucd)
+     &         (iflag_format, node, ele, nod_comm, ucd)
 !
       use t_geometry_data
       use t_comm_table
@@ -77,16 +75,15 @@
       type(element_data), intent(in) :: ele
       type(communication_table), intent(in) :: nod_comm
       type(ucd_data), intent(inout) :: ucd
-      type(merged_ucd_data), intent(inout) :: m_ucd
 !
 !
-      call link_nnod_stacks_2_ucd(nprocs, node, m_ucd)
-      call alloc_merged_ucd_ele_stack(nprocs, m_ucd)
+      call link_nnod_stacks_2_ucd(nprocs, node, ucd)
+      call alloc_merged_ucd_ele_stack(nprocs, ucd)
 !
       ucd%nele = num_internal_element_4_IO                              &
      &         (node%internal_node, ele%numele, ele%nnod_4_ele, ele%ie)
       call count_number_of_node_stack                                   &
-     &   (int(ucd%nele), m_ucd%istack_merged_ele)
+     &   (int(ucd%nele), ucd%istack_merged_ele)
 !
 !
       call alloc_double_numbering(node%numnod, dbl_id1)
@@ -102,42 +99,38 @@
      &    dbl_id1%inod_local, dbl_id1%irank_home,                       &
      &    ucd%nele, ucd%nnod_4_ele, ucd%ie)
 !
-      if(iflag_format .eq. iflag_sgl_hdf5) then
-        call parallel_init_hdf5(ucd, m_ucd)
-      end if
+      if(iflag_format .eq. iflag_sgl_hdf5) call parallel_init_hdf5
 !
       end subroutine init_merged_ucd
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine finalize_merged_ucd(iflag_format, m_ucd)
+      subroutine finalize_merged_ucd(iflag_format, ucd)
 !
       use hdf5_file_IO
 !
       integer(kind = kint), intent(in) :: iflag_format
-      type(merged_ucd_data), intent(inout) :: m_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      if(iflag_format .eq. iflag_sgl_hdf5) then
-        call parallel_finalize_hdf5(m_ucd)
-      end if
+      if(iflag_format .eq. iflag_sgl_hdf5) call parallel_finalize_hdf5
+!
       call dealloc_double_numbering(dbl_id1)
-      call unlink_merged_ucd_nod_stack(m_ucd)
-      call dealloc_merged_ucd_ele_stack(m_ucd)
+      call unlink_merged_ucd_nod_stack(ucd)
+      call dealloc_merged_ucd_ele_stack(ucd)
 !
       end subroutine finalize_merged_ucd
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine write_ucd_file_mpi(file_name, ucd, m_ucd)
+      subroutine write_ucd_file_mpi(file_name, ucd)
 !
       use ucd_file_MPI_IO
 !
       character(len=kchara), intent(in) :: file_name
 !
       type(ucd_data), intent(in) :: ucd
-      type(merged_ucd_data), intent(in) :: m_ucd
 !
       integer :: id_vtk
       integer(kind = kint_gl) :: ioff_gl
@@ -152,13 +145,13 @@
       ioff_gl = 0
       call write_ucd_node_mpi(id_vtk, ioff_gl,                          &
      &    ucd%nnod, ucd%ntot_comp, ucd%xx,                              &
-     &    m_ucd%istack_merged_intnod, m_ucd%istack_merged_ele)
+     &    ucd%istack_merged_intnod, ucd%istack_merged_ele)
       call write_ucd_connect_mpi(id_vtk, ioff_gl,                       &
-     &    ucd%nele, ucd%nnod_4_ele, ucd%ie, m_ucd%istack_merged_ele)
+     &    ucd%nele, ucd%nnod_4_ele, ucd%ie, ucd%istack_merged_ele)
 !
       call write_ucd_data_mpi(id_vtk, ioff_gl,                          &
      &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
-     &    ucd%phys_name, ucd%d_ucd, m_ucd%istack_merged_intnod)
+     &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_intnod)
 !
       call calypso_close_mpi_file(id_vtk)
 !
@@ -166,14 +159,13 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine write_ucd_phys_mpi(file_name, ucd, m_ucd)
+      subroutine write_ucd_phys_mpi(file_name, ucd)
 !
       use ucd_file_MPI_IO
 !
       character(len=kchara), intent(in) :: file_name
 !
       type(ucd_data), intent(in) :: ucd
-      type(merged_ucd_data), intent(in) :: m_ucd
 !
       integer :: id_vtk
       integer(kind = kint_gl) :: ioff_gl
@@ -188,7 +180,7 @@
       ioff_gl = 0
       call write_ucd_data_mpi(id_vtk, ioff_gl,                          &
      &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
-     &    ucd%phys_name, ucd%d_ucd, m_ucd%istack_merged_intnod)
+     &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_intnod)
 !
       call calypso_close_mpi_file(id_vtk)
 !
@@ -196,14 +188,13 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine write_ucd_grid_mpi(file_name, ucd, m_ucd)
+      subroutine write_ucd_grid_mpi(file_name, ucd)
 !
       use ucd_file_MPI_IO
 !
       character(len=kchara), intent(in) :: file_name
 !
       type(ucd_data), intent(in) :: ucd
-      type(merged_ucd_data), intent(in) :: m_ucd
 !
       integer :: id_vtk
       integer(kind = kint_gl) :: ioff_gl
@@ -218,9 +209,9 @@
       ioff_gl = 0
       call write_ucd_node_mpi(id_vtk, ioff_gl,                          &
      &    ucd%nnod, ucd%ntot_comp, ucd%xx,                              &
-     &    m_ucd%istack_merged_intnod, m_ucd%istack_merged_ele)
+     &    ucd%istack_merged_intnod, ucd%istack_merged_ele)
       call write_ucd_connect_mpi(id_vtk, ioff_gl,                       &
-     &    ucd%nele, ucd%nnod_4_ele, ucd%ie, m_ucd%istack_merged_ele)
+     &    ucd%nele, ucd%nnod_4_ele, ucd%ie, ucd%istack_merged_ele)
 !
       call calypso_close_mpi_file(id_vtk)
 !
@@ -229,14 +220,13 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine write_vtk_file_mpi(file_name, ucd, m_ucd)
+      subroutine write_vtk_file_mpi(file_name, ucd)
 !
       use vtk_file_MPI_IO
 !
       character(len=kchara), intent(in) :: file_name
 !
       type(ucd_data), intent(in) :: ucd
-      type(merged_ucd_data), intent(in) :: m_ucd
 !
       integer :: id_vtk
       integer(kind = kint_gl) :: ioff_gl
@@ -251,11 +241,11 @@
       ioff_gl = 0
       call write_vtk_mesh_mpi(id_vtk, ioff_gl,                          &
      &    ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie,           &
-     &    m_ucd%istack_merged_intnod, m_ucd%istack_merged_ele)
+     &    ucd%istack_merged_intnod, ucd%istack_merged_ele)
 !
       call write_vtk_data_mpi(id_vtk, ioff_gl,                          &
      &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
-     &    ucd%phys_name, ucd%d_ucd, m_ucd%istack_merged_intnod)
+     &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_intnod)
 !
       call calypso_close_mpi_file(id_vtk)
 !
@@ -263,14 +253,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_vtk_phys_mpi(file_name, ucd, m_ucd)
+      subroutine write_vtk_phys_mpi(file_name, ucd)
 !
       use vtk_file_MPI_IO
 !
       character(len=kchara), intent(in) :: file_name
 !
       type(ucd_data), intent(in) :: ucd
-      type(merged_ucd_data), intent(in) :: m_ucd
 !
       integer :: id_vtk
       integer(kind = kint_gl) :: ioff_gl
@@ -285,7 +274,7 @@
       ioff_gl = 0
       call write_vtk_data_mpi(id_vtk, ioff_gl,                          &
      &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
-     &    ucd%phys_name, ucd%d_ucd, m_ucd%istack_merged_intnod)
+     &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_intnod)
 !
       call calypso_close_mpi_file(id_vtk)
 !
@@ -293,14 +282,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_vtk_grid_mpi(file_name, ucd, m_ucd)
+      subroutine write_vtk_grid_mpi(file_name, ucd)
 !
       use vtk_file_MPI_IO
 !
       character(len=kchara), intent(in) :: file_name
 !
       type(ucd_data), intent(in) :: ucd
-      type(merged_ucd_data), intent(in) :: m_ucd
 !
       integer :: id_vtk
       integer(kind = kint_gl) :: ioff_gl
@@ -315,7 +303,7 @@
       ioff_gl = 0
       call write_vtk_mesh_mpi(id_vtk, ioff_gl,                          &
      &    ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie,           &
-     &    m_ucd%istack_merged_intnod, m_ucd%istack_merged_ele)
+     &    ucd%istack_merged_intnod, ucd%istack_merged_ele)
 !
       call calypso_close_mpi_file(id_vtk)
 !
@@ -324,7 +312,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine write_ucd_file_mpi_b(file_name, ucd, m_ucd)
+      subroutine write_ucd_file_mpi_b(file_name, ucd)
 !
       use MPI_binary_head_IO
       use MPI_ascii_data_IO
@@ -333,7 +321,6 @@
       character(len=kchara), intent(in) :: file_name
 !
       type(ucd_data), intent(in) :: ucd
-      type(merged_ucd_data), intent(in) :: m_ucd
 !
 !
       if(my_rank .eq. 0) write(*,*)                                     &
@@ -343,10 +330,10 @@
 !
       call write_ucd_mesh_data_mpi_b                                    &
      &   (IO_param, ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie, &
-     &    m_ucd%istack_merged_intnod)
+     &    ucd%istack_merged_intnod)
       call write_ucd_data_mpi_b(IO_param,                               &
      &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
-     &    ucd%phys_name, ucd%d_ucd, m_ucd%istack_merged_intnod)
+     &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_intnod)
 !
       call close_mpi_file(IO_param)
 !
@@ -354,7 +341,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_ucd_phys_mpi_b(file_name, ucd, m_ucd)
+      subroutine write_ucd_phys_mpi_b(file_name, ucd)
 !
       use MPI_binary_head_IO
       use MPI_ascii_data_IO
@@ -363,7 +350,6 @@
       character(len=kchara), intent(in) :: file_name
 !
       type(ucd_data), intent(in) :: ucd
-      type(merged_ucd_data), intent(in) :: m_ucd
 !
 !
       if(my_rank .eq. 0) write(*,*)                                     &
@@ -373,7 +359,7 @@
 !
       call write_ucd_data_mpi_b(IO_param,                               &
      &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
-     &    ucd%phys_name, ucd%d_ucd, m_ucd%istack_merged_intnod)
+     &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_intnod)
 !
       call close_mpi_file(IO_param)
 !
@@ -381,7 +367,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine write_ucd_grid_mpi_b(file_name, ucd, m_ucd)
+      subroutine write_ucd_grid_mpi_b(file_name, ucd)
 !
       use MPI_binary_head_IO
       use MPI_ascii_data_IO
@@ -389,7 +375,6 @@
 !
       character(len=kchara), intent(in) :: file_name
       type(ucd_data), intent(in) :: ucd
-      type(merged_ucd_data), intent(in) :: m_ucd
 !
       type(calypso_MPI_IO_params) :: IO_param
 !
@@ -402,7 +387,7 @@
 !
       call write_ucd_mesh_data_mpi_b                                    &
      &   (IO_param, ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie, &
-     &    m_ucd%istack_merged_intnod)
+     &    ucd%istack_merged_intnod)
       call close_mpi_file(IO_param)
 !
       end subroutine write_ucd_grid_mpi_b

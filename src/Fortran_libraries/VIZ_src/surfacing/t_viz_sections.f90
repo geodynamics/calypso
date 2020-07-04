@@ -1,8 +1,12 @@
-!t_viz_sections.f90
-!      module t_viz_sections
+!>@file   t_viz_sections.f90
+!!@brief  module t_viz_sections
+!!
+!!@auther   Hiroaki Matsui
+!!@date  Programmed by H.Matsui in Apr., 2012
 !
-!      Written by H. Matsui on Apr., 2012
-!
+!>@brief Top routine for sectiong
+!!
+!!@verbatim
 !!      subroutine init_visualize_surface                               &
 !!     &         (fem, nod_fld, surfacing_ctls, viz_psfs)
 !!      subroutine visualize_surface                                    &
@@ -13,6 +17,7 @@
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(surfacing_controls), intent(inout) :: surfacing_ctls
 !!        type(surfacing_modules), intent(inout) :: viz_psfs
+!!@endverbatim
 !
       module t_viz_sections
 !
