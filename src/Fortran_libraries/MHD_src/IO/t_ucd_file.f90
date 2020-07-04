@@ -10,27 +10,27 @@
 !!
 !!@verbatim
 !!      subroutine s_output_ucd_file_control                            &
-!!     &         (ucd_param, i_step, time_d, ucd_step, fem_ucd)
+!!     &         (ucd_param, i_step, time_d, ucd_step, ucd)
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!        type(time_data), intent(in) :: time_d
+!!        type(ucd_data), intent(in) :: ucd
 !!        type(IO_step_param), intent(inout) :: ucd_step
-!!        type(ucd_file_data), intent(inout) :: fem_ucd
 !!
 !!      subroutine output_grd_file_4_snapshot                           &
-!!     &         (ucd_param, ucd_step, mesh, nod_fld, fem_ucd)
+!!     &         (ucd_param, ucd_step, mesh, nod_fld, ucd)
 !!        type(mesh_geometry), intent(in) :: mesh
 !!        type(mesh_data_MHD), intent(in) :: MHD_mesh
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(field_IO_params), intent(in) :: ucd_param
-!!        type(ucd_file_data), intent(inout) :: fem_ucd
+!!        type(ucd_data), intent(inout) :: ucd
 !!      subroutine read_udt_4_snap                                      &
 !!     &         (i_step, udt_file_param, nod_fld, t_IO, ucd_step)
 !!        type(IO_step_param), intent(in) :: ucd_step
 !!        type(field_IO_params), intent(in) :: udt_file_param
 !!        type(phys_data),intent(inout) :: nod_fld
-!!      subroutine finalize_output_ucd(ucd_param, fem_ucd)
+!!      subroutine finalize_output_ucd(ucd_param, ucd)
 !!        type(field_IO_params), intent(in) :: ucd_param
-!!        type(ucd_file_data), intent(inout) :: fem_ucd
+!!        type(ucd_data), intent(inout) :: ucd
 !!@endverbatim
 !
       module t_ucd_file
@@ -49,11 +49,6 @@
 !
       implicit none
 !
-!
-      type ucd_file_data
-        type(ucd_data) :: ucd
-      end type ucd_file_data
-!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -61,7 +56,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine s_output_ucd_file_control                              &
-     &         (ucd_param, i_step, time_d, ucd_step, fem_ucd)
+     &         (ucd_param, i_step, time_d, ucd_step, ucd)
 !
       use calypso_mpi
       use parallel_ucd_IO_select
@@ -69,8 +64,8 @@
       integer(kind = kint), intent(in) :: i_step
       type(field_IO_params), intent(in) :: ucd_param
       type(time_data), intent(in) :: time_d
+      type(ucd_data), intent(in) :: ucd
       type(IO_step_param), intent(inout) :: ucd_step
-      type(ucd_file_data), intent(inout) :: fem_ucd
 !
 !
       if(ucd_param%iflag_format .lt. 0) return
@@ -78,7 +73,7 @@
 !
       call set_IO_step_flag(i_step,ucd_step)
       call sel_write_parallel_ucd_file(ucd_step%istep_file,             &
-     &    ucd_param, time_d, fem_ucd%ucd)
+     &    ucd_param, time_d, ucd)
 !      call output_range_data(node, nod_fld, ucd_step%istep_file, time)
 !
       end subroutine s_output_ucd_file_control
@@ -86,7 +81,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine output_grd_file_4_snapshot                             &
-     &         (ucd_param, ucd_step, mesh, nod_fld, fem_ucd)
+     &         (ucd_param, ucd_step, mesh, nod_fld, ucd)
 !
       use output_parallel_ucd_file
 !
@@ -94,13 +89,13 @@
       type(IO_step_param), intent(in) :: ucd_step
       type(mesh_geometry), intent(in) :: mesh
       type(phys_data),intent(in) :: nod_fld
-      type(ucd_file_data), intent(inout) :: fem_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
       if(ucd_param%iflag_format .lt. 0) return
       if(ucd_step%increment .eq. 0) return
       call link_output_grd_file(mesh%node, mesh%ele, mesh%nod_comm,     &
-     &    nod_fld, ucd_param, fem_ucd%ucd)
+     &    nod_fld, ucd_param, ucd)
 !
       end subroutine output_grd_file_4_snapshot
 !
@@ -129,15 +124,15 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine finalize_output_ucd(ucd_param, fem_ucd)
+      subroutine finalize_output_ucd(ucd_param, ucd)
 !
       use output_parallel_ucd_file
 !
       type(field_IO_params), intent(in) :: ucd_param
-      type(ucd_file_data), intent(inout) :: fem_ucd
+      type(ucd_data), intent(inout) :: ucd
 !
 !
-      call finalize_ucd_file_output(ucd_param, fem_ucd%ucd)
+      call finalize_ucd_file_output(ucd_param, ucd)
 !
       end subroutine finalize_output_ucd
 !

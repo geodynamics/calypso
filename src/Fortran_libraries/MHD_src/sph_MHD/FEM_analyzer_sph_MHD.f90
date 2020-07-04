@@ -58,6 +58,7 @@
       use t_MHD_step_parameter
       use t_MHD_file_parameter
       use t_MHD_IO_data
+      use t_ucd_file
 !
       implicit none
 !
@@ -113,7 +114,7 @@
       if(iflag_debug .gt. 0) write(*,*) 'output_grd_file_4_snapshot'
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+5)
       call output_grd_file_4_snapshot(MHD_files%ucd_file_IO,            &
-     &    MHD_step%ucd_step, geofem%mesh, nod_fld, MHD_IO%fem_ucd)
+     &    MHD_step%ucd_step, geofem%mesh, nod_fld, MHD_IO%ucd)
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+5)
 !
       end subroutine FEM_initialize_sph_MHD
@@ -157,7 +158,7 @@
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+5)
       call s_output_ucd_file_control                                    &
      &   (MHD_files%ucd_file_IO, MHD_step%time_d%i_time_step,           &
-     &    MHD_step%time_d, MHD_step%ucd_step, MHD_IO%fem_ucd)
+     &    MHD_step%time_d, MHD_step%ucd_step, MHD_IO%ucd)
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+5)
 !
       end subroutine FEM_analyze_sph_MHD
@@ -224,7 +225,7 @@
 !
      if(MHD_step%ucd_step%increment .gt. 0) then
        call dealloc_phys_range(MHD_IO%range)
-       call finalize_output_ucd(MHD_files%ucd_file_IO, MHD_IO%fem_ucd)
+       call finalize_output_ucd(MHD_files%ucd_file_IO, MHD_IO%ucd)
      end if
 !
       end subroutine FEM_finalize

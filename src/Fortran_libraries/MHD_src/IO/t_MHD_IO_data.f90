@@ -14,7 +14,7 @@
 !
       use t_MHD_file_parameter
       use t_field_data_IO
-      use t_ucd_file
+      use t_ucd_data
       use t_cal_max_indices
 !
       implicit  none
@@ -22,9 +22,7 @@
 !
       type MHD_IO_data
         type(field_IO) :: rst_IO
-!
-        type(ucd_file_data) :: fem_ucd
-!
+        type(ucd_data) :: ucd
         type(maximum_informations) :: range
       end type MHD_IO_data
 !
