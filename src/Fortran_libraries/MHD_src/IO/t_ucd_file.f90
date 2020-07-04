@@ -51,8 +51,6 @@
 !
 !
       type ucd_file_data
-        type(time_data) :: time_IO
-!>        Instance for FEM field data IO
         type(ucd_data) :: ucd
       end type ucd_file_data
 !
@@ -79,9 +77,8 @@
       if(output_IO_flag(i_step,ucd_step) .ne. 0) return
 !
       call set_IO_step_flag(i_step,ucd_step)
-      call copy_time_step_size_data(time_d, fem_ucd%time_IO)
       call sel_write_parallel_ucd_file(ucd_step%istep_file,             &
-     &    ucd_param, fem_ucd%time_IO, fem_ucd%ucd)
+     &    ucd_param, time_d, fem_ucd%ucd)
 !      call output_range_data(node, nod_fld, ucd_step%istep_file, time)
 !
       end subroutine s_output_ucd_file_control
