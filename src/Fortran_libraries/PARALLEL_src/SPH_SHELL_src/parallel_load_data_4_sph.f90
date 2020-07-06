@@ -207,6 +207,7 @@
       integer(kind = kint) :: ierr
 !
 !
+      write(*,*) 'sph_file_param%iflag_format', sph_file_param%iflag_format
       if (iflag_debug.gt.0) write(*,*) 'input_geom_rtp_sph_trans'
       call sel_mpi_read_geom_rtp_file                                   &
      &   (nprocs, my_rank, sph_file_param, sph_file_l)
