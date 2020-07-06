@@ -100,6 +100,7 @@
       subroutine evolution_sph_snap_w_psf
 !
       use output_viz_file_control
+      use set_time_step_params
 !
       integer(kind = kint) :: visval
       integer(kind = kint) :: iflag
@@ -107,7 +108,7 @@
 !*  -----------  set initial step data --------------
 !*
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+2)
-      call s_initialize_time_step(MHD_step1%init_d, MHD_step1%time_d)
+      call set_from_initial_step(MHD_step1%init_d, MHD_step1%time_d)
 !*
 !*  -------  time evelution loop start -----------
 !*

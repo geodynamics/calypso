@@ -63,6 +63,8 @@
       subroutine MHD_viz_routine_flag_and_step                          &
      &         (flex_p, time_d, viz_step, viz_flag)
 !
+      use t_flex_delta_t_parameter
+!
       type(time_data), intent(in) :: time_d
       type(flexible_stepping_parameter), intent(in) :: flex_p
       type(VIZ_step_params), intent(inout) :: viz_step
@@ -86,7 +88,7 @@
      &              (iflag_flexible_step, i_step_fix, time_d, IO_step)
 !
       use t_time_data
-      use t_flex_delta_t_data
+      use t_flex_delta_t_parameter
 !
       integer(kind = kint), intent(in) :: iflag_flexible_step
       integer(kind = kint), intent(in) :: i_step_fix
@@ -108,7 +110,7 @@
      &              (iflag_flexible_step, i_step_fix, time_d, IO_step)
 !
       use t_time_data
-      use t_flex_delta_t_data
+      use t_flex_delta_t_parameter
 !
       integer(kind = kint), intent(in) :: iflag_flexible_step
       integer(kind = kint), intent(in) :: i_step_fix

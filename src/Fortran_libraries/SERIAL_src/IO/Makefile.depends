@@ -124,6 +124,8 @@ set_restart_data.o: $(IO_DIR)/set_restart_data.f90 m_precision.o m_phys_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_sph_extensions.o: $(IO_DIR)/set_sph_extensions.f90 m_precision.o set_parallel_file_name.o
 	$(F90) -c $(F90OPTFLAGS) $<
+set_time_step_params.o: $(IO_DIR)/set_time_step_params.f90 m_constants.o m_machine_parameter.o t_time_data.o t_ctl_data_4_time_steps.o m_error_IDs.o
+	$(F90) -c $(F90OPTFLAGS) $<
 set_ucd_data.o: $(IO_DIR)/set_ucd_data.f90 m_precision.o m_constants.o t_ucd_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_ucd_extensions.o: $(IO_DIR)/set_ucd_extensions.f90 m_precision.o set_parallel_file_name.o
@@ -234,7 +236,7 @@ t_read_mesh_data.o: $(IO_DIR)/t_read_mesh_data.f90 m_precision.o t_comm_table.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 t_spheric_data_IO.o: $(IO_DIR)/t_spheric_data_IO.f90 m_precision.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_spheric_group.o t_node_id_spherical_IO.o t_comm_table.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_step_parameter.o: $(IO_DIR)/t_step_parameter.f90 m_constants.o m_machine_parameter.o t_time_data.o t_IO_step_parameter.o t_ctl_data_4_time_steps.o m_error_IDs.o
+t_step_parameter.o: $(IO_DIR)/t_step_parameter.f90 m_constants.o m_machine_parameter.o t_time_data.o t_IO_step_parameter.o t_ctl_data_4_time_steps.o set_time_step_params.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_surf_edge_IO.o: $(IO_DIR)/t_surf_edge_IO.f90 m_precision.o t_geometry_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
