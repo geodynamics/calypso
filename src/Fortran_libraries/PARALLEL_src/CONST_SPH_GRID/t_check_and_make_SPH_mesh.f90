@@ -80,6 +80,7 @@
      &     (sph_file_param, sph_maker%sph_tmp, sph_maker%gen_sph)
         call dealloc_gen_mesh_params(sph_maker%gen_sph)
       end if
+      call calypso_mpi_barrier
 !
       end subroutine check_and_make_SPH_mesh
 !
