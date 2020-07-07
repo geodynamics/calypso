@@ -13,8 +13,8 @@
 !!        type(isosurf_controls), intent(inout) :: iso_ctls
 !!        type(isosurface_module), intent(inout) :: iso
 !!        type(phys_data), intent(in) :: nod_fld
-!!      subroutine ISOSURF_visualize                                    &
-!!     &         (istep_iso, time_d, fem, nod_fld, iso)
+!!      subroutine ISOSURF_visualize(ISO_t, time_d, fem, nod_fld, iso)
+!!        type(IO_step_param), intent(in) :: ISO_t
 !!        type(time_data), intent(in) :: time_d
 !!        type(mesh_data), intent(in) :: fem
 !!        type(phys_data), intent(in) :: nod_fld
@@ -33,6 +33,7 @@
       use t_time_data
       use t_psf_case_table
       use t_ucd_data
+      use t_IO_step_parameter
       use t_file_IO_parameter
       use t_control_params_4_iso
       use t_control_data_isosurfaces
@@ -125,8 +126,7 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine ISOSURF_visualize                                      &
-     &         (istep_iso, time_d, fem, nod_fld, iso)
+      subroutine ISOSURF_visualize(ISO_t, time_d, fem, nod_fld, iso)
 !
       use m_work_time
       use m_elapsed_labels_4_VIZ
@@ -139,7 +139,7 @@
       use set_fields_for_psf
       use output_4_psf
 !
-      integer(kind = kint), intent(in) :: istep_iso
+      type(IO_step_param), intent(in) :: ISO_t
 !
       type(time_data), intent(in) :: time_d
       type(mesh_data), intent(in) :: fem
@@ -148,7 +148,7 @@
       type(isosurface_module), intent(inout) :: iso
 !
 !
-      if (iso%num_iso.le.0 .or. istep_iso.le.0) return
+      if (iso%num_iso.le.0 .or. ISO_t%istep_file.le.0) return
 !
       if(iflag_ISO_time) call start_elapsed_time(ist_elapsed_ISO+1)
       if (iflag_debug.eq.1) write(*,*) 'set_const_4_isosurfaces'
@@ -170,7 +170,7 @@
 !
       if(iflag_ISO_time) call start_elapsed_time(ist_elapsed_ISO+3)
       call output_isosurface                                            &
-     &   (iso%num_iso, iso%iso_file_IO, istep_iso, time_d,              &
+     &   (iso%num_iso, iso%iso_file_IO, ISO_t%istep_file, time_d,       &
      &    iso%iso_mesh, iso%iso_time_IO, iso%iso_out)
 !
       call dealloc_psf_field_data(iso%num_iso, iso%iso_mesh)

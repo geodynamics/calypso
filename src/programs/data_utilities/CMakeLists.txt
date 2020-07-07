@@ -10,9 +10,6 @@ SET(SRC_SPH_D_BENCH_MAIN SNAPSHOT_MHD/main_sph_dynamobench.f90 SNAPSHOT_MHD/anal
 ADD_EXECUTABLE(sph_dynamobench ${SRC_SPH_D_BENCH_MAIN})
 TARGET_LINK_LIBRARIES(sph_dynamobench calypso calypso_c fftpack.5d)
 
-ADD_EXECUTABLE(psf_to_vtk SNAPSHOT_MHD/psf_file_to_VTK.f90)
-TARGET_LINK_LIBRARIES(psf_to_vtk calypso calypso_c)
-
 SET(SRC_SPH_INITIAL INITIAL_FIELD/main_sph_initial_fld.f90 INITIAL_FIELD/SPH_analyzer_const_initial.f90 INITIAL_FIELD/const_sph_initial_spectr.f90)
 ADD_EXECUTABLE(sph_initial_field ${SRC_SPH_INITIAL})
 TARGET_LINK_LIBRARIES(sph_initial_field calypso calypso_c fftpack.5d)
@@ -35,3 +32,16 @@ TARGET_LINK_LIBRARIES(t_ave_nusselt calypso)
 
 ADD_EXECUTABLE(sph_ene_check TIME_HISTORIES/compare_sph_mean_square.f90)
 TARGET_LINK_LIBRARIES(sph_ene_check calypso)
+
+
+SET(SRC_PSF_PLUG VIZ_only/load_mesh_and_field_4_viz.f90 VIZ_only/t_control_data_section_only.f90 VIZ_only/t_surfacing.f90 VIZ_only/FEM_analyzer_viz_surf.f90 VIZ_only/analyzer_psf.f90 VIZ_only/main_surface_rendering.f90)
+ADD_EXECUTABLE(sectioning ${SRC_PSF_PLUG})
+TARGET_LINK_LIBRARIES(sectioning calypso calypso_c)
+
+SET(SRC_VTK_CONVERT_PLUG VIZ_only/load_mesh_and_field_4_viz.f90 VIZ_only/t_control_data_section_only.f90 VIZ_only/t_viz_VTK_convert.f90 VIZ_only/FEM_analyzer_VTK_convert.f90 VIZ_only/analyzer_VTK_convert.f90 VIZ_only/main_VTK_convert.f90)
+ADD_EXECUTABLE(field_to_VTK ${SRC_VTK_CONVERT_PLUG})
+TARGET_LINK_LIBRARIES(field_to_VTK calypso calypso_c)
+
+ADD_EXECUTABLE(psf_to_vtk VIZ_only/psf_file_to_VTK.f90)
+TARGET_LINK_LIBRARIES(psf_to_vtk calypso calypso_c)
+

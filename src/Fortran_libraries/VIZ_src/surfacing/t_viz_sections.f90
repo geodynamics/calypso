@@ -40,7 +40,9 @@
 !
 !>      Structure of sectioning and isosurfaceing modules
       type surfacing_modules
+!>        Structure of cross sections
         type(sectioning_module) :: psf
+!>        Structure of isosurfaces
         type(isosurface_module) :: iso
       end type surfacing_modules
 !
@@ -88,13 +90,13 @@
 !
 !
       if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
-      call SECTIONING_visualize(viz_step%PSF_t%istep_file, time_d,      &
-     &    fem, nod_fld, viz_psfs%psf)
+      call SECTIONING_visualize                                         &
+     &   (viz_step%PSF_t, time_d, fem, nod_fld, viz_psfs%psf)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
 !
       if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+7)
-      call ISOSURF_visualize(viz_step%ISO_t%istep_file, time_d,         &
-     &    fem, nod_fld, viz_psfs%iso)
+      call ISOSURF_visualize                                            &
+     &   (viz_step%ISO_t, time_d, fem, nod_fld, viz_psfs%iso)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+7)
 !
       end subroutine visualize_surface

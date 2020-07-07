@@ -2,11 +2,14 @@
 #
 #
 
+DATA_UTILS_DIR = $$(PROG_DIR)/data_utilities
+
 SUBDIRS = \
 MERGE \
 INITIAL_FIELD \
 SNAPSHOT_MHD \
 TIME_HISTORIES \
+VIZ_only \
 \
 Rayleigh_link
 
@@ -16,7 +19,7 @@ Rayleigh_link
 #
 
 dir_list:
-	@echo 'DATA_UTILS_DIR =    $$(PROG_DIR)/data_utilities'   >> $(MAKENAME)
+	@echo 'DATA_UTILS_DIR = $(DATA_UTILS_DIR)'   >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( \
@@ -46,6 +49,7 @@ target_task:
 	assembles \
 	sph_snapshots \
 	sph_initial \
+	visualizer \
 	>> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \

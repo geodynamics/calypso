@@ -1,0 +1,35 @@
+begin visualizer
+  begin data_files_def
+    num_subdomain_ctl           2
+    num_smp_ctl                 4
+!
+    mesh_file_prefix             'mesh/in'
+    field_file_prefix           'field/out'
+!
+    mesh_file_fmt_ctl           'ascii'
+    field_file_fmt_ctl          'ascii'
+  end data_files_def
+!
+  begin time_step_ctl
+    i_step_init_ctl           0
+    i_step_number_ctl      2000
+!
+    i_step_field_ctl        400
+    i_step_sectioning_ctl   400
+    i_step_isosurface_ctl   400
+  end time_step_ctl
+!
+  begin visual_control
+    array cross_section_ctl
+      file   cross_section_ctl   'ctl_psf_eq'
+    end array cross_section_ctl
+!
+    array isosurface_ctl
+      file   isosurface_ctl   'ctl_iso_p_n1e4'
+      file   isosurface_ctl   'ctl_iso_p_p1e4'
+    end array isosurface_ctl
+!
+    output_field_file_fmt_ctl   'merged_VTK'
+  end  visual_control
+!
+end  visualizer
