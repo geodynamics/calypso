@@ -149,6 +149,7 @@
 !
       call s_set_fixed_time_step_params                                 &
      &   (tctl, MHD_step%init_d, MHD_step%finish_d, ierr, e_message)
+      if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message)
 !
       call output_step_4_fixed_step_ctl(ione, MHD_step%init_d%dt,       &
      &    tctl%i_step_rst_ctl, tctl%delta_t_rst_ctl, MHD_step%rst_step)
@@ -158,7 +159,6 @@
      &    MHD_step%ucd_step)
       call viz_fixed_time_step_params                                   &
      &   (MHD_step%init_d%dt, tctl, MHD_step%viz_step)
-      if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message)
 !
       call output_step_4_fixed_step_ctl(ione, MHD_step%init_d%dt,       &
      &    tctl%i_step_check_ctl, tctl%delta_t_check_ctl,                &

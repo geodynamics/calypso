@@ -142,8 +142,8 @@
 !
       if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
       if (iflag_debug.gt.0) write(*,*) 'SECTIONING_visualize zmean'
-      call SECTIONING_visualize(viz_step%PSF_t%istep_file, time_d,      &
-     &    geofem, nod_fld, zm_psf)
+      call SECTIONING_visualize                                         &
+     &   (viz_step%PSF_t, time_d, geofem, nod_fld, zm_psf)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
 !
       end subroutine SPH_MHD_zonal_mean_section
@@ -182,8 +182,8 @@
 !
       if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
       if (iflag_debug.gt.0) write(*,*) 'SECTIONING_visualize RMS'
-      call SECTIONING_visualize(viz_step%PSF_t%istep_file, time_d,      &
-     &    geofem, nod_fld, zrms_psf)
+      call SECTIONING_visualize                                         &
+     &   (viz_step%PSF_t, time_d, geofem, nod_fld, zrms_psf)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
 !
       end subroutine SPH_MHD_zonal_RMS_section
