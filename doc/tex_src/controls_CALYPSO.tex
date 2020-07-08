@@ -93,6 +93,18 @@ Field data field format for visualize snapshots \verb|[fld_format]| is defined b
 \label{href_t:spherical_shell_ctl}
 Configuration of the spherical shell and parallelization are defined by in this block. This block can be stored in an external file.
 %
+
+\subsubsection{\tt FEM\_mesh\_ctl}
+\label{href_t:FEM_mesh_ctl}
+Configuration of the FEM mesh is defined in this block. This block is optional.
+\hyperref[href_i:FEM_mesh_ctl]{(Back to {\tt control\_sph\_shell})}
+
+\paragraph{\tt FEM\_mesh\_output\_switch}
+\label{href_t:FEM_mesh_output_switch}
+\verb|[ON or OFF]| \\
+Set \verb|ON| if FEM mesh data need to be written.
+%
+
 \subsubsection{\tt num\_domain\_ctl}
 \label{href_t:num_domain_ctl}
 Parallelization is defined in this block. Domain decomposition is defined for spectrum data, field data, and Legendre transform. \\
@@ -773,7 +785,7 @@ Spectrum as a function of degree {l} is written in \verb|[vol_pwr_prefix])_l.dat
 If this file prefix is not defined, volume spectrum data are not generated and volume mean square data is written as \verb|sph_pwr_volume_s.dat|.
 
 \paragraph{\tt nusselt\_number\_prefix}
-\label{href_t:gauss_coefs_prefix}
+\label{href_t:nusselt_number_prefix}
 \verb|[nusselt_number_prefix]| \\
 File prefix for Nusselt number data at ICB and CMB \verb|[nusselt_number_prefix]| is defined by Text. Program add {\tt .dat} extension after this file prefix. If this file prefix is not defined, Nusselt number data are not generated. \\
 {\bf CAUTION: Nusselt number is not evaluated if heat source exsists.}
@@ -879,10 +891,9 @@ Parameters to generate data at mid-depth of euqtorial plane are defined in this 
 \label{href_t:nphi_mid_eq_ctl}
 \verb|[Nphi_mid_equator]| \\
 Number of grid points \verb|[Nphi_mid_equator]|in longitudinal direction to evaluate mid-depth of the shell in the equatorial plane for dynamo benchmark is defined as integer. If \verb|[Nphi_mid_equator]| is not defined or less than zero, \verb|[Nphi_mid_equator]| is set set number grid as the input spherical transform data. 
-
-
 %
 %
+
 \subsection{\tt visual\_control}
 \label{href_t:visual_control}
 Visualization modules are defined in this block. Parameters for cross sections and isosurfaces are defined in this block. \\
@@ -1061,6 +1072,13 @@ Field informations for cross section are defined in this array. Name of the outp
 \end{center}
 \end{table}
 %
+%
+
+
+\subsection{\tt isosurface\_ctl}
+\label{href_t:isosurface_ctl}
+Control parameters for isosurfacing are defined in this block. \\
+\hyperref[href_i:isosurface_ctl]{(Back to {\tt isosurface\_ctl)}}
 
 %
 %
@@ -1118,6 +1136,29 @@ Isosurface value is defined as real value \verb|VALUE|.
 Field informations for cross section are defined in this array. Name of the output fields is defined by \verb|[FIELD]|, and component of the fields is defined by \verb|[COMPONENT]|. Labels of the field name are listed in Table \ref{table:fields}, and labels of the component are listed in Table \ref{table:components}. \\
 %
 %
+%
+%
+
+\subsection{\tt dynamo\_vizs\_control}
+\label{href_t:dynamo_vizs_control}
+Visualization for zonal mean, RMS, and truncated magnetic field are defined in this block. Parameters for cross section is set for zonal mean and RMS, and spherical harmonics degree of the truncated magnetic field is also defined here. \\
+\hyperref[href_i:dynamo_vizs_control]{(Back to {\tt dynamo\_vizs\_control)}}
+
+%
+%
+\paragraph{\tt zonal\_mean\_section\_ctl}
+\label{href_t:zonal_mean_section_ctl}
+Control parameters for cross section of the zonal mean field are defined in this block. This block has the same control items as \hyperref[href_i:cross_section_ctl]{\tt cross\_section\_ctl}. In the external file {\tt [zonal\_mean\_section\_control\_file]}, con trol block starts from {\tt cross\_section\_ctl}.
+
+
+\paragraph{\tt zonal\_RMS\_section\_ctl}
+\label{href_t:zonal_RMS_section_ctl}
+Control parameters for cross section of the zonal RMS field are defined in this block. This block has the same control items as \hyperref[href_i:cross_section_ctl]{\tt cross\_section\_ctl}. In the external file {\tt [zonal\_RMS\_section\_control\_file]}, con trol block starts from {\tt cross\_section\_ctl}.
+
+\paragraph{\tt crustal\_filtering\_ctl}
+\label{href_t:crustal_filtering_ctl}
+Set the truncation degree to make the truncated magnetic field by the crustal magnetic field. The spherical harmonics degree of the truncated magnetic field is defined in {\tt truncation\_degree\_ctl}. In the external file {\tt [zonal\_mean\_section\_control\_file]}, con trol block starts from {\tt cross\_section\_ctl}.
+
 %
 
 \subsection{\tt new\_data\_files\_def}

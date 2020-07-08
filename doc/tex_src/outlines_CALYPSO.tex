@@ -15,6 +15,8 @@ Program & Control file name & Type \\ \hline
 \verb|assemble_sph|           & \verb|control_assemble_sph| & Parallel  \\ \hline
 \verb|sph_snapshot|           & \verb|control_snapshot| &   Parallel  \\
 \verb|sph_dynamobench|        & \verb|control_snapshot| &   Parallel  \\ \hline
+\verb|sectioning|             & \verb|control_viz| &        Parallel  \\
+\verb|field_to_VTK|           & \verb|control_viz| &        Parallel  \\
 \verb|psf_to_vtk|             & N/A & Serial  \\ \hline
 % \verb|sph_ene_check|          & N/A & Serial  \\
 \verb|t_ave_sph_mean_square|  & N/A & Serial  \\
@@ -26,6 +28,7 @@ Program & Control file name & Type \\ \hline
 \label{table:controls}
 \end{table}
 %
+
 Because the serial programs do not use MPI, they are simply invoked by
 %
 \begin{verbatim}

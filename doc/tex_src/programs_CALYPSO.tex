@@ -122,10 +122,15 @@ Block {\tt MHD\_control} (Top block of the control file)
 		\item \hyperref[href_t:sph_file_fmt_ctl]{\tt sph\_file\_fmt\_ctl    [sph\_format]}
 		\end{itemize}
 %
-	\item File \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl    [resolution\_file\_name]}
+	\item File \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl    [resolution\_control]}
 	\item or Block \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
 %
 		\begin{itemize}
+		\item (Block \hyperref[href_t:FEM_mesh_ctl]{\tt FEM\_mesh\_ctl})
+		\begin{itemize} \label{href_i:FEM_mesh_ctl}
+		\item (\hyperref[href_t:FEM_mesh_output_switch]{\tt FEM\_mesh\_output\_switch [ON or OFF]})
+		\end{itemize}
+%
 		\item Block \hyperref[href_t:num_domain_ctl]{\tt num\_domain\_ctl}
 			\begin{itemize} \label{href_i:num_domain_ctl}
 			\item \hyperref[href_t:num_radial_domain_ctl]{\tt num\_radial\_domain\_ctl [Ndomain]}
@@ -170,11 +175,12 @@ Block {\tt MHD\_control} (Top block of the control file)
 If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined, the following arrays \verb|num_domain_sph_grid|, \verb|num_domain_legendre|, and \verb|num_domain_spectr| are not necessary. \\
 (see \hyperref[href_t:gen_w_innercore]{example} \verb|spherical_shell/with_inner_core|)
 
-The external file for resoultion and parallelization information \verb|[resolution_file_name]| needs the following contorl blocks:
+The external file for resoultion and parallelization information \verb|[resolution_control]| needs the following contorl blocks:
 %
 	\begin{itemize}
-	\item Block \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
+	\item Block \hyperref[href_i:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
 		\begin{itemize}
+		\item Block \hyperref[href_i:FEM_mesh_ctl]{\tt FEM\_mesh\_ctl}
 		\item Block \hyperref[href_i:num_domain_ctl]{\tt num\_domain\_ctl}
 		\item Block \hyperref[href_i:num_grid_sph]{\tt num\_grid\_sph}
 		\end{itemize}
@@ -192,7 +198,7 @@ The external file for resoultion and parallelization information \verb|[resoluti
 %
 
 \subsection{Finite element mesh data (optional)}
-Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written based on GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. The extension of the mesh file is listed in Table \ref{table:mesh_format}. This mesh data is used to generate 
+Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written based on GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. The extension of the mesh file is listed in Table \ref{table:mesh_format}. This mesh data is only used in the programs \verb|sectioning| and \verb|field_to_VTK|.
 
 \subsection{Radial grid data}
 The preprocessing program generates radius of each layer in \verb|radial_info.dat| if \verb|radial_grid_type_ctl| is set to \verb|Chebyshev| or \verb|equi_distance|. This file consists of blocks \verb|array r_layer| and \verb|array boundaries_ctl| for control file. This data may be useful if you want to modify radial grid spacing by yourself.
@@ -303,345 +309,299 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 The format of the control file \verb|control_MHD| is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking "(Detail)". \\
 \\
 %
-\verb|MHD_control|  (Header of the control file)
+Block \verb|MHD_control|  (Top block of the control file)
 \label{href_i:MHD_control}
 %
 \begin{itemize}
-\item \hyperref[href_t:data_files_def]{\tt data\_files\_def}
+\item Block \hyperref[href_t:data_files_def]{\tt data\_files\_def}
 	\label{href_i:data_files_def}
 %
 	\begin{itemize}
-	\item \verb|num_subdomain_ctl           [Num_PE]|
-		\hyperref[href_t:num_subdomain_ctl]{(Detail)}
-	\item \verb|num_smp_ctl                 [Num_Threads]|
-		\hyperref[href_t:num_smp_ctl]{(Detail)}
-	\item \verb|sph_file_prefix             [sph_prefix]|
-			\hyperref[href_t:sph_file_prefix]{(Detail)}
-	\item \verb|boundary_data_file_name      [boundary_data_name]|
-			\hyperref[href_t:boundary_data_file_name]{(Detail)}
+	\item \hyperref[href_t:num_subdomain_ctl]
+			{\tt num\_subdomain\_ctl    [Num\_PE]}
+	\item \hyperref[href_t:num_smp_ctl]
+			{\tt num\_smp\_ctl    [Num\_Threads]}
+	\item \hyperref[href_t:sph_file_prefix]
+			{\tt sph\_file\_prefix    [sph\_prefix]}
+	\item \hyperref[href_t:boundary_data_file_name]
+		{\tt boundary\_data\_file\_name    [boundary\_data\_name]}
 %
-	\item \verb|restart_file_prefix         [rst_prefix]|
-			\hyperref[href_t:restart_file_prefix]{(Detail)}
-	\item \verb|field_file_prefix           [fld_prefix]|
-			\hyperref[href_t:field_file_prefix]{(Detail)}
+	\item \hyperref[href_t:restart_file_prefix]
+		{\tt restart\_file\_prefix    [rst\_prefix])}
+	\item \hyperref[href_t:field_file_prefix]
+			{\tt field\_file\_prefix    [fld\_prefix]}
 %
-	\item \verb|sph_file_fmt_ctl            [sph_format]|
-			\hyperref[href_t:sph_file_fmt_ctl]{(Detail)}
-	\item \verb|restart_file_fmt_ctl        [rst_format]|
-			\hyperref[href_t:restart_file_fmt_ctl]{(Detail)}
-	\item \verb|field_file_fmt_ctl          [fld_format]|
-			\hyperref[href_t:field_file_fmt_ctl]{(Detail)}
+	\item \hyperref[href_t:sph_file_fmt_ctl]
+			{\tt sph\_file\_fmt\_ctl    [sph\_format]}
+	\item \hyperref[href_t:restart_file_fmt_ctl]
+			{\tt restart\_file\_fmt\_ctl    [rst\_format]}
+	\item \hyperref[href_t:field_file_fmt_ctl]
+			{\tt field\_file\_fmt\_ctl    [fld\_format]}
 	\end{itemize}
 %
-\item (\verb|file spherical_shell_ctl	[resolution_file_name]|)
-	\hyperref[href_t:file_spherical_shell_ctl]{(Detail)}
-\item (\verb|spherical_shell_ctl|)
+\item (File or Block \hyperref[href_i:spherical_shell_ctl]
+			{\tt spherical\_shell\_ctl        [resolution\_control]})
 	\begin{itemize}
-	\item (\verb|num_domain_ctl|
-		\hyperref[href_i:data_files_def2]{(Detail)}) \\
-		(\verb|...|)
-%
-	\item (\verb|num_grid_sph|
-		\hyperref[href_i:num_grid_sph]{(Detail)}) \\
-		(\verb|...|)
+	\item (Block \hyperref[href_i:FEM_mesh_ctl]
+        {\tt FEM\_mesh\_ctl} See Section \ref{section:gen_sph_grid})
+	\item (Block \hyperref[href_i:num_domain_ctl]
+		{\tt num\_domain\_ctl} See Section \ref{section:gen_sph_grid})
+	\item (Block \hyperref[href_i:num_grid_sph]
+		{\tt num\_grid\_sph} See Section \ref{section:gen_sph_grid})
 	\end{itemize}
 %
-\item \verb|model|
+\item Block \verb|model|
 	\begin{itemize}
-	\item \verb|phys_values_ctl|
-		\label{href_i:phys_values_ctl}
-    		\hyperref[href_t:phys_values_ctl]{(Detail)}
-		\begin{itemize}
-		\item \verb|array nod_value_ctl       [Field]   [Viz_flag] [Monitor_flag]|
-				\hyperref[href_t:nod_value_ctl]{(Detail)}
+	\item Block \hyperref[href_t:phys_values_ctl]{\tt phys\_values\_ctl}
+		\begin{itemize} \label{href_i:phys_values_ctl}
+		\item Array \hyperref[href_t:nod_value_ctl]
+			{\tt nod\_value\_ctl    [Field]  [Viz\_flag]  [Monitor\_flag]}
 		\end{itemize}
 %
-	\item \verb|time_evolution_ctl|
-		\label{href_i:time_evolution_ctl}
-    		\hyperref[href_t:time_evolution_ctl]{(Detail)}
-		\begin{itemize}
-		\item \verb|array time_evo_ctl       [Field]|
-				\hyperref[href_t:time_evo_ctl]{(Detail)}
+	\item Block \hyperref[href_t:time_evolution_ctl]{\tt time\_evolution\_ctl}
+		\begin{itemize} \label{href_i:time_evolution_ctl}
+		\item Array \hyperref[href_t:time_evo_ctl]
+			{\tt time\_evo\_ctl    [Field]}
 		\end{itemize}
 %
-	\item \verb|boundary_condition|
-		\label{href_i:boundary_condition}
-    		\hyperref[href_t:boundary_condition]{(Detail)}
-		\begin{itemize}
-		\item \verb|array bc_temperature       [Group]  [Type]  [Value]|
-				\hyperref[href_t:bc_temperature]{(Detail)}
-		\item \verb|array bc_velocity          [Group]  [Type]  [Value]|
-				\hyperref[href_t:bc_velocity]{(Detail)}
-		\item \verb|array bc_composition       [Group]  [Type]  [Value]|
-				\hyperref[href_t:bc_composition]{(Detail)}
-		\item \verb|array bc_magnetic_field    [Group]  [Type]  [Value]|
-				\hyperref[href_t:bc_magnetic_field]{(Detail)}
+	\item Block \hyperref[href_t:boundary_condition]{\tt boundary\_condition}
+		\begin{itemize} \label{href_i:boundary_condition}
+		\item Array \hyperref[href_t:bc_temperature]
+            {\tt bc\_temperature       [Group]  [Type]  [Value]}
+		\item Array \hyperref[href_t:bc_velocity]
+			{\tt bc\_velocity          [Group]  [Type]  [Value]}
+		\item Array \hyperref[href_t:bc_composition]
+			{\tt bc\_composition       [Group]  [Type]  [Value]}
+		\item Array \hyperref[href_t:bc_magnetic_field]
+			{\tt bc\_magnetic\_field    [Group]  [Type]  [Value]}
 		\end{itemize}
 %
-	\item \verb|forces_define|
-    		\label{href_i:forces_define}
-    		\hyperref[href_t:forces_define]{(Detail)}
-		\begin{itemize}
-		\item \verb|array force_ctl       [Force]|
-				\hyperref[href_t:force_ctl]{(Detail)}
+	\item Block \hyperref[href_t:forces_define]{\tt forces\_define}
+		\begin{itemize} \label{href_i:forces_define}
+		\item Array \hyperref[href_t:force_ctl]{\tt force\_ctl    [Force]}
 		\end{itemize}
 %
-	\item \verb|dimensionless_ctl|
-		\label{href_i:dimensionless_ctl}
-    		\hyperref[href_t:dimensionless_ctl]{(Detail)}
-		\begin{itemize}
-		\item \verb|array dimless_ctl       [Name]  [Value]|
-				\hyperref[href_t:dimless_ctl]{(Detail)}
+	\item Block \hyperref[href_t:dimensionless_ctl]{\tt dimensionless\_ctl}
+		\begin{itemize} \label{href_i:dimensionless_ctl}
+		\item Array \hyperref[href_t:dimless_ctl]{\tt dimless\_ctl    [Name]  [Value]}
 		\end{itemize}
 %
-	\item \verb|coefficients_ctl|
-		\label{href_i:coefficients_ctl}
-    		\hyperref[href_t:coefficients_ctl]{(Detail)}
-		\begin{itemize}
-		\item \verb|thermal|
-			\label{href_i:thermal}
-				\hyperref[href_t:thermal]{(Detail)}
-			\begin{itemize}
-			\item \verb|array coef_4_termal_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_termal_ctl]{(Detail)}
-			\item \verb|array coef_4_t_diffuse_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_t_diffuse_ctl]{(Detail)}
-			\item \verb|array coef_4_heat_source_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_heat_source_ctl]{(Detail)}
+	\item Block \hyperref[href_t:coefficients_ctl]{\tt coefficients\_ctl}
+		\begin{itemize} \label{href_i:coefficients_ctl}
+		\item Block \hyperref[href_t:thermal]{\tt thermal}
+			\begin{itemize} \label{href_i:thermal}
+			\item Array \hyperref[href_t:coef_4_termal_ctl]
+					{\tt coef\_4\_termal\_ctl          [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_t_diffuse_ctl]
+					{\tt coef\_4\_t\_diffuse\_ctl      [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_heat_source_ctl]
+					{\tt coef\_4\_heat\_source\_ctl    [Name] [Power]}
 			\end{itemize}
 %
-		\item \verb|momentum|
-			\label{href_i:momentum}
-				\hyperref[href_t:momentum]{(Detail)}
-			\begin{itemize}
-			\item \verb|array coef_4_velocity_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_velocity_ctl]{(Detail)}
-			\item \verb|array coef_4_press_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_press_ctl]{(Detail)}
-			\item \verb|array coef_4_v_diffuse_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_v_diffuse_ctl]{(Detail)}
-			\item \verb|array coef_4_buoyancy_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_buoyancy_ctl]{(Detail)}
-			\item \verb|array coef_4_Coriolis_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_Coriolis_ctl]{(Detail)}
-			\item \verb|array coef_4_Lorentz_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_Lorentz_ctl]{(Detail)}
-			\item \verb|array coef_4_composit_buoyancy_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_composit_buoyancy_ctl]{(Detail)}
+		\item Block \hyperref[href_t:momentum]{\tt momentum}
+			\begin{itemize} \label{href_i:momentum}
+			\item Array \hyperref[href_t:coef_4_velocity_ctl]
+				{\tt coef\_4\_velocity\_ctl          [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_press_ctl]
+				{\tt coef\_4\_press\_ctl             [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_v_diffuse_ctl]
+                {\tt coef\_4\_v\_diffuse\_ctl         [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_buoyancy_ctl]
+				{\tt coef\_4\_buoyancy\_ctl          [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_Coriolis_ctl]
+				{\tt coef\_4\_Coriolis\_ctl          [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_Lorentz_ctl]
+				{\tt coef\_4\_Lorentz\_ctl           [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_composit_buoyancy_ctl]
+				{\tt coef\_4\_composit\_buoyancy\_ctl [Name] [Power]}
 			\end{itemize}
 %
-		\item \verb|induction|
-			\label{href_i:induction}
-				\hyperref[href_t:induction]{(Detail)}
-			\begin{itemize}
-			\item \verb|array coef_4_magnetic_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_magnetic_ctl]{(Detail)}
-			\item \verb|array coef_4_m_diffuse_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_m_diffuse_ctl]{(Detail)}
-			\item \verb|array coef_4_induction_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_induction_ctl]{(Detail)}
+		\item Block \hyperref[href_t:induction]{\tt induction}
+			\begin{itemize} \label{href_i:induction}
+			\item Array \hyperref[href_t:coef_4_magnetic_ctl]
+				{\tt coef\_4\_magnetic\_ctl   [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_m_diffuse_ctl]
+				{\tt coef\_4\_m\_diffuse\_ctl [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_induction_ctl]
+				{\tt coef\_4\_induction\_ctl  [Name] [Power]}
 			\end{itemize}
 %
-		\item \verb|composition|
-			\label{href_i:composition}
-				\hyperref[href_t:composition]{(Detail)}
-			\begin{itemize}
-			\item \verb|array coef_4_composition_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_composition_ctl]{(Detail)}
-			\item \verb|array coef_4_c_diffuse_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_c_diffuse_ctl]{(Detail)}
-			\item \verb|array coef_4_composition_source_ctl [Name] [Power]|
-					\hyperref[href_t:coef_4_composition_source_ctl]{(Detail)}
+		\item Block \hyperref[href_t:composition]{\tt composition}
+			\begin{itemize} \label{href_i:composition}
+			\item Array \hyperref[href_t:coef_4_composition_ctl]
+				{\tt coef\_4\_composition\_ctl         [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_c_diffuse_ctl]
+				{\tt coef\_4\_c\_diffuse\_ctl          [Name] [Power]}
+			\item Array \hyperref[href_t:coef_4_composition_source_ctl]
+				{\tt coef\_4\_composition\_source\_ctl [Name] [Power]}
 			\end{itemize}
 		\end{itemize}
 %
-%	\item \verb|gravity_define|
-% 		\label{href_i:gravity_define}
-%    		\hyperref[href_t:gravity_define]{(Detail)}
-%		\begin{itemize}
-%		\item \verb|gravity_type_ctl       [Name]|
-%				\hyperref[href_t:gravity_type_ctl]{(Detail)}
+%	\item Block \hyperref[href_t:gravity_define]{\tt gravity\_define}
+%		\begin{itemize} \label{href_i:gravity_define}
+%		\item \verb||
+%				\hyperref[href_t:gravity_type_ctl]{\tt gravity\_type\_ctl    [Name]}
 %		\end{itemize}
 %
-%	\item \verb|Coriolis_define|
-%		\label{href_i:Coriolis_define}
-%    		\hyperref[href_t:Coriolis_define]{(Detail)}
-%		\begin{itemize}
-%		\item \verb|array rotation_vec       [Direction] [Value]|
-%				\hyperref[href_t:rotation_vec]{(Detail)}
+%	\item Block \hyperref[href_t:Coriolis_define]{\tt Coriolis_define}
+%		\begin{itemize} \label{href_i:Coriolis_define}
+%		\item Array \hyperref[href_t:rotation_vec]
+%				{\tt rotation\_vec    [Direction] [Value]}
 %		\end{itemize}
 %
-	\item \verb|temperature_define|
-		\label{href_i:temperature_define}
-    		\hyperref[href_t:temperature_define]{(Detail)}
-		\begin{itemize}
-		\item \verb|ref_temp_ctl        [REFERENCE_TEMP]|
-				\hyperref[href_t:ref_temp_ctl]{(Detail)}
-		\item \verb|low_temp_ctl|
-				\hyperref[href_t:low_temp_ctl]{(Detail)}
+	\item Block \hyperref[href_t:temperature_define]{\tt temperature\_define}
+		\begin{itemize} \label{href_i:temperature_define}
+		\item \verb||
+				\hyperref[href_t:ref_temp_ctl]{\tt ref\_temp\_ctl        [REFERENCE\_TEMP]}
+		\item Block \hyperref[href_t:low_temp_ctl]{\tt low\_temp\_ctl}
 			\begin{itemize}
-			\item \verb|depth             [RADIUS]|
-					\hyperref[href_t:depth]{(Detail)}
-			\item \verb|temperature       [TEMPERATURE]|
-					\hyperref[href_t:temperature]{(Detail)}
+			\item \hyperref[href_t:depth]      {\tt depth        [RADIUS]}
+			\item \hyperref[href_t:temperature]{\tt temperature  [TEMPERATURE]}
 			\end{itemize}
 %
-		\item \verb|high_temp_ctl|
-				\hyperref[href_t:high_temp_ctl]{(Detail)}
+		\item Block \hyperref[href_t:high_temp_ctl]{\tt high\_temp\_ctl}
 			\begin{itemize}
-			\item \verb|depth             [RADIUS]|
-					\hyperref[href_t:depth]{(Detail)}
-			\item \verb|temperature       [TEMPERATURE]|
-					\hyperref[href_t:temperature]{(Detail)}
+			\item \hyperref[href_t:depth]      {\tt depth        [RADIUS]}
+			\item \hyperref[href_t:temperature]{\tt temperature  [TEMPERATURE]}
 			\end{itemize}
-%
 		\end{itemize}
-%
 	\end{itemize}
 %
-\item \verb|control|
+\item Block \verb|control|
 	\begin{itemize}
-	\item \verb|time_step_ctl|
-		\label{href_i:time_step_ctl}
-    		\hyperref[href_t:time_step_ctl]{(Detail)}
-		\begin{itemize}
-		\item \verb|elapsed_time_ctl        [ELAPSED_TIME]|
-				\hyperref[href_t:elapsed_time_ctl]{(Detail)}
-		\item \verb|i_step_init_ctl         [ISTEP_START]|
-				\hyperref[href_t:i_step_init_ctl]{(Detail)}
-		\item \verb|i_step_finish_ctl       [ISTEP_FINISH]|
-				\hyperref[href_t:i_step_finish_ctl]{(Detail)}
-		\item \verb|i_step_check_ctl        [ISTEP_MONITOR]|
-				\hyperref[href_t:i_step_check_ctl]{(Detail)}
-		\item \verb|i_step_rst_ctl          [ISTEP_RESTART]|
-				\hyperref[href_t:i_step_rst_ctl]{(Detail)}
-		\item \verb|i_step_field_ctl        [ISTEP_FIELD]|
-				\hyperref[href_t:i_step_field_ctl]{(Detail)}
-		\item \verb|i_step_sectioning_ctl   [ISTEP_SECTION]|
-				\hyperref[href_t:i_step_sectioning_ctl]{(Detail)}
-		\item \verb|i_step_isosurface_ctl   [ISTEP_ISOSURFACE]|
-				\hyperref[href_t:i_step_isosurface_ctl]{(Detail)}
-		\item \verb|dt_ctl                  [DELTA_TIME]|
-				\hyperref[href_t:dt_ctl]{(Detail)}
-		\item \verb|time_init_ctl           [INITIAL_TIME]|
-				\hyperref[href_t:time_init_ctl]{(Detail)}
+	\item Block \hyperref[href_t:time_step_ctl]{\tt time\_step\_ctl}
+		\begin{itemize} \label{href_i:time_step_ctl}
+		\item \hyperref[href_t:elapsed_time_ctl]{\tt elapsed\_time\_ctl            [ELAPSED\_TIME]}
+		\item \hyperref[href_t:i_step_init_ctl]{\tt i\_step\_init\_ctl              [ISTEP\_START]}
+		\item \hyperref[href_t:i_step_finish_ctl]{\tt i\_step\_finish\_ctl          [ISTEP\_FINISH]}
+		\item \hyperref[href_t:i_step_check_ctl]{\tt i\_step\_check\_ctl            [ISTEP\_MONITOR]}
+		\item \hyperref[href_t:i_step_rst_ctl]{\tt i\_step\_rst\_ctl                [ISTEP\_RESTART]}
+		\item \hyperref[href_t:i_step_field_ctl]{\tt i\_step\_field\_ctl            [ISTEP\_FIELD]}
+		\item \hyperref[href_t:i_step_sectioning_ctl]{\tt i\_step\_sectioning\_ctl  [ISTEP\_SECTION]}
+		\item \hyperref[href_t:i_step_isosurface_ctl]{\tt i\_step\_isosurface\_ctl  [ISTEP\_ISOSURFACE]}
+		\item \hyperref[href_t:dt_ctl]{\tt dt\_ctl                                  [DELTA\_TIME]}
+		\item \hyperref[href_t:time_init_ctl]{\tt time\_init\_ctl                   [INITIAL\_TIME]}
 		\end{itemize}
 %
-	\item \verb|restart_file_ctl|
-		\label{href_i:restart_file_ctl}
-    		\hyperref[href_t:restart_file_ctl]{(Detail)}
-		\begin{itemize}
-		\item \verb|rst_ctl      [INITIAL_TYPE]|
-				\hyperref[href_t:rst_ctl]{(Detail)}
+	\item Block \hyperref[href_t:restart_file_ctl]{\tt restart\_file\_ctl}
+		\begin{itemize} \label{href_i:restart_file_ctl}
+		\item \hyperref[href_t:rst_ctl]{\tt rst\_ctl      [INITIAL\_TYPE]}
 		\end{itemize}
 %
-	\item \verb|time_loop_ctl|
-		\label{href_i:time_loop_ctl}
-    		\hyperref[href_t:time_loop_ctl]{(Detail)}
-		\begin{itemize}
-		\item \verb|scheme_ctl              [EVOLUTION_SCHEME]|
-				\hyperref[href_t:scheme_ctl]{(Detail)}
-		\item \verb|coef_imp_v_ctl          [COEF_INP_U]|
-				\hyperref[href_t:coef_imp_v_ctl]{(Detail)}
-		\item \verb|coef_imp_t_ctl          [COEF_INP_T]|
-				\hyperref[href_t:coef_imp_t_ctl]{(Detail)}
-		\item \verb|coef_imp_b_ctl          [COEF_INP_B]|
-				\hyperref[href_t:coef_imp_b_ctl]{(Detail)}
-		\item \verb|coef_imp_c_ctl          [COEF_INP_C]|
-				\hyperref[href_t:coef_imp_c_ctl]{(Detail)}
-		\item \verb|FFT_library_ctl         [FFT_Name]|
-				\hyperref[href_t:FFT_library_ctl]{(Detail)}
-		\item \verb|Legendre_trans_loop_ctl [Leg_Loop]|
-				\hyperref[href_t:Legendre_trans_loop_ctl]{(Detail)}
+	\item Block \verb||
+    		\hyperref[href_t:time_loop_ctl]{\tt time\_loop\_ctl}
+		\begin{itemize} \label{href_i:time_loop_ctl}
+		\item \hyperref[href_t:scheme_ctl]{\tt scheme\_ctl              [EVOLUTION\_SCHEME]}
+		\item \hyperref[href_t:coef_imp_v_ctl]{\tt coef\_imp\_v\_ctl    [COEF\_INP\_U]}
+		\item \hyperref[href_t:coef_imp_t_ctl]{\tt coef\_imp\_t\_ctl    [COEF\_INP\_T]}
+		\item \hyperref[href_t:coef_imp_b_ctl]{\tt coef\_imp\_b\_ctl    [COEF\_INP\_B]}
+		\item \hyperref[href_t:coef_imp_c_ctl]{\tt coef\_imp\_c\_ctl    [COEF\_INP\_C]}
+		\item \hyperref[href_t:FFT_library_ctl]{\tt FFT\_library\_ctl   [FFT\_Name]}
+		\item \hyperref[href_t:Legendre_trans_loop_ctl]
+			{\tt Legendre\_trans\_loop\_ctl [Leg\_Loop]}
 		\end{itemize}
 %
 	\end{itemize}
 %
-\item \verb|sph_monitor_ctl|
-	\label{href_i:sph_monitor_ctl}
-		\hyperref[href_t:sph_monitor_ctl]{(Detail)}
-	\begin{itemize}
-	\item \verb|volume_average_prefix             [vol_ave_prefix]|
-			\hyperref[href_t:volume_average_prefix]{(Detail)}
-	\item \verb|volume_pwr_spectr_prefix          [vol_pwr_prefix]|
-			\hyperref[href_t:volume_pwr_spectr_prefix]{(Detail)}
-	\item \verb|nusselt_number_prefix             [nusselt_number_prefix]| \\
-			\hyperref[href_t:nusselt_number_prefix]{(Detail)}
+\item Block \hyperref[href_t:sph_monitor_ctl]{\tt sph\_monitor\_ctl}
+	\begin{itemize} \label{href_i:sph_monitor_ctl}
+	\item \hyperref[href_t:volume_average_prefix]
+			{\tt volume\_average\_prefix        [vol\_ave\_prefix]}
+	\item \hyperref[href_t:volume_pwr_spectr_prefix]
+			{\tt volume\_pwr\_spectr\_prefix    [vol\_pwr\_prefix]}
+	\item \hyperref[href_t:nusselt_number_prefix]
+			{\tt nusselt\_number\_prefix        [nusselt\_number\_prefix]}
 %
-	\item \verb|array volume_spectrum_ctl|
-		\hyperref[href_t:volume_spectrum_ctl]{(Detail)}
+	\item Array \hyperref[href_t:volume_spectrum_ctl]{\tt volume\_spectrum\_ctl}
 		\begin{itemize}
-		\item \verb|volume_spectrum_ctl|
+		\item Block \verb|volume_spectrum_ctl|
 			\begin{itemize}
-			\item \verb|volume_average_prefix             [vol_ave_prefix]|
-					\hyperref[href_t:volume_average_prefix]{(Detail)}
-			\item \verb|volume_pwr_spectr_prefix          [vol_pwr_prefix]|
-					\hyperref[href_t:volume_pwr_spectr_prefix]{(Detail)}
-			\item \verb|inner_radius_ctl          [radius]|
-					\hyperref[href_t:inner_radius_ctl]{(Detail)}
-			\item \verb|outer_radius_ctl          [radius]|
-					\hyperref[href_t:outer_radius_ctl]{(Detail)}
+			\item \hyperref[href_t:volume_average_prefix]
+				{\tt volume\_average\_prefix      [vol\_ave\_prefix]}
+			\item \hyperref[href_t:volume_pwr_spectr_prefix]
+				{\tt volume\_pwr\_spectr\_prefix  [vol\_pwr\_prefix]}
+			\item \hyperref[href_t:inner_radius_ctl]
+				{\tt inner\_radius\_ctl           [radius]}
+			\item \hyperref[href_t:outer_radius_ctl]
+				{\tt outer\_radius\_ctl           [radius]}
 			\end{itemize}
 		\end{itemize}
 %
-	\item \verb|layered_spectrum_ctl|
-		\hyperref[href_t:layered_spectrum_ctl]{(Detail)}
+	\item Block \hyperref[href_t:layered_spectrum_ctl]{\tt layered\_spectrum\_ctl}
 		\begin{itemize}
-		\item \verb|layered_pwr_spectr_prefix         [layer_pwr_prefix]| \\
-			\hyperref[href_t:layered_pwr_spectr_prefix]{(Detail)}
-		\item \verb|array [spectr_layer_ctl]| \\
-			\hyperref[href_t:spectr_layer_ctl]{(Detail)}
+		\item \hyperref[href_t:layered_pwr_spectr_prefix]
+				{\tt layered\_pwr\_spectr\_prefix         [layer\_pwr\_prefix]}
+			\item Array \hyperref[href_t:spectr_layer_ctl]
+				{\tt spectr\_layer\_ctl [Layer \#] }
 		\end{itemize}
 %
-	\item \verb|gauss_coefficient_ctl|
-		\hyperref[href_t:gauss_coefficient_ctl]{(Detail)}
+	\item Block \hyperref[href_t:gauss_coefficient_ctl]{\tt gauss\_coefficient\_ctl}
 		\begin{itemize}
-		\item \verb|gauss_coefs_prefix                [gauss_coef_prefix]| \\
-			\hyperref[href_t:gauss_coefs_prefix]{(Detail)}
-		\item \verb|gauss_coefs_radius_ctl            [gauss_coef_radius]| \\
-			\hyperref[href_t:gauss_coefs_radius_ctl]{(Detail)}
-			\item \verb|array pick_gauss_coefs_ctl        [Degree]   [Order]| \\
-			\hyperref[href_t:pick_gauss_coefs_ctl]{(Detail)}
-		\item \verb|array pick_gauss_coef_degree_ctl  [Degree]|
-			\hyperref[href_t:pick_gauss_coef_degree_ctl]{(Detail)}
-		\item \verb|array pick_gauss_coef_order_ctl   [Order]|
-			\hyperref[href_t:pick_gauss_coef_order_ctl]{(Detail)}
+		\item \hyperref[href_t:gauss_coefs_prefix]
+			{\tt gauss\_coefs\_prefix                [gauss\_coef\_prefix]}
+		\item \hyperref[href_t:gauss_coefs_radius_ctl]
+            {\tt gauss\_coefs\_radius\_ctl           [gauss\_coef\_radius]}
+			\item Array \hyperref[href_t:pick_gauss_coefs_ctl]
+                		{\tt pick\_gauss\_coefs\_ctl  [Degree]   [Order]}
+		\item Array \hyperref[href_t:pick_gauss_coef_degree_ctl]
+                    {\tt pick\_gauss\_coef\_degree\_ctl  [Degree]}
+		\item Array \hyperref[href_t:pick_gauss_coef_order_ctl]
+					{\tt pick\_gauss\_coef\_order\_ctl   [Order]}
 		\end{itemize}
 %
-	\item \verb|pickup_spectr_ctl|
-		\hyperref[href_t:pickup_spectr_ctl]{(Detail)}
+	\item Block \hyperref[href_t:pickup_spectr_ctl]{\tt pickup\_spectr\_ctl}
 		\begin{itemize}
-		\item \verb|picked_sph_prefix                 [picked_sph_prefix]| \\
-			\hyperref[href_t:picked_sph_prefix]{(Detail)}
-		\item \verb|array pick_layer_ctl              [Layer #]|
-			\hyperref[href_t:pick_layer_ctl]{(Detail)}
-		\item \verb|array pick_sph_spectr_ctl         [Degree]  [Order]| \\
-			\hyperref[href_t:pick_sph_spectr_ctl]{(Detail)}
-		\item \verb|array pick_sph_degree_ctl         [Degree]|
-			\hyperref[href_t:pick_sph_degree_ctl]{(Detail)}
-		\item \verb|array pick_sph_order_ctl          [Order]|
-			\hyperref[href_t:pick_sph_order_ctl]{(Detail)}
+		\item \hyperref[href_t:picked_sph_prefix]
+			{\tt picked\_sph\_prefix                    [picked\_sph\_prefix]|}
+		\item Array \hyperref[href_t:pick_layer_ctl]
+					{\tt pick\_layer\_ctl               [Layer \#]}
+		\item Array \hyperref[href_t:pick_sph_spectr_ctl]
+					{\tt pick\_sph\_spectr\_ctl         [Degree]  [Order]}
+		\item Array \hyperref[href_t:pick_sph_degree_ctl]
+					{\tt pick\_sph\_degree\_ctl         [Degree]}
+		\item Array \hyperref[href_t:pick_sph_order_ctl]
+					{\tt pick\_sph\_order\_ctl          [Order]}
 		\end{itemize}
 %
-	\item \verb|mid_equator_monitor_ctl|
-		\hyperref[href_t:mid_equator_monitor_ctl]{(Detail)}
+	\item Block \hyperref[href_t:mid_equator_monitor_ctl]
+				{\tt mid\_equator\_monitor\_ctl}
 		\begin{itemize}
-		\item \verb|nphi_mid_eq_ctl   [Nphi_mid_equator]|
-			\label{href_i:nphi_mid_eq_ctl}
-			\hyperref[href_t:nphi_mid_eq_ctl]{(Detail)}
+		\item \hyperref[href_t:nphi_mid_eq_ctl]
+				{\tt nphi\_mid\_eq\_ctl   [Nphi\_mid\_equator]}
+				\label{href_i:nphi_mid_eq_ctl}
 		\end{itemize}
 	\end{itemize}
 %
-\item \verb|visual_control|
-    \label{href_i:visual_control}
-    \hyperref[href_t:visual_control]{(Detail)}
-    \begin{itemize}
-    \item \verb|array cross_section_ctl   [File or Block]|
-            \hyperref[href_t:cross_section_ctl]{(Detail)}
-    \item \verb|array isosurface_ctl   [File or Block]|
-            \hyperref[href_t:isosurface_ctl]{(Detail)}
+\item Block \hyperref[href_t:visual_control]{\tt visual\_control}
+    \begin{itemize} \label{href_i:visual_control}
+    \item Array \hyperref[href_t:cross_section_ctl]{\tt cross\_section\_ctl}
+		\begin{itemize}
+        \item File or Block {\tt cross\_section\_ctl} \\
+                            {\tt [section\_control\_file]}
+		\end{itemize}
 %
+    \item Array \hyperref[href_t:isosurface_ctl]{\tt isosurface\_ctl}
+		\begin{itemize}
+		\item File or Block {\tt isosurface\_ctl} \\
+                            {\tt [isosurface\_control\_file]}
+		\end{itemize}
     \end{itemize}
+%
+\item Block \hyperref[href_t:dynamo_vizs_control]{\tt dynamo\_vizs\_control}
+	\begin{itemize} \label{href_i:dynamo_vizs_control}
+		\item File or Block \hyperref[href_t:zonal_mean_section_ctl]
+							{\tt zonal\_mean\_section\_ctl} \\
+							{\tt [zonal\_mean\_section\_control\_file]}
+		\item File or Block \hyperref[href_t:zonal_RMS_section_ctl]
+							{\tt zonal\_RMS\_section\_ctl} \\
+                            {\tt [zonal\_RMS\_section\_control\_file]}
+%
+		\item Block \hyperref[href_t:crustal_filtering_ctl]{\tt crustal\_filtering\_ctl}
+			\begin{itemize}
+				\item \hyperref[href_t:crustal_filtering_ctl]
+						{\tt truncation\_degree\_ctl          [Degree]}
+			\end{itemize}
+	\end{itemize}
 \end{itemize}
 %
 \verb|spherical_shell_ctl| block is required if spherical harmonics indexing files are not exist.
@@ -712,7 +672,7 @@ CMB
 
 \subsection{Field data for visualization}
 \label{sec:VTK}
- Field data is used for the visualization processes.  Field data are written with XDMF format (\url{http://www.xdmf.org/index.php/Main_Page}), merged VTK, or distributed VTK format (\url{http://www.vtk.org/VTK/img/file-formats.pdf}). The output data format is defined by \verb|fld_format|. Visualization applications which we checked are listed in Table \ref{table:Viz_app}. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, coordinate conversion is required to plot vector field in spherical coordinate $(r, \theta, \phi)$ or cylindrical coordinate $(s,\phi, z)$. We will introduce a example of visualization process using ParaView in Section \ref{sec:paraview}.
+ Field data is used for the visualization processes. Field data are written with XDMF format (\url{http://www.xdmf.org/index.php/Main_Page}), merged VTK, or distributed VTK format (\url{http://www.vtk.org/VTK/img/file-formats.pdf}). The output data format is defined by \verb|fld_format|. Visualization applications which we checked are listed in Table \ref{table:Viz_app}. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, coordinate conversion is required to plot vector field in spherical coordinate $(r, \theta, \phi)$ or cylindrical coordinate $(s,\phi, z)$. We will introduce a example of visualization process using ParaView in Section \ref{sec:paraview}. Field data also output merged ASCII or binary format. Tese original formats have smaller file size than VTK format because of excluding grid information. Program \verb|field_to_VTK| generates VTK file from FEM mesh data and field data.
 %
 %
 \begin{table}[htp]
@@ -721,7 +681,7 @@ CMB
 \begin{center} 
 \begin{tabular}{|c|c|c|}
 \hline
- \verb|fld_format| & Application  \\ \hline \hline
+Control flag & \verb|fld_format| & Application \\ \hline \hline
 \verb|VTK| & Distributed VTK & ParaView \\ \hline
 \verb|single_VTK| & Merged VTK & ParaView, VisIt, or Mayavi \\ \hline
 \verb|VTK_gz| & Compressed Distributed VTK & ParaView \\
@@ -729,6 +689,15 @@ CMB
 \verb|single_VTK_gz| & Compressed Merged VTK & ParaView, VisIt or Mayavi \\
  & &  after expanding by {\tt gzip} \\ \hline
 \verb|single_HDF5| & XDMF   & ParaView, VisIt   \\ \hline
+\verb|ascii| & Distributed ASCII & - \\
+\verb|binary| & Distributed binary & - \\
+\verb|gzip| & Distributed compressed ASCII & - \\
+\verb|bin_gz| & Distributed compressed binary & - \\
+\verb|merged| & Merged ASCII & - \\
+\verb|merged_bin| & Merged binary & - \\
+\verb|merged_gzip| & Merged compressed ASCII & - \\
+\verb|merged_bin_gz| & Merged compressed binary & - \\ \hline
+
 \end{tabular}
 \end{center}
 More informations about ParaView is in \url{https://www.paraview.org}. \\
@@ -836,7 +805,7 @@ Merged XDMF data generate files listed in Table \ref{table:XDMF}. For ParaView, 
 %
 
 %
-\subsection{Cross section data (Parallel Surfacing module}
+\subsection{Cross section data (Parallel Surfacing module)}
 \label{section:PSF}
 Calypso can output cross section data for visualization with finer time increment than the whole domain data. The cross section data consist of triangle patches with VTK format, then data can be visualized by Paraview like as the whole field data. This cross sectioning module can output arbitrary quadrature surface, but plane, sphere, and cylindrical section would be useful for the geodynamo simulations.
 
