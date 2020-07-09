@@ -4,11 +4,10 @@
 !     programmed by H. Matsui
 !     modified by H. Matsui on Aug., 2007
 !
-!!      integer(kind = kint) function lead_field_data_flag              &
-!!     &                   (i_step, MHD_step)
+!!      logical function lead_field_data_flag(i_step, MHD_step)
 !!        type(MHD_step_param), intent(in) :: MHD_step
-!!      subroutine MHD_viz_routine_flag_and_step                        &
-!!     &         (flex_p, time_d, viz_step, viz_flag)
+!!      logical function MHD_viz_routine_flag(flex_p, time_d, viz_step)
+!!      subroutine MHD_viz_routine_step(flex_p, time_d, viz_step)
 !!        type(time_data), intent(in) :: time_d
 !!        type(flexible_stepping_parameter), intent(in) :: flex_p
 !!        type(VIZ_step_params), intent(inout) :: viz_step
@@ -30,8 +29,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      integer(kind = kint) function lead_field_data_flag                &
-     &                   (i_step, MHD_step)
+      logical function lead_field_data_flag(i_step, MHD_step)
 !
       integer(kind = kint), intent(in) :: i_step
       type(MHD_step_param), intent(in) :: MHD_step
@@ -39,53 +37,68 @@
 !
       lead_field_data_flag                                              &
      &      = iflag_vizs_w_fix_step(i_step, MHD_step%viz_step)          &
-     &       * output_IO_flag(i_step, MHD_step%rst_step)                &
-     &       * output_IO_flag(i_step, MHD_step%ucd_step)                &
-     &       * output_IO_flag(i_step, MHD_step%rms_step)                &
-     &       * output_IO_flag(i_step, MHD_step%point_step)              &
-     &       * output_IO_flag(i_step, MHD_step%sgs_IO_step)
+     &    .or. output_IO_flag(i_step, MHD_step%rst_step)                &
+     &    .or. output_IO_flag(i_step, MHD_step%ucd_step)                &
+     &    .or. output_IO_flag(i_step, MHD_step%rms_step)                &
+     &    .or. output_IO_flag(i_step, MHD_step%point_step)              &
+     &    .or. output_IO_flag(i_step, MHD_step%sgs_IO_step)
 !
-      if (iflag_debug.eq.1) then
-        write(*,*) 'irst: ', output_IO_flag(i_step, MHD_step%rst_step)
-        write(*,*) 'i_udt: ', output_IO_flag(i_step, MHD_step%ucd_step)
-        write(*,*) 'i_monitor: ',                                       &
+      if(iflag_debug .eq. 0) return
+      write(*,*) 'irst: ', output_IO_flag(i_step, MHD_step%rst_step)
+      write(*,*) 'i_udt: ', output_IO_flag(i_step, MHD_step%ucd_step)
+      write(*,*) 'i_monitor: ',                                         &
      &            output_IO_flag(i_step, MHD_step%point_step)
-        write(*,*) 'i_step_rms: ',                                      &
+      write(*,*) 'i_step_rms: ',                                        &
      &            output_IO_flag(i_step, MHD_step%rms_step)
-        write(*,*) 'i_model_coef: ',                                    &
+      write(*,*) 'i_model_coef: ',                                      &
      &            output_IO_flag(i_step, MHD_step%sgs_IO_step)
-      end if
 !
       end function lead_field_data_flag
 !
 !-----------------------------------------------------------------------
 !
-      subroutine MHD_viz_routine_flag_and_step                          &
-     &         (flex_p, time_d, viz_step, viz_flag)
+      logical function MHD_viz_routine_flag(flex_p, time_d, viz_step)
 !
       use t_flex_delta_t_parameter
 !
       type(time_data), intent(in) :: time_d
       type(flexible_stepping_parameter), intent(in) :: flex_p
       type(VIZ_step_params), intent(inout) :: viz_step
-      integer(kind = kint), intent(inout) :: viz_flag
 !
 !
       if(flex_p%iflag_flexible_step .eq. iflag_flex_step) then
-        viz_flag = iflag_vizs_w_flex_step(time_d, viz_step)
+        MHD_viz_routine_flag = iflag_vizs_w_flex_step(time_d, viz_step)
+      else
+        MHD_viz_routine_flag                                            &
+     &       = iflag_vizs_w_fix_step(flex_p%istep_max_dt, viz_step)
+      end if
+!
+      end function MHD_viz_routine_flag
+!
+!-----------------------------------------------------------------------
+!
+      subroutine MHD_viz_routine_step(flex_p, time_d, viz_step)
+!
+      use t_flex_delta_t_parameter
+!
+      type(time_data), intent(in) :: time_d
+      type(flexible_stepping_parameter), intent(in) :: flex_p
+      type(VIZ_step_params), intent(inout) :: viz_step
+!
+!
+      if(flex_p%iflag_flexible_step .eq. iflag_flex_step) then
         call istep_viz_w_flex_dt(time_d, viz_step)
       else
-        viz_flag = iflag_vizs_w_fix_step(flex_p%istep_max_dt, viz_step)
         call istep_viz_w_fix_dt(flex_p%istep_max_dt, viz_step)
       end if
 !
-      end subroutine MHD_viz_routine_flag_and_step
+      end subroutine MHD_viz_routine_step
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      integer(kind = kint) function iflag_viz_output                    &
-     &              (iflag_flexible_step, i_step_fix, time_d, IO_step)
+      logical function iflag_viz_output                                 &
+     &               (iflag_flexible_step, i_step_fix, time_d, IO_step)
 !
       use t_time_data
       use t_flex_delta_t_parameter
@@ -96,6 +109,7 @@
       type(IO_step_param), intent(in) :: IO_step
 !
 !
+      iflag_viz_output = .FALSE.
       if(iflag_flexible_step .eq. iflag_flex_step) then
         iflag_viz_output = iflag_viz_flex_step(time_d, IO_step)
       else
@@ -119,9 +133,9 @@
 !
 !
       if(iflag_flexible_step .eq. iflag_flex_step) then
-        viz_time_step = iflag_viz_flex_step(time_d, IO_step)
+        viz_time_step = istep_file_w_flex_dt(time_d, IO_step)
       else
-        viz_time_step = output_IO_flag(i_step_fix, IO_step)
+        viz_time_step = istep_file_w_fix_dt(i_step_fix, IO_step)
       end if
 !
       end function viz_time_step

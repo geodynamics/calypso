@@ -17,7 +17,7 @@
 !!        type(phys_data), intent(inout) :: nod_fld
 !!        type(MHD_IO_data), intent(inout) :: MHD_IO
 !!      subroutine FEM_analyze_sph_MHD                                  &
-!!     &         (MHD_files, geofem, nod_fld, MHD_step, visval, MHD_IO)
+!!     &         (MHD_files, geofem, nod_fld, MHD_step, MHD_IO)
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(SGS_paremeters), intent(in) :: SGS_par
 !!        type(time_data), intent(in) :: time_d
@@ -40,7 +40,6 @@
 !!@endverbatim
 !!
 !!@n @param  i_step       Current time step
-!!@n @param  visval       Return flag to call visualization routines
 !
       module FEM_analyzer_sph_MHD
 !
@@ -123,7 +122,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine FEM_analyze_sph_MHD                                    &
-     &         (MHD_files, geofem, nod_fld, MHD_step, visval, MHD_IO)
+     &         (MHD_files, geofem, nod_fld, MHD_step, MHD_IO)
 !
       use m_work_time
       use m_elapsed_labels_4_MHD
@@ -134,19 +133,14 @@
       type(mesh_data), intent(in) :: geofem
       type(phys_data), intent(inout) :: nod_fld
 !
-      integer (kind =kint), intent(inout) :: visval
       type(MHD_step_param), intent(inout) :: MHD_step
       type(MHD_IO_data), intent(inout) :: MHD_IO
 !
 !
 !*  ----------   Count steps for visualization
 !*
-      visval = iflag_vizs_w_fix_step(MHD_step%time_d%i_time_step,       &
-     &                             MHD_step%viz_step)
-      call istep_viz_w_fix_dt(MHD_step%time_d%i_time_step,              &
-     &                             MHD_step%viz_step)
-      if(lead_field_data_flag(MHD_step%time_d%i_time_step,MHD_step)     &
-     &  .ne. 0) return
+      if(lead_field_data_flag(MHD_step%time_d%i_time_step, MHD_step)    &
+     &    .eqv. .FALSE.) return
 !
 !*  ----------- Data communication  --------------
 !
@@ -158,7 +152,7 @@
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+5)
       call s_output_ucd_file_control                                    &
      &   (MHD_files%ucd_file_IO, MHD_step%time_d%i_time_step,           &
-     &    MHD_step%time_d, MHD_step%ucd_step, MHD_IO%ucd)
+     &    MHD_step%ucd_step, MHD_step%time_d, MHD_IO%ucd)
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+5)
 !
       end subroutine FEM_analyze_sph_MHD

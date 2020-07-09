@@ -7,12 +7,14 @@
 !>@brief FEM top routines for surfacing
 !!
 !!@verbatim
-!!      subroutine FEM_initialize_VTK_convert(init_d, sfcing)
+!!      subroutine FEM_initialize_VTK_convert(ucd_step, init_d, sfcing)
+!!        type(IO_step_param), intent(in) :: ucd_step
 !!        type(time_data), intent(in) :: init_d
 !!        type(FEM_mesh_field_4_surfacing), intent(inout) :: sfcing
 !!      subroutine FEM_analyze_VTK_convert                              &
-!!     &         (i_step, time_d, ucd_step, sfcing)
+!!     &         (i_step, ucd_step, time_d, sfcing)
 !!        integer (kind =kint), intent(in) :: i_step
+!!        type(IO_step_param), intent(in) :: ucd_step
 !!        type(time_data), intent(inout) :: time_d
 !!        type(IO_step_param), intent(inout) :: ucd_step
 !!        type(FEM_mesh_field_4_surfacing), intent(inout) :: sfcing
@@ -39,10 +41,11 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine FEM_initialize_VTK_convert(init_d, sfcing)
+      subroutine FEM_initialize_VTK_convert(ucd_step, init_d, sfcing)
 !
       use load_mesh_and_field_4_viz
 !
+      type(IO_step_param), intent(in) :: ucd_step
       type(time_data), intent(in) :: init_d
       type(FEM_mesh_field_4_surfacing), intent(inout) :: sfcing
 !
@@ -50,9 +53,9 @@
 !       setup mesh information
 !   --------------------------------
 !
-      call mesh_setup_4_VIZ(sfcing%mesh_file_IO, sfcing%ucd_file_IO,    &
-     &    init_d, sfcing%geofem, sfcing%ucd_time, sfcing%ucd_in,        &
-     &    sfcing%nod_fld)
+      call mesh_setup_4_VIZ(init_d, ucd_step, sfcing%ucd_file_IO,       &
+     &    sfcing%mesh_file_IO, sfcing%geofem, sfcing%ucd_time,          &
+     &    sfcing%ucd_in, sfcing%nod_fld)
       call deallocate_surface_geom_type(sfcing%geofem%mesh%surf)
 !
       end subroutine FEM_initialize_VTK_convert
@@ -61,21 +64,19 @@
 !-----------------------------------------------------------------------
 !
       subroutine FEM_analyze_VTK_convert                                &
-     &         (i_step, time_d, ucd_step, sfcing)
+     &         (i_step, ucd_step, time_d, sfcing)
 !
       use load_mesh_and_field_4_viz
 !
       integer (kind =kint), intent(in) :: i_step
-      type(time_data), intent(inout) :: time_d
       type(IO_step_param), intent(inout) :: ucd_step
+      type(time_data), intent(inout) :: time_d
       type(FEM_mesh_field_4_surfacing), intent(inout) :: sfcing
 !
 !
-      call istep_file_w_fix_dt(i_step, ucd_step)
       call set_field_data_4_VIZ                                         &
-     &   (ucd_step%istep_file, i_step, sfcing%ucd_file_IO,              &
-     &    sfcing%geofem, sfcing%ucd_time, sfcing%ucd_in, time_d,        &
-     &    sfcing%nod_fld)
+     &   (i_step, ucd_step, sfcing%ucd_file_IO, sfcing%geofem,          &
+     &    sfcing%ucd_time, sfcing%ucd_in, time_d, sfcing%nod_fld)
 !
       end subroutine FEM_analyze_VTK_convert
 !

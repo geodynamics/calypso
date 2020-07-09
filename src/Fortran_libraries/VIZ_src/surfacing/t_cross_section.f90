@@ -12,8 +12,7 @@
 !!        type(mesh_data), intent(in) :: fem
 !!        type(phys_data), intent(in) :: nod_fld
 !!      subroutine SECTIONING_visualize                                 &
-!!     &         (PSF_t, time_d, fem, nod_fld, psf)
-!!        type(IO_step_param), intent(in) :: PSF_t
+!!     &         (istep_psf, time_d, fem, nod_fld, psf)
 !!        type(time_data), intent(in) :: time_d
 !!        type(mesh_data), intent(in) :: fem
 !!        type(phys_data), intent(in) :: nod_fld
@@ -39,7 +38,6 @@
 !
       use t_psf_case_table
       use t_surface_group_connect
-      use t_IO_step_parameter
       use t_file_IO_parameter
       use t_control_params_4_psf
       use t_control_data_sections
@@ -158,7 +156,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine SECTIONING_visualize                                   &
-     &         (PSF_t, time_d, fem, nod_fld, psf)
+     &         (istep_psf, time_d, fem, nod_fld, psf)
 !
       use m_work_time
       use m_elapsed_labels_4_VIZ
@@ -166,7 +164,7 @@
       use set_ucd_data_to_type
       use output_4_psf
 !
-      type(IO_step_param), intent(in) :: PSF_t
+      integer(kind = kint), intent(in) :: istep_psf
       type(time_data), intent(in) :: time_d
       type(mesh_data), intent(in) :: fem
       type(phys_data), intent(in) :: nod_fld
@@ -174,7 +172,7 @@
       type(sectioning_module), intent(inout) :: psf
 !
 !
-      if (psf%num_psf.le.0 .or. PSF_t%istep_file.le.0) return
+      if (psf%num_psf.le.0 .or. istep_psf.le.0) return
 !
       if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+2)
       call set_field_4_psf(psf%num_psf, fem%mesh%edge, nod_fld,         &
@@ -185,7 +183,7 @@
       if (iflag_debug.eq.1) write(*,*) 'output_section_data'
       if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+3)
       call output_section_data(psf%num_psf, psf%psf_file_IO,            &
-     &    PSF_t%istep_file, time_d, psf%psf_time_IO, psf%psf_out)
+     &    istep_psf, time_d, psf%psf_time_IO, psf%psf_out)
       if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+3)
 !
       end subroutine SECTIONING_visualize

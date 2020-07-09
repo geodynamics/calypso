@@ -12,19 +12,22 @@
 !!        type(time_data_control), intent(in) :: tctl
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(field_IO_params), intent(inout) :: mesh_file
+!!        type(IO_step_param), intent(in) :: ucd_step
 !!        type(field_IO_params), intent(inout) :: ucd_param
 !!        type(time_step_param_w_viz), intent(inout) :: t_viz_param
 !!
-!!      subroutine mesh_setup_4_VIZ                                     &
-!!     &         (mesh_file, ucd_param, init_d, fem, t_IO, ucd, field)
+!!      subroutine mesh_setup_4_VIZ(init_d, ucd_step, mesh_file,        &
+!!     &          ucd_param, fem, t_IO, ucd, field)
 !!        type(field_IO_params), intent(in) :: mesh_file
 !!        type(field_IO_params), intent(in) :: ucd_param
+!!        type(IO_step_param), intent(in) :: ucd_step
 !!        type(time_data), intent(in) :: init_d
 !!        type(mesh_data), intent(inout) :: fem
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(ucd_data), intent(inout) :: ucd
 !!        type(phys_data), intent(inout) :: field
-!!      subroutine set_field_data_4_VIZ(iflag, istep_ucd, time_d)
+!!      subroutine set_field_data_4_VIZ(istep, ucd_step, ucd_param,     &
+!!     &          fem, t_IO, ucd, time_d, field)
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!        type(time_data), intent(inout) :: time_d
 !!@endverbatim
@@ -40,6 +43,7 @@
       use t_mesh_data
       use t_phys_data
       use t_ucd_data
+      use t_IO_step_parameter
       use t_file_IO_parameter
       use t_VIZ_only_step_parameter
 !
@@ -87,8 +91,8 @@
 ! ----------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine mesh_setup_4_VIZ                                       &
-     &         (mesh_file, ucd_param, init_d, fem, t_IO, ucd, field)
+      subroutine mesh_setup_4_VIZ(init_d, ucd_step, ucd_param,          &
+     &          mesh_file, fem, t_IO, ucd, field)
 !
       use m_array_for_send_recv
       use mpi_load_mesh_data
@@ -99,6 +103,7 @@
       use ucd_IO_select
 !
       type(field_IO_params), intent(in) :: mesh_file
+      type(IO_step_param), intent(in) :: ucd_step
       type(field_IO_params), intent(in) :: ucd_param
       type(time_data), intent(in) :: init_d
 !
@@ -107,6 +112,7 @@
       type(ucd_data), intent(inout) :: ucd
       type(phys_data), intent(inout) :: field
 !
+      integer(kind = kint) :: istep_ucd
 !
 !   --------------------------------
 !       setup mesh information
@@ -115,29 +121,29 @@
 !       load mesh informations
       call mpi_input_mesh(mesh_file, nprocs, fem)
 !
-       if(iflag_debug.gt.0) write(*,*) 'FEM_mesh_initialization'
-       call FEM_mesh_initialization(fem%mesh, fem%group)
+      if(iflag_debug.gt.0) write(*,*) 'FEM_mesh_initialization'
+      call FEM_mesh_initialization(fem%mesh, fem%group)
 !
 !     ---------------------
 !
       ucd%nnod = fem%mesh%node%numnod
-      call sel_read_udt_param                                           &
-     &   (my_rank, init_d%i_time_step, ucd_param, t_IO, ucd)
-      call alloc_phys_data_type_by_output                               &
-     &   (ucd, fem%mesh%node, field)
+      istep_ucd = IO_step_exc_zero_inc(init_d%i_time_step, ucd_step)
+      call sel_read_udt_param(my_rank, istep_ucd, ucd_param, t_IO, ucd)
+      call alloc_phys_data_type_by_output(ucd, fem%mesh%node, field)
 !
       end subroutine mesh_setup_4_VIZ
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_field_data_4_VIZ(iflag, istep_ucd, ucd_param,      &
-     &         fem, t_IO, ucd, time_d, field)
+      subroutine set_field_data_4_VIZ(istep, ucd_step, ucd_param,       &
+     &          fem, t_IO, ucd, time_d, field)
 !
       use set_ucd_data_to_type
       use nod_phys_send_recv
 !
-      integer(kind = kint), intent(in) :: iflag, istep_ucd
+      integer(kind = kint), intent(in) :: istep
+      type(IO_step_param), intent(in) :: ucd_step
       type(field_IO_params), intent(in) :: ucd_param
       type(mesh_data), intent(in) :: fem
 !
@@ -146,8 +152,10 @@
       type(time_data), intent(inout) :: time_d
       type(phys_data), intent(inout) :: field
 !
+      integer(kind = kint) :: istep_ucd
 !
-      if(iflag .ne. 0) return
+!
+      istep_ucd = IO_step_exc_zero_inc(istep, ucd_step)
       call set_data_by_read_ucd(my_rank, istep_ucd,                     &
      &    ucd_param, t_IO, ucd, field)
       call copy_time_step_size_data(t_IO, time_d)

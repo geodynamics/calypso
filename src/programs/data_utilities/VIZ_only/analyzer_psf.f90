@@ -59,7 +59,8 @@
       if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message)
 !
 !  FEM Initialization
-      call FEM_initialize_surface(t_VIZ2%init_d, sfcing2)
+      call FEM_initialize_surface                                       &
+     &   (t_VIZ2%ucd_step, t_VIZ2%init_d, sfcing2)
 !
 !  VIZ Initialization
       call init_visualize_surface(sfcing2%geofem, sfcing2%nod_fld,      &
@@ -75,14 +76,20 @@
 !
 !
       do i_step = t_VIZ2%init_d%i_time_step, t_VIZ2%finish_d%i_end_step
-        if(output_IO_flag(i_step,t_VIZ2%ucd_step) .ne. izero) cycle
-        call set_IO_step_flag(i_step,t_VIZ2%ucd_step)
+        if(output_IO_flag(i_step,t_VIZ2%ucd_step) .eqv. .FALSE.) cycle
+        if(iflag_vizs_w_fix_step(i_step,t_VIZ2%viz_step)                &
+     &       .eqv. .FALSE.) cycle
 !
 !  Load field data
         call FEM_analyze_surface                                        &
-     &     (i_step, t_VIZ2%time_d, t_VIZ2%viz_step, sfcing2)
+     &     (i_step, t_VIZ2%ucd_step, t_VIZ2%time_d, sfcing2)
 !
 !  Generate field lines
+        t_VIZ2%viz_step%istep_psf                                       &
+     &     = istep_file_w_fix_dt(i_step, t_VIZ2%viz_step%PSF_t)
+        t_VIZ2%viz_step%istep_iso                                       &
+     &     = istep_file_w_fix_dt(i_step, t_VIZ2%viz_step%ISO_t)
+!
         call visualize_surface(t_VIZ2%viz_step, t_VIZ2%time_d,          &
      &      sfcing2%geofem, sfcing2%nod_fld, viz_psfs2)
       end do

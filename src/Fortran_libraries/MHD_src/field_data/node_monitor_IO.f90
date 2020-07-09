@@ -84,7 +84,7 @@
 !
 !
 !
-      if(output_IO_flag(istep,point_step) .gt. 0) return
+      if(output_IO_flag(istep,point_step) .eqv. .FALSE.) return
       if(num_monitor .eq. 0 .or. num_monitor_local .eq. 0) return
       if(iflag_debug.eq.1) write(*,*) 'output_nodal_monitor_data'
 !

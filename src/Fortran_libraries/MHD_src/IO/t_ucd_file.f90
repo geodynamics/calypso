@@ -10,11 +10,11 @@
 !!
 !!@verbatim
 !!      subroutine s_output_ucd_file_control                            &
-!!     &         (ucd_param, i_step, time_d, ucd_step, ucd)
+!!     &         (ucd_param, i_step, ucd_step, time_d, ucd)
+!!        type(IO_step_param), intent(in) :: ucd_step
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!        type(time_data), intent(in) :: time_d
 !!        type(ucd_data), intent(in) :: ucd
-!!        type(IO_step_param), intent(inout) :: ucd_step
 !!
 !!      subroutine output_grd_file_4_snapshot                           &
 !!     &         (ucd_param, ucd_step, mesh, nod_fld, ucd)
@@ -24,10 +24,11 @@
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!        type(ucd_data), intent(inout) :: ucd
 !!      subroutine read_udt_4_snap                                      &
-!!     &         (i_step, udt_file_param, nod_fld, t_IO, ucd_step)
+!!     &         (i_step, ucd_step, udt_file_param, nod_fld, t_IO)
 !!        type(IO_step_param), intent(in) :: ucd_step
 !!        type(field_IO_params), intent(in) :: udt_file_param
 !!        type(phys_data),intent(inout) :: nod_fld
+!!        type(time_data), intent(inout) :: t_IO
 !!      subroutine finalize_output_ucd(ucd_param, ucd)
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!        type(ucd_data), intent(inout) :: ucd
@@ -56,25 +57,27 @@
 ! ----------------------------------------------------------------------
 !
       subroutine s_output_ucd_file_control                              &
-     &         (ucd_param, i_step, time_d, ucd_step, ucd)
+     &         (ucd_param, i_step, ucd_step, time_d, ucd)
 !
       use calypso_mpi
       use parallel_ucd_IO_select
 !
       integer(kind = kint), intent(in) :: i_step
+      type(IO_step_param), intent(in) :: ucd_step
       type(field_IO_params), intent(in) :: ucd_param
       type(time_data), intent(in) :: time_d
       type(ucd_data), intent(in) :: ucd
-      type(IO_step_param), intent(inout) :: ucd_step
+!
+      integer(kind = kint) :: istep_ucd
 !
 !
       if(ucd_param%iflag_format .lt. 0) return
-      if(output_IO_flag(i_step,ucd_step) .ne. 0) return
+      if(output_IO_flag(i_step,ucd_step) .eqv. .FALSE.) return
 !
-      call set_IO_step_flag(i_step,ucd_step)
-      call sel_write_parallel_ucd_file(ucd_step%istep_file,             &
-     &    ucd_param, time_d, ucd)
-!      call output_range_data(node, nod_fld, ucd_step%istep_file, time)
+      istep_ucd = IO_step_exc_zero_inc(i_step, ucd_step)
+      call sel_write_parallel_ucd_file                                  &
+     &   (istep_ucd, ucd_param, time_d, ucd)
+!      call output_range_data(node, nod_fld, istep_ucd, time)
 !
       end subroutine s_output_ucd_file_control
 !
@@ -102,22 +105,24 @@
 ! ----------------------------------------------------------------------
 !
       subroutine read_udt_4_snap                                        &
-     &         (i_step, udt_file_param, nod_fld, t_IO, ucd_step)
+     &         (i_step, ucd_step, udt_file_param, nod_fld, t_IO)
 !
       use calypso_mpi
       use set_ucd_data_to_type
 !
       integer(kind = kint), intent(in) :: i_step
+      type(IO_step_param), intent(in) :: ucd_step
       type(field_IO_params), intent(in) :: udt_file_param
       type(phys_data),intent(inout) :: nod_fld
       type(time_data), intent(inout) :: t_IO
-      type(IO_step_param), intent(inout) :: ucd_step
+!
+      integer(kind = kint) :: istep_ucd
 !
 !
-      if(output_IO_flag(i_step,ucd_step) .ne. izero) return
-      call set_IO_step_flag(i_step,ucd_step)
-      call set_data_by_read_ucd_once(my_rank, ucd_step%istep_file,      &
-    &     udt_file_param, nod_fld, t_IO)
+      if(output_IO_flag(i_step,ucd_step) .eqv. .FALSE.) return
+      istep_ucd = IO_step_exc_zero_inc(i_step, ucd_step)
+      call set_data_by_read_ucd_once                                    &
+    &    (my_rank, istep_ucd, udt_file_param, nod_fld, t_IO)
 !
       end subroutine read_udt_4_snap
 !

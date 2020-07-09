@@ -102,9 +102,6 @@
       use output_viz_file_control
       use set_time_step_params
 !
-      integer(kind = kint) :: visval
-      integer(kind = kint) :: iflag
-!
 !*  -----------  set initial step data --------------
 !*
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+2)
@@ -114,10 +111,8 @@
 !*
       do
         call add_one_step(MHD_step1%time_d)
-!
-        iflag = output_IO_flag(MHD_step1%time_d%i_time_step,            &
-     &                         MHD_step1%rst_step)
-        if(iflag .ne. 0) cycle
+        if(output_IO_flag(MHD_step1%time_d%i_time_step,                 &
+     &                    MHD_step1%rst_step) .eqv. .FALSE.) cycle
 !
 !*  ----------  time evolution by spectral methood -----------------
 !*
@@ -128,9 +123,8 @@
 !*  -----------  output field data --------------
 !*
         if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+3)
-        iflag = lead_field_data_flag(MHD_step1%time_d%i_time_step,      &
-     &                               MHD_step1)
-        if(iflag .eq. 0) then
+        if(lead_field_data_flag(MHD_step1%time_d%i_time_step,           &
+     &                          MHD_step1)) then
           if (iflag_debug.eq.1) write(*,*) 'SPH_to_FEM_bridge_MHD'
           call SPH_to_FEM_bridge_MHD(SPH_MHD1%sph, SPH_WK1%trns_WK,     &
      &        FEM_d1%geofem%mesh, FEM_d1%field)
@@ -138,23 +132,28 @@
 !
         if (iflag_debug.eq.1) write(*,*) 'FEM_analyze_sph_MHD'
         call FEM_analyze_sph_MHD(MHD_files1,                            &
-     &      FEM_d1%geofem, FEM_d1%field, MHD_step1, visval, MHD_IO1)
+     &      FEM_d1%geofem, FEM_d1%field, MHD_step1, MHD_IO1)
 !
         if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
 !
 !*  ----------- Visualization --------------
 !*
-        if(visval .eq. 0) then
+        if(iflag_vizs_w_fix_step(MHD_step1%time_d%i_time_step,          &
+     &                           MHD_step1%viz_step)) then
           if (iflag_debug.eq.1) write(*,*) 'visualize_surface'
           if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+4)
+          call istep_viz_w_fix_dt(MHD_step1%time_d%i_time_step,         &
+     &                          MHD_step1%viz_step)
           call visualize_surface(MHD_step1%viz_step, MHD_step1%time_d,  &
      &        FEM_d1%geofem, FEM_d1%field, viz_psfs1)
 !*
 !*  ----------- Zonal means --------------
 !*
-          call SPH_MHD_zmean_sections                                   &
-     &       (MHD_step1%viz_step, MHD_step1%time_d, SPH_MHD1%sph,       &
-     &        FEM_d1%geofem, SPH_WK1%trns_WK, FEM_d1%field, zmeans1)
+          if(MHD_step1%viz_step%istep_psf .ge. 0) then
+            call SPH_MHD_zmean_sections(MHD_step1%viz_step%istep_psf,   &
+     &          MHD_step1%time_d, SPH_MHD1%sph, FEM_d1%geofem,          &
+     &          SPH_WK1%trns_WK, FEM_d1%field, zmeans1)
+          end if
           if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+4)
         end if
 !

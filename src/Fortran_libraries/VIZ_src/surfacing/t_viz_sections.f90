@@ -91,12 +91,12 @@
 !
       if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
       call SECTIONING_visualize                                         &
-     &   (viz_step%PSF_t, time_d, fem, nod_fld, viz_psfs%psf)
+     &   (viz_step%istep_psf, time_d, fem, nod_fld, viz_psfs%psf)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
 !
       if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+7)
       call ISOSURF_visualize                                            &
-     &   (viz_step%ISO_t, time_d, fem, nod_fld, viz_psfs%iso)
+     &   (viz_step%istep_iso, time_d, fem, nod_fld, viz_psfs%iso)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+7)
 !
       end subroutine visualize_surface

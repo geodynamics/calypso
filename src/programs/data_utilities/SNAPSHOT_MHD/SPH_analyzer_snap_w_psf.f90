@@ -172,7 +172,7 @@
       call trans_per_temp_to_temp_sph(SPH_model,                        &
      &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
 !*
-      if(lead_field_data_flag(i_step, MHD_step) .eq. 0) then
+      if(lead_field_data_flag(i_step, MHD_step)) then
         if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
         call s_lead_fields_4_sph_mhd(SPH_WK%monitor, SPH_WK%r_2nd,      &
      &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%trans_p,   &
@@ -184,7 +184,7 @@
 !*
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+3)
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+7)
-      if(output_IO_flag(i_step, MHD_step%rms_step) .eq. 0) then
+      if(output_IO_flag(i_step, MHD_step%rms_step)) then
         if(iflag_debug.gt.0)  write(*,*) 'output_rms_sph_mhd_control'
         call output_rms_sph_mhd_control(MHD_step%time_d, SPH_MHD,       &
      &      SPH_model%sph_MHD_bc, SPH_WK%trans_p%leg, SPH_WK%monitor)

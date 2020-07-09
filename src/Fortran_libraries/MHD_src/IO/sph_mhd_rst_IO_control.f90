@@ -214,7 +214,7 @@
 !
 !
       if(sph_file_IO%iflag_IO .eq. 0) return
-      if(output_IO_flag(i_step,ucd_step) .ne. 0) return
+      if(output_IO_flag(i_step,ucd_step) .eqv. .FALSE.) return
       istep_udt = set_IO_step(i_step, ucd_step)
 !
       call copy_time_step_size_data(time_d, sph_time_IO)

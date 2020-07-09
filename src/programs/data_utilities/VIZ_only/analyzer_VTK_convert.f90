@@ -59,7 +59,8 @@
       if(ierr .gt. 0) call calypso_MPI_abort(ierr, e_message)
 !
 !  FEM Initialization
-      call FEM_initialize_VTK_convert(t_VIZ5%init_d, sfcing5)
+      call FEM_initialize_VTK_convert                                   &
+     &   (t_VIZ5%ucd_step, t_VIZ5%init_d, sfcing5)
 !
 !  VIZ Initialization
       call init_visualize_convert_vtk                                   &
@@ -73,19 +74,19 @@
 !
       subroutine analyze_VTK_convert
 !
-      integer(kind=kint ) :: i_step
+      integer(kind = kint) :: i_step, istep_ucd
 !
 !
       do i_step = t_VIZ5%init_d%i_time_step, t_VIZ5%finish_d%i_end_step
-        if(output_IO_flag(i_step,t_VIZ5%ucd_step) .ne. izero) cycle
-        call set_IO_step_flag(i_step,t_VIZ5%ucd_step)
+        if(output_IO_flag(i_step,t_VIZ5%ucd_step) .eqv. .FALSE.) cycle
 !
 !  Load field data
         call FEM_analyze_VTK_convert                                    &
-     &     (i_step, t_VIZ5%time_d, t_VIZ5%ucd_step, sfcing5)
+     &     (i_step, t_VIZ5%ucd_step, t_VIZ5%time_d, sfcing5)
 !
 !  Generate field lines
-        call visualize_convert_vtk(t_VIZ5%ucd_step, t_VIZ5%time_d,      &
+        istep_ucd = istep_file_w_fix_dt(i_step, t_VIZ5%ucd_step)
+        call visualize_convert_vtk(i_step, istep_ucd, t_VIZ5%time_d,    &
      &      sfcing5%vtk_file_IO, vtk_out5)
       end do
 !

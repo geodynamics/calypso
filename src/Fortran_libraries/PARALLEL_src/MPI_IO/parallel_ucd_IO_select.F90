@@ -109,6 +109,7 @@
       character(len=kchara) :: file_name
 !
 !
+      if(istep_ucd .lt. 0) return
       file_name = set_parallel_ucd_file_name(ucd_param%file_prefix,     &
      &           ucd_param%iflag_format, my_rank, istep_ucd)
 !
