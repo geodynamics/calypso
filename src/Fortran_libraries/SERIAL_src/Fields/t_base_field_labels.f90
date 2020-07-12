@@ -142,11 +142,11 @@
      &                name = 'density',                                 &
      &                math = '$ \rho $')
 !>        Field label for perturbation of density
-!!         @f$  \Thera_{\rho} = \rho - \rho_{0} @f$
+!!         @f$  \Theta_{\rho} = \rho - \rho_{0} @f$
       type(field_def), parameter :: perturbation_density                &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'perturbation_density',                    &
-     &                math = '$ \Thera_{\rho} = \rho - \rho_{0} $')
+     &                math = '$ \Theta_{\rho} = \rho - \rho_{0} $')
 !>        Field label for reference density
 !!         @f$  \rho_{0} @f$
       type(field_def), parameter :: reference_density                   &
@@ -184,7 +184,7 @@
       type(field_def), parameter :: perturbation_composition            &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'perturbation_composition',                &
-     &                math = '$ \Thera_{C} = C - C_{0} $')
+     &                math = '$ \Theta_{C} = C - C_{0} $')
 !>        Field label for reference composition
 !!         @f$  C_{0} @f$
       type(field_def), parameter :: reference_composition               &
@@ -203,7 +203,7 @@
       type(field_def), parameter :: perturbation_entropy                &
      &    = field_def(n_comp = n_scalar,                                &
      &                name = 'perturbation_entropy',                    &
-     &                math = '$ \Thera_{S} = S - S_{0} $')
+     &                math = '$ \Theta_{S} = S - S_{0} $')
 !>        Field label for reference entropy
 !!         @f$  S_{0} @f$
       type(field_def), parameter :: reference_entropy                   &

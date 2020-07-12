@@ -16,8 +16,8 @@
 !!
 !!      character(len = kchara) function add_sdt_extension(file_head)
 !!                put ".sdt" at the end
-!!      character(len = kchara) function add_psf_extension(file_head)
-!!                put ".psf" at the end
+!!      character(len = kchara) function add_sfm_extension(file_head)
+!!                put ".sfm" at the end
 !!      character(len = kchara) function add_sgd_extension(file_head)
 !!                put ".sgd" at the end
 !!
@@ -58,17 +58,17 @@
 !
       implicit  none
 !
-      character(len=3), parameter, private :: inp_ext = "inp"
-      character(len=3), parameter, private :: udt_ext = "udt"
-      character(len=3), parameter, private :: grd_ext = "grd"
+      character(len=3), parameter :: inp_ext = "inp"
+      character(len=3), parameter :: udt_ext = "udt"
+      character(len=3), parameter :: grd_ext = "grd"
 !
-      character(len=3), parameter, private :: psf_ext = "psf"
-      character(len=3), parameter, private :: sdt_ext = "sdt"
-      character(len=3), parameter, private :: sgd_ext = "sgd"
+      character(len=3), parameter :: sfm_ext = "sfm"
+      character(len=3), parameter :: sdt_ext = "sdt"
+      character(len=3), parameter :: sgd_ext = "sgd"
 !
-      character(len=3), parameter, private :: vtk_ext = "vtk"
-      character(len=3), parameter, private :: vtd_ext = "vtd"
-      character(len=3), parameter, private :: vtg_ext = "vtg"
+      character(len=3), parameter :: vtk_ext = "vtk"
+      character(len=3), parameter :: vtd_ext = "vtd"
+      character(len=3), parameter :: vtg_ext = "vtg"
 !
 !-----------------------------------------------------------------------
 !
@@ -117,13 +117,13 @@
 !
 !-----------------------------------------------------------------------
 !
-      character(len = kchara) function add_psf_extension(file_head)
+      character(len = kchara) function add_sfm_extension(file_head)
 !
       character(len=kchara), intent(in) :: file_head
 !
-      add_psf_extension = add_3chara_extension(file_head, psf_ext)
+      add_sfm_extension = add_3chara_extension(file_head, sfm_ext)
 !
-      end function add_psf_extension
+      end function add_sfm_extension
 !
 !-----------------------------------------------------------------------
 !

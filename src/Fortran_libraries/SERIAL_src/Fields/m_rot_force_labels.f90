@@ -46,31 +46,32 @@
      &    = field_def(n_comp = n_vector,                                &
      &                name = 'rot_inertia',                             &
      &                math = '$ e_{ijk} \partial_{j}'                   &
-     &               // ' (e_{kkm} \omega_{l} u_{m})$')
+     &               // ' \left(e_{kkm} \omega_{l} u_{m} \right)$')
 !>        Field label for curl of Lorentz force
-!!         @f$ -2 e_{ijk} \partial_{j} (e_{klm} J_{l} B_{m}) @f$
+!!         @f$ -2 e_{ijk} \partial_{j} 
+!!            \left(e_{klm} J_{l} B_{m} \right) @f$
       type(field_def), parameter :: rot_Coriolis_force                  &
      &    = field_def(n_comp = n_vector,                                &
      &                name = 'rot_Coriolis_force',                      &
      &                math = '$ -2 e_{ijk} \partial_{j}'                &
-     &                    // '(e_{kkm} \Omega_{l} u_{m}) $')
+     &               // '\left(e_{kkm} \Omega_{l} u_{m} \right) $')
 !>        Field label for curl of Lorentz force
-!!         @f$ e_{ijk} \partial_{j} (e_{klm} J_{l} B_{m}) @f$
+!!         @f$ e_{ijk} \partial_{j} \left(e_{klm} J_{l} B_{m}\right) @f$
       type(field_def), parameter :: rot_Lorentz_force                   &
      &    = field_def(n_comp = n_vector,                                &
      &                name = 'rot_Lorentz_force',                       &
      &                math = '$ e_{ijk} \partial_{j}'                   &
-     &                    // '(e_{kkm} J_{l} B_{m}) $')
+     &               // '\left(e_{kkm} J_{l} B_{m} \right) $')
 !
 !>        Field label for curl of filtered buoyancy
-!!        @f$ -e_{ijk} \partial_{j} \alpha_{T} T g_{k}$') @f$
+!!        @f$ -e_{ijk} \partial_{j} \alpha_{T} T g_{k} @f$
       type(field_def), parameter :: rot_buoyancy                        &
      &    = field_def(n_comp = n_vector,                                &
      &                name = 'rot_buoyancy',                            &
      &                math = '$-e_{ijk} \partial_{j} \alpha_{T}'        &
      &                    // ' T g_{k}$')
 !>        Field label for curl of compositional buoyancy
-!!        @f$ -e_{ijk} \partial_{j} \alpha_{C} C g_{k}$') @f$
+!!        @f$ -e_{ijk} \partial_{j} \alpha_{C} C g_{k} @f$
       type(field_def), parameter :: rot_composite_buoyancy              &
      &    = field_def(n_comp = n_vector,                                &
      &                name = 'rot_composite_buoyancy',                  &

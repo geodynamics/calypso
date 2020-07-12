@@ -23,7 +23,7 @@
       read(*,*) ucd_param%file_prefix
 !
   90  continue
-      ifmt_input = section_format_id_from_input()
+      ifmt_input = psf_to_vtk_format_id_from_input()
       write(*,*) 'ifmt_input', ifmt_input
       if(ifmt_input .eq. iflag_vtk) then
         write(*,*) 'Set correct file extension (except for vtk)'

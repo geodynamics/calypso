@@ -118,7 +118,7 @@
       else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
         fname_tmp = add_udt_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_ucd_bin/iten) then
-        fname_tmp = add_psf_extension(file_name)
+        fname_tmp = add_sfm_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
         fname_tmp = add_sdt_extension(file_name)
       else
@@ -204,7 +204,7 @@
       else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
         fname_tmp = add_udt_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_ucd_bin/iten) then
-        fname_tmp = add_psf_extension(file_name)
+        fname_tmp = add_sfm_extension(file_name)
       else if(mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
         fname_tmp = add_sdt_extension(file_name)
       else

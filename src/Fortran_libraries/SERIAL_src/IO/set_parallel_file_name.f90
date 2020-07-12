@@ -54,7 +54,7 @@
 !
       implicit  none
 !
-      character(len=2), parameter, private :: gz_ext =  "gz"
+      character(len=2), parameter :: gz_ext =  "gz"
 !
 !-----------------------------------------------------------------------
 !
