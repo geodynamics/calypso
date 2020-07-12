@@ -23,6 +23,11 @@ Number of SMP threads for OpenMP \verb|[Num_Threads]| is defined by integer. You
 \verb|[sph_prefix]| \\
 File prefix of spherical harmonics indexing and FEM mesh file \verb|[sph_prefix]| is defined by text. Process ID and extension are added after this file prefix.
 
+\paragraph{\tt mesh\_file\_prefix}
+\label{href_t:mesh_file_prefix}
+\verb|[mesh_prefix]| \\
+File prefix of FEM mesh file \verb|[mesh_prefix]| is defined by text. Process ID and extension are added after this file prefix. This flag is only used for the sectioning program (\hyperref[sec:sectioning]{\tt sectioning}) and data converter to VTK (\hyperref[sec:field_to_VTK]{\tt field\_to\_VTK}).
+
 \paragraph{\tt boundary\_data\_file\_name}
 \label{href_t:boundary_data_file_name}
 \verb|[boundary_data_name]| \\
@@ -54,6 +59,11 @@ File format of spherical harmonics indexing and FEM mesh file \verb|[sph_format]
 \item{\tt merged\_bin\_gz: } Compressed merged binary data
 \end{description}
 %
+
+\paragraph{\tt mesh\_file\_fmt\_ctl}
+\label{href_t:mesh_file_fmt_ctl}
+\verb|[mesh_formayt]| \\
+File format of FEM mesh file \verb|[mesh_format]| is defined by text. Data formats can be defined the same as {\tt sph\_file\_fmt\_ctl}. Extensions of each data format is listed in Table \ref{table:mesh_format}. This flag is only used for the sectioning program (\hyperref[sec:sectioning]{\tt sectioning}) and data converter to VTK (\hyperref[sec:field_to_VTK]{\tt field\_to\_VTK}).
 
 \paragraph{\tt restart\_file\_fmt\_ctl}
 \label{href_t:restart_file_fmt_ctl}
@@ -658,12 +668,12 @@ Increment of time step to output field data for visualization \verb|[ISTEP_FIELD
 \paragraph{\tt i\_step\_sectioning\_ctl}
 \label{href_t:i_step_sectioning_ctl}
 \verb|[ISTEP_SECTION]| \\
-Increment of time step to output cross section data for visualization \verb|[ISTEP_SECTION]| is defined by integer. If \verb|[ISTEP_SECTION]| is set to be 0, no cross section data are written.
+Increment of time step to output cross section data for visualization \verb|[ISTEP_SECTION]| is defined by integer. If \verb|[ISTEP_SECTION]| is set to be 0, no cross section data are written. If \verb|[ISTEP_SECTION]| is set in the block \hyperref[href_i:visual_control]{\tt visual\_control}, The value in {\tt visual\_control} is used.
 
 \paragraph{\tt i\_step\_isosurface\_ctl}
 \label{href_t:i_step_isosurface_ctl}
 \verb|[ISTEP_ISOSURFACE]| \\
-Increment of time step to output isosurface data for visualization \verb|[ISTEP_ISOSURFACE]| is defined by integer. If \verb|[ISTEP_ISOSURFACE]| is set to be 0, no isosurface data are written.
+Increment of time step to output isosurface data for visualization \verb|[ISTEP_ISOSURFACE]| is defined by integer. If \verb|[ISTEP_ISOSURFACE]| is set to be 0, no isosurface data are written.If \verb|[ISTEP_ISOSURFACE]| is set in the block \hyperref[href_i:visual_control]{\tt visual\_control}, The value in {\tt visual\_control} is used.
 
 \paragraph{\tt dt\_ctl}
 \label{href_t:dt_ctl}
@@ -911,6 +921,17 @@ Control parameters for cross sectioning are defined in this block. \\
 \verb|[file_prefix]| \\
 File prefix for cross section data is defined as character \verb|[file_prefix]|.
 
+\paragraph{\tt psf\_output\_type}
+\label{href_t:psf_output_type}
+\verb|[file_format]| \\
+File format for cross section data is defined as character \verb|[file_format]|. The following formats are available;
+\begin{description}
+\item{\tt VTK: }               VTK format
+\item{\tt VTK\_gz: }           Compressed VTK format (Available if zlib library is linked)
+\item{\tt PSF: }               Binary section data format
+\item{\tt PSF\_gzip: }         Compressed Binary section data format (Available if zlib library is linked)
+\end{description}
+
 \subsubsection{\tt surface\_define}
 \label{href_t:surface_define}
 Each cross section is defined in this block. \\
@@ -1087,6 +1108,16 @@ Control parameters for isosurfacing are defined in this block. \\
 \verb|[file_prefix]| \\
 File prefix for isosurface data is defined as character \verb|[file_prefix]|.
 
+\paragraph{\tt iso\_output\_type}
+\label{href_t:iso_output_type}
+File format for isosurface data is defined as character \verb|[file_format]|. The following formats are available;
+\begin{description}
+\item{\tt VTK: }               VTK format
+\item{\tt VTK\_gz: }           Compressed VTK format (Available if zlib library is linked)
+\item{\tt ISO: }               Binary isosurface data format
+\item{\tt ISO\_gzip: }         Compressed Binary isosurface data format (Available if zlib library is linked)
+\end{description}
+
 \subsubsection{\tt isosurf\_define}
 \label{href_t:isosurf_define}
 Each isosurface is defined in this block. \\
@@ -1136,8 +1167,17 @@ Isosurface value is defined as real value \verb|VALUE|.
 Field informations for cross section are defined in this array. Name of the output fields is defined by \verb|[FIELD]|, and component of the fields is defined by \verb|[COMPONENT]|. Labels of the field name are listed in Table \ref{table:fields}, and labels of the component are listed in Table \ref{table:components}. \\
 %
 %
+\subsection{\tt output\_field\_file\_fmt\_ctl  [VTK\_format]}
+\label{href_t:output_field_file_fmt_ctl}
+File format of field data is defined as character \verb|[VTK_format]|. THe following formats are available.
 %
-%
+\begin{description}
+\item{\tt single\_HDF5: }  Merged HDF5 file (Available if HDF5 library is linked)
+\item{\tt single\_VTK: }   Merged VTK file (Default)
+\item{\tt VTK: }           Distributed VTK file
+\item{\tt single\_VTK\_gz: }   Compressed merged VTK file (Available if zlib library is linked)
+\item{\tt VTK\_gz: }           Compressed distributed VTK file (Available if zlib library is linked)
+\end{description}
 
 \subsection{\tt dynamo\_vizs\_control}
 \label{href_t:dynamo_vizs_control}
@@ -1166,25 +1206,31 @@ Set the truncation degree to make the truncated magnetic field by the crustal ma
 File names and number of processes for new domain decomposed data are defined in this block. \\
 \hyperref[href_i:new_data_files_def]{(Back to {\tt control\_assemble\_sph)}}
 
-\paragraph{\tt num\_new\_domain\_ctl}
-\label{href_t:num_new_domain_ctl}
-\verb|[new_num_domain]| \\
-Number of subdomain for new new decomposed data \verb|[new_num_domain]| is defined by integer.
-
-\paragraph{\tt new\_sph\_mode\_prefix}
-\label{href_t:new_sph_mode_prefix}
-\verb|[new_sph_prefix]| \\
-File prefix of new spherical harmonics indexing \verb|[new_sph_prefix]| is defined by text.
-
-\paragraph{\tt new\_restart\_prefix}
-\label{href_t:new_restart_prefix}
-\verb|[new_rst_prefix]| \\
-File prefix of new spectrum data \verb|[new_rst_prefix]| is defined by text.
-
 \paragraph{\tt delete\_original\_data\_flag}
 \label{href_t:delete_original_data_flag}
 \verb|[delete_original_data_flag]| \\
 If this flag set to \verb|YES|, original specter data is deleted at the end of program. 
+
+\subsection{\tt new\_time\_step\_ctl}
+\label{href_t:new_time_step_ctl}
+Parameters to modify time step and time data in the new restrat file. \\
+\hyperref[href_i:new_time_step_ctl]{(Back to {\tt control\_assemble\_sph)}}
+
+\paragraph{\tt magnetic\_field\_ratio\_ctl}
+\label{href_t:i_step_init_ctl_a} 
+\verb|[ISTEP_START]| \\
+New time step \verb|[ISTEP_START]| for the restart file is defined by integer.
+
+\paragraph{\tt i\_step\_rst\_ctl}
+\label{href_t:i_step_rst_ctl_a} 
+\verb|[ISTEP_RESTART]| \\
+New step number of restrart file \verb|[ISTEP_RESTART]| is defined by integer.
+
+\paragraph{\tt time\_init\_ctl}
+\label{href_t:time_init_ctl_a} 
+\verb|[INITIAL_TIME]| \\
+New time data \verb|[INITIAL_TIME]| is defined by real.
+
 
 \subsection{\tt newrst\_magne\_ctl}
 \label{href_t:newrst_magne_ctl}

@@ -104,7 +104,7 @@ where, $k_{CMB}$ is the grid point number at CMB.
 Control files for Calypso consists of blocks starting and ending with \verb|begin| and \verb|end|, respectively. Entities with more than one components are defined between \verb|begin array| and \verb|end array| flags. The number of components of an array must be defined at \verb|begin array| line. If blocks to be defined in an external file, the external file name is defined by \verb|file| flag. 
 
 \label{section:control_sph_shell}
-Control file ({\tt control\_sph\_shell}) consists the following items. Detailed description for each item can be checked by clicking "(Detail)" at the end of each item.
+Control file ({\tt control\_sph\_shell}) consists the following items. Detailed description for each item can be checked by clicking each item.
 \\
 %
 \verb|spherical_shell_ctl|
@@ -198,7 +198,7 @@ The external file for resoultion and parallelization information \verb|[resoluti
 %
 
 \subsection{Finite element mesh data (optional)}
-Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written based on GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. The extension of the mesh file is listed in Table \ref{table:mesh_format}. This mesh data is only used in the programs \verb|sectioning| and \verb|field_to_VTK|.
+Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written based on GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. The extension of the mesh file is listed in Table \ref{table:mesh_format}. This mesh data is only used in the programs \hyperref[sec:sectioning]{\tt sectioning} and \verb|field_to_VTK|.
 
 \subsection{Radial grid data}
 The preprocessing program generates radius of each layer in \verb|radial_info.dat| if \verb|radial_grid_type_ctl| is set to \verb|Chebyshev| or \verb|equi_distance|. This file consists of blocks \verb|array r_layer| and \verb|array boundaries_ctl| for control file. This data may be useful if you want to modify radial grid spacing by yourself.
@@ -261,7 +261,7 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 \verb|[sph_prefix].[rlm_extension]| & - & Input / (Output) \\
 \verb|[sph_prefix].[rtm_extension]| & - & Input / (Output) \\
 \verb|[sph_prefix].[rtp_extension]| & - & Input / (Output) \\ \hline
-\verb|[sph_prefix].[fem_extension]| & - & Input / (Output) \\ \hline
+\verb|[sph_prefix].[fem_extension]| & - & (Input / Output) \\ \hline
 \verb|[boundary_data_name]| & Single & Input \\ \hline
 \verb|[rst_prefix].[step #].[rst_extension]| &  - & Input/Output  \\ \hline
 \verb|[vol_pwr_prefix]_s.dat| & Single & Output \\ \hline
@@ -306,7 +306,7 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 %
 \newpage
 \subsection{Control file}
-The format of the control file \verb|control_MHD| is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking "(Detail)". \\
+The format of the control file \verb|control_MHD| is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking each item. \\
 \\
 %
 Block \verb|MHD_control|  (Top block of the control file)
@@ -471,16 +471,26 @@ Block \verb|MHD_control|  (Top block of the control file)
 	\begin{itemize}
 	\item Block \hyperref[href_t:time_step_ctl]{\tt time\_step\_ctl}
 		\begin{itemize} \label{href_i:time_step_ctl}
-		\item \hyperref[href_t:elapsed_time_ctl]{\tt elapsed\_time\_ctl            [ELAPSED\_TIME]}
-		\item \hyperref[href_t:i_step_init_ctl]{\tt i\_step\_init\_ctl              [ISTEP\_START]}
-		\item \hyperref[href_t:i_step_finish_ctl]{\tt i\_step\_finish\_ctl          [ISTEP\_FINISH]}
-		\item \hyperref[href_t:i_step_check_ctl]{\tt i\_step\_check\_ctl            [ISTEP\_MONITOR]}
-		\item \hyperref[href_t:i_step_rst_ctl]{\tt i\_step\_rst\_ctl                [ISTEP\_RESTART]}
-		\item \hyperref[href_t:i_step_field_ctl]{\tt i\_step\_field\_ctl            [ISTEP\_FIELD]}
-		\item \hyperref[href_t:i_step_sectioning_ctl]{\tt i\_step\_sectioning\_ctl  [ISTEP\_SECTION]}
-		\item \hyperref[href_t:i_step_isosurface_ctl]{\tt i\_step\_isosurface\_ctl  [ISTEP\_ISOSURFACE]}
-		\item \hyperref[href_t:dt_ctl]{\tt dt\_ctl                                  [DELTA\_TIME]}
-		\item \hyperref[href_t:time_init_ctl]{\tt time\_init\_ctl                   [INITIAL\_TIME]}
+		\item \hyperref[href_t:elapsed_time_ctl]
+			{\tt elapsed\_time\_ctl        [ELAPSED\_TIME]}
+		\item \hyperref[href_t:i_step_init_ctl]
+			{\tt i\_step\_init\_ctl        [ISTEP\_START]}
+		\item \hyperref[href_t:i_step_finish_ctl]
+			{\tt i\_step\_finish\_ctl      [ISTEP\_FINISH]}
+		\item \hyperref[href_t:i_step_check_ctl]
+			{\tt i\_step\_check\_ctl       [ISTEP\_MONITOR]}
+		\item \hyperref[href_t:i_step_rst_ctl]
+			{\tt i\_step\_rst\_ctl         [ISTEP\_RESTART]}
+		\item \hyperref[href_t:i_step_field_ctl]
+			{\tt i\_step\_field\_ctl       [ISTEP\_FIELD]}
+		\item \hyperref[href_t:i_step_sectioning_ctl]
+			{\tt i\_step\_sectioning\_ctl  [ISTEP\_SECTION]}
+		\item \hyperref[href_t:i_step_isosurface_ctl]
+			{\tt i\_step\_isosurface\_ctl  [ISTEP\_ISOSURFACE]}
+		\item \hyperref[href_t:dt_ctl]
+			{\tt dt\_ctl                   [DELTA\_TIME]}
+		\item \hyperref[href_t:time_init_ctl]
+			{\tt time\_init\_ctl           [INITIAL\_TIME]}
 		\end{itemize}
 %
 	\item Block \hyperref[href_t:restart_file_ctl]{\tt restart\_file\_ctl}
@@ -574,16 +584,22 @@ Block \verb|MHD_control|  (Top block of the control file)
 %
 \item Block \hyperref[href_t:visual_control]{\tt visual\_control}
     \begin{itemize} \label{href_i:visual_control}
+	\item \hyperref[href_t:i_step_sectioning_ctl]
+        {\tt i\_step\_sectioning\_ctl  [ISTEP\_SECTION]}
     \item Array \hyperref[href_t:cross_section_ctl]{\tt cross\_section\_ctl}
 		\begin{itemize}
         \item File or Block {\tt cross\_section\_ctl} \\
-                            {\tt [section\_control\_file]}
+                            {\tt [section\_control\_file]} \\
+								(See section \ref{section:section_control})
 		\end{itemize}
 %
+    \item \hyperref[href_t:i_step_isosurface_ctl]
+		{\tt i\_step\_isosurface\_ctl  [ISTEP\_ISOSURFACE]}
     \item Array \hyperref[href_t:isosurface_ctl]{\tt isosurface\_ctl}
 		\begin{itemize}
 		\item File or Block {\tt isosurface\_ctl} \\
-                            {\tt [isosurface\_control\_file]}
+                            {\tt [isosurface\_control\_file]} \\
+								(See section \ref{section:isosurface_control})
 		\end{itemize}
     \end{itemize}
 %
@@ -591,10 +607,12 @@ Block \verb|MHD_control|  (Top block of the control file)
 	\begin{itemize} \label{href_i:dynamo_vizs_control}
 		\item File or Block \hyperref[href_t:zonal_mean_section_ctl]
 							{\tt zonal\_mean\_section\_ctl} \\
-							{\tt [zonal\_mean\_section\_control\_file]}
+							{\tt [zonal\_mean\_section\_control\_file]} \\
+								(See section \ref{section:section_control})
 		\item File or Block \hyperref[href_t:zonal_RMS_section_ctl]
 							{\tt zonal\_RMS\_section\_ctl} \\
-                            {\tt [zonal\_RMS\_section\_control\_file]}
+                            {\tt [zonal\_RMS\_section\_control\_file]} \\
+                                (See section \ref{section:section_control})
 %
 		\item Block \hyperref[href_t:crustal_filtering_ctl]{\tt crustal\_filtering\_ctl}
 			\begin{itemize}
@@ -672,8 +690,7 @@ CMB
 
 \subsection{Field data for visualization}
 \label{sec:VTK}
- Field data is used for the visualization processes. Field data are written with XDMF format (\url{http://www.xdmf.org/index.php/Main_Page}), merged VTK, or distributed VTK format (\url{http://www.vtk.org/VTK/img/file-formats.pdf}). The output data format is defined by \verb|fld_format|. Visualization applications which we checked are listed in Table \ref{table:Viz_app}. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, coordinate conversion is required to plot vector field in spherical coordinate $(r, \theta, \phi)$ or cylindrical coordinate $(s,\phi, z)$. We will introduce a example of visualization process using ParaView in Section \ref{sec:paraview}. Field data also output merged ASCII or binary format. Tese original formats have smaller file size than VTK format because of excluding grid information. Program \verb|field_to_VTK| generates VTK file from FEM mesh data and field data.
-%
+Field data is used for the visualization processes. Field data are written with XDMF format (\url{http://www.xdmf.org/index.php/Main_Page}), merged VTK, or distributed VTK format (\url{http://www.vtk.org/VTK/img/file-formats.pdf}). The output data format is defined by \verb|fld_format|. Visualization applications which we checked are listed in Table \ref{table:Viz_app}. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, coordinate conversion is required to plot vector field in spherical coordinate $(r, \theta, \phi)$ or cylindrical coordinate $(s,\phi, z)$. We will introduce a example of visualization process using ParaView in Section \ref{sec:paraview}. Field data also output merged ASCII or binary format including compression using zlib. These original formats have smaller file size than VTK format because of excluding grid information. Program \hyperref[sec:field_to_VTK]{\tt field\_to\_VTK} generates VTK file from FEM mesh data and field data.
 %
 \begin{table}[htp]
 \caption{Checked visualization application}
@@ -684,7 +701,7 @@ CMB
 Control flag & \verb|fld_format| & Application \\ \hline \hline
 \verb|VTK| & Distributed VTK & ParaView \\ \hline
 \verb|single_VTK| & Merged VTK & ParaView, VisIt, or Mayavi \\ \hline
-\verb|VTK_gz| & Compressed Distributed VTK & ParaView \\
+\verb|VTK_gzip| & Compressed Distributed VTK & ParaView \\
  & & after expanding by {\tt gzip} \\ \hline
 \verb|single_VTK_gz| & Compressed Merged VTK & ParaView, VisIt or Mayavi \\
  & &  after expanding by {\tt gzip} \\ \hline
@@ -803,6 +820,26 @@ Merged XDMF data generate files listed in Table \ref{table:XDMF}. For ParaView, 
 \label{table:XDMF}
 \end{table}
 %
+\subsubsection{Calypso field data}
+Calypso field data is based on the spectr data for restarting. The data is simply replaced from spherical harmonics coefficients to each component of field data in the cartesian coordinate. The file format flag \verb|[field_file_fmt_ctl]| and corresponding extensiton are showw in Table \ref{table:field_format}.
+%
+\begin{table}[htp]
+\caption{Data format flag {[\tt field\_file\_fmt\_ctl]} and extensions for the field file.}
+\begin{center} 
+\begin{tabular}{|c||c|c|c|c|}
+\hline
+\multicolumn{5}{|c|}{Distributed files} \\ \hline
+\verb|[field_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|gzip_bin| \\ \hline
+\verb|[extension]| & \verb|[#].fld| & \verb|[#].flb| & \verb|[#].fld| & \verb|[#].flb.gz| \\ \hline \hline
+\multicolumn{5}{|c|}{Single file}  \\ \hline
+\verb|[field_file_fmt_ctl]| & \verb|merged| & \verb|merged_bin| & \verb|merged_gz| & \verb|merged_bin_gz| \\ \hline
+\verb|[extension]| & \verb|.fld| & \verb|.flb| & \verb|.fld| & \verb|.flb.gz| \\ \hline \hline
+\multicolumn{5}{c}{{\tt [\#]} is the domain or process number} \\
+\end{tabular}
+\end{center}
+\label{table:field_format}
+\end{table}
+%
 
 %
 \subsection{Cross section data (Parallel Surfacing module)}
@@ -863,42 +900,63 @@ Area for visualization can be defined by array \verb|chosen_ele_grp_ctl| by choo
 \end{center}
 \end{table}
 %
-\subsubsection{Control file}
-The format of the control file or block for cross sections is described below. The detail of each block is described in section \ref{section:def_control}.  \verb|cross_section_ctl| block can be read from an external file. To define the external file name, as \verb|file cross_section_ctl [file name]| in \verb|control_MHD| or \verb|control_snapshot|. You can jump to detailed description by clicking "(Detail)". \\
+\subsubsection{Control data} \label{section:section_control}
+The format of the control file or block for cross sections is described below. The detail of each block is described in section \ref{section:def_control}.  \verb|cross_section_ctl| block can be read from an external file. To define the external file name, as \verb|file cross_section_ctl [file name]| in \verb|control_MHD| or \verb|control_snapshot|. \\
 \\
 %
-\verb|cross_section_ctl|  (Header of the control file)
+Block \verb|cross_section_ctl| (Top level for sectioning)
 \label{href_i:cross_section_ctl}
 \begin{itemize}
-	\item \verb|section_file_prefix	[section_prefix]|
-			\hyperref[href_t:section_file_prefix]{(Detail)}
-	\item \verb|surface_define|
-			\hyperref[href_t:surface_define]{(Detail)}
+	\item \hyperref[href_t:section_file_prefix]
+			{\tt section\_file\_prefix    [section\_prefix]}
+	\item \hyperref[href_t:psf_output_type]
+			{\tt psf\_output\_type        [file\_format]}
+	\item Block \hyperref[href_t:surface_define]{\tt surface\_define}
 		\begin{itemize}
-			\item \verb|section_method	[METHOD]|
-					\hyperref[href_t:section_method]{(Detail)}
-			\item \verb|array coefs_ctl	[TERM]	[COEFFICIENT]|
-		 		\hyperref[href_t:psf_coefs_ctl]{(Detail)}
-			\item \verb|radius	[SIZE]|
-		 		\hyperref[href_t:psf_radius]{(Detail)}
-			\item \verb|array normal_vector		[DIRECTION]	[COMPONENT]|
-				\hyperref[href_t:psf_normal_vector]{(Detail)}
-			\item \verb|array axial_length		[DIRECTION]	[COMPONENT]|
-				\hyperref[href_t:psf_axial_length]{(Detail)}
-			\item \verb|array center_position	[DIRECTION]	[COMPONENT]|
-				\hyperref[href_t:psf_center_position]{(Detail)}
+			\item \hyperref[href_t:section_method]
+				{\tt section\_method    [METHOD]}
+			\item Array \hyperref[href_t:psf_coefs_ctl]
+				{\tt coefs\_ctl        [TERM]         [COEFFICIENT]}
+			\item \hyperref[href_t:psf_radius]{\tt radius    [SIZE]}
+			\item Array \hyperref[href_t:psf_normal_vector]
+				{\tt normal\_vector    [DIRECTION]    [COMPONENT]}
+			\item Array \hyperref[href_t:psf_axial_length]
+                {\tt axial\_length     [DIRECTION]    [COMPONENT]}
+			\item Array \hyperref[href_t:psf_center_position]
+                {\tt center\_position  [DIRECTION]    [COMPONENT]}
 %
-			\item \verb|array section_area_ctl		[AREA_NAME]|
-				\hyperref[href_t:section_area_ctl]{(Detail)}
+			\item Array \hyperref[href_t:section_area_ctl]
+				{\tt section\_area\_ctl        [AREA\_NAME]}
 	\end{itemize}
 %
-	\item \verb|output_field_define|
-		\hyperref[href_t:output_field_define]{(Detail)}
+	\item \hyperref[href_t:output_field_define]{\tt output\_field\_define}
 		\begin{itemize}
-			\item \verb|array output_field		[FIELD]	[COMPONENT]|
-				\hyperref[href_t:psf_output_field]{(Detail)}
+			\item Array \hyperref[href_t:psf_output_field]
+                {\tt output\_field     [FIELD]    [COMPONENT]}
 		\end{itemize}
 \end{itemize}
+
+\subsubsection{Output data format of sectioning module}
+\label{sec:PSF_data}
+Sectioning data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|psf_output_type| are listed in Table \ref{table:PSF_data}. In the binary data format, position data and field data are saved independently not to write the grid data for each output step. Program \hyperref[section:psf_to_VTK]{\tt psf\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|psf_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
+%
+\begin{table}[htp]
+\caption{Data format for sectioning data}
+\label{table:PSF_data}
+\begin{center} 
+\begin{tabular}{|c|c|c|c|}
+\hline
+\verb|fld_format| & File format & \verb|extension| & Application \\ \hline \hline
+\verb|VTK| & VTK & .vtk & ParaView \\ \hline
+\verb|VTK_gzip| & Compressed VTK & .vtk.gz & ParaView \\
+& & & after expanding by {\tt gzip}  \\ \hline
+\verb|PSF| & Binary & 0.sgd (grid data) & - \\
+           &        &  .sdt (field data) & - \\ \hline
+\verb|PSF_gzip| & Compressed binary & .sgd.gz (grid data) & - \\
+           &        &  .sdt.gz (field data) & - \\ \hline
+\end{tabular}
+\end{center} 
+\end{table} 
 
 %
 \subsection{Isosurface data}
@@ -908,41 +966,57 @@ Calypso can also output isosurface data for visualization. Generally, data size 
 
 To output cross sectioning, increment of the surface output data should be defined by \verb|i_step_isosurface_ctl| in \verb|time_step_ctl| block. And, array block \verb|isosurface_ctl| in \verb|visual_control| section is required to define cross sections. Each \verb|isosurface_ctl| block defines one cross section. Each cross section can also define by an external file by specifying external file name with \verb|file| label.
 %
-\subsubsection{Control file}
-The format of the control file or block for isosurfaces is described below. The detail of each block is described in section \ref{section:def_control}.  \verb|isosurface_ctl| block can be read from an external file. To define the external file name, as \verb|file isosurface_ctl [file name]| in \verb|control_MHD| or \verb|control_snapshot|. You can jump to detailed description by clicking "(Detail)". \\
+\subsubsection{Control data}  \label{section:isosurface_control}
+The format of the control file or block for isosurfaces is described below. The detail of each block is described in section \ref{section:def_control}.  \verb|isosurface_ctl| block can be read from an external file. To define the external file name, as \verb|file isosurface_ctl [file name]| in \verb|control_MHD| or \verb|control_snapshot|. \\
 \\
 %
-\verb|isosurface_ctl|  (Header of the control file)
+Block \verb|isosurface_ctl|  (Top lebel of the control data)
 \label{href_i:isosurface_ctl}
 \begin{itemize}
-	\item \verb|isosurface_file_prefix         [file_prefix]|
-    		\hyperref[href_t:isosurface_file_prefix]{(Detail)}
+	\item \hyperref[href_t:isosurface_file_prefix]
+			{\tt isosurface\_file\_prefix    [file\_prefix]}
+	\item \hyperref[href_t:iso_output_type]
+			{\tt iso\_output\_type           [file\_format]}
 %
-	\item \verb|isosurf_define|
-    		\hyperref[href_t:isosurf_define]{(Detail)}
+	\item Block \hyperref[href_t:isosurf_define]{\tt isosurf\_define}
 		\begin{itemize}
-			\item \verb|isosurf_field	[FIELD]|
-    				\hyperref[href_t:isosurf_field]{(Detail)}
-			\item \verb|isosurf_component	[COMPONENT]|
-    				\hyperref[href_t:isosurf_component]{(Detail)}
-			\item \verb|isosurf_value	[VALUE]|
-    				\hyperref[href_t:isosurf_value]{(Detail)}
+			\item \hyperref[href_t:isosurf_field]{\tt isosurf\_field    [FIELD]}
+			\item \hyperref[href_t:isosurf_component]
+						{\tt isosurf\_component    [COMPONENT]}
+			\item \hyperref[href_t:isosurf_value]{\tt isosurf\_value    [VALUE]}
 %
-			\item \verb|array isosurf_area_ctl		[AREA_NAME]|
-    				\hyperref[href_t:isosurf_area_ctl]{(Detail)}
+			\item Array \hyperref[href_t:isosurf_area_ctl]
+						{\tt isosurf\_area\_ctl  [AREA\_NAME]}
 		\end{itemize}
 %
-	\item \verb|field_on_isosurf|
-    		\hyperref[href_t:field_on_isosurf]{(Detail)}
+	\item Block \hyperref[href_t:field_on_isosurf]{\tt field\_on\_isosurf}
 		\begin{itemize}
-			\item \verb|result_type	[TYPE]|
-    				\hyperref[href_t:result_type]{(Detail)}
-			\item \verb|result_value	[VALUE]|
-    				\hyperref[href_t:result_value]{(Detail)}
-			\item \verb|array output_field		[FIELD]	[COMPONENT]|
-    				\hyperref[href_t:iso_output_field]{(Detail)}
+			\item \hyperref[href_t:result_type]{\tt result\_type    [TYPE]}
+			\item \hyperref[href_t:result_value]{\tt result\_value    [VALUE]}
+			\item Array \hyperref[href_t:iso_output_field]
+						{\tt output\_field        [FIELD]    [COMPONENT]}
 		\end{itemize}
 \end{itemize}
+
+\subsubsection{Output data format of isosurface module}
+\label{sec:PSF_data}
+Isosurface data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|iso_output_type| are listed in Table \ref{table:ISO_data}. Like as sectioning data, program \hyperref[section:psf_to_VTK]{\tt psf\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|iso_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
+%
+\begin{table}[htp]
+\caption{Data format for isosurface data}
+\label{table:ISO_data}
+\begin{center} 
+\begin{tabular}{|c|c|c|c|}
+\hline
+\verb|fld_format| & File format & \verb|extension| & Application \\ \hline \hline
+\verb|VTK| & VTK & .vtk & ParaView \\ \hline
+\verb|VTK_gzip| & Compressed VTK & .vtk.gz & ParaView \\
+& & & after expanding by {\tt gzip}  \\ \hline
+\verb|ISO| & Binary & .sfm & - \\ \hline
+\verb|ISO_gzip| & Compressed binary &  .sfm.gz & - \\ \hline
+\end{tabular}
+\end{center} 
+\end{table} 
 
 
 
@@ -1039,7 +1113,7 @@ B_{Tsq}(n) &=& \frac{1}{V} \sum_{l=n}^{l=l-n} \int \left[\left(\bvec{B}_{Tl}^{\ 
 \end{description}
 
 %
-\subsubsection{layered spectrum data}
+\subsubsection{Layered spectrum data}
 \label{section:layerd_spectr}
 Spectrum data for the each radial position are written by defining {\tt layered\_pwr\_spectr\_prefix} in control file. By defining {\tt layered\_pwr\_spectr\_prefix}, following spectrum data averaged over the fluid shell is written. Data format is the same as the volume spectrum data, but radial grid point and radius of the layer is added in the list. The following files are generated. The radial points for output is listed in the array \verb|spectr_layer_ctl|. If \verb|spectr_layer_ctl| is not defined, mean square data at {\bf all} radial levels will be written. See example of \hyperref[section:dynamobench]{dynamo benchmark case 2}.
 %
@@ -1092,6 +1166,14 @@ B_{Tsq}(k,n) &=& \frac{1}{S} \sum_{l=n}^{l=L} \int \left[\left(\bvec{B}_{Tl}^{\ 
 \end{description}
 %
 
+\subsection{Volume average data {\tt [volume\_average\_prefix].dat}}
+The volume average information is written in the file {\tt [volume\_average\_prefix].dat}.
+The volume average is evaluated by the radial integration of $l = m = 0$ component of the spherical harmonics coefficients as
+\begin{eqnarray}
+f_{ave} &=& \frac{1}{V} \int f_{0}^{0}(r) 4 \pi r^{2} dr.
+\end{eqnarray}
+Consequently, volume average of the solenoidal vector field to be 0, but but average data for the solenoidal vector is also written in the data to share the data IO routine with other monitor data output. To ouytput the average value over the specific radial level, use spectrum monitor data output \hyperref[sec:pickup_spectr_ctl]{\tt pickup\_spectr\_ctl} with $l = m = 0$.
+
 \subsection{Gauss coefficient data {\tt [gauss\_coef\_prefix].dat}}
 This program output selected Gauss coefficients of the magnetic field. Gauss coefficients is evaluated for radius defined by \verb|[gauss_coef_radius]| every \verb|[increment_monitor]| steps. Gauss coefficients are evaluated by using poloidal magnetic field at CMB $B_{Sl}^{\ m}(r_{o})$ and radius defined by \verb|[gauss_coef_radius]| $r_{e}$ as
 %
@@ -1112,6 +1194,7 @@ The data file has the following headers in the first three lines,
 The data consists of time step, time, and Gauss coefficients for each step in one line. If the Gauss coefficients data file exist before starting the simulation, programs append Gauss coefficients at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old Gauss coefficients file to another directory before starting the programs.
 
 \subsection{Spectrum monitor data {\tt [picked\_sph\_prefix].dat}}
+\label{sec:pickup_spectr_ctl}
 This program outputs spherical harmonics coefficients at specified spherical harmonics modes and radial points in single text file. Spectrum data marked \verb|[Monitor_On]| are written in our line for each spherical harmonics mode and radial point every \\
 \verb|[increment_monitor]| steps. If the spectrum monitor data file exist before starting the simulation, programs append spectrum data at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old spectrum monitor file to another directory before starting the programs.
 
@@ -1167,8 +1250,7 @@ If the Nusselt number data file exist before starting the simulation, programs a
 
 
 \newpage
-\section{Data transform program \\
-({\tt sph\_snapshot} and {\tt sph\_zm\_snapshot})}
+\section{Data transform program ({\tt sph\_snapshot})}
 \label{section:sph_snapshot}
 %
 \begin{figure}[htbp]
@@ -1179,40 +1261,9 @@ If the Nusselt number data file exist before starting the simulation, programs a
 \label{fig:flow_3}
 \end{figure}
 %
-Simulation program outputs spectrum data as a whole field data. This program generates field data from spectrum data for visualization. This program also can pick Gauss coefficients, mean square data over sphere or each surface from spectrum data as the simulation program.
-
-\begin{table}[htp]
-\caption{List of files for simulation {\tt sph\_snap} and {\tt sph\_zm\_snap} }
-\begin{center} 
-\begin{tabular}{|c|c|c|}
-\hline
- name & Parallelization & I/O \\ \hline \hline
-\verb|control_snapshot| & Serial & Input \\ \hline
-\verb|[sph_prefix].[rj_extension]|  & - & Input \\
-\verb|[sph_prefix].[rlm_extension]| & - & Input \\
-\verb|[sph_prefix].[rtm_extension]| & - & Input \\
-\verb|[sph_prefix].[rtp_extension]| & - & Input \\ \hline
-\verb|[sph_prefix].[fem_extension]| & - & Input \\ \hline
-\verb|[boundary_data_name]| & Single & Input \\ \hline
-\verb|[rst_prefix].[step #].[rst_extension]| & - & Input  \\ \hline
-\verb|[vol_pwr_prefix].dat| & Single & Output \\ \hline
-\verb|[vol_pwr_prefix]_l.dat| & Single & Output \\
-\verb|[vol_pwr_prefix]_m.dat| & Single & Output \\
-\verb|[vol_pwr_prefix]_lm.dat| & Single & Output \\
-\verb|[vol_ave_prefix].dat| & Single & Output \\ \hline
-\verb|[layer_pwr_prefix]_l.dat| & Single & Output \\
-\verb|[layer_pwr_prefix]_m.dat| & Single & Output \\
-\verb|[layer_pwr_prefix]_lm.dat| & Single & Output \\ \hline
-\verb|[gauss_coef_prefix].dat| & Single & Output   \\
-\verb|[picked_sph_prefix].dat| & Single & Output   \\ \hline
-\verb|[nusselt_number_prefix].dat| & Single & Output   \\ \hline
-\verb|[fld_prefix].[step#].[domain#].[extension]| &  - & Output  \\ \hline
-\end{tabular}
-\end{center}
-\label{table:sph_snap}
-\end{table}
+Simulation program outputs spectrum data as a whole field data. This program is made from simulation program by replacing from time integration routines to restart data input routine. Consequently, Input/Output files in Table \ref{table:sph_mhd} are the same for {\tt sph\_snapshot}, except for the required input restart data \verb|[rst_prefix].[step #].[rst_extension]|.
 %
-This program requires control file \verb|control_snapshot|. File format of the control file is same as the control field for simulation \hyperref[href_i:MHD_control]{\tt control\_MHD}.
+This program requires control file \verb|control_snapshot| insteacd of \verb|control_mhd|. File format of the control file is same as the control field for simulation \hyperref[href_i:MHD_control]{\tt control\_MHD}.
 
 The same files as the simulation program are read in this program, and field data are generated from the snapshots of spectrum data. The monitoring data for snapshots can also be generated. \verb|[step #]| is added in the file name, and the \verb|[step #]| is calculated by \verb|time step|/\verb|[ISTEP_FIELD]|.
 
@@ -1488,7 +1539,175 @@ phi_4    omega_vp44    omega_vt54    B_theta    v_phi    temp
 ...
 \end{verbatim}
 }
- 
+%
+
+\section{Sectioning program ({\tt sectioning})} \label{sec:sectioning}
+This program generates cross sections and isosurfaces from FEM mesh data and field data using the sectioning and isosurface module in the simulation program {\tt sph\_mhd}. The data for this program is listed in Table \ref{table:sectioning}. This program run on the parallel environment, and needs to use the same number of MPI processes as the number of processes which is used for the simulation program. VTK and compressed VTK data is not supported for the input field data.
+%
+\begin{table}[htp]
+\caption{List of files for sectioning {\tt sectioning} }
+\begin{center} 
+\begin{tabular}{|c|c|c|}
+\hline
+name & Parallelization & I/O \\ \hline \hline
+\verb|control_viz| & Serial & Input \\ \hline
+\verb|[mesh_prefix].[fem_extension]| & - & Input \\ \hline
+\verb|[fld_prefix].[step#].[domain#].[extension]| & - & Input  \\ \hline
+\verb|[section_prefix].[step#].[extension]| &  Single & Output  \\
+\verb|[isosurface_prefix].[step#].[extension]| &  Single & Output  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:sectioning}
+\end{table}
+%
+
+\subsection{Control file}
+The format of the control file \verb|control_viz| is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking each item". \\
+\\
+%
+Block \verb|visualizer|  (Top block of the control file)
+\label{href_i:visualizer}
+%
+\begin{itemize}
+\item Block \hyperref[href_t:data_files_def]{\tt data\_files\_def}
+	\label{href_i:data_files_def_v}
+%
+	\begin{itemize}
+	\item \hyperref[href_t:num_subdomain_ctl]
+			{\tt num\_subdomain\_ctl    [Num\_PE]}
+	\item \hyperref[href_t:num_smp_ctl]
+			{\tt num\_smp\_ctl    [Num\_Threads]}
+	\item \hyperref[href_t:mesh_file_prefix]
+			{\tt mesh\_file\_prefix    [mesh\_prefix]}
+	\item \hyperref[href_t:field_file_prefix]
+			{\tt field\_file\_prefix    [fld\_prefix]}
+%
+	\item \hyperref[href_t:mesh_file_fmt_ctl]
+			{\tt mesh\_file\_fmt\_ctl    [mesh\_format]}
+	\item \hyperref[href_t:field_file_fmt_ctl]
+			{\tt field\_file\_fmt\_ctl    [fld\_format]}
+	\end{itemize}
+%
+\item Block \hyperref[href_t:time_step_ctl]{\tt time\_step\_ctl}
+	\begin{itemize} \label{href_i:time_step_ctl_v}
+	\item \hyperref[href_t:i_step_init_ctl]
+		{\tt i\_step\_init\_ctl        [ISTEP\_START]}
+	\item \hyperref[href_t:i_step_finish_ctl]
+		{\tt i\_step\_finish\_ctl      [ISTEP\_FINISH]}
+	\item \hyperref[href_t:i_step_field_ctl]
+		{\tt i\_step\_field\_ctl       [ISTEP\_FIELD]}
+	\item \hyperref[href_t:i_step_sectioning_ctl]
+		{\tt i\_step\_sectioning\_ctl  [ISTEP\_SECTION]}
+	\item \hyperref[href_t:i_step_isosurface_ctl]
+		{\tt i\_step\_isosurface\_ctl  [ISTEP\_ISOSURFACE]}
+	\end{itemize}
+%
+\item Block \hyperref[href_t:visual_control]{\tt visual\_control}
+    \begin{itemize} \label{href_i:visual_control_v}
+    \item \hyperref[href_t:i_step_sectioning_ctl]
+        {\tt i\_step\_sectioning\_ctl  [ISTEP\_SECTION]}
+    \item Array \hyperref[href_t:cross_section_ctl]{\tt cross\_section\_ctl}
+		\begin{itemize}
+        \item File or Block {\tt cross\_section\_ctl} \\
+                            {\tt [section\_control\_file]} \\
+								(See section \ref{section:section_control})
+		\end{itemize}
+%
+    \item \hyperref[href_t:i_step_isosurface_ctl]
+		{\tt i\_step\_isosurface\_ctl  [ISTEP\_ISOSURFACE]}
+    \item Array \hyperref[href_t:isosurface_ctl]{\tt isosurface\_ctl}
+		\begin{itemize}
+		\item File or Block {\tt isosurface\_ctl} \\
+                            {\tt [isosurface\_control\_file]} \\
+								(See section \ref{section:isosurface_control})
+		\end{itemize}
+    \end{itemize}
+\end{itemize}
+%
+
+\section{Field data converter program ({\tt field\_to\_VTK})} \label{sec:field_to_VTK}
+This program generates VTK data from FEM mesh data and field data. The data for this program is listed in Table \ref{table:fld_to_vtk}. This program run on the parallel environment, and needs to use the same number of MPI processes as the number of processes which is used for the simulation program.
+%
+\begin{table}[htp]
+\caption{List of files for sectioning {\tt sectioning} }
+\begin{center} 
+\begin{tabular}{|c|c|c|}
+\hline
+name & Parallelization & I/O \\ \hline \hline
+\verb|control_viz| & Serial & Input \\ \hline
+\verb|[mesh_prefix].[fem_extension]| & - & Input \\ \hline
+\verb|[fld_prefix].[step#].[domain#].[extension]| & - & Input  \\ \hline
+\verb|[fld_prefix].[step#].[domain#].[vtk]| or [vtk.gz] & - & Output  \\ \hline
+\end{tabular}
+\end{center}
+\label{table:sectioning}
+\end{table}
+%
+
+\newpage
+\subsection{Control file}
+The format of the control file \verb|control_viz| is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking each item". \\
+\\
+%
+Block \verb|visualizer|  (Top block of the control file)
+\label{href_i:visualizer}
+%
+\begin{itemize}
+\item Block \hyperref[href_t:data_files_def]{\tt data\_files\_def}
+	\label{href_i:data_files_def_f}
+%
+	\begin{itemize}
+	\item \hyperref[href_t:num_subdomain_ctl]
+			{\tt num\_subdomain\_ctl    [Num\_PE]}
+	\item \hyperref[href_t:num_smp_ctl]
+			{\tt num\_smp\_ctl    [Num\_Threads]}
+	\item \hyperref[href_t:mesh_file_prefix]
+			{\tt mesh\_file\_prefix    [mesh\_prefix]}
+	\item \hyperref[href_t:field_file_prefix]
+			{\tt field\_file\_prefix    [fld\_prefix]}
+%
+	\item \hyperref[href_t:mesh_file_fmt_ctl]
+			{\tt mesh\_file\_fmt\_ctl    [mesh\_format]}
+	\item \hyperref[href_t:field_file_fmt_ctl]
+			{\tt field\_file\_fmt\_ctl    [fld\_format]}
+	\end{itemize}
+%
+\item Block \hyperref[href_t:time_step_ctl]{\tt time\_step\_ctl}
+	\begin{itemize} \label{href_i:time_step_ctl_f}
+	\item \hyperref[href_t:i_step_init_ctl]
+		{\tt i\_step\_init\_ctl        [ISTEP\_START]}
+	\item \hyperref[href_t:i_step_finish_ctl]
+		{\tt i\_step\_finish\_ctl      [ISTEP\_FINISH]}
+	\item \hyperref[href_t:i_step_field_ctl]
+		{\tt i\_step\_field\_ctl       [ISTEP\_FIELD]}
+	\end{itemize}
+%
+\item Block \hyperref[href_t:visual_control]{\tt visual\_control}
+    \begin{itemize} \label{href_i:visual_control_v}
+    \item \hyperref[href_t:output_field_file_fmt_ctl]
+		{\tt output\_field\_file\_fmt\_ctl  [VTK\_format]}
+    \end{itemize}
+\end{itemize}
+%
+
+\section{Section and isosurface data converter program ({\tt psf\_to\_VTK})} \label{section:psf_to_VTK}
+This program generates VTK data from bindary sectioning and isosurface data. This program run on a single processor, and needs interactive input. The following is the console output of the program.
+
+{\small
+\begin{verbatim}
+% /usr/local/Calypso/bin/psf_to_vtk 
+Input file prefix
+zm_y0									<- Input file prefix
+Input file extension from following:
+vtk, vtk.gz, vtd, vtd.gz, inp, inp.gz, udt, udt.gz, psf, psf.gz, sdt, sdt.gz  
+sdt.gz									<- Input extension
+ifmt_input          23
+Input start, end, and increment of file step
+{\color{red} 2004 2000 1								<- Input start, end, and increment of file step} 
+Write ascii VTK file: zm_y0.2000.vtk
+\end{verbatim}
+}
+
 \section{Data assemble program ({\tt assemble\_sph})}
 \label{section:assemble_sph}
 %
@@ -1523,81 +1742,72 @@ Calypso uses distributed data files for simulations. This program is to generate
 \subsection{Format of control file}
 Control file consists the following groups. \\
 %
-\verb|assemble_control| \label{href_i:assemble_control}
+Block \verb|assemble_control| \label{href_i:assemble_control} (Top lebel of the block)
 \begin{itemize}
-\item \verb|data_files_def|
+\item Block \verb|data_files_def|
 	\hyperref[href_t:data_files_def]{(Detail)}
 	\begin{itemize}
-	\item \verb|num_subdomain_ctl           [Num_PE]|
-		\hyperref[href_t:num_subdomain_ctl]{(Detail)}
-	\item \verb|sph_file_prefix             [sph_prefix]|
-			\hyperref[href_t:sph_file_prefix]{(Detail)}
-	\item \verb|restart_file_prefix         [rst_prefix]|
-			\hyperref[href_t:restart_file_prefix]{(Detail)}
+	\item \hyperref[href_t:num_subdomain_ctl]
+			{\tt num\_subdomain\_ctl    [Num\_PE]}
+	\item \hyperref[href_t:sph_file_prefix]
+			{\tt sph\_file\_prefix      [sph\_prefix]}
+	\item \hyperref[href_t:restart_file_prefix]
+            {\tt restart\_file\_prefix  [rst\_prefix])}
 %
-	\item \verb|sph_file_fmt_ctl         [sph_format]|
-			\hyperref[href_t:sph_file_fmt_ctl]{(Detail)}
-	\item \verb|restart_file_fmt_ctl        [rst_format]|
-			\hyperref[href_t:restart_file_fmt_ctl]{(Detail)}
+	\item \hyperref[href_t:sph_file_fmt_ctl]
+			{\tt sph\_file\_fmt\_ctl    [sph\_format]}
+	\item \hyperref[href_t:restart_file_fmt_ctl]
+			{\tt restart\_file\_fmt\_ctl    [rst\_format]}
 	\end{itemize}
 %
-\item \verb|new_data_files_def|
+\item Block \verb|new_data_files_def|
 	\label{href_i:new_data_files_def}
 	\hyperref[href_t:new_data_files_def]{(Detail)}
 	\begin{itemize}
-	\item \verb|num_new_domain_ctl           [new_num_domain]|
-		\hyperref[href_t:num_new_domain_ctl]{(Detail)}
-	\item \verb|new_sph_mode_prefix          [new_sph_prefix]|
-    		\hyperref[href_t:new_sph_mode_prefix]{(Detail)}
-	\item \verb|new_restart_prefix           [new_rst_prefix]|
-    		\hyperref[href_t:new_restart_prefix]{(Detail)}
-	\item \verb|delete_original_data_flag    [YES or NO]|
-    		\hyperref[href_t:delete_original_data_flag]{(Detail)}
+	\item \hyperref[href_t:num_subdomain_ctl]
+			{\tt num\_subdomain\_ctl    [Num\_PE]}
+	\item \hyperref[href_t:sph_file_prefix]
+			{\tt sph\_file\_prefix      [sph\_prefix]}
+	\item \hyperref[href_t:restart_file_prefix]
+            {\tt restart\_file\_prefix  [rst\_prefix])}
+%
+	\item \hyperref[href_t:sph_file_fmt_ctl]
+			{\tt sph\_file\_fmt\_ctl    [sph\_format]}
+	\item \hyperref[href_t:restart_file_fmt_ctl]
+			{\tt restart\_file\_fmt\_ctl    [rst\_format]}
+%
+	\item \hyperref[href_t:delete_original_data_flag]
+			{\tt delete\_original\_data\_flag    [YES or NO]}
 	\end{itemize}
 %
-\item \verb|control|
+\item Block \verb|control|
 	\begin{itemize}
-	\item \verb|time_step_ctl|
-		\label{href_i:time_step_ctl2}
-			\hyperref[href_t:time_step_ctl]{(Detail)}
-		\begin{itemize}
-		\item \verb|i_step_init_ctl       [integer]|
-				\hyperref[href_t:i_step_init_ctl]{(Detail)}
-		\item \verb|i_step_finish_ctl     [integer]|
-				\hyperref[href_t:i_step_finish_ctl]{(Detail)}
-		\item \verb|i_step_rst_ctl        [integer]|
-				\hyperref[href_t:i_step_rst_ctl]{(Detail)}
+	\item Block \hyperref[href_t:time_step_ctl]{\tt time\_step\_ctl}
+		\begin{itemize} \label{href_i:time_step_ctl2}
+		\item \hyperref[href_t:i_step_init_ctl]
+			{\tt i\_step\_init\_ctl        [ISTEP\_START]}
+		\item \hyperref[href_t:i_step_finish_ctl]
+			{\tt i\_step\_finish\_ctl      [ISTEP\_FINISH]}
+		\item \hyperref[href_t:i_step_rst_ctl]
+			{\tt i\_step\_rst\_ctl         [ISTEP\_RESTART]}
+		\end{itemize}
+%
+	\item  Block \hyperref[href_t:i_step_init_ctl]{\tt new\_time\_step\_ctl}
+		\begin{itemize} \label{href_i:new_time_step_ctl}
+		\item \hyperref[href_t:i_step_init_ctl_a]
+			{\tt i\_step\_init\_ctl        [ISTEP\_START]}
+		\item \hyperref[href_t:i_step_rst_ctl_a]
+			{\tt i\_step\_rst\_ctl         [ISTEP\_RESTART]}
+		\item \hyperref[href_t:time_init_ctl_a]
+			{\tt time\_init\_ctl           [INITIAL\_TIME]}
 		\end{itemize}
 	\end{itemize}
 %
-	\begin{itemize}
-	\item \verb|new_time_step_ctl|
-		\label{href_i:new_time_step_ctl}
-			\hyperref[href_t:new_time_step_ctl]{(Detail)}
-		\begin{itemize}
-		\item \verb|i_step_init_ctl       [integer]|
-				\hyperref[href_t:i_step_init_ctl]{(Detail)}
-		\item \verb|i_step_rst_ctl        [integer]|
-				\hyperref[href_t:i_step_rst_ctl]{(Detail)}
-		\item \verb|time_init_ctl         [INITIAL_TIME]|
-				\hyperref[href_t:time_init_ctl]{(Detail)}
-		\end{itemize}
+\item Block \hyperref[href_t:newrst_magne_ctl]{\tt newrst\_magne\_ctl}
+	\begin{itemize} \label{href_i:newrst_magne_ctl}
+	\item \hyperref[href_t:magnetic_field_ratio_ctl]
+		{\tt magnetic\_field\_ratio\_ctl    [ratio]}
 	\end{itemize}
-%
-\item \verb|newrst_magne_ctl|
-	\label{href_i:newrst_magne_ctl}
-	\hyperref[href_t:newrst_magne_ctl]{(Detail)}
-	\begin{itemize}
-	\item \verb|magnetic_field_ratio_ctl [ratio] |
-    		\hyperref[href_t:magnetic_field_ratio_ctl]{(Detail)}
-	\end{itemize}
-\end{itemize}
-
-\section{Module dependency program ({\tt module\_dependency})}
-This program is only used to generate Makefile in {\tt work} directory. Most of case, Fortran 90 modules have to compiled prior to be referred by another fortran90 routines. This program is generates dependency lists in Makefile. To use this program, the following limitation is required.
-\begin{itemize}
-\item One source code has to consist of one module.
-\item The module name should be the same as the file name.
 \end{itemize}
 
 \section{Time averaging programs}
@@ -1627,7 +1837,23 @@ This program generate time average and standard deviation of power spectrum data
 %
 \subsection{Averaging for picked harmonics mode data \\
  ({\tt t\_ave\_picked\_sph\_coefs})}
-This program generate time average and standard deviation of spherical harmonic coefficients which selected in the file \verb|[picked_sph_prefix].dat|. In this program, file prefix  \verb|[picked_sph_prefix]| and start and end time are required in the interactive input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
+This program generate time average and standard deviation of spherical harmonic coefficients which selected in the file \verb|[picked_sph_prefix].dat|.
+
+In this program, file prefix  \verb|[picked_sph_prefix]| and start and end time are required in the interactive input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
+%
+\subsection{Averaging for Nusselt number data \\
+ ({\tt t\_ave\_nusselt})}
+This program generate time average and standard deviation of the Nusselt number in the file \verb|[nusselt_number_prefix].dat|. 
+
+In this program, file prefix  \verb|[nusselt_number_prefix]| and start and end time are required in the interactive input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
+%
+
+\section{Module dependency program ({\tt module\_dependency})}
+This program is only used to generate Makefile in {\tt work} directory. Most of case, Fortran 90 modules have to compiled prior to be referred by another fortran90 routines. This program is generates dependency lists in Makefile. To use this program, the following limitation is required.
+\begin{itemize}
+\item One source code has to consist of one module.
+\item The module name should be the same as the file name.
+\end{itemize}
 %
 \section{Visualization using field data}
 \label{sec:paraview}
