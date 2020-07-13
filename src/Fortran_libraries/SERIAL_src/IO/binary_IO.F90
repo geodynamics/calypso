@@ -506,16 +506,9 @@
       character(len=kchara), intent(inout) :: chara_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer(kind = kint_gl) :: l8_byte
-!
 !
       if(num .le. 0) return
       read(bbuf%id_binary, err=99, end=99)  chara_dat(1:num)
-!
-      if(bbuf%iflag_swap .eq. iendian_FLIP) then
-        l8_byte = num * kchara
-        call byte_swap_64bit_f(l8_byte, chara_dat(1))
-      end if
       return
 !
   99  continue
@@ -534,10 +527,6 @@
 !
       if(num .le. 0) return
       read(bbuf%id_binary, err=99, end=99)  chara_dat(1:num)
-!
-      if(bbuf%iflag_swap .eq. iendian_FLIP) then
-        call byte_swap_64bit_f(num, chara_dat(1))
-      end if
       return
 !
   99  continue
