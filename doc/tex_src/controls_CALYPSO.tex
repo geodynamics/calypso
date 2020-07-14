@@ -252,7 +252,7 @@ In the \verb|[Monitor_flag]|, output in the monitoring data is defined by
 \item{\tt Monitor\_Off} Do not write spectrum into monitoring data
 \end{description}
 %
-Supported field in the present version is listed in Table \ref{table:fields}
+Supported field in the present version is listed in Table \ref{table:fields} and \ref{table:fields2} 
 %
 \begin{table}[htp]
 \caption{List of field name}
@@ -276,40 +276,71 @@ Supported field in the present version is listed in Table \ref{table:fields}
 \verb|magnetic_field| &  Magnetic field  & $\bvec{B}$ \\
 \verb|current_density| & Current density & $\bvec{J} = \nabla \times \bvec{B} $ \\
 \verb|electric_field| & Electric field & $\bvec{E} = \sigma \left(\bvec{J} - \bvec{u} \times \bvec{B}\right) $ \\
- \hline
-\verb inertia & Inertia term &  $ -\bvec{\omega} \times \bvec{u} $ \\
+\verb|truncated_magnetic_field| & Truncated Magnetic field at $Lt$ & $\sum_{l=1}^{Lt} \bvec{B}_{l}^{m}$ \\
+ &  See \hyperref[href_t:crustal_filtering_ctl]{\tt truncation\_degree\_ctl} &  \\
+\hline \hline
 \verb|viscous_diffusion| & Viscous diffusion
 & $-\nu \nabla \times \nabla \times \bvec{u}$ \\
+\verb inertia & Inertia term &  $ \bvec{\omega} \times \bvec{u} $ \\
 \verb buoyancy                   & Thermal buoyancy &  $ -\alpha_{T} T \bvec{g}  $ \\
 \verb composite_buoyancy & Compositional buoyancy &  $ -\alpha_{C} C\bvec{g}  $\\
 \verb Lorentz_force & Lorentz force &  $ \bvec{J} \times \bvec{B} $ \\
 \verb Coriolis_force & Coriolis force &  $ -2 \Omega \hat{z} \times \bvec{u} $ \\
+\verb pressure_gradient & Pressure gradient &  $  - \nabla P  $ \\
+\verb rest_of_geostrophic & Rest of geostrophic balance &  $ - \nabla P - 2 \Omega \hat{z} \times \bvec{u} $ \\
 \hline
 \verb|thermal_diffusion| & Termal diffusion & $ \kappa_{T} \nabla^{2} T $ \\
 \verb grad_temp & Temperature gradient & $ \nabla T$ \\
 \verb heat_flux & Advective heat flux & $ \bvec{u} T$ \\
-\verb heat_advect & Heat advection & $ -\bvec{u} \cdot \nabla T = -\nabla \cdot \left(  \bvec{u} T \right) $ \\
+\verb heat_advect & Heat advection & $ \bvec{u} \cdot \nabla T = \nabla \cdot \left(  \bvec{u} T \right) $ \\
 \hline
 \verb composition_diffusion & Compositional diffusion & $ \kappa_{C} \nabla^{2} C $ \\
 \verb grad_composition & Composition gradient & $ \nabla C$ \\
 \verb composite_flux & Advective composition flux & $ \bvec{u} C$ \\
-\verb composition_advect & Compositional advection & $ -\bvec{u} \cdot \nabla C = -\nabla \cdot \left(  \bvec{u} C \right) $ \\
+\verb composition_advect & Compositional advection & $ \bvec{u} \cdot \nabla C = \nabla \cdot \left(  \bvec{u} C \right) $ \\
 \hline
 \verb magnetic_diffusion & Magnetic diffusion 
 & $-\eta \nabla \times \nabla \times \bvec{B}$ \\
+\verb vecp_induction & Induction for the vector potential &  $ \bvec{u} \times \bvec{B} $ \\
+\verb magnetic_induction & Magnetic induction &  $ \nabla \times \left(\bvec{u} \times \bvec{B}\right) $ \\
 \verb poynting_flux & Poynting flux &  $ \bvec{E} \times \bvec{B} $ \\
 \hline
+\end{tabular}
+\end{center}
+\label{table:fields}
+\end{table}
+*: Magnetic helicity $\bvec{A} \cdot \bvec{B} $ is not implimented.
+%
+%
+\begin{table}[htp]
+\caption{List of field name (Continued)}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\verb|[Name]| & field name & Description \\ \hline \hline
+\verb rot_inertia & Curl of inertia &  $ \nabla \times \left(\bvec{\omega} \times \bvec{u}\right) $ \\
 \verb rot_Lorentz_force & Curl of Lorentz force &  $ \nabla \times \left(\bvec{J} \times \bvec{B}\right) $ \\
 \verb rot_Coriolis_force & Curl of Coriolis force &  $ -2 \Omega \nabla \times \left(\hat{z} \times \bvec{u} \right) $ \\
 \verb rot_buoyancy                   & Curl of thermal buoyancy &  $ - \nabla \times \left(\alpha_{T} T \bvec{g}\right)  $ \\
 \verb rot_composite_buoyancy & Curl of compositional buoyancy &  $ - \nabla \times \left(\alpha_{C} C\bvec{g}\right)  $\\
 \hline
-\verb|buoyancy_flux| & Buoyancy flux & $ -\alpha_{T} T \bvec{g} \cdot \bvec{u} $ \\
 \verb|Lorentz_work| & Work of Lorentz force
- & $\bvec{u}\cdot \left( \bvec{J} \times \bvec{B} \right) $ \\ \hline
+ & $\bvec{u}\cdot \left( \bvec{J} \times \bvec{B} \right) $ \\ 
+\verb|work_against_Lorentz| & Work against Lorentz force
+ & $- \bvec{u}\cdot \left( \bvec{J} \times \bvec{B} \right) $ \\ 
+\verb|buoyancy_flux| & Thermal buoyancy flux & $ -\alpha_{T} T \bvec{g} \cdot \bvec{u} $ \\
+\verb|composite_buoyancy_flux| & Compositional buoyancy flux & $ -\alpha_{c} C \bvec{g} \cdot \bvec{u} $ \\
+\verb|magnetic_ene_generation| & Energy production by magnetic induction
+ & $  \bvec{B} \cdot \left( \bvec{u} \times \bvec{B} \right) $ \\ 
+\hline
+\verb|kinetic_helicity| & Kinetic helicity & $  \bvec{u} \cdot \bvec{\omega} $ \\
+\verb|current_helicity| & Current helicity & $  \bvec{B} \cdot \bvec{J} $ \\
+\verb|cross_helicity| & Cross helicity$^{*}$ & $  \bvec{u} \cdot \bvec{B} $ \\
+\hline
 \end{tabular}
 \end{center}
-\label{table:fields}
+*: Magnetic helicity $\bvec{A} \cdot \bvec{B} $ is not implimented.
+\label{table:fields2}
 \end{table}
 %
 

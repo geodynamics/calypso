@@ -1358,6 +1358,7 @@ After updating the source code, the program \verb|sph_initial_field| needs to be
 Then, the program  \verb|sph_initial_field| and  \verb|sph_add_initial_field| are updated.
 
 %
+{\small
 \begin{verbatim}
 !
       subroutine set_initial_temperature
@@ -1426,6 +1427,7 @@ Then, the program  \verb|sph_initial_field| and  \verb|sph_add_initial_field| ar
       end subroutine set_initial_temperature
 !
 \end{verbatim}
+}
 %
 
 \section{Initial field modification program \\
@@ -1543,6 +1545,14 @@ phi_4    omega_vp44    omega_vt54    B_theta    v_phi    temp
 
 \section{Sectioning program ({\tt sectioning})} \label{sec:sectioning}
 This program generates cross sections and isosurfaces from FEM mesh data and field data using the sectioning and isosurface module in the simulation program {\tt sph\_mhd}. The data for this program is listed in Table \ref{table:sectioning}. This program run on the parallel environment, and needs to use the same number of MPI processes as the number of processes which is used for the simulation program. VTK and compressed VTK data is not supported for the input field data.
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{images/flow_5}
+\end{center}
+\caption{Data flow for sectioning program.}
+\label{fig:flow_add_ini}
+\end{figure}
 %
 \begin{table}[htp]
 \caption{List of files for sectioning {\tt sectioning} }
