@@ -1,4 +1,4 @@
-Calypso - MHD dyanmo model in a rotating spherical shell
+Calypso - MHD dynamo model in a rotating spherical shell
 ========================================================
 
 About
