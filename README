@@ -1,3 +1,6 @@
+Calypso - Nemerical MHD dyanmo model in a rotating spherical shell
+===========================================================
+
 Calypso is a set of programs for MHD dynamo simulation in a rotating spherical
 shell using spherical harmonics expansion methods.
 
