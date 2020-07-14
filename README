@@ -25,5 +25,5 @@ examples: Directory for examples
 src:      Directory for source files
 work:     Work directory (created by make)
 
-For installation instructions, please read INSTALL or the documentation page 16--19.
+For installation instructions, please read INSTALL or the documentation.
 
