@@ -30,10 +30,10 @@
 !!        type(MHD_step_param), intent(in) :: MHD_step
 !!        type(MHD_IO_data), intent(inout) :: MHD_IO
 !!
-!!      subroutine SPH_to_FEM_bridge_MHD(sph, WK, mesh, nod_fld)
+!!      subroutine SPH_to_FEM_bridge_MHD(sph, WK, geofem, nod_fld)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(works_4_sph_trans_MHD), intent(in) :: WK
-!!        type(mesh_geometry), intent(in) :: mesh
+!!        type(mesh_data), intent(in) :: geofem
 !!        type(phys_address), intent(in) :: iphys
 !!        type(phys_data), intent(inout) :: nod_fld
 !!      subroutine FEM_to_SPH_bridge
@@ -160,7 +160,7 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine SPH_to_FEM_bridge_MHD(sph, WK, mesh, nod_fld)
+      subroutine SPH_to_FEM_bridge_MHD(sph, WK, geofem, nod_fld)
 !
       use t_spheric_parameter
       use t_sph_trans_arrays_MHD
@@ -169,7 +169,7 @@
 !
       type(sph_grids), intent(in) :: sph
       type(works_4_sph_trans_MHD), intent(in) :: WK
-      type(mesh_geometry), intent(in) :: mesh
+      type(mesh_data), intent(in) :: geofem
 !
       type(phys_data), intent(inout) :: nod_fld
 !*
@@ -177,23 +177,23 @@
 !*
       if (iflag_debug.gt.0) write(*,*) 'copy_force_from_transform MHD'
       call copy_force_from_transform(sph%sph_params, sph%sph_rtp,       &
-     &    WK%trns_MHD%forward, mesh, nod_fld)
+     &    WK%trns_MHD%forward, geofem%mesh, nod_fld)
 !
       if (iflag_debug.gt.0) write(*,*)                                  &
      &                'copy_field_from_transform base fields'
       call copy_field_from_transform(sph%sph_params, sph%sph_rtp,       &
-     &    WK%trns_snap%backward, mesh, nod_fld)
+     &    WK%trns_snap%backward, geofem%mesh, nod_fld)
       if (iflag_debug.gt.0) write(*,*)                                  &
      &                'copy_field_from_transform diff_vector'
       call copy_field_from_transform(sph%sph_params, sph%sph_rtp,       &
-     &    WK%trns_difv%backward, mesh, nod_fld)
+     &    WK%trns_difv%backward, geofem%mesh, nod_fld)
 !
       if (iflag_debug.gt.0) write(*,*) 'copy_field_from_transform SNAP'
       call copy_field_from_transform(sph%sph_params, sph%sph_rtp,       &
-     &    WK%trns_eflux%backward, mesh, nod_fld)
+     &    WK%trns_eflux%backward, geofem%mesh, nod_fld)
       if (iflag_debug.gt.0) write(*,*) 'copy_force_from_transform SNAP'
       call copy_force_from_transform(sph%sph_params, sph%sph_rtp,       &
-     &    WK%trns_eflux%forward, mesh, nod_fld)
+     &    WK%trns_eflux%forward, geofem%mesh, nod_fld)
 !
       end subroutine SPH_to_FEM_bridge_MHD
 !

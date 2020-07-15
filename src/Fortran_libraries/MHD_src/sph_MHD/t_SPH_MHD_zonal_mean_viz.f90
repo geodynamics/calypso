@@ -173,7 +173,7 @@
       if(zrms_psf%num_psf .le. 0) return
 !
       if (iflag_debug.gt.0) write(*,*) 'SPH_to_FEM_bridge_MHD'
-      call SPH_to_FEM_bridge_MHD(sph, WK, geofem%mesh, nod_fld)
+      call SPH_to_FEM_bridge_MHD(sph, WK, geofem, nod_fld)
       call zonal_rms_all_rtp_field                                      &
      &   (sph%sph_rtp, geofem%mesh%node, nod_fld)
 !

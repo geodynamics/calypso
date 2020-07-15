@@ -136,7 +136,7 @@
      &                          MHD_step1)) then
           if (iflag_debug.eq.1) write(*,*) 'SPH_to_FEM_bridge_MHD'
           call SPH_to_FEM_bridge_MHD(SPH_MHD1%sph, SPH_WK1%trns_WK,     &
-     &        FEM_d1%geofem%mesh, FEM_d1%field)
+     &        FEM_d1%geofem, FEM_d1%field)
         end if
 !
         if (iflag_debug.eq.1) write(*,*) 'FEM_analyze_sph_MHD'
