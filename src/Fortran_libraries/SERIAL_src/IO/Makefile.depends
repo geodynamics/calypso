@@ -74,7 +74,7 @@ m_monitor_file_labels.o: $(IO_DIR)/m_monitor_file_labels.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_more_component_flags.o: $(IO_DIR)/m_more_component_flags.f90 m_precision.o m_phys_constants.o t_field_labels.o t_multi_flag_labels.o m_component_flags.o
 	$(F90) -c $(F90OPTFLAGS) $<
-m_section_file_extensions.o: $(IO_DIR)/m_section_file_extensions.f90 m_precision.o m_field_file_format.o skip_comment_f.o
+m_section_file_extensions.o: $(IO_DIR)/m_section_file_extensions.f90 m_precision.o m_field_file_format.o skip_comment_f.o set_parallel_file_name.o set_ucd_extensions.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_sph_modes_grid_labels.o: $(IO_DIR)/m_sph_modes_grid_labels.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<

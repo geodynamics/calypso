@@ -21,7 +21,6 @@
 !
 !>      Structure of spetr grid and data
       type(SPH_mesh_field_data), save :: SPH_MHD1
-!
 !>      Structure of sectioning and isosurfaceing modules
       type(surfacing_modules), save :: viz_psfs1
 !

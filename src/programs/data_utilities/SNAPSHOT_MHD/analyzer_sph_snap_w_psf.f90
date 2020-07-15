@@ -22,21 +22,28 @@
       use m_machine_parameter
       use m_MHD_step_parameter
       use m_SPH_MHD_model_data
-      use m_jacobians_VIZ
-      use m_SPH_SGS_structure
+      use t_ctl_data_MHD
       use t_step_parameter
-      use t_visualizer
+      use t_SPH_mesh_field_data
+      use t_viz_sections
       use t_SPH_MHD_zonal_mean_viz
       use t_sph_trans_arrays_MHD
 !
       use SPH_analyzer_snap_w_psf
-      use FEM_analyzer_sph_SGS_MHD
+      use FEM_analyzer_sph_MHD
 !
       implicit none
 !
-      integer(kind = kint), parameter, private :: ctl_file_code = 11
+!>      File name for control file
       character(len=kchara), parameter, private                         &
      &                      :: snap_ctl_name = 'control_snapshot'
+!>      Control struture for MHD simulation
+      type(DNS_mhd_simulation_control), save, private :: DNS_MHD_ctl1
+!
+!>      Structure of spetr grid and data
+      type(SPH_mesh_field_data), save, private :: SPH_MHD1
+!>      Structure of sectioning and isosurfaceing modules
+      type(surfacing_modules), save, private :: viz_psfs1
 !
       real (kind=kreal), private  ::  total_start
 !
@@ -48,12 +55,9 @@
 !
       subroutine initialize_sph_snap_w_psf
 !
-      use t_ctl_data_SGS_MHD
-      use m_ctl_data_sph_SGS_MHD
-!
+      use t_ctl_data_sph_MHD_psf
       use init_sph_MHD_elapsed_label
-      use input_control_sph_SGS_MHD
-!
+      use input_control_sph_MHD
 !
       write(*,*) 'Simulation start: PE. ', my_rank
       total_start = MPI_WTIME()
@@ -66,12 +70,12 @@
       if(iflag_TOT_time) call start_elapsed_time(ied_total_elapsed)
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+3)
       if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_SGS_MHD'
-      call read_control_4_sph_SGS_MHD(snap_ctl_name, MHD_ctl1)
+      call read_control_4_sph_MHD_w_psf(snap_ctl_name, DNS_MHD_ctl1)
 !
       if (iflag_debug.eq.1) write(*,*) 'input_control_SPH_SGS_dynamo'
-      call input_control_SPH_SGS_dynamo                                 &
-     &  (MHD_files1, MHD_ctl1, MHD_step1, SPH_model1,                   &
-     &   SPH_WK1%trns_WK, SPH_WK1%monitor, SPH_SGS1, SPH_MHD1, FEM_d1)
+      call input_control_SPH_MHD_psf                                    &
+     &  (MHD_files1, DNS_MHD_ctl1, MHD_step1, SPH_model1,               &
+     &   SPH_WK1%trns_WK, SPH_WK1%monitor, SPH_MHD1, FEM_d1)
       call copy_delta_t(MHD_step1%init_d, MHD_step1%time_d)
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
 !
@@ -79,20 +83,20 @@
 !
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+1)
       if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize_sph_SGS_MHD'
-      call FEM_initialize_sph_SGS_MHD(MHD_files1, MHD_step1,            &
-     &   FEM_d1%geofem, FEM_d1%field, FEM_d1%iphys, SPH_SGS1%iphys_LES, &
-     &   next_tbl_VIZ1, jacobians_VIZ1, MHD_IO1)
+      call FEM_initialize_sph_MHD(MHD_files1, MHD_step1,                &
+     &   FEM_d1%geofem, FEM_d1%field, FEM_d1%iphys, MHD_IO1)
 !
 !        Initialize spherical transform dynamo
       if(iflag_debug .gt. 0) write(*,*) 'SPH_init_sph_snap_psf'
-      call SPH_init_sph_snap_psf(MHD_files1, FEM_d1%iphys, SPH_model1,  &
-     &    SPH_SGS1, SPH_MHD1, SPH_WK1)
+      call SPH_init_sph_snap_psf                                        &
+     &   (MHD_files1, FEM_d1%iphys, SPH_model1, SPH_MHD1, SPH_WK1)
+!
 !        Initialize visualization
-      if(iflag_debug .gt. 0) write(*,*) 'init_visualize'
-      call init_visualize                                               &
-     &   (FEM_d1%geofem, FEM_d1%field, MHD_ctl1%viz_ctls, vizs1)
+      if(iflag_debug .gt. 0) write(*,*) 'init_visualize_surface'
+      call init_visualize_surface(FEM_d1%geofem, FEM_d1%field,          &
+     &    DNS_MHD_ctl1%surfacing_ctls, viz_psfs1)
       call init_zonal_mean_sections                                     &
-     &   (FEM_d1%geofem, FEM_d1%field, MHD_ctl1%zm_ctls, zmeans1)
+     &   (FEM_d1%geofem, FEM_d1%field, DNS_MHD_ctl1%zm_ctls, zmeans1)
 !
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+1)
       call calypso_MPI_barrier
@@ -104,10 +108,7 @@
 !
       subroutine evolution_sph_snap_w_psf
 !
-      use FEM_analyzer_sph_MHD
-      use SGS_MHD_zonal_mean_viz
       use output_viz_file_control
-      use t_sph_trans_arrays_SGS_MHD
       use set_time_step_params
 !
 !*  -----------  set initial step data --------------
@@ -133,7 +134,7 @@
         if (iflag_debug.eq.1) write(*,*) 'SPH_analyze_snap_psf'
         call SPH_analyze_snap_psf                                       &
      &     (MHD_step1%time_d%i_time_step, MHD_files1,                   &
-     &      SPH_model1, MHD_step1, SPH_SGS1, SPH_MHD1, SPH_WK1)
+     &      SPH_model1, MHD_step1, SPH_MHD1, SPH_WK1)
 !*
 !*  -----------  output field data --------------
 !*
@@ -160,16 +161,15 @@
           if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+4)
           call istep_viz_w_fix_dt(MHD_step1%time_d%i_time_step,         &
      &                          MHD_step1%viz_step)
-          call visualize_all(MHD_step1%viz_step, MHD_step1%time_d,      &
-     &        FEM_d1%geofem, FEM_d1%field, next_tbl_VIZ1%neib_ele,      &
-     &        jacobians_VIZ1, vizs1)
+          call visualize_surface(MHD_step1%viz_step, MHD_step1%time_d,  &
+     &        FEM_d1%geofem, FEM_d1%field, viz_psfs1)
 !*
 !*  ----------- Zonal means --------------
 !*
           if(MHD_step1%viz_step%istep_psf .ge. 0) then
-            call SGS_MHD_zmean_sections(MHD_step1%viz_step%istep_psf,   &
+            call SPH_MHD_zmean_sections(MHD_step1%viz_step%istep_psf,   &
      &          MHD_step1%time_d, SPH_MHD1%sph, FEM_d1%geofem,          &
-     &          SPH_WK1%trns_WK, SPH_SGS1, FEM_d1%field, zmeans1)
+     &          SPH_WK1%trns_WK, FEM_d1%field, zmeans1)
           end if
           if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+4)
         end if

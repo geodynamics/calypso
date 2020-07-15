@@ -23,6 +23,7 @@
       use m_elapsed_labels_SEND_RECV
       use m_SPH_MHD_model_data
       use m_SPH_MHD_structure
+      use t_ctl_data_MHD
       use t_field_on_circle
       use t_field_4_dynamobench
       use t_step_parameter
@@ -31,8 +32,12 @@
 !
       implicit none
 !
-      character(len=kchara), parameter, private                         &
+!>      File name for control file
+      character(len=kchara), parameter                                  &
      &                      :: snap_ctl_name = 'control_snapshot'
+!>      Control struture for MHD simulation
+      type(DNS_mhd_simulation_control), save :: DNS_MHD_ctl1
+      private :: snap_ctl_name, DNS_MHD_ctl1
 !
       type(circle_fld_maker), save, private :: cdat1
       type(dynamobench_monitor), save, private :: bench1
@@ -46,7 +51,6 @@
       subroutine initialize_sph_dynamobench
 !
       use t_ctl_data_sph_MHD_psf
-      use m_ctl_data_sph_MHD
       use init_sph_MHD_elapsed_label
       use input_control_dynamobench
 !

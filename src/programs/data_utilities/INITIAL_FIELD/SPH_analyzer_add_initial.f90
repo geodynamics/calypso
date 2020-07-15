@@ -21,15 +21,21 @@
       use m_work_time
       use m_elapsed_labels_4_MHD
       use m_elapsed_labels_SEND_RECV
-      use m_ctl_data_sph_MHD
       use m_SPH_MHD_model_data
       use m_SPH_MHD_structure
       use m_MHD_step_parameter
+      use t_ctl_data_MHD
       use t_MHD_file_parameter
       use t_SPH_mesh_field_data
       use t_field_data_IO
 !
       implicit none
+!
+!>      File name for control file
+      character(len=kchara), parameter :: MHD_ctl_name =  'control_MHD'
+!>      Control struture for MHD simulation
+      type(DNS_mhd_simulation_control), save :: DNS_MHD_ctl1
+      private :: MHD_ctl_name, DNS_MHD_ctl1
 !
       type(field_IO), save, private :: rst_IO1
 !
