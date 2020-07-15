@@ -5,7 +5,7 @@
 !! @date   Programmed in 2012
 !!
 !!
-!> @brief control date for volume averaged spectr data
+!>@brief control date for volume averaged spectr data
 !!
 !!@verbatim
 !!      subroutine reset_mid_equator_control(meq_ctl)

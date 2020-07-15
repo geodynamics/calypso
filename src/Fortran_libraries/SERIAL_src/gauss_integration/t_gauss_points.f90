@@ -1,10 +1,10 @@
 !>@file   t_gauss_points.f90
 !!        module t_gauss_points
 !!
-!! @author H. Matsui
-!! @date   Programmed in 2003
+!!@author H. Matsui
+!!@date   Programmed in 2003
 !!
-!
+!!
 !> @brief Constants for Gauss-Legendre integration
 !!
 !!@verbatim
@@ -259,7 +259,7 @@
       end subroutine set_points_4_elevation
 !
 ! -----------------------------------------------------------------------
-!
+!>      Calicurate gauss integrations
       subroutine cal_gauss_integrals(gauss, g_int, x)
 !
       use gauss_integration
@@ -276,7 +276,7 @@
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
-!
+!>       Check Gauss points
       subroutine check_gauss_points(gauss)
 !
       type(gauss_points), intent(in) :: gauss

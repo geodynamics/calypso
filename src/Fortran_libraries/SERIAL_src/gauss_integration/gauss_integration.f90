@@ -1,10 +1,10 @@
 !>@file   gauss_integration.f90
 !!        module gauss_integration
 !!
-!! @author H. Matsui
-!! @date   Programmed in 2003
+!!@author H. Matsui
+!!@date   Programmed in 2003
 !!
-!
+!!
 !> @brief Constants for Gauss-Legendre integration
 !!
 !!@verbatim

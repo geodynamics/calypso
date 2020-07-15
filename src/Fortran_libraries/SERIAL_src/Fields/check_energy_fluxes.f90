@@ -5,7 +5,7 @@
 !! @date   Programmed in Jan., 2020
 !!
 !!
-!> @brief Labels and addresses for basic fields
+!> @brief Check Dependecies for energy fluxes
 !!
 !!@verbatim
 !!      subroutine add_field_ctl_4_ene_flux(field_ctl)

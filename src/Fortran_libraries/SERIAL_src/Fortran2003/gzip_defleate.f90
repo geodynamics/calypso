@@ -1,4 +1,4 @@
-!>@file   gzip_defleate.f03
+!>@file   gzip_defleate.f90
 !!        module gzip_defleate
 !!
 !! @author H. Matsui

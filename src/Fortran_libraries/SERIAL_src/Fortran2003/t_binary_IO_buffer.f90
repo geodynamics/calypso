@@ -1,10 +1,10 @@
-!>@file  t_binary_IO_buffer.f03
+!>@file  t_binary_IO_buffer.f90
 !!       module t_binary_IO_buffer
 !!
 !!@author H. Matsui
 !!@date   Programmed in Aug., 2016
 !!        Modified in March, 2020
-!
+!!
 !> @brief Buffer and pointers for binary IO data IO
 !!
 !!@verbatim

@@ -4,7 +4,7 @@
 !!@author H. Matsui
 !!@date Programmed in Jan., 2005
 !!
-!>        Subroutines to read control data
+!>@brief    Subroutines to read control items
 !!
 !!@verbatim
 !!      subroutine load_one_line_from_control(id_control, c_buf)

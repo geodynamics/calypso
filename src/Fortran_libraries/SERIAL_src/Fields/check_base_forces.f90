@@ -5,7 +5,7 @@
 !! @date   Programmed in Jan., 2020
 !!
 !!
-!> @brief Labels and addresses for basic fields
+!> @brief Check Dependecies for basic forces
 !!
 !!@verbatim
 !!      subroutine add_field_ctl_4_forces(field_ctl)

@@ -5,7 +5,7 @@
 !! @date   Programmed in Jan., 2020
 !!
 !!
-!> @brief Labels and addresses for basic fields
+!> @brief Check Dependecies for basic fields
 !!
 !!@verbatim
 !!      subroutine add_field_ctl_4_base_field(field_ctl)

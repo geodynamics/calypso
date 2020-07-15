@@ -1,10 +1,10 @@
-!>@file  t_buffer_4_gzip.f03
+!>@file  t_buffer_4_gzip.f90
 !!       module t_buffer_4_gzip
 !!
 !!@author H. Matsui
 !!@date   Programmed in Aug., 2016
 !!        Modified in March, 2020
-!
+!!
 !> @brief Buffer and pointers for zlib data IO
 !!
 !!@verbatim

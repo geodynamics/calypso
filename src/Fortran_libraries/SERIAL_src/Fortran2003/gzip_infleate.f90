@@ -1,4 +1,4 @@
-!>@file   gzip_infleate.f03
+!>@file   gzip_infleate.f90
 !!        module gzip_infleate
 !!
 !! @author H. Matsui
