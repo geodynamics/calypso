@@ -22,7 +22,7 @@
       use m_elapsed_labels_SEND_RECV
       use m_SPH_MHD_model_data
       use m_MHD_step_parameter
-      use m_SPH_MHD_structure
+      use t_SPH_mesh_field_data
       use t_ctl_data_MHD
       use t_viz_sections
       use t_SPH_MHD_zonal_mean_viz
@@ -39,6 +39,11 @@
 !>      Control struture for MHD simulation
       type(DNS_mhd_simulation_control), save :: DNS_MHD_ctl1
       private :: MHD_ctl_name, DNS_MHD_ctl1
+!
+!>      Structure of spectr grid and data
+      type(SPH_mesh_field_data), save, private :: SPH_MHD1
+!>      Structure of sectioning and isosurfaceing modules
+      type(surfacing_modules), save, private :: viz_psfs1
 !
 ! ----------------------------------------------------------------------
 !

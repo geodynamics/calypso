@@ -22,8 +22,8 @@
       use m_elapsed_labels_4_MHD
       use m_elapsed_labels_SEND_RECV
       use m_SPH_MHD_model_data
-      use m_SPH_MHD_structure
       use m_MHD_step_parameter
+      use t_SPH_mesh_field_data
       use t_ctl_data_MHD
       use t_MHD_file_parameter
       use t_SPH_mesh_field_data
@@ -37,6 +37,9 @@
       type(DNS_mhd_simulation_control), save :: DNS_MHD_ctl1
       private :: MHD_ctl_name, DNS_MHD_ctl1
 !
+!>      Structure of spectr grid and data
+      type(SPH_mesh_field_data), save, private :: SPH_MHD1
+!>      Structure of restart IO data
       type(field_IO), save, private :: rst_IO1
 !
       private :: SPH_add_initial_field

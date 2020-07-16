@@ -191,7 +191,7 @@
 #endif
 !
       write(id_timer_file,*)                                            &
-     &   'Processes for spetr (r, l and m):        ', nproc_rj_IO(1:2)
+     &   'Processes for spectr (r, l and m):        ', nproc_rj_IO(1:2)
       write(id_timer_file,*)                                            &
      &   'Processes for Legendre trans. (r, l, m): ', nproc_rlm_IO(1:2)
       write(id_timer_file,*)                                            &

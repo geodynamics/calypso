@@ -65,7 +65,7 @@
       end type sph_mesh_data
 !
 !
-!>      Structure of spetr grid and data
+!>      Structure of spectr grid and data
       type SPH_mesh_field_data
 !>         Structure of grid and spectr data for spherical spectr method
         type(sph_grids) :: sph

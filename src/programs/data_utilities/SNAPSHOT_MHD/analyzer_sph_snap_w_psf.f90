@@ -40,7 +40,7 @@
 !>      Control struture for MHD simulation
       type(DNS_mhd_simulation_control), save, private :: DNS_MHD_ctl1
 !
-!>      Structure of spetr grid and data
+!>      Structure of spectr grid and data
       type(SPH_mesh_field_data), save, private :: SPH_MHD1
 !>      Structure of sectioning and isosurfaceing modules
       type(surfacing_modules), save, private :: viz_psfs1

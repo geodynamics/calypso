@@ -22,7 +22,7 @@
       use m_elapsed_labels_4_MHD
       use m_elapsed_labels_SEND_RECV
       use m_SPH_MHD_model_data
-      use m_SPH_MHD_structure
+      use t_SPH_mesh_field_data
       use t_ctl_data_MHD
       use t_field_on_circle
       use t_field_4_dynamobench
@@ -39,7 +39,12 @@
       type(DNS_mhd_simulation_control), save :: DNS_MHD_ctl1
       private :: snap_ctl_name, DNS_MHD_ctl1
 !
+!>      Structure of spectr grid and data
+      type(SPH_mesh_field_data), save, private :: SPH_MHD1
+!
+!>      Structure of field on mid-depth and equator
       type(circle_fld_maker), save, private :: cdat1
+!>      Structure of benchmark result data
       type(dynamobench_monitor), save, private :: bench1
 !
 ! ----------------------------------------------------------------------
