@@ -129,29 +129,24 @@
      &                          MHD_step1)) then
           call alloc_sph_trans_area_snap                                &
      &       (SPH_MHD1%sph%sph_rtp, SPH_WK1%trns_WK)
-        end if
 !
-        if (iflag_debug.eq.1) write(*,*) 'SPH_analyze_snap_psf'
-        call SPH_analyze_snap_psf                                       &
-     &     (MHD_step1%time_d%i_time_step, MHD_files1,                   &
-     &      SPH_model1, MHD_step1, SPH_MHD1, SPH_WK1)
+          if (iflag_debug.eq.1) write(*,*) 'SPH_analyze_snap_psf'
+          call SPH_analyze_snap_psf                                     &
+     &       (MHD_step1%time_d%i_time_step, MHD_files1,                 &
+     &        SPH_model1, MHD_step1, SPH_MHD1, SPH_WK1)
 !*
 !*  -----------  output field data --------------
 !*
-        if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+3)
-!
-        if(lead_field_data_flag(MHD_step1%time_d%i_time_step,           &
-     &                          MHD_step1)) then
+          if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+3)
           if (iflag_debug.eq.1) write(*,*) 'SPH_to_FEM_bridge_MHD'
           call SPH_to_FEM_bridge_MHD(SPH_MHD1%sph, SPH_WK1%trns_WK,     &
      &        FEM_d1%geofem, FEM_d1%field)
+!
+          if (iflag_debug.eq.1) write(*,*) 'FEM_analyze_sph_MHD'
+          call FEM_analyze_sph_MHD(MHD_files1,                          &
+     &        FEM_d1%geofem, FEM_d1%field, MHD_step1, MHD_IO1)
+          if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
         end if
-!
-        if (iflag_debug.eq.1) write(*,*) 'FEM_analyze_sph_MHD'
-        call FEM_analyze_sph_MHD(MHD_files1,                            &
-     &      FEM_d1%geofem, FEM_d1%field, MHD_step1, MHD_IO1)
-!
-        if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
 !
 !*  ----------- Visualization --------------
 !*

@@ -94,11 +94,6 @@
       call allocate_vector_for_solver                                   &
      &   (isix, SPH_MHD%sph%sph_rtp%nnod_rtp)
 !
-      if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr_4_mhd'
-      call init_rms_4_sph_spectr_4_mhd                                  &
-     &   (SPH_MHD%sph, SPH_MHD%fld, SPH_WK%monitor)
-!
-! ---------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
       call init_r_infos_sph_mhd_evo(SPH_WK%r_2nd, SPH_model%bc_IO,      &
@@ -125,6 +120,10 @@
 !
       call init_radial_sph_interpolation(MHD_files%org_rj_file_IO,      &
      &    SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj)
+!
+      if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr_4_mhd'
+      call init_rms_4_sph_spectr_4_mhd                                  &
+     &   (SPH_MHD%sph, SPH_MHD%fld, SPH_WK%monitor)
 !
 !* -----  find mid-equator point -----------------
 !*

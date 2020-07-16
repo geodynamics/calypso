@@ -96,6 +96,8 @@
 !
       subroutine evolution_sph_dynamobench
 !
+      use output_viz_file_control
+      use t_sph_trans_arrays_MHD
       use set_time_step_params
 !
 !*  -----------  set initial step data --------------
@@ -112,9 +114,17 @@
 !
 !*  ----------  time evolution by spectral methood -----------------
 !*
-        if (iflag_debug.eq.1) write(*,*) 'SPH_analyze_dbench'
-        call SPH_analyze_dbench(MHD_step1%time_d%i_time_step,           &
+        if(lead_field_data_flag(MHD_step1%time_d%i_time_step,           &
+     &                          MHD_step1)) then
+          call alloc_sph_trans_area_snap                                &
+     &       (SPH_MHD1%sph%sph_rtp, SPH_WK1%trns_WK)
+!
+          if (iflag_debug.eq.1) write(*,*) 'SPH_analyze_dbench'
+          call SPH_analyze_dbench(MHD_step1%time_d%i_time_step,         &
      &      MHD_files1, SPH_model1, SPH_MHD1, SPH_WK1, cdat1, bench1)
+!
+           call dealloc_sph_trans_area_snap(SPH_WK1%trns_WK)
+        end if
 !*
 !*  -----------  exit loop --------------
 !*

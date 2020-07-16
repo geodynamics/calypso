@@ -66,7 +66,7 @@ legendre_fwd_trans_testloop.o: $(SPH_COMMDIR)/legendre_fwd_trans_testloop.f90 m_
 	$(F90) -c $(F90OPTFLAGS) $<
 legendre_trans_matmul_big.o: $(SPH_COMMDIR)/legendre_trans_matmul_big.f90 m_precision.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_sph_trans_comm_tbl.o t_schmidt_poly_on_rtm.o t_work_4_sph_trans.o t_leg_trans_sym_matmul_big.o leg_b_trans_sym_matmul_big.o leg_f_trans_sym_matmul_big.o
 	$(F90) -c $(F90OPTFLAGS) $<
-legendre_trans_sym_matmul.o: $(SPH_COMMDIR)/legendre_trans_sym_matmul.f90 m_precision.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_sph_trans_comm_tbl.o t_schmidt_poly_on_rtm.o t_work_4_sph_trans.o t_legendre_work_sym_matmul.o legendre_bwd_sym_matmul.o calypso_mpi.o legendre_fwd_sym_matmul.o
+legendre_trans_sym_matmul.o: $(SPH_COMMDIR)/legendre_trans_sym_matmul.f90 m_precision.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_sph_trans_comm_tbl.o t_schmidt_poly_on_rtm.o t_work_4_sph_trans.o t_legendre_work_sym_matmul.o legendre_bwd_sym_matmul.o legendre_fwd_sym_matmul.o
 	$(F90) -c $(F90OPTFLAGS) $<
 legendre_transform_org.o: $(SPH_COMMDIR)/legendre_transform_org.f90 m_precision.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_sph_trans_comm_tbl.o t_schmidt_poly_on_rtm.o t_work_4_sph_trans.o t_work_4_sph_trans_spin.o legendre_bwd_trans_symmetry.o legendre_fwd_trans_symmetry.o
 	$(F90) -c $(F90OPTFLAGS) $<
