@@ -67,16 +67,6 @@
      &    ele%nnod_4_ele, surf%nnod_4_surf, ele%ie, surf%ie_surf,       &
      &    surf%isf_4_ele, surf%isf_rot_ele)
 !
-!       Subsittuiton of set_center_of_surface
-!          and int_normal_4_all_surface
-!      call copy_surf_geometry_from_IO                                  &
-!     &   (surf_mesh_IO%node, surf_mesh_IO%sfed, surf)
-!      call dealloc_surf_geometry_data(surf_mesh_IO)
-!
-!      call position_2_sph(surf%numsurf, surf%x_surf,                   &
-!     &    surf%r_surf, surf%theta_surf, surf%phi_surf,                 &
-!     &    surf%ar_surf, surf%s_surf, surf%as_surf)
-!
       end subroutine set_surface_mesh_from_IO
 !
 !  ---------------------------------------------------------------------
@@ -101,16 +91,6 @@
      &   (edge_mesh_IO%ele, edge_mesh_IO%sfed,                          &
      &    edge, ele%numele, surf%numsurf)
       call dealloc_edge_mesh_IO(edge_mesh_IO)
-!
-!       Subsittuiton of set_center_of_edge
-!          and s_int_edge_vector
-!      call copy_edge_geometry_from_IO                                  &
-!     &   (edge_mesh_IO%node, edge_mesh_IO%sfed, edge)
-!      call dealloc_surf_geometry_data(edge_mesh_IO)
-!
-!      call position_2_sph(edge%numedge, edge%x_edge,                   &
-!     &    edge%r_edge, edge%theta_edge, edge%phi_edge,                 &
-!     &    edge%ar_edge, edge%s_edge, edge%as_edge)
 !
       end subroutine set_edge_mesh_from_IO
 !

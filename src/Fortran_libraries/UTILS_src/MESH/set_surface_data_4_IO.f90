@@ -9,8 +9,6 @@
 !!@verbatim
 !!      subroutine copy_surf_connect_to_IO(surf, nele, ele_IO, sfed_IO)
 !!      subroutine copy_surf_geometry_to_IO(surf, nod_IO, sfed_IO)
-!!      subroutine copy_surf_geometry_to_IO_sph(surf, nod_IO, sfed_IO)
-!!      subroutine copy_surf_geometry_to_IO_cyl(surf, nod_IO, sfed_IO)
 !!        type(surface_data), intent(inout) :: surf
 !!        type(node_data), intent(inout) :: nod_IO
 !!        type(element_data), intent(inout) :: ele_IO
@@ -119,73 +117,6 @@
 !omp end parallel do
 !
       end subroutine copy_surf_geometry_to_IO
-!
-!------------------------------------------------------------------
-!
-      subroutine copy_surf_geometry_to_IO_sph(surf, nod_IO, sfed_IO)
-!
-      type(surface_data), intent(in) :: surf
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
-!
-      integer(kind = kint) :: isurf
-!
-!
-      nod_IO%numnod =        surf%numsurf
-      nod_IO%internal_node = surf%internal_surf
-!
-      call alloc_node_geometry_base(nod_IO)
-      call alloc_ele_vector_IO(nod_IO, sfed_IO)
-      call alloc_ele_scalar_IO(nod_IO, sfed_IO)
-!
-!omp parallel do
-      do isurf = 1, surf%numsurf
-        nod_IO%inod_global(isurf) = surf%isurf_global(isurf)
-        nod_IO%xx(isurf,1) = surf%r_surf(isurf)
-        nod_IO%xx(isurf,2) = surf%theta_surf(isurf)
-        nod_IO%xx(isurf,3) = surf%phi_surf(isurf)
-!
-        sfed_IO%ele_scalar(isurf) =   surf%area_surf(isurf)
-        sfed_IO%ele_vector(isurf,1) = surf%vnorm_surf_sph(isurf,1)
-        sfed_IO%ele_vector(isurf,2) = surf%vnorm_surf_sph(isurf,2)
-        sfed_IO%ele_vector(isurf,3) = surf%vnorm_surf_sph(isurf,3)
-      end do
-!omp end parallel do
-!
-      end subroutine copy_surf_geometry_to_IO_sph
-!
-!------------------------------------------------------------------
-!
-      subroutine copy_surf_geometry_to_IO_cyl(surf, nod_IO, sfed_IO)
-!
-      type(surface_data), intent(in) :: surf
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
-!
-      integer(kind = kint) :: isurf
-!
-!
-      nod_IO%numnod =        surf%numsurf
-      nod_IO%internal_node = surf%internal_surf
-!
-      call alloc_node_geometry_base(nod_IO)
-      call alloc_ele_vector_IO(nod_IO, sfed_IO)
-      call alloc_ele_scalar_IO(nod_IO, sfed_IO)
-!
-!omp parallel do
-      do isurf = 1, surf%numsurf
-        nod_IO%inod_global(isurf) = surf%isurf_global(isurf)
-        nod_IO%xx(isurf,1) = surf%s_surf(isurf)
-        nod_IO%xx(isurf,2) = surf%phi_surf(isurf)
-        nod_IO%xx(isurf,3) = surf%x_surf(isurf,3)
-        sfed_IO%ele_scalar(isurf) =   surf%area_surf(isurf)
-        sfed_IO%ele_vector(isurf,1) = surf%vnorm_surf_cyl(isurf,1)
-        sfed_IO%ele_vector(isurf,2) = surf%vnorm_surf_cyl(isurf,2)
-        sfed_IO%ele_vector(isurf,3) = surf%vnorm_surf_cyl(isurf,3)
-      end do
-!omp end parallel do
-!
-      end subroutine copy_surf_geometry_to_IO_cyl
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------

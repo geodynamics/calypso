@@ -14,8 +14,6 @@
 !!      subroutine allocate_iso_surface_type(surf)
 !!      subroutine allocate_surface_geom_type(surf)
 !!      subroutine allocate_normal_vect_type(surf)
-!!      subroutine allocate_normal_vect_sph_type(surf)
-!!      subroutine allocate_normal_vect_cyl_type(surf)
 !!      subroutine allocate_surf_param_smp_type(surf)
 !!      subroutine alloc_ele_4_surf_type(surf)
 !!
@@ -26,8 +24,6 @@
 !!      subroutine deallocate_iso_surface_type(surf)
 !!      subroutine deallocate_surface_geom_type(surf)
 !!      subroutine deallocate_normal_vect_type(surf)
-!!      subroutine deallocate_normal_vect_sph_type(surf)
-!!      subroutine deallocate_normal_vect_cyl_type(surf)
 !!      subroutine deallocate_surf_param_smp_type(surf)
 !!      subroutine dealloc_ele_4_surf_type(surf)
 !!        integer(kind = kint), intent(in) :: nele
@@ -99,18 +95,6 @@
 !
 !>       position of center of surface
         real(kind=kreal)  , allocatable  :: x_surf(:,:)
-!>       distance from the center of surface
-        real(kind=kreal)  , allocatable  :: r_surf(:)
-!>       1/r_surf
-        real(kind=kreal)  , allocatable  :: ar_surf(:)
-!>       longitude of center of surface
-        real(kind=kreal)  , allocatable  :: phi_surf(:)
-!>       colatitude of center of surface
-        real(kind=kreal)  , allocatable  :: theta_surf(:)
-!>       cylindorical radius of center of surface
-        real(kind=kreal)  , allocatable  :: s_surf(:)
-!>       1 / s_surf
-        real(kind=kreal)  , allocatable  :: as_surf(:)
 ! 
 !>       area of each surface
         real (kind=kreal), allocatable :: area_surf(:)
@@ -119,11 +103,6 @@
 !
 !>       normal vector for sach surface
         real (kind=kreal), allocatable :: vnorm_surf(:,:)
-!
-!>       normal vector for sach surface (spherical coordinate)
-        real (kind=kreal), allocatable :: vnorm_surf_sph(:,:)
-!>       normal vector for sach surface (cylindrical coordinate)
-        real (kind=kreal), allocatable :: vnorm_surf_cyl(:,:)
       end type surface_data
 !
 !  ---------------------------------------------------------------------
@@ -217,24 +196,12 @@
 !
       allocate( surf%x_surf(surf%numsurf,3) )
 !
-      allocate( surf%r_surf(surf%numsurf) )
-      allocate( surf%ar_surf(surf%numsurf) )
-      allocate( surf%phi_surf(surf%numsurf) )
-      allocate( surf%theta_surf(surf%numsurf) )
-!
-      allocate( surf%s_surf(surf%numsurf) )
-      allocate( surf%as_surf(surf%numsurf) )
-!
-      if ( surf%numsurf .gt. 0 ) then
-        surf%x_surf =      0.0d0
-!
-        surf%r_surf =      0.0d0
-        surf%ar_surf =     0.0d0
-        surf%phi_surf =    0.0d0
-        surf%theta_surf =  0.0d0
-!
-        surf%s_surf =      0.0d0
-        surf%as_surf =     0.0d0
+      if(surf%numsurf .gt. 0) then
+!$omp parallel workshare
+        surf%x_surf(1:surf%numsurf,1) = 0.0d0
+        surf%x_surf(1:surf%numsurf,2) = 0.0d0
+        surf%x_surf(1:surf%numsurf,3) = 0.0d0
+!$omp end parallel workshare
       end if
 !
       end subroutine allocate_surface_geom_type
@@ -250,36 +217,18 @@
       allocate( surf%vnorm_surf(surf%numsurf,3) )
 !
       if ( surf%numsurf .gt. 0 ) then
-        surf%area_surf =   0.0d0
-        surf%a_area_surf = 0.0d0
-        surf%vnorm_surf =  0.0d0
+!$omp parallel workshare
+        surf%area_surf(1:surf%numsurf) =     0.0d0
+        surf%a_area_surf(1:surf%numsurf) =   0.0d0
+        surf%vnorm_surf(1:surf%numsurf,1) =  0.0d0
+        surf%vnorm_surf(1:surf%numsurf,2) =  0.0d0
+        surf%vnorm_surf(1:surf%numsurf,3) =  0.0d0
+!$omp end parallel workshare
       end if
 !
       end subroutine allocate_normal_vect_type
 !
 ! ------------------------------------------------------
-!
-      subroutine allocate_normal_vect_sph_type(surf)
-!
-      type(surface_data), intent(inout) :: surf
-!
-      allocate( surf%vnorm_surf_sph(surf%numsurf,3) )
-      if ( surf%numsurf .gt. 0 ) surf%vnorm_surf_sph =  0.0d0
-!
-      end subroutine allocate_normal_vect_sph_type
-!
-! ------------------------------------------------------
-!
-      subroutine allocate_normal_vect_cyl_type(surf)
-!
-      type(surface_data), intent(inout) :: surf
-!
-      allocate( surf%vnorm_surf_cyl(surf%numsurf,3) )
-      if ( surf%numsurf .gt. 0 ) surf%vnorm_surf_cyl =  0.0d0
-!
-      end subroutine allocate_normal_vect_cyl_type
-!
-!  ---------------------------------------------------------------------
 !
       subroutine allocate_surf_param_smp_type(surf)
 !
@@ -369,14 +318,6 @@
 !
       deallocate( surf%x_surf )
 !
-      deallocate( surf%r_surf )
-      deallocate( surf%ar_surf )
-      deallocate( surf%phi_surf )
-      deallocate( surf%theta_surf )
-!
-      deallocate( surf%s_surf )
-      deallocate( surf%as_surf )
-!
       end subroutine deallocate_surface_geom_type
 !
 !  ---------------------------------------------------------------------
@@ -392,26 +333,6 @@
       end subroutine deallocate_normal_vect_type
 !
 ! ------------------------------------------------------
-!
-      subroutine deallocate_normal_vect_sph_type(surf)
-!
-      type(surface_data), intent(inout) :: surf
-!
-      deallocate( surf%vnorm_surf_sph )
-!
-      end subroutine deallocate_normal_vect_sph_type
-!
-! ------------------------------------------------------
-!
-      subroutine deallocate_normal_vect_cyl_type(surf)
-!
-      type(surface_data), intent(inout) :: surf
-!
-      deallocate( surf%vnorm_surf_cyl )
-!
-      end subroutine deallocate_normal_vect_cyl_type
-!
-!  ---------------------------------------------------------------------
 !
       subroutine deallocate_surf_param_smp_type(surf)
 !

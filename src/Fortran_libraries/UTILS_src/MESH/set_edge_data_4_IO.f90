@@ -11,8 +11,6 @@
 !!      subroutine copy_edge_connect_to_IO                              &
 !!     &         (edge, nele, nsurf, ele_IO, sfed_IO)
 !!      subroutine copy_edge_geometry_to_IO(edge, nod_IO, sfed_IO)
-!!      subroutine copy_edge_geometry_to_IO_sph(edge, nod_IO, sfed_IO)
-!!      subroutine copy_edge_geometry_to_IO_cyl(edge, nod_IO, sfed_IO)
 !!        type(edge_data), intent(inout) :: edge
 !!        type(node_data), intent(inout) :: nod_IO
 !!        type(element_data), intent(inout) :: ele_IO
@@ -130,72 +128,6 @@
 !omp end parallel do
 !
       end subroutine copy_edge_geometry_to_IO
-!
-!------------------------------------------------------------------
-!
-      subroutine copy_edge_geometry_to_IO_sph(edge, nod_IO, sfed_IO)
-!
-      type(edge_data), intent(in) :: edge
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
-!
-      integer(kind = kint) :: iedge
-!
-!
-      nod_IO%numnod =        edge%numedge
-      nod_IO%internal_node = edge%internal_edge
-!
-      call alloc_node_geometry_base(nod_IO)
-      call alloc_ele_vector_IO(nod_IO, sfed_IO)
-      call alloc_ele_scalar_IO(nod_IO, sfed_IO)
-!
-!omp parallel do
-      do iedge = 1, edge%numedge
-        nod_IO%inod_global(iedge) = edge%iedge_global(iedge)
-        nod_IO%xx(iedge,1) =        edge%r_edge(iedge)
-        nod_IO%xx(iedge,2) =        edge%theta_edge(iedge)
-        nod_IO%xx(iedge,3) =        edge%phi_edge(iedge)
-        sfed_IO%ele_scalar(iedge) = edge%edge_length(iedge)
-        sfed_IO%ele_vector(iedge,1) =   edge%edge_vect_sph(iedge,1)
-        sfed_IO%ele_vector(iedge,2) =   edge%edge_vect_sph(iedge,2)
-        sfed_IO%ele_vector(iedge,3) =   edge%edge_vect_sph(iedge,3)
-      end do
-!omp end parallel do
-!
-      end subroutine copy_edge_geometry_to_IO_sph
-!
-!------------------------------------------------------------------
-!
-      subroutine copy_edge_geometry_to_IO_cyl(edge, nod_IO, sfed_IO)
-!
-      type(edge_data), intent(in) :: edge
-      type(node_data), intent(inout) :: nod_IO
-      type(surf_edge_IO_data), intent(inout) :: sfed_IO
-!
-      integer(kind = kint) :: iedge
-!
-!
-      nod_IO%numnod =        edge%numedge
-      nod_IO%internal_node = edge%internal_edge
-!
-      call alloc_node_geometry_base(nod_IO)
-      call alloc_ele_vector_IO(nod_IO, sfed_IO)
-      call alloc_ele_scalar_IO(nod_IO, sfed_IO)
-!
-!omp parallel do
-      do iedge = 1, edge%numedge
-        nod_IO%inod_global(iedge) = edge%iedge_global(iedge)
-        nod_IO%xx(iedge,1) =        edge%s_edge(iedge)
-        nod_IO%xx(iedge,2) =        edge%phi_edge(iedge)
-        nod_IO%xx(iedge,3) =        edge%x_edge(iedge,3)
-        sfed_IO%ele_scalar(iedge) = edge%edge_length(iedge)
-        sfed_IO%ele_vector(iedge,1) =   edge%edge_vect_cyl(iedge,1)
-        sfed_IO%ele_vector(iedge,2) =   edge%edge_vect_cyl(iedge,2)
-        sfed_IO%ele_vector(iedge,3) =   edge%edge_vect_cyl(iedge,3)
-      end do
-!omp end parallel do
-!
-      end subroutine copy_edge_geometry_to_IO_cyl
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------

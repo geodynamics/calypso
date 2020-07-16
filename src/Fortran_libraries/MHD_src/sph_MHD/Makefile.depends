@@ -150,7 +150,7 @@ m_MHD_step_parameter.o: $(MHD_SPH_DIR)/m_MHD_step_parameter.f90 m_precision.o t_
 	$(F90) -c $(F90OPTFLAGS) $<
 m_SPH_MHD_model_data.o: $(MHD_SPH_DIR)/m_SPH_MHD_model_data.f90 m_precision.o t_SPH_MHD_model_data.o t_FEM_mesh_field_data.o t_work_SPH_MHD.o t_SPH_MHD_zonal_mean_viz.o
 	$(F90) -c $(F90OPTFLAGS) $<
-m_SPH_MHD_structure.o: $(MHD_SPH_DIR)/m_SPH_MHD_structure.f90 m_precision.o t_SPH_mesh_field_data.o t_viz_sections.o
+m_SPH_MHD_structure.o: $(MHD_SPH_DIR)/m_SPH_MHD_structure.f90 m_precision.o t_SPH_mesh_field_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_elapsed_labels_4_MHD.o: $(MHD_SPH_DIR)/m_elapsed_labels_4_MHD.f90 m_precision.o m_work_time.o
 	$(F90) -c $(F90OPTFLAGS) $<
