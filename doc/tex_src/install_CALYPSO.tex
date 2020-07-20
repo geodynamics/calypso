@@ -144,12 +144,32 @@ Some influential environment variables:
 An example of usage of the configure command is the following;
 \begin{verbatim}
 % ./configure --prefix='/Users/matsui/local' \
-? CFLAGS='-O -Wall -g' FCFLAGS='-O -Wall -g' \
-? PKG_CONFIG_PATH='/Users/matsui/local/lib/pkgconfig' \
-? --with-blas=yes --enable-fftw3 --with-zlib=/usr/local \
-? --with-hdf5='/Users/matsui/local/bin/h5pcc'
-
+? CFLAGS='-O -Wall -g' \
+? PKG_CONFIG_PATH='/Users/matsui/local/lib/pkgconfig'
 \end{verbatim}
+
+At the end of the configuration, The following message can use to check if libraries can be refered correctly:
+
+{\small
+\begin{verbatim}
+-----   Configuration summary   -------------------------------
+
+host:        "x86_64-apple-darwin16.7.0"
+host_alias:  ""
+XL_FORTRAN:    ""
+Use OpenMP ...        yes
+
+Use BLAS ...          yes
+
+Use FFTW3 ...         yes
+Use parallel HDF5 ... yes
+
+Use zlib at ...       yes
+
+---------------------------------------------------------------
+\end{verbatim}
+}
+
 
 \subsubsection{Compile}
 Compile is performed using the {\tt make} command. The Makefile in the top directory is used to generate another Makefile in the {\tt work} directory, which is automatically used to complete the compilation. The object file and libraries are compiled in the {\tt work} directory. Finally, the executive files are assembled in {\tt bin} directory. You should find the following programs in the {\tt bin} directory.
@@ -246,8 +266,8 @@ In Makefile, the following variables should be defined.
 \item{}
 \item{\verb|F90OPTFLAGS|}  Optimization flags for Fortran90 compiler (including OpenMP flags)
 \item{\verb|BLAS_LIBS|} Library lists for BLAS  (ex.  \verb|-lblas|)
-\item{\verb|ZLIB_CFLAGS|} Option flags for FFTW3  (ex.  \verb|-I/usr/include|)
-\item{\verb|ZLIB_LIB|}   Library lists for FFTW3 (ex. \verb|-L/usr/lib -lz|)
+\item{\verb|ZLIB_CFLAGS|} Option flags for zlib  (ex.  \verb|-I/usr/include|)
+\item{\verb|ZLIB_LIB|}   Library lists for zlib (ex. \verb|-L/usr/lib -lz|)
 \item{\verb|FFTW3_CFLAGS|} Option flags for FFTW3  (ex.  \verb|-I/usr/local/include|)
 \item{\verb|FFTW3_LIBS|}   Library lists for FFTW3 (ex. \verb|-L/usr/local/lib -lfftw3 -lm|)
 \item{\verb|HDF5_FFLAGS|}  Option flags to compile with HDF5. This setting can be found by using hfd5 command \verb|h5pfc -show|.

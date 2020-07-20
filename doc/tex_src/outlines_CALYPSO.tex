@@ -1,46 +1,5 @@
 \section{Simulation procedure}
-Calypso consists of programs shown in Table \ref{table:controls}.
-%
-\begin{table}[htp]
-\caption{List of program and required control file name}
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-Program & Control file name & Type \\ \hline
-\verb|gen_sph_grids|          & \verb|control_sph_shell| &  Parallel    \\
-\verb|check_sph_grids|        & \verb|control_sph_shell| &  Parallel    \\ \hline
-\verb|sph_mhd|                & \verb|control_MHD| &        Parallel  \\ \hline
-\verb|sph_initial_field|      & \verb|control_MHD| &        Parallel  \\
-\verb|sph_add_initial_field|  & \verb|control_MHD| &        Parallel  \\
-\verb|assemble_sph|           & \verb|control_assemble_sph| & Parallel  \\ \hline
-\verb|sph_snapshot|           & \verb|control_snapshot| &   Parallel  \\
-\verb|sph_dynamobench|        & \verb|control_snapshot| &   Parallel  \\ \hline
-\verb|sectioning|             & \verb|control_viz| &        Parallel  \\
-\verb|field_to_VTK|           & \verb|control_viz| &        Parallel  \\
-\verb|psf_to_vtk|             & N/A & Serial  \\ \hline
-% \verb|sph_ene_check|          & N/A & Serial  \\
-\verb|t_ave_sph_mean_square|  & N/A & Serial  \\
-\verb|t_ave_picked_sph_coefs| & N/A & Serial  \\
-\verb|t_ave_nusselt|          & N/A & Serial  \\ \hline
-% \verb|make_f90depends|        & N/A & Serial  \\ \hline
-\end{tabular}
-\end{center}
-\label{table:controls}
-\end{table}
-%
-
-Because the serial programs do not use MPI, they are simply invoked by
-%
-\begin{verbatim}
-% [program]
-\end{verbatim}
-%
-Parallel programs must be invoked using MPI commands. On a Linux cluster using MPICH, parallel programs are invoked with 
-%
-\begin{verbatim}
-% mpirun -np [# of processes] [program]
-\end{verbatim}
-%
+To invoke the program, 
 
 This command will vary depending on the MPI implementation installed on the machine.  Please consult with your sysadmin for details.
 
