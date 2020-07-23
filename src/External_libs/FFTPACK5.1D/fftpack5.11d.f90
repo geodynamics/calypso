@@ -1,5 +1,5 @@
 !
-!      module fftpack5.2d
+!      module fftpack5.11d
 !
 !      implicit none
 !
@@ -15810,4 +15810,4 @@ end
 !
 ! ------------------------------------------------------------------
 !
-!      end module fftpack5.2d
+!      end module fftpack5.11d
