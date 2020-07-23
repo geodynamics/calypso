@@ -9,10 +9,8 @@ LIB_FFTPACK_FILE = libfftpack.5d.a
 
 FFTPACKFLAG = $(subst '-warn all','',$(F90OPTFLAGS))
 
-SOURCES = $(shell ls *.f90)
-
-MOD_FFTPACK = \
-fftpack5.1d.o
+SRC_FFTPACK = fftpack5.11d.f90
+MOD_FFTPACK = fftpack5.11d.o
 
 #
 #  -------------------------------------------------------------------------
@@ -46,7 +44,7 @@ mod_list:
 depends:
 
 module:
-	@echo 'fftpack5.1d.o: $$(FFTPACK_DIR)/fftpack5.1d.f90' >> $(MAKENAME)
+	@echo '$(MOD_FFTPACK): $$(FFTPACK_DIR)/$(SRC_FFTPACK)' >> $(MAKENAME)
 	@echo '	' '$$(F90) -c $$(FFTPACKFLAG) $$<' >> $(MAKENAME)
 
 clean:
