@@ -14,23 +14,25 @@
 !!     &          NTOT_SEND, NTOT_RECV, SR_sig, SR_r)
 !!      subroutine resize_iwork_SR_t(NPE_SEND, NPE_RECV,                &
 !!     &          NTOT_SEND, NTOT_RECV, SR_sig, SR_i)
-!!      subroutine resize_i8work_SR_t(NPE_SEND, NPE_RECV,               &
-!!     &          NTOT_SEND, NTOT_RECV, SR_sig, SR_il)
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!        type(send_recv_int_buffer), intent(inout) :: SR_i
-!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!
 !!      subroutine resize_work_itp_SR_t                                 &
 !!     &         (NB, NPE_SEND, NPE_RECV, NTOT_RECV, SR_sig, SR_r)
 !!      subroutine resize_iwork_itp_SR_t                                &
 !!     &         (NPE_SEND, NPE_RECV, NTOT_RECV, SR_sig, SR_i)
-!!      subroutine resize_i8work_itp_SR_t                               &
-!!     &         (NPE_SEND, NPE_RECV, NTOT_RECV, SR_sig, SR_il)
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!        type(send_recv_int_buffer), intent(inout) :: SR_i
-!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
+!!
+!!      subroutine resize_SR_flag(NPE_SEND, NPE_RECV, SR_sig)
+!!        integer(kind = kint), intent(in)   ::  NPE_SEND, NPE_RECV
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!
+!!      subroutine calypso_send_recv_fin_t(npe_send, isend_self, SR_sig)
+!!        integer(kind = kint), intent(in) :: npe_send, isend_self
+!!        type(send_recv_status), intent(inout) :: SR_sig
 !!@endverbatim
 !!
 !!@n @param  NB           Number of components
@@ -46,6 +48,7 @@
       module t_solver_SR
 !
       use m_precision
+      use calypso_mpi
 !
       implicit none
 !
@@ -89,24 +92,8 @@
       end type send_recv_int_buffer
 !
 !
-!>      Structure of communication buffer for 8-byte integer
-      type send_recv_int8_buffer
-!>        size of send buffer
-        integer(kind = kint) :: n_i8WS = 0
-!>        size of recieve buffer
-        integer(kind = kint) :: n_i8WR = 0
-!
-!>        work array for 8 byte integer send buffer
-        integer(kind = kint_gl), allocatable :: i8WS(:)
-!>        work array for 8 byte integer recieve buffer
-        integer(kind = kint_gl), allocatable :: i8WR(:)
-      end type send_recv_int8_buffer
-!
-!
-      private :: resize_flag_4_SR
       private :: resize_wsend_SR, resize_wrecv_SR
 !      private :: resize_isend_SR, resize_irecv_SR
-!      private :: resize_i8send_SR, resize_i8recv_SR
 !
 ! ----------------------------------------------------------------------
 !
@@ -123,7 +110,7 @@
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
-      call resize_flag_4_SR(NPE_SEND, NPE_RECV, SR_sig)
+      call resize_SR_flag(NPE_SEND, NPE_RECV, SR_sig)
       call resize_wsend_SR(NB, NTOT_SEND+1, SR_r)
       call resize_wrecv_SR(NB, NTOT_RECV+1, SR_r)
 !
@@ -140,28 +127,11 @@
       type(send_recv_int_buffer), intent(inout) :: SR_i
 !
 !
-      call resize_flag_4_SR(NPE_SEND, NPE_RECV, SR_sig)
+      call resize_SR_flag(NPE_SEND, NPE_RECV, SR_sig)
       call resize_isend_SR(NTOT_SEND+1, SR_i)
       call resize_irecv_SR(NTOT_RECV+1, SR_i)
 !
       end subroutine resize_iwork_SR_t
-!
-! ----------------------------------------------------------------------
-!
-      subroutine resize_i8work_SR_t(NPE_SEND, NPE_RECV,                 &
-     &          NTOT_SEND, NTOT_RECV, SR_sig, SR_il)
-!
-      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
-      integer(kind = kint), intent(in) ::  NTOT_SEND, NTOT_RECV
-      type(send_recv_status), intent(inout) :: SR_sig
-      type(send_recv_int8_buffer), intent(inout) :: SR_il
-!
-!
-      call resize_flag_4_SR(NPE_SEND, NPE_RECV, SR_sig)
-      call resize_i8send_SR(NTOT_SEND+1, SR_il)
-      call resize_i8recv_SR(NTOT_RECV+1, SR_il)
-!
-      end subroutine resize_i8work_SR_t
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -175,7 +145,7 @@
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
-      call resize_flag_4_SR(NPE_SEND, NPE_RECV, SR_sig)
+      call resize_SR_flag(NPE_SEND, NPE_RECV, SR_sig)
       call resize_wrecv_SR(NB, NTOT_RECV, SR_r)
 !
       end subroutine resize_work_itp_SR_t
@@ -191,33 +161,34 @@
       type(send_recv_int_buffer), intent(inout) :: SR_i
 !
 !
-      call resize_flag_4_SR(NPE_SEND, NPE_RECV, SR_sig)
+      call resize_SR_flag(NPE_SEND, NPE_RECV, SR_sig)
       call resize_irecv_SR(NTOT_RECV, SR_i)
 !
       end subroutine resize_iwork_itp_SR_t
 !
 ! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
-      subroutine resize_i8work_itp_SR_t                                 &
-     &         (NPE_SEND, NPE_RECV, NTOT_RECV, SR_sig, SR_il)
+      subroutine calypso_send_recv_fin_t(npe_send, isend_self, SR_sig)
 !
-      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
-      integer(kind = kint), intent(in) ::  NTOT_RECV
+      integer(kind = kint), intent(in) :: npe_send, isend_self
       type(send_recv_status), intent(inout) :: SR_sig
-      type(send_recv_int8_buffer), intent(inout) :: SR_il
+!
+      integer :: ncomm_send
 !
 !
-      call resize_flag_4_SR(NPE_SEND, NPE_RECV, SR_sig)
-      call resize_i8recv_SR(NTOT_RECV, SR_il)
+      ncomm_send = int(npe_send - isend_self)
+      if(ncomm_send .gt. 0) then
+        call MPI_WAITALL                                                &
+     &     (ncomm_send, SR_sig%req1, SR_sig%sta1, ierr_MPI)
+      end if
 !
-      end subroutine resize_i8work_itp_SR_t
+      end subroutine calypso_send_recv_fin_t
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_flag_4_SR(NPE_SEND, NPE_RECV, SR_sig)
-!
-      use calypso_mpi
+      subroutine resize_SR_flag(NPE_SEND, NPE_RECV, SR_sig)
 !
       integer(kind = kint), intent(in)   ::  NPE_SEND, NPE_RECV
       type(send_recv_status), intent(inout) :: SR_sig
@@ -241,7 +212,7 @@
         allocate(SR_sig%req2(NPE_RECV))
       end if
 !
-      end subroutine resize_flag_4_SR
+      end subroutine resize_SR_flag
 !
 ! ----------------------------------------------------------------------
 !
@@ -323,46 +294,6 @@
       end if
 !
       end subroutine resize_irecv_SR
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine resize_i8send_SR(NTOT_SEND, SR_il)
-!
-      integer(kind=kint), intent(in) :: NTOT_SEND
-      type(send_recv_int8_buffer), intent(inout) :: SR_il
-!
-      if(allocated(SR_il%i8WS)                                          &
-     &    .and. (size(SR_il%i8WS) .lt. (NTOT_SEND)) ) then
-        deallocate (SR_il%i8WS)
-        SR_il%n_i8WS = -1
-      end if
-      if(allocated(SR_il%i8WS) .eqv. .false.) then
-        allocate (SR_il%i8WS(NTOT_SEND))
-        SR_il%n_i8WS = size(SR_il%i8WS)
-     end if
-!
-      end subroutine resize_i8send_SR
-!
-! ----------------------------------------------------------------------
-!
-      subroutine resize_i8recv_SR(NTOT_RECV, SR_il)
-!
-      integer(kind=kint), intent(in) :: NTOT_RECV
-      type(send_recv_int8_buffer), intent(inout) :: SR_il
-!
-!
-      if(allocated(SR_il%i8WR)                                          &
-     &   .and. (size(SR_il%i8WR).lt.(NTOT_RECV))) then
-        deallocate (SR_il%i8WR)
-        SR_il%n_i8WR = -1
-      end if
-      if(allocated(SR_il%i8WR) .eqv. .false.) then
-        allocate (SR_il%i8WR(NTOT_RECV))
-        SR_il%n_i8WR = size(SR_il%i8WR)
-      end if
-!
-      end subroutine resize_i8recv_SR
 !
 ! ----------------------------------------------------------------------
 !

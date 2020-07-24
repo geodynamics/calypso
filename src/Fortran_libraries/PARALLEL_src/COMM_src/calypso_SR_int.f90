@@ -126,8 +126,10 @@
      &                       irev_import, i8X_org, i8X_new)
 !
       use calypso_mpi
+      use t_solver_SR
+      use t_solver_SR_int8
+      use solver_SR_int8
       use m_solver_SR
-      use calypso_SR_core
       use set_to_send_buffer
       use select_copy_from_recv
 !
@@ -153,8 +155,9 @@
       integer(kind = kint_gl), intent(inout):: i8X_new(nnod_new)
 !
 !
-      call resize_i8work_4_SR(npe_send, npe_recv,                       &
-     &    istack_send(npe_send), istack_recv(npe_recv))
+      call resize_i8work_SR(npe_send, npe_recv,                         &
+     &    istack_send(npe_send), istack_recv(npe_recv),                 &
+     &    SR_sig1, SR_il1)
 !
 !C-- SEND
 !
@@ -164,7 +167,8 @@
 !C-- COMM
       call calypso_send_recv_i8core                                     &
      &             (npe_send, isend_self, id_pe_send, istack_send,      &
-     &              npe_recv, irecv_self, id_pe_recv, istack_recv)
+     &              npe_recv, irecv_self, id_pe_recv, istack_recv,      &
+     &              SR_sig1, SR_il1)
 !
 !C-- RECV
       call sel_cppy_from_recv_buf_i8(iflag_SR, nnod_new,                &
@@ -172,7 +176,7 @@
      &    SR_il1%i8WR(1), i8X_new)
 !
 !C-- WAIT
-      call calypso_send_recv_fin(npe_send, isend_self)
+      call calypso_send_recv_fin_t(npe_send, isend_self, SR_sig1)
 !
       end subroutine calypso_send_recv_int8
 !

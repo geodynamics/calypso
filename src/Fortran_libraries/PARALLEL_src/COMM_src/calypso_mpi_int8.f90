@@ -40,6 +40,9 @@
 !!        integer(kind = kint_gl), intent(in) ::    i8_local(count)
 !!        integer(kind = kint_gl), intent(inout) :: i8_global(count)
 !!
+!!      subroutine calypso_mpi_allgather_one_int8(i8sendbuf, i8recvbuf)
+!!        integer(kind = kint_gl), intent(in) :: i8sendbuf
+!!        integer(kind = kint_gl), intent(inout) :: i8recvbuf(nprocs)
 !!      subroutine calypso_mpi_allgather_int8                           &
 !!     &         (i8sendbuf, n_send, i8recvbuf, n_recv)
 !!        integer(kind = kint), intent(in) :: n_send, n_recv
@@ -196,6 +199,23 @@
       end subroutine calypso_mpi_allreduce_int8
 !
 !  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_allgather_one_int8(i8sendbuf, i8recvbuf)
+!
+      integer(kind = kint_gl), intent(in) :: i8sendbuf
+      integer(kind = kint_gl), intent(inout) :: i8recvbuf(nprocs)
+!
+      integer(kind = kint_gl) :: i8_lc(1)
+!
+!
+      i8_lc(1) = i8sendbuf
+      call MPI_AllGather(i8_lc, 1, CALYPSO_GLOBAL_INT,                  &
+     &                   i8recvbuf, 1, CALYPSO_GLOBAL_INT,              &
+     &                   CALYPSO_COMM, ierr_MPI)
+!
+      end subroutine calypso_mpi_allgather_one_int8
+!
 !  ---------------------------------------------------------------------
 !
       subroutine calypso_mpi_allgather_int8                             &

@@ -13,12 +13,9 @@
 !!     &         (NB, NPE_SEND, NPE_RECV, NTOT_SEND, NTOT_RECV)
 !!      subroutine resize_iwork_4_SR                                    &
 !!     &         (NPE_SEND, NPE_RECV, NTOT_SEND, NTOT_RECV)
-!!      subroutine resize_i8work_4_SR                                   &
-!!     &         (NPE_SEND, NPE_RECV, NTOT_SEND, NTOT_RECV)
 !!
 !!      subroutine resize_work_itp_SR(NB, NPE_SEND, NPE_RECV, NTOT_RECV)
 !!      subroutine resize_iwork_itp_SR(NPE_SEND, NPE_RECV, NTOT_RECV)
-!!      subroutine resize_i8work_itp_SR(NPE_SEND, NPE_RECV, NTOT_RECV)
 !!@endverbatim
 !!
 !!@n @param  NB           Number of components
@@ -35,6 +32,7 @@
 !
       use m_precision
       use t_solver_SR
+      use t_solver_SR_int8
 !
       implicit none
 !
@@ -57,6 +55,9 @@
       real(kind = kreal), allocatable :: WS(:)
 !>       work array for recieve buffer
       real(kind = kreal), allocatable :: WR(:)
+!
+!>      Structure of communication flags
+      type(send_recv_status), save :: SR_sig1
 !
 !>      Structure of communication buffer for 8-byte integer
       type(send_recv_int_buffer), save :: SR_i1
@@ -101,21 +102,6 @@
       end subroutine resize_iwork_4_SR
 !
 ! ----------------------------------------------------------------------
-!
-      subroutine resize_i8work_4_SR                                     &
-     &         (NPE_SEND, NPE_RECV, NTOT_SEND, NTOT_RECV)
-!
-      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
-      integer(kind = kint), intent(in) ::  NTOT_SEND, NTOT_RECV
-!
-!
-      call resize_flag_4_SR(NPE_SEND, NPE_RECV)
-      call resize_i8send_SR(NTOT_SEND+1, SR_il1)
-      call resize_i8recv_SR(NTOT_RECV+1, SR_il1)
-!
-      end subroutine resize_i8work_4_SR
-!
-! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
       subroutine resize_work_itp_SR(NB, NPE_SEND, NPE_RECV, NTOT_RECV)
@@ -141,19 +127,6 @@
       call resize_irecv_SR(NTOT_RECV, SR_i1)
 !
       end subroutine resize_iwork_itp_SR
-!
-! ----------------------------------------------------------------------
-!
-      subroutine resize_i8work_itp_SR(NPE_SEND, NPE_RECV, NTOT_RECV)
-!
-      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
-      integer(kind = kint), intent(in) ::  NTOT_RECV
-!
-!
-      call resize_flag_4_SR(NPE_SEND, NPE_RECV)
-      call resize_i8recv_SR(NTOT_RECV, SR_il1)
-!
-      end subroutine resize_i8work_itp_SR
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

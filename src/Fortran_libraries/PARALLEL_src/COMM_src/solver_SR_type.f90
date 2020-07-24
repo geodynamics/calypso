@@ -156,7 +156,9 @@
       subroutine SOLVER_SEND_RECV_int8_type(NP, comm_tbl, i8X)
 !
       use t_comm_table
-      use solver_SR_int
+      use t_solver_SR_int8
+      use solver_SR_int8
+      use m_solver_SR
 !
       type(communication_table), intent(in) :: comm_tbl
       integer(kind = kint), intent(in) :: NP
@@ -168,7 +170,8 @@
       call SOLVER_SEND_RECV_i8                                          &
      &   (NP, comm_tbl%num_neib, comm_tbl%id_neib,                      &
      &   comm_tbl%istack_import, comm_tbl%item_import,                  &
-     &   comm_tbl%istack_export, comm_tbl%item_export, i8X(1))
+     &   comm_tbl%istack_export, comm_tbl%item_export,                  &
+     &   SR_sig1, SR_il1, i8X(1))
       if(iflag_FSR_time) call end_elapsed_time(ist_elapsed_FSR+1)
 !
       end subroutine SOLVER_SEND_RECV_int8_type
