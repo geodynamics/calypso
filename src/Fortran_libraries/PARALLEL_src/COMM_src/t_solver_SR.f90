@@ -105,7 +105,7 @@
 !
       private :: resize_flag_4_SR
       private :: resize_wsend_SR, resize_wrecv_SR
-      private :: resize_isend_SR, resize_irecv_SR
+!      private :: resize_isend_SR, resize_irecv_SR
 !      private :: resize_i8send_SR, resize_i8recv_SR
 !
 ! ----------------------------------------------------------------------

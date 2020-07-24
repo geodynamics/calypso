@@ -8,6 +8,9 @@
 !> @brief MPI communication routines for 8-byte integer in Calypso
 !!
 !!@verbatim
+!!      subroutine calypso_mpi_bcast_one_int8(buffer, root)
+!!        integer, intent(in) :: root
+!!        integer(kind = kint_gl), intent(inout) :: buffer
 !!      subroutine calypso_mpi_bcast_int8(buffer, count, root)
 !!        integer, intent(in) :: root
 !!        integer(kind = kint_gl), intent(in) :: count
@@ -25,12 +28,18 @@
 !!        integer(kind = kint_gl), intent(in) ::    i8_local(count)
 !!        integer(kind = kint_gl), intent(inout) :: i8_global(count)
 !!
+!!      subroutine calypso_mpi_allreduce_one_int8                       &
+!!     &         (i8_local, i8_global, operation)
+!!        integer, intent(in) :: operation
+!!        integer(kind = kint_gl), intent(in) ::    i8_local
+!!        integer(kind = kint_gl), intent(inout) :: i8_global
 !!      subroutine calypso_mpi_allreduce_int8                           &
 !!     &         (i8_local, i8_global, count, operation)
 !!        integer, intent(in) :: operation
 !!        integer(kind = kint_gl), intent(in) :: count
 !!        integer(kind = kint_gl), intent(in) ::    i8_local(count)
 !!        integer(kind = kint_gl), intent(inout) :: i8_global(count)
+!!
 !!      subroutine calypso_mpi_allgather_int8                           &
 !!     &         (i8sendbuf, n_send, i8recvbuf, n_recv)
 !!        integer(kind = kint), intent(in) :: n_send, n_recv
@@ -55,6 +64,23 @@
       contains
 !
 ! ----------------------------------------------------------------------
+!
+      subroutine calypso_mpi_bcast_one_int8(buffer, root)
+!
+      integer, intent(in) :: root
+      integer(kind = kint_gl), intent(inout) :: buffer
+!
+      integer(kind = kint_gl) :: itmp8(1)
+!
+!
+      itmp8(1) = buffer
+      call MPI_BCAST(itmp8, 1, CALYPSO_GLOBAL_INT,                      &
+     &               root, CALYPSO_COMM, ierr_MPI)
+      buffer = itmp8(1)
+!
+      end subroutine calypso_mpi_bcast_one_int8
+!
+!  ---------------------------------------------------------------------
 !
       subroutine calypso_mpi_bcast_int8(buffer, count, root)
 !
@@ -125,6 +151,26 @@
       end subroutine calypso_mpi_reduce_int8
 !
 !  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_allreduce_one_int8                         &
+     &         (i8_local, i8_global, operation)
+!
+      integer, intent(in) :: operation
+      integer(kind = kint_gl), intent(in) ::    i8_local
+      integer(kind = kint_gl), intent(inout) :: i8_global
+!
+      integer(kind = kint_gl) :: i8_lc(1), i8_gl(1)
+!
+!
+      i8_lc(1) = i8_local
+      call MPI_allREDUCE(i8_lc, i8_gl, 1, CALYPSO_GLOBAL_INT,           &
+     &                   operation, CALYPSO_COMM, ierr_MPI)
+      i8_global = i8_gl(1)
+!
+      end subroutine calypso_mpi_allreduce_one_int8
+!
+!  ---------------------------------------------------------------------
 !
       subroutine calypso_mpi_allreduce_int8                             &
      &         (i8_local, i8_global, count, operation)
@@ -149,6 +195,7 @@
 !
       end subroutine calypso_mpi_allreduce_int8
 !
+!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine calypso_mpi_allgather_int8                             &
