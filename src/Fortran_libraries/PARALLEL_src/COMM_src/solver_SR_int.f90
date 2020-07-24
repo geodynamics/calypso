@@ -179,13 +179,13 @@
         
 !$omp parallel do
         do k= istart+1, iend
-           i8WS(k)= iX8(NOD_EXPORT(k))
+          SR_il1%i8WS(k)= iX8(NOD_EXPORT(k))
         end do
 !$omp end parallel do
 !
-        call MPI_ISEND (i8WS(istart+1), inum, CALYPSO_GLOBAL_INT,       &
-     &                  int(NEIBPE(neib)), 0, CALYPSO_COMM,             &
-     &                  req1(neib), ierr_MPI)
+        call MPI_ISEND(SR_il1%i8WS(istart+1), inum, CALYPSO_GLOBAL_INT, &
+     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM,              &
+     &                 req1(neib), ierr_MPI)
       end do
 
 !C
@@ -194,9 +194,9 @@
       do neib = 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1)
         inum  = int(STACK_IMPORT(neib  ) - istart)
-        call MPI_IRECV (i8WR(istart+1), inum, CALYPSO_GLOBAL_INT,       &
-     &                  int(NEIBPE(neib)), 0, CALYPSO_COMM,             &
-     &                  req2(neib), ierr_MPI)
+        call MPI_IRECV(SR_il1%i8WR(istart+1), inum, CALYPSO_GLOBAL_INT, &
+     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM,              &
+     &                 req2(neib), ierr_MPI)
       enddo
 
       call MPI_WAITALL(int(NEIBPETOT), req2(1), sta2(1,1), ierr_MPI)
@@ -207,7 +207,7 @@
         iend  = STACK_IMPORT(neib  )
 !$omp do
         do k = istart+1, iend
-          iX8(NOD_IMPORT(k))= i8WR(k)
+          iX8(NOD_IMPORT(k))= SR_il1%i8WR(k)
         end do
 !$omp end do nowait
       end do

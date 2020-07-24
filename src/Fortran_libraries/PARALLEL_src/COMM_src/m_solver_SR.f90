@@ -34,6 +34,7 @@
       module m_solver_SR
 !
       use m_precision
+      use t_solver_SR
 !
       implicit none
 !
@@ -67,22 +68,11 @@
 !>       work array for integer recieve buffer
       integer(kind = kint), allocatable :: iWR(:)
 !
-!
-!>       size of send buffer
-      integer(kind = kint) :: n_i8WS = 0
-!>       size of recieve buffer
-      integer(kind = kint) :: n_i8WR = 0
-!
-!>       work array for 8 byte integer send buffer
-      integer(kind = kint_gl), allocatable :: i8WS(:)
-!>       work array for 8 byte integer recieve buffer
-      integer(kind = kint_gl), allocatable :: i8WR(:)
-!
+      type(send_recv_int8_buffer), save :: SR_il1
 !
       private :: resize_flag_4_SR
       private :: resize_wsend_SR, resize_wrecv_SR
       private :: resize_isend_SR, resize_irecv_SR
-      private :: resize_i8send_SR, resize_i8recv_SR
 !
 ! ----------------------------------------------------------------------
 !
@@ -128,8 +118,8 @@
 !
 !
       call resize_flag_4_SR(NPE_SEND, NPE_RECV)
-      call resize_i8send_SR(NTOT_SEND+1)
-      call resize_i8recv_SR(NTOT_RECV+1)
+      call resize_i8send_SR(NTOT_SEND+1, SR_il1)
+      call resize_i8recv_SR(NTOT_RECV+1, SR_il1)
 !
       end subroutine resize_i8work_4_SR
 !
@@ -169,7 +159,7 @@
 !
 !
       call resize_flag_4_SR(NPE_SEND, NPE_RECV)
-      call resize_i8recv_SR(NTOT_RECV)
+      call resize_i8recv_SR(NTOT_RECV, SR_il1)
 !
       end subroutine resize_i8work_itp_SR
 !
@@ -255,34 +245,6 @@
       n_iWR = size(iWR)
 !
       end subroutine resize_irecv_SR
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine resize_i8send_SR(NTOT_SEND)
-!
-      integer(kind=kint), intent(in) :: NTOT_SEND
-!
-      if(allocated(i8WS) .and. (size(i8WS) .lt. (NTOT_SEND)) )          &
-     &                                deallocate (i8WS)
-      if(allocated(i8WS) .eqv. .false.) allocate (i8WS(NTOT_SEND))
-      n_i8WS = size(i8WS)
-!
-      end subroutine resize_i8send_SR
-!
-! ----------------------------------------------------------------------
-!
-      subroutine resize_i8recv_SR(NTOT_RECV)
-!
-      integer(kind=kint), intent(in) :: NTOT_RECV
-!
-!
-      if(allocated(i8WR) .and. (size(i8WR) .lt. (NTOT_RECV)) )          &
-     &                                deallocate (i8WR)
-      if(allocated(i8WR) .eqv. .false.) allocate (i8WR(NTOT_RECV))
-      n_i8WR = size(i8WR)
-!
-      end subroutine resize_i8recv_SR
 !
 ! ----------------------------------------------------------------------
 !

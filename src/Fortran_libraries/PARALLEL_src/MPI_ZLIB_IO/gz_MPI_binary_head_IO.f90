@@ -293,6 +293,8 @@
 !
       subroutine gz_mpi_read_mul_int8head_b(IO_param, num, int8_dat)
 !
+      use calypso_mpi_int8
+      use byte_swap_f
       use transfer_to_long_integers
       use data_convert_by_zlib
 !
@@ -315,7 +317,7 @@
         call dealloc_zip_buffer(zbuf)
 !
         if(IO_param%iflag_bin_swap .eq. iendian_FLIP) then
-          call byte_swap_64bit_f((num*kint_gl), int8_dat(1))
+          call byte_swap_int8_f(num, int8_dat(1))
         end if
       end if
 !
@@ -330,6 +332,7 @@
 !
       subroutine gz_mpi_read_mul_charahead_b(IO_param, num, chara_dat)
 !
+      use calypso_mpi_char
       use transfer_to_long_integers
       use data_convert_by_zlib
 !
@@ -363,8 +366,10 @@
 !
       subroutine gz_mpi_read_mul_realhead_b(IO_param, num, real_dat)
 !
+      use byte_swap_f
       use transfer_to_long_integers
       use data_convert_by_zlib
+      use calypso_mpi_real
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       integer(kind=kint), intent(in) :: num
@@ -384,7 +389,7 @@
         call dealloc_zip_buffer(zbuf)
 !
         if(IO_param%iflag_bin_swap .eq. iendian_FLIP) then
-          call byte_swap_64bit_f(cast_long(num*kreal), real_dat(1))
+          call byte_swap_real_f(cast_long(num), real_dat(1))
         end if
       end if
 !

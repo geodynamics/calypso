@@ -137,6 +137,7 @@
       subroutine sync_group_name_4_empty                                &
      &         (num_pe, nod_grp, ele_grp, sf_grp)
 !
+      use calypso_mpi_char
       use t_group_data
       use transfer_to_long_integers
 !

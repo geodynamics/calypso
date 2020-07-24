@@ -159,7 +159,7 @@
 !C-- SEND
 !
       call set_to_send_buf_i8(nnod_org,                                 &
-     &    istack_send(npe_send), inod_export, i8X_org, i8WS)
+     &    istack_send(npe_send), inod_export, i8X_org, SR_il1%i8WS)
 !C
 !C-- COMM
       call calypso_send_recv_i8core                                     &
@@ -169,7 +169,7 @@
 !C-- RECV
       call sel_cppy_from_recv_buf_i8(iflag_SR, nnod_new,                &
      &    istack_recv(npe_recv), inod_import, irev_import,              &
-     &    i8WR(1), i8X_new)
+     &    SR_il1%i8WR(1), i8X_new)
 !
 !C-- WAIT
       call calypso_send_recv_fin(npe_send, isend_self)

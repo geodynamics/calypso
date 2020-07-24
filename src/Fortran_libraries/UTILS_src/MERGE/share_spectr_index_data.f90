@@ -30,6 +30,8 @@
 !
       subroutine share_sph_rj_data(ip_org, sph_mesh)
 !
+       use calypso_mpi_real
+       use calypso_mpi_int
        use transfer_to_long_integers
 !
       integer(kind = kint), intent(in) :: ip_org

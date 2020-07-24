@@ -331,6 +331,8 @@
 !
       subroutine mpi_read_mul_int8head_b(IO_param, num, int8_dat)
 !
+      use calypso_mpi_int8
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
       integer(kind = kint_gl), intent(in) :: num
@@ -356,6 +358,7 @@
 !
       subroutine mpi_read_mul_charahead_b(IO_param, num, chara_dat)
 !
+      use calypso_mpi_char
       use transfer_to_long_integers
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
@@ -383,6 +386,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine mpi_read_mul_realhead_b(IO_param, num, real_dat)
+!
+      use calypso_mpi_real
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !

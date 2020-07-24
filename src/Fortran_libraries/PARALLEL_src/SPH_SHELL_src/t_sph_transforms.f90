@@ -125,6 +125,7 @@
      &        (ncomp_trans, nvector, nscalar, sph, comms_sph, trans_p,  &
      &         n_WS, n_WR, WS, WR, v_rtp, v_pl_local, v_pole, WK_sph)
 !
+      use calypso_mpi_real
       use pole_sph_transform
 !
       type(sph_grids), intent(in) :: sph
@@ -194,6 +195,7 @@
      &        (ncomp_trans, nvector, nscalar, sph, comms_sph, trans_p,  &
      &         n_WS, n_WR, WS, WR, v_pl_local, v_pole)
 !
+      use calypso_mpi_real
       use pole_sph_transform
 !
       type(sph_grids), intent(in) :: sph

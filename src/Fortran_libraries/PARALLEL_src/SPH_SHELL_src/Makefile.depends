@@ -4,7 +4,7 @@ cal_circle_transform.o: $(SPH_COMMDIR)/cal_circle_transform.f90 m_precision.o m_
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_rms_by_sph_spectr.o: $(SPH_COMMDIR)/cal_rms_by_sph_spectr.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_phys_address.o m_phys_constants.o cal_sph_mean_square.o t_base_field_labels.o single_pt_sph_mean_square.o
 	$(F90) -c $(F90OPTFLAGS) $<
-cal_rms_fields_by_sph.o: $(SPH_COMMDIR)/cal_rms_fields_by_sph.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_parameter.o t_phys_data.o t_phys_address.o t_sum_sph_rms_data.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o calypso_mpi.o sum_sph_rms_data.o volume_average_4_sph.o cal_ave_4_rms_vector_sph.o quicksort.o radial_int_for_sph_spec.o
+cal_rms_fields_by_sph.o: $(SPH_COMMDIR)/cal_rms_fields_by_sph.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_parameter.o t_phys_data.o t_phys_address.o t_sum_sph_rms_data.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o calypso_mpi.o sum_sph_rms_data.o volume_average_4_sph.o cal_ave_4_rms_vector_sph.o quicksort.o calypso_mpi_real.o radial_int_for_sph_spec.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_sp_rlm_by_vecprod.o: $(SPH_COMMDIR)/cal_sp_rlm_by_vecprod.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -164,7 +164,7 @@ t_sph_multi_FFTW.o: $(SPH_COMMDIR)/t_sph_multi_FFTW.F90 m_precision.o m_constant
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 t_sph_single_FFTW.o: $(SPH_COMMDIR)/t_sph_single_FFTW.F90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
-t_sph_transforms.o: $(SPH_COMMDIR)/t_sph_transforms.f90 m_precision.o calypso_mpi.o m_work_time.o m_elapsed_labels_SPH_TRNS.o m_machine_parameter.o spherical_SRs_N.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_schmidt_poly_on_rtm.o t_work_4_sph_trans.o t_legendre_trans_select.o t_sph_FFT_selector.o pole_sph_transform.o
+t_sph_transforms.o: $(SPH_COMMDIR)/t_sph_transforms.f90 m_precision.o calypso_mpi.o m_work_time.o m_elapsed_labels_SPH_TRNS.o m_machine_parameter.o spherical_SRs_N.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_schmidt_poly_on_rtm.o t_work_4_sph_trans.o t_legendre_trans_select.o t_sph_FFT_selector.o pole_sph_transform.o calypso_mpi_real.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_sum_sph_rms_data.o: $(SPH_COMMDIR)/t_sum_sph_rms_data.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<

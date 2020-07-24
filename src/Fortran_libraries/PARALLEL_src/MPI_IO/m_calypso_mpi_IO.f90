@@ -482,6 +482,8 @@
       subroutine calypso_mpi_seek_read_real(id_mpi_file,                &
      &          iflag_bin_swap, ioffset, num, vector)
 !
+      use byte_swap_f
+!
       integer, intent(in) :: id_mpi_file
       integer, intent(in) :: iflag_bin_swap
       integer(kind = kint_gl), intent(in) :: num
@@ -506,8 +508,7 @@
       end do
 !
       if(iflag_bin_swap .eq. iendian_FLIP) then
-        l8_byte = num * kreal
-        call byte_swap_64bit_f(l8_byte, vector(1))
+        call byte_swap_real_f(num, vector(1))
       end if
 !
       end subroutine calypso_mpi_seek_read_real
@@ -516,6 +517,8 @@
 !
       subroutine calypso_mpi_seek_read_int(id_mpi_file,                 &
      &          iflag_bin_swap, ioffset, num, i_vector)
+!
+      use byte_swap_f
 !
       integer, intent(in) ::  id_mpi_file
       integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
@@ -541,12 +544,7 @@
       end do
 !
       if(iflag_bin_swap .eq. iendian_FLIP) then
-        l8_byte = num * kint
-        if(kint .eq. kint_gl) then
-          call byte_swap_64bit_f(l8_byte, i_vector(1))
-        else
-          call byte_swap_32bit_f(l8_byte, i_vector(1))
-        end if
+        call byte_swap_int_f(num, i_vector(1))
       end if
 !
       end subroutine calypso_mpi_seek_read_int
@@ -555,6 +553,8 @@
 !
       subroutine calypso_mpi_seek_read_int8(id_mpi_file,                &
      &          iflag_bin_swap, ioffset, num, i8_vector)
+!
+      use byte_swap_f
 !
       integer, intent(in) ::  id_mpi_file
       integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
@@ -580,8 +580,7 @@
       end do
 !
       if(iflag_bin_swap .eq. iendian_FLIP) then
-        l8_byte = num * kint_gl
-        call byte_swap_64bit_f(l8_byte, i8_vector(1))
+        call byte_swap_int8_f(num, i8_vector(1))
       end if
 !
       end subroutine calypso_mpi_seek_read_int8
@@ -590,6 +589,8 @@
 !
       subroutine calypso_mpi_seek_read_int4(id_mpi_file,                &
      &          iflag_bin_swap, ioffset, num, i4_vector)
+!
+      use byte_swap_f
 !
       integer, intent(in) ::  id_mpi_file
       integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
@@ -615,8 +616,7 @@
       end do
 !
       if(iflag_bin_swap .eq. iendian_FLIP) then
-        l8_byte = num * kint_4b
-        call byte_swap_32bit_f(l8_byte, i4_vector(1))
+        call byte_swap_int4_f(num, i4_vector(1))
       end if
 !
       end subroutine calypso_mpi_seek_read_int4
@@ -683,6 +683,7 @@
 !
       subroutine calypso_gz_mpi_seek_write(id_mpi_file, ioff_gl, zbuf)
 !
+      use calypso_mpi_int8
       use t_buffer_4_gzip
 !
       integer, intent(in) ::  id_mpi_file

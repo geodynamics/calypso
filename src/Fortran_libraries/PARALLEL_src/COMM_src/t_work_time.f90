@@ -174,6 +174,7 @@
      &         (iflag_time_4_each_pe, time_file_prefix, elps)
 !
       use calypso_mpi
+      use calypso_mpi_real
       use set_parallel_file_name
 !
       integer(kind = kint), intent(in) :: iflag_time_4_each_pe

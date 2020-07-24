@@ -166,6 +166,8 @@
 !
       subroutine set_numbers_2_head_node(num_local, IO_param)
 !
+      use calypso_mpi_int
+!
       integer(kind = kint), intent(in) :: num_local
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
@@ -181,6 +183,8 @@
 !  ---------------------------------------------------------------------
 !
       subroutine istack64_4_parallel_data(num_local, IO_param)
+!
+      use calypso_mpi_int
 !
       integer(kind = kint_gl), intent(in) :: num_local
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
@@ -205,6 +209,8 @@
 !
       subroutine set_istack_over_subdomains                             &
      &         (nprocs_in, nloop, num_local, istack_merged)
+!
+      use calypso_mpi_int8
 !
       integer, intent(in) :: nprocs_in
       integer(kind = kint), intent(in) :: nloop

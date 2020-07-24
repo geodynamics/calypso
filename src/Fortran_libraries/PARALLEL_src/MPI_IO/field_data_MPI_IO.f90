@@ -114,6 +114,7 @@
 !
       subroutine sync_field_names_mpi(num_field, field_name)
 !
+     use calypso_mpi_char
      use transfer_to_long_integers
 !
       integer(kind=kint), intent(in) :: num_field
@@ -228,6 +229,7 @@
       subroutine read_field_header_mpi(id_fld, num_pe, id_rank,         &
      &          ioff_gl, nnod, num_field, istack_merged)
 !
+      use calypso_mpi_int8
       use m_phys_constants
       use field_data_IO
       use transfer_to_long_integers

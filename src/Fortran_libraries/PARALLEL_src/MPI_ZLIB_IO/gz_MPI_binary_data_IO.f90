@@ -213,6 +213,7 @@
 !
       subroutine gz_mpi_read_int8_vector_b(IO_param, num, int8_dat)
 !
+      use byte_swap_f
       use data_convert_by_zlib
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
@@ -221,8 +222,6 @@
       integer(kind = kint_gl), intent(inout) :: int8_dat(num)
 !
       integer(kind = MPI_OFFSET_KIND) :: ioffset
-!
-      integer(kind = kint_gl) :: l8_byte
 !
 !
       call gz_mpi_read_merged_stack_b(IO_param,                         &
@@ -246,8 +245,7 @@
         call dealloc_zip_buffer(zbuf)
 !
         if(IO_param%iflag_bin_swap .eq. iendian_FLIP) then
-          l8_byte = num * kint_gl
-          call byte_swap_64bit_f(l8_byte, int8_dat(1))
+          call byte_swap_int8_f(num, int8_dat(1))
         end if
       end if
 !
@@ -257,6 +255,7 @@
 !
       subroutine gz_mpi_read_1d_vector_b(IO_param, num, real_dat)
 !
+      use byte_swap_f
       use data_convert_by_zlib
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
@@ -265,8 +264,6 @@
       real(kind = kreal), intent(inout) :: real_dat(num)
 !
       integer(kind = MPI_OFFSET_KIND) :: ioffset
-!
-      integer(kind = kint_gl) :: l8_byte
 !
 !
       call gz_mpi_read_merged_stack_b(IO_param,                         &
@@ -290,8 +287,7 @@
         call dealloc_zip_buffer(zbuf)
 !
         if(IO_param%iflag_bin_swap .eq. iendian_FLIP) then
-          l8_byte = num * kreal
-          call byte_swap_64bit_f(l8_byte, real_dat(1))
+          call byte_swap_real_f(num, real_dat(1))
         end if
       end if
 !

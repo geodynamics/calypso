@@ -413,19 +413,18 @@
 !
       subroutine read_mul_int_from_32bit(bbuf, num, int_dat)
 !
+      use byte_swap_f
+!
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint_4b), intent(inout) :: int_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
-!
-      integer(kind = kint_gl) :: l8_byte
 !
 !
       if(num .le. 0) return
       read(bbuf%id_binary, err=99, end=99)  int_dat(1:num)
 !
       if(bbuf%iflag_swap .eq. iendian_FLIP) then
-        l8_byte = num * kint_4b
-        call byte_swap_32bit_f(l8_byte, int_dat(1))
+        call byte_swap_int4_f(num, int_dat(1))
       end if
       return
 !
@@ -438,19 +437,18 @@
 !
       subroutine read_mul_int8_b(bbuf, num, int_gl_dat)
 !
+      use byte_swap_f
+!
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint_gl), intent(inout) :: int_gl_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
-!
-      integer(kind = kint_gl) :: l8_byte
 !
 !
       if(num .le. 0) return
       read(bbuf%id_binary, err=99, end=99)  int_gl_dat(1:num)
 !
       if(bbuf%iflag_swap .eq. iendian_FLIP) then
-        l8_byte = num * kint_gl
-        call byte_swap_64bit_f(l8_byte, int_gl_dat(1))
+        call byte_swap_int8_f(num, int_gl_dat(1))
       end if
       return
 !
@@ -538,19 +536,18 @@
 !
       subroutine read_1d_vector_b(bbuf, num, real_dat)
 !
+      use byte_swap_f
+!
       integer(kind = kint_gl), intent(in) :: num
       real(kind = kreal), intent(inout) :: real_dat(num)
       type(binary_IO_buffer), intent(inout) :: bbuf
-!
-      integer(kind = kint_gl) :: l8_byte
 !
 !
       if(num .le. 0) return
       read(bbuf%id_binary, err=99, end=99)  real_dat(1:num)
 !
       if(bbuf%iflag_swap .eq. iendian_FLIP) then
-        l8_byte = num * kreal
-        call byte_swap_64bit_f(l8_byte, real_dat(1))
+        call byte_swap_real_f(num, real_dat(1))
       end if
       return
 !

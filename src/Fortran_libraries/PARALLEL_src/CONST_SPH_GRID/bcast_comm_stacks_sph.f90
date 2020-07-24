@@ -40,6 +40,8 @@
 !
       subroutine s_bcast_comm_stacks_sph(ndomain_sph, comm_sph)
 !
+      use calypso_mpi_int
+!
       integer(kind = kint), intent(in) :: ndomain_sph
       type(sph_comm_tbl), intent(inout) :: comm_sph(ndomain_sph)
 !

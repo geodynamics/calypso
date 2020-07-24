@@ -266,6 +266,7 @@
 !
       use t_control_array_real
       use transfer_to_long_integers
+      use calypso_mpi_real
 !
       type(ctl_array_real), intent(inout) :: array_real
 !
@@ -290,6 +291,7 @@
 !
       use t_control_array_real2
       use transfer_to_long_integers
+      use calypso_mpi_real
 !
       type(ctl_array_r2), intent(inout) :: array_r2
 !
@@ -316,6 +318,7 @@
 !
       use t_control_array_real3
       use transfer_to_long_integers
+      use calypso_mpi_real
 !
       type(ctl_array_r3), intent(inout) :: array_r3
 !
@@ -342,6 +345,7 @@
 !
       subroutine bcast_ctl_array_i1(array_int)
 !
+      use calypso_mpi_int
       use t_control_array_integer
       use transfer_to_long_integers
 !
@@ -366,6 +370,7 @@
 !
       subroutine bcast_ctl_array_i2(array_i2)
 !
+      use calypso_mpi_int
       use t_control_array_integer2
       use transfer_to_long_integers
 !
@@ -392,6 +397,7 @@
 !
       subroutine bcast_ctl_array_i3(array_i3)
 !
+      use calypso_mpi_int
       use t_control_array_integer3
       use transfer_to_long_integers
 !
@@ -420,6 +426,7 @@
 !
       subroutine bcast_ctl_array_c1(array_chara)
 !
+      use calypso_mpi_char
       use t_control_array_character
       use transfer_to_long_integers
 !
@@ -444,6 +451,7 @@
 !
       subroutine bcast_ctl_array_c2(array_c2)
 !
+      use calypso_mpi_char
       use t_control_array_character2
       use transfer_to_long_integers
 !
@@ -470,6 +478,7 @@
 !
       subroutine bcast_ctl_array_c3(array_c3)
 !
+      use calypso_mpi_char
       use t_control_array_character3
       use transfer_to_long_integers
 !
@@ -498,6 +507,8 @@
 !
       subroutine bcast_ctl_array_cr(array_cr)
 !
+      use calypso_mpi_real
+      use calypso_mpi_char
       use t_control_array_charareal
       use transfer_to_long_integers
 !
@@ -524,6 +535,8 @@
 !
       subroutine bcast_ctl_array_ci(array_ci)
 !
+      use calypso_mpi_int
+      use calypso_mpi_char
       use t_control_array_charaint
       use transfer_to_long_integers
 !
@@ -550,6 +563,8 @@
 !
       subroutine bcast_ctl_array_cr2(array_cr2)
 !
+      use calypso_mpi_real
+      use calypso_mpi_char
       use t_control_array_charareal2
       use transfer_to_long_integers
 !
@@ -578,6 +593,8 @@
 !
       subroutine bcast_ctl_array_c2r(array_c2r)
 !
+      use calypso_mpi_real
+      use calypso_mpi_char
       use t_control_array_chara2real
       use transfer_to_long_integers
 !
@@ -606,6 +623,9 @@
 !
       subroutine bcast_ctl_array_icr(array_icr)
 !
+      use calypso_mpi_real
+      use calypso_mpi_int
+      use calypso_mpi_char
       use t_control_array_intcharreal
       use transfer_to_long_integers
 !
@@ -634,6 +654,8 @@
 !
       subroutine bcast_ctl_array_ir(array_ir)
 !
+      use calypso_mpi_real
+      use calypso_mpi_int
       use t_control_array_intreal
       use transfer_to_long_integers
 !
@@ -660,6 +682,8 @@
 !
       subroutine bcast_ctl_array_i2r(array_i2r)
 !
+      use calypso_mpi_real
+      use calypso_mpi_int
       use t_control_array_int2real
       use transfer_to_long_integers
 !
@@ -688,6 +712,8 @@
 !
       subroutine bcast_ctl_array_i2r2(array_i2r2)
 !
+      use calypso_mpi_real
+      use calypso_mpi_int
       use t_control_array_int2real2
       use transfer_to_long_integers
 !
@@ -718,6 +744,8 @@
 !
       subroutine bcast_ctl_array_ci3(array_ci3)
 !
+      use calypso_mpi_int
+      use calypso_mpi_char
       use t_control_array_charaint3
       use transfer_to_long_integers
 !

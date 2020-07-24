@@ -2,10 +2,8 @@ add_direction_labels.o: $(IO_DIR)/add_direction_labels.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 add_nodal_fields_ctl.o: $(IO_DIR)/add_nodal_fields_ctl.f90 m_precision.o m_machine_parameter.o t_field_labels.o t_control_array_character3.o
 	$(F90) -c $(F90OPTFLAGS) $<
-binary_IO.o: $(IO_DIR)/binary_IO.F90 m_precision.o m_constants.o m_machine_parameter.o m_error_IDs.o t_binary_IO_buffer.o set_parallel_file_name.o transfer_to_long_integers.o
+binary_IO.o: $(IO_DIR)/binary_IO.F90 m_precision.o m_constants.o m_machine_parameter.o m_error_IDs.o t_binary_IO_buffer.o set_parallel_file_name.o transfer_to_long_integers.o byte_swap_f.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
-byte_swap_f.o: $(IO_DIR)/byte_swap_f.f90 m_precision.o
-	$(F90) -c $(F90OPTFLAGS) $<
 comm_table_IO.o: $(IO_DIR)/comm_table_IO.f90 m_precision.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 data_IO_to_textline.o: $(IO_DIR)/data_IO_to_textline.f90 m_precision.o m_constants.o

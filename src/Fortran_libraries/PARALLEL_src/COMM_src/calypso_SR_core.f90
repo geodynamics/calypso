@@ -209,9 +209,9 @@
       do neib = 1, ncomm_send
         ist= istack_send(neib-1) + 1
         num  = int(istack_send(neib  ) - istack_send(neib-1))
-        call MPI_ISEND                                                  &
-     &     (i8WS(ist), num, CALYPSO_GLOBAL_INT, int(id_pe_send(neib)),  &
-     &      0, CALYPSO_COMM, req1(neib), ierr_MPI)
+        call MPI_ISEND(SR_il1%i8WS(ist), num, CALYPSO_GLOBAL_INT,       &
+     &                 int(id_pe_send(neib)), 0, CALYPSO_COMM,          &
+     &                 req1(neib), ierr_MPI)
       end do
 !C
 !C-- RECEIVE
@@ -219,9 +219,9 @@
         do neib = ncomm_recv, 1, -1
           ist= istack_recv(neib-1) + 1
           num  = int(istack_recv(neib  ) - istack_recv(neib-1))
-          call MPI_IRECV                                                &
-     &      (i8WR(ist), num, CALYPSO_GLOBAL_INT, int(id_pe_recv(neib)), &
-     &       0, CALYPSO_COMM, req2(neib), ierr_MPI)
+          call MPI_IRECV(SR_il1%i8WR(ist), num, CALYPSO_GLOBAL_INT,     &
+     &                   int(id_pe_recv(neib)),0, CALYPSO_COMM,         &
+     &                   req2(neib), ierr_MPI)
         end do
       end if
 !
@@ -236,7 +236,7 @@
       num  =  int(istack_send(npe_send  ) - istack_send(npe_send-1))
 !$omp parallel do
       do i = 1, num
-        i8WR(ist_recv+i) = i8WS(ist_send+i)
+        SR_il1%i8WR(ist_recv+i) = SR_il1%i8WS(ist_send+i)
       end do
 !$omp end parallel do
 !

@@ -178,6 +178,7 @@
      &          phys_name_rj, d_rj, d_circle, circle)
 !
       use calypso_mpi
+      use calypso_mpi_real
 !
       integer(kind = kint), intent(in) :: nnod_rj, jmax
       integer(kind = kint), intent(in) :: nidx_global_rj(2)

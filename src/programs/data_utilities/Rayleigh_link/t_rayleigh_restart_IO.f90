@@ -60,12 +60,12 @@
 !>        truncation degree
         integer :: i_version_from_file
 !>        truncation degree
-        integer(kind = kint) :: ltr_org
+        integer :: ltr_org
 !
 !>        Radial grid type
-        integer(kind = kint) :: iflag_rtype
+        integer :: iflag_rtype
 !>        Number of radial grid
-        integer(kind = kint) :: nri_org
+        integer :: nri_org
 !>        radial
         real(kind = kreal), allocatable :: r_org(:)
 !
@@ -140,13 +140,16 @@
 !
       subroutine read_rayleigh_restart_params(dir, i_step, ra_rst)
 !
+      use byte_swap_f
+!
       integer(kind = kint), intent(in) :: i_step
       character(len = kchara), intent(in) :: dir
 !
       type(rayleigh_restart), intent(inout) :: ra_rst
 !
       character(len = kchara) :: file_name
-      integer :: i4_tmp
+      integer :: i4_tmp(1)
+      real(kind = kreal) :: r_tmp(1)
       integer(kind = kint_gl) :: l8_byte
 !
       integer, parameter :: id_file = 15
@@ -161,8 +164,8 @@
      &     FORM='UNFORMATTED', ACCESS='STREAM')
 !
       ra_rst%iflag_swap = iendian_KEEP
-      read(id_file) i4_tmp
-      if(i4_tmp .ne. iflag_pi) ra_rst%iflag_swap = iendian_FLIP
+      read(id_file) i4_tmp(1)
+      if(i4_tmp(1) .ne. iflag_pi) ra_rst%iflag_swap = iendian_FLIP
 !
       read(id_file) ra_rst%i_version_from_file
       read(id_file) ra_rst%nri_org
@@ -174,16 +177,21 @@
 !      read(id_file)ra_rst%new_dt_org
 !
       if(ra_rst%iflag_swap .eq. iendian_FLIP) then
-        l8_byte = kint_4b
-        call byte_swap_32bit_f                                          &
-     &     (l8_byte, ra_rst%i_version_from_file)
-        call byte_swap_32bit_f(l8_byte, ra_rst%nri_org)
-        call byte_swap_32bit_f(l8_byte, ra_rst%iflag_rtype)
-        call byte_swap_32bit_f(l8_byte, ra_rst%ltr_org)
-        l8_byte = kreal
-        call byte_swap_64bit_f(l8_byte, ra_rst%dt_org)
-        call byte_swap_64bit_f(l8_byte, ra_rst%dt_new)
- !       call byte_swap_64bit_f(l8_byte, ra_rst%new_dt_org)
+        l8_byte = 1
+        call byte_swap_int4_f(l8_byte, i4_tmp)
+        ra_rst%i_version_from_file = i4_tmp(1)
+        call byte_swap_int4_f(l8_byte, i4_tmp)
+        ra_rst%nri_org = i4_tmp(1)
+        call byte_swap_int4_f(l8_byte, i4_tmp)
+        ra_rst%iflag_rtype = i4_tmp(1)
+        call byte_swap_int4_f(l8_byte, i4_tmp)
+        ra_rst%ltr_org = i4_tmp(1)
+        call byte_swap_real_f(l8_byte, r_tmp)
+        ra_rst%dt_org = r_tmp(1)
+        call byte_swap_real_f(l8_byte, r_tmp)
+        ra_rst%dt_new = r_tmp(1)
+!        call byte_swap_real_f(l8_byte, r_tmp)
+!        ra_rst%new_dt_org = r_tmp(1)
       end if
 !
       call alloc_rayleigh_radial_grid(ra_rst)
@@ -194,11 +202,13 @@
       close(id_file)
 !
       if(ra_rst%iflag_swap .eq. iendian_FLIP) then
-        l8_byte = ra_rst%nri_org * kreal
-        call byte_swap_64bit_f(l8_byte, ra_rst%r_org)
-        l8_byte = kreal
-        call byte_swap_64bit_f(l8_byte, ra_rst%time_org)
-        call byte_swap_32bit_f(l8_byte, ra_rst%i_step_org)
+        l8_byte = ra_rst%nri_org
+        call byte_swap_real_f(l8_byte, ra_rst%r_org)
+        l8_byte = 1
+        call byte_swap_real_f(l8_byte, r_tmp)
+        ra_rst%time_org = r_tmp(1)
+        call byte_swap_int4_f(l8_byte, i4_tmp)
+        ra_rst%i_step_org = i4_tmp(1)
       end if
 !
       write(*,*) 'ra_rst%time_org', ra_rst%time_org

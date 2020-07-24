@@ -213,6 +213,7 @@
      &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,  &
      &          rj_fld, trns_MHD, WK_sph, cor_rlm)
 !
+      use calypso_mpi_real
       use sph_transforms_4_MHD
 !
       type(sph_grids), intent(in) :: sph

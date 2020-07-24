@@ -197,6 +197,8 @@
       subroutine chebyshev_fwd_mat_4_rayleigh                           &
      &         (new_sph_mesh, r_itp, ra_rst)
 !
+      use calypso_mpi_real
+!
       type(sph_mesh_data), intent(in) :: new_sph_mesh
       type(sph_radial_itp_data), intent(in) :: r_itp
 !

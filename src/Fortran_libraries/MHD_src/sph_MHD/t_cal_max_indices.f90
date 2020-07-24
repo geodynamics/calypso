@@ -151,6 +151,8 @@
       subroutine cal_max_indices(node, nod_fld, range)
 !
       use calypso_mpi
+      use calypso_mpi_real
+      use calypso_mpi_int8
       use t_geometry_data
       use t_phys_data
 !

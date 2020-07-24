@@ -206,6 +206,7 @@
      &          is_coriolis, ntot_phys_rj, d_rj, coriolis_rtp)
 !
       use calypso_mpi
+      use calypso_mpi_real
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_rj_grid), intent(in) ::  sph_rj

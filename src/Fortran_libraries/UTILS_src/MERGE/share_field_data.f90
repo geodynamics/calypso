@@ -81,6 +81,7 @@
       subroutine share_each_field_data(ip_org, fld)
 !
       use t_phys_data
+      use calypso_mpi_real
 !
       integer(kind = kint), intent(in) :: ip_org
       type(phys_data), intent(inout) :: fld

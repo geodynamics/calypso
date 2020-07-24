@@ -273,6 +273,7 @@
      &         (l_truncation, WK_pwr, pwr)
 !
       use calypso_mpi
+      use calypso_mpi_real
 !
       use cal_ave_4_rms_vector_sph
       use radial_int_for_sph_spec
@@ -303,7 +304,7 @@
      &          num_vol_spectr, v_pwr)
 !
       use calypso_mpi
-!
+      use calypso_mpi_real
       use radial_int_for_sph_spec
 !
       integer(kind = kint), intent(in) :: l_truncation
