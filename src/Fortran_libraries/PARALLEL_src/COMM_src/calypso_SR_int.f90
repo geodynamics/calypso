@@ -66,8 +66,10 @@
      &                       irev_import, iX_org, iX_new)
 !
       use calypso_mpi
+      use t_solver_SR
+      use t_solver_SR_int
       use m_solver_SR
-      use calypso_SR_core
+      use solver_SR_int
       use set_to_send_buffer
       use select_copy_from_recv
 !
@@ -93,8 +95,8 @@
       integer (kind=kint), intent(inout):: iX_new(nnod_new)
 !
 !
-      call resize_iwork_4_SR(npe_send, npe_recv,                        &
-     &    istack_send(npe_send), istack_recv(npe_recv))
+      call resize_iwork_SR_t(npe_send, npe_recv,                        &
+     &    istack_send(npe_send), istack_recv(npe_recv), SR_sig1, SR_i1)
 !
 !C-- SEND
 !
@@ -103,8 +105,9 @@
 !C
 !C-- COMM
       call calypso_send_recv_intcore                                    &
-     &             (npe_send, isend_self, id_pe_send, istack_send,      &
-     &              npe_recv, irecv_self, id_pe_recv, istack_recv)
+     &   (npe_send, isend_self, id_pe_send, istack_send,                &
+     &    npe_recv, irecv_self, id_pe_recv, istack_recv,                &
+     &    SR_sig1, SR_i1)
 !
 !C-- RECV
       call sel_cppy_from_recv_buf_int(iflag_SR, nnod_new,               &
@@ -112,7 +115,7 @@
      &    SR_i1%iWR(1), iX_new)
 !
 !C-- WAIT
-      call calypso_send_recv_fin(npe_send, isend_self)
+      call calypso_send_recv_fin_t(npe_send, isend_self, SR_sig1)
 !
       end subroutine calypso_send_recv_int
 !
@@ -166,9 +169,9 @@
 !C
 !C-- COMM
       call calypso_send_recv_i8core                                     &
-     &             (npe_send, isend_self, id_pe_send, istack_send,      &
-     &              npe_recv, irecv_self, id_pe_recv, istack_recv,      &
-     &              SR_sig1, SR_il1)
+     &   (npe_send, isend_self, id_pe_send, istack_send,                &
+     &    npe_recv, irecv_self, id_pe_recv, istack_recv,                &
+     &    SR_sig1, SR_il1)
 !
 !C-- RECV
       call sel_cppy_from_recv_buf_i8(iflag_SR, nnod_new,                &

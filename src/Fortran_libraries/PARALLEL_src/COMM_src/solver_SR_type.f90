@@ -134,7 +134,9 @@
       subroutine SOLVER_SEND_RECV_int_type(NP, comm_tbl, iX)
 !
       use t_comm_table
+      use t_solver_SR_int
       use solver_SR_int
+      use m_solver_SR
 !
       type(communication_table), intent(in) :: comm_tbl
       integer(kind = kint), intent(in) :: NP
@@ -146,7 +148,8 @@
       call SOLVER_SEND_RECV_i                                           &
      &   (NP, comm_tbl%num_neib, comm_tbl%id_neib,                      &
      &    comm_tbl%istack_import, comm_tbl%item_import,                 &
-     &    comm_tbl%istack_export, comm_tbl%item_export, iX(1))
+     &    comm_tbl%istack_export, comm_tbl%item_export,                 &
+     &    SR_sig1, SR_i1, iX(1))
       if(iflag_FSR_time) call end_elapsed_time(ist_elapsed_FSR+1)
 !
       end subroutine SOLVER_SEND_RECV_int_type
@@ -181,6 +184,8 @@
       subroutine SOLVER_SEND_RECV_num_type(comm_tbl, nSEND, nRECV)
 !
       use t_comm_table
+      use t_solver_SR
+      use m_solver_SR
       use solver_SR_int
 !
       type(communication_table), intent(in) :: comm_tbl
@@ -190,8 +195,8 @@
 !
 !
       if(iflag_FSR_time) call start_elapsed_time(ist_elapsed_FSR+1)
-      call SOLVER_SEND_RECV_num                                         &
-     &   (comm_tbl%num_neib, comm_tbl%id_neib, nSEND(1), nRECV(1))
+      call SOLVER_SEND_RECV_num(comm_tbl%num_neib, comm_tbl%id_neib,    &
+     &                          nSEND(1), nRECV(1), SR_sig1)
       if(iflag_FSR_time) call end_elapsed_time(ist_elapsed_FSR+1)
 !
       end subroutine SOLVER_SEND_RECV_num_type

@@ -81,8 +81,8 @@
       call resize_work_4_SR                                             &
      &   (n_sym_tensor, nod_comm%num_neib, nod_comm%num_neib,           &
      &    nod_comm%ntot_export, nod_comm%ntot_import)
-      call resize_iwork_4_SR(nod_comm%num_neib, nod_comm%num_neib,      &
-     &    nod_comm%ntot_export, nod_comm%ntot_import)
+      call resize_iwork_SR_t(nod_comm%num_neib, nod_comm%num_neib,      &
+     &    nod_comm%ntot_export, nod_comm%ntot_import, SR_sig1, SR_i1)
       call resize_i8work_SR(nod_comm%num_neib, nod_comm%num_neib,       &
      &    nod_comm%ntot_export, nod_comm%ntot_import, SR_sig1, SR_il1)
 !

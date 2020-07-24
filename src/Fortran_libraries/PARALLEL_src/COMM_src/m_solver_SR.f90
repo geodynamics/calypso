@@ -11,11 +11,8 @@
 !!@verbatim
 !!      subroutine resize_work_4_SR                                     &
 !!     &         (NB, NPE_SEND, NPE_RECV, NTOT_SEND, NTOT_RECV)
-!!      subroutine resize_iwork_4_SR                                    &
-!!     &         (NPE_SEND, NPE_RECV, NTOT_SEND, NTOT_RECV)
 !!
 !!      subroutine resize_work_itp_SR(NB, NPE_SEND, NPE_RECV, NTOT_RECV)
-!!      subroutine resize_iwork_itp_SR(NPE_SEND, NPE_RECV, NTOT_RECV)
 !!@endverbatim
 !!
 !!@n @param  NB           Number of components
@@ -32,6 +29,7 @@
 !
       use m_precision
       use t_solver_SR
+      use t_solver_SR_int
       use t_solver_SR_int8
 !
       implicit none
@@ -87,21 +85,6 @@
       end subroutine resize_work_4_SR
 !
 ! ----------------------------------------------------------------------
-!
-      subroutine resize_iwork_4_SR                                      &
-     &         (NPE_SEND, NPE_RECV, NTOT_SEND, NTOT_RECV)
-!
-      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
-      integer(kind = kint), intent(in) ::  NTOT_SEND, NTOT_RECV
-!
-!
-      call resize_flag_4_SR(NPE_SEND, NPE_RECV)
-      call resize_isend_SR(NTOT_SEND+1, SR_i1)
-      call resize_irecv_SR(NTOT_RECV+1, SR_i1)
-!
-      end subroutine resize_iwork_4_SR
-!
-! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
       subroutine resize_work_itp_SR(NB, NPE_SEND, NPE_RECV, NTOT_RECV)
@@ -114,19 +97,6 @@
       call resize_wrecv_SR(NB, NTOT_RECV)
 !
       end subroutine resize_work_itp_SR
-!
-! ----------------------------------------------------------------------
-!
-      subroutine resize_iwork_itp_SR(NPE_SEND, NPE_RECV, NTOT_RECV)
-!
-      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
-      integer(kind = kint), intent(in) ::  NTOT_RECV
-!
-!
-      call resize_flag_4_SR(NPE_SEND, NPE_RECV)
-      call resize_irecv_SR(NTOT_RECV, SR_i1)
-!
-      end subroutine resize_iwork_itp_SR
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

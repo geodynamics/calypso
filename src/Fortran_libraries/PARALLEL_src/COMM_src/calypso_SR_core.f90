@@ -11,12 +11,8 @@
 !!      subroutine calypso_send_recv_core                               &
 !!     &         (NB, npe_send, isend_self, id_pe_send, istack_send,    &
 !!     &              npe_recv, irecv_self, id_pe_recv, istack_recv)
-!!      subroutine calypso_send_recv_intcore                            &
-!!     &             (npe_send, isend_self, id_pe_send, istack_send,    &
-!!     &              npe_recv, irecv_self, id_pe_recv, istack_recv)
 !!
 !!      subroutine calypso_send_recv_fin(npe_send, isend_self)
-!!
 !!      subroutine calypso_send_recv_check                              &
 !!     &         (NB, npe_send, isend_self, istack_send,                &
 !!     &              npe_recv, irecv_self, istack_recv)
@@ -114,68 +110,6 @@
 !$omp end parallel do
 !
       end subroutine calypso_send_recv_core
-!
-! ----------------------------------------------------------------------
-!
-      subroutine calypso_send_recv_intcore                              &
-     &             (npe_send, isend_self, id_pe_send, istack_send,      &
-     &              npe_recv, irecv_self, id_pe_recv, istack_recv)
-!
-      use calypso_mpi
-      use m_solver_SR
-!
-      integer(kind = kint), intent(in) :: npe_send, isend_self
-      integer(kind = kint), intent(in) :: id_pe_send(npe_send)
-      integer(kind = kint), intent(in) :: istack_send(0:npe_send)
-!
-      integer(kind = kint), intent(in) :: npe_recv, irecv_self
-      integer(kind = kint), intent(in) :: id_pe_recv(npe_recv)
-      integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
-!
-      integer (kind = kint) :: ist
-      integer :: num, i
-      integer :: ncomm_send, ncomm_recv, neib
-      integer (kind = kint) :: ist_send, ist_recv
-!
-!
-      ncomm_send = int(npe_send - isend_self)
-      ncomm_recv = int(npe_recv - irecv_self)
-!
-      do neib = 1, ncomm_send
-        ist= istack_send(neib-1) + 1
-        num  = int(istack_send(neib  ) - istack_send(neib-1))
-        call MPI_ISEND(SR_i1%iWS(ist), num, CALYPSO_INTEGER,            &
-     &                 int(id_pe_send(neib)), 0, CALYPSO_COMM,          &
-     &                 req1(neib), ierr_MPI)
-      end do
-!C
-!C-- RECEIVE
-      if(ncomm_recv .gt. 0) then
-        do neib = ncomm_recv, 1, -1
-          ist= istack_recv(neib-1) + 1
-          num  = int(istack_recv(neib  ) - istack_recv(neib-1))
-          call MPI_IRECV(SR_i1%iWR(ist), num, CALYPSO_INTEGER,          &
-     &                   int(id_pe_recv(neib)), 0, CALYPSO_COMM,        &
-     &                   req2(neib), ierr_MPI)
-        end do
-      end if
-!
-      if(ncomm_recv .gt. 0) then
-        call MPI_WAITALL(ncomm_recv, req2, sta2, ierr_MPI)
-      end if
-!
-      if (isend_self .eq. 0) return
-!
-      ist_send= istack_send(npe_send-1)
-      ist_recv= istack_recv(npe_recv-1)
-      num  =   int(istack_send(npe_send  ) - istack_send(npe_send-1))
-!$omp parallel do
-      do i = 1, num
-        SR_i1%iWR(ist_recv+i) = SR_i1%iWS(ist_send+i)
-      end do
-!$omp end parallel do
-!
-      end subroutine calypso_send_recv_intcore
 !
 ! ----------------------------------------------------------------------
 !

@@ -101,6 +101,8 @@
      &         (txt, numele, nnod_4_ele, ie, internal_flag, x_ele,      &
      &          node, nod_comm, neib_e, x_ref_ele, host, e_comm)
 !
+      use m_solver_SR
+      use reverse_SR_int
       use find_element_comm_table
       use const_global_element_ids
       use set_element_export_item
@@ -147,7 +149,7 @@
      &   (node%numnod, nod_comm%num_neib, nod_comm%id_neib,             &
      &    nod_comm%istack_import, nod_comm%item_import,                 &
      &    nod_comm%istack_export, nod_comm%item_export,                 &
-     &    wk_comm%item_local, wk_comm%inod_local)
+     &    SR_sig1, wk_comm%item_local, wk_comm%inod_local)
       if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+2)
 !
 !      write(*,*) 'set_element_import_item', my_rank
@@ -166,9 +168,9 @@
 !
 !      write(*,*) 'element_num_reverse_SR', my_rank
       if(iflag_ecomm_time) call start_elapsed_time(ist_elapsed+4)
-      call element_num_reverse_SR(e_comm%num_neib, e_comm%id_neib,      &
-     &    e_comm%num_import, e_comm%num_export, e_comm%istack_export,   &
-     &    e_comm%ntot_export)
+      call element_num_reverse_SR                                       &
+     &   (e_comm%num_neib, e_comm%id_neib, e_comm%num_import, SR_sig1,  &
+     &    e_comm%num_export, e_comm%istack_export, e_comm%ntot_export)
       if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+4)
 !
       call alloc_element_rev_exports(e_comm%ntot_export, wk_comm)

@@ -12,21 +12,16 @@
 !!@verbatim
 !!      subroutine resize_work_SR_t(NB, NPE_SEND, NPE_RECV,             &
 !!     &          NTOT_SEND, NTOT_RECV, SR_sig, SR_r)
-!!      subroutine resize_iwork_SR_t(NPE_SEND, NPE_RECV,                &
-!!     &          NTOT_SEND, NTOT_RECV, SR_sig, SR_i)
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
-!!        type(send_recv_int_buffer), intent(inout) :: SR_i
 !!
 !!      subroutine resize_work_itp_SR_t                                 &
 !!     &         (NB, NPE_SEND, NPE_RECV, NTOT_RECV, SR_sig, SR_r)
-!!      subroutine resize_iwork_itp_SR_t                                &
-!!     &         (NPE_SEND, NPE_RECV, NTOT_RECV, SR_sig, SR_i)
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
-!!        type(send_recv_int_buffer), intent(inout) :: SR_i
 !!
 !!      subroutine resize_SR_flag(NPE_SEND, NPE_RECV, SR_sig)
+!!      subroutine dealloc_SR_flag(SR_sig)
 !!        integer(kind = kint), intent(in)   ::  NPE_SEND, NPE_RECV
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!
@@ -78,22 +73,7 @@
         real(kind = kreal), allocatable :: WR(:)
       end type send_recv_real_buffer
 !
-!>      Structure of communication buffer for integer
-      type send_recv_int_buffer
-!>        size of send buffer
-        integer(kind = kint) :: n_iWS = 0
-!>        size of recieve buffer
-        integer(kind = kint) :: n_iWR = 0
-!
-!>        work array for integer send buffer
-        integer(kind = kint), allocatable :: iWS(:)
-!>        work array for integer recieve buffer
-        integer(kind = kint), allocatable :: iWR(:)
-      end type send_recv_int_buffer
-!
-!
       private :: resize_wsend_SR, resize_wrecv_SR
-!      private :: resize_isend_SR, resize_irecv_SR
 !
 ! ----------------------------------------------------------------------
 !
@@ -117,23 +97,6 @@
       end subroutine resize_work_SR_t
 !
 ! ----------------------------------------------------------------------
-!
-      subroutine resize_iwork_SR_t(NPE_SEND, NPE_RECV,                  &
-     &          NTOT_SEND, NTOT_RECV, SR_sig, SR_i)
-!
-      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
-      integer(kind = kint), intent(in) ::  NTOT_SEND, NTOT_RECV
-      type(send_recv_status), intent(inout) :: SR_sig
-      type(send_recv_int_buffer), intent(inout) :: SR_i
-!
-!
-      call resize_SR_flag(NPE_SEND, NPE_RECV, SR_sig)
-      call resize_isend_SR(NTOT_SEND+1, SR_i)
-      call resize_irecv_SR(NTOT_RECV+1, SR_i)
-!
-      end subroutine resize_iwork_SR_t
-!
-! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
       subroutine resize_work_itp_SR_t                                   &
@@ -149,22 +112,6 @@
       call resize_wrecv_SR(NB, NTOT_RECV, SR_r)
 !
       end subroutine resize_work_itp_SR_t
-!
-! ----------------------------------------------------------------------
-!
-      subroutine resize_iwork_itp_SR_t                                  &
-     &         (NPE_SEND, NPE_RECV, NTOT_RECV, SR_sig, SR_i)
-!
-      integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
-      integer(kind = kint), intent(in) ::  NTOT_RECV
-      type(send_recv_status), intent(inout) :: SR_sig
-      type(send_recv_int_buffer), intent(inout) :: SR_i
-!
-!
-      call resize_SR_flag(NPE_SEND, NPE_RECV, SR_sig)
-      call resize_irecv_SR(NTOT_RECV, SR_i)
-!
-      end subroutine resize_iwork_itp_SR_t
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -216,6 +163,19 @@
 !
 ! ----------------------------------------------------------------------
 !
+      subroutine dealloc_SR_flag(SR_sig)
+!
+      type(send_recv_status), intent(inout) :: SR_sig
+!
+!
+      deallocate(SR_sig%sta1, SR_sig%req1)
+      deallocate(SR_sig%sta2, SR_sig%req2)
+!
+      end subroutine dealloc_SR_flag
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
       subroutine resize_wsend_SR(NB, NTOT_SEND, SR_r)
 !
       integer(kind=kint), intent(in)   ::  NB, NTOT_SEND
@@ -253,47 +213,6 @@
       end if
 !
       end subroutine resize_wrecv_SR
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine resize_isend_SR(NTOT_SEND, SR_i)
-!
-      integer(kind=kint), intent(in) :: NTOT_SEND
-      type(send_recv_int_buffer), intent(inout) :: SR_i
-!
-!
-      if(allocated(SR_i%iWS)                                            &
-     &      .and. (size(SR_i%iWS) .lt. (NTOT_SEND)) ) then
-        deallocate (SR_i%iWS)
-        SR_i%n_iWS = -1
-      end if
-      if(allocated(SR_i%iWS) .eqv. .false.) then
-        allocate (SR_i%iWS(NTOT_SEND))
-        SR_i%n_iWS = size(SR_i%iWS)
-      end if
-!
-      end subroutine resize_isend_SR
-!
-! ----------------------------------------------------------------------
-!
-      subroutine resize_irecv_SR(NTOT_RECV, SR_i)
-!
-      integer(kind=kint), intent(in) :: NTOT_RECV
-      type(send_recv_int_buffer), intent(inout) :: SR_i
-!
-!
-      if(allocated(SR_i%iWR)                                            &
-     &     .and. (size(SR_i%iWR) .lt. (NTOT_RECV)) ) then
-        deallocate(SR_i%iWR)
-        SR_i%n_iWR = -1
-      end if
-      if(allocated(SR_i%iWR) .eqv. .false.) then
-        allocate (SR_i%iWR(NTOT_RECV))
-        SR_i%n_iWR = size(SR_i%iWR)
-      end if
-!
-      end subroutine resize_irecv_SR
 !
 ! ----------------------------------------------------------------------
 !
