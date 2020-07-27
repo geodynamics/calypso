@@ -126,7 +126,7 @@ field_at_mid_equator.o: $(MHD_SPH_DIR)/field_at_mid_equator.f90 m_precision.o m_
 	$(F90) -c $(F90OPTFLAGS) $<
 fill_scalar_field.o: $(MHD_SPH_DIR)/fill_scalar_field.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-global_field_4_dynamobench.o: $(MHD_SPH_DIR)/global_field_4_dynamobench.f90 m_precision.o m_constants.o m_phys_labels.o t_rms_4_sph_spectr.o calypso_mpi.o
+global_field_4_dynamobench.o: $(MHD_SPH_DIR)/global_field_4_dynamobench.f90 m_precision.o m_constants.o m_phys_labels.o t_rms_4_sph_spectr.o calypso_mpi_real.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
 init_FFT_4_MHD.o: $(MHD_SPH_DIR)/init_FFT_4_MHD.F90 m_precision.o calypso_mpi.o m_work_time.o m_machine_parameter.o t_spheric_rtp_data.o t_sph_transforms.o t_sph_trans_comm_tbl.o t_sph_trans_arrays_MHD.o t_sph_multi_FFTW.o t_sph_FFT_selector.o m_solver_SR.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
@@ -270,7 +270,7 @@ t_control_parameter.o: $(MHD_SPH_DIR)/t_control_parameter.f90 m_precision.o t_ph
 	$(F90) -c $(F90OPTFLAGS) $<
 t_coriolis_terms_rlm.o: $(MHD_SPH_DIR)/t_coriolis_terms_rlm.f90 m_precision.o m_machine_parameter.o m_constants.o t_spheric_rlm_data.o t_sph_trans_comm_tbl.o t_poloidal_rotation.o t_addresses_sph_transform.o t_schmidt_poly_on_rtm.o t_physical_property.o t_boundary_params_sph_MHD.o t_gaunt_coriolis_rlm.o calypso_mpi.o interact_coriolis_rlm.o sum_coriolis_terms_rlm.o m_sph_communicators.o m_sel_spherical_SRs.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_each_sph_boundary_IO_data.o: $(MHD_SPH_DIR)/t_each_sph_boundary_IO_data.f90 m_precision.o t_spheric_rj_data.o t_boundary_sph_spectr.o t_boundary_params_sph_MHD.o calypso_mpi.o m_machine_parameter.o set_sph_boundary_from_file.o skip_comment_f.o
+t_each_sph_boundary_IO_data.o: $(MHD_SPH_DIR)/t_each_sph_boundary_IO_data.f90 m_precision.o t_spheric_rj_data.o t_boundary_sph_spectr.o t_boundary_params_sph_MHD.o calypso_mpi.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o calypso_mpi_real.o m_machine_parameter.o set_sph_boundary_from_file.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_field_4_dynamobench.o: $(MHD_SPH_DIR)/t_field_4_dynamobench.f90 m_precision.o m_constants.o calypso_mpi.o t_phys_address.o t_boundary_data_sph_MHD.o
 	$(F90) -c $(F90OPTFLAGS) $<

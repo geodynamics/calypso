@@ -42,23 +42,23 @@
 !
       irank_org = int(mod(ip_org - 1,nprocs))
 !      write(*,*) 'MPI_Bcast irank_sph_rj', ip_org
-      call MPI_Bcast(sph_mesh%sph%sph_rj%irank_sph_rj,                  &
-     &    2, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_int(sph_mesh%sph%sph_rj%irank_sph_rj,      &
+     &                           cast_long(2), irank_org)
 !      write(*,*) 'MPI_Bcast nidx_global_rj', ip_org
-      call MPI_Bcast(sph_mesh%sph%sph_rj%nidx_global_rj,                &
-     &    2, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_int(sph_mesh%sph%sph_rj%nidx_global_rj,    &
+     &                           cast_long(2), irank_org)
 !      write(*,*) 'MPI_Bcast nnod_rj', ip_org
-      call MPI_Bcast(sph_mesh%sph%sph_rj%nnod_rj,                       &
-     &    1, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(sph_mesh%sph%sph_rj%nnod_rj,       &
+     &                               irank_org)
 !      write(*,*) 'MPI_Bcast nidx_rj', ip_org
-      call MPI_Bcast(sph_mesh%sph%sph_rj%nidx_rj,                       &
-     &    2, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_int(sph_mesh%sph%sph_rj%nidx_rj,           &
+     &                           cast_long(2), irank_org)
 !      write(*,*) 'MPI_Bcast ist_rj', ip_org
-      call MPI_Bcast(sph_mesh%sph%sph_rj%ist_rj,                        &
-     &    2, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_int(sph_mesh%sph%sph_rj%ist_rj,            &
+     &                           cast_long(2), irank_org)
 !      write(*,*) 'MPI_Bcast ied_rj', ip_org
-      call MPI_Bcast(sph_mesh%sph%sph_rj%ied_rj,                        &
-     &    2, CALYPSO_INTEGER, irank_org, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_int(sph_mesh%sph%sph_rj%ied_rj,            &
+     &                           cast_long(2), irank_org)
 !
       if(mod(ip_org-1,nprocs) .ne. my_rank) then
         call alloc_type_spheric_param_rj(sph_mesh%sph%sph_rj)

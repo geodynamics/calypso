@@ -10,12 +10,12 @@
 !>@brief  Work area for data communications
 !!
 !!@verbatim
-!!      subroutine resize_work_SR_t(NB, NPE_SEND, NPE_RECV,             &
+!!      subroutine resize_work_SR(NB, NPE_SEND, NPE_RECV,               &
 !!     &          NTOT_SEND, NTOT_RECV, SR_sig, SR_r)
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!
-!!      subroutine resize_work_itp_SR_t                                 &
+!!      subroutine resize_work_itp_SR                                   &
 !!     &         (NB, NPE_SEND, NPE_RECV, NTOT_RECV, SR_sig, SR_r)
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
@@ -25,7 +25,7 @@
 !!        integer(kind = kint), intent(in)   ::  NPE_SEND, NPE_RECV
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!
-!!      subroutine calypso_send_recv_fin_t(npe_send, isend_self, SR_sig)
+!!      subroutine calypso_send_recv_fin(npe_send, isend_self, SR_sig)
 !!        integer(kind = kint), intent(in) :: npe_send, isend_self
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!@endverbatim
@@ -57,6 +57,9 @@
         integer, allocatable :: req1(:  )
 !>        status flag for recieving
         integer, allocatable :: req2(:  )
+!
+!>        Integer flag to select copry routine from recieve buffer
+        integer(kind = kint) :: iflag_recv = 0
       end type send_recv_status
 !
 !
@@ -81,7 +84,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_work_SR_t(NB, NPE_SEND, NPE_RECV,               &
+      subroutine resize_work_SR(NB, NPE_SEND, NPE_RECV,                 &
      &          NTOT_SEND, NTOT_RECV, SR_sig, SR_r)
 !
       integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
@@ -94,12 +97,12 @@
       call resize_wsend_SR(NB, NTOT_SEND+1, SR_r)
       call resize_wrecv_SR(NB, NTOT_RECV+1, SR_r)
 !
-      end subroutine resize_work_SR_t
+      end subroutine resize_work_SR
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine resize_work_itp_SR_t                                   &
+      subroutine resize_work_itp_SR                                     &
      &         (NB, NPE_SEND, NPE_RECV, NTOT_RECV, SR_sig, SR_r)
 !
       integer(kind = kint), intent(in) ::  NPE_SEND, NPE_RECV
@@ -111,12 +114,12 @@
       call resize_SR_flag(NPE_SEND, NPE_RECV, SR_sig)
       call resize_wrecv_SR(NB, NTOT_RECV, SR_r)
 !
-      end subroutine resize_work_itp_SR_t
+      end subroutine resize_work_itp_SR
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine calypso_send_recv_fin_t(npe_send, isend_self, SR_sig)
+      subroutine calypso_send_recv_fin(npe_send, isend_self, SR_sig)
 !
       integer(kind = kint), intent(in) :: npe_send, isend_self
       type(send_recv_status), intent(inout) :: SR_sig
@@ -130,7 +133,7 @@
      &     (ncomm_send, SR_sig%req1, SR_sig%sta1, ierr_MPI)
       end if
 !
-      end subroutine calypso_send_recv_fin_t
+      end subroutine calypso_send_recv_fin
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

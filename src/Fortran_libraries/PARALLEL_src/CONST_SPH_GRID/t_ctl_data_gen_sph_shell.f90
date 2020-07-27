@@ -199,18 +199,19 @@
       subroutine bcast_parallel_shell_ctl(psph_ctl)
 !
       use calypso_mpi
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
       use bcast_4_sphere_ctl
       use bcast_4_platform_ctl
 !
       type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !
 !
-      call MPI_Bcast(psph_ctl%iflag_sph_shell, 1,                       &
-     &    CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(psph_ctl%ifile_sph_shell, 1,                       &
-     &    CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(psph_ctl%control_sph_file , kchara,                &
-     &    CALYPSO_CHARACTER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(psph_ctl%iflag_sph_shell, 0)
+      call calypso_mpi_bcast_one_int(psph_ctl%ifile_sph_shell, 0)
+      call calypso_mpi_bcast_character                                  &
+     &   (psph_ctl%control_sph_file, cast_long(kchara), 0)
 !
       if(psph_ctl%iflag_sph_shell .eq. 0) return
 !

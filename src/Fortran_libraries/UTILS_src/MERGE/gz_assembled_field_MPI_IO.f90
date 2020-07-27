@@ -247,7 +247,7 @@
         id_rank = my_rank + (iloop-1) * nprocs
         if(id_rank .lt. num_pe) then
           ioffset = int(ioff_gl) + istack_gz_pe(id_rank)
-          call calypso_mpi_seek_write_chara (id_mpi_file, ioffset,      &
+          call mpi_write_one_chara_b (id_mpi_file, ioffset,             &
      &        int(gz_bufs(iloop)%ilen_gzipped),                         &
      &         gz_bufs(iloop)%gzip_buf(1))
         end if
@@ -327,7 +327,7 @@
         id_rank = my_rank + (iloop-1) * nprocs
         if(id_rank .lt. IO_param%nprocs_in) then
           ioffset = int(IO_param%ioff_gl) + istack_gz_pe(id_rank)
-          call calypso_mpi_seek_write_chara(IO_param%id_file, ioffset,  &
+          call mpi_write_one_chara_b(IO_param%id_file, ioffset,         &
      &        int(gz_bufs(iloop)%ilen_gzipped),                         &
      &        gz_bufs(iloop)%gzip_buf(1))
         end if

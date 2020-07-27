@@ -21,17 +21,47 @@
 !!        integer(kind = kint_gl), intent(in) :: count
 !!        real(kind = kreal), intent(in) ::    r_local(count)
 !!        real(kind = kreal), intent(inout) :: r_global(count)
+!!
+!!      subroutine calypso_mpi_allreduce_one_real                       &
+!!     &         (r_local, r_global, operation)
+!!        integer, intent(in) :: operation
+!!        real(kind = kreal), intent(in) ::    r_local
+!!        real(kind = kreal), intent(inout) :: r_global
 !!      subroutine calypso_mpi_allreduce_real                           &
 !!     &         (r_local, r_global, count, operation)
-!!       integer, intent(in) :: operation
+!!        integer, intent(in) :: operation
 !!        integer(kind = kint_gl), intent(in) :: count
 !!        real(kind = kreal), intent(in) ::    r_local(count)
 !!        real(kind = kreal), intent(inout) :: r_global(count)
+!!
+!!      subroutine calypso_mpi_gather_one_real(sendbuf, recvbuf, root)
+!!        integer, intent(in) :: root
+!!        real(kind = kreal), intent(in) ::    sendbuf
+!!        real(kind = kreal), intent(inout) :: recvbuf(nprocs)
+!!
+!!      subroutine calypso_mpi_allgather_one_real(sendbuf, recvbuf)
+!!        real(kind = kreal), intent(in) ::    sendbuf
+!!        real(kind = kreal), intent(inout) :: recvbuf(nprocs)
 !!      subroutine calypso_mpi_allgather_real                           &
 !!     &         (sendbuf, n_send, recvbuf, n_recv)
 !!        integer(kind =kint), intent(in) :: n_send, n_recv
 !!        real(kind = kreal), intent(in) ::    sendbuf(n_send)
 !!        real(kind = kreal), intent(inout) :: recvbuf(nprocs*n_recv)
+!!
+!!      subroutine calypso_mpi_seek_write_real                          &
+!!     &         (id_mpi_file, ioffset, num, vector, sta_IO)
+!!        integer, intent(in) ::  id_mpi_file
+!!        integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
+!!        integer(kind = kint_gl), intent(in) :: num
+!!        real(kind = kreal), intent(in) :: vector(num)
+!!        integer, intent(inout) :: sta_IO(MPI_STATUS_SIZE)
+!!      subroutine calypso_mpi_seek_read_real                           &
+!!     &          (id_mpi_file, ioffset, num, vector, sta_IO)
+!!        integer, intent(in) :: id_mpi_file
+!!        integer(kind = kint_gl), intent(in) :: num
+!!        integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
+!!        real(kind = kreal), intent(inout) :: vector(num)
+!!        integer, intent(inout) :: sta_IO(MPI_STATUS_SIZE)
 !!@endverbatim
 !!
 !!@n @param  icode       error code
@@ -117,6 +147,25 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine calypso_mpi_allreduce_one_real                         &
+     &         (r_local, r_global, operation)
+!
+      integer, intent(in) :: operation
+      real(kind = kreal), intent(in) ::    r_local
+      real(kind = kreal), intent(inout) :: r_global
+!
+      real(kind = kreal) :: r_lc(1), r_gl(1)
+!
+!
+      r_lc(1) = r_local
+      call MPI_allREDUCE(r_lc, r_gl, 1, CALYPSO_REAL,                   &
+     &   operation, CALYPSO_COMM, ierr_MPI)
+      r_global = r_gl(1)
+!
+      end subroutine calypso_mpi_allreduce_one_real
+!
+!  ---------------------------------------------------------------------
+!
       subroutine calypso_mpi_allreduce_real                             &
      &         (r_local, r_global, count, operation)
 !
@@ -141,6 +190,41 @@
       end subroutine calypso_mpi_allreduce_real
 !
 !  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_gather_one_real(sendbuf, recvbuf, root)
+!
+      integer, intent(in) :: root
+      real(kind = kreal), intent(in) ::    sendbuf
+      real(kind = kreal), intent(inout) :: recvbuf(nprocs)
+!
+      real(kind = kreal) :: r_lc(1)
+!
+!
+      r_lc(1) = sendbuf
+      call MPI_Gather(r_lc, 1, CALYPSO_REAL, recvbuf, 1, CALYPSO_REAL,  &
+     &                root, CALYPSO_COMM, ierr_MPI)
+!
+      end subroutine calypso_mpi_gather_one_real
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_allgather_one_real(sendbuf, recvbuf)
+!
+      real(kind = kreal), intent(in) ::    sendbuf
+      real(kind = kreal), intent(inout) :: recvbuf(nprocs)
+!
+      real(kind = kreal) :: r_lc(1)
+!
+!
+      r_lc(1) = sendbuf
+      call MPI_AllGather(r_lc, 1, CALYPSO_REAL,                         &
+     &    recvbuf, 1, CALYPSO_REAL, CALYPSO_COMM, ierr_MPI)
+!
+      end subroutine calypso_mpi_allgather_one_real
+!
+!  ---------------------------------------------------------------------
 !
       subroutine calypso_mpi_allgather_real                             &
      &         (sendbuf, n_send, recvbuf, n_recv)
@@ -154,6 +238,69 @@
      &    recvbuf, int(n_recv), CALYPSO_REAL, CALYPSO_COMM, ierr_MPI)
 !
       end subroutine calypso_mpi_allgather_real
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_seek_write_real                            &
+     &         (id_mpi_file, ioffset, num, vector, sta_IO)
+!
+      integer, intent(in) ::  id_mpi_file
+      integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
+      integer(kind = kint_gl), intent(in) :: num
+      real(kind = kreal), intent(in) :: vector(num)
+!
+      integer, intent(inout) :: sta_IO(MPI_STATUS_SIZE)
+!
+      integer :: ilen_in
+      integer(kind = kint_gl) :: l8_byte, ist
+!
+!
+      ist = 0
+      l8_byte = ioffset
+      do
+        ilen_in = int(min(num-ist, huge_20))
+        call MPI_FILE_SEEK                                              &
+     &     (id_mpi_file, l8_byte, MPI_SEEK_SET, ierr_MPI)
+        call MPI_FILE_WRITE(id_mpi_file, vector(ist+1), ilen_in,        &
+     &      CALYPSO_REAL, sta_IO, ierr_MPI)
+        ist = ist + ilen_in
+        l8_byte = l8_byte + ilen_in*kreal
+        if(ist .ge. num) exit
+      end do
+!
+      end subroutine calypso_mpi_seek_write_real
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_seek_read_real                             &
+     &          (id_mpi_file, ioffset, num, vector, sta_IO)
+!
+      integer, intent(in) :: id_mpi_file
+      integer(kind = kint_gl), intent(in) :: num
+      integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
+!
+      real(kind = kreal), intent(inout) :: vector(num)
+      integer, intent(inout) :: sta_IO(MPI_STATUS_SIZE)
+!
+      integer(kind = kint) :: ilen_in
+      integer(kind = kint_gl) :: l8_byte, ist
+!
+!
+      ist = 0
+      l8_byte = ioffset
+      do
+        ilen_in = int(min(num-ist, huge_20))
+        call MPI_FILE_SEEK                                              &
+     &     (id_mpi_file, l8_byte, MPI_SEEK_SET, ierr_MPI)
+        call MPI_FILE_READ(id_mpi_file, vector(ist+1), ilen_in,         &
+     &      CALYPSO_REAL, sta_IO, ierr_MPI)
+        ist = ist + ilen_in
+        l8_byte = l8_byte + ilen_in*kreal
+        if(ist .ge. num) exit
+      end do
+!
+      end subroutine calypso_mpi_seek_read_real
 !
 !  ---------------------------------------------------------------------
 !

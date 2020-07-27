@@ -137,22 +137,23 @@
 !
       subroutine bcast_files_4_psf_ctl(psf_ctls)
 !
-      use calypso_mpi
       use t_control_data_4_psf
+      use calypso_mpi
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
 !
       type(section_controls), intent(inout) :: psf_ctls
       integer (kind=kint) :: i_psf
 !
 !
-      call MPI_BCAST(psf_ctls%num_psf_ctl, 1,                           &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(psf_ctls%num_psf_ctl, 0)
       if(psf_ctls%num_psf_ctl .le. 0) return
 !
       if(my_rank .gt. 0) call alloc_psf_ctl_stract(psf_ctls)
 !
-      call MPI_BCAST                                                    &
-     &   (psf_ctls%fname_psf_ctl, int(kchara*psf_ctls%num_psf_ctl),     &
-     &    CALYPSO_CHARACTER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_character(psf_ctls%fname_psf_ctl,          &
+     &    cast_long(kchara*psf_ctls%num_psf_ctl), 0)
       do i_psf = 1, psf_ctls%num_psf_ctl
         call bcast_psf_control_data(psf_ctls%psf_ctl_struct(i_psf))
       end do

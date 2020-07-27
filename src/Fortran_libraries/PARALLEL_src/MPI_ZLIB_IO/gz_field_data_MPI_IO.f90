@@ -39,6 +39,7 @@
       subroutine gz_write_fld_vecotr_mpi                                &
      &         (id_fld, ioff_gl, nnod, ndir, vector)
 !
+      use calypso_mpi_int8
       use field_data_IO
       use data_IO_to_textline
 !
@@ -60,9 +61,8 @@
 !
       call defleate_vector_txt(izero, nnod, ndir, vector, zbuf)
 !
-      call MPI_Allgather(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,      &
-     &    ilen_gzipped_gl, 1, CALYPSO_GLOBAL_INT, CALYPSO_COMM,         &
-     &    ierr_MPI)
+      call calypso_mpi_allgather_one_int8                               &
+     &   (zbuf%ilen_gzipped, ilen_gzipped_gl)
 !
       istack_buffer(0) = 0
       do ip = 1, nprocs
@@ -85,6 +85,7 @@
 !
       subroutine gz_write_fld_header_mpi(id_fld, ioff_gl, header_txt)
 !
+      use calypso_mpi_int8
       use zlib_convert_text
 !
       integer(kind = kint_gl), intent(inout) :: ioff_gl
@@ -103,8 +104,7 @@
         call calypso_mpi_seek_write_gz(id_fld, ioffset, zbuf)
         call dealloc_zip_buffer(zbuf)
       end if
-      call MPI_BCAST(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,          &
-     &    0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int8(zbuf%ilen_gzipped, 0)
       ioff_gl = ioff_gl + zbuf%ilen_gzipped
 !
       end subroutine gz_write_fld_header_mpi
@@ -115,6 +115,7 @@
       subroutine gz_read_fld_charhead_mpi(id_fld,                       &
      &         ioff_gl, ilength, chara_dat)
 !
+      use calypso_mpi_int8
       use zlib_convert_text
 !
       integer, intent(in) ::  id_fld
@@ -136,8 +137,7 @@
         call infleate_characters(ilength, chara_dat, zbuf)
       end if
 !
-      call MPI_BCAST(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,          &
-     &    0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int8(zbuf%ilen_gzipped, 0)
       ioff_gl = ioff_gl + zbuf%ilen_gzipped
 !
       end subroutine gz_read_fld_charhead_mpi
@@ -146,6 +146,7 @@
 !
       subroutine gz_read_fld_1word_mpi(id_fld, ioff_gl, field_name)
 !
+      use calypso_mpi_int8
       use field_data_IO
       use field_data_MPI_IO
       use zlib_convert_text
@@ -170,8 +171,7 @@
       end if
 !
       call sync_field_name_mpi(ilength, field_name)
-      call MPI_BCAST(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,          &
-     &    0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int8(zbuf%ilen_gzipped, 0)
       ioff_gl = ioff_gl + zbuf%ilen_gzipped
 !
       end subroutine gz_read_fld_1word_mpi
@@ -181,10 +181,12 @@
       subroutine gz_read_each_field_mpi(id_fld, num_pe, id_rank,        &
      &          ioff_gl, nnod, ndir, vector)
 !
+      use calypso_mpi_int8
       use field_data_IO
       use field_data_MPI_IO
       use data_IO_to_textline
       use zlib_convert_ascii_vector
+      use transfer_to_long_integers
 !
       integer, intent(in) ::  id_fld
       integer(kind = kint_gl), intent(inout) :: ioff_gl
@@ -208,8 +210,7 @@
       if(my_rank .eq. 0) call read_bufer_istack_nod_buffer              &
      &                      (textbuf_p, num_pe, istack_buf)
 !
-      call MPI_BCAST(istack_buf, int(num_pe+1), CALYPSO_GLOBAL_INT,     &
-     &    0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_int8(istack_buf, cast_long(num_pe+1), 0)
 !
 !
       if(id_rank .ge. num_pe) then

@@ -133,7 +133,7 @@
 !
       if(num .le. 0) return
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
-      call calypso_mpi_seek_write_int8                                  &
+      call mpi_write_int8_b                                             &
      &    (IO_param%id_file, ioffset, num, int8_dat(1))
 !
       end subroutine mpi_write_int8_vector_b
@@ -165,7 +165,7 @@
 !
       if(num .le. 0) return
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
-      call calypso_mpi_seek_write_real                                  &
+      call mpi_write_real_b                                             &
      &    (IO_param%id_file, ioffset, num, real_dat(1))
 !
       end subroutine mpi_write_1d_vector_b
@@ -273,8 +273,7 @@
       if(IO_param%id_rank .ge. IO_param%nprocs_in) then
         int8_dat(1:num) = 0
       else
-        call calypso_mpi_seek_read_int8                                 &
-     &     (IO_param%id_file, IO_param%iflag_bin_swap,                  &
+        call mpi_read_int8_b(IO_param%id_file, IO_param%iflag_bin_swap, &
      &      ioffset, num, int8_dat(1))
       end if
 !
@@ -309,9 +308,8 @@
       if(IO_param%id_rank .ge. IO_param%nprocs_in) then
         real_dat(1:num) = 0.0d0
       else
-        call calypso_mpi_seek_read_real                                 &
-     &     (IO_param%id_file, IO_param%iflag_bin_swap,                  &
-     &      ioffset, num, real_dat(1))
+        call mpi_read_real_b(IO_param%id_file, IO_param%iflag_bin_swap, &
+     &                       ioffset, num, real_dat(1))
       end if
 !
       end subroutine mpi_read_1d_vector_b

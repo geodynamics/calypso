@@ -104,22 +104,23 @@
 !
       subroutine bcast_files_4_iso_ctl(iso_ctls)
 !
-      use calypso_mpi
       use t_control_data_4_iso
+      use calypso_mpi
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
 !
       type(isosurf_controls), intent(inout) :: iso_ctls
       integer (kind=kint) :: i_iso
 !
 !
-      call MPI_BCAST(iso_ctls%num_iso_ctl,  1,                          &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(iso_ctls%num_iso_ctl, 0)
       if(iso_ctls%num_iso_ctl .le. 0) return
 !
       if(my_rank .gt. 0) call alloc_iso_ctl_stract(iso_ctls)
 !
-      call MPI_BCAST                                                    &
-     &   (iso_ctls%fname_iso_ctl, int(kchara*iso_ctls%num_iso_ctl),     &
-     &    CALYPSO_CHARACTER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_character(iso_ctls%fname_iso_ctl,          &
+     &    cast_long(kchara*iso_ctls%num_iso_ctl), 0)
       do i_iso = 1, iso_ctls%num_iso_ctl
         call bcast_iso_control_data(iso_ctls%iso_ctl_struct(i_iso))
       end do

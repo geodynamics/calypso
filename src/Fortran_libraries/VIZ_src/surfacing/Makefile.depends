@@ -96,9 +96,9 @@ t_control_data_4_psf.o: $(PSF_SECTION_DIR)/t_control_data_4_psf.f90 m_precision.
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_data_4_psf_def.o: $(PSF_SECTION_DIR)/t_control_data_4_psf_def.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_control_array_real.o t_control_array_character.o t_control_array_charareal.o calypso_mpi.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_isosurfaces.o: $(PSF_SECTION_DIR)/t_control_data_isosurfaces.f90 m_precision.o m_machine_parameter.o t_control_data_4_iso.o t_read_control_elements.o skip_comment_f.o calypso_mpi.o
+t_control_data_isosurfaces.o: $(PSF_SECTION_DIR)/t_control_data_isosurfaces.f90 m_precision.o m_machine_parameter.o t_control_data_4_iso.o t_read_control_elements.o skip_comment_f.o calypso_mpi.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_sections.o: $(PSF_SECTION_DIR)/t_control_data_sections.f90 m_precision.o m_machine_parameter.o t_control_data_4_psf.o t_read_control_elements.o skip_comment_f.o calypso_mpi.o
+t_control_data_sections.o: $(PSF_SECTION_DIR)/t_control_data_sections.f90 m_precision.o m_machine_parameter.o t_control_data_4_psf.o t_read_control_elements.o skip_comment_f.o calypso_mpi.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_data_surfacings.o: $(PSF_SECTION_DIR)/t_control_data_surfacings.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_control_data_sections.o t_control_data_isosurfaces.o t_control_array_real.o t_control_array_character.o t_control_array_integer.o t_read_control_elements.o skip_comment_f.o bcast_control_arrays.o t_ctl_data_4_time_steps.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -285,12 +285,12 @@
      &         + IO_param%istack_merged(IO_param%nprocs_in)
 !
       if(nnod .le. 0) then
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, 1, char(10))
       else
         do i = 1, nnod
           idx_tmp(1:numdir) = idx(i,1:numdir)
-          call calypso_mpi_seek_write_chara                             &
+          call mpi_write_one_chara_b                                    &
      &       (IO_param%id_file, ioffset, ilength,                       &
      &        multi_int_textline(numdir, idx_tmp))
         end do

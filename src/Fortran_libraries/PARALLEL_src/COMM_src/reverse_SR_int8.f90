@@ -10,20 +10,11 @@
 !>@brief  Data communication for 8-byte integer
 !!
 !!@verbatim
-!!      subroutine global_id_reverse_SR                                 &
+!!      subroutine reverse_send_recv_int8                               &
 !!     &         (num_neib, id_neib, istack_import, istack_export,      &
 !!     &          inod_import, SR_sig, inod_export)
 !!      type(send_recv_status), intent(inout) :: SR_sig
 !!@endverbatim
-!!
-!!@n @param  NB           Number of components
-!!@n @param  NTOT_SEND    Total number of data points for export
-!!@n @param  NTOT_RECV    Total number of data points for import
-!!@n @param  NPE_SEND      Number of processses to receive
-!!@n @param  NPE_RECV      Number of processses to send
-!!
-!!@n @param  ITEM_IMPORT  import table
-!!@n @param  REV_IMPORT   reversed import table
 !
       module reverse_SR_int8
 !
@@ -40,7 +31,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine global_id_reverse_SR                                   &
+      subroutine reverse_send_recv_int8                                 &
      &         (num_neib, id_neib, istack_import, istack_export,        &
      &          inod_import, SR_sig, inod_export)
 !
@@ -83,7 +74,7 @@
       call MPI_WAITALL                                                  &
      &   (int(num_neib), SR_sig%req1(1), SR_sig%sta1(1,1), ierr_MPI)
 !
-      end subroutine global_id_reverse_SR
+      end subroutine reverse_send_recv_int8
 !
 !-----------------------------------------------------------------------
 !

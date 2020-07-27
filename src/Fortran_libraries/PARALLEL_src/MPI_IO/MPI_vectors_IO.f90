@@ -162,12 +162,12 @@
 !
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
       if(nnod .le. 0) then
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, 1, char(10))
       else
         do i = 1, nnod
           vec_tmp(1) = scalar(i)
-          call calypso_mpi_seek_write_chara                             &
+          call mpi_write_one_chara_b                                    &
      &       (IO_param%id_file, ioffset, ilength,                       &
      &        vector_textline(ione, vec_tmp))
         end do
@@ -203,12 +203,12 @@
 !
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
       if(nnod .le. 0) then
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, 1, char(10))
       else
         do i = 1, nnod
           vec_tmp(1:numdir) = vect(i,1:numdir)
-          call calypso_mpi_seek_write_chara                             &
+          call mpi_write_one_chara_b                                    &
      &       (IO_param%id_file, ioffset, ilength,                       &
      &        vector_textline(numdir, vec_tmp))
         end do

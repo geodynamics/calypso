@@ -124,7 +124,7 @@
 !
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, ilength, chara_dat)
       end if
       IO_param%ioff_gl = IO_param%ioff_gl + ilength
@@ -191,6 +191,9 @@
 !
       function  mpi_read_charahead(IO_param, ilength)
 !
+      use calypso_mpi_char
+      use transfer_to_long_integers
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       integer, intent(in) :: ilength
       character(len=ilength) :: mpi_read_charahead
@@ -205,8 +208,8 @@
       end if
 !
       IO_param%ioff_gl = IO_param%ioff_gl + ilength
-      call MPI_BCAST(mpi_read_charahead, ilength, CALYPSO_CHARACTER,    &
-     &    0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_character                                  &
+     &   (mpi_read_charahead, cast_long(ilength), 0)
 !
       end function mpi_read_charahead
 !

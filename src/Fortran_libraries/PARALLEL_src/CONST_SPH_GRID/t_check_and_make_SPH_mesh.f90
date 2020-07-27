@@ -49,6 +49,7 @@
      &         (iflag_make_SPH, sph_file_param, sph_maker)
 !
       use m_error_IDs
+      use calypso_mpi_logical
       use parallel_gen_sph_grids
       use sph_file_IO_select
 !
@@ -66,8 +67,7 @@
      &          .and. check_exsist_rlm_file(my_rank, sph_file_param)    &
      &          .and. check_exsist_rj_file(my_rank, sph_file_param)
       end if
-      call MPI_BCAST(iflag_lc, 1, CALYPSO_LOGICAL, 0,                   &
-     &               CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_logical(iflag_lc, 0)
 !
       if(iflag_lc) then
         if(my_rank.eq.0) write(*,*) 'spherical harmonics table exists'

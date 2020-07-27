@@ -174,8 +174,7 @@
       integer(kind = kint) :: num_global(nprocs)
 !
 !
-      call MPI_Allgather(num_local, 1, CALYPSO_INTEGER,                 &
-     &    num_global, 1, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allgather_one_int(num_local, num_global)
       IO_param%istack_merged(1:nprocs) = num_global(1:nprocs)
 !
       end subroutine set_numbers_2_head_node
@@ -184,7 +183,7 @@
 !
       subroutine istack64_4_parallel_data(num_local, IO_param)
 !
-      use calypso_mpi_int
+      use calypso_mpi_int8
 !
       integer(kind = kint_gl), intent(in) :: num_local
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
@@ -193,9 +192,7 @@
       integer(kind = kint) :: ip
 !
 !
-      call MPI_Allgather(num_local, 1, CALYPSO_GLOBAL_INT,              &
-     &    num_global, 1, CALYPSO_GLOBAL_INT, CALYPSO_COMM,              &
-     &    ierr_MPI)
+      call calypso_mpi_allgather_one_int8(num_local, num_global)
 !
       IO_param%istack_merged(0) = 0
       do ip = 1, IO_param%nprocs_in

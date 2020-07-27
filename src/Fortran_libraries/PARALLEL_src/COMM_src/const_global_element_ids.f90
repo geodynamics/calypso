@@ -31,6 +31,8 @@
 !
       subroutine count_number_of_node_stack(nnod, istack_nod_list)
 !
+      use calypso_mpi_int
+!
       integer(kind = kint), intent(in) :: nnod
       integer(kind = kint_gl), intent(inout)                            &
      &            :: istack_nod_list(0:nprocs)
@@ -43,8 +45,7 @@
       allocate(nnod_list_gl(nprocs))
       nnod_list_gl = 0
 !
-      call MPI_Allgather(nnod, 1, CALYPSO_INTEGER,                      &
-     &    nnod_list_gl, 1, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allgather_one_int(nnod, nnod_list_gl)
 !
       istack_nod_list(0) = 0
       do ip = 1, nprocs
@@ -59,6 +60,8 @@
 !
       subroutine count_number_of_node_stack4(nnod, istack_nod_list)
 !
+      use calypso_mpi_int
+!
       integer(kind = kint), intent(in) :: nnod
       integer(kind = kint), intent(inout) :: istack_nod_list(0:nprocs)
 !
@@ -70,8 +73,7 @@
       allocate(nnod_list_gl(nprocs))
       nnod_list_gl = 0
 !
-      call MPI_Allgather(nnod, 1, CALYPSO_INTEGER,                      &
-     &    nnod_list_gl, 1, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allgather_one_int(nnod, nnod_list_gl)
 !
       istack_nod_list(0) = 0
       do ip = 1, nprocs
@@ -129,6 +131,7 @@
       subroutine check_element_position(txt, nele, x_ele, e_comm)
 !
       use t_comm_table
+      use calypso_mpi_int
       use solver_SR_type
 !
       character(len=kchara), intent(in) :: txt
@@ -178,8 +181,7 @@
         end if
       end do
 !
-      call mpi_Allreduce(iflag, iflag_gl, 1, CALYPSO_INTEGER, MPI_SUM,  &
-     &     CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_one_int(iflag, iflag_gl, MPI_SUM)
       if(iflag_gl .eq. 0 .and. my_rank .eq. 0) write(*,*)               &
      &     trim(txt), ' position is successfully syncronizad'
 !

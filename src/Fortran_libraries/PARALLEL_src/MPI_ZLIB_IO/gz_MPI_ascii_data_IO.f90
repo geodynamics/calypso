@@ -44,6 +44,7 @@
 !
       subroutine gz_mpi_write_charahead(IO_param, ilength, chara_dat)
 !
+      use calypso_mpi_int8
       use zlib_convert_text
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
@@ -62,8 +63,7 @@
         call calypso_mpi_seek_write_gz(IO_param%id_file, ioffset, zbuf)
         call dealloc_zip_buffer(zbuf)
       end if
-      call MPI_BCAST(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,          &
-     &    0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int8(zbuf%ilen_gzipped, 0)
       IO_param%ioff_gl = IO_param%ioff_gl + zbuf%ilen_gzipped
 !
       end subroutine gz_mpi_write_charahead
@@ -158,6 +158,9 @@
 !
       function gz_mpi_read_charahead(IO_param, ilength)
 !
+      use calypso_mpi_int8
+      use calypso_mpi_char
+      use transfer_to_long_integers
       use zlib_convert_text
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
@@ -177,10 +180,9 @@
         call infleate_characters(ilength, gz_mpi_read_charahead, zbuf)
       end if
 !
-      call MPI_BCAST(gz_mpi_read_charahead, ilength,                    &
-     &    CALYPSO_CHARACTER, 0,  CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,          &
-     &    0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_character                                  &
+     &   (gz_mpi_read_charahead, cast_long(ilength), 0)
+      call calypso_mpi_bcast_one_int8(zbuf%ilen_gzipped, 0)
       IO_param%ioff_gl = IO_param%ioff_gl + zbuf%ilen_gzipped
 !
       end function gz_mpi_read_charahead
@@ -219,6 +221,7 @@
 !
       subroutine gz_mpi_skip_header(IO_param, ilength)
 !
+      use calypso_mpi_int8
       use zlib_convert_text
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
@@ -237,8 +240,7 @@
         call infleate_skip_header(ilength, zbuf)
       end if
 !
-      call MPI_BCAST(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,          &
-     &    0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int8(zbuf%ilen_gzipped, 0)
       IO_param%ioff_gl = IO_param%ioff_gl + zbuf%ilen_gzipped
 !
       end subroutine gz_mpi_skip_header

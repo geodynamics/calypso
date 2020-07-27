@@ -59,7 +59,7 @@
 !
       if(iflag_FFT .eq. iflag_UNDEFINED_FFT) then
         call s_select_fourier_transform(ncomp, sph_rtp, comm_rtp,       &
-     &     n_WS, n_WR, WS, WR, WK_FFTs)
+     &      SR_r1%n_WS, SR_r1%n_WR, SR_r1%WS, SR_r1%WR, WK_FFTs)
         iflag_FFT = iflag_selected
       end if
 !
@@ -148,7 +148,7 @@
       subroutine test_fourier_trans_vector(ncomp, sph_rtp, comm_rtp,    &
      &          n_WS, n_WR, WS, WR, X_rtp, WK_FFTs, etime_fft)
 !
-      use calypso_mpi
+      use calypso_mpi_real
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_comm_tbl), intent(in) :: comm_rtp
@@ -180,8 +180,7 @@
       if(iflag_debug .gt. 0) write(*,*) 'finalize_sph_FFT_select'
       call finalize_sph_FFT_select(WK_FFTs)
 !
-      call MPI_allREDUCE (endtime, etime_fft, 1,                        &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_one_real(endtime, etime_fft, MPI_SUM)
       etime_fft = etime_fft / dble(nprocs)
 !
       end subroutine test_fourier_trans_vector

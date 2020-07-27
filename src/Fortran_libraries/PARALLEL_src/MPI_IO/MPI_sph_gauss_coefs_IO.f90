@@ -111,7 +111,7 @@
      &        picked%num_sph_mode, picked%radius_gl(1), char(10),       &
      &        hd_time_label()
 !
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, ilen_h, timebuf)
       end if
       IO_param%ioff_gl = IO_param%ioff_gl + ilen_h
@@ -128,7 +128,7 @@
           len_each = len_trim(picked%gauss_mode_name_lc(i)) + 4
           write(textbuf,'(a,a4)') trim(picked%gauss_mode_name_lc(i)),   &
      &                           '    '
-          call calypso_mpi_seek_write_chara                             &
+          call mpi_write_one_chara_b                                    &
      &       (IO_param%id_file, ioffset, len_each, textbuf)
         end do
       end if
@@ -137,7 +137,7 @@
 !
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, 1, char(10))
       end if
       IO_param%ioff_gl = IO_param%ioff_gl + ione
@@ -182,7 +182,7 @@
         ioffset = IO_param%ioff_gl
         timebuf = picked_gauss_head(time_d%i_time_step, time_d%time)
 !
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, ilength, timebuf)
       end if
       IO_param%ioff_gl = IO_param%ioff_gl + ilength
@@ -203,7 +203,7 @@
           write(pickedbuf(inum),'(1pE25.14e3)') d_rj_out(inum)
         end do
 !
-        call calypso_mpi_seek_wrt_mul_chara                             &
+        call mpi_write_mul_chara_b                                      &
      &     (IO_param%id_file, ioffset, ilen_n, num, pickedbuf)
         deallocate(d_rj_out, pickedbuf)
       end if
@@ -214,7 +214,7 @@
         ioffset = IO_param%ioff_gl
         write(timebuf,'(a1)') char(10)
 !
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, 1, timebuf)
       end if
       IO_param%ioff_gl = IO_param%ioff_gl + ione

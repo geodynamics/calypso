@@ -88,7 +88,6 @@
 !
       use m_solver_SR
       use skip_comment_f
-      use calypso_solver_SR
 !
       character(len = kchara), intent(in) :: import_ctl
 !
@@ -109,6 +108,7 @@
       subroutine check_calypso_sph_buf_N                                &
      &         (NB, npe_send, istack_send, npe_recv, istack_recv)
 !
+      use t_solver_SR
       use m_solver_SR
       use set_to_send_buffer
 !
@@ -121,8 +121,8 @@
       integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
 !
 !
-      call resize_work_4_SR(NB, npe_send, npe_recv,                     &
-     &      istack_send(npe_send), istack_recv(npe_recv))
+      call resize_work_SR(NB, npe_send, npe_recv,                       &
+     &    istack_send(npe_send), istack_recv(npe_recv), SR_sig1, SR_r1)
 !
       end subroutine check_calypso_sph_buf_N
 !
@@ -149,9 +149,10 @@
 !
       if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+2)
       call calypso_send_recv_core                                       &
-     &       (NB, npe_send, isend_self, id_pe_send, istack_send,        &
-     &            npe_recv, irecv_self, id_pe_recv, istack_recv)
-      call clear_addtional_SR_recv(NB, istack_recv(npe_recv), WR)
+     &   (NB, npe_send, isend_self, id_pe_send, istack_send,            &
+     &        npe_recv, irecv_self, id_pe_recv, istack_recv,            &
+     &        SR_sig1, SR_r1)
+      call clear_addtional_SR_recv(NB, istack_recv(npe_recv), SR_r1%WR)
       if(iflag_CSR_time) call end_elapsed_time(ist_elapsed_CSR+2)
 !
       end subroutine sel_calypso_sph_comm_N

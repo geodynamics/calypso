@@ -99,7 +99,8 @@
      &          nlayer_ICB, ar_1d_rj, is_velo,                          &
      &          nnod_rj, ntot_phys_rj, d_rj, rotate_icore)
 !
-      use calypso_mpi
+      use calypso_mpi_real
+      use transfer_to_long_integers
 !
       integer(kind = kint), intent(in) :: idx_rj_degree_one(-1:1)
       integer(kind = kint), intent(in) :: nidx_rj(2)
@@ -126,8 +127,8 @@
         end if
       end do
 !
-      call MPI_allREDUCE (rotate_ic_local, rotate_icore, 3,             &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_real                                   &
+     &   (rotate_ic_local, rotate_icore, cast_long(3),  MPI_SUM)
 !
       end subroutine pick_inner_core_rotation
 !
@@ -137,7 +138,8 @@
      &          nidx_rj, nlayer_ICB, radius_1d_rj_r, is_lorentz,        &
      &          nnod_rj, ntot_phys_rj, d_rj, m_torque_icore)
 !
-      use calypso_mpi
+      use calypso_mpi_real
+      use transfer_to_long_integers
 !
       integer(kind = kint), intent(in) :: idx_rj_degree_one(-1:1)
       integer(kind = kint), intent(in) :: nidx_rj(2)
@@ -165,8 +167,8 @@
         end if
       end do
 !
-      call MPI_allREDUCE (m_torque_local, m_torque_icore, 3,            &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_real                                   &
+     &   (m_torque_local, m_torque_icore, cast_long(3), MPI_SUM)
 !
       end subroutine pick_mag_torque_inner_core
 !

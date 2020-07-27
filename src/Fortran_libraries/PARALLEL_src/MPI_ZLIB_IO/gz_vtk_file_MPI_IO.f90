@@ -160,6 +160,7 @@
 !
       subroutine gz_write_vtk_header_mpi(id_vtk, ioff_gl, header_txt)
 !
+      use calypso_mpi_int8
       use zlib_convert_text
 !
       integer(kind = kint_gl), intent(inout) :: ioff_gl
@@ -178,8 +179,7 @@
         call calypso_mpi_seek_write_gz(id_vtk, ioffset, zbuf)
         call dealloc_zip_buffer(zbuf)
       end if
-      call MPI_BCAST(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,          &
-     &    0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int8(zbuf%ilen_gzipped, 0)
       ioff_gl = ioff_gl + zbuf%ilen_gzipped
 !
       end subroutine gz_write_vtk_header_mpi
@@ -249,6 +249,7 @@
       subroutine gz_write_vtk_tensor_mpi(id_vtk, ioff_gl,               &
      &          nnod, vect, istack_merged_intnod)
 !
+      use calypso_mpi_int8
       use zlib_cvt_vtk_data
 !
       integer(kind = kint_gl), intent(inout) :: ioff_gl
@@ -271,9 +272,8 @@
 !
       call defleate_vtk_tensor(nnod, num, vect, zbuf)
 !
-      call MPI_Allgather(zbuf%ilen_gzipped, 1, CALYPSO_GLOBAL_INT,      &
-     &    ilen_gzipped_list(1), 1, CALYPSO_GLOBAL_INT,                  &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allgather_one_int8                               &
+     &   (zbuf%ilen_gzipped, ilen_gzipped_list(1))
       ioffset = int(ioff_gl)
       do ip = 1, my_rank
         ioffset = ioffset + ilen_gzipped_list(ip)

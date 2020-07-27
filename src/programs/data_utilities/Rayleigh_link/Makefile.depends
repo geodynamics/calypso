@@ -4,7 +4,7 @@ convert_from_rayleigh_rst.o: $(RAYLEIGH_LINK_DIR)/convert_from_rayleigh_rst.f90 
 	$(F90) -c $(F90OPTFLAGS) $<
 main_cvt_from_rayleigh_sph.o: $(RAYLEIGH_LINK_DIR)/main_cvt_from_rayleigh_sph.f90 m_precision.o calypso_mpi.o analyzer_rayleigh_cvt_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<
-rayleigh_restart_IO.o: $(RAYLEIGH_LINK_DIR)/rayleigh_restart_IO.f90 m_precision.o m_constants.o t_field_data_IO.o t_rayleigh_restart_IO.o t_base_field_labels.o t_explicit_term_labels.o set_parallel_file_name.o rayleigh99_rst_param_IO.o calypso_mpi.o delete_data_files.o
+rayleigh_restart_IO.o: $(RAYLEIGH_LINK_DIR)/rayleigh_restart_IO.f90 m_precision.o m_constants.o t_field_data_IO.o t_rayleigh_restart_IO.o t_base_field_labels.o t_explicit_term_labels.o set_parallel_file_name.o rayleigh99_rst_param_IO.o calypso_mpi.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o delete_data_files.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_convert_from_rayleigh.o: $(RAYLEIGH_LINK_DIR)/t_convert_from_rayleigh.f90 m_precision.o m_constants.o calypso_mpi.o m_machine_parameter.o m_file_format_switch.o r_interpolate_marged_sph.o t_SPH_mesh_field_data.o t_time_data.o t_field_data_IO.o t_control_data_4_merge.o t_control_param_assemble.o t_spectr_data_4_assemble.o new_SPH_restart.o parallel_assemble_sph.o copy_rj_phys_data_4_IO.o assemble_sph_fields.o set_control_newsph.o rayleigh_restart_IO.o field_IO_select.o MPI_read_rayleigh_restart.o calypso_mpi_real.o t_spheric_rj_data.o t_phys_data.o
 	$(F90) -c $(F90OPTFLAGS) $<

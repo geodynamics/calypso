@@ -46,6 +46,7 @@
 !
       use t_spheric_rj_data
       use t_pickup_sph_spectr_data
+      use calypso_mpi_int
 !
       integer(kind = kint), intent(in) :: iflag_center
       integer(kind = kint), intent(in) :: l_truncation
@@ -77,10 +78,8 @@
       if(picked%idx_out(0,4) .gt. 0) then 
         picked%ntot_pick_spectr_lc = picked%ntot_pick_spectr_lc + 1
       end if
-      call MPI_Allgather                                                &
-     &   (picked%ntot_pick_spectr_lc, 1, CALYPSO_INTEGER,               &
-     &    picked%istack_picked_spec_lc(1), 1, CALYPSO_INTEGER,          &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allgather_one_int                                &
+     &   (picked%ntot_pick_spectr_lc, picked%istack_picked_spec_lc(1))
 !
       picked%istack_picked_spec_lc(0) = 0
       do i = 1, nprocs

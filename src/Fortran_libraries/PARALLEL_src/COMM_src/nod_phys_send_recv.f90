@@ -73,14 +73,15 @@
       subroutine init_send_recv(nod_comm)
 !
       use m_phys_constants
+      use t_solver_SR
       use m_solver_SR
 !
       type(communication_table), intent(in) :: nod_comm
 !
 !
-      call resize_work_4_SR                                             &
+      call resize_work_SR                                               &
      &   (n_sym_tensor, nod_comm%num_neib, nod_comm%num_neib,           &
-     &    nod_comm%ntot_export, nod_comm%ntot_import)
+     &    nod_comm%ntot_export, nod_comm%ntot_import, SR_sig1, SR_r1)
       call resize_iwork_SR_t(nod_comm%num_neib, nod_comm%num_neib,      &
      &    nod_comm%ntot_export, nod_comm%ntot_import, SR_sig1, SR_i1)
       call resize_i8work_SR(nod_comm%num_neib, nod_comm%num_neib,       &

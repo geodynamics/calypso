@@ -167,7 +167,6 @@
      &         (nitem_SR, CALYPSO_SUB_COMM, SR_i)
 !
       use calypso_mpi
-      use m_solver_SR
 !
       integer, intent(in)  :: CALYPSO_SUB_COMM
       integer(kind = kint), intent(in) :: nitem_SR

@@ -345,9 +345,12 @@
       subroutine read_field_header_gz_mpi(id_fld, num_pe, id_rank,      &
      &          ioff_gl, nnod, num_field, istack_merged)
 !
+      use calypso_mpi_int
+      use calypso_mpi_int8
       use field_data_IO
       use field_data_MPI_IO
       use gz_field_data_MPI_IO
+      use transfer_to_long_integers
 !
       integer, intent(in) ::  id_fld
       integer(kind = kint_gl), intent(inout) :: ioff_gl
@@ -373,10 +376,9 @@
       if(my_rank .eq. 0) call read_field_num_buffer                     &
      &                      (textbuf_c, num_field)
 !
-      call MPI_BCAST(istack_merged, int(num_pe+1),                      &
-     &    CALYPSO_GLOBAL_INT, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(num_field, 1, CALYPSO_INTEGER, 0,                  &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_int8                                       &
+     &   (istack_merged, cast_long(num_pe+1), 0)
+      call calypso_mpi_bcast_one_int(num_field, 0)
 !
       call sync_field_header_mpi(num_pe, id_rank, nnod,                 &
      &    istack_merged)
@@ -388,9 +390,11 @@
       subroutine read_field_num_gz_mpi                                  &
      &         (id_fld, ioff_gl, num_field, ncomp_field)
 !
+      use calypso_mpi_int
       use field_data_IO
       use field_data_MPI_IO
       use gz_field_data_MPI_IO
+      use transfer_to_long_integers
 !
       integer, intent(in) ::  id_fld
       integer(kind = kint_gl), intent(inout) :: ioff_gl
@@ -408,8 +412,7 @@
       if(my_rank .eq. 0) call read_field_comp_buffer                    &
      &                      (textbuf, num_field, ncomp_field)
 !
-      call MPI_BCAST(ncomp_field, int(num_field), CALYPSO_INTEGER, 0,   &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_int(ncomp_field, cast_long(num_field), 0)
 !
       end subroutine read_field_num_gz_mpi
 !

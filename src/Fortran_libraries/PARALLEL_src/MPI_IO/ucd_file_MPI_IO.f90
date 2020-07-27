@@ -192,8 +192,8 @@
         dat_1(1:ntot_comp) = d_nod(inod,1:ntot_comp)
         textbuf_n(inod) = ucd_each_field(inod_gl, ntot_comp, dat_1)
       end do
-      call calypso_mpi_seek_wrt_mul_chara(id_vtk, ioffset, ilen_n,      &
-     &    num, textbuf_n(1))
+      call mpi_write_mul_chara_b                                        &
+     &   (id_vtk, ioffset, ilen_n, num, textbuf_n(1))
 !
       end subroutine write_ucd_data_mpi
 !
@@ -243,8 +243,8 @@
         dat_1(1:n_vector) = xx(inod,1:n_vector)
         textbuf_n(inod) = ucd_each_field(inod_gl, n_vector, dat_1)
       end do
-      call calypso_mpi_seek_wrt_mul_chara(id_vtk, ioffset, ilen_n,      &
-     &    num, textbuf_n)
+      call mpi_write_mul_chara_b                                        &
+     &   (id_vtk, ioffset, ilen_n, num, textbuf_n)
 !
       end subroutine write_ucd_node_mpi
 !
@@ -286,8 +286,8 @@
         ie0(1:nnod_ele) = ie(iele,1:nnod_ele)
         textbuf_e(iele) = ucd_each_connect(iele_gl, nnod_ele,ie0)
       end do
-      call calypso_mpi_seek_wrt_mul_chara(id_vtk, ioffset, ilen_e,      &
-     &    nele, textbuf_e)
+      call mpi_write_mul_chara_b                                        &
+     &   (id_vtk, ioffset, ilen_e, nele, textbuf_e)
 !
       end subroutine write_ucd_connect_mpi
 !

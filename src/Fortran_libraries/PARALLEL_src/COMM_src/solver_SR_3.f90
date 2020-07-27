@@ -9,13 +9,16 @@
 !!        in overlapped partitioning
 !!
 !!@verbatim
-!!      subroutine  SOLVER_SEND_RECV_3                                  &
-!!     &          (N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,      &
-!!     &                                 STACK_EXPORT, NOD_EXPORT, X)
-!!      subroutine  solver_send_recv_3x3                                &
-!!     &          (N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,      &
+!!      subroutine  SOLVER_SEND_RECV_3(N, NEIBPETOT, NEIBPE,            &
+!!     &                               STACK_IMPORT, NOD_IMPORT,        &
+!!     &                               STACK_EXPORT, NOD_EXPORT,        &
+!!     &                               SR_sig, SR_r, X)
+!!      subroutine  solver_send_recv_3x3(N, NEIBPETOT, NEIBPE,          &
+!!     &                                 STACK_IMPORT, NOD_IMPORT,      &
 !!     &                                 STACK_EXPORT, NOD_EXPORT,      &
-!!     &           X1, X2, X3)
+!!     &                                 SR_sig, SR_r, X1, X2, X3)
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
 !!
 !!@n @param  N     Number of data points
@@ -40,6 +43,8 @@
 !
       use m_precision
       use m_constants
+      use t_solver_SR
+      use calypso_mpi
 !
       implicit none
 !
@@ -52,12 +57,10 @@
 !C
 !C*** SOLVER_SEND_RECV_3
 !C
-      subroutine  SOLVER_SEND_RECV_3                                    &
-     &         ( N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,        &
-     &                                 STACK_EXPORT, NOD_EXPORT, X)
-
-      use calypso_mpi
-      use m_solver_SR
+      subroutine  SOLVER_SEND_RECV_3(N, NEIBPETOT, NEIBPE,              &
+     &                               STACK_IMPORT, NOD_IMPORT,          &
+     &                               STACK_EXPORT, NOD_EXPORT,          &
+     &                               SR_sig, SR_r, X)
 
 !>       number of nodes
       integer(kind=kint )                , intent(in)   ::  N
@@ -78,12 +81,18 @@
 !>       communicated result vector
       real   (kind=kreal), dimension(3*N), intent(inout):: X
 !
+!>      Structure of communication flags
+      type(send_recv_status), intent(inout) :: SR_sig
+!>      Structure of communication buffer for 8-byte real
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
       integer (kind = kint) :: neib, istart, iend, k, ii
       integer :: inum
 !
 !
-      call resize_work_4_SR(ithree, NEIBPETOT, NEIBPETOT,               &
-     &    STACK_EXPORT(NEIBPETOT), STACK_IMPORT(NEIBPETOT) )
+      call resize_work_SR(ithree, NEIBPETOT, NEIBPETOT,                 &
+     &    STACK_EXPORT(NEIBPETOT), STACK_IMPORT(NEIBPETOT),             &
+     &    SR_sig, SR_r)
 !
 !C
 !C-- SEND
@@ -94,15 +103,15 @@
         
         do k= istart, iend
                ii   = 3*NOD_EXPORT(k)
-           WS(3*k-2)= X(ii-2)
-           WS(3*k-1)= X(ii-1)
-           WS(3*k  )= X(ii  )
+           SR_r%WS(3*k-2)= X(ii-2)
+           SR_r%WS(3*k-1)= X(ii-1)
+           SR_r%WS(3*k  )= X(ii  )
         enddo
         istart= 3 * STACK_EXPORT(neib-1) + 1
         inum  = int(3 * ( STACK_EXPORT(neib  ) - STACK_EXPORT(neib-1)))
-        call MPI_ISEND(WS(istart), inum, CALYPSO_REAL,                  &
-     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM, req1(neib),  &
-     &                 ierr_MPI)
+        call MPI_ISEND(SR_r%WS(istart), inum, CALYPSO_REAL,             &
+     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM,              &
+     &                 SR_sig%req1(neib), ierr_MPI)
       enddo
 
 !C
@@ -110,37 +119,36 @@
       do neib= 1, NEIBPETOT
         istart= 3 * STACK_IMPORT(neib-1) + 1
         inum  = int(3 * ( STACK_IMPORT(neib  ) - STACK_IMPORT(neib-1)))
-        call MPI_IRECV(WR(istart), inum, CALYPSO_REAL,                  &
-     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM, req2(neib),  &
-     &                 ierr_MPI)
+        call MPI_IRECV(SR_r%WR(istart), inum, CALYPSO_REAL,             &
+     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM,              &
+     &                 SR_sig%req2(neib), ierr_MPI)
       enddo
 
-      call MPI_WAITALL(int(NEIBPETOT), req2(1), sta2(1,1), ierr_MPI)
+      call MPI_WAITALL                                                  &
+     &   (int(NEIBPETOT), SR_sig%req2(1), SR_sig%sta2(1,1), ierr_MPI)
    
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1) + 1
         iend  = STACK_IMPORT(neib  )
       do k= istart, iend
           ii   = 3*NOD_IMPORT(k)
-        X(ii-2)= WR(3*k-2)
-        X(ii-1)= WR(3*k-1)
-        X(ii  )= WR(3*k  )
+        X(ii-2)= SR_r%WR(3*k-2)
+        X(ii-1)= SR_r%WR(3*k-1)
+        X(ii  )= SR_r%WR(3*k  )
       enddo
       enddo
 
-      call MPI_WAITALL (int(NEIBPETOT), req1(1), sta1(1,1), ierr_MPI)
+      call MPI_WAITALL                                                  &
+     &   (int(NEIBPETOT), SR_sig%req1(1), SR_sig%sta1(1,1), ierr_MPI)
 
       end subroutine solver_send_recv_3
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine  solver_send_recv_3x3                                  &
-     &         ( N, NEIBPETOT, NEIBPE, STACK_IMPORT, NOD_IMPORT,        &
+      subroutine  solver_send_recv_3x3(N, NEIBPETOT, NEIBPE,            &
+     &                                 STACK_IMPORT, NOD_IMPORT,        &
      &                                 STACK_EXPORT, NOD_EXPORT,        &
-     &           X1, X2, X3)
-
-      use calypso_mpi
-      use m_solver_SR
+     &                                 SR_sig, SR_r, X1, X2, X3)
 !
       integer(kind=kint )                , intent(in)   ::  N
       integer(kind=kint )                , intent(in)   ::  NEIBPETOT
@@ -155,12 +163,18 @@
       real   (kind=kreal), dimension(3*N), intent(inout):: X2
       real   (kind=kreal), dimension(3*N), intent(inout):: X3
 !
+!>      Structure of communication flags
+      type(send_recv_status), intent(inout) :: SR_sig
+!>      Structure of communication buffer for 8-byte real
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
       integer (kind = kint) :: neib, istart, iend, k, ii
       integer :: inum
 !
 !
-      call resize_work_4_SR(inine, NEIBPETOT, NEIBPETOT,                &
-     &    STACK_EXPORT(NEIBPETOT), STACK_IMPORT(NEIBPETOT) )
+      call resize_work_SR(inine, NEIBPETOT, NEIBPETOT,                  &
+     &    STACK_EXPORT(NEIBPETOT), STACK_IMPORT(NEIBPETOT),             &
+     &    SR_sig, SR_r)
 !C
 !C-- SEND
       
@@ -170,21 +184,21 @@
         
         do k= istart, iend
                ii   = 3*NOD_EXPORT(k)
-           WS(9*k-8)= X1(ii-2)
-           WS(9*k-7)= X1(ii-1)
-           WS(9*k-6)= X1(ii  )
-           WS(9*k-5)= X2(ii-2)
-           WS(9*k-4)= X2(ii-1)
-           WS(9*k-3)= X2(ii  )
-           WS(9*k-2)= X3(ii-2)
-           WS(9*k-1)= X3(ii-1)
-           WS(9*k  )= X3(ii  )
+           SR_r%WS(9*k-8)= X1(ii-2)
+           SR_r%WS(9*k-7)= X1(ii-1)
+           SR_r%WS(9*k-6)= X1(ii  )
+           SR_r%WS(9*k-5)= X2(ii-2)
+           SR_r%WS(9*k-4)= X2(ii-1)
+           SR_r%WS(9*k-3)= X2(ii  )
+           SR_r%WS(9*k-2)= X3(ii-2)
+           SR_r%WS(9*k-1)= X3(ii-1)
+           SR_r%WS(9*k  )= X3(ii  )
         enddo
         istart= 9 * STACK_EXPORT(neib-1) + 1
         inum  = int(9 * (STACK_EXPORT(neib  ) - STACK_EXPORT(neib-1)))
-        call MPI_ISEND(WS(istart), inum, CALYPSO_REAL,                  &
-     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM, req1(neib),  &
-     &                 ierr_MPI)
+        call MPI_ISEND(SR_r%WS(istart), inum, CALYPSO_REAL,             &
+     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM,              &
+     &                 SR_sig%req1(neib), ierr_MPI)
       enddo
 
 !C
@@ -192,31 +206,33 @@
       do neib= 1, NEIBPETOT
         istart= 9 * STACK_IMPORT(neib-1) + 1
         inum  = int(9 * ( STACK_IMPORT(neib  ) - STACK_IMPORT(neib-1)))
-        call MPI_IRECV(WR(istart), inum, CALYPSO_REAL,                  &
-     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM, req2(neib),  &
-     &                 ierr_MPI)
+        call MPI_IRECV(SR_r%WR(istart), inum, CALYPSO_REAL,             &
+     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM,              &
+     &                 SR_sig%req2(neib), ierr_MPI)
       enddo
 
-      call MPI_WAITALL(int(NEIBPETOT), req2(1), sta2(1,1), ierr_MPI)
+      call MPI_WAITALL                                                  &
+     &   (int(NEIBPETOT), SR_sig%req2(1), SR_sig%sta2(1,1), ierr_MPI)
    
       do neib= 1, NEIBPETOT
         istart= STACK_IMPORT(neib-1) + 1
         iend  = STACK_IMPORT(neib  )
         do k= istart, iend
             ii   = 3*NOD_IMPORT(k)
-          X1(ii-2)= WR(9*k-8)
-          X1(ii-1)= WR(9*k-7)
-          X1(ii  )= WR(9*k-6)
-          X2(ii-2)= WR(9*k-5)
-          X2(ii-1)= WR(9*k-4)
-          X2(ii  )= WR(9*k-3)
-          X3(ii-2)= WR(9*k-2)
-          X3(ii-1)= WR(9*k-1)
-          X3(ii  )= WR(9*k  )
+          X1(ii-2)= SR_r%WR(9*k-8)
+          X1(ii-1)= SR_r%WR(9*k-7)
+          X1(ii  )= SR_r%WR(9*k-6)
+          X2(ii-2)= SR_r%WR(9*k-5)
+          X2(ii-1)= SR_r%WR(9*k-4)
+          X2(ii  )= SR_r%WR(9*k-3)
+          X3(ii-2)= SR_r%WR(9*k-2)
+          X3(ii-1)= SR_r%WR(9*k-1)
+          X3(ii  )= SR_r%WR(9*k  )
         enddo
       enddo
 
-      call MPI_WAITALL (int(NEIBPETOT), req1(1), sta1(1,1), ierr_MPI)
+      call MPI_WAITALL                                                  &
+     &   (int(NEIBPETOT), SR_sig%req1(1), SR_sig%sta1(1,1), ierr_MPI)
 !
       end subroutine solver_send_recv_3x3
 !

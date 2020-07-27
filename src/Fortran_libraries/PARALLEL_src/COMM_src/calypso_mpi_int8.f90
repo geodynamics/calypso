@@ -49,10 +49,22 @@
 !!        integer(kind = kint_gl), intent(in) ::    i8sendbuf(n_send)
 !!        integer(kind = kint_gl), intent(inout)                        &
 !!     &                        :: i8recvbuf(nprocs*n_recv)
-!!@endverbatim
 !!
-!!@n @param  icode       error code
-!!@n @param  message    message to output
+!!      subroutine calypso_mpi_seek_write_int8                          &
+!!     &         (id_mpi_file, ioffset, num, i8_vector, sta_IO)
+!!        integer, intent(in) ::  id_mpi_file
+!!        integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
+!!        integer(kind = kint_gl), intent(in) :: num
+!!        integer(kind = kint_gl), intent(in) :: i8_vector(num)
+!!        integer, intent(inout) :: sta_IO(MPI_STATUS_SIZE)
+!!      subroutine calypso_mpi_seek_read_int8                           &
+!!     &         (id_mpi_file, ioffset, num, i8_vector, sta_IO)
+!!        integer, intent(in) ::  id_mpi_file
+!!        integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
+!!        integer(kind = kint_gl), intent(in) :: num
+!!        integer(kind = kint_gl), intent(inout) :: i8_vector(num)
+!!        integer, intent(inout) :: sta_IO(MPI_STATUS_SIZE)
+!!@endverbatim
 !
       module calypso_mpi_int8
 !
@@ -210,7 +222,7 @@
 !
 !
       i8_lc(1) = i8sendbuf
-      call MPI_AllGather(i8_lc, 1, CALYPSO_GLOBAL_INT,                  &
+      call MPI_AllGather(i8_lc,     1, CALYPSO_GLOBAL_INT,              &
      &                   i8recvbuf, 1, CALYPSO_GLOBAL_INT,              &
      &                   CALYPSO_COMM, ierr_MPI)
 !
@@ -228,10 +240,71 @@
 !
 !
       call MPI_AllGather(i8sendbuf, int(n_send), CALYPSO_GLOBAL_INT,    &
-     &    i8recvbuf, int(n_recv), CALYPSO_GLOBAL_INT, CALYPSO_COMM,     &
-     &    ierr_MPI)
+     &                   i8recvbuf, int(n_recv), CALYPSO_GLOBAL_INT,    &
+     &                   CALYPSO_COMM, ierr_MPI)
 !
       end subroutine calypso_mpi_allgather_int8
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_seek_write_int8                            &
+     &         (id_mpi_file, ioffset, num, i8_vector, sta_IO)
+!
+      integer, intent(in) ::  id_mpi_file
+      integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
+      integer(kind = kint_gl), intent(in) :: num
+      integer(kind = kint_gl), intent(in) :: i8_vector(num)
+      integer, intent(inout) :: sta_IO(MPI_STATUS_SIZE)
+!
+      integer :: ilen_in
+      integer(kind = kint_gl) :: l8_byte, ist
+!
+!
+      ist = 0
+      l8_byte = ioffset
+      do
+        ilen_in = int(min(num-ist, huge_20))
+        call MPI_FILE_SEEK                                              &
+     &     (id_mpi_file, l8_byte, MPI_SEEK_SET, ierr_MPI)
+        call MPI_FILE_WRITE(id_mpi_file, i8_vector(ist+1), ilen_in,     &
+     &      CALYPSO_GLOBAL_INT, sta_IO, ierr_MPI)
+        ist = ist + ilen_in
+        l8_byte = l8_byte + ilen_in*kint_gl
+        if(ist .ge. num) exit
+      end do
+!
+      end subroutine calypso_mpi_seek_write_int8
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_seek_read_int8                             &
+     &         (id_mpi_file, ioffset, num, i8_vector, sta_IO)
+!
+      integer, intent(in) ::  id_mpi_file
+      integer(kind = MPI_OFFSET_KIND), intent(in) :: ioffset
+      integer(kind = kint_gl), intent(in) :: num
+      integer(kind = kint_gl), intent(inout) :: i8_vector(num)
+      integer, intent(inout) :: sta_IO(MPI_STATUS_SIZE)
+!
+      integer(kind = kint) :: ilen_in
+      integer(kind = kint_gl) :: l8_byte, ist
+!
+!
+      ist = 0
+      l8_byte = ioffset
+      do
+        ilen_in = int(min(num-ist, huge_20))
+        call MPI_FILE_SEEK                                              &
+     &     (id_mpi_file, l8_byte, MPI_SEEK_SET, ierr_MPI)
+        call MPI_FILE_READ(id_mpi_file, i8_vector(ist+1), ilen_in,      &
+     &      CALYPSO_GLOBAL_INT, sta_IO, ierr_MPI)
+        ist = ist + ilen_in
+        l8_byte = l8_byte + ilen_in*kint_gl
+        if(ist .ge. num) exit
+      end do
+!
+      end subroutine calypso_mpi_seek_read_int8
 !
 !  ---------------------------------------------------------------------
 !

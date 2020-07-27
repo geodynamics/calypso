@@ -171,8 +171,8 @@
         charatmp => textbuf_n(i)
         write(charatmp,fmt_txt) vect(i,1:ncomp), char(10)
       end do
-      call calypso_mpi_seek_wrt_mul_chara(id_vtk, ioffset, ilength,     &
-     &    num, textbuf_n(1))
+      call mpi_write_mul_chara_b                                        &
+     &   (id_vtk, ioffset, ilength, num, textbuf_n(1))
 !
       nullify(charatmp)
 !
@@ -219,8 +219,8 @@
         write(charatmp,fmt_txt)                                         &
      &                    vect(i,3), vect(i,5), vect(i,6), char(10)
       end do
-      call calypso_mpi_seek_wrt_mul_chara(id_vtk, ioffset, ilength,     &
-     &    num3, textbuf_n(1))
+      call mpi_write_mul_chara_b                                        &
+     &   (id_vtk, ioffset, ilength, num3, textbuf_n(1))
 !
       nullify(charatmp)
 !
@@ -261,8 +261,8 @@
         ie0(1:nnod_ele) = ie(iele,1:nnod_ele) - 1
         textbuf_n(iele) = vtk_each_connect(nnod_ele,ie0)
       end do
-      call calypso_mpi_seek_wrt_mul_chara(id_vtk, ioffset, ilength,     &
-     &    nele, textbuf_n(1))
+      call mpi_write_mul_chara_b                                        &
+     &   (id_vtk, ioffset, ilength, nele, textbuf_n(1))
 !
       end subroutine write_vtk_connect_mpi
 !
@@ -297,8 +297,8 @@
       do iele = 1, nele
         textbuf_n(iele) = vtk_each_cell_type(icellid)
       end do
-      call calypso_mpi_seek_wrt_mul_chara(id_vtk, ioffset, ilength,     &
-     &    nele, textbuf_n)
+      call mpi_write_mul_chara_b                                        &
+     &   (id_vtk, ioffset, ilength, nele, textbuf_n)
 !
       end subroutine write_vtk_celltype_mpi
 !

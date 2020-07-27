@@ -506,6 +506,7 @@
       subroutine set_domains_4_spectr_output(sph_rj, pwr)
 !
       use calypso_mpi
+      use calypso_mpi_int4
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(sph_mean_squares), intent(inout) :: pwr
@@ -521,8 +522,7 @@
 !
       ip_lc = 0
       if(sph_rj%idx_rj_degree_zero .gt. 0)  ip_lc = my_rank
-      call MPI_allREDUCE(ip_lc, ip_ave, 1, CALYPSO_FOUR_INT,            &
-     &    MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_one_int4(ip_lc, ip_ave, MPI_SUM)
 !
       pwr%irank_m = -1
       pwr%irank_l = -1

@@ -64,16 +64,15 @@
       subroutine sync_field_time_mpi(t_IO)
 !
       use t_time_data
+      use calypso_mpi_real
+      use calypso_mpi_int
 !
       type(time_data), intent(inout) :: t_IO
 !
 !
-      call MPI_BCAST(t_IO%i_time_step, 1, CALYPSO_INTEGER, 0,           &
-     &    CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(t_IO%time, 1, CALYPSO_REAL, 0,                     &
-     &    CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(t_IO%dt, 1, CALYPSO_REAL, 0,                       &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(t_IO%i_time_step, 0)
+      call calypso_mpi_bcast_one_real(t_IO%time, 0)
+      call calypso_mpi_bcast_one_real(t_IO%dt, 0)
 !
       end subroutine sync_field_time_mpi
 !
@@ -99,14 +98,17 @@
 !
       subroutine sync_field_name_mpi(ilength, field_name)
 !
+      use calypso_mpi_int4
+      use calypso_mpi_char
+      use transfer_to_long_integers
+!
       integer, intent(inout) :: ilength
       character(len=kchara), intent(inout) :: field_name
 !
 !
-      call MPI_BCAST(ilength, 1, CALYPSO_FOUR_INT, 0,                   &
-     &    CALYPSO_COMM, ierr_MPI)
-      call MPI_BCAST(field_name, kchara, CALYPSO_CHARACTER, 0,          &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int4(ilength, 0)
+      call calypso_mpi_bcast_character                                  &
+     &   (field_name, cast_long(kchara), 0)
 !
       end subroutine sync_field_name_mpi
 !
@@ -178,7 +180,7 @@
       ioffset = ioff_gl + ilength * istack_merged(id_rank)
       do inod = 1, nnod
         v1(1:ncomp) = vector(inod,1:ncomp)
-        call calypso_mpi_seek_write_chara(id_fld, ioffset, ilength,     &
+        call mpi_write_one_chara_b(id_fld, ioffset, ilength,            &
      &      vector_textline(ncomp, v1))
       end do
       ioff_gl = ioff_gl + ilength * istack_merged(num_pe)
@@ -208,7 +210,7 @@
 !
       if(my_rank .eq. 0) then
         ioffset = ioff_gl
-        call calypso_mpi_seek_read_lenchara                             &
+        call mpi_read_one_chara_b                                       &
      &     (id_fld, ioffset, len_step_data_buf, textbuf_c)
         call read_step_data_buffer(textbuf_c, iread, t_IO)
 !
@@ -229,8 +231,9 @@
       subroutine read_field_header_mpi(id_fld, num_pe, id_rank,         &
      &          ioff_gl, nnod, num_field, istack_merged)
 !
-      use calypso_mpi_int8
       use m_phys_constants
+      use calypso_mpi_int
+      use calypso_mpi_int8
       use field_data_IO
       use transfer_to_long_integers
 !
@@ -252,7 +255,7 @@
       ilength = int(len(textbuf_d))
       if(my_rank .eq. 0) then
         ioffset = ioff_gl
-        call calypso_mpi_seek_read_lenchara                             &
+        call mpi_read_one_chara_b                                       &
      &     (id_fld, ioffset, ilength, textbuf_d)
         call read_field_istack_nod_buffer                               &
      &     (textbuf_d, num_pe, istack_merged)
@@ -262,7 +265,7 @@
       ilength = len(textbuf_c)
       if(my_rank .eq. 0) then
         ioffset = ioff_gl
-        call calypso_mpi_seek_read_lenchara                             &
+        call mpi_read_one_chara_b                                       &
      &       (id_fld, ioffset, ilength, textbuf_c)
         call read_field_num_buffer(textbuf_c, num_field)
       end if
@@ -270,8 +273,7 @@
 !
       num64 = int(num_pe+1,KIND(num64))
       call calypso_mpi_bcast_int8(istack_merged, num64 , 0)
-      call MPI_BCAST(num_field, 1, CALYPSO_INTEGER, 0,                  &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(num_field, 0)
 !
       call sync_field_header_mpi(num_pe, id_rank, nnod,                 &
      &    istack_merged)
@@ -284,8 +286,10 @@
      &         (id_fld, ioff_gl, num_field, ncomp_field)
 !
       use m_phys_constants
+      use calypso_mpi_int
       use field_data_IO
       use ucd_data_to_buffer
+      use transfer_to_long_integers
 !
       integer(kind = kint_gl), intent(inout) :: ioff_gl
       integer(kind=kint), intent(in) :: num_field
@@ -301,14 +305,13 @@
       ilength = len(charabuf_c)
       if(my_rank .eq. 0) then
         ioffset = ioff_gl
-        call calypso_mpi_seek_read_lenchara                             &
+        call mpi_read_one_chara_b                                       &
      &       (id_fld, ioffset, ilength, charabuf_c)
         call read_field_comp_buffer(charabuf_c, num_field, ncomp_field)
       end if
       ioff_gl = ioff_gl + ilength
 !
-      call MPI_BCAST(ncomp_field, int(num_field), CALYPSO_INTEGER, 0,   &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_int(ncomp_field, cast_long(num_field), 0)
 !
       end subroutine read_field_num_mpi
 !
@@ -333,7 +336,7 @@
       if(my_rank .eq. 0) then
         ioffset = ioff_gl
         ilength = int(len(textbuf_c))
-        call calypso_mpi_seek_read_lenchara                             &
+        call mpi_read_one_chara_b                                       &
      &     (id_fld, ioffset, ilength, textbuf_c)
         call read_each_field_name_buffer                                &
      &     (textbuf_c, field_name, ilength)
@@ -379,7 +382,7 @@
       ioffset = ioff_gl + ilength * istack_merged(id_rank)
 !
       do inod = 1, nnod
-        call calypso_mpi_seek_read_lenchara                             &
+        call mpi_read_one_chara_b                                       &
      &    (id_fld, ioffset, ilength, textbuf_d)
         call read_vector_textline(textbuf_d, ncomp, v1)
         vector(inod,1:ncomp) = v1(1:ncomp)

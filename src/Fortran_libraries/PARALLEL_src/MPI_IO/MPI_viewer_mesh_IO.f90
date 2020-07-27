@@ -70,12 +70,12 @@
 !
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
       if(nnod .le. 0) then
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, 1, char(10))
       else
         do i = 1, nnod
           xx_tmp(1:numdir) = xx(i,1:numdir)
-          call calypso_mpi_seek_write_chara                             &
+          call mpi_write_one_chara_b                                    &
      &       (IO_param%id_file, ioffset, ilength,                       &
      &        int8_and_vector_textline(id_global(i), numdir, xx_tmp))
         end do
@@ -117,16 +117,16 @@
 !
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
       if(num .le. 0) then
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, 1, char(10))
       else if(num .gt. 0) then
         do i = 0, (num-1)/ncolumn - 1
-          call calypso_mpi_seek_write_chara(IO_param%id_file, ioffset,  &
+          call mpi_write_one_chara_b(IO_param%id_file, ioffset,         &
      &        len_multi_6digit_line(ncolumn),                           &
      &        mul_6digit_int_line(ncolumn, int_dat(ncolumn*i+1)))
         end do
         nrest = mod((num-1),ncolumn) + 1
-        call calypso_mpi_seek_write_chara(IO_param%id_file, ioffset,    &
+        call mpi_write_one_chara_b(IO_param%id_file, ioffset,           &
      &      len_multi_6digit_line(nrest),                               &
      &      mul_6digit_int_line(nrest, int_dat(num-nrest+1)))
       end if
@@ -168,12 +168,12 @@
 !
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
       if(nele .le. 0) then
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, 1, char(10))
       else
         do i = 1, nele
           ie_tmp(1:nnod_4_ele) = ie(i,1:nnod_4_ele)
-          call calypso_mpi_seek_write_chara                             &
+          call mpi_write_one_chara_b                                    &
      &       (IO_param%id_file, ioffset, ilength,                       &
      &        int8_and_mul_int_textline(id_global(i),                   &
      &                                  nnod_4_ele, ie_tmp))
@@ -297,16 +297,16 @@
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
       if(num .gt. 0) then
         do i = 0, (num-1)/ncolumn - 1
-          call calypso_mpi_seek_write_chara(IO_param%id_file, ioffset,  &
+          call mpi_write_one_chara_b(IO_param%id_file, ioffset,         &
      &        len_multi_int_textline(ncolumn),                          &
      &        multi_int_textline(ncolumn, int_dat(ncolumn*i+1)))
         end do
         nrest = mod((num-1),ncolumn) + 1
-        call calypso_mpi_seek_write_chara(IO_param%id_file, ioffset,    &
+        call mpi_write_one_chara_b(IO_param%id_file, ioffset,           &
      &      len_multi_int_textline(nrest),                              &
      &      multi_int_textline(nrest, int_dat(num-nrest+1)))
       else
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, ione, char(10))
       end if
 !

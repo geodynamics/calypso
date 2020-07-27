@@ -340,15 +340,17 @@
       subroutine find_position_range(node)
 !
       use t_geometry_data
+      use calypso_mpi_real
+      use transfer_to_long_integers
 !
       type(node_data), intent(inout) :: node
 !
 !
 !  Evaluate range in local domain
-      call MPI_ALLREDUCE(node%xyz_max_lc, node%xyz_max_gl,              &
-     &     3, CALYPSO_REAL, MPI_MAX,CALYPSO_COMM, ierr_MPI)
-      call MPI_ALLREDUCE(node%xyz_min_lc, node%xyz_min_gl,              &
-     &     3, CALYPSO_REAL, MPI_MIN,CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_real(node%xyz_max_lc, node%xyz_max_gl, &
+     &                                cast_long(3), MPI_MAX)
+      call calypso_mpi_allreduce_real(node%xyz_min_lc, node%xyz_min_gl, &
+     &                                cast_long(3), MPI_MIN)
 !
       if(iflag_debug .gt. 0) then
         write(*,*)  'x range: ', node%xyz_min_gl(1), node%xyz_max_gl(1)

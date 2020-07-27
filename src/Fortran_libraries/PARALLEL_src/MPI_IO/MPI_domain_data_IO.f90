@@ -221,7 +221,7 @@
       IO_param%ioff_gl = IO_param%ioff_gl                               &
      &         + IO_param%istack_merged(IO_param%nprocs_in)
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
-        call calypso_mpi_seek_write_chara(IO_param%id_file, ioffset,    &
+        call mpi_write_one_chara_b(IO_param%id_file, ioffset,           &
      &      ilength, multi_int_textline(num, int_dat))
 !
       end subroutine mpi_write_int_vector
@@ -371,16 +371,16 @@
 !
       if(IO_param%id_rank .ge. IO_param%nprocs_in) return
       if(num .le. 0) then
-        call calypso_mpi_seek_write_chara                               &
+        call mpi_write_one_chara_b                                      &
      &     (IO_param%id_file, ioffset, 1, char(10))
       else
         do i = 0, (num-1)/ncolumn - 1
-          call calypso_mpi_seek_write_chara(IO_param%id_file, ioffset,  &
+          call mpi_write_one_chara_b(IO_param%id_file, ioffset,         &
      &        len_multi_int_textline(ncolumn),                          &
      &        multi_int_textline(ncolumn, int_dat(ncolumn*i+1)))
         end do
         nrest = mod((num-1),ncolumn) + 1
-        call calypso_mpi_seek_write_chara(IO_param%id_file, ioffset,    &
+        call mpi_write_one_chara_b(IO_param%id_file, ioffset,           &
      &      len_multi_int_textline(nrest),                              &
      &      multi_int_textline(nrest, int_dat(num-nrest+1)))
       end if

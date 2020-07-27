@@ -83,12 +83,13 @@
 !
       call mhd_spectr_to_sendbuf_wpole                                  &
      &   (sph%sph_rtp%nnod_pole, sph%sph_rj, comms_sph%comm_rj,         &
-     &    rj_fld, n_WS, WS(1), trns_bwd)
+     &    rj_fld, SR_r1%n_WS, SR_r1%WS(1), trns_bwd)
 !
       call sph_b_trans_w_poles(trns_bwd%ncomp, trns_bwd%num_vector,     &
      &    nscalar_trans, sph, comms_sph, trans_p,                       &
-     &    n_WS, n_WR, WS(1), WR(1), trns_bwd%fld_rtp,                   &
-     &    trns_bwd%flc_pole, trns_bwd%fld_pole, WK_sph)
+     &    SR_r1%n_WS, SR_r1%n_WR, SR_r1%WS(1), SR_r1%WR(1),             &
+     &    trns_bwd%fld_rtp, trns_bwd%flc_pole, trns_bwd%fld_pole,       &
+     &    WK_sph)
 !
       end subroutine sph_back_trans_snapshot_MHD
 !
@@ -120,10 +121,11 @@
 !   transform for vectors and scalars
       call sph_forward_transforms(trns_fwd%ncomp, trns_fwd%num_vector,  &
      &    trns_fwd%num_scalar, sph, comms_sph, trans_p,                 &
-     &    trns_fwd%fld_rtp, n_WS, n_WR, WS, WR, WK_sph)
+     &    trns_fwd%fld_rtp, SR_r1%n_WS, SR_r1%n_WR, SR_r1%WS, SR_r1%WR, &
+     &    WK_sph)
 !
       call mhd_spectr_from_recvbuf                                      &
-     &   (trns_fwd, comms_sph%comm_rj, n_WR, WR(1), rj_fld)
+     &   (trns_fwd, comms_sph%comm_rj, SR_r1%n_WR, SR_r1%WR(1), rj_fld)
 !
       end subroutine sph_forward_trans_snapshot_MHD
 !

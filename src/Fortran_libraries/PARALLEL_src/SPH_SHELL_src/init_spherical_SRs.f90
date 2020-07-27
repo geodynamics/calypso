@@ -98,6 +98,8 @@
      &          X_rtp, X_rtm, X_rlm, X_rj)
 !
       use calypso_mpi
+      use calypso_mpi_real
+      use transfer_to_long_integers
 !
       use m_sph_communicators
       use m_solver_SR
@@ -145,8 +147,8 @@
       endtime(1) = MPI_WTIME() - starttime
 !
       endtime(1) = MPI_WTIME() - starttime
-      call MPI_allREDUCE (endtime(0), etime_item_import(0), 2,          &
-     &    CALYPSO_REAL, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_real(endtime(0), etime_item_import(0), &
+     &                                cast_long(2), MPI_SUM)
       etime_item_import(0:1) = etime_item_import(0:1) / dble(nprocs)
 !
       if(etime_item_import(1) .le. etime_item_import(0)) then
@@ -225,7 +227,7 @@
      &         (NB, comm_rtp, comm_rtm, comm_rlm, comm_rj)
 !
       use calypso_mpi
-      use select_calypso_SR
+      use calypso_SR_core
 !
       integer (kind=kint), intent(in) :: NB
       type(sph_comm_tbl), intent(in) :: comm_rtp
@@ -235,25 +237,25 @@
 !
 !
       if(my_rank .eq. 0) write(*,*) 'check rtp -> rtm'
-      call check_calypso_send_recv_N                                    &
+      call check_calypso_SR_stack                                       &
      &   (NB, comm_rtp%nneib_domain, comm_rtp%iflag_self,               &
      &    comm_rtp%istack_sr, comm_rtm%nneib_domain,                    &
-     &    comm_rtm%iflag_self, comm_rtm%istack_sr)
+     &    comm_rtm%iflag_self, comm_rtm%istack_sr, SR_sig1, SR_r1)
       if(my_rank .eq. 0) write(*,*) 'check rtm -> rtp'
-      call check_calypso_send_recv_N                                    &
+      call check_calypso_SR_stack                                       &
      &   (NB, comm_rtm%nneib_domain, comm_rtm%iflag_self,               &
      &    comm_rtm%istack_sr, comm_rtp%nneib_domain,                    &
-     &    comm_rtp%iflag_self, comm_rtp%istack_sr)
+     &    comm_rtp%iflag_self, comm_rtp%istack_sr, SR_sig1, SR_r1)
       if(my_rank .eq. 0) write(*,*) 'check rj -> rlm'
-      call check_calypso_send_recv_N                                    &
+      call check_calypso_SR_stack                                       &
      &    (NB, comm_rj%nneib_domain, comm_rj%iflag_self,                &
      &     comm_rj%istack_sr, comm_rlm%nneib_domain,                    &
-     &     comm_rlm%iflag_self, comm_rlm%istack_sr)
+     &     comm_rlm%iflag_self, comm_rlm%istack_sr, SR_sig1, SR_r1)
       if(my_rank .eq. 0) write(*,*) 'check rlm -> rj'
-      call check_calypso_send_recv_N                                    &
+      call check_calypso_SR_stack                                       &
      &   (NB, comm_rlm%nneib_domain, comm_rlm%iflag_self,               &
      &    comm_rlm%istack_sr, comm_rj%nneib_domain,                     &
-     &    comm_rj%iflag_self, comm_rj%istack_sr)
+     &    comm_rj%iflag_self, comm_rj%istack_sr, SR_sig1, SR_r1)
 !
       end subroutine check_spherical_SRs_N
 !

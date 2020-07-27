@@ -90,6 +90,9 @@
      &         (i_version, dir, i_step, fld_IO)
 !
       use calypso_mpi
+      use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
 !
       integer(kind = kint), intent(in) :: i_version, i_step
       character(len = kchara), intent(in) :: dir
@@ -109,10 +112,10 @@
       if(my_rank .ne. 0) call alloc_phys_name_IO(fld_IO)
 !
       ilength = int(fld_IO%num_field_IO * kchara)
-      call MPI_Bcast(fld_IO%fld_name, ilength,                          &
-     &    CALYPSO_CHARACTER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(fld_IO%num_comp_IO, fld_IO%num_field_IO,           &
-     &    CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_character                                  &
+     &   (fld_IO%fld_name, cast_long(ilength), 0)
+      call calypso_mpi_bcast_int                                        &
+     &   (fld_IO%num_comp_IO, cast_long(fld_IO%num_field_IO), 0)
 !
       call cal_istack_phys_comp_IO(fld_IO)
       call alloc_phys_data_IO(fld_IO)

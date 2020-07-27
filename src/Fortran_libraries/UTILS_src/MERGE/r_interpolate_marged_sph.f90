@@ -9,6 +9,9 @@
 !!@verbatim
 !!      subroutine const_r_interpolate_table                            &
 !!     &         (org_sph_mesh, new_sph_mesh, r_itp)
+!!        type(sph_mesh_data), intent(in) :: org_sph_mesh
+!!        type(sph_mesh_data), intent(inout) :: new_sph_mesh
+!!        type(sph_radial_itp_data), intent(inout) :: r_itp
 !!      subroutine const_ICB_and_CMB_radius(org_sph_mesh, new_sph_mesh, &
 !!     &          nlayer_ICB_org, nlayer_CMB_org,                       &
 !!     &          nlayer_ICB_new, nlayer_CMB_new)
@@ -67,8 +70,8 @@
      &         (org_sph_mesh, new_sph_mesh, r_itp)
 !
       type(sph_mesh_data), intent(in) :: org_sph_mesh
-      type(sph_mesh_data), intent(in) :: new_sph_mesh
 !
+      type(sph_mesh_data), intent(inout) :: new_sph_mesh
       type(sph_radial_itp_data), intent(inout) :: r_itp
 !
 !
@@ -174,14 +177,17 @@
 !
       subroutine share_r_interpolation_tbl(new_sph_mesh, r_itp)
 !
-      type(sph_mesh_data), intent(in) :: new_sph_mesh
+      use calypso_mpi_real
+      use calypso_mpi_int
+      use transfer_to_long_integers
+!
+      type(sph_mesh_data), intent(inout) :: new_sph_mesh
       type(sph_radial_itp_data), intent(inout) :: r_itp
 !
 !
-      call MPI_Bcast(r_itp%iflag_same_rgrid,                            &
-     &    1, CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(new_sph_mesh%sph%sph_rj%nidx_rj(1),                &
-     &    1, CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(r_itp%iflag_same_rgrid, 0)
+      call calypso_mpi_bcast_one_int                                    &
+     &   (new_sph_mesh%sph%sph_rj%nidx_rj(1), 0)
       if(my_rank .eq. 0) write(*,*) 'iflag_same_rgrid: ',               &
      &            r_itp%iflag_same_rgrid,                               &
      &            new_sph_mesh%sph%sph_rj%nidx_rj(1)
@@ -190,19 +196,16 @@
         if(my_rank .ne. 0)  call allocate_radial_itp_tbl                &
      &             (new_sph_mesh%sph%sph_rj%nidx_rj(1), r_itp)
 !
-        call MPI_Bcast(r_itp%nri_old2new, 1, CALYPSO_INTEGER,           &
-     &      0, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(r_itp%kr_inner_domain, 1, CALYPSO_INTEGER,       &
-     &      0, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(r_itp%kr_outer_domain, 1, CALYPSO_INTEGER,       &
-     &      0, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_bcast_one_int(r_itp%nri_old2new, 0)
+        call calypso_mpi_bcast_one_int(r_itp%kr_inner_domain, 0)
+        call calypso_mpi_bcast_one_int(r_itp%kr_outer_domain, 0)
 !
-        call MPI_Bcast(r_itp%k_old2new_in, int(r_itp%nri_old2new),      &
-     &      CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(r_itp%k_old2new_out, int(r_itp%nri_old2new),     &
-     &      CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(r_itp%coef_old2new_in, int(r_itp%nri_old2new),   &
-     &      CALYPSO_REAL, 0, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_bcast_int                                      &
+     &     (r_itp%k_old2new_in, cast_long(r_itp%nri_old2new), 0)
+        call calypso_mpi_bcast_int                                      &
+     &     (r_itp%k_old2new_out, cast_long(r_itp%nri_old2new), 0)
+        call calypso_mpi_bcast_real                                     &
+     &     (r_itp%coef_old2new_in, cast_long(r_itp%nri_old2new), 0)
       end if
 !
       end subroutine share_r_interpolation_tbl
@@ -213,20 +216,18 @@
      &         (nlayer_ICB_org, nlayer_CMB_org,                         &
      &          nlayer_ICB_new, nlayer_CMB_new)
 !
+      use calypso_mpi_int
+!
       integer(kind = kint), intent(inout) :: nlayer_ICB_org
       integer(kind = kint), intent(inout) :: nlayer_CMB_org
       integer(kind = kint), intent(inout) :: nlayer_ICB_new
       integer(kind = kint), intent(inout) :: nlayer_CMB_new
 !
 !
-      call MPI_Bcast(nlayer_ICB_org, 1, CALYPSO_INTEGER, 0,             &
-     &    CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(nlayer_CMB_org, 1, CALYPSO_INTEGER, 0,             &
-     &    CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(nlayer_ICB_new, 1, CALYPSO_INTEGER, 0,             &
-     &    CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(nlayer_CMB_new, 1, CALYPSO_INTEGER, 0,             &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(nlayer_ICB_org, 0)
+      call calypso_mpi_bcast_one_int(nlayer_CMB_org, 0)
+      call calypso_mpi_bcast_one_int(nlayer_ICB_new, 0)
+      call calypso_mpi_bcast_one_int(nlayer_CMB_new, 0)
 !
       if(my_rank .eq. 0) then
         write(*,*) 'nlayer_ICB_org: ', nlayer_ICB_org, nlayer_CMB_org

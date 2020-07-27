@@ -69,8 +69,7 @@
 !
       call open_write_mpi_file                                          &
      &   (file_name, num_pe, id_rank, IO_param)
-      call calypso_mpi_seek_write_endian                                &
-     &   (IO_param%id_file, IO_param%ioff_gl)
+      call mpi_write_endian_flag(IO_param%id_file, IO_param%ioff_gl)
 !
       end subroutine open_write_mpi_file_b
 !
@@ -86,7 +85,7 @@
 !
       call open_read_mpi_file                                           &
      &   (file_name, num_pe, id_rank, IO_param)
-      call calypso_mpi_seek_read_endian                                 &
+      call mpi_read_set_endian_flag                                     &
      &   (IO_param%id_file, IO_param%iflag_bin_swap, IO_param%ioff_gl)
 !
       end subroutine open_read_mpi_file_b
@@ -186,7 +185,7 @@
       if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
-        call calypso_mpi_seek_write_int8                                &
+        call mpi_write_int8_b                                           &
      &     (IO_param%id_file, ioffset, num, int8_dat)
       end if
       IO_param%ioff_gl = IO_param%ioff_gl + num * kint_gl
@@ -210,7 +209,7 @@
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
         num64 = num
-        call calypso_mpi_seek_wrt_mul_chara                             &
+        call mpi_write_mul_chara_b                                      &
      &     (IO_param%id_file, ioffset, kchara, num64, chara_dat(1))
       end if
       IO_param%ioff_gl = IO_param%ioff_gl + num * kchara
@@ -231,7 +230,7 @@
       if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
-        call calypso_mpi_seek_write_real                                &
+        call mpi_write_real_b                                           &
      &     (IO_param%id_file, ioffset, num, real_dat)
       end if
       IO_param%ioff_gl = IO_param%ioff_gl + num * kreal
@@ -344,8 +343,7 @@
       if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
-        call calypso_mpi_seek_read_int8                                 &
-     &     (IO_param%id_file, IO_param%iflag_bin_swap,                  &
+        call mpi_read_int8_b(IO_param%id_file, IO_param%iflag_bin_swap, &
      &      ioffset, num, int8_dat(1))
       end if
       IO_param%ioff_gl = IO_param%ioff_gl + num*kint_gl
@@ -373,8 +371,8 @@
       if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
-        call calypso_mpi_seek_read_mul_chara(IO_param%id_file, ioffset, &
-     &     kchara, cast_long(num), chara_dat(1))
+        call mpi_read_mul_chara_b(IO_param%id_file, ioffset,            &
+     &      kchara, cast_long(num), chara_dat(1))
       end if
       ilen_64 = num * kchara
       IO_param%ioff_gl = IO_param%ioff_gl + ilen_64
@@ -400,9 +398,8 @@
       if(num .le. 0) return
       if(my_rank .eq. 0) then
         ioffset = IO_param%ioff_gl
-        call calypso_mpi_seek_read_real                                 &
-     &     (IO_param%id_file, IO_param%iflag_bin_swap,                  &
-     &      ioffset, num, real_dat(1))
+        call mpi_read_real_b(IO_param%id_file, IO_param%iflag_bin_swap, &
+     &                       ioffset, num, real_dat(1))
       end if
       IO_param%ioff_gl = IO_param%ioff_gl + num*kreal
 !

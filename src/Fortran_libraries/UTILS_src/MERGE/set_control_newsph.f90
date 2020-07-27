@@ -40,32 +40,25 @@
 !
       subroutine bcast_ctl_param_newsph(asbl_param, sph_asbl)
 !
+      use calypso_mpi_real
+      use calypso_mpi_int
       use bcast_file_IO_parameter
 !
       type(control_param_assemble), intent(inout) :: asbl_param
       type(spectr_data_4_assemble), intent(inout) :: sph_asbl
 !
 !
-      call MPI_Bcast(sph_asbl%np_sph_org, 1, CALYPSO_INTEGER,           &
-     &               0, CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(sph_asbl%np_sph_new, 1, CALYPSO_INTEGER,           &
-     &               0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(sph_asbl%np_sph_org, 0)
+      call calypso_mpi_bcast_one_int(sph_asbl%np_sph_new, 0)
 !
-      call MPI_Bcast(asbl_param%iflag_newtime, 1,                       &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(asbl_param%istep_new_rst, 1,                       &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(asbl_param%increment_new_step, 1,                  &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(asbl_param%time_new , 1,                           &
-     &               CALYPSO_REAL, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(asbl_param%iflag_newtime, 0)
+      call calypso_mpi_bcast_one_int(asbl_param%istep_new_rst, 0)
+      call calypso_mpi_bcast_one_int(asbl_param%increment_new_step, 0)
+      call calypso_mpi_bcast_one_real(asbl_param%time_new, 0)
 !
-      call MPI_Bcast(asbl_param%istep_start, 1, CALYPSO_INTEGER,        &
-     &               0, CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(asbl_param%istep_end, 1, CALYPSO_INTEGER,          &
-     &               0, CALYPSO_COMM, ierr_MPI)
-      call MPI_Bcast(asbl_param%increment_step, 1, CALYPSO_INTEGER,     &
-     &               0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(asbl_param%istep_start, 0)
+      call calypso_mpi_bcast_one_int(asbl_param%istep_end, 0)
+      call calypso_mpi_bcast_one_int(asbl_param%increment_step, 0)
 !
       call bcast_field_IO_parameter(asbl_param%org_mesh_file)
       call bcast_field_IO_parameter(asbl_param%new_mesh_file)
@@ -73,11 +66,9 @@
       call bcast_field_IO_parameter(asbl_param%org_fld_file)
       call bcast_field_IO_parameter(asbl_param%new_fld_file)
 !
-      call MPI_Bcast(asbl_param%iflag_delete_org, 1,                    &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(asbl_param%iflag_delete_org, 0)
 !
-      call MPI_Bcast(asbl_param%b_ratio , 1,                            &
-     &               CALYPSO_REAL, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_real(asbl_param%b_ratio, 0)
 !
       end subroutine bcast_ctl_param_newsph
 !

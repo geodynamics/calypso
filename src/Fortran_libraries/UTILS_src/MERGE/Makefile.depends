@@ -10,13 +10,13 @@ new_SPH_restart.o: $(MERGE_DIR)/new_SPH_restart.f90 m_precision.o calypso_mpi.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 parallel_assemble_sph.o: $(MERGE_DIR)/parallel_assemble_sph.f90 m_precision.o m_machine_parameter.o m_constants.o t_spheric_parameter.o t_spheric_rj_data.o r_interpolate_marged_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<
-r_interpolate_marged_sph.o: $(MERGE_DIR)/r_interpolate_marged_sph.f90 m_precision.o m_constants.o calypso_mpi.o t_SPH_mesh_field_data.o t_spheric_parameter.o skip_comment_f.o
+r_interpolate_marged_sph.o: $(MERGE_DIR)/r_interpolate_marged_sph.f90 m_precision.o m_constants.o calypso_mpi.o t_SPH_mesh_field_data.o t_spheric_parameter.o skip_comment_f.o calypso_mpi_real.o calypso_mpi_int.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_control_newsph.o: $(MERGE_DIR)/set_control_newsph.f90 m_precision.o m_constants.o calypso_mpi.o t_file_IO_parameter.o t_control_param_assemble.o t_spectr_data_4_assemble.o bcast_file_IO_parameter.o m_error_IDs.o t_control_data_4_merge.o t_check_and_make_SPH_mesh.o t_ctl_params_gen_sph_shell.o m_file_format_switch.o set_control_platform_data.o new_SPH_restart.o skip_comment_f.o
+set_control_newsph.o: $(MERGE_DIR)/set_control_newsph.f90 m_precision.o m_constants.o calypso_mpi.o t_file_IO_parameter.o t_control_param_assemble.o t_spectr_data_4_assemble.o calypso_mpi_real.o calypso_mpi_int.o bcast_file_IO_parameter.o m_error_IDs.o t_control_data_4_merge.o t_check_and_make_SPH_mesh.o t_ctl_params_gen_sph_shell.o m_file_format_switch.o set_control_platform_data.o new_SPH_restart.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_merged_restart_data.o: $(MERGE_DIR)/set_merged_restart_data.f90 m_precision.o m_phys_labels.o t_phys_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
-share_field_data.o: $(MERGE_DIR)/share_field_data.f90 m_precision.o m_constants.o calypso_mpi.o t_time_data.o t_phys_data.o cal_minmax_and_stacks.o calypso_mpi_real.o t_field_data_IO.o
+share_field_data.o: $(MERGE_DIR)/share_field_data.f90 m_precision.o m_constants.o calypso_mpi.o calypso_mpi_real.o calypso_mpi_int.o t_time_data.o t_phys_data.o calypso_mpi_logical.o transfer_to_long_integers.o cal_minmax_and_stacks.o t_field_data_IO.o calypso_mpi_char.o
 	$(F90) -c $(F90OPTFLAGS) $<
 share_spectr_index_data.o: $(MERGE_DIR)/share_spectr_index_data.f90 m_precision.o m_constants.o calypso_mpi.o t_SPH_mesh_field_data.o calypso_mpi_real.o calypso_mpi_int.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
