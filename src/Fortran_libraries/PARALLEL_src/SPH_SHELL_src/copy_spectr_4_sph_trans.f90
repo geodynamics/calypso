@@ -24,13 +24,13 @@
 !!        type(phys_data), intent(in) :: rj_fld
 !!
 !!      subroutine sel_sph_rj_scalar_from_recv                          &
-!!     &         (ncomp_recv, i_field, i_recv, comm_rj,                 &
+!!     &         (iflag_recv, ncomp_recv, i_field, i_recv, comm_rj,     &
 !!     &          n_WR, WR, rj_fld)
 !!      subroutine sel_sph_rj_vector_from_recv                          &
-!!     &         (ncomp_recv, i_field, i_recv, comm_rj,                 &
+!!     &         (iflag_recv, ncomp_recv, i_field, i_recv, comm_rj,     &
 !!     &          n_WR, WR, rj_fld)
 !!      subroutine sel_sph_rj_tensor_from_recv                          &
-!!     &         (ncomp_recv, i_field, i_recv, comm_rj,                 &
+!!     &         (iflag_recv, ncomp_recv, i_field, i_recv, comm_rj,     &
 !!     &          n_WR, WR, rj_fld)
 !!        type(sph_comm_tbl), intent(in) :: comm_rj
 !!        type(phys_data), intent(inout) :: rj_fld
@@ -58,7 +58,7 @@
      &          sph_rj, comm_rj, rj_fld, n_WS, WS, v_pl_local)
 !
       use m_sph_communicators
-      use m_sel_spherical_SRs
+      use sel_spherical_SRs
 !
       use t_spheric_rj_data
 !
@@ -97,7 +97,7 @@
      &          n_WS, WS)
 !
       use m_sph_communicators
-      use m_sel_spherical_SRs
+      use sel_spherical_SRs
 !
       type(sph_comm_tbl), intent(in) :: comm_rj
       type(phys_data), intent(in) :: rj_fld
@@ -120,7 +120,7 @@
      &          n_WS, WS)
 !
       use m_sph_communicators
-      use m_sel_spherical_SRs
+      use sel_spherical_SRs
 !
       type(sph_comm_tbl), intent(in) :: comm_rj
       type(phys_data), intent(in) :: rj_fld
@@ -143,7 +143,7 @@
      &          n_WS, WS)
 !
       use m_sph_communicators
-      use m_sel_spherical_SRs
+      use sel_spherical_SRs
 !
       type(sph_comm_tbl), intent(in) :: comm_rj
       type(phys_data), intent(in) :: rj_fld
@@ -163,12 +163,13 @@
 !-----------------------------------------------------------------------
 !
       subroutine sel_sph_rj_scalar_from_recv                            &
-     &         (ncomp_recv, i_field, i_recv, comm_rj,                   &
+     &         (iflag_recv, ncomp_recv, i_field, i_recv, comm_rj,       &
      &          n_WR, WR, rj_fld)
 !
       use m_sph_communicators
-      use m_sel_spherical_SRs
+      use sel_spherical_SRs
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       type(sph_comm_tbl), intent(in) :: comm_rj
       integer(kind = kint), intent(in) :: i_field, i_recv
       integer(kind = kint), intent(in) :: ncomp_recv, n_WR
@@ -177,7 +178,8 @@
 !
 !
       if(i_field*i_recv .eq. 0) return
-      call sel_sph_scalar_from_recv(ncomp_recv, rj_fld%n_point, n_WR,   &
+      call sel_sph_scalar_from_recv                                     &
+     &   (iflag_recv, ncomp_recv, rj_fld%n_point, n_WR,                 &
      &    comm_rj%nneib_domain, comm_rj%istack_sr, comm_rj%item_sr,     &
      &    comm_rj%irev_sr,  rj_fld%ntot_phys, i_field, i_recv,          &
      &    WR, rj_fld%d_fld)
@@ -187,12 +189,13 @@
 !-----------------------------------------------------------------------
 !
       subroutine sel_sph_rj_vector_from_recv                            &
-     &         (ncomp_recv, i_field, i_recv, comm_rj,                   &
+     &         (iflag_recv, ncomp_recv, i_field, i_recv, comm_rj,       &
      &          n_WR, WR, rj_fld)
 !
       use m_sph_communicators
-      use m_sel_spherical_SRs
+      use sel_spherical_SRs
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       type(sph_comm_tbl), intent(in) :: comm_rj
       integer(kind = kint), intent(in) :: i_field, i_recv
       integer(kind = kint), intent(in) :: ncomp_recv, n_WR
@@ -201,7 +204,8 @@
 !
 !
       if(i_field*i_recv .eq. 0) return
-      call sel_sph_vector_from_recv(ncomp_recv, rj_fld%n_point, n_WR,   &
+      call sel_sph_vector_from_recv                                     &
+     &   (iflag_recv, ncomp_recv, rj_fld%n_point, n_WR,                 &
      &    comm_rj%nneib_domain, comm_rj%istack_sr, comm_rj%item_sr,     &
      &    comm_rj%irev_sr,  rj_fld%ntot_phys, i_field, i_recv,          &
      &    WR, rj_fld%d_fld)
@@ -211,12 +215,13 @@
 !-----------------------------------------------------------------------
 !
       subroutine sel_sph_rj_tensor_from_recv                            &
-     &         (ncomp_recv, i_field, i_recv, comm_rj,                   &
+     &         (iflag_recv, ncomp_recv, i_field, i_recv, comm_rj,       &
      &          n_WR, WR, rj_fld)
 !
       use m_sph_communicators
-      use m_sel_spherical_SRs
+      use sel_spherical_SRs
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       type(sph_comm_tbl), intent(in) :: comm_rj
       integer(kind = kint), intent(in) :: i_field, i_recv
       integer(kind = kint), intent(in) :: ncomp_recv, n_WR
@@ -225,7 +230,8 @@
 !
 !
       if(i_field*i_recv .eq. 0) return
-      call sel_sph_tensor_from_recv(ncomp_recv, rj_fld%n_point, n_WR,   &
+      call sel_sph_tensor_from_recv                                     &
+     &   (iflag_recv, ncomp_recv, rj_fld%n_point, n_WR,                 &
      &    comm_rj%nneib_domain, comm_rj%istack_sr, comm_rj%item_sr,     &
      &    comm_rj%irev_sr,  rj_fld%ntot_phys, i_field, i_recv,          &
      &    WR, rj_fld%d_fld)

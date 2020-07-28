@@ -46,8 +46,6 @@
 !>      integer flag to use ISPACK
       integer(kind = kint), parameter :: iflag_ISPACK =      4
 !
-      integer(kind = kint) :: iflag_FFT = iflag_UNDEFINED_FFT
-!
       private :: hd_FFTPACK, hd_FFTW, hd_FFTW3, hd_FFTW_S, hd_FFTW3_S
       private :: hd_ISPACK, hd_FFTW_F, hd_FFTW3_F
 !
@@ -57,11 +55,12 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine set_fft_library_ctl(FFT_library_ctl)
+      subroutine set_fft_library_ctl(FFT_library_ctl, iflag_FFT)
 !
       use skip_comment_f
 !
       character(len = kchara), intent(in) :: FFT_library_ctl
+      integer(kind = kint), intent(inout) :: iflag_FFT
 !
 !
       if     (cmp_no_case(FFT_library_ctl, hd_FFTPACK)) then

@@ -182,7 +182,7 @@
      &         (nidx_rlm, ncomp, nvector, nscalar, sp_rlm_spin,         &
      &          nneib_domain_rlm, istack_sr_rlm, item_sr_rlm, WS)
 !
-      use m_sel_spherical_SRs
+      use sel_spherical_SRs
 !
       integer(kind = kint), intent(in) :: nidx_rlm(2)
 !
@@ -243,7 +243,7 @@
      &         (nidx_rtm, ncomp, nvector, nscalar, vr_rtm_spin,         &
      &          nneib_domain_rtm, istack_sr_rtm, item_sr_rtm, WS)
 !
-      use m_sel_spherical_SRs
+      use sel_spherical_SRs
 !
       integer(kind = kint), intent(in) :: nidx_rtm(3)
 !

@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine init_fourier_transform_4_sph                         &
-!!     &         (ncomp, sph_rtp, comm_rtp, WK_FFTs)
+!!     &         (ncomp, sph_rtp, comm_rtp, WK_FFTs, iflag_FFT)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in) :: comm_rtp
 !!        type(work_for_FFTs), intent(inout) :: WK_FFTs
@@ -46,7 +46,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine init_fourier_transform_4_sph                           &
-     &         (ncomp, sph_rtp, comm_rtp, WK_FFTs)
+     &         (ncomp, sph_rtp, comm_rtp, WK_FFTs, iflag_FFT)
 !
       use m_solver_SR
 !
@@ -55,6 +55,7 @@
       type(sph_comm_tbl), intent(in) :: comm_rtp
 !
       type(work_for_FFTs), intent(inout) :: WK_FFTs
+      integer(kind = kint), intent(inout) :: iflag_FFT
 !
 !
       if(iflag_FFT .eq. iflag_UNDEFINED_FFT) then
@@ -63,7 +64,8 @@
         iflag_FFT = iflag_selected
       end if
 !
-      call init_sph_FFT_select(my_rank, sph_rtp, ncomp, WK_FFTs)
+      call init_sph_FFT_select                                          &
+     &   (my_rank, iflag_FFT, sph_rtp, ncomp, WK_FFTs)
 !
       if(my_rank .gt. 0) return
       write(*,'(a,i4)', advance='no') 'Selected Fourier transform: ',   &
@@ -101,24 +103,24 @@
       allocate(X_rtp(ncomp*sph_rtp%nnod_rtp))
       X_rtp = 0.0d0
 !
-      iflag_FFT = iflag_FFTPACK
-      call test_fourier_trans_vector(ncomp, sph_rtp, comm_rtp,         &
-     &    n_WS, n_WR, WS, WR, X_rtp, WK_FFTs, etime_fft(iflag_FFT))
+      call test_fourier_trans_vector                                   &
+     &   (iflag_FFTPACK, ncomp, sph_rtp, comm_rtp,                     &
+     &    n_WS, n_WR, WS, WR, X_rtp, WK_FFTs, etime_fft(iflag_FFTPACK))
 !
 !
 #ifdef FFTW3
-      iflag_FFT = iflag_FFTW
-      call test_fourier_trans_vector(ncomp, sph_rtp, comm_rtp,         &
+      call test_fourier_trans_vector                                   &
+     &   (iflag_FFTW, ncomp, sph_rtp, comm_rtp,                        &
      &    n_WS, n_WR, WS, WR, X_rtp, WK_FFTs, etime_fft(iflag_FFTW))
 !
-      iflag_FFT = iflag_FFTW_SINGLE
-      call test_fourier_trans_vector(ncomp, sph_rtp, comm_rtp,         &
+      call test_fourier_trans_vector                                   &
+     &   (iflag_FFTW_SINGLE, ncomp, sph_rtp, comm_rtp,                 &
      &    n_WS, n_WR, WS, WR, X_rtp, WK_FFTs,                          &
      &    etime_fft(iflag_FFTW_SINGLE))
 #endif
 !
-      iflag_FFT = iflag_ISPACK
-      call test_fourier_trans_vector(ncomp, sph_rtp, comm_rtp,         &
+      call test_fourier_trans_vector                                   &
+     &    (iflag_ISPACK, ncomp, sph_rtp, comm_rtp,                     &
      &     n_WS, n_WR, WS, WR, X_rtp, WK_FFTs,                         &
      &     etime_fft(iflag_ISPACK))
       deallocate(X_rtp)
@@ -145,11 +147,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine test_fourier_trans_vector(ncomp, sph_rtp, comm_rtp,    &
+      subroutine test_fourier_trans_vector                              &
+     &         (iflag_FFT, ncomp, sph_rtp, comm_rtp,                    &
      &          n_WS, n_WR, WS, WR, X_rtp, WK_FFTs, etime_fft)
 !
       use calypso_mpi_real
 !
+      integer(kind = kint), intent(in) :: iflag_FFT
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_comm_tbl), intent(in) :: comm_rtp
 !
@@ -166,19 +170,20 @@
 !
 !
       if(iflag_debug .gt. 0) write(*,*) 'init_sph_FFT_select'
-      call init_sph_FFT_select(my_rank, sph_rtp, ncomp, WK_FFTs)
+      call init_sph_FFT_select                                          &
+     &   (my_rank, iflag_FFT, sph_rtp, ncomp, WK_FFTs)
 !
       if(iflag_debug .gt. 0) write(*,*) 'back_FFT_select_from_recv'
       starttime = MPI_WTIME()
-      call back_FFT_select_from_recv                                    &
-     &   (sph_rtp, comm_rtp, ncomp, n_WR, WR, X_rtp, WK_FFTs)
-      call fwd_FFT_select_to_send                                       &
-     &   (sph_rtp, comm_rtp, ncomp, n_WS, X_rtp, WS, WK_FFTs)
+      call back_FFT_select_from_recv(iflag_FFT, sph_rtp, comm_rtp,      &
+     &    ncomp, n_WR, WR, X_rtp, WK_FFTs)
+      call fwd_FFT_select_to_send(iflag_FFT, sph_rtp, comm_rtp,         &
+     &    ncomp, n_WS, X_rtp, WS, WK_FFTs)
       endtime = MPI_WTIME() - starttime
       if(iflag_debug .gt. 0) write(*,*) 'fwd_FFT_select_to_send end'
 !
       if(iflag_debug .gt. 0) write(*,*) 'finalize_sph_FFT_select'
-      call finalize_sph_FFT_select(WK_FFTs)
+      call finalize_sph_FFT_select(iflag_FFT, WK_FFTs)
 !
       call calypso_mpi_allreduce_one_real(endtime, etime_fft, MPI_SUM)
       etime_fft = etime_fft / dble(nprocs)

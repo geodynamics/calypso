@@ -7,14 +7,16 @@
 !>@brief  Arbitrary components data communication
 !!
 !!@verbatim
-!!      subroutine calypso_send_recv_N(NB, nnod_org, nnod_new,          &
+!!      subroutine calypso_send_recv_N                                  &
+!!     &                          (iflag_recv, NB, nnod_org, nnod_new,  &
 !!     &                           npe_send, isend_self,                &
 !!     &                           id_pe_send, istack_send, inod_export,&
 !!     &                           npe_recv, irecv_self,                &
 !!     &                           id_pe_recv, istack_recv, inod_import,&
 !!     &                           irev_import, SR_sig, SR_r,           &
 !!     &                           X_org, X_new)
-!!      subroutine calypso_send_recv_3xN(NB, nnod_org, nnod_new,        &
+!!      subroutine calypso_send_recv_3xN                                &
+!!     &                          (iflag_recv, NB, nnod_org, nnod_new,  &
 !!     &                           npe_send, isend_self,                &
 !!     &                           id_pe_send, istack_send, inod_export,&
 !!     &                           npe_recv, irecv_self,                &
@@ -63,7 +65,8 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine calypso_send_recv_N(NB, nnod_org, nnod_new,            &
+      subroutine calypso_send_recv_N                                    &
+     &                          (iflag_recv, NB, nnod_org, nnod_new,    &
      &                           npe_send, isend_self,                  &
      &                           id_pe_send, istack_send, inod_export,  &
      &                           npe_recv, irecv_self,                  &
@@ -75,6 +78,7 @@
       use set_to_send_buffer
       use select_copy_from_recv
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       integer(kind = kint), intent(in) :: NB
 !
       integer(kind = kint), intent(in) :: nnod_org
@@ -108,8 +112,8 @@
      &    istack_send(npe_send), istack_recv(npe_recv), SR_sig, SR_r)
 !
 !C-- SEND
-      call set_to_send_buf_N_mod(NB, nnod_org, npe_send,                &
-     &    istack_send(npe_send), istack_send, inod_export,              &
+      call sel_cppy_to_send_buf_N(iflag_recv, NB, nnod_org,             &
+     &    npe_send, istack_send(npe_send), istack_send, inod_export,    &
      &    X_org, SR_r%WS)
 !C
 !C-- COMM
@@ -119,8 +123,7 @@
      &        SR_sig, SR_r)
 !
 !C-- RECV
-      call sel_cppy_from_recv_buf_N                                     &
-     &   (SR_sig%iflag_recv, NB, nnod_new, npe_recv,                    &
+      call sel_cppy_from_recv_buf_N(iflag_recv, NB, nnod_new, npe_recv, &
      &    istack_recv(npe_recv), istack_recv, inod_import, irev_import, &
      &    SR_r%WR(1), X_new)
 !
@@ -131,7 +134,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine calypso_send_recv_3xN(NB, nnod_org, nnod_new,          &
+      subroutine calypso_send_recv_3xN                                  &
+     &                          (iflag_recv, NB, nnod_org, nnod_new,    &
      &                           npe_send, isend_self,                  &
      &                           id_pe_send, istack_send, inod_export,  &
      &                           npe_recv, irecv_self,                  &
@@ -144,6 +148,7 @@
       use set_to_send_buf_tri
       use select_copy_from_recv
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       integer(kind = kint), intent(in) :: NB
 !
       integer(kind = kint), intent(in) :: nnod_org
@@ -199,7 +204,7 @@
 !
 !C-- RECV
       call sel_cppy_from_recv_buf_3xN                                   &
-     &   (SR_sig%iflag_recv, NB, nnod_new, npe_recv,                    &
+     &   (iflag_recv, NB, nnod_new, npe_recv,                           &
      &    istack_recv(npe_recv), istack_recv, inod_import, irev_import, &
      &    SR_r%WR(1), X1_new, X2_new, X3_new)
 !

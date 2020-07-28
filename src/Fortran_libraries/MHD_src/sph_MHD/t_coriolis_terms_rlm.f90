@@ -263,8 +263,8 @@
      &          f_trns, cor_rlm, n_WS, WS)
 !
       use m_sph_communicators
-      use m_sel_spherical_SRs
       use sum_coriolis_terms_rlm
+      use sel_spherical_SRs
 !
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_comm_tbl), intent(in) :: comm_rlm

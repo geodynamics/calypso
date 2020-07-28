@@ -52,8 +52,6 @@ m_array_for_send_recv.o: $(COMMDIR)/m_array_for_send_recv.f90 m_precision.o caly
 	$(F90) -c $(F90OPTFLAGS) $<
 m_elapsed_labels_SEND_RECV.o: $(COMMDIR)/m_elapsed_labels_SEND_RECV.f90 m_precision.o m_work_time.o
 	$(F90) -c $(F90OPTFLAGS) $<
-m_sel_spherical_SRs.o: $(COMMDIR)/m_sel_spherical_SRs.f90 m_precision.o m_work_time.o m_elapsed_labels_SEND_RECV.o select_copy_from_recv.o m_solver_SR.o skip_comment_f.o t_solver_SR.o set_to_send_buffer.o calypso_SR_core.o set_from_recv_buf_rev.o field_to_send_buffer.o set_from_recv_buffer.o
-	$(F90) -c $(F90OPTFLAGS) $<
 m_solver_SR.o: $(COMMDIR)/m_solver_SR.f90 m_precision.o t_solver_SR.o t_solver_SR_int.o t_solver_SR_int8.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_sph_communicators.o: $(COMMDIR)/m_sph_communicators.f90 m_precision.o calypso_mpi.o m_machine_parameter.o
@@ -72,7 +70,9 @@ reverse_SR_int8.o: $(COMMDIR)/reverse_SR_int8.f90 m_precision.o calypso_mpi.o t_
 	$(F90) -c $(F90OPTFLAGS) $<
 reverse_SR_real.o: $(COMMDIR)/reverse_SR_real.f90 m_precision.o calypso_mpi.o t_solver_SR.o t_solver_SR_int8.o
 	$(F90) -c $(F90OPTFLAGS) $<
-select_copy_from_recv.o: $(COMMDIR)/select_copy_from_recv.f90 m_precision.o m_constants.o set_from_recv_buffer.o set_from_recv_buf_rev.o set_from_recv_buff_tri.o set_from_recv_buf_rev_tri.o
+sel_spherical_SRs.o: $(COMMDIR)/sel_spherical_SRs.f90 m_precision.o m_work_time.o m_elapsed_labels_SEND_RECV.o select_copy_from_recv.o t_solver_SR.o m_solver_SR.o set_to_send_buffer.o calypso_SR_core.o set_from_recv_buf_rev.o field_to_send_buffer.o set_from_recv_buffer.o
+	$(F90) -c $(F90OPTFLAGS) $<
+select_copy_from_recv.o: $(COMMDIR)/select_copy_from_recv.f90 m_precision.o m_constants.o set_from_recv_buffer.o set_from_recv_buf_rev.o set_to_send_buffer.o set_from_recv_buff_tri.o set_from_recv_buf_rev_tri.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_ctl_parallel_platform.o: $(COMMDIR)/set_ctl_parallel_platform.f90 m_precision.o m_error_IDs.o t_ctl_data_4_platforms.o m_constants.o m_machine_parameter.o calypso_mpi.o
 	$(F90) -c $(F90OPTFLAGS) $<

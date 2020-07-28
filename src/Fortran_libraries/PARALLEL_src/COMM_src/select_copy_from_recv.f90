@@ -24,6 +24,10 @@
 !!     &                         inod_import, irev_import,              &
 !!     &                         WR, X_new)
 !!
+!!      subroutine sel_cppy_to_send_buf_N(iflag_recv, NB, nnod_org,     &
+!!     &                         npe_send, ntot_export, istack_send,    &
+!!     &                         inod_export, X_org, WS)
+!!
 !!      subroutine sel_cppy_from_recv_buf_3x1(iflag_recv, nnod_new,     &
 !!     &                         ntot_import, inod_import, irev_import, &
 !!     &                         WR, X1_new, X2_new, X3_new)
@@ -74,7 +78,9 @@
 !>      Integer flag to use reversed import table for data points
       integer(kind = kint), parameter :: iflag_import_rev =  1
 !>      Integer flag to use testroutine to import
-      integer(kind = kint), parameter :: iflag_import_test = 2
+      integer(kind = kint), parameter :: iflag_import_mod = 2
+!>      Integer flag to use testroutine to import
+      integer(kind = kint), parameter :: iflag_import_test = -10
 !
 !-----------------------------------------------------------------------
 !
@@ -229,7 +235,7 @@
       if(iflag_recv .eq. iflag_import_rev) then
         call set_from_recv_buf_rev_N(NB, nnod_new,                      &
      &      ntot_import, irev_import, WR(1), X_new)
-      else if(iflag_recv .eq. iflag_import_test) then
+      else if(iflag_recv .eq. iflag_import_mod) then
         call set_from_recv_buf_N_mod(NB, nnod_new,                      &
      &      npe_recv, ntot_import, istack_recv, inod_import,            &
      &      WR(1), X_new)
@@ -239,6 +245,37 @@
       end if
 !
       end subroutine sel_cppy_from_recv_buf_N
+!
+! ----------------------------------------------------------------------
+!
+      subroutine sel_cppy_to_send_buf_N(iflag_recv, NB, nnod_org,       &
+     &                         npe_send, ntot_export, istack_send,      &
+     &                         inod_export, X_org, WS)
+!
+      use set_to_send_buffer
+!
+      integer(kind = kint), intent(in) :: iflag_recv
+      integer(kind = kint), intent(in) :: NB
+      integer(kind = kint), intent(in) :: nnod_org
+!
+      integer(kind = kint), intent(in) :: ntot_export
+      integer(kind = kint), intent(in) :: npe_send
+      integer(kind = kint), intent(in) :: istack_send(0:npe_send)
+      integer(kind = kint), intent(in) :: inod_export(ntot_export)
+      real (kind=kreal), intent(in):: X_org(NB*nnod_org)
+!
+      real (kind=kreal), intent(inout):: WS(NB*(ntot_export+1))
+!
+!C-- SEND
+      if(iflag_recv .eq. iflag_import_mod) then
+        call set_to_send_buf_N_mod(NB, nnod_org, npe_send,              &
+     &      ntot_export, istack_send, inod_export, X_org, WS)
+      else
+        call set_to_send_buf_N                                          &
+     &     (NB, nnod_org, ntot_export, inod_export, X_org, WS)
+      end if
+!
+      end subroutine sel_cppy_to_send_buf_N
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

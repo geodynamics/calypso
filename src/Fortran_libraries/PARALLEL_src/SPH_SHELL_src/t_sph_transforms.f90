@@ -112,7 +112,8 @@
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+2)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
-      call back_FFT_select_from_recv(sph%sph_rtp, comms_sph%comm_rtp,   &
+      call back_FFT_select_from_recv                                    &
+     &   (trans_p%iflag_FFT, sph%sph_rtp, comms_sph%comm_rtp,           &
      &    ncomp_trans, n_WR, WR, v_rtp, WK_sph%WK_FFTs)
       call finish_send_recv_sph(comms_sph%comm_rtm)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
@@ -175,7 +176,8 @@
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+2)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
-      call back_FFT_select_from_recv(sph%sph_rtp, comms_sph%comm_rtp,   &
+      call back_FFT_select_from_recv                                    &
+     &   (trans_p%iflag_FFT, sph%sph_rtp, comms_sph%comm_rtp,           &
      &    ncomp_trans, n_WR, WR, v_rtp, WK_sph%WK_FFTs)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !
@@ -255,7 +257,8 @@
 !
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
-      call fwd_FFT_select_to_send(sph%sph_rtp, comms_sph%comm_rtp,      &
+      call fwd_FFT_select_to_send                                       &
+     &   (trans_p%iflag_FFT, sph%sph_rtp, comms_sph%comm_rtp,           &
      &    ncomp_trans, n_WS, v_rtp, WS, WK_sph%WK_FFTs)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !

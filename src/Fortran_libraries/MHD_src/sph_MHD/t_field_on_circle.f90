@@ -7,12 +7,13 @@
 !>@brief  field data on specific circle at (s,z)
 !!
 !!@verbatim
-!!      subroutine sph_transfer_on_circle(sph_rj, rj_fld, cdat)
+!!      subroutine sph_transfer_on_circle                               &
+!!     &         (iflag_FFT, sph_rj, rj_fld, cdat)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(phys_data), intent(in) :: rj_fld
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!      subroutine const_circle_point_global                            &
-!!     &         (l_truncation, sph_rtp, sph_rj, cdat)
+!!     &         (iflag_FFT, l_truncation, sph_rtp, sph_rj, cdat)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(circle_fld_maker), intent(inout) :: cdat
@@ -51,7 +52,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine sph_transfer_on_circle(sph_rj, rj_fld, cdat)
+      subroutine sph_transfer_on_circle                                 &
+     &         (iflag_FFT, sph_rj, rj_fld, cdat)
 !
       use calypso_mpi
       use m_phys_constants
@@ -61,6 +63,7 @@
 !
       use circle_transform_single
 !
+      integer(kind = kint), intent(in) :: iflag_FFT
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(phys_data), intent(in) :: rj_fld
 !
@@ -82,14 +85,14 @@
       do ifld = 1, cdat%d_circle%num_phys_viz
         icomp =  cdat%d_circle%istack_component(ifld-1) + 1
         if(cdat%d_circle%num_component(ifld) .eq. n_sym_tensor) then
-          call circle_transfer_sym_tensor(icomp, cdat%circle,           &
-     &        cdat%circ_spec, cdat%WK_circle_fft)
+          call circle_transfer_sym_tensor(iflag_FFT, icomp,             &
+     &        cdat%circle, cdat%circ_spec, cdat%WK_circle_fft)
         else if(cdat%d_circle%num_component(ifld) .eq. n_vector) then
-          call circle_transfer_vector(icomp, cdat%circle,               &
-     &        cdat%circ_spec, cdat%WK_circle_fft)
+          call circle_transfer_vector(iflag_FFT, icomp,                 &
+     &        cdat%circle, cdat%circ_spec, cdat%WK_circle_fft)
         else
-          call circle_transfer_scalar(icomp, cdat%circle,               &
-     &        cdat%circ_spec, cdat%WK_circle_fft)
+          call circle_transfer_scalar(iflag_FFT, icomp,                 &
+     &        cdat%circle, cdat%circ_spec, cdat%WK_circle_fft)
         end if
 !
         do nd = 1, cdat%d_circle%num_component(ifld)
@@ -106,12 +109,13 @@
 ! ----------------------------------------------------------------------
 !
       subroutine const_circle_point_global                              &
-     &         (l_truncation, sph_rtp, sph_rj, cdat)
+     &         (iflag_FFT, l_truncation, sph_rtp, sph_rj, cdat)
 !
       use t_spheric_rtp_data
       use t_spheric_rj_data
       use circle_transform_single
 !
+      integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) :: l_truncation
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_rj_grid), intent(in) ::  sph_rj
@@ -123,8 +127,8 @@
      &   (sph_rtp%nidx_rtp(3), sph_rj%nidx_global_rj(2),                &
      &    cdat%circle, cdat%d_circle)
       call alloc_circle_transform(l_truncation, cdat%circ_spec)
-      call initialize_circle_transform(cdat%circle, cdat%circ_spec,     &
-     &    cdat%WK_circle_fft)
+      call initialize_circle_transform(iflag_FFT,                       &
+     &    cdat%circle, cdat%circ_spec, cdat%WK_circle_fft)
       call set_circle_point_global                                      &
      &   (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r,                     &
      &    cdat%circ_spec, cdat%circle)

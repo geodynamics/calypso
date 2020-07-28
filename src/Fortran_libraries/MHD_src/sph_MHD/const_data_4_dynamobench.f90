@@ -8,12 +8,12 @@
 !!
 !!@verbatim
 !!      subroutine s_const_data_4_dynamobench                           &
-!!     &         (time, sph_params, sph_rj, sph_MHD_bc, leg, ipol,      &
+!!     &         (time, sph_params, sph_rj, sph_MHD_bc, trans_p, ipol,  &
 !!     &          rj_fld, cdat, pwr, bench, WK_pwr)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-!!        type(legendre_4_sph_trans), intent(in) :: leg
+!!        type(parameters_4_sph_trans), intent(in) :: trans_p
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_data), intent(in) :: rj_fld
 !!        type(circle_fld_maker), intent(inout) :: cdat
@@ -30,6 +30,8 @@
 !
       implicit none
 !
+      private :: mid_eq_transfer_dynamobench
+!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -37,7 +39,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine s_const_data_4_dynamobench                             &
-     &         (time, sph_params, sph_rj, sph_MHD_bc, leg, ipol,        &
+     &         (time, sph_params, sph_rj, sph_MHD_bc, trans_p, ipol,    &
      &          rj_fld, cdat, pwr, bench, WK_pwr)
 !
       use field_at_mid_equator
@@ -53,6 +55,7 @@
       use t_boundary_data_sph_MHD
       use t_field_on_circle
       use t_field_4_dynamobench
+      use t_work_4_sph_trans
 !
       use calypso_mpi
       use cal_rms_fields_by_sph
@@ -62,7 +65,7 @@
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-      type(legendre_4_sph_trans), intent(in) :: leg
+      type(parameters_4_sph_trans), intent(in) :: trans_p
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(in) :: rj_fld
 !
@@ -74,12 +77,12 @@
 !
       if(iflag_debug.gt.0)  write(*,*) 'mid_eq_transfer_dynamobench'
       call mid_eq_transfer_dynamobench                                  &
-     &   (time, sph_rj, rj_fld, cdat, bench)
+     &   (time, trans_p%iflag_FFT, sph_rj, rj_fld, cdat, bench)
 !
       pwr%v_spectr(1)%kr_inside =  sph_params%nlayer_ICB
       pwr%v_spectr(1)%kr_outside = sph_params%nlayer_CMB
-      call cal_mean_squre_in_shell                                      &
-     &   (sph_params, sph_rj, ipol, rj_fld, leg%g_sph_rj, pwr, WK_pwr)
+      call cal_mean_squre_in_shell(sph_params, sph_rj, ipol, rj_fld,    &
+     &                             trans_p%leg%g_sph_rj, pwr, WK_pwr)
       if(my_rank .eq. 0) then
         call copy_energy_4_dynamobench                                  &
      &     (pwr, bench%KE_bench, bench%ME_bench)
@@ -95,8 +98,8 @@
       if(sph_MHD_bc%sph_bc_B%iflag_icb .eq. iflag_sph_fill_center) then
         pwr%v_spectr(1)%kr_inside =  izero
         pwr%v_spectr(1)%kr_outside = sph_params%nlayer_ICB
-        call cal_mean_squre_in_shell                                    &
-     &    (sph_params, sph_rj, ipol, rj_fld, leg%g_sph_rj, pwr, WK_pwr)
+        call cal_mean_squre_in_shell(sph_params, sph_rj, ipol, rj_fld,  &
+     &      trans_p%leg%g_sph_rj, pwr, WK_pwr)
         if(my_rank .eq. 0) then
           call copy_icore_energy_4_dbench(pwr, bench%mene_icore)
         end if
@@ -117,7 +120,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine mid_eq_transfer_dynamobench                            &
-     &         (time, sph_rj, rj_fld, cdat, bench)
+     &         (time, iflag_FFT, sph_rj, rj_fld, cdat, bench)
 !
       use calypso_mpi
       use t_field_on_circle
@@ -128,6 +131,7 @@
       use t_field_4_dynamobench
 !
       real(kind=kreal), intent(in) :: time
+      integer(kind = kint), intent(in) :: iflag_FFT
       type(sph_rj_grid), intent(in) :: sph_rj
       type(phys_data), intent(in) :: rj_fld
       type(circle_fld_maker), intent(inout) :: cdat
@@ -135,7 +139,7 @@
 !
 !    spherical transfer
 !
-      call sph_transfer_on_circle(sph_rj, rj_fld, cdat)
+      call sph_transfer_on_circle(iflag_FFT, sph_rj, rj_fld, cdat)
 !
       if(my_rank .gt. 0) return
 !

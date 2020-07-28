@@ -87,10 +87,6 @@
         type(leg_trns_theta_omp_work) :: WK_l_tsp
       end type legendre_trns_works
 !
-!
-!>      vector length for legendre transform
-      integer(kind = kint) :: nvector_legendre = 0
-!
 ! -----------------------------------------------------------------------
 !
       contains

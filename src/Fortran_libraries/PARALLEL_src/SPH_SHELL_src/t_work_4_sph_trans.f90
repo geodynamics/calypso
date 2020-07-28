@@ -13,14 +13,28 @@
 !!
 !!      subroutine dealloc_work_4_sph_trans
 !!      subroutine dealloc_l_rtm_block
+!!
+!!      subroutine set_import_table_ctl(import_ctl, trans_p)
+!!        type(parameters_4_sph_trans), intent(inout) :: trans_p
+!!      subroutine write_import_table_mode(trans_p)
+!!        type(parameters_4_sph_trans), intent(in) :: trans_p
 !!@endverbatim
 !!
       module t_work_4_sph_trans
 !
       use m_precision
       use t_schmidt_poly_on_rtm
+      use m_FFT_selector
+      use select_copy_from_recv
 !
       implicit none
+!
+!>      Character flag to use import table
+      character(len = kchara), parameter                                &
+     &                       :: hd_import_item = 'regular_table'
+!>      Character flag to use reverse import table
+      character(len = kchara), parameter                                &
+     &                       :: hd_import_rev =  'reversed_table'
 !
 !>      Structure of indices for spherical transforms
       type index_4_sph_trans
@@ -41,9 +55,6 @@
 !>       End point of each block for grid in @f$ \theta @f$-direction
         integer(kind = kint), allocatable :: lstack_block_rtm(:)
 !
-!>       Number of block for grid in hermonics degree
-        integer(kind = kint) :: nblock_j_rlm = 1
-!
 !>       End address of spherical harmonics order for SMP parallelization
         integer(kind = kint), allocatable :: lstack_rlm(:)
 !>       Maximum point of each block for grid in  hermonics degree
@@ -54,6 +65,13 @@
 !
 !>        Structures of parameters for spherical transform
       type parameters_4_sph_trans
+!>      vector length for legendre transform
+        integer(kind = kint) :: nvector_legendre = 0
+!>        Integer flag to select FFT
+        integer(kind = kint) :: iflag_FFT = iflag_UNDEFINED_FFT
+!>        Integer flag to select routines to get data from recieve buffer
+        integer(kind = kint) :: iflag_SPH_recv = iflag_import_UNDEFINED
+!
 !>        Structures of Legendre polynomials for spherical transform
         type(legendre_4_sph_trans) :: leg
 !>        Structure of indices for spherical transforms
@@ -130,5 +148,44 @@
       end subroutine dealloc_l_rtm_block
 !
 ! ----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine set_import_table_ctl(import_ctl, trans_p)
+!
+      use skip_comment_f
+!
+      character(len = kchara), intent(in) :: import_ctl
+      type(parameters_4_sph_trans), intent(inout) :: trans_p
+!
+!
+      if(cmp_no_case(import_ctl, hd_import_item)) then
+        trans_p%iflag_SPH_recv = iflag_import_item
+      else if(cmp_no_case(import_ctl, hd_import_rev)) then
+        trans_p%iflag_SPH_recv = iflag_import_rev
+      else
+        trans_p%iflag_SPH_recv = iflag_import_UNDEFINED
+      end if
+!
+      end subroutine set_import_table_ctl
+!
+! ------------------------------------------------------------------
+!
+      subroutine write_import_table_mode(trans_p)
+!
+      type(parameters_4_sph_trans), intent(in) :: trans_p
+!
+!
+      write(*,'(a,i4)', advance='no')                                 &
+     &   'Communication mode for sph. transform: ',                   &
+     &    trans_p%iflag_SPH_recv
+      if(trans_p%iflag_SPH_recv .eq. iflag_import_item) then
+        write(*,'(3a)') ' (', trim(hd_import_item), ') '
+      else if(trans_p%iflag_SPH_recv .eq. iflag_import_rev) then
+        write(*,'(3a)') ' (', trim(hd_import_rev), ') '
+      end if
+!
+      end subroutine write_import_table_mode
+!
+! ------------------------------------------------------------------
 !
       end module t_work_4_sph_trans

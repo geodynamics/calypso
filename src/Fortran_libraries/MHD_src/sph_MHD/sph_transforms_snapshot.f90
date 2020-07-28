@@ -124,8 +124,8 @@
      &    trns_fwd%fld_rtp, SR_r1%n_WS, SR_r1%n_WR, SR_r1%WS, SR_r1%WR, &
      &    WK_sph)
 !
-      call mhd_spectr_from_recvbuf                                      &
-     &   (trns_fwd, comms_sph%comm_rj, SR_r1%n_WR, SR_r1%WR(1), rj_fld)
+      call mhd_spectr_from_recvbuf(trans_p%iflag_SPH_recv,              &
+     &    trns_fwd, comms_sph%comm_rj, SR_r1%n_WR, SR_r1%WR(1), rj_fld)
 !
       end subroutine sph_forward_trans_snapshot_MHD
 !

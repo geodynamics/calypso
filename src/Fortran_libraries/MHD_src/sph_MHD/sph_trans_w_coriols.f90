@@ -162,8 +162,8 @@
       if(iflag_debug .gt. 0) write(*,*) 'back_FFT_select_from_recv',    &
      &        trns_bwd%ncomp, trns_bwd%num_vector, trns_bwd%num_scalar
       call back_FFT_select_from_recv                                    &
-     &   (sph%sph_rtp, comms_sph%comm_rtp, trns_bwd%ncomp,              &
-     &    n_WR, WR, trns_bwd%fld_rtp, WK_sph%WK_FFTs)
+     &   (trans_p%iflag_FFT, sph%sph_rtp, comms_sph%comm_rtp,           &
+     &    trns_bwd%ncomp, n_WR, WR, trns_bwd%fld_rtp, WK_sph%WK_FFTs)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !
       if(iflag_debug .gt. 0) write(*,*) 'finish_send_recv_rtm_2_rtp'
@@ -194,8 +194,8 @@
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
       call fwd_FFT_select_to_send                                       &
-     &   (sph%sph_rtp, comms_sph%comm_rtp, trns_fwd%ncomp,              &
-     &    n_WS, trns_fwd%fld_rtp, WS, WK_sph%WK_FFTs)
+     &   (trans_p%iflag_FFT, sph%sph_rtp, comms_sph%comm_rtp,           &
+     &    trns_fwd%ncomp, n_WS, trns_fwd%fld_rtp, WS, WK_sph%WK_FFTs)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+3)

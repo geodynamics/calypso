@@ -57,9 +57,6 @@
         integer, allocatable :: req1(:  )
 !>        status flag for recieving
         integer, allocatable :: req2(:  )
-!
-!>        Integer flag to select copry routine from recieve buffer
-        integer(kind = kint) :: iflag_recv = 0
       end type send_recv_status
 !
 !

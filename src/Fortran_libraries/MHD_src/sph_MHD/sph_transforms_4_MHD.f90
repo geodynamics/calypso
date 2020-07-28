@@ -48,7 +48,8 @@
 !!
 !!      subroutine sph_transform_4_licv                                 &
 !!     &         (sph_rlm, comm_rlm, comm_rj, fl_prop, sph_bc_U,        &
-!!     &          omega_sph, leg, gt_cor, trns_MHD, rj_fld, cor_rlm)
+!!     &          omega_sph, trans_p, gt_cor, trns_MHD,                 &
+!!     &          rj_fld, cor_rlm)
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(coriolis_rlm_data), intent(inout) :: cor_rlm
@@ -165,8 +166,8 @@
      &    trns_fwd, SR_r1%n_WS, SR_r1%n_WR, SR_r1%WS(1), SR_r1%WR(1),   &
      &    WK_sph)
 !
-      call mhd_spectr_from_recvbuf                                      &
-     &   (trns_fwd, comms_sph%comm_rj, SR_r1%n_WR, SR_r1%WR(1), rj_fld)
+      call mhd_spectr_from_recvbuf(trans_p%iflag_SPH_recv,              &
+     &    trns_fwd, comms_sph%comm_rj, SR_r1%n_WR, SR_r1%WR(1), rj_fld)
 !
       end subroutine sph_forward_trans_4_MHD
 !
@@ -212,7 +213,8 @@
 !
       subroutine sph_transform_4_licv                                   &
      &         (sph_rlm, comm_rlm, comm_rj, fl_prop, sph_bc_U,          &
-     &          omega_sph, leg, gt_cor, trns_MHD, rj_fld, cor_rlm)
+     &          omega_sph, trans_p, gt_cor, trns_MHD,                   &
+     &          rj_fld, cor_rlm)
 !
       use m_solver_SR
       use sph_trans_w_coriols
@@ -225,7 +227,7 @@
       type(fluid_property), intent(in) :: fl_prop
       type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_rotation), intent(in) :: omega_sph
-      type(legendre_4_sph_trans), intent(in) :: leg
+      type(parameters_4_sph_trans), intent(in) :: trans_p
       type(address_4_sph_trans), intent(in) :: trns_MHD
       type(gaunt_coriolis_rlm), intent(in) :: gt_cor
 !
@@ -245,15 +247,15 @@
      &   (trns_MHD%backward, comm_rj, rj_fld, SR_r1%n_WS, SR_r1%WS(1))
 !
       call sph_b_trans_licv(sph_rlm, comm_rlm, comm_rj,                 &
-     &    fl_prop, sph_bc_U, omega_sph, leg, gt_cor,                    &
+     &    fl_prop, sph_bc_U, omega_sph, trans_p%leg, gt_cor,            &
      &    trns_MHD%b_trns, trns_MHD%backward,                           &
      &    SR_r1%n_WR, SR_r1%WR(1), cor_rlm)
       call sph_f_trans_licv(sph_rlm, comm_rlm, comm_rj,                 &
      &    fl_prop, cor_rlm, trns_MHD%f_trns, trns_MHD%forward,          &
      &    SR_r1%n_WS, SR_r1%WS(1))
 !
-      call mhd_spectr_from_recvbuf                                      &
-     &   (trns_MHD%forward, comm_rj, SR_r1%n_WR, SR_r1%WR(1), rj_fld)
+      call mhd_spectr_from_recvbuf(trans_p%iflag_SPH_recv,              &
+     &    trns_MHD%forward, comm_rj, SR_r1%n_WR, SR_r1%WR(1), rj_fld)
 !
       end subroutine sph_transform_4_licv
 !

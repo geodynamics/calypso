@@ -10,7 +10,7 @@
 !!      subroutine input_control_SPH_dynamobench                        &
 !!     &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,&
 !!     &           rj_fld, nod_fld, MHD_step, MHD_prop, MHD_BC,         &
-!!     &           WK, monitor, cdat, bench)
+!!     &           SPH_WK, cdat, bench)
 !!        type(MHD_file_IO_params), intent(inout) :: MHD_files
 !!        type(sph_sgs_mhd_control), intent(inout) :: MHD_ctl
 !!        type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
@@ -23,7 +23,7 @@
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!        type(MHD_BC_lists), intent(inout) :: MHD_BC
-!!        type(sph_mhd_monitor_data), intent(inout) :: monitor
+!!        type(work_SPH_MHD), intent(inout) :: SPH_WK
 !!        type(circle_fld_maker), intent(inout) :: cdat
 !!        type(dynamobench_monitor), intent(inout) :: bench
 !!@endverbatim
@@ -46,13 +46,12 @@
       use t_spheric_group
       use t_rms_4_sph_spectr
       use t_file_IO_parameter
-      use t_sph_trans_arrays_MHD
       use t_sph_boundary_input_data
       use t_bc_data_list
       use t_check_and_make_SPH_mesh
       use t_flex_delta_t_data
       use t_field_4_dynamobench
-      use t_sph_mhd_monitor_data_IO
+      use t_work_SPH_MHD
 !
       implicit none
 !
@@ -71,7 +70,7 @@
       subroutine input_control_SPH_dynamobench                          &
      &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,  &
      &           rj_fld, nod_fld, MHD_step, MHD_prop, MHD_BC,           &
-     &           WK, monitor, cdat, bench)
+     &           SPH_WK, cdat, bench)
 !
       use t_ctl_data_MHD
       use t_field_on_circle
@@ -91,8 +90,7 @@
       type(MHD_step_param), intent(inout) :: MHD_step
       type(MHD_evolution_param), intent(inout) :: MHD_prop
       type(MHD_BC_lists), intent(inout) :: MHD_BC
-      type(works_4_sph_trans_MHD), intent(inout) :: WK
-      type(sph_mhd_monitor_data), intent(inout) :: monitor
+      type(work_SPH_MHD), intent(inout) :: SPH_WK
       type(circle_fld_maker), intent(inout) :: cdat
       type(dynamobench_monitor), intent(inout) :: bench
 !
@@ -101,12 +99,12 @@
       call set_control_4_SPH_MHD                                        &
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
-     &    MHD_files, bc_IO, MHD_step, MHD_prop, MHD_BC, WK%WK_sph,      &
-     &    sph_maker2)
+     &    MHD_files, bc_IO, MHD_step, MHD_prop, MHD_BC,                 &
+     &    SPH_WK%trans_p, SPH_WK%trns_WK, sph_maker2)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
-     &    MHD_prop, sph, rj_fld, nod_fld, monitor)
+     &    MHD_prop, sph, rj_fld, nod_fld, SPH_WK%monitor)
 !
       call set_ctl_params_dynamobench                                   &
      &   (DMHD_ctl%model_ctl%fld_ctl%field_ctl,                         &

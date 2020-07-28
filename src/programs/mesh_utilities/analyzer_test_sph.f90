@@ -110,11 +110,11 @@
 !
       do itype = iflag_import_item, iflag_import_rev
 !
-       if(itype .eq. iflag_import_item) then
-         write(id_check,*)  'USING IMPORT_ITEM'
-       else if(itype .eq. iflag_import_rev) then
-         write(id_check,*)  'USING IMPORT_REVERSE'
-       end if
+        if(itype .eq. iflag_import_item) then
+          write(id_check,*)  'USING IMPORT_ITEM'
+        else if(itype .eq. iflag_import_rev) then
+          write(id_check,*)  'USING IMPORT_REVERSE'
+        end if
 !
         call sph_type_indices_transfer                                  &
      &     (itype, SPH_TEST%sph, SPH_TEST%comms)
@@ -122,7 +122,7 @@
         call compare_transfer_sph_indices(id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_N                                        &
-     &     (NB, itype, SPH_TEST%sph, SPH_TEST%comms)
+     &     (itype, NB, SPH_TEST%sph, SPH_TEST%comms)
         call compare_transfer_sph_reals(NB, id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_6                                        &

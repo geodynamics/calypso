@@ -7,14 +7,14 @@
 !>@brief  vector data communication
 !!
 !!@verbatim
-!!      subroutine calypso_send_recv_3(nnod_org, nnod_new,              &
+!!      subroutine calypso_send_recv_3(iflag_recv, nnod_org, nnod_new,  &
 !!     &                         npe_send, isend_self,                  &
 !!     &                         id_pe_send, istack_send, inod_export,  &
 !!     &                         npe_recv, irecv_self,                  &
 !!     &                         id_pe_recv, istack_recv, inod_import,  &
 !!     &                         irev_import, SR_sig, SR_r,             &
 !!     &                         X_org, X_new)
-!!      subroutine calypso_send_recv_3x3(nnod_org, nnod_new,            &
+!!      subroutine calypso_send_recv_3x3(iflag_recv, nnod_org, nnod_new,&
 !!     &                         npe_send, isend_self,                  &
 !!     &                         id_pe_send, istack_send, inod_export,  &
 !!     &                         npe_recv, irecv_self,                  &
@@ -65,7 +65,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine calypso_send_recv_3(nnod_org, nnod_new,                &
+      subroutine calypso_send_recv_3(iflag_recv, nnod_org, nnod_new,    &
      &                         npe_send, isend_self,                    &
      &                         id_pe_send, istack_send, inod_export,    &
      &                         npe_recv, irecv_self,                    &
@@ -77,6 +77,7 @@
       use set_to_send_buffer
       use select_copy_from_recv
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
 !
@@ -117,7 +118,7 @@
      &            SR_sig, SR_r)
 !C
 !C-- RECEIVE
-      call sel_cppy_from_recv_buf_3(SR_sig%iflag_recv, nnod_new,        &
+      call sel_cppy_from_recv_buf_3(iflag_recv, nnod_new,               &
      &    istack_recv(npe_recv), inod_import, irev_import,              &
      &    SR_r%WR(1), X_new)
 !
@@ -128,7 +129,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine calypso_send_recv_3x3(nnod_org, nnod_new,              &
+      subroutine calypso_send_recv_3x3(iflag_recv, nnod_org, nnod_new,  &
      &                         npe_send, isend_self,                    &
      &                         id_pe_send, istack_send, inod_export,    &
      &                         npe_recv, irecv_self,                    &
@@ -141,6 +142,7 @@
       use set_to_send_buf_tri
       use select_copy_from_recv
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
 !
@@ -185,7 +187,7 @@
      &           SR_sig, SR_r)
 !C
 !C-- RECEIVE
-      call sel_cppy_from_recv_buf_3x3(SR_sig%iflag_recv, nnod_new,      &
+      call sel_cppy_from_recv_buf_3x3(iflag_recv, nnod_new,             &
      &    istack_recv(npe_recv), inod_import, irev_import,              &
      &    SR_r%WR(1), X1_new, X2_new, X3_new)
 !

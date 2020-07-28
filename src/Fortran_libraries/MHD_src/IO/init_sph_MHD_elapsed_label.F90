@@ -109,9 +109,10 @@
      &         (sph_rtp, sph_rtm, sph_rlm, sph_rj,                      &
      &          nproc_rj_IO, nproc_rlm_IO, nproc_rtm_IO, nproc_rtp_IO)
 !
-      use calypso_mpi
+      use calypso_mpi_int
       use m_work_time
       use t_spheric_parameter
+      use transfer_to_long_integers
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -125,14 +126,17 @@
 !
 !
 !
-      call MPI_REDUCE(sph_rj%irank_sph_rj, nproc_rj_IO, 2,              &
-     &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE(sph_rlm%irank_sph_rlm, nproc_rlm_IO, 2,           &
-     &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE(sph_rtm%irank_sph_rtm, nproc_rtm_IO, 3,           &
-     &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
-      call MPI_REDUCE(sph_rtp%irank_sph_rtp, nproc_rtp_IO, 3,           &
-     &    CALYPSO_INTEGER, MPI_MAX, izero, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_reduce_int                                       &
+     &   (sph_rj%irank_sph_rj, nproc_rj_IO, cast_long(2), MPI_MAX, 0)
+      call calypso_mpi_reduce_int                                       &
+     &   (sph_rlm%irank_sph_rlm, nproc_rlm_IO, cast_long(2),            &
+     &    MPI_MAX, 0)
+      call calypso_mpi_reduce_int                                       &
+     &   (sph_rtm%irank_sph_rtm, nproc_rtm_IO, cast_long(3),            &
+     &    MPI_MAX, izero)
+      call calypso_mpi_reduce_int                                       &
+     &   (sph_rtp%irank_sph_rtp, nproc_rtp_IO, cast_long(3),            &
+     &    MPI_MAX, izero)
 !
       if(my_rank .ne. 0) return
       nproc_rj_IO(1:2) =  nproc_rj_IO(1:2) +  1

@@ -1,5 +1,5 @@
-!>@file   m_sel_spherical_SRs.f90
-!!@brief  module m_sel_spherical_SRs
+!>@file   sel_spherical_SRs.f90
+!!@brief  module sel_spherical_SRs
 !!
 !!@author H. Matsui
 !!@date Programmed in Aug., 2014
@@ -29,25 +29,29 @@
 !!     &                    npe_send, istack_send, inod_export,         &
 !!     &                    ncomp_X, i_fld_X, i_fld_WS, d_org, WS)
 !!
-!!      subroutine sel_sph_vector_from_recv(NB, nnod_new, n_WR,         &
+!!      subroutine sel_sph_vector_from_recv                             &
+!!     &                   (iflag_recv, NB, nnod_new, n_WR,             &
 !!     &                    npe_recv, istack_recv, inod_import,         &
 !!     &                    irev_import, ncomp_X, i_fld_X, i_fld_WR,    &
 !!     &                    WR, d_new)
-!!      subroutine sel_sph_scalar_from_recv(NB, nnod_new, n_WR,         &
+!!      subroutine sel_sph_scalar_from_recv                             &
+!!     &                   (iflag_recv, NB, nnod_new, n_WR,             &
 !!     &                    npe_recv, istack_recv, inod_import,         &
 !!     &                    irev_import, ncomp_X, i_fld_X, i_fld_WR,    &
 !!     &                    WR, d_new)
-!!      subroutine sel_sph_tensor_from_recv(NB, nnod_new, n_WR,         &
+!!      subroutine sel_sph_tensor_from_recv                             &
+!!     &                   (iflag_recv, NB, nnod_new, n_WR,             &
 !!     &                    npe_recv, istack_recv, inod_import,         &
 !!     &                    irev_import, ncomp_X, i_fld_X, i_fld_WR,    &
 !!     &                    WR, d_new)
 !!
-!!      subroutine sel_calypso_from_recv_N(NB, nnod_new, n_WR,          &
+!!      subroutine sel_calypso_from_recv_N                              &
+!!     &                   (iflag_recv, NB, nnod_new, n_WR,             &
 !!     &                    npe_recv, istack_recv, inod_import,         &
 !!     &                    irev_import, WR, X_new)
 !!@endverbatim
 !
-      module m_sel_spherical_SRs
+      module sel_spherical_SRs
 !
       use m_precision
       use m_work_time
@@ -56,53 +60,10 @@
 !
       implicit none
 !
-!>      Character flag to use import table
-      character(len = kchara), parameter                                &
-     &                       :: hd_import_item = 'regular_table'
-!>      Character flag to use reverse import table
-      character(len = kchara), parameter                                &
-     &                       :: hd_import_rev =  'reversed_table'
-!
-!
-!>      Data communication mode for arbitrary size data
-      integer(kind = kint) :: iflag_sph_SRN =   iflag_import_UNDEFINED
-!
-!>      Data communication mode for six components data
-      integer(kind = kint) :: iflag_sph_SR6 = iflag_import_item
-!>      Data communication mode for vector
-      integer(kind = kint) :: iflag_sph_SR3 = iflag_import_item
-!>      Data communication mode for soleinoidal vection
-      integer(kind = kint) :: iflag_sph_SR2 = iflag_import_item
-!>      Data communication mode for scalar
-      integer(kind = kint) :: iflag_sph_SR =  iflag_import_item
-!>      Data communication mode for integer
-      integer(kind = kint) :: iflag_sph_SR_int = iflag_import_item
-!
 !-----------------------------------------------------------------------
 !
       contains
 !
-!-----------------------------------------------------------------------
-!
-      subroutine set_import_table_ctl(import_ctl)
-!
-      use m_solver_SR
-      use skip_comment_f
-!
-      character(len = kchara), intent(in) :: import_ctl
-!
-!
-      if(cmp_no_case(import_ctl, hd_import_item)) then
-        iflag_sph_SRN = iflag_import_item
-      else if(cmp_no_case(import_ctl, hd_import_rev)) then
-        iflag_sph_SRN = iflag_import_rev
-      else
-        iflag_sph_SRN = iflag_import_UNDEFINED
-      end if
-!
-      end subroutine set_import_table_ctl
-!
-! ------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
       subroutine check_calypso_sph_buf_N                                &
@@ -270,13 +231,15 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine sel_sph_vector_from_recv(NB, nnod_new, n_WR,           &
+      subroutine sel_sph_vector_from_recv                               &
+     &                   (iflag_recv, NB, nnod_new, n_WR,               &
      &                    npe_recv, istack_recv, inod_import,           &
      &                    irev_import, ncomp_X, i_fld_X, i_fld_WR,      &
      &                    WR, d_new)
 !
       use field_to_send_buffer
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       integer(kind = kint), intent(in) :: nnod_new, ncomp_X, i_fld_X
       integer(kind = kint), intent(in) :: NB, n_WR, i_fld_WR
 !
@@ -291,7 +254,7 @@
 !
 !
       if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+3)
-      if(iflag_sph_SRN .eq. iflag_import_item) then
+      if(iflag_recv .eq. iflag_import_item) then
         call set_from_recv_buf_vector(NB, nnod_new,                     &
      &      istack_recv(npe_recv), inod_import,                         &
      &      ncomp_X, i_fld_X, i_fld_WR, WR(1), d_new)
@@ -306,13 +269,15 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sel_sph_scalar_from_recv(NB, nnod_new, n_WR,           &
+      subroutine sel_sph_scalar_from_recv                               &
+     &                   (iflag_recv, NB, nnod_new, n_WR,               &
      &                    npe_recv, istack_recv, inod_import,           &
      &                    irev_import, ncomp_X, i_fld_X, i_fld_WR,      &
      &                    WR, d_new)
 !
       use field_to_send_buffer
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       integer(kind = kint), intent(in) :: nnod_new, ncomp_X, i_fld_X
       integer(kind = kint), intent(in) :: NB, n_WR, i_fld_WR
 !
@@ -327,7 +292,7 @@
 !
 !
       if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+3)
-      if(iflag_sph_SRN .eq. iflag_import_item) then
+      if(iflag_recv .eq. iflag_import_item) then
         call set_from_recv_buf_scalar(NB, nnod_new,                     &
      &      istack_recv(npe_recv), inod_import,                         &
      &      ncomp_X, i_fld_X, i_fld_WR, WR(1), d_new)
@@ -342,13 +307,15 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sel_sph_tensor_from_recv(NB, nnod_new, n_WR,           &
+      subroutine sel_sph_tensor_from_recv                               &
+     &                   (iflag_recv, NB, nnod_new, n_WR,               &
      &                    npe_recv, istack_recv, inod_import,           &
      &                    irev_import, ncomp_X, i_fld_X, i_fld_WR,      &
      &                    WR, d_new)
 !
       use field_to_send_buffer
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       integer(kind = kint), intent(in) :: nnod_new, ncomp_X, i_fld_X
       integer(kind = kint), intent(in) :: NB, n_WR, i_fld_WR
 !
@@ -363,7 +330,7 @@
 !
 !
       if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+3)
-      if(iflag_sph_SRN .eq. iflag_import_item) then
+      if(iflag_recv .eq. iflag_import_item) then
         call set_from_recv_buf_tensor(NB, nnod_new,                     &
      &      istack_recv(npe_recv), inod_import,                         &
      &      ncomp_X, i_fld_X, i_fld_WR, WR(1), d_new)
@@ -379,13 +346,15 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine sel_calypso_from_recv_N(NB, nnod_new, n_WR,            &
+      subroutine sel_calypso_from_recv_N                                &
+     &                   (iflag_recv, NB, nnod_new, n_WR,               &
      &                    npe_recv, istack_recv, inod_import,           &
      &                    irev_import, WR, X_new)
 !
       use set_from_recv_buffer
       use set_from_recv_buf_rev
 !
+      integer(kind = kint), intent(in) :: iflag_recv
       integer(kind = kint), intent(in) :: NB, nnod_new, n_WR
 !
       integer(kind = kint), intent(in) :: npe_recv
@@ -399,7 +368,7 @@
 !
 !
       if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+3)
-      if(iflag_sph_SRN .eq. iflag_import_item) then
+      if(iflag_recv .eq. iflag_import_item) then
         call set_from_recv_buf_N(NB, nnod_new,                          &
      &      istack_recv(npe_recv), inod_import, WR(1), X_new)
       else
@@ -412,4 +381,4 @@
 !
 !-----------------------------------------------------------------------
 !
-      end module m_sel_spherical_SRs
+      end module sel_spherical_SRs

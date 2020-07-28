@@ -8,14 +8,14 @@
 !!
 !!@verbatim
 !!      subroutine initialize_circle_transform                          &
-!!     &          (circle, circ_spec, WK_circle_fft)
+!!     &          (iflag_FFT, circle, circ_spec, WK_circle_fft)
 !!
 !!      subroutine circle_transfer_vector                               &
-!!     &         (ifld, circle, circ_spec, WK_circle_fft)
+!!     &         (iflag_FFT, ifld, circle, circ_spec, WK_circle_fft)
 !!      subroutine circle_transfer_scalar                               &
-!!     &         (ifld, circle, circ_spec, WK_circle_fft)
+!!     &         (iflag_FFT, ifld, circle, circ_spec, WK_circle_fft)
 !!      subroutine circle_transfer_sym_tensor                           &
-!!     &         (ifld, circle, circ_spec, WK_circle_fft)
+!!     &         (iflag_FFT, ifld, circle, circ_spec, WK_circle_fft)
 !!        type(fields_on_circle), intent(inout) :: circle
 !!        type(circle_transform_spetr), intent(inout) :: circ_spec
 !!        type(working_FFTs), intent(inout) :: WK_circle_fft
@@ -46,10 +46,11 @@
 ! ----------------------------------------------------------------------
 !
       subroutine initialize_circle_transform                            &
-     &          (circle, circ_spec, WK_circle_fft)
+     &          (iflag_FFT, circle, circ_spec, WK_circle_fft)
 !
       use calypso_mpi
 !
+      integer(kind = kint), intent(in) :: iflag_FFT
       type(fields_on_circle), intent(in) :: circle
 !
       type(circle_transform_spetr), intent(inout) :: circ_spec
@@ -87,7 +88,7 @@
       write(*,*) 'istack_circfft_smp', circ_spec%istack_circfft_smp
       write(*,*) 'mphi_circle', circle%mphi_circle
       call initialize_FFT_select                                        &
-     &   (my_rank, np_smp, circ_spec%istack_circfft_smp,                &
+     &   (my_rank, iflag_FFT, np_smp, circ_spec%istack_circfft_smp,     &
      &    circle%mphi_circle, WK_circle_fft)
 !
       end subroutine initialize_circle_transform
@@ -95,11 +96,12 @@
 ! ----------------------------------------------------------------------
 !
       subroutine circle_transfer_vector                                 &
-     &         (ifld, circle, circ_spec, WK_circle_fft)
+     &         (iflag_FFT, ifld, circle, circ_spec, WK_circle_fft)
 !
       use m_geometry_constants
       use cal_circle_transform
 !
+      integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) :: ifld
       type(fields_on_circle), intent(inout) :: circle
       type(circle_transform_spetr), intent(inout) :: circ_spec
@@ -127,15 +129,15 @@
      &    circle%mphi_circle, circle%v_rtp_circle(1,1))
 !
       call backward_FFT_select                                          &
-     &   (np_smp, circ_spec%istack_circfft_smp, ione,                   &
+     &   (iflag_FFT, np_smp, circ_spec%istack_circfft_smp, ione,        &
      &    circle%mphi_circle, circle%v_rtp_circle(1,1),                 &
      &    WK_circle_fft)
       call backward_FFT_select                                          &
-     &   (np_smp, circ_spec%istack_circfft_smp, ione,                   &
+     &   (iflag_FFT, np_smp, circ_spec%istack_circfft_smp, ione,        &
      &    circle%mphi_circle, circle%v_rtp_circle(1,2),                 &
      &    WK_circle_fft)
       call backward_FFT_select                                          &
-     &   (np_smp, circ_spec%istack_circfft_smp, ione,                   &
+     &   (iflag_FFT, np_smp, circ_spec%istack_circfft_smp, ione,        &
      &    circle%mphi_circle, circle%v_rtp_circle(1,3),                 &
      &    WK_circle_fft)
 !
@@ -144,11 +146,12 @@
 ! ----------------------------------------------------------------------
 !
       subroutine circle_transfer_scalar                                 &
-     &         (ifld, circle, circ_spec, WK_circle_fft)
+     &         (iflag_FFT, ifld, circle, circ_spec, WK_circle_fft)
 !
       use m_FFT_selector
       use cal_circle_transform
 !
+      integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) :: ifld
       type(fields_on_circle), intent(inout) :: circle
       type(circle_transform_spetr), intent(inout) :: circ_spec
@@ -169,7 +172,7 @@
      &    circle%mphi_circle, circle%v_rtp_circle(1,1))
 !
       call backward_FFT_select                                          &
-     &   (np_smp, circ_spec%istack_circfft_smp, ione,                   &
+     &   (iflag_FFT, np_smp, circ_spec%istack_circfft_smp, ione,        &
      &    circle%mphi_circle, circle%v_rtp_circle(1,1),                 &
      &    WK_circle_fft)
 !
@@ -178,10 +181,11 @@
 ! ----------------------------------------------------------------------
 !
       subroutine circle_transfer_sym_tensor                             &
-     &         (ifld, circle, circ_spec, WK_circle_fft)
+     &         (iflag_FFT, ifld, circle, circ_spec, WK_circle_fft)
 !
       use m_phys_constants
 !
+      integer(kind = kint), intent(in) :: iflag_FFT
       integer(kind = kint), intent(in) :: ifld
       type(fields_on_circle), intent(inout) :: circle
       type(circle_transform_spetr), intent(inout) :: circ_spec
@@ -192,7 +196,7 @@
 !
       do nd = 0, n_sym_tensor-1
         call circle_transfer_scalar                                     &
-     &     (ifld+nd, circle, circ_spec, WK_circle_fft)
+     &     (iflag_FFT, ifld+nd, circle, circ_spec, WK_circle_fft)
       end do
 !
       end subroutine circle_transfer_sym_tensor

@@ -128,7 +128,7 @@
 !* -----  find mid-equator point -----------------
 !*
       call set_mid_equator_point_global                                 &
-     &   (SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rtp,                  &
+     &   (SPH_WK%trans_p, SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rtp,  &
      &    SPH_MHD%sph%sph_rj, cdat)
 !
       end subroutine SPH_init_sph_dbench
@@ -194,7 +194,7 @@
       if(iflag_debug.gt.0)  write(*,*) 'const_data_4_dynamobench'
       call s_const_data_4_dynamobench                                   &
      &   (MHD_step1%time_d%time, SPH_MHD%sph%sph_params,                &
-     &    SPH_MHD%sph%sph_rj, SPH_model%sph_MHD_bc, SPH_WK%trans_p%leg, &
+     &    SPH_MHD%sph%sph_rj, SPH_model%sph_MHD_bc, SPH_WK%trans_p,     &
      &    SPH_MHD%ipol, SPH_MHD%fld, cdat, SPH_WK%monitor%pwr,          &
      &    bench, SPH_WK%monitor%WK_pwr)
       call output_field_4_dynamobench(i_step, MHD_step1%time_d%time,    &

@@ -8,17 +8,17 @@
 !!
 !!@verbatim
 !!      subroutine input_control_SPH_MHD_psf(MHD_files, DMHD_ctl,       &
-!!     &          MHD_step, SPH_model, WK, monitor, SPH_MHD, FEM_dat)
+!!     &          MHD_step, SPH_model, SPH_WK, SPH_MHD, FEM_dat)
 !!      subroutine input_control_4_SPH_MHD_nosnap(MHD_files, DMHD_ctl,  &
-!!     &          MHD_step, SPH_model, WK, monitor, SPH_MHD)
+!!     &          MHD_step, SPH_model, SPH_WK, SPH_MHD)
 !!
 !!      subroutine input_control_4_SPH_make_init(MHD_files, DMHD_ctl,   &
-!!     &          MHD_step, SPH_model, WK, monitor, SPH_MHD, FEM_dat)
+!!     &          MHD_step, SPH_model, SPH_WK, SPH_MHD, FEM_dat)
 !!        type(MHD_file_IO_params), intent(inout) :: MHD_files
 !!        type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(SPH_MHD_model_data), intent(inout) :: SPH_model
-!!        type(sph_mhd_monitor_data), intent(inout) :: monitor
+!!        type(work_SPH_MHD), intent(inout) :: SPH_WK
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!        type(FEM_mesh_field_data), intent(inout) :: FEM_dat
 !!@endverbatim
@@ -39,12 +39,11 @@
       use t_FEM_mesh_field_data
       use t_rms_4_sph_spectr
       use t_file_IO_parameter
-      use t_sph_trans_arrays_MHD
       use t_sph_boundary_input_data
       use t_bc_data_list
       use t_check_and_make_SPH_mesh
       use t_flex_delta_t_data
-      use t_sph_mhd_monitor_data_IO
+      use t_work_SPH_MHD
 !
       implicit none
 !
@@ -60,7 +59,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine input_control_SPH_MHD_psf(MHD_files, DMHD_ctl,         &
-     &          MHD_step, SPH_model, WK, monitor, SPH_MHD, FEM_dat)
+     &          MHD_step, SPH_model, SPH_WK, SPH_MHD, FEM_dat)
 !
       use t_ctl_data_MHD
       use m_error_IDs
@@ -75,8 +74,7 @@
 !
       type(MHD_step_param), intent(inout) :: MHD_step
       type(SPH_MHD_model_data), intent(inout) :: SPH_model
-      type(works_4_sph_trans_MHD), intent(inout) :: WK
-      type(sph_mhd_monitor_data), intent(inout) :: monitor
+      type(work_SPH_MHD), intent(inout) :: SPH_WK
 !
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(FEM_mesh_field_data), intent(inout) :: FEM_dat
@@ -87,12 +85,12 @@
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
      &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, WK%WK_sph, sph_maker1)
+     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, sph_maker1)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
-     &     SPH_model%MHD_prop, SPH_MHD%sph, SPH_MHD%fld, FEM_dat%field, &
-     &    monitor)
+     &    SPH_model%MHD_prop, SPH_MHD%sph, SPH_MHD%fld, FEM_dat%field,  &
+     &    SPH_WK%monitor)
 !
 !  Check and construct spherical shell table
       call check_and_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,   &
@@ -117,7 +115,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine input_control_4_SPH_MHD_nosnap(MHD_files, DMHD_ctl,    &
-     &          MHD_step, SPH_model, WK, monitor, SPH_MHD)
+     &          MHD_step, SPH_model, SPH_WK, SPH_MHD)
 !
       use t_ctl_data_MHD
       use set_control_sph_mhd
@@ -129,8 +127,7 @@
 !
       type(MHD_step_param), intent(inout) :: MHD_step
       type(SPH_MHD_model_data), intent(inout) :: SPH_model
-      type(works_4_sph_trans_MHD), intent(inout) :: WK
-      type(sph_mhd_monitor_data), intent(inout) :: monitor
+      type(work_SPH_MHD), intent(inout) :: SPH_WK
 !
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !
@@ -140,11 +137,11 @@
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
      &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, WK%WK_sph, sph_maker1)
+     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, sph_maker1)
 !
       call set_control_SPH_MHD_noviz                                    &
      &   (DMHD_ctl%model_ctl, DMHD_ctl%smonitor_ctl,                    &
-     &    SPH_model%MHD_prop, SPH_MHD%fld, monitor)
+     &    SPH_model%MHD_prop, SPH_MHD%fld, SPH_WK%monitor)
 !
       if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
       call load_para_sph_mesh(MHD_files%sph_file_param,                 &
@@ -161,7 +158,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine input_control_4_SPH_make_init(MHD_files, DMHD_ctl,     &
-     &          MHD_step, SPH_model, WK, monitor, SPH_MHD, FEM_dat)
+     &          MHD_step, SPH_model, SPH_WK, SPH_MHD, FEM_dat)
 !
       use t_ctl_data_MHD
       use set_control_sph_mhd
@@ -173,8 +170,7 @@
 !
       type(MHD_step_param), intent(inout) :: MHD_step
       type(SPH_MHD_model_data), intent(inout) :: SPH_model
-      type(works_4_sph_trans_MHD), intent(inout) :: WK
-      type(sph_mhd_monitor_data), intent(inout) :: monitor
+      type(work_SPH_MHD), intent(inout) :: SPH_WK
 !
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(FEM_mesh_field_data), intent(inout) :: FEM_dat
@@ -185,12 +181,12 @@
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
      &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, WK%WK_sph, sph_maker1)
+     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, sph_maker1)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
      &    SPH_model%MHD_prop, SPH_MHD%sph, SPH_MHD%fld, FEM_dat%field,  &
-     &    monitor)
+     &    SPH_WK%monitor)
 !
 !  Check and construct spherical shell table
       call check_and_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,   &

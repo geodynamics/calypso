@@ -239,8 +239,7 @@
         call sph_transform_4_licv                                       &
      &     (sph%sph_rlm, comms_sph%comm_rlm, comms_sph%comm_rj,         &
      &      MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U, omega_sph,           &
-     &      trans_p%leg, WK%gt_cor, WK%trns_MHD,                        &
-     &      rj_fld, WK%cor_rlm)
+     &      trans_p, WK%gt_cor, WK%trns_MHD, rj_fld, WK%cor_rlm)
       end if
 !
 !   ----  lead nonlinear terms by phesdo spectrum
