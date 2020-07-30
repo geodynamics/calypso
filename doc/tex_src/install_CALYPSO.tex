@@ -5,13 +5,6 @@
 \subsection{Compiler Requirements}
 Most of source code of Calypso are written in Fortran2003. Consequently, Fortran compiler with supporting fortran 2003 is required. We can obtain a number of information about Fortran from \url{http://fortranwiki.org/}, and you can also find a table of the supported features of Fortran 2003 standard at \url{http://fortranwiki.org/fortran/show/Fortran+2003+status}. In addition, C compiler is optionally required to us zlib support for compressed data IO. 
 
-\subsubsection{Linux}
-GCC, the GNU Compiler Collection (\url{https://gcc.gnu.org}) includes gfortran compiler in the most of Linux distributions. However, packages for development are need to be installed. For example, 
-
-
-For MacOS, any fortran compiler needs to be installed because Xcode does not have fortran compiler. The easiest way is installing GCC by using a package manager such as macports (\url{https://www.macports.org}) or homebrew (\url{https://brew.sh/index}).
-
-
 \subsection{Library Requirements}
 \label{sec:requirements}
 Calypso requires the following libraries.
@@ -40,12 +33,49 @@ HDF5 is used for field data output with XDMF format instead of VTK format. The c
 
 OpenMP is used for the parallelization under the shared memory. Better choice to use both MPI and OpenMP parallelization (so-called Hybrid parallelization) or only using MPI (so-called flat MPI) is depends on the computational platform and compiler. For example, flat MPI has much better performance on Linux cluster with Intel Xeon processors and with Intel fortran compiler, but Hybrid model has better performance on Hitachi SR24000 with Power 8 processors.
 
+\subsubsection{Installation of required softwares for Linux}
+GCC, the GNU Compiler Collection (\url{https://gcc.gnu.org}) is already installed in the most of Linux distributions. However, packages for development are need to be installed. For Ubuntu 20, for example, the required compilers and  libraries can be installed by using \verb|apt| command as following::
+%
+\begin{verbatim}
+% sudo apt install pkg-config
+% sudo apt install git
+% sudo apt install gfortran
+% sudo apt install libopenmpi-dev
+% sudo apt install zlib1g
+% sudo apt install zlib1g-dev
+% sudo apt install libblas-dev
+% sudo apt install libfftw3-dev
+% sudo apt install libhdf5-openmpi-dev
+\end{verbatim}
+
+ 
+\subsubsection{Installation of required softwares for Mac OS}
+For MacOS, any fortran compiler needs to be installed because Xcode does not have fortran compiler. The easiest way is installing GCC by using a package manager such as macports (\url{https://www.macports.org}) or homebrew (\url{https://brew.sh/index}). By using the Macports, 
+
+\paragraph{IMacports}
+The required compiler and packages can be installed as followings as an example using GCC9. GCC in Macports includes gfortran compiler.
+%
+\begin{verbatim}
+% sudo port install gcc9
+% sudo port install openmpi-gcc9
+% sudo port install fftw-3 +gcc9 +openmpi
+% sudo port install hdf5 +fortran +gcc9 +openmpi +threadsafe
+\end{verbatim}
+
+\paragraph{Homebrew}
+The required compiler and packages can be installed as followings: GCC in Homebrew includes gfortran compiler.
+%
+\begin{verbatim}
+% brew install gcc
+% brew install open-mpi
+% brew install fftw
+% brew install lhdf5-mpi
+\end{verbatim}
+
+
 \subsection{Known problems}
 \subsubsection*{FFTPACK and Intel compiler}
 FFTPACK fails to compile with Intel fortran using the {\tt `-warn all'} option. Currently the {\tt `-warn all'} option is excluded by Makefile when FFTPACK is compiled.
-
-\subsubsection*{Homebrew's FFTW3 on Mac OS X}
-Calypso uses Fortran wrappers in FFTW3. If FFTW3 is installed using Homebrew for Mac OS X (\url{http://mxcl.github.com/homebrew/}), the required fortran wrappers are not installed. In this case, please install FFTW3 with Fortran wrappers with another package manager (Macports (\url{http://www.macports.org}, for example), build FFTW3 by yourself including the Fortran wrapper, or turn off FFTW3 features in Calypso.
 
 \subsubsection*{XL fortran}
 In XL fortran, preprocessor options is not specified by \verb|-D...|, but \verb|-Wf, '-D...'|. Please edit preprocessor macro option \verb|F90CPPFLAGS| in \verb|work/Makefile| by an editor.
