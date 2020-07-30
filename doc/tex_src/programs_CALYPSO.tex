@@ -24,7 +24,7 @@ This program generates index table and a communication table for parallel spheri
 \hline
 Files & extension & Parallelization & I/O \\ \hline \hline
 Control file & \verb|control_sph_grid| & Single & Input \\ \hline
-Index for $(r,j)$ & \verb|[sph_prefix].[rj_extension]|　& - & Output \\
+Index for $(r,j)$ & \verb|[sph_prefix].[rj_extension]| & - & Output \\
 Index for $(r,l,m)$ & \verb|[sph_prefix].[rlm_extension]| & - & Output \\
 Index for $(r,t,m)$ & \verb|[sph_prefix].[rtm_extension]| & - & Output \\
 Index for $(r,t,p)$ & \verb|[sph_prefix].[rtp_extension]| & - & Output \\ \hline
@@ -42,7 +42,7 @@ Radial point list & \verb|radial_info.dat| & Single & Output \\ \hline
 \begin{tabular}{|c||c|c|c|c|}
 \hline
   \multicolumn{5}{|c|}{Distributed files} \\ \hline
-  \verb|[sph_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|gzip_bin| \\ \hline
+  \verb|[sph_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|bin_gz| \\ \hline
 \verb|[rj_extension]|  & \verb|[#].rj|  & \verb|[#].brj| & \verb|[#].rj.gz|  & \verb|[#].brj.gz| \\
 \verb|[rlm_extension]| & \verb|[#].rlm| & \verb|[#].blm| & \verb|[#].rlm.gz| & \verb|[#].blm.gz| \\
 \verb|[rtm_extension]| & \verb|[#].rtm| & \verb|[#].btm| & \verb|[#].rtm.gz| & \verb|[#].btm.gz| \\
@@ -292,7 +292,7 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 \begin{tabular}{|c||c|c|c|c|}
 \hline
   \multicolumn{5}{|c|}{Distributed files} \\ \hline
-  \verb|[sph_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|gzip_bin| \\ \hline
+  \verb|[sph_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|bin_gz| \\ \hline
 \verb|[rst_extension]| & \verb|[#].fst| & \verb|[#].fsb| & \verb|[#].fst.gz| & \verb|[#].fsb.gz| \\ \hline \hline
   \multicolumn{5}{|c|}{Single file}  \\ \hline
   \verb|[sph_file_fmt_ctl]| & \verb|merged| & \verb|merged_bin| & \verb|merged_gz| & \verb|merged_bin_gz| \\ \hline
@@ -829,7 +829,7 @@ Calypso field data is based on the spectr data for restarting. The data is simpl
 \begin{tabular}{|c||c|c|c|c|}
 \hline
 \multicolumn{5}{|c|}{Distributed files} \\ \hline
-\verb|[field_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|gzip_bin| \\ \hline
+\verb|[field_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|bin_gz| \\ \hline
 \verb|[extension]| & \verb|[#].fld| & \verb|[#].flb| & \verb|[#].fld| & \verb|[#].flb.gz| \\ \hline \hline
 \multicolumn{5}{|c|}{Single file}  \\ \hline
 \verb|[field_file_fmt_ctl]| & \verb|merged| & \verb|merged_bin| & \verb|merged_gz| & \verb|merged_bin_gz| \\ \hline
@@ -838,6 +838,26 @@ Calypso field data is based on the spectr data for restarting. The data is simpl
 \end{tabular}
 \end{center}
 \label{table:field_format}
+\end{table}
+%
+%
+\begin{table}[htp]
+\caption{Data format flag {[\tt field\_file\_fmt\_ctl]} and extensions for the field file.}
+\begin{center} 
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+File format & \verb|[field_file_fmt_ctl]|  & \verb|extension| & size (MByte) & time (sec)  \\ \hline \hline
+             &  \verb|ascii| & \verb|[#].fld|  & \verb|gzip| & \verb|bin_gz| \\
+Parallel &  \verb|binary| & \verb|[#].flb|  & \verb|gzip| & \verb|bin_gz| \\
+            &  \verb|gzip| &  \verb|[#].fld.gz| & \verb|gzip| & \verb|bin_gz| \\
+            &  \verb|bin_gz| &\verb|[#].flb.gz| & \verb|gzip| & \verb|bin_gz| \\ \hline
+              & \verb|merged|  &  \verb|[#].fld| & \verb|gzip| & \verb|bin_gz| \\
+ Merged &  \verb|merged_bin| &  \verb|.flb| & \verb|gzip| & \verb|bin_gz| \\
+              &  \verb|merged_gz| &  \verb|.fld.gz| & \verb|gzip| & \verb|bin_gz| \\
+              &  \verb|merged_bin_gz| &  \verb|.flb.gz| & \verb|gzip| & \verb|bin_gz| \\ \hline
+\end{tabular}
+\end{center}
+\label{table:field_format2}
 \end{table}
 %
 
@@ -941,19 +961,18 @@ Block \verb|cross_section_ctl| (Top level for sectioning)
 Sectioning data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|psf_output_type| are listed in Table \ref{table:PSF_data}. In the binary data format, position data and field data are saved independently not to write the grid data for each output step. Program \hyperref[section:psf_to_VTK]{\tt psf\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|psf_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
 %
 \begin{table}[htp]
-\caption{Data format for sectioning data}
+\caption{Data format  and an example of data size and output time  for sectioning data}
 \label{table:PSF_data}
 \begin{center} 
-\begin{tabular}{|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|}
 \hline
-\verb|fld_format| & File format & \verb|extension| & Application \\ \hline \hline
-\verb|VTK| & VTK & \verb|.vtk| & ParaView \\ \hline
-\verb|VTK_gzip| & Compressed VTK & \verb|.vtk.gz| & ParaView \\
-& & & after expanding by {\tt gzip}  \\ \hline
-\verb|PSF| & Binary & \verb|0.sgd| (grid data)& - \\
-           &        &  \verb|.sdt| (field data) & - \\ \hline
-\verb|PSF_gzip| & Compressed binary & \verb|.sgd.gz| (grid data) & - \\
-           &        &  \verb|.sdt.gz| (field data) & - \\ \hline
+File format & \verb|[fld_format]| & \verb|extension| & size (MByte) & time (sec)  \\ \hline \hline
+VTK & \verb|VTK| & \verb|.vtk| & 29.1 & 2.88 \\ \hline
+Compressed VTK & \verb|VTK_gzip| & \verb|.vtk.gz| & 6.04 & 1.29 \\ \hline
+Binary & \verb|PSF| & \verb|0.sgd| (grid) & 5.30 &  \\
+           &        &  \verb|.sdt| (field) & 4.13 & 2.59 \\ \hline
+Compressed binary & \verb|PSF_gzip| & \verb|.sgd.gz| (grid) & 1.17 & \\
+           &        &  \verb|.sdt.gz| (field) & 3.94 & 1.21 \\ \hline
 \end{tabular}
 \end{center} 
 \end{table} 
@@ -1003,22 +1022,20 @@ Block \verb|isosurface_ctl|  (Top lebel of the control data)
 Isosurface data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|iso_output_type| are listed in Table \ref{table:ISO_data}. Like as sectioning data, program \hyperref[section:psf_to_VTK]{\tt psf\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|iso_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
 %
 \begin{table}[htp]
-\caption{Data format for isosurface data}
+\caption{Data format and an example of data size and output time for isosurface data}
 \label{table:ISO_data}
 \begin{center} 
-\begin{tabular}{|c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|}
 \hline
-\verb|fld_format| & File format & \verb|extension| & Application \\ \hline \hline
-\verb|VTK| & VTK & \verb|.vtk| & ParaView \\ \hline
-\verb|VTK_gzip| & Compressed VTK & \verb|.vtk.gz| & ParaView \\
-& & & after expanding by {\tt gzip}  \\ \hline
-\verb|ISO| & Binary & \verb|.sfm| & - \\ \hline
-\verb|ISO_gzip| & Compressed binary & \verb|.sfm.gz| & - \\ \hline
+File format & \verb|[fld_format]| & \verb|extension| &  Size  (MByte) & Time (sec)   \\ \hline \hline
+VTK &\verb|VTK| &  \verb|.vtk| & 172 & 1.88 \\ \hline
+Compressed VTK &\verb|VTK_gzip| &  \verb|.vtk.gz| & 38.8 & 2.92  \\ \hline
+Binary &\verb|ISO| &  \verb|.sfm| & 55.7 & 2.22 \\ \hline
+Compressed binary & \verb|ISO_gzip| & \verb|.sfm.gz| & 35.0 &  1.73  \\ \hline
 \end{tabular}
 \end{center} 
 \end{table} 
-
-
+%
 
 \subsection{Mean square amplitude data}
 This program output mean square amplitude of the fields which is marked as \verb|Monitor_ON| over the fluid shell at every \verb|[increment_monitor]| steps. The data is written in the file \verb|[vol_pwr_prefix]_s.dat| or  \verb|sph_pwr_volume_s.dat| if  \verb|[vol_pwr_prefix]| is not defined in the control file. For vector fields, For the velocity $\bvec{u}$ and magnetic field $\bvec{B}$, the kinetic energy $1/2 u^{2}$ and magnetic energy $1/2 B^{2}$ are calculated instead of mean square amplitude. Labels on the first lines indicate following data. The data file have the following headers in the first 7 lines, and headers of the data and data are stored in the following lines. The header in the first 7 lines is the following. If these mean square amplitude data files exist before starting the simulation, programs append results at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the existed data files to another directory before starting the programs.
