@@ -287,17 +287,19 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 %
 %
 \begin{table}[htp]
-\caption{data format flag {[\tt restart\_file\_fmt\_ctl]} and extensions for the restart file.}
+\caption{data format flag {[\tt restart\_file\_fmt\_ctl]} and extensions for the restart file. An example of data size and output time is also listed.}
 \begin{center} 
-\begin{tabular}{|c||c|c|c|c|}
+\begin{tabular}{|c|c|c|c|c|}
 \hline
-  \multicolumn{5}{|c|}{Distributed files} \\ \hline
-  \verb|[sph_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|bin_gz| \\ \hline
-\verb|[rst_extension]| & \verb|[#].fst| & \verb|[#].fsb| & \verb|[#].fst.gz| & \verb|[#].fsb.gz| \\ \hline \hline
-  \multicolumn{5}{|c|}{Single file}  \\ \hline
-  \verb|[sph_file_fmt_ctl]| & \verb|merged| & \verb|merged_bin| & \verb|merged_gz| & \verb|merged_bin_gz| \\ \hline
-\verb|[rst_extension]| & \verb|.fst| & \verb|.fsb| & \verb|.fst.gz| & \verb|.fsb.gz| \\ \hline \hline
-  \multicolumn{5}{c}{{\tt [\#]} is the domain or process number} \\
+File format & \verb|[sph_file_fmt_ctl]|  & \verb|extension| & size (MByte) & time (sec)  \\ \hline \hline
+              &  \verb|ascii| & \verb|[#].fld|  & 1,286 & 7.10 \\
+Parallel  &  \verb|binary| & \verb|[#].flb|  & 410 & 2.36 \\
+              &  \verb|gzip| &  \verb|[#].fld.gz| & 418 &  4.65 \\
+              &  \verb|bin_gz| &\verb|[#].flb.gz| & 336 &  2.84 \\ \hline
+              & \verb|merged|  &  \verb|.fld| & 1,312 & 50.2 \\
+Merged  &  \verb|merged_bin| &  \verb|.flb| & 413 &  2.34 \\
+              &  \verb|merged_gz| &  \verb|.fld.gz| & 455 & 8.60 \\
+              &  \verb|merged_bin_gz| &  \verb|.flb.gz| & 340 & 3.57 \\ \hline
 \end{tabular}
 \end{center}
 \label{table:restart_format}
@@ -823,41 +825,28 @@ Merged XDMF data generate files listed in Table \ref{table:XDMF}. For ParaView, 
 \subsubsection{Calypso field data}
 Calypso field data is based on the spectr data for restarting. The data is simply replaced from spherical harmonics coefficients to each component of field data in the cartesian coordinate. The file format flag \verb|[field_file_fmt_ctl]| and corresponding extensiton are showw in Table \ref{table:field_format}.
 %
-\begin{table}[htp]
-\caption{Data format flag {[\tt field\_file\_fmt\_ctl]} and extensions for the field file.}
-\begin{center} 
-\begin{tabular}{|c||c|c|c|c|}
-\hline
-\multicolumn{5}{|c|}{Distributed files} \\ \hline
-\verb|[field_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|bin_gz| \\ \hline
-\verb|[extension]| & \verb|[#].fld| & \verb|[#].flb| & \verb|[#].fld| & \verb|[#].flb.gz| \\ \hline \hline
-\multicolumn{5}{|c|}{Single file}  \\ \hline
-\verb|[field_file_fmt_ctl]| & \verb|merged| & \verb|merged_bin| & \verb|merged_gz| & \verb|merged_bin_gz| \\ \hline
-\verb|[extension]| & \verb|.fld| & \verb|.flb| & \verb|.fld| & \verb|.flb.gz| \\ \hline \hline
-\multicolumn{5}{c}{{\tt [\#]} is the domain or process number} \\
-\end{tabular}
-\end{center}
-\label{table:field_format}
-\end{table}
-%
 %
 \begin{table}[htp]
-\caption{Data format flag {[\tt field\_file\_fmt\_ctl]} and extensions for the field file.}
+\caption{Data format flag {[\tt field\_file\_fmt\_ctl]} and extensions for the field file. An example of data size and output time is also listed.}
 \begin{center} 
 \begin{tabular}{|c|c|c|c|c|}
 \hline
-File format & \verb|[field_file_fmt_ctl]|  & \verb|extension| & size (MByte) & time (sec)  \\ \hline \hline
-             &  \verb|ascii| & \verb|[#].fld|  & \verb|gzip| & \verb|bin_gz| \\
-Parallel &  \verb|binary| & \verb|[#].flb|  & \verb|gzip| & \verb|bin_gz| \\
-            &  \verb|gzip| &  \verb|[#].fld.gz| & \verb|gzip| & \verb|bin_gz| \\
-            &  \verb|bin_gz| &\verb|[#].flb.gz| & \verb|gzip| & \verb|bin_gz| \\ \hline
-              & \verb|merged|  &  \verb|[#].fld| & \verb|gzip| & \verb|bin_gz| \\
- Merged &  \verb|merged_bin| &  \verb|.flb| & \verb|gzip| & \verb|bin_gz| \\
-              &  \verb|merged_gz| &  \verb|.fld.gz| & \verb|gzip| & \verb|bin_gz| \\
-              &  \verb|merged_bin_gz| &  \verb|.flb.gz| & \verb|gzip| & \verb|bin_gz| \\ \hline
+File format & \verb|[field_file_fmt_ctl]|  & \verb|extension| & size (GByte) & time (sec)  \\ \hline \hline
+              &  \verb|ascii| & \verb|[#].fld|  & 9.31 & 61.1 \\
+              &  \verb|binary| & \verb|[#].flb|  & 2.93 & 39.4  \\
+Parallel  &  \verb|gzip| &  \verb|[#].fld.gz| & 3.25 &  40.6 \\
+              &  \verb|bin_gz| &\verb|[#].flb.gz| & 2.78 &  39.6\\
+              &  \verb|VTK| & \verb|[#].vtk|  & 12.4 & 1030.5 \\
+              &  \verb|VTK_gz| & \verb|[#].vtk.gz|  & 3.36 & 40.8 \\ \hline
+              & \verb|merged|  &  \verb|.fld| & 9.53 & 39.1 \\
+ Merged &  \verb|merged_bin| &  \verb|.flb| & 3.58 & 41.7  \\
+              &  \verb|merged_gz| &  \verb|.fld.gz| & 2.99 &  39.4  \\
+              &  \verb|merged_bin_gz| &  \verb|.flb.gz| & 2.84 &  39.2 \\
+              &  \verb|merged_VTK| & \verb|.vtk|  & 11.8 & 39.3 \\
+              &  \verb|merged_VTK_gz| & \verb|.vtk.gz|  & 3.13 & 39.0 \\  \hline
 \end{tabular}
 \end{center}
-\label{table:field_format2}
+\label{table:field_format}
 \end{table}
 %
 
@@ -971,7 +960,7 @@ VTK & \verb|VTK| & \verb|.vtk| & 29.1 & 2.88 \\ \hline
 Compressed VTK & \verb|VTK_gzip| & \verb|.vtk.gz| & 6.04 & 1.29 \\ \hline
 Binary & \verb|PSF| & \verb|0.sgd| (grid) & 5.30 &  \\
            &        &  \verb|.sdt| (field) & 4.13 & 2.59 \\ \hline
-Compressed binary & \verb|PSF_gzip| & \verb|.sgd.gz| (grid) & 1.17 & \\
+Compressed binary & \verb|PSF_gzip| & \verb|.0.sgd.gz| (grid) & 1.17 & \\
            &        &  \verb|.sdt.gz| (field) & 3.94 & 1.21 \\ \hline
 \end{tabular}
 \end{center} 
