@@ -105,27 +105,36 @@
         file_name = fname_tmp
       end if
 !
-      if(mod(itype_file,iten) .eq. iflag_bin) then
-        fname_tmp = add_flb_extension(file_name)
-        file_name = fname_tmp
-        return
-      else if(mod(itype_file,icent)/iten .eq. iflag_vtk/iten) then
+      if     ( mod(itype_file,icent) .eq. iflag_vtk                     &
+     &    .or. mod(itype_file,icent) .eq. iflag_vtk_gz) then
         fname_tmp = add_vtk_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
+      else if( mod(itype_file,icent) .eq. iflag_vtd                     &
+     &    .or. mod(itype_file,icent) .eq. iflag_vtd_gz) then
         fname_tmp = add_vtd_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_ucd/iten) then
+      else if( mod(itype_file,icent) .eq. iflag_ucd                     &
+     &    .or. mod(itype_file,icent) .eq. iflag_ucd_gz) then
         fname_tmp = add_ucd_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
+      else if( mod(itype_file,icent) .eq. iflag_udt                     &
+     &    .or. mod(itype_file,icent) .eq. iflag_udt_gz) then
         fname_tmp = add_udt_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_ucd_bin/iten) then
+      else if( mod(itype_file,icent) .eq. iflag_ucd_bin                 &
+     &   .or.  mod(itype_file,icent) .eq. iflag_ucd_bin_gz) then
         fname_tmp = add_sfm_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
+      else if( mod(itype_file,icent) .eq. iflag_udt_bin                 &
+     &   .or.  mod(itype_file,icent) .eq. iflag_udt_bin_gz) then
         fname_tmp = add_sdt_extension(file_name)
+      else if( mod(itype_file,icent) .eq. iflag_bin                     &
+     &   .or.  mod(itype_file,icent) .eq. iflag_bin_gz) then
+        fname_tmp = add_flb_extension(file_name)
+      else if( mod(itype_file,icent) .eq. iflag_ascii                   &
+     &   .or.  mod(itype_file,icent) .eq. iflag_fld_gz) then
+        fname_tmp = add_fld_extension(file_name)
       else
         fname_tmp = add_fld_extension(file_name)
       end if
 !
-      if (   mod(itype_file,iten) .eq. iflag_gzip) then
+      if (     (mod(itype_file,iten) .eq. iflag_gzip)                   &
+     &    .or. (mod(itype_file,iten) .eq. iflag_bin_gz)) then
         file_name = add_gzip_extension(fname_tmp)
       else
         file_name = fname_tmp
@@ -159,11 +168,14 @@
         file_name = fname_tmp
       end if
 !
-      if     (mod(itype_file,icent)/iten .eq. iflag_vtd/iten) then
+      if(      mod(itype_file,icent) .eq. iflag_vtd                     &
+     &    .or. mod(itype_file,icent) .eq. iflag_vtd_gz) then
         fname_tmp = add_vtg_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_udt/iten) then
+      else if( mod(itype_file,icent) .eq. iflag_udt                     &
+     &    .or. mod(itype_file,icent) .eq. iflag_udt_gz) then
         fname_tmp = add_grd_extension(file_name)
-      else if(mod(itype_file,icent)/iten .eq. iflag_udt_bin/iten) then
+      else if( mod(itype_file,icent) .eq. iflag_udt_bin                 &
+     &   .or.  mod(itype_file,icent) .eq. iflag_udt_bin_gz) then
         fname_tmp = add_sgd_extension(file_name)
       else
         fname_tmp = file_name

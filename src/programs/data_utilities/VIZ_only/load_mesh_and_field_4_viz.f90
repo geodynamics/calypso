@@ -139,7 +139,7 @@
       subroutine set_field_data_4_VIZ(istep, ucd_step, ucd_param,       &
      &          fem, t_IO, ucd, time_d, field)
 !
-      use set_ucd_data_to_type
+      use output_parallel_ucd_file
       use nod_phys_send_recv
 !
       integer(kind = kint), intent(in) :: istep
@@ -156,8 +156,8 @@
 !
 !
       istep_ucd = IO_step_exc_zero_inc(istep, ucd_step)
-      call set_data_by_read_ucd(my_rank, istep_ucd,                     &
-     &    ucd_param, t_IO, ucd, field)
+      call set_data_by_read_ucd                                         &
+     &   (istep_ucd, ucd_param, t_IO, ucd, field)
       call copy_time_step_size_data(t_IO, time_d)
 !
       if (iflag_debug.gt.0)  write(*,*) 'phys_send_recv_all'

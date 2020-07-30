@@ -27,13 +27,18 @@
       character(len = kchara), parameter :: hdf5_names(3)               &
      &            = (/'HDF5        ', 'merged_HDF5 ', 'single_HDF5 '/)
 !
+!
+      type(multi_flag_labels), save :: mgd_fld_ascii_labels
+      type(multi_flag_labels), save :: mgd_fld_bin_labels
+      type(multi_flag_labels), save :: mgd_fld_gz_labels
+      type(multi_flag_labels), save :: mgd_fbin_gz_labels
+!
 !>     Character lables for merged UCD
 !!       'merged_UCD', 'single_UCD', 'UCD_merged', 'UCD_single' 
       type(multi_flag_labels), save :: mgd_ucd_labels
 !
 !>     Character lables for merged splitted UCD into mesh and data
 !!      'merged_UDT', 'single_UDT', 'UDT_merged', 'UDT_single',
-!!      'merged', 'single' 
       type(multi_flag_labels), save :: mgd_udt_labels
 !
 !>     Character lables for merged VTK
@@ -57,12 +62,10 @@
 !!       into mesh and data
 !!       'merged_UDT_gzip', 'merged_UDT_gz',   'single_UDT_gzip',
 !!       'single_UDT_gz',   'UDT_merged_gzip', 'UDT_merged_gz',
-!!       'UDT_single_gzip', 'UDT_single_gz',   'merged_gzip',
-!!       'merged_gz', 'single_gzip', 'single_gz', 'gzip_merged_UDT',
+!!       'UDT_single_gzip', 'UDT_single_gz',   'gzip_merged_UDT',
 !!       'gzip_single_UDT', 'gzip_UDT_merged', 'gzip_UDT_single',
-!!       'gzip_merged',     'gzip_single',     'gz_merged_UDT',
-!!       'gz_single_UDT',   'gz_UDT_merged',   'gz_UDT_single',
-!!       'gz_merged', 'gz_single' 
+!!       'gz_merged_UDT',   'gz_single_UDT',   'gz_UDT_merged',  
+!!       'gz_UDT_single',
       type(multi_flag_labels), save :: mgd_udt_gz_labels
 !
 !>     Character lables for gzipped merged UCD
@@ -129,7 +132,17 @@
 !
       call init_from_two_kinds_flags                                    &
      &   (merged_flags, udt_flags, mgd_udt_labels, icou)
-      call append_multi_flag_labels(merged_flags, mgd_udt_labels)
+!
+      call init_from_two_kinds_flags(merged_flags, field_ascii_labels,  &
+     &                               mgd_fld_ascii_labels, icou)
+      call append_multi_flag_labels(merged_flags, mgd_fld_ascii_labels)
+      call init_from_two_kinds_flags(merged_flags, field_bin_labels,    &
+     &                               mgd_fld_bin_labels, icou)
+!
+      call init_from_two_kinds_flags(merged_flags, field_gz_labels,     &
+     &                               mgd_fld_gz_labels, icou)
+      call init_from_two_kinds_flags(merged_flags, fbin_gz_labels,      &
+     &                               mgd_fbin_gz_labels, icou)
 !
       call init_from_two_kinds_flags                                    &
      &   (merged_flags, ucd_flags, mgd_ucd_labels, icou)
@@ -166,6 +179,11 @@
 !
 !
       call dealloc_field_type_flags()
+!
+      call dealloc_multi_flags(mgd_fld_ascii_labels)
+      call dealloc_multi_flags(mgd_fld_bin_labels)
+      call dealloc_multi_flags(mgd_fld_gz_labels)
+      call dealloc_multi_flags(mgd_fbin_gz_labels)
 !
       call dealloc_multi_flags(mgd_ucd_labels)
       call dealloc_multi_flags(mgd_udt_labels)

@@ -242,7 +242,7 @@ t_ucd_data.o: $(IO_DIR)/t_ucd_data.f90 m_precision.o m_constants.o m_field_file_
 	$(F90) -c $(F90OPTFLAGS) $<
 time_data_IO.o: $(IO_DIR)/time_data_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_time_data.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-ucd_IO_select.o: $(IO_DIR)/ucd_IO_select.F90 m_precision.o m_constants.o m_file_format_switch.o m_field_file_format.o udt_file_IO.o ucd_field_file_IO.o ucd_field_file_IO_b.o vtk_file_IO.o read_psf_binary_file.o set_ucd_file_names.o gz_udt_file_IO.o gz_ucd_field_file_IO.o gz_vtk_file_IO.o gz_read_psf_binary_file.o t_file_IO_parameter.o t_time_data.o t_ucd_data.o t_ctl_data_4_platforms.o
+ucd_IO_select.o: $(IO_DIR)/ucd_IO_select.F90 m_precision.o m_constants.o m_file_format_switch.o m_field_file_format.o udt_file_IO.o ucd_field_file_IO.o ucd_field_file_IO_b.o vtk_file_IO.o read_psf_binary_file.o set_ucd_file_names.o gz_udt_file_IO.o gz_vtk_file_IO.o gz_read_psf_binary_file.o gz_ucd_field_file_IO.o gz_ucd_field_file_IO_b.o t_file_IO_parameter.o t_time_data.o t_ucd_data.o t_ctl_data_4_platforms.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 ucd_data_to_buffer.o: $(IO_DIR)/ucd_data_to_buffer.f90 m_precision.o m_constants.o m_geometry_constants.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<

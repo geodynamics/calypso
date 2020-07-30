@@ -353,10 +353,14 @@
         sel_psf_file_format = iflag_sgl_vtd_gz
 !
       else if(check_mul_flags(file_fmt_ctl, mgd_vtk_labels)             &
-     &   .or. check_mul_flags(file_fmt_ctl, vtk_flags)) then
+     &   .or. check_mul_flags(file_fmt_ctl, vtk_flags)                  &
+     &   .or. check_mul_flags(file_fmt_ctl, mgd_fld_ascii_labels)       &
+     &   .or. check_mul_flags(file_fmt_ctl, field_ascii_labels)) then
         sel_psf_file_format = iflag_sgl_vtk
       else if(check_mul_flags(file_fmt_ctl, mgd_vtk_gz_labels)          &
-     &   .or. check_mul_flags(file_fmt_ctl, vtk_gz_flags)) then
+     &   .or. check_mul_flags(file_fmt_ctl, vtk_gz_flags)               &
+     &   .or. check_mul_flags(file_fmt_ctl, mgd_fld_gz_labels)          &
+     &   .or. check_mul_flags(file_fmt_ctl, field_gz_labels)) then
         sel_psf_file_format = iflag_sgl_vtk_gz
 !
       else if(check_mul_flags(file_fmt_ctl, mgd_iso_labels)             &
@@ -367,10 +371,14 @@
         sel_psf_file_format = iflag_sgl_ucd_bin_gz
 !
       else if(check_mul_flags(file_fmt_ctl, mgd_psf_labels)             &
-     &   .or. check_mul_flags(file_fmt_ctl, psf_flags)) then
+     &   .or. check_mul_flags(file_fmt_ctl, psf_flags)                  &
+     &   .or. check_mul_flags(file_fmt_ctl, mgd_fld_bin_labels)         &
+     &   .or. check_mul_flags(file_fmt_ctl, field_bin_labels)) then
         sel_psf_file_format = iflag_sgl_udt_bin
       else if(check_mul_flags(file_fmt_ctl, mgd_psf_gz_labels)          &
-     &   .or. check_mul_flags(file_fmt_ctl, psf_gz_flags)) then
+     &   .or. check_mul_flags(file_fmt_ctl, psf_gz_flags)               &
+     &   .or. check_mul_flags(file_fmt_ctl, mgd_fbin_gz_labels)         &
+     &   .or. check_mul_flags(file_fmt_ctl, fbin_gz_labels)) then
         sel_psf_file_format = iflag_sgl_udt_bin_gz
       else
         sel_psf_file_format = iflag_sgl_vtk

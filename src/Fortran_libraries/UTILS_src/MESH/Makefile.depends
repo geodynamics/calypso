@@ -124,7 +124,7 @@ set_surface_node.o: $(MESHDIR)/set_surface_node.f90 m_precision.o m_machine_para
 	$(F90) -c $(F90OPTFLAGS) $<
 set_surface_position.o: $(MESHDIR)/set_surface_position.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_ucd_data_to_type.o: $(MESHDIR)/set_ucd_data_to_type.f90 m_precision.o m_constants.o t_geometry_data.o t_phys_data.o t_time_data.o t_ucd_data.o t_file_IO_parameter.o set_and_cal_udt_data.o set_ucd_data.o cal_minmax_and_stacks.o ucd_IO_select.o
+set_ucd_data_to_type.o: $(MESHDIR)/set_ucd_data_to_type.f90 m_precision.o m_constants.o t_geometry_data.o t_phys_data.o t_time_data.o t_ucd_data.o t_file_IO_parameter.o set_and_cal_udt_data.o set_ucd_data.o cal_minmax_and_stacks.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_FEM_mesh_field_data.o: $(MESHDIR)/t_FEM_mesh_field_data.f90 m_precision.o t_mesh_data.o t_phys_data.o t_phys_address.o
 	$(F90) -c $(F90OPTFLAGS) $<

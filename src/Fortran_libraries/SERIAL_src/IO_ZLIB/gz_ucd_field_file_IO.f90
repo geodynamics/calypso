@@ -7,12 +7,12 @@
 !> @brief gzipped UCD ascii data IO
 !!
 !!@verbatim
-!!      subroutine write_ucd_2_gz_fld_file                              &
+!!      subroutine gz_write_ucd_2_fld_file                              &
 !!     &         (id_rank, gzip_name, t_IO, ucd)
 !!
-!!      subroutine read_ucd_2_gz_fld_file                               &
+!!      subroutine gz_read_ucd_2_fld_file                               &
 !!     &         (id_rank, gzip_name, t_IO, ucd, ierr_IO)
-!!      subroutine read_alloc_ucd_2_gz_fld_file                         &
+!!      subroutine gz_read_alloc_ucd_2_ld_file                          &
 !!     &         (id_rank, gzip_name, t_IO, ucd, ierr)
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(ucd_data), intent(inout) :: ucd
@@ -45,7 +45,7 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine write_ucd_2_gz_fld_file                                &
+      subroutine gz_write_ucd_2_fld_file                                &
      &         (id_rank, gzip_name, t_IO, ucd)
 !
       use skip_gz_comment
@@ -70,12 +70,12 @@
 !
       call close_gzfile_a(zbuf_fu)
 !
-      end subroutine write_ucd_2_gz_fld_file
+      end subroutine gz_write_ucd_2_fld_file
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine read_ucd_2_gz_fld_file                                 &
+      subroutine gz_read_ucd_2_fld_file                                 &
      &         (id_rank, gzip_name, t_IO, ucd, ierr_IO)
 !
       use skip_gz_comment
@@ -106,11 +106,11 @@
 !
       call close_gzfile_a(zbuf_fu)
 !
-      end subroutine read_ucd_2_gz_fld_file
+      end subroutine gz_read_ucd_2_fld_file
 !
 !------------------------------------------------------------------
 !
-      subroutine read_alloc_ucd_2_gz_fld_file                           &
+      subroutine gz_read_alloc_ucd_2_ld_file                            &
      &         (id_rank, gzip_name, t_IO, ucd, ierr_IO)
 !
       use skip_gz_comment
@@ -148,7 +148,7 @@
 !
       call close_gzfile_a(zbuf_fu)
 !
-      end subroutine read_alloc_ucd_2_gz_fld_file
+      end subroutine gz_read_alloc_ucd_2_ld_file
 !
 !------------------------------------------------------------------
 !

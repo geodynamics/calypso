@@ -108,7 +108,7 @@
      &         (i_step, ucd_step, udt_file_param, nod_fld, t_IO)
 !
       use calypso_mpi
-      use set_ucd_data_to_type
+      use output_parallel_ucd_file
 !
       integer(kind = kint), intent(in) :: i_step
       type(IO_step_param), intent(in) :: ucd_step

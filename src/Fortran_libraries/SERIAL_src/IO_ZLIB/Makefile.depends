@@ -76,6 +76,8 @@ gz_ucd_data_IO.o: $(ZLIB_IO_DIR)/gz_ucd_data_IO.f90 m_precision.o m_constants.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_ucd_field_file_IO.o: $(ZLIB_IO_DIR)/gz_ucd_field_file_IO.f90 m_precision.o m_machine_parameter.o m_field_file_format.o t_time_data.o t_ucd_data.o gz_field_data_IO.o set_ucd_file_names.o skip_gz_comment.o gz_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
+gz_ucd_field_file_IO_b.o: $(ZLIB_IO_DIR)/gz_ucd_field_file_IO_b.f90 m_precision.o m_machine_parameter.o m_field_file_format.o t_time_data.o t_ucd_data.o gz_field_data_IO.o set_ucd_file_names.o skip_gz_comment.o gzip_file_access.o gz_field_data_IO_b.o
+	$(F90) -c $(F90OPTFLAGS) $<
 gz_udt_file_IO.o: $(ZLIB_IO_DIR)/gz_udt_file_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_ucd_data.o t_buffer_4_gzip.o skip_gz_comment.o gz_udt_type_data_IO.o gz_ucd_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_udt_to_VTK_data_IO.o: $(ZLIB_IO_DIR)/gz_udt_to_VTK_data_IO.f90 m_precision.o m_constants.o m_machine_parameter.o t_ucd_data.o gz_vtk_data_IO.o vtk_data_to_buffer.o skip_comment_f.o copy_between_two_fields.o

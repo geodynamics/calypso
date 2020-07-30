@@ -49,23 +49,23 @@
 !        character(len=kchara) :: file_prefix = "rst"
 !>        file format flag for field data
 !        integer(kind = kint) :: iflag_file_fmt =  0
+!
+!>        number of data points (numgrid_phys_IO)
+        integer(kind = kint) :: nnod_IO
 !>        number of field for IO (num_phys_data_IO)
         integer(kind = kint) :: num_field_IO
 !>        total number of component for IO (ntot_phys_data_IO)
         integer(kind = kint) :: ntot_comp_IO
-!>        number of component for each field (num_comp_IO)
-        integer(kind = kint), allocatable :: num_comp_IO(:)
 !>        end address of component for each field (istack_phys_comp_IO)
         integer(kind = kint), allocatable :: istack_comp_IO(:)
 !
+!>        number of component for each field (num_comp_IO)
+        integer(kind = kint), pointer :: num_comp_IO(:)
 !>        field name (phys_data_name_IO)
-        character(len=kchara), allocatable :: fld_name(:)
-!
-!>        number of data points (numgrid_phys_IO)
-        integer(kind = kint) :: nnod_IO
+        character(len=kchara), pointer :: fld_name(:)
 !
 !>        field data for IO  (d_IO(:,:))
-        real(kind = kreal), allocatable :: d_IO(:,:)
+        real(kind = kreal), pointer :: d_IO(:,:)
 !
 !>        end point for number of node for each subdomain
         integer(kind = kint_gl), allocatable :: istack_numnod_IO(:)
@@ -201,7 +201,7 @@
       type(field_IO), intent(inout) :: fld_IO
 !
 !
-      if(allocated(fld_IO%num_comp_IO)) then 
+      if(associated(fld_IO%num_comp_IO)) then 
         deallocate( fld_IO%num_comp_IO )
         deallocate( fld_IO%istack_comp_IO )
         deallocate( fld_IO%fld_name )
@@ -216,7 +216,7 @@
       type(field_IO), intent(inout) :: fld_IO
 !
 !
-      if(allocated(fld_IO%d_IO)) deallocate(fld_IO%d_IO)
+      if(associated(fld_IO%d_IO)) deallocate(fld_IO%d_IO)
 !
       end subroutine dealloc_phys_data_IO
 !

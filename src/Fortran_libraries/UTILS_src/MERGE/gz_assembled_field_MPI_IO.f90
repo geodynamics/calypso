@@ -90,6 +90,7 @@
       use field_data_IO
       use gz_field_file_MPI_IO
       use gz_field_data_MPI_IO
+      use gz_field_block_MPI_IO
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: num_pe

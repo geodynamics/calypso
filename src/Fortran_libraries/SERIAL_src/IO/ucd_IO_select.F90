@@ -50,9 +50,10 @@
 !
 #ifdef ZLIB_IO
       use gz_udt_file_IO
-      use gz_ucd_field_file_IO
       use gz_vtk_file_IO
       use gz_read_psf_binary_file
+      use gz_ucd_field_file_IO
+      use gz_ucd_field_file_IO_b
 #endif
 !
       use t_file_IO_parameter
@@ -118,18 +119,21 @@
       else if(ucd_param%iflag_format .eq. iflag_udt_gz) then
         call write_gz_udt_file(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_fld_gz) then
-        call write_ucd_2_gz_fld_file(id_rank, file_name, t_IO, ucd)
+        call gz_write_ucd_2_fld_file(id_rank, file_name, t_IO, ucd)
+      else if(ucd_param%iflag_format .eq. iflag_bin_gz) then
+        call gz_write_ucd_2_fld_file_b(id_rank, file_name, t_IO, ucd)
 #endif
 !
-      else if (ucd_param%iflag_format .eq. iflag_bin) then
-        call write_ucd_2_fld_file_b                                     &
-     &     (id_rank, file_name, t_IO, ucd, ierr)
       else if(ucd_param%iflag_format .eq. iflag_vtd) then
         call write_vtk_phys(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_ucd) then
         call write_ucd_file(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_udt) then
         call write_udt_file(id_rank, file_name, ucd)
+!
+      else if (ucd_param%iflag_format .eq. iflag_bin) then
+        call write_ucd_2_fld_file_b                                     &
+     &     (id_rank, file_name, t_IO, ucd, ierr)
       else
         call write_ucd_2_fld_file(id_rank, file_name, t_IO, ucd)
       end if
@@ -168,18 +172,21 @@
       else if(ucd_param%iflag_format .eq. iflag_udt_gz) then
         call write_gz_udt_file(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_fld_gz) then
-        call write_ucd_2_gz_fld_file(id_rank, file_name, t_IO, ucd)
+        call gz_write_ucd_2_fld_file(id_rank, file_name, t_IO, ucd)
+      else if(ucd_param%iflag_format .eq. iflag_bin_gz) then
+        call gz_write_ucd_2_fld_file_b(id_rank, file_name, t_IO, ucd)
 #endif
 !
-      else if (ucd_param%iflag_format .eq. iflag_bin) then
-        call write_ucd_2_fld_file_b                                     &
-     &     (id_rank, file_name, t_IO, ucd, ierr)
       else if(ucd_param%iflag_format .eq. iflag_vtd) then
         call write_vtk_phys(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_ucd) then
         call write_ucd_file(id_rank, file_name, ucd)
       else if(ucd_param%iflag_format .eq. iflag_udt) then
         call write_udt_file(id_rank, file_name, ucd)
+!
+      else if (ucd_param%iflag_format .eq. iflag_bin) then
+        call write_ucd_2_fld_file_b                                     &
+     &     (id_rank, file_name, t_IO, ucd, ierr)
       else
         call write_ucd_2_fld_file(id_rank, file_name, t_IO, ucd)
       end if
@@ -201,7 +208,12 @@
      &           ucd_param%iflag_format, id_rank)
 !
 !
-      if(ucd_param%iflag_format .eq. iflag_vtd) then
+      if(     (ucd_param%iflag_format .eq. iflag_fld_gz)                &
+     &  .or.  (ucd_param%iflag_format .eq. iflag_bin_gz)                &
+     &  .or.  (ucd_param%iflag_format .eq. iflag_bin)                   &
+     &  .or.  (ucd_param%iflag_format .eq. iflag_ascii)) then
+        return
+      else if(ucd_param%iflag_format .eq. iflag_vtd) then
         call write_vtk_grid(id_rank, file_name, ucd)
 !
 #ifdef ZLIB_IO
@@ -254,7 +266,10 @@
       else if (ucd_param%iflag_format .eq. iflag_udt_bin_gz) then
         call gz_read_alloc_psf_bin_file(file_name, np_tmp, ucd)
       else if(ucd_param%iflag_format .eq. iflag_fld_gz) then
-        call read_alloc_ucd_2_gz_fld_file                               &
+        call gz_read_alloc_ucd_2_ld_file                                &
+     &     (id_rank, file_name, t_IO, ucd, ierr)
+      else if(ucd_param%iflag_format .eq. iflag_bin_gz) then
+        call gz_read_alloc_ucd_2_fld_file_b                             &
      &     (id_rank, file_name, t_IO, ucd, ierr)
 #endif
 !
@@ -305,7 +320,10 @@
       else if (ucd_param%iflag_format .eq. iflag_udt_bin_gz) then
         call gz_read_alloc_psf_bin_file(file_name, np_tmp, ucd)
       else if(ucd_param%iflag_format .eq. iflag_fld_gz) then
-        call read_alloc_ucd_2_gz_fld_file                               &
+        call gz_read_alloc_ucd_2_ld_file                                &
+     &     (id_rank, file_name, t_IO, ucd, ierr)
+      else if(ucd_param%iflag_format .eq. iflag_bin_gz) then
+        call gz_read_alloc_ucd_2_fld_file_b                             &
      &     (id_rank, file_name, t_IO, ucd, ierr)
 #endif
 !
@@ -422,7 +440,10 @@
       else if (ucd_param%iflag_format .eq. iflag_udt_bin_gz) then
         call gz_read_psf_bin_file(file_name, np_tmp, ucd)
       else if(ucd_param%iflag_format .eq. iflag_fld_gz) then
-        call read_ucd_2_gz_fld_file                                     &
+        call gz_read_ucd_2_fld_file                                     &
+     &     (id_rank, file_name, t_IO, ucd, ierr)
+      else if(ucd_param%iflag_format .eq. iflag_bin_gz) then
+        call gz_read_ucd_2_fld_file_b                                   &
      &     (id_rank, file_name, t_IO, ucd, ierr)
 #endif
 !

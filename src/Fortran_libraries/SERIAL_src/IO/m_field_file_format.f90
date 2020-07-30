@@ -114,6 +114,10 @@
 !>      Integer flag for HDF file data
       integer(kind = kint), parameter :: iflag_sgl_hdf5 = 150
 !
+!>      Integer flag for merged gzipped binary data
+      integer(kind = kint), parameter :: iflag_sgl_bin_gz = 102
+!>      Integer flag for merged gzipped binary data
+      integer(kind = kint), parameter :: iflag_sgl_gz = 103
 !
 !>      Integer flag for gzipped ascii original data
       integer(kind = kint), parameter :: iflag_fld_gz =       3
@@ -134,8 +138,6 @@
 !!         (Separated by FEM mesh part and field part)
       integer(kind = kint), parameter :: iflag_udt_bin_gz =  83
 !
-!>      Integer flag for merged gzipped binary data
-      integer(kind = kint), parameter :: iflag_sgl_bin_gz = 103
 !>      Integer flag for merged binary field and grid data
       integer(kind = kint), parameter :: iflag_sgl_ucd_bin_gz =  173
 !>      Integer flag for merged binary field data
@@ -166,15 +168,30 @@
       integer(kind= kint), intent(in) :: i_file_fmt
       character(len=kchara), intent(in) :: file_fmt_ctl
 !
+      character(len = kchara) :: input_flag
 !
       call init_mgd_field_type_flags
 !
+!        input_flag = 'mgd_fld_gz_labels'
+!        call write_multi_flags(6, input_flag, mgd_fld_gz_labels)
+!        input_flag = 'mgd_fbin_gz_labels'
+!        call write_multi_flags(6, input_flag, mgd_fbin_gz_labels)
+        write(*,*) 'file_fmt_ctl', file_fmt_ctl
       if (i_file_fmt .eq. 0) then
         choose_para_fld_file_format = iflag_sgl_vtk
         return
       end if
 !
-      if     (check_mul_flags(file_fmt_ctl, mgd_udt_labels)) then
+      if     (check_mul_flags(file_fmt_ctl, mgd_fld_ascii_labels)) then
+        choose_para_fld_file_format = iflag_single
+      else if(check_mul_flags(file_fmt_ctl, mgd_fld_bin_labels)) then
+        choose_para_fld_file_format = iflag_sgl_bin
+      else if(check_mul_flags(file_fmt_ctl, mgd_fld_gz_labels)) then
+        choose_para_fld_file_format = iflag_sgl_gz
+      else if(check_mul_flags(file_fmt_ctl, mgd_fbin_gz_labels)) then
+        choose_para_fld_file_format = iflag_sgl_bin_gz
+!
+      else if(check_mul_flags(file_fmt_ctl, mgd_udt_labels)) then
         choose_para_fld_file_format = iflag_sgl_udt
       else if(check_mul_flags(file_fmt_ctl, mgd_udt_gz_labels)) then
         choose_para_fld_file_format = iflag_sgl_udt_gz
@@ -212,6 +229,7 @@
      &        = choose_ucd_file_format(file_fmt_ctl, i_file_fmt)
       end if
       call dealloc_mgd_field_type_flags
+      write(*,*) 'choose_para_fld_file_format', choose_para_fld_file_format
 !
       end function choose_para_fld_file_format
 !
@@ -235,6 +253,11 @@
            choose_ucd_file_format = iflag_fld
       else if(check_mul_flags(file_fmt_ctl, field_gz_labels)) then
            choose_ucd_file_format = iflag_fld + iflag_gzip
+      else if(check_mul_flags(file_fmt_ctl, field_bin_labels)) then
+           choose_ucd_file_format = iflag_bin 
+      else if(check_mul_flags(file_fmt_ctl, fbin_gz_labels)) then
+           choose_ucd_file_format = iflag_bin_gz
+!
       else if(check_mul_flags(file_fmt_ctl, udt_flags)) then
            choose_ucd_file_format = iflag_udt
       else if(check_mul_flags(file_fmt_ctl, udt_gz_flags)) then
