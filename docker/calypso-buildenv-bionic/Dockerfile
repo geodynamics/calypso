@@ -8,7 +8,8 @@ RUN apt update && \
   doxygen \
   gfortran \
   git \
-  zlib \
+  zlib1g \
+  zlib1g-dev \
   libblas-dev \
   libfftw3-dev \
   libhdf5-openmpi-dev \
