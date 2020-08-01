@@ -96,8 +96,6 @@
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
 !
-      integer(kind = kint_gl) :: num64
-!
 !
       if(my_rank .eq. 0) write(*,*)                                     &
      &    'read gzipped binary data by MPI-IO: ', trim(file_name)
@@ -140,8 +138,6 @@
 !
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
-!
-      integer(kind = kint_gl) :: num64
 !
 !
       if(my_rank .eq. 0) write(*,*)                                     &

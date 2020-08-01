@@ -4,7 +4,7 @@ add_base_field_4_sph_trns.o: $(MHD_SPH_DIR)/add_base_field_4_sph_trns.f90 m_prec
 	$(F90) -c $(F90OPTFLAGS) $<
 add_base_force_4_sph_trns.o: $(MHD_SPH_DIR)/add_base_force_4_sph_trns.f90 m_precision.o m_constants.o t_base_force_labels.o t_addresses_sph_transform.o t_physical_property.o m_base_force_labels.o add_field_to_sph_trans_list.o m_rot_force_labels.o m_div_force_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_diff_vect_to_sph_trans.o: $(MHD_SPH_DIR)/add_diff_vect_to_sph_trans.f90 m_precision.o t_diff_vector_labels.o t_grad_field_labels.o t_addresses_sph_transform.o add_field_to_sph_trans_list.o
+add_diff_vect_to_sph_trans.o: $(MHD_SPH_DIR)/add_diff_vect_to_sph_trans.f90 m_precision.o t_diff_vector_labels.o t_grad_field_labels.o t_addresses_sph_transform.o add_field_to_sph_trans_list.o m_diff_vector_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 add_diffusion_4_sph_trns.o: $(MHD_SPH_DIR)/add_diffusion_4_sph_trns.f90 m_precision.o m_constants.o t_diffusion_term_labels.o t_addresses_sph_transform.o m_diffusion_term_labels.o add_field_to_sph_trans_list.o
 	$(F90) -c $(F90OPTFLAGS) $<

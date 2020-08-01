@@ -46,7 +46,6 @@
 !
       use t_field_product_labels
       use t_grad_field_labels
-      use t_diff_vector_labels
       use t_explicit_term_labels
 !
       use m_base_field_labels
@@ -54,6 +53,7 @@
       use m_rot_force_labels
       use m_div_force_labels
       use m_diffusion_term_labels
+      use m_diff_vector_labels
 !
       character(len = kchara), intent(in) :: phys_name_ctl
       logical :: flag

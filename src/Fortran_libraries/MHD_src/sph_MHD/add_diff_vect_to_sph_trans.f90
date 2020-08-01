@@ -95,6 +95,7 @@
       subroutine add_diff_vect_sph_trns_by_pol                          &
      &         (ipol_dv, iphys_dv, b_trns_dv, trns)
 !
+      use m_diff_vector_labels
       use add_field_to_sph_trans_list
 !
       type(diff_vector_address), intent(in) :: ipol_dv, iphys_dv
@@ -174,6 +175,7 @@
       subroutine add_diff_vect_scalar_trns_bpol                         &
      &         (ipol_dv, iphys_dv, f_trns_dv, trns)
 !
+      use m_diff_vector_labels
       use add_field_to_sph_trans_list
 !
       type(diff_vector_address), intent(in) :: ipol_dv, iphys_dv

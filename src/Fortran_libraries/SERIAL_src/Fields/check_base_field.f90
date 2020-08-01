@@ -148,7 +148,7 @@
 !
       subroutine add_field_ctl_4_diff_vector(field_ctl)
 !
-      use t_diff_vector_labels
+      use m_diff_vector_labels
       use m_base_field_labels
       use add_nodal_fields_ctl
 !
