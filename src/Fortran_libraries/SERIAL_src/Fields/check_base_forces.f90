@@ -36,6 +36,7 @@
 !
       use t_control_array_character3
       use t_diff_vector_labels
+      use m_base_field_labels
       use add_nodal_fields_ctl
 !
       type(ctl_array_c3), intent(inout) :: field_ctl
@@ -178,6 +179,7 @@
 !
       use t_control_array_character3
       use t_field_product_labels
+      use m_base_field_labels
       use add_nodal_fields_ctl
 !
       type(ctl_array_c3), intent(inout) :: field_ctl
@@ -245,6 +247,7 @@
 !
       use t_control_array_character3
       use t_diffusion_term_labels
+      use m_base_field_labels
       use add_nodal_fields_ctl
 !
       type(ctl_array_c3), intent(inout) :: field_ctl

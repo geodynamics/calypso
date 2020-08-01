@@ -41,6 +41,7 @@
       subroutine s_bcast_comm_stacks_sph(ndomain_sph, comm_sph)
 !
       use calypso_mpi_int
+      use transfer_to_long_integers
 !
       integer(kind = kint), intent(in) :: ndomain_sph
       type(sph_comm_tbl), intent(inout) :: comm_sph(ndomain_sph)
@@ -79,10 +80,10 @@
      &       = comm_sph(ip)%istack_sr(0:comm_sph(ip)%nneib_domain)
         end if
 !
-        call MPI_Bcast(comm_tmp%id_domain(1), comm_tmp%nneib_domain,    &
-     &      CALYPSO_INTEGER, iroot, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(comm_tmp%istack_sr(1), comm_tmp%nneib_domain,    &
-     &      CALYPSO_INTEGER, iroot, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_bcast_int(comm_tmp%id_domain(1),               &
+     &      cast_long(comm_tmp%nneib_domain), iroot)
+        call calypso_mpi_bcast_int(comm_tmp%istack_sr(1),               &
+     &      cast_long(comm_tmp%nneib_domain), iroot)
 !
         iflag = 0
         do i = 1, comm_tmp%nneib_domain

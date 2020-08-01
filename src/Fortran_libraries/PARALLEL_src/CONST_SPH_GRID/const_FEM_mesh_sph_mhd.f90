@@ -181,8 +181,10 @@
      &          s3d_ranks, sph_dbc, sph_lcp, stk_lc1d, sph_gl1d)
 !
       use calypso_mpi
+      use calypso_mpi_int
       use const_global_sph_grids_modes
       use set_global_spherical_param
+      use transfer_to_long_integers
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(group_data), intent(in) :: radial_rtp_grp
@@ -198,8 +200,9 @@
       integer :: ip_rank
 !
 !
-      call MPI_allREDUCE(sph_rtp%irank_sph_rtp, s3d_ranks%ndomain_rtp,  &
-     &    3, CALYPSO_INTEGER, MPI_MAX, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_int                                    &
+     &   (sph_rtp%irank_sph_rtp, s3d_ranks%ndomain_rtp,                 &
+     &    cast_long(3), MPI_MAX)
       s3d_ranks%ndomain_rtp(1:3) = s3d_ranks%ndomain_rtp(1:3) + 1
 !
       s3d_ranks%ndomain_sph = nprocs
@@ -209,8 +212,9 @@
       s3d_ranks%iglobal_rank_rtp(1:3,my_rank)                           &
      &           = sph_rtp%irank_sph_rtp(1:3)
       do ip_rank = 0, nprocs-1
-        call MPI_Bcast(s3d_ranks%iglobal_rank_rtp(1,ip_rank), 3,        &
-     &       CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_bcast_int                                      &
+     &     (s3d_ranks%iglobal_rank_rtp(1,ip_rank),                      &
+     &      cast_long(3), ip_rank)
       end do
       if(s3d_ranks%iglobal_rank_rtp(1,1)                                &
      &       .eq. s3d_ranks%iglobal_rank_rtp(1,0)) then
@@ -234,10 +238,11 @@
       stk_lc1d%istack_idx_local_rtp_r(ip) =   sph_rtp%ied_rtp(1)
       do ip = 1, s3d_ranks%ndomain_rtp(1)
         ip_rank = int((ip-1) * inc_r)
-        call MPI_Bcast(sph_lc1_SF%nidx_local_rtp_r(ip), 1,              &
-     &      CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(stk_lc1d%istack_idx_local_rtp_r(ip-1), 2,        &
-     &      CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_bcast_int(sph_lc1_SF%nidx_local_rtp_r(ip),     &
+     &      cast_long(1), ip_rank)
+        call calypso_mpi_bcast_int                                      &
+     &     (stk_lc1d%istack_idx_local_rtp_r(ip-1),                      &
+     &      cast_long(2), ip_rank)
       end do
 !
       ip = sph_rtp%irank_sph_rtp(2) + 1
@@ -247,10 +252,11 @@
 !
       do ip = 1, s3d_ranks%ndomain_rtp(2)
         ip_rank = int((ip-1) * inc_t)
-        call MPI_Bcast(sph_lc1_SF%nidx_local_rtp_t(ip), 1,              &
-     &      CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(stk_lc1d%istack_idx_local_rtp_t(ip-1), 2,        &
-     &      CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_bcast_int(sph_lc1_SF%nidx_local_rtp_t(ip),     &
+     &      cast_long(1), ip_rank)
+        call calypso_mpi_bcast_int                                      &
+     &     (stk_lc1d%istack_idx_local_rtp_t(ip-1),                      &
+     &      cast_long(2), ip_rank)
       end do
 !
       ip = sph_rtp%irank_sph_rtp(3) + 1
@@ -306,18 +312,18 @@
 !
       do ip = 1, s3d_ranks%ndomain_rtp(1)
         ip_rank = int((ip-1) * inc_r)
-        call MPI_Bcast(sph_dbc%nidx_local_rtp_OC(ip), 1,                &
-     &      CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(sph_dbc%nidx_local_rtp_IC(ip), 1,                &
-     &      CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(sph_dbc%nidx_local_rtp_MT(ip), 1,                &
-     &      CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(sph_dbc%ist_idx_local_rtp_OC(ip), 1,             &
-     &      CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(sph_dbc%ist_idx_local_rtp_IC(ip), 1,             &
-     &      CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
-        call MPI_Bcast(sph_dbc%ist_idx_local_rtp_MT(ip), 1,             &
-     &      CALYPSO_INTEGER, ip_rank, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_bcast_int                                      &
+     &     (sph_dbc%nidx_local_rtp_OC(ip), cast_long(1),  ip_rank)
+        call calypso_mpi_bcast_int                                      &
+     &     (sph_dbc%nidx_local_rtp_IC(ip), cast_long(1),  ip_rank)
+        call calypso_mpi_bcast_int                                      &
+     &     (sph_dbc%nidx_local_rtp_MT(ip), cast_long(1),  ip_rank)
+        call calypso_mpi_bcast_int                                      &
+     &     (sph_dbc%ist_idx_local_rtp_OC(ip), cast_long(1), ip_rank)
+        call calypso_mpi_bcast_int                                      &
+     &     (sph_dbc%ist_idx_local_rtp_IC(ip), cast_long(1), ip_rank)
+        call calypso_mpi_bcast_int                                      &
+     &     (sph_dbc%ist_idx_local_rtp_MT(ip), cast_long(1), ip_rank)
       end do
 !
       call set_gl_nnod_spherical(s3d_ranks%ndomain_sph,                 &
@@ -336,9 +342,8 @@
       do ip = 1, s3d_ranks%ndomain_rtp(1)
         ip_rank = int((ip-1) * inc_r)
         ist = stk_lc1d%istack_idx_local_rtp_r(ip-1) + 1
-        call MPI_Bcast(sph_gl1d%idx_global_rtp_r(ist),                  &
-     &      int(sph_lc1_SF%nidx_local_rtp_r(ip)), CALYPSO_INTEGER,      &
-     &      ip_rank, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_bcast_int(sph_gl1d%idx_global_rtp_r(ist),      &
+     &      cast_long(sph_lc1_SF%nidx_local_rtp_r(ip)), ip_rank)
       end do
 !
       do inum = 1, sph_rtp%nidx_rtp(2)
@@ -348,9 +353,8 @@
       do ip = 1, s3d_ranks%ndomain_rtp(2)
         ip_rank = int((ip-1) * inc_t)
         ist = stk_lc1d%istack_idx_local_rtp_t(ip-1) + 1
-        call MPI_Bcast(sph_gl1d%idx_global_rtp_t(ist),                  &
-     &      int(sph_lc1_SF%nidx_local_rtp_t(ip)), CALYPSO_INTEGER,      &
-     &      ip_rank, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_bcast_int(sph_gl1d%idx_global_rtp_t(ist),      &
+     &      cast_long(sph_lc1_SF%nidx_local_rtp_t(ip)), ip_rank)
       end do
 !
       do inod = 1, sph_rtp%nidx_rtp(3)

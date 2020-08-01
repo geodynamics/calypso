@@ -216,6 +216,7 @@
 !
       subroutine bcast_dimless_ctl(dless_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(dimless_control), intent(inout) :: dless_ctl
@@ -223,14 +224,15 @@
 !
       call bcast_ctl_array_cr(dless_ctl%dimless)
 !
-      call MPI_BCAST(dless_ctl%i_dimless_ctl, 1,                        &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(dless_ctl%i_dimless_ctl, 0)
 !
       end subroutine bcast_dimless_ctl
 !
 !   --------------------------------------------------------------------
 !
       subroutine bcast_coef_term_ctl(eqs_ctl)
+!
+      use calypso_mpi_int
 !
       type(equations_control), intent(inout) :: eqs_ctl
 !
@@ -240,8 +242,7 @@
       call bcast_induction_ctl(eqs_ctl%induct_ctl)
       call bcast_thermal_ctl(eqs_ctl%comp_ctl)
 !
-      call MPI_BCAST(eqs_ctl%i_coef_term_ctl, 1,                        &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(eqs_ctl%i_coef_term_ctl, 0)
 !
       end subroutine bcast_coef_term_ctl
 !

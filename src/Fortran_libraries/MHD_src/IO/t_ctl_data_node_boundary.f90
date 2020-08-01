@@ -243,6 +243,7 @@
 !
       subroutine bcast_bc_4_node_ctl(nbc_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(node_bc_control), intent(inout) :: nbc_ctl
@@ -257,8 +258,7 @@
       call bcast_ctl_array_c2r(nbc_ctl%node_bc_A_ctl)
       call bcast_ctl_array_c2r(nbc_ctl%node_bc_J_ctl)
 !
-      call MPI_BCAST(nbc_ctl%i_bc_4_node, 1,                            &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(nbc_ctl%i_bc_4_node, 0)
 !
       end subroutine bcast_bc_4_node_ctl
 !

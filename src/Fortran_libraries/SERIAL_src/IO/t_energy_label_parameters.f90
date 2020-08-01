@@ -21,7 +21,6 @@
       module t_energy_label_parameters
 !
       use m_precision
-!      use m_phys_labels
 !
       use t_spheric_parameter
       use t_rms_4_sph_spectr
@@ -52,7 +51,7 @@
 !
       subroutine init_energy_labels_base(ene_labels)
 !
-      use t_base_field_labels
+      use m_base_field_labels
       use add_direction_labels
 !
       type(energy_label_param), intent(inout) :: ene_labels

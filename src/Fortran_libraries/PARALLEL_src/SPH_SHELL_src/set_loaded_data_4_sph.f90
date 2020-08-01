@@ -49,6 +49,7 @@
      &          comm_rtp, comm_rtm, comm_rlm, comm_rj)
 !
       use calypso_mpi
+      use calypso_mpi_int
       use m_machine_parameter
 !
       use count_num_sph_smp
@@ -101,9 +102,8 @@
      &    sph_rj%inod_rj_center)
 !
       sph_rj%iflag_rj_center = 0
-      call MPI_allREDUCE                                                &
-     &   (sph_rj%inod_rj_center, sph_rj%iflag_rj_center, 1,             &
-     &    CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_one_int                                &
+     &   (sph_rj%inod_rj_center, sph_rj%iflag_rj_center, MPI_SUM)
       if(sph_rj%iflag_rj_center .gt. 0) sph_rj%iflag_rj_center = 1
 !
       end subroutine set_index_flags_4_SPH
@@ -113,6 +113,7 @@
       subroutine set_index_flags_4_rj(sph_rj, comm_rj)
 !
       use calypso_mpi
+      use calypso_mpi_int
       use m_machine_parameter
 !
       use count_num_sph_smp
@@ -133,9 +134,8 @@
      &    sph_rj%inod_rj_center)
 !
       sph_rj%iflag_rj_center = 0
-      call MPI_allREDUCE                                                &
-     &   (sph_rj%inod_rj_center, sph_rj%iflag_rj_center, 1,             &
-     &    CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_one_int                                &
+     &   (sph_rj%inod_rj_center, sph_rj%iflag_rj_center, MPI_SUM)
       if(sph_rj%iflag_rj_center .gt. 0) sph_rj%iflag_rj_center = 1
 !
       end subroutine set_index_flags_4_rj
@@ -146,6 +146,7 @@
      &         (internal_node, sph_rtp, sph_param)
 !
       use calypso_mpi
+      use calypso_mpi_int
       use m_machine_parameter
       use m_spheric_constants
 !
@@ -181,8 +182,8 @@
 !
       if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_local',   &
      &     my_rank, iflag_shell_local, internal_node, nnod_full_shell
-      call MPI_allreduce(iflag_shell_local, sph_param%iflag_shell_mode, &
-     &    1, CALYPSO_INTEGER, MPI_MAX, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_one_int                                &
+     &   (iflag_shell_local, sph_param%iflag_shell_mode, MPI_MAX)
       if(i_debug .eq. iflag_full_msg) write(*,*) 'iflag_shell_mode',    &
      &     my_rank, sph_param%iflag_shell_mode
 !
@@ -193,6 +194,8 @@
 !
       subroutine count_interval_4_each_dir(numdir, nnod, idx_global,    &
      &         istep)
+!
+      use calypso_mpi_int
 !
       integer(kind = kint), intent(in) :: numdir, nnod
       integer(kind = kint), intent(in) :: idx_global(nnod,numdir)

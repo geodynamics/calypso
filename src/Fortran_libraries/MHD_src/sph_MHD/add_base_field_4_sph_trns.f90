@@ -47,6 +47,7 @@
 !     &         (fl_prop, cd_prop, ht_prop, cp_prop,                    &
      &         (ipol_base, iphys_base, b_trns_base, trns)
 !
+      use m_base_field_labels
       use add_field_to_sph_trans_list
 !
 !      type(fluid_property), intent(in) :: fl_prop
@@ -92,6 +93,7 @@
       subroutine add_base_scalar_4_MHD_sph_trns                         &
      &         (ipol_base, iphys_base, b_trns_base, trns)
 !
+      use m_base_field_labels
       use add_field_to_sph_trans_list
 !
 !      type(scalar_property), intent(in) :: ht_prop, cp_prop
@@ -138,6 +140,7 @@
       subroutine add_base_scalar_sph_trns_snap                          &
      &         (ipol_base, iphys_base, b_trns_base, trns)
 !
+      use m_base_field_labels
       use add_field_to_sph_trans_list
 !
       type(base_field_address), intent(in) :: ipol_base, iphys_base

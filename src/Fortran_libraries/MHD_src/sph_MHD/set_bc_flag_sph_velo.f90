@@ -99,6 +99,7 @@
       subroutine set_sph_velo_ICB_flag(sph_rj, bc_IO, r_ICB, ibc_type,  &
      &          bc_mag, sph_bc_U, ICB_Uspec, ICB_Uevo)
 !
+      use m_base_field_labels
       use set_sph_bc_data_by_file
 !
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -159,6 +160,7 @@
       subroutine set_sph_velo_CMB_flag(sph_rj, bc_IO, r_CMB, ibc_type,  &
      &          bc_mag, sph_bc_U, CMB_Uspec, CMB_Uevo)
 !
+      use m_base_field_labels
       use set_sph_bc_data_by_file
 !
       type(sph_rj_grid), intent(in) :: sph_rj

@@ -324,6 +324,7 @@
 !
       subroutine bcast_restart_ctl(mr_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(mhd_restart_control), intent(inout) :: mr_ctl
@@ -331,8 +332,7 @@
 !
       call bcast_ctl_type_c1(mr_ctl%restart_flag_ctl)
 !
-      call MPI_BCAST(mr_ctl%i_restart_file, 1,                          &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(mr_ctl%i_restart_file, 0)
 !
       end subroutine bcast_restart_ctl
 !
@@ -340,6 +340,7 @@
 !
       subroutine bcast_time_loop_ctl(mevo_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(mhd_evo_scheme_control), intent(inout) :: mevo_ctl
@@ -372,8 +373,7 @@
       call bcast_ctl_type_i1(mevo_ctl%maxiter_ctl)
       call bcast_ctl_type_i1(mevo_ctl%leg_vector_len)
 !
-      call MPI_BCAST(mevo_ctl%i_time_loop, 1,                           &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(mevo_ctl%i_time_loop, 0)
 !
       end subroutine bcast_time_loop_ctl
 !

@@ -64,7 +64,7 @@
 !
       subroutine write_total_energy_to_screen(id_rank, time_d, pwr)
 !
-      use m_phys_labels
+      use m_base_field_labels
       use sph_mean_spectr_IO
 !
       integer, intent(in) :: id_rank

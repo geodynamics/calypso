@@ -27,6 +27,7 @@
 !
       subroutine bcast_ctl_data_4_time_step(tctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(time_data_control), intent(inout) :: tctl
@@ -82,8 +83,7 @@
 !
       call bcast_ctl_type_c1(tctl%flexible_step_ctl)
 !
-      call MPI_BCAST(tctl%i_tstep, 1,                                   &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(tctl%i_tstep, 0)
 !
       end subroutine bcast_ctl_data_4_time_step
 !

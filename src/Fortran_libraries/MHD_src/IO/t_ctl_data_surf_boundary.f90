@@ -250,6 +250,7 @@
 !
       subroutine bcast_bc_4_surf_ctl(sbc_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(surf_bc_control), intent(inout) :: sbc_ctl
@@ -265,8 +266,7 @@
       call bcast_ctl_array_c2r(sbc_ctl%surf_bc_CF_ctl)
       call bcast_ctl_array_c2r(sbc_ctl%surf_bc_INF_ctl)
 !
-      call MPI_BCAST(sbc_ctl%i_bc_4_surf, 1,                            &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(sbc_ctl%i_bc_4_surf, 0)
 !
       end subroutine bcast_bc_4_surf_ctl
 !

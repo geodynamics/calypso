@@ -310,13 +310,13 @@
       subroutine bcast_section_def_control(psf_def_c)
 !
       use calypso_mpi
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(psf_define_ctl), intent(inout) :: psf_def_c
 !
 !
-      call MPI_BCAST(psf_def_c%i_surface_define,  1,                    &
-     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(psf_def_c%i_surface_define, 0)
 !
       call bcast_ctl_array_cr(psf_def_c%psf_coefs_ctl)
       call bcast_ctl_array_cr(psf_def_c%psf_center_ctl)

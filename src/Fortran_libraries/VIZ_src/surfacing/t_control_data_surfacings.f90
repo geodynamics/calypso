@@ -169,6 +169,7 @@
 !
       subroutine bcast_surfacing_controls(surfacing_ctls)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(surfacing_controls), intent(inout) :: surfacing_ctls
@@ -187,8 +188,8 @@
 !
       call bcast_ctl_type_c1(surfacing_ctls%output_ucd_fmt_s_ctl)
 !
-      call MPI_BCAST(surfacing_ctls%i_surfacing_control, 1,             &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int                                    &
+     &   (surfacing_ctls%i_surfacing_control, 0)
 !
       end subroutine bcast_surfacing_controls
 !

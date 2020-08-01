@@ -251,6 +251,8 @@
 !
       subroutine bcast_ref_scalar_ctl(refs_ctl)
 !
+      use calypso_mpi_int
+!
       type(reference_temperature_ctl), intent(inout) :: refs_ctl
 !
 !
@@ -262,8 +264,7 @@
       call bcast_ctl_type_c1(refs_ctl%reference_ctl)
       call bcast_ctl_type_c1(refs_ctl%stratified_ctl)
 !
-      call MPI_BCAST(refs_ctl%i_temp_def, 1,                            &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(refs_ctl%i_temp_def, 0)
 !
       end subroutine bcast_ref_scalar_ctl
 !
@@ -352,20 +353,23 @@
 !
       subroutine bcast_ref_value_ctl(ref_ctl)
 !
+      use calypso_mpi_int
+!
       type(reference_point_control), intent(inout) :: ref_ctl
 !
 !
       call bcast_ctl_type_r1(ref_ctl%depth)
       call bcast_ctl_type_r1(ref_ctl%value)
 !
-      call MPI_BCAST(ref_ctl%i_referenced, 1,                           &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(ref_ctl%i_referenced, 0)
 !
       end subroutine bcast_ref_value_ctl
 !
 !   --------------------------------------------------------------------
 !
       subroutine bcast_takepiro_ctl(takepiro_ctl)
+!
+      use calypso_mpi_int
 !
       type(takepiro_model_control), intent(inout) :: takepiro_ctl
 !
@@ -374,8 +378,7 @@
       call bcast_ctl_type_r1(takepiro_ctl%stratified_width_ctl)
       call bcast_ctl_type_r1(takepiro_ctl%stratified_outer_r_ctl)
 !
-      call MPI_BCAST(takepiro_ctl%i_takepiro_t_ctl, 1,                  &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call MPI_BCAST(takepiro_ctl%i_takepiro_t_ctl, 0)
 !
       end subroutine bcast_takepiro_ctl
 !

@@ -251,9 +251,10 @@
      &          new_sph, r_itp, new_phys, new_fst_IO, t_IO)
 !
       use calypso_mpi
-      use m_phys_labels
       use t_spheric_parameter
       use r_interpolate_marged_sph
+!
+      use m_base_field_labels
 !
       use parallel_assemble_sph
       use copy_rj_phys_data_4_IO

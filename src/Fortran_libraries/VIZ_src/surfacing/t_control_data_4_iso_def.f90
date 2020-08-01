@@ -200,6 +200,7 @@
       subroutine bcast_iso_define_control(iso_def_c)
 !
       use calypso_mpi
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(iso_define_ctl), intent(inout) :: iso_def_c
@@ -210,8 +211,7 @@
       call bcast_ctl_type_r1(iso_def_c%isosurf_value_ctl)
       call bcast_ctl_type_c1(iso_def_c%isosurf_data_ctl)
 !
-      call MPI_BCAST(iso_def_c%i_iso_define,  1,                        &
-     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(iso_def_c%i_iso_define, 0)
 !
       end subroutine bcast_iso_define_control
 !

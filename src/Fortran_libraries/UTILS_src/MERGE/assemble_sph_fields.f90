@@ -155,7 +155,7 @@
 !
       use extend_potential_field_t
 !
-      use m_phys_labels
+      use m_base_field_labels
       use t_sph_spectr_data
       use t_spheric_parameter
       use r_interpolate_marged_sph

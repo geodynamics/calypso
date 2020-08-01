@@ -83,7 +83,9 @@
       use pickup_gauss_coefficients
       use cal_rms_fields_by_sph
       use output_sph_m_square_file
+      use calypso_mpi_int
       use MPI_sph_gauss_coefs_IO
+      use calypso_mpi_int
 !
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: ipol
@@ -100,8 +102,7 @@
       iflag = check_sph_vol_ms_file(my_rank, monitor%ene_labels,        &
      &                              sph%sph_params, sph%sph_rj,         &
      &                              monitor%pwr)
-      call MPI_Bcast(iflag, 1, CALYPSO_INTEGER, 0,                      &
-     &               CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(iflag, 0)
       if(iflag .gt. 0) then
         call calypso_mpi_barrier
         call calypso_mpi_abort(ierr_file,                               &
@@ -118,8 +119,7 @@
 !
       if ( iflag_debug.gt.0 ) write(*,*) 'check_gauss_coefs_num'
       iflag = check_gauss_coefs_num(monitor%gauss_coef)
-      call MPI_Bcast(iflag, 1, CALYPSO_INTEGER, 0,                      &
-     &               CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(iflag, 0)
       if(iflag .gt. 0) then
         call calypso_mpi_barrier
         call calypso_mpi_abort(ierr_file,                               &

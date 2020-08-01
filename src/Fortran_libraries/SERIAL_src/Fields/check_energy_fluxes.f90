@@ -31,6 +31,7 @@
 !
       subroutine add_field_ctl_4_ene_flux(field_ctl)
 !
+      use m_base_field_labels
       use t_control_array_character3
       use t_diffusion_term_labels
       use add_nodal_fields_ctl

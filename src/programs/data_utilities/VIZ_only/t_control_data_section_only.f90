@@ -145,6 +145,7 @@
 !
       subroutine bcast_section_control_data(sec_viz_ctl)
 !
+      use calypso_mpi_int
       use bcast_4_platform_ctl
       use bcast_4_time_step_ctl
 !
@@ -155,8 +156,7 @@
       call bcast_ctl_data_4_time_step(sec_viz_ctl%t_sect_ctl)
       call bcast_surfacing_controls(sec_viz_ctl%surfacing_ctls)
 !
-      call MPI_BCAST(sec_viz_ctl%i_viz_only_file, 1,                    &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(sec_viz_ctl%i_viz_only_file, 0)
 !
       end subroutine bcast_section_control_data
 !

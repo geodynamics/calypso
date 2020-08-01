@@ -111,6 +111,7 @@
 !
       subroutine bcast_monitor_data_ctl(nmtr_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(node_monitor_control), intent(inout) :: nmtr_ctl
@@ -120,8 +121,7 @@
       call bcast_ctl_array_r3(nmtr_ctl%xx_4_monitor_ctl)
       call bcast_ctl_array_i2(nmtr_ctl%node_4_monitor_ctl)
 !
-      call MPI_BCAST(nmtr_ctl%i_monitor_data, 1,                        &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(nmtr_ctl%i_monitor_data, 0)
 !
       end subroutine bcast_monitor_data_ctl
 !

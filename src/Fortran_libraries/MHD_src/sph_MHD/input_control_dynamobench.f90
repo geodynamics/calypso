@@ -129,6 +129,7 @@
       use t_phys_data
       use t_circle_transform
       use m_phys_labels
+      use m_base_field_labels
       use m_phys_constants
 !
       type(ctl_array_c3), intent(in) :: fld_ctl

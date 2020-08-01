@@ -70,7 +70,7 @@ MPI_surface_data_IO_b.o: $(MPI_IO_DIR)/MPI_surface_data_IO_b.f90 m_precision.o t
 	$(F90) -c $(F90OPTFLAGS) $<
 MPI_vectors_IO.o: $(MPI_IO_DIR)/MPI_vectors_IO.f90 m_precision.o m_constants.o t_calypso_mpi_IO_param.o MPI_ascii_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-MPI_viewer_mesh_IO.o: $(MPI_IO_DIR)/MPI_viewer_mesh_IO.f90 m_precision.o m_constants.o t_viewer_mesh.o t_viewer_group.o t_calypso_mpi_IO_param.o MPI_domain_data_IO.o MPI_ascii_data_IO.o
+MPI_viewer_mesh_IO.o: $(MPI_IO_DIR)/MPI_viewer_mesh_IO.f90 m_precision.o m_constants.o t_viewer_mesh.o t_viewer_group.o t_calypso_mpi_IO_param.o MPI_domain_data_IO.o MPI_ascii_data_IO.o calypso_mpi_int.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
 MPI_viewer_mesh_file_IO.o: $(MPI_IO_DIR)/MPI_viewer_mesh_file_IO.f90 m_precision.o m_constants.o t_merged_viewer_mesh.o t_calypso_mpi_IO_param.o MPI_ascii_data_IO.o m_viewer_mesh_labels.o m_fem_mesh_labels.o MPI_domain_data_IO.o MPI_viewer_mesh_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -96,7 +96,7 @@ merged_udt_vtk_file_IO.o: $(MPI_IO_DIR)/merged_udt_vtk_file_IO.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 mesh_MPI_IO_select.o: $(MPI_IO_DIR)/mesh_MPI_IO_select.F90 m_precision.o calypso_mpi.o m_file_format_switch.o t_file_IO_parameter.o t_mesh_data.o mesh_IO_select.o MPI_mesh_file_IO.o MPI_mesh_file_IO_b.o set_mesh_file_names.o mesh_file_name_by_param.o gz_MPI_mesh_file_IO.o gz_MPI_mesh_file_IO_b.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
-mpi_load_mesh_data.o: $(MPI_IO_DIR)/mpi_load_mesh_data.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_file_IO_parameter.o t_mesh_data.o t_comm_table.o t_geometry_data.o t_surface_data.o t_edge_data.o t_group_data.o mesh_MPI_IO_select.o set_nnod_4_ele_by_type.o load_mesh_data.o calypso_mpi_char.o transfer_to_long_integers.o set_element_data_4_IO.o copy_mesh_structures.o
+mpi_load_mesh_data.o: $(MPI_IO_DIR)/mpi_load_mesh_data.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_file_IO_parameter.o t_mesh_data.o t_comm_table.o t_geometry_data.o t_surface_data.o t_edge_data.o t_group_data.o mesh_MPI_IO_select.o set_nnod_4_ele_by_type.o load_mesh_data.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o set_element_data_4_IO.o copy_mesh_structures.o
 	$(F90) -c $(F90OPTFLAGS) $<
 output_parallel_ucd_file.o: $(MPI_IO_DIR)/output_parallel_ucd_file.f90 m_precision.o calypso_mpi.o t_file_IO_parameter.o t_time_data.o t_ucd_data.o t_geometry_data.o t_comm_table.o t_phys_data.o m_field_file_format.o merged_udt_vtk_file_IO.o parallel_ucd_IO_select.o set_ucd_data_to_type.o set_and_cal_udt_data.o
 	$(F90) -c $(F90OPTFLAGS) $<

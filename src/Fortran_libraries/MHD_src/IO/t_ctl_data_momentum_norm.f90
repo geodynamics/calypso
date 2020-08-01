@@ -160,6 +160,7 @@
 !
       subroutine bcast_momentum_ctl(mom_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(momentum_equation_control), intent(inout) :: mom_ctl
@@ -174,8 +175,7 @@
       call bcast_ctl_array_cr(mom_ctl%coef_4_Coriolis)
       call bcast_ctl_array_cr(mom_ctl%coef_4_Lorentz)
 !
-      call MPI_BCAST(mom_ctl%i_momentum, 1,                             &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(mom_ctl%i_momentum, 0)
 !
       end subroutine bcast_momentum_ctl
 !

@@ -137,8 +137,9 @@
       subroutine sync_group_name_4_empty                                &
      &         (num_pe, nod_grp, ele_grp, sf_grp)
 !
-      use calypso_mpi_char
       use t_group_data
+      use calypso_mpi_int
+      use calypso_mpi_char
       use transfer_to_long_integers
 !
       integer, intent(in) :: num_pe
@@ -157,8 +158,7 @@
         num_grp_g(3) = sf_grp%num_grp
       end if
 !
-      call MPI_BCAST(num_grp_g, 3, CALYPSO_INTEGER, 0,                  &
-     &    CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_int(num_grp_g, cast_long(3), 0)
 !
       if(my_rank .ge. num_pe) then
         nod_grp%num_grp = num_grp_g(1)

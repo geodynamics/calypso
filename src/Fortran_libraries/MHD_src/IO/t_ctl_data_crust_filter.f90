@@ -85,14 +85,15 @@
 !
       subroutine bcast_crustal_filtering_ctl(crust_filter_c)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(clust_filtering_ctl), intent(inout) :: crust_filter_c
 !
 !
       call bcast_ctl_type_i1(crust_filter_c%crust_truncation_ctl)
-      call MPI_BCAST(crust_filter_c%i_crustal_filtering, 1,             &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int                                    &
+     &   (crust_filter_c%i_crustal_filtering, 0)
 !
       end subroutine bcast_crustal_filtering_ctl
 !

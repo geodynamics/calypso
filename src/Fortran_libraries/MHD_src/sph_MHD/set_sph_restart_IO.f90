@@ -161,7 +161,7 @@
       subroutine set_sph_restart_from_IO(fld_IO, rj_fld)
 !
       use calypso_mpi
-      use m_phys_labels
+      use m_base_field_labels
       use copy_rj_phys_data_4_IO
 !
       type(field_IO), intent(in) :: fld_IO
@@ -204,7 +204,7 @@
 !
       logical function check_vector_4_restart(field_name)
 !
-      use m_phys_labels
+      use m_base_field_labels
 !
       character(len = kchara), intent(in) :: field_name
 !
@@ -223,7 +223,7 @@
 !
       logical function check_scalar_4_restart(field_name)
 !
-      use m_phys_labels
+      use m_base_field_labels
 !
       character(len = kchara), intent(in) :: field_name
 !

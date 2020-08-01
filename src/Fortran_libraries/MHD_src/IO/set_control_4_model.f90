@@ -45,11 +45,11 @@
      &          mevo_ctl, evo_ctl, nmtr_ctl, MHD_prop)
 !
       use calypso_mpi
-      use m_phys_labels
       use t_ctl_data_mhd_evolution
       use t_ctl_data_temp_model
       use t_ctl_data_node_monitor
       use t_reference_scalar_param
+      use m_base_field_labels
       use node_monitor_IO
 !
       type(reference_temperature_ctl), intent(in) :: reft_ctl

@@ -169,6 +169,9 @@
       use t_ctl_data_pick_sph_spectr
       use t_pickup_sph_spectr_data
       use t_rms_4_sph_spectr
+!
+      use m_base_field_labels
+!
       use output_sph_m_square_file
       use skip_comment_f
 !
@@ -325,7 +328,7 @@
       subroutine set_ctl_params_no_heat_Nu                              &
      &         (Nusselt_file_prefix, rj_fld, Nu_type)
 !
-      use m_phys_labels
+      use m_base_field_labels
       use t_no_heat_Nusselt
       use t_phys_data
       use t_control_array_character

@@ -225,13 +225,13 @@
       subroutine bcast_iso_control_data(iso_c)
 !
       use calypso_mpi
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(iso_ctl), intent(inout) :: iso_c
 !
 !
-      call MPI_BCAST(iso_c%i_iso_ctl,  1,                               &
-     &              CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(iso_c%i_iso_ctl, 0)
 !
       call bcast_ctl_type_c1(iso_c%iso_file_head_ctl)
       call bcast_ctl_type_c1(iso_c%iso_file_head_ctl)

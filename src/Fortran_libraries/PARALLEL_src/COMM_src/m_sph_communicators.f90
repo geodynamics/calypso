@@ -60,7 +60,7 @@
      &                     :: id_domain_rtp(nneib_domain_rtp)
       integer(kind = kint), intent(in) :: nneib_domain_rj
 !
-      integer(kind = kint) :: isum_rtp, isum_rj
+      integer :: isum_rtp, isum_rj
       integer :: icolor_rj_rlm, icolor_rtp_rtm
       integer :: nprocs_rtp4, nprocs_rj4
       integer :: my_rank4, my_rank_rtp4, my_rank_rj4
@@ -105,10 +105,11 @@
       write(*,'(a,6i16)') 'my_rank, RJ_COMM,  np_rj,  rank_rj ',        &
      &          my_rank, CALYPSO_RJ_COMM, nprocs_rj, my_rank_rj
 !
-      CALL MPI_ALLREDUCE(my_rank,isum_rtp, 1, CALYPSO_INTEGER,MPI_SUM,  &
-     &     CALYPSO_RTP_COMM,ierr_MPI)
-      CALL MPI_ALLREDUCE(my_rank,isum_rj,  1, CALYPSO_INTEGER,MPI_SUM,  &
-     &     CALYPSO_RJ_COMM,ierr_MPI)
+      call MPI_ALLREDUCE(my_rank, isum_rtp, 1, CALYPSO_FOUR_INT,        &
+     &                   MPI_SUM, CALYPSO_RTP_COMM, ierr_MPI)
+      call MPI_ALLREDUCE(my_rank, isum_rj,  1, CALYPSO_FOUR_INT,        &
+     &                   MPI_SUM,  &
+     &     CALYPSO_RJ_COMM, ierr_MPI)
       write(*,'(a,6i16)') 'SUM_test', my_rank, isum_rtp, isum_rj
 !
       end subroutine split_rtp_comms

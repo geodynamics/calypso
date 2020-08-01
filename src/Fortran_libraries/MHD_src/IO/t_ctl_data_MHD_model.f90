@@ -188,6 +188,7 @@
 !
       subroutine bcast_sph_mhd_model(Dmodel_ctl)
 !
+      use calypso_mpi_int
       use bcast_4_field_ctl
 !
       type(mhd_DNS_model_control), intent(inout) :: Dmodel_ctl
@@ -209,8 +210,7 @@
       call bcast_ref_scalar_ctl(Dmodel_ctl%reft_ctl)
       call bcast_ref_scalar_ctl(Dmodel_ctl%refc_ctl)
 !
-      call MPI_BCAST(Dmodel_ctl%i_model, 1,                             &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(Dmodel_ctl%i_model, 0)
 !
       end subroutine bcast_sph_mhd_model
 !

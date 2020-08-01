@@ -96,6 +96,7 @@
 !
       use calypso_mpi
       use m_calypso_mpi_IO
+      use m_base_field_labels
       use MPI_read_rayleigh_restart
 !
       integer(kind = kint), intent(in) :: i_fld, i_comp

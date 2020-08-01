@@ -93,6 +93,7 @@
 !
       subroutine bcast_sph_mhd_control(smctl_ctl)
 !
+      use calypso_mpi_int
       use bcast_4_time_step_ctl
 !
       type(sph_mhd_control_control), intent(inout) :: smctl_ctl
@@ -102,8 +103,7 @@
       call bcast_time_loop_ctl(smctl_ctl%mevo_ctl)
       call bcast_ctl_data_4_time_step(smctl_ctl%tctl)
 !
-      call MPI_BCAST(smctl_ctl%i_control, 1,                            &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(smctl_ctl%i_control, 0)
 !
       end subroutine bcast_sph_mhd_control
 !

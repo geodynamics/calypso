@@ -1,10 +1,10 @@
-bcast_4_field_ctl.o: $(COMMDIR)/bcast_4_field_ctl.f90 m_precision.o t_ctl_data_4_fields.o bcast_control_arrays.o
+bcast_4_field_ctl.o: $(COMMDIR)/bcast_4_field_ctl.f90 m_precision.o t_ctl_data_4_fields.o calypso_mpi_int.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
-bcast_4_platform_ctl.o: $(COMMDIR)/bcast_4_platform_ctl.f90 m_precision.o t_ctl_data_4_platforms.o bcast_control_arrays.o t_ctl_data_4_FEM_mesh.o
+bcast_4_platform_ctl.o: $(COMMDIR)/bcast_4_platform_ctl.f90 m_precision.o t_ctl_data_4_platforms.o bcast_control_arrays.o calypso_mpi_int.o t_ctl_data_4_FEM_mesh.o
 	$(F90) -c $(F90OPTFLAGS) $<
-bcast_4_sph_monitor_ctl.o: $(COMMDIR)/bcast_4_sph_monitor_ctl.f90 m_precision.o calypso_mpi.o t_ctl_data_4_sph_monitor.o t_ctl_data_sph_vol_spectr.o t_ctl_data_pick_sph_spectr.o bcast_control_arrays.o t_mid_equator_control.o
+bcast_4_sph_monitor_ctl.o: $(COMMDIR)/bcast_4_sph_monitor_ctl.f90 m_precision.o calypso_mpi.o t_ctl_data_4_sph_monitor.o t_ctl_data_sph_vol_spectr.o t_ctl_data_pick_sph_spectr.o bcast_control_arrays.o calypso_mpi_int.o t_mid_equator_control.o
 	$(F90) -c $(F90OPTFLAGS) $<
-bcast_4_time_step_ctl.o: $(COMMDIR)/bcast_4_time_step_ctl.f90 m_precision.o t_ctl_data_4_time_steps.o bcast_control_arrays.o
+bcast_4_time_step_ctl.o: $(COMMDIR)/bcast_4_time_step_ctl.f90 m_precision.o t_ctl_data_4_time_steps.o calypso_mpi_int.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
 bcast_control_arrays.o: $(COMMDIR)/bcast_control_arrays.f90 m_precision.o m_constants.o calypso_mpi.o t_control_array_real.o calypso_mpi_real.o calypso_mpi_int.o t_control_array_integer.o t_control_array_character.o calypso_mpi_char.o transfer_to_long_integers.o t_control_array_real2.o t_control_array_real3.o t_control_array_integer2.o t_control_array_integer3.o t_control_array_character3.o t_control_array_charaint3.o t_control_array_character2.o t_control_array_charareal.o t_control_array_charaint.o t_control_array_charareal2.o t_control_array_chara2real.o t_control_array_intcharreal.o t_control_array_intreal.o t_control_array_int2real.o t_control_array_int2real2.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -62,7 +62,7 @@ make_element_comm_table_SR.o: $(COMMDIR)/make_element_comm_table_SR.f90 m_precis
 	$(F90) -c $(F90OPTFLAGS) $<
 nod_phys_send_recv.o: $(COMMDIR)/nod_phys_send_recv.f90 m_precision.o calypso_mpi.o t_mesh_data.o t_phys_data.o m_machine_parameter.o m_phys_constants.o t_solver_SR.o m_solver_SR.o m_array_for_send_recv.o m_work_time.o solver_SR_type.o
 	$(F90) -c $(F90OPTFLAGS) $<
-parallel_FEM_mesh_init.o: $(COMMDIR)/parallel_FEM_mesh_init.f90 m_precision.o m_constants.o m_machine_parameter.o m_phys_constants.o calypso_mpi.o t_mesh_data.o t_file_IO_parameter.o t_read_mesh_data.o m_array_for_send_recv.o nod_phys_send_recv.o const_mesh_information.o const_element_comm_tables.o mesh_file_name_by_param.o t_geometry_data.o
+parallel_FEM_mesh_init.o: $(COMMDIR)/parallel_FEM_mesh_init.f90 m_precision.o m_constants.o m_machine_parameter.o m_phys_constants.o calypso_mpi.o t_mesh_data.o t_file_IO_parameter.o t_read_mesh_data.o m_array_for_send_recv.o nod_phys_send_recv.o const_mesh_information.o const_element_comm_tables.o mesh_file_name_by_param.o calypso_mpi_int.o t_geometry_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 reverse_SR_int.o: $(COMMDIR)/reverse_SR_int.f90 m_precision.o m_constants.o calypso_mpi.o t_solver_SR.o
 	$(F90) -c $(F90OPTFLAGS) $<

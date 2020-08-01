@@ -50,7 +50,7 @@
 !
       use t_spheric_parameter
       use t_pickup_sph_spectr_data
-      use m_phys_labels
+      use m_base_field_labels
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj

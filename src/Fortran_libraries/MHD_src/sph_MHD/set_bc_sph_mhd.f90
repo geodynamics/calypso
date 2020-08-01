@@ -24,7 +24,6 @@
 !
       use m_machine_parameter
       use m_boundary_condition_IDs
-      use m_phys_labels
 !
       use t_control_parameter
       use t_physical_property
@@ -48,6 +47,8 @@
 !
       subroutine s_set_bc_sph_mhd(bc_IO, sph_params, sph_rj,            &
      &          radial_rj_grp, MHD_prop, MHD_BC, sph_MHD_bc)
+!
+      use m_base_field_labels
 !
       use set_bc_flag_sph_velo
       use set_bc_sph_scalars
@@ -193,6 +194,7 @@
      &        CTR_nod_grp_name, CTR_sf_grp_name, magne_nod, magne_surf, &
      &        sph_bc_B, bcs_B)
 !
+      use m_base_field_labels
       use set_bc_sph_scalars
       use set_sph_bc_data_by_file
 !

@@ -35,6 +35,7 @@
      &         (fl_prop, cd_prop, ht_prop, cp_prop, field_ctl)
 !
       use add_nodal_fields_ctl
+      use m_base_field_labels
       use m_rot_force_labels
       use m_div_force_labels
 !

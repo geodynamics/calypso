@@ -188,6 +188,7 @@
 !
       subroutine bcast_mhd_time_evo_ctl(evo_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(mhd_evolution_control), intent(inout) :: evo_ctl
@@ -195,8 +196,7 @@
 !
       call bcast_ctl_array_c1(evo_ctl%t_evo_field_ctl)
 !
-      call MPI_BCAST(evo_ctl%i_time_evo, 1,                             &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(evo_ctl%i_time_evo, 0)
 !
       end subroutine bcast_mhd_time_evo_ctl
 !
@@ -204,6 +204,7 @@
 !
       subroutine bcast_mhd_layer_ctl(earea_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(mhd_evo_area_control), intent(inout) :: earea_ctl
@@ -212,8 +213,7 @@
       call bcast_ctl_array_c1(earea_ctl%evo_fluid_group_ctl)
       call bcast_ctl_array_c1(earea_ctl%evo_conduct_group_ctl)
 !
-      call MPI_BCAST(earea_ctl%i_layers_ctl, 1,                         &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(earea_ctl%i_layers_ctl, 0)
 !
       end subroutine bcast_mhd_layer_ctl
 !

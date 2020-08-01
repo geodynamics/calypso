@@ -137,7 +137,7 @@
 !
       subroutine set_sph_magne_address(rj_fld, ipol)
 !
-      use m_phys_labels
+      use m_base_field_labels
 !
       type(phys_data), intent(in) :: rj_fld
       type(phys_address), intent(inout) :: ipol
@@ -192,6 +192,9 @@
      &         (fld_IO, sph_rj, ipol, rj_fld)
 !
       use m_phys_labels
+!
+      use m_base_field_labels
+!
       use t_field_data_IO
       use extend_potential_field
       use radial_interpolation
@@ -209,20 +212,20 @@
         do j_fld = 1, fld_IO%num_field_IO
           if(rj_fld%phys_name(i_fld) .eq. fld_IO%fld_name(j_fld)) then
             if    (rj_fld%phys_name(i_fld) .eq. velocity%name           &
-     &        .or. rj_fld%phys_name(i_fld) .eq. vorticity%name          &
-     &        .or. rj_fld%phys_name(i_fld) .eq. pressure%name           &
-     &        .or. rj_fld%phys_name(i_fld) .eq. temperature%name        &
-     &        .or. rj_fld%phys_name(i_fld) .eq. composition%name        &
-     &        .or. rj_fld%phys_name(i_fld) .eq. magnetic_field%name     &
-     &        .or. rj_fld%phys_name(i_fld) .eq. magnetic_potential%name &
-     &        .or. rj_fld%phys_name(i_fld) .eq. entropy%name            &
-     &        .or. rj_fld%phys_name(i_fld) .eq. previous_momentum%name  &
-     &        .or. rj_fld%phys_name(i_fld) .eq. previous_induction%name &
-     &        .or. rj_fld%phys_name(i_fld) .eq. previous_heat%name      &
-     &        .or. rj_fld%phys_name(i_fld) .eq. previous_composition%name &
-     &        .or. rj_fld%phys_name(i_fld) .eq. heat_source%name        &
-     &        .or. rj_fld%phys_name(i_fld) .eq. composition_source%name &
-     &        .or. rj_fld%phys_name(i_fld) .eq. entropy_source%name     &
+     &       .or. rj_fld%phys_name(i_fld) .eq. vorticity%name           &
+     &       .or. rj_fld%phys_name(i_fld) .eq. pressure%name            &
+     &       .or. rj_fld%phys_name(i_fld) .eq. temperature%name         &
+     &       .or. rj_fld%phys_name(i_fld) .eq. composition%name         &
+     &       .or. rj_fld%phys_name(i_fld) .eq. magnetic_field%name      &
+     &       .or. rj_fld%phys_name(i_fld) .eq. magnetic_potential%name  &
+     &       .or. rj_fld%phys_name(i_fld) .eq. entropy%name             &
+     &       .or. rj_fld%phys_name(i_fld) .eq. previous_momentum%name   &
+     &       .or. rj_fld%phys_name(i_fld) .eq. previous_induction%name  &
+     &       .or. rj_fld%phys_name(i_fld) .eq. previous_heat%name       &
+     &       .or. rj_fld%phys_name(i_fld) .eq.previous_composition%name &
+     &       .or. rj_fld%phys_name(i_fld) .eq. heat_source%name         &
+     &       .or. rj_fld%phys_name(i_fld) .eq. composition_source%name  &
+     &       .or. rj_fld%phys_name(i_fld) .eq. entropy_source%name      &
      &         ) then
               call set_org_rj_phys_data_from_IO                         &
      &           (j_fld, fld_IO, n_rj_org, d_rj_org)

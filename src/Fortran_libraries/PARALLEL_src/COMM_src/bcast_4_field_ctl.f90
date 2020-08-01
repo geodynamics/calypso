@@ -69,6 +69,7 @@
 !
       subroutine bcast_phys_data_ctl(fld_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(field_control), intent(inout) :: fld_ctl
@@ -80,8 +81,7 @@
       call bcast_ctl_array_ci(fld_ctl%scalar_phys)
       call bcast_ctl_array_ci3(fld_ctl%vector_phys)
 !
-      call MPI_BCAST(fld_ctl%i_phys_values, 1,                          &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(fld_ctl%i_phys_values, 0)
 !
       end subroutine bcast_phys_data_ctl
 !

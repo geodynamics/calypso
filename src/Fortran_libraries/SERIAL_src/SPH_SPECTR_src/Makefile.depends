@@ -28,7 +28,7 @@ load_data_for_sph_IO.o: $(SPH_SPECTR_DIR)/load_data_for_sph_IO.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_spheric_constants.o: $(SPH_SPECTR_DIR)/m_spheric_constants.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-output_sph_m_square_file.o: $(SPH_SPECTR_DIR)/output_sph_m_square_file.f90 m_precision.o m_constants.o t_time_data.o t_spheric_parameter.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o t_energy_label_parameters.o sph_mean_spectr_header_IO.o m_phys_labels.o sph_mean_spectr_IO.o set_parallel_file_name.o
+output_sph_m_square_file.o: $(SPH_SPECTR_DIR)/output_sph_m_square_file.f90 m_precision.o m_constants.o t_time_data.o t_spheric_parameter.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o t_energy_label_parameters.o sph_mean_spectr_header_IO.o m_base_field_labels.o sph_mean_spectr_IO.o set_parallel_file_name.o
 	$(F90) -c $(F90OPTFLAGS) $<
 radial_int_for_sph_spec.o: $(SPH_SPECTR_DIR)/radial_int_for_sph_spec.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<

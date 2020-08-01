@@ -210,6 +210,9 @@
       subroutine mpi_write_viewer_grp_data                              &
      &         (IO_param, num_grp, grp_name, view_grp)
 !
+      use calypso_mpi_int
+      use transfer_to_long_integers
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       integer(kind = kint), intent(in) :: num_grp
       character(len=kchara), intent(in) :: grp_name(num_grp)
@@ -229,8 +232,8 @@
       do i = 1, num_grp
         num_l(i) = view_grp%istack_sf(i) - view_grp%istack_sf(i-1)
       end do
-      call MPI_allREDUCE(num_l, istack_g(1), num_grp, CALYPSO_INTEGER,  &
-     &    MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_int(num_l, istack_g(1),                &
+     &                               cast_long(num_grp),  MPI_SUM)
       istack_g(0) = 0
       do i = 1, num_grp
         istack_g(i) = istack_g(i) + istack_g(i-1)

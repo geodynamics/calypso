@@ -143,6 +143,7 @@
 !
       use t_control_array_character3
       use t_reference_scalar_param
+      use m_base_field_labels
 !
       type(reference_scalar_param), intent(in) :: ref_param_T
       type(reference_scalar_param), intent(in) :: ref_param_C
@@ -169,6 +170,7 @@
 !
       use t_control_array_character3
       use t_reference_scalar_param
+      use m_base_field_labels
 !
       type(fluid_property), intent(in) :: fl_prop
       type(reference_scalar_param), intent(in) :: ref_param_T
@@ -305,7 +307,7 @@
 !
       use t_physical_property
       use t_explicit_term_labels
-      use t_base_field_labels
+      use m_base_field_labels
       use add_nodal_fields_ctl
 !
       type(conductive_property), intent(in) :: cd_prop

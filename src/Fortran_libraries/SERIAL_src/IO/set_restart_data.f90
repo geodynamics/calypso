@@ -203,8 +203,6 @@
      &          num_fld_IO, ntot_comp_IO, istack_comp_IO,               &
      &          field_IO_name, nnod_IO, dat_IO)
 !
-      use m_phys_labels
-!
       integer(kind=kint), intent(in) :: num_fld_IO, ntot_comp_IO
       character(len=kchara), intent(in) :: field_IO_name(num_fld_IO)
       integer(kind=kint), intent(in) :: istack_comp_IO(0:num_fld_IO)
@@ -260,8 +258,6 @@
 !
       subroutine set_num_comps_4_rst(rst_name, numdir)
 !
-      use m_phys_labels
-!
       integer(kind = kint), intent(inout) :: numdir
       character(len=kchara), intent(in) :: rst_name
 !
@@ -306,6 +302,7 @@
 !
       logical function check_vector_4_FEM_rst(field_name)
 !
+      use m_base_field_labels
       use m_phys_labels
 !
       character(len = kchara), intent(in) :: field_name
@@ -328,6 +325,7 @@
 !
       logical function check_scalar_4_FEM_rst(field_name)
 !
+      use m_base_field_labels
       use m_phys_labels
 !
       character(len = kchara), intent(in) :: field_name

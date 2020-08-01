@@ -325,13 +325,14 @@
 !
       subroutine bcast_forces_ctl(frc_ctl)
 !
+      use calypso_mpi_int
+!
       type(forces_control), intent(inout) :: frc_ctl
 !
 !
       call bcast_ctl_array_c1(frc_ctl%force_names)
 !
-      call MPI_BCAST(frc_ctl%i_forces_ctl, 1,                           &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(frc_ctl%i_forces_ctl, 0)
 !
       end subroutine bcast_forces_ctl
 !
@@ -339,14 +340,15 @@
 !
       subroutine bcast_gravity_ctl(g_ctl)
 !
+      use calypso_mpi_int
+!
       type(gravity_control), intent(inout) :: g_ctl
 !
 !
       call bcast_ctl_array_cr(g_ctl%gravity_vector)
       call bcast_ctl_type_c1(g_ctl%gravity)
 !
-      call MPI_BCAST(g_ctl%i_gravity_ctl, 1,                            &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(g_ctl%i_gravity_ctl, 0)
 !
       end subroutine bcast_gravity_ctl
 !
@@ -354,19 +356,22 @@
 !
       subroutine bcast_coriolis_ctl(cor_ctl)
 !
+      use calypso_mpi_int
+!
       type(coriolis_control), intent(inout) :: cor_ctl
 !
 !
       call bcast_ctl_array_cr(cor_ctl%system_rotation)
 !
-      call MPI_BCAST(cor_ctl%i_coriolis_ctl, 1,                         &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(cor_ctl%i_coriolis_ctl, 0)
 !
       end subroutine bcast_coriolis_ctl
 !
 !   --------------------------------------------------------------------
 !
       subroutine bcast_magneto_ctl(mcv_ctl)
+!
+      use calypso_mpi_int
 !
       type(magneto_convection_control), intent(inout) :: mcv_ctl
 !
@@ -375,8 +380,7 @@
       call bcast_ctl_type_c1(mcv_ctl%magneto_cv)
       call bcast_ctl_type_c1(mcv_ctl%filterd_induction_ctl)
 !
-      call MPI_BCAST(mcv_ctl%i_magneto_ctl, 1,                          &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(mcv_ctl%i_magneto_ctl, 0)
 !
       end subroutine bcast_magneto_ctl
 !

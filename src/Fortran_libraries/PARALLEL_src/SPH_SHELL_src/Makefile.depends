@@ -86,7 +86,7 @@ ordering_schmidt_trans_spin.o: $(SPH_COMMDIR)/ordering_schmidt_trans_spin.f90 m_
 	$(F90) -c $(F90OPTFLAGS) $<
 parallel_load_data_4_sph.o: $(SPH_COMMDIR)/parallel_load_data_4_sph.f90 m_precision.o m_constants.o t_file_IO_parameter.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_spheric_group.o t_spheric_data_IO.o t_const_spherical_grid.o t_sph_local_parameter.o sph_file_MPI_IO_select.o set_loaded_data_4_sph.o calypso_mpi.o t_mesh_data.o copy_mesh_structures.o mesh_file_name_by_param.o mpi_load_mesh_data.o t_comm_table.o t_geometry_data.o t_group_data.o m_spheric_constants.o const_FEM_mesh_sph_mhd.o gen_sph_grids_modes.o mesh_IO_select.o set_nnod_4_ele_by_type.o m_machine_parameter.o load_data_for_sph_IO.o set_from_recv_buf_rev.o set_special_sph_lm_flags.o
 	$(F90) -c $(F90OPTFLAGS) $<
-pickup_gauss_coefficients.o: $(SPH_COMMDIR)/pickup_gauss_coefficients.f90 m_precision.o m_constants.o t_spheric_parameter.o t_phys_address.o t_phys_data.o t_pickup_sph_spectr_data.o pickup_sph_spectr.o m_phys_labels.o calypso_mpi.o set_parallel_file_name.o t_no_heat_Nusselt.o
+pickup_gauss_coefficients.o: $(SPH_COMMDIR)/pickup_gauss_coefficients.f90 m_precision.o m_constants.o t_spheric_parameter.o t_phys_address.o t_phys_data.o t_pickup_sph_spectr_data.o pickup_sph_spectr.o m_base_field_labels.o calypso_mpi.o set_parallel_file_name.o t_no_heat_Nusselt.o
 	$(F90) -c $(F90OPTFLAGS) $<
 pickup_sph_coefs.o: $(SPH_COMMDIR)/pickup_sph_coefs.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_pickup_sph_spectr_data.o pickup_sph_spectr.o calypso_mpi.o quicksort.o m_phys_labels.o add_direction_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -98,7 +98,7 @@ pole_sph_transform.o: $(SPH_COMMDIR)/pole_sph_transform.f90 m_precision.o m_mach
 	$(F90) -c $(F90OPTFLAGS) $<
 products_at_poles.o: $(SPH_COMMDIR)/products_at_poles.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-r_interpolate_sph_data.o: $(SPH_COMMDIR)/r_interpolate_sph_data.f90 m_precision.o calypso_mpi.o m_constants.o m_machine_parameter.o t_spheric_rj_data.o t_phys_address.o t_phys_data.o t_group_data.o m_phys_labels.o t_file_IO_parameter.o t_spheric_data_IO.o sph_file_MPI_IO_select.o radial_interpolation.o t_field_data_IO.o extend_potential_field.o t_global_gauss_coefs.o m_error_IDs.o t_node_id_spherical_IO.o
+r_interpolate_sph_data.o: $(SPH_COMMDIR)/r_interpolate_sph_data.f90 m_precision.o calypso_mpi.o m_constants.o m_machine_parameter.o t_spheric_rj_data.o t_phys_address.o t_phys_data.o t_group_data.o m_base_field_labels.o t_file_IO_parameter.o t_spheric_data_IO.o sph_file_MPI_IO_select.o radial_interpolation.o m_phys_labels.o t_field_data_IO.o extend_potential_field.o t_global_gauss_coefs.o m_error_IDs.o t_node_id_spherical_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 radial_interpolation.o: $(SPH_COMMDIR)/radial_interpolation.f90 m_precision.o m_constants.o m_machine_parameter.o t_field_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -108,7 +108,7 @@ schmidt_b_trans_at_pole.o: $(SPH_COMMDIR)/schmidt_b_trans_at_pole.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 set_legendre_matrices.o: $(SPH_COMMDIR)/set_legendre_matrices.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_loaded_data_4_sph.o: $(SPH_COMMDIR)/set_loaded_data_4_sph.f90 m_precision.o m_constants.o t_spheric_parameter.o t_sph_trans_comm_tbl.o calypso_mpi.o m_machine_parameter.o count_num_sph_smp.o set_special_sph_lm_flags.o set_from_recv_buf_rev.o m_spheric_constants.o
+set_loaded_data_4_sph.o: $(SPH_COMMDIR)/set_loaded_data_4_sph.f90 m_precision.o m_constants.o t_spheric_parameter.o t_sph_trans_comm_tbl.o calypso_mpi.o calypso_mpi_int.o m_machine_parameter.o count_num_sph_smp.o set_special_sph_lm_flags.o set_from_recv_buf_rev.o m_spheric_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_params_sph_trans.o: $(SPH_COMMDIR)/set_params_sph_trans.f90 m_precision.o m_constants.o t_spheric_rtp_data.o t_spheric_rtm_data.o t_schmidt_poly_on_rtm.o calypso_mpi.o t_spheric_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -27,6 +27,7 @@
 !
       use t_ctl_data_4_platforms
       use bcast_control_arrays
+      use calypso_mpi_int
 !
       type(platform_data_control), intent(inout) :: plt
 !
@@ -63,8 +64,7 @@
 !
       call bcast_ctl_type_c1(plt%del_org_data_ctl)
 !
-      call MPI_BCAST(plt%i_platform, 1,                                 &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(plt%i_platform, 0)
 !
       end subroutine bcast_ctl_data_4_platform
 !

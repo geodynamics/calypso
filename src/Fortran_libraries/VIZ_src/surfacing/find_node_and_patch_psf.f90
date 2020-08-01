@@ -80,6 +80,7 @@
 !
       use m_geometry_constants
       use calypso_mpi
+      use calypso_mpi_int
       use t_control_params_4_psf
       use t_mesh_data
       use t_surface_group_connect
@@ -150,10 +151,10 @@
 !
       if(i_debug .eq. 0) return
       do i_psf = 1, num_psf
-        call mpi_allreduce(psf_mesh(i_psf)%patch%numele, nele_psf,     &
-     &      1, CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, ierr_MPI)
-        call mpi_allreduce(ntot_failed(i_psf), ntot_failed_gl,         &
-     &      1, CALYPSO_INTEGER, MPI_SUM, CALYPSO_COMM, ierr_MPI)
+        call calypso_mpi_allreduce_one_int                              &
+     &     (psf_mesh(i_psf)%patch%numele, nele_psf, MPI_SUM)
+        call calypso_mpi_allreduce_one_int                             &
+     &     (ntot_failed(i_psf), ntot_failed_gl, MPI_SUM)
         if(my_rank .eq. 0) write(*,*) 'nele_psf', i_psf, nele_psf
         if(my_rank .eq. 0) write(*,*) 'ntot_failed_gl',                &
      &                               i_psf, ntot_failed_gl

@@ -119,6 +119,7 @@
 !
       subroutine bcast_sph_shell_define_ctl(gen_SPH_ctl)
 !
+      use calypso_mpi_int
       use bcast_4_platform_ctl
 !
       type(sph_mesh_generation_ctl), intent(inout) :: gen_SPH_ctl
@@ -127,8 +128,7 @@
       call bcast_ctl_data_4_platform(gen_SPH_ctl%plt)
       call bcast_parallel_shell_ctl(gen_SPH_ctl%psph_ctl)
 !
-      call MPI_BCAST(gen_SPH_ctl%i_sph_mesh_ctl, 1,                     &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(gen_SPH_ctl%i_sph_mesh_ctl, 0)
 !
       end subroutine bcast_sph_shell_define_ctl
 !

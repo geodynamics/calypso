@@ -78,6 +78,7 @@
       subroutine check_whole_num_of_elements(ele)
 !
       use calypso_mpi
+      use calypso_mpi_int
       use m_machine_parameter
       use t_geometry_data
 !
@@ -106,8 +107,7 @@
         nele_l = nele_l + nele_smp(iproc)
       end do
 !
-      call MPI_allREDUCE ( nele_l, nele_g, 1, CALYPSO_INTEGER,          &
-     &   MPI_SUM, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_allreduce_one_int(nele_l, nele_g, MPI_SUM)
 !
       if (my_rank.eq.0) write(*,*)                                      &
      &      'number of element for whole domain:  ', nele_g

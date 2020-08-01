@@ -36,11 +36,12 @@
 !
       subroutine bcast_sph_monitoring_ctl(smonitor_ctl)
 !
+      use calypso_mpi_int
+!
       type(sph_monitor_control), intent(inout) :: smonitor_ctl
 !
 !
-      call MPI_BCAST(smonitor_ctl%i_pick_sph, 1,                        &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(smonitor_ctl%i_pick_sph, 0)
 !
       call bcast_ctl_type_c1(smonitor_ctl%volume_average_prefix)
       call bcast_ctl_type_c1(smonitor_ctl%volume_pwr_spectr_prefix)
@@ -54,8 +55,7 @@
       call bcast_mid_eq_monitor_ctl(smonitor_ctl%meq_ctl)
 !
 !
-      call MPI_BCAST(smonitor_ctl%num_vspec_ctl, 1,                     &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(smonitor_ctl%num_vspec_ctl, 0)
       if(smonitor_ctl%num_vspec_ctl .gt. 0 .and. my_rank .gt. 0) then
         allocate(smonitor_ctl%v_pwr(smonitor_ctl%num_vspec_ctl))
       end if

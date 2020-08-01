@@ -176,6 +176,7 @@
 !
       subroutine bcast_thermal_ctl(heat_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(heat_equation_control), intent(inout) :: heat_ctl
@@ -185,8 +186,7 @@
       call bcast_ctl_array_cr(heat_ctl%coef_4_diffuse)
       call bcast_ctl_array_cr(heat_ctl%coef_4_source)
 !
-      call MPI_BCAST(heat_ctl%i_diff_adv, 1,                            &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(heat_ctl%i_diff_adv, 0)
 !
       end subroutine bcast_thermal_ctl
 !

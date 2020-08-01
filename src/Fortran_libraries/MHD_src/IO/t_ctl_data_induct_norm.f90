@@ -122,6 +122,7 @@
 !
       subroutine bcast_induction_ctl(induct_ctl)
 !
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(induction_equation_control), intent(inout) :: induct_ctl
@@ -132,8 +133,7 @@
       call bcast_ctl_array_cr(induct_ctl%coef_4_mag_diffuse)
       call bcast_ctl_array_cr(induct_ctl%coef_4_induction)
 !
-      call MPI_BCAST(induct_ctl%i_induct_ctl, 1,                        &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(induct_ctl%i_induct_ctl, 0)
 !
       end subroutine bcast_induction_ctl
 !

@@ -21,6 +21,7 @@
       subroutine rescale_4_magne(b_ratio, fld)
 !
       use m_phys_labels
+      use m_base_field_labels
       use t_phys_data
 !
       real(kind = kreal), intent(in) :: b_ratio

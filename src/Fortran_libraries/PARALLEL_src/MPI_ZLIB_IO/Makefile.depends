@@ -68,7 +68,7 @@ gz_MPI_surface_data_IO_b.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_surface_data_IO_b.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_MPI_vectors_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_vectors_IO.f90 m_precision.o m_constants.o t_calypso_mpi_IO_param.o t_buffer_4_gzip.o gz_MPI_ascii_data_IO.o gz_MPI_domain_data_IO.o MPI_ascii_data_IO.o zlib_convert_ascii_vector.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_MPI_viewer_mesh_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_viewer_mesh_IO.f90 m_precision.o m_constants.o t_viewer_mesh.o t_viewer_group.o t_calypso_mpi_IO_param.o t_buffer_4_gzip.o gz_MPI_ascii_data_IO.o gz_MPI_domain_data_IO.o MPI_ascii_data_IO.o gz_MPI_position_IO.o zlib_convert_ascii_vector.o zlib_cvt_ascii_comm_tbl.o
+gz_MPI_viewer_mesh_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_viewer_mesh_IO.f90 m_precision.o m_constants.o t_viewer_mesh.o t_viewer_group.o t_calypso_mpi_IO_param.o t_buffer_4_gzip.o gz_MPI_ascii_data_IO.o gz_MPI_domain_data_IO.o MPI_ascii_data_IO.o gz_MPI_position_IO.o zlib_convert_ascii_vector.o calypso_mpi_int.o transfer_to_long_integers.o zlib_cvt_ascii_comm_tbl.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_MPI_viewer_mesh_file_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_viewer_mesh_file_IO.f90 m_precision.o m_constants.o t_merged_viewer_mesh.o t_calypso_mpi_IO_param.o MPI_ascii_data_IO.o set_parallel_file_name.o m_viewer_mesh_labels.o m_fem_mesh_labels.o gz_MPI_ascii_data_IO.o gz_MPI_viewer_mesh_IO.o gz_MPI_integer_list_IO.o m_phys_constants.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<

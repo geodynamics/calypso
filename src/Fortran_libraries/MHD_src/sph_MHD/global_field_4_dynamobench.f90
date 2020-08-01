@@ -34,7 +34,7 @@
 !
       subroutine copy_energy_4_dynamobench(pwr, KE_bench, ME_bench)
 !
-      use m_phys_labels
+      use m_base_field_labels
       use t_rms_4_sph_spectr
 !
       type(sph_mean_squares), intent(in) :: pwr
@@ -70,7 +70,7 @@
 !
       subroutine copy_icore_energy_4_dbench(pwr, mene_icore)
 !
-      use m_phys_labels
+      use m_base_field_labels
       use t_rms_4_sph_spectr
 !
       type(sph_mean_squares), intent(in) :: pwr

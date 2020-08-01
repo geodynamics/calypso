@@ -95,6 +95,7 @@
      &         (bc_IO, sph_rj, radial_rj_grp, temp_nod, h_flux_surf,    &
      &          sph_bc_T, bcs_T)
 !
+      use m_base_field_labels
       use m_phys_labels
 !
       type(boundary_spectra), intent(in) :: bc_IO
@@ -143,6 +144,7 @@
      &         (bc_IO, sph_rj, radial_rj_grp, light_nod, light_surf,    &
      &          sph_bc_C, bcs_C)
 !
+      use m_base_field_labels
       use m_phys_labels
 !
       type(boundary_spectra), intent(in) :: bc_IO

@@ -14,7 +14,7 @@ main_surface_rendering.o: $(VIZ_PLUG_DIR)/main_surface_rendering.f90 m_precision
 	$(F90) -c $(F90OPTFLAGS) $<
 psf_file_to_VTK.o: $(VIZ_PLUG_DIR)/psf_file_to_VTK.f90 m_precision.o m_constants.o m_field_file_format.o m_section_file_extensions.o t_file_IO_parameter.o t_ucd_data.o ucd_IO_select.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_data_section_only.o: $(VIZ_PLUG_DIR)/t_control_data_section_only.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_read_control_elements.o t_ctl_data_4_platforms.o t_ctl_data_4_time_steps.o t_control_data_surfacings.o skip_comment_f.o bcast_4_platform_ctl.o bcast_4_time_step_ctl.o
+t_control_data_section_only.o: $(VIZ_PLUG_DIR)/t_control_data_section_only.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_read_control_elements.o t_ctl_data_4_platforms.o t_ctl_data_4_time_steps.o t_control_data_surfacings.o skip_comment_f.o calypso_mpi_int.o bcast_4_platform_ctl.o bcast_4_time_step_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_surfacing.o: $(VIZ_PLUG_DIR)/t_surfacing.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_time_data.o t_mesh_data.o t_phys_data.o t_ucd_data.o t_file_IO_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<

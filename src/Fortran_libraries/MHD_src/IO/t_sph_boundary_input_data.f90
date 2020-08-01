@@ -98,6 +98,7 @@
 !
       subroutine bcast_boundary_spectr_file(bc_IO)
 !
+      use calypso_mpi_int
       use calypso_mpi
 !
       type(boundary_spectra), intent(inout) :: bc_IO
@@ -105,8 +106,7 @@
       integer(kind = kint) :: igrp
 !
 !
-      call MPI_BCAST(bc_IO%num_bc_fld,  1,                              &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(bc_IO%num_bc_fld,  0)
       if(my_rank .ne. 0) call alloc_sph_bc_item_ctl(bc_IO)
       call calypso_mpi_barrier
 !

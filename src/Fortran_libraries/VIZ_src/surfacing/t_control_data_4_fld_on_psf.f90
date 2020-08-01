@@ -175,6 +175,7 @@
       subroutine bcast_fld_on_psf_control(fld_on_psf_c)
 !
       use calypso_mpi
+      use calypso_mpi_int
       use bcast_control_arrays
 !
       type(field_on_psf_ctl), intent(inout) :: fld_on_psf_c
@@ -184,8 +185,7 @@
       call bcast_ctl_type_c1(fld_on_psf_c%output_type_ctl)
       call bcast_ctl_array_c2(fld_on_psf_c%field_output_ctl)
 !
-      call MPI_BCAST(fld_on_psf_c%i_iso_result,  1,                     &
-     &               CALYPSO_INTEGER, 0, CALYPSO_COMM, ierr_MPI)
+      call calypso_mpi_bcast_one_int(fld_on_psf_c%i_iso_result, 0)
 !
       end subroutine bcast_fld_on_psf_control
 !
