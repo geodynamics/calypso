@@ -181,9 +181,9 @@
       subroutine add_field_ctl_4_field_products(field_ctl)
 !
       use t_control_array_character3
-      use t_field_product_labels
       use m_base_field_labels
       use m_base_force_labels
+      use m_field_product_labels
       use add_nodal_fields_ctl
 !
       type(ctl_array_c3), intent(inout) :: field_ctl

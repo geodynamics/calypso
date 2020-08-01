@@ -44,7 +44,6 @@
 !
       logical function check_vector_fields(phys_name_ctl)
 !
-      use t_field_product_labels
       use t_explicit_term_labels
 !
       use m_base_field_labels
@@ -54,6 +53,7 @@
       use m_diffusion_term_labels
       use m_diff_vector_labels
       use m_grad_field_labels
+      use m_field_product_labels
 !
       character(len = kchara), intent(in) :: phys_name_ctl
       logical :: flag
@@ -77,8 +77,6 @@
 !
       logical function check_scalar_fields(phys_name_ctl)
 !
-      use t_base_force_labels
-      use t_field_product_labels
       use t_explicit_term_labels
 !
       use m_base_field_labels
@@ -87,6 +85,7 @@
       use m_diffusion_term_labels
       use m_grad_field_labels
       use m_energy_flux_labels
+      use m_field_product_labels
 !
       character(len = kchara), intent(in) :: phys_name_ctl
       logical :: flag
@@ -203,6 +202,7 @@
      &         (i_fld, field_name, iphys, flag)
 !
       use m_energy_flux_labels
+      use m_field_product_labels
 !
       integer(kind = kint), intent(in) :: i_fld
       character(len = kchara), intent(in) :: field_name

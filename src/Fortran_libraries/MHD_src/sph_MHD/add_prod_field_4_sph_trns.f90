@@ -40,6 +40,8 @@
       subroutine add_subtracted_sph_trns_snap                           &
      &         (ipol_prd, iphys_prd, b_trns_prd, trns)
 !
+      use m_field_product_labels
+!
       use add_field_to_sph_trans_list
 !
       type(phys_products_address), intent(in) :: ipol_prd, iphys_prd
@@ -61,6 +63,8 @@
 !
       subroutine add_prod_vector_sph_trns_snap                          &
      &         (ipol_prd, iphys_prd, f_trns_prd, trns)
+!
+      use m_field_product_labels
 !
       use add_field_to_sph_trans_list
 !
@@ -98,6 +102,8 @@
 !
       subroutine add_prod_scalar_sph_trns_snap                          &
      &         (ipol_prd, iphys_prd, f_trns_prd, trns)
+!
+      use m_field_product_labels
 !
       use add_field_to_sph_trans_list
 !
