@@ -39,6 +39,7 @@
       use m_base_force_labels
       use m_rot_force_labels
       use m_div_force_labels
+      use m_diffusion_term_labels
 !
       type(fluid_property), intent(in) :: fl_prop
       type(conductive_property), intent(in) :: cd_prop

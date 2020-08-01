@@ -123,7 +123,7 @@
       subroutine dealloc_grp_connect(e_grp)
 !
       type(group_connect_data), intent(inout) :: e_grp
-!
+!←
 !
       deallocate(e_grp%item_e_grp)
       deallocate(e_grp%nitem_e_grp )

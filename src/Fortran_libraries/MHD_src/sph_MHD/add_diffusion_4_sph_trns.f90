@@ -36,6 +36,7 @@
       subroutine add_vector_diffusion_sph_trns                          &
      &         (ipol_dif, iphys_dif, b_trns_dif, trns)
 !
+      use m_diffusion_term_labels
       use add_field_to_sph_trans_list
 !
       type(diffusion_address), intent(in) :: ipol_dif, iphys_dif
@@ -64,6 +65,7 @@
       subroutine add_scalar_diffusion_sph_trns                          &
      &         (ipol_dif, iphys_dif, b_trns_dif, trns)
 !
+      use m_diffusion_term_labels
       use add_field_to_sph_trans_list
 !
       type(diffusion_address), intent(in) :: ipol_dif, iphys_dif
