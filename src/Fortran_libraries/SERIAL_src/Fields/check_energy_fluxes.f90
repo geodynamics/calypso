@@ -17,8 +17,6 @@
       use m_precision
       use m_constants
 !
-      use t_energy_flux_labels
-!
       implicit  none
 ! 
 ! ----------------------------------------------------------------------
@@ -33,6 +31,7 @@
       use m_base_field_labels
       use m_base_force_labels
       use m_diffusion_term_labels
+      use m_energy_flux_labels
       use add_nodal_fields_ctl
 !
       type(ctl_array_c3), intent(inout) :: field_ctl

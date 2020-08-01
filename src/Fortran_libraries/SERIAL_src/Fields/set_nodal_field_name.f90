@@ -178,6 +178,7 @@
       subroutine set_scalar_field_name                                  &
      &         (phys_name_ctl, flag_viz, flag_monitor, fld, flag)
 !
+      use m_energy_flux_labels
       use set_MHD_field_address
 !
       character(len = kchara), intent(in) :: phys_name_ctl

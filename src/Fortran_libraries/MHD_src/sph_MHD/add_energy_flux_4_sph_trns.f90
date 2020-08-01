@@ -34,6 +34,7 @@
       subroutine add_ene_flux_4_sph_trns_snap                          &
      &         (ipol_efx, iphys_efx, f_trns_efx, trns)
 !
+      use m_energy_flux_labels
       use add_field_to_sph_trans_list
 !
       type(energy_flux_address), intent(in) :: ipol_efx, iphys_efx
