@@ -44,8 +44,6 @@
 !
       logical function check_vector_fields(phys_name_ctl)
 !
-      use t_explicit_term_labels
-!
       use m_base_field_labels
       use m_base_force_labels
       use m_rot_force_labels
@@ -54,6 +52,7 @@
       use m_diff_vector_labels
       use m_grad_field_labels
       use m_field_product_labels
+      use m_explicit_term_labels
 !
       character(len = kchara), intent(in) :: phys_name_ctl
       logical :: flag
@@ -77,8 +76,6 @@
 !
       logical function check_scalar_fields(phys_name_ctl)
 !
-      use t_explicit_term_labels
-!
       use m_base_field_labels
       use m_base_force_labels
       use m_div_force_labels
@@ -86,6 +83,7 @@
       use m_grad_field_labels
       use m_energy_flux_labels
       use m_field_product_labels
+      use m_explicit_term_labels
 !
       character(len = kchara), intent(in) :: phys_name_ctl
       logical :: flag

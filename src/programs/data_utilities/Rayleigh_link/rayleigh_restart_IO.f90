@@ -148,6 +148,7 @@
      &         (i_version, dir, i_step, fld_IO)
 !
       use m_base_field_labels
+      use m_explicit_term_labels
 !
       integer(kind = kint), intent(in) :: i_version, i_step
       character(len = kchara), intent(in) :: dir
@@ -193,6 +194,7 @@
      &          field_name, iflag_ncomp, file_name)
 !
       use m_base_field_labels
+      use m_explicit_term_labels
 !
       integer(kind = kint), intent(in) :: i_version, i_step
       character(len = kchara), intent(in) :: dir

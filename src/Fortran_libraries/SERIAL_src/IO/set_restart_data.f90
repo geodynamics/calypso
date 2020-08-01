@@ -303,7 +303,7 @@
       logical function check_vector_4_FEM_rst(field_name)
 !
       use m_base_field_labels
-      use m_phys_labels
+      use m_explicit_term_labels
 !
       character(len = kchara), intent(in) :: field_name
 !
@@ -326,7 +326,7 @@
       logical function check_scalar_4_FEM_rst(field_name)
 !
       use m_base_field_labels
-      use m_phys_labels
+      use m_explicit_term_labels
 !
       character(len = kchara), intent(in) :: field_name
 !

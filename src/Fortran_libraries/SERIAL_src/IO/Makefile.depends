@@ -118,7 +118,7 @@ set_mesh_file_names.o: $(IO_DIR)/set_mesh_file_names.f90 m_precision.o m_constan
 	$(F90) -c $(F90OPTFLAGS) $<
 set_parallel_file_name.o: $(IO_DIR)/set_parallel_file_name.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_restart_data.o: $(IO_DIR)/set_restart_data.f90 m_precision.o m_base_field_labels.o m_phys_labels.o
+set_restart_data.o: $(IO_DIR)/set_restart_data.f90 m_precision.o m_base_field_labels.o m_explicit_term_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_sph_extensions.o: $(IO_DIR)/set_sph_extensions.f90 m_precision.o set_parallel_file_name.o
 	$(F90) -c $(F90OPTFLAGS) $<

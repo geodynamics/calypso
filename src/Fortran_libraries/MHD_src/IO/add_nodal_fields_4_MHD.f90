@@ -25,7 +25,6 @@
       use m_precision
 !
       use m_machine_parameter
-      use m_phys_labels
       use t_control_parameter
       use t_physical_property
       use add_nodal_fields_ctl
@@ -144,6 +143,7 @@
       use t_control_array_character3
       use t_reference_scalar_param
       use m_base_field_labels
+      use m_grad_field_labels
 !
       type(reference_scalar_param), intent(in) :: ref_param_T
       type(reference_scalar_param), intent(in) :: ref_param_C
@@ -205,6 +205,7 @@
      &         (fl_prop, cd_prop, field_ctl)
 !
       use t_control_array_character3
+      use m_explicit_term_labels
 !
       type(fluid_property), intent(in) :: fl_prop
       type(conductive_property), intent(in) :: cd_prop
@@ -228,6 +229,7 @@
      &         (fl_prop, cd_prop, ht_prop, cp_prop, field_ctl)
 !
       use t_control_array_character3
+      use m_explicit_term_labels
 !
       type(fluid_property), intent(in) :: fl_prop
       type(conductive_property), intent(in) :: cd_prop
@@ -261,6 +263,7 @@
      &         (fl_prop, cd_prop,  ht_prop, cp_prop, field_ctl)
 !
       use t_control_array_character3
+      use m_explicit_term_labels
 !
       type(fluid_property), intent(in) :: fl_prop
       type(conductive_property), intent(in) :: cd_prop
@@ -309,6 +312,7 @@
       use t_physical_property
       use t_explicit_term_labels
       use m_base_field_labels
+      use m_explicit_term_labels
       use add_nodal_fields_ctl
 !
       type(conductive_property), intent(in) :: cd_prop
