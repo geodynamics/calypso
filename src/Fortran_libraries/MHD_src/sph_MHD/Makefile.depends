@@ -8,7 +8,7 @@ add_diff_vect_to_sph_trans.o: $(MHD_SPH_DIR)/add_diff_vect_to_sph_trans.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 add_diffusion_4_sph_trns.o: $(MHD_SPH_DIR)/add_diffusion_4_sph_trns.f90 m_precision.o m_constants.o t_diffusion_term_labels.o t_addresses_sph_transform.o m_diffusion_term_labels.o add_field_to_sph_trans_list.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_energy_flux_4_sph_trns.o: $(MHD_SPH_DIR)/add_energy_flux_4_sph_trns.f90 m_precision.o m_constants.o t_energy_flux_labels.o t_addresses_sph_transform.o add_field_to_sph_trans_list.o
+add_energy_flux_4_sph_trns.o: $(MHD_SPH_DIR)/add_energy_flux_4_sph_trns.f90 m_precision.o m_constants.o t_energy_flux_labels.o t_addresses_sph_transform.o m_energy_flux_labels.o add_field_to_sph_trans_list.o
 	$(F90) -c $(F90OPTFLAGS) $<
 add_field_to_sph_trans_list.o: $(MHD_SPH_DIR)/add_field_to_sph_trans_list.f90 m_precision.o t_field_labels.o t_addresses_sph_transform.o m_machine_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<
