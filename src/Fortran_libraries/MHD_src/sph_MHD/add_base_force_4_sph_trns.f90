@@ -80,6 +80,7 @@
 !     &         (fl_prop, cd_prop, ht_prop, cp_prop,                    &
      &         (ipol_frc, iphys_frc, f_trns_frc, trns)
 !
+      use m_base_force_labels
       use add_field_to_sph_trans_list
 !
 !      type(fluid_property), intent(in) :: fl_prop
@@ -142,6 +143,7 @@
       subroutine add_base_force_sph_trns_snap                           &
      &         (ipol_frc, iphys_frc, f_trns_frc, trns)
 !
+      use m_base_force_labels
       use add_field_to_sph_trans_list
 !
       type(base_force_address), intent(in) :: ipol_frc, iphys_frc
@@ -212,6 +214,7 @@
       subroutine add_base_force_fwd_trns_snap                           &
      &         (ipol_frc, iphys_frc, f_trns_frc, trns)
 !
+      use m_base_force_labels
       use add_field_to_sph_trans_list
 !
       type(base_force_address), intent(in) :: ipol_frc, iphys_frc
@@ -234,6 +237,7 @@
       subroutine add_base_force_bwd_trns_snap                           &
      &         (ipol_frc, iphys_frc, b_trns_frc, trns)
 !
+      use m_base_force_labels
       use add_field_to_sph_trans_list
 !
       type(base_force_address), intent(in) :: ipol_frc, iphys_frc
@@ -263,6 +267,7 @@
       subroutine add_scalar_flux_bwd_trns_snap                          &
      &         (ipol_frc, iphys_frc, b_trns_frc, trns)
 !
+      use m_base_force_labels
       use add_field_to_sph_trans_list
 !
       type(base_force_address), intent(in) :: ipol_frc, iphys_frc

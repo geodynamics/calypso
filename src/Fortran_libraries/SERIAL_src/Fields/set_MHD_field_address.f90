@@ -44,8 +44,6 @@
 !
       logical function check_vector_fields(phys_name_ctl)
 !
-      use t_base_field_labels
-      use t_base_force_labels
       use t_diffusion_term_labels
       use t_field_product_labels
       use t_grad_field_labels
@@ -53,6 +51,7 @@
       use t_explicit_term_labels
 !
       use m_base_field_labels
+      use m_base_force_labels
       use m_rot_force_labels
       use m_div_force_labels
 !
@@ -78,7 +77,6 @@
 !
       logical function check_scalar_fields(phys_name_ctl)
 !
-      use t_base_field_labels
       use t_base_force_labels
       use t_energy_flux_labels
       use t_diffusion_term_labels
@@ -87,6 +85,7 @@
       use t_explicit_term_labels
 !
       use m_base_field_labels
+      use m_base_force_labels
       use m_div_force_labels
 !
       character(len = kchara), intent(in) :: phys_name_ctl
@@ -112,7 +111,7 @@
 !
       logical function check_sym_tensor_fields(phys_name_ctl)
 !
-      use t_base_force_labels
+      use m_base_force_labels
 !
       character(len = kchara), intent(in) :: phys_name_ctl
 !
@@ -124,7 +123,7 @@
 !
       logical function check_asym_tensor_fields(phys_name_ctl)
 !
-      use t_base_force_labels
+      use m_base_force_labels
 !
       character(len = kchara), intent(in) :: phys_name_ctl
 !

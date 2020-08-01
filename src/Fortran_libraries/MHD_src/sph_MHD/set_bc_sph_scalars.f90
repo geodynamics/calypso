@@ -96,7 +96,7 @@
      &          sph_bc_T, bcs_T)
 !
       use m_base_field_labels
-      use m_phys_labels
+      use m_base_force_labels
 !
       type(boundary_spectra), intent(in) :: bc_IO
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -145,7 +145,7 @@
      &          sph_bc_C, bcs_C)
 !
       use m_base_field_labels
-      use m_phys_labels
+      use m_base_force_labels
 !
       type(boundary_spectra), intent(in) :: bc_IO
       type(sph_rj_grid), intent(in) :: sph_rj

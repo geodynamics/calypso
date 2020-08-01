@@ -17,8 +17,6 @@
       use m_precision
       use m_constants
 !
-      use t_base_field_labels
-      use t_base_force_labels
       use t_energy_flux_labels
 !
       implicit  none
@@ -32,6 +30,7 @@
       subroutine add_field_ctl_4_ene_flux(field_ctl)
 !
       use m_base_field_labels
+      use m_base_force_labels
       use t_control_array_character3
       use t_diffusion_term_labels
       use add_nodal_fields_ctl

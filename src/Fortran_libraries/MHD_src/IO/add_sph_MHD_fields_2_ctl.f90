@@ -36,6 +36,7 @@
 !
       use add_nodal_fields_ctl
       use m_base_field_labels
+      use m_base_force_labels
       use m_rot_force_labels
       use m_div_force_labels
 !

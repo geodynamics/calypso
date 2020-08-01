@@ -42,6 +42,7 @@
       integer(kind = kint) function num_comp_bc_data(label)
 !
       use m_base_field_labels
+      use m_base_force_labels
       use skip_comment_f
 !
       character(len = kchara), intent(in) :: label
@@ -78,6 +79,7 @@
       logical function find_scalar_bc_label(label, postfix)
 !
       use m_base_field_labels
+      use m_base_force_labels
 !
       character(len = kchara), intent(in) :: label, postfix
 !

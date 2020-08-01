@@ -171,6 +171,7 @@
       use t_control_array_character3
       use t_reference_scalar_param
       use m_base_field_labels
+      use m_base_force_labels
 !
       type(fluid_property), intent(in) :: fl_prop
       type(reference_scalar_param), intent(in) :: ref_param_T
