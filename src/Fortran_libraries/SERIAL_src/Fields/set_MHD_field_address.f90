@@ -140,9 +140,6 @@
       use t_field_product_labels
       use t_diffusion_term_labels
       use t_explicit_term_labels
-
-      use m_rot_force_labels
-      use m_div_force_labels
 !
       integer(kind = kint), intent(in) :: i_fld
       character(len = kchara), intent(in) :: field_name

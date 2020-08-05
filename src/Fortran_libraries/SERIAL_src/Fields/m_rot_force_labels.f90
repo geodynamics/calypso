@@ -8,9 +8,6 @@
 !!
 !!@verbatim
 !!      logical function check_rot_force(field_name)
-!!      subroutine set_rot_force_addresses                              &
-!!     &         (i_phys, field_name, rot_forces, flag)
-!!        type(base_force_address), intent(inout) :: rot_forces
 !!
 !!      integer(kind = kint) function num_rot_forces()
 !!      subroutine set_rot_force_labels(n_comps, names, maths)
@@ -33,7 +30,6 @@
       use m_precision
       use m_phys_constants
       use t_field_labels
-      use t_base_force_labels
 !
 !>      Number of field labels
       integer(kind = kint), parameter, private :: nrot_force = 5
@@ -97,37 +93,6 @@
      &   .or. (field_name .eq. rot_composite_buoyancy%name)
 !
       end function check_rot_force
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine set_rot_force_addresses                                &
-     &         (i_phys, field_name, rot_forces, flag)
-!
-      integer(kind = kint), intent(in) :: i_phys
-      character(len = kchara), intent(in) :: field_name
-!
-      type(base_force_address), intent(inout) :: rot_forces
-      logical, intent(inout) :: flag
-!
-!
-      flag = check_rot_force(field_name)
-      if(flag) then
-        if (field_name .eq. rot_inertia%name) then
-          rot_forces%i_m_advect =   i_phys
-        else if (field_name .eq. rot_Coriolis_force%name) then
-          rot_forces%i_Coriolis =   i_phys
-        else if (field_name .eq. rot_Lorentz_force%name) then
-          rot_forces%i_lorentz =    i_phys
-!
-        else if (field_name .eq. rot_buoyancy%name) then
-          rot_forces%i_buoyancy =   i_phys
-        else if (field_name .eq. rot_composite_buoyancy%name) then
-          rot_forces%i_comp_buo =   i_phys
-        end if
-      end if
-!
-      end subroutine set_rot_force_addresses
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

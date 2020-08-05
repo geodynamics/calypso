@@ -11,6 +11,12 @@
 !!      subroutine set_base_force_addresses                             &
 !!     &         (i_phys, field_name, forces, flag)
 !!        type(base_force_address), intent(inout) :: forces
+!!      subroutine set_rot_force_addresses                              &
+!!     &         (i_phys, field_name, rot_forces, flag)
+!!        type(base_force_address), intent(inout) :: rot_forces
+!!      subroutine set_div_force_addresses                              &
+!!     &         (i_phys, field_name, div_force, flag)
+!!        type(base_force_address), intent(inout) :: div_force
 !!
 !! !!!!!  Base force names  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
@@ -208,6 +214,91 @@
       end if
 !
       end subroutine set_base_force_addresses
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine set_rot_force_addresses                                &
+     &         (i_phys, field_name, rot_forces, flag)
+!
+      use m_rot_force_labels
+!
+      integer(kind = kint), intent(in) :: i_phys
+      character(len = kchara), intent(in) :: field_name
+!
+      type(base_force_address), intent(inout) :: rot_forces
+      logical, intent(inout) :: flag
+!
+!
+      flag = check_rot_force(field_name)
+      if(flag) then
+        if (field_name .eq. rot_inertia%name) then
+          rot_forces%i_m_advect =   i_phys
+        else if (field_name .eq. rot_Coriolis_force%name) then
+          rot_forces%i_Coriolis =   i_phys
+        else if (field_name .eq. rot_Lorentz_force%name) then
+          rot_forces%i_lorentz =    i_phys
+!
+        else if (field_name .eq. rot_buoyancy%name) then
+          rot_forces%i_buoyancy =   i_phys
+        else if (field_name .eq. rot_composite_buoyancy%name) then
+          rot_forces%i_comp_buo =   i_phys
+        end if
+      end if
+!
+      end subroutine set_rot_force_addresses
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine set_div_force_addresses                                &
+     &         (i_phys, field_name, div_forces, flag)
+!
+      use m_div_force_labels
+!
+      integer(kind = kint), intent(in) :: i_phys
+      character(len = kchara), intent(in) :: field_name
+!
+      type(base_force_address), intent(inout) :: div_forces
+      logical, intent(inout) :: flag
+!
+!
+      flag = check_div_force(field_name)                                &
+     &      .or. check_div_flux_tensor(field_name)                      &
+     &      .or. check_div_scalar_flux(field_name)
+      if(flag) then
+        if (field_name .eq. div_inertia%name) then
+          div_forces%i_m_advect =   i_phys
+        else if (field_name .eq. div_Coriolis_force%name) then
+          div_forces%i_Coriolis =   i_phys
+        else if (field_name .eq. div_Lorentz_force%name) then
+          div_forces%i_lorentz =    i_phys
+!
+        else if (field_name .eq. div_buoyancy%name) then
+          div_forces%i_buoyancy =   i_phys
+        else if (field_name .eq. div_composite_buoyancy%name) then
+          div_forces%i_comp_buo =   i_phys
+!
+        else if (field_name .eq. div_heat_flux%name) then
+          div_forces%i_h_flux =    i_phys
+        else if (field_name .eq. div_pert_heat_flux%name) then
+          div_forces%i_ph_flux =   i_phys
+!
+        else if (field_name .eq. div_composition_flux%name) then
+          div_forces%i_c_flux =    i_phys
+        else if (field_name .eq. div_pert_composition_flux%name) then
+          div_forces%i_pc_flux =   i_phys
+!
+        else if (field_name .eq. div_momentum_flux%name) then
+          div_forces%i_m_flux =   i_phys
+        else if (field_name .eq. div_maxwell_tensor%name) then
+          div_forces%i_maxwell =  i_phys
+        else if (field_name .eq. div_induction_tensor%name) then
+          div_forces%i_induct_t = i_phys
+        end if
+      end if
+!
+      end subroutine set_div_force_addresses
 !
 ! ----------------------------------------------------------------------
 !

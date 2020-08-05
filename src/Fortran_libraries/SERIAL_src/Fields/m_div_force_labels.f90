@@ -11,10 +11,6 @@
 !!      logical function check_div_flux_tensor(field_name)
 !!      logical function check_div_scalar_flux(field_name)
 !!
-!!      subroutine set_div_force_addresses                              &
-!!     &         (i_phys, field_name, div_force, flag)
-!!        type(base_force_address), intent(inout) :: div_force
-!!
 !!      integer(kind = kint) function num_div_forces()
 !!      subroutine set_div_force_labels(n_comps, names, maths)
 !!
@@ -44,7 +40,7 @@
 !
       use m_precision
       use m_phys_constants
-      use t_base_force_labels
+      use t_field_labels
 !
 !>      Number of field labels
       integer(kind = kint), parameter, private :: ndiv_force = 12
@@ -182,56 +178,6 @@
      &   .or. (field_name .eq. div_pert_composition_flux%name)
 !
       end function check_div_scalar_flux
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine set_div_force_addresses                                &
-     &         (i_phys, field_name, div_forces, flag)
-!
-      integer(kind = kint), intent(in) :: i_phys
-      character(len = kchara), intent(in) :: field_name
-!
-      type(base_force_address), intent(inout) :: div_forces
-      logical, intent(inout) :: flag
-!
-!
-      flag = check_div_force(field_name)                                &
-     &      .or. check_div_flux_tensor(field_name)                      &
-     &      .or. check_div_scalar_flux(field_name)
-      if(flag) then
-        if (field_name .eq. div_inertia%name) then
-          div_forces%i_m_advect =   i_phys
-        else if (field_name .eq. div_Coriolis_force%name) then
-          div_forces%i_Coriolis =   i_phys
-        else if (field_name .eq. div_Lorentz_force%name) then
-          div_forces%i_lorentz =    i_phys
-!
-        else if (field_name .eq. div_buoyancy%name) then
-          div_forces%i_buoyancy =   i_phys
-        else if (field_name .eq. div_composite_buoyancy%name) then
-          div_forces%i_comp_buo =   i_phys
-!
-        else if (field_name .eq. div_heat_flux%name) then
-          div_forces%i_h_flux =    i_phys
-        else if (field_name .eq. div_pert_heat_flux%name) then
-          div_forces%i_ph_flux =   i_phys
-!
-        else if (field_name .eq. div_composition_flux%name) then
-          div_forces%i_c_flux =    i_phys
-        else if (field_name .eq. div_pert_composition_flux%name) then
-          div_forces%i_pc_flux =   i_phys
-!
-        else if (field_name .eq. div_momentum_flux%name) then
-          div_forces%i_m_flux =   i_phys
-        else if (field_name .eq. div_maxwell_tensor%name) then
-          div_forces%i_maxwell =  i_phys
-        else if (field_name .eq. div_induction_tensor%name) then
-          div_forces%i_induct_t = i_phys
-        end if
-      end if
-!
-      end subroutine set_div_force_addresses
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
