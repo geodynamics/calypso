@@ -28,7 +28,6 @@
       module set_nodal_field_name
 !
       use m_precision
-      use m_phys_labels
       use t_phys_data
       use t_control_array_character3
 !

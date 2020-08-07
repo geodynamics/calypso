@@ -14,6 +14,10 @@
 !!        type(mhd_evo_scheme_control), intent(inout) :: mevo_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
 !!
+!!      subroutine bcast_restart_ctl(mr_ctl)
+!!        type(mhd_restart_control), intent(inout) :: mr_ctl
+!!      subroutine bcast_time_loop_ctl(mevo_ctl)
+!!        type(mhd_evo_scheme_control), intent(inout) :: mevo_ctl
 !! !!!!  control for initial and restart data  !!!!!!!!!!!!!!!!!!!!!!!!!!
 !!   no_data:             No initial values
 !!   start_from_rst_file: Read restart data as initial values
@@ -373,7 +377,7 @@
       call bcast_ctl_type_i1(mevo_ctl%maxiter_ctl)
       call bcast_ctl_type_i1(mevo_ctl%leg_vector_len)
 !
-      call MPI_BCAST(mevo_ctl%i_time_loop, 0)
+      call calypso_mpi_bcast_one_int(mevo_ctl%i_time_loop, 0)
 !
       end subroutine bcast_time_loop_ctl
 !

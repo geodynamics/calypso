@@ -329,6 +329,7 @@
      &         (Nusselt_file_prefix, rj_fld, Nu_type)
 !
       use m_base_field_labels
+      use m_grad_field_labels
       use t_no_heat_Nusselt
       use t_phys_data
       use t_control_array_character

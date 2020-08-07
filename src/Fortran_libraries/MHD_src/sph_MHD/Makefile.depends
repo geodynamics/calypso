@@ -4,7 +4,7 @@ add_base_field_4_sph_trns.o: $(MHD_SPH_DIR)/add_base_field_4_sph_trns.f90 m_prec
 	$(F90) -c $(F90OPTFLAGS) $<
 add_base_force_4_sph_trns.o: $(MHD_SPH_DIR)/add_base_force_4_sph_trns.f90 m_precision.o m_constants.o t_base_force_labels.o t_addresses_sph_transform.o t_physical_property.o m_base_force_labels.o add_field_to_sph_trans_list.o m_rot_force_labels.o m_div_force_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_diff_vect_to_sph_trans.o: $(MHD_SPH_DIR)/add_diff_vect_to_sph_trans.f90 m_precision.o t_diff_vector_labels.o t_grad_field_labels.o t_addresses_sph_transform.o add_field_to_sph_trans_list.o m_diff_vector_labels.o
+add_diff_vect_to_sph_trans.o: $(MHD_SPH_DIR)/add_diff_vect_to_sph_trans.f90 m_precision.o t_diff_vector_labels.o t_grad_field_labels.o t_addresses_sph_transform.o m_grad_field_labels.o add_field_to_sph_trans_list.o m_diff_vector_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 add_diffusion_4_sph_trns.o: $(MHD_SPH_DIR)/add_diffusion_4_sph_trns.f90 m_precision.o m_constants.o t_diffusion_term_labels.o t_addresses_sph_transform.o m_diffusion_term_labels.o add_field_to_sph_trans_list.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -80,7 +80,7 @@ cal_write_sph_monitor_data.o: $(MHD_SPH_DIR)/cal_write_sph_monitor_data.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 center_sph_matrices.o: $(MHD_SPH_DIR)/center_sph_matrices.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-check_dependency_for_MHD.o: $(MHD_SPH_DIR)/check_dependency_for_MHD.f90 m_precision.o m_error_IDs.o m_machine_parameter.o calypso_mpi.o m_phys_labels.o t_control_parameter.o t_phys_data.o t_phys_address.o t_base_field_labels.o t_physical_property.o t_spheric_parameter.o set_control_field_data.o
+check_dependency_for_MHD.o: $(MHD_SPH_DIR)/check_dependency_for_MHD.f90 m_precision.o m_error_IDs.o m_machine_parameter.o calypso_mpi.o t_control_parameter.o t_phys_data.o t_phys_address.o t_base_field_labels.o t_physical_property.o t_spheric_parameter.o set_control_field_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 coef_fdm2_free_CMB.o: $(MHD_SPH_DIR)/coef_fdm2_free_CMB.f90 m_precision.o m_constants.o t_coef_fdm2_MHD_boundaries.o cal_inverse_small_matrix.o
 	$(F90) -c $(F90OPTFLAGS) $<

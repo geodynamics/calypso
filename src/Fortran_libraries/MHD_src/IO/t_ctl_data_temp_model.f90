@@ -361,7 +361,7 @@
       call bcast_ctl_type_r1(ref_ctl%depth)
       call bcast_ctl_type_r1(ref_ctl%value)
 !
-      call MPI_BCAST(ref_ctl%i_referenced, 0)
+      call calypso_mpi_bcast_one_int(ref_ctl%i_referenced, 0)
 !
       end subroutine bcast_ref_value_ctl
 !
@@ -378,7 +378,7 @@
       call bcast_ctl_type_r1(takepiro_ctl%stratified_width_ctl)
       call bcast_ctl_type_r1(takepiro_ctl%stratified_outer_r_ctl)
 !
-      call MPI_BCAST(takepiro_ctl%i_takepiro_t_ctl, 0)
+      call calypso_mpi_bcast_one_int(takepiro_ctl%i_takepiro_t_ctl, 0)
 !
       end subroutine bcast_takepiro_ctl
 !

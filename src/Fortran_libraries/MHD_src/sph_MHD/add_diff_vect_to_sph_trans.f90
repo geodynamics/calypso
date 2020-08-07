@@ -44,6 +44,7 @@
       subroutine add_grad_4_sph_trns_by_pol                             &
      &         (ipol_grd, iphys_grd, b_trns_grd, trns)
 !
+      use m_grad_field_labels
       use add_field_to_sph_trans_list
 !
       type(gradient_field_address), intent(in) :: ipol_grd
@@ -69,6 +70,7 @@
       subroutine add_grad_4_sph_trns_snap                               &
      &         (ipol_grd, iphys_grd, b_trns_grd, trns)
 !
+      use m_grad_field_labels
       use add_field_to_sph_trans_list
 !
       type(gradient_field_address), intent(in) :: ipol_grd

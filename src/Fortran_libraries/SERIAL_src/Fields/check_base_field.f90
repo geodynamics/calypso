@@ -100,8 +100,8 @@
 !
       subroutine add_field_ctl_4_grad_field(field_ctl)
 !
-      use t_grad_field_labels
       use m_base_field_labels
+      use m_grad_field_labels
       use add_nodal_fields_ctl
 !
       type(ctl_array_c3), intent(inout) :: field_ctl

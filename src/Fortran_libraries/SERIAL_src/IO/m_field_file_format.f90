@@ -176,7 +176,6 @@
 !        call write_multi_flags(6, input_flag, mgd_fld_gz_labels)
 !        input_flag = 'mgd_fbin_gz_labels'
 !        call write_multi_flags(6, input_flag, mgd_fbin_gz_labels)
-        write(*,*) 'file_fmt_ctl', file_fmt_ctl
       if (i_file_fmt .eq. 0) then
         choose_para_fld_file_format = iflag_sgl_vtk
         return
@@ -229,7 +228,6 @@
      &        = choose_ucd_file_format(file_fmt_ctl, i_file_fmt)
       end if
       call dealloc_mgd_field_type_flags
-      write(*,*) 'choose_para_fld_file_format', choose_para_fld_file_format
 !
       end function choose_para_fld_file_format
 !

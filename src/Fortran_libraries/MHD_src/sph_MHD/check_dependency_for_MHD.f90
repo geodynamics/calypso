@@ -33,7 +33,6 @@
       use m_machine_parameter
 !
       use calypso_mpi
-      use m_phys_labels
 !
       use t_control_parameter
       use t_phys_data

@@ -36,7 +36,6 @@
       module sph_mean_spectr_header_IO
 !
       use m_precision
-      use m_phys_labels
 !
       use t_spheric_parameter
       use t_rms_4_sph_spectr
