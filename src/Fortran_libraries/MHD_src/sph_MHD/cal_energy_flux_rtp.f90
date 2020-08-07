@@ -337,7 +337,7 @@
       if(fe_trns_prod%i_k_heli .gt. 0) then
         call cal_dot_prod_no_coef_smp(nnod,                             &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
-     &      fld_rtp(1,bs_trns_base%i_magne),                            &
+     &      fld_rtp(1,bs_trns_base%i_vort),                             &
      &      fhls_rtp(1,fe_trns_prod%i_k_heli))
       end if
       if(fe_trns_prod%i_c_heli .gt. 0) then
