@@ -46,7 +46,7 @@ MPI_picked_sph_spectr_IO.o: $(MPI_IO_DIR)/MPI_picked_sph_spectr_IO.f90 m_precisi
 	$(F90) -c $(F90OPTFLAGS) $<
 MPI_position_IO.o: $(MPI_IO_DIR)/MPI_position_IO.f90 m_precision.o m_constants.o t_calypso_mpi_IO_param.o MPI_ascii_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-MPI_sph_gauss_coefs_IO.o: $(MPI_IO_DIR)/MPI_sph_gauss_coefs_IO.f90 m_precision.o m_constants.o calypso_mpi.o m_calypso_mpi_IO.o t_calypso_mpi_IO_param.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_address.o t_phys_data.o t_time_data.o m_monitor_file_labels.o MPI_ascii_data_IO.o set_parallel_file_name.o write_field_labels.o transfer_to_long_integers.o pickup_gauss_coefficients.o m_phys_labels.o skip_comment_f.o
+MPI_sph_gauss_coefs_IO.o: $(MPI_IO_DIR)/MPI_sph_gauss_coefs_IO.f90 m_precision.o m_constants.o calypso_mpi.o m_calypso_mpi_IO.o t_calypso_mpi_IO_param.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_address.o t_phys_data.o t_time_data.o m_monitor_file_labels.o MPI_ascii_data_IO.o set_parallel_file_name.o write_field_labels.o transfer_to_long_integers.o pickup_gauss_coefficients.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 MPI_sph_gl_1d_idx_IO.o: $(MPI_IO_DIR)/MPI_sph_gl_1d_idx_IO.f90 m_precision.o m_constants.o t_node_id_spherical_IO.o t_calypso_mpi_IO_param.o m_sph_modes_grid_labels.o MPI_domain_data_IO.o MPI_ascii_data_IO.o MPI_position_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<

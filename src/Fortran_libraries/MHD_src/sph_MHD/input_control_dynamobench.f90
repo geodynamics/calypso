@@ -128,7 +128,6 @@
       use t_control_array_character3
       use t_phys_data
       use t_circle_transform
-      use m_phys_labels
       use m_base_field_labels
       use m_phys_constants
 !

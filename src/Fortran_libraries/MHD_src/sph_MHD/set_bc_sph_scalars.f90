@@ -63,8 +63,6 @@
       subroutine check_sph_bc_scalar_sph                                &
      &         (sph_rj, sph_bc, ICB_Sspec, CMB_Sspec)
 !
-      use m_phys_labels
-!
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_boundary_type), intent(in) :: sph_bc
       type(sph_scalar_BC_coef), intent(in) :: ICB_Sspec, CMB_Sspec

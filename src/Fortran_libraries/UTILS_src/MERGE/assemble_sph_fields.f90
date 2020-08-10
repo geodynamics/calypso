@@ -224,7 +224,6 @@
 !
       use extend_potential_field_t
 !
-      use m_phys_labels
       use t_spheric_parameter
 !
       type(sph_grids), intent(in) :: sph

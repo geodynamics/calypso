@@ -27,7 +27,6 @@
       use m_precision
       use m_machine_parameter
 !
-      use m_phys_labels
       use m_phys_constants
       use t_phys_address
       use t_addresses_sph_transform

@@ -81,8 +81,6 @@
       subroutine count_sph_labels_4_monitor                             &
      &        (num_phys_rj, num_phys_comp_rj, flag_monitor_rj, picked)
 !
-      use m_phys_labels
-!
       integer(kind = kint), intent(in) :: num_phys_rj
       integer(kind = kint), intent(in) :: num_phys_comp_rj(num_phys_rj)
       logical, intent(in) :: flag_monitor_rj(num_phys_rj)

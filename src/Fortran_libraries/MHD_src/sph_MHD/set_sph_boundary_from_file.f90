@@ -15,7 +15,6 @@
       module set_sph_boundary_from_file
 !
       use m_precision
-      use m_phys_labels
       use t_spheric_rj_data
       use t_field_labels
 !

@@ -69,8 +69,6 @@
 !
       subroutine set_sph_restart_field_to_IO(rj_fld, fld_IO)
 !
-      use m_phys_labels
-!
       type(phys_data), intent(in) :: rj_fld
       type(field_IO), intent(inout) :: fld_IO
 !
@@ -91,8 +89,6 @@
 ! -------------------------------------------------------------------
 !
       subroutine set_sph_restart_comp_to_IO(rj_fld, fld_IO)
-!
-      use m_phys_labels
 !
       type(phys_data), intent(in) :: rj_fld
       type(field_IO), intent(inout) :: fld_IO
@@ -127,7 +123,6 @@
 !
       subroutine set_sph_restart_data_to_IO(rj_fld, fld_IO)
 !
-      use m_phys_labels
       use copy_rj_phys_data_4_IO
 !
       type(phys_data), intent(in) :: rj_fld

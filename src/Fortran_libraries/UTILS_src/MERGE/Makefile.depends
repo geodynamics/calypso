@@ -1,4 +1,4 @@
-assemble_sph_fields.o: $(MERGE_DIR)/assemble_sph_fields.f90 m_precision.o m_constants.o calypso_mpi.o t_sph_spectr_data.o t_SPH_mesh_field_data.o share_spectr_index_data.o share_field_data.o parallel_assemble_sph.o extend_potential_field_t.o m_base_field_labels.o t_spheric_parameter.o r_interpolate_marged_sph.o m_phys_labels.o
+assemble_sph_fields.o: $(MERGE_DIR)/assemble_sph_fields.f90 m_precision.o m_constants.o calypso_mpi.o t_sph_spectr_data.o t_SPH_mesh_field_data.o share_spectr_index_data.o share_field_data.o parallel_assemble_sph.o extend_potential_field_t.o m_base_field_labels.o t_spheric_parameter.o r_interpolate_marged_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<
 bcast_4_assemble_sph_ctl.o: $(MERGE_DIR)/bcast_4_assemble_sph_ctl.f90 m_precision.o calypso_mpi.o t_control_data_4_merge.o m_machine_parameter.o calypso_mpi_int.o t_ctl_data_gen_sph_shell.o bcast_4_platform_ctl.o bcast_control_arrays.o bcast_4_field_ctl.o bcast_4_time_step_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -43,7 +43,6 @@
       subroutine set_mid_equator_point_global                           &
      &         (trans_p, sph_params, sph_rtp, sph_rj, cdat)
 !
-      use m_phys_labels
       use t_work_4_sph_trans
       use t_spheric_parameter
 !

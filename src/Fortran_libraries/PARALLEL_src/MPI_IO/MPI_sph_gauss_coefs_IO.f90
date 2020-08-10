@@ -270,7 +270,6 @@
       integer(kind = kint)                                              &
      &      function check_gauss_coefs_4_monitor(gauss)
 !
-      use m_phys_labels
       use skip_comment_f
 !
       type(picked_spectrum_data), intent(in) :: gauss

@@ -25,7 +25,6 @@
       use m_constants
       use m_machine_parameter
       use m_boundary_condition_IDs
-      use m_phys_labels
       use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr
