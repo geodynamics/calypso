@@ -64,6 +64,7 @@
       integer(kind = kint) :: iloop, ierr
 !
 !  Read index data
+      ierr = 0
       call set_sph_mesh_file_fmt_prefix                                 &
      &   (sph_file_param%iflag_format, sph_file_param%file_prefix,      &
      &    file_param)
@@ -78,7 +79,7 @@
      &             ' on ', my_rank, 'at loop ', iloop
           call copy_sph_trans_rj_from_IO(sph_file_m,                    &
      &       sph_mesh(ip)%sph%sph_rj, sph_mesh(ip)%sph_comms%comm_rj,   &
-     &       sph_mesh(ip)%sph_grps, sph_mesh(ip)%sph%sph_params, ierr)
+     &       sph_mesh(ip)%sph_grps, sph_mesh(ip)%sph%sph_params)
           call count_num_rj_smp(sph_mesh(ip)%sph%sph_rj, ierr)
           call dealloc_rj_mode_IO(sph_file_m)
         end if

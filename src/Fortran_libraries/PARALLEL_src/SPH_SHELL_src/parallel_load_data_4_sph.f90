@@ -86,39 +86,33 @@
       type(sph_comm_tables), intent(inout) :: comms_sph
       type(sph_group_data), intent(inout) ::  sph_grps
 !
-      integer(kind = kint) :: ierr
-!
 !
       if (iflag_debug.gt.0) write(*,*) 'copy_sph_trans_rtp_from_IO'
       call sel_mpi_read_geom_rtp_file                                   &
      &   (nprocs, my_rank, sph_file_param, sph_file_l)
       call copy_sph_trans_rtp_from_IO(sph_file_l, sph%sph_rtp,          &
-     &    comms_sph%comm_rtp, sph_grps, sph%sph_params, ierr)
-      if(ierr .gt. 0) call calypso_mpi_abort(ierr, 'error in RTP mesh')
+     &    comms_sph%comm_rtp, sph_grps, sph%sph_params)
       call dealloc_rtp_grid_IO(sph_file_l)
 !
       if (iflag_debug.gt.0) write(*,*) 'copy_sph_trans_rj_from_IO'
       call sel_mpi_read_spectr_rj_file                                  &
      &   (nprocs, my_rank, sph_file_param, sph_file_l)
       call copy_sph_trans_rj_from_IO(sph_file_l, sph%sph_rj,            &
-     &    comms_sph%comm_rj, sph_grps, sph%sph_params, ierr)
-      if(ierr .gt. 0) call calypso_mpi_abort(ierr, 'error in RJ mesh')
+     &    comms_sph%comm_rj, sph_grps, sph%sph_params)
       call dealloc_rj_mode_IO(sph_file_l)
 !
       if (iflag_debug.gt.0) write(*,*) 'copy_sph_trans_rtm_from_IO'
       call sel_mpi_read_geom_rtm_file                                   &
      &   (nprocs, my_rank, sph_file_param, sph_file_l)
       call copy_sph_trans_rtm_from_IO(sph_file_l,                       &
-     &    sph%sph_rtm, comms_sph%comm_rtm, sph%sph_params, ierr)
-      if(ierr .gt. 0) call calypso_mpi_abort(ierr, 'error in RTM mesh')
+     &    sph%sph_rtm, comms_sph%comm_rtm, sph%sph_params)
       call dealloc_rtm_grid_IO(sph_file_l)
 !
       if (iflag_debug.gt.0) write(*,*) 'copy_sph_trans_rlm_from_IO'
       call sel_mpi_read_modes_rlm_file                                  &
      &   (nprocs, my_rank, sph_file_param, sph_file_l)
       call copy_sph_trans_rlm_from_IO(sph_file_l,                       &
-     &    sph%sph_rlm, comms_sph%comm_rlm, sph%sph_params, ierr)
-      if(ierr .gt. 0) call calypso_mpi_abort(ierr, 'error in RLM mesh')
+     &    sph%sph_rlm, comms_sph%comm_rlm, sph%sph_params)
       call dealloc_rlm_mode_IO(sph_file_l)
 !
       end subroutine load_sph_mesh
@@ -136,14 +130,12 @@
       type(sph_comm_tbl), intent(inout) :: comm_rj
       type(sph_group_data), intent(inout) ::  sph_grps
 !
-      integer(kind = kint) :: ierr
-!
 !
       if (iflag_debug.gt.0) write(*,*) 'copy_sph_trans_rj_from_IO'
       call sel_mpi_read_spectr_rj_file                                  &
      &   (nprocs, my_rank, sph_file_param, sph_file_l)
       call copy_sph_trans_rj_from_IO(sph_file_l,                        &
-     &    sph_rj, comm_rj, sph_grps, sph_params, ierr)
+     &    sph_rj, comm_rj, sph_grps, sph_params)
       call dealloc_rj_mode_IO(sph_file_l)
 !
       end subroutine load_sph_rj_mesh
@@ -247,6 +239,7 @@
       integer(kind = kint) :: ierr
 !
 !
+      ierr = 0
       call count_num_rtp_smp(sph%sph_rtp, ierr)
       call count_num_rj_smp(sph%sph_rj, ierr)
       call count_num_rtm_smp(sph%sph_rtm, ierr)
@@ -296,6 +289,7 @@
       integer(kind = kint) :: ierr
 !
 !
+      ierr = 0
       call count_num_rj_smp(sph_rj, ierr)
 !
       call set_reverse_import_table(sph_rj%nnod_rj,                     &

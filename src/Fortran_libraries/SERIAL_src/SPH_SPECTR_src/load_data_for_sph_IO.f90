@@ -7,27 +7,27 @@
 !!
 !!@verbatim
 !!      subroutine copy_sph_trans_rtp_from_IO(sph_grps_IO,              &
-!!     &          sph_rtp, comm_rtp, sph_grps, sph_params, ierr)
+!!     &          sph_rtp, comm_rtp, sph_grps, sph_params)
 !!        type(sph_file_data_type), intent(in) :: sph_file
 !!        type(sph_shell_parameters), intent(inout) :: sph_params
 !!        type(sph_rtp_grid), intent(inout) :: sph_rtp
 !!        type(sph_comm_tbl), intent(inout) :: comm_rtp
 !!        type(sph_group_data), intent(inout) :: sph_grps
 !!      subroutine copy_sph_trans_rj_from_IO(sph_grps_IO,               &
-!!     &          sph_rj, comm_rj, sph_grps, sph_params, ierr)
+!!     &          sph_rj, comm_rj, sph_grps, sph_params)
 !!        type(sph_file_data_type), intent(in) :: sph_file
 !!        type(sph_shell_parameters), intent(inout) :: sph_params
 !!        type(sph_rj_grid),  intent(inout) :: sph_rj
 !!        type(sph_comm_tbl), intent(inout) :: comm_rj
 !!        type(sph_group_data), intent(inout) :: sph_grps
 !!      subroutine copy_sph_trans_rtm_from_IO                           &
-!!     &         (sph_file, sph_rtm, comm_rtm, sph_params, ierr)
+!!     &         (sph_file, sph_rtm, comm_rtm, sph_params)
 !!        type(sph_file_data_type), intent(in) :: sph_file
 !!        type(sph_shell_parameters), intent(inout) :: sph_params
 !!        type(sph_rtm_grid), intent(inout) :: sph_rtm
 !!        type(sph_comm_tbl), intent(inout) :: comm_rtm
 !!      subroutine copy_sph_trans_rlm_from_IO                           &
-!!     &         (sph_file, sph_rlm, comm_rlm, sph_params, ierr)
+!!     &         (sph_file, sph_rlm, comm_rlm, sph_params)
 !!        type(sph_file_data_type), intent(in) :: sph_file
 !!        type(sph_shell_parameters), intent(inout) :: sph_params
 !!        type(sph_rlm_grid), intent(inout) :: sph_rlm
@@ -82,7 +82,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine copy_sph_trans_rtp_from_IO(sph_file,                   &
-     &          sph_rtp, comm_rtp, sph_grps, sph_params, ierr)
+     &          sph_rtp, comm_rtp, sph_grps, sph_params)
 !
       use copy_sph_comm_table_4_IO
       use copy_sph_node_4_IO
@@ -94,7 +94,6 @@
       type(sph_comm_tbl), intent(inout) :: comm_rtp
       type(sph_group_data), intent(inout) :: sph_grps
       type(sph_shell_parameters), intent(inout) :: sph_params
-      integer(kind = kint), intent(inout) :: ierr
 !
 !
       call copy_sph_node_4_rtp_from_IO                                  &
@@ -116,7 +115,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine copy_sph_trans_rj_from_IO(sph_file,                    &
-     &          sph_rj, comm_rj, sph_grps, sph_params, ierr)
+     &          sph_rj, comm_rj, sph_grps, sph_params)
 !
       use copy_sph_comm_table_4_IO
       use copy_sph_node_4_IO
@@ -128,7 +127,6 @@
       type(sph_comm_tbl), intent(inout) :: comm_rj
       type(sph_group_data), intent(inout) :: sph_grps
       type(sph_shell_parameters), intent(inout) :: sph_params
-      integer(kind = kint), intent(inout) :: ierr
 !
 !
       call copy_sph_node_4_rj_from_IO                                   &
@@ -146,7 +144,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine copy_sph_trans_rtm_from_IO                             &
-     &         (sph_file, sph_rtm, comm_rtm, sph_params, ierr)
+     &         (sph_file, sph_rtm, comm_rtm, sph_params)
 !
       use copy_sph_comm_table_4_IO
       use copy_sph_node_4_IO
@@ -156,7 +154,6 @@
       type(sph_rtm_grid), intent(inout) :: sph_rtm
       type(sph_comm_tbl), intent(inout) :: comm_rtm
       type(sph_shell_parameters), intent(inout) :: sph_params
-      integer(kind = kint), intent(inout) :: ierr
 !
 !
       call copy_sph_node_4_rtm_from_IO                                  &
@@ -169,7 +166,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine copy_sph_trans_rlm_from_IO                             &
-     &         (sph_file, sph_rlm, comm_rlm, sph_params, ierr)
+     &         (sph_file, sph_rlm, comm_rlm, sph_params)
 !
       use copy_sph_comm_table_4_IO
       use copy_sph_node_4_IO
@@ -179,7 +176,6 @@
       type(sph_rlm_grid), intent(inout) :: sph_rlm
       type(sph_comm_tbl), intent(inout) :: comm_rlm
       type(sph_shell_parameters), intent(inout) :: sph_params
-      integer(kind = kint), intent(inout) :: ierr
 !
 !
       call copy_sph_node_4_rlm_from_IO                                  &
