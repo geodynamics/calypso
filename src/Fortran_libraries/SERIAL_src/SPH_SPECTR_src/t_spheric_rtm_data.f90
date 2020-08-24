@@ -7,13 +7,13 @@
 !>@brief  Structure for indexing table of speherical harmonics transform
 !!
 !!@verbatim
-!!      subroutine alloc_type_spheric_param_rtm(sph_rtm)
-!!      subroutine alloc_type_sph_1d_index_rtm(sph_rtm)
+!!      subroutine alloc_spheric_param_rtm(sph_rtm)
+!!      subroutine alloc_sph_1d_index_rtm(sph_rtm)
 !!      subroutine alloc_rtm_param_smp(sph_rtm)
 !!        type(sph_rtm_grid), intent(inout) :: sph_rtm
 !!
-!!      subroutine dealloc_type_spheric_param_rtm(sph_rtm)
-!!      subroutine dealloc_type_sph_1d_index_rtm(sph_rtm)
+!!      subroutine dealloc_spheric_param_rtm(sph_rtm)
+!!      subroutine dealloc_sph_1d_index_rtm(sph_rtm)
 !!      subroutine dealloc_rtm_param_smp(sph_rtm)
 !!        type(sph_rtm_grid), intent(inout) :: sph_rtm
 !!
@@ -22,7 +22,7 @@
 !!      type(sph_rtm_grid), intent(in) :: rtm_org
 !!      type(sph_rtm_grid), intent(inout) :: rtm_new
 !!
-!!      subroutine check_type_spheric_param_rtm(id_rank, sph_rtm)
+!!      subroutine check_spheric_param_rtm(id_rank, sph_rtm)
 !!        integer, intent(in) :: id_rank
 !!        type(sph_rtm_grid), intent(in) :: sph_rtm
 !!@endverbatim
@@ -101,7 +101,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_type_spheric_param_rtm(sph_rtm)
+      subroutine alloc_spheric_param_rtm(sph_rtm)
 !
       type(sph_rtm_grid), intent(inout) :: sph_rtm
 !
@@ -109,11 +109,11 @@
 !
       if(sph_rtm%nnod_rtm .gt. 0) sph_rtm%idx_global_rtm = 0
 !
-      end subroutine alloc_type_spheric_param_rtm
+      end subroutine alloc_spheric_param_rtm
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine alloc_type_sph_1d_index_rtm(sph_rtm)
+      subroutine alloc_sph_1d_index_rtm(sph_rtm)
 !
       type(sph_rtm_grid), intent(inout) :: sph_rtm
       integer(kind = kint) :: num
@@ -135,7 +135,7 @@
         sph_rtm%a_r_1d_rtm_r = 0.0d0
       end if
 !
-      end subroutine alloc_type_sph_1d_index_rtm
+      end subroutine alloc_sph_1d_index_rtm
 !
 ! ----------------------------------------------------------------------
 !
@@ -167,17 +167,17 @@
 ! -----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_type_spheric_param_rtm(sph_rtm)
+      subroutine dealloc_spheric_param_rtm(sph_rtm)
 !
       type(sph_rtm_grid), intent(inout) :: sph_rtm
 !
       deallocate(sph_rtm%idx_global_rtm)
 !
-      end subroutine dealloc_type_spheric_param_rtm
+      end subroutine dealloc_spheric_param_rtm
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_type_sph_1d_index_rtm(sph_rtm)
+      subroutine dealloc_sph_1d_index_rtm(sph_rtm)
 !
       type(sph_rtm_grid), intent(inout) :: sph_rtm
 !
@@ -188,7 +188,7 @@
       deallocate(sph_rtm%idx_gl_1d_rtm_t)
       deallocate(sph_rtm%idx_gl_1d_rtm_m)
 !
-      end subroutine dealloc_type_sph_1d_index_rtm
+      end subroutine dealloc_sph_1d_index_rtm
 !
 ! ----------------------------------------------------------------------
 !
@@ -229,8 +229,8 @@
       rtm_new%ist_rtm(1:ithree) =  rtm_org%ist_rtm(1:ithree)
       rtm_new%ied_rtm(1:ithree) =  rtm_org%ied_rtm(1:ithree)
 !
-      call alloc_type_spheric_param_rtm(rtm_new)
-      call alloc_type_sph_1d_index_rtm(rtm_new)
+      call alloc_spheric_param_rtm(rtm_new)
+      call alloc_sph_1d_index_rtm(rtm_new)
 !
       do i = 1, ithree
         rtm_new%idx_global_rtm(1:rtm_new%nnod_rtm,i)                    &
@@ -248,15 +248,15 @@
       rtm_new%idx_gl_1d_rtm_m(1:rtm_new%nidx_rtm(3),2)                  &
      &      = rtm_org%idx_gl_1d_rtm_m(1:rtm_new%nidx_rtm(3),2)
 !
-!      call dealloc_type_sph_1d_index_rtm(rtm_org)
-!      call dealloc_type_spheric_param_rtm(rtm_org)
+!      call dealloc_sph_1d_index_rtm(rtm_org)
+!      call dealloc_spheric_param_rtm(rtm_org)
 !
       end subroutine copy_spheric_rtm_data
 !
 ! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_type_spheric_param_rtm(id_rank, sph_rtm)
+      subroutine check_spheric_param_rtm(id_rank, sph_rtm)
 !
       integer, intent(in) :: id_rank
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -272,7 +272,7 @@
         write(id_rank+50,*) i, sph_rtm%idx_global_rtm(i,1:3)
       end do
 !
-      end subroutine check_type_spheric_param_rtm
+      end subroutine check_spheric_param_rtm
 !
 ! -----------------------------------------------------------------------
 !

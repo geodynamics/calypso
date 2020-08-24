@@ -7,7 +7,7 @@
 !>@brief  Spherical transform for poles
 !!
 !!@verbatim
-!!      subroutine init_pole_transform(sph_rtp)
+!!      subroutine init_pole_grids(sph_rtp)
 !!
 !!      subroutine pole_backward_transforms(ncomp, nvector, nscalar,    &
 !!     &          sph_params, sph_rtp, sph_rtm, sph_rlm, comm_rlm, leg, &
@@ -87,7 +87,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_pole_transform(sph_rtp)
+      subroutine init_pole_grids(sph_rtp)
 !
       use cal_minmax_and_stacks
 !
@@ -100,7 +100,7 @@
       call count_number_4_smp(np_smp, ione, sph_rtp%nnod_pole,          &
      &    sph_rtp%istack_npole_smp, max_npole_smp)
 !
-      end subroutine init_pole_transform
+      end subroutine init_pole_grids
 !
 ! -----------------------------------------------------------------------
 !

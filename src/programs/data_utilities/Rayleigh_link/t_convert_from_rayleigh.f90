@@ -184,7 +184,7 @@
 !
       org_sph_mesh%sph%sph_rj%nidx_rj(1) = ra_rst%nri_org
       org_sph_mesh%sph%sph_rj%nidx_rj(2) = 1
-      call alloc_type_sph_1d_index_rj(org_sph_mesh%sph%sph_rj)
+      call alloc_sph_1d_index_rj(org_sph_mesh%sph%sph_rj)
       do k = 1, org_sph_mesh%sph%sph_rj%nidx_rj(1)
         kr = ra_rst%nri_org-k+1
         org_sph_mesh%sph%sph_rj%radius_1d_rj_r(k) = ra_rst%r_org(kr)

@@ -1,10 +1,19 @@
+!>@file   set_global_spherical_param.f90
+!!@brief  module set_global_spherical_param
+!!
+!!@author H. Matsui
+!!@date   Programmed  H. Matsui in July, 2007
 !
-!      module set_global_spherical_param
-!
-!     Written by H. Matsui on July, 2007
-!
+!>@brief  Set global resolution of spherical hermonics
+!!
+!!@verbatim
 !!      subroutine set_global_sph_resolution(l_truncation, m_folding,   &
 !!     &          sph_rtp, sph_rtm, sph_rlm, sph_rj)
+!!
+!!      subroutine set_global_rtm_resolution(l_truncation, m_folding,   &
+!!     &                                     sph_rtp, sph_rtm)
+!!      subroutine set_global_rlm_resolution(l_truncation, m_folding,   &
+!!     &                                     nidx_global_rtp_r, sph_rlm)
 !!        type(sph_rtp_grid), intent(inout) :: sph_rtp
 !!        type(sph_rtm_grid), intent(inout) :: sph_rtm
 !!        type(sph_rlm_grid), intent(inout) :: sph_rlm
@@ -32,17 +41,13 @@
 !!     &                  (iner_r_flag, ndomain_2d, ip_r, ip_j)
 !!
 !!      subroutine check_spheric_global_numnod(id_rank)
+!!@endverbatim
 !
       module set_global_spherical_param
 !
       use m_precision
 !
       implicit none
-!
-      integer(kind = kint), private :: nnod_global_rtp
-      integer(kind = kint), private :: nnod_global_rtm
-      integer(kind = kint), private :: nnod_global_rlm
-      integer(kind = kint), private :: nnod_global_rj
 !
 ! -----------------------------------------------------------------------
 !
@@ -62,34 +67,59 @@
       type(sph_rj_grid), intent(inout) :: sph_rj
 !
 !
-      sph_rtp%nidx_global_rtp(3)                                        &
-     &                   = 2*sph_rtp%nidx_global_rtp(2) / m_folding
-!
-      sph_rtm%nidx_global_rtm(1) = sph_rtp%nidx_global_rtp(1)
-      sph_rtm%nidx_global_rtm(2) = sph_rtp%nidx_global_rtp(2)
-      sph_rtm%nidx_global_rtm(3) = 2*(l_truncation/m_folding + 1) 
-!
-      sph_rlm%nidx_global_rlm(1) = sph_rtp%nidx_global_rtp(1)
-      sph_rlm%nidx_global_rlm(2)                                        &
-     &                   = (l_truncation+2)*l_truncation / m_folding
+      sph_rtp%nidx_global_rtp(3) = 2 * sph_rtp%nidx_global_rtp(2)       &
+     &                            / m_folding
 !
       sph_rj%nidx_global_rj(1) = sph_rtp%nidx_global_rtp(1)
       sph_rj%nidx_global_rj(2)                                          &
      &                   = (l_truncation+2)*l_truncation / m_folding
 !
-      nnod_global_rtp                                                   &
-     &  =  sph_rtp%nidx_global_rtp(1) * sph_rtp%nidx_global_rtp(2)      &
-     &   * sph_rtp%nidx_global_rtp(3)
-      nnod_global_rtm                                                   &
-     &  =  sph_rtm%nidx_global_rtm(1) * sph_rtm%nidx_global_rtm(2)      &
-     &   * sph_rtm%nidx_global_rtm(3)
-      nnod_global_rlm                                                   &
-     &  = sph_rlm%nidx_global_rlm(1) * (sph_rlm%nidx_global_rlm(2)+1)
-      nnod_global_rj                                                    &
-     &  = sph_rj%nidx_global_rj(1) * (sph_rj%nidx_global_rj(2) + 1)
+      call set_global_rtm_resolution                                    &
+     &   (l_truncation, m_folding, sph_rtp, sph_rtm)
+      call set_global_rlm_resolution                                    &
+     &   (l_truncation, m_folding, sph_rtp%nidx_global_rtp(1), sph_rlm)
+!
+!      call check_spheric_global_numnod                                 &
+!     &   (my_rank+50, sph_rtp, sph_rtm, sph_rlm, sph_rj)
 !
       end subroutine set_global_sph_resolution
 !
+! -----------------------------------------------------------------------
+!
+      subroutine set_global_rtm_resolution(l_truncation, m_folding,     &
+     &                                     sph_rtp, sph_rtm)
+!
+      use t_spheric_parameter
+!
+      integer(kind = kint), intent(in) :: l_truncation, m_folding
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_rtm_grid), intent(inout) :: sph_rtm
+!
+!
+      sph_rtm%nidx_global_rtm(1:2) = sph_rtp%nidx_global_rtp(1:2)
+      sph_rtm%nidx_global_rtm(3) =   2*(l_truncation/m_folding + 1) 
+!
+      end subroutine set_global_rtm_resolution
+!
+! -----------------------------------------------------------------------
+!
+      subroutine set_global_rlm_resolution(l_truncation, m_folding,     &
+     &                                     nidx_global_rtp_r, sph_rlm)
+!
+      use t_spheric_parameter
+!
+      integer(kind = kint), intent(in) :: l_truncation, m_folding
+      integer(kind = kint), intent(in) :: nidx_global_rtp_r
+      type(sph_rlm_grid), intent(inout) :: sph_rlm
+!
+!
+      sph_rlm%nidx_global_rlm(1) = nidx_global_rtp_r
+      sph_rlm%nidx_global_rlm(2)                                        &
+     &                   = (l_truncation+2)*l_truncation / m_folding
+!
+      end subroutine set_global_rlm_resolution
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine set_gl_nnod_spherical(nproc,                           &
@@ -261,10 +291,31 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_spheric_global_numnod(id_rank)
+      subroutine check_spheric_global_numnod                            &
+     &         (id_rank, sph_rtp, sph_rtm, sph_rlm, sph_rj)
+!
+      use t_spheric_parameter
 !
       integer, intent(in) :: id_rank
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_rtm_grid), intent(in) :: sph_rtm
+      type(sph_rlm_grid), intent(in) :: sph_rlm
+      type(sph_rj_grid), intent(in) :: sph_rj
 !
+      integer(kind = kint) :: nnod_global_rtp, nnod_global_rtm
+      integer(kind = kint) :: nnod_global_rlm, nnod_global_rj
+!
+!
+      nnod_global_rtp                                                   &
+     &  =  sph_rtp%nidx_global_rtp(1) * sph_rtp%nidx_global_rtp(2)      &
+     &   * sph_rtp%nidx_global_rtp(3)
+      nnod_global_rtm                                                   &
+     &  =  sph_rtm%nidx_global_rtm(1) * sph_rtm%nidx_global_rtm(2)      &
+     &   * sph_rtm%nidx_global_rtm(3)
+      nnod_global_rlm                                                   &
+     &  = sph_rlm%nidx_global_rlm(1) * (sph_rlm%nidx_global_rlm(2)+1)
+      nnod_global_rj                                                    &
+     &  = sph_rj%nidx_global_rj(1) * (sph_rj%nidx_global_rj(2) + 1)
 !
       write(id_rank+50,*) 'nnod_global_rtp ', nnod_global_rtp
       write(id_rank+50,*) 'nnod_global_rtm ', nnod_global_rtm

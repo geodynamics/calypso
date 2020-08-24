@@ -20,7 +20,7 @@
 !!        type(sph_group_data), intent(in) :: sph_grps
 !!        type(MHD_BC_lists), intent(in) :: MHD_BC
 !!        type(phys_address), intent(in) :: ipol
-!!        type(sph_grids), intent(inout) :: sph
+!!        type(sph_grids), intent(in) :: sph
 !!        type(sph_rotation), intent(inout) :: omega_sph
 !!        type(reference_field), intent(inout) :: ref_temp, ref_comp
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
@@ -57,7 +57,7 @@
 !
       implicit none
 !
-      private :: set_radius_rot_reft_dat_4_sph, init_reference_temps
+      private :: set_delta_r_4_sph_mhd, init_reference_temps
 !
 !  -------------------------------------------------------------------
 !
@@ -78,8 +78,8 @@
       type(sph_group_data), intent(in) :: sph_grps
       type(MHD_BC_lists), intent(in) :: MHD_BC
       type(phys_address), intent(in) :: ipol
+      type(sph_grids), intent(in) :: sph
 !
-      type(sph_grids), intent(inout) :: sph
       type(sph_rotation), intent(inout) :: omega_sph
       type(reference_field), intent(inout) :: ref_temp, ref_comp
       type(MHD_evolution_param), intent(inout) :: MHD_prop
@@ -113,8 +113,8 @@
       type(sph_group_data), intent(in) :: sph_grps
       type(MHD_BC_lists), intent(in) :: MHD_BC
       type(phys_address), intent(in) :: ipol
+      type(sph_grids), intent(in) :: sph
 !
-      type(sph_grids), intent(inout) :: sph
       type(sph_rotation), intent(inout) :: omega_sph
       type(reference_field), intent(inout) :: ref_temp, ref_comp
       type(MHD_evolution_param), intent(inout) :: MHD_prop
@@ -122,9 +122,8 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_radius_rot_reft_dat_4_sph'
-      call set_radius_rot_reft_dat_4_sph                                &
-     &   (sph_grps%radial_rj_grp, sph%sph_params, sph%sph_rj)
+      if (iflag_debug.gt.0) write(*,*) 'set_delta_r_4_sph_mhd'
+      call set_delta_r_4_sph_mhd(sph%sph_params, sph%sph_rj)
 !
 !*  ----------  rotation of earth  ---------------
 !
@@ -155,29 +154,13 @@
 !  -------------------------------------------------------------------
 !  -------------------------------------------------------------------
 !
-      subroutine set_radius_rot_reft_dat_4_sph                          &
-     &         (radial_rj_grp, sph_params, sph_rj)
+      subroutine set_delta_r_4_sph_mhd(sph_params, sph_rj)
 !
       use set_radius_func_noequi
-      use set_radius_4_sph_dynamo
       use set_reference_temp_sph
 !
-      type(group_data), intent(in) :: radial_rj_grp
-!
-      type(sph_rj_grid), intent(inout) :: sph_rj
-      type(sph_shell_parameters), intent(inout) :: sph_params
-!
-!* --------  radius  --------------
-!
-      if (iflag_debug .ge. iflag_routine_msg)                           &
-     &      write(*,*) 'set_radius_dat_4_sph_dynamo'
-      call set_radius_dat_4_sph_dynamo                                  &
-     &   (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, radial_rj_grp,      &
-     &    sph_params%iflag_radial_grid, sph_params%nlayer_ICB,          &
-     &    sph_params%nlayer_CMB, sph_params%nlayer_2_center,            &
-     &    sph_rj%ar_1d_rj, sph_rj%r_ele_rj, sph_rj%ar_ele_rj,           &
-     &    sph_params%radius_ICB, sph_params%radius_CMB,                 &
-     &    sph_params%R_earth)
+      type(sph_rj_grid), intent(in) :: sph_rj
+      type(sph_shell_parameters), intent(in) :: sph_params
 !
 !   Choose radial grid mode
       if (iflag_debug .ge. iflag_routine_msg)                           &
@@ -186,7 +169,7 @@
       call set_dr_for_nonequi(sph_params%nlayer_CMB,                    &
      &    sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r)
 !*
-      end subroutine set_radius_rot_reft_dat_4_sph
+      end subroutine set_delta_r_4_sph_mhd
 !
 !  -------------------------------------------------------------------
 !

@@ -53,8 +53,8 @@
       comm_sph%nneib_domain = comm%num_neib
       comm_sph%ntot_item_sr = comm%ntot_import
 !
-      call alloc_type_sph_comm_stack(comm_sph)
-      call alloc_type_sph_comm_item(numnod, comm_sph)
+      call alloc_sph_comm_stack(comm_sph)
+      call alloc_sph_comm_item(numnod, comm_sph)
 !
       comm_sph%id_domain(1:comm_sph%nneib_domain)                       &
      &      = comm%id_neib(1:comm_sph%nneib_domain)

@@ -8,8 +8,14 @@
 !!
 !!@verbatim
 !!      subroutine dealloc_gen_mesh_params(gen_sph)
-!!      subroutine dealloc_gen_sph_fem_mesh_param(gen_sph)
+!!      subroutine dealloc_gen_sph_radial_groups(gen_sph)
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
+!!
+!!      subroutine copy_sph_radial_groups(gen_sph)
+!!        type(sph_group_data), intent(in) ::  sph_grps
+!!        type(construct_spherical_grid), intent(inout) :: gen_sph
+!!      subroutine empty_theta_rtp_grp(theta_rtp_grp_lc)
+!!        type(group_data), intent(inout) :: theta_rtp_grp_lc
 !!@endverbatim
 !
       module t_const_spherical_grid
@@ -86,7 +92,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine dealloc_gen_sph_fem_mesh_param(gen_sph)
+      subroutine dealloc_gen_sph_radial_groups(gen_sph)
 !
       type(construct_spherical_grid), intent(inout) :: gen_sph
 !
@@ -95,7 +101,41 @@
      call dealloc_group(gen_sph%radial_rtp_grp_lc)
      call dealloc_group(gen_sph%theta_rtp_grp_lc)
 !
-      end subroutine dealloc_gen_sph_fem_mesh_param
+      end subroutine dealloc_gen_sph_radial_groups
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine copy_sph_radial_groups(sph_grps, gen_sph)
+!
+      use t_spheric_group
+      use copy_mesh_structures
+!
+      type(sph_group_data), intent(in) ::  sph_grps
+      type(construct_spherical_grid), intent(inout) :: gen_sph
+!
+!
+      call copy_group_data                                              &
+     &   (sph_grps%radial_rtp_grp, gen_sph%radial_rtp_grp_lc)
+      call copy_group_data                                              &
+     &   (sph_grps%theta_rtp_grp, gen_sph%theta_rtp_grp_lc)
+      call copy_group_data                                              &
+     &   (sph_grps%radial_rj_grp, gen_sph%radial_rj_grp_lc)
+!
+      end subroutine copy_sph_radial_groups
+!
+! -----------------------------------------------------------------------
+!
+      subroutine empty_theta_rtp_grp(theta_rtp_grp_lc)
+!
+      type(group_data), intent(inout) :: theta_rtp_grp_lc
+!
+!
+      theta_rtp_grp_lc%num_grp = 0
+      call alloc_group_num(theta_rtp_grp_lc)
+      call alloc_group_item(theta_rtp_grp_lc)
+!
+      end subroutine empty_theta_rtp_grp
 !
 ! -----------------------------------------------------------------------
 !

@@ -84,7 +84,6 @@
       type(work_SPH_MHD), intent(inout) :: SPH_WK
       type(field_IO), intent(inout) :: sph_fst_IO
 !
-!
 !   Allocate spectr field data
 !
       call set_sph_MHD_sprctr_data(SPH_MHD%sph, SPH_model%MHD_prop,     &

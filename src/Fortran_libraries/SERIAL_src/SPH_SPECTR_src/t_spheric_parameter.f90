@@ -12,17 +12,17 @@
 !!        igrid_non_equidist = 1 :: non-equi-distance
 !!        igrid_equidistance = 0 :: equi-distance
 !!
-!!      subroutine alloc_type_spheric_parameter(sph)
-!!        type(sph_grids), intent(inout) :: sph
-!!      subroutine dealloc_type_spheric_parameter(sph)
+!!      subroutine alloc_spheric_parameter(sph)
+!!      subroutine dealloc_spheric_parameter(sph)
+!!      subroutine dealloc_sph_1d_indices(sph)
 !!        type(sph_grids), intent(inout) :: sph
 !!
 !!      subroutine check_global_spheric_parameter(sph_params, sph_rtp)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rtp_grid), intent(in)  :: sph_rtp
-!!      subroutine check_type_spheric_para_gl_part(sph)
+!!      subroutine check_spheric_para_gl_part(sph)
 !!        type(sph_grids), intent(in) :: sph
-!!      subroutine check_type_spheric_parameter(id_rank, sph)
+!!      subroutine check_spheric_parameter(id_rank, sph)
 !!        integer, intent(in) :: id_rank
 !!        type(sph_grids), intent(in) :: sph
 !!@endverbatim
@@ -128,31 +128,45 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_type_spheric_parameter(sph)
+      subroutine alloc_spheric_parameter(sph)
 !
       type(sph_grids), intent(inout) :: sph
 !
 !
-      call alloc_type_spheric_param_rtp(sph%sph_rtp)
-      call alloc_type_spheric_param_rtm(sph%sph_rtm)
-      call alloc_type_spheric_param_rlm(sph%sph_rlm)
-      call alloc_type_spheric_param_rj(sph%sph_rj)
+      call alloc_spheric_param_rtp(sph%sph_rtp)
+      call alloc_spheric_param_rtm(sph%sph_rtm)
+      call alloc_spheric_param_rlm(sph%sph_rlm)
+      call alloc_spheric_param_rj(sph%sph_rj)
 !
-      end subroutine alloc_type_spheric_parameter
+      end subroutine alloc_spheric_parameter
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_type_spheric_parameter(sph)
+      subroutine dealloc_spheric_parameter(sph)
 !
       type(sph_grids), intent(inout) :: sph
 !
 !
-      call dealloc_type_spheric_param_rtp(sph%sph_rtp)
-      call dealloc_type_spheric_param_rtm(sph%sph_rtm)
-      call dealloc_type_spheric_param_rlm(sph%sph_rlm)
+      call dealloc_spheric_param_rtp(sph%sph_rtp)
+      call dealloc_spheric_param_rtm(sph%sph_rtm)
+      call dealloc_spheric_param_rlm(sph%sph_rlm)
       call dealloc_spheric_param_rj(sph%sph_rj)
 !
-      end subroutine dealloc_type_spheric_parameter
+      end subroutine dealloc_spheric_parameter
+!
+! -----------------------------------------------------------------------
+!
+      subroutine dealloc_sph_1d_indices(sph)
+!
+      type(sph_grids), intent(inout) :: sph
+!
+!
+      call dealloc_sph_1d_index_rj(sph%sph_rj)
+      call dealloc_sph_1d_index_rlm(sph%sph_rlm)
+      call dealloc_sph_1d_index_rtm(sph%sph_rtm)
+      call dealloc_sph_1d_index_rtp(sph%sph_rtp)
+!
+      end subroutine dealloc_sph_1d_indices
 !
 ! -----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -172,7 +186,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine check_type_spheric_para_gl_part(sph)
+      subroutine check_spheric_para_gl_part(sph)
 !
       type(sph_grids), intent(in) :: sph
 !
@@ -183,21 +197,21 @@
       write(50,*) 'nidx_global_rj ',  sph%sph_rj%nidx_global_rj(1:2)
 !
 !
-      end subroutine check_type_spheric_para_gl_part
+      end subroutine check_spheric_para_gl_part
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine check_type_spheric_parameter(id_rank, sph)
+      subroutine check_spheric_parameter(id_rank, sph)
 !
       integer, intent(in) :: id_rank
       type(sph_grids), intent(in) :: sph
 !
-      call check_type_spheric_param_rtp(id_rank, sph%sph_rtp)
-      call check_type_spheric_param_rtm(id_rank, sph%sph_rtm)
-      call check_type_spheric_param_rlm(id_rank, sph%sph_rlm)
-      call check_type_spheric_param_rj(id_rank, sph%sph_rj)
+      call check_spheric_param_rtp(id_rank, sph%sph_rtp)
+      call check_spheric_param_rtm(id_rank, sph%sph_rtm)
+      call check_spheric_param_rlm(id_rank, sph%sph_rlm)
+      call check_spheric_param_rj(id_rank, sph%sph_rj)
 !
-      end subroutine check_type_spheric_parameter
+      end subroutine check_spheric_parameter
 !
 ! -----------------------------------------------------------------------
 !

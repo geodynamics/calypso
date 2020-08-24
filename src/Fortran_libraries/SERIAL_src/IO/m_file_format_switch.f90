@@ -38,6 +38,9 @@
       implicit none
 !
 !
+!>      Integer flag for no file
+       integer(kind = kint), parameter :: id_no_file =      -1000
+!
 !>      Integer flag for ascii data format
       integer(kind = kint), parameter :: id_ascii_file_fmt =    0
 !>      Integer flag for binary data format
@@ -138,6 +141,9 @@
            set_file_format = id_gzip_txt_file_fmt
         else if(check_mul_flags(file_fmt_ctl, gzip_bin_flags)) then
            set_file_format = id_gzip_bin_file_fmt
+!
+        else if(check_mul_flags(file_fmt_ctl, no_file_flags)) then
+           set_file_format = id_no_file
         end if
       end if
 !

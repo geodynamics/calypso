@@ -84,7 +84,7 @@ matmul_for_legendre_trans.o: $(SPH_COMMDIR)/matmul_for_legendre_trans.F90 m_prec
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 ordering_schmidt_trans_spin.o: $(SPH_COMMDIR)/ordering_schmidt_trans_spin.f90 m_precision.o m_constants.o m_machine_parameter.o sel_spherical_SRs.o
 	$(F90) -c $(F90OPTFLAGS) $<
-parallel_load_data_4_sph.o: $(SPH_COMMDIR)/parallel_load_data_4_sph.f90 m_precision.o m_constants.o t_file_IO_parameter.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_spheric_group.o t_spheric_data_IO.o t_const_spherical_grid.o t_sph_local_parameter.o sph_file_MPI_IO_select.o set_loaded_data_4_sph.o calypso_mpi.o t_mesh_data.o copy_mesh_structures.o mesh_file_name_by_param.o mpi_load_mesh_data.o t_comm_table.o t_geometry_data.o t_group_data.o m_spheric_constants.o const_FEM_mesh_sph_mhd.o gen_sph_grids_modes.o mesh_IO_select.o set_nnod_4_ele_by_type.o m_machine_parameter.o load_data_for_sph_IO.o set_from_recv_buf_rev.o set_special_sph_lm_flags.o
+parallel_load_data_4_sph.o: $(SPH_COMMDIR)/parallel_load_data_4_sph.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_file_IO_parameter.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_spheric_group.o t_spheric_data_IO.o t_const_spherical_grid.o t_sph_local_parameter.o sph_file_MPI_IO_select.o set_loaded_data_4_sph.o load_data_for_sph_IO.o set_from_recv_buf_rev.o count_num_sph_smp.o pole_sph_transform.o set_radius_4_sph_dynamo.o
 	$(F90) -c $(F90OPTFLAGS) $<
 pickup_gauss_coefficients.o: $(SPH_COMMDIR)/pickup_gauss_coefficients.f90 m_precision.o m_constants.o t_spheric_parameter.o t_phys_address.o t_phys_data.o t_pickup_sph_spectr_data.o pickup_sph_spectr.o m_base_field_labels.o calypso_mpi.o set_parallel_file_name.o t_no_heat_Nusselt.o
 	$(F90) -c $(F90OPTFLAGS) $<

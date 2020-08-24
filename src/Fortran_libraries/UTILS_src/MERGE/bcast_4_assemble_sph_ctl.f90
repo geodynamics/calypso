@@ -42,7 +42,8 @@
       call bcast_ctl_data_4_platform(mgd_ctl%source_plt)
       call bcast_ctl_data_4_platform(mgd_ctl%assemble_plt)
 !
-      call bcast_parallel_shell_ctl(mgd_ctl%psph_ctl)
+      call bcast_parallel_shell_ctl(mgd_ctl%src_psph_ctl)
+      call bcast_parallel_shell_ctl(mgd_ctl%asbl_psph_ctl)
 !
       call bcast_merge_field_data(mgd_ctl)
       call bcast_merge_step_data(mgd_ctl)

@@ -61,8 +61,8 @@
      &                           cast_long(2), irank_org)
 !
       if(mod(ip_org-1,nprocs) .ne. my_rank) then
-        call alloc_type_spheric_param_rj(sph_mesh%sph%sph_rj)
-        call alloc_type_sph_1d_index_rj(sph_mesh%sph%sph_rj)
+        call alloc_spheric_param_rj(sph_mesh%sph%sph_rj)
+        call alloc_sph_1d_index_rj(sph_mesh%sph%sph_rj)
       end if
 !
 !      write(*,*) 'calypso_mpi_bcast_int idx_global_rj', ip_org

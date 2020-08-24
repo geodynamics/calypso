@@ -75,7 +75,6 @@
 !
       use set_address_sph_trans_MHD
       use set_address_sph_trans_snap
-      use pole_sph_transform
 !
       type(phys_address), intent(in) :: iphys
       type(SPH_MHD_model_data), intent(in) :: SPH_model
@@ -91,8 +90,6 @@
 !>      total number of svalars for spherical harmonics transform
       integer(kind = kint), save :: nscalar_max_trans = 0
 !
-!
-      call init_pole_transform(SPH_MHD%sph%sph_rtp)
 !
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &                     'set_addresses_trans_sph_MHD'
@@ -176,8 +173,8 @@
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !
-      type(sph_grids), intent(inout) :: sph
-      type(sph_comm_tables), intent(inout) :: comms_sph
+      type(sph_grids), intent(in) :: sph
+      type(sph_comm_tables), intent(in) :: comms_sph
       type(sph_rotation), intent(in) :: omega_sph
 !
       integer(kind = kint), intent(in) :: ncomp_max_trans

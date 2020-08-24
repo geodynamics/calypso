@@ -7,13 +7,13 @@
 !>@brief  Structure for indexing table of speherical harmonic oefficients
 !!
 !!@verbatim
-!!      subroutine alloc_type_spheric_param_rj(rj)
-!!      subroutine alloc_type_sph_1d_index_rj(rj)
+!!      subroutine alloc_spheric_param_rj(rj)
+!!      subroutine alloc_sph_1d_index_rj(rj)
 !!      subroutine alloc_rj_param_smp(rj)
 !!        type(sph_rj_grid), intent(inout) :: rj
 !!
 !!      subroutine dealloc_spheric_param_rj(rj)
-!!      subroutine dealloc_type_sph_1d_index_rj(rj)
+!!      subroutine dealloc_sph_1d_index_rj(rj)
 !!      subroutine dealloc_rj_param_smp(rj)
 !!        type(sph_rj_grid), intent(inout) :: rj
 !!
@@ -22,7 +22,7 @@
 !!        type(sph_rj_grid), intent(in) :: rj_org
 !!        type(sph_rj_grid), intent(inout) :: rj_new
 !!
-!!      subroutine check_type_spheric_param_rj(id_rank, rj)
+!!      subroutine check_spheric_param_rj(id_rank, rj)
 !!        integer, intent(in) :: id_rank
 !!        type(sph_rj_grid), intent(in) :: rj
 !!
@@ -123,7 +123,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_type_spheric_param_rj(rj)
+      subroutine alloc_spheric_param_rj(rj)
 !
       type(sph_rj_grid), intent(inout) :: rj
 !
@@ -131,11 +131,11 @@
 !
       if(rj%nnod_rj .gt. 0) rj%idx_global_rj =  0
 !
-      end subroutine alloc_type_spheric_param_rj
+      end subroutine alloc_spheric_param_rj
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine alloc_type_sph_1d_index_rj(rj)
+      subroutine alloc_sph_1d_index_rj(rj)
 !
       type(sph_rj_grid), intent(inout) :: rj
       integer(kind = kint) :: num
@@ -166,7 +166,7 @@
         rj%ar_ele_rj = 0.0d0
       end if
 !
-      end subroutine alloc_type_sph_1d_index_rj
+      end subroutine alloc_sph_1d_index_rj
 !
 ! ----------------------------------------------------------------------
 !
@@ -202,7 +202,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_type_sph_1d_index_rj(rj)
+      subroutine dealloc_sph_1d_index_rj(rj)
 !
       type(sph_rj_grid), intent(inout) :: rj
 !
@@ -211,7 +211,7 @@
       deallocate(rj%ar_1d_rj, rj%r_ele_rj, rj%ar_ele_rj)
       deallocate(rj%idx_gl_1d_rj_r, rj%idx_gl_1d_rj_j)
 !
-      end subroutine dealloc_type_sph_1d_index_rj
+      end subroutine dealloc_sph_1d_index_rj
 !
 ! ----------------------------------------------------------------------
 !
@@ -249,8 +249,8 @@
       rj_new%ist_rj(1:itwo) =  rj_org%ist_rj(1:itwo)
       rj_new%ied_rj(1:itwo) =  rj_org%ied_rj(1:itwo)
 !
-      call alloc_type_spheric_param_rj(rj_new)
-      call alloc_type_sph_1d_index_rj(rj_new)
+      call alloc_spheric_param_rj(rj_new)
+      call alloc_sph_1d_index_rj(rj_new)
 !
       do i = 1, itwo
         rj_new%idx_global_rj(1:rj_new%nnod_rj,i)                        &
@@ -268,7 +268,7 @@
       rj_new%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),3)                      &
      &      = rj_org%idx_gl_1d_rj_j(1:rj_new%nidx_rj(2),3)
 !
-!      call dealloc_type_sph_1d_index_rj(rj_org)
+!      call dealloc_sph_1d_index_rj(rj_org)
 !      call dealloc_spheric_param_rj(rj_org)
 !
       end subroutine copy_spheric_rj_data
@@ -276,7 +276,7 @@
 ! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_type_spheric_param_rj(id_rank, rj)
+      subroutine check_spheric_param_rj(id_rank, rj)
 !
       integer, intent(in) :: id_rank
       type(sph_rj_grid), intent(in) :: rj
@@ -292,7 +292,7 @@
         write(id_rank+50,*) i, rj%idx_global_rj(i,1:2)
       end do
 !
-      end subroutine check_type_spheric_param_rj
+      end subroutine check_spheric_param_rj
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

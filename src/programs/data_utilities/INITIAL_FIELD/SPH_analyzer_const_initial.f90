@@ -9,7 +9,6 @@
 !!
 !!@verbatim
 !!      subroutine initialize_const_sph_initial
-!!      subroutine SPH_const_initial_field
 !!@endverbatim
 !
 !
@@ -111,7 +110,6 @@
 !
       type(SPH_MHD_model_data), intent(inout) :: SPH_model
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
-!
 !
 !   Allocate spectr field data
 !

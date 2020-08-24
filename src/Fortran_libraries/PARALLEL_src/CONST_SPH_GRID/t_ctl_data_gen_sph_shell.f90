@@ -73,9 +73,9 @@
 !>        File name to read spherical shell control file
         character (len = kchara)                                        &
      &         :: control_sph_file = 'control_sph_shell'
-!>        Tnteger flag to defined spherical shell
+!>        Integer flag to defined spherical shell
         integer (kind=kint) :: iflag_sph_shell = 0
-!>        Tnteger flag to read spherical shell control file
+!>        Integer flag to read spherical shell control file
         integer (kind=kint) :: ifile_sph_shell = 0
       end type parallel_sph_shell_control
 !

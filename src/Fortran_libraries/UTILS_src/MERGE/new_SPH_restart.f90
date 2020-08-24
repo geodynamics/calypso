@@ -10,10 +10,6 @@
 !!      subroutine alloc_sph_mesh_parallel_merge
 !!      subroutine dealloc_sph_mesh_4_merge
 !!
-!!      subroutine set_local_rj_mesh_4_merge                            &
-!!     &         (sph_mesh_file, num_pe, sph_mesh)
-!!        type(field_IO_params), intent(in) :: sph_mesh_file
-!!        type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
 !!      subroutine load_field_name_assemble_sph(istep_start, np_sph_org,&
 !!     &          org_fst_param, org_phys, new_phys, t_IO)
 !!      subroutine load_org_sph_data(id_rank, istep, np_sph_org,        &
@@ -54,45 +50,6 @@
 !
       contains
 !
-! -----------------------------------------------------------------------
-!
-      subroutine set_local_rj_mesh_4_merge                              &
-     &         (sph_mesh_file, num_pe, sph_mesh)
-!
-      use sph_file_MPI_IO_select
-      use sph_file_IO_select
-      use load_data_for_sph_IO
-!
-      integer, intent(in) ::  num_pe
-      type(field_IO_params), intent(in) :: sph_mesh_file
-      type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
-!
-      type(field_IO_params) :: sph_file_param
-      type(sph_file_data_type) :: sph_file
-      integer :: id_rank, ip
-      integer(kind = kint) :: iloop, ierr
-!
-!
-      call set_sph_mesh_file_fmt_prefix                                 &
-     &   (sph_mesh_file%iflag_format, sph_mesh_file%file_prefix,        &
-     &    sph_file_param)
-      do iloop = 0, (num_pe-1) / nprocs
-        id_rank = my_rank + iloop * nprocs
-        ip = id_rank + 1
-        call sel_mpi_read_spectr_rj_file                                &
-     &     (num_pe, id_rank, sph_file_param, sph_file)
-!
-        if(id_rank .lt. num_pe) then
-          call input_modes_rj_sph_trans(sph_file,                       &
-     &       sph_mesh(ip)%sph%sph_rj, sph_mesh(ip)%sph_comms%comm_rj,   &
-     &       sph_mesh(ip)%sph_grps, sph_mesh(ip)%sph%sph_params, ierr)
-          call dealloc_rj_mode_IO(sph_file)
-        end if
-      end do
-!
-      end subroutine set_local_rj_mesh_4_merge
-!
-! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine load_field_name_assemble_sph(istep_start, np_sph_org,  &

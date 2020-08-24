@@ -56,9 +56,11 @@
       use field_IO_select
       use share_spectr_index_data
       use count_nnod_4_asseble_sph
+      use parallel_gen_sph_grids
 !
       type(control_data_4_merge) :: mgd_ctl_s
-      type(sph_grid_maker_in_sim) :: sph_maker_s
+      type(sph_grid_maker_in_sim) :: sph_asbl_maker_s
+      type(sph_grid_maker_in_sim) :: sph_org_maker_s
 !      integer(kind = kint) :: ip, jp
 !
 !
@@ -66,27 +68,26 @@
 !
       if(my_rank .eq. 0) call read_control_assemble_sph(mgd_ctl_s)
       call bcast_merge_control_data(mgd_ctl_s)
-      call set_control_4_newsph                                         &
-     &   (mgd_ctl_s, asbl_param_s, sph_asbl_s, sph_maker_s)
+      call set_control_4_newsph(mgd_ctl_s, asbl_param_s, sph_asbl_s,    &
+     &                          sph_org_maker_s, sph_asbl_maker_s)
 !
       call alloc_spectr_data_4_assemble(sph_asbl_s)
 !
-!  Check and construct spherical shell grid data
-!
-      call check_and_make_SPH_mesh(mgd_ctl_s%psph_ctl%iflag_sph_shell,  &
-     &    asbl_param_s%new_mesh_file, sph_maker_s)
-!
 !  set original spectr data
 !
-      call set_local_rj_mesh_4_merge(asbl_param_s%org_mesh_file,        &
-     &    sph_asbl_s%np_sph_org, sph_asbl_s%org_sph_mesh)
+      call check_and_make_para_rj_mode(asbl_param_s%org_mesh_file,      &
+     &    sph_asbl_s%np_sph_org, sph_asbl_s%org_sph_mesh,               &
+     &    sph_org_maker_s)
       call share_org_sph_rj_data                                        &
      &   (sph_asbl_s%np_sph_org, sph_asbl_s%org_sph_mesh)
 !
 !  set new spectr data
 !
-      call set_local_rj_mesh_4_merge(asbl_param_s%new_mesh_file,        &
-     &    sph_asbl_s%np_sph_new, sph_asbl_s%new_sph_mesh)
+      call check_and_make_SPH_rj_mode                                   &
+     &   (asbl_param_s%new_mesh_file, sph_asbl_maker_s,                 &
+     &    sph_asbl_s%new_sph_mesh(my_rank+1)%sph,                       &
+     &    sph_asbl_s%new_sph_mesh(my_rank+1)%sph_comms,                 &
+     &    sph_asbl_s%new_sph_mesh(my_rank+1)%sph_grps)
       call load_new_spectr_rj_data                                      &
      &   (sph_asbl_s%np_sph_org, sph_asbl_s%np_sph_new,                 &
      &    sph_asbl_s%org_sph_mesh, sph_asbl_s%new_sph_mesh,             &

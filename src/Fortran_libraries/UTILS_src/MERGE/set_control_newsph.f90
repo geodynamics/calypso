@@ -8,12 +8,13 @@
 !!
 !!@verbatim
 !!      subroutine bcast_ctl_param_newsph(asbl_param, sph_asbl)
-!!      subroutine set_control_4_newsph                                 &
-!!     &         (mgd_ctl, asbl_param, sph_asbl, sph_maker)
+!!      subroutine set_control_4_newsph(mgd_ctl, asbl_param,            &
+!!     &          sph_asbl, org_sph_maker, asbl_sph_maker)
 !!        type(control_data_4_merge), intent(in) :: mgd_ctl
 !!        type(control_param_assemble), intent(inout) :: asbl_param
 !!        type(spectr_data_4_assemble), intent(inout) :: sph_asbl
-!!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
+!!        type(sph_grid_maker_in_sim), intent(inout) :: org_sph_maker
+!!        type(sph_grid_maker_in_sim), intent(inout) :: asbl_sph_maker
 !!@endverbatim
 !
       module set_control_newsph
@@ -74,8 +75,8 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine set_control_4_newsph                                   &
-     &         (mgd_ctl, asbl_param, sph_asbl, sph_maker)
+      subroutine set_control_4_newsph(mgd_ctl, asbl_param,              &
+     &          sph_asbl, org_sph_maker, asbl_sph_maker)
 !
       use m_error_IDs
       use t_control_data_4_merge
@@ -89,7 +90,8 @@
       type(control_data_4_merge), intent(in) :: mgd_ctl
       type(control_param_assemble), intent(inout) :: asbl_param
       type(spectr_data_4_assemble), intent(inout) :: sph_asbl
-      type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
+      type(sph_grid_maker_in_sim), intent(inout) :: org_sph_maker
+      type(sph_grid_maker_in_sim), intent(inout) :: asbl_sph_maker
 !
       integer(kind = kint) :: ierr
 !
@@ -120,6 +122,7 @@
      &    mgd_ctl%source_plt%sph_file_prefix,                           &
      &    mgd_ctl%source_plt%sph_file_fmt_ctl,                          &
      &    asbl_param%org_mesh_file)
+!
       call set_parallel_file_ctl_params(def_new_sph_head,               &
      &    mgd_ctl%assemble_plt%sph_file_prefix,                         &
      &    mgd_ctl%assemble_plt%sph_file_fmt_ctl,                        &
@@ -149,12 +152,32 @@
 !
 !   set spherical shell parameters
 !
-      if(mgd_ctl%psph_ctl%iflag_sph_shell .gt. 0) then
-        if (iflag_debug.gt.0) write(*,*) 'set_control_4_shell_grids'
+      if(mgd_ctl%src_psph_ctl%iflag_sph_shell .gt. 0) then
+        org_sph_maker%make_SPH_flag =    .TRUE.
+        org_sph_maker%mesh_output_flag = .FALSE.
+!
+        if(iflag_debug.gt.0) write(*,*) 'set_control_4_shell_grids org'
         call set_control_4_shell_grids                                  &
-     &     (nprocs, mgd_ctl%psph_ctl%Fmesh_ctl,                         &
-     &      mgd_ctl%psph_ctl%spctl, mgd_ctl%psph_ctl%sdctl,             &
-     &      sph_maker%sph_tmp, sph_maker%gen_sph, ierr)
+     &     (sph_asbl%np_sph_org, mgd_ctl%src_psph_ctl%Fmesh_ctl,        &
+     &      mgd_ctl%src_psph_ctl%spctl, mgd_ctl%src_psph_ctl%sdctl,     &
+     &      org_sph_maker%sph_tmp, org_sph_maker%gen_sph, ierr)
+        if(ierr .gt. 0) call calypso_mpi_abort(ierr, e_message)
+      end if
+!
+      if(mgd_ctl%asbl_psph_ctl%iflag_sph_shell .gt. 0) then
+        asbl_sph_maker%make_SPH_flag = .TRUE.
+        asbl_sph_maker%mesh_output_flag = .TRUE.
+!
+        if(asbl_param%new_mesh_file%iflag_format .eq. id_no_file        &
+     &    .or. mgd_ctl%assemble_plt%sph_file_prefix%iflag .eq. 0) then
+          asbl_sph_maker%mesh_output_flag = .FALSE.
+        end if
+!
+        if(iflag_debug.gt.0) write(*,*) 'set_control_4_shell_grids new'
+        call set_control_4_shell_grids                                  &
+     &     (nprocs, mgd_ctl%asbl_psph_ctl%Fmesh_ctl,                    &
+     &      mgd_ctl%asbl_psph_ctl%spctl, mgd_ctl%asbl_psph_ctl%sdctl,   &
+     &      asbl_sph_maker%sph_tmp, asbl_sph_maker%gen_sph, ierr)
         if(ierr .gt. 0) call calypso_mpi_abort(ierr, e_message)
       end if
 !

@@ -113,7 +113,6 @@
       type(SPH_MHD_model_data), intent(inout) :: SPH_model
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !
-!
 !   Allocate spectr field data
 !
       call init_field_data                                              &

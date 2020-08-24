@@ -7,14 +7,31 @@
 !>@brief  Main loop to generate spherical harmonics indices
 !!
 !!@verbatim
-!!      subroutine check_and_make_SPH_mesh                              &
-!!     &         (iflag_make_SPH, sph_file_param, sph_maker)
+!!      subroutine load_para_SPH_and_FEM_mesh(FEM_mesh_flags,           &
+!!     &          sph_file_param, sph, comms_sph, sph_grps, geofem,     &
+!!     &          mesh_file, sph_maker)
+!!        type(FEM_file_IO_flags), intent(in) :: FEM_mesh_flags
+!!        type(field_IO_params), intent(in) ::  sph_file_param
+!!        type(sph_grids), intent(inout) :: sph
+!!        type(sph_comm_tables), intent(inout) :: comms_sph
+!!        type(sph_group_data), intent(inout) ::  sph_grps
+!!        type(mesh_data), intent(inout) :: geofem
+!!        type(field_IO_params), intent(inout) ::  mesh_file
+!!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
+!!      subroutine check_and_make_SPH_mesh(sph_file_param, sph_maker,   &
+!!     &          sph, comms_sph, sph_grps)
 !!        type(field_IO_params), intent(in) :: sph_file_param
 !!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
-!!      subroutine para_gen_sph_grids(sph_file_param, sph, gen_sph)
-!!        type(field_IO_params), intent(in) :: sph_file_param
-!!        type(construct_spherical_grid), intent(inout) :: gen_sph
 !!        type(sph_grids), intent(inout) :: sph
+!!        type(sph_comm_tables), intent(inout) :: comms_sph
+!!        type(sph_group_data), intent(inout) :: sph_grps
+!!      subroutine check_and_make_SPH_rj_mode(sph_file_param, sph_maker,&
+!!     &          sph, comms_sph, sph_grps)
+!!        type(field_IO_params), intent(in) :: sph_file_param
+!!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
+!!        type(sph_grids), intent(inout) :: sph
+!!        type(sph_comm_tables), intent(inout) :: comms_sph
+!!        type(sph_group_data), intent(inout) :: sph_grps
 !!@endverbatim
 !
       module t_check_and_make_SPH_mesh
@@ -25,19 +42,30 @@
       use calypso_mpi
 !
       use m_work_time
+      use m_elapsed_labels_gen_SPH
 !
       use t_spheric_parameter
+      use t_sph_trans_comm_tbl
+      use t_spheric_group
       use t_const_spherical_grid
       use t_file_IO_parameter
 !
       implicit none
 !
+!>      Structure to check and construct spherical shell mesh
       type sph_grid_maker_in_sim
+!>        Switch to construct spherical shell grid
+        logical :: make_SPH_flag =    .FALSE.
+!>        Switch to output constructed spherical shell grid
+        logical :: mesh_output_flag = .FALSE.
+!
 !>        Structure to construct grid
         type(construct_spherical_grid) :: gen_sph
-!         Structure for temporal spherical grid
+!>        Structure for temporal spherical grid
         type(sph_grids) :: sph_tmp
       end type sph_grid_maker_in_sim
+!
+      private :: load_FEM_mesh_4_SPH
 !
 ! ----------------------------------------------------------------------
 !
@@ -45,18 +73,69 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine check_and_make_SPH_mesh                                &
-     &         (iflag_make_SPH, sph_file_param, sph_maker)
+      subroutine load_para_SPH_and_FEM_mesh(FEM_mesh_flags,             &
+     &          sph_file_param, sph, comms_sph, sph_grps, geofem,       &
+     &          mesh_file, sph_maker)
+!
+      use calypso_mpi
+      use t_mesh_data
+      use copy_mesh_structures
+      use mesh_file_name_by_param
+      use mpi_load_mesh_data
+      use parallel_load_data_4_sph
+!
+      type(FEM_file_IO_flags), intent(in) :: FEM_mesh_flags
+      type(field_IO_params), intent(in) ::  sph_file_param
+      type(sph_grids), intent(inout) :: sph
+      type(sph_comm_tables), intent(inout) :: comms_sph
+      type(sph_group_data), intent(inout) ::  sph_grps
+!
+      type(mesh_data), intent(inout) :: geofem
+      type(field_IO_params), intent(inout) ::  mesh_file
+!
+      type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
+!
+!  Check and construct spherical shell table
+      call check_and_make_SPH_mesh(sph_file_param, sph_maker,           &
+     &                             sph, comms_sph, sph_grps)
+!
+!  --  load geofem mesh data
+      if(check_exist_mesh(mesh_file, my_rank)) then
+        if (iflag_debug.gt.0) write(*,*) 'mpi_input_mesh'
+        call mpi_input_mesh(mesh_file, nprocs, geofem)
+        call set_fem_center_mode_4_SPH                                  &
+     &     (geofem%mesh%node%internal_node,                             &
+     &      sph%sph_rtp, sph%sph_params)
+      else
+        call copy_sph_radial_groups(sph_grps, sph_maker%gen_sph)
+!  --  Construct FEM mesh
+        mesh_file%file_prefix = sph_file_param%file_prefix
+        call load_FEM_mesh_4_SPH(FEM_mesh_flags, mesh_file,             &
+     &      sph%sph_params, sph%sph_rtp, sph%sph_rj,                    &
+     &      geofem, sph_maker%gen_sph)
+        call dealloc_gen_sph_radial_groups(sph_maker%gen_sph)
+      end if
+!
+      end subroutine load_para_SPH_and_FEM_mesh
+!
+! -----------------------------------------------------------------------
+!
+      subroutine check_and_make_SPH_mesh(sph_file_param, sph_maker,     &
+     &          sph, comms_sph, sph_grps)
 !
       use m_error_IDs
       use calypso_mpi_logical
-      use parallel_gen_sph_grids
+      use output_gen_sph_grid_modes
+      use mpi_gen_sph_grids_modes
       use sph_file_IO_select
+      use parallel_load_data_4_sph
 !
-      integer(kind = kint), intent(in) :: iflag_make_SPH
       type(field_IO_params), intent(in) :: sph_file_param
 !
       type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
+      type(sph_grids), intent(inout) :: sph
+      type(sph_comm_tables), intent(inout) :: comms_sph
+      type(sph_group_data), intent(inout) :: sph_grps
 !
       logical :: iflag_lc
 !
@@ -71,103 +150,155 @@
 !
       if(iflag_lc) then
         if(my_rank.eq.0) write(*,*) 'spherical harmonics table exists'
-      else if(iflag_make_SPH .eq. 0) then
+        if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+1)
+        call load_sph_mesh(sph_file_param, sph, comms_sph, sph_grps)
+        if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+1)
+      else if(sph_maker%make_SPH_flag .eqv. .FALSE.) then
         call calypso_mpi_abort(ierr_file,                               &
      &     'Set parameters for spherical shell')
       else
         if (my_rank.eq.0) write(*,*) 'Make spherical harmonics table'
-        call para_gen_sph_grids                                         &
-     &     (sph_file_param, sph_maker%sph_tmp, sph_maker%gen_sph)
-        call dealloc_gen_mesh_params(sph_maker%gen_sph)
+        if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
+        call mpi_gen_sph_grids(sph_maker%gen_sph,                       &
+     &      sph_maker%sph_tmp, sph, comms_sph, sph_grps)
+        if(sph_maker%mesh_output_flag) then
+          call output_sph_mesh(sph_file_param,                          &
+     &                         sph, comms_sph, sph_grps)
+        end if
+        if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
       end if
+!
+      if (iflag_debug.gt.0) write(*,*) 'sph_index_flags_and_params'
+      call sph_index_flags_and_params(sph_grps, sph, comms_sph)
+!
+      write(*,*) my_rank, 'sph_rtp%nnod_pole', &
+     &                    sph%sph_rtp%nnod_pole
+      write(*,*) my_rank, 'istack_npole_smp', &
+     &                    sph%sph_rtp%istack_npole_smp
+!
       call calypso_mpi_barrier
 !
       end subroutine check_and_make_SPH_mesh
 !
 ! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
 !
-      subroutine para_gen_sph_grids(sph_file_param, sph, gen_sph)
+      subroutine check_and_make_SPH_rj_mode(sph_file_param, sph_maker,  &
+     &          sph, comms_sph, sph_grps)
 !
-      use m_elapsed_labels_gen_SPH
-      use set_global_spherical_param
+      use m_error_IDs
+      use calypso_mpi_logical
       use mpi_gen_sph_grids_modes
-      use set_comm_table_rtp_rj
-      use const_global_sph_grids_modes
-      use const_sph_radial_grid
-      use bcast_comm_stacks_sph
+      use output_gen_sph_grid_modes
+      use sph_file_IO_select
+      use parallel_load_data_4_sph
+      use set_from_recv_buf_rev
 !
       type(field_IO_params), intent(in) :: sph_file_param
+!
+      type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
       type(sph_grids), intent(inout) :: sph
-      type(construct_spherical_grid), intent(inout) :: gen_sph
+      type(sph_comm_tables), intent(inout) :: comms_sph
+      type(sph_group_data), intent(inout) :: sph_grps
 !
-!>      Structure for parallel spherical mesh table
-      type(sph_comm_tbl), allocatable :: comm_rlm_mul(:)
-!>      Structure for parallel spherical mesh table
-      type(sph_comm_tbl), allocatable :: comm_rtm_mul(:)
+      logical :: iflag_lc
 !
 !
-!  =========  Set global resolutions ===================================
+      if(my_rank .eq. izero) then
+        iflag_lc =    check_exsist_rtp_file(my_rank, sph_file_param)    &
+     &          .and. check_exsist_rtm_file(my_rank, sph_file_param)    &
+     &          .and. check_exsist_rlm_file(my_rank, sph_file_param)    &
+     &          .and. check_exsist_rj_file(my_rank, sph_file_param)
+      end if
+      call calypso_mpi_bcast_one_logical(iflag_lc, 0)
 !
-      call set_global_sph_resolution                                    &
-     &   (sph%sph_params%l_truncation, sph%sph_params%m_folding,        &
-     &    sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
+      if(iflag_lc) then
+        if(my_rank.eq.0) write(*,*) 'spherical harmonics table exists'
+        if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+1)
+        call load_sph_rj_mesh                                           &
+     &     (sph_file_param, sph%sph_params, sph%sph_rj,                 &
+     &      comms_sph%comm_rj, sph_grps)
+        if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+1)
+      else if(sph_maker%make_SPH_flag .eqv. .FALSE.) then
+        call calypso_mpi_abort(ierr_file,                               &
+     &     'Set parameters for spherical shell')
+      else
+        if (my_rank.eq.0) write(*,*) 'Make spherical harmonics table'
+        if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
+        call mpi_gen_sph_grids(sph_maker%gen_sph,                       &
+     &      sph_maker%sph_tmp, sph, comms_sph, sph_grps)
 !
-      if(my_rank .eq. 0) then
-        call check_global_spheric_parameter                             &
-     &     (sph%sph_params, sph%sph_rtp)
-        call output_set_radial_grid                                     &
-     &     (sph%sph_params, sph%sph_rtp, gen_sph%s3d_radius)
+        if(sph_maker%mesh_output_flag) then
+          call output_sph_mesh(sph_file_param,                          &
+     &                         sph, comms_sph, sph_grps)
+        end if
+        if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
       end if
 !
-!  ========= Generate spherical harmonics table ========================
+      call sph_rj_index_flags_and_params                                &
+     &   (sph_grps, sph%sph_params, sph%sph_rj, comms_sph%comm_rj)
 !
-      call s_const_global_sph_grids_modes                               &
-     &   (sph%sph_params, sph%sph_rtp, sph%sph_rtm, sph%sph_rj,         &
-     &    gen_sph%s3d_ranks, gen_sph%sph_lcp,                           &
-     &    gen_sph%stk_lc1d, gen_sph%sph_gl1d)
+      call calypso_mpi_barrier
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+1)
-      allocate(comm_rlm_mul(gen_sph%s3d_ranks%ndomain_sph))
-!
-        if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rlm_grids'
-      call mpi_gen_sph_rlm_grids(sph_file_param,                        &
-     &    gen_sph, sph%sph_params, sph%sph_rlm, comm_rlm_mul)
-      call s_bcast_comm_stacks_sph                                      &
-     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+1)
-!
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
-      call mpi_gen_sph_rj_modes                                         &
-     &   (sph_file_param, comm_rlm_mul, sph%sph_params,                 &
-     &    gen_sph, sph%sph_rlm, sph%sph_rj)
-      call dealloc_comm_stacks_sph                                      &
-     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
-      deallocate(comm_rlm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
-!
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+1)
-      allocate(comm_rtm_mul(gen_sph%s3d_ranks%ndomain_sph))
-!
-      if(iflag_debug .gt. 0) write(*,*) 'mpi_gen_sph_rtm_grids'
-      call mpi_gen_sph_rtm_grids(sph_file_param,                        &
-     &    gen_sph, sph%sph_params, sph%sph_rtm, comm_rtm_mul)
-      call s_bcast_comm_stacks_sph                                      &
-     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rtm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+1)
-!
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
-      call mpi_gen_sph_rtp_grids                                        &
-     &   (sph_file_param, comm_rtm_mul, sph%sph_params,                 &
-     &    gen_sph, sph%sph_rtp, sph%sph_rtm)
-      call dealloc_comm_stacks_sph                                      &
-     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rtm_mul)
-!
-      deallocate(comm_rtm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
-!
-      end subroutine para_gen_sph_grids
+      end subroutine check_and_make_SPH_rj_mode
 !
 ! ----------------------------------------------------------------------
+!
+      subroutine load_FEM_mesh_4_SPH                                    &
+     &         (FEM_mesh_flags, mesh_file, sph_params, sph_rtp, sph_rj, &
+     &          geofem, gen_sph)
+!
+      use calypso_mpi
+      use t_mesh_data
+      use t_comm_table
+      use t_geometry_data
+      use t_group_data
+!
+      use m_spheric_constants
+      use copy_mesh_structures
+      use const_FEM_mesh_sph_mhd
+      use gen_sph_grids_modes
+      use mesh_IO_select
+      use set_nnod_4_ele_by_type
+!
+      type(FEM_file_IO_flags), intent(in) :: FEM_mesh_flags
+      type(field_IO_params), intent(in) ::  mesh_file
+      type(sph_shell_parameters), intent(inout) :: sph_params
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_rj_grid), intent(in) :: sph_rj
+!
+      type(mesh_data), intent(inout) :: geofem
+!
+      type(construct_spherical_grid), intent(inout) :: gen_sph
+!
+      type(mesh_data) :: femmesh_s
+!
+!
+!  --  Construct FEM mesh
+      if(sph_params%iflag_shell_mode .eq. iflag_no_FEMMESH) then
+        if(sph_rj%iflag_rj_center .gt. 0) then
+          sph_params%iflag_shell_mode =  iflag_MESH_w_center
+        else
+          sph_params%iflag_shell_mode = iflag_MESH_same
+        end if
+      end if
+!
+      if (iflag_debug.gt.0) write(*,*) 'const_FEM_mesh_4_sph_mhd'
+      call const_FEM_mesh_4_sph_mhd                                     &
+     &   (FEM_mesh_flags, mesh_file, sph_params, sph_rtp, sph_rj,       &
+     &    femmesh_s%mesh, femmesh_s%group, gen_sph)
+!      call compare_mesh_type                                           &
+!     &   (my_rank, geofem%mesh%nod_comm, mesh%node, mesh%ele,          &
+!     &    femmesh_s%mesh)
+!      call compare_mesh_groups(geofem%group%nod_grp, femmesh_s%group)
+!
+      if (iflag_debug.gt.0) write(*,*) 'set_mesh_data_from_type'
+      femmesh_s%mesh%ele%first_ele_type                                 &
+     &   = set_cube_eletype_from_num(femmesh_s%mesh%ele%nnod_4_ele)
+      call set_mesh_data_from_type                                      &
+     &   (femmesh_s%mesh, femmesh_s%group, geofem%mesh, geofem%group)
+!
+      end subroutine load_FEM_mesh_4_SPH
+!
+! -----------------------------------------------------------------------
 !
       end module t_check_and_make_SPH_mesh

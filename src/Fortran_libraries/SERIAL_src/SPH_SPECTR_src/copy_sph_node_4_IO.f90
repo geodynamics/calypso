@@ -79,8 +79,8 @@
       rtp%ied_rtp(1:ithree) =  sph_IO%ied_sph(1:ithree)
       rtp%nnod_med =           sph_IO%nidx_sph(1)*sph_IO%nidx_sph(2)
 !
-      call alloc_type_spheric_param_rtp(rtp)
-      call alloc_type_sph_1d_index_rtp(rtp)
+      call alloc_spheric_param_rtp(rtp)
+      call alloc_sph_1d_index_rtp(rtp)
 !
       do i = 1, ithree
         rtp%idx_global_rtp(1:rtp%nnod_rtp,i)                            &
@@ -130,8 +130,8 @@
       rtm%ist_rtm(1:ithree) =  sph_IO%ist_sph(1:ithree)
       rtm%ied_rtm(1:ithree) =  sph_IO%ied_sph(1:ithree)
 !
-      call alloc_type_spheric_param_rtm(rtm)
-      call alloc_type_sph_1d_index_rtm(rtm)
+      call alloc_spheric_param_rtm(rtm)
+      call alloc_sph_1d_index_rtm(rtm)
 !
       do i = 1, ithree
         rtm%idx_global_rtm(1:rtm%nnod_rtm,i)                            &
@@ -181,8 +181,8 @@
       rlm%ist_rlm(1:itwo) =  sph_IO%ist_sph(1:itwo)
       rlm%ied_rlm(1:itwo) =  sph_IO%ied_sph(1:itwo)
 !
-      call alloc_type_spheric_param_rlm(rlm)
-      call alloc_type_sph_1d_index_rlm(rlm)
+      call alloc_spheric_param_rlm(rlm)
+      call alloc_sph_1d_index_rlm(rlm)
 !
       do i = 1, itwo
         rlm%idx_global_rlm(1:rlm%nnod_rlm,i)                            &
@@ -229,8 +229,8 @@
       rj%ist_rj(1:itwo) =  sph_IO%ist_sph(1:itwo)
       rj%ied_rj(1:itwo) =  sph_IO%ied_sph(1:itwo)
 !
-      call alloc_type_spheric_param_rj(rj)
-      call alloc_type_sph_1d_index_rj(rj)
+      call alloc_spheric_param_rj(rj)
+      call alloc_sph_1d_index_rj(rj)
 !
       do i = 1, itwo
         rj%idx_global_rj(1:rj%nnod_rj,i)                                &

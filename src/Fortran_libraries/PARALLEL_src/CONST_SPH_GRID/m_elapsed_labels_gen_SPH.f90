@@ -29,22 +29,28 @@
 !
       subroutine elpsed_label_gen_sph_grid
 !
-      integer(kind = kint), parameter :: num_append = 5
+      integer(kind = kint), parameter :: num_append = 7
 !
 !
       call append_elapsed_times                                         &
      &   (num_append, ist_elapsed_GSP, ied_elapsed_GSP)
 !
       elps1%labels(ist_elapsed_GSP+1)                                   &
-     &      = 'Generation of spherical transform table'
+     &      = 'Load spherical harmonic indices table from file'
       elps1%labels(ist_elapsed_GSP+2)                                   &
-     &      = 'Generation of spherical mode and grid'
+     &      = 'Construction of spherical harmonic indices table'
+!
       elps1%labels(ist_elapsed_GSP+3)                                   &
-     &      = 'Generation of FEM mesh data'
+     &      = 'Construction of FEM mesh data'
       elps1%labels(ist_elapsed_GSP+4)                                   &
-     &      = 'Generation of surface FEM mesh data'
+     &      = 'Construction of surface FEM mesh data'
       elps1%labels(ist_elapsed_GSP+5)                                   &
-     &      = 'Generation of viewer data'
+     &      = 'Construction of viewer data'
+!
+      elps1%labels(ist_elapsed_GSP+6)                                   &
+     &      = 'Construction of spherical transform table'
+      elps1%labels(ist_elapsed_GSP+7)                                   &
+     &      = 'Construction of spherical mode and grid'
 !
       iflag_GSP_time = .TRUE.
 !

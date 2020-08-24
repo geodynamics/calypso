@@ -75,8 +75,8 @@
 !
 !      nnod_rlm = sph_rlm%nnod_rlm
 !      nidx_rlm(1:2) = sph_rlm%nidx_rlm(1:2)
-      call alloc_type_spheric_param_rlm(sph_rlm)
-      call alloc_type_sph_1d_index_rlm(sph_rlm)
+      call alloc_spheric_param_rlm(sph_rlm)
+      call alloc_sph_1d_index_rlm(sph_rlm)
 !
       call copy_sph_1d_gl_idx_rlm(s3d_radius, sph_gl1d, sph_rlm)
 !
@@ -85,7 +85,7 @@
       call set_global_sph_4_rlm(s3d_ranks, stk_lc1d, sph_rlm)
 !
       if(iflag_debug .gt. 0) then
-        call check_type_spheric_param_rlm(id_rank, sph_rlm)
+        call check_spheric_param_rlm(id_rank, sph_rlm)
       end if
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
@@ -125,8 +125,8 @@
       call copy_gl_2_local_rtm_param                                    &
      &   (id_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rtm)
 !
-      call alloc_type_spheric_param_rtm(sph_rtm)
-      call alloc_type_sph_1d_index_rtm(sph_rtm)
+      call alloc_spheric_param_rtm(sph_rtm)
+      call alloc_sph_1d_index_rtm(sph_rtm)
 !
       call copy_sph_1d_gl_idx_rtm(s3d_radius, sph_gl1d, sph_rtm)
 !
@@ -135,7 +135,7 @@
       call set_global_sph_4_rtm(s3d_ranks, stk_lc1d, sph_rtm)
 !
       if(iflag_debug .gt. 0) then
-        call check_type_spheric_param_rtm(id_rank, sph_rtm)
+        call check_spheric_param_rtm(id_rank, sph_rtm)
       end if
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
@@ -174,7 +174,7 @@
       call count_num_domain_rtm_rlm                                     &
      &   (s3d_ranks%ndomain_sph, comm_rlm%nneib_domain)
 !
-      call alloc_type_sph_comm_stack(comm_rlm)
+      call alloc_sph_comm_stack(comm_rlm)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'set_comm_stack_rtm_rlm', id_rank
@@ -182,7 +182,7 @@
      &    comm_rlm%nneib_domain, comm_rlm%id_domain,                    &
      &    comm_rlm%istack_sr, comm_rlm%ntot_item_sr)
 !
-      call alloc_type_sph_comm_item(sph_rlm%nnod_rlm, comm_rlm)
+      call alloc_sph_comm_item(sph_rlm%nnod_rlm, comm_rlm)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'set_comm_table_4_rlm', id_rank
@@ -224,15 +224,15 @@
       call count_num_domain_rtm_rlm                                     &
      &   (s3d_ranks%ndomain_sph, comm_rtm%nneib_domain)
 !
-!      write(*,*) 'alloc_type_sph_comm_stack'
-      call alloc_type_sph_comm_stack(comm_rtm)
+!      write(*,*) 'alloc_sph_comm_stack'
+      call alloc_sph_comm_stack(comm_rtm)
 !
 !      write(*,*) 'set_comm_stack_rtm_rlm'
       call set_comm_stack_rtm_rlm(id_rank, s3d_ranks%ndomain_sph,       &
      &    comm_rtm%nneib_domain, comm_rtm%id_domain,                    &
      &    comm_rtm%istack_sr, comm_rtm%ntot_item_sr)
 !
-      call alloc_type_sph_comm_item(sph_rtm%nnod_rtm, comm_rtm)
+      call alloc_sph_comm_item(sph_rtm%nnod_rtm, comm_rtm)
 !
 !      write(*,*) 'set_comm_table_4_rtm'
       call set_comm_table_4_rtm(s3d_ranks, sph_rtm%nnod_rtm,            &

@@ -42,8 +42,10 @@
 !>        Structure for file information for assembled data
         type(platform_data_control) :: assemble_plt
 !
-!>        Control structure for parallel spherical shell
-        type(parallel_sph_shell_control) :: psph_ctl
+!>        Control structure for original parallel spherical shell
+        type(parallel_sph_shell_control) :: src_psph_ctl
+!>        Control structure for assembled parallel spherical shell
+        type(parallel_sph_shell_control) :: asbl_psph_ctl
 !
 !>        Structure for field information control
         type(field_control) :: fld_mge_ctl
@@ -69,15 +71,18 @@
 !   2nd level for assemble_control
 !
       character(len=kchara), parameter                                  &
-     &                    :: hd_platform = 'data_files_def'
+     &                :: hd_platform = 'data_files_def'
       character(len=kchara), parameter                                  &
-     &                    :: hd_new_data = 'new_data_files_def'
+     &                :: hd_new_data = 'new_data_files_def'
       character(len=kchara), parameter :: hd_model =   'model'
       character(len=kchara), parameter :: hd_control = 'control'
       character(len=kchara), parameter                                  &
-     &                    :: hd_newrst_magne = 'newrst_magne_ctl'
+     &                :: hd_newrst_magne = 'newrst_magne_ctl'
+!
       character(len=kchara), parameter                                  &
-     &                    :: hd_sph_shell = 'spherical_shell_ctl'
+     &                :: hd_orgsph_shell = 'spherical_shell_ctl'
+      character(len=kchara), parameter                                  &
+     &                :: hd_newsph_shell = 'new_spherical_shell_ctl'
 !
 !>      label for block
       character(len=kchara), parameter                                  &
@@ -97,7 +102,8 @@
       private :: hd_assemble
       private :: hd_platform, hd_new_data, hd_model, hd_control
       private :: hd_phys_values, hd_time_step, hd_new_time_step
-      private :: hd_newrst_magne, hd_magnetic_field_ratio, hd_sph_shell
+      private :: hd_newrst_magne, hd_magnetic_field_ratio
+      private :: hd_orgsph_shell, hd_newsph_shell
 !
       private :: read_merge_control_data
       private :: read_newrst_control
@@ -181,7 +187,9 @@
      &     (id_control, hd_newrst_magne, mgd_ctl, c_buf)
 !
         call read_parallel_shell_in_MHD_ctl                             &
-     &     (id_control, hd_sph_shell, mgd_ctl%psph_ctl, c_buf)
+     &     (id_control, hd_orgsph_shell, mgd_ctl%src_psph_ctl, c_buf)
+        call read_parallel_shell_in_MHD_ctl                             &
+     &     (id_control, hd_newsph_shell, mgd_ctl%asbl_psph_ctl, c_buf)
       end do
       mgd_ctl%i_assemble = 1
 !
@@ -194,7 +202,8 @@
       type(control_data_4_merge), intent(inout) :: mgd_ctl
 !
 !
-      call dealloc_parallel_shell_ctl(mgd_ctl%psph_ctl)
+      call dealloc_parallel_shell_ctl(mgd_ctl%src_psph_ctl)
+      call dealloc_parallel_shell_ctl(mgd_ctl%asbl_psph_ctl)
       call reset_control_platforms(mgd_ctl%source_plt)
       call reset_control_platforms(mgd_ctl%assemble_plt)
 !

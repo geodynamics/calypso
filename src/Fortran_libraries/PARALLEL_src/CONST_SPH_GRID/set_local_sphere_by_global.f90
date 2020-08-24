@@ -168,6 +168,8 @@
       sph_rtp%ied_rtp(2) = stk_lc1d%istack_idx_local_rtp_t(i2)
       sph_rtp%ied_rtp(3) = stk_lc1d%istack_idx_local_rtp_p(i3)
 !
+      sph_rtp%nnod_med = sph_rtp%nidx_rtp(1)*sph_rtp%nidx_rtp(2)
+!
       end subroutine copy_gl_2_local_rtp_param
 !
 ! -----------------------------------------------------------------------

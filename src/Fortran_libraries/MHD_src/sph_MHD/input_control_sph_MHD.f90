@@ -48,9 +48,7 @@
       implicit none
 !
 !>      Structure to construct grid
-      type(sph_grid_maker_in_sim), save :: sph_maker1
-!
-      private :: sph_maker1
+      type(sph_grid_maker_in_sim), save, private :: sph_maker1
 !
 ! ----------------------------------------------------------------------
 !
@@ -92,17 +90,12 @@
      &    SPH_model%MHD_prop, SPH_MHD%sph, SPH_MHD%fld, FEM_dat%field,  &
      &    SPH_WK%monitor)
 !
-!  Check and construct spherical shell table
-      call check_and_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,   &
-     &    MHD_files%sph_file_param, sph_maker1)
-!
 !  Load spherical shell table
       if (iflag_debug.eq.1) write(*,*) 'load_para_SPH_and_FEM_mesh'
       call load_para_SPH_and_FEM_mesh                                   &
      &   (MHD_files%FEM_mesh_flags, MHD_files%sph_file_param,           &
      &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, FEM_dat%geofem,   &
-     &    MHD_files%mesh_file_IO, sph_maker1%gen_sph)
-      call dealloc_gen_sph_fem_mesh_param(sph_maker1%gen_sph)
+     &    MHD_files%mesh_file_IO, sph_maker1)
 !
       call dealloc_surfacing_controls(DMHD_ctl%surfacing_ctls)
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
@@ -143,9 +136,9 @@
      &   (DMHD_ctl%model_ctl, DMHD_ctl%smonitor_ctl,                    &
      &    SPH_model%MHD_prop, SPH_MHD%fld, SPH_WK%monitor)
 !
-      if (iflag_debug.eq.1) write(*,*) 'load_para_sph_mesh'
-      call load_para_sph_mesh(MHD_files%sph_file_param,                 &
-     &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups)
+      if (iflag_debug.eq.1) write(*,*) 'check_and_make_SPH_mesh'
+      call check_and_make_SPH_mesh(MHD_files%sph_file_param,            &
+     &   sph_maker1, SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
@@ -188,17 +181,12 @@
      &    SPH_model%MHD_prop, SPH_MHD%sph, SPH_MHD%fld, FEM_dat%field,  &
      &    SPH_WK%monitor)
 !
-!  Check and construct spherical shell table
-      call check_and_make_SPH_mesh(DMHD_ctl%psph_ctl%iflag_sph_shell,   &
-     &    MHD_files%sph_file_param, sph_maker1)
-!
 !  Load spherical shell table
       if (iflag_debug.eq.1) write(*,*) 'load_para_SPH_and_FEM_mesh'
       call load_para_SPH_and_FEM_mesh                                   &
      &   (MHD_files%FEM_mesh_flags, MHD_files%sph_file_param,           &
      &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, FEM_dat%geofem,   &
-     &    MHD_files%mesh_file_IO, sph_maker1%gen_sph)
-      call dealloc_gen_sph_fem_mesh_param(sph_maker1%gen_sph)
+     &    MHD_files%mesh_file_IO, sph_maker1)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !

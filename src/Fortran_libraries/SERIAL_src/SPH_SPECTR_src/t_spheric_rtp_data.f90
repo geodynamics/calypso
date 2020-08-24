@@ -7,15 +7,15 @@
 !>@brief  Structure for indexing table of speherical harmonics transform
 !!
 !!@verbatim
-!!      subroutine alloc_type_spheric_param_rtp(sph_rtp)
-!!      subroutine alloc_type_sph_1d_index_rtp(sph_rtp)
+!!      subroutine alloc_spheric_param_rtp(sph_rtp)
+!!      subroutine alloc_sph_1d_index_rtp(sph_rtp)
 !!      subroutine alloc_rtp_param_smp(sph_rtp)
 !!      subroutine alloc_num_pole_sph_trans(sph_rtp)
 !!      subroutine alloc_theta_4_rtp(sph_rtp)
 !!        type(sph_rtp_grid), intent(inout) :: sph_rtp
 !!
-!!      subroutine dealloc_type_spheric_param_rtp(sph_rtp)
-!!      subroutine dealloc_type_sph_1d_index_rtp(sph_rtp)
+!!      subroutine dealloc_spheric_param_rtp(sph_rtp)
+!!      subroutine dealloc_sph_1d_index_rtp(sph_rtp)
 !!      subroutine dealloc_rtp_param_smp(sph_rtp)
 !!      subroutine dealloc_num_pole_sph_trans(sph_rtp)
 !!      subroutine dealloc_theta_4_rtp(sph_rtp)
@@ -26,7 +26,7 @@
 !!        type(sph_rtp_grid), intent(inout) :: rtp_org
 !!        type(sph_rtp_grid), intent(inout) :: rtp_new
 !!
-!!      subroutine check_type_spheric_param_rtp(id_rank, sph_rtp)
+!!      subroutine check_spheric_param_rtp(id_rank, sph_rtp)
 !!        integer, intent(in) :: id_rank
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!@endverbatim
@@ -112,18 +112,18 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_type_spheric_param_rtp(sph_rtp)
+      subroutine alloc_spheric_param_rtp(sph_rtp)
 !
       type(sph_rtp_grid), intent(inout) :: sph_rtp
 !
       allocate(sph_rtp%idx_global_rtp(sph_rtp%nnod_rtp,3))
       if(sph_rtp%nnod_rtp .gt. 0) sph_rtp%idx_global_rtp = 0
 !
-      end subroutine alloc_type_spheric_param_rtp
+      end subroutine alloc_spheric_param_rtp
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine alloc_type_sph_1d_index_rtp(sph_rtp)
+      subroutine alloc_sph_1d_index_rtp(sph_rtp)
 !
       type(sph_rtp_grid), intent(inout) :: sph_rtp
       integer(kind = kint) :: num
@@ -145,7 +145,7 @@
         sph_rtp%a_r_1d_rtp_r = 0.0d0
       end if
 !
-      end subroutine alloc_type_sph_1d_index_rtp
+      end subroutine alloc_sph_1d_index_rtp
 !
 ! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -210,17 +210,17 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_type_spheric_param_rtp(sph_rtp)
+      subroutine dealloc_spheric_param_rtp(sph_rtp)
 !
       type(sph_rtp_grid), intent(inout) :: sph_rtp
 !
       deallocate(sph_rtp%idx_global_rtp)
 !
-      end subroutine dealloc_type_spheric_param_rtp
+      end subroutine dealloc_spheric_param_rtp
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_type_sph_1d_index_rtp(sph_rtp)
+      subroutine dealloc_sph_1d_index_rtp(sph_rtp)
 !
       type(sph_rtp_grid), intent(inout) :: sph_rtp
 !
@@ -230,7 +230,7 @@
       deallocate(sph_rtp%idx_gl_1d_rtp_t)
       deallocate(sph_rtp%idx_gl_1d_rtp_p)
 !
-      end subroutine dealloc_type_sph_1d_index_rtp
+      end subroutine dealloc_sph_1d_index_rtp
 !
 ! ----------------------------------------------------------------------
 !
@@ -295,8 +295,8 @@
       rtp_new%ist_rtp(1:ithree) =  rtp_org%ist_rtp(1:ithree)
       rtp_new%ied_rtp(1:ithree) =  rtp_org%ied_rtp(1:ithree)
 !
-      call alloc_type_spheric_param_rtp(rtp_new)
-      call alloc_type_sph_1d_index_rtp(rtp_new)
+      call alloc_spheric_param_rtp(rtp_new)
+      call alloc_sph_1d_index_rtp(rtp_new)
 !
       do i = 1, ithree
         rtp_new%idx_global_rtp(1:rtp_new%nnod_rtp,i)                    &
@@ -314,15 +314,15 @@
       rtp_new%idx_gl_1d_rtp_p(1:rtp_new%nidx_rtp(3),2)                  &
      &       = rtp_org%idx_gl_1d_rtp_p(1:rtp_new%nidx_rtp(3),2)
 !
-!      call dealloc_type_sph_1d_index_rtp(rtp_org)
-!      call dealloc_type_spheric_param_rtp(rtp_org)
+!      call dealloc_sph_1d_index_rtp(rtp_org)
+!      call dealloc_spheric_param_rtp(rtp_org)
 !
       end subroutine copy_spheric_rtp_data
 !
 ! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine check_type_spheric_param_rtp(id_rank, sph_rtp)
+      subroutine check_spheric_param_rtp(id_rank, sph_rtp)
 !
       integer, intent(in) :: id_rank
       type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -338,7 +338,7 @@
         write(id_rank+50,*) i, sph_rtp%idx_global_rtp(i,1:3)
       end do
 !
-      end subroutine check_type_spheric_param_rtp
+      end subroutine check_spheric_param_rtp
 !
 ! -----------------------------------------------------------------------
 !

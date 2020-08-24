@@ -69,15 +69,16 @@
       use share_field_data
 !
       type(control_data_4_merge) :: mgd_ctl_s
-      type(sph_grid_maker_in_sim) :: sph_maker_s
+      type(sph_grid_maker_in_sim) :: sph_org_maker_s
+      type(sph_grid_maker_in_sim) :: sph_asbl_maker_s
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
 !
       if(my_rank .eq. 0) call read_control_assemble_sph(mgd_ctl_s)
       call bcast_merge_control_data(mgd_ctl_s)
-      call set_control_4_newsph                                         &
-     &   (mgd_ctl_s, asbl_param_s, sph_asbl_s, sph_maker_s)
+      call set_control_4_newsph(mgd_ctl_s, asbl_param_s, sph_asbl_s,    &
+     &                          sph_org_maker_s, sph_asbl_maker_s)
 !
       sph_asbl_s%np_sph_org = 1
       call alloc_spectr_data_4_assemble(sph_asbl_s)
@@ -95,14 +96,12 @@
       call copy_rayleigh_radial_data                                    &
      &   (ra_rst_s, sph_asbl_s%org_sph_mesh(1))
 !
-!  Check and construct spherical shell grid data
-!
-      call check_and_make_SPH_mesh(mgd_ctl_s%psph_ctl%iflag_sph_shell,  &
-     &    asbl_param_s%new_mesh_file, sph_maker_s)
 !  set new spectr data
-!
-      call set_local_rj_mesh_4_merge(asbl_param_s%new_mesh_file,        &
-     &    sph_asbl_s%np_sph_new, sph_asbl_s%new_sph_mesh)
+      call check_and_make_SPH_rj_mode                                   &
+     &   (asbl_param_s%new_mesh_file, sph_asbl_maker_s,                 &
+     &    sph_asbl_s%new_sph_mesh(my_rank+1)%sph,                       &
+     &    sph_asbl_s%new_sph_mesh(my_rank+1)%sph_comms,                 &
+     &    sph_asbl_s%new_sph_mesh(my_rank+1)%sph_grps)
 !
 !     Share number of nodes for new mesh
 !

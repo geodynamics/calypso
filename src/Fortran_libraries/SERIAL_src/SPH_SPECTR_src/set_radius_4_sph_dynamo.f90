@@ -95,7 +95,6 @@
       R_earth(1) = one / R_earth(0)
       R_earth(2) = one / R_earth(0)**2
 !
-!
       call set_radial_distance_flag(nri, nlayer_ICB, nlayer_CMB,        &
      &    r_ICB, r_CMB, radius_1d_rj_r, iflag_radial_grid)
 !

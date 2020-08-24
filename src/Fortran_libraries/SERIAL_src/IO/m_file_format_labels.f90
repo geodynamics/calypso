@@ -44,6 +44,8 @@
       character(len = kchara), parameter :: hd_gzip =   'gzip'
 !>      flag parts for distributed compressed binary data
       character(len = kchara), parameter :: hd_bin_gz = 'binary_gz'
+!>      flag parts for distributed compressed binary data
+      character(len = kchara), parameter :: hd_none =   'none'
 !
 !>      flag parts for merged ascii data
       character(len = kchara), parameter                                &
@@ -77,7 +79,10 @@
 !>      flag parts for MPI-IO usage
       character(len = kchara), parameter :: merged_names(2)             &
      &                        = (/'merged ', 'single '/)
-!
+!>      flag parts for MPI-IO usage
+      character(len = kchara), parameter :: none_names(2)               &
+     &                        = (/'None    ', 'No_file '/)
+!!
 !>     Character lables for compressed ASCII
 !!        'binary', 'bin' 
       type(multi_flag_labels), save :: binary_flags
@@ -90,6 +95,9 @@
 !>     Character lables for merged data by MPI-IO
 !!       'merged', 'single' 
       type(multi_flag_labels), save :: merged_flags
+!>     Character lables for No file
+!!        'None', 'No_file' 
+      type(multi_flag_labels), save :: no_file_flags
 !
 !>     Character lables for compressed ASCII
 !!        'ascii_gzip', 'ascii_gz', 'text_gzip', 'text_gz', 
@@ -156,6 +164,8 @@
       call init_multi_flags_by_labels(itwo, gzip_names, gzip_flags)
       call init_multi_flags_by_labels(itwo, merged_names, merged_flags)
 !
+      call init_multi_flags_by_labels(itwo, none_names, no_file_flags)
+!
       call init_from_two_kinds_flags                                    &
      &   (ascii_flags, gzip_flags, gzip_ascii_flags, icou)
       call append_multi_flag_labels                                     &
@@ -187,6 +197,8 @@
       call dealloc_multi_flags(binary_flags)
       call dealloc_multi_flags(gzip_flags)
       call dealloc_multi_flags(merged_flags)
+!
+      call dealloc_multi_flags(no_file_flags)
 !
       call dealloc_multi_flags(gzip_ascii_flags)
       call dealloc_multi_flags(gzip_bin_flags)
@@ -263,6 +275,8 @@
          file_fmt_ctl = trim(hd_rayleigh99) // char(0)
       else if(cmp_no_case(file_fmt_ctl, hd_rayleigh)) then
          file_fmt_ctl = trim(hd_rayleigh) // char(0)
+      else if(check_mul_flags(file_fmt_ctl, no_file_flags)) then
+         file_fmt_ctl = trim(hd_none) // char(0)
       else
          file_fmt_ctl = trim(hd_ascii) // char(0)
       end if

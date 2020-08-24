@@ -220,6 +220,14 @@
 !   set spherical shell parameters
 !
       if(psph_ctl%iflag_sph_shell .gt. 0) then
+        sph_maker%make_SPH_flag = .TRUE.
+        sph_maker%mesh_output_flag = .TRUE.
+!
+        if(MHD_files%sph_file_param%iflag_format .eq. id_no_file        &
+     &    .or. plt%sph_file_prefix%iflag .eq. 0) then
+          sph_maker%mesh_output_flag = .FALSE.
+        end if
+!
         if (iflag_debug.gt.0) write(*,*) 'set_control_4_shell_grids'
         call set_control_4_shell_grids                                  &
      &     (nprocs, psph_ctl%Fmesh_ctl, psph_ctl%spctl, psph_ctl%sdctl, &

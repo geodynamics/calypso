@@ -7,15 +7,15 @@
 !> @brief Structure for communication table for spherical transform
 !!
 !!@verbatim
-!!      subroutine alloc_type_sph_comms_stack(comms_sph)
-!!      subroutine alloc_type_sph_comms_item(sph, comms_sph)
-!!      subroutine dealloc_type_sph_comms_item(comms_sph)
+!!      subroutine alloc_sph_comms_stack(comms_sph)
+!!      subroutine alloc_sph_comms_item(sph, comms_sph)
+!!      subroutine dealloc_sph_comms_item(comms_sph)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(inout) :: comms_sph
 !!
-!!      subroutine alloc_type_sph_comm_stack(comm)
-!!      subroutine alloc_type_sph_comm_item(numnod, comm)
-!!      subroutine dealloc_type_sph_comm_item(comm)
+!!      subroutine alloc_sph_comm_stack(comm)
+!!      subroutine alloc_sph_comm_item(numnod, comm)
+!!      subroutine dealloc_sph_comm_item(comm)
 !!        type(sph_comm_tbl), intent(inout) :: comm
 !!
 !!      subroutine copy_sph_comm_table(nnod_sph, comm_org, comm_new)
@@ -72,20 +72,20 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_type_sph_comms_stack(comms_sph)
+      subroutine alloc_sph_comms_stack(comms_sph)
 !
       type(sph_comm_tables), intent(inout) :: comms_sph
 !
-      call alloc_type_sph_comm_stack(comms_sph%comm_rtp)
-      call alloc_type_sph_comm_stack(comms_sph%comm_rtm)
-      call alloc_type_sph_comm_stack(comms_sph%comm_rlm)
-      call alloc_type_sph_comm_stack(comms_sph%comm_rj)
+      call alloc_sph_comm_stack(comms_sph%comm_rtp)
+      call alloc_sph_comm_stack(comms_sph%comm_rtm)
+      call alloc_sph_comm_stack(comms_sph%comm_rlm)
+      call alloc_sph_comm_stack(comms_sph%comm_rj)
 !
-      end subroutine alloc_type_sph_comms_stack
+      end subroutine alloc_sph_comms_stack
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_type_sph_comms_item(sph, comms_sph)
+      subroutine alloc_sph_comms_item(sph, comms_sph)
 !
       use t_spheric_parameter
 !
@@ -93,34 +93,34 @@
       type(sph_comm_tables), intent(inout) :: comms_sph
 !
 !
-      call alloc_type_sph_comm_item(sph%sph_rtp%nnod_rtp,               &
+      call alloc_sph_comm_item(sph%sph_rtp%nnod_rtp,                    &
      &    comms_sph%comm_rtp)
-      call alloc_type_sph_comm_item(sph%sph_rtm%nnod_rtm,               &
+      call alloc_sph_comm_item(sph%sph_rtm%nnod_rtm,                    &
      &    comms_sph%comm_rtm)
-      call alloc_type_sph_comm_item(sph%sph_rlm%nnod_rlm,               &
+      call alloc_sph_comm_item(sph%sph_rlm%nnod_rlm,                    &
      &    comms_sph%comm_rlm)
-      call alloc_type_sph_comm_item(sph%sph_rj%nnod_rj,                 &
+      call alloc_sph_comm_item(sph%sph_rj%nnod_rj,                      &
      &    comms_sph%comm_rj)
 !
-      end subroutine alloc_type_sph_comms_item
+      end subroutine alloc_sph_comms_item
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine dealloc_type_sph_comms_item(comms_sph)
+      subroutine dealloc_sph_comms_item(comms_sph)
 !
       type(sph_comm_tables), intent(inout) :: comms_sph
 !
-      call dealloc_type_sph_comm_item(comms_sph%comm_rtp)
-      call dealloc_type_sph_comm_item(comms_sph%comm_rtm)
-      call dealloc_type_sph_comm_item(comms_sph%comm_rlm)
-      call dealloc_type_sph_comm_item(comms_sph%comm_rj)
+      call dealloc_sph_comm_item(comms_sph%comm_rtp)
+      call dealloc_sph_comm_item(comms_sph%comm_rtm)
+      call dealloc_sph_comm_item(comms_sph%comm_rlm)
+      call dealloc_sph_comm_item(comms_sph%comm_rj)
 !
-      end subroutine dealloc_type_sph_comms_item
+      end subroutine dealloc_sph_comms_item
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_type_sph_comm_stack(comm)
+      subroutine alloc_sph_comm_stack(comm)
 !
       type(sph_comm_tbl), intent(inout) :: comm
 !
@@ -130,11 +130,11 @@
       comm%istack_sr =  0
       comm%iflag_self = 0
 !
-      end subroutine alloc_type_sph_comm_stack
+      end subroutine alloc_sph_comm_stack
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_type_sph_comm_item(numnod, comm)
+      subroutine alloc_sph_comm_item(numnod, comm)
 !
       integer(kind = kint), intent(in) :: numnod
       type(sph_comm_tbl), intent(inout) :: comm
@@ -145,7 +145,7 @@
       if(comm%ntot_item_sr .gt. 0) comm%item_sr = 0
       if(numnod .gt. 0) comm%irev_sr = 0
 !
-      end subroutine alloc_type_sph_comm_item
+      end subroutine alloc_sph_comm_item
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -160,14 +160,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine dealloc_type_sph_comm_item(comm)
+      subroutine dealloc_sph_comm_item(comm)
 !
       type(sph_comm_tbl), intent(inout) :: comm
 !
       deallocate(comm%item_sr, comm%irev_sr)
       call dealloc_type_sph_comm_stack(comm)
 !
-      end subroutine dealloc_type_sph_comm_item
+      end subroutine dealloc_sph_comm_item
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -193,7 +193,7 @@
 !
 !
       comm_new%nneib_domain = comm_org%nneib_domain
-      call alloc_type_sph_comm_stack(comm_new)
+      call alloc_sph_comm_stack(comm_new)
 !
       comm_new%id_domain(1:comm_new%nneib_domain)                       &
      &      = comm_org%id_domain(1:comm_new%nneib_domain)
@@ -212,7 +212,7 @@
 !
 !
       comm_new%ntot_item_sr = comm_org%ntot_item_sr
-      call alloc_type_sph_comm_item(nnod_sph, comm_new)
+      call alloc_sph_comm_item(nnod_sph, comm_new)
 !
       comm_new%item_sr(1:comm_org%ntot_item_sr)                         &
      &      = comm_org%item_sr(1:comm_org%ntot_item_sr)

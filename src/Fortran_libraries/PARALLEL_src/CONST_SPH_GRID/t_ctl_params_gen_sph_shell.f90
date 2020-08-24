@@ -36,6 +36,7 @@
       use t_ctl_data_4_divide_sphere
       use t_spheric_global_ranks
       use t_const_spherical_grid
+      use t_check_and_make_SPH_mesh
 !
       implicit  none
 !
@@ -66,14 +67,13 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_control_4_gen_shell_grids                          &
-     &         (id_rank, plt, psph_ctl, sph, sph_files, gen_sph, ierr)
+     &         (id_rank, plt, psph_ctl, sph_files, sph_maker, ierr)
 !
       integer, intent(in) :: id_rank
       type(platform_data_control), intent(in) :: plt
       type(parallel_sph_shell_control), intent(inout) :: psph_ctl
-      type(sph_grids), intent(inout) :: sph
       type(gen_sph_file_IO_params), intent(inout) ::  sph_files
-      type(construct_spherical_grid), intent(inout) :: gen_sph
+      type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
       integer(kind = kint), intent(inout) :: ierr
 !
       integer :: nprocs_check
@@ -82,9 +82,13 @@
       call set_control_4_shell_files                                    &
      &   (id_rank, plt, psph_ctl%Fmesh_ctl, nprocs_check, sph_files)
 !
-      call set_control_4_shell_grids                                    &
-     &   (nprocs_check, psph_ctl%Fmesh_ctl, psph_ctl%spctl,             &
-     &    psph_ctl%sdctl, sph, gen_sph, ierr)
+      if(psph_ctl%iflag_sph_shell .gt. 0) then
+        sph_maker%make_SPH_flag =    .TRUE.
+        sph_maker%mesh_output_flag = .TRUE.
+        call set_control_4_shell_grids                                  &
+     &     (nprocs_check, psph_ctl%Fmesh_ctl, psph_ctl%spctl,           &
+     &      psph_ctl%sdctl, sph_maker%sph_tmp, sph_maker%gen_sph, ierr)
+      end if
       call dealloc_parallel_shell_ctl(psph_ctl)
       call reset_control_shell_define(psph_ctl%spctl)
 !
