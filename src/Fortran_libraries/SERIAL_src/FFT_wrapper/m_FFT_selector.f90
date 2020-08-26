@@ -32,6 +32,8 @@
       character(len = kchara), parameter :: hd_FFTW3_S =  'fftw3_single'
 !>      Character flag to use ISPACK
       character(len = kchara), parameter :: hd_ISPACK =   'ispack'
+!>      Character flag to use ISPACK
+      character(len = kchara), parameter :: hd_ISPACK3 =  'ispack3'
 !
 !>      integer flag for undefined
       integer(kind = kint), parameter :: iflag_UNDEFINED_FFT =   0
@@ -43,8 +45,10 @@
       integer(kind = kint), parameter :: iflag_FFTW_SINGLE = 3
 !>      integer flag to use FFTW3 for each component
 !      integer(kind = kint), parameter :: iflag_FFTW_FIELD =  4
-!>      integer flag to use ISPACK
-      integer(kind = kint), parameter :: iflag_ISPACK =      4
+!>      integer flag to use ISPACK Ver.0.93
+      integer(kind = kint), parameter :: iflag_ISPACK1 =     4
+!>      integer flag to use ISPACK Ver. 3.01
+      integer(kind = kint), parameter :: iflag_ISPACK3 =     5
 !
       private :: hd_FFTPACK, hd_FFTW, hd_FFTW3, hd_FFTW_S, hd_FFTW3_S
       private :: hd_ISPACK, hd_FFTW_F, hd_FFTW3_F
@@ -66,7 +70,9 @@
       if     (cmp_no_case(FFT_library_ctl, hd_FFTPACK)) then
         iflag_FFT = iflag_FFTPACK
       else if(cmp_no_case(FFT_library_ctl, hd_ISPACK)) then
-        iflag_FFT = iflag_ISPACK
+        iflag_FFT = iflag_ISPACK1
+      else if(cmp_no_case(FFT_library_ctl, hd_ISPACK3)) then
+        iflag_FFT = iflag_ISPACK3
       else if(cmp_no_case(FFT_library_ctl, hd_FFTW)                     &
      &     .or. cmp_no_case(FFT_library_ctl, hd_FFTW3)) then
         iflag_FFT = iflag_FFTW

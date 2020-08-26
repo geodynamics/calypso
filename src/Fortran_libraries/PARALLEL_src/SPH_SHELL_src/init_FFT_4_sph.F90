@@ -75,8 +75,10 @@
         write(*,'(a)') ' (FFTPACK) '
       else if(iflag_FFT .eq. iflag_FFTW) then
         write(*,'(a)') ' (FFTW) '
-      else if(iflag_FFT .eq. iflag_ISPACK) then
+      else if(iflag_FFT .eq. iflag_ISPACK1) then
         write(*,'(a)') ' (ISPACK) '
+      else if(iflag_FFT .eq. iflag_ISPACK3) then
+        write(*,'(a)') ' (ISPACK3) '
       else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
         write(*,'(a)') ' (FFTW_SINGLE) '
       end if
@@ -120,9 +122,13 @@
 #endif
 !
       call test_fourier_trans_vector                                   &
-     &    (iflag_ISPACK, ncomp, sph_rtp, comm_rtp,                     &
+     &    (iflag_ISPACK1, ncomp, sph_rtp, comm_rtp,                    &
      &     n_WS, n_WR, WS, WR, X_rtp, WK_FFTs,                         &
-     &     etime_fft(iflag_ISPACK))
+     &     etime_fft(iflag_ISPACK1))
+      call test_fourier_trans_vector                                   &
+     &    (iflag_ISPACK3, ncomp, sph_rtp, comm_rtp,                    &
+     &     n_WS, n_WR, WS, WR, X_rtp, WK_FFTs,                         &
+     &     etime_fft(iflag_ISPACK3))
       deallocate(X_rtp)
 !
       iflag_selected = minloc(etime_fft,1)
@@ -138,9 +144,13 @@
           write(*,*) '3: elapsed by single FFTW3:   ',                  &
      &            etime_fft(iflag_FFTW_SINGLE)
         end if
-        if(etime_fft(iflag_ISPACK) .gt. zero) then
-          write(*,*) '4: elapsed by ISPACK:         ',                  &
-     &            etime_fft(iflag_ISPACK)
+        if(etime_fft(iflag_ISPACK1) .gt. zero) then
+          write(*,*) '4: elapsed by ISPACK V0.93:         ',            &
+     &            etime_fft(iflag_ISPACK1)
+        end if
+        if(etime_fft(iflag_ISPACK3) .gt. zero) then
+          write(*,*) '4: elapsed by ISPACK V3.0.1:         ',           &
+     &            etime_fft(iflag_ISPACK3)
         end if
 !
       end subroutine s_select_fourier_transform

@@ -77,7 +77,7 @@
           write(*,'(a)') ' (FFTPACK) '
         else if(iflag_FFT .eq. iflag_FFTW) then
           write(*,'(a)') ' (FFTW) '
-!        else if(iflag_FFT .eq. iflag_ISPACK) then
+!        else if(iflag_FFT .eq. iflag_ISPACK1) then
 !          write(*,'(a)') ' (ISPACK) '
         else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
           write(*,'(a)') ' (FFTW_SINGLE) '
@@ -127,9 +127,9 @@
      &    WK_FFTs, etime_fft(iflag_FFTW))
 #endif
 !
-!      call test_fourier_trans_4_MHD(iflag_ISPACK,                      &
+!      call test_fourier_trans_4_MHD(iflag_ISPACK1,                     &
 !     &    ncomp_tot, sph_rtp, comm_rtp, n_WS, n_WR, WS, WR, trns_MHD,  &
-!     &    WK_FFTs, etime_fft(iflag_ISPACK))
+!     &    WK_FFTs, etime_fft(iflag_ISPACK1))
 !
       iflag_selected = minloc(etime_fft,1)
       etime_shortest = minval(etime_fft)
@@ -144,9 +144,9 @@
           write(*,*) '3: elapsed by single FFTW3:   ',                  &
      &            etime_fft(iflag_FFTW_SINGLE)
         end if
-!        if(etime_fft(iflag_ISPACK) .gt. zero) then
+!        if(etime_fft(iflag_ISPACK1) .gt. zero) then
 !          write(*,*) '5: elapsed by ISPACK:         ',                 &
-!     &            etime_fft(iflag_ISPACK)
+!     &            etime_fft(iflag_ISPACK1)
 !        end if
 !
       end subroutine compare_FFT_4_MHD
