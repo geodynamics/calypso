@@ -162,7 +162,7 @@
       type(field_IO), intent(inout) :: fld_IO
 !
 !
-      allocate( fld_IO%d_IO(fld_IO%nnod_IO, fld_IO%ntot_comp_IO) )
+      allocate(fld_IO%d_IO(fld_IO%nnod_IO, fld_IO%ntot_comp_IO))
       if(fld_IO%nnod_IO .gt. 0) fld_IO%d_IO = 0.0d0
 !
       end subroutine alloc_phys_data_IO

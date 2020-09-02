@@ -147,9 +147,9 @@
 !
       if(my_rank .eq. izero) then
         iflag_lc = check_exsist_rj_file(my_rank, sph_file_param)
-        write(*,*) 'iflag_lc: ',         iflag_lc
-        write(*,*) 'make_SPH_flag: ',    sph_maker%make_SPH_flag
-        write(*,*) 'mesh_output_flag: ', sph_maker%mesh_output_flag
+!        write(*,*) 'iflag_lc: ',         iflag_lc
+!        write(*,*) 'make_SPH_flag: ',    sph_maker%make_SPH_flag
+!        write(*,*) 'mesh_output_flag: ', sph_maker%mesh_output_flag
       end if
       call calypso_mpi_bcast_one_logical(iflag_lc, 0)
 !

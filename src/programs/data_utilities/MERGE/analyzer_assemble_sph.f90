@@ -196,7 +196,7 @@
      &      sph_asbl_s%new_fst_IO, sph_asbl_s%fst_time_IO)
 !
         call sel_write_step_SPH_field_file                              &
-     &     (nprocs, my_rank, istep_out, asbl_param_s%new_fld_file,      &
+     &     (istep_out, asbl_param_s%new_fld_file,                       &
      &      sph_asbl_s%fst_time_IO, sph_asbl_s%new_fst_IO)
 !
         call dealloc_phys_data_IO(sph_asbl_s%new_fst_IO)

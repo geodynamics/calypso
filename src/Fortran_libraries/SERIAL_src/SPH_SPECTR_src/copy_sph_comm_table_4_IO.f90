@@ -14,6 +14,11 @@
 !!      subroutine copy_comm_sph_to_comm_tbl(comm_sph, comm)
 !!        type(sph_comm_tbl), intent(in) :: comm_sph
 !!        type(communication_table), intent(inout) :: comm
+!!
+!!      integer(kind = kint) function compare_comm_sph_with_comm_tbl    &
+!!     &                            (comm_sph, comm)
+!!        type(sph_comm_tbl), intent(in) :: comm_sph
+!!        type(communication_table), intent(in) :: comm
 !!@endverbatim
 !!
 !!@n @param nnod_rtp
@@ -92,5 +97,33 @@
       end subroutine copy_comm_sph_to_comm_tbl
 !
 ! -----------------------------------------------------------------------
-
+!
+      integer(kind = kint) function compare_comm_sph_with_comm_tbl      &
+     &                            (comm_sph, comm)
+!
+      type(sph_comm_tbl), intent(in) :: comm_sph
+      type(communication_table), intent(in) :: comm
+!
+      integer(kind = kint) :: i
+!
+!
+      compare_comm_sph_with_comm_tbl = 1
+      if(comm%num_neib .ne.    comm_sph%nneib_domain) return
+      if(comm%ntot_import .ne. comm_sph%ntot_item_sr) return
+! 
+      if(comm%istack_import(0) .ne. comm_sph%istack_sr(0)) return
+      do i = 1, comm_sph%nneib_domain
+        if(comm%id_neib(i) .ne. comm_sph%id_domain(i)) return
+        if(comm%istack_import(i) .ne. comm_sph%istack_sr(i)) return
+      end do
+!
+      do i = 1, comm_sph%ntot_item_sr
+        if(comm%item_import(i) .ne. comm_sph%item_sr(i)) return
+      end do
+      compare_comm_sph_with_comm_tbl = 0
+!
+      end function compare_comm_sph_with_comm_tbl
+!
+! -----------------------------------------------------------------------
+!
       end module copy_sph_comm_table_4_IO

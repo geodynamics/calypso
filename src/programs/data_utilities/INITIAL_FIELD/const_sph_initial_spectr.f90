@@ -41,12 +41,12 @@
 !!      subroutine adjust_by_CMB_temp(sph_bc_T, sph, ipol, rj_fld)
 !!
 !!      subroutine add_outer_core_heat_source                           &
-!!     &         (sph_bc_T, sph, ipol, rj_fld)
+!!     &         (sph_bc_T, bcs_T, sph, ipol, rj_fld)
 !!       Set homogenious heat source at outer core
 !!       by CMB and ICB heat flux
 !!
 !!      subroutine add_inner_core_heat_source                           &
-!!     &         (sph_bc_T, sph, ipol, rj_fld)
+!!     &         (sph_bc_T, bcs_T, sph, ipol, rj_fld)
 !!       Set homogenious heat source and temperature at inner core
 !!       by CMB heat flux
 !!         f_CMB = (dT/dr)_CMB
@@ -56,7 +56,7 @@
 !!          T(r) = T_ICB + 0.5 * (f_ICB / r_ICB) * (r_ICB**2 - r**2)
 !!
 !!      subroutine add_whole_core_heat_source                           &
-!!     &         (sph_bc_T, sph, ipol, rj_fld)
+!!     &         (sph_bc_T, bcs_T, sph, ipol, rj_fld)
 !!       Set homogenious heat source for whole core
 !!       and temperature at inner core by CMB heat flux
 !!         f_CMB = (dT/dr)_CMB
@@ -149,11 +149,13 @@
 !
 !  Set initial temperature if temperature is exist
       call set_initial_temperature                                      &
-     &   (sph_MHD_bc%sph_bc_T, SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
+     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                        &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !  Set initial composition if composition is exist
       call set_initial_composition                                      &
-     &   (sph_MHD_bc%sph_bc_C, SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
+     &   (sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,                        &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !  Set initial magnetic field if magnetic field is exist
       call set_initial_magne_sph(sph_MHD_bc%sph_bc_B,                   &
@@ -161,13 +163,22 @@
 !
 !  Set heat source if  heat source is exist
       call set_initial_heat_source_sph                                  &
-     &   (sph_MHD_bc%sph_bc_T, SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
+     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                        &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
+!      call add_outer_core_heat_source                                  &
+!     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
+!     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !      call add_inner_core_heat_source                                  &
-!     &   (sph_MHD_bc%sph_bc_T, SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
+!     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
+!     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
+!      call add_whole_core_heat_source                                  &
+!     &   (sph_MHD_bc%sph_bc_T, sph_MHD_bc%bcs_T,                       &
+!     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !  Set light element source if light element is exist
       call set_initial_light_source_sph                                 &
-     &   (sph_MHD_bc%sph_bc_C, SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
+     &   (sph_MHD_bc%sph_bc_C, sph_MHD_bc%bcs_C,                        &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !  Copy initial field to restart IO data
       call copy_time_step_data(MHD_step1%init_d, MHD_step1%time_d)
@@ -243,9 +254,11 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_initial_temperature(sph_bc_T, sph, ipol, rj_fld)
+      subroutine set_initial_temperature                                &
+     &         (sph_bc_T, bcs_T, sph, ipol, rj_fld)
 !
       type(sph_boundary_type), intent(in) :: sph_bc_T
+      type(sph_scalar_boundary_data), intent(in) :: bcs_T
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
@@ -321,9 +334,11 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_initial_composition(sph_bc_C, sph, ipol, rj_fld)
+      subroutine set_initial_composition                                &
+     &         (sph_bc_C, bcs_C, sph, ipol, rj_fld)
 !
       type(sph_boundary_type), intent(in) :: sph_bc_C
+      type(sph_scalar_boundary_data), intent(in) :: bcs_C
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
@@ -485,9 +500,10 @@
 !-----------------------------------------------------------------------
 !
       subroutine set_initial_heat_source_sph                            &
-     &         (sph_bc_T, sph, ipol, rj_fld)
+     &         (sph_bc_T, bcs_T, sph, ipol, rj_fld)
 !
       type(sph_boundary_type), intent(in) :: sph_bc_T
+      type(sph_scalar_boundary_data), intent(in) :: bcs_T
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
@@ -511,8 +527,8 @@
 !
       if (jj .gt. 0) then
         q = (three / (sph_bc_T%r_CMB(0)**3 - sph_bc_T%r_ICB(0)**3))     &
-     &     * (-sph_bc_T%CMB_flux(jj) * sph_bc_T%r_CMB(0)**2             &
-     &        - sph_bc_T%ICB_flux(jj) * sph_bc_T%r_ICB(0)**2)
+     &     * (-bcs_T%CMB_Sspec%S_BC(jj) * sph_bc_T%r_CMB(0)**2          &
+     &        - bcs_T%ICB_Sspec%S_BC(jj) * sph_bc_T%r_ICB(0)**2)
 !
         do k = sph_bc_T%kr_in, sph_bc_T%kr_out
           inod = local_sph_data_address(sph, k, jj)
@@ -532,11 +548,12 @@
 !-----------------------------------------------------------------------
 !
       subroutine set_initial_light_source_sph                           &
-     &         (sph_bc_C, sph, ipol, rj_fld)
+     &         (sph_bc_C, bcs_C, sph, ipol, rj_fld)
 !
       use calypso_mpi
 !
       type(sph_boundary_type), intent(in) :: sph_bc_C
+      type(sph_scalar_boundary_data), intent(in) :: bcs_C
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
@@ -624,9 +641,10 @@
 !-----------------------------------------------------------------------
 !
       subroutine add_outer_core_heat_source                             &
-     &         (sph_bc_T, sph, ipol, rj_fld)
+     &         (sph_bc_T, bcs_T, sph, ipol, rj_fld)
 !
       type(sph_boundary_type), intent(in) :: sph_bc_T
+      type(sph_scalar_boundary_data), intent(in) :: bcs_T
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
@@ -650,8 +668,8 @@
 !
       if (jj .gt. 0) then
         q = (three / (sph_bc_T%r_CMB(0)**3 - sph_bc_T%r_ICB(0)**3))     &
-     &     * (-sph_bc_T%CMB_flux(jj) * sph_bc_T%r_CMB(0)**2             &
-     &       - sph_bc_T%ICB_flux(jj) * sph_bc_T%r_ICB(0)**2)
+     &     * (-bcs_T%CMB_Sspec%S_BC(jj) * sph_bc_T%r_CMB(0)**2          &
+     &       - bcs_T%ICB_Sspec%S_BC(jj) * sph_bc_T%r_ICB(0)**2)
 !
 !
         do k = sph_bc_T%kr_in, sph_bc_T%kr_out
@@ -667,9 +685,10 @@
 !-----------------------------------------------------------------------
 !
       subroutine add_inner_core_heat_source                             &
-     &         (sph_bc_T, sph, ipol, rj_fld)
+     &         (sph_bc_T, bcs_T, sph, ipol, rj_fld)
 !
       type(sph_boundary_type), intent(in) :: sph_bc_T
+      type(sph_scalar_boundary_data), intent(in) :: bcs_T
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
@@ -692,7 +711,7 @@
       jj =  find_local_sph_mode_address(sph, 0, 0)
 !
       if (jj .gt. 0) then
-        f_ICB = -sph_bc_T%CMB_flux(jj)                                  &
+        f_ICB = -bcs_T%CMB_Sspec%S_BC(jj)                               &
      &         * (sph_bc_T%r_CMB(0) / r_ICB(sph))**2
         q = three * f_ICB / r_ICB(sph)
 !
@@ -723,9 +742,10 @@
 !-----------------------------------------------------------------------
 !
       subroutine add_whole_core_heat_source                             &
-     &         (sph_bc_T, sph, ipol, rj_fld)
+     &         (sph_bc_T, bcs_T, sph, ipol, rj_fld)
 !
       type(sph_boundary_type), intent(in) :: sph_bc_T
+      type(sph_scalar_boundary_data), intent(in) :: bcs_T
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(inout) :: rj_fld
@@ -748,8 +768,8 @@
       jj =  find_local_sph_mode_address(sph, 0, 0)
 !
       if (jj .gt. 0) then
-        q = - three * sph_bc_T%CMB_flux(jj) / sph_bc_T%r_CMB(0)
-        f_ICB = -sph_bc_T%CMB_flux(jj)                                  &
+        q = - three * bcs_T%CMB_Sspec%S_BC(jj) / sph_bc_T%r_CMB(0)
+        f_ICB = -bcs_T%CMB_Sspec%S_BC(jj)                               &
      &         * (r_ICB(sph) / sph_bc_T%r_CMB(0))
         write(*,*) 'q', q
         write(*,*) 'flux_ICB', f_ICB

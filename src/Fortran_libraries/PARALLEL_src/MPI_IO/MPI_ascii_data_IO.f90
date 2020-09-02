@@ -7,11 +7,8 @@
 !> @brief Output merged binary field file using MPI-IO
 !!
 !!@verbatim
-!!      subroutine open_write_mpi_file                                  &
-!!     &         (file_name, num_pe, id_rank, IO_param)
-!!        Substitution of open_wt_gzfile_b
-!!      subroutine open_append_mpi_file                                 &
-!!     &         (file_name, num_pe, id_rank, IO_param)
+!!      subroutine open_write_mpi_file(file_name, IO_param)
+!!      subroutine open_append_mpi_file(file_name, IO_param)
 !!      subroutine open_read_mpi_file                                   &
 !!     &         (file_name, num_pe, id_rank, IO_param)
 !!        Substitution of open_rd_gzfile_b
@@ -48,16 +45,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine open_write_mpi_file                                    &
-     &         (file_name, num_pe, id_rank, IO_param)
+      subroutine open_write_mpi_file(file_name, IO_param)
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
 !
-      call alloc_istack_merge(id_rank, num_pe, IO_param)
+      call alloc_istack_merge(my_rank, nprocs, IO_param)
       call calypso_mpi_write_file_open                                  &
      &   (file_name, IO_param%nprocs_in, IO_param%id_file)
       IO_param%ioff_gl = izero
@@ -66,16 +61,14 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine open_append_mpi_file                                   &
-     &         (file_name, num_pe, id_rank, IO_param)
+      subroutine open_append_mpi_file(file_name, IO_param)
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
 !
-      call alloc_istack_merge(id_rank, num_pe, IO_param)
+      call alloc_istack_merge(my_rank, nprocs, IO_param)
       call calypso_mpi_append_file_open(file_name, IO_param%nprocs_in,  &
      &     IO_param%id_file, IO_param%ioff_gl)
 !

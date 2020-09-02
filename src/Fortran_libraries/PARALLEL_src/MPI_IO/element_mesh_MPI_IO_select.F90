@@ -198,21 +198,17 @@
 !
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
-        call mpi_output_element_file_b                                  &
-     &     (nprocs, my_rank, file_name, ele_mesh_IO)
+        call mpi_output_element_file_b(file_name, ele_mesh_IO)
       else if(mesh_file%iflag_format .eq. iflag_single) then
-        call mpi_output_element_file                                    &
-     &     (nprocs, my_rank, file_name, ele_mesh_IO)
+        call mpi_output_element_file(file_name, ele_mesh_IO)
 !
 #ifdef ZLIB_IO
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
-        call gz_mpi_output_element_file_b                               &
-     &     (nprocs, my_rank, file_name, ele_mesh_IO)
+        call gz_mpi_output_element_file_b(file_name, ele_mesh_IO)
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
-        call gz_mpi_output_element_file                                 &
-     &     (nprocs, my_rank, file_name, ele_mesh_IO)
+        call gz_mpi_output_element_file(file_name, ele_mesh_IO)
 #endif
 !
       else
@@ -239,21 +235,17 @@
 !
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
-        call mpi_output_surface_file_b                                  &
-     &     (nprocs, my_rank, file_name, surf_mesh_IO)
+        call mpi_output_surface_file_b(file_name, surf_mesh_IO)
       else if(mesh_file%iflag_format .eq. iflag_single) then
-        call mpi_output_surface_file                                    &
-     &     (nprocs, my_rank, file_name, surf_mesh_IO)
+        call mpi_output_surface_file(file_name, surf_mesh_IO)
 !
 #ifdef ZLIB_IO
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
-        call gz_mpi_output_surface_file_b                               &
-     &     (nprocs, my_rank, file_name, surf_mesh_IO)
+        call gz_mpi_output_surface_file_b(file_name, surf_mesh_IO)
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
-        call gz_mpi_output_surface_file                                 &
-     &     (nprocs, my_rank, file_name, surf_mesh_IO)
+        call gz_mpi_output_surface_file(file_name, surf_mesh_IO)
 #endif
 !
       else
@@ -280,21 +272,17 @@
 !
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
-        call mpi_output_edge_file_b                                     &
-     &     (nprocs, my_rank, file_name, edge_mesh_IO)
+        call mpi_output_edge_file_b(file_name, edge_mesh_IO)
       else if(mesh_file%iflag_format .eq. iflag_single) then
-        call mpi_output_edge_file                                       &
-     &     (nprocs, my_rank, file_name, edge_mesh_IO)
+        call mpi_output_edge_file(file_name, edge_mesh_IO)
 !
 #ifdef ZLIB_IO
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
-        call gz_mpi_output_edge_file_b                                  &
-     &     (nprocs, my_rank, file_name, edge_mesh_IO)
+        call gz_mpi_output_edge_file_b(file_name, edge_mesh_IO)
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
-        call gz_mpi_output_edge_file                                    &
-     &     (nprocs, my_rank, file_name, edge_mesh_IO)
+        call gz_mpi_output_edge_file(file_name, edge_mesh_IO)
 #endif
 !
       else

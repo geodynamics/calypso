@@ -156,6 +156,8 @@
       subroutine copy_sph_1d_gl_idx_rj                                  &
      &         (s3d_radius, sph_gl1d, sph_rj)
 !
+      use calypso_mpi
+!
       type(spheric_global_radius), intent(in) :: s3d_radius
       type(sph_1d_global_index), intent(in) :: sph_gl1d
       type(sph_rj_grid), intent(inout) :: sph_rj
@@ -163,10 +165,29 @@
       integer(kind = kint) :: i, j
 !
 !
+!      write(*,*) my_rank, sph_rj%ist_rj(1), 'Check idx_global_rj_r', &
+!     &        size(sph_gl1d%idx_global_rj_r), sph_rj%nidx_rj(1)
+!      do i = 1, sph_rj%nidx_rj(1)
+!        if(sph_gl1d%idx_global_rj_r(i) .le. 0) write(*,*) &
+!     &          'aho!', my_rank, i, sph_gl1d%idx_global_rj_r(i)
+!        if(sph_gl1d%idx_global_rj_r(i) .gt. sph_rj%nidx_rj(1)) write(*,*) &
+!     &          'Baka!', my_rank, i, sph_gl1d%idx_global_rj_r(i)
+!      end do
       do i = 1, sph_rj%nidx_rj(1)
         j = i - 1 + sph_rj%ist_rj(1)
         sph_rj%idx_gl_1d_rj_r(i) = sph_gl1d%idx_global_rj_r(j)
       end do
+
+!      if(my_rank .eq. 0) then
+!        write(*,*) 'Check idx_gl_1d_rj_r', sph_rj%ist_rj(:)
+!        do i = 1, sph_rj%nidx_rj(1)
+!          if(sph_rj%idx_gl_1d_rj_r(i) .le. 0) write(*,*) &
+!     &          'aho!', my_rank, i, sph_rj%idx_gl_1d_rj_r(i)
+!          if(sph_rj%idx_gl_1d_rj_r(i) .gt. sph_rj%nidx_rj(1))          &
+!     &       write(*,*) 'Baka!', my_rank, i, sph_rj%idx_gl_1d_rj_r(i)
+!        end do
+!      end if
+
       do i = 1, sph_rj%nidx_rj(1)
         j = sph_rj%idx_gl_1d_rj_r(i)
         sph_rj%radius_1d_rj_r(i) = s3d_radius%radius_1d_gl(j)

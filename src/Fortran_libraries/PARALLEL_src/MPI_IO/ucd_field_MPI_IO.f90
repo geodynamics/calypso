@@ -7,8 +7,7 @@
 !> @brief Output merged field file using MPI-IO
 !!
 !!@verbatim
-!!      subroutine write_ucd_field_file_mpi                             &
-!!     &         (file_name, num_pe, id_rank, t_IO, ucd)
+!!      subroutine write_ucd_field_file_mpi(file_name, t_IO, ucd)
 !!        type(time_data), intent(in) :: t_IO
 !!        type(ucd_data), intent(in) :: ucd
 !!
@@ -50,13 +49,11 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine write_ucd_field_file_mpi                               &
-     &         (file_name, num_pe, id_rank, t_IO, ucd)
+      subroutine write_ucd_field_file_mpi(file_name, t_IO, ucd)
 !
       use field_block_MPI_IO
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
 !
       type(time_data), intent(in) :: t_IO
       type(ucd_data), intent(in) :: ucd
@@ -67,15 +64,12 @@
 !
       if(my_rank .eq. 0) write(*,*) 'Write ascii data by MPI-IO: ',     &
      &                               trim(file_name)
-      call calypso_mpi_write_file_open(file_name, num_pe, id_fld)
+      call calypso_mpi_write_file_open(file_name, nprocs, id_fld)
 !
-      if(id_rank .lt. num_pe) then
-        ioff_gl = 0
-        call write_field_data_mpi                                       &
-     &     (id_fld, num_pe, id_rank, ioff_gl, t_IO,                     &
-     &      ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,       &
-     &      ucd%phys_name, ucd%d_ucd, ucd%istack_merged_nod)
-      end if
+      ioff_gl = 0
+      call write_field_data_mpi(id_fld, ioff_gl, t_IO,                  &
+     &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
+     &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_nod)
 !
       call calypso_close_mpi_file(id_fld)
 !

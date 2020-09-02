@@ -90,8 +90,8 @@
       call copy_time_step_size_data(time_d, sph_time_IO)
       call set_sph_restart_data_to_IO(rj_fld, sph_fst_IO)
 !
-      call sel_write_step_SPH_field_file(nprocs, my_rank,               &
-     &    istep_rst, fst_file_IO, sph_time_IO, sph_fst_IO)
+      call sel_write_step_SPH_field_file                                &
+     &   (istep_rst, fst_file_IO, sph_time_IO, sph_fst_IO)
 !
       end subroutine output_sph_restart_control
 !
@@ -228,8 +228,8 @@
       call count_number_of_node_stack                                   &
      &   (sph_out_IO%nnod_IO, sph_out_IO%istack_numnod_IO)
 !
-      call sel_write_step_SPH_field_file(nprocs, my_rank,               &
-     &    istep_udt, sph_file_IO, sph_time_IO, sph_out_IO)
+      call sel_write_step_SPH_field_file                                &
+     &   (istep_udt, sph_file_IO, sph_time_IO, sph_out_IO)
 !
       call dealloc_merged_field_stack(sph_out_IO)
       call dealloc_phys_data_IO(sph_out_IO)

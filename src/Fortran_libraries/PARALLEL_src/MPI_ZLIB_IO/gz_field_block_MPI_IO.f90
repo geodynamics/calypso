@@ -7,8 +7,8 @@
 !> @brief Output merged VTK file usgin MPI-IO
 !!
 !!@verbatim
-!!      subroutine write_field_head_gz_mpi(id_fld, num_pe,              &
-!!     &          ioff_gl, t_IO, num_field, ncomp_field, istack_merged)
+!!      subroutine write_field_head_gz_mpi(id_fld, ioff_gl,             &
+!!     &          t_IO, num_field, ncomp_field, istack_merged)
 !!      subroutine write_field_data_gz_mpi(id_fld, ioff_gl,             &
 !!     &           nnod, num_field, ntot_comp, ncomp_field,             &
 !!     &           field_name, d_nod)
@@ -41,8 +41,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine write_field_head_gz_mpi(id_fld, num_pe,                &
-     &          ioff_gl, t_IO, num_field, ncomp_field, istack_merged)
+      subroutine write_field_head_gz_mpi(id_fld, ioff_gl,               &
+     &          t_IO, num_field, ncomp_field, istack_merged)
 !
       use m_phys_constants
       use time_data_IO
@@ -50,8 +50,7 @@
       use gz_field_data_MPI_IO
 !
       integer(kind = kint_gl), intent(inout) :: ioff_gl
-      integer(kind = kint_gl), intent(in) :: istack_merged(0:num_pe)
-      integer, intent(in) :: num_pe
+      integer(kind = kint_gl), intent(in) :: istack_merged(0:nprocs)
 !
       type(time_data), intent(in) :: t_IO
 !
@@ -62,9 +61,9 @@
 !
 !
       call gz_write_fld_header_mpi                                      &
-     &   (id_fld, ioff_gl, step_data_buffer(num_pe, t_IO))
+     &   (id_fld, ioff_gl, step_data_buffer(nprocs, t_IO))
       call gz_write_fld_header_mpi(id_fld, ioff_gl,                     &
-     &    field_istack_nod_buffer(num_pe, istack_merged))
+     &    field_istack_nod_buffer(nprocs, istack_merged))
       call gz_write_fld_header_mpi(id_fld, ioff_gl,                     &
      &    field_num_buffer(num_field))
       call gz_write_fld_header_mpi                                      &

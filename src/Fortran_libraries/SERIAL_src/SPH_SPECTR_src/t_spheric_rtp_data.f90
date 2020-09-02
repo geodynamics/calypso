@@ -65,23 +65,23 @@
         integer(kind = kint) :: ied_rtp(3)
 !
 !>        SMP stack for spectr data @f$ f(r,t,p) @f$
-      integer(kind = kint), allocatable :: istack_inod_rtp_smp(:)
+        integer(kind = kint), allocatable :: istack_inod_rtp_smp(:)
 !
 !>        SMP stacks for indexing @f$ r@f$
-      integer(kind = kint), allocatable :: istack_rtp_kr_smp(:)
+        integer(kind = kint), allocatable :: istack_rtp_kr_smp(:)
 !>        SMP stacks for indexing @f$ t @f$
-      integer(kind = kint), allocatable :: istack_rtp_lt_smp(:)
+        integer(kind = kint), allocatable :: istack_rtp_lt_smp(:)
 !>        SMP stacks for indexing @f$ p @f$
-      integer(kind = kint), allocatable :: istack_rtp_mp_smp(:)
+        integer(kind = kint), allocatable :: istack_rtp_mp_smp(:)
 !
 !>        SMP stacks for indexing @f$ r, t@f$
-      integer(kind = kint), allocatable :: istack_rtp_rt_smp(:)
+        integer(kind = kint), allocatable :: istack_rtp_rt_smp(:)
 !
 !>        SMP stacks for pole indexing
-      integer(kind = kint), allocatable :: istack_npole_smp(:)
+        integer(kind = kint), allocatable :: istack_npole_smp(:)
 !
 !>        Maximum SMP number for spectr data @f$ f(r,t,p) @f$
-      integer(kind = kint)  ::  maxirt_rtp_smp =  0
+        integer(kind = kint)  ::  maxirt_rtp_smp =  0
 !
 !>        global address for each direction @f$ f(r,\theta,\phi) @f$
         integer(kind = kint), allocatable :: idx_global_rtp(:,:)

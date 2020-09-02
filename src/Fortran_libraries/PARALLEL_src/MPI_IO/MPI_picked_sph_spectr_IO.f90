@@ -72,7 +72,7 @@
 !      end if
 !      call calypso_mpi_barrier
 !
-      call open_append_mpi_file(file_name, nprocs, my_rank, IO_param1)
+      call open_append_mpi_file(file_name, IO_param1)
       call calypso_mpi_barrier
 !
       if(IO_param1%ioff_gl .eq. 0) then

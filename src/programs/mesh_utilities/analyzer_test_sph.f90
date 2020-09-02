@@ -35,6 +35,8 @@
 !
 !>      Structure for file settings
       type(sph_mesh_generation_ctl), save :: SPH_TEST_ctl
+!>      Structure to check and construct spherical shell mesh
+      type(sph_grid_maker_in_sim), save :: sph_maker_T
 !
       type(SPH_mesh_field_data), save :: SPH_TEST
 !
@@ -51,9 +53,12 @@
 !
       subroutine init_test_sph
 !
-      use set_control_platform_data
-      use parallel_load_data_4_sph
+      use t_ctl_params_gen_sph_shell
+      use t_check_and_make_SPH_mesh
       use cmp_trans_sph_tests
+      use set_control_platform_data
+!
+      integer(kind = kint) :: ierr = 0
 !
 !
       if (my_rank.eq.0) then
@@ -70,17 +75,14 @@
 !
       call turn_off_debug_flag_by_ctl(my_rank, SPH_TEST_ctl%plt)
       call read_control_4_const_shell(control_file_name, SPH_TEST_ctl)
-      call set_control_sph_mesh                                         &
-     &   (SPH_TEST_ctl%plt, SPH_TEST_ctl%psph_ctl%Fmesh_ctl,            &
-     &    test_sph_files%sph_file_param, test_sph_files%mesh_file_IO,   &
-     &    test_sph_files%sph_file_IO, test_sph_files%FEM_mesh_flags)
+      call set_control_4_gen_shell_grids                                &
+     &   (my_rank, SPH_TEST_ctl%plt, SPH_TEST_ctl%psph_ctl,             &
+     &    test_sph_files, sph_maker_T, ierr)
 !
-      if (iflag_debug.gt.0) write(*,*) 'load_sph_mesh'
-      call load_sph_mesh(test_sph_files%sph_file_param,                 &
+      if (iflag_debug.gt.0) write(*,*) 'check_and_make_SPH_mesh'
+      call check_and_make_SPH_mesh                                      &
+     &   (test_sph_files%sph_file_param, sph_maker_T,                   &
      &    SPH_TEST%sph, SPH_TEST%comms, SPH_TEST%groups)
-      if (iflag_debug.gt.0) write(*,*) 'sph_index_flags_and_params'
-      call sph_index_flags_and_params                                   &
-     &   (SPH_TEST%groups, SPH_TEST%sph, SPH_TEST%comms)
 !
        end subroutine init_test_sph
 !
@@ -89,13 +91,15 @@
       subroutine analyze_test_sph
 !
       use m_solver_SR
+      use calypso_mpi_int
       use cmp_trans_sph_indices
       use cmp_trans_sph_tests
       use set_parallel_file_name
       use select_copy_from_recv
+      use delete_data_files
 !
       character(len=kchara) :: fname_tmp, file_name
-      integer(kind = kint) :: itype
+      integer(kind = kint) :: itype, iflag_gl, iflag_sum, iflag(7)
       integer(kind = kint), parameter :: NB = 8
 !
 !
@@ -111,6 +115,7 @@
       write(*,*) 'error check result: ', trim(file_name)
       open(id_check, file=file_name)
 !
+      iflag_sum = 0
       do itype = iflag_import_item, iflag_import_rev
 !
         if(itype .eq. iflag_import_item) then
@@ -121,37 +126,49 @@
 !
         call sph_type_indices_transfer                                  &
      &     (itype, SPH_TEST%sph, SPH_TEST%comms)
-        call check_missing_sph_indices(id_check, SPH_TEST%sph)
-        call compare_transfer_sph_indices(id_check, SPH_TEST%sph)
+        iflag(1) = check_missing_sph_indices(id_check, SPH_TEST%sph)
+        iflag(2) = compare_transfer_sph_indices(id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_N                                        &
      &     (itype, NB, SPH_TEST%sph, SPH_TEST%comms)
-        call compare_transfer_sph_reals(NB, id_check, SPH_TEST%sph)
+        iflag(3) = compare_transfer_sph_reals                           &
+     &           (NB, id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_6                                        &
      &     (itype, SPH_TEST%sph, SPH_TEST%comms)
-        call compare_transfer_sph_reals(isix, id_check, SPH_TEST%sph)
+        iflag(4) = compare_transfer_sph_reals                           &
+     &           (isix, id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_3                                        &
      &     (itype, SPH_TEST%sph, SPH_TEST%comms)
-        call compare_transfer_sph_reals                                 &
-     &     (ithree, id_check, SPH_TEST%sph)
+        iflag(5) = compare_transfer_sph_reals                           &
+     &        (ithree, id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_2                                        &
      &     (itype, SPH_TEST%sph, SPH_TEST%comms)
-        call compare_transfer_sph_reals(itwo, id_check, SPH_TEST%sph)
+        iflag(6) = compare_transfer_sph_reals                           &
+     &        (itwo, id_check, SPH_TEST%sph)
 !
         call sph_transfer_test_1                                        &
      &     (itype, SPH_TEST%sph, SPH_TEST%comms)
-        call compare_transfer_sph_reals(ione, id_check, SPH_TEST%sph)
+        iflag(7) = compare_transfer_sph_reals                           &
+     &        (ione, id_check, SPH_TEST%sph)
+!
+        iflag_sum = iflag_sum + sum(iflag)
       end do
 !
       close(id_check)
 !
       call deallocate_real_sph_test
       call deallocate_idx_sph_recieve
+      call calypso_mpi_allreduce_one_int(iflag_sum, iflag_gl, MPI_SUM)
 !
-      call output_elapsed_times
+      if(iflag_gl .eq. 0) then
+        if(my_rank .eq. 0) write(*,'(3a)')                              &
+     &         char(10), '---- No communication error ----', char(10)
+        call delete_file_by_f(file_name)
+      end if
+
 !
       if (iflag_debug.eq.1) write(*,*) 'exit analyze_test_sph'
 !

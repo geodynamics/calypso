@@ -157,8 +157,7 @@
 !
       call copy_sph_trans_rlm_to_IO(sph%sph_params, sph%sph_rlm,        &
      &                              comms_sph%comm_rlm, sph_file_l)
-      call sel_mpi_write_modes_rlm_file                                 &
-     &   (nprocs, my_rank, sph_file_param, sph_file_l)
+      call sel_mpi_write_modes_rlm_file(sph_file_param, sph_file_l)
       call dealloc_rlm_mode_IO(sph_file_l)
       write(*,'(a,i6,a)') 'Spherical transform table for domain',       &
      &          my_rank, ' is done.'
@@ -167,8 +166,7 @@
      &                 'copy_sph_trans_rj_to_IO', my_rank
       call copy_sph_trans_rj_to_IO(sph%sph_params,                      &
      &    sph%sph_rj, comms_sph%comm_rj, sph_grps, sph_file_l)
-      call sel_mpi_write_spectr_rj_file                                 &
-     &   (nprocs, my_rank, sph_file_param, sph_file_l)
+      call sel_mpi_write_spectr_rj_file(sph_file_param, sph_file_l)
       call dealloc_rj_mode_IO(sph_file_l)
       write(*,'(a,i6,a)') 'Spherical modes for domain',                 &
      &          my_rank, ' is done.'
@@ -176,8 +174,7 @@
 !
       call copy_sph_trans_rtm_to_IO(sph%sph_params, sph%sph_rtm,        &
      &    comms_sph%comm_rtm, sph_file_l)
-      call sel_mpi_write_geom_rtm_file                                  &
-     &   (nprocs, my_rank, sph_file_param, sph_file_l)
+      call sel_mpi_write_geom_rtm_file(sph_file_param, sph_file_l)
       call dealloc_rtm_grid_IO(sph_file_l)
       write(*,'(a,i6,a)') 'Legendre transform table rtm',               &
      &          my_rank, ' is done.'
@@ -187,8 +184,7 @@
      &                 'copy_sph_trans_rtp_to_IO', my_rank
       call copy_sph_trans_rtp_to_IO(sph%sph_params,                     &
      &    sph%sph_rtp, comms_sph%comm_rtp, sph_grps, sph_file_l)
-      call sel_mpi_write_geom_rtp_file                                  &
-     &   (nprocs, my_rank, sph_file_param, sph_file_l)
+      call sel_mpi_write_geom_rtp_file(sph_file_param, sph_file_l)
       call dealloc_rtp_grid_IO(sph_file_l)
       write(*,'(a,i6,a)') 'Spherical grids for domain',                 &
      &          my_rank, ' is done.'
@@ -213,8 +209,7 @@
      &                 'copy_sph_trans_rj_to_IO', my_rank
       call copy_sph_trans_rj_to_IO(sph%sph_params,                      &
      &    sph%sph_rj, comms_sph%comm_rj, sph_grps, sph_file_l)
-      call sel_mpi_write_spectr_rj_file                                 &
-     &   (nprocs, my_rank, sph_file_param, sph_file_l)
+      call sel_mpi_write_spectr_rj_file(sph_file_param, sph_file_l)
       call dealloc_rj_mode_IO(sph_file_l)
       write(*,'(a,i6,a)') 'Spherical modes for domain',                 &
      &          my_rank, ' is done.'

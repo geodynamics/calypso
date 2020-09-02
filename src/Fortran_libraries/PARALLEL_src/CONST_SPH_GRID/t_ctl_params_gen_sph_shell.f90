@@ -69,6 +69,8 @@
       subroutine set_control_4_gen_shell_grids                          &
      &         (id_rank, plt, psph_ctl, sph_files, sph_maker, ierr)
 !
+      use m_file_format_switch
+!
       integer, intent(in) :: id_rank
       type(platform_data_control), intent(in) :: plt
       type(parallel_sph_shell_control), intent(inout) :: psph_ctl
@@ -84,7 +86,11 @@
 !
       if(psph_ctl%iflag_sph_shell .gt. 0) then
         sph_maker%make_SPH_flag =    .TRUE.
-        sph_maker%mesh_output_flag = .TRUE.
+        if(sph_files%sph_file_param%iflag_format .eq. id_no_file        &
+     &    .or. plt%sph_file_prefix%iflag .eq. 0) then
+          sph_maker%mesh_output_flag = .FALSE.
+        end if
+!
         call set_control_4_shell_grids                                  &
      &     (nprocs_check, psph_ctl%Fmesh_ctl, psph_ctl%spctl,           &
      &      psph_ctl%sdctl, sph_maker%sph_tmp, sph_maker%gen_sph, ierr)

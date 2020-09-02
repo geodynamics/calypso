@@ -49,12 +49,9 @@
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Write gzipped ascii mesh file: ', trim(gzip_name)
 !
-      call open_write_mpi_file                                          &
-     &   (gzip_name, nprocs, my_rank, IO_param)
-!
+      call open_write_mpi_file(gzip_name, IO_param)
       call gz_write_viewer_mesh_infos                                   &
      &   (mgd_v_mesh, mgd_view_prm, IO_param)
-!
       call close_mpi_file(IO_param)
 !
       end subroutine gz_mpi_write_viewer_mesh_file

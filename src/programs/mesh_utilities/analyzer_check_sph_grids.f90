@@ -1,5 +1,5 @@
-!>@file   analyzer_gen_sph_grids.f90
-!!@brief  module analyzer_gen_sph_grids
+!>@file   analyzer_check_sph_grids.f90
+!!@brief  module analyzer_check_sph_grids
 !!
 !!@author H. Matsui
 !!@date   Programmed  H. Matsui in Apr., 2010
@@ -7,11 +7,11 @@
 !>@brief  Main loop to generate spherical harmonics indices
 !!
 !!@verbatim
-!!      subroutine init_gen_sph_grids
-!!      subroutine analyze_gen_sph_grids
+!!      subroutine init_check_sph_grids
+!!      subroutine analyze_check_sph_grids
 !!@endverbatim
 !
-      module analyzer_gen_sph_grids
+      module analyzer_check_sph_grids
 !
       use m_precision
       use m_constants
@@ -53,12 +53,6 @@
 !>      Structure to check and construct spherical shell mesh
       type(sph_grid_maker_in_sim), save :: sph_maker_G
 !
-      type(sph_comm_tables), save, private :: comms_sph
-      type(sph_group_data), save, private ::  sph_grps
-      type(mesh_data), save, private :: geofem
-!
-      type(parallel_make_vierwer_mesh), save, private :: para_v1
-!
       private :: control_file_name
       private :: sph_const, SPH_MAKE_ctl
 !
@@ -68,7 +62,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine init_gen_sph_grids
+      subroutine init_check_sph_grids
 !
       use m_error_IDs
 !
@@ -83,7 +77,6 @@
       call set_control_4_gen_shell_grids                                &
      &   (my_rank, SPH_MAKE_ctl%plt, SPH_MAKE_ctl%psph_ctl,             &
      &    sph_files1, sph_maker_G, ierr)
-      sph_maker_G%mesh_output_flag = .TRUE.
       if(ierr .gt. 0) call calypso_mpi_abort(ierr, e_message)
 !
       if(sph_maker_G%gen_sph%s3d_ranks%ndomain_sph .ne. nprocs) then
@@ -95,18 +88,21 @@
         call calypso_mpi_abort(ierr_P_MPI, e_message)
       end if
 !
-      end subroutine init_gen_sph_grids
+      end subroutine init_check_sph_grids
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine analyze_gen_sph_grids
+      subroutine analyze_check_sph_grids
 !
+      use calypso_mpi_int
+      use m_error_IDs
       use m_array_for_send_recv
       use t_check_and_make_SPH_mesh
-      use parallel_FEM_mesh_init
       use mpi_gen_sph_grids_modes
-      use output_gen_sph_grid_modes
+      use compare_sph_with_IO
       use parallel_load_data_4_sph
+!
+      integer(kind = kint) :: iflag, iflag_gl
 !
 !  ========= Generate spherical harmonics table ========================
 !
@@ -114,55 +110,25 @@
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
       call mpi_gen_sph_grids(sph_maker_G%gen_sph, sph_maker_G%sph_tmp,  &
      &    sph_const, comms_sph_const, sph_grp_const)
-      call output_sph_mesh(sph_files1%sph_file_param,                   &
+      iflag = s_compare_sph_with_IO(sph_files1%sph_file_param,          &
      &    sph_const, comms_sph_const, sph_grp_const)
-      if(iflag_debug.gt.0) write(*,*) 'sph_index_flags_and_params'
-      call sph_index_flags_and_params                                   &
-     &   (sph_grp_const, sph_const, comms_sph_const)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
+      call calypso_mpi_allreduce_one_int(iflag, iflag_gl, MPI_MAX)
 !
-      if(sph_files1%FEM_mesh_flags%iflag_access_FEM .eq. 0) goto 99
-!
-!  ========= Generate FEM mesh ===========================
-!
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+3)
-      if(iflag_debug .gt. 0) write(*,*) 'const_FEM_mesh_4_SPH'
-      call const_FEM_mesh_4_SPH                                         &
-     &   (sph_files1%FEM_mesh_flags, sph_files1%sph_file_param,         &
-     &    sph_const, comms_sph, sph_grps,                               &
-     &    geofem, sph_files1%mesh_file_IO, sph_maker_G)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+3)
-      call calypso_MPI_barrier
-!
-!  ========= Generate viewer mesh ===========================
-!
-      if(sph_files1%FEM_mesh_flags%iflag_output_VMESH .gt. 0) then
-        if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+5)
-        if(iflag_debug .gt. 0) write(*,*) 'pickup_surface_mesh'
-        call pickup_surface_mesh(sph_files1%mesh_file_IO, para_v1)
-        if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+5)
+      write(*,*) 'indexing', my_rank, iflag_gl
+      call calypso_mpi_barrier
+      if(iflag .gt. 0) call calypso_mpi_abort(ierr_P_MPI, e_message)
+      if(iflag_gl .eq. 0 .and. my_rank .eq. 0) then
+        write(*,*) 'indexing is correct'
       end if
 !
-!  ========= Generate FEM surface and edge mesh =======================
-!
-!      if(sph_files1%FEM_mesh_flags%iflag_output_SURF .eq. 0) goto 99
-!
-!      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+4)
-!      if(iflag_debug .gt. 0) write(*,*) 'FEM_mesh_initialization'
-!      call FEM_mesh_initialization(geofem%mesh, geofem%group)
-!      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+4)
-!
-  99  continue
       call dealloc_sph_modes(sph_const, comms_sph_const,                &
      &    sph_grp_const)
-      call end_elapsed_time(ied_total_elapsed)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
 !
-      call output_elapsed_times
-      call calypso_MPI_barrier
       if (iflag_debug.eq.1) write(*,*) 'exit evolution'
 !
-      end subroutine analyze_gen_sph_grids
+      end subroutine analyze_check_sph_grids
 !
 ! ----------------------------------------------------------------------
 !
-      end module analyzer_gen_sph_grids
+      end module analyzer_check_sph_grids

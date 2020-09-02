@@ -4,8 +4,9 @@
 
 GEN_SPH_GRIDDIR = $$(PROG_DIR)/mesh_utilities
 
-TARGET_GEN_SPH =       gen_sph_grids
-TARGET_TEST_SPH_GRID = check_sph_grids
+TARGET_GEN_SPH_GRID =    gen_sph_grids
+TARGET_CHECK_SPH_GRID =  check_sph_grids
+TARGET_TEST_SPH_GRID =   check_sph_comms
 
 
 SOURCES = $(shell ls *.f90)
@@ -13,6 +14,10 @@ SOURCES = $(shell ls *.f90)
 MOD_GEN_SPH_GRID = \
 main_generate_sph_grids.o \
 analyzer_gen_sph_grids.o
+
+MOD_CHECK_SPH_GRID = \
+main_check_sph_grids.o \
+analyzer_check_sph_grids.o
 
 MOD_TEST_SPH_GRID = \
 cmp_trans_sph_indices.o \
@@ -28,7 +33,9 @@ dir_list:
 	@echo 'GEN_SPH_GRIDDIR = $(GEN_SPH_GRIDDIR)' >> $(MAKENAME)
 
 target_list:
-	@echo 'TARGET_GEN_SPH =      $$(BUILDDIR)/$(TARGET_GEN_SPH)'   \
+	@echo 'TARGET_GEN_SPH_GRID =      $$(BUILDDIR)/$(TARGET_GEN_SPH_GRID)'   \
+	>> $(MAKENAME)
+	@echo 'TARGET_CHECK_SPH_GRID =   $$(BUILDDIR)/$(TARGET_CHECK_SPH_GRID)'   \
 	>> $(MAKENAME)
 	@echo 'TARGET_TEST_SPH_GRID = $$(BUILDDIR)/$(TARGET_TEST_SPH_GRID)'     \
 	>> $(MAKENAME)
@@ -36,15 +43,24 @@ target_list:
 
 target_task:
 	@echo mesh_utils:   \
-	'$$(TARGET_TEST_SPH_GRID)' \
-	'$$(TARGET_GEN_SPH)'   >> $(MAKENAME)
+	'$$(TARGET_TEST_SPH_GRID) $$(TARGET_CHECK_SPH_GRID)' \
+	'$$(TARGET_GEN_SPH_GRID)'   >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
-	@echo '$$(TARGET_GEN_SPH)': '$$(MOD_GEN_SPH_GRID)' \
+	@echo '$$(TARGET_GEN_SPH_GRID)': '$$(MOD_GEN_SPH_GRID)' \
 	'$$(LIB_CALYPSO_FILE)' \
 	>> $(MAKENAME)
 	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
-	-o '$$(TARGET_GEN_SPH)' \
+	-o '$$(TARGET_GEN_SPH_GRID)' \
 	'$$(MOD_GEN_SPH_GRID)' \
+	'-L. $$(LIB_CALYPSO)  $$(LIB_CALYPSO_C)' \
+	'$$(F90LIBS)' >> $(MAKENAME)
+	@echo '' >> $(MAKENAME)
+	@echo '$$(TARGET_CHECK_SPH_GRID)': '$$(MOD_CHECK_SPH_GRID)' \
+	'$$(LIB_CALYPSO_FILE)' \
+	>> $(MAKENAME)
+	@echo '	''$$(F90)' '$$(F90OPTFLAGS)' '$$(F90CPPFLAGS)' \
+	-o '$$(TARGET_CHECK_SPH_GRID)' \
+	'$$(MOD_CHECK_SPH_GRID)' \
 	'-L. $$(LIB_CALYPSO)  $$(LIB_CALYPSO_C)' \
 	'$$(F90LIBS)' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
@@ -64,6 +80,8 @@ lib_name:
 mod_list:
 	@echo  MOD_GEN_SPH_GRID=  \\ >> $(MAKENAME)
 	@echo  $(MOD_GEN_SPH_GRID) >> $(MAKENAME)
+	@echo  MOD_CHECK_SPH_GRID=  \\ >> $(MAKENAME)
+	@echo  $(MOD_CHECK_SPH_GRID) >> $(MAKENAME)
 	@echo  MOD_TEST_SPH_GRID=  \\ >> $(MAKENAME)
 	@echo  $(MOD_TEST_SPH_GRID) >> $(MAKENAME)
 	@echo  '#'  >> $(MAKENAME)

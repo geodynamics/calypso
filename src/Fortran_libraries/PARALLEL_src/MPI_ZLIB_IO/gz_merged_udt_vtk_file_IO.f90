@@ -248,8 +248,7 @@
      &   'write gzipped binary mesh and field data by MPI-IO: ',        &
      &    trim(gzip_name)
 !
-      call open_write_gz_mpi_file_b                                     &
-     &   (gzip_name, nprocs, my_rank, IO_param)
+      call open_write_gz_mpi_file_b(gzip_name, IO_param)
 !
       call gz_mpi_write_ucd_mesh_data_b(IO_param,                       &
      &    ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie,           &
@@ -280,8 +279,7 @@
       if(my_rank .eq. 0) write(*,*)                                     &
      &   'write gzipped binary field file by MPI-IO: ', trim(gzip_name)
 !
-      call open_write_gz_mpi_file_b                                     &
-     &   (gzip_name, nprocs, my_rank, IO_param)
+      call open_write_gz_mpi_file_b(gzip_name, IO_param)
 !
       call gz_write_ucd_data_mpi_b(IO_param,                            &
      &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
@@ -307,8 +305,7 @@
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Write gzipped binary grid file by MPI-IO: ', trim(gzip_name)
 !
-      call open_write_gz_mpi_file_b                                     &
-     &   (gzip_name, nprocs, my_rank, IO_param)
+      call open_write_gz_mpi_file_b(gzip_name, IO_param)
 !
       call gz_mpi_write_ucd_mesh_data_b(IO_param,                       &
      &    ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie,           &

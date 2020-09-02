@@ -7,8 +7,7 @@
 !> @brief Output merged VTK file usgin MPI-IO
 !!
 !!@verbatim
-!!      subroutine write_gz_step_field_file_mpi                         &
-!!     &         (file_name, num_pe, id_rank, t_IO, fld_IO)
+!!      subroutine write_gz_step_field_file_mpi(file_name, t_IO, fld_IO)
 !!        type(time_data), intent(in) :: t_IO
 !!        type(field_IO), intent(in) :: fld_IO
 !!
@@ -53,15 +52,13 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine write_gz_step_field_file_mpi                           &
-     &         (file_name, num_pe, id_rank, t_IO, fld_IO)
+      subroutine write_gz_step_field_file_mpi(file_name, t_IO, fld_IO)
 !
       use gz_field_block_MPI_IO
       use transfer_to_long_integers
 !
       character(len=kchara), intent(in) :: file_name
 !
-      integer, intent(in) :: num_pe, id_rank
       type(time_data), intent(in) :: t_IO
       type(field_IO), intent(in) :: fld_IO
 !
@@ -71,19 +68,17 @@
 !
       if(my_rank .eq. 0) write(*,*)                                     &
      &    'Write gzipped ascii data by MPI-IO: ', trim(file_name)
-      call calypso_mpi_write_file_open(file_name, num_pe, id_fld)
+      call calypso_mpi_write_file_open(file_name, nprocs, id_fld)
 !
-      if(id_rank .lt. num_pe) then
-        ioff_gl = 0
-        call write_field_head_gz_mpi                                    &
-     &     (id_fld, num_pe, ioff_gl, t_IO, fld_IO%num_field_IO,         &
-     &      fld_IO%num_comp_IO,  fld_IO%istack_numnod_IO)
+      ioff_gl = 0
+      call write_field_head_gz_mpi(id_fld, ioff_gl, t_IO,               &
+     &    fld_IO%num_field_IO, fld_IO%num_comp_IO,                      &
+     &    fld_IO%istack_numnod_IO)
 !
-        call write_field_data_gz_mpi                                    &
-     &     (id_fld, ioff_gl, cast_long(fld_IO%nnod_IO),                 &
-     &      fld_IO%num_field_IO, fld_IO%ntot_comp_IO,                   &
-     &      fld_IO%num_comp_IO, fld_IO%fld_name, fld_IO%d_IO)
-      end if
+      call write_field_data_gz_mpi                                      &
+     &   (id_fld, ioff_gl, cast_long(fld_IO%nnod_IO),                   &
+     &    fld_IO%num_field_IO, fld_IO%ntot_comp_IO,                     &
+     &    fld_IO%num_comp_IO, fld_IO%fld_name, fld_IO%d_IO)
 !
       call calypso_close_mpi_file(id_fld)
 !

@@ -14,7 +14,8 @@
 !!      subroutine sph_transfer_test_N(iflag_recv, NB, sph, comms_sph)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
-!!      subroutine compare_transfer_sph_reals(NB, id_check, sph)
+!!      integer(kind = kint) function compare_transfer_sph_reals        &
+!!     &                            (NB, id_check, sph)
 !!        type(sph_grids), intent(in) :: sph
 !
       module cmp_trans_sph_tests
@@ -99,22 +100,22 @@
       call set_transfer_sph_reals                                       &
      &   (ione, sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
 !
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rtp_2_rtm_1'
+      if (my_rank .eq. 0) write(*,*) 'scalar comm. for rtp => rtm'
       call send_recv_sph_trans                                          &
      &   (iflag_recv, sph%sph_rtp%nnod_rtp, sph%sph_rtm%nnod_rtm,       &
      &   comms_sph%comm_rtp, comms_sph%comm_rtm,                        &
      &    X_global_rtp(1), X_rtm_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rtm_2_rtp_1'
+      if (my_rank .eq. 0) write(*,*) 'scalar comm. for rtm => rtp'
       call send_recv_sph_trans                                          &
      &   (iflag_recv, sph%sph_rtm%nnod_rtm, sph%sph_rtp%nnod_rtp,       &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp,                       &
      &    X_global_rtm(1), X_rtp_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rj_2_rlm_1'
+      if (my_rank .eq. 0) write(*,*) 'scalar comm. for rj => rlm'
       call send_recv_sph_trans                                          &
      &   (iflag_recv, sph%sph_rj%nnod_rj, sph%sph_rlm%nnod_rlm,         &
      &    comms_sph%comm_rj, comms_sph%comm_rlm,                        &
      &    X_global_rj(1), X_rlm_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rlm_2_rj_1'
+      if (my_rank .eq. 0) write(*,*) 'scalar comm. for rlm => rj'
       call send_recv_sph_trans                                          &
      &   (iflag_recv, sph%sph_rlm%nnod_rlm, sph%sph_rj%nnod_rj,         &
      &    comms_sph%comm_rlm, comms_sph%comm_rj,                        &
@@ -138,22 +139,22 @@
       call set_transfer_sph_reals                                       &
      &   (itwo, sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
 !
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rtp_2_rtm_2'
+      if (my_rank .eq. 0) write(*,*) 'solenoidal comm. for rtp => rtm'
       call send_recv_sph_trans_2                                        &
      &   (iflag_recv, sph%sph_rtp%nnod_rtp, sph%sph_rtm%nnod_rtm,       &
      &    comms_sph%comm_rtp, comms_sph%comm_rtm,                       &
      &    X_global_rtp(1), X_rtm_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rtm_2_rtp_2'
+      if (my_rank .eq. 0) write(*,*) 'solenoidal comm. for rtm => rtp'
       call send_recv_sph_trans_2                                        &
      &   (iflag_recv, sph%sph_rtm%nnod_rtm, sph%sph_rtp%nnod_rtp,       &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp,                       &
      &    X_global_rtm(1), X_rtp_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rj_2_rlm_2'
+      if (my_rank .eq. 0) write(*,*) 'solenoidal comm. for rj => rlm'
       call send_recv_sph_trans_2                                        &
      &   (iflag_recv, sph%sph_rj%nnod_rj, sph%sph_rlm%nnod_rlm,         &
      &    comms_sph%comm_rj, comms_sph%comm_rlm,                        &
      &    X_global_rj(1), X_rlm_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rlm_2_rj_2'
+      if (my_rank .eq. 0) write(*,*) 'solenoidal comm. for rlm => rj'
       call send_recv_sph_trans_2                                        &
      &   (iflag_recv, sph%sph_rlm%nnod_rlm, sph%sph_rj%nnod_rj,         &
      &    comms_sph%comm_rlm, comms_sph%comm_rj,                        &
@@ -177,22 +178,22 @@
       call set_transfer_sph_reals                                       &
      &   (ithree, sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
 !
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rtp_2_rtm_3'
+      if (my_rank .eq. 0) write(*,*) 'vector comm. for rtp => rtm'
       call send_recv_sph_trans_3                                        &
      &   (iflag_recv, sph%sph_rtp%nnod_rtp, sph%sph_rtm%nnod_rtm,       &
      &    comms_sph%comm_rtp, comms_sph%comm_rtm,                       &
      &    X_global_rtp(1), X_rtm_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rtm_2_rtp_3'
+      if (my_rank .eq. 0) write(*,*) 'vector comm. for rtm => rtp'
       call send_recv_sph_trans_3                                        &
      &   (iflag_recv, sph%sph_rtm%nnod_rtm, sph%sph_rtp%nnod_rtp,       &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp,                       &
      &    X_global_rtm(1), X_rtp_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rj_2_rlm_3'
+      if (my_rank .eq. 0) write(*,*) 'vector comm. for rj => rlm'
       call send_recv_sph_trans_3                                        &
      &   (iflag_recv, sph%sph_rj%nnod_rj, sph%sph_rlm%nnod_rlm,         &
      &    comms_sph%comm_rj, comms_sph%comm_rlm,                        &
      &    X_global_rj(1), X_rlm_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rlm_2_rj_3'
+      if (my_rank .eq. 0) write(*,*) 'vector comm. for rlm => rj'
       call send_recv_sph_trans_3                                        &
      &   (iflag_recv, sph%sph_rlm%nnod_rlm, sph%sph_rj%nnod_rj,         &
      &    comms_sph%comm_rlm, comms_sph%comm_rj,                        &
@@ -216,22 +217,22 @@
       call set_transfer_sph_reals                                       &
      &   (isix, sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
 !
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rtp_2_rtm_6'
+      if (my_rank .eq. 0) write(*,*) 'sym. tensor comm. for rtp => rtm'
       call send_recv_sph_trans_6                                        &
      &   (iflag_recv, sph%sph_rtp%nnod_rtp, sph%sph_rtm%nnod_rtm,       &
      &    comms_sph%comm_rtp, comms_sph%comm_rtm,                       &
      &    X_global_rtp(1), X_rtm_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rtm_2_rtp_6'
+      if (my_rank .eq. 0) write(*,*) 'sym. tensor comm. for rtm => rtp'
       call send_recv_sph_trans_6                                        &
      &   (iflag_recv, sph%sph_rtm%nnod_rtm, sph%sph_rtp%nnod_rtp,       &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp,                       &
      &    X_global_rtm(1), X_rtp_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rj_2_rlm_6'
+      if (my_rank .eq. 0) write(*,*) 'sym. tensor comm. for rj => rlm'
       call send_recv_sph_trans_6                                        &
      &   (iflag_recv, sph%sph_rj%nnod_rj,  sph%sph_rlm%nnod_rlm,        &
      &    comms_sph%comm_rj, comms_sph%comm_rlm,                        &
      &    X_global_rj(1), X_rlm_recieve(1) )
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rlm_2_rj_6'
+      if (my_rank .eq. 0) write(*,*) 'sym. tensor comm. for rlm => rj'
       call send_recv_sph_trans_6                                        &
      &   (iflag_recv, sph%sph_rlm%nnod_rlm, sph%sph_rj%nnod_rj,         &
      &    comms_sph%comm_rlm, comms_sph%comm_rj,                        &
@@ -256,25 +257,25 @@
       call set_transfer_sph_reals                                       &
      &   (NB, sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
 !
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rtp_2_rtm_N'
+      if (my_rank .eq. 0) write(*,*) 'N-vector comm. for rtp => rtm'
       call send_recv_sph_trans_N                                        &
      &   (iflag_recv, NB, sph%sph_rtp%nnod_rtp, sph%sph_rtm%nnod_rtm,   &
      &    comms_sph%comm_rtp, comms_sph%comm_rtm,                       &
      &    X_global_rtp(1), X_rtm_recieve(1))
 !
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rtm_2_rtp_N'
+      if (my_rank .eq. 0) write(*,*) 'N-vector comm. for rtm => rtp'
       call send_recv_sph_trans_N                                        &
      &   (iflag_recv, NB, sph%sph_rtm%nnod_rtm, sph%sph_rtp%nnod_rtp,   &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp,                       &
      &    X_global_rtm(1), X_rtp_recieve(1))
 !
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rj_2_rlm_N'
+      if (my_rank .eq. 0) write(*,*) 'N-vector comm. for rj => rlm'
       call send_recv_sph_trans_N                                        &
      &   (iflag_recv, NB, sph%sph_rj%nnod_rj, sph%sph_rlm%nnod_rlm,     &
      &    comms_sph%comm_rj, comms_sph%comm_rlm,                        &
      &    X_global_rj(1), X_rlm_recieve(1))
 !
-      if (my_rank .eq. 0) write(*,*) 'send_recv_rlm_2_rj_N'
+      if (my_rank .eq. 0) write(*,*) 'N-vector comm. for rlm => rj'
       call send_recv_sph_trans_N                                        &
      &   (iflag_recv, NB, sph%sph_rlm%nnod_rlm, sph%sph_rj%nnod_rj,     &
      &    comms_sph%comm_rlm, comms_sph%comm_rj,                        &
@@ -353,7 +354,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine compare_transfer_sph_reals(NB, id_check, sph)
+      integer(kind = kint) function compare_transfer_sph_reals          &
+     &                            (NB, id_check, sph)
 !
       use cmp_trans_sph_indices
 !
@@ -361,12 +363,16 @@
       type(sph_grids), intent(in) :: sph
 !
 !
-      integer(kind = kint) :: inod, nd
+      integer(kind = kint) :: inod, nd, mphi
       real(kind = kreal) :: diff
 !
 !
+      compare_transfer_sph_reals = 0
       write(id_check,*) 'Wrong commnication in rtm => rtp with ', NB
       do inod = 1, sph%sph_rtp%nnod_rtp
+        mphi = sph%sph_rtp%idx_global_rtp(inod,3)
+        if(abs(sph%sph_rtp%idx_gl_1d_rtp_p(mphi,2))                     &
+     &            .gt. sph%sph_params%l_truncation) cycle
         if(   idx_rtp_recieve(inod,1) .eq. 0                            &
      &   .or. idx_rtp_recieve(inod,2) .eq. 0                            &
      &   .or. idx_rtp_recieve(inod,3) .eq. 0) then
@@ -378,6 +384,7 @@
             write(id_check,'(4i16,1p3E23.15)') inod,                    &
      &       sph%sph_rtp%idx_global_rtp(inod,1:3), diff,                &
      &       X_rtp_recieve(NB*inod-NB+1), X_global_rtp(NB*inod-NB+1)
+             compare_transfer_sph_reals = 1
           end if
         end if
       end do
@@ -394,6 +401,7 @@
           if (diff .gt. 1.0E-11) then
             write(id_check,'(4i16,1pE23.15)') inod,                     &
      &          sph%sph_rtm%idx_global_rtm(inod,1:3), diff
+            compare_transfer_sph_reals = 1
           end if
         end if
       end do
@@ -410,6 +418,7 @@
           if (diff .gt. 1.0E-11) then
             write(id_check,'(3i16,1pE23.15)') inod,                     &
      &          sph%sph_rlm%idx_global_rlm(inod,1:2), diff
+            compare_transfer_sph_reals = 1
           end if
         end if
       end do
@@ -426,11 +435,12 @@
           if (diff .gt. 1.0E-11) then
             write(id_check,'(3i16,1p3E23.15)') inod,                    &
      &          sph%sph_rj%idx_global_rj(inod,1:2), diff
+            compare_transfer_sph_reals = 1
           end if
         end if
       end do
 !
-      end subroutine compare_transfer_sph_reals
+      end function compare_transfer_sph_reals
 !
 ! -----------------------------------------------------------------------
 !

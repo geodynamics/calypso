@@ -189,7 +189,7 @@
         call calypso_mpi_barrier
         if(my_rank .eq. 0) write(*,*) 'sel_write_step_SPH_field_file'
         call sel_write_step_SPH_field_file                              &
-     &     (nprocs, my_rank, istep_out, asbl_param_s%new_fld_file,      &
+     &     (istep_out, asbl_param_s%new_fld_file,                       &
      &      sph_asbl_s%fst_time_IO, sph_asbl_s%new_fst_IO)
 !
         call calypso_mpi_barrier

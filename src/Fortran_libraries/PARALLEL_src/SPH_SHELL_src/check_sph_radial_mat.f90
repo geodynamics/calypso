@@ -207,19 +207,19 @@
       write(50+id_rank,'(i6,1p8E25.15e3)') ione,   rr(1),               &
      &              -1.0d30, -1.0d30, -1.0d30, (mat(4-l,1+l),l=0,3)
       write(50+id_rank,'(i6,1p8E25.15e3)') itwo,   rr(2),               &
-     &              -1.0d30, -1.0d30, (mat(4-l,1+l),l=-1,3)
+     &              -1.0d30, -1.0d30, (mat(4-l,2+l),l=-1,3)
       write(50+id_rank,'(i6,1p8E25.15e3)') ithree, rr(3),               &
-     &              -1.0d30, (mat(4-l,2+l),l=-2,3)
+     &              -1.0d30, (mat(4-l,3+l),l=-2,3)
       do k = 4, nri-3
         write(50+id_rank,'(i6,1p8E25.15e3)') k, rr(k),                  &
      &              (mat(4-l,k+l),l=-3,3)
       end do
       write(50+id_rank,'(i6,1p8E25.15e3)') (nri-2), rr(nri-2),          &
-     &              (mat(4-l,nri-1+l),l=-3,2), 1.0d30
+     &              (mat(4-l,nri-2+l),l=-3,2), 1.0d30
       write(50+id_rank,'(i6,1p8E25.15e3)') (nri-1), rr(nri-1),          &
-     &              (mat(4-l,nri+l),l=-3,1), 1.0d30, 1.0d30
+     &              (mat(4-l,nri-1+l),l=-3,1), 1.0d30, 1.0d30
       write(50+id_rank,'(i6,1p8E25.15e3)') nri,     rr(nri  ),          &
-     &              (mat(4-l,nri+l),l=-3,0), 1.0d30, 1.0d30, 1.0d30
+     &              (mat(4-l,nri  +l),l=-3,0), 1.0d30, 1.0d30, 1.0d30
 !
       end subroutine check_single_radial_7band_mat
 !

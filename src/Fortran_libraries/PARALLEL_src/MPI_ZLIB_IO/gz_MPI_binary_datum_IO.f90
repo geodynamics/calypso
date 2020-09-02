@@ -7,10 +7,10 @@
 !> @brief Output merged binary field file using MPI-IO
 !!
 !!@verbatim
-!!      subroutine open_write_gz_mpi_file_b                             &
-!!     &         (file_name, num_pe, id_rank, IO_param)
+!!      subroutine open_write_gz_mpi_file_b(file_name, IO_param)
 !!      subroutine open_read_gz_mpi_file_b                              &
 !!     &         (file_name, num_pe, id_rank, IO_param)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !!
 !!      subroutine gz_mpi_write_process_id_b(IO_param)
 !!      subroutine gz_mpi_write_one_inthead_b(IO_param, int_dat)
@@ -44,17 +44,14 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine open_write_gz_mpi_file_b                               &
-     &         (file_name, num_pe, id_rank, IO_param)
+      subroutine open_write_gz_mpi_file_b(file_name, IO_param)
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
 !
-      call open_write_mpi_file                                          &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_write_mpi_file(file_name, IO_param)
       call gz_mpi_write_byte_flag(IO_param)
 !
       end subroutine open_write_gz_mpi_file_b

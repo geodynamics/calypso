@@ -131,11 +131,9 @@
      &           ucd_param%iflag_format, my_rank, istep_ucd)
 !
       if     (ucd_param%iflag_format .eq. iflag_single) then
-        call write_ucd_field_file_mpi                                   &
-     &     (file_name, nprocs, my_rank, t_IO, ucd)
+        call write_ucd_field_file_mpi(file_name, t_IO, ucd)
       else if(ucd_param%iflag_format .eq. iflag_sgl_bin) then
-        call write_ucd_field_file_mpi_b                                 &
-     &     (file_name, nprocs, my_rank, t_IO, ucd)
+        call write_ucd_field_file_mpi_b(file_name, t_IO, ucd)
 !
       else if(ucd_param%iflag_format .eq. iflag_sgl_vtk) then
         call write_vtk_file_mpi(file_name, ucd)
@@ -155,11 +153,9 @@
 !
 #ifdef ZLIB_IO
       else if(ucd_param%iflag_format .eq. iflag_sgl_gz) then
-        call gz_write_ucd_field_file_mpi                                &
-     &     (file_name, nprocs, my_rank, t_IO, ucd)
+        call gz_write_ucd_field_file_mpi(file_name, t_IO, ucd)
       else if(ucd_param%iflag_format .eq. iflag_sgl_bin_gz) then
-        call gz_write_ucd_field_file_mpi_b                              &
-     &     (file_name, nprocs, my_rank, t_IO, ucd)
+        call gz_write_ucd_field_file_mpi_b(file_name, t_IO, ucd)
 !
       else if(ucd_param%iflag_format .eq. iflag_ucd_bin_gz              &
      &   .or. ucd_param%iflag_format .eq. iflag_sgl_ucd_bin_gz) then

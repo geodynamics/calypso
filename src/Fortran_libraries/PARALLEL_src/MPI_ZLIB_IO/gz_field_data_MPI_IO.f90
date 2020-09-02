@@ -207,7 +207,7 @@
       call gz_read_fld_charhead_mpi                                     &
      &   (id_fld, ioff_gl, len(textbuf_p), textbuf_p)
 
-      if(my_rank .eq. 0) call read_bufer_istack_nod_buffer              &
+      if(my_rank .eq. 0) call read_buffer_istack_nod_buffer             &
      &                      (textbuf_p, num_pe, istack_buf)
 !
       call calypso_mpi_bcast_int8(istack_buf, cast_long(num_pe+1), 0)
@@ -232,24 +232,25 @@
 !
       subroutine gz_skip_each_field_mpi(id_fld, num_pe, ioff_gl)
 !
+      use calypso_mpi_int8
       use field_data_IO
+      use transfer_to_long_integers
 !
       integer, intent(in) ::  id_fld
       integer(kind = kint_gl), intent(inout) :: ioff_gl
       integer, intent(in) :: num_pe
 !
-      integer :: ilength
-      character(num_pe*16+1) :: textbuf_c
+      character(len=num_pe*16+1) :: textbuf_p
 !
       integer(kind = kint_gl) :: istack_buf(0:num_pe)
 !
 !
-      ilength = len(buffer_istack_nod_buffer(num_pe,istack_buf))
-!
       call gz_read_fld_charhead_mpi                                     &
-     &   (id_fld, ioff_gl, ilength, textbuf_c)
-      call read_bufer_istack_nod_buffer                                 &
-     &   (textbuf_c, num_pe, istack_buf)
+     &   (id_fld, ioff_gl, len(textbuf_p), textbuf_p)
+!
+      if(my_rank .eq. 0) call read_buffer_istack_nod_buffer             &
+     &                      (textbuf_p, num_pe, istack_buf)
+      call calypso_mpi_bcast_int8(istack_buf, cast_long(num_pe+1), 0)
 !
       ioff_gl = ioff_gl + istack_buf(num_pe)
 !

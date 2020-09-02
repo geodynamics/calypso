@@ -235,7 +235,7 @@
 !
 !       save mesh information
       call sel_mpi_write_mesh_file                                      &
-     &   (nprocs, my_rank, mesh_file, fem_IO_m%mesh, fem_IO_m%group)
+     &   (mesh_file, fem_IO_m%mesh, fem_IO_m%group)
 !
       call dealloc_mesh_geometry_base(fem_IO_m%mesh)
       call dealloc_groups_data(fem_IO_m%group)

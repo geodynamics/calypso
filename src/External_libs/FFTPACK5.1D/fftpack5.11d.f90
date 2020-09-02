@@ -7783,73 +7783,85 @@ subroutine mcsqb1 (lot,jump,n,inc,x,wsave,work,ier)
 !
 !  Parameters:
 !
-  implicit none
+      implicit none
 
-  integer ( kind = 4 ) ido
-  integer ( kind = 4 ) in1
-  integer ( kind = 4 ) in2
-  integer ( kind = 4 ) l1
+      integer ( kind = 4 ) ido
+      integer ( kind = 4 ) in1
+      integer ( kind = 4 ) in2
+      integer ( kind = 4 ) l1
 
-  real ( kind = 8 ) cc(in1,ido,2,l1)
-  real ( kind = 8 ) ch(in2,ido,l1,2)
-  integer ( kind = 4 ) i
-  integer ( kind = 4 ) ic
-  integer ( kind = 4 ) idp2
-  integer ( kind = 4 ) im1
-  integer ( kind = 4 ) im2
-  integer ( kind = 4 ) k
-  integer ( kind = 4 ) m
-  integer ( kind = 4 ) m1
-  integer ( kind = 4 ) m1d
-  integer ( kind = 4 ) m2
-  integer ( kind = 4 ) m2s
-  real ( kind = 8 ) wa1(ido)
+      real ( kind = 8 ) cc(in1,ido,2,l1)
+      real ( kind = 8 ) ch(in2,ido,l1,2)
+      integer ( kind = 4 ) i
+      integer ( kind = 4 ) ic
+      integer ( kind = 4 ) idp2
+      integer ( kind = 4 ) im1
+      integer ( kind = 4 ) im2
+      integer ( kind = 4 ) k
+      integer ( kind = 4 ) m
+      integer ( kind = 4 ) m1
+      integer ( kind = 4 ) m1d
+      integer ( kind = 4 ) m2
+      integer ( kind = 4 ) m2s
+      real ( kind = 8 ) wa1(ido)
 
-  m1d = (m-1)*im1+1
-  m2s = 1-im2
+      m1d = (m-1)*im1+1
+      m2s = 1-im2
 
-  do k=1,l1
-    m2 = m2s
-    do m1=1,m1d,im1
-      m2 = m2+im2
-      ch(m2,1,k,1) = cc(m1,1,1,k)+cc(m1,ido,2,k)
-      ch(m2,1,k,2) = cc(m1,1,1,k)-cc(m1,ido,2,k)
-    end do
-  end do
+      do k=1,l1
+        m2 = m2s
+        do m1=1,m1d,im1
+          m2 = m2+im2
+          ch(m2,1,k,1) = cc(m1,1,1,k)+cc(m1,ido,2,k)
+          ch(m2,1,k,2) = cc(m1,1,1,k)-cc(m1,ido,2,k)
+        end do
+      end do
 
-      if (ido-2) 107,105,102
-  102 idp2 = ido+2
+!      if (ido-2) 107,105,102
+      if(ido .lt. 2) then
+        return
+      else if(ido .eq. 2) then
+        go to 105
+      end if  
+ ! 102 continue
+ !
+      idp2 = ido+2
       do 104 k=1,l1
-         do 103 i=3,ido,2
-            ic = idp2-i
-               m2 = m2s
-               do 1002 m1=1,m1d,im1
-               m2 = m2+im2
-        ch(m2,i-1,k,1) = cc(m1,i-1,1,k)+cc(m1,ic-1,2,k)
-        ch(m2,i,k,1) = cc(m1,i,1,k)-cc(m1,ic,2,k)
-        ch(m2,i-1,k,2) = wa1(i-2)*(cc(m1,i-1,1,k)-cc(m1,ic-1,2,k)) &
-        -wa1(i-1)*(cc(m1,i,1,k)+cc(m1,ic,2,k))
+        do 103 i=3,ido,2
+          ic = idp2-i
+          m2 = m2s
+          do 1002 m1=1,m1d,im1
+            m2 = m2+im2
+            ch(m2,i-1,k,1) = cc(m1,i-1,1,k)+cc(m1,ic-1,2,k)
+            ch(m2,i,k,1) = cc(m1,i,1,k)-cc(m1,ic,2,k)
+            ch(m2,i-1,k,2) = wa1(i-2)*(cc(m1,i-1,1,k)-cc(m1,ic-1,2,k))  &
+     &                      -wa1(i-1)*(cc(m1,i,1,k)+cc(m1,ic,2,k))
 
-        ch(m2,i,k,2) = wa1(i-2)*(cc(m1,i,1,k)+cc(m1,ic,2,k))+wa1(i-1) &
-        *(cc(m1,i-1,1,k)-cc(m1,ic-1,2,k))
+            ch(m2,i,k,2) = wa1(i-2)*(cc(m1,i,1,k)+cc(m1,ic,2,k))        &
+     &                    +wa1(i-1)*(cc(m1,i-1,1,k)-cc(m1,ic-1,2,k))
 
- 1002          continue
-  103    continue
+ 1002     continue
+  103   continue
   104 continue
       if (mod(ido,2) == 1) return
-  105 do 106 k=1,l1
-          m2 = m2s
-          do 1003 m1=1,m1d,im1
+!
+  105 continue
+      do 106 k=1,l1
+        m2 = m2s
+        do 1003 m1=1,m1d,im1
           m2 = m2+im2
-         ch(m2,ido,k,1) = cc(m1,ido,1,k)+cc(m1,ido,1,k)
-         ch(m2,ido,k,2) = -(cc(m1,1,2,k)+cc(m1,1,2,k))
- 1003     continue
+          ch(m2,ido,k,1) = cc(m1,ido,1,k)+cc(m1,ido,1,k)
+          ch(m2,ido,k,2) = -(cc(m1,1,2,k)+cc(m1,1,2,k))
+ 1003   continue
   106 continue
-  107 continue
+!  107 continue
 
-  return
-end
-subroutine mradb3 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1,wa2)
+      return
+      end
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine mradb3 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1,wa2)
 
 !*****************************************************************************80
 !
@@ -8054,8 +8066,17 @@ subroutine mradb4 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1,wa2,wa3)
          -(cc(m1,1,3,k)+cc(m1,1,3,k))
         end do
   101 continue
-      if (ido-2) 107,105,102
-  102 idp2 = ido+2
+!
+!      if (ido-2) 107,105,102
+      if(ido .lt. 2) then
+        return
+      else if(ido .eq. 2) then
+        go to 105
+!      else
+!  102 continue
+      end if
+!
+      idp2 = ido+2
       do 104 k=1,l1
          do 103 i=3,ido,2
             ic = idp2-i
@@ -8089,26 +8110,30 @@ subroutine mradb4 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1,wa2,wa3)
   103    continue
   104 continue
       if (mod(ido,2) == 1) return
+!
   105 continue
       do 106 k=1,l1
-               m2 = m2s
-               do 1003 m1=1,m1d,im1
-               m2 = m2+im2
-         ch(m2,ido,k,1) = (cc(m1,ido,1,k)+cc(m1,ido,3,k)) &
-         +(cc(m1,ido,1,k)+cc(m1,ido,3,k))
-         ch(m2,ido,k,2) = sqrt2*((cc(m1,ido,1,k)-cc(m1,ido,3,k)) &
-         -(cc(m1,1,2,k)+cc(m1,1,4,k)))
-         ch(m2,ido,k,3) = (cc(m1,1,4,k)-cc(m1,1,2,k)) &
-         +(cc(m1,1,4,k)-cc(m1,1,2,k))
-         ch(m2,ido,k,4) = -sqrt2*((cc(m1,ido,1,k)-cc(m1,ido,3,k)) &
-         +(cc(m1,1,2,k)+cc(m1,1,4,k)))
- 1003          continue
+        m2 = m2s
+        do 1003 m1=1,m1d,im1
+          m2 = m2+im2
+          ch(m2,ido,k,1) = (cc(m1,ido,1,k)+cc(m1,ido,3,k))              &
+     &                    +(cc(m1,ido,1,k)+cc(m1,ido,3,k))
+          ch(m2,ido,k,2) = sqrt2*((cc(m1,ido,1,k)-cc(m1,ido,3,k))       &
+     &                    -(cc(m1,1,2,k)+cc(m1,1,4,k)))
+          ch(m2,ido,k,3) = (cc(m1,1,4,k)-cc(m1,1,2,k))                  &
+     &                    +(cc(m1,1,4,k)-cc(m1,1,2,k))
+          ch(m2,ido,k,4) = -sqrt2*((cc(m1,ido,1,k)-cc(m1,ido,3,k))      &
+     &                    +(cc(m1,1,2,k)+cc(m1,1,4,k)))
+ 1003   continue
   106 continue
-  107 continue
-
-  return
-end
-subroutine mradb5 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1,wa2,wa3,wa4)
+!  107 continue
+!
+      return
+      end
+!
+! ------------------------------------------------------------------
+!
+      subroutine mradb5 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1,wa2,wa3,wa4)
 
 !*****************************************************************************80
 !
@@ -8143,157 +8168,176 @@ subroutine mradb5 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1,wa2,wa3,wa4)
 !
 !  Parameters:
 !
-  implicit none
+      implicit none
 
-  integer ( kind = 4 ) ido
-  integer ( kind = 4 ) in1
-  integer ( kind = 4 ) in2
-  integer ( kind = 4 ) l1
+      integer ( kind = 4 ) ido
+      integer ( kind = 4 ) in1
+      integer ( kind = 4 ) in2
+      integer ( kind = 4 ) l1
 
-  real ( kind = 8 ) arg
-  real ( kind = 8 ) cc(in1,ido,5,l1)
-  real ( kind = 8 ) ch(in2,ido,l1,5)
-  integer ( kind = 4 ) i
-  integer ( kind = 4 ) ic
-  integer ( kind = 4 ) idp2
-  integer ( kind = 4 ) im1
-  integer ( kind = 4 ) im2
-  integer ( kind = 4 ) k
-  integer ( kind = 4 ) m
-  integer ( kind = 4 ) m1
-  integer ( kind = 4 ) m1d
-  integer ( kind = 4 ) m2
-  integer ( kind = 4 ) m2s
-  real ( kind = 8 ) ti11
-  real ( kind = 8 ) ti12
-  real ( kind = 8 ) tr11
-  real ( kind = 8 ) tr12
-  real ( kind = 8 ) wa1(ido)
-  real ( kind = 8 ) wa2(ido)
-  real ( kind = 8 ) wa3(ido)
-  real ( kind = 8 ) wa4(ido)
+      real ( kind = 8 ) arg
+      real ( kind = 8 ) cc(in1,ido,5,l1)
+      real ( kind = 8 ) ch(in2,ido,l1,5)
+      integer ( kind = 4 ) i
+      integer ( kind = 4 ) ic
+      integer ( kind = 4 ) idp2
+      integer ( kind = 4 ) im1
+      integer ( kind = 4 ) im2
+      integer ( kind = 4 ) k
+      integer ( kind = 4 ) m
+      integer ( kind = 4 ) m1
+      integer ( kind = 4 ) m1d
+      integer ( kind = 4 ) m2
+      integer ( kind = 4 ) m2s
+      real ( kind = 8 ) ti11
+      real ( kind = 8 ) ti12
+      real ( kind = 8 ) tr11
+      real ( kind = 8 ) tr12
+      real ( kind = 8 ) wa1(ido)
+      real ( kind = 8 ) wa2(ido)
+      real ( kind = 8 ) wa3(ido)
+      real ( kind = 8 ) wa4(ido)
 
-  m1d = (m-1)*im1+1
-  m2s = 1-im2
-  arg= 2.0D+00 * 4.0D+00 * atan ( 1.0D+00 ) / 5.0D+00 
-  tr11=cos(arg)
-  ti11=sin(arg)
-  tr12=cos( 2.0D+00 *arg)
-  ti12=sin( 2.0D+00 *arg)
+      m1d = (m-1)*im1+1
+      m2s = 1-im2
+      arg= 2.0D+00 * 4.0D+00 * atan ( 1.0D+00 ) / 5.0D+00 
+      tr11=cos(arg)
+      ti11=sin(arg)
+      tr12=cos( 2.0D+00 *arg)
+      ti12=sin( 2.0D+00 *arg)
 
       do 101 k=1,l1
-      m2 = m2s
-      do 1001 m1=1,m1d,im1
-         m2 = m2+im2
-         ch(m2,1,k,1) = cc(m1,1,1,k)+ 2.0D+00 *cc(m1,ido,2,k)+ 2.0D+00 *cc(m1,ido,4,k)
-         ch(m2,1,k,2) = (cc(m1,1,1,k)+tr11* 2.0D+00 *cc(m1,ido,2,k) &
-         +tr12* 2.0D+00 *cc(m1,ido,4,k))-(ti11* 2.0D+00 *cc(m1,1,3,k) &
-         +ti12* 2.0D+00 *cc(m1,1,5,k))
-         ch(m2,1,k,3) = (cc(m1,1,1,k)+tr12* 2.0D+00 *cc(m1,ido,2,k) &
-         +tr11* 2.0D+00 *cc(m1,ido,4,k))-(ti12* 2.0D+00 *cc(m1,1,3,k) &
-         -ti11* 2.0D+00 *cc(m1,1,5,k))
-         ch(m2,1,k,4) = (cc(m1,1,1,k)+tr12* 2.0D+00 *cc(m1,ido,2,k) &
-         +tr11* 2.0D+00 *cc(m1,ido,4,k))+(ti12* 2.0D+00 *cc(m1,1,3,k) &
-         -ti11* 2.0D+00 *cc(m1,1,5,k))
-         ch(m2,1,k,5) = (cc(m1,1,1,k)+tr11* 2.0D+00 *cc(m1,ido,2,k) &
-         +tr12* 2.0D+00 *cc(m1,ido,4,k))+(ti11* 2.0D+00 *cc(m1,1,3,k) &
-         +ti12* 2.0D+00 *cc(m1,1,5,k))
+        m2 = m2s
+        do 1001 m1=1,m1d,im1
+          m2 = m2+im2
+          ch(m2,1,k,1) =  cc(m1,1,1,k)+ 2.0D+00 *cc(m1,ido,2,k)         &
+     &     + 2.0D+00 *cc(m1,ido,4,k)
+          ch(m2,1,k,2) = (cc(m1,1,1,k)+tr11* 2.0D+00 *cc(m1,ido,2,k)    &
+     &     +tr12* 2.0D+00 *cc(m1,ido,4,k))-(ti11* 2.0D+00 *cc(m1,1,3,k) &
+     &     +ti12* 2.0D+00 *cc(m1,1,5,k))
+          ch(m2,1,k,3) = (cc(m1,1,1,k)+tr12* 2.0D+00 *cc(m1,ido,2,k)    &
+     &     +tr11* 2.0D+00 *cc(m1,ido,4,k))-(ti12* 2.0D+00 *cc(m1,1,3,k) &
+     &     -ti11* 2.0D+00 *cc(m1,1,5,k))
+          ch(m2,1,k,4) = (cc(m1,1,1,k)+tr12* 2.0D+00 *cc(m1,ido,2,k)    &
+     &     +tr11* 2.0D+00 *cc(m1,ido,4,k))+(ti12* 2.0D+00 *cc(m1,1,3,k) &
+     &     -ti11* 2.0D+00 *cc(m1,1,5,k))
+          ch(m2,1,k,5) = (cc(m1,1,1,k)+tr11* 2.0D+00 *cc(m1,ido,2,k)    &
+     &     +tr12* 2.0D+00 *cc(m1,ido,4,k))+(ti11* 2.0D+00 *cc(m1,1,3,k) &
+     &     +ti12* 2.0D+00 *cc(m1,1,5,k))
  1001          continue
   101 continue
 
       if (ido == 1) return
       idp2 = ido+2
       do 103 k=1,l1
-         do 102 i=3,ido,2
-            ic = idp2-i
-            m2 = m2s
-      do 1002 m1=1,m1d,im1
-        m2 = m2+im2
-        ch(m2,i-1,k,1) = cc(m1,i-1,1,k)+(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k)) &
-        +(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k))
-        ch(m2,i,k,1) = cc(m1,i,1,k)+(cc(m1,i,3,k)-cc(m1,ic,2,k)) &
-        +(cc(m1,i,5,k)-cc(m1,ic,4,k))
-        ch(m2,i-1,k,2) = wa1(i-2)*((cc(m1,i-1,1,k)+tr11* &
-       (cc(m1,i-1,3,k)+cc(m1,ic-1,2,k))+tr12 &
-        *(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))-(ti11*(cc(m1,i,3,k) &
-        +cc(m1,ic,2,k))+ti12*(cc(m1,i,5,k)+cc(m1,ic,4,k)))) &
-        -wa1(i-1)*((cc(m1,i,1,k)+tr11*(cc(m1,i,3,k)-cc(m1,ic,2,k)) &
-        +tr12*(cc(m1,i,5,k)-cc(m1,ic,4,k)))+(ti11*(cc(m1,i-1,3,k) &
-        -cc(m1,ic-1,2,k))+ti12*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k)))) 
+        do 102 i=3,ido,2
+          ic = idp2-i
+          m2 = m2s
+          do 1002 m1=1,m1d,im1
+            m2 = m2+im2
+            ch(m2,i-1,k,1) = cc(m1,i-1,1,k)                             &
+     &                       +(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k))          &
+     &                       +(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k))
+            ch(m2,i,k,1) = cc(m1,i,1,k)+(cc(m1,i,3,k)-cc(m1,ic,2,k))    &
+     &                     +(cc(m1,i,5,k)-cc(m1,ic,4,k))
+            ch(m2,i-1,k,2) = wa1(i-2)*((cc(m1,i-1,1,k)                  &
+     &                        +tr11*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k))    &
+     &                        +tr12*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))   &
+     &                       -(ti11*(cc(m1,i,3,k)+cc(m1,ic,2,k))        &
+     &                        +ti12*(cc(m1,i,5,k)+cc(m1,ic,4,k))))      &
+     &                       -wa1(i-1)*((cc(m1,i,1,k)                   &
+     &                        +tr11*(cc(m1,i,3,k)-cc(m1,ic,2,k))        &
+     &                        +tr12*(cc(m1,i,5,k)-cc(m1,ic,4,k)))       &
+     &                      +(ti11*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))     &
+     &                       +ti12*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k)))) 
 
-        ch(m2,i,k,2) = wa1(i-2)*((cc(m1,i,1,k)+tr11*(cc(m1,i,3,k) &
-        -cc(m1,ic,2,k))+tr12*(cc(m1,i,5,k)-cc(m1,ic,4,k))) &
-        +(ti11*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))+ti12 &
-        *(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))+wa1(i-1) &
-        *((cc(m1,i-1,1,k)+tr11*(cc(m1,i-1,3,k) &
-        +cc(m1,ic-1,2,k))+tr12*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k))) &
-        -(ti11*(cc(m1,i,3,k)+cc(m1,ic,2,k))+ti12 &
-        *(cc(m1,i,5,k)+cc(m1,ic,4,k))))
-        ch(m2,i-1,k,3) = wa2(i-2) &
-        *((cc(m1,i-1,1,k)+tr12*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k)) &
-        +tr11*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))-(ti12*(cc(m1,i,3,k) &
-        +cc(m1,ic,2,k))-ti11*(cc(m1,i,5,k)+cc(m1,ic,4,k)))) &
-       -wa2(i-1) &
-       *((cc(m1,i,1,k)+tr12*(cc(m1,i,3,k)- &
-        cc(m1,ic,2,k))+tr11*(cc(m1,i,5,k)-cc(m1,ic,4,k))) &
-        +(ti12*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))-ti11 &
-        *(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))
+            ch(m2,i,k,2) = wa1(i-2)*((cc(m1,i,1,k)                      &
+     &                      +tr11*(cc(m1,i,3,k)-cc(m1,ic,2,k))          &
+     &                      +tr12*(cc(m1,i,5,k)-cc(m1,ic,4,k)))         &
+     &                      +(ti11*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))     &
+     &                       +ti12*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))   &
+     &                     +wa1(i-1)*((cc(m1,i-1,1,k)                   &
+     &                      +tr11*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k))      &
+     &                      +tr12*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))     &
+     &                      -(ti11*(cc(m1,i,3,k)+cc(m1,ic,2,k))         &
+     &                       +ti12*(cc(m1,i,5,k)+cc(m1,ic,4,k))))
+            ch(m2,i-1,k,3) = wa2(i-2)*((cc(m1,i-1,1,k)                  &
+     &                        +tr12*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k))    &
+     &                        +tr11*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))   &
+     &                        -(ti12*(cc(m1,i,3,k)+cc(m1,ic,2,k))       &
+     &                         -ti11*(cc(m1,i,5,k)+cc(m1,ic,4,k))))     &
+     &                       -wa2(i-1)*((cc(m1,i,1,k)                   &
+     &                        +tr12*(cc(m1,i,3,k)-cc(m1,ic,2,k))        &
+     &                        +tr11*(cc(m1,i,5,k)-cc(m1,ic,4,k)))       &
+     &                        +(ti12*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))   &
+     &                         -ti11*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))
 
-        ch(m2,i,k,3) = wa2(i-2) &
-       *((cc(m1,i,1,k)+tr12*(cc(m1,i,3,k)- &
-        cc(m1,ic,2,k))+tr11*(cc(m1,i,5,k)-cc(m1,ic,4,k))) &
-        +(ti12*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))-ti11 &
-        *(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k)))) &
-        +wa2(i-1) &
-        *((cc(m1,i-1,1,k)+tr12*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k)) &
-        +tr11*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))-(ti12*(cc(m1,i,3,k) &
-        +cc(m1,ic,2,k))-ti11*(cc(m1,i,5,k)+cc(m1,ic,4,k))))
+            ch(m2,i,k,3) = wa2(i-2) *((cc(m1,i,1,k)                     &
+     &                     +tr12*(cc(m1,i,3,k)-cc(m1,ic,2,k))           &
+     &                     +tr11*(cc(m1,i,5,k)-cc(m1,ic,4,k)))          &
+     &                      +(ti12*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))     &
+     &                       -ti11*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))   &
+     &                    +wa2(i-1)*((cc(m1,i-1,1,k)                    &
+     &                     +tr12*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k))       &
+     &                     +tr11*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))      &
+     &                     -(ti12*(cc(m1,i,3,k)+cc(m1,ic,2,k))          &
+     &                      -ti11*(cc(m1,i,5,k)+cc(m1,ic,4,k))))
 
-        ch(m2,i-1,k,4) = wa3(i-2) &
-        *((cc(m1,i-1,1,k)+tr12*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k)) &
-        +tr11*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))+(ti12*(cc(m1,i,3,k) &
-        +cc(m1,ic,2,k))-ti11*(cc(m1,i,5,k)+cc(m1,ic,4,k)))) &
-        -wa3(i-1) &
-       *((cc(m1,i,1,k)+tr12*(cc(m1,i,3,k)- &
-        cc(m1,ic,2,k))+tr11*(cc(m1,i,5,k)-cc(m1,ic,4,k))) &
-        -(ti12*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))-ti11 &
-        *(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))
+            ch(m2,i-1,k,4) = wa3(i-2)*((cc(m1,i-1,1,k)                  &
+     &                       +tr12*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k))     &
+     &                       +tr11*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))    &
+     &                        +(ti12*(cc(m1,i,3,k)+cc(m1,ic,2,k))       &
+     &                         -ti11*(cc(m1,i,5,k)+cc(m1,ic,4,k))))     &
+     &                      -wa3(i-1)*((cc(m1,i,1,k)                    &
+     &                       +tr12*(cc(m1,i,3,k)-cc(m1,ic,2,k))         &
+     &                       +tr11*(cc(m1,i,5,k)-cc(m1,ic,4,k)))        &
+     &                        -(ti12*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))   &
+     &                         -ti11*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))
 
-        ch(m2,i,k,4) = wa3(i-2) &
-       *((cc(m1,i,1,k)+tr12*(cc(m1,i,3,k)- &
-        cc(m1,ic,2,k))+tr11*(cc(m1,i,5,k)-cc(m1,ic,4,k))) &
-        -(ti12*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))-ti11 &
-        *(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k)))) &
-        +wa3(i-1) &
-        *((cc(m1,i-1,1,k)+tr12*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k)) &
-        +tr11*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))+(ti12*(cc(m1,i,3,k) &
-        +cc(m1,ic,2,k))-ti11*(cc(m1,i,5,k)+cc(m1,ic,4,k))))
+            ch(m2,i,k,4) = wa3(i-2)*((cc(m1,i,1,k)                      &
+     &                     +tr12*(cc(m1,i,3,k)-cc(m1,ic,2,k))           &
+     &                     +tr11*(cc(m1,i,5,k)-cc(m1,ic,4,k)))          &
+     &                      -(ti12*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))     &
+     &                       -ti11*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))   &
+     &                    +wa3(i-1)*((cc(m1,i-1,1,k)                    &
+     &                     +tr12*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k))       &
+     &                     +tr11*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))      &
+     &                      +(ti12*(cc(m1,i,3,k)+cc(m1,ic,2,k))         &
+     &                       -ti11*(cc(m1,i,5,k)+cc(m1,ic,4,k))))
 
-        ch(m2,i-1,k,5) = wa4(i-2) &
-        *((cc(m1,i-1,1,k)+tr11*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k)) &
-        +tr12*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))+(ti11*(cc(m1,i,3,k) &
-        +cc(m1,ic,2,k))+ti12*(cc(m1,i,5,k)+cc(m1,ic,4,k)))) &
-        -wa4(i-1) &
-        *((cc(m1,i,1,k)+tr11*(cc(m1,i,3,k)-cc(m1,ic,2,k)) &
-        +tr12*(cc(m1,i,5,k)-cc(m1,ic,4,k)))-(ti11*(cc(m1,i-1,3,k) &
-        -cc(m1,ic-1,2,k))+ti12*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))
+            ch(m2,i-1,k,5) = wa4(i-2)*((cc(m1,i-1,1,k)                  &
+     &                       +tr11*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k))     &
+     &                       +tr12*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))    &
+     &                        +(ti11*(cc(m1,i,3,k)+cc(m1,ic,2,k))       &
+     &                         +ti12*(cc(m1,i,5,k)+cc(m1,ic,4,k))))     &
+     &                      -wa4(i-1)*((cc(m1,i,1,k)                    &
+     &                       +tr11*(cc(m1,i,3,k)-cc(m1,ic,2,k))         &
+     &                       +tr12*(cc(m1,i,5,k)-cc(m1,ic,4,k)))        &
+     &                        -(ti11*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))   &
+     &                         +ti12*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))
 
-        ch(m2,i,k,5) = wa4(i-2) &
-        *((cc(m1,i,1,k)+tr11*(cc(m1,i,3,k)-cc(m1,ic,2,k)) &
-        +tr12*(cc(m1,i,5,k)-cc(m1,ic,4,k)))-(ti11*(cc(m1,i-1,3,k) &
-        -cc(m1,ic-1,2,k))+ti12*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k)))) &
-        +wa4(i-1) &
-        *((cc(m1,i-1,1,k)+tr11*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k)) &
-        +tr12*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))+(ti11*(cc(m1,i,3,k) &
-        +cc(m1,ic,2,k))+ti12*(cc(m1,i,5,k)+cc(m1,ic,4,k))))
+            ch(m2,i,k,5) = wa4(i-2)*((cc(m1,i,1,k)                      &
+     &                     +tr11*(cc(m1,i,3,k)-cc(m1,ic,2,k))           &
+     &                     +tr12*(cc(m1,i,5,k)-cc(m1,ic,4,k)))          &
+     &                      -(ti11*(cc(m1,i-1,3,k)-cc(m1,ic-1,2,k))     &
+     &                       +ti12*(cc(m1,i-1,5,k)-cc(m1,ic-1,4,k))))   &
+     &                     +wa4(i-1)*((cc(m1,i-1,1,k)                   &
+     &                      +tr11*(cc(m1,i-1,3,k)+cc(m1,ic-1,2,k))      &
+     &                      +tr12*(cc(m1,i-1,5,k)+cc(m1,ic-1,4,k)))     &
+     &                       +(ti11*(cc(m1,i,3,k)+cc(m1,ic,2,k))        &
+     &                        +ti12*(cc(m1,i,5,k)+cc(m1,ic,4,k))))
 
  1002      continue
   102    continue
   103 continue
 
-  return
-end
-subroutine mradbg (m,ido,ip,l1,idl1,cc,c1,c2,im1,in1,ch,ch2,im2,in2,wa)
+      return
+      end
+!
+! ------------------------------------------------------------------
+!
+      subroutine mradbg (m,ido,ip,l1,idl1,cc,c1,c2,im1,in1,            &
+     &                   ch,ch2,im2,in2,wa)
 
 !*****************************************************************************80
 !
@@ -8671,8 +8715,15 @@ subroutine mradf2 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1)
          end do
   101 continue
 
-      if (ido-2) 107,105,102
-  102 idp2 = ido+2
+!      if (ido-2) 107,105,102
+      if(ido .lt. 2) then
+        return
+      else if(ido .eq. 2) then
+        go to 105
+      end if  
+!  102 continue
+!
+      idp2 = ido+2
       do 104 k=1,l1
          do 103 i=3,ido,2
             ic = idp2-i
@@ -8691,7 +8742,9 @@ subroutine mradf2 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1)
   103    continue
   104 continue
       if (mod(ido,2) == 1) return
-  105 do 106 k=1,l1
+!
+  105 continue
+  do 106 k=1,l1
          m2 = m2s
          do 1006 m1=1,m1d,im1
          m2 = m2+im2
@@ -8699,7 +8752,7 @@ subroutine mradf2 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1)
          ch(m2,ido,1,k) = cc(m1,ido,k,1)
  1006    continue
   106 continue
-  107 continue
+!  107 continue
 
   return
 end
@@ -8905,8 +8958,15 @@ subroutine mradf4 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1,wa2,wa3)
  1001    continue
   101 continue
 
-      if (ido-2) 107,105,102
-  102 idp2 = ido+2
+!      if (ido-2) 107,105,102
+      if(ido .lt. 2) then
+        return
+      else if(ido .eq. 2) then
+        go to 105
+      end if
+  
+!  102 continue
+      idp2 = ido+2
       do 104 k=1,l1
          do 103 i=3,ido,2
             ic = idp2-i
@@ -8957,6 +9017,7 @@ subroutine mradf4 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1,wa2,wa3)
   103    continue
   104 continue
       if (mod(ido,2) == 1) return
+!
   105 continue
       do 106 k=1,l1
          m2 = m2s
@@ -8972,7 +9033,7 @@ subroutine mradf4 (m,ido,l1,cc,im1,in1,ch,im2,in2,wa1,wa2,wa3)
              cc(m1,ido,k,3)
  1006    continue
   106 continue
-  107 continue
+!  107 continue
 
   return
 end
@@ -9579,22 +9640,25 @@ subroutine mrftb1 (m,im,n,in,c,ch,wa,fac)
       ch(i,1) = c(m2,1)
       ch(i,n) = c(m2,n)
   117 continue
-      do 118 j=2,nl,2
-      m2 = 1-im
-      do 118 i=1,m
-         m2 = m2+im
-	 ch(i,j) = half*c(m2,j)
-	 ch(i,j+1) = halfm*c(m2,j+1)
-  118 continue
+      do j=2,nl,2
+        m2 = 1-im
+        do i=1,m
+          m2 = m2+im
+          ch(i,j) = half*c(m2,j)
+          ch(i,j+1) = halfm*c(m2,j+1)
+        end do
+      end do
       go to 124
   120 continue
-      do 122 j=2,nl,2
-      m2 = 1-im
-      do 122 i=1,m
-         m2 = m2+im
-	 c(m2,j) = half*c(m2,j)
-	 c(m2,j+1) = halfm*c(m2,j+1)
-  122 continue
+!
+      do j=2,nl,2
+        m2 = 1-im
+        do i=1,m
+          m2 = m2+im
+          c(m2,j) = half*c(m2,j)
+          c(m2,j+1) = halfm*c(m2,j+1)
+        end do
+      end do
   124 l1 = 1
       iw = 1
       do 116 k1=1,nf
@@ -9803,23 +9867,28 @@ subroutine mrftf1 (m,im,n,in,c,ch,wa,fac)
          m2 = m2+im
          c(m2,1) = sn*c(m2,1)
   121 continue
-      do 122 j=2,nl,2
-      m2 = 1-im
-      do 122 i=1,m
-         m2 = m2+im
-	 c(m2,j) = tsn*c(m2,j)
-	 c(m2,j+1) = tsnm*c(m2,j+1)
-  122 continue
+      do j=2,nl,2
+        m2 = 1-im
+        do i=1,m
+          m2 = m2+im
+          c(m2,j) = tsn*c(m2,j)
+          c(m2,j+1) = tsnm*c(m2,j+1)
+        end do
+      end do
+!
       if(modn /= 0) return
       m2 = 1-im
       do i=1,m
          m2 = m2+im
          c(m2,n) = sn*c(m2,n)
       end do
-
-  return
-end
-subroutine mrfti1 (n,wa,fac)
+!
+      return
+      end
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine mrfti1 (n,wa,fac)
 
 !*****************************************************************************80
 !
@@ -9897,19 +9966,29 @@ subroutine mrfti1 (n,wa,fac)
 
   data ntryh / 4, 2, 3, 5 /
 
-  nl = n
-  nf = 0
-  j = 0
-
-  101 j = j+1
-      if (j-4) 102,102,103
-  102 ntry = ntryh(j)
-      go to 104
-  103 ntry = ntry+2
-  104 nq = nl/ntry
-      nr = nl-ntry*nq
-      if (nr) 101,105,101
-  105 nf = nf+1
+      nl = n
+      nf = 0
+      j = 0
+!
+  101 continue
+        j = j+1
+!        if (j-4) 102,102,103
+        if(j .le. 4) then
+!  102     continue
+          ntry = ntryh(j)
+        else
+!  103     continue
+          ntry = ntry+2
+        end if  
+!        go to 104
+  104   continue
+        nq = nl/ntry
+        nr = nl-ntry*nq
+        if(nr .ne. 0) go to 101
+!        if (nr) 101,105,101
+!
+!  105 continue
+      nf = nf+1
       fac(nf+2) = ntry
       nl = nq
       if (ntry /= 2) go to 107
@@ -9918,7 +9997,9 @@ subroutine mrfti1 (n,wa,fac)
          fac(ib+2) = fac(ib+1)
       end do
       fac(3) = 2
-  107 if (nl /= 1) go to 104
+  107 continue
+      if(nl .ne. 1) go to 104
+!
       fac(1) = n
       fac(2) = nf
       tpi = 8.0D+00 * atan ( 1.0D+00 )
@@ -10022,29 +10103,35 @@ subroutine msntb1(lot,jump,n,inc,x,wsave,dsum,xh,work,ier)
   ier = 0
   lj = (lot-1)*jump+1
 
-      if (n-2) 200,102,103
- 102  srt3s2 = sqrt( 3.0D+00 )/ 2.0D+00 
+!      if (n-2) 200,102,103
+      if(n .lt. 2) then
+        return
+      else if(n .eq. 2) then
+!  102    continue
+        srt3s2 = sqrt( 3.0D+00 )/ 2.0D+00 
 
-      do m=1,lj,jump
-         xhold = srt3s2*(x(m,1)+x(m,2))
-         x(m,2) = srt3s2*(x(m,1)-x(m,2))
-         x(m,1) = xhold
-      end do
-
-      go to 200
-  103 np1 = n+1
-      ns2 = n/2
-      do 104 k=1,ns2
-         kc = np1-k
-         m1 = 0
-         do 114 m=1,lj,jump
-         m1 = m1+1
-         t1 = x(m,k)-x(m,kc)
-         t2 = wsave(k)*(x(m,k)+x(m,kc))
-         xh(m1,k+1) = t1+t2
-         xh(m1,kc+1) = t2-t1
-  114    continue
-  104 continue
+        do m=1,lj,jump
+           xhold = srt3s2*(x(m,1)+x(m,2))
+           x(m,2) = srt3s2*(x(m,1)-x(m,2))
+           x(m,1) = xhold
+        end do
+        return
+!      else
+      end if
+!  103    continue
+        np1 = n+1
+        ns2 = n/2
+        do k=1,ns2
+          kc = np1-k
+          m1 = 0
+          do m=1,lj,jump
+            m1 = m1+1
+            t1 = x(m,k)-x(m,kc)
+            t2 = wsave(k)*(x(m,k)+x(m,kc))
+            xh(m1,k+1) = t1+t2
+            xh(m1,kc+1) = t2-t1
+          end do  
+        end do  
       modn = mod(n,2)
       if (modn == 0) go to 124
       m1 = 0
@@ -10062,10 +10149,10 @@ subroutine msntb1(lot,jump,n,inc,x,wsave,dsum,xh,work,ier)
 
       call rfftmf(lot,1,np1,lot,xh,lnxh,wsave(ns2+1),lnsv,work,lnwk,ier1)     
 
-      if (ier1 /= 0) then
+      if(ier1 .ne. 0) then
         ier = 20
         call xerfft ('msntb1',-5)
-        go to 200
+        return
       end if
 
       if(mod(np1,2) /= 0) go to 30
@@ -10088,18 +10175,19 @@ subroutine msntb1(lot,jump,n,inc,x,wsave,dsum,xh,work,ier)
             x(m,i) = dsum(m1)
   115    continue
   105 continue
-      if (modn /= 0) go to 200
+      if (modn .ne. 0) return
       m1 = 0
-      do 116 m=1,lj,jump
+      do m=1,lj,jump
          m1 = m1+1
          x(m,n) = fnp1s4*xh(m1,n+1)
-  116 continue
+      end do
 
-  200 continue
-
-  return
-end
-subroutine msntf1(lot,jump,n,inc,x,wsave,dsum,xh,work,ier)
+      return
+      end
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine msntf1(lot,jump,n,inc,x,wsave,dsum,xh,work,ier)
 
 !*****************************************************************************80
 !
@@ -10169,28 +10257,35 @@ subroutine msntf1(lot,jump,n,inc,x,wsave,dsum,xh,work,ier)
   ier = 0
   lj = (lot-1)*jump+1
 
-      if (n-2) 101,102,103
- 102  ssqrt3 = 1.0D+00 / sqrt ( 3.0D+00 )
+!      if (n-2) 101,102,103
+      if(n .lt. 2) then
+        return
+      else if(n .eq. 2) then
+! 102    continue
+        ssqrt3 = 1.0D+00 / sqrt ( 3.0D+00 )
 
-      do m=1,lj,jump
-         xhold = ssqrt3*(x(m,1)+x(m,2))
-         x(m,2) = ssqrt3*(x(m,1)-x(m,2))
-         x(m,1) = xhold
-      end do
-
-  101  go to 200
-  103 np1 = n+1
+        do m=1,lj,jump
+          xhold = ssqrt3*(x(m,1)+x(m,2))
+          x(m,2) = ssqrt3*(x(m,1)-x(m,2))
+          x(m,1) = xhold
+        end do
+        return
+!      else
+      end if
+!  101  go to 200
+  103 continue
+      np1 = n+1
       ns2 = n/2
       do 104 k=1,ns2
-         kc = np1-k
-         m1 = 0
-         do 114 m=1,lj,jump
-         m1 = m1 + 1
-         t1 = x(m,k)-x(m,kc)
-         t2 = wsave(k)*(x(m,k)+x(m,kc))
-         xh(m1,k+1) = t1+t2
-         xh(m1,kc+1) = t2-t1
-  114    continue
+        kc = np1-k
+        m1 = 0
+        do 114 m=1,lj,jump
+          m1 = m1 + 1
+          t1 = x(m,k)-x(m,kc)
+          t2 = wsave(k)*(x(m,k)+x(m,kc))
+          xh(m1,k+1) = t1+t2
+          xh(m1,kc+1) = t2-t1
+  114   continue
   104 continue
       modn = mod(n,2)
       if (modn == 0) go to 124
@@ -10243,10 +10338,13 @@ subroutine msntf1(lot,jump,n,inc,x,wsave,dsum,xh,work,ier)
 
   200 continue
 
-  return
-end
-subroutine r1f2kb (ido,l1,cc,in1,ch,in2,wa1)
-
+      return
+      end
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine r1f2kb (ido,l1,cc,in1,ch,in2,wa1)
+!
 !*****************************************************************************80
 !
 !! R1F2KB is an FFTPACK5.1 auxilliary function.
@@ -10300,8 +10398,15 @@ subroutine r1f2kb (ido,l1,cc,in1,ch,in2,wa1)
     ch(1,1,k,2) = cc(1,1,1,k)-cc(1,ido,2,k)
   end do
 
-      if (ido-2) 107,105,102
- 102  idp2 = ido+2
+!      if (ido-2) 107,105,102
+      if(ido .lt. 2) then
+        return
+      else if(ido .eq. 2) then
+        go to 105
+      end if  
+!
+ 102  continue
+      idp2 = ido+2
       do 104 k=1,l1
          do 103 i=3,ido,2
             ic = idp2-i
@@ -10317,11 +10422,12 @@ subroutine r1f2kb (ido,l1,cc,in1,ch,in2,wa1)
  103     continue
  104  continue
       if (mod(ido,2) == 1) return
- 105  do 106 k=1,l1
+ 105  continue
+      do 106 k=1,l1
          ch(1,ido,k,1) = cc(1,ido,1,k)+cc(1,ido,1,k)
          ch(1,ido,k,2) = -(cc(1,1,2,k)+cc(1,1,2,k))
  106  continue
- 107  continue
+! 107  continue
 
   return
 end
@@ -10380,8 +10486,15 @@ subroutine r1f2kf (ido,l1,cc,in1,ch,in2,wa1)
     ch(1,ido,2,k) = cc(1,1,k,1)-cc(1,1,k,2)
   end do
 
-      if (ido-2) 107,105,102
-  102 idp2 = ido+2
+!      if (ido-2) 107,105,102
+      if(ido .lt. 2) then
+        return
+      else if(ido .eq. 2) then
+        go to 105
+      end if  
+!
+  102 continue
+      idp2 = ido+2
       do 104 k=1,l1
          do i=3,ido,2
             ic = idp2-i
@@ -10396,11 +10509,12 @@ subroutine r1f2kf (ido,l1,cc,in1,ch,in2,wa1)
           end do
   104 continue
       if (mod(ido,2) == 1) return
-  105 do 106 k=1,l1
+  105 continue
+      do 106 k=1,l1
          ch(1,1,2,k) = -cc(1,ido,k,2)
          ch(1,ido,1,k) = cc(1,ido,k,1)
   106 continue
-  107 continue
+!  107 continue
 
   return
 end
@@ -10690,9 +10804,14 @@ subroutine r1f4kb (ido,l1,cc,in1,ch,in2,wa1,wa2,wa3)
       -(cc(1,1,3,k)+cc(1,1,3,k))
   end do
 
-      if (ido-2) 107,105,102
-
-  102 idp2 = ido+2
+!      if (ido-2) 107,105,102
+      if(ido .lt. 2) then
+        return
+      else if(ido .eq. 2) then
+        go to 105
+      end if  
+!  102 continue
+      idp2 = ido+2
       do 104 k=1,l1
          do 103 i=3,ido,2
             ic = idp2-i
@@ -10733,7 +10852,7 @@ subroutine r1f4kb (ido,l1,cc,in1,ch,in2,wa1,wa2,wa3)
          ch(1,ido,k,4) = -sqrt2*((cc(1,ido,1,k)-cc(1,ido,3,k)) &
          +(cc(1,1,2,k)+cc(1,1,4,k)))
   106 continue
-  107 continue
+!  107 continue
 
   return
 end
@@ -10799,8 +10918,15 @@ subroutine r1f4kf (ido,l1,cc,in1,ch,in2,wa1,wa2,wa3)
     ch(1,1,3,k) = cc(1,1,k,4)-cc(1,1,k,2)
   end do
 
-      if (ido-2) 107,105,102
-  102 idp2 = ido+2
+!      if (ido-2) 107,105,102
+      if(ido .lt. 2) then
+        return
+      else if(ido .eq. 2) then
+        go to 105
+      end if  
+!  102 continue
+!
+      idp2 = ido+2
       do 104 k=1,l1
          do 103 i=3,ido,2
             ic = idp2-i
@@ -10846,7 +10972,7 @@ subroutine r1f4kf (ido,l1,cc,in1,ch,in2,wa1,wa2,wa3)
             ch(1,1,2,k) = (-hsqt2*(cc(1,ido,k,2)+cc(1,ido,k,4)))-cc(1,ido,k,3)
             ch(1,1,4,k) = (-hsqt2*(cc(1,ido,k,2)+cc(1,ido,k,4)))+cc(1,ido,k,3)
   106 continue
-  107 continue
+!  107 continue
 
   return
 end
@@ -13445,15 +13571,26 @@ subroutine rffti1 ( n, wa, fac )
       nl = n
       nf = 0
       j = 0
-  101 j = j+1
-      if (j-4) 102,102,103
-  102 ntry = ntryh(j)
-      go to 104
-  103 ntry = ntry+2
-  104 nq = nl/ntry
-      nr = nl-ntry*nq
-      if (nr) 101,105,101
-  105 nf = nf+1
+!
+  101 continue
+        j = j+1
+!        if (j-4) 102,102,103
+        if(j .le. 4) then
+!  102      continue
+          ntry = ntryh(j)
+        else
+!  103     continue
+          ntry = ntry+2
+        end if  
+!        go to 104
+  104   continue
+        nq = nl/ntry
+        nr = nl-ntry*nq
+        if(nr .ne. 0) go to 101
+!        if (nr) 101,105,101
+!
+!  105 continue
+      nf = nf+1
       fac(nf+2) = ntry
       nl = nq
       if (ntry /= 2) go to 107
@@ -13463,7 +13600,9 @@ subroutine rffti1 ( n, wa, fac )
          fac(ib+2) = fac(ib+1)
   106 continue
       fac(3) = 2
-  107 if (nl /= 1) go to 104
+  107 continue
+      if(nl .ne. 1) go to 104
+!
       fac(1) = n
       fac(2) = nf
       tpi = 8.0D+00 * atan ( 1.0D+00 )
@@ -14359,7 +14498,7 @@ subroutine sinqmb ( lot, jump, n, inc, x, lenx, wsave, lensav, &
          xhold = x(m,k)
          x(m,k) = x(m,kc+1)
          x(m,kc+1) = xhold
- 203     continue
+  203  continue
   103 continue
   300 continue
 
@@ -15023,14 +15162,20 @@ subroutine sintb1 ( n, inc, x, wsave, xh, work, ier )
   real ( kind = 8 ) xhold
 
       ier = 0
-      if (n-2) 200,102,103
-  102 srt3s2 = sqrt( 3.0D+00 ) / 2.0D+00
-      xhold = srt3s2*(x(1,1)+x(1,2))
-      x(1,2) = srt3s2*(x(1,1)-x(1,2))
-      x(1,1) = xhold
-      return
-
-  103 np1 = n+1
+!      if (n-2) 200,102,103
+      if(n .lt. 2) then
+        return
+      else if(n .eq. 2) then
+!  102   contirnue
+        srt3s2 = sqrt( 3.0D+00 ) / 2.0D+00
+        xhold = srt3s2*(x(1,1)+x(1,2))
+        x(1,2) = srt3s2*(x(1,1)-x(1,2))
+        x(1,1) = xhold
+        return
+!      else
+      end if
+!  103 continue
+      np1 = n+1
       ns2 = n/2
       do 104 k=1,ns2
          kc = np1-k
@@ -15072,9 +15217,12 @@ subroutine sintb1 ( n, inc, x, wsave, xh, work, ier )
 
   200 continue
 
-  return
-end
-subroutine sintf1 ( n, inc, x, wsave, xh, work, ier )
+      return
+      end
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine sintf1 ( n, inc, x, wsave, xh, work, ier )
 
 !*****************************************************************************80
 !
@@ -15137,13 +15285,21 @@ subroutine sintf1 ( n, inc, x, wsave, xh, work, ier )
   real ( kind = 8 ) xhold
 
       ier = 0
-      if (n-2) 200,102,103
-  102 ssqrt3 = 1.0D+00 / sqrt ( 3.0D+00 )
-      xhold = ssqrt3*(x(1,1)+x(1,2))
-      x(1,2) = ssqrt3*(x(1,1)-x(1,2))
-      x(1,1) = xhold
-      go to 200
-  103 np1 = n+1
+!      if (n-2) 200,102,103
+      if(n .lt. 2) then
+        return
+      else if(n .eq. 2) then
+!  102 continue
+        ssqrt3 = 1.0D+00 / sqrt ( 3.0D+00 )
+        xhold = ssqrt3*(x(1,1)+x(1,2))
+        x(1,2) = ssqrt3*(x(1,1)-x(1,2))
+        x(1,1) = xhold
+        return
+!      else
+!  103 continue
+      end if
+!
+      np1 = n+1
       ns2 = n/2
       do k=1,ns2
          kc = np1-k
@@ -15184,10 +15340,13 @@ subroutine sintf1 ( n, inc, x, wsave, xh, work, ier )
       x(1,n) = 0.5D+00 * xh(n+1)
   200 continue
 
-  return
-end
-subroutine sintmb ( lot, jump, n, inc, x, lenx, wsave, lensav, &
-  work, lenwrk, ier )
+      return
+      end
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine sintmb ( lot, jump, n, inc, x, lenx, wsave, lensav,    &
+     &                    work, lenwrk, ier )
 
 !*****************************************************************************80
 !
@@ -15326,10 +15485,13 @@ subroutine sintmb ( lot, jump, n, inc, x, lenx, wsave, lensav, &
     return
   end if
 
-  return
-end
-subroutine sintmf ( lot, jump, n, inc, x, lenx, wsave, lensav, &
-  work, lenwrk, ier )
+      return
+      end
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine sintmf ( lot, jump, n, inc, x, lenx, wsave, lensav,    &
+     &                   work, lenwrk, ier )
 
 !*****************************************************************************80
 !
@@ -15417,58 +15579,62 @@ subroutine sintmf ( lot, jump, n, inc, x, lenx, wsave, lensav, &
 !    4, input parameters INC,JUMP,N,LOT are not consistent;
 !    20, input error returned by lower level routine.
 !
-  implicit none
+      implicit none
 
-  integer ( kind = 4 ) inc
-  integer ( kind = 4 ) lensav
-  integer ( kind = 4 ) lenwrk
+      integer ( kind = 4 ) inc
+      integer ( kind = 4 ) lensav
+      integer ( kind = 4 ) lenwrk
 
-  integer ( kind = 4 ) ier
-  integer ( kind = 4 ) ier1
-  integer ( kind = 4 ) iw1
-  integer ( kind = 4 ) iw2
-  integer ( kind = 4 ) jump
-  integer ( kind = 4 ) lenx
-  integer ( kind = 4 ) lot
-  integer ( kind = 4 ) n
-  real ( kind = 8 ) work(lenwrk)
-  real ( kind = 8 ) wsave(lensav)
-  real ( kind = 8 ) x(inc,*)
-  logical xercon
+      integer ( kind = 4 ) ier
+      integer ( kind = 4 ) ier1
+      integer ( kind = 4 ) iw1
+      integer ( kind = 4 ) iw2
+      integer ( kind = 4 ) jump
+      integer ( kind = 4 ) lenx
+      integer ( kind = 4 ) lot
+      integer ( kind = 4 ) n
+      real ( kind = 8 ) work(lenwrk)
+      real ( kind = 8 ) wsave(lensav)
+      real ( kind = 8 ) x(inc,*)
+      logical xercon
 
-  ier = 0
+      ier = 0
 
-  if ( lenx < ( lot - 1) * jump + inc * ( n - 1 ) + 1 ) then
-    ier = 1
-    call xerfft ( 'sintmf', 6 )
-    return
-  else if ( lensav < n / 2 + n + int ( log ( real ( n, kind = 8 ) ) &
-    / log ( 2.0D+00 ) ) + 4 ) then
-    ier = 2
-    call xerfft ( 'sintmf', 8 )
-    return
-  else if ( lenwrk < lot * ( 2 * n + 4 ) ) then
-    ier = 3
-    call xerfft ( 'sintmf', 10 )
-    return
-  else if ( .not. xercon ( inc, jump, n, lot ) ) then
-    ier = 4
-    call xerfft ( 'sintmf', -1 )
-    return
-  end if
+      if ( lenx < ( lot - 1) * jump + inc * ( n - 1 ) + 1 ) then
+        ier = 1
+        call xerfft ( 'sintmf', 6 )
+        return
+      else if(lensav < n/2 + n + int ( log(real(n, kind=8))             &
+     &                                / log ( 2.0D+00 ) ) + 4) then
+        ier = 2
+        call xerfft ( 'sintmf', 8 )
+        return
+      else if ( lenwrk < lot * ( 2 * n + 4 ) ) then
+        ier = 3
+        call xerfft ( 'sintmf', 10 )
+        return
+      else if ( .not. xercon ( inc, jump, n, lot ) ) then
+        ier = 4
+        call xerfft ( 'sintmf', -1 )
+        return
+      end if
 
-  iw1 = lot + lot + 1
-  iw2 = iw1 + lot * ( n + 1 )
-  call msntf1 ( lot, jump, n, inc, x, wsave, work, work(iw1), work(iw2), ier1 )
+      iw1 = lot + lot + 1
+      iw2 = iw1 + lot * ( n + 1 )
+      call msntf1 ( lot, jump, n, inc, x, wsave, work,                  &
+     &             work(iw1), work(iw2), ier1 )
 
-  if ( ier1 /= 0 ) then
-    ier = 20
-    call xerfft ( 'sintmf', -5 )
-  end if
+      if ( ier1 /= 0 ) then
+        ier = 20
+        call xerfft ( 'sintmf', -5 )
+      end if
 
-  return
-end
-subroutine sintmi ( n, wsave, lensav, ier )
+      return
+      end
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine sintmi ( n, wsave, lensav, ier )
 
 !*****************************************************************************80
 !
@@ -15527,54 +15693,55 @@ subroutine sintmi ( n, wsave, lensav, ier )
 !    2, input parameter LENSAV not big enough;
 !    20, input error returned by lower level routine.
 !
-  implicit none
+      implicit none
 
-  integer ( kind = 4 ) lensav
+      integer ( kind = 4 ) lensav
 
-  real ( kind = 8 ) dt
-  integer ( kind = 4 ) ier
-  integer ( kind = 4 ) ier1
-  integer ( kind = 4 ) k
-  integer ( kind = 4 ) lnsv
-  integer ( kind = 4 ) n
-  integer ( kind = 4 ) np1
-  integer ( kind = 4 ) ns2
-  real ( kind = 8 ) pi
-  real ( kind = 8 ) wsave(lensav)
+      real ( kind = 8 ) dt
+      integer ( kind = 4 ) ier
+      integer ( kind = 4 ) ier1
+      integer ( kind = 4 ) k
+      integer ( kind = 4 ) lnsv
+      integer ( kind = 4 ) n
+      integer ( kind = 4 ) np1
+      integer ( kind = 4 ) ns2
+      real ( kind = 8 ) pi
+      real ( kind = 8 ) wsave(lensav)
 
-  ier = 0
+      ier = 0
 
-  if ( lensav < n / 2 + n + int ( log ( real ( n, kind = 8 ) ) &
-    / log ( 2.0D+00 ) ) + 4 ) then
-    ier = 2
-    call xerfft ( 'sintmi', 3 )
-    return
-  end if
+      if ( lensav < n / 2 + n + int ( log ( real ( n, kind = 8 ) )      &
+     &                               / log ( 2.0D+00 ) ) + 4 ) then
+        ier = 2
+        call xerfft ( 'sintmi', 3 )
+        return
+      end if
 
-  pi = 4.0D+00 * atan ( 1.0D+00 )
+      pi = 4.0D+00 * atan ( 1.0D+00 )
 
-  if ( n <= 1 ) then
-    return
-  end if
+      if ( n <= 1 ) then
+        return
+      end if
 
-  ns2 = n / 2
-  np1 = n + 1
-  dt = pi / real ( np1, kind = 8 )
+      ns2 = n / 2
+      np1 = n + 1
+      dt = pi / real ( np1, kind = 8 )
 
-  do k = 1, ns2
-    wsave(k) = 2.0D+00 * sin ( k * dt )
-  end do
+      do k = 1, ns2
+        wsave(k) = 2.0D+00 * sin ( k * dt )
+      end do
 
-  lnsv = np1 + int ( log ( real ( np1, kind = 8 ) ) / log ( 2.0D+00 ) ) + 4
-  call rfftmi ( np1, wsave(ns2+1), lnsv, ier1 )
+      lnsv = np1 + int ( log ( real ( np1, kind = 8 ) )                 &
+     &                  / log ( 2.0D+00 ) ) + 4
+      call rfftmi ( np1, wsave(ns2+1), lnsv, ier1 )
 
-  if ( ier1 /= 0 ) then
-    ier = 20
-    call xerfft ( 'sintmi', -5 )
-  end if
+      if ( ier1 /= 0 ) then
+        ier = 20
+        call xerfft ( 'sintmi', -5 )
+      end if
 
-  return
-end
+      return
+      end
 !
 !  ---------------------------------------------------------------------
 !

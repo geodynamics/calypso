@@ -15,6 +15,8 @@
 !
 !>     Error ID for MPI related
       integer(kind = kint), parameter :: ierr_P_MPI = 1
+!>     Error ID for MPI related
+      integer(kind = kint), parameter :: ierr_P_SMP = 2
 !
 !>     Error ID for missing file
       integer(kind = kint), parameter :: ierr_file = 100

@@ -46,12 +46,9 @@
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Write ascii mesh file: ', trim(file_name)
 !
-      call open_write_mpi_file                                          &
-     &   (file_name, nprocs, my_rank, IO_param)
-!
+      call open_write_mpi_file(file_name, IO_param)
       call write_viewer_mesh_infos                                      &
      &   (mgd_v_mesh, mgd_view_prm, IO_param)
-!
       call close_mpi_file(IO_param)
 !
       end subroutine mpi_write_viewer_mesh_file

@@ -71,12 +71,20 @@
 !>      Field data IO structure for original data
       type(field_IO) :: org_fst_IO
       integer :: ip
+!      integer :: i
 !
 !
-      call sel_read_alloc_step_SPH_file(np_sph_org, 0, istep_start,     &
+      call sel_read_alloc_SPH_fld_head(np_sph_org, 0, istep_start,      &
      &    org_fst_param, t_IO, org_fst_IO)
 !
       if(my_rank .eq. 0) then
+!        write(*,*) 'org_fst_IO%num_field_IO', org_fst_IO%num_field_IO
+!        do i = 1, org_fst_IO%num_field_IO
+!          write(*,*) 'org_fst_IO%fld_name', &
+!     &              org_fst_IO%num_comp_IO(i), &
+!     &              trim(org_fst_IO%fld_name(i))
+!        end do
+!
         call copy_rj_phys_name_from_IO(org_fst_IO, new_phys)
 !
         do ip = 1, np_sph_org
@@ -84,10 +92,7 @@
         end do
       end if
 !
-      if(my_rank .lt. np_sph_org) then
-        call dealloc_phys_data_IO(org_fst_IO)
-        call dealloc_phys_name_IO(org_fst_IO)
-      end if
+      if(my_rank .lt. np_sph_org) call dealloc_phys_name_IO(org_fst_IO)
 !
       end subroutine load_field_name_assemble_sph
 !

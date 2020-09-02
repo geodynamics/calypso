@@ -14,7 +14,13 @@ copy_rj_phys_data_4_IO.o: $(SPH_SPECTR_DIR)/copy_rj_phys_data_4_IO.f90 m_precisi
 	$(F90) -c $(F90OPTFLAGS) $<
 copy_sph_comm_table_4_IO.o: $(SPH_SPECTR_DIR)/copy_sph_comm_table_4_IO.f90 m_precision.o m_constants.o t_comm_table.o t_sph_trans_comm_tbl.o
 	$(F90) -c $(F90OPTFLAGS) $<
-copy_sph_node_4_IO.o: $(SPH_SPECTR_DIR)/copy_sph_node_4_IO.f90 m_precision.o m_constants.o t_spheric_parameter.o t_node_id_spherical_IO.o t_spheric_rtp_data.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_spheric_rj_data.o
+copy_sph_rj_mode_4_IO.o: $(SPH_SPECTR_DIR)/copy_sph_rj_mode_4_IO.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_node_id_spherical_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+copy_sph_rlm_mode_4_IO.o: $(SPH_SPECTR_DIR)/copy_sph_rlm_mode_4_IO.f90 m_precision.o m_constants.o t_spheric_rlm_data.o t_node_id_spherical_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+copy_sph_rtm_node_4_IO.o: $(SPH_SPECTR_DIR)/copy_sph_rtm_node_4_IO.f90 m_precision.o m_constants.o t_spheric_rtm_data.o t_node_id_spherical_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+copy_sph_rtp_node_4_IO.o: $(SPH_SPECTR_DIR)/copy_sph_rtp_node_4_IO.f90 m_precision.o m_constants.o t_spheric_rtp_data.o t_node_id_spherical_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 count_num_sph_smp.o: $(SPH_SPECTR_DIR)/count_num_sph_smp.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_rtp_data.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_spheric_rj_data.o cal_minmax_and_stacks.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -24,7 +30,7 @@ extend_potential_field_t.o: $(SPH_SPECTR_DIR)/extend_potential_field_t.f90 m_pre
 	$(F90) -c $(F90OPTFLAGS) $<
 half_chebyshev_radial_grid.o: $(SPH_SPECTR_DIR)/half_chebyshev_radial_grid.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-load_data_for_sph_IO.o: $(SPH_SPECTR_DIR)/load_data_for_sph_IO.f90 m_precision.o t_spheric_rtp_data.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_spheric_rj_data.o t_sph_trans_comm_tbl.o t_spheric_group.o t_spheric_data_IO.o copy_sph_comm_table_4_IO.o copy_sph_node_4_IO.o set_group_types_4_IO.o
+load_data_for_sph_IO.o: $(SPH_SPECTR_DIR)/load_data_for_sph_IO.f90 m_precision.o t_spheric_rtp_data.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_spheric_rj_data.o t_sph_trans_comm_tbl.o t_spheric_group.o t_spheric_data_IO.o copy_sph_comm_table_4_IO.o copy_sph_rtp_node_4_IO.o set_group_types_4_IO.o copy_sph_rj_mode_4_IO.o copy_sph_rtm_node_4_IO.o copy_sph_rlm_mode_4_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_spheric_constants.o: $(SPH_SPECTR_DIR)/m_spheric_constants.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<

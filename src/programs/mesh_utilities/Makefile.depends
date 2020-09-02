@@ -1,10 +1,14 @@
+analyzer_check_sph_grids.o: $(GEN_SPH_GRIDDIR)/analyzer_check_sph_grids.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_work_time.o m_elapsed_labels_gen_SPH.o t_mesh_data.o t_spheric_parameter.o t_spheric_group.o t_sph_trans_comm_tbl.o t_file_IO_parameter.o t_ctl_data_const_sph_mesh.o t_check_and_make_SPH_mesh.o t_ctl_params_gen_sph_shell.o para_const_kemoview_mesh.o m_error_IDs.o calypso_mpi_int.o m_array_for_send_recv.o mpi_gen_sph_grids_modes.o compare_sph_with_IO.o parallel_load_data_4_sph.o
+	$(F90) -c $(F90OPTFLAGS) $<
 analyzer_gen_sph_grids.o: $(GEN_SPH_GRIDDIR)/analyzer_gen_sph_grids.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_work_time.o m_elapsed_labels_gen_SPH.o t_mesh_data.o t_spheric_parameter.o t_spheric_group.o t_sph_trans_comm_tbl.o t_file_IO_parameter.o t_ctl_data_const_sph_mesh.o t_check_and_make_SPH_mesh.o t_ctl_params_gen_sph_shell.o para_const_kemoview_mesh.o m_error_IDs.o m_array_for_send_recv.o parallel_FEM_mesh_init.o mpi_gen_sph_grids_modes.o output_gen_sph_grid_modes.o parallel_load_data_4_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<
-analyzer_test_sph.o: $(GEN_SPH_GRIDDIR)/analyzer_test_sph.f90 m_precision.o m_constants.o m_machine_parameter.o m_work_time.o m_elapsed_labels_SEND_RECV.o t_SPH_mesh_field_data.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_file_IO_parameter.o t_ctl_data_const_sph_mesh.o t_ctl_params_gen_sph_shell.o calypso_mpi.o set_control_platform_data.o parallel_load_data_4_sph.o cmp_trans_sph_tests.o m_solver_SR.o cmp_trans_sph_indices.o set_parallel_file_name.o select_copy_from_recv.o
+analyzer_test_sph.o: $(GEN_SPH_GRIDDIR)/analyzer_test_sph.f90 m_precision.o m_constants.o m_machine_parameter.o m_work_time.o m_elapsed_labels_SEND_RECV.o t_SPH_mesh_field_data.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_file_IO_parameter.o t_ctl_data_const_sph_mesh.o t_ctl_params_gen_sph_shell.o calypso_mpi.o t_check_and_make_SPH_mesh.o cmp_trans_sph_tests.o set_control_platform_data.o m_solver_SR.o calypso_mpi_int.o cmp_trans_sph_indices.o set_parallel_file_name.o select_copy_from_recv.o delete_data_files.o
 	$(F90) -c $(F90OPTFLAGS) $<
-cmp_trans_sph_indices.o: $(GEN_SPH_GRIDDIR)/cmp_trans_sph_indices.f90 m_precision.o t_spheric_parameter.o t_sph_trans_comm_tbl.o calypso_mpi.o spherical_SRs_N.o sel_spherical_SRs.o
+cmp_trans_sph_indices.o: $(GEN_SPH_GRIDDIR)/cmp_trans_sph_indices.f90 m_precision.o calypso_mpi.o t_spheric_parameter.o t_sph_trans_comm_tbl.o spherical_SRs_N.o sel_spherical_SRs.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cmp_trans_sph_tests.o: $(GEN_SPH_GRIDDIR)/cmp_trans_sph_tests.f90 m_precision.o t_spheric_parameter.o t_sph_trans_comm_tbl.o calypso_mpi.o sel_spherical_SRs.o spherical_SRs_N.o cmp_trans_sph_indices.o
+	$(F90) -c $(F90OPTFLAGS) $<
+main_check_sph_grids.o: $(GEN_SPH_GRIDDIR)/main_check_sph_grids.f90 m_precision.o calypso_mpi.o analyzer_check_sph_grids.o
 	$(F90) -c $(F90OPTFLAGS) $<
 main_generate_sph_grids.o: $(GEN_SPH_GRIDDIR)/main_generate_sph_grids.f90 m_precision.o calypso_mpi.o analyzer_gen_sph_grids.o
 	$(F90) -c $(F90OPTFLAGS) $<

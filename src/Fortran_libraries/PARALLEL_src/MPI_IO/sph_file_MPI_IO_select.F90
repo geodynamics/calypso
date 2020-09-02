@@ -18,14 +18,10 @@
 !!        type(field_IO_params), intent(in) :: file_param
 !!        type(sph_file_data_type), intent(inout) :: sph_file
 !!
-!!      subroutine sel_mpi_write_geom_rtp_file                          &
-!!     &         (num_pe, id_rank, file_param, sph_file)
-!!      subroutine sel_mpi_write_spectr_rj_file                         &
-!!     &         (num_pe, id_rank, file_param, sph_file)
-!!      subroutine sel_mpi_write_geom_rtm_file                          &
-!!     &         (num_pe, id_rank, file_param, sph_file)
-!!      subroutine sel_mpi_write_modes_rlm_file                         &
-!!     &         (num_pe, id_rank, file_param, sph_file)
+!!      subroutine sel_mpi_write_geom_rtp_file(file_param, sph_file)
+!!      subroutine sel_mpi_write_spectr_rj_file(file_param, sph_file)
+!!      subroutine sel_mpi_write_geom_rtm_file(file_param, sph_file)
+!!      subroutine sel_mpi_write_modes_rlm_file(file_param, sph_file)
 !!        type(field_IO_params), intent(in) :: file_param
 !!        type(sph_file_data_type), intent(in) :: sph_file
 !!@endverbatim
@@ -252,10 +248,8 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine sel_mpi_write_geom_rtp_file                            &
-     &         (num_pe, id_rank, file_param, sph_file)
+      subroutine sel_mpi_write_geom_rtp_file(file_param, sph_file)
 !
-      integer, intent(in) :: num_pe, id_rank
       type(field_IO_params), intent(in) :: file_param
       type(sph_file_data_type), intent(in) :: sph_file
 !
@@ -263,42 +257,34 @@
 !
 !
       sph_file_name = set_sph_rtp_file_name(file_param%file_prefix,     &
-     &               file_param%iflag_format, id_rank)
+     &               file_param%iflag_format, my_rank)
 !
       if(file_param%iflag_format .eq. iflag_single+id_binary_file_fmt)  &
      & then
-        call mpi_write_geom_rtp_file_b                                  &
-     &     (sph_file_name, nprocs, id_rank, sph_file)
+        call mpi_write_geom_rtp_file_b(sph_file_name, sph_file)
       else if(file_param%iflag_format .eq. iflag_single) then
-        call mpi_write_geom_rtp_file                                    &
-     &     (sph_file_name, num_pe, id_rank, sph_file)
+        call mpi_write_geom_rtp_file(sph_file_name, sph_file)
 !
 #ifdef ZLIB_IO
       else if(file_param%iflag_format                                   &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
-        call gz_mpi_write_geom_rtp_file_b                               &
-     &     (sph_file_name, nprocs, id_rank, sph_file)
+        call gz_mpi_write_geom_rtp_file_b(sph_file_name, sph_file)
       else if(file_param%iflag_format                                   &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
-        call gz_mpi_write_geom_rtp_file                                 &
-     &     (sph_file_name, num_pe, id_rank, sph_file)
+        call gz_mpi_write_geom_rtp_file(sph_file_name, sph_file)
 #endif
 !
       else
-        if(id_rank .lt. num_pe) then
-          call sel_write_geom_rtp_file                                  &
-      &      (id_rank, file_param, sph_file, ierr)
-        end if
+        call sel_write_geom_rtp_file                                    &
+     &     (my_rank, file_param, sph_file, ierr)
       end if
 !
       end subroutine sel_mpi_write_geom_rtp_file
 !
 !------------------------------------------------------------------
 !
-      subroutine sel_mpi_write_spectr_rj_file                           &
-     &         (num_pe, id_rank, file_param, sph_file)
+      subroutine sel_mpi_write_spectr_rj_file(file_param, sph_file)
 !
-      integer, intent(in) :: num_pe, id_rank
       type(field_IO_params), intent(in) :: file_param
       type(sph_file_data_type), intent(in) :: sph_file
 !
@@ -306,42 +292,34 @@
 !
 !
       sph_file_name = set_sph_rj_file_name(file_param%file_prefix,      &
-     &               file_param%iflag_format, id_rank)
+     &               file_param%iflag_format, my_rank)
 !
       if(file_param%iflag_format .eq. iflag_single+id_binary_file_fmt)  &
      & then
-        call mpi_write_spectr_rj_file_b                                 &
-     &     (sph_file_name, nprocs, id_rank, sph_file)
+        call mpi_write_spectr_rj_file_b(sph_file_name, sph_file)
       else if(file_param%iflag_format .eq. iflag_single) then
-        call mpi_write_spectr_rj_file                                   &
-     &     (sph_file_name, num_pe, id_rank, sph_file)
+        call mpi_write_spectr_rj_file(sph_file_name, sph_file)
 !
 #ifdef ZLIB_IO
       else if(file_param%iflag_format                                   &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
-        call gz_mpi_write_spectr_rj_file_b                              &
-     &     (sph_file_name, nprocs, id_rank, sph_file)
+        call gz_mpi_write_spectr_rj_file_b(sph_file_name, sph_file)
       else if(file_param%iflag_format                                   &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
-        call gz_mpi_write_spectr_rj_file                                &
-     &     (sph_file_name, num_pe, id_rank, sph_file)
+        call gz_mpi_write_spectr_rj_file(sph_file_name, sph_file)
 #endif
 !
       else
-        if(id_rank .lt. num_pe) then
-          call sel_write_spectr_modes_rj_file                           &
-      &      (id_rank, file_param, sph_file, ierr)
-        end if
+        call sel_write_spectr_modes_rj_file                             &
+     &     (my_rank, file_param, sph_file, ierr)
       end if
 !
       end subroutine sel_mpi_write_spectr_rj_file
 !
 !------------------------------------------------------------------
 !
-      subroutine sel_mpi_write_geom_rtm_file                            &
-     &         (num_pe, id_rank, file_param, sph_file)
+      subroutine sel_mpi_write_geom_rtm_file(file_param, sph_file)
 !
-      integer, intent(in) :: num_pe, id_rank
       type(field_IO_params), intent(in) :: file_param
       type(sph_file_data_type), intent(in) :: sph_file
 !
@@ -349,42 +327,34 @@
 !
 !
       sph_file_name = set_sph_rtm_file_name(file_param%file_prefix,     &
-     &               file_param%iflag_format, id_rank)
+     &               file_param%iflag_format, my_rank)
 !
       if(file_param%iflag_format .eq. iflag_single+id_binary_file_fmt)  &
      & then
-        call mpi_write_geom_rtm_file_b                                  &
-     &     (sph_file_name, nprocs, id_rank, sph_file)
+        call mpi_write_geom_rtm_file_b(sph_file_name, sph_file)
       else if(file_param%iflag_format .eq. iflag_single) then
-        call mpi_write_geom_rtm_file                                    &
-     &     (sph_file_name, num_pe, id_rank, sph_file)
+        call mpi_write_geom_rtm_file(sph_file_name, sph_file)
 !
 #ifdef ZLIB_IO
       else if(file_param%iflag_format                                   &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
-        call gz_mpi_write_geom_rtm_file_b                               &
-     &     (sph_file_name, nprocs, id_rank, sph_file)
+        call gz_mpi_write_geom_rtm_file_b(sph_file_name, sph_file)
       else if(file_param%iflag_format                                   &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
-        call gz_mpi_write_geom_rtm_file                                 &
-     &     (sph_file_name, num_pe, id_rank, sph_file)
+        call gz_mpi_write_geom_rtm_file(sph_file_name, sph_file)
 #endif
 !
       else
-        if(id_rank .lt. num_pe) then
-          call sel_write_geom_rtm_file                                  &
-      &      (id_rank, file_param, sph_file, ierr)
-        end if
+        call sel_write_geom_rtm_file                                    &
+     &     (my_rank, file_param, sph_file, ierr)
       end if
 !
       end subroutine sel_mpi_write_geom_rtm_file
 !
 !------------------------------------------------------------------
 !
-      subroutine sel_mpi_write_modes_rlm_file                           &
-     &         (num_pe, id_rank, file_param, sph_file)
+      subroutine sel_mpi_write_modes_rlm_file(file_param, sph_file)
 !
-      integer, intent(in) :: num_pe, id_rank
       type(field_IO_params), intent(in) :: file_param
       type(sph_file_data_type), intent(in) :: sph_file
 !
@@ -392,32 +362,26 @@
 !
 !
       sph_file_name = set_sph_rlm_file_name(file_param%file_prefix,     &
-     &               file_param%iflag_format, id_rank)
+     &               file_param%iflag_format, my_rank)
 !
       if(file_param%iflag_format .eq. iflag_single+id_binary_file_fmt)  &
      & then
-        call mpi_write_modes_rlm_file_b                                 &
-     &     (sph_file_name, nprocs, id_rank, sph_file)
+        call mpi_write_modes_rlm_file_b(sph_file_name, sph_file)
       else if(file_param%iflag_format .eq. iflag_single) then
-        call mpi_write_modes_rlm_file                                   &
-     &     (sph_file_name, num_pe, id_rank, sph_file)
+        call mpi_write_modes_rlm_file(sph_file_name, sph_file)
 !
 #ifdef ZLIB_IO
       else if(file_param%iflag_format                                   &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
-        call gz_mpi_write_modes_rlm_file_b                              &
-     &     (sph_file_name, nprocs, id_rank, sph_file)
+        call gz_mpi_write_modes_rlm_file_b(sph_file_name, sph_file)
       else if(file_param%iflag_format                                   &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
-        call gz_mpi_write_modes_rlm_file                                &
-     &     (sph_file_name, num_pe, id_rank, sph_file)
+        call gz_mpi_write_modes_rlm_file(sph_file_name, sph_file)
 #endif
 !
       else
-        if(id_rank .lt. num_pe) then
-          call sel_write_modes_rlm_file                                 &
-      &      (id_rank, file_param, sph_file, ierr)
-        end if
+        call sel_write_modes_rlm_file                                   &
+     &     (my_rank, file_param, sph_file, ierr)
       end if
 !
       end subroutine sel_mpi_write_modes_rlm_file

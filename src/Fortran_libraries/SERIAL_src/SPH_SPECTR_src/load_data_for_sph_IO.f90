@@ -85,7 +85,7 @@
      &          sph_rtp, comm_rtp, sph_grps, sph_params)
 !
       use copy_sph_comm_table_4_IO
-      use copy_sph_node_4_IO
+      use copy_sph_rtp_node_4_IO
       use set_group_types_4_IO
 !
       type(sph_file_data_type), intent(in) :: sph_file
@@ -118,8 +118,8 @@
      &          sph_rj, comm_rj, sph_grps, sph_params)
 !
       use copy_sph_comm_table_4_IO
-      use copy_sph_node_4_IO
       use set_group_types_4_IO
+      use copy_sph_rj_mode_4_IO
 !
       type(sph_file_data_type), intent(in) :: sph_file
 !
@@ -147,7 +147,7 @@
      &         (sph_file, sph_rtm, comm_rtm, sph_params)
 !
       use copy_sph_comm_table_4_IO
-      use copy_sph_node_4_IO
+      use copy_sph_rtm_node_4_IO
 !
       type(sph_file_data_type), intent(in) :: sph_file
 !
@@ -169,7 +169,7 @@
      &         (sph_file, sph_rlm, comm_rlm, sph_params)
 !
       use copy_sph_comm_table_4_IO
-      use copy_sph_node_4_IO
+      use copy_sph_rlm_mode_4_IO
 !
       type(sph_file_data_type), intent(in) :: sph_file
 !
@@ -192,7 +192,7 @@
      &         (sph_params, sph_rtp, comm_rtp, sph_grps, sph_file)
 !
       use copy_sph_comm_table_4_IO
-      use copy_sph_node_4_IO
+      use copy_sph_rtp_node_4_IO
       use set_group_types_4_IO
 !
       type(sph_shell_parameters), intent(in) :: sph_params
@@ -224,8 +224,8 @@
      &          sph_rj, comm_rj, sph_grps, sph_file)
 !
       use copy_sph_comm_table_4_IO
-      use copy_sph_node_4_IO
       use set_group_types_4_IO
+      use copy_sph_rj_mode_4_IO
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid),  intent(in) :: sph_rj
@@ -252,7 +252,7 @@
      &         (sph_params, sph_rtm, comm_rtm, sph_file)
 !
       use copy_sph_comm_table_4_IO
-      use copy_sph_node_4_IO
+      use copy_sph_rtm_node_4_IO
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -273,7 +273,7 @@
      &         (sph_params, sph_rlm, comm_rlm, sph_file)
 !
       use copy_sph_comm_table_4_IO
-      use copy_sph_node_4_IO
+      use copy_sph_rlm_mode_4_IO
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rlm_grid), intent(in) :: sph_rlm

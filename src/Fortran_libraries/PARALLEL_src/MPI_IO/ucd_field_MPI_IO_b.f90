@@ -7,8 +7,7 @@
 !> @brief Output merged binary field file using MPI-IO
 !!
 !!@verbatim
-!!      subroutine write_ucd_field_file_mpi_b                           &
-!!     &         (file_name, num_pe, id_rank, t_IO, ucd)
+!!      subroutine write_ucd_field_file_mpi_b(file_name, t_IO, ucd)
 !!        type(time_data), intent(in) :: t_IO
 !!        type(ucd_data), intent(in) :: ucd
 !!
@@ -54,15 +53,13 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine write_ucd_field_file_mpi_b                             &
-     &         (file_name, num_pe, id_rank, t_IO, ucd)
+      subroutine write_ucd_field_file_mpi_b(file_name, t_IO, ucd)
 !
       use MPI_binary_head_IO
       use MPI_ascii_data_IO
       use field_block_MPI_IO_b
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
 !
       type(time_data), intent(in) :: t_IO
       type(ucd_data), intent(in) :: ucd
@@ -70,15 +67,12 @@
 !
       if(my_rank .eq. 0) write(*,*)                                     &
      &    'write binary data by MPI-IO: ', trim(file_name) 
-      call open_write_mpi_file_b                                        &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_write_mpi_file_b(file_name, IO_param)
 !
-      if(id_rank .lt. num_pe) then
-        call write_field_data_mpi_b(IO_param,                           &
-     &      t_IO%i_time_step, t_IO%time, t_IO%dt,                       &
-     &      ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,       &
-     &      ucd%phys_name, ucd%d_ucd, ucd%istack_merged_nod)
-      end if
+      call write_field_data_mpi_b(IO_param,                             &
+     &    t_IO%i_time_step, t_IO%time, t_IO%dt,                         &
+     &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
+     &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_nod)
 !
       call close_mpi_file(IO_param)
 !

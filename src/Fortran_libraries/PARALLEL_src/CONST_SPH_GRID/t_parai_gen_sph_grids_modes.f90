@@ -30,8 +30,6 @@
 !
       implicit none
 !
-      type(sph_local_1d_index), save, private :: sph_lcx_m
-!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -70,11 +68,10 @@
      &     (sph_mesh(ip)%sph_comms%comm_rlm, comm_rlm_mul(ip))
       end do
 !
-      call s_bcast_comm_stacks_sph(num_pe, comm_rlm_mul)
+      call para_bcast_comm_stacks_sph(num_pe, comm_rlm_mul)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
-      call alloc_rj_1d_local_idx(sph_mesh(1)%sph%sph_rj, sph_lcx_m)
       do ip = 1, num_pe
         id_rank = ip - 1
         if(mod(id_rank,nprocs) .ne. my_rank) cycle
@@ -88,9 +85,8 @@
      &      gen_sph%stk_lc1d, gen_sph%sph_gl1d,                         &
      &      sph_mesh(ip)%sph%sph_params, sph_mesh(ip)%sph%sph_rtp,      &
      &      sph_mesh(ip)%sph%sph_rj, sph_mesh(ip)%sph_comms%comm_rj,    &
-     &      sph_mesh(ip)%sph_grps, sph_lcx_m)
+     &      sph_mesh(ip)%sph_grps)
       end do
-      call dealloc_rj_1d_local_idx(sph_lcx_m)
       call dealloc_comm_stacks_sph(num_pe, comm_rlm_mul)
       deallocate(comm_rlm_mul)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
@@ -130,11 +126,10 @@
         call copy_sph_comm_neib                                         &
      &     (sph_mesh(ip)%sph_comms%comm_rtm, comm_rtm_mul(ip))
       end do
-      call s_bcast_comm_stacks_sph(num_pe, comm_rtm_mul)
+      call para_bcast_comm_stacks_sph(num_pe, comm_rtm_mul)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
-      call alloc_rtp_1d_local_idx(sph_mesh(1)%sph%sph_rtp, sph_lcx_m)
       do ip = 1, num_pe
         id_rank = ip - 1
         if(mod(id_rank,nprocs) .ne. my_rank) cycle
@@ -148,10 +143,8 @@
      &      gen_sph%s3d_radius, gen_sph%sph_lcp,                        &
      &      gen_sph%stk_lc1d, gen_sph%sph_gl1d,                         &
      &      sph_mesh(ip)%sph%sph_params, sph_mesh(ip)%sph%sph_rtp,      &
-     &      sph_mesh(ip)%sph_comms%comm_rtp, sph_mesh(ip)%sph_grps,     &
-     &      sph_lcx_m)
+     &      sph_mesh(ip)%sph_comms%comm_rtp, sph_mesh(ip)%sph_grps)
       end do
-      call dealloc_rtp_1d_local_idx(sph_lcx_m)
       call dealloc_comm_stacks_sph(num_pe, comm_rtm_mul)
       deallocate(comm_rtm_mul)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)

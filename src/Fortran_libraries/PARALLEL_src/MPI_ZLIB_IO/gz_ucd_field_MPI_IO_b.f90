@@ -7,8 +7,7 @@
 !> @brief Output ucd data into gzipped binary field file using MPI-IO
 !!
 !!@verbatim
-!!      subroutine gz_write_ucd_field_file_mpi_b                        &
-!!     &         (file_name, num_pe, id_rank, t_IO, ucd)
+!!      subroutine gz_write_ucd_field_file_mpi_b(file_name, t_IO, ucd)
 !!        type(time_data), intent(in) :: t_IO
 !!        type(ucd_data), intent(in) :: ucd
 !!
@@ -42,8 +41,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine gz_write_ucd_field_file_mpi_b                          &
-     &         (file_name, num_pe, id_rank, t_IO, ucd)
+      subroutine gz_write_ucd_field_file_mpi_b(file_name, t_IO, ucd)
 !
       use m_error_IDs
       use MPI_binary_head_IO
@@ -53,19 +51,14 @@
 !
       character(len=kchara), intent(in) :: file_name
 !
-      integer, intent(in) :: num_pe, id_rank
       type(time_data), intent(in) :: t_IO
       type(ucd_data), intent(in) :: ucd
 !
 !
-      if(nprocs .ne. num_pe)  call calypso_mpi_abort                    &
-     &                (ierr_fld, 'gzipped data output does not work')
-!
       if(my_rank .eq. 0) write(*,*)                                     &
      &    'write gzipped binary data by MPI-IO: ', trim(file_name)
 !
-      call open_write_gz_mpi_file_b                                     &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_write_gz_mpi_file_b(file_name, IO_param)
 !
       call gz_write_field_head_mpi_b(IO_param,                          &
      &    t_IO%i_time_step, t_IO%time, t_IO%dt,                         &

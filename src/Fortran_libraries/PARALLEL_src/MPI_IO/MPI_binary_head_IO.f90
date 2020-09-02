@@ -7,8 +7,7 @@
 !> @brief Output merged binary field file using MPI-IO
 !!
 !!@verbatim
-!!      subroutine open_write_mpi_file_b                                &
-!!     &         (file_name, num_pe, id_rank, IO_param)
+!!      subroutine open_write_mpi_file_b(file_name, IO_param)
 !!      subroutine open_read_mpi_file_b                                 &
 !!     &         (file_name, num_pe, id_rank, IO_param)
 !!
@@ -59,16 +58,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine open_write_mpi_file_b                                  &
-     &         (file_name, num_pe, id_rank, IO_param)
+      subroutine open_write_mpi_file_b(file_name, IO_param)
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !
 !
-      call open_write_mpi_file                                          &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_write_mpi_file(file_name, IO_param)
       call mpi_write_endian_flag(IO_param%id_file, IO_param%ioff_gl)
 !
       end subroutine open_write_mpi_file_b

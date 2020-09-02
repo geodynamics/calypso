@@ -13,9 +13,9 @@
 !!     &                (id_rank, istep_fld, file_IO)
 !!
 !!      subroutine sel_write_step_FEM_field_file                        &
-!!     &         (num_pe, id_rank, istep_fld, file_IO, t_IO, fld_IO)
+!!     &         (istep_fld, file_IO, t_IO, fld_IO)
 !!      subroutine sel_write_step_SPH_field_file                        &
-!!     &         (num_pe, id_rank, istep_fld, file_IO, t_IO, fld_IO)
+!!     &         (istep_fld, file_IO, t_IO, fld_IO)
 !!
 !!      subroutine sel_read_step_FEM_field_file                         &
 !!     &         (num_pe, id_rank, istep_fld, file_IO, t_IO, fld_IO)
@@ -94,11 +94,10 @@
 !------------------------------------------------------------------
 !
       subroutine sel_write_step_FEM_field_file                          &
-     &         (num_pe, id_rank, istep_fld, file_IO, t_IO, fld_IO)
+     &         (istep_fld, file_IO, t_IO, fld_IO)
 !
       use set_field_file_names
 !
-      integer, intent(in) :: id_rank, num_pe
       integer(kind = kint), intent(in) :: istep_fld
       type(field_IO_params), intent(in) :: file_IO
       type(time_data), intent(in) :: t_IO
@@ -108,21 +107,18 @@
 !
 !
       file_name = set_FEM_fld_file_name(file_IO%file_prefix,            &
-     &           file_IO%iflag_format, id_rank, istep_fld)
-!
-      call sel_write_step_field_file                                    &
-     &    (file_name, num_pe, id_rank, file_IO, t_IO, fld_IO)
+     &           file_IO%iflag_format, my_rank, istep_fld)
+      call sel_write_step_field_file (file_name, file_IO, t_IO, fld_IO)
 !
       end subroutine sel_write_step_FEM_field_file
 !
 !------------------------------------------------------------------
 !
       subroutine sel_write_step_SPH_field_file                          &
-     &         (num_pe, id_rank, istep_fld, file_IO, t_IO, fld_IO)
+     &         (istep_fld, file_IO, t_IO, fld_IO)
 !
       use set_field_file_names
 !
-      integer, intent(in) :: id_rank, num_pe
       integer(kind = kint), intent(in) :: istep_fld
       type(field_IO_params), intent(in) :: file_IO
       type(time_data), intent(in) :: t_IO
@@ -132,10 +128,8 @@
 !
 !
       file_name = set_SPH_fld_file_name(file_IO%file_prefix,            &
-     &         file_IO%iflag_format, id_rank, istep_fld)
-!
-      call sel_write_step_field_file                                    &
-     &    (file_name, num_pe, id_rank, file_IO, t_IO, fld_IO)
+     &         file_IO%iflag_format, my_rank, istep_fld)
+      call sel_write_step_field_file(file_name, file_IO, t_IO, fld_IO)
 !
       end subroutine sel_write_step_SPH_field_file
 !
@@ -289,13 +283,12 @@
 !------------------------------------------------------------------
 !
       subroutine sel_write_step_field_file                              &
-     &     (file_name, num_pe, id_rank, file_IO, t_IO, fld_IO)
+     &         (file_name, file_IO, t_IO, fld_IO)
 !
       use calypso_mpi
       use m_error_IDs
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: id_rank, num_pe
       type(field_IO_params), intent(in) :: file_IO
       type(time_data), intent(in) :: t_IO
       type(field_IO), intent(in) :: fld_IO
@@ -303,44 +296,36 @@
       integer(kind = kint) :: ierr = 0
 !
 !
-      if( (file_IO%iflag_format/iflag_single) .eq. 0) then
-        if(id_rank .ge. num_pe)  return
-      end if
-!
       if(file_IO%iflag_format .eq. iflag_single) then
-        call write_step_field_file_mpi                                  &
-     &     (file_name, num_pe, id_rank, t_IO, fld_IO)
+        call write_step_field_file_mpi(file_name, t_IO, fld_IO)
 !
       else if(file_IO%iflag_format                                      &
      &       .eq. iflag_single+id_binary_file_fmt) then
-        call write_step_field_file_mpi_b                                &
-     &     (file_name, num_pe, id_rank, t_IO, fld_IO)
+        call write_step_field_file_mpi_b(file_name, t_IO, fld_IO)
 !
 #ifdef ZLIB_IO
       else if(file_IO%iflag_format .eq. id_binary_file_fmt) then
         call write_step_field_file_b                                    &
-     &     (file_name, id_rank, t_IO, fld_IO, ierr)
+     &     (file_name, my_rank, t_IO, fld_IO, ierr)
       else if(file_IO%iflag_format                                      &
      &       .eq. iflag_single+id_gzip_bin_file_fmt) then
-        call gz_write_step_fld_file_mpi_b                               &
-     &     (file_name, num_pe, id_rank, t_IO, fld_IO)
+        call gz_write_step_fld_file_mpi_b(file_name, t_IO, fld_IO)
       else if(file_IO%iflag_format                                      &
      &       .eq. iflag_single+id_gzip_txt_file_fmt) then
-        if(nprocs .eq. num_pe) then
-          call write_gz_step_field_file_mpi                             &
-     &     (file_name, num_pe, id_rank, t_IO, fld_IO)
+        if(nprocs .eq. nprocs) then
+          call write_gz_step_field_file_mpi(file_name, t_IO, fld_IO)
         else
           call calypso_mpi_abort                                        &
      &      (ierr_fld, 'gzipped data output does not dort')
         end if
       else if(file_IO%iflag_format .eq. id_gzip_bin_file_fmt) then
-        call gz_write_step_fld_file_b(file_name, id_rank, t_IO, fld_IO)
+        call gz_write_step_fld_file_b(file_name, my_rank, t_IO, fld_IO)
       else if(file_IO%iflag_format .eq. id_gzip_txt_file_fmt) then
-        call write_gz_step_field_file(file_name, id_rank, t_IO, fld_IO)
+        call write_gz_step_field_file(file_name, my_rank, t_IO, fld_IO)
 #endif
 !
       else
-        call write_step_field_file(file_name, id_rank, t_IO, fld_IO)
+        call write_step_field_file(file_name, my_rank, t_IO, fld_IO)
       end if
 !
       end subroutine sel_write_step_field_file

@@ -66,7 +66,7 @@
       if(gauss%num_sph_mode .le. 0) return
 !
       file_name = add_dat_extension(gauss%file_prefix)
-      call open_append_mpi_file(file_name, nprocs, my_rank, IO_param)
+      call open_append_mpi_file(file_name, IO_param)
       call calypso_mpi_barrier
 !
       if(IO_param%ioff_gl .eq. 0) then

@@ -17,7 +17,7 @@
 !!      subroutine read_arrays_for_stacks(file_id, num, istack_begin,   &
 !!      &         ntot, istack)
 !!      subroutine read_field_num_buffer(textbuf, nnod, num_field)
-!!      subroutine read_bufer_istack_nod_buffer                         &
+!!      subroutine read_buffer_istack_nod_buffer                        &
 !!     &         (textbuf, num_pe, istack_nod)
 !!      subroutine read_field_comp_buffer                               &
 !!     &         (textbuf, num_field, ncomp_field)
@@ -192,7 +192,7 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine read_bufer_istack_nod_buffer                           &
+      subroutine read_buffer_istack_nod_buffer                          &
      &         (textbuf, num_pe, istack_nod)
 !
       integer, intent(in) :: num_pe
@@ -205,7 +205,7 @@
       istack_nod(0) = 0
       read(tmp1,*) istack_nod(1:num_pe)
 !
-      end subroutine read_bufer_istack_nod_buffer
+      end subroutine read_buffer_istack_nod_buffer
 !
 ! -------------------------------------------------------------------
 !

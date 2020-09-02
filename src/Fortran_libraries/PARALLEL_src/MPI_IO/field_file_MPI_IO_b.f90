@@ -7,8 +7,7 @@
 !> @brief Output merged binary field file using MPI-IO
 !!
 !!@verbatim
-!!      subroutine write_step_field_file_mpi_b                          &
-!!     &         (file_name, num_pe, id_rank, t_IO, fld_IO)
+!!      subroutine write_step_field_file_mpi_b(file_name, t_IO, fld_IO)
 !!        type(time_data), intent(in) :: t_IO
 !!        type(field_IO), intent(in) :: fld_IO
 !!
@@ -56,8 +55,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine write_step_field_file_mpi_b                            &
-     &         (file_name, num_pe, id_rank, t_IO, fld_IO)
+      subroutine write_step_field_file_mpi_b(file_name, t_IO, fld_IO)
 !
       use MPI_binary_head_IO
       use MPI_ascii_data_IO
@@ -65,7 +63,6 @@
       use transfer_to_long_integers
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
 !
       type(time_data), intent(in) :: t_IO
       type(field_IO), intent(in) :: fld_IO
@@ -73,16 +70,12 @@
 !
       if(my_rank .eq. 0) write(*,*)                                     &
      &    'write binary data by MPI-IO: ', trim(file_name) 
-      call open_write_mpi_file_b                                        &
-     &   (file_name, num_pe, id_rank, IO_param)
-!
-      if(id_rank .lt. num_pe) then
-        call write_field_data_mpi_b(IO_param,                           &
-     &      t_IO%i_time_step, t_IO%time, t_IO%dt,                       &
-     &      cast_long(fld_IO%nnod_IO), fld_IO%num_field_IO,             &
-     &      fld_IO%ntot_comp_IO, fld_IO%num_comp_IO, fld_IO%fld_name,   &
-     &      fld_IO%d_IO, fld_IO%istack_numnod_IO)
-      end if
+      call open_write_mpi_file_b(file_name, IO_param)
+      call write_field_data_mpi_b(IO_param,                             &
+     &    t_IO%i_time_step, t_IO%time, t_IO%dt,                         &
+     &    cast_long(fld_IO%nnod_IO), fld_IO%num_field_IO,               &
+     &    fld_IO%ntot_comp_IO, fld_IO%num_comp_IO, fld_IO%fld_name,     &
+     &    fld_IO%d_IO, fld_IO%istack_numnod_IO)
 !
       call close_mpi_file(IO_param)
 !

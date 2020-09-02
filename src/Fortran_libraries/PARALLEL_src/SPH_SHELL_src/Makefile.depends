@@ -20,6 +20,8 @@ check_sph_radial_mat.o: $(SPH_COMMDIR)/check_sph_radial_mat.f90 m_precision.o m_
 	$(F90) -c $(F90OPTFLAGS) $<
 circle_transform_single.o: $(SPH_COMMDIR)/circle_transform_single.f90 m_precision.o m_constants.o m_machine_parameter.o t_FFT_selector.o t_schmidt_polynomial.o t_circle_transform.o calypso_mpi.o m_geometry_constants.o cal_circle_transform.o m_FFT_selector.o m_phys_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
+compare_sph_with_IO.o: $(SPH_COMMDIR)/compare_sph_with_IO.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_file_IO_parameter.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_spheric_group.o t_spheric_data_IO.o t_const_spherical_grid.o t_sph_local_parameter.o sph_file_MPI_IO_select.o set_loaded_data_4_sph.o load_data_for_sph_IO.o copy_sph_comm_table_4_IO.o copy_sph_rtp_node_4_IO.o set_group_types_4_IO.o copy_sph_rj_mode_4_IO.o copy_sph_rtm_node_4_IO.o copy_sph_rlm_mode_4_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
 copy_field_4_sph_trans.o: $(SPH_COMMDIR)/copy_field_4_sph_trans.f90 m_precision.o m_machine_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<
 copy_nodal_fld_4_sph_trans.o: $(SPH_COMMDIR)/copy_nodal_fld_4_sph_trans.f90 m_precision.o m_constants.o m_machine_parameter.o m_phys_constants.o t_spheric_rtp_data.o t_geometry_data.o t_phys_data.o copy_field_4_sph_trans.o copy_pole_field_sph_trans.o cvt_sph_vector_2_xyz_smp.o cvt_sph_tensor_2_xyz_smp.o cvt_xyz_vector_2_sph_smp.o cvt_xyz_tensor_2_sph_smp.o

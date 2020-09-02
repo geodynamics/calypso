@@ -23,7 +23,7 @@
 !!        type(mesh_geometry), intent(inout) :: mesh_IO
 !!
 !!      subroutine sel_mpi_write_mesh_file                              &
-!!     &         (num_pe, id_rank, mesh_file, mesh_IO, group_IO)
+!!     &         (mesh_file, mesh_IO, group_IO)
 !!        type(field_IO_params), intent(in) ::  mesh_file
 !!        type(mesh_geometry), intent(in) :: mesh_IO
 !!        type(mesh_groups), intent(in) ::   group_IO
@@ -247,41 +247,36 @@
 !------------------------------------------------------------------
 !
       subroutine sel_mpi_write_mesh_file                                &
-     &         (num_pe, id_rank, mesh_file, mesh_IO, group_IO)
+     &         (mesh_file, mesh_IO, group_IO)
 !
       use set_mesh_file_names
 !
-      integer, intent(in) :: num_pe, id_rank
       type(field_IO_params), intent(in) ::  mesh_file
       type(mesh_geometry), intent(in) :: mesh_IO
       type(mesh_groups), intent(in) ::   group_IO
 !
 !
       file_name = set_mesh_file_name                                    &
-     &        (mesh_file%file_prefix, mesh_file%iflag_format, id_rank)
+     &        (mesh_file%file_prefix, mesh_file%iflag_format, my_rank)
 !
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
-        call mpi_write_mesh_file_b                                      &
-     &     (num_pe, id_rank, file_name, mesh_IO, group_IO)
+        call mpi_write_mesh_file_b(file_name, mesh_IO, group_IO)
       else if(mesh_file%iflag_format .eq. iflag_single) then
-        call mpi_write_mesh_file                                        &
-     &     (num_pe, id_rank, file_name, mesh_IO, group_IO)
+        call mpi_write_mesh_file(file_name, mesh_IO, group_IO)
 !
 #ifdef ZLIB_IO
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
-        call gz_mpi_write_mesh_file_b                                   &
-     &     (num_pe, id_rank, file_name, mesh_IO, group_IO)
+        call gz_mpi_write_mesh_file_b(file_name, mesh_IO, group_IO)
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
-        call gz_mpi_write_mesh_file                                     &
-     &     (num_pe, id_rank, file_name, mesh_IO, group_IO)
+        call gz_mpi_write_mesh_file(file_name, mesh_IO, group_IO)
 #endif
 !
-      else if(id_rank .lt. num_pe) then
+      else if(my_rank .lt. nprocs) then
         call sel_write_mesh_file                                        &
-     &     (mesh_file, id_rank, mesh_IO, group_IO)
+     &     (mesh_file, my_rank, mesh_IO, group_IO)
       end if
 !
       end subroutine sel_mpi_write_mesh_file

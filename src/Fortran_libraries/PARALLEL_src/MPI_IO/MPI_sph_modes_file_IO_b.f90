@@ -17,14 +17,10 @@
 !!     &         (file_name, num_pe, id_rank, sph_file)
 !!        type(sph_file_data_type), intent(inout) :: sph_file
 !!
-!!      subroutine mpi_write_geom_rtp_file_b                            &
-!!     &         (file_name, num_pe, id_rank, sph_file)
-!!      subroutine mpi_write_spectr_rj_file_b                           &
-!!     &         (file_name, num_pe, id_rank, sph_file)
-!!      subroutine mpi_write_geom_rtm_file_b                            &
-!!     &         (file_name, num_pe, id_rank, sph_file)
-!!      subroutine mpi_write_modes_rlm_file_b                           &
-!!     &         (file_name, num_pe, id_rank, sph_file)
+!!      subroutine mpi_write_geom_rtp_file_b(file_name, sph_file)
+!!      subroutine mpi_write_spectr_rj_file_b(file_name, sph_file)
+!!      subroutine mpi_write_geom_rtm_file_b(file_name, sph_file)
+!!      subroutine mpi_write_modes_rlm_file_b(file_name, sph_file)
 !!        type(sph_file_data_type), intent(in) :: sph_file
 !!@endverbatim
 !!
@@ -136,18 +132,15 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine mpi_write_geom_rtp_file_b                             &
-     &         (file_name, num_pe, id_rank, sph_file)
+      subroutine mpi_write_geom_rtp_file_b(file_name, sph_file)
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
       type(sph_file_data_type), intent(in) :: sph_file
 !
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write merged binary grid file: ', trim(file_name)
-      call open_write_mpi_file_b                                        &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_write_mpi_file_b(file_name, IO_param)
 !
       call mpi_write_geom_rtp_data_b(IO_param, sph_file%comm_IO,        &
      &    sph_file%sph_IO, sph_file%sph_grp_IO)
@@ -157,18 +150,15 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine mpi_write_spectr_rj_file_b                             &
-     &         (file_name, num_pe, id_rank, sph_file)
+      subroutine mpi_write_spectr_rj_file_b(file_name, sph_file)
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
       type(sph_file_data_type), intent(in) :: sph_file
 !
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'merged binary spectr modes file: ', trim(file_name)
-      call open_write_mpi_file_b                                        &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_write_mpi_file_b(file_name, IO_param)
 !
       call mpi_write_spectr_rj_data_b(IO_param, sph_file%comm_IO,      &
      &    sph_file%sph_IO, sph_file%sph_grp_IO)
@@ -178,18 +168,15 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine mpi_write_geom_rtm_file_b                              &
-     &         (file_name, num_pe, id_rank, sph_file)
+      subroutine mpi_write_geom_rtm_file_b(file_name, sph_file)
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
       type(sph_file_data_type), intent(in) :: sph_file
 !
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write merged binary grid file: ', trim(file_name)
-      call open_write_mpi_file_b                                        &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_write_mpi_file_b(file_name, IO_param)
 !
       call mpi_write_geom_rtm_data_b                                    &
      &   (IO_param, sph_file%comm_IO, sph_file%sph_IO)
@@ -199,18 +186,15 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine mpi_write_modes_rlm_file_b                             &
-     &         (file_name, num_pe, id_rank, sph_file)
+      subroutine mpi_write_modes_rlm_file_b(file_name, sph_file)
 !
       character(len=kchara), intent(in) :: file_name
-      integer, intent(in) :: num_pe, id_rank
       type(sph_file_data_type), intent(in) :: sph_file
 !
 !
       if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Write merged binary spectr modes file: ', trim(file_name)
-      call open_write_mpi_file_b                                        &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_write_mpi_file_b(file_name, IO_param)
 !
       call mpi_write_modes_rlm_data_b                                   &
      &   (IO_param, sph_file%comm_IO, sph_file%sph_IO)
