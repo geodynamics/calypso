@@ -30,6 +30,6 @@ test:
 	$(MPIRUN) -np 6 $(BUILDDIR)/check_sph_comms
 
 clean:
-	rm -f *.dat mesh/in.*
+	rm -f *.dat in.*
 
 distclean: clean

@@ -25,11 +25,11 @@ all: test
 
 test: 
 	rm -f *.dat
-	$(MPIRUN) -np 6 $(BUILDDIR)/gen_sph_grids
-	$(MPIRUN) -np 6 $(BUILDDIR)/check_sph_grids
-	$(MPIRUN) -np 6 $(BUILDDIR)/check_sph_comms
+	$(MPIRUN) -np 3 $(BUILDDIR)/gen_sph_grids
+	$(MPIRUN) -np 3 $(BUILDDIR)/assemble_sph
+	$(MPIRUN) -np 3 $(BUILDDIR)/compare_sph_restart
 
 clean:
-	rm -f *.dat mesh/in.*
+	rm -f *.dat restart/rst.* sph_lm7t12r14c_ic_3/in.* 
 
 distclean: clean

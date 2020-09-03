@@ -25,6 +25,8 @@ MPILIBS =
 #
 SUBDIRS = \
 Communication_check \
+restart_assemble \
+\
 Dynamobench_case1 \
 Dynamobench_case2 \
 heterogineous_temp

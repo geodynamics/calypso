@@ -2,21 +2,18 @@ begin assemble_control
 !
   begin data_files_def
     num_subdomain_ctl             4
-    sph_file_prefix      '../sph_lm7t12r14c_ic_4/in'
     restart_file_prefix  '../reference/rst'
-!
-    sph_file_fmt_ctl           'ascii'
     restart_file_fmt_ctl       'ascii'
   end data_files_def
 !
   begin new_data_files_def
-    num_subdomain_ctl           3
-    sph_file_prefix      'sph_lm7t12r14c_ic_3/in'
-    restart_file_prefix  'restart/rst'
-!
+    num_subdomain_ctl           4
     restart_file_prefix         'restart/rst'
-    restart_file_fmt_ctl           'ascii'
+    restart_file_fmt_ctl        'gzip'
   end new_data_files_def
+!
+  file spherical_shell_ctl       '../sph_lm7t12r14c_ic_4/control_resolution'
+  file new_spherical_shell_ctl   '../sph_lm7t12r14c_ic_4/control_resolution'
 !
   begin control
 !!!!!  information for time integration

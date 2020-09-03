@@ -1,0 +1,48 @@
+begin assemble_control
+!
+  begin data_files_def
+    num_subdomain_ctl             4
+    sph_file_prefix     '../sph_lm7t12r14c_ic_4/in'
+    sph_file_fmt_ctl           'ascii'
+!
+    restart_file_prefix  '../reference/rst'
+    restart_file_fmt_ctl       'ascii'
+  end data_files_def
+!
+  begin new_data_files_def
+    num_subdomain_ctl           3
+    restart_file_prefix         'restart/rst'
+    restart_file_fmt_ctl        'merged_bin'
+  end new_data_files_def
+!
+  begin new_spherical_shell_ctl
+    begin num_domain_ctl
+      num_radial_domain_ctl         3
+      num_horizontal_domain_ctl     1
+    end num_domain_ctl
+!
+    begin num_grid_sph
+      truncation_level_ctl      7
+!
+      ngrid_meridonal_ctl      12
+      ngrid_zonal_ctl          24
+!
+      radial_grid_type_ctl   Chebyshev
+      num_fluid_grid_ctl     14
+      fluid_core_size_ctl   1.0
+      ICB_to_CMB_ratio_ctl  0.35
+      Min_radius_ctl        0.0
+    end num_grid_sph
+  end new_spherical_shell_ctl
+!
+  begin control
+!!!!!  information for time integration
+    begin time_step_ctl
+      i_step_init_ctl         110
+      i_step_number_ctl       110
+      i_step_rst_ctl          1
+      i_step_ucd_ctl          1
+    end time_step_ctl
+  end control
+end assemble_control
+

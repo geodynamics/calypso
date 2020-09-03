@@ -24,8 +24,6 @@ MPILIBS =
 #  -------------------------------------------------------------------------
 #
 SUBDIRS = \
-no_file \
-\
 ascii \
 binary \
 gzip \
@@ -45,7 +43,7 @@ all: test
 
 test: 
 	for dir in $(SUBDIRS) ; do \
-	echo "# Test spherical harmonics indexining in $${dir} directory..."; \
+	echo "# Test restart converter in $${dir} directory..."; \
 		( cd $${dir}; \
 		$(GMAKE) \
 		GMAKE="$(GMAKE)" \
@@ -55,8 +53,6 @@ test:
 		MPIRUN="$(MPIRUN)" \
 		test)\
 	done; \
-	echo "# Test Communication without indexing file"; \
-	$(MPIRUN) -np 6 $(BUILDDIR)/check_sph_comms
 	
 	rm -f *.dat
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90

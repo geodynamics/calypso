@@ -8,9 +8,9 @@ begin MHD_control
 !
   begin data_files_def
     debug_flag_ctl            'OFF'
-    num_subdomain_ctl            3
+    num_subdomain_ctl            4
 !
-    sph_file_prefix             'sph_lm7t12r14c_ic_3/in'
+    sph_file_prefix             'in'
     sph_file_fmt_ctl            'ascii'
   end data_files_def
 !
@@ -21,5 +21,5 @@ begin MHD_control
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
-  file spherical_shell_ctl 'sph_lm7t12r14c_ic_3/control_resolution'
+  file spherical_shell_ctl 'control_resolution'
 end MHD_control

@@ -1,0 +1,11 @@
+ Average elapsed time
+  1. Total time:    2.76337500000E-02
+  3. Construction of spherical harmonic indices table:    2.33947500000E-02
+  7. Construction of spherical transform table:    1.16875000000E-03
+  8. Construction of spherical mode and grid:    5.51250000000E-04
+ 
+ Minimum and maximum elapsed time
+  1. Total time:    2.75560000000E-02   2.77860000000E-02
+  3. Construction of spherical harmonic indices table:    2.32400000000E-02   2.36880000000E-02
+  7. Construction of spherical transform table:    1.14700000000E-03   1.19300000000E-03
+  8. Construction of spherical mode and grid:    5.08000000000E-04   5.96000000000E-04
