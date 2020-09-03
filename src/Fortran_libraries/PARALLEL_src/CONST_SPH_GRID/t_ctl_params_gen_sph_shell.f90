@@ -205,7 +205,7 @@
 !
       if(sph%sph_rtp%nidx_global_rtp(2)                                 &
      &      .lt. (sph%sph_params%l_truncation+1)*3/2) then
-        write(*,*) 'Spherical harmonics transform has Ailiasing'
+        write(*,*) 'Spherical harmonics transform has Aliasing'
       else if (sph%sph_rtp%nidx_global_rtp(2)                           &
      &      .lt. (sph%sph_params%l_truncation+1)) then
         write(*,*) "Grid has less than Nyquist's sampling theorem"

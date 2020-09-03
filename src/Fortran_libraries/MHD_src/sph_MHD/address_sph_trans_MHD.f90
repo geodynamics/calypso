@@ -9,14 +9,16 @@
 !!
 !!@verbatim
 !!      subroutine bwd_trans_address_MHD                                &
-!!     &         (ipol, iphys, b_trns, trns_back)
+!!     &         (d_rj, ipol, iphys, b_trns, trns_back)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
+!!        type(phys_data), intent(in) :: d_rj
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(phys_address), intent(inout) :: b_trns
 !!        type(spherical_transform_data), intent(inout) :: trns_back
 !!      subroutine fwd_trans_address_MHD                                &
-!!     &         (ipol, iphys, f_trns, trns_fwd)
+!!     &         (d_rj, ipol, iphys, f_trns, trns_fwd)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
+!!        type(phys_data), intent(in) :: d_rj
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(phys_address), intent(inout) :: f_trns
 !!        type(spherical_transform_data), intent(inout) :: trns_fwd
@@ -28,6 +30,7 @@
       use m_machine_parameter
 !
       use m_phys_constants
+      use t_phys_data
       use t_phys_address
       use t_addresses_sph_transform
       use t_control_parameter
@@ -42,11 +45,12 @@
 !-----------------------------------------------------------------------
 !
       subroutine bwd_trans_address_MHD                                  &
-     &         (ipol, iphys, b_trns, trns_back)
+     &         (d_rj, ipol, iphys, b_trns, trns_back)
 !
       use add_base_field_4_sph_trns
 !
 !      type(MHD_evolution_param), intent(in) :: MHD_prop
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
       type(phys_address), intent(inout) :: b_trns
       type(spherical_transform_data), intent(inout) :: trns_back
@@ -62,12 +66,12 @@
 !
 !      Vectors
       call add_base_vector_4_MHD_sph_trns                               &
-     &   (ipol%base, iphys%base, b_trns%base, trns_back)
+     &   (d_rj, ipol%base, iphys%base, b_trns%base, trns_back)
       trns_back%num_vector = trns_back%nfield
 !
 !      Scalars
       call add_base_scalar_4_MHD_sph_trns                               &
-     &   (ipol%base, iphys%base, b_trns%base, trns_back)
+     &   (d_rj, ipol%base, iphys%base, b_trns%base, trns_back)
       trns_back%num_scalar = trns_back%nfield - trns_back%num_vector
       trns_back%num_tensor = 0
 !
@@ -76,11 +80,12 @@
 !-----------------------------------------------------------------------
 !
       subroutine fwd_trans_address_MHD                                  &
-     &         (ipol, iphys, f_trns, trns_fwd)
+     &         (d_rj, ipol, iphys, f_trns, trns_fwd)
 !
       use add_base_force_4_sph_trns
 !
 !      type(MHD_evolution_param), intent(in) :: MHD_prop
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
 !
       type(phys_address), intent(inout) :: f_trns
@@ -97,16 +102,16 @@
 !
 !   rotation of Coriolis force
       call add_rot_coriolis_MHD_sph_trns                                &
-     &   (ipol%rot_forces, iphys%rot_forces, f_trns%rot_forces,         &
+     &   (d_rj, ipol%rot_forces, iphys%rot_forces, f_trns%rot_forces,   &
      &    trns_fwd)
 !   forces
       call add_base_force_4_MHD_sph_trns                                &
-     &   (ipol%forces, iphys%forces, f_trns%forces, trns_fwd)
+     &   (d_rj, ipol%forces, iphys%forces, f_trns%forces, trns_fwd)
       trns_fwd%num_vector = trns_fwd%nfield
 !
 !   divergence of Coriolis force
       call add_div_coriolis_MHD_sph_trns                                &
-     &   (ipol%div_forces, iphys%div_forces, f_trns%div_forces,         &
+     &   (d_rj, ipol%div_forces, iphys%div_forces, f_trns%div_forces,   &
      &    trns_fwd)
       trns_fwd%num_scalar = trns_fwd%nfield - trns_fwd%num_vector
       trns_fwd%num_tensor = 0

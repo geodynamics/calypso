@@ -8,16 +8,22 @@
 !!       in MHD dynamo simulation
 !!
 !!@verbatim
-!!      subroutine set_addresses_snapshot_trans(ipol, iphys, trns_snap, &
+!!      subroutine set_addresses_snapshot_trans                         &
+!!     &         (d_rj, ipol, iphys, trns_snap,                         &
 !!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+!!        type(phys_data), intent(in) :: d_rj
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(address_4_sph_trans), intent(inout) :: trns_snap
-!!      subroutine set_addresses_ene_flux_trans(ipol, iphys, trns_eflux,&
+!!      subroutine set_addresses_ene_flux_trans                         &
+!!     &         (d_rj, ipol, iphys, trns_eflux,                        &
 !!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+!!        type(phys_data), intent(in) :: d_rj
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(address_4_sph_trans), intent(inout) :: trns_eflux
-!!      subroutine set_addresses_diff_vect_trans(ipol, iphys, trns_difv,&
+!!      subroutine set_addresses_diff_vect_trans                        &
+!!     &         (d_rj, ipol, iphys, trns_difv,                         &
 !!     &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
+!!        type(phys_data), intent(in) :: d_rj
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(address_4_sph_trans), intent(inout) :: trns_difv
 !!
@@ -37,6 +43,7 @@
       use m_precision
       use m_machine_parameter
 !
+      use t_phys_data
       use t_phys_address
       use t_sph_trans_arrays_MHD
       use t_mesh_data
@@ -50,11 +57,13 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_addresses_snapshot_trans(ipol, iphys, trns_snap,   &
+      subroutine set_addresses_snapshot_trans                           &
+     &         (d_rj, ipol, iphys, trns_snap,                           &
      &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
       use address_sph_trans_snap
 !
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
       type(address_4_sph_trans), intent(inout) :: trns_snap
       integer(kind = kint), intent(inout) :: ncomp_sph_trans
@@ -68,10 +77,10 @@
       end if
 !
       call bwd_trans_address_snap                                       &
-     &   (ipol, iphys, trns_snap%b_trns, trns_snap%backward)
+     &   (d_rj, ipol, iphys, trns_snap%b_trns, trns_snap%backward)
 !
       call fwd_trans_address_snap                                       &
-     &   (ipol, iphys, trns_snap%f_trns, trns_snap%forward)
+     &   (d_rj, ipol, iphys, trns_snap%f_trns, trns_snap%forward)
 !
       call count_num_fields_each_trans(trns_snap%backward,              &
      &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
@@ -92,11 +101,13 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_addresses_ene_flux_trans(ipol, iphys, trns_eflux,  &
+      subroutine set_addresses_ene_flux_trans                           &
+     &         (d_rj, ipol, iphys, trns_eflux,                          &
      &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
       use address_sph_trans_snap
 !
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
       type(address_4_sph_trans), intent(inout) :: trns_eflux
       integer(kind = kint), intent(inout) :: ncomp_sph_trans
@@ -110,9 +121,9 @@
       end if
 !
       call bwd_trans_address_ene_flux                                   &
-     &   (ipol, iphys, trns_eflux%b_trns, trns_eflux%backward)
+     &   (d_rj, ipol, iphys, trns_eflux%b_trns, trns_eflux%backward)
       call fwd_trans_address_ene_flux                                   &
-     &   (ipol, iphys, trns_eflux%f_trns, trns_eflux%forward)
+     &   (d_rj, ipol, iphys, trns_eflux%f_trns, trns_eflux%forward)
 !
       call count_num_fields_each_trans(trns_eflux%backward,             &
      &   ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
@@ -133,11 +144,13 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_addresses_diff_vect_trans(ipol, iphys, trns_difv,  &
+      subroutine set_addresses_diff_vect_trans                          &
+     &         (d_rj, ipol, iphys, trns_difv,                           &
      &          ncomp_sph_trans, nvector_sph_trans, nscalar_sph_trans)
 !
       use address_sph_trans_snap
 !
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
       type(address_4_sph_trans), intent(inout) :: trns_difv
       integer(kind = kint), intent(inout) :: ncomp_sph_trans
@@ -151,9 +164,9 @@
       end if
 !
       call bwd_trans_address_diff_vect                                  &
-     &   (ipol, iphys, trns_difv%b_trns, trns_difv%backward)
+     &   (d_rj, ipol, iphys, trns_difv%b_trns, trns_difv%backward)
       call fwd_trans_address_diff_vect                                  &
-     &   (ipol, iphys, trns_difv%f_trns, trns_difv%forward)
+     &   (d_rj, ipol, iphys, trns_difv%f_trns, trns_difv%forward)
 !
 !
       call count_num_fields_each_trans(trns_difv%backward,              &

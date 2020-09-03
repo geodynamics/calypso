@@ -9,34 +9,39 @@
 !!
 !!@verbatim
 !!      subroutine bwd_trans_address_snap                               &
-!!     &         (ipol, iphys, b_trns, trns_back)
+!!     &         (d_rj, ipol, iphys, b_trns, trns_back)
+!!        type(phys_data), intent(in) :: d_rj
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(phys_address), intent(inout) :: b_trns
 !!        type(spherical_transform_data), intent(inout) :: trns_back
 !!      subroutine fwd_trans_address_snap                               &
-!!     &         (ipol, iphys, f_trns, trns_fwd)
+!!     &         (d_rj, ipol, iphys, f_trns, trns_fwd)
+!!        type(phys_data), intent(in) :: d_rj
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(spherical_transform_data), intent(inout) :: trns_fwd
 !!        type(phys_address), intent(inout) :: f_trns
 !!
 !!      subroutine bwd_trans_address_ene_flux                           &
-!!     &         (ipol, iphys, b_trns, trns_back)
+!!     &         (d_rj, ipol, iphys, b_trns, trns_back)
+!!        type(phys_data), intent(in) :: d_rj
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(spherical_transform_data), intent(inout) :: trns_back
 !!        type(phys_address), intent(inout) :: b_trns
 !!      subroutine fwd_trans_address_ene_flux                           &
-!!     &         (ipol, iphys, f_trns, trns_fwd)
+!!     &         (d_rj, ipol, iphys, f_trns, trns_fwd)
+!!        type(phys_data), intent(in) :: d_rj
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(spherical_transform_data), intent(inout) :: trns_fwd
 !!        type(phys_address), intent(inout) :: f_trns
 !!
 !!      subroutine bwd_trans_address_diff_vect                          &
-!!     &         (ipol, iphys, b_trns, trns_back)
+!!     &         (d_rj, ipol, iphys, b_trns, trns_back)
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(phys_address), intent(inout) :: b_trns
 !!        type(spherical_transform_data), intent(inout) :: trns_back
 !!      subroutine fwd_trans_address_diff_vect                          &
-!!     &         (ipol, iphys, f_trns, trns_fwd)
+!!     &         (d_rj, ipol, iphys, f_trns, trns_fwd)
+!!        type(phys_data), intent(in) :: d_rj
 !!        type(phys_address), intent(in) :: ipol, iphys
 !!        type(phys_address), intent(inout) :: f_trns
 !!        type(spherical_transform_data), intent(inout) :: trns_fwd
@@ -47,6 +52,7 @@
       use m_precision
       use m_machine_parameter
 !
+      use t_phys_data
       use t_phys_address
       use t_addresses_sph_transform
 !
@@ -59,10 +65,11 @@
 !-----------------------------------------------------------------------
 !
       subroutine bwd_trans_address_snap                                 &
-     &         (ipol, iphys, b_trns, trns_back)
+     &         (d_rj, ipol, iphys, b_trns, trns_back)
 !
       use add_base_field_4_sph_trns
 !
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
       type(phys_address), intent(inout) :: b_trns
       type(spherical_transform_data), intent(inout) :: trns_back
@@ -77,12 +84,12 @@
       call alloc_sph_trns_field_name(trns_back)
 !
       call add_base_vector_sph_trns_snap                                &
-     &   (ipol%base, iphys%base, b_trns%base, trns_back)
+     &   (d_rj, ipol%base, iphys%base, b_trns%base, trns_back)
       trns_back%num_vector = trns_back%nfield
 !
 !      Scalars
       call add_base_scalar_sph_trns_snap                                &
-     &   (ipol%base, iphys%base, b_trns%base, trns_back)
+     &   (d_rj, ipol%base, iphys%base, b_trns%base, trns_back)
       trns_back%num_scalar = trns_back%nfield - trns_back%num_vector
       trns_back%num_tensor = 0
 !
@@ -91,10 +98,11 @@
 !-----------------------------------------------------------------------
 !
       subroutine fwd_trans_address_snap                                 &
-     &         (ipol, iphys, f_trns, trns_fwd)
+     &         (d_rj, ipol, iphys, f_trns, trns_fwd)
 !
       use add_base_force_4_sph_trns
 !
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
       type(spherical_transform_data), intent(inout) :: trns_fwd
       type(phys_address), intent(inout) :: f_trns
@@ -110,11 +118,11 @@
 !
 !   forces
       call add_base_force_sph_trns_snap                                 &
-     &   (ipol%forces, iphys%forces, f_trns%forces, trns_fwd)
+     &   (d_rj, ipol%forces, iphys%forces, f_trns%forces, trns_fwd)
       trns_fwd%num_vector = trns_fwd%nfield
 !
       call add_div_coriolis_MHD_sph_trns                                &
-     &   (ipol%div_forces, iphys%div_forces, f_trns%div_forces,         &
+     &   (d_rj, ipol%div_forces, iphys%div_forces, f_trns%div_forces,   &
      &    trns_fwd)
       trns_fwd%num_scalar = trns_fwd%nfield - trns_fwd%num_vector
       trns_fwd%num_tensor = 0
@@ -125,7 +133,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine bwd_trans_address_ene_flux                             &
-     &         (ipol, iphys, b_trns, trns_back)
+     &         (d_rj, ipol, iphys, b_trns, trns_back)
 !
       use add_base_field_4_sph_trns
       use add_base_force_4_sph_trns
@@ -134,6 +142,7 @@
       use add_diff_vect_to_sph_trans
       use add_field_to_sph_trans_list
 !
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
       type(spherical_transform_data), intent(inout) :: trns_back
       type(phys_address), intent(inout) :: b_trns
@@ -148,29 +157,33 @@
       call alloc_sph_trns_field_name(trns_back)
 !
       call add_vector_diffusion_sph_trns                                &
-     &   (ipol%diffusion, iphys%diffusion, b_trns%diffusion, trns_back)
+     &   (d_rj, ipol%diffusion, iphys%diffusion, b_trns%diffusion,      &
+     &    trns_back)
 !
       call add_rot_force_4_sph_trns_snap                                &
-     &   (ipol%rot_forces, iphys%rot_forces, b_trns%rot_forces,         &
+     &   (d_rj, ipol%rot_forces, iphys%rot_forces, b_trns%rot_forces,   &
      &    trns_back)
       call add_base_force_bwd_trns_snap                                 &
-     &   (ipol%forces, iphys%forces, b_trns%forces, trns_back)
+     &   (d_rj, ipol%forces, iphys%forces, b_trns%forces, trns_back)
 !
       call add_grad_4_sph_trns_snap                                     &
-     &   (ipol%grad_fld, iphys%grad_fld, b_trns%grad_fld, trns_back)
+     &   (d_rj, ipol%grad_fld, iphys%grad_fld, b_trns%grad_fld,         &
+     &    trns_back)
       call add_subtracted_sph_trns_snap                                 &
-     &   (ipol%prod_fld, iphys%prod_fld, b_trns%prod_fld, trns_back)
+     &   (d_rj, ipol%prod_fld, iphys%prod_fld, b_trns%prod_fld,         &
+     &    trns_back)
       trns_back%num_vector = trns_back%nfield
 !
 !
       call add_scalar_diffusion_sph_trns                                &
-     &   (ipol%diffusion, iphys%diffusion, b_trns%diffusion, trns_back)
+     &   (d_rj, ipol%diffusion, iphys%diffusion, b_trns%diffusion,      &
+     &    trns_back)
 !
       call add_scalar_flux_bwd_trns_snap                                &
-     &   (ipol%forces, iphys%forces, b_trns%forces, trns_back)
+     &   (d_rj, ipol%forces, iphys%forces, b_trns%forces, trns_back)
 !
       call add_div_force_4_sph_trns_snap                                &
-     &   (ipol%div_forces, iphys%div_forces, b_trns%div_forces,         &
+     &   (d_rj, ipol%div_forces, iphys%div_forces, b_trns%div_forces,   &
      &    trns_back)
 !
       trns_back%num_scalar = trns_back%nfield - trns_back%num_vector
@@ -181,12 +194,13 @@
 !-----------------------------------------------------------------------
 !
       subroutine fwd_trans_address_ene_flux                             &
-     &         (ipol, iphys, f_trns, trns_fwd)
+     &         (d_rj, ipol, iphys, f_trns, trns_fwd)
 !
       use add_base_force_4_sph_trns
       use add_prod_field_4_sph_trns
       use add_energy_flux_4_sph_trns
 !
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
       type(spherical_transform_data), intent(inout) :: trns_fwd
       type(phys_address), intent(inout) :: f_trns
@@ -201,15 +215,18 @@
       call alloc_sph_trns_field_name(trns_fwd)
 !
       call add_base_force_fwd_trns_snap                                 &
-     &   (ipol%forces, iphys%forces, f_trns%forces, trns_fwd)
+     &   (d_rj, ipol%forces, iphys%forces, f_trns%forces, trns_fwd)
       call add_prod_vector_sph_trns_snap                                &
-     &   (ipol%prod_fld, iphys%prod_fld, f_trns%prod_fld, trns_fwd)
+     &   (d_rj, ipol%prod_fld, iphys%prod_fld, f_trns%prod_fld,         &
+     &    trns_fwd)
       trns_fwd%num_vector = trns_fwd%nfield
 !
       call add_prod_scalar_sph_trns_snap                                &
-     &   (ipol%prod_fld, iphys%prod_fld, f_trns%prod_fld, trns_fwd)
+     &   (d_rj, ipol%prod_fld, iphys%prod_fld, f_trns%prod_fld,         &
+     &    trns_fwd)
       call add_ene_flux_4_sph_trns_snap                                 &
-     &   (ipol%ene_flux, iphys%ene_flux, f_trns%ene_flux, trns_fwd)
+     &   (d_rj, ipol%ene_flux, iphys%ene_flux, f_trns%ene_flux,         &
+     &    trns_fwd)
       trns_fwd%num_scalar = trns_fwd%nfield - trns_fwd%num_vector
       trns_fwd%num_tensor = 0
 !
@@ -219,10 +236,11 @@
 !-----------------------------------------------------------------------
 !
       subroutine bwd_trans_address_diff_vect                            &
-     &         (ipol, iphys, b_trns, trns_back)
+     &         (d_rj, ipol, iphys, b_trns, trns_back)
 !
       use add_diff_vect_to_sph_trans
 !
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
       type(phys_address), intent(inout) :: b_trns
       type(spherical_transform_data), intent(inout) :: trns_back
@@ -237,8 +255,8 @@
       call alloc_sph_trns_field_name(trns_back)
 !
       call add_diff_vect_sph_trns_by_pol                                &
-     &   (ipol%diff_vector, iphys%diff_vector, b_trns%diff_vector,      &
-     &    trns_back)
+     &   (d_rj, ipol%diff_vector, iphys%diff_vector,                    &
+     &    b_trns%diff_vector, trns_back)
       trns_back%num_vector = trns_back%nfield
       trns_back%num_scalar = trns_back%nfield - trns_back%num_vector
       trns_back%num_tensor = 0
@@ -248,10 +266,11 @@
 !-----------------------------------------------------------------------
 !
       subroutine fwd_trans_address_diff_vect                            &
-     &         (ipol, iphys, f_trns, trns_fwd)
+     &         (d_rj, ipol, iphys, f_trns, trns_fwd)
 !
       use add_diff_vect_to_sph_trans
 !
+      type(phys_data), intent(in) :: d_rj
       type(phys_address), intent(in) :: ipol, iphys
       type(phys_address), intent(inout) :: f_trns
       type(spherical_transform_data), intent(inout) :: trns_fwd
@@ -266,8 +285,8 @@
       call alloc_sph_trns_field_name(trns_fwd)
       trns_fwd%num_vector = trns_fwd%nfield
 !
-      call add_diff_vect_scalar_trns_bpol                               &
-     &   (ipol%diff_vector, iphys%diff_vector, f_trns%diff_vector,      &
+      call add_diff_vect_scalar_trns_bpol(d_rj,                         &
+     &    ipol%diff_vector, iphys%diff_vector, f_trns%diff_vector,      &
      &    trns_fwd)
       trns_fwd%num_scalar = trns_fwd%nfield - trns_fwd%num_vector
       trns_fwd%num_tensor = 0
