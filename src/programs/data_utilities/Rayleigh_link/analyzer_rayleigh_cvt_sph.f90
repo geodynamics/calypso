@@ -99,9 +99,9 @@
 !  set new spectr data
       call check_and_make_SPH_rj_mode                                   &
      &   (asbl_param_s%new_mesh_file, sph_asbl_maker_s,                 &
-     &    sph_asbl_s%new_sph_mesh(my_rank+1)%sph,                       &
-     &    sph_asbl_s%new_sph_mesh(my_rank+1)%sph_comms,                 &
-     &    sph_asbl_s%new_sph_mesh(my_rank+1)%sph_grps)
+     &    sph_asbl_s%new_sph_mesh%sph,                                  &
+     &    sph_asbl_s%new_sph_mesh%sph_comms,                            &
+     &    sph_asbl_s%new_sph_mesh%sph_grps)
 !
 !     Share number of nodes for new mesh
 !
@@ -111,11 +111,11 @@
 !     construct radial interpolation table
 !
       call const_r_interpolate_table                                    &
-     &   (sph_asbl_s%org_sph_mesh(1), sph_asbl_s%new_sph_mesh(1),       &
+     &   (sph_asbl_s%org_sph_mesh(1), sph_asbl_s%new_sph_mesh,          &
      &    sph_asbl_s%r_itp)
 !
 !      call chebyshev_fwd_mat_4_rayleigh                                &
-!     &   (sph_asbl_s%new_sph_mesh(1), sph_asbl_s%r_itp, ra_rst_s)
+!     &   (sph_asbl_s%new_sph_mesh, sph_asbl_s%r_itp, ra_rst_s)
 !
       call dealloc_rayleigh_radial_grid(ra_rst_s)
 !
@@ -129,10 +129,10 @@
 !
       if(my_rank .eq. 0) then
         call copy_rj_phys_name_from_IO                                  &
-     &     (fld_IO_r, sph_asbl_s%new_sph_phys(1))
+     &     (fld_IO_r, sph_asbl_s%new_sph_phys)
       end if
-      call share_new_spectr_field_names(sph_asbl_s%np_sph_new,          &
-     &    sph_asbl_s%new_sph_mesh, sph_asbl_s%new_sph_phys(1))
+      call share_new_spectr_field_names                                 &
+     &   (sph_asbl_s%new_sph_mesh, sph_asbl_s%new_sph_phys)
 !
 !      call check_nodal_field_name                                      &
 !     &   (50+my_rank, sph_asbl_s%new_sph_phys(1))
@@ -176,14 +176,14 @@
         if(my_rank .eq. 0) write(*,*) 'convert_fields_from_rayleigh'
         call convert_fields_from_rayleigh                               &
      &     (istep, asbl_param_s%org_fld_file,                           &
-     &      sph_asbl_s%new_sph_mesh(my_rank+1), sph_asbl_s%r_itp,       &
-     &      ra_rst_s, sph_asbl_s%new_sph_phys(my_rank+1))
+     &      sph_asbl_s%new_sph_mesh, sph_asbl_s%r_itp,                  &
+     &      ra_rst_s, sph_asbl_s%new_sph_phys)
 !
         call calypso_mpi_barrier
         if(my_rank .eq. 0) write(*,*) 'const_assembled_sph_data'
         call const_assembled_sph_data(asbl_param_s%b_ratio, init_t,     &
-     &      sph_asbl_s%new_sph_mesh(my_rank+1)%sph, sph_asbl_s%r_itp,   &
-     &      sph_asbl_s%new_sph_phys(my_rank+1),                         &
+     &      sph_asbl_s%new_sph_mesh%sph, sph_asbl_s%r_itp,              &
+     &      sph_asbl_s%new_sph_phys,                                    &
      &      sph_asbl_s%new_fst_IO, sph_asbl_s%fst_time_IO)
 !
         call calypso_mpi_barrier

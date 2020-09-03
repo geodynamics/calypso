@@ -24,11 +24,6 @@
 !
       implicit none
 !
-      integer(kind = kint), allocatable :: nnod_list_lc(:)
-      integer(kind = kint), allocatable :: nnod_list(:)
-      integer(kind = kint_gl), allocatable :: istack_nnod_list(:)
-      private :: nnod_list_lc, nnod_list, istack_nnod_list
-!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -41,41 +36,28 @@
       use calypso_mpi_int
 !
       integer, intent(in) :: np_sph_new
-      type(sph_mesh_data), intent(in) :: new_sph_mesh(np_sph_new)
+      type(sph_mesh_data), intent(in) :: new_sph_mesh
 !
       type(field_IO), intent(inout) :: new_fst_IO
 !
-      integer(kind = kint) :: jp, irank_new
-      integer(kind = kint_gl) :: num64
+      integer(kind = kint) :: jp
+      integer(kind = kint), allocatable :: nnod_list(:)
 !
 !
-      allocate(nnod_list_lc(np_sph_new))
-      allocate(nnod_list(np_sph_new))
-      allocate(istack_nnod_list(0:np_sph_new))
-      nnod_list_lc(1:np_sph_new) = 0
-      nnod_list(1:np_sph_new) = 0
+      allocate(nnod_list(nprocs))
+      nnod_list(1:nprocs) = 0
 !
-      do jp = 1, np_sph_new
-        irank_new = jp - 1
-        if(mod(irank_new,nprocs) .ne. my_rank) cycle
-        nnod_list_lc(jp) = new_sph_mesh(jp)%sph%sph_rj%nnod_rj
-      end do
+      call calypso_mpi_allgather_one_int                                &
+     &   (new_sph_mesh%sph%sph_rj%nnod_rj, nnod_list)
 !
-      num64 = int(np_sph_new, KIND(num64))
-      call calypso_mpi_allreduce_int                                    &
-     &   (nnod_list_lc, nnod_list, num64, MPI_SUM)
-!
-      istack_nnod_list(0) = 0
-      do jp = 1, np_sph_new
-        istack_nnod_list(jp) = istack_nnod_list(jp-1) + nnod_list(jp)
-      end do
       call alloc_merged_field_stack(np_sph_new, new_fst_IO)
-      new_fst_IO%istack_numnod_IO(0:np_sph_new)                         &
-     &     = istack_nnod_list(0:np_sph_new)
+      new_fst_IO%istack_numnod_IO(0) = 0
+      do jp = 1, np_sph_new
+        new_fst_IO%istack_numnod_IO(jp)                                 &
+     &      = new_fst_IO%istack_numnod_IO(jp-1) + nnod_list(jp)
+      end do
 !
-      deallocate(istack_nnod_list)
       deallocate(nnod_list)
-      deallocate(nnod_list_lc)
 !
       end subroutine s_count_nnod_4_asseble_sph
 !

@@ -1,22 +1,22 @@
 FEM_analyzer_sph_MHD.o: $(MHD_SPH_DIR)/FEM_analyzer_sph_MHD.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_work_time.o t_time_data.o t_mesh_data.o t_phys_data.o t_phys_address.o t_MHD_step_parameter.o t_MHD_file_parameter.o t_MHD_IO_data.o t_ucd_file.o m_elapsed_labels_4_MHD.o m_array_for_send_recv.o t_cal_max_indices.o set_control_field_data.o nod_phys_send_recv.o node_monitor_IO.o parallel_FEM_mesh_init.o output_viz_file_control.o t_spheric_parameter.o t_sph_trans_arrays_MHD.o set_address_sph_trans_snap.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_base_field_4_sph_trns.o: $(MHD_SPH_DIR)/add_base_field_4_sph_trns.f90 m_precision.o t_base_field_labels.o t_addresses_sph_transform.o t_physical_property.o m_base_field_labels.o add_field_to_sph_trans_list.o
+add_base_field_4_sph_trns.o: $(MHD_SPH_DIR)/add_base_field_4_sph_trns.f90 m_precision.o t_phys_data.o t_base_field_labels.o t_addresses_sph_transform.o t_physical_property.o add_field_to_sph_trans_list.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_base_force_4_sph_trns.o: $(MHD_SPH_DIR)/add_base_force_4_sph_trns.f90 m_precision.o m_constants.o t_base_force_labels.o t_addresses_sph_transform.o t_physical_property.o m_base_force_labels.o add_field_to_sph_trans_list.o m_rot_force_labels.o m_div_force_labels.o
+add_base_force_4_sph_trns.o: $(MHD_SPH_DIR)/add_base_force_4_sph_trns.f90 m_precision.o m_constants.o t_phys_data.o t_base_force_labels.o t_addresses_sph_transform.o t_physical_property.o add_field_to_sph_trans_list.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_diff_vect_to_sph_trans.o: $(MHD_SPH_DIR)/add_diff_vect_to_sph_trans.f90 m_precision.o t_diff_vector_labels.o t_grad_field_labels.o t_addresses_sph_transform.o m_grad_field_labels.o add_field_to_sph_trans_list.o m_diff_vector_labels.o
+add_diff_vect_to_sph_trans.o: $(MHD_SPH_DIR)/add_diff_vect_to_sph_trans.f90 m_precision.o t_phys_data.o t_diff_vector_labels.o t_grad_field_labels.o t_addresses_sph_transform.o add_field_to_sph_trans_list.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_diffusion_4_sph_trns.o: $(MHD_SPH_DIR)/add_diffusion_4_sph_trns.f90 m_precision.o m_constants.o t_diffusion_term_labels.o t_addresses_sph_transform.o m_diffusion_term_labels.o add_field_to_sph_trans_list.o
+add_diffusion_4_sph_trns.o: $(MHD_SPH_DIR)/add_diffusion_4_sph_trns.f90 m_precision.o m_constants.o t_phys_data.o t_diffusion_term_labels.o t_addresses_sph_transform.o add_field_to_sph_trans_list.o m_diffusion_term_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_energy_flux_4_sph_trns.o: $(MHD_SPH_DIR)/add_energy_flux_4_sph_trns.f90 m_precision.o m_constants.o t_energy_flux_labels.o t_addresses_sph_transform.o m_energy_flux_labels.o add_field_to_sph_trans_list.o
+add_energy_flux_4_sph_trns.o: $(MHD_SPH_DIR)/add_energy_flux_4_sph_trns.f90 m_precision.o m_constants.o t_phys_data.o t_energy_flux_labels.o t_addresses_sph_transform.o add_field_to_sph_trans_list.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_field_to_sph_trans_list.o: $(MHD_SPH_DIR)/add_field_to_sph_trans_list.f90 m_precision.o t_field_labels.o t_addresses_sph_transform.o m_machine_parameter.o
+add_field_to_sph_trans_list.o: $(MHD_SPH_DIR)/add_field_to_sph_trans_list.f90 m_precision.o t_phys_data.o t_addresses_sph_transform.o m_machine_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<
-add_prod_field_4_sph_trns.o: $(MHD_SPH_DIR)/add_prod_field_4_sph_trns.f90 m_precision.o t_field_product_labels.o t_addresses_sph_transform.o m_field_product_labels.o add_field_to_sph_trans_list.o
+add_prod_field_4_sph_trns.o: $(MHD_SPH_DIR)/add_prod_field_4_sph_trns.f90 m_precision.o t_phys_data.o t_field_product_labels.o t_addresses_sph_transform.o add_field_to_sph_trans_list.o
 	$(F90) -c $(F90OPTFLAGS) $<
-address_sph_trans_MHD.o: $(MHD_SPH_DIR)/address_sph_trans_MHD.f90 m_precision.o m_machine_parameter.o m_phys_constants.o t_phys_address.o t_addresses_sph_transform.o t_control_parameter.o t_physical_property.o add_base_field_4_sph_trns.o add_base_force_4_sph_trns.o
+address_sph_trans_MHD.o: $(MHD_SPH_DIR)/address_sph_trans_MHD.f90 m_precision.o m_machine_parameter.o m_phys_constants.o t_phys_data.o t_phys_address.o t_addresses_sph_transform.o t_control_parameter.o t_physical_property.o add_base_field_4_sph_trns.o add_base_force_4_sph_trns.o
 	$(F90) -c $(F90OPTFLAGS) $<
-address_sph_trans_snap.o: $(MHD_SPH_DIR)/address_sph_trans_snap.f90 m_precision.o m_machine_parameter.o t_phys_address.o t_addresses_sph_transform.o add_base_field_4_sph_trns.o add_base_force_4_sph_trns.o add_diffusion_4_sph_trns.o add_prod_field_4_sph_trns.o add_diff_vect_to_sph_trans.o add_field_to_sph_trans_list.o add_energy_flux_4_sph_trns.o
+address_sph_trans_snap.o: $(MHD_SPH_DIR)/address_sph_trans_snap.f90 m_precision.o m_machine_parameter.o t_phys_data.o t_phys_address.o t_addresses_sph_transform.o add_base_field_4_sph_trns.o add_base_force_4_sph_trns.o add_diffusion_4_sph_trns.o add_prod_field_4_sph_trns.o add_diff_vect_to_sph_trans.o add_field_to_sph_trans_list.o add_energy_flux_4_sph_trns.o
 	$(F90) -c $(F90OPTFLAGS) $<
 adjust_reference_fields.o: $(MHD_SPH_DIR)/adjust_reference_fields.f90 m_precision.o m_machine_parameter.o t_SPH_MHD_model_data.o t_spheric_parameter.o t_spheric_rj_data.o t_phys_address.o t_phys_data.o t_reference_scalar_param.o set_reference_sph_mhd.o copy_nodal_fields.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -180,7 +180,7 @@ self_buoyancy_on_sphere.o: $(MHD_SPH_DIR)/self_buoyancy_on_sphere.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 set_address_sph_trans_MHD.o: $(MHD_SPH_DIR)/set_address_sph_trans_MHD.f90 m_precision.o t_sph_trans_comm_tbl.o t_spheric_rj_data.o t_phys_address.o t_phys_data.o t_sph_trans_arrays_MHD.o t_control_parameter.o t_physical_property.o address_sph_trans_MHD.o copy_spectr_4_sph_trans.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_address_sph_trans_snap.o: $(MHD_SPH_DIR)/set_address_sph_trans_snap.f90 m_precision.o m_machine_parameter.o t_phys_address.o t_sph_trans_arrays_MHD.o t_mesh_data.o t_spheric_parameter.o address_sph_trans_snap.o copy_fields_from_sph_trans.o
+set_address_sph_trans_snap.o: $(MHD_SPH_DIR)/set_address_sph_trans_snap.f90 m_precision.o m_machine_parameter.o t_phys_data.o t_phys_address.o t_sph_trans_arrays_MHD.o t_mesh_data.o t_spheric_parameter.o address_sph_trans_snap.o copy_fields_from_sph_trans.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_bc_flag_sph_velo.o: $(MHD_SPH_DIR)/set_bc_flag_sph_velo.f90 m_precision.o m_constants.o m_machine_parameter.o m_boundary_condition_IDs.o t_boundary_data_sph_MHD.o t_boundary_params_sph_MHD.o t_boundary_sph_spectr.o t_sph_boundary_input_data.o t_spheric_rj_data.o t_group_data.o t_bc_data_list.o set_bc_sph_scalars.o m_base_field_labels.o set_sph_bc_data_by_file.o
 	$(F90) -c $(F90OPTFLAGS) $<

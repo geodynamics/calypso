@@ -31,6 +31,9 @@
 !!      subroutine read_field_data                                      &
 !!     &         (id_file, nnod64, num_field, ntot_comp,                &
 !!     &          ncomp_field, field_name, field_data)
+!!      subroutine read_field_name                                      &
+!!     &         (id_file, nnod64, num_field, ntot_comp,                &
+!!     &          ncomp_field, field_name)
 !!@endverbatim
 !
       module field_data_IO
@@ -349,6 +352,41 @@
       end do
 !
       end subroutine read_field_data
+!
+! -------------------------------------------------------------------
+!
+      subroutine read_field_name                                        &
+     &         (id_file, nnod64, num_field, ncomp_field, field_name)
+!
+      use skip_comment_f
+!
+      integer(kind = kint), intent(in) :: id_file
+!
+      integer(kind = kint_gl), intent(in) :: nnod64
+      integer(kind = kint), intent(in) :: num_field
+      integer(kind = kint), intent(in) :: ncomp_field(num_field)
+!
+      character(len=kchara), intent(inout) :: field_name(num_field)
+!
+      character(len=255) :: character_4_read
+      integer(kind = kint_gl) :: inod
+      integer(kind = kint) :: i_fld, icou, ist, i
+      real(kind = kreal) :: rtmp
+!
+!
+      icou = 0
+      do i_fld = 1, num_field
+        call skip_comment(character_4_read,id_file)
+        read(character_4_read,*) field_name(i_fld)
+!
+        ist = icou + 1
+        icou = icou + ncomp_field(i_fld)
+        do inod = 1, nnod64
+          read(id_file,*) (rtmp,i=ist,icou)
+        end do
+      end do
+!
+      end subroutine read_field_name
 !
 ! -------------------------------------------------------------------
 !

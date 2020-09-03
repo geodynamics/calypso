@@ -222,9 +222,11 @@
       call alloc_phys_name_IO(fld_IO)
       read(id_phys_file,*) fld_IO%num_comp_IO(1:fld_IO%num_field_IO)
 !
-      close(id_phys_file)
-!
       call cal_istack_phys_comp_IO(fld_IO)
+!
+      call read_field_name(id_phys_file, cast_long(fld_IO%nnod_IO),     &
+     &    fld_IO%num_field_IO, fld_IO%num_comp_IO, fld_IO%fld_name)
+     close (id_phys_file)
 !
       end subroutine read_and_allocate_step_head
 !

@@ -17,6 +17,8 @@
 !!     &          ncomp_field, field_name, field_data, zbuf)
 !!      subroutine read_gz_field_data(nnod64, num_field, ntot_comp,     &
 !!     &          ncomp_field, field_name, field_data, zbuf)
+!!      subroutine read_gz_field_name                                   &
+!!     &         (nnod64, num_field, ncomp_field, field_name, zbuf)
 !!@endverbatim
 !
       module gz_field_data_IO
@@ -27,6 +29,7 @@
       implicit none
 !
       private :: write_gz_field_vect, read_gz_field_vect
+      private :: skip_gz_field_vect
 !
 !------------------------------------------------------------------
 !
@@ -174,6 +177,33 @@
       end subroutine read_gz_field_data
 !
 !------------------------------------------------------------------
+!
+      subroutine read_gz_field_name                                     &
+     &         (nnod64, num_field, ncomp_field, field_name, zbuf)
+!
+      use skip_gz_comment
+!
+      integer(kind=kint_gl), intent(in)  :: nnod64
+      integer(kind=kint), intent(in)  :: num_field
+      integer(kind=kint), intent(in)  :: ncomp_field(num_field)
+!
+      character(len=kchara), intent(inout) :: field_name(num_field)
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer(kind=kint)  :: i_fld, icou
+!
+!
+      icou = 1
+      do i_fld = 1, num_field
+!
+        call skip_gz_comment_chara(field_name(i_fld), zbuf)
+        call skip_gz_field_vect(nnod64, ncomp_field(i_fld), zbuf)
+        icou = icou + ncomp_field(i_fld)
+      end do
+!
+      end subroutine read_gz_field_name
+!
+!------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
       subroutine write_gz_field_vect                                    &
@@ -205,6 +235,7 @@
       end subroutine write_gz_field_vect
 !
 !------------------------------------------------------------------
+!------------------------------------------------------------------
 !
       subroutine read_gz_field_vect(nnod64, ndir, vector, zbuf)
 !
@@ -224,6 +255,27 @@
       end do
 !
       end subroutine read_gz_field_vect
+!
+!------------------------------------------------------------------
+!
+      subroutine skip_gz_field_vect(nnod64, ndir, zbuf)
+!
+      use gzip_file_access
+!
+      integer(kind=kint_gl), intent(in) :: nnod64
+      integer(kind=kint), intent(in) :: ndir
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer(kind=kint_gl)  :: i, nd
+      real(kind = kreal) :: rtmp
+!
+!
+      do i = 1, nnod64
+        call get_one_line_text_from_gz(zbuf)
+        read(zbuf%fixbuf(1),*)  (rtmp,nd=1,ndir)
+      end do
+!
+      end subroutine skip_gz_field_vect
 !
 !------------------------------------------------------------------
 !

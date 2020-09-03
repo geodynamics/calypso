@@ -229,9 +229,13 @@
       call read_gz_multi_int                                            &
      &   (fld_IO%num_field_IO, fld_IO%num_comp_IO, zbuf_f)
 !
-      call close_gzfile_a(zbuf_f)
-!
       call cal_istack_phys_comp_IO(fld_IO)
+!
+      call read_gz_field_name(cast_long(fld_IO%nnod_IO),                &
+     &    fld_IO%num_field_IO, fld_IO%num_comp_IO, fld_IO%fld_name,     &
+     &    zbuf_f)
+!
+      call close_gzfile_a(zbuf_f)
 !
       end subroutine read_alloc_gz_step_field_head
 !

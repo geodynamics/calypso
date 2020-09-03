@@ -1,5 +1,5 @@
-!>@file   analyzer_assemble_sph.f90
-!!@brief  module analyzer_assemble_sph
+!>@file   analyzer_compare_sph_rst.f90
+!!@brief  module analyzer_compare_sph_rst
 !!
 !!@author H. Matsui
 !!@date   Programmed  H. Matsui in Apr., 2010
@@ -7,11 +7,11 @@
 !>@brief  Main loop to assemble spectr data
 !!
 !!@verbatim
-!!      subroutine init_assemble_sph
-!!      subroutine analyze_assemble_sph
+!!      subroutine init_compare_sph_restart
+!!      subroutine analyze_compare_sph_restart
 !!@endverbatim
 !
-      module analyzer_assemble_sph
+      module analyzer_compare_sph_rst
 !
       use m_precision
       use m_constants
@@ -46,7 +46,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine init_assemble_sph
+      subroutine init_compare_sph_restart
 !
       use m_error_IDs
 !
@@ -61,7 +61,7 @@
       type(control_data_4_merge) :: mgd_ctl_s
       type(sph_grid_maker_in_sim) :: sph_asbl_maker_s
       type(sph_grid_maker_in_sim) :: sph_org_maker_s
-      integer(kind = kint) :: ip
+!      integer(kind = kint) :: ip
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
@@ -96,6 +96,7 @@
 !
       call s_count_nnod_4_asseble_sph(sph_asbl_s%np_sph_new,            &
      &    sph_asbl_s%new_sph_mesh, sph_asbl_s%new_fst_IO)
+      call dealloc_merged_field_stack(sph_asbl_s%new_fst_IO)
 !
 !     construct radial interpolation table
 !
@@ -112,37 +113,25 @@
 !
       call share_org_spectr_field_names                                 &
      &   (sph_asbl_s%np_sph_org, sph_asbl_s%org_sph_phys)
-!
       call share_new_spectr_field_names                                 &
      &   (sph_asbl_s%new_sph_mesh, sph_asbl_s%new_sph_phys)
 !
-!      write(*,*) size(sph_asbl_s%new_sph_phys%phys_name),  &
-!     &    'share_new_spectr_field_names', &
-!     &    (trim(sph_asbl_s%new_sph_phys%phys_name(ip)) // ' ', &
-!     &      ip=1,size(sph_asbl_s%new_sph_phys%phys_name))
-!
-!      do ip = 1, sph_asbl_s%np_sph_org
-!        do j = 1, sph_asbl_s%org_sph_mesh(1)%sph%sph_rj%nidx_rj(2)
-!          if(sph_asbl_s%j_table(ip)%j_org_to_new(j).gt. 0)             &
-!     &          write(50+my_rank,*) my_rank+1, ip, j,                  &
-!     &               sph_asbl_s%j_table(ip)%j_org_to_new(j)
-!        end do
-!      end do
-!      write(*,*) 'init_assemble_sph end'
-!
-      end subroutine init_assemble_sph
+      end subroutine init_compare_sph_restart
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine analyze_assemble_sph
+      subroutine analyze_compare_sph_restart
 !
+      use calypso_mpi_int
+      use m_machine_parameter
       use r_interpolate_marged_sph
       use set_field_file_names
       use share_field_data
+      use compare_by_assemble_sph
 !
       integer(kind = kint) :: istep, icou
-      integer(kind = kint) :: ip
-      integer(kind = kint) :: iloop
+      integer(kind = kint) :: iloop, ip
+      integer(kind = kint) :: iflag, iflag_gl
       integer(kind = kint) :: istep_out
       integer :: irank_new
 !
@@ -185,14 +174,24 @@
           call dealloc_phys_data_type(sph_asbl_s%org_sph_phys(ip))
         end do
 !
-        call const_assembled_sph_data(asbl_param_s%b_ratio, init_t,     &
-     &      sph_asbl_s%new_sph_mesh%sph, sph_asbl_s%r_itp,              &
-     &      sph_asbl_s%new_sph_phys, sph_asbl_s%new_fst_IO,             &
-     &      sph_asbl_s%fst_time_IO)
-!
-        call sel_write_step_SPH_field_file                              &
-     &     (istep_out, asbl_param_s%new_fld_file,                       &
+        call sel_read_alloc_step_SPH_file                               &
+     &     (nprocs, my_rank, istep_out, asbl_param_s%new_fld_file,      &
      &      sph_asbl_s%fst_time_IO, sph_asbl_s%new_fst_IO)
+!
+        iflag = compare_assembled_sph_data(my_rank, init_t,             &
+     &            sph_asbl_s%new_sph_mesh%sph, sph_asbl_s%new_sph_phys, &
+     &            sph_asbl_s%new_fst_IO, sph_asbl_s%fst_time_IO)
+!
+        call calypso_mpi_allreduce_one_int(iflag, iflag_gl, MPI_MAX)
+        if(my_rank.eq.0) then
+          if(iflag_gl.gt.0) then
+            write(e_message,'(a)') 'Data do not have consistentency'
+            call calypso_mpi_abort(1,e_message)
+          else
+            write(*,*) 'Data have a consistecy at step ',               &
+     &                sph_asbl_s%fst_time_IO%i_time_step
+          end if
+        end if
 !
         call dealloc_phys_data_IO(sph_asbl_s%new_fst_IO)
         call dealloc_phys_name_IO(sph_asbl_s%new_fst_IO)
@@ -202,23 +201,10 @@
       call dealloc_spectr_data_4_assemble(sph_asbl_s)
 !
       call calypso_MPI_barrier
-!
-      if(asbl_param_s%iflag_delete_org .gt. 0) then
-        icou = 0
-        do istep = asbl_param_s%istep_start, asbl_param_s%istep_end,    &
-     &            asbl_param_s%increment_step
-          icou = icou + 1
-          if(mod(icou,nprocs) .ne. my_rank) cycle
-          call delete_SPH_fld_file                                      &
-     &        (asbl_param_s%org_fld_file, sph_asbl_s%np_sph_org, istep)
-        end do
-      end if
-!
-      call calypso_MPI_barrier
       if (iflag_debug.eq.1) write(*,*) 'exit evolution'
 !
-      end subroutine analyze_assemble_sph
+      end subroutine analyze_compare_sph_restart
 !
 ! ----------------------------------------------------------------------
 !
-      end module analyzer_assemble_sph
+      end module analyzer_compare_sph_rst

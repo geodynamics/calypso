@@ -14,13 +14,13 @@
 !!        type(phys_data), intent(inout) :: org_sph_phys(np_sph_org)
 !!      subroutine share_new_spectr_field_names                         &
 !!     &         (np_sph_new, new_sph_mesh, new_sph_phys)
-!!        type(sph_mesh_data), intent(in) :: new_sph_mesh(np_sph_new)
-!!        type(phys_data), intent(inout) :: new_sph_phys(np_sph_new)
+!!        type(sph_mesh_data), intent(in) :: new_sph_mesh
+!!        type(phys_data), intent(inout) :: new_sph_phys
 !!
-!!      subroutine load_new_spectr_rj_data(np_sph_org, np_sph_new,      &
-!!     &          org_sph_mesh, new_sph_mesh, j_table)
+!!      subroutine load_new_spectr_rj_data(np_sph_org, org_sph_mesh,    &
+!!     &                                   new_sph_mesh, j_table)
 !!        type(sph_mesh_data), intent(in) :: org_sph_mesh(np_sph_org)
-!!        type(sph_mesh_data), intent(in) :: new_sph_mesh(np_sph_new)
+!!        type(sph_mesh_data), intent(in) :: new_sph_mesh
 !!        type(rj_assemble_tbl), intent(inout)                          &
 !!       &                             :: j_table(np_sph_org,np_sph_new)
 !!
@@ -91,59 +91,40 @@
 ! -----------------------------------------------------------------------
 !
       subroutine share_new_spectr_field_names                           &
-     &         (np_sph_new, new_sph_mesh, new_sph_phys)
+     &         (new_sph_mesh, new_sph_phys)
 !
       use share_field_data
 !
-      integer, intent(in) :: np_sph_new
-      type(sph_mesh_data), intent(in) :: new_sph_mesh(np_sph_new)
-      type(phys_data), intent(inout) :: new_sph_phys(np_sph_new)
-!
-      integer(kind = kint) :: jp
+      type(sph_mesh_data), intent(in) :: new_sph_mesh
+      type(phys_data), intent(inout) :: new_sph_phys
 !
 !
-!
-      call share_phys_field_names(new_sph_phys(1))
-!
-      do jp = 2, np_sph_new
-        if(mod(jp-1,nprocs) .ne. my_rank) cycle
-        call copy_field_name_type(new_sph_phys(1), new_sph_phys(jp))
-      end do
-!
-      do jp = 1, np_sph_new
-        if(mod(jp-1,nprocs) .ne. my_rank) cycle
-         call alloc_phys_data_type                                      &
-     &     (new_sph_mesh(jp)%sph%sph_rj%nnod_rj, new_sph_phys(jp))
-      end do
+      call share_phys_field_names(new_sph_phys)
+      call alloc_phys_data_type                                         &
+     &   (new_sph_mesh%sph%sph_rj%nnod_rj, new_sph_phys)
 !
       end subroutine share_new_spectr_field_names
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine load_new_spectr_rj_data(np_sph_org, np_sph_new,        &
-     &          org_sph_mesh, new_sph_mesh, j_table)
+      subroutine load_new_spectr_rj_data(np_sph_org, org_sph_mesh,      &
+     &                                   new_sph_mesh, j_table)
 !
       use parallel_assemble_sph
 !
-      integer, intent(in) :: np_sph_org, np_sph_new
+      integer, intent(in) :: np_sph_org
       type(sph_mesh_data), intent(in) :: org_sph_mesh(np_sph_org)
-      type(sph_mesh_data), intent(in) :: new_sph_mesh(np_sph_new)
-      type(rj_assemble_tbl), intent(inout)                              &
-     &                             :: j_table(np_sph_org,np_sph_new)
+      type(sph_mesh_data), intent(in) :: new_sph_mesh
+      type(rj_assemble_tbl), intent(inout) :: j_table(np_sph_org)
 !
-      integer(kind = kint) :: iproc, jp, jproc, jrank_new
+      integer(kind = kint) :: iproc
 !
 !     Construct mode transfer table
-      do jp = 0, (np_sph_new-1) / nprocs
-        jrank_new = my_rank + jp * nprocs
-        jproc = jrank_new + 1
-        if(jrank_new .ge. np_sph_new) cycle
-        do iproc = 1, np_sph_org
-          call alloc_each_mode_tbl_4_assemble                           &
-     &      (org_sph_mesh(iproc)%sph, j_table(iproc,jproc))
-          call set_mode_table_4_assemble(org_sph_mesh(iproc)%sph,       &
-     &        new_sph_mesh(jproc)%sph, j_table(iproc,jproc))
-        end do
+      do iproc = 1, np_sph_org
+        call alloc_each_mode_tbl_4_assemble                             &
+     &     (org_sph_mesh(iproc)%sph, j_table(iproc))
+        call set_mode_table_4_assemble(org_sph_mesh(iproc)%sph,         &
+     &      new_sph_mesh%sph, j_table(iproc))
       end do
 !
       end subroutine load_new_spectr_rj_data

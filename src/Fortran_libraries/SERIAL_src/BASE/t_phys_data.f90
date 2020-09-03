@@ -26,6 +26,7 @@
 !!
 !!      integer(kind = kint) function field_id_by_address(fld, i_ref)
 !!      character(len=kchara) function field_name_by_address(fld, i_ref)
+!!      integer(kind=kint) function field_comp_by_address(fld, i_ref)
 !!        type(phys_data), intent(in) :: fld
 !!
 !!      subroutine check_all_field_data(id_rank, fld)
@@ -325,12 +326,11 @@
       type(phys_data), intent(in) :: fld
       integer(kind = kint), intent(in) :: i_ref
 !
-      integer(kind = kint) :: i, i_start
+      integer(kind = kint) :: i
 !
       field_id_by_address = 0
       do i = 1, fld%num_phys
-        i_start = fld%istack_component(i-1) + 1
-        if(i_start .eq. i_ref) then
+        if(fld%istack_component(i-1) .eq. i_ref-1) then
           field_id_by_address = i
           exit
         end if
@@ -345,18 +345,35 @@
       type(phys_data), intent(in) :: fld
       integer(kind = kint), intent(in) :: i_ref
 !
-      integer(kind = kint) :: i, i_start
+      integer(kind = kint) :: i
 !
-      write(field_name_by_address,'(a)') 'MISSING'
-      do i = 1, fld%num_phys
-        i_start = fld%istack_component(i-1) + 1
-        if(i_start .eq. i_ref) then
-          field_name_by_address = fld%phys_name(i)
-          exit
-        end if
-      end do
+      i = field_id_by_address(fld, i_ref)
+      if(i .gt. 0) then
+        field_name_by_address = fld%phys_name(i)
+      else
+        write(field_name_by_address,'(a)') 'MISSING'
+      end if
 !
       end function field_name_by_address
+!
+! -----------------------------------------------------------------------
+!
+      integer(kind=kint) function field_comp_by_address(fld, i_ref)
+!
+      type(phys_data), intent(in) :: fld
+      integer(kind = kint), intent(in) :: i_ref
+!
+      integer(kind = kint) :: i
+!
+      i = field_id_by_address(fld, i_ref)
+      if(i .gt. 0) then
+        field_comp_by_address = fld%istack_component(i)                 &
+     &                         - fld%istack_component(i-1)
+      else
+        field_comp_by_address = 0
+      end if
+!
+      end function field_comp_by_address
 !
 ! -----------------------------------------------------------------------
 !  --------------------------------------------------------------------
