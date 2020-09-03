@@ -1,0 +1,26 @@
+begin MHD_control
+!!!!! Define for files !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+!  num_subdomain_ctl: number of subdomains
+!  mesh_file_head_ctl:  header of mesh file (Default: in.domain#)
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+  begin data_files_def
+    debug_flag_ctl            'OFF'
+    num_subdomain_ctl            6
+!
+    sph_file_prefix             'in'
+    sph_file_fmt_ctl            'merged_gz'
+  end data_files_def
+!
+!!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!
+!
+!  To Define by external file...
+!    file spherical_shell_ctl  'file name'
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+  file spherical_shell_ctl '../control_resolution'
+!
+end MHD_control
