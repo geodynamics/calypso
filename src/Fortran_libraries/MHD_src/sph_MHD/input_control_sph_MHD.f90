@@ -97,7 +97,6 @@
      &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, FEM_dat%geofem,   &
      &    MHD_files%mesh_file_IO, sph_maker1)
 !
-      call dealloc_surfacing_controls(DMHD_ctl%surfacing_ctls)
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
       call sph_boundary_IO_control                                      &

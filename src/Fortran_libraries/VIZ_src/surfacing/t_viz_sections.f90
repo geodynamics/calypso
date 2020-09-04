@@ -74,6 +74,8 @@
      &   (fem, nod_fld, surfacing_ctls%iso_s_ctls, viz_psfs%iso)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+2)
 !
+      call dealloc_surfacing_controls(surfacing_ctls)
+!
       end subroutine init_visualize_surface
 !
 !  ---------------------------------------------------------------------
