@@ -161,9 +161,9 @@
       function vtk_each_scalar(d_nod)
 !
       real(kind = kreal), intent(in) :: d_nod
-      character(len=23+1) :: vtk_each_scalar
+      character(len=25+1) :: vtk_each_scalar
 !
-      write(vtk_each_scalar,'(1pE23.12e3,a1)') d_nod, char(10)
+      write(vtk_each_scalar,'(1pE25.15e3,a1)') d_nod, char(10)
 !
       end function vtk_each_scalar
 !
@@ -172,9 +172,9 @@
       function vtk_each_vector(d1, d2, d3)
 !
       real(kind = kreal), intent(in) :: d1, d2, d3
-      character(len=3*23+1) :: vtk_each_vector
+      character(len=3*25+1) :: vtk_each_vector
 !
-      write(vtk_each_vector,'(1p3E23.12e3,a1)') d1, d2, d3, char(10)
+      write(vtk_each_vector,'(1p3E25.15e3,a1)') d1, d2, d3, char(10)
 !
       end function vtk_each_vector
 !
