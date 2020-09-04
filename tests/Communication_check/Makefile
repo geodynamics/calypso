@@ -56,7 +56,7 @@ test:
 		test)\
 	done; \
 	echo "# Test Communication without indexing file"; \
-	$(MPIRUN) -np 6 $(BUILDDIR)/check_sph_comms
+	$(MPIRUN) -np 6 $(BUILDDIR)/tests/check_sph_comms
 	
 	rm -f *.dat
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90

@@ -25,10 +25,10 @@ all: test
 
 test: 
 	rm -f *.dat
-	$(MPIRUN) -np 4 $(BUILDDIR)/gen_sph_grids
+	$(MPIRUN) -np 4 $(BUILDDIR)/$(TARGET_GEN_SPH_GRID)
 	$(MPIRUN) -np 4 $(BUILDDIR)/sph_mhd
 	echo 'Compare with reference mean square data'
-	$(BUILDDIR)/sph_ene_check
+	$(BUILDDIR)/tests/sph_ene_check
 
 clean:
 	rm -f *.dat rst_4/rst.*  sph_lm31r48c_4/in.*

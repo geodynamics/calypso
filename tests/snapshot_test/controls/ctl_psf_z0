@@ -1,0 +1,42 @@
+!
+!     example of control for surface rendering on equator
+!
+begin surface_rendering
+  psf_file_head    'section/psf_eq'
+  psf_output_type    PSF
+!
+  begin surface_define
+    section_method    equation
+!
+    array coefs_ctl
+      coefs_ctl  x2     0.0
+      coefs_ctl  y2     0.0
+      coefs_ctl  z2     0.0
+      coefs_ctl  xy     0.0
+      coefs_ctl  yz     0.0
+      coefs_ctl  zx     0.0
+      coefs_ctl  x      0.0
+      coefs_ctl  y      0.0
+      coefs_ctl  z      1.0
+      coefs_ctl  const  0.0
+    end array coefs_ctl
+!
+    begin plot_area_ctl
+      array chosen_ele_grp_ctl
+        chosen_ele_grp_ctl   all
+      end array chosen_ele_grp_ctl
+    end plot_area_ctl
+  end surface_define
+!
+  begin output_field_define
+    array output_field
+      output_field  temperature           scalar            
+      output_field  velocity              cylindrical_vector
+      output_field  vorticity             cylindrical_vector
+      output_field  magnetic_field        cylindrical_vector
+!
+      output_field  Lorentz_work            scalar
+      output_field  buoyancy_flux           scalar
+    end array output_field
+  end output_field_define
+end surface_rendering

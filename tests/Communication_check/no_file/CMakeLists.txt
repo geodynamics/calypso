@@ -19,4 +19,4 @@ add_test (NAME "Dynamobench_case1_sph_mhd"
 
 add_test (NAME "Dynamobench_case1_sph_ene_check"
           WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tests/Dynamobench_case1
-          COMMAND ${CMAKE_BINARY_DIR}/bin/sph_ene_check)
+          COMMAND ${CMAKE_BINARY_DIR}/bin/tests/sph_ene_check)

@@ -26,7 +26,7 @@ all: test
 test: 
 	rm -f *.dat
 	$(MPIRUN) -np 4 $(BUILDDIR)/assemble_sph
-	$(MPIRUN) -np 4 $(BUILDDIR)/compare_sph_restart
+	$(MPIRUN) -np 4 $(BUILDDIR)/tests/compare_sph_restart
 
 clean:
 	rm -f *.dat rst.*

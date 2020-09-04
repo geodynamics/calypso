@@ -27,9 +27,12 @@ test:
 	rm -f *.dat
 	$(MPIRUN) -np 4 $(BUILDDIR)/sph_mhd
 	echo 'Compare with reference mean square data'
-	$(BUILDDIR)/sph_ene_check
+	$(BUILDDIR)/tests/sph_ene_check
 
 clean:
-	rm -f *.dat rst_4/rst.*  sph_lm31r48c_ic_4/in.*
+	rm -f *.dat
+	rm -f rst_4/rst.*
+	rm -f section/*.vtk
+	rm -f isosurface/*.vtk
 
 distclean: clean

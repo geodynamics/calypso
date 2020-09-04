@@ -1,0 +1,47 @@
+!
+!!     example of control for Isosurface at T = 0.6
+!
+begin isosurface_ctl
+  isosurface_file_prefix    'isosurface/iso_T0.6'
+  iso_output_type            VTK_gz
+!
+  begin isosurf_define
+    isosurf_field          temperature
+    isosurf_component      scalar
+    isosurf_value          0.6
+!
+    array isosurf_area_ctl
+      isosurf_area_ctl   outer_core
+    end array isosurf_area_ctl
+  end isosurf_define
+!
+  begin field_on_isosurf
+    result_type      field
+!
+    array output_field
+      output_field    velocity         spherical_vector
+      output_field    magnetic_field   radial
+    end array output_field
+  end field_on_isosurf
+!
+end isosurface_ctl
+!
+!    iso_output_type:
+!           ucd, OpenDX
+!
+!    result_type:  (Original name: display_method)
+!                   specified_fields
+!                   constant
+!    num_result_comp: number of fields
+!    output_field: (Original name: color_comp and color_subcomp)
+!         field and componenet name for output
+!           x, y, z, radial, elevation, azimuth, cylinder_r
+!           norm, vector, tensor, spherical_vector, cylindrical_vector
+!    result_value: (Original name: specified_color)
+!
+!    
+!
+!    isosurf_data: field for isosurface
+!    isosurf_comp: component for isosurface
+!           x, y, z, radial, elevation, azimuth, cylinder_r, norm
+!    isosurf_value:  value for isosurface

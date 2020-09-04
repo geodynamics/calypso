@@ -48,6 +48,11 @@ test:
 		TESTDIR="$(TESTDIR)" \
 		MHDDIR="$(MHDDIR)" \
 		MPIRUN="$(MPIRUN)" \
+		TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
+		TARGET_CHECK_SPH_GRID="$(TARGET_CHECK_SPH_GRID)" \
+		TARGET_TEST_SPH_GRID="$(TARGET_TEST_SPH_GRID)" \
+		TARGET_NEWSPH="$(TARGET_NEWSPH)" \
+		TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
 		test)\
 	done; \
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90

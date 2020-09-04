@@ -1,0 +1,43 @@
+!
+!!     example of control for Isosurface at \omega_z = 10
+!
+begin isosurface_ctl
+  isosurface_file_prefix    'isosurface/iso_w10p'
+  iso_output_type            VTK
+!
+  begin isosurf_define
+    isosurf_field          vorticity
+    isosurf_component      z
+    isosurf_value          10.0
+!
+    array isosurf_area_ctl
+      isosurf_area_ctl   outer_core
+    end array isosurf_area_ctl
+  end isosurf_define
+!
+  begin field_on_isosurf
+    result_type      constant
+    result_value      0.8
+  end field_on_isosurf
+!
+end isosurface_ctl
+!
+!    iso_output_type:
+!           ucd, OpenDX
+!
+!    result_type:  (Original name: display_method)
+!                   specified_fields
+!                   constant
+!    num_result_comp: number of fields
+!    output_field: (Original name: color_comp and color_subcomp)
+!         field and componenet name for output
+!           x, y, z, radial, elevation, azimuth, cylinder_r
+!           norm, vector, tensor, spherical_vector, cylindrical_vector
+!    result_value: (Original name: specified_color)
+!
+!    
+!
+!    isosurf_data: field for isosurface
+!    isosurf_comp: component for isosurface
+!           x, y, z, radial, elevation, azimuth, cylinder_r, norm
+!    isosurf_value:  value for isosurface

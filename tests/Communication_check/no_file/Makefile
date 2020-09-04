@@ -25,7 +25,7 @@ all: test
 
 test: 
 	rm -f *.dat
-	$(MPIRUN) -np 6 $(BUILDDIR)/check_sph_grids
+	$(MPIRUN) -np 6 $(BUILDDIR)/tests/check_sph_comms
 
 clean:
 	rm -f *.dat
