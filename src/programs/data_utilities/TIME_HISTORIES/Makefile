@@ -7,7 +7,7 @@ SPH_UTILS_DIR = $$(DATA_UTILS_DIR)/TIME_HISTORIES
 TARGET_TAVE_SPH_ENE_SPEC =   t_ave_sph_mean_square
 TARGET_T_AVE_PICK_SPH_SPEC = t_ave_picked_sph_coefs
 TARGET_T_AVE_NUSSELT =       t_ave_nusselt
-TARGET_SPH_ENE_CHECK =       sph_ene_check
+TARGET_SPH_ENE_CHECK =       tests/sph_ene_check
 
 SOURCES = $(shell ls *.f90)
 

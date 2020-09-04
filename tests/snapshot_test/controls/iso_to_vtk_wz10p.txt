@@ -1,0 +1,3 @@
+'isosurface/iso_w10p'
+sfm
+1 1 1
