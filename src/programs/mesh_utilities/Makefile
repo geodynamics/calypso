@@ -5,8 +5,8 @@
 GEN_SPH_GRIDDIR = $$(PROG_DIR)/mesh_utilities
 
 TARGET_GEN_SPH_GRID =    gen_sph_grids
-TARGET_CHECK_SPH_GRID =  check_sph_grids
-TARGET_TEST_SPH_GRID =   check_sph_comms
+TARGET_CHECK_SPH_GRID =  tests/check_sph_grids
+TARGET_TEST_SPH_GRID =   tests/check_sph_comms
 
 
 SOURCES = $(shell ls *.f90)

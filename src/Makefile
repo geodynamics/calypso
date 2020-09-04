@@ -102,6 +102,9 @@ depends:
 	if [ ! -d $(BUILDDIR) ]; then \
 		mkdir $(BUILDDIR); \
 	fi
+	if [ ! -d $(BUILDDIR)/tests ]; then \
+		mkdir $(BUILDDIR)/tests; \
+	fi
 	@for dir in $(SUBDIRS) ; do \
 		( \
 		echo 'Construct dependencies'; \
@@ -127,6 +130,9 @@ makemake:
 	fi
 	if [ ! -d $(BUILDDIR) ]; then \
 		mkdir $(BUILDDIR); \
+	fi
+	if [ ! -d $(BUILDDIR)/tests ]; then \
+		mkdir $(BUILDDIR)/tests; \
 	fi
 	@echo # create module list
 	echo '#' > $(MAKENAME)
