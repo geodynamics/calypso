@@ -1,5 +1,5 @@
 #
-#  Makefile for Dynamo toolkit Calypso
+#  Makefile for Kemo's Dynamo toolkit
 #    Written by H. Matsui
 #
 SHELL           = /bin/sh
@@ -25,10 +25,15 @@ all: test
 
 test: 
 	rm -f *.dat
-	$(MPIRUN) -np 6 $(BUILDDIR)/assemble_sph
-	$(MPIRUN) -np 6 $(BUILDDIR)/tests/compare_sph_restart
+	$(BUILDDIR)/tests/test_FFTPACK
+	$(BUILDDIR)/tests/test_FFTW3_f
+	$(BUILDDIR)/tests/test_single_FFTW3
+	echo 'Compare section and isosurface data'
+	$(BUILDDIR)/tests/compare_fft_test < compare_FFTPACK.txt
+	$(BUILDDIR)/tests/compare_fft_test < compare_FFTW3.txt
+	$(BUILDDIR)/tests/compare_fft_test < compare_single_FFTW3.txt
 
 clean:
-	rm -f *.dat rst.*
+	rm -f *.dat
 
 distclean: clean

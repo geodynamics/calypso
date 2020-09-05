@@ -1,0 +1,7 @@
+schmidt_poly_on_meridian.o: $(SMDT_POLY_TEST_DIR)/schmidt_poly_on_meridian.f90 m_precision.o t_schmidt_poly_on_gauss.o t_schmidt_polynomial.o t_spherical_harmonics.o t_gauss_points.o spherical_harmonics.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_spherical_harmonics.o: $(SMDT_POLY_TEST_DIR)/t_spherical_harmonics.f90 m_precision.o t_schmidt_polynomial.o spherical_harmonics.o
+	$(F90) -c $(F90OPTFLAGS) $<
+test_schmidt_poly_med.o: $(SMDT_POLY_TEST_DIR)/test_schmidt_poly_med.f90 t_schmidt_poly_on_gauss.o schmidt_poly_on_meridian.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

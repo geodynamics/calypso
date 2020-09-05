@@ -1,42 +1,19 @@
 #
 #
 #
+TESTS_DIR = $$(PROG_DIR)/TESTS
 
-PROG_DIR = $$(MHDDIR)/programs
-
-SUBDIRS = \
-SPH_MHD \
-\
-mesh_utilities \
-data_utilities \
-\
-TESTS
-
-
-LIBS_SPH_MHD = \
-'$$(LIB_CALYPSO)'  \
-'$$(LIB_CALYPSO_C)'  \
-'$$(LIB_FFTPACK)'
-
-LIBS_MESH_UTILS = \
-'$$(LIB_CALYPSO)'  \
-'$$(LIB_CALYPSO_C)'
-
-LIB_FILES_SPH_MHD = \
-'$$(LIB_CALYPSO_FILE)'   \
-'$$(LIB_CALYPSO_C_FILE)' \
-'$$(LIB_FFTPACK_FILE)'
-
-LIB_FILES_MESH_UTILS = \
-'$$(LIB_CALYPSO_FILE)'   \
-'$$(LIB_CALYPSO_C_FILE)'
+SUBDIRS =      \
+Gauss_point_test  \
+Legendre_test \
+FFT_test
 
 #
 #  -------------------------------------------------------------------------
 #
 
 dir_list:
-	@echo 'PROG_DIR = $(PROG_DIR)'     >> $(MAKENAME)
+	@echo 'TESTS_DIR =  $(TESTS_DIR)'            >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( \
@@ -62,45 +39,33 @@ target_list:
 	done
 
 target_task:
-	@echo 'parallels: sph_mhd'      \
+	@echo tests_with_f: gauss_tests \
+	'fft_test leg_tests' \
 	>> $(MAKENAME)
-	@echo '' >> $(MAKENAME)
-	@echo 'utilities: data_utils mesh_utils sph_data_util' >> $(MAKENAME)
-	@echo 'tests: tests_with_f' >> $(MAKENAME)
+	>> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
-		FFTW3_LIBS='$(FFTW3_LIBS)' \
 		target_task \
 		) \
 	done
 
 
 lib_name:
-	@echo  LIBS_SPH_MHD=  \\          >> $(MAKENAME)
-	@echo  $(LIBS_SPH_MHD)            >> $(MAKENAME)
-	@echo  LIB_FILES_SPH_MHD=  \\     >> $(MAKENAME)
-	@echo  $(LIB_FILES_SPH_MHD)       >> $(MAKENAME)
-	@echo  '#' >> $(MAKENAME)
-	@echo  LIBS_MESH_UTILS=  \\          >> $(MAKENAME)
-	@echo  $(LIBS_MESH_UTILS)            >> $(MAKENAME)
-	@echo  LIB_FILES_MESH_UTILS=  \\     >> $(MAKENAME)
-	@echo  $(LIB_FILES_MESH_UTILS)       >> $(MAKENAME)
-	@echo  '#' >> $(MAKENAME)
-	@for dir in $(SUBDIRS); do \
-		( cd $${dir};  \
+	@for dir in  $(SUBDIRS) ; do \
+		( \
 		echo 'generate library list for ' $$dir ; \
+		cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
+		MAKEDIR='$(MAKEDIR)' \
 		MAKENAME='$(MAKENAME)' \
-		lib_name \
-		) \
+		lib_name; \
+		 ) \
 	done
-
-lib_tasks:
 
 
 mod_list:
@@ -113,11 +78,9 @@ mod_list:
 		) \
 	done
 
-
 module:
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
-		echo 'generate compile list for ' $$dir ; \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		MAKENAME='$(MAKENAME)' \
@@ -127,14 +90,23 @@ module:
 
 depends:
 	@for dir in $(SUBDIRS); do \
-		( cd $${dir};  \
-		echo 'generate dependencies for ' $$dir ; \
+		( \
+		echo 'Construct dependencies for ' $$dir ; \
+		cd $${dir};  \
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
+		CC='$(CC)'   \
 		MAKE_MOD_DEP='$(MAKE_MOD_DEP)' \
+		MHDDIR='$(MHDDIR)' \
+		MAKEDIR='$(MAKEDIR)' \
+		MAKENAME='$(MAKENAME)' \
+		DEPFLAGS='$(DEPFLAGS)' \
+		OPTFLAGS='$(OPTFLAGS)' \
+		C_INCLUDE='$(C_INCLUDE)' \
 		depends; \
 		) \
 	done
+
 
 clean:
 	@for dir in $(SUBDIRS); do \

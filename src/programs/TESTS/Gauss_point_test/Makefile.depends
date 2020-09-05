@@ -1,0 +1,7 @@
+compare_gauss_points.o: $(GAUSS_TEST_DIR)/compare_gauss_points.f90 m_precision.o t_gauss_points.o gauss_points_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+gauss_points_IO.o: $(GAUSS_TEST_DIR)/gauss_points_IO.f90 m_precision.o m_constants.o t_gauss_points.o
+	$(F90) -c $(F90OPTFLAGS) $<
+test_gauss_points.o: $(GAUSS_TEST_DIR)/test_gauss_points.f90 m_precision.o t_gauss_points.o gauss_points_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

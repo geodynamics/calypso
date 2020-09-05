@@ -210,7 +210,7 @@ makemake:
 	@echo '# target lists ' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
-	@echo 'PROGRAMS= parallels utilities' >> $(MAKENAME)
+	@echo 'PROGRAMS= parallels utilities tests' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)

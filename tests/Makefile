@@ -24,6 +24,9 @@ MPILIBS =
 #  -------------------------------------------------------------------------
 #
 SUBDIRS = \
+Gauss_point_test \
+FFT_test \
+\
 Communication_check \
 restart_assemble \
 \

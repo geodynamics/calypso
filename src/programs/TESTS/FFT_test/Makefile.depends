@@ -1,0 +1,11 @@
+compare_FFT_test.o: $(FFT_TEST_DIR)/compare_FFT_test.f90 m_precision.o m_constants.o m_machine_parameter.o t_fft_test_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_fft_test_data.o: $(FFT_TEST_DIR)/t_fft_test_data.f90 m_precision.o m_constants.o m_machine_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
+test_FFTPACK5.o: $(FFT_TEST_DIR)/test_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o t_fft_test_data.o t_FFTPACK5_wrapper.o
+	$(F90) -c $(F90OPTFLAGS) $<
+test_FFTW3.o: $(FFT_TEST_DIR)/test_FFTW3.f90 m_precision.o m_constants.o m_machine_parameter.o t_multi_FFTW_wrapper.o t_fft_test_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
+test_single_FFTW3.o: $(FFT_TEST_DIR)/test_single_FFTW3.f90 m_precision.o m_constants.o m_machine_parameter.o t_FFTW_wrapper.o t_fft_test_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
+
