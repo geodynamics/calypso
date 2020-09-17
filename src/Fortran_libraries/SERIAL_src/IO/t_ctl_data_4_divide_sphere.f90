@@ -20,6 +20,15 @@
 !!
 !!  begin num_domain_ctl
 !!    inner_decomp_direction        radial or horizontal
+!!
+!!    rj_inner_loop_direction             radial or horizontal
+!!    rlm_inner_loop_direction            radial or horizontal
+!!    rtm_inner_loop_direction            radial or horizontal
+!!    rtp_inner_loop_direction            radial or horizontal
+!!
+!!    rlm_order_distribution               cyclic_eq_transform
+!!       (Flags:  cyclic_eq_transform, cyclic_eq_mode, or simple)
+!!
 !!    num_radial_domain_ctl         2
 !!    num_horizontal_domain_ctl     2
 !!
@@ -57,6 +66,18 @@
 !>        Direction of inner decomposition
         type(read_character_item) :: inner_decomp_ctl
 !
+!>        Direction of inner loop for f(r,j)
+        type(read_character_item) :: rj_inner_loop_ctl
+!>        Direction of inner loop for f(r,l,m)
+        type(read_character_item) :: rlm_inner_loop_ctl
+!>        Direction of inner loop for f(r,\theta,m)
+        type(read_character_item) :: rtm_inner_loop_ctl
+!>        Direction of inner loop for f(r,t,p)
+        type(read_character_item) :: rtp_inner_loop_ctl
+!
+!>        Distribution of harmonics order for legendre transform
+        type(read_character_item) :: rlm_distibution_ctl
+!
 !>        Number of subdomains in raidal direction for reduced definition
         type(read_integer_item) :: num_radial_domain_ctl
 !
@@ -85,6 +106,19 @@
 !
       character(len=kchara), parameter                                  &
      &      :: hd_inner_decomp =       'inner_decomp_direction'
+!
+      character(len=kchara), parameter                                  &
+     &      :: hd_rj_inner_loop =       'rj_inner_loop_direction'
+      character(len=kchara), parameter                                  &
+     &      :: hd_rlm_inner_loop =      'rlm_inner_loop_direction'
+      character(len=kchara), parameter                                  &
+     &      :: hd_rtm_inner_loop =      'rtm_inner_loop_direction'
+      character(len=kchara), parameter                                  &
+     &      :: hd_rtp_inner_loop =      'rtp_inner_loop_direction'
+!
+      character(len=kchara), parameter                                  &
+     &      :: hd_rlm_order_dist =      'rlm_order_distribution'
+!
       character(len=kchara), parameter                                  &
      &      :: hd_num_radial_domain =  'num_radial_domain_ctl'
       character(len=kchara), parameter                                  &
@@ -98,6 +132,8 @@
      &       :: hd_ndomain_rj  = 'num_domain_spectr'
 !
       private :: hd_inner_decomp
+      private :: hd_rj_inner_loop,  hd_rlm_inner_loop
+      private :: hd_rtm_inner_loop, hd_rtp_inner_loop
       private :: hd_num_radial_domain, hd_num_horiz_domain
       private :: hd_ndomain_rtp, hd_ndomain_rtm, hd_ndomain_rj
 !
@@ -143,6 +179,18 @@
 !
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_inner_decomp, sdctl%inner_decomp_ctl)
+!
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_rj_inner_loop,  sdctl%rj_inner_loop_ctl)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_rlm_inner_loop, sdctl%rlm_inner_loop_ctl)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_rtm_inner_loop, sdctl%rtm_inner_loop_ctl)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_rtp_inner_loop, sdctl%rtp_inner_loop_ctl)
+!
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_rlm_order_dist, sdctl%rlm_distibution_ctl)
 !
         call read_integer_ctl_type                                      &
      &     (c_buf, hd_num_radial_domain, sdctl%num_radial_domain_ctl)

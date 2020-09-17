@@ -154,21 +154,22 @@
 !
       call set_FEM_mesh_mode_4_SPH(spctl, sph%sph_params)
 !
+!
       sph%sph_rtp%nidx_global_rtp(1) = 2
       sph%sph_rtp%nidx_global_rtp(2) = 2
       sph%sph_rtp%nidx_global_rtp(3) = 4
       sph%sph_params%l_truncation = 2
       sph%sph_params%m_folding =    1
 !
-      if (spctl%ltr_ctl%iflag .gt. 0) then
+      if(spctl%ltr_ctl%iflag .gt. 0) then
         sph%sph_params%l_truncation = spctl%ltr_ctl%intvalue
       end if
 !
-      if (spctl%phi_symmetry_ctl%iflag .gt. 0) then
+      if(spctl%phi_symmetry_ctl%iflag .gt. 0) then
         sph%sph_params%m_folding = spctl%phi_symmetry_ctl%intvalue
       end if
 !
-      if (spctl%ngrid_elevation_ctl%iflag .gt. 0) then
+      if(spctl%ngrid_elevation_ctl%iflag .gt. 0) then
         sph%sph_rtp%nidx_global_rtp(2)                                  &
      &          = spctl%ngrid_elevation_ctl%intvalue
       end if
@@ -184,6 +185,7 @@
 !
       call set_subdomains_4_sph_shell                                   &
      &    (nprocs_check, sdctl, gen_sph%s3d_ranks, ierr, e_message)
+      call set_inner_loop_4_sph_shell(sdctl, gen_sph%s3d_ranks)
 !
       if (ierr .gt. 0) return
 !

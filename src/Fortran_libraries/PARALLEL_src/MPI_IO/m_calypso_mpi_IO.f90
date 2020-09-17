@@ -114,9 +114,8 @@
      &    MPI_MODE_RDWR+MPI_MODE_APPEND+MPI_MODE_CREATE,                &
      &    MPI_INFO_NULL, id_mpi_file, ierr_MPI)
 !
-     if(num_pe .le. nprocs) then
-       call MPI_FILE_SET_SIZE(id_mpi_file, zerosize, ierr_MPI)
-     end if
+      call MPI_FILE_SET_SIZE(id_mpi_file, zerosize, ierr_MPI)
+      call calypso_mpi_barrier
 !
       end subroutine calypso_mpi_write_file_open
 !

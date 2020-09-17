@@ -25,6 +25,8 @@
       use m_constants
 !
       use m_machine_parameter
+      use m_elapsed_labels_SPH_TRNS
+      use m_work_time
 !
       implicit none
 !
@@ -275,7 +277,11 @@
       integer(kind = kint) :: nd, jj
       real(kind = kreal) :: g6e, g6o, g7e, g7o, gme, gmo, r1, r2
 !
+      real(kind = kreal) :: ts0
+      real(kind = kreal) :: tm(10)
 !
+!
+      if(iflag_LEG_time) call start_elapsed_time(ist_elapsed_LEG+1)
 !$omp parallel do                                                       &
 !$omp& private(jj,kr_nd,nd,k_rlm,g6e,g6o,g7e,g7o,gme,gmo,r1,r2)
       do jj = 1, n_jk_o
@@ -316,7 +322,9 @@
         end do
       end do
 !$omp end parallel do
+      if(iflag_LEG_time) call end_elapsed_time(ist_elapsed_LEG+1)
 !
+      if(iflag_LEG_time) call start_elapsed_time(ist_elapsed_LEG+2)
 !$omp parallel do                                                       &
 !$omp& private(kr_nd,k_rlm,nd,jj,ie_rlm,io_rlm,ie_send,io_send)
       do jj = 1, n_jk_o
@@ -365,6 +373,7 @@
         end do
       end do
 !$omp end parallel do
+      if(iflag_LEG_time) call end_elapsed_time(ist_elapsed_LEG+2)
 !
       do jj = n_jk_o+1, n_jk_e
         g6e = g_sph_rlm(2*jj+jst-1,6)
@@ -373,6 +382,8 @@
         g7o = g_sph_rlm(2*jj+jst,  7)
         gme = dble(idx_gl_1d_rlm_j(2*jj+jst-1,3))
         gmo = dble(idx_gl_1d_rlm_j(2*jj+jst,  3))
+!
+        if(iflag_LEG_time) call start_elapsed_time(ist_elapsed_LEG+3)
 !$omp parallel do private(kr_nd,nd,k_rlm,r1,r2)
         do kr_nd = 1, nvector*nidx_rlm(1)
           nd = 1 + mod((kr_nd-1),nvector)
@@ -388,7 +399,9 @@
           pol_e(3*nd-1,k_rlm,jj) = pol_e(3*nd-1,k_rlm,jj) * r1*g7e*gme
         end do
 !$omp end parallel do
+        if(iflag_LEG_time) call end_elapsed_time(ist_elapsed_LEG+3)
 !
+      if(iflag_LEG_time) call start_elapsed_time(ist_elapsed_LEG+4)
 !$omp parallel do private(kr_nd,nd,k_rlm,r1,r2)
         do kr_nd = 1, nscalar*nidx_rlm(1)
           nd = 1 + mod((kr_nd-1),nscalar)
@@ -398,7 +411,9 @@
      &            = pol_e(nd+3*nvector,k_rlm,jj) * g6e
         end do
 !$omp end parallel do
+        if(iflag_LEG_time) call end_elapsed_time(ist_elapsed_LEG+4)
 !
+        if(iflag_LEG_time) call start_elapsed_time(ist_elapsed_LEG+5)
 !$omp parallel do private(kr_nd,k_rlm,nd,ie_rlm,ie_send)
         do kr_nd = 1, nvector*nidx_rlm(1)
           nd = 1 + mod((kr_nd-1),nvector)
@@ -416,7 +431,9 @@
      &                                  - tor_e(2*nd-1,k_rlm,jj)
         end do
 !$omp end parallel do
+        if(iflag_LEG_time) call end_elapsed_time(ist_elapsed_LEG+5)
 !
+        if(iflag_LEG_time) call start_elapsed_time(ist_elapsed_LEG+6)
 !$omp parallel do private(kr_nd,k_rlm,nd,ie_rlm,ie_send)
         do kr_nd = 1, nscalar*nidx_rlm(1)
           nd = 1 + mod((kr_nd-1),nscalar)
@@ -430,6 +447,7 @@
           WS(ie_send) = WS(ie_send) + pol_e(nd+3*nvector,k_rlm,jj)
         end do
 !$omp end parallel do
+        if(iflag_LEG_time) call end_elapsed_time(ist_elapsed_LEG+6)
       end do
 !
       end subroutine cal_sp_rlm_sym_mat_rin

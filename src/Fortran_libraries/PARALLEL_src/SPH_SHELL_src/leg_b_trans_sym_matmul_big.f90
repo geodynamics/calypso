@@ -42,13 +42,12 @@
       use t_sph_trans_comm_tbl
       use t_work_4_sph_trans
       use t_leg_trans_sym_matmul_big
+      use m_elapsed_labels_SPH_TRNS
 !
       use matmul_for_legendre_trans
 !
       implicit none
 !
-      real(kind = kreal), private :: st_elapsed
-      real(kind = kreal), private :: elaps(4)
       integer, external :: omp_get_max_threads
 !
 ! -----------------------------------------------------------------------
@@ -91,14 +90,15 @@
 !
 !
 !$omp parallel workshare
+        WK_l_bsm%time_omp(1:np_smp,1:3) = 0.0d0
+!$omp end parallel workshare
+!
+!$omp parallel workshare
       WS(1:ncomp*comm_rtm%ntot_item_sr) = 0.0d0
 !$omp end parallel workshare
 !
-      elaps(1:4) = 0
       nl_rtm = (sph_rtm%nidx_rtm(2) + 1)/2
-!$omp parallel do schedule(static)                                      &
-!$omp&            private(ip,mp_rlm,mn_rlm,st_elapsed)                  &
-!$omp& reduction(+:elaps)
+!$omp parallel do private(ip,mp_rlm,mn_rlm)
       do ip = 1, np_smp
         kst(ip) = sph_rlm%istack_rlm_kr_smp(ip-1)
         nkr(ip) = sph_rlm%istack_rlm_kr_smp(ip)                         &
@@ -115,7 +115,7 @@
           n_jk_o(ip) = idx_trns%lstack_rlm(mp_rlm)                      &
      &                - idx_trns%lstack_even_rlm(mp_rlm)
 !
-!          st_elapsed = MPI_WTIME()
+          WK_l_bsm%time_omp(ip,0) = MPI_WTIME()
           call set_sp_rlm_vec_sym_matmul_big                            &
      &       (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,    &
      &        sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r, g_sph_rlm, &
@@ -128,10 +128,11 @@
      &        kst(ip), nkr(ip), jst(ip), n_jk_e(ip), n_jk_o(ip),        &
      &        ncomp, nvector, nscalar, comm_rlm%irev_sr, n_WR, WR,      &
      &        WK_l_bsm%pol_e(1,ip), WK_l_bsm%pol_o(1,ip) )
-!          elaps(2) = MPI_WTIME() - st_elapsed + elaps(2)
+          WK_l_bsm%time_omp(ip,1) = WK_l_bsm%time_omp(ip,1)             &
+     &                    + MPI_WTIME() - WK_l_bsm%time_omp(ip,0)
 !
 !   even l-m
-!          st_elapsed = MPI_WTIME()
+          WK_l_bsm%time_omp(ip,0) = MPI_WTIME()
           call matmul_bwd_leg_trans                                     &
      &       (iflag_matmul, nl_rtm, nkrs(ip), n_jk_e(ip),               &
      &        WK_l_bsm%Ps_tj(1,jst(ip)+1), WK_l_bsm%pol_e(1,ip),        &
@@ -149,9 +150,10 @@
      &       (iflag_matmul, nl_rtm, nkrt(ip), n_jk_o(ip),               &
      &        WK_l_bsm%dPsdt_tj(1,jst_h(ip)), WK_l_bsm%tor_o(1,ip),     &
      &        WK_l_bsm%symp_p(1,ip))
-!          elaps(3) = MPI_WTIME() - st_elapsed + elaps(3)
+          WK_l_bsm%time_omp(ip,2) = WK_l_bsm%time_omp(ip,2)             &
+     &                    + MPI_WTIME() - WK_l_bsm%time_omp(ip,0)
 !
-!          st_elapsed = MPI_WTIME()
+          WK_l_bsm%time_omp(ip,0) = MPI_WTIME()
           call cal_vr_rtm_vec_sym_matmul_big                            &
      &       (sph_rtm%nnod_rtm, sph_rtm%nidx_rtm, sph_rtm%istep_rtm,    &
      &        sph_rlm%nidx_rlm, asin_theta_1d_rtm,                      &
@@ -164,14 +166,28 @@
      &        sph_rlm%nidx_rlm, kst(ip), nkr(ip), mp_rlm, nl_rtm,       &
      &        WK_l_bsm%symp_r(1,ip), WK_l_bsm%asmp_r(1,ip),             &
      &        ncomp, nvector, nscalar, comm_rtm%irev_sr, n_WS, WS)
-!          elaps(4) = MPI_WTIME() - st_elapsed + elaps(4)
+          WK_l_bsm%time_omp(ip,3) = WK_l_bsm%time_omp(ip,3)             &
+     &                    + MPI_WTIME() - WK_l_bsm%time_omp(ip,0)
 !
         end do
       end do
 !$omp end parallel do
 !
-!      elapsed(41:44)                                                   &
-!     &     = elaps(1:4)/ dble(omp_get_max_threads()) + elapsed(41:44)
+      if(iflag_SDT_time) then
+        do ip = 2, np_smp
+          WK_l_bsm%time_omp(1,1:3)                                      &
+     &          = WK_l_bsm%time_omp(ip,1:3) + WK_l_bsm%time_omp(ip,1:3)
+        end do
+        elps1%elapsed(ist_elapsed_SDT+ 9)                               &
+     &          = elps1%elapsed(ist_elapsed_SDT+ 9)                     &
+     &           + WK_l_bsm%time_omp(1,1) / dble(np_smp)
+        elps1%elapsed(ist_elapsed_SDT+11)                               &
+     &          = elps1%elapsed(ist_elapsed_SDT+11)                     &
+     &           + WK_l_bsm%time_omp(1,2) / dble(np_smp)
+        elps1%elapsed(ist_elapsed_SDT+12)                               &
+     &          = elps1%elapsed(ist_elapsed_SDT+12)                     &
+     &           + WK_l_bsm%time_omp(1,3) / dble(np_smp)
+      end if
 !
       end subroutine leg_bwd_trans_sym_matmul_big
 !

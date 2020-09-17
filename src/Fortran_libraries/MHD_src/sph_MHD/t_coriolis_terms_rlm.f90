@@ -196,6 +196,8 @@
       use t_physical_property
       use t_boundary_params_sph_MHD
       use sum_coriolis_terms_rlm
+      use sum_rot_coriolis_terms_rlm
+!      use sum_div_coriolis_terms_rlm
 !
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_comm_tbl), intent(in) :: comm_rlm
@@ -215,30 +217,52 @@
 !
       if(fl_prop%iflag_4_coriolis .eqv. .FALSE.) return
 !
-      call sum_rot_coriolis_rlm_10(b_trns,                              &
+      if(sph_rlm%istep_rlm(1) .eq. 1) then
+        call sum_rot_coriolis_rlm_10(b_trns,                            &
      &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%a_r_1d_rlm_r,     &
      &    leg%g_sph_rlm, omega_sph%ws_rlm, fl_prop%coef_cor,            &
      &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sw_rlm, gt_cor%tw_rlm, &
      &    ncomp_trans, n_WR, comm_rlm%irev_sr, WR,                      &
      &    cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_rot_cor),                  &
      &    cor_rlm%d_cor_rlm(1,cor_rlm%it_rlm_rot_cor))
+      else
+        call sum_rot_coriolis_lrm_10(b_trns,                            &
+     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%a_r_1d_rlm_r,     &
+     &    leg%g_sph_rlm, omega_sph%ws_rlm, fl_prop%coef_cor,            &
+     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sw_rlm, gt_cor%tw_rlm, &
+     &    ncomp_trans, n_WR, comm_rlm%irev_sr, WR,                      &
+     &    cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_rot_cor),                  &
+     &    cor_rlm%d_cor_rlm(1,cor_rlm%it_rlm_rot_cor))
+      end if
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
-        call inner_core_rot_z_coriolis_rlm                              &
-     &     (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                 &
+        call inner_core_rot_z_coriolis_rlm(b_trns,                      &
+     &      sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,      &
      &      sph_rlm%radius_1d_rlm_r, omega_sph%ws_rlm,                  &
      &      fl_prop%coef_cor, ncomp_trans, n_WR, comm_rlm%irev_sr, WR,  &
      &      cor_rlm%idx_rlm_ICB, cor_rlm%idx_rlm_degree_one,            &
      &      cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_rot_cor))
       end if
 !
-!      call sum_div_coriolis_rlm_10                                     &
+
+!      if(sph_rlm%istep_rlm(1) .eq. 1) then
+!        call sum_div_coriolis_rlm_10                                   &
 !     &   (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                  &
 !     &    sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,               &
 !     &    omega_sph%ws_rlm, fl_prop%coef_cor,                          &
 !     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sd_rlm, gt_cor%td_rlm,&
 !     &    ncomp_trans, n_WR, comm_rlm%irev_sr, WR,                     &
 !     &    cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_div_cor))
+!      else
+!        call sum_div_coriolis_lrm_10                                   &
+!     &   (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                  &
+!     &    sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,               &
+!     &    omega_sph%ws_rlm, fl_prop%coef_cor,                          &
+!     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sd_rlm, gt_cor%td_rlm,&
+!     &    ncomp_trans, n_WR, comm_rlm%irev_sr, WR,                     &
+!     &    cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_div_cor))
+!      end if
+!
 !      call sum_r_coriolis_bc_rlm_10                                    &
 !     &   (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                  &
 !     &    sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,               &

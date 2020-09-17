@@ -80,6 +80,13 @@
 !
       call bcast_ctl_type_c1(sdctl%inner_decomp_ctl)
 !
+      call bcast_ctl_type_c1(sdctl%rj_inner_loop_ctl)
+      call bcast_ctl_type_c1(sdctl%rlm_inner_loop_ctl)
+      call bcast_ctl_type_c1(sdctl%rtm_inner_loop_ctl)
+      call bcast_ctl_type_c1(sdctl%rtp_inner_loop_ctl)
+!
+      call bcast_ctl_type_c1(sdctl%rlm_distibution_ctl)
+!
       call bcast_ctl_type_i1(sdctl%num_radial_domain_ctl)
       call bcast_ctl_type_i1(sdctl%num_horiz_domain_ctl)
 !

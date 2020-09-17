@@ -43,6 +43,7 @@
 !
       call elpsed_label_4_sph_trns
       call elpsed_label_4_sph_detail
+      call elpsed_label_4_fft_detail
 !
       call elpsed_label_calypso_send_recv
 !      call elapsed_label_4_Legendre_trans
@@ -68,6 +69,8 @@
 !
       call reset_elapse_after_init_SPH
       call reset_elapse_after_init_SDT
+      call reset_elapse_after_init_FFT
+!
       call reset_elapse_after_init_SR
       call reset_elapse_after_init_SPH_MHD
       call reset_elapse_after_init_SGS
@@ -96,8 +99,8 @@
 !
       if(my_rank .ne. 0) return
 !
-      call write_resolution_info                                        &
-     &   (nprocs, sph%sph_params, sph%sph_rtp, sph%sph_rtm,             &
+      call write_resolution_info(nprocs, sph%sph_params,                &
+     &    sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj,            &
      &    nproc_rj_IO, nproc_rlm_IO, nproc_rtm_IO, nproc_rtp_IO)
 !
       end subroutine write_resolution_data
@@ -149,7 +152,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine write_resolution_info                                  &
-     &         (num_pe, sph_params, sph_rtp, sph_rtm,                   &
+     &         (num_pe, sph_params, sph_rtp, sph_rtm, sph_rlm, sph_rj,  &
      &          nproc_rj_IO, nproc_rlm_IO, nproc_rtm_IO, nproc_rtp_IO)
 !
       use m_work_time
@@ -161,11 +164,15 @@
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_rtm_grid), intent(in) :: sph_rtm
+      type(sph_rlm_grid), intent(in) :: sph_rlm
+      type(sph_rj_grid),  intent(in) :: sph_rj
 !
       integer(kind = kint), intent(in) :: nproc_rj_IO(2)
       integer(kind = kint), intent(in) :: nproc_rlm_IO(2)
       integer(kind = kint), intent(in) :: nproc_rtm_IO(3)
       integer(kind = kint), intent(in) :: nproc_rtp_IO(3)
+!
+      character(len=kchara) ::  tmpchara
 !
 #ifdef _OPENMP
       integer, external :: omp_get_max_threads
@@ -176,7 +183,7 @@
       open(id_timer_file,file=file_name,position='append')
 !
       write(id_timer_file,*)
-      write(id_timer_file,*) '=========================================='
+      write(id_timer_file,*) '========================================'
       write(id_timer_file,*) 'Truncation level:      ',                 &
      &                      sph_params%l_truncation
       write(id_timer_file,*) 'Longitudinal symmetry: ',                 &
@@ -202,6 +209,43 @@
      &   'Processes for Legendre trans. (r, t, m): ', nproc_rtm_IO(1:3)
       write(id_timer_file,*)                                            &
      &   'Processes for physical space. (r, t, p): ', nproc_rtp_IO(1:3)
+      write(id_timer_file,*)
+!
+      if(sph_rj%istep_rj(1) .eq. 1) then
+        write(tmpchara,'(a)') 'radius'
+      else
+        write(tmpchara,'(a)') 'modes'
+      end if
+      write(id_timer_file,*)                                            &
+     &   'Innermost loop for spectr (r, l and m):        ',             &
+     &   trim(tmpchara)
+!
+      if(sph_rlm%istep_rlm(1) .eq. 1) then
+        write(tmpchara,'(a)') 'radius'
+      else
+        write(tmpchara,'(a)') 'degree'
+      end if
+      write(id_timer_file,*)                                            &
+     &   'Innermost loop for Legendre trans. (r, l, m): ',              &
+     &   trim(tmpchara)
+!
+      if(sph_rtm%istep_rtm(1) .eq. 1) then
+        write(tmpchara,'(a)') 'radius'
+      else
+        write(tmpchara,'(a)') 'meridian'
+      end if
+      write(id_timer_file,*)                                            &
+     &   'Innermost loop for Legendre trans. (r, t, m): ',              &
+     &   trim(tmpchara)
+!
+      if(sph_rtp%istep_rtp(1) .eq. 1) then
+        write(tmpchara,'(a)') 'radius'
+      else
+        write(tmpchara,'(a)') 'meridian'
+      end if
+      write(id_timer_file,*)                                            &
+     &   'Innermost loop for physical space. (r, t, p): ',              &
+     &   trim(tmpchara)
       write(id_timer_file,*)
 !
       close(id_timer_file)

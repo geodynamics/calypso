@@ -30,7 +30,7 @@
 !
       implicit none
 !
-!
+!>     Structure of spherical shell parameters
       type construct_spherical_grid
 !>        Structure of subdomain information
         type(spheric_global_rank) :: s3d_ranks

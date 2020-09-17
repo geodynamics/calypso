@@ -73,6 +73,8 @@
       use m_constants
       use m_machine_parameter
       use m_fftw_parameters
+      use m_elapsed_labels_SPH_TRNS
+      use calypso_mpi
 !
       implicit none
 !
@@ -92,6 +94,9 @@
 !
 !>        temporal area for ordering
         real(kind = kreal), allocatable :: v_tmp(:)
+!
+!>        temporal area for time count
+        real(kind = kreal), allocatable :: t_omp(:,:)
       end type work_for_sgl_FFTW
 !
       private :: alloc_FFTW_plan
@@ -122,6 +127,9 @@
       end do
       FFTW_t%aNfft = one / dble(nidx_rtp(3))
 !
+      allocate(FFTW_t%t_omp(np_smp,0:3))
+      FFTW_t%t_omp = 0.0d0
+!
       end subroutine init_sph_single_FFTW
 !
 ! ------------------------------------------------------------------
@@ -140,6 +148,7 @@
       end do
 !
       call dealloc_FFTW_plan(FFTW_t)
+      deallocate(FFTW_t%t_omp)
 !
       end subroutine finalize_sph_single_FFTW
 !
@@ -185,8 +194,13 @@
 !
       integer(kind = kint) ::  m, j, ip, ist, ied, nd
       integer(kind = kint) :: ic_rtp, is_rtp, ic_send, is_send
-      real :: dummy(np_smp,3), rtmp(np_smp,3)
 !
+!
+      if(iflag_FFT_time) then
+!$omp parallel workshare
+        FFTW_t%t_omp(1:np_smp,0:3) = 0
+!$omp end parallel workshare
+      end if
 !
 !$omp parallel do schedule(static)                                      &
 !$omp&         private(nd,m,j,ip,ist,ied,ic_rtp,is_rtp,ic_send,is_send)
@@ -195,15 +209,19 @@
         ied = irt_rtp_smp_stack(ip) 
         do nd = 1, ncomp
 !
-!        call cpu_time(dummy(ip,1))
           do j = ist, ied
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,0) = MPI_WTIME()
             FFTW_t%X(1:nidx_rtp(3),ip) = X_rtp(j,1:nidx_rtp(3),nd)
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,1)= FFTW_t%t_omp(ip,1)   &
+     &                       + MPI_WTIME() - FFTW_t%t_omp(ip,0)
 !
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,0) = MPI_WTIME()
             call dfftw_execute(FFTW_t%plan_fwd(ip))
-!            call cpu_time(rtmp(ip,2))
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,2)= FFTW_t%t_omp(ip,2)   &
+     &                       + MPI_WTIME() - FFTW_t%t_omp(ip,0)
 !
 !   normalization
-!            call cpu_time(dummy(ip,3))
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,0) = MPI_WTIME()
             ic_send = nd + (irev_sr_rtp(j) - 1) * ncomp
             WS(ic_send) = FFTW_t%aNfft * real(FFTW_t%C(1,ip))
             do m = 2, (nidx_rtp(3)+1)/2
@@ -218,16 +236,30 @@
             ic_rtp = j + irt_rtp_smp_stack(np_smp)
             ic_send = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp
             WS(ic_send) = two*FFTW_t%aNfft * real(FFTW_t%C(m,ip))
-!             call cpu_time(rtmp(ip,3))
+!
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,3)= FFTW_t%t_omp(ip,3)   &
+     &                       + MPI_WTIME() - FFTW_t%t_omp(ip,0)
           end do
         end do
       end do
 !$omp end parallel do
 !
-!      do ip = 1, np_smp
-!        elapsed_fftw(1:3) = elapsed_fftw(1:3)                          &
-!     &                     + rtmp(ip,1:3) - dummy(ip,1:3)
-!      end do
+      if(iflag_FFT_time) then
+        do ip = 2, np_smp
+          FFTW_t%t_omp(1,1) = FFTW_t%t_omp(1,1) + FFTW_t%t_omp(ip,1)
+          FFTW_t%t_omp(1,2) = FFTW_t%t_omp(1,2) + FFTW_t%t_omp(ip,2)
+          FFTW_t%t_omp(1,3) = FFTW_t%t_omp(1,3) + FFTW_t%t_omp(ip,3)
+        end do
+        elps1%elapsed(ist_elapsed_FFT+4)                                &
+     &        = elps1%elapsed(ist_elapsed_FFT+4)                        &
+     &         + FFTW_t%t_omp(1,1) / dble(np_smp)
+        elps1%elapsed(ist_elapsed_FFT+5)                                &
+     &        = elps1%elapsed(ist_elapsed_FFT+5)                        &
+     &         + FFTW_t%t_omp(1,2) / dble(np_smp)
+        elps1%elapsed(ist_elapsed_FFT+6)                                &
+     &        = elps1%elapsed(ist_elapsed_FFT+6)                        &
+     &         + FFTW_t%t_omp(1,3) / dble(np_smp)
+      end if
 !
       end subroutine sph_single_fwd_FFTW_to_send
 !
@@ -252,8 +284,13 @@
 !
       integer(kind = kint) :: m, j, ip, ist, ied, nd
       integer(kind = kint) :: ic_rtp, is_rtp, ic_recv, is_recv
-      real :: dummy(np_smp,3), rtmp(np_smp,3)
 !
+!
+      if(iflag_FFT_time) then
+!$omp parallel workshare
+        FFTW_t%t_omp(1:np_smp,0:3) = 0
+!$omp end parallel workshare
+      end if
 !
 !$omp parallel do schedule(static)                                      &
 !$omp&         private(nd,m,j,ip,ist,ied,ic_rtp,is_rtp,ic_recv,is_recv)
@@ -262,10 +299,9 @@
         ied = irt_rtp_smp_stack(ip)
         do nd = 1, ncomp
 !
-!   normalization
-!        call cpu_time(dummy(ip,3))
-!   normalization
           do j = ist, ied
+!
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,0) = MPI_WTIME()
             ic_recv = nd + (irev_sr_rtp(j) - 1) * ncomp
             FFTW_t%C(1,ip) = cmplx(WR(ic_recv), zero, kind(0d0))
             do m = 2, (nidx_rtp(3)+1)/2
@@ -281,24 +317,39 @@
             ic_recv = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp
             FFTW_t%C(m,ip)                                              &
      &              = half * cmplx(WR(ic_recv), zero, kind(0d0))
-!           call cpu_time(rtmp(ip,3))
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,1)= FFTW_t%t_omp(ip,1)   &
+     &                       + MPI_WTIME() - FFTW_t%t_omp(ip,0)
 !
-!           call cpu_time(dummy(ip,2))
-           call dfftw_execute(FFTW_t%plan_bwd(ip))
-!           call cpu_time(rtmp(ip,2))
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,0) = MPI_WTIME()
+            call dfftw_execute(FFTW_t%plan_bwd(ip))
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,2)= FFTW_t%t_omp(ip,2)   &
+     &                       + MPI_WTIME() - FFTW_t%t_omp(ip,0)
 !
-!           call cpu_time(dummy(ip,1))
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,0) = MPI_WTIME()
             X_rtp(j,1:nidx_rtp(3),nd) = FFTW_t%X(1:nidx_rtp(3),ip)
-!           call cpu_time(rtmp(ip,1))
+            if(iflag_FFT_time) FFTW_t%t_omp(ip,3)= FFTW_t%t_omp(ip,3)   &
+     &                       + MPI_WTIME() - FFTW_t%t_omp(ip,0)
           end do
         end do
       end do
 !$omp end parallel do
 !
-!      do ip = 1, np_smp
-!        elapsed_fftw(1:3) = elapsed_fftw(1:3)                          &
-!     &                     + rtmp(ip,1:3) - dummy(ip,1:3)
-!      end do
+      if(iflag_FFT_time) then
+        do ip = 2, np_smp
+          FFTW_t%t_omp(1,1) = FFTW_t%t_omp(1,1) + FFTW_t%t_omp(ip,1)
+          FFTW_t%t_omp(1,2) = FFTW_t%t_omp(1,2) + FFTW_t%t_omp(ip,2)
+          FFTW_t%t_omp(1,3) = FFTW_t%t_omp(1,3) + FFTW_t%t_omp(ip,3)
+        end do
+        elps1%elapsed(ist_elapsed_FFT+1)                                &
+     &        = elps1%elapsed(ist_elapsed_FFT+1)                        &
+     &         + FFTW_t%t_omp(1,1) / dble(np_smp)
+        elps1%elapsed(ist_elapsed_FFT+2)                                &
+     &        = elps1%elapsed(ist_elapsed_FFT+2)                        &
+     &         + FFTW_t%t_omp(1,2) / dble(np_smp)
+        elps1%elapsed(ist_elapsed_FFT+3)                                &
+     &        = elps1%elapsed(ist_elapsed_FFT+3)                        &
+     &         + FFTW_t%t_omp(1,3) / dble(np_smp)
+      end if
 !
       end subroutine sph_single_back_FFTW_from_recv
 !

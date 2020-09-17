@@ -93,7 +93,7 @@
         jp_rj = s3d_ranks%id_domain_rj_j(idx2)
 !
         irank_tgt = set_rank_by_1b_rj_rank                              &
-     &            (s3d_ranks%iflag_radial_inner_domain,                 &
+     &            (s3d_ranks%radial_inner_domain_flag,                  &
      &             s3d_ranks%ndomain_rj, kp_rj, jp_rj)
         ncomm(irank_tgt) = ncomm(irank_tgt) + 1
       end do
@@ -136,7 +136,7 @@
         jp_rj = s3d_ranks%id_domain_rj_j(idx2)
 !
         irank_tgt = set_rank_by_1b_rj_rank                              &
-     &            (s3d_ranks%iflag_radial_inner_domain,                 &
+     &            (s3d_ranks%radial_inner_domain_flag,                  &
      &             s3d_ranks%ndomain_rj, kp_rj, jp_rj)
         ip = ineib_tgt(irank_tgt)
 !
@@ -190,7 +190,7 @@
         if(kp_rtp.lt.0 .or. lp_rtp.lt.0 .or. mp_rtp.lt.0) cycle
 !
         irank_tgt = set_rank_by_1b_sph_rank                             &
-     &            (s3d_ranks%iflag_radial_inner_domain,                 &
+     &            (s3d_ranks%radial_inner_domain_flag,                  &
      &             s3d_ranks%ndomain_rtp, kp_rtp, lp_rtp, mp_rtp)
         ncomm(irank_tgt) = ncomm(irank_tgt) + 1
       end do
@@ -253,7 +253,7 @@
         if(kp_rtp.lt.0 .or. lp_rtp.lt.0 .or. mp_rtp.lt.0) cycle
 !
         irank_tgt = set_rank_by_1b_sph_rank                             &
-     &            (s3d_ranks%iflag_radial_inner_domain,                 &
+     &            (s3d_ranks%radial_inner_domain_flag,                  &
      &             s3d_ranks%ndomain_rtp, kp_rtp, lp_rtp, mp_rtp)
         ip = ineib_tgt(irank_tgt)
 !

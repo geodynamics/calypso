@@ -62,6 +62,7 @@
       use m_machine_parameter
       use m_work_time
       use m_elapsed_labels_4_MHD
+      use m_elapsed_labels_SPH_TRNS
       use m_legendre_transform_list
 !
       use calypso_mpi
@@ -75,7 +76,6 @@
       use t_sph_trans_arrays_MHD
       use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
-      use t_sph_multi_FFTW
       use t_sph_single_FFTW
       use t_sph_transforms
       use t_coriolis_terms_rlm
@@ -121,8 +121,10 @@
      &   comms_sph%comm_rtm, comms_sph%comm_rtp)
 !
       if(iflag_debug .gt. 0) write(*,*) 'mhd_spectr_to_sendbuf'
+      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+8)
       call mhd_spectr_to_sendbuf                                        &
      &   (trns_bwd, comms_sph%comm_rj, rj_fld, SR_r1%n_WS, SR_r1%WS(1))
+      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+8)
 !
       if(trns_bwd%ncomp .eq. 0) return
       call sph_b_trans_w_coriolis(sph, comms_sph, fl_prop, sph_bc_U,    &
@@ -166,8 +168,10 @@
      &    trns_fwd, SR_r1%n_WS, SR_r1%n_WR, SR_r1%WS(1), SR_r1%WR(1),   &
      &    WK_sph)
 !
+      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+9)
       call mhd_spectr_from_recvbuf(trans_p%iflag_SPH_recv,              &
      &    trns_fwd, comms_sph%comm_rj, SR_r1%n_WR, SR_r1%WR(1), rj_fld)
+      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+9)
 !
       end subroutine sph_forward_trans_4_MHD
 !
@@ -194,10 +198,8 @@
      &    comms_sph%comm_rtm, comms_sph%comm_rtp)
 !
       if(iflag_debug .gt. 0) write(*,*) 'mhd_spectr_to_sendbuf'
-      if(iflag_LEG_time) call start_elapsed_time(ist_elapsed_LEG+10)
       call mhd_spectr_to_sendbuf(trns_bwd, comms_sph%comm_rj, rj_fld,   &
      &                           SR_r1%n_WS, SR_r1%WS(1))
-      if(iflag_LEG_time) call end_elapsed_time(ist_elapsed_LEG+10)
 !
       if(trns_bwd%ncomp .eq. 0) return
       call pole_b_transform                                             &

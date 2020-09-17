@@ -1,5 +1,5 @@
-!>@file   legendre_fwd_trans_testloop.f90
-!!@brief  module legendre_fwd_trans_testloop
+!>@file   leg_fwd_trans_on_the_fly.f90
+!!@brief  module leg_fwd_trans_on_the_fly
 !!
 !!@author H. Matsui
 !!@date Programmed in Aug., 2007
@@ -9,10 +9,10 @@
 !!       (Blocked loop version)
 !!
 !!@verbatim
-!!      subroutine legendre_f_trans_vector_test(ncomp, nvector, nscalar,&
-!!     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns,       &
-!!     &          asin_theta_1d_rtm, g_sph_rlm, weight_rtm,             &
-!!     &          n_WR, n_WS, WR, WS, WK_l_tst)
+!!      subroutine legendre_f_trans_on_the_fly                          &
+!!     &         (iflag_matmul, ncomp, nvector, nscalar,                &
+!!     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,  &
+!!     &          n_WR, n_WS, WR, WS, WK_l_otf)
 !!        Input:  vr_rtm   (Order: radius,theta,phi)
 !!        Output: sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!
@@ -20,7 +20,7 @@
 !!        type(sph_rtm_grid), intent(in) :: sph_rtm
 !!        type(sph_comm_tbl), intent(in) :: comm_rlm, comm_rtm
 !!        type(index_4_sph_trans), intent(in) :: idx_trns
-!!        type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
+!!        type(leg_trns_on_the_fly_work), intent(inout) :: WK_l_otf
 !!@endverbatim
 !!
 !!@param   ncomp    Total number of components for spherical transform
@@ -28,7 +28,7 @@
 !!@param   nscalar  Number of scalar (including tensor components)
 !!                  for spherical transform
 !
-      module legendre_fwd_trans_testloop
+      module leg_fwd_trans_on_the_fly
 !
       use m_precision
 !
@@ -39,11 +39,11 @@
       use m_machine_parameter
       use matmul_for_legendre_trans
 !
-      use t_legendre_work_testlooop
       use t_spheric_rtm_data
       use t_spheric_rlm_data
       use t_sph_trans_comm_tbl
       use t_work_4_sph_trans
+      use t_legendre_work_on_the_fly
       use m_elapsed_labels_SPH_TRNS
 !
       implicit none
@@ -60,15 +60,16 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_f_trans_vector_test                           &
+      subroutine legendre_f_trans_on_the_fly                            &
      &         (iflag_matmul, ncomp, nvector, nscalar,                  &
-     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns, leg,    &
-     &          n_WR, n_WS, WR, WS, WK_l_tst)
+     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,    &
+     &          n_WR, n_WS, WR, WS, WK_l_otf)
 !
       use t_schmidt_poly_on_rtm
       use set_vr_rtm_sym_mat_tsmp
       use cal_sp_rlm_sym_mat_tsmp
       use matmul_for_legendre_trans
+      use sum_spectr_over_smp_segment
 !
       integer(kind = kint), intent(in) :: iflag_matmul
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -76,7 +77,7 @@
       type(sph_comm_tbl), intent(in) :: comm_rtm, comm_rlm
       type(legendre_4_sph_trans), intent(in) :: leg
       type(index_4_sph_trans), intent(in) :: idx_trns
-      type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
+      type(leg_trns_on_the_fly_work), intent(inout) :: WK_l_otf
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
       integer(kind = kint), intent(in) :: n_WR, n_WS
@@ -91,7 +92,7 @@
 !
 !$omp parallel do
       do ip = 1, np_smp
-        WK_l_tst%wk_plm(ip)%time_omp(1:3) = 0
+        WK_l_otf%wk_plm(ip)%time_omp(1:3) = 0
       end do
 !$omp end parallel do
 !
@@ -109,98 +110,79 @@
 !
 !$omp parallel do private(ip,lt,lp_rtm,ln_rtm,lt2,lst)
         do ip = 1, np_smp
-          WK_l_tst%Smat(ip)%pol_e(1:WK_l_tst%n_pol_e) = 0.0d0
-          WK_l_tst%Smat(ip)%tor_e(1:WK_l_tst%n_tor_e) = 0.0d0
-          WK_l_tst%Smat(ip)%pol_o(1:WK_l_tst%n_pol_e) = 0.0d0
-          WK_l_tst%Smat(ip)%tor_o(1:WK_l_tst%n_tor_e) = 0.0d0
+          WK_l_otf%Smat(ip)%pol_e(1:WK_l_otf%n_pol_e) = 0.0d0
+          WK_l_otf%Smat(ip)%tor_e(1:WK_l_otf%n_tor_e) = 0.0d0
+          WK_l_otf%Smat(ip)%pol_o(1:WK_l_otf%n_pol_e) = 0.0d0
+          WK_l_otf%Smat(ip)%tor_o(1:WK_l_otf%n_tor_e) = 0.0d0
 !
-          do lt2 = 1, WK_l_tst%nlo_rtm(ip) / 8
+          do lt2 = 1, WK_l_otf%nlo_rtm(ip) / 8
             call leg_fwd_trans_8latitude                              &
      &         (lt2, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,             &
      &          iflag_matmul, ncomp, nvector, nscalar,                &
      &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,            &
-     &          WK_l_tst%n_jk_e(mp_rlm), WK_l_tst%n_jk_o(mp_rlm),     &
-     &          WK_l_tst%lst_rtm(ip), WK_l_tst%Fmat(ip),              &
-     &          WK_l_tst%Ptj_mat(ip), WK_l_tst%Smat(ip),              &
-     &          WK_l_tst%wk_plm(ip))
+     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),     &
+     &          WK_l_otf%lst_rtm(ip), WK_l_otf%Fmat(ip),              &
+     &          WK_l_otf%Ptj_mat(ip), WK_l_otf%Smat(ip),              &
+     &          WK_l_otf%wk_plm(ip))
           end do
-          lst = 1 + int(WK_l_tst%nlo_rtm(ip)/8) * 8
+          lst = 1 + int(WK_l_otf%nlo_rtm(ip)/8) * 8
 !
-          do lt2 = 1 + lst/4, WK_l_tst%nlo_rtm(ip) / 4
+          do lt2 = 1 + lst/4, WK_l_otf%nlo_rtm(ip) / 4
             call leg_fwd_trans_4latitude                              &
      &         (lt2, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,             &
      &          iflag_matmul, ncomp, nvector, nscalar,                &
      &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,            &
-     &          WK_l_tst%n_jk_e(mp_rlm), WK_l_tst%n_jk_o(mp_rlm),     &
-     &          WK_l_tst%lst_rtm(ip), WK_l_tst%Fmat(ip),              &
-     &          WK_l_tst%Ptj_mat(ip), WK_l_tst%Smat(ip),              &
-     &          WK_l_tst%wk_plm(ip))
+     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),     &
+     &          WK_l_otf%lst_rtm(ip), WK_l_otf%Fmat(ip),              &
+     &          WK_l_otf%Ptj_mat(ip), WK_l_otf%Smat(ip),              &
+     &          WK_l_otf%wk_plm(ip))
           end do
 !
-          lst = 1 + int(WK_l_tst%nlo_rtm(ip)/4) * 4
-          do lt2 = 1 + lst/2, WK_l_tst%nlo_rtm(ip) / 2
+          lst = 1 + int(WK_l_otf%nlo_rtm(ip)/4) * 4
+          do lt2 = 1 + lst/2, WK_l_otf%nlo_rtm(ip) / 2
             call leg_fwd_trans_2latitude                              &
      &         (lt2, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,             &
      &          iflag_matmul, ncomp, nvector, nscalar,                &
      &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,            &
-     &          WK_l_tst%n_jk_e(mp_rlm), WK_l_tst%n_jk_o(mp_rlm),     &
-     &          WK_l_tst%lst_rtm(ip), WK_l_tst%Fmat(ip),              &
-     &          WK_l_tst%Ptj_mat(ip), WK_l_tst%Smat(ip),              &
-     &          WK_l_tst%wk_plm(ip))
+     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),     &
+     &          WK_l_otf%lst_rtm(ip), WK_l_otf%Fmat(ip),              &
+     &          WK_l_otf%Ptj_mat(ip), WK_l_otf%Smat(ip),              &
+     &          WK_l_otf%wk_plm(ip))
           end do
 !
-          lst = 1 + int(WK_l_tst%nlo_rtm(ip)/2) * 2
-          do lt = lst, WK_l_tst%nlo_rtm(ip)
-            lp_rtm = WK_l_tst%lst_rtm(ip) + lt
+          lst = 1 + int(WK_l_otf%nlo_rtm(ip)/2) * 2
+          do lt = lst, WK_l_otf%nlo_rtm(ip)
+            lp_rtm = WK_l_otf%lst_rtm(ip) + lt
             ln_rtm = sph_rtm%nidx_rtm(2) - lp_rtm + 1
             call leg_fwd_trans_1latitude                                &
      &         (lp_rtm, ln_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,    &
      &          iflag_matmul, ncomp, nvector, nscalar,                  &
      &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
-     &          WK_l_tst%n_jk_e(mp_rlm), WK_l_tst%n_jk_o(mp_rlm),       &
-     &          WK_l_tst%Fmat(ip), WK_l_tst%Pjt_mat(ip),                &
-     &          WK_l_tst%Smat(ip), WK_l_tst%wk_plm(ip))
+     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &
+     &          WK_l_otf%Fmat(ip), WK_l_otf%Pjt_mat(ip),                &
+     &          WK_l_otf%Smat(ip), WK_l_otf%wk_plm(ip))
           end do
 !
 !   Equator (if necessary)
-          if(WK_l_tst%nle_rtm(ip) .gt. WK_l_tst%nlo_rtm(ip)) then
-            lp_rtm = WK_l_tst%lst_rtm(ip) + WK_l_tst%nle_rtm(ip)
+          if(WK_l_otf%nle_rtm(ip) .gt. WK_l_otf%nlo_rtm(ip)) then
+            lp_rtm = WK_l_otf%lst_rtm(ip) + WK_l_otf%nle_rtm(ip)
             call leg_fwd_trans_at_equator                               &
      &         (lp_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,            &
      &          iflag_matmul, ncomp, nvector, nscalar,                  &
      &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
-     &          WK_l_tst%n_jk_e(mp_rlm), WK_l_tst%n_jk_o(mp_rlm),       &
-     &          WK_l_tst%Fmat(ip), WK_l_tst%Pjt_mat(ip),                &
-     &          WK_l_tst%Smat(ip), WK_l_tst%wk_plm(ip))
+     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &
+     &          WK_l_otf%Fmat(ip), WK_l_otf%Pjt_mat(ip),                &
+     &          WK_l_otf%Smat(ip), WK_l_otf%wk_plm(ip))
           end if
         end do
 !$omp end parallel do
 !
         if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+16)
-!$omp parallel private(ip)
-        do ip = 2, np_smp
-!$omp workshare
-          WK_l_tst%Smat(1)%pol_e(1:nkrs*WK_l_tst%n_jk_e(mp_rlm))        &
-     &      =  WK_l_tst%Smat(1)%pol_e(1:nkrs*WK_l_tst%n_jk_e(mp_rlm))   &
-     &       + WK_l_tst%Smat(ip)%pol_e(1:nkrs*WK_l_tst%n_jk_e(mp_rlm))
-!$omp end workshare nowait
-!$omp workshare
-          WK_l_tst%Smat(1)%tor_e(1:nkrt*WK_l_tst%n_jk_e(mp_rlm))        &
-     &      =  WK_l_tst%Smat(1)%tor_e(1:nkrt*WK_l_tst%n_jk_e(mp_rlm))   &
-     &       + WK_l_tst%Smat(ip)%tor_e(1:nkrt*WK_l_tst%n_jk_e(mp_rlm))
-!$omp end workshare nowait
-!$omp workshare
-          WK_l_tst%Smat(1)%pol_o(1:nkrs*WK_l_tst%n_jk_o(mp_rlm))        &
-     &      =  WK_l_tst%Smat(1)%pol_o(1:nkrs*WK_l_tst%n_jk_o(mp_rlm))   &
-     &       + WK_l_tst%Smat(ip)%pol_o(1:nkrs*WK_l_tst%n_jk_o(mp_rlm))
-!$omp end workshare nowait
-!$omp workshare
-          WK_l_tst%Smat(1)%tor_o(1:nkrt*WK_l_tst%n_jk_o(mp_rlm))        &
-     &      =  WK_l_tst%Smat(1)%tor_o(1:nkrt*WK_l_tst%n_jk_o(mp_rlm))   &
-     &       + WK_l_tst%Smat(ip)%tor_o(1:nkrt*WK_l_tst%n_jk_o(mp_rlm))
-!$omp end workshare nowait
-        end do
-!$omp end parallel
+!        call sum_spectr_over_smp_out(nkrs, nkrt,                       &
+!        call sum_spectr_over_smp_in(nkrs, nkrt,                        &
+        call sum_spectr_over_kr_in(nkrs, nkrt,                          &
+     &      WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),           &
+     &      WK_l_otf%Smat)
         if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+16)
 !
         if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+17)
@@ -208,31 +190,31 @@
      &       (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                       &
      &        sph_rlm%istep_rlm, sph_rlm%idx_gl_1d_rlm_j,               &
      &        sph_rlm%radius_1d_rlm_r, leg%g_sph_rlm, jst,              &
-     &        WK_l_tst%n_jk_o(mp_rlm), WK_l_tst%n_jk_e(mp_rlm),         &
-     &        WK_l_tst%Smat(1)%pol_e(1), WK_l_tst%Smat(1)%pol_o(1),     &
-     &        WK_l_tst%Smat(1)%tor_e(1), WK_l_tst%Smat(1)%tor_o(1),     &
+     &        WK_l_otf%n_jk_o(mp_rlm), WK_l_otf%n_jk_e(mp_rlm),         &
+     &        WK_l_otf%Smat(1)%pol_e(1), WK_l_otf%Smat(1)%pol_o(1),     &
+     &        WK_l_otf%Smat(1)%tor_e(1), WK_l_otf%Smat(1)%tor_o(1),     &
      &        ncomp, nvector, nscalar, comm_rlm%irev_sr, n_WS, WS)
         if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+17)
       end do
 !
       if(iflag_SDT_time) then
         do ip = 2, np_smp
-          WK_l_tst%wk_plm(1)%time_omp(1:3)                              &
-     &          = WK_l_tst%wk_plm(1)%time_omp(1:3)                      &
-     &           + WK_l_tst%wk_plm(ip)%time_omp(1:3)
+          WK_l_otf%wk_plm(1)%time_omp(1:3)                              &
+     &          = WK_l_otf%wk_plm(1)%time_omp(1:3)                      &
+     &           + WK_l_otf%wk_plm(ip)%time_omp(1:3)
         end do
         elps1%elapsed(ist_elapsed_SDT+13)                               &
      &          = elps1%elapsed(ist_elapsed_SDT+13)                     &
-     &           + WK_l_tst%wk_plm(1)%time_omp(1) / dble(np_smp)
+     &           + WK_l_otf%wk_plm(1)%time_omp(1) / dble(np_smp)
         elps1%elapsed(ist_elapsed_SDT+14)                               &
      &          = elps1%elapsed(ist_elapsed_SDT+14)                     &
-     &           + WK_l_tst%wk_plm(1)%time_omp(2) / dble(np_smp)
+     &           + WK_l_otf%wk_plm(1)%time_omp(2) / dble(np_smp)
         elps1%elapsed(ist_elapsed_SDT+15)                               &
      &          = elps1%elapsed(ist_elapsed_SDT+15)                     &
-     &           + WK_l_tst%wk_plm(1)%time_omp(3) / dble(np_smp)
+     &           + WK_l_otf%wk_plm(1)%time_omp(3) / dble(np_smp)
       end if
 !
-      end subroutine legendre_f_trans_vector_test
+      end subroutine legendre_f_trans_on_the_fly
 !
 ! -----------------------------------------------------------------------
 !
@@ -272,6 +254,7 @@
       integer(kind = kint) :: lt, lp_rtm, ln_rtm
       integer(kind = kint) :: kst_s, kst_t
 !
+!
 !   Pull data from recieve buffer
       wk_plm%st_time_omp = MPI_WTIME()
       do lt = 1, n_AVX512
@@ -291,7 +274,7 @@
       wk_plm%time_omp(1) = wk_plm%time_omp(1)                           &
      &                    + MPI_WTIME() - wk_plm%st_time_omp
 !
-!      Set Legendre polynomials
+!    Set Legendre polynomials
       wk_plm%st_time_omp = MPI_WTIME()
       lp_rtm = lst_rtm + (lt2-1)*n_AVX512 + 1
       call set_each_sym_leg_omp_mat_tj(sph_rlm, mm, jst, n_AVX512,      &
@@ -375,7 +358,7 @@
       wk_plm%time_omp(1) = wk_plm%time_omp(1)                           &
      &                    + MPI_WTIME() - wk_plm%st_time_omp
 !
-!      Set Legendre polynomials
+!    Set Legendre polynomials
       wk_plm%st_time_omp = MPI_WTIME()
       lp_rtm = lst_rtm + (lt2-1)*n_AVX + 1
       call set_each_sym_leg_omp_mat_tj(sph_rlm, mm, jst, n_AVX,         &
@@ -459,7 +442,7 @@
       wk_plm%time_omp(1) = wk_plm%time_omp(1)                           &
      &                    + MPI_WTIME() - wk_plm%st_time_omp
 !
-!      Set Legendre polynomials
+!    Set Legendre polynomials
       wk_plm%st_time_omp = MPI_WTIME()
       lp_rtm = lst_rtm + (lt2-1)*n_SSE2 + 1
       call set_each_sym_leg_omp_mat_tj(sph_rlm, mm, jst, n_SSE2,        &
@@ -636,5 +619,143 @@
       end subroutine leg_fwd_trans_at_equator
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
 !
-      end module legendre_fwd_trans_testloop
+      subroutine sum_spectr_over_smp_in                                 &
+     &         (nkrs, nkrt, n_jk_e, n_jk_o, Smat)
+!
+      integer(kind = kint), intent(in) :: nkrs, nkrt
+      integer(kind = kint), intent(in) :: n_jk_e, n_jk_o
+      type(spectr_matrix_omp), intent(inout) :: Smat(np_smp)
+!
+      integer(kind = kint) :: ip, j
+!
+!
+!$omp parallel
+!$omp do private(j,ip)
+        do j = 1, nkrs*n_jk_e
+          do ip = 2, np_smp
+            Smat(1)%pol_e(j) = Smat(1)%pol_e(j) + Smat(ip)%pol_e(j)
+          end do
+        end do
+!$omp end do nowait
+!$omp do private(j,ip)
+        do j = 1, nkrt*n_jk_e
+          do ip = 2, np_smp
+            Smat(1)%pol_e(j) = Smat(1)%pol_e(j) + Smat(ip)%pol_e(j)
+          end do
+        end do
+!$omp end do nowait
+!$omp do private(j,ip)
+        do j = 1, nkrs*n_jk_o
+          do ip = 2, np_smp
+            Smat(1)%pol_o(j) = Smat(1)%pol_o(j) + Smat(ip)%pol_o(j)
+          end do
+        end do
+!$omp end do nowait
+!$omp do private(j,ip)
+        do j = 1, nkrt*n_jk_o
+          do ip = 2, np_smp
+            Smat(1)%tor_o(j) =  Smat(1)%tor_o(j) + Smat(ip)%tor_o(j)
+          end do
+        end do
+!$omp end do
+!$omp end parallel
+!
+      end subroutine sum_spectr_over_smp_in
+!
+! -----------------------------------------------------------------------
+!
+      subroutine sum_spectr_over_smp_krin                               &
+     &         (nkrs, nkrt, n_jk_e, n_jk_o, Smat)
+!
+      integer(kind = kint), intent(in) :: nkrs, nkrt
+      integer(kind = kint), intent(in) :: n_jk_e, n_jk_o
+      type(spectr_matrix_omp), intent(inout) :: Smat(np_smp)
+!
+      integer(kind = kint) :: ip, nr, lt, j
+!
+!
+!$omp parallel
+!$omp do private(lt,nr,j,ip)
+      do lt = 1, n_jk_e
+        do ip = 2, np_smp
+          do nr = 1, nkrs
+            j = nr + (lt-1)*nkrs
+            Smat(1)%pol_e(j) = Smat(1)%pol_e(j) + Smat(ip)%pol_e(j)
+          end do
+        end do
+      end do
+!$omp end do nowait
+!$omp do private(lt,nr,j,ip)
+      do lt = 1, n_jk_e
+        do ip = 2, np_smp
+          do nr = 1, nkrt
+            j = nr + (lt-1)*nkrt
+            Smat(1)%tor_e(j) = Smat(1)%tor_e(j) + Smat(ip)%tor_e(j)
+          end do
+        end do
+      end do
+!$omp end do nowait
+!$omp do private(lt,nr,j,ip)
+      do lt = 1, n_jk_o
+        do ip = 2, np_smp
+          do nr = 1, nkrs
+            j = nr + (lt-1)*nkrs
+            Smat(1)%pol_o(j) = Smat(1)%pol_o(j) + Smat(ip)%pol_o(j)
+          end do
+        end do
+      end do
+!$omp end do nowait
+!$omp do private(lt,nr,j,ip)
+      do lt = 1, n_jk_o
+        do ip = 2, np_smp
+          do nr = 1, nkrt
+            j = nr + (lt-1)*nkrt
+            Smat(1)%tor_o(j) =  Smat(1)%tor_o(j) + Smat(ip)%tor_o(j)
+          end do
+        end do
+      end do
+!$omp end do
+!$omp end parallel
+!
+      end subroutine sum_spectr_over_smp_krin
+!
+! -----------------------------------------------------------------------
+!
+      subroutine sum_spectr_over_smp_out                                &
+     &         (nkrs, nkrt, n_jk_e, n_jk_o, Smat)
+!
+      integer(kind = kint), intent(in) :: nkrs, nkrt
+      integer(kind = kint), intent(in) :: n_jk_e, n_jk_o
+      type(spectr_matrix_omp), intent(inout) :: Smat(np_smp)
+!
+      integer(kind = kint) :: ip
+!
+!
+!$omp parallel private(ip)
+        do ip = 2, np_smp
+!$omp workshare
+          Smat(1)%pol_e(1:nkrs*n_jk_e) =  Smat(1)%pol_e(1:nkrs*n_jk_e)  &
+     &       + Smat(ip)%pol_e(1:nkrs*n_jk_e)
+!$omp end workshare nowait
+!$omp workshare
+          Smat(1)%tor_e(1:nkrt*n_jk_e) =  Smat(1)%tor_e(1:nkrt*n_jk_e)  &
+     &       + Smat(ip)%tor_e(1:nkrt*n_jk_e)
+!$omp end workshare nowait
+!$omp workshare
+          Smat(1)%pol_o(1:nkrs*n_jk_o) = Smat(1)%pol_o(1:nkrs*n_jk_o)   &
+     &       + Smat(ip)%pol_o(1:nkrs*n_jk_o)
+!$omp end workshare nowait
+!$omp workshare
+          Smat(1)%tor_o(1:nkrt*n_jk_o) = Smat(1)%tor_o(1:nkrt*n_jk_o)   &
+     &       + Smat(ip)%tor_o(1:nkrt*n_jk_o)
+!$omp end workshare nowait
+        end do
+!$omp end parallel
+!
+      end subroutine sum_spectr_over_smp_out
+!
+! -----------------------------------------------------------------------
+!
+      end module leg_fwd_trans_on_the_fly

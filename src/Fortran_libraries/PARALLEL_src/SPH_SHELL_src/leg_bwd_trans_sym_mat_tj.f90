@@ -99,43 +99,43 @@
       do mp_rlm = 1, sph_rtm%nidx_rtm(3)
         jst = idx_trns%lstack_rlm(mp_rlm-1)
 !
-      if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+12)
-          call set_sp_rlm_sym_mat_rout                                  &
-     &       (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,    &
-     &        sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r, g_sph_rlm, &
-     &        jst, WK_l_tsp%n_jk_e(mp_rlm),  WK_l_tsp%n_jk_o(mp_rlm),   &
-     &        ncomp, nvector, nscalar, comm_rlm%irev_sr, n_WR, WR,      &
-     &        WK_l_tsp%Smat(1)%pol_e(1), WK_l_tsp%Smat(1)%tor_e(1),     &
-     &        WK_l_tsp%Smat(1)%pol_o(1), WK_l_tsp%Smat(1)%tor_o(1) )
-      if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+12)
+        if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+9)
+        call set_sp_rlm_sym_mat_rout                                    &
+     &     (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,      &
+     &      sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r, g_sph_rlm,   &
+     &      jst, WK_l_tsp%n_jk_e(mp_rlm),  WK_l_tsp%n_jk_o(mp_rlm),     &
+     &      ncomp, nvector, nscalar, comm_rlm%irev_sr, n_WR, WR,        &
+     &      WK_l_tsp%Smat(1)%pol_e(1), WK_l_tsp%Smat(1)%tor_e(1),       &
+     &      WK_l_tsp%Smat(1)%pol_o(1), WK_l_tsp%Smat(1)%tor_o(1) )
+        if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+9)
 !
-          if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+13)
+        if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+11)
 !$omp parallel do private(ip,lst_rtm)
         do ip = 1, np_smp
           lst_rtm = WK_l_tsp%lst_rtm(ip)
 !   even l-m
           call matmul_bwd_leg_trans(iflag_matmul,                       &
      &        WK_l_tsp%nle_rtm(ip), nkrs, WK_l_tsp%n_jk_e(mp_rlm),      &
-     &        WK_l_tsp%Pmat(mp_rlm,ip)%Pse_tj,                          &
+     &        WK_l_tsp%Ptj_mat(mp_rlm,ip)%Pse_tj(1),                    &
      &        WK_l_tsp%Smat(1)%pol_e(1), WK_l_tsp%Fmat(ip)%symp_r(1))
           call matmul_bwd_leg_trans(iflag_matmul,                       &
      &        WK_l_tsp%nle_rtm(ip), nkrt, WK_l_tsp%n_jk_e(mp_rlm),      &
-     &        WK_l_tsp%Pmat(mp_rlm,ip)%dPsedt_tj,                       &
+     &        WK_l_tsp%Ptj_mat(mp_rlm,ip)%dPsedt_tj(1),                 &
      &        WK_l_tsp%Smat(1)%tor_e(1), WK_l_tsp%Fmat(ip)%asmp_p(1))
 !   odd l-m
           call matmul_bwd_leg_trans(iflag_matmul,                       &
      &        WK_l_tsp%nle_rtm(ip), nkrs, WK_l_tsp%n_jk_o(mp_rlm),      &
-     &        WK_l_tsp%Pmat(mp_rlm,ip)%Pso_tj,                          &
+     &        WK_l_tsp%Ptj_mat(mp_rlm,ip)%Pso_tj(1),                    &
      &        WK_l_tsp%Smat(1)%pol_o(1), WK_l_tsp%Fmat(ip)%asmp_r(1))
           call matmul_bwd_leg_trans(iflag_matmul,                       &
      &        WK_l_tsp%nle_rtm(ip), nkrt, WK_l_tsp%n_jk_o(mp_rlm),      &
-     &        WK_l_tsp%Pmat(mp_rlm,ip)%dPsodt_tj,                       &
+     &        WK_l_tsp%Ptj_mat(mp_rlm,ip)%dPsodt_tj(1),                 &
      &        WK_l_tsp%Smat(1)%tor_o(1), WK_l_tsp%Fmat(ip)%symp_p(1))
         end do
 !$omp end parallel do
-      if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+13)
+        if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+11)
 !
-      if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+14)
+        if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+12)
 !$omp parallel do private(ip,lst_rtm)
         do ip = 1, np_smp
           lst_rtm = WK_l_tsp%lst_rtm(ip)
@@ -149,8 +149,7 @@
      &        ncomp, nvector, nscalar, comm_rtm%irev_sr, n_WS, WS)
         end do
 !$omp end parallel do
-          if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+14)
-!
+        if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+12)
       end do
 !
       end subroutine legendre_b_trans_sym_mat_tj

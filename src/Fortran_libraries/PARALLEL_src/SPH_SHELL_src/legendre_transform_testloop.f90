@@ -47,6 +47,7 @@
 !
       use m_precision
 !
+      use t_spheric_parameter
       use t_spheric_rtm_data
       use t_spheric_rlm_data
       use t_sph_trans_comm_tbl
@@ -68,6 +69,7 @@
 !
       use legendre_bwd_trans_testloop
       use spherical_SRs_N
+      use matmul_for_legendre_trans
 !
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -82,9 +84,9 @@
       type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
 !
 !
-        call legendre_b_trans_vector_test(ncomp, nvector, nscalar,      &
-     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns,             &
-     &      leg%asin_t_rtm, leg%g_sph_rlm,                              &
+        call legendre_b_trans_vector_test                               &
+     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
+     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns, leg,        &
      &      n_WR, n_WS, WR, WS, WK_l_tst)
 !
       end subroutine leg_backward_trans_test
@@ -97,6 +99,7 @@
 !
       use legendre_fwd_trans_testloop
       use spherical_SRs_N
+      use matmul_for_legendre_trans
 !
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_rlm_grid), intent(in) :: sph_rlm
@@ -111,9 +114,9 @@
       type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
 !
 !
-        call legendre_f_trans_vector_test(ncomp, nvector, nscalar,      &
-     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns,             &
-     &      leg%asin_t_rtm, leg%g_sph_rlm, leg%weight_rtm,              &
+        call legendre_f_trans_vector_test                               &
+     &     (iflag_MATPROD, ncomp, nvector, nscalar,                     &
+     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, idx_trns, leg,        &
      &      n_WR, n_WS, WR, WS, WK_l_tst)
 !
       end subroutine leg_forward_trans_test

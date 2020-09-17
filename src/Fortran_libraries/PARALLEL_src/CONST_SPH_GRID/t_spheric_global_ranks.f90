@@ -41,8 +41,20 @@
 !
 !
       type spheric_global_rank
+!>        logical flag to set radius as innermost loop for f(r,j)
+        logical :: rj_rin_flag =  .FALSE.
+!>        logical flag to set radius as innermost loop for f(r,l,m)
+        logical :: rlm_rin_flag = .TRUE.
+!>        logical flag to set radius as innermost loop for f(r,\theta,m)
+        logical :: rtm_rin_flag = .TRUE.
+!>        logical flag to set radius as innermost loop for f(r,\theta,p)
+        logical :: rtp_rin_flag = .TRUE.
+!
 !>        flag for radial inner decomposition
-        integer(kind = kint) :: iflag_radial_inner_domain = 0
+        logical :: radial_inner_domain_flag =  .FALSE.
+!
+!>        flag for radial inner decomposition
+        integer(kind = kint) :: iflag_rlm_distribute = 0
 !
 !>        number of subdomains
         integer(kind = kint) :: ndomain_sph

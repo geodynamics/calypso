@@ -66,6 +66,7 @@
       use set_vr_rtm_sym_mat_tsmp
       use cal_sp_rlm_sym_mat_tsmp
       use matmul_for_legendre_trans
+      use sum_spectr_over_smp_segment
 !
       integer(kind = kint), intent(in) :: iflag_matmul
       type(sph_rtm_grid), intent(in) :: sph_rtm
@@ -99,7 +100,7 @@
       do mp_rlm = 1, sph_rtm%nidx_rtm(3)
         jst = idx_trns%lstack_rlm(mp_rlm-1)
 !
-      if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+15)
+        if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+13)
 !$omp parallel do private(ip,lst_rtm)
         do ip = 1, np_smp
           lst_rtm = WK_l_tsp%lst_rtm(ip)
@@ -113,61 +114,44 @@
      &        WK_l_tsp%Fmat(ip)%asmp_r(1), WK_l_tsp%Fmat(ip)%symp_p(1))
         end do
 !$omp end parallel do
-      if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+15)
+        if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+13)
 !
 !  even l-m
-        if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+16)
+        if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+15)
 !$omp parallel do private(ip,lst_rtm)
         do ip = 1, np_smp
           lst_rtm = WK_l_tsp%lst_rtm(ip)
           call matmul_fwd_leg_trans_Pjl(iflag_matmul,                   &
      &        WK_l_tsp%n_jk_e(mp_rlm), nkrs, WK_l_tsp%nle_rtm(ip),      &
-     &        WK_l_tsp%Pmat(mp_rlm,ip)%Pse_jt,                          &
+     &        WK_l_tsp%Pjt_mat(mp_rlm,ip)%Pse_jt(1),                    &
      &        WK_l_tsp%Fmat(ip)%symp_r(1), WK_l_tsp%Smat(ip)%pol_e(1))
           call matmul_fwd_leg_trans_Pjl(iflag_matmul,                   &
      &        WK_l_tsp%n_jk_e(mp_rlm), nkrt, WK_l_tsp%nle_rtm(ip),      &
-     &        WK_l_tsp%Pmat(mp_rlm,ip)%dPsedt_jt,                       &
+     &        WK_l_tsp%Pjt_mat(mp_rlm,ip)%dPsedt_jt(1),                 &
      &        WK_l_tsp%Fmat(ip)%asmp_p(1), WK_l_tsp%Smat(ip)%tor_e(1))
 !
 !  odd l-m
           call matmul_fwd_leg_trans_Pjl(iflag_matmul,                   &
      &        WK_l_tsp%n_jk_o(mp_rlm), nkrs, WK_l_tsp%nle_rtm(ip),      &
-     &        WK_l_tsp%Pmat(mp_rlm,ip)%Pso_jt,                          &
+     &        WK_l_tsp%Pjt_mat(mp_rlm,ip)%Pso_jt(1),                    &
      &        WK_l_tsp%Fmat(ip)%asmp_r(1), WK_l_tsp%Smat(ip)%pol_o(1))
           call matmul_fwd_leg_trans_Pjl(iflag_matmul,                   &
      &        WK_l_tsp%n_jk_o(mp_rlm), nkrt, WK_l_tsp%nle_rtm(ip),      &
-     &        WK_l_tsp%Pmat(mp_rlm,ip)%dPsodt_jt,                       &
+     &        WK_l_tsp%Pjt_mat(mp_rlm,ip)%dPsodt_jt(1),                 &
      &        WK_l_tsp%Fmat(ip)%symp_p(1), WK_l_tsp%Smat(ip)%tor_o(1))
         end do 
 !$omp end parallel do
+        if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+15)
+!
+        if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+16)
+!        call sum_spectr_over_smp_out(nkrs, nkrt,                       &
+!        call sum_spectr_over_smp_in(nkrs, nkrt,                        &
+        call sum_spectr_over_kr_in(nkrs, nkrt,                          &
+     &      WK_l_tsp%n_jk_e(mp_rlm), WK_l_tsp%n_jk_o(mp_rlm),           &
+     &      WK_l_tsp%Smat)
         if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+16)
 !
         if(iflag_SDT_time) call start_elapsed_time(ist_elapsed_SDT+17)
-!$omp parallel private(ip)
-        do ip = 2, np_smp
-!$omp workshare
-          WK_l_tsp%Smat(1)%pol_e(1:nkrs*WK_l_tsp%n_jk_e(mp_rlm))        &
-     &      =  WK_l_tsp%Smat(1)%pol_e(1:nkrs*WK_l_tsp%n_jk_e(mp_rlm))   &
-     &       + WK_l_tsp%Smat(ip)%pol_e(1:nkrs*WK_l_tsp%n_jk_e(mp_rlm))
-!$omp end workshare nowait
-!$omp workshare
-          WK_l_tsp%Smat(1)%tor_e(1:nkrt*WK_l_tsp%n_jk_e(mp_rlm))        &
-     &      =  WK_l_tsp%Smat(1)%tor_e(1:nkrt*WK_l_tsp%n_jk_e(mp_rlm))   &
-     &       + WK_l_tsp%Smat(ip)%tor_e(1:nkrt*WK_l_tsp%n_jk_e(mp_rlm))
-!$omp end workshare nowait
-!$omp workshare
-          WK_l_tsp%Smat(1)%pol_o(1:nkrs*WK_l_tsp%n_jk_o(mp_rlm))        &
-     &      =  WK_l_tsp%Smat(1)%pol_o(1:nkrs*WK_l_tsp%n_jk_o(mp_rlm))   &
-     &       + WK_l_tsp%Smat(ip)%pol_o(1:nkrs*WK_l_tsp%n_jk_o(mp_rlm))
-!$omp end workshare nowait
-!$omp workshare
-          WK_l_tsp%Smat(1)%tor_o(1:nkrt*WK_l_tsp%n_jk_o(mp_rlm))        &
-     &      =  WK_l_tsp%Smat(1)%tor_o(1:nkrt*WK_l_tsp%n_jk_o(mp_rlm))   &
-     &       + WK_l_tsp%Smat(ip)%tor_o(1:nkrt*WK_l_tsp%n_jk_o(mp_rlm))
-!$omp end workshare nowait
-        end do
-!$omp end parallel
-!
         call cal_sp_rlm_sym_mat_rout                                    &
      &     (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                         &
      &      sph_rlm%istep_rlm, sph_rlm%idx_gl_1d_rlm_j,                 &
@@ -177,7 +161,6 @@
      &      WK_l_tsp%Smat(1)%tor_e(1), WK_l_tsp%Smat(1)%tor_o(1),       &
      &      ncomp, nvector, nscalar, comm_rlm%irev_sr, n_WS, WS)
         if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+17)
-!
       end do
 !
       end subroutine legendre_f_trans_sym_mat_jt

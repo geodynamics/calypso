@@ -174,6 +174,9 @@
 !!@n       symp_p = symp_p(          1:  nvec_lk,ip)
 !!@n       symp_t = symp_p(  nvec_lk+1:2*nvec_lk,ip)
         real(kind = kreal), allocatable :: symp_p(:,:)
+!
+!>         work area for timer
+        real(kind = kreal), allocatable :: time_omp(:,:)
       end type leg_trns_bsym_mul_work
 !
       private :: const_symmetric_legendre_lj
@@ -204,6 +207,9 @@
      &   (sph_rtm%nidx_rtm(2), sph_rtm%maxidx_rtm_smp(1),               &
      &    nvector, nscalar, idx_trns, WK_l_bsm)
 !
+      allocate(WK_l_bsm%time_omp(np_smp,0:4))
+      WK_l_bsm%time_omp = 0.0d0
+!
       end subroutine init_leg_sym_matmul_big
 !
 ! -----------------------------------------------------------------------
@@ -226,6 +232,9 @@
       call alloc_leg_sym_matmul_big2                                    &
      &   (sph_rtm%nidx_rtm(1), sph_rtm%maxidx_rtm_smp(1),               &
      &    nvector, nscalar, idx_trns, WK_l_bsm)
+!
+      allocate(WK_l_bsm%time_omp(np_smp,0:3))
+      WK_l_bsm%time_omp = 0.0d0
 !
       end subroutine init_leg_sym_matmul_big2
 !
@@ -343,6 +352,8 @@
       deallocate(WK_l_bsm%asmp_r, WK_l_bsm%asmp_p)
 !
       deallocate(WK_l_bsm%Ps_tj, WK_l_bsm%dPsdt_tj)
+!
+      deallocate(WK_l_bsm%time_omp)
 !
       end subroutine dealloc_leg_sym_matmul_big
 !

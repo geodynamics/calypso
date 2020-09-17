@@ -170,7 +170,7 @@
       i4_tmp(1) = i4_dat
       call MPI_FILE_SEEK                                                &
      &   (id_mpi_file, ioffset, MPI_SEEK_SET, ierr_MPI)
-      call MPI_FILE_WRITE(id_mpi_file, i4_tmp, 1,                       &
+      call MPI_FILE_WRITE(id_mpi_file, i4_tmp(1), 1,                    &
      &    CALYPSO_FOUR_INT, sta_IO, ierr_MPI)
 !
       end subroutine calypso_mpi_seek_write_one_int4
@@ -191,7 +191,7 @@
 !
       call MPI_FILE_SEEK                                                &
      &   (id_mpi_file, ioffset, MPI_SEEK_SET, ierr_MPI)
-      call MPI_FILE_READ(id_mpi_file, i4_tmp, 1,                        &
+      call MPI_FILE_READ(id_mpi_file, i4_tmp(1), 1,                     &
      &    CALYPSO_FOUR_INT, sta_IO, ierr_MPI)
       i4_dat = i4_tmp(1)
 

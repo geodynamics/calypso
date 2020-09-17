@@ -23,7 +23,6 @@
       use t_spheric_rtp_data
       use t_phys_address
       use t_addresses_sph_transform
-      use t_sph_multi_FFTW
       use t_sph_transforms
       use t_coriolis_terms_rlm
       use t_gaunt_coriolis_rlm

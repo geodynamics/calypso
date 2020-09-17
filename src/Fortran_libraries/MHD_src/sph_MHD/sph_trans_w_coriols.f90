@@ -86,7 +86,6 @@
       use t_addresses_sph_transform
       use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
-      use t_sph_multi_FFTW
       use t_legendre_trans_select
       use t_sph_transforms
       use t_coriolis_terms_rlm

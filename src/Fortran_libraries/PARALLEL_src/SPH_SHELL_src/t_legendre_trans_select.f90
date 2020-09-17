@@ -10,25 +10,24 @@
 !!
 !!@verbatim
 !!      subroutine sel_init_legendre_trans(ncomp, nvector, nscalar,     &
-!!     &          sph_rtm, sph_rlm, leg, idx_trns, WK_leg)
+!!     &          sph_params, sph_rtm, sph_rlm, leg, idx_trns, WK_leg)
 !!      subroutine sel_finalize_legendre_trans(WK_leg)
 !!
 !!    Backward transforms
-!!      subroutine sel_backward_legendre_trans                          &
-!!     &         (ncomp, nvector, nscalar,                              &
+!!      subroutine sel_backward_legendre_trans(ncomp, nvector, nscalar, &
 !!     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,  &
 !!     &          n_WR, n_WS, WR, WS, WK_leg)
 !!        Input:  sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!        Output: vr_rtm   (Order: radius,theta,phi)
 !!
 !!    Forward transforms
-!!      subroutine sel_forward_legendre_trans                           &
-!!     &         (ncomp, nvector, nscalar,                              &
+!!      subroutine sel_forward_legendre_trans(ncomp, nvector, nscalar,  &
 !!     &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,  &
 !!     &          n_WR, n_WS, WR, WS, WK_leg)
 !!        Input:  vr_rtm   (Order: radius,theta,phi)
 !!        Output: sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!
+!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rtm_grid), intent(in) :: sph_rtm
 !!        type(sph_rlm_grid), intent(in) :: sph_rlm
 !!        type(sph_comm_tbl), intent(in) :: comm_rtm, comm_rlm
@@ -47,6 +46,7 @@
       use m_precision
       use m_legendre_transform_list
 !
+      use t_spheric_parameter
       use t_spheric_rtm_data
       use t_spheric_rlm_data
       use t_sph_trans_comm_tbl
@@ -56,6 +56,7 @@
       use t_legendre_work_sym_matmul
       use t_leg_trans_sym_matmul_big
       use t_legendre_work_sym_mat_jt
+      use leg_fwd_trans_on_the_fly
       use t_legendre_work_testlooop
 !
       use legendre_transform_org
@@ -83,8 +84,10 @@
 !>        Structure for Legendre trasdorm for test
         type(leg_trns_testloop_work) :: WK_l_tst
 !
-!>        Structure for Legendre trasdorm for test
+!>        Structure for Legendre trasdorm for OopenMP in theta direction
         type(leg_trns_theta_omp_work) :: WK_l_tsp
+!>        Structure for Legendre trasdorm for on the fly mode
+        type(leg_trns_on_the_fly_work) :: WK_l_otf
       end type legendre_trns_works
 !
 ! -----------------------------------------------------------------------
@@ -94,9 +97,10 @@
 ! -----------------------------------------------------------------------
 !
       subroutine sel_init_legendre_trans(ncomp, nvector, nscalar,       &
-     &          sph_rtm, sph_rlm, leg, idx_trns, WK_leg)
+     &          sph_params, sph_rtm, sph_rlm, leg, idx_trns, WK_leg)
 !
       integer(kind = kint), intent(in) :: ncomp, nvector, nscalar
+      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_rlm_grid), intent(in) :: sph_rlm
       type(legendre_4_sph_trans), intent(in) :: leg
@@ -124,8 +128,15 @@
      &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_tj) then
         call init_legendre_sym_mat_tj(sph_rtm, sph_rlm, leg,            &
      &      idx_trns, nvector, nscalar, WK_leg%WK_l_tsp)
+!
+      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matprod          &
+     &   .or. WK_leg%id_legendre .eq. iflag_on_the_fly_matmul           &
+     &   .or. WK_leg%id_legendre .eq. iflag_on_the_fly_dgemm) then
+        call init_legendre_sym_mat_otfly(sph_params, sph_rtm,           &
+     &      idx_trns, nvector, nscalar, WK_leg%WK_l_otf)
+!
       else if(WK_leg%id_legendre .eq. iflag_leg_test_loop) then
-        call init_legendre_testloop(sph_rtm, sph_rlm, leg,              &
+        call init_legendre_sym_mat_both(sph_params, sph_rtm,            &
      &      idx_trns, nvector, nscalar, WK_leg%WK_l_tst)
       else
         call init_legendre_symmetry                                     &
@@ -154,8 +165,14 @@
       else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_tj              &
      &   .or. WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_tj) then
         call dealloc_leg_sym_mat_tj(WK_leg%WK_l_tsp)
+      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matprod          &
+     &   .or. WK_leg%id_legendre .eq. iflag_on_the_fly_matmul           &
+     &   .or. WK_leg%id_legendre .eq. iflag_on_the_fly_dgemm) then
+        call dealloc_leg_sym_mat_otfly(WK_leg%WK_l_otf)
+!
       else if(WK_leg%id_legendre .eq. iflag_leg_test_loop) then
-        call dealloc_leg_vec_test(WK_leg%WK_l_tst)
+        call dealloc_leg_sym_mat_both(WK_leg%WK_l_tst)
+!
       else
         call finalize_legendre_sym_matmul(WK_leg%WK_l_sml)
       end if
@@ -165,10 +182,11 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine sel_backward_legendre_trans                            &
-     &         (ncomp, nvector, nscalar,                                &
+      subroutine sel_backward_legendre_trans(ncomp, nvector, nscalar,   &
      &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,    &
      &          n_WR, n_WS, WR, WS, WK_leg)
+!
+      use leg_bwd_trans_on_the_fly
 !
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_rlm_grid), intent(in) :: sph_rlm
@@ -218,7 +236,7 @@
      &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
       else if(WK_leg%id_legendre .eq. iflag_leg_sym_dgemm_jt) then
-      call leg_backward_trans_smat_jt                                   &
+        call leg_backward_trans_smat_jt                                 &
      &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
      &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
@@ -232,6 +250,23 @@
      &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
      &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
+!
+      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matprod) then
+        call legendre_b_trans_on_the_fly                                &
+     &     (iflag_MATPROD, ncomp, nvector, nscalar,                     &
+     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
+     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
+      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matmul) then
+        call legendre_b_trans_on_the_fly                                &
+     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
+     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
+     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
+      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_dgemm) then
+        call legendre_b_trans_on_the_fly                                &
+     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
+     &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
+     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
+!
       else
         call leg_backward_trans_sym_org(ncomp, nvector, nscalar,        &
      &      sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,        &
@@ -242,10 +277,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sel_forward_legendre_trans                             &
-     &         (ncomp, nvector, nscalar,                                &
+      subroutine sel_forward_legendre_trans(ncomp, nvector, nscalar,    &
      &          sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,    &
      &          n_WR, n_WS, WR, WS, WK_leg)
+!
+      use leg_fwd_trans_on_the_fly
 !
       type(sph_rtm_grid), intent(in) :: sph_rtm
       type(sph_rlm_grid), intent(in) :: sph_rlm
@@ -269,6 +305,7 @@
         call leg_forward_trans_sym_spin(ncomp, nvector, nscalar,        &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_sml)
+!
       else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul) then
         call leg_forward_trans_sym_matmul                               &
      &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
@@ -279,6 +316,7 @@
      &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_sml)
+!
       else if(WK_leg%id_legendre .eq. iflag_leg_sym_matmul_big) then
         call leg_forward_trans_matmul_big                               &
      &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
@@ -289,6 +327,7 @@
      &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_bsm)
+!
       else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_jt) then
         call leg_forward_trans_smat_jt                                  &
      &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
@@ -299,6 +338,7 @@
      &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
+!
       else if(WK_leg%id_legendre .eq. iflag_leg_sym_mat_tj) then
         call leg_forward_trans_smat_tj                                  &
      &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
@@ -309,6 +349,23 @@
      &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
      &      n_WR, n_WS, WR, WS, WK_leg%WK_l_tsp)
+!
+      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matprod) then
+        call legendre_f_trans_on_the_fly                                &
+     &     (iflag_MATPROD, ncomp, nvector, nscalar,                     &
+     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
+     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
+      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_matmul) then
+        call legendre_f_trans_on_the_fly                                &
+     &     (iflag_INTRINSIC, ncomp, nvector, nscalar,                   &
+     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
+     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
+      else if(WK_leg%id_legendre .eq. iflag_on_the_fly_dgemm) then
+        call legendre_f_trans_on_the_fly                                &
+     &     (iflag_DGEMM, ncomp, nvector, nscalar,                       &
+     &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &
+     &      n_WR, n_WS, WR, WS, WK_leg%WK_l_otf)
+!
       else
         call leg_forward_trans_sym_org(ncomp, nvector, nscalar,         &
      &      sph_rtm, sph_rlm, comm_rtm, comm_rlm, leg, idx_trns,        &

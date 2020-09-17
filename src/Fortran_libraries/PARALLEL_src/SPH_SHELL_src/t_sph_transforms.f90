@@ -99,8 +99,8 @@
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+1)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+5)
-      call sel_backward_legendre_trans                                  &
-     &   (ncomp_trans, nvector, nscalar, sph%sph_rlm, sph%sph_rtm,      &
+      call sel_backward_legendre_trans(ncomp_trans, nvector, nscalar,   &
+     &    sph%sph_rlm, sph%sph_rtm,                                     &
      &    comms_sph%comm_rlm, comms_sph%comm_rtm,                       &
      &    trans_p%leg, trans_p%idx_trns,                                &
      &    n_WR, n_WS, WR, WS, WK_sph%WK_leg)
@@ -163,8 +163,8 @@
 !
 !
       if(iflag_debug .gt. 0) write(*,*) 'sel_backward_legendre_trans'
-      call sel_backward_legendre_trans                                  &
-     &   (ncomp_trans, nvector, nscalar, sph%sph_rlm, sph%sph_rtm,      &
+      call sel_backward_legendre_trans(ncomp_trans, nvector, nscalar,   &
+     &    sph%sph_rlm, sph%sph_rtm,                                     &
      &    comms_sph%comm_rlm, comms_sph%comm_rtm,                       &
      &    trans_p%leg, trans_p%idx_trns,                                &
      &    n_WR, n_WS, WR, WS, WK_sph%WK_leg)
@@ -270,8 +270,8 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'sel_forward_legendre_trans'
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+6)
-      call sel_forward_legendre_trans                                   &
-     &   (ncomp_trans, nvector, nscalar, sph%sph_rtm, sph%sph_rlm,      &
+      call sel_forward_legendre_trans(ncomp_trans, nvector, nscalar,    &
+     &    sph%sph_rtm, sph%sph_rlm,                                     &
      &    comms_sph%comm_rtm, comms_sph%comm_rlm,                       &
      &    trans_p%leg, trans_p%idx_trns,                                &
      &    n_WR, n_WS, WR, WS, WK_sph%WK_leg)

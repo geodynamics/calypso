@@ -31,14 +31,14 @@
 !!     &          nidx_local, nnod_local)
 !!
 !!      subroutine set_gl_rank_3d                                       &
-!!     &         (iner_r_flag, nproc, ndomain_3d, id_gl_rank)
+!!     &         (inner_r_flag, nproc, ndomain_3d, id_gl_rank)
 !!      subroutine set_gl_rank_2d                                       &
-!!     &         (iner_r_flag, nproc, ndomain_2d, id_gl_rank)
+!!     &         (inner_r_flag, nproc, ndomain_2d, id_gl_rank)
 !!
 !!      integer(kind = kint) function set_rank_by_1b_sph_rank            &
-!!     &                  (iner_r_flag, ndomain_3d, ip_r, ip_t, ip_p)
+!!     &                  (inner_r_flag, ndomain_3d, ip_r, ip_t, ip_p)
 !!      integer(kind = kint) function set_rank_by_1b_rj_rank             &
-!!     &                  (iner_r_flag, ndomain_2d, ip_r, ip_j)
+!!     &                  (inner_r_flag, ndomain_2d, ip_r, ip_j)
 !!
 !!      subroutine check_spheric_global_numnod(id_rank)
 !!@endverbatim
@@ -190,9 +190,9 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_gl_rank_3d                                         &
-     &         (iner_r_flag, nproc, ndomain_3d, id_gl_rank)
+     &         (inner_r_flag, nproc, ndomain_3d, id_gl_rank)
 !
-      integer(kind = kint), intent(in) :: iner_r_flag
+      logical, intent(in) :: inner_r_flag
       integer(kind = kint), intent(in) :: nproc
       integer(kind = kint), intent(in) :: ndomain_3d(3)
       integer(kind = kint), intent(inout) :: id_gl_rank(3,0:(nproc-1))
@@ -200,7 +200,7 @@
       integer(kind = kint) :: itmp
 !
 !
-      if(iner_r_flag .gt. 0) then
+      if(inner_r_flag) then
         do ip_rank = 0, nproc-1
           id_gl_rank(1,ip_rank) = mod(ip_rank,ndomain_3d(1))
           itmp = (ip_rank-id_gl_rank(1,ip_rank)) / ndomain_3d(1)
@@ -223,16 +223,16 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_gl_rank_2d                                         &
-     &         (iner_r_flag, nproc, ndomain_2d, id_gl_rank)
+     &         (inner_r_flag, nproc, ndomain_2d, id_gl_rank)
 !
-      integer(kind = kint), intent(in) :: iner_r_flag
+      logical, intent(in) :: inner_r_flag
       integer(kind = kint), intent(in) :: nproc
       integer(kind = kint), intent(in) :: ndomain_2d(2)
       integer(kind = kint), intent(inout) :: id_gl_rank(2,0:(nproc-1))
       integer(kind = kint) :: ip_rank
 !
 !
-      if(iner_r_flag .gt. 0) then
+      if(inner_r_flag) then
         do ip_rank = 0, nproc-1
           id_gl_rank(1,ip_rank) = mod(ip_rank,ndomain_2d(1))
           id_gl_rank(2,ip_rank) = (ip_rank-id_gl_rank(1,ip_rank))       &
@@ -251,14 +251,14 @@
 ! -----------------------------------------------------------------------
 !
       integer(kind = kint) function set_rank_by_1b_sph_rank              &
-     &                  (iner_r_flag, ndomain_3d, ip_r, ip_t, ip_p)
+     &                  (inner_r_flag, ndomain_3d, ip_r, ip_t, ip_p)
 !
-      integer(kind = kint), intent(in) :: iner_r_flag
+      logical, intent(in) :: inner_r_flag
       integer(kind = kint), intent(in) :: ip_r, ip_t, ip_p
       integer(kind = kint), intent(in) :: ndomain_3d(3)
 !
 !
-      if(iner_r_flag .gt. 0) then
+      if(inner_r_flag) then
         set_rank_by_1b_sph_rank =  ip_r                                 &
      &                           + ip_t*ndomain_3d(1)*ndomain_3d(3)     &
      &                           + ip_p*ndomain_3d(1)
@@ -273,14 +273,14 @@
 ! -----------------------------------------------------------------------
 !
       integer(kind = kint) function set_rank_by_1b_rj_rank               &
-     &                  (iner_r_flag, ndomain_2d, ip_r, ip_j)
+     &                  (inner_r_flag, ndomain_2d, ip_r, ip_j)
 !
-      integer(kind = kint), intent(in) :: iner_r_flag
+      logical, intent(in) :: inner_r_flag
       integer(kind = kint), intent(in) :: ip_r, ip_j
       integer(kind = kint), intent(in) :: ndomain_2d(2)
 !
 !
-      if(iner_r_flag .gt. 0) then
+      if(inner_r_flag) then
         set_rank_by_1b_rj_rank =  ip_r + ip_j*ndomain_2d(1)
       else
         set_rank_by_1b_rj_rank =  ip_r*ndomain_2d(2) + ip_j

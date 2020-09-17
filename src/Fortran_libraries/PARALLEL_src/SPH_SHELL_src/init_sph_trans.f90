@@ -73,8 +73,8 @@
 !
       call sel_init_legendre_trans                                      &
      &   (ncomp_trans, nvector_trns, nscalar_trns,                      &
-     &    sph%sph_rtm, sph%sph_rlm, trans_p%leg, trans_p%idx_trns,      &
-     &    WK_sph%WK_leg)
+     &    sph%sph_params, sph%sph_rtm, sph%sph_rlm,                     &
+     &    trans_p%leg, trans_p%idx_trns, WK_sph%WK_leg)
 !
       end subroutine initialize_sph_trans
 !

@@ -1,5 +1,5 @@
-!>@file   legendre_bwd_trans_testloop.f90
-!!@brief  module legendre_bwd_trans_testloop
+!>@file   leg_bwd_trans_on_the_fly.f90
+!!@brief  module leg_bwd_trans_on_the_fly
 !!
 !!@author H. Matsui
 !!@date Programmed in Aug., 2007
@@ -9,10 +9,10 @@
 !!       (Blocked loop version)
 !!
 !!@verbatim
-!!      subroutine legendre_b_trans_vector_test(ncomp, nvector, nscalar,&
-!!     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, idx_trns,       &
-!!     &          asin_theta_1d_rtm, g_sph_rlm,                         &
-!!     &          n_WR, n_WS, WR, WS, WK_l_tst)
+!!      subroutine legendre_b_trans_on_the_fly                          &
+!!     &         (iflag_matmul, ncomp, nvector, nscalar,                &
+!!     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,  &
+!!     &          n_WR, n_WS, WR, WS, WK_l_otf)
 !!        Input:  vr_rtm   (Order: radius,theta,phi)
 !!        Output: sp_rlm   (Order: poloidal,diff_poloidal,toroidal)
 !!
@@ -20,7 +20,7 @@
 !!        type(sph_rtm_grid), intent(in) :: sph_rtm
 !!        type(sph_comm_tbl), intent(in) :: comm_rlm, comm_rtm
 !!        type(index_4_sph_trans), intent(in) :: idx_trns
-!!        type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
+!!        type(leg_trns_on_the_fly_work), intent(inout) :: WK_l_otf
 !!@endverbatim
 !!
 !!@param   ncomp    Total number of components for spherical transform
@@ -28,7 +28,7 @@
 !!@param   nscalar  Number of scalar (including tensor components)
 !!                  for spherical transform
 !
-      module legendre_bwd_trans_testloop
+      module leg_bwd_trans_on_the_fly
 !
       use m_precision
 !
@@ -42,7 +42,7 @@
       use t_spheric_rlm_data
       use t_sph_trans_comm_tbl
       use t_work_4_sph_trans
-      use t_legendre_work_testlooop
+      use t_legendre_work_on_the_fly
       use m_elapsed_labels_SPH_TRNS
 !
       use matmul_for_legendre_trans
@@ -51,16 +51,18 @@
 !
       integer, external :: omp_get_max_threads
 !
+      private :: leg_bwd_trans_1latitude, leg_bwd_trans_at_equator
+!
 ! -----------------------------------------------------------------------
 !
       contains
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine legendre_b_trans_vector_test                           &
+      subroutine legendre_b_trans_on_the_fly                            &
      &         (iflag_matmul, ncomp, nvector, nscalar,                  &
-     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm,  idx_trns, leg,   &
-     &          n_WR, n_WS, WR, WS, WK_l_tst)
+     &          sph_rlm, sph_rtm, comm_rlm, comm_rtm, leg, idx_trns,    &
+     &          n_WR, n_WS, WR, WS, WK_l_otf)
 !
       use t_schmidt_poly_on_rtm
       use set_sp_rlm_sym_mat_tsmp
@@ -78,7 +80,7 @@
       integer(kind = kint), intent(in) :: n_WR, n_WS
       real (kind=kreal), intent(inout):: WR(n_WR)
       real (kind=kreal), intent(inout):: WS(n_WS)
-      type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
+      type(leg_trns_on_the_fly_work), intent(inout) :: WK_l_otf
 !
       integer(kind = kint) :: mp_rlm, mn_rlm, mm
       integer(kind = kint) :: nkrs, nkrt, lp_rtm
@@ -87,7 +89,7 @@
 !
 !$omp parallel do
       do ip = 1, np_smp
-        WK_l_tst%wk_plm(ip)%time_omp(1:3) = 0
+        WK_l_otf%wk_plm(ip)%time_omp(1:3) = 0
       end do
 !$omp end parallel do
 !
@@ -110,64 +112,65 @@
      &       (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,    &
      &        sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,            &
      &        leg%g_sph_rlm, &
-     &        jst, WK_l_tst%n_jk_e(mp_rlm),  WK_l_tst%n_jk_o(mp_rlm),   &
+     &        jst, WK_l_otf%n_jk_e(mp_rlm),  WK_l_otf%n_jk_o(mp_rlm),   &
      &        ncomp, nvector, nscalar, comm_rlm%irev_sr, n_WR, WR,      &
-     &        WK_l_tst%Smat(1)%pol_e(1), WK_l_tst%Smat(1)%tor_e(1),     &
-     &        WK_l_tst%Smat(1)%pol_o(1), WK_l_tst%Smat(1)%tor_o(1) )
+     &        WK_l_otf%Smat(1)%pol_e(1), WK_l_otf%Smat(1)%tor_e(1),     &
+     &        WK_l_otf%Smat(1)%pol_o(1), WK_l_otf%Smat(1)%tor_o(1) )
         if(iflag_SDT_time) call end_elapsed_time(ist_elapsed_SDT+9)
 !
 !
 !$omp parallel do private(ip,lt,kst_s,kst_t,lp_rtm)
         do ip = 1, np_smp
 !   even l-m
-          do lt = 1, WK_l_tst%nlo_rtm(ip)
+          do lt = 1, WK_l_otf%nlo_rtm(ip)
 !            kst_s = (lt-1) * nkrs + 1
 !            kst_t = (lt-1) * nkrt + 1
 !
 !      Set Legendre polynomials
-            lp_rtm = WK_l_tst%lst_rtm(ip) + lt
+            lp_rtm = WK_l_otf%lst_rtm(ip) + lt
             call leg_bwd_trans_1latitude                                &
      &         (lp_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,            &
      &          iflag_matmul, ncomp, nvector, nscalar,                  &
      &          sph_rlm, sph_rtm, comm_rlm, comm_rtm,                   &
      &          idx_trns, leg, n_WR, n_WS, WR, WS,                      &
-     &          WK_l_tst%n_jk_e(mp_rlm), WK_l_tst%n_jk_o(mp_rlm),       &
-     &          WK_l_tst%Smat(1), WK_l_tst%Pjt_mat(ip),                 &
-     &          WK_l_tst%Fmat(ip), WK_l_tst%wk_plm(ip))
+     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &
+     &          WK_l_otf%Smat(1), WK_l_otf%Pjt_mat(ip),                 &
+     &          WK_l_otf%Fmat(ip), WK_l_otf%wk_plm(ip))
           end do
 !
 !     Equator (if necessary)
-          if(WK_l_tst%nle_rtm(ip) .gt. WK_l_tst%nlo_rtm(ip)) then
-            lp_rtm = WK_l_tst%lst_rtm(ip) + WK_l_tst%nle_rtm(ip)
+          if(WK_l_otf%nle_rtm(ip) .gt. WK_l_otf%nlo_rtm(ip)) then
+            lp_rtm = WK_l_otf%lst_rtm(ip) + WK_l_otf%nle_rtm(ip)
             call leg_bwd_trans_at_equator                               &
      &         (lp_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,            &
      &          iflag_matmul, ncomp, nvector, nscalar,                  &
      &          sph_rlm, sph_rtm, comm_rtm, leg, n_WS, WS,              &
-     &          WK_l_tst%n_jk_e(mp_rlm), WK_l_tst%n_jk_o(mp_rlm),       &
-     &          WK_l_tst%Smat(1), WK_l_tst%Pjt_mat(ip),                 &
-     &          WK_l_tst%Fmat(ip), WK_l_tst%wk_plm(ip))
+     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &
+     &          WK_l_otf%Smat(1), WK_l_otf%Pjt_mat(ip),                 &
+     &          WK_l_otf%Fmat(ip), WK_l_otf%wk_plm(ip))
           end if
         end do
 !$omp end parallel do
       end do
 !
       do ip = 2, np_smp
-        WK_l_tst%wk_plm(1)%time_omp(1:3)                                &
-     &        = WK_l_tst%wk_plm(1)%time_omp(1:3)                        &
-     &         + WK_l_tst%wk_plm(ip)%time_omp(1:3)
+        WK_l_otf%wk_plm(1)%time_omp(1:3)                                &
+     &        = WK_l_otf%wk_plm(1)%time_omp(1:3)                        &
+     &         + WK_l_otf%wk_plm(ip)%time_omp(1:3)
       end do
       elps1%elapsed(ist_elapsed_SDT+10)                                 &
      &        = elps1%elapsed(ist_elapsed_SDT+10)                       &
-     &         + WK_l_tst%wk_plm(1)%time_omp(1) / dble(np_smp)
+     &         + WK_l_otf%wk_plm(1)%time_omp(1) / dble(np_smp)
       elps1%elapsed(ist_elapsed_SDT+11)                                 &
      &        = elps1%elapsed(ist_elapsed_SDT+11)                       &
-     &         + WK_l_tst%wk_plm(1)%time_omp(2) / dble(np_smp)
+     &         + WK_l_otf%wk_plm(1)%time_omp(2) / dble(np_smp)
       elps1%elapsed(ist_elapsed_SDT+12)                                 &
      &        = elps1%elapsed(ist_elapsed_SDT+12)                       &
-     &         + WK_l_tst%wk_plm(1)%time_omp(3) / dble(np_smp)
+     &         + WK_l_otf%wk_plm(1)%time_omp(3) / dble(np_smp)
 !
-      end subroutine legendre_b_trans_vector_test
+      end subroutine legendre_b_trans_on_the_fly
 !
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine leg_bwd_trans_1latitude                                &
@@ -311,4 +314,4 @@
 !
 ! -----------------------------------------------------------------------
 !
-      end module legendre_bwd_trans_testloop
+      end module leg_bwd_trans_on_the_fly

@@ -25,7 +25,7 @@
       implicit none
 !
 !>      Number of LEgendre transform types
-      integer(kind = kint), parameter :: maxindex_Leg_trans_loop = 16
+      integer(kind = kint), parameter :: maxindex_Leg_trans_loop = 17
 !
 !>      Character flag to perform Legendre transform 
 !@n     using original array order
@@ -114,8 +114,22 @@
       character(len = kchara), parameter                                &
      &           :: leg_dgemm_tj =   'Ptj_BLAS_w_theta_OMP'
 !
+!>      Character flag to perform Legendre transform 
+!@n     with symmetry and on-the-fly Legendre polynomial
+      character(len = kchara), parameter                                &
+     &           :: on_the_fly_matmul =   'On_the_fly_Plm_matmul'
+!>      Character flag to perform Legendre transform 
+!@n     with symmetry and on-the-fly Legendre polynomial
+      character(len = kchara), parameter                                &
+     &           :: on_the_fly_dgemm =    'On_the_fly_Plm_BLAS'
+!>      Character flag to perform Legendre transform 
+!@n     with symmetry and on-the-fly Legendre polynomial
+      character(len = kchara), parameter                                &
+     &           :: on_the_fly_matprod =  'On_the_fly_Plm'
+!
 !>      integer flag to run elpse time check for legendre transform
-      integer(kind = kint), parameter :: iflag_leg_undefined = -1
+      integer(kind = kint), parameter :: iflag_leg_undefined =    -1
+!
 !>      integer flag to perform Legendre transform with symmetry
       integer(kind = kint), parameter :: iflag_leg_symmetry =      1
 !>      integer flag to perform Legendre transform 
@@ -145,6 +159,17 @@
 !>      integer flag to perform Legendre transform 
 !@n     with symmetry and  self matrix product
       integer(kind = kint), parameter :: iflag_leg_sym_dgemm_tj = 16
+!
+!>      integer flag to perform Legendre transform 
+!@n     with symmetry and on-the-fly Legendre polynomial
+      integer(kind = kint), parameter :: iflag_on_the_fly_matmul = 7
+!>      integer flag to perform Legendre transform 
+!@n     with symmetry and on-the-fly Legendre polynomial
+      integer(kind = kint), parameter :: iflag_on_the_fly_dgemm = 17
+!>      integer flag to perform Legendre transform 
+!@n     with symmetry and on-the-fly Legendre polynomial
+      integer(kind = kint), parameter :: iflag_on_the_fly_matprod = 8
+!
 !>      integer flag to perform Legendre transform 
 !@n     with testing loop
       integer(kind = kint), parameter :: iflag_leg_test_loop =   99
@@ -190,6 +215,13 @@
       else if(cmp_no_case(tranx_loop_ctl, leg_dgemm_tj)) then
         set_legendre_trans_mode_ctl = iflag_leg_sym_dgemm_tj
 !
+      else if(cmp_no_case(tranx_loop_ctl, on_the_fly_matmul)) then
+        set_legendre_trans_mode_ctl = iflag_on_the_fly_matmul
+      else if(cmp_no_case(tranx_loop_ctl, on_the_fly_dgemm)) then
+        set_legendre_trans_mode_ctl = iflag_on_the_fly_dgemm
+      else if(cmp_no_case(tranx_loop_ctl, on_the_fly_matprod)) then
+        set_legendre_trans_mode_ctl = iflag_on_the_fly_matprod
+!
       else
         set_legendre_trans_mode_ctl = iflag_leg_symmetry
       end if
@@ -231,6 +263,13 @@
         write(tmpchara,'(a)') trim(leg_sym_mat_tj)
       else if(id_legendre .eq. iflag_leg_sym_dgemm_tj) then
         write(tmpchara,'(a)') trim(leg_dgemm_tj)
+!
+      else if(id_legendre .eq. iflag_on_the_fly_matmul) then
+        write(tmpchara,'(a)') trim(on_the_fly_matmul)
+      else if(id_legendre .eq. iflag_on_the_fly_dgemm) then
+        write(tmpchara,'(a)') trim(on_the_fly_dgemm)
+      else if(id_legendre .eq. iflag_on_the_fly_matprod) then
+        write(tmpchara,'(a)') trim(on_the_fly_matprod)
 !
       else if(id_legendre .eq. iflag_leg_test_loop) then
         write(tmpchara,'(a)') trim(leg_test_loop)

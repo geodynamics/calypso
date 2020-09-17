@@ -8,6 +8,9 @@
 !!        for spherical transform
 !!
 !!@verbatim
+!!      subroutine set_inner_loop_4_sph_shell(sdctl, s3d_ranks)
+!!        type(sphere_domain_control), intent(in) :: sdctl
+!!        type(spheric_global_rank), intent(inout) :: s3d_ranks
 !!      subroutine set_subdomains_4_sph_shell                           &
 !!     &         (nprocs_check, sdctl, s3d_ranks, ierr, e_message)
 !!        type(sphere_domain_control), intent(in) :: sdctl
@@ -38,8 +41,15 @@
 !
       character(len=kchara), parameter :: horiz1 = 'horizontal'
 !
+      character(len = kchara), parameter :: simple =      'simple'
+      character(len = kchara), parameter                                &
+     &                        :: cyclic_mode = 'cyclic_eq_mode'
+      character(len = kchara), parameter                                &
+     &                        :: cyclic_trns = 'cyclic_eq_transform'
+!
       private :: radius1, theta1, phi1, mode1
       private :: radius2, theta2, phi2, mode2, horiz1
+      private :: simple, cyclic_mode, cyclic_trns
 !
       private :: simple_subdomains_4_sph_shell
       private :: full_subdomains_4_sph_shell
@@ -47,6 +57,61 @@
 !  ---------------------------------------------------------------------
 !
       contains
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine set_inner_loop_4_sph_shell(sdctl, s3d_ranks)
+!
+      use skip_comment_f
+      use zonal_wavenumber_4_legendre
+!
+      type(sphere_domain_control), intent(in) :: sdctl
+      type(spheric_global_rank), intent(inout) :: s3d_ranks
+!
+      character(len = kchara) :: tmpchara
+!
+!
+      s3d_ranks%rj_rin_flag =  .FALSE.
+!
+      s3d_ranks%rlm_rin_flag = .TRUE.
+      if(sdctl%rlm_inner_loop_ctl%iflag .gt. 0) then
+        tmpchara = sdctl%rlm_inner_loop_ctl%charavalue
+        if(     cmp_no_case(tmpchara, radius1)                          &
+     &     .or. cmp_no_case(tmpchara, radius2)                          &
+     &     .or. cmp_no_case(tmpchara, radius3)) then
+          s3d_ranks%rlm_rin_flag = .TRUE.
+        else if(     cmp_no_case(tmpchara, horiz1)) then
+          s3d_ranks%rlm_rin_flag = .FALSE.
+        end if
+      end if
+!
+      s3d_ranks%rtm_rin_flag = .TRUE.
+      if(sdctl%rtm_inner_loop_ctl%iflag .gt. 0) then
+        tmpchara = sdctl%rtm_inner_loop_ctl%charavalue
+        if(     cmp_no_case(tmpchara, radius1)                          &
+     &     .or. cmp_no_case(tmpchara, radius2)                          &
+     &     .or. cmp_no_case(tmpchara, radius3)) then
+          s3d_ranks%rtm_rin_flag = .TRUE.
+        else if(     cmp_no_case(tmpchara, horiz1)) then
+          s3d_ranks%rtm_rin_flag = .FALSE.
+        end if
+      end if
+!
+      s3d_ranks%rtp_rin_flag = .TRUE.
+!
+      s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_transform
+      if(sdctl%rlm_distibution_ctl%iflag .gt. 0) then
+        tmpchara = sdctl%rlm_distibution_ctl%charavalue
+        if(     cmp_no_case(tmpchara, simple)) then
+          s3d_ranks%iflag_rlm_distribute = id_simple_rlm_distribute
+        else if(cmp_no_case(tmpchara, cyclic_mode)) then
+          s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_mode
+        else if(cmp_no_case(tmpchara, cyclic_trns)) then
+          s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_transform
+        end if
+      end if
+!
+      end subroutine set_inner_loop_4_sph_shell
 !
 !  ---------------------------------------------------------------------
 !
@@ -83,12 +148,12 @@
         return
       end if
 !
-      s3d_ranks%iflag_radial_inner_domain = 0
+      s3d_ranks%radial_inner_domain_flag = .FALSE.
       if(sdctl%inner_decomp_ctl%iflag .gt. 0) then
         if(cmp_no_case(sdctl%inner_decomp_ctl%charavalue, radius1)      &
      &    .or. cmp_no_case(sdctl%inner_decomp_ctl%charavalue, radius2)  &
      &    .or. cmp_no_case(sdctl%inner_decomp_ctl%charavalue, radius3)) &
-     &   s3d_ranks%iflag_radial_inner_domain = 1
+     &   s3d_ranks%radial_inner_domain_flag = .TRUE.
       end if
 !
       call check_sph_domains(nprocs_check, s3d_ranks, ierr, e_message)
