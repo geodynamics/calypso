@@ -186,7 +186,7 @@
 !
       call link_real_buffer_for_bin(num, data, bbuf)
       call rawread_64bit(bbuf%iflag_swap,                               &
-     &    bbuf%len_buf, C_LOC(bbuf%dat_p), bbuf%len_used)
+     &    bbuf%len_buf, C_LOC(bbuf%dat_p(1)), bbuf%len_used)
       call unlink_real_buffer_for_bin(bbuf)
 !
       end subroutine rawread_real_f
@@ -203,7 +203,7 @@
 !
       call link_int8_buffer_for_bin(num, int8_dat, bbuf)
       call rawread_64bit(bbuf%iflag_swap,                               &
-     &    bbuf%len_buf , C_LOC(bbuf%idat8_p), bbuf%len_used)
+     &    bbuf%len_buf , C_LOC(bbuf%idat8_p(1)), bbuf%len_used)
       call unlink_int8_buffer_for_bin(bbuf)
 !
       end subroutine rawread_int8_f
@@ -220,7 +220,7 @@
 !
       call link_int4_buffer_for_bin(num, int4_dat, bbuf)
       call rawread_32bit(bbuf%iflag_swap,                               &
-     &    bbuf%len_buf, C_LOC(bbuf%idat4_p), bbuf%len_used)
+     &    bbuf%len_buf, C_LOC(bbuf%idat4_p(1)), bbuf%len_used)
       call unlink_int4_buffer_for_bin(bbuf)
       bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
 !
@@ -241,7 +241,7 @@
 !
       call link_text_buffer_for_bin(len_buf, textbuf, bbuf)
       call rawread_32bit(iflag_noswap,                                  &
-     &    bbuf%len_buf, C_LOC(bbuf%buf_p), bbuf%len_used)
+     &    bbuf%len_buf, C_LOC(bbuf%buf_p(1)), bbuf%len_used)
       call unlink_text_buffer_for_bin(bbuf)
       bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
 !
@@ -259,7 +259,7 @@
 !
 !
       call link_real_buffer_for_bin(num, data, bbuf)
-      call rawwrite(bbuf%len_buf , C_LOC(bbuf%dat_p), bbuf%len_used)
+      call rawwrite(bbuf%len_buf, C_LOC(bbuf%dat_p(1)), bbuf%len_used)
       call unlink_real_buffer_for_bin(bbuf)
       bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
 !
@@ -276,7 +276,8 @@
 !
 !
       call link_int8_buffer_for_bin(num, int8_dat, bbuf)
-      call rawwrite(bbuf%len_buf, C_LOC(bbuf%idat8_p), bbuf%len_used)
+      call rawwrite                                                     &
+     &   (bbuf%len_buf, C_LOC(bbuf%idat8_p(1)), bbuf%len_used)
       call unlink_int8_buffer_for_bin(bbuf)
       bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
 !
@@ -293,7 +294,8 @@
 !
 !
       call link_int4_buffer_for_bin(num, int4_dat, bbuf)
-      call rawwrite(bbuf%len_buf, C_LOC(bbuf%idat4_p), bbuf%len_used)
+      call rawwrite                                                     &
+     &   (bbuf%len_buf, C_LOC(bbuf%idat4_p(1)), bbuf%len_used)
       call unlink_int4_buffer_for_bin(bbuf)
       bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
 !
@@ -310,7 +312,7 @@
 !
 !
       call link_text_buffer_for_bin(len_buf, textbuf, bbuf)
-      call rawwrite(bbuf%len_buf , C_LOC(bbuf%buf_p), bbuf%len_used)
+      call rawwrite(bbuf%len_buf , C_LOC(bbuf%buf_p(1)), bbuf%len_used)
       call unlink_text_buffer_for_bin(bbuf)
       bbuf%ierr_bin = bbuf%len_buf - bbuf%len_used
 !

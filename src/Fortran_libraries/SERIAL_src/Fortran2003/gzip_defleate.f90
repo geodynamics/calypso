@@ -118,7 +118,7 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_real_buffer_for_zlib(num, data, zbuf)
-      call gzip_defleat_once(zbuf%len_buf, C_LOC(zbuf%dat_p),           &
+      call gzip_defleat_once(zbuf%len_buf, C_LOC(zbuf%dat_p(1)),        &
      &    zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
@@ -140,7 +140,7 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_int8_buffer_for_zlib(num, int8_dat, zbuf)
-      call gzip_defleat_once(zbuf%len_buf, C_LOC(zbuf%idat8_p),         &
+      call gzip_defleat_once(zbuf%len_buf, C_LOC(zbuf%idat8_p(1)),      &
      &    zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
@@ -162,7 +162,7 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_int4_buffer_for_zlib(num, int4_dat, zbuf)
-      call gzip_defleat_once(zbuf%len_buf, C_LOC(zbuf%idat4_p),         &
+      call gzip_defleat_once(zbuf%len_buf, C_LOC(zbuf%idat4_p(1)),      &
      &    zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
@@ -185,7 +185,7 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call gzip_defleat_once(zbuf%len_buf, C_LOC(zbuf%buf_p),           &
+      call gzip_defleat_once(zbuf%len_buf, C_LOC(zbuf%buf_p(1)),        &
      &    zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
@@ -207,7 +207,7 @@
 !
       call link_compressed_buffer(len_gzipbuf, gzipbuf, zbuf)
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call gzip_defleat_begin(zbuf%len_buf, C_LOC(zbuf%buf_p),          &
+      call gzip_defleat_begin(zbuf%len_buf, C_LOC(zbuf%buf_p(1)),       &
      &    zbuf%len_gzipbuf, zbuf%len_used, zbuf%gzipbuf_p)
 !
       end subroutine gzip_defleat_char_begin
@@ -222,7 +222,7 @@
 !
 !
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call gzip_defleat_cont(zbuf%len_buf, C_LOC(zbuf%buf_p),           &
+      call gzip_defleat_cont(zbuf%len_buf, C_LOC(zbuf%buf_p(1)),        &
      &    zbuf%len_gzipbuf, zbuf%len_used)
 !
       end subroutine gzip_defleat_char_cont
@@ -237,7 +237,7 @@
 !
 !
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call gzip_defleat_last(zbuf%len_buf, C_LOC(zbuf%buf_p),          &
+      call gzip_defleat_last(zbuf%len_buf, C_LOC(zbuf%buf_p(1)),        &
      &    zbuf%len_gzipbuf, zbuf%len_used)
       call unlink_pointer_for_zlib_buffer(zbuf)
       zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &

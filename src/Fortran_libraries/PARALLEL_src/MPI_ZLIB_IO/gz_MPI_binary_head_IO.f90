@@ -7,6 +7,8 @@
 !> @brief Output merged binary field file using MPI-IO
 !!
 !!@verbatim
+!!      subroutine gz_mpi_write_byte_flag(IO_param)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !!      subroutine gz_mpi_write_mul_inthead_b(IO_param, num, int_dat)
 !!      subroutine gz_mpi_write_merged_stack_b                          &
 !!     &         (IO_param, num_pe, i8stack)

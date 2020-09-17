@@ -193,7 +193,7 @@
       call link_text_buffer_for_zlib                                    &
      &   (len(zbuf%fixbuf(1)), zbuf%fixbuf(1), zbuf)
       call get_one_line_from_gz(zbuf%len_buf, zbuf%num_word,            &
-     &    zbuf%len_used, C_LOC(zbuf%buf_p))
+     &    zbuf%len_used, C_LOC(zbuf%buf_p(1)))
       call unlink_text_buffer_for_zlib(zbuf)
 !
       end subroutine get_one_line_text_from_gz
@@ -207,7 +207,7 @@
 !
       call link_text_buffer_for_zlib                                    &
      &   (len(zbuf%fixbuf(1)), zbuf%fixbuf(1), zbuf)
-      call write_compress_txt_nolf(zbuf%len_buf, C_LOC(zbuf%buf_p))
+      call write_compress_txt_nolf(zbuf%len_buf, C_LOC(zbuf%buf_p(1)))
       call unlink_text_buffer_for_zlib(zbuf)
 !
       end subroutine gz_write_textbuf_no_lf
@@ -225,7 +225,7 @@
 !
       call link_real_buffer_for_zlib(num, data, zbuf)
       call gzread_64bit_f(zbuf%iflag_swap,                              &
-     &    zbuf%len_buf, C_LOC(zbuf%dat_p), zbuf%ierr_zlib)
+     &    zbuf%len_buf, C_LOC(zbuf%dat_p(1)), zbuf%ierr_zlib)
       call unlink_real_buffer_for_zlib(zbuf)
 !
       end subroutine gzread_real_f
@@ -242,7 +242,7 @@
 !
       call link_int8_buffer_for_zlib(num, int8_dat, zbuf)
       call gzread_64bit_f(zbuf%iflag_swap,                              &
-     &    zbuf%len_buf , C_LOC(zbuf%idat8_p), zbuf%ierr_zlib)
+     &    zbuf%len_buf , C_LOC(zbuf%idat8_p(1)), zbuf%ierr_zlib)
       call unlink_int8_buffer_for_zlib(zbuf)
 !
       end subroutine gzread_int8_f
@@ -259,7 +259,7 @@
 !
       call link_int4_buffer_for_zlib(num, int4_dat, zbuf)
       call gzread_32bit_f(zbuf%iflag_swap,                              &
-     &    zbuf%len_buf, C_LOC(zbuf%idat4_p), zbuf%ierr_zlib)
+     &    zbuf%len_buf, C_LOC(zbuf%idat4_p(1)), zbuf%ierr_zlib)
       call unlink_int4_buffer_for_zlib(zbuf)
 !
       end subroutine gzread_int4_f
@@ -279,7 +279,7 @@
 !
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
       call gzread_32bit_f(iflag_noswap,                                 &
-     &    zbuf%len_buf, C_LOC(zbuf%buf_p), zbuf%ierr_zlib)
+     &    zbuf%len_buf, C_LOC(zbuf%buf_p(1)), zbuf%ierr_zlib)
       call unlink_text_buffer_for_zlib(zbuf)
 !
       end subroutine gzread_chara_f
@@ -296,7 +296,8 @@
 !
 !
       call link_real_buffer_for_zlib(num, data, zbuf)
-      call gzwrite_f(zbuf%len_buf , C_LOC(zbuf%dat_p), zbuf%ierr_zlib)
+      call gzwrite_f(zbuf%len_buf, C_LOC(zbuf%dat_p(1)),                &
+     &               zbuf%ierr_zlib)
       call unlink_real_buffer_for_zlib(zbuf)
 !
       end subroutine gzwrite_real_f
@@ -312,7 +313,8 @@
 !
 !
       call link_int8_buffer_for_zlib(num, int8_dat, zbuf)
-      call gzwrite_f(zbuf%len_buf, C_LOC(zbuf%idat8_p), zbuf%ierr_zlib)
+      call gzwrite_f                                                    &
+     &   (zbuf%len_buf, C_LOC(zbuf%idat8_p(1)), zbuf%ierr_zlib)
       call unlink_int8_buffer_for_zlib(zbuf)
 !
       end subroutine gzwrite_int8_f
@@ -328,7 +330,8 @@
 !
 !
       call link_int4_buffer_for_zlib(num, int4_dat, zbuf)
-      call gzwrite_f(zbuf%len_buf, C_LOC(zbuf%idat4_p), zbuf%ierr_zlib)
+      call gzwrite_f(zbuf%len_buf, C_LOC(zbuf%idat4_p(1)),              &
+     &               zbuf%ierr_zlib)
       call unlink_int4_buffer_for_zlib(zbuf)
 !
       end subroutine gzwrite_int4_f
@@ -344,7 +347,8 @@
 !
 !
       call link_text_buffer_for_zlib(len_buf, textbuf, zbuf)
-      call gzwrite_f(zbuf%len_buf , C_LOC(zbuf%buf_p), zbuf%ierr_zlib)
+      call gzwrite_f(zbuf%len_buf, C_LOC(zbuf%buf_p(1)),                &
+     &               zbuf%ierr_zlib)
       call unlink_text_buffer_for_zlib(zbuf)
 !
       end subroutine gzwrite_chara_f
