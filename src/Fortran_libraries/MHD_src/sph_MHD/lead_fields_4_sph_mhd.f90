@@ -19,8 +19,8 @@
 !!        type(dynamic_SGS_data_4_sph), intent(inout) :: dynamic_SPH
 !!        type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
-!!      subroutine lead_fields_by_sph_trans                             &
-!!     &         (sph, comms_sph, MHD_prop, trans_p, trns_MHD, rj_fld)
+!!      subroutine lead_fields_by_sph_trans(sph, comms_sph, MHD_prop,   &
+!!     &          trans_p, trns_MHD, trns_snap, WK_leg, WK_FFTs, rj_fld)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
@@ -31,7 +31,7 @@
 !!      subroutine cal_sph_enegy_fluxes(ltr_crust, sph, comms_sph,      &
 !!     &          r_2nd, MHD_prop, sph_MHD_bc, trans_p,                 &
 !!     &          ipol, trns_MHD, trns_snap, trns_difv, trns_eflux,     &
-!!     &          WK_sph, rj_fld)
+!!     &          WK_leg, WK_FFTs, rj_fld)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(fdm_matrices), intent(in) :: r_2nd
@@ -43,11 +43,12 @@
 !!        type(address_4_sph_trans), intent(in) :: trns_snap
 !!        type(address_4_sph_trans), intent(in) :: trns_difv
 !!        type(address_4_sph_trans), intent(inout) :: trns_eflux
-!!        type(spherical_trns_works), intent(inout) :: WK_sph
+!!        type(legendre_trns_works), intent(inout) :: WK_leg
+!!        type(work_for_FFTs), intent(inout) :: WK_FFTs
 !!        type(phys_data), intent(inout) :: rj_fld
 !!      subroutine gradients_of_vectors_sph                             &
 !!     &         (sph, comms_sph, r_2nd, sph_MHD_bc, trans_p,           &
-!!     &          ipol, trns_snap, trns_difv, WK_sph, rj_fld)
+!!     &          ipol, trns_snap, trns_difv, WK_leg, WK_FFTs, rj_fld)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(fdm_matrices), intent(in) :: r_2nd
@@ -56,7 +57,8 @@
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(phys_address), intent(in) :: ipol
 !!        type(address_4_sph_trans), intent(inout) :: trns_difv
-!!        type(spherical_trns_works), intent(inout) :: WK_sph
+!!        type(legendre_trns_works), intent(inout) :: WK_leg
+!!        type(work_for_FFTs), intent(inout) :: WK_FFTs
 !!        type(phys_data), intent(inout) :: rj_fld
 !!@endverbatim
 !
@@ -76,7 +78,8 @@
       use t_sph_matrices
       use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
-      use t_sph_transforms
+      use t_legendre_trans_select
+      use t_sph_FFT_selector
       use t_boundary_data_sph_MHD
       use t_radial_matrices_sph_MHD
       use t_sph_mhd_monitor_data_IO
@@ -123,24 +126,24 @@
       end if
 !
       call lead_fields_by_sph_trans(SPH_MHD%sph, SPH_MHD%comms,         &
-     &    MHD_prop, trans_p, WK%trns_MHD, WK%trns_snap, WK%WK_sph,      &
-     &    SPH_MHD%fld)
+     &    MHD_prop, trans_p, WK%trns_MHD, WK%trns_snap,                 &
+     &    WK%WK_leg, WK%WK_FFTs, SPH_MHD%fld)
       call gradients_of_vectors_sph                                     &
      &   (SPH_MHD%sph, SPH_MHD%comms, r_2nd, sph_MHD_bc, trans_p,       &
-     &    SPH_MHD%ipol, WK%trns_snap, WK%trns_difv, WK%WK_sph,          &
-     &    SPH_MHD%fld)
+     &    SPH_MHD%ipol, WK%trns_snap, WK%trns_difv,                     &
+     &    WK%WK_leg, WK%WK_FFTs, SPH_MHD%fld)
 !
       call enegy_fluxes_4_sph_mhd(monitor%ltr_crust, SPH_MHD%sph,       &
      &    SPH_MHD%comms, r_2nd, MHD_prop, sph_MHD_bc, trans_p,          &
      &    SPH_MHD%ipol, WK%trns_MHD, WK%trns_snap, WK%trns_difv,        &
-     &    WK%trns_eflux, WK%WK_sph, SPH_MHD%fld)
+     &    WK%trns_eflux, WK%WK_leg, WK%WK_FFTs, SPH_MHD%fld)
 !
       end subroutine s_lead_fields_4_sph_mhd
 !
 ! ----------------------------------------------------------------------
 !
       subroutine lead_fields_by_sph_trans(sph, comms_sph, MHD_prop,     &
-     &          trans_p, trns_MHD, trns_snap, WK_sph, rj_fld)
+     &          trans_p, trns_MHD, trns_snap, WK_leg, WK_FFTs, rj_fld)
 !
       use sph_transforms_snapshot
       use cal_nonlinear_sph_MHD
@@ -152,13 +155,14 @@
 !
       type(address_4_sph_trans), intent(inout) :: trns_MHD
       type(address_4_sph_trans), intent(inout) :: trns_snap
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs
       type(phys_data), intent(inout) :: rj_fld
 !
 !
       if(iflag_debug.gt.0) write(*,*) 'sph_back_trans_snapshot_MHD'
       call sph_back_trans_snapshot_MHD(sph, comms_sph, trans_p,         &
-     &    rj_fld, trns_snap%backward, WK_sph)
+     &    rj_fld, trns_snap%backward, WK_leg, WK_FFTs)
 !
       if    (sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_pole     &
      &  .or. sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_center)  &
@@ -228,7 +232,7 @@
       subroutine enegy_fluxes_4_sph_mhd(ltr_crust, sph, comms_sph,      &
      &          r_2nd, MHD_prop, sph_MHD_bc, trans_p,                   &
      &          ipol, trns_MHD, trns_snap, trns_difv, trns_eflux,       &
-     &          WK_sph, rj_fld)
+     &          WK_leg, WK_FFTs, rj_fld)
 !
       use sph_transforms_snapshot
       use cal_energy_flux_rtp
@@ -246,20 +250,23 @@
       type(address_4_sph_trans), intent(in) :: trns_MHD
       type(address_4_sph_trans), intent(in) :: trns_snap
       type(address_4_sph_trans), intent(in) :: trns_difv
+!
       type(address_4_sph_trans), intent(inout) :: trns_eflux
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs
       type(phys_data), intent(inout) :: rj_fld
 !
 !
       call cal_sph_enegy_fluxes                                         &
      &   (ltr_crust, sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc,       &
      &    trans_p, ipol, trns_MHD, trns_snap, trns_difv, trns_eflux,    &
-     &    WK_sph, rj_fld)
+     &    WK_leg, WK_FFTs, rj_fld)
 !
       if (iflag_debug.gt.0) write(*,*)                                  &
      &                          'sph_forward_trans_snapshot_MHD'
       call sph_forward_trans_snapshot_MHD                               &
-     &   (sph, comms_sph, trans_p, trns_eflux%forward, WK_sph, rj_fld)
+     &   (sph, comms_sph, trans_p, trns_eflux%forward,                  &
+     &    WK_leg, WK_FFTs, rj_fld)
 !
       end subroutine enegy_fluxes_4_sph_mhd
 !
@@ -269,7 +276,7 @@
       subroutine cal_sph_enegy_fluxes(ltr_crust, sph, comms_sph,        &
      &          r_2nd, MHD_prop, sph_MHD_bc, trans_p,                   &
      &          ipol, trns_MHD, trns_snap, trns_difv, trns_eflux,       &
-     &          WK_sph, rj_fld)
+     &          WK_leg, WK_FFTs, rj_fld)
 !
       use sph_transforms_snapshot
       use cal_energy_flux_rj
@@ -287,8 +294,10 @@
       type(address_4_sph_trans), intent(in) :: trns_MHD
       type(address_4_sph_trans), intent(in) :: trns_snap
       type(address_4_sph_trans), intent(in) :: trns_difv
+!
       type(address_4_sph_trans), intent(inout) :: trns_eflux
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs
       type(phys_data), intent(inout) :: rj_fld
 !
 !      Evaluate fields for output in spectrum space
@@ -298,7 +307,7 @@
 !
       if (iflag_debug.gt.0) write(*,*) 'sph_back_trans_snapshot_MHD'
       call sph_back_trans_snapshot_MHD(sph, comms_sph, trans_p,         &
-     &    rj_fld, trns_eflux%backward, WK_sph)
+     &    rj_fld, trns_eflux%backward, WK_leg, WK_FFTs)
 !
 !       Evaluate energy fluxes
       if (iflag_debug.gt.0) write(*,*) 's_cal_energy_flux_rtp'
@@ -316,7 +325,7 @@
 !
       subroutine gradients_of_vectors_sph                               &
      &         (sph, comms_sph, r_2nd, sph_MHD_bc, trans_p,             &
-     &          ipol, trns_snap, trns_difv, WK_sph, rj_fld)
+     &          ipol, trns_snap, trns_difv, WK_leg, WK_FFTs, rj_fld)
 !
       use sph_transforms_snapshot
       use copy_rtp_vectors_4_grad
@@ -331,7 +340,8 @@
       type(phys_address), intent(in) :: ipol
 !
       type(address_4_sph_trans), intent(inout) :: trns_difv
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs
       type(phys_data), intent(inout) :: rj_fld
 !
 !
@@ -343,7 +353,7 @@
       if (iflag_debug.gt.0) write(*,*)                                  &
      &      'sph_forward_trans_snapshot_MHD for diff of vector'
       call sph_forward_trans_snapshot_MHD(sph, comms_sph, trans_p,      &
-     &    trns_difv%forward, WK_sph, rj_fld)
+     &    trns_difv%forward, WK_leg, WK_FFTs, rj_fld)
 !
       if (iflag_debug.gt.0) write(*,*) 'overwrt_grad_of_vectors_sph'
       call overwrt_grad_of_vectors_sph(sph, r_2nd, sph_MHD_bc,          &
@@ -352,7 +362,7 @@
       if (iflag_debug.gt.0) write(*,*)                                  &
      &      'sph_back_trans_snapshot_MHD for diff of vector'
       call sph_back_trans_snapshot_MHD(sph, comms_sph, trans_p,         &
-     &    rj_fld, trns_difv%backward, WK_sph)
+     &    rj_fld, trns_difv%backward, WK_leg, WK_FFTs)
 !
       end subroutine gradients_of_vectors_sph
 !

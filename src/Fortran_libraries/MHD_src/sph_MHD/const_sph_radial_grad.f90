@@ -317,7 +317,7 @@
      &          g_sph_rj, coef_press, is_press, is_grad, rj_fld)
 !
       use cal_sph_exp_nod_none_bc
-      use const_wz_coriolis_rtp
+      use t_const_wz_coriolis_rtp
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd

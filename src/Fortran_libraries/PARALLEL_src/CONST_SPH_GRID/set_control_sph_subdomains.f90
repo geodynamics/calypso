@@ -41,15 +41,28 @@
 !
       character(len=kchara), parameter :: horiz1 = 'horizontal'
 !
+!
       character(len = kchara), parameter :: simple =      'simple'
+!
       character(len = kchara), parameter                                &
-     &                        :: cyclic_mode = 'cyclic_eq_mode'
+     &                    :: cyclic_mode = 'cyclic_eq_mode'
       character(len = kchara), parameter                                &
-     &                        :: cyclic_trns = 'cyclic_eq_transform'
+     &                    :: cyclic_trns = 'cyclic_eq_trans'
+!
+      character(len = kchara), parameter                                &
+     &                    :: cyclic_neib_mode = 'cyclic_neib_eq_mode'
+      character(len = kchara), parameter                                &
+     &                    :: cyclic_neib_trns = 'cyclic_neib_eq_trans'
+!
+      character(len = kchara), parameter                                &
+     &                        :: test_ditribution = 'test'
+!
 !
       private :: radius1, theta1, phi1, mode1
       private :: radius2, theta2, phi2, mode2, horiz1
+!
       private :: simple, cyclic_mode, cyclic_trns
+      private :: cyclic_neib_mode, cyclic_neib_trns, test_ditribution
 !
       private :: simple_subdomains_4_sph_shell
       private :: full_subdomains_4_sph_shell
@@ -63,7 +76,7 @@
       subroutine set_inner_loop_4_sph_shell(sdctl, s3d_ranks)
 !
       use skip_comment_f
-      use zonal_wavenumber_4_legendre
+      use select_zonal_4_legendre
 !
       type(sphere_domain_control), intent(in) :: sdctl
       type(spheric_global_rank), intent(inout) :: s3d_ranks
@@ -104,10 +117,19 @@
         tmpchara = sdctl%rlm_distibution_ctl%charavalue
         if(     cmp_no_case(tmpchara, simple)) then
           s3d_ranks%iflag_rlm_distribute = id_simple_rlm_distribute
+!
         else if(cmp_no_case(tmpchara, cyclic_mode)) then
           s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_mode
         else if(cmp_no_case(tmpchara, cyclic_trns)) then
           s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_transform
+!
+        else if(cmp_no_case(tmpchara, cyclic_neib_mode)) then
+          s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_mode_neib
+        else if(cmp_no_case(tmpchara, cyclic_neib_trns)) then
+          s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_trans_neib
+!
+        else if(cmp_no_case(tmpchara, test_ditribution)) then
+          s3d_ranks%iflag_rlm_distribute = id_test_distribute
         end if
       end if
 !

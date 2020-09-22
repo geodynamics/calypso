@@ -94,7 +94,7 @@
       subroutine nonlinear_terms_in_rtp(sph_rtp, MHD_prop, leg,         &
      &          b_trns_base, f_trns_frc, trns_b_MHD, trns_f_MHD)
 !
-      use const_wz_coriolis_rtp
+      use t_const_wz_coriolis_rtp
       use cal_products_smp
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -125,7 +125,7 @@
       subroutine cal_nonlinear_pole_MHD(sph_rtp, MHD_prop,              &
      &          b_trns_base, f_trns_frc, trns_b_snap, trns_f_MHD)
 !
-      use const_wz_coriolis_rtp
+      use t_const_wz_coriolis_rtp
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(MHD_evolution_param), intent(in) :: MHD_prop

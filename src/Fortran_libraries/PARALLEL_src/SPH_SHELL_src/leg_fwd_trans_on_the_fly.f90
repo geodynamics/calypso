@@ -84,7 +84,7 @@
       real (kind=kreal), intent(inout):: WR(n_WR)
       real (kind=kreal), intent(inout):: WS(n_WS)
 !
-      integer(kind = kint) :: mm, mp_rlm, mn_rlm, lp_rtm, ln_rtm
+      integer(kind = kint) :: mm, mp_rlm, lp_rtm, ln_rtm
       integer(kind = kint) :: nkrs, nkrt, lt, lt2
       integer(kind = kint) :: ip, jst
       integer(kind = kint) :: lst
@@ -104,7 +104,6 @@
       nkrt = 2*nvector * sph_rlm%nidx_rlm(1)
 !
       do mp_rlm = 1, sph_rtm%nidx_rtm(3)
-        mn_rlm = sph_rtm%nidx_rtm(3) - mp_rlm + 1
         mm = abs(sph_rtm%idx_gl_1d_rtm_m(mp_rlm,2))
         jst = idx_trns%lstack_rlm(mp_rlm-1)
 !
@@ -116,37 +115,37 @@
           WK_l_otf%Smat(ip)%tor_o(1:WK_l_otf%n_tor_e) = 0.0d0
 !
           do lt2 = 1, WK_l_otf%nlo_rtm(ip) / 8
-            call leg_fwd_trans_8latitude                              &
-     &         (lt2, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,             &
-     &          iflag_matmul, ncomp, nvector, nscalar,                &
-     &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,            &
-     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),     &
-     &          WK_l_otf%lst_rtm(ip), WK_l_otf%Fmat(ip),              &
-     &          WK_l_otf%Ptj_mat(ip), WK_l_otf%Smat(ip),              &
+            call leg_fwd_trans_8latitude(lt2, jst, mm,                  &
+     &          mp_rlm, idx_trns%mn_rlm(mp_rlm), nkrs, nkrt,            &
+     &          iflag_matmul, ncomp, nvector, nscalar,                  &
+     &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
+     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &
+     &          WK_l_otf%lst_rtm(ip), WK_l_otf%Fmat(ip),                &
+     &          WK_l_otf%Ptj_mat(ip), WK_l_otf%Smat(ip),                &
      &          WK_l_otf%wk_plm(ip))
           end do
           lst = 1 + int(WK_l_otf%nlo_rtm(ip)/8) * 8
 !
           do lt2 = 1 + lst/4, WK_l_otf%nlo_rtm(ip) / 4
-            call leg_fwd_trans_4latitude                              &
-     &         (lt2, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,             &
-     &          iflag_matmul, ncomp, nvector, nscalar,                &
-     &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,            &
-     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),     &
-     &          WK_l_otf%lst_rtm(ip), WK_l_otf%Fmat(ip),              &
-     &          WK_l_otf%Ptj_mat(ip), WK_l_otf%Smat(ip),              &
+            call leg_fwd_trans_4latitude(lt2, jst, mm,                  &
+     &          mp_rlm, idx_trns%mn_rlm(mp_rlm), nkrs, nkrt,            &
+     &          iflag_matmul, ncomp, nvector, nscalar,                  &
+     &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
+     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &
+     &          WK_l_otf%lst_rtm(ip), WK_l_otf%Fmat(ip),                &
+     &          WK_l_otf%Ptj_mat(ip), WK_l_otf%Smat(ip),                &
      &          WK_l_otf%wk_plm(ip))
           end do
 !
           lst = 1 + int(WK_l_otf%nlo_rtm(ip)/4) * 4
           do lt2 = 1 + lst/2, WK_l_otf%nlo_rtm(ip) / 2
-            call leg_fwd_trans_2latitude                              &
-     &         (lt2, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,             &
-     &          iflag_matmul, ncomp, nvector, nscalar,                &
-     &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,            &
-     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),     &
-     &          WK_l_otf%lst_rtm(ip), WK_l_otf%Fmat(ip),              &
-     &          WK_l_otf%Ptj_mat(ip), WK_l_otf%Smat(ip),              &
+            call leg_fwd_trans_2latitude(lt2, jst, mm,                  &
+     &          mp_rlm, idx_trns%mn_rlm(mp_rlm), nkrs, nkrt,            &
+     &          iflag_matmul, ncomp, nvector, nscalar,                  &
+     &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
+     &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &
+     &          WK_l_otf%lst_rtm(ip), WK_l_otf%Fmat(ip),                &
+     &          WK_l_otf%Ptj_mat(ip), WK_l_otf%Smat(ip),                &
      &          WK_l_otf%wk_plm(ip))
           end do
 !
@@ -154,8 +153,8 @@
           do lt = lst, WK_l_otf%nlo_rtm(ip)
             lp_rtm = WK_l_otf%lst_rtm(ip) + lt
             ln_rtm = sph_rtm%nidx_rtm(2) - lp_rtm + 1
-            call leg_fwd_trans_1latitude                                &
-     &         (lp_rtm, ln_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,    &
+            call leg_fwd_trans_1latitude(lp_rtm, ln_rtm, jst, mm,       &
+     &          mp_rlm, idx_trns%mn_rlm(mp_rlm), nkrs, nkrt,            &
      &          iflag_matmul, ncomp, nvector, nscalar,                  &
      &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
      &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &
@@ -166,8 +165,8 @@
 !   Equator (if necessary)
           if(WK_l_otf%nle_rtm(ip) .gt. WK_l_otf%nlo_rtm(ip)) then
             lp_rtm = WK_l_otf%lst_rtm(ip) + WK_l_otf%nle_rtm(ip)
-            call leg_fwd_trans_at_equator                               &
-     &         (lp_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,            &
+            call leg_fwd_trans_at_equator(lp_rtm, jst, mm,              &
+     &          mp_rlm, idx_trns%mn_rlm(mp_rlm), nkrs, nkrt,            &
      &          iflag_matmul, ncomp, nvector, nscalar,                  &
      &          sph_rtm, sph_rlm, comm_rtm, leg, n_WR, WR,              &
      &          WK_l_otf%n_jk_e(mp_rlm), WK_l_otf%n_jk_o(mp_rlm),       &

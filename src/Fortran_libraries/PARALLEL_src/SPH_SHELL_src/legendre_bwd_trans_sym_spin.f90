@@ -109,7 +109,7 @@
      &                - idx_trns%lstack_block_rtm(lp-1)/2
 !
               do mp_rlm = 1, sph_rtm%nidx_rtm(3)
-                mn_rlm = sph_rtm%nidx_rtm(3) - mp_rlm + 1
+                mn_rlm = idx_trns%mn_rlm(mp_rlm)
                 jst = idx_trns%lstack_rlm(mp_rlm-1)
                 nj_rlm = idx_trns%lstack_rlm(mp_rlm)                    &
      &                  - idx_trns%lstack_rlm(mp_rlm-1)
@@ -177,7 +177,7 @@
             led = (sph_rtm%nidx_rtm(2)+1)/2
             do lp_rtm = lps, led
               do mp_rlm = 1, sph_rtm%nidx_rtm(3)
-                mn_rlm = sph_rtm%nidx_rtm(3) - mp_rlm + 1
+                mn_rlm = idx_trns%mn_rlm(mp_rlm)
                 jst = idx_trns%lstack_rlm(mp_rlm-1)
                 nj_rlm = idx_trns%lstack_rlm(mp_rlm)                    &
      &                  - idx_trns%lstack_rlm(mp_rlm-1)

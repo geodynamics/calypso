@@ -82,7 +82,7 @@
       type(leg_trns_bsym_mul_work), intent(inout) :: WK_l_bsm
 !
       integer(kind = kint) :: ip
-      integer(kind = kint) :: nl_rtm, mp_rlm, mn_rlm
+      integer(kind = kint) :: nl_rtm, mp_rlm
       integer(kind = kint) :: kst(np_smp),  nkr(np_smp)
       integer(kind = kint) :: nkrs(np_smp),  nkrt(np_smp)
       integer(kind = kint) :: jst(np_smp), jst_h(np_smp)
@@ -98,7 +98,7 @@
 !$omp end parallel workshare
 !
       nl_rtm = (sph_rtm%nidx_rtm(2) + 1)/2
-!$omp parallel do private(ip,mp_rlm,mn_rlm)
+!$omp parallel do private(ip,mp_rlm)
       do ip = 1, np_smp
         kst(ip) = sph_rlm%istack_rlm_kr_smp(ip-1)
         nkr(ip) = sph_rlm%istack_rlm_kr_smp(ip)                         &
@@ -107,7 +107,6 @@
         nkrt(ip) = 2*nvector*nkr(ip)
 !
         do mp_rlm = 1, sph_rtm%nidx_rtm(3)
-          mn_rlm = sph_rtm%nidx_rtm(3) - mp_rlm + 1
           jst(ip) = idx_trns%lstack_rlm(mp_rlm-1)
           jst_h(ip) = idx_trns%lstack_even_rlm(mp_rlm) + 1
           n_jk_e(ip) = idx_trns%lstack_even_rlm(mp_rlm)                 &
@@ -156,8 +155,8 @@
           WK_l_bsm%time_omp(ip,0) = MPI_WTIME()
           call cal_vr_rtm_vec_sym_matmul_big                            &
      &       (sph_rtm%nnod_rtm, sph_rtm%nidx_rtm, sph_rtm%istep_rtm,    &
-     &        sph_rlm%nidx_rlm, asin_theta_1d_rtm,                      &
-     &        kst(ip), nkr(ip), mp_rlm, mn_rlm, nl_rtm,                 &
+     &        sph_rlm%nidx_rlm, asin_theta_1d_rtm, kst(ip), nkr(ip),    &
+     &        mp_rlm, idx_trns%mn_rlm(mp_rlm), nl_rtm,                  &
      &        WK_l_bsm%symp_r(1,ip), WK_l_bsm%asmp_p(1,ip),             &
      &        WK_l_bsm%asmp_r(1,ip), WK_l_bsm%symp_p(1,ip),             &
      &        ncomp, nvector, comm_rtm%irev_sr, n_WS, WS)

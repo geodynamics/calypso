@@ -146,7 +146,7 @@
           call cal_vr_rtm_sym_mat_rin                                   &
      &       (sph_rtm%nnod_rtm, sph_rtm%nidx_rtm, sph_rtm%istep_rtm,    &
      &        sph_rlm%nidx_rlm, asin_theta_1d_rtm,                      &
-     &        mp_rlm, WK_l_tsp%lst_rtm(ip),                             &
+     &        mp_rlm, idx_trns%mn_rlm(mp_rlm), WK_l_tsp%lst_rtm(ip),    &
      &        WK_l_tsp%nle_rtm(ip), WK_l_tsp%nlo_rtm(ip),               &
      &        WK_l_tsp%Fmat(ip)%symp_r(1), WK_l_tsp%Fmat(ip)%asmp_p(1), &
      &        WK_l_tsp%Fmat(ip)%asmp_r(1), WK_l_tsp%Fmat(ip)%symp_p(1), &

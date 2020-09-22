@@ -79,7 +79,7 @@
 !
 !
       integer(kind = kint) :: ip, kst, ked, k_rlm, nd, ie_rlm, io_rlm
-      integer(kind = kint) :: mp_rlm, mn_rlm, ie_send, io_send
+      integer(kind = kint) :: mp_rlm, ie_send, io_send
       integer(kind = kint) :: jst, nj_rlm, jj, je_rlm, jo_rlm
       integer(kind = kint) :: nle_rtm, nlo_rtm, n_jk_e, n_jk_o
       real(kind = kreal) :: r1_1d_rlm_r, r2_1d_rlm_r, gme, gmo
@@ -95,7 +95,7 @@
       nlo_rtm = sph_rtm%nidx_rtm(2) / 2
 !$omp parallel do schedule(static)                                      &
 !$omp             private(ip,kst,ked,jj,k_rlm,nd,je_rlm,jo_rlm,         &
-!$omp&                    mp_rlm,mn_rlm,jst,nj_rlm,n_jk_e,n_jk_o,       &
+!$omp&                    mp_rlm,jst,nj_rlm,n_jk_e,n_jk_o,              &
 !$omp&                    r1_1d_rlm_r,r2_1d_rlm_r,                      &
 !$omp&                    ie_rlm,io_rlm,ie_send,io_send,gme,gmo)
       do ip = 1, np_smp
@@ -107,7 +107,6 @@
           do nd = 1, nvector
 !
             do mp_rlm = 1, sph_rtm%nidx_rtm(3)
-              mn_rlm = sph_rtm%nidx_rtm(3) - mp_rlm + 1
               jst = idx_trns%lstack_rlm(mp_rlm-1)
               nj_rlm = idx_trns%lstack_rlm(mp_rlm)                      &
      &                - idx_trns%lstack_rlm(mp_rlm-1)
@@ -133,7 +132,7 @@
                 call set_vr_rtm_vector_symmetry(sph_rtm%nnod_rtm,       &
      &              sph_rtm%nidx_rtm, sph_rtm%istep_rtm,                &
      &              weight_rtm, asin_theta_1d_rtm, nd, k_rlm,           &
-     &              mp_rlm, mn_rlm, nle_rtm, nlo_rtm,                   &
+     &              mp_rlm, idx_trns%mn_rlm(mp_rlm), nle_rtm, nlo_rtm,  &
      &              ncomp, comm_rtm%irev_sr, n_WR, WR,                  &
      &              WK_l_sml%symp_r(1,ip), WK_l_sml%asmp_t(1,ip),       &
      &              WK_l_sml%asmp_p(1,ip), WK_l_sml%symn_t(1,ip),       &
@@ -170,7 +169,7 @@
                 call set_vr_rtm_vector_symmetry(sph_rtm%nnod_rtm,       &
      &              sph_rtm%nidx_rtm, sph_rtm%istep_rtm,                &
      &              weight_rtm, asin_theta_1d_rtm, nd, k_rlm,           &
-     &              mp_rlm, mn_rlm, nle_rtm, nlo_rtm,                   &
+     &              mp_rlm, idx_trns%mn_rlm(mp_rlm), nle_rtm, nlo_rtm,  &
      &              ncomp, comm_rtm%irev_sr, n_WR, WR,                  &
      &              WK_l_sml%symp_r(1,ip), WK_l_sml%asmp_t(1,ip),       &
      &              WK_l_sml%asmp_p(1,ip), WK_l_sml%symn_t(1,ip),       &

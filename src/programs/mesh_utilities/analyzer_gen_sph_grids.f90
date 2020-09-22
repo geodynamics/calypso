@@ -108,18 +108,48 @@
       use output_gen_sph_grid_modes
       use parallel_load_data_4_sph
 !
+      integer :: i1, i2, i
+      integer :: istep_sr_rtp
+!
 !  ========= Generate spherical harmonics table ========================
 !
       if(iflag_debug .gt. 0) write(*,*) 'mpi_gen_sph_grids'
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
       call mpi_gen_sph_grids(sph_maker_G%gen_sph, sph_maker_G%sph_tmp,  &
      &    sph_const, comms_sph_const, sph_grp_const)
+!
+!
       call output_sph_mesh(sph_files1%sph_file_param,                   &
      &    sph_const, comms_sph_const, sph_grp_const)
       if(iflag_debug.gt.0) write(*,*) 'sph_index_flags_and_params'
       call sph_index_flags_and_params                                   &
      &   (sph_grp_const, sph_const, comms_sph_const)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
+!
+!      if(my_rank .eq. 0) then
+!        write(*,*) 'nidx_rtp', sph_const%sph_rtp%nidx_rtp(1:3)
+!        write(*,*) 'istep_rtp', sph_const%sph_rtp%istep_rtp(1:3)
+!
+!        i2 = comms_sph_const%comm_rtp%item_sr(2)
+!        i1 = comms_sph_const%comm_rtp%item_sr(1)
+!        write(*,*) 'item_sr(1:2)', i1, i2
+!        write(*,*) 'idx_global_rtp_SR1', sph_const%sph_rtp%idx_global_rtp(i1,1:3)
+!        write(*,*) 'idx_global_rtp_SR2', sph_const%sph_rtp%idx_global_rtp(i2,1:3)
+!        write(*,*) 'diff', sph_const%sph_rtp%idx_global_rtp(i2,1:3) - sph_const%sph_rtp%idx_global_rtp(i1,1:3)
+!
+!        do i = 1, sph_const%sph_rtp%istep_rtp(2)+1
+!          i1 = comms_sph_const%comm_rtp%item_sr(i)
+!          write(*,*) i, 'idx_global_rtp', sph_const%sph_rtp%idx_global_rtp(i1,1:3)
+!        end do
+!
+!        i2 = comms_sph_const%comm_rtp%item_sr(1+sph_const%sph_rtp%istep_rtp(2))
+!        i1 = comms_sph_const%comm_rtp%item_sr(1)
+!
+!        write(*,*) 'item_sr(1:2)', i1, i2
+!        write(*,*) 'idx_global_rtp_SR1', sph_const%sph_rtp%idx_global_rtp(i1,1:3)
+!        write(*,*) 'idx_global_rtp_SR2', sph_const%sph_rtp%idx_global_rtp(i2,1:3)
+!        write(*,*) 'diff', sph_const%sph_rtp%idx_global_rtp(i2,1:3) - sph_const%sph_rtp%idx_global_rtp(i1,1:3)
+!      end if
 !
       if(sph_files1%FEM_mesh_flags%iflag_access_FEM .eq. 0) goto 99
 !

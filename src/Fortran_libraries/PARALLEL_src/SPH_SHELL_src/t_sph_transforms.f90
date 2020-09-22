@@ -11,20 +11,22 @@
 !!@verbatim
 !!      subroutine sph_backward_transforms                              &
 !!     &        (ncomp_trans, nvector, nscalar, sph, comms_sph, trans_p,&
-!!     &         n_WS, n_WR, WS, WR, v_rtp, WK_sph)
+!!     &         n_WS, n_WR, WS, WR, v_rtp, WK_leg, WK_FFTs)
 !!      subroutine sph_b_trans_w_poles                                  &
 !!     &        (ncomp_trans, nvector, nscalar, sph, comms_sph, trans_p,&
-!!     &         n_WS, n_WR, WS, WR, v_rtp, v_pl_local, v_pole, WK_sph)
+!!     &         n_WS, n_WR, WS, WR, v_rtp, v_pl_local, v_pole,         &
+!!     &          WK_leg, WK_FFTs)
 !!      subroutine pole_b_transform                                     &
 !!     &        (ncomp_trans, nvector, nscalar, sph, comms_sph, trans_p,&
 !!     &         n_WS, n_WR, WS, WR, v_pl_local, v_pole)
 !!      subroutine sph_forward_transforms                               &
 !!     &        (ncomp_trans, nvector, nscalar, sph, comms_sph, trans_p,&
-!!     &         v_rtp, n_WS, n_WR, WS, WR, WK_sph)
+!!     &         v_rtp, n_WS, n_WR, WS, WR, WK_leg, WK_FFTs)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(parameters_4_sph_trans), intent(in) :: trans_p
-!!        type(spherical_trns_works), intent(inout) :: WK_sph
+!!        type(legendre_trns_works), intent(inout) :: WK_leg
+!!        type(work_for_FFTs), intent(inout) :: WK_FFTs
 !!
 !!   input /outpt arrays for single field
 !!
@@ -74,7 +76,7 @@
 !
       subroutine sph_backward_transforms                                &
      &        (ncomp_trans, nvector, nscalar, sph, comms_sph, trans_p,  &
-     &         n_WS, n_WR, WS, WR, v_rtp, WK_sph)
+     &         n_WS, n_WR, WS, WR, v_rtp, WK_leg, WK_FFTs)
 !
       use pole_sph_transform
 !
@@ -89,7 +91,8 @@
 !
       real(kind = kreal), intent(inout)                                 &
      &                :: v_rtp(sph%sph_rtp%nnod_rtp,ncomp_trans)
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs
 !
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+1)
@@ -103,7 +106,7 @@
      &    sph%sph_rlm, sph%sph_rtm,                                     &
      &    comms_sph%comm_rlm, comms_sph%comm_rtm,                       &
      &    trans_p%leg, trans_p%idx_trns,                                &
-     &    n_WR, n_WS, WR, WS, WK_sph%WK_leg)
+     &    n_WR, n_WS, WR, WS, WK_leg)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+5)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+2)
@@ -112,9 +115,8 @@
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+2)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
-      call back_FFT_select_from_recv                                    &
-     &   (trans_p%iflag_FFT, sph%sph_rtp, comms_sph%comm_rtp,           &
-     &    ncomp_trans, n_WR, WR, v_rtp, WK_sph%WK_FFTs)
+      call back_FFT_select_from_recv(sph%sph_rtp, comms_sph%comm_rtp,   &
+     &    ncomp_trans, n_WR, WR, v_rtp, WK_FFTs)
       call finish_send_recv_sph(comms_sph%comm_rtm)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !
@@ -124,7 +126,8 @@
 !
       subroutine sph_b_trans_w_poles                                    &
      &        (ncomp_trans, nvector, nscalar, sph, comms_sph, trans_p,  &
-     &         n_WS, n_WR, WS, WR, v_rtp, v_pl_local, v_pole, WK_sph)
+     &         n_WS, n_WR, WS, WR, v_rtp, v_pl_local, v_pole,           &
+     &         WK_leg, WK_FFTs)
 !
       use calypso_mpi_real
       use pole_sph_transform
@@ -144,7 +147,8 @@
      &                :: v_pl_local(sph%sph_rtp%nnod_pole,ncomp_trans)
       real(kind = kreal), intent(inout)                                 &
      &                :: v_pole(sph%sph_rtp%nnod_pole,ncomp_trans)
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs
 !
       integer(kind = kint_gl) :: ncomp_pole
 !
@@ -167,7 +171,7 @@
      &    sph%sph_rlm, sph%sph_rtm,                                     &
      &    comms_sph%comm_rlm, comms_sph%comm_rtm,                       &
      &    trans_p%leg, trans_p%idx_trns,                                &
-     &    n_WR, n_WS, WR, WS, WK_sph%WK_leg)
+     &    n_WR, n_WS, WR, WS, WK_leg)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+5)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+2)
@@ -176,9 +180,8 @@
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+2)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
-      call back_FFT_select_from_recv                                    &
-     &   (trans_p%iflag_FFT, sph%sph_rtp, comms_sph%comm_rtp,           &
-     &    ncomp_trans, n_WR, WR, v_rtp, WK_sph%WK_FFTs)
+      call back_FFT_select_from_recv(sph%sph_rtp, comms_sph%comm_rtp,   &
+     &    ncomp_trans, n_WR, WR, v_rtp, WK_FFTs)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !
       call finish_send_recv_sph(comms_sph%comm_rtm)
@@ -241,7 +244,7 @@
 !
       subroutine sph_forward_transforms                                 &
      &        (ncomp_trans, nvector, nscalar, sph, comms_sph, trans_p,  &
-     &         v_rtp, n_WS, n_WR, WS, WR, WK_sph)
+     &         v_rtp, n_WS, n_WR, WS, WR, WK_leg, WK_FFTs)
 !
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
@@ -253,13 +256,13 @@
       real(kind = kreal), intent(in)                                    &
      &                   :: v_rtp(sph%sph_rtp%nnod_rtp,ncomp_trans)
       real(kind = kreal), intent(inout) :: WS(n_WS), WR(n_WR)
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs
 !
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
-      call fwd_FFT_select_to_send                                       &
-     &   (trans_p%iflag_FFT, sph%sph_rtp, comms_sph%comm_rtp,           &
-     &    ncomp_trans, n_WS, v_rtp, WS, WK_sph%WK_FFTs)
+      call fwd_FFT_select_to_send(sph%sph_rtp, comms_sph%comm_rtp,      &
+     &    ncomp_trans, n_WS, v_rtp, WS, WK_FFTs)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+3)
@@ -274,7 +277,7 @@
      &    sph%sph_rtm, sph%sph_rlm,                                     &
      &    comms_sph%comm_rtm, comms_sph%comm_rlm,                       &
      &    trans_p%leg, trans_p%idx_trns,                                &
-     &    n_WR, n_WS, WR, WS, WK_sph%WK_leg)
+     &    n_WR, n_WS, WR, WS, WK_leg)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+6)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+4)

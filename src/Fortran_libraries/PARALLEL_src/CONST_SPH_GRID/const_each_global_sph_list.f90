@@ -233,7 +233,7 @@
      &          s3d_ranks, sph_lc1, sph_lcp, stk_lc1d, s2d_tbl)
 !
       use set_sph_tranform_ordering
-      use zonal_wavenumber_4_legendre
+      use select_zonal_4_legendre
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -260,24 +260,11 @@
      &    sph_rtp%nidx_global_rtp(3), sph_params%m_folding,             &
      &    s2d_tbl%mspec_4_ispack, s2d_tbl%mdx_ispack)
 !
-      if(s3d_ranks%iflag_rlm_distribute                                 &
-     &      .eq. id_simple_rlm_distribute) then
-         call zonal_leg_wavenum_simple_dist(s3d_ranks%ndomain_rtm(3),   &
-      &      sph_params%l_truncation, sph_params%m_folding,             &
-      &      sph_rtp%nidx_global_rtp(2), sph_rtp%nidx_global_rtp(3),    &
-      &      s2d_tbl%jdx_fsph, s2d_tbl%mdx_4_lgd)
-      else if(s3d_ranks%iflag_rlm_distribute                            &
-     &      .eq. id_cyclic_eq_mode) then
-        call zonal_wavenum_eq_leg_modes(s3d_ranks%ndomain_rtm(3),       &
-     &      sph_params%l_truncation, sph_params%m_folding,              &
-     &      sph_rtp%nidx_global_rtp(2), sph_rtp%nidx_global_rtp(3),     &
-     &      s2d_tbl%jdx_fsph, s2d_tbl%mdx_4_lgd)
-      else
-         call zonal_wavenum_eq_leg_modes(s3d_ranks%ndomain_rtm(3),      &
-      &      sph_params%l_truncation, sph_params%m_folding,             &
-      &      sph_rtp%nidx_global_rtp(2), sph_rtp%nidx_global_rtp(3),    &
-      &      s2d_tbl%jdx_fsph, s2d_tbl%mdx_4_lgd)
-      end if
+      call sel_zonal_ordering_4_leg_trns                                &
+     &   (s3d_ranks%iflag_rlm_distribute, s3d_ranks%ndomain_rtm(3),     &
+     &    sph_params%l_truncation, sph_params%m_folding,                &
+     &    sph_rtp%nidx_global_rtp(2), sph_rtp%nidx_global_rtp(3),       &
+     &    s2d_tbl%jdx_fsph, s2d_tbl%mdx_4_lgd)
 !
       call set_merged_index_4_sph_trans(s3d_ranks%ndomain_rtm(3),       &
      &    sph_params%l_truncation, sph_rj%nidx_global_rj(2),            &

@@ -14,8 +14,8 @@
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!      subroutine nonlinear_by_pseudo_sph                              &
 !!     &         (sph, comms_sph, omega_sph, r_2nd, MHD_prop,           &
-!!     &          sph_MHD_bc, trans_p, gt_cor, trns_MHD, WK_sph,        &
-!!     &          cor_rlm, ipol, rj_fld)
+!!     &          sph_MHD_bc, trans_p, gt_cor, trns_MHD,                &
+!!     &          WK_leg, WK_FFTs_MHD, cor_rlm, ipol, rj_fld)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(fdm_matrices), intent(in) :: r_2nd
@@ -26,7 +26,8 @@
 !!        type(gaunt_coriolis_rlm), intent(in) :: gt_cor
 !!        type(phys_address), intent(in) :: ipol
 !!        type(address_4_sph_trans), intent(inout) :: trns_MHD
-!!        type(spherical_trns_works), intent(inout) :: WK_sph
+!!        type(legendre_trns_works), intent(inout) :: WK_leg
+!!        type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
 !!        type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !!        type(phys_data), intent(inout) :: rj_fld
 !!      subroutine licv_exp(ref_temp, ref_comp, MHD_prop, sph_MHD_bc,   &
@@ -65,7 +66,8 @@
       use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
       use t_radial_reference_temp
-      use t_sph_transforms
+      use t_legendre_trans_select
+      use t_sph_FFT_selector
       use t_coriolis_terms_rlm
       use t_gaunt_coriolis_rlm
 !
@@ -111,8 +113,8 @@
       call nonlinear_by_pseudo_sph                                      &
      &   (SPH_MHD%sph, SPH_MHD%comms, SPH_model%omega_sph,              &
      &    r_2nd, SPH_model%MHD_prop, SPH_model%sph_MHD_bc, trans_p,     &
-     &    WK%gt_cor, WK%trns_MHD, WK%WK_sph, WK%cor_rlm,                &
-     &    SPH_MHD%ipol, SPH_MHD%fld)
+     &    WK%gt_cor, WK%trns_MHD, WK%WK_leg, WK%WK_FFTs_MHD,            &
+     &    WK%cor_rlm, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !   ----  Lead advection of reference field
       call add_ref_advect_sph_MHD                                       &
@@ -141,8 +143,8 @@
 !
       subroutine nonlinear_by_pseudo_sph                                &
      &         (sph, comms_sph, omega_sph, r_2nd, MHD_prop,             &
-     &          sph_MHD_bc, trans_p, gt_cor, trns_MHD, WK_sph,          &
-     &          cor_rlm, ipol, rj_fld)
+     &          sph_MHD_bc, trans_p, gt_cor, trns_MHD,                  &
+     &          WK_leg, WK_FFTs_MHD, cor_rlm, ipol, rj_fld)
 !
       use sph_transforms_4_MHD
       use cal_nonlinear_sph_MHD
@@ -162,7 +164,8 @@
       type(phys_address), intent(in) :: ipol
 !
       type(address_4_sph_trans), intent(inout) :: trns_MHD
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
       type(coriolis_rlm_data), intent(inout) :: cor_rlm
       type(phys_data), intent(inout) :: rj_fld
 !
@@ -174,7 +177,7 @@
       call sph_back_trans_4_MHD                                         &
      &   (sph, comms_sph, MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U,        &
      &    omega_sph, trans_p, gt_cor, rj_fld, trns_MHD%b_trns,          &
-     &    trns_MHD%backward, WK_sph, cor_rlm)
+     &    trns_MHD%backward, WK_leg, WK_FFTs_MHD, cor_rlm)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+9)
 !
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+10)
@@ -188,7 +191,7 @@
       if (iflag_debug.ge.1) write(*,*) 'sph_forward_trans_4_MHD'
       call sph_forward_trans_4_MHD(sph, comms_sph, MHD_prop%fl_prop,    &
      &    trans_p, cor_rlm, trns_MHD%f_trns, trns_MHD%forward,          &
-     &    WK_sph, rj_fld)
+     &    WK_leg, WK_FFTs_MHD, rj_fld)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+11)
 !
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+12)

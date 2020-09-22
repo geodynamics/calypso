@@ -1,5 +1,5 @@
-!>@file   const_wz_coriolis_rtp.f90
-!!@brief  module const_wz_coriolis_rtp
+!>@file   t_const_wz_coriolis_rtp.f90
+!!@brief  module t_const_wz_coriolis_rtp
 !!
 !!@author H. Matsui
 !!@date Programmed in May, 2013
@@ -7,9 +7,10 @@
 !>@brief  Evaluate Coriolis term on spherical grid
 !!
 !!@verbatim
-!!      subroutine alloc_sphere_ave_coriolis(sph_rj)
+!!      subroutine alloc_sphere_ave_coriolis(sph_rj, ave_cor)
+!!      subroutine dealloc_sphere_ave_coriolis(ave_cor)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
-!!      subroutine dealloc_sphere_ave_coriolis
+!!        type(spher_average_coriolis), intent(inout) :: ave_cor
 !!
 !!      subroutine cal_wz_coriolis_rtp(nnod, nidx_rtp, g_colat_rtp,     &
 !!     &          coef_cor, velo_rtp, coriolis_rtp)
@@ -20,9 +21,11 @@
 !!     &         (nnod_pole,  coef_cor, velo_pole, coriolis_pole)
 !!
 !!      subroutine subtract_sphere_ave_coriolis(sph_rtp, sph_rj,        &
-!!     &          is_coriolis, ntot_phys_rj, d_rj, coriolis_rtp)
+!!     &          is_coriolis, ntot_phys_rj, d_rj, coriolis_rtp,        &
+!!     &          ave_cor)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(spher_average_coriolis), intent(inout) :: ave_cor
 !!
 !!      subroutine ovwrt_rj_coef_prod_vect_smp                          &
 !!     &         (sph_rj, coef, i_r, n_point, ntot_phys_rj, d_rj)
@@ -33,7 +36,7 @@
 !!
 !!@n @param irj_fld   Address for spectr data
 !
-      module const_wz_coriolis_rtp
+      module t_const_wz_coriolis_rtp
 !
       use m_precision
       use m_constants
@@ -45,12 +48,14 @@
 !
       implicit none
 !
-!>     sphere average of radial coriolis force (local)
-      real(kind = kreal), allocatable :: sphere_ave_coriolis_l(:)
-!>     sphere average of radial coriolis force
-      real(kind = kreal), allocatable :: sphere_ave_coriolis_g(:)
+!>       Structure of sphere average of radial coriolis force
+      type spher_average_coriolis
+!>       sphere average of radial coriolis force (local)
+        real(kind = kreal), allocatable :: save_cor_l(:)
+!>       sphere average of radial coriolis force
+        real(kind = kreal), allocatable :: save_cor_g(:)
+      end type spher_average_coriolis
 !
-      private :: sphere_ave_coriolis_l, sphere_ave_coriolis_g
       private :: clear_rj_degree0_scalar_smp
 !
 ! -----------------------------------------------------------------------
@@ -59,27 +64,30 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_sphere_ave_coriolis(sph_rj)
+      subroutine alloc_sphere_ave_coriolis(sph_rj, ave_cor)
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
+      type(spher_average_coriolis), intent(inout) :: ave_cor
 !
       integer(kind = kint) :: num
 !
 !
       num = sph_rj%nidx_rj(1)
-      allocate(sphere_ave_coriolis_l(num))
-      allocate(sphere_ave_coriolis_g(num))
+      allocate(ave_cor%save_cor_l(num))
+      allocate(ave_cor%save_cor_g(num))
 !
-      sphere_ave_coriolis_l = 0.0d0
-      sphere_ave_coriolis_g = 0.0d0
+      ave_cor%save_cor_l = 0.0d0
+      ave_cor%save_cor_g = 0.0d0
 !
       end subroutine alloc_sphere_ave_coriolis
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine dealloc_sphere_ave_coriolis
+      subroutine dealloc_sphere_ave_coriolis(ave_cor)
 !
-      deallocate(sphere_ave_coriolis_l, sphere_ave_coriolis_g)
+      type(spher_average_coriolis), intent(inout) :: ave_cor
+!
+      deallocate(ave_cor%save_cor_l, ave_cor%save_cor_g)
 !
       end subroutine dealloc_sphere_ave_coriolis
 !
@@ -203,7 +211,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine subtract_sphere_ave_coriolis(sph_rtp, sph_rj,          &
-     &          is_coriolis, ntot_phys_rj, d_rj, coriolis_rtp)
+     &          is_coriolis, ntot_phys_rj, d_rj, coriolis_rtp,          &
+     &          ave_cor)
 !
       use calypso_mpi
       use calypso_mpi_real
@@ -212,10 +221,12 @@
       type(sph_rj_grid), intent(in) ::  sph_rj
       integer(kind = kint), intent(in) :: is_coriolis
       integer(kind = kint), intent(in) :: ntot_phys_rj
+!
       real(kind = kreal), intent(inout)                                 &
      &           :: d_rj(sph_rj%nnod_rj,ntot_phys_rj)
       real(kind = kreal), intent(inout)                                 &
      &           :: coriolis_rtp(sph_rtp%nnod_rtp,3)
+      type(spher_average_coriolis), intent(inout) :: ave_cor
 !
       integer(kind = kint) :: mphi, l_rtp, kr, k_gl, inod
       integer(kind = kint_gl) :: num64
@@ -224,17 +235,17 @@
       if(sph_rj%idx_rj_degree_zero .gt. 0) then
         do kr = 1, sph_rj%nidx_rj(1)
           inod = sph_rj%idx_rj_degree_zero + (kr-1)*sph_rj%nidx_rj(2)
-          sphere_ave_coriolis_l(kr) = d_rj(inod,is_coriolis)
+          ave_cor%save_cor_l(kr) = d_rj(inod,is_coriolis)
         end do
       else
-          sphere_ave_coriolis_l(1:sph_rj%nidx_rj(1)) = zero
+          ave_cor%save_cor_l(1:sph_rj%nidx_rj(1)) = zero
       end if
       call clear_rj_degree0_scalar_smp                                  &
      &   (sph_rj, is_coriolis, sph_rj%nnod_rj, ntot_phys_rj, d_rj)
 !
       num64 = int(sph_rj%nidx_rj(1),KIND(num64))
       call calypso_mpi_allreduce_real                                   &
-     &   (sphere_ave_coriolis_l, sphere_ave_coriolis_g, num64, MPI_SUM)
+     &   (ave_cor%save_cor_l, ave_cor%save_cor_g, num64, MPI_SUM)
 !
 !
 !$omp do private(mphi,l_rtp,kr,k_gl,inod)
@@ -247,7 +258,7 @@
      &                            * sph_rtp%nidx_rtp(2)
 !
             coriolis_rtp(inod,1) = coriolis_rtp(inod,1)                 &
-     &                             - sphere_ave_coriolis_g(k_gl)
+     &                             - ave_cor%save_cor_g(k_gl)
           end do
         end do
       end do
@@ -328,4 +339,4 @@
 !
 ! ----------------------------------------------------------------------
 !
-      end module const_wz_coriolis_rtp
+      end module t_const_wz_coriolis_rtp

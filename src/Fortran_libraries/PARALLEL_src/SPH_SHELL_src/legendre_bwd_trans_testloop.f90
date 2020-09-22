@@ -80,7 +80,7 @@
       real (kind=kreal), intent(inout):: WS(n_WS)
       type(leg_trns_testloop_work), intent(inout) :: WK_l_tst
 !
-      integer(kind = kint) :: mp_rlm, mn_rlm, mm
+      integer(kind = kint) :: mp_rlm, mm
       integer(kind = kint) :: nkrs, nkrt, lp_rtm
       integer(kind = kint) :: ip, jst, jed, jnum
       integer(kind = kint) :: lt, kst_s, kst_t
@@ -99,7 +99,6 @@
       nkrt = 2*nvector * sph_rlm%nidx_rlm(1)
 !
       do mp_rlm = 1, sph_rtm%nidx_rtm(3)
-        mn_rlm = sph_rtm%nidx_rtm(3) - mp_rlm + 1
         mm = abs(sph_rtm%idx_gl_1d_rtm_m(mp_rlm,2))
         jst = idx_trns%lstack_rlm(mp_rlm-1)
         jed = idx_trns%lstack_rlm(mp_rlm)
@@ -110,7 +109,7 @@
      &       (sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,    &
      &        sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,            &
      &        leg%g_sph_rlm, &
-     &        jst, WK_l_tst%n_jk_e(mp_rlm),  WK_l_tst%n_jk_o(mp_rlm),   &
+     &        jst, WK_l_tst%n_jk_e(mp_rlm), WK_l_tst%n_jk_o(mp_rlm),    &
      &        ncomp, nvector, nscalar, comm_rlm%irev_sr, n_WR, WR,      &
      &        WK_l_tst%Smat(1)%pol_e(1), WK_l_tst%Smat(1)%tor_e(1),     &
      &        WK_l_tst%Smat(1)%pol_o(1), WK_l_tst%Smat(1)%tor_o(1) )
@@ -126,8 +125,8 @@
 !
 !      Set Legendre polynomials
             lp_rtm = WK_l_tst%lst_rtm(ip) + lt
-            call leg_bwd_trans_1latitude                                &
-     &         (lp_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,            &
+            call leg_bwd_trans_1latitude(lp_rtm, jst, mm,               &
+     &          mp_rlm, idx_trns%mn_rlm(mp_rlm), nkrs, nkrt,            &
      &          iflag_matmul, ncomp, nvector, nscalar,                  &
      &          sph_rlm, sph_rtm, comm_rlm, comm_rtm,                   &
      &          idx_trns, leg, n_WR, n_WS, WR, WS,                      &
@@ -139,8 +138,8 @@
 !     Equator (if necessary)
           if(WK_l_tst%nle_rtm(ip) .gt. WK_l_tst%nlo_rtm(ip)) then
             lp_rtm = WK_l_tst%lst_rtm(ip) + WK_l_tst%nle_rtm(ip)
-            call leg_bwd_trans_at_equator                               &
-     &         (lp_rtm, jst, mm, mp_rlm, mn_rlm, nkrs, nkrt,            &
+            call leg_bwd_trans_at_equator(lp_rtm, jst, mm,              &
+     &          mp_rlm, idx_trns%mn_rlm(mp_rlm), nkrs, nkrt,            &
      &          iflag_matmul, ncomp, nvector, nscalar,                  &
      &          sph_rlm, sph_rtm, comm_rtm, leg, n_WS, WS,              &
      &          WK_l_tst%n_jk_e(mp_rlm), WK_l_tst%n_jk_o(mp_rlm),       &

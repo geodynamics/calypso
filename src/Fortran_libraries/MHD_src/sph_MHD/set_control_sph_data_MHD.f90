@@ -11,7 +11,7 @@
 !!     &        (MHD_prop, field_ctl, rj_fld)
 !!      subroutine s_set_control_sph_data_MHD                           &
 !!     &         (plt, mevo_ctl, rj_org_param, rst_org_param,           &
-!!     &          fst_file_IO, bc_IO, trans_p, WK_sph)
+!!     &          fst_file_IO, bc_IO, trans_p, WK_leg)
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(platform_data_control), intent(in) :: plt
@@ -22,7 +22,7 @@
 !!        type(boundary_spectra), intent(inout) :: bc_IO
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(parameters_4_sph_trans), intent(inout) :: trans_p
-!!        type(spherical_trns_works), intent(inout) :: WK_sph
+!!        type(legendre_trns_works), intent(inout) :: WK_leg
 !!@endverbatim
 !
       module set_control_sph_data_MHD
@@ -88,7 +88,7 @@
 !
       subroutine s_set_control_sph_data_MHD                             &
      &         (plt, mevo_ctl, rj_org_param, rst_org_param,             &
-     &          fst_file_IO, bc_IO, trans_p, WK_sph)
+     &          fst_file_IO, bc_IO, trans_p, WK_leg)
 !
       use calypso_mpi
       use m_error_IDs
@@ -102,7 +102,7 @@
       use t_ctl_data_mhd_evo_scheme
       use t_phys_data
       use t_field_data_IO
-      use t_sph_transforms
+      use t_legendre_trans_select
       use t_control_parameter
       use t_sph_boundary_input_data
       use t_work_4_sph_trans
@@ -120,7 +120,7 @@
       type(field_IO_params), intent(inout) :: fst_file_IO
       type(boundary_spectra), intent(inout) :: bc_IO
       type(parameters_4_sph_trans), intent(inout) :: trans_p
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
 !
 !   overwrite restart header for magnetic field extension
 !
@@ -134,8 +134,8 @@
       end if
 !      
       if(mevo_ctl%Legendre_trans_type%iflag .gt. 0) then
-        WK_sph%WK_leg%id_legendre = set_legendre_trans_mode_ctl         &
-     &                       (mevo_ctl%Legendre_trans_type%charavalue)
+        WK_leg%id_legendre = set_legendre_trans_mode_ctl                &
+     &                   (mevo_ctl%Legendre_trans_type%charavalue)
       end if
 !
       if(mevo_ctl%FFT_library%iflag .gt. 0) then

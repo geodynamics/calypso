@@ -19,6 +19,8 @@
 !!     &          idx_gl_1d_rtm_m, idx_gl_1d_rlm_j,                     &
 !!     &          mdx_p_rlm_rtm, mdx_n_rlm_rtm, maxdegree_rlm,          &
 !!     &          lstack_rlm)
+!!      subroutine find_conjugate_sph_order                             &
+!!     &         (nidx_rtm, idx_gl_1d_mphi, mn_rlm)
 !!      subroutine set_sin_theta_rtm                                    &
 !!     &         (nth_rtm, g_colat_rtm, asin_theta_1d_rtm)
 !!      subroutine radial_4_sph_trans(sph_rtp, sph_rtm, sph_rlm, sph_rj)
@@ -105,12 +107,8 @@
       integer(kind = kint), intent(inout) :: maxdegree_rlm
       integer(kind = kint), intent(inout) :: lstack_rlm(0:nidx_rtm(3))
 !
-      integer(kind = kint) :: m, mm, j, mst, med
+      integer(kind = kint) :: m, mm, j
       integer(kind = kint), allocatable :: mdx_rlm_rtm(:)
-      integer(kind = kint), allocatable :: mp_rlm(:), mn_rlm(:)
-!
-      allocate(mp_rlm( nidx_rlm(2)))
-      allocate(mn_rlm( nidx_rlm(2)))
 !
       allocate(mdx_rlm_rtm(-l_truncation:l_truncation))
       mdx_rlm_rtm(-l_truncation:l_truncation) = 0
@@ -126,39 +124,50 @@
         maxdegree_rlm = max(maxdegree_rlm,(l_truncation - abs(mm) + 1))
       end do
 !
-      do m = 1, nidx_rtm(3)
-        mst = lstack_rlm(m-1)+1
-        med = lstack_rlm(m)
-        do j = mst, med
-          mp_rlm(j) = m
-          mn_rlm(j) = nidx_rtm(3) - m + 1
-        end do
-      end do
-!
       do j = 1, nidx_rlm(2)
         m = idx_gl_1d_rlm_j(j,3)
         mdx_p_rlm_rtm(j) = mdx_rlm_rtm( m)
         mdx_n_rlm_rtm(j) = mdx_rlm_rtm(-m)
       end do
 ! 
-!      write(50+my_rank,*) 'j, mdx_p_rlm_rtm(j), mp_rlm(j)'
-!      do j = 1, nidx_rlm(2)
-!        write(50+my_rank,*) j, mdx_p_rlm_rtm(j), mp_rlm(j)
-!      end do
-!
-!      write(50+my_rank,*) 'j, mdx_n_rlm_rtm(j), mn_rlm(j)'
-!      do j = 1, nidx_rlm(2)
-!        write(50+my_rank,*) j, mdx_n_rlm_rtm(j), mn_rlm(j)
-!      end do
-!
-!      write(50+my_rank,*) 'm, lstack_rlm(m)'
-!      do m = 1, nidx_rtm(3)
-!        write(50+my_rank,*) m, lstack_rlm(m)
-!      end do
-!
-      deallocate(mdx_rlm_rtm, mp_rlm, mn_rlm)
+      deallocate(mdx_rlm_rtm)
 !
       end subroutine set_mdx_rlm_rtm
+!
+! -----------------------------------------------------------------------
+!
+      subroutine find_conjugate_sph_order                               &
+     &         (nidx_rtm, idx_gl_1d_mphi, mn_rlm)
+!
+      integer(kind = kint), intent(in) :: nidx_rtm(3)
+      integer(kind = kint), intent(in) :: idx_gl_1d_mphi(nidx_rtm(3))
+!
+      integer(kind = kint), intent(inout) :: mn_rlm(nidx_rtm(3))
+!
+      integer(kind = kint) :: mp_rlm, mn, mn0, mn1, mn2
+!
+!
+      do mp_rlm = 1, nidx_rtm(3)
+        mn1 = nidx_rtm(3) - mp_rlm + 1
+        mn2 = mp_rlm + sign(1,idx_gl_1d_mphi(mp_rlm))
+        mn0 = mp_rlm + sign(1,idx_gl_1d_mphi(mp_rlm))
+        if(idx_gl_1d_mphi(mn1) .eq. -idx_gl_1d_mphi(mp_rlm)) then
+          mn_rlm(mp_rlm) = mn1
+        else if(idx_gl_1d_mphi(mn2) .eq. -idx_gl_1d_mphi(mp_rlm)) then
+          mn_rlm(mp_rlm) = mn2
+        else if(idx_gl_1d_mphi(mn1) .eq. 0) then
+          mn_rlm(mp_rlm) = mp_rlm
+        else
+          do mn = 1, nidx_rtm(3)
+            if(idx_gl_1d_mphi(mn) .eq. -idx_gl_1d_mphi(mp_rlm)) then
+              mn_rlm(mp_rlm) = mn
+              exit
+            end if
+          end do
+        end if
+      end do
+!
+      end subroutine find_conjugate_sph_order
 !
 ! -----------------------------------------------------------------------
 !

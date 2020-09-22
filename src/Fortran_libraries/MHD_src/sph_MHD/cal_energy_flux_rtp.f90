@@ -69,7 +69,7 @@
      &          trns_f_MHD, trns_b_snap, trns_b_eflux, trns_b_difv,     &
      &          trns_f_eflux)
 !
-      use const_wz_coriolis_rtp
+      use t_const_wz_coriolis_rtp
       use cal_buoyancy_flux_sph
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp

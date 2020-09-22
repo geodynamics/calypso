@@ -98,7 +98,7 @@
       real (kind=kreal), intent(inout):: WS(n_WS)
       type(leg_trns_sym_mul_work), intent(inout) :: WK_l_sml
 !
-      integer(kind = kint) :: ip, mp_rlm, mn_rlm, nle_rtm, nlo_rtm
+      integer(kind = kint) :: ip, mp_rlm, nle_rtm, nlo_rtm
       integer(kind = kint) :: kst(np_smp), nkr(np_smp)
       integer(kind = kint) :: jst(np_smp), jst_h(np_smp)
       integer(kind = kint) :: n_jk_e(np_smp), n_jk_o(np_smp)
@@ -113,8 +113,7 @@
 !
       nle_rtm = (sph_rtm%nidx_rtm(2) + 1)/2
       nlo_rtm = sph_rtm%nidx_rtm(2) / 2
-!$omp parallel do schedule(static)                                      &
-!$omp             private(ip,mp_rlm,mn_rlm,st_elapsed)                  &
+!$omp parallel do private(ip,mp_rlm,st_elapsed)                         &
 !$omp& reduction(+:elaps)
       do ip = 1, np_smp
         kst(ip) = nvector * sph_rlm%istack_rlm_kr_smp(ip-1)
@@ -122,7 +121,6 @@
      &                     - sph_rtm%istack_rtm_kr_smp(ip-1))
 !
         do mp_rlm = 1, sph_rtm%nidx_rtm(3)
-          mn_rlm = sph_rtm%nidx_rtm(3) - mp_rlm + 1
           jst(ip) = idx_trns%lstack_rlm(mp_rlm-1)
           jst_h(ip) = idx_trns%lstack_even_rlm(mp_rlm) + 1
           n_jk_e(ip) = idx_trns%lstack_even_rlm(mp_rlm)                 &
@@ -134,8 +132,8 @@
           call set_vr_rtm_vector_sym_matmul                             &
      &       (sph_rtm%nnod_rtm, sph_rtm%nidx_rtm, sph_rtm%istep_rtm,    &
      &        sph_rlm%nidx_rlm, asin_theta_1d_rtm, weight_rtm,          &
-     &        kst(ip), nkr(ip), mp_rlm, mn_rlm, nle_rtm, nlo_rtm,       &
-     &        ncomp, comm_rtm%irev_sr, n_WR, WR,                        &
+     &        kst(ip), nkr(ip), mp_rlm, idx_trns%mn_rlm(mp_rlm),        &
+     &        nle_rtm, nlo_rtm, ncomp, comm_rtm%irev_sr, n_WR, WR,      &
      &        WK_l_sml%symp_r(1,ip), WK_l_sml%asmp_t(1,ip),             &
      &        WK_l_sml%asmp_p(1,ip), WK_l_sml%symn_t(1,ip),             &
      &        WK_l_sml%symn_p(1,ip), WK_l_sml%asmp_r(1,ip),             &

@@ -9,7 +9,7 @@
 !!@verbatim
 !!      subroutine sph_back_trans_4_MHD(sph, comms_sph, fl_prop,        &
 !!     &          sph_bc_U, omega_sph, trans_p, gt_cor, rj_fld,         &
-!!     &          b_trns, trns_bwd, WK_sph, cor_rlm)
+!!     &          b_trns, trns_bwd, WK_leg, WK_FFTs_MHD, cor_rlm)
 !!        Input ::  rj_fld
 !!        Output :: trns_MHD, cor_rlm
 !!      subroutine sph_pole_trans_4_MHD                                 &
@@ -28,11 +28,12 @@
 !!        type(phys_address), intent(in) :: f_trns
 !!        type(spherical_transform_data), intent(inout) :: trns_bwd
 !!        type(spherical_transform_data), intent(inout) :: trns_fwd
-!!        type(spherical_trns_works), intent(inout) :: WK_sph
+!!        type(legendre_trns_works), intent(inout) :: WK_leg
+!!        type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
 !!        type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !!      subroutine sph_forward_trans_4_MHD                              &
 !!     &         (sph, comms_sph, fl_prop, trans_p, cor_rlm, f_trns,    &
-!!     &          trns_fwd, WK_sph, rj_fld)
+!!     &          trns_fwd, WK_leg, WK_FFTs_MHD, rj_fld)
 !!        Input :: trns_fwd, cor_rlm
 !!        Output ::  rj_fld
 !!        type(sph_grids), intent(inout) :: sph
@@ -43,7 +44,8 @@
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_address), intent(in) :: f_trns
 !!        type(spherical_transform_data), intent(inout) :: trns_fwd
-!!        type(spherical_trns_works), intent(inout) :: WK_sph
+!!        type(legendre_trns_works), intent(inout) :: WK_leg
+!!        type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
 !!        type(phys_data), intent(inout) :: rj_fld
 !!
 !!      subroutine sph_transform_4_licv                                 &
@@ -76,8 +78,8 @@
       use t_sph_trans_arrays_MHD
       use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
-      use t_sph_single_FFTW
-      use t_sph_transforms
+      use t_legendre_trans_select
+      use t_sph_FFT_selector
       use t_coriolis_terms_rlm
       use t_gaunt_coriolis_rlm
       use t_boundary_params_sph_MHD
@@ -93,7 +95,7 @@
 !
       subroutine sph_back_trans_4_MHD(sph, comms_sph, fl_prop,          &
      &          sph_bc_U, omega_sph, trans_p, gt_cor, rj_fld,           &
-     &          b_trns, trns_bwd, WK_sph, cor_rlm)
+     &          b_trns, trns_bwd, WK_leg, WK_FFTs_MHD, cor_rlm)
 !
       use m_solver_SR
       use sph_trans_w_coriols
@@ -111,7 +113,8 @@
       type(phys_address), intent(in) :: b_trns
 !
       type(spherical_transform_data), intent(inout) :: trns_bwd
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
       type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !
 !
@@ -130,7 +133,7 @@
       call sph_b_trans_w_coriolis(sph, comms_sph, fl_prop, sph_bc_U,    &
      &    omega_sph, b_trns, trans_p, gt_cor,                           &
      &    SR_r1%n_WS, SR_r1%n_WR, SR_r1%WS(1), SR_r1%WR(1),             &
-     &    trns_bwd, WK_sph, cor_rlm)
+     &    trns_bwd, WK_leg, WK_FFTs_MHD, cor_rlm)
 !
       end subroutine sph_back_trans_4_MHD
 !
@@ -138,7 +141,7 @@
 !
       subroutine sph_forward_trans_4_MHD                                &
      &         (sph, comms_sph, fl_prop, trans_p, cor_rlm, f_trns,      &
-     &          trns_fwd, WK_sph, rj_fld)
+     &          trns_fwd, WK_leg, WK_FFTs_MHD, rj_fld)
 !
       use m_solver_SR
       use sph_trans_w_coriols
@@ -153,7 +156,8 @@
       type(phys_address), intent(in) :: f_trns
 !
       type(spherical_transform_data), intent(inout) :: trns_fwd
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
       type(phys_data), intent(inout) :: rj_fld
 !
 !
@@ -166,7 +170,7 @@
       call sph_f_trans_w_coriolis                                       &
      &   (sph, comms_sph, fl_prop, trans_p, cor_rlm, f_trns,            &
      &    trns_fwd, SR_r1%n_WS, SR_r1%n_WR, SR_r1%WS(1), SR_r1%WR(1),   &
-     &    WK_sph)
+     &    WK_leg, WK_FFTs_MHD)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+9)
       call mhd_spectr_from_recvbuf(trans_p%iflag_SPH_recv,              &

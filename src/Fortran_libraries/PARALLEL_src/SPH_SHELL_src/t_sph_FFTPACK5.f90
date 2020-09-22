@@ -9,17 +9,17 @@
 !!@verbatim
 !!  ---------------------------------------------------------------------
 !!
-!!      subroutine init_sph_FFTPACK5                                    &
-!!     &         (nidx_rtp, maxirt_rtp_smp, ncomp, fftpack_t)
+!!      subroutine init_sph_FFTPACK5(nidx_rtp, maxirt_rtp_smp,          &
+!!     &          ncomp_bwd, ncomp_fwd, fftpack_t)
 !!      subroutine finalize_sph_FFTPACK5(fftpack_t)
-!!      subroutine verify_sph_FFTPACK5                                  &
-!!     &         (nidx_rtp, maxirt_rtp_smp, ncomp, fftpack_t)
+!!      subroutine verify_sph_FFTPACK5(nidx_rtp, maxirt_rtp_smp,        &
+!!     &          ncomp_bwd, ncomp_fwd, fftpack_t)
 !! ------------------------------------------------------------------
 !!   wrapper subroutine for initierize FFT
 !! ------------------------------------------------------------------
 !!
 !!      subroutine sph_RFFTMF_to_send(nnod_rtp, nidx_rtp,               &
-!!     &          irt_rtp_smp_stack, ncomp, n_WS, irev_sr_rtp,          &
+!!     &          irt_rtp_smp_stack, ncomp_fwd, n_WS, irev_sr_rtp,      &
 !!     &          X_rtp, WS, fftpack_t)
 !! ------------------------------------------------------------------
 !!
@@ -38,7 +38,7 @@
 !! ------------------------------------------------------------------
 !!
 !!      subroutine sph_RFFTMB_from_recv(nnod_rtp, nidx_rtp,             &
-!!     &          irt_rtp_smp_stack, ncomp, n_WR, irev_sr_rtp,          &
+!!     &          irt_rtp_smp_stack, ncomp_bwd, n_WR, irev_sr_rtp,      &
 !!     &          WR, X_rtp, fftpack_t)
 !! ------------------------------------------------------------------
 !!
@@ -113,17 +113,18 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine init_sph_FFTPACK5                                      &
-     &         (nidx_rtp, maxirt_rtp_smp, ncomp, fftpack_t)
+      subroutine init_sph_FFTPACK5(nidx_rtp, maxirt_rtp_smp,            &
+     &          ncomp_bwd, ncomp_fwd, fftpack_t)
 !
       integer(kind = kint), intent(in) :: nidx_rtp(3), maxirt_rtp_smp
 !
-      integer(kind = kint), intent(in) :: ncomp
+      integer(kind = kint), intent(in) :: ncomp_bwd, ncomp_fwd
       type(work_for_fftpack), intent(inout) :: fftpack_t
 !
       integer(kind = kint) :: ierr
 !
-      fftpack_t%Mmax_smp = ncomp*maxirt_rtp_smp
+!
+      fftpack_t%Mmax_smp = maxirt_rtp_smp * max(ncomp_bwd, ncomp_fwd)
 !
       call alloc_const_4_FFTPACK(nidx_rtp(3), fftpack_t)
       call RFFTMI(nidx_rtp(3), fftpack_t%WSV, fftpack_t%NSV, ierr)
@@ -150,18 +151,18 @@
 !
 ! ------------------------------------------------------------------
 !
-      subroutine verify_sph_FFTPACK5                                    &
-     &         (nidx_rtp, maxirt_rtp_smp, ncomp, fftpack_t)
+      subroutine verify_sph_FFTPACK5(nidx_rtp, maxirt_rtp_smp,          &
+     &          ncomp_bwd, ncomp_fwd, fftpack_t)
 !
       integer(kind = kint), intent(in) :: nidx_rtp(3), maxirt_rtp_smp
+      integer(kind = kint), intent(in) :: ncomp_bwd, ncomp_fwd
 !
-      integer(kind = kint), intent(in) ::  ncomp
       type(work_for_fftpack), intent(inout) :: fftpack_t
 !
       integer(kind = kint) :: ierr
 !
 !
-      fftpack_t%Mmax_smp = ncomp*maxirt_rtp_smp
+      fftpack_t%Mmax_smp = maxirt_rtp_smp * max(ncomp_bwd, ncomp_fwd)
 !
       if(fftpack_t%iflag_fft_len .ne. nidx_rtp(3)) then
 !
@@ -190,16 +191,16 @@
 ! ------------------------------------------------------------------
 !
       subroutine sph_RFFTMF_to_send(nnod_rtp, nidx_rtp,                 &
-     &          irt_rtp_smp_stack, ncomp, n_WS, irev_sr_rtp,            &
+     &          irt_rtp_smp_stack, ncomp_fwd, n_WS, irev_sr_rtp,        &
      &          X_rtp, WS, fftpack_t)
 !
       integer(kind = kint), intent(in) :: nnod_rtp
       integer(kind = kint), intent(in) :: nidx_rtp(3)
       integer(kind = kint), intent(in) :: irt_rtp_smp_stack(0:np_smp)
 !
-      integer(kind = kint), intent(in) :: ncomp
+      integer(kind = kint), intent(in) :: ncomp_fwd
       real(kind = kreal), intent(in)                                    &
-     &     :: X_rtp(irt_rtp_smp_stack(np_smp),nidx_rtp(3),ncomp)
+     &     :: X_rtp(irt_rtp_smp_stack(np_smp),nidx_rtp(3),ncomp_fwd)
 !
       integer(kind = kint), intent(in) :: n_WS
       integer(kind = kint), intent(in) :: irev_sr_rtp(nnod_rtp)
@@ -222,15 +223,15 @@
 !$omp&            private(m,j,nd,ist,num,inum,nsize,inod_s,inod_c,      &
 !$omp&                    ic_rtp,is_rtp,ic_send,is_send)
       do ip = 1, np_smp
-        ist = ncomp *  irt_rtp_smp_stack(ip-1)
-        num = ncomp * (irt_rtp_smp_stack(ip) - irt_rtp_smp_stack(ip-1))
+        ist = ncomp_fwd *  irt_rtp_smp_stack(ip-1)
+        num = ncomp_fwd * (irt_rtp_smp_stack(ip) - irt_rtp_smp_stack(ip-1))
         nsize = num*nidx_rtp(3)
 !
         if(iflag_FFT_time) fftpack_t%t_omp(ip,0) = MPI_WTIME()
         do m = 1, nidx_rtp(3)
           do inum = 1, num
-            nd = 1 + mod(ist+inum-1,ncomp)
-            j =  1 + (ist+inum-nd) / ncomp
+            nd = 1 + mod(ist+inum-1,ncomp_fwd)
+            j =  1 + (ist+inum-nd) / ncomp_fwd
             inod_c = inum + (m-1) * num
             fftpack_t%smp(ip)%X(inod_c) = X_rtp(j,m,nd)
           end do
@@ -247,25 +248,25 @@
 !
         if(iflag_FFT_time) fftpack_t%t_omp(ip,0) = MPI_WTIME()
         do inum = 1, num
-          nd = 1 + mod(ist+inum-1,ncomp)
-          j =  1 + (ist+inum-nd) / ncomp
+          nd = 1 + mod(ist+inum-1,ncomp_fwd)
+          j =  1 + (ist+inum-nd) / ncomp_fwd
           inod_s = inum + (nidx_rtp(3)-1) * num
           is_rtp = j + irt_rtp_smp_stack(np_smp)
-          ic_send = nd + (irev_sr_rtp(j) - 1) * ncomp
-          is_send = nd + (irev_sr_rtp(is_rtp) - 1) * ncomp
+          ic_send = nd + (irev_sr_rtp(j) - 1) * ncomp_fwd
+          is_send = nd + (irev_sr_rtp(is_rtp) - 1) * ncomp_fwd
           WS(ic_send) = fftpack_t%smp(ip)%X(inum)
           WS(is_send) = fftpack_t%smp(ip)%X(inod_s)
         end do
         do m = 1, (nidx_rtp(3)+1)/2 - 1
           do inum = 1, num
-            nd = 1 + mod(ist+inum-1,ncomp)
-            j =  1 + (ist+inum-nd) / ncomp
+            nd = 1 + mod(ist+inum-1,ncomp_fwd)
+            j =  1 + (ist+inum-nd) / ncomp_fwd
             inod_c = inum + (2*m-1) * num
             inod_s = inum + (2*m  ) * num
             ic_rtp = j + (2*m  ) * irt_rtp_smp_stack(np_smp)
             is_rtp = j + (2*m+1) * irt_rtp_smp_stack(np_smp)
-            ic_send = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp
-            is_send = nd + (irev_sr_rtp(is_rtp) - 1) * ncomp
+            ic_send = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_fwd
+            is_send = nd + (irev_sr_rtp(is_rtp) - 1) * ncomp_fwd
             WS(ic_send) = fftpack_t%smp(ip)%X(inod_c)
             WS(is_send) = fftpack_t%smp(ip)%X(inod_s)
           end do
@@ -301,20 +302,20 @@
 ! ------------------------------------------------------------------
 !
       subroutine sph_RFFTMB_from_recv(nnod_rtp, nidx_rtp,               &
-     &          irt_rtp_smp_stack, ncomp, n_WR, irev_sr_rtp,            &
+     &          irt_rtp_smp_stack, ncomp_bwd, n_WR, irev_sr_rtp,        &
      &          WR, X_rtp, fftpack_t)
 !
       integer(kind = kint), intent(in) :: nnod_rtp
       integer(kind = kint), intent(in) :: nidx_rtp(3)
       integer(kind = kint), intent(in) :: irt_rtp_smp_stack(0:np_smp)
 !
-      integer(kind = kint), intent(in) :: ncomp
+      integer(kind = kint), intent(in) :: ncomp_bwd
       integer(kind = kint), intent(in) :: n_WR
       integer(kind = kint), intent(in) :: irev_sr_rtp(nnod_rtp)
       real (kind=kreal), intent(inout):: WR(n_WR)
 !
       real(kind = kreal), intent(inout)                                 &
-     &     :: X_rtp(irt_rtp_smp_stack(np_smp),nidx_rtp(3),ncomp)
+     &     :: X_rtp(irt_rtp_smp_stack(np_smp),nidx_rtp(3),ncomp_bwd)
 !
       type(work_for_fftpack), intent(inout) :: fftpack_t
 !
@@ -333,32 +334,33 @@
 !$omp&            private(m,j,nd,ist,num,inum,nsize,inod_s,inod_c,      &
 !$omp&                    ic_rtp,is_rtp,ic_recv,is_recv)
       do ip = 1, np_smp
-        ist = ncomp *  irt_rtp_smp_stack(ip-1)
-        num = ncomp * (irt_rtp_smp_stack(ip) - irt_rtp_smp_stack(ip-1))
+        ist = ncomp_bwd *  irt_rtp_smp_stack(ip-1)
+        num = ncomp_bwd * (irt_rtp_smp_stack(ip)                        &
+     &                   - irt_rtp_smp_stack(ip-1))
         nsize = num*nidx_rtp(3)
 !
 !   normalization
         if(iflag_FFT_time) fftpack_t%t_omp(ip,0) = MPI_WTIME()
         do inum = 1, num
-          nd = 1 + mod(ist+inum-1,ncomp)
-          j =  1 + (ist+inum-nd) / ncomp
+          nd = 1 + mod(ist+inum-1,ncomp_bwd)
+          j =  1 + (ist+inum-nd) / ncomp_bwd
           inod_s = inum + (nidx_rtp(3)-1) * num
           is_rtp = j + irt_rtp_smp_stack(np_smp)
-          ic_recv = nd + (irev_sr_rtp(j) - 1) * ncomp
-          is_recv = nd + (irev_sr_rtp(is_rtp) - 1) * ncomp
+          ic_recv = nd + (irev_sr_rtp(j) - 1) * ncomp_bwd
+          is_recv = nd + (irev_sr_rtp(is_rtp) - 1) * ncomp_bwd
           fftpack_t%smp(ip)%X(inum) =   WR(ic_recv)
           fftpack_t%smp(ip)%X(inod_s) = WR(is_recv)
         end do
         do m = 1, (nidx_rtp(3)+1)/2 - 1
           do inum = 1, num
-            nd = 1 + mod(ist+inum-1,ncomp)
-            j =  1 + (ist+inum-nd) / ncomp
+            nd = 1 + mod(ist+inum-1,ncomp_bwd)
+            j =  1 + (ist+inum-nd) / ncomp_bwd
             inod_c = inum + (2*m-1) * num
             inod_s = inum + (2*m  ) * num
             ic_rtp = j + (2*m  ) * irt_rtp_smp_stack(np_smp)
             is_rtp = j + (2*m+1) * irt_rtp_smp_stack(np_smp)
-            ic_recv = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp
-            is_recv = nd + (irev_sr_rtp(is_rtp) - 1) * ncomp
+            ic_recv = nd + (irev_sr_rtp(ic_rtp) - 1) * ncomp_bwd
+            is_recv = nd + (irev_sr_rtp(is_rtp) - 1) * ncomp_bwd
             fftpack_t%smp(ip)%X(inod_c) = WR(ic_recv)
             fftpack_t%smp(ip)%X(inod_s) = WR(is_recv)
           end do
@@ -376,8 +378,8 @@
         if(iflag_FFT_time) fftpack_t%t_omp(ip,0) = MPI_WTIME()
         do m = 1, nidx_rtp(3)
           do inum = 1, num
-            nd = 1 + mod(ist+inum-1,ncomp)
-            j =  1 + (ist+inum-nd) / ncomp
+            nd = 1 + mod(ist+inum-1,ncomp_bwd)
+            j =  1 + (ist+inum-nd) / ncomp_bwd
             inod_c = inum + (m-1) * num
             X_rtp(j,m,nd) = fftpack_t%smp(ip)%X(inod_c)
           end do

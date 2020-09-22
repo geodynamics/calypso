@@ -9,11 +9,12 @@
 !!@verbatim
 !!      subroutine initialize_sph_trans                                 &
 !!     &         (ncomp_trans, nvector_trns, nscalar_trns,              &
-!!     &          sph, comms_sph, trans_p, WK_sph)
+!!     &          sph, comms_sph, trans_p, WK_leg, WK_FFTs)
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(sph_comm_tables), intent(inout) :: comms_sph
 !!        type(parameters_4_sph_trans), intent(inout) :: trans_p
-!!        type(spherical_trns_works), intent(inout) :: WK_sph
+!!        type(legendre_trns_works), intent(inout) :: WK_leg
+!!        type(work_for_FFTs), intent(inout) :: WK_FFTs
 !!      subroutine initialize_legendre_trans                            &
 !!     &         (nvector_legendre, ncomp_trans, sph, comms_sph,        &
 !!     &          leg, idx_trns, iflag_recv)
@@ -32,7 +33,8 @@
       use t_sph_trans_comm_tbl
       use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
-      use t_sph_transforms
+      use t_legendre_trans_select
+      use t_sph_FFT_selector
 !
       implicit none
 !
@@ -46,7 +48,7 @@
 !
       subroutine initialize_sph_trans                                   &
      &         (ncomp_trans, nvector_trns, nscalar_trns,                &
-     &          sph, comms_sph, trans_p, WK_sph)
+     &          sph, comms_sph, trans_p, WK_leg, WK_FFTs)
 !
       use init_FFT_4_sph
 !
@@ -55,26 +57,27 @@
       type(sph_grids), intent(inout) :: sph
       type(sph_comm_tables), intent(inout) :: comms_sph
       type(parameters_4_sph_trans), intent(inout) :: trans_p
-      type(spherical_trns_works), intent(inout) :: WK_sph
+      type(legendre_trns_works), intent(inout) :: WK_leg
+      type(work_for_FFTs), intent(inout) :: WK_FFTs
 !
 !
       trans_p%iflag_FFT = iflag_FFTPACK
-      if(WK_sph%WK_leg%id_legendre .eq. iflag_leg_undefined) then
-        WK_sph%WK_leg%id_legendre = iflag_leg_sym_dgemm_big
+      if(WK_leg%id_legendre .eq. iflag_leg_undefined) then
+        WK_leg%id_legendre = iflag_leg_sym_dgemm_big
       end if
 !
       call initialize_legendre_trans                                    &
      &   (trans_p%nvector_legendre, ncomp_trans, sph, comms_sph,        &
      &    trans_p%leg, trans_p%idx_trns, trans_p%iflag_SPH_recv)
       call init_fourier_transform_4_sph(ncomp_trans, sph%sph_rtp,       &
-     &    comms_sph%comm_rtp, WK_sph%WK_FFTs, trans_p%iflag_FFT)
+     &    comms_sph%comm_rtp, WK_FFTs, trans_p%iflag_FFT)
 !
       if(my_rank .eq. 0)  call write_import_table_mode(trans_p)
 !
       call sel_init_legendre_trans                                      &
      &   (ncomp_trans, nvector_trns, nscalar_trns,                      &
      &    sph%sph_params, sph%sph_rtm, sph%sph_rlm,                     &
-     &    trans_p%leg, trans_p%idx_trns, WK_sph%WK_leg)
+     &    trans_p%leg, trans_p%idx_trns, WK_leg)
 !
       end subroutine initialize_sph_trans
 !
@@ -109,6 +112,12 @@
      &    sph%sph_rtm%idx_gl_1d_rtm_m, sph%sph_rlm%idx_gl_1d_rlm_j,     &
      &    idx_trns%mdx_p_rlm_rtm, idx_trns%mdx_n_rlm_rtm,               &
      &    idx_trns%maxdegree_rlm, idx_trns%lstack_rlm)
+      call find_conjugate_sph_order                                     &
+     &   (sph%sph_rtm%nidx_rtm, sph%sph_rtm%idx_gl_1d_rtm_m(1,2),       &
+     &    idx_trns%mn_rlm)
+!
+!      call check_mdx_pn_rlm_rtm                                        &
+!     &   ((50+my_rank), sph%nidx_rlm, sph%nidx_rtm, idx_trns)
 !
       call init_legendre_rtm(sph%sph_params%l_truncation,               &
      &    sph%sph_rj, sph%sph_rtm, sph%sph_rlm, idx_trns, leg)

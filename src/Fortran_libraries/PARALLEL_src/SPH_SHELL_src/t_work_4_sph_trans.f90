@@ -8,16 +8,22 @@
 !!        communication test
 !!
 !!@verbatim
-!!      subroutine alloc_work_4_sph_trans(nidx_rtm, nidx_rlm)
-!!      subroutine alloc_l_rtm_block
+!!      subroutine alloc_work_4_sph_trans(nidx_rtm, nidx_rlm, idx_trns)
+!!      subroutine alloc_l_rtm_block(idx_trns)
+!!        type(index_4_sph_trans), intent(inout) :: idx_trns
 !!
-!!      subroutine dealloc_work_4_sph_trans
-!!      subroutine dealloc_l_rtm_block
+!!      subroutine dealloc_work_4_sph_trans(idx_trns)
+!!      subroutine dealloc_l_rtm_block(idx_trns)
+!!        type(index_4_sph_trans), intent(inout) :: idx_trns
 !!
 !!      subroutine set_import_table_ctl(import_ctl, trans_p)
 !!        type(parameters_4_sph_trans), intent(inout) :: trans_p
 !!      subroutine write_import_table_mode(trans_p)
 !!        type(parameters_4_sph_trans), intent(in) :: trans_p
+!!
+!!      subroutine check_mdx_pn_rlm_rtm                                 &
+!!     &        (id_file, nidx_rlm, nidx_rtm, idx_trns)
+!!        type(index_4_sph_trans), intent(in) :: idx_trns
 !!@endverbatim
 !!
       module t_work_4_sph_trans
@@ -61,6 +67,12 @@
         integer(kind = kint) :: maxdegree_rlm
 !>       End address of spherical harmonics order for SMP parallelization
         integer(kind = kint), allocatable :: lstack_even_rlm(:)
+!
+!
+!>       Address of order for Legendre transform
+!        integer(kind = kint), allocatable :: mp_rlm(:)
+!>       Address of conjugate order for Legendre transform
+        integer(kind = kint), allocatable :: mn_rlm(:)
       end type index_4_sph_trans
 !
 !>        Structures of parameters for spherical transform
@@ -97,9 +109,15 @@
       allocate(idx_trns%mdx_p_rlm_rtm(nidx_rlm(2)))
       allocate(idx_trns%mdx_n_rlm_rtm(nidx_rlm(2)))
 !
+!      allocate(idx_trns%mp_rlm(nidx_rtm(3)))
+      allocate(idx_trns%mn_rlm(nidx_rtm(3)))
+!
       if(nidx_rtm(3) .gt. 0) then
         idx_trns%lstack_rlm = 0
         idx_trns%lstack_even_rlm = 0
+!
+!        idx_trns%mp_rlm = 0
+        idx_trns%mn_rlm = 0
       end if
       if(nidx_rlm(2) .gt. 0) then
         idx_trns%mdx_p_rlm_rtm = 0
@@ -131,6 +149,8 @@
 !
       deallocate(idx_trns%lstack_rlm, idx_trns%lstack_even_rlm)
       deallocate(idx_trns%mdx_p_rlm_rtm, idx_trns%mdx_n_rlm_rtm)
+!      deallocate(idx_trns%mp_rlm)
+      deallocate(idx_trns%mn_rlm)
 !
       idx_trns%maxdegree_rlm =   0
 !
@@ -175,8 +195,8 @@
       type(parameters_4_sph_trans), intent(in) :: trans_p
 !
 !
-      write(*,'(a,i4)', advance='no')                                 &
-     &   'Communication mode for sph. transform: ',                   &
+      write(*,'(a,i4)', advance='no')                                   &
+     &   'Communication mode for sph. transform: ',                     &
      &    trans_p%iflag_SPH_recv
       if(trans_p%iflag_SPH_recv .eq. iflag_import_item) then
         write(*,'(3a)') ' (', trim(hd_import_item), ') '
@@ -187,5 +207,36 @@
       end subroutine write_import_table_mode
 !
 ! ------------------------------------------------------------------
+!
+      subroutine check_mdx_pn_rlm_rtm                                   &
+     &        (id_file, nidx_rlm, nidx_rtm, idx_trns)
+!
+      integer(kind = kint), intent(in) :: id_file
+      integer(kind = kint), intent(in) :: nidx_rtm(3)
+      integer(kind = kint), intent(in) :: nidx_rlm(2)
+      type(index_4_sph_trans), intent(in) :: idx_trns
+!
+      integer(kind = kint) :: j, m
+!
+!
+      write(id_file,*) 'm, lstack_rlm(m)'
+      do m = 1, nidx_rtm(3)
+        write(id_file,*) m, idx_trns%lstack_rlm(m)
+      end do
+!
+      write(id_file,*) 'm, mn_rlm(m)'
+      do m = 1, nidx_rtm(3)
+        write(id_file,*) m, idx_trns%mn_rlm(m)
+      end do
+!
+      write(id_file,*) 'j, mdx_p_rlm_rtm(j), mdx_n_rlm_rtm(j)'
+      do j = 1, nidx_rlm(2)
+        write(id_file,*) j, idx_trns%mdx_p_rlm_rtm(j),                  &
+     &                     idx_trns%mdx_n_rlm_rtm(j)
+      end do
+!
+      end subroutine check_mdx_pn_rlm_rtm
+!
+! -----------------------------------------------------------------------
 !
       end module t_work_4_sph_trans
