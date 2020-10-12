@@ -69,7 +69,7 @@
      &          trns_f_MHD, trns_b_snap, trns_b_eflux, trns_b_difv,     &
      &          trns_f_eflux)
 !
-      use t_const_wz_coriolis_rtp
+      use const_wz_coriolis_rtp
       use cal_buoyancy_flux_sph
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -90,8 +90,7 @@
 !
 !
       if(fe_trns%forces%i_coriolis .gt. 0) then
-        call cal_wz_coriolis_rtp(sph_rtp%nnod_rtp, sph_rtp%nidx_rtp,    &
-     &      leg%g_colat_rtp, fl_prop%coef_cor,                          &
+        call sel_wz_coriolis_rtp(sph_rtp, leg, fl_prop%coef_cor,        &
      &      trns_b_snap%fld_rtp(1,bs_trns%base%i_velo),                 &
      &      trns_f_eflux%fld_rtp(1,fe_trns%forces%i_coriolis))
       end if

@@ -46,6 +46,11 @@ ifdef ZLIB_LIBS
   F90LIBS+= $$(ZLIB_LIBS)
 endif
 
+ifdef FFTW3_OMP_LIBS
+  CPP_FLAGS+= -DOMP_FFTW3
+  F90LIBS+= $$(FFTW3_OMP_LIBS)
+endif
+
 ifdef FFTW3_LIBS
   CPP_FLAGS+= -DFFTW3
   C_INCLUDE+= $$(FFTW3_CFLAGS)
@@ -145,7 +150,7 @@ makemake:
 	@echo '#' >> $(MAKENAME)
 	@echo '# Compiler commands' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
-	@echo CC=$(MPICC)            >> $(MAKENAME)
+	@echo CC=$(CC)               >> $(MAKENAME)
 	@echo F90=$(MPIF90)          >> $(MAKENAME)
 	@echo AR=$(AR)               >> $(MAKENAME)
 	@echo RANLIB=$(RANLIB) >> $(MAKENAME)
@@ -175,8 +180,9 @@ makemake:
 	@echo '#' >> $(MAKENAME)
 	@echo '# FFTW3 settings' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
-	@echo 'FFTW3_CFLAGS = $(FFTW3_CFLAGS)'                  >> $(MAKENAME)
-	@echo 'FFTW3_LIBS =   $(FFTW3_LIBS)'                    >> $(MAKENAME)
+	@echo 'FFTW3_CFLAGS =   $(FFTW3_CFLAGS)'                  >> $(MAKENAME)
+	@echo 'FFTW3_LIBS =     $(FFTW3_LIBS)'                    >> $(MAKENAME)
+	@echo 'FFTW3_OMP_LIBS = $(FFTW3_OMP_LIBS)'                >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
 	@echo '# HDF5 settings' >> $(MAKENAME)
 	@echo '#' >> $(MAKENAME)
@@ -260,6 +266,7 @@ makemake:
 		$(GMAKE) \
 		GMAKE='$(GMAKE)' \
 		FFTW3_LIBS='$(FFTW3_LIBS)'   \
+		FFTW3_OMP_LIBS='$(FFTW3_OMP_LIBS)'   \
 		MAKEDIR='$(MAKEDIR)' \
 		MAKENAME='$(MAKENAME)'\
 		mod_list; \

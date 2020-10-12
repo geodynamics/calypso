@@ -20,6 +20,8 @@
 !>      data size of complex for FFTW3
       integer, parameter :: fftw_complex = 8
 !
+!>      Unit real number
+      complex(kind = fftw_complex), parameter :: ru = (1.0d0,0.0d0)
 !>      Unit imaginary number
       complex(kind = fftw_complex), parameter :: iu = (0.0d0,1.0d0)
 !

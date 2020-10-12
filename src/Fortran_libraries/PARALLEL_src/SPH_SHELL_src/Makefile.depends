@@ -28,11 +28,15 @@ copy_nodal_fld_4_sph_trans.o: $(SPH_COMMDIR)/copy_nodal_fld_4_sph_trans.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 copy_pole_field_sph_trans.o: $(SPH_COMMDIR)/copy_pole_field_sph_trans.f90 m_precision.o m_constants.o m_phys_constants.o calypso_mpi.o t_spheric_rtp_data.o t_geometry_data.o t_phys_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
+copy_rtp_data_to_FFTPACK.o: $(SPH_COMMDIR)/copy_rtp_data_to_FFTPACK.f90 m_precision.o m_constants.o m_machine_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
+copy_single_FFT_and_rtp.o: $(SPH_COMMDIR)/copy_single_FFT_and_rtp.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
 copy_spectr_4_sph_trans.o: $(SPH_COMMDIR)/copy_spectr_4_sph_trans.f90 m_precision.o m_machine_parameter.o t_sph_trans_comm_tbl.o t_phys_data.o m_sph_communicators.o sel_spherical_SRs.o t_spheric_rj_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 correlation_by_sph_spectr.o: $(SPH_COMMDIR)/correlation_by_sph_spectr.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_phys_address.o m_phys_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-init_FFT_4_sph.o: $(SPH_COMMDIR)/init_FFT_4_sph.F90 m_precision.o calypso_mpi.o m_work_time.o m_machine_parameter.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_sph_FFT_selector.o m_solver_SR.o calypso_mpi_real.o
+init_FFT_4_sph.o: $(SPH_COMMDIR)/init_FFT_4_sph.F90 m_precision.o calypso_mpi.o m_work_time.o m_machine_parameter.o m_FFT_selector.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_sph_FFT_selector.o m_solver_SR.o calypso_mpi_real.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 init_sph_trans.o: $(SPH_COMMDIR)/init_sph_trans.f90 m_precision.o m_constants.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_schmidt_poly_on_rtm.o t_work_4_sph_trans.o t_legendre_trans_select.o t_sph_FFT_selector.o init_FFT_4_sph.o m_FFT_selector.o schmidt_poly_on_rtm_grid.o set_legendre_matrices.o set_params_sph_trans.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_spheric_rj_data.o calypso_mpi.o m_machine_parameter.o m_sph_communicators.o m_legendre_transform_list.o init_spherical_SRs.o cal_minmax_and_stacks.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -112,6 +116,14 @@ schmidt_b_trans_at_center.o: $(SPH_COMMDIR)/schmidt_b_trans_at_center.f90 m_prec
 	$(F90) -c $(F90OPTFLAGS) $<
 schmidt_b_trans_at_pole.o: $(SPH_COMMDIR)/schmidt_b_trans_at_pole.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o
 	$(F90) -c $(F90OPTFLAGS) $<
+set_comm_table_prt_FFTPACK.o: $(SPH_COMMDIR)/set_comm_table_prt_FFTPACK.f90 m_precision.o m_constants.o m_machine_parameter.o t_sph_comm_table_from_FFT.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_comm_table_prt_FFTW.o: $(SPH_COMMDIR)/set_comm_table_prt_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o t_sph_comm_table_from_FFTW.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_comm_table_rtp_FFTPACK.o: $(SPH_COMMDIR)/set_comm_table_rtp_FFTPACK.f90 m_precision.o m_constants.o m_machine_parameter.o t_sph_comm_table_from_FFT.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_comm_table_rtp_FFTW.o: $(SPH_COMMDIR)/set_comm_table_rtp_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o t_sph_comm_table_from_FFTW.o
+	$(F90) -c $(F90OPTFLAGS) $<
 set_legendre_matrices.o: $(SPH_COMMDIR)/set_legendre_matrices.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_loaded_data_4_sph.o: $(SPH_COMMDIR)/set_loaded_data_4_sph.f90 m_precision.o m_constants.o t_spheric_parameter.o t_sph_trans_comm_tbl.o calypso_mpi.o calypso_mpi_int.o m_machine_parameter.o count_num_sph_smp.o set_special_sph_lm_flags.o set_from_recv_buf_rev.o m_spheric_constants.o
@@ -136,6 +148,22 @@ set_vr_rtm_sym_mat_tsmp.o: $(SPH_COMMDIR)/set_vr_rtm_sym_mat_tsmp.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 small_matmul_leg_trans_krin.o: $(SPH_COMMDIR)/small_matmul_leg_trans_krin.F90 m_precision.o m_constants.o matmul_for_legendre_trans.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
+sph_prt_FFTPACK5.o: $(SPH_COMMDIR)/sph_prt_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFT.o t_sph_FFTPACK5.o calypso_mpi.o set_comm_table_prt_FFTPACK.o copy_rtp_data_to_FFTPACK.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_prt_FFTW.o: $(SPH_COMMDIR)/sph_prt_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFTW.o t_sph_field_FFTW.o set_comm_table_prt_FFTW.o copy_rtp_data_to_FFTPACK.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_prt_domain_FFTPACK5.o: $(SPH_COMMDIR)/sph_prt_domain_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFT.o t_sph_domain_FFTPACK5.o set_comm_table_prt_FFTPACK.o copy_rtp_data_to_FFTPACK.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_prt_domain_FFTW.o: $(SPH_COMMDIR)/sph_prt_domain_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFTW.o t_sph_field_FFTW.o set_comm_table_prt_FFTW.o copy_rtp_data_to_FFTPACK.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_rtp_FFTPACK5.o: $(SPH_COMMDIR)/sph_rtp_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFT.o t_sph_FFTPACK5.o calypso_mpi.o set_comm_table_rtp_FFTPACK.o copy_rtp_data_to_FFTPACK.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_rtp_FFTW.o: $(SPH_COMMDIR)/sph_rtp_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFTW.o t_sph_field_FFTW.o set_comm_table_rtp_FFTW.o copy_rtp_data_to_FFTPACK.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_rtp_domain_FFTPACK5.o: $(SPH_COMMDIR)/sph_rtp_domain_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFT.o t_sph_domain_FFTPACK5.o set_comm_table_rtp_FFTPACK.o copy_rtp_data_to_FFTPACK.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_rtp_domain_FFTW.o: $(SPH_COMMDIR)/sph_rtp_domain_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFTW.o t_sph_field_FFTW.o set_comm_table_rtp_FFTW.o copy_rtp_data_to_FFTPACK.o
+	$(F90) -c $(F90OPTFLAGS) $<
 sph_rtp_zonal_rms_data.o: $(SPH_COMMDIR)/sph_rtp_zonal_rms_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_rtp_data.o t_geometry_data.o t_phys_data.o coordinate_convert_4_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<
 spherical_SRs_N.o: $(SPH_COMMDIR)/spherical_SRs_N.f90 m_precision.o m_constants.o m_work_time.o t_sph_trans_comm_tbl.o t_solver_SR.o m_solver_SR.o sel_spherical_SRs.o calypso_SR_6.o calypso_SR_3.o calypso_SR_2.o calypso_SR.o calypso_SR_int.o m_elapsed_labels_SEND_RECV.o set_to_send_buffer.o
@@ -166,13 +194,25 @@ t_legendre_work_testlooop.o: $(SPH_COMMDIR)/t_legendre_work_testlooop.f90 m_prec
 	$(F90) -c $(F90OPTFLAGS) $<
 t_set_legendre_4_sph_trans.o: $(SPH_COMMDIR)/t_set_legendre_4_sph_trans.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_rlm_data.o schmidt_fix_m.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_sph_FFTPACK5.o: $(SPH_COMMDIR)/t_sph_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o
+t_sph_FFTPACK5.o: $(SPH_COMMDIR)/t_sph_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFT.o calypso_mpi.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_sph_FFT_selector.o: $(SPH_COMMDIR)/t_sph_FFT_selector.F90 m_precision.o m_machine_parameter.o m_FFT_selector.o t_sph_FFTPACK5.o t_sph_single_FFTW.o t_sph_field_FFTW.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o
+t_sph_FFT_selector.o: $(SPH_COMMDIR)/t_sph_FFT_selector.F90 m_precision.o m_machine_parameter.o m_FFT_selector.o t_sph_FFTPACK5.o t_sph_component_FFTPACK5.o t_sph_domain_FFTPACK5.o t_sph_single_FFTPACK5.o sph_rtp_domain_FFTPACK5.o sph_prt_domain_FFTPACK5.o sph_rtp_FFTPACK5.o sph_prt_FFTPACK5.o t_sph_single_FFTW.o t_sph_field_FFTW.o t_sph_component_FFTW.o sph_rtp_domain_FFTW.o sph_prt_domain_FFTW.o sph_rtp_FFTW.o sph_prt_FFTW.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
-t_sph_field_FFTW.o: $(SPH_COMMDIR)/t_sph_field_FFTW.F90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o
+t_sph_comm_table_from_FFT.o: $(SPH_COMMDIR)/t_sph_comm_table_from_FFT.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o calypso_mpi.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_comm_table_from_FFTW.o: $(SPH_COMMDIR)/t_sph_comm_table_from_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o calypso_mpi.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_component_FFTPACK5.o: $(SPH_COMMDIR)/t_sph_component_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o copy_single_FFT_and_rtp.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_component_FFTW.o: $(SPH_COMMDIR)/t_sph_component_FFTW.F90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o copy_single_FFT_and_rtp.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
-t_sph_single_FFTW.o: $(SPH_COMMDIR)/t_sph_single_FFTW.F90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o
+t_sph_domain_FFTPACK5.o: $(SPH_COMMDIR)/t_sph_domain_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFT.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_field_FFTW.o: $(SPH_COMMDIR)/t_sph_field_FFTW.F90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFTW.o
+	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
+t_sph_single_FFTPACK5.o: $(SPH_COMMDIR)/t_sph_single_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o copy_single_FFT_and_rtp.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_single_FFTW.o: $(SPH_COMMDIR)/t_sph_single_FFTW.F90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o copy_single_FFT_and_rtp.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 t_sph_transforms.o: $(SPH_COMMDIR)/t_sph_transforms.f90 m_precision.o calypso_mpi.o m_work_time.o m_elapsed_labels_SPH_TRNS.o m_machine_parameter.o spherical_SRs_N.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_schmidt_poly_on_rtm.o t_work_4_sph_trans.o t_legendre_trans_select.o t_sph_FFT_selector.o pole_sph_transform.o calypso_mpi_real.o
 	$(F90) -c $(F90OPTFLAGS) $<

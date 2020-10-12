@@ -204,9 +204,15 @@
 !
       call copy_sph_1d_gl_idx_rtp(s3d_radius, sph_gl1d, sph_rtp)
 !
-      if(iflag_debug .gt. 0) write(*,*)                                 &
+      if(s3d_ranks%rtp_rin_flag) then
+        if(iflag_debug .gt. 0) write(*,*)                               &
      &                 'set_global_sph_rtp_id', id_rank
-      call set_global_sph_rtp_id(s3d_ranks, stk_lc1d, sph_rtp)
+        call set_global_sph_rtp_id(s3d_ranks, stk_lc1d, sph_rtp)
+      else
+        if(iflag_debug .gt. 0) write(*,*)                               &
+     &                 'set_global_sph_prt_id', id_rank
+        call set_global_sph_prt_id(s3d_ranks, stk_lc1d, sph_rtp)
+      end if
 !
       if(iflag_debug .gt. 0) then
         write(*,*) 'check_spheric_param_rtp', id_rank

@@ -238,10 +238,10 @@
      &   'Innermost loop for Legendre trans. (r, t, m): ',              &
      &   trim(tmpchara)
 !
-      if(sph_rtp%istep_rtp(1) .eq. 1) then
-        write(tmpchara,'(a)') 'radius'
+      if(sph_rtp%istep_rtp(3) .eq. 1) then
+        write(tmpchara,'(a)') 'phi'
       else
-        write(tmpchara,'(a)') 'meridian'
+        write(tmpchara,'(a)') 'radius'
       end if
       write(id_timer_file,*)                                            &
      &   'Innermost loop for physical space. (r, t, p): ',              &

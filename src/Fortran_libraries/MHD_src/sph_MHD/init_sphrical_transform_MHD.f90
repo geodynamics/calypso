@@ -146,7 +146,8 @@
 !
       trans_p%iflag_FFT = set_FFT_mode_4_snapshot(WK%iflag_MHD_FFT)
       call init_sph_FFT_select(my_rank, trans_p%iflag_FFT,              &
-     &    sph%sph_rtp, ncomp_max_trans, ncomp_max_trans, WK%WK_FFTs)
+     &    sph%sph_rtp, comms_sph%comm_rtp,                              &
+     &    ncomp_max_trans, ncomp_max_trans, WK%WK_FFTs)
 !
       if(my_rank .eq. 0)  call write_import_table_mode(trans_p)
 !

@@ -12,14 +12,6 @@
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(spher_average_coriolis), intent(inout) :: ave_cor
 !!
-!!      subroutine cal_wz_coriolis_rtp(nnod, nidx_rtp, g_colat_rtp,     &
-!!     &          coef_cor, velo_rtp, coriolis_rtp)
-!!      subroutine cal_wz_div_coriolis_rtp(nnod, nidx_rtp, g_colat_rtp, &
-!!     &          coef_cor, velo_rtp, div_coriolis_rtp)
-!!
-!!      subroutine cal_wz_coriolis_pole                                 &
-!!     &         (nnod_pole,  coef_cor, velo_pole, coriolis_pole)
-!!
 !!      subroutine subtract_sphere_ave_coriolis(sph_rtp, sph_rj,        &
 !!     &          is_coriolis, ntot_phys_rj, d_rj, coriolis_rtp,        &
 !!     &          ave_cor)
@@ -56,6 +48,8 @@
         real(kind = kreal), allocatable :: save_cor_g(:)
       end type spher_average_coriolis
 !
+      private :: subtract_sph_ave_coriolis_prt
+      private :: subtract_sph_ave_coriolis_rtp
       private :: clear_rj_degree0_scalar_smp
 !
 ! -----------------------------------------------------------------------
@@ -90,122 +84,6 @@
       deallocate(ave_cor%save_cor_l, ave_cor%save_cor_g)
 !
       end subroutine dealloc_sphere_ave_coriolis
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine cal_wz_coriolis_rtp(nnod, nidx_rtp, g_colat_rtp,       &
-     &          coef_cor, velo_rtp, coriolis_rtp)
-!
-      integer(kind = kint), intent(in) :: nnod
-      integer(kind = kint), intent(in) :: nidx_rtp(3)
-      real(kind = kreal), intent(in) :: g_colat_rtp(nidx_rtp(2))
-      real(kind = kreal), intent(in) :: coef_cor
-      real(kind = kreal), intent(in) :: velo_rtp(nnod,3)
-!
-      real(kind = kreal), intent(inout) :: coriolis_rtp(nnod,3)
-!
-      integer(kind = kint) :: mphi, l_rtp, kr, inod
-      real(kind = kreal) :: omega(3)
-!
-!
-!$omp parallel do private(mphi,l_rtp,kr,inod,omega)
-      do mphi = 1, nidx_rtp(3)
-        do l_rtp = 1, nidx_rtp(2)
-          do kr = 1, nidx_rtp(1)
-            inod = kr + (l_rtp-1) * nidx_rtp(1)                         &
-     &                + (mphi-1)  * nidx_rtp(1)*nidx_rtp(2)
-!
-            omega(1) =  cos( g_colat_rtp(l_rtp) )
-            omega(2) = -sin( g_colat_rtp(l_rtp) )
-            omega(3) = zero
-!
-            coriolis_rtp(inod,1) = - coef_cor                           &
-     &                         * ( omega(2)*velo_rtp(inod,3)            &
-     &                           - omega(3)*velo_rtp(inod,2) )
-            coriolis_rtp(inod,2) = - coef_cor                           &
-     &                         * ( omega(3)*velo_rtp(inod,1)            &
-     &                           - omega(1)*velo_rtp(inod,3) )
-            coriolis_rtp(inod,3) = - coef_cor                           &
-     &                         * ( omega(1)*velo_rtp(inod,2)            &
-     &                           - omega(2)*velo_rtp(inod,1) )
-          end do
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine cal_wz_coriolis_rtp
-!
-! -----------------------------------------------------------------------
-!
-      subroutine cal_wz_div_coriolis_rtp(nnod, nidx_rtp, g_colat_rtp,   &
-     &          coef_cor, velo_rtp, div_coriolis_rtp)
-!
-      integer(kind = kint), intent(in) :: nnod
-      integer(kind = kint), intent(in) :: nidx_rtp(3)
-      real(kind = kreal), intent(in) :: g_colat_rtp(nidx_rtp(2))
-      real(kind = kreal), intent(in) :: coef_cor
-      real(kind = kreal), intent(in) :: velo_rtp(nnod,3)
-!
-      real(kind = kreal), intent(inout) :: div_coriolis_rtp(nnod)
-!
-      integer(kind = kint) :: mphi, l_rtp, kr, inod
-      real(kind = kreal) :: omega(3)
-!
-!
-!$omp parallel do private(mphi,l_rtp,kr,inod,omega)
-      do mphi = 1, nidx_rtp(3)
-        do l_rtp = 1, nidx_rtp(2)
-          do kr = 1, nidx_rtp(1)
-            inod = kr + (l_rtp-1) * nidx_rtp(1)                         &
-     &                + (mphi-1)  * nidx_rtp(1)*nidx_rtp(2)
-!
-            omega(1) =  cos( g_colat_rtp(l_rtp) )
-            omega(2) = -sin( g_colat_rtp(l_rtp) )
-            omega(3) = zero
-!
-            div_coriolis_rtp(inod)                                      &
-     &          = coef_cor * ( omega(1)*velo_rtp(inod,1)                &
-     &                       - omega(2)*velo_rtp(inod,2) )
-          end do
-        end do
-      end do
-!$omp end parallel do
-!
-      end subroutine cal_wz_div_coriolis_rtp
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine cal_wz_coriolis_pole                                   &
-     &         (nnod_pole,  coef_cor, velo_pole, coriolis_pole)
-!
-      integer(kind = kint), intent(in) :: nnod_pole
-      real(kind = kreal), intent(in) :: coef_cor
-      real(kind = kreal), intent(in) :: velo_pole(nnod_pole,3)
-!
-      real(kind = kreal), intent(inout) :: coriolis_pole(nnod_pole,3)
-!
-      integer(kind = kint) :: inod
-      real(kind = kreal), parameter :: omega(3) = (/zero, zero, one/)
-!
-!
-!$omp parallel do private(inod)
-      do inod = 1, nnod_pole
-            coriolis_pole(inod,1) = - coef_cor                          &
-!     &                         * ( omega(2)*velo_pole(inod,3)          &
-     &                         * ( -omega(3)*velo_pole(inod,2) )
-            coriolis_pole(inod,2) = - coef_cor                          &
-     &                         * ( omega(3)*velo_pole(inod,1) )
-!     &                           - omega(1)*velo_pole(inod,3) )
-            coriolis_pole(inod,3) = zero
-!            coriolis_pole(inod,3) = - coef_cor                         &
-!     &                         * ( omega(1)*velo_pole(inod,2)          &
-!     &                           - omega(2)*velo_pole(inod,1) )
-      end do
-!$omp end parallel do
-!
-      end subroutine cal_wz_coriolis_pole
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
@@ -247,22 +125,13 @@
       call calypso_mpi_allreduce_real                                   &
      &   (ave_cor%save_cor_l, ave_cor%save_cor_g, num64, MPI_SUM)
 !
-!
-!$omp do private(mphi,l_rtp,kr,k_gl,inod)
-      do mphi = 1, sph_rtp%nidx_rtp(3)
-        do l_rtp = 1, sph_rtp%nidx_rtp(2)
-          do kr = 1, sph_rtp%nidx_rtp(1)
-            k_gl = sph_rtp%idx_gl_1d_rtp_r(kr)
-            inod = kr + (l_rtp-1) * sph_rtp%nidx_rtp(1)                 &
-     &                + (mphi-1)  * sph_rtp%nidx_rtp(1)                 &
-     &                            * sph_rtp%nidx_rtp(2)
-!
-            coriolis_rtp(inod,1) = coriolis_rtp(inod,1)                 &
-     &                             - ave_cor%save_cor_g(k_gl)
-          end do
-        end do
-      end do
-!$omp end do nowait
+      if(sph_rtp%istep_rtp(3) .eq. 1) then
+        call subtract_sph_ave_coriolis_prt                              &
+     &         (sph_rtp, coriolis_rtp, ave_cor)
+      else
+        call subtract_sph_ave_coriolis_rtp                              &
+     &         (sph_rtp, coriolis_rtp, ave_cor)
+      end if
 !
       end subroutine subtract_sphere_ave_coriolis
 !
@@ -338,5 +207,68 @@
       end subroutine clear_rj_degree0_vector_smp
 !
 ! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine subtract_sph_ave_coriolis_rtp                          &
+     &         (sph_rtp, coriolis_rtp, ave_cor)
+!
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+!
+      real(kind = kreal), intent(inout)                                 &
+     &           :: coriolis_rtp(sph_rtp%nnod_rtp,3)
+      type(spher_average_coriolis), intent(inout) :: ave_cor
+!
+      integer(kind = kint) :: mphi, l_rtp, kr, k_gl, inod
+!
+!
+!$omp do private(mphi,l_rtp,kr,k_gl,inod)
+      do mphi = 1, sph_rtp%nidx_rtp(3)
+        do l_rtp = 1, sph_rtp%nidx_rtp(2)
+          do kr = 1, sph_rtp%nidx_rtp(1)
+            k_gl = sph_rtp%idx_gl_1d_rtp_r(kr)
+            inod = kr + (l_rtp-1) * sph_rtp%istep_rtp(2)                &
+     &                + (mphi-1)  * sph_rtp%istep_rtp(3)
+!
+            coriolis_rtp(inod,1) = coriolis_rtp(inod,1)                 &
+     &                             - ave_cor%save_cor_g(k_gl)
+          end do
+        end do
+      end do
+!$omp end do nowait
+!
+      end subroutine subtract_sph_ave_coriolis_rtp
+!
+! -----------------------------------------------------------------------
+!
+      subroutine subtract_sph_ave_coriolis_prt                          &
+     &         (sph_rtp, coriolis_rtp, ave_cor)
+!
+      type(sph_rtp_grid), intent(in) :: sph_rtp
+!
+      real(kind = kreal), intent(inout)                                 &
+     &           :: coriolis_rtp(sph_rtp%nnod_rtp,3)
+      type(spher_average_coriolis), intent(inout) :: ave_cor
+!
+      integer(kind = kint) :: mphi, l_rtp, kr, k_gl, inod
+!
+!
+!$omp do private(mphi,l_rtp,kr,k_gl,inod)
+      do l_rtp = 1, sph_rtp%nidx_rtp(2)
+        do kr = 1, sph_rtp%nidx_rtp(1)
+          k_gl = sph_rtp%idx_gl_1d_rtp_r(kr)
+          do mphi = 1, sph_rtp%nidx_rtp(3)
+            inod = mphi + (kr-1) *    sph_rtp%istep_rtp(1)              &
+     &                  + (l_rtp-1) * sph_rtp%istep_rtp(2)
+!
+            coriolis_rtp(inod,1) = coriolis_rtp(inod,1)                 &
+     &                             - ave_cor%save_cor_g(k_gl)
+          end do
+        end do
+      end do
+!$omp end do nowait
+!
+      end subroutine subtract_sph_ave_coriolis_prt
+!
+! -----------------------------------------------------------------------
 !
       end module t_const_wz_coriolis_rtp

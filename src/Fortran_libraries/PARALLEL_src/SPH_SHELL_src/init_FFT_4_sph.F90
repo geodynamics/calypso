@@ -25,6 +25,7 @@
       use calypso_mpi
       use m_work_time
       use m_machine_parameter
+      use m_FFT_selector
 !
       use t_spheric_parameter
       use t_sph_trans_comm_tbl
@@ -33,8 +34,26 @@
 !
       implicit none
 !
+#ifdef FFTW3
+      integer(kind = kint), parameter :: num_test =   6
+#else
+      integer(kind = kint), parameter :: num_test =   3
+#endif
+!
+      integer(kind = kint), parameter :: list_test(num_test)            &
+     &        = (/iflag_FFTPACK,                                        &
+#ifdef FFTW3
+     &            iflag_FFTW_SINGLE,                                    &
+     &            iflag_FFTW,                                           &
+     &            iflag_FFTW_COMPONENT,                                 &
+#endif
+     &            iflag_ISPACK1,                                        &
+     &            iflag_ISPACK3/)
+!
       real(kind = kreal) :: etime_shortest = -1.0e10
       integer(kind = kint) :: iflag_selected
+!
+      private :: num_test, list_test
 !
       private :: etime_shortest, iflag_selected
       private :: s_select_fourier_transform, test_fourier_trans_vector
@@ -65,23 +84,11 @@
       end if
 !
       call init_sph_FFT_select                                          &
-     &   (my_rank, iflag_FFT, sph_rtp, ncomp, ncomp, WK_FFTs)
+     &   (my_rank, iflag_FFT, sph_rtp, comm_rtp, ncomp, ncomp, WK_FFTs)
 !
       if(my_rank .gt. 0) return
-      write(*,'(a,i4)', advance='no') 'Selected Fourier transform: ',   &
-     &                          iflag_FFT
-!
-      if     (iflag_FFT .eq. iflag_FFTPACK) then
-        write(*,'(a)') ' (FFTPACK) '
-      else if(iflag_FFT .eq. iflag_FFTW) then
-        write(*,'(a)') ' (FFTW) '
-      else if(iflag_FFT .eq. iflag_ISPACK1) then
-        write(*,'(a)') ' (ISPACK) '
-      else if(iflag_FFT .eq. iflag_ISPACK3) then
-        write(*,'(a)') ' (ISPACK3) '
-      else if(iflag_FFT .eq. iflag_FFTW_SINGLE) then
-        write(*,'(a)') ' (FFTW_SINGLE) '
-      end if
+      write(*,'(a,a,a,i3,a)') 'Selected Fourier transform: ',           &
+     &         trim(chosen_fft_name(iflag_FFT)), ' (', iflag_FFT, ')'
 !
       end subroutine init_fourier_transform_4_sph
 !
@@ -99,59 +106,28 @@
       type(work_for_FFTs), intent(inout) :: WK_FFTs
 !
       real(kind = kreal), allocatable :: X_rtp(:)
-      real(kind = kreal) :: etime_fft(5)
+      real(kind = kreal) :: etime_fft(num_test)
+      integer(kind = kint) :: i
 !
 !
       allocate(X_rtp(ncomp*sph_rtp%nnod_rtp))
       X_rtp = 0.0d0
 !
-      call test_fourier_trans_vector                                   &
-     &   (iflag_FFTPACK, ncomp, sph_rtp, comm_rtp,                     &
-     &    n_WS, n_WR, WS, WR, X_rtp, WK_FFTs, etime_fft(iflag_FFTPACK))
-!
-!
-#ifdef FFTW3
-      call test_fourier_trans_vector                                   &
-     &   (iflag_FFTW, ncomp, sph_rtp, comm_rtp,                        &
-     &    n_WS, n_WR, WS, WR, X_rtp, WK_FFTs, etime_fft(iflag_FFTW))
-!
-      call test_fourier_trans_vector                                   &
-     &   (iflag_FFTW_SINGLE, ncomp, sph_rtp, comm_rtp,                 &
-     &    n_WS, n_WR, WS, WR, X_rtp, WK_FFTs,                          &
-     &    etime_fft(iflag_FFTW_SINGLE))
-#endif
-!
-      call test_fourier_trans_vector                                   &
-     &    (iflag_ISPACK1, ncomp, sph_rtp, comm_rtp,                    &
-     &     n_WS, n_WR, WS, WR, X_rtp, WK_FFTs,                         &
-     &     etime_fft(iflag_ISPACK1))
-      call test_fourier_trans_vector                                   &
-     &    (iflag_ISPACK3, ncomp, sph_rtp, comm_rtp,                    &
-     &     n_WS, n_WR, WS, WR, X_rtp, WK_FFTs,                         &
-     &     etime_fft(iflag_ISPACK3))
+      do i = 1, num_test
+        call test_fourier_trans_vector                                 &
+     &   (list_test(i), ncomp, sph_rtp, comm_rtp,                      &
+     &    n_WS, n_WR, WS, WR, X_rtp, WK_FFTs, etime_fft(i))
+      end do
       deallocate(X_rtp)
 !
-      iflag_selected = minloc(etime_fft,1)
+      i = minloc(etime_fft,1)
+      iflag_selected = list_test(i)
       etime_shortest = minval(etime_fft)
 !
       if(my_rank .gt. 0) return
-        write(*,*)   '1: elapsed by FFTPACK: ',                         &
-     &            etime_fft(iflag_FFTPACK)
-        if(etime_fft(iflag_FFTW) .gt. zero) then
-          write(*,*) '2: elapsed by FFTW3:   ', etime_fft(iflag_FFTW)
-        end if
-        if(etime_fft(iflag_FFTW_SINGLE) .gt. zero) then
-          write(*,*) '3: elapsed by single FFTW3:   ',                  &
-     &            etime_fft(iflag_FFTW_SINGLE)
-        end if
-        if(etime_fft(iflag_ISPACK1) .gt. zero) then
-          write(*,*) '4: elapsed by ISPACK V0.93:         ',            &
-     &            etime_fft(iflag_ISPACK1)
-        end if
-        if(etime_fft(iflag_ISPACK3) .gt. zero) then
-          write(*,*) '4: elapsed by ISPACK V3.0.1:         ',           &
-     &            etime_fft(iflag_ISPACK3)
-        end if
+      do i = 1, num_test
+        call write_elapsed_4_FFT(list_test(i), etime_fft(i))
+      end do
 !
       end subroutine s_select_fourier_transform
 !
@@ -181,7 +157,7 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'init_sph_FFT_select'
       call init_sph_FFT_select                                          &
-     &   (my_rank, iflag_FFT, sph_rtp, ncomp, ncomp, WK_FFTs)
+     &   (my_rank, iflag_FFT, sph_rtp, comm_rtp, ncomp, ncomp, WK_FFTs)
 !
       if(iflag_debug .gt. 0) write(*,*) 'back_FFT_select_from_recv'
       starttime = MPI_WTIME()
@@ -192,7 +168,7 @@
       endtime = MPI_WTIME() - starttime
 !
       if(iflag_debug .gt. 0) write(*,*) 'finalize_sph_FFT_select'
-      call finalize_sph_FFT_select(WK_FFTs)
+      call finalize_sph_FFT_select(sph_rtp, WK_FFTs)
 !
       call calypso_mpi_allreduce_one_real(endtime, etime_fft, MPI_SUM)
       etime_fft = etime_fft / dble(nprocs)

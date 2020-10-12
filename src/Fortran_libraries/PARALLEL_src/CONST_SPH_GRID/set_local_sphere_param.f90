@@ -10,6 +10,7 @@
 !!
 !!@verbatim
 !!      subroutine set_global_sph_rtp_id(s3d_ranks, stk_lc1d, sph_rtp)
+!!      subroutine set_global_sph_prt_id(s3d_ranks, stk_lc1d, sph_rtp)
 !!        type(spheric_global_rank), intent(in) :: s3d_ranks
 !!        type(sph_1d_index_stack), intent(in) :: stk_lc1d
 !!        type(sph_rtp_grid), intent(inout) :: sph_rtp
@@ -80,6 +81,45 @@
 !
       end subroutine set_global_sph_rtp_id
 !
+! -----------------------------------------------------------------------
+!
+      subroutine set_global_sph_prt_id(s3d_ranks, stk_lc1d, sph_rtp)
+!
+      use t_spheric_rtp_data
+!
+      type(spheric_global_rank), intent(in) :: s3d_ranks
+      type(sph_1d_index_stack), intent(in) :: stk_lc1d
+      type(sph_rtp_grid), intent(inout) :: sph_rtp
+!
+      integer(kind = kint) :: inod, k, l, m
+      integer(kind = kint) :: k_gl, l_gl, m_gl
+      integer(kind = kint) :: ndom_r, ndom_t, nsize_r, nsize_t
+!
+!
+      ndom_r = s3d_ranks%ndomain_rtp(1)
+      ndom_t = s3d_ranks%ndomain_rtp(2)
+      nsize_r = stk_lc1d%istack_idx_local_rtp_r(ndom_r)
+      nsize_t = stk_lc1d%istack_idx_local_rtp_t(ndom_t)
+!
+      inod = 0
+      do l = 1, sph_rtp%nidx_rtp(2)
+        l_gl = sph_rtp%idx_gl_1d_rtp_t(l)
+        do k = 1, sph_rtp%nidx_rtp(1)
+          k_gl = sph_rtp%idx_gl_1d_rtp_r(k)
+          do m = 1, sph_rtp%nidx_rtp(3)
+            m_gl = sph_rtp%idx_gl_1d_rtp_p(m,1)
+!
+            inod = inod + 1
+            sph_rtp%idx_global_rtp(inod,1) = k_gl
+            sph_rtp%idx_global_rtp(inod,2) = l_gl
+            sph_rtp%idx_global_rtp(inod,3) = m_gl
+          end do
+        end do
+      end do
+!
+      end subroutine set_global_sph_prt_id
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine set_global_sph_rj_id(s3d_ranks, stk_lc1d, sph_rj)
