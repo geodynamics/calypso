@@ -385,7 +385,7 @@
 #endif
       else
         if(sph_rtp%istep_rtp(3) .eq. 1) then
-          call rtp_RFFTMF_to_send(sph_rtp, comm_rtp, ncomp_fwd, n_WS,   &
+          call prt_RFFTMF_to_send(sph_rtp, comm_rtp, ncomp_fwd, n_WS,   &
      &        v_rtp(1,1), WS(1), WK_FFTs%sph_FFTPACK)
         else
           call rtp_RFFTMF_to_send(sph_rtp, comm_rtp, ncomp_fwd, n_WS,   &

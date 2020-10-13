@@ -161,7 +161,9 @@
      &          trns_MHD, WK_leg, WK_FFTs_MHD, trans_p, gt_cor,         &
      &          cor_rlm, rj_fld)
 !
+      use m_legendre_transform_list
       use test_legendre_transforms
+      use skip_comment_f
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
@@ -182,6 +184,8 @@
       type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
       type(phys_data), intent(inout) :: rj_fld
 !
+      character(len=kchara) :: tmpchara
+!
 !
       if (iflag_debug.eq.1) write(*,*) 's_test_legendre_transforms'
       call s_test_legendre_transforms(sph, comms_sph, MHD_prop%fl_prop, &
@@ -195,7 +199,11 @@
      &    trans_p%leg, trans_p%idx_trns, WK_leg)
 !
       if(my_rank .ne. 0) return
-      call display_selected_legendre_mode(WK_leg%id_legendre)
+      tmpchara = chosen_legendre_name(WK_leg%id_legendre)
+      call change_2_upper_case(tmpchara)
+      write(*,'(a,i4)', advance='no')                                   &
+     &       'Selected Legendre transform type: ', WK_leg%id_legendre
+      write(*,'(a,a,a)') ' (', trim(tmpchara), ') '
 !
       end subroutine sel_sph_transform_MHD
 !

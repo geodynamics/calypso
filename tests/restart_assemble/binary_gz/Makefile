@@ -24,7 +24,7 @@ MPILIBS =
 all: test
 
 test: 
-	rm -f *.dat
+	rm -f *.dat restart/rst.*
 	$(MPIRUN) -np 6 $(BUILDDIR)/assemble_sph
 	$(MPIRUN) -np 6 $(BUILDDIR)/tests/compare_sph_restart
 

@@ -12,7 +12,7 @@ begin assemble_control
   begin new_data_files_def
     num_subdomain_ctl           3
     restart_file_prefix         'restart/rst'
-    restart_file_fmt_ctl        'merged_bin'
+    restart_file_fmt_ctl        'binary'
   end new_data_files_def
 !
   begin new_spherical_shell_ctl

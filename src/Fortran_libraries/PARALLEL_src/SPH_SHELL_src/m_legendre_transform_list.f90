@@ -7,10 +7,12 @@
 !
 !>@brief  Legendre transform selector
 !!
-!!
 !!@verbatim
-!!      subroutine set_legendre_trans_mode_ctl(tranx_loop_ctl)
-!!      subroutine display_selected_legendre_mode(id_legendre)
+!!      integer(kind = kint) function                                   &
+!!     &                    set_legendre_trans_mode_ctl(tranx_loop_ctl)
+!!      character(len = kchara) function chosen_legendre_name(i_mode)
+!!      subroutine write_elapsed_4_legendre                             &
+!!     &         (i_mode, etime_max, etime_trans)
 !!@endverbatim
 !!
 !!@param   ncomp    Total number of components for spherical transform
@@ -30,27 +32,27 @@
 !>      Character flag to perform Legendre transform 
 !@n     using original array order
       character(len = kchara), parameter                                &
-     &           :: leg_orginal_loop = 'original_loop'
+     &           :: leg_orginal_loop = 'Original_loop'
 !>      Character flag to perform Legendre transform 
 !@n     using blocked loop
       character(len = kchara), parameter                                &
-     &           :: leg_blocked_loop = 'blocked_loop'
+     &           :: leg_blocked_loop = 'Blocked_loop'
 !>      Character flag to perform Legendre transform 
 !!@n    using longer loop for original array order 
       character(len = kchara), parameter                                &
-     &           :: leg_krloop_inner = 'inner_radial_loop'
+     &           :: leg_krloop_inner = 'Inner_radial_loop'
 !>      Character flag to perform Legendre transform 
 !@n     with inneromst Legendre polynomial loop
       character(len = kchara), parameter                                &
-     &           :: leg_krloop_outer = 'outer_radial_loop'
+     &           :: leg_krloop_outer = 'Outer_radial_loop'
 !>      Character flag to perform Legendre transform 
 !@n     with symmetry
       character(len = kchara), parameter                                &
-     &           :: leg_sym_org_loop =   'symmetric_original_loop'
+     &           :: leg_sym_org_loop =   'Symmetric_original_loop'
 !>      Character flag to perform Legendre transform 
 !@n     with inneromst Legendre polynomial loop
       character(len = kchara), parameter                                &
-     &           :: leg_sym_spin_loop = 'symmetric_outer_radial_loop'
+     &           :: leg_sym_spin_loop = 'Symmetric_outer_radial_loop'
 !
 !>      Character flag to perform Legendre transform 
 !@n     with mutmul function
@@ -63,43 +65,38 @@
 !>      Character flag to perform Legendre transform 
 !@n     with self matrix product
       character(len = kchara), parameter                                &
-     &           :: leg_matprod = 'matproduct'
+     &           :: leg_matprod = 'Matproduct'
 !
 !>      Chalacter flag to perform Legendre transform 
 !@n     with symmetry and mutmul function
       character(len = kchara), parameter                                &
-     &           :: leg_sym_matmul =  'symmetric_matmul'
+     &           :: leg_sym_matmul =  'Symmetric_matmul'
 !>      Character flag to perform Legendre transform 
 !@n     with symmetry and dgemm in BLAS
       character(len = kchara), parameter                                &
-     &           :: leg_sym_dgemm =   'symmetric_BLAS'
+     &           :: leg_sym_dgemm =   'Symmetric_BLAS'
 !>      Character flag to perform Legendre transform 
 !@n     with symmetry and  self matrix product
       character(len = kchara), parameter                                &
-     &           :: leg_sym_matprod = 'symmetric_matproduct'
+     &           :: leg_sym_matprod = 'Symmetric_matproduct'
 !
 !>      Chalacter flag to perform Legendre transform 
 !@n     with symmetry and mutmul function
       character(len = kchara), parameter                                &
-     &           :: leg_sym_matmul_big =  'symmetric_matmul_big'
+     &           :: leg_sym_matmul_big =  'Symmetric_matmul_big'
 !>      Character flag to perform Legendre transform 
 !@n     with symmetry and dgemm in BLAS
       character(len = kchara), parameter                                &
-     &           :: leg_sym_dgemm_big =   'symmetric_BLAS_big'
+     &           :: leg_sym_dgemm_big =   'Symmetric_BLAS_big'
 !>      Character flag to perform Legendre transform 
 !@n     with symmetry and  self matrix product
       character(len = kchara), parameter                                &
-     &           :: leg_sym_matprod_big = 'symmetric_matproduct_big'
-!
-!>      Character flag to perform Legendre transform 
-!@n     with testing loop
-      character(len = kchara), parameter                                &
-     &           :: leg_test_loop =    'test_loop'
+     &           :: leg_sym_matprod_big = 'Symmetric_matproduct_big'
 !
 !>      Chalacter flag to perform Legendre transform 
 !@n     with symmetry and mutmul function
       character(len = kchara), parameter                                &
-     &           :: leg_sym_mat_jt =  'Pjt_matmul_theta_OMP'
+     &           :: leg_sym_mat_jt =     'Pjt_matmul_theta_OMP'
 !>      Character flag to perform Legendre transform 
 !@n     with symmetry and dgemm in BLAS
       character(len = kchara), parameter                                &
@@ -126,6 +123,13 @@
 !@n     with symmetry and on-the-fly Legendre polynomial
       character(len = kchara), parameter                                &
      &           :: on_the_fly_matprod =  'On_the_fly_Plm'
+!
+!>      Character flag to perform Legendre transform 
+!@n     with testing loop
+      character(len = kchara), parameter                                &
+     &           :: leg_test_loop =      'Test_Loop'
+!
+!
 !
 !>      integer flag to run elpse time check for legendre transform
       integer(kind = kint), parameter :: iflag_leg_undefined =    -1
@@ -180,8 +184,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer(kind = kint) function set_legendre_trans_mode_ctl         &
-     &                            (tranx_loop_ctl)
+      integer(kind = kint) function                                     &
+     &                    set_legendre_trans_mode_ctl(tranx_loop_ctl)
 !
       use skip_comment_f
 !
@@ -190,6 +194,7 @@
 !
       if(     cmp_no_case(tranx_loop_ctl, leg_test_loop)) then
         set_legendre_trans_mode_ctl = iflag_leg_test_loop
+!
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_org_loop)) then
         set_legendre_trans_mode_ctl = iflag_leg_symmetry
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_spin_loop)) then
@@ -230,58 +235,111 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine display_selected_legendre_mode(id_legendre)
+      character(len = kchara) function chosen_legendre_name(i_mode)
 !
-      use skip_comment_f
-!
-      integer(kind = kint), intent(in) :: id_legendre
+      integer(kind = kint), intent(in) :: i_mode
 !
       character(len=kchara) :: tmpchara
 !
+      if     (i_mode .eq. iflag_leg_symmetry) then
+        chosen_legendre_name = leg_sym_org_loop
+      else if(i_mode .eq. iflag_leg_sym_spin_loop) then
+        chosen_legendre_name = leg_sym_spin_loop
 !
-      if(id_legendre .eq. iflag_leg_symmetry) then
-        write(tmpchara,'(a)') trim(leg_sym_org_loop)
-       else if(id_legendre .eq. iflag_leg_sym_spin_loop) then
-        write(tmpchara,'(a)') trim(leg_sym_spin_loop)
+      else if(i_mode .eq. iflag_leg_sym_matmul) then
+        chosen_legendre_name = leg_sym_matmul
+      else if(i_mode .eq. iflag_leg_sym_dgemm) then
+        chosen_legendre_name = leg_sym_dgemm
 !
-      else if(id_legendre .eq. iflag_leg_sym_matmul) then
-        write(tmpchara,'(a)') trim(leg_sym_matmul)
-      else if(id_legendre .eq. iflag_leg_sym_dgemm) then
-        write(tmpchara,'(a)') trim(leg_sym_dgemm)
+      else if(i_mode .eq. iflag_leg_sym_matmul_big) then
+        chosen_legendre_name = leg_sym_matmul_big
+      else if(i_mode .eq. iflag_leg_sym_dgemm_big) then
+        chosen_legendre_name = leg_sym_dgemm_big
 !
-      else if(id_legendre .eq. iflag_leg_sym_matmul_big) then
-        write(tmpchara,'(a)') trim(leg_sym_matmul_big)
-      else if(id_legendre .eq. iflag_leg_sym_dgemm_big) then
-        write(tmpchara,'(a)') trim(leg_sym_dgemm_big)
+      else if(i_mode .eq. iflag_leg_sym_mat_jt) then
+        chosen_legendre_name = leg_sym_mat_jt
+      else if(i_mode .eq. iflag_leg_sym_dgemm_jt) then
+        chosen_legendre_name = leg_sym_dgemm_jt
 !
-      else if(id_legendre .eq. iflag_leg_sym_mat_jt) then
-        write(tmpchara,'(a)') trim(leg_sym_mat_jt)
-      else if(id_legendre .eq. iflag_leg_sym_dgemm_jt) then
-        write(tmpchara,'(a)') trim(leg_sym_dgemm_jt)
+      else if(i_mode .eq. iflag_leg_sym_mat_tj) then
+        chosen_legendre_name = leg_sym_mat_tj
+      else if(i_mode .eq. iflag_leg_sym_dgemm_tj) then
+        chosen_legendre_name = leg_dgemm_tj
 !
-      else if(id_legendre .eq. iflag_leg_sym_mat_tj) then
-        write(tmpchara,'(a)') trim(leg_sym_mat_tj)
-      else if(id_legendre .eq. iflag_leg_sym_dgemm_tj) then
-        write(tmpchara,'(a)') trim(leg_dgemm_tj)
+      else if(i_mode .eq. iflag_on_the_fly_matmul) then
+        chosen_legendre_name = on_the_fly_matmul
+      else if(i_mode .eq. iflag_on_the_fly_dgemm) then
+        chosen_legendre_name = on_the_fly_dgemm
+      else if(i_mode .eq. iflag_on_the_fly_matprod) then
+        chosen_legendre_name = on_the_fly_matprod
 !
-      else if(id_legendre .eq. iflag_on_the_fly_matmul) then
-        write(tmpchara,'(a)') trim(on_the_fly_matmul)
-      else if(id_legendre .eq. iflag_on_the_fly_dgemm) then
-        write(tmpchara,'(a)') trim(on_the_fly_dgemm)
-      else if(id_legendre .eq. iflag_on_the_fly_matprod) then
-        write(tmpchara,'(a)') trim(on_the_fly_matprod)
-!
-      else if(id_legendre .eq. iflag_leg_test_loop) then
-        write(tmpchara,'(a)') trim(leg_test_loop)
+      else if(i_mode .eq. iflag_leg_test_loop) then
+        chosen_legendre_name = leg_test_loop
       end if
-      call change_2_upper_case(tmpchara)
 !
-      write(*,'(a,i4)', advance='no')                                 &
-     &       'Selected id_legendre_transfer: ', id_legendre
-      write(*,'(a,a,a)') ' (', trim(tmpchara), ') '
+      end function chosen_legendre_name
 !
-      end subroutine display_selected_legendre_mode
+! ------------------------------------------------------------------
 !
-! -----------------------------------------------------------------------
+      subroutine write_elapsed_4_legendre                               &
+     &         (i_mode, etime_max, etime_trans)
+!
+      integer(kind = kint), intent(in) :: i_mode
+      real(kind = kreal), intent(in) :: etime_max, etime_trans
+!
+!
+      if     (i_mode .eq. iflag_leg_symmetry) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by original loop with symmetric    '
+      else if(i_mode .eq. iflag_leg_sym_spin_loop) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by sym. outer radius               '
+!
+      else if(i_mode .eq. iflag_leg_sym_matmul) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by using matmul with radial SMP    '
+      else if(i_mode .eq. iflag_leg_sym_dgemm) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by using BLAS with radial SMP      '
+!
+      else if(i_mode .eq. iflag_leg_sym_matmul_big) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by big matmul with radial SMP      '
+      else if(i_mode .eq. iflag_leg_sym_dgemm_big) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by big BLAS with radial SMP        '
+!
+      else if(i_mode .eq. iflag_leg_sym_mat_jt) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by matmul for Pjt with theta SMP   '
+      else if(i_mode .eq. iflag_leg_sym_dgemm_jt) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by BLAS for Pjt with theta SMP     '
+!
+      else if(i_mode .eq. iflag_leg_sym_mat_tj) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by matmul for Ptj with theta SMP   '
+      else if(i_mode .eq. iflag_leg_sym_dgemm_tj) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by BLAS for Ptj with theta SMP     '
+!
+      else if(i_mode .eq. iflag_on_the_fly_matmul) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by matmul with on-the-fly Plm      '
+      else if(i_mode .eq. iflag_on_the_fly_dgemm) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by BLAS with on-the-fly Plm        '
+      else if(i_mode .eq. iflag_on_the_fly_matprod) then
+          write(*,'(i3,a)', advance='NO') i_mode,                       &
+     &          ': elapsed by simple loop with on-the-fly Plm '
+      end if
+!
+      write(*,'(a1,a,a4,1p2e16.6)')                                     &
+     &       '(', trim(chosen_legendre_name(i_mode)), '):  ',           &
+     &       etime_max, etime_trans
+!
+      end subroutine write_elapsed_4_legendre
+!
+! ------------------------------------------------------------------
 !
       end module m_legendre_transform_list

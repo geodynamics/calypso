@@ -139,8 +139,8 @@
       end if
 !
       if(mevo_ctl%FFT_library%iflag .gt. 0) then
-        call set_fft_library_ctl                                        &
-     &     (mevo_ctl%FFT_library%charavalue, trans_p%iflag_FFT)
+        trans_p%iflag_FFT                                               &
+     &     = set_fft_library_ctl(mevo_ctl%FFT_library%charavalue)
       end if
       if(mevo_ctl%import_mode%iflag .gt. 0) then
         call set_import_table_ctl                                       &

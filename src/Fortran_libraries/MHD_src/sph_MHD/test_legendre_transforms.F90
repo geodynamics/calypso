@@ -68,7 +68,6 @@
      &            iflag_on_the_fly_matprod/)
 !
       private :: num_test, list_test
-      private :: write_time_4_transform
 !
 !-----------------------------------------------------------------------
 !
@@ -104,22 +103,20 @@
       type(phys_data), intent(inout) :: rj_fld
 !
       real(kind = kreal) :: starttime, etime_shortest
-      real(kind = kreal) :: endtime(maxindex_Leg_trans_loop)
-      real(kind = kreal) :: etime_trans(maxindex_Leg_trans_loop)
-      real(kind = kreal) :: etime_max(maxindex_Leg_trans_loop)
+      real(kind = kreal) :: endtime(num_test)
+      real(kind = kreal) :: etime_trans(num_test)
+      real(kind = kreal) :: etime_max(num_test)
 !
-      integer(kind = kint) :: id, iloop_type
+      integer(kind = kint) :: id
 !
 !
       if(WK_leg%id_legendre .ne. iflag_leg_undefined) return
 !
-      endtime(1:maxindex_Leg_trans_loop) =     zero
-      etime_trans(1:maxindex_Leg_trans_loop) = zero
-      etime_max(1:maxindex_Leg_trans_loop) =   zero
-      do iloop_type = 1, num_test
-        WK_leg%id_legendre = list_test(iloop_type)
-        if(my_rank .eq. 0) write(*,*)                                   &
-     &            'Test SPH transform for ', WK_leg%id_legendre
+      endtime(1:num_test) =     zero
+      do id = 1, num_test
+        WK_leg%id_legendre = list_test(id)
+        if(my_rank .eq. 0) write(*,*) 'Test SPH transform for ',        &
+     &             trim(chosen_legendre_name(WK_leg%id_legendre))
         call sel_init_legendre_trans                                    &
      &     (ncomp_max_trans, nvector_max_trans, nscalar_max_trans,      &
      &      sph%sph_params, sph%sph_rtm, sph%sph_rlm,                   &
@@ -132,125 +129,35 @@
         call sph_forward_trans_4_MHD(sph, comms_sph, fl_prop,           &
      &      trans_p, cor_rlm, trns_MHD%f_trns, trns_MHD%forward,        &
      &      WK_leg, WK_FFTs_MHD, rj_fld)
-        endtime(WK_leg%id_legendre) = MPI_WTIME() - starttime
+        endtime(id) = MPI_WTIME() - starttime
 !
         call sel_finalize_legendre_trans(WK_leg)
       end do
 !
+      etime_trans(1:num_test) = zero
+      etime_max(1:num_test) =   zero
       call calypso_mpi_allreduce_real(endtime, etime_trans,             &
-     &    cast_long(maxindex_Leg_trans_loop), MPI_SUM)
+     &    cast_long(num_test), MPI_SUM)
       call calypso_mpi_allreduce_real(endtime, etime_max,               &
-     &    cast_long(maxindex_Leg_trans_loop), MPI_SUM)
-      etime_trans(1:maxindex_Leg_trans_loop)                            &
-     &      = etime_trans(1:maxindex_Leg_trans_loop) / dble(nprocs)
+     &    cast_long(num_test), MPI_SUM)
+      etime_trans(1:num_test) = etime_trans(1:num_test) / dble(nprocs)
 !
       etime_shortest =  1.0d30
-      do iloop_type = 1, num_test
-        id = list_test(iloop_type)
+      do id = 1, num_test
         if(etime_max(id) .lt. etime_shortest) then
-          WK_leg%id_legendre = id
-          etime_shortest =       etime_max(id)
+          WK_leg%id_legendre = list_test(id)
+          etime_shortest =     etime_max(id)
         end if
       end do
 !
       if(my_rank .gt. 0) return
-      call write_time_4_transform(etime_trans, etime_max)
+      write(*,'(a)') 'Loop ID: type, maximum time, average time'
+      do id = 1, num_test
+        call write_elapsed_4_legendre                                   &
+     &     (list_test(id), etime_max(id), etime_trans(id))
+      end do
 !
       end subroutine s_test_legendre_transforms
-!
-!-----------------------------------------------------------------------
-!
-      subroutine write_time_4_transform(etime_trans, etime_max)
-!
-      real(kind = kreal), intent(in)                                    &
-     &                   :: etime_trans(maxindex_Leg_trans_loop)
-      real(kind = kreal), intent(in)                                    &
-     &                   :: etime_max(maxindex_Leg_trans_loop)
-!
-!
-        write(*,'(a)') 'Loop ID: type, maximum time, average time'
-        if(etime_trans(iflag_leg_symmetry) .gt. zero) then
-          write(*,'(i3,a)') iflag_leg_symmetry,                         &
-     &          ': elapsed by original loop with symmetric'
-          write(*,'(2a,1p2e16.6)') trim(leg_sym_org_loop),  ':  ',      &
-     &            etime_max(iflag_leg_symmetry),                        &
-     &            etime_trans(iflag_leg_symmetry)
-        end if
-!
-        if(etime_trans(iflag_leg_sym_spin_loop) .gt. zero) then
-          write(*,'(i3,a)') iflag_leg_sym_spin_loop,                    &
-     &            ': elapsed by sym. outer radius'
-          write(*,'(2a,1p2e16.6)') trim(leg_sym_spin_loop),  ':  ',     &
-     &            etime_max(iflag_leg_sym_spin_loop),                   &
-     &            etime_trans(iflag_leg_sym_spin_loop)
-        end if
-!
-        if(etime_trans(iflag_leg_sym_matmul) .gt. zero) then
-          write(*,'(i3,a)') iflag_leg_sym_matmul,                       &
-     &          ': elapsed by using matmul with radial SMP'
-          write(*,'(2a,1p2e16.6)') trim(leg_sym_matmul),  ':  ',        &
-     &            etime_max(iflag_leg_sym_matmul),                      &
-     &            etime_trans(iflag_leg_sym_matmul)
-        end if
-!
-        if(etime_trans(iflag_leg_sym_matmul_big) .gt. zero) then
-          write(*,'(i3,a)') iflag_leg_sym_matmul_big,                   &
-     &          ': elapsed by big matmul with radial SMP'
-          write(*,'(2a,1p2e16.6)') trim(leg_sym_matmul_big),  ':  ',    &
-     &            etime_max(iflag_leg_sym_matmul_big),                  &
-     &            etime_trans(iflag_leg_sym_matmul_big)
-        end if
-!
-        if(etime_trans(iflag_leg_sym_dgemm_big) .gt. zero) then
-          write(*,'(i3,a)') iflag_leg_sym_dgemm_big,                    &
-     &          ': elapsed by big BLAS with radial SMP'
-          write(*,'(2a,1p2e16.6)') trim(leg_sym_dgemm_big),  ':  ',     &
-     &            etime_max(iflag_leg_sym_dgemm_big),                   &
-     &            etime_trans(iflag_leg_sym_dgemm_big)
-        end if
-!
-        if(etime_trans(iflag_leg_sym_mat_tj) .gt. zero) then
-          write(*,'(i3,a)') iflag_leg_sym_mat_tj,                       &
-     &          ': elapsed by matmul for Ptj with theta SMP'
-          write(*,'(2a,1p2e16.6)') trim(leg_sym_mat_tj),  ':  ',        &
-     &            etime_max(iflag_leg_sym_mat_tj),                      &
-     &            etime_trans(iflag_leg_sym_mat_tj)
-        end if
-!
-        if(etime_trans(iflag_leg_sym_dgemm_tj) .gt. zero) then
-          write(*,'(i3,a)') iflag_leg_sym_dgemm_tj,                     &
-     &          ': elapsed by BLAS for Ptj with theta SMP'
-          write(*,'(2a,1p2e16.6)') trim(leg_dgemm_tj),  ':  ',          &
-     &            etime_max(iflag_leg_sym_dgemm_tj),                    &
-     &            etime_trans(iflag_leg_sym_dgemm_tj)
-        end if
-!
-!
-        if(etime_trans(iflag_on_the_fly_matmul) .gt. zero) then
-          write(*,'(i3,a)') iflag_on_the_fly_matmul,                    &
-     &          ': elapsed by matmul with on-the-fly Plm'
-          write(*,'(2a,1p2e16.6)') trim(leg_dgemm_tj),  ':  ',          &
-     &            etime_max(iflag_on_the_fly_matmul),                   &
-     &            etime_trans(iflag_on_the_fly_matmul)
-        end if
-!
-        if(etime_trans(iflag_on_the_fly_dgemm) .gt. zero) then
-          write(*,'(i3,a)') iflag_on_the_fly_dgemm,                     &
-     &          ': elapsed by BLAS with on-the-fly Plm'
-          write(*,'(2a,1p2e16.6)') trim(leg_dgemm_tj),  ':  ',          &
-     &            etime_max(iflag_on_the_fly_dgemm),                    &
-     &            etime_trans(iflag_on_the_fly_dgemm)
-        end if
-!
-        if(etime_trans(iflag_on_the_fly_matprod) .gt. zero) then
-          write(*,'(i3,a)') iflag_on_the_fly_matprod,                   &
-     &          ': elapsed by simple loop with on-the-fly Plm'
-          write(*,'(2a,1p2e16.6)') trim(leg_dgemm_tj),  ':  ',          &
-     &            etime_max(iflag_on_the_fly_matprod),                  &
-     &            etime_trans(iflag_on_the_fly_matprod)
-        end if
-!
-      end subroutine write_time_4_transform
 !
 !-----------------------------------------------------------------------
 !
