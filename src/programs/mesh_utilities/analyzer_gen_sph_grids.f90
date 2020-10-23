@@ -34,33 +34,29 @@
 !
       implicit none
 !
-      character (len = kchara)                                          &
+      character (len = kchara), private, parameter                      &
      &         :: control_file_name = 'control_sph_shell'
 !
 !
 !>      Structure for file settings
-      type(sph_mesh_generation_ctl), save :: SPH_MAKE_ctl
+      type(sph_mesh_generation_ctl), save, private :: SPH_MAKE_ctl
 !
 !>       Structure of grid and spectr data for spherical spectr method
-      type(sph_grids), save :: sph_const
+      type(sph_grids), save, private :: sph_const
 !>       Structure of communication table for spherical spectr method
-      type(sph_comm_tables), save :: comms_sph_const
+      type(sph_comm_tables), save, private :: comms_sph_const
 !>       Structure of group data for spherical spectr method
-      type(sph_group_data), save :: sph_grp_const
+      type(sph_group_data), save, private :: sph_grp_const
 !>      Structure of mesh file name and formats
       type(gen_sph_file_IO_params), save ::  sph_files1
 !
 !>      Structure to check and construct spherical shell mesh
       type(sph_grid_maker_in_sim), save :: sph_maker_G
 !
-      type(sph_comm_tables), save, private :: comms_sph
-      type(sph_group_data), save, private ::  sph_grps
+!>      Structure of FEM mesh
       type(mesh_data), save, private :: geofem
 !
       type(parallel_make_vierwer_mesh), save, private :: para_v1
-!
-      private :: control_file_name
-      private :: sph_const, SPH_MAKE_ctl
 !
 ! ----------------------------------------------------------------------
 !
@@ -159,7 +155,7 @@
       if(iflag_debug .gt. 0) write(*,*) 'const_FEM_mesh_4_SPH'
       call const_FEM_mesh_4_SPH                                         &
      &   (sph_files1%FEM_mesh_flags, sph_files1%sph_file_param,         &
-     &    sph_const, comms_sph, sph_grps,                               &
+     &    sph_const, comms_sph_const, sph_grp_const,                    &
      &    geofem, sph_files1%mesh_file_IO, sph_maker_G)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+3)
       call calypso_MPI_barrier

@@ -106,7 +106,7 @@
      &           :: coriolis_rtp(sph_rtp%nnod_rtp,3)
       type(spher_average_coriolis), intent(inout) :: ave_cor
 !
-      integer(kind = kint) :: mphi, l_rtp, kr, k_gl, inod
+      integer(kind = kint) :: kr, inod
       integer(kind = kint_gl) :: num64
 !
 !

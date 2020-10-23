@@ -147,9 +147,7 @@
       character(len = kchara), intent(in) :: FFT_library_ctl
 !
 !
-      if     (cmp_no_case(FFT_library_ctl, hd_FFTPACK)) then
-        set_fft_library_ctl = iflag_FFTPACK
-      else if(cmp_no_case(FFT_library_ctl, hd_FFTPACK_S)) then
+      if(cmp_no_case(FFT_library_ctl, hd_FFTPACK_S)) then
         set_fft_library_ctl = iflag_FFTPACK_SINGLE
       else if(cmp_no_case(FFT_library_ctl, hd_FFTPACK_C)) then
         set_fft_library_ctl = iflag_FFTPACK_COMPONENT
@@ -193,6 +191,10 @@
 !
       else if(cmp_no_case(FFT_library_ctl, hd_FFT_TEST)) then
         set_fft_library_ctl = iflag_FFT_TEST
+!
+!      if     (cmp_no_case(FFT_library_ctl, hd_FFTPACK)) then
+      else
+        set_fft_library_ctl = iflag_FFTPACK
       end if
 !
       end function set_fft_library_ctl

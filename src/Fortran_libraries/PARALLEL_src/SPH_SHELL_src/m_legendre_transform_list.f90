@@ -239,7 +239,6 @@
 !
       integer(kind = kint), intent(in) :: i_mode
 !
-      character(len=kchara) :: tmpchara
 !
       if     (i_mode .eq. iflag_leg_symmetry) then
         chosen_legendre_name = leg_sym_org_loop

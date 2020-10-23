@@ -7,9 +7,8 @@
 !> @brief Output merged binary field file using MPI-IO
 !!
 !!@verbatim
-!!      subroutine gz_write_field_head_mpi_b                            &
-!!     &         (IO_param_l, i_time_step_IO, time_IO, delta_t_IO,      &
-!!     &          num_field, ncomp_field, istack_merged)
+!!      subroutine gz_write_field_time_mpi_b                            &
+!!     &         (IO_param_l, i_time_step_IO, time_IO, delta_t_IO)
 !!      subroutine gz_write_field_data_mpi_b(IO_param_l,                &
 !!     &          nnod, num_field, ntot_comp, field_name, d_nod)
 !!
@@ -36,31 +35,48 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine gz_write_field_head_mpi_b                              &
-     &         (IO_param_l, i_time_step_IO, time_IO, delta_t_IO,        &
-     &          num_field, ncomp_field, istack_merged)
+      subroutine gz_write_field_time_mpi_b                              &
+     &         (IO_param_l, i_time_step_IO, time_IO, delta_t_IO)
 !
       use m_phys_constants
-      use field_data_IO
       use gz_MPI_binary_head_IO
       use gz_MPI_binary_datum_IO
-      use transfer_to_long_integers
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param_l
 !
       integer(kind=kint), intent(in) :: i_time_step_IO
       real(kind = kreal), intent(in) :: time_IO, delta_t_IO
 !
-      integer(kind = kint_gl), intent(in) :: istack_merged(0:nprocs)
-      integer(kind=kint), intent(in) :: num_field
-      integer(kind=kint), intent(in) :: ncomp_field(num_field)
-!
 !
       call gz_mpi_write_process_id_b(IO_param_l)
-      call gz_mpi_write_one_inthead_b(IO_param_l, i_time_step_IO)
 !
+      call gz_mpi_write_one_inthead_b(IO_param_l, i_time_step_IO)
       call gz_mpi_write_one_realhead_b(IO_param_l, time_IO)
       call gz_mpi_write_one_realhead_b(IO_param_l, delta_t_IO)
+!
+      end subroutine gz_write_field_time_mpi_b
+!
+! -----------------------------------------------------------------------
+!
+      subroutine gz_write_field_data_mpi_b(IO_param_l,                  &
+     &          nnod, num_field, ntot_comp, ncomp_field, field_name,    &
+     &          istack_merged, d_nod)
+!
+      use m_phys_constants
+      use field_data_IO
+      use gz_MPI_binary_data_IO
+      use gz_MPI_binary_head_IO
+      use gz_MPI_binary_datum_IO
+      use transfer_to_long_integers
+!
+      type(calypso_MPI_IO_params), intent(inout) :: IO_param_l
+!
+      integer(kind = kint_gl), intent(in) :: nnod
+      integer(kind = kint), intent(in) :: num_field, ntot_comp
+      integer(kind=kint), intent(in) :: ncomp_field(num_field)
+      character(len = kchara), intent(in) :: field_name(num_field)
+      integer(kind = kint_gl), intent(in) :: istack_merged(0:nprocs)
+      real(kind = kreal), intent(in) :: d_nod(nnod,ntot_comp)
 !
 !
       call gz_mpi_write_merged_stack_b(IO_param_l,                      &
@@ -68,26 +84,6 @@
       call gz_mpi_write_one_inthead_b(IO_param_l, num_field)
       call gz_mpi_write_mul_inthead_b                                   &
      &   (IO_param_l, num_field, ncomp_field)
-!
-      end subroutine gz_write_field_head_mpi_b
-!
-! -----------------------------------------------------------------------
-!
-      subroutine gz_write_field_data_mpi_b(IO_param_l,                  &
-     &          nnod, num_field, ntot_comp, field_name, d_nod)
-!
-      use m_phys_constants
-      use field_data_IO
-      use gz_MPI_binary_data_IO
-      use gz_MPI_binary_head_IO
-!
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param_l
-!
-      integer(kind = kint_gl), intent(in) :: nnod
-      integer(kind = kint), intent(in) :: num_field, ntot_comp
-      character(len = kchara), intent(in) :: field_name(num_field)
-      real(kind = kreal), intent(in) :: d_nod(nnod,ntot_comp)
-!
 !
       call gz_mpi_write_mul_charahead_b                                 &
      &   (IO_param_l, num_field, field_name)

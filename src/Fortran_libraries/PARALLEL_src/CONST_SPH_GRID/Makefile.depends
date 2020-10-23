@@ -32,7 +32,7 @@ m_elapsed_labels_gen_SPH.o: $(SPH_GRID_SRCDIR)/m_elapsed_labels_gen_SPH.f90 m_pr
 	$(F90) -c $(F90OPTFLAGS) $<
 mpi_gen_sph_grids_modes.o: $(SPH_GRID_SRCDIR)/mpi_gen_sph_grids_modes.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_work_time.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_const_spherical_grid.o t_file_IO_parameter.o set_global_spherical_param.o const_sph_radial_grid.o const_global_sph_grids_modes.o t_sph_local_index.o m_elapsed_labels_gen_SPH.o bcast_comm_stacks_sph.o set_comm_table_rtp_rj.o gen_sph_grids_modes.o copy_para_sph_global_params.o set_local_sphere_by_global.o
 	$(F90) -c $(F90OPTFLAGS) $<
-ordering_sph_mesh_to_rtp.o: $(SPH_GRID_SRCDIR)/ordering_sph_mesh_to_rtp.f90 m_precision.o m_constants.o t_geometry_data.o t_comm_table.o t_group_data.o t_sph_mesh_1d_connect.o t_sph_1d_global_index.o cal_sph_node_addresses.o
+ordering_sph_mesh_to_rtp.o: $(SPH_GRID_SRCDIR)/ordering_sph_mesh_to_rtp.f90 m_precision.o m_constants.o t_geometry_data.o t_comm_table.o t_group_data.o t_spheric_rtp_data.o t_sph_mesh_1d_connect.o t_sph_1d_global_index.o cal_sph_node_addresses.o
 	$(F90) -c $(F90OPTFLAGS) $<
 output_gen_sph_grid_modes.o: $(SPH_GRID_SRCDIR)/output_gen_sph_grid_modes.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_work_time.o t_SPH_mesh_field_data.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_spheric_group.o t_file_IO_parameter.o t_spheric_data_IO.o sph_file_MPI_IO_select.o sph_file_IO_select.o load_data_for_sph_IO.o count_num_sph_smp.o parallel_load_data_4_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<

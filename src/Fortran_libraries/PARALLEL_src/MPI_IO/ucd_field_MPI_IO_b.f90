@@ -69,8 +69,9 @@
      &    'write binary data by MPI-IO: ', trim(file_name) 
       call open_write_mpi_file_b(file_name, IO_param)
 !
+      call write_field_time_mpi_b(IO_param,                             &
+     &    t_IO%i_time_step, t_IO%time, t_IO%dt)
       call write_field_data_mpi_b(IO_param,                             &
-     &    t_IO%i_time_step, t_IO%time, t_IO%dt,                         &
      &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
      &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_nod)
 !

@@ -46,7 +46,7 @@ gz_node_geometry_IO_b.o: $(ZLIB_IO_DIR)/gz_node_geometry_IO_b.f90 m_precision.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_read_psf_binary_data.o: $(ZLIB_IO_DIR)/gz_read_psf_binary_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_buffer_4_gzip.o gz_binary_IO.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_read_psf_binary_file.o: $(ZLIB_IO_DIR)/gz_read_psf_binary_file.f90 m_precision.o m_constants.o m_machine_parameter.o t_buffer_4_gzip.o t_ucd_data.o gz_binary_IO.o gzip_file_access.o gz_read_udt_from_bin_data.o
+gz_read_psf_binary_file.o: $(ZLIB_IO_DIR)/gz_read_psf_binary_file.f90 m_precision.o m_constants.o m_machine_parameter.o t_time_data.o t_buffer_4_gzip.o t_ucd_data.o gz_binary_IO.o gzip_file_access.o gz_read_udt_from_bin_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_read_udt_from_bin_data.o: $(ZLIB_IO_DIR)/gz_read_udt_from_bin_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_buffer_4_gzip.o t_ucd_data.o gz_binary_IO.o gzip_file_access.o gz_read_psf_binary_data.o
 	$(F90) -c $(F90OPTFLAGS) $<

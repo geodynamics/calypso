@@ -24,10 +24,6 @@
 !!      subroutine write_vtk_file_mpi(file_name, ucd)
 !!      subroutine write_vtk_phys_mpi(file_name, ucd)
 !!      subroutine write_vtk_grid_mpi(file_name, ucd)
-!!
-!!      subroutine write_ucd_file_mpi_b(file_name, ucd)
-!!      subroutine write_ucd_phys_mpi_b(file_name, ucd)
-!!      subroutine write_ucd_grid_mpi_b(file_name, ucd)
 !!        type(ucd_data), intent(in) :: ucd
 !!@endverbatim
 !
@@ -38,6 +34,7 @@
       use calypso_mpi
       use m_field_file_format
 !
+      use t_time_data
       use t_ucd_data
       use t_para_double_numbering
       use t_calypso_mpi_IO_param
@@ -98,6 +95,7 @@
      &    node%internal_node,  ele%numele, ele%nnod_4_ele, ele%ie,      &
      &    dbl_id1%inod_local, dbl_id1%irank_home,                       &
      &    ucd%nele, ucd%nnod_4_ele, ucd%ie)
+      call dealloc_double_numbering(dbl_id1)
 !
       if(iflag_format .eq. iflag_sgl_hdf5) call parallel_init_hdf5
 !
@@ -115,7 +113,6 @@
 !
       if(iflag_format .eq. iflag_sgl_hdf5) call parallel_finalize_hdf5
 !
-      call dealloc_double_numbering(dbl_id1)
       call unlink_merged_ucd_nod_stack(ucd)
       call dealloc_merged_ucd_ele_stack(ucd)
 !
@@ -308,83 +305,6 @@
       call calypso_close_mpi_file(id_vtk)
 !
       end subroutine write_vtk_grid_mpi
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine write_ucd_file_mpi_b(file_name, ucd)
-!
-      use MPI_binary_head_IO
-      use MPI_ascii_data_IO
-      use ucd_file_MPI_IO
-!
-      character(len=kchara), intent(in) :: file_name
-!
-      type(ucd_data), intent(in) :: ucd
-!
-!
-      if(my_rank .eq. 0) write(*,*)                                     &
-     &    'write binary data by MPI-IO: ', trim(file_name) 
-      call open_write_mpi_file_b(file_name, IO_param)
-      call write_ucd_mesh_data_mpi_b                                    &
-     &   (IO_param, ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie, &
-     &    ucd%istack_merged_intnod)
-      call write_ucd_data_mpi_b(IO_param,                               &
-     &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
-     &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_intnod)
-!
-      call close_mpi_file(IO_param)
-!
-      end subroutine write_ucd_file_mpi_b
-!
-! -----------------------------------------------------------------------
-!
-      subroutine write_ucd_phys_mpi_b(file_name, ucd)
-!
-      use MPI_binary_head_IO
-      use MPI_ascii_data_IO
-      use ucd_file_MPI_IO
-!
-      character(len=kchara), intent(in) :: file_name
-!
-      type(ucd_data), intent(in) :: ucd
-!
-!
-      if(my_rank .eq. 0) write(*,*)                                     &
-     &    'write binary data by MPI-IO: ', trim(file_name) 
-      call open_write_mpi_file_b(file_name, IO_param)
-      call write_ucd_data_mpi_b(IO_param,                               &
-     &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%num_comp,         &
-     &    ucd%phys_name, ucd%d_ucd, ucd%istack_merged_intnod)
-!
-      call close_mpi_file(IO_param)
-!
-      end subroutine write_ucd_phys_mpi_b
-!
-! -----------------------------------------------------------------------
-!
-      subroutine write_ucd_grid_mpi_b(file_name, ucd)
-!
-      use MPI_binary_head_IO
-      use MPI_ascii_data_IO
-      use ucd_file_MPI_IO
-!
-      character(len=kchara), intent(in) :: file_name
-      type(ucd_data), intent(in) :: ucd
-!
-      type(calypso_MPI_IO_params) :: IO_param
-!
-!
-      if(my_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
-     &  'Write gzipped binary merged mesh file: ', trim(file_name)
-!
-      call open_write_mpi_file_b(file_name, IO_param)
-      call write_ucd_mesh_data_mpi_b                                    &
-     &   (IO_param, ucd%nnod, ucd%nele, ucd%nnod_4_ele, ucd%xx, ucd%ie, &
-     &    ucd%istack_merged_intnod)
-      call close_mpi_file(IO_param)
-!
-      end subroutine write_ucd_grid_mpi_b
 !
 ! -----------------------------------------------------------------------
 !

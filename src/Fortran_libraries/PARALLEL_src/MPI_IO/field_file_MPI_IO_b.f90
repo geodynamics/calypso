@@ -71,8 +71,9 @@
       if(my_rank .eq. 0) write(*,*)                                     &
      &    'write binary data by MPI-IO: ', trim(file_name) 
       call open_write_mpi_file_b(file_name, IO_param)
+      call write_field_time_mpi_b(IO_param,                             &
+     &    t_IO%i_time_step, t_IO%time, t_IO%dt)
       call write_field_data_mpi_b(IO_param,                             &
-     &    t_IO%i_time_step, t_IO%time, t_IO%dt,                         &
      &    cast_long(fld_IO%nnod_IO), fld_IO%num_field_IO,               &
      &    fld_IO%ntot_comp_IO, fld_IO%num_comp_IO, fld_IO%fld_name,     &
      &    fld_IO%d_IO, fld_IO%istack_numnod_IO)

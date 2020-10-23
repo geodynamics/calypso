@@ -35,7 +35,7 @@
 !
       do istep = istart, iend, increment
         ucd_param%iflag_format = ifmt_input
-        call sel_read_alloc_ucd_file(-1, istep, ucd_param, ucd)
+        call sel_read_alloc_ucd_file(-1, istep, ucd_param, t_IO, ucd)
 !
         ucd_param%iflag_format = iflag_vtk
         call sel_write_ucd_file(-1, istep, ucd_param, t_IO, ucd)

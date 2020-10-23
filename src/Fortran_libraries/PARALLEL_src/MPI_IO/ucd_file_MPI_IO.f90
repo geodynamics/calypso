@@ -7,13 +7,13 @@
 !> @brief Output merged VTK file usgin MPI-IO
 !!
 !!@verbatim
-!!      subroutine write_ucd_data_mpi_b(IO_param,                       &
+!!      subroutine write_ucd_data_mpi_b(IO_param_l,                     &
 !!     &          nnod, num_field, ntot_comp, ncomp_field,              &
 !!     &          field_name, d_nod, istack_merged_intnod)
 !!      subroutine write_ucd_mesh_data_mpi_b                            &
-!!     &         (IO_param, nnod, nele, nnod_ele, xx, ie,               &
+!!     &         (IO_param_l, nnod, nele, nnod_ele, xx, ie,             &
 !!     &          istack_merged_intnod, istack_merged_ele)
-!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param_l
 !!
 !!      subroutine write_ucd_data_mpi(id_vtk, ioff_gl,                  &
 !!     &          nnod, num_field, ntot_comp, ncomp_field,              &
@@ -44,13 +44,15 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine write_ucd_data_mpi_b(IO_param,                         &
+      subroutine write_ucd_data_mpi_b(IO_param_l,                       &
      &          nnod, num_field, ntot_comp, ncomp_field,                &
      &          field_name, d_nod, istack_merged_intnod)
 !
       use t_calypso_mpi_IO_param
       use MPI_binary_head_IO
       use MPI_binary_data_IO
+!
+      type(calypso_MPI_IO_params), intent(inout) :: IO_param_l
 !
       integer(kind = kint_gl), intent(in)                               &
      &         :: istack_merged_intnod(0:nprocs)
@@ -60,8 +62,6 @@
       character(len=kchara), intent(in) :: field_name(num_field)
       real(kind = kreal), intent(in) :: d_nod(nnod,ntot_comp)
 !
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-!
       integer(kind = kint) :: nd
       integer(kind = kint_gl) :: n_internal(1)
       integer(kind = kint_gl), parameter :: ione64 = 1
@@ -69,20 +69,17 @@
 !
       n_internal(1) = istack_merged_intnod(my_rank+1)                   &
      &               - istack_merged_intnod(my_rank)
+      call set_istack_4_fixed_num(ione, IO_param_l)
+      call mpi_write_int8_vector_b(IO_param_l, ione64, n_internal(1))
 !
-      call mpi_write_process_id_b(IO_param)
+      call mpi_write_one_inthead_b(IO_param_l, num_field)
+      call mpi_write_mul_inthead_b(IO_param_l, num_field, ncomp_field)
+      call mpi_write_mul_charahead_b(IO_param_l, num_field, field_name)
 !
-      call set_istack_4_fixed_num(ione, IO_param)
-      call mpi_write_int8_vector_b(IO_param, ione64, n_internal(1))
-!
-      call mpi_write_one_inthead_b(IO_param, num_field)
-      call mpi_write_mul_inthead_b(IO_param, num_field, ncomp_field)
-      call mpi_write_mul_charahead_b(IO_param, num_field, field_name)
-!
-      call istack64_4_parallel_data(n_internal(1), IO_param)
+      call istack64_4_parallel_data(n_internal(1), IO_param_l)
       do nd = 1, ntot_comp
         call mpi_write_1d_vector_b                                      &
-     &     (IO_param, n_internal(1), d_nod(1,nd))
+     &     (IO_param_l, n_internal(1), d_nod(1,nd))
       end do
 !
       end subroutine write_ucd_data_mpi_b
@@ -90,7 +87,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine write_ucd_mesh_data_mpi_b                              &
-     &         (IO_param, nnod, nele, nnod_ele, xx, ie,                 &
+     &         (IO_param_l, nnod, nele, nnod_ele, xx, ie,               &
      &          istack_merged_intnod)
 !
       use m_phys_constants
@@ -105,7 +102,7 @@
       integer(kind = kint_gl), intent(in) :: ie(nele,nnod_ele)
       real(kind = kreal), intent(in) :: xx(nnod,3)
 !
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
+      type(calypso_MPI_IO_params), intent(inout) :: IO_param_l
 !
       integer(kind = kint) :: nd
       integer(kind = kint_gl) :: n_internal(1)
@@ -116,27 +113,27 @@
       n_internal(1) = istack_merged_intnod(my_rank+1)                   &
      &               - istack_merged_intnod(my_rank)
 !
-      call mpi_write_process_id_b(IO_param)
+      call mpi_write_process_id_b(IO_param_l)
 !
-      call set_istack_4_fixed_num(ione, IO_param)
-      call mpi_write_int8_vector_b(IO_param, ione64, n_internal(1))
+      call set_istack_4_fixed_num(ione, IO_param_l)
+      call mpi_write_int8_vector_b(IO_param_l, ione64, n_internal(1))
 !
-      call istack64_4_parallel_data(n_internal(1), IO_param)
-      call mpi_write_1d_vector_b(IO_param, n_internal(1), xx(1,1))
-      call mpi_write_1d_vector_b(IO_param, n_internal(1), xx(1,2))
-      call mpi_write_1d_vector_b(IO_param, n_internal(1), xx(1,3))
+      call istack64_4_parallel_data(n_internal(1), IO_param_l)
+      call mpi_write_1d_vector_b(IO_param_l, n_internal(1), xx(1,1))
+      call mpi_write_1d_vector_b(IO_param_l, n_internal(1), xx(1,2))
+      call mpi_write_1d_vector_b(IO_param_l, n_internal(1), xx(1,3))
 !
-      call mpi_write_one_inthead_b(IO_param, nnod_ele)
+      call mpi_write_one_inthead_b(IO_param_l, nnod_ele)
       call mpi_write_one_inthead_b                                      &
-     &   (IO_param, linear_eletype_from_num(nnod_ele))
+     &   (IO_param_l, linear_eletype_from_num(nnod_ele))
 !
       num64(1) = nele
-      call set_istack_4_fixed_num(ione, IO_param)
-      call mpi_write_int8_vector_b(IO_param, ione64, num64(1))
+      call set_istack_4_fixed_num(ione, IO_param_l)
+      call mpi_write_int8_vector_b(IO_param_l, ione64, num64(1))
 !
-      call istack64_4_parallel_data(num64(1), IO_param)
+      call istack64_4_parallel_data(num64(1), IO_param_l)
       do nd = 1, nnod_ele
-        call mpi_write_int8_vector_b(IO_param, num64(1), ie(1,nd))
+        call mpi_write_int8_vector_b(IO_param_l, num64(1), ie(1,nd))
       end do
 !
       end subroutine write_ucd_mesh_data_mpi_b

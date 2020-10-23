@@ -96,7 +96,7 @@ node_geometry_IO_b.o: $(IO_DIR)/node_geometry_IO_b.f90 m_precision.o m_constants
 	$(F90) -c $(F90OPTFLAGS) $<
 read_psf_binary_data.o: $(IO_DIR)/read_psf_binary_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_binary_IO_buffer.o binary_IO.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
-read_psf_binary_file.o: $(IO_DIR)/read_psf_binary_file.f90 m_precision.o m_constants.o m_machine_parameter.o t_binary_IO_buffer.o t_ucd_data.o binary_IO.o read_udt_from_bindary_data.o
+read_psf_binary_file.o: $(IO_DIR)/read_psf_binary_file.f90 m_precision.o m_constants.o m_machine_parameter.o t_time_data.o t_binary_IO_buffer.o t_ucd_data.o binary_IO.o read_udt_from_bindary_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 read_udt_from_bindary_data.o: $(IO_DIR)/read_udt_from_bindary_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_binary_IO_buffer.o t_ucd_data.o binary_IO.o read_psf_binary_data.o
 	$(F90) -c $(F90OPTFLAGS) $<

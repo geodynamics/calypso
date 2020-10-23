@@ -60,11 +60,11 @@
 !
       call open_write_gz_mpi_file_b(file_name, IO_param)
 !
-      call gz_write_field_head_mpi_b(IO_param,                          &
-     &    t_IO%i_time_step, t_IO%time, t_IO%dt,                         &
-     &    ucd%num_field, ucd%num_comp, ucd%istack_merged_nod)
+      call gz_write_field_time_mpi_b(IO_param,                          &
+     &    t_IO%i_time_step, t_IO%time, t_IO%dt)
       call gz_write_field_data_mpi_b(IO_param, ucd%nnod, ucd%num_field, &
-     &    ucd%ntot_comp, ucd%phys_name, ucd%d_ucd)
+     &    ucd%ntot_comp, ucd%num_comp, ucd%phys_name,                   &
+     &    ucd%istack_merged_nod, ucd%d_ucd)
 !
       call close_mpi_file(IO_param)
 !

@@ -7,6 +7,8 @@
 !> @brief read binary section file
 !!
 !!@verbatim
+!!      subroutine read_psf_bin_time_data                               &
+!!     &         (nprocs, i_time_step_IO, time_IO, delta_t_IO, bbuf)
 !!      subroutine read_psf_bin_field_data                              &
 !!     &         (nprocs, ucd_b, bbuf, itmp1_mp)
 !!      subroutine read_alloc_psf_bin_field_data                        &
@@ -34,6 +36,32 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine read_psf_bin_time_data                                 &
+     &         (nprocs, i_time_step_IO, time_IO, delta_t_IO, bbuf)
+!
+      use binary_IO
+      use read_psf_binary_data
+!
+      integer, intent(in) :: nprocs
+!
+      integer(kind=kint), intent(inout) :: i_time_step_IO
+      real(kind = kreal), intent(inout) :: time_IO, delta_t_IO
+      type(binary_IO_buffer), intent(inout) :: bbuf
+!
+      integer :: nprocs2
+!
+!
+      call read_one_integer_b(bbuf, nprocs2)
+      if(nprocs2 .ne. nprocs) stop 'Wrong mesh and field data'
+!
+      call read_one_integer_b(bbuf, i_time_step_IO)
+      call read_one_real_b(bbuf, time_IO)
+      call read_one_real_b(bbuf, delta_t_IO)
+!
+      end subroutine read_psf_bin_time_data
+!
+!  ---------------------------------------------------------------------
+!
       subroutine read_psf_bin_field_data                                &
      &         (nprocs, ucd_b, bbuf, itmp1_mp)
 !
@@ -48,9 +76,6 @@
       integer :: nprocs2
       integer(kind = kint) :: num_field, ntot_comp
 !
-!
-      call read_one_integer_b(bbuf, nprocs2)
-      if(nprocs2 .ne. nprocs) stop 'Wrong mesh and field data'
 !
       call read_psf_phys_num_bin                                        &
      &   (nprocs, ucd_b%nnod, num_field, itmp1_mp, bbuf)
@@ -84,9 +109,6 @@
 !
       integer :: nprocs2
 !
-!
-      call read_one_integer_b(bbuf, nprocs2)
-      if(nprocs2 .ne. nprocs) stop 'Wrong mesh and field data'
 !
       call read_psf_phys_num_bin                                        &
      &   (nprocs, ucd_b%nnod, ucd_b%num_field, itmp1_mp, bbuf)

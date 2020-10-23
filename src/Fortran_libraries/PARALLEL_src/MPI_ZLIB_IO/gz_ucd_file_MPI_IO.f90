@@ -73,7 +73,6 @@
       n_internal(1) = istack_merged_intnod(my_rank+1)                   &
      &               - istack_merged_intnod(my_rank)
 !
-      call gz_mpi_write_process_id_b(IO_param)
       call gz_mpi_write_int8_vector_b(IO_param, ione64, n_internal(1))
 !
       call gz_mpi_write_one_inthead_b(IO_param, num_field)

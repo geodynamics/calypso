@@ -134,9 +134,8 @@
 !
 !      write(*,*) 's_const_FEM_mesh_for_sph',                           &
 !     &          sph_params%iflag_shell_mode, iflag_MESH_w_center
-      call s_const_FEM_mesh_for_sph                                     &
-     &   (my_rank, sph_rtp%nidx_rtp, sph_rj%radius_1d_rj_r, gauss_SF,   &
-     &    sph_params, sph_rtp, gen_sph, mesh, group, stbl_SF)
+      call s_const_FEM_mesh_for_sph(my_rank, gauss_SF,                  &
+     &    sph_params, sph_rtp, sph_rj, gen_sph, mesh, group, stbl_SF)
 !
       call dealloc_nnod_nele_sph_mesh(stbl_SF)
       call dealloc_gauss_colatitude(gauss_SF)

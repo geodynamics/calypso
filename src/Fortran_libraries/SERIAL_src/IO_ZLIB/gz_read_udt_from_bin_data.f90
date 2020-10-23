@@ -7,6 +7,8 @@
 !> @brief read binary section file
 !!
 !!@verbatim
+!!      subroutine gz_read_psf_bin_time_data                           &
+!!     &         (nprocs, i_time_step_IO, time_IO, delta_t_IO, zbuf)
 !!      subroutine gz_read_psf_bin_field_data                           &
 !!     &         (nprocs, ucd_z, zbuf, itmp1_mp)
 !!      subroutine gz_read_alloc_psf_bin_fld_data                       &
@@ -35,6 +37,32 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine gz_read_psf_bin_time_data                             &
+     &         (nprocs, i_time_step_IO, time_IO, delta_t_IO, zbuf)
+!
+      use gz_binary_IO
+      use gzip_file_access
+      use gz_read_psf_binary_data
+!
+      integer, intent(in) :: nprocs
+      integer(kind=kint), intent(inout) :: i_time_step_IO
+      real(kind = kreal), intent(inout) :: time_IO, delta_t_IO
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer :: nprocs2
+!
+!
+      call gz_read_one_integer_b(zbuf, nprocs2)
+      if(nprocs2 .ne. nprocs) stop 'Wrong mesh and field data'
+!
+      call gz_read_one_integer_b(zbuf, i_time_step_IO)
+      call gz_read_one_real_b(zbuf, time_IO)
+      call gz_read_one_real_b(zbuf, delta_t_IO)
+!
+      end subroutine gz_read_psf_bin_time_data
+!
+!  ---------------------------------------------------------------------
+!
       subroutine gz_read_psf_bin_field_data                             &
      &         (nprocs, ucd_z, zbuf, itmp1_mp)
 !
@@ -47,12 +75,8 @@
       type(ucd_data), intent(inout) :: ucd_z
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer :: nprocs2
       integer(kind = kint) :: num_field, ntot_comp
 !
-!
-      call gz_read_one_integer_b(zbuf, nprocs2)
-      if(nprocs2 .ne. nprocs) stop 'Wrong mesh and field data'
 !
       call read_psf_phys_num_bin_gz                                     &
      &   (nprocs, ucd_z%nnod, num_field, itmp1_mp, zbuf)
@@ -85,11 +109,6 @@
       type(ucd_data), intent(inout) :: ucd_z
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      integer :: nprocs2
-!
-!
-      call gz_read_one_integer_b(zbuf, nprocs2)
-      if(nprocs2 .ne. nprocs) stop 'Wrong mesh and field data'
 !
       call read_psf_phys_num_bin_gz                                     &
      &   (nprocs, ucd_z%nnod, ucd_z%num_field, itmp1_mp, zbuf)
