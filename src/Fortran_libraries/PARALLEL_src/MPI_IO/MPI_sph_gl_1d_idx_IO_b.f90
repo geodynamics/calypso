@@ -115,9 +115,8 @@
       integer(kind = kint_gl) :: num64
 !
 !
-      call set_istack_4_fixed_num(sph_IO%numdir_sph, IO_param)
-!
       num64 = sph_IO%numdir_sph
+      call istack64_4_parallel_data(num64, IO_param)
       call mpi_write_int_vector_b(IO_param, num64, sph_IO%nidx_sph)
       call mpi_write_int_vector_b(IO_param, num64, sph_IO%ist_sph)
       call mpi_write_int_vector_b(IO_param, num64, sph_IO%ied_sph)
@@ -149,9 +148,9 @@
       integer(kind = kint_gl) :: num64
 !
 !
-      call set_istack_4_fixed_num(sph_IO%numdir_sph, IO_param)
 !
       num64 = sph_IO%numdir_sph
+      call istack64_4_parallel_data(num64, IO_param)
       call mpi_write_int_vector_b(IO_param, num64, sph_IO%nidx_sph)
       call mpi_write_int_vector_b(IO_param, num64, sph_IO%ist_sph)
       call mpi_write_int_vector_b(IO_param, num64, sph_IO%ied_sph)

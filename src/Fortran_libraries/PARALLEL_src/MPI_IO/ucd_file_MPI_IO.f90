@@ -69,7 +69,7 @@
 !
       n_internal(1) = istack_merged_intnod(my_rank+1)                   &
      &               - istack_merged_intnod(my_rank)
-      call set_istack_4_fixed_num(ione, IO_param_l)
+      call istack64_4_parallel_data(ione64, IO_param_l)
       call mpi_write_int8_vector_b(IO_param_l, ione64, n_internal(1))
 !
       call mpi_write_one_inthead_b(IO_param_l, num_field)
@@ -115,7 +115,7 @@
 !
       call mpi_write_process_id_b(IO_param_l)
 !
-      call set_istack_4_fixed_num(ione, IO_param_l)
+      call istack64_4_parallel_data(ione64, IO_param_l)
       call mpi_write_int8_vector_b(IO_param_l, ione64, n_internal(1))
 !
       call istack64_4_parallel_data(n_internal(1), IO_param_l)
@@ -128,7 +128,7 @@
      &   (IO_param_l, linear_eletype_from_num(nnod_ele))
 !
       num64(1) = nele
-      call set_istack_4_fixed_num(ione, IO_param_l)
+      call istack64_4_parallel_data(ione64, IO_param_l)
       call mpi_write_int8_vector_b(IO_param_l, ione64, num64(1))
 !
       call istack64_4_parallel_data(num64(1), IO_param_l)

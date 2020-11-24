@@ -85,8 +85,7 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read ascii mesh file: ', trim(file_name)
 !
-      call open_read_mpi_file                                           &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_read_mpi_file(file_name, num_pe, id_rank, IO_param)
       call mpi_read_geometry_data(IO_param, mesh_IO)
       call close_mpi_file(IO_param)
 !
@@ -110,8 +109,7 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read ascii mesh file: ', trim(file_name)
 !
-      call open_read_mpi_file                                           &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_read_mpi_file(file_name, num_pe, id_rank, IO_param)
       call mpi_read_num_node(IO_param, mesh_IO)
       call close_mpi_file(IO_param)
 !
@@ -135,8 +133,7 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read ascii mesh file: ', trim(file_name)
 !
-      call open_read_mpi_file                                           &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_read_mpi_file(file_name, num_pe, id_rank, IO_param)
       call mpi_read_num_node_ele(IO_param, mesh_IO)
       call close_mpi_file(IO_param)
 !

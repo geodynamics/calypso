@@ -19,6 +19,8 @@
 !!    example of control data
 !!
 !!  begin num_domain_ctl
+!!    ordering_set_ctl         Ver_2
+!!
 !!    inner_decomp_direction        radial or horizontal
 !!
 !!    rj_inner_loop_direction             radial or horizontal
@@ -63,6 +65,9 @@
 !
 !>      control data structure for spherical shell parallelization
       type sphere_domain_control
+!>        Orsering set control
+        type(read_character_item) :: indices_ordering_set
+!
 !>        Direction of inner decomposition
         type(read_character_item) :: inner_decomp_ctl
 !
@@ -115,6 +120,8 @@
      &      :: hd_rtm_inner_loop =      'rtm_inner_loop_direction'
       character(len=kchara), parameter                                  &
      &      :: hd_rtp_inner_loop =      'rtp_inner_loop_direction'
+      character(len=kchara), parameter                                  &
+     &      :: hd_indices_ordering_set = 'ordering_set_ctl'
 !
       character(len=kchara), parameter                                  &
      &      :: hd_rlm_order_dist =      'rlm_order_distribution'
@@ -188,6 +195,8 @@
      &     (c_buf, hd_rtm_inner_loop, sdctl%rtm_inner_loop_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_rtp_inner_loop, sdctl%rtp_inner_loop_ctl)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_indices_ordering_set, sdctl%indices_ordering_set)
 !
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_rlm_order_dist, sdctl%rlm_distibution_ctl)

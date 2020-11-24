@@ -58,16 +58,25 @@
 !
       subroutine mpi_write_one_integer_b(IO_param, int_dat)
 !
+      use transfer_to_long_integers
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       integer(kind = kint), intent(in) :: int_dat
 !
-      integer(kind = kint_gl), parameter :: ione64 = 1
+      type(tmp_i8_array)  :: tmp64
       integer(kind = kint) :: itmp_IO(1)
+      integer(kind = kint) :: ip
 !
 !
+      do ip = 0, IO_param%nprocs_in
+        IO_param%istack_merged(ip) = ip
+      end do
+!
+      if(IO_param%id_rank .ge. IO_param%nprocs_in) return
       itmp_IO(1) = int_dat
-      call set_istack_4_fixed_num(ione, IO_param)
-      call mpi_write_int_vector_b(IO_param, ione64, itmp_IO)
+      call dup_from_short_array(cast_long(1), itmp_IO, tmp64)
+      call mpi_write_int8_vector_b(IO_param, tmp64%n1, tmp64%id_a)
+      call dealloc_1d_i8array(tmp64)
 !
       end subroutine mpi_write_one_integer_b
 !
@@ -83,6 +92,7 @@
       integer(kind = kint_gl) :: ist
 !
       ist = min(1,num)
+      call istack64_4_parallel_data(num, IO_param)
       call mpi_write_int_vector_b(IO_param, num, istack(ist))
 !
       end subroutine mpi_write_integer_stack_b
@@ -193,14 +203,19 @@
 !
       subroutine mpi_read_one_integer_b(IO_param, int_dat)
 !
+      use m_phys_constants
+      use transfer_to_long_integers
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       integer(kind = kint), intent(inout) :: int_dat
 !
-      integer(kind = kint) :: itmp_IO(IO_param%nprocs_in)
-      integer(kind = kint_gl), parameter :: ione64 = 1
+      type(tmp_i8_array)  :: tmp64
+      integer(kind = kint) :: itmp_IO(1)
 !
 !
-      call mpi_read_int_vector_b(IO_param, ione64, itmp_IO(1))
+      call alloc_1d_i8array(cast_long(1), tmp64)
+      call mpi_read_int8_vector_b(IO_param, tmp64%n1, tmp64%id_a)
+      call dup_to_short_array(tmp64, itmp_IO)
       int_dat = itmp_IO(1)
 !
       end subroutine mpi_read_one_integer_b

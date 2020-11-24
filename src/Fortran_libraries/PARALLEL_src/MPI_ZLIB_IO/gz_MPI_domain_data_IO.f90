@@ -7,6 +7,7 @@
 !>@brief  Routine for gzipped binary doimain data IO
 !!
 !!@verbatim
+!!      subroutine gz_mpi_check_num_of_domains(IO_param)
 !!      subroutine gz_mpi_read_domain_info(IO_param, comm_IO)
 !!      subroutine gz_mpi_read_import_data(IO_param, comm_IO)
 !!      subroutine gz_mpi_read_export_data(IO_param, comm_IO)
@@ -51,6 +52,25 @@
 !
 !------------------------------------------------------------------
 !
+      subroutine gz_mpi_check_num_of_domains(IO_param)
+!
+      use m_error_IDs
+!
+      type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!
+      integer(kind = kint) :: nprocs_read
+!
+!
+      call read_integer_textline                                        &
+     &   (gz_mpi_read_charahead(IO_param, len_int_txt), nprocs_read)
+      if(nprocs_read .ne. IO_param%nprocs_in) then
+        call calypso_mpi_abort(ierr_file, '#. of subdmain is wrong')
+      end if
+!
+      end subroutine gz_mpi_check_num_of_domains
+!
+! -----------------------------------------------------------------------
+!
       subroutine gz_mpi_read_domain_info(IO_param, comm_IO)
 !
       use m_error_IDs
@@ -61,11 +81,7 @@
       integer(kind = kint) :: nprocs_read
 !
 !
-      call read_integer_textline                                        &
-     &   (gz_mpi_read_charahead(IO_param, len_int_txt), nprocs_read)
-      if(nprocs_read .ne. IO_param%nprocs_in) then
-        call calypso_mpi_abort(ierr_file, '#. of subdmain is wrong')
-      end if
+      call gz_mpi_check_num_of_domains(IO_param)
 !
       call gz_mpi_read_num_of_data(IO_param, comm_IO%num_neib)
       call alloc_neighbouring_id(comm_IO)

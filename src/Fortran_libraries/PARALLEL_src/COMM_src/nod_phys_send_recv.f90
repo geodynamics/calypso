@@ -1,10 +1,13 @@
+!>@file   nod_phys_send_recv.f90
+!!@brief  module nod_phys_send_recv
+!!
+!!@author H. Matsui
+!!@date Programmed in July, 2005
+!!      modified in July, 2008
 !
-!      module nod_phys_send_recv
-!
-!      Written by H. Matsui on July, 2005
-!      Modified by H. Matsui on July, 2008
-!
-!
+!>@brief  DAta communication for nodal field
+!!
+!!@verbatim
 !!      subroutine init_nod_send_recv(mesh)
 !!      subroutine nod_fields_send_recv(mesh, nod_fld)
 !!        type(mesh_geometry), intent(in) :: mesh
@@ -25,6 +28,7 @@
 !!      subroutine nod_scalar_send_recv(numnod, nod_comm, scl_nod)
 !!      subroutine nod_vector_send_recv(numnod, nod_comm, vec_nod)
 !!      subroutine nod_tensor_send_recv(numnod, nod_comm, tsr_nod)
+!!@endverbatim
 !
       module nod_phys_send_recv
 !

@@ -60,8 +60,7 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Read merged binary element comm file: ', trim(file_name)
 !
-      call open_read_mpi_file_b                                         &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_read_mpi_file_b(file_name, num_pe, id_rank, IO_param)
 !
       call mpi_read_element_comm_table_b(IO_param, ele_mesh_IO%comm)
 !      call mpi_read_element_geometry_b(IO_param,                       &
@@ -86,8 +85,7 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Read merged binary surface mesh file: ', trim(file_name)
 !
-      call open_read_mpi_file_b                                         &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_read_mpi_file_b(file_name, num_pe, id_rank, IO_param)
 !
       call mpi_read_surface_connection_b(IO_param, surf_mesh_IO%comm,   &
      &   surf_mesh_IO%ele, surf_mesh_IO%sfed)
@@ -113,8 +111,7 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Read merged binary edge mesh file: ', trim(file_name)
 !
-      call open_read_mpi_file_b                                         &
-     &   (file_name, num_pe, id_rank, IO_param)
+      call open_read_mpi_file_b(file_name, num_pe, id_rank, IO_param)
 !
       call mpi_read_edge_connection_b(IO_param, edge_mesh_IO%comm,      &
      &    edge_mesh_IO%ele, edge_mesh_IO%sfed)

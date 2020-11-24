@@ -1,12 +1,13 @@
-!t_mesh_data.f90
-!      module t_mesh_data
+!>@file   t_mesh_data.f90
+!!@brief  module t_mesh_data
+!!
+!!@author H. Matsui
+!!@date Programmed on Dec., 2008
 !
 !> @brief Structure for mesh data
+!!   including geometry, connectivity, and groups
 !
-!>   including geometry, connectivity, and groups
-!
-!     Written by H. Matsui on Dec., 2008
-!
+!!@verbatim
 !!      subroutine dealloc_mesh_infos_w_normal(mesh, group)
 !!      subroutine dealloc_mesh_infomations(mesh, group)
 !!      subroutine dealloc_nod_ele_infos(mesh, group)
@@ -21,6 +22,7 @@
 !!
 !!      subroutine compare_mesh_groups(id_rank, group_ref, group)
 !!        type(mesh_groups), intent(in) :: group_ref, group
+!!@endverbatim
 !
       module t_mesh_data
 !

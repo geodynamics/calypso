@@ -235,6 +235,7 @@
       psph_ctl%iflag_sph_shell = 0
       psph_ctl%ifile_sph_shell = 0
 !
+      call reset_FEM_mesh_control(psph_ctl%Fmesh_ctl)
       call dealloc_control_shell_define(psph_ctl%spctl)
       call dealloc_ndomain_rtp_ctl(psph_ctl%sdctl)
 !

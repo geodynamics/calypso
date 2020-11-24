@@ -133,16 +133,16 @@
 !
       subroutine mpi_write_import_data_b(IO_param, comm_IO)
 !
+      use transfer_to_long_integers
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(communication_table), intent(in) :: comm_IO
 !
       integer (kind = kint_gl) :: num64
 !
 !
-      num64 = comm_IO%num_neib
-      call istack64_4_parallel_data(num64, IO_param)
       call mpi_write_integer_stack_b                                    &
-     &   (IO_param, num64, comm_IO%istack_import)
+     &   (IO_param, cast_long(comm_IO%num_neib), comm_IO%istack_import)
 !
       num64 = comm_IO%ntot_import
       call istack64_4_parallel_data(num64, IO_param)
@@ -155,16 +155,16 @@
 !
       subroutine mpi_write_export_data_b(IO_param, comm_IO)
 !
+      use transfer_to_long_integers
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(communication_table), intent(in) :: comm_IO
 !
       integer (kind = kint_gl) :: num64
 !
 !
-      num64 = comm_IO%num_neib
-      call istack64_4_parallel_data(num64, IO_param)
       call mpi_write_integer_stack_b                                    &
-     &   (IO_param, num64, comm_IO%istack_export)
+     &   (IO_param, cast_long(comm_IO%num_neib), comm_IO%istack_export)
 !
       num64 = comm_IO%ntot_export
       call istack64_4_parallel_data(num64, IO_param)

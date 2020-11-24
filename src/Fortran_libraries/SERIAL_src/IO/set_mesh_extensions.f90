@@ -20,6 +20,11 @@
 !!      character(len=kchara) function add_ksm_extension(file_head)
 !!                put ".ksm" at the end
 !!
+!!      character(len=kchara) function add_itp_extension(file_head)
+!!                put ".itp" at the end
+!!      character(len=kchara) function add_itb_extension(file_head)
+!!                put ".itb" at the end
+!!
 !!      character(len=kchara) function add_gel_extension(file_head)
 !!                put ".gel" at the end
 !!      character(len=kchara) function add_gsf_extension(file_head)
@@ -51,7 +56,12 @@
 !
       character(len=3), parameter, private :: gfm_ext = "gfm"
       character(len=3), parameter, private :: gfb_ext = "gfb"
+!
       character(len=3), parameter, private :: ksm_ext = "ksm"
+!
+      character(len=3), parameter, private :: itp_ext = "itp"
+      character(len=3), parameter, private :: itb_ext = "itb"
+!
       character(len=3), parameter, private :: gel_ext = "gel"
       character(len=3), parameter, private :: gsf_ext = "gsf"
       character(len=3), parameter, private :: ged_ext = "ged"
@@ -114,6 +124,27 @@
       add_ksm_extension = add_3chara_extension(file_head, ksm_ext)
 !
       end function add_ksm_extension
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      character(len=kchara) function add_itp_extension(file_head)
+!
+      character(len=kchara), intent(in) :: file_head
+!
+      add_itp_extension = add_3chara_extension(file_head, itp_ext)
+!
+      end function add_itp_extension
+!
+!-----------------------------------------------------------------------
+!
+      character(len=kchara) function add_itb_extension(file_head)
+!
+      character(len=kchara), intent(in) :: file_head
+!
+      add_itb_extension = add_3chara_extension(file_head, itb_ext)
+!
+      end function add_itb_extension
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

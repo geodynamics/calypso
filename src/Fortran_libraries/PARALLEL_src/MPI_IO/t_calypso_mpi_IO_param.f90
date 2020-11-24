@@ -19,7 +19,6 @@
 !!      subroutine istack64_4_parallel_data(num_local, IO_param)
 !!      subroutine set_istack_over_subdomains                           &
 !!     &         (nprocs_in, nloop, num_local, istack_merged)
-!!      subroutine set_istack_4_fixed_num(num_local, IO_param)
 !!@endverbatim
 !
       module t_calypso_mpi_IO_param
@@ -242,21 +241,5 @@
       end subroutine set_istack_over_subdomains
 !
 !  ---------------------------------------------------------------------
-!
-      subroutine set_istack_4_fixed_num(num_local, IO_param)
-!
-      integer(kind = kint), intent(in) :: num_local
-      type(calypso_MPI_IO_params), intent(inout) :: IO_param
-!
-      integer(kind = kint) :: ip
-!
-!
-      do ip = 0, IO_param%nprocs_in
-        IO_param%istack_merged(ip) = ip * num_local
-      end do
-!
-      end subroutine set_istack_4_fixed_num
-!
-! -----------------------------------------------------------------------
 !
       end module t_calypso_mpi_IO_param

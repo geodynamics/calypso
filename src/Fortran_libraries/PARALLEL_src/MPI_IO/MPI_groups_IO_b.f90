@@ -96,6 +96,8 @@
 !
       subroutine mpi_write_grp_data_b(IO_param, group_IO)
 !
+      use transfer_to_long_integers
+!
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(group_data), intent(in) :: group_IO
 !
@@ -107,10 +109,8 @@
       call mpi_write_mul_charahead_b                                    &
      &     (IO_param, group_IO%num_grp, group_IO%grp_name)
 !
-      num64 = group_IO%num_grp
-      call istack64_4_parallel_data(num64, IO_param)
       call mpi_write_integer_stack_b                                    &
-     &   (IO_param, num64, group_IO%istack_grp)
+     &   (IO_param, cast_long(group_IO%num_grp), group_IO%istack_grp)
 !
       num64 = group_IO%num_item
       call istack64_4_parallel_data(num64, IO_param)
@@ -121,6 +121,8 @@
 !------------------------------------------------------------------
 !
       subroutine mpi_write_surf_grp_data_b(IO_param, surf_grp_IO)
+!
+      use transfer_to_long_integers
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(surface_group_data), intent(in) :: surf_grp_IO
@@ -133,10 +135,8 @@
       call mpi_write_mul_charahead_b                                    &
      &   (IO_param, surf_grp_IO%num_grp, surf_grp_IO%grp_name)
 !
-      num64 = surf_grp_IO%num_grp
-      call istack64_4_parallel_data(num64, IO_param)
-      call mpi_write_integer_stack_b                                    &
-     &     (IO_param, num64, surf_grp_IO%istack_grp)
+      call mpi_write_integer_stack_b(IO_param,                          &
+     &    cast_long(surf_grp_IO%num_grp), surf_grp_IO%istack_grp)
 !
       num64 = 2 * surf_grp_IO%num_item
       call istack64_4_parallel_data(num64, IO_param)

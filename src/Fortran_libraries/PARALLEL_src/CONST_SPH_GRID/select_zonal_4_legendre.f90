@@ -26,6 +26,7 @@
 !
       integer(kind = kint), parameter :: id_simple_rlm_distribute = 10
 !
+      integer(kind = kint), parameter :: id_V1_rlm_distribute =  100
       integer(kind = kint), parameter :: id_test_distribute = 999
 !
       private :: zonal_wavenum_list_test
@@ -62,19 +63,25 @@
       else if(iflag_rlm_distribute .eq. id_cyclic_eq_mode_neib) then
         call set_domain_by_eq_leg_modes                                 &
      &     (ndomain_m, ltr, m_folding, ip_tmp)
-        call set_local_sph_back_order(ndomain_m, ltr, m_folding,        &
-     &      nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
-!
-      else if(iflag_rlm_distribute .eq. id_cyclic_eq_trans_neib) then
-        call set_domain_by_eq_leg_trns                                  &
-     &     (ndomain_m, ltr, m_folding, ip_tmp)
         call set_local_sph_neib_order(ndomain_m, ltr, m_folding,        &
      &      nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
+!
+!      else if(iflag_rlm_distribute .eq. id_cyclic_eq_trans_neib) then
+!        call set_domain_by_eq_leg_trns                                 &
+!     &     (ndomain_m, ltr, m_folding, ip_tmp)
+!        call set_local_sph_neib_order(ndomain_m, ltr, m_folding,       &
+!     &      nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
 !
       else if(iflag_rlm_distribute .eq. id_simple_rlm_distribute) then
         call set_domain_by_eq_leg_trns                                  &
      &     (ndomain_m, ltr, m_folding, ip_tmp)
-        call set_local_sph_neib_order(ndomain_m, ltr, m_folding,        &
+        call set_local_sph_back_order(ndomain_m, ltr, m_folding,        &
+     &      nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
+!
+      else if(iflag_rlm_distribute .eq. id_V1_rlm_distribute) then
+        call set_domain_by_eq_leg_modes                                 &
+     &     (ndomain_m, ltr, m_folding, ip_tmp)
+        call set_local_sph_fwd_order(ndomain_m, ltr, m_folding,         &
      &      nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
 !
       else if(iflag_rlm_distribute .eq. id_test_distribute) then
@@ -114,7 +121,7 @@
       call set_domain_by_eq_leg_modes                                   &
      &   (ndomain_m, ltr, m_folding, ip_tmp)
 !
-      call set_local_sph_back_order(ndomain_m, ltr, m_folding,          &
+      call set_local_sph_fwd_order(ndomain_m, ltr, m_folding,           &
      &    nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
 !
 !        write(8,*) 'm, ip_tmp(m)'

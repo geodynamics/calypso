@@ -12,6 +12,8 @@
 !!      subroutine set_domain_by_eq_leg_modes                           &
 !!     &         (ndomain_m, ltr, m_folding, ip_tmp)
 !!
+!!      subroutine set_local_sph_fwd_order(ndomain_m, ltr, m_folding,   &
+!!     &          nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
 !!      subroutine set_local_sph_back_order(ndomain_m, ltr, m_folding,  &
 !!     &          nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
 !!      subroutine set_local_sph_neib_order(ndomain_m, ltr, m_folding,  &
@@ -126,6 +128,39 @@
       end subroutine set_domain_by_eq_leg_modes
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_local_sph_fwd_order(ndomain_m, ltr, m_folding,     &
+     &          nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
+!
+      integer(kind = kint), intent(in) :: ltr, m_folding
+      integer(kind = kint), intent(in) :: nth, nph, ndomain_m
+      integer(kind = kint), intent(in) :: ip_tmp(0:ltr)
+!
+      integer(kind = kint), intent(inout) :: jdx_fsph(-nth:nth)
+      integer(kind = kint), intent(inout) :: mdx_4_lgd(0:nph)
+!
+      integer(kind = kint) :: m, ip, ma, mm
+!
+!
+      mm = 0
+      do ip = 1, ndomain_m
+        do m = -ltr/m_folding, ltr/m_folding
+          ma = abs(m)
+          if (ip_tmp(ma) .eq. ip) then
+            jdx_fsph(m) = mm
+            mm = mm + 1
+          end if
+        end do
+      end do
+!
+      do m = -ltr/m_folding, ltr/m_folding
+        mm = jdx_fsph(m)
+        mdx_4_lgd(mm) = m
+      end do
+!
+      end subroutine set_local_sph_fwd_order
+!
 ! -----------------------------------------------------------------------
 !
       subroutine set_local_sph_back_order(ndomain_m, ltr, m_folding,    &

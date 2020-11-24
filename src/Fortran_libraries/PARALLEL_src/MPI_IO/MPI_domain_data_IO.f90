@@ -7,6 +7,7 @@
 !>@brief  Routine for gzipped binary doimain data IO
 !!
 !!@verbatim
+!!      subroutine mpi_check_num_of_domains(IO_param)
 !!      subroutine mpi_read_domain_info(IO_param, comm_IO)
 !!      subroutine mpi_read_import_data(IO_param, comm_IO)
 !!      subroutine mpi_read_export_data(IO_param, comm_IO)
@@ -24,6 +25,11 @@
 !!      subroutine mpi_write_int_stack(IO_param, num, istack)
 !!      subroutine mpi_write_comm_table(IO_param, ncolumn, num, int_dat)
 !!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!
+!!      subroutine mpi_write_int_vector(IO_param, num, int_dat)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
+!!      subroutine mpi_read_int_vector(IO_param, num, int_dat)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !!@endverbatim
 !
       module MPI_domain_data_IO
@@ -40,7 +46,7 @@
 !
       implicit none
 !
-      private :: mpi_write_int_vector, mpi_read_int_vector
+      private :: mpi_read_int_vector, mpi_write_int_vector
 !
 !------------------------------------------------------------------
 !
@@ -48,12 +54,11 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine mpi_read_domain_info(IO_param, comm_IO)
+      subroutine mpi_check_num_of_domains(IO_param)
 !
       use m_error_IDs
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
-      type(communication_table), intent(inout) :: comm_IO
 !
       integer(kind = kint) :: nprocs_read
 !
@@ -64,8 +69,21 @@
         call calypso_mpi_abort(ierr_file, '#. of subdmain is wrong')
       end if
 !
-      call mpi_read_num_of_data(IO_param, comm_IO%num_neib)
+      end subroutine mpi_check_num_of_domains
 !
+! -----------------------------------------------------------------------
+!
+      subroutine mpi_read_domain_info(IO_param, comm_IO)
+!
+      use m_error_IDs
+!
+      type(calypso_MPI_IO_params), intent(inout) :: IO_param
+      type(communication_table), intent(inout) :: comm_IO
+!
+!
+      call mpi_check_num_of_domains(IO_param)
+!
+      call mpi_read_num_of_data(IO_param, comm_IO%num_neib)
       call alloc_neighbouring_id(comm_IO)
 !
       call mpi_read_int_vector                                          &

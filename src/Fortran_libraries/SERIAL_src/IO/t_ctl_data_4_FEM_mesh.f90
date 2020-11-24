@@ -12,6 +12,7 @@
 !!        type(FEM_mesh_control), intent(inout) :: Fmesh_ctl
 !!      subroutine write_FEM_mesh_control                               &
 !!     &         (id_file, hd_block, Fmesh_ctl, level)
+!!      subroutine reset_FEM_mesh_control(Fmesh_ctl)
 !!
 !! ------------------------------------------------------------------
 !!      Example of control parameters
@@ -160,6 +161,23 @@
       level =  write_end_flag_for_ctl(id_file, level, hd_block)
 !
       end subroutine write_FEM_mesh_control
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine reset_FEM_mesh_control(Fmesh_ctl)
+!
+      type(FEM_mesh_control), intent(inout) :: Fmesh_ctl
+!
+!
+      Fmesh_ctl%FEM_sleeve_level_ctl%iflag =      0
+      Fmesh_ctl%memory_conservation_ctl%iflag =   0
+      Fmesh_ctl%FEM_mesh_output_switch%iflag =    0
+      Fmesh_ctl%FEM_surface_output_switch%iflag = 0
+      Fmesh_ctl%FEM_viewer_output_switch%iflag =  0
+!
+      Fmesh_ctl%i_FEM_mesh = 0
+!
+      end subroutine reset_FEM_mesh_control
 !
 !  ---------------------------------------------------------------------
 !

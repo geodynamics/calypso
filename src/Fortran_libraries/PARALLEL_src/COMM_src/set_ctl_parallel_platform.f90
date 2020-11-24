@@ -34,7 +34,7 @@
 !
 !
       if (plt%ndomain_ctl%iflag .gt. 0) then
-        if( nprocs .ne. plt%ndomain_ctl%intvalue) then
+        if(nprocs .ne. plt%ndomain_ctl%intvalue) then
           write(e_message,'(a)')                                        &
      &              'Number of processes should be num. of mesh'
           call calypso_MPI_abort(ierr_P_MPI, e_message)

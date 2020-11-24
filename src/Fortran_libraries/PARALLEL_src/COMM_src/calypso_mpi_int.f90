@@ -53,6 +53,10 @@
 !!        integer(kind = kint), intent(in) ::    isendbuf(n_send)
 !!        integer(kind = kint), intent(inout) :: irecvbuf(nprocs*n_recv)
 !!
+!!      subroutine calypso_mpi_alltoall_one_int(isendbuf, irecvbuf)
+!!        integer(kind = kint), intent(in) ::    isendbuf(nprocs)
+!!        integer(kind = kint), intent(inout) :: irecvbuf(nprocs)
+!!
 !!      subroutine calypso_mpi_seek_write_int                           &
 !!     &         (id_mpi_file, ioffset, num, i_vector, sta_IO)
 !!        integer, intent(in) ::  id_mpi_file
@@ -267,6 +271,20 @@
      &    ierr_MPI)
 !
       end subroutine calypso_mpi_allgather_int
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_alltoall_one_int(isendbuf, irecvbuf)
+!
+      integer(kind = kint), intent(in) ::    isendbuf(nprocs)
+      integer(kind = kint), intent(inout) :: irecvbuf(nprocs)
+!
+!
+      call MPI_AlltoAll(isendbuf, 1, CALYPSO_INTEGER,                   &
+     &    irecvbuf, 1, CALYPSO_INTEGER, CALYPSO_COMM, ierr_MPI)
+!
+      end subroutine calypso_mpi_alltoall_one_int
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
