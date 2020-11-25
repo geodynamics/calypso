@@ -12,6 +12,8 @@ cal_sp_rlm_sym_mat_tsmp.o: $(SPH_COMMDIR)/cal_sp_rlm_sym_mat_tsmp.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_sph_exp_1st_diff.o: $(SPH_COMMDIR)/cal_sph_exp_1st_diff.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
+cal_sph_zonal_ave_rms_data.o: $(SPH_COMMDIR)/cal_sph_zonal_ave_rms_data.f90 m_precision.o m_constants.o m_machine_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
 cal_vr_rtm_by_vecprod.o: $(SPH_COMMDIR)/cal_vr_rtm_by_vecprod.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_vr_rtm_sym_mat_tsmp.o: $(SPH_COMMDIR)/cal_vr_rtm_sym_mat_tsmp.f90 m_precision.o m_constants.o m_machine_parameter.o
@@ -164,7 +166,7 @@ sph_rtp_domain_FFTPACK5.o: $(SPH_COMMDIR)/sph_rtp_domain_FFTPACK5.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 sph_rtp_domain_FFTW.o: $(SPH_COMMDIR)/sph_rtp_domain_FFTW.f90 m_precision.o m_constants.o m_machine_parameter.o m_fftw_parameters.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o t_sph_comm_table_from_FFTW.o t_sph_field_FFTW.o set_comm_table_rtp_FFTW.o copy_rtp_data_to_FFTPACK.o
 	$(F90) -c $(F90OPTFLAGS) $<
-sph_rtp_zonal_rms_data.o: $(SPH_COMMDIR)/sph_rtp_zonal_rms_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_rtp_data.o t_geometry_data.o t_phys_data.o coordinate_convert_4_sph.o
+sph_rtp_zonal_rms_data.o: $(SPH_COMMDIR)/sph_rtp_zonal_rms_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_rtp_data.o t_geometry_data.o t_phys_data.o coordinate_convert_4_sph.o cal_sph_zonal_ave_rms_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 spherical_SRs_N.o: $(SPH_COMMDIR)/spherical_SRs_N.f90 m_precision.o m_constants.o m_work_time.o t_sph_trans_comm_tbl.o t_solver_SR.o m_solver_SR.o sel_spherical_SRs.o calypso_SR_6.o calypso_SR_3.o calypso_SR_2.o calypso_SR.o calypso_SR_int.o m_elapsed_labels_SEND_RECV.o set_to_send_buffer.o
 	$(F90) -c $(F90OPTFLAGS) $<
