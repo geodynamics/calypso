@@ -31,6 +31,7 @@
       implicit  none
 !
       private :: truncate_magnetic_field_4_view
+      private :: copy_poloidal_to_streamfunc_rj
 !
 ! -----------------------------------------------------------------------
 !
@@ -70,8 +71,15 @@
      &      ipol%base%i_magne, ipol%prod_fld%i_truncated_B)
       end if
 !
+!
+      if(ipol%prod_fld%i_stream_pol_u .gt. 0) then
+        call copy_poloidal_to_streamfunc_rj(sph_rj, rj_fld,             &
+     &      ipol%base%i_velo, ipol%prod_fld%i_stream_pol_u)
+      end if
+!
       end subroutine s_cal_energy_flux_rj
 !
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine truncate_magnetic_field_4_view(ltr_crust, sph_rj,      &
@@ -103,6 +111,27 @@
 !$omp end parallel do
 !
       end subroutine truncate_magnetic_field_4_view
+!
+!-----------------------------------------------------------------------
+!
+      subroutine copy_poloidal_to_streamfunc_rj(sph_rj, rj_fld,         &
+     &                                          is_fld, is_stream)
+!
+      integer(kind = kint), intent(in) :: is_fld, is_stream
+      type(sph_rj_grid), intent(in) :: sph_rj
+      type(phys_data), intent(inout) :: rj_fld
+!
+      integer(kind = kint) :: inod
+!
+!$omp parallel do private(inod)
+      do inod = 1, sph_rj%nnod_rj
+        rj_fld%d_fld(inod,is_stream  ) = zero
+        rj_fld%d_fld(inod,is_stream+1) = zero
+        rj_fld%d_fld(inod,is_stream+2) = rj_fld%d_fld(inod,is_fld)
+      end do
+!$omp end parallel do
+!
+      end subroutine copy_poloidal_to_streamfunc_rj
 !
 !-----------------------------------------------------------------------
 !
