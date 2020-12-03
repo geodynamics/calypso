@@ -120,6 +120,17 @@ Set \verb|ON| if FEM mesh data need to be written.
 Parallelization is defined in this block. Domain decomposition is defined for spectrum data, field data, and Legendre transform. \\
 \hyperref[href_i:num_domain_ctl]{(Back to {\tt control\_sph\_shell})}
 
+\paragraph{\tt ordering\_set\_ctl}
+\label{href_t:ordering_set_ctl}
+\verb|[ORDERING_SET]| \\
+ Ordering set of spherical harmonics and grid data is defined here.  The following text parameter set \verb|[ORDERING_SET]| is available:
+ \begin{description}
+ \item[{\tt Ver\_2}]  Optimized ordering for Ver. 2.
+ \item[{\tt Ver\_1}] Original data ordering for Ver. 1.x
+ \end{description} 
+
+If \verb|[ORDERING_SET]| is not defined, ordering set for \verb|Ver_2| is chosen.
+
 \paragraph{\tt num\_radial\_domain\_ctl}
 \label{href_t:num_radial_domain_ctl}
 \verb|[Ndomain]| \\
@@ -1244,7 +1255,7 @@ If this flag set to \verb|YES|, original specter data is deleted at the end of p
 
 \subsection{\tt new\_time\_step\_ctl}
 \label{href_t:new_time_step_ctl}
-Parameters to modify time step and time data in the new restrat file. \\
+Parameters to modify time step and time data in the new restart file. \\
 \hyperref[href_i:new_time_step_ctl]{(Back to {\tt control\_assemble\_sph)}}
 
 \paragraph{\tt magnetic\_field\_ratio\_ctl}
