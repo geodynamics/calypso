@@ -98,9 +98,9 @@
       if(i_import_mode .gt. 0) then
         call set_import_table_ctl(import_mode_ctl)
       end if
-      if(i_SR_routine .gt. 0) then
-        call set_sph_comm_routine_ctl(SR_routine_ctl)
-      end if
+!      if(i_SR_routine .gt. 0) then
+!        call set_sph_comm_routine_ctl(SR_routine_ctl)
+!      end if
 !
       if (bc_data_file_name_ctl%iflag .gt. 0) then
         bc_sph_file_name = bc_data_file_name_ctl%charavalue

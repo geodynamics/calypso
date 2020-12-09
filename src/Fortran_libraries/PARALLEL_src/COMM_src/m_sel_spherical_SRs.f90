@@ -91,7 +91,7 @@
       integer(kind = kint) :: iflag_sph_SRN =   iflag_import_UNDEFINED
 !
 !>      Data communication mode for arbitrary size data
-      integer(kind = kint) :: iflag_sph_commN = iflag_SR_UNDEFINED
+      integer(kind = kint) :: iflag_sph_commN = iflag_send_recv
 !
 !-----------------------------------------------------------------------
 !
@@ -128,15 +128,15 @@
       character(len = kchara), intent(in) :: send_recv_ctl
 !
 !
-      if(cmp_no_case(send_recv_ctl, hd_sendrecv)     ) then
+!      if(cmp_no_case(send_recv_ctl, hd_sendrecv)     ) then
         iflag_sph_commN = iflag_send_recv
 !      else if(cmp_no_case(send_recv_ctl, hd_all2allv)) then
 !        iflag_sph_commN = iflag_alltoallv
 !      else if(cmp_no_case(send_recv_ctl, hd_all2all) ) then
 !        iflag_sph_commN = iflag_alltoall
-      else
-        iflag_sph_commN = iflag_SR_UNDEFINED
-      end if
+!      else
+!        iflag_sph_commN = iflag_SR_UNDEFINED
+!      end if
 !
       end subroutine set_sph_comm_routine_ctl
 !
