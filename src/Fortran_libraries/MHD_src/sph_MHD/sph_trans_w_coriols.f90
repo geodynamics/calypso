@@ -78,6 +78,7 @@
       call start_eleps_time(13)
       if(iflag_debug .gt. 0) write(*,*) 'sum_coriolis_rlm'
       call sum_coriolis_rlm(ncomp_trans, n_WR, WR)
+      call finish_send_recv_rj_2_rlm
       call end_eleps_time(13)
 !
       call start_eleps_time(22)
@@ -131,6 +132,7 @@
 !
       call start_eleps_time(23)
       if(iflag_debug .gt. 0) write(*,*) 'sel_forward_legendre_trans'
+      call finish_send_recv_rtp_2_rtm
       call sel_forward_legendre_trans                                   &
      &   (ncomp_trans, nvector, nscalar, n_WR, n_WS, WR, WS)
       call end_eleps_time(23)

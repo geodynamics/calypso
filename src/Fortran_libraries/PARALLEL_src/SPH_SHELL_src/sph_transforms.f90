@@ -69,6 +69,7 @@
       START_SRtime= MPI_WTIME()
       call start_eleps_time(18)
       call calypso_sph_comm_rj_2_rlm_N(ncomp_trans)
+      call finish_send_recv_rj_2_rlm
       call end_eleps_time(18)
       SendRecvtime = MPI_WTIME() - START_SRtime + SendRecvtime
 !
@@ -121,6 +122,7 @@
 !
       call start_eleps_time(23)
       if(iflag_debug .gt. 0) write(*,*) 'sel_forward_legendre_trans'
+      call finish_send_recv_rtp_2_rtm
       call sel_forward_legendre_trans                                   &
      &   (ncomp_trans, nvector, nscalar, n_WR, n_WS, WR, WS)
       call end_eleps_time(23)
