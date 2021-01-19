@@ -15,6 +15,9 @@
 !!      subroutine dealloc_iso_ctl_stract(iso_ctls)
 !!        type(isosurf_controls), intent(inout) :: iso_ctls
 !!
+!!       subroutine add_fields_4_isos_to_fld_ctl(iso_ctls, field_ctl)
+!!        type(isosurf_controls), intent(in) :: iso_ctls
+!!        type(ctl_array_c3), intent(inout) :: field_ctl
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!    array isosurface_ctl     2
 !!      file   isosurface_ctl   'ctl_iso_p_n1e4'
@@ -62,6 +65,7 @@
      &         (id_control, hd_block, iso_ctls, c_buf)
 !
       use t_read_control_elements
+      use read_iso_control_data
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
@@ -93,7 +97,7 @@
 !
           write(*,*) 'Control for', trim(hd_block), ' No. ',            &
      &              iso_ctls%num_iso_ctl, ' is included'
-          call read_iso_control_data(id_control, hd_block,              &
+          call s_read_iso_control_data(id_control, hd_block,            &
      &        iso_ctls%iso_ctl_struct(iso_ctls%num_iso_ctl), c_buf)
         end if
       end do
@@ -140,6 +144,24 @@
       iso_ctls%num_iso_ctl = 0
 !
       end subroutine dealloc_iso_ctl_stract
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine add_fields_4_isos_to_fld_ctl(iso_ctls, field_ctl)
+!
+      use t_control_array_character3
+!
+      type(isosurf_controls), intent(in) :: iso_ctls
+      type(ctl_array_c3), intent(inout) :: field_ctl
+      integer(kind = kint) :: i_iso
+!
+!
+      do i_iso = 1, iso_ctls%num_iso_ctl
+        call add_fields_4_iso_to_fld_ctl                                &
+     &     (iso_ctls%iso_ctl_struct(i_iso), field_ctl)
+      end do
+!
+      end subroutine add_fields_4_isos_to_fld_ctl
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
@@ -224,6 +246,7 @@
 !
       use t_read_control_elements
       use t_control_data_4_iso
+      use read_iso_control_data
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: fname_iso_ctl
@@ -237,9 +260,9 @@
 !
       do
         call load_one_line_from_control(id_control, c_buf1)
-        call read_iso_control_data                                      &
+        call s_read_iso_control_data                                    &
      &     (id_control, hd_isosurf_ctl, iso_ctl_struct, c_buf1)
-        call read_iso_control_data                                      &
+        call s_read_iso_control_data                                    &
      &     (id_control, hd_iso_ctl, iso_ctl_struct, c_buf1)
         if(iso_ctl_struct%i_iso_ctl .gt. 0) exit
       end do

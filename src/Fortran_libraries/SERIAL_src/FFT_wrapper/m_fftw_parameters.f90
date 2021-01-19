@@ -26,8 +26,8 @@
       complex(kind = fftw_complex), parameter :: iu = (0.0d0,1.0d0)
 !
 !>      estimation flag for FFTW
-      integer(kind = 4), parameter :: FFTW_ESTIMATE = 64
+      integer(kind = 4), parameter :: FFTW_KEMO_EST = 64
 !>      Meajor flag for FFTW
-      integer(kind = 4), parameter :: FFTW_MEASURE = 0
+      integer(kind = 4), parameter :: FFTW_KEMO_MEASURE = 0
 !
       end module m_fftw_parameters

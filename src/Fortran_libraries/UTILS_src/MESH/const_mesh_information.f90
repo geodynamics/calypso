@@ -8,6 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine empty_mesh_info(mesh, group)
+!!      subroutine dealloc_empty_mesh_info(mesh, group)
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::   group
 !!
@@ -28,9 +29,6 @@
 !!        type(surface_group_data), intent(inout) :: surf_grp
 !!        type(element_group_table), intent(inout) :: tbls_ele_grp
 !!        type(surface_group_table), intent(inout) :: tbls_sf_grp
-!!
-!!      subroutine empty_nod_and_ele_type_infos(geom)
-!!        type(mesh_geometry), intent(inout) :: geom
 !!
 !!      subroutine const_group_type_info                                &
 !!     &         (node, ele, surf, edge, ele_grp, surf_grp,             &
@@ -61,6 +59,8 @@
 !
       implicit none
 !
+      private :: empty_nod_and_ele_infos
+!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -78,8 +78,8 @@
       type(mesh_groups), intent(inout) ::   group
 !
 !
-      if (iflag_debug.eq.1) write(*,*) 'empty_nod_and_ele_type_infos'
-      call empty_nod_and_ele_type_infos(mesh)
+      if (iflag_debug.eq.1) write(*,*) 'empty_nod_and_ele_infos'
+      call empty_nod_and_ele_infos(mesh)
 !
 !
       call empty_surface_and_edge(mesh%ele, mesh%surf, mesh%edge)
@@ -104,6 +104,18 @@
      &   (group%surf_grp, group%tbls_surf_grp)
 !
       end subroutine empty_mesh_info
+!
+! ----------------------------------------------------------------------
+!
+      subroutine dealloc_empty_mesh_info(mesh, group)
+!
+      type(mesh_geometry), intent(inout) :: mesh
+      type(mesh_groups), intent(inout) ::   group
+!
+!
+      call dealloc_empty_nod_ele_infos(mesh)
+!
+      end subroutine dealloc_empty_mesh_info
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -131,8 +143,8 @@
       call set_local_element_info(mesh%surf, mesh%edge)
 !
 !     set connectivity and geometry for surface and edge
-      if (iflag_debug.gt.0) write(*,*) 'set_surface_and_edge'
-      call set_surface_and_edge                                         &
+      if (iflag_debug.gt.0) write(*,*) 'const_surface_and_edge'
+      call const_surface_and_edge                                       &
      &   (mesh%node, mesh%ele, mesh%surf, mesh%edge)
 !
 !     set connection relation of element and surface
@@ -231,13 +243,14 @@
       read_element = allocated(ele%x_ele)
 !
       if(read_element .eqv. .false.) then
+        call alloc_overlapped_ele(ele)
         call alloc_ele_geometry(ele)
         if (iflag_debug.eq.1) write(*,*) 'set_center_of_element'
         call set_center_of_element(node, ele)
       end if
 !
-       if (iflag_debug.eq.1) write(*,*) 'count_size_4_smp_mesh_type'
-      call count_size_4_smp_mesh_type(node, ele)
+       if (iflag_debug.eq.1) write(*,*) 'count_size_4_smp_mesh'
+      call count_size_4_smp_mesh(node, ele)
 !
        if (iflag_debug.eq.1) write(*,*) 'set_spherical_position'
       call set_spherical_position(node)
@@ -252,19 +265,34 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine empty_nod_and_ele_type_infos(geom)
+      subroutine empty_nod_and_ele_infos(geom)
 !
       type(mesh_geometry), intent(inout) :: geom
 !
 !
       geom%ele%numele = 0
+      call alloc_overlapped_ele(geom%ele)
       call alloc_ele_geometry(geom%ele)
 !
-      if (iflag_debug.eq.1) write(*,*) 'allocate_node_param_smp_type'
-      call allocate_node_param_smp_type(geom%node)
-      call allocate_ele_param_smp_type(geom%ele)
+      if (iflag_debug.eq.1) write(*,*) 'alloc_node_param_smp'
+      call alloc_node_param_smp(geom%node)
+      call alloc_ele_param_smp(geom%ele)
 !
-      end subroutine empty_nod_and_ele_type_infos
+      end subroutine empty_nod_and_ele_infos
+!
+! ----------------------------------------------------------------------
+!
+      subroutine dealloc_empty_nod_ele_infos(geom)
+!
+      type(mesh_geometry), intent(inout) :: geom
+!
+!
+      call dealloc_overlapped_ele(geom%ele)
+      call dealloc_ele_geometry(geom%ele)
+      call dealloc_node_param_smp(geom%node)
+      call dealloc_ele_param_smp(geom%ele)
+!
+      end subroutine dealloc_empty_nod_ele_infos
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

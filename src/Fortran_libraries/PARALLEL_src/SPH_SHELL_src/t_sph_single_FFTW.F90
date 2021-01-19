@@ -133,9 +133,9 @@
       Nfft4 = int(sph_rtp%nidx_rtp(3))
       do ip = 1, np_smp
         call dfftw_plan_dft_r2c_1d(FFTW_t%plan_fwd(ip), Nfft4,          &
-     &      FFTW_t%X(1,ip), FFTW_t%C(1,ip) , FFTW_ESTIMATE)
+     &      FFTW_t%X(1,ip), FFTW_t%C(1,ip) , FFTW_KEMO_EST)
         call dfftw_plan_dft_c2r_1d(FFTW_t%plan_bwd(ip), Nfft4,          &
-     &      FFTW_t%C(1,ip), FFTW_t%X(1,ip) , FFTW_ESTIMATE)
+     &      FFTW_t%C(1,ip), FFTW_t%X(1,ip) , FFTW_KEMO_EST)
       end do
       FFTW_t%aNfft = one / dble(sph_rtp%nidx_rtp(3))
 !

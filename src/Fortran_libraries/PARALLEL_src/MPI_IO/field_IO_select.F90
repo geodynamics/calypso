@@ -11,11 +11,15 @@
 !!@verbatim
 !!      logical function check_step_FEM_field_file                      &
 !!     &                (id_rank, istep_fld, file_IO)
+!!      logical function check_writable_FEM_fld_file                    &
+!!     &                (id_rank, istep_fld, file_IO)
+!!        type(field_IO_params), intent(in) :: file_IO
 !!
 !!      subroutine sel_write_step_FEM_field_file                        &
 !!     &         (istep_fld, file_IO, t_IO, fld_IO)
 !!      subroutine sel_write_step_SPH_field_file                        &
 !!     &         (istep_fld, file_IO, t_IO, fld_IO)
+!!        type(field_IO_params), intent(in) :: file_IO
 !!
 !!      subroutine sel_read_step_FEM_field_file                         &
 !!     &         (num_pe, id_rank, istep_fld, file_IO, t_IO, fld_IO)
@@ -89,6 +93,29 @@
       check_step_FEM_field_file = check_file_exist(file_name)
 !
       end function check_step_FEM_field_file
+!
+!------------------------------------------------------------------
+!
+      logical function check_writable_FEM_fld_file                      &
+     &                (id_rank, istep_fld, file_IO)
+!
+      use set_field_file_names
+      use delete_data_files
+!
+      integer, intent(in) :: id_rank
+      integer(kind = kint), intent(in) :: istep_fld
+      type(field_IO_params), intent(in) :: file_IO
+!
+      character(len=kchara) :: file_name
+!
+!
+      file_name = set_FEM_fld_file_name(file_IO%file_prefix,            &
+     &           file_IO%iflag_format, id_rank, istep_fld)
+!
+      check_writable_FEM_fld_file                                       &
+     &          = check_file_writable(id_rank, file_name)
+!
+      end function check_writable_FEM_fld_file
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------

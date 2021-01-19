@@ -72,7 +72,7 @@
 !   vorticity flag
 !      if(fl_prop%iflag_4_inertia) then
         call add_field_4_sph_trns_by_pol(d_rj,                          &
-     &      ipol_base%i_vort, iphys_base%i_vort, b_trns_base%i_vort,   &
+     &      ipol_base%i_vort, iphys_base%i_vort, b_trns_base%i_vort,    &
      &      trns)
 !      end if
 !   magnetic field flag

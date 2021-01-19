@@ -126,11 +126,11 @@
         call dfftw_plan_many_dft_r2c                                    &
      &     (plan_forward_smp(ip), IONE_4, Nfft4, howmany,               &
      &      X_FFTW(1,ist), inembed, istride, idist_r,                   &
-     &      C_FFTW(1,ist), inembed, istride, idist_c, FFTW_ESTIMATE)
+     &      C_FFTW(1,ist), inembed, istride, idist_c, FFTW_KEMO_EST)
         call dfftw_plan_many_dft_c2r                                    &
      &     (plan_backward_smp(ip), IONE_4, Nfft4, howmany,              &
      &      C_FFTW(1,ist), inembed, istride, idist_c,                   &
-     &      X_FFTW(1,ist), inembed, istride, idist_r, FFTW_ESTIMATE)
+     &      X_FFTW(1,ist), inembed, istride, idist_r, FFTW_KEMO_EST)
       end do
       aNfft = one / dble(Nfft)
 !

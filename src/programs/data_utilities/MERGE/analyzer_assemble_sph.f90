@@ -61,7 +61,7 @@
       type(control_data_4_merge) :: mgd_ctl_s
       type(sph_grid_maker_in_sim) :: sph_asbl_maker_s
       type(sph_grid_maker_in_sim) :: sph_org_maker_s
-      integer(kind = kint) :: ip
+!      integer(kind = kint) :: ip
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank

@@ -108,8 +108,8 @@
       if (iflag_debug.eq.1) write(*,*) 'allocate_surface_connect_type'
       call allocate_surface_connect_type(surf, ele%numele)
 !
-      if (iflag_debug.eq.1) write(*,*) 'allocate_surf_param_smp_type'
-      call allocate_surf_param_smp_type(surf)
+      if (iflag_debug.eq.1) write(*,*) 'alloc_surf_param_smp'
+      call alloc_surf_param_smp(surf)
 !
       end subroutine empty_surface_connect
 !

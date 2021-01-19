@@ -80,7 +80,6 @@
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      call link_num_field_2_ucd(nod_fld, ucd)
       call link_local_mesh_2_ucd(node, ele, ucd)
       call link_field_data_to_ucd(nod_fld, ucd)
 !
@@ -125,7 +124,6 @@
       type(ucd_data) :: ucd
 !
 !
-      call link_num_field_2_ucd(nod_fld, ucd)
       call link_local_mesh_2_ucd(node, ele, ucd)
       call link_field_data_to_ucd(nod_fld, ucd)
 !

@@ -196,6 +196,7 @@
 !
       type(group_data), intent(inout) :: grp
 !
+      if(allocated(grp%grp_name) .eqv. .FALSE.) return
       deallocate(grp%grp_name)
       deallocate(grp%nitem_grp)
       deallocate(grp%istack_grp)
@@ -208,6 +209,7 @@
 !
       type(group_data), intent(inout) :: grp
 !
+      if(allocated(grp%item_grp) .eqv. .FALSE.) return
       deallocate(grp%item_grp)
 !
       end subroutine dealloc_group_item
@@ -218,6 +220,7 @@
 !
       type(group_data), intent(inout) :: grp
 !
+      if(allocated(grp%istack_grp_smp) .eqv. .FALSE.) return
       deallocate(grp%istack_grp_smp)
 !
       end subroutine dealloc_group_smp
@@ -240,6 +243,7 @@
 !
       type(surface_group_data), intent(inout) :: sf_grp
 !
+      if(allocated(sf_grp%grp_name) .eqv. .FALSE.) return
       deallocate(sf_grp%grp_name)
       deallocate(sf_grp%nitem_grp)
       deallocate(sf_grp%istack_grp)
@@ -252,6 +256,7 @@
 !
       type(surface_group_data), intent(inout) :: sf_grp
 !
+      if(allocated(sf_grp%item_sf_grp) .eqv. .FALSE.) return
       deallocate(sf_grp%item_sf_grp)
 !
       end subroutine dealloc_sf_group_item
@@ -262,6 +267,7 @@
 !
       type(surface_group_data), intent(inout) :: sf_grp
 !
+      if(allocated(sf_grp%istack_grp_smp) .eqv. .FALSE.) return
       deallocate(sf_grp%istack_grp_smp)
 !
       end subroutine dealloc_sf_group_smp

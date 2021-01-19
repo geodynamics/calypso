@@ -3,9 +3,10 @@
 !
 !      Written by H. Matsui on July, 2006
 !
-!!      subroutine read_control_data_section_only(sec_viz_ctl)
-!!      subroutine reset_section_control_data(sec_viz_ctl)
+!!      subroutine read_control_file_section_only(sec_viz_ctl)
+!!      subroutine dealloc_section_control_data(sec_viz_ctl)
 !!        type(control_data_section_only), intent(inout) :: sec_viz_ctl
+!!
 !!
 !!   --------------------------------------------------------------------
 !!    Example of control block
@@ -36,6 +37,7 @@
       use t_ctl_data_4_platforms
       use t_ctl_data_4_time_steps
       use t_control_data_surfacings
+      use t_control_array_character3
 !
       implicit  none
 !
@@ -53,6 +55,9 @@
 !
 !>        Structures of visualization controls
         type(surfacing_controls) :: surfacing_ctls
+!
+!>        Structures of field used in visualization
+        type(ctl_array_c3) :: viz_field_ctl
 !
         integer (kind=kint) :: i_viz_only_file = 0
       end type control_data_section_only
@@ -81,7 +86,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_control_data_section_only(sec_viz_ctl)
+      subroutine read_control_file_section_only(sec_viz_ctl)
 !
       use skip_comment_f
       use t_control_data_surfacings
@@ -102,11 +107,16 @@
 !
         call section_step_ctls_to_time_ctl                              &
      &     (sec_viz_ctl%surfacing_ctls, sec_viz_ctl%t_sect_ctl)
+!
+        sec_viz_ctl%viz_field_ctl%num =  0
+        call alloc_control_array_c3(sec_viz_ctl%viz_field_ctl)
+        call add_fields_4_scts_to_fld_ctl(sec_viz_ctl%surfacing_ctls,   &
+     &                                    sec_viz_ctl%viz_field_ctl)
       end if
 !
       call bcast_section_control_data(sec_viz_ctl)
 !
-      end subroutine read_control_data_section_only
+      end subroutine read_control_file_section_only
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
@@ -115,6 +125,7 @@
      &         (id_control, hd_block, sec_viz_ctl, c_buf)
 !
       use skip_comment_f
+      use read_surfacing_controls
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -134,7 +145,7 @@
         call read_control_time_step_data                                &
      &     (id_control, hd_time_step, sec_viz_ctl%t_sect_ctl, c_buf)
 !
-        call read_surfacing_controls                                    &
+        call s_read_surfacing_controls                                  &
      &     (id_control, hd_viz_ctl, sec_viz_ctl%surfacing_ctls, c_buf)
       end do
       sec_viz_ctl%i_viz_only_file = 1
@@ -148,10 +159,12 @@
       use calypso_mpi_int
       use bcast_4_platform_ctl
       use bcast_4_time_step_ctl
+      use bcast_control_arrays
 !
       type(control_data_section_only), intent(inout) :: sec_viz_ctl
 !
 !
+      call bcast_ctl_array_c3(sec_viz_ctl%viz_field_ctl)
       call bcast_ctl_data_4_platform(sec_viz_ctl%sect_plt)
       call bcast_ctl_data_4_time_step(sec_viz_ctl%t_sect_ctl)
       call bcast_surfacing_controls(sec_viz_ctl%surfacing_ctls)
@@ -162,17 +175,21 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine reset_section_control_data(sec_viz_ctl)
+      subroutine dealloc_section_control_data(sec_viz_ctl)
+!
+      use bcast_4_time_step_ctl
 !
       type(control_data_section_only), intent(inout) :: sec_viz_ctl
 !
 !
+      call dealloc_control_array_c3(sec_viz_ctl%viz_field_ctl)
       call reset_control_platforms(sec_viz_ctl%sect_plt)
-      call bcast_surfacing_controls(sec_viz_ctl%surfacing_ctls)
+      call reset_ctl_data_4_time_step(sec_viz_ctl%t_sect_ctl)
+      call dealloc_surfacing_controls(sec_viz_ctl%surfacing_ctls)
 !
       sec_viz_ctl%i_viz_only_file = 0
 !
-      end subroutine reset_section_control_data
+      end subroutine dealloc_section_control_data
 !
 !   --------------------------------------------------------------------
 !

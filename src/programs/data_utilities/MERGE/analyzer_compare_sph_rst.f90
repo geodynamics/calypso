@@ -129,7 +129,7 @@
       use share_field_data
       use compare_by_assemble_sph
 !
-      integer(kind = kint) :: istep, icou
+      integer(kind = kint) :: istep
       integer(kind = kint) :: iloop, ip
       integer(kind = kint) :: iflag, iflag_gl
       integer(kind = kint) :: istep_out

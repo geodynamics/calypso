@@ -7,10 +7,10 @@
 !>@brief Copy FEM mesh structures
 !!
 !!@verbatim
-!!      subroutine set_mesh_data_from_type                              &
+!!      subroutine copy_mesh_and_group                                  &
 !!     &         (mesh, group, tgt_mesh, tgt_grp)
-!!        type(mesh_geometry), intent(inout) :: mesh
-!!        type(mesh_groups), intent(inout) :: group
+!!        type(mesh_geometry), intent(in) :: mesh
+!!        type(mesh_groups), intent(in) :: group
 !!        type(mesh_geometry), intent(inout) :: tgt_mesh
 !!        type(mesh_groups), intent(inout) :: tgt_grp
 !!
@@ -47,7 +47,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_mesh_data_from_type                                &
+      subroutine copy_mesh_and_group                                    &
      &         (mesh, group, tgt_mesh, tgt_grp)
 !
       use t_mesh_data
@@ -59,8 +59,8 @@
       use set_nnod_4_ele_by_type
 !
 !
-      type(mesh_geometry), intent(inout) :: mesh
-      type(mesh_groups), intent(inout) :: group
+      type(mesh_geometry), intent(in) :: mesh
+      type(mesh_groups), intent(in) :: group
 !
       type(mesh_geometry), intent(inout) :: tgt_mesh
       type(mesh_groups), intent(inout) :: tgt_grp
@@ -77,14 +77,12 @@
       call copy_surface_group(group%surf_grp, tgt_grp%surf_grp)
 !
       call alloc_sph_node_geometry(tgt_mesh%node)
+!      call alloc_overlapped_ele(tgt_mesh%ele)
 !      call alloc_ele_geometry(tgt_mesh%ele)
       call set_3D_nnod_4_sfed_by_ele(tgt_mesh%ele%nnod_4_ele,           &
      &    tgt_mesh%surf%nnod_4_surf, tgt_mesh%edge%nnod_4_edge)
 !
-      call dealloc_groups_data(group)
-      call dealloc_mesh_geometry_base(mesh)
-!
-      end subroutine set_mesh_data_from_type
+      end subroutine copy_mesh_and_group
 !
 !  ---------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -193,7 +191,7 @@
       new_ele%nnod_4_ele                                                &
      &      = set_nnod_4_ele_by_eletype(new_ele%first_ele_type)
 !
-      call allocate_ele_connect_type(new_ele)
+      call alloc_ele_connect(new_ele)
 !
 !$omp parallel private(k1)
       do k1 = 1, new_ele%nnod_4_ele

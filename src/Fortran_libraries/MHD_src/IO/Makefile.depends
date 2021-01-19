@@ -42,7 +42,7 @@ t_bc_data_list.o: $(MHD_IO_DIR)/t_bc_data_list.f90 m_precision.o t_control_param
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_data_dynamo_vizs.o: $(MHD_IO_DIR)/t_control_data_dynamo_vizs.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_control_data_sections.o t_ctl_data_crust_filter.o t_read_control_elements.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_MHD.o: $(MHD_IO_DIR)/t_ctl_data_MHD.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_ctl_data_4_platforms.o t_ctl_data_MHD_model.o t_ctl_data_SPH_MHD_control.o t_ctl_data_4_sph_monitor.o t_ctl_data_node_monitor.o t_ctl_data_gen_sph_shell.o t_control_data_surfacings.o t_control_data_dynamo_vizs.o calypso_mpi_int.o bcast_4_platform_ctl.o bcast_4_field_ctl.o bcast_4_sph_monitor_ctl.o bcast_4_sphere_ctl.o
+t_ctl_data_MHD.o: $(MHD_IO_DIR)/t_ctl_data_MHD.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_ctl_data_4_platforms.o t_ctl_data_MHD_model.o t_ctl_data_SPH_MHD_control.o t_ctl_data_4_sph_monitor.o t_ctl_data_node_monitor.o t_ctl_data_gen_sph_shell.o t_control_data_surfacings.o t_control_data_dynamo_vizs.o read_surfacing_controls.o calypso_mpi_int.o bcast_4_platform_ctl.o bcast_4_field_ctl.o bcast_4_sph_monitor_ctl.o bcast_4_sphere_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_MHD_model.o: $(MHD_IO_DIR)/t_ctl_data_MHD_model.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_ctl_data_4_fields.o t_ctl_data_mhd_evolution.o t_ctl_data_node_boundary.o t_ctl_data_surf_boundary.o t_ctl_data_mhd_normalize.o t_ctl_data_mhd_forces.o t_ctl_data_temp_model.o skip_comment_f.o calypso_mpi_int.o bcast_4_field_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<

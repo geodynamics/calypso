@@ -104,8 +104,7 @@
       use output_gen_sph_grid_modes
       use parallel_load_data_4_sph
 !
-      integer :: i1, i2, i
-      integer :: istep_sr_rtp
+!      integer :: i1, i2, i
 !
 !  ========= Generate spherical harmonics table ========================
 !

@@ -14,17 +14,17 @@
 !!      subroutine allocate_iso_surface_type(surf)
 !!      subroutine allocate_surface_geom_type(surf)
 !!      subroutine allocate_normal_vect_type(surf)
-!!      subroutine allocate_surf_param_smp_type(surf)
+!!      subroutine alloc_surf_param_smp(surf)
 !!      subroutine alloc_ele_4_surf_type(surf)
 !!
 !!      subroutine dealloc_numsurf_stack(surf)
-!!      subroutine deallocate_inod_in_surf_type(surf)
+!!      subroutine dealloc_inod_in_surf(surf)
 !!      subroutine deallocate_surface_connect_type(surf)
 !!      subroutine deallocate_ext_surface_type(surf)
 !!      subroutine deallocate_iso_surface_type(surf)
 !!      subroutine deallocate_surface_geom_type(surf)
 !!      subroutine deallocate_normal_vect_type(surf)
-!!      subroutine deallocate_surf_param_smp_type(surf)
+!!      subroutine dealloc_surf_param_smp(surf)
 !!      subroutine dealloc_ele_4_surf_type(surf)
 !!        integer(kind = kint), intent(in) :: nele
 !!        type(surface_data), intent(inout) :: surf
@@ -228,9 +228,9 @@
 !
       end subroutine allocate_normal_vect_type
 !
-! ------------------------------------------------------
+!-----------------------------------------------------------------------
 !
-      subroutine allocate_surf_param_smp_type(surf)
+      subroutine alloc_surf_param_smp(surf)
 !
       use m_machine_parameter
 !
@@ -239,7 +239,7 @@
       allocate( surf%istack_surf_smp(0:np_smp))
       surf%istack_surf_smp = 0
 !
-      end subroutine allocate_surf_param_smp_type
+      end subroutine alloc_surf_param_smp
 !
 !-----------------------------------------------------------------------
 !
@@ -261,20 +261,22 @@
       type(surface_data), intent(inout) :: surf
 !
 !
+      if(allocated(surf%istack_numsurf) .eqv. .FALSE.) return
       deallocate (surf%istack_numsurf, surf%istack_intersurf)
 !
       end subroutine dealloc_numsurf_stack
 !
 !  ---------------------------------------------------------------------
 !
-       subroutine deallocate_inod_in_surf_type(surf)
+      subroutine dealloc_inod_in_surf(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
 !
-       deallocate (surf%node_on_sf, surf%node_on_sf_n)
+      if(allocated(surf%node_on_sf) .eqv. .FALSE.) return
+      deallocate (surf%node_on_sf, surf%node_on_sf_n)
 !
-       end subroutine deallocate_inod_in_surf_type
+      end subroutine dealloc_inod_in_surf
 !
 !  ---------------------------------------------------------------------
 !
@@ -282,6 +284,7 @@
 !
       type(surface_data), intent(inout) :: surf
 !
+      if(allocated(surf%isf_4_ele) .eqv. .FALSE.) return
       deallocate( surf%isf_4_ele     )
       deallocate( surf%isf_rot_ele   )
       deallocate( surf%ie_surf       )
@@ -296,6 +299,7 @@
 !
       type(surface_data), intent(inout) :: surf
 !
+      if(allocated(surf%isf_external) .eqv. .FALSE.) return
       deallocate( surf%isf_external )
 !
       end subroutine deallocate_ext_surface_type
@@ -306,6 +310,7 @@
 !
       type(surface_data), intent(inout) :: surf
 !
+      if(allocated(surf%isf_isolate) .eqv. .FALSE.) return
       deallocate( surf%isf_isolate )
 !
       end subroutine deallocate_iso_surface_type
@@ -316,6 +321,7 @@
 !
       type(surface_data), intent(inout) :: surf
 !
+      if(allocated(surf%x_surf) .eqv. .FALSE.) return
       deallocate( surf%x_surf )
 !
       end subroutine deallocate_surface_geom_type
@@ -326,6 +332,7 @@
 !
       type(surface_data), intent(inout) :: surf
 !
+      if(allocated(surf%area_surf) .eqv. .FALSE.) return
       deallocate( surf%area_surf )
       deallocate( surf%a_area_surf )
       deallocate( surf%vnorm_surf )
@@ -334,13 +341,14 @@
 !
 ! ------------------------------------------------------
 !
-      subroutine deallocate_surf_param_smp_type(surf)
+      subroutine dealloc_surf_param_smp(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
+      if(allocated(surf%istack_surf_smp) .eqv. .FALSE.) return
       deallocate( surf%istack_surf_smp )
 !
-      end subroutine deallocate_surf_param_smp_type
+      end subroutine dealloc_surf_param_smp
 !
 !-----------------------------------------------------------------------
 !
@@ -349,6 +357,7 @@
       type(surface_data), intent(inout) :: surf
 !
 !
+      if(allocated(surf%iele_4_surf) .eqv. .FALSE.) return
       deallocate(surf%iele_4_surf)
 !
       end subroutine dealloc_ele_4_surf_type

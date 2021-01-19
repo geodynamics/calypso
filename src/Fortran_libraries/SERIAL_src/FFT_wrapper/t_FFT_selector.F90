@@ -103,7 +103,7 @@
 !
 !
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW) then
+      if(iflag_FFT .eq. iflag_FFTW_ONCE) then
         if(id_rank .eq. 0) write(*,*) 'Use FFTW'
         call init_FFTW_mul_type(Nsmp, Nstacksmp, Nfft, WKS%WK_MUL_FFTW)
         return
@@ -130,7 +130,7 @@
 !
 !
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW) then
+      if(iflag_FFT .eq. iflag_FFTW_ONCE) then
         if(iflag_debug .gt. 0) write(*,*) 'Finalize FFTW'
         call finalize_FFTW_mul_type(Nsmp, WKS%WK_MUL_FFTW)
         return
@@ -159,7 +159,7 @@
 !
 !
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW) then
+      if(iflag_FFT .eq. iflag_FFTW_ONCE) then
         if(iflag_debug .gt. 0) write(*,*) 'Use FFTW'
         call verify_wk_FFTW_mul_type(Nsmp, Nstacksmp,                   &
      &      Nfft, WKS%WK_MUL_FFTW)
@@ -191,7 +191,7 @@
 !
 !
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW) then
+      if(iflag_FFT .eq. iflag_FFTW_ONCE) then
         call FFTW_mul_forward_type(Nsmp, Nstacksmp, M, Nfft, X,         &
      &      WKS%WK_MUL_FFTW)
         return
@@ -221,7 +221,7 @@
 !
 !
 #ifdef FFTW3
-      if(iflag_FFT .eq. iflag_FFTW) then
+      if(iflag_FFT .eq. iflag_FFTW_ONCE) then
         call FFTW_mul_backward_type(Nsmp, Nstacksmp, M, Nfft, X,        &
      &      WKS%WK_MUL_FFTW)
         return

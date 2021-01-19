@@ -145,7 +145,7 @@
 !
       mm = 0
       do ip = 1, ndomain_m
-        do m = -ltr/m_folding, ltr/m_folding
+        do m = ltr/m_folding, -ltr/m_folding, -1
           ma = abs(m)
           if (ip_tmp(ma) .eq. ip) then
             jdx_fsph(m) = mm

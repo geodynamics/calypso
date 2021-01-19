@@ -13,27 +13,29 @@
 !!      subroutine alloc_node_geometry_w_sph(node)
 !!      subroutine alloc_node_geometry_base(node)
 !!      subroutine alloc_sph_node_geometry(node)
+!!        type(node_data), intent(inout) :: node
 !!
-!!      subroutine allocate_ele_connect_type(ele)
+!!      subroutine alloc_ele_connect(ele)
 !!      subroutine alloc_element_types(ele)
 !!      subroutine alloc_ele_connectivity(ele)
-!!      subroutine alloc_overlaped_ele(ele)
+!!      subroutine alloc_overlapped_ele(ele)
 !!      subroutine alloc_ele_geometry(ele)
-!!      subroutine allocate_node_param_smp_type(node)
-!!      subroutine allocate_ele_param_smp_type(ele)
+!!      subroutine alloc_node_param_smp(node)
+!!      subroutine alloc_ele_param_smp(ele)
 !!        type(element_data), intent(inout) :: ele
 !!
 !!      subroutine dealloc_numnod_stack(node)
 !!      subroutine dealloc_numele_stack(ele)
 !!      subroutine dealloc_node_geometry_w_sph(node)
 !!      subroutine dealloc_node_geometry_base(node)
-!!      subroutine deallocate_sph_node_geometry(node)
+!!      subroutine dealloc_sph_node_geometry(node)
+!!        type(node_data), intent(inout) :: node
 !!
-!!      subroutine deallocate_ele_connect_type(ele)
-!!      subroutine dealloc_overlaped_ele(ele)
-!!      subroutine deallocate_ele_geometry_type(ele)
-!!      subroutine deallocate_node_param_smp_type(node)
-!!      subroutine deallocate_ele_param_smp_type(ele)
+!!      subroutine dealloc_ele_connect(ele)
+!!      subroutine dealloc_overlapped_ele(ele)
+!!      subroutine dealloc_ele_geometry(ele)
+!!      subroutine dealloc_node_param_smp(node)
+!!      subroutine dealloc_ele_param_smp(ele)
 !!        type(element_data), intent(inout) :: ele
 !!
 !!      subroutine check_nod_size_smp_type(node, id_rank)
@@ -249,14 +251,14 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_ele_connect_type(ele)
+      subroutine alloc_ele_connect(ele)
 !
       type(element_data), intent(inout) :: ele
 !
       call alloc_element_types(ele)
       call alloc_ele_connectivity(ele)
 !
-      end subroutine allocate_ele_connect_type
+      end subroutine alloc_ele_connect
 !
 !  ---------------------------------------------------------------------
 !
@@ -290,7 +292,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine alloc_overlaped_ele(ele)
+      subroutine alloc_overlapped_ele(ele)
 !
       type(element_data), intent(inout) :: ele
 !
@@ -298,7 +300,7 @@
       allocate(ele%interior_ele(ele%numele) )
       if(ele%numele .gt. 0) ele%interior_ele = 1
 !
-      end subroutine alloc_overlaped_ele
+      end subroutine alloc_overlapped_ele
 !
 !  ---------------------------------------------------------------------
 !
@@ -307,20 +309,18 @@
       type(element_data), intent(inout) :: ele
 !
 !
-      call alloc_overlaped_ele(ele)
+      allocate(ele%x_ele(ele%numele,3))
+      allocate(ele%r_ele(ele%numele))
+      allocate(ele%ar_ele(ele%numele))
+      allocate(ele%phi_ele(ele%numele))
+      allocate(ele%theta_ele(ele%numele))
+      allocate(ele%s_ele(ele%numele))
+      allocate(ele%as_ele(ele%numele))
 !
-      allocate( ele%x_ele(ele%numele,3))
-      allocate( ele%r_ele(ele%numele))
-      allocate( ele%ar_ele(ele%numele))
-      allocate( ele%phi_ele(ele%numele))
-      allocate( ele%theta_ele(ele%numele))
-      allocate( ele%s_ele(ele%numele))
-      allocate( ele%as_ele(ele%numele))
+      allocate(ele%volume_ele(ele%numele))
+      allocate(ele%a_vol_ele(ele%numele))
 !
-      allocate( ele%volume_ele(ele%numele) )
-      allocate( ele%a_vol_ele(ele%numele) )
-!
-      if (ele%numele .gt. 0) then
+      if(ele%numele .gt. 0) then
         ele%x_ele = 0.0d0
 !
         ele%r_ele = 0.0d0
@@ -337,8 +337,9 @@
       end subroutine alloc_ele_geometry
 !
 !  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
 !
-      subroutine allocate_node_param_smp_type(node)
+      subroutine alloc_node_param_smp(node)
 !
       use m_machine_parameter
 !
@@ -350,11 +351,11 @@
       node%istack_nod_smp =      0
       node%istack_internal_smp = 0
 !
-      end subroutine allocate_node_param_smp_type
+      end subroutine alloc_node_param_smp
 !
 !-----------------------------------------------------------------------
 !
-      subroutine allocate_ele_param_smp_type(ele)
+      subroutine alloc_ele_param_smp(ele)
 !
       use m_machine_parameter
 !
@@ -363,7 +364,7 @@
       allocate( ele%istack_ele_smp(0:np_smp))
       ele%istack_ele_smp = 0
 !
-      end subroutine allocate_ele_param_smp_type
+      end subroutine alloc_ele_param_smp
 !
 !-----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -373,6 +374,7 @@
       type(node_data), intent(inout) :: node
 !
 !
+      if(allocated(node%istack_numnod) .eqv. .FALSE.) return
       deallocate(node%istack_numnod, node%istack_internod)
 !
       end subroutine dealloc_numnod_stack
@@ -384,6 +386,7 @@
       type(element_data), intent(inout) :: ele
 !
 !
+      if(allocated(ele%istack_numele) .eqv. .FALSE.) return
       deallocate(ele%istack_numele, ele%istack_interele)
 !
       end subroutine dealloc_numele_stack
@@ -394,7 +397,7 @@
 !
       type(node_data), intent(inout) :: node
 !
-      call deallocate_sph_node_geometry(node)
+      call dealloc_sph_node_geometry(node)
       call dealloc_node_geometry_base(node)
 !
       end subroutine dealloc_node_geometry_w_sph
@@ -405,86 +408,89 @@
 !
       type(node_data), intent(inout) :: node
 !
+      if(allocated(node%inod_global) .eqv. .FALSE.) return
       deallocate(node%inod_global, node%xx)
 !
       end subroutine dealloc_node_geometry_base
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_sph_node_geometry(node)
+      subroutine dealloc_sph_node_geometry(node)
 !
       type(node_data), intent(inout) :: node
 !
+      if(allocated(node%rr) .eqv. .FALSE.) return
       deallocate(node%rr, node%a_r, node%ss)
       deallocate(node%a_s, node%phi, node%theta)
 !
-      end subroutine deallocate_sph_node_geometry
+      end subroutine dealloc_sph_node_geometry
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_ele_connect_type(ele)
+      subroutine dealloc_ele_connect(ele)
 !
       type(element_data), intent(inout) :: ele
 !
+      if(allocated(ele%iele_global) .eqv. .FALSE.) return
       deallocate(ele%iele_global)
       deallocate(ele%elmtyp, ele%nodelm)
       deallocate(ele%ie)
 !
-      end subroutine deallocate_ele_connect_type
+      end subroutine dealloc_ele_connect
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine dealloc_overlaped_ele(ele)
+      subroutine dealloc_overlapped_ele(ele)
 !
       type(element_data), intent(inout) :: ele
 !
 !
+      if(allocated(ele%interior_ele) .eqv. .FALSE.) return
       deallocate(ele%interior_ele)
 !
-      end subroutine dealloc_overlaped_ele
+      end subroutine dealloc_overlapped_ele
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_ele_geometry_type(ele)
+      subroutine dealloc_ele_geometry(ele)
 !
       type(element_data), intent(inout) :: ele
 !
-      call dealloc_overlaped_ele(ele)
 !
-      deallocate( ele%x_ele)
-      deallocate( ele%r_ele)
-      deallocate( ele%ar_ele)
-      deallocate( ele%phi_ele)
-      deallocate( ele%theta_ele)
-      deallocate( ele%s_ele)
-      deallocate( ele%as_ele)
+      if(allocated(ele%x_ele) .eqv. .FALSE.) return
+      deallocate(ele%x_ele)
+      deallocate(ele%r_ele, ele%ar_ele)
+      deallocate(ele%phi_ele, ele%theta_ele)
+      deallocate(ele%s_ele, ele%as_ele)
 !
-      deallocate( ele%volume_ele )
-      deallocate( ele%a_vol_ele )
+      deallocate(ele%volume_ele)
+      deallocate(ele%a_vol_ele)
 !
-      end subroutine deallocate_ele_geometry_type
+      end subroutine dealloc_ele_geometry
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_node_param_smp_type(node)
+      subroutine dealloc_node_param_smp(node)
 !
       type(node_data), intent(inout) :: node
 !
+      if(allocated(node%istack_nod_smp) .eqv. .FALSE.) return
       deallocate(node%istack_nod_smp)
       deallocate(node%istack_internal_smp)
 !
-      end subroutine deallocate_node_param_smp_type
+      end subroutine dealloc_node_param_smp
 !
 !-----------------------------------------------------------------------
 !
-      subroutine deallocate_ele_param_smp_type(ele)
+      subroutine dealloc_ele_param_smp(ele)
 !
       type(element_data), intent(inout) :: ele
 !
-      deallocate( ele%istack_ele_smp)
+      if(allocated(ele%istack_ele_smp) .eqv. .FALSE.) return
+      deallocate(ele%istack_ele_smp)
 !
-      end subroutine deallocate_ele_param_smp_type
+      end subroutine dealloc_ele_param_smp
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

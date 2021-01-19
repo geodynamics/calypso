@@ -7,10 +7,7 @@
 !>@brief  Spectr data IO selector
 !!
 !!@verbatim
-!!      subroutine set_sph_mesh_file_fmt_prefix                         &
-!!     &         (iflag_fmt, file_head, file_param)
-!!
-!!      subroutine sel_read_geom_rtp_file                               &
+!!!      subroutine sel_read_geom_rtp_file                               &
 !!     &         (id_rank, file_param, sph_file, ierr)
 !!      subroutine sel_read_spectr_rj_file                              &
 !!     &         (id_rank, file_param, sph_file, ierr)
@@ -29,11 +26,6 @@
 !!      subroutine sel_write_modes_rlm_file                             &
 !!     &         (id_rank, file_param, sph_file, ierr)
 !!        type(sph_file_data_type), intent(in) :: sph_file
-!!
-!!      logical function check_exsist_rtp_file(id_rank, file_param)
-!!      logical function check_exsist_rj_file(id_rank, file_param)
-!!      logical function check_exsist_rtm_file(id_rank, file_param)
-!!      logical function check_exsist_rlm_file(id_rank, file_param)
 !!@endverbatim
 !!
 !!@param id_rank    Process ID
@@ -68,21 +60,6 @@
       contains
 !
 !------------------------------------------------------------------
-!
-      subroutine set_sph_mesh_file_fmt_prefix                           &
-     &         (iflag_fmt, file_head, file_param)
-!
-      integer(kind = kint), intent(in) :: iflag_fmt
-      character(len=kchara), intent(in) :: file_head
-      type(field_IO_params), intent(inout) :: file_param
-!
-      file_param%iflag_format = iflag_fmt
-      write(file_param%file_prefix,'(a)') trim(file_head)
-!
-      end subroutine set_sph_mesh_file_fmt_prefix
-!
-! -------------------------------------------------------------------
-! -------------------------------------------------------------------
 !
       subroutine sel_read_geom_rtp_file                                 &
      &         (id_rank, file_param, sph_file, ierr)
@@ -353,71 +330,6 @@
       end if
 !
       end subroutine sel_write_modes_rlm_file
-!
-!------------------------------------------------------------------
-!------------------------------------------------------------------
-!
-      logical function check_exsist_rtp_file(id_rank, file_param)
-!
-      use delete_data_files
-!
-      integer, intent(in) :: id_rank
-      type(field_IO_params), intent(in) :: file_param
-!
-!
-      sph_file_name = set_sph_rtp_file_name(file_param%file_prefix,     &
-     &               file_param%iflag_format, id_rank)
-      check_exsist_rtp_file = check_file_exist(sph_file_name)
-!
-      end function check_exsist_rtp_file
-!
-!------------------------------------------------------------------
-!
-      logical function check_exsist_rj_file(id_rank, file_param)
-!
-      use delete_data_files
-!
-      integer, intent(in) :: id_rank
-      type(field_IO_params), intent(in) :: file_param
-!
-!
-      sph_file_name = set_sph_rj_file_name(file_param%file_prefix,      &
-     &               file_param%iflag_format, id_rank)
-      check_exsist_rj_file = check_file_exist(sph_file_name)
-!
-      end function check_exsist_rj_file
-!
-!------------------------------------------------------------------
-!
-      logical function check_exsist_rtm_file(id_rank, file_param)
-!
-      use delete_data_files
-!
-      integer, intent(in) :: id_rank
-      type(field_IO_params), intent(in) :: file_param
-!
-!
-      sph_file_name = set_sph_rtm_file_name(file_param%file_prefix,     &
-     &               file_param%iflag_format, id_rank)
-      check_exsist_rtm_file = check_file_exist(sph_file_name)
-!
-      end function check_exsist_rtm_file
-!
-!------------------------------------------------------------------
-!
-      logical function check_exsist_rlm_file(id_rank, file_param)
-!
-      use delete_data_files
-!
-      integer, intent(in) :: id_rank
-      type(field_IO_params), intent(in) :: file_param
-!
-!
-      sph_file_name = set_sph_rlm_file_name(file_param%file_prefix,     &
-     &               file_param%iflag_format, id_rank)
-      check_exsist_rlm_file = check_file_exist(sph_file_name)
-!
-      end function check_exsist_rlm_file
 !
 !------------------------------------------------------------------
 !

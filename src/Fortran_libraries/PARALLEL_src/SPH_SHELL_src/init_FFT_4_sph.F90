@@ -41,14 +41,14 @@
 #endif
 !
       integer(kind = kint), parameter :: list_test(num_test)            &
-     &        = (/iflag_FFTPACK,                                        &
+     &        = (/iflag_FFTPACK_ONCE,                                   &
 #ifdef FFTW3
      &            iflag_FFTW_SINGLE,                                    &
-     &            iflag_FFTW,                                           &
+     &            iflag_FFTW_ONCE,                                      &
      &            iflag_FFTW_COMPONENT,                                 &
 #endif
-     &            iflag_ISPACK1,                                        &
-     &            iflag_ISPACK3/)
+     &            iflag_ISPACK1_ONCE,                                   &
+     &            iflag_ISPACK3_ONCE/)
 !
       real(kind = kreal) :: etime_shortest = -1.0e10
       integer(kind = kint) :: iflag_selected

@@ -184,7 +184,7 @@
 !
       type(tmp_i8_2darray) :: eletmp
 !
-      call allocate_ele_connect_type(psf_patch)
+      call alloc_ele_connect(psf_patch)
       call const_global_numele_list(psf_patch)
 !
       call alloc_2d_i8array(cast_long(psf_patch%numele),                &
@@ -230,7 +230,7 @@
       type(tmp_i8_2darray) :: eletmp
 !
 !
-      call allocate_ele_connect_type(iso_patch)
+      call alloc_ele_connect(iso_patch)
       call const_global_numele_list(iso_patch)
 !
       call alloc_2d_i8array(cast_long(iso_patch%numele),                &

@@ -25,6 +25,8 @@
 !!      subroutine deallocate_parallel_ucd_mesh(ucd)
 !!
 !!      subroutine disconnect_ucd_node(ucd)
+!!      subroutine disconnect_ucd_phys_data(ucd)
+!!      subroutine disconnect_ucd_phys_name(ucd)
 !!      subroutine disconnect_ucd_data(ucd)
 !!      subroutine disconnect_ucd_mesh(ucd)
 !!      subroutine disconnect_merged_ucd_mesh(ucd)
@@ -301,13 +303,35 @@
 !
 ! -----------------------------------------------------------------------
 !
+      subroutine disconnect_ucd_phys_data(ucd)
+!
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      nullify(ucd%d_ucd)
+!
+      end subroutine disconnect_ucd_phys_data
+!
+! -----------------------------------------------------------------------
+!
+      subroutine disconnect_ucd_phys_name(ucd)
+!
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      nullify(ucd%phys_name, ucd%num_comp)
+!
+      end subroutine disconnect_ucd_phys_name
+!
+! -----------------------------------------------------------------------
+!
       subroutine disconnect_ucd_data(ucd)
 !
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      nullify(ucd%num_comp)
-      nullify(ucd%phys_name, ucd%d_ucd)
+      call disconnect_ucd_phys_data(ucd)
+      call disconnect_ucd_phys_name(ucd)
 !
       end subroutine disconnect_ucd_data
 !

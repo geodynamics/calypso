@@ -52,6 +52,7 @@
 !
       use sph_file_MPI_IO_select
       use sph_file_IO_select
+      use check_sph_file_access
       use load_data_for_sph_IO
       use count_num_sph_smp
 !

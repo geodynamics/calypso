@@ -11,7 +11,7 @@
 !!      subroutine dealloc_mesh_infos_w_normal(mesh, group)
 !!      subroutine dealloc_mesh_infomations(mesh, group)
 !!      subroutine dealloc_nod_ele_infos(mesh, group)
-!!      subroutine dealloc_mesh_infos(mesh, group)
+!!      subroutine dealloc_mesh_data(mesh, group)
 !!
 !!      subroutine dealloc_mesh_type(mesh)
 !!      subroutine dealloc_mesh_geometry_base(mesh)
@@ -105,6 +105,7 @@
       call dealloc_vect_surf_grp_nod(group%surf_nod_grp)
 !
       call dealloc_mesh_infomations(mesh, group)
+      call dealloc_mesh_data(mesh, group)
 !
       end subroutine dealloc_mesh_infos_w_normal
 !
@@ -133,7 +134,7 @@
       call deallocate_ext_surface_type(mesh%surf)
 !
       call dealloc_edge_param_smp(mesh%edge)
-      call deallocate_surf_param_smp_type(mesh%surf)
+      call dealloc_surf_param_smp(mesh%surf)
 !
       call dealloc_edge_4_ele(mesh%edge)
       call dealloc_edge_connect(mesh%edge)
@@ -157,19 +158,18 @@
       call dealloc_group_smp(group%nod_grp)
 !
       call dealloc_inod_in_edge(mesh%edge)
-      call deallocate_inod_in_surf_type(mesh%surf)
-      call deallocate_ele_param_smp_type(mesh%ele)
-      call deallocate_node_param_smp_type(mesh%node)
+      call dealloc_inod_in_surf(mesh%surf)
+      call dealloc_ele_param_smp(mesh%ele)
+      call dealloc_node_param_smp(mesh%node)
 !
-      call deallocate_ele_geometry_type(mesh%ele)
-!
-      call dealloc_mesh_infos(mesh, group)
+      call dealloc_overlapped_ele(mesh%ele)
+      call dealloc_ele_geometry(mesh%ele)
 !
       end subroutine dealloc_nod_ele_infos
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_mesh_infos(mesh, group)
+      subroutine dealloc_mesh_data(mesh, group)
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
@@ -178,7 +178,7 @@
       call dealloc_mesh_type(mesh)
       call dealloc_groups_data(group)
 !
-      end subroutine dealloc_mesh_infos
+      end subroutine dealloc_mesh_data
 !
 ! ----------------------------------------------------------------------
 !------------------------------------------------------------------
@@ -202,7 +202,7 @@
       type(mesh_geometry), intent(inout) :: mesh
 !
 !
-      call deallocate_ele_connect_type(mesh%ele)
+      call dealloc_ele_connect(mesh%ele)
       call dealloc_node_geometry_w_sph(mesh%node)
       call dealloc_comm_table(mesh%nod_comm)
 !
@@ -215,7 +215,7 @@
       type(mesh_geometry), intent(inout) :: mesh
 !
 !
-      call deallocate_ele_connect_type(mesh%ele)
+      call dealloc_ele_connect(mesh%ele)
       call dealloc_node_geometry_base(mesh%node)
       call dealloc_comm_table(mesh%nod_comm)
 !

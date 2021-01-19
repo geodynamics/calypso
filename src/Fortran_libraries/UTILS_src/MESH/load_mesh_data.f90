@@ -235,7 +235,7 @@
 !
       ele%numele = izero
       ele%first_ele_type = izero
-      call allocate_ele_connect_type(ele)
+      call alloc_ele_connect(ele)
 !
       call set_3D_nnod_4_sfed_by_ele                                    &
      &   (ele%nnod_4_ele, surf%nnod_4_surf, edge%nnod_4_edge)

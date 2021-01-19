@@ -109,6 +109,8 @@
       subroutine read_sph_mhd_ctl_w_psf                                 &
      &         (id_control, hd_block, DMHD_ctl, c_buf)
 !
+      use read_surfacing_controls
+!
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
@@ -141,7 +143,7 @@
         call read_sph_monitoring_ctl                                    &
      &     (id_control, hd_pick_sph, DMHD_ctl%smonitor_ctl, c_buf)
 !
-        call read_surfacing_controls                                    &
+        call s_read_surfacing_controls                                  &
      &     (id_control, hd_viz_ctl, DMHD_ctl%surfacing_ctls, c_buf)
 !
         call read_dynamo_viz_control                                    &

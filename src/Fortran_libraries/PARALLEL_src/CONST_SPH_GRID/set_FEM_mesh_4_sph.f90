@@ -143,7 +143,7 @@
       call count_local_elements_sph_mesh                                &
      &   (ip_r, ip_t, sph_params, stbl, ele)
 !
-      call allocate_ele_connect_type(ele)
+      call alloc_ele_connect(ele)
       call set_local_elements_sph_mesh                                  &
      &   (ip_r, ip_t, sph_params, stbl, ele)
 !

@@ -103,7 +103,7 @@
      &                             sph, comms_sph, sph_grps)
 !
 !  --  load geofem mesh data
-      if(check_exist_mesh(mesh_file, my_rank)) then
+      if(check_exist_mesh(my_rank, mesh_file)) then
         if (iflag_debug.gt.0) write(*,*) 'mpi_input_mesh'
         call mpi_input_mesh(mesh_file, nprocs, geofem)
         call set_fem_center_mode_4_SPH                                  &
@@ -166,6 +166,7 @@
       use output_gen_sph_grid_modes
       use mpi_gen_sph_grids_modes
       use sph_file_IO_select
+      use check_sph_file_access
       use parallel_load_data_4_sph
       use check_sph_mhd_openmp_size
 !
@@ -226,6 +227,7 @@
       use mpi_gen_sph_grids_modes
       use output_gen_sph_grid_modes
       use sph_file_IO_select
+      use check_sph_file_access
       use parallel_load_data_4_sph
       use set_from_recv_buf_rev
 !
@@ -327,11 +329,14 @@
 !     &    femmesh_s%mesh)
 !      call compare_mesh_groups(geofem%group%nod_grp, femmesh_s%group)
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_mesh_data_from_type'
+      if (iflag_debug.gt.0) write(*,*) 'copy_mesh_and_group'
       femmesh_s%mesh%ele%first_ele_type                                 &
      &   = set_cube_eletype_from_num(femmesh_s%mesh%ele%nnod_4_ele)
-      call set_mesh_data_from_type                                      &
+      call copy_mesh_and_group                                          &
      &   (femmesh_s%mesh, femmesh_s%group, geofem%mesh, geofem%group)
+      call dealloc_groups_data(femmesh_s%group)
+      call dealloc_mesh_geometry_base(femmesh_s%mesh)
+!
 !
       end subroutine load_FEM_mesh_4_SPH
 !

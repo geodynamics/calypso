@@ -154,9 +154,8 @@
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+2)
       call calypso_sph_comm_N                                           &
      &   (trns_bwd%ncomp, comms_sph%comm_rtm, comms_sph%comm_rtp)
-call finish_send_recv_sph(comms_sph%comm_rtm)
+      call finish_send_recv_sph(comms_sph%comm_rtm)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+2)
-      call calypso_mpi_barrier
 !
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
@@ -166,7 +165,6 @@ call finish_send_recv_sph(comms_sph%comm_rtm)
      &    trns_bwd%ncomp, n_WR, WR, trns_bwd%fld_rtp, WK_FFTs_MHD)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !
-call calypso_mpi_barrier
       if(iflag_debug .gt. 0) write(*,*) 'finish_send_recv_rtm_2_rtp'
 !
       end subroutine sph_b_trans_w_coriolis

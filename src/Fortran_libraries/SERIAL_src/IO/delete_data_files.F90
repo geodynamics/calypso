@@ -13,11 +13,13 @@
 !!      subroutine delete_parallel_files(iflag_fmt, nprocs, file_head)
 !!
 !!      logical function check_file_exist(file_name)
+!!      logical function check_file_writable(my_rank, file_name)
 !!@endverbatim
 !!
 !!@n @param  file_name   file name
 !!@n @param  file_head   file header to delete
 !!@n @param  iflag_fmt   file format flag
+!!@n @param  nprocs      MPI rank
 !!@n @param  nprocs      number of subdomains
 !
       module delete_data_files
@@ -36,10 +38,11 @@
       subroutine delete_file_if_exist(file_name)
 !
       character(len=kchara), intent(in) :: file_name
+      integer(kind = kint), parameter :: id_file = 255
 !
 !
-      open(255, file=file_name, status='old', err=99)
-      close(255, status='DELETE')
+      open(id_file, file=file_name, status='old', err=99)
+      close(id_file, status='DELETE')
       write(*,*) trim(file_name), ' is deleted.'
 !
   99  return
@@ -51,10 +54,11 @@
       subroutine delete_file_by_f(file_name)
 !
       character(len=kchara), intent(in) :: file_name
+      integer(kind = kint), parameter :: id_file = 255
 !
 !
-      open(255, file=file_name)
-      close(255, status='DELETE')
+      open(id_file, file=file_name)
+      close(id_file, status='DELETE')
       write(*,*) trim(file_name), ' is deleted.'
 !
       end subroutine delete_file_by_f
@@ -107,6 +111,35 @@
       return
 !
       end function check_file_exist
+!
+!  ---------------------------------------------------------------------
+!
+      logical function check_file_writable(my_rank, file_name)
+!
+      integer, intent(in) :: my_rank
+      character(len=kchara), intent(in) :: file_name
+      integer(kind = kint), parameter :: id_file = 255
+!
+!
+      check_file_writable = .TRUE.
+      if(my_rank .gt. 0) return
+!
+      open(id_file, file=file_name, err=99)
+      write(id_file,'(i3)', err=98) id_file
+      close(id_file, status='DELETE')
+      return
+!
+  98  continue
+      close(id_file, status='DELETE')
+  99  continue
+!
+      write(*,*) 'File ', trim(file_name),                              &
+     &         ' can not be written. Check directory or permittion'
+      check_file_writable = .FALSE.
+!
+      return
+!
+      end function check_file_writable
 !
 !  ---------------------------------------------------------------------
 !
