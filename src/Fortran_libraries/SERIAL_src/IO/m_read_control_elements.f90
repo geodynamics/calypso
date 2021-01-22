@@ -237,12 +237,14 @@
 !
       if(iflag .gt. 0) then
         if(iflag_end .lt. num) then
-           write(*,*) 'number of array is not enough!'
+           write(*,*) 'number of array for ', trim(ctl_name),           &
+     &               ' is not enough!'
            stop
         end if
       else
         if(iflag_end .ge. num) then
-          write(*,*) ' array should be finished!!'
+          write(*,*) 'Number of array for ', trim(ctl_name),            &
+     &               'is exceeded!!'
           iflag_end = num-1
         end if
       end if
