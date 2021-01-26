@@ -111,6 +111,7 @@ depends: $(MAKE_MOD_DEP)
 		F90LIB="$(F90LIB)" \
 		MPIF90="$(MPIF90)" \
 		MPICC="$(MPICC)"   \
+		CC="$(CC)" \
 		AR="$(AR)" \
 		RANLIB="$(RANLIB)" \
 		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
@@ -144,6 +145,7 @@ makemake: $(MAKE_MOD_DEP)
 		F90LIB="$(F90LIB)" \
 		MPIF90="$(MPIF90)" \
 		MPICC="$(MPICC)"   \
+		CC="$(CC)" \
 		AR="$(AR)" \
 		RANLIB="$(RANLIB)" \
 		MAKE_MOD_DEP="$(MAKE_MOD_DEP)" \
