@@ -1,3 +1,5 @@
+append_phys_data.o: $(BASEDIR)/append_phys_data.f90 m_precision.o m_machine_parameter.o t_phys_data.o compare_indices.o
+	$(F90) -c $(F90OPTFLAGS) $<
 cal_add_smp.o: $(BASEDIR)/cal_add_smp.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_inverse_small_matrix.o: $(BASEDIR)/cal_inverse_small_matrix.f90 m_precision.o
@@ -12,7 +14,7 @@ cal_products_smp.o: $(BASEDIR)/cal_products_smp.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_subtract_smp.o: $(BASEDIR)/cal_subtract_smp.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-compare_indices.o: $(BASEDIR)/compare_indices.f90 m_precision.o
+compare_indices.o: $(BASEDIR)/compare_indices.f90 m_precision.o m_machine_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<
 coordinate_converter.o: $(BASEDIR)/coordinate_converter.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<

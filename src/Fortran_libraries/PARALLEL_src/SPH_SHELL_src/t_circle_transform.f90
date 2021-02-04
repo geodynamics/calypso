@@ -8,10 +8,10 @@
 !!
 !!@verbatim
 !!      subroutine alloc_circle_transform(ltr, circ_spec)
-!!      subroutine alloc_circle_field(mphi_rtp, nidx_global_jmax,       &
-!!     &          circle, d_circle)
+!!      subroutine alloc_circle_field                                   &
+!!     &         (my_rank, mphi_rtp, nidx_global_jmax, circle, d_circle)
 !!      subroutine dealloc_circle_transform
-!!      subroutine dealloc_circle_field(circle, d_circle)
+!!      subroutine dealloc_circle_field(my_rank, circle, d_circle)
 !!@endverbatim
 !!
 !!@n @param  ltr      Truncation of spherical harmonics
@@ -142,11 +142,10 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine alloc_circle_field(mphi_rtp, nidx_global_jmax,         &
-     &          circle, d_circle)
+      subroutine alloc_circle_field                                     &
+     &         (my_rank, mphi_rtp, nidx_global_jmax, circle, d_circle)
 !
-      use calypso_mpi
-!
+      integer, intent(in) :: my_rank
       integer(kind = kint), intent(in) :: mphi_rtp, nidx_global_jmax
       type(fields_on_circle), intent(inout) :: circle
       type(phys_data), intent(inout) :: d_circle
@@ -178,7 +177,7 @@
         circle%d_rj_circle = 0.0d0
       end if
 !
-      call alloc_phys_data_type(circle%mphi_circle, d_circle)
+      call alloc_phys_data(circle%mphi_circle, d_circle)
 !
       end subroutine alloc_circle_field
 !
@@ -198,10 +197,9 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_circle_field(circle, d_circle)
+      subroutine dealloc_circle_field(my_rank, circle, d_circle)
 !
-      use calypso_mpi
-!
+      integer, intent(in) :: my_rank
       type(fields_on_circle), intent(inout) :: circle
       type(phys_data), intent(inout) :: d_circle
 !
@@ -212,8 +210,8 @@
         deallocate(circle%d_rj_circle, circle%v_rtp_circle)
       end if
 !
-      call dealloc_phys_data_type(d_circle)
-      call dealloc_phys_name_type(d_circle)
+      call dealloc_phys_data(d_circle)
+      call dealloc_phys_name(d_circle)
 !
       end subroutine dealloc_circle_field
 !

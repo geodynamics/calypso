@@ -40,6 +40,7 @@
 !
       use m_field_product_labels
       use set_MHD_field_address
+      use append_phys_data
 !
       character(len = kchara), intent(in) :: phys_name_ctl
       logical, intent(in) :: flag_viz, flag_monitor
@@ -70,6 +71,7 @@
 !
       use m_energy_flux_labels
       use set_MHD_field_address
+      use append_phys_data
 !
       character(len = kchara), intent(in) :: phys_name_ctl
       logical, intent(in) :: flag_viz, flag_monitor
@@ -100,6 +102,7 @@
      &         (phys_name_ctl, flag_viz, flag_monitor, fld, flag)
 !
       use set_MHD_field_address
+      use append_phys_data
 !
       character(len = kchara), intent(in) :: phys_name_ctl
       logical, intent(in) :: flag_viz, flag_monitor

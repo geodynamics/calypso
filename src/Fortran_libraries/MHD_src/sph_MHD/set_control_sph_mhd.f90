@@ -66,9 +66,9 @@
       use t_ctl_data_node_monitor
       use t_ctl_data_gen_sph_shell
       use t_control_data_dynamo_vizs
-      use t_sph_transforms
       use t_bc_data_list
       use t_flex_delta_t_data
+      use t_SPH_mesh_field_data
 !
       implicit none
 !
@@ -159,12 +159,12 @@
       subroutine set_control_4_SPH_MHD(plt, org_plt,                    &
      &          Dmodel_ctl, smctl_ctl, nmtr_ctl, psph_ctl,              &
      &          MHD_files, bc_IO, MHD_step, MHD_prop, MHD_BC,           &
-     &          trans_p, WK, sph_maker)
+     &          trans_p, WK, SPH_MHD)
 !
       use t_spheric_parameter
       use t_phys_data
       use t_rms_4_sph_spectr
-      use t_check_and_make_SPH_mesh
+      use t_SPH_mesh_field_data
       use t_sph_trans_arrays_MHD
       use t_const_spherical_grid
       use t_sph_boundary_input_data
@@ -179,6 +179,7 @@
       use set_control_sph_data_MHD
       use set_control_4_force
       use set_control_4_normalize
+      use set_ctl_4_shell_grids
 !
       use set_control_4_pickup_sph
       use parallel_ucd_IO_select
@@ -197,7 +198,7 @@
       type(MHD_BC_lists), intent(inout) :: MHD_BC
       type(parameters_4_sph_trans), intent(inout) :: trans_p
       type(works_4_sph_trans_MHD), intent(inout) :: WK
-      type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
+      type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !
       integer(kind = kint) :: ierr
 !
@@ -220,20 +221,9 @@
 !
 !   set spherical shell parameters
 !
-      if(psph_ctl%iflag_sph_shell .gt. 0) then
-        sph_maker%make_SPH_flag = .TRUE.
-        sph_maker%mesh_output_flag = .TRUE.
-!
-        if(MHD_files%sph_file_param%iflag_format .eq. id_no_file        &
-     &    .or. plt%sph_file_prefix%iflag .eq. 0) then
-          sph_maker%mesh_output_flag = .FALSE.
-        end if
-!
-        if (iflag_debug.gt.0) write(*,*) 'set_control_4_shell_grids'
-        call set_control_4_shell_grids                                  &
-     &     (nprocs, psph_ctl%Fmesh_ctl, psph_ctl%spctl, psph_ctl%sdctl, &
-     &      sph_maker%sph_tmp, sph_maker%gen_sph, ierr)
-      end if
+      call set_ctl_4_sph_grid_maker(nprocs, psph_ctl,                   &
+     &    plt%sph_file_prefix, MHD_files%sph_file_param,                &
+     &    SPH_MHD%sph_maker, ierr)
 !
 !   set forces
 !

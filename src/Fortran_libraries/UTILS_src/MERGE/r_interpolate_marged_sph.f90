@@ -7,14 +7,15 @@
 !>@brief Radial interpolation for assemble program
 !!
 !!@verbatim
-!!      subroutine const_r_interpolate_table                            &
-!!     &         (org_sph_mesh, new_sph_mesh, r_itp)
-!!        type(sph_mesh_data), intent(in) :: org_sph_mesh
-!!        type(sph_mesh_data), intent(inout) :: new_sph_mesh
+!!      subroutine const_r_interpolate_table(org_sph, new_sph, r_itp)
+!!        type(sph_grids), intent(in) :: org_sph
+!!        type(sph_grids), intent(inout) :: new_sph
 !!        type(sph_radial_itp_data), intent(inout) :: r_itp
-!!      subroutine const_ICB_and_CMB_radius(org_sph_mesh, new_sph_mesh, &
+!!      subroutine const_ICB_and_CMB_radius(org_sph_grps, new_sph_grps, &
 !!     &          nlayer_ICB_org, nlayer_CMB_org,                       &
 !!     &          nlayer_ICB_new, nlayer_CMB_new)
+!!       type(sph_group_data), intent(in) :: org_sph_grps
+!!        type(sph_group_data), intent(in) :: new_sph_grps
 !!      subroutine deallocate_radial_itp_tbl(nri_new)
 !!      subroutine sph_radial_interpolation_coef                        &
 !!     &         (nri_org, r_org, nri_new, r_new)
@@ -33,7 +34,8 @@
       use m_precision
       use m_constants
       use calypso_mpi
-      use t_SPH_mesh_field_data
+      use t_spheric_parameter
+      use t_spheric_group
 !
       implicit none
 !
@@ -66,34 +68,32 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_r_interpolate_table                              &
-     &         (org_sph_mesh, new_sph_mesh, r_itp)
+      subroutine const_r_interpolate_table(org_sph, new_sph, r_itp)
 !
-      type(sph_mesh_data), intent(in) :: org_sph_mesh
+      type(sph_grids), intent(in) :: org_sph
 !
-      type(sph_mesh_data), intent(inout) :: new_sph_mesh
+      type(sph_grids), intent(inout) :: new_sph
       type(sph_radial_itp_data), intent(inout) :: r_itp
 !
 !
       if(my_rank .eq. 0) then
         call sph_radial_interpolation_coef                              &
-     &     (org_sph_mesh%sph%sph_rj%nidx_rj(1),                         &
-     &      org_sph_mesh%sph%sph_rj%radius_1d_rj_r,                     &
-     &      new_sph_mesh%sph%sph_rj%nidx_rj(1),                         &
-     &      new_sph_mesh%sph%sph_rj%radius_1d_rj_r, r_itp)
+     &     (org_sph%sph_rj%nidx_rj(1), org_sph%sph_rj%radius_1d_rj_r,   &
+     &      new_sph%sph_rj%nidx_rj(1), new_sph%sph_rj%radius_1d_rj_r,   &
+     &      r_itp)
       end if
-      call share_r_interpolation_tbl(new_sph_mesh, r_itp)
+      call share_r_interpolation_tbl(new_sph, r_itp)
 !
       end subroutine const_r_interpolate_table
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_ICB_and_CMB_radius(org_sph_mesh, new_sph_mesh,   &
+      subroutine const_ICB_and_CMB_radius(org_sph_grps, new_sph_grps,   &
      &          nlayer_ICB_org, nlayer_CMB_org,                         &
      &          nlayer_ICB_new, nlayer_CMB_new)
 !
-      type(sph_mesh_data), intent(in) :: org_sph_mesh
-      type(sph_mesh_data), intent(in) :: new_sph_mesh
+      type(sph_group_data), intent(in) :: org_sph_grps
+      type(sph_group_data), intent(in) :: new_sph_grps
 !
       integer(kind = kint), intent(inout) :: nlayer_ICB_org
       integer(kind = kint), intent(inout) :: nlayer_CMB_org
@@ -102,10 +102,10 @@
 !
 !
       if(my_rank .eq. 0) then
-        call set_sph_boundary_4_merge(org_sph_mesh%sph_grps,            &
-     &      nlayer_ICB_org, nlayer_CMB_org)
-        call set_sph_boundary_4_merge(new_sph_mesh%sph_grps,            &
-     &      nlayer_ICB_new, nlayer_CMB_new)
+        call set_sph_boundary_4_merge                                   &
+     &     (org_sph_grps, nlayer_ICB_org, nlayer_CMB_org)
+        call set_sph_boundary_4_merge                                   &
+     &     (new_sph_grps, nlayer_ICB_new, nlayer_CMB_new)
       end if
 !
       call share_ICB_and_CMB_radius(nlayer_ICB_org, nlayer_CMB_org,     &
@@ -175,26 +175,25 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine share_r_interpolation_tbl(new_sph_mesh, r_itp)
+      subroutine share_r_interpolation_tbl(new_sph, r_itp)
 !
       use calypso_mpi_real
       use calypso_mpi_int
       use transfer_to_long_integers
 !
-      type(sph_mesh_data), intent(inout) :: new_sph_mesh
+      type(sph_grids), intent(inout) :: new_sph
       type(sph_radial_itp_data), intent(inout) :: r_itp
 !
 !
       call calypso_mpi_bcast_one_int(r_itp%iflag_same_rgrid, 0)
       call calypso_mpi_bcast_one_int                                    &
-     &   (new_sph_mesh%sph%sph_rj%nidx_rj(1), 0)
+     &   (new_sph%sph_rj%nidx_rj(1), 0)
       if(my_rank .eq. 0) write(*,*) 'iflag_same_rgrid: ',               &
-     &            r_itp%iflag_same_rgrid,                               &
-     &            new_sph_mesh%sph%sph_rj%nidx_rj(1)
+     &            r_itp%iflag_same_rgrid, new_sph%sph_rj%nidx_rj(1)
 !
       if(r_itp%iflag_same_rgrid .eq. 0) then
         if(my_rank .ne. 0)  call allocate_radial_itp_tbl                &
-     &             (new_sph_mesh%sph%sph_rj%nidx_rj(1), r_itp)
+     &                         (new_sph%sph_rj%nidx_rj(1), r_itp)
 !
         call calypso_mpi_bcast_one_int(r_itp%nri_old2new, 0)
         call calypso_mpi_bcast_one_int(r_itp%kr_inner_domain, 0)

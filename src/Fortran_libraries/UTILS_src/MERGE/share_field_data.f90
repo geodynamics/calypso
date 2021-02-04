@@ -63,7 +63,7 @@
 !
       call share_field_num(fld%num_phys, fld%ntot_phys)
 !
-      if(my_rank .ne. 0) call alloc_phys_name_type(fld)
+      if(my_rank .ne. 0) call alloc_phys_name(fld)
 !
       call share_field_stack                                            &
      &   (fld%num_phys, fld%istack_component, fld%phys_name)
@@ -95,7 +95,7 @@
       call calypso_mpi_bcast_one_int(fld%n_point, irank_org)
 !
       if(mod(irank_org,nprocs) .ne. my_rank) then
-        call alloc_phys_data_type(fld%n_point, fld)
+        call alloc_phys_data(fld%n_point, fld)
       end if
 !
       num64 = fld%ntot_phys * fld%n_point

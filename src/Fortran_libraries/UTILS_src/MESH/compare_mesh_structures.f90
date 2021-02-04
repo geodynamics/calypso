@@ -12,10 +12,12 @@
 !!        type(communication_table), intent(inout) :: nod_comm
 !!        type(node_data), intent(inout) ::           node
 !!        type(element_data), intent(inout) ::        ele
-!!      subroutine compare_node_types(id_rank, org_node, new_node)
+!!      integer(kind = kint) function compare_node_position             &
+!!     &                            (id_rank, org_node, new_node)
 !!        type(node_data), intent(in) :: org_node
 !!        type(node_data), intent(in) :: new_node
-!!      subroutine compare_element_types(id_rank, org_ele, new_ele)
+!!      integer(kind = kint) function compare_ele_connect               &
+!!     &                            (id_rank, org_ele, new_ele)
 !!        type(element_data), intent(in) :: org_ele
 !!        type(element_data), intent(in) :: new_ele
 !!
@@ -27,6 +29,7 @@
       module compare_mesh_structures
 !
       use m_precision
+      use m_machine_parameter
 !
       implicit  none
 !
@@ -48,9 +51,11 @@
       type(node_data), intent(inout) ::           node
       type(element_data), intent(inout) ::        ele
 !
+      integer(kind = kint) :: iflag
 !
-      call compare_node_types(id_rank, node, mesh%node)
-      call compare_element_types(id_rank, ele, mesh%ele)
+!
+      iflag = compare_node_position(id_rank, node, mesh%node)
+      iflag = iflag + compare_ele_connect(id_rank, ele, mesh%ele)
       call compare_node_comm_types(id_rank, nod_comm, mesh%nod_comm)
 !
       end subroutine compare_mesh_type
@@ -58,39 +63,50 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine compare_node_types(id_rank, org_node, new_node)
+      integer(kind = kint) function compare_node_position               &
+     &                            (id_rank, org_node, new_node)
 !
       use t_geometry_data
+      use m_phys_constants
+      use compare_indices
 !
       integer, intent(in) :: id_rank
       type(node_data), intent(in) :: org_node
       type(node_data), intent(in) :: new_node
 !
-      integer(kind = kint) :: i
-      real(kind = kreal) :: err
+      character(len=kchara), parameter :: field_name = 'position'
+      integer(kind = kint) :: iflag
 !
 !
-      if(new_node%numnod .ne. org_node%numnod) write(*,*) 'numnod',     &
-     &      id_rank, new_node%numnod, org_node%numnod
-      if(new_node%internal_node .ne. org_node%internal_node) write(*,*) &
-     &      'numnod', id_rank, new_node%internal_node,                  &
-     &      org_node%internal_node
-      do i = 1, org_node%numnod
-        err = sqrt((new_node%xx(i,1) - org_node%xx(i,1))**2             &
-     &           + (new_node%xx(i,2) - org_node%xx(i,2))**2             &
-     &           + (new_node%xx(i,3) - org_node%xx(i,3))**2)
-        if(new_node%inod_global(i) .ne. org_node%inod_global(i))        &
-     &       write(*,*) 'inod_global(i)', id_rank, i,                   &
-     &       new_node%inod_global(i), org_node%inod_global(i)
-        if(err .gt. 1d-11) write(*,*) 'xx', id_rank, err, i,            &
-     &       new_node%xx(i,1:3), org_node%xx(i,1:3)
-      end do
+      if(iflag_debug .gt. 0) then
+        write(*,*) id_rank, 'numnod', org_node%numnod, new_node%numnod
+        write(*,*) id_rank, 'internal_node',                            &
+     &            org_node%internal_node, new_node%internal_node
+      end if
 !
-      end subroutine compare_node_types
+      iflag = 0
+      if(org_node%numnod .ne. new_node%numnod) then
+        write(*,*) 'Number of node is different in domain ', id_rank,   &
+     &              ':  ', org_node%numnod, new_node%numnod
+        iflag = iflag + 1
+      end if
+      if(org_node%internal_node .ne. new_node%internal_node) then
+        write(*,*)                                                      &
+     &      'Number of internal node is different in domain ', id_rank, &
+     &      ':  ', org_node%internal_node, new_node%internal_node
+        iflag = iflag + 1
+      end if
+      iflag = iflag + compare_field_vector                              &
+     &              (org_node%numnod, n_vector, field_name,             &
+     &               org_node%xx(1,1), new_node%xx(1,1))
+      compare_node_position = iflag
+!
+      end function compare_node_position
 !
 !------------------------------------------------------------------
 !
-      subroutine compare_element_types(id_rank, org_ele, new_ele)
+      integer(kind = kint) function compare_ele_connect                 &
+     &                            (id_rank, org_ele, new_ele)
 !
       use t_geometry_data
 !
@@ -98,42 +114,55 @@
       type(element_data), intent(in) :: org_ele
       type(element_data), intent(in) :: new_ele
 !
+      integer(kind = kint) :: iele, k1, iflag
 !
-      integer(kind = kint) :: i, k1, iflag
 !
+      if(iflag_debug .gt. 0) then
+        write(*,*) id_rank, 'numele', org_ele%numele, new_ele%numele
+        write(*,*) id_rank, 'nnod_4_ele', org_ele%nnod_4_ele,           &
+     &                                     new_ele%nnod_4_ele
+        write(*,*) id_rank, 'first_ele_type', org_ele%first_ele_type,   &
+     &                               new_ele%first_ele_type
+      end if
 !
-      if(new_ele%numele .ne. org_ele%numele) write(*,*) 'numele',       &
-     &      id_rank, new_ele%numele, org_ele%numele
-      if(new_ele%first_ele_type .ne. org_ele%first_ele_type) write(*,*) &
-     &       'first_ele_type', id_rank, new_ele%first_ele_type,         &
-     &       org_ele%first_ele_type
-      if(new_ele%nnod_4_ele .ne. org_ele%nnod_4_ele) write(*,*)         &
-     &   'nnod_4_ele', id_rank, new_ele%nnod_4_ele, org_ele%nnod_4_ele
+      iflag = 0
+      if(org_ele%numele .ne. new_ele%numele) then
+        write(*,*) 'Number of element is differenct: ',                 &
+     &             org_ele%numele, new_ele%numele
+        iflag = iflag + 1
+      end if
+      if(org_ele%nnod_4_ele .ne. new_ele%nnod_4_ele) then
+        write(*,*) 'Element type is differennt: ',                      &
+     &             org_ele%nnod_4_ele, new_ele%nnod_4_ele
+        iflag = iflag + 1
+      end if
 !
-      do i = 1, org_ele%numele
-        iflag = 0
-        do k1 = 1, org_ele%nnod_4_ele
-          if(new_ele%ie(i,k1) .ne. org_ele%ie(i,k1)) iflag = 1
-        end do
-        if(new_ele%iele_global(i) .ne. org_ele%iele_global(i))          &
-     &       write(*,*) 'iele_global(i)', id_rank, i,                   &
-     &       new_ele%iele_global(i), org_ele%iele_global(i)
-        if(new_ele%elmtyp(i) .ne. org_ele%elmtyp(i)) write(*,*)         &
-     &       'elmtyp(i)', id_rank, i,                                   &
-     &        new_ele%elmtyp(i), org_ele%elmtyp(i)
-        if(new_ele%nodelm(i) .ne. org_ele%nodelm(i)) write(*,*)         &
-     &       'nodelm(i)', id_rank, i,                                   &
-     &       new_ele%nodelm(i), org_ele%nodelm(i)
-        if(iflag .gt. 0) then
-          do k1 = 1, org_ele%nnod_4_ele
-            if(new_ele%nodelm(i) .ne. org_ele%nodelm(i)) write(*,*)     &
-     &         'ie(i,k)', id_rank, i, k1,                               &
-     &         new_ele%ie(i,k1), org_ele%ie(i,k1)
-          end do
+      do iele = 1, org_ele%numele
+        if(org_ele%elmtyp(iele) .ne. new_ele%elmtyp(iele)) then
+          write(*,*) 'element type at ', iele, ' is differ',            &
+     &        org_ele%elmtyp(iele), new_ele%elmtyp(iele)
+          iflag = iflag + 1
         end if
       end do
+      do iele = 1, org_ele%numele
+        if(org_ele%nodelm(iele) .ne. new_ele%nodelm(iele)) then
+          write(*,*) 'number of node for ', iele, ' is differ',         &
+     &        org_ele%nodelm(iele), new_ele%nodelm(iele)
+          iflag = iflag + 1
+        end if
+      end do
+      do k1 = 1, org_ele%nnod_4_ele
+        do iele = 1, org_ele%numele
+          if(org_ele%ie(iele,k1) .ne. new_ele%ie(iele,k1)) then
+            write(*,*) 'connectivity at ', iele, k1, ' is differ',      &
+     &          org_ele%ie(iele,k1), new_ele%ie(iele,k1)
+            iflag = iflag + 1
+          end if
+        end do
+      end do
+      compare_ele_connect = iflag
 !
-      end subroutine compare_element_types
+      end function compare_ele_connect
 !
 !------------------------------------------------------------------
 !

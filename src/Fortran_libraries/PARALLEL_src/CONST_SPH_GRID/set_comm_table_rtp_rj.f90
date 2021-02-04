@@ -9,32 +9,20 @@
 !!
 !!@verbatim
 !!      subroutine const_sph_rj_modes                                   &
-!!     &         (id_rank, num_pe, comm_rlm_mul, added_radial_grp,      &
-!!     &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,   &
+!!     &         (id_rank, num_pe, comm_rlm_mul, gen_sph,               &
 !!     &          sph_params, sph_rtp, sph_rj, comm_rj_lc, sph_grp_lc)
-!!        type(spheric_global_rank), intent(in) :: s3d_ranks
-!!        type(spheric_global_radius), intent(in) :: s3d_radius
-!!        type(sph_local_parameters), intent(in) :: sph_lcp
-!!        type(sph_1d_index_stack), intent(in) :: stk_lc1d
-!!        type(sph_1d_global_index), intent(in) :: sph_gl1d
-!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_comm_tbl), intent(in) :: comm_rlm_mul(ndomain_sph)
+!!        type(construct_spherical_grid), intent(in) :: gen_sph
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!        type(sph_comm_tbl), intent(inout) :: comm_rj_lc
 !!        type(sph_group_data), intent(inout) :: sph_grp_lc
 !!      subroutine const_sph_rtp_grids(id_rank, num_pe, comm_rtm_mul,   &
-!!     &          added_radial_grp, r_layer_grp, med_layer_grp,         &
-!!     &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,   &
-!!     &          sph_params, sph_rtp, comm_rtp_lc, sph_grp_lc)
-!!        type(spheric_global_rank), intent(in) :: s3d_ranks
-!!        type(spheric_global_radius), intent(in) :: s3d_radius
-!!        type(sph_local_parameters), intent(in) :: sph_lcp
-!!        type(sph_1d_index_stack), intent(in) :: stk_lc1d
-!!        type(sph_1d_global_index), intent(in) :: sph_gl1d
-!!        type(sph_shell_parameters), intent(in) :: sph_params
+!!     &          gen_sph, sph_params, sph_rtp, comm_rtp_lc, sph_grp_lc)
+!!        type(construct_spherical_grid), intent(in) :: gen_sph
 !!        type(sph_comm_tbl), intent(in) :: comm_rtm_mul(ndomain_sph)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rtp_grid), intent(inout) :: sph_rtp
 !!        type(sph_comm_tbl), intent(inout) :: comm_rtp_lc
 !!        type(sph_group_data), intent(inout) :: sph_grp_lc
@@ -49,12 +37,9 @@
       use t_sph_trans_comm_tbl
       use t_spheric_group
       use t_spheric_data_IO
-      use t_spheric_global_ranks
-      use t_sph_local_parameter
-      use t_sph_1d_global_index
       use t_sph_mesh_1d_connect
-      use t_control_1D_layering
       use t_sph_local_index
+      use t_const_spherical_grid
 !
       implicit none
 !
@@ -102,8 +87,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine const_sph_rj_modes                                     &
-     &         (id_rank, num_pe, comm_rlm_mul, added_radial_grp,        &
-     &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
+     &         (id_rank, num_pe, comm_rlm_mul, gen_sph,                 &
      &          sph_params, sph_rtp, sph_rj, comm_rj_lc, sph_grp_lc)
 !
       use calypso_mpi
@@ -115,12 +99,7 @@
       integer, intent(in) :: id_rank
       integer, intent(in) :: num_pe
       type(sph_comm_tbl), intent(in) :: comm_rlm_mul(num_pe)
-      type(layering_group_list), intent(in) :: added_radial_grp
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(spheric_global_radius), intent(in) :: s3d_radius
-      type(sph_local_parameters), intent(in) :: sph_lcp
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
-      type(sph_1d_global_index), intent(in) :: sph_gl1d
+      type(construct_spherical_grid), intent(in) :: gen_sph
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtp_grid), intent(in) :: sph_rtp
 !
@@ -129,21 +108,22 @@
       type(sph_group_data), intent(inout) :: sph_grp_lc
 !
 !
-      call copy_gl_2_local_rj_param                                     &
-     &   (id_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rj)
+      call copy_gl_2_local_rj_param(id_rank,                            &
+     &    gen_sph%s3d_ranks, gen_sph%sph_lcp, gen_sph%stk_lc1d, sph_rj)
 !
-      call add_center_mode_rj(id_rank, sph_gl1d, sph_rj)
+      call add_center_mode_rj(id_rank, gen_sph%sph_gl1d, sph_rj)
 !      nnod_rj = sph_rj%nnod_rj
 !      nidx_rj(1:2) = sph_rj%nidx_rj(1:2)
 !
       call alloc_spheric_param_rj(sph_rj)
       call alloc_sph_1d_index_rj(sph_rj)
 !
-      call copy_sph_1d_gl_idx_rj(s3d_radius, sph_gl1d, sph_rj)
+      call copy_sph_1d_gl_idx_rj(gen_sph%s3d_radius,                    &
+     &                           gen_sph%sph_gl1d, sph_rj)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &                 'set_global_sph_rj_id', id_rank
-      call set_global_sph_rj_id(s3d_ranks, stk_lc1d, sph_rj)
+      call set_global_sph_rj_id(sph_rj)
 !
       if(iflag_debug .gt. 0) then
         call check_spheric_param_rj(id_rank, sph_rj)
@@ -151,14 +131,14 @@
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &                 'const_comm_table_4_rj', id_rank
-      call const_comm_table_4_rj(id_rank, num_pe, comm_rlm_mul,         &
-     &    s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,           &
-     &    sph_rtp%nidx_global_rtp(1), sph_params, sph_rj,               &
-     &    comm_rj_lc)
+      call const_comm_table_4_rj                                        &
+     &   (id_rank, num_pe, comm_rlm_mul, gen_sph,                       &
+     &    sph_rtp%nidx_global_rtp(1), sph_params, sph_rj, comm_rj_lc)
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &                  'set_sph_rj_groups', id_rank
-      call set_sph_rj_groups(sph_params, sph_rj, added_radial_grp,      &
+      call set_sph_rj_groups                                            &
+     &   (sph_params, sph_rj, gen_sph%added_radial_grp,                 &
      &    sph_grp_lc%radial_rj_grp, sph_grp_lc%sphere_rj_grp)
 !
       end subroutine const_sph_rj_modes
@@ -166,9 +146,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine const_sph_rtp_grids(id_rank, num_pe, comm_rtm_mul,     &
-     &          added_radial_grp, r_layer_grp, med_layer_grp,           &
-     &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
-     &          sph_params, sph_rtp, comm_rtp_lc, sph_grp_lc)
+     &          gen_sph, sph_params, sph_rtp, comm_rtp_lc, sph_grp_lc)
 !
       use set_sph_groups
       use copy_sph_1d_global_index
@@ -180,14 +158,7 @@
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_comm_tbl), intent(in) :: comm_rtm_mul(num_pe)
-      type(layering_group_list), intent(in) :: added_radial_grp
-      type(layering_group_list), intent(in) :: r_layer_grp
-      type(layering_group_list), intent(in) :: med_layer_grp
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(spheric_global_radius), intent(in) :: s3d_radius
-      type(sph_local_parameters), intent(in) :: sph_lcp
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
-      type(sph_1d_global_index), intent(in) :: sph_gl1d
+      type(construct_spherical_grid), intent(in) :: gen_sph
 !
       type(sph_rtp_grid), intent(inout) :: sph_rtp
       type(sph_comm_tbl), intent(inout) :: comm_rtp_lc
@@ -196,22 +167,23 @@
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &                'copy_gl_2_local_rtp_param', id_rank
-      call copy_gl_2_local_rtp_param                                    &
-     &   (id_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rtp)
+      call copy_gl_2_local_rtp_param(id_rank, gen_sph%s3d_ranks,        &
+     &    gen_sph%sph_lcp, gen_sph%stk_lc1d, sph_rtp)
 !
       call alloc_spheric_param_rtp(sph_rtp)
       call alloc_sph_1d_index_rtp(sph_rtp)
 !
-      call copy_sph_1d_gl_idx_rtp(s3d_radius, sph_gl1d, sph_rtp)
+      call copy_sph_1d_gl_idx_rtp(gen_sph%s3d_radius,                   &
+     &                            gen_sph%sph_gl1d, sph_rtp)
 !
-      if(s3d_ranks%rtp_rin_flag) then
+      if(gen_sph%s3d_ranks%rtp_rin_flag) then
         if(iflag_debug .gt. 0) write(*,*)                               &
      &                 'set_global_sph_rtp_id', id_rank
-        call set_global_sph_rtp_id(s3d_ranks, stk_lc1d, sph_rtp)
+        call set_global_sph_rtp_id(sph_rtp)
       else
         if(iflag_debug .gt. 0) write(*,*)                               &
      &                 'set_global_sph_prt_id', id_rank
-        call set_global_sph_prt_id(s3d_ranks, stk_lc1d, sph_rtp)
+        call set_global_sph_prt_id(sph_rtp)
       end if
 !
       if(iflag_debug .gt. 0) then
@@ -222,12 +194,12 @@
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &                 'const_comm_table_4_rtp', id_rank
       call const_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,        &
-     &    s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,           &
-     &    sph_params, sph_rtp, comm_rtp_lc)
+     &    gen_sph, sph_params, sph_rtp, comm_rtp_lc)
 !
       if(iflag_debug .gt. 0) write(*,*) 'set_sph_rtp_groups', id_rank
-      call set_sph_rtp_groups(sph_params, sph_rtp,                      &
-     &    added_radial_grp, r_layer_grp, med_layer_grp,                 &
+      call set_sph_rtp_groups                                           &
+     &   (sph_params, sph_rtp, gen_sph%added_radial_grp,                &
+     &    gen_sph%r_layer_grp, gen_sph%med_layer_grp,                   &
      &    sph_grp_lc%bc_rtp_grp, sph_grp_lc%radial_rtp_grp,             &
      &    sph_grp_lc%theta_rtp_grp, sph_grp_lc%zonal_rtp_grp)
 !
@@ -236,18 +208,14 @@
 ! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_comm_table_4_rj(id_rank, num_pe, comm_rlm_mul,   &
-     &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
+      subroutine const_comm_table_4_rj                                  &
+     &         (id_rank, num_pe, comm_rlm_mul, gen_sph,                 &
      &          nidx_global_rtp_r, sph_params, sph_rj, comm_rj)
 !
       integer, intent(in) :: id_rank
       integer, intent(in) :: num_pe
       type(sph_comm_tbl), intent(in) :: comm_rlm_mul(num_pe)
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(spheric_global_radius), intent(in) :: s3d_radius
-      type(sph_local_parameters), intent(in) :: sph_lcp
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
-      type(sph_1d_global_index), intent(in) :: sph_gl1d
+      type(construct_spherical_grid), intent(in) :: gen_sph
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       integer(kind = kint), intent(in) :: nidx_global_rtp_r
@@ -272,8 +240,8 @@
       call alloc_sph_comm_item(sph_rj%nnod_rj, comm_rj)
 !
       icou = 0
-      call set_comm_table_4_rj(id_rank, num_pe, comm_rlm_mul,           &
-     &    s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,           &
+      call set_comm_table_4_rj                                          &
+     &   (id_rank, num_pe, comm_rlm_mul, gen_sph,                       &
      &    nidx_global_rtp_r, sph_params, sph_rj, comm_rj, icou)
 !
       end subroutine const_comm_table_4_rj
@@ -281,18 +249,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,  &
-     &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
-     &          sph_params, sph_rtp, comm_rtp)
+     &          gen_sph, sph_params, sph_rtp, comm_rtp)
 !
       integer, intent(in) :: id_rank
       integer, intent(in) :: num_pe
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_comm_tbl), intent(in) :: comm_rtm_mul(num_pe)
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(spheric_global_radius), intent(in) :: s3d_radius
-      type(sph_local_parameters), intent(in) :: sph_lcp
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
-      type(sph_1d_global_index), intent(in) :: sph_gl1d
+      type(construct_spherical_grid), intent(in) :: gen_sph
       type(sph_shell_parameters), intent(in) :: sph_params
 !
       type(sph_comm_tbl), intent(inout) :: comm_rtp
@@ -320,8 +283,7 @@
 !
       icou = 0
       call set_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,          &
-     &    s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,           &
-     &    sph_params, sph_rtp, comm_rtp, icou)
+     &    gen_sph, sph_params, sph_rtp, comm_rtp, icou)
 !
       end subroutine const_comm_table_4_rtp
 !
@@ -366,8 +328,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_comm_table_4_rj(id_rank, num_pe, comm_rlm_mul,     &
-     &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
+      subroutine set_comm_table_4_rj                                    &
+     &         (id_rank, num_pe, comm_rlm_mul,  gen_sph,                &
      &          nidx_global_rtp_r, sph_params, sph_rj, comm_rj, icou)
 !
       use t_spheric_rlm_data
@@ -378,11 +340,7 @@
       integer, intent(in) :: num_pe
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_comm_tbl), intent(in) :: comm_rlm_mul(num_pe)
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(spheric_global_radius), intent(in) :: s3d_radius
-      type(sph_local_parameters), intent(in) :: sph_lcp
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
-      type(sph_1d_global_index), intent(in) :: sph_gl1d
+      type(construct_spherical_grid), intent(in) :: gen_sph
       type(sph_shell_parameters), intent(in) :: sph_params
       integer(kind = kint), intent(in) :: nidx_global_rtp_r
 !
@@ -424,9 +382,8 @@
 !      if(id_rank .eq. 0) write(*,*) 'nidx_rlm', sph_rlm_lc%nidx_rlm(:)
         call dealloc_sph_1d_index_rlm(sph_rlm_lc)
 !
-        call const_sph_rlm_modes(id_org_rank,                           &
-     &      s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,         &
-     &      sph_rlm_lc, comm_rlm_lc)
+        call const_sph_rlm_modes(id_org_rank, gen_sph,                  &
+     &                           sph_rlm_lc, comm_rlm_lc)
 !
         jst = comm_rlm_lc%istack_sr(iflag_jp-1)+1
         jed = comm_rlm_lc%istack_sr(iflag_jp)
@@ -493,8 +450,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_comm_table_4_rtp(id_rank, num_pe, comm_rtm_mul,    &
-     &          s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,     &
-     &          sph_params, sph_rtp, comm_rtp, icou)
+     &          gen_sph, sph_params, sph_rtp, comm_rtp, icou)
 !
       use gen_sph_grids_modes
       use set_global_spherical_param
@@ -503,11 +459,7 @@
       integer, intent(in) :: num_pe
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_comm_tbl), intent(in) :: comm_rtm_mul(num_pe)
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(spheric_global_radius), intent(in) :: s3d_radius
-      type(sph_local_parameters), intent(in) :: sph_lcp
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
-      type(sph_1d_global_index), intent(in) :: sph_gl1d
+      type(construct_spherical_grid), intent(in) :: gen_sph
       type(sph_shell_parameters), intent(in) :: sph_params
 !
       integer(kind = kint), intent(inout) :: icou
@@ -540,9 +492,8 @@
         end do
         if(iflag_jp .eq. 0) cycle
 !
-        call const_sph_rtm_grids(id_org_rank,                           &
-     &      s3d_ranks, s3d_radius, sph_lcp, stk_lc1d, sph_gl1d,         &
-     &      sph_rtm_lc, comm_rtm_lc)
+        call const_sph_rtm_grids(id_org_rank, gen_sph,                  &
+     &                           sph_rtm_lc, comm_rtm_lc)
 !
         jst = comm_rtm_lc%istack_sr(iflag_jp-1)+1
         jed = comm_rtm_lc%istack_sr(iflag_jp)

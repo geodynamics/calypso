@@ -7,7 +7,8 @@
 !>@brief  Distribute number of data for communication
 !!
 !!@verbatim
-!!      subroutine mpi_bcast_comm_stacks_sph(ndomain_sph, comm_sph)
+!!      subroutine mpi_bcast_comm_stacks_sph(comm_sph)
+!!        type(sph_comm_tbl), intent(inout) :: comm_sph(nprocs)
 !!      subroutine para_bcast_comm_stacks_sph(ndomain_sph, comm_sph)
 !!        type(sph_comm_tbl), intent(inout) :: comm_sph(ndomain_sph)
 !!      subroutine dealloc_comm_stacks_sph(ndomain_sph, comm_rtm)
@@ -36,13 +37,12 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine mpi_bcast_comm_stacks_sph(ndomain_sph, comm_sph)
+      subroutine mpi_bcast_comm_stacks_sph(comm_sph)
 !
       use calypso_mpi_int
       use transfer_to_long_integers
 !
-      integer(kind = kint), intent(in) :: ndomain_sph
-      type(sph_comm_tbl), intent(inout) :: comm_sph(ndomain_sph)
+      type(sph_comm_tbl), intent(inout) :: comm_sph(nprocs)
 !
 !      integer(kind = kint) :: ip
 !
@@ -50,15 +50,14 @@
       call calypso_mpi_barrier
 !      if(my_rank .eq. 0) write(*,*) 'barrier finished'
 !
-      allocate(nneib_rtm_gl(ndomain_sph))
+      allocate(nneib_rtm_gl(nprocs))
       call calypso_mpi_allgather_one_int                                &
      &  (comm_sph(my_rank+1)%nneib_domain, nneib_rtm_gl)
 !
-      call set_bcast_comm_stacks_sph                                    &
-     &   (ndomain_sph, nneib_rtm_gl, comm_sph)
+      call set_bcast_comm_stacks_sph(nprocs, nneib_rtm_gl, comm_sph)
       deallocate(nneib_rtm_gl)
 !
-!      do ip = 1, ndomain_sph
+!      do ip = 1, nprocs
 !        write(50+my_rank,*) 'ip', ip
 !        write(50+my_rank,*) 'nneib_domain', comm_sph(ip)%nneib_domain
 !        write(50+my_rank,*) 'id_domain', comm_sph(ip)%id_domain
@@ -73,7 +72,7 @@
       use calypso_mpi_int
       use transfer_to_long_integers
 !
-      integer(kind = kint), intent(in) :: ndomain_sph
+      integer, intent(in) :: ndomain_sph
       type(sph_comm_tbl), intent(inout) :: comm_sph(ndomain_sph)
 !
       integer(kind = kint) :: i, ip, jp, num_tmp
@@ -124,7 +123,7 @@
 !
       subroutine dealloc_comm_stacks_sph(ndomain_sph, comm_rtm)
 !
-      integer(kind = kint), intent(in) :: ndomain_sph
+      integer, intent(in) :: ndomain_sph
       type(sph_comm_tbl), intent(inout) :: comm_rtm(ndomain_sph)
       integer(kind = kint) :: ip, iflag, i, irank_tgt
 !
@@ -156,7 +155,7 @@
       use calypso_mpi_int
       use transfer_to_long_integers
 !
-      integer(kind = kint), intent(in) :: ndomain_sph
+      integer, intent(in) :: ndomain_sph
       integer(kind = kint), intent(in) :: nneib_rtm_tmp(ndomain_sph)
       type(sph_comm_tbl), intent(inout) :: comm_sph(ndomain_sph)
 !

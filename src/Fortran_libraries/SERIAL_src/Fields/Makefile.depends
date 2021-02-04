@@ -32,7 +32,7 @@ set_MHD_field_address.o: $(FIELDIR)/set_MHD_field_address.f90 m_precision.o t_ph
 	$(F90) -c $(F90OPTFLAGS) $<
 set_control_field_data.o: $(FIELDIR)/set_control_field_data.f90 m_precision.o m_constants.o m_machine_parameter.o m_error_IDs.o t_phys_address.o t_phys_data.o t_control_array_character3.o set_nodal_field_name.o set_MHD_field_address.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_each_field_name.o: $(FIELDIR)/set_each_field_name.f90 m_precision.o t_phys_data.o m_field_product_labels.o set_MHD_field_address.o m_energy_flux_labels.o
+set_each_field_name.o: $(FIELDIR)/set_each_field_name.f90 m_precision.o t_phys_data.o m_field_product_labels.o set_MHD_field_address.o append_phys_data.o m_energy_flux_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_nodal_field_name.o: $(FIELDIR)/set_nodal_field_name.f90 m_precision.o t_phys_data.o t_control_array_character3.o add_nodal_fields_ctl.o set_each_field_name.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -43,6 +43,7 @@
       use t_field_list_for_vizs
       use t_VIZ_step_parameter
       use t_IO_step_parameter
+      use t_vector_for_solver
 !
       implicit none
 !
@@ -60,6 +61,9 @@
         type(mesh_data) :: geofem
 !>         Structure for nodal field data
         type(phys_data) :: nod_fld
+!
+!>        Structure for communicatiors for solver
+        type(vectors_4_solver) :: v_sol
 !
 !>          time data from data input
         type(time_data) :: ucd_time
@@ -117,7 +121,6 @@
       subroutine FEM_initialize_surface(ucd_step, init_d, sfcing)
 !
       use t_field_list_for_vizs
-      use m_array_for_send_recv
       use mpi_load_mesh_data
       use nod_phys_send_recv
       use parallel_FEM_mesh_init
@@ -138,6 +141,7 @@
       call mpi_input_mesh(sfcing%mesh_file_IO, nprocs, sfcing%geofem)
 !
       if(iflag_debug.gt.0) write(*,*) 'FEM_mesh_initialization'
+      call FEM_comm_initialization(sfcing%geofem%mesh, sfcing%v_sol)
       call FEM_mesh_initialization(sfcing%geofem%mesh,                  &
      &                             sfcing%geofem%group)
 !
@@ -151,8 +155,8 @@
      &                                    sfcing%nod_fld)
       call add_field_in_viz_controls(sfcing%viz_fld_list,               &
      &                               sfcing%nod_fld)
-      call alloc_phys_data_type(sfcing%geofem%mesh%node%numnod,         &
-     &                          sfcing%nod_fld)
+      call alloc_phys_data(sfcing%geofem%mesh%node%numnod,              &
+     &                     sfcing%nod_fld)
       call deallocate_surface_geom_type(sfcing%geofem%mesh%surf)
 !
       end subroutine FEM_initialize_surface
@@ -178,7 +182,8 @@
       call copy_time_step_size_data(sfcing%ucd_time, time_d)
 !
       if (iflag_debug.gt.0)  write(*,*) 'phys_send_recv_all'
-      call nod_fields_send_recv(sfcing%geofem%mesh, sfcing%nod_fld)
+      call nod_fields_send_recv(sfcing%geofem%mesh,                     &
+     &                          sfcing%nod_fld, sfcing%v_sol)
 !
       end subroutine FEM_analyze_surface
 !
@@ -187,7 +192,6 @@
 !
       subroutine FEM_initialize_VTK_convert(ucd_step, init_d, sfcing)
 !
-      use m_array_for_send_recv
       use mpi_load_mesh_data
       use nod_phys_send_recv
       use parallel_FEM_mesh_init
@@ -207,6 +211,7 @@
       call mpi_input_mesh(sfcing%mesh_file_IO, nprocs, sfcing%geofem)
 !
       if(iflag_debug.gt.0) write(*,*) 'FEM_mesh_initialization'
+      call FEM_comm_initialization(sfcing%geofem%mesh, sfcing%v_sol)
       call FEM_mesh_initialization(sfcing%geofem%mesh,                  &
      &                             sfcing%geofem%group)
 !
@@ -218,8 +223,8 @@
      &                        sfcing%ucd_time, sfcing%ucd_in)
       call alloc_phys_name_type_by_output(sfcing%ucd_in,                &
      &                                    sfcing%nod_fld)
-      call alloc_phys_data_type(sfcing%geofem%mesh%node%numnod,         &
-     &                          sfcing%nod_fld)
+      call alloc_phys_data(sfcing%geofem%mesh%node%numnod,              &
+     &                     sfcing%nod_fld)
       call deallocate_surface_geom_type(sfcing%geofem%mesh%surf)
 !
       end subroutine FEM_initialize_VTK_convert

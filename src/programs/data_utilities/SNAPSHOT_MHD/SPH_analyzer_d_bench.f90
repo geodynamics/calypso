@@ -42,6 +42,8 @@
       use t_field_4_dynamobench
       use t_work_SPH_MHD
 !
+      use calypso_mpi
+!
       implicit none
 !
 ! ----------------------------------------------------------------------
@@ -54,9 +56,7 @@
      &          SPH_model, SPH_MHD, SPH_WK, cdat)
 !
       use m_constants
-      use m_array_for_send_recv
       use m_machine_parameter
-      use calypso_mpi
 !
       use t_sph_boundary_input_data
 !
@@ -90,11 +90,6 @@
       call set_sph_MHD_sprctr_data(SPH_MHD%sph, SPH_model%MHD_prop,     &
      &    SPH_MHD%fld, SPH_MHD%ipol)
 !
-      if (iflag_debug.gt.0 ) write(*,*) 'allocate_vector_for_solver'
-      call allocate_vector_for_solver                                   &
-     &   (isix, SPH_MHD%sph%sph_rtp%nnod_rtp)
-!
-!
       if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
       call init_r_infos_sph_mhd_evo(SPH_WK%r_2nd, SPH_model%bc_IO,      &
      &    SPH_MHD%groups, SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph,  &
@@ -127,8 +122,8 @@
 !
 !* -----  find mid-equator point -----------------
 !*
-      call set_mid_equator_point_global                                 &
-     &   (SPH_WK%trans_p, SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rtp,  &
+      call set_mid_equator_point_global(my_rank, SPH_WK%trans_p,        &
+     &    SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rtp,                  &
      &    SPH_MHD%sph%sph_rj, cdat)
 !
       end subroutine SPH_init_sph_dbench

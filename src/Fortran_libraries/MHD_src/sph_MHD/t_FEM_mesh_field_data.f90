@@ -1,9 +1,3 @@
-!t_FEM_mesh_field_data.f90
-!      module t_FEM_mesh_field_data
-!
-!      Written by H. Matsui on July, 2006
-!      Modified by H. Matsui on June, 2007
-!
 !>@file   t_FEM_mesh_field_data.f90
 !!@brief  module t_FEM_mesh_field_data
 !!
@@ -21,22 +15,26 @@
       use t_mesh_data
       use t_phys_data
       use t_phys_address
+      use t_vector_for_solver
 !
       implicit none
 !
 !>      Structure of FEM mesh and field structures
       type FEM_mesh_field_data
-!>       label   for simulation
+!>        Label for simulation
         character(len=kchara)   :: label_sim
 !
-!>       Structure for FEM mesh data
+!>        Structure for FEM mesh data
 !!         (position, connectivity, communication, and groups)
         type(mesh_data) :: geofem
 !
-!>       Structure for nodal field data
+!>        Structure for nodal field data
         type(phys_data) :: field
-!>       address for nodal fields
+!>        Address for nodal fields
         type(phys_address) :: iphys
+!
+!>        Structure for vectors for solver
+        type(vectors_4_solver) :: v_sol
       end type FEM_mesh_field_data
 !
       end module t_FEM_mesh_field_data

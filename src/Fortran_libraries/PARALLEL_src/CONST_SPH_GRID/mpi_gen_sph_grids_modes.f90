@@ -11,9 +11,11 @@
 !!        type(construct_spherical_grid), intent(inout) :: gen_sph
 !!        type(sph_grids), intent(inout) :: sph
 !!
-!!      subroutine mpi_gen_sph_grids(gen_sph, sph, comms_sph, sph_grp)
-!!      subroutine mpi_gen_sph_rj_mode(gen_sph, sph, comms_sph, sph_grp)
-!!        type(construct_spherical_grid), intent(inout) :: gen_sph
+!!      subroutine mpi_gen_sph_grids(sph_maker, sph, comms_sph, sph_grp)
+!!      subroutine mpi_gen_sph_rj_mode                                  &
+!!     &         (sph_maker, sph, comms_sph, sph_grp)
+!!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
+!!        type(sph_grids), intent(inout) :: sph_tmp
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(sph_comm_tables), intent(inout) :: comms_sph
 !!        type(sph_group_data), intent(inout) :: sph_grp
@@ -30,7 +32,7 @@
 !
       use t_spheric_parameter
       use t_sph_trans_comm_tbl
-      use t_const_spherical_grid
+      use t_sph_grid_maker_in_sim
       use t_file_IO_parameter
 !
       implicit none
@@ -76,8 +78,7 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine mpi_gen_sph_grids                                      &
-     &         (gen_sph, sph_tmp, sph, comms_sph, sph_grp)
+      subroutine mpi_gen_sph_grids(sph_maker, sph, comms_sph, sph_grp)
 !
       use t_sph_local_index
 !
@@ -89,9 +90,8 @@
 !
       use set_local_sphere_by_global
 !
-      type(construct_spherical_grid), intent(inout) :: gen_sph
-!>       Structure of grid and spectr data for spherical spectr method
-      type(sph_grids), intent(inout) :: sph_tmp
+!>      Structure to check and construct spherical shell mesh
+      type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !>       Structure of grid and spectr data for spherical spectr method
       type(sph_grids), intent(inout) :: sph
 !>       Structure of communication table for spherical spectr method
@@ -106,80 +106,68 @@
 !
 !  =========  Set global resolutions ===================================
 !
-      call const_sph_global_parameters(gen_sph, sph_tmp)
+      call const_sph_global_parameters(sph_maker%gen_sph,               &
+     &                                 sph_maker%sph_tmp)
 !
       call copy_each_sph_param_from_ctl                                 &
-     &   (sph_tmp, sph%sph_params, sph%sph_rtp, sph%sph_rj)
-      call copy_each_global_sph_resolution                              &
-     &   (sph_tmp, sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
+     &   (sph_maker%sph_tmp, sph%sph_params, sph%sph_rtp, sph%sph_rj)
+      call copy_each_global_sph_resolution (sph_maker%sph_tmp,          &
+     &    sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
       call calypso_mpi_barrier
 !
 !  ========= Generate each spherical harmonics table ===================
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+6)
-      allocate(comm_rlm_mul(gen_sph%s3d_ranks%ndomain_sph))
+      allocate(comm_rlm_mul(nprocs))
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &             'start rlm table generation for', my_rank
-      call const_sph_rlm_modes                                          &
-     &   (my_rank, gen_sph%s3d_ranks, gen_sph%s3d_radius,               &
-     &    gen_sph%sph_lcp, gen_sph%stk_lc1d, gen_sph%sph_gl1d,          &
-     &    sph%sph_rlm, comms_sph%comm_rlm)
+      call const_sph_rlm_modes(my_rank, sph_maker%gen_sph,              &
+     &                         sph%sph_rlm, comms_sph%comm_rlm)
       call copy_sph_comm_neib                                           &
      &   (comms_sph%comm_rlm, comm_rlm_mul(my_rank+1))
 !
-      call mpi_bcast_comm_stacks_sph                                    &
-     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
+      call mpi_bcast_comm_stacks_sph(comm_rlm_mul)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &             'Construct spherical modes for domain ', my_rank
 !
-      call const_sph_rj_modes                                           &
-     &   (my_rank, nprocs, comm_rlm_mul, gen_sph%added_radial_grp,      &
-     &    gen_sph%s3d_ranks, gen_sph%s3d_radius,                        &
-     &    gen_sph%sph_lcp, gen_sph%stk_lc1d, gen_sph%sph_gl1d,          &
-     &    sph%sph_params, sph%sph_rtp, sph%sph_rj,                      &
+      call const_sph_rj_modes(my_rank, nprocs, comm_rlm_mul,            &
+     &    sph_maker%gen_sph, sph%sph_params, sph%sph_rtp, sph%sph_rj,   &
      &    comms_sph%comm_rj, sph_grp)
 
 !
-      call dealloc_comm_stacks_sph                                      &
-     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
+      call dealloc_comm_stacks_sph(nprocs, comm_rlm_mul)
       deallocate(comm_rlm_mul)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
 !
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+6)
-      allocate(comm_rtm_mul(gen_sph%s3d_ranks%ndomain_sph))
+      allocate(comm_rtm_mul(nprocs))
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &             'start rtm table generation for',  my_rank
       call const_sph_rtm_grids                                          &
-     &   (my_rank, gen_sph%s3d_ranks, gen_sph%s3d_radius,               &
-     &    gen_sph%sph_lcp, gen_sph%stk_lc1d, gen_sph%sph_gl1d,          &
-     &    sph%sph_rtm, comms_sph%comm_rtm)
+     &   (my_rank, sph_maker%gen_sph, sph%sph_rtm, comms_sph%comm_rtm)
       call copy_sph_comm_neib                                           &
      &   (comms_sph%comm_rtm, comm_rtm_mul(my_rank+1))
 !
-      call mpi_bcast_comm_stacks_sph                                    &
-     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rtm_mul)
+      call mpi_bcast_comm_stacks_sph(comm_rtm_mul)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &             'Construct spherical grids for domain ',  my_rank
       call const_sph_rtp_grids(my_rank, nprocs, comm_rtm_mul,           &
-     &    gen_sph%added_radial_grp, gen_sph%r_layer_grp,                &
-     &    gen_sph%med_layer_grp, gen_sph%s3d_ranks, gen_sph%s3d_radius, &
-     &    gen_sph%sph_lcp, gen_sph%stk_lc1d, gen_sph%sph_gl1d,          &
-     &    sph%sph_params, sph%sph_rtp, comms_sph%comm_rtp, sph_grp)
+     &    sph_maker%gen_sph, sph%sph_params, sph%sph_rtp,               &
+     &    comms_sph%comm_rtp, sph_grp)
 !
-      call dealloc_comm_stacks_sph                                      &
-     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rtm_mul)
+      call dealloc_comm_stacks_sph(nprocs, comm_rtm_mul)
 !
       deallocate(comm_rtm_mul)
-      call dealloc_gen_mesh_params(gen_sph)
+      call dealloc_gen_mesh_params(sph_maker%gen_sph)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
 !
       end subroutine mpi_gen_sph_grids
@@ -187,8 +175,8 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine mpi_gen_sph_rj_mode(gen_sph, sph_tmp,                  &
-     &          sph, comms_sph, sph_grp)
+      subroutine mpi_gen_sph_rj_mode                                    &
+     &         (sph_maker, sph, comms_sph, sph_grp)
 !
       use t_sph_local_index
 !
@@ -198,9 +186,8 @@
       use gen_sph_grids_modes
       use copy_para_sph_global_params
 !
-      type(construct_spherical_grid), intent(inout) :: gen_sph
-!>       Structure of grid and spectr data for spherical spectr method
-      type(sph_grids), intent(inout) :: sph_tmp
+!>      Structure to check and construct spherical shell mesh
+      type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !>       Structure of grid and spectr data for spherical spectr method
       type(sph_grids), intent(inout) :: sph
 !>       Structure of communication table for spherical spectr method
@@ -215,44 +202,38 @@
 !
 !  =========  Set global resolutions ===================================
 !
-      call const_sph_global_parameters(gen_sph, sph_tmp)
+      call const_sph_global_parameters(sph_maker%gen_sph,               &
+     &                                 sph_maker%sph_tmp)
       call copy_each_sph_param_from_ctl                                 &
-     &   (sph_tmp, sph%sph_params, sph%sph_rtp, sph%sph_rj)
-      call copy_each_global_sph_resolution                              &
-     &   (sph_tmp, sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
+     &   (sph_maker%sph_tmp, sph%sph_params, sph%sph_rtp, sph%sph_rj)
+      call copy_each_global_sph_resolution(sph_maker%sph_tmp,           &
+     &    sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
 !
 !  ========= Generate each spherical harmonics table ===================
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+6)
-      allocate(comm_rlm_mul(gen_sph%s3d_ranks%ndomain_sph))
+      allocate(comm_rlm_mul(nprocs))
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &             'start rlm table generation for', my_rank
-      call const_sph_rlm_modes                                          &
-     &   (my_rank, gen_sph%s3d_ranks, gen_sph%s3d_radius,               &
-     &    gen_sph%sph_lcp, gen_sph%stk_lc1d, gen_sph%sph_gl1d,          &
-     &    sph%sph_rlm, comms_sph%comm_rlm)
+      call const_sph_rlm_modes(my_rank, sph_maker%gen_sph,              &
+     &                         sph%sph_rlm, comms_sph%comm_rlm)
       ip = my_rank + 1
       call copy_sph_comm_neib(comms_sph%comm_rlm, comm_rlm_mul(ip))
 !
-      call mpi_bcast_comm_stacks_sph                                    &
-     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
+      call mpi_bcast_comm_stacks_sph(comm_rlm_mul)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &             'Construct spherical modes for domain ', my_rank
-      call const_sph_rj_modes                                           &
-     &   (my_rank, nprocs, comm_rlm_mul, gen_sph%added_radial_grp,      &
-     &    gen_sph%s3d_ranks, gen_sph%s3d_radius,                        &
-     &    gen_sph%sph_lcp, gen_sph%stk_lc1d, gen_sph%sph_gl1d,          &
-     &    sph%sph_params, sph%sph_rtp, sph%sph_rj,                      &
+      call const_sph_rj_modes(my_rank, nprocs, comm_rlm_mul,            &
+     &    sph_maker%gen_sph, sph%sph_params, sph%sph_rtp, sph%sph_rj,   &
      &    comms_sph%comm_rj, sph_grp)
 !
-      call dealloc_comm_stacks_sph                                      &
-     &   (gen_sph%s3d_ranks%ndomain_sph, comm_rlm_mul)
+      call dealloc_comm_stacks_sph(nprocs, comm_rlm_mul)
       deallocate(comm_rlm_mul)
-      call dealloc_gen_mesh_params(gen_sph)
+      call dealloc_gen_mesh_params(sph_maker%gen_sph)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
 !
       end subroutine mpi_gen_sph_rj_mode

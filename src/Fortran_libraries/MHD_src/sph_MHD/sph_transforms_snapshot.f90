@@ -45,7 +45,6 @@
       use t_sph_trans_arrays_MHD
       use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
-      use t_sph_transforms
       use t_legendre_trans_select
       use t_sph_FFT_selector
 !
@@ -64,6 +63,7 @@
 !
       use m_solver_SR
       use set_address_sph_trans_MHD
+      use spherical_transforms
       use spherical_SRs_N
 !
       type(sph_grids), intent(in) :: sph
@@ -106,6 +106,7 @@
 !
       use m_solver_SR
       use set_address_sph_trans_MHD
+      use spherical_transforms
       use spherical_SRs_N
 !
       type(sph_grids), intent(in) :: sph

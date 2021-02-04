@@ -84,7 +84,7 @@
       call link_field_data_to_ucd(nod_fld, ucd)
 !
       if (ucd_param%iflag_format/icent .eq. iflag_single/icent) then
-        call init_merged_ucd                                            &
+        call init_merged_ucd_element                                    &
      &     (ucd_param%iflag_format, node, ele, nod_comm, ucd)
       end if
 !
@@ -128,7 +128,7 @@
       call link_field_data_to_ucd(nod_fld, ucd)
 !
       if (ucd_param%iflag_format/icent .eq. iflag_single/icent) then
-        call init_merged_ucd                                            &
+        call init_merged_ucd_element                                    &
      &     (ucd_param%iflag_format, node, ele, nod_comm, ucd)
       end if
 !

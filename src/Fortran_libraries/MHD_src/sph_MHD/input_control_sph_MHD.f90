@@ -41,14 +41,10 @@
       use t_file_IO_parameter
       use t_sph_boundary_input_data
       use t_bc_data_list
-      use t_check_and_make_SPH_mesh
       use t_flex_delta_t_data
       use t_work_SPH_MHD
 !
       implicit none
-!
-!>      Structure to construct grid
-      type(sph_grid_maker_in_sim), save, private :: sph_maker1
 !
 ! ----------------------------------------------------------------------
 !
@@ -83,7 +79,7 @@
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
      &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, sph_maker1)
+     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
@@ -94,8 +90,7 @@
       if (iflag_debug.eq.1) write(*,*) 'load_para_SPH_and_FEM_mesh'
       call load_para_SPH_and_FEM_mesh                                   &
      &   (MHD_files%FEM_mesh_flags, MHD_files%sph_file_param,           &
-     &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, FEM_dat%geofem,   &
-     &    MHD_files%mesh_file_IO, sph_maker1)
+     &    SPH_MHD, FEM_dat%geofem, MHD_files%mesh_file_IO)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
@@ -129,15 +124,14 @@
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
      &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, sph_maker1)
+     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
 !
       call set_control_SPH_MHD_noviz                                    &
      &   (DMHD_ctl%model_ctl, DMHD_ctl%smonitor_ctl,                    &
      &    SPH_model%MHD_prop, SPH_MHD%fld, SPH_WK%monitor)
 !
       if (iflag_debug.eq.1) write(*,*) 'check_and_make_SPH_mesh'
-      call check_and_make_SPH_mesh(MHD_files%sph_file_param,            &
-     &   sph_maker1, SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups)
+      call check_and_make_SPH_mesh(MHD_files%sph_file_param, SPH_MHD)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
@@ -173,7 +167,7 @@
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
      &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, sph_maker1)
+     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
@@ -184,8 +178,7 @@
       if (iflag_debug.eq.1) write(*,*) 'load_para_SPH_and_FEM_mesh'
       call load_para_SPH_and_FEM_mesh                                   &
      &   (MHD_files%FEM_mesh_flags, MHD_files%sph_file_param,           &
-     &    SPH_MHD%sph, SPH_MHD%comms, SPH_MHD%groups, FEM_dat%geofem,   &
-     &    MHD_files%mesh_file_IO, sph_maker1)
+     &    SPH_MHD, FEM_dat%geofem, MHD_files%mesh_file_IO)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !

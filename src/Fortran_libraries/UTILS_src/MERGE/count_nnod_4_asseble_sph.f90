@@ -8,8 +8,8 @@
 !!
 !!@verbatim
 !!      subroutine s_count_nnod_4_asseble_sph                           &
-!!     &         (np_sph_new, new_sph_mesh, new_fst_IO)
-!!        type(sph_mesh_data), intent(in) :: new_sph_mesh(np_sph_new)
+!!     &         (np_sph_new, new_sph_data, new_fst_IO)
+!!        type(SPH_mesh_field_data), intent(in) :: new_sph_data
 !!        type(field_IO), intent(inout) :: new_fst_IO
 !!@endverbatim
 !
@@ -31,12 +31,12 @@
 ! ----------------------------------------------------------------------
 !
       subroutine s_count_nnod_4_asseble_sph                             &
-     &         (np_sph_new, new_sph_mesh, new_fst_IO)
+     &         (np_sph_new, new_sph_data, new_fst_IO)
 !
       use calypso_mpi_int
 !
       integer, intent(in) :: np_sph_new
-      type(sph_mesh_data), intent(in) :: new_sph_mesh
+      type(SPH_mesh_field_data), intent(in) :: new_sph_data
 !
       type(field_IO), intent(inout) :: new_fst_IO
 !
@@ -48,7 +48,7 @@
       nnod_list(1:nprocs) = 0
 !
       call calypso_mpi_allgather_one_int                                &
-     &   (new_sph_mesh%sph%sph_rj%nnod_rj, nnod_list)
+     &   (new_sph_data%sph%sph_rj%nnod_rj, nnod_list)
 !
       call alloc_merged_field_stack(np_sph_new, new_fst_IO)
       new_fst_IO%istack_numnod_IO(0) = 0

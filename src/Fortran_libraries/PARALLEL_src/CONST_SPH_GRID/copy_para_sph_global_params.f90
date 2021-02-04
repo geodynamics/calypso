@@ -4,23 +4,34 @@
 !!@author H. Matsui
 !!@date Programmed on July, 2007
 !
-!>@brief  Set control data for domain decomposition for spherical transform
+!>@brief  Copy spherical hermonics indexing data
 !!
 !!@verbatim
-!!      subroutine copy_para_sph_param_from_ctl                         &
-!!     &         (sph_org, num_pe, sph_mesh)
-!!      subroutine copy_para_global_sph_resolution                      &
-!!     &         (sph_org, num_pe, sph_mesh)
-!!        integer(kind = kint), intent(in) :: num_pe
+!!      subroutine copy_para_sph_param_from_ctl(sph_org, sph_array)
+!!      subroutine copy_para_global_sph_resolution(sph_org, sph_array)
 !!        type(sph_grids), intent(in) :: sph_org
-!!        type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
+!!        type(sph_mesh_array), intent(inout) :: sph_array
+!!
+!!      subroutine copy_each_sph_param_from_ctl                         &
+!!     &         (sph_org, sph_params, sph_rtp, sph_rj)
+!!        type(sph_grids), intent(in) :: sph_org
+!!        type(sph_shell_parameters), intent(inout) :: sph_params
+!!        type(sph_rtp_grid), intent(inout) :: sph_rtp
+!!        type(sph_rj_grid), intent(inout) :: sph_rj
+!!      subroutine copy_each_global_sph_resolution(sph_org,             &
+!!     &          sph_rtp, sph_rtm, sph_rlm, sph_rj)
+!!        type(sph_grids), intent(in) :: sph_org
+!!        type(sph_rtp_grid), intent(inout) :: sph_rtp
+!!        type(sph_rtm_grid), intent(inout) :: sph_rtm
+!!        type(sph_rlm_grid), intent(inout) :: sph_rlm
+!!        type(sph_rj_grid), intent(inout) :: sph_rj
 !!@endverbatim
 !
       module copy_para_sph_global_params
 !
       use m_precision
 !
-      use t_SPH_mesh_field_data
+      use t_SPH_mesh_field_array
       use t_spheric_parameter
 !
       implicit  none
@@ -31,22 +42,19 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine copy_para_sph_param_from_ctl                           &
-     &         (sph_org, num_pe, sph_mesh)
+      subroutine copy_para_sph_param_from_ctl(sph_org, sph_array)
 !
-      integer(kind = kint), intent(in) :: num_pe
       type(sph_grids), intent(in) :: sph_org
+      type(sph_mesh_array), intent(inout) :: sph_array
 !
-      type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
-!
-      integer(kind = kint) :: ip
+      integer :: ip
 !
 !
 !$omp parallel do
-      do ip = 1, num_pe
+      do ip = 1, sph_array%num_pe
         call copy_each_sph_param_from_ctl                               &
-     &     (sph_org, sph_mesh(ip)%sph%sph_params,                       &
-     &      sph_mesh(ip)%sph%sph_rtp, sph_mesh(ip)%sph%sph_rj)
+     &     (sph_org, sph_array%sph(ip)%sph_params,                      &
+     &      sph_array%sph(ip)%sph_rtp, sph_array%sph(ip)%sph_rj)
       end do
 !$omp end parallel do
 !
@@ -54,21 +62,19 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine copy_para_global_sph_resolution                        &
-     &         (sph_org, num_pe, sph_mesh)
+      subroutine copy_para_global_sph_resolution(sph_org, sph_array)
 !
-      integer(kind = kint), intent(in) :: num_pe
       type(sph_grids), intent(in) :: sph_org
-      type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
+      type(sph_mesh_array), intent(inout) :: sph_array
 !
       integer(kind = kint) :: ip
 !
 !
 !$omp parallel do
-      do ip = 1, num_pe
+      do ip = 1, sph_array%num_pe
         call copy_each_global_sph_resolution(sph_org,                   &
-     &     sph_mesh(ip)%sph%sph_rtp, sph_mesh(ip)%sph%sph_rtm,          &
-     &     sph_mesh(ip)%sph%sph_rlm, sph_mesh(ip)%sph%sph_rj)
+     &     sph_array%sph(ip)%sph_rtp, sph_array%sph(ip)%sph_rtm,        &
+     &     sph_array%sph(ip)%sph_rlm, sph_array%sph(ip)%sph_rj)
       end do
 !$omp end parallel do
 !

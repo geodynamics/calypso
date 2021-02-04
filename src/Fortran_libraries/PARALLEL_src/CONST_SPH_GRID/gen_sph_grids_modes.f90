@@ -9,23 +9,13 @@
 !!
 !!@verbatim
 !!      subroutine const_sph_rlm_modes                                  &
-!!     &         (id_rank, s3d_ranks, s3d_radius, sph_lcp, stk_lc1d,    &
-!!     &          sph_gl1d,  sph_rlm, comm_rlm)
-!!        type(spheric_global_rank), intent(in) :: s3d_ranks
-!!        type(spheric_global_radius), intent(in) :: s3d_radius
-!!        type(sph_local_parameters), intent(in) :: sph_lcp
-!!        type(sph_1d_index_stack), intent(in)  :: stk_lc1d
-!!        type(sph_1d_global_index), intent(in)  :: sph_gl1d
+!!     &         (id_rank, gen_sph, sph_rlm, comm_rlm)
+!!        type(construct_spherical_grid), intent(in) :: gen_sph
 !!        type(sph_rlm_grid), intent(inout) :: sph_rlm
 !!        type(sph_comm_tbl), intent(inout) :: comm_rlm
 !!      subroutine const_sph_rtm_grids                                  &
-!!     &         (id_rank, s3d_ranks, s3d_radius, sph_lcp, stk_lc1d,    &
-!!     &          sph_gl1d, sph_rtm, comm_rtm)
-!!        type(spheric_global_rank), intent(in) :: s3d_ranks
-!!        type(spheric_global_radius), intent(in) :: s3d_radius
-!!        type(sph_local_parameters), intent(in) :: sph_lcp
-!!        type(sph_1d_index_stack), intent(in)  :: stk_lc1d
-!!        type(sph_1d_global_index), intent(in)  :: sph_gl1d
+!!     &         (id_rank, gen_sph, sph_rtm, comm_rtm)
+!!        type(construct_spherical_grid), intent(in) :: gen_sph
 !!        type(sph_rtm_grid), intent(inout) :: sph_rtm
 !!        type(sph_comm_tbl), intent(inout) :: comm_rtm
 !!@endverbatim
@@ -34,6 +24,8 @@
 !
       use m_precision
       use m_machine_parameter
+!
+      use t_const_spherical_grid
 !
       implicit none
 !
@@ -46,46 +38,39 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_sph_rlm_modes                                    &
-     &         (id_rank, s3d_ranks, s3d_radius, sph_lcp, stk_lc1d,      &
-     &          sph_gl1d,  sph_rlm, comm_rlm)
+     &         (id_rank, gen_sph, sph_rlm, comm_rlm)
 !
       use t_spheric_rlm_data
       use t_sph_trans_comm_tbl
-      use t_spheric_global_ranks
-      use t_sph_1d_global_index
-      use t_sph_local_parameter
 !
       use copy_sph_1d_global_index
       use set_local_sphere_param
       use set_local_sphere_by_global
 !
       integer, intent(in) :: id_rank
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(spheric_global_radius), intent(in) :: s3d_radius
-      type(sph_local_parameters), intent(in) :: sph_lcp
-      type(sph_1d_index_stack), intent(in)  :: stk_lc1d
-      type(sph_1d_global_index), intent(in)  :: sph_gl1d
+      type(construct_spherical_grid), intent(in) :: gen_sph
 !
       type(sph_rlm_grid), intent(inout) :: sph_rlm
       type(sph_comm_tbl), intent(inout) :: comm_rlm
 !
 !
-      call copy_gl_2_local_rlm_param                                    &
-     &   (id_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rlm)
+      call copy_gl_2_local_rlm_param(id_rank, gen_sph%s3d_ranks,        &
+     &    gen_sph%sph_lcp, gen_sph%stk_lc1d, sph_rlm)
 !
       call alloc_sph_1d_index_rlm(sph_rlm)
       call alloc_spheric_param_rlm(sph_rlm)
 !
-      call copy_sph_1d_gl_idx_rlm(s3d_radius, sph_gl1d, sph_rlm)
+      call copy_sph_1d_gl_idx_rlm                                       &
+     &   (gen_sph%s3d_radius, gen_sph%sph_gl1d, sph_rlm)
 !
-      if(s3d_ranks%rlm_rin_flag) then
+      if(gen_sph%s3d_ranks%rlm_rin_flag) then
         if(iflag_debug .gt. 0) write(*,*)                               &
      &          'set_global_sph_4_rlm', id_rank
-        call set_global_sph_4_rlm(s3d_ranks, stk_lc1d, sph_rlm)
+        call set_global_sph_4_rlm(sph_rlm)
       else
         if(iflag_debug .gt. 0) write(*,*)                               &
      &          'set_global_sph_4_lmr', id_rank
-        call set_global_sph_4_lmr(s3d_ranks, stk_lc1d, sph_rlm)
+        call set_global_sph_4_lmr(sph_rlm)
       end if
 !
       if(iflag_debug .gt. 0) then
@@ -95,53 +80,46 @@
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'const_comm_table_4_rlm', id_rank
       call const_comm_table_4_rlm                                       &
-     &   (id_rank, s3d_ranks, sph_rlm, comm_rlm)
+     &   (id_rank, gen_sph%s3d_ranks, sph_rlm, comm_rlm)
 !
       end subroutine const_sph_rlm_modes
 !
 ! ----------------------------------------------------------------------
 !
       subroutine const_sph_rtm_grids                                    &
-     &         (id_rank, s3d_ranks, s3d_radius, sph_lcp, stk_lc1d,      &
-     &          sph_gl1d, sph_rtm, comm_rtm)
+     &         (id_rank, gen_sph, sph_rtm, comm_rtm)
 !
       use t_spheric_rtm_data
       use t_sph_trans_comm_tbl
-      use t_spheric_global_ranks
-      use t_sph_1d_global_index
-      use t_sph_local_parameter
 !
       use copy_sph_1d_global_index
       use set_local_sphere_param
       use set_local_sphere_by_global
 !
       integer, intent(in) :: id_rank
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(spheric_global_radius), intent(in) :: s3d_radius
-      type(sph_local_parameters), intent(in) :: sph_lcp
-      type(sph_1d_index_stack), intent(in)  :: stk_lc1d
-      type(sph_1d_global_index), intent(in)  :: sph_gl1d
+      type(construct_spherical_grid), intent(in) :: gen_sph
 !
       type(sph_rtm_grid), intent(inout) :: sph_rtm
       type(sph_comm_tbl), intent(inout) :: comm_rtm
 !
 !
-      call copy_gl_2_local_rtm_param                                    &
-     &   (id_rank, s3d_ranks, sph_lcp, stk_lc1d, sph_rtm)
+      call copy_gl_2_local_rtm_param(id_rank, gen_sph%s3d_ranks,        &
+     &    gen_sph%sph_lcp, gen_sph%stk_lc1d, sph_rtm)
 !
       call alloc_spheric_param_rtm(sph_rtm)
       call alloc_sph_1d_index_rtm(sph_rtm)
 !
-      call copy_sph_1d_gl_idx_rtm(s3d_radius, sph_gl1d, sph_rtm)
+      call copy_sph_1d_gl_idx_rtm(gen_sph%s3d_radius,                   &
+     &                            gen_sph%sph_gl1d, sph_rtm)
 !
-      if(s3d_ranks%rtm_rin_flag) then
+      if(gen_sph%s3d_ranks%rtm_rin_flag) then
         if(iflag_debug .gt. 0) write(*,*)                               &
      &          'set_global_sph_4_rtm', id_rank
-        call set_global_sph_4_rtm(s3d_ranks, stk_lc1d, sph_rtm)
+        call set_global_sph_4_rtm(sph_rtm)
       else
         if(iflag_debug .gt. 0) write(*,*)                               &
      &          'set_global_sph_4_trm', id_rank
-        call set_global_sph_4_trm(s3d_ranks, stk_lc1d, sph_rtm)
+        call set_global_sph_4_trm(sph_rtm)
       end if
 !
       if(iflag_debug .gt. 0) then
@@ -151,7 +129,7 @@
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &          'const_comm_table_4_rtm', id_rank
       call const_comm_table_4_rtm                                       &
-     &   (id_rank, s3d_ranks, sph_rtm, comm_rtm)
+     &   (id_rank, gen_sph%s3d_ranks, sph_rtm, comm_rtm)
 !
       end subroutine const_sph_rtm_grids
 !
@@ -161,7 +139,6 @@
       subroutine const_comm_table_4_rlm                                 &
      &         (id_rank, s3d_ranks, sph_rlm, comm_rlm)
 !
-      use t_spheric_global_ranks
       use t_spheric_rlm_data
       use t_sph_trans_comm_tbl
       use set_comm_table_rtm_rlm
@@ -212,7 +189,6 @@
       subroutine const_comm_table_4_rtm                                 &
      &         (id_rank, s3d_ranks, sph_rtm, comm_rtm)
 !
-      use t_spheric_global_ranks
       use t_spheric_rtm_data
       use t_sph_trans_comm_tbl
       use set_comm_table_rtm_rlm

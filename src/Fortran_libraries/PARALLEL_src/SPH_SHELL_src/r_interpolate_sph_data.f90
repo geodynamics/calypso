@@ -1,10 +1,12 @@
-!r_interpolate_sph_data.f90
-!     module r_interpolate_sph_data
+!>@file   r_interpolate_sph_data.f90
+!!@brief  module r_interpolate_sph_data
+!!
+!!@author H. Matsui
+!!@date Programmed in March, 2012
 !
-!      Written by H. Matsui on Sep., 2011
-!
-!      subroutine deallocate_original_sph_data
-!
+!>@brief Interpolate spectr data
+!!
+!!@verbatim
 !!      subroutine copy_cmb_icb_radial_point(nlayer_ICB, nlayer_CMB)
 !!      subroutine set_cmb_icb_radial_point                             &
 !!     &         (cmb_r_grp, icb_r_grp, radial_rj_grp)
@@ -19,12 +21,10 @@
 !!     &         (fld_IO, sph_rj, ipol, rj_fld)
 !!      subroutine r_interpolate_sph_fld_from_IO                        &
 !!     &         (fld_IO, sph_rj, ipol, rj_fld)
-!!      subroutine set_poloidal_b_by_gauss_coefs                        &
-!!     &         (sph_rj, ipol, d_gauss, rj_fld)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(phys_address), intent(in) :: ipol
-!!        type(global_gauss_points), intent(in) :: d_gauss
 !!        type(phys_data), intent(inout) :: rj_fld
+!!@endverbatim
 !
       module r_interpolate_sph_data
 !
@@ -297,36 +297,6 @@
       end if
 !
       end subroutine r_interpolate_sph_fld_from_IO
-!
-! -----------------------------------------------------------------------
-!  -------------------------------------------------------------------
-!
-      subroutine set_poloidal_b_by_gauss_coefs                          &
-     &         (sph_rj, ipol, d_gauss, rj_fld)
-!
-      use t_global_gauss_coefs
-      use extend_potential_field
-!
-      type(sph_rj_grid), intent(in) ::  sph_rj
-      type(phys_address), intent(in) :: ipol
-      type(global_gauss_points), intent(in) :: d_gauss
-      type(phys_data), intent(inout) :: rj_fld
-!
-!
-      write(*,*) ' ipol%base%i_magne', ipol%base%i_magne,               &
-     &          kr_outside, kr_inside
-      if (ipol%base%i_magne .gt. 0) then
-        call gauss_to_poloidal_out                                      &
-     &     (kr_outside, d_gauss%ltr_w, d_gauss%r_gauss,                 &
-     &      d_gauss%w_gauss, d_gauss%index_w, ipol%base%i_magne,        &
-     &      sph_rj, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-        call gauss_to_poloidal_in                                       &
-     &     (kr_inside, d_gauss%ltr_w, d_gauss%r_gauss,                  &
-     &      d_gauss%w_gauss, d_gauss%index_w, ipol%base%i_magne,        &
-     &      sph_rj, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      end if
-!
-      end subroutine set_poloidal_b_by_gauss_coefs
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

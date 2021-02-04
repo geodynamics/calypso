@@ -44,12 +44,16 @@
 !>        Current time of wall clock time
         real (kind=kreal), allocatable :: elapsed(:)
 !
-!>        Total of wall clock time
-        real(kind=kreal), allocatable :: elapsed_tot(:)
+!>        Average of wall clock time
+        real(kind=kreal), allocatable :: elapsed_ave(:)
+!>        Standard deviation of wall clock time
+        real(kind=kreal), allocatable :: elapsed_std(:)
 !>        Minimum of wall clock time
         real(kind=kreal), allocatable :: elapsed_min(:)
-!>        MAximum of wall clock time
+!>        Maximum of wall clock time
         real(kind=kreal), allocatable :: elapsed_max(:)
+!>        Square of deviation of wall clock time from average
+        real(kind=kreal), allocatable :: elapsed_sqr(:)
       end type elapsed_time_data
 !
 ! ----------------------------------------------------------------------
@@ -64,7 +68,9 @@
 !
 !
       allocate(elps%elapsed(elps%num_elapsed))
-      allocate(elps%elapsed_tot(elps%num_elapsed))
+      allocate(elps%elapsed_ave(elps%num_elapsed))
+      allocate(elps%elapsed_std(elps%num_elapsed))
+      allocate(elps%elapsed_sqr(elps%num_elapsed))
       allocate(elps%elapsed_min(elps%num_elapsed))
       allocate(elps%elapsed_max(elps%num_elapsed))
       allocate(elps%start_time(elps%num_elapsed))
@@ -73,7 +79,9 @@
       if(elps%num_elapsed .le. 0) return
         elps%start_time =  zero
         elps%elapsed =     zero
-        elps%elapsed_tot = zero
+        elps%elapsed_ave = zero
+        elps%elapsed_std = zero
+        elps%elapsed_sqr = zero
         elps%elapsed_min = zero
         elps%elapsed_max = zero
 !
@@ -114,7 +122,8 @@
       type(elapsed_time_data), intent(inout) :: elps
 !
 !
-      deallocate(elps%elapsed, elps%elapsed_tot)
+      deallocate(elps%elapsed, elps%elapsed_ave)
+      deallocate(elps%elapsed_std, elps%elapsed_sqr)
       deallocate(elps%elapsed_min, elps%elapsed_max)
       deallocate(elps%start_time)
       deallocate(elps%labels)
@@ -176,25 +185,34 @@
       use calypso_mpi
       use calypso_mpi_real
       use set_parallel_file_name
+      use transfer_to_long_integers
 !
       integer(kind = kint), intent(in) :: iflag_time_4_each_pe
       character(len=kchara), intent(in) :: time_file_prefix
 !
       type(elapsed_time_data), intent(inout) :: elps
 !
-      integer(kind = kint_gl) :: num64
       integer(kind = kint) :: i
       character(len=kchara) :: fname_tmp, file_name
 !
 !
-      num64 = int(elps%num_elapsed,KIND(num64))
-      call calypso_mpi_reduce_real(elps%elapsed, elps%elapsed_tot,      &
-     &    num64, MPI_SUM, 0)
+      call calypso_mpi_allreduce_real(elps%elapsed, elps%elapsed_ave,   &
+     &    cast_long(elps%num_elapsed), MPI_SUM)
       call calypso_mpi_reduce_real(elps%elapsed, elps%elapsed_min,      &
-     &    num64, MPI_MIN, 0)
+     &    cast_long(elps%num_elapsed), MPI_MIN, 0)
       call calypso_mpi_reduce_real(elps%elapsed, elps%elapsed_max,      &
-     &    num64, MPI_MAX, 0)
+     &    cast_long(elps%num_elapsed), MPI_MAX, 0)
 !
+!$omp parallel workshare
+      elps%elapsed_ave(1:elps%num_elapsed)                              &
+     &     = elps%elapsed_ave(1:elps%num_elapsed) / dble(nprocs)
+      elps%elapsed_sqr(1:elps%num_elapsed)                              &
+     &     = (elps%elapsed(1:elps%num_elapsed)                          &
+     &      - elps%elapsed_ave(1:elps%num_elapsed))**2
+!$omp end parallel workshare
+!
+      call calypso_mpi_reduce_real(elps%elapsed_sqr, elps%elapsed_std,  &
+     &    cast_long(elps%num_elapsed), MPI_MAX, 0)
 !
       if(iflag_time_4_each_pe .gt. 0) then
         fname_tmp = add_process_id(my_rank, time_file_prefix)
@@ -212,25 +230,28 @@
 !
       if (my_rank .ne. 0) return
 !
-      do i = 1, elps%num_elapsed
-        elps%elapsed(i) = elps%elapsed_tot(i) / dble(nprocs)
-      end do
+!$omp parallel workshare
+      elps%elapsed_std(1:elps%num_elapsed)                              &
+     &     = sqrt(elps%elapsed_std(1:elps%num_elapsed) / dble(nprocs))
+!$omp end parallel workshare
 !
       file_name = add_dat_extension(time_file_prefix)
       open(id_timer_file,file=file_name,position='append')
-      write(id_timer_file,*) 'Average elapsed time'
+      write(id_timer_file,'(a)') 'Elapsed time'
+      write(id_timer_file,'(a)') 'Average and standard deviation'
       do i = 1, elps%num_elapsed
-        if(elps%elapsed(i) .gt. zero) then
-          write(id_timer_file,'(i3,a2,a,a2,1pe20.11)') i, '. ',         &
-     &        trim(elps%labels(i)), ': ', elps%elapsed(i)
+        if(elps%elapsed_ave(i) .gt. zero) then
+          write(id_timer_file,'(i3,a2,a,a2,1p2e15.6)')                  &
+     &        i, '. ', trim(elps%labels(i)), ': ',                      &
+     &        elps%elapsed_ave(i), elps%elapsed_std(i)
         end if
       end do
 !
-      write(id_timer_file,*) ''
-      write(id_timer_file,*) 'Minimum and maximum elapsed time'
+      write(id_timer_file,'(a)') ''
+      write(id_timer_file,'(a)') 'Minimum and maximum elapsed time'
       do i = 1, elps%num_elapsed
-        if(elps%elapsed(i) .gt. zero) then
-          write(id_timer_file,'(i3,a2,a,a2,1p2e20.11)')                 &
+        if(elps%elapsed_ave(i) .gt. zero) then
+          write(id_timer_file,'(i3,a2,a,a2,1p2e15.6)')                  &
      &            i, '. ', trim(elps%labels(i)), ': ',                  &
      &            elps%elapsed_min(i), elps%elapsed_max(i)
          end if

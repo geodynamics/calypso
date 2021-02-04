@@ -1,8 +1,11 @@
+!>@file   t_control_params_4_psf.f90
+!!@brief  module t_control_params_4_psf
+!!
+!!@date  Programmed by H.Matsui in May, 2006
 !
-!      module t_control_params_4_psf
-!
-!        programmed by H.Matsui on May. 2006
-!
+!>@brief  Parameters for for cross sections
+!!
+!!@verbatim
 !!      subroutine alloc_coefficients_4_psf(psf_def)
 !!      subroutine dealloc_coefficients_4_psf(psf_def)
 !!      subroutine count_control_4_psf                                  &
@@ -22,7 +25,17 @@
 !!        type(phys_data), intent(inout) :: psf_fld
 !!        type(psf_parameters), intent(inout) :: psf_param
 !!        type(section_define), intent(inout) :: psf_def
+!!
+!!      subroutine set_read_psf_file_ctl(default_prefix,                &
+!!     &          file_prefix_ctl, file_format_ctl, ucd_param)
+!!      subroutine set_merged_psf_file_ctl(default_prefix,              &
+!!     &          file_prefix_ctl, file_format_ctl, ucd_param)
+!!        character(len = kchara), intent(in) :: default_prefix
+!!        type(read_character_item), intent(in) :: file_prefix_ctl
+!!        type(read_character_item), intent(in) :: file_format_ctl
+!!        type(field_IO_params), intent(inout) :: ucd_param
 !!      integer(kind = kint) function sel_psf_file_format(file_fmt_ctl)
+!!@endverbatim
 !
       module t_control_params_4_psf
 !
@@ -43,7 +56,6 @@
       end type section_define
 !
       private :: default_psf_prefix
-      private :: set_merged_psf_file_ctl
       private :: count_control_4_psf_define, set_control_psf_define
       private :: count_control_4_field_on_psf
       private :: set_control_4_field_on_psf
@@ -287,6 +299,28 @@
       end subroutine set_control_4_field_on_psf
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine set_read_psf_file_ctl(default_prefix,                  &
+     &          file_prefix_ctl, file_format_ctl, ucd_param)
+!
+      use t_control_array_character
+      use t_file_IO_parameter
+      use m_file_format_switch
+!
+      character(len = kchara), intent(in) :: default_prefix
+      type(read_character_item), intent(in) :: file_prefix_ctl
+      type(read_character_item), intent(in) :: file_format_ctl
+      type(field_IO_params), intent(inout) :: ucd_param
+!
+!
+      call set_merged_psf_file_ctl(default_prefix,                      &
+     &    file_prefix_ctl, file_format_ctl, ucd_param)
+      ucd_param%iflag_format                                            &
+     &      = mod(ucd_param%iflag_format, iflag_single)
+!
+      end subroutine set_read_psf_file_ctl
+!
+! -----------------------------------------------------------------------
 !
       subroutine set_merged_psf_file_ctl(default_prefix,                &
      &          file_prefix_ctl, file_format_ctl, ucd_param)

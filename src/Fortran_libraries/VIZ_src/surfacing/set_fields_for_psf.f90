@@ -55,8 +55,8 @@
 !
       do i = 1, num_psf
         call alloc_dat_on_patch_psf(psf_mesh(i))
-        call alloc_phys_data_type                                       &
-     &     (psf_mesh(i)%node%numnod, psf_mesh(i)%field)
+        call alloc_phys_data(psf_mesh(i)%node%numnod,                   &
+     &                       psf_mesh(i)%field)
       end do
 !
       end subroutine alloc_psf_field_data
@@ -75,7 +75,7 @@
 !
       do i = 1, num_psf
         call dealloc_dat_on_patch_psf(psf_mesh(i))
-        call dealloc_phys_data_type(psf_mesh(i)%field)
+        call dealloc_phys_data(psf_mesh(i)%field)
       end do
 !
       end subroutine dealloc_psf_field_data
