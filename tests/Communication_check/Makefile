@@ -67,6 +67,7 @@ clean:
 		( cd $${dir}; \
 		make clean )\
 	done; \
+	rm -f reference/in.*
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 
 distclean: clean

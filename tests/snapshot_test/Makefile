@@ -37,12 +37,7 @@ test:
 	gunzip -f isosurface/iso_T0.6.1.vtk.gz
 	
 	echo 'Compare section and isosurface data'
-	diff section/psf_cmb.1.vtk ../Dynamobench_case2/section/psf_cmb.1.vtk
-	diff section/psf_eq.1.vtk ../Dynamobench_case2/section/psf_eq.1.vtk
-	diff section/psf_z0.3.1.vtk ../Dynamobench_case2/section/psf_z0.3.1.vtk
-	diff isosurface/iso_T0.6.1.vtk ../Dynamobench_case2/isosurface/iso_T0.6.1.vtk
-	diff isosurface/iso_w10n.1.vtk ../Dynamobench_case2/isosurface/iso_w10n.1.vtk
-	diff isosurface/iso_w10p.1.vtk ../Dynamobench_case2/isosurface/iso_w10p.1.vtk
+	$(BUILDDIR)/tests/compare_psf
 
 clean:
 	rm -f *.dat

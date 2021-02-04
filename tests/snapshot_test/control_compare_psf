@@ -1,0 +1,73 @@
+array compare_surface_file
+  begin compare_surface_file
+    begin first_file_ctl
+      surface_file_prefix    'section/psf_cmb'
+      surface_file_format            VTK
+    end first_file_ctl
+    begin second_file_ctl
+      surface_file_prefix    '../Dynamobench_case2/section/psf_cmb'
+      surface_file_format            VTK
+    end second_file_ctl
+    i_step_surface_ctl      1
+  end compare_surface_file
+!
+  begin compare_surface_file
+    begin first_file_ctl
+      surface_file_prefix    'section/psf_eq'
+      surface_file_format            PSF
+    end first_file_ctl
+    begin second_file_ctl
+      surface_file_prefix    '../Dynamobench_case2/section/psf_eq'
+      surface_file_format            VTK
+    end second_file_ctl
+    i_step_surface_ctl      1
+  end compare_surface_file
+!
+  begin compare_surface_file
+    begin first_file_ctl
+      surface_file_prefix    'section/psf_z0.3'
+      surface_file_format            PSF_gz
+    end first_file_ctl
+    begin second_file_ctl
+      surface_file_prefix    '../Dynamobench_case2/section/psf_z0.3'
+      surface_file_format            VTK
+    end second_file_ctl
+    i_step_surface_ctl      1
+  end compare_surface_file
+!
+  begin compare_surface_file
+    begin first_file_ctl
+      surface_file_prefix    'isosurface/iso_T0.6'
+      surface_file_format            VTK
+    end first_file_ctl
+    begin second_file_ctl
+      surface_file_prefix    '../Dynamobench_case2/isosurface/iso_T0.6'
+      surface_file_format            VTK
+    end second_file_ctl
+    i_step_surface_ctl      1
+  end compare_surface_file
+!
+  begin compare_surface_file
+    begin first_file_ctl
+      surface_file_prefix    'isosurface/iso_w10n'
+      surface_file_format            ISO_gz
+    end first_file_ctl
+    begin second_file_ctl
+      surface_file_prefix    '../Dynamobench_case2/isosurface/iso_w10n'
+      surface_file_format            VTK
+    end second_file_ctl
+    i_step_surface_ctl      1
+  end compare_surface_file
+!
+  begin compare_surface_file
+    begin first_file_ctl
+      surface_file_prefix    'isosurface/iso_w10p'
+      surface_file_format            ISO
+    end first_file_ctl
+    begin second_file_ctl
+      surface_file_prefix    '../Dynamobench_case2/isosurface/iso_w10p'
+      surface_file_format            VTK
+    end second_file_ctl
+    i_step_surface_ctl      1
+  end compare_surface_file
+end array compare_surface_file
