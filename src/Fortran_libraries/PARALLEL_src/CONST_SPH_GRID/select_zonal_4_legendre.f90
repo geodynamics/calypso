@@ -66,11 +66,11 @@
         call set_local_sph_neib_order(ndomain_m, ltr, m_folding,        &
      &      nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
 !
-!      else if(iflag_rlm_distribute .eq. id_cyclic_eq_trans_neib) then
-!        call set_domain_by_eq_leg_trns                                 &
-!     &     (ndomain_m, ltr, m_folding, ip_tmp)
-!        call set_local_sph_neib_order(ndomain_m, ltr, m_folding,       &
-!     &      nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
+      else if(iflag_rlm_distribute .eq. id_cyclic_eq_trans_neib) then
+        call set_domain_by_eq_leg_trns                                  &
+     &     (ndomain_m, ltr, m_folding, ip_tmp)
+        call set_local_sph_neib_order(ndomain_m, ltr, m_folding,        &
+     &      nth, nph, ip_tmp, jdx_fsph, mdx_4_lgd)
 !
       else if(iflag_rlm_distribute .eq. id_simple_rlm_distribute) then
         call set_domain_by_eq_leg_trns                                  &

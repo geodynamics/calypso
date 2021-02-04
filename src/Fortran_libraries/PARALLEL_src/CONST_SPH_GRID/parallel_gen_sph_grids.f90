@@ -47,7 +47,7 @@
 !
       use m_elapsed_labels_gen_SPH
       use output_gen_sph_grid_modes
-!      use sph_file_IO_select
+!      use check_sph_file_access
 !      use calypso_mpi_logical
 !
       integer(kind = kint), intent(in) :: num_pe
@@ -135,6 +135,7 @@
       use copy_para_sph_global_params
       use output_gen_sph_grid_modes
       use sph_file_IO_select
+      use check_sph_file_access
       use calypso_mpi_logical
 !
       integer(kind = kint), intent(in) :: num_pe

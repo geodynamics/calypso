@@ -40,21 +40,21 @@
 #ifdef FFTW3
       integer(kind = kint), parameter :: num_test =   8
       integer(kind = kint), parameter :: list_test(num_test)            &
-     &        = (/iflag_FFTPACK,                                        &
+     &        = (/iflag_FFTPACK_SINGLE,                                 &
      &            iflag_FFTPACK_COMPONENT,                              &
      &            iflag_FFTPACK_DOMAIN,                                 &
      &            iflag_FFTPACK_SINGLE,                                 &
-     &            iflag_FFTW,                                           &
+     &            iflag_FFTW_COMPONENT,                                 &
      &            iflag_FFTW_SINGLE,                                    &
      &            iflag_FFTW_DOMAIN,                                    &
-     &            iflag_FFTW_COMPONENT/)
+     &            iflag_FFTW_SINGLE/)
 #else
       integer(kind = kint), parameter :: num_test =   4
       integer(kind = kint), parameter :: list_test(num_test)            &
-     &        = (/iflag_FFTPACK,                                        &
+     &        = (/iflag_FFTPACK_ONCE,                                   &
      &            iflag_FFTPACK_COMPONENT,                              &
-     &            iflag_FFTPACK_DOMAIN,                                 &
-     &            iflag_FFTPACK_SINGLE/)
+     &            iflag_FFTPACK_SINGLE,                                 &
+     &            iflag_FFTPACK_DOMAIN/)
 #endif
 !
       real(kind = kreal) :: etime_shortest = -1.0e10
@@ -109,7 +109,7 @@
 !
       if(iflag_FFT_MHD .eq. iflag_FFTW_COMPONENT) then
         set_FFT_mode_4_snapshot = iflag_FFTW_SINGLE
-      else if(iflag_FFT_MHD .eq. iflag_FFTW) then
+      else if(iflag_FFT_MHD .eq. iflag_FFTW_ONCE) then
         set_FFT_mode_4_snapshot = iflag_FFTW_DOMAIN
 !
       else

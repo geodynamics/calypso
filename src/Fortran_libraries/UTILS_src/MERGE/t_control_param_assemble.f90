@@ -88,7 +88,7 @@
      &         (source_plt, assemble_plt, asbl_param)
 !
       use t_ctl_data_4_platforms
-      use set_control_platform_data
+      use set_control_platform_item
 !
       type(platform_data_control), intent(in) :: source_plt
       type(platform_data_control), intent(in) :: assemble_plt

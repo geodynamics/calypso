@@ -106,6 +106,7 @@
       subroutine set_control_4_shell_files                              &
      &         (id_rank, plt, Fmesh_ctl, nprocs_check, sph_files)
 !
+      use set_control_platform_item
       use set_control_platform_data
       use gen_sph_grids_modes
 !

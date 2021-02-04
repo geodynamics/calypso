@@ -699,7 +699,7 @@ begin MHD_control
       end array pick_gauss_coef_order_ctl
     end   gauss_coefficient_ctl
 !
-    array volume_spectrum_ctl      2
+    array volume_spectrum_ctl
       begin volume_spectrum_ctl
         volume_pwr_spectr_prefix     'sph_pwr_convective'
         volume_average_prefix        'sph_ave_convective'

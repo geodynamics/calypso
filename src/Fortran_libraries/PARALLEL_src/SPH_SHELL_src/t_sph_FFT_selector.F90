@@ -165,7 +165,7 @@
         end if
 !
 #ifdef FFTW3
-      else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW) then
+      else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW_ONCE) then
         if(sph_rtp%istep_rtp(3) .eq. 1) then
           if(id_rank .eq. 0) write(*,*) 'Use prt FFTW'
           call init_prt_FFTW(sph_rtp, comm_rtp,                         &
@@ -229,7 +229,7 @@
 !
 !
 #ifdef FFTW3
-      else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW) then
+      else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW_ONCE) then
         if(iflag_debug .gt. 0) write(*,*) 'Finalize FFTW'
         call finalize_sph_field_FFTW(WK_FFTs%sph_fld_FFTW)
       else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW_DOMAIN) then
@@ -284,7 +284,7 @@
         end if
 !
 #ifdef FFTW3
-      else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW) then
+      else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW_ONCE) then
         if(sph_rtp%istep_rtp(3) .eq. 1) then
           if(iflag_debug .gt. 0) write(*,*) 'Use prt FFTW'
           call verify_prt_FFTW(sph_rtp, comm_rtp,                       &
@@ -360,7 +360,7 @@
         end if
 !
 #ifdef FFTW3
-      else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW) then
+      else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW_ONCE) then
         if(sph_rtp%istep_rtp(3) .eq. 1) then
           call prt_fwd_FFTW_to_send(sph_rtp, comm_rtp,                  &
      &        ncomp_fwd, n_WS, v_rtp(1,1), WS(1), WK_FFTs%sph_fld_FFTW)
@@ -431,7 +431,7 @@
         end if
 !
 #ifdef FFTW3
-      else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW) then
+      else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW_ONCE) then
         if(sph_rtp%istep_rtp(3) .eq. 1) then
           call prt_back_FFTW_from_recv(sph_rtp, comm_rtp,               &
      &        ncomp_bwd, n_WR, WR(1), v_rtp(1,1), WK_FFTs%sph_fld_FFTW)

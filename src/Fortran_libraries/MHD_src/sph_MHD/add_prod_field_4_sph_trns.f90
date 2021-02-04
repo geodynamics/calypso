@@ -59,6 +59,11 @@
      &    ipol_prd%i_truncated_B, iphys_prd%i_truncated_B,              &
      &    b_trns_prd%i_truncated_B, trns)
 !
+!
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_prd%i_stream_pol_u, iphys_prd%i_stream_pol_u,            &
+     &    b_trns_prd%i_stream_pol_u, trns)
+!
       end subroutine add_subtracted_sph_trns_snap
 !
 !-----------------------------------------------------------------------

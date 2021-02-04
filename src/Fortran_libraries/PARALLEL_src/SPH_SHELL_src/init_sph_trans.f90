@@ -61,7 +61,7 @@
       type(work_for_FFTs), intent(inout) :: WK_FFTs
 !
 !
-      trans_p%iflag_FFT = iflag_FFTPACK
+      trans_p%iflag_FFT = iflag_FFTPACK_ONCE
       if(WK_leg%id_legendre .eq. iflag_leg_undefined) then
         WK_leg%id_legendre = iflag_leg_sym_dgemm_big
       end if

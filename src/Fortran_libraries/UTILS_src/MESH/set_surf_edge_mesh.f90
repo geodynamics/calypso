@@ -1,23 +1,18 @@
-!set_surf_edge_mesh.f90
-!      module set_surf_edge_mesh
-!
-!     Written by H. Matsui on Dec., 2008
-!
-!!      subroutine set_surface_and_edge(node, ele, surf, edge)
+!>@file   set_surf_edge_mesh.f90
+!!@brief  module set_surf_edge_mesh
+!!
+!!@author H. Matsui
+!!@date Programmed in Dec., 2008
+!!
+!> @brief set surface and edge connectivity
+!!
+!!@verbatim
+!!      subroutine const_surface_and_edge(node, ele, surf, edge)
+!!      subroutine dealloc_surface_and_edge(node, ele, surf, edge)
 !!      subroutine empty_surface_and_edge(ele, surf, edge)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(inout) :: surf
-!!        type(edge_data), intent(inout) :: edge
-!!
-!!      subroutine set_surf_connectivity(node, ele, surf)
-!!        type(node_data), intent(in) :: node
-!!        type(element_data), intent(in) :: ele
-!!        type(surface_data), intent(inout) :: surf
-!!      subroutine set_edge_connectivity(node, ele, surf, edge)
-!!        type(node_data), intent(in) :: node
-!!        type(element_data), intent(in) :: ele
-!!        type(surface_data), intent(in) :: surf
 !!        type(edge_data), intent(inout) :: edge
 !!
 !!      subroutine set_surf_geometry(node, surf)
@@ -25,6 +20,7 @@
 !!        type(node_data), intent(in) :: node
 !!        type(surface_data), intent(inout) :: surf
 !!        type(edge_data), intent(inout) :: edge
+!!@endverbatim
 !
       module set_surf_edge_mesh
 !
@@ -38,7 +34,7 @@
 !
       implicit  none
 !
-      private :: set_surf_connectivity, set_edge_connectivity
+      private :: const_surf_connectivity, const_edge_connectivity
       private :: set_surf_geometry, set_edge_geometry
 !
 ! ----------------------------------------------------------------------
@@ -47,7 +43,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_surface_and_edge(node, ele, surf, edge)
+      subroutine const_surface_and_edge(node, ele, surf, edge)
 !
       type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
@@ -56,18 +52,38 @@
       type(edge_data), intent(inout) :: edge
 !
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_surf_connectivity'
-      call set_surf_connectivity(node, ele, surf)
-      if (iflag_debug.gt.0) write(*,*) 'set_edge_connectivity'
-      call set_edge_connectivity(node, ele, surf, edge)
+      if (iflag_debug.gt.0) write(*,*) 'const_surf_connectivity'
+      call const_surf_connectivity(node, ele, surf)
+      if (iflag_debug.gt.0) write(*,*) 'const_edge_connectivity'
+      call const_edge_connectivity(node, ele, surf, edge)
 !
       if (iflag_debug.gt.0) write(*,*) 'set_surf_geometry'
       call set_surf_geometry(node, surf)
       if (iflag_debug.gt.0) write(*,*) 'set_edge_geometry'
       call set_edge_geometry(node, edge)
 !
-      end subroutine set_surface_and_edge
+      end subroutine const_surface_and_edge
 !
+! ----------------------------------------------------------------------
+!
+      subroutine dealloc_surface_and_edge(node, ele, surf, edge)
+!
+      type(node_data), intent(in) :: node
+      type(element_data), intent(in) :: ele
+!
+      type(surface_data), intent(inout) :: surf
+      type(edge_data), intent(inout) :: edge
+!
+!
+      call dealloc_surf_connectivity(surf)
+      call dealloc_edge_connectivity(edge)
+!
+!      call set_surf_geometry(node, surf)
+!      call set_edge_geometry(node, edge)
+!
+      end subroutine dealloc_surface_and_edge
+!
+! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
       subroutine empty_surface_and_edge(ele, surf, edge)
@@ -92,7 +108,7 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_surf_connectivity(node, ele, surf)
+      subroutine const_surf_connectivity(node, ele, surf)
 !
       use const_surface_data
       use set_size_4_smp_types
@@ -119,14 +135,15 @@
       end if
 !
       if (iflag_debug.eq.1) write(*,*) 'count_overlap_surf_type'
-      call count_surf_size_smp_type(surf)
+      call alloc_surf_param_smp(surf)
+      call count_surf_size_smp(surf)
       call count_overlap_surf(node, surf)
 !
-      end subroutine set_surf_connectivity
+      end subroutine const_surf_connectivity
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_edge_connectivity(node, ele, surf, edge)
+      subroutine const_edge_connectivity(node, ele, surf, edge)
 !
       use const_edge_data
       use set_size_4_smp_types
@@ -152,10 +169,11 @@
       end if
 !
       if (iflag_debug.eq.1) write(*,*) 'count_overlap_edge'
-      call count_edge_size_smp_type(edge)
+      call alloc_edge_param_smp(edge)
+      call count_edge_size_smp(edge)
       call count_overlap_edge(node, edge)
 !
-      end subroutine set_edge_connectivity
+      end subroutine const_edge_connectivity
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -187,6 +205,31 @@
       call set_center_of_edge(node, edge)
 !
       end subroutine set_edge_geometry
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine dealloc_surf_connectivity(surf)
+!
+      use set_size_4_smp_types
+!
+      type(surface_data), intent(inout) :: surf
+!
+      call dealloc_surf_param_smp(surf)
+!
+      end subroutine dealloc_surf_connectivity
+!
+! ----------------------------------------------------------------------
+!
+      subroutine dealloc_edge_connectivity(edge)
+!
+      use set_size_4_smp_types
+!
+      type(edge_data), intent(inout) :: edge
+!
+      call dealloc_edge_param_smp(edge)
+!
+      end subroutine dealloc_edge_connectivity
 !
 ! ----------------------------------------------------------------------
 !

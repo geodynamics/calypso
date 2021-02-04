@@ -78,9 +78,9 @@
       call deallocate_iso_surface_type(par_v%fem%mesh%surf)
       call deallocate_ext_surface_type(par_v%fem%mesh%surf)
       call deallocate_surface_connect_type(par_v%fem%mesh%surf)
-      call deallocate_inod_in_surf_type(par_v%fem%mesh%surf)
+      call dealloc_inod_in_surf(par_v%fem%mesh%surf)
 !
-      call dealloc_mesh_infos(par_v%fem%mesh, par_v%fem%group)
+      call dealloc_mesh_data(par_v%fem%mesh, par_v%fem%group)
       call dealloc_inod_in_edge(par_v%fem%mesh%edge)
 !
       if(iflag_write_subdomain .gt. 0) then

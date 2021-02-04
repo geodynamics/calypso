@@ -18,6 +18,9 @@
 !!     &         (id_control, hd_block, psf_c, c_buf)
 !!      subroutine bcast_psf_control_data(psf_c)
 !!        type(psf_ctl), intent(inout) :: psf_c
+!!      subroutine add_fields_4_psf_to_fld_ctl(psf_c, field_ctl)
+!!        type(psf_ctl), intent(in) :: psf_c
+!!        type(ctl_array_c3), intent(inout) :: field_ctl
 !!
 !!      integer(kind = kint) function num_label_psf_ctl()
 !!      integer(kind = kint) function num_label_psf_ctl_w_dpl()
@@ -134,6 +137,7 @@
       use t_control_array_character2
       use t_control_data_4_psf_def
       use t_control_data_4_fld_on_psf
+      use calypso_mpi
 !
       implicit  none
 !
@@ -279,7 +283,6 @@
 !
       subroutine bcast_psf_control_data(psf_c)
 !
-      use calypso_mpi
       use calypso_mpi_int
       use bcast_control_arrays
 !
@@ -298,6 +301,22 @@
       end subroutine bcast_psf_control_data
 !
 !   --------------------------------------------------------------------
+!
+      subroutine add_fields_4_psf_to_fld_ctl(psf_c, field_ctl)
+!
+      use t_control_array_character3
+      use add_nodal_fields_ctl
+!
+      type(psf_ctl), intent(in) :: psf_c
+      type(ctl_array_c3), intent(inout) :: field_ctl
+!
+!
+      call add_fields_on_psf_to_fld_ctl(my_rank, psf_c%fld_on_psf_c,    &
+     &                                  field_ctl)
+!
+      end subroutine add_fields_4_psf_to_fld_ctl
+!
+!  ---------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       integer(kind = kint) function num_label_psf_ctl()

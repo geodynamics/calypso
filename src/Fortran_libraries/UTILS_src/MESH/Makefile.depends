@@ -104,7 +104,7 @@ set_nodes_4_viewer.o: $(MESHDIR)/set_nodes_4_viewer.f90 m_precision.o m_constant
 	$(F90) -c $(F90OPTFLAGS) $<
 set_norm_nod_4_surf_grp.o: $(MESHDIR)/set_norm_nod_4_surf_grp.f90 m_precision.o m_geometry_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_size_4_smp_types.o: $(MESHDIR)/set_size_4_smp_types.f90 m_precision.o m_constants.o m_machine_parameter.o t_geometry_data.o cal_minmax_and_stacks.o t_surface_data.o t_edge_data.o count_overlap.o
+set_size_4_smp_types.o: $(MESHDIR)/set_size_4_smp_types.f90 m_precision.o m_constants.o m_machine_parameter.o t_mesh_data.o t_geometry_data.o t_surface_data.o t_edge_data.o cal_minmax_and_stacks.o count_overlap.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_smp_4_group_types.o: $(MESHDIR)/set_smp_4_group_types.f90 m_precision.o m_machine_parameter.o t_group_data.o cal_minmax_and_stacks.o
 	$(F90) -c $(F90OPTFLAGS) $<

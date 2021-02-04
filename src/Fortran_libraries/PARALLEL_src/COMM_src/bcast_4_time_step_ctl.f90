@@ -8,6 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine bcast_ctl_data_4_time_step(tctl)
+!!      subroutine reset_ctl_data_4_time_step(tctl)
 !!        type(time_data_control), intent(inout) :: tctl
 !!@endverbatim
 !
@@ -86,6 +87,67 @@
       call calypso_mpi_bcast_one_int(tctl%i_tstep, 0)
 !
       end subroutine bcast_ctl_data_4_time_step
+!
+!   --------------------------------------------------------------------
+!
+      subroutine reset_ctl_data_4_time_step(tctl)
+!
+      type(time_data_control), intent(inout) :: tctl
+!
+!
+      tctl%elapsed_time_ctl%iflag = 0
+!
+      tctl%dt_ctl%iflag = 0
+      tctl%time_init_ctl%iflag = 0
+!
+      tctl%min_delta_t_ctl%iflag = 0
+      tctl%max_delta_t_ctl%iflag = 0
+      tctl%max_eps_to_shrink_ctl%iflag = 0
+      tctl%min_eps_to_expand_ctl%iflag = 0
+!
+      tctl%delta_t_check_ctl%iflag = 0
+      tctl%delta_t_rst_ctl%iflag = 0
+      tctl%delta_t_psf_ctl%iflag = 0
+      tctl%delta_t_iso_ctl%iflag = 0
+      tctl%delta_t_pvr_ctl%iflag = 0
+      tctl%delta_t_fline_ctl%iflag = 0
+      tctl%delta_t_lic_ctl%iflag = 0
+      tctl%delta_t_field_ctl%iflag = 0
+      tctl%delta_t_monitor_ctl%iflag = 0
+      tctl%delta_t_sgs_coefs_ctl%iflag = 0
+      tctl%delta_t_boundary_ctl%iflag = 0
+!
+!
+      tctl%i_step_init_ctl%iflag = 0
+      tctl%i_step_number_ctl%iflag = 0
+      tctl%i_step_number_ctl%iflag = 0
+!
+      tctl%i_step_check_ctl%iflag = 0
+      tctl%i_step_rst_ctl%iflag = 0
+!
+      tctl%i_step_psf_ctl%iflag = 0
+      tctl%i_step_iso_ctl%iflag = 0
+      tctl%i_step_pvr_ctl%iflag = 0
+      tctl%i_step_lic_ctl%iflag = 0
+      tctl%i_step_fline_ctl%iflag = 0
+!
+      tctl%i_step_ucd_ctl%iflag = 0
+      tctl%i_step_monitor_ctl%iflag = 0
+!
+      tctl%i_step_sgs_coefs_ctl%iflag = 0
+      tctl%i_step_boundary_ctl%iflag = 0
+!
+      tctl%i_diff_steps_ctl%iflag = 0
+!
+      tctl%start_rst_step_ctl%iflag = 0
+      tctl%end_rst_step_ctl%iflag = 0
+!
+!
+      tctl%flexible_step_ctl%iflag = 0
+!
+      tctl%i_tstep = 0
+!
+      end subroutine reset_ctl_data_4_time_step
 !
 !   --------------------------------------------------------------------
 !

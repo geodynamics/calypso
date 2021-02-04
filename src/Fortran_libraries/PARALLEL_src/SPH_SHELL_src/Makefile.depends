@@ -110,7 +110,7 @@ pole_sph_transform.o: $(SPH_COMMDIR)/pole_sph_transform.f90 m_precision.o m_mach
 	$(F90) -c $(F90OPTFLAGS) $<
 products_at_poles.o: $(SPH_COMMDIR)/products_at_poles.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-r_interpolate_sph_data.o: $(SPH_COMMDIR)/r_interpolate_sph_data.f90 m_precision.o calypso_mpi.o m_constants.o m_machine_parameter.o t_spheric_rj_data.o t_phys_address.o t_phys_data.o t_group_data.o m_base_field_labels.o t_file_IO_parameter.o t_spheric_data_IO.o sph_file_MPI_IO_select.o radial_interpolation.o m_explicit_term_labels.o t_field_data_IO.o extend_potential_field.o t_global_gauss_coefs.o m_error_IDs.o t_node_id_spherical_IO.o
+r_interpolate_sph_data.o: $(SPH_COMMDIR)/r_interpolate_sph_data.f90 m_precision.o calypso_mpi.o m_constants.o m_machine_parameter.o t_spheric_rj_data.o t_phys_address.o t_phys_data.o t_group_data.o m_base_field_labels.o t_file_IO_parameter.o t_spheric_data_IO.o sph_file_MPI_IO_select.o check_sph_file_access.o radial_interpolation.o m_explicit_term_labels.o t_field_data_IO.o extend_potential_field.o t_global_gauss_coefs.o m_error_IDs.o t_node_id_spherical_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 radial_interpolation.o: $(SPH_COMMDIR)/radial_interpolation.f90 m_precision.o m_constants.o m_machine_parameter.o t_field_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<

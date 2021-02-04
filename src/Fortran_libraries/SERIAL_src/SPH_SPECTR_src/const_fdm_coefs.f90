@@ -15,17 +15,18 @@
 !!      Coeeficients for derivatives by 1d finite difference method
 !!
 !!    2nd order derivatives on node by nodal field
-!!      dfdr =    r_2nd%fdm(1)%dmat(-1) * d_nod(k-1)
-!!              + r_2nd%fdm(1)%dmat( 0) * d_nod(k  )
-!!              + r_2nd%fdm(1)%dmat( 1) * d_nod(k+1)
-!!      d2fdr2 =  r_2nd%fdm(2)%dmat(-1) * d_nod(k-1)
-!!              + r_2nd%fdm(2)%dmat( 0) * d_nod(k  )
-!!              + r_2nd%fdm(2)%dmat( 1) * d_nod(k+1)
+!!      dfdr =    r_2nd%fdm(1)%dmat(k,-1) * d_nod(k-1)
+!!              + r_2nd%fdm(1)%dmat(k, 0) * d_nod(k  )
+!!              + r_2nd%fdm(1)%dmat(k, 1) * d_nod(k+1)
+!!      d2fdr2 =  r_2nd%fdm(2)%dmat(k,-1) * d_nod(k-1)
+!!              + r_2nd%fdm(2)%dmat(k, 0) * d_nod(k  )
+!!              + r_2nd%fdm(2)%dmat(k, 1) * d_nod(k+1)
 !!
 !!       r_2nd%fdm(1)%dmat = d1nod_mat_fdm_2
 !!       r_2nd%fdm(2)%dmat = d2nod_mat_fdm_2
-!
-!! ----------------------------------------------------------------------!!      Work array to obtain 1d FDM
+!!
+!! ----------------------------------------------------------------------
+!!      Work array to obtain 1d FDM
 !!
 !!    derivatives on node by nodal field
 !!      dfdr =    r_2nd%wk_mat(2,1,k) * d_nod(k  )
@@ -49,26 +50,26 @@
 !!       d_ele(k) = half *(d_nod(k-1) + d_nod(k))
 !!
 !!    4th order derivatives on node by nodal field
-!!      dfdr =    r_4th%fdm(1)%dmat(-2,1) *  d_nod(k-2)
-!!              + r_4th%fdm(1)%dmat(-1,2) *  d_nod(k-1)
-!!              + r_4th%fdm(1)%dmat( 0,3) *  d_nod(k  )
-!!              + r_4th%fdm(1)%dmat( 1,3) *  d_nod(k+1)
-!!              + r_4th%fdm(1)%dmat( 2,4) *  d_nod(k+2)
-!!      d2fdr2 =  r_4th%fdm(2)%dmat(-2,1) *  d_nod(k-2)
-!!              + r_4th%fdm(2)%dmat(-1,2) *  d_nod(k-1)
-!!              + r_4th%fdm(2)%dmat( 1,3) *  d_nod(k  )
-!!              + r_4th%fdm(2)%dmat( 0,3) *  d_nod(k+1)
-!!              + r_4th%fdm(2)%dmat( 2,4) *  d_nod(k+2)
-!!      d3fdr3 =  r_4th%fdm(3)%dmat(-2,1) *  d_nod(k-2)
-!!              + r_4th%fdm(3)%dmat(-1,2) *  d_nod(k-1)
-!!              + r_4th%fdm(3)%dmat( 0,3) *  d_nod(k  )
-!!              + r_4th%fdm(3)%dmat( 1,3) *  d_nod(k+1)
-!!              + r_4th%fdm(3)%dmat( 2,4) *  d_nod(k+2)
-!!      d4fdr4 =  r_4th%fdm(4)%dmat(-2,1) *  d_nod(k-2)
-!!              + r_4th%fdm(4)%dmat(-1,2) *  d_nod(k-1)
-!!              + r_4th%fdm(4)%dmat( 0,3) *  d_nod(k  )
-!!              + r_4th%fdm(4)%dmat( 1,3) *  d_nod(k+1)
-!!              + r_4th%fdm(4)%dmat( 2,4) *  d_nod(k+2)
+!!      dfdr =    r_4th%fdm(1)%dmat(k,-2) *  d_nod(k-2)
+!!              + r_4th%fdm(1)%dmat(k,-1) *  d_nod(k-1)
+!!              + r_4th%fdm(1)%dmat(k, 0) *  d_nod(k  )
+!!              + r_4th%fdm(1)%dmat(k, 1) *  d_nod(k+1)
+!!              + r_4th%fdm(1)%dmat(k, 2) *  d_nod(k+2)
+!!      d2fdr2 =  r_4th%fdm(2)%dmat(k,-2) *  d_nod(k-2)
+!!              + r_4th%fdm(2)%dmat(k,-1) *  d_nod(k-1)
+!!              + r_4th%fdm(2)%dmat(k, 1) *  d_nod(k  )
+!!              + r_4th%fdm(2)%dmat(k, 0) *  d_nod(k+1)
+!!              + r_4th%fdm(2)%dmat(k, 2) *  d_nod(k+2)
+!!      d3fdr3 =  r_4th%fdm(3)%dmat(k,-2) *  d_nod(k-2)
+!!              + r_4th%fdm(3)%dmat(k,-1) *  d_nod(k-1)
+!!              + r_4th%fdm(3)%dmat(k, 0) *  d_nod(k  )
+!!              + r_4th%fdm(3)%dmat(k, 1) *  d_nod(k+1)
+!!              + r_4th%fdm(3)%dmat(k, 2) *  d_nod(k+2)
+!!      d4fdr4 =  r_4th%fdm(4)%dmat(k,-2) *  d_nod(k-2)
+!!              + r_4th%fdm(4)%dmat(k,-1) *  d_nod(k-1)
+!!              + r_4th%fdm(4)%dmat(k, 0) *  d_nod(k  )
+!!              + r_4th%fdm(4)%dmat(k, 1) *  d_nod(k+1)
+!!              + r_4th%fdm(4)%dmat(k, 2) *  d_nod(k+2)
 !!
 !!       r_4th%fdm(1)%dmat = d1nod_mat_fdm_4
 !!       r_4th%fdm(2)%dmat = d2nod_mat_fdm_4
@@ -114,8 +115,8 @@
 !!       d_ele(k) = half *(d_nod(k+1) + d_nod(k))
 !!
 !!    derivatives on node by element field
-!!      dfdr =    r_2nd_ele%fdm(1)%dmat(0) * d_ele(k  )
-!!              + r_2nd_ele%fdm(1)%dmat(1) * d_ele(k+1)
+!!      dfdr =    r_2nd_ele%fdm(1)%dmat(k,0) * d_ele(k  )
+!!              + r_2nd_ele%fdm(1)%dmat(k,1) * d_ele(k+1)
 !!
 !!    r_2nd_ele%fdm(1)%dmat = d1nod_mat_fdm_2e
 !!

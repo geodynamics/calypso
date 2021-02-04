@@ -55,7 +55,7 @@
       ele_IO%numele =        surf%numsurf
       ele_IO%nnod_4_ele =    surf%nnod_4_surf
 !
-      call allocate_ele_connect_type(ele_IO)
+      call alloc_ele_connect(ele_IO)
       call alloc_surface_connect_IO(nele, nsurf_4_ele, sfed_IO)
 !
       if      (surf%nnod_4_surf .eq. num_linear_sf) then

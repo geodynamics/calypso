@@ -14,19 +14,18 @@ MOD_PSF_PLUG = \
 main_surface_rendering.o \
 analyzer_psf.o \
 FEM_analyzer_viz_surf.o \
-t_surfacing.o \
 \
 t_control_data_section_only.o \
-load_mesh_and_field_4_viz.o
+t_field_list_for_vizs.o
 
 MOD_VTK_CONVERT_PLUG = \
 main_VTK_convert.o \
 analyzer_VTK_convert.o \
-FEM_analyzer_VTK_convert.o \
+FEM_analyzer_viz_surf.o \
 t_viz_VTK_convert.o \
 \
 t_control_data_section_only.o \
-load_mesh_and_field_4_viz.o
+t_field_list_for_vizs.o
 
 MOD_PSF_2_VTK = \
 psf_file_to_VTK.o

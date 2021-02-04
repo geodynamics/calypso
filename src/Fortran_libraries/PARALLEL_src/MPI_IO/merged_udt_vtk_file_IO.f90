@@ -49,8 +49,6 @@
 !>      Structure of double numbering
       type(parallel_double_numbering), private, save :: dbl_id1
 !
-      type(calypso_MPI_IO_params), private, save :: IO_param
-!
 !-----------------------------------------------------------------------
 !
       contains

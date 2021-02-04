@@ -10,7 +10,6 @@
 !!      subroutine link_local_mesh_2_ucd(node, ele, ucd)
 !!      subroutine link_global_mesh_2_ucd(node, ele, ucd)
 !!
-!!      subroutine link_num_field_2_ucd(ele, ucd)
 !!      subroutine link_node_data_2_ucd(node, ucd)
 !!      subroutine link_ele_data_2_ucd(ele, ucd)
 !!      subroutine link_field_data_to_ucd(node, phys_nod, ucd)
@@ -55,6 +54,7 @@
       type(ucd_data), intent(inout) :: ucd
 !
 !
+      ucd%nnod = node%numnod
       call const_udt_local_nodes(node%numnod, node%xx, ucd)
       call const_udt_local_connect(node%internal_node,                  &
      &    ele%numele, ele%nnod_4_ele, ele%ie, ucd)
@@ -109,21 +109,6 @@
      &   ele%iele_global, ele%ie, ucd)
 !
       end subroutine link_ele_data_2_ucd
-!
-!-----------------------------------------------------------------------
-!
-      subroutine link_num_field_2_ucd(phys_nod, ucd)
-!
-      use set_ucd_data
-!
-      type(phys_data), intent(in) :: phys_nod
-      type(ucd_data), intent(inout) :: ucd
-!
-!
-      call link_num_field_2_output                                      &
-     &   (phys_nod%n_point, phys_nod%num_phys_viz, ucd)
-!
-      end subroutine link_num_field_2_ucd
 !
 !-----------------------------------------------------------------------
 !

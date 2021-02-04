@@ -161,6 +161,7 @@
       use t_file_IO_parameter
       use t_spheric_data_IO
       use sph_file_MPI_IO_select
+      use check_sph_file_access
       use radial_interpolation
 !
       type(field_IO_params), intent(in) :: rj_file_param

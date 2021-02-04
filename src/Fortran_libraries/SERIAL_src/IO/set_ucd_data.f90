@@ -10,7 +10,10 @@
 !!      subroutine link_node_data_2_output(numnod, inod_gl, xx, ucd)
 !!      subroutine link_ele_data_2_output(numele, nnod_4_ele,           &
 !!     &          iele_gl, ie, ucd)
-!!      subroutine link_num_field_2_output(numnod, ntot_comp_vis, ucd)
+!!      subroutine link_field_data_2_output(numnod, num_phys, ntot_comp,&
+!!     &          num_phys_vis, ntot_comp_vis, num_component,           &
+!!     &          phy_name, d_nod, ucd)
+!!        type(ucd_data), intent(inout) :: ucd
 !!
 !!      subroutine link_numnod_stacks_2_output                          &
 !!     &         (nprocs, istack_numnod, istack_internod, ucd)
@@ -73,20 +76,6 @@
 !$omp end parallel workshare
 !
       end subroutine link_ele_data_2_output
-!
-!-----------------------------------------------------------------------
-!
-      subroutine link_num_field_2_output(numnod, ntot_comp_vis, ucd)
-!
-      integer(kind = kint), intent(in) :: numnod, ntot_comp_vis
-!
-      type(ucd_data), intent(inout) :: ucd
-!
-!
-      ucd%nnod =      numnod
-      ucd%ntot_comp = ntot_comp_vis
-!
-      end subroutine link_num_field_2_output
 !
 !-----------------------------------------------------------------------
 !

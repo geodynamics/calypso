@@ -11,12 +11,15 @@
 !!      subroutine SECTIONING_initialize(fem, nod_fld, psf_ctls, psf)
 !!        type(mesh_data), intent(in) :: fem
 !!        type(phys_data), intent(in) :: nod_fld
+!!        type(section_controls), intent(inout) :: psf_ctls
+!!        type(sectioning_module), intent(inout) :: psf
 !!      subroutine SECTIONING_visualize                                 &
 !!     &         (istep_psf, time_d, fem, nod_fld, psf)
 !!        type(time_data), intent(in) :: time_d
 !!        type(mesh_data), intent(in) :: fem
 !!        type(phys_data), intent(in) :: nod_fld
-!!      subroutine dealloc_psf_field_type(psf)
+!!      subroutine SECTIONING_finalize(psf)
+!!        type(sectioning_module), intent(inout) :: psf
 !!@endverbatim
 !
 !
@@ -126,8 +129,8 @@
 !
 !
       do i_psf = 1, psf%num_psf
-        call allocate_node_param_smp_type(psf%psf_mesh(i_psf)%node)
-        call allocate_ele_param_smp_type(psf%psf_mesh(i_psf)%patch)
+        call alloc_node_param_smp(psf%psf_mesh(i_psf)%node)
+        call alloc_ele_param_smp(psf%psf_mesh(i_psf)%patch)
 !
         call alloc_ref_field_4_psf(fem%mesh%node, psf%psf_list(i_psf))
       end do
@@ -189,6 +192,39 @@
       end subroutine SECTIONING_visualize
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine SECTIONING_finalize(psf)
+!
+      use set_psf_iso_control
+      use set_fields_for_psf
+      use find_node_and_patch_psf
+!
+      type(sectioning_module), intent(inout) :: psf
+      integer(kind = kint) :: i_psf
+!
+      do i_psf = 1, psf%num_psf
+        call dealloc_node_param_smp(psf%psf_mesh(i_psf)%node)
+        call dealloc_ele_param_smp(psf%psf_mesh(i_psf)%patch)
+!
+        call disconnect_merged_ucd_mesh(psf%psf_out(i_psf))
+!
+        call dealloc_inod_grp_psf(psf%psf_grp_list(i_psf))
+        call dealloc_coefficients_4_psf(psf%psf_def(i_psf))
+      end do
+!
+      call dealloc_psf_node_and_patch                                   &
+    &    (psf%num_psf, psf%psf_list, psf%psf_mesh)
+      call dealloc_psf_field_name(psf%num_psf, psf%psf_mesh)
+      call dealloc_psf_field_data(psf%num_psf, psf%psf_mesh)
+      call dealloc_psf_case_table(psf%psf_case_tbls)
+!
+      deallocate(psf%psf_mesh, psf%psf_list, psf%psf_grp_list)
+      deallocate(psf%psf_search, psf%psf_file_IO)
+      deallocate(psf%psf_out, psf%psf_param)
+!
+      end subroutine SECTIONING_finalize
+!
+!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine alloc_psf_field_type(psf)
@@ -216,36 +252,6 @@
       psf%psf_file_IO(1:psf%num_psf)%iflag_format = iflag_sgl_udt
 !
       end subroutine alloc_psf_field_type
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine dealloc_psf_field_type(psf)
-!
-      use set_psf_iso_control
-      use set_fields_for_psf
-      use find_node_and_patch_psf
-!
-      type(sectioning_module), intent(inout) :: psf
-      integer(kind = kint) :: i_psf
-!
-      do i_psf = 1, psf%num_psf
-        call disconnect_merged_ucd_mesh(psf%psf_out(i_psf))
-!
-        call dealloc_inod_grp_psf(psf%psf_grp_list(i_psf))
-        call dealloc_coefficients_4_psf(psf%psf_def(i_psf))
-      end do
-!
-      call dealloc_psf_node_and_patch                                   &
-    &    (psf%num_psf, psf%psf_list, psf%psf_mesh)
-      call dealloc_psf_field_name(psf%num_psf, psf%psf_mesh)
-      call dealloc_psf_field_data(psf%num_psf, psf%psf_mesh)
-      call dealloc_psf_case_table(psf%psf_case_tbls)
-!
-      deallocate(psf%psf_mesh, psf%psf_list, psf%psf_grp_list)
-      deallocate(psf%psf_search, psf%psf_file_IO)
-      deallocate(psf%psf_out, psf%psf_param)
-!
-      end subroutine dealloc_psf_field_type
 !
 !  ---------------------------------------------------------------------
 !

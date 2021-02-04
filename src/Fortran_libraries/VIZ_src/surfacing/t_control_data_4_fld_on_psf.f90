@@ -19,6 +19,11 @@
 !!      subroutine bcast_fld_on_psf_control(fld_on_psf_c)
 !!        type(field_on_psf_ctl), intent(inout) :: fld_on_psf_c
 !!
+!!      subroutine add_fields_on_psf_to_fld_ctl                         &
+!!     &         (my_rank, fld_on_psf_c, field_ctl)
+!!        type(field_on_psf_ctl), intent(in) :: fld_on_psf_c
+!!        type(ctl_array_c3), intent(inout) :: field_ctl
+!!
 !!      integer(kind = kint) function num_label_fld_on_psf_control()
 !!      subroutine set_label_fld_on_psf_control(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -190,6 +195,29 @@
       end subroutine bcast_fld_on_psf_control
 !
 !   --------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine add_fields_on_psf_to_fld_ctl                           &
+     &         (my_rank, fld_on_psf_c, field_ctl)
+!
+      use t_control_array_character3
+      use add_nodal_fields_ctl
+!
+      integer, intent(in) :: my_rank
+      type(field_on_psf_ctl), intent(in) :: fld_on_psf_c
+      type(ctl_array_c3), intent(inout) :: field_ctl
+!
+      integer(kind = kint) :: i_fld
+!
+!
+      do i_fld = 1, fld_on_psf_c%field_output_ctl%num
+        call add_viz_name_ctl(my_rank,                                  &
+     &      fld_on_psf_c%field_output_ctl%c1_tbl(i_fld), field_ctl)
+      end do
+!
+      end subroutine add_fields_on_psf_to_fld_ctl
+!
+!  ---------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       integer(kind = kint) function num_label_fld_on_psf_control()

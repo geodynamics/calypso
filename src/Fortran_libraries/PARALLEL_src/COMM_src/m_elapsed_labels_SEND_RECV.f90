@@ -1,5 +1,5 @@
 !>@file   m_elapsed_labels_SEND_RECV.f90
-!!@brief  module m_elapsed_labels_SEND_RECV
+!!@brief  module d
 !!
 !!@author H. Matsui
 !!@date Programmed in Nov., 2018

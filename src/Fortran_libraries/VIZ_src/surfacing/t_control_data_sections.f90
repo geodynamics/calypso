@@ -14,6 +14,10 @@
 !!      subroutine bcast_files_4_psf_ctl(psf_ctls)
 !!        type(section_controls), intent(inout) :: psf_ctls
 !!
+!!      subroutine add_fields_4_psfs_to_fld_ctl(psf_ctls, field_ctl)
+!!        type(section_controls), intent(in) :: psf_ctls
+!!        type(ctl_array_c3), intent(inout) :: field_ctl
+!!
 !!      subroutine read_control_4_psf_file                              &
 !!     &         (id_control, fname_psf_ctl, psf_ctl_struct)
 !!
@@ -161,6 +165,25 @@
       end subroutine bcast_files_4_psf_ctl
 !
 !   --------------------------------------------------------------------
+!
+      subroutine add_fields_4_psfs_to_fld_ctl(psf_ctls, field_ctl)
+!
+      use t_control_array_character3
+!
+      type(section_controls), intent(in) :: psf_ctls
+      type(ctl_array_c3), intent(inout) :: field_ctl
+!
+      integer(kind = kint) :: i_psf
+!
+!
+      do i_psf = 1, psf_ctls%num_psf_ctl
+        call add_fields_4_psf_to_fld_ctl                                &
+     &     (psf_ctls%psf_ctl_struct(i_psf), field_ctl)
+      end do
+!
+      end subroutine add_fields_4_psfs_to_fld_ctl
+!
+!  ---------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
       subroutine append_new_section_control(psf_ctls)
@@ -210,6 +233,7 @@
 !
       end subroutine dup_control_4_psfs
 !
+!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine dealloc_cont_dat_4_psfs(num_psf, psf_c)

@@ -36,10 +36,12 @@
 !!   square_temperature       [i_square_t]:
 !!   square_composition       [i_square_c]:
 !!
-!!   velocity_scale    [i_velo_scale]:
-!!   magnetic_scale    [i_magne_scale]:
-!!   temperature_scale [i_temp_scale]:
-!!   composition_scale [i_comp_scale]:
+!!   velocity_scale           [i_velo_scale]:
+!!   magnetic_scale           [i_magne_scale]:
+!!   temperature_scale        [i_temp_scale]:
+!!   composition_scale        [i_comp_scale]:
+!!
+!!   stream_pol_velocity      [i_stream_pol_u]:
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -52,7 +54,7 @@
 !
       implicit  none
 ! 
-      integer(kind = kint), parameter, private :: nfid_product = 19
+      integer(kind = kint), parameter, private :: nfid_product = 20
 !
 !
 !>        Field label for ageostrophic balance
@@ -169,6 +171,13 @@
      &                name = 'composition_scale',                       &
      &                math = '$ L_{C} $')
 !
+!
+!>        Stream functin for the poloidal velocity @f$ \Psi_{Us} @f$
+      type(field_def), parameter :: stream_pol_velocity                 &
+     &    = field_def(n_comp = n_vector,                                &
+     &                name = 'stream_pol_velocity',                     &
+     &                math = '$ \Psi_{Us} $')
+!
 !    ----------   Ole definision  ------------------
 !>        Field label for ageostrophic balance
 !!         @f$ -2 e_{ijk} \Omega_{j} u_{k} - \partial_{i} p @f$
@@ -200,6 +209,8 @@
      &   .or. (field_name .eq. square_magne%name)                       &
      &   .or. (field_name .eq. square_vector_potential%name)            &
      &   .or. (field_name .eq. square_current%name)                     &
+!
+     &   .or. (field_name .eq. stream_pol_velocity%name)                &
      &      )   check_field_product_vectors = .TRUE.
 !
       end function check_field_product_vectors
@@ -286,6 +297,9 @@
      &    n_comps(18), names(18), maths(18))
       call set_field_labels(composition_scale,                          &
      &    n_comps(19), names(19), maths(19))
+!
+      call set_field_labels(stream_pol_velocity,                        &
+     &    n_comps(20), names(20), maths(20))
 !
       end subroutine set_field_product_labels
 !

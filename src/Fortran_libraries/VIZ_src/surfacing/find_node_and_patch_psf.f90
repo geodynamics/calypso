@@ -66,7 +66,7 @@
         call dealloc_numnod_stack(psf_mesh(i_psf)%node)
         call dealloc_numele_stack(psf_mesh(i_psf)%patch)
         call dealloc_node_geometry_w_sph(psf_mesh(i_psf)%node)
-        call deallocate_ele_connect_type(psf_mesh(i_psf)%patch)
+        call dealloc_ele_connect(psf_mesh(i_psf)%patch)
       end do
 !
       end subroutine dealloc_psf_node_and_patch

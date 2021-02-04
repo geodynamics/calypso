@@ -106,9 +106,9 @@
       Nfft4 = int(Nfft)
       do j = 1, Ncomp
         call dfftw_plan_dft_r2c_1d(plan_forward(j), Nfft4,              &
-     &      X_FFTW(1,j), C_FFTW(1,j) , FFTW_ESTIMATE)
+     &      X_FFTW(1,j), C_FFTW(1,j) , FFTW_KEMO_EST)
         call dfftw_plan_dft_c2r_1d(plan_backward(j), Nfft4,             &
-     &      C_FFTW(1,j), X_FFTW(1,j) , FFTW_ESTIMATE)
+     &      C_FFTW(1,j), X_FFTW(1,j) , FFTW_KEMO_EST)
       end do
       aNfft = one / dble(Nfft)
 !

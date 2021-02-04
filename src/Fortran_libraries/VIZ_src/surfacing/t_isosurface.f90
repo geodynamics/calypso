@@ -20,7 +20,8 @@
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(isosurface_module), intent(inout) :: iso
 !!
-!!      subroutine dealloc_iso_field_type(iso)
+!!      subroutine ISOSURF_finalize(iso)
+!!        type(isosurface_module), intent(inout) :: iso
 !!@endverbatim
 !
       module t_isosurface
@@ -113,8 +114,8 @@
      &    iso%iso_param, iso%iso_search)
 !
       do i_iso = 1, iso%num_iso
-        call allocate_node_param_smp_type(iso%iso_mesh(i_iso)%node)
-        call allocate_ele_param_smp_type(iso%iso_mesh(i_iso)%patch)
+        call alloc_node_param_smp(iso%iso_mesh(i_iso)%node)
+        call alloc_ele_param_smp(iso%iso_mesh(i_iso)%patch)
 !
         call alloc_ref_field_4_psf                                      &
      &     (fem%mesh%node, iso%iso_list(i_iso))
@@ -181,6 +182,31 @@
       end subroutine ISOSURF_visualize
 !
 !  ---------------------------------------------------------------------
+!
+      subroutine ISOSURF_finalize(iso)
+!
+      use set_psf_iso_control
+!
+      type(isosurface_module), intent(inout) :: iso
+!
+      integer(kind = kint) :: i_iso
+!
+!
+      do i_iso = 1, iso%num_iso
+        call dealloc_node_param_smp(iso%iso_mesh(i_iso)%node)
+        call dealloc_ele_param_smp(iso%iso_mesh(i_iso)%patch)
+      end do
+!
+      call dealloc_psf_field_name(iso%num_iso, iso%iso_mesh)
+      call dealloc_psf_case_table(iso%iso_case_tbls)
+!
+      deallocate(iso%iso_mesh, iso%iso_list)
+      deallocate(iso%iso_search, iso%iso_param, iso%iso_def)
+      deallocate(iso%iso_file_IO, iso%iso_out)
+!
+      end subroutine ISOSURF_finalize
+!
+!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine dealloc_iso_field_type(iso)
@@ -189,13 +215,6 @@
 !
       type(isosurface_module), intent(inout) :: iso
 !
-!
-      call dealloc_psf_field_name(iso%num_iso, iso%iso_mesh)
-      call dealloc_psf_case_table(iso%iso_case_tbls)
-!
-      deallocate(iso%iso_mesh, iso%iso_list)
-      deallocate(iso%iso_search, iso%iso_param, iso%iso_def)
-      deallocate(iso%iso_file_IO, iso%iso_out)
 !
       end subroutine dealloc_iso_field_type
 !

@@ -48,7 +48,7 @@
       ele_IO%numele =     ele%numele
       ele_IO%nnod_4_ele = ele%nnod_4_ele
 !
-      call allocate_ele_connect_type(ele_IO)
+      call alloc_ele_connect(ele_IO)
 !
 !$omp parallel private(k1)
       do k1 = 1, ele%nnod_4_ele
@@ -84,7 +84,7 @@
 !
 !
       if (ele_IO%numele .eq. 0) then
-        call deallocate_ele_connect_type(ele_IO)
+        call dealloc_ele_connect(ele_IO)
         return
       end if
 !
@@ -93,7 +93,7 @@
 !
       ele%nnod_4_ele = set_nnod_4_ele_by_eletype(ele%first_ele_type)
 !
-      call allocate_ele_connect_type(ele)
+      call alloc_ele_connect(ele)
 !
 !$omp parallel private(k1)
       do k1 = 1, ele%nnod_4_ele
@@ -218,6 +218,7 @@
 !
 !
       ele%internal_ele = nod_IO%internal_node
+      call alloc_overlapped_ele(ele)
       call alloc_ele_geometry(ele)
 !
 !$omp parallel do

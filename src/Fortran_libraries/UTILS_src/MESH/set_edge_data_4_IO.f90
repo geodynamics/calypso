@@ -61,7 +61,7 @@
       ele_IO%numele =     edge%numedge
       ele_IO%nnod_4_ele = edge%nnod_4_edge
 !
-      call allocate_ele_connect_type(ele_IO)
+      call alloc_ele_connect(ele_IO)
       call alloc_surface_connect_IO(nsurf, nedge_4_surf, sfed_IO)
       call alloc_edge_connect_IO(nele, nedge_4_ele, sfed_IO)
 !

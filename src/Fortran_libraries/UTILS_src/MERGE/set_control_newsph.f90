@@ -83,7 +83,7 @@
       use t_check_and_make_SPH_mesh
       use t_ctl_params_gen_sph_shell
       use m_file_format_switch
-      use set_control_platform_data
+      use set_control_platform_item
       use new_SPH_restart
       use skip_comment_f
 !

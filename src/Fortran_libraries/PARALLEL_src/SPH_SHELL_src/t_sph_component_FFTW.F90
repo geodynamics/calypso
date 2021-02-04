@@ -140,12 +140,12 @@
      &      IONE_4, int(FFTW_c%Nfft_r), FFTW_c%howmany_fwd,             &
      &      FFTW_c%X(1,ip), inembed, FFTW_c%howmany_fwd, IONE_4,        &
      &      FFTW_c%C(1,ip), inembed, FFTW_c%howmany_fwd, IONE_4,        &
-     &      FFTW_ESTIMATE)
+     &      FFTW_KEMO_EST)
         call dfftw_plan_many_dft_c2r(FFTW_c%plan_bwd(ip),               &
      &      IONE_4, int(FFTW_c%Nfft_r), FFTW_c%howmany_bwd,             &
      &      FFTW_c%C(1,ip), inembed, FFTW_c%howmany_bwd, IONE_4,        &
      &      FFTW_c%X(1,ip), inembed, FFTW_c%howmany_bwd, IONE_4,        &
-     &      FFTW_ESTIMATE)
+     &      FFTW_KEMO_EST)
       end do
       FFTW_c%aNfft = one / dble(sph_rtp%nidx_rtp(3))
 !

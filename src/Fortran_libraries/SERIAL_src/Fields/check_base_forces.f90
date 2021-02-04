@@ -224,7 +224,8 @@
       end if
 !
       if(      check_field_list_ctl(square_velocity, field_ctl)         &
-     &    .or. check_field_list_ctl(velocity_scale, field_ctl))         &
+     &    .or. check_field_list_ctl(velocity_scale, field_ctl)          &
+     &    .or. check_field_list_ctl(stream_pol_velocity, field_ctl))    &
      &   call add_phys_name_ctl(velocity, field_ctl)
       if(check_field_list_ctl(square_vorticity, field_ctl))             &
      &   call add_phys_name_ctl(vorticity, field_ctl)

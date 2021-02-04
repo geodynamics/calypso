@@ -329,6 +329,7 @@
 !
       type(communication_table), intent(inout) :: comm_tbl
 !
+      if(associated(comm_tbl%id_neib) .eqv. .FALSE.) return
       deallocate(comm_tbl%id_neib)
 !
       end subroutine dealloc_neib_id
@@ -340,6 +341,7 @@
 !
       type(communication_table), intent(inout) :: comm_tbl
 !
+      if(associated(comm_tbl%num_import) .eqv. .FALSE.) return
       deallocate(comm_tbl%num_import)
       deallocate(comm_tbl%istack_import)
 !
@@ -351,6 +353,7 @@
 !
       type(communication_table), intent(inout) :: comm_tbl
 !
+      if(associated(comm_tbl%num_export) .eqv. .FALSE.) return
       deallocate(comm_tbl%num_export)
       deallocate(comm_tbl%istack_export)
 !
@@ -414,13 +417,14 @@
       comm_tbl%ntot_import = 0
       comm_tbl%ntot_export = 0
 !
-      nullify( comm_tbl%id_neib       )
-      nullify( comm_tbl%num_import    )
-      nullify( comm_tbl%istack_import )
-      nullify( comm_tbl%item_import   )
-      nullify( comm_tbl%num_export    )
-      nullify( comm_tbl%istack_export )
-      nullify( comm_tbl%item_export   )
+      if(associated(comm_tbl%id_neib) .eqv. .FALSE.) return
+      nullify(comm_tbl%id_neib      )
+      nullify(comm_tbl%num_import   )
+      nullify(comm_tbl%istack_import)
+      nullify(comm_tbl%item_import  )
+      nullify(comm_tbl%num_export   )
+      nullify(comm_tbl%istack_export)
+      nullify(comm_tbl%item_export  )
 !
       end subroutine unlink_dest_comm_tbl_type
 !

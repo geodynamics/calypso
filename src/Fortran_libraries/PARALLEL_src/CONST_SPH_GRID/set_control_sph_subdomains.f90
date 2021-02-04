@@ -129,7 +129,7 @@
         end if
       end if
 !
-      s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_mode_neib
+      s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_mode
       if(sdctl%rlm_distibution_ctl%iflag .gt. 0) then
         tmpchara = sdctl%rlm_distibution_ctl%charavalue
         if(     cmp_no_case(tmpchara, simple)) then
@@ -140,14 +140,14 @@
 !        else if(cmp_no_case(tmpchara, cyclic_trns)) then
 !          s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_transform
 !
-        else if(cmp_no_case(tmpchara, cyclic_neib_mode)) then
-          s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_mode_neib
+!        else if(cmp_no_case(tmpchara, cyclic_neib_mode)) then
+!          s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_mode_neib
 !        else if(cmp_no_case(tmpchara, cyclic_neib_trns)) then
 !          s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_trans_neib
 !
         else if(cmp_no_case(tmpchara, test_ditribution)) then
           s3d_ranks%iflag_rlm_distribute = id_test_distribute
-        !
+!
         else if(cmp_no_case(tmpchara, original)) then
           s3d_ranks%iflag_rlm_distribute = id_V1_rlm_distribute
         end if
@@ -168,7 +168,7 @@
           s3d_ranks%rlm_rin_flag = .TRUE.
           s3d_ranks%rtm_rin_flag = .TRUE.
           s3d_ranks%rtp_rin_flag = .FALSE.
-          s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_mode_neib
+          s3d_ranks%iflag_rlm_distribute = id_cyclic_eq_mode
         end if
       end if
 !

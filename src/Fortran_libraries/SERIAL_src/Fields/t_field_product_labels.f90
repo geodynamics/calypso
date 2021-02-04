@@ -34,10 +34,12 @@
 !!   square_temperature       [i_square_t]:
 !!   square_composition       [i_square_c]:
 !!
-!!   velocity_scale    [i_velo_scale]:
-!!   magnetic_scale    [i_magne_scale]:
-!!   temperature_scale [i_temp_scale]:
-!!   composition_scale [i_comp_scale]:
+!!   velocity_scale           [i_velo_scale]:
+!!   magnetic_scale           [i_magne_scale]:
+!!   temperature_scale        [i_temp_scale]:
+!!   composition_scale        [i_comp_scale]:
+!!
+!!   stream_pol_velocity      [i_stream_pol_u]:
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -106,6 +108,9 @@
         integer (kind=kint) :: i_temp_scale =       izero
 !>        start address for composition length scale
         integer (kind=kint) :: i_comp_scale =       izero
+!
+!>        start address for stream function for poloidal velocity
+        integer (kind=kint) :: i_stream_pol_u =     izero
       end type phys_products_address
 !
 ! ----------------------------------------------------------------------
@@ -170,6 +175,9 @@
           prod_fld%i_temp_scale = i_phys
         else if (field_name .eq. composition_scale%name) then
           prod_fld%i_comp_scale = i_phys
+!
+        else if (field_name .eq. stream_pol_velocity%name) then
+          prod_fld%i_stream_pol_u = i_phys
         end if
       end if
 !

@@ -172,6 +172,7 @@
       use t_sph_trans_arrays_MHD
 !
       use gen_sph_grids_modes
+      use set_control_platform_item
       use set_control_platform_data
       use set_ctl_parallel_platform
       use set_control_4_model

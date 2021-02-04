@@ -64,8 +64,10 @@
         end do
         close(ctl_file_code)
 !
-        call section_step_ctls_to_time_ctl                              &
-     &     (DMHD_ctl%surfacing_ctls, DMHD_ctl%smctl_ctl%tctl)
+        call section_step_ctls_to_time_ctl(DMHD_ctl%surfacing_ctls,     &
+     &                                     DMHD_ctl%smctl_ctl%tctl)
+        call add_fields_4_scts_to_fld_ctl(DMHD_ctl%surfacing_ctls,      &
+     &      DMHD_ctl%model_ctl%fld_ctl%field_ctl)
       end if
 !
       call bcast_sph_mhd_ctl_w_psf(DMHD_ctl)
