@@ -8,13 +8,12 @@
 !!
 !!@verbatim
 !!      subroutine check_and_make_para_SPH_mesh                         &
-!!     &         (sph_file_param, num_pe, sph_mesh, sph_maker)
+!!     &         (sph_file_param, sph_maker, sph_array)
 !!      subroutine check_and_make_para_rj_mode                          &
-!!     &         (sph_file_param, num_pe, sph_mesh, sph_maker)
-!!        integer(kind = kint), intent(in) :: num_pe
+!!     &         (sph_file_param, sph_maker, sph_array)
 !!        type(field_IO_params), intent(in) :: sph_file_param
 !!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
-!!        type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
+!!        type(sph_mesh_array), intent(inout) :: sph_array
 !!@endverbatim
 !
       module parallel_gen_sph_grids
@@ -28,9 +27,8 @@
       use m_work_time
 !
       use t_SPH_mesh_field_data
-      use t_parai_gen_sph_grids_modes
+      use t_SPH_mesh_field_array
       use t_const_spherical_grid
-      use t_check_and_make_SPH_mesh
 !
       implicit none
 !
@@ -43,17 +41,16 @@
 ! ----------------------------------------------------------------------
 !
       subroutine check_and_make_para_SPH_mesh                           &
-     &         (sph_file_param, num_pe, sph_mesh, sph_maker)
+     &         (sph_file_param, sph_maker, sph_array)
 !
       use m_elapsed_labels_gen_SPH
       use output_gen_sph_grid_modes
 !      use check_sph_file_access
 !      use calypso_mpi_logical
 !
-      integer(kind = kint), intent(in) :: num_pe
       type(field_IO_params), intent(in) :: sph_file_param
       type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
-      type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
+      type(sph_mesh_array), intent(inout) :: sph_array
 !
       logical :: iflag_lc
 !
@@ -74,49 +71,43 @@
      &     'Set parameters for spherical shell')
       else
         if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_grids'
-        call para_gen_sph_grids(num_pe, sph_mesh, sph_maker)
+        call para_gen_sph_grids(sph_maker, sph_array)
 !
         if(iflag_debug .gt. 0) write(*,*) 'para_output_sph_mode_grids'
-        call para_output_sph_mode_grids                                 &
-     &     (sph_file_param, num_pe, sph_mesh)
+        call para_output_sph_mode_grids(sph_file_param, sph_array)
       end if
 !
       end subroutine check_and_make_para_SPH_mesh
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine para_gen_sph_grids(num_pe, sph_mesh, sph_maker)
+      subroutine para_gen_sph_grids(sph_maker, sph_array)
 !
       use m_elapsed_labels_gen_SPH
       use mpi_gen_sph_grids_modes
+      use para_gen_sph_grids_modes
       use set_comm_table_rtp_rj
       use const_global_sph_grids_modes
       use const_sph_radial_grid
       use copy_para_sph_global_params
 !
-      integer(kind = kint), intent(in) :: num_pe
       type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
-      type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
+      type(sph_mesh_array), intent(inout) :: sph_array
 !
 !
 !  =========  Set global resolutions ===================================
       call const_sph_global_parameters                                  &
      &   (sph_maker%gen_sph, sph_maker%sph_tmp)
 !
-!      num_pe = sph_maker%gen_sph%s3d_ranks%ndomain_sph
-!      allocate(sph_mesh(num_pe))
-      call copy_para_sph_param_from_ctl                                 &
-     &   (sph_maker%sph_tmp, num_pe, sph_mesh)
-      call copy_para_global_sph_resolution                              &
-     &   (sph_maker%sph_tmp, num_pe, sph_mesh)
+      call copy_para_sph_param_from_ctl(sph_maker%sph_tmp, sph_array)
+      call copy_para_global_sph_resolution(sph_maker%sph_tmp,           &
+     &                                     sph_array)
 !
       if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rlm_rj_modes'
-      call para_gen_sph_rlm_rj_modes                                    &
-     &   (num_pe, sph_maker%gen_sph, sph_mesh)
+      call para_gen_sph_rlm_rj_modes(sph_maker%gen_sph, sph_array)
 !
       if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rtm_rtp_grids'
-      call para_gen_sph_rtm_rtp_grids                                   &
-     &   (num_pe, sph_maker%gen_sph, sph_mesh)
+      call para_gen_sph_rtm_rtp_grids(sph_maker%gen_sph, sph_array)
       call dealloc_gen_mesh_params(sph_maker%gen_sph)
 !
       end subroutine para_gen_sph_grids
@@ -125,10 +116,10 @@
 ! ----------------------------------------------------------------------
 !
       subroutine check_and_make_para_rj_mode                            &
-     &         (sph_file_param, num_pe, sph_mesh, sph_maker)
+     &         (sph_file_param, sph_maker, sph_array)
 !
       use m_elapsed_labels_gen_SPH
-      use mpi_gen_sph_grids_modes
+      use para_gen_sph_grids_modes
       use set_comm_table_rtp_rj
       use const_global_sph_grids_modes
       use const_sph_radial_grid
@@ -138,10 +129,9 @@
       use check_sph_file_access
       use calypso_mpi_logical
 !
-      integer(kind = kint), intent(in) :: num_pe
       type(field_IO_params), intent(in) :: sph_file_param
       type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
-      type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
+      type(sph_mesh_array), intent(inout) :: sph_array
 !
       logical :: iflag_lc
 !
@@ -156,20 +146,18 @@
 !
       if(iflag_lc) then
         if(my_rank.eq.0) write(*,*) 'spherical harmonics table exists'
-        call load_local_rj_mesh_4_merge                                 &
-     &     (sph_file_param, num_pe, sph_mesh)
+        call load_local_rj_mesh_4_merge(sph_file_param, sph_array)
       else if(sph_maker%make_SPH_flag .eqv. .FALSE.) then
         call calypso_mpi_abort(ierr_file,                               &
      &     'Set parameters for spherical shell')
       else
         if (my_rank.eq.0) write(*,*) 'Make spherical harmonics table'
         if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rj_mode'
-        call para_gen_sph_rj_mode(num_pe, sph_mesh, sph_maker)
+        call para_gen_sph_rj_mode(sph_maker, sph_array)
 !
         if(sph_maker%mesh_output_flag) then
           if(iflag_debug .gt. 0) write(*,*) 'para_output_sph_rj_modes'
-          call para_output_sph_rj_modes                                 &
-     &       (sph_file_param, num_pe, sph_mesh)
+          call para_output_sph_rj_modes(sph_file_param, sph_array)
         end if
       end if
       call calypso_mpi_barrier
@@ -178,32 +166,29 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine para_gen_sph_rj_mode(num_pe, sph_mesh, sph_maker)
+      subroutine para_gen_sph_rj_mode(sph_maker, sph_array)
 !
       use m_elapsed_labels_gen_SPH
       use mpi_gen_sph_grids_modes
+      use para_gen_sph_grids_modes
       use set_comm_table_rtp_rj
       use const_global_sph_grids_modes
       use const_sph_radial_grid
       use copy_para_sph_global_params
 !
-      integer(kind = kint), intent(in) :: num_pe
       type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
-      type(sph_mesh_data), intent(inout) :: sph_mesh(num_pe)
+      type(sph_mesh_array), intent(inout) :: sph_array
 !
 !  =========  Set global resolutions ===================================
       call const_sph_global_parameters                                  &
      &   (sph_maker%gen_sph, sph_maker%sph_tmp)
 !
-!      num_pe = sph_maker%gen_sph%s3d_ranks%ndomain_sph
-      call copy_para_sph_param_from_ctl                                 &
-     &   (sph_maker%sph_tmp, num_pe, sph_mesh)
-      call copy_para_global_sph_resolution                              &
-     &   (sph_maker%sph_tmp, num_pe, sph_mesh)
+      call copy_para_sph_param_from_ctl(sph_maker%sph_tmp, sph_array)
+      call copy_para_global_sph_resolution(sph_maker%sph_tmp,           &
+     &                                     sph_array)
 !
       if(iflag_debug .gt. 0) write(*,*) 'para_gen_sph_rlm_rj_modes'
-      call para_gen_sph_rlm_rj_modes                                    &
-     &   (num_pe, sph_maker%gen_sph, sph_mesh)
+      call para_gen_sph_rlm_rj_modes(sph_maker%gen_sph, sph_array)
       call dealloc_gen_mesh_params(sph_maker%gen_sph)
 !
       end subroutine para_gen_sph_rj_mode

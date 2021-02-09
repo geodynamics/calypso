@@ -118,7 +118,7 @@
       logical :: flag
 !
 !
-      call alloc_phys_data_type(n_point, fld)
+      call alloc_phys_data(n_point, fld)
 !
       do i = 1, fld%num_phys
         i_fld = fld%istack_component(i-1) + 1

@@ -74,16 +74,18 @@
 
       if (iflag_debug.eq.1) write(*,*) 'input_control_SPH_dynamobench'
       call input_control_SPH_dynamobench                                &
-     &   (MHD_files1, SPH_model1%bc_IO, DNS_MHD_ctl1, SPH_MHD1%sph,     &
-     &    SPH_MHD1%comms, SPH_MHD1%groups, SPH_MHD1%fld, FEM_d1%field,  &
-     &    MHD_step1, SPH_model1%MHD_prop, SPH_model1%MHD_BC,            &
-     &    SPH_WK1, cdat1, bench1)
+     &   (MHD_files1, SPH_model1%bc_IO, DNS_MHD_ctl1, SPH_MHD1,         &
+     &    FEM_d1%field, MHD_step1, SPH_model1%MHD_prop,                 &
+     &    SPH_model1%MHD_BC, SPH_WK1, cdat1, bench1)
       call copy_delta_t(MHD_step1%init_d, MHD_step1%time_d)
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
 !
 !    precondition elaps start
 !
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+1)
+      if (iflag_debug.gt.0 ) write(*,*) 'alloc_iccgN_vec_type'
+      call alloc_iccgN_vec_type                                         &
+     &   (isix, SPH_MHD1%sph%sph_rtp%nnod_rtp, FEM_d1%v_sol)
 !
 !        Initialize spherical transform dynamo
 !

@@ -8,12 +8,12 @@
 !!
 !!@verbatim
 !!      subroutine convert_fields_from_rayleigh(istep, org_fld_file,    &
-!!     &          new_sph_mesh, r_itp, ra_rst, new_sph_phys)
+!!     &          new_sph, r_itp, ra_rst, new_phys)
 !!        type(field_IO_params), intent(in) :: org_fld_file
-!!        type(sph_mesh_data), intent(in) :: new_sph_mesh
+!!        type(sph_grids), intent(in) :: new_sph
 !!        type(rayleigh_restart), intent(in) :: ra_rst
 !!        type(sph_radial_itp_data), intent(in) :: r_itp
-!!        type(phys_data), intent(inout) :: new_sph_phys
+!!        type(phys_data), intent(inout) :: new_phys
 !!@endverbatim
 !
       module convert_from_rayleigh_rst
@@ -24,9 +24,11 @@
 !
       use m_machine_parameter
 !
-      use r_interpolate_marged_sph
+      use t_spheric_parameter
+      use t_phys_data
       use t_rayleigh_restart_IO
       use t_convert_from_rayleigh
+      use r_interpolate_marged_sph
 !
       implicit none
 !
@@ -40,18 +42,18 @@
 ! ----------------------------------------------------------------------
 !
       subroutine convert_fields_from_rayleigh(istep, org_fld_file,      &
-     &          new_sph_mesh, r_itp, ra_rst, new_sph_phys)
+     &          new_sph, r_itp, ra_rst, new_phys)
 !
       use rayleigh_restart_IO
 !      use MPI_read_rayleigh_restart
 !
       integer(kind = kint), intent(in) :: istep
       type(field_IO_params), intent(in) :: org_fld_file
-      type(sph_mesh_data), intent(in) :: new_sph_mesh
+      type(sph_grids), intent(in) :: new_sph
       type(rayleigh_restart), intent(in) :: ra_rst
       type(sph_radial_itp_data), intent(in) :: r_itp
 !
-      type(phys_data), intent(inout) :: new_sph_phys
+      type(phys_data), intent(inout) :: new_phys
 !
       character(len = kchara) :: file_name(2)
       type(work_fftpack_chebyshev) :: fcheby_WK
@@ -65,20 +67,20 @@
      &   (ra_rst%nri_org, r_itp, rayleigh_WK)
       call init_fftpack_4_cheby(rayleigh_WK%nri_tgt, fcheby_WK, ierr)
 !
-      do i_fld = 1, new_sph_phys%num_phys
+      do i_fld = 1, new_phys%num_phys
 !        if(my_rank .eq. 0) write(*,*)                                  &
 !     &      'set_rayleigh_rst_file_name', i_fld
 !
         call set_rayleigh_rst_file_name(ra_rst%i_version,               &
      &      org_fld_file%file_prefix, istep,                            &
-     &      new_sph_phys%phys_name(i_fld), iflag_ncomp, file_name(1))
+     &      new_phys%phys_name(i_fld), iflag_ncomp, file_name(1))
 !
         do nd = 1, iflag_ncomp
-          i_comp = 2*nd - 1 + new_sph_phys%istack_component(i_fld-1)
+          i_comp = 2*nd - 1 + new_phys%istack_component(i_fld-1)
 !
           call cvt_each_field_from_rayleigh(file_name(nd),              &
-     &        i_fld, i_comp, new_sph_mesh,                              &
-     &        r_itp, ra_rst, fcheby_WK, rayleigh_WK, new_sph_phys)
+     &        i_fld, i_comp, new_sph, r_itp, ra_rst,                    &
+     &        fcheby_WK, rayleigh_WK, new_phys)
         end do
 !
       end do
@@ -91,8 +93,8 @@
 ! ----------------------------------------------------------------------
 !
       subroutine cvt_each_field_from_rayleigh                           &
-     &          (file_name, i_fld, i_comp, new_sph_mesh, r_itp, ra_rst, &
-     &           fcheby_WK, rayleigh_WK, new_sph_phys)
+     &          (file_name, i_fld, i_comp, new_sph, r_itp, ra_rst, &
+     &           fcheby_WK, rayleigh_WK, new_phys)
 !
       use calypso_mpi
       use m_calypso_mpi_IO
@@ -102,13 +104,13 @@
 !
       integer(kind = kint), intent(in) :: i_fld, i_comp
       character(len = kchara), intent(in) :: file_name
-      type(sph_mesh_data), intent(in) :: new_sph_mesh
+      type(sph_grids), intent(in) :: new_sph
       type(rayleigh_restart), intent(in) :: ra_rst
       type(sph_radial_itp_data), intent(in) :: r_itp
       type(work_fftpack_chebyshev), intent(in) :: fcheby_WK
 !
       type(work_rayleigh_checkpoint), intent(inout) :: rayleigh_WK
-      type(phys_data), intent(inout) :: new_sph_phys
+      type(phys_data), intent(inout) :: new_phys
 !
       integer ::  id_mpi_file
       integer(kind = kint) :: j, l, m, ierr
@@ -116,10 +118,10 @@
 !
       call calypso_mpi_read_file_open(file_name, id_mpi_file)
 !      write(50+my_rank,*) 'k, kr, l, m, ra_rst%iflag_swap',            &
-!       &     new_sph_mesh%sph%sph_rj%nidx_rj(1:2), ra_rst%iflag_swap
-      do j = 1, new_sph_mesh%sph%sph_rj%nidx_rj(2)
-        l = new_sph_mesh%sph%sph_rj%idx_gl_1d_rj_j(j,2)
-        m = new_sph_mesh%sph%sph_rj%idx_gl_1d_rj_j(j,3)
+!       &     new_sph%sph_rj%nidx_rj(1:2), ra_rst%iflag_swap
+      do j = 1, new_sph%sph_rj%nidx_rj(2)
+        l = new_sph%sph_rj%idx_gl_1d_rj_j(j,2)
+        m = new_sph%sph_rj%idx_gl_1d_rj_j(j,3)
         if(l .gt. ra_rst%ltr_org) cycle
         call read_each_mode_from_rayleigh(id_mpi_file, ra_rst, l, m,    &
      &      rayleigh_WK%rayleigh_in(1,1), rayleigh_WK%rayleigh_in(1,2))
@@ -131,11 +133,10 @@
 !     &    ra_rst%Cheby_fwd(1,1), rayleigh_WK%rayleigh_tg(1,1),         &
 !     &    rayleigh_WK%rayleigh_fd(1,1))
 !
-        if    (new_sph_phys%phys_name(i_fld) .eq. velocity%name         &
-     &   .or. new_sph_phys%phys_name(i_fld) .eq. pressure%name          &
-     &   .or. new_sph_phys%phys_name(i_fld) .eq. temperature%name       &
-     &   .or. new_sph_phys%phys_name(i_fld) .eq. magnetic_field%name)   &
-     &       then
+        if    (new_phys%phys_name(i_fld) .eq. velocity%name             &
+     &   .or. new_phys%phys_name(i_fld) .eq. pressure%name              &
+     &   .or. new_phys%phys_name(i_fld) .eq. temperature%name           &
+     &   .or. new_phys%phys_name(i_fld) .eq. magnetic_field%name) then
           call rescaling_for_chebyshev_FFT                              &
      &      (ra_rst%nri_org, rayleigh_WK%rayleigh_in(1,1),              &
      &       rayleigh_WK%nri_tgt, rayleigh_WK%rayleigh_tg(1,1))
@@ -144,25 +145,23 @@
      &       fcheby_WK%WSAVE, fcheby_WK%LENSAV, fcheby_WK%WORK,         &
      &       rayleigh_WK%nri_tgt+1, ierr)
 !
-          call copy_from_chebyshev_trans(new_sph_mesh%sph%sph_rj,       &
+          call copy_from_chebyshev_trans(new_sph%sph_rj,                &
      &        r_itp, j, i_comp,  rayleigh_WK%nri_tgt,                   &
-     &        rayleigh_WK%rayleigh_tg(1,1), new_sph_phys)
-        else if(new_sph_phys%phys_name(i_fld)                           &
-     &                             .eq. previous_momentum%name          &
-     &   .or. new_sph_phys%phys_name(i_fld)                             &
-     &                             .eq. previous_heat%name              &
-     &   .or. new_sph_phys%phys_name(i_fld)                             &
-     &                             .eq. previous_induction%name) then
+     &        rayleigh_WK%rayleigh_tg(1,1), new_phys)
+        else if(new_phys%phys_name(i_fld) .eq. previous_momentum%name   &
+     &   .or. new_phys%phys_name(i_fld) .eq.   previous_heat%name       &
+     &   .or. new_phys%phys_name(i_fld) .eq. previous_induction%name)   &
+     &   then
           call radial_interpolation_rayleigh(r_itp,                     &
      &        ra_rst%nri_org, rayleigh_WK%rayleigh_in(1,1),             &
      &        rayleigh_WK%nri_tgt, rayleigh_WK%rayleigh_tg(1,1))
         end if
 !
 !        call check_chebyshev_trans                                     &
-!     &     (new_sph_mesh%sph%sph_rj, r_itp, file_name,                 &
+!     &     (new_sph%sph_rj, r_itp, file_name,                          &
 !     &      l, m, j, i_fld, i_comp, ra_rst%nri_org,                    &
 !     &      rayleigh_WK%rayleigh_in, rayleigh_WK%nri_tgt,              &
-!     &      rayleigh_WK%rayleigh_tg, new_sph_phys)
+!     &      rayleigh_WK%rayleigh_tg, new_phys)
       end do
 !
       call calypso_close_mpi_file(id_mpi_file)
@@ -175,7 +174,7 @@
       subroutine check_chebyshev_trans                                  &
      &         (sph_rj, r_itp, file_name, l, m, j, i_fld, i_comp,       &
      &          nri_org, rayleigh_in, nri_tgt, rayleigh_tg,             &
-     &          new_sph_phys)
+     &          new_phys)
 !
       use t_spheric_rj_data
       use t_phys_data
@@ -189,7 +188,7 @@
       real(kind = kreal), intent(in) :: rayleigh_in(nri_org,2)
 !
       real(kind = kreal), intent(in) :: rayleigh_tg(nri_tgt,1)
-      type(phys_data), intent(in) :: new_sph_phys
+      type(phys_data), intent(in) :: new_phys
 !
       integer(kind = kint) :: k, kr, inod, iflag
 !
@@ -218,11 +217,11 @@
 !        write(50+my_rank,*) k, rayleigh_fd(k,1)
 !      end do
 !
-      write(50+my_rank,*) trim(new_sph_phys%phys_name(i_fld)), i_comp
+      write(50+my_rank,*) trim(new_phys%phys_name(i_fld)), i_comp
       do k = 1, sph_rj%nidx_rj(1)
         inod = j + (k-1) * sph_rj%nidx_rj(2)
         write(50+my_rank,*) k, sph_rj%radius_1d_rj_r(k),                &
-     &                      l, m, new_sph_phys%d_fld(inod,i_comp)
+     &                      l, m, new_phys%d_fld(inod,i_comp)
       end do
 !
       end subroutine check_chebyshev_trans

@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine set_mid_equator_point_global                         &
-!!     &         (trans_p, sph_params, sph_rtp, sph_rj, cdat)
+!!     &         (my_rank, trans_p, sph_params, sph_rtp, sph_rj, cdat)
 !!        type(parameters_4_sph_trans), intent(in) :: trans_p
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
@@ -41,11 +41,12 @@
 ! ----------------------------------------------------------------------
 !
       subroutine set_mid_equator_point_global                           &
-     &         (trans_p, sph_params, sph_rtp, sph_rj, cdat)
+     &         (my_rank, trans_p, sph_params, sph_rtp, sph_rj, cdat)
 !
       use t_work_4_sph_trans
       use t_spheric_parameter
 !
+      integer, intent(in) :: my_rank
       type(parameters_4_sph_trans), intent(in) :: trans_p
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rtp_grid), intent(in) :: sph_rtp
@@ -61,7 +62,7 @@
 !
       cdat%circle%s_circle = r_MID
       cdat%circle%z_circle = zero
-      call const_circle_point_global(trans_p%iflag_FFT,                 &
+      call const_circle_point_global(my_rank, trans_p%iflag_FFT,        &
      &    sph_params%l_truncation, sph_rtp, sph_rj, cdat)
 !
       end subroutine set_mid_equator_point_global

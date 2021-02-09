@@ -27,7 +27,6 @@
       use t_control_data_4_merge
       use t_control_param_assemble
       use t_spectr_data_4_assemble
-      use t_check_and_make_SPH_mesh
       use t_convert_from_rayleigh
 !
       use new_SPH_restart
@@ -70,7 +69,6 @@
 !
       type(control_data_4_merge) :: mgd_ctl_s
       type(sph_grid_maker_in_sim) :: sph_org_maker_s
-      type(sph_grid_maker_in_sim) :: sph_asbl_maker_s
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
@@ -78,7 +76,7 @@
       if(my_rank .eq. 0) call read_control_assemble_sph(mgd_ctl_s)
       call bcast_merge_control_data(mgd_ctl_s)
       call set_control_4_newsph(mgd_ctl_s, asbl_param_s, sph_asbl_s,    &
-     &                          sph_org_maker_s, sph_asbl_maker_s)
+     &    sph_org_maker_s, sph_asbl_s%new_sph_data)
 !
       sph_asbl_s%np_sph_org = 1
       call alloc_spectr_data_4_assemble(sph_asbl_s)
@@ -94,28 +92,25 @@
         if(my_rank .eq. 0) call check_rayleigh_rst_params(6, ra_rst_s)
 !
       call copy_rayleigh_radial_data                                    &
-     &   (ra_rst_s, sph_asbl_s%org_sph_mesh(1))
+     &   (ra_rst_s, sph_asbl_s%org_sph_array%sph(1))
 !
 !  set new spectr data
       call check_and_make_SPH_rj_mode                                   &
-     &   (asbl_param_s%new_mesh_file, sph_asbl_maker_s,                 &
-     &    sph_asbl_s%new_sph_mesh%sph,                                  &
-     &    sph_asbl_s%new_sph_mesh%sph_comms,                            &
-     &    sph_asbl_s%new_sph_mesh%sph_grps)
+     &   (asbl_param_s%new_mesh_file, sph_asbl_s%new_sph_data)
 !
 !     Share number of nodes for new mesh
 !
       call s_count_nnod_4_asseble_sph(sph_asbl_s%np_sph_new,            &
-     &   sph_asbl_s%new_sph_mesh, sph_asbl_s%new_fst_IO)
+     &   sph_asbl_s%new_sph_data, sph_asbl_s%new_fst_IO)
 !
 !     construct radial interpolation table
 !
       call const_r_interpolate_table                                    &
-     &   (sph_asbl_s%org_sph_mesh(1), sph_asbl_s%new_sph_mesh,          &
-     &    sph_asbl_s%r_itp)
+     &   (sph_asbl_s%org_sph_array%sph(1),                              &
+     &    sph_asbl_s%new_sph_data%sph, sph_asbl_s%r_itp)
 !
 !      call chebyshev_fwd_mat_4_rayleigh                                &
-!     &   (sph_asbl_s%new_sph_mesh, sph_asbl_s%r_itp, ra_rst_s)
+!     &   (sph_asbl_s%new_sph_data%sph, sph_asbl_s%r_itp, ra_rst_s)
 !
       call dealloc_rayleigh_radial_grid(ra_rst_s)
 !
@@ -129,13 +124,12 @@
 !
       if(my_rank .eq. 0) then
         call copy_rj_phys_name_from_IO                                  &
-     &     (fld_IO_r, sph_asbl_s%new_sph_phys)
+     &     (fld_IO_r, sph_asbl_s%new_sph_data%fld)
       end if
-      call share_new_spectr_field_names                                 &
-     &   (sph_asbl_s%new_sph_mesh, sph_asbl_s%new_sph_phys)
+      call share_new_spectr_field_names(sph_asbl_s%new_sph_data)
 !
 !      call check_nodal_field_name                                      &
-!     &   (50+my_rank, sph_asbl_s%new_sph_phys(1))
+!     &   (50+my_rank, sph_asbl_s%new_sph_data%fld(1))
 !
       end subroutine init_cvt_rayleigh_sph
 !
@@ -176,14 +170,13 @@
         if(my_rank .eq. 0) write(*,*) 'convert_fields_from_rayleigh'
         call convert_fields_from_rayleigh                               &
      &     (istep, asbl_param_s%org_fld_file,                           &
-     &      sph_asbl_s%new_sph_mesh, sph_asbl_s%r_itp,                  &
-     &      ra_rst_s, sph_asbl_s%new_sph_phys)
+     &      sph_asbl_s%new_sph_data%sph, sph_asbl_s%r_itp,              &
+     &      ra_rst_s, sph_asbl_s%new_sph_data%fld)
 !
         call calypso_mpi_barrier
         if(my_rank .eq. 0) write(*,*) 'const_assembled_sph_data'
         call const_assembled_sph_data(asbl_param_s%b_ratio, init_t,     &
-     &      sph_asbl_s%new_sph_mesh%sph, sph_asbl_s%r_itp,              &
-     &      sph_asbl_s%new_sph_phys,                                    &
+     &      sph_asbl_s%r_itp, sph_asbl_s%new_sph_data,                  &
      &      sph_asbl_s%new_fst_IO, sph_asbl_s%fst_time_IO)
 !
         call calypso_mpi_barrier

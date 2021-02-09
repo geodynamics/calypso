@@ -22,12 +22,10 @@
       use m_elapsed_labels_gen_SPH
 !
       use t_mesh_data
-      use t_spheric_parameter
-      use t_spheric_group
+      use t_SPH_mesh_field_data
       use t_sph_trans_comm_tbl
       use t_file_IO_parameter
       use t_ctl_data_const_sph_mesh
-      use t_check_and_make_SPH_mesh
       use t_ctl_params_gen_sph_shell
 !
       use para_const_kemoview_mesh
@@ -41,12 +39,8 @@
 !>      Structure for file settings
       type(sph_mesh_generation_ctl), save :: SPH_MAKE_ctl
 !
-!>       Structure of grid and spectr data for spherical spectr method
-      type(sph_grids), save :: sph_const
-!>       Structure of communication table for spherical spectr method
-      type(sph_comm_tables), save :: comms_sph_const
-!>       Structure of group data for spherical spectr method
-      type(sph_group_data), save :: sph_grp_const
+!>      Structure of spherical transform mesh information
+      type(SPH_mesh_field_data), save :: SPH_GEN
 !>      Structure of mesh file name and formats
       type(gen_sph_file_IO_params), save ::  sph_files1
 !
@@ -54,7 +48,7 @@
       type(sph_grid_maker_in_sim), save :: sph_maker_G
 !
       private :: control_file_name
-      private :: sph_const, SPH_MAKE_ctl
+      private :: SPH_GEN, SPH_MAKE_ctl
 !
 ! ----------------------------------------------------------------------
 !
@@ -96,8 +90,6 @@
 !
       use calypso_mpi_int
       use m_error_IDs
-      use m_array_for_send_recv
-      use t_check_and_make_SPH_mesh
       use mpi_gen_sph_grids_modes
       use compare_sph_with_IO
       use parallel_load_data_4_sph
@@ -108,10 +100,10 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'mpi_gen_sph_grids'
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+2)
-      call mpi_gen_sph_grids(sph_maker_G%gen_sph, sph_maker_G%sph_tmp,  &
-     &    sph_const, comms_sph_const, sph_grp_const)
+      call mpi_gen_sph_grids                                            &
+     &   (sph_maker_G, SPH_GEN%sph, SPH_GEN%comms, SPH_GEN%groups)
       iflag = s_compare_sph_with_IO(sph_files1%sph_file_param,          &
-     &    sph_const, comms_sph_const, sph_grp_const)
+     &    SPH_GEN%sph, SPH_GEN%comms, SPH_GEN%groups)
       call calypso_mpi_allreduce_one_int(iflag, iflag_gl, MPI_MAX)
 !
       write(*,*) 'indexing', my_rank, iflag_gl
@@ -121,8 +113,8 @@
         write(*,*) 'indexing is correct'
       end if
 !
-      call dealloc_sph_modes(sph_const, comms_sph_const,                &
-     &    sph_grp_const)
+      call dealloc_sph_modes(SPH_GEN%sph, SPH_GEN%comms,                &
+     &                       SPH_GEN%groups)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+2)
 !
       if (iflag_debug.eq.1) write(*,*) 'exit evolution'

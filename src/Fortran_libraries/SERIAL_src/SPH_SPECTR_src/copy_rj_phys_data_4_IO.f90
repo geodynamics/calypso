@@ -105,7 +105,7 @@
 !
 !
       rj_fld%num_phys =  fld_IO%num_field_IO
-      call alloc_phys_name_type(rj_fld)
+      call alloc_phys_name(rj_fld)
 !
       rj_fld%phys_name(1:rj_fld%num_phys)                               &
      &      = fld_IO%fld_name(1:rj_fld%num_phys)

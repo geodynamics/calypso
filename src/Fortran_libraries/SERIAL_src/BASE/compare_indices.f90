@@ -4,9 +4,16 @@
 !!@author H. Matsui
 !!@date    programmed by H.Matsui on Apr., 2006
 !!
-!>@brief compare integers if these are same
+!>@brief compare vector and integers
 !!
 !!@verbatim
+!!      integer(kind = kint) function compare_field_vector              &
+!!     &      (n_point, numdir, fld_name, d_fld1, d_fld2)
+!!        character(len=kchara), intent(in) :: fld_name
+!!        integer(kind = kint), intent(in) :: n_point, numdir
+!!        real(kind = kreal), intent(in) :: d_fld1(n_point,numdir)
+!!        real(kind = kreal), intent(in) :: d_fld2(n_point,numdir)
+!!
 !!      integer(kind = kint) function                                   &
 !!     &                    check_4_on_3(i1, i2, i3, j1, j2, j3, j4)
 !!      integer(kind = kint) function                                   &
@@ -30,11 +37,67 @@
 !
       implicit none
 !
+      real(kind = kreal), parameter :: TINY = 1.0d-12
+!
 !------------------------------------------------------------------
 !
       contains
 !
 !------------------------------------------------------------------
+!
+      integer(kind = kint) function compare_field_vector                &
+     &      (n_point, numdir, fld_name, d_fld1, d_fld2)
+!
+      use m_machine_parameter
+!
+      implicit none
+!
+      character(len=kchara), intent(in) :: fld_name
+      integer(kind = kint), intent(in) :: n_point, numdir
+      real(kind = kreal), intent(in) :: d_fld1(n_point,numdir)
+      real(kind = kreal), intent(in) :: d_fld2(n_point,numdir)
+!
+      real(kind = kreal), allocatable :: vmin(:), vmax(:), size(:)
+      real(kind = kreal) :: scale, diff
+      integer(kind = kint) :: inod, ifld, icomp
+      integer(kind = kint) :: iflag
+!
+      iflag = 0
+      allocate(vmin(numdir))
+      allocate(vmax(numdir))
+      allocate(size(numdir))
+!
+!$omp parallel workshare
+      vmin(1:numdir) = minval(d_fld1(1:n_point,1:numdir),1)
+      vmax(1:numdir) = maxval(d_fld1(1:n_point,1:numdir),1)
+!$omp end parallel workshare
+      size(1:numdir) = vmax(1:numdir) - vmin(1:numdir)
+!
+      scale = 0.0d0
+      do icomp = 1, numdir
+        scale = scale + vmax(icomp)**2
+      end do
+      scale = sqrt(scale)
+      if(iflag_debug .gt. 0) write(*,*) ifld, 'scale for ',             &
+     &                                 trim(fld_name), ': ', scale
+!
+      do inod = 1, n_point
+        do icomp = 1, numdir
+          diff = d_fld2(inod,icomp) - d_fld1(inod,icomp)
+          if((abs(diff) / scale) .gt. TINY) then
+            write(*,*) icomp, '-component of ', trim(fld_name),     &
+     &                ' at ', inod, ' is different: ', diff
+            iflag = iflag + 1
+          end if
+        end do
+      end do
+      deallocate(vmin, vmax, size)
+      compare_field_vector = iflag
+!
+      end function compare_field_vector
+!
+!  --------------------------------------------------------------------
+!  --------------------------------------------------------------------
 !
       integer(kind = kint) function                                     &
      &                    check_4_on_3(i1, i2, i3, j1, j2, j3, j4)

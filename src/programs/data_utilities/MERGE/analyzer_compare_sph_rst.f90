@@ -25,7 +25,6 @@
       use t_control_data_4_merge
       use t_control_param_assemble
       use t_spectr_data_4_assemble
-      use t_check_and_make_SPH_mesh
 !
       use new_SPH_restart
       use parallel_assemble_sph
@@ -59,7 +58,6 @@
       use parallel_gen_sph_grids
 !
       type(control_data_4_merge) :: mgd_ctl_s
-      type(sph_grid_maker_in_sim) :: sph_asbl_maker_s
       type(sph_grid_maker_in_sim) :: sph_org_maker_s
 !      integer(kind = kint) :: ip
 !
@@ -69,52 +67,43 @@
       if(my_rank .eq. 0) call read_control_assemble_sph(mgd_ctl_s)
       call bcast_merge_control_data(mgd_ctl_s)
       call set_control_4_newsph(mgd_ctl_s, asbl_param_s, sph_asbl_s,    &
-     &                          sph_org_maker_s, sph_asbl_maker_s)
+     &    sph_org_maker_s, sph_asbl_s%new_sph_data)
 !
       call alloc_spectr_data_4_assemble(sph_asbl_s)
 !
 !  set original spectr data
 !
       call check_and_make_para_rj_mode(asbl_param_s%org_mesh_file,      &
-     &    sph_asbl_s%np_sph_org, sph_asbl_s%org_sph_mesh,               &
-     &    sph_org_maker_s)
-      call share_org_sph_rj_data                                        &
-     &   (sph_asbl_s%np_sph_org, sph_asbl_s%org_sph_mesh)
+     &    sph_org_maker_s, sph_asbl_s%org_sph_array)
+      call share_org_sph_rj_data(sph_asbl_s%org_sph_array)
 !
 !  set new spectr data
 !
       call check_and_make_SPH_rj_mode                                   &
-     &   (asbl_param_s%new_mesh_file, sph_asbl_maker_s,                 &
-     &    sph_asbl_s%new_sph_mesh%sph,                                  &
-     &    sph_asbl_s%new_sph_mesh%sph_comms,                            &
-     &    sph_asbl_s%new_sph_mesh%sph_grps)
-      call load_new_spectr_rj_data                                      &
-     &   (sph_asbl_s%np_sph_org, sph_asbl_s%org_sph_mesh,               &
-     &    sph_asbl_s%new_sph_mesh, sph_asbl_s%j_table)
+     &   (asbl_param_s%new_mesh_file, sph_asbl_s%new_sph_data)
+      call load_new_spectr_rj_data(sph_asbl_s%org_sph_array,            &
+     &    sph_asbl_s%new_sph_data, sph_asbl_s%j_table)
 !
 !     Share number of nodes for new mesh
 !
       call s_count_nnod_4_asseble_sph(sph_asbl_s%np_sph_new,            &
-     &    sph_asbl_s%new_sph_mesh, sph_asbl_s%new_fst_IO)
+     &    sph_asbl_s%new_sph_data, sph_asbl_s%new_fst_IO)
       call dealloc_merged_field_stack(sph_asbl_s%new_fst_IO)
 !
 !     construct radial interpolation table
 !
       call const_r_interpolate_table                                    &
-     &   (sph_asbl_s%org_sph_mesh(1), sph_asbl_s%new_sph_mesh,          &
-     &    sph_asbl_s%r_itp)
+     &   (sph_asbl_s%org_sph_array%sph(1),                              &
+     &    sph_asbl_s%new_sph_data%sph, sph_asbl_s%r_itp)
 !
 !      Construct field list from spectr file
 !
-      call load_field_name_assemble_sph                                 &
-     &   (asbl_param_s%istep_start, sph_asbl_s%np_sph_org,              &
-     &    asbl_param_s%org_fld_file, sph_asbl_s%org_sph_phys(1),        &
-     &    sph_asbl_s%new_sph_phys, sph_asbl_s%fst_time_IO)
+      call load_field_name_assemble_sph(asbl_param_s%istep_start,       &
+     &    asbl_param_s%org_fld_file, sph_asbl_s%org_sph_array,          &
+     &    sph_asbl_s%new_sph_data, sph_asbl_s%fst_time_IO)
 !
-      call share_org_spectr_field_names                                 &
-     &   (sph_asbl_s%np_sph_org, sph_asbl_s%org_sph_phys)
-      call share_new_spectr_field_names                                 &
-     &   (sph_asbl_s%new_sph_mesh, sph_asbl_s%new_sph_phys)
+      call share_org_spectr_field_names(sph_asbl_s%org_sph_array)
+      call share_new_spectr_field_names(sph_asbl_s%new_sph_data)
 !
       end subroutine init_compare_sph_restart
 !
@@ -130,10 +119,8 @@
       use compare_by_assemble_sph
 !
       integer(kind = kint) :: istep
-      integer(kind = kint) :: iloop, ip
       integer(kind = kint) :: iflag, iflag_gl
       integer(kind = kint) :: istep_out
-      integer :: irank_new
 !
 !
 !     ---------------------
@@ -142,15 +129,8 @@
      &          asbl_param_s%increment_step
 !
 !     Load original spectr data
-        do iloop = 0, (sph_asbl_s%np_sph_org-1) / nprocs
-          irank_new = int(my_rank + iloop * nprocs)
-          ip = irank_new + 1
-          call load_org_sph_data(irank_new, istep,                      &
-     &        sph_asbl_s%np_sph_org, asbl_param_s%org_fld_file,         &
-     &        sph_asbl_s%org_sph_mesh(ip)%sph, init_t,                  &
-     &        sph_asbl_s%org_sph_phys(ip))
-          call calypso_mpi_barrier
-        end do
+        call load_org_sph_data(istep, asbl_param_s%org_fld_file,        &
+     &                         init_t, sph_asbl_s%org_sph_array)
 !
         istep_out = istep
         if(asbl_param_s%iflag_newtime .gt. 0) then
@@ -162,25 +142,19 @@
 !
         call share_time_step_data(init_t)
 !
-!     Bloadcast original spectr data
-        do ip = 1, sph_asbl_s%np_sph_org
-          call share_each_field_data(ip, sph_asbl_s%org_sph_phys(ip))
-!
 !     Copy spectr data to temporal array
-          call set_assembled_sph_data                                   &
-     &       (sph_asbl_s%org_sph_mesh(ip), sph_asbl_s%new_sph_mesh,     &
-     &        sph_asbl_s%j_table(ip), sph_asbl_s%r_itp,                 &
-     &        sph_asbl_s%org_sph_phys(ip), sph_asbl_s%new_sph_phys)
-          call dealloc_phys_data_type(sph_asbl_s%org_sph_phys(ip))
-        end do
+        call set_assembled_sph_data(sph_asbl_s%org_sph_array%num_pe,    &
+     &      sph_asbl_s%org_sph_array%sph, sph_asbl_s%j_table,           &
+     &      sph_asbl_s%r_itp, sph_asbl_s%org_sph_array%fld,             &
+     &      sph_asbl_s%new_sph_data)
 !
         call sel_read_alloc_step_SPH_file                               &
      &     (nprocs, my_rank, istep_out, asbl_param_s%new_fld_file,      &
      &      sph_asbl_s%fst_time_IO, sph_asbl_s%new_fst_IO)
 !
         iflag = compare_assembled_sph_data(my_rank, init_t,             &
-     &            sph_asbl_s%new_sph_mesh%sph, sph_asbl_s%new_sph_phys, &
-     &            sph_asbl_s%new_fst_IO, sph_asbl_s%fst_time_IO)
+     &        sph_asbl_s%new_sph_data%sph, sph_asbl_s%new_sph_data%fld, &
+     &        sph_asbl_s%new_fst_IO, sph_asbl_s%fst_time_IO)
 !
         call calypso_mpi_allreduce_one_int(iflag, iflag_gl, MPI_MAX)
         if(my_rank.eq.0) then

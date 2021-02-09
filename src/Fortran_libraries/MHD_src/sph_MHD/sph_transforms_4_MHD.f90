@@ -185,8 +185,8 @@
      &         (sph, comms_sph, trans_p, rj_fld, trns_bwd)
 !
       use m_solver_SR
-      use t_sph_transforms
       use set_address_sph_trans_MHD
+      use spherical_transforms
       use spherical_SRs_N
 !
       type(sph_grids), intent(in) :: sph

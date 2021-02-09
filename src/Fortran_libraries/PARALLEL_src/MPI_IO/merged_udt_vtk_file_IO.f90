@@ -8,7 +8,7 @@
 !> @brief Output merged VTK file usgin MPI-IO
 !!
 !!@verbatim
-!!      subroutine init_merged_ucd                                      &
+!!      subroutine init_merged_ucd_element                              &
 !!     &         (iflag_format, node, ele, nod_comm, ucd)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
@@ -55,7 +55,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine init_merged_ucd                                        &
+      subroutine init_merged_ucd_element                                &
      &         (iflag_format, node, ele, nod_comm, ucd)
 !
       use t_geometry_data
@@ -72,11 +72,15 @@
       type(ucd_data), intent(inout) :: ucd
 !
 !
-      call link_nnod_stacks_2_ucd(nprocs, node, ucd)
-      call alloc_merged_ucd_ele_stack(nprocs, ucd)
+      call alloc_merged_ucd_nod_stack(nprocs, ucd)
+      call count_number_of_node_stack(node%numnod,                      &
+     &                                ucd%istack_merged_nod)
+      call count_number_of_node_stack(node%internal_node,               &
+     &                                ucd%istack_merged_intnod)
 !
       ucd%nele = num_internal_element_4_IO                              &
      &         (node%internal_node, ele%numele, ele%nnod_4_ele, ele%ie)
+      call alloc_merged_ucd_ele_stack(nprocs, ucd)
       call count_number_of_node_stack                                   &
      &   (int(ucd%nele), ucd%istack_merged_ele)
 !
@@ -89,7 +93,7 @@
       call allocate_ucd_ele(ucd)
 !
       call set_internal_element_4_IO                                    &
-     &   (nprocs, node%istack_internod, node%numnod,                    &
+     &   (nprocs, ucd%istack_merged_intnod, node%numnod,                &
      &    node%internal_node,  ele%numele, ele%nnod_4_ele, ele%ie,      &
      &    dbl_id1%inod_local, dbl_id1%irank_home,                       &
      &    ucd%nele, ucd%nnod_4_ele, ucd%ie)
@@ -97,7 +101,7 @@
 !
       if(iflag_format .eq. iflag_sgl_hdf5) call parallel_init_hdf5
 !
-      end subroutine init_merged_ucd
+      end subroutine init_merged_ucd_element
 !
 !  ---------------------------------------------------------------------
 !
@@ -111,7 +115,7 @@
 !
       if(iflag_format .eq. iflag_sgl_hdf5) call parallel_finalize_hdf5
 !
-      call unlink_merged_ucd_nod_stack(ucd)
+      call dealloc_merged_ucd_nod_stack(ucd)
       call dealloc_merged_ucd_ele_stack(ucd)
 !
       end subroutine finalize_merged_ucd

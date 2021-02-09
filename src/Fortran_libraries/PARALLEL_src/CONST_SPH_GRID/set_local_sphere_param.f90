@@ -9,24 +9,16 @@
 !!
 !!
 !!@verbatim
-!!      subroutine set_global_sph_rtp_id(s3d_ranks, stk_lc1d, sph_rtp)
-!!      subroutine set_global_sph_prt_id(s3d_ranks, stk_lc1d, sph_rtp)
-!!        type(spheric_global_rank), intent(in) :: s3d_ranks
-!!        type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!!      subroutine set_global_sph_rtp_id(sph_rtp)
+!!      subroutine set_global_sph_prt_id(sph_rtp)
 !!        type(sph_rtp_grid), intent(inout) :: sph_rtp
-!!      subroutine set_global_sph_rj_id(s3d_ranks, stk_lc1d, sph_rj)
-!!        type(spheric_global_rank), intent(in) :: s3d_ranks
-!!        type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!!      subroutine set_global_sph_rj_id(sph_rj)
 !!        type(sph_rj_grid), intent(inout) ::  sph_rj
-!!      subroutine set_global_sph_4_rtm(s3d_ranks, stk_lc1d, sph_rtm)
-!!      subroutine set_global_sph_4_trm(s3d_ranks, stk_lc1d, sph_rtm)
-!!        type(spheric_global_rank), intent(in) :: s3d_ranks
-!!        type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!!      subroutine set_global_sph_4_rtm(sph_rtm)
+!!      subroutine set_global_sph_4_trm(sph_rtm)
 !!        type(sph_rtm_grid), intent(inout) :: sph_rtm
-!!      subroutine set_global_sph_4_rlm(s3d_ranks, stk_lc1d, sph_rlm)
-!!      subroutine set_global_sph_4_lmr(s3d_ranks, stk_lc1d, sph_rlm)
-!!        type(spheric_global_rank), intent(in) :: s3d_ranks
-!!        type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!!      subroutine set_global_sph_4_rlm(sph_rlm)
+!!      subroutine set_global_sph_4_lmr(sph_rlm)
 !!        type(sph_rlm_grid), intent(inout) :: sph_rlm
 !!@endverbatim
 !
@@ -45,23 +37,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_global_sph_rtp_id(s3d_ranks, stk_lc1d, sph_rtp)
+!      subroutine set_global_sph_rtp_id(s3d_ranks, stk_lc1d, sph_rtp)
+      subroutine set_global_sph_rtp_id(sph_rtp)
 !
       use t_spheric_rtp_data
 !
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!      type(spheric_global_rank), intent(in) :: s3d_ranks
+!      type(sph_1d_index_stack), intent(in) :: stk_lc1d
       type(sph_rtp_grid), intent(inout) :: sph_rtp
 !
       integer(kind = kint) :: inod, k, l, m
       integer(kind = kint) :: k_gl, l_gl, m_gl
-      integer(kind = kint) :: ndom_r, ndom_t, nsize_r, nsize_t
+!      integer(kind = kint) :: ndom_r, ndom_t, nsize_r, nsize_t
 !
 !
-      ndom_r = s3d_ranks%ndomain_rtp(1)
-      ndom_t = s3d_ranks%ndomain_rtp(2)
-      nsize_r = stk_lc1d%istack_idx_local_rtp_r(ndom_r)
-      nsize_t = stk_lc1d%istack_idx_local_rtp_t(ndom_t)
+!      ndom_r = s3d_ranks%ndomain_rtp(1)
+!      ndom_t = s3d_ranks%ndomain_rtp(2)
+!      nsize_r = stk_lc1d%istack_idx_local_rtp_r(ndom_r)
+!      nsize_t = stk_lc1d%istack_idx_local_rtp_t(ndom_t)
 !
       inod = 0
       do m = 1, sph_rtp%nidx_rtp(3)
@@ -83,23 +76,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_global_sph_prt_id(s3d_ranks, stk_lc1d, sph_rtp)
+!      subroutine set_global_sph_prt_id(s3d_ranks, stk_lc1d, sph_rtp)
+      subroutine set_global_sph_prt_id(sph_rtp)
 !
       use t_spheric_rtp_data
 !
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!      type(spheric_global_rank), intent(in) :: s3d_ranks
+!      type(sph_1d_index_stack), intent(in) :: stk_lc1d
       type(sph_rtp_grid), intent(inout) :: sph_rtp
 !
       integer(kind = kint) :: inod, k, l, m
       integer(kind = kint) :: k_gl, l_gl, m_gl
-      integer(kind = kint) :: ndom_r, ndom_t, nsize_r, nsize_t
+!      integer(kind = kint) :: ndom_r, ndom_t, nsize_r, nsize_t
 !
 !
-      ndom_r = s3d_ranks%ndomain_rtp(1)
-      ndom_t = s3d_ranks%ndomain_rtp(2)
-      nsize_r = stk_lc1d%istack_idx_local_rtp_r(ndom_r)
-      nsize_t = stk_lc1d%istack_idx_local_rtp_t(ndom_t)
+!      ndom_r = s3d_ranks%ndomain_rtp(1)
+!      ndom_t = s3d_ranks%ndomain_rtp(2)
+!      nsize_r = stk_lc1d%istack_idx_local_rtp_r(ndom_r)
+!      nsize_t = stk_lc1d%istack_idx_local_rtp_t(ndom_t)
 !
       inod = 0
       do l = 1, sph_rtp%nidx_rtp(2)
@@ -122,19 +116,20 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_global_sph_rj_id(s3d_ranks, stk_lc1d, sph_rj)
+!      subroutine set_global_sph_rj_id(s3d_ranks, stk_lc1d, sph_rj)
+      subroutine set_global_sph_rj_id(sph_rj)
 !
       use t_spheric_rj_data
 !
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!      type(spheric_global_rank), intent(in) :: s3d_ranks
+!      type(sph_1d_index_stack), intent(in) :: stk_lc1d
       type(sph_rj_grid), intent(inout) ::  sph_rj
 !
       integer(kind = kint) :: j, k, inod
-      integer(kind = kint) :: ndom_r, nsize_r
+!      integer(kind = kint) :: ndom_r, nsize_r
 !
-      ndom_r =  s3d_ranks%ndomain_rj(1)
-      nsize_r = stk_lc1d%istack_idx_local_rj_r(ndom_r)
+!      ndom_r =  s3d_ranks%ndomain_rj(1)
+!      nsize_r = stk_lc1d%istack_idx_local_rj_r(ndom_r)
 !
       inod = 0
       do k = 1, sph_rj%nidx_rj(1)
@@ -154,22 +149,23 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_global_sph_4_rtm(s3d_ranks, stk_lc1d, sph_rtm)
+!      subroutine set_global_sph_4_rtm(s3d_ranks, stk_lc1d, sph_rtm)
+      subroutine set_global_sph_4_rtm(sph_rtm)
 !
       use t_spheric_rtm_data
 !
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!      type(spheric_global_rank), intent(in) :: s3d_ranks
+!      type(sph_1d_index_stack), intent(in) :: stk_lc1d
       type(sph_rtm_grid), intent(inout) :: sph_rtm
 !
       integer(kind = kint) :: inod, k, l, m
-      integer(kind = kint) :: ndom_r, ndom_t, nsize_r, nsize_t
+!      integer(kind = kint) :: ndom_r, ndom_t, nsize_r, nsize_t
 !
 !
-      ndom_r = s3d_ranks%ndomain_rtm(1)
-      ndom_t = s3d_ranks%ndomain_rtm(2)
-      nsize_r = stk_lc1d%istack_idx_local_rtm_r(ndom_r)
-      nsize_t = stk_lc1d%istack_idx_local_rtm_t(ndom_t)
+!      ndom_r = s3d_ranks%ndomain_rtm(1)
+!      ndom_t = s3d_ranks%ndomain_rtm(2)
+!      nsize_r = stk_lc1d%istack_idx_local_rtm_r(ndom_r)
+!      nsize_t = stk_lc1d%istack_idx_local_rtm_t(ndom_t)
 !
 !$omp parallel private(m)
       do m = 1, sph_rtm%nidx_rtm(3)
@@ -192,22 +188,23 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_global_sph_4_trm(s3d_ranks, stk_lc1d, sph_rtm)
+!      subroutine set_global_sph_4_trm(s3d_ranks, stk_lc1d, sph_rtm)
+      subroutine set_global_sph_4_trm(sph_rtm)
 !
       use t_spheric_rtm_data
 !
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!      type(spheric_global_rank), intent(in) :: s3d_ranks
+!      type(sph_1d_index_stack), intent(in) :: stk_lc1d
       type(sph_rtm_grid), intent(inout) :: sph_rtm
 !
       integer(kind = kint) :: inod, k, l, m
-      integer(kind = kint) :: ndom_r, ndom_t, nsize_r, nsize_t
+!      integer(kind = kint) :: ndom_r, ndom_t, nsize_r, nsize_t
 !
 !
-      ndom_r = s3d_ranks%ndomain_rtm(1)
-      ndom_t = s3d_ranks%ndomain_rtm(2)
-      nsize_r = stk_lc1d%istack_idx_local_rtm_r(ndom_r)
-      nsize_t = stk_lc1d%istack_idx_local_rtm_t(ndom_t)
+!      ndom_r = s3d_ranks%ndomain_rtm(1)
+!      ndom_t = s3d_ranks%ndomain_rtm(2)
+!      nsize_r = stk_lc1d%istack_idx_local_rtm_r(ndom_r)
+!      nsize_t = stk_lc1d%istack_idx_local_rtm_t(ndom_t)
 !
 !$omp parallel private(m,k)
       do m = 1, sph_rtm%nidx_rtm(3)
@@ -231,19 +228,20 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_global_sph_4_rlm(s3d_ranks, stk_lc1d, sph_rlm)
+!      subroutine set_global_sph_4_rlm(s3d_ranks, stk_lc1d, sph_rlm)
+      subroutine set_global_sph_4_rlm(sph_rlm)
 !
       use t_spheric_rlm_data
 !
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!      type(spheric_global_rank), intent(in) :: s3d_ranks
+!      type(sph_1d_index_stack), intent(in) :: stk_lc1d
       type(sph_rlm_grid), intent(inout) :: sph_rlm
 !
       integer(kind = kint) :: j, k, inod
-      integer(kind = kint) :: ndom_r, nsize_r
+!      integer(kind = kint) :: ndom_r, nsize_r
 !
-      ndom_r = s3d_ranks%ndomain_rlm(1)
-      nsize_r = stk_lc1d%istack_idx_local_rlm_r(ndom_r)
+!      ndom_r = s3d_ranks%ndomain_rlm(1)
+!      nsize_r = stk_lc1d%istack_idx_local_rlm_r(ndom_r)
 !
 !$omp parallel do private(j,k,inod)
       do j = 1, sph_rlm%nidx_rlm(2)
@@ -259,20 +257,21 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_global_sph_4_lmr(s3d_ranks, stk_lc1d, sph_rlm)
+!      subroutine set_global_sph_4_lmr(s3d_ranks, stk_lc1d, sph_rlm)
+      subroutine set_global_sph_4_lmr(sph_rlm)
 !
       use t_spheric_rlm_data
 !
-      type(spheric_global_rank), intent(in) :: s3d_ranks
-      type(sph_1d_index_stack), intent(in) :: stk_lc1d
+!      type(spheric_global_rank), intent(in) :: s3d_ranks
+!      type(sph_1d_index_stack), intent(in) :: stk_lc1d
       type(sph_rlm_grid), intent(inout) :: sph_rlm
 !
       integer(kind = kint) :: j, k, inod
-      integer(kind = kint) :: ndom_r, nsize_r
+!      integer(kind = kint) :: ndom_r, nsize_r
 !
 !
-      ndom_r = s3d_ranks%ndomain_rlm(1)
-      nsize_r = stk_lc1d%istack_idx_local_rlm_r(ndom_r)
+!      ndom_r = s3d_ranks%ndomain_rlm(1)
+!      nsize_r = stk_lc1d%istack_idx_local_rlm_r(ndom_r)
 !
 !$omp parallel private(k)
       do k = 1, sph_rlm%nidx_rlm(1)

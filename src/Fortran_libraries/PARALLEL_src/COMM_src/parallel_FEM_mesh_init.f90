@@ -40,23 +40,12 @@
       use t_file_IO_parameter
       use t_read_mesh_data
 !
-      use m_array_for_send_recv
-!
-      use nod_phys_send_recv
       use const_mesh_information
       use const_element_comm_tables
       use mesh_file_name_by_param
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
-!
-!  ------  In itialize data communication for FEM data
-!
-      if (iflag_debug.gt.0 ) write(*,*) 'allocate_vector_for_solver'
-      call allocate_vector_for_solver(n_sym_tensor, mesh%node%numnod)
-!
-      if(iflag_debug.gt.0) write(*,*)' init_nod_send_recv'
-      call init_nod_send_recv(mesh)
 !
 !  -----    construct geometry informations
 !

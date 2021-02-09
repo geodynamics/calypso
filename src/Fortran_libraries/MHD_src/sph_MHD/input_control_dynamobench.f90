@@ -8,17 +8,12 @@
 !!
 !!@verbatim
 !!      subroutine input_control_SPH_dynamobench                        &
-!!     &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,&
-!!     &           rj_fld, nod_fld, MHD_step, MHD_prop, MHD_BC,         &
-!!     &           SPH_WK, cdat, bench)
+!!     &          (MHD_files, bc_IO, DMHD_ctl, SPH_MHD, nod_fld,        &
+!!     &           MHD_step, MHD_prop, MHD_BC,  SPH_WK, cdat, bench)
 !!        type(MHD_file_IO_params), intent(inout) :: MHD_files
 !!        type(sph_sgs_mhd_control), intent(inout) :: MHD_ctl
 !!        type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
-!!        type(sph_grids), intent(inout) :: sph
-!!        type(sph_comm_tables), intent(inout) :: comms_sph
-!!        type(sph_group_data), intent(inout) ::  sph_grps
-!!        type(construct_spherical_grid), intent(inout) :: gen_sph1
-!!        type(phys_data), intent(inout) :: rj_fld
+!!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!        type(phys_data), intent(inout) :: nod_fld
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
@@ -40,6 +35,7 @@
       use t_const_spherical_grid
       use t_MHD_file_parameter
       use t_MHD_step_parameter
+      use t_SPH_mesh_field_array
       use t_spheric_parameter
       use t_mesh_data
       use t_phys_data
@@ -48,17 +44,13 @@
       use t_file_IO_parameter
       use t_sph_boundary_input_data
       use t_bc_data_list
-      use t_check_and_make_SPH_mesh
+      use t_SPH_mesh_field_data
       use t_flex_delta_t_data
       use t_field_4_dynamobench
       use t_work_SPH_MHD
 !
       implicit none
 !
-!>      Structure to construct grid
-      type(sph_grid_maker_in_sim), save :: sph_maker2
-!
-      private :: sph_maker2
       private :: set_ctl_params_dynamobench
 !
 ! ----------------------------------------------------------------------
@@ -68,9 +60,8 @@
 ! ----------------------------------------------------------------------
 !
       subroutine input_control_SPH_dynamobench                          &
-     &          (MHD_files, bc_IO, DMHD_ctl, sph, comms_sph, sph_grps,  &
-     &           rj_fld, nod_fld, MHD_step, MHD_prop, MHD_BC,           &
-     &           SPH_WK, cdat, bench)
+     &          (MHD_files, bc_IO, DMHD_ctl, SPH_MHD, nod_fld,          &
+     &           MHD_step, MHD_prop, MHD_BC,  SPH_WK, cdat, bench)
 !
       use t_ctl_data_MHD
       use t_field_on_circle
@@ -81,11 +72,8 @@
       type(MHD_file_IO_params), intent(inout) :: MHD_files
       type(boundary_spectra), intent(inout) :: bc_IO
       type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
-      type(sph_grids), intent(inout) :: sph
-      type(sph_comm_tables), intent(inout) :: comms_sph
-      type(sph_group_data), intent(inout) ::  sph_grps
+      type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !
-      type(phys_data), intent(inout) :: rj_fld
       type(phys_data), intent(inout) :: nod_fld
       type(MHD_step_param), intent(inout) :: MHD_step
       type(MHD_evolution_param), intent(inout) :: MHD_prop
@@ -100,11 +88,11 @@
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
      &    MHD_files, bc_IO, MHD_step, MHD_prop, MHD_BC,                 &
-     &    SPH_WK%trans_p, SPH_WK%trns_WK, sph_maker2)
+     &    SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
-     &    MHD_prop, sph, rj_fld, nod_fld, SPH_WK%monitor)
+     &    MHD_prop, SPH_MHD%sph, SPH_MHD%fld, nod_fld, SPH_WK%monitor)
 !
       call set_ctl_params_dynamobench                                   &
      &   (DMHD_ctl%model_ctl%fld_ctl%field_ctl,                         &
@@ -112,10 +100,10 @@
      &    bench)
 !
       if (iflag_debug.eq.1) write(*,*) 'load_sph_mesh'
-      call load_sph_mesh(MHD_files%sph_file_param,                      &
-     &                   sph, comms_sph, sph_grps)
+      call check_and_make_SPH_mesh(MHD_files%sph_file_param, SPH_MHD)
       if (iflag_debug.gt.0) write(*,*) 'sph_index_flags_and_params'
-      call sph_index_flags_and_params(sph_grps, sph, comms_sph)
+      call sph_index_flags_and_params                                   &
+     &   (SPH_MHD%groups, SPH_MHD%sph, SPH_MHD%comms)
 !
       call dealloc_sph_mhd_ctl_data(DMHD_ctl)
 !
@@ -161,7 +149,7 @@
 !
       d_circle%num_phys = bench%ibench_velo + bench%ibench_temp         &
      &                   + bench%ibench_magne
-      call alloc_phys_name_type(d_circle)
+      call alloc_phys_name(d_circle)
 !
       ifld = 0
       if(bench%ibench_temp .gt. 0) then

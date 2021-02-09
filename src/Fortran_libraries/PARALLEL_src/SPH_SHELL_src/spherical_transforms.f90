@@ -1,5 +1,5 @@
-!>@file   t_sph_transforms.f90
-!!@brief  module t_sph_transforms
+!>@file   spherical_transforms.f90
+!!@brief  module spherical_transforms
 !!
 !!@author H. Matsui
 !!@date Programmed in Aug., 2007
@@ -41,7 +41,7 @@
 !!
 !!@param ncomp_trans Number of components for transform
 !
-      module t_sph_transforms
+      module spherical_transforms
 !
       use m_precision
 !
@@ -59,14 +59,6 @@
       use t_sph_FFT_selector
 !
       implicit none
-!
-!>      Work structures for various spherical harmonics trasform
-      type spherical_trns_works
-!>        Work structures for various Legendre trasform
-        type(legendre_trns_works) :: WK_leg
-!>        Structure for work area of FFTs
-        type(work_for_FFTs) :: WK_FFTs
-      end type spherical_trns_works
 !
 ! -----------------------------------------------------------------------
 !
@@ -290,4 +282,4 @@
 !
 ! -----------------------------------------------------------------------
 !
-      end module t_sph_transforms
+      end module spherical_transforms

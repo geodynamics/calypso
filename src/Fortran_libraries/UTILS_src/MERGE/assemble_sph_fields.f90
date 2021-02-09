@@ -7,22 +7,19 @@
 !>@brief routines for parallel spectr data assemble
 !!
 !!@verbatim
-!!      subroutine share_org_sph_rj_data(np_sph_org, org_sph_mesh)
-!!        type(sph_mesh_data), intent(inout) :: org_sph_mesh(np_sph_org)
-!!      subroutine share_org_spectr_field_names                         &
-!!     &         (np_sph_org, org_sph_phys)
-!!        type(phys_data), intent(inout) :: org_sph_phys(np_sph_org)
-!!      subroutine share_new_spectr_field_names                         &
-!!     &         (np_sph_new, new_sph_mesh, new_sph_phys)
-!!        type(sph_mesh_data), intent(in) :: new_sph_mesh
-!!        type(phys_data), intent(inout) :: new_sph_phys
+!!      subroutine share_org_sph_rj_data(org_sph_array)
+!!        type(sph_mesh_array), intent(inout) :: org_sph_array
+!!      subroutine share_org_spectr_field_names(org_sph_array)
+!!        type(sph_mesh_array), intent(inout) :: org_sph_array
+!!      subroutine share_new_spectr_field_names(new_sph_data)
+!!        type(SPH_mesh_field_data), intent(inout) :: new_sph_data
 !!
-!!      subroutine load_new_spectr_rj_data(np_sph_org, org_sph_mesh,    &
-!!     &                                   new_sph_mesh, j_table)
-!!        type(sph_mesh_data), intent(in) :: org_sph_mesh(np_sph_org)
-!!        type(sph_mesh_data), intent(in) :: new_sph_mesh
+!!      subroutine load_new_spectr_rj_data                              &
+!!     &         (org_sph_array, new_sph_data, j_table)
+!!        type(sph_mesh_array), intent(in) :: org_sph_array
+!!        type(SPH_mesh_field_data), intent(in) :: new_sph_data
 !!        type(rj_assemble_tbl), intent(inout)                          &
-!!       &                             :: j_table(np_sph_org,np_sph_new)
+!!     &                      :: j_table(org_sph_array%num_pe)
 !!
 !!      subroutine extend_potential_magne(sph, r_itp, sph_phys)
 !!      subroutine extend_inner_core_scalar                             &
@@ -40,6 +37,7 @@
       use calypso_mpi
 !
       use t_sph_spectr_data
+      use t_SPH_mesh_field_array
       use t_SPH_mesh_field_data
 !
       implicit none
@@ -53,78 +51,73 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine share_org_sph_rj_data(np_sph_org, org_sph_mesh)
+      subroutine share_org_sph_rj_data(org_sph_array)
 !
       use share_spectr_index_data
 !
-      integer, intent(in) :: np_sph_org
-      type(sph_mesh_data), intent(inout) :: org_sph_mesh(np_sph_org)
+      type(sph_mesh_array), intent(inout) :: org_sph_array
 !
-      integer(kind = kint) :: ip
+      integer :: ip
 !
 !
-      do ip = 1, np_sph_org
-        call share_sph_rj_data(ip, org_sph_mesh(ip))
+      do ip = 1, org_sph_array%num_pe
+        call share_sph_rj_data(ip, org_sph_array%sph(ip))
       end do
 !
       end subroutine share_org_sph_rj_data
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine share_org_spectr_field_names                           &
-     &         (np_sph_org, org_sph_phys)
+      subroutine share_org_spectr_field_names(org_sph_array)
 !
       use share_field_data
 !
-      integer, intent(in) :: np_sph_org
-      type(phys_data), intent(inout) :: org_sph_phys(np_sph_org)
+      type(sph_mesh_array), intent(inout) :: org_sph_array
 !
-      integer(kind = kint) :: ip
+      integer :: ip
 !
 !
-      do ip = 1, np_sph_org
-        call share_phys_field_names(org_sph_phys(ip))
+      do ip = 1, org_sph_array%num_pe
+        call share_phys_field_names(org_sph_array%fld(ip))
       end do
 !
       end subroutine share_org_spectr_field_names
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine share_new_spectr_field_names                           &
-     &         (new_sph_mesh, new_sph_phys)
+      subroutine share_new_spectr_field_names(new_sph_data)
 !
       use share_field_data
 !
-      type(sph_mesh_data), intent(in) :: new_sph_mesh
-      type(phys_data), intent(inout) :: new_sph_phys
+      type(SPH_mesh_field_data), intent(inout) :: new_sph_data
 !
 !
-      call share_phys_field_names(new_sph_phys)
-      call alloc_phys_data_type                                         &
-     &   (new_sph_mesh%sph%sph_rj%nnod_rj, new_sph_phys)
+      call share_phys_field_names(new_sph_data%fld)
+      call alloc_phys_data(new_sph_data%sph%sph_rj%nnod_rj,             &
+     &                     new_sph_data%fld)
 !
       end subroutine share_new_spectr_field_names
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine load_new_spectr_rj_data(np_sph_org, org_sph_mesh,      &
-     &                                   new_sph_mesh, j_table)
+      subroutine load_new_spectr_rj_data                                &
+     &         (org_sph_array, new_sph_data, j_table)
 !
       use parallel_assemble_sph
 !
-      integer, intent(in) :: np_sph_org
-      type(sph_mesh_data), intent(in) :: org_sph_mesh(np_sph_org)
-      type(sph_mesh_data), intent(in) :: new_sph_mesh
-      type(rj_assemble_tbl), intent(inout) :: j_table(np_sph_org)
+      type(sph_mesh_array), intent(in) :: org_sph_array
+      type(SPH_mesh_field_data), intent(in) :: new_sph_data
+      type(rj_assemble_tbl), intent(inout)                              &
+     &                      :: j_table(org_sph_array%num_pe)
 !
-      integer(kind = kint) :: iproc
+      integer :: ip
 !
 !     Construct mode transfer table
-      do iproc = 1, np_sph_org
+      do ip = 1, org_sph_array%num_pe
         call alloc_each_mode_tbl_4_assemble                             &
-     &     (org_sph_mesh(iproc)%sph, j_table(iproc))
-        call set_mode_table_4_assemble(org_sph_mesh(iproc)%sph,         &
-     &      new_sph_mesh%sph, j_table(iproc))
+     &     (org_sph_array%sph(ip), j_table(ip))
+        call set_mode_table_4_assemble(org_sph_array%sph(ip),           &
+     &      new_sph_data%sph, j_table(ip))
       end do
 !
       end subroutine load_new_spectr_rj_data

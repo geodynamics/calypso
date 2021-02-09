@@ -8,16 +8,11 @@
 !!@verbatim
 !!      subroutine load_sph_mesh                                        &
 !!     &         (sph_file_param, sph, comms_sph, sph_grps)
+!!      subroutine load_sph_rj_mesh                                     &
+!!     &         (sph_file_param, sph, comms_sph, sph_grps)
 !!        type(field_IO_params), intent(in) ::  sph_file_param
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(sph_comm_tables), intent(inout) :: comms_sph
-!!        type(sph_group_data), intent(inout) ::  sph_grps
-!!      subroutine load_sph_rj_mesh                                     &
-!!     &         (sph_file_param, sph_params, sph_rj, comm_rj, sph_grps)
-!!        type(field_IO_params), intent(in) :: sph_file_param
-!!        type(sph_shell_parameters), intent(inout) :: sph_params
-!!        type(sph_rj_grid), intent(inout) :: sph_rj
-!!        type(sph_comm_tbl), intent(inout) :: comm_rj
 !!        type(sph_group_data), intent(inout) ::  sph_grps
 !!
 !!      subroutine output_sph_mesh                                      &
@@ -120,14 +115,13 @@
 ! -----------------------------------------------------------------------
 !
       subroutine load_sph_rj_mesh                                       &
-     &         (sph_file_param, sph_params, sph_rj, comm_rj, sph_grps)
+     &         (sph_file_param, sph, comms_sph, sph_grps)
 !
       use load_data_for_sph_IO
 !
       type(field_IO_params), intent(in) :: sph_file_param
-      type(sph_shell_parameters), intent(inout) :: sph_params
-      type(sph_rj_grid), intent(inout) :: sph_rj
-      type(sph_comm_tbl), intent(inout) :: comm_rj
+      type(sph_grids), intent(inout) :: sph
+      type(sph_comm_tables), intent(inout) :: comms_sph
       type(sph_group_data), intent(inout) ::  sph_grps
 !
 !
@@ -135,7 +129,7 @@
       call sel_mpi_read_spectr_rj_file                                  &
      &   (nprocs, my_rank, sph_file_param, sph_file_l)
       call copy_sph_trans_rj_from_IO(sph_file_l,                        &
-     &    sph_rj, comm_rj, sph_grps, sph_params)
+     &    sph%sph_rj, comms_sph%comm_rj, sph_grps, sph%sph_params)
       call dealloc_rj_mode_IO(sph_file_l)
 !
       end subroutine load_sph_rj_mesh

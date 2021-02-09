@@ -52,7 +52,7 @@
       integer(kind = kint) :: i
 !
       do i = 1, num_psf
-        call dealloc_phys_name_type(psf_mesh(i)%field)
+        call dealloc_phys_name(psf_mesh(i)%field)
       end do
 !
       end subroutine dealloc_psf_field_name
@@ -95,7 +95,7 @@
       end do
 !
       do i = 1, num_psf
-        call alloc_phys_name_type(psf_mesh(i)%field)
+        call alloc_phys_name(psf_mesh(i)%field)
         call set_control_4_psf                                          &
      &     (psf_ctls%psf_ctl_struct(i), group%ele_grp, group%surf_grp,  &
      &      nod_fld%num_phys, nod_fld%phys_name,                        &
@@ -151,7 +151,7 @@
       end do
 !
       do i = 1, num_iso
-        call alloc_phys_name_type(iso_mesh(i)%field)
+        call alloc_phys_name(iso_mesh(i)%field)
         call set_control_4_iso(iso_ctls%iso_ctl_struct(i),              &
      &      group%ele_grp, nod_fld%num_phys, nod_fld%phys_name,         &
      &      iso_mesh(i)%field, iso_param(i), iso_def(i))

@@ -15,6 +15,8 @@
 !!      subroutine link_field_data_to_ucd(node, phys_nod, ucd)
 !!      subroutine link_nnod_stacks_2_ucd(num_pe, node, ucd)
 !!      subroutine link_nele_stacks_2_ucd(num_pe, ele, ucd)
+!!        type(node_data), intent(in) :: node
+!!        type(element_data), intent(in) :: ele
 !!        type(ucd_data), intent(inout) :: ucd
 !!
 !!      subroutine alloc_phys_name_type_by_output(ucd, phys_nod)
@@ -174,7 +176,7 @@
       phys_nod%num_phys =     ucd%num_field
       phys_nod%num_phys_viz = ucd%num_field
 !
-      call alloc_phys_name_type(phys_nod)
+      call alloc_phys_name(phys_nod)
 !
       phys_nod%num_component(1:phys_nod%num_phys)                       &
      &           = ucd%num_comp(1:phys_nod%num_phys)
@@ -198,7 +200,7 @@
 !
 !
       call alloc_phys_name_type_by_output(ucd, phys_nod)
-      call alloc_phys_data_type(node%numnod, phys_nod)
+      call alloc_phys_data(node%numnod, phys_nod)
 !
       end subroutine alloc_phys_data_type_by_output
 !
