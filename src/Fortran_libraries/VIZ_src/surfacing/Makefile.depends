@@ -120,8 +120,6 @@ t_psf_geometry_list.o: $(PSF_SECTION_DIR)/t_psf_geometry_list.f90 m_precision.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 t_psf_patch_data.o: $(PSF_SECTION_DIR)/t_psf_patch_data.f90 m_precision.o t_geometry_data.o t_phys_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_psf_results.o: $(PSF_SECTION_DIR)/t_psf_results.f90 m_precision.o m_field_file_format.o t_geometry_data.o t_phys_data.o t_time_data.o t_ucd_data.o t_file_IO_parameter.o set_ucd_data_to_type.o ucd_IO_select.o m_geometry_constants.o m_phys_constants.o cal_mesh_position.o
-	$(F90) -c $(F90OPTFLAGS) $<
 t_viz_sections.o: $(PSF_SECTION_DIR)/t_viz_sections.f90 m_precision.o m_machine_parameter.o m_work_time.o m_elapsed_labels_4_VIZ.o calypso_mpi.o t_VIZ_step_parameter.o t_time_data.o t_mesh_data.o t_phys_data.o t_cross_section.o t_isosurface.o t_control_data_surfacings.o
 	$(F90) -c $(F90OPTFLAGS) $<
 

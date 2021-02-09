@@ -31,7 +31,7 @@
 !!      control block for pickup spherical harmonics
 !!
 !!
-!!    array volume_spectrum_ctl      2
+!!    array volume_spectrum_ctl
 !!      begin volume_spectrum_ctl
 !!        volume_average_prefix        'sph_ave_convective'
 !!        volume_pwr_spectr_prefix     'sph_pwr_convective'
@@ -87,7 +87,7 @@
 !
 !
       type volume_spectr_control
-!>        filew name for volume average
+!>        filew name for volume mean square
         type(read_character_item) :: volume_spec_file_ctl
 !>        filew name for volume average
         type(read_character_item) :: volume_ave_file_ctl

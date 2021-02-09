@@ -22,7 +22,7 @@
 !!
 !!    nusselt_number_prefix        'Nusselt'
 !!!
-!!    array volume_spectrum_ctl      2
+!!    array volume_spectrum_ctl
 !!      ...
 !!    end array volume_spectrum_ctl
 !!

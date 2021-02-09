@@ -7,14 +7,10 @@
 !> @brief Time spectrum data IO for utilities
 !!
 !!@verbatim
-!!      integer(kind = kint) function  read_volume_pwr_sph              &
-!!     &                            (id_file, sph_IN)
-!!      integer(kind = kint) function  read_volume_spectr_sph           &
-!!     &                            (id_file, sph_IN)
-!!      integer(kind = kint) function  read_layer_pwr_sph               &
-!!     &                            (id_file, sph_IN)
-!!      integer(kind = kint) function  read_layer_spectr_sph            &
-!!     &                            (id_file, sph_IN)
+!!      subroutine read_volume_pwr_sph(id_file, sph_IN, ierr)
+!!      subroutine read_volume_spectr_sph(id_file, sph_IN, ierr)
+!!      subroutine read_layer_pwr_sph(id_file, sph_IN, ierr)
+!!      subroutine read_layer_spectr_sph(id_file, sph_IN, ierr)
 !!        type(read_sph_spectr_data), intent(inout) :: sph_IN
 !!
 !!      subroutine write_vol_sph_data(id_file, sph_IN)
@@ -23,10 +19,8 @@
 !!      subroutine write_layer_spectr_data(id_file, sph_IN)
 !!        type(read_sph_spectr_data), intent(in) :: sph_IN
 !!
-!!      integer(kind = kint) function  read_layer_pwr_sph_old           &
-!!     &                            (id_file, sph_IN)
-!!      integer(kind = kint) function  read_layer_spectr_sph_old        &
-!!     &                            (id_file, sph_IN)
+!!      subroutine  read_layer_pwr_sph_old(id_file, sph_IN, ierr)
+!!      subroutine  read_layer_spectr_sph_old(id_file, sph_IN, ierr)
 !!        type(read_sph_spectr_data), intent(inout) :: sph_IN
 !!@endverbatim
 !
@@ -45,36 +39,36 @@
 !
 !   --------------------------------------------------------------------
 !
-      integer(kind = kint) function  read_volume_pwr_sph                &
-     &                            (id_file, sph_IN)
+      subroutine read_volume_pwr_sph(id_file, sph_IN, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
       type(read_sph_spectr_data), intent(inout) :: sph_IN
+      integer(kind = kint), intent(inout) :: ierr
 !
 !
-      read_volume_pwr_sph = 0
+      ierr = 0
       read(id_file,*,err=99,end=99) sph_IN%i_step, sph_IN%time,         &
      &             sph_IN%spectr_IO(1:sph_IN%ntot_sph_spec,0,1)
       return
 !
    99 continue
-      read_volume_pwr_sph = 1
+      ierr = 1
       return
 !
-      end function read_volume_pwr_sph
+      end subroutine read_volume_pwr_sph
 !
 !   --------------------------------------------------------------------
 !
-      integer(kind = kint) function  read_volume_spectr_sph             &
-     &                            (id_file, sph_IN)
+      subroutine read_volume_spectr_sph(id_file, sph_IN, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
       type(read_sph_spectr_data), intent(inout) :: sph_IN
+      integer(kind = kint), intent(inout) :: ierr
 !
       integer(kind = kint) :: itmp, lth
 !
 !
-      read_volume_spectr_sph = 0
+      ierr = 0
       do lth = 0, sph_IN%ltr_sph
         read(id_file,*,err=99,end=99) sph_IN%i_step, sph_IN%time, itmp, &
      &               sph_IN%spectr_IO(1:sph_IN%ntot_sph_spec,lth,1)
@@ -82,23 +76,23 @@
       return
 !
    99 continue
-      read_volume_spectr_sph = 1
+      ierr = 1
       return
 !
-      end function read_volume_spectr_sph
+      end subroutine read_volume_spectr_sph
 !
 !   --------------------------------------------------------------------
 !
-      integer(kind = kint) function  read_layer_pwr_sph                 &
-     &                            (id_file, sph_IN)
+      subroutine read_layer_pwr_sph(id_file, sph_IN, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
       type(read_sph_spectr_data), intent(inout) :: sph_IN
+      integer(kind = kint), intent(inout) :: ierr
 !
       integer(kind = kint) :: kr
 !
 !
-      read_layer_pwr_sph = 0
+      ierr = 0
       do kr = 1, sph_IN%nri_sph
         read(id_file,*,err=99,end=99) sph_IN%i_step, sph_IN%time,       &
      &      sph_IN%kr_sph(kr), sph_IN%r_sph(kr),                        &
@@ -107,23 +101,23 @@
       return
 !
    99 continue
-      read_layer_pwr_sph = 1
+      ierr = 1
       return
 !
-      end function read_layer_pwr_sph
+      end subroutine read_layer_pwr_sph
 !
 !   --------------------------------------------------------------------
 !
-      integer(kind = kint) function  read_layer_spectr_sph              &
-     &                            (id_file, sph_IN)
+      subroutine read_layer_spectr_sph(id_file, sph_IN, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
       type(read_sph_spectr_data), intent(inout) :: sph_IN
+      integer(kind = kint), intent(inout) :: ierr
 !
       integer(kind = kint) :: kr, itmp, lth
 !
 !
-      read_layer_spectr_sph = 0
+      ierr = 0
       do kr = 1, sph_IN%nri_sph
         do lth = 0, sph_IN%ltr_sph
           read(id_file,*,err=99,end=99) sph_IN%i_step, sph_IN%time,     &
@@ -134,10 +128,10 @@
       return
 !
    99 continue
-      read_layer_spectr_sph = 1
+      ierr = 1
       return
 !
-      end function read_layer_spectr_sph
+      end subroutine read_layer_spectr_sph
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
@@ -222,16 +216,16 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      integer(kind = kint) function  read_layer_pwr_sph_old             &
-     &                            (id_file, sph_IN)
+      subroutine  read_layer_pwr_sph_old(id_file, sph_IN, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
       type(read_sph_spectr_data), intent(inout) :: sph_IN
+      integer(kind = kint), intent(inout) :: ierr
 !
       integer(kind = kint) :: kr
 !
 !
-      read_layer_pwr_sph_old = 0
+      ierr = 0
       do kr = 1, sph_IN%nri_sph
         read(id_file,*,err=99,end=99)                                   &
      &      sph_IN%i_step, sph_IN%time, sph_IN%kr_sph(kr),              &
@@ -240,23 +234,23 @@
       return
 !
    99 continue
-      read_layer_pwr_sph_old = 1
+      ierr = 1
       return
 !
-      end function read_layer_pwr_sph_old
+      end subroutine read_layer_pwr_sph_old
 !
 !   --------------------------------------------------------------------
 !
-      integer(kind = kint) function  read_layer_spectr_sph_old          &
-     &                            (id_file, sph_IN)
+      subroutine  read_layer_spectr_sph_old(id_file, sph_IN, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
       type(read_sph_spectr_data), intent(inout) :: sph_IN
+      integer(kind = kint), intent(inout) :: ierr
 !
       integer(kind = kint) :: kr, itmp, lth
 !
 !
-      read_layer_spectr_sph_old = 0
+      ierr = 0
       do kr = 1, sph_IN%nri_sph
         do lth = 0, sph_IN%ltr_sph
           read(id_file,*,err=99,end=99) sph_IN%i_step, sph_IN%time,     &
@@ -267,10 +261,10 @@
       return
 !
    99 continue
-      read_layer_spectr_sph_old = 1
+      ierr = 1
       return
 !
-      end function read_layer_spectr_sph_old
+      end subroutine read_layer_spectr_sph_old
 !
 !   --------------------------------------------------------------------
 !

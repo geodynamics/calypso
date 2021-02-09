@@ -3,13 +3,29 @@
 !
 !        programmed by H.Matsui on Dec., 2012
 !
+!! -----------------------------------------------------------------
+!!    Input control file:  control_sph_time_average
+!!
+!!  begin time_averaging_sph_monitor
+!!    start_time_ctl     1.0
+!!    end_time_ctl       2.0
+!!
+!!    picked_sph_prefix        'picked_mode'
+!!  end time_averaging_sph_monitor
+!! -----------------------------------------------------------------
+!
       program tave_picked_sph_spec_data
 !
       use m_precision
       use m_constants
+!
       use t_picked_sph_spectr_data_IO
+      use t_ctl_data_tave_sph_monitor
 !
       implicit  none
+!
+!>      Structure for control data
+      type(tave_sph_monitor_ctl), save :: tave_sph_ctl1
 !
       type(picked_spectrum_data_IO), save :: pick_IO
 !
@@ -29,15 +45,32 @@
       real(kind = kreal) :: start_time, end_time, true_start
 !
 !
-      write(*,*) 'Input picked spectr evolution file header'
-      read(5,*) evo_header
+      call read_control_file_psf_compare(0, tave_sph_ctl1)
+!
+      if(tave_sph_ctl1%picked_mode_head_ctl%iflag .eq. 0) then
+        write(*,*) 'Set File prefix for Gauss coefficients'
+        stop
+      end if
+      evo_header = tave_sph_ctl1%picked_mode_head_ctl%charavalue
+!
+      if(tave_sph_ctl1%start_time_ctl%iflag .eq. 0) then
+        write(*,*) 'Set start time'
+        stop
+      end if
+      start_time = tave_sph_ctl1%start_time_ctl%realvalue
+!
+      if(tave_sph_ctl1%end_time_ctl%iflag .eq. 0) then
+        write(*,*) 'Set end time'
+        stop
+      end if
+      end_time = tave_sph_ctl1%end_time_ctl%realvalue
+!
 !
       write(tave_header,'(a6,a)') 't_ave_', trim(evo_header)
       write(trms_header,'(a8,a)') 't_rms_', trim(evo_header)
       write(sdev_header,'(a8,a)') 't_sigma_', trim(evo_header)
 !
-      write(*,*) 'Input start and end time'
-      read(5,*) start_time, end_time
+!      Open picked mode file
 !
       call open_sph_spec_read(id_pick, evo_header, pick_IO)
 !

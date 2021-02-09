@@ -15,8 +15,6 @@
 !!      subroutine copy_read_ene_step_data(sph_IN, sph_OUT)
 !!      subroutine copy_ene_spectr_data_to_IO(nri_sph, ltr_sph, ncomp,  &
 !!     &          spectr_l, sph_OUT)
-!!
-!!      subroutine select_sph_ene_spec_data_file(sph_IN, input_header)
 !!@endverbatim
 !
       module t_read_sph_spectra
@@ -28,10 +26,6 @@
 !
 !
       type read_sph_spectr_data
-        integer(kind = kint) :: iflag_vol_ave
-        integer(kind = kint) :: iflag_spectr
-        integer(kind = kint) :: iflag_old_fmt
-!
         integer(kind = kint) :: nfield_sph_spec
         integer(kind = kint) :: ntot_sph_spec
         integer(kind = kint) :: num_time_labels
@@ -114,8 +108,6 @@
 !
       integer(kind = kint) :: i
 !
-      sph_OUT%iflag_vol_ave = sph_IN%iflag_vol_ave
-      sph_OUT%iflag_old_fmt = 0
       sph_OUT%ltr_sph = sph_IN%ltr_sph
       sph_OUT%nri_sph = sph_IN%nri_sph
       sph_OUT%kr_ICB = sph_IN%kr_ICB
@@ -187,29 +179,6 @@
       end subroutine copy_ene_spectr_data_to_IO
 !
 !   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine select_sph_ene_spec_data_file(sph_IN, input_header)
-!
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
-      character(len = kchara), intent(inout) :: input_header
-!
-!
-      write(*,*) ' Choose data type to take average'
-      write(*,*)  ' 0: spectrum on each layer  '
-      write(*,*)  ' 1: volume average spectrum '
-      read(*,*) sph_IN%iflag_vol_ave
-!
-      write(*,*) ' Is data has old format?'
-      write(*,*)  ' 1: yes '
-      write(*,*)  ' 0: no  '
-      read(*,*) sph_IN%iflag_old_fmt
-!
-      write(*,*) 'enter file header for averaging'
-      read(*,*) input_header
-!
-      end subroutine select_sph_ene_spec_data_file
-!
 !   --------------------------------------------------------------------
 !
       end module t_read_sph_spectra

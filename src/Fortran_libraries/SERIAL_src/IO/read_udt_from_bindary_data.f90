@@ -73,7 +73,6 @@
       type(ucd_data), intent(inout) :: ucd_b
       type(binary_IO_buffer), intent(inout) :: bbuf
 !
-      integer :: nprocs2
       integer(kind = kint) :: num_field, ntot_comp
 !
 !
@@ -106,8 +105,6 @@
       integer(kind = kint_gl), intent(inout) :: itmp1_mp(nprocs)
       type(ucd_data), intent(inout) :: ucd_b
       type(binary_IO_buffer), intent(inout) :: bbuf
-!
-      integer :: nprocs2
 !
 !
       call read_psf_phys_num_bin                                        &

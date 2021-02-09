@@ -3,16 +3,32 @@
 !
 !        programmed by H.Matsui on Apr., 2014
 !
+!
+!! -----------------------------------------------------------------
+!!    Input control file:  control_sph_time_average
+!!
+!!  begin time_averaging_sph_monitor
+!!    start_time_ctl     1.0
+!!    end_time_ctl       2.0
+!!
+!!    nusselt_number_prefix        'Nusselt'
+!!  end time_averaging_sph_monitor
+!! -----------------------------------------------------------------
+!
+
       program t_average_nusselt
 !
       use m_precision
       use m_constants
 !
       use t_no_heat_Nusselt
+      use t_ctl_data_tave_sph_monitor
 !
       implicit  none
 !
+      type(tave_sph_monitor_ctl), save :: tave_sph_ctl1
       type(nusselt_number_data), save :: Nu_t
+!
       real(kind = kreal) :: prev_Nu(2)
       real(kind = kreal) :: ave_Nu(2)
       real(kind = kreal) :: sdev_Nu(2)
@@ -31,10 +47,29 @@
       write(*,*) '-----------------------------------------------'
       write(*,*) ''
       write(*,*) 'Input picked harmonics coefficients file prefix'
-      read(5,*) Nu_t%Nusselt_file_head
 !
-      write(*,*) 'Input start and end time'
-      read(5,*) start_time, end_time
+      call read_control_file_psf_compare(0, tave_sph_ctl1)
+!
+      if(tave_sph_ctl1%Nusselt_file_prefix%iflag .eq. 0) then
+        write(*,*) 'Set File prefix for Nusselt number'
+        stop
+      end if
+      Nu_t%Nusselt_file_head                                            &
+     &      = tave_sph_ctl1%Nusselt_file_prefix%charavalue
+!
+      if(tave_sph_ctl1%start_time_ctl%iflag .eq. 0) then
+        write(*,*) 'Set start time'
+        stop
+      end if
+      start_time = tave_sph_ctl1%start_time_ctl%realvalue
+!
+      if(tave_sph_ctl1%end_time_ctl%iflag .eq. 0) then
+        write(*,*) 'Set end time'
+        stop
+      end if
+      end_time = tave_sph_ctl1%end_time_ctl%realvalue
+!
+!       Open Nusselt data file
 !
       call open_read_no_heat_source_Nu(id_pick, Nu_t)
 !
@@ -43,6 +78,7 @@
       icou = 0
       time = start_time
       prev_time = start_time
+      ave_Nu(1:2) = 0.0d0
       write(*,'(a5,i12,a30,i12)',advance="NO")                          &
      &       'step= ', i_step,  ' averaging finished. Count=  ', icou
       do
@@ -87,6 +123,7 @@
       icou = 0
       time = start_time
       prev_time = start_time
+      sdev_Nu(1:2) = 0.0d0
       do
         call read_no_heat_source_Nu                                     &
      &     (id_pick, i_step, time, Nu_t, ierr)
