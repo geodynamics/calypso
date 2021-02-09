@@ -10,7 +10,7 @@ begin MHD_control
     debug_flag_ctl            'OFF'
     num_subdomain_ctl            6
 !
-    sph_file_prefix             'ascii/in'
+    sph_file_prefix             'ascii/mesh/in'
     sph_file_fmt_ctl            'ascii'
   end data_files_def
 !
