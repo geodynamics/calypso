@@ -118,7 +118,6 @@
       call deallocate_surface_geom_type(geofem%mesh%surf)
       call dealloc_edge_geometory(geofem%mesh%edge)
 !
-!  -------------------------------
       end subroutine FEM_initialize_sph_MHD
 !
 !-----------------------------------------------------------------------

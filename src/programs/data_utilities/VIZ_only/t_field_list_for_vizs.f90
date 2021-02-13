@@ -7,8 +7,8 @@
 !>@brief Field list for visualization
 !!
 !!@verbatim
-!!      subroutine set_viz_field_list_control(viz_field_ctl,            &
-!!     &                                      viz_fld_list)
+!!      subroutine init_viz_field_list_control(viz_field_ctl,           &
+!!     &                                       viz_fld_list)
 !!      subroutine dealloc_field_lists_for_vizs(viz_fld_list)
 !!        type(ctl_array_c3), intent(in) :: viz_field_ctl
 !!        type(visulize_field_list), intent(inout) :: viz_fld_list
@@ -39,8 +39,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_viz_field_list_control(viz_field_ctl,              &
-     &                                      viz_fld_list)
+      subroutine init_viz_field_list_control(viz_field_ctl,             &
+     &                                       viz_fld_list)
 !
       use t_control_array_character3
 !
@@ -54,7 +54,7 @@
       viz_fld_list%field_name(1:viz_fld_list%num_field)                 &
      &    = viz_field_ctl%c1_tbl(1:viz_fld_list%num_field)
 !
-      end subroutine set_viz_field_list_control
+      end subroutine init_viz_field_list_control
 !
 ! ----------------------------------------------------------------------
 !

@@ -10,7 +10,8 @@
 !!@verbatim
 !!      subroutine dealloc_mesh_infos_w_normal(mesh, group)
 !!      subroutine dealloc_mesh_infomations(mesh, group)
-!!      subroutine dealloc_nod_ele_infos(mesh, group)
+!!      subroutine dealloc_nod_ele_infos(mesh)
+!!      subroutine dealloc_mesh_smp_stack(mesh, group)
 !!      subroutine dealloc_mesh_data(mesh, group)
 !!
 !!      subroutine dealloc_mesh_type(mesh)
@@ -105,6 +106,7 @@
       call dealloc_vect_surf_grp_nod(group%surf_nod_grp)
 !
       call dealloc_mesh_infomations(mesh, group)
+      call dealloc_mesh_smp_stack(mesh, group)
       call dealloc_mesh_data(mesh, group)
 !
       end subroutine dealloc_mesh_infos_w_normal
@@ -141,13 +143,28 @@
       call deallocate_surface_connect_type(mesh%surf)
       call dealloc_ele_4_surf_type(mesh%surf)
 !
-      call dealloc_nod_ele_infos(mesh, group)
+      call dealloc_nod_ele_infos(mesh)
 !
       end subroutine dealloc_mesh_infomations
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_nod_ele_infos(mesh, group)
+      subroutine dealloc_nod_ele_infos(mesh)
+!
+      type(mesh_geometry), intent(inout) :: mesh
+!
+!
+      call dealloc_inod_in_edge(mesh%edge)
+      call dealloc_inod_in_surf(mesh%surf)
+!
+      call dealloc_overlapped_ele(mesh%ele)
+      call dealloc_ele_geometry(mesh%ele)
+!
+      end subroutine dealloc_nod_ele_infos
+!
+! ----------------------------------------------------------------------
+!
+      subroutine dealloc_mesh_smp_stack(mesh, group)
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
@@ -157,15 +174,10 @@
       call dealloc_group_smp(group%ele_grp)
       call dealloc_group_smp(group%nod_grp)
 !
-      call dealloc_inod_in_edge(mesh%edge)
-      call dealloc_inod_in_surf(mesh%surf)
       call dealloc_ele_param_smp(mesh%ele)
       call dealloc_node_param_smp(mesh%node)
 !
-      call dealloc_overlapped_ele(mesh%ele)
-      call dealloc_ele_geometry(mesh%ele)
-!
-      end subroutine dealloc_nod_ele_infos
+      end subroutine dealloc_mesh_smp_stack
 !
 ! ----------------------------------------------------------------------
 !
