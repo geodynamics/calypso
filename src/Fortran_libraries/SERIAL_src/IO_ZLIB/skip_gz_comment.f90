@@ -244,7 +244,7 @@
 !
       type(buffer_4_gzip), intent(inout):: zbuf
       character(len=1) :: chara_flag
-!      character(len=65535) :: tbuf2
+!      character(len=32767) :: tbuf2
 !
       do
         call get_one_line_text_from_gz(zbuf)

@@ -45,7 +45,7 @@
       implicit none
 !
 !>      lengh of fixed text buffer
-      integer(kind = 4), parameter, private :: nbuf = 65535
+      integer(kind = 4), parameter, private :: nbuf = 32767
 !
 !>      Structure of buffer for zlib
       type buffer_4_gzip
