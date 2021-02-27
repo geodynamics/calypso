@@ -7,12 +7,13 @@
 !>@brief  Check dependecy of field list fro MHD dynamo
 !!
 !!@verbatim
-!!      subroutine set_sph_MHD_sprctr_data(sph, MHD_prop, rj_fld, ipol)
-!!        type(sph_grids), intent(in) :: sph
+!!      subroutine set_sph_MHD_sprctr_data(MHD_prop, SPH_MHD)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
+!!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+!!      subroutine init_sph_MHD_field_data(sph, rj_fld, ipol)
+!!        type(sph_grids), intent(in) :: sph
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(phys_address), intent(inout) :: ipol
-!!        type(SGS_model_addresses), intent(inout) :: ipol_LES
 !!
 !!      subroutine check_field_dependencies                             &
 !!     &         (fl_prop, cd_prop, ht_prop, cp_prop,                   &
@@ -35,6 +36,7 @@
       use calypso_mpi
 !
       use t_control_parameter
+      use t_spheric_parameter
       use t_phys_data
       use t_phys_address
       use t_base_field_labels
@@ -48,13 +50,34 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_sph_MHD_sprctr_data(sph, MHD_prop, rj_fld, ipol)
+      subroutine set_sph_MHD_sprctr_data(MHD_prop, SPH_MHD)
 !
-      use t_spheric_parameter
+      use t_SPH_mesh_field_data
+!
+      type(MHD_evolution_param), intent(in) :: MHD_prop
+      type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+!
+!
+      call init_sph_MHD_field_data                                      &
+     &   (SPH_MHD%sph, SPH_MHD%fld, SPH_MHD%ipol)
+!
+      call check_field_dependencies                                     &
+     &   (MHD_prop%fl_prop, MHD_prop%cd_prop,                           &
+     &    MHD_prop%ht_prop, MHD_prop%cp_prop,                           &
+     &    SPH_MHD%ipol%base, SPH_MHD%fld)
+      call check_dependence_SPH_evo                                     &
+     &   (MHD_prop%fl_prop, SPH_MHD%ipol, SPH_MHD%fld)
+!
+      end subroutine set_sph_MHD_sprctr_data
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine init_sph_MHD_field_data(sph, rj_fld, ipol)
+!
       use set_control_field_data
 !
       type(sph_grids), intent(in) :: sph
-      type(MHD_evolution_param), intent(in) :: MHD_prop
 !
       type(phys_address), intent(inout) :: ipol
       type(phys_data), intent(inout) :: rj_fld
@@ -62,14 +85,8 @@
 !
       call init_field_data(sph%sph_rj%nnod_rj, rj_fld, ipol)
 !
-      call check_field_dependencies                                     &
-     &   (MHD_prop%fl_prop, MHD_prop%cd_prop,                           &
-     &    MHD_prop%ht_prop, MHD_prop%cp_prop, ipol%base, rj_fld)
-      call check_dependence_SPH_evo(MHD_prop%fl_prop, ipol, rj_fld)
+      end subroutine init_sph_MHD_field_data
 !
-      end subroutine set_sph_MHD_sprctr_data
-!
-! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine check_field_dependencies                               &

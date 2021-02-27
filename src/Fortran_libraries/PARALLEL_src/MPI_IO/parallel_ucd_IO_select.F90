@@ -22,6 +22,8 @@
 !!     &         (istep_ucd, ucd_param, t_IO, ucd, m_ucd)
 !!      subroutine sel_write_parallel_ucd_mesh(ucd_param, ucd)
 !!
+!!      subroutine sel_read_parallel_udt_param                          &
+!!     &         (istep_ucd, ucd_param, t_IO, ucd)
 !!      subroutine sel_read_parallel_udt_file                           &
 !!     &         (istep_ucd, ucd_param, t_IO, ucd)
 !!      subroutine sel_read_alloc_para_udt_file                         &
@@ -279,6 +281,71 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
+      subroutine sel_read_parallel_udt_param                            &
+     &         (istep_ucd, ucd_param, t_IO, ucd)
+!
+      use ucd_IO_select
+      use ucd_field_MPI_IO
+      use ucd_field_MPI_IO_b
+!
+#ifdef ZLIB_IO
+      use gz_ucd_field_MPI_IO
+      use gz_ucd_field_MPI_IO_b
+#endif
+!
+      integer(kind=kint), intent(in) :: istep_ucd
+      type(field_IO_params), intent(in) :: ucd_param
+      type(time_data), intent(inout) :: t_IO
+      type(ucd_data), intent(inout) :: ucd
+!
+      character(len=kchara) :: file_name
+!
+!
+      if(istep_ucd .lt. 0) return
+      file_name = set_parallel_ucd_file_name(ucd_param%file_prefix,     &
+     &           ucd_param%iflag_format, my_rank, istep_ucd)
+!
+      if(     (ucd_param%iflag_format .eq. iflag_sgl_vtk)               &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_vtd)               &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_ucd)               &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_ucd_bin)           &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_bin)           &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_ucd_bin_gz)        &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_bin_gz)        &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_vtk_gz)            &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_vtd_gz)            &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_ucd_gz)            &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_gz)            &
+     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_hdf5)) then
+!        if(my_rank .eq. 0) write(*,*) 'File format ',                  &
+!     &         trim(sel_psf_file_format(ucd_param%iflag_format))'      &
+!     &         is not supported to read'
+        return
+!
+      else if(ucd_param%iflag_format .eq. iflag_single) then
+        call read_alloc_ucd_fld_file_mpi                                &
+     &     (file_name, nprocs, my_rank, t_IO, ucd)
+      else if(ucd_param%iflag_format .eq. iflag_sgl_bin) then
+        call read_alloc_ucd_prm_file_mpi_b                              &
+     &     (file_name, nprocs, my_rank, t_IO, ucd)
+!
+#ifdef ZLIB_IO
+      else if(ucd_param%iflag_format .eq. iflag_sgl_gz) then
+        call gz_read_alloc_ucd_fld_file_mpi                             &
+     &     (file_name, nprocs, my_rank, t_IO, ucd)
+      else if(ucd_param%iflag_format .eq. iflag_sgl_bin_gz) then
+        call gz_rd_alloc_ucd_prm_file_mpi_b                             &
+     &     (file_name, nprocs, my_rank, t_IO, ucd)
+#endif
+      else
+          call sel_read_udt_param                                       &
+     &       (my_rank, istep_ucd, ucd_param, t_IO, ucd)
+      end if
+!
+      end subroutine sel_read_parallel_udt_param
+!
+!------------------------------------------------------------------
+!
       subroutine sel_read_parallel_udt_file                             &
      &         (istep_ucd, ucd_param, t_IO, ucd)
 !
@@ -310,12 +377,14 @@
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_bin)           &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_ucd_bin_gz)        &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_bin_gz)        &
-     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_bin_gz)        &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_vtk_gz)            &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_vtd_gz)            &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_ucd_gz)            &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_gz)            &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_hdf5)) then
+!        if(my_rank .eq. 0) write(*,*) 'File format ',                  &
+!     &         trim(sel_psf_file_format(ucd_param%iflag_format))'      &
+!     &         is not supported to read'
         return
 !
       else if(ucd_param%iflag_format .eq. iflag_single) then
@@ -373,12 +442,14 @@
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_bin)           &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_ucd_bin_gz)        &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_bin_gz)        &
-     &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_bin_gz)        &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_vtk_gz)            &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_vtd_gz)            &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_ucd_gz)            &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_udt_gz)            &
      &   .or. (ucd_param%iflag_format .eq. iflag_sgl_hdf5)) then
+!        if(my_rank .eq. 0) write(*,*) 'File format ',                  &
+!     &         trim(sel_psf_file_format(ucd_param%iflag_format))'      &
+!     &         is not supported to read'
         return
 !
       else if(ucd_param%iflag_format .eq. iflag_single) then

@@ -16,7 +16,8 @@ analyzer_psf.o \
 FEM_analyzer_viz_surf.o \
 \
 t_control_data_section_only.o \
-t_field_list_for_vizs.o
+t_field_list_for_vizs.o \
+t_FEM_mesh_field_4_viz.o
 
 MOD_VTK_CONVERT_PLUG = \
 main_VTK_convert.o \

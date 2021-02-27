@@ -101,7 +101,6 @@
       use t_phys_data
       use t_psf_patch_data
       use t_file_IO_parameter
-      use parallel_ucd_IO_select
       use set_area_4_viz
       use set_field_comp_for_viz
 !

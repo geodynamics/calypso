@@ -95,7 +95,7 @@
 !
 !
       nod_IO%numnod =        surf%numsurf
-      nod_IO%internal_node = surf%internal_surf
+      nod_IO%internal_node = sum(surf%interior_surf)
 !
       call alloc_node_geometry_base(nod_IO)
       call alloc_ele_vector_IO(nod_IO, sfed_IO)
@@ -134,12 +134,8 @@
 !
       surf%numsurf = ele_IO%numele
 !
-      call allocate_surface_connect_type(surf, nele)
+      call alloc_surface_connect(surf, nele)
 !
-!$omp workshare
-      surf%isurf_global(1:surf%numsurf)                                 &
-     &        = ele_IO%iele_global(1:surf%numsurf)
-!$omp end workshare
 !$omp workshare
       surf%ie_surf(1:surf%numsurf,1:surf%nnod_4_surf)                   &
      &        = ele_IO%ie(1:surf%numsurf,1:surf%nnod_4_surf)
@@ -163,10 +159,9 @@
       integer(kind = kint) :: isurf
 !
 !
-!      surf%numsurf =       nod_IO%numnod
-      surf%internal_surf = nod_IO%internal_node
-      call allocate_surface_geom_type(surf)
-      call allocate_normal_vect_type(surf)
+      surf%numsurf =       nod_IO%numnod
+      call alloc_surface_geometory(surf)
+      call alloc_normal_vector(surf)
 !
 !
 !omp parallel do

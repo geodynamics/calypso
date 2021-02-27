@@ -14,8 +14,8 @@
 !!      subroutine verify_iccgN_vec_type(NB, nnod, v_sol)
 !!         integer(kind = kint), intent(in) :: NB, nnod
 !!         type(vectors_4_solver), intent(inout) :: v_sol
-!!      subroutine alloc_iccgN_vec_type(NB, nnod, v_sol)
-!!      subroutine dealloc_iccgN_vec_type(v_sol)
+!!      subroutine alloc_iccgN_vector(NB, nnod, v_sol)
+!!      subroutine dealloc_iccgN_vector(v_sol)
 !!         type(vectors_4_solver), intent(inout) :: v_sol
 !!
 !!      subroutine alloc_iccg_int_vector(nnod, v_sol)
@@ -94,11 +94,11 @@
 !
       ncomp = NB*nnod
       if (v_sol%isize_solver_vect .lt. 0) then
-        call alloc_iccgN_vec_type(NB, nnod, v_sol)
+        call alloc_iccgN_vector(NB, nnod, v_sol)
       else
         if (v_sol%isize_solver_vect .lt. ncomp) then
-          call dealloc_iccgN_vec_type(v_sol)
-          call alloc_iccgN_vec_type(NB,nnod, v_sol)
+          call dealloc_iccgN_vector(v_sol)
+          call alloc_iccgN_vector(NB,nnod, v_sol)
         end if
       end if
 !
@@ -106,7 +106,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-       subroutine alloc_iccgN_vec_type(NB, nnod, v_sol)
+       subroutine alloc_iccgN_vector(NB, nnod, v_sol)
 !
        integer(kind = kint), intent(in) :: NB, nnod
        type(vectors_4_solver), intent(inout) :: v_sol
@@ -126,11 +126,11 @@
 !
        v_sol%isize_solver_vect = NB*nnod
 !
-       end subroutine alloc_iccgN_vec_type
+       end subroutine alloc_iccgN_vector
 !
 !  ---------------------------------------------------------------------
 !
-       subroutine dealloc_iccgN_vec_type(v_sol)
+       subroutine dealloc_iccgN_vector(v_sol)
 !
        type(vectors_4_solver), intent(inout) :: v_sol
 !
@@ -139,7 +139,7 @@
        deallocate(v_sol%x_vec, v_sol%b_vec)
        v_sol%isize_solver_vect = 0
 !
-       end subroutine dealloc_iccgN_vec_type
+       end subroutine dealloc_iccgN_vector
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------

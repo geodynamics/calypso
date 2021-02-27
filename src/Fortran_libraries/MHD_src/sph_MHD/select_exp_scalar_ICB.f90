@@ -87,6 +87,7 @@
 !
 !
 !   Set RHS vector for ICB
+      if(sph_bc%iflag_icb .eq. iflag_sph_fill_center) return
       if(sph_bc%iflag_icb .eq. iflag_fixed_field                        &
      &  .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
         call set_fixed_scalar_sph(sph_rj%nidx_rj(2),                    &

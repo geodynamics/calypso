@@ -13,6 +13,8 @@
 !!      subroutine cal_max_indices(node, nod_fld)
 !!        type(node_data), intent(in) :: node
 !!        type(phys_data), intent(in) :: nod_fld
+!!      subroutine output_range_data                                    &
+!!     &         (istep_ucd, time, node, nod_fld, range)
 !!@endverbatim
 !
       module t_cal_max_indices
@@ -109,7 +111,8 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine output_range_data(istep_ucd, time, node, nod_fld, range)
+      subroutine output_range_data                                      &
+     &         (istep_ucd, time, node, nod_fld, range)
 !
       use calypso_mpi
 !

@@ -25,11 +25,13 @@ endif
 
 LIBS_FFT_TEST = \
 '$$(LIB_MESH)'      \
-'$$(LIB_FFTPACK)'
+'$$(LIB_FFTPACK)'   \
+'$$(LIB_NETLIB)'
 
 LIB_FILES_FFT_TEST = \
 '$$(LIB_MESH_FILE)'      \
-'$$(LIB_FFTPACK_FILE)'
+'$$(LIB_FFTPACK_FILE)'   \
+'$$(LIB_NETLIB_FILE)'
 
 SOURCES = $(shell ls *.f90)
 

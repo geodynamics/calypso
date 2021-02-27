@@ -223,19 +223,16 @@
         if(r_itp%iflag_same_rgrid .eq. 0) then
           call r_itp_field_data_sph_assemble                            &
      &       (org_sph(ip), new_sph_data%sph, r_itp, j_table(ip),        &
-     &        new_sph_data%fld%ntot_phys, org_fld(ip)%d_fld,            &
-     &        new_sph_data%fld%d_fld)
+     &        org_fld(ip), new_sph_data%fld)
         else
           call copy_field_data_sph_assemble                             &
      &       (org_sph(ip), new_sph_data%sph, j_table(ip),               &
-     &        new_sph_data%fld%ntot_phys, org_fld(ip)%d_fld,            &
-     &        new_sph_data%fld%d_fld)
+     &        org_fld(ip), new_sph_data%fld)
         end if
 !
         call copy_field_data_sph_center                                 &
      &     (org_sph(ip), new_sph_data%sph, j_table(ip),                 &
-     &      new_sph_data%fld%ntot_phys, org_fld(ip)%d_fld,              &
-     &      new_sph_data%fld%d_fld)
+     &      org_fld(ip), new_sph_data%fld)
 !
         call dealloc_phys_data(org_fld(ip))
       end do

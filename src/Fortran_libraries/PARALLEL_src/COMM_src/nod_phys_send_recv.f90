@@ -69,8 +69,8 @@
       type(vectors_4_solver), intent(inout) :: v_sol
 !
 !
-      if (iflag_debug.gt.0 ) write(*,*) 'alloc_iccgN_vec_type'
-      call alloc_iccgN_vec_type(n_sym_tensor, mesh%node%numnod, v_sol)
+      if (iflag_debug.gt.0 ) write(*,*) 'alloc_iccgN_vector'
+      call alloc_iccgN_vector(n_sym_tensor, mesh%node%numnod, v_sol)
 !
       if(iflag_debug.gt.0) write(*,*)' init_nod_send_recv'
       call init_nod_send_recv(mesh)

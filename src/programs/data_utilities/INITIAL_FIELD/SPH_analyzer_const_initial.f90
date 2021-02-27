@@ -113,8 +113,7 @@
 !
 !   Allocate spectr field data
 !
-      call set_sph_MHD_sprctr_data(SPH_MHD%sph, SPH_model%MHD_prop,     &
-     &    SPH_MHD%fld, SPH_MHD%ipol)
+      call set_sph_MHD_sprctr_data(SPH_model%MHD_prop, SPH_MHD)
 !
 ! ---------------------------------
 !

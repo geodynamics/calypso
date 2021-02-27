@@ -47,7 +47,7 @@
       integer(kind = kint), parameter, private :: id_vtk_file = 16
 !
 !>      Structure of double numbering
-      type(parallel_double_numbering), private, save :: dbl_id1
+      type(node_ele_double_number), private, save :: dbl_id1
 !
 !-----------------------------------------------------------------------
 !
@@ -86,8 +86,7 @@
 !
 !
       call alloc_double_numbering(node%numnod, dbl_id1)
-      call set_para_double_numbering                                    &
-     &   (node%internal_node, nod_comm, dbl_id1)
+      call set_node_double_numbering(node, nod_comm, dbl_id1)
 !
       ucd%nnod_4_ele = ele%nnod_4_ele
       call allocate_ucd_ele(ucd)
@@ -95,7 +94,7 @@
       call set_internal_element_4_IO                                    &
      &   (nprocs, ucd%istack_merged_intnod, node%numnod,                &
      &    node%internal_node,  ele%numele, ele%nnod_4_ele, ele%ie,      &
-     &    dbl_id1%inod_local, dbl_id1%irank_home,                       &
+     &    dbl_id1%index, dbl_id1%irank,                                 &
      &    ucd%nele, ucd%nnod_4_ele, ucd%ie)
       call dealloc_double_numbering(dbl_id1)
 !

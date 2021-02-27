@@ -12,13 +12,6 @@
 !!      subroutine set_iele_4_node(numnod, numele, nnod_4_ele, ie,      &
 !!     &          iele_st, iele_ed, ntot_ele_4_node, iele_stack_4_node, &
 !!     &          nele_4_node, iele_4_node, iconn_4_node)
-!!
-!!      subroutine count_belonged_ele_4_node(numnod, numele, nnod_4_ele,&
-!!     &          ie, iele_st, iele_ed, nele_4_node)
-!!      subroutine set_belonged_ele_4_node(numnod, numele, nnod_4_ele,  &
-!!     &          ie, iele_st, iele_ed, ntot_ele_4_node,                &
-!!     &          iele_stack_4_node, nele_4_node, iele_4_node,          &
-!!     &          iconn_4_node)
 !!@endverbatim
 !
       module find_element_id_4_node
@@ -36,6 +29,8 @@
 !
       subroutine count_iele_4_node(numnod, numele, nnod_4_ele, ie,      &
      &          iele_st, iele_ed, nele_4_node)
+!
+!      use degraded_node_in_ele
 !
       integer (kind=kint), intent(in) :: numnod, numele, nnod_4_ele
       integer (kind=kint), intent(in) :: ie(numele,nnod_4_ele)
@@ -99,7 +94,7 @@
 !$omp parallel do private(inod,ist)
       do inod = 1, numnod
         ist = iele_stack_4_node(inod-1) + 1
-        if(nele_4_node(inod) .gt. 0) then
+        if(nele_4_node(inod) .gt. 1) then
           call quicksort_w_index(nele_4_node(inod), iele_4_node(ist),   &
      &        ione, nele_4_node(inod), iconn_4_node(ist))
         end if
@@ -107,50 +102,6 @@
 !$omp end parallel do
 !
       end  subroutine set_iele_4_node
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine count_belonged_ele_4_node(numnod, numele, nnod_4_ele,  &
-     &          ie, iele_st, iele_ed, nele_4_node)
-!
-      integer (kind=kint), intent(in) :: numnod, numele, nnod_4_ele
-      integer (kind=kint), intent(in) :: ie(numele,nnod_4_ele)
-      integer (kind=kint), intent(in) :: iele_st, iele_ed
-!
-      integer (kind=kint), intent(inout) :: nele_4_node(numnod)
-!
-!
-      call count_iele_4_node(numnod, numele, ione, ie(1,1),             &
-     &   iele_st, iele_ed, nele_4_node)
-!
-      end  subroutine count_belonged_ele_4_node
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_belonged_ele_4_node(numnod, numele, nnod_4_ele,    &
-     &          ie, iele_st, iele_ed, ntot_ele_4_node,                  &
-     &          iele_stack_4_node, nele_4_node, iele_4_node,            &
-     &          iconn_4_node)
-!
-      integer (kind=kint), intent(in) :: numnod, numele, nnod_4_ele
-      integer (kind=kint), intent(in) :: ie(numele,nnod_4_ele)
-      integer (kind=kint), intent(in) :: iele_st, iele_ed
-      integer (kind=kint), intent(in) :: ntot_ele_4_node
-      integer (kind=kint), intent(in) :: iele_stack_4_node(0:numnod)
-!
-      integer (kind=kint), intent(inout) :: nele_4_node(numnod)
-      integer (kind=kint), intent(inout)                                &
-     &                    :: iele_4_node(ntot_ele_4_node)
-      integer (kind=kint), intent(inout)                                &
-     &                    :: iconn_4_node(ntot_ele_4_node)
-!
-!
-      call set_iele_4_node(numnod, numele, ione, ie(1,1),               &
-     &          iele_st, iele_ed, ntot_ele_4_node, iele_stack_4_node,   &
-     &          nele_4_node, iele_4_node, iconn_4_node)
-!
-      end  subroutine set_belonged_ele_4_node
 !
 ! -----------------------------------------------------------------------
 !

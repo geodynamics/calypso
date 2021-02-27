@@ -111,6 +111,10 @@
       real(kind= kreal) :: c0
 !
 !
+!$omp parallel workshare
+      psf_list%id_n_on_e(1:numedge) =    izero
+!$omp end parallel workshare
+!
 !$omp parallel do                                                       &
 !$omp& private(ist,ied,inum,icou,jcou,iedge,inod1,inod2,c0)
       do ip = 1, np_smp
@@ -127,9 +131,12 @@
             if(interior_edge(iedge) .gt. 0) then
               icou = icou + 1
               psf_list%iedge_int_nod(icou) = iedge
+              psf_list%id_n_on_e(iedge) = icou
             else
               jcou = jcou + 1
               psf_list%iedge_ext_nod(jcou) = iedge
+              psf_list%id_n_on_e(iedge) = icou                          &
+     &                                   + psf_list%internod_on_edge
             end if
           end if
         end do

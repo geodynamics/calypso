@@ -87,8 +87,7 @@
 !
 !   Allocate spectr field data
 !
-      call set_sph_MHD_sprctr_data(SPH_MHD%sph, SPH_model%MHD_prop,     &
-     &    SPH_MHD%fld, SPH_MHD%ipol)
+      call set_sph_MHD_sprctr_data(SPH_model%MHD_prop, SPH_MHD)
 !
       if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
       call init_r_infos_sph_mhd_evo(SPH_WK%r_2nd, SPH_model%bc_IO,      &

@@ -7,23 +7,23 @@
 !> @brief structure of surface data (geometry and connectivity)
 !!
 !!@verbatim
-!!      subroutine alloc_numsurf_stack(num_pe, surf)
 !!      subroutine allocate_inod_in_surf(surf)
-!!      subroutine allocate_surface_connect_type(surf, nele)
-!!      subroutine allocate_ext_surface_type(surf)
-!!      subroutine allocate_iso_surface_type(surf)
-!!      subroutine allocate_surface_geom_type(surf)
-!!      subroutine allocate_normal_vect_type(surf)
+!!      subroutine alloc_surface_connect(surf, nele)
+!!      subroutine alloc_interior_surf(surf)
+!!      subroutine alloc_ext_surface(surf)
+!!      subroutine alloc_iso_surface(surf)
+!!      subroutine alloc_surface_geometory(surf)
+!!      subroutine alloc_normal_vector(surf)
 !!      subroutine alloc_surf_param_smp(surf)
 !!      subroutine alloc_ele_4_surf_type(surf)
 !!
-!!      subroutine dealloc_numsurf_stack(surf)
 !!      subroutine dealloc_inod_in_surf(surf)
-!!      subroutine deallocate_surface_connect_type(surf)
+!!      subroutine dealloc_surface_connect(surf)
+!!      subroutine dealloc_interior_surf(nele)
 !!      subroutine deallocate_ext_surface_type(surf)
 !!      subroutine deallocate_iso_surface_type(surf)
-!!      subroutine deallocate_surface_geom_type(surf)
-!!      subroutine deallocate_normal_vect_type(surf)
+!!      subroutine dealloc_surface_geometory(surf)
+!!      subroutine dealloc_normal_vector(surf)
 !!      subroutine dealloc_surf_param_smp(surf)
 !!      subroutine dealloc_ele_4_surf_type(surf)
 !!        integer(kind = kint), intent(in) :: nele
@@ -40,19 +40,12 @@
       type surface_data
 !>       number of surface on local PE
         integer( kind=kint )  ::  numsurf
-!>       number of internal surface on local PE
-        integer( kind=kint )  ::  internal_surf
 !>       number of nodes in each surface
         integer(kind=kint) :: nnod_4_surf
 !>       number of external sueface
         integer(kind=kint) ::  numsurf_ext
 !>       number of isolated sueface
         integer(kind=kint) ::  numsurf_iso
-!
-!>        Stack list of number of surface
-        integer(kind=kint_gl), allocatable  :: istack_numsurf(:)
-!>        Stack list of number of internal surface
-        integer(kind=kint_gl), allocatable  :: istack_intersurf(:)
 !
 !>   local index for surface on each element
         integer (kind=kint), allocatable :: node_on_sf(:,:)
@@ -68,8 +61,10 @@
 !
 !>       global surface id (where i:surface id)
         integer(kind=kint_gl), allocatable  ::  isurf_global(:)
+!>       integer flag for interior surface 1...interior, 0...exterior
+        integer(kind = kint), allocatable :: interior_surf(:)
 !
-!>   surface connectivity ie_surf(i:surface ID,j:surface index)
+!>        surface connectivity ie_surf(i:surface ID,j:surface index)
         integer(kind=kint), allocatable  :: ie_surf(:,:)
 !
 !>   surface ID for element surface isf_4_ele(:,:)
@@ -90,9 +85,6 @@
 !>                                1:element or 2:local surface)
         integer(kind=kint), allocatable  :: iele_4_surf(:,:,:)
 !
-!>  integer flag for interior surface 1...interior, 0...exterior
-        integer(kind = kint), allocatable :: interior_surf(:)
-!
 !>       position of center of surface
         real(kind=kreal)  , allocatable  :: x_surf(:,:)
 ! 
@@ -108,21 +100,6 @@
 !  ---------------------------------------------------------------------
 !
       contains
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine alloc_numsurf_stack(num_pe, surf)
-!
-      integer, intent(in) :: num_pe
-      type(surface_data), intent(inout) :: surf
-!
-!
-      allocate(surf%istack_numsurf(0:num_pe))
-      allocate(surf%istack_intersurf(0:num_pe))
-      surf%istack_numsurf =   0
-      surf%istack_intersurf = 0
-!
-      end subroutine alloc_numsurf_stack
 !
 !  ---------------------------------------------------------------------
 !
@@ -143,7 +120,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_surface_connect_type(surf, nele)
+      subroutine alloc_surface_connect(surf, nele)
 !
       use m_geometry_constants
 !
@@ -153,44 +130,56 @@
       allocate( surf%isf_4_ele(nele,nsurf_4_ele) )
       allocate( surf%isf_rot_ele(nele,nsurf_4_ele) )
       allocate( surf%ie_surf(surf%numsurf,surf%nnod_4_surf) )
-      allocate( surf%isurf_global(surf%numsurf) )
-      allocate( surf%interior_surf(surf%numsurf) )
 !
       if (surf%numsurf.gt. 0) then
         surf%isf_4_ele =     0
         surf%isf_rot_ele =  -1
         surf%ie_surf =       0
+      end if
+!
+      end subroutine alloc_surface_connect
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine alloc_interior_surf(surf)
+!
+      type(surface_data), intent(inout) :: surf
+!
+      allocate(surf%isurf_global(surf%numsurf))
+      allocate(surf%interior_surf(surf%numsurf))
+!
+      if (surf%numsurf.gt. 0) then
         surf%isurf_global =  0
         surf%interior_surf = 0
       end if
 !
-      end subroutine allocate_surface_connect_type
+      end subroutine alloc_interior_surf
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_ext_surface_type(surf)
+      subroutine alloc_ext_surface(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
       allocate( surf%isf_external(surf%numsurf_ext) )
       if (surf%numsurf_ext .gt. 0) surf%isf_external = 0
 !
-      end subroutine allocate_ext_surface_type
+      end subroutine alloc_ext_surface
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_iso_surface_type(surf)
+      subroutine alloc_iso_surface(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
       allocate( surf%isf_isolate(surf%numsurf_iso) )
       if (surf%numsurf_iso .gt. 0) surf%isf_isolate = 0
 !
-      end subroutine allocate_iso_surface_type
+      end subroutine alloc_iso_surface
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_surface_geom_type(surf)
+      subroutine alloc_surface_geometory(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
@@ -198,17 +187,15 @@
 !
       if(surf%numsurf .gt. 0) then
 !$omp parallel workshare
-        surf%x_surf(1:surf%numsurf,1) = 0.0d0
-        surf%x_surf(1:surf%numsurf,2) = 0.0d0
-        surf%x_surf(1:surf%numsurf,3) = 0.0d0
+        surf%x_surf(1:surf%numsurf,1:3) = 0.0d0
 !$omp end parallel workshare
       end if
 !
-      end subroutine allocate_surface_geom_type
+      end subroutine alloc_surface_geometory
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine allocate_normal_vect_type(surf)
+      subroutine alloc_normal_vector(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
@@ -226,7 +213,7 @@
 !$omp end parallel workshare
       end if
 !
-      end subroutine allocate_normal_vect_type
+      end subroutine alloc_normal_vector
 !
 !-----------------------------------------------------------------------
 !
@@ -256,18 +243,6 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine dealloc_numsurf_stack(surf)
-!
-      type(surface_data), intent(inout) :: surf
-!
-!
-      if(allocated(surf%istack_numsurf) .eqv. .FALSE.) return
-      deallocate (surf%istack_numsurf, surf%istack_intersurf)
-!
-      end subroutine dealloc_numsurf_stack
-!
-!  ---------------------------------------------------------------------
-!
       subroutine dealloc_inod_in_surf(surf)
 !
       type(surface_data), intent(inout) :: surf
@@ -280,7 +255,7 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_surface_connect_type(surf)
+      subroutine dealloc_surface_connect(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
@@ -288,10 +263,19 @@
       deallocate( surf%isf_4_ele     )
       deallocate( surf%isf_rot_ele   )
       deallocate( surf%ie_surf       )
-      deallocate( surf%isurf_global  )
-      deallocate( surf%interior_surf )
 !
-      end subroutine deallocate_surface_connect_type
+      end subroutine dealloc_surface_connect
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine dealloc_interior_surf(surf)
+!
+      type(surface_data), intent(inout) :: surf
+!
+      if(allocated(surf%interior_surf) .eqv. .FALSE.) return
+      deallocate(surf%isurf_global, surf%interior_surf)
+!
+      end subroutine dealloc_interior_surf
 !
 !  ---------------------------------------------------------------------
 !
@@ -317,18 +301,18 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_surface_geom_type(surf)
+      subroutine dealloc_surface_geometory(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
       if(allocated(surf%x_surf) .eqv. .FALSE.) return
       deallocate( surf%x_surf )
 !
-      end subroutine deallocate_surface_geom_type
+      end subroutine dealloc_surface_geometory
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine deallocate_normal_vect_type(surf)
+      subroutine dealloc_normal_vector(surf)
 !
       type(surface_data), intent(inout) :: surf
 !
@@ -337,9 +321,9 @@
       deallocate( surf%a_area_surf )
       deallocate( surf%vnorm_surf )
 !
-      end subroutine deallocate_normal_vect_type
+      end subroutine dealloc_normal_vector
 !
-! ------------------------------------------------------
+!  ---------------------------------------------------------------------
 !
       subroutine dealloc_surf_param_smp(surf)
 !

@@ -52,6 +52,12 @@ cvt_xyz_vector_2_sph_smp.o: $(BASEDIR)/cvt_xyz_vector_2_sph_smp.f90 m_precision.
 	$(F90) -c $(F90OPTFLAGS) $<
 delete_field_smp.o: $(BASEDIR)/delete_field_smp.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
+dsort_with_int.o: $(BASEDIR)/dsort_with_int.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+i8sort_with_int.o: $(BASEDIR)/i8sort_with_int.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+isort_with_int.o: $(BASEDIR)/isort_with_int.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
 m_constants.o: $(BASEDIR)/m_constants.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_error_IDs.o: $(BASEDIR)/m_error_IDs.f90 m_precision.o
@@ -72,7 +78,7 @@ overwrite_products_smp.o: $(BASEDIR)/overwrite_products_smp.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 primefac.o: $(BASEDIR)/primefac.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-quicksort.o: $(BASEDIR)/quicksort.f90 m_precision.o
+quicksort.o: $(BASEDIR)/quicksort.f90 m_precision.o m_constants.o isort_with_int.o i8sort_with_int.o dsort_with_int.o
 	$(F90) -c $(F90OPTFLAGS) $<
 solver_33_array.o: $(BASEDIR)/solver_33_array.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<

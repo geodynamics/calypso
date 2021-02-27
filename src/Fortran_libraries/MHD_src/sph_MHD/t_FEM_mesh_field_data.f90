@@ -3,11 +3,13 @@
 !!
 !!@author H. Matsui
 !!@date Programmed by H. Okuda in July, 2006
-!!@n    Mmodified by H. Matsui in June, 2007
-!!@n    Mmodified by H. Matsui in Sep., 2017
+!!@n    Modified by H. Matsui in June, 2007
+!!@n    Modified by H. Matsui in Sep., 2017
 !
 !> @brief Strcture for FEM mesh and nodal field
 !!
+!!@verbatim
+!!@endverbatim
       module t_FEM_mesh_field_data
 !
       use m_precision
@@ -22,12 +24,11 @@
 !>      Structure of FEM mesh and field structures
       type FEM_mesh_field_data
 !>        Label for simulation
-        character(len=kchara)   :: label_sim
+        character(len=kchara) :: label_sim
 !
 !>        Structure for FEM mesh data
 !!         (position, connectivity, communication, and groups)
         type(mesh_data) :: geofem
-!
 !>        Structure for nodal field data
         type(phys_data) :: field
 !>        Address for nodal fields

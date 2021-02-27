@@ -59,8 +59,6 @@
 !
       implicit none
 !
-      private :: empty_nod_and_ele_infos
-!
 ! ----------------------------------------------------------------------
 !
       contains
@@ -73,6 +71,7 @@
       use set_connects_4_ele_group
       use set_connects_4_surf_group
       use set_surf_edge_mesh
+      use nod_and_ele_derived_info
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
@@ -109,11 +108,13 @@
 !
       subroutine dealloc_empty_mesh_info(mesh, group)
 !
+      use nod_and_ele_derived_info
+!
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
 !
 !
-      call dealloc_empty_nod_ele_infos(mesh)
+      call dealloc_nod_and_ele_infos(mesh)
 !
       end subroutine dealloc_empty_mesh_info
 !
@@ -125,6 +126,7 @@
       use const_surface_data
       use set_surf_edge_mesh
       use set_connects_4_surf_group
+      use set_size_4_smp_types
 !      use check_surface_groups
 !
       integer, intent(in) :: id_rank
@@ -143,9 +145,11 @@
       call set_local_element_info(mesh%surf, mesh%edge)
 !
 !     set connectivity and geometry for surface and edge
-      if (iflag_debug.gt.0) write(*,*) 'const_surface_and_edge'
-      call const_surface_and_edge                                       &
-     &   (mesh%node, mesh%ele, mesh%surf, mesh%edge)
+      if(iflag_debug .gt. 0) write(*,*) 'const_surf_connectivity'
+      call const_surf_connectivity(mesh%node, mesh%ele, mesh%surf)
+      if(iflag_debug .gt. 0) write(*,*) 'const_edge_connectivity'
+      call const_edge_connectivity(mesh%node, mesh%ele,                 &
+     &                             mesh%surf, mesh%edge)
 !
 !     set connection relation of element and surface
       if (iflag_debug.gt.0) write(*,*) 'const_ele_list_4_surface'
@@ -170,6 +174,9 @@
      &    group%ele_grp, group%surf_grp,                                &
      &    group%tbls_ele_grp, group%tbls_surf_grp)
 !
+      call init_surface_and_edge_geometry                               &
+     &   (mesh%node, mesh%surf, mesh%edge)
+!
       end subroutine const_mesh_infos
 !
 ! ----------------------------------------------------------------------
@@ -177,6 +184,7 @@
       subroutine const_nod_ele_infos                                    &
      &         (id_rank, node, ele, nod_grp, ele_grp, surf_grp)
 !
+      use nod_and_ele_derived_info
       use set_smp_4_group_types
 !
       integer, intent(in) :: id_rank
@@ -226,73 +234,6 @@
      &    edge%node_on_edge, edge%node_on_edge_sf)
 !
       end subroutine set_local_element_info
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_nod_and_ele_infos(node, ele)
-!
-      use set_size_4_smp_types
-      use cal_mesh_position
-!
-      type(node_data), intent(inout) :: node
-      type(element_data), intent(inout) :: ele
-!
-      logical :: read_element
-!
-!
-      read_element = allocated(ele%x_ele)
-!
-      if(read_element .eqv. .false.) then
-        call alloc_overlapped_ele(ele)
-        call alloc_ele_geometry(ele)
-        if (iflag_debug.eq.1) write(*,*) 'set_center_of_element'
-        call set_center_of_element(node, ele)
-      end if
-!
-       if (iflag_debug.eq.1) write(*,*) 'count_size_4_smp_mesh'
-      call count_size_4_smp_mesh(node, ele)
-!
-       if (iflag_debug.eq.1) write(*,*) 'set_spherical_position'
-      call set_spherical_position(node)
-!
-      call find_subdomain_position_range(node)
-!
-       if (iflag_debug.eq.1) write(*,*) 'count_overlap_ele'
-      call count_overlap_ele(node, ele)
-!
-      end subroutine set_nod_and_ele_infos
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine empty_nod_and_ele_infos(geom)
-!
-      type(mesh_geometry), intent(inout) :: geom
-!
-!
-      geom%ele%numele = 0
-      call alloc_overlapped_ele(geom%ele)
-      call alloc_ele_geometry(geom%ele)
-!
-      if (iflag_debug.eq.1) write(*,*) 'alloc_node_param_smp'
-      call alloc_node_param_smp(geom%node)
-      call alloc_ele_param_smp(geom%ele)
-!
-      end subroutine empty_nod_and_ele_infos
-!
-! ----------------------------------------------------------------------
-!
-      subroutine dealloc_empty_nod_ele_infos(geom)
-!
-      type(mesh_geometry), intent(inout) :: geom
-!
-!
-      call dealloc_overlapped_ele(geom%ele)
-      call dealloc_ele_geometry(geom%ele)
-      call dealloc_node_param_smp(geom%node)
-      call dealloc_ele_param_smp(geom%ele)
-!
-      end subroutine dealloc_empty_nod_ele_infos
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

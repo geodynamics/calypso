@@ -77,7 +77,7 @@
 !
       call deallocate_iso_surface_type(par_v%fem%mesh%surf)
       call deallocate_ext_surface_type(par_v%fem%mesh%surf)
-      call deallocate_surface_connect_type(par_v%fem%mesh%surf)
+      call dealloc_surface_connect(par_v%fem%mesh%surf)
       call dealloc_inod_in_surf(par_v%fem%mesh%surf)
 !
       call dealloc_mesh_data(par_v%fem%mesh, par_v%fem%group)

@@ -29,7 +29,7 @@
 !
       subroutine elpsed_label_gen_sph_grid
 !
-      integer(kind = kint), parameter :: num_append = 7
+      integer(kind = kint), parameter :: num_append = 10
 !
 !
       call append_elapsed_times                                         &
@@ -46,11 +46,18 @@
      &      = 'Construction of surface FEM mesh data'
       elps1%labels(ist_elapsed_GSP+5)                                   &
      &      = 'Construction of viewer data'
-!
       elps1%labels(ist_elapsed_GSP+6)                                   &
-     &      = 'Construction of spherical transform table'
+     &      = 'Load FEM mesh file'
+!
       elps1%labels(ist_elapsed_GSP+7)                                   &
+     &      = 'Construction of spherical transform table'
+      elps1%labels(ist_elapsed_GSP+8)                                   &
      &      = 'Construction of spherical mode and grid'
+!
+      elps1%labels(ist_elapsed_GSP+9)                                   &
+     &      = 'Base FEM mesh construction'
+      elps1%labels(ist_elapsed_GSP+10)                                  &
+     &      = 'FEM mesh sleeve extension'
 !
       iflag_GSP_time = .TRUE.
 !

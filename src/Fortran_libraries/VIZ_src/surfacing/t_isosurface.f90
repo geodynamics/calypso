@@ -8,15 +8,16 @@
 !>@brief Structure for isosurfacing
 !!
 !!@verbatim
-!!      subroutine ISOSURF_initialize(fem, nod_fld, iso_ctls, iso)
-!!        type(mesh_data), intent(in) :: fem
+!!      subroutine ISOSURF_initialize(geofem, nod_fld, iso_ctls, iso)
+!!        type(mesh_data), intent(in) :: geofem
 !!        type(isosurf_controls), intent(inout) :: iso_ctls
 !!        type(isosurface_module), intent(inout) :: iso
 !!        type(phys_data), intent(in) :: nod_fld
 !!      subroutine ISOSURF_visualize                                    &
-!!     &         (istep_iso, time_d, fem, nod_fld, iso)
+!!     &         (istep_iso, time_d, geofem, edge_comm, nod_fld, iso)
 !!        type(time_data), intent(in) :: time_d
-!!        type(mesh_data), intent(in) :: fem
+!!        type(mesh_data), intent(in) :: geofem
+!!        type(communication_table), intent(in) :: edge_comm
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(isosurface_module), intent(inout) :: iso
 !!
@@ -28,6 +29,7 @@
 !
       use m_precision
       use t_mesh_data
+      use t_comm_table
       use t_phys_data
       use t_psf_geometry_list
       use t_psf_patch_data
@@ -81,14 +83,14 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine ISOSURF_initialize(fem, nod_fld, iso_ctls, iso)
+      subroutine ISOSURF_initialize(geofem, nod_fld, iso_ctls, iso)
 !
       use m_geometry_constants
 !
       use set_psf_iso_control
       use search_ele_list_for_psf
 !
-      type(mesh_data), intent(in) :: fem
+      type(mesh_data), intent(in) :: geofem
       type(phys_data), intent(in) :: nod_fld
 !
       type(isosurf_controls), intent(inout) :: iso_ctls
@@ -106,11 +108,12 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'set_iso_control'
       call set_iso_control                                              &
-     &   (iso%num_iso, fem%group, nod_fld, iso_ctls,                    &
+     &   (iso%num_iso, geofem%group, nod_fld, iso_ctls,                 &
      &    iso%iso_param, iso%iso_def, iso%iso_mesh, iso%iso_file_IO)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_search_mesh_list_4_psf'
-      call set_search_mesh_list_4_psf(iso%num_iso, fem%mesh, fem%group, &
+      call set_search_mesh_list_4_psf                                   &
+     &   (iso%num_iso, geofem%mesh, geofem%group,                       &
      &    iso%iso_param, iso%iso_search)
 !
       do i_iso = 1, iso%num_iso
@@ -118,7 +121,7 @@
         call alloc_ele_param_smp(iso%iso_mesh(i_iso)%patch)
 !
         call alloc_ref_field_4_psf                                      &
-     &     (fem%mesh%node, iso%iso_list(i_iso))
+     &     (geofem%mesh%node, iso%iso_list(i_iso))
       end do
 !
       end subroutine ISOSURF_initialize
@@ -127,7 +130,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine ISOSURF_visualize                                      &
-     &         (istep_iso, time_d, fem, nod_fld, iso)
+     &         (istep_iso, time_d, geofem, edge_comm, nod_fld, iso)
 !
       use m_work_time
       use m_elapsed_labels_4_VIZ
@@ -143,7 +146,8 @@
       integer(kind = kint), intent(in) :: istep_iso
 !
       type(time_data), intent(in) :: time_d
-      type(mesh_data), intent(in) :: fem
+      type(mesh_data), intent(in) :: geofem
+      type(communication_table), intent(in) :: edge_comm
       type(phys_data), intent(in) :: nod_fld
 !
       type(isosurface_module), intent(inout) :: iso
@@ -153,19 +157,19 @@
 !
       if(iflag_ISO_time) call start_elapsed_time(ist_elapsed_ISO+1)
       if (iflag_debug.eq.1) write(*,*) 'set_const_4_isosurfaces'
-      call set_const_4_isosurfaces(iso%num_iso, fem%mesh%node,          &
+      call set_const_4_isosurfaces(iso%num_iso, geofem%mesh%node,       &
      &    nod_fld, iso%iso_def, iso%iso_list)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_node_and_patch_iso'
       call set_node_and_patch_iso                                       &
-     &   (iso%num_iso, fem%mesh, iso%iso_case_tbls,                     &
+     &   (iso%num_iso, geofem%mesh, edge_comm, iso%iso_case_tbls,       &
      &    iso%iso_search, iso%iso_list, iso%iso_mesh)
       if(iflag_ISO_time) call end_elapsed_time(ist_elapsed_ISO+1)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_field_4_iso'
       if(iflag_ISO_time) call start_elapsed_time(ist_elapsed_ISO+2)
       call alloc_psf_field_data(iso%num_iso, iso%iso_mesh)
-      call set_field_4_iso(iso%num_iso, fem%mesh%edge, nod_fld,         &
+      call set_field_4_iso(iso%num_iso, geofem%mesh%edge, nod_fld,      &
      &    iso%iso_param, iso%iso_def, iso%iso_list, iso%iso_mesh)
       if(iflag_ISO_time) call end_elapsed_time(ist_elapsed_ISO+2)
 !

@@ -8,7 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine init_zonal_mean_sections                             &
-!!     &         (geofem, nod_fld, zm_ctls, zmeans)
+!!     &         (geofem, edge_comm, nod_fld, zm_ctls, zmeans)
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
@@ -42,6 +42,7 @@
       use calypso_mpi
 !
       use t_time_data
+      use t_comm_table
       use t_mesh_data
       use t_phys_data
       use t_spheric_parameter
@@ -68,11 +69,12 @@
 !  ---------------------------------------------------------------------
 !
       subroutine init_zonal_mean_sections                               &
-     &         (geofem, nod_fld, zm_ctls, zmeans)
+     &         (geofem, edge_comm, nod_fld, zm_ctls, zmeans)
 !
       use t_control_data_dynamo_vizs
 !
       type(mesh_data), intent(in) :: geofem
+      type(communication_table), intent(in) :: edge_comm
       type(phys_data), intent(in) :: nod_fld
 !
       type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
@@ -80,10 +82,10 @@
 !
 !
       if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+1)
-      call SECTIONING_initialize                                        &
-     &   (geofem, nod_fld, zm_ctls%zm_psf_ctls, zmeans%zm_psf)
-      call SECTIONING_initialize                                        &
-     &   (geofem, nod_fld, zm_ctls%zRMS_psf_ctls, zmeans%zrms_psf)
+      call SECTIONING_initialize(geofem, edge_comm, nod_fld,            &
+     &    zm_ctls%zm_psf_ctls, zmeans%zm_psf)
+      call SECTIONING_initialize(geofem, edge_comm, nod_fld,            &
+     &    zm_ctls%zRMS_psf_ctls, zmeans%zrms_psf)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+1)
 !
       end subroutine init_zonal_mean_sections

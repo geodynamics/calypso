@@ -11,12 +11,18 @@
 !!      subroutine dealloc_mode_table_4_assemble(j_table)
 !!
 !!      subroutine set_mode_table_4_assemble(org_sph, new_sph, j_table)
-!!      subroutine copy_field_data_sph_assemble(org_sph, new_sph,       &
-!!     &          j_table, ntot_phys_rj, d_rj_org, d_rj_tmp)
-!!      subroutine r_itp_field_data_sph_assemble(org_sph, new_sph,      &
-!!     &          r_itp, j_table, ntot_phys_rj, d_rj_org, d_rj_new)
-!!      subroutine copy_field_data_sph_center(org_sph, new_sph, j_table,&
-!!     &          ntot_phys_rj, d_rj_org, d_rj)
+!!      subroutine copy_field_data_sph_assemble                         &
+!!     &         (org_sph, new_sph, j_table, org_fld, new_fld)
+!!      subroutine copy_field_data_sph_center                           &
+!!     &         (org_sph, new_sph, j_table, org_fld, new_fld)
+!!      subroutine r_itp_field_data_sph_assemble                        &
+!!     &         (org_sph, new_sph, r_itp, j_table, org_fld, new_fld)
+!!        type(sph_grids), intent(in) :: org_sph
+!!        type(sph_grids), intent(in) :: new_sph
+!!        type(rj_assemble_tbl), intent(in) :: j_table
+!!        type(sph_radial_itp_data), intent(in) :: r_itp
+!!        type(phys_data), intent(in) :: org_fld
+!!        type(phys_data), intent(inout) :: new_fld
 !!@endverbatim
 !!
 !!@param   istep  TIme step number
@@ -26,6 +32,9 @@
       use m_precision
       use m_machine_parameter
       use m_constants
+!
+      use t_spheric_parameter
+      use t_phys_data
 !
       implicit none
 !
@@ -107,27 +116,24 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine copy_field_data_sph_assemble(org_sph, new_sph,         &
-     &          j_table, ntot_phys_rj, d_rj_org, d_rj)
+      subroutine copy_field_data_sph_assemble                           &
+     &         (org_sph, new_sph, j_table, org_fld, new_fld)
 !
       use t_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: ntot_phys_rj
       type(sph_grids), intent(in) :: org_sph
       type(sph_grids), intent(in) :: new_sph
       type(rj_assemble_tbl), intent(in) :: j_table
-      real(kind = kreal), intent(in)                                    &
-     &                :: d_rj_org(org_sph%sph_rj%nnod_rj,ntot_phys_rj)
+      type(phys_data), intent(in) :: org_fld
 !
-      real(kind = kreal), intent(inout)                                 &
-     &                :: d_rj(new_sph%sph_rj%nnod_rj,ntot_phys_rj)
+      type(phys_data), intent(inout) :: new_fld
 !
 !
       integer(kind = kint) :: nd, j_org, j_new, kr
       integer(kind = kint) :: inod_org, inod_new
 !
 !!$omp parallel private(nd)
-      do nd = 1, ntot_phys_rj
+      do nd = 1, new_fld%ntot_phys
 !!$omp do private(j_org,j_new,kr,inod_org,inod_new)
         do j_org = 1, org_sph%sph_rj%nidx_rj(2)
           j_new = j_table%j_org_to_new(j_org)
@@ -136,7 +142,7 @@
           do kr = 1, org_sph%sph_rj%nidx_rj(1)
             inod_org = j_org + (kr - 1) * org_sph%sph_rj%nidx_rj(2)
             inod_new = j_new + (kr - 1) * new_sph%sph_rj%nidx_rj(2)
-            d_rj(inod_new,nd) = d_rj_org(inod_org,nd)
+            new_fld%d_fld(inod_new,nd) = org_fld%d_fld(inod_org,nd)
           end do
         end do
 !!$omp end do
@@ -147,62 +153,76 @@
 !
 ! -------------------------------------------------------------------
 !
-      subroutine copy_field_data_sph_center(org_sph, new_sph, j_table,  &
-     &          ntot_phys_rj, d_rj_org, d_rj)
+      subroutine copy_field_data_sph_center                             &
+     &         (org_sph, new_sph, j_table, org_fld, new_fld)
 !
       use t_spheric_parameter
 !
-      integer(kind = kint), intent(in) :: ntot_phys_rj
       type(sph_grids), intent(in) :: org_sph
       type(sph_grids), intent(in) :: new_sph
       type(rj_assemble_tbl), intent(in) :: j_table
-      real(kind = kreal), intent(in)                                    &
-     &                :: d_rj_org(org_sph%sph_rj%nnod_rj,ntot_phys_rj)
+      type(phys_data), intent(in) :: org_fld
 !
-      real(kind = kreal), intent(inout)                                 &
-     &                :: d_rj(new_sph%sph_rj%nnod_rj,ntot_phys_rj)
+      type(phys_data), intent(inout) :: new_fld
 !
-      integer(kind = kint) :: nd, inod_org, inod_new
+      integer(kind = kint) :: inod_org, inod_new
+      integer(kind = kint) :: i_fld, ist, num, jj
 !
 !
-      if(j_table%icenter .eq. 0) return
+      if(new_sph%sph_rj%inod_rj_center .eq. 0) return
 !
-!$omp parallel
-      do nd = 1, ntot_phys_rj
+      if(j_table%icenter .gt. 0) then
         inod_org = org_sph%sph_rj%inod_rj_center
-        inod_new = j_table%icenter
-        d_rj(inod_new,nd) = d_rj_org(inod_org,nd)
-      end do
-!$omp end parallel
+        inod_new = new_sph%sph_rj%inod_rj_center
+!$omp parallel workshare
+        new_fld%d_fld(inod_new,1:new_fld%ntot_phys)                     &
+     &          = org_fld%d_fld(inod_org,1:new_fld%ntot_phys)
+!$omp end parallel workshare
+!
+      else if(j_table%icenter .eq. 0) then
+        jj = find_local_sph_address(org_sph%sph_rj, 0, 0)
+        if(jj .gt. 0) then
+          inod_org = local_sph_node_address(org_sph%sph_rj, 1, jj)
+          inod_new = new_sph%sph_rj%inod_rj_center
+!$omp parallel do private(i_fld,ist,num)
+          do i_fld = 1, new_fld%num_phys
+            ist = new_fld%istack_component(i_fld-1)
+            num = new_fld%istack_component(i_fld) - ist
+            if(num .eq. 1) then
+              new_fld%d_fld(inod_new,ist+1)                             &
+     &            = org_fld%d_fld(inod_org,ist+1)
+            else
+              new_fld%d_fld(inod_new,ist+1) = 0.0d0
+            end if
+          end do
+!$omp end parallel do
+!
+        end if
+      end if
 !
       end subroutine copy_field_data_sph_center
 !
 ! -------------------------------------------------------------------
 !
-      subroutine r_itp_field_data_sph_assemble(org_sph, new_sph,        &
-     &          r_itp, j_table, ntot_phys_rj, d_rj_org, d_rj_new)
+      subroutine r_itp_field_data_sph_assemble                          &
+     &         (org_sph, new_sph, r_itp, j_table, org_fld, new_fld)
 !
-      use t_spheric_parameter
       use r_interpolate_marged_sph
 !
-      integer(kind = kint), intent(in) :: ntot_phys_rj
       type(sph_grids), intent(in) :: org_sph
       type(sph_grids), intent(in) :: new_sph
       type(rj_assemble_tbl), intent(in) :: j_table
       type(sph_radial_itp_data), intent(in) :: r_itp
+      type(phys_data), intent(in) :: org_fld
 !
-      real(kind = kreal), intent(in)                                    &
-     &                :: d_rj_org(org_sph%sph_rj%nnod_rj,ntot_phys_rj)
-!
-      real(kind = kreal), intent(inout)                                 &
-     &                :: d_rj_new(new_sph%sph_rj%nnod_rj,ntot_phys_rj)
+      type(phys_data), intent(inout) :: new_fld
 !
 !
       integer(kind = kint) :: nd, j_org, j_new, kr, kr_in, kr_out
       integer(kind = kint) :: inod_in, inod_out, inod_new
 !
 !$omp parallel private(nd)
-      do nd = 1, ntot_phys_rj
+      do nd = 1, new_fld%ntot_phys
 !$omp do private(j_org,j_new,kr,kr_in,kr_out,inod_in,inod_out,inod_new)
         do j_org = 1, org_sph%sph_rj%nidx_rj(2)
           j_new = j_table%j_org_to_new(j_org)
@@ -214,10 +234,10 @@
             inod_in =  j_org + (kr_in -  1) * org_sph%sph_rj%nidx_rj(2)
             inod_out = j_org + (kr_out - 1) * org_sph%sph_rj%nidx_rj(2)
             inod_new = j_new + (kr - 1) * new_sph%sph_rj%nidx_rj(2)
-            d_rj_new(inod_new,nd)                                       &
-     &           = r_itp%coef_old2new_in(kr) * d_rj_org(inod_in,nd)     &
-     &            + (1.0d0 - r_itp%coef_old2new_in(kr))                 &
-     &             * d_rj_org(inod_out,nd)
+            new_fld%d_fld(inod_new,nd)                                  &
+     &         = r_itp%coef_old2new_in(kr) * org_fld%d_fld(inod_in,nd)  &
+     &          + (1.0d0 - r_itp%coef_old2new_in(kr))                   &
+     &           * org_fld%d_fld(inod_out,nd)
           end do
         end do
 !$omp end do

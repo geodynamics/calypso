@@ -57,8 +57,11 @@
           picked%id_radius(k) = k
         end do
       end if
-      call quicksort_int(picked%num_layer, picked%id_radius,            &
-     &    ione, picked%num_layer)
+
+      if(picked%num_layer .gt. 1) then
+        call quicksort_int(picked%num_layer, picked%id_radius,          &
+     &                     ione, picked%num_layer)
+      end if
 !
       iflag_center = 0
       if(sph_rj%iflag_rj_center.gt.0 .and. picked%id_radius(1).eq.1)    &

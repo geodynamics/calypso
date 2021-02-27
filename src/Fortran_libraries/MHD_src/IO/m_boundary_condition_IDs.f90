@@ -128,6 +128,6 @@
       integer(kind = kint), parameter :: iflag_surf_qvc_sph_out =  402
 !
 !>      surface flag for infinite radius
-      integer(kind = kint), parameter :: iflag_surf_infty =      0
+      integer(kind = kint), parameter :: iflag_surf_infty = 876
 !
       end module m_boundary_condition_IDs

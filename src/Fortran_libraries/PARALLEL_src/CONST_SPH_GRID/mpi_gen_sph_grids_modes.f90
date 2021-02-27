@@ -117,7 +117,7 @@
 !
 !  ========= Generate each spherical harmonics table ===================
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+6)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
       allocate(comm_rlm_mul(nprocs))
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
@@ -128,9 +128,9 @@
      &   (comms_sph%comm_rlm, comm_rlm_mul(my_rank+1))
 !
       call mpi_bcast_comm_stacks_sph(comm_rlm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+8)
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &             'Construct spherical modes for domain ', my_rank
 !
@@ -141,10 +141,10 @@
 !
       call dealloc_comm_stacks_sph(nprocs, comm_rlm_mul)
       deallocate(comm_rlm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+8)
 !
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+6)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
       allocate(comm_rtm_mul(nprocs))
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
@@ -155,9 +155,9 @@
      &   (comms_sph%comm_rtm, comm_rtm_mul(my_rank+1))
 !
       call mpi_bcast_comm_stacks_sph(comm_rtm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+8)
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &             'Construct spherical grids for domain ',  my_rank
       call const_sph_rtp_grids(my_rank, nprocs, comm_rtm_mul,           &
@@ -168,7 +168,7 @@
 !
       deallocate(comm_rtm_mul)
       call dealloc_gen_mesh_params(sph_maker%gen_sph)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+8)
 !
       end subroutine mpi_gen_sph_grids
 !
@@ -211,7 +211,7 @@
 !
 !  ========= Generate each spherical harmonics table ===================
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+6)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
       allocate(comm_rlm_mul(nprocs))
 !
       if(iflag_debug .gt. 0) write(*,*)                                 &
@@ -222,9 +222,9 @@
       call copy_sph_comm_neib(comms_sph%comm_rlm, comm_rlm_mul(ip))
 !
       call mpi_bcast_comm_stacks_sph(comm_rlm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+8)
       if(iflag_debug .gt. 0) write(*,*)                                 &
      &             'Construct spherical modes for domain ', my_rank
       call const_sph_rj_modes(my_rank, nprocs, comm_rlm_mul,            &
@@ -234,7 +234,7 @@
       call dealloc_comm_stacks_sph(nprocs, comm_rlm_mul)
       deallocate(comm_rlm_mul)
       call dealloc_gen_mesh_params(sph_maker%gen_sph)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+8)
 !
       end subroutine mpi_gen_sph_rj_mode
 !

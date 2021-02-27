@@ -9,8 +9,6 @@
 !!@verbatim
 !!      subroutine load_para_SPH_and_FEM_mesh(FEM_mesh_flags,           &
 !!     &          sph_file_param, SPH_MHD, geofem, mesh_file)
-!!      subroutine const_FEM_mesh_4_SPH(FEM_mesh_flags,                 &
-!!     &          sph_file_param, SPH_MHD, geofem)
 !!      subroutine check_and_make_SPH_mesh(sph_file_param, SPH_MHD)
 !!        type(FEM_file_IO_flags), intent(in) :: FEM_mesh_flags
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
@@ -83,6 +81,7 @@
       use mpi_load_mesh_data
       use parallel_load_data_4_sph
       use const_FEM_mesh_sph_mhd
+      use m_work_time
 !
       type(FEM_file_IO_flags), intent(in) :: FEM_mesh_flags
       type(field_IO_params), intent(in) ::  sph_file_param
@@ -96,44 +95,23 @@
 !
 !  --  load geofem mesh data
       if(check_exist_mesh(my_rank, mesh_file)) then
+        if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+6)
         if (iflag_debug.gt.0) write(*,*) 'mpi_input_mesh'
         call mpi_input_mesh(mesh_file, nprocs, geofem)
         call set_fem_center_mode_4_SPH                                  &
      &     (geofem%mesh%node%internal_node,                             &
      &      SPH_MHD%sph%sph_rtp, SPH_MHD%sph%sph_params)
+        if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
       else
 !    --  Construct FEM mesh
+        if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+3)
         mesh_file%file_prefix = sph_file_param%file_prefix
         call load_FEM_mesh_4_SPH(FEM_mesh_flags, mesh_file,             &
      &      SPH_MHD%groups, SPH_MHD%sph, geofem, SPH_MHD%sph_maker)
+        if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+3)
       end if
 !
       end subroutine load_para_SPH_and_FEM_mesh
-!
-! -----------------------------------------------------------------------
-!
-      subroutine const_FEM_mesh_4_SPH(FEM_mesh_flags,                   &
-     &          sph_file_param, SPH_MHD, geofem)
-!
-      use calypso_mpi
-      use t_mesh_data
-      use copy_mesh_structures
-      use mesh_file_name_by_param
-      use mpi_load_mesh_data
-      use parallel_load_data_4_sph
-      use const_FEM_mesh_sph_mhd
-!
-      type(FEM_file_IO_flags), intent(in) :: FEM_mesh_flags
-      type(field_IO_params), intent(in) ::  sph_file_param
-!
-      type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
-      type(mesh_data), intent(inout) :: geofem
-!
-!    --  Construct FEM mesh
-      call load_FEM_mesh_4_SPH(FEM_mesh_flags, sph_file_param,         &
-     &    SPH_MHD%groups, SPH_MHD%sph, geofem, SPH_MHD%sph_maker)
-!
-      end subroutine const_FEM_mesh_4_SPH
 !
 ! -----------------------------------------------------------------------
 !

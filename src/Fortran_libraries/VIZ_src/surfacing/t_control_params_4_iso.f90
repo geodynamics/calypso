@@ -67,7 +67,6 @@
      &          iso_fld, iso_param, iso_def, iso_file_IO)
 !
       use m_file_format_switch
-      use parallel_ucd_IO_select
       use set_field_comp_for_viz
       use t_group_data
       use t_file_IO_parameter
@@ -207,7 +206,6 @@
      &          iso_fld, iso_def)
 !
       use m_file_format_switch
-      use parallel_ucd_IO_select
       use set_field_comp_for_viz
       use t_group_data
       use t_file_IO_parameter

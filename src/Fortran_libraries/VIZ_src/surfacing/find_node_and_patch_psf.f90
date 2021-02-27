@@ -12,7 +12,7 @@
 !!        type(sectioning_list), intent(inout) :: psf_list(num_psf)
 !!        type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !!      subroutine set_node_and_patch_psf                               &
-!!     &         (num_psf, mesh, group, psf_case_tbls,                  &
+!!     &         (num_psf, mesh, group, edge_comm, psf_case_tbls,       &
 !!     &          psf_def, psf_search, psf_list, psf_grp_list, psf_mesh)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
@@ -20,14 +20,16 @@
 !!        type(surface_group_data), intent(in) :: sf_grp
 !!        type(surface_node_grp_data), intent(in) :: sf_grp_nod
 !!        type(communication_table), intent(in) :: nod_comm
+!!        type(communication_table), intent(in) :: edge_comm
 !!        type(psf_cases), intent(in) :: psf_case_tbls
 !!        type(psf_search_lists), intent(inout) :: psf_search(num_psf)
 !!        type(sectioning_list), intent(inout) :: psf_list(num_psf)
 !!        type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
 !!        type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
-!!      subroutine set_node_and_patch_iso(num_iso, mesh, psf_case_tbls, &
-!!     &          iso_search, iso_list, iso_mesh)
+!!      subroutine set_node_and_patch_iso(num_iso, mesh, edge_comm,     &
+!!     &          psf_case_tbls, iso_search, iso_list, iso_mesh)
 !!        type(mesh_geometry), intent(in) :: mesh
+!!        type(communication_table), intent(in) :: edge_comm
 !!        type(psf_cases), intent(in) :: psf_case_tbls
 !!        type(psf_search_lists), intent(inout) :: iso_search(num_iso)
 !!        type(sectioning_list), intent(inout):: iso_list(num_iso)
@@ -75,7 +77,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_node_and_patch_psf                                 &
-     &         (num_psf, mesh, group, psf_case_tbls,                    &
+     &         (num_psf, mesh, group, edge_comm, psf_case_tbls,         &
      &          psf_def, psf_search, psf_list, psf_grp_list, psf_mesh)
 !
       use m_geometry_constants
@@ -95,6 +97,7 @@
       integer(kind = kint), intent(in) :: num_psf
       type(mesh_geometry), intent(in) :: mesh
       type(mesh_groups), intent(in) ::   group
+      type(communication_table), intent(in) :: edge_comm
 !
       type(psf_cases), intent(in) :: psf_case_tbls
       type(section_define), intent(in) :: psf_def(num_psf)
@@ -130,7 +133,7 @@
 !
       if (iflag_debug.eq.1)  write(*,*) 'set_nodes_4_psf'
       call set_nodes_4_psf                                              &
-     &   (num_psf, mesh%node, mesh%edge, mesh%nod_comm,                 &
+     &   (num_psf, mesh%node, mesh%edge, mesh%nod_comm, edge_comm,      &
      &    group%surf_grp, group%surf_nod_grp, psf_def, psf_search,      &
      &    psf_list, psf_grp_list, psf_mesh)
 !
@@ -164,8 +167,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_node_and_patch_iso(num_iso, mesh, psf_case_tbls,   &
-     &          iso_search, iso_list, iso_mesh)
+      subroutine set_node_and_patch_iso(num_iso, mesh, edge_comm,       &
+     &          psf_case_tbls, iso_search, iso_list, iso_mesh)
 !
       use m_geometry_constants
       use calypso_mpi
@@ -179,6 +182,7 @@
 !
       integer(kind = kint), intent(in) :: num_iso
       type(mesh_geometry), intent(in) :: mesh
+      type(communication_table), intent(in) :: edge_comm
       type(psf_cases), intent(in) :: psf_case_tbls
 !
       type(psf_search_lists), intent(inout) :: iso_search(num_iso)
@@ -191,8 +195,9 @@
       call count_nodes_4_iso                                            &
      &   (num_iso, mesh%edge, iso_search, iso_list, iso_mesh)
 !
-      call set_nodes_4_iso(num_iso, mesh%node, mesh%edge,               &
-     &    mesh%nod_comm, iso_search, iso_list, iso_mesh)
+      call set_nodes_4_iso                                              &
+     &   (num_iso, mesh%node, mesh%edge, mesh%nod_comm, edge_comm,      &
+     &    iso_search, iso_list, iso_mesh)
 !
 !
       do i_iso = 1, num_iso

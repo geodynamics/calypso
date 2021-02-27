@@ -93,6 +93,7 @@
       use mpi_gen_sph_grids_modes
       use output_gen_sph_grid_modes
       use parallel_load_data_4_sph
+      use const_FEM_mesh_sph_mhd
       use nod_phys_send_recv
 !
 !      integer :: i1, i2, i
@@ -142,10 +143,10 @@
 !  ========= Generate FEM mesh ===========================
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+3)
-      if(iflag_debug .gt. 0) write(*,*) 'const_FEM_mesh_4_SPH'
-      call const_FEM_mesh_4_SPH                                         &
+      if(iflag_debug .gt. 0) write(*,*) 'load_FEM_mesh_4_SPH'
+      call load_FEM_mesh_4_SPH                                          &
      &   (sph_files1%FEM_mesh_flags, sph_files1%sph_file_param,         &
-     &    SPH_GEN, geofem)
+     &    SPH_GEN%groups, SPH_GEN%sph, geofem, SPH_GEN%sph_maker)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+3)
       call calypso_MPI_barrier
 !

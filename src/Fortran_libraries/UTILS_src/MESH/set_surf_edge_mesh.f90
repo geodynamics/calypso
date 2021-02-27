@@ -7,18 +7,20 @@
 !> @brief set surface and edge connectivity
 !!
 !!@verbatim
-!!      subroutine const_surface_and_edge(node, ele, surf, edge)
 !!      subroutine dealloc_surface_and_edge(node, ele, surf, edge)
 !!      subroutine empty_surface_and_edge(ele, surf, edge)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(inout) :: surf
 !!        type(edge_data), intent(inout) :: edge
-!!
-!!      subroutine set_surf_geometry(node, surf)
-!!      subroutine set_edge_geometry(node, edge)
+!!      subroutine const_surf_connectivity(node, ele, surf)
 !!        type(node_data), intent(in) :: node
+!!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(inout) :: surf
+!!      subroutine const_edge_connectivity(node, ele, surf, edge)
+!!        type(node_data), intent(in) :: node
+!!        type(element_data), intent(in) :: ele
+!!        type(surface_data), intent(in) :: surf
 !!        type(edge_data), intent(inout) :: edge
 !!@endverbatim
 !
@@ -34,35 +36,30 @@
 !
       implicit  none
 !
-      private :: const_surf_connectivity, const_edge_connectivity
-      private :: set_surf_geometry, set_edge_geometry
-!
 ! ----------------------------------------------------------------------
 !
      contains
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine const_surface_and_edge(node, ele, surf, edge)
+      subroutine init_surface_and_edge_geometry(node, surf, edge)
+!
+      use cal_mesh_position
 !
       type(node_data), intent(in) :: node
-      type(element_data), intent(in) :: ele
 !
       type(surface_data), intent(inout) :: surf
       type(edge_data), intent(inout) :: edge
 !
 !
-      if (iflag_debug.gt.0) write(*,*) 'const_surf_connectivity'
-      call const_surf_connectivity(node, ele, surf)
-      if (iflag_debug.gt.0) write(*,*) 'const_edge_connectivity'
-      call const_edge_connectivity(node, ele, surf, edge)
+      if (iflag_debug.gt.0) write(*,*) 'set_center_of_surface'
+      call alloc_surface_geometory(surf)
+      call set_center_of_surface(node, surf)
+      if (iflag_debug.gt.0) write(*,*) 'set_center_of_edge'
+      call alloc_edge_geometory(edge)
+      call set_center_of_edge(node, edge)
 !
-      if (iflag_debug.gt.0) write(*,*) 'set_surf_geometry'
-      call set_surf_geometry(node, surf)
-      if (iflag_debug.gt.0) write(*,*) 'set_edge_geometry'
-      call set_edge_geometry(node, edge)
-!
-      end subroutine const_surface_and_edge
+      end subroutine init_surface_and_edge_geometry
 !
 ! ----------------------------------------------------------------------
 !
@@ -100,7 +97,7 @@
       call empty_surface_connect(ele, surf)
       call empty_edge_connect_type(ele, surf, edge)
 !
-      call allocate_surface_geom_type(surf)
+      call alloc_surface_geometory(surf)
       call alloc_edge_geometory(edge)
 !
       end subroutine empty_surface_and_edge
@@ -123,7 +120,7 @@
       logical :: read_surface
 !
 !
-      read_surface = allocated(surf%isurf_global)
+      read_surface = allocated(surf%ie_surf)
 !
       if(read_surface .eqv. .false.) then
         if (iflag_debug.eq.1) write(*,*) 'construct_surface_data'
@@ -137,7 +134,6 @@
       if (iflag_debug.eq.1) write(*,*) 'count_overlap_surf_type'
       call alloc_surf_param_smp(surf)
       call count_surf_size_smp(surf)
-      call count_overlap_surf(node, surf)
 !
       end subroutine const_surf_connectivity
 !
@@ -158,7 +154,7 @@
       logical :: read_edge
 !
 !
-      read_edge =    allocated(edge%iedge_global)
+      read_edge =    allocated(edge%ie_edge)
 !
       if(read_edge .eqv. .false.) then
         if (iflag_debug.eq.1) write(*,*) 'construct_edge_data'
@@ -168,43 +164,10 @@
 !        call check_edge_hexa_data(id_rank, ele, edge)
       end if
 !
-      if (iflag_debug.eq.1) write(*,*) 'count_overlap_edge'
       call alloc_edge_param_smp(edge)
       call count_edge_size_smp(edge)
-      call count_overlap_edge(node, edge)
 !
       end subroutine const_edge_connectivity
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine set_surf_geometry(node, surf)
-!
-      use cal_mesh_position
-!
-      type(node_data), intent(in) :: node
-      type(surface_data), intent(inout) :: surf
-!
-!
-      call allocate_surface_geom_type(surf)
-      call set_center_of_surface(node, surf)
-!
-      end subroutine set_surf_geometry
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_edge_geometry(node, edge)
-!
-      use cal_mesh_position
-!
-      type(node_data), intent(in) :: node
-      type(edge_data), intent(inout) :: edge
-!
-!
-      call alloc_edge_geometory(edge)
-      call set_center_of_edge(node, edge)
-!
-      end subroutine set_edge_geometry
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

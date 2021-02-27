@@ -229,8 +229,8 @@
      &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld,    &
      &    x00_w_center)
 !
-      call fill_scalar_at_external(sph_bc%kr_in, sph_bc%kr_out,         &
-     &    sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,             &
+      call fill_scalar_at_external                                      &
+     &   (sph_bc, sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,     &
      &    sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                         &
      &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !

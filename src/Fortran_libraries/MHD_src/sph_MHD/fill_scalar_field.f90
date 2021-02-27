@@ -11,9 +11,10 @@
 !!      subroutine copy_degree0_comps_from_sol(nri, jmax,               &
 !!     &          inod_rj_center, idx_rj_degree_zero, sol_00, is_field, &
 !!     &          n_point, ntot_phys_rj, d_rj)
-!!      subroutine fill_scalar_at_external(kr_in, kr_out,               &
+!!      subroutine fill_scalar_at_external(sph_bc,                      &
 !!     &          inod_rj_center, idx_rj_degree_zero, nri, jmax,        &
 !!     &          ipol_scalar, n_point, ntot_phys_rj, d_rj)
+!!        type(sph_boundary_type), intent(in) :: sph_bc
 !!@endverbatim
 !
       module fill_scalar_field
@@ -94,11 +95,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine fill_scalar_at_external(kr_in, kr_out,                 &
+      subroutine fill_scalar_at_external(sph_bc,                        &
      &          inod_rj_center, idx_rj_degree_zero, nri, jmax,          &
      &          ipol_scalar, n_point, ntot_phys_rj, d_rj)
 !
-      integer(kind = kint), intent(in) :: kr_in, kr_out
+      use t_boundary_params_sph_MHD
+!
+      type(sph_boundary_type), intent(in) :: sph_bc
       integer(kind = kint), intent(in) :: inod_rj_center
       integer(kind = kint), intent(in) :: idx_rj_degree_zero
       integer(kind = kint), intent(in) :: nri, jmax
@@ -111,9 +114,9 @@
 !
 !
 !$omp parallel do private (k,j,inod,i_bc)
-      do k = 1, kr_in - 1
+      do k = 1, sph_bc%kr_in - 1
         do j = 1, jmax
-          i_bc = j + (kr_in-1) * jmax
+          i_bc = j + (sph_bc%kr_in-1) * jmax
           inod = j + (k-1) * jmax
           d_rj(inod,ipol_scalar) = d_rj(i_bc,ipol_scalar)
         end do
@@ -122,18 +125,21 @@
 !
 !
 !$omp parallel do private (k,j,inod,i_bc)
-      do k = kr_out + 1, nri
+      do k = sph_bc%kr_out + 1, nri
         do j = 1, jmax
-          i_bc = j + (kr_out-1) * jmax
+          i_bc = j + (sph_bc%kr_out-1) * jmax
           inod = j + (k-1) * jmax
           d_rj(inod,ipol_scalar) = d_rj(i_bc,ipol_scalar)
         end do
       end do
 !$omp end parallel do
 !
-      if(inod_rj_center .gt. 0) then
-        i_bc = idx_rj_degree_zero + (kr_in-1) * jmax
-        d_rj(inod_rj_center,ipol_scalar) = d_rj(i_bc,ipol_scalar)
+      if(sph_bc%iflag_icb .eq. iflag_fixed_field                        &
+     &  .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
+        if(inod_rj_center .gt. 0) then
+          i_bc = idx_rj_degree_zero + (sph_bc%kr_in-1) * jmax
+          d_rj(inod_rj_center,ipol_scalar) = d_rj(i_bc,ipol_scalar)
+        end if
       end if
 !
       end subroutine fill_scalar_at_external

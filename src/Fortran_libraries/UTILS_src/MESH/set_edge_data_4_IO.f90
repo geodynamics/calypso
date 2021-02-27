@@ -108,7 +108,7 @@
 !
 !
       nod_IO%numnod =        edge%numedge
-      nod_IO%internal_node = edge%internal_edge
+      nod_IO%internal_node = sum(edge%interior_edge)
 !
       call alloc_node_geometry_base(nod_IO)
       call alloc_ele_vector_IO(nod_IO, sfed_IO)
@@ -142,28 +142,19 @@
       type(surf_edge_IO_data), intent(in) :: sfed_IO
       type(edge_data), intent(inout) :: edge
 !
-      integer(kind = kint) :: iele, isurf, iedge
 !
       edge%numedge = ele_IO%numele
-!
       call alloc_edge_connect(edge, nsurf)
       call alloc_edge_4_ele(edge, nele)
 !
-      do iedge = 1, edge%numedge
-        edge%iedge_global(iedge) = ele_IO%iele_global(iedge)
-        edge%ie_edge(iedge,1:edge%nnod_4_edge)                          &
-     &        = ele_IO%ie(iedge,1:edge%nnod_4_edge)
-      end do
+      edge%ie_edge(1:edge%numedge,1:edge%nnod_4_edge)                   &
+     &        = ele_IO%ie(1:edge%numedge,1:edge%nnod_4_edge)
 !
-      do isurf = 1, nsurf
-        edge%iedge_4_sf(isurf,1:nedge_4_surf)                           &
-     &        = sfed_IO%isf_for_ele(isurf,1:nedge_4_surf)
-      end do
+      edge%iedge_4_sf(1:nsurf,1:nedge_4_surf)                           &
+     &        = sfed_IO%isf_for_ele(1:nsurf,1:nedge_4_surf)
 !
-      do iele = 1, nele
-        edge%iedge_4_ele(iele,1:nedge_4_ele)                            &
-     &        = sfed_IO%iedge_for_ele(iele,1:nedge_4_ele)
-      end do
+      edge%iedge_4_ele(1:nele,1:nedge_4_ele)                            &
+     &        = sfed_IO%iedge_for_ele(1:nele,1:nedge_4_ele)
 !
       end subroutine copy_edge_connect_from_IO
 !
@@ -178,7 +169,7 @@
       integer(kind = kint) :: iedge
 !
 !
-       edge%internal_edge = nod_IO%internal_node
+       edge%numedge = nod_IO%numnod
        call alloc_edge_geometory(edge)
 !
 !omp parallel do

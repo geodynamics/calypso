@@ -17,7 +17,6 @@
 !!      subroutine alloc_ref_field_4_psf(node, psf_list)
 !!       type(node_data), intent(in) :: node
 !!      subroutine alloc_nnod_psf(np_smp, edge, psf_list)
-!!      subroutine alloc_iedge_global_psf(psf_list)
 !!        type(edge_data), intent(in) :: edge
 !!      subroutine alloc_inod_psf(psf_list)
 !!      subroutine alloc_nnod_grp_psf(np_smp, node, psf_g_list)
@@ -25,7 +24,6 @@
 !!      subroutine alloc_inod_grp_psf(psf_g_list)
 !!      subroutine dealloc_ref_field_4_psf(psf_list)
 !!      subroutine dealloc_nnod_psf(psf_list)
-!!      subroutine dealloc_iedge_global_psf(psf_list)
 !!      subroutine dealloc_inod_psf(psf_list)
 !!      subroutine dealloc_inod_grp_psf(psf_g_list)
 !!@endverbatim
@@ -83,11 +81,6 @@
 !>        SMP stack for sections on edge
         integer(kind = kint), allocatable :: istack_exter_n_on_e_smp(:)
 !
-!>        Communication table for used edge
-        type(communication_table) :: edge_comm_4_psf
-!
-!>        ID for node on edge
-        integer(kind = kint_gl), allocatable :: id_global_psf(:)
 !>        ID for node on edge
         integer(kind = kint_gl), allocatable :: id_n_on_e(:)
 !
@@ -237,18 +230,6 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine alloc_iedge_global_psf(psf_list)
-!
-      type(sectioning_list), intent(inout) :: psf_list
-!
-!
-      allocate(psf_list%id_global_psf(psf_list%totalnod_on_edge))
-      if(psf_list%totalnod_on_edge .gt. 0) psf_list%id_global_psf = 0
-!
-      end subroutine alloc_iedge_global_psf
-!
-!  ---------------------------------------------------------------------
-!
       subroutine alloc_inod_psf(psf_list)
 !
       type(sectioning_list), intent(inout) :: psf_list
@@ -327,18 +308,6 @@
       deallocate(psf_list%id_n_on_e)
 !
       end subroutine dealloc_nnod_psf
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine dealloc_iedge_global_psf(psf_list)
-!
-      type(sectioning_list), intent(inout) :: psf_list
-!
-!
-      deallocate(psf_list%id_global_psf)
-      call dealloc_comm_table(psf_list%edge_comm_4_psf)
-!
-      end subroutine dealloc_iedge_global_psf
 !
 !  ---------------------------------------------------------------------
 !

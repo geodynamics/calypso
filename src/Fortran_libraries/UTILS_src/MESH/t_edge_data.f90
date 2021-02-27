@@ -7,9 +7,9 @@
 !> @brief Structure of edge geometry data
 !!
 !!@verbatim
-!!      subroutine alloc_numedge_stack(num_pe, edge)
 !!      subroutine alloc_inod_in_edge(edge)
 !!      subroutine alloc_edge_connect(edge, nsurf)
+!!      subroutine alloc_interior_edge(edge)
 !!      subroutine alloc_edge_4_ele(edge, nele)
 !!      subroutine alloc_isolate_edge(edge)
 !!      subroutine alloc_edge_geometory(edge)
@@ -19,9 +19,9 @@
 !!        type(edge_data), intent(inout) :: edge
 !!        type(edge_position), intent(inout) :: edge_pt
 !!
-!!      subroutine dealloc_numedge_stack(edge)
 !!      subroutine dealloc_inod_in_edge(edge)
 !!      subroutine dealloc_edge_connect(edge)
+!!      subroutine dealloc_interior_edge(edge)
 !!      subroutine dealloc_edge_4_ele(edge)
 !!      subroutine dealloc_isolate_edge(edge)
 !!      subroutine dealloc_edge_geometory(edge)
@@ -43,17 +43,10 @@
       type edge_data
 !>     number of edge on local PE
         integer(kind=kint) ::  numedge
-!>     number of internal edge on local PE
-        integer(kind=kint) ::  internal_edge
 !>     number of nodes in each edge
         integer(kind=kint) ::  nnod_4_edge
 !>     number of isolated edge
         integer(kind=kint) ::  numedge_iso
-!
-!>        Stack list of number of edge
-        integer(kind=kint_gl), allocatable  :: istack_numedge(:)
-!>        Stack list of number of internal edge
-        integer(kind=kint_gl), allocatable  :: istack_interedge(:)
 !
 !>     local index for edge on each element
         integer (kind=kint), allocatable :: node_on_edge(:,:)
@@ -69,6 +62,8 @@
 !
 !>       global edge id (where i:edge id)
         integer(kind=kint_gl), allocatable  ::  iedge_global(:)
+!>    integer flag for interior edge 1...interior, 0...exterior
+        integer(kind = kint), allocatable :: interior_edge(:)
 !
 !>   edge connectivity ie_edge(i:edge ID,j:surface index)
         integer(kind=kint), allocatable  :: ie_edge(:,:)
@@ -79,8 +74,6 @@
 !
 !>     isolated edge list
         integer(kind=kint), allocatable  ::  iedge_isolate(:)
-!>    integer flag for interior edge 1...interior, 0...exterior
-        integer(kind = kint), allocatable :: interior_edge(:)
 !
 !>   position of center of edge
         real(kind = kreal), allocatable  :: x_edge(:,:)
@@ -97,21 +90,6 @@
 !  ---------------------------------------------------------------------
 !
       contains
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine alloc_numedge_stack(num_pe, edge)
-!
-      integer, intent(in) :: num_pe
-      type(edge_data), intent(inout) :: edge
-!
-!
-      allocate(edge%istack_numedge(0:num_pe))
-      allocate(edge%istack_interedge(0:num_pe))
-      edge%istack_numedge =   0
-      edge%istack_interedge = 0
-!
-      end subroutine alloc_numedge_stack
 !
 !  ---------------------------------------------------------------------
 !
@@ -138,17 +116,29 @@
 !
       allocate( edge%iedge_4_sf(nsurf,nedge_4_surf) )
       allocate( edge%ie_edge(edge%numedge,edge%nnod_4_edge) )
-      allocate( edge%iedge_global(edge%numedge) )
-      allocate( edge%interior_edge(edge%numedge) )
 !
-      if(nsurf .gt. 0) edge%iedge_4_sf =    0
+      if(nsurf .gt. 0)        edge%iedge_4_sf =    0
+      if(edge%numedge .gt. 0) edge%ie_edge =       0
+!
+      end subroutine alloc_edge_connect
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine alloc_interior_edge(edge)
+!
+      use m_geometry_constants
+!
+      type(edge_data), intent(inout) :: edge
+!
+      allocate(edge%iedge_global(edge%numedge))
+      allocate(edge%interior_edge(edge%numedge))
+!
       if(edge%numedge .gt. 0) then
-        edge%ie_edge =       0
         edge%iedge_global =  0
         edge%interior_edge = 0
       end if
 !
-      end subroutine alloc_edge_connect
+      end subroutine alloc_interior_edge
 !
 !  ---------------------------------------------------------------------
 !
@@ -186,10 +176,7 @@
       allocate( edge%x_edge(edge%numedge,3) )
 !
 !
-      if (edge%numedge .gt. 0) then
-        edge%x_edge =      0.0d0
-!
-      end if
+      if (edge%numedge .gt. 0) edge%x_edge = 0.0d0
 !
       end subroutine alloc_edge_geometory
 !
@@ -227,23 +214,13 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine dealloc_numedge_stack(edge)
-!
-      type(edge_data), intent(inout) :: edge
-!
-!
-      deallocate ( edge%istack_numedge, edge%istack_interedge)
-!
-      end subroutine dealloc_numedge_stack
-!
-!  ---------------------------------------------------------------------
-!
       subroutine dealloc_inod_in_edge(edge)
 !
       type(edge_data), intent(inout) :: edge
 !
 !
-      deallocate ( edge%node_on_edge, edge%node_on_edge_sf)
+      if(allocated(edge%node_on_edge) .eqv. .FALSE.) return
+      deallocate(edge%node_on_edge, edge%node_on_edge_sf)
 !
       end subroutine dealloc_inod_in_edge
 !
@@ -253,12 +230,21 @@
 !
       type(edge_data), intent(inout) :: edge
 !
-      deallocate( edge%iedge_4_sf )
-      deallocate( edge%ie_edge )
-      deallocate( edge%iedge_global )
-      deallocate( edge%interior_edge )
+      if(allocated(edge%iedge_4_sf) .eqv. .FALSE.) return
+      deallocate(edge%iedge_4_sf, edge%ie_edge)
 !
       end subroutine dealloc_edge_connect
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine dealloc_interior_edge(edge)
+!
+      type(edge_data), intent(inout) :: edge
+!
+      if(allocated(edge%interior_edge) .eqv. .FALSE.) return
+      deallocate(edge%iedge_global, edge%interior_edge)
+!
+      end subroutine dealloc_interior_edge
 !
 !  ---------------------------------------------------------------------
 !
@@ -266,8 +252,7 @@
 !
       type(edge_data), intent(inout) :: edge
 !
-!
-      deallocate( edge%iedge_4_ele )
+      if(allocated(edge%iedge_4_ele)) deallocate(edge%iedge_4_ele)
 !
       end subroutine dealloc_edge_4_ele
 !
@@ -277,8 +262,7 @@
 !
       type(edge_data), intent(inout) :: edge
 !
-!
-      deallocate( edge%iedge_isolate )
+      if(allocated(edge%iedge_isolate)) deallocate(edge%iedge_isolate)
 !
       end subroutine dealloc_isolate_edge
 !
@@ -288,7 +272,7 @@
 !
       type(edge_data), intent(inout) :: edge
 !
-      deallocate( edge%x_edge )
+      if(allocated(edge%x_edge)) deallocate(edge%x_edge)
 !
       end subroutine dealloc_edge_geometory
 !
@@ -298,9 +282,9 @@
 !
       type(edge_data), intent(inout) :: edge
 !
-      deallocate( edge%edge_length   )
-      deallocate( edge%a_edge_length )
-      deallocate( edge%edge_vect     )
+      if(allocated(edge%edge_length) .eqv. .FALSE.) return
+      deallocate(edge%edge_length, edge%a_edge_length)
+      deallocate(edge%edge_vect)
 !
       end subroutine dealloc_edge_vect
 !
@@ -310,7 +294,7 @@
 !
       type(edge_data), intent(inout) :: edge
 !
-      deallocate( edge%istack_edge_smp )
+      if(allocated(edge%x_edge)) deallocate(edge%istack_edge_smp)
 !
       end subroutine dealloc_edge_param_smp
 !

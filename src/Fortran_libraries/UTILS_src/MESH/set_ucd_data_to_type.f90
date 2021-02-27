@@ -49,6 +49,7 @@
       subroutine link_local_mesh_2_ucd(node, ele, ucd)
 !
       use set_and_cal_udt_data
+      use count_overlap
 !
       type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
@@ -57,8 +58,13 @@
 !
 !
       ucd%nnod = node%numnod
-      call const_udt_local_nodes(node%numnod, node%xx, ucd)
-      call const_udt_local_connect(node%internal_node,                  &
+      call allocate_ucd_node(ucd)
+      call set_udt_local_nodes(node%numnod, node%xx, ucd)
+      ucd%nnod_4_ele = ele%nnod_4_ele
+      ucd%nele = count_interier_element(node, ele)
+      call allocate_ucd_ele(ucd)
+!
+      call set_udt_local_connect(node%internal_node,                    &
      &    ele%numele, ele%nnod_4_ele, ele%ie, ucd)
 !
       end subroutine link_local_mesh_2_ucd
@@ -68,6 +74,7 @@
       subroutine link_global_mesh_2_ucd(node, ele, ucd)
 !
       use set_and_cal_udt_data
+      use count_overlap
 !
       type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
@@ -76,8 +83,14 @@
 !
 !
       call link_node_data_2_ucd(node, ucd)
-      call const_udt_global_connect(node%internal_node,                 &
+!
+      ucd%nnod_4_ele = ele%nnod_4_ele
+      ucd%nele = count_interier_element(node, ele)
+      call allocate_ucd_ele(ucd)
+!
+      call set_udt_global_connect(node%internal_node,                   &
      &    ele%numele, ele%nnod_4_ele, ele%iele_global, ele%ie, ucd)
+!
 !
       end subroutine link_global_mesh_2_ucd
 !

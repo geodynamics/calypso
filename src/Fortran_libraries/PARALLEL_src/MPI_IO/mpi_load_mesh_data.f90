@@ -227,7 +227,7 @@
 !
 !
       call copy_comm_tbl_type(mesh%nod_comm, fem_IO_m%mesh%nod_comm)
-      call copy_node_geometry_types(mesh%node, fem_IO_m%mesh%node)
+      call copy_node_geometry(mesh%node, fem_IO_m%mesh%node)
       call copy_ele_connect_to_IO(mesh%ele, fem_IO_m%mesh%ele)
 !
       call set_grp_data_to_IO                                           &

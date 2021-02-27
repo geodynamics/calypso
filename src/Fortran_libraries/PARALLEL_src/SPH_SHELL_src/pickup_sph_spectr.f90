@@ -288,8 +288,10 @@
 !
       if(num_pickup_lc .le. 0) return
 !
-      call quicksort_w_index(num_pickup_lc, idx_pickup(1,3),            &
-     &    ione, num_pickup_lc, idx_pickup(1,4))
+      if(num_pickup_lc .gt. 1) then
+        call quicksort_w_index(num_pickup_lc, idx_pickup(1,3),          &
+     &                         ione, num_pickup_lc, idx_pickup(1,4))
+      end if
 !
       do jcou = 1, num_pickup_lc
         call get_degree_order_by_full_j(idx_pickup(jcou,3),             &

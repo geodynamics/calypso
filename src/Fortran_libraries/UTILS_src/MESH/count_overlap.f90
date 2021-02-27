@@ -7,8 +7,10 @@
 !> @brief Check overlapped element
 !!
 !!@verbatim
-!!      integer(kind = kint) function count_interier_element            &
-!!     &                            (internal_node, numele, ie)
+!!      logical function check_internal_element(iele, node, ele)
+!!      integer(kind = kint) function count_interier_element(node, ele)
+!!        type(node_data), intent(in) :: node
+!!        type(element_data), intent(in) :: ele
 !!      subroutine set_overlap_flag(np_smp, inum_smp_stack,             &
 !!     &          internal_node, numele, ie, internal_n, interior_flag)
 !!
@@ -31,19 +33,38 @@
 !
 ! ----------------------------------------------------------------------
 !
-      integer(kind = kint) function count_interier_element              &
-     &                            (internal_node, numele, ie)
+      logical function check_internal_element(iele, node, ele)
 !
-      integer(kind = kint), intent(in) :: internal_node, numele
-      integer(kind = kint), intent(in) :: ie(numele,1)
+      use t_geometry_data
+!
+      integer(kind = kint), intent(in) :: iele
+      type(node_data), intent(in) :: node
+      type(element_data), intent(in) :: ele
+!
+      if(ele%ie(iele,1) .le. node%internal_node)  then
+        check_internal_element = .TRUE.
+      else
+        check_internal_element = .FALSE.
+      end if
+!
+      end function check_internal_element
+!
+! ----------------------------------------------------------------------
+!
+      integer(kind = kint) function count_interier_element(node, ele)
+!
+      use t_geometry_data
+!
+      type(node_data), intent(in) :: node
+      type(element_data), intent(in) :: ele
 !
       integer (kind = kint) :: icou, iele
 !
 !
       icou = 0
 !$omp parallel do private(iele) reduction(+:icou)
-      do iele = 1, numele
-        if(ie(iele,1) .le. internal_node) icou = icou + 1
+      do iele = 1, ele%numele
+        if(check_internal_element(iele, node, ele)) icou = icou + 1
       end do
 !$omp end parallel do
       count_interier_element = icou

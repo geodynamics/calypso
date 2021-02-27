@@ -14,7 +14,7 @@
 !!        type(mesh_geometry), intent(inout) :: tgt_mesh
 !!        type(mesh_groups), intent(inout) :: tgt_grp
 !!
-!!      subroutine copy_node_geometry_types(org_node, new_node)
+!!      subroutine copy_node_geometry(org_node, new_node)
 !!      subroutine copy_node_sph_to_xx(org_node, new_node)
 !!      subroutine copy_node_cyl_to_xx(org_node, new_node)
 !!        type(node_data), intent(in) :: org_node
@@ -68,7 +68,7 @@
 !
       call copy_comm_tbl_types(mesh%nod_comm, tgt_mesh%nod_comm)
 !
-      call copy_node_geometry_types(mesh%node, tgt_mesh%node)
+      call copy_node_geometry(mesh%node, tgt_mesh%node)
       call copy_element_connect_types(mesh%ele, tgt_mesh%ele)
 !
 !
@@ -87,7 +87,7 @@
 !  ---------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine copy_node_geometry_types(org_node, new_node)
+      subroutine copy_node_geometry(org_node, new_node)
 !
       use t_geometry_data
 !
@@ -111,7 +111,7 @@
       end do
 !$omp end parallel do
 !
-      end subroutine copy_node_geometry_types
+      end subroutine copy_node_geometry
 !
 !------------------------------------------------------------------
 !

@@ -8,15 +8,16 @@
 !>@brief Structure for cross sectioning
 !!
 !!@verbatim
-!!      subroutine SECTIONING_initialize(fem, nod_fld, psf_ctls, psf)
-!!        type(mesh_data), intent(in) :: fem
+!!      subroutine SECTIONING_initialize(geofem, nod_fld, psf_ctls, psf)
+!!        type(mesh_data), intent(in) :: geofem
+!!        type(communication_table), intent(in) :: edge_comm
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(section_controls), intent(inout) :: psf_ctls
 !!        type(sectioning_module), intent(inout) :: psf
 !!      subroutine SECTIONING_visualize                                 &
-!!     &         (istep_psf, time_d, fem, nod_fld, psf)
+!!     &         (istep_psf, time_d, geofem, nod_fld, psf)
 !!        type(time_data), intent(in) :: time_d
-!!        type(mesh_data), intent(in) :: fem
+!!        type(mesh_data), intent(in) :: geofem
 !!        type(phys_data), intent(in) :: nod_fld
 !!      subroutine SECTIONING_finalize(psf)
 !!        type(sectioning_module), intent(inout) :: psf
@@ -34,6 +35,7 @@
 !
       use t_time_data
       use t_mesh_data
+      use t_comm_table
       use t_phys_data
       use t_psf_geometry_list
       use t_psf_patch_data
@@ -87,7 +89,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine SECTIONING_initialize(fem, nod_fld, psf_ctls, psf)
+      subroutine SECTIONING_initialize                                  &
+     &         (geofem, edge_comm, nod_fld, psf_ctls, psf)
 !
       use m_work_time
       use m_elapsed_labels_4_VIZ
@@ -101,7 +104,8 @@
       use set_fields_for_psf
       use output_4_psf
 !
-      type(mesh_data), intent(in) :: fem
+      type(mesh_data), intent(in) :: geofem
+      type(communication_table), intent(in) :: edge_comm
       type(phys_data), intent(in) :: nod_fld
 !
       type(section_controls), intent(inout) :: psf_ctls
@@ -119,12 +123,13 @@
       call alloc_psf_field_type(psf)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_psf_control'
-      call set_psf_control(psf%num_psf, fem%group, nod_fld,             &
+      call set_psf_control(psf%num_psf, geofem%group, nod_fld,          &
      &    psf_ctls, psf%psf_param, psf%psf_def,                         &
      &    psf%psf_mesh, psf%psf_file_IO)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_search_mesh_list_4_psf'
-      call set_search_mesh_list_4_psf(psf%num_psf, fem%mesh, fem%group, &
+      call set_search_mesh_list_4_psf                                   &
+     &   (psf%num_psf, geofem%mesh, geofem%group,                       &
      &    psf%psf_param, psf%psf_search)
 !
 !
@@ -132,16 +137,18 @@
         call alloc_node_param_smp(psf%psf_mesh(i_psf)%node)
         call alloc_ele_param_smp(psf%psf_mesh(i_psf)%patch)
 !
-        call alloc_ref_field_4_psf(fem%mesh%node, psf%psf_list(i_psf))
+        call alloc_ref_field_4_psf                                      &
+     &     (geofem%mesh%node, psf%psf_list(i_psf))
       end do
 !
       if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+1)
       if (iflag_debug.eq.1) write(*,*) 'set_const_4_crossections'
       call set_const_4_crossections                                     &
-     &   (psf%num_psf, psf%psf_def, fem%mesh%node, psf%psf_list)
+     &   (psf%num_psf, psf%psf_def, geofem%mesh%node, psf%psf_list)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_node_and_patch_psf'
-      call set_node_and_patch_psf(psf%num_psf, fem%mesh, fem%group,     &
+      call set_node_and_patch_psf                                       &
+     &   (psf%num_psf, geofem%mesh, geofem%group, edge_comm,            &
      &    psf%psf_case_tbls, psf%psf_def, psf%psf_search, psf%psf_list, &
      &    psf%psf_grp_list, psf%psf_mesh)
 !
@@ -159,7 +166,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine SECTIONING_visualize                                   &
-     &         (istep_psf, time_d, fem, nod_fld, psf)
+     &         (istep_psf, time_d, geofem, nod_fld, psf)
 !
       use m_work_time
       use m_elapsed_labels_4_VIZ
@@ -169,7 +176,7 @@
 !
       integer(kind = kint), intent(in) :: istep_psf
       type(time_data), intent(in) :: time_d
-      type(mesh_data), intent(in) :: fem
+      type(mesh_data), intent(in) :: geofem
       type(phys_data), intent(in) :: nod_fld
 !
       type(sectioning_module), intent(inout) :: psf
@@ -178,7 +185,7 @@
       if (psf%num_psf.le.0 .or. istep_psf.le.0) return
 !
       if(iflag_PSF_time) call start_elapsed_time(ist_elapsed_PSF+2)
-      call set_field_4_psf(psf%num_psf, fem%mesh%edge, nod_fld,         &
+      call set_field_4_psf(psf%num_psf, geofem%mesh%edge, nod_fld,      &
      &    psf%psf_def, psf%psf_param, psf%psf_list, psf%psf_grp_list,   &
      &    psf%psf_mesh)
       if(iflag_PSF_time) call end_elapsed_time(ist_elapsed_PSF+2)

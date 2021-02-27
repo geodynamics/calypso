@@ -105,8 +105,8 @@
 !
 !
       surf%numsurf = 0
-      if (iflag_debug.eq.1) write(*,*) 'allocate_surface_connect_type'
-      call allocate_surface_connect_type(surf, ele%numele)
+      if (iflag_debug.eq.1) write(*,*) 'alloc_surface_connect'
+      call alloc_surface_connect(surf, ele%numele)
 !
       if (iflag_debug.eq.1) write(*,*) 'alloc_surf_param_smp'
       call alloc_surf_param_smp(surf)
@@ -193,7 +193,7 @@
       call count_all_surfaces                                           &
      &   (sf_ele_tbl%ntot_list, sf_ele_tbl%iflag_hash, surf%numsurf)
 !
-      call allocate_surface_connect_type(surf, ele%numele)
+      call alloc_surface_connect(surf, ele%numele)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_all_surfaces'
       call set_all_surfaces                                             &
@@ -244,7 +244,7 @@
       call count_part_surface(ele%numele, sf_ele_tbl%ntot_list,         &
      &    sf_ele_tbl%iflag_hash, surf%numsurf_ext)
 !
-      call allocate_ext_surface_type(surf)
+      call alloc_ext_surface(surf)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_part_surface'
       call set_part_surface                                             &
@@ -280,7 +280,7 @@
       call count_part_surface(ele%numele, sf_ele_tbl%ntot_list,         &
      &    sf_ele_tbl%iflag_hash, surf%numsurf_iso)
 !
-      call allocate_iso_surface_type(surf)
+      call alloc_iso_surface(surf)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_part_surface'
       call set_part_surface                                             &

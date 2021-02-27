@@ -126,7 +126,7 @@
 !
 !
       call copy_comm_tbl_type(mesh%nod_comm, fem_IO_i%mesh%nod_comm)
-      call copy_node_geometry_types(mesh%node, fem_IO_i%mesh%node)
+      call copy_node_geometry(mesh%node, fem_IO_i%mesh%node)
       call copy_ele_connect_to_IO(mesh%ele, fem_IO_i%mesh%ele)
 !
       call set_grp_data_to_IO                                           &
@@ -179,7 +179,7 @@
 !
 !
       call copy_comm_tbl_type(mesh_IO%nod_comm, nod_comm)
-      call copy_node_geometry_types(mesh_IO%node, node)
+      call copy_node_geometry(mesh_IO%node, node)
       call copy_ele_connect_from_IO(mesh_IO%ele, ele)
 !
       call dealloc_mesh_geometry_base(mesh_IO)
@@ -199,7 +199,7 @@
       type(node_data), intent(inout) :: node
 !
 !
-      call copy_node_geometry_types(mesh_IO%node, node)
+      call copy_node_geometry(mesh_IO%node, node)
 !
       call dealloc_node_geometry_IO(mesh_IO)
 !

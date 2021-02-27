@@ -54,6 +54,7 @@
 !
       use t_time_data
       use t_mesh_data
+      use t_comm_table
       use t_phys_data
       use t_phys_address
       use t_MHD_step_parameter
@@ -81,6 +82,7 @@
       use nod_phys_send_recv
       use node_monitor_IO
       use parallel_FEM_mesh_init
+      use const_element_comm_tables
 !
       type(MHD_file_IO_params), intent(in) :: MHD_files
       type(MHD_step_param), intent(in) :: MHD_step
@@ -111,14 +113,9 @@
 !
 !  -------------------------------
 !
-      if (iflag_debug.gt.0 ) write(*,*) 'FEM_mesh_initialization'
+      if (iflag_debug.gt.0 ) write(*,*) 'FEM_comm_initialization'
       call FEM_comm_initialization(geofem%mesh, v_sol)
-      call FEM_mesh_initialization(geofem%mesh, geofem%group)
 !
-      call deallocate_surface_geom_type(geofem%mesh%surf)
-      call dealloc_edge_geometory(geofem%mesh%edge)
-!
-!  -------------------------------
       end subroutine FEM_initialize_sph_MHD
 !
 !-----------------------------------------------------------------------

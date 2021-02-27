@@ -8,7 +8,7 @@ count_nnod_4_asseble_sph.o: $(MERGE_DIR)/count_nnod_4_asseble_sph.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 new_SPH_restart.o: $(MERGE_DIR)/new_SPH_restart.f90 m_precision.o calypso_mpi.o t_time_data.o t_SPH_mesh_field_array.o t_SPH_mesh_field_data.o t_file_IO_parameter.o t_phys_data.o t_field_data_IO.o t_spheric_parameter.o append_phys_data.o copy_rj_phys_data_4_IO.o field_IO_select.o input_old_file_sel_4_zlib.o r_interpolate_marged_sph.o parallel_assemble_sph.o share_field_data.o m_base_field_labels.o assemble_sph_fields.o set_merged_restart_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
-parallel_assemble_sph.o: $(MERGE_DIR)/parallel_assemble_sph.f90 m_precision.o m_machine_parameter.o m_constants.o t_spheric_parameter.o t_spheric_rj_data.o r_interpolate_marged_sph.o
+parallel_assemble_sph.o: $(MERGE_DIR)/parallel_assemble_sph.f90 m_precision.o m_machine_parameter.o m_constants.o t_spheric_parameter.o t_phys_data.o t_spheric_rj_data.o r_interpolate_marged_sph.o
 	$(F90) -c $(F90OPTFLAGS) $<
 r_interpolate_marged_sph.o: $(MERGE_DIR)/r_interpolate_marged_sph.f90 m_precision.o m_constants.o calypso_mpi.o t_spheric_parameter.o t_spheric_group.o skip_comment_f.o calypso_mpi_real.o calypso_mpi_int.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<

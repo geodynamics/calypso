@@ -52,7 +52,7 @@
 !
 !
       allocate(comm_rlm_mul(sph_array%num_pe))
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+6)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
       do ip = 1, sph_array%num_pe
         id_rank = ip - 1
         if(mod(id_rank,nprocs) .ne. my_rank) cycle
@@ -66,9 +66,9 @@
       end do
 !
       call para_bcast_comm_stacks_sph(sph_array%num_pe, comm_rlm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+8)
       do ip = 1, sph_array%num_pe
         id_rank = ip - 1
         if(mod(id_rank,nprocs) .ne. my_rank) cycle
@@ -84,7 +84,7 @@
       end do
       call dealloc_comm_stacks_sph(sph_array%num_pe, comm_rlm_mul)
       deallocate(comm_rlm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+8)
 !
       end subroutine para_gen_sph_rlm_rj_modes
 !
@@ -105,7 +105,7 @@
       integer :: ip, id_rank
 !
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+6)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
       allocate(comm_rtm_mul(sph_array%num_pe))
       do ip = 1, sph_array%num_pe
         id_rank = ip - 1
@@ -119,9 +119,9 @@
      &     (sph_array%comms(ip)%comm_rtm, comm_rtm_mul(ip))
       end do
       call para_bcast_comm_stacks_sph(sph_array%num_pe, comm_rtm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+6)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
 !
-      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+7)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+8)
       do ip = 1, sph_array%num_pe
         id_rank = ip - 1
         if(mod(id_rank,nprocs) .ne. my_rank) cycle
@@ -136,7 +136,7 @@
       end do
       call dealloc_comm_stacks_sph(sph_array%num_pe, comm_rtm_mul)
       deallocate(comm_rtm_mul)
-      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+7)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+8)
 !
       end subroutine para_gen_sph_rtm_rtp_grids
 !

@@ -35,7 +35,7 @@
       use m_elapsed_labels_4_MHD
       use m_elapsed_labels_4_VIZ
       use m_elapsed_labels_gen_SPH
-      use const_element_comm_table
+!      use parallel_sleeve_extension
 !
 !
       call elapsed_label_4_MHD
@@ -51,6 +51,7 @@
       call elpsed_label_4_VIZ
       call elapsed_label_4_SGS_model
 !      call elapsed_label_4_ele_comm_tbl
+!      call elpsed_label_4_sleeve_ext
 !
       call elpsed_label_gen_sph_grid
 !

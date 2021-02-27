@@ -185,7 +185,6 @@
       call dealloc_control_array_c3(sec_viz_ctl%viz_field_ctl)
       call reset_control_platforms(sec_viz_ctl%sect_plt)
       call reset_ctl_data_4_time_step(sec_viz_ctl%t_sect_ctl)
-      call dealloc_surfacing_controls(sec_viz_ctl%surfacing_ctls)
 !
       sec_viz_ctl%i_viz_only_file = 0
 !

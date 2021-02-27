@@ -125,8 +125,10 @@
         end if
       end do
 !
-      call quicksort_int                                                &
-     &   (pwr%nri_rms, pwr%kr_4_rms, ione, pwr%nri_rms)
+      if(pwr%nri_rms .gt. 1) then
+        call quicksort_int                                              &
+     &     (pwr%nri_rms, pwr%kr_4_rms, ione, pwr%nri_rms)
+      end if
 !
       call set_domains_4_spectr_output(sph_rj, pwr)
       call alloc_rms_4_sph_spectr                                       &

@@ -15,6 +15,8 @@
 !!     &         (file_name, num_pe, id_rank, t_IO, ucd)
 !!      subroutine read_alloc_ucd_fld_file_mpi_b                        &
 !!     &         (file_name, num_pe, id_rank, t_IO, ucd)
+!!      subroutine read_alloc_ucd_prm_file_mpi_b                        &
+!!     &         (file_name, num_pe, id_rank, t_IO, ucd)
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(ucd_data), intent(inout) :: ucd
 !!
@@ -88,6 +90,7 @@
       use MPI_binary_head_IO
       use MPI_ascii_data_IO
       use field_block_MPI_IO_b
+      use transfer_to_long_integers
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -95,8 +98,6 @@
 !
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
-!
-      integer(kind = kint_gl) :: num64
 !
 !
       if(my_rank .eq. 0) write(*,*)                                     &
@@ -109,9 +110,8 @@
      &   (num_pe, IO_param, t_IO, ucd%nnod, ucd%istack_merged_nod)
       call mpi_read_one_inthead_b(IO_param, ucd%num_field)
 !
-      num64 = ucd%num_field
       call mpi_read_mul_inthead_b                                       &
-     &    (IO_param, num64, ucd%num_comp)
+     &    (IO_param, cast_long(ucd%num_field), ucd%num_comp)
 !
       call mpi_read_mul_charahead_b                                     &
      &   (IO_param, ucd%num_field, ucd%phys_name)
@@ -132,6 +132,7 @@
       use MPI_binary_head_IO
       use MPI_ascii_data_IO
       use field_block_MPI_IO_b
+      use transfer_to_long_integers
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -140,12 +141,9 @@
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
 !
-      integer(kind = kint_gl) :: num64
-!
 !
       if(my_rank .eq. 0) write(*,*)                                     &
      &    'read binary data by MPI-IO: ', trim(file_name)
-!
 !
       call open_read_mpi_file_b                                         &
      &   (file_name, num_pe, id_rank, IO_param)
@@ -153,9 +151,9 @@
      &   (num_pe, IO_param, t_IO, ucd%nnod, ucd%istack_merged_nod)
       call mpi_read_one_inthead_b(IO_param, ucd%num_field)
 !
-      num64 = ucd%num_field
       call allocate_ucd_phys_name(ucd)
-      call mpi_read_mul_inthead_b(IO_param, num64, ucd%num_comp)
+      call mpi_read_mul_inthead_b(IO_param, cast_long(ucd%num_field),   &
+     &                            ucd%num_comp)
 !
       call cal_istack_ucd_component(ucd)
       call allocate_ucd_phys_data(ucd)
@@ -174,6 +172,52 @@
       end if
 !
       end subroutine read_alloc_ucd_fld_file_mpi_b
+!
+! -----------------------------------------------------------------------
+!
+      subroutine read_alloc_ucd_prm_file_mpi_b                          &
+     &         (file_name, num_pe, id_rank, t_IO, ucd)
+!
+      use MPI_binary_data_IO
+      use MPI_binary_head_IO
+      use MPI_ascii_data_IO
+      use field_block_MPI_IO_b
+      use transfer_to_long_integers
+!
+      character(len=kchara), intent(in) :: file_name
+      integer, intent(in) :: id_rank
+      integer, intent(in) :: num_pe
+!
+      type(time_data), intent(inout) :: t_IO
+      type(ucd_data), intent(inout) :: ucd
+!
+!
+      if(my_rank .eq. 0) write(*,*)                                     &
+     &    'read binary data by MPI-IO: ', trim(file_name)
+      call open_read_mpi_file_b                                         &
+     &   (file_name, num_pe, id_rank, IO_param)
+      call read_field_header_mpi_b                                      &
+     &   (num_pe, IO_param, t_IO, ucd%nnod, ucd%istack_merged_nod)
+      call mpi_read_one_inthead_b(IO_param, ucd%num_field)
+!
+      call allocate_ucd_phys_name(ucd)
+      call mpi_read_mul_inthead_b(IO_param, cast_long(ucd%num_field),   &
+     &                            ucd%num_comp)
+!
+      call cal_istack_ucd_component(ucd)
+      call allocate_ucd_phys_data(ucd)
+!
+      call mpi_read_mul_charahead_b                                     &
+     &   (IO_param, ucd%num_field, ucd%phys_name)
+!
+      call close_mpi_file(IO_param)
+!
+      if(id_rank .ge. num_pe) then
+        call deallocate_ucd_phys_data(ucd)
+        call deallocate_ucd_phys_name(ucd)
+      end if
+!
+      end subroutine read_alloc_ucd_prm_file_mpi_b
 !
 ! -----------------------------------------------------------------------
 !

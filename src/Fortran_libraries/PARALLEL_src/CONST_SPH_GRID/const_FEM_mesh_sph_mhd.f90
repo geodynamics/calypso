@@ -121,6 +121,8 @@
      &        (FEM_mesh_flags, mesh_file, sph_params, sph_rtp, sph_rj,  &
      &         mesh, group, gen_sph)
 !
+      use m_elapsed_labels_gen_SPH
+      use m_work_time
       use mpi_load_mesh_data
       use sph_file_IO_select
 !      use para_const_kemoview_mesh
@@ -141,14 +143,15 @@
 !      integer(kind = kint) :: i_level
 !
 !
+      if(iflag_GSP_time) call start_elapsed_time(ied_elapsed_GSP+9)
       call base_FEM_mesh_sph_mhd(sph_params, sph_rtp, sph_rj,           &
      &    mesh, group, gen_sph)
+      if(iflag_GSP_time) call end_elapsed_time(ied_elapsed_GSP+9)
 !
 !! Increase sleeve size
-!      do i_level = 2, gen_sph%num_FEM_sleeve
-!        if(my_rank .eq. 0) write(*,*) 'extend sleeve:', i_level
-!        call para_sleeve_extension(mesh, group)
-!      end do
+!      if(iflag_GSP_time) call end_elapsed_time(ied_elapsed_GSP+10)
+!      call sleeve_extension_loop(gen_sph%num_FEM_sleeve, mesh, group)
+!      if(iflag_GSP_time) call start_elapsed_time(ied_elapsed_GSP+10)
 !
 ! Output mesh data
       if(FEM_mesh_flags%iflag_access_FEM .gt. 0) then

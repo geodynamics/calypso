@@ -69,6 +69,9 @@
         type(boundary_condition_lists) :: e_potential_BC
 !>         Node group data list for current density
         type(boundary_condition_lists) :: current_BC
+!
+!>         Node group data list for infinity
+        type(boundary_condition_list) :: infty_BC
       end type MHD_BC_lists
 !
 ! -----------------------------------------------------------------------

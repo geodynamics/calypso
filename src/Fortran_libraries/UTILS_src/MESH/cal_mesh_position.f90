@@ -1,21 +1,26 @@
-!cal_mesh_position.f90
-!      module cal_mesh_position
+!> @file  cal_mesh_position.f90
+!!      module cal_mesh_position
+!!
+!! @author  H. Matsui
+!! @date Programmed in July, 2006
 !
-!      Written by H. Matsui on July, 2006
-!
-!      subroutine set_spherical_position(nod)
-!        type(node_data), intent(inout) :: nod
-!      subroutine set_center_of_element(nod, ele)
-!        type(node_data),    intent(in) :: nod
-!        type(element_data), intent(inout) :: ele
-!      subroutine set_center_of_surface(nod, surf)
-!        type(node_data),    intent(in) :: nod
-!        type(surface_data), intent(inout) :: surf
-!      subroutine set_center_of_edge(nod, edge)
-!        type(node_data), intent(in) :: nod
-!        type(edge_data), intent(inout) :: edge
-!      subroutine find_subdomain_position_range(nod)
-!        type(node_data), intent(in) :: nod
+!> @brief Set positions for node, element, surface, edge
+!!
+!!@verbatim
+!!      subroutine set_spherical_position(nod)
+!!        type(node_data), intent(inout) :: nod
+!!      subroutine set_center_of_element(nod, ele)
+!!        type(node_data),    intent(in) :: nod
+!!        type(element_data), intent(inout) :: ele
+!!      subroutine set_center_of_surface(nod, surf)
+!!        type(node_data),    intent(in) :: nod
+!!        type(surface_data), intent(inout) :: surf
+!!      subroutine set_center_of_edge(nod, edge)
+!!        type(node_data), intent(in) :: nod
+!!        type(edge_data), intent(inout) :: edge
+!!      subroutine find_subdomain_position_range(nod)
+!!        type(node_data), intent(in) :: nod
+!!@endverbatim
 !
       module cal_mesh_position
 !
@@ -66,7 +71,7 @@
      &      nod%xx, ele%x_ele)
       end if
 !
-      call position_2_sph( ele%numele, ele%x_ele,                       &
+      call position_2_sph(ele%numele, ele%x_ele,                        &
      &    ele%r_ele, ele%theta_ele,   ele%phi_ele,                      &
      &    ele%ar_ele, ele%s_ele, ele%as_ele)
 !

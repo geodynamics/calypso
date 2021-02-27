@@ -168,8 +168,8 @@
       type(send_recv_status), intent(inout) :: SR_sig
 !
 !
-      deallocate(SR_sig%sta1, SR_sig%req1)
-      deallocate(SR_sig%sta2, SR_sig%req2)
+      if(allocated(SR_sig%req1)) deallocate(SR_sig%sta1, SR_sig%req1)
+      if(allocated(SR_sig%req2)) deallocate(SR_sig%sta2, SR_sig%req2)
 !
       end subroutine dealloc_SR_flag
 !
