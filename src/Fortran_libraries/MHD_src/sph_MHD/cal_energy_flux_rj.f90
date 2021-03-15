@@ -77,6 +77,12 @@
      &      ipol%base%i_velo, ipol%prod_fld%i_stream_pol_u)
       end if
 !
+!
+      if(ipol%prod_fld%i_stream_pol_b .gt. 0) then
+        call copy_poloidal_to_streamfunc_rj(sph_rj, rj_fld,             &
+    &       ipol%base%i_magne, ipol%prod_fld%i_stream_pol_b)
+      end if
+!
       end subroutine s_cal_energy_flux_rj
 !
 !-----------------------------------------------------------------------
