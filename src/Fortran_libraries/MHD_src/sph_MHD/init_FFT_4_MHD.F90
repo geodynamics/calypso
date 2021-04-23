@@ -40,14 +40,14 @@
 #ifdef FFTW3
       integer(kind = kint), parameter :: num_test =   8
       integer(kind = kint), parameter :: list_test(num_test)            &
-     &        = (/iflag_FFTPACK_SINGLE,                                 &
+     &        = (/iflag_FFTPACK_ONCE,                                   &
+     &            iflag_FFTPACK_SINGLE,                                 &
      &            iflag_FFTPACK_COMPONENT,                              &
      &            iflag_FFTPACK_DOMAIN,                                 &
-     &            iflag_FFTPACK_SINGLE,                                 &
-     &            iflag_FFTW_COMPONENT,                                 &
+     &            iflag_FFTW_ONCE,                                      &
      &            iflag_FFTW_SINGLE,                                    &
-     &            iflag_FFTW_DOMAIN,                                    &
-     &            iflag_FFTW_SINGLE/)
+     &            iflag_FFTW_COMPONENT,                                 &
+     &            iflag_FFTW_DOMAIN/)
 #else
       integer(kind = kint), parameter :: num_test =   4
       integer(kind = kint), parameter :: list_test(num_test)            &
