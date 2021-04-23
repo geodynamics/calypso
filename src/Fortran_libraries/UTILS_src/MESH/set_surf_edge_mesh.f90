@@ -7,7 +7,7 @@
 !> @brief set surface and edge connectivity
 !!
 !!@verbatim
-!!      subroutine dealloc_surface_and_edge(node, ele, surf, edge)
+!!      subroutine dealloc_surface_and_edge(surf, edge)
 !!      subroutine empty_surface_and_edge(ele, surf, edge)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
@@ -63,10 +63,7 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine dealloc_surface_and_edge(node, ele, surf, edge)
-!
-      type(node_data), intent(in) :: node
-      type(element_data), intent(in) :: ele
+      subroutine dealloc_surface_and_edge(surf, edge)
 !
       type(surface_data), intent(inout) :: surf
       type(edge_data), intent(inout) :: edge
@@ -74,9 +71,6 @@
 !
       call dealloc_surf_connectivity(surf)
       call dealloc_edge_connectivity(edge)
-!
-!      call set_surf_geometry(node, surf)
-!      call set_edge_geometry(node, edge)
 !
       end subroutine dealloc_surface_and_edge
 !

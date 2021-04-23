@@ -127,14 +127,6 @@
         write(*,*) "Grid has less than Nyquist's sampling theorem"
       end if
 !
-!
-      gen_sph%num_FEM_sleeve = 1
-      if(Fmesh_ctl%FEM_sleeve_level_ctl%iflag .gt. 0) then
-        gen_sph%num_FEM_sleeve                                          &
-     &        = Fmesh_ctl%FEM_sleeve_level_ctl%intvalue
-      end if
-      if(gen_sph%num_FEM_sleeve .lt. 1) gen_sph%num_FEM_sleeve = 1
-!
       end subroutine set_control_4_shell_grids
 !
 !  ---------------------------------------------------------------------

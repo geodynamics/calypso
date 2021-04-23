@@ -167,14 +167,17 @@
         real(kind = kreal) :: coef_exp = half
 !
 !>       coefficient for time evolution of temperature and heat flux
-        real  (kind=kreal) :: coef_advect
+        real(kind = kreal) :: coef_advect
 !>       coefficient for heat flux (-coef_advect)
-        real  (kind=kreal) :: coef_nega_adv
+        real(kind = kreal) :: coef_nega_adv
 !
 !>       coefficient for thermal diffusion
-        real  (kind=kreal) :: coef_diffuse
+        real(kind = kreal) :: coef_diffuse
 !>       coefficient for heat source term
-        real  (kind=kreal) :: coef_source = zero
+        real(kind = kreal) :: coef_source = zero
+!
+!>       coefficient for diffusion reduction for ICB
+        real(kind = kreal) :: ICB_diffusie_reduction = one
 !
 !>        Force flag for advection
         logical :: iflag_4_advection = .FALSE.

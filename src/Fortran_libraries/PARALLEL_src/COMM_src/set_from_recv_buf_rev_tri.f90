@@ -13,7 +13,11 @@
 !!     &          nnod_recv, irev_import, WR, X1_new, X2_new, X3_new)
 !!      subroutine set_from_recv_buf_rev_3x3(nnod_new,                  &
 !!     &          nnod_recv, irev_import, WR, X1_new, X2_new, X3_new)
+!!      subroutine set_from_recv_buf_rev_3x4(nnod_new,                  &
+!!     &          nnod_recv, irev_import, WR, X1_new, X2_new, X3_new)
 !!      subroutine set_from_recv_buf_rev_3x6(nnod_new,                  &
+!!     &          nnod_recv, irev_import, WR, X1_new, X2_new, X3_new)
+!!      subroutine set_from_recv_buf_rev_3x8(nnod_new,                  &
 !!     &          nnod_recv, irev_import, WR, X1_new, X2_new, X3_new)
 !!      subroutine set_from_recv_buf_rev_3xN(NB, nnod_new,              &
 !!     &          nnod_recv, irev_import, WR, X1_new, X2_new, X3_new)
@@ -56,9 +60,7 @@
       integer (kind = kint) :: k, j
 !
 !
-      WR(3*nnod_recv+1) = 0.0d0
-      WR(3*nnod_recv+2) = 0.0d0
-      WR(3*nnod_recv+3) = 0.0d0
+      WR(3*nnod_recv+1:3*nnod_recv+3) = 0.0d0
 !
 !$omp parallel do private(j,k)
       do k = 1, nnod_new
@@ -88,9 +90,9 @@
       integer (kind = kint) :: k, j
 !
 !
-      do k = 1, 6
-        WR(6*nnod_recv+k) = 0.0d0
-      end do
+!$omp parallel workshare
+      WR(6*nnod_recv+1:6*nnod_recv+6) = 0.0d0
+!$omp end parallel workshare
 !
 !$omp parallel do private(j,k)
       do k = 1, nnod_new
@@ -123,9 +125,10 @@
       integer (kind = kint) :: k, j
 !
 !
-      do k = 1, 9
-        WR(9*nnod_recv+k) = 0.0d0
-      end do
+!$omp parallel workshare
+      WR(9*nnod_recv+1:9*nnod_recv+9) = 0.0d0
+!$omp end parallel workshare
+!
 !
 !$omp parallel do private(j,k)
       do k = 1, nnod_new
@@ -146,6 +149,38 @@
 !
 ! ----------------------------------------------------------------------
 !
+      subroutine set_from_recv_buf_rev_3x4(nnod_new,                    &
+     &          nnod_recv, irev_import, WR, X1_new, X2_new, X3_new)
+!
+      integer(kind = kint), intent(in) :: nnod_new, nnod_recv
+      integer(kind = kint), intent(in) :: irev_import(nnod_new)
+!
+      real (kind=kreal), intent(inout):: WR(12*(nnod_recv+1))
+!
+      real (kind=kreal), intent(inout):: X1_new(4*nnod_new)
+      real (kind=kreal), intent(inout):: X2_new(4*nnod_new)
+      real (kind=kreal), intent(inout):: X3_new(4*nnod_new)
+!
+      integer (kind = kint) :: k, j
+!
+!
+!$omp parallel workshare
+      WR(12*nnod_recv+1:12*nnod_recv+12) = 0.0d0
+!$omp end parallel workshare
+!
+!$omp parallel do private(j,k)
+      do k = 1, nnod_new
+        j = irev_import(k)
+        X1_new(4*k-3:4*k) = WR(12*j-11:12*j- 8)
+        X2_new(4*k-3:4*k) = WR(12*j- 7:12*j- 4)
+        X3_new(4*k-3:4*k) = WR(12*j- 3:12*j   )
+      end do
+!$omp end parallel do
+!
+      end subroutine set_from_recv_buf_rev_3x4
+!
+! ----------------------------------------------------------------------
+!
       subroutine set_from_recv_buf_rev_3x6(nnod_new,                    &
      &          nnod_recv, irev_import, WR, X1_new, X2_new, X3_new)
 !
@@ -161,9 +196,9 @@
       integer (kind = kint) :: k, j
 !
 !
-      do k = 1, 18
-        WR(18*nnod_recv+k) = 0.0d0
-      end do
+!$omp parallel workshare
+      WR(18*nnod_recv+1:18*nnod_recv+18) = 0.0d0
+!$omp end parallel workshare
 !
 !$omp parallel do private(j,k)
       do k = 1, nnod_new
@@ -193,6 +228,38 @@
 !
 ! ----------------------------------------------------------------------
 !
+      subroutine set_from_recv_buf_rev_3x8(nnod_new,                    &
+     &          nnod_recv, irev_import, WR, X1_new, X2_new, X3_new)
+!
+      integer(kind = kint), intent(in) :: nnod_new, nnod_recv
+      integer(kind = kint), intent(in) :: irev_import(nnod_new)
+!
+      real (kind=kreal), intent(inout):: WR(24*(nnod_recv+1))
+!
+      real (kind=kreal), intent(inout):: X1_new(8*nnod_new)
+      real (kind=kreal), intent(inout):: X2_new(8*nnod_new)
+      real (kind=kreal), intent(inout):: X3_new(8*nnod_new)
+!
+      integer (kind = kint) :: k, j
+!
+!
+!$omp parallel workshare
+      WR(24*nnod_recv+1:24*nnod_recv+24) = 0.0d0
+!$omp end parallel workshare
+!
+!$omp parallel do private(j,k)
+      do k = 1, nnod_new
+        j = irev_import(k)
+        X1_new(8*k-7:8*k) = WR(24*j-23:24*j-16)
+        X2_new(8*k-7:8*k) = WR(24*j-15:24*j- 8)
+        X3_new(8*k-7:8*k) = WR(24*j- 7:24*j   )
+      end do
+!$omp end parallel do
+!
+      end subroutine set_from_recv_buf_rev_3x8
+!
+! ----------------------------------------------------------------------
+!
       subroutine set_from_recv_buf_rev_3xN(NB, nnod_new,                &
      &          nnod_recv, irev_import, WR, X1_new, X2_new, X3_new)
 !
@@ -209,9 +276,9 @@
       integer (kind = kint) :: k, kk, jj, nd
 !
 !
-      do k = 1, 3*NB
-        WR(k+3*NB*nnod_recv) = 0.0d0
-      end do
+!$omp parallel workshare
+      WR(3*NB*nnod_recv+1:3*NB*nnod_recv+3*NB) = 0.0d0
+!$omp end parallel workshare
 !
 !$omp parallel do private(k,jj,kk,nd)
       do kk = 1, NB*nnod_new

@@ -80,7 +80,7 @@
 !
       elps1%labels(ist_elapsed+1) = 'count_element_import_num'
       elps1%labels(ist_elapsed+2) = 'set_element_import_item'
-      elps1%labels(ist_elapsed+3) = 'element_num_reverse_SR'
+      elps1%labels(ist_elapsed+3) = 'num_items_send_recv'
       elps1%labels(ist_elapsed+4) = 'element_data_reverse_SR'
       elps1%labels(ist_elapsed+5) = 'set_element_export_item'
       elps1%labels(ist_elapsed+6) = 'check_element_position'
@@ -142,11 +142,12 @@
 !
       call alloc_export_num(e_comm)
 !
-!      write(*,*) 'element_num_reverse_SR', my_rank
+!      write(*,*) 'num_items_send_recv', my_rank
 !      if(iflag_ecomm_time) call start_elapsed_time(ist_elapsed+3)
-      call element_num_reverse_SR                                       &
-     &   (e_comm%num_neib, e_comm%id_neib, e_comm%num_import, SR_sig1,  &
-     &    e_comm%num_export, e_comm%istack_export, e_comm%ntot_export)
+      call num_items_send_recv                                          &
+     &   (e_comm%num_neib, e_comm%id_neib, e_comm%num_import,           &
+     &    e_comm%num_neib, e_comm%id_neib, izero, e_comm%num_export,    &
+     &    e_comm%istack_export, e_comm%ntot_export)
 !      if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+3)
 !
 !      write(*,*) 'element_data_reverse_SR2', my_rank
@@ -188,7 +189,6 @@
      &          inod_lc_import, ipe_lc_import, xe_import,               &
      &          inod_lc_export, ipe_lc_export,xe_export)
 !
-      use m_solver_SR
       use reverse_SR_real
       use reverse_SR_int
 !
@@ -216,17 +216,19 @@
       integer(kind = kint) :: k1
 !
 !
-      call reverse_send_recv_3(num_neib_e, id_neib_e,                   &
-     &    istack_import_e, istack_export_e, xe_import,                  &
-     &    SR_sig1, xe_export)
+      call real_items_send_recv_3                                       &
+     &   (num_neib_e, id_neib_e, istack_import_e, xe_import,            &
+     &    num_neib_e, id_neib_e, istack_export_e, izero, xe_export)
 !
       do k1 = 1, nnod_4_ele
-        call reverse_send_recv_int(num_neib_e, id_neib_e,               &
-     &      istack_import_e, istack_export_e, inod_lc_import(1,k1),     &
-     &      SR_sig1, inod_lc_export(1,k1))
-        call reverse_send_recv_int(num_neib_e, id_neib_e,               &
-     &      istack_import_e, istack_export_e, ipe_lc_import(1,k1),      &
-     &      SR_sig1, ipe_lc_export(1,k1))
+        call comm_items_send_recv(num_neib_e, id_neib_e,                &
+     &      istack_import_e, inod_lc_import(1,k1),                      &
+     &      num_neib_e, id_neib_e, istack_export_e,                     &
+     &      izero, inod_lc_export(1,k1))
+        call comm_items_send_recv(num_neib_e, id_neib_e,                &
+     &      istack_import_e, ipe_lc_import(1,k1),                       &
+     &      num_neib_e, id_neib_e, istack_export_e,                     &
+     &      izero, ipe_lc_export(1,k1))
       end do
 !
       end subroutine element_data_reverse_SR

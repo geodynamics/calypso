@@ -222,8 +222,9 @@
      &    property%coef_advect, property%coef_diffuse, dt,              &
      &    property%coef_imp, is_scalar, rj_fld)
       call set_ICB_scalar_sph_crank(sph_rj, sph_bc, bcs_S%ICB_Sspec,    &
-     &    property%coef_advect, property%coef_diffuse, dt,              &
-     &    property%coef_imp, is_scalar, rj_fld)
+     &    property%coef_advect, property%coef_diffuse,                  &
+     &    property%ICB_diffusie_reduction, dt, property%coef_imp,       &
+     &    is_scalar, rj_fld)
 !
       call solve_scalar_sph_crank(sph_rj, band_s_evo, band_s00_evo,     &
      &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld,    &

@@ -58,9 +58,6 @@
         type(group_data) :: theta_rtp_grp_lc
 !>        Structure of radial group data in sprectrum space
         type(group_data) :: radial_rj_grp_lc
-!
-!>        Sleeve leavel of FEM mesh
-        integer(kind = kint) :: num_FEM_sleeve = 1
       end type construct_spherical_grid
 !
 ! ----------------------------------------------------------------------

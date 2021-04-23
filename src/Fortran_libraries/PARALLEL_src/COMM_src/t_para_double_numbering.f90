@@ -88,6 +88,7 @@
 !
       subroutine set_node_double_numbering(node, nod_comm, inod_dbl)
 !
+      use m_solver_SR
       use t_geometry_data
       use t_comm_table
       use solver_SR_type
@@ -108,8 +109,9 @@
         inod_dbl%index(inod) = inod
       end do
 !$omp end parallel do
-      call SOLVER_SEND_RECV_int_type                                    &
-     &   (node%numnod, nod_comm, inod_dbl%index(1))
+!
+      call SOLVER_SEND_RECV_int_type(node%numnod, nod_comm,             &
+     &                               SR_sig1, SR_i1, inod_dbl%index(1))
 !
       end subroutine set_node_double_numbering
 !
@@ -119,6 +121,7 @@
      &         (ele, ele_comm, inod_dbl, iele_dbl)
 
 !
+      use m_solver_SR
       use t_geometry_data
       use t_comm_table
       use solver_SR_type
@@ -138,8 +141,8 @@
       end do
 !$omp end parallel do
 !
-      call SOLVER_SEND_RECV_int_type                                    &
-     &   (ele%numele, ele_comm, iele_dbl%index(1))
+      call SOLVER_SEND_RECV_int_type(ele%numele, ele_comm,              &
+     &                               SR_sig1, SR_i1, iele_dbl%index(1))
 !
       end subroutine set_ele_double_numbering
 !

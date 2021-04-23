@@ -176,7 +176,7 @@
       integer(kind = kint), intent(in) :: kr_in, kr_out
       real(kind = kreal), intent(in) :: ar_1d_rj(nri,3)
       real(kind = kreal), intent(in) :: g_sph_rj(jmax,13)
-      real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: coef_p(nri)
       real(kind = kreal), intent(in) :: d1nod_mat_fdm_2(nri,-1:1)
       real(kind = kreal), intent(in) :: d2nod_mat_fdm_2(nri,-1:1)
 !
@@ -189,14 +189,14 @@
       do k = kr_in+1, kr_out-1
         do j = 1, jmax
           mat3(3,k-1,j) = mat3(3,k-1,j)                                 &
-     &                   - coef_p * (d2nod_mat_fdm_2(k,-1)              &
+     &                   - coef_p(k) * (d2nod_mat_fdm_2(k,-1)           &
      &                 + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k,-1))
           mat3(2,k,  j) = mat3(2,k,  j)                                 &
-     &                   - coef_p * (d2nod_mat_fdm_2(k, 0)              &
+     &                   - coef_p(k) * (d2nod_mat_fdm_2(k, 0)           &
      &                 + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k, 0)    &
      &                 - g_sph_rj(j,3)*ar_1d_rj(k,2) )
           mat3(1,k+1,j) = mat3(1,k+1,j)                                 &
-     &                   - coef_p * (d2nod_mat_fdm_2(k, 1)              &
+     &                   - coef_p(k) * (d2nod_mat_fdm_2(k, 1)           &
      &                 + two * ar_1d_rj(k,1) * d1nod_mat_fdm_2(k, 1))
         end do
       end do

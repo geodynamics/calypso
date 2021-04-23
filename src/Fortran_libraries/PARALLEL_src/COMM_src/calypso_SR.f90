@@ -8,20 +8,14 @@
 !!
 !!@verbatim
 !!      subroutine calypso_send_recv(iflag_recv, nnod_org, nnod_new,    &
-!!     &                         npe_send, isend_self,                  &
-!!     &                         id_pe_send, istack_send, inod_export,  &
-!!     &                         npe_recv, irecv_self,                  &
-!!     &                         id_pe_recv, istack_recv, inod_import,  &
-!!     &                         irev_import, SR_sig, SR_r,             &
-!!     &                         X_org, X_new)
+!!     &          npe_send, id_pe_send, istack_send, inod_export,       &
+!!     &          npe_recv, id_pe_recv, istack_recv, inod_import,       &
+!!     &          irev_import, iflag_self, SR_sig, SR_r, X_org, X_new)
 !!      subroutine calypso_send_recv_3x1(iflag_recv, nnod_org, nnod_new,&
-!!     &                         npe_send, isend_self,                  &
-!!     &                         id_pe_send, istack_send, inod_export,  &
-!!     &                         npe_recv, irecv_self,                  &
-!!     &                         id_pe_recv, istack_recv, inod_import,  &
-!!     &                         irev_import, SR_sig, SR_r,             &
-!!     &                         X1_org, X2_org, X3_org,                &
-!!     &                         X1_new, X2_new, X3_new)
+!!     &          npe_send, id_pe_send, istack_send, inod_export,       &
+!!     &          npe_recv, id_pe_recv, istack_recv, inod_import,       &
+!!     &          irev_import, iflag_self, SR_sig, SR_r,                &
+!!     &          X1_org, X2_org, X3_org, X1_new, X2_new, X3_new)
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
@@ -30,7 +24,6 @@
 !!@n @param  nnod_new    Number of components for destination
 !!@n
 !!@n @param  npe_send    Number of processses to send
-!!@n @param  isend_self  Integer flag to copy within own process
 !!@n @param  id_pe_send(npe_send)      Process ID to send
 !!@n @param  istack_send(0:npe_send)
 !!                    End points of send buffer for each process
@@ -38,7 +31,7 @@
 !!                    local node ID to copy in send buffer
 !!@n
 !!@n @param  npe_recv    Number of processses to receive
-!!@n @param  irecv_self  Integer flag to copy within own process
+!!@n @param  iflag_self  Integer flag to copy within own process
 !!@n @param  id_pe_recv(npe_send)      Process ID to receive
 !!@n @param  istack_recv(0:npe_send)
 !!                    End points of receive buffer for each process
@@ -66,12 +59,9 @@
 !-----------------------------------------------------------------------
 !
       subroutine calypso_send_recv(iflag_recv, nnod_org, nnod_new,      &
-     &                         npe_send, isend_self,                    &
-     &                         id_pe_send, istack_send, inod_export,    &
-     &                         npe_recv, irecv_self,                    &
-     &                         id_pe_recv, istack_recv, inod_import,    &
-     &                         irev_import, SR_sig, SR_r,               &
-     &                         X_org, X_new)
+     &          npe_send, id_pe_send, istack_send, inod_export,         &
+     &          npe_recv, id_pe_recv, istack_recv, inod_import,         &
+     &          irev_import, iflag_self, SR_sig, SR_r, X_org, X_new)
 !
       use calypso_SR_core
       use set_to_send_buffer
@@ -81,13 +71,13 @@
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
 !
-      integer(kind = kint), intent(in) :: npe_send, isend_self
+      integer(kind = kint), intent(in) :: npe_send
       integer(kind = kint), intent(in) :: id_pe_send(npe_send)
       integer(kind = kint), intent(in) :: istack_send(0:npe_send)
       integer(kind = kint), intent(in)                                  &
      &                      :: inod_export( istack_send(npe_send) )
 !
-      integer(kind = kint), intent(in) :: npe_recv, irecv_self
+      integer(kind = kint), intent(in) :: npe_recv, iflag_self
       integer(kind = kint), intent(in) :: id_pe_recv(npe_recv)
       integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
       integer(kind = kint), intent(in)                                  &
@@ -113,46 +103,43 @@
 !C
 !C-- COMM
       call calypso_send_recv_core                                       &
-     &   (ione, npe_send, isend_self, id_pe_send, istack_send,          &
-     &          npe_recv, irecv_self, id_pe_recv, istack_recv,          &
-     &          SR_sig, SR_r)
+     &   (ione, npe_send, id_pe_send, istack_send, SR_r%WS(1),          &
+     &          npe_recv, id_pe_recv, istack_recv, iflag_self,          &
+     &          SR_r%WR(1), SR_sig)
 !
 !C-- RECV
-      call sel_cppy_from_recv_buf_1(iflag_recv, nnod_new,               &
+      call sel_copy_from_recv_buf_1(iflag_recv, nnod_new,               &
      &    istack_recv(npe_recv), inod_import, irev_import,              &
      &    SR_r%WR(1), X_new)
 !
 !C-- WAIT
-      call calypso_send_recv_fin(npe_send, isend_self, SR_sig)
+      call calypso_send_recv_fin(npe_send, iflag_self, SR_sig)
 !
       end subroutine calypso_send_recv
 !
 ! ----------------------------------------------------------------------
 !
       subroutine calypso_send_recv_3x1(iflag_recv, nnod_org, nnod_new,  &
-     &                         npe_send, isend_self,                    &
-     &                         id_pe_send, istack_send, inod_export,    &
-     &                         npe_recv, irecv_self,                    &
-     &                         id_pe_recv, istack_recv, inod_import,    &
-     &                         irev_import, SR_sig, SR_r,               &
-     &                         X1_org, X2_org, X3_org,                  &
-     &                         X1_new, X2_new, X3_new)
+     &          npe_send, id_pe_send, istack_send, inod_export,         &
+     &          npe_recv, id_pe_recv, istack_recv, inod_import,         &
+     &          irev_import, iflag_self, SR_sig, SR_r,                  &
+     &          X1_org, X2_org, X3_org, X1_new, X2_new, X3_new)
 !
       use calypso_SR_core
       use set_to_send_buf_tri
-      use select_copy_from_recv
+      use select_copy_from_recv_tri
 !
       integer(kind = kint), intent(in) :: iflag_recv
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
 !
-      integer(kind = kint), intent(in) :: npe_send, isend_self
+      integer(kind = kint), intent(in) :: npe_send
       integer(kind = kint), intent(in) :: id_pe_send(npe_send)
       integer(kind = kint), intent(in) :: istack_send(0:npe_send)
       integer(kind = kint), intent(in)                                  &
      &                      :: inod_export( istack_send(npe_send) )
 !
-      integer(kind = kint), intent(in) :: npe_recv, irecv_self
+      integer(kind = kint), intent(in) :: npe_recv, iflag_self
       integer(kind = kint), intent(in) :: id_pe_recv(npe_recv)
       integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
       integer(kind = kint), intent(in)                                  &
@@ -182,17 +169,17 @@
 !C
 !C-- COMM
       call calypso_send_recv_core                                       &
-     &   (ithree, npe_send, isend_self, id_pe_send, istack_send,        &
-     &            npe_recv, irecv_self, id_pe_recv, istack_recv,        &
-     &            SR_sig, SR_r)
+     &   (ithree, npe_send, id_pe_send, istack_send, SR_r%WS(1),        &
+     &            npe_recv, id_pe_recv, istack_recv, iflag_self,        &
+     &            SR_r%WR(1), SR_sig)
 !
 !C-- RECV
-      call sel_cppy_from_recv_buf_3x1(iflag_recv, nnod_new,             &
+      call sel_copy_from_recv_buf_3x1(iflag_recv, nnod_new,             &
      &    istack_recv(npe_recv), inod_import, irev_import,              &
      &    SR_r%WR(1), X1_new, X2_new, X3_new)
 !
 !C-- WAIT
-      call calypso_send_recv_fin(npe_send, isend_self, SR_sig)
+      call calypso_send_recv_fin(npe_send, iflag_self, SR_sig)
 !
       end subroutine calypso_send_recv_3x1
 !

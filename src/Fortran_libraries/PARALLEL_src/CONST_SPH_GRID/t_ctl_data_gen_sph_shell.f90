@@ -22,9 +22,6 @@
 !!      FEM_mesh_output_switch         'NO'
 !!      FEM_surface_output_switch      'NO'
 !!      FEM_viewer_mesh_output_switch  'NO'
-!!
-!!      sleeve_level_ctl            2
-!!      element_overlap_ctl        ON
 !!    end FEM_mesh_ctl
 !!
 !!    begin num_domain_ctl

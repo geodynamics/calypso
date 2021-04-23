@@ -11,6 +11,8 @@
 !!        type(platform_data_control), intent(inout) :: plt
 !!      subroutine bcast_FEM_mesh_control(Fmesh_ctl)
 !!        type(FEM_mesh_control), intent(inout) :: Fmesh_ctl
+!!      subroutine bcast_FEM_sleeve_control(sleeve_ctl)
+!!        type(FEM_sleeve_control), intent(inout) :: sleeve_ctl
 !!@endverbatim
 !
       module bcast_4_platform_ctl
@@ -84,11 +86,30 @@
       call bcast_ctl_type_c1(Fmesh_ctl%FEM_surface_output_switch)
       call bcast_ctl_type_c1(Fmesh_ctl%FEM_viewer_output_switch)
 !
-      call bcast_ctl_type_i1(Fmesh_ctl%FEM_sleeve_level_ctl)
-!
       call calypso_mpi_bcast_one_int(Fmesh_ctl%i_FEM_mesh, 0)
 !
       end subroutine bcast_FEM_mesh_control
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine bcast_FEM_sleeve_control(sleeve_ctl)
+!
+      use t_ctl_data_FEM_sleeve_size
+      use bcast_control_arrays
+      use calypso_mpi_int
+!
+      type(FEM_sleeve_control), intent(inout) :: sleeve_ctl
+!
+!
+      call bcast_ctl_array_c1(sleeve_ctl%ref_vector_ctl)
+!
+      call bcast_ctl_type_c1(sleeve_ctl%sleeve_extension_mode_ctl)
+      call bcast_ctl_type_i1(sleeve_ctl%sleeve_level_ctl)
+      call bcast_ctl_type_r1(sleeve_ctl%sleeve_size_ctl)
+!
+      call calypso_mpi_bcast_one_int(sleeve_ctl%i_FEM_sleeve_ctl, 0)
+!
+      end subroutine bcast_FEM_sleeve_control
 !
 !  ---------------------------------------------------------------------
 !

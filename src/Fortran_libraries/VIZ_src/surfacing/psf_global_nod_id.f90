@@ -19,7 +19,6 @@
       use calypso_mpi
       use t_comm_table
       use m_machine_parameter
-      use solver_SR_type
 !
       implicit none
 !
@@ -32,7 +31,9 @@
       subroutine psf_global_nod_id_on_edge                              &
      &         (edge_comm, numedge, istack_internod, psf_list)
 !
+      use m_solver_SR
       use t_psf_geometry_list
+      use solver_SR_type
 !
       type(communication_table), intent(in) :: edge_comm
       integer(kind = kint), intent(in) :: numedge
@@ -55,7 +56,7 @@
       end do
 !
       call SOLVER_SEND_RECV_int8_type                                   &
-     &   (numedge, edge_comm, psf_list%id_n_on_e)
+     &   (numedge, edge_comm, SR_sig1, SR_il1, psf_list%id_n_on_e)
 !
       end subroutine psf_global_nod_id_on_edge
 !
@@ -63,6 +64,9 @@
 !
       subroutine psf_global_nod_id_on_node                              &
      &         (nod_comm, numnod, istack_internod, id_n_on_n)
+!
+      use m_solver_SR
+      use solver_SR_type
 !
       type(communication_table), intent(in) :: nod_comm
       integer(kind = kint), intent(in) :: numnod
@@ -81,7 +85,8 @@
       end do
       write(*,*) 'istack_internod', istack_internod
 !
-      call SOLVER_SEND_RECV_int8_type(numnod,  nod_comm,  id_n_on_n)
+      call SOLVER_SEND_RECV_int8_type(numnod, nod_comm,                 &
+     &                                SR_sig1, SR_il1, id_n_on_n)
 !
       end subroutine psf_global_nod_id_on_node
 !

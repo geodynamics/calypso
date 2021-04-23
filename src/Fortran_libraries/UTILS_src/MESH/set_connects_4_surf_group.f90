@@ -1,45 +1,32 @@
-!set_connects_4_surf_group.f90
-!     module set_connects_4_surf_group
+!>@file   set_connects_4_surf_group.f90
+!!@brief  module set_connects_4_surf_group
+!!
+!!@author H. Matsui
+!!@date Programmed in Dec., 2010
 !
-!
-!        programmed by H. Matsui on Dec., 2010
-!
-!      subroutine set_surf_id_4_surf_group(ele, surf,                   &
-!     &          surf_grp, sf_grp_tbl)
-!        type(element_data),       intent(in) :: ele
-!        type(surface_data),       intent(in) :: surf
-!        type(surface_group_data), intent(in) :: surf_grp
-!        type(surface_group_table), intent(inout) :: sf_grp_tbl
-!
-!      subroutine set_edge_4_surf_group(surf, edge, surf_grp,           &
-!     &          sf_grp_tbl)
-!        type(surface_data),        intent(in) :: surf
-!        type(edge_data),           intent(in) :: edge
-!        type(surface_group_data), intent(in) :: surf_grp
-!        type(surface_group_table), intent(inout) :: sf_grp_tbl
-!
-!      subroutine set_node_4_surf_group(nod, ele, surf, sf_grp, sf_nod)
-!        type(node_data),    intent(in) ::       nod
-!        type(element_data), intent(in) ::       ele
-!        type(surface_data), intent(in) ::       surf
-!        type(surface_group_data), intent(in) :: sf_grp
-!        type(surface_node_grp_data), intent(inout) :: sf_nod
-!
-!      subroutine cal_surf_normal_at_nod(node, ele, surf, sf_grp,       &
-!     &          sf_grp_v, sf_nod)
-!        type(node_data),              intent(in) :: node
-!        type(element_data),           intent(in) :: ele
-!        type(surface_data),           intent(in) :: surf
-!        type(surface_group_data),     intent(in) :: sf_grp
-!        type(surface_group_geometry), intent(in) :: sf_grp_v
-!        type(surface_node_grp_data), intent(inout) :: sf_nod
-!
-!      subroutine empty_sf_ed_nod_surf_grp_type(surf_grp, sf_grp_tbl)
-!        type(surface_group_data), intent(in) :: surf_grp
-!        type(surface_group_table), intent(inout) :: sf_grp_tbl
-!      subroutine empty_surface_node_grp_type(sf_grp, sf_nod)
-!        type(surface_group_data), intent(in) :: sf_grp
-!        type(surface_node_grp_data), intent(inout) :: sf_nod
+!> @brief Construct connectivities for surface group
+!!
+!!@verbatim
+!!      subroutine set_node_4_surf_group(nod, ele, surf, sf_grp, sf_nod)
+!!        type(node_data),    intent(in) ::       nod
+!!        type(element_data), intent(in) ::       ele
+!!        type(surface_data), intent(in) ::       surf
+!!        type(surface_group_data), intent(in) :: sf_grp
+!!        type(surface_node_grp_data), intent(inout) :: sf_nod
+!!
+!!      subroutine cal_surf_normal_at_nod(node, ele, surf, sf_grp,      &
+!!     &          sf_grp_v, sf_nod)
+!!        type(node_data),              intent(in) :: node
+!!        type(element_data),           intent(in) :: ele
+!!        type(surface_data),           intent(in) :: surf
+!!        type(surface_group_data),     intent(in) :: sf_grp
+!!        type(surface_group_normals), intent(in) :: sf_grp_v
+!!        type(surface_node_grp_data), intent(inout) :: sf_nod
+!!
+!!      subroutine empty_surface_node_grp_type(sf_grp, sf_nod)
+!!        type(surface_group_data), intent(in) :: sf_grp
+!!        type(surface_node_grp_data), intent(inout) :: sf_nod
+!!@endverbatim
 !
       module set_connects_4_surf_group
 !
@@ -50,78 +37,6 @@
 !-----------------------------------------------------------------------
 !
       contains
-!
-!-----------------------------------------------------------------------
-!
-      subroutine set_surf_id_4_surf_group(ele, surf,                    &
-     &          surf_grp, sf_grp_tbl)
-!
-      use t_geometry_data
-      use t_group_data
-      use t_group_connects
-      use t_surface_data
-      use set_surface_id_4_surf_grp
-!
-      type(element_data),       intent(in) :: ele
-      type(surface_data),       intent(in) :: surf
-      type(surface_group_data), intent(in) :: surf_grp
-      type(surface_group_table), intent(inout) :: sf_grp_tbl
-!
-!
-      call alloc_surf_item_sf_grp_type(surf_grp%num_item, sf_grp_tbl)
-!
-      call set_surface_id_4_surf_group(ele%numele, surf%isf_4_ele,      &
-     &    surf_grp%num_grp, surf_grp%num_item,                          &
-     &    surf_grp%istack_grp, surf_grp%item_sf_grp,                    &
-     &    sf_grp_tbl%isurf_grp, sf_grp_tbl%isurf_grp_n)
-!
-      end subroutine set_surf_id_4_surf_group
-!
-!-----------------------------------------------------------------------
-!
-      subroutine set_edge_4_surf_group(surf, edge, surf_grp,            &
-     &          sf_grp_tbl)
-!
-      use m_geometry_constants
-      use t_surface_data
-      use t_edge_data
-      use t_group_data
-      use t_group_connects
-      use set_node_4_group
-!
-      type(surface_data),        intent(in) :: surf
-      type(edge_data),           intent(in) :: edge
-      type(surface_group_data), intent(in) :: surf_grp
-      type(surface_group_table), intent(inout) :: sf_grp_tbl
-!
-      integer(kind=kint), allocatable :: imark_surf_grp(:)
-!
-!
-      allocate( imark_surf_grp(edge%numedge) )
-      imark_surf_grp = 0
-!
-      call alloc_num_other_grp(surf_grp%num_grp, sf_grp_tbl%edge)
-!
-      call count_nod_4_ele_grp(edge%numedge, surf%numsurf,              &
-     &    nedge_4_surf, edge%iedge_4_sf,                                &
-     &    surf_grp%num_grp, surf_grp%num_item,                          &
-     &    surf_grp%istack_grp, sf_grp_tbl%isurf_grp,                    &
-     &    sf_grp_tbl%edge%ntot_e_grp, sf_grp_tbl%edge%nitem_e_grp,      &
-     &    sf_grp_tbl%edge%istack_e_grp, imark_surf_grp)
-!
-      call alloc_item_other_grp(sf_grp_tbl%edge)
-!
-      call set_nod_4_ele_grp(edge%numedge, surf%numsurf,                &
-     &    nedge_4_surf, edge%iedge_4_sf,                                &
-     &    surf_grp%num_grp, surf_grp%num_item,                          &
-     &    surf_grp%istack_grp, sf_grp_tbl%isurf_grp,                    &
-     &    sf_grp_tbl%edge%ntot_e_grp, sf_grp_tbl%edge%nitem_e_grp,      &
-     &    sf_grp_tbl%edge%istack_e_grp, sf_grp_tbl%edge%item_e_grp,     &
-     &    imark_surf_grp)
-!
-      deallocate(imark_surf_grp)
-!
-      end subroutine set_edge_4_surf_group
 !
 !-----------------------------------------------------------------------
 !
@@ -186,7 +101,7 @@
       use t_geometry_data
       use t_surface_data
       use t_group_data
-      use t_surface_group_geometry
+      use t_surface_group_normals
       use t_surface_group_connect
       use set_norm_nod_4_surf_grp
 !
@@ -194,7 +109,7 @@
       type(element_data),           intent(in) :: ele
       type(surface_data),           intent(in) :: surf
       type(surface_group_data),     intent(in) :: sf_grp
-      type(surface_group_geometry), intent(in) :: sf_grp_v
+      type(surface_group_normals), intent(in) :: sf_grp_v
       type(surface_node_grp_data), intent(inout) :: sf_nod
 !
 !
@@ -214,25 +129,6 @@
       end subroutine cal_surf_normal_at_nod
 !
 ! -----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine empty_sf_ed_nod_surf_grp_type(surf_grp, sf_grp_tbl)
-!
-      use t_group_data
-      use t_group_connects
-!
-      type(surface_group_data), intent(in) :: surf_grp
-      type(surface_group_table), intent(inout) :: sf_grp_tbl
-!
-!
-      call alloc_num_other_grp(surf_grp%num_grp, sf_grp_tbl%edge)
-!
-      sf_grp_tbl%edge%ntot_e_grp = 0
-      call alloc_surf_item_sf_grp_type(surf_grp%num_item, sf_grp_tbl)
-      call alloc_item_other_grp(sf_grp_tbl%edge)
-!
-      end subroutine empty_sf_ed_nod_surf_grp_type
-!
 !-----------------------------------------------------------------------
 !
       subroutine empty_surface_node_grp_type(sf_grp, sf_nod)

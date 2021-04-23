@@ -17,7 +17,7 @@
 !!      subroutine dealloc_mesh_type(mesh)
 !!      subroutine dealloc_mesh_geometry_base(mesh)
 !!      subroutine dealloc_groups_data(group)
-!!      subroutine dealloc_ele_surf_edge_type(mesh)
+!!      subroutine dealloc_surf_edge(mesh)
 !!      subroutine check_mesh_smp_size(id_rank, mesh)
 !!      subroutine check_surf_edge_smp_size(mesh)
 !!
@@ -35,7 +35,7 @@
       use t_surface_group_connect
       use t_surface_data
       use t_edge_data
-      use t_surface_group_geometry
+      use t_surface_group_normals
       use t_group_connects
       use t_surface_boundary
 !
@@ -70,12 +70,7 @@
 !>     Structure for node data on surface group
         type (surface_node_grp_data) ::   surf_nod_grp
 !>     Structure for grometry data for surface group
-        type (surface_group_geometry) ::  surf_grp_geom
-!
-!>     Structure for element group connectivity
-        type (element_group_table) ::    tbls_ele_grp
-!>     Structure for surface group connectivity
-        type (surface_group_table) ::    tbls_surf_grp
+        type (surface_group_normals) ::  surf_grp_norm
 !
 !>     Structure for infinity surface
         type (scalar_surf_BC_list) ::    infty_grp
@@ -119,15 +114,8 @@
       type(mesh_groups), intent(inout) ::   group
 !
 !
-      call dealloc_grp_connect(group%tbls_surf_grp%edge)
-      call dealloc_surf_item_sf_grp_type(group%tbls_surf_grp)
       call dealloc_num_surf_grp_nod_smp(group%surf_nod_grp)
       call dealloc_surf_grp_nod(group%surf_nod_grp)
-!
-      call dealloc_grp_connect(group%tbls_ele_grp%surf)
-      call dealloc_grp_connect(group%tbls_ele_grp%edge)
-      call dealloc_grp_connect(group%tbls_ele_grp%node)
-!
 !
       call dealloc_surface_geometory(mesh%surf)
       call dealloc_edge_geometory(mesh%edge)
@@ -138,10 +126,7 @@
       call dealloc_edge_param_smp(mesh%edge)
       call dealloc_surf_param_smp(mesh%surf)
 !
-      call dealloc_edge_4_ele(mesh%edge)
-      call dealloc_edge_connect(mesh%edge)
-      call dealloc_surface_connect(mesh%surf)
-      call dealloc_ele_4_surf_type(mesh%surf)
+      call dealloc_surf_edge(mesh)
 !
       call dealloc_nod_ele_infos(mesh)
 !
@@ -247,17 +232,18 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine dealloc_ele_surf_edge_type(mesh)
+      subroutine dealloc_surf_edge(mesh)
 !
       type(mesh_geometry), intent(inout) :: mesh
 !
 !
+      call dealloc_ele_4_surf_type(mesh%surf)
       call dealloc_surface_connect(mesh%surf)
 !
       call dealloc_edge_connect(mesh%edge)
       call dealloc_edge_4_ele(mesh%edge)
 !
-      end subroutine dealloc_ele_surf_edge_type
+      end subroutine dealloc_surf_edge
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------

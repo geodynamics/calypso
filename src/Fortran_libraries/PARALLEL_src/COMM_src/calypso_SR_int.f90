@@ -8,18 +8,16 @@
 !!
 !!@verbatim
 !!      subroutine calypso_send_recv_int                                &
-!!     &                      (iflag_recv, nnod_org, nnod_new,          &
-!!     &                       npe_send, isend_self,                    &
+!!     &                      (iflag_recv, nnod_org, nnod_new, npe_send,&
 !!     &                       id_pe_send, istack_send, inod_export,    &
-!!     &                       npe_recv, irecv_self,                    &
+!!     &                       iflag_self, npe_recv,                    &
 !!     &                       id_pe_recv, istack_recv, inod_import,    &
 !!     &                       irev_import, SR_sig, SR_i,               &
 !!     &                       iX_org, iX_new)
 !!      subroutine calypso_send_recv_int8                               &
-!!     &                      (iflag_recv, nnod_org, nnod_new,          &
-!!     &                       npe_send, isend_self,                    &
+!!     &                      (iflag_recv, nnod_org, nnod_new, npe_send,&
 !!     &                       id_pe_send, istack_send, inod_export,    &
-!!     &                       npe_recv, irecv_self,                    &
+!!     &                       npe_recv, iflag_self,                    &
 !!     &                       id_pe_recv, istack_recv, inod_import,    &
 !!     &                       irev_import, SR_sig, SR_il,              &
 !!     &                       i8X_org, i8X_new)
@@ -67,10 +65,9 @@
 !-----------------------------------------------------------------------
 !
       subroutine calypso_send_recv_int                                  &
-     &                      (iflag_recv, nnod_org, nnod_new,            &
-     &                       npe_send, isend_self,                      &
+     &                      (iflag_recv, nnod_org, nnod_new, npe_send,  &
      &                       id_pe_send, istack_send, inod_export,      &
-     &                       npe_recv, irecv_self,                      &
+     &                       iflag_self, npe_recv,                      &
      &                       id_pe_recv, istack_recv, inod_import,      &
      &                       irev_import, SR_sig, SR_i,                 &
      &                       iX_org, iX_new)
@@ -84,14 +81,14 @@
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
 !
-      integer(kind = kint), intent(in) :: npe_send, isend_self
+      integer(kind = kint), intent(in) :: npe_send
       integer(kind = kint), intent(in) :: id_pe_send(npe_send)
       integer(kind = kint), intent(in) :: istack_send(0:npe_send)
       integer(kind = kint), intent(in)                                  &
      &                      :: inod_export( istack_send(npe_send) )
       integer(kind = kint), intent(in) :: irev_import(nnod_new)
 !
-      integer(kind = kint), intent(in) :: npe_recv, irecv_self
+      integer(kind = kint), intent(in) :: npe_recv, iflag_self
       integer(kind = kint), intent(in) :: id_pe_recv(npe_recv)
       integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
       integer(kind = kint), intent(in)                                  &
@@ -116,9 +113,8 @@
 !C
 !C-- COMM
       call calypso_send_recv_intcore                                    &
-     &   (npe_send, isend_self, id_pe_send, istack_send,                &
-     &    npe_recv, irecv_self, id_pe_recv, istack_recv,                &
-     &    SR_sig, SR_i)
+     &   (npe_send, id_pe_send, istack_send, SR_i%iWS(1), iflag_self,   &
+     &    npe_recv, id_pe_recv, istack_recv, SR_i%iWR(1), SR_sig)
 !
 !C-- RECV
       call sel_cppy_from_recv_buf_int(iflag_recv, nnod_new,             &
@@ -126,17 +122,16 @@
      &    SR_i%iWR(1), iX_new)
 !
 !C-- WAIT
-      call calypso_send_recv_fin(npe_send, isend_self, SR_sig)
+      call calypso_send_recv_fin(npe_send, iflag_self, SR_sig)
 !
       end subroutine calypso_send_recv_int
 !
 ! ----------------------------------------------------------------------
 !
       subroutine calypso_send_recv_int8                                 &
-     &                      (iflag_recv, nnod_org, nnod_new,            &
-     &                       npe_send, isend_self,                      &
+     &                      (iflag_recv, nnod_org, nnod_new, npe_send,  &
      &                       id_pe_send, istack_send, inod_export,      &
-     &                       npe_recv, irecv_self,                      &
+     &                       npe_recv, iflag_self,                      &
      &                       id_pe_recv, istack_recv, inod_import,      &
      &                       irev_import, SR_sig, SR_il,                &
      &                       i8X_org, i8X_new)
@@ -150,14 +145,14 @@
       integer(kind = kint), intent(in) :: nnod_org
       integer(kind = kint), intent(in) :: nnod_new
 !
-      integer(kind = kint), intent(in) :: npe_send, isend_self
+      integer(kind = kint), intent(in) :: npe_send
       integer(kind = kint), intent(in) :: id_pe_send(npe_send)
       integer(kind = kint), intent(in) :: istack_send(0:npe_send)
       integer(kind = kint), intent(in)                                  &
      &                      :: inod_export( istack_send(npe_send) )
       integer(kind = kint), intent(in) :: irev_import(nnod_new)
 !
-      integer(kind = kint), intent(in) :: npe_recv, irecv_self
+      integer(kind = kint), intent(in) :: npe_recv, iflag_self
       integer(kind = kint), intent(in) :: id_pe_recv(npe_recv)
       integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
       integer(kind = kint), intent(in)                                  &
@@ -183,9 +178,8 @@
 !C
 !C-- COMM
       call calypso_send_recv_i8core                                     &
-     &   (npe_send, isend_self, id_pe_send, istack_send,                &
-     &    npe_recv, irecv_self, id_pe_recv, istack_recv,                &
-     &    SR_sig, SR_il)
+     &   (npe_send, id_pe_send, istack_send, SR_il%i8WS(1), iflag_self, &
+     &    npe_recv, id_pe_recv, istack_recv, SR_il%i8WR(1), SR_sig)
 !
 !C-- RECV
       call sel_cppy_from_recv_buf_i8(iflag_recv, nnod_new,              &
@@ -193,7 +187,7 @@
      &    SR_il%i8WR(1), i8X_new)
 !
 !C-- WAIT
-      call calypso_send_recv_fin(npe_send, isend_self, SR_sig)
+      call calypso_send_recv_fin(npe_send, iflag_self, SR_sig)
 !
       end subroutine calypso_send_recv_int8
 !

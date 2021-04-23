@@ -8,7 +8,8 @@
 !!
 !!@verbatim
 !!      subroutine set_ICB_scalar_sph_crank(sph_rj, sph_bc, ICB_Sspec,  &
-!!     &          coef_f, coef_d, dt, coef_imp, is_field, rj_fld)
+!!     &          coef_f, coef_d, diffuse_reduction, dt, coef_imp,      &
+!!     &          is_field, rj_fld)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(sph_boundary_type), intent(in) :: sph_bc
 !!        type(sph_scalar_BC_coef), intent(in) :: ICB_Sspec
@@ -70,7 +71,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine set_ICB_scalar_sph_crank(sph_rj, sph_bc, ICB_Sspec,    &
-     &          coef_f, coef_d, dt, coef_imp, is_field, rj_fld)
+     &          coef_f, coef_d, diffuse_reduction, dt, coef_imp,        &
+     &          is_field, rj_fld)
 !
       use set_scalar_boundary_sph
       use cal_sph_exp_center
@@ -79,6 +81,7 @@
       type(sph_boundary_type), intent(in) :: sph_bc
       type(sph_scalar_BC_coef), intent(in) :: ICB_Sspec
       real(kind = kreal), intent(in) :: coef_imp, coef_f, coef_d
+      real(kind = kreal), intent(in) :: diffuse_reduction
       real(kind = kreal), intent(in) :: dt
 !
       integer(kind = kint), intent(in) :: is_field
@@ -103,9 +106,9 @@
      &     .and. coef_f .ne. 0.0d0) then
         call adjust_in_fixed_flux_sph                                   &
      &     (sph_rj%nidx_rj(2), sph_bc%kr_in, sph_bc%r_ICB,              &
-     &      sph_bc%fdm2_fix_dr_ICB, ICB_Sspec%S_BC, coef_d,             &
-     &      coef_imp, dt, is_field, rj_fld%n_point, rj_fld%ntot_phys,   &
-     &      rj_fld%d_fld)
+     &      sph_bc%fdm2_fix_dr_ICB, ICB_Sspec%S_BC,                     &
+     &      coef_d, diffuse_reduction, coef_imp, dt, is_field,          &
+     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !      else if(sph_bc%iflag_icb .eq. iflag_fixed_flux                   &
 !     &    .or. sph_bc%iflag_icb .eq. iflag_evolve_flux) then
       else

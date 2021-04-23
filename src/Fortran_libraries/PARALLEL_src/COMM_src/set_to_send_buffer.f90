@@ -13,7 +13,11 @@
 !!     &          nnod_send, inod_export, X_org, WS)
 !!      subroutine set_to_send_buf_3(nnod_org,                          &
 !!     &          nnod_send, inod_export, X_org, WS)
+!!      subroutine set_to_send_buf_4(nnod_org,                          &
+!!     &          nnod_send, inod_export, X_org, WS)
 !!      subroutine set_to_send_buf_6(nnod_org,                          &
+!!     &          nnod_send, inod_export, X_org, WS)
+!!      subroutine set_to_send_buf_8(nnod_org,                          &
 !!     &          nnod_send, inod_export, X_org, WS)
 !!      subroutine set_to_send_buf_N(NB, nnod_org,                      &
 !!     &          nnod_send, inod_export, X_org, WS)
@@ -127,6 +131,30 @@
 !
 ! ----------------------------------------------------------------------
 !
+      subroutine set_to_send_buf_4(nnod_org,                            &
+     &          nnod_send, inod_export, X_org, WS)
+!
+      integer(kind = kint), intent(in) :: nnod_org, nnod_send
+      integer(kind = kint), intent(in) :: inod_export(nnod_send)
+!
+      real (kind=kreal), intent(in)::    X_org(4*nnod_org)
+!
+      real (kind=kreal), intent(inout):: WS(4*nnod_send)
+!
+      integer (kind = kint) :: k, j
+!
+!
+!$omp parallel do private(k,j)
+      do k = 1, nnod_send
+        j = inod_export(k)
+        WS(4*k-3:4*k  )= X_org(4*j-3:4*j)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_to_send_buf_4
+!
+! ----------------------------------------------------------------------
+!
       subroutine set_to_send_buf_6(nnod_org,                            &
      &          nnod_send, inod_export, X_org, WS)
 !
@@ -153,6 +181,30 @@
 !$omp end parallel do
 !
       end subroutine set_to_send_buf_6
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_to_send_buf_8(nnod_org,                            &
+     &          nnod_send, inod_export, X_org, WS)
+!
+      integer(kind = kint), intent(in) :: nnod_org, nnod_send
+      integer(kind = kint), intent(in) :: inod_export(nnod_send)
+!
+      real (kind=kreal), intent(in)::    X_org(8*nnod_org)
+!
+      real (kind=kreal), intent(inout):: WS(8*nnod_send)
+!
+      integer (kind = kint) :: k, j
+!
+!
+!$omp parallel do private(k,j)
+      do k = 1, nnod_send
+        j = inod_export(k)
+        WS(8*k-7:8*k)= X_org(8*j-7:8*j)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_to_send_buf_8
 !
 ! ----------------------------------------------------------------------
 !

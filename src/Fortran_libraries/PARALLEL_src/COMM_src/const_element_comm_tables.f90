@@ -40,7 +40,6 @@
       use t_surface_data
       use t_edge_data
       use t_comm_table
-      use t_next_node_ele_4_node
       use t_failed_export_list
 !
       use m_machine_parameter
@@ -169,9 +168,8 @@
 !
 !
       call const_global_numele_list(ele)
-      call set_global_ele_id(txt_ele, ele%numele, ele%istack_interele,  &
-     &   ele%interior_ele, ele_comm, ele%iele_global)
-      call calypso_mpi_barrier
+      call check_global_ele_id(txt_ele, ele%numele,                     &
+     &    ele%interior_ele, ele_comm, ele%iele_global)
 !
       end subroutine const_ele_comm_table
 !

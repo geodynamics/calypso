@@ -143,10 +143,11 @@
 !  ========= Generate FEM mesh ===========================
 !
       if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+3)
-      if(iflag_debug .gt. 0) write(*,*) 'load_FEM_mesh_4_SPH'
-      call load_FEM_mesh_4_SPH                                          &
+      if(iflag_debug .gt. 0) write(*,*) 'const_FEM_mesh_4_sph_mhd'
+      call const_FEM_mesh_4_sph_mhd                                     &
      &   (sph_files1%FEM_mesh_flags, sph_files1%sph_file_param,         &
-     &    SPH_GEN%groups, SPH_GEN%sph, geofem, SPH_GEN%sph_maker)
+     &   SPH_GEN%groups, SPH_GEN%sph, geofem%mesh, geofem%group,        &
+     &   SPH_GEN%sph_maker%gen_sph)
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+3)
       call calypso_MPI_barrier
 !
@@ -158,15 +159,6 @@
         call pickup_surface_mesh(sph_files1%sph_file_param, para_v1)
         if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+5)
       end if
-!
-!  ========= Generate FEM surface and edge mesh =======================
-!
-!      if(sph_files1%FEM_mesh_flags%iflag_output_SURF .eq. 0) goto 99
-!
-!      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+4)
-!      if(iflag_debug .gt. 0) write(*,*) 'FEM_mesh_initialization'
-!      call FEM_mesh_initialization(geofem%mesh, geofem%group)
-!      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+4)
 !
   99  continue
       call dealloc_sph_modes(SPH_GEN%sph, SPH_GEN%comms,                &

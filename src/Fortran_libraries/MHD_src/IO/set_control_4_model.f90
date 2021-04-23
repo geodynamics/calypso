@@ -132,6 +132,15 @@
      &             MHD_prop%cd_prop%iflag_Aevo_scheme
       end if
 !
+!   set control for diffusion reduction by latent heating
+!
+      MHD_prop%cp_prop%ICB_diffusie_reduction = 1.0d0
+      MHD_prop%ht_prop%ICB_diffusie_reduction = 1.0d0
+      if(reft_ctl%ICB_diffuse_reduction_ctl%iflag .gt. 0) then
+        MHD_prop%ht_prop%ICB_diffusie_reduction                         &
+     &        = reft_ctl%ICB_diffuse_reduction_ctl%realvalue
+      end if
+!
 !   set control for reference temperature 
 !
       write(tmpchara,'(a)') 'Reference temperature'
@@ -140,7 +149,7 @@
       call set_filtered_advection_ctl                                   &
      &   (reft_ctl%filterd_advect_ctl, MHD_prop%ht_prop)
 !
-!   set control for reference  
+!   set control for reference
 !
       write(tmpchara,'(a)') 'Reference composition'
       call set_reference_scalar_ctl(tmpchara, refc_ctl,                 &

@@ -40,11 +40,10 @@
 !!        type(sectioning_list), intent(inout) :: psf_list(num_psf)
 !!        type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
 !!        type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
-!!      subroutine set_nodes_4_iso                                      &
-!!     &         (num_iso, node, edge, nod_comm, edge_comm,             &
+!!      subroutine set_nodes_4_iso(num_iso, node, edge, edge_comm,      &
+!!     &                           iso_search, iso_list, iso_mesh)
 !!        type(node_data), intent(in) :: node
 !!        type(edge_data), intent(in) :: edge
-!!        type(communication_table), intent(in) :: nod_comm
 !!        type(communication_table), intent(in) :: edge_comm
 !!        type(psf_search_lists), intent(in) :: iso_search(num_iso)
 !!        type(sectioning_list), intent(inout) :: iso_list(num_iso)
@@ -244,9 +243,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_nodes_4_iso                                        &
-     &         (num_iso, node, edge, nod_comm, edge_comm,               &
-     &          iso_search, iso_list, iso_mesh)
+      subroutine set_nodes_4_iso(num_iso, node, edge, edge_comm,        &
+     &                           iso_search, iso_list, iso_mesh)
 !
       use calypso_mpi
       use t_geometry_data
@@ -263,7 +261,6 @@
 !
       type(node_data), intent(in) :: node
       type(edge_data), intent(in) :: edge
-      type(communication_table), intent(in) :: nod_comm
       type(communication_table), intent(in) :: edge_comm
 !
       type(psf_search_lists), intent(in) :: iso_search(num_iso)

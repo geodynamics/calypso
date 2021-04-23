@@ -12,6 +12,7 @@
 !!        type(psf_define_ctl), intent(in) :: psf_def_c
 !!        real(kind = kreal) function side_of_plane(const_psf, xx)
 !!      subroutine cal_normal_of_plane(const_psf, xx, normal)
+!!      subroutine cal_normal4_of_plane(const_psf, xx4, normal4)
 !!
 !!      integer(kind = kint) function num_label_psf_def_type()
 !!      integer(kind = kint) function num_label_psf_def_type_grp()
@@ -147,6 +148,34 @@
      &               + const_psf( 9) *  xx(3)
 !
       end subroutine cal_normal_of_plane
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine cal_normal4_of_plane(const_psf, xx4, normal4)
+!
+      real(kind = kreal), intent(in) :: xx4(4)
+      real(kind = kreal), intent(in) :: const_psf(10)
+!
+      real(kind = kreal), intent(inout) :: normal4(4)
+!
+!
+      normal4(1) =     const_psf( 1) *  xx4(1) * two                    &
+     &               + const_psf( 4) *  xx4(2)                          &
+     &               + const_psf( 6) *  xx4(3)                          &
+     &               + const_psf( 7) *  xx4(1)
+!
+      normal4(2) =     const_psf( 2) *  xx4(2) * two                    &
+     &               + const_psf( 4) *  xx4(1)                          &
+     &               + const_psf( 5) *  xx4(3)                          &
+     &               + const_psf( 8) *  xx4(2)
+!
+      normal4(3) =     const_psf( 3) *  xx4(3) * two                    &
+     &               + const_psf( 5) *  xx4(2)                          &
+     &               + const_psf( 6) *  xx4(1)                          &
+     &               + const_psf( 9) *  xx4(3)
+      normal4(4) =   0.0d0
+!
+      end subroutine cal_normal4_of_plane
 !
 !  ---------------------------------------------------------------------
 !   --------------------------------------------------------------------

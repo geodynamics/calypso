@@ -35,7 +35,7 @@
       use m_elapsed_labels_4_MHD
       use m_elapsed_labels_4_VIZ
       use m_elapsed_labels_gen_SPH
-!      use parallel_sleeve_extension
+!      use m_work_time_4_sleeve_extend
 !
 !
       call elapsed_label_4_MHD

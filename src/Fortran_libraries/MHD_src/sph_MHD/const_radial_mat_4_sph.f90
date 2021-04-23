@@ -8,12 +8,12 @@
 !!
 !!@verbatim
 !!      subroutine const_radial_mat_sph_mhd(dt, MHD_prop, sph_MHD_bc,   &
-!!     &          sph_rj, r_2nd, leg, sph_MHD_mat)
+!!     &          sph, r_2nd, leg, sph_MHD_mat)
 !!      subroutine const_radial_mat_sph_snap(MHD_prop, sph_MHD_bc,      &
 !!     &          sph_rj, r_2nd, leg, sph_MHD_mat)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-!!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(sph_grids), intent(in) :: sph
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
@@ -28,6 +28,7 @@
 !
       use t_control_parameter
       use t_physical_property
+      use t_spheric_parameter
       use t_spheric_rj_data
       use t_fdm_coefs
       use t_schmidt_poly_on_rtm
@@ -52,11 +53,11 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_radial_mat_sph_mhd(dt, MHD_prop, sph_MHD_bc,     &
-     &          sph_rj, r_2nd, leg, sph_MHD_mat)
+     &          sph, r_2nd, leg, sph_MHD_mat)
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-      type(sph_rj_grid), intent(in) :: sph_rj
+      type(sph_grids), intent(in) :: sph
       type(fdm_matrices), intent(in) :: r_2nd
       type(legendre_4_sph_trans), intent(in) :: leg
 !
@@ -65,12 +66,13 @@
       type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
 !
 !
-      call const_radial_matrices_sph(dt, sph_rj, r_2nd,                 &
+      call const_radial_matrices_sph                                    &
+     &   (dt, sph%sph_params, sph%sph_rj, r_2nd,                        &
      &    MHD_prop, sph_MHD_bc, leg%g_sph_rj, sph_MHD_mat)
 !
-      if(sph_rj%inod_rj_center .gt. 0) then
+      if(sph%sph_rj%inod_rj_center .gt. 0) then
         call const_radial_mat_sph_w_center                              &
-     &     (dt, sph_rj, MHD_prop, sph_MHD_bc, sph_MHD_mat)
+     &     (dt, sph%sph_rj, MHD_prop, sph_MHD_bc, sph_MHD_mat)
       end if
 !
       end subroutine const_radial_mat_sph_mhd
@@ -116,12 +118,13 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_radial_matrices_sph(dt, sph_rj, r_2nd,           &
-     &          MHD_prop, sph_MHD_bc, g_sph_rj, sph_MHD_mat)
+      subroutine const_radial_matrices_sph(dt, sph_params, sph_rj,      &
+     &          r_2nd, MHD_prop, sph_MHD_bc, g_sph_rj, sph_MHD_mat)
 !
       use const_r_mat_4_scalar_sph
       use const_r_mat_4_vector_sph
 !
+      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(MHD_evolution_param), intent(in) :: MHD_prop
@@ -152,7 +155,7 @@
 !
       write(mat_name,'(a)') 'Temperature_evolution'
       call const_radial_mat_4_scalar_sph                                &
-     &   (mat_name, dt, sph_rj, r_2nd, MHD_prop%ht_prop,                &
+     &   (mat_name, dt, sph_params, sph_rj, r_2nd, MHD_prop%ht_prop,    &
      &    sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                  &
      &    g_sph_rj, sph_MHD_mat%band_temp_evo)
 !
@@ -163,7 +166,7 @@
 !
       write(mat_name,'(a)') 'Composition_evolution'
       call const_radial_mat_4_scalar_sph                                &
-     &   (mat_name, dt, sph_rj, r_2nd, MHD_prop%cp_prop,                &
+     &   (mat_name, dt, sph_params, sph_rj, r_2nd, MHD_prop%cp_prop,    &
      &    sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                  &
      &    g_sph_rj, sph_MHD_mat%band_comp_evo)
 !

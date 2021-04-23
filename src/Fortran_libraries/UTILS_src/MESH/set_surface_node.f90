@@ -101,7 +101,7 @@
         ied =   surf_istack(iq)
 !
         do inod = 1, nnod_4_surf
-!$omp parallel do private(isurf,iele,isf,i,k1) 
+!!$omp parallel do private(isurf,iele,isf,i,k1)
           do isurf = ist, ied
 !
             iele = surf_item(1,isurf)
@@ -110,7 +110,7 @@
             i = ie(iele,k1)
             imark_nod(i) = 1
           end do
-!$omp end parallel do
+!!$omp end parallel do
         end do
 !
         icount_smp = 0

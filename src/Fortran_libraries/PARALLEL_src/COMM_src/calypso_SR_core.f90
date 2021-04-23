@@ -8,13 +8,13 @@
 !!@n      using reverse import table
 !!
 !!@verbatim
+!!      subroutine calypso_send_recv_core                               &
+!!     &         (NB, npe_send, id_pe_send, istack_send, Wsend,         &
+!!     &              npe_recv, id_pe_recv, istack_recv, iflag_self,    &
+!!     &              Wrecv, SR_sig)
 !!      subroutine check_calypso_SR_stack                               &
 !!     &         (NB, npe_send, isend_self, istack_send,                &
 !!     &              npe_recv, irecv_self, istack_recv, SR_sig, SR_r)
-!!      subroutine calypso_send_recv_core                               &
-!!     &         (NB, npe_send, isend_self, id_pe_send, istack_send,    &
-!!     &              npe_recv, irecv_self, id_pe_recv, istack_recv,    &
-!!     &              SR_sig, SR_r)
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
@@ -55,6 +55,75 @@
 !
 !-----------------------------------------------------------------------
 !
+      subroutine calypso_send_recv_core                                 &
+     &         (NB, npe_send, id_pe_send, istack_send, Wsend,           &
+     &              npe_recv, id_pe_recv, istack_recv, iflag_self,      &
+     &              Wrecv, SR_sig)
+!
+      integer(kind = kint), intent(in) :: NB
+!
+      integer(kind = kint), intent(in) :: npe_send
+      integer(kind = kint), intent(in) :: id_pe_send(npe_send)
+      integer(kind = kint), intent(in) :: istack_send(0:npe_send)
+      real(kind = kreal), intent(in) :: Wsend(NB*istack_send(npe_send))
+!
+      integer(kind = kint), intent(in) :: npe_recv, iflag_self
+      integer(kind = kint), intent(in) :: id_pe_recv(npe_recv)
+      integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
+!
+      real(kind = kreal), intent(inout)                                 &
+     &                   :: Wrecv(NB*istack_recv(npe_recv))
+!>      Structure of communication flags
+      type(send_recv_status), intent(inout) :: SR_sig
+!
+      integer (kind = kint) :: ist
+      integer :: ncomm_send, ncomm_recv, neib
+      integer :: num, i
+      integer (kind = kint) :: ist_send, ist_recv
+!
+!
+      ncomm_send = int(npe_send - iflag_self)
+      ncomm_recv = int(npe_recv - iflag_self)
+!
+      do neib = 1, ncomm_send
+        ist = NB * istack_send(neib-1)
+        num = int(NB * (istack_send(neib  ) - istack_send(neib-1)))
+        call MPI_ISEND                                                  &
+     &      (Wsend(ist+1), num, CALYPSO_REAL, int(id_pe_send(neib)),    &
+     &       0, CALYPSO_COMM, SR_sig%req1(neib), ierr_MPI)
+      end do
+!C
+!C-- RECEIVE
+      if(ncomm_recv .gt. 0) then
+        do neib = ncomm_recv, 1, -1
+          ist= NB * istack_recv(neib-1)
+          num  = int(NB * (istack_recv(neib  ) - istack_recv(neib-1)))
+          call MPI_IRECV                                                &
+     &       (Wrecv(ist+1), num, CALYPSO_REAL, int(id_pe_recv(neib)),   &
+     &        0, CALYPSO_COMM, SR_sig%req2(neib), ierr_MPI)
+        end do
+      end if
+!
+      if(ncomm_recv .gt. 0) then
+        call MPI_WAITALL                                                &
+     &     (ncomm_recv, SR_sig%req2, SR_sig%sta2, ierr_MPI)
+      end if
+!
+      if (iflag_self .eq. 0) return
+      ist_send= NB * istack_send(npe_send-1)
+      ist_recv= NB * istack_recv(npe_recv-1)
+      num = int(NB * (istack_send(npe_send) - istack_send(npe_send-1)))
+!$omp parallel do
+      do i = 1, num
+        Wrecv(ist_recv+i) = Wsend(ist_send+i)
+      end do
+!$omp end parallel do
+!
+      end subroutine calypso_send_recv_core
+!
+!-----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
       subroutine check_calypso_SR_stack                                 &
      &         (NB, npe_send, isend_self, istack_send,                  &
      &              npe_recv, irecv_self, istack_recv, SR_sig, SR_r)
@@ -83,73 +152,6 @@
       end subroutine check_calypso_SR_stack
 !
 !-----------------------------------------------------------------------
-!
-      subroutine calypso_send_recv_core                                 &
-     &         (NB, npe_send, isend_self, id_pe_send, istack_send,      &
-     &              npe_recv, irecv_self, id_pe_recv, istack_recv,      &
-     &              SR_sig, SR_r)
-!
-      integer(kind = kint), intent(in) :: NB
-!
-      integer(kind = kint), intent(in) :: npe_send, isend_self
-      integer(kind = kint), intent(in) :: id_pe_send(npe_send)
-      integer(kind = kint), intent(in) :: istack_send(0:npe_send)
-!
-      integer(kind = kint), intent(in) :: npe_recv, irecv_self
-      integer(kind = kint), intent(in) :: id_pe_recv(npe_recv)
-      integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
-!
-!>      Structure of communication flags
-      type(send_recv_status), intent(inout) :: SR_sig
-!>      Structure of communication buffer for 8-byte real
-      type(send_recv_real_buffer), intent(inout) :: SR_r
-!
-      integer (kind = kint) :: ist
-      integer :: ncomm_send, ncomm_recv, neib
-      integer :: num, i
-      integer (kind = kint) :: ist_send, ist_recv
-!
-!
-      ncomm_send = int(npe_send - isend_self)
-      ncomm_recv = int(npe_recv - irecv_self)
-!
-      do neib = 1, ncomm_send
-        ist = NB * istack_send(neib-1) + 1
-        num = int(NB * (istack_send(neib  ) - istack_send(neib-1)))
-        call MPI_ISEND                                                  &
-     &      (SR_r%WS(ist), num, CALYPSO_REAL, int(id_pe_send(neib)),    &
-     &       0, CALYPSO_COMM, SR_sig%req1(neib), ierr_MPI)
-      end do
-!C
-!C-- RECEIVE
-      if(ncomm_recv .gt. 0) then
-        do neib = ncomm_recv, 1, -1
-          ist= NB * istack_recv(neib-1) + 1
-          num  = int(NB * (istack_recv(neib  ) - istack_recv(neib-1)))
-          call MPI_IRECV                                                &
-     &       (SR_r%WR(ist), num, CALYPSO_REAL, int(id_pe_recv(neib)),   &
-     &        0, CALYPSO_COMM, SR_sig%req2(neib), ierr_MPI)
-        end do
-      end if
-!
-      if(ncomm_recv .gt. 0) then
-        call MPI_WAITALL                                                &
-     &     (ncomm_recv, SR_sig%req2, SR_sig%sta2, ierr_MPI)
-      end if
-!
-      if (isend_self .eq. 0) return
-      ist_send= NB * istack_send(npe_send-1)
-      ist_recv= NB * istack_recv(npe_recv-1)
-      num = int(NB * (istack_send(npe_send) - istack_send(npe_send-1)))
-!$omp parallel do
-      do i = 1, num
-        SR_r%WR(ist_recv+i) = SR_r%WS(ist_send+i)
-      end do
-!$omp end parallel do
-!
-      end subroutine calypso_send_recv_core
-!
-! ----------------------------------------------------------------------
 !
       subroutine check_calypso_send_recv_stack                          &
      &         (NB, npe_send, isend_self, istack_send,                  &

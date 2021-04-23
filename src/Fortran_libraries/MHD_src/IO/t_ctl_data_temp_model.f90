@@ -33,7 +33,9 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
 !!    begin temperature_define
-!!      filtered_advection_ctl    Off
+!!      filtered_advection_ctl       Off
+!!
+!!      ICB_diffusivity_reduction_ctl     0.1
 !!
 !!      ref_temp_ctl              spherical_shell
 !!      begin low_temp_ctl
@@ -110,6 +112,8 @@
         type(read_character_item) :: reference_ctl
         type(read_character_item) :: stratified_ctl
 !
+        type(read_real_item) :: ICB_diffuse_reduction_ctl
+!
         type(reference_point_control) :: low_ctl
         type(reference_point_control) :: high_ctl
         type(takepiro_model_control) :: takepiro_ctl
@@ -127,7 +131,10 @@
      &       :: hd_high_temp =   'high_temp_ctl'
 !
       character(len=kchara), parameter                                  &
-     &       :: hd_filterd_advection = 'filtered_advection_ctl'
+     &    :: hd_filterd_advection = 'filtered_advection_ctl'
+      character(len=kchara), parameter                                  &
+     &    :: hd_diffusivity_reduction = 'ICB_diffusivity_reduction_ctl'
+!
       character(len=kchara), parameter                                  &
      &       :: hd_ref_comp =    'ref_comp_ctl'
       character(len=kchara), parameter                                  &
@@ -156,7 +163,7 @@
       character(len=kchara), parameter                                  &
      &       :: hd_comp_value = 'composition'
 !
-      private :: hd_filterd_advection
+      private :: hd_filterd_advection, hd_diffusivity_reduction
       private :: hd_ref_temp, hd_ref_comp
       private :: hd_strat_ctl, hd_strat_sigma
       private :: hd_strat_width, hd_strat_outer
@@ -204,6 +211,9 @@
      &     (c_buf, hd_ref_temp, reft_ctl%reference_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_strat_ctl, reft_ctl%stratified_ctl)
+!
+        call read_real_ctl_type(c_buf, hd_diffusivity_reduction,        &
+     &                          reft_ctl%ICB_diffuse_reduction_ctl)
       end do
       reft_ctl%i_temp_def = 1
 !
@@ -235,13 +245,15 @@
         call read_takepiro_ctl                                          &
      &     (id_control, hd_takepiro_ctl, refc_ctl%takepiro_ctl, c_buf)
 !
-!
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_filterd_advection, refc_ctl%filterd_advect_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_ref_comp, refc_ctl%reference_ctl)
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_strat_ctl, refc_ctl%stratified_ctl)
+!
+        call read_real_ctl_type(c_buf, hd_diffusivity_reduction,        &
+     &                          refc_ctl%ICB_diffuse_reduction_ctl)
       end do
       refc_ctl%i_temp_def = 1
 !
@@ -263,6 +275,8 @@
       call bcast_ctl_type_c1(refs_ctl%filterd_advect_ctl)
       call bcast_ctl_type_c1(refs_ctl%reference_ctl)
       call bcast_ctl_type_c1(refs_ctl%stratified_ctl)
+!
+      call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_ctl)
 !
       call calypso_mpi_bcast_one_int(refs_ctl%i_temp_def, 0)
 !

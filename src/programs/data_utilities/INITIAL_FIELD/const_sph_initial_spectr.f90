@@ -847,27 +847,27 @@
 !
 !-----------------------------------------------------------------------
 !
-      real function r_CMB(sph)
+      real(kind = kreal) function r_CMB(sph)
 !
       type(sph_grids), intent(in) :: sph
 !
-      r_CMB = int(sph%sph_params%radius_CMB)
+      r_CMB = sph%sph_params%radius_CMB
 !
       end function r_CMB
 !
 !-----------------------------------------------------------------------
 !
-      real function r_ICB(sph)
+      real(kind = kreal) function r_ICB(sph)
 !
       type(sph_grids), intent(in) :: sph
 !
-      r_ICB = int(sph%sph_params%radius_ICB)
+      r_ICB = sph%sph_params%radius_ICB
 !
       end function r_ICB
 !
 !-----------------------------------------------------------------------
 !
-      integer function nlayer_CMB(sph)
+      integer(kind= kint) function nlayer_CMB(sph)
 !
       type(sph_grids), intent(in) :: sph
 !
@@ -877,7 +877,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      integer function nlayer_ICB(sph)
+      integer(kind= kint) function nlayer_ICB(sph)
 !
       type(sph_grids), intent(in) :: sph
 !

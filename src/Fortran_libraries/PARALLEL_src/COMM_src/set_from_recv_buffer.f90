@@ -13,7 +13,11 @@
 !!     &          nnod_recv, inod_import, WR, X_new)
 !!      subroutine set_from_recv_buf_3(nnod_new,                        &
 !!     &          nnod_recv, inod_import, WR, X_new)
+!!      subroutine set_from_recv_buf_4(nnod_new,                        &
+!!     &          nnod_recv, inod_import, WR, X_new)
 !!      subroutine set_from_recv_buf_6(nnod_new,                        &
+!!     &          nnod_recv, inod_import, WR, X_new)
+!!      subroutine set_from_recv_buf_8(nnod_new,                        &
 !!     &          nnod_recv, inod_import, WR, X_new)
 !!      subroutine set_from_recv_buf_N(NB, nnod_new,                    &
 !!     &          nnod_recv, inod_import, WR, X_new)
@@ -56,7 +60,6 @@
 !
       integer(kind = kint), intent(in) :: nnod_new, nnod_recv
       integer(kind = kint), intent(in) :: inod_import(nnod_recv)
-!
       real (kind=kreal), intent(in):: WR(nnod_recv)
 !
       real (kind=kreal), intent(inout):: X_new(nnod_new)
@@ -64,14 +67,8 @@
       integer (kind = kint) :: k, j
 !
 !
-!$omp parallel do
-      do j = 1, nnod_new
-        X_new(j) = 0.0d0
-      end do
-!$omp end parallel do
-!
 !$omp parallel do private(k,j)
-      do k= 1, nnod_recv
+      do k = 1, nnod_recv
         j = inod_import(k)
         X_new(j  ) = WR(k  )
       end do
@@ -94,14 +91,8 @@
       integer (kind = kint) :: k, j
 !
 !
-!$omp parallel do
-      do j = 1, 2*nnod_new
-        X_new(j) = 0.0d0
-      end do
-!$omp end parallel do
-!
 !$omp parallel do private(k,j)
-      do k= 1, nnod_recv
+      do k = 1, nnod_recv
         j = inod_import(k)
         X_new(2*j-1) = WR(2*k-1)
         X_new(2*j  ) = WR(2*k  )
@@ -125,14 +116,8 @@
       integer (kind = kint) :: k, j
 !
 !
-!$omp parallel do
-      do j = 1, 3*nnod_new
-        X_new(j) = 0.0d0
-      end do
-!$omp end parallel do
-!
 !$omp parallel do private(k,j)
-      do k= 1, nnod_recv
+      do k = 1, nnod_recv
         j = inod_import(k)
         X_new(3*j-2) = WR(3*k-2)
         X_new(3*j-1) = WR(3*k-1)
@@ -141,6 +126,30 @@
 !$omp end parallel do
 !
       end subroutine set_from_recv_buf_3
+!
+! ----------------------------------------------------------------------
+!
+      subroutine set_from_recv_buf_4(nnod_new,                          &
+     &          nnod_recv, inod_import, WR, X_new)
+!
+      integer(kind = kint), intent(in) :: nnod_new, nnod_recv
+      integer(kind = kint), intent(in) :: inod_import(nnod_recv)
+!
+      real (kind=kreal), intent(in):: WR(4*nnod_recv)
+!
+      real (kind=kreal), intent(inout):: X_new(4*nnod_new)
+!
+      integer (kind = kint) :: k, j
+!
+!
+!$omp parallel do private(k,j)
+      do k = 1, nnod_recv
+        j = inod_import(k)
+        X_new(3*j-3:3*j) = WR(3*k-3:3*k)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_from_recv_buf_4
 !
 ! ----------------------------------------------------------------------
 !
@@ -156,12 +165,6 @@
 !
       integer (kind = kint) :: k, j
 !
-!
-!$omp parallel do
-      do j = 1, 6*nnod_new
-        X_new(j) = 0.0d0
-      end do
-!$omp end parallel do
 !
 !$omp parallel do private(k,j)
       do k= 1, nnod_recv
@@ -179,6 +182,30 @@
 !
 ! ----------------------------------------------------------------------
 !
+      subroutine set_from_recv_buf_8(nnod_new,                          &
+     &          nnod_recv, inod_import, WR, X_new)
+!
+      integer(kind = kint), intent(in) :: nnod_new, nnod_recv
+      integer(kind = kint), intent(in) :: inod_import(nnod_recv)
+!
+      real (kind=kreal), intent(in):: WR(8*nnod_recv)
+!
+      real (kind=kreal), intent(inout):: X_new(8*nnod_new)
+!
+      integer (kind = kint) :: k, j
+!
+!
+!$omp parallel do private(k,j)
+      do k = 1, nnod_recv
+        j = inod_import(k)
+        X_new(8*j-7:8*j) = WR(8*k-7:8*k)
+      end do
+!$omp end parallel do
+!
+      end subroutine set_from_recv_buf_8
+!
+! ----------------------------------------------------------------------
+!
       subroutine set_from_recv_buf_N(NB, nnod_new,                      &
      &          nnod_recv, inod_import, WR, X_new)
 !
@@ -192,12 +219,6 @@
 !
       integer (kind = kint) :: k, nd, jj, kk
 !
-!
-!$omp parallel do
-      do jj = 1, NB*nnod_new
-        X_new(jj) = 0.0d0
-      end do
-!$omp end parallel do
 !
 !$omp parallel do private(k,jj,kk,nd)
       do kk = 1, NB*nnod_recv
@@ -229,12 +250,6 @@
       integer (kind = kint) :: neib, ist, num
       integer (kind = kint) :: k, nd, jj, kk
 !
-!
-!$omp parallel do
-      do jj = 1, NB*nnod_new
-        X_new(jj) = 0.0d0
-      end do
-!$omp end parallel do
 !
 !$omp parallel private(nd,neib,ist,num)
       do neib = 1, npe_recv

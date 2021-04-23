@@ -9,13 +9,13 @@
 !!        in overlapped partitioning
 !!
 !!@verbatim
-!!      subroutine  SOLVER_SEND_RECV_6(N, NEIBPETOT, NEIBPE,            &
+!!      subroutine  SOLVER_SEND_RECV_6(NP, NEIBPETOT, NEIBPE,           &
 !!     &                               STACK_IMPORT, NOD_IMPORT,        &
 !!     &                               STACK_EXPORT, NOD_EXPORT,        &
 !!     &                               SR_sig, SR_r, X)
 !!@endverbatim
 !!
-!!@n @param  N     Number of data points
+!!@n @param  NP     Number of data points
 !!@n
 !!@n @param  NEIBPETOT    Number of processses to communicate
 !!@n @param  NEIBPE(NEIBPETOT)      Process ID to communicate
@@ -28,7 +28,7 @@
 !!@n @param  NOD_EXPORT(STACK_IMPORT(NEIBPETOT))
 !!                    local node ID to copy in export buffer
 !!
-!!@n @param  X(6*N)   field data with 6 components
+!!@n @param  X(6*NP)   field data with 6 components
 !
       module solver_SR_6
 !
@@ -45,36 +45,38 @@
 !
 ! ----------------------------------------------------------------------
 !C
-      subroutine  SOLVER_SEND_RECV_6(N, NEIBPETOT, NEIBPE,              &
+      subroutine  SOLVER_SEND_RECV_6(NP, NEIBPETOT, NEIBPE,             &
      &                               STACK_IMPORT, NOD_IMPORT,          &
      &                               STACK_EXPORT, NOD_EXPORT,          &
      &                               SR_sig, SR_r, X)
 !
+      use calypso_SR_core
+      use set_to_send_buffer
+      use set_from_recv_buffer
+!
 !>       number of nodes
-      integer(kind=kint )                , intent(in)   ::  N
+      integer(kind=kint )                , intent(in)   ::  NP
 !>       total neighboring pe count
-      integer(kind=kint )                , intent(in)   ::  NEIBPETOT
+      integer(kind=kint ), intent(in)   ::  NEIBPETOT
 !>       neighboring pe id                        (i-th pe)
-      integer(kind=kint ), dimension(NEIBPETOT) :: NEIBPE
+      integer(kind=kint ), intent(in) :: NEIBPE(NEIBPETOT)
 !>       imported node count for each neighbor pe (i-th pe)
-      integer(kind=kint ), dimension(0:NEIBPETOT) :: STACK_IMPORT
+      integer(kind=kint ), intent(in) :: STACK_IMPORT(0:NEIBPETOT)
 !>       imported node                            (i-th dof)
-      integer(kind=kint ), dimension(STACK_IMPORT(NEIBPETOT))           &
-     &        :: NOD_IMPORT
+      integer(kind=kint ), intent(in)                                   &
+     &        :: NOD_IMPORT(STACK_IMPORT(NEIBPETOT))
 !>       exported node count for each neighbor pe (i-th pe)
-      integer(kind=kint ), dimension(0:NEIBPETOT) :: STACK_EXPORT
+      integer(kind=kint ), intent(in) :: STACK_EXPORT(0:NEIBPETOT)
 !>       exported node                            (i-th dof)
-      integer(kind=kint ), dimension(STACK_EXPORT(NEIBPETOT))           &
-     &        :: NOD_EXPORT
+      integer(kind=kint ), intent(in)                                   &
+     &        :: NOD_EXPORT(STACK_EXPORT(NEIBPETOT))
 !>       communicated result vector
-      real   (kind=kreal), dimension(6*N), intent(inout):: X
+      real   (kind=kreal), dimension(6*NP), intent(inout):: X
 !
 !>      Structure of communication flags
       type(send_recv_status), intent(inout) :: SR_sig
 !>      Structure of communication buffer for 8-byte real
       type(send_recv_real_buffer), intent(inout) :: SR_r
-!
-      integer (kind = kint) :: neib, istart, inum, k, ii
 !
 !
       call resize_work_SR(isix, NEIBPETOT, NEIBPETOT,                   &
@@ -82,57 +84,22 @@
      &    SR_sig, SR_r)
 !C
 !C-- SEND
-      
-      do neib= 1, NEIBPETOT
-        istart= STACK_EXPORT(neib-1)
-        inum  = STACK_EXPORT(neib  ) - istart
-        
-        do k= istart+1, istart+inum
-               ii   = 6*NOD_EXPORT(k)
-           SR_r%WS(6*k-5)= X(ii-5)
-           SR_r%WS(6*k-4)= X(ii-4)
-           SR_r%WS(6*k-3)= X(ii-3)
-           SR_r%WS(6*k-2)= X(ii-2)
-           SR_r%WS(6*k-1)= X(ii-1)
-           SR_r%WS(6*k  )= X(ii  )
-        enddo
-        call MPI_ISEND(SR_r%WS(6*istart+1), int(6*inum), CALYPSO_REAL,  &
-     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM,              &
-     &                 SR_sig%req1(neib), ierr_MPI)
-      enddo
-
-!C
+      call set_to_send_buf_6(NP, STACK_EXPORT(NEIBPETOT), NOD_EXPORT,   &
+     &                       X(1), SR_r%WS(1))
+!
+!C-- COMM
+      call calypso_send_recv_core                                       &
+     &   (isix, NEIBPETOT, NEIBPE, STACK_EXPORT, SR_r%WS(1),            &
+     &            NEIBPETOT, NEIBPE, STACK_IMPORT, izero,               &
+     &            SR_r%WR(1), SR_sig)
 !C-- RECEIVE
-      do neib= 1, NEIBPETOT
-        istart= STACK_IMPORT(neib-1)
-        inum  = STACK_IMPORT(neib  ) - istart
-        call MPI_IRECV(SR_r%WR(6*istart+1), int(6*inum), CALYPSO_REAL,  &
-     &                 int(NEIBPE(neib)), 0, CALYPSO_COMM,              &
-     &                 SR_sig%req2(neib), ierr_MPI)
-      enddo
+      call set_from_recv_buf_6(NP, STACK_IMPORT(NEIBPETOT), NOD_IMPORT, &
+     &                         SR_r%WR(1), X(1))
 
-      call MPI_WAITALL                                                  &
-     &   (int(NEIBPETOT), SR_sig%req2(1), SR_sig%sta2(1,1), ierr_MPI)
-   
-      do neib= 1, NEIBPETOT
-        istart= STACK_IMPORT(neib-1)
-        inum  = STACK_IMPORT(neib  ) - istart
-        do k= istart+1, istart+inum
-          ii   = 6*NOD_IMPORT(k)
-          X(ii-5)= SR_r%WR(6*k-5)
-          X(ii-4)= SR_r%WR(6*k-4)
-          X(ii-3)= SR_r%WR(6*k-3)
-          X(ii-2)= SR_r%WR(6*k-2)
-          X(ii-1)= SR_r%WR(6*k-1)
-          X(ii  )= SR_r%WR(6*k  )
-        enddo
-      enddo
-
-      call MPI_WAITALL                                                  &
-     &   (int(NEIBPETOT), SR_sig%req1(1), SR_sig%sta1(1,1), ierr_MPI)
+      call calypso_send_recv_fin(NEIBPETOT, izero, SR_sig)
 
       end subroutine SOLVER_SEND_RECV_6
 !
 ! ----------------------------------------------------------------------
 !
-      end module     solver_SR_6
+      end module solver_SR_6

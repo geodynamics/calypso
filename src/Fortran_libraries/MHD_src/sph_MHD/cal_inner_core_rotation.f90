@@ -37,6 +37,10 @@
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(band_matrices_type), intent(inout) :: band_vt_evo
+!!
+!!      subroutine reduction_scalar_diffusion_ICB                       &
+!!     &         (reduction, jmax, kr_in, ipol_diffuse,                 &
+!!     &          n_point, ntot_phys_rj, d_rj)
 !!@endverbatim
 !!
 !!@n @param coef_d  Coefficient for diffusion term
@@ -423,6 +427,31 @@
      &      = d_rj(i10c_o,it_lorentz)
 !
       end subroutine int_icore_tor_lorentz_l1
+!
+! ----------------------------------------------------------------------
+!
+      subroutine reduction_scalar_diffusion_ICB                         &
+     &         (reduction, jmax, kr_in, ipol_diffuse,                   &
+     &          n_point, ntot_phys_rj, d_rj)
+!
+      integer(kind = kint), intent(in) :: jmax, kr_in
+      integer(kind = kint), intent(in) :: ipol_diffuse
+      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
+      real(kind = kreal), intent(in) :: reduction
+!
+      real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
+!
+      integer(kind = kint) :: j, inod
+!
+!
+!$omp parallel do private(j,inod)
+      do j = 1, jmax
+        inod = j + (kr_in-1) * jmax
+        d_rj(inod,ipol_diffuse) = reduction * d_rj(inod,ipol_diffuse)
+      end do
+!$omp end parallel do
+!
+      end subroutine reduction_scalar_diffusion_ICB
 !
 ! ----------------------------------------------------------------------
 !

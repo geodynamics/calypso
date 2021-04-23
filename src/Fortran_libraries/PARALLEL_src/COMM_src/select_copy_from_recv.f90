@@ -7,43 +7,26 @@
 !>@brief  scalar components data communication
 !!
 !!@verbatim
-!!      subroutine sel_cppy_from_recv_buf_1(iflag_recv, nnod_new,       &
+!!      subroutine sel_copy_from_recv_buf_1(iflag_recv, nnod_new,       &
 !!     &                         ntot_import, inod_import, irev_import, &
 !!     &                         WR, X_new)
-!!      subroutine sel_cppy_from_recv_buf_2(iflag_recv, nnod_new,       &
+!!      subroutine sel_copy_from_recv_buf_2(iflag_recv, nnod_new,       &
 !!     &                         ntot_import, inod_import, irev_import, &
 !!     &                         WR, X_new)
-!!      subroutine sel_cppy_from_recv_buf_3(iflag_recv, nnod_new,       &
+!!      subroutine sel_copy_from_recv_buf_3(iflag_recv, nnod_new,       &
 !!     &                         ntot_import, inod_import, irev_import, &
 !!     &                         WR, X_new)
-!!      subroutine sel_cppy_from_recv_buf_6(iflag_recv, nnod_new,       &
+!!      subroutine sel_copy_from_recv_buf_6(iflag_recv, nnod_new,       &
 !!     &                         ntot_import, inod_import, irev_import, &
 !!     &                         WR, X_new)
-!!      subroutine sel_cppy_from_recv_buf_N(iflag_recv, NB, nnod_new,   &
+!!      subroutine sel_copy_from_recv_buf_N(iflag_recv, NB, nnod_new,   &
 !!     &                         npe_recv, ntot_import, istack_recv,    &
 !!     &                         inod_import, irev_import,              &
 !!     &                         WR, X_new)
 !!
-!!      subroutine sel_cppy_to_send_buf_N(iflag_recv, NB, nnod_org,     &
+!!      subroutine sel_copy_to_send_buf_N(iflag_recv, NB, nnod_org,     &
 !!     &                         npe_send, ntot_export, istack_send,    &
 !!     &                         inod_export, X_org, WS)
-!!
-!!      subroutine sel_cppy_from_recv_buf_3x1(iflag_recv, nnod_new,     &
-!!     &                         ntot_import, inod_import, irev_import, &
-!!     &                         WR, X1_new, X2_new, X3_new)
-!!      subroutine sel_cppy_from_recv_buf_3x2(iflag_recv, nnod_new,     &
-!!     &                         ntot_import, inod_import, irev_import, &
-!!     &                         WR, X1_new, X2_new, X3_new)
-!!      subroutine sel_cppy_from_recv_buf_3x3(iflag_recv, nnod_new,     &
-!!     &                         ntot_import, inod_import, irev_import, &
-!!     &                         WR, X1_new, X2_new, X3_new)
-!!      subroutine sel_cppy_from_recv_buf_3x6(iflag_recv, nnod_new,     &
-!!     &                         ntot_import, inod_import, irev_import, &
-!!     &                         WR, X1_new, X2_new, X3_new)
-!!      subroutine sel_cppy_from_recv_buf_3xN(iflag_recv, NB, nnod_new, &
-!!     &                         npe_recv, ntot_import, istack_recv,    &
-!!     &                         inod_import, irev_import,              &
-!!     &                         WR, X1_new, X2_new, X3_new)
 !!
 !!      subroutine sel_cppy_from_recv_buf_int(iflag_recv, nnod_new,     &
 !!     &                       ntot_import, inod_import, irev_import,   &
@@ -88,7 +71,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sel_cppy_from_recv_buf_1(iflag_recv, nnod_new,         &
+      subroutine sel_copy_from_recv_buf_1(iflag_recv, nnod_new,         &
      &                         ntot_import, inod_import, irev_import,   &
      &                         WR, X_new)
 !
@@ -110,15 +93,19 @@
         call set_from_recv_buf_rev_1(nnod_new,                          &
      &      ntot_import, irev_import, WR(1), X_new)
       else
+!$omp parallel workshare
+        X_new(1:nnod_new) = 0.0d0
+!$omp end parallel workshare
+!
         call set_from_recv_buf_1(nnod_new,                              &
      &      ntot_import, inod_import, WR(1), X_new)
       end if
 !
-      end subroutine sel_cppy_from_recv_buf_1
+      end subroutine sel_copy_from_recv_buf_1
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sel_cppy_from_recv_buf_2(iflag_recv, nnod_new,         &
+      subroutine sel_copy_from_recv_buf_2(iflag_recv, nnod_new,         &
      &                         ntot_import, inod_import, irev_import,   &
      &                         WR, X_new)
 !
@@ -141,15 +128,19 @@
         call set_from_recv_buf_rev_2(nnod_new,                          &
      &      ntot_import, irev_import, WR(1), X_new)
       else
+!$omp parallel workshare
+        X_new(1:2*nnod_new) = 0.0d0
+!$omp end parallel workshare
+!
         call set_from_recv_buf_2(nnod_new,                              &
      &      ntot_import, inod_import, WR(1), X_new)
       end if
 !
-      end subroutine sel_cppy_from_recv_buf_2
+      end subroutine sel_copy_from_recv_buf_2
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine sel_cppy_from_recv_buf_3(iflag_recv, nnod_new,         &
+      subroutine sel_copy_from_recv_buf_3(iflag_recv, nnod_new,         &
      &                         ntot_import, inod_import, irev_import,   &
      &                         WR, X_new)
 !
@@ -172,15 +163,19 @@
         call set_from_recv_buf_rev_3(nnod_new,                          &
      &      ntot_import, irev_import, WR(1), X_new)
       else
+!$omp parallel workshare
+        X_new(1:3*nnod_new) = 0.0d0
+!$omp end parallel workshare
+!
         call set_from_recv_buf_3(nnod_new,                              &
      &    ntot_import, inod_import, WR(1), X_new)
       end if
 !
-      end subroutine sel_cppy_from_recv_buf_3
+      end subroutine sel_copy_from_recv_buf_3
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sel_cppy_from_recv_buf_6(iflag_recv, nnod_new,         &
+      subroutine sel_copy_from_recv_buf_6(iflag_recv, nnod_new,         &
      &                         ntot_import, inod_import, irev_import,   &
      &                         WR, X_new)
 !
@@ -202,15 +197,19 @@
         call set_from_recv_buf_rev_6(nnod_new,                          &
      &      ntot_import, irev_import, WR(1), X_new)
       else
+!$omp parallel workshare
+        X_new(1:6*nnod_new) = 0.0d0
+!$omp end parallel workshare
+!
         call set_from_recv_buf_6(nnod_new,                              &
      &      ntot_import, inod_import, WR(1), X_new)
       end if
 !
-      end subroutine sel_cppy_from_recv_buf_6
+      end subroutine sel_copy_from_recv_buf_6
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine sel_cppy_from_recv_buf_N(iflag_recv, NB, nnod_new,     &
+      subroutine sel_copy_from_recv_buf_N(iflag_recv, NB, nnod_new,     &
      &                         npe_recv, ntot_import, istack_recv,      &
      &                         inod_import, irev_import,                &
      &                         WR, X_new)
@@ -236,19 +235,27 @@
         call set_from_recv_buf_rev_N(NB, nnod_new,                      &
      &      ntot_import, irev_import, WR(1), X_new)
       else if(iflag_recv .eq. iflag_import_mod) then
+!$omp parallel workshare
+        X_new(1:NB*nnod_new) = 0.0d0
+!$omp end parallel workshare
+
         call set_from_recv_buf_N_mod(NB, nnod_new,                      &
      &      npe_recv, ntot_import, istack_recv, inod_import,            &
      &      WR(1), X_new)
       else
+!$omp parallel workshare
+        X_new(1:NB*nnod_new) = 0.0d0
+!$omp end parallel workshare
+!
         call set_from_recv_buf_N(NB, nnod_new,                          &
      &      ntot_import, inod_import, WR(1), X_new)
       end if
 !
-      end subroutine sel_cppy_from_recv_buf_N
+      end subroutine sel_copy_from_recv_buf_N
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine sel_cppy_to_send_buf_N(iflag_recv, NB, nnod_org,       &
+      subroutine sel_copy_to_send_buf_N(iflag_recv, NB, nnod_org,       &
      &                         npe_send, ntot_export, istack_send,      &
      &                         inod_export, X_org, WS)
 !
@@ -275,178 +282,10 @@
      &     (NB, nnod_org, ntot_export, inod_export, X_org, WS)
       end if
 !
-      end subroutine sel_cppy_to_send_buf_N
+      end subroutine sel_copy_to_send_buf_N
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
-!
-      subroutine sel_cppy_from_recv_buf_3x1(iflag_recv, nnod_new,       &
-     &                         ntot_import, inod_import, irev_import,   &
-     &                         WR, X1_new, X2_new, X3_new)
-!
-      use set_from_recv_buff_tri
-      use set_from_recv_buf_rev_tri
-!
-      integer(kind = kint), intent(in) :: iflag_recv
-      integer(kind = kint), intent(in) :: nnod_new
-!
-      integer(kind = kint), intent(in) :: ntot_import
-      integer(kind = kint), intent(in) :: inod_import(ntot_import)
-      integer(kind = kint), intent(in) :: irev_import(nnod_new)
-      real (kind=kreal), intent(inout):: WR(3*(ntot_import+1))
-!
-      real (kind=kreal), intent(inout):: X1_new(nnod_new)
-      real (kind=kreal), intent(inout):: X2_new(nnod_new)
-      real (kind=kreal), intent(inout):: X3_new(nnod_new)
-!
-!C-- RECV
-      if(iflag_recv .eq. iflag_import_rev) then
-        call set_from_recv_buf_rev_3x1(nnod_new, ntot_import,           &
-     &      irev_import, WR(1), X1_new, X2_new, X3_new)
-      else
-        call set_from_recv_buf_3x1(nnod_new, ntot_import,               &
-     &      inod_import, WR(1), X1_new, X2_new, X3_new)
-      end if
-!
-      end subroutine sel_cppy_from_recv_buf_3x1
-!
-! ----------------------------------------------------------------------
-!
-      subroutine sel_cppy_from_recv_buf_3x2(iflag_recv, nnod_new,       &
-     &                         ntot_import, inod_import, irev_import,   &
-     &                         WR, X1_new, X2_new, X3_new)
-!
-      use set_from_recv_buff_tri
-      use set_from_recv_buf_rev_tri
-!
-      integer(kind = kint), intent(in) :: iflag_recv
-      integer(kind = kint), intent(in) :: nnod_new
-!
-      integer(kind = kint), intent(in) :: ntot_import
-      integer(kind = kint), intent(in) :: inod_import(ntot_import)
-      integer(kind = kint), intent(in) :: irev_import(nnod_new)
-      real (kind=kreal), intent(inout):: WR(6*(ntot_import+1))
-!
-      real (kind=kreal), intent(inout):: X1_new(2*nnod_new)
-      real (kind=kreal), intent(inout):: X2_new(2*nnod_new)
-      real (kind=kreal), intent(inout):: X3_new(2*nnod_new)
-!
-!
-!C-- RECV
-      if(iflag_recv .eq. iflag_import_rev) then
-        call set_from_recv_buf_rev_3x2(nnod_new, ntot_import,           &
-     &    irev_import, WR(1), X1_new, X2_new, X3_new)
-      else
-        call set_from_recv_buf_3x2(nnod_new, ntot_import,               &
-     &      inod_import, WR(1), X1_new, X2_new, X3_new)
-      end if
-!
-      end subroutine sel_cppy_from_recv_buf_3x2
-!
-!-----------------------------------------------------------------------
-!
-      subroutine sel_cppy_from_recv_buf_3x3(iflag_recv, nnod_new,       &
-     &                         ntot_import, inod_import, irev_import,   &
-     &                         WR, X1_new, X2_new, X3_new)
-!
-      use set_from_recv_buff_tri
-      use set_from_recv_buf_rev_tri
-!
-      integer(kind = kint), intent(in) :: iflag_recv
-      integer(kind = kint), intent(in) :: nnod_new
-!
-      integer(kind = kint), intent(in) :: ntot_import
-      integer(kind = kint), intent(in) :: inod_import(ntot_import)
-      integer(kind = kint), intent(in) :: irev_import(nnod_new)
-      real (kind=kreal), intent(inout):: WR(9*(ntot_import+1))
-!
-      real (kind=kreal), intent(inout):: X1_new(3*nnod_new)
-      real (kind=kreal), intent(inout):: X2_new(3*nnod_new)
-      real (kind=kreal), intent(inout):: X3_new(3*nnod_new)
-!
-!C
-!C-- RECEIVE
-      if(iflag_recv .eq. iflag_import_rev) then
-        call set_from_recv_buf_rev_3x3(nnod_new, ntot_import,           &
-     &    irev_import, WR(1), X1_new, X2_new, X3_new)
-      else
-        call set_from_recv_buf_3x3(nnod_new, ntot_import,               &
-     &     inod_import, WR(1), X1_new, X2_new, X3_new)
-      end if
-!
-      end subroutine sel_cppy_from_recv_buf_3x3
-!
-! ----------------------------------------------------------------------
-!
-      subroutine sel_cppy_from_recv_buf_3x6(iflag_recv, nnod_new,       &
-     &                         ntot_import, inod_import, irev_import,   &
-     &                         WR, X1_new, X2_new, X3_new)
-!
-      use set_from_recv_buff_tri
-      use set_from_recv_buf_rev_tri
-!
-      integer(kind = kint), intent(in) :: iflag_recv
-      integer(kind = kint), intent(in) :: nnod_new
-!
-      integer(kind = kint), intent(in) :: ntot_import
-      integer(kind = kint), intent(in) :: inod_import(ntot_import)
-      integer(kind = kint), intent(in) :: irev_import(nnod_new)
-      real (kind=kreal), intent(inout):: WR(18*(ntot_import+1))
-!
-      real (kind=kreal), intent(inout):: X1_new(isix*nnod_new)
-      real (kind=kreal), intent(inout):: X2_new(isix*nnod_new)
-      real (kind=kreal), intent(inout):: X3_new(isix*nnod_new)
-!
-!C-- RECV
-      if(iflag_recv .eq. iflag_import_rev) then
-        call set_from_recv_buf_rev_3x6(nnod_new, ntot_import,           &
-     &      irev_import, WR(1), X1_new, X2_new, X3_new)
-      else
-        call set_from_recv_buf_3x6(nnod_new, ntot_import,               &
-     &      inod_import, WR(1), X1_new, X2_new, X3_new)
-      end if
-!
-      end subroutine sel_cppy_from_recv_buf_3x6
-!
-!-----------------------------------------------------------------------
-!
-      subroutine sel_cppy_from_recv_buf_3xN(iflag_recv, NB, nnod_new,   &
-     &                         npe_recv, ntot_import, istack_recv,      &
-     &                         inod_import, irev_import,                &
-     &                         WR, X1_new, X2_new, X3_new)
-!
-      use set_from_recv_buff_tri
-      use set_from_recv_buf_rev_tri
-!
-      integer(kind = kint), intent(in) :: iflag_recv
-      integer(kind = kint), intent(in) :: NB
-      integer(kind = kint), intent(in) :: nnod_new
-!
-      integer(kind = kint), intent(in) :: ntot_import
-      integer(kind = kint), intent(in) :: npe_recv
-      integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
-      integer(kind = kint), intent(in) :: inod_import(ntot_import)
-      integer(kind = kint), intent(in) :: irev_import(nnod_new)
-      real (kind=kreal), intent(inout):: WR(3*NB*(ntot_import+1))
-!
-      real (kind=kreal), intent(inout):: X1_new(NB*nnod_new)
-      real (kind=kreal), intent(inout):: X2_new(NB*nnod_new)
-      real (kind=kreal), intent(inout):: X3_new(NB*nnod_new)
-!
-!C-- RECV
-      if(iflag_recv .eq. iflag_import_rev) then
-        call set_from_recv_buf_rev_3xN(NB, nnod_new, ntot_import,       &
-     &      irev_import, WR(1), X1_new, X2_new, X3_new)
-      else
-        call set_from_recv_buf_3xN(NB, nnod_new,                        &
-     &      npe_recv, ntot_import, istack_recv, inod_import,            &
-     &      WR(1), X1_new, X2_new, X3_new)
-      end if
-!
-      end subroutine sel_cppy_from_recv_buf_3xN
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
 !
       subroutine sel_cppy_from_recv_buf_int(iflag_recv, nnod_new,       &
      &                       ntot_import, inod_import, irev_import,     &
@@ -470,6 +309,10 @@
         call set_from_recv_buf_rev_int(nnod_new,                        &
      &      ntot_import, irev_import, iWR(1), iX_new)
       else
+!$omp parallel workshare
+         iX_new(1:nnod_new) = 0.0d0
+!$omp end parallel workshare
+!
         call set_from_recv_buf_int(nnod_new,                            &
      &      ntot_import, inod_import, iWR(1), iX_new)
       end if
@@ -500,6 +343,10 @@
         call set_from_recv_buf_rev_i8(nnod_new,                         &
      &      ntot_import, irev_import, i8WR(1), i8X_new)
       else
+!$omp parallel workshare
+         i8X_new(1:nnod_new) = 0.0d0
+!$omp end parallel workshare
+!
         call set_from_recv_buf_i8(nnod_new,                             &
      &      ntot_import, inod_import, i8WR(1), i8X_new)
       end if

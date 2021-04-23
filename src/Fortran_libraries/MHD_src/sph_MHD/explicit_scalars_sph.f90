@@ -7,8 +7,8 @@
 !>@brief Time integration for momentum equation by explicit scheme
 !!
 !!@verbatim
-!!      subroutine explicit_scalars_sph_adams                           &
-!!     &         (dt, sph_rj, ht_prop, cp_prop, sph_bc_T, sph_bc_C,     &
+!!      subroutine explicit_scalars_sph_adams(dt, sph_params, sph_rj,   &
+!!     &          ht_prop, cp_prop, sph_bc_T, sph_bc_C,                 &
 !!     &          ipol_base, ipol_exp, ipol_frc, ipol_dif, rj_fld)
 !!      subroutine explicit_scalars_sph_euler                           &
 !!     &         (dt, sph_rj, ht_prop, cp_prop, sph_bc_T, sph_bc_C,     &
@@ -16,6 +16,7 @@
 !!      subroutine first_scalars_prev_step_adams                        &
 !!     &         (sph_rj, ht_prop, cp_prop, sph_bc_T, sph_bc_C,         &
 !!     &          ipol_base, ipol_exp, ipol_frc, rj_fld)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(scalar_property), intent(in) :: ht_prop, cp_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_T, sph_bc_C
@@ -32,6 +33,7 @@
 !
       use m_precision
 !
+      use t_spheric_parameter
       use t_spheric_rj_data
       use t_boundary_data_sph_MHD
       use t_physical_property
@@ -49,14 +51,16 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine explicit_scalars_sph_adams                             &
-     &         (dt, sph_rj, ht_prop, cp_prop, sph_bc_T, sph_bc_C,       &
+      subroutine explicit_scalars_sph_adams(dt, sph_params, sph_rj,     &
+     &          ht_prop, cp_prop, sph_bc_T, sph_bc_C,                   &
      &          ipol_base, ipol_exp, ipol_frc, ipol_dif, rj_fld)
 !
       use select_diff_adv_source
+      use cal_inner_core_rotation
 !
       real(kind = kreal), intent(in) :: dt
 !
+      type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(scalar_property), intent(in) :: ht_prop, cp_prop
       type(sph_boundary_type), intent(in) :: sph_bc_T, sph_bc_C
@@ -67,7 +71,15 @@
       type(phys_data), intent(inout) :: rj_fld
 !
 !
+!
       if(ht_prop%iflag_scheme .gt.     id_no_evolution) then
+        if(ht_prop%ICB_diffusie_reduction .lt. one) then
+          call reduction_scalar_diffusion_ICB                           &
+     &       (ht_prop%ICB_diffusie_reduction, sph_rj%nidx_rj(2),        &
+     &        sph_params%nlayer_CMB, ipol_dif%i_t_diffuse,              &
+     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+        end if
+!
           if(iflag_debug .gt. 0) write(*,*)                             &
      &                'sel_scalar_diff_adv_src_adams temperature'
         call sel_scalar_diff_adv_src_adams                              &
@@ -79,6 +91,13 @@
       end if
 !
       if(cp_prop%iflag_scheme .gt. id_no_evolution) then
+        if(cp_prop%ICB_diffusie_reduction .lt. one) then
+          call reduction_scalar_diffusion_ICB                           &
+     &       (cp_prop%ICB_diffusie_reduction, sph_rj%nidx_rj(2),        &
+     &        sph_params%nlayer_CMB, ipol_dif%i_c_diffuse,              &
+     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+        end if
+!
           if(iflag_debug .gt. 0) write(*,*)                             &
      &                'sel_scalar_diff_adv_src_adams composition'
         call sel_scalar_diff_adv_src_adams                              &

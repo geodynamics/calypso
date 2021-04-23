@@ -213,18 +213,6 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine dealloc_iso_field_type(iso)
-!
-      use set_psf_iso_control
-!
-      type(isosurface_module), intent(inout) :: iso
-!
-!
-      end subroutine dealloc_iso_field_type
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
       subroutine alloc_iso_field_type(iso)
 !
       use m_field_file_format

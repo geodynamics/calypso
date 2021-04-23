@@ -195,9 +195,8 @@
       call count_nodes_4_iso                                            &
      &   (num_iso, mesh%edge, iso_search, iso_list, iso_mesh)
 !
-      call set_nodes_4_iso                                              &
-     &   (num_iso, mesh%node, mesh%edge, mesh%nod_comm, edge_comm,      &
-     &    iso_search, iso_list, iso_mesh)
+      call set_nodes_4_iso(num_iso, mesh%node, mesh%edge, edge_comm,    &
+     &                     iso_search, iso_list, iso_mesh)
 !
 !
       do i_iso = 1, num_iso

@@ -16,9 +16,8 @@
 !!        type(mesh_data), intent(inout) :: geofem
 !!        type(sph_grid_maker_in_sim), intent(inout) :: sph_maker
 !!
-!!      subroutine const_FEM_mesh_4_sph_mhd                             &
-!!     &        (FEM_mesh_flags, mesh_file, sph_params, sph_rtp, sph_rj,&
-!!     &         mesh, group, mesh_file, gen_sph)
+!!      subroutine const_FEM_mesh_4_sph_mhd(FEM_mesh_flags, mesh_file,  &
+!!     &          sph_grps, sph, mesh, group, gen_sph)
 !!      subroutine base_FEM_mesh_sph_mhd                                &
 !!     &         (FEM_mesh_flags, sph_params, sph_rtp, sph_rj,          &
 !!     &          mesh, group, gen_sph)
@@ -55,8 +54,6 @@
       type(gauss_points), save, private :: gauss_SF
       type(comm_table_make_sph), save, private :: stbl_SF
 !
-      private :: const_FEM_mesh_4_sph_mhd
-!
 !-----------------------------------------------------------------------
 !
       contains
@@ -84,20 +81,9 @@
       type(mesh_data) :: femmesh_s
 !
 !
-      call copy_sph_radial_groups(sph_grps, sph_maker%gen_sph)
-!
-!  --  Construct FEM mesh
-      if(sph%sph_params%iflag_shell_mode .eq. iflag_no_FEMMESH) then
-        if(sph%sph_rj%iflag_rj_center .gt. 0) then
-          sph%sph_params%iflag_shell_mode =  iflag_MESH_w_center
-        else
-          sph%sph_params%iflag_shell_mode = iflag_MESH_same
-        end if
-      end if
-!
       if (iflag_debug.gt.0) write(*,*) 'const_FEM_mesh_4_sph_mhd'
-      call const_FEM_mesh_4_sph_mhd(FEM_mesh_flags, mesh_file,          &
-     &    sph%sph_params, sph%sph_rtp, sph%sph_rj,                      &
+      call const_FEM_mesh_4_sph_mhd                                     &
+     &   (FEM_mesh_flags, mesh_file, sph_grps, sph,                     &
      &    femmesh_s%mesh, femmesh_s%group, sph_maker%gen_sph)
 !      call compare_mesh_type                                           &
 !     &   (my_rank, geofem%mesh%nod_comm, mesh%node, mesh%ele,          &
@@ -109,6 +95,7 @@
      &   = set_cube_eletype_from_num(femmesh_s%mesh%ele%nnod_4_ele)
       call copy_mesh_and_group                                          &
      &   (femmesh_s%mesh, femmesh_s%group, geofem%mesh, geofem%group)
+      return
       call dealloc_groups_data(femmesh_s%group)
       call dealloc_mesh_geometry_base(femmesh_s%mesh)
       call dealloc_gen_sph_radial_groups(sph_maker%gen_sph)
@@ -117,41 +104,46 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_FEM_mesh_4_sph_mhd                               &
-     &        (FEM_mesh_flags, mesh_file, sph_params, sph_rtp, sph_rj,  &
-     &         mesh, group, gen_sph)
+      subroutine const_FEM_mesh_4_sph_mhd(FEM_mesh_flags, mesh_file,    &
+     &          sph_grps, sph, mesh, group, gen_sph)
 !
+      use m_spheric_constants
       use m_elapsed_labels_gen_SPH
       use m_work_time
       use mpi_load_mesh_data
       use sph_file_IO_select
 !      use para_const_kemoview_mesh
-!      use parallel_sleeve_extension
 !
       type(FEM_file_IO_flags), intent(in) :: FEM_mesh_flags
       type(field_IO_params), intent(in) ::  mesh_file
-      type(sph_shell_parameters), intent(in) :: sph_params
-      type(sph_rtp_grid), intent(in) :: sph_rtp
-      type(sph_rj_grid), intent(in) :: sph_rj
+      type(sph_group_data), intent(in) :: sph_grps
 !
+      type(sph_grids), intent(inout) :: sph
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::  group
-!
       type(construct_spherical_grid), intent(inout) :: gen_sph
 !
 !      type(parallel_make_vierwer_mesh) :: par_view
 !      integer(kind = kint) :: i_level
 !
 !
+      call copy_sph_radial_groups(sph_grps, gen_sph)
+!
+!  --  Construct FEM mesh
+      if(sph%sph_params%iflag_shell_mode .eq. iflag_no_FEMMESH) then
+        if(sph%sph_rj%iflag_rj_center .gt. 0) then
+          sph%sph_params%iflag_shell_mode =  iflag_MESH_w_center
+        else
+          sph%sph_params%iflag_shell_mode = iflag_MESH_same
+        end if
+      end if
+!
+!
       if(iflag_GSP_time) call start_elapsed_time(ied_elapsed_GSP+9)
-      call base_FEM_mesh_sph_mhd(sph_params, sph_rtp, sph_rj,           &
+      call base_FEM_mesh_sph_mhd                                        &
+     &   (sph%sph_params, sph%sph_rtp, sph%sph_rj,                      &
      &    mesh, group, gen_sph)
       if(iflag_GSP_time) call end_elapsed_time(ied_elapsed_GSP+9)
-!
-!! Increase sleeve size
-!      if(iflag_GSP_time) call end_elapsed_time(ied_elapsed_GSP+10)
-!      call sleeve_extension_loop(gen_sph%num_FEM_sleeve, mesh, group)
-!      if(iflag_GSP_time) call start_elapsed_time(ied_elapsed_GSP+10)
 !
 ! Output mesh data
       if(FEM_mesh_flags%iflag_access_FEM .gt. 0) then

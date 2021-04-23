@@ -110,9 +110,9 @@
 !
       if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+2)
       call calypso_send_recv_core                                       &
-     &   (NB, npe_send, isend_self, id_pe_send, istack_send,            &
-     &        npe_recv, irecv_self, id_pe_recv, istack_recv,            &
-     &        SR_sig1, SR_r1)
+     &   (NB, npe_send, id_pe_send, istack_send, SR_r1%WS(1),           &
+     &        npe_recv, id_pe_recv, istack_recv, irecv_self,            &
+     &        SR_r1%WR(1), SR_sig1)
       call clear_addtional_SR_recv(NB, istack_recv(npe_recv), SR_r1%WR)
       if(iflag_CSR_time) call end_elapsed_time(ist_elapsed_CSR+2)
 !
@@ -369,6 +369,10 @@
 !
       if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+3)
       if(iflag_recv .eq. iflag_import_item) then
+!$omp parallel workshare
+        X_new(1:NB*nnod_new) = 0.0d0
+!$omp end parallel workshare
+!
         call set_from_recv_buf_N(NB, nnod_new,                          &
      &      istack_recv(npe_recv), inod_import, WR(1), X_new)
       else

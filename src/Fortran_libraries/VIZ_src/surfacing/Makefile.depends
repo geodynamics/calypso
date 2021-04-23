@@ -6,6 +6,8 @@ copy_psf_data_to_SR.o: $(PSF_SECTION_DIR)/copy_psf_data_to_SR.f90 m_precision.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 find_node_and_patch_psf.o: $(PSF_SECTION_DIR)/find_node_and_patch_psf.f90 m_precision.o m_machine_parameter.o t_psf_geometry_list.o t_psf_patch_data.o m_geometry_constants.o calypso_mpi.o calypso_mpi_int.o t_control_params_4_psf.o t_mesh_data.o t_surface_group_connect.o t_psf_case_table.o set_nodes_for_psf.o set_patches_for_psf.o const_element_comm_tables.o
 	$(F90) -c $(F90OPTFLAGS) $<
+get_geometry_reference.o: $(PSF_SECTION_DIR)/get_geometry_reference.f90 m_precision.o m_constants.o set_components_flags.o
+	$(F90) -c $(F90OPTFLAGS) $<
 m_elapsed_labels_4_VIZ.o: $(PSF_SECTION_DIR)/m_elapsed_labels_4_VIZ.f90 m_precision.o m_work_time.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_intersection_data_0.o: $(PSF_SECTION_DIR)/m_intersection_data_0.f90 m_precision.o
@@ -44,7 +46,7 @@ output_4_psf.o: $(PSF_SECTION_DIR)/output_4_psf.f90 m_precision.o calypso_mpi.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 patch_4_psf.o: $(PSF_SECTION_DIR)/patch_4_psf.f90 m_precision.o m_constants.o m_geometry_constants.o calypso_mpi.o m_machine_parameter.o t_geometry_data.o t_psf_geometry_list.o t_edge_data.o t_psf_case_table.o
 	$(F90) -c $(F90OPTFLAGS) $<
-psf_global_nod_id.o: $(PSF_SECTION_DIR)/psf_global_nod_id.f90 calypso_mpi.o t_comm_table.o m_machine_parameter.o solver_SR_type.o t_psf_geometry_list.o
+psf_global_nod_id.o: $(PSF_SECTION_DIR)/psf_global_nod_id.f90 calypso_mpi.o t_comm_table.o m_machine_parameter.o m_solver_SR.o t_psf_geometry_list.o solver_SR_type.o
 	$(F90) -c $(F90OPTFLAGS) $<
 read_iso_control_data.o: $(PSF_SECTION_DIR)/read_iso_control_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_control_data_4_iso.o t_read_control_elements.o t_control_array_character.o t_control_data_4_iso_def.o t_control_data_4_fld_on_psf.o calypso_mpi.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<

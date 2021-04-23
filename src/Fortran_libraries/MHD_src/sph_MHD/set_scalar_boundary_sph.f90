@@ -15,8 +15,9 @@
 !!     &          ntot_phys_rj, d_rj)
 !!
 !!      subroutine adjust_in_fixed_flux_sph                             &
-!!     &       (jmax, kr_in, r_ICB, fdm2_fix_dr_ICB, flux_ICB, coef_d,  &
-!!     &        coef_imp, dt, is_fld, n_point, ntot_phys_rj, d_rj)
+!!     &         (jmax, kr_in, r_ICB, fdm2_fix_dr_ICB, flux_ICB, coef_d,&
+!!     &          diffuse_reduction, coef_imp, dt, is_fld,              &
+!!     &          n_point, ntot_phys_rj, d_rj)
 !!      subroutine adjust_out_fixed_flux_sph                            &
 !!     &       (jmax, kr_out, r_CMB, fdm2_fix_dr_CMB, flux_CMB, coef_d, &
 !!     &        coef_imp, dt, is_fld, n_point, ntot_phys_rj, d_rj)
@@ -106,11 +107,13 @@
 !
       subroutine adjust_in_fixed_flux_sph                               &
      &         (jmax, kr_in, r_ICB, fdm2_fix_dr_ICB, flux_ICB, coef_d,  &
-     &          coef_imp, dt, is_fld, n_point, ntot_phys_rj, d_rj)
+     &          diffuse_reduction, coef_imp, dt, is_fld,                &
+     &          n_point, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: jmax, kr_in
       integer(kind = kint), intent(in) :: is_fld
       real(kind = kreal), intent(in) :: coef_d, coef_imp, dt
+      real(kind = kreal), intent(in) :: diffuse_reduction
       real(kind = kreal), intent(in) :: flux_ICB(jmax)
       real(kind = kreal), intent(in) :: r_ICB(0:2)
       real(kind = kreal), intent(in) :: fdm2_fix_dr_ICB(-1:1,3)
@@ -126,7 +129,7 @@
         inod = j + (kr_in-1) * jmax
 !
         d_rj(inod,is_fld) =  d_rj(inod,is_fld)                          &
-     &                     + dt * coef_imp * coef_d                     &
+     &                     + dt * coef_imp * coef_d * diffuse_reduction &
      &                      * ( fdm2_fix_dr_ICB(-1,3)                   &
      &                       + two*r_ICB(1) ) * flux_ICB(j)
       end do

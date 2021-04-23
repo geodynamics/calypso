@@ -15,6 +15,11 @@
 !!        integer(kind = kint_gl), intent(in) :: count
 !!        integer(kind = kint), intent(inout) :: buffer(count)
 !!
+!!      subroutine calypso_mpi_reduce_one_int                           &
+!!     &         (i_local, i_global, operation, destination)
+!!        integer, intent(in) :: operation
+!!        integer(kind = kint), intent(in) ::    i_local
+!!        integer(kind = kint), intent(inout) :: i_global
 !!      subroutine calypso_mpi_reduce_int                               &
 !!     &         (i_local, i_global, count, operation, destination)
 !!        integer, intent(in) :: destination
@@ -129,6 +134,27 @@
       end subroutine calypso_mpi_bcast_int
 !
 !  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_mpi_reduce_one_int                             &
+     &         (i_local, i_global, operation, destination)
+!
+      integer, intent(in) :: destination
+      integer, intent(in) :: operation
+      integer(kind = kint), intent(in) ::    i_local
+      integer(kind = kint), intent(inout) :: i_global
+!
+      integer(kind = kint) :: i_lc(1), l_gl(1)
+!
+!
+      i_lc(1) = i_local
+      call MPI_REDUCE(i_lc(1), l_gl(1), 1,                              &
+     &    CALYPSO_INTEGER, operation, destination,                      &
+     &    CALYPSO_COMM, ierr_MPI)
+      i_global = l_gl(1)
+!
+      end subroutine calypso_mpi_reduce_one_int
+!
 !  ---------------------------------------------------------------------
 !
       subroutine calypso_mpi_reduce_int                                 &
