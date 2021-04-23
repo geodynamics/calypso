@@ -177,7 +177,7 @@
         end if
       else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW_DOMAIN) then
         if(sph_rtp%istep_rtp(3) .eq. 1) then
-          if(id_rank .eq. 0) write(*,*) 'Use rtp FFTW for domain'
+          if(id_rank .eq. 0) write(*,*) 'Use prt FFTW for domain'
           call init_prt_field_FFTW                                      &
      &       (sph_rtp, comm_rtp, WK_FFTs%sph_fld_FFTW)
         else
@@ -296,11 +296,11 @@
         end if
       else if(WK_FFTs%iflag_FFT .eq. iflag_FFTW_DOMAIN) then
         if(sph_rtp%istep_rtp(3) .eq. 1) then
-          if(iflag_debug .gt. 0) write(*,*) 'Use prt FFTW for domain'
+          if(iflag_debug .gt. 0) write(*,*) 'Use prt FFTW for field'
           call verify_prt_field_FFTW                                    &
      &       (sph_rtp, comm_rtp, WK_FFTs%sph_fld_FFTW)
         else
-          if(iflag_debug .gt. 0) write(*,*) 'Use rtp FFTW for domain'
+          if(iflag_debug .gt. 0) write(*,*) 'Use rtp FFTW for field'
           call verify_rtp_field_FFTW                                    &
      &       (sph_rtp, comm_rtp, WK_FFTs%sph_fld_FFTW)
         end if
