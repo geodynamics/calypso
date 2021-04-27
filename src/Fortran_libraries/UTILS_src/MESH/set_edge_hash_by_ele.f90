@@ -233,8 +233,6 @@
 !
 !
       iedge_flag(1:ntot_list) = 0
-!
-!!$omp parallel do private(ihash,ist,ied,k1,k2,inod,jnod)
       do ihash = 1, iend_edge_hash
         ist = istack_edge_hash(ihash-1)+1
         ied = istack_edge_hash(ihash)
@@ -261,7 +259,6 @@
           end do
         end if
       end do
-!!$omp end parallel do
 !
       end subroutine mark_all_edges_by_ele
 !
