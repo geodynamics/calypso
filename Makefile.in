@@ -41,6 +41,7 @@ RANLIB = @RANLIB@
 # XL_FORTRAN   Set "-WF," option for cpp preprocessor
 #
 OPENMP_FCFLAGS = @OPENMP_FCFLAGS@
+OPENMP_CFLAGS =  @OPENMP_CFLAGS@
 XL_FORTRAN =     @XL_FORTRAN@
 #
 #
