@@ -11,7 +11,6 @@
 !!      subroutine finalize_size_4_smp_mesh(nod, ele)
 !!        type(node_data),    intent(inout) :: nod
 !!        type(element_data), intent(inout) :: ele
-!!      subroutine count_size_4_smp_surf_edge(surf, edge)
 !!      subroutine finalize_size_4_smp_surf_edge(surf, edge)
 !!        type(surface_data), intent(inout) :: surf
 !!        type(edge_data),    intent(inout) :: edge
@@ -63,22 +62,6 @@
       call count_ele_4_smp_mesh(ele)
 !
       end subroutine count_size_4_smp_mesh
-!
-!-----------------------------------------------------------------------
-!
-      subroutine count_size_4_smp_surf_edge(surf, edge)
-!
-      type(surface_data), intent(inout) :: surf
-      type(edge_data),    intent(inout) :: edge
-!
-!
-      call alloc_surf_param_smp(surf)
-      call alloc_edge_param_smp(edge)
-!
-      call count_surf_size_smp(surf)
-      call count_edge_size_smp(edge)
-!
-      end subroutine count_size_4_smp_surf_edge
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------

@@ -1,10 +1,18 @@
+!>@file   set_smp_4_group_types.f90
+!!@brief  module set_smp_4_group_types
+!!
+!!@author H. Matsui
+!!@date Programmed in Dec., 2008
 !
-!      module set_smp_4_group_types
-!
-!     Written by H. Matsui on Dec., 2008
-!
-!!      subroutine count_num_groups_smp(nod_grp, ele_grp, surf_grp)
-!        type(mesh_groups), intent(inout) :: group
+!> @brief Set SMP stacks for group data
+!!
+!!@verbatim
+!!      subroutine count_num_groups_smp                                 &
+!!     &         (id_rank, nod_grp, ele_grp, surf_grp)
+!!        type(group_data), intent(inout) :: nod_grp
+!!        type(group_data), intent(inout) :: ele_grp
+!!        type(surface_group_data), intent(inout) :: surf_grp
+!!@endverbatim
 !
       module set_smp_4_group_types
 !
@@ -23,8 +31,10 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine count_num_groups_smp(nod_grp, ele_grp, surf_grp)
+      subroutine count_num_groups_smp                                   &
+     &         (id_rank, nod_grp, ele_grp, surf_grp)
 !
+      integer, intent(in) :: id_rank
       type(group_data), intent(inout) :: nod_grp
       type(group_data), intent(inout) :: ele_grp
       type(surface_group_data), intent(inout) :: surf_grp
@@ -33,6 +43,12 @@
       call count_grp_type_smp(nod_grp)
       call count_grp_type_smp(ele_grp)
       call count_surf_grp_type_smp(surf_grp)
+!
+!       if (iflag_debug.gt.0) then
+!         call check_grp_4_sheard_para(id_rank, nod_grp)
+!         call check_grp_4_sheard_para(id_rank, ele_grp)
+!         call check_surf_grp_4_sheard_para(id_rank, surf_grp)
+!       end if
 !
       end subroutine count_num_groups_smp
 !

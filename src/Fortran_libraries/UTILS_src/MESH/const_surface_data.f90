@@ -7,20 +7,20 @@
 !>@brief Construct surface information form element connectivity
 !!
 !!@verbatim
-!!      subroutine construct_surface_data(nod, ele, surf)
-!!      subroutine const_surface_hash(nod, ele, surf, sf_ele_tbl)
+!!      subroutine construct_surface_data(node, ele, surf)
+!!      subroutine const_surface_hash(node, ele, surf, sf_ele_tbl)
 !!      subroutine const_part_surface_hash(ele, nele_grp, item_grp,     &
 !!     &          sf_ele_tbl)
 !!        integer(kind = kint) :: nele_grp
 !!        integer(kind = kint) :: item_grp(nele_grp)
-!!        type(node_data),    intent(in) :: nod
+!!        type(node_data),    intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(inout) :: surf
 !!        type(sum_hash_tbl), intent(inout) :: sf_ele_tbl
 !!
 !!      subroutine const_ele_list_4_surface(ele, surf)
 !!      subroutine empty_surface_connect(ele, surf)
-!!        type(node_data),    intent(in) :: nod
+!!        type(node_data),    intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(inout) :: surf
 !!@endverbatim
@@ -50,26 +50,32 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine construct_surface_data(nod, ele, surf)
+      subroutine construct_surface_data(node, ele, surf)
 !
+      use set_local_id_table_4_1ele
       use set_surface_hash
 !
-      type(node_data),    intent(in) :: nod
+      type(node_data),    intent(in) :: node
       type(element_data), intent(in) :: ele
       type(surface_data), intent(inout) :: surf
 !
-!   set hash data for suface elements using sum of local node ID
 !
-      call alloc_sum_hash(nod%numnod, ele%numele,                       &
+      if (iflag_debug.eq.1) write(*,*) 'allocate_inod_in_surf'
+      call allocate_inod_in_surf(surf)
+      call set_inod_in_surf(surf%nnod_4_surf,                           &
+     &                      surf%node_on_sf, surf%node_on_sf_n)
+!
+!   set hash data for suface elements using sum of local node ID
+      call alloc_sum_hash(node%numnod, ele%numele,                      &
      &    nsurf_4_ele, surf%nnod_4_surf, surf_ele_tbl)
-!         surf_ele_tbl%ntot_id = nod%numnod * surf%nnod_4_surf
+!         surf_ele_tbl%ntot_id = node%numnod * surf%nnod_4_surf
 !         surf_ele_tbl%ntot_list = nsurf_4_ele * ele%numele
 !
       call const_surface_hash(ele, surf_ele_tbl)
 !
       call const_all_surface_data(ele, surf, surf_ele_tbl)
 !
-      call const_external_surface_data(nod, ele, surf, surf_ele_tbl)
+      call const_external_surface_data(node, ele, surf, surf_ele_tbl)
       call const_isolate_surface_data(ele, surf, surf_ele_tbl)
 !
 !
@@ -89,7 +95,7 @@
       type(surface_data), intent(inout) :: surf
 !
 !
-      call alloc_ele_4_surf_type(surf)
+      call alloc_element_4_surface(surf)
       call set_ele_list_4_surf(ele%numele, surf%numsurf,                &
      &     nsurf_4_ele, surf%isf_4_ele, surf%iele_4_surf)
 !
@@ -212,12 +218,12 @@
 !------------------------------------------------------------------
 !
       subroutine const_external_surface_data                            &
-     &         (nod, ele, surf, sf_ele_tbl)
+     &         (node, ele, surf, sf_ele_tbl)
 !
       use mark_surf_hash
       use set_surface_data
 !
-      type(node_data),    intent(in) :: nod
+      type(node_data),    intent(in) :: node
       type(element_data), intent(in) :: ele
 !
       type(surface_data), intent(inout) :: surf
@@ -233,7 +239,7 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'mark_external_surface'
       call mark_external_surface                                        &
-     &   (nod%internal_node, ele%numele, ele%nnod_4_ele, ele%ie,        &
+     &   (node%internal_node, ele%numele, ele%nnod_4_ele, ele%ie,       &
      &    sf_ele_tbl%ntot_id, sf_ele_tbl%ntot_list,                     &
      &    sf_ele_tbl%istack_hash, sf_ele_tbl%iend_hash,                 &
      &    sf_ele_tbl%id_hash, sf_ele_tbl%iflag_hash)

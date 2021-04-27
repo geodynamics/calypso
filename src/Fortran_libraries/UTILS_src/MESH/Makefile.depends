@@ -8,19 +8,19 @@ compare_mesh_structures.o: $(MESHDIR)/compare_mesh_structures.f90 m_precision.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 const_edge_4_viewer.o: $(MESHDIR)/const_edge_4_viewer.f90 m_precision.o m_geometry_constants.o t_viewer_mesh.o t_viewer_group.o t_sum_hash.o t_edge_data.o const_grp_edge_4_viewer.o set_edge_hash_by_sf.o set_edge_data_by_sf.o
 	$(F90) -c $(F90OPTFLAGS) $<
-const_edge_data.o: $(MESHDIR)/const_edge_data.f90 m_precision.o m_geometry_constants.o t_geometry_data.o t_surface_data.o t_edge_data.o t_sum_hash.o m_machine_parameter.o set_edge_hash_by_ele.o set_edge_data_by_ele.o
+const_edge_data.o: $(MESHDIR)/const_edge_data.f90 m_precision.o m_geometry_constants.o t_geometry_data.o t_surface_data.o t_edge_data.o t_sum_hash.o m_machine_parameter.o set_edge_hash_by_ele.o set_edge_data_by_ele.o set_local_id_table_4_1ele.o
 	$(F90) -c $(F90OPTFLAGS) $<
 const_grp_edge_4_viewer.o: $(MESHDIR)/const_grp_edge_4_viewer.f90 m_precision.o t_viewer_mesh.o t_viewer_group.o t_sum_hash.o set_edge_hash_by_sf.o set_edge_data_by_sf.o
 	$(F90) -c $(F90OPTFLAGS) $<
-const_kemoview_mesh.o: $(MESHDIR)/const_kemoview_mesh.f90 m_precision.o m_constants.o m_machine_parameter.o m_file_format_switch.o t_mesh_data.o t_file_IO_parameter.o t_viewer_mesh.o t_viewer_ele_grp_surface.o const_merged_surf_4_group.o set_surf_connect_4_viewer.o set_nodes_4_viewer.o const_edge_4_viewer.o set_nodes_4_groups_viewer.o const_mesh_information.o const_surface_data.o
+const_kemoview_mesh.o: $(MESHDIR)/const_kemoview_mesh.f90 m_precision.o m_constants.o m_machine_parameter.o m_file_format_switch.o t_mesh_data.o t_file_IO_parameter.o t_viewer_mesh.o t_viewer_ele_grp_surface.o const_merged_surf_4_group.o set_surf_connect_4_viewer.o set_nodes_4_viewer.o const_edge_4_viewer.o set_nodes_4_groups_viewer.o const_mesh_information.o const_surface_data.o set_local_id_table_4_1ele.o
 	$(F90) -c $(F90OPTFLAGS) $<
 const_merged_surf_4_group.o: $(MESHDIR)/const_merged_surf_4_group.f90 m_precision.o t_sum_hash.o t_mesh_data.o t_surface_data.o t_viewer_ele_grp_surface.o set_surface_hash.o mark_surf_hash.o set_surface_data.o const_surface_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
-const_mesh_information.o: $(MESHDIR)/const_mesh_information.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_geometry_data.o t_group_data.o t_group_connects.o t_surface_group_connect.o t_surface_group_normals.o t_surface_data.o t_edge_data.o t_element_group_table.o set_smp_4_group_types.o set_connects_4_surf_group.o set_surf_edge_mesh.o nod_and_ele_derived_info.o const_surface_data.o set_size_4_smp_types.o set_local_id_table_4_1ele.o
+const_mesh_information.o: $(MESHDIR)/const_mesh_information.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_geometry_data.o t_group_data.o t_group_connects.o t_surface_group_connect.o t_surface_group_normals.o t_surface_data.o t_edge_data.o t_element_group_table.o set_smp_4_group_types.o set_connects_4_surf_group.o set_surf_edge_mesh.o nod_and_ele_derived_info.o cal_mesh_position.o const_surface_data.o set_size_4_smp_types.o
 	$(F90) -c $(F90OPTFLAGS) $<
 const_node_list_4_viewer.o: $(MESHDIR)/const_node_list_4_viewer.f90 m_precision.o m_geometry_constants.o t_viewer_mesh.o t_viewer_group.o
 	$(F90) -c $(F90OPTFLAGS) $<
-const_surface_data.o: $(MESHDIR)/const_surface_data.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o t_geometry_data.o t_surface_data.o t_sum_hash.o set_surface_hash.o set_element_list_4_surface.o mark_surf_hash.o set_surface_data.o
+const_surface_data.o: $(MESHDIR)/const_surface_data.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o t_geometry_data.o t_surface_data.o t_sum_hash.o set_local_id_table_4_1ele.o set_surface_hash.o set_element_list_4_surface.o mark_surf_hash.o set_surface_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 coordinate_convert_4_sph.o: $(MESHDIR)/coordinate_convert_4_sph.f90 m_precision.o m_constants.o m_machine_parameter.o t_geometry_data.o t_phys_data.o cvt_sph_vector_2_xyz_smp.o cvt_sph_tensor_2_xyz_smp.o cvt_cyl_vector_2_xyz_smp.o cvt_cyl_tensor_2_xyz_smp.o cvt_xyz_vector_2_sph_smp.o cvt_xyz_tensor_2_sph_smp.o cvt_xyz_vector_2_cyl_smp.o cvt_xyz_tensor_2_cyl_smp.o cvt_sph_vector_2_cyl_smp.o cvt_sph_tensor_2_cyl_smp.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -114,7 +114,7 @@ set_smp_4_group_types.o: $(MESHDIR)/set_smp_4_group_types.f90 m_precision.o m_ma
 	$(F90) -c $(F90OPTFLAGS) $<
 set_surf_connect_4_viewer.o: $(MESHDIR)/set_surf_connect_4_viewer.f90 m_precision.o m_constants.o t_viewer_mesh.o t_mesh_data.o t_surface_data.o t_viewer_ele_grp_surface.o pickup_surface_4_viewer.o renumber_surface_4_viewer.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_surf_edge_mesh.o: $(MESHDIR)/set_surf_edge_mesh.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_geometry_data.o t_surface_data.o t_edge_data.o cal_mesh_position.o const_surface_data.o const_edge_data.o set_size_4_smp_types.o
+set_surf_edge_mesh.o: $(MESHDIR)/set_surf_edge_mesh.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_geometry_data.o t_surface_data.o t_edge_data.o const_surface_data.o const_edge_data.o set_size_4_smp_types.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_surface_data.o: $(MESHDIR)/set_surface_data.f90 m_precision.o m_geometry_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<

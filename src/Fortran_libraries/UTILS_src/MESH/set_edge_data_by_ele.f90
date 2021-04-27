@@ -1,12 +1,16 @@
-!set_edge_data_by_ele.f90
-!      module set_edge_data_by_ele
+!>@file   set_edge_data_by_ele.f90
+!!@brief  module set_edge_data_by_ele
+!!
+!!@author H. Matsui
+!!@date Programmed in ????
 !
-!      Written by H. Matsui
-!
+!> @brief Edge construction routine
+!!
+!!@verbatim
 !!      subroutine count_num_edges_by_ele(ntot_id, ntot_list,           &
 !!     &          istack_edge_hash, iend_edge_hash, iedge_flag, numedge)
-!!      subroutine set_edges_connect_by_ele                             &
-!!     &         (numele, numedge, nnod_4_ele, nnod_4_edge, ie,         &
+!!     subroutine set_edges_connect_by_ele(numnod, numele, numedge,     &
+!!     &          nnod_4_ele, nnod_4_edge, ie, irank_local, inod_local, &
 !!     &          ntot_id, ntot_list, istack_edge_hash, iend_edge_hash, &
 !!     &          iedge_hash, iedge_flag, ie_edge, iedge_4_ele,         &
 !!     &          node_on_edge)
@@ -19,6 +23,7 @@
 !!     &        (numele, nunmedge_part, iedge_4_ele, ntot_id, ntot_list,&
 !!     &         istack_edge_hash, iend_edge_hash, iedge_hash,          &
 !!     &         iedge_flag, iedge_part)
+!!@endverbatim
 !
       module set_edge_data_by_ele
 !
@@ -62,15 +67,17 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine set_edges_connect_by_ele                               &
-     &         (numele, numedge, nnod_4_ele, nnod_4_edge, ie,           &
+      subroutine set_edges_connect_by_ele(numnod, numele, numedge,      &
+     &          nnod_4_ele, nnod_4_edge, ie, irank_local, inod_local,   &
      &          ntot_id, ntot_list, istack_edge_hash, iend_edge_hash,   &
      &          iedge_hash, iedge_flag, ie_edge, iedge_4_ele,           &
      &          node_on_edge)
 !
-      integer(kind = kint), intent(in) :: numele, numedge
+      integer(kind = kint), intent(in) :: numnod, numele, numedge
       integer(kind = kint), intent(in) :: nnod_4_ele, nnod_4_edge
       integer(kind = kint), intent(in) :: ie(numele, nnod_4_ele)
+      integer(kind = kint), intent(in) :: inod_local(numnod)
+      integer(kind = kint), intent(in) :: irank_local(numnod)
 !
       integer(kind = kint_gl), intent(in) :: ntot_id, ntot_list
       integer(kind = kint_gl), intent(in) :: iend_edge_hash
@@ -86,8 +93,8 @@
       integer(kind = kint), intent(in)                                  &
      &                     :: node_on_edge(nnod_4_edge,nedge_4_ele)
 !
-      integer(kind = kint) :: i, iele, is, iedge
-      integer(kind = kint) :: j, jele, js
+      integer(kind = kint) :: iele, is, iedge
+      integer(kind = kint) :: j, jele, js, j1, j2, inod1, inod2
       integer(kind = kint_gl) :: ihash
       integer(kind = kint_gl) :: k1, k2, ist, ied
 !
@@ -97,21 +104,44 @@
         ist = istack_edge_hash(ihash-1)+1
         ied = istack_edge_hash(ihash)
         do k1 = ist, ied
-          if (iedge_flag(k1) .eq. k1) then
+          if(iedge_flag(k1) .eq. k1) then
             iedge = iedge + 1
 !
             iele = iedge_hash(k1,1)
             is =   iedge_hash(k1,2)
-            iedge_4_ele(iele,is) = iedge
-            do i = 1, nnod_4_edge
-              j = node_on_edge(i,is)
-              ie_edge(iedge,i) = ie(iele,j)
-            end do
+            j1 = node_on_edge(1,is)
+            j2 = node_on_edge(2,is)
+            inod1 = ie(iele,j1)
+            inod2 = ie(iele,j2)
+!
+            if(irank_local(inod1) .lt. irank_local(inod2)) then
+              iedge_4_ele(iele,is) =  iedge
+              ie_edge(iedge,1) =      inod1
+              ie_edge(iedge,2) =      inod2
+            else if(irank_local(inod1) .gt. irank_local(inod2)) then
+              iedge_4_ele(iele,is) = -iedge
+              ie_edge(iedge,1) =      inod2
+              ie_edge(iedge,2) =      inod1
+            else
+              if(inod_local(inod1) .le. inod_local(inod2)) then
+                iedge_4_ele(iele,is) =  iedge
+                ie_edge(iedge,1) =      inod1
+                ie_edge(iedge,2) =      inod2
+              else
+                iedge_4_ele(iele,is) = -iedge
+                ie_edge(iedge,1) =      inod2
+                ie_edge(iedge,2) =      inod1
+              end if
+            end if
+!
+            if(nnod_4_edge .eq. 3) then
+              j = node_on_edge(3,is)
+              ie_edge(iedge,3) = ie(iele,j)
+            end if
 !
           end if
         end do
       end do
-!
 !
 !
       do ihash = 1, iend_edge_hash
@@ -119,7 +149,7 @@
         ied = istack_edge_hash(ihash)
         do k1 = ist, ied
 !
-          if (iedge_flag(k1) .ne. k1) then
+          if(iedge_flag(k1) .ne. k1) then
             k2 = abs(iedge_flag(k1))
             iele = iedge_hash(k1,1)
             is =   iedge_hash(k1,2)

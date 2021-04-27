@@ -237,7 +237,7 @@
       type(mesh_geometry), intent(inout) :: mesh
 !
 !
-      call dealloc_ele_4_surf_type(mesh%surf)
+      call dealloc_element_4_surface(mesh%surf)
       call dealloc_surface_connect(mesh%surf)
 !
       call dealloc_edge_connect(mesh%edge)

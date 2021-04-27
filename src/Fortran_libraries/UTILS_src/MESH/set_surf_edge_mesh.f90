@@ -17,7 +17,8 @@
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(inout) :: surf
-!!      subroutine const_edge_connectivity(node, ele, surf, edge)
+!!      subroutine const_edge_connectivity                              &
+!!     &         (node, ele, surf, irank_local, inod_local, edge)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(surface_data), intent(in) :: surf
@@ -39,27 +40,6 @@
 ! ----------------------------------------------------------------------
 !
      contains
-!
-! ----------------------------------------------------------------------
-!
-      subroutine init_surface_and_edge_geometry(node, surf, edge)
-!
-      use cal_mesh_position
-!
-      type(node_data), intent(in) :: node
-!
-      type(surface_data), intent(inout) :: surf
-      type(edge_data), intent(inout) :: edge
-!
-!
-      if (iflag_debug.gt.0) write(*,*) 'set_center_of_surface'
-      call alloc_surface_geometory(surf)
-      call set_center_of_surface(node, surf)
-      if (iflag_debug.gt.0) write(*,*) 'set_center_of_edge'
-      call alloc_edge_geometory(edge)
-      call set_center_of_edge(node, edge)
-!
-      end subroutine init_surface_and_edge_geometry
 !
 ! ----------------------------------------------------------------------
 !
@@ -133,7 +113,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine const_edge_connectivity(node, ele, surf, edge)
+      subroutine const_edge_connectivity                                &
+     &         (node, ele, surf, irank_local, inod_local, edge)
 !
       use const_edge_data
       use set_size_4_smp_types
@@ -142,6 +123,8 @@
       type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
       type(surface_data), intent(in) :: surf
+      integer(kind = kint), intent(in) :: irank_local(node%numnod)
+      integer(kind = kint), intent(in) :: inod_local(node%numnod)
 !
       type(edge_data), intent(inout) :: edge
 !
@@ -152,7 +135,8 @@
 !
       if(read_edge .eqv. .false.) then
         if (iflag_debug.eq.1) write(*,*) 'construct_edge_data'
-        call construct_edge_data(node, ele, surf, edge)
+        call construct_edge_data                                        &
+     &     (node, ele, surf, irank_local, inod_local, edge)
 !
 !        call check_edge_data(id_rank, surf, edge)
 !        call check_edge_hexa_data(id_rank, ele, edge)

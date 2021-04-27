@@ -52,11 +52,6 @@
       type(surface_data), intent(inout) :: surf
 !
 !
-!       Subsittuiton of const_surf_comm_table
-!      call copy_comm_tbl_type(surf_mesh_IO%comm, surf_comm)
-!
-!       Subsittuiton of construct_surface_data 
-!            and const_global_surface_id
       call copy_surf_connect_from_IO                                    &
      &   (surf_mesh_IO%ele, surf_mesh_IO%sfed, surf, ele%numele)
       call dealloc_surface_mesh_IO(surf_mesh_IO)

@@ -43,14 +43,21 @@
       use const_mesh_information
       use const_element_comm_tables
       use mesh_file_name_by_param
+      use parallel_edge_information
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
 !
 !  -----    construct geometry informations
 !
-      if (iflag_debug .gt. 0) write(*,*) 'const_mesh_infos tako'
-      call const_mesh_infos(my_rank, mesh, group)
+      if (iflag_debug.gt.0) write(*,*) 'const_nod_ele_infos'
+      call const_nod_ele_infos(my_rank, mesh, group)
+      if (iflag_debug .gt. 0) write(*,*) 'const_surface_infos tako'
+      call const_surface_infos(my_rank, mesh%node, mesh%ele,            &
+     &    group%surf_grp, mesh%surf, group%surf_nod_grp)
+      if (iflag_debug.gt.0) write(*,*) 'const_para_edge_infos'
+      call const_para_edge_infos(mesh%nod_comm, mesh%node, mesh%ele,    &
+     &                           mesh%surf, mesh%edge)
 !
       if(iflag_debug.gt.0) write(*,*) 'const_global_mesh_infos'
       call const_global_mesh_infos(mesh)

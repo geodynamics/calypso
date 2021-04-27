@@ -232,7 +232,8 @@
 !      integer(kind= kint_gl) :: i1_gl, i2_gl
 !
 !
-      iedge_flag = 0
+      iedge_flag(1:ntot_list) = 0
+!
 !!$omp parallel do private(ihash,ist,ied,k1,k2,inod,jnod)
       do ihash = 1, iend_edge_hash
         ist = istack_edge_hash(ihash-1)+1
