@@ -61,7 +61,6 @@
       subroutine input_mesh(mesh_file, id_rank, mesh, group, ierr)
 !
       use mesh_IO_select
-      use set_nnod_4_ele_by_type
       use cal_minmax_and_stacks
 !
       integer, intent(in) :: id_rank
@@ -82,8 +81,6 @@
      &    group%surf_grp%nitem_grp, group%surf_grp%istack_grp)
 !
       call alloc_sph_node_geometry(mesh%node)
-      call set_3D_nnod_4_sfed_by_ele(mesh%ele%nnod_4_ele,               &
-     &    mesh%surf%nnod_4_surf, mesh%edge%nnod_4_edge)
 !
       end subroutine input_mesh
 !
@@ -146,8 +143,6 @@
 !
       subroutine set_mesh(fem_IO, mesh, group)
 !
-      use set_nnod_4_ele_by_type
-!
       type(mesh_data), intent(inout) :: fem_IO
 !
       type(mesh_geometry), intent(inout) :: mesh
@@ -159,9 +154,6 @@
       call set_grp_data_from_IO(fem_IO%group,                           &
      &    group%nod_grp, group%ele_grp, group%surf_grp)
       call dealloc_groups_data(fem_IO%group)
-!
-      call set_3D_nnod_4_sfed_by_ele(mesh%ele%nnod_4_ele,               &
-     &    mesh%surf%nnod_4_surf, mesh%edge%nnod_4_edge)
 !
       end subroutine set_mesh
 !
@@ -208,19 +200,16 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine set_zero_mesh_data(nod_comm, node, ele, surf, edge)
+      subroutine set_zero_mesh_data(nod_comm, node, ele)
 !
       use t_comm_table
       use t_geometry_data
       use t_surface_data
       use t_edge_data
-      use set_nnod_4_ele_by_type
 !
       type(communication_table), intent(inout) :: nod_comm
       type(node_data), intent(inout) :: node
       type(element_data), intent(inout) :: ele
-      type(surface_data), intent(inout) :: surf
-      type(edge_data), intent(inout) ::    edge
 !
 !
       nod_comm%num_neib =    izero
@@ -236,9 +225,6 @@
       ele%numele = izero
       ele%first_ele_type = izero
       call alloc_ele_connect(ele)
-!
-      call set_3D_nnod_4_sfed_by_ele                                    &
-     &   (ele%nnod_4_ele, surf%nnod_4_surf, edge%nnod_4_edge)
 !
       end subroutine set_zero_mesh_data
 !

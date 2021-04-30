@@ -95,10 +95,10 @@
 !
 !
 !$omp parallel
-      call copy_nod_scalar_smp(rj_fld%n_point,                          &
+      call copy_scalar_smp(rj_fld%n_point,                              &
      &    rj_fld%d_fld(1,ipol%base%i_vort+2),                           &
      &    rj_fld%d_fld(1,ipol%base%i_velo  ))
-      call copy_nod_scalar_smp(rj_fld%n_point,                          &
+      call copy_scalar_smp(rj_fld%n_point,                              &
      &    rj_fld%d_fld(1,ipol%base%i_vort  ),                           &
      &    rj_fld%d_fld(1,ipol%base%i_velo+2))
 !$omp end parallel

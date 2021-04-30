@@ -7,9 +7,8 @@
 !> @brief structure of surface data (geometry and connectivity)
 !!
 !!@verbatim
-!!      subroutine allocate_inod_in_surf(surf)
+!!      subroutine alloc_inod_in_surf(surf)
 !!      subroutine alloc_surface_connect(surf, nele)
-!!      subroutine alloc_interior_surf(surf)
 !!      subroutine alloc_ext_surface(surf)
 !!      subroutine alloc_iso_surface(surf)
 !!      subroutine alloc_surface_geometory(surf)
@@ -19,7 +18,6 @@
 !!
 !!      subroutine dealloc_inod_in_surf(surf)
 !!      subroutine dealloc_surface_connect(surf)
-!!      subroutine dealloc_interior_surf(nele)
 !!      subroutine deallocate_ext_surface_type(surf)
 !!      subroutine deallocate_iso_surface_type(surf)
 !!      subroutine dealloc_surface_geometory(surf)
@@ -28,6 +26,10 @@
 !!      subroutine dealloc_element_4_surface(surf)
 !!        integer(kind = kint), intent(in) :: nele
 !!        type(surface_data), intent(inout) :: surf
+!!      subroutine alloc_interior_surf(surf, surf_gl)
+!!      subroutine dealloc_interior_surf(surf_gl)
+!!        type(surface_data), intent(in) :: surf
+!!        type(global_surface_data), intent(inout) :: surf_gl
 !!@endverbatim
 !
       module t_surface_data
@@ -56,11 +58,6 @@
         integer( kind=kint ), allocatable :: istack_surf_smp(:)
 !>     maximum number of smp surface on local PE
         integer( kind=kint )  ::  max_surf_smp
-!
-!>       global surface id (where i:surface id)
-        integer(kind=kint_gl), allocatable  ::  isurf_global(:)
-!>       integer flag for interior surface 1...interior, 0...exterior
-        integer(kind = kint), allocatable :: interior_surf(:)
 !
 !>        surface connectivity ie_surf(i:surface ID,j:surface index)
         integer(kind=kint), allocatable  :: ie_surf(:,:)
@@ -95,13 +92,21 @@
         real (kind=kreal), allocatable :: vnorm_surf(:,:)
       end type surface_data
 !
+!>      structure of global surface data
+      type global_surface_data
+!>       global surface id (where i:surface id)
+        integer(kind=kint_gl), allocatable  ::  isurf_global(:)
+!>       integer flag for interior surface 1...interior, 0...exterior
+        integer(kind = kint), allocatable :: interior_surf(:)
+      end type global_surface_data
+!
 !  ---------------------------------------------------------------------
 !
       contains
 !
 !  ---------------------------------------------------------------------
 !
-       subroutine allocate_inod_in_surf(surf)
+       subroutine alloc_inod_in_surf(surf)
 !
       use m_geometry_constants
 !
@@ -114,7 +119,7 @@
        surf%node_on_sf =   0
        surf%node_on_sf_n = 0
 !
-       end subroutine allocate_inod_in_surf
+       end subroutine alloc_inod_in_surf
 !
 !  ---------------------------------------------------------------------
 !
@@ -140,24 +145,6 @@
       end if
 !
       end subroutine alloc_surface_connect
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine alloc_interior_surf(surf)
-!
-      type(surface_data), intent(inout) :: surf
-!
-      allocate(surf%isurf_global(surf%numsurf))
-      allocate(surf%interior_surf(surf%numsurf))
-!
-      if (surf%numsurf.gt. 0) then
-!$omp parallel workshare
-        surf%isurf_global =  0
-        surf%interior_surf = 0
-!$omp end parallel workshare
-      end if
-!
-      end subroutine alloc_interior_surf
 !
 !  ---------------------------------------------------------------------
 !
@@ -272,17 +259,6 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine dealloc_interior_surf(surf)
-!
-      type(surface_data), intent(inout) :: surf
-!
-      if(allocated(surf%interior_surf) .eqv. .FALSE.) return
-      deallocate(surf%isurf_global, surf%interior_surf)
-!
-      end subroutine dealloc_interior_surf
-!
-!  ---------------------------------------------------------------------
-!
       subroutine deallocate_ext_surface_type(surf)
 !
       type(surface_data), intent(inout) :: surf
@@ -351,5 +327,36 @@
       end subroutine dealloc_element_4_surface
 !
 !-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
+      subroutine alloc_interior_surf(surf, surf_gl)
+!
+      type(surface_data), intent(in) :: surf
+      type(global_surface_data), intent(inout) :: surf_gl
+!
+      allocate(surf_gl%isurf_global(surf%numsurf))
+      allocate(surf_gl%interior_surf(surf%numsurf))
+!
+      if (surf%numsurf.gt. 0) then
+!$omp parallel workshare
+        surf_gl%isurf_global =  0
+        surf_gl%interior_surf = 0
+!$omp end parallel workshare
+      end if
+!
+      end subroutine alloc_interior_surf
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine dealloc_interior_surf(surf_gl)
+!
+      type(global_surface_data), intent(inout) :: surf_gl
+!
+      if(allocated(surf_gl%interior_surf) .eqv. .FALSE.) return
+      deallocate(surf_gl%isurf_global, surf_gl%interior_surf)
+!
+      end subroutine dealloc_interior_surf
+!
+!  ---------------------------------------------------------------------
 !
       end module t_surface_data

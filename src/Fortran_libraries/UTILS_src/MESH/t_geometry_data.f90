@@ -119,8 +119,6 @@
         integer( kind=kint ), allocatable :: istack_ele_smp(:)
 !>       maximum smp number of element on local PE
         integer( kind=kint )  ::  max_ele_smp
-!>       maximum internal smp number of element on local PE
-        integer( kind=kint )  ::  max_internal_ele_smp
 !
 !>       element connectivity  (where i:element id j:node id)
         integer(kind=kint), allocatable  :: ie(:,:)

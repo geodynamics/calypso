@@ -51,7 +51,6 @@
 !
       use coordinate_converter
       use ordering_sph_mesh_to_rtp
-      use set_nnod_4_ele_by_type
 !
       type(construct_spherical_grid), intent(in) :: gen_sph
       type(comm_table_make_sph), intent(inout) :: stbl
@@ -101,9 +100,6 @@
      &    mesh%node%xx(1:mesh%node%numnod,1),                           &
      &    mesh%node%xx(1:mesh%node%numnod,2),                           &
      &    mesh%node%xx(1:mesh%node%numnod,3))
-!
-      call set_3D_nnod_4_sfed_by_ele(mesh%ele%nnod_4_ele,               &
-     &    mesh%surf%nnod_4_surf, mesh%edge%nnod_4_edge)
 !
       end subroutine s_const_FEM_mesh_for_sph
 !

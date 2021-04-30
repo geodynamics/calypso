@@ -44,7 +44,7 @@ parallel_gen_sph_grids.o: $(SPH_GRID_SRCDIR)/parallel_gen_sph_grids.f90 m_precis
 	$(F90) -c $(F90OPTFLAGS) $<
 select_zonal_4_legendre.o: $(SPH_GRID_SRCDIR)/select_zonal_4_legendre.f90 m_precision.o zonal_wavenumber_4_legendre.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_FEM_mesh_4_sph.o: $(SPH_GRID_SRCDIR)/set_FEM_mesh_4_sph.f90 m_precision.o t_spheric_parameter.o t_gauss_points.o t_mesh_data.o t_comm_table.o t_geometry_data.o t_group_data.o t_surface_data.o t_edge_data.o t_const_spherical_grid.o t_sph_mesh_1d_connect.o coordinate_converter.o ordering_sph_mesh_to_rtp.o set_nnod_4_ele_by_type.o calypso_mpi.o set_sph_local_node.o set_sph_local_element.o set_sph_node_group.o set_sph_ele_group.o set_sph_surf_group.o cal_minmax_and_stacks.o t_spheric_global_ranks.o const_comm_tbl_4_sph_mesh.o
+set_FEM_mesh_4_sph.o: $(SPH_GRID_SRCDIR)/set_FEM_mesh_4_sph.f90 m_precision.o t_spheric_parameter.o t_gauss_points.o t_mesh_data.o t_comm_table.o t_geometry_data.o t_group_data.o t_surface_data.o t_edge_data.o t_const_spherical_grid.o t_sph_mesh_1d_connect.o coordinate_converter.o ordering_sph_mesh_to_rtp.o calypso_mpi.o set_sph_local_node.o set_sph_local_element.o set_sph_node_group.o set_sph_ele_group.o set_sph_surf_group.o cal_minmax_and_stacks.o t_spheric_global_ranks.o const_comm_tbl_4_sph_mesh.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_comm_table_rtm_rlm.o: $(SPH_GRID_SRCDIR)/set_comm_table_rtm_rlm.f90 m_precision.o t_spheric_global_ranks.o set_global_spherical_param.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -31,6 +31,7 @@
 !
       use FEM_analyzer_sph_MHD
       use SPH_analyzer_MHD
+      use FEM_to_PSF_bridge
       use init_sph_MHD_elapsed_label
 !
       implicit none
@@ -46,7 +47,7 @@
 !>      Structure of sectioning and isosurfaceing modules
       type(surfacing_modules), save, private :: viz_psfs1
 !>      Structure of edge communication table
-      type(communication_table), save, private :: edge_comm_M
+      type(PSF_mesh_field), save, private :: PSF_DAT_M
 !
 ! ----------------------------------------------------------------------
 !
@@ -58,7 +59,6 @@
 !
       use t_ctl_data_sph_MHD_psf
       use input_control_sph_MHD
-      use FEM_to_PSF_bridge
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
@@ -89,7 +89,7 @@
      &    FEM_d1%geofem, FEM_d1%field, FEM_d1%iphys,                    &
      &    MHD_IO1, FEM_d1%v_sol)
       call init_FEM_to_PSF_bridge                                       &
-     &   (MHD_step1%viz_step, FEM_d1%geofem, edge_comm_M)
+     &   (MHD_step1%viz_step, FEM_d1%geofem, PSF_DAT_M)
 !
 !        Initialize spherical transform dynamo
 !
@@ -101,10 +101,11 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'init_visualize_surface'
       call init_visualize_surface                                       &
-     &   (FEM_d1%geofem, edge_comm_M, FEM_d1%field,                     &
+     &   (FEM_d1%geofem, PSF_DAT_M%edge_comm, FEM_d1%field,             &
      &    DNS_MHD_ctl1%surfacing_ctls, viz_psfs1)
 !
-      call init_zonal_mean_sections(FEM_d1%geofem, edge_comm_M,         &
+      call init_zonal_mean_sections                                     &
+     &   (FEM_d1%geofem, PSF_DAT_M%edge_comm,                           &
      &    FEM_d1%field, DNS_MHD_ctl1%zm_ctls, zmeans1)
 !
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+1)
@@ -174,7 +175,8 @@
      &                          MHD_step1%viz_step)
           call visualize_surface                                        &
      &       (MHD_step1%viz_step, MHD_step1%time_d,                     &
-     &        FEM_d1%geofem, edge_comm_M, FEM_d1%field, viz_psfs1)
+     &        FEM_d1%geofem, PSF_DAT_M%edge_comm,                       &
+     &        FEM_d1%field, viz_psfs1)
 !*
 !*  ----------- Zonal means --------------
 !*
