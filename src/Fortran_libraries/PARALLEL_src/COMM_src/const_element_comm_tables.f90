@@ -14,20 +14,14 @@
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(communication_table), intent(inout) :: ele_comm
 !!        type(element_data), intent(inout) :: ele
-!!      subroutine const_surf_comm_table                                &
-!!     &         (node, nod_comm, surf_comm, surf)
-!!        type(node_data), intent(in) :: node
-!!        type(communication_table), intent(in) :: nod_comm
-!!        type(communication_table), intent(inout) :: surf_comm
-!!        type(surface_data), intent(inout) :: surf
-!!      subroutine const_edge_comm_table                                &
-!!     &         (node, nod_comm, edge_comm, edge)
-!!        type(node_data), intent(in) :: node
-!!        type(communication_table), intent(in) :: nod_comm
-!!        type(communication_table), intent(inout) :: edge_comm
-!!        type(edge_data), intent(inout) :: edge
 !!
 !!      subroutine const_global_numnod_list(node)
+!!
+!!      subroutine ele_send_recv_check(numele, iele_gl, x_ele, wk_check)
+!!        integer(kind = kint), intent(in) :: numele
+!!        integer(kind = kint_gl), intent(in) :: iele_gl(numele)
+!!        real(kind = kreal), intent(in) :: x_ele(numele,3)
+!!        type(work_for_comm_check), intent(inout) :: wk_check
 !!@endverbatim
 !
       module const_element_comm_tables
@@ -47,10 +41,7 @@
       implicit none
 !
       character(len=kchara), parameter :: txt_ele =  'element'
-      character(len=kchara), parameter :: txt_edge = 'edge'
-      character(len=kchara), parameter :: txt_surf = 'surface'
-!
-      private :: txt_ele, txt_edge, txt_surf
+      private :: txt_ele
 !
 !-----------------------------------------------------------------------
 !
@@ -158,7 +149,7 @@
 !
       call alloc_failed_export(0, fail_tbl_e)
       call const_comm_table_by_connenct                                 &
-     &   (txt_surf, ele%numele, ele%nnod_4_ele, ele%ie,                 &
+     &   (txt_ele, ele%numele, ele%nnod_4_ele, ele%ie,                  &
      &    ele%x_ele, node, nod_comm, inod_dbl, iele_dbl,                &
      &    neib_ele, ele_comm, fail_tbl_e)
       call dealloc_ele_double_number(iele_dbl)
@@ -172,152 +163,6 @@
      &    ele%interior_ele, ele_comm, ele%iele_global)
 !
       end subroutine const_ele_comm_table
-!
-!-----------------------------------------------------------------------
-!
-      subroutine const_surf_comm_table                                  &
-     &         (node, nod_comm, surf_comm, surf)
-!
-      use m_geometry_constants
-      use t_para_double_numbering
-      use t_element_double_number
-      use t_const_comm_table
-      use set_ele_id_4_node_type
-      use const_global_element_ids
-!
-      type(node_data), intent(in) :: node
-      type(communication_table), intent(in) :: nod_comm
-      type(communication_table), intent(inout) :: surf_comm
-      type(surface_data), intent(inout) :: surf
-!
-      type(node_ele_double_number) :: inod_dbl
-      type(element_double_number) :: isurf_dbl
-      type(element_around_node) :: neib_surf
-      type(failed_table) :: fail_tbl_s
-!
-      integer(kind = kint) :: internal_num = 0
-      integer(kind = kint_gl), allocatable :: istack_inersurf(:)
-!
-      call alloc_double_numbering(node%numnod, inod_dbl)
-      call set_node_double_numbering(node, nod_comm, inod_dbl)
-!
-      call alloc_ele_double_number(surf%numsurf, isurf_dbl)
-      call alloc_interior_surf(surf)
-      call find_belonged_pe_4_surf(my_rank, inod_dbl,                   &
-     &    surf%numsurf, surf%nnod_4_surf, surf%ie_surf,                 &
-     &    internal_num, surf%interior_surf, isurf_dbl)
-!
-      call set_surf_id_4_node(node, surf, neib_surf)
-!
-      call alloc_failed_export(0, fail_tbl_s)
-      call const_comm_table_by_connenct                                 &
-     &   (txt_surf, surf%numsurf, surf%nnod_4_surf, surf%ie_surf,       &
-     &    surf%x_surf, node, nod_comm, inod_dbl, isurf_dbl,             &
-     &    neib_surf, surf_comm, fail_tbl_s)
-      call dealloc_ele_double_number(isurf_dbl)
-      call dealloc_double_numbering(inod_dbl)
-      call dealloc_iele_belonged(neib_surf)
-      call dealloc_failed_export(fail_tbl_s)
-!
-!
-      allocate(istack_inersurf(0:nprocs))
-      istack_inersurf(0:nprocs) = 0
-!
-      call count_number_of_node_stack(internal_num, istack_inersurf)
-      call set_global_ele_id                                            &
-     &   (txt_surf, surf%numsurf, istack_inersurf,                      &
-     &    surf%interior_surf, surf_comm, surf%isurf_global)
-      deallocate(istack_inersurf)
-!
-      end subroutine const_surf_comm_table
-!
-!-----------------------------------------------------------------------
-!
-      subroutine dealloc_surf_comm_table(surf_comm, surf)
-!
-      type(communication_table), intent(inout) :: surf_comm
-      type(surface_data), intent(inout) :: surf
-!
-      call dealloc_comm_table(surf_comm)
-      call dealloc_interior_surf(surf)
-!
-      end subroutine dealloc_surf_comm_table
-!
-!-----------------------------------------------------------------------
-!
-      subroutine const_edge_comm_table                                  &
-     &         (node, nod_comm, edge_comm, edge)
-!
-      use m_geometry_constants
-      use t_para_double_numbering
-      use t_element_double_number
-      use t_const_comm_table
-      use set_ele_id_4_node_type
-      use const_global_element_ids
-!
-      type(node_data), intent(in) :: node
-      type(communication_table), intent(in) :: nod_comm
-!
-      type(communication_table), intent(inout) :: edge_comm
-      type(edge_data), intent(inout) :: edge
-!
-      type(node_ele_double_number) :: inod_dbl
-      type(element_double_number) :: iedge_dbl
-      type(element_around_node) :: neib_edge
-      type(failed_table) :: fail_tbl_d
-!
-      integer(kind = kint) :: internal_num = 0
-      integer(kind = kint_gl), allocatable :: istack_ineredge(:)
-!
-!
-      call alloc_double_numbering(node%numnod, inod_dbl)
-      call set_node_double_numbering(node, nod_comm, inod_dbl)
-!
-      call alloc_ele_double_number(edge%numedge, iedge_dbl)
-      call alloc_interior_edge(edge)
-      call find_belonged_pe_4_edge(my_rank, inod_dbl,                   &
-     &    edge%numedge, edge%nnod_4_edge, edge%ie_edge,                 &
-     &    internal_num, edge%interior_edge, iedge_dbl)
-!
-!
-      if(iflag_debug.gt.0) write(*,*) ' set_edge_id_4_node in edge'
-      call set_edge_id_4_node(node, edge, neib_edge)
-!
-      if(iflag_debug.gt.0) write(*,*)                                   &
-     &          ' const_comm_table_by_connenct in edge'
-      call alloc_failed_export(0, fail_tbl_d)
-      call const_comm_table_by_connenct                                 &
-     &   (txt_edge, edge%numedge, edge%nnod_4_edge, edge%ie_edge,       &
-     &    edge%x_edge, node, nod_comm, inod_dbl, iedge_dbl,             &
-     &    neib_edge, edge_comm, fail_tbl_d)
-      call dealloc_ele_double_number(iedge_dbl)
-      call dealloc_double_numbering(inod_dbl)
-      call dealloc_iele_belonged(neib_edge)
-      call dealloc_failed_export(fail_tbl_d)
-!
-!
-      allocate(istack_ineredge(0:nprocs))
-      istack_ineredge(0:nprocs) = 0
-!
-      call count_number_of_node_stack(internal_num, istack_ineredge)
-      call set_global_ele_id                                            &
-     &   (txt_edge, edge%numedge, istack_ineredge,                      &
-     &    edge%interior_edge, edge_comm, edge%iedge_global)
-      deallocate(istack_ineredge)
-!
-      end subroutine const_edge_comm_table
-!
-!-----------------------------------------------------------------------
-!
-      subroutine dealloc_edge_comm_table(edge_comm, edge)
-!
-      type(communication_table), intent(inout) :: edge_comm
-      type(edge_data), intent(inout) :: edge
-!
-      call dealloc_comm_table(edge_comm)
-      call dealloc_interior_edge(edge)
-!
-      end subroutine dealloc_edge_comm_table
 !
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
@@ -370,5 +215,31 @@
       end subroutine set_node_ele_double_address
 !
 ! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine ele_send_recv_check(numele, iele_gl, x_ele, wk_check)
+!
+      use t_work_for_comm_check
+      use diff_geometory_comm_test
+      use solver_SR_type
+!
+      integer(kind = kint), intent(in) :: numele
+      integer(kind = kint_gl), intent(in) :: iele_gl(numele)
+      real(kind = kreal), intent(in) :: x_ele(numele,3)
+!
+      type(work_for_comm_check), intent(inout) :: wk_check
+!
+!
+      wk_check%num_diff =  count_ele_comm_test                          &
+     &               (numele, x_ele, wk_check%xx_test)
+      call alloc_diff_ele_comm_test(wk_check)
+      call compare_ele_comm_test(numele, x_ele,                         &
+     &    wk_check%xx_test, wk_check%num_diff,                          &
+     &    wk_check%i_diff, wk_check%x_diff)
+      call dealloc_ele_4_comm_test(wk_check)
+!
+      end subroutine ele_send_recv_check
+!
+! ----------------------------------------------------------------------
 !
       end module const_element_comm_tables

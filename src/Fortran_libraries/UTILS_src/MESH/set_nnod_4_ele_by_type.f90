@@ -7,13 +7,11 @@
 !>@brief  Set Number of element from element type ID
 !!
 !!@verbatim
-!!      subroutine set_3D_nnod_4_ele_by_type(itype,                     &
-!!     &          nnod_4_ele, nnod_4_surf, nnod_4_edge)
 !!      integer(kind = kint) function set_nnod_4_ele_by_eletype(itype)
 !!      subroutine set_3D_nnod_4_sfed_by_ele                            &
 !!     &         (nnod_4_ele, nnod_4_surf, nnod_4_edge)
-!!      subroutine set_3D_nnod_4_sfed_by_ele,                           &
-!!     &         (nnod_4_ele, nnod_4_surf, nnod_4_edge)
+!!      integer(kind = kint) function set_nnod_4_surf_by_ele(nnod_4_ele)
+!!      integer(kind = kint) function set_nnod_4_edge_by_ele(nnod_4_ele)
 !!      subroutine s_set_nnod_4_ele_by_type(itype, nnod_4_ele)
 !!
 !!      integer(kind = kint) function                                   &
@@ -31,25 +29,6 @@
 !------------------------------------------------------------------
 !
       contains
-!
-!------------------------------------------------------------------
-!
-      subroutine set_3D_nnod_4_ele_by_type(itype,                       &
-     &          nnod_4_ele, nnod_4_surf, nnod_4_edge)
-!
-      use m_geometry_constants
-!
-      integer(kind = kint), intent(in) :: itype
-      integer(kind = kint), intent(inout) :: nnod_4_ele
-      integer(kind = kint), intent(inout) :: nnod_4_surf
-      integer(kind = kint), intent(inout) :: nnod_4_edge
-!
-!
-      nnod_4_ele = set_nnod_4_ele_by_eletype(itype)
-      call set_3D_nnod_4_sfed_by_ele                                    &
-     &   (nnod_4_ele, nnod_4_surf, nnod_4_edge)
-!
-      end subroutine set_3D_nnod_4_ele_by_type
 !
 !------------------------------------------------------------------
 !
@@ -84,18 +63,46 @@
       integer(kind = kint), intent(inout) :: nnod_4_edge
 !
 !
-      if (nnod_4_ele .eq. num_t_quad) then
-        nnod_4_surf = num_quad_sf
-        nnod_4_edge = num_quad_edge
-      else if (nnod_4_ele .eq. num_t_linear) then
-        nnod_4_surf = num_linear_sf
-        nnod_4_edge = num_linear_edge
-      else if (nnod_4_ele .eq. num_t_lag) then
-        nnod_4_surf = num_lag_sf
-        nnod_4_edge = num_quad_edge
-      end if
+      nnod_4_surf = set_nnod_4_surf_by_ele(nnod_4_ele)
+      nnod_4_edge = set_nnod_4_edge_by_ele(nnod_4_ele)
 !
       end subroutine set_3D_nnod_4_sfed_by_ele
+!
+!------------------------------------------------------------------
+!
+      integer(kind = kint) function set_nnod_4_surf_by_ele(nnod_4_ele)
+!
+      use m_geometry_constants
+!
+      integer(kind = kint), intent(in) :: nnod_4_ele
+!
+!
+      if (nnod_4_ele .eq. num_t_quad) then
+        set_nnod_4_surf_by_ele = num_quad_sf
+      else if (nnod_4_ele .eq. num_t_lag) then
+        set_nnod_4_surf_by_ele = num_lag_sf
+      else
+        set_nnod_4_surf_by_ele = num_linear_sf
+      end if
+!
+      end function set_nnod_4_surf_by_ele
+!
+!------------------------------------------------------------------
+!
+      integer(kind = kint) function set_nnod_4_edge_by_ele(nnod_4_ele)
+!
+      use m_geometry_constants
+!
+      integer(kind = kint), intent(in) :: nnod_4_ele
+!
+!
+      if (nnod_4_ele.eq.num_t_quad .or. nnod_4_ele.eq.num_t_lag) then
+        set_nnod_4_edge_by_ele = num_quad_edge
+      else
+        set_nnod_4_edge_by_ele = num_linear_edge
+      end if
+!
+      end function set_nnod_4_edge_by_ele
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------

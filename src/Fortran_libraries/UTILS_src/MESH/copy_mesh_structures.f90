@@ -56,7 +56,6 @@
       use t_surface_data
       use t_edge_data
       use t_group_data
-      use set_nnod_4_ele_by_type
 !
 !
       type(mesh_geometry), intent(in) :: mesh
@@ -79,8 +78,6 @@
       call alloc_sph_node_geometry(tgt_mesh%node)
 !      call alloc_overlapped_ele(tgt_mesh%ele)
 !      call alloc_ele_geometry(tgt_mesh%ele)
-      call set_3D_nnod_4_sfed_by_ele(tgt_mesh%ele%nnod_4_ele,           &
-     &    tgt_mesh%surf%nnod_4_surf, tgt_mesh%edge%nnod_4_edge)
 !
       end subroutine copy_mesh_and_group
 !

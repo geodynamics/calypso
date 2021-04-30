@@ -7,12 +7,13 @@
 !>@brief subroutine to copy field data
 !!
 !!@verbatim
-!!      subroutine copy_nod_scalar_smp(nnod, scalar, copied)
-!!      subroutine copy_nod_vector_smp(nnod, vector, copied)
-!!      subroutine copy_nod_sym_tensor_smp(nnod, tensor, copied)
+!!      subroutine copy_scalar_smp(nnod, scalar, copied)
+!!      subroutine copy_vector_smp(nnod, vector, copied)
+!!      subroutine copy_sym_tensor_smp(nnod, tensor, copied)
 !!      subroutine copy_all_field_smp(nnod, ntot_comp, vector, copied)
 !!
-!!      subroutine copy_nod_integer_smp(nnod, int_scalar, int_copied)
+!!      subroutine copy_int_vector_smp(nnod, int_scalar, int_copied)
+!!      subroutine copy_int8_vector_smp(nnod, int8_scalar, int8_copied)
 !!@endverbatim
 !!
 !!@n @param  nnod   Number of data points
@@ -21,9 +22,11 @@
 !!@n @param  vector(nnod,3)   original vector field
 !!@n @param  tensor(nnod,6)   original symmetric tensor field
 !!@n @param  int_scalar(nnod) original integer field
+!!@n @param  int8_scalar(nnod) original 8-byte integer field
 !!
 !!@n @param  copied(nnod,n) copied field data
 !!@n @param  int_copied(nnod) copied integer field data
+!!@n @param  int8_copied(nnod) copied 8-byte integer field data
 !
       module copy_field_smp
 !
@@ -37,7 +40,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_nod_scalar_smp(nnod, scalar, copied)
+      subroutine copy_scalar_smp(nnod, scalar, copied)
 !
        integer (kind = kint) :: nnod
        real(kind=kreal), intent(in)    :: scalar(nnod)
@@ -48,11 +51,11 @@
        copied(1:nnod) = scalar(1:nnod)
 !$omp end workshare nowait
 !
-      end subroutine copy_nod_scalar_smp
+      end subroutine copy_scalar_smp
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_nod_vector_smp(nnod, vector, copied)
+      subroutine copy_vector_smp(nnod, vector, copied)
 !
        integer (kind = kint) :: nnod
        real(kind=kreal), intent(in)    :: vector(nnod,3)
@@ -65,11 +68,11 @@
        copied(1:nnod,3) = vector(1:nnod,3)
 !$omp end workshare nowait
 !
-      end subroutine copy_nod_vector_smp
+      end subroutine copy_vector_smp
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_nod_sym_tensor_smp(nnod, tensor, copied)
+      subroutine copy_sym_tensor_smp(nnod, tensor, copied)
 !
        integer (kind = kint) :: nnod
        real(kind=kreal), intent(in)    :: tensor(nnod,6)
@@ -85,7 +88,7 @@
        copied(1:nnod,6) = tensor(1:nnod,6)
 !$omp end workshare nowait
 !
-      end subroutine copy_nod_sym_tensor_smp
+      end subroutine copy_sym_tensor_smp
 !
 ! -----------------------------------------------------------------------
 !
@@ -105,18 +108,33 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine copy_nod_integer_smp(nnod, int_scalar, int_copied)
+      subroutine copy_int_vector_smp(nnod, int_scalar, int_copied)
 !
-       integer (kind = kint) :: nnod
-       integer (kind = kint), intent(in)    :: int_scalar(nnod)
-       integer (kind = kint), intent(inout) :: int_copied(nnod)
+       integer(kind = kint) :: nnod
+       integer(kind = kint), intent(in)    :: int_scalar(nnod)
+       integer(kind = kint), intent(inout) :: int_copied(nnod)
 !
 !
 !$omp workshare
        int_copied(1:nnod) = int_scalar(1:nnod)
 !$omp end workshare nowait
 !
-      end subroutine copy_nod_integer_smp
+      end subroutine copy_int_vector_smp
+!
+! -----------------------------------------------------------------------
+!
+      subroutine copy_int8_vector_smp(nnod, int8_scalar, int8_copied)
+!
+       integer(kind = kint) :: nnod
+       integer(kind = kint_gl), intent(in)    :: int8_scalar(nnod)
+       integer(kind = kint_gl), intent(inout) :: int8_copied(nnod)
+!
+!
+!$omp workshare
+       int8_copied(1:nnod) = int8_scalar(1:nnod)
+!$omp end workshare nowait
+!
+      end subroutine copy_int8_vector_smp
 !
 ! -----------------------------------------------------------------------
 !

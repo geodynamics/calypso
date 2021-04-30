@@ -19,7 +19,8 @@
 !!        type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
 !!        type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !!      subroutine count_nodes_4_iso                                    &
-!!     &         (num_iso, edge, iso_search, iso_list, iso_mesh)
+!!     &         (num_iso, node, edge, iso_search, iso_list, iso_mesh)
+!!        type(node_data), intent(in) :: node
 !!        type(edge_data), intent(in) :: edge
 !!        type(psf_search_lists), intent(inout) :: iso_search(num_iso)
 !!        type(sectioning_list), intent(inout) :: iso_list(num_iso)
@@ -99,8 +100,8 @@
       do i = 1, num_psf
         if(psf_def(i)%id_section_method .gt. 0) then
           call count_node_on_edge_4_psf                                 &
-     &       (edge%numedge, edge%nnod_4_edge, edge%ie_edge,             &
-     &        edge%interior_edge, psf_search(i)%edge_list, psf_list(i))
+     &       (node%internal_node, edge%numedge, edge%nnod_4_edge,       &
+     &        edge%ie_edge, psf_search(i)%edge_list, psf_list(i))
           call count_position_4_psf(psf_list(i),  psf_mesh(i)%node)
 !
           psf_grp_list(i)%internod_on_nod = 0
@@ -124,13 +125,14 @@
 !  ---------------------------------------------------------------------
 !
       subroutine count_nodes_4_iso                                      &
-     &         (num_iso, edge, iso_search, iso_list, iso_mesh)
+     &         (num_iso, node, edge, iso_search, iso_list, iso_mesh)
 !
       use t_edge_data
       use t_psf_geometry_list
       use t_psf_patch_data
 !
       integer(kind = kint), intent(in) :: num_iso
+      type(node_data), intent(in) :: node
       type(edge_data), intent(in) :: edge
 !
       type(psf_search_lists), intent(inout) :: iso_search(num_iso)
@@ -142,9 +144,9 @@
 !
       do i = 1, num_iso
         call alloc_nnod_psf(np_smp, edge, iso_list(i))
-        call count_node_on_edge_4_psf(edge%numedge, edge%nnod_4_edge,   &
-     &      edge%ie_edge, edge%interior_edge,                           &
-     &      iso_search(i)%edge_list, iso_list(i))
+        call count_node_on_edge_4_psf                                   &
+     &     (node%internal_node, edge%numedge, edge%nnod_4_edge,         &
+     &      edge%ie_edge, iso_search(i)%edge_list, iso_list(i))
 !
         call count_position_4_psf(iso_list(i),  iso_mesh(i)%node)
       end do
@@ -195,8 +197,8 @@
       do i = 1, num_psf
         if(psf_def(i)%id_section_method .gt. 0) then
           call set_node_on_edge_4_psf                                   &
-     &       (edge%numedge, edge%nnod_4_edge, edge%ie_edge,             &
-     &        edge%interior_edge, psf_search(i)%edge_list, psf_list(i))
+     &       (node%internal_node, edge%numedge, edge%nnod_4_edge,       &
+     &        edge%ie_edge, psf_search(i)%edge_list, psf_list(i))
 !
           call set_node_on_edge_int_quad_psf                            &
      &       (node%numnod, edge%numedge, edge%nnod_4_edge,              &
@@ -276,8 +278,8 @@
         call const_global_numnod_list(iso_mesh(i)%node)
 !
         call set_node_on_edge_4_psf                                     &
-     &     (edge%numedge, edge%nnod_4_edge, edge%ie_edge,               &
-     &      edge%interior_edge, iso_search(i)%edge_list, iso_list(i))
+     &     (node%internal_node, edge%numedge, edge%nnod_4_edge,         &
+     &      edge%ie_edge, iso_search(i)%edge_list, iso_list(i))
 !
         call set_node_on_edge_int_linear_psf(node%numnod, edge%numedge, &
      &      edge%nnod_4_edge, edge%ie_edge, iso_list(i))
