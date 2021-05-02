@@ -107,7 +107,7 @@
         if(node%inod_global(i1).eq.9687462  &
      &      .and. node%inod_global(i2).eq.9687687) write(*,*)           &
      &     'edge with global_node(9687462, 9687687): ', my_rank, i,     &
-     &     'iedge_dbl: ', iedge_dbl%irank(i), iedge_dbl%irank(i),       &
+     &     'iedge_dbl: ', iedge_dbl%irank(i), iedge_dbl%index(i),       &
      &     'local node id: ', i1, i2,                                   &
      &     'inod_dbl%irank: ', inod_dbl%irank(i1), inod_dbl%irank(i2),  &
      &     'inod_dbl%index: ', inod_dbl%index(i1), inod_dbl%index(i2)
