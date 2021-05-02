@@ -68,7 +68,8 @@
         call set_mesh(fem_IO_m, fem%mesh, fem%group)
       else
         call set_zero_mesh_data                                         &
-     &     (fem%mesh%nod_comm, fem%mesh%node, fem%mesh%ele)
+     &     (fem%mesh%nod_comm, fem%mesh%node, fem%mesh%ele,             &
+     &      fem%mesh%surf, fem%mesh%edge)
       end if
 !
       if(num_pe .ge. nprocs) return
@@ -99,7 +100,8 @@
         call set_mesh_geometry_data(mesh_IO_m,                          &
      &      mesh%nod_comm, mesh%node, mesh%ele)
       else
-        call set_zero_mesh_data(mesh%nod_comm, mesh%node, mesh%ele)
+        call set_zero_mesh_data                                         &
+     &     (mesh%nod_comm, mesh%node, mesh%ele, mesh%surf, mesh%edge)
       end if
 !
       end subroutine mpi_input_mesh_geometry

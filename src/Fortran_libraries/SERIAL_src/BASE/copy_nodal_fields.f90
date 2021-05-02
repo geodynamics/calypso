@@ -72,7 +72,7 @@
 !
 !
 !$omp parallel
-      call copy_scalar_smp(fld%n_point,                                 &
+      call copy_nod_scalar_smp(fld%n_point,                             &
      &    fld%d_fld(1,i_org), fld%d_fld(1,i_target))
 !$omp end parallel
 !
@@ -89,7 +89,7 @@
 !
 !
 !$omp parallel
-      call copy_vector_smp(fld%n_point,                                 &
+      call copy_nod_vector_smp(fld%n_point,                             &
      &    fld%d_fld(1,i_org), fld%d_fld(1,i_target))
 !$omp end parallel
 !
@@ -106,7 +106,7 @@
 !
 !
 !$omp parallel
-      call copy_sym_tensor_smp(fld%n_point,                             &
+      call copy_nod_sym_tensor_smp(fld%n_point,                         &
      &    fld%d_fld(1,i_org), fld%d_fld(1,i_target))
 !$omp end parallel
 !

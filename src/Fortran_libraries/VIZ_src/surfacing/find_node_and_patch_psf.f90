@@ -192,8 +192,8 @@
       integer(kind= kint) :: i_iso
 !
 !
-      call count_nodes_4_iso(num_iso, mesh%node, mesh%edge,             &
-     &                       iso_search, iso_list, iso_mesh)
+      call count_nodes_4_iso                                            &
+     &   (num_iso, mesh%edge, iso_search, iso_list, iso_mesh)
 !
       call set_nodes_4_iso(num_iso, mesh%node, mesh%edge, edge_comm,    &
      &                     iso_search, iso_list, iso_mesh)

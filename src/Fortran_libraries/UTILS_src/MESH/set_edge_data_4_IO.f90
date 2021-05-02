@@ -9,19 +9,16 @@
 !!
 !!@verbatim
 !!      subroutine copy_edge_connect_to_IO                              &
-!!     &         (edge, edge_gl, nele, nsurf, ele_IO, sfed_IO)
-!!      subroutine copy_edge_geometry_to_IO                             &
-!!     &        (edge, edge_gl, nod_IO, sfed_IO)
+!!     &         (edge, nele, nsurf, ele_IO, sfed_IO)
+!!      subroutine copy_edge_geometry_to_IO(edge, nod_IO, sfed_IO)
 !!        type(edge_data), intent(inout) :: edge
-!!        type(global_edge_data), intent(in) :: edge_gl
 !!        type(node_data), intent(inout) :: nod_IO
 !!        type(element_data), intent(inout) :: ele_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !!
 !!      subroutine copy_edge_connect_from_IO                            &
-!!     &          (ele_IO, sfed_IO, edge, ele, nsurf)
+!!     &          (ele_IO, sfed_IO, edge, nele, nsurf)
 !!      subroutine copy_edge_geometry_from_IO(nod_IO, sfed_IO, edge)
-!!        type(element_data), intent(in) :: ele
 !!        type(node_data), intent(in) :: nod_IO
 !!        type(element_data), intent(in) :: ele_IO
 !!        type(surf_edge_IO_data), intent(in) :: sfed_IO
@@ -47,13 +44,12 @@
 !------------------------------------------------------------------
 !
       subroutine copy_edge_connect_to_IO                                &
-     &         (edge, edge_gl, nele, nsurf, ele_IO, sfed_IO)
+     &         (edge, nele, nsurf, ele_IO, sfed_IO)
 !
       use m_geometry_constants
 !
       integer(kind = kint), intent(in) :: nele, nsurf
       type(edge_data), intent(in) :: edge
-      type(global_edge_data), intent(in) :: edge_gl
       type(element_data), intent(inout) :: ele_IO
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !
@@ -77,7 +73,7 @@
 !
 !omp parallel do
       do iedge = 1, edge%numedge
-        ele_IO%iele_global(iedge) = edge_gl%iedge_global(iedge)
+        ele_IO%iele_global(iedge) = edge%iedge_global(iedge)
         ele_IO%nodelm(iedge) =      edge%nnod_4_edge
         ele_IO%ie(iedge,1:edge%nnod_4_edge)                             &
      &        = edge%ie_edge(iedge,1:edge%nnod_4_edge)
@@ -102,11 +98,9 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine copy_edge_geometry_to_IO                               &
-     &        (edge, edge_gl, nod_IO, sfed_IO)
+      subroutine copy_edge_geometry_to_IO(edge, nod_IO, sfed_IO)
 !
       type(edge_data), intent(in) :: edge
-      type(global_edge_data), intent(in) :: edge_gl
       type(node_data), intent(inout) :: nod_IO
       type(surf_edge_IO_data), intent(inout) :: sfed_IO
 !
@@ -114,7 +108,7 @@
 !
 !
       nod_IO%numnod =        edge%numedge
-      nod_IO%internal_node = sum(edge_gl%interior_edge)
+      nod_IO%internal_node = sum(edge%interior_edge)
 !
       call alloc_node_geometry_base(nod_IO)
       call alloc_ele_vector_IO(nod_IO, sfed_IO)
@@ -122,7 +116,7 @@
 !
 !omp parallel do
       do iedge = 1, edge%numedge
-        nod_IO%inod_global(iedge) = edge_gl%iedge_global(iedge)
+        nod_IO%inod_global(iedge) = edge%iedge_global(iedge)
         nod_IO%xx(iedge,1) =        edge%x_edge(iedge,1)
         nod_IO%xx(iedge,2) =        edge%x_edge(iedge,2)
         nod_IO%xx(iedge,3) =        edge%x_edge(iedge,3)
@@ -139,48 +133,28 @@
 !------------------------------------------------------------------
 !
       subroutine copy_edge_connect_from_IO                              &
-     &          (ele_IO, sfed_IO, edge, ele, nsurf)
+     &          (ele_IO, sfed_IO, edge, nele, nsurf)
 !
       use m_geometry_constants
-      use set_nnod_4_ele_by_type
-      use set_local_id_table_4_1ele
 !
-      integer(kind = kint), intent(in) :: nsurf
-      type(element_data), intent(in) :: ele
+      integer(kind = kint), intent(in) :: nele, nsurf
       type(element_data), intent(in) :: ele_IO
       type(surf_edge_IO_data), intent(in) :: sfed_IO
       type(edge_data), intent(inout) :: edge
 !
 !
-      edge%numedge =     ele_IO%numele
-      edge%nnod_4_edge = set_nnod_4_edge_by_ele(ele%nnod_4_ele)
-      call alloc_inod_in_edge(edge)
-      call copy_inod_in_edge(edge%nnod_4_edge,                          &
-     &    edge%node_on_edge, edge%node_on_edge_sf)
-!
+      edge%numedge = ele_IO%numele
       call alloc_edge_connect(edge, nsurf)
-      call alloc_edge_4_ele(edge, ele%numele)
+      call alloc_edge_4_ele(edge, nele)
 !
-      if(edge%numedge .gt. 0) then
-!$omp parallel workshare
-        edge%ie_edge(1:edge%numedge,1:edge%nnod_4_edge)                 &
+      edge%ie_edge(1:edge%numedge,1:edge%nnod_4_edge)                   &
      &        = ele_IO%ie(1:edge%numedge,1:edge%nnod_4_edge)
-!$omp end parallel workshare
-      end if
 !
-      if(nsurf .gt. 0) then
-!$omp parallel workshare
-        edge%iedge_4_sf(1:nsurf,1:nedge_4_surf)                         &
+      edge%iedge_4_sf(1:nsurf,1:nedge_4_surf)                           &
      &        = sfed_IO%isf_for_ele(1:nsurf,1:nedge_4_surf)
-!$omp end parallel workshare
-      end if
 !
-      if(ele%numele .gt. 0) then
-!$omp parallel workshare
-        edge%iedge_4_ele(1:ele%numele,1:nedge_4_ele)                    &
-     &        = sfed_IO%iedge_for_ele(1:ele%numele,1:nedge_4_ele)
-!$omp end parallel workshare
-      end if
+      edge%iedge_4_ele(1:nele,1:nedge_4_ele)                            &
+     &        = sfed_IO%iedge_for_ele(1:nele,1:nedge_4_ele)
 !
       end subroutine copy_edge_connect_from_IO
 !

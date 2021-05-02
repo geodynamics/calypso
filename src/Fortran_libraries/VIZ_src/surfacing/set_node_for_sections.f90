@@ -8,11 +8,10 @@
 !!
 !!@verbatim
 !!      subroutine count_node_on_edge_4_psf                             &
-!!     &         (internal_node, numedge, nnod_4_edge, ie_edge,         &
+!!     &         (numedge, nnod_4_edge, ie_edge, interior_edge,         &
 !!     &          ie_edge, edge_search, psf_list)
-!!      subroutine set_node_on_edge_4_psf                               &
-!!     &         (internal_node, numedge, nnod_4_edge, ie_edge,         &
-!!     &          edge_search, psf_list)
+!!      subroutine set_node_on_edge_4_psf(numedge, nnod_4_edge,         &
+!!     &          ie_edge, interior_edge, edge_search, psf_list)
 !!@endverbatim
 !
       module set_node_for_sections
@@ -29,16 +28,16 @@
 !  ---------------------------------------------------------------------
 !
       subroutine count_node_on_edge_4_psf                               &
-     &         (internal_node, numedge, nnod_4_edge, ie_edge,           &
+     &         (numedge, nnod_4_edge, ie_edge, interior_edge,           &
      &          edge_search, psf_list)
 !
       use m_constants
       use m_machine_parameter
       use cal_minmax_and_stacks
 !
-      integer(kind = kint), intent(in) :: internal_node
       integer(kind = kint), intent(in) :: numedge, nnod_4_edge
       integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
+      integer(kind = kint), intent(in) :: interior_edge(numedge)
       type(sect_search_list), intent(in) :: edge_search
 !
       type(sectioning_list), intent(inout) :: psf_list
@@ -64,7 +63,7 @@
           c0 = psf_list%ref_fld(inod1) * psf_list%ref_fld(inod2)
           if(c0 .le. zero) then
             num_item(ip) = num_item(ip) + 1
-            if(ie_edge(iedge,1) .le. internal_node) then
+            if(interior_edge(iedge) .gt. 0) then
               inter_item(ip) = inter_item(ip) + 1
             else
               exter_item(ip) = exter_item(ip) + 1
@@ -94,16 +93,15 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine set_node_on_edge_4_psf                                 &
-     &         (internal_node, numedge, nnod_4_edge, ie_edge,           &
-     &          edge_search, psf_list)
+      subroutine set_node_on_edge_4_psf(numedge, nnod_4_edge,           &
+     &          ie_edge, interior_edge, edge_search, psf_list)
 !
       use m_machine_parameter
       use m_constants
 !
-      integer(kind = kint), intent(in) :: internal_node
       integer(kind = kint), intent(in) :: numedge, nnod_4_edge
       integer(kind = kint), intent(in) :: ie_edge(numedge,nnod_4_edge)
+      integer(kind = kint), intent(in) :: interior_edge(numedge)
       type(sect_search_list), intent(in) :: edge_search
 !
       type(sectioning_list), intent(inout) :: psf_list
@@ -130,7 +128,7 @@
           inod2 = abs( ie_edge(iedge,2) )
           c0 = psf_list%ref_fld(inod1) * psf_list%ref_fld(inod2)
           if(c0 .le. zero) then
-            if(ie_edge(iedge,1) .le. internal_node) then
+            if(interior_edge(iedge) .gt. 0) then
               icou = icou + 1
               psf_list%iedge_int_nod(icou) = iedge
               psf_list%id_n_on_e(iedge) = icou

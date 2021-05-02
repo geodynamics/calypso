@@ -54,7 +54,6 @@
       use const_mesh_information
       use const_surface_data
       use set_local_id_table_4_1ele
-      use set_nnod_4_ele_by_type
 !
       type(mesh_groups), intent(in) :: group
       type(mesh_geometry), intent(inout) :: mesh
@@ -92,8 +91,6 @@
        call set_surf_domain_id_viewer(mesh%surf, view_mesh)
 !
 !       write(*,*)  'construct_edge_4_viewer'
-      mesh%edge%nnod_4_edge                                             &
-     &    = set_nnod_4_edge_by_ele(mesh%ele%nnod_4_ele)
       call alloc_inod_in_edge(mesh%edge)
       call copy_inod_in_edge(mesh%edge%nnod_4_edge,                     &
      &    mesh%edge%node_on_edge, mesh%edge%node_on_edge_sf)
