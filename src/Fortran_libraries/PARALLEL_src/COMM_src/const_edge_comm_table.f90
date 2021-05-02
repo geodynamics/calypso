@@ -120,16 +120,14 @@
      &     'local node 2: ', i2, node%xx(i2,1:3),                       &
      &     'inod_dbl%irank: ', inod_dbl%irank(i1), inod_dbl%irank(i2),  &
      &     'inod_dbl%index: ', inod_dbl%index(i1), inod_dbl%index(i2)
-        if(node%inod_global(i1).eq.12452273  &
-     &      .and. node%inod_global(i2).eq.16298885) write(*,*)          &
+        if(node%inod_global(i2).eq.16298885) write(*,*)          &
      &     'edge with global_node(12452273, 16298885): ', my_rank, i,   &
      &     'iedge_dbl: ', iedge_dbl%irank(i), iedge_dbl%irank(i),       &
      &     'local node 1: ', i1, node%xx(i1,1:3),                       &
      &     'local node 2: ', i2, node%xx(i2,1:3),                       &
      &     'inod_dbl%irank: ', inod_dbl%irank(i1), inod_dbl%irank(i2),  &
      &     'inod_dbl%index: ', inod_dbl%index(i1), inod_dbl%index(i2)
-        if(node%inod_global(i1).eq.16298885  &
-     &      .and. node%inod_global(i2).eq.12452273) write(*,*)          &
+        if(node%inod_global(i1).eq.16298885) write(*,*)          &
      &     'edge with global_node(16298885, 12452273): ', my_rank, i,   &
      &     'iedge_dbl: ', iedge_dbl%irank(i), iedge_dbl%irank(i),       &
      &     'local node 1: ', i1, node%xx(i1,1:3),                       &
