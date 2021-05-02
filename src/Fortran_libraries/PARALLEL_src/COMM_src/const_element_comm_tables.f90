@@ -209,7 +209,6 @@
      &    edge%numedge, edge%nnod_4_edge, edge%ie_edge,                 &
      &    internal_num, edge%interior_edge, iedge_dbl)
       call calypso_mpi_barrier
-      write(*,*) 'Check'
 !
       do i = 1, edge%numedge
         i1 = edge%ie_edge(i,1)
@@ -249,7 +248,6 @@
       end do
 !
       call calypso_mpi_barrier
-      write(*,*) my_rank, 'set_edge_id_4_node'
       if(iflag_debug.gt.0) write(*,*) ' set_edge_id_4_node in edge'
       call set_edge_id_4_node(node, edge, neib_edge)
 !
@@ -274,7 +272,6 @@
       deallocate(istack_ineredge)
 !
       call calypso_mpi_barrier
-      write(*,*) my_rank, 'check_element_position'
       call check_element_position                                       &
      &   (txt_edge, node%numnod, node%inod_global, edge%numedge,        &
      &    edge%nnod_4_edge, edge%ie_edge, edge%iedge_global,            &
