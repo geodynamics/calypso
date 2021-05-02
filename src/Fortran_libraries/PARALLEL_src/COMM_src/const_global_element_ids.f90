@@ -14,8 +14,9 @@
 !!      subroutine check_global_ele_id                                  &
 !!     &         (txt, nele, internal_flag, e_comm, iele_global)
 !!        type(communication_table), intent(in) :: e_comm
-!!      subroutine check_element_position(txt, nele, nnod_4_ele, ie,    &
-!!     &          iele_global, x_ele, inod_dbl, iele_dbl, e_comm)
+!!      subroutine check_element_position(txt, nnod, inod_global,       &
+!!     &          nele, nnod_4_ele, ie, iele_global, x_ele,             &
+!!     &          inod_dbl, iele_dbl, e_comm)
 !!        type(node_ele_double_number), intent(in) :: inod_dbl
 !!        type(element_double_number), intent(in) ::  iele_dbl
 !!@endverbatim
@@ -180,8 +181,9 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine check_element_position(txt, nele, nnod_4_ele, ie,      &
-     &          iele_global, x_ele, inod_dbl, iele_dbl, e_comm)
+      subroutine check_element_position(txt, nnod, inod_global,         &
+     &          nele, nnod_4_ele, ie, iele_global, x_ele,               &
+     &          inod_dbl, iele_dbl, e_comm)
 !
       use m_solver_SR
       use t_comm_table
@@ -191,6 +193,8 @@
       use solver_SR_type
 !
       character(len=kchara), intent(in) :: txt
+      integer(kind = kint), intent(in) :: nnod
+      integer(kind = kint_gl), intent(in) :: inod_global(nele)
       integer(kind = kint), intent(in) :: nele, nnod_4_ele
       integer(kind = kint), intent(in) :: ie(nele,nnod_4_ele)
       integer(kind = kint_gl), intent(in) :: iele_global(nele)
@@ -259,7 +263,9 @@
      &      my_rank, iele, x_ele(iele,1:3), dx, dy, dz,                 &
      &      'local connectivity: ', ie(iele,1:nnod_4_ele),              &
      &      'origin  rank: ', inod_dbl%irank(ie(iele,1:nnod_4_ele)),    &
-     &      'origin node id: ', inod_dbl%irank(ie(iele,1:nnod_4_ele))
+     &      'origin node id: ', inod_dbl%index(ie(iele,1:nnod_4_ele)),  &
+     &      'origin global node id: ',                                  &
+     &      inod_global(ie(iele,1:nnod_4_ele))
         end if
       end do
 !

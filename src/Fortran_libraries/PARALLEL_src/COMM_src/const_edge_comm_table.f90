@@ -128,9 +128,9 @@
 !      write(*,*) 'check_element_position', my_rank
 !      if(iflag_ecomm_time) call start_elapsed_time(ist_elapsed+6)
       call check_element_position                                       &
-     &   (txt_edge, edge%numedge, edge%nnod_4_edge, edge%ie_edge,       &
-     &    edge_gl%iedge_global, edge%x_edge, inod_dbl, iedge_dbl,       &
-     &    edge_comm)
+     &   (txt_edge, node%numnod, node%inod_global, edge%numedge,        &
+     &    edge%nnod_4_edge, edge%ie_edge, edge_gl%iedge_global,         &
+     &    edge%x_edge, inod_dbl, iedge_dbl, edge_comm)
 !      if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+6)
       call dealloc_double_numbering(inod_dbl)
       call dealloc_ele_double_number(iedge_dbl)
