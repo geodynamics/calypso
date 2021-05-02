@@ -162,6 +162,14 @@
       call check_global_ele_id(txt_ele, ele%numele,                     &
      &    ele%interior_ele, ele_comm, ele%iele_global)
 !
+!      write(*,*) 'check_element_position', my_rank
+!      if(iflag_ecomm_time) call start_elapsed_time(ist_elapsed+6)
+      call check_element_position                                       &
+     &   (txt_ele, ele%numele, ele%nnod_4_ele, ele%ie,                  &
+     &    ele%iele_global, ele%x_ele, inod_dbl, iele_dbl,               &
+     &    ele_comm)
+!      if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+6)
+!
       end subroutine const_ele_comm_table
 !
 !-----------------------------------------------------------------------

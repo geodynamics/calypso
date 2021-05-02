@@ -111,8 +111,6 @@
      &   (txt_edge, edge%numedge, edge%nnod_4_edge, edge%ie_edge,       &
      &    edge%x_edge, node, nod_comm, inod_dbl, iedge_dbl,             &
      &    neib_edge, edge_comm, fail_tbl_d)
-      call dealloc_ele_double_number(iedge_dbl)
-      call dealloc_double_numbering(inod_dbl)
       call dealloc_iele_belonged(neib_edge)
       call dealloc_failed_export(fail_tbl_d)
 !
@@ -125,6 +123,17 @@
      &   (txt_edge, edge%numedge, istack_ineredge,                      &
      &    edge_gl%interior_edge, edge_comm, edge_gl%iedge_global)
       deallocate(istack_ineredge)
+!
+!
+!      write(*,*) 'check_element_position', my_rank
+!      if(iflag_ecomm_time) call start_elapsed_time(ist_elapsed+6)
+      call check_element_position                                       &
+     &   (txt_edge, edge%numedge, edge%nnod_4_edge, edge%ie_edge,       &
+     &    edge_gl%iedge_global, edge%x_edge, inod_dbl, iedge_dbl,       &
+     &    edge_comm)
+!      if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+6)
+      call dealloc_double_numbering(inod_dbl)
+      call dealloc_ele_double_number(iedge_dbl)
 !
       end subroutine s_const_edge_comm_table
 !

@@ -14,7 +14,10 @@
 !!      subroutine check_global_ele_id                                  &
 !!     &         (txt, nele, internal_flag, e_comm, iele_global)
 !!        type(communication_table), intent(in) :: e_comm
-!!      subroutine check_element_position(txt, nele, x_ele, e_comm)
+!!      subroutine check_element_position(txt, nele, nnod_4_ele, ie,    &
+!!     &          iele_global, x_ele, inod_dbl, iele_dbl, e_comm)
+!!        type(node_ele_double_number), intent(in) :: inod_dbl
+!!        type(element_double_number), intent(in) ::  iele_dbl
 !!@endverbatim
 !!
       module const_global_element_ids
@@ -177,28 +180,41 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine check_element_position(txt, nele, x_ele, e_comm)
+      subroutine check_element_position(txt, nele, nnod_4_ele, ie,      &
+     &          iele_global, x_ele, inod_dbl, iele_dbl, e_comm)
 !
       use m_solver_SR
       use t_comm_table
+      use t_para_double_numbering
+      use t_element_double_number
       use calypso_mpi_int
       use solver_SR_type
 !
       character(len=kchara), intent(in) :: txt
-      integer(kind = kint), intent(in) :: nele
+      integer(kind = kint), intent(in) :: nele, nnod_4_ele
+      integer(kind = kint), intent(in) :: ie(nele,nnod_4_ele)
+      integer(kind = kint_gl), intent(in) :: iele_global(nele)
       real(kind = kreal), intent(in)  :: x_ele(nele,3)
 !
+      type(node_ele_double_number), intent(in) :: inod_dbl
+      type(element_double_number), intent(in) ::  iele_dbl
       type(communication_table), intent(in) :: e_comm
 !
 !
       real(kind = kreal) :: dx, dy, dz
       real(kind = kreal), allocatable :: x_test(:)
-      integer(kind = kint) :: iele, inum, iflag, iflag_gl
+      integer(kind = kint), allocatable :: id_test(:,:)
+      integer(kind = kint), allocatable :: ir_test(:,:)
+      integer(kind = kint_gl), allocatable :: l_test(:)
+      integer(kind = kint) :: iele, inum, iflag, iflag_gl, k1
 !
 !
       if(i_debug .gt. 0) write(*,*) 'Number of  ', trim(txt),           &
      &           ' for ', my_rank, ': ',   nele, size(x_ele,1)
       allocate(x_test(3*nele))
+      allocate(id_test(nele,nnod_4_ele))
+      allocate(ir_test(nele,nnod_4_ele))
+      allocate(l_test(nele))
 !
 !$omp parallel do
       do iele = 1, nele
@@ -208,12 +224,24 @@
       end do
 !$omp end parallel do
 !
+      do k1 = 1, nnod_4_ele
+!$omp parallel workshare
+        id_test(1:nele,k1) = inod_dbl%index(ie(iele,k1))
+        ir_test(1:nele,k1) = inod_dbl%irank(ie(iele,k1))
+!$omp end parallel workshare
+      end do
+!$omp parallel workshare
+      l_test(1:nele) = iele_global(1:nele)
+!$omp end parallel workshare
+!
+!
 !$omp parallel do private(inum,iele)
       do inum = 1, e_comm%ntot_import
         iele = e_comm%item_import(inum)
         x_test(3*iele-2) = 1.e30
         x_test(3*iele-1) = 1.e30
         x_test(3*iele  ) = 1.e30
+        l_test(iele) = 0
       end do
 !$omp end parallel do
 !
@@ -228,7 +256,10 @@
         if(     (abs(dx) .ge. TINY)  .or. (abs(dy) .ge. TINY)           &
      &     .or. (abs(dz) .ge. TINY)) then
           write(*,*) 'wrong ', trim(txt), ' position at: ',             &
-     &         my_rank, iele, x_ele(iele,1:3), dx, dy, dz
+     &      my_rank, iele, x_ele(iele,1:3), dx, dy, dz,                 &
+     &      'local connectivity: ', ie(iele,1:nnod_4_ele),              &
+     &      'origin  rank: ', inod_dbl%irank(ie(iele,1:nnod_4_ele)),    &
+     &      'origin node id: ', inod_dbl%irank(ie(iele,1:nnod_4_ele))
         end if
       end do
 !
@@ -236,7 +267,7 @@
       if(iflag_gl .eq. 0 .and. my_rank .eq. 0) write(*,*)               &
      &     trim(txt), ' position is successfully syncronizad'
 !
-      deallocate(x_test)
+      deallocate(x_test, id_test, ir_test, l_test)
 !
       end subroutine check_element_position
 !
