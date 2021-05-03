@@ -199,6 +199,12 @@
       integer(kind = kint_gl), allocatable :: istack_ineredge(:)
       integer(kind = kint) :: i, i1, i2
 !
+      integer, external :: omp_get_max_threads
+      integer :: nsmp
+!
+!
+      nsmp = omp_get_max_threads()
+      call omp_set_num_threads(1)
 !
       call alloc_double_numbering(node%numnod, inod_dbl)
       call set_node_double_numbering(node, nod_comm, inod_dbl)
@@ -208,44 +214,6 @@
       call find_belonged_pe_4_edge(my_rank, inod_dbl,                   &
      &    edge%numedge, edge%nnod_4_edge, edge%ie_edge,                 &
      &    internal_num, edge%interior_edge, iedge_dbl)
-      call calypso_mpi_barrier
-!
-      do i = 1, edge%numedge
-        i1 = edge%ie_edge(i,1)
-        i2 = edge%ie_edge(i,2)
-        if(node%inod_global(i1).eq.9687462  &
-     &      .and. node%inod_global(i2).eq.9687687) write(*,*)           &
-     &     'edge with global_node(9687462, 9687687): ', my_rank, i,     &
-     &     'iedge_dbl: ', iedge_dbl%irank(i), iedge_dbl%k_ref(i),       &
-     &     'local node 1: ', i1, node%xx(i1,1:3),                       &
-     &     'local node 2: ', i2, node%xx(i2,1:3),                       &
-     &     'inod_dbl%irank: ', inod_dbl%irank(i1), inod_dbl%irank(i2),  &
-     &     'inod_dbl%index: ', inod_dbl%index(i1), inod_dbl%index(i2)
-        if(node%inod_global(i1).eq.9687687  &
-     &      .and. node%inod_global(i2).eq.9687462) write(*,*)           &
-     &     'edge with global_node(9687687, 9687462): ', my_rank, i,     &
-     &     'iedge_dbl: ', iedge_dbl%irank(i), iedge_dbl%irank(i),       &
-     &     'local node 1: ', i1, node%xx(i1,1:3),                       &
-     &     'local node 2: ', i2, node%xx(i2,1:3),                       &
-     &     'inod_dbl%irank: ', inod_dbl%irank(i1), inod_dbl%irank(i2),  &
-     &     'inod_dbl%index: ', inod_dbl%index(i1), inod_dbl%index(i2)
-        if(node%inod_global(i2).eq.16298885) write(*,*)          &
-     &     'edge with global_node(', node%inod_global(i1),      &
-     &     ', 16298885): ', my_rank, i,   &
-     &     'iedge_dbl: ', iedge_dbl%irank(i), iedge_dbl%irank(i),       &
-     &     'local node 1: ', i1, node%xx(i1,1:3),                       &
-     &     'local node 2: ', i2, node%xx(i2,1:3),                       &
-     &     'inod_dbl%irank: ', inod_dbl%irank(i1), inod_dbl%irank(i2),  &
-     &     'inod_dbl%index: ', inod_dbl%index(i1), inod_dbl%index(i2)
-        if(node%inod_global(i1).eq.16298885) write(*,*)          &
-     &     'edge with global_node(16298885, ', node%inod_global(i2), &
-     &     '): ', my_rank, i,   &
-     &     'iedge_dbl: ', iedge_dbl%irank(i), iedge_dbl%irank(i),       &
-     &     'local node 1: ', i1, node%xx(i1,1:3),                       &
-     &     'local node 2: ', i2, node%xx(i2,1:3),                       &
-     &     'inod_dbl%irank: ', inod_dbl%irank(i1), inod_dbl%irank(i2),  &
-     &     'inod_dbl%index: ', inod_dbl%index(i1), inod_dbl%index(i2)
-      end do
 !
       call calypso_mpi_barrier
       if(iflag_debug.gt.0) write(*,*) ' set_edge_id_4_node in edge'
@@ -260,6 +228,7 @@
      &    neib_edge, edge_comm, fail_tbl_d)
       call dealloc_iele_belonged(neib_edge)
       call dealloc_failed_export(fail_tbl_d)
+      call omp_set_num_threads(nsmp)
 !
 !
       allocate(istack_ineredge(0:nprocs))
