@@ -211,6 +211,8 @@
       integer(kind = kint), allocatable :: ir_test(:,:)
       integer(kind = kint_gl), allocatable :: l_test(:)
       integer(kind = kint) :: iele, inum, iflag, iflag_gl, k1
+      integer(kind = kint) :: ip
+      integer(kind = kint) :: inod_e(nnod_4_ele)
 !
 !
       if(i_debug .gt. 0) write(*,*) 'Number of  ', trim(txt),           &
@@ -252,6 +254,10 @@
       call SOLVER_SEND_RECV_3_type(nele, e_comm,                        &
      &                             SR_sig1, SR_r1, x_test(1))
 !
+      call calypso_mpi_barrier
+      do ip = 1, nprocs
+      if(my_rank .eq. ip-1) then
+!
       iflag = 0
       do iele = 1, nele
         dx = x_test(3*iele-2) - x_ele(iele,1)
@@ -259,14 +265,20 @@
         dz = x_test(3*iele  ) - x_ele(iele,3)
         if(     (abs(dx) .ge. TINY)  .or. (abs(dy) .ge. TINY)           &
      &     .or. (abs(dz) .ge. TINY)) then
+          inod_e(1:nnod_4_ele) = ie(iele,1:nnod_4_ele)
           write(*,*) 'wrong ', trim(txt), ' position at: ',             &
      &      my_rank, iele, x_ele(iele,1:3), dx, dy, dz,                 &
-     &      'local connectivity: ', ie(iele,1:nnod_4_ele),              &
-     &      'origin  rank: ', inod_dbl%irank(ie(iele,1:nnod_4_ele)),    &
-     &      'origin node id: ', inod_dbl%index(ie(iele,1:nnod_4_ele)),  &
+     &      'local connectivity: ', inod_e(1:nnod_4_ele),              &
+     &      'origin  rank: ', inod_dbl%irank(inod_e(1:nnod_4_ele)),    &
+     &      'origin node id: ', inod_dbl%index(inod_e(1:nnod_4_ele)),  &
      &      'origin global node id: ',                                  &
-     &      inod_global(ie(iele,1:nnod_4_ele))
+     &      inod_global(inod_e(1:nnod_4_ele))
+
         end if
+      end do
+!
+      end if
+      call calypso_mpi_barrier
       end do
 !
       call calypso_mpi_allreduce_one_int(iflag, iflag_gl, MPI_SUM)
