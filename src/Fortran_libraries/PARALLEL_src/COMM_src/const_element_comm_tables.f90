@@ -42,9 +42,8 @@
 !
       character(len=kchara), parameter :: txt_ele =  'element'
       character(len=kchara), parameter :: txt_edge = 'edge'
-      character(len=kchara), parameter :: txt_surf = 'surface'
 !
-      private :: txt_ele, txt_edge, txt_surf
+      private :: txt_ele, txt_edge
 !
 !-----------------------------------------------------------------------
 !
@@ -197,7 +196,7 @@
 !
       integer(kind = kint) :: internal_num = 0
       integer(kind = kint_gl), allocatable :: istack_ineredge(:)
-      integer(kind = kint) :: i, i1, i2
+!      integer(kind = kint) :: i, i1, i2
 !
       call alloc_double_numbering(node%numnod, inod_dbl)
       call set_node_double_numbering(node, nod_comm, inod_dbl)
@@ -208,7 +207,6 @@
      &    edge%numedge, edge%nnod_4_edge, edge%ie_edge,                 &
      &    internal_num, edge%interior_edge, iedge_dbl)
 !
-      call calypso_mpi_barrier
       if(iflag_debug.gt.0) write(*,*) ' set_edge_id_4_node in edge'
       call set_edge_id_4_node(node, edge, neib_edge)
 !
