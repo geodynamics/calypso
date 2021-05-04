@@ -73,7 +73,7 @@
 !
       subroutine elapsed_label_4_ele_comm_tbl
 !
-      integer(kind = kint), parameter :: num_append = 6
+      integer(kind = kint), parameter :: num_append = 5
 !
 !
       call append_elapsed_times(num_append, ist_elapsed, ied_elapsed)
@@ -83,7 +83,6 @@
       elps1%labels(ist_elapsed+3) = 'num_items_send_recv'
       elps1%labels(ist_elapsed+4) = 'element_data_reverse_SR'
       elps1%labels(ist_elapsed+5) = 'set_element_export_item'
-      elps1%labels(ist_elapsed+6) = 'check_element_position'
 !
       iflag_ecomm_time = .TRUE.
 !
@@ -173,11 +172,6 @@
      &    wk_comm%xe_export, e_comm%item_export, fail_tbl)
       call dealloc_element_rev_exports(wk_comm)
 !      if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+5)
-!
-!      write(*,*) 'check_element_position', my_rank
-!      if(iflag_ecomm_time) call start_elapsed_time(ist_elapsed+6)
-      call check_element_position(txt, numele, x_ele, e_comm)
-!      if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+6)
 !
       end subroutine const_comm_table_by_connenct
 !
