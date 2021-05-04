@@ -17,8 +17,6 @@
 !!      subroutine check_element_position(txt, nnod, inod_global,       &
 !!     &          nele, nnod_4_ele, ie, iele_global, x_ele,             &
 !!     &          inod_dbl, iele_dbl, e_comm)
-!!        type(node_ele_double_number), intent(in) :: inod_dbl
-!!        type(element_double_number), intent(in) ::  iele_dbl
 !!@endverbatim
 !!
       module const_global_element_ids
@@ -207,8 +205,8 @@
 !
       real(kind = kreal) :: dx, dy, dz
       real(kind = kreal), allocatable :: x_test(:)
-      integer(kind = kint), allocatable :: id_test(:,:)
-      integer(kind = kint), allocatable :: ir_test(:,:)
+!      integer(kind = kint), allocatable :: id_test(:,:)
+!      integer(kind = kint), allocatable :: ir_test(:,:)
       integer(kind = kint_gl), allocatable :: l_test(:)
       integer(kind = kint) :: iele, inum, iflag, iflag_gl, k1
       integer(kind = kint) :: ip
@@ -218,8 +216,8 @@
       if(i_debug .gt. 0) write(*,*) 'Number of  ', trim(txt),           &
      &           ' for ', my_rank, ': ',   nele, size(x_ele,1)
       allocate(x_test(3*nele))
-      allocate(id_test(nele,nnod_4_ele))
-      allocate(ir_test(nele,nnod_4_ele))
+!      allocate(id_test(nele,nnod_4_ele))
+!      allocate(ir_test(nele,nnod_4_ele))
       allocate(l_test(nele))
 !
 !$omp parallel do
@@ -230,15 +228,14 @@
       end do
 !$omp end parallel do
 !
-      do k1 = 1, nnod_4_ele
-!$omp parallel workshare
-        id_test(1:nele,k1) = inod_dbl%index(ie(iele,k1))
-        ir_test(1:nele,k1) = inod_dbl%irank(ie(iele,k1))
-!$omp end parallel workshare
-      end do
 !$omp parallel workshare
       l_test(1:nele) = iele_global(1:nele)
 !$omp end parallel workshare
+!
+!      do k1 = 1, nnod_4_ele
+!        id_test(1:nele,k1) = inod_dbl%index(ie(iele,k1))
+!        ir_test(1:nele,k1) = inod_dbl%irank(ie(iele,k1))
+!      end do
 !
 !
 !$omp parallel do private(inum,iele)
@@ -254,10 +251,6 @@
       call SOLVER_SEND_RECV_3_type(nele, e_comm,                        &
      &                             SR_sig1, SR_r1, x_test(1))
 !
-      call calypso_mpi_barrier
-      do ip = 1, nprocs
-      if(my_rank .eq. ip-1) then
-!
       iflag = 0
       do iele = 1, nele
         dx = x_test(3*iele-2) - x_ele(iele,1)
@@ -265,27 +258,25 @@
         dz = x_test(3*iele  ) - x_ele(iele,3)
         if(     (abs(dx) .ge. TINY)  .or. (abs(dy) .ge. TINY)           &
      &     .or. (abs(dz) .ge. TINY)) then
+          iflag = iflag + 1
           inod_e(1:nnod_4_ele) = ie(iele,1:nnod_4_ele)
           write(*,*) 'wrong ', trim(txt), ' position at: ',             &
      &      my_rank, iele, x_ele(iele,1:3), dx, dy, dz,                 &
-     &      'local connectivity: ', inod_e(1:nnod_4_ele),              &
-     &      'origin  rank: ', inod_dbl%irank(inod_e(1:nnod_4_ele)),    &
-     &      'origin node id: ', inod_dbl%index(inod_e(1:nnod_4_ele)),  &
+     &      'local connectivity: ', inod_e(1:nnod_4_ele),               &
+     &      'origin  rank: ', inod_dbl%irank(inod_e(1:nnod_4_ele)),     &
+     &      'origin node id: ', inod_dbl%index(inod_e(1:nnod_4_ele)),   &
      &      'origin global node id: ',                                  &
      &      inod_global(inod_e(1:nnod_4_ele))
 
         end if
       end do
 !
-      end if
-      call calypso_mpi_barrier
-      end do
-!
       call calypso_mpi_allreduce_one_int(iflag, iflag_gl, MPI_SUM)
       if(iflag_gl .eq. 0 .and. my_rank .eq. 0) write(*,*)               &
      &     trim(txt), ' position is successfully syncronizad'
 !
-      deallocate(x_test, id_test, ir_test, l_test)
+!      deallocate(id_test, ir_test)
+      deallocate(x_test, l_test)
 !
       end subroutine check_element_position
 !
