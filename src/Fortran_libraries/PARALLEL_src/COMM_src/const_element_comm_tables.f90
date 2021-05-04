@@ -157,7 +157,6 @@
       call dealloc_iele_belonged(neib_ele)
       call dealloc_failed_export(fail_tbl_e)
 !
-!
       call const_global_numele_list(ele)
       call check_global_ele_id(txt_ele, ele%numele,                     &
      &    ele%interior_ele, ele_comm, ele%iele_global)
@@ -197,6 +196,7 @@
 !
       integer(kind = kint) :: internal_num = 0
       integer(kind = kint_gl), allocatable :: istack_ineredge(:)
+!      integer(kind = kint) :: i, i1, i2
 !
 !
       call alloc_double_numbering(node%numnod, inod_dbl)

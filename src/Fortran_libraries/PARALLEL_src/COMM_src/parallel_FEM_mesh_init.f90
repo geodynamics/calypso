@@ -55,6 +55,8 @@
       if (iflag_debug .gt. 0) write(*,*) 'const_surface_infos tako'
       call const_surface_infos(my_rank, mesh%node, mesh%ele,            &
      &    group%surf_grp, mesh%surf, group%surf_nod_grp)
+!
+!
       if (iflag_debug.gt.0) write(*,*) 'const_para_edge_infos'
       call const_para_edge_infos(mesh%nod_comm, mesh%node, mesh%ele,    &
      &                           mesh%surf, mesh%edge)
