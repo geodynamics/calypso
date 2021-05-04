@@ -48,9 +48,6 @@
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
 !
-      integer, external :: omp_get_max_threads
-      integer :: nsmp
-!
 !  -----    construct geometry informations
 !
       if (iflag_debug.gt.0) write(*,*) 'const_nod_ele_infos'
@@ -60,13 +57,9 @@
      &    group%surf_grp, mesh%surf, group%surf_nod_grp)
 
 
-      nsmp = omp_get_max_threads()
-      call omp_set_num_threads(1)
-!
       if (iflag_debug.gt.0) write(*,*) 'const_para_edge_infos'
       call const_para_edge_infos(mesh%nod_comm, mesh%node, mesh%ele,    &
      &                           mesh%surf, mesh%edge)
-      call omp_set_num_threads(nsmp)
 !
       if(iflag_debug.gt.0) write(*,*) 'const_global_mesh_infos'
       call const_global_mesh_infos(mesh)

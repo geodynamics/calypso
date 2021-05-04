@@ -199,13 +199,6 @@
       integer(kind = kint_gl), allocatable :: istack_ineredge(:)
       integer(kind = kint) :: i, i1, i2
 !
-      integer, external :: omp_get_max_threads
-      integer :: nsmp
-!
-!
-      nsmp = omp_get_max_threads()
-      call omp_set_num_threads(1)
-!
       call alloc_double_numbering(node%numnod, inod_dbl)
       call set_node_double_numbering(node, nod_comm, inod_dbl)
 !
@@ -228,7 +221,6 @@
      &    neib_edge, edge_comm, fail_tbl_d)
       call dealloc_iele_belonged(neib_edge)
       call dealloc_failed_export(fail_tbl_d)
-      call omp_set_num_threads(nsmp)
 !
 !
       allocate(istack_ineredge(0:nprocs))
