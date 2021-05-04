@@ -139,11 +139,11 @@
       end if
 !
 !
-      if(iflag_GSP_time) call start_elapsed_time(ied_elapsed_GSP+9)
+      if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+9)
       call base_FEM_mesh_sph_mhd                                        &
      &   (sph%sph_params, sph%sph_rtp, sph%sph_rj,                      &
      &    mesh, group, gen_sph)
-      if(iflag_GSP_time) call end_elapsed_time(ied_elapsed_GSP+9)
+      if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+9)
 !
 ! Output mesh data
       if(FEM_mesh_flags%iflag_access_FEM .gt. 0) then
