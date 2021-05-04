@@ -46,19 +46,17 @@
       use set_edge_hash_by_ele
       use set_edge_data_by_ele
       use set_local_id_table_4_1ele
-      use set_nnod_4_ele_by_type
 !
-      type(node_data), intent(in)      :: node
-      type(element_data), intent(in)   :: ele
-      type(surface_data), intent(in)   :: surf
+      type(node_data),    intent(in) :: node
+      type(element_data), intent(in) :: ele
+      type(surface_data), intent(in) :: surf
       integer(kind = kint), intent(in) :: irank_local(node%numnod)
       integer(kind = kint), intent(in) :: inod_local(node%numnod)
 !
-      type(edge_data), intent(inout) :: edge
+      type(edge_data),    intent(inout) :: edge
 !
 !
       if (iflag_debug.eq.1) write(*,*) 'alloc_inod_in_edge'
-      edge%nnod_4_edge = set_nnod_4_edge_by_ele(ele%nnod_4_ele)
       call alloc_inod_in_edge(edge)
       call copy_inod_in_edge(edge%nnod_4_edge,                          &
      &    edge%node_on_edge, edge%node_on_edge_sf)
@@ -108,8 +106,6 @@
       subroutine empty_edge_connect_type(ele, surf, edge)
 !
       use m_machine_parameter
-      use set_nnod_4_ele_by_type
-      use set_local_id_table_4_1ele
 !
       type(element_data), intent(in) :: ele
       type(surface_data), intent(in) :: surf
@@ -117,11 +113,6 @@
 !
 !
       edge%numedge = 0
-      edge%nnod_4_edge = set_nnod_4_edge_by_ele(ele%nnod_4_ele)
-      call alloc_inod_in_edge(edge)
-      call copy_inod_in_edge(edge%nnod_4_edge,                          &
-     &    edge%node_on_edge, edge%node_on_edge_sf)
-!
       if (iflag_debug.eq.1) write(*,*) 'empty edge data'
       call alloc_edge_connect(edge, surf%numsurf)
       call alloc_edge_4_ele(edge, ele%numele)

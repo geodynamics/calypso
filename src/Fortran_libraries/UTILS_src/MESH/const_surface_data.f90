@@ -53,7 +53,6 @@
       subroutine construct_surface_data(node, ele, surf)
 !
       use set_local_id_table_4_1ele
-      use set_nnod_4_ele_by_type
       use set_surface_hash
 !
       type(node_data),    intent(in) :: node
@@ -61,9 +60,8 @@
       type(surface_data), intent(inout) :: surf
 !
 !
-      if (iflag_debug.eq.1) write(*,*) 'alloc_inod_in_surf'
-      surf%nnod_4_surf = set_nnod_4_surf_by_ele(ele%nnod_4_ele)
-      call alloc_inod_in_surf(surf)
+      if (iflag_debug.eq.1) write(*,*) 'allocate_inod_in_surf'
+      call allocate_inod_in_surf(surf)
       call set_inod_in_surf(surf%nnod_4_surf,                           &
      &                      surf%node_on_sf, surf%node_on_sf_n)
 !
@@ -108,14 +106,11 @@
 !
       subroutine empty_surface_connect(ele, surf)
 !
-      use set_nnod_4_ele_by_type
-!
       type(element_data), intent(in) :: ele
       type(surface_data), intent(inout) :: surf
 !
 !
       surf%numsurf = 0
-      surf%nnod_4_surf = set_nnod_4_surf_by_ele(ele%nnod_4_ele)
       if (iflag_debug.eq.1) write(*,*) 'alloc_surface_connect'
       call alloc_surface_connect(surf, ele%numele)
 !
@@ -136,12 +131,14 @@
       type(sum_hash_tbl), intent(inout) :: sf_ele_tbl
 !
 !   set hash data for suface elements using sum of local node ID
+!
+!
       call count_surface_hash(ele%numele, ele%nnod_4_ele, ele%ie,       &
-     &    sf_ele_tbl%ntot_id, sf_ele_tbl%num_hash,                      &
+     &    surf_ele_tbl%ntot_id, sf_ele_tbl%num_hash,                    &
      &    sf_ele_tbl%istack_hash, sf_ele_tbl%iend_hash)
 !
       call set_surf_hash(ele%numele, ele%nnod_4_ele, ele%ie,            &
-     &    sf_ele_tbl%ntot_id, sf_ele_tbl%ntot_list,                     &
+     &    surf_ele_tbl%ntot_id, surf_ele_tbl%ntot_list,                 &
      &    sf_ele_tbl%num_hash, sf_ele_tbl%istack_hash,                  &
      &    sf_ele_tbl%id_hash)
 !
@@ -181,7 +178,6 @@
 !
       use mark_surf_hash
       use set_surface_data
-      use set_nnod_4_ele_by_type
 !
       type(element_data), intent(in) :: ele
 !
@@ -280,7 +276,7 @@
 !
       if (iflag_debug.eq.1) write(*,*) 'mark_independent_surface'
       call mark_independent_surface(ele%numele, ele%nnod_4_ele, ele%ie, &
-     &    sf_ele_tbl%ntot_id, sf_ele_tbl%ntot_list,                     &
+     &    surf_ele_tbl%ntot_id, surf_ele_tbl%ntot_list,                 &
      &    sf_ele_tbl%istack_hash, sf_ele_tbl%iend_hash,                 &
      &    sf_ele_tbl%id_hash, sf_ele_tbl%iflag_hash)
 !

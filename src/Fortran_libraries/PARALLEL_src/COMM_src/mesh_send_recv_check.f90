@@ -11,6 +11,8 @@
 !!     &         (node, nod_comm, nod_check)
 !!      subroutine ele_send_recv_test                                   &
 !!     &         (node, ele, ele_comm, ele_check)
+!!      subroutine edge_send_recv_test                                  &
+!!     &         (node, edge, edge_comm, edge_check)
 !!        type(node_data), intent(in) :: node
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(work_for_comm_check), intent(inout) :: nod_check
@@ -27,9 +29,6 @@
 !!        type(communication_table), intent(in) :: new_comm
 !!        type(calypso_comm_table), intent(in) :: trans_tbl
 !!        type(work_for_comm_check), intent(inout) :: nod_check
-!!
-!!      subroutine collect_failed_comm(wk_check)
-!!        type(work_for_comm_check), intent(inout) :: wk_check
 !!@endverbatim
 !
       module mesh_send_recv_check
@@ -53,7 +52,8 @@
 !
       type(send_recv_status), save, private :: SR_sig_c
 !
-      private :: nod_send_recv_check
+      private :: collect_failed_comm
+      private :: nod_send_recv_check, ele_send_recv_check
 !
 ! ----------------------------------------------------------------------
 !
@@ -102,7 +102,6 @@
       use diff_geometory_comm_test
       use nod_phys_send_recv
       use solver_SR_type
-      use const_element_comm_tables
 !
       type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
@@ -127,6 +126,39 @@
      &    ele_check%istack_diff_pe(nprocs)
 !
       end subroutine ele_send_recv_test
+!
+! ----------------------------------------------------------------------
+!
+      subroutine edge_send_recv_test                                    &
+     &         (node, edge, edge_comm, edge_check)
+!
+      use m_solver_SR
+      use diff_geometory_comm_test
+      use solver_SR_type
+!
+      type(node_data), intent(in) :: node
+      type(edge_data), intent(in) :: edge
+      type(communication_table), intent(in) :: edge_comm
+      type(work_for_comm_check), intent(inout) :: edge_check
+!
+!
+      call alloc_geom_4_comm_test(edge%numedge, edge_check)
+      call set_element_4_comm_test(edge%numedge ,edge%interior_edge,    &
+     &                             edge%x_edge, edge_check%xx_test)
+      call SOLVER_SEND_RECV_3_type(edge%numedge, edge_comm,             &
+     &                             SR_sig1, SR_r1, edge_check%xx_test)
+!
+      call ele_send_recv_check                                          &
+     &   (edge%numedge, edge%iedge_global, edge%x_edge, edge_check)
+!
+      if(i_debug .gt. 0)  write(*,*) my_rank,                           &
+     &     'Failed communication for edge', edge_check%num_diff
+      call collect_failed_comm(edge_check)
+      if(my_rank .eq. 0) write(*,*) my_rank,                            &
+     &   'Total Failed communication for edge',                         &
+     &    edge_check%istack_diff_pe(nprocs)
+!
+      end subroutine edge_send_recv_test
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
@@ -201,6 +233,30 @@
      &    nod_check%i_diff, nod_check%x_diff)
 !
       end subroutine nod_send_recv_check
+!
+! ----------------------------------------------------------------------
+!
+      subroutine ele_send_recv_check(numele, iele_gl, x_ele, wk_check)
+!
+      use diff_geometory_comm_test
+      use solver_SR_type
+!
+      integer(kind = kint), intent(in) :: numele
+      integer(kind = kint_gl), intent(in) :: iele_gl(numele)
+      real(kind = kreal), intent(in) :: x_ele(numele,3)
+!
+      type(work_for_comm_check), intent(inout) :: wk_check
+!
+!
+      wk_check%num_diff =  count_ele_comm_test                          &
+     &               (numele, x_ele, wk_check%xx_test)
+      call alloc_diff_ele_comm_test(wk_check)
+      call compare_ele_comm_test(numele, x_ele,                         &
+     &    wk_check%xx_test, wk_check%num_diff,                          &
+     &    wk_check%i_diff, wk_check%x_diff)
+      call dealloc_ele_4_comm_test(wk_check)
+!
+      end subroutine ele_send_recv_check
 !
 ! ----------------------------------------------------------------------
 !

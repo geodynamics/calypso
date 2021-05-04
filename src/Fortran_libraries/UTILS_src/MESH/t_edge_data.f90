@@ -9,6 +9,7 @@
 !!@verbatim
 !!      subroutine alloc_inod_in_edge(edge)
 !!      subroutine alloc_edge_connect(edge, nsurf)
+!!      subroutine alloc_interior_edge(edge)
 !!      subroutine alloc_edge_4_ele(edge, nele)
 !!      subroutine alloc_isolate_edge(edge)
 !!      subroutine alloc_edge_geometory(edge)
@@ -20,6 +21,7 @@
 !!
 !!      subroutine dealloc_inod_in_edge(edge)
 !!      subroutine dealloc_edge_connect(edge)
+!!      subroutine dealloc_interior_edge(edge)
 !!      subroutine dealloc_edge_4_ele(edge)
 !!      subroutine dealloc_isolate_edge(edge)
 !!      subroutine dealloc_edge_geometory(edge)
@@ -29,11 +31,6 @@
 !!        integer(kind = kint), intent(in) :: nele
 !!        integer(kind = kint), intent(in) :: nsurf
 !!        type(edge_data), intent(inout) :: edge
-!!
-!!      subroutine alloc_interior_edge(edge, edge_gl)
-!!      subroutine dealloc_interior_edge(edge_gl)
-!!        type(edge_data), intent(in) :: edge
-!!        type(global_edge_data), intent(inout) :: edge_gl
 !!@endverbatim
 !
       module t_edge_data
@@ -63,6 +60,11 @@
 !>     maximum number of internal smp edge on local PE
         integer( kind=kint )  ::  max_internal_edge_smp
 !
+!>       global edge id (where i:edge id)
+        integer(kind=kint_gl), allocatable  ::  iedge_global(:)
+!>    integer flag for interior edge 1...interior, 0...exterior
+        integer(kind = kint), allocatable :: interior_edge(:)
+!
 !>   edge connectivity ie_edge(i:edge ID,j:surface index)
         integer(kind=kint), allocatable  :: ie_edge(:,:)
 !>   edge ID for each surface
@@ -84,14 +86,6 @@
 !>   edge vector
         real(kind = kreal), allocatable :: edge_vect(:,:)
       end type edge_data
-!
-!>     Structure for global edge data
-      type global_edge_data
-!>       global edge id (where i:edge id)
-        integer(kind=kint_gl), allocatable  ::  iedge_global(:)
-!>    integer flag for interior edge 1...interior, 0...exterior
-        integer(kind = kint), allocatable :: interior_edge(:)
-      end type global_edge_data
 !
 !  ---------------------------------------------------------------------
 !
@@ -127,6 +121,24 @@
       if(edge%numedge .gt. 0) edge%ie_edge =       0
 !
       end subroutine alloc_edge_connect
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine alloc_interior_edge(edge)
+!
+      use m_geometry_constants
+!
+      type(edge_data), intent(inout) :: edge
+!
+      allocate(edge%iedge_global(edge%numedge))
+      allocate(edge%interior_edge(edge%numedge))
+!
+      if(edge%numedge .gt. 0) then
+        edge%iedge_global =  0
+        edge%interior_edge = 0
+      end if
+!
+      end subroutine alloc_interior_edge
 !
 !  ---------------------------------------------------------------------
 !
@@ -227,6 +239,17 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine dealloc_interior_edge(edge)
+!
+      type(edge_data), intent(inout) :: edge
+!
+      if(allocated(edge%interior_edge) .eqv. .FALSE.) return
+      deallocate(edge%iedge_global, edge%interior_edge)
+!
+      end subroutine dealloc_interior_edge
+!
+!  ---------------------------------------------------------------------
+!
       subroutine dealloc_edge_4_ele(edge)
 !
       type(edge_data), intent(inout) :: edge
@@ -278,36 +301,5 @@
       end subroutine dealloc_edge_param_smp
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      subroutine alloc_interior_edge(edge, edge_gl)
-!
-      use m_geometry_constants
-!
-      type(edge_data), intent(in) :: edge
-      type(global_edge_data), intent(inout) :: edge_gl
-!
-      allocate(edge_gl%iedge_global(edge%numedge))
-      allocate(edge_gl%interior_edge(edge%numedge))
-!
-      if(edge%numedge .gt. 0) then
-        edge_gl%iedge_global =  0
-        edge_gl%interior_edge = 0
-      end if
-!
-      end subroutine alloc_interior_edge
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine dealloc_interior_edge(edge_gl)
-!
-      type(global_edge_data), intent(inout) :: edge_gl
-!
-      if(allocated(edge_gl%interior_edge) .eqv. .FALSE.) return
-      deallocate(edge_gl%iedge_global, edge_gl%interior_edge)
-!
-      end subroutine dealloc_interior_edge
-!
-!  ---------------------------------------------------------------------
 !
       end module t_edge_data

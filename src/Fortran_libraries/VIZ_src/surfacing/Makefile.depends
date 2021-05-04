@@ -1,4 +1,4 @@
-FEM_to_PSF_bridge.o: $(PSF_SECTION_DIR)/FEM_to_PSF_bridge.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_phys_data.o t_comm_table.o t_VIZ_step_parameter.o parallel_FEM_mesh_init.o const_element_comm_tables.o const_edge_comm_table.o
+FEM_to_PSF_bridge.o: $(PSF_SECTION_DIR)/FEM_to_PSF_bridge.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_phys_data.o t_comm_table.o t_VIZ_step_parameter.o parallel_FEM_mesh_init.o const_element_comm_tables.o
 	$(F90) -c $(F90OPTFLAGS) $<
 convert_components_4_viz.o: $(PSF_SECTION_DIR)/convert_components_4_viz.f90 m_precision.o m_machine_parameter.o set_components_flags.o set_nodal_field_for_psf.o mag_of_field_smp.o copy_field_smp.o cvt_xyz_vector_2_sph_smp.o cvt_xyz_vector_2_cyl_smp.o cvt_xyz_tensor_2_sph_smp.o cvt_xyz_tensor_2_cyl_smp.o
 	$(F90) -c $(F90OPTFLAGS) $<
