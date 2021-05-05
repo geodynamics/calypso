@@ -8,7 +8,8 @@
 !>@brief Structure for isosurfacing
 !!
 !!@verbatim
-!!      subroutine ISOSURF_initialize(geofem, nod_fld, iso_ctls, iso)
+!!      subroutine ISOSURF_initialize(increment_iso, geofem,            &
+!!     &                              nod_fld, iso_ctls, iso)
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(isosurf_controls), intent(inout) :: iso_ctls
 !!        type(isosurface_module), intent(inout) :: iso
@@ -83,13 +84,15 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine ISOSURF_initialize(geofem, nod_fld, iso_ctls, iso)
+      subroutine ISOSURF_initialize(increment_iso, geofem,              &
+     &                              nod_fld, iso_ctls, iso)
 !
       use m_geometry_constants
 !
       use set_psf_iso_control
       use search_ele_list_for_psf
 !
+      integer(kind = kint), intent(in) :: increment_iso
       type(mesh_data), intent(in) :: geofem
       type(phys_data), intent(in) :: nod_fld
 !
@@ -100,6 +103,7 @@
 !
 !
       iso%num_iso = iso_ctls%num_iso_ctl
+      if(increment_iso .le. 0) iso%num_iso = 0
       if(iso%num_iso .le. 0) return
 !
       call init_psf_case_tables(iso%iso_case_tbls)
@@ -195,6 +199,8 @@
 !
       integer(kind = kint) :: i_iso
 !
+!
+      if(iso%num_iso .le. 0) return
 !
       do i_iso = 1, iso%num_iso
         call dealloc_node_param_smp(iso%iso_mesh(i_iso)%node)

@@ -212,6 +212,9 @@
       type(sectioning_module), intent(inout) :: psf
       integer(kind = kint) :: i_psf
 !
+!
+      if(psf%num_psf .le. 0) return
+!
       do i_psf = 1, psf%num_psf
         call dealloc_node_param_smp(psf%psf_mesh(i_psf)%node)
         call dealloc_ele_param_smp(psf%psf_mesh(i_psf)%patch)
