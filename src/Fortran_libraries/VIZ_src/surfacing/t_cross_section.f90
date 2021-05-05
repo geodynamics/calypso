@@ -8,7 +8,8 @@
 !>@brief Structure for cross sectioning
 !!
 !!@verbatim
-!!      subroutine SECTIONING_initialize(geofem, nod_fld, psf_ctls, psf)
+!!      subroutine SECTIONING_initialize(increment_psf, geofem,         &
+!!     &          edge_comm, nod_fld, psf_ctls, psf)
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(communication_table), intent(in) :: edge_comm
 !!        type(phys_data), intent(in) :: nod_fld
@@ -89,8 +90,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine SECTIONING_initialize                                  &
-     &         (geofem, edge_comm, nod_fld, psf_ctls, psf)
+      subroutine SECTIONING_initialize(increment_psf, geofem,           &
+     &          edge_comm, nod_fld, psf_ctls, psf)
 !
       use m_work_time
       use m_elapsed_labels_4_VIZ
@@ -104,6 +105,7 @@
       use set_fields_for_psf
       use output_4_psf
 !
+      integer(kind = kint), intent(in) :: increment_psf
       type(mesh_data), intent(in) :: geofem
       type(communication_table), intent(in) :: edge_comm
       type(phys_data), intent(in) :: nod_fld
@@ -115,6 +117,7 @@
 !
 !
       psf%num_psf = psf_ctls%num_psf_ctl
+      if(increment_psf .le. 0) psf%num_psf = 0
       if(psf%num_psf .le. 0) return
 !
       call init_psf_case_tables(psf%psf_case_tbls)

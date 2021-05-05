@@ -103,8 +103,8 @@
       call init_visualize_surface                                       &
      &   (MHD_step1%viz_step, FEM_d1%geofem, edge_comm_M, FEM_d1%field, &
      &    DNS_MHD_ctl1%surfacing_ctls, viz_psfs1)
-      call init_zonal_mean_sections(FEM_d1%geofem, edge_comm_M,         &
-     &    FEM_d1%field, DNS_MHD_ctl1%zm_ctls, zmeans1)
+      call init_zonal_mean_sections(MHD_step1%viz_step, FEM_d1%geofem,  &
+     &    edge_comm_M, FEM_d1%field, DNS_MHD_ctl1%zm_ctls, zmeans1)
 !
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+1)
       call calypso_MPI_barrier
@@ -171,7 +171,7 @@
 !*  ----------- Zonal means --------------
 !*
           if(MHD_step1%viz_step%istep_psf .ge. 0) then
-            call SPH_MHD_zmean_sections(MHD_step1%viz_step%istep_psf,   &
+            call SPH_MHD_zmean_sections(MHD_step1%viz_step,             &
      &          MHD_step1%time_d, SPH_MHD1%sph, FEM_d1%geofem,          &
      &          SPH_WK1%trns_WK, FEM_d1%field, zmeans1, FEM_d1%v_sol)
           end if

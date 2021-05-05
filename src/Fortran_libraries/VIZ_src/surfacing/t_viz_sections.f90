@@ -68,12 +68,11 @@
       type(surfacing_modules), intent(inout) :: viz_psfs
 !
 !
-      if(viz_step%PSF_t%increment .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+1)
-        call SECTIONING_initialize(geofem, edge_comm, nod_fld,          &
-     &      surfacing_ctls%psf_s_ctls, viz_psfs%psf)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+1)
-      end if
+      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+1)
+      call SECTIONING_initialize                                        &
+     &   (viz_step%PSF_t%increment, geofem, edge_comm, nod_fld,         &
+     &    surfacing_ctls%psf_s_ctls, viz_psfs%psf)
+      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+1)
 !
       if(viz_step%ISO_t%increment .gt. 0) then
         if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+2)
@@ -100,12 +99,10 @@
       type(surfacing_modules), intent(inout) :: viz_psfs
 !
 !
-      if(viz_step%PSF_t%increment .gt. 0) then
-        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
-        call SECTIONING_visualize                                       &
-     &     (viz_step%istep_psf, time_d, geofem, nod_fld, viz_psfs%psf)
-        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
-      end if
+      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
+      call SECTIONING_visualize                                       &
+     &   (viz_step%istep_psf, time_d, geofem, nod_fld, viz_psfs%psf)
+      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
 !
       if(viz_step%ISO_t%increment .gt. 0) then
         if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+7)
