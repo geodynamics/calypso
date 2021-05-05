@@ -7,8 +7,8 @@
 !>@brief Top routine for sectiong
 !!
 !!@verbatim
-!!      subroutine init_visualize_surface                               &
-!!     &         (geofem, edge_comm, nod_fld, surfacing_ctls, viz_psfs)
+!!      subroutine init_visualize_surface(viz_step, geofem, edge_comm,  &
+!!     &          nod_fld, surfacing_ctls, viz_psfs)
 !!      subroutine visualize_surface                                    &
 !!     &        (viz_step, time_d, geofem, edge_comm, nod_fld, viz_psfs)
 !!        type(VIZ_step_params), intent(in) :: viz_step
@@ -54,11 +54,12 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine init_visualize_surface                                 &
-     &         (geofem, edge_comm, nod_fld, surfacing_ctls, viz_psfs)
+      subroutine init_visualize_surface(viz_step, geofem, edge_comm,    &
+     &          nod_fld, surfacing_ctls, viz_psfs)
 !
       use t_control_data_surfacings
 !
+      type(VIZ_step_params), intent(in) :: viz_step
       type(mesh_data), intent(in) :: geofem
       type(communication_table), intent(in) :: edge_comm
       type(phys_data), intent(in) :: nod_fld
@@ -67,15 +68,19 @@
       type(surfacing_modules), intent(inout) :: viz_psfs
 !
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+1)
-      call SECTIONING_initialize(geofem, edge_comm, nod_fld,            &
-     &    surfacing_ctls%psf_s_ctls, viz_psfs%psf)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+1)
+      if(viz_step%PSF_t%increment .gt. 0) then
+        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+1)
+        call SECTIONING_initialize(geofem, edge_comm, nod_fld,          &
+     &      surfacing_ctls%psf_s_ctls, viz_psfs%psf)
+        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+1)
+      end if
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+2)
-      call ISOSURF_initialize                                           &
-     &   (geofem, nod_fld, surfacing_ctls%iso_s_ctls, viz_psfs%iso)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+2)
+      if(viz_step%ISO_t%increment .gt. 0) then
+        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+2)
+        call ISOSURF_initialize                                         &
+     &     (geofem, nod_fld, surfacing_ctls%iso_s_ctls, viz_psfs%iso)
+        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+2)
+      end if
 !
       call dealloc_surfacing_controls(surfacing_ctls)
 !
@@ -95,15 +100,19 @@
       type(surfacing_modules), intent(inout) :: viz_psfs
 !
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
-      call SECTIONING_visualize                                         &
-     &   (viz_step%istep_psf, time_d, geofem, nod_fld, viz_psfs%psf)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
+      if(viz_step%PSF_t%increment .gt. 0) then
+        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+6)
+        call SECTIONING_visualize                                       &
+     &     (viz_step%istep_psf, time_d, geofem, nod_fld, viz_psfs%psf)
+        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+6)
+      end if
 !
-      if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+7)
-      call ISOSURF_visualize(viz_step%istep_iso, time_d,                &
-     &                       geofem, edge_comm, nod_fld, viz_psfs%iso)
-      if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+7)
+      if(viz_step%ISO_t%increment .gt. 0) then
+        if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+7)
+        call ISOSURF_visualize(viz_step%istep_iso, time_d,              &
+     &                         geofem, edge_comm, nod_fld, viz_psfs%iso)
+        if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+7)
+      end if
 !
       end subroutine visualize_surface
 !

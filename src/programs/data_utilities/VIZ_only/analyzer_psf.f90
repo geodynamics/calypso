@@ -64,8 +64,8 @@
 !
 !  VIZ Initialization
       call init_visualize_surface                                       &
-     &   (FEM_viz2%geofem, edge_comm_PSF, FEM_viz2%field,               &
-     &    sec_viz_ctl2%surfacing_ctls, viz_psfs2)
+     &   (t_VIZ2%viz_step, FEM_viz2%geofem, edge_comm_PSF,              &
+     &    FEM_viz2%field, sec_viz_ctl2%surfacing_ctls, viz_psfs2)
 !
       end subroutine init_analyzer_psf
 !

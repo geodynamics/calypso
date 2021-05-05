@@ -16,6 +16,7 @@
 !!        type(element_data), intent(inout) :: ele
 !!      subroutine const_edge_comm_table                                &
 !!     &         (node, nod_comm, edge_comm, edge)
+!!      subroutine dealloc_edge_comm_table(edge_comm, edge)
 !!        type(node_data), intent(in) :: node
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(communication_table), intent(inout) :: edge_comm
