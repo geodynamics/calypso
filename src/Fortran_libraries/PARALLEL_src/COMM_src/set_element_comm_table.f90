@@ -134,12 +134,10 @@
       num_import_tmp(1:nprocs) = 0
 !$omp end parallel workshare
 !
-!$omp parallel do private(ip)
       do inum = 1, num_neib_e
         ip = id_neib_e(inum)
         ip_rev_tmp(ip+1) = inum
       end do
-!$omp end parallel do
 !
       do iele = 1, iele_dbl%num_dbl
         ip =   iele_dbl%irank(iele)

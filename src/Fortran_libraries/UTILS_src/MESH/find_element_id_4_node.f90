@@ -91,7 +91,6 @@
         end do
       end do
 !
-!$omp parallel do private(inod,ist)
       do inod = 1, numnod
         ist = iele_stack_4_node(inod-1) + 1
         if(nele_4_node(inod) .gt. 1) then
@@ -99,7 +98,6 @@
      &        ione, nele_4_node(inod), iconn_4_node(ist))
         end if
       end do
-!$omp end parallel do
 !
       end  subroutine set_iele_4_node
 !

@@ -104,11 +104,9 @@
       call find_belonged_pe_4_node                                      &
      &   (my_rank, node, nod_comm, inod_dbl%irank)
 !
-!$omp parallel do
       do inod = 1, node%numnod
         inod_dbl%index(inod) = inod
       end do
-!$omp end parallel do
 !
       call SOLVER_SEND_RECV_int_type(node%numnod, nod_comm,             &
      &                               SR_sig1, SR_i1, inod_dbl%index(1))

@@ -155,7 +155,6 @@
 !
       allocate(iele_comm(nele))
 !
-!$omp parallel do private(iele)
       do iele = 1, nele
         if(internal_flag(iele) .gt. 0) then
           iele_comm(iele) = iele_global(iele)
@@ -163,7 +162,6 @@
           iele_comm(iele) = 0
         end if
       end do
-!$omp end parallel do
 !
       call SOLVER_SEND_RECV_int8_type(nele, e_comm,                     &
      &                                SR_sig1, SR_il1, iele_comm)
@@ -238,7 +236,6 @@
 !      end do
 !
 !
-!$omp parallel do private(inum,iele)
       do inum = 1, e_comm%ntot_import
         iele = e_comm%item_import(inum)
         x_test(3*iele-2) = 1.e30
@@ -246,7 +243,6 @@
         x_test(3*iele  ) = 1.e30
         l_test(iele) = 0
       end do
-!$omp end parallel do
 !
       call SOLVER_SEND_RECV_3_type(nele, e_comm,                        &
      &                             SR_sig1, SR_r1, x_test(1))

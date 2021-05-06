@@ -219,7 +219,6 @@
       iedge_dbl%k_ref(1:numedge) =    0
 !$omp end parallel workshare
 !
-!%omp parallel do private(iedge,ie_edge_one,nnod_same)
       do iedge = 1, numedge
         ie_edge_one(1) = ie_edge(iedge,1)
         ie_edge_one(2) = ie_edge(iedge,2)
@@ -230,14 +229,11 @@
         interior_edge(iedge)                                            &
      &     = set_each_interior_flag(my_rank, iedge_dbl%irank(iedge))
       end do
-!%omp end parallel do
 !
       icou = 0
-!%omp parallel do private(iedge) reduction(+:icou)
       do iedge = 1, numedge
         if(iedge_dbl%irank(iedge) .eq. my_rank) icou = icou + 1
       end do
-!%omp end parallel do
       internal_edge = icou
 !
       end subroutine find_belonged_pe_4_edge
