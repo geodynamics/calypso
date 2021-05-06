@@ -12,7 +12,7 @@
 !>@brief Top routine for VTK convert
 !!
 !!@verbatim
-!!      subroutine init_visualize_surface                               &
+!!      subroutine init_visualize_convert_vtk                           &
 !!     &         (geofem, nod_fld, ucd_step, output_vtk_fmt_ctl,        &
 !!     &          ucd_file_IO, vtk_file_IO, vtk_out)
 !!        type(mesh_data), intent(in) :: geofem

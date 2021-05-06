@@ -9,10 +9,8 @@
 !!@verbatim
 !!      subroutine node_send_recv_test                                  &
 !!     &         (node, nod_comm, nod_check)
-!!      subroutine ele_send_recv_test                                   &
-!!     &         (node, ele, ele_comm, ele_check)
-!!      subroutine edge_send_recv_test                                  &
-!!     &         (node, edge, edge_comm, edge_check)
+!!      subroutine ele_send_recv_test(ele, ele_comm, ele_check)
+!!      subroutine edge_send_recv_test(edge, edge_comm, edge_check)
 !!        type(node_data), intent(in) :: node
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(work_for_comm_check), intent(inout) :: nod_check
@@ -29,6 +27,10 @@
 !!        type(communication_table), intent(in) :: new_comm
 !!        type(calypso_comm_table), intent(in) :: trans_tbl
 !!        type(work_for_comm_check), intent(inout) :: nod_check
+!!
+!!      subroutine ele_send_recv_check(numele, iele_gl, x_ele, wk_check)
+!!      subroutine collect_failed_comm(wk_check)
+!!        type(work_for_comm_check), intent(inout) :: wk_check
 !!@endverbatim
 !
       module mesh_send_recv_check
@@ -52,8 +54,7 @@
 !
       type(send_recv_status), save, private :: SR_sig_c
 !
-      private :: collect_failed_comm
-      private :: nod_send_recv_check, ele_send_recv_check
+      private :: nod_send_recv_check
 !
 ! ----------------------------------------------------------------------
 !
@@ -95,15 +96,13 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine ele_send_recv_test                                     &
-     &         (node, ele, ele_comm, ele_check)
+      subroutine ele_send_recv_test(ele, ele_comm, ele_check)
 !
       use m_solver_SR
       use diff_geometory_comm_test
       use nod_phys_send_recv
       use solver_SR_type
 !
-      type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
       type(communication_table), intent(in) :: ele_comm
       type(work_for_comm_check), intent(inout) :: ele_check
@@ -129,14 +128,12 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine edge_send_recv_test                                    &
-     &         (node, edge, edge_comm, edge_check)
+      subroutine edge_send_recv_test(edge, edge_comm, edge_check)
 !
       use m_solver_SR
       use diff_geometory_comm_test
       use solver_SR_type
 !
-      type(node_data), intent(in) :: node
       type(edge_data), intent(in) :: edge
       type(communication_table), intent(in) :: edge_comm
       type(work_for_comm_check), intent(inout) :: edge_check
