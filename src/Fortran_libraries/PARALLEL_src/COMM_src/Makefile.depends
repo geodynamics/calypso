@@ -48,6 +48,8 @@ const_element_comm_tables.o: $(COMMDIR)/const_element_comm_tables.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 const_global_element_ids.o: $(COMMDIR)/const_global_element_ids.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o calypso_mpi_int.o m_solver_SR.o t_comm_table.o solver_SR_type.o t_para_double_numbering.o t_element_double_number.o
 	$(F90) -c $(F90OPTFLAGS) $<
+const_surface_comm_table.o: $(COMMDIR)/const_surface_comm_table.f90 m_precision.o calypso_mpi.o t_next_node_ele_4_node.o t_mesh_data.o t_geometry_data.o t_surface_data.o t_comm_table.o t_failed_export_list.o m_machine_parameter.o m_geometry_constants.o t_para_double_numbering.o t_element_double_number.o t_const_comm_table.o set_ele_id_4_node_type.o const_global_element_ids.o t_work_for_comm_check.o m_solver_SR.o diff_geometory_comm_test.o nod_phys_send_recv.o solver_SR_type.o mesh_send_recv_check.o
+	$(F90) -c $(F90OPTFLAGS) $<
 field_to_send_buffer.o: $(COMMDIR)/field_to_send_buffer.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_elapsed_labels_SEND_RECV.o: $(COMMDIR)/m_elapsed_labels_SEND_RECV.f90 m_precision.o m_work_time.o
@@ -129,5 +131,7 @@ t_viewer_group.o: $(COMMDIR)/t_viewer_group.f90 m_precision.o m_geometry_constan
 t_work_for_comm_check.o: $(COMMDIR)/t_work_for_comm_check.f90 m_precision.o m_constants.o calypso_mpi.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_work_time.o: $(COMMDIR)/t_work_time.f90 m_precision.o m_constants.o calypso_mpi.o calypso_mpi_real.o set_parallel_file_name.o transfer_to_long_integers.o
+	$(F90) -c $(F90OPTFLAGS) $<
+write_diff_4_comm_test.o: $(COMMDIR)/write_diff_4_comm_test.f90 m_precision.o calypso_mpi.o t_work_for_comm_check.o
 	$(F90) -c $(F90OPTFLAGS) $<
 
