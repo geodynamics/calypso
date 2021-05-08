@@ -7,7 +7,8 @@ SUBDIRS =      \
 Gauss_point_test  \
 Legendre_test \
 FFT_test \
-Compare
+Compare  \
+MESH_test
 
 #
 #  -------------------------------------------------------------------------
@@ -41,7 +42,7 @@ target_list:
 
 target_task:
 	@echo tests_with_f: gauss_tests \
-	'fft_test leg_tests compare' \
+	'fft_test leg_tests compare comm_tests' \
 	>> $(MAKENAME)
 	>> $(MAKENAME)
 	@echo '' >> $(MAKENAME)

@@ -56,7 +56,8 @@
 !!    isosurf_comp: component for isosurface
 !!           x, y, z, radial, elevation, azimuth, cylinder_r, norm
 !!    isosurf_value:  value for isosurface
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!@endverbatim
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!@endverbatim
 !
       module t_control_data_4_iso_def
 !
@@ -91,18 +92,17 @@
       end type iso_define_ctl
 !
 !     3nd level for isosurf_define
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &             :: hd_iso_field =  'isosurf_field'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &             :: hd_iso_comp =   'isosurf_component'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &             :: hd_iso_value =  'isosurf_value'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &             :: hd_iso_area =   'isosurf_area_ctl'
 !
       integer(kind = kint), parameter :: n_label_iso_define_ctl = 4
 !
-      private :: hd_iso_area, hd_iso_value, hd_iso_comp, hd_iso_field
       private :: n_label_iso_define_ctl
 !
 !  ---------------------------------------------------------------------
