@@ -284,7 +284,7 @@
       end do
 !$omp end parallel do
 !
-!$omp parallel do private(inum,inod_org)
+!$omp parallel do private(inod)
       do inod = 1, node%numnod
         id_global_org(inod) = node%inod_global(inod)
         node%xx(inod,1) = node%rr(inod)
@@ -293,7 +293,7 @@
       end do
 !$omp end parallel do
 !
-!$omp parallel do private(inum,inod_org)
+!$omp parallel do private(inod,inod_org)
       do inod_org = 1, node%numnod
         inod = inod_old2new(inod_org)
 !
