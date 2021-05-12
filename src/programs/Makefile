@@ -10,7 +10,9 @@ SPH_MHD \
 mesh_utilities \
 data_utilities \
 \
-TESTS
+TESTS \
+\
+Fujitsu_test
 
 
 LIBS_SPH_MHD = \
@@ -67,7 +69,7 @@ target_task:
 	@echo 'parallels: sph_mhd'      \
 	>> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
-	@echo 'utilities: data_utils mesh_utils sph_data_util' >> $(MAKENAME)
+	@echo 'utilities: data_utils mesh_utils sph_data_util fujitsu' >> $(MAKENAME)
 	@echo 'tests: tests_with_f' >> $(MAKENAME)
 	@echo '' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
