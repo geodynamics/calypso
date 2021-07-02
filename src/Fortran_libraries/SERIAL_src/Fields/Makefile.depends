@@ -22,6 +22,12 @@ m_explicit_term_labels.o: $(FIELDIR)/m_explicit_term_labels.f90 m_precision.o m_
 	$(F90) -c $(F90OPTFLAGS) $<
 m_field_product_labels.o: $(FIELDIR)/m_field_product_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
+m_filtered_ene_flux_labels.o: $(FIELDIR)/m_filtered_ene_flux_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_filtered_field_labels.o: $(FIELDIR)/m_filtered_field_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_filtered_force_labels.o: $(FIELDIR)/m_filtered_force_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
 m_grad_field_labels.o: $(FIELDIR)/m_grad_field_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_rot_force_labels.o: $(FIELDIR)/m_rot_force_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
