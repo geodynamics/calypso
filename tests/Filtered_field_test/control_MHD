@@ -72,13 +72,28 @@ begin MHD_control
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
-      array nod_value_ctl     6
+      array nod_value_ctl
         nod_value_ctl  velocity                Viz_On   Monitor_On
         nod_value_ctl  temperature             Viz_On   Monitor_On
         nod_value_ctl  pressure                Viz_Off  Monitor_Off
         nod_value_ctl  vorticity               Viz_Off  Monitor_Off
         nod_value_ctl  magnetic_field          Viz_On   Monitor_On
         nod_value_ctl  current_density         Viz_Off  Monitor_Off
+!
+        nod_value_ctl  filter_velocity         Viz_On   Monitor_On
+        nod_value_ctl  filter_vorticity        Viz_On   Monitor_On
+        nod_value_ctl  filter_current          Viz_On   Monitor_On
+        nod_value_ctl  filter_temperature      Viz_On   Monitor_On
+!
+        nod_value_ctl  inertia_by_filtered          Viz_On   Monitor_On
+        nod_value_ctl  Lorentz_force_by_filtered    Viz_On   Monitor_On
+        nod_value_ctl  filtered_buoyancy            Viz_On   Monitor_On
+        nod_value_ctl  heat_flux_by_filtered        Viz_On   Monitor_On
+        nod_value_ctl  vecp_induction_by_filtered   Viz_On   Monitor_On
+!
+        nod_value_ctl  filtered_buoyancy_flux           Viz_On   Monitor_On
+        nod_value_ctl  inertia_work_by_filtered         Viz_On   Monitor_On
+        nod_value_ctl  Lorentz_work_by_filtered         Viz_On   Monitor_On
       end array nod_value_ctl
     end phys_values_ctl
 !

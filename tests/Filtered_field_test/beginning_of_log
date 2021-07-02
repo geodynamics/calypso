@@ -1,8 +1,38 @@
+matsui@Kemo-Mac-2018 CALYPSO_test % make filter_test           
+echo "Test filtered field!!"; \
+	cd /Users/matsui/CALYPSO_test/tests ; \
+		make \
+		GMAKE="make" \
+		BUILDDIR="/Users/matsui/CALYPSO_test/bin" \
+		TESTDIR="/Users/matsui/CALYPSO_test/tests" \
+		MHDDIR="/Users/matsui/CALYPSO_test/src" \
+		MPIRUN="mpirun" \
+		filter_test
+Test filtered field!!
+for dir in Filtered_field_test ; do \
+	echo "# Test in ${dir} directory..."; \
+		( cd ${dir}; \
+		make \
+		GMAKE="make" \
+		BUILDDIR="/Users/matsui/CALYPSO_test/bin" \
+		TESTDIR="/Users/matsui/CALYPSO_test/tests" \
+		MHDDIR="/Users/matsui/CALYPSO_test/src" \
+		MPIRUN="mpirun" \
+		TARGET_GEN_SPH_GRID="" \
+		TARGET_CHECK_SPH_GRID="" \
+		TARGET_TEST_SPH_GRID="" \
+		TARGET_NEWSPH="" \
+		TARGET_CMP_SPH_RST="" \
+		test)\
+	done; \
+	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
+# Test in Filtered_field_test directory...
+rm -f *.dat
 mpirun -np 4 /Users/matsui/CALYPSO_test/bin/sph_mhd
+ Simulation start: PE.            3
  Simulation start: PE.            0
  Simulation start: PE.            1
  Simulation start: PE.            2
- Simulation start: PE.            3
  Spherical shell resolution file: control_resolution
  Spherical shell resolution file end
 Read file for cross_section_ctl No.    1...  Section control file: controls/ctl_psf_cmb
@@ -90,60 +120,72 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  coef_imp_c    0.0000000000000000     
  s_set_control_field_data
  check_nodal_field_name for fld
- fld%num_phys            8
- fld%num_phys_viz            6
+ fld%num_phys           20
+ fld%num_phys_viz           18
  id#, num_component, stack_component, field_name 
      1     3     3    velocity
      2     1     4    temperature
      3     3     7    vorticity
      4     3    10    magnetic_field
-     5     1    11    Lorentz_work
-     6     1    12    buoyancy_flux
-     7     1    13    pressure
-     8     3    16    current_density
+     5     3    13    filter_velocity
+     6     3    16    filter_vorticity
+     7     3    19    filter_current
+     8     1    20    filter_temperature
+     9     3    23    inertia_by_filtered
+    10     3    26    Lorentz_force_by_filtered
+    11     3    29    filtered_buoyancy
+    12     3    32    heat_flux_by_filtered
+    13     3    35    vecp_induction_by_filtered
+    14     1    36    filtered_buoyancy_flux
+    15     1    37    inertia_work_by_filtered
+    16     1    38    Lorentz_work_by_filtered
+    17     1    39    Lorentz_work
+    18     1    40    buoyancy_flux
+    19     1    41    pressure
+    20     3    44    current_density
  set_control_sph_mhd_fields
- original number of field            8
+ original number of field           20
  add_work_area_4_potentials
- pressure_work is added at field ID            9
- m_potential_work is added at field ID           10
+ pressure_work is added at field ID           21
+ m_potential_work is added at field ID           22
  add_ctl_4_forces
- perturbation_temp is added at field ID           11
- Coriolis_force is added at field ID           12
+ perturbation_temp is added at field ID           23
+ Coriolis_force is added at field ID           24
  add_data_4_previous_step
- previous_momentum is added at field ID           13
- previous_pressure is added at field ID           14
- sum_forces is added at field ID           15
- previous_induction is added at field ID           16
- previous_heat is added at field ID           17
+ previous_momentum is added at field ID           25
+ previous_pressure is added at field ID           26
+ sum_forces is added at field ID           27
+ previous_induction is added at field ID           28
+ previous_heat is added at field ID           29
  add_data_4_check_step
- check_momentum is added at field ID           18
- check_pressure is added at field ID           19
- check_induction is added at field ID           20
- check_potential is added at field ID           21
- check_heat is added at field ID           22
- grad_temp is added at field ID           23
- grad_pert_temp is added at field ID           24
- viscous_diffusion is added at field ID           25
- div_viscousity is added at field ID           26
- vorticity_diffusion is added at field ID           27
- inertia is added at field ID           28
- rot_inertia is added at field ID           29
- div_inertia is added at field ID           30
- rot_Coriolis_force is added at field ID           31
- div_Coriolis_force is added at field ID           32
- Lorentz_force is added at field ID           33
- rot_Lorentz_force is added at field ID           34
- div_Lorentz_force is added at field ID           35
- buoyancy is added at field ID           36
- rot_buoyancy is added at field ID           37
- div_buoyancy is added at field ID           38
- magnetic_diffusion is added at field ID           39
- magnetic_induction is added at field ID           40
- vecp_induction is added at field ID           41
- thermal_diffusion is added at field ID           42
- heat_flux is added at field ID           43
- heat_advect is added at field ID           44
- magnetic_potential is added at field ID           45
+ check_momentum is added at field ID           30
+ check_pressure is added at field ID           31
+ check_induction is added at field ID           32
+ check_potential is added at field ID           33
+ check_heat is added at field ID           34
+ grad_temp is added at field ID           35
+ grad_pert_temp is added at field ID           36
+ viscous_diffusion is added at field ID           37
+ div_viscousity is added at field ID           38
+ vorticity_diffusion is added at field ID           39
+ inertia is added at field ID           40
+ rot_inertia is added at field ID           41
+ div_inertia is added at field ID           42
+ rot_Coriolis_force is added at field ID           43
+ div_Coriolis_force is added at field ID           44
+ Lorentz_force is added at field ID           45
+ rot_Lorentz_force is added at field ID           46
+ div_Lorentz_force is added at field ID           47
+ buoyancy is added at field ID           48
+ rot_buoyancy is added at field ID           49
+ div_buoyancy is added at field ID           50
+ magnetic_diffusion is added at field ID           51
+ magnetic_induction is added at field ID           52
+ vecp_induction is added at field ID           53
+ thermal_diffusion is added at field ID           54
+ heat_flux is added at field ID           55
+ heat_advect is added at field ID           56
+ magnetic_potential is added at field ID           57
  add_field_ctl_4_check_evo end
  add_field_ctl_4_evo_magne end
  add_field_ctl_4_ene_flux end
@@ -154,59 +196,71 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  add_field_ctl_4_forces end
  add_field_ctl_4_diff_vector end
  add_field_ctl_4_grad_field end
- reference_temperature is added at field ID           46
+ reference_temperature is added at field ID           58
  add_field_ctl_4_base_field end
  s_set_control_field_data
  check_nodal_field_name for fld
- fld%num_phys           46
- fld%num_phys_viz            6
+ fld%num_phys           58
+ fld%num_phys_viz           18
  id#, num_component, stack_component, field_name 
      1     3     3    velocity
      2     1     4    temperature
      3     3     7    vorticity
      4     3    10    magnetic_field
-     5     1    11    Lorentz_work
-     6     1    12    buoyancy_flux
-     7     1    13    pressure
-     8     3    16    current_density
-     9     1    17    pressure_work
-    10     1    18    m_potential_work
-    11     1    19    perturbation_temp
-    12     3    22    Coriolis_force
-    13     3    25    previous_momentum
-    14     1    26    previous_pressure
-    15     3    29    sum_forces
-    16     3    32    previous_induction
-    17     1    33    previous_heat
-    18     3    36    check_momentum
-    19     1    37    check_pressure
-    20     3    40    check_induction
-    21     1    41    check_potential
-    22     1    42    check_heat
-    23     3    45    grad_temp
-    24     3    48    grad_pert_temp
-    25     3    51    viscous_diffusion
-    26     1    52    div_viscousity
-    27     3    55    vorticity_diffusion
-    28     3    58    inertia
-    29     3    61    rot_inertia
-    30     1    62    div_inertia
-    31     3    65    rot_Coriolis_force
-    32     1    66    div_Coriolis_force
-    33     3    69    Lorentz_force
-    34     3    72    rot_Lorentz_force
-    35     1    73    div_Lorentz_force
-    36     3    76    buoyancy
-    37     3    79    rot_buoyancy
-    38     1    80    div_buoyancy
-    39     3    83    magnetic_diffusion
-    40     3    86    magnetic_induction
-    41     3    89    vecp_induction
-    42     1    90    thermal_diffusion
-    43     3    93    heat_flux
-    44     1    94    heat_advect
-    45     1    95    magnetic_potential
-    46     1    96    reference_temperature
+     5     3    13    filter_velocity
+     6     3    16    filter_vorticity
+     7     3    19    filter_current
+     8     1    20    filter_temperature
+     9     3    23    inertia_by_filtered
+    10     3    26    Lorentz_force_by_filtered
+    11     3    29    filtered_buoyancy
+    12     3    32    heat_flux_by_filtered
+    13     3    35    vecp_induction_by_filtered
+    14     1    36    filtered_buoyancy_flux
+    15     1    37    inertia_work_by_filtered
+    16     1    38    Lorentz_work_by_filtered
+    17     1    39    Lorentz_work
+    18     1    40    buoyancy_flux
+    19     1    41    pressure
+    20     3    44    current_density
+    21     1    45    pressure_work
+    22     1    46    m_potential_work
+    23     1    47    perturbation_temp
+    24     3    50    Coriolis_force
+    25     3    53    previous_momentum
+    26     1    54    previous_pressure
+    27     3    57    sum_forces
+    28     3    60    previous_induction
+    29     1    61    previous_heat
+    30     3    64    check_momentum
+    31     1    65    check_pressure
+    32     3    68    check_induction
+    33     1    69    check_potential
+    34     1    70    check_heat
+    35     3    73    grad_temp
+    36     3    76    grad_pert_temp
+    37     3    79    viscous_diffusion
+    38     1    80    div_viscousity
+    39     3    83    vorticity_diffusion
+    40     3    86    inertia
+    41     3    89    rot_inertia
+    42     1    90    div_inertia
+    43     3    93    rot_Coriolis_force
+    44     1    94    div_Coriolis_force
+    45     3    97    Lorentz_force
+    46     3   100    rot_Lorentz_force
+    47     1   101    div_Lorentz_force
+    48     3   104    buoyancy
+    49     3   107    rot_buoyancy
+    50     1   108    div_buoyancy
+    51     3   111    magnetic_diffusion
+    52     3   114    magnetic_induction
+    53     3   117    vecp_induction
+    54     1   118    thermal_diffusion
+    55     3   121    heat_flux
+    56     1   122    heat_advect
+    57     1   123    magnetic_potential
+    58     1   124    reference_temperature
  iflag_shell_mode          -1
  load_para_SPH_and_FEM_mesh
  Make spherical harmonics table
@@ -341,6 +395,11 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  sph_bc%iflag_cmb           0
  sph_bc_T%iflag_icb           0
  sph_bc_T%iflag_cmb           0
+ Fixed boundary condition spectr for heat
+ sph_bc%iflag_icb           0
+ sph_bc%iflag_cmb           0
+ sph_bc_T%iflag_icb           0
+ sph_bc_T%iflag_cmb           0
  init_r_infos_sph_mhd_evo
  set_delta_r_4_sph_mhd
  set_dr_for_nonequi
@@ -382,16 +441,16 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
     1. velocity:     1    1    1
     2. vorticity:     4    5    5
     3. magnetic_field:     7    8    8
-    4. current_density:    10   14   14
+    4. current_density:    10   42   42
     5. temperature:    13    4    4
  Address for forward transform: transform, poloidal, toroidal, grid data
-    1. rot_Coriolis_force:     1   63    0
-    2. inertia:     4   56    0
-    3. Coriolis_force:     7   20    0
-    4. Lorentz_force:    10   67    0
-    5. vecp_induction:    13   87    0
-    6. heat_flux:    16   91    0
-    7. div_Coriolis_force:    19   66    0
+    1. rot_Coriolis_force:     1   91    0
+    2. inertia:     4   84    0
+    3. Coriolis_force:     7   48    0
+    4. Lorentz_force:    10   95    0
+    5. vecp_induction:    13  115    0
+    6. heat_flux:    16  119    0
+    7. div_Coriolis_force:    19   94    0
  ncomp_sph_trans           19
  nvector_rj_2_rtp            4
  nscalar_rj_2_rtp            1
@@ -402,12 +461,12 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
     1. velocity:     1    1    1
     2. vorticity:     4    5    5
     3. magnetic_field:     7    8    8
-    4. current_density:    10   14   14
+    4. current_density:    10   42   42
     5. temperature:    13    4    4
-    6. pressure:    14   13   13
-    7. perturbation_temp:    15   19    0
+    6. pressure:    14   41   41
+    7. perturbation_temp:    15   47    0
  Address for forward transform: transform, poloidal, toroidal, grid data
-    1. div_Coriolis_force:     1   66    0
+    1. div_Coriolis_force:     1   94    0
  ncomp_sph_trans           19
  nvector_rj_2_rtp            4
  nscalar_rj_2_rtp            3
@@ -416,8 +475,8 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  Spherical transform field table for energy flux (trns_eflux)
  Address for backward transform: transform, poloidal, toroidal, grid data
  Address for forward transform: transform, poloidal, toroidal, grid data
-    1. Lorentz_work:     1   11   11
-    2. buoyancy_flux:     2   12   12
+    1. Lorentz_work:     1   39   39
+    2. buoyancy_flux:     2   40   40
  ncomp_sph_trans           19
  nvector_rj_2_rtp            0
  nscalar_rj_2_rtp            0
