@@ -168,6 +168,17 @@ test:
 		MPIRUN="$(MPIRUN)" \
 		test
 
+filter_test:
+	echo "Test filtered field!!"; \
+	cd $(TESTDIR) ; \
+		$(GMAKE) \
+		GMAKE="$(GMAKE)" \
+		BUILDDIR="$(BUILDDIR)" \
+		TESTDIR="$(TESTDIR)" \
+		MHDDIR="$(MHDDIR)" \
+		MPIRUN="$(MPIRUN)" \
+		filter_test
+
 install:
 	cd $(MAKEDIR) ; \
 		make install

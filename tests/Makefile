@@ -61,8 +61,27 @@ test:
 	done; \
 	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 
+filter_test: 
+	for dir in Filtered_field_test ; do \
+	echo "# Test in $${dir} directory..."; \
+		( cd $${dir}; \
+		$(GMAKE) \
+		GMAKE="$(GMAKE)" \
+		BUILDDIR="$(BUILDDIR)" \
+		TESTDIR="$(TESTDIR)" \
+		MHDDIR="$(MHDDIR)" \
+		MPIRUN="$(MPIRUN)" \
+		TARGET_GEN_SPH_GRID="$(TARGET_GEN_SPH_GRID)" \
+		TARGET_CHECK_SPH_GRID="$(TARGET_CHECK_SPH_GRID)" \
+		TARGET_TEST_SPH_GRID="$(TARGET_TEST_SPH_GRID)" \
+		TARGET_NEWSPH="$(TARGET_NEWSPH)" \
+		TARGET_CMP_SPH_RST="$(TARGET_CMP_SPH_RST)" \
+		test)\
+	done; \
+	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
+
 clean:
-	for dir in $(SUBDIRS) ; do \
+	for dir in $(SUBDIRS) Filtered_field_test; do \
 	echo "# cleaning $${dir} directory..."; \
 		( cd $${dir}; \
 		make clean )\
