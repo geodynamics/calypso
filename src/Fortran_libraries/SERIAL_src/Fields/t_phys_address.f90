@@ -56,6 +56,14 @@
         type(explicit_term_address) :: check_fld1
 !>        Second check work area
         type(explicit_term_address) :: check_fld2
+!
+!
+!>        Structure of filtered fields
+        type(base_field_address) :: filter_fld
+!>        Structure of filtered forces
+        type(base_force_address) :: force_by_filter
+!>        Structure of filtered energy fluxes
+        type(energy_flux_address) :: eflux_by_filter
       end type phys_address
 !
 !
