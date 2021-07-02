@@ -31,6 +31,9 @@
 !!
 !!      integer(kind = kint) function iflag_divide(charaname)
 !!      integer(kind = kint) function max_len_of_charaarray(num, carray)
+!!      subroutine write_ctl_real_cont(id_file, real_item)
+!!      subroutine write_ctl_integer_cont(id_file, int_item)
+!!      subroutine write_ctl_fixlen_chara(id_file, maxlen, charaname)
 !!      subroutine write_ctl_chara_cont(id_file, charaname)
 !!      subroutine write_ctl_chara_lf(id_file, charaname)
 !!      subroutine write_spaces(id_file, nspace)
@@ -313,6 +316,47 @@
       max_len_of_charaarray = maxlen
 !
       end function max_len_of_charaarray
+!
+! ----------------------------------------------------------------------
+!
+      subroutine write_ctl_real_cont(id_file, real_item)
+!
+      integer(kind = kint), intent(in) :: id_file
+      real(kind = kreal), intent(in) :: real_item
+!
+!
+      write(id_file,'(1pE25.15e3,a2)',advance='no') real_item,  '  '
+!
+      end subroutine write_ctl_real_cont
+!
+! ----------------------------------------------------------------------
+!
+      subroutine write_ctl_integer_cont(id_file, int_item)
+!
+      integer(kind = kint), intent(in) :: id_file
+      integer(kind = kint), intent(in) :: int_item
+!
+!
+      write(id_file,'(i16,a2)',advance='no') int_item,  '  '
+!
+      end subroutine write_ctl_integer_cont
+!
+! ----------------------------------------------------------------------
+!
+      subroutine write_ctl_fixlen_chara(id_file, maxlen, charaname)
+!
+      integer(kind = kint), intent(in) :: id_file
+      integer(kind = kint), intent(in) :: maxlen
+      character(len=kchara), intent(in) :: charaname
+!
+      integer(kind = kint) :: nspace0
+!
+!
+      nspace0 = maxlen - len_trim(charaname)
+      call write_ctl_chara_cont(id_file, charaname)
+      if(nspace0 .gt. 0) call write_spaces(id_file, nspace0)
+!
+      end subroutine write_ctl_fixlen_chara
 !
 ! ----------------------------------------------------------------------
 !

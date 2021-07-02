@@ -1,8 +1,0 @@
-  begin mesh_test
-    begin data_files_def
-      num_subdomain_ctl           2
-      num_smp_ctl                 1
-      mesh_file_prefix         'mesh/in'
-      mesh_file_fmt_ctl        'merged_gzip'
-    end data_files_def
-  end mesh_test

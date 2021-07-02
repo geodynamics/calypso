@@ -9,19 +9,24 @@
 !!@verbatim
 !!      subroutine initialize_sph_trans                                 &
 !!     &         (ncomp_trans, nvector_trns, nscalar_trns,              &
-!!     &          sph, comms_sph, trans_p, WK_leg, WK_FFTs)
+!!     &          sph, comms_sph, trans_p, WK_leg, WK_FFTs,             &
+!!     &          SR_sig, SR_r)
 !!        type(sph_grids), intent(inout) :: sph
 !!        type(sph_comm_tables), intent(inout) :: comms_sph
 !!        type(parameters_4_sph_trans), intent(inout) :: trans_p
 !!        type(legendre_trns_works), intent(inout) :: WK_leg
 !!        type(work_for_FFTs), intent(inout) :: WK_FFTs
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine initialize_legendre_trans                            &
 !!     &         (nvector_legendre, ncomp_trans, sph, comms_sph,        &
-!!     &          leg, idx_trns, iflag_recv)
+!!     &          leg, idx_trns, SR_sig, SR_r, iflag_recv)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(legendre_4_sph_trans), intent(inout) :: leg
 !!        type(index_4_sph_trans), intent(inout) :: idx_trns
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
 !
       module init_sph_trans
@@ -35,6 +40,7 @@
       use t_work_4_sph_trans
       use t_legendre_trans_select
       use t_sph_FFT_selector
+      use t_solver_SR
 !
       implicit none
 !
@@ -48,7 +54,8 @@
 !
       subroutine initialize_sph_trans                                   &
      &         (ncomp_trans, nvector_trns, nscalar_trns,                &
-     &          sph, comms_sph, trans_p, WK_leg, WK_FFTs)
+     &          sph, comms_sph, trans_p, WK_leg, WK_FFTs,               &
+     &          SR_sig, SR_r)
 !
       use init_FFT_4_sph
 !
@@ -59,6 +66,8 @@
       type(parameters_4_sph_trans), intent(inout) :: trans_p
       type(legendre_trns_works), intent(inout) :: WK_leg
       type(work_for_FFTs), intent(inout) :: WK_FFTs
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       trans_p%iflag_FFT = iflag_FFTPACK_ONCE
@@ -68,9 +77,10 @@
 !
       call initialize_legendre_trans                                    &
      &   (trans_p%nvector_legendre, ncomp_trans, sph, comms_sph,        &
-     &    trans_p%leg, trans_p%idx_trns, trans_p%iflag_SPH_recv)
+     &    trans_p%leg, trans_p%idx_trns, SR_sig, SR_r,                  &
+     &    trans_p%iflag_SPH_recv)
       call init_fourier_transform_4_sph(ncomp_trans, sph%sph_rtp,       &
-     &    comms_sph%comm_rtp, WK_FFTs, trans_p%iflag_FFT)
+     &    comms_sph%comm_rtp, WK_FFTs, SR_r, trans_p%iflag_FFT)
 !
       if(my_rank .eq. 0)  call write_import_table_mode(trans_p)
 !
@@ -86,7 +96,7 @@
 !
       subroutine initialize_legendre_trans                              &
      &         (nvector_legendre, ncomp_trans, sph, comms_sph,          &
-     &          leg, idx_trns, iflag_recv)
+     &          leg, idx_trns, SR_sig, SR_r, iflag_recv)
 !
       use m_FFT_selector
       use schmidt_poly_on_rtm_grid
@@ -100,6 +110,8 @@
       type(legendre_4_sph_trans), intent(inout) :: leg
       type(index_4_sph_trans), intent(inout) :: idx_trns
       integer(kind = kint), intent(inout) :: iflag_recv
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       call alloc_work_4_sph_trans                                       &
@@ -128,8 +140,8 @@
       call set_sym_legendre_stack(sph%sph_rtm%nidx_rtm(3),              &
      &    idx_trns%lstack_rlm, idx_trns%lstack_even_rlm)
 !
-      call set_blocks_4_leg_trans(nvector_legendre,                     &
-     &    ncomp_trans, sph, comms_sph, idx_trns, iflag_recv)
+      call set_blocks_4_leg_trans(nvector_legendre, ncomp_trans,        &
+     &    sph, comms_sph, idx_trns, SR_sig, SR_r, iflag_recv)
 !
       if(my_rank .ne. 0) return
       write(*,*) 'Vector length for Legendre transform:',               &
@@ -194,8 +206,8 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_blocks_4_leg_trans(nvector_legendre,               &
-     &          ncomp_trans, sph, comms_sph, idx_trns, iflag_recv)
+      subroutine set_blocks_4_leg_trans(nvector_legendre, ncomp_trans,  &
+     &          sph, comms_sph, idx_trns, SR_sig, SR_r, iflag_recv)
 !
       use calypso_mpi
       use m_machine_parameter
@@ -211,6 +223,8 @@
 !
       integer(kind = kint), intent(inout) :: iflag_recv
       type(index_4_sph_trans), intent(inout) :: idx_trns
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
       integer(kind = kint) :: lmax_block_rtm
 !
@@ -232,7 +246,7 @@
       call split_rtp_comms(comms_sph%comm_rtp%nneib_domain,             &
      &    comms_sph%comm_rtp%id_domain, comms_sph%comm_rj%nneib_domain)
       call init_sph_send_recv_N                                         &
-     &   (ncomp_trans, sph, comms_sph, iflag_recv)
+     &   (ncomp_trans, sph, comms_sph, iflag_recv, SR_sig, SR_r)
 !
       end subroutine set_blocks_4_leg_trans
 !

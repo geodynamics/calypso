@@ -8,40 +8,51 @@
 !>@brief  Data communication for nodal field
 !!
 !!@verbatim
-!!      subroutine FEM_comm_initialization(mesh, v_sol)
-!!        type(mesh_geometry), intent(in) :: mesh
-!!        type(vectors_4_solver), intent(inout) :: v_sol
-!!
-!!      subroutine init_nod_send_recv(mesh)
-!!      subroutine nod_fields_send_recv(mesh, nod_fld, v_sol)
+!!      subroutine nod_fields_send_recv(mesh, nod_fld,                  &
+!!     &                                v_sol, SR_sig, SR_r)
 !!        type(mesh_geometry), intent(in) :: mesh
 !!        type(phys_data),intent(inout) :: nod_fld
 !!        type(vectors_4_solver), intent(inout) :: v_sol
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
+!!        type(send_recv_int_buffer), intent(inout) :: SR_i
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!
-!!      subroutine init_send_recv(nod_comm)
-!!      subroutine fields_send_recv(nod_comm, nod_fld, v_sol)
+!!      subroutine init_real_send_recv(nod_comm, SR_sig, SR_r)
+!!      subroutine fields_send_recv(nod_comm, nod_fld,                  &
+!!     &                            v_sol, SR_sig, SR_r)
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(phys_data),intent(inout) :: nod_fld
 !!        type(vectors_4_solver), intent(inout) :: v_sol
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
+!!        type(send_recv_int_buffer), intent(inout) :: SR_i
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!
-!!      subroutine scalar_send_recv(id_phys, nod_comm, nod_fld, v_sol)
-!!      subroutine vector_send_recv(id_phys, nod_comm, nod_fld, v_sol)
-!!      subroutine sym_tensor_send_recv(id_phys, nod_comm,              &
-!!                                      nod_fld, v_sol)
+!!      subroutine scalar_send_recv(id_phys, nod_comm, nod_fld,         &
+!!     &                            v_sol, SR_sig, SR_r)
+!!      subroutine vector_send_recv(id_phys, nod_comm, nod_fld,         &
+!!     &                            v_sol, SR_sig, SR_r)
+!!      subroutine sym_tensor_send_recv(id_phys, nod_comm, nod_fld,     &
+!!     &                                v_sol, SR_sig, SR_r)
 !!        type(node_data), intent(in) :: node
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(vectors_4_solver), intent(inout) :: v_sol
 !!        type(phys_data),intent(inout) :: nod_fld
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!         id_phys:  field ID of nodal fields
 !!
 !!      subroutine nod_scalar_send_recv(numnod, nod_comm,               &
-!!                                      scl_nod, v_sol)
+!!     &                                scl_nod, v_sol, SR_sig, SR_r)
 !!      subroutine nod_vector_send_recv(numnod, nod_comm,               &
-!!                                      vec_nod, v_sol)
+!!     &                                vec_nod, v_sol, SR_sig, SR_r)
 !!      subroutine nod_tensor_send_recv(numnod, nod_comm,               &
-!!                                      tsr_nod, v_sol)
+!!                                      tsr_nod, v_sol, SR_sig, SR_r)
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(vectors_4_solver), intent(inout) :: v_sol
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
 !
       module nod_phys_send_recv
@@ -54,6 +65,9 @@
       use t_mesh_data
       use t_phys_data
       use t_vector_for_solver
+      use t_solver_SR
+      use t_solver_SR_int
+      use t_solver_SR_int8
 !
       implicit none
 !
@@ -63,77 +77,48 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine FEM_comm_initialization(mesh, v_sol)
-!
-      type(mesh_geometry), intent(in) :: mesh
-      type(vectors_4_solver), intent(inout) :: v_sol
-!
-!
-      if (iflag_debug.gt.0 ) write(*,*) 'alloc_iccgN_vector'
-      call alloc_iccgN_vector(n_sym_tensor, mesh%node%numnod, v_sol)
-!
-      if(iflag_debug.gt.0) write(*,*)' init_nod_send_recv'
-      call init_nod_send_recv(mesh)
-!
-      end subroutine FEM_comm_initialization
-!
-! ----------------------------------------------------------------------
-! ----------------------------------------------------------------------
-!
-      subroutine init_nod_send_recv(mesh)
-!
-      type(mesh_geometry), intent(in) :: mesh
-!
-!
-      call init_send_recv(mesh%nod_comm)
-!
-      end subroutine init_nod_send_recv
-!
-! ----------------------------------------------------------------------
-!
-      subroutine nod_fields_send_recv(mesh, nod_fld, v_sol)
-!
-      use t_phys_data
+      subroutine nod_fields_send_recv(mesh, nod_fld,                    &
+     &                                v_sol, SR_sig, SR_r)
 !
       type(mesh_geometry), intent(in) :: mesh
       type(phys_data),intent(inout) :: nod_fld
       type(vectors_4_solver), intent(inout) :: v_sol
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
-      call fields_send_recv(mesh%nod_comm, nod_fld, v_sol)
+      call fields_send_recv(mesh%nod_comm, nod_fld,                     &
+     &                      v_sol, SR_sig, SR_r)
 !
       end subroutine nod_fields_send_recv
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine init_send_recv(nod_comm)
-!
-      use t_solver_SR
-      use m_solver_SR
+      subroutine init_real_send_recv(nod_comm, SR_sig, SR_r)
 !
       type(communication_table), intent(in) :: nod_comm
+!
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       call resize_work_SR                                               &
      &   (n_sym_tensor, nod_comm%num_neib, nod_comm%num_neib,           &
-     &    nod_comm%ntot_export, nod_comm%ntot_import, SR_sig1, SR_r1)
-      call resize_iwork_SR_t(nod_comm%num_neib, nod_comm%num_neib,      &
-     &    nod_comm%ntot_export, nod_comm%ntot_import, SR_sig1, SR_i1)
-      call resize_i8work_SR(nod_comm%num_neib, nod_comm%num_neib,       &
-     &    nod_comm%ntot_export, nod_comm%ntot_import, SR_sig1, SR_il1)
+     &    nod_comm%ntot_export, nod_comm%ntot_import, SR_sig, SR_r)
 !
-      end subroutine init_send_recv
+      end subroutine init_real_send_recv
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine fields_send_recv(nod_comm, nod_fld, v_sol)
-!
-      use t_phys_data
+      subroutine fields_send_recv(nod_comm, nod_fld,                    &
+     &                            v_sol, SR_sig, SR_r)
 !
       type(communication_table), intent(in) :: nod_comm
       type(phys_data),intent(inout) :: nod_fld
       type(vectors_4_solver), intent(inout) :: v_sol
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
       integer (kind=kint) :: i, ist
 !
@@ -144,17 +129,20 @@
         if (nod_fld%num_component(i) .eq. n_vector) then
           if (iflag_debug .ge. iflag_routine_msg) write(*,*)            &
      &      'comm. for vector of ', trim(nod_fld%phys_name(i))
-          call vector_send_recv(ist, nod_comm, nod_fld, v_sol)
+          call vector_send_recv(ist, nod_comm, nod_fld,                 &
+     &                          v_sol, SR_sig, SR_r)
 !
         else if (nod_fld%num_component(i) .eq. n_scalar) then
           if (iflag_debug .ge. iflag_routine_msg) write(*,*)            &
      &      'comm. for scaler of ', trim(nod_fld%phys_name(i))
-          call scalar_send_recv(ist, nod_comm, nod_fld, v_sol)
+          call scalar_send_recv(ist, nod_comm, nod_fld,                 &
+     &                          v_sol, SR_sig, SR_r)
 !
         else if (nod_fld%num_component(i) .eq. n_sym_tensor) then
           if (iflag_debug .ge. iflag_routine_msg) write(*,*)            &
      &      'comm. for tensor of ', trim(nod_fld%phys_name(i))
-          call sym_tensor_send_recv(ist, nod_comm, nod_fld, v_sol)
+          call sym_tensor_send_recv(ist, nod_comm, nod_fld,             &
+     &                              v_sol, SR_sig, SR_r)
         end if
       end do
 !
@@ -163,53 +151,55 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine scalar_send_recv(id_phys, nod_comm, nod_fld, v_sol)
-!
-      use t_phys_data
+      subroutine scalar_send_recv(id_phys, nod_comm, nod_fld,           &
+     &                            v_sol, SR_sig, SR_r)
 !
       integer(kind = kint), intent(in) :: id_phys
       type(communication_table), intent(in) :: nod_comm
       type(phys_data),intent(inout) :: nod_fld
       type(vectors_4_solver), intent(inout) :: v_sol
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
-      call nod_scalar_send_recv                                         &
-     &   (nod_fld%n_point, nod_comm, nod_fld%d_fld(1,id_phys), v_sol)
+      call nod_scalar_send_recv(nod_fld%n_point, nod_comm,              &
+     &    nod_fld%d_fld(1,id_phys), v_sol, SR_sig, SR_r)
 !
       end subroutine scalar_send_recv
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine vector_send_recv(id_phys, nod_comm, nod_fld, v_sol)
-!
-      use t_phys_data
+      subroutine vector_send_recv(id_phys, nod_comm, nod_fld,           &
+     &                            v_sol, SR_sig, SR_r)
 !
       integer(kind = kint), intent(in) :: id_phys
       type(communication_table), intent(in) :: nod_comm
       type(phys_data),intent(inout) :: nod_fld
       type(vectors_4_solver), intent(inout) :: v_sol
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
-      call nod_vector_send_recv                                         &
-     &   (nod_fld%n_point, nod_comm,  nod_fld%d_fld(1,id_phys), v_sol)
+      call nod_vector_send_recv(nod_fld%n_point, nod_comm,              &
+     &    nod_fld%d_fld(1,id_phys), v_sol, SR_sig, SR_r)
 !
       end subroutine vector_send_recv
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine sym_tensor_send_recv(id_phys, nod_comm,                &
-     &                                nod_fld, v_sol)
-!
-      use t_phys_data
+      subroutine sym_tensor_send_recv(id_phys, nod_comm, nod_fld,       &
+     &                                v_sol, SR_sig, SR_r)
 !
       integer(kind = kint), intent(in) :: id_phys
       type(communication_table), intent(in) :: nod_comm
       type(phys_data),intent(inout) :: nod_fld
       type(vectors_4_solver), intent(inout) :: v_sol
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       call nod_tensor_send_recv(nod_fld%n_point, nod_comm,              &
-     &    nod_fld%d_fld(1,id_phys), v_sol)
+     &    nod_fld%d_fld(1,id_phys), v_sol, SR_sig, SR_r)
 !
       end subroutine sym_tensor_send_recv
 !
@@ -217,16 +207,17 @@
 !-----------------------------------------------------------------------
 !
       subroutine nod_scalar_send_recv(numnod, nod_comm,                 &
-     &                                scl_nod, v_sol)
+     &                                scl_nod, v_sol, SR_sig, SR_r)
 !
       use m_work_time
-      use m_solver_SR
       use solver_SR_type
 !
       integer(kind = kint), intent(in) :: numnod
       type(communication_table), intent(in) :: nod_comm
 !
       type(vectors_4_solver), intent(inout) :: v_sol
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
       real(kind = kreal), intent(inout) :: scl_nod(numnod)
 !
       integer(kind=kint)  :: inod
@@ -239,7 +230,7 @@
 !$omp end parallel do
 !
       call SOLVER_SEND_RECV_type(numnod, nod_comm,                      &
-     &                           SR_sig1, SR_r1, v_sol%x_vec(1))
+     &                           SR_sig, SR_r, v_sol%x_vec(1))
 !
 !$omp parallel do
       do inod=1, numnod
@@ -252,16 +243,17 @@
 ! ----------------------------------------------------------------------
 !
       subroutine nod_vector_send_recv(numnod, nod_comm,                 &
-     &                                vec_nod, v_sol)
+     &                                vec_nod, v_sol, SR_sig, SR_r)
 !
       use m_work_time
-      use m_solver_SR
       use solver_SR_type
 !
       integer(kind = kint), intent(in) :: numnod
       type(communication_table), intent(in) :: nod_comm
 !
       type(vectors_4_solver), intent(inout) :: v_sol
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
       real(kind = kreal), intent(inout) :: vec_nod(numnod,3)
 !
       integer (kind = kint) :: inod
@@ -275,7 +267,7 @@
 !$omp end parallel do
 !
       call SOLVER_SEND_RECV_3_type(numnod, nod_comm,                    &
-     &                             SR_sig1, SR_r1, v_sol%x_vec(1))
+     &                             SR_sig, SR_r, v_sol%x_vec(1))
 !
 !$omp parallel do
       do inod=1, numnod
@@ -290,16 +282,17 @@
 ! ----------------------------------------------------------------------
 !
       subroutine nod_tensor_send_recv(numnod, nod_comm,                 &
-     &                                tsr_nod, v_sol)
+     &                                tsr_nod, v_sol, SR_sig, SR_r)
 !
       use m_work_time
-      use m_solver_SR
       use solver_SR_type
 !
       integer(kind = kint), intent(in) :: numnod
       type(communication_table), intent(in) :: nod_comm
 !
       type(vectors_4_solver), intent(inout) :: v_sol
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
       real(kind = kreal), intent(inout) :: tsr_nod(numnod,6)
 !
       integer (kind = kint) :: inod
@@ -316,7 +309,7 @@
 !$omp end parallel do
 !
       call SOLVER_SEND_RECV_6_type(numnod, nod_comm,                    &
-     &                             SR_sig1, SR_r1, v_sol%x_vec(1))
+     &                             SR_sig, SR_r, v_sol%x_vec(1))
 !
 !$omp parallel do
       do inod=1, numnod

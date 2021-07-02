@@ -14,7 +14,7 @@
 !!@verbatim
 !!      subroutine init_visualize_convert_vtk                           &
 !!     &         (geofem, nod_fld, ucd_step, output_vtk_fmt_ctl,        &
-!!     &          ucd_file_IO, vtk_file_IO, vtk_out)
+!!     &          ucd_file_IO, vtk_file_IO, vtk_out, SR_sig, SR_i)
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(IO_step_param), intent(in) :: ucd_step
@@ -22,6 +22,8 @@
 !!        type(read_character_item), intent(in) :: output_vtk_fmt_ctl
 !!        type(field_IO_params), intent(inout) :: vtk_file_IO
 !!        type(ucd_data), intent(inout) :: vtk_out
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int_buffer), intent(inout) :: SR_i
 !!      subroutine visualize_convert_vtk                                &
 !!     &         (i_step, istep_ucd, time_d, vtk_file_IO, vtk_out)
 !!        type(time_data), intent(in) :: time_d
@@ -43,6 +45,8 @@
       use t_mesh_data
       use t_phys_data
       use t_ucd_data
+      use t_solver_SR
+      use t_solver_SR_int
 !
       implicit  none
 !
@@ -54,7 +58,7 @@
 !
       subroutine init_visualize_convert_vtk                             &
      &         (geofem, nod_fld, ucd_step, output_vtk_fmt_ctl,          &
-     &          ucd_file_IO, vtk_file_IO, vtk_out)
+     &          ucd_file_IO, vtk_file_IO, vtk_out, SR_sig, SR_i)
 !
       use m_field_file_format
       use t_control_array_character
@@ -68,6 +72,8 @@
 !
       type(field_IO_params), intent(inout) :: vtk_file_IO
       type(ucd_data), intent(inout) :: vtk_out
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int_buffer), intent(inout) :: SR_i
 !
 !
       call copy_file_params_type(ucd_file_IO, vtk_file_IO)
@@ -93,7 +99,7 @@
       if(ucd_step%increment .eq. 0) return
       call link_output_grd_file                                         &
      &   (geofem%mesh%node, geofem%mesh%ele, geofem%mesh%nod_comm,      &
-     &    nod_fld, vtk_file_IO, vtk_out)
+     &    nod_fld, vtk_file_IO, vtk_out, SR_sig, SR_i)
 !
       end subroutine init_visualize_convert_vtk
 !

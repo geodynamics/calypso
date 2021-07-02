@@ -17,7 +17,6 @@
       use t_mesh_data
       use t_phys_data
       use t_phys_address
-      use t_vector_for_solver
 !
       implicit none
 !
@@ -33,9 +32,6 @@
         type(phys_data) :: field
 !>        Address for nodal fields
         type(phys_address) :: iphys
-!
-!>        Structure for vectors for solver
-        type(vectors_4_solver) :: v_sol
       end type FEM_mesh_field_data
 !
       end module t_FEM_mesh_field_data

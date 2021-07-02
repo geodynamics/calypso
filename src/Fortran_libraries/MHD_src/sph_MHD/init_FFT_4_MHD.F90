@@ -7,14 +7,15 @@
 !>@brief Select Fourier transform routine by elapsed time
 !!
 !!@verbatim
-!!      subroutine init_fourier_transform_4_MHD                         &
-!!     &         (sph_rtp, comm_rtp, trns_MHD, WK_FFTs, iflag_FFT_MHD)
+!!      subroutine init_fourier_transform_4_MHD(sph_rtp, comm_rtp,      &
+!!     &          trns_MHD, WK_FFTs, SR_r, iflag_FFT_MHD)
 !!      integer(kind = kint) function                                   &
 !!     &                    set_FFT_mode_4_snapshot(iflag_FFT_MHD)
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in) :: comm_rtp
 !!        type(address_4_sph_trans), intent(inout) :: trns_MHD
 !!        type(work_for_FFTs), intent(inout) :: WK_FFTs
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!
 !!       Current problem
 !!      FFTW crashes when both single and multi transforms are 
@@ -69,23 +70,23 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_fourier_transform_4_MHD                           &
-     &         (sph_rtp, comm_rtp, trns_MHD, WK_FFTs, iflag_FFT_MHD)
+      subroutine init_fourier_transform_4_MHD(sph_rtp, comm_rtp,        &
+     &          trns_MHD, WK_FFTs, SR_r, iflag_FFT_MHD)
 !
-      use m_solver_SR
+      use t_solver_SR
 !
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_comm_tbl), intent(in) :: comm_rtp
 !
       type(address_4_sph_trans), intent(inout) :: trns_MHD
       type(work_for_FFTs), intent(inout) :: WK_FFTs
+      type(send_recv_real_buffer), intent(inout) :: SR_r
       integer(kind = kint), intent(inout) :: iflag_FFT_MHD
 !
 !
       if(iflag_FFT_MHD .eq. iflag_UNDEFINED_FFT) then
         call compare_FFT_4_MHD(sph_rtp, comm_rtp,                       &
-     &      SR_r1%n_WS, SR_r1%n_WR, SR_r1%WS, SR_r1%WR,                 &
-     &      trns_MHD, WK_FFTs)
+     &      SR_r%n_WS, SR_r%n_WR, SR_r%WS, SR_r%WR, trns_MHD, WK_FFTs)
         iflag_FFT_MHD = iflag_selected
       end if
 !
@@ -173,6 +174,7 @@
       real(kind = kreal), intent(inout) :: etime_fft
 !
       real(kind = kreal) :: starttime, endtime
+      type(work_for_sgl_FFTW) :: TEST_mul_FFTW
 !
 !
       if(iflag_debug .gt. 0) write(*,*) 'init_sph_FFT_select'

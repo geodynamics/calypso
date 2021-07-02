@@ -28,7 +28,7 @@
 !!      subroutine set_nodes_4_psf                                      &
 !!      &        (num_psf, node, edge, nod_comm, edge_comm,             &
 !!      &         sf_grp, sf_grp_nod, psf_def, psf_search,              &
-!!      &         psf_list, psf_grp_list, psf_mesh)
+!!      &         psf_list, psf_grp_list, psf_mesh, SR_sig, SR_il)
 !!        type(node_data), intent(in) :: node
 !!        type(edge_data), intent(in) :: edge
 !!        type(surface_group_data), intent(in) :: sf_grp
@@ -40,14 +40,18 @@
 !!        type(sectioning_list), intent(inout) :: psf_list(num_psf)
 !!        type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
 !!        type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!      subroutine set_nodes_4_iso(num_iso, node, edge, edge_comm,      &
-!!     &                           iso_search, iso_list, iso_mesh)
+!!     &          iso_search, iso_list, iso_mesh, SR_sig, SR_il)
 !!        type(node_data), intent(in) :: node
 !!        type(edge_data), intent(in) :: edge
 !!        type(communication_table), intent(in) :: edge_comm
 !!        type(psf_search_lists), intent(in) :: iso_search(num_iso)
 !!        type(sectioning_list), intent(inout) :: iso_list(num_iso)
 !!        type(psf_local_data), intent(inout) :: iso_mesh(num_iso)
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!@endverbatim
 !
       module set_nodes_for_psf
@@ -55,6 +59,9 @@
       use m_precision
 !
       use m_machine_parameter
+      use t_solver_SR
+      use t_solver_SR_int8
+!
       use set_node_for_sections
       use set_nodal_field_for_psf
       use set_psf_nodes_4_by_surf_grp
@@ -157,7 +164,7 @@
       subroutine set_nodes_4_psf                                        &
       &        (num_psf, node, edge, nod_comm, edge_comm,               &
       &         sf_grp, sf_grp_nod, psf_def, psf_search,                &
-      &         psf_list, psf_grp_list, psf_mesh)
+      &         psf_list, psf_grp_list, psf_mesh, SR_sig, SR_il)
 !
       use calypso_mpi
       use t_control_params_4_psf
@@ -188,6 +195,8 @@
       type(sectioning_list), intent(inout) :: psf_list(num_psf)
       type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
       type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int8_buffer), intent(inout) :: SR_il
 !
       integer(kind = kint) :: i, ist, num, igrp, inod
 !
@@ -203,7 +212,8 @@
      &        edge%ie_edge, node%xx, psf_def(i)%const_psf, psf_list(i))
 !
           call psf_global_nod_id_on_edge(edge_comm, edge%numedge,       &
-     &        psf_mesh(i)%node%istack_internod, psf_list(i))
+     &        psf_mesh(i)%node%istack_internod, psf_list(i),            &
+     &        SR_sig, SR_il)
 !
           call set_position_4_psf(node%numnod,                          &
      &        edge%numedge, edge%nnod_4_edge, edge%ie_edge,             &
@@ -222,7 +232,7 @@
 !
           call psf_global_nod_id_on_node(nod_comm, node%numnod,         &
      &       psf_mesh(i)%node%istack_internod,                          &
-     &       psf_grp_list(i)%id_n_on_n)
+     &       psf_grp_list(i)%id_n_on_n, SR_sig, SR_il)
 !
           call set_position_psf_grp(node%numnod, node%xx,               &
      &        psf_mesh(i)%node%istack_internod(my_rank),                &
@@ -244,7 +254,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_nodes_4_iso(num_iso, node, edge, edge_comm,        &
-     &                           iso_search, iso_list, iso_mesh)
+     &          iso_search, iso_list, iso_mesh, SR_sig, SR_il)
 !
       use calypso_mpi
       use t_geometry_data
@@ -266,6 +276,8 @@
       type(psf_search_lists), intent(in) :: iso_search(num_iso)
       type(sectioning_list), intent(inout) :: iso_list(num_iso)
       type(psf_local_data), intent(inout) :: iso_mesh(num_iso)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int8_buffer), intent(inout) :: SR_il
 !
       integer(kind = kint) :: i
 !
@@ -283,7 +295,8 @@
      &      edge%nnod_4_edge, edge%ie_edge, iso_list(i))
 !
         call psf_global_nod_id_on_edge(edge_comm, edge%numedge,         &
-     &      iso_mesh(i)%node%istack_internod, iso_list(i))
+     &      iso_mesh(i)%node%istack_internod, iso_list(i),              &
+     &      SR_sig, SR_il)
 !
 !
         call set_position_4_psf                                         &

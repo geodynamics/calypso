@@ -13,6 +13,8 @@
 !!      subroutine calypso_MPI_abort(icode, message)
 !!
 !!      subroutine calypso_MPI_barrier
+!!
+!!      subroutine calypso_MPI_setup
 !!@endverbatim
 !!
 !!@n @param  icode       error code
@@ -64,6 +66,50 @@
 !
 !
       call  MPI_INIT(ierr_MPI)
+      call  calypso_MPI_setup
+!
+      end subroutine calypso_MPI_init
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_MPI_finalize
+!
+!
+      call  MPI_FINALIZE(ierr_MPI)
+!
+      end subroutine calypso_MPI_finalize
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_MPI_abort(icode, message)
+!
+      integer(kind = kint), intent(in)  ::  icode
+      character(len=*), intent(in)  ::  message
+!
+!
+      write(*,*) ' ///// abnormal termination ///// ', icode,           &
+     &                                            ' ', message
+!
+      call  MPI_ABORT(CALYPSO_COMM, 999, ierr_MPI)
+!
+      stop
+      end subroutine calypso_MPI_abort
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_MPI_barrier
+!
+!
+      call MPI_BARRIER(CALYPSO_COMM, ierr_MPI)
+!
+      end subroutine  calypso_MPI_barrier
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine calypso_MPI_setup
+!
+!
       call  MPI_COMM_DUP (MPI_COMM_WORLD, CALYPSO_COMM, ierr_MPI)
       call  MPI_COMM_SIZE(CALYPSO_COMM, nprocs, ierr_MPI)
       call  MPI_COMM_RANK(CALYPSO_COMM, my_rank, ierr_MPI)
@@ -102,42 +148,7 @@
         CALYPSO_GLOBAL_INT = MPI_INTEGER
       end if
 !
-      end subroutine calypso_MPI_init
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine calypso_MPI_finalize
-!
-!
-      call  MPI_FINALIZE(ierr_MPI)
-!
-      end subroutine calypso_MPI_finalize
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine calypso_MPI_abort(icode, message)
-!
-      integer(kind = kint), intent(in)  ::  icode
-      character(len=*), intent(in)  ::  message
-!
-!
-      write(*,*) ' ///// abnormal termination ///// ', icode,           &
-     &                                            ' ', message
-!
-      call  MPI_ABORT(CALYPSO_COMM, 999, ierr_MPI)
-!
-      stop
-      end subroutine calypso_MPI_abort
-!
-!  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
-!
-      subroutine calypso_MPI_barrier
-!
-!
-      call MPI_BARRIER(CALYPSO_COMM, ierr_MPI)
-!
-      end subroutine  calypso_MPI_barrier
+      end subroutine calypso_MPI_setup
 !
 !  ---------------------------------------------------------------------
 !

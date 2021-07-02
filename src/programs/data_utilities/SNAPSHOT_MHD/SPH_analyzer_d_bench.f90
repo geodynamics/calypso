@@ -10,21 +10,25 @@
 !!
 !!@verbatim
 !!      subroutine SPH_init_sph_dbench(MHD_files, iphys,                &
-!!     &          SPH_model, SPH_MHD, SPH_WK, cdat)
+!!     &          SPH_model, SPH_MHD, SPH_WK, SR_sig, SR_r, cdat)
 !!         type(MHD_file_IO_params), intent(in) :: MHD_files
 !!         type(phys_address), intent(in) :: iphys
 !!         type(SPH_MHD_model_data), intent(inout) :: SPH_model
-!!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
-!!        type(work_SPH_MHD), intent(inout) :: SPH_WK
+!!         type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+!!         type(work_SPH_MHD), intent(inout) :: SPH_WK
 !!         type(circle_fld_maker), intent(inout) :: cdat
+!!         type(send_recv_status), intent(inout) :: SR_sig
+!!         type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine SPH_analyze_dbench(i_step, MHD_files, SPH_model,     &
-!!     &          SPH_MHD, SPH_WK, cdat, bench)
+!!     &          SPH_MHD, SPH_WK, SR_sig, SR_r, cdat, bench)
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!         type(SPH_MHD_model_data), intent(in) :: SPH_model
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!        type(work_SPH_MHD), intent(inout) :: SPH_WK
 !!        type(phys_data), intent(inout) :: cdat
 !!        type(dynamobench_monitor), intent(inout) :: bench
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine SPH_finalize_dbench
 !!@endverbatim
 !
@@ -41,6 +45,7 @@
       use t_field_on_circle
       use t_field_4_dynamobench
       use t_work_SPH_MHD
+      use t_solver_SR
 !
       use calypso_mpi
 !
@@ -53,7 +58,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine SPH_init_sph_dbench(MHD_files, iphys,                  &
-     &          SPH_model, SPH_MHD, SPH_WK, cdat)
+     &          SPH_model, SPH_MHD, SPH_WK, SR_sig, SR_r, cdat)
 !
       use m_constants
       use m_machine_parameter
@@ -83,6 +88,8 @@
       type(SPH_MHD_model_data), intent(inout) :: SPH_model
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(work_SPH_MHD), intent(inout) :: SPH_WK
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
       type(circle_fld_maker), intent(inout) :: cdat
 !
 !   Allocate spectr field data
@@ -98,8 +105,8 @@
 !  -------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'init_sph_transform_MHD'
-      call init_sph_transform_MHD                                       &
-     &   (SPH_model, iphys, SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
+      call init_sph_transform_MHD(SPH_model, iphys, SPH_WK%trans_p,     &
+     &    SPH_WK%trns_WK, SPH_MHD, SR_sig, SR_r)
 !
 ! ---------------------------------
 !
@@ -130,7 +137,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine SPH_analyze_dbench(i_step, MHD_files, SPH_model,       &
-     &          SPH_MHD, SPH_WK, cdat, bench)
+     &          SPH_MHD, SPH_WK, SR_sig, SR_r, cdat, bench)
 !
       use cal_sol_sph_MHD_crank
       use adjust_reference_fields
@@ -146,6 +153,8 @@
 !
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(work_SPH_MHD), intent(inout) :: SPH_WK
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
       type(circle_fld_maker), intent(inout) :: cdat
       type(dynamobench_monitor), intent(inout) :: bench
 !
@@ -177,7 +186,7 @@
         if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
         call s_lead_fields_4_sph_mhd(SPH_WK%monitor, SPH_WK%r_2nd,      &
      &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%trans_p,   &
-     &      SPH_WK%MHD_mats, SPH_WK%trns_WK, SPH_MHD)
+     &      SPH_WK%MHD_mats, SPH_WK%trns_WK, SPH_MHD, SR_sig, SR_r)
       end if
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+5)
 !

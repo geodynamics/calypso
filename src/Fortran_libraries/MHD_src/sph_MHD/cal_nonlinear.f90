@@ -7,15 +7,18 @@
 !>@brief Evaluate nonlinear terms by pseudo spectram scheme
 !!
 !!@verbatim
-!!      subroutine nonlinear(r_2nd, SPH_model, trans_p, WK, SPH_MHD)
+!!      subroutine nonlinear(r_2nd, SPH_model, trans_p,                 &
+!!     &                     WK, SPH_MHD, SR_sig, SR_r)
 !!        type(fdm_matrices), intent(in) :: r_2nd
 !!        type(SGS_model_control_params), intent(in) :: SGS_param
 !!        type(works_4_sph_trans_MHD), intent(inout) :: WK
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine nonlinear_by_pseudo_sph                              &
 !!     &         (sph, comms_sph, omega_sph, r_2nd, MHD_prop,           &
-!!     &          sph_MHD_bc, trans_p, gt_cor, trns_MHD,                &
-!!     &          WK_leg, WK_FFTs_MHD, cor_rlm, ipol, rj_fld)
+!!     &          sph_MHD_bc, trans_p, gt_cor, trns_MHD, WK_leg,        &
+!!     &          WK_FFTs_MHD, cor_rlm, ipol, rj_fld, SR_sig, SR_r)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(fdm_matrices), intent(in) :: r_2nd
@@ -30,8 +33,11 @@
 !!        type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
 !!        type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !!        type(phys_data), intent(inout) :: rj_fld
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine licv_exp(ref_temp, ref_comp, MHD_prop, sph_MHD_bc,   &
-!!     &          sph, comms_sph, omega_sph, trans_p, ipol, WK, rj_fld)
+!!     &          sph, comms_sph, omega_sph, trans_p, ipol, WK,         &
+!!     &          rj_fld, SR_sig, SR_r)
 !!        type(SGS_model_control_params), intent(in) :: SGS_param
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
@@ -45,6 +51,8 @@
 !!        type(reference_field), intent(in) :: ref_comp
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
 !
 !
@@ -70,6 +78,7 @@
       use t_sph_FFT_selector
       use t_coriolis_terms_rlm
       use t_gaunt_coriolis_rlm
+      use t_solver_SR
 !
       implicit none
 !
@@ -79,7 +88,8 @@
 !*
 !*   ------------------------------------------------------------------
 !*
-      subroutine nonlinear(r_2nd, SPH_model, trans_p, WK, SPH_MHD)
+      subroutine nonlinear(r_2nd, SPH_model, trans_p,                   &
+     &                     WK, SPH_MHD, SR_sig, SR_r)
 !
       use cal_inner_core_rotation
 !
@@ -96,6 +106,8 @@
 !
       type(works_4_sph_trans_MHD), intent(inout) :: WK
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
 !   ----  lead rottion of buoyancies
@@ -114,7 +126,7 @@
      &   (SPH_MHD%sph, SPH_MHD%comms, SPH_model%omega_sph,              &
      &    r_2nd, SPH_model%MHD_prop, SPH_model%sph_MHD_bc, trans_p,     &
      &    WK%gt_cor, WK%trns_MHD, WK%WK_leg, WK%WK_FFTs_MHD,            &
-     &    WK%cor_rlm, SPH_MHD%ipol, SPH_MHD%fld)
+     &    WK%cor_rlm, SPH_MHD%ipol, SPH_MHD%fld, SR_sig, SR_r)
 !
 !   ----  Lead advection of reference field
       call add_ref_advect_sph_MHD                                       &
@@ -143,8 +155,8 @@
 !
       subroutine nonlinear_by_pseudo_sph                                &
      &         (sph, comms_sph, omega_sph, r_2nd, MHD_prop,             &
-     &          sph_MHD_bc, trans_p, gt_cor, trns_MHD,                  &
-     &          WK_leg, WK_FFTs_MHD, cor_rlm, ipol, rj_fld)
+     &          sph_MHD_bc, trans_p, gt_cor, trns_MHD, WK_leg,          &
+     &          WK_FFTs_MHD, cor_rlm, ipol, rj_fld, SR_sig, SR_r)
 !
       use sph_transforms_4_MHD
       use cal_nonlinear_sph_MHD
@@ -168,7 +180,8 @@
       type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
       type(coriolis_rlm_data), intent(inout) :: cor_rlm
       type(phys_data), intent(inout) :: rj_fld
-!
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !   ----  lead nonlinear terms by phesdo spectrum
 !
@@ -177,7 +190,8 @@
       call sph_back_trans_4_MHD                                         &
      &   (sph, comms_sph, MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U,        &
      &    omega_sph, trans_p, gt_cor, rj_fld, trns_MHD%b_trns,          &
-     &    trns_MHD%backward, WK_leg, WK_FFTs_MHD, cor_rlm)
+     &    trns_MHD%backward, WK_leg, WK_FFTs_MHD, cor_rlm,              &
+     &    SR_sig, SR_r)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+9)
 !
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+10)
@@ -191,7 +205,7 @@
       if (iflag_debug.ge.1) write(*,*) 'sph_forward_trans_4_MHD'
       call sph_forward_trans_4_MHD(sph, comms_sph, MHD_prop%fl_prop,    &
      &    trans_p, cor_rlm, trns_MHD%f_trns, trns_MHD%forward,          &
-     &    WK_leg, WK_FFTs_MHD, rj_fld)
+     &    WK_leg, WK_FFTs_MHD, rj_fld, SR_sig, SR_r)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+11)
 !
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+12)
@@ -207,7 +221,8 @@
 !*   ------------------------------------------------------------------
 !*
       subroutine licv_exp(ref_temp, ref_comp, MHD_prop, sph_MHD_bc,     &
-     &          sph, comms_sph, omega_sph, trans_p, ipol, WK, rj_fld)
+     &          sph, comms_sph, omega_sph, trans_p, ipol, WK,           &
+     &          rj_fld, SR_sig, SR_r)
 !
       use m_phys_constants
       use rot_self_buoyancies_sph
@@ -227,6 +242,8 @@
 !
       type(works_4_sph_trans_MHD), intent(inout) :: WK
       type(phys_data), intent(inout) :: rj_fld
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !   ----  lead rottion of buoyancies
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
@@ -241,8 +258,8 @@
       if(MHD_prop%fl_prop%iflag_4_coriolis) then
         call sph_transform_4_licv                                       &
      &     (sph%sph_rlm, comms_sph%comm_rlm, comms_sph%comm_rj,         &
-     &      MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U, omega_sph,           &
-     &      trans_p, WK%gt_cor, WK%trns_MHD, rj_fld, WK%cor_rlm)
+     &      MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U, omega_sph, trans_p,  &
+     &      WK%gt_cor, WK%trns_MHD, rj_fld, WK%cor_rlm, SR_sig, SR_r)
       end if
 !
 !   ----  lead nonlinear terms by phesdo spectrum

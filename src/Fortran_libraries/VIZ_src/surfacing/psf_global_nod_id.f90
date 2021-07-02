@@ -6,18 +6,25 @@
 !>@brief Set global node ID list for sectioning
 !!
 !!@verbatim
-!!      subroutine psf_global_nod_id_on_edge                            &
-!!     &         (edge_comm, numedge, istack_internod, psf_list)
+!!      subroutine psf_global_nod_id_on_edge(edge_comm,                 &
+!!     &          numedge, istack_internod, psf_list, SR_sig, SR_il)
 !!        type(communication_table), intent(in) :: edge_comm
 !!        type(sectioning_list), intent(inout) :: psf_list
-!!      subroutine psf_global_nod_id_on_node                            &
-!!     &         (nod_comm, numnod, istack_internod, id_n_on_n)
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
+!!      subroutine psf_global_nod_id_on_node(nod_comm,                  &
+!!     &          numnod, istack_internod, id_n_on_n, SR_sig, SR_il)
+!!        type(communication_table), intent(in) :: nod_comm
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!@endverbatim
 !
       module psf_global_nod_id
 !
       use calypso_mpi
       use t_comm_table
+      use t_solver_SR
+      use t_solver_SR_int8
       use m_machine_parameter
 !
       implicit none
@@ -28,10 +35,9 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine psf_global_nod_id_on_edge                              &
-     &         (edge_comm, numedge, istack_internod, psf_list)
+      subroutine psf_global_nod_id_on_edge(edge_comm,                   &
+     &          numedge, istack_internod, psf_list, SR_sig, SR_il)
 !
-      use m_solver_SR
       use t_psf_geometry_list
       use solver_SR_type
 !
@@ -40,6 +46,8 @@
       integer(kind = kint_gl), intent(in) :: istack_internod(0:nprocs)
 !
       type(sectioning_list), intent(inout) :: psf_list
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int8_buffer), intent(inout) :: SR_il
 !
       integer(kind = kint) :: iedge, icou
 !
@@ -56,16 +64,15 @@
       end do
 !
       call SOLVER_SEND_RECV_int8_type                                   &
-     &   (numedge, edge_comm, SR_sig1, SR_il1, psf_list%id_n_on_e)
+     &   (numedge, edge_comm, SR_sig, SR_il, psf_list%id_n_on_e)
 !
       end subroutine psf_global_nod_id_on_edge
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine psf_global_nod_id_on_node                              &
-     &         (nod_comm, numnod, istack_internod, id_n_on_n)
+      subroutine psf_global_nod_id_on_node(nod_comm,                    &
+     &          numnod, istack_internod, id_n_on_n, SR_sig, SR_il)
 !
-      use m_solver_SR
       use solver_SR_type
 !
       type(communication_table), intent(in) :: nod_comm
@@ -73,6 +80,8 @@
       integer(kind = kint_gl), intent(in) :: istack_internod(0:nprocs)
 !
       integer(kind = kint_gl), intent(inout) :: id_n_on_n(numnod)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int8_buffer), intent(inout) :: SR_il
 !
       integer(kind = kint) :: inod
 !
@@ -86,7 +95,7 @@
       write(*,*) 'istack_internod', istack_internod
 !
       call SOLVER_SEND_RECV_int8_type(numnod, nod_comm,                 &
-     &                                SR_sig1, SR_il1, id_n_on_n)
+     &                                SR_sig, SR_il, id_n_on_n)
 !
       end subroutine psf_global_nod_id_on_node
 !

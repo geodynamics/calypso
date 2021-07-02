@@ -11,7 +11,8 @@
 !!      subroutine s_test_legendre_transforms(sph, comms_sph,           &
 !!     &          fl_prop, sph_bc_U, omega_sph, trans_p, gt_cor,        &
 !!     &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,&
-!!     &          rj_fld, trns_MHD, WK_leg, WK_FFTs_MHD, cor_rlm)
+!!     &          rj_fld, trns_MHD, WK_leg, WK_FFTs_MHD,                &
+!!     &          cor_rlm, SR_sig, SR_r)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!        type(fluid_property), intent(in) :: fl_prop
@@ -24,6 +25,8 @@
 !!        type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
 !!        type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !!        type(phys_data), intent(inout) :: rj_fld
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
 !!
       module test_legendre_transforms
@@ -48,6 +51,7 @@
       use t_coriolis_terms_rlm
       use t_gaunt_coriolis_rlm
       use t_boundary_data_sph_MHD
+      use t_solver_SR
 !
       implicit  none
 !
@@ -78,7 +82,8 @@
       subroutine s_test_legendre_transforms(sph, comms_sph,             &
      &          fl_prop, sph_bc_U, omega_sph, trans_p, gt_cor,          &
      &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,  &
-     &          rj_fld, trns_MHD, WK_leg, WK_FFTs_MHD, cor_rlm)
+     &          rj_fld, trns_MHD, WK_leg, WK_FFTs_MHD,                  &
+     &          cor_rlm, SR_sig, SR_r)
 !
       use calypso_mpi_real
       use sph_transforms_4_MHD
@@ -101,6 +106,8 @@
       type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
       type(coriolis_rlm_data), intent(inout) :: cor_rlm
       type(phys_data), intent(inout) :: rj_fld
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
       real(kind = kreal) :: starttime, etime_shortest
       real(kind = kreal) :: endtime(num_test)
@@ -125,10 +132,11 @@
         starttime = MPI_WTIME()
         call sph_back_trans_4_MHD(sph, comms_sph, fl_prop, sph_bc_U,    &
      &      omega_sph, trans_p, gt_cor, rj_fld, trns_MHD%b_trns,        &
-     &      trns_MHD%backward, WK_leg, WK_FFTs_MHD, cor_rlm)
+     &      trns_MHD%backward, WK_leg, WK_FFTs_MHD, cor_rlm,            &
+     &      SR_sig, SR_r)
         call sph_forward_trans_4_MHD(sph, comms_sph, fl_prop,           &
      &      trans_p, cor_rlm, trns_MHD%f_trns, trns_MHD%forward,        &
-     &      WK_leg, WK_FFTs_MHD, rj_fld)
+     &      WK_leg, WK_FFTs_MHD, rj_fld, SR_sig, SR_r)
         endtime(id) = MPI_WTIME() - starttime
 !
         call sel_finalize_legendre_trans(WK_leg)

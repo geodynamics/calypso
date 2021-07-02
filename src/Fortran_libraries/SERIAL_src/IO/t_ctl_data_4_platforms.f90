@@ -15,6 +15,9 @@
 !!        type(platform_data_control), intent(in) :: plt
 !!      subroutine reset_control_platforms(plt)
 !!        type(platform_data_control), intent(inout) :: plt
+!!      subroutine copy_ctl_data_4_platform(org_plt, new_plt)
+!!        type(platform_data_control), intent(in) :: org_plt
+!!        type(platform_data_control), intent(inout) :: new_plt
 !!
 !! ------------------------------------------------------------------
 !!      Example of control parameters
@@ -41,7 +44,7 @@
 !!      spectr_field_file_prefix    'sph_spectr/spectr'
 !!
 !!      rayleigh_spectr_dir            'Checkpoints/'
-!!      rayleigh_field_dir             'Spherical3D/'
+!!      rayleigh_field_dir             'Spherical_3D/'
 !!
 !!      mesh_file_fmt_ctl           'ascii'
 !!      restart_file_fmt_ctl        'ascii'
@@ -435,6 +438,70 @@
       plt%i_platform = 0
 !
       end subroutine reset_control_platforms
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine copy_ctl_data_4_platform(org_plt, new_plt)
+!
+      type(platform_data_control), intent(in) :: org_plt
+      type(platform_data_control), intent(inout) :: new_plt
+!
+!
+      call copy_integer_ctl(org_plt%ndomain_ctl, new_plt%ndomain_ctl)
+      call copy_integer_ctl(org_plt%num_smp_ctl, new_plt%num_smp_ctl)
+!
+      call copy_chara_ctl(org_plt%mesh_file_prefix,                     &
+     &                    new_plt%mesh_file_prefix)
+!
+      call copy_chara_ctl(org_plt%field_file_prefix,                    &
+     &                    new_plt%field_file_prefix)
+      call copy_chara_ctl(org_plt%restart_file_prefix,                  &
+     &                    new_plt%restart_file_prefix)
+      call copy_chara_ctl(org_plt%spectr_field_file_prefix,             &
+     &                    new_plt%spectr_field_file_prefix)
+!
+      call copy_chara_ctl(org_plt%sph_file_prefix,                      &
+     &                    new_plt%sph_file_prefix)
+!
+      call copy_chara_ctl(org_plt%coriolis_int_file_name,               &
+     &                     new_plt%coriolis_int_file_name)
+      call copy_chara_ctl(org_plt%bc_data_file_name_ctl,                &
+     &                    new_plt%bc_data_file_name_ctl)
+!
+      call copy_chara_ctl(org_plt%rayleigh_spectr_dir,                  &
+     &                    new_plt%rayleigh_spectr_dir)
+      call copy_chara_ctl(org_plt%rayleigh_field_dir,                   &
+     &                    new_plt%rayleigh_field_dir)
+!
+      call copy_chara_ctl(org_plt%interpolate_sph_to_fem_ctl,           &
+     &                    new_plt%interpolate_sph_to_fem_ctl)
+      call copy_chara_ctl(org_plt%interpolate_fem_to_sph_ctl,           &
+     &                    new_plt%interpolate_fem_to_sph_ctl)
+!
+      call copy_chara_ctl(org_plt%mesh_file_fmt_ctl,                    &
+     &                    new_plt%mesh_file_fmt_ctl)
+      call copy_chara_ctl(org_plt%restart_file_fmt_ctl,                 &
+     &                    new_plt%restart_file_fmt_ctl)
+      call copy_chara_ctl(org_plt%field_file_fmt_ctl,                   &
+     &                    new_plt%field_file_fmt_ctl)
+      call copy_chara_ctl(org_plt%sph_file_fmt_ctl,                     &
+     &                    new_plt%sph_file_fmt_ctl)
+      call copy_chara_ctl(org_plt%itp_file_fmt_ctl,                     &
+     &                    new_plt%itp_file_fmt_ctl)
+      call copy_chara_ctl(org_plt%spectr_field_fmt_ctl,                 &
+     &                    new_plt%spectr_field_fmt_ctl)
+      call copy_chara_ctl(org_plt%coriolis_file_fmt_ctl,                &
+     &                    new_plt%coriolis_file_fmt_ctl)
+!
+      call copy_chara_ctl(org_plt%debug_flag_ctl,                       &
+     &                    new_plt%debug_flag_ctl)
+!
+      call copy_chara_ctl(org_plt%del_org_data_ctl,                     &
+     &                    new_plt%del_org_data_ctl)
+!
+      new_plt%i_platform = org_plt%i_platform
+!
+      end subroutine copy_ctl_data_4_platform
 !
 !  ---------------------------------------------------------------------
 !

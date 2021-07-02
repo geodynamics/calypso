@@ -8,20 +8,22 @@
 !!
 !!@verbatim
 !!      subroutine init_sph_transform_MHD                               &
-!!     &         (SPH_model, iphys, trans_p, WK, SPH_MHD)
-!!      subroutine init_leg_fourier_trans_MHD                           &
-!!     &         (sph, comms_sph, ncomp_max_trans, trans_p, WK)
+!!     &         (SPH_model, iphys, trans_p, WK, SPH_MHD, SR_sig, SR_r)
+!!      subroutine init_leg_fourier_trans_MHD(sph, comms_sph,           &
+!!     &          ncomp_max_trans, trans_p, WK, SR_sig, SR_r)
 !!      subroutine sel_sph_transform_MHD                                &
 !!     &         (MHD_prop, sph_MHD_bc, sph, comms_sph, omega_sph,      &
 !!     &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,&
 !!     &          trns_MHD, WK_leg, WK_FFTs_MHD, trans_p, gt_cor,       &
-!!     &          cor_rlm, rj_fld)
+!!     &          cor_rlm, rj_fld, SR_sig, SR_r)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(parameters_4_sph_trans), intent(inout) :: trans_p
 !!        type(works_4_sph_trans_MHD), intent(inout) :: WK
 !!        type(gaunt_coriolis_rlm), intent(inout) :: gt_cor
 !!        type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine init_work_4_coriolis(sph_MHD_bc, sph, trans_p, WK)
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(sph_grids), intent(inout) :: sph
@@ -51,6 +53,7 @@
       use t_coriolis_terms_rlm
       use t_gaunt_coriolis_rlm
       use t_boundary_data_sph_MHD
+      use t_solver_SR
 !
       implicit  none
 !
@@ -61,7 +64,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine init_sph_transform_MHD                                 &
-     &         (SPH_model, iphys, trans_p, WK, SPH_MHD)
+     &         (SPH_model, iphys, trans_p, WK, SPH_MHD, SR_sig, SR_r)
 !
       use set_address_sph_trans_MHD
       use set_address_sph_trans_snap
@@ -72,6 +75,8 @@
       type(parameters_4_sph_trans), intent(inout) :: trans_p
       type(works_4_sph_trans_MHD), intent(inout) :: WK
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !>      total number of components for spherical harmonics transform
       integer(kind = kint), save :: ncomp_max_trans = 0
@@ -99,8 +104,8 @@
 !
       call alloc_sph_trans_address(SPH_MHD%sph%sph_rtp, WK)
 !
-      call init_leg_fourier_trans_MHD                                   &
-     &   (SPH_MHD%sph, SPH_MHD%comms, ncomp_max_trans, trans_p, WK)
+      call init_leg_fourier_trans_MHD(SPH_MHD%sph, SPH_MHD%comms,       &
+     &    ncomp_max_trans, trans_p, WK, SR_sig, SR_r)
 !
       call init_work_4_coriolis                                         &
      &   (SPH_model%sph_MHD_bc, SPH_MHD%sph, trans_p, WK)
@@ -110,14 +115,14 @@
      &    SPH_MHD%sph, SPH_MHD%comms, SPH_model%omega_sph,              &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans,        &
      &    WK%trns_MHD, WK%WK_leg, WK%WK_FFTs_MHD, trans_p,              &
-     &    WK%gt_cor, WK%cor_rlm, SPH_MHD%fld)
+     &    WK%gt_cor, WK%cor_rlm, SPH_MHD%fld, SR_sig, SR_r)
 !
       end subroutine init_sph_transform_MHD
 !
 !-----------------------------------------------------------------------
 !
-      subroutine init_leg_fourier_trans_MHD                             &
-     &         (sph, comms_sph, ncomp_max_trans, trans_p, WK)
+      subroutine init_leg_fourier_trans_MHD(sph, comms_sph,             &
+     &          ncomp_max_trans, trans_p, WK, SR_sig, SR_r)
 !
       use init_sph_trans
       use init_FFT_4_MHD
@@ -132,17 +137,20 @@
 !
       type(parameters_4_sph_trans), intent(inout) :: trans_p
       type(works_4_sph_trans_MHD), intent(inout) :: WK
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       if (iflag_debug.eq.1) write(*,*) 'initialize_legendre_trans'
       call initialize_legendre_trans                                    &
      &   (trans_p%nvector_legendre, ncomp_max_trans, sph, comms_sph,    &
-     &    trans_p%leg, trans_p%idx_trns, trans_p%iflag_SPH_recv)
+     &    trans_p%leg, trans_p%idx_trns, SR_sig, SR_r,                  &
+     &    trans_p%iflag_SPH_recv)
 !
       WK%iflag_MHD_FFT = trans_p%iflag_FFT
       call init_fourier_transform_4_MHD                                 &
      &   (sph%sph_rtp, comms_sph%comm_rtp,                              &
-     &    WK%trns_MHD, WK%WK_FFTs_MHD, WK%iflag_MHD_FFT)
+     &    WK%trns_MHD, WK%WK_FFTs_MHD, SR_r, WK%iflag_MHD_FFT)
 !
       trans_p%iflag_FFT = set_FFT_mode_4_snapshot(WK%iflag_MHD_FFT)
       call init_sph_FFT_select(my_rank, trans_p%iflag_FFT,              &
@@ -159,7 +167,7 @@
      &         (MHD_prop, sph_MHD_bc, sph, comms_sph, omega_sph,        &
      &          ncomp_max_trans, nvector_max_trans, nscalar_max_trans,  &
      &          trns_MHD, WK_leg, WK_FFTs_MHD, trans_p, gt_cor,         &
-     &          cor_rlm, rj_fld)
+     &          cor_rlm, rj_fld, SR_sig, SR_r)
 !
       use m_legendre_transform_list
       use test_legendre_transforms
@@ -183,6 +191,8 @@
       type(legendre_trns_works), intent(inout) :: WK_leg
       type(work_for_FFTs), intent(inout) :: WK_FFTs_MHD
       type(phys_data), intent(inout) :: rj_fld
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
       character(len=kchara) :: tmpchara
 !
@@ -191,7 +201,7 @@
       call s_test_legendre_transforms(sph, comms_sph, MHD_prop%fl_prop, &
      &    sph_MHD_bc%sph_bc_U, omega_sph, trans_p, gt_cor,              &
      &    ncomp_max_trans, nvector_max_trans, nscalar_max_trans,        &
-     &    rj_fld, trns_MHD, WK_leg, WK_FFTs_MHD, cor_rlm)
+     &    rj_fld, trns_MHD, WK_leg, WK_FFTs_MHD, cor_rlm, SR_sig, SR_r)
 !
       call sel_init_legendre_trans                                      &
      &   (ncomp_max_trans, nvector_max_trans, nscalar_max_trans,        &

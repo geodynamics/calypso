@@ -10,32 +10,47 @@
 !!@verbatim
 !!      subroutine send_recv_sph_trans_N                                &
 !!     &         (iflag_recv, NB, nnod_send, nnod_recv,                 &
-!!     &          send_comm, recv_comm, X_send, X_recv)
+!!     &          send_comm, recv_comm, X_send, X_recv, SR_sig, SR_r)
 !!      subroutine send_recv_sph_trans_6                                &
 !!     &         (iflag_recv, nnod_send, nnod_recv,                     &
-!!     &          send_comm, recv_comm, X_send, X_recv)
+!!     &          send_comm, recv_comm, X_send, X_recv, SR_sig, SR_r)
 !!      subroutine send_recv_sph_trans_3                                &
 !!     &         (iflag_recv, nnod_send, nnod_recv,                     &
-!!     &          send_comm, recv_comm, X_send, X_recv)
+!!     &          send_comm, recv_comm, X_send, X_recv, SR_sig, SR_r)
 !!      subroutine send_recv_sph_trans_2                                &
 !!     &         (iflag_recv, nnod_send, nnod_recv,                     &
-!!     &          send_comm, recv_comm, X_send, X_recv)
+!!     &          send_comm, recv_comm, X_send, X_recv, SR_sig, SR_r)
 !!      subroutine send_recv_sph_trans                                  &
 !!     &         (iflag_recv, nnod_send, nnod_recv,                     &
-!!     &          send_comm, recv_comm, X_send, X_recv)
+!!     &          send_comm, recv_comm, X_send, X_recv, SR_sig, SR_r)
 !!      subroutine send_recv_sph_trans_int                              &
 !!     &         (iflag_recv, nnod_send, nnod_recv,                     &
-!!     &          send_comm, recv_comm, iX_send, iX_recv)
+!!     &          send_comm, recv_comm, iX_send, iX_recv, SR_sig, SR_i)
+!!        type(sph_comm_tbl), intent(in) :: send_comm
+!!        type(sph_comm_tbl), intent(in) :: recv_comm
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
+!!        type(send_recv_int_buffer), intent(inout) :: SR_i
 !!
-!!      subroutine check_calypso_sph_comm_buf_N(NB, send_comm, recv_comm)
-!!      subroutine calypso_sph_comm_N(NB, send_comm, recv_comm)
+!!      subroutine check_calypso_sph_comm_buf_N                         &
+!!     &          (NB, send_comm, recv_comm, SR_sig, SR_r)
+!!      subroutine calypso_sph_comm_N(NB, send_comm, recv_comm,         &
+!!     &                              SR_sig, SR_r)
+!!        type(sph_comm_tbl), intent(in) :: send_comm
+!!        type(sph_comm_tbl), intent(in) :: recv_comm
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine calypso_sph_to_send_N(NB, nnod_org,                  &
-!!     &          comm_sph, n_WS, X_org, WS)
+!!     &                                 comm_sph, n_WS, X_org, WS)
 !!      subroutine calypso_sph_from_recv_N(iflag_recv, NB, nnod_sph,    &
-!!     &          comm_sph, n_WR, WR, X_sph)
-!!
-!!      subroutine finish_send_recv_sph(comm_sph)
+!!     &                                   comm_sph, n_WR, WR, X_sph)
 !!        type(sph_comm_tbl), intent(in) :: comm_sph
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
+!!
+!!      subroutine finish_send_recv_sph(comm_sph, SR_sig)
+!!        type(sph_comm_tbl), intent(in) :: comm_sph
+!!        type(send_recv_status), intent(inout) :: SR_sig
 !!@endverbatim
 !!
 !!
@@ -59,7 +74,7 @@
 !
       use t_sph_trans_comm_tbl
       use t_solver_SR
-      use m_solver_SR
+      use t_solver_SR_int
 !
       implicit none
 !
@@ -71,7 +86,7 @@
 !
       subroutine send_recv_sph_trans_N                                  &
      &         (iflag_recv, NB, nnod_send, nnod_recv,                   &
-     &          send_comm, recv_comm, X_send, X_recv)
+     &          send_comm, recv_comm, X_send, X_recv, SR_sig, SR_r)
 !
       use sel_spherical_SRs
 !
@@ -82,17 +97,20 @@
       real (kind=kreal), intent(in)::    X_send(NB*nnod_send)
 !
       real (kind=kreal), intent(inout):: X_recv(NB*nnod_recv)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
-      call check_calypso_sph_comm_buf_N(NB, send_comm, recv_comm)
+      call check_calypso_sph_comm_buf_N(NB, send_comm, recv_comm,       &
+     &                                  SR_sig, SR_r)
 !
       call calypso_sph_to_send_N(NB, nnod_send,                         &
-     &    send_comm, SR_r1%n_WS, X_send, SR_r1%WS)
-      call calypso_sph_comm_N(NB, send_comm, recv_comm)
+     &    send_comm, SR_r%n_WS, X_send, SR_r%WS)
+      call calypso_sph_comm_N(NB, send_comm, recv_comm, SR_sig, SR_r)
       call calypso_sph_from_recv_N(iflag_recv, NB, nnod_recv,           &
-     &    recv_comm, SR_r1%n_WR, SR_r1%WR, X_recv)
+     &    recv_comm, SR_r%n_WR, SR_r%WR, X_recv)
 !
-      call finish_send_recv_sph(send_comm)
+      call finish_send_recv_sph(send_comm, SR_sig)
 !
       end subroutine send_recv_sph_trans_N
 !
@@ -100,7 +118,7 @@
 !
       subroutine send_recv_sph_trans_6                                  &
      &         (iflag_recv, nnod_send, nnod_recv,                       &
-     &          send_comm, recv_comm, X_send, X_recv)
+     &          send_comm, recv_comm, X_send, X_recv, SR_sig, SR_r)
 !
       use sel_spherical_SRs
       use calypso_SR_6
@@ -110,7 +128,10 @@
       type(sph_comm_tbl), intent(in) :: send_comm
       type(sph_comm_tbl), intent(in) :: recv_comm
       real (kind=kreal), intent(in)::    X_send(isix*nnod_send)
+!
       real (kind=kreal), intent(inout):: X_recv(isix*nnod_recv)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       call calypso_send_recv_6(iflag_recv, nnod_send, nnod_recv,        &
@@ -118,7 +139,7 @@
      &    send_comm%istack_sr, send_comm%item_sr,                       &
      &    recv_comm%nneib_domain, recv_comm%id_domain,                  &
      &    recv_comm%istack_sr, recv_comm%item_sr, recv_comm%irev_sr,    &
-     &    recv_comm%iflag_self, SR_sig1, SR_r1, X_send, X_recv)
+     &    recv_comm%iflag_self, SR_sig, SR_r, X_send, X_recv)
 !
       end subroutine send_recv_sph_trans_6
 !
@@ -126,7 +147,7 @@
 !
       subroutine send_recv_sph_trans_3                                  &
      &         (iflag_recv, nnod_send, nnod_recv,                       &
-     &          send_comm, recv_comm, X_send, X_recv)
+     &          send_comm, recv_comm, X_send, X_recv, SR_sig, SR_r)
 !
       use sel_spherical_SRs
       use calypso_SR_3
@@ -136,7 +157,10 @@
       type(sph_comm_tbl), intent(in) :: send_comm
       type(sph_comm_tbl), intent(in) :: recv_comm
       real (kind=kreal), intent(in)::    X_send(ithree*nnod_send)
+!
       real (kind=kreal), intent(inout):: X_recv(ithree*nnod_recv)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       call calypso_send_recv_3(iflag_recv, nnod_send, nnod_recv,        &
@@ -144,7 +168,7 @@
      &    send_comm%istack_sr, send_comm%item_sr,                       &
      &    recv_comm%nneib_domain, recv_comm%id_domain,                  &
      &    recv_comm%istack_sr, recv_comm%item_sr, recv_comm%irev_sr,    &
-     &    recv_comm%iflag_self, SR_sig1, SR_r1, X_send, X_recv)
+     &    recv_comm%iflag_self, SR_sig, SR_r, X_send, X_recv)
 !
       end subroutine send_recv_sph_trans_3
 !
@@ -152,7 +176,7 @@
 !
       subroutine send_recv_sph_trans_2                                  &
      &         (iflag_recv, nnod_send, nnod_recv,                       &
-     &          send_comm, recv_comm, X_send, X_recv)
+     &          send_comm, recv_comm, X_send, X_recv, SR_sig, SR_r)
 !
       use sel_spherical_SRs
       use calypso_SR_2
@@ -162,7 +186,10 @@
       type(sph_comm_tbl), intent(in) :: send_comm
       type(sph_comm_tbl), intent(in) :: recv_comm
       real (kind=kreal), intent(in)::    X_send(ithree*nnod_send)
+!
       real (kind=kreal), intent(inout):: X_recv(ithree*nnod_recv)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       call calypso_send_recv_2(iflag_recv, nnod_send, nnod_recv,        &
@@ -170,7 +197,7 @@
      &    send_comm%istack_sr, send_comm%item_sr,                       &
      &    recv_comm%nneib_domain, recv_comm%id_domain,                  &
      &    recv_comm%istack_sr, recv_comm%item_sr, recv_comm%irev_sr,    &
-     &    recv_comm%iflag_self, SR_sig1, SR_r1, X_send, X_recv)
+     &    recv_comm%iflag_self, SR_sig, SR_r, X_send, X_recv)
 !
       end subroutine send_recv_sph_trans_2
 !
@@ -178,7 +205,7 @@
 !
       subroutine send_recv_sph_trans                                    &
      &         (iflag_recv, nnod_send, nnod_recv,                       &
-     &          send_comm, recv_comm, X_send, X_recv)
+     &          send_comm, recv_comm, X_send, X_recv, SR_sig, SR_r)
 !
       use sel_spherical_SRs
       use calypso_SR
@@ -188,7 +215,10 @@
       type(sph_comm_tbl), intent(in) :: send_comm
       type(sph_comm_tbl), intent(in) :: recv_comm
       real (kind=kreal), intent(in)::    X_send(nnod_send)
+!
       real (kind=kreal), intent(inout):: X_recv(nnod_recv)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       call calypso_send_recv(iflag_recv, nnod_send, nnod_recv,          &
@@ -197,7 +227,7 @@
      &    recv_comm%nneib_domain, recv_comm%id_domain,                  &
      &    recv_comm%istack_sr, recv_comm%item_sr,                       &
      &    recv_comm%irev_sr, recv_comm%iflag_self,                      &
-     &    SR_sig1, SR_r1, X_send, X_recv)
+     &    SR_sig, SR_r, X_send, X_recv)
 !
       end subroutine send_recv_sph_trans
 !
@@ -205,7 +235,7 @@
 !
       subroutine send_recv_sph_trans_int                                &
      &         (iflag_recv, nnod_send, nnod_recv,                       &
-     &          send_comm, recv_comm, iX_send, iX_recv)
+     &          send_comm, recv_comm, iX_send, iX_recv, SR_sig, SR_i)
 !
       use sel_spherical_SRs
       use calypso_SR_int
@@ -214,8 +244,11 @@
       integer (kind=kint), intent(in) :: nnod_send, nnod_recv
       type(sph_comm_tbl), intent(in) :: send_comm
       type(sph_comm_tbl), intent(in) :: recv_comm
-      integer (kind=kint), intent(in)::    iX_send(nnod_send)
-      integer (kind=kint), intent(inout):: iX_recv(nnod_recv)
+      integer(kind = kint), intent(in) ::    iX_send(nnod_send)
+!
+      integer(kind = kint), intent(inout) :: iX_recv(nnod_recv)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int_buffer), intent(inout) :: SR_i
 !
 !
       call calypso_send_recv_int                                        &
@@ -223,14 +256,15 @@
      &    send_comm%id_domain, send_comm%istack_sr, send_comm%item_sr,  &
      &    recv_comm%iflag_self, recv_comm%nneib_domain,                 &
      &    recv_comm%id_domain, recv_comm%istack_sr, recv_comm%item_sr,  &
-     &    recv_comm%irev_sr, SR_sig1, SR_i1, iX_send, iX_recv)
+     &    recv_comm%irev_sr, SR_sig, SR_i, iX_send, iX_recv)
 !
       end subroutine send_recv_sph_trans_int
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine check_calypso_sph_comm_buf_N(NB, send_comm, recv_comm)
+      subroutine check_calypso_sph_comm_buf_N                           &
+     &          (NB, send_comm, recv_comm, SR_sig, SR_r)
 !
       use sel_spherical_SRs
 !
@@ -238,15 +272,19 @@
       type(sph_comm_tbl), intent(in) :: send_comm
       type(sph_comm_tbl), intent(in) :: recv_comm
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
       call check_calypso_sph_buf_N(NB,                                  &
      &    send_comm%nneib_domain, send_comm%istack_sr,                  &
-     &    recv_comm%nneib_domain,  recv_comm%istack_sr)
+     &    recv_comm%nneib_domain,  recv_comm%istack_sr, SR_sig, SR_r)
 !
       end subroutine check_calypso_sph_comm_buf_N
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine calypso_sph_comm_N(NB, send_comm, recv_comm)
+      subroutine calypso_sph_comm_N(NB, send_comm, recv_comm,           &
+     &                              SR_sig, SR_r)
 !
       use sel_spherical_SRs
 !
@@ -254,19 +292,22 @@
       type(sph_comm_tbl), intent(in) :: send_comm
       type(sph_comm_tbl), intent(in) :: recv_comm
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
-      call sel_calypso_sph_comm_N(NB,                                   &
-     &    send_comm%nneib_domain, send_comm%iflag_self,                 &
+!
+      call sel_calypso_sph_comm_N(NB, send_comm%nneib_domain,           &
      &    send_comm%id_domain, send_comm%istack_sr,                     &
      &    recv_comm%nneib_domain, recv_comm%iflag_self,                 &
-     &    recv_comm%id_domain, recv_comm%istack_sr)
+     &    recv_comm%id_domain, recv_comm%istack_sr, SR_sig, SR_r)
 !
       end subroutine calypso_sph_comm_N
 !
 ! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
       subroutine calypso_sph_to_send_N(NB, nnod_org,                    &
-     &          comm_sph, n_WS, X_org, WS)
+     &                                 comm_sph, n_WS, X_org, WS)
 !
       use m_elapsed_labels_SEND_RECV
       use set_to_send_buffer
@@ -275,7 +316,7 @@
       integer (kind=kint), intent(in) :: NB
       integer (kind=kint), intent(in) :: nnod_org, n_WS
       real (kind=kreal), intent(in) ::   X_org(NB*nnod_org)
-      real (kind=kreal), intent(inout):: WS(NB*comm_sph%ntot_item_sr)
+      real (kind=kreal), intent(inout):: WS(n_WS)
 !
 !
       if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+1)
@@ -289,7 +330,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine calypso_sph_from_recv_N(iflag_recv, NB, nnod_sph,      &
-     &          comm_sph, n_WR, WR, X_sph)
+     &                                   comm_sph, n_WR, WR, X_sph)
 !
       use sel_spherical_SRs
 !
@@ -308,16 +349,18 @@
       end subroutine calypso_sph_from_recv_N
 !
 ! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
 !
-      subroutine finish_send_recv_sph(comm_sph)
+      subroutine finish_send_recv_sph(comm_sph, SR_sig)
 !
       use sel_spherical_SRs
 !
       type(sph_comm_tbl), intent(in) :: comm_sph
+      type(send_recv_status), intent(inout) :: SR_sig
 !
 !
       call calypso_send_recv_fin                                        &
-     &   (comm_sph%nneib_domain, comm_sph%iflag_self, SR_sig1)
+     &   (comm_sph%nneib_domain, comm_sph%iflag_self, SR_sig)
 !
       end subroutine finish_send_recv_sph
 !

@@ -8,20 +8,24 @@
 !!
 !!@verbatim
 !!      subroutine SPH_init_sph_snap_psf(MHD_files, iphys,              &
-!!     &          SPH_model, SPH_MHD, SPH_WK)
+!!     &          SPH_model, SPH_MHD, SPH_WK, SR_sig, SR_r)
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(phys_address), intent(in) :: iphys
 !!        type(SPH_MHD_model_data), intent(inout) :: SPH_model
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!        type(work_SPH_MHD), intent(inout) :: SPH_WK
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine SPH_analyze_snap_psf(i_step, MHD_files, SPH_model,   &
-!!     &          MHD_step, SPH_MHD, SPH_WK)
+!!     &          MHD_step, SPH_MHD, SPH_WK, SR_sig, SR_r)
 !!        type(phys_address), intent(in) :: iphys
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
 !!        type(SPH_MHD_model_data), intent(inout) :: SPH_model
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!        type(work_SPH_MHD), intent(inout) :: SPH_WK
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
 !
       module SPH_analyzer_snap_w_psf
@@ -38,6 +42,7 @@
       use t_boundary_data_sph_MHD
       use t_work_SPH_MHD
       use t_sph_mhd_monitor_data_IO
+      use t_solver_SR
 !
       implicit none
 !
@@ -48,7 +53,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine SPH_init_sph_snap_psf(MHD_files, iphys,                &
-     &          SPH_model, SPH_MHD, SPH_WK)
+     &          SPH_model, SPH_MHD, SPH_WK, SR_sig, SR_r)
 !
       use m_constants
       use calypso_mpi
@@ -76,6 +81,8 @@
       type(SPH_MHD_model_data), intent(inout) :: SPH_model
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(work_SPH_MHD), intent(inout) :: SPH_WK
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !   Allocate spectr field data
 !
@@ -92,8 +99,8 @@
 !  -------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'init_sph_transform_MHD'
-      call init_sph_transform_MHD                                       &
-     &   (SPH_model, iphys, SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
+      call init_sph_transform_MHD(SPH_model, iphys, SPH_WK%trans_p,     &
+     &    SPH_WK%trns_WK, SPH_MHD, SR_sig, SR_r)
 !
 ! ---------------------------------
 !
@@ -118,7 +125,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine SPH_analyze_snap_psf(i_step, MHD_files, SPH_model,     &
-     &          MHD_step, SPH_MHD, SPH_WK)
+     &          MHD_step, SPH_MHD, SPH_WK, SR_sig, SR_r)
 !
       use cal_nonlinear
       use cal_sol_sph_MHD_crank
@@ -134,6 +141,8 @@
       type(MHD_step_param), intent(inout) :: MHD_step
       type(work_SPH_MHD), intent(inout) :: SPH_WK
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       call read_alloc_sph_rst_4_snap                                    &
@@ -161,8 +170,8 @@
 !*  ----------------lead nonlinear term ... ----------
 !*
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+4)
-      call nonlinear(SPH_WK%r_2nd, SPH_model,                           &
-     &    SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
+      call nonlinear(SPH_WK%r_2nd, SPH_model, SPH_WK%trans_p,           &
+     &               SPH_WK%trns_WK, SPH_MHD, SR_sig, SR_r)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+4)
 !
 !* ----  Update fields after time evolution ------------------------=
@@ -176,7 +185,7 @@
         if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
         call s_lead_fields_4_sph_mhd(SPH_WK%monitor, SPH_WK%r_2nd,      &
      &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc, SPH_WK%trans_p,   &
-     &      SPH_WK%MHD_mats, SPH_WK%trns_WK, SPH_MHD)
+     &      SPH_WK%MHD_mats, SPH_WK%trns_WK, SPH_MHD, SR_sig, SR_r)
       end if
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+5)
 !

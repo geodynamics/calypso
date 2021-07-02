@@ -7,11 +7,16 @@
 !!     &         (NB, nnod_rtp, nnod_rtm, nnod_rlm, nnod_rj)
 !      subroutine deallocate_real_sph_test
 !
-!!      subroutine sph_transfer_test_1(iflag_recv, sph, comms_sph)
-!!      subroutine sph_transfer_test_2(iflag_recv, sph, comms_sph)
-!!      subroutine sph_transfer_test_3(iflag_recv, sph, comms_sph)
-!!      subroutine sph_transfer_test_6(iflag_recv, sph, comms_sph)
-!!      subroutine sph_transfer_test_N(iflag_recv, NB, sph, comms_sph)
+!!      subroutine sph_transfer_test_1(iflag_recv, sph, comms_sph,      &
+!!     &                               SR_sig, SR_r)
+!!      subroutine sph_transfer_test_2(iflag_recv, sph, comms_sph,      &
+!!     &                               SR_sig, SR_r)
+!!      subroutine sph_transfer_test_3(iflag_recv, sph, comms_sph,      &
+!!     &                               SR_sig, SR_r)
+!!      subroutine sph_transfer_test_6(iflag_recv, sph, comms_sph,      &
+!!     &                               SR_sig, SR_r)
+!!      subroutine sph_transfer_test_N(iflag_recv, NB, sph, comms_sph,  &
+!!     &                               SR_sig, SR_r)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(sph_comm_tables), intent(in) :: comms_sph
 !!      integer(kind = kint) function compare_transfer_sph_reals        &
@@ -23,6 +28,7 @@
       use m_precision
       use t_spheric_parameter
       use t_sph_trans_comm_tbl
+      use t_solver_SR
 !
       implicit none
 !
@@ -86,7 +92,8 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine sph_transfer_test_1(iflag_recv, sph, comms_sph)
+      subroutine sph_transfer_test_1(iflag_recv, sph, comms_sph,        &
+     &                               SR_sig, SR_r)
 !
       use calypso_mpi
       use sel_spherical_SRs
@@ -95,6 +102,9 @@
       integer(kind = kint), intent(in) ::iflag_recv
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
+!
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       call set_transfer_sph_reals                                       &
@@ -104,28 +114,29 @@
       call send_recv_sph_trans                                          &
      &   (iflag_recv, sph%sph_rtp%nnod_rtp, sph%sph_rtm%nnod_rtm,       &
      &   comms_sph%comm_rtp, comms_sph%comm_rtm,                        &
-     &    X_global_rtp(1), X_rtm_recieve(1) )
+     &    X_global_rtp(1), X_rtm_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'scalar comm. for rtm => rtp'
       call send_recv_sph_trans                                          &
      &   (iflag_recv, sph%sph_rtm%nnod_rtm, sph%sph_rtp%nnod_rtp,       &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp,                       &
-     &    X_global_rtm(1), X_rtp_recieve(1) )
+     &    X_global_rtm(1), X_rtp_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'scalar comm. for rj => rlm'
       call send_recv_sph_trans                                          &
      &   (iflag_recv, sph%sph_rj%nnod_rj, sph%sph_rlm%nnod_rlm,         &
      &    comms_sph%comm_rj, comms_sph%comm_rlm,                        &
-     &    X_global_rj(1), X_rlm_recieve(1) )
+     &    X_global_rj(1), X_rlm_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'scalar comm. for rlm => rj'
       call send_recv_sph_trans                                          &
      &   (iflag_recv, sph%sph_rlm%nnod_rlm, sph%sph_rj%nnod_rj,         &
      &    comms_sph%comm_rlm, comms_sph%comm_rj,                        &
-     &    X_global_rlm(1), X_rj_recieve(1) )
+     &    X_global_rlm(1), X_rj_recieve(1), SR_sig, SR_r)
 !
       end subroutine sph_transfer_test_1
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sph_transfer_test_2(iflag_recv, sph, comms_sph)
+      subroutine sph_transfer_test_2(iflag_recv, sph, comms_sph,        &
+     &                               SR_sig, SR_r)
 !
       use calypso_mpi
       use sel_spherical_SRs
@@ -135,6 +146,9 @@
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
 !
       call set_transfer_sph_reals                                       &
      &   (itwo, sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
@@ -143,28 +157,29 @@
       call send_recv_sph_trans_2                                        &
      &   (iflag_recv, sph%sph_rtp%nnod_rtp, sph%sph_rtm%nnod_rtm,       &
      &    comms_sph%comm_rtp, comms_sph%comm_rtm,                       &
-     &    X_global_rtp(1), X_rtm_recieve(1) )
+     &    X_global_rtp(1), X_rtm_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'solenoidal comm. for rtm => rtp'
       call send_recv_sph_trans_2                                        &
      &   (iflag_recv, sph%sph_rtm%nnod_rtm, sph%sph_rtp%nnod_rtp,       &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp,                       &
-     &    X_global_rtm(1), X_rtp_recieve(1) )
+     &    X_global_rtm(1), X_rtp_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'solenoidal comm. for rj => rlm'
       call send_recv_sph_trans_2                                        &
      &   (iflag_recv, sph%sph_rj%nnod_rj, sph%sph_rlm%nnod_rlm,         &
      &    comms_sph%comm_rj, comms_sph%comm_rlm,                        &
-     &    X_global_rj(1), X_rlm_recieve(1) )
+     &    X_global_rj(1), X_rlm_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'solenoidal comm. for rlm => rj'
       call send_recv_sph_trans_2                                        &
      &   (iflag_recv, sph%sph_rlm%nnod_rlm, sph%sph_rj%nnod_rj,         &
      &    comms_sph%comm_rlm, comms_sph%comm_rj,                        &
-     &    X_global_rlm(1), X_rj_recieve(1) )
+     &    X_global_rlm(1), X_rj_recieve(1), SR_sig, SR_r)
 !
       end subroutine sph_transfer_test_2
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sph_transfer_test_3(iflag_recv, sph, comms_sph)
+      subroutine sph_transfer_test_3(iflag_recv, sph, comms_sph,        &
+     &                               SR_sig, SR_r)
 !
       use calypso_mpi
       use sel_spherical_SRs
@@ -173,6 +188,9 @@
       integer(kind = kint), intent(in) :: iflag_recv
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
+!
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
       call set_transfer_sph_reals                                       &
@@ -182,28 +200,29 @@
       call send_recv_sph_trans_3                                        &
      &   (iflag_recv, sph%sph_rtp%nnod_rtp, sph%sph_rtm%nnod_rtm,       &
      &    comms_sph%comm_rtp, comms_sph%comm_rtm,                       &
-     &    X_global_rtp(1), X_rtm_recieve(1) )
+     &    X_global_rtp(1), X_rtm_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'vector comm. for rtm => rtp'
       call send_recv_sph_trans_3                                        &
      &   (iflag_recv, sph%sph_rtm%nnod_rtm, sph%sph_rtp%nnod_rtp,       &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp,                       &
-     &    X_global_rtm(1), X_rtp_recieve(1) )
+     &    X_global_rtm(1), X_rtp_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'vector comm. for rj => rlm'
       call send_recv_sph_trans_3                                        &
      &   (iflag_recv, sph%sph_rj%nnod_rj, sph%sph_rlm%nnod_rlm,         &
      &    comms_sph%comm_rj, comms_sph%comm_rlm,                        &
-     &    X_global_rj(1), X_rlm_recieve(1) )
+     &    X_global_rj(1), X_rlm_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'vector comm. for rlm => rj'
       call send_recv_sph_trans_3                                        &
      &   (iflag_recv, sph%sph_rlm%nnod_rlm, sph%sph_rj%nnod_rj,         &
      &    comms_sph%comm_rlm, comms_sph%comm_rj,                        &
-     &    X_global_rlm(1), X_rj_recieve(1) )
+     &    X_global_rlm(1), X_rj_recieve(1), SR_sig, SR_r)
 !
       end subroutine sph_transfer_test_3
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sph_transfer_test_6(iflag_recv, sph, comms_sph)
+      subroutine sph_transfer_test_6(iflag_recv, sph, comms_sph,        &
+     &                               SR_sig, SR_r)
 !
       use calypso_mpi
       use sel_spherical_SRs
@@ -213,6 +232,9 @@
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
 !
       call set_transfer_sph_reals                                       &
      &   (isix, sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
@@ -221,28 +243,29 @@
       call send_recv_sph_trans_6                                        &
      &   (iflag_recv, sph%sph_rtp%nnod_rtp, sph%sph_rtm%nnod_rtm,       &
      &    comms_sph%comm_rtp, comms_sph%comm_rtm,                       &
-     &    X_global_rtp(1), X_rtm_recieve(1) )
+     &    X_global_rtp(1), X_rtm_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'sym. tensor comm. for rtm => rtp'
       call send_recv_sph_trans_6                                        &
      &   (iflag_recv, sph%sph_rtm%nnod_rtm, sph%sph_rtp%nnod_rtp,       &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp,                       &
-     &    X_global_rtm(1), X_rtp_recieve(1) )
+     &    X_global_rtm(1), X_rtp_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'sym. tensor comm. for rj => rlm'
       call send_recv_sph_trans_6                                        &
      &   (iflag_recv, sph%sph_rj%nnod_rj,  sph%sph_rlm%nnod_rlm,        &
      &    comms_sph%comm_rj, comms_sph%comm_rlm,                        &
-     &    X_global_rj(1), X_rlm_recieve(1) )
+     &    X_global_rj(1), X_rlm_recieve(1), SR_sig, SR_r)
       if (my_rank .eq. 0) write(*,*) 'sym. tensor comm. for rlm => rj'
       call send_recv_sph_trans_6                                        &
      &   (iflag_recv, sph%sph_rlm%nnod_rlm, sph%sph_rj%nnod_rj,         &
      &    comms_sph%comm_rlm, comms_sph%comm_rj,                        &
-     &    X_global_rlm(1), X_rj_recieve(1) )
+     &    X_global_rlm(1), X_rj_recieve(1), SR_sig, SR_r)
 !
       end subroutine sph_transfer_test_6
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sph_transfer_test_N(iflag_recv, NB, sph, comms_sph)
+      subroutine sph_transfer_test_N(iflag_recv, NB, sph, comms_sph,    &
+     &                               SR_sig, SR_r)
 !
       use calypso_mpi
       use sel_spherical_SRs
@@ -253,6 +276,9 @@
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
 !
       call set_transfer_sph_reals                                       &
      &   (NB, sph%sph_rtp, sph%sph_rtm, sph%sph_rlm, sph%sph_rj)
@@ -261,25 +287,25 @@
       call send_recv_sph_trans_N                                        &
      &   (iflag_recv, NB, sph%sph_rtp%nnod_rtp, sph%sph_rtm%nnod_rtm,   &
      &    comms_sph%comm_rtp, comms_sph%comm_rtm,                       &
-     &    X_global_rtp(1), X_rtm_recieve(1))
+     &    X_global_rtp(1), X_rtm_recieve(1), SR_sig, SR_r)
 !
       if (my_rank .eq. 0) write(*,*) 'N-vector comm. for rtm => rtp'
       call send_recv_sph_trans_N                                        &
      &   (iflag_recv, NB, sph%sph_rtm%nnod_rtm, sph%sph_rtp%nnod_rtp,   &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp,                       &
-     &    X_global_rtm(1), X_rtp_recieve(1))
+     &    X_global_rtm(1), X_rtp_recieve(1), SR_sig, SR_r)
 !
       if (my_rank .eq. 0) write(*,*) 'N-vector comm. for rj => rlm'
       call send_recv_sph_trans_N                                        &
      &   (iflag_recv, NB, sph%sph_rj%nnod_rj, sph%sph_rlm%nnod_rlm,     &
      &    comms_sph%comm_rj, comms_sph%comm_rlm,                        &
-     &    X_global_rj(1), X_rlm_recieve(1))
+     &    X_global_rj(1), X_rlm_recieve(1), SR_sig, SR_r)
 !
       if (my_rank .eq. 0) write(*,*) 'N-vector comm. for rlm => rj'
       call send_recv_sph_trans_N                                        &
      &   (iflag_recv, NB, sph%sph_rlm%nnod_rlm, sph%sph_rj%nnod_rj,     &
      &    comms_sph%comm_rlm, comms_sph%comm_rj,                        &
-     &    X_global_rlm(1), X_rj_recieve(1))
+     &    X_global_rlm(1), X_rj_recieve(1), SR_sig, SR_r)
 !
       end subroutine sph_transfer_test_N
 !

@@ -8,10 +8,13 @@
 !!
 !!@verbatim
 !!      subroutine init_fourier_transform_4_sph                         &
-!!     &         (ncomp, sph_rtp, comm_rtp, WK_FFTs, iflag_FFT)
+!!     &         (ncomp, sph_rtp, comm_rtp, WK_FFTs, SR_r, iflag_FFT)
+!!        integer(kind = kint), intent(in) :: ncomp
 !!        type(sph_rtp_grid), intent(in) :: sph_rtp
 !!        type(sph_comm_tbl), intent(in) :: comm_rtp
 !!        type(work_for_FFTs), intent(inout) :: WK_FFTs
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
+!!        integer(kind = kint), intent(inout) :: iflag_FFT
 !!
 !!       Current problem
 !!      FFTW crashes when both single and multi transforms are 
@@ -23,7 +26,6 @@
       use m_precision
 !
       use calypso_mpi
-      use m_work_time
       use m_machine_parameter
       use m_FFT_selector
 !
@@ -65,21 +67,22 @@
 ! -----------------------------------------------------------------------
 !
       subroutine init_fourier_transform_4_sph                           &
-     &         (ncomp, sph_rtp, comm_rtp, WK_FFTs, iflag_FFT)
+     &         (ncomp, sph_rtp, comm_rtp, WK_FFTs, SR_r, iflag_FFT)
 !
-      use m_solver_SR
+      use t_solver_SR
 !
       integer(kind = kint), intent(in) :: ncomp
       type(sph_rtp_grid), intent(in) :: sph_rtp
       type(sph_comm_tbl), intent(in) :: comm_rtp
 !
       type(work_for_FFTs), intent(inout) :: WK_FFTs
+      type(send_recv_real_buffer), intent(inout) :: SR_r
       integer(kind = kint), intent(inout) :: iflag_FFT
 !
 !
       if(iflag_FFT .eq. iflag_UNDEFINED_FFT) then
         call s_select_fourier_transform(ncomp, sph_rtp, comm_rtp,       &
-     &      SR_r1%n_WS, SR_r1%n_WR, SR_r1%WS, SR_r1%WR, WK_FFTs)
+     &      SR_r%n_WS, SR_r%n_WR, SR_r%WS, SR_r%WR, WK_FFTs)
         iflag_FFT = iflag_selected
       end if
 !
