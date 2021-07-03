@@ -96,6 +96,8 @@
 !
       implicit none
 !
+      integer(kind = kint), parameter, private :: LTR_cutoff = 13
+!
       private :: pressure_4_sph_mhd
       private :: enegy_fluxes_4_sph_mhd
 !
@@ -112,6 +114,7 @@
       use sph_transforms_4_MHD
       use cal_energy_flux_rtp
       use cal_self_buoyancies_sph
+      use truncate_rj_base_field
 !
       type(sph_mhd_monitor_data), intent(in) :: monitor
       type(fdm_matrices), intent(in) :: r_2nd
@@ -136,6 +139,9 @@
      &     (SPH_MHD%sph, MHD_prop, sph_MHD_bc, r_2nd, trans_p%leg,      &
      &      sph_MHD_mat%band_p_poisson, SPH_MHD%ipol, SPH_MHD%fld)
       end if
+!
+      call s_truncate_rj_base_field(LTR_cutoff, SPH_MHD%sph%sph_rj,     &
+     &    SPH_MHD%ipol%base, SPH_MHD%ipol%filter_fld, SPH_MHD%fld)
 !
       call lead_fields_by_sph_trans(SPH_MHD%sph, SPH_MHD%comms,         &
      &    MHD_prop, trans_p, WK%trns_MHD, WK%trns_snap,                 &
