@@ -50,6 +50,7 @@
 !
       use add_nodal_fields_4_MHD
       use add_sph_MHD_fields_2_ctl
+      use add_depends_for_filter_fld
       use set_control_field_data
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
@@ -75,6 +76,7 @@
      &     (MHD_prop%fl_prop, MHD_prop%cd_prop,                         &
      &      MHD_prop%ht_prop, MHD_prop%cp_prop, field_ctl)
 !
+      call add_dependent_filterd_field(field_ctl)
       call add_dependent_field(MHD_prop, field_ctl)
 !
 !    set nodal data

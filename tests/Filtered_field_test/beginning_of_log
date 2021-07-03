@@ -29,10 +29,10 @@ for dir in Filtered_field_test ; do \
 # Test in Filtered_field_test directory...
 rm -f *.dat
 mpirun -np 4 /Users/matsui/CALYPSO_test/bin/sph_mhd
+ Simulation start: PE.            2
  Simulation start: PE.            3
  Simulation start: PE.            0
  Simulation start: PE.            1
- Simulation start: PE.            2
  Spherical shell resolution file: control_resolution
  Spherical shell resolution file end
 Read file for cross_section_ctl No.    1...  Section control file: controls/ctl_psf_cmb
@@ -185,7 +185,11 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  thermal_diffusion is added at field ID           54
  heat_flux is added at field ID           55
  heat_advect is added at field ID           56
- magnetic_potential is added at field ID           57
+ add_field_ctl_4_fil_ene_flux end
+ filter_magne is added at field ID           57
+ add_field_ctl_4_filter_forces end
+ add_field_ctl_4_filterd_field end
+ magnetic_potential is added at field ID           58
  add_field_ctl_4_check_evo end
  add_field_ctl_4_evo_magne end
  add_field_ctl_4_ene_flux end
@@ -196,11 +200,11 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  add_field_ctl_4_forces end
  add_field_ctl_4_diff_vector end
  add_field_ctl_4_grad_field end
- reference_temperature is added at field ID           58
+ reference_temperature is added at field ID           59
  add_field_ctl_4_base_field end
  s_set_control_field_data
  check_nodal_field_name for fld
- fld%num_phys           58
+ fld%num_phys           59
  fld%num_phys_viz           18
  id#, num_component, stack_component, field_name 
      1     3     3    velocity
@@ -259,8 +263,9 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
     54     1   118    thermal_diffusion
     55     3   121    heat_flux
     56     1   122    heat_advect
-    57     1   123    magnetic_potential
-    58     1   124    reference_temperature
+    57     3   125    filter_magne
+    58     1   126    magnetic_potential
+    59     1   127    reference_temperature
  iflag_shell_mode          -1
  load_para_SPH_and_FEM_mesh
  Make spherical harmonics table
@@ -384,22 +389,12 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  set_edge_id_4_node_sum_order
   const_comm_table_by_connenct in edge
  Failed export by set_element_export_item           0
+ Number of  edge for            3 :       362403      362403
  Number of  edge for            0 :       360001      360001
  Number of  edge for            1 :       360001      360001
  Number of  edge for            2 :       369076      369076
- Number of  edge for            3 :       362403      362403
  edge position is successfully syncronizad
  SPH_initialize_MHD
- Fixed boundary condition spectr for heat
- sph_bc%iflag_icb           0
- sph_bc%iflag_cmb           0
- sph_bc_T%iflag_icb           0
- sph_bc_T%iflag_cmb           0
- Fixed boundary condition spectr for heat
- sph_bc%iflag_icb           0
- sph_bc%iflag_cmb           0
- sph_bc_T%iflag_icb           0
- sph_bc_T%iflag_cmb           0
  init_r_infos_sph_mhd_evo
  set_delta_r_4_sph_mhd
  set_dr_for_nonequi
@@ -423,6 +418,11 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  
  coefficient for temperature:            1.0000000000000000     
  coefficient for thermal diffusion:      1.0000000000000000     
+ Fixed boundary condition spectr for heat
+ sph_bc%iflag_icb           0
+ sph_bc%iflag_cmb           0
+ sph_bc_T%iflag_icb           0
+ sph_bc_T%iflag_cmb           0
  coefficient for velocity:               1.0000000000000000     
  coefficient for pressure:               1000.0000000000000     
  coefficient for viscous diffusion:      1.0000000000000000     
