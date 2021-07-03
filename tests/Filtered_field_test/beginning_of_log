@@ -29,10 +29,10 @@ for dir in Filtered_field_test ; do \
 # Test in Filtered_field_test directory...
 rm -f *.dat
 mpirun -np 4 /Users/matsui/CALYPSO_test/bin/sph_mhd
- Simulation start: PE.            0
  Simulation start: PE.            1
  Simulation start: PE.            2
  Simulation start: PE.            3
+ Simulation start: PE.            0
  Spherical shell resolution file: control_resolution
  Spherical shell resolution file end
 Read file for cross_section_ctl No.    1...  Section control file: controls/ctl_psf_cmb
@@ -395,16 +395,6 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  Number of  edge for            3 :       362403      362403
  edge position is successfully syncronizad
  SPH_initialize_MHD
- Fixed boundary condition spectr for heat
- sph_bc%iflag_icb           0
- sph_bc%iflag_cmb           0
- sph_bc_T%iflag_icb           0
- sph_bc_T%iflag_cmb           0
- Fixed boundary condition spectr for heat
- sph_bc%iflag_icb           0
- sph_bc%iflag_cmb           0
- sph_bc_T%iflag_icb           0
- sph_bc_T%iflag_cmb           0
  init_r_infos_sph_mhd_evo
  set_delta_r_4_sph_mhd
  set_dr_for_nonequi
@@ -444,6 +434,11 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  Spherical transform field table for MHD
  Address for backward transform: transform, poloidal, toroidal, grid data
     1. velocity:     1    1    1
+ Fixed boundary condition spectr for heat
+ sph_bc%iflag_icb           0
+ sph_bc%iflag_cmb           0
+ sph_bc_T%iflag_icb           0
+ sph_bc_T%iflag_cmb           0
     2. vorticity:     4    5    5
     3. magnetic_field:     7    8    8
     4. current_density:    10   45   45
@@ -476,16 +471,15 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
    11. perturbation_temp:    27   50    0
    12. filter_temperature:    28   23   23
  Address for forward transform: transform, poloidal, toroidal, grid data
- Fixed boundary condition spectr for heat
- sph_bc%iflag_icb           0
- sph_bc%iflag_cmb           0
- sph_bc_T%iflag_icb           0
- sph_bc_T%iflag_cmb           0
-    1. div_Coriolis_force:     1   97    0
+    1. inertia_by_filtered:     1   24   24
+    2. Lorentz_force_by_filtered:     4   27   27
+    3. vecp_induction_by_filtered:     7   36   36
+    4. heat_flux_by_filtered:    10   33   33
+    5. div_Coriolis_force:    13   97    0
  ncomp_sph_trans           28
  nvector_rj_2_rtp            8
  nscalar_rj_2_rtp            4
- nvector_rtp_2_rj            0
+ nvector_rtp_2_rj            4
  nscalar_rtp_2_rj            1
  Spherical transform field table for energy flux (trns_eflux)
  Address for backward transform: transform, poloidal, toroidal, grid data
@@ -505,4 +499,4 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  nscalar_rj_2_rtp            0
  nvector_rtp_2_rj            0
  nscalar_rtp_2_rj            0
- initialize_legendre_trans
+ Fixed boundary condition spectr for heat

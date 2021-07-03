@@ -125,6 +125,13 @@
 !   forces
       call add_base_force_sph_trns_snap                                 &
      &   (d_rj, ipol%forces, iphys%forces, f_trns%forces, trns_fwd)
+!
+      call add_base_force_4_MHD_sph_trns                                &
+     &   (d_rj, ipol%force_by_filter, iphys%force_by_filter,            &
+     &    f_trns%force_by_filter, trns_fwd)
+      call add_base_force_sph_trns_snap                                 &
+     &   (d_rj, ipol%force_by_filter, iphys%force_by_filter,            &
+     &    f_trns%force_by_filter, trns_fwd)
       trns_fwd%num_vector = trns_fwd%nfield
 !
       call add_div_coriolis_MHD_sph_trns                                &
