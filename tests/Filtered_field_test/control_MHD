@@ -82,6 +82,7 @@ begin MHD_control
 !
         nod_value_ctl  filter_velocity         Viz_On   Monitor_On
         nod_value_ctl  filter_vorticity        Viz_On   Monitor_On
+        nod_value_ctl  filter_magne            Viz_On   Monitor_On
         nod_value_ctl  filter_current          Viz_On   Monitor_On
         nod_value_ctl  filter_temperature      Viz_On   Monitor_On
 !
