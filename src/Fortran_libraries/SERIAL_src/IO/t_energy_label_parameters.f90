@@ -29,9 +29,10 @@
       implicit none
 !
 !
-      integer(kind = kint), parameter :: n_fld_ene = 2
-      character(len=kchara), parameter :: ene_lebel_base(2)             &
-     &                    = (/'K_ene     ', 'M_ene     '/)
+      integer(kind = kint), parameter :: n_fld_ene = 4
+      character(len=kchara), parameter :: ene_lebel_base(4)             &
+     &                    = (/'K_ene     ', 'M_ene     ',               &
+     &                        'filter_KE ', 'filter_ME '/)
 !
 !>      Structure of label for energies
       type energy_label_param
@@ -52,6 +53,7 @@
       subroutine init_energy_labels_base(ene_labels)
 !
       use m_base_field_labels
+      use m_filtered_field_labels
       use add_direction_labels
 !
       type(energy_label_param), intent(inout) :: ene_labels
@@ -63,6 +65,8 @@
 !
       ene_labels%field_name(1) = trim(velocity%name)
       ene_labels%field_name(2) = trim(magnetic_field%name)
+      ene_labels%field_name(3) = trim(filter_velocity%name)
+      ene_labels%field_name(4) = trim(filter_magne%name)
       do i = 1, n_fld_ene
         call add_vector_power_sph_label(ene_lebel_base(i),              &
      &      ene_labels%label(1,i), ene_labels%label(2,i),               &
