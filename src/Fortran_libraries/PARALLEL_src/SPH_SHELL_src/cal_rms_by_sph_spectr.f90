@@ -87,6 +87,8 @@
 !
         call cvt_mag_or_kin_ene_one_mode                                &
      &     (sph_rj, ipol%base, icomp_rj, rms_sph_r(0,1))
+        call cvt_mag_or_kin_ene_one_mode                                &
+     &     (sph_rj, ipol%filter_fld, icomp_rj, rms_sph_r(0,1))
       end if
 !
       end subroutine cal_rms_sph_spec_one_mode
@@ -127,6 +129,8 @@
 !
         call cvt_mag_or_kin_ene_spectr                                  &
      &         (sph_rj, ipol%base, icomp_rj, rms_sph_rj(0,1,1))
+        call cvt_mag_or_kin_ene_spectr                                  &
+     &         (sph_rj, ipol%filter_fld, icomp_rj, rms_sph_rj(0,1,1))
       end if
 !
       end subroutine cal_rms_sph_spec_one_field
