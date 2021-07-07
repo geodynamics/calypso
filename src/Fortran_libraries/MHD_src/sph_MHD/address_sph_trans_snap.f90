@@ -240,6 +240,9 @@
       call add_ene_flux_4_sph_trns_snap                                 &
      &   (d_rj, ipol%ene_flux, iphys%ene_flux, f_trns%ene_flux,         &
      &    trns_fwd)
+      call add_ene_flux_4_sph_trns_snap                                 &
+     &   (d_rj, ipol%eflux_by_filter, iphys%eflux_by_filter,            &
+     &    f_trns%eflux_by_filter, trns_fwd)
       trns_fwd%num_scalar = trns_fwd%nfield - trns_fwd%num_vector
       trns_fwd%num_tensor = 0
 !
