@@ -230,7 +230,8 @@
       if(check_field_list_ctl(square_vorticity, field_ctl))             &
      &   call add_phys_name_ctl(vorticity, field_ctl)
       if(      check_field_list_ctl(square_magne, field_ctl)            &
-     &    .or. check_field_list_ctl(magnetic_scale, field_ctl))         &
+     &    .or. check_field_list_ctl(magnetic_scale, field_ctl)         &
+     &    .or. check_field_list_ctl(stream_pol_magne, field_ctl))       &
      &   call add_phys_name_ctl(magnetic_field, field_ctl)
       if(check_field_list_ctl(square_vector_potential, field_ctl))      &
      &   call add_phys_name_ctl(vector_potential, field_ctl)
