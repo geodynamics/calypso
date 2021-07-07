@@ -1,8 +1,38 @@
+matsui@Kemo-Mac-2018 CALYPSO_test % make filter_test
+echo "Test filtered field!!"; \
+	cd /Users/matsui/CALYPSO_test/tests ; \
+		make \
+		GMAKE="make" \
+		BUILDDIR="/Users/matsui/CALYPSO_test/bin" \
+		TESTDIR="/Users/matsui/CALYPSO_test/tests" \
+		MHDDIR="/Users/matsui/CALYPSO_test/src" \
+		MPIRUN="mpirun" \
+		filter_test
+Test filtered field!!
+for dir in Filtered_field_test ; do \
+	echo "# Test in ${dir} directory..."; \
+		( cd ${dir}; \
+		make \
+		GMAKE="make" \
+		BUILDDIR="/Users/matsui/CALYPSO_test/bin" \
+		TESTDIR="/Users/matsui/CALYPSO_test/tests" \
+		MHDDIR="/Users/matsui/CALYPSO_test/src" \
+		MPIRUN="mpirun" \
+		TARGET_GEN_SPH_GRID="" \
+		TARGET_CHECK_SPH_GRID="" \
+		TARGET_TEST_SPH_GRID="" \
+		TARGET_NEWSPH="" \
+		TARGET_CMP_SPH_RST="" \
+		test)\
+	done; \
+	rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
+# Test in Filtered_field_test directory...
+rm -f *.dat
 mpirun -np 4 /Users/matsui/CALYPSO_test/bin/sph_mhd
  Simulation start: PE.            0
- Simulation start: PE.            3
- Simulation start: PE.            2
  Simulation start: PE.            1
+ Simulation start: PE.            2
+ Simulation start: PE.            3
  Spherical shell resolution file: control_resolution
  Spherical shell resolution file end
 Read file for cross_section_ctl No.    1...  Section control file: controls/ctl_psf_cmb
@@ -386,6 +416,11 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  const_2nd_fdm_matrices
   set_material_property
  
+ Fixed boundary condition spectr for heat
+ sph_bc%iflag_icb           0
+ sph_bc%iflag_cmb           0
+ sph_bc_T%iflag_icb           0
+ sph_bc_T%iflag_cmb           0
  coefficient for temperature:            1.0000000000000000     
  coefficient for thermal diffusion:      1.0000000000000000     
  coefficient for velocity:               1.0000000000000000     
@@ -448,13 +483,14 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  nscalar_rtp_2_rj            1
  Spherical transform field table for energy flux (trns_eflux)
  Address for backward transform: transform, poloidal, toroidal, grid data
+    1. filtered_buoyancy:     1   30   30
  Address for forward transform: transform, poloidal, toroidal, grid data
     1. Lorentz_work:     1   42   42
     2. buoyancy_flux:     2   43   43
     3. Lorentz_work_by_filtered:     3   41   41
     4. filtered_buoyancy_flux:     4   39   39
  ncomp_sph_trans           28
- nvector_rj_2_rtp            0
+ nvector_rj_2_rtp            1
  nscalar_rj_2_rtp            0
  nvector_rtp_2_rj            0
  nscalar_rtp_2_rj            4

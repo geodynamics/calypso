@@ -185,6 +185,10 @@
       call add_subtracted_sph_trns_snap                                 &
      &   (d_rj, ipol%prod_fld, iphys%prod_fld, b_trns%prod_fld,         &
      &    trns_back)
+!
+      call add_base_force_bwd_trns_snap                                 &
+     &   (d_rj, ipol%force_by_filter, iphys%force_by_filter,            &
+     &    b_trns%force_by_filter, trns_back)
       trns_back%num_vector = trns_back%nfield
 !
 !
