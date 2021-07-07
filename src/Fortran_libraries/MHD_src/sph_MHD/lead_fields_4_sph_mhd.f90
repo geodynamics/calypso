@@ -142,6 +142,11 @@
 !
       call s_truncate_rj_base_field(LTR_cutoff, SPH_MHD%sph%sph_rj,     &
      &    SPH_MHD%ipol%base, SPH_MHD%ipol%filter_fld, SPH_MHD%fld)
+      call sel_buoyancies_sph_MHD(SPH_MHD%sph%sph_rj, trans_p%leg,      &
+     &    SPH_MHD%ipol%filter_fld, SPH_MHD%ipol%force_by_filter,        &
+     &    MHD_prop%fl_prop, MHD_prop%ref_param_T, MHD_prop%ref_param_C, &
+     &    sph_MHD_bc%sph_bc_U, SPH_MHD%fld)
+!
 !
       call lead_fields_by_sph_trans(SPH_MHD%sph, SPH_MHD%comms,         &
      &    MHD_prop, trans_p, WK%trns_MHD, WK%trns_snap,                 &
