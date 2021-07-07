@@ -56,6 +56,42 @@
         type(explicit_term_address) :: check_fld1
 !>        Second check work area
         type(explicit_term_address) :: check_fld2
+!
+!
+!>        Structure of symmetric fields
+        type(base_field_address) :: sym_fld
+!>        Structure of asymmetric fields
+        type(base_field_address) :: asym_fld
+! 
+! 
+!>        Structure of symmetric forces
+        type(base_force_address) :: l_forces_by_sym
+!>        Structure of asymmetric forces
+        type(base_force_address) :: l_forces_by_asym
+! 
+!>        Structure of forces by sym and sym fields
+        type(base_force_address) :: nl_forces_by_sym_sym
+!>        Structure of forces by asym and asym fields
+        type(base_force_address) :: nl_forces_by_asym_asym
+!>        Structure of forces by sym and asym fields
+        type(base_force_address) :: nl_forces_by_sym_asym
+!>        Structure of forces by asym and sym fields
+        type(base_force_address) :: nl_forces_by_asym_sym
+! 
+! 
+!>        Structure of symmetric energy fluxes
+        type(base_force_address) :: l_eflux_to_sym
+!>        Structure of asymmetric energy fluxes
+        type(base_force_address) :: l_eflux_to_asym
+! 
+!>        Structure of energy fluxes s. (s x a) 
+        type(energy_flux_address) :: nl_eflux_to_sym_by_sym_asym
+!>        Structure of energy fluxes s. (a x s)
+        type(energy_flux_address) :: nl_eflux_to_sym_by_asym_sym
+!>        Structure of energy fluxes a. (s x s)
+        type(energy_flux_address) :: nl_eflux_to_asym_by_sym_sym
+!>        Structure of energy fluxes a. (a x a)
+        type(energy_flux_address) :: nl_eflux_to_asym_by_asym_asym
       end type phys_address
 !
 !
