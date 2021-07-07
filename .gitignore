@@ -20,3 +20,5 @@ CALYPSO.out
 CALYPSO.log
 
 CALYPSO.aux
+
+module_dependency.mod
