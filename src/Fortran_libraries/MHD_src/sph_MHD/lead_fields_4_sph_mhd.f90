@@ -211,6 +211,12 @@
      &      trns_snap%forward%ncomp,  trns_snap%forward%fld_pole)
       end if
 !
+      if (iflag_debug.gt.0) write(*,*)                                  &
+     &    'sph_forward_trans_snapshot_MHD for trns_snap'
+      call sph_forward_trans_snapshot_MHD                               &
+     &   (sph, comms_sph, trans_p, trns_snap%forward,                   &
+     &    WK_leg, WK_FFTs, rj_fld, SR_sig, SR_r)
+!
       end subroutine lead_fields_by_sph_trans
 !
 ! ----------------------------------------------------------------------
