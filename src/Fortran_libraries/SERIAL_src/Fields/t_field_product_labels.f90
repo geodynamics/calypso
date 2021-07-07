@@ -40,6 +40,7 @@
 !!   composition_scale        [i_comp_scale]:
 !!
 !!   stream_pol_velocity      [i_stream_pol_u]:
+!!   stream_pol_magnetic_field      [i_stream_pol_b]:
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -111,6 +112,8 @@
 !
 !>        start address for stream function for poloidal velocity
         integer (kind=kint) :: i_stream_pol_u =     izero
+!>        start address for stream function for poloidal magnetic field
+        integer (kind=kint) :: i_stream_pol_b =     izero
       end type phys_products_address
 !
 ! ----------------------------------------------------------------------
@@ -178,6 +181,9 @@
 !
         else if (field_name .eq. stream_pol_velocity%name) then
           prod_fld%i_stream_pol_u = i_phys
+!
+        else if (field_name .eq. stream_pol_magne%name) then
+          prod_fld%i_stream_pol_b = i_phys
         end if
       end if
 !
