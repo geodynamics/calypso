@@ -218,8 +218,7 @@
      &   .or. (field_name .eq. square_current%name)                     &
 !
      &   .or. (field_name .eq. stream_pol_velocity%name)                &
-!
-     &   .or. (field_name .eq. stream_pol_magne%name)                &
+     &   .or. (field_name .eq. stream_pol_magne%name)                   &
      &      )   check_field_product_vectors = .TRUE.
 !
       end function check_field_product_vectors
