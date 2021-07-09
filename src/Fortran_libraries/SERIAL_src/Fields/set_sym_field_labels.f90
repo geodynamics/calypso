@@ -73,16 +73,16 @@
             else if (field_name .eq. sym_vorticity%name) then
             sym_fld%i_vort = i_phys
 !
-            else if (field_name .eq. sym_magne%name) then
+            else if (field_name .eq. sym_magnetic_field%name) then
             sym_fld%i_magne =    i_phys
             else if (field_name .eq. sym_vector_potential%name) then
             sym_fld%i_vecp =     i_phys
-            else if (field_name .eq. sym_current%name) then
+            else if (field_name .eq. sym_current_density%name) then
             sym_fld%i_current =  i_phys
 !
             else if (field_name .eq. sym_temperature%name) then
             sym_fld%i_temp =            i_phys
-            else if (field_name .eq. sym_perturbation_temperature%name) then
+            else if (field_name .eq. sym_perturbation_temp%name) then
             sym_fld%i_per_temp =        i_phys
 !
             else if (field_name .eq. sym_composition%name) then
@@ -127,17 +127,17 @@
             else if (field_name .eq. asym_vorticity%name) then
             asym_fld%i_vort = i_phys
 !
-            else if (field_name .eq. asym_magne%name) then
+            else if (field_name .eq. asym_magnetic_field%name) then
             asym_fld%i_magne =    i_phys
             else if (field_name .eq. asym_vector_potential%name) then
             asym_fld%i_vecp =     i_phys
-            else if (field_name .eq. asym_current%name) then
+            else if (field_name .eq. asym_current_density%name) then
             asym_fld%i_current =  i_phys
 !
 ! 
             else if (field_name .eq. asym_temperature%name) then
             asym_fld%i_temp =            i_phys
-            else if (field_name .eq. asym_perturbation_temperature%name) then
+            else if (field_name .eq. asym_perturbation_temp%name) then
             asym_fld%i_per_temp =        i_phys
 !
             else if (field_name .eq. asym_composition%name) then
