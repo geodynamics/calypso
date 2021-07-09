@@ -1,0 +1,36 @@
+!
+!     example of control for surface rendering on CMB
+!
+begin surface_rendering
+  psf_file_head    'section/psf_cmb'
+  psf_output_type   VTK
+!
+  begin surface_define
+    section_method    equation
+!
+    array coefs_ctl
+      coefs_ctl  x2     1.0
+      coefs_ctl  y2     1.0
+      coefs_ctl  z2     1.0
+      coefs_ctl  xy     0.0
+      coefs_ctl  yz     0.0
+      coefs_ctl  zx     0.0
+      coefs_ctl  x      0.0
+      coefs_ctl  y      0.0
+      coefs_ctl  z      0.0
+      coefs_ctl  const  -2.3667
+    end array coefs_ctl
+!
+    begin plot_area_ctl
+      array chosen_ele_grp_ctl 1
+        chosen_ele_grp_ctl   all
+      end array chosen_ele_grp_ctl
+    end plot_area_ctl
+  end surface_define
+!
+  begin output_field_define
+    array output_field
+      output_field   magnetic_field          spherical_vector
+    end array output_field
+  end output_field_define
+end surface_rendering
