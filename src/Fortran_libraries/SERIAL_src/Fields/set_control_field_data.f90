@@ -108,6 +108,7 @@
       subroutine init_field_data(n_point, fld, iphys)
 !
       use set_MHD_field_address
+      use set_MHD_sym_fld_address
 !
       integer(kind = kint), intent(in) :: n_point
       type(phys_data), intent(inout) :: fld
@@ -124,6 +125,11 @@
         i_fld = fld%istack_component(i-1) + 1
 !
         call set_MHD_field_addresses                                    &
+     &     (i_fld, fld%phys_name(i), iphys, flag)
+        if(flag) cycle
+!
+!
+        call set_MHD_sym_field_addresses                                    &
      &     (i_fld, fld%phys_name(i), iphys, flag)
         if(flag) cycle
 !
