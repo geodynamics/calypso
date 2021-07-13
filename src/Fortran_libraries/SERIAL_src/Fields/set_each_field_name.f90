@@ -40,6 +40,7 @@
 !
       use m_field_product_labels
       use set_MHD_field_address
+      use set_MHD_sym_fld_address
       use append_phys_data
 !
       character(len = kchara), intent(in) :: phys_name_ctl
@@ -48,7 +49,8 @@
       logical, intent(inout) :: flag
 !
 !
-      flag =  check_vector_fields(phys_name_ctl)
+      flag =  check_vector_fields(phys_name_ctl)                        &
+     &   .or. check_sym_vector_fields(phys_name_ctl)
       if(flag) then
         call append_field_name_list(phys_name_ctl, n_vector,            &
      &      flag_viz, flag_monitor, ione, fld)
@@ -71,6 +73,7 @@
 !
       use m_energy_flux_labels
       use set_MHD_field_address
+      use set_MHD_sym_fld_address
       use append_phys_data
 !
       character(len = kchara), intent(in) :: phys_name_ctl
@@ -79,7 +82,8 @@
       logical, intent(inout) :: flag
 !
 !
-      flag =  check_scalar_fields(phys_name_ctl)
+      flag =  check_scalar_fields(phys_name_ctl)                        &
+     &   .or. check_sym_scalar_fields(phys_name_ctl)
       if(flag) then
         call append_field_name_list(phys_name_ctl, n_scalar,            &
      &      flag_viz, flag_monitor, ione, fld)
@@ -102,6 +106,7 @@
      &         (phys_name_ctl, flag_viz, flag_monitor, fld, flag)
 !
       use set_MHD_field_address
+      use set_MHD_sym_fld_address
       use append_phys_data
 !
       character(len = kchara), intent(in) :: phys_name_ctl
@@ -110,14 +115,16 @@
       logical, intent(inout) :: flag
 !
 !
-      flag =  check_sym_tensor_fields(phys_name_ctl)
+      flag =  check_sym_tensor_fields(phys_name_ctl)                    &
+     &   .or. check_sym_tensor_fields_w_sym(phys_name_ctl)
       if(flag) then
         call append_field_name_list(phys_name_ctl, n_sym_tensor,        &
      &      flag_viz, flag_monitor, ione, fld)
         return
       end if
 !
-      flag =  check_asym_tensor_fields(phys_name_ctl)
+      flag =  check_asym_tensor_fields(phys_name_ctl)                   &
+     &   .or. check_asym_tensor_fields_w_sym(phys_name_ctl)
       if(flag) then
         call append_field_name_list(phys_name_ctl, ithree,              &
      &      flag_viz, flag_monitor, ione, fld)

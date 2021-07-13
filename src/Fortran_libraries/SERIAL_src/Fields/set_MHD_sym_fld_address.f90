@@ -42,55 +42,70 @@
 !
 ! -----------------------------------------------------------------------
 !
-!       logical function check_sym_vector_fields(phys_name_ctl)
-! !
-!       use m_field_w_symmetry_labels
-!       use m_force_w_sym_labels
-! !
-!       character(len = kchara), intent(in) :: phys_name_ctl
-!       logical :: flag
-! !
-!       flag =  check_sym_vector(phys_name_ctl)                        &
-!       &   .or. check_sym_force(phys_name_ctl)
-! !
-!       check_sym_vector_fields = flag
-! !
-!       end function check_sym_vector_fields
+      logical function check_sym_vector_fields(phys_name_ctl)
+!
+      use m_field_w_symmetry_labels
+      use m_force_w_sym_labels
+!
+      character(len = kchara), intent(in) :: phys_name_ctl
+      logical :: flag
+!
+      flag =  check_base_vector_symmetry(phys_name_ctl)                        &
+      &   .or. check_forces_w_sym(phys_name_ctl)
+!
+      check_sym_vector_fields = flag
+!
+      end function check_sym_vector_fields
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
-! !
-!       logical function check_sym_scalar_fields(phys_name_ctl)
-! !
-!       use m_field_w_symmetry_labels
-!       use m_force_w_sym_labels
-! !     use m_sym_ene_flux_labels
-! !
-!       character(len = kchara), intent(in) :: phys_name_ctl
-!       logical :: flag
-! !
-!       flag =  check_sym_scalar(phys_name_ctl)                        &
-!       &   .or. check_sym_scalar_flux(phys_name_ctl)                 
-! !    &   .or. check_sym_enegy_fluxes(phys_name_ctl)
-! !
-!       check_sym_scalar_fields = flag
-! !
-!       end function check_sym_scalar_fields
+!
+      logical function check_sym_scalar_fields(phys_name_ctl)
+!
+      use m_field_w_symmetry_labels
+      use m_force_w_sym_labels
+!     use m_sym_ene_flux_labels
+!
+      character(len = kchara), intent(in) :: phys_name_ctl
+      logical :: flag
+!
+      flag =  check_base_scalar_w_symmetry(phys_name_ctl)                        &
+      &   .or. check_scalar_advection_w_sym(phys_name_ctl)                 
+!    &   .or. check_sym_enegy_fluxes(phys_name_ctl)
+!
+      check_sym_scalar_fields = flag
+!
+      end function check_sym_scalar_fields
 !
 ! -----------------------------------------------------------------------
 !
-!       logical function check_sym_sym_tensor_fields(phys_name_ctl)
-! !
-!       use m_force_w_sym_labels
-! !
-!       character(len = kchara), intent(in) :: phys_name_ctl
-!       logical :: flag
-! !
-!       flag =  check_sym_flux_tensor(phys_name_ctl)
-! !
-!       check_sym_sym_tensor_fields = flag
-! !
-!       end function check_sym_sym_tensor_fields
+      logical function check_sym_tensor_fields_w_sym(phys_name_ctl)
+!
+      use m_force_w_sym_labels
+!
+      character(len = kchara), intent(in) :: phys_name_ctl
+      logical :: flag
+!
+      flag =  check_flux_tensors_w_sym(phys_name_ctl)
+!
+      check_sym_tensor_fields_w_sym = flag
+!
+      end function check_sym_tensor_fields_w_sym
+!
+! -----------------------------------------------------------------------
+!
+      logical function check_asym_tensor_fields_w_sym(phys_name_ctl)
+!
+      use m_force_w_sym_labels
+!
+      character(len = kchara), intent(in) :: phys_name_ctl
+      logical :: flag
+!
+      flag =  check_flux_asym_tensors_w_sym(phys_name_ctl)
+!
+      check_asym_tensor_fields_w_sym = flag
+!
+      end function check_asym_tensor_fields_w_sym
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
