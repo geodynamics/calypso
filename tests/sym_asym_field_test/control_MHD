@@ -90,9 +90,10 @@ begin MHD_control
         nod_value_ctl  Jsym_x_Bsym    Viz_On   Monitor_On
         nod_value_ctl  sym_thermal_buoyancy            Viz_On   Monitor_On
 !
-!        nod_value_ctl  filtered_buoyancy_flux           Viz_On   Monitor_On
-!        nod_value_ctl  inertia_work_by_filtered         Viz_On   Monitor_On
-!        nod_value_ctl  Lorentz_work_by_filtered         Viz_On   Monitor_On
+        nod_value_ctl  us_d_js_x_ba           Viz_On   Monitor_On
+        nod_value_ctl  us_d_ja_x_bs           Viz_On   Monitor_On
+        nod_value_ctl  sym_buoyancy_flux      Viz_On   Monitor_On
+        nod_value_ctl  asym_buoyancy_flux     Viz_On   Monitor_On
       end array nod_value_ctl
     end phys_values_ctl
 !
