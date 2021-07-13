@@ -98,9 +98,8 @@
 !
 !
       flag = check_forces_w_sym(field_name)                           &
-      &      .or. check_sym_flux_tensor(field_name)                 &
-      &      .or. check_scalar_advection_w_sym(field_name)
-      &      .or. check_flux_tensors_w_sym(field_name)
+      &      .or. check_flux_tensors_w_sym(field_name)                &
+      &      .or. check_scalar_advection_w_sym(field_name)            &
       &      .or. check_flux_asym_tensors_w_sym(field_name)
       if(flag) then
             if     (field_name .eq. wsym_x_usym%name) then
@@ -167,9 +166,8 @@
 !
 !
       flag = check_forces_w_sym(field_name)                           &
-      &      .or. check_sym_flux_tensor(field_name)                 &
-      &      .or. check_scalar_advection_w_sym(field_name)
-      &      .or. check_flux_tensors_w_sym(field_name)
+      &      .or. check_flux_tensors_w_sym(field_name)                &
+      &      .or. check_scalar_advection_w_sym(field_name)            &
       &      .or. check_flux_asym_tensors_w_sym(field_name)
       if(flag) then
             if     (field_name .eq. wasym_x_uasym%name) then
@@ -231,9 +229,8 @@
 !
 !
       flag = check_forces_w_sym(field_name)                           &
-      &      .or. check_sym_flux_tensor(field_name)                 &
-      &      .or. check_scalar_advection_w_sym(field_name)
-      &      .or. check_flux_tensors_w_sym(field_name)
+      &      .or. check_flux_tensors_w_sym(field_name)                &
+      &      .or. check_scalar_advection_w_sym(field_name)            &
       &      .or. check_flux_asym_tensors_w_sym(field_name)
       if(flag) then
             if     (field_name .eq. wsym_x_uasym%name) then
@@ -295,9 +292,8 @@
 !
 !
       flag = check_forces_w_sym(field_name)                           &
-      &      .or. check_sym_flux_tensor(field_name)                 &
-      &      .or. check_scalar_advection_w_sym(field_name)
-      &      .or. check_flux_tensors_w_sym(field_name)
+      &      .or. check_flux_tensors_w_sym(field_name)                &
+      &      .or. check_scalar_advection_w_sym(field_name)            &
       &      .or. check_flux_asym_tensors_w_sym(field_name)
       if(flag) then
             if     (field_name .eq. wasym_x_usym%name) then
@@ -333,10 +329,6 @@
             else if (field_name .eq. pert_c_flux_asym_sym%name) then
             force_by_asym_sym%i_pc_flux =   i_phys
 !
-            else if(field_name .eq. m_flux_asym_sym%name) then
-            force_by_asym_sym%i_m_flux =   i_phys
-            else if(field_name .eq. maxwell_tensor_asym_sym%name) then
-            force_by_asym_sym%i_maxwell =  i_phys
             else if(field_name .eq. uasym_Bsym%name) then
             force_by_asym_sym%i_induct_t = i_phys
             end if
@@ -346,57 +338,57 @@
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
-!
-      subroutine set_sym_ene_flux_addresses                          &
-      &         (i_phys, field_name, eflux_by_sym, flag)
-!
-      use m_sym_ene_flux_labels
-!
-      integer(kind = kint), intent(in) :: i_phys
-      character(len = kchara), intent(in) :: field_name
-!
-      type(energy_flux_address), intent(inout) :: eflux_by_sym
-      logical, intent(inout) :: flag
-!
-!
-      flag = check_sym_enegy_fluxes(field_name)
-      if(flag) then
-            if (field_name .eq. inertia_work_by_sym%name) then
-            eflux_by_sym%i_m_advect_work = i_phys
-            else if (field_name .eq. wk_against_Lorentz_by_sym%name)   &
-      &   then
-            eflux_by_sym%i_nega_ujb =      i_phys
-            else if (field_name .eq. Lorentz_work_by_sym%name) then
-            eflux_by_sym%i_ujb =           i_phys
-            else if (field_name .eq. mag_tension_work_by_sym%name)     &
-      &   then
-            eflux_by_sym%i_m_tension_wk =  i_phys
-!
-            else if (field_name .eq. sym_buoyancy_flux%name) then
-            eflux_by_sym%i_buo_gen =       i_phys
-            else if (field_name .eq. sym_comp_buoyancy_flux%name) then
-            eflux_by_sym%i_c_buo_gen =     i_phys
-!
-            else if (field_name .eq. mag_ene_generation_by_sym%name)   &
-      &   then
-            eflux_by_sym%i_me_gen =           i_phys
-            else if (field_name .eq. mag_stretch_flux_by_sym%name)     &
-      &   then
-            eflux_by_sym%i_mag_stretch_flux = i_phys
-!
-            else if (field_name .eq. temp_generation_by_sym%name) then
-            eflux_by_sym%i_temp_gen =  i_phys
-            else if (field_name .eq. part_temp_gen_by_sym%name) then
-            eflux_by_sym%i_par_t_gen = i_phys
-!
-            else if (field_name .eq. comp_generation_by_sym%name) then
-            eflux_by_sym%i_comp_gen =  i_phys
-            else if (field_name .eq. part_comp_gen_by_sym%name) then
-            eflux_by_sym%i_par_c_gen = i_phys
-            end if
-      end if
-!
-      end subroutine set_sym_ene_flux_addresses
+! !
+!       subroutine set_sym_ene_flux_addresses                          &
+!       &         (i_phys, field_name, eflux_by_sym, flag)
+! !
+!       use m_sym_ene_flux_labels
+! !
+!       integer(kind = kint), intent(in) :: i_phys
+!       character(len = kchara), intent(in) :: field_name
+! !
+!       type(energy_flux_address), intent(inout) :: eflux_by_sym
+!       logical, intent(inout) :: flag
+! !
+! !
+!       flag = check_sym_enegy_fluxes(field_name)
+!       if(flag) then
+!             if (field_name .eq. inertia_work_by_sym%name) then
+!             eflux_by_sym%i_m_advect_work = i_phys
+!             else if (field_name .eq. wk_against_Lorentz_by_sym%name)   &
+!       &   then
+!             eflux_by_sym%i_nega_ujb =      i_phys
+!             else if (field_name .eq. Lorentz_work_by_sym%name) then
+!             eflux_by_sym%i_ujb =           i_phys
+!             else if (field_name .eq. mag_tension_work_by_sym%name)     &
+!       &   then
+!             eflux_by_sym%i_m_tension_wk =  i_phys
+! !
+!             else if (field_name .eq. sym_buoyancy_flux%name) then
+!             eflux_by_sym%i_buo_gen =       i_phys
+!             else if (field_name .eq. sym_comp_buoyancy_flux%name) then
+!             eflux_by_sym%i_c_buo_gen =     i_phys
+! !
+!             else if (field_name .eq. mag_ene_generation_by_sym%name)   &
+!       &   then
+!             eflux_by_sym%i_me_gen =           i_phys
+!             else if (field_name .eq. mag_stretch_flux_by_sym%name)     &
+!       &   then
+!             eflux_by_sym%i_mag_stretch_flux = i_phys
+! !
+!             else if (field_name .eq. temp_generation_by_sym%name) then
+!             eflux_by_sym%i_temp_gen =  i_phys
+!             else if (field_name .eq. part_temp_gen_by_sym%name) then
+!             eflux_by_sym%i_par_t_gen = i_phys
+! !
+!             else if (field_name .eq. comp_generation_by_sym%name) then
+!             eflux_by_sym%i_comp_gen =  i_phys
+!             else if (field_name .eq. part_comp_gen_by_sym%name) then
+!             eflux_by_sym%i_par_c_gen = i_phys
+!             end if
+!       end if
+! !
+!       end subroutine set_sym_ene_flux_addresses
 !
 ! ----------------------------------------------------------------------
 !
