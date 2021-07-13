@@ -64,14 +64,14 @@
 !
       use m_field_w_symmetry_labels
       use m_force_w_sym_labels
-!     use m_sym_ene_flux_labels
+      use m_sym_ene_flux_labels
 !
       character(len = kchara), intent(in) :: phys_name_ctl
       logical :: flag
 !
       flag =  check_base_scalar_w_symmetry(phys_name_ctl)                        &
       &   .or. check_scalar_advection_w_sym(phys_name_ctl)                 
-!    &   .or. check_sym_enegy_fluxes(phys_name_ctl)
+      &   .or. check_enegy_fluxes_w_sym(phys_name_ctl)
 !
       check_sym_scalar_fields = flag
 !
@@ -148,6 +148,23 @@
 !
       call set_asym_sym_force_addresses                                 &
       &   (i_fld, field_name, iphys%forces_by_asym_sym, flag)
+      if(flag) return
+!
+! 
+      call set_sym_ene_flux_addresses_by_sym_asym                                 &
+      &   (i_fld, field_name, iphys%eflux_to_sym_by_sym_asym, flag)
+      if(flag) return
+!
+      call set_sym_ene_flux_addresses_by_asym_sym                                 &
+      &   (i_fld, field_name, iphys%eflux_to_sym_by_asym_sym, flag)
+      if(flag) return
+!
+      call set_asym_ene_flux_addresses_by_sym_sym                                 &
+      &   (i_fld, field_name, iphys%eflux_to_asym_by_sym_sym, flag)
+      if(flag) return
+!
+      call set_asym_ene_flux_addresses_by_asym_asym                                 &
+      &   (i_fld, field_name, iphys%eflux_to_asym_by_asym_asym, flag)
       if(flag) return
 !
 !
