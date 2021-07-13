@@ -70,7 +70,7 @@
       logical :: flag
 !
       flag =  check_base_scalar_w_symmetry(phys_name_ctl)                        &
-      &   .or. check_scalar_advection_w_sym(phys_name_ctl)                 
+      &   .or. check_scalar_advection_w_sym(phys_name_ctl)                       &
       &   .or. check_enegy_fluxes_w_sym(phys_name_ctl)
 !
       check_sym_scalar_fields = flag

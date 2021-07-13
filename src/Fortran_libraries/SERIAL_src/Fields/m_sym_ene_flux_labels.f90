@@ -51,7 +51,7 @@
 !!         @f$ u_{symi} (e_{ijk} \tilde{J}_{symj} \tilde{B}_{asymk}) @f$
         type(field_def), parameter :: us_d_js_x_ba            &
         &    = field_def(n_comp = n_scalar,                                &
-        &                name = 'us_d_js_ba',                &
+        &                name = 'us_d_js_x_ba',                &
         &         math = '$ u_{symi} (e_{ijk} \tilde{J}_{symj} \tilde{B}_{asymk})$')
 !>        Field label of work of Lorentz force
 !!         @f$ u_{symi} (e_{ijk} \tilde{J}_{asymj} \tilde{B}_{symk}) @f$
@@ -96,8 +96,8 @@
         character(len = kchara), intent(in) :: field_name
 !
 !
-        check_filter_enegy_fluxes                              &
-        &   =    (field_name .eq. us_d_js_s_ba%name)           &
+        check_enegy_fluxes_w_sym                              &
+        &   =    (field_name .eq. us_d_js_x_ba%name)           &
         &   .or. (field_name .eq. us_d_ja_x_bs%name)             &
         &   .or. (field_name .eq. ua_d_js_x_bs%name)           &
         &   .or. (field_name .eq. ua_d_ja_x_ba%name)           &
