@@ -86,10 +86,22 @@
       call add_base_vector_sph_trns_snap                                &
      &   (d_rj, ipol%base, iphys%base, b_trns%base, trns_back)
       trns_back%num_vector = trns_back%nfield
+      call add_base_vector_sph_trns_snap                                &
+     &   (d_rj, ipol%sym_fld, iphys%sym_fld, b_trns%sym_fld,   &
+     &    trns_back)
+     call add_base_vector_sph_trns_snap                                &
+     &   (d_rj, ipol%asym_fld, iphys%asym_fld, b_trns%asym_fld,   &
+     &    trns_back)
 !
 !      Scalars
       call add_base_scalar_sph_trns_snap                                &
      &   (d_rj, ipol%base, iphys%base, b_trns%base, trns_back)
+      call add_base_scalar_sph_trns_snap                                &
+     &   (d_rj, ipol%sym_fld, iphys%sym_fld, b_trns%sym_fld,            &
+     &    trns_back)
+      call add_base_scalar_sph_trns_snap                                &
+     &   (d_rj, ipol%asym_fld, iphys%asym_fld, b_trns%asym_fld,         &
+     &    trns_back)
       trns_back%num_scalar = trns_back%nfield - trns_back%num_vector
       trns_back%num_tensor = 0
 !
