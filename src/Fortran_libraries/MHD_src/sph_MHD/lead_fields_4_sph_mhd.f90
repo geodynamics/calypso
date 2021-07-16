@@ -112,6 +112,7 @@
       use sph_transforms_4_MHD
       use cal_energy_flux_rtp
       use cal_self_buoyancies_sph
+      use decomp_w_sym_rj_base_field
 !
       type(sph_mhd_monitor_data), intent(in) :: monitor
       type(fdm_matrices), intent(in) :: r_2nd
@@ -137,6 +138,8 @@
      &      sph_MHD_mat%band_p_poisson, SPH_MHD%ipol, SPH_MHD%fld)
       end if
 !
+      call s_decomp_w_sym_rj_base_field(SPH_MHD%sph%sph_rj,     &
+     &    SPH_MHD%ipol%base, SPH_MHD%ipol%sym_fld, SPH_MHD%ipol%asym_fld, SPH_MHD%fld)
       call lead_fields_by_sph_trans(SPH_MHD%sph, SPH_MHD%comms,         &
      &    MHD_prop, trans_p, WK%trns_MHD, WK%trns_snap,                 &
      &    WK%WK_leg, WK%WK_FFTs, SPH_MHD%fld, SR_sig, SR_r)
