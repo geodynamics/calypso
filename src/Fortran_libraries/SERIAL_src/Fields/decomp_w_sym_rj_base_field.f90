@@ -59,7 +59,7 @@
 !
 	call decomp_rj_scalar(sph_rj, rj_fld,               &
 	&    base_fld%i_temp, sym_fld%i_temp, asym_fld%i_temp)
-	call decomp_rj_scalar(ltr_filter, sph_rj, rj_fld,               &
+	call decomp_rj_scalar(sph_rj, rj_fld,               &
 	&    base_fld%i_per_temp, sym_fld%i_per_temp, asym_fld%i_per_temp)
 !
 	call decomp_rj_scalar(sph_rj, rj_fld,               &
@@ -88,10 +88,10 @@
 	type(sph_rj_grid), intent(in) :: sph_rj
 	type(phys_data), intent(inout) :: rj_fld
 !
-	integer(kind = kint) :: inod, l_gl, m_gl
+	integer(kind = kint) :: inod, l_gl, m_gl, lm_odd
 !
 !
-	if(ipol_filtered .le. 0) return
+	if(ipol_sym .le. 0 .or. ipol_asym .le. 0 ) return
 !      write(*,*) 'Filtering vector', ipol_filtered
 !$omp parallel do private(inod, l_gl)
 	do inod = 1, sph_rj%nnod_rj
@@ -129,7 +129,7 @@
 	integer(kind = kint) :: inod, l_gl, m_gl, lm_odd
 !
 !
-	if(ipol_sym .le. 0) return
+	if(ipol_sym .le. 0 .or. ipol_asym .le. 0 ) return
 !      write(*,*) 'sym scalar', ipol_sym 
 !      write(*,*) 'asym scalar', ipol_asym 
 !$omp parallel do private(inod, l_gl, m_gl)
@@ -148,49 +148,49 @@
 	end subroutine decomp_rj_scalar
 !
 !-----------------------------------------------------------------------
-!
-	subroutine decomp_rj_sym_tensor(ltr_filter, sph_rj,             &
-	&          rj_fld, ipol_fld, ipol_filtered)
-!
-	integer(kind = kint), intent(in) :: ltr_filter
-	integer(kind = kint), intent(in) :: ipol_fld, ipol_filtered
-	type(sph_rj_grid), intent(in) :: sph_rj
-	type(phys_data), intent(inout) :: rj_fld
-!
-	integer(kind = kint) :: inod, l_gl
-!
-!
-	if(ipol_filtered .le. 0) return
-!      write(*,*) 'Filtering tensor', ipol_filtered
-!$omp parallel do private(inod, l_gl)
-	do inod = 1, sph_rj%nnod_rj
-		l_gl = aint(sqrt(real(sph_rj%idx_global_rj(inod,2))))
-		if(l_gl .le. ltr_filter) then
-			rj_fld%d_fld(inod,ipol_filtered  )                            &
-			&          = rj_fld%d_fld(inod,ipol_fld  )
-			rj_fld%d_fld(inod,ipol_filtered+1)                            &
-			&          = rj_fld%d_fld(inod,ipol_fld+1)
-			rj_fld%d_fld(inod,ipol_filtered+2)                            &
-			&          = rj_fld%d_fld(inod,ipol_fld+2)
-			rj_fld%d_fld(inod,ipol_filtered+3)                            &
-			&          = rj_fld%d_fld(inod,ipol_fld+3)
-			rj_fld%d_fld(inod,ipol_filtered+4)                            &
-			&          = rj_fld%d_fld(inod,ipol_fld+4)
-			rj_fld%d_fld(inod,ipol_filtered+5)                            &
-			&          = rj_fld%d_fld(inod,ipol_fld+5)
-		else
-			rj_fld%d_fld(inod,ipol_filtered  ) = zero
-			rj_fld%d_fld(inod,ipol_filtered+1) = zero
-			rj_fld%d_fld(inod,ipol_filtered+2) = zero
-			rj_fld%d_fld(inod,ipol_filtered+3) = zero
-			rj_fld%d_fld(inod,ipol_filtered+4) = zero
-			rj_fld%d_fld(inod,ipol_filtered+5) = zero
-		end if
-	end do
-!$omp end parallel do
-!
-	end subroutine decomp_rj_sym_tensor
-!
+! !
+! 	subroutine decomp_rj_sym_tensor(ltr_filter, sph_rj,             &
+! 	&          rj_fld, ipol_fld, ipol_filtered)
+! !
+! 	integer(kind = kint), intent(in) :: ltr_filter
+! 	integer(kind = kint), intent(in) :: ipol_fld, ipol_filtered
+! 	type(sph_rj_grid), intent(in) :: sph_rj
+! 	type(phys_data), intent(inout) :: rj_fld
+! !
+! 	integer(kind = kint) :: inod, l_gl
+! !
+! !
+! 	if(ipol_sym .le. 0 .or. ipol_asym .le. 0 ) return
+! !      write(*,*) 'Filtering tensor', ipol_filtered
+! !$omp parallel do private(inod, l_gl)
+! 	do inod = 1, sph_rj%nnod_rj
+! 		l_gl = aint(sqrt(real(sph_rj%idx_global_rj(inod,2))))
+! 		if(l_gl .le. ltr_filter) then
+! 			rj_fld%d_fld(inod,ipol_filtered  )                            &
+! 			&          = rj_fld%d_fld(inod,ipol_fld  )
+! 			rj_fld%d_fld(inod,ipol_filtered+1)                            &
+! 			&          = rj_fld%d_fld(inod,ipol_fld+1)
+! 			rj_fld%d_fld(inod,ipol_filtered+2)                            &
+! 			&          = rj_fld%d_fld(inod,ipol_fld+2)
+! 			rj_fld%d_fld(inod,ipol_filtered+3)                            &
+! 			&          = rj_fld%d_fld(inod,ipol_fld+3)
+! 			rj_fld%d_fld(inod,ipol_filtered+4)                            &
+! 			&          = rj_fld%d_fld(inod,ipol_fld+4)
+! 			rj_fld%d_fld(inod,ipol_filtered+5)                            &
+! 			&          = rj_fld%d_fld(inod,ipol_fld+5)
+! 		else
+! 			rj_fld%d_fld(inod,ipol_filtered  ) = zero
+! 			rj_fld%d_fld(inod,ipol_filtered+1) = zero
+! 			rj_fld%d_fld(inod,ipol_filtered+2) = zero
+! 			rj_fld%d_fld(inod,ipol_filtered+3) = zero
+! 			rj_fld%d_fld(inod,ipol_filtered+4) = zero
+! 			rj_fld%d_fld(inod,ipol_filtered+5) = zero
+! 		end if
+! 	end do
+! !$omp end parallel do
+! !
+! 	end subroutine decomp_rj_sym_tensor
+! !
 !-----------------------------------------------------------------------
 !
 	end module decomp_w_sym_rj_base_field
