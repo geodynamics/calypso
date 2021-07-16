@@ -362,6 +362,7 @@
       use sph_transforms_snapshot
       use cal_energy_flux_rj
       use cal_energy_flux_rtp
+      use cal_ene_flux_by_sym_rtp
 !
       integer(kind = kint), intent(in) :: ltr_crust
       type(sph_grids), intent(in) :: sph
@@ -401,6 +402,11 @@
      &    trns_difv%b_trns, trns_eflux%f_trns,                          &
      &    trns_MHD%forward, trns_snap%backward, trns_eflux%backward,    &
      &    trns_difv%backward, trns_eflux%forward)
+!
+      call s_cal_ene_flux_by_sym_rtp(sph%sph_rtp, MHD_prop%fl_prop,  &
+     &    MHD_prop%ref_param_T, MHD_prop%ref_param_C,                   &
+     &    trns_snap%b_trns, trns_snap%f_trns, trns_eflux%f_trns,        &
+     &    trns_snap%backward, trns_snap%forward, trns_eflux%forward)
 !
       end subroutine cal_sph_enegy_fluxes
 !
