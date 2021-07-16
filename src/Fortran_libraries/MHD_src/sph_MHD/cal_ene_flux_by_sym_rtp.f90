@@ -91,12 +91,6 @@
      &    trns_f_snap%ncomp, trns_f_snap%fld_rtp,                       &
      &    trns_f_eflux%ncomp, trns_f_eflux%fld_rtp)
 !
-      call cal_work_of_lorentz_on_node                                  &
-     &   (bs_trns%base, fs_trns%force_by_filter,                        &
-     &    fe_trns%eflux_by_filter, sph_rtp%nnod_pole,                   &
-     &    trns_b_snap%ncomp, trns_b_snap%fld_pole,                      &
-     &    trns_f_snap%ncomp, trns_f_snap%fld_pole,                      &
-     &    trns_f_eflux%ncomp, trns_f_eflux%fld_pole)
 !
       call cal_buoyancy_flux_rtp                                        &
      &   (sph_rtp, fl_prop, ref_param_T, ref_param_C,                   &
@@ -105,10 +99,6 @@
       call cal_buoyancy_flux_rtp                                        &
      &   (sph_rtp, fl_prop, ref_param_T, ref_param_C,                   &
      &    bs_trns%sym_fld, bs_trns%asym_fld, fe_trns%eflux_to_asym_by_sym_sym,    &
-     &    trns_b_snap, trns_b_snap, trns_f_eflux)
-      call pole_buoyancy_flux_rtp                                       &
-     &   (sph_rtp, fl_prop, ref_param_T, ref_param_C,                   &
-     &    bs_trns%base, bs_trns%filter_fld, fe_trns%eflux_by_filter,    &
      &    trns_b_snap, trns_b_snap, trns_f_eflux)
 !
       end subroutine s_cal_ene_flux_by_sym_rtp
@@ -147,4 +137,4 @@
 !
 !-----------------------------------------------------------------------
 !
-      end module cal_ene_flux_by_filter_rtp
+      end module cal_ene_flux_by_sym_rtp
