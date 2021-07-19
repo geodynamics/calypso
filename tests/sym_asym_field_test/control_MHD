@@ -80,11 +80,13 @@ begin MHD_control
         nod_value_ctl  magnetic_field          Viz_On   Monitor_On
         nod_value_ctl  current_density         Viz_Off  Monitor_Off
 !
+        nod_value_ctl  sym_temperature            Viz_On   Monitor_On
+        nod_value_ctl  asym_temperature            Viz_On   Monitor_On
+!
         nod_value_ctl  sym_velocity            Viz_On   Monitor_On
         nod_value_ctl  sym_vorticity           Viz_On   Monitor_On
         nod_value_ctl  sym_magnetic_field      Viz_On   Monitor_On
         nod_value_ctl  sym_current_density     Viz_On   Monitor_On
-        nod_value_ctl  sym_temperature         Viz_On   Monitor_On
 !
         nod_value_ctl  wsym_x_usym          Viz_On   Monitor_On
         nod_value_ctl  Jsym_x_Bsym    Viz_On   Monitor_On

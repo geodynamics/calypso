@@ -1,22 +1,22 @@
 echo "Test symmetric field!!"; \
-cd /home/usr3/g70393a/kera/calypso_develop/calypso/tests ; \
+cd /home/usr3/g70393a/kera/calypso_develop/calypso_dv/tests ; \
 	make \
 	GMAKE="make" \
-	BUILDDIR="/home/usr3/g70393a/kera/calypso_develop/calypso/bin" \
-	TESTDIR="/home/usr3/g70393a/kera/calypso_develop/calypso/tests" \
-	MHDDIR="/home/usr3/g70393a/kera/calypso_develop/calypso/src" \
+	BUILDDIR="/home/usr3/g70393a/kera/calypso_develop/calypso_dv/bin" \
+	TESTDIR="/home/usr3/g70393a/kera/calypso_develop/calypso_dv/tests" \
+	MHDDIR="/home/usr3/g70393a/kera/calypso_develop/calypso_dv/src" \
 	MPIRUN="mpirun" \
 	sym_test
 Test symmetric field!!
-make[1]: ディレクトリ `/home/usr3/g70393a/kera/calypso_develop/calypso/tests' に入ります
+make[1]: ディレクトリ `/home/usr3/g70393a/kera/calypso_develop/calypso_dv/tests' に入ります
 for dir in sym_asym_field_test ; do \
 echo "# Test in ${dir} directory..."; \
 	( cd ${dir}; \
 	make \
 	GMAKE="make" \
-	BUILDDIR="/home/usr3/g70393a/kera/calypso_develop/calypso/bin" \
-	TESTDIR="/home/usr3/g70393a/kera/calypso_develop/calypso/tests" \
-	MHDDIR="/home/usr3/g70393a/kera/calypso_develop/calypso/src" \
+	BUILDDIR="/home/usr3/g70393a/kera/calypso_develop/calypso_dv/bin" \
+	TESTDIR="/home/usr3/g70393a/kera/calypso_develop/calypso_dv/tests" \
+	MHDDIR="/home/usr3/g70393a/kera/calypso_develop/calypso_dv/src" \
 	MPIRUN="mpirun" \
 	TARGET_GEN_SPH_GRID="" \
 	TARGET_CHECK_SPH_GRID="" \
@@ -27,13 +27,13 @@ echo "# Test in ${dir} directory..."; \
 done; \
 rm -f mpif.h *.o *.mod *~ *.par *.diag *.a *.f90
 # Test in sym_asym_field_test directory...
-make[2]: ディレクトリ `/home/usr3/g70393a/kera/calypso_develop/calypso/tests/sym_asym_field_test' に入ります
+make[2]: ディレクトリ `/home/usr3/g70393a/kera/calypso_develop/calypso_dv/tests/sym_asym_field_test' に入ります
 rm -f *.dat
-mpirun -np 4 /home/usr3/g70393a/kera/calypso_develop/calypso/bin/sph_mhd
+mpirun -np 4 /home/usr3/g70393a/kera/calypso_develop/calypso_dv/bin/sph_mhd
  Simulation start: PE.            0
- Simulation start: PE.            1
- Simulation start: PE.            2
  Simulation start: PE.            3
+ Simulation start: PE.            2
+ Simulation start: PE.            1
  Spherical shell resolution file: control_resolution
  Spherical shell resolution file end
 Read file for cross_section_ctl No.    1...  Section control file: 
@@ -129,72 +129,73 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  coef_imp_c   0.000000000000000E+000
  s_set_control_field_data
  check_nodal_field_name for fld
- fld%num_phys           20
- fld%num_phys_viz           18
+ fld%num_phys           21
+ fld%num_phys_viz           19
  id#, num_component, stack_component, field_name 
      1     3     3    velocity
      2     1     4    temperature
      3     3     7    vorticity
      4     3    10    magnetic_field
-     5     3    13    sym_velocity
-     6     3    16    sym_vorticity
-     7     3    19    sym_magnetic_field
-     8     3    22    sym_current_density
-     9     1    23    sym_temperature
-    10     3    26    wsym_x_usym
-    11     3    29    Jsym_x_Bsym
-    12     3    32    sym_thermal_buoyancy
-    13     1    33    us_d_js_x_ba
-    14     1    34    us_d_ja_x_bs
-    15     1    35    sym_buoyancy_flux
-    16     1    36    asym_buoyancy_flux
-    17     1    37    Lorentz_work
-    18     1    38    buoyancy_flux
-    19     1    39    pressure
-    20     3    42    current_density
+     5     1    11    sym_temperature
+     6     1    12    asym_temperature
+     7     3    15    sym_velocity
+     8     3    18    sym_vorticity
+     9     3    21    sym_magnetic_field
+    10     3    24    sym_current_density
+    11     3    27    wsym_x_usym
+    12     3    30    Jsym_x_Bsym
+    13     3    33    sym_thermal_buoyancy
+    14     1    34    us_d_js_x_ba
+    15     1    35    us_d_ja_x_bs
+    16     1    36    sym_buoyancy_flux
+    17     1    37    asym_buoyancy_flux
+    18     1    38    Lorentz_work
+    19     1    39    buoyancy_flux
+    20     1    40    pressure
+    21     3    43    current_density
  set_control_sph_mhd_fields
- original number of field           20
+ original number of field           21
  add_work_area_4_potentials
- pressure_work is added at field ID           21
- m_potential_work is added at field ID           22
+ pressure_work is added at field ID           22
+ m_potential_work is added at field ID           23
  add_ctl_4_forces
- perturbation_temp is added at field ID           23
- Coriolis_force is added at field ID           24
+ perturbation_temp is added at field ID           24
+ Coriolis_force is added at field ID           25
  add_data_4_previous_step
- previous_momentum is added at field ID           25
- previous_pressure is added at field ID           26
- sum_forces is added at field ID           27
- previous_induction is added at field ID           28
- previous_heat is added at field ID           29
+ previous_momentum is added at field ID           26
+ previous_pressure is added at field ID           27
+ sum_forces is added at field ID           28
+ previous_induction is added at field ID           29
+ previous_heat is added at field ID           30
  add_data_4_check_step
- check_momentum is added at field ID           30
- check_pressure is added at field ID           31
- check_induction is added at field ID           32
- check_potential is added at field ID           33
- check_heat is added at field ID           34
- grad_temp is added at field ID           35
- grad_pert_temp is added at field ID           36
- viscous_diffusion is added at field ID           37
- div_viscousity is added at field ID           38
- vorticity_diffusion is added at field ID           39
- inertia is added at field ID           40
- rot_inertia is added at field ID           41
- div_inertia is added at field ID           42
- rot_Coriolis_force is added at field ID           43
- div_Coriolis_force is added at field ID           44
- Lorentz_force is added at field ID           45
- rot_Lorentz_force is added at field ID           46
- div_Lorentz_force is added at field ID           47
- buoyancy is added at field ID           48
- rot_buoyancy is added at field ID           49
- div_buoyancy is added at field ID           50
- magnetic_diffusion is added at field ID           51
- magnetic_induction is added at field ID           52
- vecp_induction is added at field ID           53
- thermal_diffusion is added at field ID           54
- heat_flux is added at field ID           55
- heat_advect is added at field ID           56
- magnetic_potential is added at field ID           57
+ check_momentum is added at field ID           31
+ check_pressure is added at field ID           32
+ check_induction is added at field ID           33
+ check_potential is added at field ID           34
+ check_heat is added at field ID           35
+ grad_temp is added at field ID           36
+ grad_pert_temp is added at field ID           37
+ viscous_diffusion is added at field ID           38
+ div_viscousity is added at field ID           39
+ vorticity_diffusion is added at field ID           40
+ inertia is added at field ID           41
+ rot_inertia is added at field ID           42
+ div_inertia is added at field ID           43
+ rot_Coriolis_force is added at field ID           44
+ div_Coriolis_force is added at field ID           45
+ Lorentz_force is added at field ID           46
+ rot_Lorentz_force is added at field ID           47
+ div_Lorentz_force is added at field ID           48
+ buoyancy is added at field ID           49
+ rot_buoyancy is added at field ID           50
+ div_buoyancy is added at field ID           51
+ magnetic_diffusion is added at field ID           52
+ magnetic_induction is added at field ID           53
+ vecp_induction is added at field ID           54
+ thermal_diffusion is added at field ID           55
+ heat_flux is added at field ID           56
+ heat_advect is added at field ID           57
+ magnetic_potential is added at field ID           58
  add_field_ctl_4_check_evo end
  add_field_ctl_4_evo_magne end
  add_field_ctl_4_ene_flux end
@@ -205,71 +206,72 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  add_field_ctl_4_forces end
  add_field_ctl_4_diff_vector end
  add_field_ctl_4_grad_field end
- reference_temperature is added at field ID           58
+ reference_temperature is added at field ID           59
  add_field_ctl_4_base_field end
  s_set_control_field_data
  check_nodal_field_name for fld
- fld%num_phys           58
- fld%num_phys_viz           18
+ fld%num_phys           59
+ fld%num_phys_viz           19
  id#, num_component, stack_component, field_name 
      1     3     3    velocity
      2     1     4    temperature
      3     3     7    vorticity
      4     3    10    magnetic_field
-     5     3    13    sym_velocity
-     6     3    16    sym_vorticity
-     7     3    19    sym_magnetic_field
-     8     3    22    sym_current_density
-     9     1    23    sym_temperature
-    10     3    26    wsym_x_usym
-    11     3    29    Jsym_x_Bsym
-    12     3    32    sym_thermal_buoyancy
-    13     1    33    us_d_js_x_ba
-    14     1    34    us_d_ja_x_bs
-    15     1    35    sym_buoyancy_flux
-    16     1    36    asym_buoyancy_flux
-    17     1    37    Lorentz_work
-    18     1    38    buoyancy_flux
-    19     1    39    pressure
-    20     3    42    current_density
-    21     1    43    pressure_work
-    22     1    44    m_potential_work
-    23     1    45    perturbation_temp
-    24     3    48    Coriolis_force
-    25     3    51    previous_momentum
-    26     1    52    previous_pressure
-    27     3    55    sum_forces
-    28     3    58    previous_induction
-    29     1    59    previous_heat
-    30     3    62    check_momentum
-    31     1    63    check_pressure
-    32     3    66    check_induction
-    33     1    67    check_potential
-    34     1    68    check_heat
-    35     3    71    grad_temp
-    36     3    74    grad_pert_temp
-    37     3    77    viscous_diffusion
-    38     1    78    div_viscousity
-    39     3    81    vorticity_diffusion
-    40     3    84    inertia
-    41     3    87    rot_inertia
-    42     1    88    div_inertia
-    43     3    91    rot_Coriolis_force
-    44     1    92    div_Coriolis_force
-    45     3    95    Lorentz_force
-    46     3    98    rot_Lorentz_force
-    47     1    99    div_Lorentz_force
-    48     3   102    buoyancy
-    49     3   105    rot_buoyancy
-    50     1   106    div_buoyancy
-    51     3   109    magnetic_diffusion
-    52     3   112    magnetic_induction
-    53     3   115    vecp_induction
-    54     1   116    thermal_diffusion
-    55     3   119    heat_flux
-    56     1   120    heat_advect
-    57     1   121    magnetic_potential
-    58     1   122    reference_temperature
+     5     1    11    sym_temperature
+     6     1    12    asym_temperature
+     7     3    15    sym_velocity
+     8     3    18    sym_vorticity
+     9     3    21    sym_magnetic_field
+    10     3    24    sym_current_density
+    11     3    27    wsym_x_usym
+    12     3    30    Jsym_x_Bsym
+    13     3    33    sym_thermal_buoyancy
+    14     1    34    us_d_js_x_ba
+    15     1    35    us_d_ja_x_bs
+    16     1    36    sym_buoyancy_flux
+    17     1    37    asym_buoyancy_flux
+    18     1    38    Lorentz_work
+    19     1    39    buoyancy_flux
+    20     1    40    pressure
+    21     3    43    current_density
+    22     1    44    pressure_work
+    23     1    45    m_potential_work
+    24     1    46    perturbation_temp
+    25     3    49    Coriolis_force
+    26     3    52    previous_momentum
+    27     1    53    previous_pressure
+    28     3    56    sum_forces
+    29     3    59    previous_induction
+    30     1    60    previous_heat
+    31     3    63    check_momentum
+    32     1    64    check_pressure
+    33     3    67    check_induction
+    34     1    68    check_potential
+    35     1    69    check_heat
+    36     3    72    grad_temp
+    37     3    75    grad_pert_temp
+    38     3    78    viscous_diffusion
+    39     1    79    div_viscousity
+    40     3    82    vorticity_diffusion
+    41     3    85    inertia
+    42     3    88    rot_inertia
+    43     1    89    div_inertia
+    44     3    92    rot_Coriolis_force
+    45     1    93    div_Coriolis_force
+    46     3    96    Lorentz_force
+    47     3    99    rot_Lorentz_force
+    48     1   100    div_Lorentz_force
+    49     3   103    buoyancy
+    50     3   106    rot_buoyancy
+    51     1   107    div_buoyancy
+    52     3   110    magnetic_diffusion
+    53     3   113    magnetic_induction
+    54     3   116    vecp_induction
+    55     1   117    thermal_diffusion
+    56     3   120    heat_flux
+    57     1   121    heat_advect
+    58     1   122    magnetic_potential
+    59     1   123    reference_temperature
  iflag_shell_mode          -1
  load_para_SPH_and_FEM_mesh
  Make spherical harmonics table
@@ -343,6 +345,70 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  FEM_initialize_sph_MHD
  set_local_nod_4_monitor
  init_field_data
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                             37
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                             37
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                             37
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                             37
  FEM_comm_initialization
  output_grd_file_4_snapshot
  FEM_mesh_initialization
@@ -399,17 +465,91 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  Number of  edge for            3 :       362403      362403
  edge position is successfully syncronizad
  SPH_initialize_MHD
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                             37
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                             37
+ Fixed boundary condition spectr for heat
+ sph_bc%iflag_icb           0
+ sph_bc%iflag_cmb           0
+ sph_bc_T%iflag_icb           0
+ sph_bc_T%iflag_cmb           0
+ Fixed boundary condition spectr for heat
+ sph_bc%iflag_icb           0
+ sph_bc%iflag_cmb           0
+ sph_bc_T%iflag_icb           0
+ sph_bc_T%iflag_cmb           0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                             37
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                              0
+ asym_buoyancy_flux                                                             
+                                                                                
+                                                                                
+                             37
+ Fixed boundary condition spectr for heat
+ sph_bc%iflag_icb           0
+ sph_bc%iflag_cmb           0
+ sph_bc_T%iflag_icb           0
+ sph_bc_T%iflag_cmb           0
  init_r_infos_sph_mhd_evo
  set_delta_r_4_sph_mhd
  set_dr_for_nonequi
  set_rot_earth_4_sph
  s_set_bc_sph_mhd
- Fixed boundary condition spectr for heat
  set_sph_bc_velo_sph
- sph_bc%iflag_icb           0
- sph_bc%iflag_cmb           0
- sph_bc_T%iflag_icb           0
- sph_bc_T%iflag_cmb           0
  set_sph_bc_temp_sph
  Fixed boundary condition spectr for heat
  sph_bc%iflag_icb           0
@@ -423,13 +563,8 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
  set_ref_temp_sph_mhd
  alloc_reft_rj_data
  const_2nd_fdm_matrices
- Fixed boundary condition spectr for heat
   set_material_property
  
- sph_bc%iflag_icb           0
- sph_bc%iflag_cmb           0
- sph_bc_T%iflag_icb           0
- sph_bc_T%iflag_cmb           0
  coefficient for temperature:            1.00000000000000     
  coefficient for thermal diffusion:      1.00000000000000     
  coefficient for velocity:               1.00000000000000     
@@ -450,16 +585,16 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
     1. velocity:     1    1    1
     2. vorticity:     4    5    5
     3. magnetic_field:     7    8    8
-    4. current_density:    10   40   40
+    4. current_density:    10   41   41
     5. temperature:    13    4    4
  Address for forward transform: transform, poloidal, toroidal, grid data
-    1. rot_Coriolis_force:     1   89    0
-    2. inertia:     4   82    0
-    3. Coriolis_force:     7   46    0
-    4. Lorentz_force:    10   93    0
-    5. vecp_induction:    13  113    0
-    6. heat_flux:    16  117    0
-    7. div_Coriolis_force:    19   92    0
+    1. rot_Coriolis_force:     1   90    0
+    2. inertia:     4   83    0
+    3. Coriolis_force:     7   47    0
+    4. Lorentz_force:    10   94    0
+    5. vecp_induction:    13  114    0
+    6. heat_flux:    16  118    0
+    7. div_Coriolis_force:    19   93    0
  ncomp_sph_trans           19
  nvector_rj_2_rtp            4
  nscalar_rj_2_rtp            1
@@ -470,49 +605,56 @@ ex_magne    0.000000000000000E+000   0.000000000000000E+000   0.000000000000000E
     1. velocity:     1    1    1
     2. vorticity:     4    5    5
     3. magnetic_field:     7    8    8
-    4. current_density:    10   40   40
-    5. temperature:    13    4    4
-    6. pressure:    14   39   39
-    7. perturbation_temp:    15   45    0
+    4. current_density:    10   41   41
+    5. sym_velocity:    13   13   13
+    6. sym_vorticity:    16   16   16
+    7. sym_magnetic_field:    19   19   19
+    8. sym_current_density:    22   22   22
+    9. temperature:    25    4    4
+   10. pressure:    26   40   40
+   11. perturbation_temp:    27   46    0
+   12. sym_temperature:    28   11   11
+   13. asym_temperature:    29   12   12
  Address for forward transform: transform, poloidal, toroidal, grid data
-    1. div_Coriolis_force:     1   92    0
- ncomp_sph_trans           19
+    1. wsym_x_usym:     1   25   25
+    2. Jsym_x_Bsym:     4   28   28
+    3. div_Coriolis_force:     7   93    0
+ ncomp_sph_trans           29
  nvector_rj_2_rtp            4
- nscalar_rj_2_rtp            3
- nvector_rtp_2_rj            0
+ nscalar_rj_2_rtp            9
+ nvector_rtp_2_rj            2
  nscalar_rtp_2_rj            1
  Spherical transform field table for energy flux (trns_eflux)
  Address for backward transform: transform, poloidal, toroidal, grid data
  Address for forward transform: transform, poloidal, toroidal, grid data
-    1. Lorentz_work:     1   37   37
-    2. buoyancy_flux:     2   38   38
- ncomp_sph_trans           19
+    1. Lorentz_work:     1   38   38
+    2. buoyancy_flux:     2   39   39
+    3. us_d_js_x_ba:     3   34   34
+    4. sym_buoyancy_flux:     4   36   36
+    5. us_d_ja_x_bs:     5   35   35
+    6. asym_buoyancy_flux:     6   37   37
+ ncomp_sph_trans           29
  nvector_rj_2_rtp            0
  nscalar_rj_2_rtp            0
  nvector_rtp_2_rj            0
- nscalar_rtp_2_rj            2
+ nscalar_rtp_2_rj            6
  Spherical transform field table for intermediate of snapshot (trns_difv)
  Address for backward transform: transform, poloidal, toroidal, grid data
  Address for forward transform: transform, poloidal, toroidal, grid data
- ncomp_sph_trans           19
+ ncomp_sph_trans           29
  nvector_rj_2_rtp            0
  nscalar_rj_2_rtp            0
  nvector_rtp_2_rj            0
  nscalar_rtp_2_rj            0
- Fixed boundary condition spectr for heat
- sph_bc%iflag_icb           0
- sph_bc%iflag_cmb           0
- sph_bc_T%iflag_icb           0
- sph_bc_T%iflag_cmb           0
  initialize_legendre_trans
 my_rank, RTP_COMM, np_rtp, rank_rtp               0     -2080374778               2               0
 my_rank, RJ_COMM,  np_rj,  rank_rj                0     -1006632959               2               0
 my_rank, RTP_COMM, np_rtp, rank_rtp               3     -2080374780               2               1
 my_rank, RJ_COMM,  np_rj,  rank_rj                3     -2080374778               2               1
-my_rank, RTP_COMM, np_rtp, rank_rtp               1     -2080374780               2               1
-my_rank, RJ_COMM,  np_rj,  rank_rj                1     -2080374778               2               0
 my_rank, RTP_COMM, np_rtp, rank_rtp               2     -2080374780               2               0
 my_rank, RJ_COMM,  np_rj,  rank_rj                2     -2080374777               2               1
+my_rank, RTP_COMM, np_rtp, rank_rtp               1     -2080374780               2               1
+my_rank, RJ_COMM,  np_rj,  rank_rj                1     -2080374778               2               0
 SUM_test               0               1               2
 SUM_test               2               5               2
 SUM_test               1               1               4
@@ -527,8 +669,8 @@ SUM_test               3               5               4
  check rlm -> rj
  test  send_recv with reg. import
  test  send_recv with rev. import
- 0: Time by reg. import list:   3.092930355342105E-002
- 1: Time by rev. import list:   5.418143264250830E-002
+ 0: Time by reg. import list:   3.387525887228549E-002
+ 1: Time by rev. import list:   3.258191177155823E-002
  Vector length for Legendre transform:           0
  Block number for meridinal grid:            1
  init_sph_FFT_select
@@ -572,22 +714,22 @@ SUM_test               3               5               4
  finalize_sph_FFT_select
  Finalize FFTW for domain
  elapsed by FFTPACK at once               (FFTPACK_ONCE): 
-  6.119926070095971E-002
- elapsed by single FFTPACK                (FFTPACK):   3.153714828658849E-002
+  3.741728526074439E-002
+ elapsed by single FFTPACK                (FFTPACK):   2.801513258600608E-002
  elapsed by FFTPACK for all component     (FFTPACK_COMPONENT): 
-  2.594058174872771E-002
+  8.662186271976680E-003
  elapsed by FFTPACK for domain            (FFTPACK_DOMAIN): 
-  3.686572669539601E-002
- elapsed by FFTW3 for at once             (FFTW_ONCE):   2.246240410022438E-002
- elapsed by single FFTW3                  (FFTW):   1.726500276708975E-002
+  1.846412237500772E-002
+ elapsed by FFTW3 for at once             (FFTW_ONCE):   1.383359951432794E-002
+ elapsed by single FFTW3                  (FFTW):   1.429655542597175E-002
  elapsed by FFTW3 for all component       (FFTW_COMPONENT): 
-  9.167064097709954E-003
+  7.427375414408743E-003
  elapsed by FFTW3 for domain              (FFTW_DOMAIN): 
-  1.611116778803989E-002
+  1.577089674538001E-002
  Use FFTW for all compontnent
 Selected Fourier transform: FFTW_COMPONENT ( 13)
  Use single transform in FFTW
-Communication mode for sph. transform:    0 (regular_table) 
+Communication mode for sph. transform:    1 (reversed_table) 
  alloc_sphere_ave_coriolis
  init_sum_coriolis_rlm
  cal_gaunt_coriolis_rlm
@@ -644,12 +786,12 @@ Communication mode for sph. transform:    0 (regular_table)
  sel_forward_legendre_trans
  copy_coriolis_terms_rlm
 Loop ID: type, maximum time, average time
-  1: elapsed by original loop with symmetric    (Symmetric_original_loop):      7.656689E-01    1.914172E-01
-  2: elapsed by sym. outer radius               (Symmetric_outer_radial_loop):      6.175674E-01    1.543918E-01
-  3: elapsed by using matmul with radial SMP    (Symmetric_matmul):      2.142488E-01    5.356220E-02
-  4: elapsed by big matmul with radial SMP      (Symmetric_matmul_big):      1.258859E-01    3.147147E-02
-  8: elapsed by simple loop with on-the-fly Plm (On_the_fly_Plm):      2.315008E-01    5.787521E-02
-Selected Legendre transform type:    4 (SYMMETRIC_MATMUL_BIG) 
+  1: elapsed by original loop with symmetric    (Symmetric_original_loop):      4.045728E-01    1.011432E-01
+  2: elapsed by sym. outer radius               (Symmetric_outer_radial_loop):      4.456693E-01    1.114173E-01
+  3: elapsed by using matmul with radial SMP    (Symmetric_matmul):      1.074380E-01    2.685950E-02
+  4: elapsed by big matmul with radial SMP      (Symmetric_matmul_big):      1.050789E-01    2.626972E-02
+  8: elapsed by simple loop with on-the-fly Plm (On_the_fly_Plm):      9.591488E-02    2.397872E-02
+Selected Legendre transform type:    8 (ON_THE_FLY_PLM) 
   sph_initial_data_control
  copy_time_step_data
  output_sph_restart_control
@@ -665,8 +807,8 @@ Selected Legendre transform type:    4 (SYMMETRIC_MATMUL_BIG)
  const_sph_viscous_by_vort2
  const_sph_vorticirty_diffusion
  update_after_heat_sph
- const_radial_grad_temp          69
- const_sph_scalar_diffusion         116
+ const_radial_grad_temp          70
+ const_sph_scalar_diffusion         117
  update_after_composit_sph
  const_sph_mag_diffuse_by_j
  first nonlinear
@@ -772,8 +914,8 @@ Selected Legendre transform type:    4 (SYMMETRIC_MATMUL_BIG)
  cal_sol_magne_sph_crank
  const_sph_viscous_by_vort2
  const_sph_vorticirty_diffusion
- const_radial_grad_temp          69
- const_sph_scalar_diffusion         116
+ const_radial_grad_temp          70
+ const_sph_scalar_diffusion         117
  const_sph_mag_diffuse_by_j
  sel_rot_self_buoyancy_sph
  cal_rot_buoyancy_sph_MHD           4
@@ -807,15 +949,25 @@ Selected Legendre transform type:    4 (SYMMETRIC_MATMUL_BIG)
  s_lead_fields_4_sph_mhd
  cal_buoyancy_sph_MHD by pert. temperature
  cal_div_of_forces_sph_2
+ sym scalar          11
+ asym scalar          12
  cal_r_buoyancy_on_sphere
  cal_r_buoyancy_on_sphere
  cal_sol_pressure_by_div_v
+ sym scalar          11
+ asym scalar          12
+ sym scalar          11
+ asym scalar          12
+ sym scalar          11
+ asym scalar          12
  sph_back_trans_snapshot_MHD
  pole_backward_transforms
  schmidt_b_trans_pole_vect
  sel_backward_legendre_trans
  v_pole
  cal_nonlinear_pole_MHD
+ sph_forward_trans_snapshot_MHD for trns_snap
+ sel_forward_legendre_trans
  copy_vectors_rtp_4_grad
  sph_forward_trans_snapshot_MHD for diff of vector
  overwrt_grad_of_vectors_sph
@@ -832,7 +984,7 @@ Selected Legendre transform type:    4 (SYMMETRIC_MATMUL_BIG)
  cal_volume_average_sph
  cal_no_heat_source_Nu
  write_total_energy_to_screen
-time step=               1     time= 5.00000000E-05  E_kin =  1.35692163E-02  E_mag =  5.07243449E+00
+time step=               1     time= 5.00000000E-05  E_kin =  9.76396934E-03  E_mag =  5.07243449E+00
  sync_temp_by_per_temp_sph
  irst:  F
  i_udt:  F
@@ -842,6 +994,7 @@ time step=               1     time= 5.00000000E-05  E_kin =  1.35692163E-02  E_
  SPH_to_FEM_bridge_MHD
  copy_force_from_transform MHD
  copy_field_from_transform base fields
+ copy_force_from_transform snap
  copy_field_from_transform diff_vector
  copy_field_from_transform SNAP
  copy_force_from_transform SNAP
@@ -856,11 +1009,12 @@ time step=               1     time= 5.00000000E-05  E_kin =  1.35692163E-02  E_
  comm. for scaler of temperature
  comm. for vector of vorticity
  comm. for vector of magnetic_field
+ comm. for scaler of sym_temperature
+ comm. for scaler of asym_temperature
  comm. for vector of sym_velocity
  comm. for vector of sym_vorticity
  comm. for vector of sym_magnetic_field
  comm. for vector of sym_current_density
- comm. for scaler of sym_temperature
  comm. for vector of wsym_x_usym
  comm. for vector of Jsym_x_Bsym
  comm. for vector of sym_thermal_buoyancy
@@ -881,5 +1035,5 @@ time step=               1     time= 5.00000000E-05  E_kin =  1.35692163E-02  E_
  write_resolution_data
  output_elapsed_times 
  exit evolution
-make[2]: ディレクトリ `/home/usr3/g70393a/kera/calypso_develop/calypso/tests/sym_asym_field_test' から出ます
-make[1]: ディレクトリ `/home/usr3/g70393a/kera/calypso_develop/calypso/tests' から出ます
+make[2]: ディレクトリ `/home/usr3/g70393a/kera/calypso_develop/calypso_dv/tests/sym_asym_field_test' から出ます
+make[1]: ディレクトリ `/home/usr3/g70393a/kera/calypso_develop/calypso_dv/tests' から出ます
