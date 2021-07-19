@@ -240,6 +240,11 @@
             else if(field_name .eq. Bsym_nabla_Basym%name) then
             force_by_sym_asym%i_m_tension =  i_phys
 !
+            else if(field_name .eq. sym_thermal_buoyancy%name) then
+            force_by_sym_asym%i_buoyancy =   i_phys
+            else if(field_name .eq. sym_composite_buoyancy%name) then
+            force_by_sym_asym%i_comp_buo =   i_phys
+!
             else if(field_name .eq. usym_x_Basym%name) then
             force_by_sym_asym%i_vp_induct =    i_phys
             else if(field_name .eq. rot_usym_x_Basym%name)    &
