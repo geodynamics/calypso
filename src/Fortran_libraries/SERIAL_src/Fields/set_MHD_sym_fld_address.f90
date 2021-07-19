@@ -127,8 +127,6 @@
 !
       call set_sym_field_addresses                                   &
       &   (i_fld, field_name, iphys%sym_fld, flag)
-      if(flag) return
-!
       call set_asym_field_addresses                                   &
       &   (i_fld, field_name, iphys%asym_fld, flag)
       if(flag) return
@@ -136,16 +134,10 @@
 !
       call set_sym_sym_force_addresses                                 &
       &   (i_fld, field_name, iphys%forces_by_sym_sym, flag)
-      if(flag) return
-!
       call set_asym_asym_force_addresses                                 &
       &   (i_fld, field_name, iphys%forces_by_asym_asym, flag)
-      if(flag) return
-!
       call set_sym_asym_force_addresses                                 &
       &   (i_fld, field_name, iphys%forces_by_sym_asym, flag)
-      if(flag) return
-!
       call set_asym_sym_force_addresses                                 &
       &   (i_fld, field_name, iphys%forces_by_asym_sym, flag)
       if(flag) return
@@ -153,16 +145,10 @@
 ! 
       call set_sym_ene_flux_addresses_by_sym_asym                                 &
       &   (i_fld, field_name, iphys%eflux_to_sym_by_sym_asym, flag)
-      if(flag) return
-!
       call set_sym_ene_flux_addresses_by_asym_sym                                 &
       &   (i_fld, field_name, iphys%eflux_to_sym_by_asym_sym, flag)
-      if(flag) return
-!
       call set_asym_ene_flux_addresses_by_sym_sym                                 &
       &   (i_fld, field_name, iphys%eflux_to_asym_by_sym_sym, flag)
-      if(flag) return
-!
       call set_asym_ene_flux_addresses_by_asym_asym                                 &
       &   (i_fld, field_name, iphys%eflux_to_asym_by_asym_asym, flag)
       if(flag) return
