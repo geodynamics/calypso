@@ -91,9 +91,9 @@
 	integer(kind = kint) :: inod, l_gl, m_gl, lm_odd
 !
 !
-	if(ipol_sym .le. 0 .or. ipol_asym .le. 0 ) return
+	if(ipol_sym .le. 0 .and. ipol_asym .le. 0 ) return
 !      write(*,*) 'Filtering vector', ipol_filtered
-!$omp parallel do private(inod, l_gl)
+!$omp parallel do private(inod, l_gl, m_gl, lm_odd)
 	do inod = 1, sph_rj%nnod_rj
 		l_gl = aint(sqrt(real(sph_rj%idx_global_rj(inod,2))))
 		m_gl = sph_rj%idx_global_rj(inod,2) - l_gl*(l_gl + 1)
@@ -129,10 +129,10 @@
 	integer(kind = kint) :: inod, l_gl, m_gl, lm_odd
 !
 !
-	if(ipol_sym .le. 0 .or. ipol_asym .le. 0 ) return
-!      write(*,*) 'sym scalar', ipol_sym 
-!      write(*,*) 'asym scalar', ipol_asym 
-!$omp parallel do private(inod, l_gl, m_gl)
+	if(ipol_sym .le. 0 .and. ipol_asym .le. 0 ) return
+! write(*,*) 'sym scalar', ipol_sym 
+! write(*,*) 'asym scalar', ipol_asym 
+!$omp parallel do private(inod, l_gl, m_gl, lm_odd)
 	do inod = 1, sph_rj%nnod_rj
 		l_gl = aint(sqrt(real(sph_rj%idx_global_rj(inod,2))))
 		m_gl = sph_rj%idx_global_rj(inod,2) - l_gl*(l_gl + 1)
