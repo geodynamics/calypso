@@ -69,7 +69,7 @@
 !!         @f$ u_{asymi} (e_{ijk} \tilde{J}_{asymj} \tilde{B}_{asymk}) @f$
         type(field_def), parameter :: ua_d_ja_x_ba            &
         &    = field_def(n_comp = n_scalar,                                &
-        &                name = 'ua_d_ja_x_bs',                &
+        &                name = 'ua_d_ja_x_ba',                &
         &         math = '$ u_{asymi} (e_{ijk} \tilde{J}_{asymj} \tilde{B}_{asymk})$')
 ! 
 !>        Field label for sym buoyancy flux
