@@ -97,7 +97,9 @@
 	do inod = 1, sph_rj%nnod_rj
 		l_gl = aint(sqrt(real(sph_rj%idx_global_rj(inod,2))))
 		m_gl = sph_rj%idx_global_rj(inod,2) - l_gl*(l_gl + 1)
-		lm_odd = mod(l_gl - abs(m_gl), 2)
+!		lm_odd = mod(l_gl - abs(m_gl), 2)
+!		lm_odd = (l_gl - abs(m_gl)+1)/2 - (l_gl - abs(m_gl))/2
+		lm_odd = int(l_gl - abs(m_gl)+1)/2 - int(l_gl - abs(m_gl))/2
 ! 
 		rj_fld%d_fld(inod,ipol_sym  )                            &
 		&          = dble(1-lm_odd)*rj_fld%d_fld(inod,ipol_fld  )
@@ -112,6 +114,23 @@
 		&          = dble(lm_odd)*rj_fld%d_fld(inod,ipol_fld+1)
 		rj_fld%d_fld(inod,ipol_asym+2)                            &
 		&          = dble(1-lm_odd)*rj_fld%d_fld(inod,ipol_fld+2)
+! 
+! 		if ( l_gl .eq. abs(m_gl) ) then 
+! 			rj_fld%d_fld(inod,ipol_sym  )                            &
+! 			&          = rj_fld%d_fld(inod,ipol_fld  )
+! 			rj_fld%d_fld(inod,ipol_sym+1)                            &
+! 			&          = rj_fld%d_fld(inod,ipol_fld+1)
+! 			rj_fld%d_fld(inod,ipol_sym+2)                            &
+! 			&          = 0.0d0
+! !
+! 			rj_fld%d_fld(inod,ipol_asym  )                            &
+! 			&          = 0.0d0
+! 			rj_fld%d_fld(inod,ipol_asym+1)                            &
+! 			&          = 0.0d0
+! 			rj_fld%d_fld(inod,ipol_asym+2)                            &
+! 			&          = rj_fld%d_fld(inod,ipol_fld+2)
+! 			write(*,*) ' l = m is called'
+! 		end if
 	end do
 !$omp end parallel do
 !
@@ -136,12 +155,22 @@
 	do inod = 1, sph_rj%nnod_rj
 		l_gl = aint(sqrt(real(sph_rj%idx_global_rj(inod,2))))
 		m_gl = sph_rj%idx_global_rj(inod,2) - l_gl*(l_gl + 1)
-		lm_odd = mod(l_gl - abs(m_gl), 2)
+!		lm_odd = mod(l_gl - abs(m_gl), 2)
+!		lm_odd = (l_gl - abs(m_gl)+1)/2 - (l_gl - abs(m_gl))/2
+		lm_odd = int(l_gl - abs(m_gl)+1)/2 - int(l_gl - abs(m_gl))/2
 ! 
 		rj_fld%d_fld(inod, ipol_sym)				&
 	&   = dble(1-lm_odd) * rj_fld%d_fld(inod, ipol_fld)
 		rj_fld%d_fld(inod, ipol_asym)				&
 	&   = dble(lm_odd) * rj_fld%d_fld(inod, ipol_fld)
+! 
+		! if ( l_gl .eq. abs(m_gl) ) then 
+		! 	rj_fld%d_fld(inod, ipol_sym)				&
+		! 	&   = rj_fld%d_fld(inod, ipol_fld)
+		! 	rj_fld%d_fld(inod, ipol_asym)				&
+		! 	&   = 0.0d0
+		! 	write(*,*) ' l = m is called'
+		! end if
 	end do
 !$omp end parallel do
 !
