@@ -94,13 +94,41 @@
 !
       call cal_buoyancy_flux_rtp                                        &
      &   (sph_rtp, fl_prop, ref_param_T, ref_param_C,                   &
-     &    bs_trns%sym_fld, bs_trns%sym_fld, fe_trns%eflux_to_sym_by_sym_asym,    &
+     &    bs_trns%sym_fld, bs_trns%sym_fld,                             &
+     &    fe_trns%eflux_to_sym_by_sym_asym,                             &
      &    trns_b_snap, trns_b_snap, trns_f_eflux)
       call cal_buoyancy_flux_rtp                                        &
      &   (sph_rtp, fl_prop, ref_param_T, ref_param_C,                   &
-     &    bs_trns%sym_fld, bs_trns%asym_fld, fe_trns%eflux_to_asym_by_sym_sym,    &
-     &    trns_b_snap, trns_b_snap, trns_f_eflux)
+     &   bs_trns%asym_fld, bs_trns%asym_fld,                            &
+     &   fe_trns%eflux_to_asym_by_sym_sym,                              &
+     &   trns_b_snap, trns_b_snap, trns_f_eflux)
 !
+!
+     call cal_work_of_inertia_on_node                                  &
+     &   (bs_trns%sym_fld, fs_trns%forces_by_sym_asym,                  &
+     &    fe_trns%eflux_to_sym_by_sym_asym, sph_rtp%nnod_rtp,           &
+     &    trns_b_snap%ncomp, trns_b_snap%fld_rtp,                       &
+     &    trns_f_snap%ncomp, trns_f_snap%fld_rtp,                       &
+     &    trns_f_eflux%ncomp, trns_f_eflux%fld_rtp)
+     call cal_work_of_inertia_on_node                                  &
+     &   (bs_trns%sym_fld, fs_trns%forces_by_asym_sym,                  &
+     &    fe_trns%eflux_to_sym_by_asym_sym, sph_rtp%nnod_rtp,           &
+     &    trns_b_snap%ncomp, trns_b_snap%fld_rtp,                       &
+     &    trns_f_snap%ncomp, trns_f_snap%fld_rtp,                       &
+     &    trns_f_eflux%ncomp, trns_f_eflux%fld_rtp)
+     call cal_work_of_inertia_on_node                                  &
+     &   (bs_trns%asym_fld, fs_trns%forces_by_sym_sym,                  &
+     &    fe_trns%eflux_to_asym_by_sym_sym, sph_rtp%nnod_rtp,           &
+     &    trns_b_snap%ncomp, trns_b_snap%fld_rtp,                       &
+     &    trns_f_snap%ncomp, trns_f_snap%fld_rtp,                       &
+     &    trns_f_eflux%ncomp, trns_f_eflux%fld_rtp)
+     call cal_work_of_inertia_on_node                                  &
+     &   (bs_trns%asym_fld, fs_trns%forces_by_asym_asym,                  &
+     &    fe_trns%eflux_to_asym_by_asym_asym, sph_rtp%nnod_rtp,           &
+     &    trns_b_snap%ncomp, trns_b_snap%fld_rtp,                       &
+     &    trns_f_snap%ncomp, trns_f_snap%fld_rtp,                       &
+     &    trns_f_eflux%ncomp, trns_f_eflux%fld_rtp)
+! 
       end subroutine s_cal_ene_flux_by_sym_rtp
 !
 !-----------------------------------------------------------------------
@@ -134,6 +162,38 @@
 !$omp end parallel
 !
       end subroutine cal_work_of_lorentz_on_node
+!
+!-----------------------------------------------------------------------
+!
+      subroutine cal_work_of_inertia_on_node                            &
+     &         (bs_trns_base, f_trns_frc, fs_trns_eflux,                &
+     &          nnod, ntot_comp_fld, fld_rtp, ntot_comp_frc, frc_rtp,   &
+     &          ntot_comp_flx, flx_rtp)
+!
+      use cal_products_smp
+!
+      type(base_field_address), intent(in) :: bs_trns_base
+      type(base_force_address), intent(in) :: f_trns_frc
+      type(energy_flux_address), intent(in) :: fs_trns_eflux
+!
+      integer(kind = kint), intent(in) :: nnod
+      integer(kind = kint), intent(in) :: ntot_comp_fld, ntot_comp_frc
+      integer(kind = kint), intent(in) :: ntot_comp_flx
+      real(kind = kreal), intent(in) :: fld_rtp(nnod,ntot_comp_fld)
+      real(kind = kreal), intent(in) :: frc_rtp(nnod,ntot_comp_frc)
+!
+      real(kind = kreal), intent(inout) :: flx_rtp(nnod,ntot_comp_flx)
+!
+!$omp parallel
+      if(fs_trns_eflux%i_ujb .gt. 0) then
+        call cal_dot_prod_no_coef_smp(nnod,                             &
+     &      frc_rtp(1,f_trns_frc%i_m_advect),                            &
+     &      fld_rtp(1,bs_trns_base%i_velo),                             &
+     &      flx_rtp(1,fs_trns_eflux%i_m_advect_work) )
+      end if
+!$omp end parallel
+!
+      end subroutine cal_work_of_inertia_on_node
 !
 !-----------------------------------------------------------------------
 !
