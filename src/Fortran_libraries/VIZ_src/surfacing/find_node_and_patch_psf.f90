@@ -13,7 +13,8 @@
 !!        type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
 !!      subroutine set_node_and_patch_psf                               &
 !!     &         (num_psf, mesh, group, edge_comm, psf_case_tbls,       &
-!!     &          psf_def, psf_search, psf_list, psf_grp_list, psf_mesh)
+!!     &          psf_def, psf_search, psf_list, psf_grp_list, psf_mesh,&
+!!     &          SR_sig, SR_il)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(edge_data), intent(in) :: edge
@@ -26,20 +27,28 @@
 !!        type(sectioning_list), intent(inout) :: psf_list(num_psf)
 !!        type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
 !!        type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!      subroutine set_node_and_patch_iso(num_iso, mesh, edge_comm,     &
-!!     &          psf_case_tbls, iso_search, iso_list, iso_mesh)
+!!     &          psf_case_tbls, iso_search, iso_list, iso_mesh,        &
+!!     &          SR_sig, SR_il)
 !!        type(mesh_geometry), intent(in) :: mesh
 !!        type(communication_table), intent(in) :: edge_comm
 !!        type(psf_cases), intent(in) :: psf_case_tbls
 !!        type(psf_search_lists), intent(inout) :: iso_search(num_iso)
 !!        type(sectioning_list), intent(inout):: iso_list(num_iso)
 !!        type(psf_local_data), intent(inout) :: iso_mesh(num_iso)
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!@endverbatim
 !
       module find_node_and_patch_psf
 !
       use m_precision
       use m_machine_parameter
+!
+      use t_solver_SR
+      use t_solver_SR_int8
 !
       implicit none
 !
@@ -78,7 +87,8 @@
 !
       subroutine set_node_and_patch_psf                                 &
      &         (num_psf, mesh, group, edge_comm, psf_case_tbls,         &
-     &          psf_def, psf_search, psf_list, psf_grp_list, psf_mesh)
+     &          psf_def, psf_search, psf_list, psf_grp_list, psf_mesh,  &
+     &          SR_sig, SR_il)
 !
       use m_geometry_constants
       use calypso_mpi
@@ -106,6 +116,8 @@
       type(sectioning_list), intent(inout) :: psf_list(num_psf)
       type(grp_section_list), intent(inout) :: psf_grp_list(num_psf)
       type(psf_local_data), intent(inout) :: psf_mesh(num_psf)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int8_buffer), intent(inout) :: SR_il
 !
       integer(kind = kint) :: i_psf, nele_psf
       integer(kind = kint) :: ntot_failed(num_psf), ntot_failed_gl
@@ -135,7 +147,7 @@
       call set_nodes_4_psf                                              &
      &   (num_psf, mesh%node, mesh%edge, mesh%nod_comm, edge_comm,      &
      &    group%surf_grp, group%surf_nod_grp, psf_def, psf_search,      &
-     &    psf_list, psf_grp_list, psf_mesh)
+     &    psf_list, psf_grp_list, psf_mesh, SR_sig, SR_il)
 !
       if (iflag_debug.eq.1)  write(*,*) 'count_psf_patches'
       do i_psf = 1, num_psf
@@ -156,10 +168,10 @@
       do i_psf = 1, num_psf
         call calypso_mpi_allreduce_one_int                              &
      &     (psf_mesh(i_psf)%patch%numele, nele_psf, MPI_SUM)
-        call calypso_mpi_allreduce_one_int                             &
+        call calypso_mpi_allreduce_one_int                              &
      &     (ntot_failed(i_psf), ntot_failed_gl, MPI_SUM)
         if(my_rank .eq. 0) write(*,*) 'nele_psf', i_psf, nele_psf
-        if(my_rank .eq. 0) write(*,*) 'ntot_failed_gl',                &
+        if(my_rank .eq. 0) write(*,*) 'ntot_failed_gl',                 &
      &                               i_psf, ntot_failed_gl
       end do
 !
@@ -168,7 +180,8 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_node_and_patch_iso(num_iso, mesh, edge_comm,       &
-     &          psf_case_tbls, iso_search, iso_list, iso_mesh)
+     &          psf_case_tbls, iso_search, iso_list, iso_mesh,          &
+     &          SR_sig, SR_il)
 !
       use m_geometry_constants
       use calypso_mpi
@@ -188,6 +201,8 @@
       type(psf_search_lists), intent(inout) :: iso_search(num_iso)
       type(sectioning_list), intent(inout):: iso_list(num_iso)
       type(psf_local_data), intent(inout) :: iso_mesh(num_iso)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int8_buffer), intent(inout) :: SR_il
 !
       integer(kind= kint) :: i_iso
 !
@@ -196,7 +211,7 @@
      &   (num_iso, mesh%edge, iso_search, iso_list, iso_mesh)
 !
       call set_nodes_4_iso(num_iso, mesh%node, mesh%edge, edge_comm,    &
-     &                     iso_search, iso_list, iso_mesh)
+     &    iso_search, iso_list, iso_mesh, SR_sig, SR_il)
 !
 !
       do i_iso = 1, num_iso

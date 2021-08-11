@@ -82,9 +82,9 @@ set_edge_hash_by_sf.o: $(MESHDIR)/set_edge_hash_by_sf.f90 m_precision.o m_geomet
 	$(F90) -c $(F90OPTFLAGS) $<
 set_edge_position.o: $(MESHDIR)/set_edge_position.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_ele_id_4_node_type.o: $(MESHDIR)/set_ele_id_4_node_type.f90 m_precision.o m_constants.o t_geometry_data.o t_next_node_ele_4_node.o find_element_id_4_node.o cal_minmax_and_stacks.o t_surface_data.o t_edge_data.o find_grp_ele_id_4_node.o calypso_mpi.o m_machine_parameter.o find_node_4_group.o
-	$(F90) -c $(F90OPTFLAGS) $<
 set_element_data_4_IO.o: $(MESHDIR)/set_element_data_4_IO.f90 m_precision.o t_geometry_data.o t_surf_edge_IO.o t_read_mesh_data.o m_geometry_constants.o set_nnod_4_ele_by_type.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_element_id_4_node.o: $(MESHDIR)/set_element_id_4_node.f90 m_precision.o m_constants.o t_geometry_data.o t_next_node_ele_4_node.o find_element_id_4_node.o cal_minmax_and_stacks.o t_surface_data.o t_edge_data.o find_grp_ele_id_4_node.o calypso_mpi.o m_machine_parameter.o find_node_4_group.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_element_list_4_surface.o: $(MESHDIR)/set_element_list_4_surface.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -14,13 +14,15 @@
 !!        type(isosurf_controls), intent(inout) :: iso_ctls
 !!        type(isosurface_module), intent(inout) :: iso
 !!        type(phys_data), intent(in) :: nod_fld
-!!      subroutine ISOSURF_visualize                                    &
-!!     &         (istep_iso, time_d, geofem, edge_comm, nod_fld, iso)
+!!      subroutine ISOSURF_visualize(istep_iso, time_d,                 &
+!!     &          geofem, edge_comm, nod_fld, iso, SR_sig, SR_il)
 !!        type(time_data), intent(in) :: time_d
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(communication_table), intent(in) :: edge_comm
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(isosurface_module), intent(inout) :: iso
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!
 !!      subroutine ISOSURF_finalize(iso)
 !!        type(isosurface_module), intent(inout) :: iso
@@ -40,6 +42,8 @@
       use t_file_IO_parameter
       use t_control_params_4_iso
       use t_control_data_isosurfaces
+      use t_solver_SR
+      use t_solver_SR_int8
 !
       use m_constants
       use m_machine_parameter
@@ -133,8 +137,8 @@
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
-      subroutine ISOSURF_visualize                                      &
-     &         (istep_iso, time_d, geofem, edge_comm, nod_fld, iso)
+      subroutine ISOSURF_visualize(istep_iso, time_d,                   &
+     &          geofem, edge_comm, nod_fld, iso, SR_sig, SR_il)
 !
       use m_work_time
       use m_elapsed_labels_4_VIZ
@@ -155,6 +159,8 @@
       type(phys_data), intent(in) :: nod_fld
 !
       type(isosurface_module), intent(inout) :: iso
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int8_buffer), intent(inout) :: SR_il
 !
 !
       if (iso%num_iso.le.0 .or. istep_iso.le.0) return
@@ -167,7 +173,7 @@
       if (iflag_debug.eq.1) write(*,*) 'set_node_and_patch_iso'
       call set_node_and_patch_iso                                       &
      &   (iso%num_iso, geofem%mesh, edge_comm, iso%iso_case_tbls,       &
-     &    iso%iso_search, iso%iso_list, iso%iso_mesh)
+     &    iso%iso_search, iso%iso_list, iso%iso_mesh, SR_sig, SR_il)
       if(iflag_ISO_time) call end_elapsed_time(ist_elapsed_ISO+1)
 !
       if (iflag_debug.eq.1) write(*,*) 'set_field_4_iso'

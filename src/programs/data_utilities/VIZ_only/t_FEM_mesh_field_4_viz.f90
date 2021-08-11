@@ -20,7 +20,6 @@
 !
       use t_mesh_data
       use t_phys_data
-      use t_vector_for_solver
       use t_field_list_for_vizs
       use t_file_IO_parameter
       use t_time_data
@@ -43,9 +42,6 @@
         type(mesh_data) :: geofem
 !>        Structure for nodal field data
         type(phys_data) :: field
-!
-!>        Structure for vectors for solver
-        type(vectors_4_solver) :: v_sol
 !
 !>        Structure of field list for visualization
         type(visulize_field_list) :: viz_fld_list

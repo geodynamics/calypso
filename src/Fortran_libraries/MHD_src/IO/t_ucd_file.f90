@@ -16,13 +16,15 @@
 !!        type(time_data), intent(in) :: time_d
 !!        type(ucd_data), intent(in) :: ucd
 !!
-!!      subroutine output_grd_file_4_snapshot                           &
-!!     &         (ucd_param, ucd_step, mesh, nod_fld, ucd)
+!!      subroutine output_grd_file_4_snapshot(ucd_param, ucd_step,      &
+!!     &          mesh, nod_fld, ucd, SR_sig, SR_i)
 !!        type(mesh_geometry), intent(in) :: mesh
 !!        type(mesh_data_MHD), intent(in) :: MHD_mesh
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!        type(ucd_data), intent(inout) :: ucd
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int_buffer), intent(inout) :: SR_i
 !!      subroutine read_udt_4_snap                                      &
 !!     &         (i_step, ucd_step, udt_file_param, nod_fld, t_IO)
 !!        type(IO_step_param), intent(in) :: ucd_step
@@ -47,6 +49,8 @@
       use t_phys_data
       use t_file_IO_parameter
       use t_IO_step_parameter
+      use t_solver_SR
+      use t_solver_SR_int
 !
       implicit none
 !
@@ -83,8 +87,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine output_grd_file_4_snapshot                             &
-     &         (ucd_param, ucd_step, mesh, nod_fld, ucd)
+      subroutine output_grd_file_4_snapshot(ucd_param, ucd_step,        &
+     &          mesh, nod_fld, ucd, SR_sig, SR_i)
 !
       use output_parallel_ucd_file
 !
@@ -93,12 +97,14 @@
       type(mesh_geometry), intent(in) :: mesh
       type(phys_data),intent(in) :: nod_fld
       type(ucd_data), intent(inout) :: ucd
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int_buffer), intent(inout) :: SR_i
 !
 !
       if(ucd_param%iflag_format .lt. 0) return
       if(ucd_step%increment .eq. 0) return
       call link_output_grd_file(mesh%node, mesh%ele, mesh%nod_comm,     &
-     &    nod_fld, ucd_param, ucd)
+     &    nod_fld, ucd_param, ucd, SR_sig, SR_i)
 !
       end subroutine output_grd_file_4_snapshot
 !

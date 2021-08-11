@@ -1,5 +1,5 @@
-!>@file   set_ele_id_4_node_type.f90
-!!@brief  module set_ele_id_4_node_type
+!>@file   set_element_id_4_node.f90
+!!@brief  module set_element_id_4_node
 !!
 !!@author H. Matsui
 !!@date Programmed in Dec., 2008
@@ -37,7 +37,7 @@
 !!        type(next_nod_id_4_nod), intent(inout) :: neib_nod
 !!@endverbatim
 !
-      module set_ele_id_4_node_type
+      module set_element_id_4_node
 !
       use m_precision
       use m_constants
@@ -290,4 +290,4 @@
 !
 !-----------------------------------------------------------------------
 !
-      end module set_ele_id_4_node_type
+      end module set_element_id_4_node

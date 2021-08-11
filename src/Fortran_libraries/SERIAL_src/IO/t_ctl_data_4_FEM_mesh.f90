@@ -9,10 +9,13 @@
 !!@verbatim
 !!      subroutine read_FEM_mesh_control                                &
 !!     &         (id_control, hd_block, Fmesh_ctl, c_buf)
-!!        type(FEM_mesh_control), intent(inout) :: Fmesh_ctl
 !!      subroutine write_FEM_mesh_control                               &
 !!     &         (id_file, hd_block, Fmesh_ctl, level)
 !!      subroutine reset_FEM_mesh_control(Fmesh_ctl)
+!!        type(FEM_mesh_control), intent(inout) :: Fmesh_ctl
+!!      subroutine copy_FEM_mesh_control(org_Fmesh_c, new_Fmesh_c)
+!!        type(FEM_mesh_control), intent(in) :: org_Fmesh_c
+!!        type(FEM_mesh_control), intent(inout) :: new_Fmesh_c
 !!
 !! ------------------------------------------------------------------
 !!      Example of control parameters
@@ -152,6 +155,27 @@
       Fmesh_ctl%i_FEM_mesh = 0
 !
       end subroutine reset_FEM_mesh_control
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine copy_FEM_mesh_control(org_Fmesh_c, new_Fmesh_c)
+!
+      type(FEM_mesh_control), intent(in) :: org_Fmesh_c
+      type(FEM_mesh_control), intent(inout) :: new_Fmesh_c
+!
+!
+      call copy_chara_ctl(org_Fmesh_c%memory_conservation_ctl,          &
+     &                    new_Fmesh_c%memory_conservation_ctl)
+      call copy_chara_ctl(org_Fmesh_c%FEM_mesh_output_switch,           &
+     &                    new_Fmesh_c%FEM_mesh_output_switch)
+      call copy_chara_ctl(org_Fmesh_c%FEM_surface_output_switch,        &
+     &                    new_Fmesh_c%FEM_surface_output_switch)
+      call copy_chara_ctl(org_Fmesh_c%FEM_viewer_output_switch,         &
+     &                    new_Fmesh_c%FEM_viewer_output_switch)
+!
+      new_Fmesh_c%i_FEM_mesh = org_Fmesh_c%i_FEM_mesh
+!
+      end subroutine copy_FEM_mesh_control
 !
 !  ---------------------------------------------------------------------
 !

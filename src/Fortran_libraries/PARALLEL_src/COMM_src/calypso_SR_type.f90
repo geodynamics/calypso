@@ -8,21 +8,33 @@
 !!
 !!@verbatim
 !!      subroutine calypso_SR_type_1(iflag_recv, cps_tbl,               &
-!!     &          nnod_org, nnod_new, X_org, X_new)
+!!     &          nnod_org, nnod_new, X_org, X_new, SR_sig, SR_r)
 !!      subroutine calypso_SR_type_3(iflag_recv, cps_tbl,               &
-!!     &          nnod_org, nnod_new, X_org, X_new)
+!!     &          nnod_org, nnod_new, X_org, X_new, SR_sig, SR_r)
 !!      subroutine calypso_SR_type_N(iflag_recv, NB, cps_tbl,           &
-!!     &          nnod_org, nnod_new, X_org, X_new)
+!!     &          nnod_org, nnod_new, SR_sig, SR_r, X_org, X_new)
 !!      subroutine calypso_SR_type_3xN(iflag_recv, NB, cps_tbl,         &
 !!     &          nnod_org, nnod_new, X1_org, X2_org, X3_org,           &
-!!     &          X1_new, X2_new, X3_new)
+!!     &          X1_new, X2_new, X3_new, SR_sig, SR_r)
+!!        type(calypso_comm_table), intent(in) :: cps_tbl
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!
 !!      subroutine calypso_SR_type_int(iflag_recv, cps_tbl,             &
-!!     &          nnod_org, nnod_new, iX_org, iX_new)
+!!     &          nnod_org, nnod_new, iX_org, iX_new, SR_sig, SR_i)
+!!        type(calypso_comm_table), intent(in) :: cps_tbl
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int_buffer), intent(inout) :: SR_i
 !!      subroutine calypso_SR_type_int8(iflag_recv, cps_tbl,            &
-!!     &          nnod_org, nnod_new, i8X_org, i8X_new)
+!!     &          nnod_org, nnod_new, i8X_org, i8X_new, SR_sig, SR_il)
+!!        type(calypso_comm_table), intent(in) :: cps_tbl
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!
-!!      subroutine check_calypso_SR_N(NB, cps_tbl)
+!!      subroutine check_calypso_SR_N(NB, cps_tbl, SR_sig, SR_r)
+!!        type(calypso_comm_table), intent(in) :: cps_tbl
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
 !!
 !!@n @param  NB    Number of components for communication
@@ -44,7 +56,6 @@
       use m_constants
       use t_calypso_comm_table
       use t_solver_SR
-      use m_solver_SR
 !
       implicit none
 !
@@ -55,7 +66,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine calypso_SR_type_1(iflag_recv, cps_tbl,                 &
-     &          nnod_org, nnod_new, X_org, X_new)
+     &          nnod_org, nnod_new, X_org, X_new, SR_sig, SR_r)
 !
       use calypso_SR
 !
@@ -66,6 +77,9 @@
 !
       real (kind=kreal), intent(inout):: X_new(nnod_new)
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
 !
       call calypso_send_recv(iflag_recv, nnod_org, nnod_new,            &
      &    cps_tbl%nrank_export, cps_tbl%irank_export,                   &
@@ -73,14 +87,14 @@
      &    cps_tbl%nrank_import, cps_tbl%irank_import,                   &
      &    cps_tbl%istack_import, cps_tbl%item_import,                   &
      &    cps_tbl%irev_import, cps_tbl%iflag_self_copy,                 &
-     &    SR_sig1, SR_r1, X_org, X_new)
+     &    SR_sig, SR_r, X_org, X_new)
 !
       end subroutine calypso_SR_type_1
 !
 !-----------------------------------------------------------------------
 !
       subroutine calypso_SR_type_3(iflag_recv, cps_tbl,                 &
-     &          nnod_org, nnod_new, X_org, X_new)
+     &          nnod_org, nnod_new, X_org, X_new, SR_sig, SR_r)
 !
       use calypso_SR_3
 !
@@ -91,6 +105,9 @@
 !
       real (kind=kreal), intent(inout):: X_new(3*nnod_new)
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
 !
       call calypso_send_recv_3(iflag_recv, nnod_org, nnod_new,          &
      &    cps_tbl%nrank_export, cps_tbl%irank_export,                   &
@@ -98,14 +115,14 @@
      &    cps_tbl%nrank_import, cps_tbl%irank_import,                   &
      &    cps_tbl%istack_import, cps_tbl%item_import,                   &
      &    cps_tbl%irev_import, cps_tbl%iflag_self_copy,                 &
-     &    SR_sig1, SR_r1, X_org, X_new)
+     &    SR_sig, SR_r, X_org, X_new)
 !
       end subroutine calypso_SR_type_3
 !
 !-----------------------------------------------------------------------
 !
       subroutine calypso_SR_type_N(iflag_recv, NB, cps_tbl,             &
-     &          nnod_org, nnod_new, X_org, X_new)
+     &          nnod_org, nnod_new, X_org, X_new, SR_sig, SR_r)
 !
       use calypso_SR_N
 !
@@ -119,6 +136,9 @@
 !
       real (kind=kreal), intent(inout):: X_new(NB*nnod_new)
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
 !
       call calypso_send_recv_N(iflag_recv, NB, nnod_org, nnod_new,      &
      &    cps_tbl%nrank_export, cps_tbl%irank_export,                   &
@@ -126,7 +146,7 @@
      &    cps_tbl%nrank_import, cps_tbl%irank_import,                   &
      &    cps_tbl%istack_import, cps_tbl%item_import,                   &
      &    cps_tbl%irev_import, cps_tbl%iflag_self_copy,                 &
-     &    SR_sig1, SR_r1, X_org, X_new)
+     &    SR_sig, SR_r, X_org, X_new)
 !
       end subroutine calypso_SR_type_N
 !
@@ -134,7 +154,7 @@
 !
       subroutine calypso_SR_type_3xN(iflag_recv, NB, cps_tbl,           &
      &          nnod_org, nnod_new, X1_org, X2_org, X3_org,             &
-     &          X1_new, X2_new, X3_new)
+     &          X1_new, X2_new, X3_new, SR_sig, SR_r)
 !
       use calypso_SR_N
 !
@@ -152,15 +172,17 @@
       real (kind=kreal), intent(inout):: X2_new(NB*nnod_new)
       real (kind=kreal), intent(inout):: X3_new(NB*nnod_new)
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
 !
       call calypso_send_recv_3xN(iflag_recv, NB, nnod_org, nnod_new,    &
      &    cps_tbl%nrank_export, cps_tbl%irank_export,                   &
      &    cps_tbl%istack_export, cps_tbl%item_export,                   &
      &    cps_tbl%nrank_import, cps_tbl%irank_import,                   &
      &    cps_tbl%istack_import, cps_tbl%item_import,                   &
-     &    cps_tbl%irev_import, cps_tbl%iflag_self_copy,                 &
-     &    SR_sig1, SR_r1, X1_org, X2_org, X3_org,                       &
-     &                    X1_new, X2_new, X3_new)
+     &    cps_tbl%irev_import, cps_tbl%iflag_self_copy, SR_sig, SR_r,   &
+     &    X1_org, X2_org, X3_org, X1_new, X2_new, X3_new)
 !
       end subroutine calypso_SR_type_3xN
 !
@@ -168,8 +190,9 @@
 !-----------------------------------------------------------------------
 !
       subroutine calypso_SR_type_int(iflag_recv, cps_tbl,               &
-     &          nnod_org, nnod_new, iX_org, iX_new)
+     &          nnod_org, nnod_new, iX_org, iX_new, SR_sig, SR_i)
 !
+      use t_solver_SR_int
       use calypso_SR_int
 !
       type(calypso_comm_table), intent(in) :: cps_tbl
@@ -179,6 +202,9 @@
 !
       integer (kind=kint), intent(inout):: iX_new(nnod_new)
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int_buffer), intent(inout) :: SR_i
+!
 !
       call calypso_send_recv_int(iflag_recv, nnod_org, nnod_new,        &
      &    cps_tbl%nrank_export, cps_tbl%irank_export,                   &
@@ -186,15 +212,16 @@
      &    cps_tbl%iflag_self_copy, cps_tbl%nrank_import,                &
      &    cps_tbl%irank_import, cps_tbl%istack_import,                  &
      &    cps_tbl%item_import, cps_tbl%irev_import,                     &
-     &    SR_sig1, SR_i1, iX_org, iX_new)
+     &    SR_sig, SR_i, iX_org, iX_new)
 !
       end subroutine calypso_SR_type_int
 !
 ! ----------------------------------------------------------------------
 !
       subroutine calypso_SR_type_int8(iflag_recv, cps_tbl,              &
-     &          nnod_org, nnod_new, i8X_org, i8X_new)
+     &          nnod_org, nnod_new, i8X_org, i8X_new, SR_sig, SR_il)
 !
+      use t_solver_SR_int8
       use calypso_SR_int
 !
       type(calypso_comm_table), intent(in) :: cps_tbl
@@ -204,6 +231,9 @@
 !
       integer(kind = kint_gl), intent(inout):: i8X_new(nnod_new)
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int8_buffer), intent(inout) :: SR_il
+!
 !
       call calypso_send_recv_int8(iflag_recv, nnod_org, nnod_new,       &
      &    cps_tbl%nrank_export, cps_tbl%irank_export,                   &
@@ -211,26 +241,28 @@
      &    cps_tbl%nrank_import, cps_tbl%iflag_self_copy,                &
      &    cps_tbl%irank_import, cps_tbl%istack_import,                  &
      &    cps_tbl%item_import, cps_tbl%irev_import,                     &
-     &    SR_sig1, SR_il1, i8X_org, i8X_new)
+     &    SR_sig, SR_il, i8X_org, i8X_new)
 !
       end subroutine calypso_SR_type_int8
 !
 ! ----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine check_calypso_SR_N(NB, cps_tbl)
+      subroutine check_calypso_SR_N(NB, cps_tbl, SR_sig, SR_r)
 !
       use calypso_SR_core
 !
       integer(kind = kint), intent(in) :: NB
       type(calypso_comm_table), intent(in) :: cps_tbl
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
 !
       call check_calypso_SR_stack                                       &
      &   (NB, cps_tbl%nrank_export, cps_tbl%iflag_self_copy,            &
      &    cps_tbl%istack_export, cps_tbl%nrank_import,                  &
-     &    cps_tbl%iflag_self_copy, cps_tbl%istack_import,               &
-     &    SR_sig1, SR_r1)
+     &    cps_tbl%iflag_self_copy, cps_tbl%istack_import, SR_sig, SR_r)
 !
       end subroutine check_calypso_SR_N
 !

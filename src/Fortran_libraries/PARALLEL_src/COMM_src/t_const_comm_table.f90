@@ -11,7 +11,8 @@
 !!
 !!      subroutine const_comm_table_by_connenct                         &
 !!     &         (txt, numele, nnod_4_ele, ie, x_ele, node, nod_comm,   &
-!!     &          inod_dbl, iele_dbl, neib_e, e_comm, fail_tbl)
+!!     &          inod_dbl, iele_dbl, neib_e, sum_list,                 &
+!!     &          e_comm, fail_tbl, SR_sig)
 !!        type(node_data), intent(in) :: node
 !!        type(element_around_node), intent(in) :: neib_e
 !!        type(communication_table), intent(in) :: nod_comm
@@ -19,6 +20,8 @@
 !!        type(element_double_number), intent(in) :: iele_dbl
 !!        type(communication_table), intent(inout) :: e_comm
 !!        type(failed_table), intent(inout) :: fail_tbl
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(sum_of_local_id_list), intent(in) :: sum_list
 !!@endverbatim
 !!
       module t_const_comm_table
@@ -34,8 +37,9 @@
       use t_para_double_numbering
       use t_element_double_number
       use t_next_node_ele_4_node
+      use t_sum_local_node_id_list
       use t_failed_export_list
-      use m_solver_SR
+      use t_solver_SR
 !
       implicit none
 !
@@ -44,6 +48,8 @@
         integer(kind = kint), allocatable :: inod_lc_import(:,:)
 !>        home process for element import table
         integer(kind = kint), allocatable :: ipe_lc_import(:,:)
+!>        sum of node id for element import table
+        integer(kind = kint), allocatable :: isum_import(:)
 !>        position for element import table
         real(kind = kreal), allocatable :: xe_import(:)
 !
@@ -51,6 +57,8 @@
         integer(kind = kint), allocatable :: inod_lc_export(:,:)
 !>        home process for element export table
         integer(kind = kint), allocatable :: ipe_lc_export(:,:)
+!>        sum of node id for element export table
+        integer(kind = kint), allocatable :: isum_export(:)
 !>        position for element export table
         real(kind = kreal), allocatable :: xe_export(:)
       end type const_comm_table_work
@@ -93,7 +101,8 @@
 !
       subroutine const_comm_table_by_connenct                           &
      &         (txt, numele, nnod_4_ele, ie, x_ele, node, nod_comm,     &
-     &          inod_dbl, iele_dbl, neib_e, e_comm, fail_tbl)
+     &          inod_dbl, iele_dbl, neib_e, sum_list,                   &
+     &          e_comm, fail_tbl, SR_sig)
 !
       use reverse_SR_int
       use const_global_element_ids
@@ -109,9 +118,11 @@
       type(communication_table), intent(in) :: nod_comm
       type(node_ele_double_number), intent(in) :: inod_dbl
       type(element_double_number), intent(in) :: iele_dbl
+      type(sum_of_local_id_list), intent(in) :: sum_list
 !
       type(communication_table), intent(inout) :: e_comm
       type(failed_table), intent(inout) :: fail_tbl
+      type(send_recv_status), intent(inout) :: SR_sig
 !
       type(const_comm_table_work) :: wk_comm
 !
@@ -133,10 +144,11 @@
       call alloc_element_rev_imports                                    &
      &   (e_comm%ntot_import, nnod_4_ele, wk_comm)
       call set_element_import_item(inod_dbl, iele_dbl,                  &
-     &    numele, nnod_4_ele, ie, x_ele, e_comm%num_neib,               &
-     &    e_comm%id_neib, e_comm%istack_import, e_comm%item_import,     &
+     &    numele, nnod_4_ele, ie, x_ele, sum_list%isum_ele,             &
+     &    e_comm%num_neib, e_comm%id_neib,                              &
+     &    e_comm%istack_import, e_comm%item_import,                     &
      &    wk_comm%inod_lc_import, wk_comm%ipe_lc_import,                &
-     &    wk_comm%xe_import)
+     &    wk_comm%isum_import, wk_comm%xe_import)
 !      if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+2)
 !
       call alloc_export_num(e_comm)
@@ -146,7 +158,7 @@
       call num_items_send_recv                                          &
      &   (e_comm%num_neib, e_comm%id_neib, e_comm%num_import,           &
      &    e_comm%num_neib, e_comm%id_neib, izero, e_comm%num_export,    &
-     &    e_comm%istack_export, e_comm%ntot_export)
+     &    e_comm%istack_export, e_comm%ntot_export, SR_sig)
 !      if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+3)
 !
 !      write(*,*) 'element_data_reverse_SR2', my_rank
@@ -157,19 +169,21 @@
      &   (nnod_4_ele, e_comm%num_neib, e_comm%id_neib,                  &
      &    e_comm%istack_import, e_comm%istack_export,                   &
      &    wk_comm%inod_lc_import, wk_comm%ipe_lc_import,                &
-     &    wk_comm%xe_import, wk_comm%inod_lc_export,                    &
-     &    wk_comm%ipe_lc_export, wk_comm%xe_export)
-      call dealloc_element_rev_imports(wk_comm)
+     &    wk_comm%isum_import, wk_comm%xe_import,                       &
+     &    wk_comm%inod_lc_export, wk_comm%ipe_lc_export,                &
+     &    wk_comm%isum_export, wk_comm%xe_export, SR_sig)
+       call dealloc_element_rev_imports(wk_comm)
 !      if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+4)
 !
-      call alloc_export_item(e_comm)
-!      write(*,*) 'set_element_export_item', my_rank
+!      write(*,*) 'set_element_export_item_new', my_rank
 !      if(iflag_ecomm_time) call start_elapsed_time(ist_elapsed+5)
+      call alloc_export_item(e_comm)
       call set_element_export_item                                      &
-     &   (txt, neib_e, numele, nnod_4_ele, x_ele,                       &
+     &   (neib_e, numele, nnod_4_ele, x_ele, sum_list%isum_ele,         &
      &    e_comm%num_neib, e_comm%istack_export,                        &
      &    wk_comm%inod_lc_export, wk_comm%ipe_lc_export,                &
-     &    wk_comm%xe_export, e_comm%item_export, fail_tbl)
+     &    wk_comm%isum_export, wk_comm%xe_export, e_comm%item_export,   &
+     &    fail_tbl)
       call dealloc_element_rev_exports(wk_comm)
 !      if(iflag_ecomm_time) call end_elapsed_time(ist_elapsed+5)
 !
@@ -180,8 +194,9 @@
       subroutine element_data_reverse_SR                                &
      &         (nnod_4_ele, num_neib_e, id_neib_e,                      &
      &          istack_import_e, istack_export_e,                       &
-     &          inod_lc_import, ipe_lc_import, xe_import,               &
-     &          inod_lc_export, ipe_lc_export,xe_export)
+     &          inod_lc_import, ipe_lc_import, isum_import, xe_import,  &
+     &          inod_lc_export, ipe_lc_export, isum_export, xe_export,  &
+     &          SR_sig)
 !
       use reverse_SR_real
       use reverse_SR_int
@@ -196,33 +211,43 @@
       real(kind = kreal), intent(in)                                    &
      &         :: xe_import(3*istack_import_e(num_neib_e))
       integer(kind = kint), intent(in)                                  &
+     &        :: isum_import(istack_import_e(num_neib_e))
+      integer(kind = kint), intent(in)                                  &
      &        :: inod_lc_import(istack_import_e(num_neib_e),nnod_4_ele)
       integer(kind = kint), intent(in)                                  &
      &        :: ipe_lc_import(istack_import_e(num_neib_e),nnod_4_ele)
 !
       real(kind = kreal), intent(inout)                                 &
-     &         :: xe_export(3*istack_export_e(num_neib_e))
+     &        :: xe_export(3*istack_export_e(num_neib_e))
+      integer(kind = kint), intent(inout)                               &
+     &        :: isum_export(istack_export_e(num_neib_e))
       integer(kind = kint), intent(inout)                               &
      &        :: inod_lc_export(istack_export_e(num_neib_e),nnod_4_ele)
       integer(kind = kint), intent(inout)                               &
      &        :: ipe_lc_export(istack_export_e(num_neib_e),nnod_4_ele)
+      type(send_recv_status), intent(inout) :: SR_sig
 !
       integer(kind = kint) :: k1
 !
 !
       call real_items_send_recv_3                                       &
      &   (num_neib_e, id_neib_e, istack_import_e, xe_import,            &
-     &    num_neib_e, id_neib_e, istack_export_e, izero, xe_export)
+     &    num_neib_e, id_neib_e, istack_export_e, izero,                &
+     &    xe_export, SR_sig)
+      call comm_items_send_recv                                         &
+     &   (num_neib_e, id_neib_e, istack_import_e, isum_import,          &
+     &    num_neib_e, id_neib_e, istack_export_e, izero,                &
+     &    isum_export, SR_sig)
 !
       do k1 = 1, nnod_4_ele
         call comm_items_send_recv(num_neib_e, id_neib_e,                &
      &      istack_import_e, inod_lc_import(1,k1),                      &
      &      num_neib_e, id_neib_e, istack_export_e,                     &
-     &      izero, inod_lc_export(1,k1))
+     &      izero, inod_lc_export(1,k1), SR_sig)
         call comm_items_send_recv(num_neib_e, id_neib_e,                &
      &      istack_import_e, ipe_lc_import(1,k1),                       &
      &      num_neib_e, id_neib_e, istack_export_e,                     &
-     &      izero, ipe_lc_export(1,k1))
+     &      izero, ipe_lc_export(1,k1), SR_sig)
       end do
 !
       end subroutine element_data_reverse_SR
@@ -239,11 +264,17 @@
 !
       allocate(wk_comm%inod_lc_import(ntot_import_e,nnod_4_ele))
       allocate(wk_comm%ipe_lc_import(ntot_import_e,nnod_4_ele))
+      allocate(wk_comm%isum_import(ntot_import_e))
       allocate(wk_comm%xe_import(3*ntot_import_e))
 !
-      if(ntot_import_e .gt. 0) wk_comm%inod_lc_import = 0
-      if(ntot_import_e .gt. 0) wk_comm%ipe_lc_import = 0
-      if(ntot_import_e .gt. 0) wk_comm%xe_import = 0.0d0
+      if(ntot_import_e .gt. 0) then
+!$omp parallel workshare
+        wk_comm%inod_lc_import = 0
+        wk_comm%ipe_lc_import =  0
+        wk_comm%isum_import =    0
+        wk_comm%xe_import =      0.0d0
+!$omp end parallel workshare
+      end if
 !
       end subroutine alloc_element_rev_imports
 !
@@ -258,10 +289,17 @@
 !
       allocate(wk_comm%inod_lc_export(ntot_export_e,nnod_4_ele))
       allocate(wk_comm%ipe_lc_export(ntot_export_e,nnod_4_ele))
+      allocate(wk_comm%isum_export(ntot_export_e))
       allocate(wk_comm%xe_export(3*ntot_export_e))
-      if(ntot_export_e .gt. 0) wk_comm%inod_lc_export = 0
-      if(ntot_export_e .gt. 0) wk_comm%ipe_lc_export = 0
-      if(ntot_export_e .gt. 0) wk_comm%xe_export = 0.0d0
+!
+      if(ntot_export_e .gt. 0) then
+!$omp parallel workshare
+        wk_comm%inod_lc_export = 0
+        wk_comm%ipe_lc_export =  0
+        wk_comm%isum_export =    0
+        wk_comm%xe_export =      0.0d0
+!$omp end parallel workshare
+      end if
 !
       end subroutine alloc_element_rev_exports
 !
@@ -272,7 +310,7 @@
       type(const_comm_table_work), intent(inout) :: wk_comm
 !
       deallocate(wk_comm%inod_lc_import, wk_comm%ipe_lc_import)
-      deallocate(wk_comm%xe_import)
+      deallocate(wk_comm%isum_import, wk_comm%xe_import)
 !
       end subroutine dealloc_element_rev_imports
 !
@@ -283,7 +321,7 @@
       type(const_comm_table_work), intent(inout) :: wk_comm
 !
       deallocate(wk_comm%inod_lc_export, wk_comm%ipe_lc_export)
-      deallocate(wk_comm%xe_export)
+      deallocate(wk_comm%isum_export, wk_comm%xe_export)
 !
       end subroutine dealloc_element_rev_exports
 !

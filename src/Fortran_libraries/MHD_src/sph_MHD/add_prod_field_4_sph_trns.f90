@@ -1,8 +1,11 @@
 !>@file   add_prod_field_4_sph_trns.f90
 !!@brief  module add_prod_field_4_sph_trns
 !!
-!!@author H. Matsui
-!!@date Programmed in Jan., 2010
+!!@author H. Matsui (UC Davis)
+!!@n      and T. Kera (Tohoku University)
+!!
+!!@date   Programmed in 2010
+!!@n      Modified in July, 2021
 !
 !>@brief Products of field addresses for spherical harmonics transform
 !!       in MHD dynamo simulation
@@ -63,6 +66,11 @@
       call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_prd%i_stream_pol_u, iphys_prd%i_stream_pol_u,            &
      &    b_trns_prd%i_stream_pol_u, trns)
+!
+!
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_prd%i_stream_pol_b, iphys_prd%i_stream_pol_b,            &
+     &    b_trns_prd%i_stream_pol_b, trns)
 !
       end subroutine add_subtracted_sph_trns_snap
 !

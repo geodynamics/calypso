@@ -82,7 +82,8 @@
 !>        Integer flag to select FFT
         integer(kind = kint) :: iflag_FFT = iflag_UNDEFINED_FFT
 !>        Integer flag to select routines to get data from recieve buffer
-        integer(kind = kint) :: iflag_SPH_recv = iflag_import_UNDEFINED
+        integer(kind = kint) :: iflag_SPH_recv                          &
+     &                         = iflag_import_UNDEFINED
 !
 !>        Structures of Legendre polynomials for spherical transform
         type(legendre_4_sph_trans) :: leg

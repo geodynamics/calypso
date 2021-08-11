@@ -278,8 +278,6 @@ begin MHD_control
       coef_imp_t_ctl          6.0e-1
       coef_imp_b_ctl          6.0e-1
       coef_imp_d_ctl          6.0e-1
-!
-      Legendre_trans_loop_ctl  On_the_fly_Plm_matmul
     end time_loop_ctl
   end control
 !

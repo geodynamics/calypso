@@ -101,8 +101,7 @@
       type(FEM_sleeve_control), intent(inout) :: sleeve_ctl
 !
 !
-      call bcast_ctl_array_c1(sleeve_ctl%ref_vector_ctl)
-!
+      call bcast_ctl_type_c1(sleeve_ctl%ref_vector_ctl)
       call bcast_ctl_type_c1(sleeve_ctl%sleeve_extension_mode_ctl)
       call bcast_ctl_type_i1(sleeve_ctl%sleeve_level_ctl)
       call bcast_ctl_type_r1(sleeve_ctl%sleeve_size_ctl)

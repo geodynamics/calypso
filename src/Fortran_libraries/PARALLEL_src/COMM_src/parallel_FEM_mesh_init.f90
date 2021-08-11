@@ -8,10 +8,12 @@
 !!       to FEM data for data visualization
 !!
 !!@verbatim
-!!      subroutine FEM_mesh_initialization(mesh, group)
+!!      subroutine FEM_mesh_initialization(mesh, group, SR_sig, SR_i)
 !!        type(field_io_params), intent(in) :: mesh_file
 !!        type(mesh_geometry), intent(inout) :: mesh
 !!        type(mesh_groups), intent(inout) ::   group
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int_buffer), intent(inout) :: SR_i
 !!@endverbatim
 !!
       module parallel_FEM_mesh_init
@@ -24,6 +26,8 @@
       use calypso_mpi
 !
       use t_mesh_data
+      use t_solver_SR
+      use t_solver_SR_int
 !
       implicit none
 !
@@ -35,7 +39,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine FEM_mesh_initialization(mesh, group)
+      subroutine FEM_mesh_initialization(mesh, group, SR_sig, SR_i)
 !
       use t_file_IO_parameter
       use t_read_mesh_data
@@ -47,6 +51,8 @@
 !
       type(mesh_geometry), intent(inout) :: mesh
       type(mesh_groups), intent(inout) ::   group
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int_buffer), intent(inout) :: SR_i
 !
 !  -----    construct geometry informations
 !
@@ -59,7 +65,7 @@
 !
       if (iflag_debug.gt.0) write(*,*) 'const_para_edge_infos'
       call const_para_edge_infos(mesh%nod_comm, mesh%node, mesh%ele,    &
-     &                           mesh%surf, mesh%edge)
+     &                           mesh%surf, mesh%edge, SR_sig, SR_i)
 !
       if(iflag_debug.gt.0) write(*,*) 'const_global_mesh_infos'
       call const_global_mesh_infos(mesh)

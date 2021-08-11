@@ -12,7 +12,8 @@
 !!@verbatim
 !!      subroutine real_items_send_recv                                 &
 !!     &         (npe_send, irank_send, istack_send, x_send,            &
-!!     &          npe_recv, irank_recv, istack_recv, iflag_self, x_recv)
+!!     &          npe_recv, irank_recv, istack_recv, iflag_self,        &
+!!     &          x_recv, SR_sig)
 !!        integer(kind = kint), intent(in) :: iflag_self
 !!        integer(kind = kint), intent(in) :: npe_send, npe_recv
 !!        integer(kind = kint), intent(in) :: irank_send(npe_send)
@@ -22,9 +23,11 @@
 !!        real(kind = kreal), intent(in) :: x_send(istack_send(npe_send))
 !!        real(kind = kreal), intent(inout)                             &
 !!     &                 :: x_recv(istack_recv(npe_recv))
+!!        type(send_recv_status), intent(inout) :: SR_sig
 !!      subroutine real_items_send_recv_3                               &
 !!     &         (npe_send, irank_send, istack_send, x_send,            &
-!!     &          npe_recv, irank_recv, istack_recv, iflag_self, x_recv)
+!!     &          npe_recv, irank_recv, istack_recv, iflag_self,        &
+!!     &          x_recv, SR_sig)
 !!        integer(kind = kint), intent(in) :: num_neib
 !!        integer(kind = kint), intent(in) :: id_neib(num_neib)
 !!        integer(kind = kint), intent(in) :: istack_send(0:num_neib)
@@ -33,6 +36,7 @@
 !!           &                 :: x_send(3*istack_send(num_neib))
 !!        real(kind = kreal), intent(inout)                             &
 !!      &                 :: x_recv(3*istack_recv(num_neib))
+!!        type(send_recv_status), intent(inout) :: SR_sig
 !!@endverbatim
 !
       module reverse_SR_real
@@ -52,7 +56,8 @@
 !
       subroutine real_items_send_recv                                   &
      &         (npe_send, irank_send, istack_send, x_send,              &
-     &          npe_recv, irank_recv, istack_recv, iflag_self, x_recv)
+     &          npe_recv, irank_recv, istack_recv, iflag_self,          &
+     &          x_recv, SR_sig)
 !
       use calypso_SR_core
 !
@@ -68,17 +73,15 @@
 !
       real(kind = kreal), intent(inout)                                 &
      &                 :: x_recv(istack_recv(npe_recv))
+      type(send_recv_status), intent(inout) :: SR_sig
 !
-      type(send_recv_status) :: rSR_sig
 !
-!
-      call resize_SR_flag(npe_send, npe_recv, rSR_sig)
+      call resize_SR_flag(npe_send, npe_recv, SR_sig)
       call calypso_send_recv_core                                       &
      &   (ione, npe_send, irank_send, istack_send, x_send(1),           &
      &          npe_recv, irank_recv, istack_recv, iflag_self,          &
-     &          x_recv(1), rSR_sig)
-      call calypso_send_recv_fin(npe_send, iflag_self, rSR_sig)
-      call dealloc_SR_flag(rSR_sig)
+     &          x_recv(1), SR_sig)
+      call calypso_send_recv_fin(npe_send, iflag_self, SR_sig)
 !
       end subroutine real_items_send_recv
 !
@@ -86,7 +89,8 @@
 !
       subroutine real_items_send_recv_3                                 &
      &         (npe_send, irank_send, istack_send, x_send,              &
-     &          npe_recv, irank_recv, istack_recv, iflag_self, x_recv)
+     &          npe_recv, irank_recv, istack_recv, iflag_self,          &
+     &          x_recv, SR_sig)
 !
       use calypso_SR_core
 !
@@ -103,17 +107,15 @@
 !
       real(kind = kreal), intent(inout)                                 &
      &                 :: x_recv(3*istack_recv(npe_recv))
+      type(send_recv_status), intent(inout) :: SR_sig
 !
-      type(send_recv_status) :: rSR_sig
 !
-!
-      call resize_SR_flag(npe_send, npe_recv, rSR_sig)
+      call resize_SR_flag(npe_send, npe_recv, SR_sig)
       call calypso_send_recv_core                                       &
      &   (ithree, npe_send, irank_send, istack_send, x_send(1),         &
      &            npe_recv, irank_recv, istack_recv, iflag_self,        &
-     &            x_recv(1), rSR_sig)
-      call calypso_send_recv_fin(npe_send, iflag_self, rSR_sig)
-      call dealloc_SR_flag(rSR_sig)
+     &            x_recv(1), SR_sig)
+      call calypso_send_recv_fin(npe_send, iflag_self, SR_sig)
 !
       end subroutine real_items_send_recv_3
 !

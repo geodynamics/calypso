@@ -84,7 +84,7 @@
 !
       subroutine elpsed_label_4_VIZ_outline
 !
-      integer(kind = kint), parameter :: num_append = 11
+      integer(kind = kint), parameter :: num_append = 13
 !
 !
       call append_elapsed_times                                         &
@@ -108,6 +108,10 @@
       elps1%labels(ist_elapsed_VIZ+10) = 'LIC rendering.    '
 !
       elps1%labels(ist_elapsed_VIZ+11) = 'VTK output in viz module'
+      elps1%labels(ist_elapsed_VIZ+12)                                  &
+     &                    = 'ele. comm. table for LIC    '
+      elps1%labels(ist_elapsed_VIZ+13)                                  &
+     &                    = 'edge comm. table for surfacing    '
 !
       iflag_VIZ_time = .TRUE.
 !
@@ -157,7 +161,7 @@
 !
       subroutine elpsed_label_4_LIC
 !
-      integer(kind = kint), parameter :: num_append = 4
+      integer(kind = kint), parameter :: num_append = 9
 !
 !
       call append_elapsed_times                                         &
@@ -170,7 +174,17 @@
       elps1%labels(ist_elapsed_LIC+3)                                   &
      &                    = 'LIC V. Rendering ray trace   '
       elps1%labels(ist_elapsed_LIC+4)                                   &
+     &                    = 'Line integration for LIC   '
+      elps1%labels(ist_elapsed_LIC+5)                                   &
      &                    = 'LIC V. Rendering subimage composit   '
+      elps1%labels(ist_elapsed_LIC+6)                                   &
+     &                    = 'LIC V. Rendering domain repartition  '
+      elps1%labels(ist_elapsed_LIC+7)                                   &
+     &                    = 'LIC data transfer to new domain  '
+      elps1%labels(ist_elapsed_LIC+8)                                   &
+     &                    = 'FEM_mesh_initialization for LIC mesh  '
+      elps1%labels(ist_elapsed_LIC+9)                                   &
+     &                    = 'Data IO for line integration counts   '
 !
       iflag_LIC_time = .TRUE.
 !

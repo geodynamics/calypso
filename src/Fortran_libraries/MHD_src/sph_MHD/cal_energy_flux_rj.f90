@@ -1,10 +1,10 @@
 !> @file  cal_energy_flux_rj.f90
 !!      module cal_energy_flux_rj
 !!
-!! @author  H. Matsui
 !! @date Programmed in Oct., 2009
 !! @n    Modified in Apr., 2013
-!
+!!@n      Modified in July, 2021
+!!
 !> @brief Evaluate energy fluxes for MHD dynamo in physical space
 !!
 !!@verbatim
@@ -75,6 +75,12 @@
       if(ipol%prod_fld%i_stream_pol_u .gt. 0) then
         call copy_poloidal_to_streamfunc_rj(sph_rj, rj_fld,             &
      &      ipol%base%i_velo, ipol%prod_fld%i_stream_pol_u)
+      end if
+!
+!
+      if(ipol%prod_fld%i_stream_pol_b .gt. 0) then
+        call copy_poloidal_to_streamfunc_rj(sph_rj, rj_fld,             &
+    &       ipol%base%i_magne, ipol%prod_fld%i_stream_pol_b)
       end if
 !
       end subroutine s_cal_energy_flux_rj

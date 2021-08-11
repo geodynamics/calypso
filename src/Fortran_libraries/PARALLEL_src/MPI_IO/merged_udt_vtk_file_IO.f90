@@ -9,11 +9,13 @@
 !!
 !!@verbatim
 !!      subroutine init_merged_ucd_element                              &
-!!     &         (iflag_format, node, ele, nod_comm, ucd)
+!!     &         (iflag_format, node, ele, nod_comm, ucd, SR_sig, SR_i)
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(ucd_data), intent(inout) :: ucd
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int_buffer), intent(inout) :: SR_i
 !!      subroutine finalize_merged_ucd(iflag_format, ucd)
 !!        type(ucd_data), intent(inout) :: ucd
 !!
@@ -38,6 +40,8 @@
       use t_ucd_data
       use t_para_double_numbering
       use t_calypso_mpi_IO_param
+      use t_solver_SR
+      use t_solver_SR_int
 !
       use set_ucd_file_names
 !
@@ -56,7 +60,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine init_merged_ucd_element                                &
-     &         (iflag_format, node, ele, nod_comm, ucd)
+     &         (iflag_format, node, ele, nod_comm, ucd, SR_sig, SR_i)
 !
       use t_geometry_data
       use t_comm_table
@@ -69,7 +73,10 @@
       type(node_data), intent(in) :: node
       type(element_data), intent(in) :: ele
       type(communication_table), intent(in) :: nod_comm
+!
       type(ucd_data), intent(inout) :: ucd
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int_buffer), intent(inout) :: SR_i
 !
 !
       call alloc_merged_ucd_nod_stack(nprocs, ucd)
@@ -86,7 +93,8 @@
 !
 !
       call alloc_double_numbering(node%numnod, dbl_id1)
-      call set_node_double_numbering(node, nod_comm, dbl_id1)
+      call set_node_double_numbering(node, nod_comm, dbl_id1,           &
+     &                               SR_sig, SR_i)
 !
       ucd%nnod_4_ele = ele%nnod_4_ele
       call allocate_ucd_ele(ucd)

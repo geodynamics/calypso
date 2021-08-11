@@ -11,15 +11,13 @@
 !!      subroutine dealloc_ele_double_number(dbl_id)
 !!        type(element_double_number), intent(inout) :: dbl_id
 !!
-!!      subroutine find_belonged_pe_4_ele(my_rank, inod_dbl, numele, ie,&
-!!     &          internal_ele, interior_ele, iele_dbl)
+!!      subroutine find_belonged_pe_4_ele                               &
+!!     &         (inod_dbl, numele, ie, iele_dbl)
 !!        integer, intent(in) :: my_rank
 !!        type(node_ele_double_number), intent(in) :: inod_dbl
 !!        integer(kind = kint), intent(in) :: numele
 !!        integer(kind = kint), intent(in) :: ie(numele,1)
 !!        type(element_double_number), intent(inout) :: iele_dbl
-!!        integer(kind = kint), intent(inout) :: internal_ele
-!!        integer(kind = kint), intent(inout) :: interior_ele(numele)
 !!      subroutine find_belonged_pe_4_surf(my_rank, inod_dbl,           &
 !!     &          numsurf, nnod_4_surf, ie_surf,                        &
 !!     &          internal_surf, interior_surf, isurf_dbl)
@@ -99,27 +97,23 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine find_belonged_pe_4_ele(my_rank, inod_dbl, numele, ie,  &
-     &          internal_ele, interior_ele, iele_dbl)
+      subroutine find_belonged_pe_4_ele                                 &
+     &         (inod_dbl, numele, ie, iele_dbl)
 !
       use find_belonged_process
 !
-      integer, intent(in) :: my_rank
       type(node_ele_double_number), intent(in) :: inod_dbl
       integer(kind = kint), intent(in) :: numele
       integer(kind = kint), intent(in) :: ie(numele,1)
 !
       type(element_double_number), intent(inout) :: iele_dbl
-      integer(kind = kint), intent(inout) :: internal_ele
-      integer(kind = kint), intent(inout) :: interior_ele(numele)
 !
-      integer(kind = kint) :: iele, icou
-      integer(kind = kint) :: ie_one
+      integer(kind = kint) :: iele, ie_one
 !
 !
 !$omp parallel workshare
       iele_dbl%irank(1:numele) = -1
-      iele_dbl%k_ref(1:numele) =    0
+      iele_dbl%k_ref(1:numele) = 0
 !$omp end parallel workshare
 !
 !%omp parallel do private(iele,ie_one)
@@ -128,19 +122,8 @@
         call find_belonged_pe_each_ele                                  &
      &     (inod_dbl%num_dbl, inod_dbl%irank, ie_one,                   &
      &      iele_dbl%irank(iele), iele_dbl%k_ref(iele))
-!
-        interior_ele(iele)                                              &
-     &     = set_each_interior_flag(my_rank, iele_dbl%irank(iele))
       end do
 !%omp end parallel do
-!
-      icou = 0
-!%omp parallel do private(iele) reduction(+:icou)
-      do iele = 1, numele
-        if(iele_dbl%irank(iele) .eq. my_rank) icou = icou + 1
-      end do
-!%omp end parallel do
-      internal_ele = icou
 !
       end subroutine find_belonged_pe_4_ele
 !

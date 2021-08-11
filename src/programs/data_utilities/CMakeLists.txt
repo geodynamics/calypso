@@ -34,11 +34,11 @@ ADD_EXECUTABLE(sph_ene_check TIME_HISTORIES/compare_sph_mean_square.f90)
 TARGET_LINK_LIBRARIES(sph_ene_check calypso)
 
 
-SET(SRC_PSF_PLUG VIZ_only/load_mesh_and_field_4_viz.f90 VIZ_only/t_control_data_section_only.f90 VIZ_only/t_surfacing.f90 VIZ_only/FEM_analyzer_viz_surf.f90 VIZ_only/analyzer_psf.f90 VIZ_only/main_surface_rendering.f90)
+SET(SRC_PSF_PLUG VIZ_only/t_control_data_section_only.f90 VIZ_only/t_surfacing.f90 VIZ_only/FEM_analyzer_viz_surf.f90 VIZ_only/analyzer_psf.f90 VIZ_only/main_surface_rendering.f90)
 ADD_EXECUTABLE(sectioning ${SRC_PSF_PLUG})
 TARGET_LINK_LIBRARIES(sectioning calypso calypso_c)
 
-SET(SRC_VTK_CONVERT_PLUG VIZ_only/load_mesh_and_field_4_viz.f90 VIZ_only/t_control_data_section_only.f90 VIZ_only/t_viz_VTK_convert.f90 VIZ_only/FEM_analyzer_VTK_convert.f90 VIZ_only/analyzer_VTK_convert.f90 VIZ_only/main_VTK_convert.f90)
+SET(SRC_VTK_CONVERT_PLUG VIZ_only/t_control_data_section_only.f90 VIZ_only/t_viz_VTK_convert.f90 VIZ_only/FEM_analyzer_VTK_convert.f90 VIZ_only/analyzer_VTK_convert.f90 VIZ_only/main_VTK_convert.f90)
 ADD_EXECUTABLE(field_to_VTK ${SRC_VTK_CONVERT_PLUG})
 TARGET_LINK_LIBRARIES(field_to_VTK calypso calypso_c)
 

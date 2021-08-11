@@ -58,8 +58,8 @@
      &          inod_smp_stack, ncomp_nod, i_fld, i_rot,                &
      &          d_nod, d_len)
 !
-      integer (kind = kint) :: np_smp, nnod
-      integer (kind = kint) :: inod_smp_stack(0:np_smp)
+      integer (kind = kint), intent(in) :: np_smp, nnod
+      integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
       integer(kind = kint), intent(in) :: ncomp_nod
       integer(kind = kint), intent(in) :: i_fld, i_rot
       real(kind=kreal), intent(in) :: d_nod(nnod,ncomp_nod)
@@ -76,8 +76,8 @@
      &          inod_smp_stack, ncomp_nod, i_fld, i_diffuse,            &
      &          d_nod, d_len)
 !
-      integer (kind = kint) :: np_smp, nnod
-      integer (kind = kint) :: inod_smp_stack(0:np_smp)
+      integer (kind = kint), intent(in) :: np_smp, nnod
+      integer (kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
       integer(kind = kint), intent(in) :: ncomp_nod
       integer(kind = kint), intent(in) :: i_fld, i_diffuse
       real(kind=kreal), intent(in) :: d_nod(nnod,ncomp_nod)
@@ -95,8 +95,8 @@
       subroutine cal_vector_magnitude(np_smp, nnod, inod_smp_stack,     &
      &          d_fld, d_mag)
 !
-       integer (kind = kint) :: np_smp, nnod
-       integer (kind = kint) :: inod_smp_stack(0:np_smp)
+       integer(kind = kint), intent(in) :: np_smp, nnod
+       integer(kind = kint), intent(in) :: inod_smp_stack(0:np_smp)
        real(kind=kreal), intent(in)    :: d_fld(nnod,3)
        real(kind=kreal), intent(inout) :: d_mag(nnod)
 !

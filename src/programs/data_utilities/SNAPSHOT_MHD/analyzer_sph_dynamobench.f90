@@ -27,6 +27,7 @@
       use t_field_on_circle
       use t_field_4_dynamobench
       use t_step_parameter
+      use t_mesh_SR
 !
       use SPH_analyzer_d_bench
 !
@@ -80,18 +81,12 @@
       call copy_delta_t(MHD_step1%init_d, MHD_step1%time_d)
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
 !
-!    precondition elaps start
-!
-      if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+1)
-      if (iflag_debug.gt.0 ) write(*,*) 'alloc_iccgN_vector'
-      call alloc_iccgN_vector                                           &
-     &   (isix, SPH_MHD1%sph%sph_rtp%nnod_rtp, FEM_d1%v_sol)
-!
 !        Initialize spherical transform dynamo
 !
+      if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+1)
       if(iflag_debug .gt. 0) write(*,*) 'SPH_init_sph_dbench'
-      call SPH_init_sph_dbench(MHD_files1, FEM_d1%iphys,                &
-     &    SPH_model1, SPH_MHD1, SPH_WK1, cdat1)
+      call SPH_init_sph_dbench(MHD_files1, FEM_d1%iphys, SPH_model1,    &
+     &    SPH_MHD1, SPH_WK1, m_SR1%SR_sig, m_SR1%SR_r, cdat1)
 !
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+1)
       call calypso_MPI_barrier
@@ -128,7 +123,8 @@
 !
           if (iflag_debug.eq.1) write(*,*) 'SPH_analyze_dbench'
           call SPH_analyze_dbench(MHD_step1%time_d%i_time_step,         &
-     &      MHD_files1, SPH_model1, SPH_MHD1, SPH_WK1, cdat1, bench1)
+     &        MHD_files1, SPH_model1, SPH_MHD1, SPH_WK1,                &
+     &        m_SR1%SR_sig, m_SR1%SR_r, cdat1, bench1)
 !
            call dealloc_sph_trans_area_snap(SPH_WK1%trns_WK)
         end if

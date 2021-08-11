@@ -12,10 +12,10 @@
 !!     &          ntot_import_e)
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(element_double_number), intent(in) :: iele_dbl
-!!      subroutine set_element_import_item                              &
-!!     &         (inod_dbl, iele_dbl, numele, nnod_4_ele, ie, x_ele,    &
+!!      subroutine set_element_import_item(inod_dbl, iele_dbl,          &
+!!     &          numele, nnod_4_ele, ie, x_ele, isum_ele,              &
 !!     &          num_neib_e, id_neib_e, istack_import_e, item_import_e,&
-!!     &          inod_lc_import, ipe_lc_import, xe_import)
+!!     &          inod_lc_import, ipe_lc_import, isum_import, xe_import)
 !!        type(node_ele_double_number), intent(in) :: inod_dbl
 !!        type(element_double_number), intent(in) :: iele_dbl
 !!
@@ -34,6 +34,11 @@
       use calypso_mpi
 !
       implicit none
+!
+      integer(kind = kint), parameter, private :: ISMALL = 17
+!
+      private :: find_ele_export_from_small, find_ele_export_from_large
+      private :: dist_ele_position_to_export
 !
 !-----------------------------------------------------------------------
 !
@@ -91,10 +96,10 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine set_element_import_item                                &
-     &         (inod_dbl, iele_dbl, numele, nnod_4_ele, ie, x_ele,      &
+      subroutine set_element_import_item(inod_dbl, iele_dbl,            &
+     &          numele, nnod_4_ele, ie, x_ele, isum_ele,                &
      &          num_neib_e, id_neib_e, istack_import_e, item_import_e,  &
-     &          inod_lc_import, ipe_lc_import, xe_import)
+     &          inod_lc_import, ipe_lc_import, isum_import, xe_import)
 !
       use t_para_double_numbering
       use t_element_double_number
@@ -103,6 +108,7 @@
       type(element_double_number), intent(in) :: iele_dbl
 !
       integer(kind = kint), intent(in) :: numele, nnod_4_ele
+      integer(kind = kint), intent(in) :: isum_ele(numele)
       integer(kind = kint), intent(in) :: ie(numele, nnod_4_ele)
       real(kind = kreal), intent(in)  :: x_ele(numele,3)
 !
@@ -114,6 +120,8 @@
      &        :: item_import_e(istack_import_e(num_neib_e))
       real(kind = kreal), intent(inout)                                 &
      &        :: xe_import(3*istack_import_e(num_neib_e))
+      integer(kind = kint), intent(inout)                               &
+     &        :: isum_import(istack_import_e(num_neib_e))
       integer(kind = kint), intent(inout)                               &
      &        :: inod_lc_import(istack_import_e(num_neib_e),nnod_4_ele)
       integer(kind = kint), intent(inout)                               &
@@ -154,9 +162,11 @@
 !
       deallocate(ip_rev_tmp, num_import_tmp)
 !
+!$omp parallel do private(icou,iele,k1,inod)
       do icou = 1, istack_import_e(num_neib_e)
         iele = item_import_e(icou)
 !
+        isum_import(icou) =   isum_ele(iele)
         xe_import(3*icou-2) = x_ele(iele,1)
         xe_import(3*icou-1) = x_ele(iele,2)
         xe_import(3*icou  ) = x_ele(iele,3)
@@ -166,25 +176,27 @@
           ipe_lc_import(icou,k1) =  inod_dbl%irank(inod)
         end do
       end do
+!$omp end parallel do
 !
       end subroutine  set_element_import_item
 !
 !-----------------------------------------------------------------------
 !
       subroutine set_element_export_item                                &
-     &         (txt, neib_e, numele, nnod_4_ele, x_ele,                 &
+     &         (neib_e, numele, nnod_4_ele, x_ele, isum_ele,            &
      &          num_neib_e, istack_export_e, inod_lc_export,            &
-     &          ipe_lc_export, xe_export, item_export_e, fail_tbl)
+     &          ipe_lc_export, isum_export, xe_export,                  &
+     &          item_export_e, fail_tbl)
 !
       use t_next_node_ele_4_node
       use t_failed_export_list
       use calypso_mpi_int
       use quicksort
 !
-      character(len=kchara), intent(in) :: txt
       type(element_around_node), intent(in) :: neib_e
 !
       integer(kind = kint), intent(in) :: numele, nnod_4_ele
+      integer(kind = kint), intent(in) :: isum_ele(numele)
       real(kind = kreal), intent(in)  :: x_ele(numele,3)
 !
       integer(kind = kint), intent(in) :: num_neib_e
@@ -192,6 +204,8 @@
 !
       real(kind = kreal), intent(in)                                    &
      &        :: xe_export(3*istack_export_e(num_neib_e))
+      integer(kind = kint), intent(inout)                               &
+     &        :: isum_export(istack_export_e(num_neib_e))
       integer(kind = kint), intent(in)                                  &
      &        :: inod_lc_export(istack_export_e(num_neib_e),nnod_4_ele)
       integer(kind = kint), intent(in)                                  &
@@ -201,11 +215,11 @@
      &        :: item_export_e(istack_export_e(num_neib_e))
       type(failed_table), intent(inout) :: fail_tbl
 !
-      integer(kind = kint) :: ip, iflag, icou, num_gl
+      integer(kind = kint) :: ip, icou, num_gl
       integer(kind = kint) :: ist, ied, inum, inod
-      integer(kind = kint) :: jst, jed, jnum, jele
+      integer(kind = kint) :: jst
       integer(kind = kint) :: k1, kk
-      real(kind = kreal) :: dist, dist_min
+      real(kind = kreal) :: dist_min
 !
       integer(kind = kint) :: inod_sf_lc
       integer(kind = kint) :: n_search(nnod_4_ele)
@@ -231,32 +245,27 @@
           call quicksort_w_index                                        &
      &       (nnod_4_ele, n_search, ione, nnod_4_ele, idx_sort)
 !
-          iflag = 0
           dist_min = 1.0d30
           do k1 = 1, nnod_4_ele
             kk = idx_sort(k1)
             if(ipe_lc_export(inum,kk) .ne. my_rank) cycle
 !
             inod = inod_lc_export(inum,kk)
-            jst = neib_e%istack_4_node(inod-1) + 1
-            jed = neib_e%istack_4_node(inod)
-            do jnum = jst, jed
-              jele = neib_e%iele_4_node(jnum)
-!
-              dist = sqrt((x_ele(jele,1)- xe_export(3*inum-2))**2 &
-     &                + (x_ele(jele,2) - xe_export(3*inum-1))**2  &
-     &                + (x_ele(jele,3) - xe_export(3*inum  ))**2)
-!
-              if(dist .le. TINY) then
-                item_export_e(inum) = jele
-                iflag = 1
-                exit
-              end if
-              dist_min = min(dist_min,dist)
-            end do
-            if(iflag .eq. 1) exit
+            jst = neib_e%istack_4_node(inod-1)
+            if(neib_e%nele_4_node(inod) .le. ISMALL) then
+              call find_ele_export_from_small(numele, x_ele,            &
+     &            neib_e%nele_4_node(inod), neib_e%iele_4_node(jst+1),  &
+     &            xe_export(3*inum-2), item_export_e(inum), dist_min)
+            else
+              call find_ele_export_from_large(numele, isum_ele, x_ele,  &
+     &            neib_e%nele_4_node(inod), neib_e%iele_4_node(jst+1),  &
+     &            isum_export(inum), xe_export(3*inum-2),               &
+     &            item_export_e(inum), dist_min)
+            end if
+            if(dist_min .eq. zero) exit
           end do
-          if(iflag .eq. 0) then
+!
+          if(dist_min .ne. zero) then
             icou = icou + 1
             call set_failed_export(inum, item_export_e(inum), dist_min, &
      &                             fail_comm_t)
@@ -274,5 +283,151 @@
       end subroutine set_element_export_item
 !
 !-----------------------------------------------------------------------
+!
+      subroutine find_ele_export_from_small                             &
+     &         (numele, x_ele, nele_4_node, iele_4_node,                &
+     &          xe_export, item_export_e, dist_min)
+!
+      integer (kind=kint) :: nele_4_node
+      integer(kind = kint), intent(in) :: iele_4_node(nele_4_node)
+!
+      integer(kind = kint), intent(in) :: numele
+      real(kind = kreal), intent(in)  :: x_ele(numele,3)
+      real(kind = kreal), intent(in) :: xe_export(3)
+!
+      integer(kind = kint), intent(inout) :: item_export_e
+      real(kind = kreal), intent(inout) :: dist_min
+!
+      integer(kind = kint) :: jnum, jele
+      real(kind= kreal) :: x_each(3)
+!
+!
+      do jnum = 1, nele_4_node
+        jele = iele_4_node(jnum)
+        x_each(1:3) = x_ele(jele,1:3)
+        call dist_ele_position_to_export(x_each, xe_export, dist_min)
+!
+        if(dist_min .eq. zero) then
+          item_export_e = jele
+          return
+        end if
+      end do
+!
+      end subroutine find_ele_export_from_small
+!
+!-----------------------------------------------------------------------
+!
+      subroutine find_ele_export_from_large(numele, isum_ele, x_ele,    &
+     &          nele_4_node, iele_4_node, iref_sum, xe_export,          &
+     &          item_export_e, dist_min)
+!
+      use m_machine_parameter
+!
+      integer(kind = kint), intent(in) :: numele
+      integer(kind = kint), intent(in) :: isum_ele(numele)
+      real(kind = kreal), intent(in)  :: x_ele(numele,3)
+!
+      integer (kind=kint) :: nele_4_node
+      integer(kind = kint), intent(in) :: iele_4_node(nele_4_node)
+!
+      integer(kind = kint), intent(in) :: iref_sum
+      real(kind = kreal), intent(in) :: xe_export(3)
+!
+      integer(kind = kint), intent(inout) :: item_export_e
+      real(kind = kreal), intent(inout) :: dist_min
+!
+      integer(kind = kint) :: ist, ied, imid, ilast, inum, jele, icou
+      real(kind= kreal) :: x_each(3)
+      logical :: flag_find
+!
+!
+      flag_find = .FALSE.
+      icou = 1
+      ist = 1
+      ied = nele_4_node
+      imid = ied
+      do
+        ilast = imid
+        jele = iele_4_node(imid)
+!
+        if(isum_ele(jele) .lt. iref_sum) then
+          ist = imid
+        else if(isum_ele(jele) .gt. iref_sum) then
+          ied = imid
+        else
+          flag_find = .TRUE.
+          exit
+        end if
+!
+        imid = (ist + ied) / 2
+        if(imid .eq. ilast) exit
+        icou = icou + 1
+      end do
+!
+      if(flag_find .EQV. .FALSE.) then
+        dist_min = -1.0d0
+        write(e_message,'(a)')                                          &
+     &             'mathced sum of eleement ID is missimg'
+        return
+      end if
+!
+      dist_min = 1.0d17
+      jele = iele_4_node(imid)
+      x_each(1:3) = x_ele(jele,1:3)
+      call dist_ele_position_to_export(x_each, xe_export, dist_min)
+      if(dist_min .eq. zero) then
+        item_export_e = jele
+        return
+      end if
+!
+      do inum = imid-1, 1, -1
+        jele = iele_4_node(inum)
+        if(isum_ele(jele) .ne. iref_sum) exit
+!
+        x_each(1:3) = x_ele(jele,1:3)
+        call dist_ele_position_to_export(x_each, xe_export, dist_min)
+        if(dist_min .eq. zero) then
+          item_export_e = jele
+          return
+        end if
+      end do
+      do inum = imid+1, nele_4_node
+        jele = iele_4_node(inum)
+        if(isum_ele(jele) .ne. iref_sum) exit
+!
+        x_each(1:3) = x_ele(jele,1:3)
+        call dist_ele_position_to_export(x_each, xe_export, dist_min)
+        if(dist_min .eq. zero) then
+          item_export_e = jele
+          return
+        end if
+      end do
+!
+      end subroutine find_ele_export_from_large
+!
+! -----------------------------------------------------------------------
+!
+      subroutine dist_ele_position_to_export(x_each, xe_export,         &
+     &                                       dist_min)
+!
+      real(kind = kreal), intent(in) :: x_each(3), xe_export(3)
+      real(kind = kreal), intent(inout) :: dist_min
+!
+      real(kind = kreal) :: dist
+!
+!
+      dist = sqrt((x_each(1) - xe_export(1))**2                         &
+     &          + (x_each(2) - xe_export(2))**2                         &
+     &          + (x_each(3) - xe_export(3))**2)
+!
+      if(dist .le. TINY) then
+        dist_min = zero
+      else
+        dist_min = min(dist, dist_min)
+      end if
+!
+      end subroutine dist_ele_position_to_export
+!
+! -----------------------------------------------------------------------
 !
       end module set_element_comm_table

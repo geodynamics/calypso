@@ -22,6 +22,7 @@
 !
       use t_ctl_data_const_sph_mesh
       use t_ctl_params_gen_sph_shell
+      use t_mesh_SR
 !
       use calypso_mpi
 !
@@ -35,13 +36,13 @@
 !
 !>      Structure for file settings
       type(sph_mesh_generation_ctl), save :: SPH_TEST_ctl
-!
-      type(SPH_mesh_field_data), save :: SPH_TEST
+      type(SPH_mesh_field_data), save :: SPH_T
+      type(mesh_SR), save :: m_SR_T
 !
       type(gen_sph_file_IO_params), save ::  test_sph_files
 !
       private :: control_file_name, SPH_TEST_ctl
-      private :: check_header, SPH_TEST
+      private :: check_header, SPH_T
 !
 ! ----------------------------------------------------------------------
 !
@@ -75,11 +76,11 @@
       call read_control_4_const_shell(control_file_name, SPH_TEST_ctl)
       call set_control_4_gen_shell_grids                                &
      &   (my_rank, SPH_TEST_ctl%plt, SPH_TEST_ctl%psph_ctl,             &
-     &    test_sph_files, SPH_TEST%sph_maker, ierr)
+     &    test_sph_files, SPH_T%sph_maker, ierr)
 !
       if (iflag_debug.gt.0) write(*,*) 'check_and_make_SPH_mesh'
       call check_and_make_SPH_mesh                                      &
-     &   (test_sph_files%sph_file_param, SPH_TEST)
+     &   (test_sph_files%sph_file_param, SPH_T)
 !
        end subroutine init_test_sph
 !
@@ -87,7 +88,6 @@
 !
       subroutine analyze_test_sph
 !
-      use m_solver_SR
       use calypso_mpi_int
       use cmp_trans_sph_indices
       use cmp_trans_sph_tests
@@ -101,11 +101,11 @@
 !
 !
       call allocate_idx_sph_recieve                                     &
-     &   (SPH_TEST%sph%sph_rtp%nnod_rtp, SPH_TEST%sph%sph_rtm%nnod_rtm, &
-     &    SPH_TEST%sph%sph_rlm%nnod_rlm, SPH_TEST%sph%sph_rj%nnod_rj)
+     &   (SPH_T%sph%sph_rtp%nnod_rtp, SPH_T%sph%sph_rtm%nnod_rtm, &
+     &    SPH_T%sph%sph_rlm%nnod_rlm, SPH_T%sph%sph_rj%nnod_rj)
       call allocate_real_sph_test(NB,                                   &
-     &    SPH_TEST%sph%sph_rtp%nnod_rtp, SPH_TEST%sph%sph_rtm%nnod_rtm, &
-     &    SPH_TEST%sph%sph_rlm%nnod_rlm, SPH_TEST%sph%sph_rj%nnod_rj)
+     &    SPH_T%sph%sph_rtp%nnod_rtp, SPH_T%sph%sph_rtm%nnod_rtm, &
+     &    SPH_T%sph%sph_rlm%nnod_rlm, SPH_T%sph%sph_rj%nnod_rj)
 !
       fname_tmp = add_process_id(my_rank, check_header)
       file_name = add_dat_extension(fname_tmp)
@@ -122,34 +122,33 @@
         end if
 !
         call sph_type_indices_transfer                                  &
-     &     (itype, SPH_TEST%sph, SPH_TEST%comms)
-        iflag(1) = check_missing_sph_indices(id_check, SPH_TEST%sph)
-        iflag(2) = compare_transfer_sph_indices(id_check, SPH_TEST%sph)
+     &     (itype, SPH_T%sph, SPH_T%comms, m_SR_T%SR_sig, m_SR_T%SR_i)
+        iflag(1) = check_missing_sph_indices(id_check, SPH_T%sph)
+        iflag(2) = compare_transfer_sph_indices(id_check, SPH_T%sph)
 !
-        call sph_transfer_test_N                                        &
-     &     (itype, NB, SPH_TEST%sph, SPH_TEST%comms)
-        iflag(3) = compare_transfer_sph_reals                           &
-     &           (NB, id_check, SPH_TEST%sph)
+        call sph_transfer_test_N(itype, NB, SPH_T%sph, SPH_T%comms,     &
+     &                           m_SR_T%SR_sig, m_SR_T%SR_r)
+        iflag(3) = compare_transfer_sph_reals(NB, id_check, SPH_T%sph)
 !
-        call sph_transfer_test_6                                        &
-     &     (itype, SPH_TEST%sph, SPH_TEST%comms)
+        call sph_transfer_test_6(itype, SPH_T%sph, SPH_T%comms,         &
+     &                           m_SR_T%SR_sig, m_SR_T%SR_r)
         iflag(4) = compare_transfer_sph_reals                           &
-     &           (isix, id_check, SPH_TEST%sph)
+     &           (isix, id_check, SPH_T%sph)
 !
-        call sph_transfer_test_3                                        &
-     &     (itype, SPH_TEST%sph, SPH_TEST%comms)
+        call sph_transfer_test_3(itype, SPH_T%sph, SPH_T%comms,         &
+     &                           m_SR_T%SR_sig, m_SR_T%SR_r)
         iflag(5) = compare_transfer_sph_reals                           &
-     &        (ithree, id_check, SPH_TEST%sph)
+     &           (ithree, id_check, SPH_T%sph)
 !
-        call sph_transfer_test_2                                        &
-     &     (itype, SPH_TEST%sph, SPH_TEST%comms)
+        call sph_transfer_test_2(itype, SPH_T%sph, SPH_T%comms,         &
+     &                           m_SR_T%SR_sig, m_SR_T%SR_r)
         iflag(6) = compare_transfer_sph_reals                           &
-     &        (itwo, id_check, SPH_TEST%sph)
+     &           (itwo, id_check, SPH_T%sph)
 !
-        call sph_transfer_test_1                                        &
-     &     (itype, SPH_TEST%sph, SPH_TEST%comms)
+        call sph_transfer_test_1(itype, SPH_T%sph, SPH_T%comms,         &
+     &                           m_SR_T%SR_sig, m_SR_T%SR_r)
         iflag(7) = compare_transfer_sph_reals                           &
-     &        (ione, id_check, SPH_TEST%sph)
+     &           (ione, id_check, SPH_T%sph)
 !
         iflag_sum = iflag_sum + sum(iflag)
       end do

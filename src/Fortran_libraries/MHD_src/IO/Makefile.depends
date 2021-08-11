@@ -78,6 +78,6 @@ t_ctl_data_termal_norm.o: $(MHD_IO_DIR)/t_ctl_data_termal_norm.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_sph_boundary_input_data.o: $(MHD_IO_DIR)/t_sph_boundary_input_data.f90 m_precision.o t_spheric_rj_data.o t_each_sph_boundary_IO_data.o calypso_mpi_int.o calypso_mpi.o m_machine_parameter.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ucd_file.o: $(MHD_IO_DIR)/t_ucd_file.f90 m_precision.o m_constants.o t_time_data.o t_mesh_data.o t_comm_table.o t_geometry_data.o t_ucd_data.o t_phys_data.o t_file_IO_parameter.o t_IO_step_parameter.o calypso_mpi.o parallel_ucd_IO_select.o output_parallel_ucd_file.o
+t_ucd_file.o: $(MHD_IO_DIR)/t_ucd_file.f90 m_precision.o m_constants.o t_time_data.o t_mesh_data.o t_comm_table.o t_geometry_data.o t_ucd_data.o t_phys_data.o t_file_IO_parameter.o t_IO_step_parameter.o t_solver_SR.o t_solver_SR_int.o calypso_mpi.o parallel_ucd_IO_select.o output_parallel_ucd_file.o
 	$(F90) -c $(F90OPTFLAGS) $<
 

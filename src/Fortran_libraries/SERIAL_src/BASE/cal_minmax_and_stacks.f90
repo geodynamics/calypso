@@ -214,8 +214,8 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine count_number_4_smp( np_smp, istart, iend,              &
-     &        i_smp_stack, max_4_smp)
+      subroutine count_number_4_smp(np_smp, istart, iend,               &
+     &          i_smp_stack, max_4_smp)
 !
       integer(kind = kint), intent(in)  :: np_smp
       integer(kind = kint), intent(in)  :: istart, iend

@@ -69,8 +69,8 @@
       type(group_data), intent(in) :: old_nod_grp
       type(group_data), intent(inout) :: new_nod_grp
 !
-      character(len=kchara), parameter :: import_head = 'import'
-      character(len=kchara), parameter :: export_head = 'export'
+      character(len=kchara), parameter :: import_head = 'import_from'
+      character(len=kchara), parameter :: export_head = 'export_to'
       integer(kind = kint) :: n_import(num_pe)
       integer(kind = kint) :: n_export(num_pe)
 !

@@ -7,16 +7,18 @@
 !>@brief parallel UCD file output routines
 !!
 !!@verbatim
-!!      subroutine link_output_grd_file                                 &
-!!     &         (node, ele, nod_comm, nod_fld, ucd_param, ucd)
+!!      subroutine link_output_grd_file(node, ele, nod_comm, nod_fld,   &
+!!     &                                ucd_param, ucd, SR_sig, SR_i)
 !!      subroutine output_udt_one_snapshot(istep_ucd, ucd_param, time_d,&
-!!     &          node, ele, nod_comm, nod_fld)
+!!     &          node, ele, nod_comm, nod_fld, SR_sig, SR_i)
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!        type(time_data), intent(in) :: time_d
 !!        type(node_data), intent(in) :: node
 !!        type(element_data), intent(in) :: ele
 !!        type(communication_table), intent(in) :: nod_comm
 !!        type(phys_data), intent(in) :: nod_fld
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int_buffer), intent(inout) :: SR_i
 !!
 !!      subroutine link_output_ucd_file_once                            &
 !!     &         (istep_ucd, nod_fld, ucd_param, t_IO)
@@ -54,6 +56,8 @@
       use t_geometry_data
       use t_comm_table
       use t_phys_data
+      use t_solver_SR
+      use t_solver_SR_int
       use m_field_file_format
 !
       implicit none
@@ -64,8 +68,8 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine link_output_grd_file                                   &
-     &         (node, ele, nod_comm, nod_fld, ucd_param, ucd)
+      subroutine link_output_grd_file(node, ele, nod_comm, nod_fld,     &
+     &                                ucd_param, ucd, SR_sig, SR_i)
 !
       use merged_udt_vtk_file_IO
       use parallel_ucd_IO_select
@@ -78,14 +82,16 @@
       type(phys_data), intent(in) :: nod_fld
 !
       type(ucd_data), intent(inout) :: ucd
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int_buffer), intent(inout) :: SR_i
 !
 !
       call link_local_mesh_2_ucd(node, ele, ucd)
       call link_field_data_to_ucd(nod_fld, ucd)
 !
       if (ucd_param%iflag_format/icent .eq. iflag_single/icent) then
-        call init_merged_ucd_element                                    &
-     &     (ucd_param%iflag_format, node, ele, nod_comm, ucd)
+        call init_merged_ucd_element(ucd_param%iflag_format,            &
+     &      node, ele, nod_comm, ucd, SR_sig, SR_i)
       end if
 !
       call sel_write_parallel_ucd_mesh(ucd_param, ucd)
@@ -106,7 +112,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine output_udt_one_snapshot(istep_ucd, ucd_param, time_d,  &
-     &          node, ele, nod_comm, nod_fld)
+     &          node, ele, nod_comm, nod_fld, SR_sig, SR_i)
 !
       use merged_udt_vtk_file_IO
       use parallel_ucd_IO_select
@@ -120,6 +126,9 @@
       type(communication_table), intent(in) :: nod_comm
       type(phys_data), intent(in) :: nod_fld
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int_buffer), intent(inout) :: SR_i
+!
       type(time_data) :: t_IO
       type(ucd_data) :: ucd
 !
@@ -128,8 +137,8 @@
       call link_field_data_to_ucd(nod_fld, ucd)
 !
       if (ucd_param%iflag_format/icent .eq. iflag_single/icent) then
-        call init_merged_ucd_element                                    &
-     &     (ucd_param%iflag_format, node, ele, nod_comm, ucd)
+        call init_merged_ucd_element(ucd_param%iflag_format,            &
+     &      node, ele, nod_comm, ucd, SR_sig, SR_i)
       end if
 !
       call copy_time_step_size_data(time_d, t_IO)

@@ -9,11 +9,17 @@
 !!@verbatim
 !!      subroutine set_import_table_ctl(import_ctl)
 !!
-!!      subroutine check_calypso_sph_buf_N                              &
-!!     &         (NB, npe_send, istack_send, npe_recv, istack_recv)
+!!      subroutine check_calypso_sph_buf_N(NB, npe_send, istack_send,   &
+!!     &                                       npe_recv, istack_recv,   &
+!!     &                                       SR_sig, SR_r)
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!      subroutine sel_calypso_sph_comm_N            ,                  &
-!!     &             (NB, npe_send, isend_self, id_pe_send, istack_send,&
-!!     &                  npe_recv, irecv_self, id_pe_recv, istack_recv)
+!!     &                 (NB, npe_send, id_pe_send, istack_send,        &
+!!     &                  npe_recv, irecv_self, id_pe_recv, istack_recv,&
+!!     &                  SR_sig, SR_r)
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!
 !!      subroutine sel_calypso_to_send_N(NB, nnod_org, n_WS, nmax_sr,   &
 !!     &                    npe_send, istack_send, inod_export,         &
@@ -56,7 +62,8 @@
       use m_precision
       use m_work_time
       use m_elapsed_labels_SEND_RECV
-      use select_copy_from_recv
+!
+      use t_solver_SR
 !
       implicit none
 !
@@ -66,54 +73,55 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine check_calypso_sph_buf_N                                &
-     &         (NB, npe_send, istack_send, npe_recv, istack_recv)
+      subroutine check_calypso_sph_buf_N(NB, npe_send, istack_send,     &
+     &                                       npe_recv, istack_recv,     &
+     &                                       SR_sig, SR_r)
 !
-      use t_solver_SR
-      use m_solver_SR
       use set_to_send_buffer
 !
       integer(kind = kint), intent(in) :: NB
-!
       integer(kind = kint), intent(in) :: npe_send
       integer(kind = kint), intent(in) :: istack_send(0:npe_send)
-!
       integer(kind = kint), intent(in) :: npe_recv
       integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
 !
       call resize_work_SR(NB, npe_send, npe_recv,                       &
-     &    istack_send(npe_send), istack_recv(npe_recv), SR_sig1, SR_r1)
+     &    istack_send(npe_send), istack_recv(npe_recv), SR_sig, SR_r)
 !
       end subroutine check_calypso_sph_buf_N
 !
 !-----------------------------------------------------------------------
 !
       subroutine sel_calypso_sph_comm_N                                 &
-     &             (NB, npe_send, isend_self, id_pe_send, istack_send,  &
-     &                  npe_recv, irecv_self, id_pe_recv, istack_recv)
+     &                 (NB, npe_send, id_pe_send, istack_send,          &
+     &                  npe_recv, irecv_self, id_pe_recv, istack_recv,  &
+     &                  SR_sig, SR_r)
 !
-      use m_solver_SR
       use calypso_SR_core
       use set_from_recv_buf_rev
 !
       integer(kind = kint), intent(in) :: NB
-!
-      integer(kind = kint), intent(in) :: npe_send, isend_self
+      integer(kind = kint), intent(in) :: npe_send
       integer(kind = kint), intent(in) :: id_pe_send(npe_send)
       integer(kind = kint), intent(in) :: istack_send(0:npe_send)
-!
       integer(kind = kint), intent(in) :: npe_recv, irecv_self
       integer(kind = kint), intent(in) :: id_pe_recv(npe_recv)
       integer(kind = kint), intent(in) :: istack_recv(0:npe_recv)
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
+!
 !
       if(iflag_CSR_time) call start_elapsed_time(ist_elapsed_CSR+2)
       call calypso_send_recv_core                                       &
-     &   (NB, npe_send, id_pe_send, istack_send, SR_r1%WS(1),           &
+     &   (NB, npe_send, id_pe_send, istack_send, SR_r%WS(1),            &
      &        npe_recv, id_pe_recv, istack_recv, irecv_self,            &
-     &        SR_r1%WR(1), SR_sig1)
-      call clear_addtional_SR_recv(NB, istack_recv(npe_recv), SR_r1%WR)
+     &        SR_r%WR(1), SR_sig)
+      call clear_addtional_SR_recv(NB, istack_recv(npe_recv), SR_r%WR)
       if(iflag_CSR_time) call end_elapsed_time(ist_elapsed_CSR+2)
 !
       end subroutine sel_calypso_sph_comm_N
@@ -237,6 +245,7 @@
      &                    irev_import, ncomp_X, i_fld_X, i_fld_WR,      &
      &                    WR, d_new)
 !
+      use select_copy_from_recv
       use field_to_send_buffer
 !
       integer(kind = kint), intent(in) :: iflag_recv
@@ -275,6 +284,7 @@
      &                    irev_import, ncomp_X, i_fld_X, i_fld_WR,      &
      &                    WR, d_new)
 !
+      use select_copy_from_recv
       use field_to_send_buffer
 !
       integer(kind = kint), intent(in) :: iflag_recv
@@ -313,6 +323,7 @@
      &                    irev_import, ncomp_X, i_fld_X, i_fld_WR,      &
      &                    WR, d_new)
 !
+      use select_copy_from_recv
       use field_to_send_buffer
 !
       integer(kind = kint), intent(in) :: iflag_recv
@@ -351,6 +362,7 @@
      &                    npe_recv, istack_recv, inod_import,           &
      &                    irev_import, WR, X_new)
 !
+      use select_copy_from_recv
       use set_from_recv_buffer
       use set_from_recv_buf_rev
 !

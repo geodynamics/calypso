@@ -7,17 +7,18 @@
 !>@brief  Routines to construca element communication table
 !!
 !!@verbatim
-!!      subroutine num_items_send_recv(npe_send, irank_send, num_send,  &
-!!     &                               npe_recv, irank_recv, iflag_self,&
-!!     &                               num_recv, istack_recv, ntot_recv)
+!!      subroutine num_items_send_recv(npe_send, irank_send,            &
+!!     &          num_send, npe_recv, irank_recv, iflag_self,           &
+!!     &          num_recv, istack_recv, ntot_recv, SR_sig)
 !!      subroutine comm_items_send_recv                                 &
 !!     &         (npe_send, irank_send, istack_send, item_send,         &
 !!     &          npe_recv, irank_recv, istack_recv, iflag_self,        &
-!!     &          item_recv)
+!!     &          item_recv, SR_sig)
 !!      subroutine int8_items_send_recv                                 &
 !!     &         (npe_send, irank_send, istack_send, item8_send,        &
 !!     &          npe_recv, irank_recv, istack_recv, iflag_self,        &
-!!     &          item8_recv)
+!!     &          item8_recv, SR_sig)
+!!        type(send_recv_status), intent(inout) :: SR_sig
 !!
 !!      subroutine local_node_id_reverse_SR(numnod, num_neib, id_neib,  &
 !!     &         istack_import, item_import, istack_export, item_export,&
@@ -39,9 +40,9 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine num_items_send_recv(npe_send, irank_send, num_send,    &
-     &                               npe_recv, irank_recv, iflag_self,  &
-     &                               num_recv, istack_recv, ntot_recv)
+      subroutine num_items_send_recv(npe_send, irank_send,              &
+     &          num_send, npe_recv, irank_recv, iflag_self,             &
+     &          num_recv, istack_recv, ntot_recv, SR_sig)
 !
       use solver_SR_int
       use cal_minmax_and_stacks
@@ -56,17 +57,15 @@
       integer(kind = kint), intent(inout) :: ntot_recv
       integer(kind = kint), intent(inout) :: num_recv(npe_recv)
       integer(kind = kint), intent(inout) :: istack_recv(0:npe_recv)
+      type(send_recv_status), intent(inout) :: SR_sig
 !
-      type(send_recv_status) :: iSR_sig
 !
-!
-      call resize_SR_flag(npe_send, npe_recv, iSR_sig)
+      call resize_SR_flag(npe_send, npe_recv, SR_sig)
       call calypso_send_recv_num(npe_send, irank_send, num_send,        &
      &                           npe_recv, irank_recv, iflag_self,      &
-     &                           num_recv, iSR_sig)
+     &                           num_recv, SR_sig)
       call s_cal_total_and_stacks(npe_recv, num_recv, izero,            &
      &                            istack_recv, ntot_recv)
-      call dealloc_SR_flag(iSR_sig)
 !
       end subroutine  num_items_send_recv
 !
@@ -75,7 +74,7 @@
       subroutine comm_items_send_recv                                   &
      &         (npe_send, irank_send, istack_send, item_send,           &
      &          npe_recv, irank_recv, istack_recv, iflag_self,          &
-     &          item_recv)
+     &          item_recv, SR_sig)
 !
       use solver_SR_int
 !
@@ -92,16 +91,14 @@
 !
       integer(kind = kint), intent(inout)                               &
      &                 :: item_recv(istack_recv(npe_recv))
+      type(send_recv_status), intent(inout) :: SR_sig
 !
-      type(send_recv_status) :: iSR_sig
 !
-!
-      call resize_SR_flag(npe_send, npe_recv, iSR_sig)
+      call resize_SR_flag(npe_send, npe_recv, SR_sig)
       call calypso_send_recv_intcore                                    &
      &   (npe_send, irank_send, istack_send, item_send, iflag_self,     &
-     &    npe_recv, irank_recv, istack_recv, item_recv, iSR_sig)
-      call calypso_send_recv_fin(npe_send, iflag_self, iSR_sig)
-      call dealloc_SR_flag(iSR_sig)
+     &    npe_recv, irank_recv, istack_recv, item_recv, SR_sig)
+      call calypso_send_recv_fin(npe_send, iflag_self, SR_sig)
 !
       end subroutine comm_items_send_recv
 !
@@ -110,7 +107,7 @@
       subroutine int8_items_send_recv                                   &
      &         (npe_send, irank_send, istack_send, item8_send,          &
      &          npe_recv, irank_recv, istack_recv, iflag_self,          &
-     &          item8_recv)
+     &          item8_recv, SR_sig)
 !
       use solver_SR_int8
 !
@@ -127,16 +124,14 @@
 !
       integer(kind = kint_gl), intent(inout)                            &
      &                 :: item8_recv(istack_recv(npe_recv))
+      type(send_recv_status), intent(inout) :: SR_sig
 !
-      type(send_recv_status) :: iSR_sig
 !
-!
-      call resize_SR_flag(npe_send, npe_recv, iSR_sig)
+      call resize_SR_flag(npe_send, npe_recv, SR_sig)
       call calypso_send_recv_i8core                                     &
      &   (npe_send, irank_send, istack_send, item8_send, iflag_self,    &
-     &    npe_recv, irank_recv, istack_recv, item8_recv, iSR_sig)
-      call calypso_send_recv_fin(npe_send, iflag_self, iSR_sig)
-      call dealloc_SR_flag(iSR_sig)
+     &    npe_recv, irank_recv, istack_recv, item8_recv, SR_sig)
+      call calypso_send_recv_fin(npe_send, iflag_self, SR_sig)
 !
       end subroutine int8_items_send_recv
 !

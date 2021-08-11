@@ -10,13 +10,40 @@
 !!      subroutine count_number_of_node_stack(nnod, istack_nod_list)
 !!      subroutine count_number_of_node_stack4(nnod, istack_nod_list)
 !!      subroutine set_global_ele_id(txt, nele, istack_internal_e,      &
-!!     &         internal_flag, e_comm, iele_global)
-!!      subroutine check_global_ele_id                                  &
-!!     &         (txt, nele, internal_flag, e_comm, iele_global)
+!!     &          internal_flag, e_comm, iele_global, SR_sig, SR_il)
+!!        character(len=kchara), intent(in) :: txt
+!!        integer(kind = kint), intent(in) :: nele
+!!        integer(kind = kint), intent(in) :: internal_flag(nele)
+!!        integer(kind = kint_gl), intent(in)                           &
+!!     &        :: istack_internal_e(0:nprocs)
 !!        type(communication_table), intent(in) :: e_comm
+!!        integer(kind = kint_gl), intent(inout)  :: iele_global(nele)
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
+!!      subroutine check_global_ele_id(txt, nele, internal_flag,        &
+!!     &          e_comm, iele_global, SR_sig, SR_il)
+!!        character(len=kchara), intent(in) :: txt
+!!        integer(kind = kint), intent(in) :: nele
+!!        integer(kind = kint), intent(in) :: internal_flag(nele)
+!!        type(communication_table), intent(in) :: e_comm
+!!        integer(kind = kint_gl), intent(in)  :: iele_global(nele)
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
 !!      subroutine check_element_position(txt, nnod, inod_global,       &
 !!     &          nele, nnod_4_ele, ie, iele_global, x_ele,             &
-!!     &          inod_dbl, iele_dbl, e_comm)
+!!     &          inod_dbl, iele_dbl, e_comm, SR_sig, SR_r)
+!!        character(len=kchara), intent(in) :: txt
+!!        integer(kind = kint), intent(in) :: nnod
+!!        integer(kind = kint_gl), intent(in) :: inod_global(nele)
+!!        integer(kind = kint), intent(in) :: nele, nnod_4_ele
+!!        integer(kind = kint), intent(in) :: ie(nele,nnod_4_ele)
+!!        integer(kind = kint_gl), intent(in) :: iele_global(nele)
+!!        real(kind = kreal), intent(in)  :: x_ele(nele,3)
+!!        type(node_ele_double_number), intent(in) :: inod_dbl
+!!        type(element_double_number), intent(in) ::  iele_dbl
+!!        type(communication_table), intent(in) :: e_comm
+!!        type(send_recv_status), intent(inout) :: SR_sig
+!!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!@endverbatim
 !!
       module const_global_element_ids
@@ -25,6 +52,9 @@
       use m_constants
       use m_machine_parameter
       use calypso_mpi
+!
+      use t_solver_SR
+      use t_comm_table
 !
       implicit none
 !
@@ -93,10 +123,9 @@
 !-----------------------------------------------------------------------
 !
       subroutine set_global_ele_id(txt, nele, istack_internal_e,        &
-     &          internal_flag, e_comm, iele_global)
+     &          internal_flag, e_comm, iele_global, SR_sig, SR_il)
 !
-      use m_solver_SR
-      use t_comm_table
+      use t_solver_SR_int8
       use solver_SR_type
 !
       character(len=kchara), intent(in) :: txt
@@ -108,6 +137,8 @@
       type(communication_table), intent(in) :: e_comm
 !
       integer(kind = kint_gl), intent(inout)  :: iele_global(nele)
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int8_buffer), intent(inout) :: SR_il
 !
       integer(kind = kint) :: iele, icou
 !
@@ -123,7 +154,7 @@
       end do
 !
       call SOLVER_SEND_RECV_int8_type(nele, e_comm,                     &
-     &                                SR_sig1, SR_il1, iele_global)
+     &                                SR_sig, SR_il, iele_global)
 !
       do iele = 1, nele
         if(iele_global(iele) .eq. 0)  write(*,*)                        &
@@ -134,11 +165,10 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine check_global_ele_id                                    &
-     &         (txt, nele, internal_flag, e_comm, iele_global)
+      subroutine check_global_ele_id(txt, nele, internal_flag,          &
+     &          e_comm, iele_global, SR_sig, SR_il)
 !
-      use m_solver_SR
-      use t_comm_table
+      use t_solver_SR_int8
       use solver_SR_type
 !
       character(len=kchara), intent(in) :: txt
@@ -148,6 +178,9 @@
       type(communication_table), intent(in) :: e_comm
 !
       integer(kind = kint_gl), intent(in)  :: iele_global(nele)
+!
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_int8_buffer), intent(inout) :: SR_il
 !
       integer(kind = kint_gl), allocatable :: iele_comm(:)
       integer(kind = kint) :: iele
@@ -166,7 +199,7 @@
 !$omp end parallel do
 !
       call SOLVER_SEND_RECV_int8_type(nele, e_comm,                     &
-     &                                SR_sig1, SR_il1, iele_comm)
+     &                                SR_sig, SR_il, iele_comm)
 !
       do iele = 1, nele
         if(iele_comm(iele) .ne. iele_global(iele))  write(*,*)          &
@@ -181,10 +214,8 @@
 !
       subroutine check_element_position(txt, nnod, inod_global,         &
      &          nele, nnod_4_ele, ie, iele_global, x_ele,               &
-     &          inod_dbl, iele_dbl, e_comm)
+     &          inod_dbl, iele_dbl, e_comm, SR_sig, SR_r)
 !
-      use m_solver_SR
-      use t_comm_table
       use t_para_double_numbering
       use t_element_double_number
       use calypso_mpi_int
@@ -202,6 +233,8 @@
       type(element_double_number), intent(in) ::  iele_dbl
       type(communication_table), intent(in) :: e_comm
 !
+      type(send_recv_status), intent(inout) :: SR_sig
+      type(send_recv_real_buffer), intent(inout) :: SR_r
 !
       real(kind = kreal) :: dx, dy, dz
       real(kind = kreal), allocatable :: x_test(:)
@@ -249,7 +282,7 @@
 !$omp end parallel do
 !
       call SOLVER_SEND_RECV_3_type(nele, e_comm,                        &
-     &                             SR_sig1, SR_r1, x_test(1))
+     &                             SR_sig, SR_r, x_test(1))
 !
       iflag = 0
       do iele = 1, nele

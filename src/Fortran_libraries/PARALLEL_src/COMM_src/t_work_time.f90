@@ -241,9 +241,9 @@
       write(id_timer_file,'(a)') 'Average and standard deviation'
       do i = 1, elps%num_elapsed
         if(elps%elapsed_ave(i) .gt. zero) then
-          write(id_timer_file,'(i3,a2,a,a2,1p2e15.6)')                  &
-     &        i, '. ', trim(elps%labels(i)), ': ',                      &
-     &        elps%elapsed_ave(i), elps%elapsed_std(i)
+          write(id_timer_file,'(i3,a2,1p2e15.6,a2,a)')                  &
+     &        i, ': ', elps%elapsed_ave(i), elps%elapsed_std(i),        &
+     &           ': ', trim(elps%labels(i))
         end if
       end do
 !
@@ -251,9 +251,9 @@
       write(id_timer_file,'(a)') 'Minimum and maximum elapsed time'
       do i = 1, elps%num_elapsed
         if(elps%elapsed_ave(i) .gt. zero) then
-          write(id_timer_file,'(i3,a2,a,a2,1p2e15.6)')                  &
-     &            i, '. ', trim(elps%labels(i)), ': ',                  &
-     &            elps%elapsed_min(i), elps%elapsed_max(i)
+          write(id_timer_file,'(i3,a2,1p2e15.6,a2,a)')                  &
+     &            i, ': ', elps%elapsed_min(i), elps%elapsed_max(i),    &
+     &               ': ', trim(elps%labels(i))
          end if
       end do
       close(id_timer_file)
