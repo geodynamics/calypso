@@ -72,7 +72,7 @@
 !
       trans_p%iflag_FFT = iflag_FFTPACK_ONCE
       if(WK_leg%id_legendre .eq. iflag_leg_undefined) then
-        WK_leg%id_legendre = iflag_leg_sym_dgemm_big
+        WK_leg%id_legendre = iflag_leg_sym_matmul_big
       end if
 !
       call initialize_legendre_trans                                    &

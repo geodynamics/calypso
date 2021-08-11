@@ -138,6 +138,7 @@
      &                   (mevo_ctl%Legendre_trans_type%charavalue)
       end if
 !
+      trans_p%iflag_FFT = iflag_UNDEFINED_FFT
       if(mevo_ctl%FFT_library%iflag .gt. 0) then
         trans_p%iflag_FFT                                               &
      &     = set_fft_library_ctl(mevo_ctl%FFT_library%charavalue)

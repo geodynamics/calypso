@@ -10,14 +10,28 @@
 !!      subroutine defleate_endian_flag(zbuf)
 !!      subroutine defleate_int8_vector_b(num, int8_dat, zbuf)
 !!      subroutine defleate_1d_vector_b(num, real_dat, zbuf)
+!!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!      subroutine defleate_1d_character_b(num, chara_dat, zbuf)
+!!        integer(kind = kint_gl), intent(in) :: num
+!!        character(len=kchara), intent(in) :: chara_dat(num)
+!!        type(buffer_4_gzip), intent(inout) :: zbuf
+!!      subroutine defleate_characters_b(num, chara_dat, zbuf)
+!!        integer(kind = kint_gl), intent(in) :: num
+!!        character(len=1), intent(in) :: chara_dat(num)
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!
 !!      subroutine infleate_endian_flag(id_rank, iflag_swap, zbuf)
 !!      subroutine infleate_int8_vector_b(num, int8_dat, zbuf)
 !!      subroutine infleate_1d_vector_b(num, real_dat, zbuf)
+!!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!      subroutine infleate_1d_character_b(num, chara_dat, zbuf)
-!!          type(buffer_4_gzip), intent(inout) :: zbuf
+!!        integer(kind = kint_gl), intent(in) :: num
+!!        character(len=kchara), intent(inout) :: chara_dat(num)
+!!        type(buffer_4_gzip), intent(inout) :: zbuf
+!!      subroutine infleate_characters_b(num, chara_dat, zbuf)
+!!        integer(kind = kint_gl), intent(in) :: num
+!!        character(len=1), intent(inout) :: chara_dat(num)
+!!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!@endverbatim
 !
       module data_convert_by_zlib
@@ -158,6 +172,39 @@
       end subroutine defleate_1d_character_b
 !
 ! -----------------------------------------------------------------------
+!
+      subroutine defleate_characters_b(num, chara_dat, zbuf)
+!
+      use gzip_defleate
+!
+      integer(kind = kint_gl), intent(in) :: num
+      character(len=1), intent(in) :: chara_dat(num)
+!
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer(kind = kint_gl) :: ist, ilen_tmp
+      integer :: ilen_in, ilen_line
+!
+!
+      zbuf%ilen_gz = int(dble(num)*1.01 + 24,KIND(zbuf%ilen_gz))
+      call alloc_zip_buffer(zbuf)
+      zbuf%ilen_gzipped = 0
+!
+      ist = 0
+      ilen_tmp = int(dble(huge_30) * 1.01 + 24,KIND(ilen_tmp))
+      do
+        ilen_line = int(min((num - ist), huge_30))
+        ilen_in = int(min(zbuf%ilen_gz-zbuf%ilen_gzipped, ilen_tmp))
+!
+        call gzip_defleat_char_once(ilen_line, chara_dat(ist+1),        &
+     &      ilen_in, zbuf, zbuf%gzip_buf(zbuf%ilen_gzipped+1))
+        ist = ist + ilen_line
+        if(ist .ge. num) exit
+      end do
+!
+      end subroutine defleate_characters_b
+!
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine infleate_endian_flag(id_rank, iflag_swap, zbuf)
@@ -278,6 +325,37 @@
       end do
 !
       end subroutine infleate_1d_character_b
+!
+! -----------------------------------------------------------------------
+!
+      subroutine infleate_characters_b(num, chara_dat, zbuf)
+!
+      use gzip_infleate
+!
+      integer(kind = kint_gl), intent(in) :: num
+      character(len=1), intent(inout) :: chara_dat(num)
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer(kind = kint_gl) :: ist, ilen_tmp
+      integer :: ilen_in, ilen_line
+!
+!
+      ist = 0
+      zbuf%ilen_gzipped = 0
+      ilen_tmp = int(dble(huge_30) * 1.01 + 24,KIND(ilen_tmp))
+      do
+        ilen_line = int(min((num - ist), huge_30))
+        ilen_in = int(min(zbuf%ilen_gz-zbuf%ilen_gzipped, ilen_tmp))
+!
+        call gzip_infleat_char_once                                     &
+     &     (ilen_in, zbuf%gzip_buf(zbuf%ilen_gzipped+1),                &
+     &      ilen_line, chara_dat(ist+1), zbuf)
+!
+        ist = ist + ilen_line
+        if(ist .ge. num) exit
+      end do
+!
+      end subroutine infleate_characters_b
 !
 ! -----------------------------------------------------------------------
 !

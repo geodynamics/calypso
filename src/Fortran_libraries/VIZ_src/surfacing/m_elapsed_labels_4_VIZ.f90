@@ -161,7 +161,7 @@
 !
       subroutine elpsed_label_4_LIC
 !
-      integer(kind = kint), parameter :: num_append = 6
+      integer(kind = kint), parameter :: num_append = 9
 !
 !
       call append_elapsed_times                                         &
@@ -178,7 +178,13 @@
       elps1%labels(ist_elapsed_LIC+5)                                   &
      &                    = 'LIC V. Rendering subimage composit   '
       elps1%labels(ist_elapsed_LIC+6)                                   &
-     &                    = 'LIC V. Rendering domain repartition   '
+     &                    = 'LIC V. Rendering domain repartition  '
+      elps1%labels(ist_elapsed_LIC+7)                                   &
+     &                    = 'LIC data transfer to new domain  '
+      elps1%labels(ist_elapsed_LIC+8)                                   &
+     &                    = 'FEM_mesh_initialization for LIC mesh  '
+      elps1%labels(ist_elapsed_LIC+9)                                   &
+     &                    = 'Data IO for line integration counts   '
 !
       iflag_LIC_time = .TRUE.
 !

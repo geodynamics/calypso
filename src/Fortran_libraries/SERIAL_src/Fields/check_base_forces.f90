@@ -1,11 +1,14 @@
 !>@file   check_base_forces.f90
 !!        module check_base_forces
 !!
-!! @author H. Matsui
-!! @date   Programmed in Jan., 2020
+!!@author H. Matsui (UC Davis)
+!!@n      and T. Kera (Tohoku University)
+!!
+!!@date   Programmed in Jan., 2020
+!!@n      Modified in July, 2021
 !!
 !!
-!> @brief Check Dependecies for basic forces
+!>@brief Check Dependecies for basic forces
 !!
 !!@verbatim
 !!      subroutine add_field_ctl_4_forces(field_ctl)

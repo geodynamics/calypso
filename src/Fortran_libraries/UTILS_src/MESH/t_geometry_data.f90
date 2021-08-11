@@ -156,6 +156,8 @@
         real (kind=kreal), allocatable :: a_vol_ele(:)
 !
 !
+!>      Volume of subdomain
+        real(kind=kreal) :: volume_local
 !>      Volume of domain
         real(kind=kreal) :: volume
 !>      1 / (Volume)
