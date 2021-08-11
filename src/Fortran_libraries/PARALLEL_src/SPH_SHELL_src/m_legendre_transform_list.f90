@@ -124,15 +124,20 @@
       character(len = kchara), parameter                                &
      &           :: on_the_fly_matprod =  'On_the_fly_Plm'
 !
-!>      Character flag to perform Legendre transform 
+!>      Character flag to sarch fastest Legendre transform loop
+      character(len = kchara), parameter                                &
+     &           :: leg_search_fastest =  'Search_fastest'
+!>      Character flag to perform Legendre transform
 !@n     with testing loop
       character(len = kchara), parameter                                &
      &           :: leg_test_loop =      'Test_Loop'
 !
 !
 !
+!>      integer undefined flag for Legendre transform
+      integer(kind = kint), parameter :: iflag_leg_undefined =  -999
 !>      integer flag to run elpse time check for legendre transform
-      integer(kind = kint), parameter :: iflag_leg_undefined =    -1
+      integer(kind = kint), parameter :: iflag_leg_compare =      -1
 !
 !>      integer flag to perform Legendre transform with symmetry
       integer(kind = kint), parameter :: iflag_leg_symmetry =      1
@@ -190,46 +195,48 @@
       use skip_comment_f
 !
       character(len = kchara), intent(in) :: tranx_loop_ctl
+      integer(kind = kint) :: iflag
 !
 !
+      iflag = iflag_leg_undefined
       if(     cmp_no_case(tranx_loop_ctl, leg_test_loop)) then
-        set_legendre_trans_mode_ctl = iflag_leg_test_loop
+        iflag = iflag_leg_test_loop
+      else if(cmp_no_case(tranx_loop_ctl, leg_search_fastest)) then
+        iflag = iflag_leg_compare
 !
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_org_loop)) then
-        set_legendre_trans_mode_ctl = iflag_leg_symmetry
+        iflag = iflag_leg_symmetry
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_spin_loop)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_spin_loop
+        iflag = iflag_leg_sym_spin_loop
 !
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_matmul)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_matmul
+        iflag = iflag_leg_sym_matmul
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_dgemm)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_dgemm
+        iflag = iflag_leg_sym_dgemm
 !
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_matmul_big)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_matmul_big
+        iflag = iflag_leg_sym_matmul_big
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_dgemm_big)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_dgemm_big
+        iflag = iflag_leg_sym_dgemm_big
 !
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_mat_jt)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_mat_jt
+        iflag = iflag_leg_sym_mat_jt
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_dgemm_jt)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_dgemm_jt
+        iflag = iflag_leg_sym_dgemm_jt
 !
       else if(cmp_no_case(tranx_loop_ctl, leg_sym_mat_tj)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_mat_tj
+        iflag = iflag_leg_sym_mat_tj
       else if(cmp_no_case(tranx_loop_ctl, leg_dgemm_tj)) then
-        set_legendre_trans_mode_ctl = iflag_leg_sym_dgemm_tj
+        iflag = iflag_leg_sym_dgemm_tj
 !
       else if(cmp_no_case(tranx_loop_ctl, on_the_fly_matmul)) then
-        set_legendre_trans_mode_ctl = iflag_on_the_fly_matmul
+        iflag = iflag_on_the_fly_matmul
       else if(cmp_no_case(tranx_loop_ctl, on_the_fly_dgemm)) then
-        set_legendre_trans_mode_ctl = iflag_on_the_fly_dgemm
+        iflag = iflag_on_the_fly_dgemm
       else if(cmp_no_case(tranx_loop_ctl, on_the_fly_matprod)) then
-        set_legendre_trans_mode_ctl = iflag_on_the_fly_matprod
-!
-      else
-        set_legendre_trans_mode_ctl = iflag_leg_symmetry
+        iflag = iflag_on_the_fly_matprod
       end if
+      set_legendre_trans_mode_ctl = iflag
 !
       end function set_legendre_trans_mode_ctl
 !
@@ -238,43 +245,45 @@
       character(len = kchara) function chosen_legendre_name(i_mode)
 !
       integer(kind = kint), intent(in) :: i_mode
+      character(len = kchara) :: tmpchara
 !
 !
       if     (i_mode .eq. iflag_leg_symmetry) then
-        chosen_legendre_name = leg_sym_org_loop
+        tmpchara = leg_sym_org_loop
       else if(i_mode .eq. iflag_leg_sym_spin_loop) then
-        chosen_legendre_name = leg_sym_spin_loop
+        tmpchara = leg_sym_spin_loop
 !
       else if(i_mode .eq. iflag_leg_sym_matmul) then
-        chosen_legendre_name = leg_sym_matmul
+        tmpchara = leg_sym_matmul
       else if(i_mode .eq. iflag_leg_sym_dgemm) then
-        chosen_legendre_name = leg_sym_dgemm
+        tmpchara = leg_sym_dgemm
 !
       else if(i_mode .eq. iflag_leg_sym_matmul_big) then
-        chosen_legendre_name = leg_sym_matmul_big
+        tmpchara = leg_sym_matmul_big
       else if(i_mode .eq. iflag_leg_sym_dgemm_big) then
-        chosen_legendre_name = leg_sym_dgemm_big
+        tmpchara = leg_sym_dgemm_big
 !
       else if(i_mode .eq. iflag_leg_sym_mat_jt) then
-        chosen_legendre_name = leg_sym_mat_jt
+        tmpchara = leg_sym_mat_jt
       else if(i_mode .eq. iflag_leg_sym_dgemm_jt) then
-        chosen_legendre_name = leg_sym_dgemm_jt
+        tmpchara = leg_sym_dgemm_jt
 !
       else if(i_mode .eq. iflag_leg_sym_mat_tj) then
-        chosen_legendre_name = leg_sym_mat_tj
+        tmpchara = leg_sym_mat_tj
       else if(i_mode .eq. iflag_leg_sym_dgemm_tj) then
-        chosen_legendre_name = leg_dgemm_tj
+        tmpchara = leg_dgemm_tj
 !
       else if(i_mode .eq. iflag_on_the_fly_matmul) then
-        chosen_legendre_name = on_the_fly_matmul
+        tmpchara = on_the_fly_matmul
       else if(i_mode .eq. iflag_on_the_fly_dgemm) then
-        chosen_legendre_name = on_the_fly_dgemm
+        tmpchara = on_the_fly_dgemm
       else if(i_mode .eq. iflag_on_the_fly_matprod) then
-        chosen_legendre_name = on_the_fly_matprod
+        tmpchara = on_the_fly_matprod
 !
       else if(i_mode .eq. iflag_leg_test_loop) then
-        chosen_legendre_name = leg_test_loop
+        tmpchara = leg_test_loop
       end if
+      chosen_legendre_name = tmpchara
 !
       end function chosen_legendre_name
 !
