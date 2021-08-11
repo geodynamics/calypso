@@ -84,7 +84,14 @@
       integer(kind = kint), intent(inout) :: iflag_FFT_MHD
 !
 !
+!
       if(iflag_FFT_MHD .eq. iflag_UNDEFINED_FFT) then
+#ifdef FFTW3
+        iflag_FFT_MHD = iflag_FFTW_SINGLE
+#else
+        iflag_FFT_MHD = iflag_FFTPACK_ONCE
+#endif
+      else if(iflag_FFT_MHD .eq. iflag_SEARCH_FASTEST_FFT) then
         call compare_FFT_4_MHD(sph_rtp, comm_rtp,                       &
      &      SR_r%n_WS, SR_r%n_WR, SR_r%WS, SR_r%WR, trns_MHD, WK_FFTs)
         iflag_FFT_MHD = iflag_selected

@@ -1,9 +1,11 @@
 !>@file   m_field_product_labels.f90
 !!        module m_field_product_labels
 !!
-!! @author H. Matsui
-!! @date   Programmed in Jan., 2020
+!!@author H. Matsui (UC Davis)
+!!@n      and T. Kera (Tohoku University)
 !!
+!!@date   Programmed in Jan., 2020
+!!@n      Modified in July, 2021
 !!
 !> @brief Labels and addresses for products of forces
 !!

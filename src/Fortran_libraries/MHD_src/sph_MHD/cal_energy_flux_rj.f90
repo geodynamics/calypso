@@ -1,10 +1,10 @@
 !> @file  cal_energy_flux_rj.f90
 !!      module cal_energy_flux_rj
 !!
-!! @author  H. Matsui
 !! @date Programmed in Oct., 2009
 !! @n    Modified in Apr., 2013
-!
+!!@n      Modified in July, 2021
+!!
 !> @brief Evaluate energy fluxes for MHD dynamo in physical space
 !!
 !!@verbatim

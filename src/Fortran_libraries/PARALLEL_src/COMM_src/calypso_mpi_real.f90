@@ -229,7 +229,7 @@
       subroutine calypso_mpi_allgather_real                             &
      &         (sendbuf, n_send, recvbuf, n_recv)
 !
-      integer(kind =kint), intent(in) :: n_send, n_recv
+      integer(kind = kint), intent(in) :: n_send, n_recv
       real(kind = kreal), intent(in) ::    sendbuf(n_send)
       real(kind = kreal), intent(inout) :: recvbuf(nprocs*n_recv)
 !

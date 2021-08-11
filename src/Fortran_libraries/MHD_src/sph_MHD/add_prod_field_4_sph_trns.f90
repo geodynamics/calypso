@@ -1,8 +1,11 @@
 !>@file   add_prod_field_4_sph_trns.f90
 !!@brief  module add_prod_field_4_sph_trns
 !!
-!!@author H. Matsui
-!!@date Programmed in Jan., 2010
+!!@author H. Matsui (UC Davis)
+!!@n      and T. Kera (Tohoku University)
+!!
+!!@date   Programmed in 2010
+!!@n      Modified in July, 2021
 !
 !>@brief Products of field addresses for spherical harmonics transform
 !!       in MHD dynamo simulation
