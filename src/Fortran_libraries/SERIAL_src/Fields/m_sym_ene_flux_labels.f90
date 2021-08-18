@@ -50,7 +50,7 @@
 !>        Field label of work of inertia
 !!         @f$ u_{i} (\tilde{u}_{j} \partial_{j} \tilde{u}_{i}) @f$,
 !!         @f$ u_{i} (e_{ijk} \tilde{\omega}_{j} \tilde{u}_{k}) @f$
-        type(field_def), parameter :: -us_d_ws_x_ua            &
+        type(field_def), parameter :: mns_us_d_ws_x_ua            &
         &    = field_def(n_comp = n_scalar,                                &
         &                name = '-us_d_ws_x_ua',                &
         &                math = '$ u_{i} (e_{ijk}'                         &
@@ -58,7 +58,7 @@
 !>        Field label of work of inertia
 !!         @f$ u_{i} (\tilde{u}_{j} \partial_{j} \tilde{u}_{i}) @f$,
 !!         @f$ u_{i} (e_{ijk} \tilde{\omega}_{j} \tilde{u}_{k}) @f$
-        type(field_def), parameter :: -us_d_wa_x_us            &
+        type(field_def), parameter :: mns_us_d_wa_x_us            &
         &    = field_def(n_comp = n_scalar,                                &
         &                name = '-us_d_wa_x_us',                &
         &                math = '$ u_{i} (e_{ijk}'                         &
@@ -66,7 +66,7 @@
 !>        Field label of work of inertia
 !!         @f$ u_{i} (\tilde{u}_{j} \partial_{j} \tilde{u}_{i}) @f$,
 !!         @f$ u_{i} (e_{ijk} \tilde{\omega}_{j} \tilde{u}_{k}) @f$
-        type(field_def), parameter :: -ua_d_ws_x_us            &
+        type(field_def), parameter :: mns_ua_d_ws_x_us            &
         &    = field_def(n_comp = n_scalar,                                &
         &                name = '-ua_d_ws_x_us',                &
         &                math = '$ u_{i} (e_{ijk}'                         &
@@ -74,7 +74,7 @@
 !>        Field label of work of inertia
 !!         @f$ u_{i} (\tilde{u}_{j} \partial_{j} \tilde{u}_{i}) @f$,
 !!         @f$ u_{i} (e_{ijk} \tilde{\omega}_{j} \tilde{u}_{k}) @f$
-        type(field_def), parameter :: -ua_d_wa_x_ua            &
+        type(field_def), parameter :: mns_ua_d_wa_x_ua            &
         &    = field_def(n_comp = n_scalar,                                &
         &                name = '-ua_d_wa_x_ua',                &
         &                math = '$ u_{i} (e_{ijk}'                         &
@@ -130,10 +130,10 @@
 !
 !
         check_enegy_fluxes_w_sym                              &
-        &   =    (field_name .eq. -us_d_ws_x_ua%name)           &
-        &   .or. (field_name .eq. -us_d_wa_x_us%name)           &
-        &   .or. (field_name .eq. -ua_d_ws_x_us%name)             &
-        &   .or. (field_name .eq. -ua_d_wa_x_ua%name)             &
+        &   =    (field_name .eq. mns_us_d_ws_x_ua%name)           &
+        &   .or. (field_name .eq. mns_us_d_wa_x_us%name)           &
+        &   .or. (field_name .eq. mns_ua_d_ws_x_us%name)             &
+        &   .or. (field_name .eq. mns_ua_d_wa_x_ua%name)             &
         &   .or. (field_name .eq. us_d_js_x_ba%name)             &
         &   .or. (field_name .eq. us_d_ja_x_bs%name)             &
         &   .or. (field_name .eq. ua_d_js_x_bs%name)           &
@@ -175,13 +175,13 @@
         call set_field_labels(asym_buoyancy_flux,                &
         &    n_comps( 6), names( 6), maths( 6))
 !
-        call set_field_labels(-us_d_ws_x_ua,                &
+        call set_field_labels(mns_us_d_ws_x_ua,                &
         &    n_comps( 7), names( 7), maths( 7))
-        call set_field_labels(-us_d_wa_x_us,                &
+        call set_field_labels(mns_us_d_wa_x_us,                &
         &    n_comps( 8), names( 8), maths( 8))
-        call set_field_labels(-ua_d_ws_x_us,                &
+        call set_field_labels(mns_ua_d_ws_x_us,                &
         &    n_comps( 9), names( 9), maths( 9))
-        call set_field_labels(-ua_d_wa_x_ua,                &
+        call set_field_labels(mns_ua_d_wa_x_ua,                &
         &    n_comps( 10), names( 10), maths( 10))
 ! 
         end subroutine set_sym_ene_flax_labels
