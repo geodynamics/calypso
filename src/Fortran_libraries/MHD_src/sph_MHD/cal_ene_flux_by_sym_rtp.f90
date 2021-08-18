@@ -185,7 +185,7 @@
       real(kind = kreal), intent(inout) :: flx_rtp(nnod,ntot_comp_flx)
 !
 !$omp parallel
-      if(fs_trns_eflux%i_ujb .gt. 0) then
+      if(fs_trns_eflux%i_m_advect_work .gt. 0) then
         call cal_dot_prod_no_coef_smp(nnod,                             &
      &      frc_rtp(1,f_trns_frc%i_m_advect),                            &
      &      fld_rtp(1,bs_trns_base%i_velo),                             &
