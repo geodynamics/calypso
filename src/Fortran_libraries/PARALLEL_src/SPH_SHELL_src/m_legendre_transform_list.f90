@@ -9,7 +9,7 @@
 !!
 !!@verbatim
 !!      integer(kind = kint) function                                   &
-!!     &                    set_legendre_trans_mode_ctl(tranx_loop_ctl)
+!!     &          set_legendre_trans_mode_ctl(iflag_ctl, tranx_loop_ctl)
 !!      character(len = kchara) function chosen_legendre_name(i_mode)
 !!      subroutine write_elapsed_4_legendre                             &
 !!     &         (i_mode, etime_max, etime_trans)
@@ -134,8 +134,8 @@
 !
 !
 !
-!>      integer undefined flag for Legendre transform
-      integer(kind = kint), parameter :: iflag_leg_undefined =  -999
+!!>      integer undefined flag for Legendre transform
+!      integer(kind = kint), parameter :: iflag_leg_undefined =  -999
 !>      integer flag to run elpse time check for legendre transform
       integer(kind = kint), parameter :: iflag_leg_compare =      -1
 !
@@ -190,15 +190,21 @@
 ! -----------------------------------------------------------------------
 !
       integer(kind = kint) function                                     &
-     &                    set_legendre_trans_mode_ctl(tranx_loop_ctl)
+     &          set_legendre_trans_mode_ctl(iflag_ctl, tranx_loop_ctl)
 !
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: iflag_ctl
       character(len = kchara), intent(in) :: tranx_loop_ctl
       integer(kind = kint) :: iflag
 !
 !
-      iflag = iflag_leg_undefined
+      iflag = iflag_leg_sym_matmul_big
+      if(iflag_ctl .eq. 0) then
+        set_legendre_trans_mode_ctl = iflag
+        return
+      end if
+!
       if(     cmp_no_case(tranx_loop_ctl, leg_test_loop)) then
         iflag = iflag_leg_test_loop
       else if(cmp_no_case(tranx_loop_ctl, leg_search_fastest)) then

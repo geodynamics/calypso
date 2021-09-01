@@ -133,16 +133,12 @@
         trans_p%nvector_legendre = 0
       end if
 !      
-      if(mevo_ctl%Legendre_trans_type%iflag .gt. 0) then
-        WK_leg%id_legendre = set_legendre_trans_mode_ctl                &
-     &                   (mevo_ctl%Legendre_trans_type%charavalue)
-      end if
-!
-      trans_p%iflag_FFT = iflag_UNDEFINED_FFT
-      if(mevo_ctl%FFT_library%iflag .gt. 0) then
-        trans_p%iflag_FFT                                               &
-     &     = set_fft_library_ctl(mevo_ctl%FFT_library%charavalue)
-      end if
+      WK_leg%id_legendre =                                              &
+     &  set_legendre_trans_mode_ctl(mevo_ctl%Legendre_trans_type%iflag, &
+     &                         mevo_ctl%Legendre_trans_type%charavalue)
+      trans_p%iflag_FFT                                                 &
+     &     = set_fft_library_ctl(mevo_ctl%FFT_library%iflag,            &
+     &                           mevo_ctl%FFT_library%charavalue)
       if(mevo_ctl%import_mode%iflag .gt. 0) then
         call set_import_table_ctl                                       &
      &     (mevo_ctl%import_mode%charavalue, trans_p)

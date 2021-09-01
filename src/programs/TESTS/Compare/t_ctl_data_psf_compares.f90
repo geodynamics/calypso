@@ -83,11 +83,8 @@
         do
           call load_one_line_from_control(id_control, c_buf1)
 !
-          if(check_array_flag(c_buf1, hd_compare_psf_file)) then
-            write(*,*) 'In'
-            call read_ctl_data_psf_compares                             &
-     &         (id_control, hd_compare_psf_file, psf_compares, c_buf1)
-          end if
+          call read_ctl_data_psf_compares                               &
+     &       (id_control, hd_compare_psf_file, psf_compares, c_buf1)
 !
           if(psf_compares%i_psf_compare_list .gt. 0) exit
         end do
@@ -109,6 +106,7 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
+      if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(allocated(psf_compares%psf_cmp_ctls)) return
       psf_compares%num_psf_cmp = 0
       call alloc_psf_compares_ctl(psf_compares)

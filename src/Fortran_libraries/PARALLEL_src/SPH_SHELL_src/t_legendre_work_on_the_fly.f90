@@ -212,7 +212,7 @@
         nle_rtm(ip) = led - lst_rtm(ip)
         nlo_rtm(ip) = nle_rtm(ip)
       end do
-      nlo_rtm(np_smp) = istack_rtm_lt_smp(np_smp) / 2 - lst_rtm(np_smp)
+      nlo_rtm(np_smp) = istack_rtm_lt_smp(np_smp)/2 - lst_rtm(np_smp)
 !
       do ip = 1, np_smp
         Fmat(ip)%nvec_lk = n_AVX512 * nri_rtm * nvector

@@ -105,6 +105,7 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
+      if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(allocated(psf_ctls%fname_psf_ctl)) return
       psf_ctls%num_psf_ctl = 0
       call alloc_psf_ctl_stract(psf_ctls)

@@ -8,7 +8,7 @@ cal_sph_ele_connects.o: $(SPH_GRID_SRCDIR)/cal_sph_ele_connects.f90 m_precision.
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_sph_node_addresses.o: $(SPH_GRID_SRCDIR)/cal_sph_node_addresses.f90 m_precision.o m_constants.o m_machine_parameter.o t_sph_mesh_1d_connect.o
 	$(F90) -c $(F90OPTFLAGS) $<
-check_sph_mhd_openmp_size.o: $(SPH_GRID_SRCDIR)/check_sph_mhd_openmp_size.f90 m_precision.o calypso_mpi.o t_spheric_parameter.o m_machine_parameter.o m_error_IDs.o
+check_sph_mhd_openmp_size.o: $(SPH_GRID_SRCDIR)/check_sph_mhd_openmp_size.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_spheric_parameter.o t_legendre_trans_select.o m_error_IDs.o
 	$(F90) -c $(F90OPTFLAGS) $<
 const_1d_ele_connect_4_sph.o: $(SPH_GRID_SRCDIR)/const_1d_ele_connect_4_sph.f90 m_precision.o m_constants.o m_machine_parameter.o m_spheric_constants.o t_sph_mesh_1d_connect.o t_sph_1d_global_index.o t_spheric_global_ranks.o t_spheric_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -100,15 +100,10 @@
         if(check_end_flag(c_buf, hd_block)) exit
 !
 !
-        if(check_array_flag(c_buf, hd_section_ctl)) then
-          call read_files_4_psf_ctl(id_control, hd_section_ctl,         &
-     &        surfacing_ctls%psf_s_ctls, c_buf)
-        end if
-!
-        if(check_array_flag(c_buf, hd_isosurf_ctl)) then
-          call read_files_4_iso_ctl(id_control, hd_isosurf_ctl,         &
-     &        surfacing_ctls%iso_s_ctls, c_buf)
-        end if
+        call read_files_4_psf_ctl(id_control, hd_section_ctl,           &
+     &      surfacing_ctls%psf_s_ctls, c_buf)
+        call read_files_4_iso_ctl(id_control, hd_isosurf_ctl,           &
+     &      surfacing_ctls%iso_s_ctls, c_buf)
 !
         call read_real_ctl_type(c_buf, hd_delta_t_section,              &
      &      surfacing_ctls%delta_t_psf_s_ctl)

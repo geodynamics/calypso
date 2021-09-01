@@ -101,7 +101,7 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
-      call defleate_int8_vector_b(num, int8_dat, zbuf)
+      call gzip_defleate_int8_vector_b(num, int8_dat, zbuf)
 !
       call istack64_4_parallel_data(zbuf%ilen_gzipped, IO_param)
 !
@@ -132,7 +132,7 @@
       integer(kind = MPI_OFFSET_KIND) :: ioffset
 !
 !
-      call defleate_1d_vector_b(num, real_dat, zbuf)
+      call gzip_defleate_1d_vector_b(num, real_dat, zbuf)
 !
       call istack64_4_parallel_data(zbuf%ilen_gzipped, IO_param)
 !
@@ -241,7 +241,7 @@
         call alloc_zip_buffer(zbuf)
         call calypso_mpi_seek_read_gz(IO_param%id_file, ioffset, zbuf)
 !
-        call infleate_int8_vector_b(num, int8_dat, zbuf)
+        call gzip_infleate_int8_vector_b(num, int8_dat, zbuf)
         call dealloc_zip_buffer(zbuf)
 !
         if(IO_param%iflag_bin_swap .eq. iendian_FLIP) then
@@ -283,7 +283,7 @@
         call alloc_zip_buffer(zbuf)
         call calypso_mpi_seek_read_gz(IO_param%id_file, ioffset, zbuf)
 !
-        call infleate_1d_vector_b(num, real_dat, zbuf)
+        call gzip_infleate_1d_vector_b(num, real_dat, zbuf)
         call dealloc_zip_buffer(zbuf)
 !
         if(IO_param%iflag_bin_swap .eq. iendian_FLIP) then

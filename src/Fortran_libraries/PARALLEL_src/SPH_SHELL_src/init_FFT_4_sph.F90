@@ -80,13 +80,7 @@
       integer(kind = kint), intent(inout) :: iflag_FFT
 !
 !
-      if(iflag_FFT .eq. iflag_UNDEFINED_FFT) then
-#ifdef FFTW3
-        iflag_FFT = iflag_FFTW_SINGLE
-#else
-        iflag_FFT = iflag_FFTPACK_ONCE
-#endif
-      else if(iflag_FFT .eq. iflag_SEARCH_FASTEST_FFT) then
+      if(iflag_FFT .eq. iflag_SEARCH_FASTEST_FFT) then
         call s_select_fourier_transform(ncomp, sph_rtp, comm_rtp,       &
      &      SR_r%n_WS, SR_r%n_WR, SR_r%WS, SR_r%WR, WK_FFTs)
         iflag_FFT = iflag_selected

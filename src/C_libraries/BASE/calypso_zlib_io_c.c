@@ -195,7 +195,24 @@ void write_compress_txt_nolf(int *nchara, char *input_txt){
 	return;
 }
 
-static void strm_deflate_init (z_stream *strm)
+static void zlib_deflate_stream_init (z_stream *strm)
+{
+    strm->zalloc = Z_NULL;
+    strm->zfree  = Z_NULL;
+    strm->opaque = Z_NULL;
+    CALL_ZLIB (deflateInit (strm, Z_DEFAULT_COMPRESSION));
+    return;
+}
+static void zlib_inflate_stream_init (z_stream *strm)
+{
+    strm->zalloc = Z_NULL;
+    strm->zfree  = Z_NULL;
+    strm->opaque = Z_NULL;
+    CALL_ZLIB (inflateInit (strm));
+    return;
+}
+
+static void gzip_deflate_stream_init (z_stream *strm)
 {
     strm->zalloc = Z_NULL;
     strm->zfree  = Z_NULL;
@@ -205,7 +222,7 @@ static void strm_deflate_init (z_stream *strm)
                              Z_DEFAULT_STRATEGY));
     return;
 }
-static void strm_inflate_init (z_stream *strm)
+static void gzip_inflate_stream_init (z_stream *strm)
 {
     strm->zalloc = Z_NULL;
     strm->zfree  = Z_NULL;
@@ -214,12 +231,43 @@ static void strm_inflate_init (z_stream *strm)
     return;
 }
 
+void zlib_defleat_once(const int *len_buf, const void *buf, const int *len_gzipbuf, 
+                       int *len_gzipped, char *gzipbuf)
+{
+    z_stream strm;
+
+    zlib_deflate_stream_init (& strm);
+    strm.next_in = (unsigned char *) buf;
+    strm.avail_in =  (uInt) *len_buf;
+    strm.avail_out = (uInt) *len_gzipbuf;
+    strm.next_out = (unsigned char *) gzipbuf;
+    CALL_ZLIB (deflate (& strm, Z_FINISH));
+    *len_gzipped = *len_gzipbuf - strm.avail_out;
+/*    printf("compressed size:%d %d %d \n",*len_buf, *len_gzipbuf, *len_gzipped);*/
+    deflateEnd (& strm);
+    return;
+}
+
+void zlib_defleat_begin(const int *len_buf, const void *buf, const int *len_gzipbuf, 
+                        int *len_gzipped, char *gzipbuf)
+{
+    
+    gzip_deflate_stream_init (& strm_gl);
+    strm_gl.next_in = (unsigned char *) buf;
+    strm_gl.avail_in =  (uInt) *len_buf;
+    strm_gl.avail_out = (uInt) *len_gzipbuf;
+    strm_gl.next_out = (unsigned char *) gzipbuf;
+    CALL_ZLIB (deflate (& strm_gl, Z_NO_FLUSH));
+    *len_gzipped = *len_gzipbuf - strm_gl.avail_out;
+    return;
+}
+
 void gzip_defleat_once(const int *len_buf, const void *buf, const int *len_gzipbuf, 
                        int *len_gzipped, char *gzipbuf)
 {
     z_stream strm;
 
-    strm_deflate_init (& strm);
+    gzip_deflate_stream_init (& strm);
     strm.next_in = (unsigned char *) buf;
     strm.avail_in =  (uInt) *len_buf;
     strm.avail_out = (uInt) *len_gzipbuf;
@@ -235,7 +283,7 @@ void gzip_defleat_begin(const int *len_buf, const void *buf, const int *len_gzip
                         int *len_gzipped, char *gzipbuf)
 {
     
-    strm_deflate_init (& strm_gl);
+    gzip_deflate_stream_init (& strm_gl);
     strm_gl.next_in = (unsigned char *) buf;
     strm_gl.avail_in =  (uInt) *len_buf;
     strm_gl.avail_out = (uInt) *len_gzipbuf;
@@ -275,12 +323,45 @@ void gzip_defleat_last(const int *len_buf, const void *buf, const int *len_gzipb
     return;
 }
 
+void zlib_infleat_once(const int *len_gzipbuf, const char *gzipbuf, const int *len_buf, 
+                       void *buf, int *len_gzipped)
+{
+    z_stream strm;
+    
+/*    printf("pointer:%p %p %d \n", gzipbuf, buf, *len_gzipped); */
+    
+    zlib_inflate_stream_init (& strm);
+    strm.next_in = (unsigned char *) gzipbuf;
+    strm.avail_in =  (uInt) *len_gzipbuf;
+    strm.avail_out = (uInt) *len_buf;
+    strm.next_out = (unsigned char *) buf;
+    CALL_ZLIB (inflate (& strm, Z_NO_FLUSH));
+    *len_gzipped = *len_gzipbuf - strm.avail_in;
+/*    printf("compressed size:%d %d %d \n",*len_buf, *len_gzipbuf, *len_gzipped); */
+    inflateEnd (& strm);
+    return;
+}
+
+void zlib_infleat_begin(const int *len_gzipbuf, const char *gzipbuf, const int *len_buf, 
+                        void *buf, int *len_gzipped)
+{
+    
+    zlib_inflate_stream_init (& strm_gl);
+    strm_gl.next_in = (unsigned char *) gzipbuf;
+    strm_gl.avail_in =  (uInt) *len_gzipbuf;
+    strm_gl.avail_out = (uInt) *len_buf;
+    strm_gl.next_out = (unsigned char *) buf;
+    CALL_ZLIB (inflate (& strm_gl, Z_NO_FLUSH));
+    *len_gzipped = *len_gzipbuf - strm_gl.avail_in;
+    return;
+}
+
 void gzip_infleat_once(const int *len_gzipbuf, const char *gzipbuf, const int *len_buf, 
                        void *buf, int *len_gzipped)
 {
     z_stream strm;
     
-    strm_inflate_init (& strm);
+    gzip_inflate_stream_init (& strm);
     strm.next_in = (unsigned char *) gzipbuf;
     strm.avail_in =  (uInt) *len_gzipbuf;
     strm.avail_out = (uInt) *len_buf;
@@ -296,7 +377,7 @@ void gzip_infleat_begin(const int *len_gzipbuf, const char *gzipbuf, const int *
                         void *buf, int *len_gzipped)
 {
     
-    strm_inflate_init (& strm_gl);
+    gzip_inflate_stream_init (& strm_gl);
     strm_gl.next_in = (unsigned char *) gzipbuf;
     strm_gl.avail_in =  (uInt) *len_gzipbuf;
     strm_gl.avail_out = (uInt) *len_buf;

@@ -74,6 +74,7 @@
       type(buffer_for_control), intent(inout)  :: c_buf
 !
 !
+      if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(allocated(iso_ctls%fname_iso_ctl)) return
       iso_ctls%num_iso_ctl = 0
       call alloc_iso_ctl_stract(iso_ctls)

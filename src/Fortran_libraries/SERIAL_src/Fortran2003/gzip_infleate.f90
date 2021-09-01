@@ -94,6 +94,36 @@
         integer(C_int), intent(inout) :: len_gzipped
 !
         end subroutine gzip_infleat_last
+!  -----------------
+        subroutine zlib_infleat_once                                    &
+     &           (len_gzipbuf, gzipbuf, len_buf, buf, len_gzipped)      &
+     &            BIND(C, name = 'zlib_infleat_once')
+!
+        use ISO_C_BINDING
+!
+        integer(C_int), intent(in) :: len_gzipbuf
+        character(C_char), intent(in) :: gzipbuf(*)
+        integer(C_int), intent(in) :: len_buf
+!
+        type(C_ptr), value :: buf
+        integer(C_int), intent(inout) :: len_gzipped
+!
+        end subroutine zlib_infleat_once
+!  -----------------
+        subroutine zlib_infleat_begin                                   &
+     &           (len_gzipbuf, gzipbuf, len_buf, buf, len_gzipped)      &
+     &            BIND(C, name = 'zlib_infleat_begin')
+!
+        use ISO_C_BINDING
+!
+        integer(C_int), intent(in) :: len_gzipbuf
+        character(C_char), intent(in) :: gzipbuf(*)
+        integer(C_int), intent(in) :: len_buf
+!
+        type(C_ptr), value :: buf
+        integer(C_int), intent(inout) :: len_gzipped
+!
+        end subroutine zlib_infleat_begin
 !
 !  ---------------------------------------------------------------------
 !
@@ -191,6 +221,28 @@
      &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
 !
       end subroutine gzip_infleat_char_once
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine zlib_infleat_char_once                                 &
+     &         (len_gzipbuf, gzipbuf, len_buf, textbuf, zbuf)
+!
+      integer, intent(in) :: len_gzipbuf
+      character(len=1), target, intent(in) :: gzipbuf(len_gzipbuf)
+      integer, intent(in) :: len_buf
+      character(len=1), target, intent(in) :: textbuf(len_buf)
+!
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+!
+      call link_pointer_for_zlib_buffer                                 &
+     &   (len_gzipbuf, gzipbuf, len_buf, textbuf, zbuf)
+      call zlib_infleat_once(zbuf%len_gzipbuf, zbuf%gzipbuf_p,          &
+     &    zbuf%len_buf, C_LOC(zbuf%buf_p(1)), zbuf%len_used)
+      zbuf%ilen_gzipped = zbuf%ilen_gzipped                             &
+     &                   + int(zbuf%len_used,KIND(zbuf%ilen_gzipped))
+!
+      end subroutine zlib_infleat_char_once
 !
 !  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------

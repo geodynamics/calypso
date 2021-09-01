@@ -162,10 +162,8 @@
      &     (id_control, hd_mid_eq_monitor_ctl, i_mid_eq_monitor_ctl,    &
      &      smonitor_ctl%meq_ctl, c_buf)
 !
-        if(check_array_flag(c_buf, hd_vol_spec_block)) then
-          call read_volume_spectr_ctl                                   &
-     &       (id_control, hd_vol_spec_block, smonitor_ctl, c_buf)
-        end if
+        call read_volume_spectr_ctl                                     &
+     &     (id_control, hd_vol_spec_block, smonitor_ctl, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_Nusselt_file_head,           &
      &      smonitor_ctl%Nusselt_file_prefix)
@@ -192,6 +190,7 @@
       type(volume_spectr_control) :: read_vpwr
 !
 !
+      if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(smonitor_ctl%num_vspec_ctl .gt. 0) return
       iflag = 0
       smonitor_ctl%num_vspec_ctl = 0

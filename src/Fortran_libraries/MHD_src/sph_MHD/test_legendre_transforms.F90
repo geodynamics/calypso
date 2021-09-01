@@ -117,9 +117,6 @@
       integer(kind = kint) :: id
 !
 !
-      if(WK_leg%id_legendre .eq. iflag_leg_undefined) then
-        WK_leg%id_legendre = iflag_leg_sym_matmul_big
-      end if
       if(WK_leg%id_legendre .ne. iflag_leg_compare) return
 !
       endtime(1:num_test) =     zero

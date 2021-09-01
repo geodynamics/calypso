@@ -73,7 +73,7 @@
 !>      Work structures for various Legendre trasform
       type legendre_trns_works
 !>      Integer flag for Legendre transform
-        integer(kind = kint) :: id_legendre = iflag_leg_undefined
+        integer(kind = kint) :: id_legendre = iflag_leg_sym_matmul_big
 !
 !>        Work structure for Legendre trasform
         type(leg_trns_spin_work) :: WK_spin

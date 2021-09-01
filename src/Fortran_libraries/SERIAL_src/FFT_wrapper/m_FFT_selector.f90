@@ -1,4 +1,4 @@
-!>@file   m_FFT_selector.f90
+!>@file   m_FFT_selector.F90
 !!@brief  module m_FFT_selector
 !!
 !!@author H. Matsui
@@ -8,7 +8,9 @@
 !!
 !!@verbatim
 !!      integer(kind = kint) function                                   &
-!!     &                    set_fft_library_ctl(FFT_library_ctl)
+!!     &            set_fft_library_ctl(iflag_ctl, FFT_library_ctl)
+!!        integer(kind = kint), intent(in) :: iflag_ctl
+!!        character(len = kchara), intent(in) :: FFT_library_ctl
 !!      subroutine write_elapsed_4_FFT(i_mode, etime_fft)
 !!      character(len = kchara) function chosen_fft_name(i_mode)
 !|
@@ -112,8 +114,8 @@
 !>      Character flag to use test FFT
       character(len = kchara), parameter :: hd_FFT_TEST =  'TEST'
 !
-!>      integer flag for undefined FFT routine
-      integer(kind = kint), parameter :: iflag_UNDEFINED_FFT =   -999
+!!>      integer flag for undefined FFT routine
+!      integer(kind = kint), parameter :: iflag_UNDEFINED_FFT =   -999
 !>      integer flag for fastest FFT search
       integer(kind = kint), parameter :: iflag_SEARCH_FASTEST_FFT = -1
 !
@@ -171,15 +173,25 @@
 ! ------------------------------------------------------------------
 !
       integer(kind = kint) function                                     &
-     &                    set_fft_library_ctl(FFT_library_ctl)
+     &            set_fft_library_ctl(iflag_ctl, FFT_library_ctl)
 !
       use skip_comment_f
 !
+      integer(kind = kint), intent(in) :: iflag_ctl
       character(len = kchara), intent(in) :: FFT_library_ctl
       integer(kind = kint) :: iflag
 !
 !
-      set_fft_library_ctl = iflag_UNDEFINED_FFT
+#ifdef FFTW3
+      iflag = iflag_FFTW_SINGLE
+#else
+      iflag = iflag_FFTPACK_ONCE
+#endif
+      if(iflag_ctl .eq. 0) then
+        set_fft_library_ctl = iflag
+        return
+      end if
+!
       if(cmp_no_case(FFT_library_ctl, hd_search_fastest_fft)) then
         iflag = iflag_SEARCH_FASTEST_FFT
 !

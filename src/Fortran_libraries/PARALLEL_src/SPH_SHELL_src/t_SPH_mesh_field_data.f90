@@ -124,7 +124,6 @@
       use sph_file_IO_select
       use check_sph_file_access
       use parallel_load_data_4_sph
-      use check_sph_mhd_openmp_size
 !
       type(field_IO_params), intent(in) :: sph_file_param
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
@@ -166,8 +165,6 @@
       if(iflag_debug.gt.0) write(*,*) 'sph_index_flags_and_params'
       call sph_index_flags_and_params                                   &
      &   (SPH_MHD%groups, SPH_MHD%sph, SPH_MHD%comms)
-!
-      call s_check_sph_mhd_openmp_size(SPH_MHD%sph)
 !
       call calypso_mpi_barrier
 !
