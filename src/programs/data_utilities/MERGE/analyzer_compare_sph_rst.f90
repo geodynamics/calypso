@@ -59,7 +59,7 @@
 !
       type(control_data_4_merge) :: mgd_ctl_s
       type(sph_grid_maker_in_sim) :: sph_org_maker_s
-!      integer(kind = kint) :: ip
+      integer(kind = kint) :: istep_in
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
@@ -98,7 +98,8 @@
 !
 !      Construct field list from spectr file
 !
-      call load_field_name_assemble_sph(asbl_param_s%istep_start,       &
+      istep_in = asbl_param_s%istep_start / asbl_param_s%increment_step
+      call load_field_name_assemble_sph(istep_in,                       &
      &    asbl_param_s%org_fld_file, sph_asbl_s%org_sph_array,          &
      &    sph_asbl_s%new_sph_data, sph_asbl_s%fst_time_IO)
 !
@@ -118,21 +119,21 @@
       use share_field_data
       use compare_by_assemble_sph
 !
-      integer(kind = kint) :: istep
+      integer(kind = kint) :: istep, istep_in, istep_out
       integer(kind = kint) :: iflag, iflag_gl
-      integer(kind = kint) :: istep_out
 !
 !
 !     ---------------------
 !
-      do istep = asbl_param_s%istep_start, asbl_param_s%istep_end,      &
-     &          asbl_param_s%increment_step
+      do istep = asbl_param_s%istep_start, asbl_param_s%istep_end
+        if(mod(istep, asbl_param_s%increment_step) .ne. 0) cycle
+        istep_in = istep / asbl_param_s%increment_step
 !
 !     Load original spectr data
-        call load_org_sph_data(istep, asbl_param_s%org_fld_file,        &
+        call load_org_sph_data(istep_in, asbl_param_s%org_fld_file,     &
      &                         init_t, sph_asbl_s%org_sph_array)
 !
-        istep_out = istep
+        istep_out = istep_in
         if(asbl_param_s%iflag_newtime .gt. 0) then
           istep_out =          asbl_param_s%istep_new_rst               &
      &                        / asbl_param_s%increment_new_step
