@@ -275,7 +275,7 @@
           r_itp%k_old2new_in(k) =    1
           r_itp%k_old2new_out(k) =   2
           r_itp%coef_old2new_in(k) = 1.0d0
-        else if(r_new(k) .eq. r_org(nri_org)) then
+        else if(abs(r_new(k) - r_org(nri_org)) .lt. 1.0d-12) then
           r_itp%k_old2new_in(k) =    nri_org - 1
           r_itp%k_old2new_out(k) =   nri_org
           r_itp%coef_old2new_in(k) = 0.0d0
@@ -300,14 +300,14 @@
 !
       r_itp%kr_inner_domain = 1
       do k = nri_new, 1, -1
-        if(r_new(k) .lt. r_org(1)) then
+        if(r_itp%k_old2new_in(k) .eq. 0) then
           r_itp%kr_inner_domain = k + 1
           exit
         end if
       end do
       r_itp%kr_outer_domain = nri_new
       do k = 1, nri_new
-        if(r_new(k) .gt. r_org(nri_org)) then
+        if(r_itp%k_old2new_out(k) .eq. (nri_org+1)) then
           r_itp%kr_outer_domain = k - 1
           exit
         end if
