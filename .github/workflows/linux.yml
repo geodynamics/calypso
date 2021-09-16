@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test-compile:
+  container-compile:
     # linux build
     name: test-compile
     runs-on: [ubuntu-20.04]
@@ -21,6 +21,24 @@ jobs:
           --enable-fftw3 \
           --with-hdf5 \
           --with-blas
+        # Fix OpenMPI issue in Docker : https://github.com/open-mpi/ompi/issues/4948
+        export OMPI_MCA_btl_vader_single_copy_mechanism=none
+        make
+  build-from-scratch:
+    name: test-compile
+    runs-on: [ubuntu-20.04]
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        sudo apt install pkg-config git gfortran libopenmpi-dev \
+          zlib1g zlib1g-dev libblas-dev libfftw3-dev libhdf5-openmpi-dev
+
+        ./configure \
+          --enable-fftw3 \
+          --with-hdf5 \
+          --with-blas
+
         # Fix OpenMPI issue in Docker : https://github.com/open-mpi/ompi/issues/4948
         export OMPI_MCA_btl_vader_single_copy_mechanism=none
         make
