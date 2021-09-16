@@ -1,0 +1,26 @@
+name: linux
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.actor }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-compile:
+    # linux build
+    name: test-compile
+    runs-on: [ubuntu-20.04]
+    container:
+      image: geodynamics/calypso-buildenv-bionic:latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      run: |
+        ./configure \
+          --enable-fftw3 \
+          --with-hdf5 \
+          --with-blas
+        # Fix OpenMPI issue in Docker : https://github.com/open-mpi/ompi/issues/4948
+        export OMPI_MCA_btl_vader_single_copy_mechanism=none
+        make
