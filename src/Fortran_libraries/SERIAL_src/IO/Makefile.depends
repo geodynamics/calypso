@@ -156,7 +156,7 @@ spherical_model_IO.o: $(IO_DIR)/spherical_model_IO.f90 m_precision.o t_node_id_s
 	$(F90) -c $(F90OPTFLAGS) $<
 spherical_model_IO_b.o: $(IO_DIR)/spherical_model_IO_b.f90 m_precision.o t_node_id_spherical_IO.o t_binary_IO_buffer.o binary_IO.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
-stop_by_missing_zlib.o: $(IO_DIR)/stop_by_missing_zlib.F90 m_precision.o m_constants.o m_machine_parameter.o m_error_ids.o m_file_format_switch.o
+stop_by_missing_zlib.o: $(IO_DIR)/stop_by_missing_zlib.F90 m_precision.o m_constants.o m_machine_parameter.o m_error_IDs.o m_file_format_switch.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 surface_data_IO.o: $(IO_DIR)/surface_data_IO.f90 m_precision.o t_comm_table.o t_geometry_data.o t_read_mesh_data.o t_surf_edge_IO.o m_fem_surface_labels.o m_fem_mesh_labels.o domain_data_IO.o element_connect_IO.o node_geometry_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<

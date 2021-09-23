@@ -30,7 +30,7 @@
       subroutine s_stop_by_missing_zlib(file_prefix, id_file_fmt)
 !
       use m_machine_parameter
-      use m_error_ids
+      use m_error_IDs
       use m_file_format_switch
 !
       character(len=kchara), intent(in) :: file_prefix
@@ -59,7 +59,7 @@
       subroutine stop_by_no_zlib_in_ucd(file_prefix, id_file_fmt)
 !
       use m_machine_parameter
-      use m_error_ids
+      use m_error_IDs
       use m_file_format_switch
 !
       character(len=kchara), intent(in) :: file_prefix
