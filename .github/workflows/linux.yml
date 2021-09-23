@@ -32,7 +32,8 @@ jobs:
         ./configure \
           --enable-fftw3 \
           --with-hdf5 \
-          --with-blas
+          --with-blas \
+          MPIRUN="mpirun --oversubscribe"
 
         make
         make test
