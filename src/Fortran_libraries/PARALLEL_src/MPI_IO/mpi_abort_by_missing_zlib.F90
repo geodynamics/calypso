@@ -28,7 +28,7 @@
 !
       subroutine s_mpi_abort_by_missing_zlib(file_prefix, id_file_fmt)
 !
-      use m_error_ids
+      use m_error_IDs
       use m_file_format_switch
 !
       character(len=kchara), intent(in) :: file_prefix
@@ -57,7 +57,7 @@
 !
       subroutine mpi_abort_by_no_zlib_in_fld(file_prefix, id_file_fmt)
 !
-      use m_error_ids
+      use m_error_IDs
       use m_file_format_switch
       use m_field_file_format
 !
