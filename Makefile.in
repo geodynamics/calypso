@@ -60,7 +60,6 @@ MAKE_MOD_DEP= $(BUILDDIR)/make_f90depends
 
 all: makemake
 	cd $(MAKEDIR); make
-	make test
 
 $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
 	if [ ! -d $(BUILDDIR) ]; then \
@@ -99,7 +98,7 @@ makemake: $(MAKE_MOD_DEP)
 		makemake
 
 test:
-	echo "Test!!"; \
+	echo "Start tests"; \
 	cd $(TESTDIR) ; \
 		$(GMAKE) \
 		GMAKE="$(GMAKE)" \
