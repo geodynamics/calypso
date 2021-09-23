@@ -21,7 +21,7 @@ MPICHLIBDIR = $(MPICHDIR)/lib
 MPICHBINDIR = $(MPICHDIR)/bin
 MPICHINCDIR = @MPIINCDIR@
 MPILIBS =     @MPILIBS@
-MPIRUN =      mpirun
+MPIRUN =      @MPIRUN@
 #
 #    compilers
 #
@@ -77,7 +77,6 @@ MAKE_MOD_DEP= $(BUILDDIR)/make_f90depends
 
 all: makemake
 	cd $(MAKEDIR); make
-	make test
 
 $(MAKE_MOD_DEP): $(MHDDIR)/module_dependency/make_module_dependency.f90
 	if [ ! -d $(BUILDDIR) ]; then \
@@ -99,6 +98,7 @@ depends: $(MAKE_MOD_DEP)
 		MPILIBS="$(MPILIBS)" \
 		MPICHBINDIR="$(MPICHBINDIR)" \
 		MPICHINCDIR="$(MPICHINCDIR)" \
+		MPIRUN="$(MPIRUN)" \
 		BLAS_LIBS="$(BLAS_LIBS)" \
 		ZLIB_CFLAGS="$(ZLIB_CFLAGS)"   \
 		ZLIB_LIBS="$(ZLIB_LIBS)"       \
@@ -135,6 +135,7 @@ makemake: $(MAKE_MOD_DEP)
 		MPILIBS="$(MPILIBS)" \
 		MPICHBINDIR="$(MPICHBINDIR)" \
 		MPICHINCDIR="$(MPICHINCDIR)" \
+		MPIRUN="$(MPIRUN)" \
 		BLAS_LIBS="$(BLAS_LIBS)" \
 		ZLIB_CFLAGS="$(ZLIB_CFLAGS)"   \
 		ZLIB_LIBS="$(ZLIB_LIBS)"       \

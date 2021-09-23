@@ -102,6 +102,16 @@ AC_SUBST(MPIDIR)
 AC_SUBST(MPILIBS)
 AC_SUBST(MPIINCDIR)
 
+AC_ARG_VAR(MPIRUN, Command and options to invoke tests using MPI (Default: mpirun))
+
+if test -n "${MPIRUN}"; then
+    AC_MSG_RESULT(Defined MPIRUN..."${MPIRUN}")
+else
+	AC_MSG_RESULT(MPIRUN is not defined)
+	MPIRUN="mpirun"
+    AC_SUBST(MPIRUN)
+fi
+
 # AC_MSG_RESULT(MPIDIR..."${MPIDIR}")
 # AC_MSG_RESULT(MPIINCDIR..."${MPIINCDIR}")
 # AC_MSG_RESULT(MPILIBS..."${MPILIBS}")
@@ -176,6 +186,7 @@ AC_MSG_RESULT()
 AC_MSG_RESULT(  host:        "${host}")
 AC_MSG_RESULT(  host_alias:  "${host_alias}")
 AC_MSG_RESULT(XL_FORTRAN:    "${XL_FORTRAN}")
+AC_MSG_RESULT(mpirun command and options: "${MPIRUN}")
 if test -n "${OPENMP_FCFLAGS}"; then
         AC_MSG_RESULT(    Use OpenMP ...        yes)
 else
