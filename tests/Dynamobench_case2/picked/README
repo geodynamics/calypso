@@ -1,6 +1,6 @@
 !-----------------------------------------------------------------------
-!     Isosurface data directory for dynamo benchmark test Case 2
+!     each speherical harmonics data directory for dynamo benchmark test Case 2
 !       Please see Christensen et.al. (2001) for the model description
 !-----------------------------------------------------------------------
 !
- Isosurface data files are stored in this directory.
+ Picked spectrum data files are stored in this directory.

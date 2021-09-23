@@ -31,6 +31,7 @@ test:
 
 clean:
 	rm -f *.dat
+	rm -f picked/*.dat
 	rm -f rst_4/rst.*
 	rm -f section/*.vtk
 	rm -f isosurface/*.vtk
