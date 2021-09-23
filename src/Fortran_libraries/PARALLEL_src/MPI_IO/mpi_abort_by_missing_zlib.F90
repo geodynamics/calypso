@@ -58,6 +58,7 @@
 !
       use m_error_ids
       use m_file_format_switch
+      use m_field_file_format
 !
       character(len=kchara), intent(in) :: file_prefix
       integer(kind= kint), intent(inout) :: id_file_fmt
