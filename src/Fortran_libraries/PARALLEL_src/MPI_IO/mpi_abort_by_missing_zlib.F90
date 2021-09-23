@@ -38,8 +38,9 @@
 #ifndef ZLIB_IO
       if     (id_file_fmt .eq. id_gzip_txt_file_fmt                     &
      &   .or. id_file_fmt .eq. id_gzip_bin_file_fmt                     &
-     &   .or. id_file_fmt .eq. mgd_gzip_flags                           &
-     &   .or. id_file_fmt .eq. mgd_gzip_bin_flags) then
+     &   .or. id_file_fmt .eq. (id_gzip_txt_file_fmt+iflag_single)      &
+     &   .or. id_file_fmt .eq. (id_gzip_bin_file_fmt+iflag_single))     &
+     &   then
         id_file_fmt = id_missing_zlib
         if(my_rank .eq. 0) write(*,*) 'Zlib is not linked!'
       end if
