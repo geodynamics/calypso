@@ -43,7 +43,7 @@
      &   .or. id_file_fmt .eq. mgd_gzip_flags                           &
      &   .or. id_file_fmt .eq. mgd_gzip_bin_flags) then
         id_file_fmt = id_missing_zlib
-        if(my_rank .eq 0) write(*,*) 'Zlib is not linked!'
+        write(*,*) 'Zlib is not linked!'
       end if
 #endif
 !
@@ -83,7 +83,7 @@
      &   .or. id_file_fmt .eq. iflag_sgl_udt_bin_gz                     &
      &   .or. id_file_fmt .eq. iflag_sgl_ucd_bin_gz) then
         id_file_fmt = id_missing_zlib
-        if(my_rank .eq 0) write(*,*) 'Zlib is not linked!'
+        write(*,*) 'Zlib is not linked!'
       end if
 #endif
 !
