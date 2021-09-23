@@ -33,6 +33,7 @@ jobs:
           --enable-fftw3 \
           --with-hdf5 \
           --with-blas \
+          --with-zlib \
           MPIRUN="mpirun --oversubscribe"
 
         make
