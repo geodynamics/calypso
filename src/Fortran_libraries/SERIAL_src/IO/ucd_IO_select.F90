@@ -72,6 +72,7 @@
       subroutine set_ucd_file_define(plt, ucd_param)
 !
       use t_ctl_data_4_platforms
+      use stop_by_missing_zlib
 !
       type(platform_data_control), intent(in) :: plt
       type(field_IO_params), intent(inout) :: ucd_param
@@ -85,6 +86,8 @@
       ucd_param%iflag_format                                            &
      &      = choose_ucd_file_format(plt%field_file_fmt_ctl%charavalue, &
      &                               plt%field_file_fmt_ctl%iflag)
+      call stop_by_no_zlib_in_ucd(ucd_param%file_prefix,                &
+     &                            ucd_param%iflag_format)
       call dealloc_field_type_flags
 !
       end subroutine set_ucd_file_define

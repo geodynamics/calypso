@@ -305,6 +305,7 @@
       use t_control_array_character
       use t_file_IO_parameter
       use m_file_format_switch
+      use stop_by_missing_zlib
 !
       character(len = kchara), intent(in) :: default_prefix
       type(read_character_item), intent(in) :: file_prefix_ctl
@@ -316,6 +317,8 @@
      &    file_prefix_ctl, file_format_ctl, ucd_param)
       ucd_param%iflag_format                                            &
      &      = mod(ucd_param%iflag_format, iflag_single)
+      call stop_by_no_zlib_in_ucd(ucd_param%file_prefix,                &
+     &                            ucd_param%iflag_format)
 !
       end subroutine set_read_psf_file_ctl
 !

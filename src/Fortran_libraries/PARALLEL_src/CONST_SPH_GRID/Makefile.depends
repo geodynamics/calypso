@@ -104,7 +104,7 @@ t_ctl_data_const_sph_mesh.o: $(SPH_GRID_SRCDIR)/t_ctl_data_const_sph_mesh.f90 m_
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_data_gen_sph_shell.o: $(SPH_GRID_SRCDIR)/t_ctl_data_gen_sph_shell.f90 m_precision.o m_constants.o m_machine_parameter.o skip_comment_f.o t_read_control_elements.o t_ctl_data_4_FEM_mesh.o t_ctl_data_4_sphere_model.o t_ctl_data_4_divide_sphere.o calypso_mpi.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o bcast_4_sphere_ctl.o bcast_4_platform_ctl.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_params_gen_sph_shell.o: $(SPH_GRID_SRCDIR)/t_ctl_params_gen_sph_shell.f90 m_precision.o t_spheric_parameter.o t_file_IO_parameter.o t_ctl_data_4_platforms.o t_ctl_data_4_FEM_mesh.o t_ctl_data_gen_sph_shell.o t_ctl_data_4_sphere_model.o t_ctl_data_4_divide_sphere.o t_spheric_global_ranks.o t_const_spherical_grid.o t_sph_grid_maker_in_sim.o m_file_format_switch.o set_control_platform_item.o set_control_platform_data.o gen_sph_grids_modes.o
+t_ctl_params_gen_sph_shell.o: $(SPH_GRID_SRCDIR)/t_ctl_params_gen_sph_shell.f90 m_precision.o t_spheric_parameter.o t_file_IO_parameter.o t_ctl_data_4_platforms.o t_ctl_data_4_FEM_mesh.o t_ctl_data_gen_sph_shell.o t_ctl_data_4_sphere_model.o t_ctl_data_4_divide_sphere.o t_spheric_global_ranks.o t_const_spherical_grid.o t_sph_grid_maker_in_sim.o m_file_format_switch.o calypso_mpi.o set_control_platform_item.o set_control_platform_data.o gen_sph_grids_modes.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_sph_1d_global_index.o: $(SPH_GRID_SRCDIR)/t_sph_1d_global_index.f90 m_precision.o t_control_1D_layering.o t_spheric_global_ranks.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -7,9 +7,10 @@
 !>@brief  I/O routines for mean square and averaga data
 !!
 !!@verbatim
-!!      subroutine open_sph_vol_rms_file_mhd(sph, ipol, rj_fld, monitor)
+!!      subroutine open_sph_vol_rms_file_mhd(sph, ipol, rj_fld,         &
+!!     &                                     monitor, SR_sig)
 !!      subroutine output_rms_sph_mhd_control                           &
-!!     &         (time_d, SPH_MHD, sph_MHD_bc, leg, monitor)
+!!     &         (time_d, SPH_MHD, sph_MHD_bc, leg, monitor, SR_sig)
 !!      subroutine init_rms_4_sph_spectr_4_mhd(sph, rj_fld, monitor)
 !!        type(energy_label_param), intent(in) :: ene_labels
 !!        type(time_data), intent(in) :: time_d
@@ -17,6 +18,7 @@
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(SPH_mesh_field_data), intent(in) :: SPH_MHD
 !!        type(sph_mhd_monitor_data), intent(inout) :: monitor
+!!        type(send_recv_status), intent(inout) :: SR_sig
 !!@endverbatim
 !
       module t_sph_mhd_monitor_data_IO
@@ -77,21 +79,23 @@
 !
 !  --------------------------------------------------------------------
 !
-      subroutine open_sph_vol_rms_file_mhd(sph, ipol, rj_fld, monitor)
+      subroutine open_sph_vol_rms_file_mhd(sph, ipol, rj_fld,           &
+     &                                     monitor, SR_sig)
 !
       use m_error_IDs
       use pickup_gauss_coefficients
       use cal_rms_fields_by_sph
       use output_sph_m_square_file
+      use write_sph_gauss_coefs
       use calypso_mpi_int
-      use MPI_sph_gauss_coefs_IO
-      use calypso_mpi_int
+      use t_solver_SR
 !
       type(sph_grids), intent(in) :: sph
       type(phys_address), intent(in) :: ipol
 !
       type(phys_data), intent(inout) :: rj_fld
       type(sph_mhd_monitor_data), intent(inout) :: monitor
+      type(send_recv_status), intent(inout) :: SR_sig
 !
       integer(kind = kint) :: iflag
 !
@@ -115,7 +119,7 @@
 !
       if ( iflag_debug.gt.0 ) write(*,*) 'init_gauss_coefs_4_monitor'
       call init_gauss_coefs_4_monitor(sph%sph_params, sph%sph_rj,       &
-     &    ipol, monitor%gauss_list, monitor%gauss_coef)
+     &    ipol, monitor%gauss_list, monitor%gauss_coef, SR_sig)
 !
       if ( iflag_debug.gt.0 ) write(*,*) 'check_gauss_coefs_num'
       iflag = check_gauss_coefs_num(monitor%gauss_coef)
@@ -131,8 +135,9 @@
 !  --------------------------------------------------------------------
 !
       subroutine output_rms_sph_mhd_control                             &
-     &         (time_d, SPH_MHD, sph_MHD_bc, leg, monitor)
+     &         (time_d, SPH_MHD, sph_MHD_bc, leg, monitor, SR_sig)
 !
+      use t_solver_SR
       use t_time_data
       use t_boundary_data_sph_MHD
       use m_machine_parameter
@@ -145,6 +150,7 @@
       type(SPH_mesh_field_data), intent(in) :: SPH_MHD
 !
       type(sph_mhd_monitor_data), intent(inout) :: monitor
+      type(send_recv_status), intent(inout) :: SR_sig
 !
 !
       call cal_sph_monitor_data                                         &
@@ -156,7 +162,7 @@
      &   (monitor%ene_labels, time_d, SPH_MHD%sph%sph_params,           &
      &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld,                &
      &    monitor%pwr, monitor%pick_coef, monitor%gauss_coef,           &
-     &    monitor%Nusselt)
+     &    monitor%Nusselt, SR_sig)
 !
       end subroutine output_rms_sph_mhd_control
 !

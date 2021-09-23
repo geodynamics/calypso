@@ -88,17 +88,17 @@
      &         (source_plt, assemble_plt, asbl_param)
 !
       use t_ctl_data_4_platforms
-      use set_control_platform_item
+      use set_control_platform_data
 !
       type(platform_data_control), intent(in) :: source_plt
       type(platform_data_control), intent(in) :: assemble_plt
       type(control_param_assemble), intent(inout) :: asbl_param
 !
 !
-      call set_parallel_file_ctl_params(def_org_sph_fst,                &
+      call set_ctl_parallel_file_w_def(def_org_sph_fst,                 &
      &    source_plt%restart_file_prefix,                               &
      &    source_plt%restart_file_fmt_ctl, asbl_param%org_fld_file)
-      call set_parallel_file_ctl_params(def_new_sph_fst,                &
+      call set_ctl_parallel_file_w_def(def_new_sph_fst,                 &
      &    assemble_plt%restart_file_prefix,                             &
      &    assemble_plt%restart_file_fmt_ctl, asbl_param%new_fld_file)
 !

@@ -4,8 +4,8 @@ FFTW3_multi_wrapper.o: $(FFT_WRAP_DIR)/FFTW3_multi_wrapper.F90 m_precision.o m_c
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 FFTW3_wrapper.o: $(FFT_WRAP_DIR)/FFTW3_wrapper.F90 m_precision.o m_constants.o m_fftw_parameters.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
-m_FFT_selector.o: $(FFT_WRAP_DIR)/m_FFT_selector.f90 m_precision.o skip_comment_f.o
-	$(F90) -c $(F90OPTFLAGS) $<
+m_FFT_selector.o: $(FFT_WRAP_DIR)/m_FFT_selector.F90 m_precision.o skip_comment_f.o
+	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 m_fftw_parameters.o: $(FFT_WRAP_DIR)/m_fftw_parameters.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_FFTPACK5_wrapper.o: $(FFT_WRAP_DIR)/t_FFTPACK5_wrapper.f90 m_precision.o m_constants.o FFTPACK5_wrapper.o

@@ -63,6 +63,7 @@
       use m_field_file_format
       use t_control_array_character
       use output_parallel_ucd_file
+      use mpi_abort_by_missing_zlib
 !
       type(mesh_data), intent(in) :: geofem
       type(phys_data), intent(in) :: nod_fld
@@ -81,6 +82,8 @@
       vtk_file_IO%iflag_format                                          &
      &   = choose_para_fld_file_format(output_vtk_fmt_ctl%charavalue,   &
      &                                 output_vtk_fmt_ctl%iflag)
+      call mpi_abort_by_no_zlib_in_fld(vtk_file_IO%file_prefix,         &
+     &                                 vtk_file_IO%iflag_format)
 !
       if(vtk_file_IO%iflag_format .eq. ucd_file_IO%iflag_format) then
         call calypso_mpi_abort                                          &

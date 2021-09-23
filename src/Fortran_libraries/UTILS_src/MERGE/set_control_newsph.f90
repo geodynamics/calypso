@@ -84,6 +84,7 @@
       use t_ctl_params_gen_sph_shell
       use m_file_format_switch
       use set_control_platform_item
+      use set_control_platform_data
       use set_ctl_4_shell_grids
       use new_SPH_restart
       use skip_comment_f
@@ -119,12 +120,12 @@
         call calypso_mpi_abort(ierr_P_MPI, e_message)
       end if
 !
-      call set_parallel_file_ctl_params(def_org_sph_head,               &
+      call set_ctl_parallel_file_w_def(def_org_sph_head,                &
      &    mgd_ctl%source_plt%sph_file_prefix,                           &
      &    mgd_ctl%source_plt%sph_file_fmt_ctl,                          &
      &    asbl_param%org_mesh_file)
 !
-      call set_parallel_file_ctl_params(def_new_sph_head,               &
+      call set_ctl_parallel_file_w_def(def_new_sph_head,                &
      &    mgd_ctl%assemble_plt%sph_file_prefix,                         &
      &    mgd_ctl%assemble_plt%sph_file_fmt_ctl,                        &
      &    asbl_param%new_mesh_file)

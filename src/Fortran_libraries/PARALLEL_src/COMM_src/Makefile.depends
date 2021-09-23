@@ -42,6 +42,8 @@ calypso_mpi_real.o: $(COMMDIR)/calypso_mpi_real.f90 m_precision.o m_constants.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 collect_SR_N.o: $(COMMDIR)/collect_SR_N.f90 m_precision.o calypso_mpi.o t_solver_SR.o
 	$(F90) -c $(F90OPTFLAGS) $<
+collect_SR_char.o: $(COMMDIR)/collect_SR_char.f90 m_precision.o calypso_mpi.o t_solver_SR.o
+	$(F90) -c $(F90OPTFLAGS) $<
 collect_SR_int.o: $(COMMDIR)/collect_SR_int.f90 m_precision.o calypso_mpi.o t_solver_SR.o
 	$(F90) -c $(F90OPTFLAGS) $<
 const_element_comm_tables.o: $(COMMDIR)/const_element_comm_tables.f90 m_precision.o calypso_mpi.o t_next_node_ele_4_node.o t_mesh_data.o t_geometry_data.o t_surface_data.o t_edge_data.o t_comm_table.o t_failed_export_list.o t_mesh_SR.o m_machine_parameter.o set_element_id_4_node.o const_global_element_ids.o m_geometry_constants.o t_solver_SR_int.o t_solver_SR_int8.o t_para_double_numbering.o t_element_double_number.o t_const_comm_table.o t_sum_local_node_id_list.o calypso_mpi_real.o transfer_to_long_integers.o solver_SR_type.o

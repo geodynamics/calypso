@@ -61,10 +61,12 @@
       type(MHD_file_IO_params), intent(inout) :: MHD_files
 !
 !
-      call set_control_mesh_file_def                                    &
-     &   (def_org_sph_rj_head, org_plt, MHD_files%org_rj_file_IO)
-      call set_control_mesh_file_def                                    &
-     &   (def_org_rst_header, org_plt, MHD_files%org_rst_file_IO)
+      call set_ctl_parallel_file_w_def(def_org_sph_rj_head,             &
+     &    org_plt%sph_file_prefix, org_plt%sph_file_fmt_ctl,            &
+     &    MHD_files%org_rj_file_IO)
+      call set_ctl_parallel_file_w_def(def_org_rst_header,              &
+     &    org_plt%restart_file_prefix, org_plt%restart_file_fmt_ctl,    &
+     &    MHD_files%org_rst_file_IO)
 !
       end subroutine set_control_org_sph_files
 !

@@ -49,6 +49,7 @@
      &    psf_cmp_ctls%second_psf%file_prefix_ctl,                      &
      &    psf_cmp_ctls%second_psf%file_format_ctl,                      &
      &    psf_cmp%psf2_file_param)
+!
       psf_cmp%istep_psf = psf_cmp_ctls%i_step_surface_ctl%intvalue
 !
       end subroutine set_control_for_psf_compare

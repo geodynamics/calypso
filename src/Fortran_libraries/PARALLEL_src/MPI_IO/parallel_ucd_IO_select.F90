@@ -77,6 +77,7 @@
      &          file_prefix_ctl, file_format_ctl, ucd_param)
 !
       use t_control_array_character
+      use mpi_abort_by_missing_zlib
 !
       character(len = kchara), intent(in) :: default_prefix
       type(read_character_item), intent(in) :: file_prefix_ctl
@@ -96,6 +97,8 @@
       ucd_param%iflag_format                                            &
      &        = choose_para_fld_file_format(file_format_ctl%charavalue, &
      &                                      file_format_ctl%iflag)
+      call mpi_abort_by_no_zlib_in_fld(ucd_param%file_prefix,           &
+     &                                 ucd_param%iflag_format)
 !
       end subroutine set_merged_ucd_file_ctl
 !

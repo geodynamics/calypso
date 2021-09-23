@@ -98,7 +98,7 @@ ordering_schmidt_trans_spin.o: $(SPH_COMMDIR)/ordering_schmidt_trans_spin.f90 m_
 	$(F90) -c $(F90OPTFLAGS) $<
 parallel_load_data_4_sph.o: $(SPH_COMMDIR)/parallel_load_data_4_sph.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_file_IO_parameter.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_spheric_group.o t_spheric_data_IO.o t_const_spherical_grid.o t_sph_local_parameter.o sph_file_MPI_IO_select.o set_loaded_data_4_sph.o load_data_for_sph_IO.o set_from_recv_buf_rev.o count_num_sph_smp.o pole_sph_transform.o set_radius_4_sph_dynamo.o
 	$(F90) -c $(F90OPTFLAGS) $<
-pickup_gauss_coefficients.o: $(SPH_COMMDIR)/pickup_gauss_coefficients.f90 m_precision.o m_constants.o t_spheric_parameter.o t_phys_address.o t_phys_data.o t_pickup_sph_spectr_data.o pickup_sph_spectr.o m_base_field_labels.o calypso_mpi.o set_parallel_file_name.o t_no_heat_Nusselt.o
+pickup_gauss_coefficients.o: $(SPH_COMMDIR)/pickup_gauss_coefficients.f90 m_precision.o m_constants.o t_spheric_parameter.o t_phys_address.o t_phys_data.o t_pickup_sph_spectr_data.o pickup_sph_spectr.o calypso_mpi.o t_solver_SR.o m_base_field_labels.o collect_SR_char.o set_parallel_file_name.o t_no_heat_Nusselt.o
 	$(F90) -c $(F90OPTFLAGS) $<
 pickup_sph_coefs.o: $(SPH_COMMDIR)/pickup_sph_coefs.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_pickup_sph_spectr_data.o pickup_sph_spectr.o calypso_mpi.o quicksort.o add_direction_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -229,5 +229,9 @@ t_work_4_sph_trans.o: $(SPH_COMMDIR)/t_work_4_sph_trans.f90 m_precision.o t_schm
 t_work_4_sph_trans_spin.o: $(SPH_COMMDIR)/t_work_4_sph_trans_spin.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 volume_average_4_sph.o: $(SPH_COMMDIR)/volume_average_4_sph.f90 m_precision.o m_constants.o m_phys_constants.o t_rms_4_sph_spectr.o t_spheric_rj_data.o t_phys_data.o cal_ave_4_rms_vector_sph.o radial_int_for_sph_spec.o
+	$(F90) -c $(F90OPTFLAGS) $<
+write_picked_sph_spectr.o: $(SPH_COMMDIR)/write_picked_sph_spectr.f90 m_precision.o m_constants.o calypso_mpi.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_data.o t_time_data.o pickup_sph_spectr_data.o set_parallel_file_name.o write_field_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+write_sph_gauss_coefs.o: $(SPH_COMMDIR)/write_sph_gauss_coefs.f90 m_precision.o m_constants.o calypso_mpi.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_address.o t_phys_data.o t_time_data.o m_monitor_file_labels.o t_solver_SR.o set_parallel_file_name.o delete_data_files.o pickup_gauss_coefficients.o collect_SR_N.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 

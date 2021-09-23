@@ -40,6 +40,8 @@
 !
 !>      Integer flag for no file
        integer(kind = kint), parameter :: id_no_file =      -1000
+!>      Integer flag for no file
+       integer(kind = kint), parameter :: id_missing_zlib = -9000
 !
 !>      Integer flag for ascii data format
       integer(kind = kint), parameter :: id_ascii_file_fmt =    0

@@ -68,7 +68,10 @@
 !
       num = pick_list%num_modes                                         &
      &     + pick_list%num_degree + pick_list%num_order
-      if(num .eq. 0) return
+      if(num .eq. 0) then
+        picked%num_sph_mode_lc = 0
+        return
+      end if
 !
       call init_sph_radial_monitor_list(sph_rj, picked, iflag_center)
 !
@@ -89,7 +92,6 @@
       call set_sph_fld_id_4_monitor(rj_fld%num_phys,                    &
      &    rj_fld%num_component, rj_fld%flag_monitor, picked)
 !
-      if(my_rank .ne. 0) return
       call set_sph_labels_4_monitor                                     &
      &   (rj_fld%num_phys, rj_fld%num_component,                        &
      &    rj_fld%phys_name, picked)

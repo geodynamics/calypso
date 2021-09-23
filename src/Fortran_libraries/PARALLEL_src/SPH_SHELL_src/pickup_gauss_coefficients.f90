@@ -8,8 +8,14 @@
 !>@n      Evaluate Nusselt number without heat source
 !!
 !!@verbatim
-!!      subroutine init_gauss_coefs_4_monitor                           &
-!!     &          (sph_params, sph_rj, ipol, gauss_list, gauss_coef)
+!!      subroutine init_gauss_coefs_4_monitor(sph_params, sph_rj, ipol, &
+!!     &           gauss_list, gauss_coef, SR_sig)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
+!!        type(sph_rj_grid), intent(in) :: sph_rj
+!!        type(phys_address), intent(in) :: ipol
+!!        type(pickup_mode_list), intent(inout) :: gauss_list
+!!        type(picked_spectrum_data), intent(inout) :: gauss_coef
+!!        type(send_recv_status), intent(inout) :: SR_sig
 !!      subroutine gauss_coefficients_4_write                           &
 !!     &        (sph_params, sph_rj, ipol, rj_fld, gauss_coef, d_rj_out)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
@@ -45,12 +51,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine init_gauss_coefs_4_monitor                             &
-     &          (sph_params, sph_rj, ipol, gauss_list, gauss_coef)
+      subroutine init_gauss_coefs_4_monitor(sph_params, sph_rj, ipol,   &
+     &           gauss_list, gauss_coef, SR_sig)
 !
+      use calypso_mpi
       use t_spheric_parameter
       use t_pickup_sph_spectr_data
+      use t_solver_SR
       use m_base_field_labels
+      use collect_SR_char
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
@@ -58,6 +67,7 @@
 !
       type(pickup_mode_list), intent(inout) :: gauss_list
       type(picked_spectrum_data), intent(inout) :: gauss_coef
+      type(send_recv_status), intent(inout) :: SR_sig
 !
       integer(kind = kint) :: l
 !
@@ -86,8 +96,14 @@
       gauss_coef%spectr_name(1) = magnetic_field%name
       gauss_coef%istack_comp_rj(1) = 1
       gauss_coef%ifield_monitor_rj(1) = 1
-      call alloc_gauss_coef_monitor_lc(gauss_coef)
+      call alloc_gauss_coef_monitor_lc(my_rank, nprocs, gauss_coef)
       call set_gauss_coefs_labels(gauss_coef)
+!
+      call collect_small_send_recv_mulchar                              &
+     &   (kchara, gauss_coef%istack_picked_spec_lc,                     &
+     &    gauss_coef%num_sph_mode_lc, gauss_coef%gauss_mode_name_lc,    &
+     &    gauss_coef%istack_picked_spec_lc(nprocs),                     &
+     &    gauss_coef%gauss_mode_name_out, SR_sig)
 !
       end subroutine init_gauss_coefs_4_monitor
 !

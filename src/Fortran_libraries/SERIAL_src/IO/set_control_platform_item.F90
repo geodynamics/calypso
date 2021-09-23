@@ -17,6 +17,10 @@
 !!        type(field_IO_params), intent(inout) :: sph_file_IO
 !!        type(FEM_file_IO_flags), intent(inout) :: FEM_mesh_flags
 !!
+!!      subroutine set_control_file_def(plt, file_param)
+!!        type(platform_data_control), intent(in) :: plt
+!!        type(field_IO_params), intent(inout) :: file_param
+!!
 !!      subroutine set_parallel_file_ctl_params(default_prefix,         &
 !!     &          file_prefix_ctl, file_format_ctl,  file_params)
 !!      subroutine set_file_control_params(default_prefix,              &
@@ -107,6 +111,29 @@
 #endif
 !
       end subroutine set_control_smp_def
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_control_file_def(default_prefix,                   &
+     &          file_prefix_ctl, file_format_ctl, file_param)
+!
+      use m_default_file_prefix
+      use m_file_format_switch
+      use stop_by_missing_zlib
+!
+      character(len=kchara), intent(in) :: default_prefix
+      type(read_character_item), intent(in) :: file_prefix_ctl
+      type(read_character_item), intent(in) :: file_format_ctl
+      type(field_IO_params), intent(inout) :: file_param
+!
+!
+      call set_file_control_params(default_prefix,                      &
+     &    file_prefix_ctl, file_format_ctl, file_param)
+      call s_stop_by_missing_zlib(file_param%file_prefix,               &
+     &                            file_param%iflag_format)
+!
+      end subroutine set_control_file_def
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

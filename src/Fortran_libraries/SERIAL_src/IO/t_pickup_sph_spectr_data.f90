@@ -11,11 +11,28 @@
 !!      subroutine alloc_pick_sph_l(list_pick)
 !!      subroutine alloc_pick_sph_m(list_pick)
 !!      subroutine alloc_num_pick_layer(picked)
+!!      subroutine alloc_pickup_sph_spec_local(nprocs, picked)
+!!        integer, intent(in) :: nprocs
+!!        type(picked_spectrum_data), intent(inout) :: picked
+!!      subroutine dealloc_pickup_sph_spec_local(picked)
 !!      subroutine alloc_pick_sph_monitor(picked)
+!!
+!!      subroutine alloc_gauss_coef_monitor_lc(my_rank, nprocs, gauss)
+!!      subroutine dealloc_gauss_coef_monitor_lc(gauss)
+!!        integer, intent(in) :: my_rank, nprocs
+!!        type(picked_spectrum_data), intent(inout) :: gauss
 !!
 !!      subroutine dealloc_pick_sph_mode(list_pick)
 !!      subroutine dealloc_num_pick_layer(picked)
 !!      subroutine dealloc_pick_sph_monitor(picked)
+!!
+!!      subroutine write_pick_sph_file_header(id_file, picked)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        type(picked_spectrum_data), intent(in) :: picked
+!!
+!!      function pick_sph_header_no_field(picked)
+!!      function each_pick_sph_header_no_field(picked)
+!!        type(picked_spectrum_data), intent(in) :: picked
 !!@endverbatim
 !!
 !!@n @param  i_step    time step
@@ -73,6 +90,8 @@
         integer(kind = kint), allocatable :: idx_out(:,:)
 !>        Name of Gauss coefficients  (g_{l}^{m} or h_{l}^{m})
         character(len=kchara), allocatable :: gauss_mode_name_lc(:)
+!>        Name of Gauss coefficients  (g_{l}^{m} or h_{l}^{m})
+        character(len=kchara), allocatable :: gauss_mode_name_out(:)
 !
 !>        Number of fields for monitoring output
 !!         @f$ f(r,\theta,\phi) @f$
@@ -200,12 +219,21 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine alloc_gauss_coef_monitor_lc(gauss)
+      subroutine alloc_gauss_coef_monitor_lc(my_rank, nprocs, gauss)
 !
+      integer, intent(in) :: my_rank, nprocs
       type(picked_spectrum_data), intent(inout) :: gauss
+      integer(kind = kint) :: num
 !
 !
-      allocate( gauss%gauss_mode_name_lc(gauss%num_sph_mode_lc) )
+      allocate(gauss%gauss_mode_name_lc(gauss%num_sph_mode_lc))
+!
+      if(my_rank .eq. 0) then
+        num = gauss%istack_picked_spec_lc(nprocs)
+        allocate(gauss%gauss_mode_name_out(num))
+      else
+        allocate(gauss%gauss_mode_name_out(0))
+      end if
 !
       end subroutine alloc_gauss_coef_monitor_lc
 !
@@ -216,7 +244,8 @@
       type(picked_spectrum_data), intent(inout) :: gauss
 !
 !
-      deallocate( gauss%gauss_mode_name_lc )
+      deallocate(gauss%gauss_mode_name_lc)
+      deallocate(gauss%gauss_mode_name_out)
 !
       end subroutine dealloc_gauss_coef_monitor_lc
 !
@@ -309,6 +338,32 @@
      &        hd_time_sph_label()
 !
       end function pick_sph_header_no_field
+!
+! -----------------------------------------------------------------------
+!
+      function each_pick_sph_header_no_field(picked)
+!
+      use m_monitor_file_labels
+!
+      type(picked_spectrum_data), intent(in) :: picked
+!
+      integer(kind = kint), parameter                                   &
+     &         :: ilen_h1 = ilen_pick_sph_head + 3*16 + 1
+      integer(kind = kint), parameter                                   &
+     &         :: ilen_h2 = ilen_pick_sph_num + 16 + 1
+      integer(kind = kint), parameter                                   &
+     &        :: len_head = ilen_h1 + ilen_h2 + ilen_time_sph_label
+!
+      character(len = len_head) :: each_pick_sph_header_no_field
+!
+!
+      write(each_pick_sph_header_no_field,'(a,3i16,a1,a,i16,a1,a)')     &
+     &        hd_pick_sph_head(), picked%num_layer,                     &
+     &        ione, picked%ntot_pick_spectr, char(10),                  &
+     &        hd_pick_sph_num(), picked%ntot_comp_rj, char(10),         &
+     &        hd_time_sph_label()
+!
+      end function each_pick_sph_header_no_field
 !
 ! -----------------------------------------------------------------------
 !

@@ -73,6 +73,7 @@
       use t_control_params_4_psf
 !
       use set_field_comp_for_viz
+      use mpi_abort_by_missing_zlib
 !
       integer(kind= kint), intent(in) :: num_psf
       type(mesh_groups), intent(in) :: group
@@ -91,6 +92,8 @@
         call count_control_4_psf(psf_ctls%psf_ctl_struct(i),            &
      &      group%ele_grp, nod_fld%num_phys, nod_fld%phys_name,         &
      &      psf_mesh(i)%field, psf_param(i), psf_file_IO(i), ierr)
+        call mpi_abort_by_no_zlib_in_fld(psf_file_IO(i)%file_prefix,    &
+     &                                   psf_file_IO(i)%iflag_format)
         if(ierr.gt.0) call calypso_MPI_abort(ierr, e_message)
       end do
 !
@@ -129,6 +132,7 @@
       use t_file_IO_parameter
 !
       use set_field_comp_for_viz
+      use mpi_abort_by_missing_zlib
 !
       integer(kind= kint), intent(in) :: num_iso
       type(mesh_groups), intent(in) :: group
@@ -148,6 +152,8 @@
      &      group%ele_grp, nod_fld%num_phys, nod_fld%phys_name,         &
      &      iso_mesh(i)%field, iso_param(i), iso_def(i),                &
      &      iso_file_IO(i))
+        call mpi_abort_by_no_zlib_in_fld(iso_file_IO(i)%file_prefix,    &
+     &                                   iso_file_IO(i)%iflag_format)
       end do
 !
       do i = 1, num_iso
