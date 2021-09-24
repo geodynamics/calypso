@@ -26,7 +26,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: build
       run: |
-        brew install brew install open-mpi fftw lhdf5-mpi
+        brew install open-mpi fftw lhdf5-mpi
         ./configure \
           --enable-fftw3 \
           --with-hdf5 \
