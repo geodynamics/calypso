@@ -1236,10 +1236,10 @@ The data file has the following headers in the first three lines,
 %
 The data consists of time step, time, and Gauss coefficients for each step in one line. If the Gauss coefficients data file exist before starting the simulation, programs append Gauss coefficients at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old Gauss coefficients file to another directory before starting the programs.
 
-\subsubsection{Spectrum monitor data {\tt [picked\_sph\_prefix].dat}}
+\subsubsection{Spectrum monitor data \\
+{\tt [picked\_sph\_prefix]\_l[degree]\_m[order].dat}}
 \label{sec:pickup_spectr_ctl}
-This program outputs spherical harmonics coefficients at specified spherical harmonics modes and radial points in single text file. Spectrum data marked \verb|[Monitor_On]| are written in our line for each spherical harmonics mode and radial point every \\
-\verb|[increment_monitor]| steps. If the spectrum monitor data file exist before starting the simulation, programs append spectrum data at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old spectrum monitor file to another directory before starting the programs.
+This outputs of spherical harmonics coefficients at specified spherical harmonics modes and radial points in text files. Data for each spherical harmonic mode are saved in the files named {\tt [picked\_sph\_prefix]\_l[degree]\_m[order].dat}. Consequently, the file prefix {\tt [picked\_sph\_prefix]} is recommended to be defined including subdirectory name to save under a subdirectory. Spectrum data marked \verb|[Monitor_On]| are written in one line for each radial point every \verb|[increment_monitor]| steps. If the spectrum monitor data file exist before starting the simulation, programs append spectrum data at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old spectrum monitor file to another directory before starting the programs.
 
 If a vector field $\bvec{F}$ is not a solenoidal field, $\bvec{F}$ is described by the spherical harmonics coefficients of the poloidal $F_{Sl}^{\ m}$, toroidal $F_{Tl}^{\ m}$, and potential $\varphi_{l}^{m}$ components as
 \begin{eqnarray}
@@ -1897,9 +1897,10 @@ This program generate time average and standard deviation of power spectrum data
 \subsubsection{Averaging for picked harmonics mode data \\
  ({\tt t\_ave\_picked\_sph\_coefs})}
 \label{sec:ave_picked_spectr}
-This program generate time average and standard deviation of spherical harmonic coefficients which selected in the file \verb|[picked_sph_prefix].dat|.
+This program generate time average and standard deviation of each spherical harmonic coefficients data file \verb|[picked_sph_prefix]_l[degree]_m[ordedr][c/s].dat|.
 
-In this program, file prefix  \verb|[picked_sph_prefix]| and start and end time are required in the interactive input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
+In this program, file name excluding the extension \verb|[.dat]| \\
+(\verb|[picked_sph_prefix]_l[degree]_m[ordedr][c/s]|), start time, and end time are required in the interactive input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
 %
 \subsubsection{Averaging for Nusselt number data \\
  ({\tt t\_ave\_nusselt})}

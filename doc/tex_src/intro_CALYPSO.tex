@@ -66,6 +66,8 @@ In Version 2.0, there are a number of changes as;
 \item Calypso now support various format of data IO (ascii, binary, gzipped ascii, and gzipped binary) through MPI-IO.
 \item Include spherical harmonics index generator into simulation program. Consequently, we can start program without preprocessing.
 \item Modules to generate longitudinal average data is included into the simulation program.
+\item Due to the performance drops on massively parallel environment, spectrum data \\
+{\tt [picked\_sph\_prefix].dat} is splitted into the data files for each spherical harmonics mode {\tt [picked\_sph\_prefix]\_l[degree]\_m[order][c/s].dat}. Consequently, the file prefix [picked\_sph\_prefix] is recommends to includer subdirectory and that files are saved undere a subdirectory. (See Section \ref{sec:pickup_spectr_ctl} and tests under \verb|tests/Dynamobench_case2|.)
 \item Number of array information is not required to define "array" block in control files.
 \item Block layout of the control file is changed for spatial resolution and spherical harmonic data IO.
 \end{itemize}
