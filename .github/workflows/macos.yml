@@ -26,8 +26,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: build
       run: |
-        brew search gcc
-        brew search gfortran
+        brew info gfortran
         brew info open-mpi
         brew install gcc@11 open-mpi fftw hdf5-mpi
         
