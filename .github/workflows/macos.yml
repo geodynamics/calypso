@@ -29,7 +29,13 @@ jobs:
         brew info gfortran
         brew info open-mpi
         brew install gfortran
-        gfortran-11 -v
+
+  # Shell script to make gfortran link
+        a=`which gfortran-11`; \
+        b=`dirname $a`; \
+        c=$b/gfortran; \
+        ln -s $a $c
+
         brew install open-mpi fftw hdf5-mpi
         
         mpicc -v
