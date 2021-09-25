@@ -29,8 +29,6 @@ jobs:
         brew info gfortran
         brew info open-mpi
         brew install gfortran
-        gfortran -v
-        gfortran-10 -v
         gfortran-11 -v
         brew install open-mpi fftw hdf5-mpi
         
