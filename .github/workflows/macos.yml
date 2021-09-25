@@ -30,7 +30,6 @@ jobs:
         brew info open-mpi
         brew install gfortran
 
-  # Shell script to make gfortran link
         a=`which gfortran-11`; \
         b=`dirname $a`; \
         c=$b/gfortran; \
