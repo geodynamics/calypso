@@ -28,7 +28,7 @@ jobs:
       run: |
         brew info gfortran
         brew info open-mpi
-        brew install gcc@11 open-mpi fftw hdf5-mpi
+        brew install gfortran open-mpi fftw hdf5-mpi
         
         ./configure \
           --enable-fftw3 \
