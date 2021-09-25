@@ -33,7 +33,8 @@ jobs:
           --with-hdf5 \
           --with-blas \
           --with-zlib \
-          FC=gfortran F77=gfortran \
+          FC="gfortran" \
+          F77="gfortran" \
           MPIRUN="mpirun --oversubscribe"
 
         make
