@@ -27,6 +27,8 @@ jobs:
     - name: build
       run: |
         brew install open-mpi fftw hdf5-mpi
+        printenv PATH
+        
         ./configure \
           --enable-fftw3 \
           --with-hdf5 \
