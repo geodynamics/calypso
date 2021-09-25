@@ -29,7 +29,7 @@ jobs:
         brew search gcc
         brew search gfortran
         brew info open-mpi
-        brew install gcc-11 gfortran-11 open-mpi fftw hdf5-mpi
+        brew install gcc@11 open-mpi fftw hdf5-mpi
         
         ./configure \
           --enable-fftw3 \
