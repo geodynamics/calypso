@@ -28,13 +28,14 @@ jobs:
       run: |
         brew info gfortran
         brew info open-mpi
-        brew install gfortran open-mpi fftw hdf5-mpi
-        
-        mpicc -v
-        mpif90 -v
+        brew install gfortran
         gfortran -v
         gfortran-10 -v
         gfortran-11 -v
+        brew install open-mpi fftw hdf5-mpi
+        
+        mpicc -v
+        mpif90 -v
         
         ./configure \
           --enable-fftw3 \
