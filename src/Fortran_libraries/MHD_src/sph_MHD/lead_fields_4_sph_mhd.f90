@@ -112,6 +112,7 @@
       use sph_transforms_4_MHD
       use cal_energy_flux_rtp
       use cal_self_buoyancies_sph
+      use decomp_w_sym_rj_base_field
 !
       type(sph_mhd_monitor_data), intent(in) :: monitor
       type(fdm_matrices), intent(in) :: r_2nd
@@ -136,6 +137,18 @@
      &     (SPH_MHD%sph, MHD_prop, sph_MHD_bc, r_2nd, trans_p%leg,      &
      &      sph_MHD_mat%band_p_poisson, SPH_MHD%ipol, SPH_MHD%fld)
       end if
+!
+      call s_decomp_w_sym_rj_base_field(SPH_MHD%sph%sph_rj,     &
+     &    SPH_MHD%ipol%base, SPH_MHD%ipol%sym_fld, SPH_MHD%ipol%asym_fld, SPH_MHD%fld)
+      call sel_buoyancies_sph_MHD(SPH_MHD%sph%sph_rj, trans_p%leg,      &
+     &    SPH_MHD%ipol%sym_fld, SPH_MHD%ipol%forces_by_sym_asym,        &
+     &    MHD_prop%fl_prop, MHD_prop%ref_param_T, MHD_prop%ref_param_C, &
+     &    sph_MHD_bc%sph_bc_U, SPH_MHD%fld)
+      call sel_buoyancies_sph_MHD(SPH_MHD%sph%sph_rj, trans_p%leg,      &
+     &    SPH_MHD%ipol%asym_fld, SPH_MHD%ipol%forces_by_sym_sym,        &
+     &    MHD_prop%fl_prop, MHD_prop%ref_param_T, MHD_prop%ref_param_C, &
+     &    sph_MHD_bc%sph_bc_U, SPH_MHD%fld)
+!
 !
       call lead_fields_by_sph_trans(SPH_MHD%sph, SPH_MHD%comms,         &
      &    MHD_prop, trans_p, WK%trns_MHD, WK%trns_snap,                 &
@@ -188,6 +201,73 @@
      &      trns_snap%b_trns%base, trns_MHD%f_trns%forces,              &
      &      trns_snap%backward, trns_MHD%forward)
       end if
+!
+!
+      call nonlinear_terms_on_node_w_sym                                  &
+     &   (MHD_prop, trns_snap%b_trns%sym_fld, trns_snap%b_trns%sym_fld,   &
+     &    trns_snap%f_trns%forces_by_sym_sym, sph%sph_rtp%nnod_rtp,       &
+     &    trns_snap%backward%ncomp, trns_snap%backward%fld_rtp,         &
+     &    trns_snap%forward%ncomp,  trns_snap%forward%fld_rtp)
+      if    (sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_pole     &
+     &  .or. sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_center)  &
+     &      then
+      call nonlinear_terms_on_node_w_sym                                    &
+      &   (MHD_prop, trns_snap%b_trns%sym_fld, trns_snap%b_trns%sym_fld,   &
+      &    trns_snap%f_trns%forces_by_sym_sym, sph%sph_rtp%nnod_pole,       &
+      &    trns_snap%backward%ncomp, trns_snap%backward%fld_pole,         &
+      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_pole)
+      end if
+!
+      call nonlinear_terms_on_node_w_sym                                  &
+     &   (MHD_prop, trns_snap%b_trns%asym_fld, trns_snap%b_trns%asym_fld,   &
+     &    trns_snap%f_trns%forces_by_asym_asym, sph%sph_rtp%nnod_rtp,       &
+     &    trns_snap%backward%ncomp, trns_snap%backward%fld_rtp,         &
+     &    trns_snap%forward%ncomp,  trns_snap%forward%fld_rtp)
+     if    (sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_pole     &
+     &  .or. sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_center)  &
+     &      then
+      call nonlinear_terms_on_node_w_sym                                    &
+      &   (MHD_prop, trns_snap%b_trns%asym_fld, trns_snap%b_trns%asym_fld,   &
+      &    trns_snap%f_trns%forces_by_asym_asym, sph%sph_rtp%nnod_pole,       &
+      &    trns_snap%backward%ncomp, trns_snap%backward%fld_pole,         &
+      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_pole)
+      end if
+!
+      call nonlinear_terms_on_node_w_sym                                  &
+     &   (MHD_prop, trns_snap%b_trns%sym_fld, trns_snap%b_trns%asym_fld,   &
+     &    trns_snap%f_trns%forces_by_sym_asym, sph%sph_rtp%nnod_rtp,       &
+     &    trns_snap%backward%ncomp, trns_snap%backward%fld_rtp,         &
+     &    trns_snap%forward%ncomp,  trns_snap%forward%fld_rtp)
+     if    (sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_pole     &
+     &  .or. sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_center)  &
+     &      then
+      call nonlinear_terms_on_node_w_sym                                    &
+      &   (MHD_prop, trns_snap%b_trns%sym_fld, trns_snap%b_trns%asym_fld,   &
+      &    trns_snap%f_trns%forces_by_sym_asym, sph%sph_rtp%nnod_pole,       &
+      &    trns_snap%backward%ncomp, trns_snap%backward%fld_pole,         &
+      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_pole)
+      end if
+!
+      call nonlinear_terms_on_node_w_sym                                  &
+     &   (MHD_prop, trns_snap%b_trns%asym_fld, trns_snap%b_trns%sym_fld,   &
+     &    trns_snap%f_trns%forces_by_asym_sym, sph%sph_rtp%nnod_rtp,       &
+     &    trns_snap%backward%ncomp, trns_snap%backward%fld_rtp,         &
+     &    trns_snap%forward%ncomp,  trns_snap%forward%fld_rtp)
+     if    (sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_pole     &
+     &  .or. sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_center)  &
+     &      then
+      call nonlinear_terms_on_node_w_sym                                    &
+      &   (MHD_prop, trns_snap%b_trns%asym_fld, trns_snap%b_trns%asym_fld,   &
+      &    trns_snap%f_trns%forces_by_asym_sym, sph%sph_rtp%nnod_pole,       &
+      &    trns_snap%backward%ncomp, trns_snap%backward%fld_pole,         &
+      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_pole)
+      end if
+!
+       if (iflag_debug.gt.0) write(*,*)                                  &
+      &    'sph_forward_trans_snapshot_MHD for trns_snap'
+       call sph_forward_trans_snapshot_MHD                               &
+      &   (sph, comms_sph, trans_p, trns_snap%forward,                   &
+      &    WK_leg, WK_FFTs, rj_fld, SR_sig, SR_r)
 !
       end subroutine lead_fields_by_sph_trans
 !
@@ -299,6 +379,7 @@
       use sph_transforms_snapshot
       use cal_energy_flux_rj
       use cal_energy_flux_rtp
+      use cal_ene_flux_by_sym_rtp
 !
       integer(kind = kint), intent(in) :: ltr_crust
       type(sph_grids), intent(in) :: sph
@@ -338,6 +419,11 @@
      &    trns_difv%b_trns, trns_eflux%f_trns,                          &
      &    trns_MHD%forward, trns_snap%backward, trns_eflux%backward,    &
      &    trns_difv%backward, trns_eflux%forward)
+!
+      call s_cal_ene_flux_by_sym_rtp(sph%sph_rtp, MHD_prop%fl_prop,  &
+     &    MHD_prop%ref_param_T, MHD_prop%ref_param_C,                   &
+     &    trns_snap%b_trns, trns_snap%f_trns, trns_eflux%f_trns,        &
+     &    trns_snap%backward, trns_snap%forward, trns_eflux%forward)
 !
       end subroutine cal_sph_enegy_fluxes
 !

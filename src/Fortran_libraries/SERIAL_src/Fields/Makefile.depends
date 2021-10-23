@@ -22,19 +22,33 @@ m_explicit_term_labels.o: $(FIELDIR)/m_explicit_term_labels.f90 m_precision.o m_
 	$(F90) -c $(F90OPTFLAGS) $<
 m_field_product_labels.o: $(FIELDIR)/m_field_product_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
+m_field_w_symmetry_labels.o: $(FIELDIR)/m_field_w_symmetry_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_force_w_sym_labels.o: $(FIELDIR)/m_force_w_sym_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
 m_grad_field_labels.o: $(FIELDIR)/m_grad_field_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_rot_force_labels.o: $(FIELDIR)/m_rot_force_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_sym_ene_flux_labels.o: $(FIELDIR)/m_sym_ene_flux_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 m_time_labels.o: $(FIELDIR)/m_time_labels.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_MHD_field_address.o: $(FIELDIR)/set_MHD_field_address.f90 m_precision.o t_phys_address.o t_phys_data.o m_base_field_labels.o m_base_force_labels.o m_rot_force_labels.o m_div_force_labels.o m_diffusion_term_labels.o m_diff_vector_labels.o m_grad_field_labels.o m_field_product_labels.o m_explicit_term_labels.o m_energy_flux_labels.o t_base_field_labels.o t_base_force_labels.o t_diff_vector_labels.o t_field_product_labels.o t_diffusion_term_labels.o t_explicit_term_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_control_field_data.o: $(FIELDIR)/set_control_field_data.f90 m_precision.o m_constants.o m_machine_parameter.o m_error_IDs.o t_phys_address.o t_phys_data.o t_control_array_character3.o set_nodal_field_name.o set_MHD_field_address.o
+set_MHD_sym_fld_address.o: $(FIELDIR)/set_MHD_sym_fld_address.f90 m_precision.o t_phys_address.o t_phys_data.o m_field_w_symmetry_labels.o m_force_w_sym_labels.o m_sym_ene_flux_labels.o set_sym_field_labels.o set_sym_force_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_each_field_name.o: $(FIELDIR)/set_each_field_name.f90 m_precision.o t_phys_data.o m_field_product_labels.o set_MHD_field_address.o append_phys_data.o m_energy_flux_labels.o
+set_control_field_data.o: $(FIELDIR)/set_control_field_data.f90 m_precision.o m_constants.o m_machine_parameter.o m_error_IDs.o t_phys_address.o t_phys_data.o t_control_array_character3.o set_nodal_field_name.o set_MHD_field_address.o set_MHD_sym_fld_address.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_each_field_name.o: $(FIELDIR)/set_each_field_name.f90 m_precision.o t_phys_data.o m_field_product_labels.o set_MHD_field_address.o set_MHD_sym_fld_address.o append_phys_data.o m_energy_flux_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_nodal_field_name.o: $(FIELDIR)/set_nodal_field_name.f90 m_precision.o t_phys_data.o t_control_array_character3.o add_nodal_fields_ctl.o set_each_field_name.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_sym_field_labels.o: $(FIELDIR)/set_sym_field_labels.f90 m_precision.o m_phys_constants.o t_base_field_labels.o m_field_w_symmetry_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_sym_force_labels.o: $(FIELDIR)/set_sym_force_labels.f90 m_precision.o m_constants.o t_base_force_labels.o t_energy_flux_labels.o m_force_w_sym_labels.o m_sym_ene_flux_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+decomp_w_sym_rj_base_field.o: $(FIELDIR)/decomp_w_sym_rj_base_field.f90 m_precision.o t_spheric_rj_data.o t_phys_data.o t_base_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_base_field_labels.o: $(FIELDIR)/t_base_field_labels.f90 m_precision.o m_phys_constants.o t_field_labels.o m_base_field_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<

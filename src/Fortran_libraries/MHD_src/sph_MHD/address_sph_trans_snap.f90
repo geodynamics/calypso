@@ -85,11 +85,23 @@
 !
       call add_base_vector_sph_trns_snap                                &
      &   (d_rj, ipol%base, iphys%base, b_trns%base, trns_back)
-      trns_back%num_vector = trns_back%nfield
+      call add_base_vector_sph_trns_snap                                &
+     &   (d_rj, ipol%sym_fld, iphys%sym_fld, b_trns%sym_fld,   &
+     &    trns_back)
+      call add_base_vector_sph_trns_snap                                &
+     &   (d_rj, ipol%asym_fld, iphys%asym_fld, b_trns%asym_fld,   &
+     &    trns_back)
+     trns_back%num_vector = trns_back%nfield
 !
 !      Scalars
       call add_base_scalar_sph_trns_snap                                &
      &   (d_rj, ipol%base, iphys%base, b_trns%base, trns_back)
+      call add_base_scalar_sph_trns_snap                                &
+     &   (d_rj, ipol%sym_fld, iphys%sym_fld, b_trns%sym_fld,            &
+     &    trns_back)
+      call add_base_scalar_sph_trns_snap                                &
+     &   (d_rj, ipol%asym_fld, iphys%asym_fld, b_trns%asym_fld,         &
+     &    trns_back)
       trns_back%num_scalar = trns_back%nfield - trns_back%num_vector
       trns_back%num_tensor = 0
 !
@@ -119,6 +131,31 @@
 !   forces
       call add_base_force_sph_trns_snap                                 &
      &   (d_rj, ipol%forces, iphys%forces, f_trns%forces, trns_fwd)
+!
+     call add_base_force_4_MHD_sph_trns                                &
+     &   (d_rj, ipol%forces_by_sym_sym, iphys%forces_by_sym_sym,            &
+     &    f_trns%forces_by_sym_sym, trns_fwd)
+     call add_base_force_4_MHD_sph_trns                                &
+     &   (d_rj, ipol%forces_by_asym_asym, iphys%forces_by_asym_asym,            &
+     &    f_trns%forces_by_asym_asym, trns_fwd)
+     call add_base_force_4_MHD_sph_trns                                &
+     &   (d_rj, ipol%forces_by_sym_asym, iphys%forces_by_sym_asym,            &
+     &    f_trns%forces_by_sym_asym, trns_fwd)
+     call add_base_force_4_MHD_sph_trns                                &
+     &   (d_rj, ipol%forces_by_asym_sym, iphys%forces_by_asym_sym,            &
+     &    f_trns%forces_by_asym_sym, trns_fwd)
+     call add_base_force_sph_trns_snap                                 &
+     &   (d_rj, ipol%forces_by_sym_sym, iphys%forces_by_sym_sym,            &
+     &    f_trns%forces_by_sym_sym, trns_fwd)
+     call add_base_force_sph_trns_snap                                 &
+     &   (d_rj, ipol%forces_by_asym_asym, iphys%forces_by_asym_asym,            &
+     &    f_trns%forces_by_asym_asym, trns_fwd)
+     call add_base_force_sph_trns_snap                                 &
+     &   (d_rj, ipol%forces_by_sym_asym, iphys%forces_by_sym_asym,            &
+     &    f_trns%forces_by_sym_asym, trns_fwd)
+     call add_base_force_sph_trns_snap                                 &
+     &   (d_rj, ipol%forces_by_asym_sym, iphys%forces_by_asym_sym,            &
+     &    f_trns%forces_by_asym_sym, trns_fwd)
       trns_fwd%num_vector = trns_fwd%nfield
 !
       call add_div_coriolis_MHD_sph_trns                                &
@@ -172,6 +209,13 @@
       call add_subtracted_sph_trns_snap                                 &
      &   (d_rj, ipol%prod_fld, iphys%prod_fld, b_trns%prod_fld,         &
      &    trns_back)
+!
+      call add_base_force_bwd_trns_snap                                 &
+     &   (d_rj, ipol%forces_by_sym_asym, iphys%forces_by_sym_asym,            &
+     &    b_trns%forces_by_sym_asym, trns_back)
+      call add_base_force_bwd_trns_snap                                 &
+     &   (d_rj, ipol%forces_by_sym_sym, iphys%forces_by_sym_sym,            &
+     &    b_trns%forces_by_sym_sym, trns_back)
       trns_back%num_vector = trns_back%nfield
 !
 !
@@ -227,6 +271,18 @@
       call add_ene_flux_4_sph_trns_snap                                 &
      &   (d_rj, ipol%ene_flux, iphys%ene_flux, f_trns%ene_flux,         &
      &    trns_fwd)
+     call add_ene_flux_4_sph_trns_snap                                 &
+     &   (d_rj, ipol%eflux_to_sym_by_sym_asym, iphys%eflux_to_sym_by_sym_asym,            &
+     &    f_trns%eflux_to_sym_by_sym_asym, trns_fwd)
+     call add_ene_flux_4_sph_trns_snap                                 &
+     &   (d_rj, ipol%eflux_to_sym_by_asym_sym, iphys%eflux_to_sym_by_asym_sym,            &
+     &    f_trns%eflux_to_sym_by_asym_sym, trns_fwd)
+     call add_ene_flux_4_sph_trns_snap                                 &
+     &   (d_rj, ipol%eflux_to_asym_by_sym_sym, iphys%eflux_to_asym_by_sym_sym,            &
+     &    f_trns%eflux_to_asym_by_sym_sym, trns_fwd)
+     call add_ene_flux_4_sph_trns_snap                                 &
+     &   (d_rj, ipol%eflux_to_asym_by_asym_asym, iphys%eflux_to_asym_by_asym_asym,            &
+     &    f_trns%eflux_to_asym_by_asym_asym, trns_fwd)
       trns_fwd%num_scalar = trns_fwd%nfield - trns_fwd%num_vector
       trns_fwd%num_tensor = 0
 !
