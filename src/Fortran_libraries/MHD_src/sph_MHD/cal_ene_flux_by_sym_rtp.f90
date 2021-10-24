@@ -3,7 +3,7 @@
 !!
 !! @author  H. Matsui
 !! @date Programmed in Oct., 2009
-!! @n    Modified in Apr., 2013
+!! @n    Modified by T. Kera (Tohoku Univ.) in Apr., 2013
 !
 !> @brief Evaluate energy fluxes by filtered field
 !!

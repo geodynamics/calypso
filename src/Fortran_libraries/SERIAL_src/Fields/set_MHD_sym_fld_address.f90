@@ -1,9 +1,8 @@
 !>@file   set_MHD_sym_fld_address.f90
 !!        module set_MHD_sym_fld_address
 !!
-!! @author H. Matsui
-!! @date   Programmed on July, 2006
-!! @n      Modified  on Jan., 2012
+!! @author T. Kera (Tohoku Univ.)
+!! @date   Modified on Aug., 2021
 !!
 !!
 !> @brief Set start address for field data
