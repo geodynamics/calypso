@@ -174,7 +174,6 @@
       real(kind = kreal), intent(inout) :: etime_fft
 !
       real(kind = kreal) :: starttime, endtime
-      type(work_for_sgl_FFTW) :: TEST_mul_FFTW
 !
 !
       if(iflag_debug .gt. 0) write(*,*) 'init_sph_FFT_select'
