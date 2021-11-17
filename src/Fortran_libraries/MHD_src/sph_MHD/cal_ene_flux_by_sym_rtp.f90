@@ -1,14 +1,13 @@
 !> @file  cal_ene_flux_by_filter_rtp.f90
 !!      module cal_ene_flux_by_filter_rtp
 !!
-!! @author  H. Matsui
-!! @date Programmed in Oct., 2009
-!! @n    Modified by T. Kera (Tohoku Univ.) in Apr., 2013
+!! @author  T. Kera (Tohoku University)
+!! @date Programmed in Aug., 2021
 !
 !> @brief Evaluate energy fluxes by filtered field
 !!
 !!@verbatim
-!!      subroutine s_cal_ene_flux_by_filter_rtp                         &
+!!      subroutine s_cal_ene_flux_by_sym_rtp                            &
 !!     &         (sph_rtp, fl_prop, ref_param_T, ref_param_C,           &
 !!     &          bs_trns, fs_trns, fe_trns, trns_b_snap, trns_f_snap,  &
 !!     &          trns_f_eflux)
@@ -47,7 +46,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine s_cal_ene_flux_by_sym_rtp                           &
+      subroutine s_cal_ene_flux_by_sym_rtp                              &
      &         (sph_rtp, fl_prop, ref_param_T, ref_param_C,             &
      &          bs_trns, fs_trns, fe_trns, trns_b_snap, trns_f_snap,    &
      &          trns_f_eflux)

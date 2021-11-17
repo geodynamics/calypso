@@ -1,8 +1,8 @@
 !>@file   set_sym_field_labels.f90
 !!        module set_sym_field_labels
 !!
-!! @author H. Matsui
-!! @date   Programmed in Jan., 2020
+!!@author T. kera
+!!@date   Programmed in July, 2021 by T. Kera (Tohoku Univ.)
 !!
 !!
 !> @brief Labels and addresses for basic fields

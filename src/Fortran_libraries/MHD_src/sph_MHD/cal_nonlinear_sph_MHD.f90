@@ -1,8 +1,9 @@
 !>@file   cal_nonlinear_sph_MHD.f90
 !!@brief  module cal_nonlinear_sph_MHD
 !!
-!!@author H. Matsui
+!!@author H. Matsui (UC Berkeley) and T. Kera (Tohoku University)
 !!@date Programmed in Oct., 2009
+!>        Modified by T. Kera in Aug., 2021
 !
 !>@brief  Evaluate nonlinear terms in spherical coordinate grid
 !!
@@ -217,9 +218,9 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      subroutine nonlinear_terms_on_node_w_sym                                &
-      &         (MHD_prop, b_trns_base_1, b_trns_base_2, f_trns_frc,          &
-      &          nnod, ntot_comp_fld, fld_rtp, ntot_comp_frc, frc_rtp)
+      subroutine nonlinear_terms_on_node_w_sym                          &
+     &         (MHD_prop, b_trns_base_1, b_trns_base_2, f_trns_frc,     &
+     &          nnod, ntot_comp_fld, fld_rtp, ntot_comp_frc, frc_rtp)
 !
       use cal_products_smp
 !
@@ -235,44 +236,44 @@
 !$omp parallel
       if(f_trns_frc%i_m_advect .gt. 0) then
         call cal_cross_prod_w_coef_smp                                  &
-      &     (nnod, MHD_prop%fl_prop%coef_velo,                           &
-      &      fld_rtp(1,b_trns_base_1%i_vort),                              &
-      &      fld_rtp(1,b_trns_base_2%i_velo),                              &
-      &      frc_rtp(1,f_trns_frc%i_m_advect) )
+     &     (nnod, MHD_prop%fl_prop%coef_velo,                           &
+     &      fld_rtp(1,b_trns_base_1%i_vort),                            &
+     &      fld_rtp(1,b_trns_base_2%i_velo),                            &
+     &      frc_rtp(1,f_trns_frc%i_m_advect) )
       end if
 !
       if(f_trns_frc%i_lorentz .gt. 0) then
         call cal_cross_prod_w_coef_smp                                  &
-      &     (nnod, MHD_prop%fl_prop%coef_lor,                            &
-      &      fld_rtp(1,b_trns_base_1%i_current),                           &
-      &      fld_rtp(1,b_trns_base_2%i_magne),                             &
-      &      frc_rtp(1,f_trns_frc%i_lorentz) )
+     &     (nnod, MHD_prop%fl_prop%coef_lor,                            &
+     &      fld_rtp(1,b_trns_base_1%i_current),                         &
+     &      fld_rtp(1,b_trns_base_2%i_magne),                           &
+     &      frc_rtp(1,f_trns_frc%i_lorentz) )
       end if
 !
 !
       if(f_trns_frc%i_vp_induct .gt. 0) then
         call cal_cross_prod_w_coef_smp                                  &
-      &     (nnod, MHD_prop%cd_prop%coef_induct,                         &
-      &      fld_rtp(1,b_trns_base_1%i_velo),                              &
-      &      fld_rtp(1,b_trns_base_2%i_magne),                             &
-      &      frc_rtp(1,f_trns_frc%i_vp_induct) )
+     &     (nnod, MHD_prop%cd_prop%coef_induct,                         &
+     &      fld_rtp(1,b_trns_base_1%i_velo),                            &
+     &      fld_rtp(1,b_trns_base_2%i_magne),                           &
+     &      frc_rtp(1,f_trns_frc%i_vp_induct) )
       end if
 !
 !
       if(f_trns_frc%i_h_flux .gt. 0) then
         call cal_vec_scalar_prod_w_coef_smp                             &
-      &     (nnod, MHD_prop%ht_prop%coef_advect,                         &
-      &      fld_rtp(1,b_trns_base_1%i_velo),                              &
-      &      fld_rtp(1,b_trns_base_2%i_temp),                              &
-      &      frc_rtp(1,f_trns_frc%i_h_flux) )
+     &     (nnod, MHD_prop%ht_prop%coef_advect,                         &
+     &      fld_rtp(1,b_trns_base_1%i_velo),                            &
+     &      fld_rtp(1,b_trns_base_2%i_temp),                            &
+     &      frc_rtp(1,f_trns_frc%i_h_flux) )
       end if
 !
       if(f_trns_frc%i_c_flux .gt. 0) then
         call cal_vec_scalar_prod_w_coef_smp                             &
-      &     (nnod, MHD_prop%cp_prop%coef_advect,                         &
-      &      fld_rtp(1,b_trns_base_1%i_velo),                              &
-      &      fld_rtp(1,b_trns_base_2%i_light),                             &
-      &      frc_rtp(1,f_trns_frc%i_c_flux) )
+     &     (nnod, MHD_prop%cp_prop%coef_advect,                         &
+     &      fld_rtp(1,b_trns_base_1%i_velo),                            &
+     &      fld_rtp(1,b_trns_base_2%i_light),                           &
+     &      frc_rtp(1,f_trns_frc%i_c_flux) )
       end if
 !$omp end parallel
 !

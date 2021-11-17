@@ -3,7 +3,8 @@
 !!
 !!@author H. Matsui
 !!@date Programmed by H.Matsui and H.Okuda in July 2000
-!!@n     Modified by H. Matsui on  Aug., 2006
+!!@n     Modified by H. Matsui in  Aug., 2006
+!!@n     Modified by T. Kera in    Aug., 2021
 !
 !>@brief  Ordering field data by visualization flag
 !!
@@ -129,7 +130,7 @@
         if(flag) cycle
 !
 !
-        call set_MHD_sym_field_addresses                                    &
+        call set_MHD_sym_field_addresses                                &
      &     (i_fld, fld%phys_name(i), iphys, flag)
         if(flag) cycle
 !

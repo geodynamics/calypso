@@ -3,9 +3,10 @@
 !!
 !!@author H. Matsui
 !!@date Programmed in Jan., 2008
-!!@n        modified by H.Matsui on Oct.,  2009
-!!@n        modified by H.Matsui on June., 2012
-!!@n        modified by H.Matsui on Jan., 2021
+!!@n     Modified by H.Matsui in Oct.,  2009
+!!@n     Modified by H.Matsui in June., 2012
+!!@n     Modified by H.Matsui in Jan., 2021
+!!@n     Modified by T. Kera in Aug., 2021
 !!
 !>@brief  Set field name including SGS model from control data
 !!

@@ -40,7 +40,7 @@
 !
       interface
 !
-!  -----------------
+!  ---------------------------------------------------------------------
         subroutine gzip_defleat_once                                    &
      &           (len_buf, buf, len_gzipbuf, len_gzipped, gzipbuf)      &
      &            BIND(C, name = 'gzip_defleat_once')

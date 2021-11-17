@@ -1,11 +1,12 @@
 !>@file   t_phys_address.f90
 !!        module t_phys_address
 !!
-!! @author H. Matsui
-!! @date ...
+!!@author H. Matsui
+!!@date  Written in 200? by Hiroaki Matsui (UChicago)
+!!       Modified in July 2021, by T. Kera (Tohoku Univ.)
 !!
 !!
-!> @brief Structure of field addresses
+!>@brief Structure of field addresses
 !!       These integer points adresses of fields.
 !!
 !
@@ -62,8 +63,8 @@
         type(base_field_address) :: sym_fld
 !>        Structure of asymmetric fields
         type(base_field_address) :: asym_fld
-! 
-! 
+!
+!
 !>        Structure of forces by sym and sym fields (contain linear asym force)
         type(base_force_address) :: forces_by_sym_sym
 !>        Structure of forces by asym and asym fields
@@ -72,11 +73,11 @@
         type(base_force_address) :: forces_by_sym_asym
 !>        Structure of forces by asym and sym fields
         type(base_force_address) :: forces_by_asym_sym
-! 
-! 
+!
+!
 !>        Structure of energy fluxes s. (s x a) and s. s
         type(energy_flux_address) :: eflux_to_sym_by_sym_asym
-!>        Structure of energy fluxes s. (a x s) 
+!>        Structure of energy fluxes s. (a x s)
         type(energy_flux_address) :: eflux_to_sym_by_asym_sym
 !>        Structure of energy fluxes a. (s x s) and a. a
         type(energy_flux_address) :: eflux_to_asym_by_sym_sym
