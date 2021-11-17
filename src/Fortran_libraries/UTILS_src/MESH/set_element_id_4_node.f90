@@ -7,6 +7,11 @@
 !> @brief Set belonged element list for each node
 !!
 !!@verbatim
+!!      subroutine set_belonged_ele_and_next_nod                        &
+!!     &         (mesh, neib_ele, neib_nod)
+!!        type(mesh_geometry),       intent(in) :: mesh
+!!        type(element_around_node), intent(inout) :: neib_ele
+!!        type(next_nod_id_4_nod), intent(inout) :: neib_nod
 !!      subroutine set_ele_id_4_node(node, ele, neib_ele)
 !!      subroutine set_surf_id_4_node(node, surf, neib_ele)
 !!      subroutine set_edge_id_4_node(node, edge, neib_ele)
@@ -42,6 +47,12 @@
       use m_precision
       use m_constants
 !
+      use t_mesh_data
+      use t_geometry_data
+      use t_surface_data
+      use t_edge_data
+      use t_next_node_ele_4_node
+!
       implicit none
 !
 !-----------------------------------------------------------------------
@@ -50,10 +61,25 @@
 !
 !-----------------------------------------------------------------------
 !
+      subroutine set_belonged_ele_and_next_nod                          &
+     &         (mesh, neib_ele, neib_nod)
+!
+      type(mesh_geometry),       intent(in) :: mesh
+      type(element_around_node), intent(inout) :: neib_ele
+      type(next_nod_id_4_nod), intent(inout) ::   neib_nod
+!
+!
+      call set_ele_id_4_node(mesh%node, mesh%ele, neib_ele)
+      call const_next_nod_id_4_node                                     &
+     &   (mesh%node, mesh%ele, neib_ele, neib_nod)
+!
+      end subroutine set_belonged_ele_and_next_nod
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
       subroutine set_ele_id_4_node(node, ele, neib_ele)
 !
-      use t_geometry_data
-      use t_next_node_ele_4_node
       use find_element_id_4_node
       use cal_minmax_and_stacks
 !
@@ -84,9 +110,6 @@
 !
       subroutine set_surf_id_4_node(node, surf, neib_ele)
 !
-      use t_geometry_data
-      use t_surface_data
-      use t_next_node_ele_4_node
       use find_element_id_4_node
       use cal_minmax_and_stacks
 !
@@ -118,9 +141,6 @@
 !
       subroutine set_edge_id_4_node(node, edge, neib_ele)
 !
-      use t_geometry_data
-      use t_edge_data
-      use t_next_node_ele_4_node
       use find_element_id_4_node
       use cal_minmax_and_stacks
 !
@@ -154,8 +174,6 @@
       subroutine set_layerd_ele_id_4_node(nnod, iele_start, iele_end,   &
      &          node, ele, neib_ele)
 !
-      use t_geometry_data
-      use t_next_node_ele_4_node
       use find_element_id_4_node
       use cal_minmax_and_stacks
 !
@@ -190,8 +208,6 @@
       subroutine set_grouped_ele_id_4_node(nele_grp, iele_grp,          &
      &          node, ele, neib_ele)
 !
-      use t_geometry_data
-      use t_next_node_ele_4_node
       use find_grp_ele_id_4_node
       use cal_minmax_and_stacks
 !
@@ -230,8 +246,6 @@
 !
       use calypso_mpi
       use m_machine_parameter
-      use t_geometry_data
-      use t_next_node_ele_4_node
 !
       use find_node_4_group
       use cal_minmax_and_stacks

@@ -1,16 +1,24 @@
+FEM_analyzer_four_vizs.o: $(VIZ_PLUG_DIR)/FEM_analyzer_four_vizs.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_step_parameter.o t_time_data.o t_FEM_mesh_field_4_viz.o t_ucd_data.o t_next_node_ele_4_node.o t_shape_functions.o t_jacobians.o t_file_IO_parameter.o t_field_list_for_vizs.o t_VIZ_step_parameter.o t_mesh_SR.o t_control_data_four_vizs.o t_VIZ_only_step_parameter.o m_file_format_switch.o m_default_file_prefix.o set_control_platform_item.o set_control_platform_data.o parallel_ucd_IO_select.o t_VIZ_mesh_field.o mpi_load_mesh_data.o nod_phys_send_recv.o parallel_FEM_mesh_init.o set_parallel_file_name.o set_ucd_data_to_type.o FEM_to_VIZ_bridge.o output_parallel_ucd_file.o
+	$(F90) -c $(F90OPTFLAGS) $<
 FEM_analyzer_viz_surf.o: $(VIZ_PLUG_DIR)/FEM_analyzer_viz_surf.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o t_time_data.o t_field_list_for_vizs.o t_VIZ_step_parameter.o t_IO_step_parameter.o t_FEM_mesh_field_4_viz.o t_mesh_SR.o t_viz_sections.o t_control_data_section_only.o t_VIZ_only_step_parameter.o m_file_format_switch.o m_default_file_prefix.o set_control_platform_item.o set_control_platform_data.o parallel_ucd_IO_select.o mpi_load_mesh_data.o nod_phys_send_recv.o parallel_FEM_mesh_init.o set_parallel_file_name.o set_ucd_data_to_type.o const_element_comm_tables.o output_parallel_ucd_file.o
 	$(F90) -c $(F90OPTFLAGS) $<
 analyzer_VTK_convert.o: $(VIZ_PLUG_DIR)/analyzer_VTK_convert.f90 m_precision.o m_work_time.o t_viz_VTK_convert.o t_VIZ_only_step_parameter.o t_control_data_section_only.o t_FEM_mesh_field_4_viz.o t_file_IO_parameter.o t_vector_for_solver.o FEM_analyzer_viz_surf.o t_mesh_SR.o calypso_mpi.o m_elapsed_labels_4_VIZ.o m_elapsed_labels_SEND_RECV.o
 	$(F90) -c $(F90OPTFLAGS) $<
+analyzer_four_vizs.o: $(VIZ_PLUG_DIR)/analyzer_four_vizs.f90 m_precision.o m_machine_parameter.o m_work_time.o calypso_mpi.o t_control_data_four_vizs.o t_four_visualizers.o t_VIZ_only_step_parameter.o t_FEM_mesh_field_4_viz.o t_VIZ_mesh_field.o t_mesh_SR.o FEM_analyzer_four_vizs.o m_elapsed_labels_4_VIZ.o m_elapsed_labels_SEND_RECV.o
+	$(F90) -c $(F90OPTFLAGS) $<
 analyzer_psf.o: $(VIZ_PLUG_DIR)/analyzer_psf.f90 m_precision.o m_work_time.o t_viz_sections.o t_VIZ_only_step_parameter.o t_control_data_section_only.o t_FEM_mesh_field_4_viz.o t_mesh_SR.o FEM_analyzer_viz_surf.o calypso_mpi.o m_elapsed_labels_4_VIZ.o m_elapsed_labels_SEND_RECV.o
 	$(F90) -c $(F90OPTFLAGS) $<
 main_VTK_convert.o: $(VIZ_PLUG_DIR)/main_VTK_convert.f90 m_precision.o calypso_mpi.o analyzer_VTK_convert.o
+	$(F90) -c $(F90OPTFLAGS) $<
+main_four_visualizations.o: $(VIZ_PLUG_DIR)/main_four_visualizations.f90 m_precision.o calypso_mpi.o analyzer_four_vizs.o
 	$(F90) -c $(F90OPTFLAGS) $<
 main_surface_rendering.o: $(VIZ_PLUG_DIR)/main_surface_rendering.f90 m_precision.o calypso_mpi.o analyzer_psf.o
 	$(F90) -c $(F90OPTFLAGS) $<
 psf_file_to_VTK.o: $(VIZ_PLUG_DIR)/psf_file_to_VTK.f90 m_precision.o m_constants.o m_field_file_format.o m_section_file_extensions.o t_file_IO_parameter.o t_ucd_data.o ucd_IO_select.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_FEM_mesh_field_4_viz.o: $(VIZ_PLUG_DIR)/t_FEM_mesh_field_4_viz.f90 m_precision.o t_mesh_data.o t_phys_data.o t_field_list_for_vizs.o t_file_IO_parameter.o t_time_data.o t_ucd_data.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_control_data_four_vizs.o: $(VIZ_PLUG_DIR)/t_control_data_four_vizs.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o t_ctl_data_4_platforms.o t_ctl_data_4_time_steps.o t_control_data_viz4.o t_control_array_character3.o skip_comment_f.o viz4_step_ctls_to_time_ctl.o read_four_viz_controls.o calypso_mpi_int.o bcast_4_platform_ctl.o bcast_4_time_step_ctl.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_data_section_only.o: $(VIZ_PLUG_DIR)/t_control_data_section_only.f90 m_precision.o m_machine_parameter.o calypso_mpi.o t_read_control_elements.o t_ctl_data_4_platforms.o t_ctl_data_4_time_steps.o t_control_data_surfacings.o t_control_array_character3.o skip_comment_f.o read_surfacing_controls.o calypso_mpi_int.o bcast_4_platform_ctl.o bcast_4_time_step_ctl.o bcast_control_arrays.o
 	$(F90) -c $(F90OPTFLAGS) $<

@@ -8,7 +8,8 @@ LIB_UTILS =       -lcalypso_utils
 LIB_UTILS_FILE = libcalypso_utils.a
 
 SUBDIRS = \
-MESH           \
+MESH      \
+jacobian  \
 MERGE
 
 

@@ -92,4 +92,6 @@ t_time_data.o: $(BASEDIR)/t_time_data.f90 m_precision.o m_constants.o m_machine_
 	$(F90) -c $(F90OPTFLAGS) $<
 transfer_to_long_integers.o: $(BASEDIR)/transfer_to_long_integers.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
+transform_mat_operations.o: $(BASEDIR)/transform_mat_operations.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
 

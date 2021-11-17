@@ -1,0 +1,119 @@
+cal_1edge_jacobians.o: $(JACOBIDIR)/cal_1edge_jacobians.f90 m_precision.o m_geometry_constants.o cal_jacobian_1d.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_1ele_jacobians.o: $(JACOBIDIR)/cal_1ele_jacobians.f90 m_precision.o m_geometry_constants.o cal_jacobian_3d_linear.o cal_jacobian_3d_quad.o cal_jacobian_3d_lag.o cal_jacobian_3d_linear_quad.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_1ele_jacobians_infinte.o: $(JACOBIDIR)/cal_1ele_jacobians_infinte.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o cal_shape_func_infty_3d.o cal_jacobian_3d_inf_linear.o cal_jacobian_3d_inf_quad.o cal_jacobian_3d_inf_lag.o cal_jacobian_3d_inf_l_quad.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_1surf_grp_jacobians.o: $(JACOBIDIR)/cal_1surf_grp_jacobians.f90 m_precision.o m_geometry_constants.o cal_jacobian_sf_grp_linear.o cal_jacobian_sf_grp_quad.o cal_jacobian_sf_grp_lag.o cal_jacobian_sf_grp_l_quad.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_1surf_jacobians.o: $(JACOBIDIR)/cal_1surf_jacobians.f90 m_precision.o m_geometry_constants.o cal_jacobian_2d_linear.o cal_jacobian_2d_quad.o cal_jacobian_2d_lag.o cal_jacobian_2d_linear_quad.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_gradient_on_element.o: $(JACOBIDIR)/cal_gradient_on_element.f90 m_precision.o m_constants.o m_machine_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_1d.o: $(JACOBIDIR)/cal_jacobian_1d.f90 m_precision.o m_geometry_constants.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_2d_lag.o: $(JACOBIDIR)/cal_jacobian_2d_lag.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_2d_linear.o: $(JACOBIDIR)/cal_jacobian_2d_linear.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_2d_linear_quad.o: $(JACOBIDIR)/cal_jacobian_2d_linear_quad.f90 m_precision.o m_constants.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_2d_quad.o: $(JACOBIDIR)/cal_jacobian_2d_quad.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_3d_inf_l_quad.o: $(JACOBIDIR)/cal_jacobian_3d_inf_l_quad.f90 m_precision.o m_geometry_constants.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_3d_inf_lag.o: $(JACOBIDIR)/cal_jacobian_3d_inf_lag.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_3d_inf_linear.o: $(JACOBIDIR)/cal_jacobian_3d_inf_linear.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_3d_inf_quad.o: $(JACOBIDIR)/cal_jacobian_3d_inf_quad.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_3d_lag.o: $(JACOBIDIR)/cal_jacobian_3d_lag.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_3d_linear.o: $(JACOBIDIR)/cal_jacobian_3d_linear.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_3d_linear_quad.o: $(JACOBIDIR)/cal_jacobian_3d_linear_quad.f90 m_precision.o m_constants.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_3d_quad.o: $(JACOBIDIR)/cal_jacobian_3d_quad.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_sf_grp_l_quad.o: $(JACOBIDIR)/cal_jacobian_sf_grp_l_quad.f90 m_precision.o m_constants.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_sf_grp_lag.o: $(JACOBIDIR)/cal_jacobian_sf_grp_lag.f90 m_precision.o m_constants.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_sf_grp_linear.o: $(JACOBIDIR)/cal_jacobian_sf_grp_linear.f90 m_precision.o m_constants.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_jacobian_sf_grp_quad.o: $(JACOBIDIR)/cal_jacobian_sf_grp_quad.f90 m_precision.o m_constants.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_layered_volumes.o: $(JACOBIDIR)/cal_layered_volumes.f90 m_precision.o m_constants.o m_machine_parameter.o t_geometry_data.o t_layering_ele_list.o calypso_mpi.o calypso_mpi_real.o transfer_to_long_integers.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_shape_func_infty_3d.o: $(JACOBIDIR)/cal_shape_func_infty_3d.f90 m_precision.o m_geometry_constants.o set_shape_elements_infty_sf.o shape_func_3d_linear.o shape_func_3d_quad.o shape_func_3d_lag.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_shape_function_1d.o: $(JACOBIDIR)/cal_shape_function_1d.f90 m_precision.o m_constants.o m_geometry_constants.o shape_func_elements.o shape_func_1d_linear.o shape_func_1d_quad.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_shape_function_2d.o: $(JACOBIDIR)/cal_shape_function_2d.f90 m_precision.o m_constants.o m_geometry_constants.o shape_func_elements.o shape_func_2d_linear.o shape_func_2d_quad.o shape_func_2d_lag.o
+	$(F90) -c $(F90OPTFLAGS) $<
+cal_shape_function_3d.o: $(JACOBIDIR)/cal_shape_function_3d.f90 m_precision.o m_constants.o m_geometry_constants.o shape_func_elements.o shape_func_3d_linear.o shape_func_3d_quad.o shape_func_3d_lag.o
+	$(F90) -c $(F90OPTFLAGS) $<
+const_jacobians_1d.o: $(JACOBIDIR)/const_jacobians_1d.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o t_geometry_data.o t_edge_data.o t_fem_gauss_int_coefs.o t_shape_functions.o t_jacobian_1d.o cal_1edge_jacobians.o cal_shape_function_1d.o
+	$(F90) -c $(F90OPTFLAGS) $<
+const_jacobians_2d.o: $(JACOBIDIR)/const_jacobians_2d.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o t_geometry_data.o t_surface_data.o t_group_data.o t_fem_gauss_int_coefs.o t_shape_functions.o t_jacobian_2d.o cal_1surf_jacobians.o cal_shape_function_2d.o
+	$(F90) -c $(F90OPTFLAGS) $<
+const_jacobians_3d.o: $(JACOBIDIR)/const_jacobians_3d.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o t_geometry_data.o t_shape_functions.o t_fem_gauss_int_coefs.o t_jacobian_3d.o t_group_data.o t_surface_boundary.o cal_1ele_jacobians.o cal_shape_function_3d.o set_gauss_int_parameters.o set_integration_indices.o
+	$(F90) -c $(F90OPTFLAGS) $<
+const_jacobians_infinity.o: $(JACOBIDIR)/const_jacobians_infinity.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o t_mesh_data.o t_geometry_data.o t_group_data.o t_fem_gauss_int_coefs.o t_shape_functions.o t_jacobian_3d.o cal_1ele_jacobians_infinte.o
+	$(F90) -c $(F90OPTFLAGS) $<
+const_jacobians_sf_grp.o: $(JACOBIDIR)/const_jacobians_sf_grp.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o t_geometry_data.o t_surface_data.o t_group_data.o t_fem_gauss_int_coefs.o t_shape_functions.o t_jacobian_2d.o cal_1surf_grp_jacobians.o cal_shape_function_2d.o
+	$(F90) -c $(F90OPTFLAGS) $<
+fem_element_volume.o: $(JACOBIDIR)/fem_element_volume.f90 m_precision.o m_machine_parameter.o t_fem_gauss_int_coefs.o t_geometry_data.o t_jacobians.o
+	$(F90) -c $(F90OPTFLAGS) $<
+int_area_normal_4_surface.o: $(JACOBIDIR)/int_area_normal_4_surface.f90 m_precision.o m_machine_parameter.o m_geometry_constants.o t_geometry_data.o t_surface_data.o t_group_data.o t_fem_gauss_int_coefs.o t_jacobian_2d.o
+	$(F90) -c $(F90OPTFLAGS) $<
+int_volume_of_domain.o: $(JACOBIDIR)/int_volume_of_domain.f90 m_precision.o m_constants.o t_mesh_data.o t_geometry_data.o t_group_data.o t_surface_boundary.o t_shape_functions.o t_fem_gauss_int_coefs.o t_jacobians.o t_surface_group_normals.o set_normal_vectors.o const_jacobians_3d.o sum_volume_of_domain.o const_bc_infty_surf_type.o t_layering_ele_list.o cal_layered_volumes.o calypso_mpi_real.o fem_element_volume.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_gauss_int_parameters.o: $(JACOBIDIR)/m_gauss_int_parameters.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_gauss_int_parameters.o: $(JACOBIDIR)/set_gauss_int_parameters.f90 m_precision.o m_constants.o m_gauss_int_parameters.o t_gauss_points.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_integration_indices.o: $(JACOBIDIR)/set_integration_indices.f90 m_precision.o m_gauss_int_parameters.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_normal_vectors.o: $(JACOBIDIR)/set_normal_vectors.f90 m_precision.o m_machine_parameter.o t_mesh_data.o t_geometry_data.o t_surface_data.o t_group_data.o t_surface_group_normals.o t_shape_functions.o t_fem_gauss_int_coefs.o t_jacobians.o t_jacobian_2d.o int_area_normal_4_surface.o sum_normal_4_surf_group.o set_connects_4_surf_group.o
+	$(F90) -c $(F90OPTFLAGS) $<
+set_shape_elements_infty_sf.o: $(JACOBIDIR)/set_shape_elements_infty_sf.f90 m_precision.o m_constants.o shape_func_elements.o shape_func_infty_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+shape_func_1d_linear.o: $(JACOBIDIR)/shape_func_1d_linear.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+shape_func_1d_quad.o: $(JACOBIDIR)/shape_func_1d_quad.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+shape_func_2d_lag.o: $(JACOBIDIR)/shape_func_2d_lag.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+shape_func_2d_linear.o: $(JACOBIDIR)/shape_func_2d_linear.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+shape_func_2d_quad.o: $(JACOBIDIR)/shape_func_2d_quad.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+shape_func_3d_lag.o: $(JACOBIDIR)/shape_func_3d_lag.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+shape_func_3d_linear.o: $(JACOBIDIR)/shape_func_3d_linear.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+shape_func_3d_quad.o: $(JACOBIDIR)/shape_func_3d_quad.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+shape_func_elements.o: $(JACOBIDIR)/shape_func_elements.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+shape_func_infty_elements.o: $(JACOBIDIR)/shape_func_infty_elements.f90 m_precision.o m_constants.o shape_func_elements.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sum_normal_4_surf_group.o: $(JACOBIDIR)/sum_normal_4_surf_group.f90 m_precision.o calypso_mpi.o calypso_mpi_real.o m_machine_parameter.o t_geometry_data.o t_group_data.o t_surface_group_normals.o transfer_to_long_integers.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sum_volume_of_domain.o: $(JACOBIDIR)/sum_volume_of_domain.f90 m_precision.o m_machine_parameter.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_fem_gauss_int_coefs.o: $(JACOBIDIR)/t_fem_gauss_int_coefs.f90 m_precision.o m_constants.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_jacobian_1d.o: $(JACOBIDIR)/t_jacobian_1d.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_jacobian_2d.o: $(JACOBIDIR)/t_jacobian_2d.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_jacobian_3d.o: $(JACOBIDIR)/t_jacobian_3d.f90 m_precision.o m_geometry_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_jacobians.o: $(JACOBIDIR)/t_jacobians.f90 m_precision.o m_geometry_constants.o t_fem_gauss_int_coefs.o t_geometry_data.o t_surface_data.o t_edge_data.o t_group_data.o t_shape_functions.o t_jacobian_3d.o t_jacobian_2d.o t_jacobian_1d.o const_jacobians_3d.o const_jacobians_infinity.o const_jacobians_sf_grp.o const_jacobians_2d.o const_jacobians_1d.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_shape_functions.o: $(JACOBIDIR)/t_shape_functions.f90 m_precision.o t_fem_gauss_int_coefs.o
+	$(F90) -c $(F90OPTFLAGS) $<
+

@@ -1,4 +1,8 @@
+calypso_png_file_IO.o: $(ZLIB_IO_DIR)/calypso_png_file_IO.f90 m_precision.o m_png_file_IO.o t_buffer_4_gzip.o gzip_defleate.o number_to_bit.o filtering_rgba_png_line.o byte_swap_f.o transfer_to_long_integers.o gzip_infleate.o
+	$(F90) -c $(F90OPTFLAGS) $<
 data_convert_by_zlib.o: $(ZLIB_IO_DIR)/data_convert_by_zlib.f90 m_precision.o m_constants.o m_machine_parameter.o t_buffer_4_gzip.o transfer_to_long_integers.o gzip_defleate.o binary_IO.o gzip_infleate.o
+	$(F90) -c $(F90OPTFLAGS) $<
+filtering_rgba_png_line.o: $(ZLIB_IO_DIR)/filtering_rgba_png_line.f90 m_precision.o line_rgba_filtering_4_png.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_binary_IO.o: $(ZLIB_IO_DIR)/gz_binary_IO.f90 m_precision.o m_constants.o m_machine_parameter.o m_error_IDs.o t_buffer_4_gzip.o binary_IO.o set_parallel_file_name.o skip_gz_comment.o gzip_file_access.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -90,7 +94,15 @@ gz_vtk_file_IO.o: $(ZLIB_IO_DIR)/gz_vtk_file_IO.f90 m_precision.o m_constants.o 
 	$(F90) -c $(F90OPTFLAGS) $<
 input_old_file_sel_4_zlib.o: $(ZLIB_IO_DIR)/input_old_file_sel_4_zlib.F90 m_precision.o m_file_format_switch.o t_file_IO_parameter.o t_time_data.o t_field_data_IO.o gz_rst_data_IO_by_fld.o gz_field_file_IO.o field_file_IO.o set_field_file_names.o rst_data_IO_by_fld.o set_parallel_file_name.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
+line_rgba_filtering_4_png.o: $(ZLIB_IO_DIR)/line_rgba_filtering_4_png.f90 m_precision.o
+	$(F90) -c $(F90OPTFLAGS) $<
+m_png_file_IO.o: $(ZLIB_IO_DIR)/m_png_file_IO.f90 m_precision.o number_to_bit.o transfer_to_long_integers.o byte_swap_f.o
+	$(F90) -c $(F90OPTFLAGS) $<
+output_image_sel_4_png.o: $(ZLIB_IO_DIR)/output_image_sel_4_png.F90 m_precision.o m_constants.o t_png_file_access.o write_bmp_image.o calypso_png_file_IO.o
+	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 skip_gz_comment.o: $(ZLIB_IO_DIR)/skip_gz_comment.f90 m_precision.o m_constants.o m_file_format_switch.o t_buffer_4_gzip.o gzip_file_access.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_png_file_access.o: $(ZLIB_IO_DIR)/t_png_file_access.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
 zlib_convert_ascii_vector.o: $(ZLIB_IO_DIR)/zlib_convert_ascii_vector.f90 m_precision.o m_constants.o t_buffer_4_gzip.o data_IO_to_textline.o gzip_defleate.o gzip_infleate.o field_data_IO.o field_data_MPI_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
