@@ -69,11 +69,13 @@
 #ifdef PNG_OUTPUT
         call write_png_rgb_f                                            &
      &     (img_head, npix_x, npix_y, cimage(1,1), pbuf)
-#else
+        return
+#endif
+#ifdef ZLIB_IO
         call calypso_write_png                                          &
      &     (img_head, ithree, npix_x, npix_y, cimage(1,1))
-#endif
         return
+#endif
       end if
 !
       call pixout_BMP(img_head, npix_x, npix_y, cimage(1,1))
@@ -97,11 +99,13 @@
 #ifdef PNG_OUTPUT
         call write_png_rgba_f                                           &
      &     (img_head, npix_x, npix_y, cimage(1,1), pbuf)
-#else
+        return
+#endif
+#ifdef ZLIB_IO
         call calypso_write_png                                          &
      &     (img_head, ifour, npix_x, npix_y, cimage(1,1))
-#endif
         return
+#endif
       end if
 !
       write(*,*) 'BitMap does not support transparent image'
