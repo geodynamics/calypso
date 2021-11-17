@@ -2,9 +2,9 @@
 !!@brief  module analyzer_sph_MHD_w_4vizs
 !!
 !!@author H. Matsui
-!!@date   Programmed  H. Matsui in Apr., 2010
+!!@date   Programmed  H. Matsui in Nov., 2021
 !
-!>@brief  Main loop for MHD dynamo simulation
+!>@brief  Main loop for MHD dynamo simulation with PVR
 !!
 !!@verbatim
 !!      subroutine initialize_sph_mhd_w_4vizs
@@ -23,8 +23,9 @@
       use m_SPH_MHD_model_data
       use m_MHD_step_parameter
       use t_SPH_mesh_field_data
-      use t_ctl_data_MHD
-      use t_viz_sections
+      use t_ctl_data_MHD_w_4vizs
+      use t_VIZ_mesh_field
+      use t_four_visualizers
       use t_SPH_MHD_zonal_mean_viz
       use t_sph_trans_arrays_MHD
       use t_comm_table
@@ -39,15 +40,15 @@
 !>      File name for control file
       character(len=kchara), parameter :: MHD_ctl_name =  'control_MHD'
 !>      Control struture for MHD simulation
-      type(DNS_mhd_simulation_control), save :: DNS_MHD_ctl1
-      private :: MHD_ctl_name, DNS_MHD_ctl1
+      type(DNS_mhd_sim_w_viz4_control), save :: DNS_MHD_ctl4
+      private :: MHD_ctl_name, DNS_MHD_ctl4
 !
 !>      Structure of spectr grid and data
       type(SPH_mesh_field_data), save, private :: SPH_MHD1
-!>      Structure of sectioning and isosurfaceing modules
-      type(surfacing_modules), save, private :: viz_psfs1
-!>      Structure of edge communication table
-      type(communication_table), save, private :: edge_comm_M
+!>      Structure of data for four visualizations
+      type(VIZ_mesh_field), save, private :: VIZ_DAT4
+!>      Structure of four visualization modules
+      type(four_visualize_modules), save, private :: vizs4
 !
 ! ----------------------------------------------------------------------
 !
@@ -59,7 +60,7 @@
 !
       use t_ctl_data_sph_MHD_psf
       use input_control_sph_MHD
-      use FEM_to_PSF_bridge
+      use FEM_to_VIZ_bridge
 !
 !
       write(*,*) 'Simulation start: PE. ', my_rank
@@ -72,12 +73,12 @@
 !
       if(iflag_TOT_time) call start_elapsed_time(ied_total_elapsed)
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+3)
-      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_w_psf'
-      call read_control_4_sph_MHD_w_psf(MHD_ctl_name, DNS_MHD_ctl1)
+      if (iflag_debug.eq.1) write(*,*) 'read_control_4_sph_MHD_4vizs'
+      call read_control_4_sph_MHD_4vizs(MHD_ctl_name, DNS_MHD_ctl4)
 !
       if (iflag_debug.eq.1) write(*,*) 'input_control_SPH_MHD_psf'
-      call input_control_SPH_MHD_psf                                    &
-     &   (MHD_files1, DNS_MHD_ctl1, MHD_step1, SPH_model1,              &
+      call input_control_sph_MHD_4vizs                                  &
+     &   (MHD_files1, DNS_MHD_ctl4, MHD_step1, SPH_model1,              &
      &    SPH_WK1, SPH_MHD1, FEM_d1)
       call copy_delta_t(MHD_step1%init_d, MHD_step1%time_d)
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+3)
@@ -88,8 +89,8 @@
       if(iflag_debug .gt. 0) write(*,*) 'FEM_initialize_sph_MHD'
       call FEM_initialize_sph_MHD(MHD_files1, MHD_step1,                &
      &    FEM_d1%geofem, FEM_d1%field, FEM_d1%iphys, MHD_IO1, m_SR1)
-      call init_FEM_to_PSF_bridge                                       &
-     &   (MHD_step1%viz_step, FEM_d1%geofem, edge_comm_M, m_SR1)
+      call init_FEM_to_VIZ_bridge                                       &
+     &   (MHD_step1%viz_step, FEM_d1%geofem, VIZ_DAT4, m_SR1)
 !
 !        Initialize spherical transform dynamo
 !
@@ -100,14 +101,14 @@
 !
 !        Initialize visualization
 !
-      if(iflag_debug .gt. 0) write(*,*) 'init_visualize_surface'
-      call init_visualize_surface                                       &
-     &   (MHD_step1%viz_step, FEM_d1%geofem, edge_comm_M, FEM_d1%field, &
-     &    DNS_MHD_ctl1%surfacing_ctls, viz_psfs1, m_SR1)
+      if(iflag_debug .gt. 0)  write(*,*) 'init_four_visualize'
+      call init_four_visualize(MHD_step1%viz_step,                      &
+     &    FEM_d1%geofem, FEM_d1%field, VIZ_DAT4,                        &
+     &    DNS_MHD_ctl4%viz4_ctl, vizs4, m_SR1)
 !
       call init_zonal_mean_sections(MHD_step1%viz_step, FEM_d1%geofem,  &
-     &    edge_comm_M, FEM_d1%field, DNS_MHD_ctl1%zm_ctls, zmeans1,     &
-     &    m_SR1%SR_sig, m_SR1%SR_il)
+     &    VIZ_DAT4%edge_comm, FEM_d1%field, DNS_MHD_ctl4%zm_ctls,       &
+     &    zmeans1, m_SR1%SR_sig, m_SR1%SR_il)
 !
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+1)
       call calypso_MPI_barrier
@@ -175,9 +176,8 @@
           if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+4)
           call istep_viz_w_fix_dt(MHD_step1%time_d%i_time_step,         &
      &                            MHD_step1%viz_step)
-          call visualize_surface(MHD_step1%viz_step, MHD_step1%time_d,  &
-     &                           FEM_d1%geofem, edge_comm_M,            &
-     &                           FEM_d1%field, viz_psfs1, m_SR1)
+          call visualize_four(MHD_step1%viz_step, MHD_step1%time_d,     &
+     &        FEM_d1%geofem, FEM_d1%field, VIZ_DAT4, vizs4, m_SR1)
 !*
 !*  ----------- Zonal means --------------
 !*
