@@ -63,10 +63,6 @@
 !
       sph_param%nlayer_2_center = 1
 !
-      write(*,*) 'IN sph_rtp%nidx_global_rtp(1)', sph_rtp%nidx_global_rtp(1)
-      write(*,*) 'IN sph_param%nlayer_ICB', sph_param%nlayer_ICB
-      write(*,*) 'IN sph_param%nlayer_CMB', sph_param%nlayer_CMB
-!
       if(sph_param%iflag_radial_grid .eq. igrid_Chebyshev) then
         call count_chebyshev_ext_layers(num_fluid_grid_ctl%intvalue,    &
      &      sph_param%radius_ICB, sph_param%radius_CMB,                 &
@@ -90,11 +86,6 @@
           sph_rtp%nidx_global_rtp(1) = sph_rtp%nidx_global_rtp(1) + 1
         end if
       end do
-!
-      write(*,*) 'rmin, rmax', rmin, rmax
-      write(*,*) 'sph_rtp%nidx_global_rtp(1)', sph_rtp%nidx_global_rtp(1)
-      write(*,*) 'sph_param%nlayer_ICB', sph_param%nlayer_ICB
-      write(*,*) 'sph_param%nlayer_CMB', sph_param%nlayer_CMB
 !
       call alloc_radius_1d_gl(sph_rtp%nidx_global_rtp(1), s3d_radius)
 !
