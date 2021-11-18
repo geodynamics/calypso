@@ -22,7 +22,7 @@ const_global_sph_FEM_mesh.o: $(SPH_GRID_SRCDIR)/const_global_sph_FEM_mesh.f90 m_
 	$(F90) -c $(F90OPTFLAGS) $<
 const_global_sph_grids_modes.o: $(SPH_GRID_SRCDIR)/const_global_sph_grids_modes.f90 m_precision.o m_machine_parameter.o m_constants.o t_spheric_parameter.o t_sph_local_parameter.o t_spheric_global_ranks.o t_sph_1d_global_index.o t_2d_sph_trans_table.o set_global_spherical_param.o set_indices_4_sph_tranform.o const_each_global_sph_list.o set_sph_1d_global_index.o set_sph_1d_domain_id.o set_sph_tranform_ordering.o
 	$(F90) -c $(F90OPTFLAGS) $<
-const_sph_radial_grid.o: $(SPH_GRID_SRCDIR)/const_sph_radial_grid.f90 m_precision.o m_constants.o m_spheric_constants.o t_spheric_parameter.o t_spheric_global_ranks.o chebyshev_radial_grid.o half_chebyshev_radial_grid.o set_radial_grid_sph_shell.o
+const_sph_radial_grid.o: $(SPH_GRID_SRCDIR)/const_sph_radial_grid.f90 m_precision.o m_constants.o m_spheric_constants.o t_spheric_parameter.o t_spheric_global_ranks.o t_control_array_real.o t_control_array_integer.o chebyshev_radial_grid.o half_chebyshev_radial_grid.o set_radial_grid_sph_shell.o
 	$(F90) -c $(F90OPTFLAGS) $<
 copy_para_sph_global_params.o: $(SPH_GRID_SRCDIR)/copy_para_sph_global_params.f90 m_precision.o t_SPH_mesh_field_array.o t_spheric_parameter.o
 	$(F90) -c $(F90OPTFLAGS) $<
