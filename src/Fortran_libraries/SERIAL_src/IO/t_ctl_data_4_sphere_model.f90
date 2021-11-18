@@ -48,17 +48,22 @@
 !!    end array r_layer
 !!
 !!    radial_grid_type_ctl   Chebyshev
-!!     num_fluid_grid_ctl      10
-!!     increment_of_chebyshev   2
+!!    num_fluid_grid_ctl      10
+!!    increment_of_chebyshev   2
 !!
-!!     fluid_core_size_ctl   0.35
-!!     ICB_to_CMB_ratio_ctl  1.0
-!!     Min_radius_ctl      0.0
-!!     ICB_radius_ctl      0.5384615384615
-!!     CMB_radius_ctl      1.538461538462
-!!     Max_radius_ctl      2.0
+!!    fluid_core_size_ctl   0.35
+!!    ICB_to_CMB_ratio_ctl  1.0
+!!    Min_radius_ctl      0.0
+!!    ICB_radius_ctl      0.5384615384615
+!!    CMB_radius_ctl      1.538461538462
+!!    Max_radius_ctl      2.0
 !!
-!!    array boundaries_ctl   3
+!!    array add_external_layer
+!!      add_external_layer      2.815
+!!      add_external_layer      2.825
+!!    end array add_external_layer
+!!
+!!    array boundaries_ctl
 !!      boundaries_ctl  to_Center   1
 !!      boundaries_ctl  ICB         2
 !!      boundaries_ctl  CMB         4
@@ -114,14 +119,18 @@
         type(read_integer_item) :: ngrid_azimuth_ctl
 !
 !>        Structure for radial point data
-!!@n        light_position_ctl%ivec:  radial ID
-!!@n        light_position_ctl%vect:  Radius
+!!@n        spctl%ivec:  radial ID
+!!@n        spctl%vect:  Radius
         type(ctl_array_ir) :: radius_ctl
 !
 !>        Structure for radial grouping data for boundaries
-!!@n        light_position_ctl%c_tble:  Group name
-!!@n        light_position_ctl%ivec:    radial ID
+!!@n        spctl%ivec:  radial ID
+!!@n        spctl%vect:  Radius
         type(ctl_array_ci) :: radial_grp_ctl
+!
+!>        Structure for additional radial point data at external
+!!@n        spctl%vect:  Radius
+        type(ctl_array_real) :: add_ext_layer_ctl
 !
 !>        Grid spacing type
         type(read_character_item) :: radial_grid_type_ctl
@@ -161,58 +170,55 @@
 !
 !   labels of shell define
 !
-      character(len=kchara), parameter                                  &
-     &      ::  hd_numlayer_shell = 'r_layer'
+      character(len=kchara), parameter, private                         &
+     &      ::  hd_numlayer_shell =     'r_layer'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_ntheta_shell = 'ngrid_meridonal_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_nphi_shell =   'ngrid_zonal_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_sph_truncate = 'truncation_level_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_phi_symmetry = 'longitude_symmetry_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_sph_c_type =   'sph_coef_type_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_sph_g_type =   'sph_grid_type_ctl'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_r_grid_type = 'radial_grid_type_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_n_fluid_grid = 'num_fluid_grid_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_cheby_increment = 'increment_of_chebyshev'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_Min_radius =  'Min_radius_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_ICB_radius =  'ICB_radius_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_CMB_radius =  'CMB_radius_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_Max_radius =  'Max_radius_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_shell_size =  'fluid_core_size_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_shell_ratio = 'ICB_to_CMB_ratio_ctl'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
+     &      ::  hd_add_external_layer = 'add_external_layer'
+!
+      character(len=kchara), parameter, private                         &
      &      ::  hd_bc_sph = 'boundaries_ctl'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_num_radial_grp = 'num_radial_layering_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_num_med_grp =    'num_meridional_layering_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_list_radial_grp = 'radial_layering_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      ::  hd_list_med_grp = 'meridional_layering_ctl'
-!
-      private :: hd_numlayer_shell, hd_sph_c_type, hd_phi_symmetry
-      private :: hd_ntheta_shell, hd_nphi_shell, hd_sph_truncate
-      private :: hd_r_grid_type, hd_n_fluid_grid, hd_Min_radius
-      private :: hd_ICB_radius, hd_CMB_radius, hd_Max_radius
-      private :: hd_shell_size, hd_shell_ratio, hd_bc_sph
 !
 !  ---------------------------------------------------------------------
 !
@@ -243,9 +249,10 @@
 !
         call read_control_array_i_r(id_control,                         &
      &      hd_numlayer_shell, spctl%radius_ctl, c_buf)
-!
         call read_control_array_c_i(id_control,                         &
      &      hd_bc_sph, spctl%radial_grp_ctl, c_buf)
+        call read_control_array_r1(id_control,                          &
+     &      hd_add_external_layer, spctl%add_ext_layer_ctl, c_buf)
 !
 !
         call read_chara_ctl_type                                        &
@@ -308,6 +315,7 @@
       call dealloc_control_array_i2(spctl%radial_layer_list_ctl)
       call dealloc_control_array_i2(spctl%med_layer_list_ctl)
       call dealloc_control_array_c_i(spctl%radial_grp_ctl)
+      call dealloc_control_array_real(spctl%add_ext_layer_ctl)
       call dealloc_control_array_i_r(spctl%radius_ctl)
 !
       end subroutine dealloc_control_shell_define

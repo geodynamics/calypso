@@ -35,8 +35,8 @@
 !
 !
       call bcast_ctl_array_ir(spctl%radius_ctl)
-!
       call bcast_ctl_array_ci(spctl%radial_grp_ctl)
+      call bcast_ctl_array_r1(spctl%add_ext_layer_ctl)
 !
 !
       call bcast_ctl_type_c1(spctl%sph_coef_type_ctl)

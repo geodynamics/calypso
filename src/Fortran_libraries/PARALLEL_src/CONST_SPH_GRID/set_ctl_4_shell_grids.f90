@@ -294,8 +294,9 @@
         end if
 !
         call count_set_radial_grid                                      &
-     &     (spctl%num_fluid_grid_ctl%intvalue, r_in, r_out,             &
-     &      increment_cheby, sph_params, sph_rtp, s3d_radius)
+     &     (spctl%num_fluid_grid_ctl, spctl%add_ext_layer_ctl,          &
+     &      r_in, r_out, increment_cheby, sph_params,                   &
+     &      sph_rtp, s3d_radius)
       end if
 !
 !       Check whole sphere model
