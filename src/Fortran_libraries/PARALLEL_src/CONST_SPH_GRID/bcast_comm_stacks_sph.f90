@@ -88,7 +88,9 @@
 !$omp end parallel workshare
 !
       allocate(nneib_rtm_lc(nprocs))
-      nneib_rtm_gl(1:nprocs) = 0
+!$omp parallel workshare
+      nneib_rtm_lc(1:nprocs) = 0
+!$omp end parallel workshare
 !
       do i = 0, (ndomain_sph-1)/nprocs
         jp = 1 + my_rank + i * nprocs
