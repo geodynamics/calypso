@@ -14,6 +14,9 @@
 !!
 !!      subroutine gz_read_step_data_mpi_b                              &
 !!     &         (IO_param_l, i_time_step_IO, time_IO, delta_t_IO)
+!!      subroutine gz_read_field_header_mpi_b(IO_param_l,               &
+!!     &                                      nnod, num_field)
+!!        type(calypso_MPI_IO_params), intent(inout) :: IO_param_l
 !!@endverbatim
 !
       module gz_field_block_MPI_IO_b
@@ -118,7 +121,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_field_header_mpi_b(IO_param_l, nnod, num_field)
+      subroutine gz_read_field_header_mpi_b(IO_param_l,                 &
+     &                                      nnod, num_field)
 !
       use m_phys_constants
       use field_data_IO
@@ -132,8 +136,13 @@
 !
       call gz_mpi_read_merged_stack_b(IO_param_l,                       &
      &    IO_param_l%nprocs_in, IO_param_l%istack_merged)
-      nnod = IO_param_l%istack_merged(IO_param_l%id_rank+1)             &
+!
+      if(IO_param_l%id_rank .ge. IO_param_l%nprocs_in) then
+        nnod = 0
+      else
+        nnod = IO_param_l%istack_merged(IO_param_l%id_rank+1)           &
      &      - IO_param_l%istack_merged(IO_param_l%id_rank)
+      end if
 !
       call gz_mpi_read_one_inthead_b(IO_param_l, num_field)
 !
