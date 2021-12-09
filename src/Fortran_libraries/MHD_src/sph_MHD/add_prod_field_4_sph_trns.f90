@@ -158,6 +158,24 @@
      &    ipol_prd%i_square_c, iphys_prd%i_square_c,                    &
      &    f_trns_prd%i_square_c, trns)
 !
+!
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_prd%i_magnetic_intensity,                                &
+     &    iphys_prd%i_magnetic_intensity,                               &
+     &    f_trns_prd%i_magnetic_intensity, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_prd%i_declination, iphys_prd%i_declination,              &
+     &    f_trns_prd%i_declination, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_prd%i_inclination, iphys_prd%i_inclination,              &
+     &    f_trns_prd%i_inclination, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_prd%i_vgp_latitude, iphys_prd%i_vgp_latitude,            &
+     &    f_trns_prd%i_vgp_latitude, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_prd%i_vgp_longigude, iphys_prd%i_vgp_longigude,          &
+     &    f_trns_prd%i_vgp_longigude, trns)
+!
       end subroutine add_prod_scalar_sph_trns_snap
 !
 !-----------------------------------------------------------------------
