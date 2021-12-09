@@ -140,7 +140,8 @@
       end if
 !
       call s_decomp_w_sym_rj_base_field(SPH_MHD%sph%sph_rj,             &
-     &    SPH_MHD%ipol%base, SPH_MHD%ipol%sym_fld, SPH_MHD%ipol%asym_fld, SPH_MHD%fld)
+     &    SPH_MHD%ipol%base, SPH_MHD%ipol%sym_fld,                      &
+     &    SPH_MHD%ipol%asym_fld, SPH_MHD%fld)
       call sel_buoyancies_sph_MHD(SPH_MHD%sph%sph_rj, trans_p%leg,      &
      &    SPH_MHD%ipol%sym_fld, SPH_MHD%ipol%forces_by_sym_asym,        &
      &    MHD_prop%fl_prop, MHD_prop%ref_param_T, MHD_prop%ref_param_C, &
@@ -205,7 +206,7 @@
 !
 !
       call nonlinear_terms_on_node_w_sym                                &
-     &   (MHD_prop, trns_snap%b_trns%sym_fld, trns_snap%b_trns%sym_fld,  &
+     &   (MHD_prop, trns_snap%b_trns%sym_fld, trns_snap%b_trns%sym_fld, &
      &    trns_snap%f_trns%forces_by_sym_sym, sph%sph_rtp%nnod_rtp,     &
      &    trns_snap%backward%ncomp, trns_snap%backward%fld_rtp,         &
      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_rtp)
@@ -213,52 +214,52 @@
      &  .or. sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_center)  &
      &      then
       call nonlinear_terms_on_node_w_sym                                &
-     &   (MHD_prop, trns_snap%b_trns%sym_fld, trns_snap%b_trns%sym_fld,  &
+     &   (MHD_prop, trns_snap%b_trns%sym_fld, trns_snap%b_trns%sym_fld, &
      &    trns_snap%f_trns%forces_by_sym_sym, sph%sph_rtp%nnod_pole,    &
      &    trns_snap%backward%ncomp, trns_snap%backward%fld_pole,        &
      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_pole)
       end if
 !
-      call nonlinear_terms_on_node_w_sym                                &
-     &   (MHD_prop, trns_snap%b_trns%asym_fld, trns_snap%b_trns%asym_fld,   &
+      call nonlinear_terms_on_node_w_sym(MHD_prop,                      &
+     &    trns_snap%b_trns%asym_fld, trns_snap%b_trns%asym_fld,         &
      &    trns_snap%f_trns%forces_by_asym_asym, sph%sph_rtp%nnod_rtp,   &
      &    trns_snap%backward%ncomp, trns_snap%backward%fld_rtp,         &
      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_rtp)
       if    (sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_pole     &
      &  .or. sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_center)  &
      &      then
-      call nonlinear_terms_on_node_w_sym                                &
-     &   (MHD_prop, trns_snap%b_trns%asym_fld, trns_snap%b_trns%asym_fld,   &
+      call nonlinear_terms_on_node_w_sym(MHD_prop,                      &
+     &    trns_snap%b_trns%asym_fld, trns_snap%b_trns%asym_fld,         &
      &    trns_snap%f_trns%forces_by_asym_asym, sph%sph_rtp%nnod_pole,  &
      &    trns_snap%backward%ncomp, trns_snap%backward%fld_pole,        &
      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_pole)
       end if
 !
-      call nonlinear_terms_on_node_w_sym                                &
-     &   (MHD_prop, trns_snap%b_trns%sym_fld, trns_snap%b_trns%asym_fld,   &
+      call nonlinear_terms_on_node_w_sym(MHD_prop,                      &
+     &    trns_snap%b_trns%sym_fld, trns_snap%b_trns%asym_fld,          &
      &    trns_snap%f_trns%forces_by_sym_asym, sph%sph_rtp%nnod_rtp,    &
      &    trns_snap%backward%ncomp, trns_snap%backward%fld_rtp,         &
      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_rtp)
       if    (sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_pole     &
      &  .or. sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_center)  &
      &      then
-      call nonlinear_terms_on_node_w_sym                                &
-     &   (MHD_prop, trns_snap%b_trns%sym_fld, trns_snap%b_trns%asym_fld,   &
+      call nonlinear_terms_on_node_w_sym(MHD_prop,                      &
+     &    trns_snap%b_trns%sym_fld, trns_snap%b_trns%asym_fld,          &
      &    trns_snap%f_trns%forces_by_sym_asym, sph%sph_rtp%nnod_pole,   &
      &    trns_snap%backward%ncomp, trns_snap%backward%fld_pole,        &
      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_pole)
       end if
 !
-      call nonlinear_terms_on_node_w_sym                                &
-     &   (MHD_prop, trns_snap%b_trns%asym_fld, trns_snap%b_trns%sym_fld,   &
+      call nonlinear_terms_on_node_w_sym(MHD_prop,                      &
+     &    trns_snap%b_trns%asym_fld, trns_snap%b_trns%sym_fld,          &
      &    trns_snap%f_trns%forces_by_asym_sym, sph%sph_rtp%nnod_rtp,    &
      &    trns_snap%backward%ncomp, trns_snap%backward%fld_rtp,         &
      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_rtp)
       if    (sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_pole     &
      &  .or. sph%sph_params%iflag_shell_mode .eq. iflag_MESH_w_center)  &
      &      then
-      call nonlinear_terms_on_node_w_sym                                &
-     &   (MHD_prop, trns_snap%b_trns%asym_fld, trns_snap%b_trns%asym_fld,   &
+      call nonlinear_terms_on_node_w_sym(MHD_prop,                      &
+     &    trns_snap%b_trns%asym_fld, trns_snap%b_trns%asym_fld,         &
      &    trns_snap%f_trns%forces_by_asym_sym, sph%sph_rtp%nnod_pole,   &
      &    trns_snap%backward%ncomp, trns_snap%backward%fld_pole,        &
      &    trns_snap%forward%ncomp,  trns_snap%forward%fld_pole)
