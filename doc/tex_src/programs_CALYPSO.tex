@@ -41,7 +41,7 @@ From Ver. 2, the spherical harmonic indices data is not necessary if the paramet
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=130mm]{images/flow_1}
+\includegraphics*[width=130mm]{Images/flow_1}
 \end{center}
 \caption{Generated files by preprocessing program in Data flow.}
 \label{fig:gen_sph_grid}
@@ -251,7 +251,7 @@ The preprocessing program generates radius of each layer in \verb|radial_info.da
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=130mm]{images/parallelize}
+\includegraphics*[width=130mm]{Images/parallelize}
 \end{center}
 \caption{Parallelization and data communication in Calypso in the case using 9 (3x3) processors. Data are decomposed in radial and meridional direction for nonlinear term evaluations, decomposed in radial and harmonic order for Legendre transform, and decomposed in spherical harmonics for linear calculations.}
 \label{fig:parallelization}
@@ -277,7 +277,7 @@ The name of the simulation program is {\tt sph\_mhd}. This program requires {\tt
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=130mm]{images/flow_2}
+\includegraphics*[width=130mm]{Images/flow_2}
 \end{center}
 \caption{Data flow for the simulation program.}
 \label{fig:flow_2}
@@ -1298,7 +1298,7 @@ If the Nusselt number data file exist before starting the simulation, programs a
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=130mm]{images/flow_3}
+\includegraphics*[width=130mm]{Images/flow_3}
 \end{center}
 \caption{Data flow for data transform program.}
 \label{fig:flow_3}
@@ -1319,7 +1319,7 @@ We recommend to output cross section data at $y = 0$ by using sectioning module 
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=130mm]{images/flow_ini}
+\includegraphics*[width=130mm]{Images/flow_ini}
 \end{center}
 \caption{Data flow for initial field generation program.}
 \label{fig:flow_ini}
@@ -1480,7 +1480,7 @@ Then, the program  \verb|sph_initial_field| and  \verb|sph_add_initial_field| ar
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=130mm]{images/flow_ini}
+\includegraphics*[width=130mm]{Images/flow_ini}
 \end{center}
 \caption{Data flow for initial field modification program.}
 \label{fig:flow_add_ini}
@@ -1593,7 +1593,7 @@ This program generates cross sections and isosurfaces from FEM mesh data and fie
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=130mm]{images/flow_5}
+\includegraphics*[width=130mm]{Images/flow_5}
 \end{center}
 \caption{Data flow for sectioning program.}
 \label{fig:flow_add_ini}
@@ -1770,7 +1770,7 @@ Write ascii VTK file: zm_y0.2000.vtk
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=130mm]{images/flow_4}
+\includegraphics*[width=130mm]{Images/flow_4}
 \end{center}
 \caption{Data flow for spectrum data assemble program}
 \label{fig:flow_4}
@@ -1925,7 +1925,7 @@ The field data is written by XDMF or VTK data format using Cartesian coordinate.
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=130mm]{images/paraview_open}
+\includegraphics*[width=130mm]{Images/paraview_open}
 \caption{File open window for ParaView}
 \label{fig:paraview_load}
 \end{center}
@@ -1946,7 +1946,7 @@ Because the magnetic field is saved by the Cartesian coordinate, the radial magn
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=100mm]{images/paraview_calc}
+\includegraphics*[width=100mm]{Images/paraview_calc}
 \caption{File open window for ParaView}
 \label{fig:paraview_gen_Br}
 \end{center}
@@ -1956,7 +1956,7 @@ After obtaining the radial mantric field, the image in figure \ref{fig:paraview_
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=100mm]{images/Paraview_Br}
+\includegraphics*[width=100mm]{Images/Paraview_Br}
 \end{center}
 \caption{Visualization of radial magnetic field by Paraview.}
 \label{fig:paraview_br}
