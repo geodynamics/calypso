@@ -53,10 +53,9 @@
 !
       if (iflag_debug .eq. iflag_full_msg)                              &
      &      write(*,*) 'velo_nod%num_bc ',velo_nod%num_bc
+!
+      call allocate_nod_bc_list_velo
       if (velo_nod%num_bc .gt. 0) then
-!
-        call allocate_nod_bc_list_velo
-!
         velo_nod%bc_name(1:velo_nod%num_bc)                             &
      &      = node_bc_U_ctl%c2_tbl(1:velo_nod%num_bc)
         velo_nod%bc_magnitude(1:velo_nod%num_bc)                        &
@@ -102,9 +101,9 @@
 !
       if(iflag_debug .eq. iflag_full_msg)                               &
      &            write(*,*) 'torque_surf%num_bc', torque_surf%num_bc
-      if(torque_surf%num_bc .gt. 0) then
 !
-        call allocate_velo_surf_ctl
+      call allocate_velo_surf_ctl
+      if(torque_surf%num_bc .gt. 0) then
 !
         torque_surf%bc_name(1:torque_surf%num_bc)                       &
      &       = surf_bc_ST_ctl%c2_tbl(1:torque_surf%num_bc)

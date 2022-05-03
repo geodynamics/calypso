@@ -52,10 +52,8 @@
       if (iflag_debug .eq. iflag_full_msg)                              &
      &   write(*,*) 'light_nod%num_bc ',light_nod%num_bc
 !
+      call allocate_nod_bc_list_composit
       if (light_nod%num_bc .gt. 0) then
-!
-        call allocate_nod_bc_list_composit
-!
         light_nod%bc_name(1:light_nod%num_bc)                           &
      &      = node_bc_C_ctl%c2_tbl(1:light_nod%num_bc)
         light_nod%bc_magnitude(1:light_nod%num_bc)                      &
@@ -87,10 +85,9 @@
 !
       if (iflag_debug .eq. iflag_full_msg)                              &
      &       write(*,*) 'light_surf%num_bc ',light_surf%num_bc
+!
+      call allocate_d_scalar_surf_ctl
       if (light_surf%num_bc .gt. 0) then
-!
-        call allocate_d_scalar_surf_ctl
-!
         light_surf%bc_name(1:light_surf%num_bc)                         &
      &          = surf_bc_CF_ctl%c2_tbl(1:light_surf%num_bc)
         light_surf%bc_magnitude(1:light_surf%num_bc)                    &

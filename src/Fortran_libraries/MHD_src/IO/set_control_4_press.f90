@@ -52,10 +52,9 @@
 !
       if(iflag_debug.eq.iflag_full_msg)                                 &
      &    write(*,*) 'press_nod%num_bc ', press_nod%num_bc
+!
+      call allocate_nod_bc_list_press
       if(press_nod%num_bc .gt. 0) then
-!
-        call allocate_nod_bc_list_press
-!
         press_nod%bc_name(1:press_nod%num_bc)                           &
      &      = node_bc_P_ctl%c2_tbl(1:press_nod%num_bc)
         press_nod%bc_magnitude(1:press_nod%num_bc)                      &
@@ -81,11 +80,8 @@
       end if
 !
 !
-!
+      call allocate_press_surf_ctl
       if (wall_surf%num_bc .gt. 0) then
-!
-        call allocate_press_surf_ctl
-!
         wall_surf%bc_magnitude(1:wall_surf%num_bc)                      &
      &        =  surf_bc_PN_ctl%vect(1:wall_surf%num_bc)
         wall_surf%bc_name(1:wall_surf%num_bc)                           &

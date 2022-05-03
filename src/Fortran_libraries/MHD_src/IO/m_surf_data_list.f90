@@ -38,11 +38,11 @@
 !>       number of boundary condition list
         integer (kind=kint) :: num_bc
 !>       Value for the boundary condition
-        real (kind=kreal), pointer :: bc_magnitude(:)
+        real (kind=kreal), allocatable :: bc_magnitude(:)
 !>       Type of the boundary condition
-        integer (kind=kint), pointer :: ibc_type(:)
+        integer (kind=kint), allocatable :: ibc_type(:)
 !>       Name of group to apply the boundary condition
-        character (len=kchara), pointer :: bc_name(:)
+        character (len=kchara), allocatable :: bc_name(:)
       end type surface_bc_list_type
 !
 !>       Surface group data list for stresses
@@ -93,6 +93,7 @@
       type(surface_bc_list_type), intent(inout) :: surf_bc_list
 !
 !
+      if(allocated(surf_bc_list%bc_magnitude) .eqv. .FALSE.) return
       deallocate(surf_bc_list%bc_magnitude)
       deallocate(surf_bc_list%ibc_type)
       deallocate(surf_bc_list%bc_name)

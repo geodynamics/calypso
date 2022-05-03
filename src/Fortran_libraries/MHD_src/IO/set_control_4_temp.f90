@@ -51,10 +51,9 @@
 !
       if(iflag_debug .eq. iflag_full_msg)                               &
      &          write(*,*)  'temp_nod%num_bc ',temp_nod%num_bc
+!
+      call allocate_nod_bc_list_temp
       if(temp_nod%num_bc .gt. 0) then
-!
-        call allocate_nod_bc_list_temp
-!
         temp_nod%bc_name(1:temp_nod%num_bc)                             &
      &        = node_bc_T_ctl%c2_tbl(1:temp_nod%num_bc)
         temp_nod%bc_magnitude(1:temp_nod%num_bc)                        &
@@ -84,10 +83,8 @@
 !
 !   set boundary conditions for heat flux
 !
+      call allocate_temp_surf_ctl
       if (h_flux_surf%num_bc .gt. 0) then
-!
-        call allocate_temp_surf_ctl
-!
         h_flux_surf%bc_name(1:h_flux_surf%num_bc)                       &
      &       = surf_bc_HF_ctl%c2_tbl(1:h_flux_surf%num_bc)
         h_flux_surf%bc_magnitude(1:h_flux_surf%num_bc)                  &

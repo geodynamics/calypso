@@ -52,10 +52,9 @@
 !
       if (iflag_debug .ge. iflag_routine_msg)                           &
      &       write(*,*) 'magne_nod%num_bc ',magne_nod%num_bc
+!
+      call allocate_nod_bc_list_magne
       if (magne_nod%num_bc .gt. 0) then
-!
-        call allocate_nod_bc_list_magne
-!
         magne_nod%bc_name(1:magne_nod%num_bc)                           &
      &      = node_bc_B_ctl%c2_tbl(1:magne_nod%num_bc)
         magne_nod%bc_magnitude(1:magne_nod%num_bc)                      &
@@ -89,9 +88,9 @@
 !
       if (iflag_debug .ge. iflag_routine_msg)                           &
      &           write(*,*) 'magne_surf%num_bc ',magne_surf%num_bc
-      if (magne_surf%num_bc .gt. 0) then
 !
-        call allocate_magne_surf_ctl
+      call allocate_magne_surf_ctl
+      if (magne_surf%num_bc .gt. 0) then
 !
         magne_surf%bc_name(1:magne_surf%num_bc)                         &
      &        = surf_bc_BN_ctl%c2_tbl(1:magne_surf%num_bc)
