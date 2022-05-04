@@ -23,6 +23,10 @@
 !!   composition:        Composition anormally C
 !!   entropy:            Entropy               S
 !!
+!!   r_velocity, theta_velocity, phi_velocity
+!!   r_magnetic_f, theta_magnetic_f, phi_magnetic_f
+!!   cyl_r_velocity, cyl_r_magnetic_f
+!!
 !!   heat_source:            heat source              q_{T}
 !!   composition_source:     compositoin source       q_{T}
 !!   entropy_source:         entropy source           q_{S}
@@ -144,6 +148,40 @@
 !!         @f$  e_{ijk} E_{j} B_{k} @f$
       character(len=kchara), parameter                                  &
      &             :: fhd_poynting = 'poynting_flux'
+!
+!>        Field label for velocity
+!!         @f$ u_{i} @f$
+      character(len=kchara), parameter                                  &
+     &          :: fhd_r_velo = 'r_velocity' 
+!>        Field label for velocity
+!!         @f$ u_{i} @f$
+      character(len=kchara), parameter                                  &
+     &          :: fhd_t_velo = 'theta_velocity' 
+!>        Field label for velocity
+!!         @f$ u_{i} @f$
+      character(len=kchara), parameter                                  &
+     &          :: fhd_p_velo = 'phi_velocity' 
+!>        Field label for velocity
+!!         @f$ u_{i} @f$
+      character(len=kchara), parameter                                  &
+     &          :: fhd_s_velo = 'cyl_r_velocity' 
+!
+!>        Field label for magnetic field
+!!         @f$ B_{i} @f$
+      character(len=kchara), parameter                                  &
+     &          :: fhd_r_magne = 'r_magnetic_f'
+!>        Field label for magnetic field
+!!         @f$ B_{i} @f$
+      character(len=kchara), parameter                                  &
+     &          :: fhd_t_magne = 'theta_magnetic_f'
+!>        Field label for magnetic field
+!!         @f$ B_{i} @f$
+      character(len=kchara), parameter                                  &
+     &          :: fhd_p_magne = 'phi_magnetic_f'
+!>        Field label for magnetic field
+!!         @f$ B_{i} @f$
+      character(len=kchara), parameter                                  &
+     &          :: fhd_s_magne = 'cyl_r_magnetic_f'
 !
 !>        Field label for filtered velocity
 !!         @f$ \bar{u}_{i} @f$

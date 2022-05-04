@@ -174,6 +174,16 @@
      &  .or. (phys_nod_name_ctl .eq. fhd_entropy_source       )         &
      &      )   iflag = 1
 !
+      if (   (phys_nod_name_ctl .eq. fhd_r_velo               )         &
+     &  .or. (phys_nod_name_ctl .eq. fhd_t_velo               )         &
+     &  .or. (phys_nod_name_ctl .eq. fhd_p_velo               )         &
+     &  .or. (phys_nod_name_ctl .eq. fhd_s_velo               )         &
+     &  .or. (phys_nod_name_ctl .eq. fhd_r_magne              )         &
+     &  .or. (phys_nod_name_ctl .eq. fhd_t_magne              )         &
+     &  .or. (phys_nod_name_ctl .eq. fhd_p_magne              )         &
+     &  .or. (phys_nod_name_ctl .eq. fhd_s_magne              )         &
+     &      )   iflag = 1
+!
       if (    (phys_nod_name_ctl .eq. fhd_ref_temp            )         &
      &   .or. (phys_nod_name_ctl .eq. fhd_press_work          )         &
      &   .or. (phys_nod_name_ctl .eq. fhd_m_potential_work    )         &

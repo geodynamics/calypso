@@ -127,6 +127,23 @@
         else if ( field_name(i) .eq. fhd_cross_helicity ) then
           iphys%i_x_heli = i0
 !
+        else if ( field_name(i) .eq. fhd_r_velo ) then
+          iphys%i_velo_r = i0
+        else if ( field_name(i) .eq. fhd_t_velo ) then
+          iphys%i_velo_t = i0
+        else if ( field_name(i) .eq. fhd_p_velo ) then
+          iphys%i_velo_p = i0
+        else if ( field_name(i) .eq. fhd_s_velo ) then
+          iphys%i_velo_s = i0
+        else if ( field_name(i) .eq. fhd_r_magne ) then
+          iphys%i_magne_r = i0
+        else if ( field_name(i) .eq. fhd_t_magne ) then
+          iphys%i_magne_t = i0
+        else if ( field_name(i) .eq. fhd_p_magne ) then
+          iphys%i_magne_p = i0
+        else if ( field_name(i) .eq. fhd_s_magne ) then
+          iphys%i_magne_s = i0
+!
         else if (field_name(i) .eq. fhd_mag_ene_gen) then
           iphys%i_me_gen =   i0
         else if (field_name(i) .eq. fhd_Lorentz_work) then

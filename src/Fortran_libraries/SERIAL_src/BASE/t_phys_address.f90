@@ -172,6 +172,28 @@
 !!         @f$  e_{ijk} E_{j} B_{k} @f$
         integer (kind=kint) :: i_poynting =        izero
 !
+!>        Start address for radial velocity @f$ u_{r} @f$
+        integer (kind=kint) :: i_velo_r  =           izero
+!>        Start address for theta component of velocity
+!!         @f$ u_{\theta} @f$
+        integer (kind=kint) :: i_velo_t  =           izero
+!>        Start address for phi-component of  velocity @f$ u_{\phi} @f$
+        integer (kind=kint) :: i_velo_p  =           izero
+!>        Start address for cylindrical radial velocity @f$ u_{s} @f$
+        integer (kind=kint) :: i_velo_s  =           izero
+!
+!>        Start address for radial magnetic field @f$ B_{r} @f$
+        integer (kind=kint) :: i_magne_r  =          izero
+!>        Start address for theta component of magnetic field
+!!         @f$ B_{\theta} @f$
+        integer (kind=kint) :: i_magne_t  =          izero
+!>        Start address for phi-component of  magnetic field 
+!!         @f$ B_{\phi} @f$
+        integer (kind=kint) :: i_magne_p  =          izero
+!>        Start address for cylindrical radial magnetic field
+!!          @f$ B_{s} @f$
+        integer (kind=kint) :: i_magne_s  =          izero
+!
 !>        start address for thermal diffusion
 !!         @f$ \kappa \partial_{i}\partial_{i} T @f$
         integer (kind=kint) :: i_t_diffuse =       izero

@@ -63,6 +63,10 @@
      &       .or. phys_nod_name(i) .eq. fhd_inertia                     &
      &       .or. phys_nod_name(i) .eq. fhd_Coriolis                    &
      &       .or. phys_nod_name(i) .eq. fhd_SGS_m_flux                  &
+     &       .or. phys_nod_name(i) .eq. fhd_r_velo                      &
+     &       .or. phys_nod_name(i) .eq. fhd_t_velo                      &
+     &       .or. phys_nod_name(i) .eq. fhd_p_velo                      &
+     &       .or. phys_nod_name(i) .eq. fhd_s_velo                      &
      &       .or. phys_nod_name(i) .eq. fhd_grad_v_1                    &
      &       .or. phys_nod_name(i) .eq. fhd_grad_v_2                    &
      &       .or. phys_nod_name(i) .eq. fhd_grad_v_3                    &
@@ -84,6 +88,10 @@
      &         .or. phys_nod_name(i) .eq. fhd_Lorentz                   &
      &         .or. phys_nod_name(i) .eq. fhd_maxwell_t                 &
      &         .or. phys_nod_name(i) .eq. fhd_SGS_maxwell_t             &
+     &         .or. phys_nod_name(i) .eq. fhd_r_magne                   &
+     &         .or. phys_nod_name(i) .eq. fhd_t_magne                   &
+     &         .or. phys_nod_name(i) .eq. fhd_p_magne                   &
+     &         .or. phys_nod_name(i) .eq. fhd_s_magne                   &
      &       ) then 
            num_check = 1
            phys_check_name(1) = fhd_magne
