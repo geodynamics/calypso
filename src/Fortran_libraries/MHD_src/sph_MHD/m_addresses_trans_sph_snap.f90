@@ -155,6 +155,31 @@
      &    ncomp_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                   &
      &    fs_trns%i_f_buo_gen)
 !
+      call add_scalar_trans_flag(ipol%i_velo_r, iphys%i_velo_r,         &
+     &    ncomp_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                   &
+     &    fs_trns%i_velo_r)
+      call add_scalar_trans_flag(ipol%i_velo_t, iphys%i_velo_t,         &
+     &    ncomp_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                   &
+     &    fs_trns%i_velo_t)
+      call add_scalar_trans_flag(ipol%i_velo_p, iphys%i_velo_p,         &
+     &    ncomp_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                   &
+     &    fs_trns%i_velo_p)
+      call add_scalar_trans_flag(ipol%i_velo_s, iphys%i_velo_s,         &
+     &    ncomp_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                   &
+     &    fs_trns%i_velo_s)
+      call add_scalar_trans_flag(ipol%i_magne_r, iphys%i_magne_r,       &
+     &    ncomp_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                   &
+     &    fs_trns%i_magne_r)
+      call add_scalar_trans_flag(ipol%i_magne_t, iphys%i_magne_t,       &
+     &    ncomp_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                   &
+     &    fs_trns%i_magne_t)
+      call add_scalar_trans_flag(ipol%i_magne_p, iphys%i_magne_p,       &
+     &    ncomp_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                   &
+     &    fs_trns%i_magne_p)
+      call add_scalar_trans_flag(ipol%i_magne_s, iphys%i_magne_s,       &
+     &    ncomp_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                   &
+     &    fs_trns%i_magne_s)
+!
       call add_scalar_trans_flag(ipol%i_velo_scale, iphys%i_velo_scale, &
      &    ncomp_snap_rtp_2_rj, nscalar_snap_rtp_2_rj,                   &
      &    fs_trns%i_velo_scale)
@@ -444,6 +469,31 @@
       if(fs_trns%i_f_buo_gen .gt. 0) write(*,*)                         &
      &            'fs_trns%i_f_buo_gen', fs_trns%i_f_buo_gen,           &
      &            ipol%i_f_buo_gen, iphys%i_f_buo_gen
+!
+      if(fs_trns%i_velo_r .gt. 0) write(*,*)                            &
+     &            'fs_trns%i_velo_r', fs_trns%i_velo_r,                 &
+     &            ipol%i_velo_r, iphys%i_velo_r
+      if(fs_trns%i_velo_t .gt. 0) write(*,*)                            &
+     &            'fs_trns%i_velo_t', fs_trns%i_velo_t,                 &
+     &            ipol%i_velo_t, iphys%i_velo_t
+      if(fs_trns%i_velo_p .gt. 0) write(*,*)                            &
+     &            'fs_trns%i_velo_p', fs_trns%i_velo_p,                 &
+     &            ipol%i_velo_p, iphys%i_velo_p
+      if(fs_trns%i_velo_s .gt. 0) write(*,*)                            &
+     &            'fs_trns%i_velo_s', fs_trns%i_velo_s,                 &
+     &            ipol%i_velo_s, iphys%i_velo_s
+      if(fs_trns%i_magne_r .gt. 0) write(*,*)                           &
+     &            'fs_trns%i_magne_r', fs_trns%i_magne_r,               &
+     &            ipol%i_magne_r, iphys%i_magne_r
+      if(fs_trns%i_magne_t .gt. 0) write(*,*)                           &
+     &            'fs_trns%i_magne_t', fs_trns%i_magne_t,               &
+     &            ipol%i_magne_t, iphys%i_magne_t
+      if(fs_trns%i_magne_p .gt. 0) write(*,*)                           &
+     &            'fs_trns%i_magne_p', fs_trns%i_magne_p,               &
+     &            ipol%i_magne_p, iphys%i_magne_p
+      if(fs_trns%i_magne_s .gt. 0) write(*,*)                           &
+     &            'fs_trns%i_magne_s', fs_trns%i_magne_s,               &
+     &            ipol%i_magne_s, iphys%i_magne_s
 !
       if(fs_trns%i_velo_scale .gt. 0) write(*,*)                        &
      &            'fs_trns%i_velo_scale', fs_trns%i_velo_scale,         &

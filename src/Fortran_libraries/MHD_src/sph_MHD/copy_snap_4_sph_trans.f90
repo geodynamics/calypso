@@ -132,6 +132,23 @@
      &   (fs_trns%i_f_buo_gen, iphys%i_f_buo_gen)
 !
       call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_velo_r, iphys%i_velo_r)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_velo_t, iphys%i_velo_t)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_velo_p, iphys%i_velo_p)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_velo_s, iphys%i_velo_s)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_magne_r, iphys%i_magne_r)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_magne_t, iphys%i_magne_t)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_magne_p, iphys%i_magne_p)
+      call copy_scalar_from_snap_force                                  &
+     &   (fs_trns%i_magne_s, iphys%i_magne_s)
+!
+      call copy_scalar_from_snap_force                                  &
      &   (fs_trns%i_velo_scale, iphys%i_velo_scale)
       call copy_scalar_from_snap_force                                  &
      &   (fs_trns%i_magne_scale, iphys%i_magne_scale)

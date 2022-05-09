@@ -223,6 +223,23 @@
      &      ipol%i_f_buo_gen, fs_trns%i_f_buo_gen, n_WR, WR)
 !
       call sel_sph_rj_scalar_from_recv(ncomp_recv,                      &
+     &      ipol%i_velo_r, fs_trns%i_velo_r, n_WR, WR)
+      call sel_sph_rj_scalar_from_recv(ncomp_recv,                      &
+     &      ipol%i_velo_t, fs_trns%i_velo_t, n_WR, WR)
+      call sel_sph_rj_scalar_from_recv(ncomp_recv,                      &
+     &      ipol%i_velo_p, fs_trns%i_velo_p, n_WR, WR)
+      call sel_sph_rj_scalar_from_recv(ncomp_recv,                      &
+     &      ipol%i_velo_s, fs_trns%i_velo_s, n_WR, WR)
+      call sel_sph_rj_scalar_from_recv(ncomp_recv,                      &
+     &      ipol%i_magne_r, fs_trns%i_magne_r, n_WR, WR)
+      call sel_sph_rj_scalar_from_recv(ncomp_recv,                      &
+     &      ipol%i_magne_t, fs_trns%i_magne_t, n_WR, WR)
+      call sel_sph_rj_scalar_from_recv(ncomp_recv,                      &
+     &      ipol%i_magne_p, fs_trns%i_magne_p, n_WR, WR)
+      call sel_sph_rj_scalar_from_recv(ncomp_recv,                      &
+     &      ipol%i_magne_s, fs_trns%i_magne_s, n_WR, WR)
+!
+      call sel_sph_rj_scalar_from_recv(ncomp_recv,                      &
      &      ipol%i_velo_scale, fs_trns%i_velo_scale, n_WR, WR)
       call sel_sph_rj_scalar_from_recv(ncomp_recv,                      &
      &      ipol%i_magne_scale, fs_trns%i_magne_scale, n_WR, WR)

@@ -102,15 +102,60 @@
       use m_addresses_trans_sph_MHD
       use m_addresses_trans_sph_snap
       use m_work_4_sph_trans
+      use m_schmidt_poly_on_rtm
       use poynting_flux_smp
       use sph_poynting_flux_smp
       use sph_transforms_4_MHD
       use mag_of_field_smp
       use const_wz_coriolis_rtp
       use cal_products_smp
+      use copy_field_smp
 !
 !
 !$omp parallel
+      if(fs_trns%i_velo_r .gt. 0) then
+        call copy_nod_scalar_smp(np_smp, nnod_rtp, inod_rtp_smp_stack,  &
+     &      fls_rtp(1,bs_trns%i_velo  ), frs_rtp(1,fs_trns%i_velo_r))
+      end if
+!
+      if(fs_trns%i_velo_t .gt. 0) then
+        call copy_nod_scalar_smp(np_smp, nnod_rtp, inod_rtp_smp_stack,  &
+     &      fls_rtp(1,bs_trns%i_velo+1), frs_rtp(1,fs_trns%i_velo_t))
+      end if
+!
+      if(fs_trns%i_velo_p .gt. 0) then
+        call copy_nod_scalar_smp(np_smp, nnod_rtp, inod_rtp_smp_stack,  &
+     &      fls_rtp(1,bs_trns%i_velo+2), frs_rtp(1,fs_trns%i_velo_p))
+      end if
+!
+      if(fs_trns%i_velo_s .gt. 0) then
+        call cal_cyl_r_comp_sph_smp(np_smp, nnod_rtp, nidx_rtm(2),      &
+     &      inod_rtp_smp_stack, idx_global_rtp, g_colat_rtm,            &
+     &      fls_rtp(1,bs_trns%i_velo), frs_rtp(1,fs_trns%i_velo_s))
+      end if
+!
+!
+      if(fs_trns%i_magne_r .gt. 0) then
+        call copy_nod_scalar_smp(np_smp, nnod_rtp, inod_rtp_smp_stack,  &
+     &      fls_rtp(1,bs_trns%i_magne  ), frs_rtp(1,fs_trns%i_magne_r))
+      end if
+!
+      if(fs_trns%i_magne_t .gt. 0) then
+        call copy_nod_scalar_smp(np_smp, nnod_rtp, inod_rtp_smp_stack,  &
+     &      fls_rtp(1,bs_trns%i_magne+1), frs_rtp(1,fs_trns%i_magne_t))
+      end if
+!
+      if(fs_trns%i_magne_p .gt. 0) then
+        call copy_nod_scalar_smp(np_smp, nnod_rtp, inod_rtp_smp_stack,  &
+     &      fls_rtp(1,bs_trns%i_magne+2), frs_rtp(1,fs_trns%i_magne_p))
+      end if
+!
+      if(fs_trns%i_magne_s .gt. 0) then
+        call cal_cyl_r_comp_sph_smp(np_smp, nnod_rtp, nidx_rtm(2),      &
+     &      inod_rtp_smp_stack, idx_global_rtp, g_colat_rtm,            &
+     &      fls_rtp(1,bs_trns%i_magne), frs_rtp(1,fs_trns%i_magne_s))
+      end if
+!
 !      if(fs_trns%i_coriolis .gt. 0) then
 !        call cal_wz_coriolis_rtp(nnod_rtp, fls_rtp(1,bs_trns%i_velo),  &
 !     &      frs_rtp(1,fs_trns%i_Coriolis))
@@ -251,6 +296,40 @@
 !$omp end do nowait
 !
       end subroutine cal_buoyancy_flux_rtp_smp
+!
+! -----------------------------------------------------------------------
+!
+      subroutine cal_cyl_r_comp_sph_smp(np_smp, nnod_rtp, nth_rtm,      &
+     &          inod_smp_stack, idx_global_rtp, g_colat_rtm,            &
+     &          v_sph, v_s)
+!
+      integer (kind=kint), intent(in) :: np_smp, nnod_rtp
+      integer (kind=kint), intent(in) :: nth_rtm
+      integer (kind=kint), intent(in) :: inod_smp_stack(0:np_smp)
+      integer (kind=kint), intent(in) :: idx_global_rtp(nnod_rtp,3)
+      real (kind=kreal), intent(in) :: v_sph(nnod_rtp,3)
+      real (kind=kreal), intent(in) :: g_colat_rtm(nth_rtm)
+!
+      real (kind=kreal), intent(inout) :: v_s(nnod_rtp)
+!
+      integer (kind=kint) :: iproc, inod, ist, ied, l
+!
+!
+!$omp do private(l,ist,ied,inod)
+      do iproc = 1, np_smp
+        ist = inod_smp_stack(iproc-1)+1
+        ied = inod_smp_stack(iproc)
+!
+!cdir nodep
+        do inod = ist, ied
+          l = idx_global_rtp(inod,2)
+          v_s(inod) =      v_sph(inod,1) * sin( g_colat_rtm(l) )        &
+     &                   + v_sph(inod,2) * cos( g_colat_rtm(l) )
+        end do
+      end do
+!$omp end do nowait
+!
+      end subroutine cal_cyl_r_comp_sph_smp
 !
 ! -----------------------------------------------------------------------
 !
