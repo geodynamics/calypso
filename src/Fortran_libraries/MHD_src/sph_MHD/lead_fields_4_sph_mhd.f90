@@ -33,14 +33,18 @@
 !
       use m_control_parameter
       use m_t_step_parameter
+      use m_boundary_params_sph_MHD
       use output_viz_file_control
       use copy_MHD_4_sph_trans
       use cal_energy_flux_rtp
+      use cal_self_buoyancies_sph
 !
       integer (kind =kint) :: iflag
 !
 !
       call set_lead_physical_values_flag(iflag)
+!
+      call cal_radial_self_gravity(sph_bc_U)
 !
       if ( (iflag*mod(istep_max_dt,i_step_output_rst)) .eq.0 ) then
         if(iflag_t_evo_4_velo .gt. id_no_evolution) then
