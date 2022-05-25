@@ -48,11 +48,21 @@
       type(sph_boundary_type), intent(in) :: sph_bc_U
 !
 !
+      integer(kind = kint) :: ipol_temp
+!
+!
+      if    (iflag_4_ref_temp .eq. id_sphere_ref_temp) then
+        ipol_temp =  ipol%i_par_temp
+      else
+        ipol_temp =  ipol%i_temp
+      end if
+!
+!
       if(ipol%i_buoyancy .gt. 0) then
         if (iflag_debug.eq.1) write(*,*)                                &
-     &      'cal_buoyancy_sph_MHD', ipol%i_temp
+     &      'cal_buoyancy_sph_MHD', ipol_temp
         call cal_buoyancy_sph_MHD(sph_bc_U%kr_in, sph_bc_U%kr_out,      &
-     &      g_sph_rj, coef_buo, ipol%i_temp, ipol%i_buoyancy)
+     &      g_sph_rj, coef_buo, ipol_temp, ipol%i_buoyancy)
       end if
 !
       if(ipol%i_comp_buo .gt. 0) then
