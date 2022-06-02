@@ -134,10 +134,10 @@
 !
 !   set control for diffusion reduction by latent heating
 !
-      MHD_prop%cp_prop%ICB_diffusie_reduction = 1.0d0
-      MHD_prop%ht_prop%ICB_diffusie_reduction = 1.0d0
+      MHD_prop%cp_prop%diffusie_reduction_ICB = 1.0d0
+      MHD_prop%ht_prop%diffusie_reduction_ICB = 1.0d0
       if(reft_ctl%ICB_diffuse_reduction_ctl%iflag .gt. 0) then
-        MHD_prop%ht_prop%ICB_diffusie_reduction                         &
+        MHD_prop%ht_prop%diffusie_reduction_ICB                         &
      &        = reft_ctl%ICB_diffuse_reduction_ctl%realvalue
       end if
 !

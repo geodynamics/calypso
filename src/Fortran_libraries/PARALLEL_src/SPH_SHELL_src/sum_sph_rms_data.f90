@@ -12,7 +12,7 @@
 !!     &       num_mode_sum_l, num_mode_sum_m, num_mode_sum_lm,         &
 !!     &       istack_mode_sum_l, istack_mode_sum_m, istack_mode_sum_lm,&
 !!     &       item_mode_sum_l, item_mode_sum_m, item_mode_sum_lm)
-!!      subroutine sum_sph_layerd_rms(l_truncation, sph_rj, ipol,       &
+!!      subroutine sum_sph_layerd_pwr(l_truncation, sph_rj, ipol,       &
 !!     &       g_sph_rj, rj_fld, nri_rms, num_rms_rj,                   &
 !!     &       istack_rms_comp_rj, ifield_rms_rj, kr_for_rms,           &
 !!     &       num_vol_spectr, v_pwr, WK_pwr)
@@ -133,7 +133,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine sum_sph_layerd_rms(l_truncation, sph_rj, ipol,         &
+      subroutine sum_sph_layerd_pwr(l_truncation, sph_rj, ipol,         &
      &          g_sph_rj, rj_fld, nri_rms, num_rms_rj,                  &
      &          istack_rms_comp_rj, ifield_rms_rj, kr_for_rms,          &
      &          num_vol_spectr, v_pwr, WK_pwr)
@@ -225,7 +225,7 @@
      &      ncomp_rj, WK_pwr%shl_rj, WK_pwr%shl_lm_local(1,0,jcomp_st))
       end do
 !
-      end subroutine sum_sph_layerd_rms
+      end subroutine sum_sph_layerd_pwr
 !
 ! -----------------------------------------------------------------------
 !

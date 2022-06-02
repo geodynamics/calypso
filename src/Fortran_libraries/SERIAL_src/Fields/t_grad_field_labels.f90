@@ -68,7 +68,7 @@
 !
 !>        Field address for gradient of @f$ T @f$
 !!         @f$  \partial_{i} T / dz@f$
-        integer (kind=kint) :: i_grad_temp =           izero
+        integer (kind=kint) :: i_grad_temp =       izero
 !>        Field address for gradient of @f$ \Theta @f$
 !!         @f$  \partial_{i} \Theta / dz@f$
         integer (kind=kint) :: i_grad_per_t =      izero

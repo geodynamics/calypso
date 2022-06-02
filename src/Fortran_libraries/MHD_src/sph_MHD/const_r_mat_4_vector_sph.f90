@@ -276,7 +276,6 @@
 !
       write(band_bp_evo%mat_name,'(a)') 'poloidal_magne_evolution'
       write(band_bt_evo%mat_name,'(a)') 'toroidal_magne_evolution'
-      if (cd_prop%iflag_Bevo_scheme .lt. id_Crank_nicolson) return
 !
       call alloc_band_mat_sph(ithree, sph_rj, band_bp_evo)
       call alloc_band_mat_sph(ithree, sph_rj, band_bt_evo)

@@ -59,7 +59,8 @@
       integer(kind = kint), intent(in) :: is_temp
       integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
-      real(kind=kreal), intent(in) :: reftemp_rj(sph_rj%nidx_rj(1),0:1)
+      real(kind=kreal), intent(in)                                      &
+     &                 :: reftemp_rj(0:sph_rj%nidx_rj(1),0:1)
 !
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
@@ -99,7 +100,7 @@
       if(sph_rj%inod_rj_center .gt. 0) then
         jj = find_local_sph_address(sph_rj, 0, 0)
         inod = local_sph_node_address(sph_rj, 1, jj)
-        d_rj(sph_rj%inod_rj_center,is_temp) = d_rj(inod,is_temp)
+        d_rj(sph_rj%inod_rj_center,is_temp) = reftemp_rj(0,0)
       end if
 !
       end subroutine set_ini_reference_temp_sph
@@ -159,7 +160,8 @@
       real(kind = kreal), intent(in) :: r_ICB, r_CMB
       integer ( kind = kint), intent(in) :: isig, is_fld
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
-      real(kind=kreal), intent(in) :: reftemp_rj(sph_rj%nidx_rj(1),0:1)
+      real(kind=kreal), intent(in)                                      &
+     &                 :: reftemp_rj(0:sph_rj%nidx_rj(1),0:1)
 !
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
@@ -204,7 +206,7 @@
       if(sph_rj%inod_rj_center .gt. 0) then
         jj = find_local_sph_address(sph_rj, 0, 0)
         inod = local_sph_node_address(sph_rj, 1, jj)
-        d_rj(sph_rj%inod_rj_center,is_fld) = d_rj(inod,is_fld)
+        d_rj(sph_rj%inod_rj_center,is_fld) = reftemp_rj(0,0)
       end if
 !
       end subroutine set_initial_light_sph
@@ -238,7 +240,7 @@
           inod = j + (k-1) * sph_rj%nidx_rj(2)
 !
           d_rj(inod,is_temp) = (one-three*xr**2+three*xr**4-xr**6)      &
-     &                            * 0.1d0 * six / (sqrt(pi))
+     &                            * 1.0d-6 * six / (sqrt(pi))
         end do
       end do
 !
@@ -263,7 +265,8 @@
       real(kind = kreal), intent(in) :: r_ICB, r_CMB
       integer(kind = kint), intent(in) :: is_fld
       integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
-      real(kind=kreal), intent(in) :: reftemp_rj(sph_rj%nidx_rj(1),0:1)
+      real(kind=kreal), intent(in)                                      &
+     &                 :: reftemp_rj(0:sph_rj%nidx_rj(1),0:1)
 !
       real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
@@ -308,7 +311,7 @@
       if(sph_rj%inod_rj_center .gt. 0) then
         jj = find_local_sph_address(sph_rj, 0, 0)
         inod = local_sph_node_address(sph_rj, 1, jj)
-        d_rj(sph_rj%inod_rj_center,is_fld) = d_rj(inod,is_fld)
+        d_rj(sph_rj%inod_rj_center,is_fld) = reftemp_rj(k,0)
       end if
 !
       end subroutine set_noize_scalar_sph

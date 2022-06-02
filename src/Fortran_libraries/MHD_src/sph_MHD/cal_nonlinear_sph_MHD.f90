@@ -225,7 +225,8 @@
       use cal_products_smp
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(base_field_address), intent(in) :: b_trns_base_1, b_trns_base_2
+      type(base_field_address), intent(in) :: b_trns_base_1
+      type(base_field_address), intent(in) :: b_trns_base_2
       type(base_force_address), intent(in) :: f_trns_frc
       integer(kind = kint), intent(in) :: nnod
       integer(kind = kint), intent(in) :: ntot_comp_fld, ntot_comp_frc
@@ -323,7 +324,7 @@
       integer(kind = kint), intent(in) :: is_h_advect, is_velo
       real(kind = kreal), intent(in) :: g_sph_rj(nidx_rj(2),13)
       real(kind = kreal), intent(in) :: ar_1d_rj(nidx_rj(1),3)
-      real(kind = kreal), intent(in) :: reftemp_rj(nidx_rj(1),0:2)
+      real(kind = kreal), intent(in) :: reftemp_rj(0:nidx_rj(1),0:1)
       type(sph_boundary_type), intent(in) :: sph_bc_S
       type(scalar_property), intent(in) :: property
       type(reference_scalar_param), intent(in) :: ref_param_S
@@ -333,7 +334,10 @@
       integer(kind= kint) :: ist, ied, inod, j, k
 !
 !
-      if (ref_param_S%iflag_reference .ne. id_sphere_ref_temp) return
+      if     (ref_param_S%iflag_reference .ne. id_sphere_ref_temp       &
+     &  .and. ref_param_S%iflag_reference .ne. id_takepiro_temp         &
+     &  .and. ref_param_S%iflag_reference .ne. id_numerical_solution    &
+     &   ) return
 !
       ist = (sph_bc_S%kr_in-1) * nidx_rj(2) + 1
       ied =  sph_bc_S%kr_out * nidx_rj(2)

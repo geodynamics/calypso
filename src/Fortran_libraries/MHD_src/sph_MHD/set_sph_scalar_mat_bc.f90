@@ -20,6 +20,18 @@
 !!     &          kr_out, r_CMB, fdm2_fix_dr_CMB, coef_p, evo_mat)
 !!      subroutine add_cmb_scalar_poisson_mat(nri, jmax, g_sph_rj,      &
 !!     &          kr_out, r_CMB, fdm2_fix_dr_CMB, coef_p, p_mat)
+!!
+!!      subroutine set_fix_fld_icb_poisson00_mat(nri, kr_in, evo_mat)
+!!      subroutine add_fix_flux_icb_poisson00_mat                       &
+!!     &         (nri, kr_in, fdm2_fix_dr_ICB, coef_p, evo_mat)
+!!        integer(kind = kint), intent(in) :: nri, kr_in
+!!        real(kind = kreal), intent(inout) :: evo_mat(3,0:kr_in+1)
+!!
+!!      subroutine set_fix_fld_cmb_poisson00_mat(nri, kr_out, evo_mat)
+!!      subroutine add_fix_flux_cmb_poisson00_mat                       &
+!!     &         (nri, kr_out, fdm2_fix_dr_CMB, coef_p, evo_mat)
+!!        integer(kind = kint), intent(in) :: nri, kr_out
+!!        real(kind = kreal), intent(inout) :: evo_mat(3,0:kr_out)
 !!@endverbatim
 !!
 !!@n @param nri     Number of radial points
@@ -198,6 +210,75 @@
       end do
 !
       end subroutine add_cmb_scalar_poisson_mat
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_fix_fld_icb_poisson00_mat(nri, kr_in, evo_mat)
+!
+      integer(kind = kint), intent(in) :: nri, kr_in
+      real(kind = kreal), intent(inout) :: evo_mat(3,0:nri)
+!
+!     evo_mat(3,kr_in-1,j) = zero
+      evo_mat(2,kr_in  ) = one
+      evo_mat(1,kr_in+1) = zero
+!
+      end subroutine set_fix_fld_icb_poisson00_mat
+!
+! -----------------------------------------------------------------------
+!
+      subroutine add_fix_flux_icb_poisson00_mat                         &
+     &         (nri, kr_in, fdm2_fix_dr_ICB, coef_p, evo_mat)
+!
+      integer(kind = kint), intent(in) :: nri, kr_in
+      real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_ICB(-1:1,3)
+!
+      real(kind = kreal), intent(inout) :: evo_mat(3,0:nri)
+!
+!       evo_mat(3,kr_in-1) = evo_mat(3,kr_in-1)                         &
+!     &                          - coef_p * fdm2_fix_dr_ICB(-1,3)
+        evo_mat(2,kr_in  ) = evo_mat(2,kr_in  )                         &
+     &                          - coef_p * (fdm2_fix_dr_ICB( 0,3))
+        evo_mat(1,kr_in+1) = evo_mat(1,kr_in+1)                         &
+     &                          - coef_p * fdm2_fix_dr_ICB( 1,3)
+!
+      end subroutine add_fix_flux_icb_poisson00_mat
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine set_fix_fld_cmb_poisson00_mat(nri, kr_out, evo_mat)
+!
+      integer(kind = kint), intent(in) :: nri, kr_out
+      real(kind = kreal), intent(inout) :: evo_mat(3,0:nri)
+!
+!
+      evo_mat(3,kr_out-1) = zero
+      evo_mat(2,kr_out  ) = one
+!     evo_mat(1,kr_out+1) = zero
+!
+      end subroutine set_fix_fld_cmb_poisson00_mat
+!
+! -----------------------------------------------------------------------
+!
+      subroutine add_fix_flux_cmb_poisson00_mat                         &
+     &         (nri, kr_out, fdm2_fix_dr_CMB, coef_p, evo_mat)
+!
+      integer(kind = kint), intent(in) :: nri, kr_out
+      real(kind = kreal), intent(in) :: coef_p
+      real(kind = kreal), intent(in) :: fdm2_fix_dr_CMB(-1:1,3)
+!
+      real(kind = kreal), intent(inout) :: evo_mat(3,0:nri)
+!
+!
+      evo_mat(3,kr_out-1) = evo_mat(3,kr_out-1)                         &
+     &                         - coef_p * fdm2_fix_dr_CMB(-1,3)
+      evo_mat(2,kr_out  ) = evo_mat(2,kr_out  )                         &
+     &                         - coef_p * fdm2_fix_dr_CMB( 0,3)
+!     evo_mat(1,kr_out+1) = evo_mat(1,kr_out+1)                         &
+!
+      end subroutine add_fix_flux_cmb_poisson00_mat
 !
 ! -----------------------------------------------------------------------
 !

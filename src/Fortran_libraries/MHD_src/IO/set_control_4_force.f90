@@ -56,6 +56,7 @@
 !
       use t_control_parameter
       use t_ctl_data_mhd_forces
+      use t_ctl_data_mhd_magne
       use skip_comment_f
 !
       type(forces_control), intent(in) :: frc_ctl
@@ -301,7 +302,7 @@
       subroutine set_control_4_induction(mcv_ctl, cd_prop)
 !
       use t_physical_property
-      use t_ctl_data_mhd_forces
+      use t_ctl_data_mhd_magne
       use skip_comment_f
 !
       type(magneto_convection_control), intent(in) :: mcv_ctl

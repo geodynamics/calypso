@@ -11,6 +11,7 @@
 !!      subroutine add_field_ctl_4_base_field(field_ctl)
 !!      subroutine add_field_ctl_4_grad_field(field_ctl)
 !!      subroutine add_field_ctl_4_diff_vector(field_ctl)
+!!      subroutine add_field_ctl_4_field_comps(field_ctl)
 !!        type(ctl_array_c3), intent(in) :: field_ctl
 !!@endverbatim
 !!
@@ -178,6 +179,30 @@
      &  call add_phys_name_ctl(current_density, field_ctl)
 !
       end subroutine add_field_ctl_4_diff_vector
+!
+! -----------------------------------------------------------------------
+!
+      subroutine add_field_ctl_4_field_comps(field_ctl)
+!
+      use m_field_component_labels
+      use m_base_field_labels
+      use add_nodal_fields_ctl
+!
+      type(ctl_array_c3), intent(inout) :: field_ctl
+!
+!
+      if(   check_field_list_ctl(r_velocity, field_ctl)                 &
+     & .or. check_field_list_ctl(theta_velocity, field_ctl)             &
+     & .or. check_field_list_ctl(phi_velocity, field_ctl)               &
+     & .or. check_field_list_ctl(cyl_r_velocity, field_ctl))            &
+     &  call add_phys_name_ctl(velocity, field_ctl)
+      if(   check_field_list_ctl(r_magnetic_f, field_ctl)               &
+     & .or. check_field_list_ctl(theta_magnetic_f, field_ctl)           &
+     & .or. check_field_list_ctl(phi_magnetic_f, field_ctl)             &
+     & .or. check_field_list_ctl(cyl_r_magnetic_f, field_ctl))          &
+     &  call add_phys_name_ctl(magnetic_field, field_ctl)
+!
+      end subroutine add_field_ctl_4_field_comps
 !
 ! -----------------------------------------------------------------------
 !

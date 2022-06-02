@@ -16,6 +16,7 @@
 !!      subroutine alloc_ave_4_sph_spectr                               &
 !!     &         (idx_rj_degree_zero, nri_rj, pwr)
 !!
+!!      subroutine dealloc_num_spec_layer(pwr)
 !!      subroutine dealloc_rms_4_sph_spectr(pwr)
 !!      subroutine dealloc_ave_4_sph_spectr(idx_rj_degree_zero, pwr)
 !!@endverbatim
@@ -280,6 +281,18 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
+      subroutine dealloc_num_spec_layer(pwr)
+!
+      type(sph_mean_squares), intent(inout) :: pwr
+!
+!
+      pwr%nri_rms = 0
+      deallocate(pwr%r_4_rms, pwr%kr_4_rms)
+!
+      end subroutine dealloc_num_spec_layer
+!
+! -----------------------------------------------------------------------
+!
       subroutine dealloc_rms_4_sph_spectr(pwr)
 !
       type(sph_mean_squares), intent(inout) :: pwr
@@ -292,8 +305,6 @@
 !
         call dealloc_sph_vol_mean_square(pwr%v_spectr(i))
       end do
-!
-      deallocate(pwr%r_4_rms, pwr%kr_4_rms)
 !
 !
       deallocate(pwr%shl_l)

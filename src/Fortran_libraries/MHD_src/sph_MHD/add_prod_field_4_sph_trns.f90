@@ -25,6 +25,15 @@
 !!        type(phys_products_address), intent(in) :: ipol_prd, iphys_prd
 !!        type(phys_products_address), intent(inout) :: f_trns_prd
 !!        type(spherical_transform_data), intent(inout) :: trns
+!!
+!!      subroutine add_field_comps_sph_trns_snap                        &
+!!     &         (d_rj, ipol_cmp, iphys_cmp, f_trns_cmp, trns)
+!!        type(phys_data), intent(in) :: d_rj
+!!        type(field_component_address), intent(in) :: ipol_cmp
+!!        type(field_component_address), intent(in) :: iphys_cmp
+!!        type(field_component_address), intent(in) :: ipol_cmp
+!!        type(field_component_address), intent(inout) :: f_trns_cmp
+!!        type(spherical_transform_data), intent(inout) :: trns
 !!@endverbatim
 !
       module add_prod_field_4_sph_trns
@@ -33,6 +42,7 @@
 !
       use t_phys_data
       use t_field_product_labels
+      use t_field_component_labels
       use t_addresses_sph_transform
 !
       implicit none
@@ -177,6 +187,47 @@
      &    f_trns_prd%i_vgp_longigude, trns)
 !
       end subroutine add_prod_scalar_sph_trns_snap
+!
+!-----------------------------------------------------------------------
+!
+      subroutine add_field_comps_sph_trns_snap                          &
+     &         (d_rj, ipol_cmp, iphys_cmp, f_trns_cmp, trns)
+!
+      use add_field_to_sph_trans_list
+!
+      type(phys_data), intent(in) :: d_rj
+      type(field_component_address), intent(in) :: ipol_cmp, iphys_cmp
+      type(field_component_address), intent(inout) :: f_trns_cmp
+      type(spherical_transform_data), intent(inout) :: trns
+!
+!
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_velo_r, iphys_cmp%i_velo_r,                        &
+     &    f_trns_cmp%i_velo_r, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_velo_t, iphys_cmp%i_velo_t,                        &
+     &    f_trns_cmp%i_velo_t, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_velo_p, iphys_cmp%i_velo_p,                        &
+     &    f_trns_cmp%i_velo_p, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_velo_s, iphys_cmp%i_velo_s,                        &
+     &    f_trns_cmp%i_velo_s, trns)
+!
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_magne_r, iphys_cmp%i_magne_r,                      &
+     &    f_trns_cmp%i_magne_r, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_magne_t, iphys_cmp%i_magne_t,                      &
+     &    f_trns_cmp%i_magne_t, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_magne_p, iphys_cmp%i_magne_p,                      &
+     &    f_trns_cmp%i_magne_p, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_magne_s, iphys_cmp%i_magne_s,                      &
+     &    f_trns_cmp%i_magne_s, trns)
+!
+      end subroutine add_field_comps_sph_trns_snap
 !
 !-----------------------------------------------------------------------
 !

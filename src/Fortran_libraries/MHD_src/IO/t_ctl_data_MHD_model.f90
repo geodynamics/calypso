@@ -30,7 +30,9 @@
       use t_ctl_data_surf_boundary
       use t_ctl_data_mhd_normalize
       use t_ctl_data_mhd_forces
+      use t_ctl_data_mhd_magne
       use t_ctl_data_temp_model
+      use t_ctl_data_dimless_numbers
 !
       use skip_comment_f
 !
@@ -61,8 +63,10 @@
         type(gravity_control) :: g_ctl
 !>        Structure for Coriolis force
         type(coriolis_control) :: cor_ctl
-!>        Structure for Coriolis force
+!>        Structure for external magnetic field
         type(magneto_convection_control) :: mcv_ctl
+!>        Structure for magnetic field scaling
+        type(magnetic_field_scale_control) :: bscale_ctl
 !
 !>        Structures for reference tempearature
         type(reference_temperature_ctl) :: reft_ctl
@@ -75,50 +79,44 @@
 !    label for entry of group
 !
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_phys_values =  'phys_values_ctl'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_time_evo =     'time_evolution_ctl'
-      character(len=kchara), parameter :: hd_layers_ctl = 'layers_ctl'
+      character(len=kchara), parameter, private                         &
+     &      :: hd_layers_ctl = 'layers_ctl'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_bc_4_node =          'bc_4_node'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_boundary_condition = 'boundary_condition'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_dimless_ctl =  'dimensionless_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_coef_term_ctl ='coefficients_ctl'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_forces_ctl =   'forces_define'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_gravity_ctl =  'gravity_define'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_coriolis_ctl = 'Coriolis_define'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_induction_ctl =  'magnetic_induciton_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_magneto_ctl =  'Magneto_convection_def'
+      character(len=kchara), parameter, private                         &
+     &      :: hd_bscale_ctl =   'magnetic_field_scale_ctl'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_temp_def =     'temperature_define'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_comp_def =     'composition_define'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_bc_4_surf =    'bc_4_surface'
-!
-      private :: hd_phys_values, hd_time_evo, hd_layers_ctl
-      private :: hd_bc_4_node, hd_boundary_condition, hd_bc_4_surf
-      private :: hd_dimless_ctl, hd_coef_term_ctl
-!
-      private :: hd_forces_ctl, hd_induction_ctl
-      private :: hd_gravity_ctl, hd_coriolis_ctl, hd_magneto_ctl
-!
-      private :: hd_temp_def, hd_comp_def
 !
 ! ----------------------------------------------------------------------
 !
@@ -171,6 +169,8 @@
      &     (id_control, hd_coriolis_ctl, Dmodel_ctl%cor_ctl, c_buf)
         call read_magneto_ctl                                           &
      &     (id_control, hd_induction_ctl, Dmodel_ctl%mcv_ctl, c_buf)
+        call read_magnetic_scale_ctl                                    &
+     &     (id_control, hd_bscale_ctl, Dmodel_ctl%bscale_ctl, c_buf)
         call read_reftemp_ctl                                           &
      &     (id_control, hd_temp_def, Dmodel_ctl%reft_ctl, c_buf)
         call read_refcomp_ctl                                           &
@@ -207,6 +207,7 @@
       call bcast_gravity_ctl(Dmodel_ctl%g_ctl)
       call bcast_coriolis_ctl(Dmodel_ctl%cor_ctl)
       call bcast_magneto_ctl(Dmodel_ctl%mcv_ctl)
+      call bcast_magnetic_scale_ctl(Dmodel_ctl%bscale_ctl)
       call bcast_ref_scalar_ctl(Dmodel_ctl%reft_ctl)
       call bcast_ref_scalar_ctl(Dmodel_ctl%refc_ctl)
 !
@@ -234,6 +235,7 @@
       call dealloc_gravity_ctl(Dmodel_ctl%g_ctl)
       call dealloc_coriolis_ctl(Dmodel_ctl%cor_ctl)
       call dealloc_magneto_ctl(Dmodel_ctl%mcv_ctl)
+      call dealloc_magnetic_scale_ctl(Dmodel_ctl%bscale_ctl)
 !
       Dmodel_ctl%i_model = 0
 !

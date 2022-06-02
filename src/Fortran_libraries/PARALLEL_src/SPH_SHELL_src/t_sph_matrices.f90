@@ -116,6 +116,7 @@
       type(band_matrices_type), intent(inout) :: smat
 !
 !
+      if(allocated(smat%mat) .eqv. .FALSE.) return
       deallocate( smat%mat, smat%lu )
       deallocate( smat%det, smat%i_pivot )
 !

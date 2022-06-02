@@ -23,6 +23,7 @@
       use t_field_product_labels
       use t_explicit_term_labels
       use t_diff_vector_labels
+      use t_field_component_labels
 !
       implicit  none
 ! 
@@ -50,6 +51,8 @@
 !
 !>        Structure of products of fields
         type(phys_products_address) :: prod_fld
+!>       Structure for start address for field components
+        type(field_component_address) :: fld_cmp
 !
 !>        Structure of work area
         type(explicit_term_address) :: exp_work

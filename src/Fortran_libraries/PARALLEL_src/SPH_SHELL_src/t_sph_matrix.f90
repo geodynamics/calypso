@@ -111,7 +111,8 @@
       type(band_matrix_type), intent(inout) :: smat
 !
 !
-      deallocate( smat%mat, smat%lu, smat%i_pivot )
+      if(allocated(smat%mat) .eqv. .FALSE.) return
+      deallocate(smat%mat, smat%lu, smat%i_pivot)
 !
       end subroutine dealloc_band_matrix
 !

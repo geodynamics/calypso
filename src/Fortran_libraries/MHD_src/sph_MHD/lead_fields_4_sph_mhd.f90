@@ -176,6 +176,7 @@
 !
       use sph_transforms_snapshot
       use cal_nonlinear_sph_MHD
+      use get_components_from_field
 !
       type(sph_grids), intent(in) :: sph
       type(sph_comm_tables), intent(in) :: comms_sph
@@ -203,6 +204,12 @@
      &      trns_snap%b_trns%base, trns_MHD%f_trns%forces,              &
      &      trns_snap%backward, trns_MHD%forward)
       end if
+!
+!
+      call get_components_from_fld(sph%sph_rtp, trans_p%leg,            &
+     &    trns_snap%b_trns%base, trns_snap%f_trns%fld_cmp,              &
+     &    trns_snap%backward%ncomp, trns_snap%backward%fld_rtp,         &
+     &    trns_snap%forward%ncomp, trns_snap%forward%fld_rtp)
 !
 !
       call nonlinear_terms_on_node_w_sym                                &
@@ -283,7 +290,7 @@
       use cal_sph_divergence_of_force
       use const_radial_forces_on_bc
       use cal_div_of_forces
-      use const_sph_radial_grad
+      use sph_radial_grad_4_velocity
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
@@ -335,6 +342,7 @@
       use sph_transforms_snapshot
       use cal_energy_flux_rtp
       use cal_energy_flux_rj
+      use cal_geomagnetic_data
 !
       integer(kind = kint), intent(in) :: ltr_crust
       type(sph_grids), intent(in) :: sph
@@ -357,6 +365,11 @@
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
+      call cal_geomagnetic_rtp                                          &
+     &   (sph%sph_rtp, sph%sph_rj, sph_MHD_bc%sph_bc_B,                 &
+     &    trns_MHD%b_trns%base, trns_eflux%f_trns%prod_fld,             &
+     &    trns_MHD%backward%ncomp, trns_MHD%backward%fld_rtp,           &
+     &    trns_eflux%forward%ncomp, trns_eflux%forward%fld_rtp)
       call cal_sph_enegy_fluxes                                         &
      &   (ltr_crust, sph, comms_sph, r_2nd, MHD_prop, sph_MHD_bc,       &
      &    trans_p, ipol, trns_MHD, trns_snap, trns_difv, trns_eflux,    &
@@ -379,6 +392,7 @@
      &          WK_leg, WK_FFTs, rj_fld, SR_sig, SR_r)
 !
       use sph_transforms_snapshot
+      use cal_sph_field_by_rotation
       use cal_energy_flux_rj
       use cal_energy_flux_rtp
       use cal_ene_flux_by_sym_rtp
@@ -403,6 +417,11 @@
       type(send_recv_status), intent(inout) :: SR_sig
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
+!
+!      Evaluate magnetic induction with respect to equatorial symmetry
+      call s_cal_mag_induct_by_sym_rj                                   &
+     &   (sph%sph_rj, r_2nd, sph_MHD_bc, trans_p%leg, ipol, rj_fld)
+!
 !      Evaluate fields for output in spectrum space
       if (iflag_debug.gt.0) write(*,*) 's_cal_energy_flux_rj'
       call s_cal_energy_flux_rj                                         &
@@ -424,8 +443,10 @@
 !
       call s_cal_ene_flux_by_sym_rtp(sph%sph_rtp, MHD_prop%fl_prop,     &
      &    MHD_prop%ref_param_T, MHD_prop%ref_param_C,                   &
-     &    trns_snap%b_trns, trns_snap%f_trns, trns_eflux%f_trns,        &
-     &    trns_snap%backward, trns_snap%forward, trns_eflux%forward)
+     &    trns_snap%b_trns, trns_snap%f_trns,                           &
+     &    trns_eflux%b_trns, trns_eflux%f_trns,                         &
+     &    trns_snap%backward, trns_snap%forward,                        &
+     &    trns_eflux%backward, trns_eflux%forward)
 !
       end subroutine cal_sph_enegy_fluxes
 !

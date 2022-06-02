@@ -47,8 +47,8 @@
 !!   stream_pol_magne         [i_stream_pol_b]:
 !!
 !!   magnetic_intensity       [i_magnetic_intensity]:
-!!   declination              [i_declination]:
 !!   inclination              [i_inclination]:
+!!   declination              [i_declination]:
 !!   vgp_latitude             [i_vgp_latitude]:
 !!   vgp_longigude            [i_vgp_llongigude]:
 !!

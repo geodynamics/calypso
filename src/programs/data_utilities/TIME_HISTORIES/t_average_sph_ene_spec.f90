@@ -65,7 +65,7 @@
 !
       integer :: i
 !
-      call read_control_file_psf_compare(0, tave_sph_ctl1)
+      call read_control_file_sph_monitor(0, tave_sph_ctl1)
       call set_spec_series_file_param(tave_sph_ctl1, spec_evo_p1)
       call dealloc_ctl_tave_sph_monitor(tave_sph_ctl1)
 !

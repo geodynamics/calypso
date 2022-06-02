@@ -170,6 +170,7 @@
       use t_sph_boundary_input_data
       use t_ctl_params_gen_sph_shell
       use t_sph_trans_arrays_MHD
+      use t_coef_parameters_list
 !
       use gen_sph_grids_modes
       use set_control_platform_item
@@ -178,7 +179,6 @@
       use set_control_4_model
       use set_control_sph_data_MHD
       use set_control_4_force
-      use set_control_4_normalize
       use set_ctl_4_shell_grids
 !
       use set_control_4_pickup_sph
@@ -240,12 +240,14 @@
 !
 !   set control parameters
 !
-      if (iflag_debug.gt.0) write(*,*) 's_set_control_4_normalize'
-      call s_set_control_4_normalize                                    &
+      if (iflag_debug.gt.0) write(*,*) 'set_control_4_normalize'
+      call set_control_4_normalize                                      &
      &   (MHD_prop%fl_prop, MHD_prop%cd_prop, MHD_prop%ht_prop,         &
      &    MHD_prop%cp_prop, Dmodel_ctl%dless_ctl, Dmodel_ctl%eqs_ctl,   &
      &    MHD_prop%MHD_coef_list)
 !
+      call set_coefs_4_magnetic_scale                                   &
+     &   (Dmodel_ctl%bscale_ctl, MHD_prop%MHD_coef_list)
 !
 !   set boundary conditions
 !
@@ -329,6 +331,9 @@
 !
       use t_phys_data
       use t_sph_mhd_monitor_data_IO
+      use t_no_heat_Nusselt
+      use t_CMB_dipolarity
+      use t_sph_typical_scales
 !
       use set_control_4_pickup_sph
 !
@@ -349,8 +354,19 @@
       call set_ctl_params_pick_gauss                                    &
      &   (smonitor_ctl%g_pwr, monitor%gauss_list, monitor%gauss_coef)
 !
-      call set_ctl_params_no_heat_Nu(smonitor_ctl%Nusselt_file_prefix,  &
-     &    rj_fld, monitor%Nusselt)
+      call set_ctl_params_no_heat_Nu                                    &
+     &   (smonitor_ctl%heat_nusselt_file_prefix,                        &
+     &    rj_fld, monitor%heat_Nusselt)
+      call set_ctl_params_no_heat_Nu                                    &
+     &   (smonitor_ctl%comp_nusselt_file_prefix,                        &
+     &    rj_fld, monitor%comp_Nusselt)
+!
+      call set_ctl_dipolarity_params                                    &
+     &   (smonitor_ctl%fdip_ctl%fdip_file_prefix_ctl,                   &
+     &    smonitor_ctl%fdip_ctl%fdip_truncation_ctl,                    &
+     &    rj_fld, monitor%dip)
+      call set_ctl_typical_scale_params                                 &
+     &   (smonitor_ctl%typ_scale_file_prefix_ctl, rj_fld, monitor%tsl)
 !
       end subroutine set_control_SPH_MHD_monitors
 !

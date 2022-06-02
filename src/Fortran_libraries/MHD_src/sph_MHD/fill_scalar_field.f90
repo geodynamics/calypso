@@ -15,6 +15,10 @@
 !!     &          inod_rj_center, idx_rj_degree_zero, nri, jmax,        &
 !!     &          ipol_scalar, n_point, ntot_phys_rj, d_rj)
 !!        type(sph_boundary_type), intent(in) :: sph_bc
+!!
+!!      subroutine fill_scalar_1d_external                              &
+!!     &         (sph_bc, inod_rj_center, nri, d_r)
+!!        type(sph_boundary_type), intent(in) :: sph_bc
 !!@endverbatim
 !
       module fill_scalar_field
@@ -39,7 +43,7 @@
       integer(kind = kint), intent(in) :: idx_rj_degree_zero
       integer(kind = kint), intent(in) :: is_field
       integer(kind = kint), intent(in) :: n_point,  ntot_phys_rj
-      real (kind=kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
+      real(kind = kreal), intent(in) :: d_rj(n_point,ntot_phys_rj)
 !
       real(kind = kreal), intent(inout) :: sol_00(0:nri)
 !
@@ -51,7 +55,10 @@
         sol_00(kr) = d_rj(inod,is_field)
       end do
 !$omp end parallel do
-      sol_00(0) = d_rj(inod_rj_center,is_field)
+!
+      if(inod_rj_center .eq. 0) then
+        sol_00(0) = d_rj(inod_rj_center,is_field)
+      end if
 !
 !       write(*,*) 'kr, Average RHS'
 !       do kr = 0, nri
@@ -84,7 +91,10 @@
         d_rj(inod,is_field) = sol_00(kr)
       end do
 !$omp end parallel do
-      d_rj(inod_rj_center,is_field) = sol_00(0)
+!
+      if(inod_rj_center .eq. 0) then
+        d_rj(inod_rj_center,is_field) = sol_00(0)
+      end if
 !
 !       write(*,*) 'kr, average Solution'
 !       do kr = 0, nri
@@ -143,6 +153,36 @@
       end if
 !
       end subroutine fill_scalar_at_external
+!
+! -----------------------------------------------------------------------
+!
+      subroutine fill_scalar_1d_external                                &
+     &         (sph_bc, inod_rj_center, nri, d_r)
+!
+      use t_boundary_params_sph_MHD
+!
+      type(sph_boundary_type), intent(in) :: sph_bc
+      integer(kind = kint), intent(in) :: inod_rj_center
+      integer(kind = kint), intent(in) :: nri
+!
+      real (kind=kreal), intent(inout) :: d_r(0:nri)
+!
+      integer(kind = kint) :: k
+!
+!
+      do k = 1, sph_bc%kr_in - 1
+        d_r(k) = d_r(sph_bc%kr_in)
+      end do
+      do k = sph_bc%kr_out + 1, nri
+        d_r(k) = d_r(sph_bc%kr_out)
+      end do
+!
+      if(sph_bc%iflag_icb .eq. iflag_fixed_field                        &
+     &  .or. sph_bc%iflag_icb .eq. iflag_evolve_field) then
+        if(inod_rj_center .gt. 0) d_r(0) = d_r(sph_bc%kr_in)
+      end if
+!
+      end subroutine fill_scalar_1d_external
 !
 ! -----------------------------------------------------------------------
 !

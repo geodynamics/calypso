@@ -41,7 +41,9 @@
 !!        type(base_force_address), intent(in) :: ipol_frc, iphys_frc
 !!        type(base_force_address), intent(inout) :: f_trns_frc
 !!        type(spherical_transform_data), intent(inout) :: trns
-!!      subroutine add_base_force_bwd_trns_snap                         &
+!!      subroutine add_linear_force_bwd_trns_snap                       &
+!!     &         (d_rj, ipol_frc, iphys_frc, b_trns_frc, trns)
+!!      subroutine add_mag_induct_bwd_trns_snap                         &
 !!     &         (d_rj, ipol_frc, iphys_frc, b_trns_frc, trns)
 !!      subroutine add_scalar_flux_bwd_trns_snap                        &
 !!     &         (d_rj, ipol_frc, iphys_frc, b_trns_frc, trns)
@@ -102,8 +104,8 @@
 !   advection
 !      if(fl_prop%iflag_scheme .gt. id_no_evolution) then
 !        if(fl_prop%iflag_4_inertia) then
-          call add_field_4_sph_trns_by_pol(d_rj,                       &
-     &        ipol_frc%i_m_advect, iphys_frc%i_m_advect,               &
+          call add_field_4_sph_trns_by_pol(d_rj,                        &
+     &        ipol_frc%i_m_advect, iphys_frc%i_m_advect,                &
      &        f_trns_frc%i_m_advect, trns)
 !        end if
 !   Coriolis force
@@ -242,7 +244,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine add_base_force_bwd_trns_snap                           &
+      subroutine add_linear_force_bwd_trns_snap                         &
      &         (d_rj, ipol_frc, iphys_frc, b_trns_frc, trns)
 !
       use add_field_to_sph_trans_list
@@ -264,11 +266,28 @@
       call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_frc%i_press_grad, iphys_frc%i_press_grad,                &
      &    b_trns_frc%i_press_grad, trns)
+!
+      end subroutine add_linear_force_bwd_trns_snap
+!
+!-----------------------------------------------------------------------
+!
+      subroutine add_mag_induct_bwd_trns_snap                           &
+     &         (d_rj, ipol_frc, iphys_frc, b_trns_frc, trns)
+!
+      use add_field_to_sph_trans_list
+!
+      type(phys_data), intent(in) :: d_rj
+      type(base_force_address), intent(in) :: ipol_frc, iphys_frc
+!
+      type(base_force_address), intent(inout) :: b_trns_frc
+      type(spherical_transform_data), intent(inout) :: trns
+!
+!
       call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_frc%i_induction, iphys_frc%i_induction,                  &
      &    b_trns_frc%i_induction, trns)
 !
-      end subroutine add_base_force_bwd_trns_snap
+      end subroutine add_mag_induct_bwd_trns_snap
 !
 !-----------------------------------------------------------------------
 !

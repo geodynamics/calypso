@@ -11,7 +11,7 @@
 !!      subroutine reset_mid_equator_control(meq_ctl)
 !!        type(mid_equator_control), intent(inout) :: meq_ctl
 !!      subroutine read_mid_eq_monitor_ctl                              &
-!!     &         (id_control, hd_block, iflag, meq_ctl, c_buf)
+!!     &         (id_control, hd_block, meq_ctl, c_buf)
 !!        type(mid_equator_control), intent(inout) :: meq_ctl
 !!
 !! -----------------------------------------------------------------
@@ -52,6 +52,8 @@
 !
 !>        Structure for position for z
         type(read_real_item) :: pick_z_ctl
+!
+        integer (kind = kint) :: i_mid_equator_ctl = 0
       end type mid_equator_control
 !
 !
@@ -83,6 +85,7 @@
       meq_ctl%nphi_mid_eq_ctl%iflag = 0
       meq_ctl%pick_s_ctl%iflag =    0
       meq_ctl%pick_z_ctl%iflag =    0
+      meq_ctl%i_mid_equator_ctl =   0
 !
       end subroutine reset_mid_equator_control
 !
@@ -90,18 +93,17 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_mid_eq_monitor_ctl                                &
-     &         (id_control, hd_block, iflag, meq_ctl, c_buf)
+     &         (id_control, hd_block, meq_ctl, c_buf)
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
-      integer(kind = kint), intent(inout) :: iflag
       type(mid_equator_control), intent(inout) :: meq_ctl
       type(buffer_for_control), intent(inout) :: c_buf
 !
 !
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if (iflag .gt. 0) return
+      if(meq_ctl%i_mid_equator_ctl .gt. 0) return
       do
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_flag(c_buf, hd_block)) exit
@@ -118,7 +120,7 @@
         call read_chara_ctl_type(c_buf, hd_circle_coord,                &
      &      meq_ctl%pick_circle_coord_ctl)
       end do
-      iflag = 1
+      meq_ctl%i_mid_equator_ctl = 1
 !
       end subroutine read_mid_eq_monitor_ctl
 !

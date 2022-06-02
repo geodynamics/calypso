@@ -67,7 +67,6 @@
       use t_sph_boundary_input_data
 !
       use set_control_sph_mhd
-      use const_fdm_coefs
       use set_initial_sph_dynamo
       use adjust_reference_fields
       use set_bc_sph_mhd
@@ -101,16 +100,30 @@
 ! ---------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
-      call init_r_infos_sph_mhd_evo(SPH_WK%r_2nd, SPH_model%bc_IO,      &
-     &    SPH_MHD%groups, SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph,  &
-     &    SPH_model%omega_sph, SPH_model%ref_temp, SPH_model%ref_comp,  &
-     &    SPH_MHD%fld, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
+      call init_r_infos_sph_mhd_evo(SPH_model%bc_IO, SPH_MHD%groups,    &
+     &   SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph, SPH_WK%r_2nd,     &
+     &   SPH_model%omega_sph, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 !
 ! ---------------------------------
 !
       if (iflag_debug.gt.0) write(*,*) 'init_sph_transform_MHD'
       call init_sph_transform_MHD(SPH_model, iphys, SPH_WK%trans_p,     &
      &    SPH_WK%trns_WK, SPH_MHD, SR_sig, SR_r)
+!
+!  -------------------------------
+!
+      if(iflag_debug.gt.0) write(*,*)' read_sph_initial_data_control'
+      call read_sph_initial_data_control                                &
+     &   (MHD_files, SPH_model, SPH_MHD%sph, SPH_MHD%ipol, MHD_step,    &
+     &    SPH_MHD%fld, sph_fst_IO)
+!
+!  -------------------------------
+!
+      if (iflag_debug.gt.0) write(*,*) 'init_reference_scalars'
+      call init_reference_scalars                                       &
+     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd,                      &
+     &    SPH_model%ref_temp, SPH_model%ref_comp, SPH_MHD%fld,          &
+     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 !
 !  -------------------------------
 !
@@ -176,6 +189,7 @@
       use lead_fields_4_sph_mhd
       use sph_mhd_rst_IO_control
       use output_viz_file_control
+      use cal_write_sph_monitor_data
 !
       integer(kind = kint), intent(in) :: i_step
       type(MHD_file_IO_params), intent(in) :: MHD_files
@@ -268,9 +282,9 @@
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+7)
       if(output_IO_flag(i_step, MHD_step%rms_step)) then
         if(iflag_debug.gt.0)  write(*,*) 'output_rms_sph_mhd_control'
-        call output_rms_sph_mhd_control                                 &
-     &     (MHD_step%time_d, SPH_MHD, SPH_model%sph_MHD_bc,             &
-     &      SPH_WK%trans_p%leg, SPH_WK%monitor, SR_sig)
+        call output_rms_sph_mhd_control(MHD_step%time_d, SPH_MHD,       &
+     &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc,                   &
+     &      SPH_WK%r_2nd, SPH_WK%trans_p%leg, SPH_WK%monitor, SR_sig)
       end if
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+7)
 !
