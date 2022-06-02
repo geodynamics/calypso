@@ -42,7 +42,13 @@
 !!   composition_scale        [i_comp_scale]:
 !!
 !!   stream_pol_velocity      [i_stream_pol_u]:
-!!   stream_pol_magnetic_field      [i_stream_pol_b]:
+!!   stream_pol_magne         [i_stream_pol_b]:
+!!
+!!   magnetic_intensity       [i_magnetic_intensity]:
+!!   declination              [i_declination]:
+!!   inclination              [i_inclination]:
+!!   vgp_latitude             [i_vgp_latitude]:
+!!   vgp_longigude            [i_vgp_longigude]:
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -116,6 +122,18 @@
         integer (kind=kint) :: i_stream_pol_u =     izero
 !>        start address for stream function for poloidal magnetic field
         integer (kind=kint) :: i_stream_pol_b =     izero
+!
+!>        start address for Total magnetic field intensity  @f$ B @f$
+        integer (kind=kint) :: i_magnetic_intensity = izero
+!>        start address for Magnetic field declination  @f$ B @f$
+        integer (kind=kint) :: i_declination =        izero
+!>        start address for Magnetic field inclination  @f$ B @f$
+        integer (kind=kint) :: i_inclination =        izero
+!
+!>        start address for VGP latitude  @f$ \pi/2 - \theta_{VGP} @f$
+        integer (kind=kint) :: i_vgp_latitude =       izero
+!>        start address for VGP longitude  @f$ \phi_{VGP} @f$
+        integer (kind=kint) :: i_vgp_longigude =      izero
       end type phys_products_address
 !
 ! ----------------------------------------------------------------------
@@ -183,9 +201,20 @@
 !
         else if (field_name .eq. stream_pol_velocity%name) then
           prod_fld%i_stream_pol_u = i_phys
-!
         else if (field_name .eq. stream_pol_magne%name) then
           prod_fld%i_stream_pol_b = i_phys
+!
+        else if (field_name .eq. magnetic_intensity%name) then
+          prod_fld%i_magnetic_intensity = i_phys
+        else if (field_name .eq. declination%name) then
+          prod_fld%i_declination = i_phys
+        else if (field_name .eq. inclination%name) then
+          prod_fld%i_inclination = i_phys
+!
+        else if (field_name .eq. vgp_latitude%name) then
+          prod_fld%i_vgp_latitude = i_phys
+        else if (field_name .eq. vgp_longigude%name) then
+          prod_fld%i_vgp_longigude = i_phys
         end if
       end if
 !

@@ -19,7 +19,8 @@
 !!     &         nidx_rj, r_ICB, r_CMB, kr_ICB, kr_CMB, r_1d_rj,        &
 !!     &         reftemp_rj)
 !!
-!!      subroutine set_reftemp_4_sph(idx_rj_degree_zero, nidx_rj,       &
+!!      subroutine set_reftemp_4_sph                                    &
+!!     &        (idx_rj_degree_zero, inod_rj_center, nidx_rj,           &
 !!     &         reftemp_rj, i_ref, i_gref, nnod_rj, ntot_phys_rj, d_rj)
 !!        type(phys_address), intent(in) :: ipol
 !!***********************************************************************
@@ -66,12 +67,11 @@
       integer(kind = kint), intent(in) :: nri
       real(kind = kreal), intent(in) :: r_ICB, r_CMB
 !
-      real(kind=kreal), intent(inout) :: reftemp_rj(nri,0:2)
+      real(kind=kreal), intent(inout) :: reftemp_rj(0:nri,0:1)
 !
 !
       reftemp_rj(1:nri,0) = zero
       reftemp_rj(1:nri,1) = zero
-      reftemp_rj(1:nri,2) = zero
       depth_bottom = r_ICB
       depth_top =    r_CMB
 !
@@ -84,27 +84,27 @@
      &          nidx_rj, r_1d_rj, ar_1d_rj, reftemp_rj)
 !
       real (kind = kreal), intent(in) :: low_temp, high_temp
-      real (kind = kreal), intent(inout) :: depth_top, depth_bottom
+      real (kind = kreal), intent(in) :: depth_top, depth_bottom
 !
       integer(kind = kint), intent(in) :: nidx_rj(2)
       real(kind=kreal), intent(in) :: r_1d_rj(nidx_rj(1))
       real(kind=kreal), intent(in) :: ar_1d_rj(nidx_rj(1),3)
 !
-      real(kind=kreal), intent(inout) :: reftemp_rj(nidx_rj(1),0:2)
+      real(kind=kreal), intent(inout) :: reftemp_rj(0:nidx_rj(1),0:1)
 !
       integer (kind = kint) :: k
 !
 ! set reference temperature (for spherical shell)
 !
+      reftemp_rj(0,0) = high_temp
+      reftemp_rj(0,1) = zero
       do k = 1, nidx_rj(1)
         if(r_1d_rj(k) .lt. depth_bottom) then
           reftemp_rj(k,0) = high_temp
           reftemp_rj(k,1) = zero
-          reftemp_rj(k,2) = zero
         else if(r_1d_rj(k) .gt. depth_top) then
           reftemp_rj(k,0) = low_temp
           reftemp_rj(k,1) = zero
-          reftemp_rj(k,2) = zero
         else
           reftemp_rj(k,0) = (depth_bottom*depth_top*ar_1d_rj(k,1)       &
      &                   * (high_temp - low_temp)                       &
@@ -114,10 +114,10 @@
           reftemp_rj(k,1) = - depth_bottom*depth_top*ar_1d_rj(k,2)      &
      &                   * (high_temp - low_temp)                       &
      &                     / (depth_top - depth_bottom)
-          reftemp_rj(k,2) = two * depth_bottom*depth_top                &
-     &                   * ar_1d_rj(k,2)*ar_1d_rj(k,1)                  &
-     &                   * (high_temp - low_temp)                       &
-     &                     / (depth_top - depth_bottom)
+!          reftemp_rj(k,2) = two * depth_bottom*depth_top               &
+!     &                   * ar_1d_rj(k,2)*ar_1d_rj(k,1)                 &
+!     &                   * (high_temp - low_temp)                      &
+!     &                     / (depth_top - depth_bottom)
         end if
       end do
 !
@@ -139,27 +139,27 @@
       real(kind = kreal), intent(in) :: r_ICB, r_CMB
       real(kind=kreal), intent(in) :: r_1d_rj(nidx_rj(1))
 !
-      real(kind=kreal), intent(inout) :: reftemp_rj(nidx_rj(1),0:2)
+      real(kind=kreal), intent(inout) :: reftemp_rj(0:nidx_rj(1),0:1)
 !
       integer (kind = kint) :: k
       real(kind = kreal) :: alpha, beta
 !
 !
+      alpha = (r_ICB-stratified_outer_r) / stratified_width
+      reftemp_rj(0,0) = - half * (r_ICB + stratified_sigma)             &
+     &                 * (one - tanh(alpha)) + stratified_sigma
+      reftemp_rj(0,1) = zero
       do k = 1, nidx_rj(1)
         if(k .lt. kr_ICB) then
           alpha = (r_ICB-stratified_outer_r) / stratified_width
-          beta =  (r_ICB + stratified_sigma) / stratified_width
           reftemp_rj(k,0) = - half * (r_ICB + stratified_sigma)         &
      &                     * (one - tanh(alpha)) + stratified_sigma
           reftemp_rj(k,1) = zero
-          reftemp_rj(k,2) = zero
         else if(k .gt. kr_CMB) then
           alpha = (r_CMB-stratified_outer_r) / stratified_width
-          beta =  (r_CMB + stratified_sigma) / stratified_width
           reftemp_rj(k,0) = - half * (r_CMB + stratified_sigma)         &
      &                     * (one - tanh(alpha)) + stratified_sigma
           reftemp_rj(k,1) = zero
-          reftemp_rj(k,2) = zero
         else
           alpha = (r_1d_rj(k)-stratified_outer_r) / stratified_width
           beta =  (r_1d_rj(k) + stratified_sigma) / stratified_width
@@ -168,9 +168,9 @@
           reftemp_rj(k,1) = half * (-one + beta)                        &
      &                     + half * tanh(alpha)                         &
      &                     - half * beta * tanh(alpha) * tanh(alpha)
-          reftemp_rj(k,2) = (one - tanh(alpha)*tanh(alpha))             &
-     &                     * (one - beta * tanh(alpha))                 &
-     &                     / stratified_width
+!          reftemp_rj(k,2) = (one - tanh(alpha)*tanh(alpha))            &
+!     &                     * (one - beta * tanh(alpha))                &
+!     &                     / stratified_width
         end if
       end do
 !
@@ -179,14 +179,16 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine set_reftemp_4_sph(idx_rj_degree_zero, nidx_rj,         &
+      subroutine set_reftemp_4_sph                                      &
+     &        (idx_rj_degree_zero, inod_rj_center, nidx_rj,             &
      &         reftemp_rj, i_ref, i_gref, nnod_rj, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) ::  nidx_rj(2)
       integer(kind = kint), intent(in) ::  idx_rj_degree_zero
+      integer(kind = kint), intent(in) ::  inod_rj_center
       integer(kind = kint), intent(in) ::  nnod_rj, ntot_phys_rj
       integer(kind = kint), intent(in) ::  i_ref, i_gref
-      real(kind=kreal), intent(in) :: reftemp_rj(nidx_rj(1),0:1)
+      real(kind=kreal), intent(in) :: reftemp_rj(0:nidx_rj(1),0:1)
 !
       real (kind=kreal), intent(inout) :: d_rj(nnod_rj,ntot_phys_rj)
 !
@@ -201,6 +203,10 @@
         d_rj(inod,i_ref) =  reftemp_rj(kk,0)
         d_rj(inod,i_gref) = reftemp_rj(kk,1)
       end do
+!
+      if(inod_rj_center .gt. 0) then
+        d_rj(inod,i_ref) =  reftemp_rj(0,0)
+      end if
 !
       end subroutine set_reftemp_4_sph
 !

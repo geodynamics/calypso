@@ -14,7 +14,7 @@ t_average_nusselt.o: $(SPH_UTILS_DIR)/t_average_nusselt.f90 m_precision.o m_cons
 	$(F90) -c $(F90OPTFLAGS) $<
 t_average_sph_ene_spec.o: $(SPH_UTILS_DIR)/t_average_sph_ene_spec.f90 m_precision.o m_constants.o m_tave_sph_ene_spectr.o t_read_sph_spectra.o t_ctl_data_tave_sph_monitor.o t_ctl_param_sph_series_util.o set_parallel_file_name.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_ctl_data_tave_sph_monitor.o: $(SPH_UTILS_DIR)/t_ctl_data_tave_sph_monitor.f90 m_precision.o t_read_control_elements.o t_control_array_character.o t_control_array_real.o t_control_array_integer2.o skip_comment_f.o
+t_ctl_data_tave_sph_monitor.o: $(SPH_UTILS_DIR)/t_ctl_data_tave_sph_monitor.f90 m_precision.o t_read_control_elements.o t_control_array_character.o t_control_array_real.o t_control_array_integer2.o t_ctl_data_dimless_numbers.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_ctl_param_sph_series_util.o: $(SPH_UTILS_DIR)/t_ctl_param_sph_series_util.f90 m_precision.o m_constants.o t_ctl_data_tave_sph_monitor.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<

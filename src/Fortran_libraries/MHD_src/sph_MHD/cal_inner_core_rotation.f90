@@ -8,15 +8,14 @@
 !!
 !!@verbatim
 !!      subroutine set_inner_core_rotation                              &
-!!     &         (kr_in, sph_rj, ipol_base, rj_fld)
+!!     &         (kr_in, sph_rj, ipol_base, n_point, ntot_phys_rj, d_rj)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(base_field_address), intent(in) :: ipol_base
-!!        type(phys_data), intent(inout) :: rj_fld
 !!      subroutine set_icore_viscous_matrix(kr_in, fdm1_fix_fld_ICB,    &
 !!     &          dt, sph_rj, fl_prop, band_vt_evo)
 !!      subroutine cal_icore_viscous_drag_explicit                      &
 !!     &         (kr_in, fdm1_fix_fld_ICB, sph_rj, coef_d,              &
-!!     &          it_velo, it_viscous, rj_fld)
+!!     &          it_velo, it_viscous, n_point, ntot_phys_rj, d_rj)
 !!      subroutine copy_icore_rot_to_tor_coriolis                       &
 !!     &         (sph_bc_U, sph_rj, ipol_frc, ipol_rot_frc, rj_fld)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
@@ -70,29 +69,31 @@
 ! ----------------------------------------------------------------------
 !
       subroutine set_inner_core_rotation                                &
-     &         (kr_in, sph_rj, ipol_base, rj_fld)
+     &         (kr_in, sph_rj, ipol_base, n_point, ntot_phys_rj, d_rj)
 !
+      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       integer(kind = kint), intent(in) :: kr_in
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(base_field_address), intent(in) :: ipol_base
-      type(phys_data), intent(inout) :: rj_fld
+!
+      real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
 !
       call set_inner_core_rot_l1                                        &
      &   (ipol_base, sph_rj%idx_rj_degree_one(-1),                      &
      &    kr_in, sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                  &
      &    sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj,                       &
-     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &    n_point, ntot_phys_rj, d_rj)
       call set_inner_core_rot_l1                                        &
      &   (ipol_base, sph_rj%idx_rj_degree_one( 0),                      &
      &    kr_in, sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                  &
      &    sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj,                       &
-     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &    n_point, ntot_phys_rj, d_rj)
       call set_inner_core_rot_l1                                        &
      &   (ipol_base, sph_rj%idx_rj_degree_one( 1),                      &
      &    kr_in, sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                  &
      &    sph_rj%radius_1d_rj_r, sph_rj%ar_1d_rj,                       &
-     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &    n_point, ntot_phys_rj, d_rj)
 !
       end subroutine set_inner_core_rotation
 !
@@ -134,29 +135,30 @@
 !
       subroutine cal_icore_viscous_drag_explicit                        &
      &         (kr_in, fdm1_fix_fld_ICB, sph_rj, coef_d,                &
-     &          it_velo, it_viscous, rj_fld)
+     &          it_velo, it_viscous, n_point, ntot_phys_rj, d_rj)
 !
       integer(kind = kint), intent(in) :: kr_in
+      integer(kind = kint), intent(in) :: n_point, ntot_phys_rj
       integer(kind = kint), intent(in) :: it_velo, it_viscous
       real(kind = kreal), intent(in) :: coef_d
       real(kind = kreal), intent(in) :: fdm1_fix_fld_ICB(0:1,2)
       type(sph_rj_grid), intent(in) ::  sph_rj
 !
-      type(phys_data), intent(inout) :: rj_fld
+      real(kind = kreal), intent(inout) :: d_rj(n_point,ntot_phys_rj)
 !
 !
       call cal_icore_viscous_drag_l1(sph_rj%idx_rj_degree_one(-1),      &
      &    kr_in, fdm1_fix_fld_ICB, coef_d, it_velo, it_viscous,         &
      &    sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,        &
-     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &    n_point, ntot_phys_rj, d_rj)
       call cal_icore_viscous_drag_l1(sph_rj%idx_rj_degree_one( 0),      &
      &    kr_in, fdm1_fix_fld_ICB, coef_d, it_velo, it_viscous,         &
      &    sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,        &
-     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &    n_point, ntot_phys_rj, d_rj)
       call cal_icore_viscous_drag_l1(sph_rj%idx_rj_degree_one( 1),      &
      &    kr_in, fdm1_fix_fld_ICB, coef_d, it_velo, it_viscous,         &
      &    sph_rj%nidx_rj(1), sph_rj%nidx_rj(2), sph_rj%ar_1d_rj,        &
-     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &    n_point, ntot_phys_rj, d_rj)
 !
       end subroutine cal_icore_viscous_drag_explicit
 !

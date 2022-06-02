@@ -17,7 +17,7 @@
       use m_precision
       use t_physical_property
       use t_reference_scalar_param
-      use t_normalize_parameter
+      use t_coef_parameters_list
 !
       implicit  none
 !

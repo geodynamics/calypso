@@ -84,12 +84,14 @@
       use m_energy_flux_labels
       use m_field_product_labels
       use m_explicit_term_labels
+      use m_field_component_labels
 !
       character(len = kchara), intent(in) :: phys_name_ctl
       logical :: flag
 !
       flag =  check_base_scalar(phys_name_ctl)                          &
      &   .or. check_enegy_fluxes(phys_name_ctl)                         &
+     &   .or. check_field_comp_list(phys_name_ctl)                      &
      &   .or. check_scalar_advection(phys_name_ctl)                     &
      &   .or. check_div_force(phys_name_ctl)                            &
      &   .or. check_div_scalar_flux(phys_name_ctl)                      &
@@ -138,6 +140,7 @@
       use t_base_force_labels
       use t_diff_vector_labels
       use t_field_product_labels
+      use t_field_component_labels
       use t_diffusion_term_labels
       use t_explicit_term_labels
 !
@@ -169,6 +172,9 @@
       if(flag) return
       call set_field_product_addresses                                  &
      &   (i_fld, field_name, iphys%prod_fld, flag)
+      if(flag) return
+      call set_field_component_addresses                                &
+     &   (i_fld, field_name, iphys%fld_cmp, flag)
       if(flag) return
 !
       call set_gradient_field_addresses                                 &

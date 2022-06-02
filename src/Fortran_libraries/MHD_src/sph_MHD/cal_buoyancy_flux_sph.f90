@@ -73,7 +73,9 @@
 !
       if(fs_trns_eflux%i_buo_gen .gt. 0) then
         if    (ref_param_T%iflag_reference .eq. id_sphere_ref_temp      &
-     &    .or. ref_param_T%iflag_reference .eq. id_takepiro_temp) then
+     &    .or. ref_param_T%iflag_reference .eq. id_takepiro_temp        &
+     &    .or. ref_param_T%iflag_reference .eq. id_numerical_solution   &
+     &   ) then
           call sel_buoyancy_flux_rtp(sph_rtp, fl_prop%coef_buo,         &
      &        trns_b_scl%fld_rtp(1,bs_trns_scalar%i_per_temp),          &
      &        trns_b_snap%fld_rtp(1,bs_trns_base%i_velo),               &
@@ -88,7 +90,9 @@
 !
       if(fs_trns_eflux%i_c_buo_gen .gt. 0) then
         if    (ref_param_C%iflag_reference .eq. id_sphere_ref_temp      &
-     &    .or. ref_param_C%iflag_reference .eq. id_takepiro_temp) then
+     &    .or. ref_param_C%iflag_reference .eq. id_takepiro_temp        &
+     &    .or. ref_param_C%iflag_reference .eq. id_numerical_solution   &
+     &   ) then
           call sel_buoyancy_flux_rtp(sph_rtp, fl_prop%coef_comp_buo,    &
      &        trns_b_scl%fld_rtp(1,bs_trns_scalar%i_per_light),         &
      &        trns_b_snap%fld_rtp(1,bs_trns_base%i_velo),               &
@@ -126,7 +130,9 @@
 !$omp parallel
       if(fs_trns_eflux%i_buo_gen .gt. 0) then
         if    (ref_param_T%iflag_reference .eq. id_sphere_ref_temp      &
-     &    .or. ref_param_T%iflag_reference .eq. id_takepiro_temp) then
+     &    .or. ref_param_T%iflag_reference .eq. id_takepiro_temp        &
+     &    .or. ref_param_T%iflag_reference .eq. id_numerical_solution   &
+     &   ) then
           call pole_sph_buoyancy_flux                                   &
      &       (sph_rtp%nnod_pole, sph_rtp%nidx_rtp(1),                   &
      &        sph_rtp%radius_1d_rtp_r, fl_prop%coef_buo,                &
@@ -145,7 +151,9 @@
 !
       if(fs_trns_eflux%i_c_buo_gen .gt. 0) then
         if    (ref_param_C%iflag_reference .eq. id_sphere_ref_temp      &
-     &    .or. ref_param_C%iflag_reference .eq. id_takepiro_temp) then
+     &    .or. ref_param_C%iflag_reference .eq. id_takepiro_temp        &
+     &    .or. ref_param_C%iflag_reference .eq. id_numerical_solution   &
+     &   ) then
           call pole_sph_buoyancy_flux                                   &
      &       (sph_rtp%nnod_pole, sph_rtp%nidx_rtp(1),                   &
      &        sph_rtp%radius_1d_rtp_r, fl_prop%coef_comp_buo,           &

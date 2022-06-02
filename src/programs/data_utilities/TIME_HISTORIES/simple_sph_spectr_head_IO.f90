@@ -104,6 +104,8 @@
       write(id_file,'(a)')    'number of components'
       write(id_file,'(5i16)')                                           &
      &      sph_IN%nfield_sph_spec, sph_IN%ntot_sph_spec
+      write(id_file,'(16i5)')                                           &
+     &      sph_IN%ncomp_sph_spec(1:sph_IN%nfield_sph_spec)
 !
       do i = 1, sph_IN%num_labels
         write(id_file,'(2a)',advance='no')                              &
@@ -132,6 +134,8 @@
       write(id_file,'(a)')    'number of components'
       write(id_file,'(5i16)')                                           &
      &      sph_IN%nfield_sph_spec, sph_IN%ntot_sph_spec
+      write(id_file,'(16i5)')                                           &
+     &      sph_IN%ncomp_sph_spec(1:sph_IN%nfield_sph_spec)
 !
       do i = 1, sph_IN%num_labels
         write(id_file,'(2a)',advance='no')                              &

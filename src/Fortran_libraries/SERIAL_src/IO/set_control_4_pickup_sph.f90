@@ -24,12 +24,6 @@
 !!        type(gauss_spectr_control), intent(in) :: g_pwr
 !!        type(pickup_mode_list), intent(inout) :: gauss_list
 !!        type(picked_spectrum_data), intent(inout) :: gauss_coef
-!!
-!!      subroutine set_ctl_params_no_heat_Nu                            &
-!!     &         (Nusselt_file_prefix, rj_fld, Nu_type)
-!!        type(read_character_item), intent(in) :: Nusselt_file_prefix
-!!        type(phys_data), intent(in) :: rj_fld
-!!        type(nusselt_number_data), intent(inout) :: Nu_type
 !!@endverbatim
 !!
       module set_control_4_pickup_sph
@@ -118,10 +112,9 @@
 !
       subroutine set_ctl_params_layered_spectr(lp_ctl, pwr)
 !
-      use t_ctl_data_sph_vol_spectr
+      use t_ctl_data_sph_layer_spectr
       use t_pickup_sph_spectr_data
       use t_rms_4_sph_spectr
-      use output_sph_m_square_file
       use skip_comment_f
 !
       type(layerd_spectr_control), intent(in) :: lp_ctl
@@ -146,7 +139,7 @@
 !
 !   set pickup layer
       if(pwr%iflag_layer_rms_spec .eq. 0) then
-        pwr%nri_rms = 0
+        call alloc_num_spec_layer(izero, pwr)
       else if(lp_ctl%idx_spec_layer_ctl%num .eq. 1                      &
         .and. lp_ctl%idx_spec_layer_ctl%ivec(1) .lt. 0) then
         pwr%nri_rms = -1
@@ -171,8 +164,6 @@
       use t_rms_4_sph_spectr
 !
       use m_base_field_labels
-!
-      use output_sph_m_square_file
       use skip_comment_f
 !
       type(pick_spectr_control), intent(in) :: pspec_ctl
@@ -255,7 +246,7 @@
       subroutine set_ctl_params_pick_gauss                              &
      &         (g_pwr, gauss_list, gauss_coef)
 !
-      use t_ctl_data_pick_sph_spectr
+      use t_ctl_data_gauss_coefs
       use t_pickup_sph_spectr_data
 !
       type(gauss_spectr_control), intent(in) :: g_pwr
@@ -322,49 +313,6 @@
       end if
 !
       end subroutine set_ctl_params_pick_gauss
-!
-! -----------------------------------------------------------------------
-!
-      subroutine set_ctl_params_no_heat_Nu                              &
-     &         (Nusselt_file_prefix, rj_fld, Nu_type)
-!
-      use m_base_field_labels
-      use m_grad_field_labels
-      use t_no_heat_Nusselt
-      use t_phys_data
-      use t_control_array_character
-!
-      type(read_character_item), intent(in) :: Nusselt_file_prefix
-      type(phys_data), intent(in) :: rj_fld
-      type(nusselt_number_data), intent(inout) :: Nu_type
-!
-      integer(kind = kint) :: i
-!
-!    Turn On Nusselt number if temperature gradient is there
-      Nu_type%iflag_no_source_Nu = 0
-      do i = 1, rj_fld%num_phys
-        if(rj_fld%phys_name(i) .eq. grad_temp%name) then
-          Nu_type%iflag_no_source_Nu = 1
-          exit
-        end if
-      end do
-!
-      if(Nusselt_file_prefix%iflag .gt. 0) then
-        Nu_type%iflag_no_source_Nu = 1
-        Nu_type%Nusselt_file_head = Nusselt_file_prefix%charavalue
-      else
-        Nu_type%iflag_no_source_Nu = 0
-      end if
-!
-!    Turn Off Nusselt number if heat source is there
-      do i = 1, rj_fld%num_phys
-        if(rj_fld%phys_name(i) .eq. heat_source%name) then
-          Nu_type%iflag_no_source_Nu = 0
-          exit
-        end if
-      end do
-!
-      end subroutine set_ctl_params_no_heat_Nu
 !
 ! -----------------------------------------------------------------------
 !

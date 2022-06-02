@@ -52,7 +52,8 @@
 !
       use calypso_mpi
       use m_error_IDs
-      use t_normalize_parameter
+      use t_list_of_dimless_numbers
+      use t_powers_4_coefficients
       use skip_comment_f
 !
       type(list_of_dimless), intent(in) :: dless_list

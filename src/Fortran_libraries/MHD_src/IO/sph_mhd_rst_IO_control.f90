@@ -16,7 +16,7 @@
 !!        type(field_IO), intent(in) :: sph_fst_IO
 !!
 !!      subroutine read_alloc_sph_restart_data                          &
-!!     &         (fst_file_IO, init_d, rj_fld, rst_step, sph_fst_IO)
+!!     &         (fst_file_IO, init_d, rj_fld, rst_step)
 !!        type(time_data), intent(inout) :: init_d
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(IO_step_param), intent(inout) :: rst_step
@@ -99,7 +99,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_alloc_sph_restart_data                            &
-     &         (fst_file_IO, init_d, rj_fld, rst_step, sph_fst_IO)
+     &         (fst_file_IO, init_d, rj_fld, rst_step)
 !
       use set_sph_restart_IO
 !
@@ -108,9 +108,9 @@
       type(time_data), intent(inout) :: init_d
       type(phys_data), intent(inout) :: rj_fld
       type(IO_step_param), intent(inout) :: rst_step
-      type(field_IO), intent(inout) :: sph_fst_IO
 !
       integer(kind = kint) :: istep_rst
+      type(field_IO) :: sph_fst_IO
 !
 !
       istep_rst = set_IO_step(init_d%i_time_step, rst_step)

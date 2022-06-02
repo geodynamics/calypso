@@ -31,6 +31,8 @@
 !!    rlm_order_distribution               cyclic_eq_transform
 !!       (Flags:  cyclic_eq_transform, cyclic_eq_mode, or simple)
 !!
+!!    simple_radial_decomposition_ctl      On
+!!
 !!    num_radial_domain_ctl         2
 !!    num_horizontal_domain_ctl     2
 !!
@@ -82,6 +84,8 @@
 !
 !>        Distribution of harmonics order for legendre transform
         type(read_character_item) :: rlm_distibution_ctl
+!>        Simple radial decomposition_switch
+        type(read_character_item) :: simple_r_decomp_ctl
 !
 !>        Number of subdomains in raidal direction for reduced definition
         type(read_integer_item) :: num_radial_domain_ctl
@@ -109,40 +113,36 @@
 !
 !   labels for subdomain define for spherical shell
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_inner_decomp =       'inner_decomp_direction'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_rj_inner_loop =       'rj_inner_loop_direction'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_rlm_inner_loop =      'rlm_inner_loop_direction'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_rtm_inner_loop =      'rtm_inner_loop_direction'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_rtp_inner_loop =      'rtp_inner_loop_direction'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_indices_ordering_set = 'ordering_set_ctl'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_rlm_order_dist =      'rlm_order_distribution'
+      character(len=kchara), parameter, private                         &
+     &      :: hd_simple_r_decomp = 'simple_radial_decomposition_ctl'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_num_radial_domain =  'num_radial_domain_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_num_horiz_domain =  'num_horizontal_domain_ctl'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &      :: hd_ndomain_rtp =  'num_domain_sph_grid'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &       :: hd_ndomain_rtm = 'num_domain_legendre'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &       :: hd_ndomain_rj  = 'num_domain_spectr'
-!
-      private :: hd_inner_decomp
-      private :: hd_rj_inner_loop,  hd_rlm_inner_loop
-      private :: hd_rtm_inner_loop, hd_rtp_inner_loop
-      private :: hd_num_radial_domain, hd_num_horiz_domain
-      private :: hd_ndomain_rtp, hd_ndomain_rtm, hd_ndomain_rj
 !
 !  ---------------------------------------------------------------------
 !
@@ -200,6 +200,8 @@
 !
         call read_chara_ctl_type                                        &
      &     (c_buf, hd_rlm_order_dist, sdctl%rlm_distibution_ctl)
+        call read_chara_ctl_type                                        &
+     &     (c_buf, hd_simple_r_decomp, sdctl%simple_r_decomp_ctl)
 !
         call read_integer_ctl_type                                      &
      &     (c_buf, hd_num_radial_domain, sdctl%num_radial_domain_ctl)

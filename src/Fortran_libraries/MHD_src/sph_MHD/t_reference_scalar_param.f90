@@ -47,7 +47,9 @@
       integer (kind=kint), parameter :: id_z_ref_temp = 0
 !>      flag to use referece temperature as a function of @f$ r @f$
       integer (kind=kint), parameter :: id_sphere_ref_temp = 100
-!>      flag to use linearly decrease referece temperature 
+!>      flag to obtain diffusive profile numerically
+      integer (kind=kint), parameter :: id_numerical_solution = 999
+!>      flag to use linearly decrease referece temperature
 !!      as a function of @f$ r @f$
       integer (kind=kint), parameter :: id_linear_r_ref_temp = 200
 !>      takepiro model flag
@@ -63,6 +65,9 @@
       character(len = kchara), parameter :: label_linear_x = 'linear_x'
       character(len = kchara), parameter :: label_linear_y = 'linear_y'
       character(len = kchara), parameter :: label_linear_z = 'linear_z'
+!
+      character(len = kchara), parameter                                &
+     &               :: label_get_numerical = 'numrical_solution'
 !
       type reference_scalar_param
 !>      temperature setting
@@ -155,12 +160,16 @@
           ref_param%iflag_reference = id_y_ref_temp
         else if (cmp_no_case(tmpchara, label_linear_z)) then
           ref_param%iflag_reference = id_z_ref_temp
+        else if (cmp_no_case(tmpchara, label_get_numerical)) then
+          ref_param%iflag_reference = id_numerical_solution
         end if
       end if
 !
       iflag = low_temp_ctl%depth%iflag*low_temp_ctl%value%iflag
       if (iflag .eq. 0) then
-        if (ref_param%iflag_reference .eq. id_no_ref_temp) then
+        if(   ref_param%iflag_reference .eq. id_no_ref_temp             &
+     &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
+     &     ) then
           ref_param%low_value  =  0.0d0
           ref_param%depth_top  =  0.0d0
         else
@@ -175,7 +184,9 @@
 !
       iflag = high_temp_ctl%depth%iflag*high_temp_ctl%value%iflag
       if (iflag .eq. 0) then
-        if (ref_param%iflag_reference .eq. id_no_ref_temp) then
+        if(   ref_param%iflag_reference .eq. id_no_ref_temp             &
+     &   .or. ref_param%iflag_reference .eq. id_numerical_solution      &
+     &     ) then
           ref_param%high_value =  0.0d0
           ref_param%depth_bottom =  0.0d0
         else

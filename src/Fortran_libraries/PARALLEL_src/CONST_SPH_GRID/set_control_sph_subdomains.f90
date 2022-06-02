@@ -172,6 +172,12 @@
         end if
       end if
 !
+      s3d_ranks%flag_simple_r_decomp = .FALSE.
+      if(sdctl%simple_r_decomp_ctl%iflag .gt. 0) then
+        s3d_ranks%flag_simple_r_decomp                                  &
+     &        = yes_flag(sdctl%simple_r_decomp_ctl%charavalue)
+      end if
+!
       end subroutine set_inner_loop_4_sph_shell
 !
 !  ---------------------------------------------------------------------

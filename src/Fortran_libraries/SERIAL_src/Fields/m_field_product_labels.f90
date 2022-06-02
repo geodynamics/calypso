@@ -46,6 +46,12 @@
 !!   stream_pol_velocity      [i_stream_pol_u]:
 !!   stream_pol_magne         [i_stream_pol_b]:
 !!
+!!   magnetic_intensity       [i_magnetic_intensity]:
+!!   inclination              [i_inclination]:
+!!   declination              [i_declination]:
+!!   vgp_latitude             [i_vgp_latitude]:
+!!   vgp_longigude            [i_vgp_llongigude]:
+!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
 !!
@@ -57,7 +63,7 @@
 !
       implicit  none
 ! 
-      integer(kind = kint), parameter, private :: nfid_product = 21
+      integer(kind = kint), parameter, private :: nfid_product = 26
 !
 !
 !>        Field label for ageostrophic balance
@@ -187,6 +193,34 @@
      &                name = 'stream_pol_magne',                        &
      &                math = '$ \Phi_{Bs} $')
 !
+!
+!>      Total magnetic field intensity  @f$ B @f$
+      type(field_def), parameter :: magnetic_intensity                  &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'magnetic_intensity',                      &
+     &                math = '$ B $')
+!>      Magnetic field declination  @f$ B @f$
+      type(field_def), parameter :: declination                         &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'declination',                             &
+     &                math = '$ B_{Dec} $')
+!>      Magnetic field inclination  @f$ B @f$
+      type(field_def), parameter :: inclination                         &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'inclination',                             &
+     &                math = '$ B_{Inc} $')
+!
+!>      VGP latitude  @f$ \pi/2 - \theta_{VGP} @f$
+      type(field_def), parameter :: vgp_latitude                        &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'vgp_latitude',                            &
+     &                math = '$ VGP_{lat} $')
+!>      VGP longitude  @f$ \phi_{VGP} @f$
+      type(field_def), parameter :: vgp_longigude                       &
+     &    = field_def(n_comp = n_scalar,                                &
+     &                name = 'vgp_longigude',                           &
+     &                math = '$ VGP_{\phi} $')
+!
 !    ----------   Ole definision  ------------------
 !>        Field label for ageostrophic balance
 !!         @f$ -2 e_{ijk} \Omega_{j} u_{k} - \partial_{i} p @f$
@@ -245,6 +279,12 @@
      &   .or. (field_name .eq. magnetic_scale%name)                     &
      &   .or. (field_name .eq. temperature_scale%name)                  &
      &   .or. (field_name .eq. composition_scale%name)                  &
+!
+     &   .or. (field_name .eq. magnetic_intensity%name)                 &
+     &   .or. (field_name .eq. declination%name)                        &
+     &   .or. (field_name .eq. inclination%name)                        &
+     &   .or. (field_name .eq. vgp_latitude%name)                       &
+     &   .or. (field_name .eq. vgp_longigude%name)                      &
      &      )   check_field_product_scalars = .TRUE.
 !
       end function check_field_product_scalars
@@ -310,10 +350,19 @@
 !
       call set_field_labels(stream_pol_velocity,                        &
      &    n_comps(20), names(20), maths(20))
-!
-!
       call set_field_labels(stream_pol_magne,                           &
      &    n_comps(21), names(21), maths(21))
+!
+      call set_field_labels(magnetic_intensity,                         &
+     &    n_comps(22), names(22), maths(22))
+      call set_field_labels(declination,                                &
+     &    n_comps(23), names(23), maths(23))
+      call set_field_labels(inclination,                                &
+     &    n_comps(24), names(24), maths(24))
+      call set_field_labels(vgp_latitude,                               &
+     &    n_comps(25), names(25), maths(25))
+      call set_field_labels(vgp_longigude,                              &
+     &    n_comps(26), names(26), maths(26))
 !
       end subroutine set_field_product_labels
 !

@@ -217,7 +217,6 @@
 !
       type(phys_data), intent(inout) :: new_fld
 !
-!
       integer(kind = kint) :: nd, j_org, j_new, kr, kr_in, kr_out
       integer(kind = kint) :: inod_in, inod_out, inod_new
 !

@@ -3,7 +3,7 @@
 %
 \begin{figure}[htbp]
 \begin{center}
-\includegraphics*[width=130mm]{images/Spherical_shell}
+\includegraphics*[width=130mm]{Images/Spherical_shell}
 \end{center}
 \caption{Rotating spherical shell modeled on the Earth's outer core.}
 \label{fig:shell}
@@ -18,28 +18,31 @@ This model performs a magnetohydrodynamics (MHD) simulation in a rotating spheri
  & &  - 2 \Omega \left(\hat{z} \times \bvec{u} \right)
      + \left( \frac{\rho}{\rho_{0}} \bvec{g} \right)
      + \frac{1}{\rho_{0}} \left(\bvec{J} \times \bvec{B} \right),
-\nonumber \\
+\label{eq:momentum} \\
+%
  \frac{\partial \bvec{B}}{\partial t}
  & = & -\eta \nabla \times \nabla \times \bvec{B}
        + \nabla \times \left(\bvec{u} \times \bvec{B} \right),
-\nonumber \\
+\label{eq:induction} \\
+%
 \frac{\partial T}{\partial t} + \left(\bvec{u} \cdot \nabla \right) T
  & = & \kappa_{T} \nabla^{2} T + q_{T},
-\nonumber \\
+\label{eq:heat} \\
+%
 \frac{\partial C}{\partial t} + \left(\bvec{u} \cdot \nabla \right) C
  & = & \kappa_{C} \nabla^{2} C + q_{C},
-\nonumber \\
+\label{eq:composition} \\
 \nabla \cdot \bvec{u} & = & \nabla \cdot \bvec{B} = 0,
-\label{eq:conservation}
-\nonumber \\
+\label{eq:conservation} \\
+%
 \bvec{\omega} & = & \nabla \times \bvec{u},
-\nonumber
+\label{eq:def_vorticity}
 \end{eqnarray}
 %
 and
 \begin{eqnarray}
 \bvec{J} & = & \frac{1}{\mu_{0}} \nabla \times \bvec{B},
-\nonumber
+\label{eq:def_current}
 \end{eqnarray}
 %
 where, $\bvec{u}$, $\bvec{\omega}$, $P$, \bvec{B}, \bvec{J}, $T$, $C$, $q_{T}$, and $q_{C}$ are the velocity, vorticity, pressure, magnetic field, current density, temperature, compositional variation, heat source, and source of light element, respectively. Coefficients in the governing equations are the kinetic viscosity $\nu$, thermal diffusivity $\kappa_{T}$, compositional diffusivity $\kappa_{C}$, and magnetic diffusivity $\eta$. The density $\rho$ is written as a function of $T$, $C$, average density $\rho_{0}$, thermal expansion $\alpha_{T}$, and density ratio of light element to main composition $\alpha_{C}$,
@@ -47,7 +50,7 @@ where, $\bvec{u}$, $\bvec{\omega}$, $P$, \bvec{B}, \bvec{J}, $T$, $C$, $q_{T}$, 
 \begin{eqnarray}
 \rho & = & \rho_{0} \left[1 - \alpha_{T} \left( T - T_{0} \right)
                                - \alpha_{C} \left( C - C_{0} \right) \right]
-\nonumber
+\label{eq:def_density}
 \end{eqnarray}
 %
 In Calypso, the vorticity equation and divergence of the momentum equation are used for solving $\bvec{u}$, $\bvec{\omega}$, and $P$ as,
@@ -58,7 +61,7 @@ In Calypso, the vorticity equation and divergence of the momentum equation are u
 \nonumber \\
  & & + \nabla \times \left( \frac{\rho}{\rho_{0}} \bvec{g} \right)
      + \frac{1}{\rho_{0}} \nabla \times \left(\bvec{J} \times \bvec{B} \right),
-\nonumber
+\label{eq:vorticity_eq}
 \end{eqnarray}
 %
 and
@@ -68,7 +71,7 @@ and
 \nonumber \\
  & & + \nabla \cdot \left( \frac{\rho}{\rho_{0}} \bvec{g} \right)
      + \frac{1}{\rho_{0}} \nabla \cdot \left(\bvec{J} \times \bvec{B} \right)
-\nonumber.
+\label{eq:div_momentum}
 \end{eqnarray}
 
 
@@ -77,29 +80,83 @@ In Calypso, fields are expanded into spherical harmonics. A scalar field (for ex
 %
 \begin{eqnarray}
 T(r, \theta, \phi) &=& \sum_{l=0}^{L} \sum_{m=-l}^{l} T_{l}^{m}(r) Y_{l}^{m}(\theta,\phi),
-\nonumber
+\label{eq:scalar_expansion}
 \end{eqnarray}
 where  $Y_{l}^{m}$ are the spherical harmonics. Solenoidal fields (e.g. velocity $\bvec{u}$, vorticity $\bvec{\omega}$, magnetic field $\bvec{B}$, and current density $\bvec{J}$) are decomposed into poloidal and toroidal components. For example, the magnetic field is described as 
 \begin{eqnarray}
 \bvec{B}(r, \theta, \phi) & = & \sum_{l=1}^{L} \sum_{m=-l}^{l} 
-\left( \bvec{B}_{Sl}^{\ m} + \bvec{B}_{Tl}^{\ m} \right),\nonumber
+\left( \bvec{B}_{Sl}^{\ m} + \bvec{B}_{Tl}^{\ m} \right),
+\label{eq:poloidal_toroidal}
 \end{eqnarray}
 where
 \begin{eqnarray}
 \bvec{B}_{Sl}^{\ m}(r, \theta, \phi) & = & \nabla \times \nabla \times \left( B_{Sl}^{\ m}(r) Y_{l}^{m}(\theta,\phi) \hat{r} \right),
-\nonumber \\
+\label{eq:def_poloidal} \\
 \bvec{B}_{Tl}^{\ m}(r, \theta, \phi) & = & \nabla \times \left( B_{Tl}^{\ m}(r) Y_{l}^{m}(\theta,\phi) \hat{r} \right).
-\nonumber
-\end{eqnarray}
+\label{eq:def_toroidal}
+\end{eqnarray} 
 
 The spherical harmonics are defined as real functions. $P_{l}^{m} \cos \left( m\phi \right)$ is assigned for positive $m$, $P_{l}^{m} \sin \left( m\phi \right)$ is assigned for negative $m$, where $P_{l}^{m}$ are Legendre polynomials. Because Schmidt quasi normalization is used for the Legendre polynomials $P_{l}^{m}$, the orthogonality relation for the spherical harmonics is 
 %
 \begin{eqnarray}
 \int Y_{l}^{m} Y_{l'}^{m'} \sin \theta d\theta d\phi &=& 4\pi \frac{1}{2l+1} \delta_{ll'}\delta_{mm'},
-\nonumber
+\label{eq:sph_normalization}
 \end{eqnarray}
 %
 where, $\delta_{ll'}$ is Kronecker delta.
+
+\subsubsection{Forward spherical harmonics transform}
+Calypso uses spherical harmonics expansion method (or so-called pseudo-spectrum method). In the present method, linear terms are solved by using the coefficients of the spherical harmonics expansion, and nonlinear terms are calculated in the physical grid space. Consequently, fields are transformed to grids space by the backward spherical transform using equations (\ref{eq:scalar_expansion}) to (\ref{eq:def_toroidal})., and nonlinear terms are transferred into the spherical harmonics coefficients by forward spherical harmonics transform.  
+
+The nonlinear terms (advection, Lorentz force, and induction, and heat flux terms) are evaluated in the physical space $(r, \theta, \phi)$ and are not solenoidal fields (i.e. the divergence of the nonlinear terms are not to be 0). The forward spherical transform for a non-solenoidal vector field $\bvec{A}$ can be expressed by the radial, horizontal divergence, and toroidal components as
+%
+\begin{eqnarray}
+A_{Rl}^{\ m} (r,t)  &=& N_{l}^{-1} \int \frac{l \left( l+1 \right)}{r^{2}} Y_{l}^{m} A_{r}(r, \theta, \phi) d\sigma, 
+\label{eq:radial_forward} \\
+A_{Hl}^{\ m} (r,t) 
+ &=& N_{l}^{-1} \int  \frac{1}{r} \left[ \frac{\partial Y_{l}^{m} }{\partial \theta} A_{\theta}(r, \theta, \phi)
+ + \frac{1}{\sin \theta} \frac{\partial Y_{l}^{m} }{\partial \phi} A_{\phi}(r, \theta, \phi) \right] d\sigma,
+\label{eq:horizontal_div_forward}
+\end{eqnarray}
+and, 
+\begin{eqnarray}
+A_{Tl}^{\ m} (r,t) 
+ &=& N_{l}^{-1} \int  \frac{1}{r} \left[ \frac{1}{\sin \theta}  \frac{\partial Y_{l}^{m} }{\partial \phi} A_{\theta}(r, \theta, \phi)
+ - \frac{\partial Y_{l}^{m} }{\partial \theta} A_{\phi}(r, \theta, \phi) \right] d\sigma,
+\label{eq:toroidal_forward} \\
+\end{eqnarray}
+%
+where, $d \sigma = \sin \theta d \theta d\phi$ is the integration over a sphere. 
+The non-solenoidal vector $\bvec{A}$ can also describes the spherical harmonics coefficients for the poloidal $A_{Sl}^{\ m}$, toroidal $A_{Tl}^{\ m}$, and scalar potential $\varphi_{l}^{m}$ as
+%
+\begin{eqnarray}
+\bvec{A} = \sum \left[ -\nabla \varphi_{l}^{m} 
++ \nabla \times \nabla \times \left(A_{Sl}^{\ m} \hat{r} \right) 
++  \nabla \times \left(A_{Tl}^{\ m} \hat{r} \right) \right].
+\end{eqnarray}
+%
+Consequently, the poloidal and toroidal components of the rotation of $\bf{A}$ can be described by
+%
+\begin{eqnarray}
+\left( \nabla \times \bf{A} \right)_{Sl}^{\ m} &=& A_{Tl}^{\ m} \\
+\left( \nabla \times \bf{A} \right)_{Tl}^{\ m}
+ &=& \frac{\partial^{2} A_{Sl}^{\ m}}{\partial r^{2}} - \frac{l \left( l+1 \right)}{r^{2}} A_{Sl}^{\ m} 
+ \nonumber \\
+ &=& - A_{Vl}^{\ m} + \frac{\partial A_{Hl}^{\ m}}{\partial r},
+\end{eqnarray}
+%
+and, the divergence of $\bf{A}$ can be obtained by
+%
+\begin{eqnarray}
+\left( \nabla \cdot \bf{A} \right)_{Tl}^{\ m}
+ &=& - \frac{\partial^{2} \varphi_{l}^{m}}{\partial r^{2}} 
+    - \frac{2}{r} \varphi_{l}^{m} 
+    + \frac{l \left( l+1 \right)}{r^{2}} \varphi_{l}^{m} 
+ \nonumber \\
+ &=& \frac{\partial A_{Vl}^{\ m}}{\partial r} + \frac{2}{r} A_{Vl}^{\ m}
+ - \frac{l \left( l+1 \right)}{r^{2}} A_{Hl}^{\ m}.
+\end{eqnarray}
+%
 
 \subsection{Evaluation of Coriolis term}
 The curl of the Coriolis force $-2\Omega \nabla \times \left(\hat{z} \times \bvec{u} \right)$ is evaluated in the spectrum space using the triple products of the spherical harmonics. These 3j-symbols (or Gaunt integral $G_{Lll'}^{Mmm'}$ and Elsasser integral $E_{Lll'}^{Mmm'}$) are written as
@@ -107,17 +164,93 @@ The curl of the Coriolis force $-2\Omega \nabla \times \left(\hat{z} \times \bve
 \begin{eqnarray}
 G_{Lll'}^{Mmm'} & = & \int Y_{L}^{M} Y_{l}^{m} Y_{l'}^{m'}
 \sin\theta d\theta d\phi,
-\nonumber \\
+\label{eq:gaunt} \\
+%
 E_{Lll'}^{Mmm'} & = & \int Y_{L}^{M} \left (
    \frac{\partial Y_{l}^{m}}{\partial \theta} \frac{\partial Y_{l'}^{m'}}{\partial\phi}
  - \frac{\partial Y_{l}^{m}}{\partial \phi} \frac{\partial Y_{l'}^{m'}}{\partial \theta}
- \nonumber
 \right) d\theta d\phi.
-\nonumber
+\label{eq:elsasser}
 \end{eqnarray}
 %
 The Gaunt integral $1/(4\pi) G_{Lll'}^{Mmm'}$ and Elsasser integral $1/(4\pi) E_{Lll'}^{Mmm'}$ for the Coriolis terms are evaluated in the simulation program.
 
+\subsection{Radial discretization}
+In Calypso, spherical harmonic coefficients $f_{l}^{m}(r, t)$ are discretized by the second order finite difference method. A non-equidistant grids is widely used in geodynamo simulations to resolve boundary layers. Now, considering the $n$-th grid point at $r = r_{n}$ and neighboring grid points. The Taylor expansion of the spherical harmonic coefficients at $n+1$-th and $n-1$-th points $f_{l}^{m}(r_{n+1}, t)$ and $f_{l}^{m}(r_{n-1}, t)$ can be described by
+%
+\begin{eqnarray}
+\left( \begin{array}{c}
+f_{l}^{m}(r_{n}) \\
+f_{l}^{m}(r_{n-1}) \\
+f_{l}^{m}(r_{n+1})
+\end{array} \right)
+ & = & 
+A_{n}
+\left( \begin{array}{c}
+f_{l}^{m}(r_{n}) \\
+\partial_r  f_{l}^{m}(r_{n}) \\
+\partial_rr f_{l}^{m}(r_{n}) \\
+\end{array} \right),
+\end{eqnarray}
+%
+where, $A_{n}$ is
+%
+\begin{eqnarray}
+A_{n} = 
+\left( \begin{array}{ccc}
+1 & 0 & 0  \\
+1 & r_{n} - r_{n-1} & \left(r_{n} - r_{n-1} \right)^2 / 2 \\
+1 & r_{n+1} - r_{n} & \left(r_{n+1} - r_{n} \right)^2 / 2
+\end{array} \right),
+\end{eqnarray}
+%
+The first and second derivatives are expressed by
+%
+\begin{eqnarray}
+\left( \begin{array}{c}
+f_{l}^{m}(r_{n}) \\
+\partial_r  f_{l}^{m}(r_{n}) \\
+\partial_rr f_{l}^{m}(r_{n}) \\
+\end{array} \right)
+ & = & 
+A_{n}^{-1}
+\left( \begin{array}{c}
+f_{l}^{m}(r_{n-1}) \\
+f_{l}^{m}(r_{n}) \\
+f_{l}^{m}(r_{n+1}) \\
+\end{array} \right).
+\end{eqnarray}
+%
+
+At the boundaries, the first radial derivative of the coefficients $\partial_{r} f_{l}^{m}(r_{1})$ is used  instead of the grid outside of the boundaries. For example, $A_{n}$ at the inner boundary $n = 1$ can be written by using the first differenciation as 
+%
+\begin{eqnarray}
+\left( \begin{array}{c}
+f_{l}^{m}(r_{1}) \\
+\partial_{r} f_{l}^{m}(r_{1}) \\
+f_{l}^{m}(r_{2}) \\
+\end{array} \right)
+ & = & 
+A_{1}
+\left( \begin{array}{c}
+f_{l}^{m}(r_{1}) \\
+\partial_r  f_{l}^{m}(r_{1}) \\
+\partial_{rr} f_{l}^{m}(r_{1}) \\
+\end{array} \right).
+\end{eqnarray}
+%
+where, $A_{1}$ is
+%
+\begin{eqnarray}
+A_{1} = 
+\left( \begin{array}{ccc}
+1 & 0 & 0  \\
+0 & 1 & 0  \\
+1 & r_{N+1} - r_{N} & \left(r_{N+1} - r_{N} \right)^2 / 2
+\end{array} \right),
+\end{eqnarray}
+%
+When $f_{l}^{m}(r_{1})$ is fixed at the boundary, the second derivative $\partial_{rr} f_{l}^{m}(r_{1})$ is not used. When the boundary condition for $\partial_r  f_{l}^{m}(r_{1})$ is given, the second derivative  $\partial_{rr} f_{l}^{m}(r_{1})$ is obtained by the boundary condition and $f_{l}^{m}(r_{1})$.
 
 \subsection{Boundary conditions}
 Calypso currently supports the following boundary conditions for velocity $\bvec{u}$, magnetic field $\bvec{B}$, temperature $T$, and composition variation $C$. These boundary conditions are defined in the control file \verb|control_MHD|.

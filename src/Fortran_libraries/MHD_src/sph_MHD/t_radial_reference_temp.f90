@@ -44,7 +44,7 @@
       type(reference_field), intent(inout) :: ref_temp
 !
       ref_temp%nri_reft_rj = nri_rj
-      allocate( ref_temp%t_rj(ref_temp%nri_reft_rj,0:2))
+      allocate( ref_temp%t_rj(0:ref_temp%nri_reft_rj,0:1))
       ref_temp%t_rj =  0.0d0
 !
       end subroutine alloc_reft_rj_data

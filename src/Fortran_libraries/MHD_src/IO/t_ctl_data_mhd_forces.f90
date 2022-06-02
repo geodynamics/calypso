@@ -1,8 +1,13 @@
-!t_ctl_data_mhd_forces.f90
-!      module t_ctl_data_mhd_forces
-!
-!        programmed by H.Matsui on March. 2006
+!>@file   t_ctl_data_mhd_forces.f90
+!!        module t_ctl_data_mhd_forces
 !!
+!!@author H. Matsui
+!!@date   Programmed in March, 2006
+!!
+!!
+!> @brief Control data for magnetic field controls
+!!
+!!@verbatim
 !!      subroutine read_forces_ctl(id_control, hd_block, frc_ctl, c_buf)
 !!        type(forces_control), intent(inout) :: frc_ctl
 !!      subroutine read_gravity_ctl(id_control, hd_block, g_ctl, c_buf)
@@ -10,20 +15,15 @@
 !!      subroutine read_coriolis_ctl                                    &
 !!     &         (id_control, hd_block, cor_ctl, c_buf)
 !!        type(coriolis_control), intent(inout) :: cor_ctl
-!!      subroutine read_magneto_ctl                                     &
-!!     &         (id_control, hd_block, mcv_ctl, c_buf)
-!!        type(magneto_convection_control), intent(inout) :: mcv_ctl
 !!
 !!      subroutine bcast_forces_ctl(frc_ctl)
 !!      subroutine bcast_gravity_ctl(g_ctl)
 !!      subroutine bcast_coriolis_ctl(cor_ctl)
-!!      subroutine bcast_magneto_ctl(mcv_ctl)
 !!
 !!      subroutine dealloc_name_force_ctl(frc_ctl)
 !!        type(forces_control), intent(inout) :: frc_ctl
 !!      subroutine dealloc_gravity_ctl(g_ctl)
 !!      subroutine dealloc_coriolis_ctl(cor_ctl)
-!!      subroutine dealloc_magneto_ctl(mcv_ctl)
 !!
 !!    begin forces_define
 !!!!!  define of forces !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -70,23 +70,8 @@
 !!      tri_sph_int_file     'rot_int.dat'
 !!      sph_int_file_format     'ascii'
 !!    end  Coriolis_define
-!!
-!!!!!!!!!!  magnetoconvection model!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!    array ext_magne_vec:   0...off  more than 1...On
-!!     ext_magne_vec: external field (constant)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!    begin magnetic_induciton_ctl
-!!      filtered_induction_ctl   Off
-!!
-!!      magneto_cv_ctl    On
-!!      array ext_magne_vec   3
-!!        ext_magne_vec  x     0.000   end
-!!        ext_magne_vec  y     1.000   end
-!!        ext_magne_vec  z     0.000   end
-!!      end array ext_magne_vec
-!!    end  magnetic_induciton_ctl
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!
+!!@endverbatim
 !
       module t_ctl_data_mhd_forces
 !
@@ -95,7 +80,6 @@
       use m_constants
       use m_machine_parameter
       use t_read_control_elements
-      use t_control_array_character
       use t_control_array_character
       use t_control_array_charareal
       use calypso_mpi
@@ -148,60 +132,25 @@
         integer (kind=kint) :: i_coriolis_ctl =  0
       end type coriolis_control
 !
-!>      Structure for Coriolis force
-      type magneto_convection_control
-!>        Structure for filtered induction flag
-        type(read_character_item) :: filterd_induction_ctl
-!>        Structure for magnetoconvection definition
-        type(read_character_item) :: magneto_cv
-!
-!>        Structure for external magnetic field control
-!!@n        ext_magne%c_tbl:  Direction of external magnetic field
-!!@n        ext_magne%vect:   Amplitude of external magnetic field
-        type(ctl_array_cr) :: ext_magne
-!
-        integer (kind=kint) :: i_magneto_ctl =   0
-      end type magneto_convection_control
-!
 !   4th level for forces
-!
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &        :: hd_num_forces =  'force_ctl'
 !
 !   4th level for time steps
-!
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &        :: hd_FEM_gravity_mode = 'FEM_gravity_model_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &        :: hd_gravity_type = 'gravity_type_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &        :: hd_gravity_vect = 'gravity_vec'
 !
 !   4th level for time steps
-!
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &        :: hd_FEM_Coriolis_model = 'FEM_Coriolis_model_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &        :: hd_FEM_Coriolis_imp =   'FEM_Coriolis_implicit_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &        :: hd_rotation_vec =        'rotation_vec'
-!
-!   4th level for external magnetic field
-!
-      character(len=kchara), parameter                                  &
-     &        :: hd_filetered_induction = 'filtered_induction_ctl'
-      character(len=kchara), parameter                                  &
-     &        :: hd_magneto_cv = 'magneto_cv_ctl'
-      character(len=kchara), parameter                                  &
-     &        :: hd_magne_vect = 'ext_magne_vec'
-!
-!
-      private :: hd_num_forces
-      private :: hd_gravity_type, hd_gravity_vect
-      private :: hd_FEM_gravity_mode, hd_FEM_Coriolis_model
-      private :: hd_FEM_Coriolis_imp
-      private :: hd_magneto_cv, hd_magne_vect
-      private :: hd_filetered_induction
 !
 !   --------------------------------------------------------------------
 !
@@ -291,36 +240,6 @@
       end subroutine read_coriolis_ctl
 !
 !   --------------------------------------------------------------------
-!
-      subroutine read_magneto_ctl                                       &
-     &         (id_control, hd_block, mcv_ctl, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(magneto_convection_control), intent(inout) :: mcv_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(mcv_ctl%i_magneto_ctl .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_control_array_c_r(id_control, hd_magne_vect,          &
-     &      mcv_ctl%ext_magne, c_buf)
-!
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_magneto_cv, mcv_ctl%magneto_cv)
-        call read_chara_ctl_type(c_buf, hd_filetered_induction,         &
-     &      mcv_ctl%filterd_induction_ctl)
-      end do
-      mcv_ctl%i_magneto_ctl = 1
-!
-      end subroutine read_magneto_ctl
-!
-! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine bcast_forces_ctl(frc_ctl)
@@ -367,24 +286,7 @@
 !
       end subroutine bcast_coriolis_ctl
 !
-!   --------------------------------------------------------------------
-!
-      subroutine bcast_magneto_ctl(mcv_ctl)
-!
-      use calypso_mpi_int
-!
-      type(magneto_convection_control), intent(inout) :: mcv_ctl
-!
-!
-      call bcast_ctl_array_cr(mcv_ctl%ext_magne)
-      call bcast_ctl_type_c1(mcv_ctl%magneto_cv)
-      call bcast_ctl_type_c1(mcv_ctl%filterd_induction_ctl)
-!
-      call calypso_mpi_bcast_one_int(mcv_ctl%i_magneto_ctl, 0)
-!
-      end subroutine bcast_magneto_ctl
-!
-!   --------------------------------------------------------------------
+! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine dealloc_name_force_ctl(frc_ctl)
@@ -421,20 +323,6 @@
       cor_ctl%i_coriolis_ctl = 0
 !
       end subroutine dealloc_coriolis_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine dealloc_magneto_ctl(mcv_ctl)
-!
-      type(magneto_convection_control), intent(inout) :: mcv_ctl
-!
-!
-      call dealloc_control_array_c_r(mcv_ctl%ext_magne)
-      mcv_ctl%filterd_induction_ctl%iflag = 0
-      mcv_ctl%magneto_cv%iflag =            0
-      mcv_ctl%i_magneto_ctl =               0
-!
-      end subroutine dealloc_magneto_ctl
 !
 !   --------------------------------------------------------------------
 !

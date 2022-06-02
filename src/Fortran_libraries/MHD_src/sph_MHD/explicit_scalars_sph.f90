@@ -73,9 +73,9 @@
 !
 !
       if(ht_prop%iflag_scheme .gt.     id_no_evolution) then
-        if(ht_prop%ICB_diffusie_reduction .lt. one) then
+        if(ht_prop%diffusie_reduction_ICB .lt. one) then
           call reduction_scalar_diffusion_ICB                           &
-     &       (ht_prop%ICB_diffusie_reduction, sph_rj%nidx_rj(2),        &
+     &       (ht_prop%diffusie_reduction_ICB, sph_rj%nidx_rj(2),        &
      &        sph_params%nlayer_CMB, ipol_dif%i_t_diffuse,              &
      &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         end if
@@ -91,9 +91,9 @@
       end if
 !
       if(cp_prop%iflag_scheme .gt. id_no_evolution) then
-        if(cp_prop%ICB_diffusie_reduction .lt. one) then
+        if(cp_prop%diffusie_reduction_ICB .lt. one) then
           call reduction_scalar_diffusion_ICB                           &
-     &       (cp_prop%ICB_diffusie_reduction, sph_rj%nidx_rj(2),        &
+     &       (cp_prop%diffusie_reduction_ICB, sph_rj%nidx_rj(2),        &
      &        sph_params%nlayer_CMB, ipol_dif%i_c_diffuse,              &
      &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         end if

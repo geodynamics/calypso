@@ -45,7 +45,7 @@
       real(kind = kreal) :: start_time, end_time, true_start
 !
 !
-      call read_control_file_psf_compare(0, tave_sph_ctl1)
+      call read_control_file_sph_monitor(0, tave_sph_ctl1)
 !
       if(tave_sph_ctl1%picked_mode_head_ctl%iflag .eq. 0) then
         write(*,*) 'Set File prefix for Gauss coefficients'
