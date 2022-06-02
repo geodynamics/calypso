@@ -7,6 +7,8 @@
 !> @brief Set initial data for spectrum dynamos
 !!
 !!@verbatim
+!!      subroutine read_sph_initial_data_control(MHD_files, SPH_model,  &
+!!     &          sph, ipol, MHD_step, rj_fld, sph_fst_IO)
 !!      subroutine sph_initial_data_control                             &
 !!     &         (MHD_files, SPH_model, SPH_MHD, MHD_step, sph_fst_IO)
 !!        type(MHD_file_IO_params), intent(in) :: MHD_files
@@ -49,6 +51,51 @@
 !
 !-----------------------------------------------------------------------
 !
+      subroutine read_sph_initial_data_control(MHD_files, SPH_model,    &
+     &          sph, ipol, MHD_step, rj_fld, sph_fst_IO)
+!
+      use m_machine_parameter
+      use m_initial_field_control
+!
+      use t_MHD_step_parameter
+!
+      use set_sph_restart_IO
+      use sph_mhd_rst_IO_control
+      use set_sph_restart_IO
+      use sph_radial_grad_4_magne
+      use calypso_mpi
+!
+      type(MHD_file_IO_params), intent(in) :: MHD_files
+      type(SPH_MHD_model_data), intent(in) :: SPH_model 
+      type(sph_grids), intent(in) :: sph
+      type(phys_address), intent(in) :: ipol
+!
+      type(MHD_step_param), intent(inout) :: MHD_step
+      type(phys_data), intent(inout) :: rj_fld
+      type(field_IO), intent(inout) :: sph_fst_IO
+!
+!
+      if (iflag_restart .ne. i_rst_by_file) return
+!
+        if(iflag_debug .gt. 0) write(*,*) 'read_alloc_sph_restart_data'
+        call read_alloc_sph_restart_data                                &
+     &     (MHD_files%fst_file_IO, MHD_step%init_d, rj_fld,             &
+     &      MHD_step%rst_step)
+!
+      call extend_by_potential_with_j                                   &
+     &   (sph%sph_rj, SPH_model%sph_MHD_bc%sph_bc_B,                    &
+     &    ipol%base%i_magne, ipol%base%i_current, rj_fld)
+!
+!
+      if(iflag_debug .gt. 0) write(*,*) 'copy_time_step_data'
+      call copy_time_step_data(MHD_step%init_d, MHD_step%time_d)
+      call set_sph_restart_num_to_IO(rj_fld, sph_fst_IO)
+!
+      end subroutine read_sph_initial_data_control
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
       subroutine sph_initial_data_control(MHD_files, SPH_model,         &
      &          sph, ipol, MHD_step, rj_fld, sph_fst_IO)
 !
@@ -63,6 +110,7 @@
       use initial_magne_dbench_qvc
       use set_initial_sph_scalars
       use set_sph_restart_IO
+      use sph_radial_grad_4_magne
       use calypso_mpi
 !
       type(MHD_file_IO_params), intent(in) :: MHD_files
@@ -75,14 +123,10 @@
       type(field_IO), intent(inout) :: sph_fst_IO
 !
 !
-      if (iflag_restart .eq. i_rst_by_file) then
-        if(iflag_debug .gt. 0) write(*,*) 'read_alloc_sph_restart_data'
-        call read_alloc_sph_restart_data                                &
-     &     (MHD_files%fst_file_IO, MHD_step%init_d, rj_fld,             &
-     &      MHD_step%rst_step, sph_fst_IO)
+      if (iflag_restart .eq. i_rst_by_file) return
 !
 !   for dynamo benchmark
-      else if(iflag_restart .eq. i_rst_dbench0                          &
+      if(     iflag_restart .eq. i_rst_dbench0                          &
      &   .or. iflag_restart .eq. i_rst_dbench1                          &
      &   .or. iflag_restart .eq. i_rst_dbench2                          &
      &   .or. iflag_restart .eq. i_rst_dbench_qcv) then
@@ -102,6 +146,11 @@
      &      sph%sph_params, sph%sph_rj,                                 &
      &      SPH_model%MHD_prop, ipol, rj_fld)
       end if
+!
+      call extend_by_potential_with_j                                   &
+     &   (sph%sph_rj, SPH_model%sph_MHD_bc%sph_bc_B,                    &
+     &    ipol%base%i_magne, ipol%base%i_current, rj_fld)
+!
 !
       if(iflag_debug .gt. 0) write(*,*) 'copy_time_step_data'
       call copy_time_step_data(MHD_step%init_d, MHD_step%time_d)

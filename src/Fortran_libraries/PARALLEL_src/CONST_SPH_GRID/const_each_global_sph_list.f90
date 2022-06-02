@@ -155,21 +155,33 @@
      &    sph_params%m_folding, sph_lc1%nidx_local_rtm_m,               &
      &    stk_lc1d%istack_idx_local_rtm_m)
 !
-      call cal_local_nums_st(s3d_ranks%ndomain_rtm(1),                  &
-     &    sph_params%nlayer_ICB, sph_params%nlayer_CMB,                 &
-     &    sph_dbc%nidx_local_rtm_OC, sph_dbc%ist_idx_local_rtm_OC)
 !
-      if (sph_params%nlayer_ICB .gt. 1) then
+!   Set inner core distribution
+      if(sph_params%nlayer_ICB .gt. 1) then
         ied = sph_params%nlayer_ICB - 1
         call cal_local_nums_rev(s3d_ranks%ndomain_rtm(1), ione, ied,    &
      &      sph_dbc%nidx_local_rtm_IC, sph_dbc%ist_idx_local_rtm_IC)
       end if
 !
-      if (sph_params%nlayer_CMB .lt. sph_rtm%nidx_global_rtm(1)) then
-        ist = sph_params%nlayer_CMB + 1
-        call cal_local_nums_rev                                         &
-     &     (s3d_ranks%ndomain_rtm(1), ist, sph_rtm%nidx_global_rtm(1),  &
-     &      sph_dbc%nidx_local_rtm_MT, sph_dbc%ist_idx_local_rtm_MT)
+!   Set outer core and external distribution
+      if(s3d_ranks%flag_simple_r_decomp) then
+        call cal_local_nums_st(s3d_ranks%ndomain_rtm(1),                &
+     &      sph_params%nlayer_ICB, sph_rtm%nidx_global_rtm(1),          &
+     &      sph_dbc%nidx_local_rtm_OC, sph_dbc%ist_idx_local_rtm_OC)
+!
+      else
+!   Set outer core distribution
+        call cal_local_nums_st(s3d_ranks%ndomain_rtm(1),                &
+     &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
+     &      sph_dbc%nidx_local_rtm_OC, sph_dbc%ist_idx_local_rtm_OC)
+!
+!   Set external of the core distribution
+        if(sph_params%nlayer_CMB .lt. sph_rtm%nidx_global_rtm(1)) then
+          ist = sph_params%nlayer_CMB + 1
+          call cal_local_nums_rev                                       &
+     &      (s3d_ranks%ndomain_rtm(1), ist, sph_rtm%nidx_global_rtm(1), &
+     &       sph_dbc%nidx_local_rtm_MT, sph_dbc%ist_idx_local_rtm_MT)
+        end if
       end if
 !
       call merge_num_3_local_layers(s3d_ranks%ndomain_rtm(1),           &

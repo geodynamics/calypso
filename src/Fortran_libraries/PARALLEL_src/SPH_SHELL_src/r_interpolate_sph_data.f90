@@ -241,14 +241,14 @@
       end do
 !
       if (ipol%base%i_magne .gt. 0) then
-        call ext_outside_potential(kr_outside, ipol%base%i_magne,       &
+        call ext_outside_potential(kr_outside,                          &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
      &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-        call ext_inside_potential(kr_inside, ipol%base%i_magne,         &
+     &      rj_fld%n_point, rj_fld%d_fld(1,ipol%base%i_magne))
+        call ext_inside_potential(kr_inside,                            &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
      &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &      rj_fld%n_point, rj_fld%d_fld(1,ipol%base%i_magne))
       end if
 !
       end subroutine r_interpolate_sph_rst_from_IO
@@ -286,14 +286,14 @@
       end do
 !
       if (ipol%base%i_magne .gt. 0) then
-        call ext_outside_potential(kr_outside, ipol%base%i_magne,       &
+        call ext_outside_potential(kr_outside,                          &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
      &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-        call ext_inside_potential(kr_inside, ipol%base%i_magne,         &
+     &      rj_fld%n_point, rj_fld%d_fld(1,ipol%base%i_magne))
+        call ext_inside_potential(kr_inside,                            &
      &      sph_rj%nidx_rj, sph_rj%idx_gl_1d_rj_j,                      &
      &      sph_rj%radius_1d_rj_r, sph_rj%a_r_1d_rj_r,                  &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &      rj_fld%n_point, rj_fld%d_fld(1,ipol%base%i_magne))
       end if
 !
       end subroutine r_interpolate_sph_fld_from_IO

@@ -22,12 +22,6 @@
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(phys_address), intent(in) :: ipol
 !!        type(picked_spectrum_data), intent(inout) :: gauss_coef
-!!
-!!      subroutine cal_no_heat_source_Nu(kr_in, kr_out, r_in, r_out,    &
-!!     &          idx_rj_degree_zero, nidx_rj,                          &
-!!     &          nnod_rj, ntot_phys_rj, d_rj, Nu_type)
-!!        type(phys_address), intent(in) :: ipol
-!!        type(nusselt_number_data), intent(inout) :: Nu_type
 !!@endverbatim
 !
       module pickup_gauss_coefficients
@@ -86,10 +80,10 @@
 !
         call const_picked_sph_address(izero, sph_params%l_truncation,   &
      &      sph_rj, gauss_list, gauss_coef)
-!
       else
         gauss_coef%num_sph_mode = 0
         call alloc_pick_sph_monitor(gauss_coef)
+        call alloc_pickup_sph_spec_local(nprocs, gauss_coef)
         call dealloc_pick_sph_mode(gauss_list)
       end if
 !
@@ -195,68 +189,6 @@
       end do
 !
       end subroutine set_gauss_coefs_labels
-!
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-      subroutine cal_no_heat_source_Nu(kr_in, kr_out, r_in, r_out,      &
-     &          idx_rj_degree_zero, nidx_rj, ipol,                      &
-     &          nnod_rj, ntot_phys_rj, d_rj, Nu_type)
-!
-      use t_no_heat_Nusselt
-!
-      type(phys_address), intent(in) :: ipol
-!
-      integer(kind = kint), intent(in) :: kr_in, kr_out
-      real(kind = kreal), intent(in) :: r_in, r_out
-!
-      integer(kind = kint), intent(in) :: idx_rj_degree_zero
-      integer(kind = kint), intent(in) :: nidx_rj(2)
-!
-      integer(kind = kint), intent(in) :: nnod_rj, ntot_phys_rj
-      real (kind=kreal), intent(in) :: d_rj(nnod_rj,ntot_phys_rj)
-!
-      type(nusselt_number_data), intent(inout) :: Nu_type
-!
-      real(kind = kreal) :: temp_ICB, temp_CMB
-!      real(kind = kreal) :: dTdr_ICB, dTdr_CMB
-      real(kind = kreal) :: c1, c2
-!      real(kind = kreal) :: dTdr_diff_ICB, dTdr_diff_CMB
-      integer(kind = kint) :: inod_ICB, inod_CMB
-!
-!
-      if(Nu_type%iflag_no_source_Nu .eq. izero) return
-      if(idx_rj_degree_zero .eq. 0) return
-!
-      Nu_type%r_ICB_Nu = r_in
-      Nu_type%r_CMB_Nu = r_out
-!
-      inod_ICB = idx_rj_degree_zero + (kr_in-1) * nidx_rj(2)
-      temp_ICB = d_rj(inod_ICB,ipol%base%i_temp)
-!      dTdr_ICB = half*d_rj(inod_ICB,ipol%grad_fld%i_grad_temp)         &
-!     &           * a_r_1d_rj_r(kr_in)**2
-!
-      inod_CMB = idx_rj_degree_zero + (kr_out-1) * nidx_rj(2)
-      temp_CMB = d_rj(inod_CMB,ipol%base%i_temp)
-!      dTdr_CMB = half*d_rj(inod_CMB,ipol%grad_fld%i_grad_temp)         &
-!     &          * a_r_1d_rj_r(kr_out)**2
-!
-      c1 = (Nu_type%r_CMB_Nu*temp_CMB - Nu_type%r_ICB_Nu*temp_ICB)      &
-     &    / ( Nu_type%r_CMB_Nu - Nu_type%r_ICB_Nu )
-      c2 =  Nu_type%r_CMB_Nu * Nu_type%r_ICB_Nu * (temp_ICB - temp_CMB) &
-     &    / ( Nu_type%r_CMB_Nu - Nu_type%r_ICB_Nu )
-!
-!      dTdr_diff_ICB = - c2 * a_r_1d_rj_r(kr_in)**2
-!      dTdr_diff_CMB = - c2 * a_r_1d_rj_r(kr_out)**2
-!      Nu_type%Nu_ICB = dTdr_ICB / dTdr_diff_ICB
-!      Nu_type%Nu_CMB = dTdr_CMB / dTdr_diff_CMB
-!
-      Nu_type%Nu_ICB                                                    &
-     &     = - half*d_rj(inod_ICB,ipol%grad_fld%i_grad_temp) / c2
-      Nu_type%Nu_CMB                                                    &
-     &     = - half*d_rj(inod_CMB,ipol%grad_fld%i_grad_temp) / c2
-!
-      end subroutine cal_no_heat_source_Nu
 !
 ! -----------------------------------------------------------------------
 !

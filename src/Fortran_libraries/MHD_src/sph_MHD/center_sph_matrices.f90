@@ -8,6 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine copy_to_band3_mat_w_center(nri, c_evo, mat3, mat00_3)
+!!      subroutine copy_to_band3_mat_no_center(nri, mat3, mat00_3)
 !!      subroutine add_scalar_poisson_mat_fill_ctr(nri, r_CTR1,         &
 !!     &          fdm2_fix_dr_center, fdm2_fix_fld_ctr1, coef_p, mat00_3)
 !!      subroutine add_scalar_poisson_mat_fix_ctr(nri, r_CTR1,          &
@@ -49,28 +50,58 @@
       integer(kind = kint) :: k
 !
 !
-      mat00_3(1,1) = zero
-      mat00_3(1,2) = zero
-!
       if(c_evo .eq. zero) then
         mat00_3(2,0) = zero
-        mat00_3(2,1) = zero
       else
         mat00_3(2,0) = one
-        mat00_3(2,1) = one
       end if
+      mat00_3(1,1) = zero
 !
       mat00_3(3,0) = zero
+      if(c_evo .eq. zero) then
+        mat00_3(2,1) = zero
+      else
+        mat00_3(2,1) = one
+      end if
+      mat00_3(1,2) = zero
 !
       do k = 2, nri-1
-        mat00_3(1,k+1) = mat3(1,k+1)
-        mat00_3(2,k  ) = mat3(2,k  )
         mat00_3(3,k-1) = mat3(3,k-1)
+        mat00_3(2,k  ) = mat3(2,k  )
+        mat00_3(1,k+1) = mat3(1,k+1)
       end do
-      mat00_3(2,nri  ) = mat3(2,nri  )
       mat00_3(3,nri-1) = mat3(3,nri-1)
+      mat00_3(2,nri  ) = mat3(2,nri  )
 !
       end subroutine copy_to_band3_mat_w_center
+!
+! -----------------------------------------------------------------------
+!
+      subroutine copy_to_band3_mat_no_center(nri, mat3, mat00_3)
+!
+      integer(kind = kint), intent(in) :: nri
+      real(kind = kreal), intent(in) :: mat3(3,nri)
+      real(kind = kreal), intent(inout) :: mat00_3(3,0:nri)
+!
+      integer(kind = kint) :: k
+!
+!
+      mat00_3(2,0) = one
+      mat00_3(1,1) = zero
+!
+      mat00_3(3,0) = zero
+      mat00_3(2,1) = mat3(2,1)
+      mat00_3(1,2) = mat3(1,2)
+!
+      do k = 2, nri-1
+        mat00_3(3,k-1) = mat3(3,k-1)
+        mat00_3(2,k  ) = mat3(2,k  )
+        mat00_3(1,k+1) = mat3(1,k+1)
+      end do
+      mat00_3(3,nri-1) = mat3(3,nri-1)
+      mat00_3(2,nri  ) = mat3(2,nri  )
+!
+      end subroutine copy_to_band3_mat_no_center
 !
 ! -----------------------------------------------------------------------
 !

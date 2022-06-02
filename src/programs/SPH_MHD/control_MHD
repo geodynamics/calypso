@@ -426,6 +426,7 @@ begin MHD_control
 !
 !    ref_temperature_ctl: none           (No reference of temperature)
 !                         spherical_shell ( for spherical shell model)
+!                         numrical_solution ( Get numerical solution)
 !                         linear_x        ( propotional to x-direction )
 !                         linear_y        ( propotional to x-direction )
 !                         linear_z        ( propotional to x-direction )

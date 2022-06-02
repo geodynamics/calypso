@@ -21,6 +21,11 @@
 !!    volume_pwr_spectr_prefix     'sph_pwr_volume'
 !!
 !!    nusselt_number_prefix        'Nusselt'
+!!
+!!    heat_Nusselt_number_prefix        'Nusselt_temp'
+!!    comp_Nusselt_number_prefix        'Nusselt_comp'
+!!
+!!    typical_scale_prefix         'typical_scale'
 !!!
 !!    array volume_spectrum_ctl
 !!      ...
@@ -41,6 +46,10 @@
 !!    begin mid_equator_monitor_ctl
 !!      ...
 !!    end   mid_equator_monitor_ctl
+!!
+!!  begin sph_dipolarity_ctl
+!!      ...
+!!  end sph_dipolarity_ctl
 !!  end sph_monitor_ctl
 !!
 !! -----------------------------------------------------------------
@@ -53,8 +62,11 @@
       use t_read_control_elements
       use t_control_array_character
       use t_ctl_data_sph_vol_spectr
+      use t_ctl_data_sph_layer_spectr
       use t_ctl_data_pick_sph_spectr
+      use t_ctl_data_gauss_coefs
       use t_mid_equator_control
+      use t_ctl_data_sph_dipolarity
       use skip_comment_f
 !
       implicit  none
@@ -73,6 +85,8 @@
 !
         type(mid_equator_control) :: meq_ctl
 !
+!>        Structure for dipolarity setting
+        type(sph_dipolarity_control) :: fdip_ctl
 !
 !>        Structure for layered spectrum file prefix
         type(read_character_item) :: volume_average_prefix
@@ -80,47 +94,48 @@
 !>        Structure for layered spectrum file prefix
         type(read_character_item) :: volume_pwr_spectr_prefix
 !
-!>        Structure for picked spectrum file prefix
-        type(read_character_item) :: Nusselt_file_prefix
+!>        Structure for Nusselt number file prefix
+        type(read_character_item) :: heat_Nusselt_file_prefix
+!>        Structure for Nusselt number file prefix
+        type(read_character_item) :: comp_Nusselt_file_prefix
 !
-        integer (kind = kint) :: i_pick_sph = 0
+!>        Structure for typical scale file prefix
+        type(read_character_item) :: typ_scale_file_prefix_ctl
+!
+        integer (kind = kint) :: i_sph_monitor = 0
       end type sph_monitor_control
 !
 !
 !    label for entry
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &            :: hd_vol_spec_block =   'volume_spectrum_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &            :: hd_layer_spec_block = 'layered_spectrum_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &            :: hd_gauss_spec_block = 'gauss_coefficient_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &            :: hd_pick_sph_ctl =     'pickup_spectr_ctl'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
+     &            :: hd_sph_dipolarity_ctl = 'sph_dipolarity_ctl'
+      character(len=kchara), parameter, private                         &
      &            :: hd_mid_eq_monitor_ctl = 'mid_equator_monitor_ctl'
-      integer(kind = kint) :: i_layer_spectr_ctl = 0
-      integer(kind = kint) :: i_gauss_pwr_ctl = 0
-      integer(kind = kint) :: i_pick_sph_ctl =  0
-      integer(kind = kint) :: i_mid_eq_monitor_ctl =  0
 !
 !   labels for item
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &           :: hd_voume_ave_head = 'volume_average_prefix'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &           :: hd_voume_rms_head = 'volume_pwr_spectr_prefix'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &           :: hd_Nusselt_file_head = 'nusselt_number_prefix'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_typ_scale_file_head = 'typical_scale_prefix'
 !
-!
-      private :: hd_vol_spec_block
-      private :: hd_layer_spec_block, i_layer_spectr_ctl
-      private :: hd_gauss_spec_block, i_gauss_pwr_ctl
-      private :: hd_pick_sph_ctl, i_pick_sph_ctl
-      private :: hd_mid_eq_monitor_ctl, i_mid_eq_monitor_ctl
-      private :: hd_Nusselt_file_head
-      private :: hd_voume_ave_head, hd_voume_rms_head
+       character(len=kchara), parameter, private                         &
+     &    :: hd_heat_Nusselt_file_head = 'heat_Nusselt_number_prefix'
+       character(len=kchara), parameter, private                         &
+     &    :: hd_comp_Nusselt_file_head = 'comp_Nusselt_number_prefix'
 !
       private :: read_volume_spectr_ctl
       private :: append_volume_spectr_ctls
@@ -144,35 +159,41 @@
 !
 !
       if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(smonitor_ctl%i_pick_sph  .gt. 0) return
+      if(smonitor_ctl%i_sph_monitor  .gt. 0) return
       do
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_flag(c_buf, hd_block)) exit
 !
-        call read_gauss_spectr_ctl                                      &
-     &     (id_control, hd_gauss_spec_block, i_gauss_pwr_ctl,           &
-     &      smonitor_ctl%g_pwr, c_buf)
-        call read_pickup_spectr_ctl                                     &
-     &     (id_control, hd_pick_sph_ctl, i_pick_sph_ctl,                &
-     &      smonitor_ctl%pspec_ctl, c_buf)
-        call read_layerd_spectr_ctl                                     &
-     &     (id_control, hd_layer_spec_block, i_layer_spectr_ctl,        &
-     &      smonitor_ctl%lp_ctl, c_buf)
-        call read_mid_eq_monitor_ctl                                    &
-     &     (id_control, hd_mid_eq_monitor_ctl, i_mid_eq_monitor_ctl,    &
+        call read_gauss_spectr_ctl(id_control, hd_gauss_spec_block,     &
+     &                             smonitor_ctl%g_pwr, c_buf)
+        call read_pickup_spectr_ctl(id_control, hd_pick_sph_ctl,        &
+     &                              smonitor_ctl%pspec_ctl, c_buf)
+        call read_layerd_spectr_ctl(id_control, hd_layer_spec_block,    &
+     &                              smonitor_ctl%lp_ctl, c_buf)
+        call read_sph_dipolarity_ctl(id_control,                        &
+     &      hd_sph_dipolarity_ctl, smonitor_ctl%fdip_ctl, c_buf)
+        call read_mid_eq_monitor_ctl(id_control, hd_mid_eq_monitor_ctl, &
      &      smonitor_ctl%meq_ctl, c_buf)
 !
         call read_volume_spectr_ctl                                     &
      &     (id_control, hd_vol_spec_block, smonitor_ctl, c_buf)
 !
         call read_chara_ctl_type(c_buf, hd_Nusselt_file_head,           &
-     &      smonitor_ctl%Nusselt_file_prefix)
+     &      smonitor_ctl%heat_Nusselt_file_prefix)
+!
+        call read_chara_ctl_type(c_buf, hd_heat_Nusselt_file_head,      &
+     &      smonitor_ctl%heat_Nusselt_file_prefix)
+        call read_chara_ctl_type(c_buf, hd_comp_Nusselt_file_head,      &
+     &      smonitor_ctl%comp_Nusselt_file_prefix)
+!
+        call read_chara_ctl_type(c_buf, hd_typ_scale_file_head,         &
+     &      smonitor_ctl%typ_scale_file_prefix_ctl)
         call read_chara_ctl_type(c_buf, hd_voume_ave_head,              &
      &      smonitor_ctl%volume_average_prefix)
         call read_chara_ctl_type(c_buf, hd_voume_rms_head,              &
      &      smonitor_ctl%volume_pwr_spectr_prefix)
       end do
-      smonitor_ctl%i_pick_sph = 1
+      smonitor_ctl%i_sph_monitor = 1
 !
       end subroutine read_sph_monitoring_ctl
 !
@@ -186,13 +207,12 @@
       type(sph_monitor_control), intent(inout) :: smonitor_ctl
       type(buffer_for_control), intent(inout)  :: c_buf
 !
-      integer(kind = kint) :: iflag = 0
       type(volume_spectr_control) :: read_vpwr
 !
 !
       if(check_array_flag(c_buf, hd_block) .eqv. .FALSE.) return
       if(smonitor_ctl%num_vspec_ctl .gt. 0) return
-      iflag = 0
+      read_vpwr%i_vol_spectr_ctl = 0
       smonitor_ctl%num_vspec_ctl = 0
       call alloc_volume_spectr_control(smonitor_ctl)
 !
@@ -200,11 +220,11 @@
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_array_flag(c_buf, hd_block)) exit
 !
-        call read_each_vol_spectr_ctl(id_control,                       &
-     &      hd_block, iflag, read_vpwr, c_buf)
-        if(iflag .gt. 0) then
+        call read_each_vol_spectr_ctl(id_control, hd_block,             &
+     &                                read_vpwr, c_buf)
+        if(read_vpwr%i_vol_spectr_ctl .gt. 0) then
           call append_volume_spectr_ctls(read_vpwr, smonitor_ctl)
-          iflag = 0
+          read_vpwr%i_vol_spectr_ctl = 0
         end if
       end do
 !
@@ -219,16 +239,19 @@
       integer(kind = kint) :: i
 !
 !
-      smonitor_ctl%i_pick_sph = 0
+      smonitor_ctl%i_sph_monitor = 0
 !
       call dealloc_num_spec_layer_ctl(smonitor_ctl%lp_ctl)
       call dealloc_pick_spectr_control(smonitor_ctl%pspec_ctl)
       call dealloc_gauss_spectr_control(smonitor_ctl%g_pwr)
       call reset_mid_equator_control(smonitor_ctl%meq_ctl)
+      call reset_sph_dipolarity_ctl(smonitor_ctl%fdip_ctl)
 !
-      smonitor_ctl%volume_average_prefix%iflag = 0
-      smonitor_ctl%volume_pwr_spectr_prefix%iflag = 0
-      smonitor_ctl%Nusselt_file_prefix%iflag = 0
+      smonitor_ctl%volume_average_prefix%iflag =     0
+      smonitor_ctl%volume_pwr_spectr_prefix%iflag =  0
+      smonitor_ctl%heat_Nusselt_file_prefix%iflag =  0
+      smonitor_ctl%comp_Nusselt_file_prefix%iflag =  0
+      smonitor_ctl%typ_scale_file_prefix_ctl%iflag = 0
 !
       if(smonitor_ctl%num_vspec_ctl .le. 0) return
 !

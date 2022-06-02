@@ -206,8 +206,14 @@
         call add_phys_name_ctl(current_density, field_ctl)
       end if
 !
-      if(check_field_list_ctl(truncated_magnetic_field, field_ctl))     &
-     &   call add_phys_name_ctl(magnetic_field, field_ctl)
+      if(     check_field_list_ctl(truncated_magnetic_field, field_ctl) &
+     &   .or. check_field_list_ctl(magnetic_intensity, field_ctl)       &
+     &   .or. check_field_list_ctl(declination, field_ctl)              &
+     &   .or. check_field_list_ctl(inclination, field_ctl)              &
+     &   .or. check_field_list_ctl(vgp_latitude, field_ctl)             &
+     &   .or. check_field_list_ctl(vgp_longigude, field_ctl)) then
+        call add_phys_name_ctl(magnetic_field, field_ctl)
+      end if
 !
       if(check_field_list_ctl(kinetic_helicity, field_ctl)) then
         call add_phys_name_ctl(velocity, field_ctl)

@@ -29,7 +29,7 @@
       type(tave_sph_monitor_ctl), save :: tave_sph_ctl1
       type(nusselt_number_data), save :: Nu_t
 !
-      real(kind = kreal) :: prev_Nu(2)
+      real(kind = kreal) :: prev_Nu(2) = 0.0d0
       real(kind = kreal) :: ave_Nu(2)
       real(kind = kreal) :: sdev_Nu(2)
       integer(kind = kint), parameter :: id_pick = 15
@@ -48,7 +48,7 @@
       write(*,*) ''
       write(*,*) 'Input picked harmonics coefficients file prefix'
 !
-      call read_control_file_psf_compare(0, tave_sph_ctl1)
+      call read_control_file_sph_monitor(0, tave_sph_ctl1)
 !
       if(tave_sph_ctl1%Nusselt_file_prefix%iflag .eq. 0) then
         write(*,*) 'Set File prefix for Nusselt number'
@@ -87,12 +87,11 @@
         if(ierr .gt. 0) exit
 !
         if(time .ge. start_time) then
-          prev_Nu(1) = Nu_t%Nu_ICB
-          prev_Nu(2) = Nu_t%Nu_CMB
-!
           if(icou .eq. 0) then
             true_start = time
             prev_time = time
+            prev_Nu(1) = Nu_t%Nu_ICB
+            prev_Nu(2) = Nu_t%Nu_CMB
           else
             ave_Nu(1) = ave_Nu(1) + half*(Nu_t%Nu_ICB + prev_Nu(1))     &
      &                 * (time - prev_time)
@@ -103,6 +102,8 @@
           icou = icou + 1
         end if
         prev_time = time
+        prev_Nu(1) = Nu_t%Nu_ICB
+        prev_Nu(2) = Nu_t%Nu_CMB
 !
         write(*,'(59a1,a5,i12,a30,i12)',advance="NO") (char(8),i=1,59), &
      &       'step= ', i_step,  ' averaging finished. Count=   ', icou
@@ -130,12 +131,11 @@
         if(ierr .gt. 0) exit
 !
         if(time .ge. start_time) then
-          prev_Nu(1) = (Nu_t%Nu_ICB - ave_Nu(1))**2
-          prev_Nu(2) = (Nu_t%Nu_CMB - ave_Nu(2))**2
-!
           if(icou .eq. 0) then
             true_start = time
             prev_time = time
+            prev_Nu(1) = (Nu_t%Nu_ICB - ave_Nu(1))**2
+            prev_Nu(2) = (Nu_t%Nu_CMB - ave_Nu(2))**2
           else
             sdev_Nu(1) = sdev_Nu(1)                                     &
      &           + half*( (Nu_t%Nu_ICB - ave_Nu(1))**2 + prev_Nu(1))    &
@@ -148,6 +148,8 @@
           icou = icou + 1
         end if
         prev_time = time
+        prev_Nu(1) = (Nu_t%Nu_ICB - ave_Nu(1))**2
+        prev_Nu(2) = (Nu_t%Nu_CMB - ave_Nu(2))**2
 !
         write(*,'(59a1,a5,i12,a30,i12)',advance="NO") (char(8),i=1,59), &
      &       'step= ', i_step,  ' deviation finished. Count=   ', icou

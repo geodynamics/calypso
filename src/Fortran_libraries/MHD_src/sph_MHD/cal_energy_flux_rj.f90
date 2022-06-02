@@ -42,7 +42,7 @@
       subroutine s_cal_energy_flux_rj                                   &
      &         (ltr_crust, sph_rj, r_2nd, sph_MHD_bc, ipol, rj_fld)
 !
-      use const_sph_radial_grad
+      use sph_radial_grad_4_velocity
       use copy_nodal_fields
 !
       integer(kind = kint), intent(in) :: ltr_crust

@@ -21,6 +21,7 @@
 !!    ref_temp_ctl: none           (No reference of temperature)
 !!                  spherical_shell ( for spherical shell model)
 !!                  takepiro        ( takepiro model )
+!!                  numrical_solution ( Get numerical solution)
 !!                  linear_x        ( propotional to x-direction )
 !!                  linear_y        ( propotional to x-direction )
 !!                  linear_z        ( propotional to x-direction )

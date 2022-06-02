@@ -113,12 +113,12 @@
      &    is_viscous, sph_rj%nidx_rj, r_2nd%fdm(1)%dmat,                &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      call sel_ICB_sph_viscous_diffusion(sph_rj, r_2nd,                 &
-     &    sph_bc_U, fdm2_free_ICB, g_sph_rj, coef_diffuse,              &
-     &    is_velo, is_viscous, rj_fld)
-      call sel_CMB_sph_viscous_diffusion                                &
-     &   (sph_rj, sph_bc_U, fdm2_free_CMB, g_sph_rj, coef_diffuse,      &
-     &    is_velo, is_viscous, rj_fld)
+      call sel_ICB_sph_viscous_diffusion(sph_rj, r_2nd, sph_bc_U,       &
+     &    fdm2_free_ICB, g_sph_rj, coef_diffuse, is_velo, is_viscous,   &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      call sel_CMB_sph_viscous_diffusion(sph_rj, sph_bc_U,              &
+     &    fdm2_free_CMB, g_sph_rj, coef_diffuse, is_velo, is_viscous,   &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       end subroutine const_sph_viscous_diffusion
 !
@@ -152,12 +152,12 @@
      &    is_w_diffuse, sph_rj%nidx_rj, r_2nd%fdm(1)%dmat,              &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      call sel_ICB_sph_vort_diffusion(sph_rj, r_2nd,                    &
-     &    sph_bc_U, fdm2_free_ICB, g_sph_rj, coef_diffuse,              &
-     &    is_vort, is_w_diffuse, rj_fld)
-      call sel_CMB_sph_vort_diffusion                                   &
-     &   (sph_rj, sph_bc_U, fdm2_free_CMB, g_sph_rj, coef_diffuse,      &
-     &    is_vort, is_w_diffuse, rj_fld)
+      call sel_ICB_sph_vort_diffusion(sph_rj, r_2nd, sph_bc_U,          &
+     &    fdm2_free_ICB, g_sph_rj, coef_diffuse, is_vort, is_w_diffuse, &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      call sel_CMB_sph_vort_diffusion(sph_rj, sph_bc_U,                 &
+     &    fdm2_free_CMB, g_sph_rj, coef_diffuse, is_vort, is_w_diffuse, &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       end subroutine const_sph_vorticirty_diffusion
 !
@@ -189,12 +189,12 @@
      &    is_ohmic, sph_rj%nidx_rj, r_2nd%fdm(1)%dmat,                  &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      call sel_ICB_sph_magnetic_diffusion                               &
-     &   (sph_rj, r_2nd, sph_bc_B, g_sph_rj, coef_diffuse,              &
-     &    is_magne, is_ohmic, rj_fld)
+      call sel_ICB_sph_magnetic_diffusion(sph_rj, r_2nd, sph_bc_B,      &
+     &    g_sph_rj, coef_diffuse, is_magne, is_ohmic,                   &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       call sel_CMB_sph_magnetic_diffusion                               &
-     &   (sph_rj, sph_bc_B, g_sph_rj, coef_diffuse,                     &
-     &    is_magne, is_ohmic, rj_fld)
+     &   (sph_rj, sph_bc_B, g_sph_rj, coef_diffuse, is_magne, is_ohmic, &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       end subroutine const_sph_magnetic_diffusion
 !
@@ -227,12 +227,13 @@
      &    r_2nd%fdm(1)%dmat, r_2nd%fdm(2)%dmat,                         &
      &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      call sel_ICB_sph_scalar_diffusion(sph_rj, sph_bc,                 &
-     &    bcs_S%ICB_Sspec, fdm2_center, g_sph_rj, coef_diffuse,         &
-     &    is_fld, is_diffuse, rj_fld)
-      call sel_CMB_sph_scalar_diffusion                                 &
-     &   (sph_rj, sph_bc, bcs_S%CMB_Sspec, g_sph_rj, coef_diffuse,      &
-     &    is_fld, is_diffuse, rj_fld)
+      call sel_ICB_sph_scalar_diffusion                                 &
+     &   (sph_rj, sph_bc, bcs_S%ICB_Sspec, fdm2_center, g_sph_rj,       &
+     &    coef_diffuse, is_fld, is_diffuse,                             &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      call sel_CMB_sph_scalar_diffusion(sph_rj, sph_bc,                 &
+     &    bcs_S%CMB_Sspec, g_sph_rj, coef_diffuse, is_fld, is_diffuse,  &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       end subroutine const_sph_scalar_diffusion
 !

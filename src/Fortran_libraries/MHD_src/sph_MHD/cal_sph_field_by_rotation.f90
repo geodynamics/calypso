@@ -19,6 +19,14 @@
 !!        type(base_force_address), intent(in) :: ipol_rot_frc
 !!        type(base_force_address), intent(in) :: ipol_div_frc
 !!        type(phys_data), intent(inout) :: rj_fld
+!!      subroutine s_cal_mag_induct_by_sym_rj                           &
+!!       &         (sph_rj, r_2nd, sph_MHD_bc, leg, ipol, rj_fld)
+!!        type(sph_rj_grid), intent(in) ::  sph_rj
+!!        type(fdm_matrices), intent(in) :: r_2nd
+!!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+!!        type(legendre_4_sph_trans), intent(in) :: leg
+!!        type(phys_address), intent(in) :: ipol
+!!        type(phys_data), intent(inout) :: rj_fld
 !!
 !!      subroutine cal_rot_of_forces_sph_2(sph_rj, r_2nd,               &
 !!     &          g_sph_rj, sph_bc_U, fdm2_free_ICB, fdm2_free_CMB,     &
@@ -109,6 +117,35 @@
      &    sph_MHD_bc%fdm2_center, ipol_frc, rj_fld)
 !
       end subroutine rot_momentum_eq_exp_sph
+!
+! ----------------------------------------------------------------------
+!
+      subroutine s_cal_mag_induct_by_sym_rj                             &
+     &         (sph_rj, r_2nd, sph_MHD_bc, leg, ipol, rj_fld)
+!
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(fdm_matrices), intent(in) :: r_2nd
+      type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
+      type(legendre_4_sph_trans), intent(in) :: leg
+      type(phys_address), intent(in) :: ipol
+!
+      type(phys_data), intent(inout) :: rj_fld
+!
+!
+      call cal_rot_of_induction_sph                                     &
+     &   (sph_rj, r_2nd, leg%g_sph_rj, sph_MHD_bc%sph_bc_B,             &
+     &    ipol%forces_by_sym_sym, rj_fld)
+      call cal_rot_of_induction_sph                                     &
+     &   (sph_rj, r_2nd, leg%g_sph_rj, sph_MHD_bc%sph_bc_B,             &
+     &    ipol%forces_by_asym_asym, rj_fld)
+      call cal_rot_of_induction_sph                                     &
+     &   (sph_rj, r_2nd, leg%g_sph_rj, sph_MHD_bc%sph_bc_B,             &
+     &    ipol%forces_by_sym_asym, rj_fld)
+      call cal_rot_of_induction_sph                                     &
+     &   (sph_rj, r_2nd, leg%g_sph_rj, sph_MHD_bc%sph_bc_B,             &
+     &    ipol%forces_by_asym_sym, rj_fld)
+!
+      end subroutine s_cal_mag_induct_by_sym_rj
 !
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------

@@ -1,8 +1,9 @@
 !>@file   cal_nonlinear_sph_MHD.f90
 !!@brief  module cal_nonlinear_sph_MHD
 !!
-!!@author H. Matsui
+!!@author H. Matsui (UC Berkeley) and T. Kera (Tohoku University)
 !!@date Programmed in Oct., 2009
+!>        Modified by T. Kera in Aug., 2021
 !
 !>@brief  Evaluate nonlinear terms in spherical coordinate grid
 !!
@@ -217,6 +218,71 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
+      subroutine nonlinear_terms_on_node_w_sym                          &
+     &         (MHD_prop, b_trns_base_1, b_trns_base_2, f_trns_frc,     &
+     &          nnod, ntot_comp_fld, fld_rtp, ntot_comp_frc, frc_rtp)
+!
+      use cal_products_smp
+!
+      type(MHD_evolution_param), intent(in) :: MHD_prop
+      type(base_field_address), intent(in) :: b_trns_base_1
+      type(base_field_address), intent(in) :: b_trns_base_2
+      type(base_force_address), intent(in) :: f_trns_frc
+      integer(kind = kint), intent(in) :: nnod
+      integer(kind = kint), intent(in) :: ntot_comp_fld, ntot_comp_frc
+      real(kind = kreal), intent(in) :: fld_rtp(nnod,ntot_comp_fld)
+!
+      real(kind = kreal), intent(inout) :: frc_rtp(nnod,ntot_comp_frc)
+!
+!$omp parallel
+      if(f_trns_frc%i_m_advect .gt. 0) then
+        call cal_cross_prod_w_coef_smp                                  &
+     &     (nnod, MHD_prop%fl_prop%coef_velo,                           &
+     &      fld_rtp(1,b_trns_base_1%i_vort),                            &
+     &      fld_rtp(1,b_trns_base_2%i_velo),                            &
+     &      frc_rtp(1,f_trns_frc%i_m_advect) )
+      end if
+!
+      if(f_trns_frc%i_lorentz .gt. 0) then
+        call cal_cross_prod_w_coef_smp                                  &
+     &     (nnod, MHD_prop%fl_prop%coef_lor,                            &
+     &      fld_rtp(1,b_trns_base_1%i_current),                         &
+     &      fld_rtp(1,b_trns_base_2%i_magne),                           &
+     &      frc_rtp(1,f_trns_frc%i_lorentz) )
+      end if
+!
+!
+      if(f_trns_frc%i_vp_induct .gt. 0) then
+        call cal_cross_prod_w_coef_smp                                  &
+     &     (nnod, MHD_prop%cd_prop%coef_induct,                         &
+     &      fld_rtp(1,b_trns_base_1%i_velo),                            &
+     &      fld_rtp(1,b_trns_base_2%i_magne),                           &
+     &      frc_rtp(1,f_trns_frc%i_vp_induct) )
+      end if
+!
+!
+      if(f_trns_frc%i_h_flux .gt. 0) then
+        call cal_vec_scalar_prod_w_coef_smp                             &
+     &     (nnod, MHD_prop%ht_prop%coef_advect,                         &
+     &      fld_rtp(1,b_trns_base_1%i_velo),                            &
+     &      fld_rtp(1,b_trns_base_2%i_temp),                            &
+     &      frc_rtp(1,f_trns_frc%i_h_flux) )
+      end if
+!
+      if(f_trns_frc%i_c_flux .gt. 0) then
+        call cal_vec_scalar_prod_w_coef_smp                             &
+     &     (nnod, MHD_prop%cp_prop%coef_advect,                         &
+     &      fld_rtp(1,b_trns_base_1%i_velo),                            &
+     &      fld_rtp(1,b_trns_base_2%i_light),                           &
+     &      frc_rtp(1,f_trns_frc%i_c_flux) )
+      end if
+!$omp end parallel
+!
+      end subroutine nonlinear_terms_on_node_w_sym
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
+!
       subroutine add_ref_advect_sph_MHD(sph_rj, sph_MHD_bc, MHD_prop,   &
      &          leg, ref_temp, ref_comp, ipol, rj_fld)
 !
@@ -258,7 +324,7 @@
       integer(kind = kint), intent(in) :: is_h_advect, is_velo
       real(kind = kreal), intent(in) :: g_sph_rj(nidx_rj(2),13)
       real(kind = kreal), intent(in) :: ar_1d_rj(nidx_rj(1),3)
-      real(kind = kreal), intent(in) :: reftemp_rj(nidx_rj(1),0:2)
+      real(kind = kreal), intent(in) :: reftemp_rj(0:nidx_rj(1),0:1)
       type(sph_boundary_type), intent(in) :: sph_bc_S
       type(scalar_property), intent(in) :: property
       type(reference_scalar_param), intent(in) :: ref_param_S
@@ -268,7 +334,10 @@
       integer(kind= kint) :: ist, ied, inod, j, k
 !
 !
-      if (ref_param_S%iflag_reference .ne. id_sphere_ref_temp) return
+      if     (ref_param_S%iflag_reference .ne. id_sphere_ref_temp       &
+     &  .and. ref_param_S%iflag_reference .ne. id_takepiro_temp         &
+     &  .and. ref_param_S%iflag_reference .ne. id_numerical_solution    &
+     &   ) return
 !
       ist = (sph_bc_S%kr_in-1) * nidx_rj(2) + 1
       ied =  sph_bc_S%kr_out * nidx_rj(2)

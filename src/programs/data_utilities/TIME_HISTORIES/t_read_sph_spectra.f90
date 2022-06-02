@@ -101,7 +101,7 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine copy_read_ene_params_4_sum(sph_IN, sph_OUT)
+      subroutine copy_read_ene_head_params(sph_IN, sph_OUT)
 !
       type(read_sph_spectr_data), intent(in) :: sph_IN
       type(read_sph_spectr_data), intent(inout) :: sph_OUT
@@ -120,25 +120,51 @@
       sph_OUT%ntot_sph_spec = sph_IN%ntot_sph_spec
       sph_OUT%num_time_labels = sph_IN%num_time_labels - 1
 !
+      end subroutine copy_read_ene_head_params
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_read_ene_name_params(sph_IN, sph_OUT)
+!
+      type(read_sph_spectr_data), intent(in) :: sph_IN
+      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+!
+      integer(kind = kint) :: i
+!
+!
       call alloc_sph_espec_name(sph_OUT)
+!
+      sph_OUT%ncomp_sph_spec(1:sph_OUT%nfield_sph_spec)                 &
+     &            = sph_IN%ncomp_sph_spec(1:sph_OUT%nfield_sph_spec)
+      sph_OUT%ene_sph_spec_name(1:sph_OUT%num_time_labels)              &
+     &         = sph_IN%ene_sph_spec_name(1:sph_OUT%num_time_labels)
+!
+      do i = 1, sph_OUT%ntot_sph_spec
+        sph_OUT%ene_sph_spec_name(i+sph_OUT%num_time_labels)            &
+     &          = sph_IN%ene_sph_spec_name(i+sph_IN%num_time_labels)
+      end do
+!
+      end subroutine copy_read_ene_name_params
+!
+!   --------------------------------------------------------------------
+!
+      subroutine copy_read_ene_params_4_sum(sph_IN, sph_OUT)
+!
+      type(read_sph_spectr_data), intent(in) :: sph_IN
+      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+!
+      integer(kind = kint) :: i
+!
+!
+      call copy_read_ene_head_params(sph_IN, sph_OUT)
+      call copy_read_ene_name_params(sph_IN, sph_OUT)
+!
       call alloc_sph_spectr_data(izero, sph_OUT)
 !
       sph_OUT%kr_sph(1:sph_OUT%nri_sph)                                 &
      &                 = sph_IN%kr_sph(1:sph_OUT%nri_sph)
       sph_OUT%r_sph(1:sph_OUT%nri_sph)                                  &
      &                 = sph_IN%r_sph(1:sph_OUT%nri_sph)
-      sph_OUT%ncomp_sph_spec(1:sph_OUT%nfield_sph_spec)                 &
-     &            = sph_IN%ncomp_sph_spec(1:sph_OUT%nfield_sph_spec)
-      sph_OUT%ene_sph_spec_name(1:sph_OUT%num_time_labels)              &
-     &         = sph_IN%ene_sph_spec_name(1:sph_OUT%num_time_labels)
-!
-      do i = 1, sph_OUT%num_time_labels
-        sph_OUT%ene_sph_spec_name(i) = sph_IN%ene_sph_spec_name(i)
-      end do
-      do i = 1, sph_OUT%ntot_sph_spec
-        sph_OUT%ene_sph_spec_name(i+sph_OUT%num_time_labels)            &
-     &          = sph_IN%ene_sph_spec_name(i+sph_IN%num_time_labels)
-      end do
 !
       end subroutine copy_read_ene_params_4_sum
 !

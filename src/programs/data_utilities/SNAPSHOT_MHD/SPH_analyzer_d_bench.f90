@@ -9,11 +9,12 @@
 !!        Initialzation and evolution loop for dynamo benchmark check
 !!
 !!@verbatim
-!!      subroutine SPH_init_sph_dbench(MHD_files, iphys,                &
-!!     &          SPH_model, SPH_MHD, SPH_WK, SR_sig, SR_r, cdat)
+!!      subroutine SPH_init_sph_dbench(MHD_files, iphys, SPH_model,     &
+!!     &          MHD_step, SPH_MHD, SPH_WK, SR_sig, SR_r, cdat)
 !!         type(MHD_file_IO_params), intent(in) :: MHD_files
 !!         type(phys_address), intent(in) :: iphys
 !!         type(SPH_MHD_model_data), intent(inout) :: SPH_model
+!!         type(MHD_step_param), intent(inout) :: MHD_step
 !!         type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !!         type(work_SPH_MHD), intent(inout) :: SPH_WK
 !!         type(circle_fld_maker), intent(inout) :: cdat
@@ -57,8 +58,8 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine SPH_init_sph_dbench(MHD_files, iphys,                  &
-     &          SPH_model, SPH_MHD, SPH_WK, SR_sig, SR_r, cdat)
+      subroutine SPH_init_sph_dbench(MHD_files, iphys, SPH_model,       &
+     &          MHD_step, SPH_MHD, SPH_WK, SR_sig, SR_r, cdat)
 !
       use m_constants
       use m_machine_parameter
@@ -66,7 +67,6 @@
       use t_sph_boundary_input_data
 !
       use set_control_sph_mhd
-      use const_fdm_coefs
       use adjust_reference_fields
       use set_bc_sph_mhd
       use adjust_reference_fields
@@ -86,6 +86,7 @@
       type(phys_address), intent(in) :: iphys
 !
       type(SPH_MHD_model_data), intent(inout) :: SPH_model
+      type(MHD_step_param), intent(inout) :: MHD_step
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
       type(work_SPH_MHD), intent(inout) :: SPH_WK
       type(send_recv_status), intent(inout) :: SR_sig
@@ -97,10 +98,9 @@
       call set_sph_MHD_sprctr_data(SPH_model%MHD_prop, SPH_MHD)
 !
       if (iflag_debug.gt.0) write(*,*) 'init_r_infos_sph_mhd_evo'
-      call init_r_infos_sph_mhd_evo(SPH_WK%r_2nd, SPH_model%bc_IO,      &
-     &    SPH_MHD%groups, SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph,  &
-     &    SPH_model%omega_sph, SPH_model%ref_temp, SPH_model%ref_comp,  &
-     &    SPH_MHD%fld, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
+      call init_r_infos_sph_mhd_evo(SPH_model%bc_IO, SPH_MHD%groups,    &
+     &   SPH_model%MHD_BC, SPH_MHD%ipol, SPH_MHD%sph, SPH_WK%r_2nd,     &
+     &   SPH_model%omega_sph, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 !
 !  -------------------------------
 !
@@ -108,7 +108,19 @@
       call init_sph_transform_MHD(SPH_model, iphys, SPH_WK%trans_p,     &
      &    SPH_WK%trns_WK, SPH_MHD, SR_sig, SR_r)
 !
+!  -------------------------------
+!
+      if(iflag_debug.gt.0) write(*,*)' read_alloc_sph_restart_data'
+      call read_alloc_sph_restart_data(MHD_files%fst_file_IO,           &
+     &    MHD_step%init_d, SPH_MHD%fld, MHD_step%rst_step)
+!
 ! ---------------------------------
+!
+      if (iflag_debug.gt.0) write(*,*) 'init_reference_scalars'
+      call init_reference_scalars                                       &
+     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd,                      &
+     &    SPH_model%ref_temp, SPH_model%ref_comp, SPH_MHD%fld,          &
+     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 !
       if (iflag_debug.eq.1) write(*,*) 'const_radial_mat_sph_snap'
       call const_radial_mat_sph_snap                                    &

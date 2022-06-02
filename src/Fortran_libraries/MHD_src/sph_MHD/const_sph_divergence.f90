@@ -74,9 +74,11 @@
      &    rj_fld%d_fld)
 !
       call sel_ICB_sph_scalar_advect(sph_rj, sph_bc, bcs_S%ICB_Sspec,   &
-     &    fdm2_center, g_sph_rj, is_flux, is_advect, rj_fld)
+     &    fdm2_center, g_sph_rj, is_flux, is_advect,                    &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       call sel_CMB_sph_scalar_advect(sph_rj, sph_bc, bcs_S%CMB_Sspec,   &
-     &    g_sph_rj, is_flux, is_advect, rj_fld)
+     &    g_sph_rj, is_flux, is_advect,                                 &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       end subroutine const_sph_scalar_advect
 !

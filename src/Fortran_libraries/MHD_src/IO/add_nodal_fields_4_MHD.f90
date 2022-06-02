@@ -81,6 +81,10 @@
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &    'add_field_ctl_4_forces end'
 !
+      call add_field_ctl_4_field_comps(field_ctl)
+      if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
+     &    'add_field_ctl_4_field_comps end'
+!
       call add_field_ctl_4_diff_vector(field_ctl)
       if (iflag_debug .ge. iflag_routine_msg) write(*,*)                &
      &    'add_field_ctl_4_diff_vector end'

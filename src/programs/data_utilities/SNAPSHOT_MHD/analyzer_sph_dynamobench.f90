@@ -85,7 +85,8 @@
 !
       if(iflag_MHD_time) call start_elapsed_time(ist_elapsed_MHD+1)
       if(iflag_debug .gt. 0) write(*,*) 'SPH_init_sph_dbench'
-      call SPH_init_sph_dbench(MHD_files1, FEM_d1%iphys, SPH_model1,    &
+      call SPH_init_sph_dbench                                          &
+     &   (MHD_files1, FEM_d1%iphys, SPH_model1, MHD_step1,              &
      &    SPH_MHD1, SPH_WK1, m_SR1%SR_sig, m_SR1%SR_r, cdat1)
 !
       if(iflag_MHD_time) call end_elapsed_time(ist_elapsed_MHD+1)

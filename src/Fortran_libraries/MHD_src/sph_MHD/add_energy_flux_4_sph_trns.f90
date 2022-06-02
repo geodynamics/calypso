@@ -1,8 +1,9 @@
 !>@file   add_energy_flux_4_sph_trns.f90
 !!@brief  module add_energy_flux_4_sph_trns
 !!
-!!@author H. Matsui
+!!@author H. Matsui (UC Berkeley) and T. Kera (Tohoku University)
 !!@date Programmed in Jan., 2010
+!>        Modified by T. Kera in Aug., 2021
 !
 !>@brief Diffusion addresses for spherical harmonics transform
 !!       in MHD dynamo simulation
@@ -44,6 +45,9 @@
       type(spherical_transform_data), intent(inout) :: trns
 !
 !
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_efx%i_m_advect_work, iphys_efx%i_m_advect_work,          &
+     &    f_trns_efx%i_m_advect_work, trns)
       call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_efx%i_me_gen, iphys_efx%i_me_gen,                        &
      &    f_trns_efx%i_me_gen, trns)

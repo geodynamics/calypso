@@ -107,12 +107,12 @@
      &   (ipol%base%i_velo, sph_rj%idx_rj_degree_zero, rj_fld%n_point,  &
      &    sph_rj%nidx_rj, rj_fld%ntot_phys, rj_fld%d_fld)
 !
-      call sel_ICB_grad_poloidal_moment                                 &
-     &   (sph_rj, r_2nd, sph_bc_U, bcs_U%ICB_Vspec, fdm2_free_ICB,      &
-     &    ipol%base%i_velo, rj_fld)
-      call sel_CMB_grad_poloidal_moment                                 &
-     &   (sph_rj, sph_bc_U, bcs_U%CMB_Vspec, fdm2_free_CMB,             &
-     &    ipol%base%i_velo, rj_fld)
+      call sel_ICB_grad_poloidal_moment(sph_rj, r_2nd, sph_bc_U,        &
+     &    bcs_U%ICB_Vspec, fdm2_free_ICB, ipol%base%i_velo,             &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+      call sel_CMB_grad_poloidal_moment(sph_rj, sph_bc_U,               &
+     &    bcs_U%CMB_Vspec, fdm2_free_CMB, ipol%base%i_velo,             &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
 !
       call solve_velo_by_vort_sph_crank                                 &
@@ -177,10 +177,10 @@
 !
       call sel_ICB_grad_poloidal_magne(sph_rj, r_2nd,                   &
      &    sph_bc_B, bcs_B%ICB_Vspec, g_sph_rj, ipol%base%i_magne,       &
-     &    rj_fld)
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       call sel_CMB_grad_poloidal_magne(sph_rj,                          &
      &    sph_bc_B, bcs_B%CMB_Vspec, g_sph_rj, ipol%base%i_magne,       &
-     &    rj_fld)
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call solve_magne_sph_crank(sph_rj,                                &
      &    band_bp_evo, band_bt_evo, ipol%base%i_magne,                  &
@@ -219,12 +219,13 @@
 !
 !
       call set_CMB_scalar_sph_crank(sph_rj, sph_bc, bcs_S%CMB_Sspec,    &
-     &    property%coef_advect, property%coef_diffuse, dt,              &
-     &    property%coef_imp, is_scalar, rj_fld)
+     &    property%coef_advect, property%coef_diffuse,                  &
+     &    dt, property%coef_imp, is_scalar,                             &
+     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
       call set_ICB_scalar_sph_crank(sph_rj, sph_bc, bcs_S%ICB_Sspec,    &
      &    property%coef_advect, property%coef_diffuse,                  &
-     &    property%ICB_diffusie_reduction, dt, property%coef_imp,       &
-     &    is_scalar, rj_fld)
+     &    property%diffusie_reduction_ICB, dt, property%coef_imp,       &
+     &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
 !
       call solve_scalar_sph_crank(sph_rj, band_s_evo, band_s00_evo,     &
      &    is_scalar, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld,    &

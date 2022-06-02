@@ -35,8 +35,8 @@
 !
 !
       call bcast_ctl_array_ir(spctl%radius_ctl)
-!
       call bcast_ctl_array_ci(spctl%radial_grp_ctl)
+      call bcast_ctl_array_r1(spctl%add_ext_layer_ctl)
 !
 !
       call bcast_ctl_type_c1(spctl%sph_coef_type_ctl)
@@ -88,6 +88,7 @@
       call bcast_ctl_type_c1(sdctl%rtp_inner_loop_ctl)
 !
       call bcast_ctl_type_c1(sdctl%rlm_distibution_ctl)
+      call bcast_ctl_type_c1(sdctl%simple_r_decomp_ctl)
 !
       call bcast_ctl_type_i1(sdctl%num_radial_domain_ctl)
       call bcast_ctl_type_i1(sdctl%num_horiz_domain_ctl)

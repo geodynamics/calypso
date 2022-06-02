@@ -15,6 +15,9 @@
 !!     &          n_point, ntot_phys_rj, d_rj)
 !!      subroutine cal_sph_nod_vect_dr_2(kr_in, kr_out, is_fld,         &
 !!     &          nidx_rj, d1nod_mat_fdm_2, n_point, ntot_phys_rj, d_rj)
+!!
+!!      subroutine cal_sph_nod_gradient_1d(kr_in, kr_out, nri,          &
+!!     &                                   d1nod_mat_fdm_2, d_r, grad_r)
 !!@endverbatim
 !!
 !!@n @param kr_in    radial ID for inner boundary
@@ -75,12 +78,13 @@
         j = mod((inod-1),nidx_rj(2)) + 1
         k = 1 + (inod- j) / nidx_rj(2)
 !
-        d1sdr =  d1nod_mat_fdm_2(k,-1) * d_rj(i_n1,is_grad+1)           &
-     &         + d1nod_mat_fdm_2(k, 0) * d_rj(inod,is_grad+1)           &
-     &         + d1nod_mat_fdm_2(k, 1) * d_rj(i_p1,is_grad+1)
+        d1sdr =  d1nod_mat_fdm_2(k,-1) * d_rj(i_n1,is_fld)              &
+     &         + d1nod_mat_fdm_2(k, 0) * d_rj(inod,is_fld)              &
+     &         + d1nod_mat_fdm_2(k, 1) * d_rj(i_p1,is_fld)
 !
         d_rj(inod,is_grad  ) = d1sdr * g_sph_rj(j,13)                   &
-     &                       * radius_1d_rj_r(k)**2
+     &                        * radius_1d_rj_r(k)**2
+
       end do
 !$omp end do
 !$omp end parallel
@@ -153,6 +157,31 @@
 !$omp end parallel do
 !
       end subroutine cal_sph_nod_vect_dr_2
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine cal_sph_nod_gradient_1d(kr_in, kr_out, nri,            &
+     &                                   d1nod_mat_fdm_2, d_r, grad_r)
+!
+      integer(kind = kint), intent(in) :: kr_in, kr_out, nri
+      real(kind = kreal), intent(in) :: d1nod_mat_fdm_2(nri,-1:1)
+!
+      real (kind=kreal), intent(in) :: d_r(0:nri)
+      real(kind = kreal), intent(inout) :: grad_r(0:nri)
+!
+      integer(kind = kint) :: k
+!
+!
+!$omp parallel do private(k)
+      do k = kr_in+1, kr_out-1
+        grad_r(k) =  d1nod_mat_fdm_2(k,-1) * d_r(k-1)                   &
+     &             + d1nod_mat_fdm_2(k, 0) * d_r(k  )                   &
+     &             + d1nod_mat_fdm_2(k, 1) * d_r(k+1)
+      end do
+!$omp end parallel do
+!
+      end subroutine cal_sph_nod_gradient_1d
 !
 ! -----------------------------------------------------------------------
 !

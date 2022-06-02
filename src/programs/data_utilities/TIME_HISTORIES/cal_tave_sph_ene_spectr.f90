@@ -223,17 +223,19 @@
       real(kind = kreal), intent(in) :: time_sph, time_ini
       integer(kind = kint), intent(in) :: nri_sph, ltr_sph
       integer(kind = kint), intent(in) :: ncomp
-      real(kind = kreal), intent(in)                                    &
-     &                   :: ave_spec_l(ncomp, 0:ltr_sph, nri_sph)
 !
+      real(kind = kreal), intent(inout)                                 &
+     &                   :: ave_spec_l(ncomp, 0:ltr_sph, nri_sph)
       real(kind = kreal), intent(inout)                                 &
      &                   :: spectr_IO(ncomp, 0:ltr_sph, nri_sph)
 !
 !
 !$omp parallel workshare
-      spectr_IO(1:ncomp,0:ltr_sph,1:nri_sph)                            &
+      ave_spec_l(1:ncomp,0:ltr_sph,1:nri_sph)                           &
      &         = ave_spec_l(1:ncomp,0:ltr_sph,1:nri_sph)                &
      &          / (time_sph - time_ini)
+      spectr_IO(1:ncomp,0:ltr_sph,1:nri_sph)                            &
+     &         = ave_spec_l(1:ncomp,0:ltr_sph,1:nri_sph)
 !$omp end parallel workshare
 !
       end subroutine divide_average_ene_spectr

@@ -171,8 +171,7 @@ Truncation level $L$ is defined by integer. Spherical harmonics is truncated by 
 \paragraph{\tt ngrid\_meridonal\_ctl}
 \label{href_t:ngrid_meridonal_ctl}
 \verb|[Ntheta]| \\
-Number of grid in the meridional direction \verb|[Ntheta]| is defined by integer.
-
+Number of grid in the meridional direction \verb|[Ntheta]| is defined by integer
 \paragraph{\tt ngrid\_zonal\_ctl}
 \label{href_t:ngrid_zonal_ctl}
 \verb|[Nphi]| \\
@@ -263,7 +262,7 @@ In the \verb|[Monitor_flag]|, output in the monitoring data is defined by
 \item{\tt Monitor\_Off} Do not write spectrum into monitoring data
 \end{description}
 %
-Supported field in the present version is listed in Table \ref{table:fields} and \ref{table:fields2} 
+Supported field in the present version is listed in Table from \ref{table:fields} to \ref{table:energy_flux_sym} 
 %
 \begin{table}[htp]
 \caption{List of field name}
@@ -320,7 +319,6 @@ Supported field in the present version is listed in Table \ref{table:fields} and
 \end{center}
 \label{table:fields}
 \end{table}
-*: Magnetic helicity $\bvec{A} \cdot \bvec{B} $ is not implimented.
 %
 %
 \begin{table}[htp]
@@ -353,6 +351,90 @@ Supported field in the present version is listed in Table \ref{table:fields} and
 *: Magnetic helicity $\bvec{A} \cdot \bvec{B} $ is not implimented.
 \label{table:fields2}
 \end{table}
+%
+\begin{table}[htp]
+\caption{List of field names decomposed by equatorial symmetry}
+\begin{center}
+\begin{tabular}{|cc|cc|}
+\hline
+\multicolumn{2}{|c|}{Symmetric} & \multicolumn{2}{c|}{Anti-symmetric} \\
+ {\tt [Name]}  & expression  & {\tt [Name]}  &  expression \\ \hline \hline
+\tt sym\_velocity &  $\bvec{u}_{sym}$ &  \tt asym\_velocity &  $\bvec{u}_{asym}$  \\
+\tt sym\_vorticity & $\bvec{\omega}_{sym} = \nabla \times \bvec{u}_{asym} $
+     & \tt asym\_vorticity & $\bvec{\omega}_{asym} = \nabla \times \bvec{u}_{sym} $ \\
+\tt sym\_pressure  & $P_{sym}$  & \tt asym\_pressure  & $P_{a}$ \\ \hline
+\tt sym\_temperature & $T_{sym}$ & \tt asym\_temperature  & $T_{asym}$ \\
+\tt sym\_composition & $C_{sym}$ & \tt asym\_composition & $C_{asym}$ \\ \hline
+\tt sym\_magnetic\_field & $\bvec{B}_{sym}$ & \tt asym\_magnetic\_field  & $\bvec{B}_{asym}$ \\
+\tt sym\_current\_density & $\bvec{J}_{sym} = \nabla \times \bvec{B}_{asym} $
+     & \tt asym\_current\_density  & $\bvec{J}_{asym} = \nabla \times \bvec{B}_{sym} $ \\ \hline
+\end{tabular}
+\end{center}
+\label{table:fields_sym}
+\end{table}
+%
+%
+\begin{table}[htp]
+\caption{List of force and nonlinear term names decomposed by equatorial symmetry}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+{\tt [Name]} & expression  \\ \hline
+\tt sym\_thermal\_buoyancy &  $ -\alpha_{T} T_{sym} \bvec{g}  $ \\
+\tt asym\_thermal\_buoyancy &  $ -\alpha_{T} T_{asym} \bvec{g}  $ \\ \hline
+\tt sym\_composite\_buoyancy &  $ -\alpha_{C} C_{sym} \bvec{g}  $ \\
+\tt asym\_composite\_buoyancy &  $ -\alpha_{C} C_{asym} \bvec{g}  $ \\ \hline
+%
+\tt wsym\_x\_usym  &  $ \bvec{\omega}_{sym} \times \bvec{u}_{sym} $ \\
+\tt wasym\_x\_uasym  &  $ \bvec{\omega}_{asym} \times \bvec{u}_{asym} $ \\
+\tt wsym\_x\_uasym  &  $ \bvec{\omega}_{sym} \times \bvec{u}_{asym} $ \\
+\tt wasym\_x\_usym  &  $ \bvec{\omega}_{asym} \times \bvec{u}_{sym} $ \\ \hline
+%
+\tt Jsym\_x\_Bsym  &  $ \bvec{J}_{sym} \times \bvec{B}_{sym} $ \\
+\tt Jasym\_x\_Basym  &  $ \bvec{J}_{asym} \times \bvec{B}_{asym} $ \\
+\tt Jsym\_x\_Basym  &  $ \bvec{J}_{sym} \times \bvec{B}_{asym} $ \\
+\tt Jasym\_x\_Bsym  &  $ \bvec{J}_{asym} \times \bvec{B}_{sym} $ \\ \hline
+%
+\tt usym\_x\_Bsym  &  $ \bvec{u}_{sym} \times \bvec{B}_{sym} $ \\
+\tt uasym\_x\_Basym  &  $ \bvec{u}_{asym} \times \bvec{B}_{asym} $ \\
+\tt usym\_x\_Basym  &  $ \bvec{u}_{sym} \times \bvec{B}_{asym} $ \\
+\tt uasym\_x\_Bsym  &  $ \bvec{u}_{asym} \times \bvec{B}_{sym} $ \\ \hline
+\end{tabular}
+\end{center}
+\label{table:fields_sym2}
+\end{table}
+%
+%
+\begin{table}[htp]
+\caption{List of energy flux names decomposed by equatorial symmetry}
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+{\tt [Name]} & expression  \\ \hline
+\tt sym\_buoyancy\_flux &  $ - \bvec{u}_{sym}  \cdot  \alpha_{T} T_{sym} \bvec{g}  $ \\
+\tt asym\_buoyancy\_flux  &  $ - \bvec{u}_{asym}  \cdot  \alpha_{T} T_{asym} \bvec{g}  $ \\ \hline
+% \tt sym\_composite\_buoyancy &  $ -\alpha_{C}  \cdot   C_{sym} \bvec{g}  $ \\
+% \tt asym\_composite\_buoyancy &  $ -\alpha_{C}  \cdot   C_{asym} \bvec{g}  $ \\ \hline
+%
+\tt -ua\_d\_ws\_x\_us &  $  \bvec{u}_{asym} \cdot \left( \bvec{\omega}_{sym} \times \bvec{u}_{sym} \right)$ \\
+\tt -ua\_d\_wa\_x\_ua  &  $ \bvec{u}_{asym} \cdot  \left( \bvec{\omega}_{asym} \times \bvec{u}_{asym} \right)$ \\
+\tt -us\_d\_ws\_x\_ua  &  $ \bvec{u}_{sym} \cdot  \left( \bvec{\omega}_{sym} \times \bvec{u}_{asym} \right)$ \\
+\tt -us\_d\_wa\_x\_us &  $ \bvec{u}_{sym} \cdot  \left( \bvec{\omega}_{asym} \times \bvec{u}_{sym} \right)$ \\ \hline
+%
+\tt ua\_d\_js\_x\_bs  &  $ \bvec{u}_{asym} \cdot \left(\bvec{J}_{sym} \times \bvec{B}_{sym} \right) $ \\
+\tt ua\_d\_ja\_x\_ba  &  $ \bvec{u}_{asym}  \cdot  \left(\bvec{J}_{asym} \times \bvec{B}_{asym} \right) $ \\
+\tt us\_d\_js\_x\_ba  &  $ \bvec{u}_{sym}  \cdot  \left(\bvec{J}_{sym} \times \bvec{B}_{asym} \right) $ \\
+\tt us\_d\_ja\_x\_bs  &  $ \bvec{u}_{sym}  \cdot  \left(\bvec{J}_{asym} \times \bvec{B}_{sym} \right) $ \\ \hline
+%
+% \tt usym\_x\_Bsym  &  $ \bvec{u}_{sym} \times \bvec{B}_{sym} $ \\
+% \tt uasym\_x\_Basym  &  $ \bvec{u}_{asym} \times \bvec{B}_{asym} $ \\
+% \tt usym\_x\_Basym  &  $ \bvec{u}_{sym} \times \bvec{B}_{asym} $ \\
+% \tt uasym\_x\_Bsym  &  $ \bvec{u}_{asym} \times \bvec{B}_{sym} $ \\ \hline
+\end{tabular}
+\end{center}
+\label{table:energy_flux_sym}
+\end{table}
+%
 %
 
 \subsection{\tt time\_evolution\_ctl}
