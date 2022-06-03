@@ -137,10 +137,9 @@
      &    SPH_model%omega_sph,  SPH_model%sph_MHD_bc)
 !
       call init_reference_scalars                                       &
-     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd,                      &
-     &    SPH_model%ref_temp, SPH_model%ref_comp, SPH_MHD%fld,          &
-     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
-!
+     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd, SPH_model%refs,      &
+     &    SPH_MHD%fld, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
+
 ! ---------------------------------
 !
       if(iflag_debug.gt.0) write(*,*)' sph_initial_spectrum'

@@ -7,14 +7,16 @@
 !>@brief  Refelence scalar by diffusive profile
 !!
 !!@verbatim
-!!      subroutine const_diffusive_profiles(sph_rj, sph_bc_S, bcs_S,    &
-!!     &          fdm2_center, r_2nd, band_s00_poisson,                 &
-!!     &          i_source, rj_fld, file_name, reftemp_rj)
+!!      subroutine const_diffusive_profiles(sph_rj, sc_prop,            &
+!!     &          sph_bc_S, bcs_S, fdm2_center, r_2nd, band_s00_poisson,&
+!!     &          i_source, rj_fld, reftemp_r, refgrad_r)
 !!      subroutine const_diffusive_profile_fix_bc                       &
-!!     &        (sph_rj, sph_bc_S, fdm2_center, r_2nd, band_s00_poisson,&
-!!     &         i_temp, i_source, rj_fld, file_name, reftemp_local)
+!!     &        (sph_rj, sc_prop, sph_bc_S, fdm2_center, r_2nd,         &
+!!     &         band_s00_poisson, i_temp, i_source, rj_fld, file_name, &
+!!     &         reftemp_rj, reftemp_local)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
+!!        type(scalar_property), intent(in) :: sc_prop
 !!        type(sph_boundary_type), intent(in) :: sph_bc_S
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
@@ -54,12 +56,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine const_diffusive_profiles(sph_rj, sph_bc_S, bcs_S,      &
-     &          fdm2_center, r_2nd, band_s00_poisson,                   &
-     &          i_source, rj_fld, file_name, reftemp_rj)
+      subroutine const_diffusive_profiles(sph_rj, sc_prop,              &
+     &          sph_bc_S, bcs_S, fdm2_center, r_2nd, band_s00_poisson,  &
+     &          i_source, rj_fld, reftemp_r, refgrad_r)
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
+      type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc_S
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
@@ -67,10 +70,9 @@
       type(band_matrix_type), intent(in) :: band_s00_poisson
 !
       integer(kind = kint), intent(in) :: i_source
-      character(len=kchara), intent(in) :: file_name
 !
-      real(kind = kreal), intent(inout)                                 &
-     &                :: reftemp_rj(0:sph_rj%nidx_rj(1),0:1)
+      real(kind=kreal), intent(inout) :: reftemp_r(0:sph_rj%nidx_rj(1))
+      real(kind=kreal), intent(inout) :: refgrad_r(0:sph_rj%nidx_rj(1))
 !
       real(kind = kreal), allocatable :: ref_local(:,:)
       integer(kind = kint) :: k
@@ -83,26 +85,22 @@
 !$omp end parallel workshare
 !
       call const_diffusive_profile(i_source, sph_rj, r_2nd,             &
-     &    sph_bc_S, bcs_S, fdm2_center, band_s00_poisson,               &
-     &    rj_fld, ref_local, reftemp_rj)
+     &    sc_prop, sph_bc_S, bcs_S, fdm2_center, band_s00_poisson,      &
+     &    rj_fld, reftemp_r, refgrad_r, ref_local)
       deallocate(ref_local)
-!
-      if(iflag_debug .gt. 0) then
-        call write_diffusive_profile_file                               &
-     &     (file_name, sph_rj, reftemp_rj)
-      end if
 !
       end subroutine const_diffusive_profiles
 !
 ! -----------------------------------------------------------------------
 !
       subroutine const_diffusive_profile_fix_bc                         &
-     &        (sph_rj, sph_bc_S, fdm2_center, r_2nd, band_s00_poisson,  &
-     &         i_temp, i_source, rj_fld, file_name,                     &
+     &        (sph_rj, sc_prop, sph_bc_S, fdm2_center, r_2nd,           &
+     &         band_s00_poisson, i_temp, i_source, rj_fld, file_name,   &
      &         reftemp_rj, reftemp_local)
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
+      type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(phys_data), intent(in) :: rj_fld
@@ -117,8 +115,8 @@
      &                :: reftemp_local(0:sph_rj%nidx_rj(1),0:1)
 !
 !
-      call const_diffusive_profile_fixS(i_temp, i_source,               &
-     &    sph_rj, r_2nd, sph_bc_S, fdm2_center, band_s00_poisson,       &
+      call const_diffusive_profile_fixS(i_temp, i_source, sph_rj,       &
+     &    r_2nd, sc_prop, sph_bc_S, fdm2_center, band_s00_poisson,      &
      &    rj_fld, reftemp_rj, reftemp_local)
 !
       if(iflag_debug .gt. 0) then
@@ -158,9 +156,10 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_diffusive_profile                                &
-     &         (is_source, sph_rj, r_2nd, sph_bc, bcs_S, fdm2_center,   &
-     &          band_s00_poisson, rj_fld, reftemp_rj, ref_local)
+      subroutine const_diffusive_profile(is_source, sph_rj, r_2nd,      &
+     &          sc_prop, sph_bc, bcs_S, fdm2_center,                    &
+     &          band_s00_poisson, rj_fld, reftemp_r, refgrad_r,         &
+     &          ref_local)
 !
       use calypso_mpi
       use calypso_mpi_real
@@ -173,14 +172,15 @@
       integer(kind = kint), intent(in) :: is_source
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
+      type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(band_matrix_type), intent(in) :: band_s00_poisson
       type(phys_data), intent(in) :: rj_fld
 !
-      real(kind = kreal), intent(inout)                                 &
-     &                :: reftemp_rj(0:sph_rj%nidx_rj(1),0:1)
+      real(kind=kreal), intent(inout) :: reftemp_r(0:sph_rj%nidx_rj(1))
+      real(kind=kreal), intent(inout) :: refgrad_r(0:sph_rj%nidx_rj(1))
       real(kind = kreal), intent(inout)                                 &
      &                :: ref_local(0:sph_rj%nidx_rj(1),0:1)
 !
@@ -194,6 +194,11 @@
      &       sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,          &
      &       is_source, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld, &
      &       ref_local(0,0))
+!$omp parallel workshare
+          ref_local(0:sph_rj%nidx_rj(1),0)                              &
+     &       = (sc_prop%coef_source / sc_prop%coef_diffuse)             &
+     &        * ref_local(0:sph_rj%nidx_rj(1),0)
+!$omp end parallel workshare
           else
 !$omp parallel workshare
             ref_local(0:sph_rj%nidx_rj(1),0) = 0.0d0
@@ -233,10 +238,13 @@
       end if
 !
 !$omp parallel workshare
-      reftemp_rj(0:sph_rj%nidx_rj(1),0:1) = 0.0d0
+      reftemp_r(0:sph_rj%nidx_rj(1)) = 0.0d0
+      refgrad_r(0:sph_rj%nidx_rj(1)) = 0.0d0
 !$omp end parallel workshare
-      num64 = 2 * (sph_rj%nidx_rj(1) + 1)
-      call calypso_mpi_allreduce_real(ref_local, reftemp_rj,            &
+      num64 = sph_rj%nidx_rj(1) + 1
+      call calypso_mpi_allreduce_real(ref_local(0,0), reftemp_r,        &
+     &                                num64, MPI_SUM)
+      call calypso_mpi_allreduce_real(ref_local(0,1), refgrad_r,        &
      &                                num64, MPI_SUM)
 !
       end subroutine const_diffusive_profile
@@ -244,8 +252,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_diffusive_profile_fixS(is_scalar, is_source,     &
-     &          sph_rj, r_2nd, sph_bc, fdm2_center, band_s00_poisson,   &
-     &          rj_fld, reftemp_rj, reftemp_local)
+     &          sph_rj, r_2nd, sc_prop, sph_bc, fdm2_center,            &
+     &          band_s00_poisson, rj_fld, reftemp_rj, reftemp_local)
 !
       use calypso_mpi
       use calypso_mpi_real
@@ -257,6 +265,7 @@
       integer(kind = kint), intent(in) :: is_scalar, is_source
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
+      type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(phys_data), intent(in) :: rj_fld
@@ -278,6 +287,11 @@
      &       sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,          &
      &       is_source, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld, &
      &       reftemp_local(0,0))
+!$omp parallel workshare
+          reftemp_local(0:sph_rj%nidx_rj(1),0)                          &
+     &       = (sc_prop%coef_source / sc_prop%coef_diffuse)             &
+     &        * reftemp_local(0:sph_rj%nidx_rj(1),0)
+!$omp end parallel workshare
           else
 !$omp parallel workshare
             reftemp_local(0:sph_rj%nidx_rj(1),0) = 0.0d0

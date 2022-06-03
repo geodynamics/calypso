@@ -131,18 +131,17 @@
      &   .or. iflag_restart .eq. i_rst_dbench2                          &
      &   .or. iflag_restart .eq. i_rst_dbench_qcv) then
         call sph_initial_data_4_benchmarks                              &
-     &     (SPH_model%ref_temp, sph%sph_params, sph%sph_rj,             &
+     &     (SPH_model%refs, sph%sph_params, sph%sph_rj,                 &
      &      SPH_model%MHD_prop, ipol, rj_fld)
 !
 !   set small seed magnetic field
       else if (iflag_restart .eq. i_rst_no_file) then
         call sph_initial_data_w_seed_B                                  &
-     &     (SPH_model%ref_temp, SPH_model%ref_comp,                     &
-     &      sph%sph_params, sph%sph_rj,                                 &
+     &     (SPH_model%refs, sph%sph_params, sph%sph_rj,                 &
      &      SPH_model%MHD_prop, SPH_model%sph_MHD_bc,                   &
      &      ipol, rj_fld)
       else if (iflag_restart .eq. i_rst_licv) then
-        call sph_initial_field_4_licv(SPH_model%ref_temp,               &
+        call sph_initial_field_4_licv(SPH_model%refs,                   &
      &      sph%sph_params, sph%sph_rj,                                 &
      &      SPH_model%MHD_prop, ipol, rj_fld)
       end if
@@ -170,7 +169,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine sph_initial_data_4_benchmarks                          &
-     &         (ref_temp, sph_params, sph_rj, MHD_prop, ipol, rj_fld)
+     &         (refs, sph_params, sph_rj, MHD_prop, ipol, rj_fld)
 !
       use m_machine_parameter
       use m_initial_field_control
@@ -186,7 +185,7 @@
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(reference_field), intent(in) :: ref_temp
+      type(reference_field), intent(in) :: refs
       type(phys_address), intent(in) :: ipol
 !
       type(phys_data), intent(inout) :: rj_fld
@@ -198,21 +197,22 @@
         call set_initial_velo_sph(ipol%base%i_velo,                     &
      &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
         if(ipol%base%i_temp .gt. 0) then
-          call set_ini_reference_temp_sph(ipol%base%i_temp,             &
-     &        ref_temp%t_rj, sph_rj, MHD_prop%ref_param_T,              &
-     &        sph_params%nlayer_ICB, sph_params%nlayer_CMB,             &
-     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-          call set_initial_temp_sph(isig, ipol%base%i_temp, sph_rj,     &
+          call set_ini_ref_temp_benchmark                               &
+     &       (sph_rj, sph_params%nlayer_ICB, sph_params%nlayer_CMB,     &
+     &        rj_fld%d_fld(1,ipol%base%i_temp))
+          call set_initial_temp_sph(isig, sph_rj,                       &
      &        sph_params%radius_ICB, sph_params%radius_CMB,             &
      &        sph_params%nlayer_ICB, sph_params%nlayer_CMB,             &
-     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &        rj_fld%d_fld(1,ipol%base%i_temp))
         end if
         if(ipol%base%i_light .gt. 0) then
-          call set_initial_light_sph(isig, ipol%base%i_light, sph_rj,   &
+          call set_ini_ref_temp_benchmark                               &
+     &       (sph_rj, sph_params%nlayer_ICB, sph_params%nlayer_CMB,     &
+     &        rj_fld%d_fld(1,ipol%base%i_light))
+          call set_initial_temp_sph(isig, sph_rj,                       &
      &        sph_params%radius_ICB, sph_params%radius_CMB,             &
      &        sph_params%nlayer_ICB, sph_params%nlayer_CMB,             &
-     &        ref_temp%t_rj, rj_fld%n_point, rj_fld%ntot_phys,          &
-     &        rj_fld%d_fld)
+     &        rj_fld%d_fld(1,ipol%base%i_light))
         end if
 !
         if(iflag_restart .eq. i_rst_dbench1) then
@@ -242,8 +242,8 @@
 !-----------------------------------------------------------------------
 !
       subroutine sph_initial_data_w_seed_B                              &
-     &         (ref_temp, ref_comp, sph_params, sph_rj,                 &
-     &          MHD_prop, sph_MHD_bc, ipol, rj_fld)
+     &         (refs, sph_params, sph_rj, MHD_prop, sph_MHD_bc,         &
+     &          ipol, rj_fld)
 !
       use t_MHD_step_parameter
       use t_reference_scalar_param
@@ -256,25 +256,31 @@
       type(sph_rj_grid), intent(in) :: sph_rj
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-      type(reference_field), intent(in) :: ref_temp, ref_comp
+      type(reference_field), intent(in) :: refs
       type(phys_address), intent(in) :: ipol
 !
       type(phys_data), intent(inout) :: rj_fld
 !
 !
         if(ipol%base%i_temp .gt. 0)  then
-          call set_noize_scalar_sph(ipol%base%i_temp, ref_temp%t_rj,    &
-     &        sph_rj, MHD_prop%ref_param_T,                             &
+          call set_ini_reference_temp_sph(sph_rj, MHD_prop%ref_param_T, &
+     &        refs%ref_field%d_fld(1,refs%iref_base%i_temp),            &
+     &        sph_params%nlayer_ICB, sph_params%nlayer_CMB,             &
+     &        rj_fld%d_fld(1,ipol%base%i_temp))
+          call set_noize_scalar_sph(sph_rj,                             &
      &        sph_params%radius_ICB, sph_params%radius_CMB,             &
      &        sph_params%nlayer_ICB, sph_params%nlayer_CMB,             &
-     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &        rj_fld%d_fld(1,ipol%base%i_temp))
         end if
         if(ipol%base%i_light .gt. 0) then
-          call set_noize_scalar_sph(ipol%base%i_light,                  &
-     &        ref_comp%t_rj, sph_rj, MHD_prop%ref_param_C,              &
+          call set_ini_reference_temp_sph(sph_rj, MHD_prop%ref_param_C, &
+     &        refs%ref_field%d_fld(1,refs%iref_base%i_light),           &
+     &        sph_params%nlayer_ICB, sph_params%nlayer_CMB,             &
+     &        rj_fld%d_fld(1,ipol%base%i_light))
+          call set_noize_scalar_sph(sph_rj,                             &
      &        sph_params%radius_ICB, sph_params%radius_CMB,             &
      &        sph_params%nlayer_ICB, sph_params%nlayer_CMB,             &
-     &        rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &        rj_fld%d_fld(1,ipol%base%i_light))
         end if
         if(ipol%base%i_magne .gt. 0) then
           call set_initial_magne_sph                                    &
@@ -290,7 +296,7 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sph_initial_field_4_licv(ref_temp, sph_params, sph_rj, &
+      subroutine sph_initial_field_4_licv(refs, sph_params, sph_rj,     &
      &          MHD_prop, ipol, rj_fld)
 !
       use t_MHD_step_parameter
@@ -303,20 +309,20 @@
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(reference_field), intent(in) :: ref_temp
+      type(reference_field), intent(in) :: refs
       type(phys_address), intent(in) :: ipol
 !
       type(phys_data), intent(inout) :: rj_fld
 !
 !
-      call set_ini_reference_temp_sph(ipol%base%i_temp, ref_temp%t_rj,  &
-     &    sph_rj, MHD_prop%ref_param_T,                                 &
+      call set_ini_reference_temp_sph(sph_rj, MHD_prop%ref_param_T,     &
+     &    refs%ref_field%d_fld(1,refs%iref_base%i_temp),                &
      &    sph_params%nlayer_ICB, sph_params%nlayer_CMB,                 &
-     &    rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
-      call set_all_part_temp_sph(ipol%base%i_temp, sph_rj,              &
-     &      sph_params%radius_ICB, sph_params%radius_CMB,               &
-     &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
-     &      rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld)
+     &    rj_fld%d_fld(1,ipol%base%i_temp))
+      call set_noize_scalar_sph(sph_rj,                                 &
+     &    sph_params%radius_ICB, sph_params%radius_CMB,                 &
+     &    sph_params%nlayer_ICB, sph_params%nlayer_CMB,                 &
+     &    rj_fld%d_fld(1,ipol%base%i_temp))
 !
       end subroutine sph_initial_field_4_licv
 !

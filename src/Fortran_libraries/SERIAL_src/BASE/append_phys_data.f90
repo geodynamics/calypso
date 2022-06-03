@@ -92,6 +92,7 @@
 !
       call alloc_phys_name(new_fld)
 !
+!$omp parallel workshare
       new_fld%num_component(1:new_fld%num_phys)                         &
      &             = org_fld%num_component(1:new_fld%num_phys)
       new_fld%phys_name(1:new_fld%num_phys)                             &
@@ -102,6 +103,7 @@
      &             = org_fld%iorder_eletype(1:new_fld%num_phys)
       new_fld%istack_component(0:new_fld%num_phys)                      &
      &             = org_fld%istack_component(0:new_fld%num_phys)
+!$omp end parallel workshare
 !
       end subroutine copy_field_name
 !

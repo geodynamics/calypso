@@ -8,14 +8,14 @@
 !!
 !!@verbatim
 !!      subroutine sel_Nusselt_routine(is_scalar, is_source, is_grad_s, &
-!!     &          mat_name, diffusie_reduction_ICB,                     &
-!!     &          sph_params, sph_rj, r_2nd, sph_bc_S, sph_bc_U,        &
-!!     &          fdm2_center, rj_fld, Nu_type)
+!!     &          mat_name, sph_params, sph_rj, r_2nd, sc_prop,         &
+!!     &          sph_bc_S, sph_bc_U, fdm2_center, rj_fld, Nu_type)
 !!        integer(kind = kint), intent(in) :: is_scalar, is_source
 !!        integer(kind = kint), intent(in) :: is_grad_s
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
+!!        type(scalar_property), intent(in) :: sc_prop
 !!        type(sph_boundary_type), (in) :: sph_bc_S
 !!        type(sph_boundary_type), (in) :: sph_bc_U
 !!        type(fdm2_center_mat), intent(in) :: fdm2_center
@@ -33,6 +33,7 @@
       use t_phys_data
       use t_boundary_params_sph_MHD
       use t_no_heat_Nusselt
+      use t_physical_property
       use pickup_sph_spectr
 !
       implicit  none
@@ -46,9 +47,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine sel_Nusselt_routine(is_scalar, is_source, is_grad_s,   &
-     &          mat_name, diffusie_reduction_ICB,                       &
-     &          sph_params, sph_rj, r_2nd, sph_bc_S, sph_bc_U,          &
-     &          fdm2_center, rj_fld, Nu_type)
+     &          mat_name, sph_params, sph_rj, r_2nd, sc_prop,           &
+     &          sph_bc_S, sph_bc_U, fdm2_center, rj_fld, Nu_type)
 !
       use t_sph_matrix
       use t_fdm_coefs
@@ -58,11 +58,11 @@
       integer(kind = kint), intent(in) :: is_scalar, is_source
       integer(kind = kint), intent(in) :: is_grad_s
       character(len=kchara), intent(in) :: mat_name
-      real(kind = kreal), intent(in) :: diffusie_reduction_ICB
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
+      type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc_S, sph_bc_U
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(phys_data), intent(in) :: rj_fld
@@ -76,8 +76,8 @@
      &      sph_rj, sph_bc_U, rj_fld, Nu_type)
       else if(Nu_type%iflag_Nusselt .eq. iflag_source_Nu) then
         call s_cal_heat_source_Nu(is_scalar, is_source, is_grad_s,      &
-     &      mat_name, diffusie_reduction_ICB, sph_params, sph_rj,       &
-     &      r_2nd, sph_bc_S, sph_bc_U, fdm2_center, rj_fld, Nu_type)
+     &      mat_name, sph_params, sph_rj, r_2nd, sc_prop,               &
+     &      sph_bc_S, sph_bc_U, fdm2_center, rj_fld, Nu_type)
       end if
 !!
       end subroutine sel_Nusselt_routine
@@ -137,9 +137,8 @@
 ! -----------------------------------------------------------------------
 !
       subroutine s_cal_heat_source_Nu(is_scalar, is_source, is_grad_s,  &
-     &          mat_name, diffusie_reduction_ICB,                       &
-     &          sph_params, sph_rj, r_2nd, sph_bc_S, sph_bc_U,          &
-     &          fdm2_center, rj_fld, Nu_type)
+     &          mat_name, sph_params, sph_rj, r_2nd, sc_prop,           &
+     &          sph_bc_S, sph_bc_U, fdm2_center, rj_fld, Nu_type)
 !
       use t_sph_matrix
       use t_fdm_coefs
@@ -151,11 +150,10 @@
       integer(kind = kint), intent(in) :: is_scalar, is_source
       integer(kind = kint), intent(in) :: is_grad_s
       character(len=kchara), intent(in) :: mat_name
-      real(kind = kreal), intent(in) :: diffusie_reduction_ICB
-!
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
+      type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc_S, sph_bc_U
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(phys_data), intent(in) :: rj_fld
@@ -173,12 +171,13 @@
         call dealloc_Nu_radial_reference(Nu_type)
         call alloc_Nu_radial_reference(sph_rj, Nu_type)
         call const_r_mat00_poisson_fixS                                 &
-     &    (mat_name, diffusie_reduction_ICB, sph_params, sph_rj,        &
-     &     r_2nd, sph_bc_S, fdm2_center, Nu_type%band_s00_poisson_fixS)
+     &     (mat_name, sc_prop%diffusie_reduction_ICB,                   &
+     &      sph_params, sph_rj, r_2nd, sph_bc_S, fdm2_center,           &
+     &      Nu_type%band_s00_poisson_fixS)
       end if
 !
       call const_diffusive_profile_fix_bc                               &
-     &   (sph_rj, sph_bc_S, fdm2_center, r_2nd,                         &
+     &   (sph_rj, sc_prop, sph_bc_S, fdm2_center, r_2nd,                &
      &    Nu_type%band_s00_poisson_fixS, is_scalar, is_source, rj_fld,  &
      &    file_name, Nu_type%ref_global, Nu_type%ref_local)
 !

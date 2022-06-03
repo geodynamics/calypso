@@ -28,9 +28,8 @@
 !!        type(sph_mhd_monitor_data), intent(inout) :: monitor
 !!
 !!      subroutine cal_write_no_heat_sourse_Nu                          &
-!!     &         (is_scalar, is_source, is_grad_s, time_d,              &
-!!     &          mat_name, diffusie_reduction_ICB,                     &
-!!     &          sph_params, sph_rj, sph_bc_S, sph_bc_U,               &
+!!     &         (is_scalar, is_source, is_grad_s, time_d, mat_name,    &
+!!     &          sph_params, sph_rj, sc_prop, sph_bc_S, sph_bc_U,      &
 !!     &          fdm2_center, r_2nd,  rj_fld, Nusselt)
 !!      subroutine cal_write_dipolarity(time_d, sph_params,             &
 !!     &          ipol, rj_fld, pwr, dip)
@@ -142,13 +141,12 @@
       call cal_mean_squre_in_shell(sph_params, sph_rj, ipol, rj_fld,    &
      &    leg%g_sph_rj, monitor%pwr, monitor%WK_pwr)
 !
-      if(monitor%heat_Nusselt%iflag_Nusselt .ne. 0) then
+       if(monitor%heat_Nusselt%iflag_Nusselt .ne. 0) then
         if(iflag_debug.gt.0)  write(*,*) 'sel_Nusselt_routine'
         write(mat_name,'(a)') 'Diffusive_Temperature'
-        call sel_Nusselt_routine                                        &
-     &     (ipol%base%i_temp, ipol%base%i_heat_source,                  &
-     &      ipol%grad_fld%i_grad_temp, mat_name,                        &
-     &      ht_prop%diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,  &
+        call sel_Nusselt_routine(ipol%base%i_temp,                      &
+     &      ipol%base%i_heat_source, ipol%grad_fld%i_grad_temp,         &
+     &      mat_name, sph_params, sph_rj, r_2nd, ht_prop,               &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%sph_bc_U,                   &
      &      sph_MHD_bc%fdm2_center, rj_fld, monitor%heat_Nusselt)
       end if
@@ -156,10 +154,9 @@
       if(monitor%comp_Nusselt%iflag_Nusselt .ne. 0) then
         if(iflag_debug.gt.0)  write(*,*) 'sel_Nusselt_routine'
         write(mat_name,'(a)') 'Diffusive_Composition'
-        call sel_Nusselt_routine                                        &
-     &     (ipol%base%i_light, ipol%base%i_light_source,                &
-     &      ipol%grad_fld%i_grad_composit, mat_name,                    &
-     &      cp_prop%diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,  &
+        call sel_Nusselt_routine(ipol%base%i_light,                     &
+     &      ipol%base%i_light_source, ipol%grad_fld%i_grad_composit,    &
+     &      mat_name, sph_params, sph_rj, r_2nd, cp_prop,               &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%sph_bc_U,                   &
      &      sph_MHD_bc%fdm2_center, rj_fld, monitor%comp_Nusselt)
       end if
@@ -250,9 +247,8 @@
 !  --------------------------------------------------------------------
 !
       subroutine cal_write_no_heat_sourse_Nu                            &
-     &         (is_scalar, is_source, is_grad_s, time_d,                &
-     &          mat_name, diffusie_reduction_ICB,                       &
-     &          sph_params, sph_rj, sph_bc_S, sph_bc_U,                 &
+     &         (is_scalar, is_source, is_grad_s, time_d, mat_name,      &
+     &          sph_params, sph_rj, sc_prop, sph_bc_S, sph_bc_U,        &
      &          fdm2_center, r_2nd,  rj_fld, Nusselt)
 !
       use pickup_gauss_coefficients
@@ -261,13 +257,13 @@
       integer(kind = kint), intent(in) :: is_scalar, is_source
       integer(kind = kint), intent(in) :: is_grad_s
       character(len=kchara), intent(in) :: mat_name
-      real(kind = kreal), intent(in) :: diffusie_reduction_ICB
 !
       type(time_data), intent(in) :: time_d
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
       type(fdm2_center_mat), intent(in) :: fdm2_center
+      type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc_S, sph_bc_U
       type(phys_data), intent(in) :: rj_fld
 !
@@ -276,7 +272,7 @@
 !
       if(Nusselt%iflag_Nusselt .eq. 0) return
       call sel_Nusselt_routine(is_scalar, is_source, is_grad_s,         &
-     &    mat_name, diffusie_reduction_ICB, sph_params, sph_rj, r_2nd,  &
+     &    mat_name, sph_params, sph_rj, r_2nd, sc_prop,                 &
      &    sph_bc_S, sph_bc_U, fdm2_center, rj_fld, Nusselt)
       call write_no_heat_source_Nu(sph_rj%idx_rj_degree_zero,           &
      &    time_d%i_time_step, time_d%time, Nusselt)

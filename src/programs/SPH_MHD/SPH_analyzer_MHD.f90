@@ -121,9 +121,8 @@
 !
       if (iflag_debug.gt.0) write(*,*) 'init_reference_scalars'
       call init_reference_scalars                                       &
-     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd,                      &
-     &    SPH_model%ref_temp, SPH_model%ref_comp, SPH_MHD%fld,          &
-     &    SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
+     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd, SPH_model%refs,      &
+     &    SPH_MHD%fld, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 !
 !  -------------------------------
 !
@@ -133,9 +132,10 @@
      &    SPH_MHD%fld, sph_fst_IO)
       MHD_step%iflag_initial_step = 0
 !
-      if(iflag_debug.gt.0) write(*,*)' sync_temp_by_per_temp_sph'
-      call sync_temp_by_per_temp_sph(SPH_model,                         &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
+      if (iflag_debug.eq.1) write(*,*)' sync_temp_by_per_temp_sph'
+      call sync_temp_by_per_temp_sph                                    &
+     &   (SPH_model%MHD_prop, SPH_model%refs,                           &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !  -------------------------------
 !
@@ -239,8 +239,9 @@
 !*
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+5)
       if(iflag_debug.gt.0) write(*,*) 'trans_per_temp_to_temp_sph'
-      call trans_per_temp_to_temp_sph(SPH_model,                        &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
+      call trans_per_temp_to_temp_sph                                   &
+     &   (SPH_model%MHD_prop, SPH_model%refs,                           &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !*
       if(lead_field_data_flag(i_step, MHD_step)) then
         if(iflag_debug.gt.0) write(*,*) 's_lead_fields_4_sph_mhd'
@@ -288,9 +289,10 @@
       end if
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+7)
 !
-      if(iflag_debug.gt.0) write(*,*) 'sync_temp_by_per_temp_sph'
-      call sync_temp_by_per_temp_sph(SPH_model,                         &
-     &    SPH_MHD%sph%sph_rj, SPH_MHD%ipol, SPH_MHD%fld)
+      if (iflag_debug.eq.1) write(*,*)' sync_temp_by_per_temp_sph'
+      call sync_temp_by_per_temp_sph                                    &
+     &   (SPH_model%MHD_prop, SPH_model%refs,                           &
+     &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !
       if(i_step .ge. MHD_step%finish_d%i_end_step                       &
      &    .and. MHD_step%finish_d%i_end_step .gt. 0) then
