@@ -403,12 +403,15 @@ end subroutine check_NaN_temperature
 !
       integer(kind = kint) :: kr, inod
 !
+      if(idx_rj_degree_zero .eq. 0) return
 !$omp parallel do private(inod)
       do kr = 1, nri
         inod = idx_rj_degree_zero + (kr-1) * jmax
         sol_00(kr) = d_rj(inod,is_field)
       end do
 !$omp end parallel do
+!
+      if(inod_rj_center .eq. 0) return
       sol_00(0) = d_rj(inod_rj_center,is_field)
 !
 !       write(*,*) 'kr, Average RHS'
@@ -431,12 +434,15 @@ end subroutine check_NaN_temperature
 !
       integer(kind = kint) :: kr, inod
 !
+      if(idx_rj_degree_zero .eq. 0) return
 !$omp parallel do private(inod)
       do kr = 1, nri
         inod = idx_rj_degree_zero + (kr-1) * jmax
         d_rj(inod,is_field) = sol_00(kr)
       end do
 !$omp end parallel do
+!
+      if(inod_rj_center .eq. 0) return
       d_rj(inod_rj_center,is_field) = sol_00(0)
 !
 !       write(*,*) 'kr, average Solution'
