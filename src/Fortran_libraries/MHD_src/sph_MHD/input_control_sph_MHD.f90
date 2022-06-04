@@ -78,8 +78,9 @@
       call set_control_4_SPH_MHD                                        &
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
-     &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
+     &    MHD_files, SPH_model%bc_IO, SPH_model%refs, MHD_step,         &
+     &    SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_WK%trans_p,         &
+     &    SPH_WK%trns_WK, SPH_MHD)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &
@@ -123,8 +124,9 @@
       call set_control_4_SPH_MHD                                        &
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
-     &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
+     &    MHD_files, SPH_model%bc_IO, SPH_model%refs, MHD_step,         &
+     &    SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_WK%trans_p,         &
+     &    SPH_WK%trns_WK, SPH_MHD)
 !
       call set_control_SPH_MHD_noviz                                    &
      &   (DMHD_ctl%model_ctl, DMHD_ctl%smonitor_ctl,                    &
@@ -166,8 +168,9 @@
       call set_control_4_SPH_MHD                                        &
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
-     &    MHD_files, SPH_model%bc_IO, MHD_step, SPH_model%MHD_prop,     &
-     &    SPH_model%MHD_BC, SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
+     &    MHD_files, SPH_model%bc_IO, SPH_model%refs, MHD_step,         &
+     &    SPH_model%MHD_prop, SPH_model%MHD_BC, SPH_WK%trans_p,         &
+     &    SPH_WK%trns_WK, SPH_MHD)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &
      &    DMHD_ctl%psph_ctl, DMHD_ctl%smonitor_ctl, DMHD_ctl%zm_ctls,   &

@@ -16,7 +16,7 @@
 !!
 !!      subroutine set_control_4_SPH_MHD(plt, org_plt,                  &
 !!     &          Dmodel_ctl, smctl_ctl, nmtr_ctl, psph_ctl,            &
-!!     &          MHD_files, bc_IO, MHD_step, MHD_prop, MHD_BC,         &
+!!     &          MHD_files, bc_IO, refs, MHD_step, MHD_prop, MHD_BC,   &
 !!     &          trans_p, WK, sph_maker)
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(platform_data_control), intent(in) :: org_plt
@@ -27,6 +27,8 @@
 !!        type(parallel_sph_shell_control), intent(inout) :: psph_ctl
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(MHD_file_IO_params), intent(inout) :: MHD_files
+!!        type(boundary_spectra), intent(inout) :: bc_IO
+!!        type(radial_reference_field), intent(inout) :: refs
 !!        type(MHD_step_param), intent(inout) :: MHD_step
 !!        type(MHD_evolution_param), intent(inout) :: MHD_prop
 !!        type(MHD_BC_lists), intent(inout) :: MHD_BC
@@ -69,6 +71,7 @@
       use t_bc_data_list
       use t_flex_delta_t_data
       use t_SPH_mesh_field_data
+      use t_radial_reference_field
 !
       implicit none
 !
@@ -158,7 +161,7 @@
 !
       subroutine set_control_4_SPH_MHD(plt, org_plt,                    &
      &          Dmodel_ctl, smctl_ctl, nmtr_ctl, psph_ctl,              &
-     &          MHD_files, bc_IO, MHD_step, MHD_prop, MHD_BC,           &
+     &          MHD_files, bc_IO, refs, MHD_step, MHD_prop, MHD_BC,     &
      &          trans_p, WK, SPH_MHD)
 !
       use t_spheric_parameter
@@ -193,6 +196,7 @@
       type(parallel_sph_shell_control), intent(in) :: psph_ctl
       type(MHD_file_IO_params), intent(inout) :: MHD_files
       type(boundary_spectra), intent(inout) :: bc_IO
+      type(radial_reference_field), intent(inout) :: refs
       type(MHD_step_param), intent(inout) :: MHD_step
       type(MHD_evolution_param), intent(inout) :: MHD_prop
       type(MHD_BC_lists), intent(inout) :: MHD_BC
@@ -236,7 +240,8 @@
       if (iflag_debug.gt.0) write(*,*) 's_set_control_sph_data_MHD'
       call s_set_control_sph_data_MHD(plt, smctl_ctl%mevo_ctl,          &
      &    MHD_files%org_rj_file_IO, MHD_files%org_rst_file_IO,          &
-     &    MHD_files%fst_file_IO, bc_IO, trans_p, WK%WK_leg)
+     &    MHD_files%fst_file_IO, bc_IO, refs%ref_input_IO,              &
+     &    trans_p, WK%WK_leg)
 !
 !   set control parameters
 !

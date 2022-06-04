@@ -18,6 +18,7 @@
       use t_work_4_sph_trans
       use t_sph_trans_arrays_MHD
       use t_sph_mhd_monitor_data_IO
+      use t_sph_radial_interpolate
 !
       implicit  none
 !
@@ -39,8 +40,11 @@
 !>        strucutres for spherical transform dor MHD dynamo
         type(works_4_sph_trans_MHD) :: trns_WK
 !
-!
+!>        monitor output date from spectrum
         type(sph_mhd_monitor_data) :: monitor
+!
+!>        Interpolation tsble in radial direction
+        type(sph_radial_interpolate) :: rj_itp
       end type work_SPH_MHD
 !
       end module t_work_SPH_MHD

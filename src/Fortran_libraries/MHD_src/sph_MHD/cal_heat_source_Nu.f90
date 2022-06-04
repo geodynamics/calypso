@@ -53,7 +53,7 @@
       use t_sph_matrix
       use t_fdm_coefs
       use t_coef_fdm2_MHD_boundaries
-      use t_radial_references
+      use const_radial_references
 !
       integer(kind = kint), intent(in) :: is_scalar, is_source
       integer(kind = kint), intent(in) :: is_grad_s
@@ -143,7 +143,7 @@
       use t_sph_matrix
       use t_fdm_coefs
       use t_coef_fdm2_MHD_boundaries
-      use t_radial_references
+      use const_radial_references
       use const_r_mat_4_scalar_sph
       use set_parallel_file_name
 !

@@ -22,12 +22,14 @@
 !!        type(IO_step_param), intent(inout) :: rst_step
 !!
 !!      subroutine init_radial_sph_interpolation                        &
-!!     &         (rj_file_param, sph_params, sph_rj)
+!!     &         (rj_file_param, sph_params, sph_rj, r_itp)
 !!      subroutine read_alloc_sph_rst_4_snap(i_step, rj_file_param,     &
-!!     &          fst_file_IO, rst_step, sph, ipol, rj_fld, time_d)
+!!     &          fst_file_IO, rst_step, sph, ipol,                     &
+!!     &          rj_fld, time_d, r_itp)
 !!        type(field_IO_params), intent(in) :: rj_file_param
 !!        type(IO_step_param), intent(in) :: rst_step
 !!        type(phys_data), intent(inout) :: rj_fld
+!!        type(sph_radial_interpolate), intent(inout) :: r_itp
 !!      subroutine output_spectr_4_snap(i_step, time_d,                 &
 !!     &          sph_file_IO, rj_fld, ucd_step)
 !!        type(time_data), intent(in) :: time_d
@@ -35,10 +37,11 @@
 !!        type(field_IO_params), intent(in) :: sph_file_IO
 !!      subroutine read_alloc_sph_spectr                                &
 !!     &         (i_step, ucd_step, rj_file_param, sph_file_IO,         &
-!!     &          sph_rj, ipol, rj_fld, time_d)
+!!     &          sph_rj, ipol, rj_fld, time_d, r_itp)
 !!        type(field_IO_params), intent(in) :: rj_file_param
 !!        type(field_IO_params), intent(in) :: sph_file_IO
 !!        type(phys_data), intent(in) :: rj_fld
+!!        type(sph_radial_interpolate), intent(inout) :: r_itp
 !!@endverbatim
 !!
 !!@n @param i_step  time step
@@ -133,7 +136,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine init_radial_sph_interpolation                          &
-     &         (rj_file_param, sph_params, sph_rj)
+     &         (rj_file_param, sph_params, sph_rj, r_itp)
 !
       use t_spheric_parameter
       use r_interpolate_sph_data
@@ -141,23 +144,25 @@
       type(field_IO_params), intent(in) :: rj_file_param
       type(sph_shell_parameters), intent(inout) :: sph_params
       type(sph_rj_grid), intent(inout) ::  sph_rj
+      type(sph_radial_interpolate), intent(inout) :: r_itp
 !
 !
       if(rj_file_param%iflag_IO .gt. 0) then
         if(iflag_debug .gt. 0) write(*,*) 'input_old_rj_sph_trans'
         call input_old_rj_sph_trans                                     &
-     &     (rj_file_param, sph_params%l_truncation, sph_rj)
+     &     (rj_file_param, sph_params%l_truncation, sph_rj, r_itp)
       end if
 !
       call copy_cmb_icb_radial_point                                    &
-     &   (sph_params%nlayer_ICB, sph_params%nlayer_CMB)
+     &   (sph_params%nlayer_ICB, sph_params%nlayer_CMB, r_itp)
 !
       end subroutine init_radial_sph_interpolation
 !
 ! -----------------------------------------------------------------------
 !
       subroutine read_alloc_sph_rst_4_snap(i_step, rj_file_param,       &
-     &          fst_file_IO, rst_step, sph, ipol, rj_fld, time_d)
+     &          fst_file_IO, rst_step, sph, ipol,                       &
+     &          rj_fld, time_d, r_itp)
 !
       use t_spheric_parameter
       use set_sph_restart_IO
@@ -172,6 +177,7 @@
 !
       type(phys_data), intent(inout) :: rj_fld
       type(time_data), intent(inout) :: time_d
+      type(sph_radial_interpolate), intent(inout) :: r_itp
 !
       type(field_IO) :: sph_fst_IO
       integer(kind = kint) :: istep_rst
@@ -190,7 +196,7 @@
         if (iflag_debug.gt.0)                                           &
      &            write(*,*) 'r_interpolate_sph_rst_from_IO'
         call r_interpolate_sph_rst_from_IO                              &
-     &     (sph_fst_IO, sph%sph_rj, ipol, rj_fld)
+     &     (sph_fst_IO, sph%sph_rj, ipol, rj_fld, r_itp)
       end if
 !
       call dealloc_phys_data_IO(sph_fst_IO)
@@ -245,7 +251,7 @@
 !
       subroutine read_alloc_sph_spectr                                  &
      &         (i_step, ucd_step, rj_file_param, sph_file_IO,           &
-     &          sph_rj, ipol, rj_fld, time_d)
+     &          sph_rj, ipol, rj_fld, time_d, r_itp)
 !
       use t_spheric_rj_data
       use copy_rj_phys_data_4_IO
@@ -260,6 +266,7 @@
 !
       type(time_data), intent(inout) :: time_d
       type(phys_data), intent(inout) :: rj_fld
+      type(sph_radial_interpolate), intent(inout) :: r_itp
 !
       type(field_IO) :: sph_out_IO
       integer(kind = kint) :: istep_udt
@@ -278,7 +285,7 @@
         if (iflag_debug.gt.0) write(*,*)                                &
      &                        'r_interpolate_sph_fld_from_IO'
         call r_interpolate_sph_fld_from_IO                              &
-     &    (sph_out_IO, sph_rj, ipol, rj_fld)
+     &    (sph_out_IO, sph_rj, ipol, rj_fld, r_itp)
       end if
 !
 !      call dealloc_merged_field_stack(sph_out_IO)

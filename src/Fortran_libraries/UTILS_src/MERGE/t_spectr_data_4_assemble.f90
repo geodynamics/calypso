@@ -20,7 +20,7 @@
       use t_phys_data
       use t_field_data_IO
       use t_time_data
-      use r_interpolate_marged_sph
+      use t_sph_radial_interpolate
       use parallel_assemble_sph
 !
       implicit none
@@ -38,7 +38,7 @@
         type(field_IO) :: new_fst_IO
         type(time_data) :: fst_time_IO
 !
-        type(sph_radial_itp_data) :: r_itp
+        type(sph_radial_interpolate) :: r_itp
       end type spectr_data_4_assemble
 !
 ! ----------------------------------------------------------------------

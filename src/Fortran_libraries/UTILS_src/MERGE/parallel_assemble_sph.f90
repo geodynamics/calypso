@@ -20,7 +20,7 @@
 !!        type(sph_grids), intent(in) :: org_sph
 !!        type(sph_grids), intent(in) :: new_sph
 !!        type(rj_assemble_tbl), intent(in) :: j_table
-!!        type(sph_radial_itp_data), intent(in) :: r_itp
+!!        type(sph_radial_interpolate), intent(in) :: r_itp
 !!        type(phys_data), intent(in) :: org_fld
 !!        type(phys_data), intent(inout) :: new_fld
 !!@endverbatim
@@ -207,12 +207,12 @@
       subroutine r_itp_field_data_sph_assemble                          &
      &         (org_sph, new_sph, r_itp, j_table, org_fld, new_fld)
 !
-      use r_interpolate_marged_sph
+      use t_sph_radial_interpolate
 !
       type(sph_grids), intent(in) :: org_sph
       type(sph_grids), intent(in) :: new_sph
       type(rj_assemble_tbl), intent(in) :: j_table
-      type(sph_radial_itp_data), intent(in) :: r_itp
+      type(sph_radial_interpolate), intent(in) :: r_itp
       type(phys_data), intent(in) :: org_fld
 !
       type(phys_data), intent(inout) :: new_fld
@@ -227,7 +227,7 @@
           j_new = j_table%j_org_to_new(j_org)
           if(j_new .le. 0) cycle
 !
-          do kr = r_itp%kr_inner_domain, r_itp%kr_outer_domain
+          do kr = r_itp%kr_inner_source, r_itp%kr_outer_source
             kr_in =  r_itp%k_old2new_in(kr)
             kr_out = r_itp%k_old2new_out(kr)
             inod_in =  j_org + (kr_in -  1) * org_sph%sph_rj%nidx_rj(2)

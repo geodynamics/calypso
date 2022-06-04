@@ -25,7 +25,7 @@
 !!      subroutine extend_inner_core_scalar                             &
 !!     &         (field_name, sph, r_itp, sph_phys)
 !!        type(sph_grids), intent(in) :: sph
-!!        type(sph_radial_itp_data), intent(in) :: r_itp
+!!        type(sph_radial_interpolate), intent(in) :: r_itp
 !!        type(phys_data), intent(inout) :: sph_phys
 !!@endverbatim
 !!
@@ -130,10 +130,10 @@
       use m_base_field_labels
       use t_sph_spectr_data
       use t_spheric_parameter
-      use r_interpolate_marged_sph
+      use t_sph_radial_interpolate
 !
       type(sph_grids), intent(in) :: sph
-      type(sph_radial_itp_data), intent(in) :: r_itp
+      type(sph_radial_interpolate), intent(in) :: r_itp
       type(phys_data), intent(inout) :: sph_phys
 !
       integer(kind = kint) :: is_magne
@@ -150,7 +150,7 @@
       if(is_magne .eq. 0) return
 !
       call extend_potential_magne_type(is_magne, sph_phys%ntot_phys,    &
-     &    sph%sph_rj, r_itp%kr_inner_domain, r_itp%kr_outer_domain,     &
+     &    sph%sph_rj, r_itp%kr_inner_source, r_itp%kr_outer_source,     &
      &    sph_phys%d_fld)
 !
       end subroutine extend_potential_magne
@@ -162,11 +162,11 @@
 !
       use t_sph_spectr_data
       use t_spheric_parameter
-      use r_interpolate_marged_sph
+      use t_sph_radial_interpolate
 !
       character(len = kchara), intent(in) :: field_name
       type(sph_grids), intent(in) :: sph
-      type(sph_radial_itp_data), intent(in) :: r_itp
+      type(sph_radial_interpolate), intent(in) :: r_itp
       type(phys_data), intent(inout) :: sph_phys
 !
 !
@@ -184,7 +184,7 @@
       if(is_field .eq. 0) return
 !
       call extend_inner_core_scl_type(is_field, sph_phys%ntot_phys,     &
-     &    sph%sph_rj, r_itp%kr_inner_domain, sph_phys%d_fld)
+     &    sph%sph_rj, r_itp%kr_inner_source, sph_phys%d_fld)
 !
       end subroutine extend_inner_core_scalar
 !

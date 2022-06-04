@@ -34,7 +34,7 @@
       use t_time_data
       use t_spheric_parameter
       use t_boundary_params_sph_MHD
-      use t_radial_reference_temp
+      use t_radial_reference_field
       use t_field_data_IO
       use t_phys_address
       use t_phys_data
@@ -130,9 +130,8 @@
      &   .or. iflag_restart .eq. i_rst_dbench1                          &
      &   .or. iflag_restart .eq. i_rst_dbench2                          &
      &   .or. iflag_restart .eq. i_rst_dbench_qcv) then
-        call sph_initial_data_4_benchmarks                              &
-     &     (SPH_model%refs, sph%sph_params, sph%sph_rj,                 &
-     &      SPH_model%MHD_prop, ipol, rj_fld)
+        call sph_initial_data_4_benchmarks(sph%sph_params, sph%sph_rj,  &
+     &                                     ipol, rj_fld)
 !
 !   set small seed magnetic field
       else if (iflag_restart .eq. i_rst_no_file) then
@@ -169,7 +168,7 @@
 !-----------------------------------------------------------------------
 !
       subroutine sph_initial_data_4_benchmarks                          &
-     &         (refs, sph_params, sph_rj, MHD_prop, ipol, rj_fld)
+     &         (sph_params, sph_rj, ipol, rj_fld)
 !
       use m_machine_parameter
       use m_initial_field_control
@@ -184,8 +183,6 @@
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
-      type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(reference_field), intent(in) :: refs
       type(phys_address), intent(in) :: ipol
 !
       type(phys_data), intent(inout) :: rj_fld
@@ -256,7 +253,7 @@
       type(sph_rj_grid), intent(in) :: sph_rj
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
-      type(reference_field), intent(in) :: refs
+      type(radial_reference_field), intent(in) :: refs
       type(phys_address), intent(in) :: ipol
 !
       type(phys_data), intent(inout) :: rj_fld
@@ -309,7 +306,7 @@
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
       type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(reference_field), intent(in) :: refs
+      type(radial_reference_field), intent(in) :: refs
       type(phys_address), intent(in) :: ipol
 !
       type(phys_data), intent(inout) :: rj_fld

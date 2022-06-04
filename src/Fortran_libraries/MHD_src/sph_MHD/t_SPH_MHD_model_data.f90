@@ -16,7 +16,7 @@
       use m_precision
       use t_control_parameter
       use t_poloidal_rotation
-      use t_radial_reference_temp
+      use t_radial_reference_field
       use t_boundary_data_sph_MHD
       use t_bc_data_list
       use t_sph_boundary_input_data
@@ -33,7 +33,7 @@
         type(sph_rotation) :: omega_sph
 !
 !>        Structure of reference temperature
-        type(reference_field) :: refs
+        type(radial_reference_field) :: refs
 !
 !>        Structure of boundary condition data
         type(sph_MHD_boundary_data) :: sph_MHD_bc

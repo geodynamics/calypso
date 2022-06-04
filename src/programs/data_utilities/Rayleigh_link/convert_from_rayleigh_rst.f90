@@ -12,7 +12,7 @@
 !!        type(field_IO_params), intent(in) :: org_fld_file
 !!        type(sph_grids), intent(in) :: new_sph
 !!        type(rayleigh_restart), intent(in) :: ra_rst
-!!        type(sph_radial_itp_data), intent(in) :: r_itp
+!!        type(sph_radial_interpolate), intent(in) :: r_itp
 !!        type(phys_data), intent(inout) :: new_phys
 !!@endverbatim
 !
@@ -28,7 +28,7 @@
       use t_phys_data
       use t_rayleigh_restart_IO
       use t_convert_from_rayleigh
-      use r_interpolate_marged_sph
+      use t_sph_radial_interpolate
 !
       implicit none
 !
@@ -51,7 +51,7 @@
       type(field_IO_params), intent(in) :: org_fld_file
       type(sph_grids), intent(in) :: new_sph
       type(rayleigh_restart), intent(in) :: ra_rst
-      type(sph_radial_itp_data), intent(in) :: r_itp
+      type(sph_radial_interpolate), intent(in) :: r_itp
 !
       type(phys_data), intent(inout) :: new_phys
 !
@@ -106,7 +106,7 @@
       character(len = kchara), intent(in) :: file_name
       type(sph_grids), intent(in) :: new_sph
       type(rayleigh_restart), intent(in) :: ra_rst
-      type(sph_radial_itp_data), intent(in) :: r_itp
+      type(sph_radial_interpolate), intent(in) :: r_itp
       type(work_fftpack_chebyshev), intent(in) :: fcheby_WK
 !
       type(work_rayleigh_checkpoint), intent(inout) :: rayleigh_WK
@@ -146,7 +146,7 @@
      &       rayleigh_WK%nri_tgt+1, ierr)
 !
           call copy_from_chebyshev_trans(new_sph%sph_rj,                &
-     &        r_itp, j, i_comp,  rayleigh_WK%nri_tgt,                   &
+     &        r_itp%kr_inner_source, j, i_comp,  rayleigh_WK%nri_tgt,   &
      &        rayleigh_WK%rayleigh_tg(1,1), new_phys)
         else if(new_phys%phys_name(i_fld) .eq. previous_momentum%name   &
      &   .or. new_phys%phys_name(i_fld) .eq.   previous_heat%name       &
@@ -181,7 +181,7 @@
       use r_interpolate_marged_sph
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
-      type(sph_radial_itp_data), intent(in) :: r_itp
+      type(sph_radial_interpolate), intent(in) :: r_itp
       character(len = kchara), intent(in) :: file_name
       integer(kind = kint), intent(in) :: i_fld, i_comp, l, m, j
       integer(kind = kint), intent(in) :: nri_org, nri_tgt
@@ -207,7 +207,7 @@
 !
       write(50+my_rank,*) 'tgt', trim(file_name), l, m, nri_tgt
       do k = 1, nri_tgt
-        kr = r_itp%kr_inner_domain + k - 1
+        kr = r_itp%kr_inner_source + k - 1
         write(50+my_rank,*) k, sph_rj%radius_1d_rj_r(kr),               &
      &                      rayleigh_tg(k,1)
       end do

@@ -47,6 +47,7 @@
 !
       call bcast_ctl_type_c1(plt%coriolis_int_file_name)
       call bcast_ctl_type_c1(plt%bc_data_file_name_ctl)
+      call bcast_ctl_type_c1(plt%radial_data_file_name_ctl)
 !
       call bcast_ctl_type_c1(plt%rayleigh_spectr_dir)
       call bcast_ctl_type_c1(plt%rayleigh_field_dir)

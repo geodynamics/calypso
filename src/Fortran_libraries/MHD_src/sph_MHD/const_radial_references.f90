@@ -1,5 +1,5 @@
-!>@file   t_radial_references.f90
-!!@brief  module t_radial_references
+!>@file   const_radial_references.f90
+!!@brief  module const_radial_references
 !!
 !!@author H. Matsui
 !!@date   Programmed  H. Matsui in Oct., 2009
@@ -9,7 +9,10 @@
 !!@verbatim
 !!      subroutine const_diffusive_profiles(sph_rj, sc_prop,            &
 !!     &          sph_bc_S, bcs_S, fdm2_center, r_2nd, band_s00_poisson,&
-!!     &          i_source, rj_fld, reftemp_r, refgrad_r)
+!!     &          iref_scalar, iref_grad, iref_source, ref_field)
+!!        integer(kind = kint), intent(in) :: iref_scalar, iref_grad
+!!        integer(kind = kint), intent(in) :: iref_source
+!!        type(phys_data), intent(inout) :: ref_field
 !!      subroutine const_diffusive_profile_fix_bc                       &
 !!     &        (sph_rj, sc_prop, sph_bc_S, fdm2_center, r_2nd,         &
 !!     &         band_s00_poisson, i_temp, i_source, rj_fld, file_name, &
@@ -23,7 +26,7 @@
 !!        type(phys_data), intent(in) :: rj_fld
 !!        type(band_matrix_type), intent(in) :: band_s00_poisson
 !!@endverbatim
-      module t_radial_references
+      module const_radial_references
 !
       use m_precision
       use m_constants
@@ -58,7 +61,7 @@
 !
       subroutine const_diffusive_profiles(sph_rj, sc_prop,              &
      &          sph_bc_S, bcs_S, fdm2_center, r_2nd, band_s00_poisson,  &
-     &          i_source, rj_fld, reftemp_r, refgrad_r)
+     &          iref_scalar, iref_grad, iref_source, ref_field)
 !
       type(sph_rj_grid), intent(in) :: sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
@@ -66,27 +69,35 @@
       type(sph_boundary_type), intent(in) :: sph_bc_S
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
-      type(phys_data), intent(in) :: rj_fld
       type(band_matrix_type), intent(in) :: band_s00_poisson
 !
-      integer(kind = kint), intent(in) :: i_source
+      integer(kind = kint), intent(in) :: iref_scalar, iref_grad
+      integer(kind = kint), intent(in) :: iref_source
 !
-      real(kind=kreal), intent(inout) :: reftemp_r(0:sph_rj%nidx_rj(1))
-      real(kind=kreal), intent(inout) :: refgrad_r(0:sph_rj%nidx_rj(1))
+      type(phys_data), intent(inout) :: ref_field
 !
       real(kind = kreal), allocatable :: ref_local(:,:)
-      integer(kind = kint) :: k
 !
 !
       allocate(ref_local(0:sph_rj%nidx_rj(1),0:1))
 !
+      if(sph_rj%idx_rj_degree_zero.gt.0 .and. iref_source.gt.0) then
 !$omp parallel workshare
-      ref_local(0:sph_rj%nidx_rj(1),0:1) = 0.0d0
+        ref_local(0:sph_rj%nidx_rj(1),0)                                &
+     &             = ref_field%d_fld(1:sph_rj%nidx_rj(1)+1,iref_source) &
+     &              * (sc_prop%coef_source / sc_prop%coef_diffuse)
+        ref_local(0:sph_rj%nidx_rj(1),1) = 0.0d0
 !$omp end parallel workshare
+      else
+!$omp parallel workshare
+        ref_local(0:sph_rj%nidx_rj(1),0:1) = 0.0d0
+!$omp end parallel workshare
+      end if
 !
-      call const_diffusive_profile(i_source, sph_rj, r_2nd,             &
-     &    sc_prop, sph_bc_S, bcs_S, fdm2_center, band_s00_poisson,      &
-     &    rj_fld, reftemp_r, refgrad_r, ref_local)
+      call const_diffusive_profile(sph_rj, r_2nd,                       &
+     &     sph_bc_S, bcs_S, fdm2_center, band_s00_poisson,              &
+     &    ref_field%d_fld(1,iref_scalar), ref_field%d_fld(1,iref_grad), &
+     &    ref_local)
       deallocate(ref_local)
 !
       end subroutine const_diffusive_profiles
@@ -156,10 +167,9 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine const_diffusive_profile(is_source, sph_rj, r_2nd,      &
-     &          sc_prop, sph_bc, bcs_S, fdm2_center,                    &
-     &          band_s00_poisson, rj_fld, reftemp_r, refgrad_r,         &
-     &          ref_local)
+      subroutine const_diffusive_profile(sph_rj, r_2nd,                 &
+     &          sph_bc, bcs_S, fdm2_center, band_s00_poisson,           &
+     &          reftemp_r, refgrad_r, ref_local)
 !
       use calypso_mpi
       use calypso_mpi_real
@@ -169,15 +179,12 @@
       use select_exp_scalar_CMB
 !      use cal_sol_reftemp_BiCGSTAB
 !
-      integer(kind = kint), intent(in) :: is_source
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(fdm_matrices), intent(in) :: r_2nd
-      type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc
       type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(band_matrix_type), intent(in) :: band_s00_poisson
-      type(phys_data), intent(in) :: rj_fld
 !
       real(kind=kreal), intent(inout) :: reftemp_r(0:sph_rj%nidx_rj(1))
       real(kind=kreal), intent(inout) :: refgrad_r(0:sph_rj%nidx_rj(1))
@@ -188,23 +195,6 @@
 !      integer :: k
 !
       if(sph_rj%idx_rj_degree_zero .gt. 0) then
-        if(is_source .gt. 0) then
-          call copy_degree0_comps_to_sol                                &
-     &      (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                      &
-     &       sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,          &
-     &       is_source, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld, &
-     &       ref_local(0,0))
-!$omp parallel workshare
-          ref_local(0:sph_rj%nidx_rj(1),0)                              &
-     &       = (sc_prop%coef_source / sc_prop%coef_diffuse)             &
-     &        * ref_local(0:sph_rj%nidx_rj(1),0)
-!$omp end parallel workshare
-          else
-!$omp parallel workshare
-            ref_local(0:sph_rj%nidx_rj(1),0) = 0.0d0
-!$omp end parallel workshare
-        end if
-!
         call set_ICB_scalar_boundary_1d                                 &
      &     (sph_rj, sph_bc, bcs_S%ICB_Sspec, ref_local(0,0))
         call set_CMB_scalar_boundary_1d                                 &
@@ -241,6 +231,7 @@
       reftemp_r(0:sph_rj%nidx_rj(1)) = 0.0d0
       refgrad_r(0:sph_rj%nidx_rj(1)) = 0.0d0
 !$omp end parallel workshare
+!
       num64 = sph_rj%nidx_rj(1) + 1
       call calypso_mpi_allreduce_real(ref_local(0,0), reftemp_r,        &
      &                                num64, MPI_SUM)
@@ -282,11 +273,10 @@
 !
       if(sph_rj%idx_rj_degree_zero .gt. 0) then
         if(is_source .gt. 0) then
-          call copy_degree0_comps_to_sol                                &
-     &      (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                      &
+          call copy_degree0_comps_to_sol(sph_rj%nidx_rj(2),             &
      &       sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,          &
-     &       is_source, rj_fld%n_point, rj_fld%ntot_phys, rj_fld%d_fld, &
-     &       reftemp_local(0,0))
+     &       rj_fld%n_point, rj_fld%d_fld(1,is_source),                 &
+     &       sph_rj%nidx_rj(1), reftemp_local(0,0))
 !$omp parallel workshare
           reftemp_local(0:sph_rj%nidx_rj(1),0)                          &
      &       = (sc_prop%coef_source / sc_prop%coef_diffuse)             &
@@ -337,4 +327,4 @@
 !
 ! -----------------------------------------------------------------------
 !
-      end module t_radial_references
+      end module const_radial_references

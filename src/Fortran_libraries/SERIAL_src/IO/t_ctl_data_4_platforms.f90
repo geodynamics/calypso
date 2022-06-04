@@ -34,6 +34,7 @@
 !!
 !!      coriolis_int_file_name      'sph_shell/rot_int.dat'
 !!      boundary_data_file_name     'bc_spec.dat'
+!!      radial_data_file_name       'radial_data.dat'
 !!
 !!      interpolate_sph_to_fem_ctl  'sph_shell/sph_to_fem'
 !!      interpolate_fem_to_sph_ctl  'sph_shell/fem_to_sph'
@@ -78,6 +79,8 @@
 !>                File name for hermonic integration for Coriolis term
 !>@n@param      boundary_data_file_name
 !>                File name for boundary conditions
+!>@n@param      radial_data_file_name
+!>                File name for reference radial data
 !>@n@param      interpolate_sph_to_fem_ctl 
 !>               File header for interpolation table
 !>               from spherical grid to FEM grid
@@ -129,6 +132,8 @@
         type(read_character_item) :: coriolis_int_file_name
 !>        Structure of boundary condition data file prefix
         type(read_character_item) :: bc_data_file_name_ctl
+!>        Structure of radial data file prefix
+        type(read_character_item) :: radial_data_file_name_ctl
 !
 !>        Structure of interpolation table file prefix
 !!        from spherical shell to FEM
@@ -192,6 +197,8 @@
      &       :: hd_coriolis_tri_int_name = 'coriolis_int_file_name'
       character(len=kchara), parameter, private                         &
      &       :: hd_bc_data_file_name =     'boundary_data_file_name'
+      character(len=kchara), parameter, private                         &
+     &       :: hd_radial_data_file_name = 'radial_data_file_name'
       character(len=kchara), parameter, private                         &
      &       :: hd_itp_sph_to_fem =        'interpolate_sph_to_fem_ctl'
       character(len=kchara), parameter, private                         &
@@ -266,6 +273,8 @@
      &      plt%coriolis_int_file_name)
         call read_chara_ctl_type(c_buf, hd_bc_data_file_name,           &
      &      plt%bc_data_file_name_ctl)
+        call read_chara_ctl_type(c_buf, hd_radial_data_file_name,       &
+     &      plt%radial_data_file_name_ctl)
 !
         call read_chara_ctl_type(c_buf, hd_itp_sph_to_fem,              &
      &      plt%interpolate_sph_to_fem_ctl)
@@ -328,6 +337,7 @@
       maxlen = max(maxlen, len_trim(hd_sph_files_header))
       maxlen = max(maxlen, len_trim(hd_coriolis_tri_int_name))
       maxlen = max(maxlen, len_trim(hd_bc_data_file_name))
+      maxlen = max(maxlen, len_trim(hd_radial_data_file_name))
       maxlen = max(maxlen, len_trim(hd_itp_sph_to_fem))
       maxlen = max(maxlen, len_trim(hd_mesh_file_fmt))
       maxlen = max(maxlen, len_trim(hd_rst_files_fmt))
@@ -372,6 +382,8 @@
      &    hd_coriolis_tri_int_name, plt%coriolis_int_file_name)
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_bc_data_file_name, plt%bc_data_file_name_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_radial_data_file_name, plt%radial_data_file_name_ctl)
 !
       call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_itp_sph_to_fem, plt%interpolate_sph_to_fem_ctl)
@@ -422,6 +434,7 @@
 !
       plt%coriolis_int_file_name%iflag =     0
       plt%bc_data_file_name_ctl%iflag =      0
+      plt%radial_data_file_name_ctl%iflag =  0
       plt%interpolate_sph_to_fem_ctl%iflag = 0
       plt%interpolate_fem_to_sph_ctl%iflag = 0
 !
@@ -467,6 +480,8 @@
      &                     new_plt%coriolis_int_file_name)
       call copy_chara_ctl(org_plt%bc_data_file_name_ctl,                &
      &                    new_plt%bc_data_file_name_ctl)
+      call copy_chara_ctl(org_plt%radial_data_file_name_ctl,            &
+     &                    new_plt%radial_data_file_name_ctl)
 !
       call copy_chara_ctl(org_plt%rayleigh_spectr_dir,                  &
      &                    new_plt%rayleigh_spectr_dir)

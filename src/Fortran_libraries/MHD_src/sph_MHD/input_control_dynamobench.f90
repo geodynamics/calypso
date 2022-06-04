@@ -8,9 +8,11 @@
 !!
 !!@verbatim
 !!      subroutine input_control_SPH_dynamobench                        &
-!!     &          (MHD_files, bc_IO, DMHD_ctl, SPH_MHD, nod_fld,        &
-!!     &           MHD_step, MHD_prop, MHD_BC,  SPH_WK, cdat, bench)
+!!     &          (MHD_files, bc_IO, refs, DMHD_ctl, SPH_MHD, nod_fld,  &
+!!     &           MHD_step, MHD_prop, MHD_BC, SPH_WK, cdat, bench)
 !!        type(MHD_file_IO_params), intent(inout) :: MHD_files
+!!        type(boundary_spectra), intent(inout) :: bc_IO
+!!        type(radial_reference_field), intent(inout) :: refs
 !!        type(sph_sgs_mhd_control), intent(inout) :: MHD_ctl
 !!        type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
 !!        type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
@@ -48,6 +50,7 @@
       use t_flex_delta_t_data
       use t_field_4_dynamobench
       use t_work_SPH_MHD
+      use t_radial_reference_field
 !
       implicit none
 !
@@ -60,8 +63,8 @@
 ! ----------------------------------------------------------------------
 !
       subroutine input_control_SPH_dynamobench                          &
-     &          (MHD_files, bc_IO, DMHD_ctl, SPH_MHD, nod_fld,          &
-     &           MHD_step, MHD_prop, MHD_BC,  SPH_WK, cdat, bench)
+     &          (MHD_files, bc_IO, refs, DMHD_ctl, SPH_MHD, nod_fld,    &
+     &           MHD_step, MHD_prop, MHD_BC, SPH_WK, cdat, bench)
 !
       use t_ctl_data_MHD
       use t_field_on_circle
@@ -71,6 +74,7 @@
 !
       type(MHD_file_IO_params), intent(inout) :: MHD_files
       type(boundary_spectra), intent(inout) :: bc_IO
+      type(radial_reference_field), intent(inout) :: refs
       type(DNS_mhd_simulation_control), intent(inout) :: DMHD_ctl
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
 !
@@ -87,7 +91,7 @@
       call set_control_4_SPH_MHD                                        &
      &   (DMHD_ctl%plt, DMHD_ctl%org_plt, DMHD_ctl%model_ctl,           &
      &    DMHD_ctl%smctl_ctl, DMHD_ctl%nmtr_ctl, DMHD_ctl%psph_ctl,     &
-     &    MHD_files, bc_IO, MHD_step, MHD_prop, MHD_BC,                 &
+     &    MHD_files, bc_IO, refs, MHD_step, MHD_prop, MHD_BC,           &
      &    SPH_WK%trans_p, SPH_WK%trns_WK, SPH_MHD)
 !
       call set_control_SPH_MHD_w_viz(DMHD_ctl%model_ctl,                &

@@ -131,7 +131,7 @@
 !  set original spectr mesh data for extension of B
 !
       call init_radial_sph_interpolation(MHD_files%org_rj_file_IO,      &
-     &    SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj)
+     &    SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj, SPH_WK%rj_itp)
 !
       if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr_4_mhd'
       call init_rms_4_sph_spectr_4_mhd                                  &
@@ -173,7 +173,7 @@
       call read_alloc_sph_rst_4_snap(i_step,                            &
      &    MHD_files%org_rj_file_IO, MHD_files%fst_file_IO,              &
      &    MHD_step1%rst_step, SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld,   &
-     &    MHD_step1%init_d)
+     &    MHD_step1%init_d, SPH_WK%rj_itp)
       call copy_time_data(MHD_step1%init_d, MHD_step1%time_d)
 !
       if (iflag_debug.eq.1) write(*,*)' sync_temp_by_per_temp_sph'

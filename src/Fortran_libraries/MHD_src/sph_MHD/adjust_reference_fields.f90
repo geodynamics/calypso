@@ -12,7 +12,7 @@
 !!      subroutine sync_temp_by_per_temp_sph                            &
 !!     &         (MHD_prop, refs, sph, ipol, rj_fld)
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
-!!        type(reference_field), intent(in) :: refs
+!!        type(radial_reference_field), intent(in) :: refs
 !!        d_rj(inod,ipol%base%i_temp):        T => \Theta = T - T0
 !!        d_rj(inod,ipol%base%i_per_temp):    \Theta = T - T0
 !!        d_rj(inod,ipol%grad_fld%i_grad_temp):      T => d \Theta / dr
@@ -45,7 +45,7 @@
       use t_phys_data
       use t_reference_scalar_param
       use t_control_parameter
-      use t_radial_reference_temp
+      use t_radial_reference_field
 !
       implicit  none
 !
@@ -81,7 +81,7 @@
      &         (MHD_prop, refs, sph, ipol, rj_fld)
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(reference_field), intent(in) :: refs
+      type(radial_reference_field), intent(in) :: refs
       type(sph_grids), intent(in) ::  sph
       type(phys_address), intent(in) :: ipol
 !
@@ -110,7 +110,7 @@
       use set_reference_sph_mhd
 !
       type(MHD_evolution_param), intent(in) :: MHD_prop
-      type(reference_field), intent(in) :: refs
+      type(radial_reference_field), intent(in) :: refs
       type(sph_grids), intent(in) ::  sph
       type(phys_address), intent(in) :: ipol
 !

@@ -110,7 +110,7 @@ pole_sph_transform.o: $(SPH_COMMDIR)/pole_sph_transform.f90 m_precision.o m_mach
 	$(F90) -c $(F90OPTFLAGS) $<
 products_at_poles.o: $(SPH_COMMDIR)/products_at_poles.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
-r_interpolate_sph_data.o: $(SPH_COMMDIR)/r_interpolate_sph_data.f90 m_precision.o calypso_mpi.o m_constants.o m_machine_parameter.o t_spheric_rj_data.o t_phys_address.o t_phys_data.o t_group_data.o m_base_field_labels.o t_file_IO_parameter.o t_spheric_data_IO.o sph_file_MPI_IO_select.o check_sph_file_access.o radial_interpolation.o m_explicit_term_labels.o t_field_data_IO.o extend_potential_field.o m_error_IDs.o t_node_id_spherical_IO.o
+r_interpolate_sph_data.o: $(SPH_COMMDIR)/r_interpolate_sph_data.f90 m_precision.o calypso_mpi.o m_constants.o m_machine_parameter.o t_spheric_rj_data.o t_phys_address.o t_phys_data.o t_sph_radial_interpolate.o t_group_data.o m_base_field_labels.o t_file_IO_parameter.o t_spheric_data_IO.o sph_file_MPI_IO_select.o check_sph_file_access.o radial_interpolation.o m_explicit_term_labels.o t_field_data_IO.o extend_potential_field.o m_error_IDs.o t_node_id_spherical_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 radial_interpolation.o: $(SPH_COMMDIR)/radial_interpolation.f90 m_precision.o m_constants.o m_machine_parameter.o t_field_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -223,6 +223,8 @@ t_sph_field_FFTW.o: $(SPH_COMMDIR)/t_sph_field_FFTW.F90 m_precision.o m_constant
 t_sph_matrices.o: $(SPH_COMMDIR)/t_sph_matrices.f90 m_precision.o m_machine_parameter.o t_spheric_rj_data.o ludcmp_357band_mul.o lubksb_357band_mul.o check_sph_radial_mat.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_sph_matrix.o: $(SPH_COMMDIR)/t_sph_matrix.f90 m_precision.o m_machine_parameter.o t_spheric_rj_data.o m_ludcmp_3band.o m_ludcmp_band.o lubksb_357band.o check_sph_radial_mat.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_radial_interpolate.o: $(SPH_COMMDIR)/t_sph_radial_interpolate.f90 m_precision.o m_constants.o calypso_mpi_real.o calypso_mpi_int.o calypso_mpi_logical.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_sph_single_FFTPACK5.o: $(SPH_COMMDIR)/t_sph_single_FFTPACK5.f90 m_precision.o m_constants.o m_machine_parameter.o m_elapsed_labels_SPH_TRNS.o calypso_mpi.o t_spheric_rtp_data.o t_sph_trans_comm_tbl.o copy_single_FFT_and_rtp.o
 	$(F90) -c $(F90OPTFLAGS) $<
