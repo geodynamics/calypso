@@ -35,6 +35,7 @@
       use t_grad_field_labels
       use t_file_IO_parameter
       use t_sph_radial_interpolate
+      use t_field_data_IO
 !
       implicit  none
 !
@@ -59,6 +60,8 @@
         type(field_IO_params) :: ref_input_IO
 !>        file name to write radial reference data
         type(field_IO_params) :: ref_output_IO
+!>        file name to write radial reference data
+        type(field_IO) :: ref_fld_IO
 !
 !>        Interpolation table from radial data input 
         type(sph_radial_interpolate) :: r_itp
@@ -126,15 +129,13 @@
 !
       use calypso_mpi
       use t_time_data
-      use t_field_data_IO
       use field_file_IO
 !
       use copy_rj_phys_data_4_IO
       use set_sph_extensions
 !
-      type(radial_reference_field), intent(in) :: refs
+      type(radial_reference_field), intent(inout) :: refs
 !
-      type(field_IO) :: sph_out_IO
       type(time_data) :: time_IO
 !
 !
@@ -144,17 +145,18 @@
       time_IO%time = zero
       time_IO%dt = zero
 !
+!
       call copy_rj_phys_name_to_IO                                      &
-     &   (refs%ref_field%num_phys_viz, refs%ref_field, sph_out_IO)
-      call alloc_phys_data_IO(sph_out_IO)
+     &   (refs%ref_field%num_phys_viz, refs%ref_field, refs%ref_fld_IO)
+      call alloc_phys_data_IO(refs%ref_fld_IO)
       call copy_rj_phys_data_to_IO                                      &
-     &   (refs%ref_field%num_phys_viz, refs%ref_field, sph_out_IO)
+     &   (refs%ref_field%num_phys_viz, refs%ref_field, refs%ref_fld_IO)
 !
       call write_step_field_file(refs%ref_output_IO%file_prefix,        &
-     &                           my_rank, time_IO, sph_out_IO)
+     &                           my_rank, time_IO, refs%ref_fld_IO)
 !
-      call dealloc_phys_data_IO(sph_out_IO)
-      call dealloc_phys_name_IO(sph_out_IO)
+      call dealloc_phys_data_IO(refs%ref_fld_IO)
+      call dealloc_phys_name_IO(refs%ref_fld_IO)
 !
       end subroutine output_reference_field
 !
@@ -167,7 +169,6 @@
       use calypso_mpi_int
       use calypso_mpi_real
       use t_time_data
-      use t_field_data_IO
       use t_file_IO_parameter
       use field_file_IO
       use interpolate_reference_data
@@ -179,7 +180,6 @@
       type(radial_reference_field), intent(inout) :: refs
 !
       type(time_data) :: time_IO
-      type(field_IO) :: ref_fld_IO
       integer(kind = kint_gl) :: num64
 !
 !
@@ -187,13 +187,14 @@
       if(refs%ref_input_IO%iflag_IO .eq. 0) return
       if(my_rank .eq. 0) then
         call read_and_alloc_step_field(refs%ref_input_IO%file_prefix,   &
-     &                                  my_rank, time_IO, ref_fld_IO)
+     &      my_rank, time_IO, refs%ref_fld_IO)
 !
         call interpolate_reference_data_IO(radius_name,                 &
-     &      refs%iref_radius, ref_fld_IO, refs%ref_field, refs%r_itp)
+     &      refs%iref_radius, refs%ref_fld_IO,                          &
+     &      refs%ref_field, refs%r_itp)
 !
-        call dealloc_phys_data_IO(ref_fld_IO)
-        call dealloc_phys_name_IO(ref_fld_IO)
+        call dealloc_phys_data_IO(refs%ref_fld_IO)
+        call dealloc_phys_name_IO(refs%ref_fld_IO)
       end if
 !
       num64 = refs%ref_field%ntot_phys

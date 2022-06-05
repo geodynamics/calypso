@@ -70,7 +70,6 @@
       subroutine init_r_infos_sph_mhd_evo(bc_IO, sph_grps, MHD_BC,      &
      &          ipol, sph, r_2nd, omega_sph, MHD_prop, sph_MHD_bc)
 !
-      use calypso_mpi
       use second_fdm_node_coefs
       use material_property
 !
@@ -196,6 +195,7 @@
 !
       call set_default_reference_file_name(refs)
       call output_reference_field(refs)
+      call calypso_mpi_barrier
 !
       end subroutine init_reference_scalars
 !

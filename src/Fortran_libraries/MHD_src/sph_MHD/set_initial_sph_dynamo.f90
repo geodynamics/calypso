@@ -76,20 +76,19 @@
 !
 !
       if (iflag_restart .ne. i_rst_by_file) return
-!
         if(iflag_debug .gt. 0) write(*,*) 'read_alloc_sph_restart_data'
         call read_alloc_sph_restart_data                                &
      &     (MHD_files%fst_file_IO, MHD_step%init_d, rj_fld,             &
      &      MHD_step%rst_step)
 !
-      call extend_by_potential_with_j                                   &
-     &   (sph%sph_rj, SPH_model%sph_MHD_bc%sph_bc_B,                    &
-     &    ipol%base%i_magne, ipol%base%i_current, rj_fld)
+        call extend_by_potential_with_j                                 &
+     &     (sph%sph_rj, SPH_model%sph_MHD_bc%sph_bc_B,                  &
+     &      ipol%base%i_magne, ipol%base%i_current, rj_fld)
 !
-!
-      if(iflag_debug .gt. 0) write(*,*) 'copy_time_step_data'
-      call copy_time_step_data(MHD_step%init_d, MHD_step%time_d)
-      call set_sph_restart_num_to_IO(rj_fld, sph_fst_IO)
+        if(iflag_debug .gt. 0) write(*,*) 'copy_time_step_data'
+        call copy_time_step_data(MHD_step%init_d, MHD_step%time_d)
+        call set_sph_restart_num_to_IO(rj_fld, sph_fst_IO)
+        call calypso_mpi_barrier
 !
       end subroutine read_sph_initial_data_control
 !
@@ -149,7 +148,6 @@
      &   (sph%sph_rj, SPH_model%sph_MHD_bc%sph_bc_B,                    &
      &    ipol%base%i_magne, ipol%base%i_current, rj_fld)
 !
-!
       if(iflag_debug .gt. 0) write(*,*) 'copy_time_step_data'
       call copy_time_step_data(MHD_step%init_d, MHD_step%time_d)
       call set_sph_restart_num_to_IO(rj_fld, sph_fst_IO)
@@ -161,6 +159,7 @@
      &      MHD_files%fst_file_IO, MHD_step%time_d, rj_fld,             &
      &      MHD_step%rst_step, sph_fst_IO)
       end if
+      call calypso_mpi_barrier
 !
       end subroutine sph_initial_data_control
 !
