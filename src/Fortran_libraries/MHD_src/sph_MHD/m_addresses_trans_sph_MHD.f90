@@ -138,10 +138,10 @@
         nvector_rtp_2_rj = nvector_rtp_2_rj + 1
         f_trns%i_m_advect = 3*nvector_rtp_2_rj - 2
 !   Coriolis flag
-        if(iflag_4_coriolis .gt. id_turn_OFF) then
-          nvector_rtp_2_rj = nvector_rtp_2_rj + 1
-          f_trns%i_coriolis = 3*nvector_rtp_2_rj - 2
-        end if
+!        if(iflag_4_coriolis .gt. id_turn_OFF) then
+!          nvector_rtp_2_rj = nvector_rtp_2_rj + 1
+!          f_trns%i_coriolis = 3*nvector_rtp_2_rj - 2
+!        end if
         if(iflag_4_coriolis .gt. id_turn_OFF) then
           nvector_rtp_2_rj =      nvector_rtp_2_rj + 1
           f_trns%i_rot_Coriolis = 3*nvector_rtp_2_rj - 2
@@ -226,9 +226,9 @@
       if(f_trns%i_m_advect .gt. 0) write(*,*) 'f_trns%i_m_advect ',     &
      &        f_trns%i_m_advect, ipol%i_m_advect,                       &
      &        itor%i_m_advect, idpdr%i_m_advect
-      if(f_trns%i_coriolis .gt. 0) write(*,*) 'f_trns%i_coriolis  ',    &
-     &        f_trns%i_coriolis, ipol%i_coriolis,                       &
-     &        itor%i_coriolis, idpdr%i_coriolis
+!      if(f_trns%i_coriolis .gt. 0) write(*,*) 'f_trns%i_coriolis  ',   &
+!     &        f_trns%i_coriolis, ipol%i_coriolis,                      &
+!     &        itor%i_coriolis, idpdr%i_coriolis
       if(f_trns%i_rot_Coriolis .gt. 0) write(*,*)                       &
      &       'f_trns%i_rot_Coriolis  ', f_trns%i_rot_Coriolis,          &
      &        ipol%i_rot_Coriolis, itor%i_rot_Coriolis,                 &
