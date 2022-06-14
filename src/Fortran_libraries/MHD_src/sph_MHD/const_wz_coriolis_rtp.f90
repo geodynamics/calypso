@@ -11,6 +11,8 @@
 !!      subroutine dealloc_sphere_ave_coriolis
 !!
 !!      subroutine set_colatitude_rtp
+!!      subroutine cal_wz_coriolis_pole                                 &
+!!     &         (nnod_pole, coef_cor, velo_pole, coriolis_pole)
 !!      subroutine cal_wz_coriolis_rtp(nnod, velo_rtp, coriolis_rtp)
 !!      subroutine cal_wz_div_coriolis_rtp(nnod, velo_rtp,              &
 !!     &          div_coriolis_rtp)
@@ -95,6 +97,41 @@
       end do
 !
       end subroutine set_colatitude_rtp
+!
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine cal_wz_coriolis_pole                                   &
+     &         (nnod_pole, velo_pole, coriolis_pole)
+!
+      use m_sph_phys_address
+      use m_physical_property
+!
+      integer(kind = kint), intent(in) :: nnod_pole
+      real(kind = kreal), intent(in) :: velo_pole(nnod_pole,3)
+!
+      real(kind = kreal), intent(inout) :: coriolis_pole(nnod_pole,3)
+!
+      integer(kind = kint) :: inod
+      real(kind = kreal), parameter :: omega(3) = (/zero, zero, one/)
+!
+!
+!$omp parallel do private(inod)
+      do inod = 1, nnod_pole
+            coriolis_pole(inod,1) = - coef_cor                          &
+!     &                         * ( omega(2)*velo_pole(inod,3)          &
+     &                         * ( -omega(3)*velo_pole(inod,2) )
+            coriolis_pole(inod,2) = - coef_cor                          &
+     &                         * ( omega(3)*velo_pole(inod,1) )
+!     &                           - omega(1)*velo_pole(inod,3) )
+            coriolis_pole(inod,3) = zero
+!            coriolis_pole(inod,3) = - coef_cor                         &
+!     &                         * ( omega(1)*velo_pole(inod,2)          &
+!     &                           - omega(2)*velo_pole(inod,1) )
+      end do
+!$omp end parallel do
+!
+      end subroutine cal_wz_coriolis_pole
 !
 ! -----------------------------------------------------------------------
 !
