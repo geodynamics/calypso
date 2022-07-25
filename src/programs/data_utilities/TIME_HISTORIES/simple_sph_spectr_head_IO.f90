@@ -7,30 +7,35 @@
 !> @brief Header output for spectrum data
 !!
 !!@verbatim
-!!      subroutine input_sph_pwr_vol_head(id_file, sph_IN)
-!!      subroutine input_sph_spectr_vol_head(id_file, sph_IN)
-!!      subroutine input_sph_pwr_layer_head(id_file, sph_IN)
-!!      subroutine input_sph_spectr_layer_head(id_file, sph_IN)
+!!      subroutine read_sph_pwr_vol_head(id_file, sph_IN)
+!!      subroutine read_sph_pwr_layer_head(id_file, sph_IN)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        type(read_sph_spectr_data), intent(inout) :: sph_IN
+!!      subroutine read_sph_spectr_name                                 &
+!!     &         (id_file, nfield_sph_spec, num_labels,                 &
+!!     &          ncomp_sph_spec, ene_sph_spec_name)
 !!
-!!      subroutine input_sph_pwr_vol_head_old(id_file, sph_IN)
-!!      subroutine input_sph_spectr_vol_head_old(id_file, sph_IN)
-!!      subroutine input_sph_pwr_layer_head_old(id_file, sph_IN)
-!!      subroutine input_sph_spectr_layer_head_old(id_file, sph_IN)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        integer(kind = kint), intent(in) :: nfield_sph_spec, num_labels
+!!        integer(kind = kint), intent(inout)                           &
+!!     &                     :: ncomp_sph_spec(nfield_sph_spec)
+!!        character(len = kchara), intent(inout)                        &
+!!     &                     :: ene_sph_spec_name(num_labels)
 !!
 !!      subroutine write_sph_pwr_vol_head(id_file, sph_IN)
 !!      subroutine write_sph_pwr_layer_head(id_file, sph_IN)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        type(read_sph_spectr_data), intent(in) :: sph_IN
 !!@endverbatim
 !
       module simple_sph_spectr_head_IO
 !
       use m_precision
       use m_constants
+      use m_machine_parameter
       use t_read_sph_spectra
 !
       implicit none
-!
-      private :: read_sph_pwr_vol_head, read_sph_pwr_layer_head
-      private :: read_sph_spectr_name
 !
 !   --------------------------------------------------------------------
 !
@@ -146,172 +151,23 @@
       end subroutine write_sph_pwr_layer_head
 !
 !   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
 !
-      subroutine read_sph_spectr_name(id_file, sph_IN)
+      subroutine read_sph_spectr_name                                   &
+     &         (id_file, nfield_sph_spec, num_labels,                   &
+     &          ncomp_sph_spec, ene_sph_spec_name)
 !
       integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
-      integer(kind = kint) :: i
+      integer(kind = kint), intent(in) :: nfield_sph_spec, num_labels
 !
+      integer(kind = kint), intent(inout)                               &
+     &                     :: ncomp_sph_spec(nfield_sph_spec)
+      character(len = kchara), intent(inout)                            &
+     &                     :: ene_sph_spec_name(num_labels)
 !
-      read(id_file,*) sph_IN%ncomp_sph_spec(1:sph_IN%nfield_sph_spec)
-      read(id_file,*)  sph_IN%ene_sph_spec_name(1:sph_IN%num_labels)
-      do i = 1, sph_IN%num_labels
-        write(*,*) i, trim(sph_IN%ene_sph_spec_name(i))
-      end  do
-!
+      read(id_file,*) ncomp_sph_spec(1:nfield_sph_spec)
+      read(id_file,*) ene_sph_spec_name(1:num_labels)
+
       end subroutine read_sph_spectr_name
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine input_sph_pwr_vol_head(id_file, sph_IN)
-!
-      integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
-!
-!
-      call read_sph_pwr_vol_head(id_file, sph_IN)
-!
-      sph_IN%nri_sph = 1
-      sph_IN%num_time_labels = 2
-      call alloc_sph_espec_name(sph_IN)
-      call read_sph_spectr_name(id_file, sph_IN)
-!
-      call alloc_sph_spectr_data(izero, sph_IN)
-!
-      end subroutine input_sph_pwr_vol_head
-!
-!   --------------------------------------------------------------------
-!
-      subroutine input_sph_spectr_vol_head(id_file, sph_IN)
-!
-      integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
-!
-!
-      call read_sph_pwr_vol_head(id_file, sph_IN)
-!
-      sph_IN%nri_sph = 1
-      sph_IN%num_time_labels = 3
-      call alloc_sph_espec_name(sph_IN)
-      call read_sph_spectr_name(id_file, sph_IN)
-!
-      call alloc_sph_spectr_data(sph_IN%ltr_sph, sph_IN)
-!
-      end subroutine input_sph_spectr_vol_head
-!
-!   --------------------------------------------------------------------
-!
-      subroutine input_sph_pwr_layer_head(id_file, sph_IN)
-!
-      integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
-!
-!
-      call read_sph_pwr_layer_head(id_file, sph_IN)
-!
-      sph_IN%num_time_labels = 4
-      call alloc_sph_espec_name(sph_IN)
-      call read_sph_spectr_name(id_file, sph_IN)
-!
-      call alloc_sph_spectr_data(izero, sph_IN)
-!
-      end subroutine input_sph_pwr_layer_head
-!
-!   --------------------------------------------------------------------
-!
-      subroutine input_sph_spectr_layer_head(id_file, sph_IN)
-!
-      integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
-!
-!
-      call read_sph_pwr_layer_head(id_file, sph_IN)
-!
-      sph_IN%num_time_labels = 5
-      call alloc_sph_espec_name(sph_IN)
-      call read_sph_spectr_name(id_file, sph_IN)
-!
-      call alloc_sph_spectr_data(sph_IN%ltr_sph, sph_IN)
-!
-      end subroutine input_sph_spectr_layer_head
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine input_sph_pwr_vol_head_old(id_file, sph_IN)
-!
-      integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
-!
-!
-      call read_sph_pwr_layer_head(id_file, sph_IN)
-!
-      sph_IN%nri_sph = 1
-      sph_IN%num_time_labels = 2
-      call alloc_sph_espec_name(sph_IN)
-      call read_sph_spectr_name(id_file, sph_IN)
-!
-      call alloc_sph_spectr_data(izero, sph_IN)
-!
-      end subroutine input_sph_pwr_vol_head_old
-!
-!   --------------------------------------------------------------------
-!
-      subroutine input_sph_spectr_vol_head_old(id_file, sph_IN)
-!
-      integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
-!
-!
-      call read_sph_pwr_layer_head(id_file, sph_IN)
-!
-      sph_IN%nri_sph = 1
-      sph_IN%num_time_labels = 3
-      call alloc_sph_espec_name(sph_IN)
-      call read_sph_spectr_name(id_file, sph_IN)
-!
-      call alloc_sph_spectr_data(sph_IN%ltr_sph, sph_IN)
-!
-      end subroutine input_sph_spectr_vol_head_old
-!
-!   --------------------------------------------------------------------
-!
-      subroutine input_sph_pwr_layer_head_old(id_file, sph_IN)
-!
-      integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
-!
-!
-      call read_sph_pwr_layer_head(id_file, sph_IN)
-!
-      sph_IN%num_time_labels = 3
-      call alloc_sph_espec_name(sph_IN)
-      call read_sph_spectr_name(id_file, sph_IN)
-!
-      call alloc_sph_spectr_data(izero, sph_IN)
-!
-      end subroutine input_sph_pwr_layer_head_old
-!
-!   --------------------------------------------------------------------
-!
-      subroutine input_sph_spectr_layer_head_old(id_file, sph_IN)
-!
-      integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
-!
-!
-      call read_sph_pwr_layer_head(id_file, sph_IN)
-!
-      sph_IN%num_time_labels = 4
-      call alloc_sph_espec_name(sph_IN)
-      call read_sph_spectr_name(id_file, sph_IN)
-!
-      call alloc_sph_spectr_data(sph_IN%ltr_sph, sph_IN)
-!
-      end subroutine input_sph_spectr_layer_head_old
 !
 !   --------------------------------------------------------------------
 !

@@ -23,13 +23,19 @@ simple_sph_spectr_data_IO.o \
 cal_tave_sph_ene_spectr.o
 
 MOD_T_AVE_PICK_SPH = \
-t_picked_sph_spectr_data_IO.o \
 t_ctl_data_tave_sph_monitor.o \
+t_ctl_param_sph_series_util.o \
+t_picked_sph_spectr_data_IO.o \
+count_monitor_time_series.o \
+picked_sph_spectr_data_IO.o \
+time_ave_picked_sph_spectr.o \
 tave_picked_sph_spec_data.o
 
 MOD_T_AVE_NUSSELT = \
-t_ctl_data_tave_sph_monitor.o \
-t_average_nusselt.o
+t_average_nusselt.o \
+time_average_nusselt.o \
+count_monitor_time_series.o \
+t_ctl_data_tave_sph_monitor.o
 
 MOD_SPH_ENE_CHECK = \
 compare_sph_mean_square.o

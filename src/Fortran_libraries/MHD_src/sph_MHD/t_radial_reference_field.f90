@@ -16,8 +16,7 @@
 !!      subroutine set_default_reference_file_name(refs)
 !!      subroutine output_reference_field(refs)
 !!        type(radial_reference_field), intent(in) :: refs
-!!      subroutine read_alloc_sph_reference_data(sph_rj, ipol,          &
-!!     &                                         rj_fld, refs)
+!!      subroutine load_sph_reference_data(sph_rj, ipol, rj_fld, refs)
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(phys_address), intent(in) :: ipol
 !!        type(phys_data), intent(inout) :: rj_fld
@@ -162,8 +161,7 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_alloc_sph_reference_data(sph_rj, ipol,            &
-     &                                         rj_fld, refs)
+      subroutine load_sph_reference_data(sph_rj, ipol, rj_fld, refs)
 !
       use calypso_mpi
       use calypso_mpi_int
@@ -205,7 +203,7 @@
       call overwrite_sources_by_reference                               &
      &   (sph_rj, refs%iref_base, ipol%base, refs%ref_field, rj_fld)
 !
-      end subroutine read_alloc_sph_reference_data
+      end subroutine load_sph_reference_data
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

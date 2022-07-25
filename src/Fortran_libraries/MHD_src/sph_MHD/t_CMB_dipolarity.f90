@@ -51,7 +51,8 @@
 !>        Integer flag for dipolarity
         integer(kind = kint) :: iflag_dipolarity = 0
 !>        File prefix for dipolarity data
-        character(len = kchara) :: dipolarity_prefix= 'dipolarity'
+        character(len = kchara)                                         &
+     &                 :: dipolarity_file_name = 'dipolarity.dat'
 !
 !>        Radial address for dipolarity
         integer(kind = kint) :: krms_CMB
@@ -79,6 +80,7 @@
       use t_phys_data
       use t_control_array_character
       use t_control_array_integer
+      use set_parallel_file_name
 !
       type(read_character_item), intent(in) :: fdip_file_prefix
       type(read_integer_item), intent(in) :: fdip_truncation
@@ -98,7 +100,8 @@
 !
       if(fdip_file_prefix%iflag .gt. 0) then
         dip%iflag_dipolarity = 1
-        dip%dipolarity_prefix = fdip_file_prefix%charavalue
+        dip%dipolarity_file_name                                        &
+     &              = add_dat_extension(fdip_file_prefix%charavalue)
       else
         dip%iflag_dipolarity = 0
       end if
@@ -185,7 +188,6 @@
 !
       subroutine open_dipolarity_file(dip, radius_CMB)
 !
-      use set_parallel_file_name
       use write_field_labels
 !
       type(dipolarity_data), intent(in) :: dip
@@ -193,8 +195,7 @@
       character(len = kchara) :: file_name
 !
 !
-      file_name = add_dat_extension(dip%dipolarity_prefix)
-      open(id_dipolarity, file = file_name,                             &
+      open(id_dipolarity, file = dip%dipolarity_file_name,              &
      &    form='formatted', status='old', position='append', err = 99)
       return
 !

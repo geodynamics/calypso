@@ -159,6 +159,7 @@
      &          refs, rj_fld, MHD_prop, sph_MHD_bc)
 !
       use sph_mhd_rst_IO_control
+      use reference_sources_from_d_rj
 !
       type(phys_address), intent(in) :: ipol
       type(sph_grids), intent(in) :: sph
@@ -172,8 +173,8 @@
       character(len=kchara) :: mat_name
 !
       call init_reft_rj_data(sph%sph_rj, ipol, refs)
-      call read_alloc_sph_reference_data(sph%sph_rj, ipol,              &
-     &                                   rj_fld, refs)
+      call cal_ref_sources_from_d_rj(sph, ipol, rj_fld, refs)
+      call load_sph_reference_data(sph%sph_rj, ipol, rj_fld, refs)
 !
       write(mat_name,'(a)') 'reference_Temperature'
       call init_reference_scalar                                        &

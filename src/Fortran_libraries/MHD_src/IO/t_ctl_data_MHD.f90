@@ -72,33 +72,31 @@
 !
 !   2nd level for MHD
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                    :: hd_platform = 'data_files_def'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                    :: hd_org_data = 'org_data_files_def'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                    :: hd_new_data = 'new_data_files_def'
-      character(len=kchara), parameter                                  &
-     &      :: hd_sph_shell = 'spherical_shell_ctl'
-      character(len=kchara), parameter :: hd_model =   'model'
-      character(len=kchara), parameter :: hd_control = 'control'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
+     &                    :: hd_sph_shell = 'spherical_shell_ctl'
+      character(len=kchara), parameter, private                         &
+     &                    :: hd_model =   'model'
+      character(len=kchara), parameter, private                         &
+     &                    :: hd_control = 'control'
+      character(len=kchara), parameter, private                         &
      &                     :: hd_pick_sph = 'sph_monitor_ctl'
-      character(len=kchara), parameter                                  &
-     &      :: hd_monitor_data = 'monitor_data_ctl'
+      character(len=kchara), parameter, private                         &
+     &                    :: hd_monitor_data = 'monitor_data_ctl'
 !
-      character(len=kchara), parameter :: hd_viz_ctl = 'visual_control'
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
+     &                    :: hd_viz_ctl = 'visual_control'
+      character(len=kchara), parameter, private                         &
      &                    :: hd_dynamo_viz_ctl = 'dynamo_vizs_control'
 !
 !>      Here is the old label
       character(len=kchara), parameter                                  &
      &                    :: hd_zm_viz_ctl = 'zonal_mean_control'
-!
-      private :: hd_platform, hd_org_data, hd_new_data
-      private :: hd_sph_shell, hd_model, hd_control
-      private :: hd_pick_sph, hd_monitor_data
-      private :: hd_viz_ctl, hd_dynamo_viz_ctl, hd_zm_viz_ctl
 !
 ! ----------------------------------------------------------------------
 !

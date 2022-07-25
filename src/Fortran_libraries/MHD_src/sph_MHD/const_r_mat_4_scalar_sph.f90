@@ -23,8 +23,8 @@
 !!     &         (mat_name, diffusie_reduction_ICB, sph_params, sph_rj, &
 !!     &          r_2nd, sph_bc, fdm2_center, band_s00_poisson)
 !!      subroutine const_r_mat00_poisson_fixS                           &
-!!     &         (mat_name, sph_params, sph_rj, r_2nd, sph_bc,          &
-!!     &          diffusie_reduction_ICB, fdm2_center, band_s00_poisson)
+!!     &         (mat_name, diffusie_reduction_ICB, sph_params, sph_rj, &
+!!     &          r_2nd, sph_bc, fdm2_center, band_s00_poisson)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd

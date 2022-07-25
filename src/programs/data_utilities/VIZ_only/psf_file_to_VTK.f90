@@ -13,6 +13,7 @@
 !
       integer(kind = kint) :: istep, istart, iend, increment
       integer(kind = kint) :: ifmt_input = iflag_vtk
+      integer :: np_ucd
       type(field_IO_params) :: ucd_param
       type(time_data), save :: t_IO
       type(ucd_data), save :: ucd
@@ -35,7 +36,8 @@
 !
       do istep = istart, iend, increment
         ucd_param%iflag_format = ifmt_input
-        call sel_read_alloc_ucd_file(-1, istep, ucd_param, t_IO, ucd)
+        call sel_read_alloc_ucd_file(-1, np_ucd, istep,                 &
+     &                               ucd_param, t_IO, ucd)
 !
         ucd_param%iflag_format = iflag_vtk
         call sel_write_ucd_file(-1, istep, ucd_param, t_IO, ucd)

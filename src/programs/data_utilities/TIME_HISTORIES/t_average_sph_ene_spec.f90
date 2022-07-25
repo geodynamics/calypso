@@ -50,7 +50,6 @@
       use m_constants
 !
       use m_tave_sph_ene_spectr
-      use t_read_sph_spectra
       use t_ctl_data_tave_sph_monitor
       use t_ctl_param_sph_series_util
       use set_parallel_file_name
@@ -59,55 +58,40 @@
 !
       type(tave_sph_monitor_ctl), save :: tave_sph_ctl1
       type(sph_spectr_file_param), save :: spec_evo_p1
-      type(read_sph_spectr_data), save :: sph_IN_t
-!
-      character(len = kchara) :: fname_org_rms
 !
       integer :: i
 !
       call read_control_file_sph_monitor(0, tave_sph_ctl1)
-      call set_spec_series_file_param(tave_sph_ctl1, spec_evo_p1)
+      call set_spec_series_file_and_time(tave_sph_ctl1, spec_evo_p1)
       call dealloc_ctl_tave_sph_monitor(tave_sph_ctl1)
 !
-      do i = 1, spec_evo_p1%nfile_vol_series_file
-        write(*,*) i, trim(spec_evo_p1%vol_series_prefix(i))
-        fname_org_rms                                                   &
-     &      = add_dat_extension(spec_evo_p1%vol_series_prefix(i))
-        call sph_spectr_average(fname_org_rms, izero,  ione,            &
-     &      spec_evo_p1, sph_IN_t)
-        call sph_spectr_std_deviation(fname_org_rms, izero,  ione,      &
-     &      spec_evo_p1, sph_IN_t)
+      do i = 1, spec_evo_p1%vol_series%num_file
+        call time_ave_sdev_sph_spectr                                   &
+     &     (spec_evo_p1%vol_series%evo_file_name(i),                    &
+     &      spectr_off, volume_on,                                      &
+     &      spec_evo_p1%start_time, spec_evo_p1%end_time)
       end do
 !
-      do i = 1, spec_evo_p1%nfile_vol_spectr_file
-        write(*,*) i, trim(spec_evo_p1%vol_spectr_prefix(i))
-        fname_org_rms                                                   &
-     &      = add_dat_extension(spec_evo_p1%vol_spectr_prefix(i))
-        call sph_spectr_average(fname_org_rms, ione,  ione,             &
-     &      spec_evo_p1, sph_IN_t)
-        call sph_spectr_std_deviation(fname_org_rms, ione,  ione,       &
-     &      spec_evo_p1, sph_IN_t)
+      do i = 1, spec_evo_p1%vol_spec_series%num_file
+        call time_ave_sdev_sph_spectr                                   &
+     &     (spec_evo_p1%vol_spec_series%evo_file_name(i),               &
+     &      spectr_on, volume_on,                                       &
+     &      spec_evo_p1%start_time, spec_evo_p1%end_time)
       end do
 !
 !
-      do i = 1, spec_evo_p1%nfile_layer_series_file
-        write(*,*) i, trim(spec_evo_p1%layer_series_prefix(i))
-        fname_org_rms                                                   &
-     &      = add_dat_extension(spec_evo_p1%layer_series_prefix(i))
-        call sph_spectr_average(fname_org_rms, izero, izero,            &
-     &      spec_evo_p1, sph_IN_t)
-        call sph_spectr_std_deviation(fname_org_rms, izero, izero,      &
-     &      spec_evo_p1, sph_IN_t)
+      do i = 1, spec_evo_p1%layer_series%num_file
+        call time_ave_sdev_sph_spectr                                   &
+     &     (spec_evo_p1%layer_series%evo_file_name(i),                  &
+     &      spectr_off, volume_off,                                     &
+     &      spec_evo_p1%start_time, spec_evo_p1%end_time)
       end do
 !
-      do i = 1, spec_evo_p1%nfile_layer_sprctr_file
-        write(*,*) i, trim(spec_evo_p1%layer_spectr_prefix(i))
-        fname_org_rms                                                   &
-     &      = add_dat_extension(spec_evo_p1%layer_spectr_prefix(i))
-        call sph_spectr_average(fname_org_rms, ione, izero,             &
-     &      spec_evo_p1, sph_IN_t)
-        call sph_spectr_std_deviation(fname_org_rms, ione, izero,       &
-     &      spec_evo_p1, sph_IN_t)
+      do i = 1, spec_evo_p1%layer_spec_series%num_file
+        call time_ave_sdev_sph_spectr                                   &
+     &     (spec_evo_p1%layer_spec_series%evo_file_name(i),             &
+     &      spectr_on, volume_off,                                      &
+     &      spec_evo_p1%start_time, spec_evo_p1%end_time)
       end do
 !
       call dealloc_spec_series_file_param(spec_evo_p1)

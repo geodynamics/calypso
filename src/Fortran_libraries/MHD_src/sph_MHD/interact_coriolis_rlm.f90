@@ -13,7 +13,46 @@
 !!     &          jgi_cor_rlm, jei_cor_rlm, gi_cor_rlm, ei_cor_rlm)
 !!      subroutine interact_rot_coriolis_rlm                            &
 !!     &         (jmax_rlm, g_sph_rlm, gi_cor_rlm, ei_cor_rlm,          &
-!!     &          sw_rlm, tw_rlm, sd_rlm, td_rlm, sr_rlm, tr_rlm)
+!!     &          sw_rlm, tw_rlm, sd_rlm, td_rlm, sr_rlm, tr_rlm,       &
+!!     &          sh_rlm, hh_rlm, th_rlm)
+!!
+!!        tr_rlm(i,j3) = -(a(a+1) + b(b+1) - l(l+1)) * G_abl            &
+!!                        / (2l(l+1) N_l)
+!!        sr_rlm(i,j3) = E_abl / (l(l+1) N_l)
+!!
+!!        th_rlm(i,j3) = a(a+1) * (-a(a+1) + b(b+1) + l(l+1))           &
+!!                      * G_abl / (2l(l+1) N_l)
+!!        sh_rlm(i,j3) = b(b+1) * E_abl / (l(l+1) N_l)
+!!        hh_rlm(i,j3) = a(a+1) * E_abl / (l(l+1) N_l)
+!!
+!!        sw_rlm(i,1,j3) = -a(a+1) * (-a(a+1) + b(b+1) + l(l+1))        &
+!!                        * G_abl / (2l(l+1) N_l)
+!!        sw_rlm(i,2,j3) =  b(b+1) * ( a(a+1) - b(b+1) + l(l+1))        &
+!!                         * G_abl / (2l(l+1) N_l)
+!!        sw_rlm(i,3,j3) =  a(a+1) * E_abl / (l(l+1) N_l)
+!!
+!!        tw_rlm(i,0,j3) = -(a(a+1) + b(b+1) - l(l+1))                  &
+!!                        * E_abl / (l(l+1) N_l)                        &
+!!                       = - hh_rlm(i,j3) - sh_rlm(i,j3)                &
+!!                        + l(l+1) * sr_rlm(i,j3)
+!!        tw_rlm(i,1,j3) = -a(a+1) * E_abl / (l(l+1) N_l)               &
+!!                       = - hh_rlm(i,j3)
+!!        tw_rlm(i,2,j3) = -l(l+1) * E_abl / (l(l+1) N_l)               &
+!!                       = - l(l+1) * sr_rlm(i,j3)
+!!        tw_rlm(i,3,j3) = -(l(l+1)*(a(a+1) + b(b+1) - l(l+1))          &
+!!                          + a(a+1)*(-a(a+1) + b(b+1) + l(l+1)))       &
+!!                        * G_abl / (2l(l+1) N_l)                       &
+!!                       = l(l+1)*tr_rlm(i,j3) - th_rlm(i,j3))
+!!        tw_rlm(i,4,j3) = -a(a+1) * (-a(a+1) + b(b+1) + l(l+1))        &
+!!                        * G_abl/ (2l(l+1) N_l)                        &
+!!                       = -th_rlm(i,j3)
+!!
+!!        sd_rlm(i,1,j3) = l(l+1) * G_abl / (l(l+1) N_l)
+!!        sd_rlm(i,2,j3) = (a(a+1) + b(b+1) - l(l+1)) * G_abl           &
+!!                        / (2l(l+1) N_l)                               &
+!!                       = - tr_rlm(i,j3)
+!!        td_rlm(i,1,j3) = E_abl / (l(l+1) N_l)                         &
+!!                       = sr_rlm(i,j3)
 !!@endverbatim
 !!
 !!@param   l_truncation   Truncation level
@@ -115,7 +154,8 @@
 !
       subroutine interact_rot_coriolis_rlm                              &
      &         (jmax_rlm, g_sph_rlm, gi_cor_rlm, ei_cor_rlm,            &
-     &          sw_rlm, tw_rlm, sd_rlm, td_rlm, sr_rlm, tr_rlm)
+     &          sw_rlm, tw_rlm, sd_rlm, td_rlm, sr_rlm, tr_rlm,         &
+     &          sh_rlm, hh_rlm, th_rlm)
 !
       integer(kind = kint), intent(in) :: jmax_rlm
       real(kind = kreal), intent(in):: g_sph_rlm(jmax_rlm,17)
@@ -129,6 +169,9 @@
       real(kind = kreal), intent(inout) :: td_rlm(2,jmax_rlm)
       real(kind = kreal), intent(inout) :: sr_rlm(2,jmax_rlm)
       real(kind = kreal), intent(inout) :: tr_rlm(2,jmax_rlm)
+      real(kind = kreal), intent(inout) :: sh_rlm(2,jmax_rlm)
+      real(kind = kreal), intent(inout) :: hh_rlm(2,jmax_rlm)
+      real(kind = kreal), intent(inout) :: th_rlm(2,jmax_rlm)
 !
       integer(kind = kint) :: j3
 !
@@ -157,7 +200,7 @@
         tw_rlm(2,3,j3) =-( g_sph_rlm(j3,3)                              &
      &               * ( two+g_sph_rlm(j3,5)-g_sph_rlm(j3,3) )          &
      &               + two*( -two+g_sph_rlm(j3,5)+g_sph_rlm(j3,3) ) )   &
-     &               * gi_cor_rlm(j3,2) * g_sph_rlm(j3,17) * half 
+     &               * gi_cor_rlm(j3,2) * g_sph_rlm(j3,17) * half
 !*
         tw_rlm(1,4,j3) =-( -two+g_sph_rlm(j3,4)+g_sph_rlm(j3,3) )       &
      &               * gi_cor_rlm(j3,1) * g_sph_rlm(j3,17)
@@ -185,13 +228,25 @@
         td_rlm(2,j3) = zero
 !*
 !
-        tr_rlm(1,j3) = -( two+g_sph_rlm(j3,4)-g_sph_rlm(j3,3) )         &
+        tr_rlm(1,j3) = -(two + g_sph_rlm(j3,4) - g_sph_rlm(j3,3))       &
      &               * gi_cor_rlm(j3,1) * g_sph_rlm(j3,17) * half
-        tr_rlm(2,j3) = -( two-g_sph_rlm(j3,5)+g_sph_rlm(j3,3) )         &
+        tr_rlm(2,j3) = -(two - g_sph_rlm(j3,5) + g_sph_rlm(j3,3))       &
      &               * gi_cor_rlm(j3,2) * g_sph_rlm(j3,17) * half
 !*
         sr_rlm(1,j3) = ei_cor_rlm(j3,1) * g_sph_rlm(j3,17)
         sr_rlm(2,j3) = zero
+!*
+        th_rlm(1,j3) = (-two + g_sph_rlm(j3,4) + g_sph_rlm(j3,3))       &
+     &                * gi_cor_rlm(j3,1) * g_sph_rlm(j3,17)
+        th_rlm(2,j3) = (-two + g_sph_rlm(j3,5) + g_sph_rlm(j3,3))       &
+     &                * gi_cor_rlm(j3,2) * g_sph_rlm(j3,17)
+!
+        sh_rlm(1,j3) = g_sph_rlm(j3,3) * ei_cor_rlm(j3,1)               &
+     &                * g_sph_rlm(j3,17)
+        sh_rlm(2,j3) = zero
+!
+        hh_rlm(1,j3) = two * ei_cor_rlm(j3,1) * g_sph_rlm(j3,17)
+        hh_rlm(2,j3) = zero
       end do
 !$omp end parallel do
 !*

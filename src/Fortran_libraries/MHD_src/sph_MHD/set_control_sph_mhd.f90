@@ -339,6 +339,7 @@
       use t_no_heat_Nusselt
       use t_CMB_dipolarity
       use t_sph_typical_scales
+      use m_base_field_labels
 !
       use set_control_4_pickup_sph
 !
@@ -359,11 +360,11 @@
       call set_ctl_params_pick_gauss                                    &
      &   (smonitor_ctl%g_pwr, monitor%gauss_list, monitor%gauss_coef)
 !
-      call set_ctl_params_no_heat_Nu                                    &
-     &   (smonitor_ctl%heat_nusselt_file_prefix,                        &
+      call set_ctl_params_no_heat_Nu(heat_source%name,                  &
+     &    smonitor_ctl%heat_nusselt_file_prefix,                        &
      &    rj_fld, monitor%heat_Nusselt)
-      call set_ctl_params_no_heat_Nu                                    &
-     &   (smonitor_ctl%comp_nusselt_file_prefix,                        &
+      call set_ctl_params_no_heat_Nu(composition_source%name,           &
+     &    smonitor_ctl%comp_nusselt_file_prefix,                        &
      &    rj_fld, monitor%comp_Nusselt)
 !
       call set_ctl_dipolarity_params                                    &

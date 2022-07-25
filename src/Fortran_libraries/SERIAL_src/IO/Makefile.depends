@@ -98,9 +98,9 @@ node_geometry_IO_b.o: $(IO_DIR)/node_geometry_IO_b.f90 m_precision.o m_constants
 	$(F90) -c $(F90OPTFLAGS) $<
 read_psf_binary_data.o: $(IO_DIR)/read_psf_binary_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_binary_IO_buffer.o binary_IO.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $<
-read_psf_binary_file.o: $(IO_DIR)/read_psf_binary_file.f90 m_precision.o m_constants.o m_machine_parameter.o t_time_data.o t_binary_IO_buffer.o t_ucd_data.o binary_IO.o read_udt_from_bindary_data.o
+read_psf_binary_file.o: $(IO_DIR)/read_psf_binary_file.f90 m_precision.o m_constants.o m_machine_parameter.o t_time_data.o t_binary_IO_buffer.o t_ucd_data.o binary_IO.o read_udt_from_binary_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
-read_udt_from_bindary_data.o: $(IO_DIR)/read_udt_from_bindary_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_binary_IO_buffer.o t_ucd_data.o binary_IO.o read_psf_binary_data.o
+read_udt_from_binary_data.o: $(IO_DIR)/read_udt_from_binary_data.f90 m_precision.o m_constants.o m_machine_parameter.o t_binary_IO_buffer.o t_ucd_data.o binary_IO.o read_psf_binary_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 rst_data_IO_by_fld.o: $(IO_DIR)/rst_data_IO_by_fld.f90 m_precision.o m_machine_parameter.o t_time_data.o t_field_data_IO.o time_data_IO.o set_parallel_file_name.o field_data_IO.o skip_comment_f.o transfer_to_long_integers.o set_restart_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -130,7 +130,7 @@ set_ucd_data.o: $(IO_DIR)/set_ucd_data.f90 m_precision.o m_constants.o t_ucd_dat
 	$(F90) -c $(F90OPTFLAGS) $<
 set_ucd_extensions.o: $(IO_DIR)/set_ucd_extensions.f90 m_precision.o set_parallel_file_name.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_ucd_file_names.o: $(IO_DIR)/set_ucd_file_names.f90 m_precision.o m_constants.o m_field_file_format.o delete_data_files.o set_parallel_file_name.o set_mesh_extensions.o set_ucd_extensions.o
+set_ucd_file_names.o: $(IO_DIR)/set_ucd_file_names.f90 m_precision.o m_constants.o m_field_file_format.o delete_data_files.o set_parallel_file_name.o set_mesh_extensions.o set_ucd_extensions.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 skip_comment_f.o: $(IO_DIR)/skip_comment_f.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<

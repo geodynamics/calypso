@@ -13,8 +13,11 @@
 !!      subroutine init_sum_coriolis_rlm                                &
 !!     &         (l_truncation, sph_rlm, sph_bc_U, leg, gt_cor, cor_rlm)
 !!
-!!      subroutine sum_coriolis_rlm(ncomp_trans, sph_rlm, comm_rlm,     &
+!!      subroutine sum_rot_coriolis_rlm(ncomp_trans, sph_rlm, comm_rlm, &
 !!     &          fl_prop, sph_bc_U, omega_sph, b_trns, leg, gt_cor,    &
+!!     &          n_WR, WR, cor_rlm)
+!!      subroutine sum_coriolis_rlm(ncomp_trans, sph_rlm, comm_rlm,     &
+!!     &          fl_prop, sph_bc_U, omega_sph, b_trns, gt_cor,         &
 !!     &          n_WR, WR, cor_rlm)
 !!        type(phys_address), intent(in) :: b_trns
 !!      subroutine copy_coriolis_terms_rlm                              &
@@ -90,6 +93,20 @@
       implicit none
 !
 !
+!>      Address for poloidal componenet of Coriolis term
+      integer(kind = kint), parameter, private :: ip_rlm_coriolis = 1
+!>      Address for horizontal componenet of Coriolis term
+      integer(kind = kint), parameter, private :: ih_rlm_coriolis = 2
+!>      Address for toroidal componenet of Coriolis term
+      integer(kind = kint), parameter, private :: it_rlm_coriolis = 3
+!
+!>      Address for poloidal componenet of rotation of Coriolis term
+      integer(kind = kint), parameter, private :: ip_rlm_rot_cor = 1
+!>      Address for toroidal componenet of rotation of Coriolis term
+      integer(kind = kint), parameter, private :: it_rlm_rot_cor = 2
+!>      Address for divergence of Coriolis term
+      integer(kind = kint), parameter, private :: ip_rlm_div_cor = 3
+!
 !>      Structure of Coriolis terms in@f$ f(r,l,m) @f$.
       type coriolis_rlm_data
 !>        local spectr index for ICB and  @f$ m = -1, 0, 1@f$.
@@ -116,13 +133,6 @@
         real(kind = kreal), allocatable :: d_cor_in_rlm(:)
 !>        Coriolis term at outer boundary
         real(kind = kreal), allocatable :: d_cor_out_rlm(:)
-!
-!>        Address for poloidal componenet of rotation of Coriolis term
-        integer(kind = kint) :: ip_rlm_rot_cor = 1
-!>        Address for toroidal componenet of rotation of Coriolis term
-        integer(kind = kint) :: it_rlm_rot_cor = 2
-!>        Address for divergence of Coriolis term
-        integer(kind = kint) :: ip_rlm_div_cor = 3
 !
 !        integer(kind = kint) :: kr_in_U_rlm =  0
 !        integer(kind = kint) :: kr_out_U_rlm = 0
@@ -183,20 +193,21 @@
      &   (sph_rlm%nidx_rlm(2), leg%g_sph_rlm,                           &
      &    gt_cor%gi_rlm, gt_cor%ei_rlm,                                 &
      &    gt_cor%sw_rlm, gt_cor%tw_rlm, gt_cor%sd_rlm,                  &
-     &    gt_cor%td_rlm, gt_cor%sr_rlm, gt_cor%tr_rlm)
+     &    gt_cor%td_rlm, gt_cor%sr_rlm, gt_cor%tr_rlm,                  &
+     &    gt_cor%sh_rlm, gt_cor%hh_rlm, gt_cor%th_rlm)
 !
       end subroutine init_sum_coriolis_rlm
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine sum_coriolis_rlm(ncomp_trans, sph_rlm, comm_rlm,       &
+      subroutine sum_rot_coriolis_rlm(ncomp_trans, sph_rlm, comm_rlm,   &
      &          fl_prop, sph_bc_U, omega_sph, b_trns, leg, gt_cor,      &
      &          n_WR, WR, cor_rlm)
 !
       use t_physical_property
       use t_boundary_params_sph_MHD
-      use sum_coriolis_terms_rlm
       use sum_rot_coriolis_terms_rlm
+      use sum_boundary_coriolis_rlm
 !      use sum_div_coriolis_terms_rlm
 !
       type(sph_rlm_grid), intent(in) :: sph_rlm
@@ -217,23 +228,11 @@
 !
       if(fl_prop%iflag_4_coriolis .eqv. .FALSE.) return
 !
-      if(sph_rlm%istep_rlm(1) .eq. 1) then
-        call sum_rot_coriolis_rlm_10(b_trns,                            &
-     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%a_r_1d_rlm_r,     &
-     &    leg%g_sph_rlm, omega_sph%ws_rlm, fl_prop%coef_cor,            &
-     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sw_rlm, gt_cor%tw_rlm, &
+      call select_sum_rot_coriolis_rlm_10(b_trns,                       &
+     &    sph_rlm, leg, omega_sph, gt_cor, fl_prop%coef_cor,            &
      &    ncomp_trans, n_WR, comm_rlm%irev_sr, WR,                      &
-     &    cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_rot_cor),                  &
-     &    cor_rlm%d_cor_rlm(1,cor_rlm%it_rlm_rot_cor))
-      else
-        call sum_rot_coriolis_lrm_10(b_trns,                            &
-     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%a_r_1d_rlm_r,     &
-     &    leg%g_sph_rlm, omega_sph%ws_rlm, fl_prop%coef_cor,            &
-     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sw_rlm, gt_cor%tw_rlm, &
-     &    ncomp_trans, n_WR, comm_rlm%irev_sr, WR,                      &
-     &    cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_rot_cor),                  &
-     &    cor_rlm%d_cor_rlm(1,cor_rlm%it_rlm_rot_cor))
-      end if
+     &    cor_rlm%d_cor_rlm(1,ip_rlm_rot_cor),                          &
+     &    cor_rlm%d_cor_rlm(1,it_rlm_rot_cor))
 !
       if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
         call inner_core_rot_z_coriolis_rlm(b_trns,                      &
@@ -241,7 +240,7 @@
      &      sph_rlm%radius_1d_rlm_r, omega_sph%ws_rlm,                  &
      &      fl_prop%coef_cor, ncomp_trans, n_WR, comm_rlm%irev_sr, WR,  &
      &      cor_rlm%idx_rlm_ICB, cor_rlm%idx_rlm_degree_one,            &
-     &      cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_rot_cor))
+     &      cor_rlm%d_cor_rlm(1,ip_rlm_rot_cor))
       end if
 !
 
@@ -252,7 +251,7 @@
 !     &    omega_sph%ws_rlm, fl_prop%coef_cor,                          &
 !     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sd_rlm, gt_cor%td_rlm,&
 !     &    ncomp_trans, n_WR, comm_rlm%irev_sr, WR,                     &
-!     &    cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_div_cor))
+!     &    cor_rlm%d_cor_rlm(1,ip_rlm_div_cor))
 !      else
 !        call sum_div_coriolis_lrm_10                                   &
 !     &   (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                  &
@@ -260,23 +259,67 @@
 !     &    omega_sph%ws_rlm, fl_prop%coef_cor,                          &
 !     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sd_rlm, gt_cor%td_rlm,&
 !     &    ncomp_trans, n_WR, comm_rlm%irev_sr, WR,                     &
-!     &    cor_rlm%d_cor_rlm(1,cor_rlm%ip_rlm_div_cor))
+!     &    cor_rlm%d_cor_rlm(1,ip_rlm_div_cor))
 !      end if
 !
-!      call sum_r_coriolis_bc_rlm_10                                    &
-!     &   (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                  &
-!     &    sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,               &
+!      call sum_r_coriolis_bc_rlm_10(b_trns,                            &
+!     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%idx_gl_1d_rlm_j, &
 !     &    omega_sph%ws_rlm, fl_prop%coef_cor,                          &
 !     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sr_rlm, gt_cor%tr_rlm,&
 !     &    ncomp_trans, kr_in_U_rlm, n_WR, comm_rlm%irev_sr,            &
 !     &    WR, cor_rlm%d_cor_in_rlm)
-!      call sum_r_coriolis_bc_rlm_10                                    &
-!     &   (b_trns, sph_rlm%nnod_rlm, sph_rlm%nidx_rlm,                  &
-!     &    sph_rlm%idx_gl_1d_rlm_j, sph_rlm%a_r_1d_rlm_r,               &
+!      call sum_r_coriolis_bc_rlm_10(b_trns,                            &
+!     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%idx_gl_1d_rlm_j, &
 !     &    omega_sph%ws_rlm, fl_prop%coef_cor,                          &
 !     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sr_rlm, gt_cor%tr_rlm,&
 !     &    ncomp_trans, kr_out_U_rlm, n_WR, comm_rlm%irev_sr,           &
 !     &    WR, cor_rlm%d_cor_out_rlm)
+!
+      end subroutine sum_rot_coriolis_rlm
+!
+! -----------------------------------------------------------------------
+!
+      subroutine sum_coriolis_rlm(ncomp_trans, sph_rlm, comm_rlm,       &
+     &          fl_prop, sph_bc_U, omega_sph, b_trns, gt_cor,           &
+     &          n_WR, WR, cor_rlm)
+!
+      use t_physical_property
+      use t_boundary_params_sph_MHD
+      use sum_coriolis_terms_rlm
+      use sum_boundary_coriolis_rlm
+!
+      type(sph_rlm_grid), intent(in) :: sph_rlm
+      type(sph_comm_tbl), intent(in) :: comm_rlm
+      type(fluid_property), intent(in) :: fl_prop
+      type(sph_boundary_type), intent(in) :: sph_bc_U
+      type(sph_rotation), intent(in) :: omega_sph
+      type(phys_address), intent(in) :: b_trns
+!
+      type(gaunt_coriolis_rlm), intent(in) :: gt_cor
+!
+      integer(kind = kint), intent(in) :: ncomp_trans, n_WR
+      real(kind = kreal), intent(in) :: WR(n_WR)
+!
+      type(coriolis_rlm_data), intent(inout) :: cor_rlm
+!
+!
+      if(fl_prop%iflag_4_coriolis .eqv. .FALSE.) return
+!
+      call select_sum_coriolis_rlm_10                                   &
+     &   (b_trns, sph_rlm, omega_sph, gt_cor, fl_prop%coef_cor,         &
+     &    ncomp_trans, n_WR, comm_rlm%irev_sr, WR,                      &
+     &    cor_rlm%d_cor_rlm(1,ip_rlm_coriolis),                         &
+     &    cor_rlm%d_cor_rlm(1,ih_rlm_coriolis),                         &
+     &    cor_rlm%d_cor_rlm(1,it_rlm_coriolis))
+!
+      if(sph_bc_U%iflag_icb .eq. iflag_rotatable_ic) then
+        call inner_core_rot_z_coriolis_rlm(b_trns,                      &
+     &      sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%istep_rlm,      &
+     &      sph_rlm%radius_1d_rlm_r, omega_sph%ws_rlm,                  &
+     &      fl_prop%coef_cor, ncomp_trans, n_WR, comm_rlm%irev_sr, WR,  &
+     &      cor_rlm%idx_rlm_ICB, cor_rlm%idx_rlm_degree_one,            &
+     &      cor_rlm%d_cor_rlm(1,it_rlm_coriolis))
+      end if
 !
       end subroutine sum_coriolis_rlm
 !
@@ -305,12 +348,12 @@
       call sel_calypso_to_send_scalar                                   &
      &   (ncomp_trans, sph_rlm%nnod_rlm, n_WS,                          &
      &    comm_rlm%nneib_domain, comm_rlm%istack_sr, comm_rlm%item_sr,  &
-     &    cor_rlm%ncomp_coriolis_rlm, cor_rlm%ip_rlm_rot_cor,           &
+     &    cor_rlm%ncomp_coriolis_rlm, ip_rlm_rot_cor,                   &
      &    f_trns%rot_forces%i_Coriolis, cor_rlm%d_cor_rlm(1,1), WS(1))
       call sel_calypso_to_send_scalar                                   &
      &   (ncomp_trans, sph_rlm%nnod_rlm, n_WS,                          &
      &    comm_rlm%nneib_domain, comm_rlm%istack_sr, comm_rlm%item_sr,  &
-     &    cor_rlm%ncomp_coriolis_rlm, cor_rlm%it_rlm_rot_cor,           &
+     &    cor_rlm%ncomp_coriolis_rlm, it_rlm_rot_cor,                   &
      &    (f_trns%rot_forces%i_Coriolis+2), cor_rlm%d_cor_rlm(1,1),     &
      &    WS(1))
 !
@@ -324,10 +367,6 @@
       integer(kind = kint), intent(in) :: nnod_rlm, jmax_rlm
       type(coriolis_rlm_data), intent(inout) :: cor_rlm
 !
-!
-      cor_rlm%ip_rlm_rot_cor = 1
-      cor_rlm%it_rlm_rot_cor = 2
-      cor_rlm%ip_rlm_div_cor = 3
 !
       cor_rlm%ncomp_coriolis_rlm = 3
       allocate( cor_rlm%d_cor_rlm(nnod_rlm,cor_rlm%ncomp_coriolis_rlm) )

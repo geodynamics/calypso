@@ -108,7 +108,51 @@
       end function iargc_kemo
 !
 !   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
+!
+      logical function cmp_no_case31(cmp_chara, ref_chara)
+!
+      character(len=*), intent(in) :: ref_chara
+      character(len=31), intent(in) :: cmp_chara
+      character(len=31)  :: ref_tmp, cmp_tmp
+      integer(kind = 4) :: len
+!
+!
+      len = len_trim(ref_chara)
+      if(len_trim(cmp_chara) .ne. len) then
+        cmp_no_case31 = .false.
+        return
+      end if
+!
+      write(ref_tmp,'(a)')  trim(ref_chara)
+      write(cmp_tmp,'(a)')  trim(cmp_chara)
+      call change_2_lower_case31(ref_tmp)
+      call change_2_lower_case31(cmp_tmp)
+!
+      cmp_no_case31 = .false.
+      if(ref_tmp .eq. cmp_tmp) cmp_no_case31 = .true.
+      return
+!
+      end function cmp_no_case31
+!
+!-----------------------------------------------------------------------
+!
+      subroutine change_2_lower_case31(string)
+!
+      character(len=31), intent(inout) :: string
+      integer(kind = 4) :: i, len
+!
+!
+      len = len_trim(string)
+      do i = 1, len
+        if (string(i:i) .ge. 'A' .and. string(i:i) .le. 'Z') then 
+          string(i:i) = char(ichar(string(i:i)) + 32)
+        end if
+      end do
+!
+      end subroutine change_2_lower_case31
+!
+!-----------------------------------------------------------------------
+!-----------------------------------------------------------------------
 !
       subroutine const_module_list(filename)
 !
@@ -131,7 +175,7 @@
 !
             iflag = 1
             do j = 1, num_exclude
-              if(module_name .eq. exclude_list(j)) then
+              if(cmp_no_case31(module_name, exclude_list(j))) then
                 write(*,*) 'module dependency for ',                    &
      &               trim(exclude_list(j)), ' is excluded'
                 iflag = 0
@@ -312,3 +356,5 @@
       close(id_makefile)
 !
       end program make_multi_mod_dependency
+!
+!-----------------------------------------------------------------------

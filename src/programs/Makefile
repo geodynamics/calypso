@@ -12,6 +12,8 @@ data_utilities \
 \
 TESTS
 
+DLIBDIRS = \
+data_utilities
 
 LIBS_SPH_MHD = \
 '$$(LIB_CALYPSO)'  \
@@ -32,6 +34,7 @@ LIB_FILES_SPH_MHD = \
 LIB_FILES_MESH_UTILS = \
 '$$(LIB_CALYPSO_FILE)'   \
 '$$(LIB_CALYPSO_C_FILE)'
+
 
 #
 #  -------------------------------------------------------------------------
@@ -104,8 +107,8 @@ lib_name:
 
 lib_tasks:
 
-
 mod_list:
+	@echo '#' >> $(MAKENAME)
 	@for dir in $(SUBDIRS); do \
 		( cd $${dir};  \
 		$(GMAKE) \

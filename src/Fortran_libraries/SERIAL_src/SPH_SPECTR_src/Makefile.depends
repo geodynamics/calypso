@@ -56,6 +56,8 @@ single_pt_sph_mean_square.o: $(SPH_SPECTR_DIR)/single_pt_sph_mean_square.f90 m_p
 	$(F90) -c $(F90OPTFLAGS) $<
 t_fdm_coefs.o: $(SPH_SPECTR_DIR)/t_fdm_coefs.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
+t_no_heat_Nusselt.o: $(SPH_SPECTR_DIR)/t_no_heat_Nusselt.f90 m_precision.o m_constants.o t_spheric_rj_data.o m_base_field_labels.o m_grad_field_labels.o t_phys_data.o t_control_array_character.o set_parallel_file_name.o write_field_labels.o skip_comment_f.o
+	$(F90) -c $(F90OPTFLAGS) $<
 t_node_id_spherical_IO.o: $(SPH_SPECTR_DIR)/t_node_id_spherical_IO.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_rms_4_sph_spectr.o: $(SPH_SPECTR_DIR)/t_rms_4_sph_spectr.f90 m_precision.o t_sph_volume_mean_square.o

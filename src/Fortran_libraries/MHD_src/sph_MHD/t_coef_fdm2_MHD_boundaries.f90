@@ -61,15 +61,15 @@
 !!              + mat_fdm_2(3,3) * d_rj(CMB-1)
 !!
 !!
-!!   Matrix for derivatives with fixed field
-!!      dfdr =      fdm2_center%dmat_fix_fld(-1,2) * d_center(0)
-!!                + fdm2_center%dmat_fix_fld( 0,2) * d_rj(1)
-!!                + fdm2_center%dmat_fix_fld( 1,2) * d_rj(2)
-!!      d2fdr2 =    fdm2_center%dmat_fix_fld(-1,3) * d_center(0)
-!!                + fdm2_center%dmat_fix_fld( 0,3) * d_rj(1)
-!!                + fdm2_center%dmat_fix_fld( 1,3) * d_rj(2)
+!!     Matrix for derivatives at the next of center with fixed field
+!!      dfdr(1) =      fdm2_center%dmat_fix_fld(-1,2) * d_center(0)
+!!                   + fdm2_center%dmat_fix_fld( 0,2) * d_rj(1)
+!!                   + fdm2_center%dmat_fix_fld( 1,2) * d_rj(2)
+!!      d2fdr2(1) =    fdm2_center%dmat_fix_fld(-1,3) * d_center(0)
+!!                   + fdm2_center%dmat_fix_fld( 0,3) * d_rj(1)
+!!                   + fdm2_center%dmat_fix_fld( 1,3) * d_rj(2)
 !!
-!!      Matrix to evaluate field at center fixed radial derivative
+!!     Matrix to evaluate field at center fixed radial derivative
 !!      (Only used for l = m = 0 component of scalar)
 !!      d_center(0) =fdm2_center%dmat_fix_dr(-1,1) * dfdr(0)
 !!                 + fdm2_center%dmat_fix_dr( 0,1) * d_center(0)
@@ -78,7 +78,7 @@
 !!                 + fdm2_center%dmat_fix_dr( 0,3) * d_center(0)
 !!                 + fdm2_center%dmat_fix_dr( 1,3) * d_rj(1)
 !!
-!!      Matrix to evaluate field at center fixed field
+!!     Matrix to evaluate field at center fixed field
 !!      (Only used for l = m = 0 component of scalar)
 !!      dfdr(0) =    fdm2_center%dmat_fixed( 0,2) * d_center(0)
 !!                 + fdm2_center%dmat_fixed( 1,2) * d_rj(1)

@@ -342,7 +342,7 @@
 #endif
       else
           call sel_read_udt_param                                       &
-     &       (my_rank, istep_ucd, ucd_param, t_IO, ucd)
+     &       (my_rank, nprocs, istep_ucd, ucd_param, t_IO, ucd)
       end if
 !
       end subroutine sel_read_parallel_udt_param
@@ -407,7 +407,7 @@
 #endif
       else
         call sel_read_udt_file                                          &
-     &     (my_rank, istep_ucd, ucd_param, t_IO, ucd)
+     &     (my_rank, nprocs, istep_ucd, ucd_param, t_IO, ucd)
       end if
 !
       end subroutine sel_read_parallel_udt_file
@@ -472,7 +472,7 @@
 #endif
       else
         call sel_read_alloc_udt_file                                    &
-     &     (my_rank, istep_ucd, ucd_param, t_IO, ucd)
+     &     (my_rank, nprocs, istep_ucd, ucd_param, t_IO, ucd)
       end if
 !
       end subroutine sel_read_alloc_para_udt_file

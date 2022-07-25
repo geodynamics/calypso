@@ -49,6 +49,11 @@
 !!      layer_sph_spectr_prefix     'sph_pwr_layer_lm'
 !!    end array layer_sph_spectr_prefix
 !!
+!!    array picked_sph_prefix
+!!      picked_sph_prefix        'monitor/picked_mode'
+!!      picked_sph_prefix        'monitor/picked_mode_l2_m0c'
+!!    end array picked_sph_prefix
+!!
 !!    gauss_coefs_prefix           'sph_spectr/gauss_coefs'
 !!    picked_sph_prefix            'sph_spectr/picked_mode'
 !!    nusselt_number_prefix        'Nusselt'
@@ -135,6 +140,8 @@
         type(ctl_array_chara) :: layered_series_file_ctl
 !>        file prefix for layered spectr time series
         type(ctl_array_chara) :: layered_spec_file_ctl
+!>        Structure for picked spectrum file prefix
+        type(ctl_array_chara) :: picked_mode_file_ctl
 !
 !>        Structure for Nusselt number
         type(read_character_item) :: Nusselt_file_prefix
@@ -144,8 +151,6 @@
         type(read_character_item) :: Elsasser_file_prefix
 !>        Structure for gauss coefficient file prefix
         type(read_character_item) :: gauss_coefs_prefix
-!>        Structure for picked spectrum file prefix
-        type(read_character_item) :: picked_mode_head_ctl
 !
 !>        Structure for Elsasser number
         type(read_character_item) :: vol_degree_spectr_prefix
@@ -324,10 +329,11 @@
         call read_control_array_c1(id_control, hd_layer_spec_series,    &
      &      tave_sph_ctl%layered_spec_file_ctl, c_buf)
 !
+        call read_control_array_c1(id_control, hd_picked_mode_head,     &
+     &      tave_sph_ctl%picked_mode_file_ctl, c_buf)
+!
         call read_chara_ctl_type(c_buf, hd_gauss_coefs_head,            &
      &      tave_sph_ctl%gauss_coefs_prefix)
-        call read_chara_ctl_type(c_buf, hd_picked_mode_head,            &
-     &      tave_sph_ctl%picked_mode_head_ctl)
 !
         call read_dimless_ctl                                           &
      &     (id_control, hd_dimless_list, tave_sph_ctl%dless_ctl, c_buf)
@@ -367,11 +373,13 @@
       call dealloc_control_array_chara                                  &
      &   (tave_sph_ctl%layered_series_file_ctl)
 !
+      call dealloc_control_array_chara                                  &
+     &   (tave_sph_ctl%picked_mode_file_ctl)
+!
       tave_sph_ctl%Nusselt_file_prefix%iflag =  0
       tave_sph_ctl%dipolarity_file_prefix%iflag = 0
       tave_sph_ctl%Elsasser_file_prefix%iflag = 0
       tave_sph_ctl%gauss_coefs_prefix%iflag =   0
-      tave_sph_ctl%picked_mode_head_ctl%iflag = 0
 !
       tave_sph_ctl%vol_degree_spectr_prefix%iflag = 0
       tave_sph_ctl%vol_order_spectr_prefix%iflag =  0

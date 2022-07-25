@@ -102,8 +102,6 @@
         integer(kind = kint), allocatable :: istack_comp_rj(:)
 !>        Field  address for monitoring of @f$ f(r,j) @f$
         integer(kind = kint), allocatable :: ifield_monitor_rj(:)
-!>        Number of modes of monitoring spectrum in each process
-        integer(kind = kint) :: ntot_pick_spectr = 0
 
 !>        Name of  monitoring spectrum
         character(len=kchara), allocatable :: spectr_name(:)
@@ -299,8 +297,7 @@
 !
       write(id_file,'(a)')    '#'
       write(id_file,'(a)')    '# num_layers, num_spectr'
-      write(id_file,'(3i16)') picked%num_layer, picked%num_sph_mode,    &
-     &                        picked%ntot_pick_spectr
+      write(id_file,'(2i16)') picked%num_layer, picked%num_sph_mode
       write(id_file,'(a)')    '# number of component'
       write(id_file,'(i16)') picked%ntot_comp_rj
 !
@@ -331,9 +328,9 @@
       character(len = len_head) :: pick_sph_header_no_field
 !
 !
-      write(pick_sph_header_no_field,'(a,3i16,a1,a,i16,a1,a)')          &
-     &        hd_pick_sph_head(), picked%num_layer,                     &
-     &        picked%num_sph_mode, picked%ntot_pick_spectr, char(10),   &
+      write(pick_sph_header_no_field,'(a,2i16,a1,a,i16,a1,a)')          &
+     &        hd_pick_sph_head(),                                       &
+     &        picked%num_layer, picked%num_sph_mode, char(10),          &
      &        hd_pick_sph_num(), picked%ntot_comp_rj, char(10),         &
      &        hd_time_sph_label()
 !
@@ -357,9 +354,8 @@
       character(len = len_head) :: each_pick_sph_header_no_field
 !
 !
-      write(each_pick_sph_header_no_field,'(a,3i16,a1,a,i16,a1,a)')     &
-     &        hd_pick_sph_head(), picked%num_layer,                     &
-     &        ione, picked%ntot_pick_spectr, char(10),                  &
+      write(each_pick_sph_header_no_field,'(a,2i16,a1,a,i16,a1,a)')     &
+     &        hd_pick_sph_head(), picked%num_layer, ione, char(10),     &
      &        hd_pick_sph_num(), picked%ntot_comp_rj, char(10),         &
      &        hd_time_sph_label()
 !

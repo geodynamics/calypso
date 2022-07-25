@@ -74,15 +74,16 @@
       type(time_data) :: t_IO_u
       type(ucd_data):: psf_ucd
 !
+      integer :: np_ucd
       integer(kind = kint) :: iflag = 0
 !
 !
       call load_psf_data_to_link_IO                                   &
      &   (psf_cmp%istep_psf, psf_cmp%psf1_file_param,                 &
-     &    t_IO_u, psf_1, psf_ucd)
+     &    np_ucd, t_IO_u, psf_1, psf_ucd)
       call load_psf_data_to_link_IO                                   &
      &   (psf_cmp%istep_psf, psf_cmp%psf2_file_param,                 &
-     &    t_IO_u, psf_2, psf_ucd)
+     &    np_ucd, t_IO_u, psf_2, psf_ucd)
 !
       iflag = compare_node_position(0, psf_1%psf_nod, psf_2%psf_nod)
       iflag = iflag                                                   &

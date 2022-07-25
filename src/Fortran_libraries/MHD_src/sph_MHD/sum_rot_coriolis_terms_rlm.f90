@@ -9,16 +9,23 @@
 !!
 !!@verbatim
 !!************************************************
-!!
-!!      subroutine sum_rot_coriolis_lrm_10(b_trns, nnod_rlm, nidx_rlm,  &
-!!     &          a_r_1d_rlm_r, g_sph_rlm, omega_rlm, coef_cor,         &
-!!     &          jgi_cor_rlm, jei_cor_rlm, sw_rlm, tw_rlm, NB, n_WR,   &
-!!     &          irev_sr_rlm, WR, d_rotp_cor_rlm, d_rott_cor_rlm)
-!!      subroutine sum_rot_coriolis_rlm_10(b_trns, nnod_rlm, nidx_rlm,  &
-!!     &          a_r_1d_rlm_r, g_sph_rlm, omega_rlm, coef_cor,         &
-!!     &          jgi_cor_rlm, jei_cor_rlm, sw_rlm, tw_rlm, NB, n_WR,   &
-!!     &          irev_sr_rlm, WR, d_rotp_cor_rlm, d_rott_cor_rlm)
-!!
+!!      subroutine select_sum_rot_coriolis_rlm_10(b_trns, sph_rlm, leg, &
+!!     &         omega_sph, gt_cor, coef_cor, NB, n_WR, irev_sr_rlm, WR,&
+!!     &         d_rotp_cor_rlm, d_rott_cor_rlm)
+!!        type(phys_address), intent(in) :: b_trns
+!!        type(sph_rlm_grid), intent(in) :: sph_rlm
+!!        type(legendre_4_sph_trans), intent(in) :: leg
+!!        type(sph_rotation), intent(in) :: omega_sph
+!!        type(gaunt_coriolis_rlm), intent(in) :: gt_cor
+!!        integer(kind = kint), intent(in) :: NB, n_WR
+!!        integer(kind = kint), intent(in)                              &
+!!     &                               :: irev_sr_rlm(sph_rlm%nnod_rlm)
+!!        real(kind = kreal), intent(in) :: WR(n_WR)
+!!        real(kind = kreal), intent(in) :: coef_cor
+!!        real(kind = kreal), intent(inout)                             &
+!!     &                   :: d_rotp_cor_rlm(sph_rlm%nnod_rlm)
+!!        real(kind = kreal), intent(inout)                             &
+!!     &                   :: d_rott_cor_rlm(sph_rlm%nnod_rlm)
 !!************************************************
 !!
 !!  Rotation of the Coriolos term
@@ -49,6 +56,7 @@
 !!     wss(jc,1,j3) = sw_rlm(jc,1,j3)
 !!     wss(jc,2,j3) = sw_rlm(jc,2,j3)
 !!     wts(jc,j3)   = sw_rlm(jc,3,j3)
+!!  (  wst(jc,0,j3) = tw_rlm(jc,0,j3) )
 !!     wst(jc,1,j3) = tw_rlm(jc,1,j3)
 !!     wst(jc,2,j3) = tw_rlm(jc,2,j3)
 !!     wtt(jc,1,j3) = tw_rlm(jc,3,j3)
@@ -72,7 +80,10 @@
       use m_machine_parameter
       use m_constants
 !
+      use t_spheric_rlm_data
       use t_phys_address
+      use t_poloidal_rotation
+      use t_schmidt_poly_on_rtm
       use t_gaunt_coriolis_rlm
 !
       implicit none
@@ -81,6 +92,48 @@
 !
       contains
 !
+!   ------------------------------------------------------------------
+!
+      subroutine select_sum_rot_coriolis_rlm_10(b_trns, sph_rlm, leg,   &
+     &         omega_sph, gt_cor, coef_cor, NB, n_WR, irev_sr_rlm, WR,  &
+     &         d_rotp_cor_rlm, d_rott_cor_rlm)
+!
+      type(phys_address), intent(in) :: b_trns
+      type(sph_rlm_grid), intent(in) :: sph_rlm
+      type(legendre_4_sph_trans), intent(in) :: leg
+      type(sph_rotation), intent(in) :: omega_sph
+!
+      type(gaunt_coriolis_rlm), intent(in) :: gt_cor
+!
+      integer(kind = kint), intent(in) :: NB, n_WR
+      integer(kind = kint), intent(in)                                  &
+     &                               :: irev_sr_rlm(sph_rlm%nnod_rlm)
+      real(kind = kreal), intent(in) :: WR(n_WR)
+      real(kind = kreal), intent(in) :: coef_cor
+!
+      real(kind = kreal), intent(inout)                                 &
+     &                   :: d_rotp_cor_rlm(sph_rlm%nnod_rlm)
+      real(kind = kreal), intent(inout)                                 &
+     &                   :: d_rott_cor_rlm(sph_rlm%nnod_rlm)
+!
+!
+      if(sph_rlm%istep_rlm(1) .eq. 1) then
+        call sum_rot_coriolis_rlm_10(b_trns,                            &
+     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%a_r_1d_rlm_r,     &
+     &    leg%g_sph_rlm, omega_sph%ws_rlm, coef_cor,                    &
+     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sw_rlm, gt_cor%tw_rlm, &
+     &    NB, n_WR, irev_sr_rlm, WR, d_rotp_cor_rlm, d_rott_cor_rlm)
+      else
+        call sum_rot_coriolis_lrm_10(b_trns,                            &
+     &    sph_rlm%nnod_rlm, sph_rlm%nidx_rlm, sph_rlm%a_r_1d_rlm_r,     &
+     &    leg%g_sph_rlm, omega_sph%ws_rlm, coef_cor,                    &
+     &    gt_cor%jgi_rlm, gt_cor%jei_rlm, gt_cor%sw_rlm, gt_cor%tw_rlm, &
+     &    NB, n_WR, irev_sr_rlm, WR, d_rotp_cor_rlm, d_rott_cor_rlm)
+      end if
+!
+      end subroutine select_sum_rot_coriolis_rlm_10
+!
+!   ------------------------------------------------------------------
 !   ------------------------------------------------------------------
 !
       subroutine sum_rot_coriolis_lrm_10(b_trns, nnod_rlm, nidx_rlm,    &
@@ -112,13 +165,13 @@
       integer(kind = kint) :: i_rlm, k_rlm, j_rlm
       integer(kind = kint) :: i11, i21, i12, ir_11, ir_21, ir_12
       real(kind = kreal) :: sp_dvp_k1, sp_dvp_k2, sp_vp_k1, sp_vp_k2
-      real(kind = kreal) :: sp_wp_l1, sp_d2vp_l1, sp_vp_l1
+      real(kind = kreal) :: sp_vt_l1, sp_d2vp_l1, sp_vp_l1
       real(kind = kreal) :: sp_wp_k1, sp_wp_k2, sp_dwp_k1, sp_dwp_k2
 !
 !
 !$omp  parallel do                                                      &
 !$omp& private(k_rlm,j_rlm,i_rlm,i11,i21,i12,ir_11,ir_21,ir_12,         &
-!$omp&         sp_dvp_k1,sp_dvp_k2,sp_vp_k1,sp_vp_k2,sp_wp_l1,          &
+!$omp&         sp_dvp_k1,sp_dvp_k2,sp_vp_k1,sp_vp_k2,sp_vt_l1,          &
 !$omp&         sp_d2vp_l1,sp_vp_l1,sp_wp_k1,sp_wp_k2,sp_dwp_k1,         &
 !$omp&         sp_dwp_k2)
       do k_rlm = 1, nidx_rlm(1)
@@ -137,7 +190,7 @@
 !
           sp_dvp_k1 = WR(b_trns%base%i_velo+1 + NB*ir_11)
           sp_dvp_k2 = WR(b_trns%base%i_velo+1 + NB*ir_21)
-          sp_wp_l1 =  WR(b_trns%base%i_vort +  NB*ir_12)
+          sp_vt_l1 =  WR(b_trns%base%i_velo+2 + NB*ir_12)
           sp_vp_k1 =  WR(b_trns%base%i_velo +  NB*ir_11)
           sp_vp_k2 =  WR(b_trns%base%i_velo +  NB*ir_21)
 !
@@ -155,7 +208,7 @@
           d_rotp_cor_rlm(i_rlm)                                         &
      &     =  sw_rlm(1,1,j_rlm) * omega_rlm(k_rlm,0) * sp_dvp_k1        &
      &      + sw_rlm(2,1,j_rlm) * omega_rlm(k_rlm,0) * sp_dvp_k2        &
-     &      + sw_rlm(1,3,j_rlm) * omega_rlm(k_rlm,0) * sp_wp_l1         &
+     &      + sw_rlm(1,3,j_rlm) * omega_rlm(k_rlm,0) * sp_vt_l1         &
      &      + sw_rlm(1,2,j_rlm) * omega_rlm(k_rlm,1) * sp_vp_k1         &
      &      + sw_rlm(2,2,j_rlm) * omega_rlm(k_rlm,1) * sp_vp_k2
 !*
@@ -211,13 +264,13 @@
       integer(kind = kint) :: i_rlm, k_rlm, j_rlm
       integer(kind = kint) :: i11, i21, i12, ir_11, ir_21, ir_12
       real(kind = kreal) :: sp_dvp_k1, sp_dvp_k2, sp_vp_k1, sp_vp_k2
-      real(kind = kreal) :: sp_wp_l1, sp_d2vp_l1, sp_vp_l1
+      real(kind = kreal) :: sp_vt_l1, sp_d2vp_l1, sp_vp_l1
       real(kind = kreal) :: sp_wp_k1, sp_wp_k2, sp_dwp_k1, sp_dwp_k2
 !
 !
 !$omp  parallel do                                                      &
 !$omp& private(k_rlm,j_rlm,i_rlm,i11,i21,i12,ir_11,ir_21,ir_12,         &
-!$omp&         sp_dvp_k1,sp_dvp_k2,sp_vp_k1,sp_vp_k2,sp_wp_l1,          &
+!$omp&         sp_dvp_k1,sp_dvp_k2,sp_vp_k1,sp_vp_k2,sp_vt_l1,          &
 !$omp&         sp_d2vp_l1,sp_vp_l1,sp_wp_k1,sp_wp_k2,sp_dwp_k1,         &
 !$omp&         sp_dwp_k2)
       do j_rlm = 1, nidx_rlm(2)
@@ -236,7 +289,7 @@
 !
           sp_dvp_k1 = WR(b_trns%base%i_velo+1 + NB*ir_11)
           sp_dvp_k2 = WR(b_trns%base%i_velo+1 + NB*ir_21)
-          sp_wp_l1 =  WR(b_trns%base%i_vort +  NB*ir_12)
+          sp_vt_l1 =  WR(b_trns%base%i_velo+2 + NB*ir_12)
           sp_vp_k1 =  WR(b_trns%base%i_velo +  NB*ir_11)
           sp_vp_k2 =  WR(b_trns%base%i_velo +  NB*ir_21)
 !
@@ -254,7 +307,7 @@
           d_rotp_cor_rlm(i_rlm)                                         &
      &     =  sw_rlm(1,1,j_rlm) * omega_rlm(k_rlm,0) * sp_dvp_k1        &
      &      + sw_rlm(2,1,j_rlm) * omega_rlm(k_rlm,0) * sp_dvp_k2        &
-     &      + sw_rlm(1,3,j_rlm) * omega_rlm(k_rlm,0) * sp_wp_l1         &
+     &      + sw_rlm(1,3,j_rlm) * omega_rlm(k_rlm,0) * sp_vt_l1         &
      &      + sw_rlm(1,2,j_rlm) * omega_rlm(k_rlm,1) * sp_vp_k1         &
      &      + sw_rlm(2,2,j_rlm) * omega_rlm(k_rlm,1) * sp_vp_k2
 !*

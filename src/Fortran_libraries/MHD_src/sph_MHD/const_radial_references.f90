@@ -14,7 +14,7 @@
 !!        integer(kind = kint), intent(in) :: iref_source
 !!        type(phys_data), intent(inout) :: ref_field
 !!      subroutine const_diffusive_profile_fix_bc                       &
-!!     &        (sph_rj, sc_prop, sph_bc_S, fdm2_center, r_2nd,         &
+!!     &        (sph_rj, sc_prop, sph_bc_S, fdm2_center, bcs_S, r_2nd,  &
 !!     &         band_s00_poisson, i_temp, i_source, rj_fld, file_name, &
 !!     &         reftemp_rj, reftemp_local)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
@@ -42,6 +42,7 @@
       use t_physical_property
       use t_boundary_data_sph_MHD
       use t_boundary_params_sph_MHD
+      use t_boundary_sph_spectr
       use t_coef_fdm2_MHD_boundaries
 !
       use t_fdm_coefs
@@ -105,7 +106,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_diffusive_profile_fix_bc                         &
-     &        (sph_rj, sc_prop, sph_bc_S, fdm2_center, r_2nd,           &
+     &        (sph_rj, sc_prop, sph_bc_S, bcs_S, fdm2_center, r_2nd,    &
      &         band_s00_poisson, i_temp, i_source, rj_fld, file_name,   &
      &         reftemp_rj, reftemp_local)
 !
@@ -113,6 +114,7 @@
       type(fdm_matrices), intent(in) :: r_2nd
       type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc_S
+      type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(phys_data), intent(in) :: rj_fld
       type(band_matrix_type), intent(in) :: band_s00_poisson
@@ -127,8 +129,8 @@
 !
 !
       call const_diffusive_profile_fixS(i_temp, i_source, sph_rj,       &
-     &    r_2nd, sc_prop, sph_bc_S, fdm2_center, band_s00_poisson,      &
-     &    rj_fld, reftemp_rj, reftemp_local)
+     &    r_2nd, sc_prop, sph_bc_S, bcs_S, fdm2_center,                 &
+     &    band_s00_poisson, rj_fld, reftemp_rj, reftemp_local)
 !
       if(iflag_debug .gt. 0) then
         call write_diffusive_profile_file(file_name, sph_rj,            &
@@ -243,7 +245,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine const_diffusive_profile_fixS(is_scalar, is_source,     &
-     &          sph_rj, r_2nd, sc_prop, sph_bc, fdm2_center,            &
+     &          sph_rj, r_2nd, sc_prop, sph_bc, bcs_S, fdm2_center,     &
      &          band_s00_poisson, rj_fld, reftemp_rj, reftemp_local)
 !
       use calypso_mpi
@@ -258,6 +260,7 @@
       type(fdm_matrices), intent(in) :: r_2nd
       type(scalar_property), intent(in) :: sc_prop
       type(sph_boundary_type), intent(in) :: sph_bc
+      type(sph_scalar_boundary_data), intent(in) :: bcs_S
       type(fdm2_center_mat), intent(in) :: fdm2_center
       type(phys_data), intent(in) :: rj_fld
       type(band_matrix_type), intent(in) :: band_s00_poisson
@@ -288,15 +291,8 @@
 !$omp end parallel workshare
         end if
 !
-        if(    sph_bc%iflag_icb .eq. iflag_sph_fill_center              &
-     &    .or. sph_bc%iflag_icb .eq. iflag_sph_fix_center) then
-          inod = sph_rj%inod_rj_center
-          reftemp_local(0,0) = rj_fld%d_fld(inod,is_scalar)
-        else
-          inod = sph_rj%idx_rj_degree_zero                              &
-     &          + (sph_bc%kr_in-1) * sph_rj%nidx_rj(2)
-          reftemp_local(sph_bc%kr_in,0) = rj_fld%d_fld(inod,is_scalar)
-        end if
+        call set_ICB_scalar_boundary_1d                                 &
+     &     (sph_rj, sph_bc, bcs_S%ICB_Sspec, reftemp_local(0,0))
 !
         inod = sph_rj%idx_rj_degree_zero                                &
      &        + (sph_bc%kr_out-1) * sph_rj%nidx_rj(2)

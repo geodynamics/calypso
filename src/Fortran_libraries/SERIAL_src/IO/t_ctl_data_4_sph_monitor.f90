@@ -47,9 +47,9 @@
 !!      ...
 !!    end   mid_equator_monitor_ctl
 !!
-!!  begin sph_dipolarity_ctl
+!!    begin sph_dipolarity_ctl
 !!      ...
-!!  end sph_dipolarity_ctl
+!!    end sph_dipolarity_ctl
 !!  end sph_monitor_ctl
 !!
 !! -----------------------------------------------------------------

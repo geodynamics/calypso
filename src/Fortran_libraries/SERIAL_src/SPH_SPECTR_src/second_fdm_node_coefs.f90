@@ -91,7 +91,7 @@
       deallocate(mat_fdm)
 !
       if(iflag_debug .gt. 0) then
-        write(*,*) 'check SEcond order FDM'
+        write(*,*) 'check Second order FDM'
         call check_fdm_coefs                                            &
      &     (sph_rj%nidx_rj(1), sph_rj%radius_1d_rj_r, fdm_2nd)
       end if

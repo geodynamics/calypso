@@ -136,7 +136,7 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'sum_coriolis_rlm'
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+8)
-      call sum_coriolis_rlm                                             &
+      call sum_rot_coriolis_rlm                                         &
      &   (trns_bwd%ncomp, sph%sph_rlm, comms_sph%comm_rlm,              &
      &    fl_prop, sph_bc_U, omega_sph, b_trns, trans_p%leg,            &
      &    gt_cor, SR_r%n_WR, SR_r%WR(1), cor_rlm)
@@ -260,9 +260,9 @@
      &                        SR_sig, SR_r)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+1)
 !
-      if(iflag_debug .gt. 0) write(*,*) 'sum_coriolis_rlm'
+      if(iflag_debug .gt. 0) write(*,*) 'sum_rot_coriolis_rlm'
       if(iflag_SMHD_time) call start_elapsed_time(ist_elapsed_SMHD+8)
-      call sum_coriolis_rlm(trns_bwd%ncomp, sph_rlm, comm_rlm,          &
+      call sum_rot_coriolis_rlm(trns_bwd%ncomp, sph_rlm, comm_rlm,      &
      &    fl_prop, sph_bc_U, omega_sph, b_trns, leg, gt_cor,            &
      &    SR_r%n_WR, SR_r%WR(1), cor_rlm)
       if(iflag_SMHD_time) call end_elapsed_time(ist_elapsed_SMHD+8)

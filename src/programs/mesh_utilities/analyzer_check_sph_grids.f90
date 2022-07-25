@@ -106,7 +106,7 @@
      &    SPH_GEN%sph, SPH_GEN%comms, SPH_GEN%groups)
       call calypso_mpi_allreduce_one_int(iflag, iflag_gl, MPI_MAX)
 !
-      write(*,*) 'indexing', my_rank, iflag_gl
+!      write(*,*) 'indexing', my_rank, iflag_gl
       call calypso_mpi_barrier
       if(iflag .gt. 0) call calypso_mpi_abort(ierr_P_MPI, e_message)
       if(iflag_gl .eq. 0 .and. my_rank .eq. 0) then
