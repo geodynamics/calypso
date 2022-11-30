@@ -149,16 +149,22 @@
           exit
         end if
       end do
-      lengh_nodir = length_name - lengh_dir - 1
 !
       if(lengh_dir .le. 0) then
+        lengh_nodir = length_name
+        write(fmt_txt,'(a2,i4,a1)') '(a',lengh_nodir,')'
         write(directory,'(a1)') char(0)
+!
+        write(fmt_txt,'(a2,i4,a1)') '(a',lengh_nodir,')'
+        write(fname_no_dir,fmt_txt) file_name(1:length_name)
       else
+        lengh_nodir = length_name - lengh_dir - 1
         write(fmt_txt,'(a2,i4,a1)') '(a',lengh_dir,')'
         write(directory,fmt_txt) file_name(1:lengh_dir)
+!
+        write(fmt_txt,'(a2,i4,a1)') '(a',lengh_nodir,')'
+        write(fname_no_dir,fmt_txt) file_name(lengh_dir+2:length_name)
       end if
-      write(fmt_txt,'(a2,i4,a1)') '(a',lengh_nodir,')'
-      write(fname_no_dir,fmt_txt) file_name(lengh_dir+2:length_name)
 !
       end subroutine split_directory
 !

@@ -164,9 +164,6 @@
      &    f_trns%forces_by_asym_sym, trns_fwd)
       trns_fwd%num_vector = trns_fwd%nfield
 !
-      call add_div_coriolis_MHD_sph_trns                                &
-     &   (d_rj, ipol%div_forces, iphys%div_forces, f_trns%div_forces,   &
-     &    trns_fwd)
       call add_field_comps_sph_trns_snap                                &
      &   (d_rj, ipol%fld_cmp, iphys%fld_cmp, f_trns%fld_cmp,            &
      &    trns_fwd)

@@ -18,6 +18,8 @@
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!      subroutine output_rms_sph_mhd_control(time_d, SPH_MHD, MHD_prop,&
 !!     &          sph_MHD_bc, r_2nd, leg, MHD_mats, monitor, SR_sig)
+!!      subroutine output_sph_monitor_data(time_d, sph_params, sph_rj,  &
+!!     &          sph_bc_U, ipol, rj_fld, monitor, SR_sig)
 !!        type(time_data), intent(in) :: time_d
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
@@ -37,13 +39,14 @@
 !!     &         (is_scalar, is_source, is_grad_s, time_d, sph, sc_prop,&
 !!     &          sph_bc_S, sph_bc_U, bcs_S, fdm2_center, r_2nd,        &
 !!     &          band_s00_poisson_fixS, rj_fld, Nusselt)
-!!      subroutine cal_write_dipolarity(time_d, sph_params,             &
+!!      subroutine cal_write_dipolarity(time_d, sph_params, sph_rj,     &
 !!     &          ipol, rj_fld, pwr, dip)
-!!      subroutine cal_write_typical_scale(time_d, rj_fld, pwr, tsl)
+!!      subroutine cal_write_typical_scale(time_d, sph_params, sph_rj,  &
+!!     &                                   sph_bc_U, rj_fld, pwr, tsl)
 !!        type(energy_label_param), intent(in) :: ene_labels
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_grids), intent(in) :: sph
-!!        type(sph_boundary_type), intent(in) :: sph_bc_U/
+!!        type(sph_boundary_type), intent(in) :: sph_bc_U
 !!        type(sph_scalar_boundary_data), intent(in) :: bcs_S
 !!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(band_matrix_type), intent(in) :: band_s00_poisson_fixS
@@ -128,8 +131,8 @@
      &      MHD_mats%band_C00_poisson_fixC, monitor%comp_Nusselt)
       end if
 !
-      call open_sph_vol_rms_file_mhd                                    &
-     &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld, monitor, SR_sig)
+      call open_sph_vol_rms_file_mhd(SPH_MHD%sph, sph_MHD_bc%sph_bc_U,  &
+     &   SPH_MHD%ipol, SPH_MHD%fld, monitor, SR_sig)
 !
       end subroutine init_rms_sph_mhd_control
 !
@@ -160,7 +163,8 @@
 !
       call output_sph_monitor_data                                      &
      &   (time_d, SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj,           &
-     &    SPH_MHD%ipol, SPH_MHD%fld, monitor, SR_sig)
+     &    sph_MHD_bc%sph_bc_U, SPH_MHD%ipol, SPH_MHD%fld,               &
+     &    monitor, SR_sig)
 !
       end subroutine output_rms_sph_mhd_control
 !
@@ -174,6 +178,8 @@
       use pickup_sph_spectr_data
       use pickup_gauss_coefficients
       use cal_heat_source_Nu
+      use cal_CMB_dipolarity
+      use cal_typical_scale
 !
       type(sph_grids), intent(in) :: sph
       type(MHD_evolution_param), intent(in) :: MHD_prop
@@ -210,28 +216,30 @@
      &      rj_fld, monitor%comp_Nusselt)
       end if
 !
-      if(iflag_debug.gt.0)  write(*,*) 'cal_CMB_dipolarity'
-      call cal_CMB_dipolarity(my_rank, rj_fld,                          &
-     &                        monitor%pwr, monitor%dip)
+      if(iflag_debug.gt.0)  write(*,*) 's_cal_CMB_dipolarity'
+      call s_cal_CMB_dipolarity(my_rank, rj_fld,                        &
+     &                          monitor%pwr, monitor%dip)
 !
       if(iflag_debug.gt.0)  write(*,*) 'cal_typical_scales'
-      call cal_typical_scales(rj_fld, monitor%pwr, monitor%tsl)
+      call cal_typical_scales(monitor%pwr, monitor%tsl)
 !
       end subroutine cal_sph_monitor_data
 !
 !  --------------------------------------------------------------------
 !
       subroutine output_sph_monitor_data(time_d, sph_params, sph_rj,    &
-     &          ipol, rj_fld, monitor, SR_sig)
+     &          sph_bc_U, ipol, rj_fld, monitor, SR_sig)
 !
       use t_solver_SR
       use output_sph_pwr_volume_file
       use write_picked_sph_spectr
       use write_sph_gauss_coefs
+      use write_typical_scale
 !
       type(time_data), intent(in) :: time_d
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) :: sph_rj
+      type(sph_boundary_type), intent(in) :: sph_bc_U
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(in) :: rj_fld
 !
@@ -246,22 +254,31 @@
      &   (monitor%ene_labels, time_d, sph_params, sph_rj, monitor%pwr)
 !
       if(monitor%heat_Nusselt%iflag_Nusselt .ne. 0) then
-        call write_no_heat_source_Nu(sph_rj%idx_rj_degree_zero,         &
-     &      time_d%i_time_step, time_d%time, monitor%heat_Nusselt)
+        call write_Nusselt_file(time_d%i_time_step, time_d%time,        &
+     &      sph_params%l_truncation, sph_rj%nidx_rj(1),                 &
+     &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
+     &      sph_rj%idx_rj_degree_zero, monitor%heat_Nusselt)
       end if
 !
       if(monitor%comp_Nusselt%iflag_Nusselt .ne. 0) then
-        call write_no_heat_source_Nu(sph_rj%idx_rj_degree_zero,         &
-     &      time_d%i_time_step, time_d%time, monitor%comp_Nusselt)
+        call write_Nusselt_file(time_d%i_time_step, time_d%time,        &
+     &      sph_params%l_truncation, sph_rj%nidx_rj(1),                 &
+     &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
+     &      sph_rj%idx_rj_degree_zero, monitor%comp_Nusselt)
       end if
 !
-      call write_dipolarity(my_rank, time_d%i_time_step, time_d%time,   &
-     &    sph_params%radius_CMB, ipol, monitor%pwr, monitor%dip)
-      call write_typical_scales(time_d%i_time_step, time_d%time,        &
-     &                          monitor%pwr, monitor%tsl)
+      if(my_rank .eq. monitor%pwr%irank_l) then
+        call write_dipolarity(time_d%i_time_step, time_d%time,          &
+     &      sph_params%l_truncation, sph_rj%nidx_rj(1),                 &
+     &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
+     &      ipol%base%i_magne, monitor%dip)
+      end if
 !
-      call write_each_picked_specr_file                                 &
-     &   (time_d, sph_rj, rj_fld, monitor%pick_coef)
+      call write_typical_scales(time_d%i_time_step, time_d%time,        &
+     &    sph_params, sph_rj, sph_bc_U, monitor%pwr, monitor%tsl)
+!
+      call write_picked_spectrum_files                                  &
+     &   (time_d, sph_params, sph_rj, rj_fld, monitor%pick_coef)
       call append_sph_gauss_coefs_file(time_d, sph_params, sph_rj,      &
      &    ipol, rj_fld, monitor%gauss_coef, SR_sig)
 !
@@ -328,18 +345,23 @@
       call sel_Nusselt_routine(is_scalar, is_source, is_grad_s,         &
      &    sph, r_2nd, sc_prop, sph_bc_S, sph_bc_U, bcs_S,               &
      &    fdm2_center, band_s00_poisson_fixS, rj_fld, Nusselt)
-      call write_no_heat_source_Nu(sph%sph_rj%idx_rj_degree_zero,       &
-     &    time_d%i_time_step, time_d%time, Nusselt)
+      call write_Nusselt_file(time_d%i_time_step, time_d%time,          &
+     &    sph%sph_params%l_truncation, sph%sph_rj%nidx_rj(1),           &
+     &    sph%sph_params%nlayer_ICB, sph%sph_params%nlayer_CMB,         &
+     &    sph%sph_rj%idx_rj_degree_zero, Nusselt)
 !
       end subroutine cal_write_no_heat_sourse_Nu
 !
 !  --------------------------------------------------------------------
 !
-      subroutine cal_write_dipolarity(time_d, sph_params,               &
+      subroutine cal_write_dipolarity(time_d, sph_params, sph_rj,       &
      &          ipol, rj_fld, pwr, dip)
+!
+      use cal_CMB_dipolarity
 !
       type(time_data), intent(in) :: time_d
       type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rj_grid), intent(in) :: sph_rj
       type(phys_address), intent(in) :: ipol
       type(phys_data), intent(in) :: rj_fld
 !
@@ -347,26 +369,37 @@
       type(dipolarity_data), intent(inout) :: dip
 !
 !
-      call cal_CMB_dipolarity(my_rank, rj_fld, pwr, dip)
-      call write_dipolarity(my_rank, time_d%i_time_step, time_d%time,   &
-     &    sph_params%radius_CMB, ipol, pwr, dip)
+      call s_cal_CMB_dipolarity(my_rank, rj_fld, pwr, dip)
+!
+      if(my_rank .eq. pwr%irank_l) then
+        call write_dipolarity(time_d%i_time_step, time_d%time,          &
+     &      sph_params%l_truncation, sph_rj%nidx_rj(1),                 &
+     &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
+     &      ipol%base%i_magne, dip)
+      end if
 !
       end subroutine cal_write_dipolarity
 !
 !  --------------------------------------------------------------------
 !
-      subroutine cal_write_typical_scale(time_d, rj_fld, pwr, tsl)
+      subroutine cal_write_typical_scale(time_d, sph_params, sph_rj,    &
+     &                                   sph_bc_U, pwr, tsl)
+!
+      use cal_typical_scale
+      use write_typical_scale
 !
       type(time_data), intent(in) :: time_d
-      type(phys_data), intent(in) :: rj_fld
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rj_grid), intent(in) :: sph_rj
+      type(sph_boundary_type), intent(in) :: sph_bc_U
       type(sph_mean_squares), intent(in) :: pwr
 !
       type(typical_scale_data), intent(inout) :: tsl
 !
 !
-      call cal_typical_scales(rj_fld, pwr, tsl)
+      call cal_typical_scales(pwr, tsl)
       call write_typical_scales(time_d%i_time_step, time_d%time,        &
-     &                          pwr, tsl)
+     &    sph_params, sph_rj, sph_bc_U, pwr, tsl)
 !
       end subroutine cal_write_typical_scale
 !

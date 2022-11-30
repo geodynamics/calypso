@@ -42,6 +42,7 @@
       implicit none
 !
       type(buffer_4_gzip), private :: zbuf_e
+      character, pointer, private, save :: FPz_ele
 !
 !------------------------------------------------------------------
 !
@@ -64,12 +65,12 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Read gzipped ascii element comm file: ', trim(file_name)
 !
-      call open_rd_gzfile_a(file_name, zbuf_e)
+      call open_rd_gzfile_a(FPz_ele, file_name, zbuf_e)
       call gz_read_element_comm_table                                   &
-     &   (id_rank, ele_mesh_IO%comm, zbuf_e, ierr)
+     &   (FPz_ele, id_rank, ele_mesh_IO%comm, zbuf_e, ierr)
 !      call gz_read_element_geometry                                    &
-!     &   (ele_mesh_IO%node, ele_mesh_IO%sfed, zbuf_e)
-      call close_gzfile_a(zbuf_e)
+!     &   (FPz_ele, ele_mesh_IO%node, ele_mesh_IO%sfed, zbuf_e)
+      call close_gzfile_a(FPz_ele, zbuf_e)
 !
       end subroutine gz_input_element_file
 !
@@ -90,12 +91,13 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Read gzipped ascii surface mesh file: ', trim(file_name)
 !
-      call open_rd_gzfile_a(file_name, zbuf_e)
-      call gz_read_surface_connection(id_rank, surf_mesh_IO%comm,       &
-     &   surf_mesh_IO%ele, surf_mesh_IO%sfed, zbuf_e, ierr)
+      call open_rd_gzfile_a(FPz_ele, file_name, zbuf_e)
+      call gz_read_surface_connection                                   &
+     &   (FPz_ele, id_rank, surf_mesh_IO%comm,                          &
+     &    surf_mesh_IO%ele, surf_mesh_IO%sfed, zbuf_e, ierr)
 !      call gz_read_surface_geometry                                    &
-!     &   (surf_mesh_IO%node, surf_mesh_IO%sfed, zbuf_e)
-      call close_gzfile_a(zbuf_e)
+!     &   (FPz_ele, surf_mesh_IO%node, surf_mesh_IO%sfed, zbuf_e)
+      call close_gzfile_a(FPz_ele, zbuf_e)
 !
       end subroutine gz_input_surface_file
 !
@@ -116,12 +118,12 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Read gzipped ascii edge mesh file: ', trim(file_name)
 !
-      call open_rd_gzfile_a(file_name, zbuf_e)
-      call gz_read_edge_connection(id_rank, edge_mesh_IO%comm,          &
+      call open_rd_gzfile_a(FPz_ele, file_name, zbuf_e)
+      call gz_read_edge_connection(FPz_ele, id_rank, edge_mesh_IO%comm, &
      &    edge_mesh_IO%ele, edge_mesh_IO%sfed, zbuf_e, ierr)
 !      call gz_read_edge_geometry                                       &
-!     &   (edge_mesh_IO%node, edge_mesh_IO%sfed, zbuf_e)
-      call close_gzfile_a(zbuf_e)
+!     &   (FPz_ele, edge_mesh_IO%node, edge_mesh_IO%sfed, zbuf_e)
+      call close_gzfile_a(FPz_ele, zbuf_e)
 !
       end subroutine gz_input_edge_file
 !
@@ -142,12 +144,12 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Write gzipped ascii element comm file: ', trim(file_name)
 !
-      call open_wt_gzfile_a(file_name, zbuf_e)
+      call open_wt_gzfile_a(FPz_ele, file_name, zbuf_e)
       call gz_write_element_comm_table                                  &
-     &   (id_rank, ele_mesh_IO%comm, zbuf_e)
+     &   (FPz_ele, id_rank, ele_mesh_IO%comm, zbuf_e)
 !      call gz_write_element_geometry                                   &
-!     &   (ele_mesh_IO%node, ele_mesh_IO%sfed, zbuf_e)
-      call close_gzfile_a(zbuf_e)
+!     &   (FPz_ele, ele_mesh_IO%node, ele_mesh_IO%sfed, zbuf_e)
+      call close_gzfile_a(FPz_ele, zbuf_e)
 !
       end subroutine gz_output_element_file
 !
@@ -167,12 +169,13 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Write gzipped ascii surface mesh file: ', trim(file_name)
 !
-      call open_wt_gzfile_a(file_name, zbuf_e)
-      call gz_write_surface_connection(id_rank, surf_mesh_IO%comm,      &
+      call open_wt_gzfile_a(FPz_ele, file_name, zbuf_e)
+      call gz_write_surface_connection                                  &
+     &   (FPz_ele, id_rank, surf_mesh_IO%comm,                          &
      &    surf_mesh_IO%ele, surf_mesh_IO%sfed, zbuf_e)
 !      call gz_write_surface_geometry                                   &
-!     &   (surf_mesh_IO%node, surf_mesh_IO%sfed, zbuf_e)
-      call close_gzfile_a(zbuf_e)
+!     &   (FPz_ele, surf_mesh_IO%node, surf_mesh_IO%sfed, zbuf_e)
+      call close_gzfile_a(FPz_ele, zbuf_e)
 !
       end subroutine gz_output_surface_file
 !
@@ -192,12 +195,13 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &  'Write gzipped ascii edge mesh file: ', trim(file_name)
 !
-      call open_wt_gzfile_a(file_name, zbuf_e)
-      call gz_write_edge_connection(id_rank, edge_mesh_IO%comm,         &
-     &    edge_mesh_IO%ele, edge_mesh_IO%sfed, zbuf_e)
+      call open_wt_gzfile_a(FPz_ele, file_name, zbuf_e)
+      call gz_write_edge_connection(FPz_ele, id_rank,                   &
+     &    edge_mesh_IO%comm, edge_mesh_IO%ele, edge_mesh_IO%sfed,       &
+     &    zbuf_e)
 !      call gz_write_edge_geometry                                      &
-!     &   (edge_mesh_IO%node, edge_mesh_IO%sfed, zbuf_e)
-      call close_gzfile_a(zbuf_e)
+!     &   (FPz_ele, edge_mesh_IO%node, edge_mesh_IO%sfed, zbuf_e)
+      call close_gzfile_a(FPz_ele, zbuf_e)
 !
       end subroutine gz_output_edge_file
 !

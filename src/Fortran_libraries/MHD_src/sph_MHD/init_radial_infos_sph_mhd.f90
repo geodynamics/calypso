@@ -126,7 +126,7 @@
       call set_rot_earth_4_sph(sph%sph_rlm, sph%sph_rj,                 &
      &    MHD_prop%fl_prop, omega_sph)
 !
-!*  ---------- boudary conditions  ---------------
+!*  ---------- boundary conditions  ---------------
       if(iflag_debug.gt.0) write(*,*) 's_set_bc_sph_mhd'
       call s_set_bc_sph_mhd                                             &
      &   (bc_IO, sph%sph_params, sph%sph_rj, sph_grps%radial_rj_grp,    &
@@ -170,33 +170,38 @@
       type(sph_MHD_boundary_data), intent(inout) :: sph_MHD_bc
       type(phys_data), intent(inout) :: rj_fld
 !
-      character(len=kchara) :: mat_name
+      character(len=kchara), parameter                                  &
+     &            :: tmat_name = 'reference_Temperature'
+      character(len=kchara), parameter                                  &
+     &            :: cmat_name = 'reference_Composition'
+      logical :: flag_ref
 !
+!
+      flag_ref = .FALSE.
       call init_reft_rj_data(sph%sph_rj, ipol, refs)
       call cal_ref_sources_from_d_rj(sph, ipol, rj_fld, refs)
       call load_sph_reference_data(sph%sph_rj, ipol, rj_fld, refs)
 !
-      write(mat_name,'(a)') 'reference_Temperature'
       call init_reference_scalar                                        &
      &   (MHD_prop%takepito_T, sph%sph_params, sph%sph_rj,              &
      &    r_2nd, MHD_prop%ht_prop, sph_MHD_bc%sph_bc_T,                 &
-     &    sph_MHD_bc%fdm2_center, mat_name, MHD_prop%ref_param_T,       &
+     &    sph_MHD_bc%fdm2_center, tmat_name, MHD_prop%ref_param_T,      &
      &    refs%iref_base%i_temp, refs%iref_grad%i_grad_temp,            &
      &    refs%iref_base%i_heat_source, refs%ref_field,                 &
-     &    sph_MHD_bc%bcs_T)
+     &    sph_MHD_bc%bcs_T, flag_ref)
 !
-      write(mat_name,'(a)') 'reference_Composition'
       call init_reference_scalar                                        &
      &   (MHD_prop%takepito_C, sph%sph_params, sph%sph_rj,              &
      &    r_2nd, MHD_prop%cp_prop, sph_MHD_bc%sph_bc_C,                 &
-     &    sph_MHD_bc%fdm2_center, mat_name, MHD_prop%ref_param_C,       &
+     &    sph_MHD_bc%fdm2_center, cmat_name, MHD_prop%ref_param_C,      &
      &    refs%iref_base%i_light, refs%iref_grad%i_grad_composit,       &
      &    refs%iref_base%i_light_source, refs%ref_field,                &
-     &    sph_MHD_bc%bcs_C)
+     &    sph_MHD_bc%bcs_C, flag_ref)
+      call calypso_mpi_barrier
 !
+      if(flag_ref .eqv. .FALSE.) return
       call set_default_reference_file_name(refs)
       call output_reference_field(refs)
-      call calypso_mpi_barrier
 !
       end subroutine init_reference_scalars
 !
@@ -205,7 +210,7 @@
       subroutine init_reference_scalar(takepiro, sph_params, sph_rj,    &
      &          r_2nd, sc_prop, sph_bc_S, fdm2_center, mat_name,        &
      &          ref_param, iref_scalar, iref_grad,                      &
-     &          iref_source, ref_field, bcs_S)
+     &          iref_source, ref_field, bcs_S, flag_ref)
 !
       use t_boundary_params_sph_MHD
       use t_boundary_sph_spectr
@@ -233,12 +238,19 @@
       type(reference_scalar_param), intent(inout) :: ref_param
       type(phys_data), intent(inout) :: ref_field
       type(sph_scalar_boundary_data), intent(inout) :: bcs_S
+      logical, intent(inout) :: flag_ref
 !
       character(len=kchara) :: file_name
       type(band_matrix_type) :: band_s00_poisson
 !
-!      Set reference temperature and adjust boundary conditions
 !
+      if (ref_param%iflag_reference .ne. id_sphere_ref_temp             &
+     & .and. ref_param%iflag_reference .ne. id_takepiro_temp            &
+     & .and. ref_param%iflag_reference .ne. id_numerical_solution       &
+     &    ) return
+      flag_ref = .TRUE.
+!
+!      Set reference temperature and adjust boundary conditions
       if (ref_param%iflag_reference .eq. id_sphere_ref_temp) then
         if(iflag_debug .gt. 0) write(*,*) 'set_ref_temp_sph_mhd'
         call set_ref_temp_sph_mhd                                       &
@@ -272,16 +284,12 @@
      &      ref_field%d_fld(1,iref_grad))
       end if
 !
-      if (ref_param%iflag_reference .eq. id_sphere_ref_temp             &
-     & .or. ref_param%iflag_reference .eq. id_takepiro_temp             &
-     & .or. ref_param%iflag_reference .eq. id_numerical_solution) then
-        call adjust_sph_temp_bc_by_reftemp                              &
-     &     (sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj(1),               &
-     &      ref_field%d_fld(1,iref_scalar),                             &
-     &      ref_field%d_fld(1,iref_grad),                               &
-     &      sph_bc_S, bcs_S%ICB_Sspec, bcs_S%CMB_Sspec,                 &
-     &      bcs_S%ICB_Sevo, bcs_S%CMB_Sevo)
-      end if
+      call adjust_sph_temp_bc_by_reftemp                                &
+     &   (sph_rj%idx_rj_degree_zero, sph_rj%nidx_rj(1),                 &
+     &    ref_field%d_fld(1,iref_scalar),                               &
+     &    ref_field%d_fld(1,iref_grad),                                 &
+     &    sph_bc_S, bcs_S%ICB_Sspec, bcs_S%CMB_Sspec,                   &
+     &    bcs_S%ICB_Sevo, bcs_S%CMB_Sevo)
 !
 !      if (i_ref*i_gref .gt. izero) then
 !        call set_reftemp_4_sph(sph_rj%idx_rj_degree_zero,              &

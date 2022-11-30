@@ -43,6 +43,18 @@
 !
       implicit none
 !
+      character(len=kchara), parameter, private                         &
+     &           :: press_l0_wc_name = 'average_pressure_w_center'
+      character(len=kchara), parameter, private                         &
+     &           :: temp_l0_wc_name = 'average_temperature_w_center'
+      character(len=kchara), parameter, private                         &
+     &           :: comp_l0_wc_name = 'average_composition_w_center'
+!
+      character(len=kchara), parameter, private                         &
+     &           :: temp_evo_name = 'Temperature_evolution'
+      character(len=kchara), parameter, private                         &
+     &           :: comp_evo_name = 'Composition_evolution'
+!
       private :: const_radial_matrices_sph
       private :: const_radial_mat_sph_w_center
 !
@@ -92,8 +104,6 @@
 !
       type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
 !
-      character(len=kchara) :: mat_name
-!
 !
       if(MHD_prop%fl_prop%iflag_scheme .lt. id_Crank_nicolson) return
       if(iflag_debug .gt. 0)                                            &
@@ -105,9 +115,8 @@
 !
       if(sph_rj%inod_rj_center .eq. 0) return
 !
-      write(mat_name,'(a)') 'average_pressure_w_center'
       call const_radial_mat_press00_sph                                 &
-     &   (mat_name, sph_rj, MHD_prop%fl_prop,                           &
+     &   (press_l0_wc_name, sph_rj, MHD_prop%fl_prop,                   &
      &    sph_MHD_bc%sph_bc_U, sph_MHD_bc%fdm2_center,                  &
      &    sph_MHD_mat%band_p_poisson, sph_MHD_mat%band_p00_poisson)
 !
@@ -132,8 +141,6 @@
       real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
 !
       type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
-!
-      character(len=kchara) :: mat_name
 !
 !
       if(MHD_prop%fl_prop%iflag_scheme .ge. id_Crank_nicolson) then
@@ -160,18 +167,16 @@
       end if
 !
       if(MHD_prop%ht_prop%iflag_scheme .ge. id_Crank_nicolson) then
-        write(mat_name,'(a)') 'Temperature_evolution'
         call const_radial_mat_4_scalar_sph                              &
-     &     (mat_name, MHD_prop%ht_prop%coef_advect, dt,                 &
+     &     (temp_evo_name, MHD_prop%ht_prop%coef_advect, dt,            &
      &      sph_params, sph_rj, r_2nd, MHD_prop%ht_prop,                &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                &
      &      g_sph_rj, sph_MHD_mat%band_temp_evo)
       end if
 !
-      if(MHD_prop%ht_prop%iflag_scheme .ge. id_Crank_nicolson) then
-        write(mat_name,'(a)') 'Composition_evolution'
+      if(MHD_prop%cp_prop%iflag_scheme .ge. id_Crank_nicolson) then
         call const_radial_mat_4_scalar_sph                              &
-     &     (mat_name, MHD_prop%cp_prop%coef_advect, dt,                 &
+     &     (comp_evo_name, MHD_prop%cp_prop%coef_advect, dt,            &
      &      sph_params, sph_rj, r_2nd, MHD_prop%cp_prop,                &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                &
      &      g_sph_rj, sph_MHD_mat%band_comp_evo)
@@ -193,30 +198,24 @@
 !
       type(MHD_radial_matrices), intent(inout) :: sph_MHD_mat
 !
-      character(len=kchara) :: mat_name
-!
 !
       if(sph_rj%idx_rj_degree_zero .eq. 0) return
 !
       call alloc_average_w_center(sph_rj, sph_MHD_mat)
 !
       if(sph_rj%inod_rj_center .gt. 0) then
-        write(mat_name,'(a)') 'average_pressure_w_center'
         call const_radial_mat_press00_sph                               &
-     &     (mat_name, sph_rj, MHD_prop%fl_prop,                         &
+     &     (press_l0_wc_name, sph_rj, MHD_prop%fl_prop,                 &
      &      sph_MHD_bc%sph_bc_U, sph_MHD_bc%fdm2_center,                &
      &      sph_MHD_mat%band_p_poisson, sph_MHD_mat%band_p00_poisson)
 !
-        write(mat_name,'(a)') 'average_temperature_w_center'
         call const_radial_mat_scalar00_sph                              &
-     &     (mat_name, dt, sph_rj, MHD_prop%ht_prop,                     &
+     &     (temp_l0_wc_name, dt, sph_rj, MHD_prop%ht_prop,              &
      &      sph_MHD_bc%sph_bc_T, sph_MHD_bc%fdm2_center,                &
      &      sph_MHD_mat%band_temp_evo, sph_MHD_mat%band_temp00_evo)
 !
-!
-        write(mat_name,'(a)') 'average_composition_w_center'
         call const_radial_mat_scalar00_sph                              &
-     &     (mat_name, dt, sph_rj, MHD_prop%cp_prop,                     &
+     &     (comp_l0_wc_name, dt, sph_rj, MHD_prop%cp_prop,              &
      &      sph_MHD_bc%sph_bc_C, sph_MHD_bc%fdm2_center,                &
      &      sph_MHD_mat%band_comp_evo, sph_MHD_mat%band_comp00_evo)
       end if

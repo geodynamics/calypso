@@ -4,7 +4,7 @@ cal_circle_transform.o: $(SPH_COMMDIR)/cal_circle_transform.f90 m_precision.o m_
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_rms_by_sph_spectr.o: $(SPH_COMMDIR)/cal_rms_by_sph_spectr.f90 m_precision.o m_constants.o t_spheric_rj_data.o t_phys_address.o m_phys_constants.o cal_sph_mean_square.o t_base_field_labels.o single_pt_sph_mean_square.o
 	$(F90) -c $(F90OPTFLAGS) $<
-cal_rms_fields_by_sph.o: $(SPH_COMMDIR)/cal_rms_fields_by_sph.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_parameter.o t_phys_data.o t_phys_address.o t_sum_sph_rms_data.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o t_CMB_dipolarity.o calypso_mpi.o sum_sph_rms_data.o volume_average_4_sph.o cal_ave_4_rms_vector_sph.o quicksort.o calypso_mpi_real.o radial_int_for_sph_spec.o calypso_mpi_int4.o
+cal_rms_fields_by_sph.o: $(SPH_COMMDIR)/cal_rms_fields_by_sph.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_parameter.o t_phys_data.o t_phys_address.o t_sum_sph_rms_data.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o calypso_mpi.o volume_average_4_sph.o cal_ave_4_rms_vector_sph.o sum_sph_rms_data.o calypso_mpi_real.o radial_int_for_sph_spec.o
 	$(F90) -c $(F90OPTFLAGS) $<
 cal_sp_rlm_by_vecprod.o: $(SPH_COMMDIR)/cal_sp_rlm_by_vecprod.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -40,6 +40,8 @@ correlation_by_sph_spectr.o: $(SPH_COMMDIR)/correlation_by_sph_spectr.f90 m_prec
 	$(F90) -c $(F90OPTFLAGS) $<
 init_FFT_4_sph.o: $(SPH_COMMDIR)/init_FFT_4_sph.F90 m_precision.o calypso_mpi.o m_machine_parameter.o m_FFT_selector.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_sph_FFT_selector.o t_solver_SR.o calypso_mpi_real.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
+init_rms_4_sph_spectr.o: $(SPH_COMMDIR)/init_rms_4_sph_spectr.f90 m_precision.o m_constants.o m_machine_parameter.o t_spheric_parameter.o t_phys_data.o t_phys_address.o t_sum_sph_rms_data.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o calypso_mpi.o sum_sph_rms_data.o volume_average_4_sph.o cal_ave_4_rms_vector_sph.o set_parallel_file_name.o quicksort.o calypso_mpi_int4.o
+	$(F90) -c $(F90OPTFLAGS) $<
 init_sph_trans.o: $(SPH_COMMDIR)/init_sph_trans.f90 m_precision.o m_constants.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_schmidt_poly_on_rtm.o t_work_4_sph_trans.o t_legendre_trans_select.o t_sph_FFT_selector.o t_solver_SR.o init_FFT_4_sph.o m_FFT_selector.o schmidt_poly_on_rtm_grid.o set_legendre_matrices.o set_params_sph_trans.o t_spheric_rtm_data.o t_spheric_rlm_data.o t_spheric_rj_data.o calypso_mpi.o m_machine_parameter.o m_sph_communicators.o m_legendre_transform_list.o init_spherical_SRs.o cal_minmax_and_stacks.o
 	$(F90) -c $(F90OPTFLAGS) $<
 init_spherical_SRs.o: $(SPH_COMMDIR)/init_spherical_SRs.f90 m_precision.o m_constants.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_work_4_sph_trans_spin.o t_solver_SR.o calypso_mpi.o m_sph_communicators.o spherical_SRs_N.o calypso_mpi_real.o transfer_to_long_integers.o select_copy_from_recv.o calypso_SR_core.o sel_spherical_SRs.o
@@ -236,8 +238,10 @@ t_work_4_sph_trans_spin.o: $(SPH_COMMDIR)/t_work_4_sph_trans_spin.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 volume_average_4_sph.o: $(SPH_COMMDIR)/volume_average_4_sph.f90 m_precision.o m_constants.o m_phys_constants.o t_rms_4_sph_spectr.o t_spheric_rj_data.o t_phys_data.o cal_ave_4_rms_vector_sph.o radial_int_for_sph_spec.o
 	$(F90) -c $(F90OPTFLAGS) $<
-write_picked_sph_spectr.o: $(SPH_COMMDIR)/write_picked_sph_spectr.f90 m_precision.o m_constants.o calypso_mpi.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_data.o t_time_data.o pickup_sph_spectr_data.o set_parallel_file_name.o write_field_labels.o
+write_each_pick_spectr_file.o: $(SPH_COMMDIR)/write_each_pick_spectr_file.f90 m_precision.o m_constants.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_data.o t_time_data.o t_buffer_4_gzip.o write_field_labels.o gz_open_sph_monitor_file.o set_parallel_file_name.o write_pick_sph_spectr_data.o delete_data_files.o select_gz_stream_file_IO.o sel_gz_input_sph_mtr_head.o compare_sph_monitor_header.o sph_power_spectr_data_text.o data_convert_by_zlib.o
 	$(F90) -c $(F90OPTFLAGS) $<
-write_sph_gauss_coefs.o: $(SPH_COMMDIR)/write_sph_gauss_coefs.f90 m_precision.o m_constants.o calypso_mpi.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_address.o t_phys_data.o t_time_data.o m_monitor_file_labels.o t_solver_SR.o set_parallel_file_name.o delete_data_files.o pickup_gauss_coefficients.o collect_SR_N.o skip_comment_f.o
+write_picked_sph_spectr.o: $(SPH_COMMDIR)/write_picked_sph_spectr.f90 m_precision.o m_constants.o calypso_mpi.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_data.o t_time_data.o t_buffer_4_gzip.o pickup_sph_spectr_data.o sph_monitor_data_text.o select_gz_stream_file_IO.o write_pick_sph_spectr_data.o write_each_pick_spectr_file.o
+	$(F90) -c $(F90OPTFLAGS) $<
+write_sph_gauss_coefs.o: $(SPH_COMMDIR)/write_sph_gauss_coefs.f90 m_precision.o m_constants.o calypso_mpi.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_address.o t_phys_data.o t_time_data.o t_read_sph_spectra.o t_buffer_4_gzip.o m_monitor_file_labels.o t_solver_SR.o set_parallel_file_name.o delete_data_files.o select_gz_stream_file_IO.o sph_monitor_data_text.o gz_open_sph_monitor_file.o m_time_labels.o pickup_gauss_coefficients.o collect_SR_N.o check_sph_monitor_header.o compare_sph_monitor_header.o sph_power_spectr_data_text.o sel_gz_input_sph_mtr_head.o
 	$(F90) -c $(F90OPTFLAGS) $<
 

@@ -149,8 +149,10 @@
 !
       if(sph_rj%idx_rj_degree_zero .eq. 0) return
 !
-      Nu_type%r_ICB_Nu = sph_bc_U%r_ICB(0)
-      Nu_type%r_CMB_Nu = sph_bc_U%r_CMB(0)
+      Nu_type%kr_ICB_Nu = sph_bc_U%kr_in
+      Nu_type%kr_CMB_Nu = sph_bc_U%kr_out
+      Nu_type%r_ICB_Nu =  sph_bc_U%r_ICB(0)
+      Nu_type%r_CMB_Nu =  sph_bc_U%r_CMB(0)
 !
       inod_ICB = sph_rj%idx_rj_degree_zero                              &
      &          + (sph_bc_U%kr_in-1) * sph_rj%nidx_rj(2)

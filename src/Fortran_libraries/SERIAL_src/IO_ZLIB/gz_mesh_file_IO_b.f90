@@ -44,7 +44,8 @@
 !
       implicit none
 !
-      type(buffer_4_gzip), private :: zbuf_mesh
+      type(buffer_4_gzip), private, save :: zbuf_mesh
+      character, pointer, private, save :: FPz_msh
 !
 !  ---------------------------------------------------------------------
 !
@@ -68,15 +69,16 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary mesh file: ', trim(file_name)
 !
-      call open_rd_gzfile_b(file_name, id_rank, zbuf_mesh)
+      call open_rd_gzfile_b(FPz_msh, file_name, id_rank, zbuf_mesh)
       if(zbuf_mesh%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_geometry_data_b(id_rank, zbuf_mesh, mesh_IO)
+      call gz_read_geometry_data_b(FPz_msh, id_rank,                    &
+     &                             zbuf_mesh, mesh_IO)
       if(zbuf_mesh%ierr_zlib .ne. 0) go to 99
-      call gz_read_mesh_groups_b(zbuf_mesh, group_IO)
+      call gz_read_mesh_groups_b(FPz_msh, zbuf_mesh, group_IO)
 !
   99  continue
-      call close_gzfile_b
+      call close_gzfile_b(FPz_msh)
       ierr = zbuf_mesh%ierr_zlib
 !
       end subroutine gz_read_mesh_file_b
@@ -98,13 +100,14 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary mesh file: ', trim(file_name)
 !
-      call open_rd_gzfile_b(file_name, id_rank, zbuf_mesh)
+      call open_rd_gzfile_b(FPz_msh, file_name, id_rank, zbuf_mesh)
       if(zbuf_mesh%ierr_zlib .ne. 0) goto 99
 !
-      call gz_read_geometry_data_b(id_rank, zbuf_mesh, mesh_IO)
+      call gz_read_geometry_data_b(FPz_msh, id_rank,                    &
+     &                             zbuf_mesh, mesh_IO)
 !
   99  continue
-      call close_gzfile_b
+      call close_gzfile_b(FPz_msh)
       ierr = zbuf_mesh%ierr_zlib
 !
       end subroutine gz_read_mesh_geometry_b
@@ -126,13 +129,13 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary mesh file: ', trim(file_name)
 !
-      call open_rd_gzfile_b(file_name, id_rank, zbuf_mesh)
+      call open_rd_gzfile_b(FPz_msh, file_name, id_rank, zbuf_mesh)
       if(zbuf_mesh%ierr_zlib .ne. 0) goto 99
 !
-      call gz_read_num_node_b(id_rank, zbuf_mesh, mesh_IO)
+      call gz_read_num_node_b(FPz_msh, id_rank, zbuf_mesh, mesh_IO)
 !
   99  continue
-      call close_gzfile_b
+      call close_gzfile_b(FPz_msh)
       ierr = zbuf_mesh%ierr_zlib
 !
       end subroutine gz_read_node_size_b
@@ -154,13 +157,14 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Read gzipped binary mesh file: ', trim(file_name)
 !
-      call open_rd_gzfile_b(file_name, id_rank, zbuf_mesh)
+      call open_rd_gzfile_b(FPz_msh, file_name, id_rank, zbuf_mesh)
       if(zbuf_mesh%ierr_zlib .ne. 0) goto 99
 !
-      call gz_read_num_node_ele_b(id_rank, zbuf_mesh, mesh_IO)
+      call gz_read_num_node_ele_b(FPz_msh, id_rank,                     &
+     &                            zbuf_mesh, mesh_IO)
 !
   99  continue
-      call close_gzfile_b
+      call close_gzfile_b(FPz_msh)
       ierr = zbuf_mesh%ierr_zlib
 !
       end subroutine gz_read_geometry_size_b
@@ -182,10 +186,11 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &   'Write gzipped binary mesh file: ', trim(file_name)
 !
-      call open_wt_gzfile_b(file_name, zbuf_mesh)
-      call gz_write_geometry_data_b(id_rank, mesh_IO, zbuf_mesh)
-      call gz_write_mesh_groups_b(group_IO, zbuf_mesh)
-      call close_gzfile_b
+      call open_wt_gzfile_b(FPz_msh, file_name, zbuf_mesh)
+      call gz_write_geometry_data_b(FPz_msh, id_rank,                   &
+     &                              mesh_IO, zbuf_mesh)
+      call gz_write_mesh_groups_b(FPz_msh, group_IO, zbuf_mesh)
+      call close_gzfile_b(FPz_msh)
 !
       end subroutine gz_write_mesh_file_b
 !

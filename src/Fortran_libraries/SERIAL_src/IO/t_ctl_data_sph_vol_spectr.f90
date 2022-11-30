@@ -30,6 +30,7 @@
 !!      begin volume_spectrum_ctl
 !!        volume_average_prefix        'sph_ave_convective'
 !!        volume_pwr_spectr_prefix     'sph_pwr_convective'
+!!        volume_pwr_spectr_format     'ASCII'
 !!        inner_radius_ctl           0.55
 !!        outer_radius_ctl           1.4
 !!      end volume_spectrum_ctl
@@ -37,6 +38,7 @@
 !!      begin volume_spectrum_ctl
 !!        volume_average_prefix        'sph_ave_inner_core'
 !!        volume_pwr_spectr_prefix     'sph_pwr_outer_core'
+!!        volume_pwr_spectr_format     'gzip'
 !!        inner_radius_ctl           0.0
 !!        outer_radius_ctl           0.538
 !!      end volume_spectrum_ctl
@@ -59,10 +61,12 @@
 !
 !
       type volume_spectr_control
-!>        filew name for volume mean square
+!>        file name for volume mean square
         type(read_character_item) :: volume_spec_file_ctl
-!>        filew name for volume average
+!>        file name for volume average
         type(read_character_item) :: volume_ave_file_ctl
+!>        file format for volume mean square
+        type(read_character_item) :: volume_spec_format_ctl
 !
 !>        Structure for inner boundary radius
         type(read_real_item) :: inner_radius_ctl
@@ -79,6 +83,8 @@
      &            :: hd_vol_pwr = 'volume_pwr_spectr_prefix'
       character(len=kchara), parameter, private                         &
      &            :: hd_vol_ave = 'volume_average_prefix'
+      character(len=kchara), parameter, private                         &
+     &            :: hd_vol_fmt = 'volume_pwr_spectr_format'
       character(len=kchara), parameter, private                         &
      &            :: hd_inner_r = 'inner_radius_ctl'
       character(len=kchara), parameter, private                         &
@@ -116,6 +122,8 @@
      &    new_vpwr%volume_spec_file_ctl)
       call copy_chara_ctl(org_vpwr%volume_ave_file_ctl,                 &
      &    new_vpwr%volume_ave_file_ctl)
+      call copy_chara_ctl(org_vpwr%volume_spec_format_ctl,              &
+     &    new_vpwr%volume_spec_format_ctl)
       call copy_real_ctl(org_vpwr%inner_radius_ctl,                     &
      &    new_vpwr%inner_radius_ctl)
       call copy_real_ctl(org_vpwr%outer_radius_ctl,                     &
@@ -143,6 +151,8 @@
 !
         call read_chara_ctl_type(c_buf, hd_vol_pwr,                     &
      &      v_pwr%volume_spec_file_ctl)
+        call read_chara_ctl_type(c_buf, hd_vol_fmt,                     &
+     &      v_pwr%volume_spec_format_ctl)
         call read_chara_ctl_type(c_buf, hd_vol_ave,                     &
      &      v_pwr%volume_ave_file_ctl)
         call read_real_ctl_type(c_buf, hd_inner_r,                      &
@@ -161,10 +171,11 @@
 !
       type(volume_spectr_control), intent(inout) :: v_pwr
 !
-      v_pwr%volume_spec_file_ctl%iflag = 0
-      v_pwr%volume_ave_file_ctl%iflag =  0
-      v_pwr%inner_radius_ctl%iflag =     0
-      v_pwr%outer_radius_ctl%iflag =     0
+      v_pwr%volume_spec_file_ctl%iflag =   0
+      v_pwr%volume_ave_file_ctl%iflag =    0
+      v_pwr%volume_spec_format_ctl%iflag = 0
+      v_pwr%inner_radius_ctl%iflag =       0
+      v_pwr%outer_radius_ctl%iflag =       0
       v_pwr%i_vol_spectr_ctl = 0
 !
       end subroutine reset_volume_spectr_control

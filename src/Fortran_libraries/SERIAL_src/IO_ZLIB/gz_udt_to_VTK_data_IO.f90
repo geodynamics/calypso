@@ -7,15 +7,17 @@
 !> @brief ucd data into VTK format IO
 !!
 !!@verbatim
-!!      subroutine write_gz_ucd_field_to_VTK(ucd, zbuf)
-!!      subroutine write_gz_ucd_mesh_to_VTK(ucd, zbuf)
+!!      subroutine write_gz_ucd_field_to_VTK(FPz_f, ucd, zbuf)
+!!      subroutine write_gz_ucd_mesh_to_VTK(FPz_f, ucd, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!        type(ucd_data), intent(in) :: ucd
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!
-!!      subroutine read_gz_udt_field_from_VTK(ucd, zbuf)
-!!      subroutine read_alloc_gz_udt_fld_from_VTK(ucd, zbuf)
-!!      subroutine read_gz_ucd_grd_from_VTK(ucd, zbuf)
-!!      subroutine read_alloc_gz_ucd_grd_from_VTK(ucd, zbuf)
+!!      subroutine read_gz_udt_field_from_VTK(FPz_f, ucd, zbuf)
+!!      subroutine read_alloc_gz_udt_fld_from_VTK(FPz_f, ucd, zbuf)
+!!      subroutine read_gz_ucd_grd_from_VTK(FPz_f, ucd, zbuf)
+!!      subroutine read_alloc_gz_ucd_grd_from_VTK(FPz_f, ucd, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!        type(ucd_data), intent(inout) :: ucd
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!@endverbatim
@@ -39,46 +41,51 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine write_gz_ucd_field_to_VTK(ucd, zbuf)
+      subroutine write_gz_ucd_field_to_VTK(FPz_f, ucd, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       type(ucd_data), intent(in) :: ucd
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
-      call write_gz_vtk_fields_head(ucd%nnod, zbuf)
-      call write_gz_vtk_data(ucd%nnod, ucd%num_field,                   &
+      call write_gz_vtk_fields_head(FPz_f, ucd%nnod, zbuf)
+      call write_gz_vtk_data(FPz_f, ucd%nnod, ucd%num_field,            &
      &    ucd%ntot_comp, ucd%num_comp, ucd%phys_name, ucd%d_ucd, zbuf)
 !
       end subroutine write_gz_ucd_field_to_VTK
 !
 !-----------------------------------------------------------------------
 !
-      subroutine write_gz_ucd_mesh_to_VTK(ucd, zbuf)
+      subroutine write_gz_ucd_mesh_to_VTK(FPz_f, ucd, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       type(ucd_data), intent(in) :: ucd
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
-      call write_gz_vtk_node_head(ucd%nnod, zbuf)
+      call write_gz_vtk_node_head(FPz_f, ucd%nnod, zbuf)
       call write_gz_vtk_each_field                                      &
-     &   (ucd%nnod, n_vector, ucd%nnod, ucd%xx, zbuf)
+     &   (FPz_f, ucd%nnod, n_vector, ucd%nnod, ucd%xx, zbuf)
 !
-      call write_gz_vtk_connect_head(ucd%nele, ucd%nnod_4_ele, zbuf)
+      call write_gz_vtk_connect_head                                    &
+     &   (FPz_f, ucd%nele, ucd%nnod_4_ele, zbuf)
       call write_gz_vtk_connect_data                                    &
-     &   (ucd%nele, ucd%nnod_4_ele, ucd%nele, ucd%ie, zbuf)
+     &   (FPz_f, ucd%nele, ucd%nnod_4_ele, ucd%nele, ucd%ie, zbuf)
 !
-      call write_gz_vtk_cell_type(ucd%nele, ucd%nnod_4_ele, zbuf)
+      call write_gz_vtk_cell_type                                       &
+     &   (FPz_f, ucd%nele, ucd%nnod_4_ele, zbuf)
 !
       end subroutine write_gz_ucd_mesh_to_VTK
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_gz_udt_field_from_VTK(ucd, zbuf)
+      subroutine read_gz_udt_field_from_VTK(FPz_f, ucd, zbuf)
 !
       use skip_comment_f
       use copy_between_two_fields
 !
+      character, pointer, intent(in) :: FPz_f
       type(ucd_data), intent(inout) :: ucd
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
@@ -88,13 +95,13 @@
       integer(kind=kint_gl) :: nnod
 !
 !
-      call read_gz_vtk_fields_head(nnod, zbuf)
+      call read_gz_vtk_fields_head(FPz_f, nnod, zbuf)
       if(nnod .ne. ucd%nnod) write(*,*) 'Error in number of node'
 !
       i_field = 0
       do
         call read_gz_vtk_each_field_head                                &
-     &     (iflag_end, ncomp_field, field_name, zbuf)
+     &     (FPz_f, iflag_end, ncomp_field, field_name, zbuf)
         if(iflag_end .ne. izero) exit
 !
         i_field = i_field + 1
@@ -108,7 +115,7 @@
         allocate(d_tmp(ucd%nnod,ncomp_field))
 !
         call read_gz_vtk_each_field                                     &
-     &     (ucd%nnod, ncomp_field, ucd%nnod, d_tmp(1,1), zbuf)
+     &     (FPz_f, ucd%nnod, ncomp_field, ucd%nnod, d_tmp(1,1), zbuf)
         call copy_fields_2_fields(ncomp_field,                          &
      &      ione, ucd%nnod, ncomp_field, d_tmp(1,1),                    &
      &      i_field, ucd%nnod, ucd%ntot_comp, ucd%d_ucd)
@@ -123,8 +130,9 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine read_alloc_gz_udt_fld_from_VTK(ucd, zbuf)
+      subroutine read_alloc_gz_udt_fld_from_VTK(FPz_f, ucd, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       type(ucd_data), intent(inout) :: ucd
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
@@ -135,7 +143,7 @@
       real(kind = kreal), allocatable :: d_tmp(:,:)
 !
 !
-      call read_gz_vtk_fields_head(ucd%nnod, zbuf)
+      call read_gz_vtk_fields_head(FPz_f, ucd%nnod, zbuf)
 !
       tmp%nnod = ucd%nnod
       ucd%num_field = 0
@@ -145,7 +153,7 @@
 !
       do
         call read_gz_vtk_each_field_head                                &
-     &     (iflag_end, ncomp_field, field_name, zbuf)
+     &     (FPz_f, iflag_end, ncomp_field, field_name, zbuf)
         if(iflag_end .ne. izero) exit
 !
         tmp%num_field = ucd%num_field
@@ -159,7 +167,7 @@
         allocate(d_tmp(ucd%nnod,ncomp_field))
 !
         call read_gz_vtk_each_field                                     &
-     &     (ucd%nnod, ncomp_field, ucd%nnod, d_tmp(1,1), zbuf)
+     &     (FPz_f, ucd%nnod, ncomp_field, ucd%nnod, d_tmp(1,1), zbuf)
         call append_new_ucd_field_data(ncomp_field, d_tmp,              &
      &      tmp, ucd)
 !
@@ -174,8 +182,9 @@
 !-----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine read_gz_ucd_grd_from_VTK(ucd, zbuf)
+      subroutine read_gz_ucd_grd_from_VTK(FPz_f, ucd, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       type(ucd_data), intent(inout) :: ucd
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
@@ -184,11 +193,11 @@
       integer(kind = kint_gl) :: inod, iele
 !
 !
-      call read_gz_vtk_node_head(nnod, zbuf)
+      call read_gz_vtk_node_head(FPz_f, nnod, zbuf)
       if(nnod .ne. ucd%nnod) write(*,*) 'Error in number of node'
 !
       call read_gz_vtk_each_field                                       &
-     &   (ucd%nnod, ithree, ucd%nnod, ucd%xx, zbuf)
+     &   (FPz_f, ucd%nnod, ithree, ucd%nnod, ucd%xx, zbuf)
 !
 !$omp parallel do
       do inod = 1, ucd%nnod
@@ -196,14 +205,14 @@
       end do
 !$omp end parallel do
 !
-      call read_gz_vtk_connect_head(nele, nnod_ele, zbuf)
+      call read_gz_vtk_connect_head(FPz_f, nele, nnod_ele, zbuf)
       if(nele .ne. ucd%nele) write(*,*) 'Error in number of element'
       if(nnod_ele .ne. ucd%nnod_4_ele) write(*,*)                       &
      &                       'Error in number of node in each element'
 !
       call read_gz_vtk_connect_data                                     &
-     &   (ucd%nele, ucd%nnod_4_ele, ucd%nele, ucd%ie, zbuf)
-      call read_gz_vtk_cell_type(ucd%nele, zbuf)
+     &   (FPz_f, ucd%nele, ucd%nnod_4_ele, ucd%nele, ucd%ie, zbuf)
+      call read_gz_vtk_cell_type(FPz_f, ucd%nele, zbuf)
 !
 !$omp parallel do
       do iele = 1, ucd%nele
@@ -215,19 +224,20 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_alloc_gz_ucd_grd_from_VTK(ucd, zbuf)
+      subroutine read_alloc_gz_ucd_grd_from_VTK(FPz_f, ucd, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       type(ucd_data), intent(inout) :: ucd
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint_gl) :: inod, iele
 !
 !
-      call read_gz_vtk_node_head(ucd%nnod, zbuf)
+      call read_gz_vtk_node_head(FPz_f, ucd%nnod, zbuf)
       call allocate_ucd_node(ucd)
 !
       call read_gz_vtk_each_field                                       &
-     &   (ucd%nnod, ithree, ucd%nnod, ucd%xx, zbuf)
+     &   (FPz_f, ucd%nnod, ithree, ucd%nnod, ucd%xx, zbuf)
 !
 !$omp parallel do
       do inod = 1, ucd%nnod
@@ -235,12 +245,13 @@
       end do
 !$omp end parallel do
 !
-      call read_gz_vtk_connect_head(ucd%nele, ucd%nnod_4_ele, zbuf)
+      call read_gz_vtk_connect_head                                     &
+     &   (FPz_f, ucd%nele, ucd%nnod_4_ele, zbuf)
       call allocate_ucd_ele(ucd)
 !
       call read_gz_vtk_connect_data                                     &
-     &   (ucd%nele, ucd%nnod_4_ele, ucd%nele, ucd%ie, zbuf)
-      call read_gz_vtk_cell_type(ucd%nele, zbuf)
+     &   (FPz_f, ucd%nele, ucd%nnod_4_ele, ucd%nele, ucd%ie, zbuf)
+      call read_gz_vtk_cell_type(FPz_f, ucd%nele, zbuf)
 !
 !$omp parallel do
       do iele = 1, ucd%nele

@@ -45,9 +45,14 @@
 !
       call bcast_ctl_type_c1(smonitor_ctl%volume_average_prefix)
       call bcast_ctl_type_c1(smonitor_ctl%volume_pwr_spectr_prefix)
+      call bcast_ctl_type_c1(smonitor_ctl%volume_pwr_spectr_format)
+
       call bcast_ctl_type_c1(smonitor_ctl%heat_Nusselt_file_prefix)
+      call bcast_ctl_type_c1(smonitor_ctl%heat_Nusselt_file_format)
       call bcast_ctl_type_c1(smonitor_ctl%comp_Nusselt_file_prefix)
+      call bcast_ctl_type_c1(smonitor_ctl%comp_Nusselt_file_format)
       call bcast_ctl_type_c1(smonitor_ctl%typ_scale_file_prefix_ctl)
+      call bcast_ctl_type_c1(smonitor_ctl%typ_scale_file_format_ctl)
 !
       call bcast_pickup_spectr_ctl(smonitor_ctl%pspec_ctl)
       call bcast_gauss_spectr_ctl(smonitor_ctl%g_pwr)
@@ -91,6 +96,7 @@
       call bcast_ctl_array_i1(pspec_ctl%idx_pick_sph_m_ctl)
 !
       call bcast_ctl_type_c1(pspec_ctl%picked_mode_head_ctl)
+      call bcast_ctl_type_c1(pspec_ctl%picked_mode_fmt_ctl)
       call calypso_mpi_bcast_one_int(pspec_ctl%i_pick_sph, 0)
 !
       end subroutine bcast_pickup_spectr_ctl
@@ -111,6 +117,7 @@
 !
       call bcast_ctl_type_r1(g_pwr%gauss_coefs_radius_ctl)
       call bcast_ctl_type_c1(g_pwr%gauss_coefs_prefix)
+      call bcast_ctl_type_c1(g_pwr%gauss_coefs_format)
       call calypso_mpi_bcast_one_int(g_pwr%i_gauss_coef_ctl, 0)
 !
       end subroutine bcast_gauss_spectr_ctl
@@ -132,6 +139,7 @@
       do i = 1, num_vspec_ctl
         call bcast_ctl_type_c1(v_pwr(i)%volume_spec_file_ctl)
         call bcast_ctl_type_c1(v_pwr(i)%volume_ave_file_ctl)
+        call bcast_ctl_type_c1(v_pwr(i)%volume_spec_format_ctl)
         call bcast_ctl_type_r1(v_pwr(i)%inner_radius_ctl)
         call bcast_ctl_type_r1(v_pwr(i)%outer_radius_ctl)
         call calypso_mpi_bcast_one_int(v_pwr(i)%i_vol_spectr_ctl, 0)
@@ -152,6 +160,7 @@
       call bcast_ctl_array_i1(lp_ctl%idx_spec_layer_ctl)
 !
       call bcast_ctl_type_c1(lp_ctl%layered_pwr_spectr_prefix)
+      call bcast_ctl_type_c1(lp_ctl%layered_pwr_spectr_format)
 !
       call bcast_ctl_type_c1(lp_ctl%degree_spectr_switch)
       call bcast_ctl_type_c1(lp_ctl%order_spectr_switch)
@@ -171,8 +180,9 @@
       type(sph_dipolarity_control), intent(inout) :: fdip_ctl
 !
 !
-      call bcast_ctl_type_i1(fdip_ctl%fdip_truncation_ctl)
+      call bcast_ctl_array_i1(fdip_ctl%fdip_truncation_ctl)
       call bcast_ctl_type_c1(fdip_ctl%fdip_file_prefix_ctl)
+      call bcast_ctl_type_c1(fdip_ctl%fdip_file_format_ctl)
       call calypso_mpi_bcast_one_int(fdip_ctl%i_dipolarity_ctl, 0)
 !
       end subroutine bcast_sph_dipolarity_ctl

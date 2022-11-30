@@ -38,6 +38,7 @@
       implicit none
 !
       type(buffer_4_gzip), private :: zbuf_fu
+      character, pointer, private, save :: FPz_ucd
 !
 !------------------------------------------------------------------
 !
@@ -60,15 +61,15 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write gzipped step data file: ', trim(gzip_name)
 !
-      call open_wt_gzfile_a(gzip_name, zbuf_fu)
+      call open_wt_gzfile_a(FPz_ucd, gzip_name, zbuf_fu)
 !
-      call write_gz_step_data                                           &
-     &   (id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt, zbuf_fu)
+      call write_gz_step_data(FPz_ucd, id_rank,                         &
+     &    t_IO%i_time_step, t_IO%time, t_IO%dt, zbuf_fu)
       call write_gz_field_data                                          &
-     &   (ucd%nnod, ucd%num_field, ucd%ntot_comp,                       &
+     &   (FPz_ucd, ucd%nnod, ucd%num_field, ucd%ntot_comp,              &
      &    ucd%num_comp, ucd%phys_name, ucd%d_ucd, zbuf_fu)
 !
-      call close_gzfile_a(zbuf_fu)
+      call close_gzfile_a(FPz_ucd, zbuf_fu)
 !
       end subroutine gz_write_ucd_2_fld_file
 !
@@ -92,19 +93,22 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read gzipped data file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_a(gzip_name, zbuf_fu)
+      call open_rd_gzfile_a(FPz_ucd, gzip_name, zbuf_fu)
 !
       call read_gz_step_data                                            &
-     &   (id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
+     &   (FPz_ucd, id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,       &
      &    zbuf_fu, ierr_IO)
       if(ierr_IO .gt. 0) return
-      call skip_gz_comment_int8_int(ucd%nnod, ucd%num_field, zbuf_fu)
-      call read_gz_multi_int(ucd%num_field, ucd%num_comp, zbuf_fu)
+      call skip_gz_comment_int8_int                                     &
+     &   (FPz_ucd, ucd%nnod, ucd%num_field, zbuf_fu)
+      call read_gz_multi_int                                            &
+     &   (FPz_ucd, ucd%num_field, ucd%num_comp, zbuf_fu)
 !
-      call read_gz_field_data(ucd%nnod, ucd%num_field, ucd%ntot_comp,   &
+      call read_gz_field_data                                           &
+     &   (FPz_ucd, ucd%nnod, ucd%num_field, ucd%ntot_comp,              &
      &    ucd%num_comp, ucd%phys_name, ucd%d_ucd, zbuf_fu)
 !
-      call close_gzfile_a(zbuf_fu)
+      call close_gzfile_a(FPz_ucd, zbuf_fu)
 !
       end subroutine gz_read_ucd_2_fld_file
 !
@@ -127,26 +131,28 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read gzipped data file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_a(gzip_name, zbuf_fu)
+      call open_rd_gzfile_a(FPz_ucd, gzip_name, zbuf_fu)
 !
       call read_gz_step_data                                            &
-     &   (id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
+     &   (FPz_ucd, id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,       &
      &    zbuf_fu, ierr_IO)
       if(ierr_IO .gt. 0) return
-      call skip_gz_comment_int8_int(ucd%nnod, ucd%num_field, zbuf_fu)
+      call skip_gz_comment_int8_int                                     &
+     &   (FPz_ucd, ucd%nnod, ucd%num_field, zbuf_fu)
 !
       call allocate_ucd_phys_name(ucd)
 !
-      call read_gz_multi_int(ucd%num_field, ucd%num_comp, zbuf_fu)
+      call read_gz_multi_int                                            &
+     &   (FPz_ucd, ucd%num_field, ucd%num_comp, zbuf_fu)
 !
       call cal_istack_ucd_component(ucd)
       call allocate_ucd_phys_data(ucd)
 !
       call read_gz_field_data                                           &
-     &   (ucd%nnod, ucd%num_field, ucd%ntot_comp,                       &
+     &   (FPz_ucd, ucd%nnod, ucd%num_field, ucd%ntot_comp,              &
      &    ucd%num_comp, ucd%phys_name, ucd%d_ucd, zbuf_fu)
 !
-      call close_gzfile_a(zbuf_fu)
+      call close_gzfile_a(FPz_ucd, zbuf_fu)
 !
       end subroutine gz_read_alloc_ucd_2_ld_file
 !

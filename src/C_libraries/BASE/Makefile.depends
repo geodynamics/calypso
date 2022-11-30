@@ -3,6 +3,11 @@ calypso_param_c.o: \
   $(C_SRCDIR)/BASE/calypso_param_c.c \
   $(C_SRCDIR)/BASE/calypso_param_c.h
 	$(CC) -c $(OPTFLAGS) $(C_INCLUDE) $<
+calypso_zlib_access_c.o: \
+  $(C_SRCDIR)/BASE/calypso_zlib_access_c.c \
+  $(C_SRCDIR)/BASE/calypso_zlib_access_c.h \
+  $(C_SRCDIR)/BASE/calypso_param_c.h
+	$(CC) -c $(OPTFLAGS) $(C_INCLUDE) $<
 calypso_zlib_io_c.o: \
   $(C_SRCDIR)/BASE/calypso_zlib_io_c.c \
   $(C_SRCDIR)/BASE/calypso_zlib_io_c.h \

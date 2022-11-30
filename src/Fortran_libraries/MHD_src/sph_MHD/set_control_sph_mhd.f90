@@ -339,14 +339,22 @@
       use t_no_heat_Nusselt
       use t_CMB_dipolarity
       use t_sph_typical_scales
+      use t_multi_flag_labels
+      use m_file_format_labels
       use m_base_field_labels
 !
       use set_control_4_pickup_sph
+      use cal_CMB_dipolarity
+      use cal_typical_scale
 !
       type(sph_monitor_control), intent(in) :: smonitor_ctl
       type(phys_data), intent(in) :: rj_fld
       type(sph_mhd_monitor_data), intent(inout) :: monitor
 !
+!
+      if(allocated(gzip_flags%flags) .eqv. .FALSE.) then
+        call init_multi_flags_by_labels(itwo, gzip_names, gzip_flags)
+      end if
 !
 !   set_pickup modes
 !
@@ -362,17 +370,21 @@
 !
       call set_ctl_params_no_heat_Nu(heat_source%name,                  &
      &    smonitor_ctl%heat_nusselt_file_prefix,                        &
+     &    smonitor_ctl%heat_nusselt_file_format,                        &
      &    rj_fld, monitor%heat_Nusselt)
       call set_ctl_params_no_heat_Nu(composition_source%name,           &
      &    smonitor_ctl%comp_nusselt_file_prefix,                        &
+     &    smonitor_ctl%comp_nusselt_file_format,                        &
      &    rj_fld, monitor%comp_Nusselt)
 !
       call set_ctl_dipolarity_params                                    &
      &   (smonitor_ctl%fdip_ctl%fdip_file_prefix_ctl,                   &
+     &    smonitor_ctl%fdip_ctl%fdip_file_format_ctl,                   &
      &    smonitor_ctl%fdip_ctl%fdip_truncation_ctl,                    &
      &    rj_fld, monitor%dip)
       call set_ctl_typical_scale_params                                 &
-     &   (smonitor_ctl%typ_scale_file_prefix_ctl, rj_fld, monitor%tsl)
+     &   (smonitor_ctl%typ_scale_file_prefix_ctl,                       &
+     &    smonitor_ctl%typ_scale_file_format_ctl, rj_fld, monitor%tsl)
 !
       end subroutine set_control_SPH_MHD_monitors
 !

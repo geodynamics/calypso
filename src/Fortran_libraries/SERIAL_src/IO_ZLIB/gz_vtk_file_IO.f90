@@ -43,6 +43,7 @@
       implicit none
 !
       type(buffer_4_gzip), private :: zbuf_vtk
+      character, pointer, private, save :: FPz_vtk
 !
 !  ---------------------------------------------------------------------
 !
@@ -76,28 +77,28 @@
       gzip_name = add_gzip_extension(file_name)
 !
       write(*,*) 'Write gzipped parallel VTK file: ', trim(gzip_name)
-      call open_wt_gzfile_a(gzip_name, zbuf_vtk)
+      call open_wt_gzfile_a(FPz_vtk, gzip_name, zbuf_vtk)
 !
       write(zbuf_vtk%fixbuf(1),'(a,2a1)') '<File version="pvtk-1.0"',   &
      &                        char(10), char(0)
-      call gz_write_textbuf_no_lf(zbuf_vtk)
+      call gz_write_textbuf_no_lf(FPz_vtk, zbuf_vtk)
       write(zbuf_vtk%fixbuf(1),'(a,2a1)')                               &
      &     '       dataType="vtkUnstructuredGrid"', char(10), char(0)
-      call gz_write_textbuf_no_lf(zbuf_vtk)
+      call gz_write_textbuf_no_lf(FPz_vtk, zbuf_vtk)
       write(zbuf_vtk%fixbuf(1),'(a,i6,a,2a1)')                          &
      &     '       numberOfPieces="', nprocs, '" >', char(10), char(0)
-      call gz_write_textbuf_no_lf(zbuf_vtk)
+      call gz_write_textbuf_no_lf(FPz_vtk, zbuf_vtk)
       do ip = 0, nprocs-1
         file_name = set_parallel_ucd_file_name(fname_nodir, iflag_vtk,  &
      &                                         ip, istep)
         write(zbuf_vtk%fixbuf(1),'(3a,2a1)') '   <Piece fileName="',    &
      &                       trim(file_name), '" />', char(10), char(0)
-        call gz_write_textbuf_no_lf(zbuf_vtk)
+        call gz_write_textbuf_no_lf(FPz_vtk, zbuf_vtk)
       end do
       write(zbuf_vtk%fixbuf(1),'(a,2a1)') '</File>', char(10), char(0)
-      call gz_write_textbuf_no_lf(zbuf_vtk)
+      call gz_write_textbuf_no_lf(FPz_vtk, zbuf_vtk)
 !
-      call close_gzfile_a(zbuf_vtk)
+      call close_gzfile_a(FPz_vtk, zbuf_vtk)
 !
       end subroutine write_gz_parallel_vtk_file
 !
@@ -117,10 +118,10 @@
       if(id_rank.le.0) write(*,*)                                       &
      &    'Write gzipped VTK data: ', trim(gzip_name)
 !
-      call open_wt_gzfile_a(gzip_name, zbuf_vtk)
-      call write_gz_ucd_mesh_to_VTK(ucd, zbuf_vtk)
-      call write_gz_ucd_field_to_VTK(ucd, zbuf_vtk)
-      call close_gzfile_a(zbuf_vtk)
+      call open_wt_gzfile_a(FPz_vtk, gzip_name, zbuf_vtk)
+      call write_gz_ucd_mesh_to_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call write_gz_ucd_field_to_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call close_gzfile_a(FPz_vtk, zbuf_vtk)
 !
       end subroutine write_gz_vtk_file
 !
@@ -139,9 +140,9 @@
       if(id_rank.le.0) write(*,*)                                       &
      &    'Write gzipped VTK field: ', trim(gzip_name)
 !
-      call open_wt_gzfile_a(gzip_name, zbuf_vtk)
-      call write_gz_ucd_field_to_VTK(ucd, zbuf_vtk)
-      call close_gzfile_a(zbuf_vtk)
+      call open_wt_gzfile_a(FPz_vtk, gzip_name, zbuf_vtk)
+      call write_gz_ucd_field_to_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call close_gzfile_a(FPz_vtk, zbuf_vtk)
 !
       end subroutine write_gz_vtk_phys
 !
@@ -160,9 +161,9 @@
       if(id_rank.le.0) write(*,*)                                       &
      &    'Write gzipped VTK grid: ', trim(gzip_name)
 !
-      call open_wt_gzfile_a(gzip_name, zbuf_vtk)
-      call write_gz_ucd_mesh_to_VTK(ucd, zbuf_vtk)
-      call close_gzfile_a(zbuf_vtk)
+      call open_wt_gzfile_a(FPz_vtk, gzip_name, zbuf_vtk)
+      call write_gz_ucd_mesh_to_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call close_gzfile_a(FPz_vtk, zbuf_vtk)
 !
       end subroutine write_gz_vtk_grid
 !
@@ -181,10 +182,10 @@
       if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read gzipped ascii VTK file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_a(gzip_name, zbuf_vtk)
-      call read_gz_ucd_grd_from_VTK(ucd, zbuf_vtk)
-      call read_gz_udt_field_from_VTK(ucd, zbuf_vtk)
-      call close_gzfile_a(zbuf_vtk)
+      call open_rd_gzfile_a(FPz_vtk, gzip_name, zbuf_vtk)
+      call read_gz_ucd_grd_from_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call read_gz_udt_field_from_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call close_gzfile_a(FPz_vtk, zbuf_vtk)
 !
       end subroutine read_gz_vtk_file
 !
@@ -202,9 +203,9 @@
       if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read gzipped ascii VTK fields: ', trim(gzip_name)
 !
-      call open_rd_gzfile_a(gzip_name, zbuf_vtk)
-      call read_gz_udt_field_from_VTK(ucd, zbuf_vtk)
-      call close_gzfile_a(zbuf_vtk)
+      call open_rd_gzfile_a(FPz_vtk, gzip_name, zbuf_vtk)
+      call read_gz_udt_field_from_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call close_gzfile_a(FPz_vtk, zbuf_vtk)
 !
       end subroutine read_gz_vtk_phys
 !
@@ -222,9 +223,9 @@
       if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read gzipped ascii VTK mesh: ', trim(gzip_name)
 !
-      call open_rd_gzfile_a(gzip_name, zbuf_vtk)
-      call read_gz_ucd_grd_from_VTK(ucd, zbuf_vtk)
-      call close_gzfile_a(zbuf_vtk)
+      call open_rd_gzfile_a(FPz_vtk, gzip_name, zbuf_vtk)
+      call read_gz_ucd_grd_from_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call close_gzfile_a(FPz_vtk, zbuf_vtk)
 !
       end subroutine read_gz_vtk_grid
 !
@@ -243,10 +244,10 @@
       if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read gzipped ascii VTK file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_a(gzip_name, zbuf_vtk)
-      call read_alloc_gz_ucd_grd_from_VTK(ucd, zbuf_vtk)
-      call read_alloc_gz_udt_fld_from_VTK(ucd, zbuf_vtk)
-      call close_gzfile_a(zbuf_vtk)
+      call open_rd_gzfile_a(FPz_vtk, gzip_name, zbuf_vtk)
+      call read_alloc_gz_ucd_grd_from_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call read_alloc_gz_udt_fld_from_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call close_gzfile_a(FPz_vtk, zbuf_vtk)
 !
       end subroutine read_alloc_gz_vtk_file
 !
@@ -264,9 +265,9 @@
       if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read gzipped ascii VTK fields: ', trim(gzip_name)
 !
-      call open_rd_gzfile_a(gzip_name, zbuf_vtk)
-      call read_alloc_gz_udt_fld_from_VTK(ucd, zbuf_vtk)
-      call close_gzfile_a(zbuf_vtk)
+      call open_rd_gzfile_a(FPz_vtk, gzip_name, zbuf_vtk)
+      call read_alloc_gz_udt_fld_from_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call close_gzfile_a(FPz_vtk, zbuf_vtk)
 !
       end subroutine read_alloc_gz_vtk_phys
 !
@@ -284,9 +285,9 @@
       if(id_rank.le.0 .or. i_debug .gt. 0) write(*,*)                   &
      &     'Read gzipped ascii VTK mesh: ', trim(gzip_name)
 !
-      call open_rd_gzfile_a(gzip_name, zbuf_vtk)
-      call read_alloc_gz_ucd_grd_from_VTK(ucd, zbuf_vtk)
-      call close_gzfile_a(zbuf_vtk)
+      call open_rd_gzfile_a(FPz_vtk, gzip_name, zbuf_vtk)
+      call read_alloc_gz_ucd_grd_from_VTK(FPz_vtk, ucd, zbuf_vtk)
+      call close_gzfile_a(FPz_vtk, zbuf_vtk)
 !
       end subroutine read_alloc_gz_vtk_grid
 !

@@ -22,6 +22,7 @@
 !!
 !!  begin layered_spectrum_ctl
 !!    layered_pwr_spectr_prefix    'sph_pwr_layer'
+!!    layered_pwr_spectr_format    'gzip'
 !!
 !!    degree_spectr_switch         'On'
 !!    order_spectr_switch          'On'
@@ -30,7 +31,7 @@
 !!
 !!   if number of spectr_layer_ctl = 0 or negative: No output
 !!   if first item of spectr_layer_ctl[1] = -1: Output all layers
-!!    array spectr_layer_ctl  1
+!!    array spectr_layer_ctl
 !!      spectr_layer_ctl  62
 !!    end array spectr_layer_ctl
 !!
@@ -55,6 +56,8 @@
       type layerd_spectr_control
 !>        Structure for layered spectrum file prefix
         type(read_character_item) :: layered_pwr_spectr_prefix
+!>        Structure for layered spectrum file format
+        type(read_character_item) :: layered_pwr_spectr_format
 !
 !>        Structure for degree spectrum switch
         type(read_character_item) :: degree_spectr_switch
@@ -78,6 +81,8 @@
 !
       character(len=kchara), parameter, private                         &
      &           :: hd_layer_rms_head = 'layered_pwr_spectr_prefix'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_layer_rms_fmt =  'layered_pwr_spectr_format'
 !
       character(len=kchara), parameter, private                         &
      &           :: hd_spctr_layer = 'spectr_layer_ctl'
@@ -119,6 +124,8 @@
 !
         call read_chara_ctl_type(c_buf, hd_layer_rms_head,              &
      &      lp_ctl%layered_pwr_spectr_prefix)
+        call read_chara_ctl_type(c_buf, hd_layer_rms_fmt,               &
+     &      lp_ctl%layered_pwr_spectr_format)
 !
         call read_chara_ctl_type(c_buf, hd_degree_spectr_switch,        &
      &      lp_ctl%degree_spectr_switch)
@@ -143,6 +150,7 @@
       call dealloc_control_array_int(lp_ctl%idx_spec_layer_ctl)
 !
       lp_ctl%layered_pwr_spectr_prefix%iflag = 0
+      lp_ctl%layered_pwr_spectr_format%iflag = 0
       lp_ctl%degree_spectr_switch%iflag =  0
       lp_ctl%order_spectr_switch%iflag =   0
       lp_ctl%diff_lm_spectr_switch%iflag = 0

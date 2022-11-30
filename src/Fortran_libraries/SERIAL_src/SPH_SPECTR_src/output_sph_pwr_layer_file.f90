@@ -50,7 +50,6 @@
      &         (id_rank, ene_labels, time_d, sph_params, pwr)
 !
       use set_parallel_file_name
-      use sph_mean_spectr_IO
 !
       integer, intent(in) :: id_rank
 !
@@ -69,7 +68,7 @@
 !
 !       write(*,*) 'write_sph_layer_ms_file m', id_rank
       write(fname_rms,   '(a,a6)') trim(pwr%fhead_rms_layer), '_s.dat'
-      write(mode_label,'(a)') 'radial_id  radius'
+      write(mode_label,'(a)') 'EMPTY'
       call write_sph_layer_pwr_file(fname_rms, mode_label,              &
      &    ene_labels, time_d, sph_params%l_truncation,                  &
      &    sph_params%nlayer_ICB, sph_params%nlayer_CMB,                 &
@@ -83,7 +82,6 @@
      &         (id_rank, ene_labels, time_d, sph_params, pwr)
 !
       use set_parallel_file_name
-      use sph_mean_spectr_IO
 !
       integer, intent(in) :: id_rank
 !
@@ -101,14 +99,14 @@
       if(id_rank .eq. pwr%irank_m) then
 !        write(*,*) 'write_sph_layer_spec_file m', id_rank
         write(fname_rms, '(a,a6)') trim(pwr%fhead_rms_layer), '_m.dat'
-        write(mode_label,'(a)') 'radial_id  radius  order'
+        write(mode_label,'(a)') 'order'
         call write_sph_layer_spec_file(fname_rms, mode_label,           &
      &      ene_labels, time_d, sph_params%l_truncation,                &
      &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
      &      pwr, pwr%shl_m)
 !
         write(fname_rms,'(a,a7)') trim(pwr%fhead_rms_layer), '_m0.dat'
-        write(mode_label,'(a)') 'radial_id  radius'
+        write(mode_label,'(a)') 'EMPTY'
         call write_sph_layer_pwr_file(fname_rms, mode_label,            &
      &      ene_labels, time_d, sph_params%l_truncation,                &
      &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
@@ -118,7 +116,7 @@
       if(id_rank .eq. pwr%irank_l) then
 !        write(*,*) 'write_sph_layer_spec_file l', id_rank
         write(fname_rms, '(a,a6)') trim(pwr%fhead_rms_layer), '_l.dat'
-        write(mode_label,'(a)') 'radial_id  radius  degree'
+        write(mode_label,'(a)') 'degree'
         call write_sph_layer_spec_file(fname_rms, mode_label,           &
      &      ene_labels, time_d, sph_params%l_truncation,                &
      &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
@@ -128,7 +126,7 @@
       if(id_rank .eq. pwr%irank_lm) then
 !        write(*,*) 'write_sph_layer_spec_file lm', id_rank
         write(fname_rms,'(a,a7)') trim(pwr%fhead_rms_layer), '_lm.dat'
-        write(mode_label,'(a)') 'radial_id  radius  diff_deg_order'
+        write(mode_label,'(a)') 'diff_deg_order'
         call write_sph_layer_spec_file(fname_rms, mode_label,           &
      &      ene_labels, time_d, sph_params%l_truncation,                &
      &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
@@ -144,7 +142,12 @@
      &         (fname_rms, mode_label, ene_labels, time_d,              &
      &          ltr, nlayer_ICB, nlayer_CMB, pwr, rms_sph)
 !
-      use sph_mean_spectr_IO
+      use t_read_sph_spectra
+      use t_buffer_4_gzip
+      use gz_open_sph_monitor_file
+      use gz_layer_mean_monitor_IO
+      use sph_mean_spectr_header_IO
+      use set_parallel_file_name
 !
       character(len=kchara), intent(in) :: fname_rms, mode_label
       type(energy_label_param), intent(in) :: ene_labels
@@ -155,10 +158,26 @@
       real(kind = kreal), intent(in)                                    &
      &           :: rms_sph(pwr%nri_rms,pwr%ntot_comp_sq)
 !
+      type(read_sph_spectr_data), save :: sph_OUT
+      type(buffer_4_gzip), save :: zbuf_m
+      logical :: flag_gzip_lc
 !
-      call open_sph_mean_sq_file(id_file_rms, fname_rms, mode_label,    &
-     &    ltr, nlayer_ICB, nlayer_CMB, ene_labels, pwr)
-      call write_sph_layerd_power(id_file_rms, time_d, pwr, rms_sph)
+!
+      call dup_sph_layer_spectr_header(mode_label,                      &
+     &    ltr, nlayer_ICB, nlayer_CMB, ene_labels, pwr, sph_OUT)
+      call alloc_sph_spectr_data(izero, sph_OUT)
+!
+      flag_gzip_lc = pwr%gzip_flag_rms_layer
+      call sel_open_sph_layer_mean_file(id_file_rms, fname_rms,         &
+     &                                   sph_OUT, zbuf_m, flag_gzip_lc)
+      call swap_layer_mean_to_IO(pwr%nri_rms, pwr%ntot_comp_sq,         &
+     &                           rms_sph, sph_OUT%spectr_IO(1,0,1))
+      call sel_gz_write_layer_mean_mtr                                  &
+     &   (flag_gzip_lc, id_file_rms, time_d%i_time_step, time_d%time,   &
+     &    pwr%nri_rms, pwr%kr_4_rms, pwr%r_4_rms,                       &
+     &    pwr%ntot_comp_sq, sph_OUT%spectr_IO(1,0,1), zbuf_m)
+      call dealloc_sph_espec_data(sph_OUT)
+      call dealloc_sph_espec_name(sph_OUT)
       close(id_file_rms)
 !
       end subroutine write_sph_layer_pwr_file
@@ -169,7 +188,12 @@
      &         (fname_rms, mode_label, ene_labels, time_d,              &
      &          ltr, nlayer_ICB, nlayer_CMB, pwr, rms_sph_x)
 !
-      use sph_mean_spectr_IO
+      use t_read_sph_spectra
+      use t_buffer_4_gzip
+      use gz_open_sph_monitor_file
+      use gz_layer_spectr_monitor_IO
+      use sph_mean_spectr_header_IO
+      use set_parallel_file_name
 !
       type(energy_label_param), intent(in) :: ene_labels
       type(time_data), intent(in) :: time_d
@@ -181,10 +205,26 @@
 !
       character(len=kchara), intent(in) :: fname_rms, mode_label
 !
-      call open_sph_mean_sq_file(id_file_rms, fname_rms, mode_label,    &
-     &    ltr, nlayer_ICB, nlayer_CMB, ene_labels, pwr)
-      call write_sph_layer_data                                         &
-     &   (id_file_rms, time_d, ltr, pwr, rms_sph_x)
+      type(read_sph_spectr_data), save :: sph_OUT
+      type(buffer_4_gzip), save :: zbuf_m
+      logical :: flag_gzip_lc
+!
+!
+      call dup_sph_layer_spectr_header(mode_label,                      &
+     &    ltr, nlayer_ICB, nlayer_CMB, ene_labels, pwr, sph_OUT)
+      call alloc_sph_spectr_data(sph_OUT%ltr_sph, sph_OUT)
+!
+      flag_gzip_lc = pwr%gzip_flag_rms_layer
+      call sel_open_sph_layer_mean_file(id_file_rms, fname_rms,         &
+     &                                  sph_OUT, zbuf_m, flag_gzip_lc)
+      call swap_layer_spectr_to_IO(pwr%nri_rms, ltr, pwr%ntot_comp_sq,  &
+     &                             rms_sph_x, sph_OUT%spectr_IO(1,0,1))
+      call sel_gz_write_layer_spectr_mtr                                &
+     &   (flag_gzip_lc, id_file_rms, time_d%i_time_step, time_d%time,   &
+     &    pwr%nri_rms, pwr%kr_4_rms, pwr%r_4_rms, ltr,                  &
+     &    pwr%ntot_comp_sq, sph_OUT%spectr_IO(1,0,1), zbuf_m)
+      call dealloc_sph_espec_data(sph_OUT)
+      call dealloc_sph_espec_name(sph_OUT)
       close(id_file_rms)
 !
       end subroutine write_sph_layer_spec_file

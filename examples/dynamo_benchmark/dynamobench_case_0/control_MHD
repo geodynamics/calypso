@@ -20,15 +20,13 @@ begin MHD_control
     num_subdomain_ctl           4
     num_smp_ctl                 2
 !
-    sph_file_prefix             'sph_lm31r48c_4/in'
-!
     restart_file_prefix         'rst_4/rst'
     field_file_prefix           'field/out'
 !
 !
-    sph_file_fmt_ctl           'ascii'
-    restart_file_fmt_ctl       'ascii'
-    field_file_fmt_ctl         'VTK'
+    sph_file_fmt_ctl           'merged'
+    restart_file_fmt_ctl       'merged'
+    field_file_fmt_ctl         'merged_VTK'
   end data_files_def
 !
 !!!!! spatial resolution and parallelization !!!!!!!!!!!!!!!
@@ -55,7 +53,24 @@ begin MHD_control
 !
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !
-  file spherical_shell_ctl  'control_resolution'
+  begin spherical_shell_ctl
+    begin num_domain_ctl
+      num_radial_domain_ctl         2
+      num_horizontal_domain_ctl     2
+    end num_domain_ctl
+!
+    begin num_grid_sph
+      truncation_level_ctl      31
+!
+      ngrid_meridonal_ctl      48
+      ngrid_zonal_ctl          96
+!
+      radial_grid_type_ctl   Chebyshev
+      num_fluid_grid_ctl     48
+      fluid_core_size_ctl   1.0
+      ICB_to_CMB_ratio_ctl  0.35
+    end num_grid_sph
+  end spherical_shell_ctl
 !
   begin model
 !!!!!  physical values!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -67,7 +82,7 @@ begin MHD_control
 !   magnetic_ene_generation
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin phys_values_ctl
-      array nod_value_ctl    4
+      array nod_value_ctl
         nod_value_ctl  velocity                Viz_On   Monitor_On
         nod_value_ctl  temperature             Viz_On   Monitor_On
         nod_value_ctl  pressure                Viz_On   Monitor_On
@@ -80,7 +95,7 @@ begin MHD_control
 !                    vector_potential, composition
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin time_evolution_ctl
-      array time_evo_ctl   2
+      array time_evo_ctl
         time_evo_ctl  temperature
         time_evo_ctl  velocity
       end array time_evo_ctl
@@ -89,12 +104,12 @@ begin MHD_control
 !!!!!  setting for boundary condition
 !
     begin boundary_condition
-      array bc_temperature  2
+      array bc_temperature
         bc_temperature  fixed ICB  1.000
         bc_temperature  fixed CMB  0.000
       end array bc_temperature
 !
-      array bc_velocity    2
+      array bc_velocity
         bc_velocity  non_slip_sph    ICB   0.000
         bc_velocity  non_slip_sph    CMB   0.000
       end array bc_velocity
@@ -105,7 +120,7 @@ begin MHD_control
 !     gravity, Coriolis, Lorentz
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin forces_define
-      array force_ctl      2
+      array force_ctl
         force_ctl   gravity
         force_ctl   Coriolis
       end array force_ctl
@@ -119,10 +134,10 @@ begin MHD_control
 !     Taylor_number, Ekman_number
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     begin dimensionless_ctl
-      array dimless_ctl 3
+      array dimless_ctl
         dimless_ctl  Pr                  1.0e-0
         dimless_ctl  modified_Ra         1.0e+2
-        dimless_ctl  E                   1.0e-3
+        dimless_ctl  Ek                  1.0e-3
       end array dimless_ctl
     end dimensionless_ctl
 !
@@ -151,37 +166,37 @@ begin MHD_control
 !
     begin coefficients_ctl
       begin thermal
-        array coef_4_termal_ctl     1
+        array coef_4_termal_ctl
           coef_4_termal_ctl            One           1.0
         end array coef_4_termal_ctl
 !
-        array coef_4_t_diffuse_ctl  1
+        array coef_4_t_diffuse_ctl
           coef_4_t_diffuse_ctl         Pr           -1.0
         end array coef_4_t_diffuse_ctl
       end thermal
 !
       begin momentum
-        array coef_4_velocity_ctl   1
+        array coef_4_velocity_ctl
           coef_4_velocity_ctl          One           1.0
         end array coef_4_velocity_ctl
 !
-        array coef_4_press_ctl      1
-          coef_4_press_ctl             E            -1.0
+        array coef_4_press_ctl
+          coef_4_press_ctl             Ek           -1.0
         end array coef_4_press_ctl
 !
-        array coef_4_v_diffuse_ctl  1
+        array coef_4_v_diffuse_ctl
           coef_4_v_diffuse_ctl         One           1.0
         end array coef_4_v_diffuse_ctl
 !
-        array coef_4_buoyancy_ctl   3
+        array coef_4_buoyancy_ctl
           coef_4_buoyancy_ctl          Radial_35     1.0
           coef_4_buoyancy_ctl          modified_Ra   1.0
-          coef_4_buoyancy_ctl          E            -1.0
+          coef_4_buoyancy_ctl          Ek           -1.0
         end array coef_4_buoyancy_ctl
 !
-        array coef_4_Coriolis_ctl   2
+        array coef_4_Coriolis_ctl
           coef_4_Coriolis_ctl          Two           1.0
-          coef_4_Coriolis_ctl          E            -1.0
+          coef_4_Coriolis_ctl          Ek           -1.0
         end array coef_4_Coriolis_ctl
       end momentum
 !
@@ -243,8 +258,13 @@ begin MHD_control
     end time_loop_ctl
   end control
 !
+  begin sph_monitor_ctl
+    volume_average_prefix        'monitor/sph_ave_volume'
+    volume_pwr_spectr_prefix     'monitor/sph_pwr_volume'
+  end sph_monitor_ctl
+!
   begin visual_control
-    array cross_section_ctl  1
+    array cross_section_ctl
 !
       begin cross_section_ctl
         section_file_prefix    'sections/equator'
@@ -252,25 +272,25 @@ begin MHD_control
         begin surface_define
           section_method    plane
 !
-          array normal_vector    3
+          array normal_vector
             normal_vector  x   0.0
             normal_vector  y   0.0
             normal_vector  z   1.0
           end array normal_vector
 !
-          array center_position    3
+          array center_position
             center_position  x   0.0
             center_position  y   0.0
             center_position  z   0.0
           end array center_position
 !
-          array section_area_ctl 1
+          array section_area_ctl
             section_area_ctl   all   end
           end array section_area_ctl
         end surface_define
 !
         begin output_field_define
-          array output_field   5
+          array output_field
             output_field  temperature           scalar
             output_field  velocity              vector
             output_field  velocity              radial     

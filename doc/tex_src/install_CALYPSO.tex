@@ -37,6 +37,7 @@ OpenMP is used for the parallelization under the shared memory. Better choice to
 GCC, the GNU Compiler Collection (\url{https://gcc.gnu.org}) is already installed in the most of Linux distributions. However, packages for development are need to be installed. For Ubuntu 20, for example, the required compilers and  libraries can be installed by using \verb|apt| command as following::
 %
 \begin{verbatim}
+% sudo apt install build-essential
 % sudo apt install pkg-config
 % sudo apt install git
 % sudo apt install gfortran
@@ -52,8 +53,8 @@ GCC, the GNU Compiler Collection (\url{https://gcc.gnu.org}) is already installe
 \subsubsection{Installation of required softwares for Mac OS}
 For MacOS, any fortran compiler needs to be installed because Xcode does not have fortran compiler. The easiest way is installing GCC by using a package manager such as macports (\url{https://www.macports.org}) or homebrew (\url{https://brew.sh/index}). By using the Macports, 
 
-\paragraph{IMacports}
-The required compiler and packages can be installed as followings as an example using GCC9. GCC in Macports includes gfortran compiler.
+\paragraph{Macports}
+The required compiler and packages can be installed as followings as an example using GCC11. GCC in Macports includes gfortran compiler.
 %
 \begin{verbatim}
 % sudo port install gcc11

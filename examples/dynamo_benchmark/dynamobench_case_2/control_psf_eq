@@ -7,26 +7,26 @@ begin cross_section_ctl
   begin surface_define
     section_method    plane
 !
-    array normal_vector    3
+    array normal_vector
       normal_vector  x   0.0
       normal_vector  y   0.0
       normal_vector  z   1.0
     end array normal_vector
 !
-    array center_position    3
+    array center_position
       center_position  x   0.0
       center_position  y   0.0
       center_position  z   0.0
     end array center_position
 !
-    array section_area_ctl 2
+    array section_area_ctl
       section_area_ctl   inner_core   end
       section_area_ctl   outer_core   end
     end array section_area_ctl
   end surface_define
 !
   begin output_field_define
-    array output_field   8
+    array output_field
       output_field  temperature           scalar
       output_field  velocity              vector
       output_field  velocity              radial     

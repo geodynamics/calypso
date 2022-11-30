@@ -13,7 +13,7 @@
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(pickup_mode_list), intent(inout) :: pick_list
 !!        type(picked_spectrum_data), intent(inout) :: picked
-!!      subroutine pick_degre0_sped_4_monitor                           &
+!!      subroutine pick_center_spectrum_monitor                         &
 !!     &         (rj_fld, picked, ntot_comp_rj, d_rj_out)
 !!      subroutine pick_single_sph_spec_4_monitor(inum, knum,           &
 !!     &          sph_rj, rj_fld, picked, ntot_comp_rj, d_rj_out)
@@ -101,7 +101,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine pick_degre0_sped_4_monitor                             &
+      subroutine pick_center_spectrum_monitor                           &
      &         (rj_fld, picked, ntot_comp_rj, d_rj_out)
 !
       type(phys_data), intent(in) :: rj_fld
@@ -117,7 +117,7 @@
      &    picked%istack_comp_rj, picked%ifield_monitor_rj,              &
      &    ntot_comp_rj, half, d_rj_out)
 !
-      end subroutine pick_degre0_sped_4_monitor
+      end subroutine pick_center_spectrum_monitor
 !
 ! -----------------------------------------------------------------------
 !

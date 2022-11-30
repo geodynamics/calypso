@@ -86,7 +86,6 @@
 !
       use m_precision
       use m_machine_parameter
-      use skip_comment_f
 !
       implicit none
 !
@@ -108,6 +107,8 @@
       integer(kind = kint) function write_begin_flag_for_ctl            &
      &                            (id_file, level, label)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
 !
@@ -124,6 +125,8 @@
 !
       integer(kind = kint) function write_end_flag_for_ctl              &
      &                            (id_file, level, label)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
@@ -145,6 +148,8 @@
 !
       subroutine write_array_flag_for_ctl(id_file, level, label, num)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       integer (kind=kint), intent(in) :: num
       character(len=kchara), intent(in) :: label
@@ -160,6 +165,8 @@
 !   --------------------------------------------------------------------
 !
       subroutine write_end_array_flag_for_ctl(id_file, level, label)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
@@ -177,6 +184,8 @@
 !
       subroutine write_real_ctl_item                                    &
      &         (id_file, level, maxlen, label, real_data)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       integer(kind = kint), intent(in) :: maxlen
@@ -200,6 +209,8 @@
       subroutine write_integer_ctl_item                                 &
      &         (id_file, level, maxlen, label, int_data)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       integer(kind = kint), intent(in) :: maxlen
       character(len=kchara), intent(in) :: label
@@ -221,6 +232,8 @@
 !
       subroutine write_character_ctl_item                               &
      &         (id_file, level, maxlen, label, chara_data)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       integer(kind = kint), intent(in) :: maxlen
@@ -244,6 +257,8 @@
       subroutine write_real2_ctl_item                                   &
      &         (id_file, level, label, real1, real2)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
       real(kind = kreal), intent(in) :: real1, real2
@@ -260,6 +275,8 @@
       subroutine write_real3_ctl_item                                   &
      &         (id_file, level, label, real1, real2, real3)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
       real(kind = kreal), intent(in) :: real1, real2, real3
@@ -275,6 +292,8 @@
 !
       subroutine write_int_real_ctl_item                                &
      &         (id_file, level, label, int_data, real_data)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
@@ -293,6 +312,8 @@
       subroutine write_integer2_ctl_item                                &
      &         (id_file, level, label, int1, int2)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
       integer (kind=kint), intent(in) :: int1, int2
@@ -308,6 +329,8 @@
       subroutine write_integer3_ctl_item                                &
      &         (id_file, level, label, int1, int2, int3)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
       integer (kind=kint), intent(in) :: int1, int2, int3
@@ -322,6 +345,8 @@
 !
        subroutine write_chara_real_ctl_item                             &
      &          (id_file, level, label, chara_data, real_data)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
@@ -341,6 +366,8 @@
        subroutine write_chara_real2_ctl_item                            &
      &          (id_file, level, label, chara_data, real1, real2)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
       character(len=kchara), intent(in) :: chara_data
@@ -358,6 +385,8 @@
 !
        subroutine write_chara2_real_ctl_item                            &
      &          (id_file, level, label, chara1, chara2, real_data)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
@@ -378,6 +407,8 @@
        subroutine write_chara_int_ctl_item                              &
      &          (id_file, level, label, chara_data, int_data)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
       character(len=kchara), intent(in) :: chara_data
@@ -396,6 +427,8 @@
        subroutine write_i2_r_ctl_item                                   &
      &          (id_file, level, label, int1, int2, real_data)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
       integer(kind = kint), intent(in) :: int1, int2
@@ -413,6 +446,8 @@
        subroutine write_i2_r2_ctl_item                                  &
      &          (id_file, level, label, int1, int2, real1, real2)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
       integer(kind = kint), intent(in) :: int1, int2
@@ -429,6 +464,8 @@
 !
        subroutine write_i_c_r_ctl_item(id_file, level, label,           &
      &           int_data, chara_data, real_data)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
@@ -448,6 +485,8 @@
 !
       subroutine write_character2_ctl_item                              &
      &         (id_file, level, label, maxlen, chara1, chara2)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       integer(kind = kint), intent(in) :: maxlen(0:1)
@@ -472,6 +511,8 @@
 !
       subroutine write_character3_ctl_item                              &
      &         (id_file, level, label, maxlen, chara1, chara2, chara3)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       integer(kind = kint), intent(in) :: maxlen(0:2)
@@ -499,6 +540,8 @@
        subroutine write_chara_int3_ctl_item(id_file, level, label,      &
      &           chara_data, ivec1, ivec2, ivec3)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
       character(len=kchara), intent(in) :: chara_data
@@ -518,6 +561,8 @@
       subroutine write_file_name_for_ctl_line                           &
      &         (id_file, level, label, fname)
 !
+      use write_control_items
+!
       integer(kind = kint), intent(in) :: id_file, level
       character(len=kchara), intent(in) :: label
       character(len=kchara), intent(in) :: fname
@@ -533,6 +578,8 @@
 !
       subroutine write_file_names_from_ctl_line                         &
      &         (id_file, level, label, num, fname)
+!
+      use write_control_items
 !
       integer(kind = kint), intent(in) :: id_file, level
       integer (kind=kint), intent(in) :: num

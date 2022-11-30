@@ -8,20 +8,23 @@
 !!
 !!@verbatim
 !!      subroutine read_psf_phys_num_bin_gz                             &
-!!     &         (np_read, nnod, num_field, zbuf)
-!!      subroutine read_psf_phys_name_bin_gz                            &
-!!     &         (num_field, ntot_comp, ncomp_field, field_name, zbuf)
+!!     &         (FPz_f, np_read, nnod, num_field, zbuf)
+!!      subroutine read_psf_phys_name_bin_gz(FPz_f, num_field,          &
+!!     &          ntot_comp, ncomp_field, field_name, zbuf)
 !!      subroutine read_psf_phys_data_bin_gz                            &
-!!     &         (np_read, nnod, ntot_comp, d_nod, zbuf)
+!!     &         (FPz_f, np_read, nnod, ntot_comp, d_nod, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!
-!!      subroutine read_psf_node_num_bin_gz(np_read, nnod, zbuf)
+!!      subroutine read_psf_node_num_bin_gz(FPz_f, np_read, nnod, zbuf)
 !!      subroutine read_psf_node_data_bin_gz                            &
-!!     &         (np_read, nnod, inod_global, xx, zbuf)
+!!     &         (FPz_f, np_read, nnod, inod_global, xx, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!
 !!      subroutine read_psf_ele_num_bin_gz                              &
-!!     &         (np_read, nele, nnod_ele, zbuf)
-!!      subroutine read_psf_ele_connect_bin_gz                          &
-!!     &         (np_read, nele, nnod_ele, iele_global, ie_psf, zbuf)
+!!     &         (FPz_f, np_read, nele, nnod_ele, zbuf)
+!!      subroutine read_psf_ele_connect_bin_gz(FPz_f, np_read,          &
+!!     &          nele, nnod_ele, iele_global, ie_psf, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!        type(buffer_4_gzip), intent(inout)  :: zbuf
 !!@endverbatim
 !
@@ -42,10 +45,11 @@
 !  ---------------------------------------------------------------------
 !
       subroutine read_psf_phys_num_bin_gz                               &
-     &         (np_read, nnod, num_field, zbuf)
+     &         (FPz_f, np_read, nnod, num_field, zbuf)
 !
       use gz_binary_IO
 !
+      character, pointer, intent(in) :: FPz_f
       integer, intent(in) :: np_read
       integer(kind=kint_gl), intent(in) :: nnod
 !
@@ -55,21 +59,22 @@
       integer(kind = kint_gl) :: nnod_gl
 !
 !
-      call read_psf_node_num_bin_gz(np_read, nnod_gl, zbuf)
+      call read_psf_node_num_bin_gz(FPz_f, np_read, nnod_gl, zbuf)
       if(nnod .ne. nnod_gl) stop 'Grid and field data are inconsistent'
 !
-      call gz_read_one_integer_b(zbuf, num_field)
+      call gz_read_one_integer_b(FPz_f, zbuf, num_field)
 !
       end subroutine read_psf_phys_num_bin_gz
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_psf_phys_name_bin_gz                              &
-     &         (num_field, ntot_comp, ncomp_field, field_name, zbuf)
+      subroutine read_psf_phys_name_bin_gz(FPz_f, num_field,            &
+     &          ntot_comp, ncomp_field, field_name, zbuf)
 !
       use gz_binary_IO
       use transfer_to_long_integers
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind=kint), intent(in) :: num_field
 !
       integer(kind=kint), intent(inout) :: ntot_comp
@@ -79,9 +84,9 @@
 !
 !
       call gz_read_mul_integer_b                                        &
-     &   (zbuf, cast_long(num_field), ncomp_field)
+     &   (FPz_f, zbuf, cast_long(num_field), ncomp_field)
       call gz_read_mul_character_b                                      &
-     &   (zbuf, cast_long(num_field), field_name)
+     &   (FPz_f, zbuf, cast_long(num_field), field_name)
       ntot_comp = sum(ncomp_field)
 !
       end subroutine read_psf_phys_name_bin_gz
@@ -89,11 +94,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_psf_phys_data_bin_gz                              &
-     &         (np_read, nnod, ntot_comp, d_nod, zbuf)
+     &         (FPz_f, np_read, nnod, ntot_comp, d_nod, zbuf)
 !
       use gz_binary_IO
       use transfer_to_long_integers
 !
+      character, pointer, intent(in) :: FPz_f
       integer, intent(in) :: np_read
       integer(kind=kint_gl), intent(in) :: nnod
       integer(kind=kint), intent(in) :: ntot_comp
@@ -107,8 +113,9 @@
 !
       allocate(itmp1_mp_gz(np_read))
       do nd = 1, ntot_comp
-        call gz_read_mul_int8_b(zbuf, cast_long(np_read), itmp1_mp_gz)
-        call gz_read_1d_vector_b(zbuf, nnod, d_nod(1,nd))
+        call gz_read_mul_int8_b(FPz_f, zbuf,                            &
+     &                          cast_long(np_read), itmp1_mp_gz)
+        call gz_read_1d_vector_b(FPz_f, zbuf, nnod, d_nod(1,nd))
       end do
       deallocate(itmp1_mp_gz)
 !
@@ -117,11 +124,12 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine read_psf_node_num_bin_gz(np_read, nnod, zbuf)
+      subroutine read_psf_node_num_bin_gz(FPz_f, np_read, nnod, zbuf)
 !
       use gz_binary_IO
       use transfer_to_long_integers
 !
+      character, pointer, intent(in) :: FPz_f
       integer, intent(in) :: np_read
 !
       integer(kind=kint_gl), intent(inout) :: nnod
@@ -131,8 +139,8 @@
 !
 !
       allocate(n_inter(np_read))
-      call gz_read_mul_int8_b(zbuf, cast_long(np_read), n_inter)
-      call gz_read_mul_int8_b(zbuf, cast_long(np_read), n_inter)
+      call gz_read_mul_int8_b(FPz_f, zbuf, cast_long(np_read), n_inter)
+      call gz_read_mul_int8_b(FPz_f, zbuf, cast_long(np_read), n_inter)
       nnod = sum(n_inter)
 !
 !      write(*,*) 'n_inter', n_inter
@@ -143,11 +151,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_psf_node_data_bin_gz                              &
-     &         (np_read, nnod, inod_global, xx, zbuf)
+     &         (FPz_f, np_read, nnod, inod_global, xx, zbuf)
 !
       use gz_binary_IO
       use transfer_to_long_integers
 !
+      character, pointer, intent(in) :: FPz_f
       integer, intent(in) :: np_read
       integer(kind=kint_gl), intent(in) :: nnod
 !
@@ -158,7 +167,8 @@
       integer(kind = kint_gl) :: i
 !
 !
-      call read_psf_phys_data_bin_gz(np_read, nnod, ithree, xx, zbuf)
+      call read_psf_phys_data_bin_gz                                    &
+     &   (FPz_f, np_read, nnod, ithree, xx, zbuf)
 !
 !$omp parallel do
       do i = 1, nnod
@@ -172,11 +182,12 @@
 ! -----------------------------------------------------------------------
 !
       subroutine read_psf_ele_num_bin_gz                                &
-     &         (np_read, nele, nnod_ele, zbuf)
+     &         (FPz_f, np_read, nele, nnod_ele, zbuf)
 !
       use gz_binary_IO
       use transfer_to_long_integers
 !
+      character, pointer, intent(in) :: FPz_f
       integer, intent(in) :: np_read
 !
       integer(kind = kint), intent(inout) :: nnod_ele
@@ -187,12 +198,12 @@
       integer(kind = kint_gl) :: eletype(1), nnod_ele_b(1)
 !
 !
-      call gz_read_mul_int8_b(zbuf, cast_long(ione), nnod_ele_b)
-      call gz_read_mul_int8_b(zbuf, cast_long(ione), eletype)
+      call gz_read_mul_int8_b(FPz_f, zbuf, cast_long(ione), nnod_ele_b)
+      call gz_read_mul_int8_b(FPz_f, zbuf, cast_long(ione), eletype)
 !
       allocate(nele_lc(np_read))
-      call gz_read_mul_int8_b(zbuf, cast_long(np_read), nele_lc)
-      call gz_read_mul_int8_b(zbuf, cast_long(np_read), nele_lc)
+      call gz_read_mul_int8_b(FPz_f, zbuf, cast_long(np_read), nele_lc)
+      call gz_read_mul_int8_b(FPz_f, zbuf, cast_long(np_read), nele_lc)
 !
       nnod_ele = int(nnod_ele_b(1),KIND(nnod_ele))
       nele = sum(nele_lc)
@@ -207,12 +218,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine read_psf_ele_connect_bin_gz                            &
-     &         (np_read, nele, nnod_ele, iele_global, ie_psf, zbuf)
+      subroutine read_psf_ele_connect_bin_gz(FPz_f, np_read,            &
+     &          nele, nnod_ele, iele_global, ie_psf, zbuf)
 !
       use gz_binary_IO
       use transfer_to_long_integers
 !
+      character, pointer, intent(in) :: FPz_f
       integer, intent(in) :: np_read
       integer(kind = kint), intent(in) :: nnod_ele
       integer(kind = kint_gl), intent(in) :: nele
@@ -228,8 +240,9 @@
 !
       allocate(itmp1_mp_gz(np_read))
       do nd = 1, nnod_ele
-        call gz_read_mul_int8_b(zbuf, cast_long(np_read), itmp1_mp_gz)
-        call gz_read_mul_int8_b(zbuf, nele, ie_psf(1,nd))
+        call gz_read_mul_int8_b(FPz_f, zbuf,                            &
+     &                          cast_long(np_read), itmp1_mp_gz)
+        call gz_read_mul_int8_b(FPz_f, zbuf, nele, ie_psf(1,nd))
       end do
       deallocate(itmp1_mp_gz)
 !

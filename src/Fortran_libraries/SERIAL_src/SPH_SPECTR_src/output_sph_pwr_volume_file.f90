@@ -14,8 +14,6 @@
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(sph_mean_squares), intent(in) :: pwr
 !!
-!!      integer(kind = kint) function check_sph_vol_ms_file             &
-!!     &             (id_rank, ene_labels, sph_params, sph_rj, pwr)
 !!      subroutine write_sph_vol_ms_file                                &
 !!     &         (id_rank, ene_labels, time_d, sph_params, sph_rj, pwr)
 !!      subroutine write_sph_vol_ms_spectr_file                         &
@@ -47,7 +45,7 @@
 !>      File ID for mean square data
       integer(kind = kint), parameter, private :: id_file_rms = 34
 !
-      private :: write_sph_volume_spec_file, write_sph_volume_pwr_file
+      private :: write_sph_volume_spec_file
 !
 !  --------------------------------------------------------------------
 !
@@ -58,7 +56,6 @@
       subroutine write_total_energy_to_screen(id_rank, time_d, pwr)
 !
       use m_base_field_labels
-      use sph_mean_spectr_IO
 !
       integer, intent(in) :: id_rank
       type(time_data), intent(in) :: time_d
@@ -95,43 +92,10 @@
 !  --------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      integer(kind = kint) function check_sph_vol_ms_file               &
-     &             (id_rank, ene_labels, sph_params, sph_rj, pwr)
-!
-      use set_parallel_file_name
-      use sph_mean_spectr_IO
-!
-      integer, intent(in) :: id_rank
-!
-      type(energy_label_param), intent(in) :: ene_labels
-      type(sph_shell_parameters), intent(in) :: sph_params
-      type(sph_rj_grid), intent(in) ::  sph_rj
-      type(sph_mean_squares), intent(in) :: pwr
-!
-      character(len=kchara) :: fname_rms, mode_label
-!
-!
-      check_sph_vol_ms_file = 0
-      if(pwr%ntot_comp_sq .eq. 0)  return
-!
-      if(id_rank .ne. pwr%v_spectr(1)%irank_m) return
-!
-      write(fname_rms,   '(a,a6)')                                      &
-     &      trim(pwr%v_spectr(1)%fhead_rms_v), '_s.dat'
-      write(mode_label,'(a)') 'EMPTY'
-      check_sph_vol_ms_file = check_sph_vol_mean_sq_file(id_file_rms,   &
-     &                       fname_rms, mode_label, ene_labels,         &
-     &                       sph_params, sph_rj, pwr%v_spectr(1))
-!
-      end function check_sph_vol_ms_file
-!
-!  --------------------------------------------------------------------
-!
       subroutine write_sph_vol_ms_file                                  &
      &         (id_rank, ene_labels, time_d, sph_params, sph_rj, pwr)
 !
       use set_parallel_file_name
-      use sph_mean_spectr_IO
 !
       integer, intent(in) :: id_rank
 !
@@ -167,7 +131,6 @@
      &         (id_rank, ene_labels, time_d, sph_params, sph_rj, pwr)
 !
       use set_parallel_file_name
-      use sph_mean_spectr_IO
 !
       integer, intent(in) :: id_rank
 !
@@ -234,7 +197,11 @@
      &         (fname_rms, mode_label, ene_labels, time_d,              &
      &          sph_params, sph_rj, v_pwr, rms_sph_x)
 !
-      use sph_mean_spectr_IO
+      use t_read_sph_spectra
+      use t_buffer_4_gzip
+      use gz_open_sph_monitor_file
+      use sph_mean_spectr_header_IO
+      use gz_volume_spectr_monitor_IO
 !
       character(len=kchara), intent(in) :: fname_rms, mode_label
       type(energy_label_param), intent(in) :: ene_labels
@@ -246,11 +213,28 @@
       real(kind = kreal), intent(in)                                    &
      &      :: rms_sph_x(0:sph_params%l_truncation, v_pwr%ntot_comp_sq)
 !
+      type(read_sph_spectr_data), save :: sph_OUT
+      type(buffer_4_gzip), save :: zbuf_m
+      logical :: flag_gzip_lc
 !
-      call open_sph_vol_mean_sq_file(id_file_rms, fname_rms,            &
-     &    mode_label, ene_labels, sph_params, sph_rj, v_pwr)
-      call write_sph_volume_data(id_file_rms, time_d,                   &
-     &    sph_params%l_truncation, v_pwr%ntot_comp_sq, rms_sph_x)
+!
+      call dup_sph_vol_spectr_header                                    &
+     &   (mode_label, sph_params%l_truncation,                          &
+     &    sph_params%nlayer_ICB, sph_params%nlayer_CMB,                 &
+     &    ene_labels, sph_rj, v_pwr, sph_OUT)
+      call alloc_sph_spectr_data(sph_OUT%ltr_sph, sph_OUT)
+!
+      flag_gzip_lc = v_pwr%gzip_flag_vol_spec
+      call sel_open_sph_vol_monitor_file(id_file_rms, fname_rms,        &
+     &    sph_pwr_labels, sph_OUT, zbuf_m, flag_gzip_lc)
+      call swap_volume_spectr_to_IO(sph_params%l_truncation,            &
+     &    v_pwr%ntot_comp_sq, rms_sph_x, sph_OUT%spectr_IO(1,0,1))
+      call sel_gz_write_volume_spectr_mtr                               &
+     &   (flag_gzip_lc, id_file_rms, time_d%i_time_step, time_d%time,   &
+     &    sph_params%l_truncation, v_pwr%ntot_comp_sq,                  &
+     &    sph_OUT%spectr_IO(1,0,1), zbuf_m)
+      call dealloc_sph_espec_data(sph_OUT)
+      call dealloc_sph_espec_name(sph_OUT)
       close(id_file_rms)
 !
       end subroutine write_sph_volume_spec_file
@@ -262,8 +246,12 @@
      &         (fname_rms, mode_label, ene_labels, time_d,              &
      &          sph_params, sph_rj, v_pwr, rms_sph_v)
 !
+      use t_read_sph_spectra
+      use t_buffer_4_gzip
       use set_parallel_file_name
-      use sph_mean_spectr_IO
+      use gz_open_sph_monitor_file
+      use sph_monitor_data_text
+      use select_gz_stream_file_IO
 !
       character(len=kchara), intent(in) :: fname_rms, mode_label
       type(energy_label_param), intent(in) :: ene_labels
@@ -274,16 +262,72 @@
 !
       real(kind = kreal), intent(in) :: rms_sph_v(v_pwr%ntot_comp_sq)
 !
+      type(read_sph_spectr_data), save :: sph_OUT
+      type(buffer_4_gzip), save :: zbuf_m
+      logical :: flag_gzip_lc
 !
-      call open_sph_vol_mean_sq_file(id_file_rms, fname_rms,            &
-     &    mode_label, ene_labels, sph_params, sph_rj, v_pwr)
 !
-      write(id_file_rms,'(i16,1pe23.14e3,1p200e23.14e3)')               &
-     &                 time_d%i_time_step,                              &
-     &                 time_d%time, rms_sph_v(1:v_pwr%ntot_comp_sq)
+      call dup_sph_vol_spectr_header                                    &
+     &   (mode_label, sph_params%l_truncation,                          &
+     &    sph_params%nlayer_ICB, sph_params%nlayer_CMB,                 &
+     &    ene_labels, sph_rj, v_pwr, sph_OUT)
+!
+      flag_gzip_lc = v_pwr%gzip_flag_vol_spec
+      call sel_open_sph_vol_monitor_file(id_file_rms, fname_rms,        &
+     &    sph_pwr_labels, sph_OUT, zbuf_m, flag_gzip_lc)
+      call dealloc_sph_espec_name(sph_OUT)
+!
+      call sel_gz_write_text_stream(flag_gzip_lc, id_file_rms,          &
+     &    volume_pwr_data_text(time_d%i_time_step, time_d%time,         &
+     &    v_pwr%ntot_comp_sq, rms_sph_v), zbuf_m)
       close(id_file_rms)
 !
       end subroutine write_sph_volume_pwr_file
+!
+!  --------------------------------------------------------------------
+!  --------------------------------------------------------------------
+!
+      logical function error_sph_vol_ms_file                            &
+     &               (id_rank, ene_labels, sph_params, sph_rj, v_pwr)
+!
+      use t_read_sph_spectra
+      use t_buffer_4_gzip
+      use gz_open_sph_monitor_file
+      use sph_monitor_data_text
+      use set_parallel_file_name
+!
+      integer, intent(in) :: id_rank
+!
+      type(energy_label_param), intent(in) :: ene_labels
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rj_grid), intent(in) ::  sph_rj
+      type(sph_vol_mean_squares), intent(in) :: v_pwr
+!
+      character(len=kchara) :: fname_rms, mode_label
+!
+      type(read_sph_spectr_data), save :: sph_OUT
+      logical :: flag_gzip_lc, error
+!
+!
+      error_sph_vol_ms_file = .FALSE.
+      if(v_pwr%ntot_comp_sq .eq. 0)  return
+!
+      if(id_rank .ne. v_pwr%irank_m) return
+!
+      flag_gzip_lc = v_pwr%gzip_flag_vol_spec
+      write(fname_rms,   '(a,a6)')                                      &
+     &      trim(v_pwr%fhead_rms_v), '_s.dat'
+      write(mode_label,'(a)') 'EMPTY'
+      call dup_sph_vol_spectr_header                                    &
+     &   (mode_label, sph_params%l_truncation,                          &
+     &    sph_params%nlayer_ICB, sph_params%nlayer_CMB,                 &
+     &    ene_labels, sph_rj, v_pwr, sph_OUT)
+      call check_sph_vol_monitor_file(fname_rms, sph_pwr_labels,        &
+     &    sph_OUT, flag_gzip_lc, error)
+      call dealloc_sph_espec_name(sph_OUT)
+      error_sph_vol_ms_file =  error
+!
+      end function error_sph_vol_ms_file
 !
 !  --------------------------------------------------------------------
 !

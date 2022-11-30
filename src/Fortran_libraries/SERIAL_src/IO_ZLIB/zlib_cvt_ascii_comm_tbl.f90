@@ -92,7 +92,8 @@
             end do
 !
             nrest = nitem_2 - nitem_c
-            call gzip_defleat_char_last(len_multi_int_textline(nrest),  &
+            call gzip_defleat_char_last                                 &
+     &         (len_multi_int_textline(nrest),                          &
      &          multi_int_textline(nrest, int_dat(ist+nitem_c+1)),      &
      &          zbuf)
             ist = ist + nitem_2

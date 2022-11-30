@@ -11,7 +11,6 @@
 !!      &     time_ave_picked_sph_spectr_f(cname, cstart, cend) Bind(C)
 !!        character(1,C_char), intent(in) :: cname(*)
 !!        real(C_double), Value :: cstart, cend
-!!      integer(c_int) function fin_tave_picked_sph_spectr_f() Bind(C)
 !!      subroutine get_each_tave_picked_spectr_f                        &
 !!     &         (yname, kr_value, l_value, m_value, r, ave, rms, sdev) &
 !!     &          bind(c, name="get_each_tave_picked_spectr_f")
@@ -69,7 +68,7 @@
       start_time = cstart
       end_time = cend
       call s_time_ave_picked_sph_spectr                                 &
-     &   (.FALSE., file_name, start_time, end_time, pick_IO_a, p_ave_a)
+     &   (.FALSE., file_name, start_time, end_time)
 !
       time_ave_picked_sph_spectr_f = 0
       end function time_ave_picked_sph_spectr_f
@@ -88,7 +87,7 @@
       real(c_double), intent(inout) :: r(1), ave(1), rms(1), sdev(1)
 !
       integer(kind = kint) :: id_radius, in_degree, in_order
-      integer(kind = kint) :: i, idx, id_comp, id_mode
+      integer(kind = kint) :: idx, id_comp, id_mode
       character(len=kchara) :: draw_name
 !
       draw_name = c_to_fstring(yname)
@@ -109,34 +108,19 @@
       end subroutine get_each_tave_picked_spectr_f
 !
 ! -------------------------------------------------------------------
-!
-      integer(c_int) function fin_tave_picked_sph_spectr_f() Bind(C)
-!
-!
-      call dealloc_pick_sph_monitor_IO(pick_IO_a)
-      call dealloc_pick_sph_series(pick_IO_a)
-      call dealloc_picked_t_avetage(p_ave_a)
-!
-      fin_tave_picked_sph_spectr_f = 0
-      end function fin_tave_picked_sph_spectr_f
-!
-! -------------------------------------------------------------------
 ! -------------------------------------------------------------------
 !
       subroutine s_time_ave_picked_sph_spectr                           &
-     &         (flag_log, file_name, start_time, end_time,              &
-     &          pick_IO, p_ave)
+     &         (flag_log, file_name, start_time, end_time)
 !
       use picked_sph_spectr_data_IO
       use count_monitor_time_series
       use set_parallel_file_name
+      use write_snap_pick_sph_spectr
 !
       logical, intent(in) :: flag_log
       character(len=kchara), intent(in) :: file_name
       real(kind = kreal), intent(in) :: start_time, end_time
-!
-      type(picked_spectrum_data_IO), intent(inout) :: pick_IO
-      type(time_ave_picked_sph), intent(inout) :: p_ave
 !
       character(len=kchara) :: directory, fname_no_dir, fname_tmp
       character(len=kchara) :: tave_fname
@@ -144,7 +128,7 @@
       character(len=kchara) :: sdev_fname
       integer(kind = kint), parameter :: id_pick = 15
 !
-      integer(kind = kint) :: i_step, i, k, nd
+      integer(kind = kint), allocatable :: imask(:)
       real(kind = kreal) :: true_start, true_end
 !
 !
@@ -158,45 +142,52 @@
       sdev_fname = append_directory(directory, fname_tmp)
 !
 !      Load picked mode file
-      if(flag_log) call check_picked_sph_spectr(file_name, pick_IO)
+      if(flag_log) call check_picked_sph_spectr(file_name, pick_IO_a)
       call load_picked_sph_spectr_series                                &
      &   (flag_log, file_name, start_time, end_time,                    &
-     &    true_start, true_end, pick_IO)
+     &    true_start, true_end, pick_IO_a)
 !
-      call alloc_picked_t_avetage(pick_IO%ntot_data, p_ave)
-      call cal_time_ave_picked_sph_spectr(pick_IO%n_step,               &
-     &    pick_IO%d_time, pick_IO%ntot_data, pick_IO%d_pick,            &
-     &    p_ave%ave_spec, p_ave%rms_spec, p_ave%sdev_spec)
+      allocate(imask(pick_IO_a%n_step))
+      imask(1:pick_IO_a%n_step) = 1
+!
+      call alloc_picked_t_avetage(pick_IO_a%ntot_data, p_ave_a)
+      call cal_time_ave_picked_sph_spectr(pick_IO_a%n_step,             &
+     &  pick_IO_a%d_time, imask, pick_IO_a%ntot_data, pick_IO_a%d_pick, &
+     &  p_ave_a%ave_spec, p_ave_a%rms_spec, p_ave_a%sdev_spec)
 !
 !$omp parallel workshare
-      pick_IO%d_pk(1:pick_IO%ntot_data)                                 &
-     &      = p_ave%ave_spec(1:pick_IO%ntot_data)
+      pick_IO_a%d_pk(1:pick_IO_a%ntot_data)                             &
+     &      = p_ave_a%ave_spec(1:pick_IO_a%ntot_data)
 !$omp end parallel workshare
       call write_tave_sph_spec_monitor                                  &
-     &   (tave_fname, pick_IO%i_step(pick_IO%n_step),                   &
-     &    true_end, true_start, pick_IO)
+     &   (tave_fname, pick_IO_a%i_step(pick_IO_a%n_step),               &
+     &    true_end, true_start, pick_IO_a)
 !
 !    output RMS deviation
 !
 !$omp parallel workshare
-      pick_IO%d_pk(1:pick_IO%ntot_data)                                 &
-     &      = p_ave%rms_spec(1:pick_IO%ntot_data)
+      pick_IO_a%d_pk(1:pick_IO_a%ntot_data)                             &
+     &      = p_ave_a%rms_spec(1:pick_IO_a%ntot_data)
 !$omp end parallel workshare
 !
       call write_tave_sph_spec_monitor                                  &
-     &   (trms_fname, pick_IO%i_step(pick_IO%n_step),                   &
-     &    true_end, true_start, pick_IO)
+     &   (trms_fname, pick_IO_a%i_step(pick_IO_a%n_step),               &
+     &    true_end, true_start, pick_IO_a)
 !
 !    output standard deviation
 !
 !$omp parallel workshare
-      pick_IO%d_pk(1:pick_IO%ntot_data)                                 &
-     &      = p_ave%sdev_spec(1:pick_IO%ntot_data)
+      pick_IO_a%d_pk(1:pick_IO_a%ntot_data)                             &
+     &      = p_ave_a%sdev_spec(1:pick_IO_a%ntot_data)
 !$omp end parallel workshare
 !
       call write_tave_sph_spec_monitor                                  &
-     &   (sdev_fname, pick_IO%i_step(pick_IO%n_step),                   &
-     &    true_end, true_start, pick_IO)
+     &   (sdev_fname, pick_IO_a%i_step(pick_IO_a%n_step),               &
+     &    true_end, true_start, pick_IO_a)
+!
+      call dealloc_pick_sph_monitor_IO(pick_IO_a)
+      call dealloc_pick_sph_series(pick_IO_a)
+      call dealloc_picked_t_avetage(p_ave_a)
 !
       end subroutine s_time_ave_picked_sph_spectr
 !

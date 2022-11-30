@@ -34,6 +34,7 @@
       implicit none
 !
       type(buffer_4_gzip), save, private :: zbuf_ucd
+      character, pointer, private, save :: FPz_psf
 !
 !  ---------------------------------------------------------------------
 !
@@ -52,11 +53,12 @@
       type(ucd_data), intent(inout) :: ucd_z
 !
 !
-      call open_rd_gzfile_b(gzip_name, izero, zbuf_ucd)
-      call gz_read_one_integer_b(zbuf_ucd, np_udt)
-      call gz_read_alloc_psf_bin_grid_data(np_udt, ucd_z, zbuf_ucd)
+      call open_rd_gzfile_b(FPz_psf, gzip_name, izero, zbuf_ucd)
+      call gz_read_one_integer_b(FPz_psf, zbuf_ucd, np_udt)
+      call gz_read_alloc_psf_bin_grid_data                              &
+     &   (FPz_psf, np_udt, ucd_z, zbuf_ucd)
 !
-      call close_gzfile_b
+      call close_gzfile_b(FPz_psf)
 !
       end subroutine gz_read_alloc_psf_bin_grid
 !
@@ -76,8 +78,8 @@
 !
       integer :: np_read
 !
-      call open_rd_gzfile_b(gzip_name, izero, zbuf_ucd)
-      call gz_read_psf_bin_time_data(np_read,                           &
+      call open_rd_gzfile_b(FPz_psf, gzip_name, izero, zbuf_ucd)
+      call gz_read_psf_bin_time_data(FPz_psf, np_read,                  &
      &    t_IO%i_time_step, t_IO%time, t_IO%dt, zbuf_ucd)
 !
       if(np_read .ne. np_udt) then
@@ -87,8 +89,9 @@
         stop
       end if
 !
-      call gz_read_alloc_psf_bin_fld_data(np_read, ucd_z, zbuf_ucd)
-      call close_gzfile_b
+      call gz_read_alloc_psf_bin_fld_data                               &
+     &   (FPz_psf, np_read, ucd_z, zbuf_ucd)
+      call close_gzfile_b(FPz_psf)
 !
       end subroutine gz_read_alloc_psf_bin_file
 !
@@ -107,14 +110,16 @@
       integer :: np_read
 !
 !
-      call open_rd_gzfile_b(gzip_name, izero, zbuf_ucd)
-      call gz_read_one_integer_b(zbuf_ucd, np_read)
-      call gz_read_alloc_psf_bin_grid_data(np_read, ucd_z, zbuf_ucd)
+      call open_rd_gzfile_b(FPz_psf, gzip_name, izero, zbuf_ucd)
+      call gz_read_one_integer_b(FPz_psf, zbuf_ucd, np_read)
+      call gz_read_alloc_psf_bin_grid_data                              &
+     &   (FPz_psf, np_read, ucd_z, zbuf_ucd)
 !
-      call gz_read_psf_bin_time_data(np_read,                           &
+      call gz_read_psf_bin_time_data(FPz_psf, np_read,                  &
      &    t_IO%i_time_step, t_IO%time, t_IO%dt, zbuf_ucd)
-      call gz_read_alloc_psf_bin_fld_data(np_read, ucd_z, zbuf_ucd)
-      call close_gzfile_b
+      call gz_read_alloc_psf_bin_fld_data                               &
+     &   (FPz_psf, np_read, ucd_z, zbuf_ucd)
+      call close_gzfile_b(FPz_psf)
 !
       end subroutine gz_read_alloc_iso_bin_file
 !
@@ -132,10 +137,10 @@
       type(ucd_data), intent(inout) :: ucd_z
 !
 !
-      call open_rd_gzfile_b(gzip_name, izero, zbuf_ucd)
-      call gz_read_one_integer_b(zbuf_ucd, np_udt)
-      call gz_read_psf_bin_grid_data(np_udt, ucd_z, zbuf_ucd)
-      call close_gzfile_b
+      call open_rd_gzfile_b(FPz_psf, gzip_name, izero, zbuf_ucd)
+      call gz_read_one_integer_b(FPz_psf, zbuf_ucd, np_udt)
+      call gz_read_psf_bin_grid_data(FPz_psf, np_udt, ucd_z, zbuf_ucd)
+      call close_gzfile_b(FPz_psf)
 !
       end subroutine gz_read_psf_bin_grid
 !
@@ -155,9 +160,9 @@
       integer :: np_read
 !
 !
-      call open_rd_gzfile_b(gzip_name, izero, zbuf_ucd)
+      call open_rd_gzfile_b(FPz_psf, gzip_name, izero, zbuf_ucd)
 !
-      call gz_read_psf_bin_time_data(np_read,                           &
+      call gz_read_psf_bin_time_data(FPz_psf, np_read,                  &
      &    t_IO%i_time_step, t_IO%time, t_IO%dt, zbuf_ucd)
 !
       if(np_read .ne. np_udt) then
@@ -167,8 +172,9 @@
         stop
       end if
 !
-      call gz_read_psf_bin_field_data(np_read, ucd_z, zbuf_ucd)
-      call close_gzfile_b
+      call gz_read_psf_bin_field_data                                   &
+     &   (FPz_psf, np_read, ucd_z, zbuf_ucd)
+      call close_gzfile_b(FPz_psf)
 !
       end subroutine gz_read_psf_bin_file
 !
@@ -187,15 +193,16 @@
       integer :: np_read
 !
 !
-      call open_rd_gzfile_b(gzip_name, izero, zbuf_ucd)
-      call gz_read_one_integer_b(zbuf_ucd, np_read)
+      call open_rd_gzfile_b(FPz_psf, gzip_name, izero, zbuf_ucd)
+      call gz_read_one_integer_b(FPz_psf, zbuf_ucd, np_read)
 !
-      call gz_read_psf_bin_grid_data(np_read, ucd_z, zbuf_ucd)
+      call gz_read_psf_bin_grid_data(FPz_psf, np_read, ucd_z, zbuf_ucd)
 !
-      call gz_read_psf_bin_time_data(np_read,                           &
+      call gz_read_psf_bin_time_data(FPz_psf, np_read,                  &
      &    t_IO%i_time_step, t_IO%time, t_IO%dt, zbuf_ucd)
-      call gz_read_psf_bin_field_data(np_read, ucd_z, zbuf_ucd)
-      call close_gzfile_b
+      call gz_read_psf_bin_field_data                                   &
+     &   (FPz_psf, np_read, ucd_z, zbuf_ucd)
+      call close_gzfile_b(FPz_psf)
 !
       end subroutine gz_read_iso_bin_file
 !

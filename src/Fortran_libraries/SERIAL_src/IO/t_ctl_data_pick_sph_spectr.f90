@@ -19,6 +19,7 @@
 !!
 !!  begin pickup_spectr_ctl
 !!    picked_sph_prefix            'sph_spectr/picked_mode'
+!!    picked_sph_format            'gzip' or 'ASCII'
 !!!
 !!!     if pick_layer_ctl = 0 or negative:
 !!!           output all layer and volume average
@@ -84,6 +85,8 @@
       type pick_spectr_control
 !>        Structure for picked spectrum file prefix
         type(read_character_item) :: picked_mode_head_ctl
+!>        Structure for picked spectrum file format (ascii or gzip)
+        type(read_character_item) :: picked_mode_fmt_ctl
 !
 !>        Structure for list of radial grid of spectr data output
 !!@n        idx_pick_layer_ctl%num:   Number of grid
@@ -112,7 +115,9 @@
 !   labels for item
 !
       character(len=kchara), parameter, private                         &
-     &           :: hd_picked_mode_head = 'picked_sph_prefix'
+     &           :: hd_picked_mode_head =   'picked_sph_prefix'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_picked_mode_format = 'picked_sph_format'
 !
       character(len=kchara), parameter, private                         &
      &           :: hd_pick_layer =  'pick_layer_ctl'
@@ -141,6 +146,7 @@
       call dealloc_control_array_int(pspec_ctl%idx_pick_layer_ctl)
 !
       pspec_ctl%picked_mode_head_ctl%iflag = 0
+      pspec_ctl%picked_mode_fmt_ctl%iflag =  0
       pspec_ctl%i_pick_sph = 0
 !
       end subroutine dealloc_pick_spectr_control
@@ -176,6 +182,8 @@
 !
         call read_chara_ctl_type(c_buf, hd_picked_mode_head,            &
      &      pspec_ctl%picked_mode_head_ctl)
+        call read_chara_ctl_type(c_buf, hd_picked_mode_format,          &
+     &      pspec_ctl%picked_mode_fmt_ctl)
       end do
       pspec_ctl%i_pick_sph = 1
 !

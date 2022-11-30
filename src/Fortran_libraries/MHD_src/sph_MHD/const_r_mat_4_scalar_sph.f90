@@ -150,7 +150,7 @@
       real(kind = kreal), allocatable :: r_coef(:)
 !
 !
-      write(band_s_evo%mat_name,'(a)') trim(mat_name)
+      band_s_evo%mat_name = mat_name
       call alloc_band_mat_sph(ithree, sph_rj, band_s_evo)
       call set_unit_on_diag(band_s_evo)
 !
@@ -223,7 +223,7 @@
 !      integer :: i
 !
 !
-      write(band_s00_poisson%mat_name,'(a)') trim(mat_name)
+      band_s00_poisson%mat_name = mat_name
       call alloc_ctr_band_mat(ithree, sph_rj, band_s00_poisson)
 !
       if(sph_rj%idx_rj_degree_zero .le. 0) return

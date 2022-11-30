@@ -133,8 +133,8 @@
       call init_radial_sph_interpolation(MHD_files%org_rj_file_IO,      &
      &    SPH_MHD%sph%sph_params, SPH_MHD%sph%sph_rj, SPH_WK%rj_itp)
 !
-      if ( iflag_debug.gt.0 ) write(*,*) 'init_rms_4_sph_spectr_4_mhd'
-      call init_rms_4_sph_spectr_4_mhd                                  &
+      if(iflag_debug.gt.0) write(*,*) 'init_sph_spectr_data_and_file'
+      call init_sph_spectr_data_and_file                                &
      &   (SPH_MHD%sph, SPH_MHD%fld, SPH_WK%monitor)
 !
 !* -----  find mid-equator point -----------------

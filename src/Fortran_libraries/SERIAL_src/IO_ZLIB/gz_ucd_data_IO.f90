@@ -7,26 +7,29 @@
 !> @brief Output routine for gzipped UCD data segments
 !!
 !!@verbatim
-!!      subroutine write_gz_udt_field_header(num_output,                &
+!!      subroutine write_gz_udt_field_header(FPz_f, num_output,         &
 !!     &          ncomp_out, name_out, zbuf)
-!!      subroutine write_gz_ucd_field_data(ntot_nod, ncomp_dat, nnod,   &
-!!     &          inod_out, dat_out, zbuf)
+!!      subroutine write_gz_ucd_field_data(FPz_f, ntot_nod, ncomp_dat,  &
+!!     &          nnod, inod_out, dat_out, zbuf)
 !!      subroutine write_gz_udt_mesh_header                             &
-!!     &         (nnod_output, nele_out, ncomp_output, zbuf)
+!!     &         (FPz_f, nnod_output, nele_out, ncomp_output, zbuf)
 !!      subroutine write_gz_ucd_mesh_connect                            &
-!!     &         (ntot_ele, nnod_ele, nele, iele_gl, ie_gl, zbuf)
+!!     &         (FPz_f, ntot_ele, nnod_ele, nele, iele_gl, ie_gl, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!
-!!      subroutine read_gz_udt_field_num(num_input, zbuf)
+!!      subroutine read_gz_udt_field_num(FPz_f, num_input, zbuf)
 !!      subroutine read_gz_udt_field_name                               &
-!!     &         (num_input, ncomp_in, name_in, zbuf)
+!!     &         (FPz_f, num_input, ncomp_in, name_in, zbuf)
 !!      subroutine read_gz_udt_field_data                               &
-!!     &         (nnod_in, ncomp_dat, dat_in, zbuf)
+!!     &         (FPz_f, nnod_in, ncomp_dat, dat_in, zbuf)
 !!      subroutine read_gz_udt_mesh_header                              &
-!!     &         (nnod_input, nele_in, ncomptot_in, zbuf)
-!!      subroutine read_gz_ucd_node_data(nnod_in, inod_gl, xx_in, zbuf)
+!!     &         (FPz_f, nnod_input, nele_in, ncomptot_in, zbuf)
+!!      subroutine read_gz_ucd_node_data                                &
+!!     &         (FPz_f, nnod_in, inod_gl, xx_in, zbuf)
 !!      subroutine read_gz_ucd_ele_connect                              &
-!!     &         (nele_in, nnod_ele, iele_gl, ie_in, zbuf)
+!!     &         (FPz_f, nele_in, nnod_ele, iele_gl, ie_in, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!@endverbatim
 !
@@ -46,11 +49,12 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine write_gz_udt_field_header(num_output,                  &
+      subroutine write_gz_udt_field_header(FPz_f, num_output,           &
      &          ncomp_out, name_out, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(in) :: num_output
       integer(kind = kint), intent(in) :: ncomp_out(num_output)
       character(len = kchara), intent(in) :: name_out(num_output)
@@ -66,23 +70,24 @@
 !
       write(zbuf%fixbuf(1),fmt_txt) num_output,'  ',                    &
      &                       ncomp_out(1:num_output), char(10), char(0)
-      call gz_write_textbuf_no_lf(zbuf)
+      call gz_write_textbuf_no_lf(FPz_f, zbuf)
 !
       do j = 1, num_output
         write(zbuf%fixbuf(1),'(a,a1,2a1)') trim(name_out(j)), ",",      &
      &                                     char(10), char(0)
-        call gz_write_textbuf_no_lf(zbuf)
+        call gz_write_textbuf_no_lf(FPz_f, zbuf)
       end do
 !
       end subroutine write_gz_udt_field_header
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine write_gz_ucd_field_data(ntot_nod, ncomp_dat, nnod,     &
-     &          inod_out, dat_out, zbuf)
+      subroutine write_gz_ucd_field_data(FPz_f, ntot_nod, ncomp_dat,    &
+     &          nnod, inod_out, dat_out, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(in) :: ncomp_dat
       integer(kind = kint_gl), intent(in) :: ntot_nod, nnod
       integer(kind = kint_gl), intent(in) :: inod_out(ntot_nod)
@@ -98,7 +103,7 @@
         dat_1(1:ncomp_dat) = dat_out(inod,1:ncomp_dat)
         zbuf%fixbuf(1)                                                  &
      &    = ucd_each_field(inod_out(inod), ncomp_dat, dat_1) // char(0)
-        call gz_write_textbuf_no_lf(zbuf)
+        call gz_write_textbuf_no_lf(FPz_f, zbuf)
       end do
 !
       end subroutine  write_gz_ucd_field_data
@@ -107,10 +112,11 @@
 ! ----------------------------------------------------------------------
 !
       subroutine write_gz_udt_mesh_header                               &
-     &         (nnod_output, nele_out, ncomp_output, zbuf)
+     &         (FPz_f, nnod_output, nele_out, ncomp_output, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: nnod_output, nele_out
       integer(kind = kint), intent(in) :: ncomp_output
 !
@@ -120,7 +126,7 @@
       zbuf%fixbuf(1)                                                    &
      &        = ucd_connect_head(nnod_output, nele_out, ncomp_output)   &
      &         // char(0)
-      call gz_write_textbuf_no_lf(zbuf)
+      call gz_write_textbuf_no_lf(FPz_f, zbuf)
 !
       end subroutine write_gz_udt_mesh_header
 !
@@ -128,11 +134,12 @@
 ! ----------------------------------------------------------------------
 !
       subroutine write_gz_ucd_mesh_connect                              &
-     &         (ntot_ele, nnod_ele, nele, iele_gl, ie_gl, zbuf)
+     &         (FPz_f, ntot_ele, nnod_ele, nele, iele_gl, ie_gl, zbuf)
 !
       use m_geometry_constants
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind=kint), intent(in) :: nnod_ele
       integer(kind=kint_gl), intent(in) :: ntot_ele, nele
       integer(kind=kint_gl), intent(in) :: iele_gl(ntot_ele)
@@ -149,7 +156,7 @@
         zbuf%fixbuf(1)                                                  &
      &          = ucd_each_connect(iele_gl(iele), nnod_ele, ie0)        &
      &           // char(0)
-        call gz_write_textbuf_no_lf(zbuf)
+        call gz_write_textbuf_no_lf(FPz_f, zbuf)
       end do
 !
       end subroutine  write_gz_ucd_mesh_connect
@@ -157,15 +164,16 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine read_gz_udt_field_num(num_input, zbuf)
+      subroutine read_gz_udt_field_num(FPz_f, num_input, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(inout) :: num_input
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
-      call get_one_line_text_from_gz(zbuf)
+      call get_one_line_text_from_gz(FPz_f, zbuf)
       read(zbuf%fixbuf(1),*) num_input
 !
       end subroutine read_gz_udt_field_num
@@ -173,10 +181,11 @@
 ! ----------------------------------------------------------------------
 !
       subroutine read_gz_udt_field_name                                 &
-     &         (num_input, ncomp_in, name_in, zbuf)
+     &         (FPz_f, num_input, ncomp_in, name_in, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(inout) :: num_input
       integer(kind = kint), intent(inout) :: ncomp_in(num_input)
       character(len = kchara), intent(inout) :: name_in(num_input)
@@ -190,7 +199,7 @@
       if(num_input .gt. zbuf%num_word-1) then
         ist = zbuf%num_word-1
         do
-          call get_one_line_text_from_gz(zbuf)
+          call get_one_line_text_from_gz(FPz_f, zbuf)
           read(zbuf%fixbuf(1),*) ncomp_in(ist+1:ist+zbuf%num_word)
           ist = ist + zbuf%num_word
           if(ist .gt. num_input) exit
@@ -198,7 +207,7 @@
       end if
 !
       do i = 1, num_input
-        call get_one_line_text_from_gz(zbuf)
+        call get_one_line_text_from_gz(FPz_f, zbuf)
         read(zbuf%fixbuf(1),*) name_in(i)
       end do
 !
@@ -207,10 +216,11 @@
 ! ----------------------------------------------------------------------
 !
       subroutine read_gz_udt_field_data                                 &
-     &         (nnod_in, ncomp_dat, dat_in, zbuf)
+     &         (FPz_f, nnod_in, ncomp_dat, dat_in, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(in) :: ncomp_dat
       integer(kind = kint_gl), intent(in) :: nnod_in
 !
@@ -222,13 +232,13 @@
 !
 !
       do inod = 1, nnod_in
-        call get_one_line_text_from_gz(zbuf)
+        call get_one_line_text_from_gz(FPz_f, zbuf)
         read(zbuf%fixbuf(1),*) itmp, dat_in(inod,1:zbuf%num_word-1)
 !
         if(ncomp_dat .gt. zbuf%num_word-1) then
           ist = zbuf%num_word-1
           do
-            call get_one_line_text_from_gz(zbuf)
+            call get_one_line_text_from_gz(FPz_f, zbuf)
             read(zbuf%fixbuf(1),*) dat_in(inod,ist+1:ist+zbuf%num_word)
             ist = ist + zbuf%num_word
             if(ist .gt. ncomp_dat) exit
@@ -241,10 +251,11 @@
 ! ----------------------------------------------------------------------
 !
       subroutine read_gz_udt_mesh_header                                &
-     &         (nnod_input, nele_in, ncomptot_in, zbuf)
+     &         (FPz_f, nnod_input, nele_in, ncomptot_in, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(inout) :: nnod_input, nele_in
       integer(kind = kint), intent(inout) :: ncomptot_in
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -252,7 +263,7 @@
       integer(kind = kint) :: itmp
 !
 !
-      call get_one_line_text_from_gz(zbuf)
+      call get_one_line_text_from_gz(FPz_f, zbuf)
       read(zbuf%fixbuf(1),*) nnod_input, nele_in, ncomptot_in,          &
      &                       itmp, itmp
 !
@@ -260,12 +271,14 @@
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine read_gz_ucd_node_data(nnod_in, inod_gl, xx_in, zbuf)
+      subroutine read_gz_ucd_node_data                                  &
+     &         (FPz_f, nnod_in, inod_gl, xx_in, zbuf)
 !
       use gzip_file_access
 !
       integer(kind=kint_gl), intent(in) :: nnod_in
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind=kint_gl), intent(inout) :: inod_gl(nnod_in)
       real(kind = kreal), intent(inout) :: xx_in(nnod_in,3)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -274,7 +287,7 @@
 !
 !
       do inod = 1, nnod_in
-        call get_one_line_text_from_gz(zbuf)
+        call get_one_line_text_from_gz(FPz_f, zbuf)
         read(zbuf%fixbuf(1),*) inod_gl(inod), xx_in(inod,1:3)
       end do
 !
@@ -283,10 +296,11 @@
 ! ----------------------------------------------------------------------
 !
       subroutine read_gz_ucd_ele_connect                                &
-     &         (nele_in, nnod_ele, iele_gl, ie_in, zbuf)
+     &         (FPz_f, nele_in, nnod_ele, iele_gl, ie_in, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind=kint), intent(in) :: nnod_ele
       integer(kind=kint_gl), intent(in) :: nele_in
 !
@@ -300,7 +314,7 @@
 !
 !
       do iele = 1, nele_in
-        call get_one_line_text_from_gz(zbuf)
+        call get_one_line_text_from_gz(FPz_f, zbuf)
         read(zbuf%fixbuf(1),*) iele_gl(iele), itmp, eleflag,            &
      &                        ie_in(iele,1:nnod_ele)
       end do

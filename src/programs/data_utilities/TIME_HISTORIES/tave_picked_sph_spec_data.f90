@@ -31,8 +31,6 @@
 !>      Structure for control data
       type(tave_sph_monitor_ctl), save :: tave_sph_ctl1
       type(sph_spectr_file_param), save :: spec_evo_p1
-      type(time_ave_picked_sph), save :: p_ave1
-      type(picked_spectrum_data_IO), save :: pick_IO_1
 !
       integer(kind = kint) :: i
 !
@@ -42,11 +40,7 @@
       do i = 1, spec_evo_p1%pick_spec_series%num_file
         call s_time_ave_picked_sph_spectr                               &
      &     (.TRUE., spec_evo_p1%pick_spec_series%evo_file_name(i),      &
-     &      spec_evo_p1%start_time, spec_evo_p1%end_time,               &
-     &      pick_IO_1, p_ave1)
-        call dealloc_pick_sph_monitor_IO(pick_IO_1)
-        call dealloc_pick_sph_series(pick_IO_1)
-        call dealloc_picked_t_avetage(p_ave1)
+     &      spec_evo_p1%start_time, spec_evo_p1%end_time)
       end do
 !
       write(*,*) '***** program finished *****'

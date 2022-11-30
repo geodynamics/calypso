@@ -9,7 +9,13 @@
 !!@verbatim
 !!      subroutine set_spec_series_file_and_time(tave_sph_ctl,          &
 !!     &                                         spec_evo_p)
-!!      subroutine set_spec_series_file_param(tave_sph_ctl, spec_evo_p)
+!!      subroutine set_spec_series_file_param(folder_ctl, file_fmt_ctl, &
+!!     &          monitor_list_ctl, spec_evo_p)
+!!        type(read_character_item), intent(in) :: folder_ctl
+!!        type(read_character_item), intent(in) :: file_fmt_ctl
+!!        type(tave_sph_monitor_ctl), intent(in) :: tave_sph_ctl
+!!        type(sph_monitor_files_ctl), intent(in) :: monitor_list_ctl
+!!        type(sph_spectr_file_param), intent(inout) :: spec_evo_p
 !!      subroutine dealloc_spec_series_file_param(spec_evo_p)
 !!        type(tave_sph_monitor_ctl), intent(in) :: tave_sph_ctl
 !!        type(sph_spectr_file_param), intent(inout) :: spec_evo_p
@@ -19,6 +25,8 @@
 !
       use m_precision
       use m_constants
+      use t_control_array_character
+      use t_multi_flag_labels
 !
       implicit none
 !
@@ -44,6 +52,9 @@
         type(sph_spectr_file_list) :: pick_spec_series
       end type sph_spectr_file_param
 !
+      type(read_character_item), parameter :: dummy_item                &
+     &       = read_character_item(iflag = 0, charavalue = 'ASCII')
+!
       private :: set_sph_series_file_list
       private :: alloc_series_prefix_list, dealloc_series_prefix_list
 !
@@ -56,6 +67,7 @@
       subroutine set_spec_series_file_and_time(tave_sph_ctl,            &
      &                                         spec_evo_p)
 !
+      use m_file_format_labels
       use t_ctl_data_tave_sph_monitor
       use skip_comment_f
       use set_parallel_file_name
@@ -63,9 +75,6 @@
 !
       type(tave_sph_monitor_ctl), intent(in) :: tave_sph_ctl
       type(sph_spectr_file_param), intent(inout) :: spec_evo_p
-!
-      character(len = kchara) :: file_prefix
-      integer(kind = kint) :: i
 !
 !
       if(tave_sph_ctl%start_time_ctl%iflag .eq. 0) then
@@ -91,32 +100,41 @@
         spec_evo_p%led = tave_sph_ctl%degree_range_ctl%intvalue(2)
       end if
 !
-      call set_spec_series_file_param(tave_sph_ctl, spec_evo_p)
+      call set_spec_series_file_param                                   &
+     &   (dummy_item, tave_sph_ctl%read_mnt_file_fmt_ctl,               &
+     &    tave_sph_ctl%monitor_list_ctl, spec_evo_p)
 !
       end subroutine set_spec_series_file_and_time
 !
 !   --------------------------------------------------------------------
 !
-      subroutine set_spec_series_file_param(tave_sph_ctl, spec_evo_p)
+      subroutine set_spec_series_file_param(folder_ctl, file_fmt_ctl,   &
+     &          monitor_list_ctl, spec_evo_p)
 !
-      use t_ctl_data_tave_sph_monitor
+      use t_ctl_data_sph_monitor_list
 !
-      type(tave_sph_monitor_ctl), intent(in) :: tave_sph_ctl
+      type(read_character_item), intent(in) :: folder_ctl
+      type(read_character_item), intent(in) :: file_fmt_ctl
+      type(sph_monitor_files_ctl), intent(in) :: monitor_list_ctl
+!
       type(sph_spectr_file_param), intent(inout) :: spec_evo_p
 !
 !
-      call set_sph_series_file_list                                     &
-     &   (tave_sph_ctl%volume_series_file_ctl,                          &
+      call set_sph_series_file_list(folder_ctl, file_fmt_ctl,           &
+     &    monitor_list_ctl%volume_series_file_ctl,                      &
      &    spec_evo_p%vol_series)
-      call set_sph_series_file_list(tave_sph_ctl%volume_spec_file_ctl,  &
-     &                              spec_evo_p%vol_spec_series)
-      call set_sph_series_file_list                                     &
-     &   (tave_sph_ctl%layered_series_file_ctl,                         &
+      call set_sph_series_file_list(folder_ctl, file_fmt_ctl,           &
+     &    monitor_list_ctl%volume_spec_file_ctl,                        &
+     &    spec_evo_p%vol_spec_series)
+      call set_sph_series_file_list(folder_ctl, file_fmt_ctl,           &
+     &    monitor_list_ctl%layered_series_file_ctl,                     &
      &    spec_evo_p%layer_series)
-      call set_sph_series_file_list(tave_sph_ctl%layered_spec_file_ctl, &
-     &                              spec_evo_p%layer_spec_series)
-      call set_sph_series_file_list(tave_sph_ctl%picked_mode_file_ctl,  &
-     &                              spec_evo_p%pick_spec_series)
+      call set_sph_series_file_list(folder_ctl, file_fmt_ctl,           &
+     &    monitor_list_ctl%layered_spec_file_ctl,                       &
+     &    spec_evo_p%layer_spec_series)
+      call set_sph_series_file_list(folder_ctl, file_fmt_ctl,           &
+     &    monitor_list_ctl%picked_mode_file_ctl,                        &
+     &    spec_evo_p%pick_spec_series)
 !
       end subroutine set_spec_series_file_param
 !
@@ -137,27 +155,68 @@
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine set_sph_series_file_list(file_list_ctl, f_list)
+      subroutine set_sph_series_file_list(folder_ctl, file_fmt_ctl,     &
+     &                                    file_list_ctl, f_list)
 !
+      use t_multi_flag_labels
       use t_control_array_character
       use set_parallel_file_name
 !
+      type(read_character_item), intent(in) :: folder_ctl
+      type(read_character_item), intent(in) :: file_fmt_ctl
       type(ctl_array_chara), intent(in) :: file_list_ctl
       type(sph_spectr_file_list), intent(inout) :: f_list
 !
-      character(len = kchara) :: file_prefix
       integer(kind = kint) :: i
 !
 !
       if(file_list_ctl%num .le. 0) return
       call alloc_series_prefix_list(file_list_ctl%num, f_list)
 !
+!
       do i = 1, f_list%num_file
-        file_prefix = file_list_ctl%c_tbl(i)
-        f_list%evo_file_name(i) = add_dat_extension(file_prefix)
+        call set_sph_series_file_name(folder_ctl, file_fmt_ctl,         &
+     &      file_list_ctl%c_tbl(i), f_list%evo_file_name(i))
       end do
 !
       end subroutine set_sph_series_file_list
+!
+!   --------------------------------------------------------------------
+!
+      subroutine set_sph_series_file_name(folder_ctl, file_fmt_ctl,     &
+     &                                    file_prefix, evo_file_name)
+!
+      use m_file_format_labels
+      use t_multi_flag_labels
+      use t_control_array_character
+      use set_parallel_file_name
+!
+      type(read_character_item), intent(in) :: folder_ctl
+      type(read_character_item), intent(in) :: file_fmt_ctl
+      character(len = kchara), intent(in) :: file_prefix
+      character(len = kchara), intent(inout) :: evo_file_name
+!
+      type(multi_flag_labels) :: gzip_flags1
+      character(len = kchara) :: fname_tmp1, fname_tmp2
+!
+!
+      if(folder_ctl%iflag .gt. 0) then
+        write(fname_tmp1,'(a,a1,a)') trim(folder_ctl%charavalue),      &
+     &                                '/', trim(file_prefix)
+      else
+        fname_tmp1 = file_prefix
+      end if
+!
+      call init_multi_flags_by_labels(itwo, gzip_names, gzip_flags1)
+      if(check_mul_flags(file_fmt_ctl%charavalue, gzip_flags1)) then
+        fname_tmp2 =               add_dat_extension(fname_tmp1)
+        evo_file_name = add_gzip_extension(fname_tmp2)
+      else
+        evo_file_name = add_dat_extension(fname_tmp1)
+      end if
+      call dealloc_multi_flags(gzip_flags1)
+!
+      end subroutine set_sph_series_file_name
 !
 !   --------------------------------------------------------------------
 !

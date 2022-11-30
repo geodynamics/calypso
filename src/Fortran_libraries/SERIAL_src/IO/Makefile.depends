@@ -6,7 +6,11 @@ binary_IO.o: $(IO_DIR)/binary_IO.F90 m_precision.o m_constants.o m_machine_param
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 check_sph_file_access.o: $(IO_DIR)/check_sph_file_access.f90 m_precision.o m_file_format_switch.o t_file_IO_parameter.o set_parallel_file_name.o set_mesh_file_names.o delete_data_files.o
 	$(F90) -c $(F90OPTFLAGS) $<
+check_sph_monitor_header.o: $(IO_DIR)/check_sph_monitor_header.f90 m_precision.o m_machine_parameter.o skip_comment_f.o
+	$(F90) -c $(F90OPTFLAGS) $<
 comm_table_IO.o: $(IO_DIR)/comm_table_IO.f90 m_precision.o skip_comment_f.o
+	$(F90) -c $(F90OPTFLAGS) $<
+compare_sph_monitor_header.o: $(IO_DIR)/compare_sph_monitor_header.f90 m_precision.o m_constants.o t_sph_spectr_head_labels.o t_read_sph_spectra.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 data_IO_to_textline.o: $(IO_DIR)/data_IO_to_textline.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -104,11 +108,15 @@ read_udt_from_binary_data.o: $(IO_DIR)/read_udt_from_binary_data.f90 m_precision
 	$(F90) -c $(F90OPTFLAGS) $<
 rst_data_IO_by_fld.o: $(IO_DIR)/rst_data_IO_by_fld.f90 m_precision.o m_machine_parameter.o t_time_data.o t_field_data_IO.o time_data_IO.o set_parallel_file_name.o field_data_IO.o skip_comment_f.o transfer_to_long_integers.o set_restart_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
+sel_gz_input_sph_mtr_head.o: $(IO_DIR)/sel_gz_input_sph_mtr_head.f90 m_precision.o m_constants.o m_machine_parameter.o t_read_sph_spectra.o t_buffer_4_gzip.o select_gz_stream_file_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+select_gz_stream_file_IO.o: $(IO_DIR)/select_gz_stream_file_IO.F90 m_precision.o t_buffer_4_gzip.o set_parallel_file_name.o skip_comment_f.o gzip_file_access.o skip_gz_comment.o data_convert_by_zlib.o transfer_to_long_integers.o
+	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 set_and_cal_udt_data.o: $(IO_DIR)/set_and_cal_udt_data.f90 m_precision.o t_ucd_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_components_flags.o: $(IO_DIR)/set_components_flags.f90 m_precision.o t_field_labels.o t_multi_flag_labels.o m_component_flags.o m_more_component_flags.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-set_control_4_pickup_sph.o: $(IO_DIR)/set_control_4_pickup_sph.f90 m_precision.o t_ctl_data_4_sph_monitor.o t_pickup_sph_spectr_data.o t_rms_4_sph_spectr.o skip_comment_f.o t_ctl_data_sph_layer_spectr.o t_ctl_data_pick_sph_spectr.o m_base_field_labels.o t_ctl_data_gauss_coefs.o
+set_control_4_pickup_sph.o: $(IO_DIR)/set_control_4_pickup_sph.f90 m_precision.o t_ctl_data_4_sph_monitor.o t_pickup_sph_spectr_data.o t_rms_4_sph_spectr.o t_multi_flag_labels.o m_file_format_labels.o skip_comment_f.o t_ctl_data_sph_layer_spectr.o t_ctl_data_pick_sph_spectr.o m_base_field_labels.o t_ctl_data_gauss_coefs.o
 	$(F90) -c $(F90OPTFLAGS) $<
 set_control_platform_item.o: $(IO_DIR)/set_control_platform_item.F90 m_precision.o m_constants.o t_ctl_data_4_platforms.o t_ctl_data_4_FEM_mesh.o t_file_IO_parameter.o m_machine_parameter.o skip_comment_f.o m_default_file_prefix.o m_file_format_switch.o stop_by_missing_zlib.o t_control_array_character.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
@@ -140,9 +148,7 @@ sph_global_1d_idx_IO.o: $(IO_DIR)/sph_global_1d_idx_IO.f90 m_precision.o t_node_
 	$(F90) -c $(F90OPTFLAGS) $<
 sph_global_1d_idx_IO_b.o: $(IO_DIR)/sph_global_1d_idx_IO_b.f90 m_precision.o t_node_id_spherical_IO.o t_binary_IO_buffer.o binary_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-sph_mean_spectr_IO.o: $(IO_DIR)/sph_mean_spectr_IO.f90 m_precision.o t_time_data.o t_spheric_parameter.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o t_energy_label_parameters.o sph_mean_spectr_header_IO.o
-	$(F90) -c $(F90OPTFLAGS) $<
-sph_mean_spectr_header_IO.o: $(IO_DIR)/sph_mean_spectr_header_IO.f90 m_precision.o t_spheric_parameter.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o t_energy_label_parameters.o write_field_labels.o skip_comment_f.o t_pickup_sph_spectr_data.o add_direction_labels.o
+sph_mean_spectr_header_IO.o: $(IO_DIR)/sph_mean_spectr_header_IO.f90 m_precision.o t_spheric_parameter.o t_rms_4_sph_spectr.o t_sph_volume_mean_square.o t_energy_label_parameters.o t_read_sph_spectra.o m_time_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
 sph_modes_grids_data_IO.o: $(IO_DIR)/sph_modes_grids_data_IO.f90 m_precision.o m_machine_parameter.o m_sph_modes_grid_labels.o t_comm_table.o t_node_id_spherical_IO.o t_spheric_group.o domain_data_IO.o spherical_model_IO.o sph_global_1d_idx_IO.o groups_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -151,6 +157,12 @@ sph_modes_grids_data_IO_b.o: $(IO_DIR)/sph_modes_grids_data_IO_b.f90 m_precision
 sph_modes_grids_file_IO.o: $(IO_DIR)/sph_modes_grids_file_IO.f90 m_precision.o m_machine_parameter.o t_spheric_data_IO.o sph_modes_grids_data_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
 sph_modes_grids_file_IO_b.o: $(IO_DIR)/sph_modes_grids_file_IO_b.f90 m_precision.o m_machine_parameter.o t_spheric_data_IO.o t_binary_IO_buffer.o sph_modes_grids_data_IO_b.o binary_IO.o groups_IO_b.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_monitor_data_text.o: $(IO_DIR)/sph_monitor_data_text.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_monitor_header_text.o: $(IO_DIR)/sph_monitor_header_text.f90 m_precision.o m_constants.o
+	$(F90) -c $(F90OPTFLAGS) $<
+sph_power_spectr_data_text.o: $(IO_DIR)/sph_power_spectr_data_text.f90 m_precision.o m_constants.o t_read_sph_spectra.o sph_monitor_header_text.o
 	$(F90) -c $(F90OPTFLAGS) $<
 spherical_model_IO.o: $(IO_DIR)/spherical_model_IO.f90 m_precision.o t_node_id_spherical_IO.o skip_comment_f.o m_sph_modes_grid_labels.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -168,9 +180,9 @@ t_control_array_chara2real.o: $(IO_DIR)/t_control_array_chara2real.f90 m_precisi
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_array_character.o: $(IO_DIR)/t_control_array_character.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_elements.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_array_character2.o: $(IO_DIR)/t_control_array_character2.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o m_constants.o skip_comment_f.o write_control_elements.o
+t_control_array_character2.o: $(IO_DIR)/t_control_array_character2.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o m_constants.o write_control_items.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_control_array_character3.o: $(IO_DIR)/t_control_array_character3.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_elements.o skip_comment_f.o
+t_control_array_character3.o: $(IO_DIR)/t_control_array_character3.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_items.o write_control_elements.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_control_array_charaint.o: $(IO_DIR)/t_control_array_charaint.f90 m_precision.o m_machine_parameter.o t_read_control_elements.o write_control_elements.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -238,11 +250,15 @@ t_mid_equator_control.o: $(IO_DIR)/t_mid_equator_control.f90 m_precision.o t_rea
 	$(F90) -c $(F90OPTFLAGS) $<
 t_multi_flag_labels.o: $(IO_DIR)/t_multi_flag_labels.f90 m_precision.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
-t_pickup_sph_spectr_data.o: $(IO_DIR)/t_pickup_sph_spectr_data.f90 m_precision.o m_constants.o m_monitor_file_labels.o write_field_labels.o
+t_pickup_sph_spectr_data.o: $(IO_DIR)/t_pickup_sph_spectr_data.f90 m_precision.o m_constants.o t_read_sph_spectra.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_read_control_elements.o: $(IO_DIR)/t_read_control_elements.f90 m_precision.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_read_mesh_data.o: $(IO_DIR)/t_read_mesh_data.f90 m_precision.o t_comm_table.o t_geometry_data.o t_group_data.o t_surf_edge_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_read_sph_spectra.o: $(IO_DIR)/t_read_sph_spectra.f90 m_precision.o m_constants.o t_sph_spectr_head_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_spectr_head_labels.o: $(IO_DIR)/t_sph_spectr_head_labels.f90 m_precision.o m_constants.o skip_comment_f.o
 	$(F90) -c $(F90OPTFLAGS) $<
 t_spheric_data_IO.o: $(IO_DIR)/t_spheric_data_IO.f90 m_precision.o t_spheric_parameter.o t_sph_trans_comm_tbl.o t_spheric_group.o t_node_id_spherical_IO.o t_comm_table.o
 	$(F90) -c $(F90OPTFLAGS) $<
@@ -282,8 +298,12 @@ vtk_data_to_buffer.o: $(IO_DIR)/vtk_data_to_buffer.f90 m_precision.o m_constants
 	$(F90) -c $(F90OPTFLAGS) $<
 vtk_file_IO.o: $(IO_DIR)/vtk_file_IO.f90 m_precision.o m_constants.o m_machine_parameter.o udt_to_VTK_data_IO.o t_ucd_data.o set_parallel_file_name.o set_ucd_file_names.o set_ucd_extensions.o
 	$(F90) -c $(F90OPTFLAGS) $<
-write_control_elements.o: $(IO_DIR)/write_control_elements.f90 m_precision.o m_machine_parameter.o skip_comment_f.o
+write_control_elements.o: $(IO_DIR)/write_control_elements.f90 m_precision.o m_machine_parameter.o write_control_items.o
+	$(F90) -c $(F90OPTFLAGS) $<
+write_control_items.o: $(IO_DIR)/write_control_items.f90 m_precision.o
 	$(F90) -c $(F90OPTFLAGS) $<
 write_field_labels.o: $(IO_DIR)/write_field_labels.f90 m_precision.o m_constants.o
 	$(F90) -c $(F90OPTFLAGS) $<
+write_pick_sph_spectr_data.o: $(IO_DIR)/write_pick_sph_spectr_data.F90 m_precision.o m_constants.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_data.o t_time_data.o t_buffer_4_gzip.o sph_monitor_data_text.o gzip_defleate.o m_time_labels.o
+	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 

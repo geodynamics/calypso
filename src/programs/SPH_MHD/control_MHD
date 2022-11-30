@@ -642,6 +642,7 @@ begin MHD_control
 !
     begin layered_spectrum_ctl
       layered_pwr_spectr_prefix    'sph_pwr_layer'
+      layered_pwr_spectr_format    'gzip'
 !
       degree_spectr_switch         'On'
       order_spectr_switch          'On'

@@ -50,6 +50,18 @@
 !
       implicit none
 !
+      character(len=kchara), parameter, private                         &
+     &           :: vt_evo_name = 'toroidal_velocity_evolution'
+      character(len=kchara), parameter, private                         &
+     &           :: wt_evo_name = 'toroidal_vorticity_evolution'
+      character(len=kchara), parameter, private                         &
+     &           :: vp_evo_name = 'poloidal_velocity_evolution'
+!
+      character(len=kchara), parameter, private                         &
+     &           :: bp_evo_name = 'poloidal_magne_evolution'
+      character(len=kchara), parameter, private                         &
+     &           :: bt_evo_name = 'toroidal_magne_evolution'
+!
 ! -----------------------------------------------------------------------
 !
       contains
@@ -87,9 +99,9 @@
       real(kind = kreal) :: coef_dvt
 !
 !
-      write(band_vt_evo%mat_name,'(a)') 'toroidal_velocity_evolution'
-      write(band_wt_evo%mat_name,'(a)') 'toroidal_vorticity_evolution'
-      write(band_vp_evo%mat_name,'(a)') 'poloidal_velocity_evolution'
+      band_vt_evo%mat_name = vt_evo_name
+      band_wt_evo%mat_name = wt_evo_name
+      band_vp_evo%mat_name = vp_evo_name
 !
       call alloc_band_mat_sph(ifive, sph_rj, band_vp_evo)
       call alloc_band_mat_sph(ithree, sph_rj, band_vt_evo)
@@ -274,8 +286,8 @@
       real(kind = kreal) :: coef_dbt
 !
 !
-      write(band_bp_evo%mat_name,'(a)') 'poloidal_magne_evolution'
-      write(band_bt_evo%mat_name,'(a)') 'toroidal_magne_evolution'
+      band_bp_evo%mat_name = bp_evo_name
+      band_bt_evo%mat_name = bt_evo_name
 !
       call alloc_band_mat_sph(ithree, sph_rj, band_bp_evo)
       call alloc_band_mat_sph(ithree, sph_rj, band_bt_evo)

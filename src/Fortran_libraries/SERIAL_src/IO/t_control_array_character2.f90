@@ -101,7 +101,7 @@
      &         (id_file, level, label, chara2_item)
 !
       use m_constants
-      use skip_comment_f
+      use write_control_items
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file, level
@@ -199,7 +199,7 @@
       subroutine write_control_array_c2                                 &
      &         (id_control, level, label, array_c2)
 !
-      use skip_comment_f
+      use write_control_items
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control, level

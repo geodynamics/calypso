@@ -40,6 +40,7 @@
       implicit none
 !
       type(buffer_4_gzip), private :: zbuf_fu
+      character, pointer, private, save :: FPz_udt
 !
 !------------------------------------------------------------------
 !
@@ -64,15 +65,15 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Write gzipped binary step data file: ', trim(gzip_name)
 !
-      call open_wt_gzfile_b(gzip_name, zbuf_fu)
+      call open_wt_gzfile_b(FPz_udt, gzip_name, zbuf_fu)
 !
-      call gz_write_step_data_b(id_rank,                                &
+      call gz_write_step_data_b(FPz_udt, id_rank,                       &
      &    t_IO%i_time_step, t_IO%time, t_IO%dt, zbuf_fu)
-      call gz_write_field_data_b(ucd%nnod, ucd%num_field,               &
+      call gz_write_field_data_b(FPz_udt, ucd%nnod, ucd%num_field,      &
      &    ucd%ntot_comp, ucd%num_comp, ucd%phys_name, ucd%d_ucd,        &
      &    zbuf_fu)
 !
-      call close_gzfile_b
+      call close_gzfile_b(FPz_udt)
 !
       end subroutine gz_write_ucd_2_fld_file_b
 !
@@ -99,23 +100,24 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read gzipped binary data file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_b(gzip_name, id_rank, zbuf_fu)
+      call open_rd_gzfile_b(FPz_udt, gzip_name, id_rank, zbuf_fu)
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_step_data_b                                          &
-     &   (zbuf_fu, id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,       &
+      call gz_read_step_data_b(FPz_udt, zbuf_fu,                        &
+     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
      &    istack_merged, ucd%num_field)
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
       call gz_read_mul_integer_b                                        &
-     &   (zbuf_fu, cast_long(ucd%num_field), ucd%num_comp)
+     &   (FPz_udt, zbuf_fu, cast_long(ucd%num_field), ucd%num_comp)
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_field_data_b(zbuf_fu, ucd%nnod, ucd%num_field,       &
-     &    ucd%ntot_comp, ucd%phys_name, ucd%d_ucd)
+      call gz_read_field_data_b(FPz_udt, zbuf_fu,                       &
+     &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%phys_name,        &
+     &    ucd%d_ucd)
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
-      call close_gzfile_b
+      call close_gzfile_b(FPz_udt)
       return
 !
   99  continue
@@ -145,28 +147,29 @@
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
      &      'Read gzipped binary data file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_b(gzip_name, id_rank, zbuf_fu)
+      call open_rd_gzfile_b(FPz_udt, gzip_name, id_rank, zbuf_fu)
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
-      call gz_read_step_data_b                                          &
-     &   (zbuf_fu, id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,       &
+      call gz_read_step_data_b(FPz_udt, zbuf_fu,                        &
+     &    id_rank, t_IO%i_time_step, t_IO%time, t_IO%dt,                &
      &    istack_merged, ucd%num_field)
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
       call allocate_ucd_phys_name(ucd)
 !
       call gz_read_mul_integer_b                                        &
-     &   (zbuf_fu, cast_long(ucd%num_field), ucd%num_comp)
+     &   (FPz_udt, zbuf_fu, cast_long(ucd%num_field), ucd%num_comp)
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
       call cal_istack_ucd_component(ucd)
       call allocate_ucd_phys_data(ucd)
 !
-      call gz_read_field_data_b(zbuf_fu, ucd%nnod, ucd%num_field,       &
-     &    ucd%ntot_comp, ucd%phys_name, ucd%d_ucd)
+      call gz_read_field_data_b(FPz_udt, zbuf_fu,                       &
+     &    ucd%nnod, ucd%num_field, ucd%ntot_comp, ucd%phys_name,        &
+     &    ucd%d_ucd)
       if(zbuf_fu%ierr_zlib .ne. 0) go to 99
 !
-      call close_gzfile_b
+      call close_gzfile_b(FPz_udt)
       return
 !
   99  continue

@@ -104,6 +104,7 @@
       subroutine write_character3_ctl_type                              &
      &         (id_file, level, label, chara3_item)
 !
+      use write_control_items
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file, level
@@ -207,7 +208,7 @@
       subroutine write_control_array_c3                                 &
      &         (id_control, level, label, array_c3)
 !
-      use skip_comment_f
+      use write_control_items
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_control, level
