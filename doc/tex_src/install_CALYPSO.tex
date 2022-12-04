@@ -392,4 +392,30 @@ After configuration, compile and install are started by
 \end{verbatim}
 %
 
-After running \verb|make| command, execute files are built in \verb|[CALYPSO_HOME]/work/bin| directory.
+After running \verb|make| command, execute files are built in \verb|[CALYPSO_HOME]/work/bin| directory. Calypso consists of the following programs:
+%
+\begin{itemize}
+\item Preprocessing programs
+	\begin{itemize}
+	\item {\tt sph\_initial\_field} (See Section \ref{sec:sph_initial_field}),
+	\item {\tt sph\_add\_initial\_field} (See Section \ref{sec:add_initial_field}),
+	\item {\tt gen\_sph\_grid} (See Section \ref{section:gen_sph_grid}) {\color{red} (Deprecated)},
+ 	\end{itemize}
+\item Simulation program {\tt sph\_mhd} (See Section \ref{section:sph_mhd}), 
+\item Data analysis programs,
+	\begin{itemize}
+	\item {\tt sph\_snapshot} (See Section \ref{section:sph_snapshot}),
+	\item {\tt sph\_dynamobench} (See Section \ref{section:check_bench}),
+	\item {\tt sectioning} (See Section \ref{sec:sectioning}),
+ 	\item {\tt field\_to\_VTK} (See Section \ref{sec:field_to_VTK}),
+ 	\item {\tt psf\_to\_VTK} (See Section \ref{section:psf_to_VTK}),
+ 	\item {\tt assemble\_sph} (See Section \ref{section:assemble_sph}),
+ 	\item {\tt t\_ave\_sph\_mean\_square} (See Section \ref{sec:ave_mean_square}),
+	\end{itemize}
+\item Utility program to bulid.
+	\begin{itemize}
+	\item {\tt module\_dependency} (See Section \ref{sec:module_dependency}),
+	\end{itemize}
+\end{itemize}
+%
+
