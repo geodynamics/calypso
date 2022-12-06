@@ -7,7 +7,7 @@
 !>@brief  Data arrays to monitoring spectrum data
 !!
 !!@verbatim
-!!      subroutine open_each_picked_spectr(inum, id_file,               &
+!!      subroutine open_write_each_picked_spectr(inum, id_file,         &
 !!     &          nlayer_ICB, nlayer_CMB, picked, flag_gzip_lc, zbuf)
 !!      logical function error_each_picked_spectr(inum, id_file,        &
 !!     &                nlayer_ICB, nlayer_CMB, picked, zbuf)
@@ -41,10 +41,11 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine open_each_picked_spectr(inum, id_file,                 &
+      subroutine open_write_each_picked_spectr(inum, id_file,           &
      &          nlayer_ICB, nlayer_CMB, picked, flag_gzip_lc, zbuf)
 !
       use write_field_labels
+      use select_gz_stream_file_IO
       use gz_open_sph_monitor_file
 !
       integer(kind = kint), intent(in) :: inum
@@ -65,21 +66,18 @@
      &                                       picked%idx_out(inum,2))
       call check_gzip_or_ascii_file(base_name, file_name,               &
      &                              flag_gzip_lc, flag_miss)
-      if(flag_miss) go to 99
 !
-      open(id_file, file=file_name, status='old', position='append',    &
-     &     form='unformatted', ACCESS='stream')
-      return
+      if(flag_miss) then
+        open(id_file, file=file_name, status='replace',                 &
+     &       form='unformatted', ACCESS='stream')
+        call write_each_pick_sph_file_head                              &
+     &      (id_file, nlayer_ICB, nlayer_CMB, picked, zbuf)
+      else
+        open(id_file, file=file_name, status='old', position='append',  &
+     &       form='unformatted', ACCESS='stream')
+      end if
 !
-!
-   99 continue
-      open(id_file, file=file_name, status='replace',                   &
-     &     form='unformatted', ACCESS='stream')
-!
-      call write_each_pick_sph_file_head                                &
-     &    (id_file, nlayer_ICB, nlayer_CMB, picked, zbuf)
-!
-      end subroutine open_each_picked_spectr
+      end subroutine open_write_each_picked_spectr
 !
 ! -----------------------------------------------------------------------
 !
@@ -114,12 +112,10 @@
       base_name = each_picked_mode_file_name(picked%file_prefix,        &
      &                                       picked%idx_out(inum,1),    &
      &                                       picked%idx_out(inum,2))
-      call check_gzip_or_ascii_file(base_name, file_name,               &
-     &                              flag_gzip_lc, flag_miss)
+      call sel_open_check_gz_stream_file(FPz_fp, id_file, base_name,    &
+     &                                   flag_gzip_lc, flag_miss, zbuf)
       if(flag_miss) go to 99
 
-      call sel_open_read_gz_stream_file(FPz_fp, id_file,                &
-     &                                  file_name, flag_gzip_lc, zbuf)
       call s_select_input_picked_sph_head(FPz_fp, id_file,              &
      &    flag_gzip_lc, sph_lbl_IN_p, sph_IN_p, zbuf)
       call sel_close_read_gz_stream_file(FPz_fp, id_file,               &

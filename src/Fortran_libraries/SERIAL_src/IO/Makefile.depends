@@ -110,7 +110,7 @@ rst_data_IO_by_fld.o: $(IO_DIR)/rst_data_IO_by_fld.f90 m_precision.o m_machine_p
 	$(F90) -c $(F90OPTFLAGS) $<
 sel_gz_input_sph_mtr_head.o: $(IO_DIR)/sel_gz_input_sph_mtr_head.f90 m_precision.o m_constants.o m_machine_parameter.o t_read_sph_spectra.o t_buffer_4_gzip.o select_gz_stream_file_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-select_gz_stream_file_IO.o: $(IO_DIR)/select_gz_stream_file_IO.F90 m_precision.o t_buffer_4_gzip.o set_parallel_file_name.o skip_comment_f.o gzip_file_access.o skip_gz_comment.o data_convert_by_zlib.o transfer_to_long_integers.o
+select_gz_stream_file_IO.o: $(IO_DIR)/select_gz_stream_file_IO.F90 m_precision.o t_buffer_4_gzip.o set_parallel_file_name.o delete_data_files.o skip_comment_f.o gzip_file_access.o skip_gz_comment.o data_convert_by_zlib.o transfer_to_long_integers.o
 	$(F90) -c $(F90OPTFLAGS) $(F90CPPFLAGS) $<
 set_and_cal_udt_data.o: $(IO_DIR)/set_and_cal_udt_data.f90 m_precision.o t_ucd_data.o
 	$(F90) -c $(F90OPTFLAGS) $<

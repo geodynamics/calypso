@@ -7,14 +7,22 @@
 !>@brief subroutines to find comment lines in data
 !!
 !!@verbatim
+!!      subroutine check_gzip_or_ascii_file                             &
+!!     &         (base_name, file_name, flag_gzip_lc, flag_miss)
+!!        character(len = kchara), intent(in) :: base_name
+!!        character(len = kchara), intent(inout) :: file_name
+!!        logical, intent(inout) :: flag_gzip_lc, flag_miss
+!!
 !!      subroutine sel_open_read_gz_stream_file                         &
-!!     &         (FPz_f, id_file, file_name, flag_gzip, zbuf)
+!!     &         (FPz_f, id_file, base_name, flag_gzip, zbuf)
+!!      subroutine sel_open_check_gz_stream_file                        &
+!!     &         (FPz_f, id_file, base_name, flag_gzip, flag_miss, zbuf)
 !!      subroutine sel_close_read_gz_stream_file                        &
 !!     &         (FPz_f, id_file, flag_gzip, zbuf)
 !!        character, pointer, intent(inout) :: FPz_f
 !!        integer(kind = kint), intent(in) :: id_file
-!!        character(len=kchara), intent(in) :: file_name
-!!        logical, intent(inout) :: flag_gzip
+!!        character(len=kchara), intent(in) :: base_name
+!!        logical, intent(inout) :: flag_gzip, flag_miss
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!
 !!      subroutine sel_read_line_gz_stream                              &
@@ -47,8 +55,40 @@
 !
 !-----------------------------------------------------------------------
 !
+      subroutine check_gzip_or_ascii_file                               &
+     &         (base_name, file_name, flag_gzip_lc, flag_miss)
+!
+      use set_parallel_file_name
+      use delete_data_files
+!
+      character(len = kchara), intent(in) :: base_name
+      character(len = kchara), intent(inout) :: file_name
+      logical, intent(inout) :: flag_gzip_lc, flag_miss
+!
+      character(len = kchara) :: gzip_name
+!
+      gzip_name = add_gzip_extension(base_name)
+      flag_miss = .TRUE.
+      if(check_file_exist(base_name)) then
+        flag_miss =    .FALSE.
+        flag_gzip_lc = .FALSE.
+      else if(check_file_exist(gzip_name)) then
+        flag_miss =    .FALSE.
+        flag_gzip_lc = .TRUE.
+      end if
+!
+      if(flag_gzip_lc) then
+        file_name = gzip_name
+      else
+        file_name = base_name
+      end if
+!
+      end subroutine check_gzip_or_ascii_file
+!
+! -----------------------------------------------------------------------
+!
       subroutine sel_open_read_gz_stream_file                           &
-     &         (FPz_f, id_file, file_name, flag_gzip, zbuf)
+     &         (FPz_f, id_file, base_name, flag_gzip, zbuf)
 !
       use set_parallel_file_name
       use skip_comment_f
@@ -56,31 +96,59 @@
 !
       character, pointer, intent(inout) :: FPz_f
       integer(kind = kint), intent(in) :: id_file
-      character(len=kchara), intent(in) :: file_name
+      character(len=kchara), intent(in) :: base_name
       logical, intent(inout) :: flag_gzip
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      character(len=kchara) :: prefix, extension
+      logical :: flag_miss
 !
+!
+      call sel_open_check_gz_stream_file                                &
+     &   (FPz_f, id_file, base_name, flag_gzip, flag_miss, zbuf)
+      if(flag_miss) then
+        write(*,*) trim(base_name), ' is not found. Stop.'
+        stop
+      end if
+!
+      end subroutine sel_open_read_gz_stream_file
+!
+!   --------------------------------------------------------------------
+!
+      subroutine sel_open_check_gz_stream_file                          &
+     &         (FPz_f, id_file, base_name, flag_gzip, flag_miss, zbuf)
+!
+      use set_parallel_file_name
+      use skip_comment_f
+      use gzip_file_access
+!
+      character, pointer, intent(inout) :: FPz_f
+      integer(kind = kint), intent(in) :: id_file
+      character(len=kchara), intent(in) :: base_name
+      logical, intent(inout) :: flag_gzip, flag_miss
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      character(len = kchara) :: fname
+!
+!
+      call check_gzip_or_ascii_file                                     &
+     &   (base_name, fname, flag_gzip, flag_miss)
+      if(flag_miss) return
 !
       call alloc_fixbuffer_for_zlib(zbuf)
-      call split_extrension(file_name, prefix, extension)
 !
-      flag_gzip = .FALSE.
 !#ifdef ZLIB_IO
-      if(cmp_no_case(extension, gz_ext)) flag_gzip = .TRUE.
       if(flag_gzip) then
-        write(*,*) 'read gzipped monitor file: ', trim(file_name)
-        call open_rd_gzfile_f(FPz_f, file_name, zbuf)
+        write(*,*) 'read gzipped monitor file: ', trim(fname)
+        call open_rd_gzfile_f(FPz_f, fname, zbuf)
         return
       end if
 !#endif
 !
-      write(*,*) 'read ASCII file as stream: ', trim(file_name)
-      open(id_file, file = file_name,  status='old',                    &
+      write(*,*) 'read ASCII file as stream: ', trim(fname)
+      open(id_file, file = fname,  status='old',                        &
      &     FORM='UNFORMATTED', ACCESS='STREAM')
 !
-      end subroutine sel_open_read_gz_stream_file
+      end subroutine sel_open_check_gz_stream_file
 !
 !   --------------------------------------------------------------------
 !

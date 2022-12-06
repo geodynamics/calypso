@@ -238,7 +238,7 @@ t_work_4_sph_trans_spin.o: $(SPH_COMMDIR)/t_work_4_sph_trans_spin.f90 m_precisio
 	$(F90) -c $(F90OPTFLAGS) $<
 volume_average_4_sph.o: $(SPH_COMMDIR)/volume_average_4_sph.f90 m_precision.o m_constants.o m_phys_constants.o t_rms_4_sph_spectr.o t_spheric_rj_data.o t_phys_data.o cal_ave_4_rms_vector_sph.o radial_int_for_sph_spec.o
 	$(F90) -c $(F90OPTFLAGS) $<
-write_each_pick_spectr_file.o: $(SPH_COMMDIR)/write_each_pick_spectr_file.f90 m_precision.o m_constants.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_data.o t_time_data.o t_buffer_4_gzip.o write_field_labels.o gz_open_sph_monitor_file.o set_parallel_file_name.o write_pick_sph_spectr_data.o delete_data_files.o select_gz_stream_file_IO.o sel_gz_input_sph_mtr_head.o compare_sph_monitor_header.o sph_power_spectr_data_text.o data_convert_by_zlib.o
+write_each_pick_spectr_file.o: $(SPH_COMMDIR)/write_each_pick_spectr_file.f90 m_precision.o m_constants.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_data.o t_time_data.o t_buffer_4_gzip.o write_field_labels.o select_gz_stream_file_IO.o gz_open_sph_monitor_file.o set_parallel_file_name.o write_pick_sph_spectr_data.o delete_data_files.o sel_gz_input_sph_mtr_head.o compare_sph_monitor_header.o sph_power_spectr_data_text.o data_convert_by_zlib.o
 	$(F90) -c $(F90OPTFLAGS) $<
 write_picked_sph_spectr.o: $(SPH_COMMDIR)/write_picked_sph_spectr.f90 m_precision.o m_constants.o calypso_mpi.o t_spheric_parameter.o t_pickup_sph_spectr_data.o t_phys_data.o t_time_data.o t_buffer_4_gzip.o pickup_sph_spectr_data.o sph_monitor_data_text.o select_gz_stream_file_IO.o write_pick_sph_spectr_data.o write_each_pick_spectr_file.o
 	$(F90) -c $(F90OPTFLAGS) $<

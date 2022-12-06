@@ -7,12 +7,6 @@
 !> @brief Time spectrum data output routines for utilities
 !!
 !!@verbatim
-!!      subroutine check_gzip_or_ascii_file                             &
-!!     &         (base_name, file_name, flag_gzip_lc, flag_miss)
-!!        character(len = kchara), intent(in) :: base_name
-!!        character(len = kchara), intent(inout) :: file_name
-!!        logical, intent(inout) :: flag_gzip_lc, flag_miss
-!!
 !!      subroutine check_sph_vol_monitor_file(base_name, monitor_labels,&
 !!     &          sph_OUT, flag_gzip_lc, error)
 !!      subroutine check_sph_vol_spectr_file(id_file, base_name,        &
@@ -62,38 +56,6 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine check_gzip_or_ascii_file                               &
-     &         (base_name, file_name, flag_gzip_lc, flag_miss)
-!
-      use set_parallel_file_name
-      use delete_data_files
-!
-      character(len = kchara), intent(in) :: base_name
-      character(len = kchara), intent(inout) :: file_name
-      logical, intent(inout) :: flag_gzip_lc, flag_miss
-!
-      character(len = kchara) :: gzip_name
-!
-      gzip_name = add_gzip_extension(base_name)
-      flag_miss = .TRUE.
-      if(check_file_exist(base_name)) then
-        flag_miss =    .FALSE.
-        flag_gzip_lc = .FALSE.
-      else if(check_file_exist(gzip_name)) then
-        flag_miss =    .FALSE.
-        flag_gzip_lc = .TRUE.
-      end if
-!
-      if(flag_gzip_lc) then
-        file_name = gzip_name
-      else
-        file_name = base_name
-      end if
-!
-      end subroutine check_gzip_or_ascii_file
-!
-! -----------------------------------------------------------------------
-!
       subroutine check_sph_vol_monitor_file(base_name, monitor_labels,  &
      &          sph_OUT, flag_gzip_lc, error)
 !
@@ -117,12 +79,10 @@
 !
 !
       error = .FALSE.
-      call check_gzip_or_ascii_file(base_name, file_name,               &
-     &                              flag_gzip_lc, flag_miss)
+      call sel_open_check_gz_stream_file(FPz_fp, id_stream, base_name,  &
+     &    flag_gzip_lc, flag_miss, zbuf_m)
       if(flag_miss) go to 99
 !
-      call sel_open_read_gz_stream_file(FPz_fp, id_stream, file_name,   &
-     &                                flag_gzip_lc, zbuf_m)
       call s_select_input_sph_series_head                               &
      &   (FPz_fp, id_stream, flag_gzip_lc, flag_current_fmt,            &
      &    spectr_off, volume_on, sph_lbl_IN_m, sph_IN_m, zbuf_m)
@@ -172,12 +132,10 @@
 !
 !
       error = .FALSE.
-      call check_gzip_or_ascii_file(base_name, fname,                   &
-     &                              flag_gzip_lc, flag_miss)
+      call sel_open_check_gz_stream_file(FPz_f, id_stream, base_name,   &
+     &                                   flag_gzip_lc, flag_miss, zbuf)
       if(flag_miss) go to 99
 !
-      call sel_open_read_gz_stream_file(FPz_f, id_stream,               &
-     &                                  fname, flag_gzip_lc, zbuf)
       call s_select_input_sph_series_head                               &
      &   (FPz_f, id_stream, flag_gzip_lc, flag_current_fmt,             &
      &    spectr_on, volume_on, sph_lbl_IN_f, sph_IN_f, zbuf)
@@ -221,17 +179,16 @@
 !
       call check_gzip_or_ascii_file(base_name, fname,                   &
      &                              flag_gzip_lc, flag_miss)
-      if(flag_miss) go to 99
 !
-      open(id_file, file=fname, status='old', position='append',        &
-     &     FORM='UNFORMATTED', ACCESS='STREAM')
-      return
-!
-   99 continue
-!
-      open(id_file, file=fname, FORM='UNFORMATTED', ACCESS='STREAM')
-      call write_sph_pwr_vol_head(flag_gzip_lc, id_file,                &
-     &                            monitor_labels, sph_OUT, zbuf)
+      if(flag_miss) then
+        open(id_file, file=fname, status='replace',                     &
+     &       FORM='UNFORMATTED', ACCESS='STREAM')
+        call write_sph_pwr_vol_head(flag_gzip_lc, id_file,              &
+     &                              monitor_labels, sph_OUT, zbuf)
+      else
+        open(id_file, file=fname, status='old', position='append',      &
+     &       FORM='UNFORMATTED', ACCESS='STREAM')
+      end if
 !
       end subroutine sel_open_sph_vol_monitor_file
 !
@@ -262,12 +219,10 @@
 !
 !
       error = .FALSE.
-      call check_gzip_or_ascii_file(base_name, fname,                   &
-     &                              flag_gzip_lc, flag_miss)
+      call sel_open_check_gz_stream_file(FPz_f, id_stream, base_name,   &
+     &                                   flag_gzip_lc, flag_miss, zbuf)
       if(flag_miss) go to 99
 !
-      call sel_open_read_gz_stream_file(FPz_f, id_stream,               &
-     &                                  fname, flag_gzip_lc, zbuf)
       call s_select_input_sph_series_head                               &
      &   (FPz_f, id_stream, flag_gzip_lc, flag_current_fmt,             &
      &    flag_spectr, volume_off, sph_lbl_IN_f, sph_IN_f, zbuf)
@@ -309,17 +264,16 @@
       fname = base_name
       call check_gzip_or_ascii_file(base_name, fname,                   &
      &                              flag_gzip_lc, flag_miss)
-      if(flag_miss) go to 99
 !
-      open(id_file, file=fname, status='old', position='append',        &
-     &     FORM='UNFORMATTED', ACCESS='STREAM')
-      return
-!
-   99 continue
-!
-      open(id_file, file=fname, FORM='UNFORMATTED', ACCESS='STREAM')
-      call write_sph_pwr_layer_head(flag_gzip_lc, id_file,              &
-     &                             sph_OUT, zbuf)
+      if(flag_miss) then
+        open(id_file, file=fname, status='replace',                     &
+     &       FORM='UNFORMATTED', ACCESS='STREAM')
+        call write_sph_pwr_layer_head(flag_gzip_lc, id_file,            &
+     &                                sph_OUT, zbuf)
+      else
+        open(id_file, file=fname, status='old', position='append',      &
+     &       FORM='UNFORMATTED', ACCESS='STREAM')
+      end if
 !
       end subroutine sel_open_sph_layer_mean_file
 !
