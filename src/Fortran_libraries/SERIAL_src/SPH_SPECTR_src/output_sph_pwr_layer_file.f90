@@ -158,7 +158,7 @@
       real(kind = kreal), intent(in)                                    &
      &           :: rms_sph(pwr%nri_rms,pwr%ntot_comp_sq)
 !
-      type(read_sph_spectr_data), save :: sph_OUT
+      type(read_sph_spectr_params), save :: sph_OUT
       type(buffer_4_gzip), save :: zbuf_m
       logical :: flag_gzip_lc
 !
@@ -205,7 +205,7 @@
 !
       character(len=kchara), intent(in) :: fname_rms, mode_label
 !
-      type(read_sph_spectr_data), save :: sph_OUT
+      type(read_sph_spectr_params), save :: sph_OUT
       type(buffer_4_gzip), save :: zbuf_m
       logical :: flag_gzip_lc
 !

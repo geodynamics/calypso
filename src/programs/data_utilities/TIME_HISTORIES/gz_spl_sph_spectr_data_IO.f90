@@ -14,7 +14,7 @@
 !!        integer(kind = kint), intent(in) :: id_stream
 !!        logical, intent(in) :: flag_gzip
 !!        logical, intent(in) :: flag_old_fmt, flag_spectr, flag_vol_ave
-!!        type(read_sph_spectr_data), intent(inout) :: sph_IN
+!!        type(read_sph_spectr_params), intent(inout) :: sph_IN
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!        integer(kind = kint), intent(inout) :: ierr
 !!
@@ -60,7 +60,7 @@
       integer(kind = kint), intent(in) :: id_stream
       logical, intent(in) :: flag_gzip
       logical, intent(in) :: flag_old_fmt, flag_spectr, flag_vol_ave
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       type(buffer_4_gzip), intent(inout) :: zbuf
       integer(kind = kint), intent(inout) :: ierr
 !
@@ -133,7 +133,7 @@
       character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(in) :: id_stream
       logical, intent(in) :: flag_gzip
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       type(buffer_4_gzip), intent(inout) :: zbuf
       integer(kind = kint), intent(inout) :: ierr
 !

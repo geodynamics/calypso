@@ -103,7 +103,7 @@
       logical :: flag_gzip_lc, flag_miss
       character, pointer :: FPz_fp
       character(len = kchara) :: file_name, base_name
-      type(read_sph_spectr_data) :: sph_IN_p, sph_OUT_p
+      type(read_sph_spectr_params) :: sph_IN_p, sph_OUT_p
       type(sph_spectr_head_labels) :: sph_lbl_IN_p
 !
 !
@@ -170,7 +170,7 @@
 !
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      type(read_sph_spectr_data) :: sph_OUT
+      type(read_sph_spectr_params) :: sph_OUT
       integer(kind = kint) :: len_each(6)
       integer(kind = kint) :: len_tot
 !

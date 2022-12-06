@@ -13,9 +13,9 @@
 !!     &               (sph_lbl_IN, sph_IN, sph_lbl_OUT, sph_OUT)
 !!      logical function cmp_sph_layer_monitor_heads                    &
 !!     &               (sph_lbl_IN, sph_IN, sph_lbl_OUT, sph_OUT)
-!!        type(read_sph_spectr_data), intent(in) :: sph_IN
+!!        type(read_sph_spectr_params), intent(in) :: sph_IN
 !!        type(sph_spectr_head_labels), intent(in) :: sph_lbl_IN
-!!        type(read_sph_spectr_data), intent(in) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(in) :: sph_OUT
 !!        type(sph_spectr_head_labels), intent(in) :: sph_lbl_OUT
 !!@endverbatim
       module compare_sph_monitor_header
@@ -39,9 +39,9 @@
 !
       use skip_comment_f
 !
-      type(read_sph_spectr_data), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(in) :: sph_IN
       type(sph_spectr_head_labels), intent(in) :: sph_lbl
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
 !
       cmp_sph_monitor_field_labels                                      &
@@ -60,9 +60,9 @@
       logical function cmp_sph_volume_monitor_heads                     &
      &               (sph_lbl_IN, sph_IN, sph_lbl_OUT, sph_OUT)
 !
-      type(read_sph_spectr_data), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(in) :: sph_IN
       type(sph_spectr_head_labels), intent(in) :: sph_lbl_IN
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
       type(sph_spectr_head_labels), intent(in) :: sph_lbl_OUT
 !
 !
@@ -87,9 +87,9 @@
       logical function cmp_sph_layer_monitor_heads                      &
      &               (sph_lbl_IN, sph_IN, sph_lbl_OUT, sph_OUT)
 !
-      type(read_sph_spectr_data), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(in) :: sph_IN
       type(sph_spectr_head_labels), intent(in) :: sph_lbl_IN
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
       type(sph_spectr_head_labels), intent(in) :: sph_lbl_OUT
 !
 !

@@ -24,8 +24,8 @@
 !!        character(len = kchara), intent(in) :: tave_file_name
 !!        character(len = kchara), intent(in) :: sdev_file_name
 !!        logical, intent(in) :: flag_spectr, flag_vol_ave
-!!        type(read_sph_spectr_data), intent(inout) :: tave_sph_IN
-!!        type(read_sph_spectr_data), intent(inout) :: sdev_sph_IN
+!!        type(read_sph_spectr_params), intent(inout) :: tave_sph_IN
+!!        type(read_sph_spectr_params), intent(inout) :: sdev_sph_IN
 !!@endverbatim
 !
       module m_tave_sph_ene_spectr
@@ -49,7 +49,7 @@
       logical, parameter, private :: flag_old_format =     .TRUE.
       logical, parameter, private :: flag_current_format = .FALSE.
 !
-      type(read_sph_spectr_data), save, private :: sph_IN1
+      type(read_sph_spectr_params), save, private :: sph_IN1
       type(spectr_ave_sigma_work), save, private :: WK_tave1
 !
       private :: id_file_rms
@@ -153,8 +153,8 @@
       character(len = kchara), intent(in) :: tave_file_name
       character(len = kchara), intent(in) :: sdev_file_name
       logical, intent(in) :: flag_spectr, flag_vol_ave
-      type(read_sph_spectr_data), intent(inout) :: tave_sph_IN
-      type(read_sph_spectr_data), intent(inout) :: sdev_sph_IN
+      type(read_sph_spectr_params), intent(inout) :: tave_sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sdev_sph_IN
 !
 !
       call read_sph_spectr_snapshot                                     &
@@ -184,7 +184,7 @@
       logical, intent(in) :: flag_spectr, flag_vol_ave, flag_old_fmt
       real(kind = kreal), intent(in) :: start_time, end_time
       real(kind = kreal), intent(inout) :: true_start, true_end
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       type(spectr_ave_sigma_work), intent(inout) :: WK_tave
 !
       character(len = kchara) :: file_name, extension
@@ -308,7 +308,7 @@
       character(len = kchara), intent(in) :: fname_org
       logical, intent(in) :: flag_spectr, flag_vol_ave, flag_old_fmt
       real(kind = kreal), intent(in) :: start_time, end_time
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       type(spectr_ave_sigma_work), intent(inout) :: WK_tave
 !
       logical :: flag_gzip1
@@ -418,7 +418,7 @@
 !
       character(len = kchara), intent(in) :: fname_org
       logical, intent(in) :: flag_spectr, flag_vol_ave
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
 !
       integer(kind = kint) :: ierr
       logical, parameter :: current_fmt = .FALSE.
@@ -459,7 +459,7 @@
 !
       subroutine alloc_tave_sph_data(sph_IN, WK_tave)
 !
-      type(read_sph_spectr_data), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(in) :: sph_IN
       type(spectr_ave_sigma_work), intent(inout) :: WK_tave
       integer(kind = kint) :: ltr, ncomp
 !
@@ -506,7 +506,7 @@
       logical, intent(in) :: flag_spectr, flag_vol_ave, flag_old_fmt
       real(kind = kreal), intent(in) :: start_time, end_time
       real(kind = kreal), intent(inout) :: true_start, true_end
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       type(read_sph_spectr_series), intent(inout) :: sph_series
 !
       real(kind = kreal) :: prev_time

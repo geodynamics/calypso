@@ -27,7 +27,7 @@
 !!        integer(kind = kint), intent(in) :: ltr, nri
 !!        integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
 !!        type(dipolarity_data), intent(in) :: dip
-!!        type(read_sph_spectr_data), intent(inout) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !!@endverbatim
 !
       module t_CMB_dipolarity
@@ -144,7 +144,7 @@
 !
       logical :: flag_gzip_lc
       type(buffer_4_gzip) :: zbuf_d
-      type(read_sph_spectr_data) :: sph_OUT_d
+      type(read_sph_spectr_params) :: sph_OUT_d
 !
 !
       if(dip%iflag_dipolarity .le. izero) return
@@ -178,7 +178,7 @@
       integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
       type(dipolarity_data), intent(in) :: dip
 !
-      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+      type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !
       integer(kind = kint) :: icou
 !

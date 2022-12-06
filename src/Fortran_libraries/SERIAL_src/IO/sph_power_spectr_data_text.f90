@@ -10,7 +10,7 @@
 !!      subroutine len_sph_vol_spectr_header(lbl_OUT, sph_OUT,          &
 !!     &                                     len_each, len_tot)
 !!        type(sph_spectr_head_labels), intent(in) :: lbl_OUT
-!!        type(read_sph_spectr_data), intent(in) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(in) :: sph_OUT
 !!        integer(kind = kint), intent(inout)  :: len_each(6)
 !!        integer(kind = kint), intent(inout)  :: len_tot
 !!      function sph_vol_spectr_header_text(len_header, len_each,       &
@@ -18,13 +18,13 @@
 !!        integer(kind = kint), intent(in) :: len_header
 !!        integer(kind = kint), intent(in) :: len_each(6)
 !!        type(sph_spectr_head_labels), intent(in) :: lbl_OUT
-!!        type(read_sph_spectr_data), intent(in) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(in) :: sph_OUT
 !!        character(len = len_header) :: sph_vol_spectr_header_text
 !!
 !!      subroutine len_sph_layer_spectr_header(lbl_OUT, sph_OUT,        &
 !!     &                                       len_each, len_tot)
 !!        type(sph_spectr_head_labels), intent(in) :: lbl_OUT
-!!        type(read_sph_spectr_data), intent(in) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(in) :: sph_OUT
 !!        integer(kind = kint), intent(inout)  :: len_each(6)
 !!        integer(kind = kint), intent(inout)  :: len_tot
 !!      function sph_layer_spectr_header_text(len_header, len_each,     &
@@ -32,7 +32,7 @@
 !!        integer(kind = kint), intent(in) :: len_header
 !!        integer(kind = kint), intent(in) :: len_each(6)
 !!        type(sph_spectr_head_labels), intent(in) :: lbl_OUT
-!!        type(read_sph_spectr_data), intent(in) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(in) :: sph_OUT
 !!        character(len = len_header) :: sph_layer_spectr_header_text
 !!@endverbatim
 !
@@ -56,7 +56,7 @@
       use sph_monitor_header_text
 !
       type(sph_spectr_head_labels), intent(in) :: lbl_OUT
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
       integer(kind = kint), intent(inout)  :: len_each(6)
       integer(kind = kint), intent(inout)  :: len_tot
 !
@@ -89,7 +89,7 @@
       integer(kind = kint), intent(in) :: len_header
       integer(kind = kint), intent(in) :: len_each(6)
       type(sph_spectr_head_labels), intent(in) :: lbl_OUT
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
       character(len = len_header) :: sph_vol_spectr_header_text
 !
@@ -145,7 +145,7 @@
       use sph_monitor_header_text
 !
       type(sph_spectr_head_labels), intent(in) :: lbl_OUT
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
       integer(kind = kint), intent(inout)  :: len_each(6)
       integer(kind = kint), intent(inout)  :: len_tot
 !
@@ -176,7 +176,7 @@
       integer(kind = kint), intent(in) :: len_header
       integer(kind = kint), intent(in) :: len_each(6)
       type(sph_spectr_head_labels), intent(in) :: lbl_OUT
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
       character(len = len_header) :: sph_layer_spectr_header_text
 !

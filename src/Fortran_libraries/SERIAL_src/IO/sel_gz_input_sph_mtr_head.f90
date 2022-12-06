@@ -17,7 +17,7 @@
 !!        logical, intent(in) :: flag_gzip, flag_old_fmt
 !!        logical, intent(in) :: flag_spectr, flag_vol_ave
 !!        type(sph_spectr_head_labels), intent(inout) :: sph_lbl_IN
-!!        type(read_sph_spectr_data), intent(inout) :: sph_IN
+!!        type(read_sph_spectr_params), intent(inout) :: sph_IN
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!@endverbatim
       module sel_gz_input_sph_mtr_head
@@ -51,7 +51,7 @@
       logical, intent(in) :: flag_spectr, flag_vol_ave
 !
       type(sph_spectr_head_labels), intent(inout) :: sph_lbl_IN
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
@@ -77,7 +77,7 @@
       logical, intent(in) :: flag_gzip
 !
       type(sph_spectr_head_labels), intent(inout) :: sph_lbl_IN
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
@@ -106,7 +106,7 @@
       logical, intent(in) :: flag_gzip, flag_vol_ave
 !
       type(sph_spectr_head_labels), intent(inout) :: sph_lbl_IN
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
@@ -133,7 +133,7 @@
       logical, intent(in) :: flag_gzip
 !
       type(sph_spectr_head_labels), intent(inout) :: sph_lbl_IN
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
@@ -188,7 +188,7 @@
       logical, intent(in) :: flag_gzip
 !
       type(sph_spectr_head_labels), intent(inout) :: sph_lbl_IN
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
       call sel_skip_comment_gz_stream                                   &
@@ -257,7 +257,7 @@
      &         (flag_old_fmt, flag_spectr, flag_vol_ave, sph_IN)
 !
       logical, intent(in) :: flag_old_fmt, flag_spectr, flag_vol_ave
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
 !
 !
       if(flag_vol_ave) then

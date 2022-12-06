@@ -88,7 +88,7 @@
 !
       real(kind=kreal), allocatable :: d_rj_out(:)
 !
-      type(read_sph_spectr_data) :: sph_OUT
+      type(read_sph_spectr_params) :: sph_OUT
       character(len=kchara) :: file_name
       logical :: flag_gzip_lc
       type(buffer_4_gzip) :: zbuf_m
@@ -140,7 +140,7 @@
       integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
       type(picked_spectrum_data), intent(in) :: gauss
 !
-      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+      type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !
       integer(kind = kint) :: icou, ntot
 !
@@ -226,7 +226,7 @@
       type(sph_rj_grid), intent(in) :: sph_rj
       type(picked_spectrum_data), intent(in) :: gauss
 !!
-      type(read_sph_spectr_data) :: sph_OUT_g
+      type(read_sph_spectr_params) :: sph_OUT_g
       character(len = kchara) :: base_name
       logical :: flag_gzip_lc, error
 !

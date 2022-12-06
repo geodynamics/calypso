@@ -38,8 +38,8 @@
 !
       implicit  none
 !
-      type(read_sph_spectr_data), save, private :: tave_sph_IN
-      type(read_sph_spectr_data), save, private :: sdev_sph_IN
+      type(read_sph_spectr_params), save, private :: tave_sph_IN
+      type(read_sph_spectr_params), save, private :: sdev_sph_IN
 !
 ! -------------------------------------------------------------------
 !

@@ -68,7 +68,7 @@
       character(len = kchara) :: base_name
       logical :: flag_gzip_lc
       type(buffer_4_gzip) :: zbuf_t
-      type(read_sph_spectr_data) :: sph_OUT_s
+      type(read_sph_spectr_params) :: sph_OUT_s
       real(kind=kreal), allocatable :: d_rj_out(:)
       integer(kind = kint) :: icou
 !
@@ -138,7 +138,7 @@
 !
       character, pointer:: FPz_fp
       logical :: flag_gzip_lc, flag_miss, error
-      type(read_sph_spectr_data) :: sph_IN_t, sph_OUT_t
+      type(read_sph_spectr_params) :: sph_IN_t, sph_OUT_t
       type(sph_spectr_head_labels) :: sph_lbl_IN_t
       type(buffer_4_gzip) :: zbuf_t
 !
@@ -177,7 +177,7 @@
       real(kind = kreal), intent(in) :: r_in, r_out
       type(typical_scale_data), intent(in) :: tsl
 !
-      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+      type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !
       integer(kind = kint) :: i
 !

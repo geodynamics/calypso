@@ -11,7 +11,7 @@
 !!      subroutine alloc_sph_spectr_data(ltr, sph_IN)
 !!      subroutine dealloc_sph_espec_data(sph_IN)
 !!        integer(kind = kint), intent(in) :: ltr
-!!        type(read_sph_spectr_data), intent(inout) :: sph_IN
+!!        type(read_sph_spectr_params), intent(inout) :: sph_IN
 !!
 !!      subroutine copy_read_ene_params_4_sum(sph_IN, sph_OUT)
 !!      subroutine copy_read_ene_step_data(sph_IN, sph_OUT)
@@ -22,10 +22,10 @@
 !!        integer(kind = kint), intent(in) :: ncomp
 !!        real(kind = kreal), intent(in)                                &
 !!     &                   :: spectr_l(ncomp, 0:ltr_sph, nri_dat)
-!!        type(read_sph_spectr_data), intent(inout) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !!
 !!      subroutine check_sph_spectr_name(sph_IN)
-!!        type(read_sph_spectr_data), intent(in) :: sph_IN
+!!        type(read_sph_spectr_params), intent(in) :: sph_IN
 !!@endverbatim
       module t_read_sph_spectra
 !
@@ -36,7 +36,7 @@
       implicit none
 !
 !
-      type read_sph_spectr_data
+      type read_sph_spectr_params
         integer(kind = kint) :: nfield_sph_spec
         integer(kind = kint) :: ntot_sph_spec
         integer(kind = kint) :: num_time_labels
@@ -56,7 +56,7 @@
         integer(kind = kint) :: i_step
         real(kind = kreal) :: time
         real(kind = kreal), allocatable :: spectr_IO(:,:,:)
-      end type read_sph_spectr_data
+      end type read_sph_spectr_params
 !
 !   --------------------------------------------------------------------
 !
@@ -66,7 +66,7 @@
 !
       subroutine alloc_sph_espec_name(sph_IN)
 !
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
 !
 !
       sph_IN%num_labels = sph_IN%ntot_sph_spec + sph_IN%num_time_labels
@@ -81,7 +81,7 @@
       subroutine alloc_sph_spectr_data(ltr, sph_IN)
 !
       integer(kind = kint), intent(in) :: ltr
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
 !
       integer(kind = kint) :: ncomp
 !
@@ -114,7 +114,7 @@
 !
       subroutine dealloc_sph_espec_name(sph_IN)
 !
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
 !
 !
       deallocate(sph_IN%ene_sph_spec_name, sph_IN%ncomp_sph_spec)
@@ -125,7 +125,7 @@
 !
       subroutine dealloc_sph_espec_data(sph_IN)
 !
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
 !
 !
       deallocate(sph_IN%kr_sph, sph_IN%r_sph)
@@ -138,8 +138,8 @@
 !
       subroutine copy_read_ene_head_params(sph_IN, sph_OUT)
 !
-      type(read_sph_spectr_data), intent(in) :: sph_IN
-      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !
 !
       sph_OUT%ltr_sph = sph_IN%ltr_sph
@@ -164,8 +164,8 @@
 !
       integer(kind= kint), intent(in) :: n_fld, ntot_spec
       integer(kind= kint), intent(in) :: num_time_labels
-      type(read_sph_spectr_data), intent(in) :: sph_IN
-      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !
       integer(kind = kint) :: i
 !
@@ -185,8 +185,8 @@
 !
       subroutine copy_read_ene_params_4_sum(sph_IN, sph_OUT)
 !
-      type(read_sph_spectr_data), intent(in) :: sph_IN
-      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !
 !
       call copy_read_ene_head_params(sph_IN, sph_OUT)
@@ -212,8 +212,8 @@
 !
       subroutine copy_read_ene_step_data(sph_IN, sph_OUT)
 !
-      type(read_sph_spectr_data), intent(in) :: sph_IN
-      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !
 !
       sph_OUT%time = sph_IN%time
@@ -235,8 +235,8 @@
 !
       subroutine copy_ene_spectr_data_to_IO(sph_IN, sph_OUT)
 !
-      type(read_sph_spectr_data), intent(in) :: sph_IN
-      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !
       integer(kind = kint) :: nri_dat, ltr_sph
       integer(kind = kint) :: ncomp
@@ -261,7 +261,7 @@
       integer(kind = kint), intent(in) :: ncomp
       real(kind = kreal), intent(in)                                    &
      &                   :: spectr_l(ncomp, 0:ltr_sph, nri_dat)
-      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+      type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !
 !
 !$omp parallel workshare
@@ -276,7 +276,7 @@
 !
       subroutine check_sph_spectr_name(sph_IN)
 !
-      type(read_sph_spectr_data), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(in) :: sph_IN
       integer(kind = kint) :: i
 !
 !

@@ -17,7 +17,7 @@
 !!        integer(kind = kint), intent(in) :: id_file
 !!        character(len = kchara), intent(in) :: fname
 !!        type(sph_spectr_head_labels), intent(in) :: monitor_labels
-!!        type(read_sph_spectr_data), intent(in) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(in) :: sph_OUT
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!        logical, intent(inout) :: flag_gzip_lc
 !!
@@ -28,7 +28,7 @@
 !!        logical, intent(in) :: flag_gzip
 !!        integer(kind = kint), intent(in) :: id_file
 !!        character(len = kchara), intent(in) :: fname
-!!        type(read_sph_spectr_data), intent(inout) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(inout) :: sph_OUT
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!        logical, intent(inout) :: flag_gzip_lc
 !!
@@ -38,7 +38,7 @@
 !!     &                                    sph_OUT, zbuf)
 !!        logical, intent(in) :: flag_gzip
 !!        integer(kind = kint), intent(in) :: id_file
-!!        type(read_sph_spectr_data), intent(in) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(in) :: sph_OUT
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!@endverbatim
 !!
@@ -65,14 +65,14 @@
 !
       character(len = kchara), intent(in) :: base_name
       type(sph_spectr_head_labels), intent(in) :: monitor_labels
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
       logical, intent(inout) :: flag_gzip_lc, error
 !
       integer(kind = kint), parameter :: id_stream = 44
       character, pointer :: FPz_fp
       type(buffer_4_gzip) :: zbuf_m
-      type(read_sph_spectr_data) :: sph_IN_m
+      type(read_sph_spectr_params) :: sph_IN_m
       type(sph_spectr_head_labels) :: sph_lbl_IN_m
       character(len = kchara) :: file_name
       logical :: flag_miss
@@ -119,13 +119,13 @@
 !
       integer(kind = kint), intent(in) :: id_stream
       character(len = kchara), intent(in) :: base_name
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
       character, pointer, intent(inout) :: FPz_f
       type(buffer_4_gzip), intent(inout) :: zbuf
       logical, intent(inout) :: flag_gzip_lc, error
 !
-      type(read_sph_spectr_data) :: sph_IN_f
+      type(read_sph_spectr_params) :: sph_IN_f
       type(sph_spectr_head_labels) :: sph_lbl_IN_f
       character(len = kchara) :: fname
       logical :: flag_miss
@@ -168,7 +168,7 @@
       integer(kind = kint), intent(in) :: id_file
       character(len = kchara), intent(in) :: base_name
       type(sph_spectr_head_labels), intent(in) :: monitor_labels
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
       type(buffer_4_gzip), intent(inout) :: zbuf
       logical, intent(inout) :: flag_gzip_lc
@@ -206,13 +206,13 @@
       integer(kind = kint), intent(in) :: id_stream
       character(len = kchara), intent(in) :: base_name
       logical, intent(in) :: flag_spectr
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
       character, pointer, intent(inout) :: FPz_f
       type(buffer_4_gzip), intent(inout) :: zbuf
       logical, intent(inout) :: flag_gzip_lc, error
 !
-      type(read_sph_spectr_data) :: sph_IN_f
+      type(read_sph_spectr_params) :: sph_IN_f
       type(sph_spectr_head_labels) :: sph_lbl_IN_f
       character(len = kchara) :: fname
       logical :: flag_miss
@@ -253,7 +253,7 @@
       integer(kind = kint), intent(in) :: id_file
       character(len = kchara), intent(in) :: base_name
 !
-      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+      type(read_sph_spectr_params), intent(inout) :: sph_OUT
       type(buffer_4_gzip), intent(inout) :: zbuf
       logical, intent(inout) :: flag_gzip_lc
 !
@@ -289,7 +289,7 @@
       logical, intent(in) :: flag_gzip
       integer(kind = kint), intent(in) :: id_file
       type(sph_spectr_head_labels), intent(in) :: monitor_labels
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint) :: len_each(6)
@@ -314,7 +314,7 @@
 !
       logical, intent(in) :: flag_gzip
       integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
       integer(kind = kint) :: len_each(6)

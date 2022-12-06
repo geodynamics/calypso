@@ -13,13 +13,13 @@
 !!        logical, intent(in) :: flag_gzip
 !!        integer(kind = kint), intent(in) :: id_file
 !!        logical, intent(in) :: flag_vol_ave
-!!        type(read_sph_spectr_data), intent(in) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(in) :: sph_OUT
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!      subroutine select_output_sph_series_data                        &
 !!     &         (id_file, flag_spectr, flag_vol_ave, sph_OUT)
 !!        integer(kind = kint), intent(in) :: id_file
 !!        logical, intent(in) :: flag_spectr, flag_vol_ave
-!!        type(read_sph_spectr_data), intent(in) :: sph_OUT
+!!        type(read_sph_spectr_params), intent(in) :: sph_OUT
 !!@endverbatim
 !
       module write_sph_monitor_data
@@ -49,7 +49,7 @@
       logical, intent(in) :: flag_gzip
       integer(kind = kint), intent(in) :: id_file
       logical, intent(in) :: flag_vol_ave
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
@@ -70,7 +70,7 @@
 !
       integer(kind = kint), intent(in) :: id_file
       logical, intent(in) :: flag_spectr, flag_vol_ave
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
 !
       if(flag_spectr) then
@@ -95,7 +95,7 @@
       subroutine read_volume_pwr_sph(id_file, sph_IN, ierr)
 !
       integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(inout) :: sph_IN
+      type(read_sph_spectr_params), intent(inout) :: sph_IN
       integer(kind = kint), intent(inout) :: ierr
 !
 !
@@ -118,7 +118,7 @@
       use write_field_labels
 !
       integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
       integer(kind = kint) :: i
 !
@@ -138,7 +138,7 @@
       subroutine write_vol_spectr_data(id_file, sph_OUT)
 !
       integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
       integer(kind = kint) :: lth
       character(len=kchara) :: fmt_txt
@@ -160,7 +160,7 @@
       subroutine write_layer_sph_data(id_file, sph_OUT)
 !
       integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
       integer(kind = kint) :: kr
       character(len=kchara) :: fmt_txt
@@ -181,7 +181,7 @@
       subroutine write_layer_spectr_data(id_file, sph_OUT)
 !
       integer(kind = kint), intent(in) :: id_file
-      type(read_sph_spectr_data), intent(in) :: sph_OUT
+      type(read_sph_spectr_params), intent(in) :: sph_OUT
 !
       integer(kind = kint) :: kr, lth
       character(len=kchara) :: fmt_txt

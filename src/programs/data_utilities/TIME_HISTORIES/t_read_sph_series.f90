@@ -11,13 +11,13 @@
 !!     &         (ltr, sph_IN, n_step, sph_series)
 !!      subroutine dealloc_sph_spectr_series(sph_series)
 !!        integer(kind = kint), intent(in) :: n_step
-!!        type(read_sph_spectr_data), intent(in) :: sph_IN
+!!        type(read_sph_spectr_params), intent(in) :: sph_IN
 !!        type(read_sph_spectr_series), intent(inout) :: sph_series
 !!
 !!      subroutine copy_spectr_IO_to_series                             &
 !!     &          (icou, ltr, sph_IN, sph_series)
 !!        integer(kind = kint), intent(in) :: icou
-!!        type(read_sph_spectr_data), intent(in) :: sph_IN
+!!        type(read_sph_spectr_params), intent(in) :: sph_IN
 !!        type(read_sph_spectr_series), intent(inout) :: sph_series
 !!@endverbatim
       module t_read_sph_series
@@ -51,7 +51,7 @@
      &         (ltr, sph_IN, n_step, sph_series)
 !
       integer(kind = kint), intent(in) :: ltr, n_step
-      type(read_sph_spectr_data), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(in) :: sph_IN
       type(read_sph_spectr_series), intent(inout) :: sph_series
 !
       integer(kind = kint) :: ncomp, nri
@@ -93,7 +93,7 @@
      &          (icou, ltr, sph_IN, sph_series)
 !
       integer(kind = kint), intent(in) :: icou, ltr
-      type(read_sph_spectr_data), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(in) :: sph_IN
       type(read_sph_spectr_series), intent(inout) :: sph_series
 !
       integer(kind = kint) :: ncomp, nri

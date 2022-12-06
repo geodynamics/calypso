@@ -49,7 +49,7 @@
       implicit none
 !
       integer(kind = kint), parameter, private :: id_file_rms = 31
-      type(read_sph_spectr_data), save, private :: sph_IN_f
+      type(read_sph_spectr_params), save, private :: sph_IN_f
       type(sph_spectr_head_labels), save, private :: sph_lbl_IN_f
       type(buffer_4_gzip), save, private :: zbuf_f
       character, pointer, private, save :: FPz_fsp
@@ -206,7 +206,7 @@
       use count_monitor_time_series
 !
       character(len=kchara), intent(in) :: draw_name
-      type(read_sph_spectr_data), intent(in) :: sph_IN
+      type(read_sph_spectr_params), intent(in) :: sph_IN
 !
       integer(kind = kint) :: i
 !
