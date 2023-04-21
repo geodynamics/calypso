@@ -156,7 +156,7 @@
       type(buffer_4_gzip), save :: zbuf1
       character, pointer, save  :: FPz_f1
 !
-      integer(kind = kint) :: num_count, ierr
+      integer(kind = kint) :: num_count, icou_skip, ierr
 !
 !
       call sel_open_read_gz_stream_file                                 &
@@ -166,7 +166,8 @@
 !
       call s_count_monitor_time_series                                  &
      &   (flag_log, FPz_f1, id_Nusselt, flag_gzip1, ione,               &
-     &    start_time, end_time, true_start, true_end, num_count, zbuf1)
+     &    start_time, end_time, true_start, true_end,                   &
+     &    num_count, icou_skip, zbuf1)
 !
       if(flag_gzip1) then
         ierr =  rewind_gzfile(FPz_f1)

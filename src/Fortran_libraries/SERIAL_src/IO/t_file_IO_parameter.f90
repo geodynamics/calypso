@@ -34,11 +34,11 @@
 !>      FEM mesh IO flags
       type FEM_file_IO_flags
 !>        Integer flag to output mesh data
-        integer(kind = kint) :: iflag_access_FEM = 0
+        logical :: flag_access_FEM = .FALSE.
 !>        Integer flag to output surface and edge mesh data
-        integer(kind = kint) :: iflag_output_SURF = 0
+        logical :: flag_output_SURF = .FALSE.
 !>        Integer flag to output mesh data for viewer
-        integer(kind = kint) :: iflag_output_VMESH = 0
+        logical :: flag_output_VMESH = .FALSE.
       end type FEM_file_IO_flags
 !
 !

@@ -7,12 +7,13 @@
 !>@brief compare vector and integers
 !!
 !!@verbatim
-!!      integer(kind = kint) function compare_field_vector              &
-!!     &      (n_point, numdir, fld_name, d_fld1, d_fld2)
+!!      subroutine compare_field_vector(n_point, numdir, fld_name,      &
+!!     &                                d_fld1, d_fld2, icount_error)
 !!        character(len=kchara), intent(in) :: fld_name
 !!        integer(kind = kint), intent(in) :: n_point, numdir
 !!        real(kind = kreal), intent(in) :: d_fld1(n_point,numdir)
 !!        real(kind = kreal), intent(in) :: d_fld2(n_point,numdir)
+!!        integer(kind = kint), intent(inout) :: icount_error
 !!
 !!      integer(kind = kint) function                                   &
 !!     &                    check_4_on_3(i1, i2, i3, j1, j2, j3, j4)
@@ -45,8 +46,8 @@
 !
 !------------------------------------------------------------------
 !
-      integer(kind = kint) function compare_field_vector                &
-     &      (n_point, numdir, fld_name, d_fld1, d_fld2)
+      subroutine compare_field_vector(n_point, numdir, fld_name,        &
+     &                                d_fld1, d_fld2, icount_error)
 !
       use m_machine_parameter
 !
@@ -57,12 +58,14 @@
       real(kind = kreal), intent(in) :: d_fld1(n_point,numdir)
       real(kind = kreal), intent(in) :: d_fld2(n_point,numdir)
 !
+      integer(kind = kint), intent(inout) :: icount_error
+!
       real(kind = kreal), allocatable :: vmin(:), vmax(:), size(:)
       real(kind = kreal) :: scale, diff
       integer(kind = kint) :: inod, ifld, icomp
-      integer(kind = kint) :: iflag
 !
-      iflag = 0
+!
+      icount_error = 0
       allocate(vmin(numdir))
       allocate(vmax(numdir))
       allocate(size(numdir))
@@ -87,14 +90,13 @@
           if((abs(diff) / scale) .gt. TINY) then
             write(*,*) icomp, '-component of ', trim(fld_name),     &
      &                ' at ', inod, ' is different: ', diff
-            iflag = iflag + 1
+            icount_error = icount_error + 1
           end if
         end do
       end do
       deallocate(vmin, vmax, size)
-      compare_field_vector = iflag
 !
-      end function compare_field_vector
+      end subroutine compare_field_vector
 !
 !  --------------------------------------------------------------------
 !  --------------------------------------------------------------------

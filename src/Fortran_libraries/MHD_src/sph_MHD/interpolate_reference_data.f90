@@ -174,7 +174,7 @@
       type(phys_data), intent(inout) :: ref_field
 !
 !
-      integer(kind = kint) :: i_fld, j_fld, ist
+      integer(kind = kint) :: i_fld, j_fld, ist, ied
 !
 !
       do i_fld = 1, ref_field%num_phys
@@ -184,6 +184,7 @@
      &             .eq. radial_fld_IO%fld_name(j_fld)) then
             ref_field%iflag_update(i_fld) = 1
             ist = ref_field%istack_component(i_fld-1) + 1
+            ied = ref_field%istack_component(i_fld)
             call set_org_radius_data_from_IO                            &
      &          (j_fld, radial_fld_IO, r_itp%n_rj_org, r_itp%d_rj_org)
             call interpolate_radial_field(ref_field%n_point,            &
@@ -191,6 +192,7 @@
      &         r_itp%coef_old2new_in, radial_fld_IO%num_comp_IO(j_fld), &
      &         r_itp%n_rj_org, r_itp%d_rj_org(1,1),                     &
      &         ref_field%d_fld(1,ist))
+            ref_field%iflag_update(ist+1:ist+ied) = 1
             exit
           end if
         end do

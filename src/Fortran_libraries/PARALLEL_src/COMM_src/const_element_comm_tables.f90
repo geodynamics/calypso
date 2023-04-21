@@ -26,6 +26,7 @@
 !!        type(mesh_SR), intent(inout) :: m_SR
 !!
 !!      subroutine const_global_numnod_list(node)
+!!      subroutine const_global_numele_list(ele)
 !!      subroutine set_node_ele_double_address                          &
 !!     &         (node, ele, nod_comm, ele_comm, inod_dbl, iele_dbl,    &
 !!     &          SR_sig, SR_i)

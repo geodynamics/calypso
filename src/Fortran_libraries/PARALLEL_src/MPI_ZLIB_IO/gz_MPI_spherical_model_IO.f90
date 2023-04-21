@@ -50,7 +50,7 @@
 !
       call gz_mpi_skip_header(IO_param, len(hd_segment()))
       call gz_mpi_read_num_of_data(IO_param, num_tmp)
-      call gz_mpi_read_comm_table(IO_param,                             &
+      call gz_mpi_read_int_items(IO_param,                              &
      &    sph_IO%numdir_sph, sph_IO%numdir_sph, sph_IO%sph_rank)
 !
       end subroutine gz_mpi_read_rank_4_sph
@@ -70,7 +70,7 @@
      &   (gz_mpi_read_charahead(IO_param, len_int_txt), sph_IO%ltr_gl)
 !
       call gz_mpi_read_num_of_data(IO_param, num_tmp)
-      call gz_mpi_read_comm_table(IO_param,                             &
+      call gz_mpi_read_int_items(IO_param,                              &
      &    sph_IO%numdir_sph, sph_IO%numdir_sph, sph_IO%nidx_gl_sph)
 !
       end subroutine gz_mpi_read_gl_reso_sph
@@ -103,7 +103,7 @@
 !
       call gz_mpi_write_charahead                                       &
      &   (IO_param, len(hd_segment()), hd_segment())
-      call gz_mpi_write_comm_table(IO_param,                            &
+      call gz_mpi_write_int_items(IO_param,                             &
      &    sph_IO%numdir_sph, sph_IO%numdir_sph, sph_IO%sph_rank)
 !
       end subroutine gz_mpi_write_rank_4_sph
@@ -120,7 +120,7 @@
      &   (IO_param, len(hd_trunc()), hd_trunc())
       call gz_mpi_write_charahead(IO_param, len_int_txt,                &
      &    integer_textline(sph_IO%ltr_gl))
-      call gz_mpi_write_comm_table(IO_param,                            &
+      call gz_mpi_write_int_items(IO_param,                             &
      &    sph_IO%numdir_sph, sph_IO%numdir_sph, sph_IO%nidx_gl_sph)
 !
       end subroutine gz_mpi_write_gl_reso_sph

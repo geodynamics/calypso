@@ -88,7 +88,7 @@
 !      call compare_mesh_type                                           &
 !     &   (my_rank, geofem%mesh%nod_comm, mesh%node, mesh%ele,          &
 !     &    femmesh_s%mesh)
-!      call compare_mesh_groups(geofem%group%nod_grp, femmesh_s%group)
+!      call compare_mesh_groups(geofem%group, femmesh_s%group)
 !
       if (iflag_debug.gt.0) write(*,*) 'copy_mesh_and_group'
       femmesh_s%mesh%ele%first_ele_type                                 &
@@ -96,9 +96,6 @@
       call copy_mesh_and_group                                          &
      &   (femmesh_s%mesh, femmesh_s%group, geofem%mesh, geofem%group)
       return
-      call dealloc_groups_data(femmesh_s%group)
-      call dealloc_mesh_geometry_base(femmesh_s%mesh)
-      call dealloc_gen_sph_radial_groups(sph_maker%gen_sph)
 !
       end subroutine load_FEM_mesh_4_SPH
 !
@@ -146,12 +143,12 @@
       if(iflag_GSP_time) call end_elapsed_time(ist_elapsed_GSP+9)
 !
 ! Output mesh data
-      if(FEM_mesh_flags%iflag_access_FEM .gt. 0) then
+      if(FEM_mesh_flags%flag_access_FEM) then
         call mpi_output_mesh(mesh_file, mesh, group)
         write(*,'(a,i6,a)')                                             &
      &          'FEM mesh for domain', my_rank, ' is done.'
 !!
-!        if(FEM_mesh_flags%iflag_output_VMESH .gt. 0) then
+!        if(FEM_mesh_flags%flag_output_VMESH) then
 !          call pickup_surface_mesh(mesh_file, par_view)
 !        end if
       end if

@@ -32,6 +32,7 @@
       use t_phys_address
       use t_base_field_labels
       use t_grad_field_labels
+      use t_field_component_labels
       use t_file_IO_parameter
       use t_sph_radial_interpolate
       use t_field_data_IO
@@ -42,7 +43,9 @@
      &             :: radius_name = 'radius'
 !
       character(len = kchara), parameter, private                       &
-     &             :: default_reference_file = 'reference_fields.dat'
+     &     :: default_input_reference_file = 'input_reference.dat'
+      character(len = kchara), parameter, private                       &
+     &     :: default_output_reference_file = 'reference_fields.dat'
 !
 !>      Structure of reference temperature
       type radial_reference_field
@@ -52,6 +55,8 @@
         type(base_field_address) :: iref_base
 !>        Address of gradient of reference field
         type(gradient_field_address) :: iref_grad
+!>        Address of reference vector components
+        type(field_component_address) :: iref_cmp
 !>        Structure of reference field (include center at the end)
         type(phys_data) :: ref_field
 !
@@ -89,7 +94,7 @@
 
       call append_reference_field_names                                 &
      &   (ipol%base, refs%iref_radius, refs%iref_base, refs%iref_grad,  &
-     &    refs%ref_field)
+     &    refs%iref_cmp, refs%ref_field)
       call alloc_phys_data((sph_rj%nidx_rj(1)+1), refs%ref_field)
 !
       refs%ref_field%d_fld(1,refs%iref_radius) = 0.0d0
@@ -118,7 +123,7 @@
 !
       type(radial_reference_field), intent(inout) :: refs
 !
-      refs%ref_output_IO%file_prefix = default_reference_file
+      refs%ref_output_IO%file_prefix = default_output_reference_file
 !
       end subroutine set_default_reference_file_name
 !
@@ -209,10 +214,11 @@
 ! -----------------------------------------------------------------------
 !
       subroutine append_reference_field_names(ipol_base, iref_radius,   &
-     &          iref_base, iref_grad, ref_field)
+     &          iref_base, iref_grad, iref_cmp, ref_field)
 !
       use m_base_field_labels
       use m_grad_field_labels
+      use m_field_component_labels
       use append_phys_data
 !
       type(base_field_address), intent(in) :: ipol_base
@@ -220,6 +226,7 @@
       integer(kind = kint), intent(inout) :: iref_radius
       type(base_field_address), intent(inout) :: iref_base
       type(gradient_field_address), intent(inout) :: iref_grad
+      type(field_component_address), intent(inout) :: iref_cmp
       type(phys_data), intent(inout) :: ref_field
 !
 !
@@ -263,6 +270,18 @@
      &      ione, .TRUE., .FALSE., izero, ref_field)
       end if
 !
+      if(ipol_base%i_back_B .gt. 0) then
+        iref_cmp%i_magne_y = ref_field%ntot_phys + 1
+        call append_field_name_list(y_magnetic_f%name,                  &
+     &      ithree, .TRUE., .FALSE., izero, ref_field)
+        iref_cmp%i_magne_z = ref_field%ntot_phys + 1
+        call append_field_name_list(z_magnetic_f%name,                  &
+     &      ithree, .TRUE., .FALSE., izero, ref_field)
+        iref_cmp%i_magne_x = ref_field%ntot_phys + 1
+        call append_field_name_list(x_magnetic_f%name,                  &
+     &      ithree, .TRUE., .FALSE., izero, ref_field)
+      end if
+!
       end subroutine append_reference_field_names
 !
 ! -----------------------------------------------------------------------
@@ -271,6 +290,7 @@
      &         (sph_rj, iref_base, ipol_base, ref_field, rj_fld)
 !
       use interpolate_reference_data
+      use init_external_magne_sph
 !
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(base_field_address), intent(in) :: iref_base
@@ -288,7 +308,6 @@
       call overwrite_each_field_by_ref(sph_rj,                          &
      &    iref_base%i_light_source, ipol_base%i_light_source,           &
      &    ref_field, rj_fld)
-
 !
       call overwrite_each_field_by_ref(sph_rj,                          &
      &    iref_base%i_ref_density, ipol_base%i_ref_density,             &

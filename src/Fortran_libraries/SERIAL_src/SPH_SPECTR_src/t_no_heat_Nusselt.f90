@@ -185,7 +185,7 @@
       use t_read_sph_spectra
       use select_gz_stream_file_IO
       use sph_monitor_data_text
-      use gz_open_sph_monitor_file
+      use gz_open_sph_vol_mntr_file
 !
       integer(kind = kint), intent(in) :: ltr, nri
       integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
@@ -195,7 +195,7 @@
 !
       logical :: flag_gzip_lc
       type(buffer_4_gzip) :: zbuf_n
-      type(read_sph_spectr_params) :: sph_OUT_n
+      type(read_sph_spectr_data) :: sph_OUT_n
 !
       real(kind = kreal) :: Nu_snap(2)
 !
@@ -232,7 +232,7 @@
       integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
       type(nusselt_number_data), intent(in) :: Nu_type
 !
-      type(read_sph_spectr_params), intent(inout) :: sph_OUT
+      type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !
       integer(kind = kint) :: icou
 !

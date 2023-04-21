@@ -27,7 +27,7 @@
 !
       use t_comm_table
       use field_data_IO
-      use comm_table_IO
+      use comm_table_data_IO
 !
       implicit none
 !

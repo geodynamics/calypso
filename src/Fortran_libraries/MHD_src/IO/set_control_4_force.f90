@@ -203,9 +203,8 @@
         end if
 !
 !
-        if (g_ctl%gravity%iflag .eq. 0) then
-          fl_prop%i_grav = iflag_self_r_g
-        else
+        fl_prop%i_grav = iflag_self_r_g
+        if (g_ctl%gravity%iflag .gt. 0) then
           tmpchara = g_ctl%gravity%charavalue
 !
           if     (cmp_no_case(tmpchara, 'constant')) then

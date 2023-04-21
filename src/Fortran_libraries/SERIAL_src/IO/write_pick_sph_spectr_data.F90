@@ -19,7 +19,7 @@
 !!     &                                    picked, sph_OUT)
 !!        integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
 !!        type(picked_spectrum_data), intent(in) :: picked
-!!        type(read_sph_spectr_params), intent(inout) :: sph_OUT
+!!        type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !!@endverbatim
 !!
       module write_pick_sph_spectr_data
@@ -90,7 +90,7 @@
       integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
       type(picked_spectrum_data), intent(in) :: picked
 !
-      type(read_sph_spectr_params), intent(inout) :: sph_OUT
+      type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !
 !
       sph_OUT%ltr_sph = 1
@@ -189,7 +189,7 @@
       integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
       type(picked_spectrum_data), intent(in) :: picked
 !
-      type(read_sph_spectr_params), intent(inout) :: sph_OUT
+      type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !
       integer(kind = kint) :: i, icou
 !

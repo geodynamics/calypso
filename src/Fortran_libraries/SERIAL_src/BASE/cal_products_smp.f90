@@ -22,6 +22,9 @@
 !!      subroutine cal_cross_prod_w_coef_smp                            &
 !!     &         (nnod, coef, vect1, vect2, prod)
 !!             prod(:,:) = coef * vect1(:,:) \times vect2(:,:)
+!!      subroutine add_cross_prod_w_coef_smp                            &
+!!     &         (nnod, coef, vect1, vect2, prod)
+!!             prod(:,:) = coef * vect1(:,:) \times vect2(:,:)
 !!      subroutine cal_cross_prod_no_coef_smp                           &
 !!     &         (nnod, vect1, vect2, prod)
 !!             prod(:,:) = vect1(:,:) \times vect2(:,:)
@@ -170,6 +173,32 @@
 !$omp end workshare nowait
 !
       end subroutine cal_cross_prod_w_coef_smp
+!
+! ----------------------------------------------------------------------
+!
+      subroutine add_cross_prod_w_coef_smp                              &
+     &         (nnod, coef, vect1, vect2, prod)
+!
+      integer (kind=kint), intent(in) :: nnod
+      real (kind=kreal), intent(in) :: coef
+      real (kind=kreal), intent(in) :: vect1(nnod,3), vect2(nnod,3)
+!
+      real (kind=kreal), intent(inout) :: prod(nnod,3)
+!
+!
+!$omp workshare
+      prod(1:nnod,1) = prod(1:nnod,1)                                   &
+     &              + (vect1(1:nnod,2)*vect2(1:nnod,3)                  &
+     &               - vect1(1:nnod,3)*vect2(1:nnod,2) ) * coef
+      prod(1:nnod,2) = prod(1:nnod,2)                                   &
+     &              + (vect1(1:nnod,3)*vect2(1:nnod,1)                  &
+     &               - vect1(1:nnod,1)*vect2(1:nnod,3) ) * coef
+      prod(1:nnod,3) = prod(1:nnod,3)                                   &
+     &              + (vect1(1:nnod,1)*vect2(1:nnod,2)                  &
+     &               - vect1(1:nnod,2)*vect2(1:nnod,1) ) * coef
+!$omp end workshare nowait
+!
+      end subroutine add_cross_prod_w_coef_smp
 !
 ! ----------------------------------------------------------------------
 !

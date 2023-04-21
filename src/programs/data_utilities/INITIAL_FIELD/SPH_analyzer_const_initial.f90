@@ -131,7 +131,7 @@
 !
 ! ---------------------------------
 !
-      call init_reference_scalars                                       &
+      call init_reference_fields                                        &
      &   (SPH_MHD%sph, SPH_MHD%ipol, SPH_WK%r_2nd, SPH_model%refs,      &
      &    SPH_MHD%fld, SPH_model%MHD_prop, SPH_model%sph_MHD_bc)
 

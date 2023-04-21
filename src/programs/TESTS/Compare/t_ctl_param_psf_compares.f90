@@ -56,7 +56,7 @@
 !
 !  --------------------------------------------------------------------
 !
-      integer(kind = kint) function compare_psf_data(psf_cmp)
+      subroutine compare_psf_data(psf_cmp, icount_error)
 !
       use m_precision
       use m_machine_parameter
@@ -69,29 +69,33 @@
       implicit none
 !
       type(psf_compare_param), intent(in):: psf_cmp
+      integer(kind = kint), intent(inout) :: icount_error
 !
       type(psf_results) :: psf_1, psf_2
       type(time_data) :: t_IO_u
       type(ucd_data):: psf_ucd
 !
       integer :: np_ucd
-      integer(kind = kint) :: iflag = 0
+      integer(kind = kint) :: icou_error
 !
 !
-      call load_psf_data_to_link_IO                                   &
-     &   (psf_cmp%istep_psf, psf_cmp%psf1_file_param,                 &
+      call load_psf_data_to_link_IO                                     &
+     &   (psf_cmp%istep_psf, psf_cmp%psf1_file_param,                   &
      &    np_ucd, t_IO_u, psf_1, psf_ucd)
-      call load_psf_data_to_link_IO                                   &
-     &   (psf_cmp%istep_psf, psf_cmp%psf2_file_param,                 &
+      call load_psf_data_to_link_IO                                     &
+     &   (psf_cmp%istep_psf, psf_cmp%psf2_file_param,                   &
      &    np_ucd, t_IO_u, psf_2, psf_ucd)
 !
-      iflag = compare_node_position(0, psf_1%psf_nod, psf_2%psf_nod)
-      iflag = iflag                                                   &
-     &       + compare_ele_connect(0, psf_1%psf_ele, psf_2%psf_ele)
-      iflag = iflag                                                   &
-     &       + compare_field_data(psf_1%psf_phys, psf_2%psf_phys)
+      call compare_node_position(0, psf_1%psf_nod, psf_2%psf_nod,       &
+     &                           icount_error)
+      call compare_ele_connect(0, psf_1%psf_ele, psf_2%psf_ele,         &
+     &                         icou_error)
+      icount_error = icount_error + icou_error
+      call compare_field_data(psf_1%psf_phys, psf_2%psf_phys,           &
+     &                        icou_error)
+      icount_error = icount_error + icou_error
 !
-      if(iflag .eq. 0) then
+      if(icount_error .eq. 0) then
         write(*,*) trim(psf_cmp%psf1_file_param%file_prefix), ' and ',  &
      &             trim(psf_cmp%psf2_file_param%file_prefix),           &
      &            ' have same data.'
@@ -103,9 +107,8 @@
 !
       call dealloc_psf_results(psf_1)
       call dealloc_psf_results(psf_2)
-      iflag = compare_psf_data
 !
-      end function compare_psf_data
+      end subroutine compare_psf_data
 !
 !-----------------------------------------------------------------------
 !

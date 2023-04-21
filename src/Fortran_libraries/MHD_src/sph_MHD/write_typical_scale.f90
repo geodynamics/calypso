@@ -54,7 +54,7 @@
       use t_sph_volume_mean_square
       use sph_monitor_data_text
       use select_gz_stream_file_IO
-      use gz_open_sph_monitor_file
+      use gz_open_sph_vol_mntr_file
       use set_parallel_file_name
 !
       integer(kind = kint), intent(in) :: i_step
@@ -68,7 +68,7 @@
       character(len = kchara) :: base_name
       logical :: flag_gzip_lc
       type(buffer_4_gzip) :: zbuf_t
-      type(read_sph_spectr_params) :: sph_OUT_s
+      type(read_sph_spectr_data) :: sph_OUT_s
       real(kind=kreal), allocatable :: d_rj_out(:)
       integer(kind = kint) :: icou
 !
@@ -121,7 +121,7 @@
       use t_rms_4_sph_spectr
       use t_read_sph_spectra
       use set_parallel_file_name
-      use gz_open_sph_monitor_file
+      use gz_open_sph_vol_mntr_file
       use check_sph_monitor_header
       use compare_sph_monitor_header
       use sph_power_spectr_data_text
@@ -134,13 +134,10 @@
       type(sph_mean_squares), intent(in) :: pwr
       type(typical_scale_data), intent(in) :: tsl
 !
-      character(len = kchara) :: file_name, base_name
+      character(len = kchara) :: base_name
 !
-      character, pointer:: FPz_fp
-      logical :: flag_gzip_lc, flag_miss, error
-      type(read_sph_spectr_params) :: sph_IN_t, sph_OUT_t
-      type(sph_spectr_head_labels) :: sph_lbl_IN_t
-      type(buffer_4_gzip) :: zbuf_t
+      logical :: flag_gzip_lc, error
+      type(read_sph_spectr_data) :: sph_OUT_t
 !
 !
       error_typical_scale_header = .FALSE.
@@ -177,7 +174,7 @@
       real(kind = kreal), intent(in) :: r_in, r_out
       type(typical_scale_data), intent(in) :: tsl
 !
-      type(read_sph_spectr_params), intent(inout) :: sph_OUT
+      type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !
       integer(kind = kint) :: i
 !

@@ -135,7 +135,7 @@
       logical :: flag_gzip1
       type(buffer_4_gzip) :: zbuf1
 !
-      integer(kind = kint) :: ierr, num_count, num
+      integer(kind = kint) :: ierr, num_count, icou_skip, num
 !
 !
       write(*,*) 'Open file: ', trim(file_name)
@@ -150,7 +150,8 @@
       num = picked_IO%num_mode * picked_IO%num_layer
       call s_count_monitor_time_series                                  &
      &   (flag_log, FPz_f1, id_pick_mode, flag_gzip1, num,              &
-     &    start_time, end_time, true_start, true_end, num_count, zbuf1)
+     &    start_time, end_time, true_start, true_end,                   &
+     &    num_count, icou_skip, zbuf1)
 !
       if(flag_gzip1) then
         ierr =  rewind_gzfile(FPz_f1)

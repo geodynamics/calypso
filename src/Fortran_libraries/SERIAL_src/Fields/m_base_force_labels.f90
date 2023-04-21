@@ -4,7 +4,6 @@
 !! @author H. Matsui
 !! @date   Programmed in Jan., 2020
 !!
-!!
 !> @brief Labels and addresses for basic forces
 !!
 !!@verbatim
@@ -18,7 +17,7 @@
 !!
 !! !!!!!  Base force names  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!
-!! field names 
+!! field name
 !!
 !!   pressure_gradient  [i_press_grad]:     pressure gradient    u
 !!   inertia    [i_m_advect]:        inertia (\omega \times u)

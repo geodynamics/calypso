@@ -21,9 +21,9 @@
 !!        type(communication_table), intent(in) :: comm_IO
 !!
 !!      subroutine mpi_read_int_stack(IO_param, num, istack, ntot)
-!!      subroutine mpi_read_comm_table(IO_param, ncolumn, num, int_dat)
+!!      subroutine mpi_read_int_items(IO_param, ncolumn, num, int_dat)
 !!      subroutine mpi_write_int_stack(IO_param, num, istack)
-!!      subroutine mpi_write_comm_table(IO_param, ncolumn, num, int_dat)
+!!      subroutine mpi_write_int_items(IO_param, ncolumn, num, int_dat)
 !!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !!
 !!      subroutine mpi_write_int_vector(IO_param, num, int_dat)
@@ -111,7 +111,7 @@
       call mpi_read_num_of_data(IO_param, comm_IO%ntot_import)
       call alloc_import_item(comm_IO)
 !
-      call mpi_read_comm_table                                          &
+      call mpi_read_int_items                                           &
      &   (IO_param, ione, comm_IO%ntot_import, comm_IO%item_import)
 !
       end subroutine mpi_read_import_data
@@ -135,7 +135,7 @@
       call mpi_read_num_of_data(IO_param, comm_IO%ntot_export)
       call alloc_export_item(comm_IO)
 !
-      call mpi_read_comm_table                                          &
+      call mpi_read_int_items                                           &
      &     (IO_param, ione, comm_IO%ntot_export, comm_IO%item_export)
 !
       end subroutine mpi_read_export_data
@@ -171,7 +171,7 @@
 !
       call mpi_write_int_stack                                          &
      &   (IO_param, comm_IO%num_neib, comm_IO%istack_import)
-      call mpi_write_comm_table                                         &
+      call mpi_write_int_items                                          &
      &   (IO_param, ione, comm_IO%ntot_import, comm_IO%item_import)
 !
       end subroutine mpi_write_import_data
@@ -186,7 +186,7 @@
 !
       call mpi_write_int_stack                                          &
      &   (IO_param, comm_IO%num_neib, comm_IO%istack_export)
-      call mpi_write_comm_table                                         &
+      call mpi_write_int_items                                          &
      &   (IO_param, ione, comm_IO%ntot_export, comm_IO%item_export)
 !
       end subroutine mpi_write_export_data
@@ -299,7 +299,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine mpi_read_comm_table(IO_param, ncolumn, num, int_dat)
+      subroutine mpi_read_int_items(IO_param, ncolumn, num, int_dat)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       integer(kind=kint), intent(in) :: num, ncolumn
@@ -354,11 +354,11 @@
       IO_param%ioff_gl = IO_param%ioff_gl                               &
      &         + IO_param%istack_merged(IO_param%nprocs_in)
 !
-      end subroutine mpi_read_comm_table
+      end subroutine mpi_read_int_items
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine mpi_write_comm_table(IO_param, ncolumn, num, int_dat)
+      subroutine mpi_write_int_items(IO_param, ncolumn, num, int_dat)
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       integer(kind=kint), intent(in) :: num, ncolumn
@@ -403,7 +403,7 @@
      &      multi_int_textline(nrest, int_dat(num-nrest+1)))
       end if
 !
-      end subroutine mpi_write_comm_table
+      end subroutine mpi_write_int_items
 !
 ! -----------------------------------------------------------------------
 !

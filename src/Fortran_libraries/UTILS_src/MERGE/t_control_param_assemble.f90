@@ -35,6 +35,8 @@
         type(field_IO_params) :: org_mesh_file
 !>        Structure of assembled mesh data file name
         type(field_IO_params) :: new_mesh_file
+!>        Structure of assembled FEM mesh IO flags
+        type(FEM_file_IO_flags) :: new_FEM_mesh_flags
 !
 !>        Structure of origianl field data file name
         type(field_IO_params) :: org_fld_file

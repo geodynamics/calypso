@@ -46,6 +46,9 @@
       type(buffer_4_gzip), private, save :: zbuf_ele
       character, pointer, private, save :: FPz_ele
 !
+      private :: gz_read_element_geometry_b
+      private :: gz_write_element_geometry_b
+!
 !------------------------------------------------------------------
 !
        contains
@@ -56,7 +59,7 @@
      &         (id_rank, file_name, ele_mesh_IO, ierr)
 !
       use gzip_file_access
-      use gz_element_data_IO_b
+      use gz_comm_table_IO_b
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -69,8 +72,8 @@
 !
       call open_rd_gzfile_b(FPz_ele, file_name, id_rank, zbuf_ele)
       if(zbuf_ele%ierr_zlib .ne. 0) go to 99
-      call gz_read_element_comm_table_b                                 &
-     &   (FPz_ele, id_rank, zbuf_ele, ele_mesh_IO%comm)
+      call gz_read_comm_table_b(FPz_ele, id_rank,                       &
+     &                          zbuf_ele, ele_mesh_IO%comm)
       if(zbuf_ele%ierr_zlib .ne. 0) go to 99
 !      call gz_read_element_geometry_b                                  &
 !     &   (FPz_ele, zbuf_ele, ele_mesh_IO%node, ele_mesh_IO%sfed)
@@ -150,7 +153,7 @@
      &         (id_rank, file_name, ele_mesh_IO)
 !
       use gzip_file_access
-      use gz_element_data_IO_b
+      use gz_comm_table_IO_b
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -161,8 +164,8 @@
      &  'Write gzipped binary element comm file: ', trim(file_name)
 !
       call open_wt_gzfile_b(FPz_ele, file_name, zbuf_ele)
-      call gz_write_element_comm_table_b                                &
-     &   (FPz_ele, id_rank, ele_mesh_IO%comm, zbuf_ele)
+      call gz_write_comm_table_b(FPz_ele, id_rank,                      &
+     &                           ele_mesh_IO%comm, zbuf_ele)
 !      call gz_write_element_geometry_b                                 &
 !     &   (FPz_ele, ele_mesh_IO%node, ele_mesh_IO%sfed, zbuf_ele)
       call close_gzfile_b(FPz_ele)
@@ -220,6 +223,64 @@
       call close_gzfile_b(FPz_ele)
 !
       end subroutine gz_output_edge_file_b
+!
+!------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      subroutine gz_read_element_geometry_b                             &
+     &         (FPz_f, zbuf, nod_IO, sfed_IO)
+!
+      use gz_node_geometry_IO_b
+!
+      character, pointer, intent(in) :: FPz_f
+      type(buffer_4_gzip), intent(inout) :: zbuf
+      type(node_data), intent(inout) :: nod_IO
+      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!
+!
+!      write(textbuf,'(a,a1)') '!', char(0)
+!      write(textbuf,'(a,a1)') '! 3.element information', char(0)
+!      write(textbuf,'(a,a1)') '!', char(0)
+!      write(textbuf,'(a,a1)') '! 3.1 center of element (position) ',   &
+!     &                       char(0)
+!      write(textbuf,'(a,a1)') '!', char(0)
+!
+      call gz_read_number_of_node_b(FPz_f, zbuf, nod_IO)
+      if(zbuf%ierr_zlib .ne. 0) return
+!
+      call gz_read_geometry_info_b(FPz_f, zbuf, nod_IO)
+      if(zbuf%ierr_zlib .ne. 0) return
+!
+!      write(textbuf,'(a,a1)') '!', char(0)
+!      write(textbuf,'(a,a1)') '! 3.2 Volume of element ', char(0)
+!      write(textbuf,'(a,a1)') '!', char(0)
+!
+      call gz_read_scalar_in_element_b(FPz_f, zbuf, nod_IO, sfed_IO)
+      if(zbuf%ierr_zlib .ne. 0) return
+!
+      end subroutine gz_read_element_geometry_b
+!
+!------------------------------------------------------------------
+!
+      subroutine gz_write_element_geometry_b                            &
+     &         (FPz_f, nod_IO, sfed_IO, zbuf)
+!
+      use gz_node_geometry_IO_b
+!
+      character, pointer, intent(in) :: FPz_f
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+!      textbuf = hd_ecomm_point() // char(0)
+      call gz_write_geometry_info_b(FPz_f, nod_IO, zbuf)
+      if(zbuf%ierr_zlib .ne. 0) return
+!
+!      textbuf = hd_ecomm_vol() // char(0)
+      call gz_write_scalar_in_element_b(FPz_f, nod_IO, sfed_IO, zbuf)
+      if(zbuf%ierr_zlib .ne. 0) return
+!
+      end subroutine gz_write_element_geometry_b
 !
 !------------------------------------------------------------------
 !

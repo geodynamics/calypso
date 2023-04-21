@@ -47,17 +47,17 @@
 !
       subroutine bcast_FEM_file_IO_flags(FEM_mesh_flags)
 !
-      use calypso_mpi_int
+      use calypso_mpi_logical
 !
       type(FEM_file_IO_flags), intent(inout) :: FEM_mesh_flags
 !
 !
-      call calypso_mpi_bcast_one_int                                    &
-     &   (FEM_mesh_flags%iflag_access_FEM, 0)
-      call calypso_mpi_bcast_one_int                                    &
-     &   (FEM_mesh_flags%iflag_output_SURF , 0)
-      call calypso_mpi_bcast_one_int                                    &
-     &   (FEM_mesh_flags%iflag_output_VMESH, 0)
+      call calypso_mpi_bcast_one_logical                                &
+     &   (FEM_mesh_flags%flag_access_FEM, 0)
+      call calypso_mpi_bcast_one_logical                                &
+     &   (FEM_mesh_flags%flag_output_SURF , 0)
+      call calypso_mpi_bcast_one_logical                                &
+     &   (FEM_mesh_flags%flag_output_VMESH, 0)
 !
       end subroutine bcast_FEM_file_IO_flags
 !

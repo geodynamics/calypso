@@ -56,6 +56,9 @@
 !>     Error ID in LIC PVR module
       integer(kind = kint), parameter :: ierr_LIC = 631
 !
+!>     Error ID in Repartioning module
+      integer(kind = kint), parameter :: ierr_repart = 701
+!
 !
 !
 !>     Error ID for FEM element

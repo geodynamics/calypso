@@ -20,11 +20,15 @@
 !!   theta_velocity            [i_velo_t]:
 !!   phi_velocity              [i_velo_p]:
 !!   cyl_r_velocity            [i_velo_s]:
+!!   z_velocity                [i_velo_z]:
 !!
 !!   r_magnetic_f              [i_magne_r]:
 !!   theta_magnetic_f          [i_magne_t]:
 !!   phi_magnetic_f            [i_magne_p]:
 !!   cyl_r_magnetic_f          [i_magne_s]:
+!!   x_magnetic_f              [i_magne_x]:
+!!   y_magnetic_f              [i_magne_y]:
+!!   z_magnetic_f              [i_magne_z]:
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!@endverbatim
@@ -49,6 +53,8 @@
         integer (kind=kint) :: i_velo_p  =           izero
 !>        Start address for cylindrical radial velocity @f$ u_{s} @f$
         integer (kind=kint) :: i_velo_s  =           izero
+!>        Start address for z-componennt of velocity @f$ u_{z} @f$
+        integer (kind=kint) :: i_velo_z  =           izero
 !
 !>        Start address for radial magnetic field @f$ B_{r} @f$
         integer (kind=kint) :: i_magne_r  =          izero
@@ -61,6 +67,15 @@
 !>        Start address for cylindrical radial magnetic field
 !!          @f$ B_{s} @f$
         integer (kind=kint) :: i_magne_s  =          izero
+!>        Start address for x-component of magnetic field
+!!          @f$ B_{x} @f$
+        integer (kind=kint) :: i_magne_x  =          izero
+!>        Start address for x-component of magnetic field
+!!          @f$ B_{y} @f$
+        integer (kind=kint) :: i_magne_y  =          izero
+!>        Start address for x-component of magnetic field
+!!          @f$ B_{z} @f$
+        integer (kind=kint) :: i_magne_z  =          izero
       end type field_component_address
 !
 ! ----------------------------------------------------------------------
@@ -91,6 +106,8 @@
           fld_cmp%i_velo_p = i_phys
         else if (field_name .eq. cyl_r_velocity%name) then
           fld_cmp%i_velo_s = i_phys
+        else if (field_name .eq. z_velocity%name) then
+          fld_cmp%i_velo_z = i_phys
 !
         else if (field_name .eq. r_magnetic_f%name) then
           fld_cmp%i_magne_r =        i_phys
@@ -100,6 +117,12 @@
           fld_cmp%i_magne_p =          i_phys
         else if (field_name .eq. cyl_r_magnetic_f%name) then
           fld_cmp%i_magne_s =      i_phys
+        else if (field_name .eq. x_magnetic_f%name) then
+          fld_cmp%i_magne_x =      i_phys
+        else if (field_name .eq. y_magnetic_f%name) then
+          fld_cmp%i_magne_y =      i_phys
+        else if (field_name .eq. z_magnetic_f%name) then
+          fld_cmp%i_magne_z =      i_phys
         end if
       end if  
 !

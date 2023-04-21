@@ -163,6 +163,11 @@
         end if
       end if
 !
+      if(cd_prop%iflag_magneto_cv .eq. id_turn_ON) then
+        msg = 'Magnetoconvection needs'
+        call check_missing_field_w_msg(fld, msg, iphys_base%i_back_B)
+      end if
+!
       end subroutine check_field_dependencies
 !
 ! -----------------------------------------------------------------------

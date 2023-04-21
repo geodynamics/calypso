@@ -63,7 +63,7 @@
         ilen_line = len_multi_int_textline(ncolumn)
         ilen_tmp = int(dble(huge_30)*1.01+24,KIND(ilen_tmp))
 !        if(my_rank .eq. 0) write(*,*)                                  &
-!     &     'gz_mpi_write_comm_table start ',                           &
+!     &     'gz_mpi_write_int_items start ',                            &
 !     &      num, ilen_line, zbuf%ilen_gz, ilen_tmp
 !
         do

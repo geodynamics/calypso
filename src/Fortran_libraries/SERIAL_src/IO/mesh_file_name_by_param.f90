@@ -58,7 +58,7 @@
 !
       logical function check_exist_ele_mesh(id_rank, mesh_file)
 !
-      use set_mesh_file_names
+      use set_element_mesh_file_names
       use delete_data_files
 !
       integer, intent(in) :: id_rank
@@ -79,7 +79,7 @@
 !
       logical function check_exist_surf_mesh(id_rank, mesh_file)
 !
-      use set_mesh_file_names
+      use set_element_mesh_file_names
       use delete_data_files
 !
       integer, intent(in) :: id_rank
@@ -100,7 +100,7 @@
 !
       logical function check_exist_edge_mesh(id_rank, mesh_file)
 !
-      use set_mesh_file_names
+      use set_element_mesh_file_names
       use delete_data_files
 !
       integer, intent(in) :: id_rank
@@ -143,7 +143,7 @@
 !
       logical function check_writable_ele_mesh(id_rank, mesh_file)
 !
-      use set_mesh_file_names
+      use set_element_mesh_file_names
       use delete_data_files
 !
       integer, intent(in) :: id_rank
@@ -165,7 +165,7 @@
 !
       logical function check_writable_surf_mesh(id_rank, mesh_file)
 !
-      use set_mesh_file_names
+      use set_element_mesh_file_names
       use delete_data_files
 !
       integer, intent(in) :: id_rank
@@ -187,7 +187,7 @@
 !
       logical function check_writable_edge_mesh(id_rank, mesh_file)
 !
-      use set_mesh_file_names
+      use set_element_mesh_file_names
       use delete_data_files
 !
       integer, intent(in) :: id_rank

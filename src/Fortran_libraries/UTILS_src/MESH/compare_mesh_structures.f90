@@ -12,14 +12,16 @@
 !!        type(communication_table), intent(inout) :: nod_comm
 !!        type(node_data), intent(inout) ::           node
 !!        type(element_data), intent(inout) ::        ele
-!!      integer(kind = kint) function compare_node_position             &
-!!     &                            (id_rank, org_node, new_node)
+!!      subroutine compare_node_position                                &
+!!     &         (id_rank, org_node, new_node, icount_error)
 !!        type(node_data), intent(in) :: org_node
 !!        type(node_data), intent(in) :: new_node
-!!      integer(kind = kint) function compare_ele_connect               &
-!!     &                            (id_rank, org_ele, new_ele)
+!!        integer(kind = kint), intent(inout) :: icount_error
+!!      subroutine compare_ele_connect                                  &
+!!     &         (id_rank, org_ele, new_ele, icount_error)
 !!        type(element_data), intent(in) :: org_ele
 !!        type(element_data), intent(in) :: new_ele
+!!        integer(kind = kint), intent(inout) :: icount_error
 !!
 !!      subroutine compare_node_comm_types(id_rank, org_comm, new_comm)
 !!        type(communication_table), intent(in) :: org_comm
@@ -51,11 +53,13 @@
       type(node_data), intent(inout) ::           node
       type(element_data), intent(inout) ::        ele
 !
-      integer(kind = kint) :: iflag
+      integer(kind = kint) :: ierror_count, icou_error
 !
 !
-      iflag = compare_node_position(id_rank, node, mesh%node)
-      iflag = iflag + compare_ele_connect(id_rank, ele, mesh%ele)
+      call compare_node_position(id_rank, node, mesh%node,              &
+     &                           ierror_count)
+      call compare_ele_connect(id_rank, ele, mesh%ele, icou_error)
+      ierror_count = ierror_count + icou_error
       call compare_node_comm_types(id_rank, nod_comm, mesh%nod_comm)
 !
       end subroutine compare_mesh_type
@@ -63,8 +67,8 @@
 !-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
-      integer(kind = kint) function compare_node_position               &
-     &                            (id_rank, org_node, new_node)
+      subroutine compare_node_position                                  &
+     &         (id_rank, org_node, new_node, icount_error)
 !
       use t_geometry_data
       use m_phys_constants
@@ -73,9 +77,10 @@
       integer, intent(in) :: id_rank
       type(node_data), intent(in) :: org_node
       type(node_data), intent(in) :: new_node
+      integer(kind = kint), intent(inout) :: icount_error
 !
       character(len=kchara), parameter :: field_name = 'position'
-      integer(kind = kint) :: iflag
+      integer(kind = kint) :: icou_error
 !
 !
       if(iflag_debug .gt. 0) then
@@ -84,37 +89,37 @@
      &            org_node%internal_node, new_node%internal_node
       end if
 !
-      iflag = 0
+      icount_error = 0
       if(org_node%numnod .ne. new_node%numnod) then
         write(*,*) 'Number of node is different in domain ', id_rank,   &
      &              ':  ', org_node%numnod, new_node%numnod
-        iflag = iflag + 1
+        icount_error = icount_error + 1
       end if
       if(org_node%internal_node .ne. new_node%internal_node) then
         write(*,*)                                                      &
      &      'Number of internal node is different in domain ', id_rank, &
      &      ':  ', org_node%internal_node, new_node%internal_node
-        iflag = iflag + 1
+        icount_error = icount_error + 1
       end if
-      iflag = iflag + compare_field_vector                              &
-     &              (org_node%numnod, n_vector, field_name,             &
-     &               org_node%xx(1,1), new_node%xx(1,1))
-      compare_node_position = iflag
+      call compare_field_vector(org_node%numnod, n_vector, field_name,  &
+     &    org_node%xx(1,1), new_node%xx(1,1), icou_error)
+      icount_error = icount_error + icou_error
 !
-      end function compare_node_position
+      end subroutine compare_node_position
 !
 !------------------------------------------------------------------
 !
-      integer(kind = kint) function compare_ele_connect                 &
-     &                            (id_rank, org_ele, new_ele)
+      subroutine compare_ele_connect                                    &
+     &         (id_rank, org_ele, new_ele, icount_error)
 !
       use t_geometry_data
 !
       integer, intent(in) :: id_rank
       type(element_data), intent(in) :: org_ele
       type(element_data), intent(in) :: new_ele
+      integer(kind = kint), intent(inout) :: icount_error
 !
-      integer(kind = kint) :: iele, k1, iflag
+      integer(kind = kint) :: iele, k1
 !
 !
       if(iflag_debug .gt. 0) then
@@ -125,30 +130,30 @@
      &                               new_ele%first_ele_type
       end if
 !
-      iflag = 0
+      icount_error = 0
       if(org_ele%numele .ne. new_ele%numele) then
         write(*,*) 'Number of element is differenct: ',                 &
      &             org_ele%numele, new_ele%numele
-        iflag = iflag + 1
+        icount_error = icount_error + 1
       end if
       if(org_ele%nnod_4_ele .ne. new_ele%nnod_4_ele) then
         write(*,*) 'Element type is differennt: ',                      &
      &             org_ele%nnod_4_ele, new_ele%nnod_4_ele
-        iflag = iflag + 1
+        icount_error = icount_error + 1
       end if
 !
       do iele = 1, org_ele%numele
         if(org_ele%elmtyp(iele) .ne. new_ele%elmtyp(iele)) then
           write(*,*) 'element type at ', iele, ' is differ',            &
      &        org_ele%elmtyp(iele), new_ele%elmtyp(iele)
-          iflag = iflag + 1
+          icount_error = icount_error + 1
         end if
       end do
       do iele = 1, org_ele%numele
         if(org_ele%nodelm(iele) .ne. new_ele%nodelm(iele)) then
           write(*,*) 'number of node for ', iele, ' is differ',         &
      &        org_ele%nodelm(iele), new_ele%nodelm(iele)
-          iflag = iflag + 1
+          icount_error = icount_error + 1
         end if
       end do
       do k1 = 1, org_ele%nnod_4_ele
@@ -156,13 +161,12 @@
           if(org_ele%ie(iele,k1) .ne. new_ele%ie(iele,k1)) then
             write(*,*) 'connectivity at ', iele, k1, ' is differ',      &
      &          org_ele%ie(iele,k1), new_ele%ie(iele,k1)
-            iflag = iflag + 1
+            icount_error = icount_error + 1
           end if
         end do
       end do
-      compare_ele_connect = iflag
 !
-      end function compare_ele_connect
+      end subroutine compare_ele_connect
 !
 !------------------------------------------------------------------
 !

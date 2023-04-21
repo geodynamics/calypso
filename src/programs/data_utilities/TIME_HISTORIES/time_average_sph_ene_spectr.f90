@@ -35,11 +35,12 @@
       use m_constants
 !
       use t_read_sph_spectra
+      use t_tave_sph_volume_spectr
 !
       implicit  none
 !
-      type(read_sph_spectr_params), save, private :: tave_sph_IN
-      type(read_sph_spectr_params), save, private :: sdev_sph_IN
+      type(read_sph_spectr_data), save, private :: tave_sph_IN
+      type(vol_spectr_ave_sigma_work), save, private :: WK_tave_s
 !
 ! -------------------------------------------------------------------
 !
@@ -50,8 +51,7 @@
       integer(c_int) function                                           &
     &     time_ave_sdev_sph_volume_pwr_f(cname, cstart, cend) Bind(C)
 !
-      use m_tave_sph_ene_spectr
-      use count_monitor_time_series
+      use time_ave_sph_volume_mean
 !
       character(1,C_char), intent(in) :: cname(*)
       real(C_double), Value :: cstart, cend
@@ -62,8 +62,8 @@
       write(fname_org,'(a)') trim(c_to_fstring(cname))
       start_time = cstart
       end_time = cend
-      call time_ave_sdev_sph_spectr                                     &
-     &   (fname_org, spectr_off, volume_on, start_time, end_time)
+      call time_ave_sdev_sph_volume_mean(fname_org,                     &
+     &                                   start_time, end_time)
 !
       time_ave_sdev_sph_volume_pwr_f = 0
       end function time_ave_sdev_sph_volume_pwr_f
@@ -73,8 +73,7 @@
       integer(c_int) function                                           &
     &     time_ave_sdev_sph_vol_spectr_f(cname, cstart, cend) Bind(C)
 !
-      use m_tave_sph_ene_spectr
-      use count_monitor_time_series
+      use time_ave_sph_monitor_data
 !
       character(1,C_char), intent(in) :: cname(*)
       real(C_double), Value :: cstart, cend
@@ -85,8 +84,8 @@
       write(fname_org,'(a)') trim(c_to_fstring(cname))
       start_time = cstart
       end_time = cend
-      call time_ave_sdev_sph_spectr                                     &
-     &   (fname_org, spectr_on, volume_on, start_time, end_time)
+      call time_ave_sdev_sph_volume_spec(fname_org,                     &
+     &                                   start_time, end_time)
 !
       time_ave_sdev_sph_vol_spectr_f = 0
       end function time_ave_sdev_sph_vol_spectr_f
@@ -96,8 +95,8 @@
       integer(c_int) function                                           &
     &     time_ave_sdev_sph_layer_pwr_f(cname, cstart, cend) Bind(C)
 !
-      use m_tave_sph_ene_spectr
-      use count_monitor_time_series
+      use t_tave_sph_layer_mean
+      use tave_sdev_sph_layer_mean
 !
       character(1,C_char), intent(in) :: cname(*)
       real(C_double), Value :: cstart, cend
@@ -108,8 +107,8 @@
       write(fname_org,'(a)') trim(c_to_fstring(cname))
       start_time = cstart
       end_time = cend
-      call time_ave_sdev_sph_spectr                                     &
-     &   (fname_org, spectr_off, volume_off, start_time, end_time)
+      call time_ave_sdev_sph_layer_mean(fname_org,                      &
+     &                                  start_time, end_time)
 !
       time_ave_sdev_sph_layer_pwr_f = 0
       end function time_ave_sdev_sph_layer_pwr_f
@@ -119,8 +118,8 @@
       integer(c_int) function                                           &
     &     time_ave_sdev_sph_layer_spec_f(cname, cstart, cend) Bind(C)
 !
-      use m_tave_sph_ene_spectr
-      use count_monitor_time_series
+      use t_tave_sph_layer_spectr
+      use tave_sdev_sph_layer_spec
 !
       character(1,C_char), intent(in) :: cname(*)
       real(C_double), Value :: cstart, cend
@@ -131,31 +130,28 @@
       write(fname_org,'(a)') trim(c_to_fstring(cname))
       start_time = cstart
       end_time = cend
-      call time_ave_sdev_sph_spectr                                     &
-     &   (fname_org, spectr_on, volume_off, start_time, end_time)
+      call time_ave_sdev_sph_layer_spec(fname_org,                      &
+     &                                  start_time, end_time)
 !
       time_ave_sdev_sph_layer_spec_f = 0
       end function time_ave_sdev_sph_layer_spec_f
 !
 ! -------------------------------------------------------------------
 !
-      integer(c_int) function read_tave_sdev_sph_vol_spec_f             &
-    &              (tave_prefix_c, sdev_prefix_c) Bind(C)
+      integer(c_int) function                                           &
+    &          read_tave_sdev_sph_vol_spec_f(monitor_prefix_c) Bind(C)
 !
-      use m_tave_sph_ene_spectr
-      use count_monitor_time_series
+      use t_tave_sph_volume_spectr
+      use tave_sdev_sph_volume_spec
 !
-      character(1,C_char), intent(in) :: tave_prefix_c(*)
-      character(1,C_char), intent(in) :: sdev_prefix_c(*)
+      character(1,C_char), intent(in) :: monitor_prefix_c(*)
 !
-      character(len=kchara) :: tave_file_name, sdev_file_name
+      character(len=kchara) :: monitor_prefix
       integer(kind = kint) :: l_truncation
 !
-      write(tave_file_name,'(a)') trim(c_to_fstring(tave_prefix_c))
-      write(sdev_file_name,'(a)') trim(c_to_fstring(sdev_prefix_c))
-      call read_time_ave_sdev_sph_spectr                                &
-     &   (tave_file_name, sdev_file_name,                               &
-     &    spectr_on, volume_on, tave_sph_IN, sdev_sph_IN)
+      write(monitor_prefix,'(a)') trim(c_to_fstring(monitor_prefix_c))
+      call read_time_ave_sph_vol_spec(monitor_prefix, sph_lbl_IN1,      &
+     &                                tave_sph_IN, WK_tave_s)
       read_tave_sdev_sph_vol_spec_f = tave_sph_IN%ltr_sph
 !
       end function read_tave_sdev_sph_vol_spec_f
@@ -196,9 +192,9 @@
       end if
 !
       tave_spectr(1:l_truncation+1)                                     &
-     &           = tave_sph_IN%spectr_IO(id_pick,0:l_truncation,1)
+     &           = tave_spectr(id_pick,0:l_truncation,1)
       sdev_spectr(1:l_truncation+1)                                     &
-     &           = sdev_sph_IN%spectr_IO(id_pick,0:l_truncation,1)
+     &           = sdev_spectr(id_pick,0:l_truncation,1)
 !
 !      write(*,*) 'In Fortran: ', trim(draw_name), id_pick
 !      do i = 0, l_truncation

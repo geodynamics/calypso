@@ -8,7 +8,7 @@ bcast_4_time_step_ctl.o: $(COMMDIR)/bcast_4_time_step_ctl.f90 m_precision.o t_ct
 	$(F90) -c $(F90OPTFLAGS) $<
 bcast_control_arrays.o: $(COMMDIR)/bcast_control_arrays.f90 m_precision.o m_constants.o calypso_mpi.o t_control_array_real.o calypso_mpi_real.o calypso_mpi_int.o t_control_array_integer.o t_control_array_character.o calypso_mpi_char.o transfer_to_long_integers.o t_control_array_real2.o t_control_array_real3.o t_control_array_integer2.o t_control_array_integer3.o t_control_array_character3.o t_control_array_charaint3.o t_control_array_character2.o t_control_array_charareal.o t_control_array_charaint.o t_control_array_charareal2.o t_control_array_chara2real.o t_control_array_intcharreal.o t_control_array_intreal.o t_control_array_int2real.o t_control_array_int2real2.o
 	$(F90) -c $(F90OPTFLAGS) $<
-bcast_file_IO_parameter.o: $(COMMDIR)/bcast_file_IO_parameter.f90 m_precision.o m_constants.o t_file_IO_parameter.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o
+bcast_file_IO_parameter.o: $(COMMDIR)/bcast_file_IO_parameter.f90 m_precision.o m_constants.o t_file_IO_parameter.o calypso_mpi_int.o calypso_mpi_char.o transfer_to_long_integers.o calypso_mpi_logical.o
 	$(F90) -c $(F90OPTFLAGS) $<
 calypso_SR.o: $(COMMDIR)/calypso_SR.f90 m_precision.o m_constants.o calypso_mpi.o t_solver_SR.o calypso_SR_core.o set_to_send_buffer.o select_copy_from_recv.o set_to_send_buf_tri.o select_copy_from_recv_tri.o
 	$(F90) -c $(F90OPTFLAGS) $<

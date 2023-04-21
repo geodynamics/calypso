@@ -48,7 +48,7 @@
 !
       use MPI_domain_data_IO_b
       use MPI_node_geometry_IO_b
-      use MPI_element_data_IO_b
+      use MPI_element_connect_IO_b
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(mesh_geometry), intent(in) :: mesh_IO
@@ -107,7 +107,7 @@
 !
       use m_error_IDs
       use MPI_node_geometry_IO_b
-      use MPI_element_data_IO_b
+      use MPI_element_connect_IO_b
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(mesh_geometry), intent(inout) :: mesh_IO
@@ -127,7 +127,8 @@
       subroutine mpi_read_geometry_data_b(IO_param, mesh_IO)
 !
       use m_error_IDs
-      use MPI_element_data_IO_b
+      use MPI_domain_data_IO_b
+      use MPI_element_connect_IO_b
 !
       type(calypso_MPI_IO_params), intent(inout) :: IO_param
       type(mesh_geometry), intent(inout) :: mesh_IO

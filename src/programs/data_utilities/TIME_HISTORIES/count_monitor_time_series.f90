@@ -14,11 +14,17 @@
 !!      subroutine s_count_monitor_time_series                          &
 !!     &         (flag_log, FPz_f, id_stream, flag_gzip, nitem_snap,    &
 !!     &          start_time, end_time, true_start, true_end,           &
-!!     &          num_count, zbuf)
+!!     &          num_count, icou_skip, zbuf)
+!!      subroutine s_count_monitor_time_start                           &
+!!     &         (flag_log, FPz_f, id_stream, flag_gzip, nitem_snap,    &
+!!     &          start_time, icou_skip, zbuf)
+!!      subroutine s_skip_monitor_time_series                           &
+!!     &         (flag_log, FPz_f, id_stream, flag_gzip, nitem_snap,    &
+!!     &          icou_skip, zbuf)
 !!        logical, intent(in) :: flag_log
 !!        integer(kind = kint), intent(in) :: id_file, nitem_snap
 !!        real(kind = kreal), intent(in) :: start_time, end_time
-!!        integer(kind = kint), intent(inout) :: num_count
+!!        integer(kind = kint), intent(inout) :: num_count, icou_skip
 !!        real(kind = kreal), intent(inout) :: true_start, true_end
 !!      subroutine read_ascii_sph_spectr_time(id_file, nitem_snap,      &
 !!     &                                      i_step, time, ierr)
@@ -83,7 +89,7 @@
       subroutine s_count_monitor_time_series                            &
      &         (flag_log, FPz_f, id_stream, flag_gzip, nitem_snap,      &
      &          start_time, end_time, true_start, true_end,             &
-     &          num_count, zbuf)
+     &          num_count, icou_skip, zbuf)
 !
       use select_gz_stream_file_IO
 !
@@ -93,7 +99,7 @@
       integer(kind = kint), intent(in) :: id_stream, nitem_snap
       real(kind = kreal), intent(in) :: start_time, end_time
 !
-      integer(kind = kint), intent(inout) :: num_count
+      integer(kind = kint), intent(inout) :: num_count, icou_skip
       real(kind = kreal), intent(inout) :: true_start, true_end
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
@@ -101,7 +107,8 @@
       real(kind = kreal) :: time
 !
 !
-      num_count = 0
+      icou_skip = 0
+      num_count =  0
       true_start = start_time
       true_end = true_start
       do
@@ -114,13 +121,15 @@
 !
         if(time .ge. start_time) then
           if(num_count .eq. 0) true_start = time
-!
           num_count = num_count + 1
-          if(flag_log) then
-            write(*,'(69a1,a5,i12,a4,1pe16.8e3,a20,i12)',advance="NO")  &
-     &        (char(8),i=1,69), 'step ', i_step,                        &
-     &        ' at ', time, ' is read. count is  ', num_count
-          end if
+        else
+          icou_skip = icou_skip + 1
+        end if
+!
+        if(flag_log) then
+          write(*,'(65a1,a6,i12,a8,f12.6,a15,i12)',advance="NO")        &
+     &       (char(8),i=1,65), 'step= ', i_step, ', time= ', time,      &
+     &       ', Read Count:  ', num_count
         end if
 !
         if(time .ge. end_time) exit
@@ -130,6 +139,89 @@
       true_end = time
 !
       end subroutine s_count_monitor_time_series
+!
+! -----------------------------------------------------------------------
+!
+      subroutine s_count_monitor_time_start                             &
+     &         (flag_log, FPz_f, id_stream, flag_gzip, nitem_snap,      &
+     &          start_time, icou_skip, zbuf)
+!
+      use select_gz_stream_file_IO
+!
+      logical, intent(in) :: flag_log
+      character, pointer, intent(in) :: FPz_f
+      logical, intent(in) :: flag_gzip
+      integer(kind = kint), intent(in) :: id_stream, nitem_snap
+      real(kind = kreal), intent(in) :: start_time
+!
+      integer(kind = kint), intent(inout) :: icou_skip
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer(kind = kint) :: i_step, ierr, i
+      real(kind = kreal) :: time
+!
+!
+      icou_skip = 0
+      do
+        do i = 1, nitem_snap
+          call sel_read_line_gz_stream(FPz_f, id_stream,                &
+     &                                 flag_gzip, zbuf)
+          if(zbuf%len_used .le. 0) go to 99
+        end do
+        read(zbuf%fixbuf(1),*,err=99) i_step, time
+!
+        if(time .ge. start_time) exit
+        icou_skip = icou_skip + 1
+!
+        if(flag_log) then
+          write(*,'(65a1,a6,i12,a8,f12.6,a15,i12)',advance="NO")        &
+     &       (char(8),i=1,65), 'step= ', i_step, ', time= ', time,      &
+     &       ', Read Count:  ', icou_skip
+        end if
+      end do
+  99  continue
+      if(flag_log) write(*,*)
+!
+      end subroutine s_count_monitor_time_start
+!
+! -----------------------------------------------------------------------
+!
+      subroutine s_skip_monitor_time_series                             &
+     &         (flag_log, FPz_f, id_stream, flag_gzip, nitem_snap,      &
+     &          icou_skip, zbuf)
+!
+      use select_gz_stream_file_IO
+!
+      logical, intent(in) :: flag_log
+      character, pointer, intent(in) :: FPz_f
+      logical, intent(in) :: flag_gzip
+      integer(kind = kint), intent(in) :: id_stream, nitem_snap
+      integer(kind = kint), intent(in) :: icou_skip
+!
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+      integer(kind = kint) :: i_step, i, icou
+      real(kind = kreal) :: time
+!
+!
+      do icou = 1, icou_skip
+        do i = 1, nitem_snap
+          call sel_read_line_gz_stream(FPz_f, id_stream,                &
+     &                                 flag_gzip, zbuf)
+          if(zbuf%len_used .le. 0) go to 99
+        end do
+        read(zbuf%fixbuf(1),*,err=99) i_step, time
+!
+        if(flag_log) then
+          write(*,'(65a1,a6,i12,a8,f12.6,a15,i12)',advance="NO")        &
+     &       (char(8),i=1,65), 'step= ', i_step, ', time= ', time,      &
+     &       ', Skip Count:  ', icou
+        end if
+      end do
+  99  continue
+      if(flag_log) write(*,*)
+!
+      end subroutine s_skip_monitor_time_series
 !
 ! -----------------------------------------------------------------------
 !

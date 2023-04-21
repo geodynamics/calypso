@@ -183,6 +183,14 @@
      &      fld_rtp(1,b_trns_base%i_current),                           &
      &      fld_rtp(1,b_trns_base%i_magne),                             &
      &      frc_rtp(1,f_trns_frc%i_lorentz) )
+!
+        if(b_trns_base%i_back_B .gt. 0) then
+          call add_cross_prod_w_coef_smp                                &
+     &       (nnod, MHD_prop%fl_prop%coef_lor,                          &
+     &        fld_rtp(1,b_trns_base%i_current),                         &
+     &        fld_rtp(1,b_trns_base%i_back_B),                          &
+     &        frc_rtp(1,f_trns_frc%i_lorentz) )
+        end if
       end if
 !
 !
@@ -192,6 +200,14 @@
      &      fld_rtp(1,b_trns_base%i_velo),                              &
      &      fld_rtp(1,b_trns_base%i_magne),                             &
      &      frc_rtp(1,f_trns_frc%i_vp_induct) )
+!
+        if(b_trns_base%i_back_B .gt. 0) then
+          call add_cross_prod_w_coef_smp                                &
+     &       (nnod, MHD_prop%cd_prop%coef_induct,                       &
+     &        fld_rtp(1,b_trns_base%i_velo),                            &
+     &        fld_rtp(1,b_trns_base%i_back_B),                          &
+     &        frc_rtp(1,f_trns_frc%i_vp_induct) )
+        end if
       end if
 !
 !
@@ -248,6 +264,14 @@
      &      fld_rtp(1,b_trns_base_1%i_current),                         &
      &      fld_rtp(1,b_trns_base_2%i_magne),                           &
      &      frc_rtp(1,f_trns_frc%i_lorentz) )
+!
+        if(b_trns_base_2%i_back_B .gt. 0) then
+          call add_cross_prod_w_coef_smp                                &
+     &       (nnod, MHD_prop%fl_prop%coef_lor,                          &
+     &        fld_rtp(1,b_trns_base_1%i_current),                       &
+     &        fld_rtp(1,b_trns_base_2%i_back_B),                        &
+     &        frc_rtp(1,f_trns_frc%i_lorentz) )
+        end if
       end if
 !
 !
@@ -257,6 +281,14 @@
      &      fld_rtp(1,b_trns_base_1%i_velo),                            &
      &      fld_rtp(1,b_trns_base_2%i_magne),                           &
      &      frc_rtp(1,f_trns_frc%i_vp_induct) )
+!
+        if(b_trns_base_2%i_back_B .gt. 0) then
+          call add_cross_prod_w_coef_smp                                &
+     &       (nnod, MHD_prop%cd_prop%coef_induct,                       &
+     &        fld_rtp(1,b_trns_base_1%i_velo),                          &
+     &        fld_rtp(1,b_trns_base_2%i_back_B),                        &
+     &        frc_rtp(1,f_trns_frc%i_vp_induct) )
+        end if
       end if
 !
 !

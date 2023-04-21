@@ -16,7 +16,7 @@
 !!        type(energy_label_param), intent(in) :: ene_labels
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(sph_vol_mean_squares), intent(in) :: v_pwr
-!!        type(read_sph_spectr_params), intent(inout) :: sph_OUT
+!!        type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !!      subroutine dup_sph_layer_spectr_header(mode_label,              &
 !!     &          ltr, nlayer_ICB, nlayer_CMB, ene_labels, pwr, sph_OUT)
 !!        character(len = kchara), intent(in) :: mode_label
@@ -24,7 +24,7 @@
 !!        integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
 !!        type(energy_label_param), intent(in) :: ene_labels
 !!        type(sph_mean_squares), intent(in) :: pwr
-!!        type(read_sph_spectr_params), intent(inout) :: sph_OUT
+!!        type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !!@endverbatim
 !!
 !!@n @param istep         time step number
@@ -65,7 +65,7 @@
       type(sph_rj_grid), intent(in) :: sph_rj
       type(sph_vol_mean_squares), intent(in) :: v_pwr
 !
-      type(read_sph_spectr_params), intent(inout) :: sph_OUT
+      type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !
       integer(kind = kint) :: i, icou
 !
@@ -124,7 +124,7 @@
       type(energy_label_param), intent(in) :: ene_labels
       type(sph_mean_squares), intent(in) :: pwr
 !
-      type(read_sph_spectr_params), intent(inout) :: sph_OUT
+      type(read_sph_spectr_data), intent(inout) :: sph_OUT
       integer(kind = kint) :: i, icou
 !
 !

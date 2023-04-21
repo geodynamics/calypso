@@ -1,130 +1,163 @@
-!>@file   comm_table_IO.f90
-!!@brief  module comm_table_IO
+!>@file  comm_table_IO.f90
+!!      module comm_table_IO
 !!
-!!@author H. Matsui
-!!@date Programmed in July, 2007
+!!@author  H. Matsui
+!!@date Programmed in Oct., 2006
 !
-!>@brief  Routines for communcation table IO
+!>@brief Data IO routines for element data
 !!
 !!@verbatim
-!!      subroutine read_send_recv_item(id_file, ntot_sr, inod_sr)
-!!      subroutine read_send_recv_work(id_file, ntot_sr, nwork,         &
-!!     &          inod_sr, idx_work)
-!!      subroutine write_send_recv_data(id_file, num_sr, ntot_sr,       &
-!!     &          istack_sr, inod_sr)
-!!      subroutine write_send_recv_work(id_file, num_sr, ntot_sr, nwork,&
-!!     &          istack_sr, inod_sr, idx_work)
+!!      subroutine read_comm_table(id_file, id_rank, comm_IO, ierr)
+!!        integer (kind = kint), intent(in) :: id_file
+!!        integer, intent(in) :: id_rank
+!!        type(communication_table), intent(inout) :: comm_IO
+!!        integer(kind = kint), intent(inout) :: ierr
+!!      subroutine write_comm_table(id_file, id_rank, comm_IO)
+!!        integer (kind = kint), intent(in) :: id_file
+!!        integer, intent(in) :: id_rank
+!!        type(communication_table), intent(in) :: comm_IO
+!!
+!!      subroutine read_calypso_comm_tbl                                &
+!!     &         (id_file, id_rank, import_IO, export_IO, ierr)
+!!        integer (kind = kint), intent(in) :: id_file
+!!        integer, intent(in) :: id_rank
+!!        type(communication_table), intent(inout) :: import_IO
+!!        type(communication_table), intent(inout) :: export_IO
+!!        integer(kind = kint), intent(inout) :: ierr
+!!      subroutine write_calypso_comm_tbl                               &
+!!     &         (id_file, id_rank, import_IO, export_IO)
+!!        integer (kind = kint), intent(in) :: id_file
+!!        integer, intent(in) :: id_rank
+!!        type(communication_table), intent(in) :: import_IO, export_IO
 !!@endverbatim
 !
       module comm_table_IO
 !
       use m_precision
 !
+      use t_geometry_data
+      use t_read_mesh_data
+      use t_comm_table
+      use t_surf_edge_IO
+      use m_fem_surface_labels
+!
       implicit none
 !
-      character(len=255) :: character_4_read = ''
-      private :: character_4_read
+!------------------------------------------------------------------
 !
-! -----------------------------------------------------------------------
+       contains
 !
-      contains
+!------------------------------------------------------------------
 !
-! -----------------------------------------------------------------------
+      subroutine read_comm_table(id_file, id_rank, comm_IO, ierr)
 !
-      subroutine read_send_recv_item(id_file, ntot_sr, inod_sr)
+      use m_fem_mesh_labels
+      use domain_data_IO
 !
-      use skip_comment_f
-!
-      integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: ntot_sr
-      integer(kind = kint), intent(inout) :: inod_sr(ntot_sr)
-!
-      integer(kind = kint) :: i
-!
-      call skip_comment(character_4_read, id_file)
-      read(character_4_read,*) inod_sr(1)
-      do i = 2, ntot_sr
-        read(id_file,*) inod_sr(i)
-      end do
-!
-      end subroutine read_send_recv_item
-!
-! -----------------------------------------------------------------------
-!
-      subroutine read_send_recv_work(id_file, ntot_sr, nwork,           &
-     &          inod_sr, idx_work)
-!
-      use skip_comment_f
-!
-      integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: ntot_sr, nwork
-      integer(kind = kint), intent(inout) :: inod_sr(ntot_sr)
-      integer(kind = kint), intent(inout) :: idx_work(ntot_sr,nwork)
-!
-      integer(kind = kint) :: i
+      integer (kind = kint), intent(in) :: id_file
+      integer, intent(in) :: id_rank
+      type(communication_table), intent(inout) :: comm_IO
+      integer(kind = kint), intent(inout) :: ierr
 !
 !
-      call skip_comment(character_4_read, id_file)
-      read(character_4_read,*) inod_sr(1), idx_work(1,1:nwork)
-      do i = 2, ntot_sr
-        read(id_file,*) inod_sr(i), idx_work(i,1:nwork)
-      end do
+!      write(id_file,'(a)') '!' 
+!      write(id_file,'(a)') '!  element position '
+!      write(id_file,'(a)') '!  and communication table '
+!      write(id_file,'(a)') '!' 
+!      write(id_file,'(a)', advance='NO') hd_fem_para()
 !
-      end subroutine read_send_recv_work
+      call read_domain_info(id_file, id_rank, comm_IO, ierr)
+      if(ierr .ne. 0) return
 !
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
+!      write(id_file,'(a)') '!'
+!      write(id_file,'(a)') '! 2.import / export information '
+!      write(id_file,'(a)') '! 2.1 element ID for import '
+!      write(id_file,'(a)') '!'
 !
-      subroutine write_send_recv_data(id_file, num_sr, ntot_sr,         &
-     &          istack_sr, inod_sr)
+      call read_import_data(id_file, comm_IO)
 !
-      integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: num_sr, ntot_sr
-      integer(kind = kint), intent(in) :: istack_sr(0:num_sr)
-      integer(kind = kint), intent(in) :: inod_sr(ntot_sr)
+!      write(id_file,'(a)') '!'
+!      write(id_file,'(a)') '! 2.2 element ID for export '
+!      write(id_file,'(a)') '! '
 !
-      integer(kind = kint) :: i
+      call read_export_data(id_file, comm_IO)
 !
-      if(num_sr .gt. 0) then
-        write(id_file,'(8i16)') istack_sr(1:num_sr)
-        if(ntot_sr .gt. 0) then
-          do i = 1, ntot_sr
-            write(id_file,'(i16)') inod_sr(i)
-          end do
-        else
-          write(id_file,'(a)')
-        end if
-      else
-        write(id_file,'(a)')
-      end if
+      end subroutine read_comm_table
 !
-      end subroutine write_send_recv_data
+!------------------------------------------------------------------
 !
-! -----------------------------------------------------------------------
+      subroutine write_comm_table(id_file, id_rank, comm_IO)
 !
-      subroutine write_send_recv_work(id_file, num_sr, ntot_sr, nwork,  &
-     &          istack_sr, inod_sr, idx_work)
+      use m_fem_mesh_labels
+      use domain_data_IO
 !
-      integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: num_sr, ntot_sr, nwork
-      integer(kind = kint), intent(in) :: istack_sr(0:num_sr)
-      integer(kind = kint), intent(in) :: inod_sr(ntot_sr)
-      integer(kind = kint), intent(in) :: idx_work(ntot_sr,nwork)
-!
-      integer(kind = kint) :: i
+      integer (kind = kint), intent(in) :: id_file
+      integer, intent(in) :: id_rank
+      type(communication_table), intent(in) :: comm_IO
 !
 !
-      if (num_sr .gt. 0) then
-        write(id_file,'(8i16)') istack_sr(1:num_sr)
-        do i = 1, ntot_sr
-          write(id_file,'(20i16)') inod_sr(i), idx_work(i,1:nwork)
-        end do
-      else
-        write(id_file,'(a)')
-      end if
+      write(id_file,'(a)', advance='NO') hd_fem_para()
+      call write_domain_info(id_file, id_rank, comm_IO)
 !
-      end subroutine write_send_recv_work
+      write(id_file,'(a)', advance='NO') hd_ecomm_import()
+      call write_import_data(id_file, comm_IO)
 !
-! -----------------------------------------------------------------------
+      write(id_file,'(a)', advance='NO') hd_ecomm_export()
+      call write_export_data(id_file, comm_IO)
+!
+      end subroutine write_comm_table
+!
+!------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      subroutine read_calypso_comm_tbl                                  &
+     &         (id_file, id_rank, import_IO, export_IO, ierr)
+!
+      use m_fem_mesh_labels
+      use domain_data_IO
+!
+      integer, intent(in) :: id_rank
+      integer (kind = kint), intent(in) :: id_file
+      type(communication_table), intent(inout) :: import_IO
+      type(communication_table), intent(inout) :: export_IO
+      integer(kind = kint), intent(inout) :: ierr
+!
+!
+      call read_domain_info(id_file, id_rank, import_IO, ierr)
+      if(ierr .ne. 0) return
+      call read_import_data(id_file, import_IO)
+!
+      call read_domain_info(id_file, id_rank, export_IO, ierr)
+      if(ierr .ne. 0) return
+      call read_export_data(id_file, export_IO)
+!
+      end subroutine read_calypso_comm_tbl
+!
+!------------------------------------------------------------------
+!
+      subroutine write_calypso_comm_tbl                                 &
+     &         (id_file, id_rank, import_IO, export_IO)
+!
+      use m_fem_mesh_labels
+      use domain_data_IO
+!
+      integer (kind = kint), intent(in) :: id_file
+      integer, intent(in) :: id_rank
+      type(communication_table), intent(in) :: import_IO, export_IO
+!
+!
+      write(id_file,'(a)', advance='NO') hd_fem_para()
+      call write_domain_info(id_file, id_rank, import_IO)
+      write(id_file,'(a)', advance='NO') hd_ecomm_import()
+      call write_import_data(id_file, import_IO)
+!
+      write(id_file,'(a)', advance='NO') hd_fem_para()
+      call write_domain_info(id_file, id_rank, export_IO)
+      write(id_file,'(a)', advance='NO') hd_ecomm_export()
+      call write_export_data(id_file, export_IO)
+!
+      end subroutine write_calypso_comm_tbl
+!
+!------------------------------------------------------------------
 !
       end module comm_table_IO

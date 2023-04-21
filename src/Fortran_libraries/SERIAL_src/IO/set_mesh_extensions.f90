@@ -19,24 +19,6 @@
 !!
 !!      character(len=kchara) function add_ksm_extension(file_head)
 !!                put ".ksm" at the end
-!!
-!!      character(len=kchara) function add_itp_extension(file_head)
-!!                put ".itp" at the end
-!!      character(len=kchara) function add_itb_extension(file_head)
-!!                put ".itb" at the end
-!!
-!!      character(len=kchara) function add_gel_extension(file_head)
-!!                put ".gel" at the end
-!!      character(len=kchara) function add_gsf_extension(file_head)
-!!                put ".gsf" at the end
-!!      character(len=kchara) function add_ged_extension(file_head)
-!!                put ".ged" at the end
-!!      character(len=kchara) function add_elb_extension(file_head)
-!!                put ".elb" at the end
-!!      character(len=kchara) function add_sfb_extension(file_head)
-!!                put ".sfb" at the end
-!!      character(len=kchara) function add_edb_extension(file_head)
-!!                put ".edb" at the end
 !!@endverbatim
 !!
 !!@n @param dir_file_name    file name (header) including directory name
@@ -58,16 +40,6 @@
       character(len=3), parameter, private :: gfb_ext = "gfb"
 !
       character(len=3), parameter, private :: ksm_ext = "ksm"
-!
-      character(len=3), parameter, private :: itp_ext = "itp"
-      character(len=3), parameter, private :: itb_ext = "itb"
-!
-      character(len=3), parameter, private :: gel_ext = "gel"
-      character(len=3), parameter, private :: gsf_ext = "gsf"
-      character(len=3), parameter, private :: ged_ext = "ged"
-      character(len=3), parameter, private :: elb_ext = "elb"
-      character(len=3), parameter, private :: sfb_ext = "sfb"
-      character(len=3), parameter, private :: edb_ext = "edb"
 !
 !-----------------------------------------------------------------------
 !
@@ -124,88 +96,6 @@
       add_ksm_extension = add_3chara_extension(file_head, ksm_ext)
 !
       end function add_ksm_extension
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      character(len=kchara) function add_itp_extension(file_head)
-!
-      character(len=kchara), intent(in) :: file_head
-!
-      add_itp_extension = add_3chara_extension(file_head, itp_ext)
-!
-      end function add_itp_extension
-!
-!-----------------------------------------------------------------------
-!
-      character(len=kchara) function add_itb_extension(file_head)
-!
-      character(len=kchara), intent(in) :: file_head
-!
-      add_itb_extension = add_3chara_extension(file_head, itb_ext)
-!
-      end function add_itb_extension
-!
-!-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      character(len=kchara) function add_gel_extension(file_head)
-!
-      character(len=kchara), intent(in) :: file_head
-!
-      add_gel_extension = add_3chara_extension(file_head, gel_ext)
-!
-      end function add_gel_extension
-!
-!-----------------------------------------------------------------------
-!
-      character(len=kchara) function add_gsf_extension(file_head)
-!
-      character(len=kchara), intent(in) :: file_head
-!
-      add_gsf_extension = add_3chara_extension(file_head, gsf_ext)
-!
-      end function add_gsf_extension
-!
-!-----------------------------------------------------------------------
-!
-      character(len=kchara) function add_ged_extension(file_head)
-!
-      character(len=kchara), intent(in) :: file_head
-!
-      add_ged_extension = add_3chara_extension(file_head, ged_ext)
-!
-      end function add_ged_extension
-!
-!-----------------------------------------------------------------------
-!
-      character(len=kchara) function add_elb_extension(file_head)
-!
-      character(len=kchara), intent(in) :: file_head
-!
-      add_elb_extension = add_3chara_extension(file_head, elb_ext)
-!
-      end function add_elb_extension
-!
-!-----------------------------------------------------------------------
-!
-      character(len=kchara) function add_sfb_extension(file_head)
-!
-      character(len=kchara), intent(in) :: file_head
-!
-      add_sfb_extension = add_3chara_extension(file_head, sfb_ext)
-!
-      end function add_sfb_extension
-!
-!-----------------------------------------------------------------------
-!
-      character(len=kchara) function add_edb_extension(file_head)
-!
-      character(len=kchara), intent(in) :: file_head
-!
-      add_edb_extension = add_3chara_extension(file_head, edb_ext)
-!
-      end function add_edb_extension
 !
 !-----------------------------------------------------------------------
 !

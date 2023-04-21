@@ -21,10 +21,10 @@
 !!        type(communication_table), intent(in) :: comm_IO
 !!
 !!      subroutine gz_mpi_read_int_stack(IO_param, num, istack, ntot)
-!!      subroutine gz_mpi_read_comm_table                               &
+!!      subroutine gz_mpi_read_int_items                                &
 !!     &         (IO_param, ncolumn, num, int_dat)
 !!      subroutine gz_mpi_write_int_stack(IO_param, num, istack)
-!!      subroutine gz_mpi_write_comm_table                              &
+!!      subroutine gz_mpi_write_int_items                               &
 !!     &         (IO_param, ncolumn, num, int_dat)
 !!        type(calypso_MPI_IO_params), intent(inout) :: IO_param
 !!@endverbatim
@@ -111,7 +111,7 @@
       call gz_mpi_read_num_of_data(IO_param, comm_IO%ntot_import)
       call alloc_import_item(comm_IO)
 !
-      call gz_mpi_read_comm_table                                       &
+      call gz_mpi_read_int_items                                        &
      &   (IO_param, ione, comm_IO%ntot_import, comm_IO%item_import)
 !
       end subroutine gz_mpi_read_import_data
@@ -135,7 +135,7 @@
       call gz_mpi_read_num_of_data(IO_param, comm_IO%ntot_import)
       call alloc_export_item(comm_IO)
 !
-      call gz_mpi_read_comm_table                                       &
+      call gz_mpi_read_int_items                                        &
      &   (IO_param, ione, comm_IO%ntot_export, comm_IO%item_export)
 !
       end subroutine gz_mpi_read_export_data
@@ -172,7 +172,7 @@
       call gz_mpi_write_int_stack                                       &
      &   (IO_param, comm_IO%num_neib, comm_IO%istack_import)
 !
-      call gz_mpi_write_comm_table                                      &
+      call gz_mpi_write_int_items                                       &
      &   (IO_param, ione, comm_IO%ntot_import, comm_IO%item_import)
 !
       end subroutine gz_mpi_write_import_data
@@ -188,7 +188,7 @@
       call gz_mpi_write_int_stack                                       &
      &   (IO_param, comm_IO%num_neib, comm_IO%istack_export)
 !
-      call gz_mpi_write_comm_table                                      &
+      call gz_mpi_write_int_items                                       &
      &   (IO_param, ione, comm_IO%ntot_export, comm_IO%item_export)
 !
       end subroutine gz_mpi_write_export_data
@@ -274,7 +274,7 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_mpi_read_comm_table                                 &
+      subroutine gz_mpi_read_int_items                                  &
      &         (IO_param, ncolumn, num, int_dat)
 !
       use zlib_cvt_ascii_comm_tbl
@@ -312,11 +312,11 @@
       num64 = num
       call infleate_comm_table(ncolumn, num64, int_dat, zbuf)
 !
-      end subroutine gz_mpi_read_comm_table
+      end subroutine gz_mpi_read_int_items
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_mpi_write_comm_table                                &
+      subroutine gz_mpi_write_int_items                                 &
      &         (IO_param, ncolumn, num, int_dat)
 !
       use zlib_cvt_ascii_comm_tbl
@@ -347,7 +347,7 @@
      &                  + IO_param%istack_merged(IO_param%nprocs_in)
       call dealloc_zip_buffer(zbuf)
 !
-      end subroutine gz_mpi_write_comm_table
+      end subroutine gz_mpi_write_int_items
 !
 ! -----------------------------------------------------------------------
 !

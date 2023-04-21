@@ -11,7 +11,7 @@
 !!      subroutine alloc_comm_table_item(comm_tbl)
 !!      subroutine dealloc_comm_table(comm_tbl)
 !!      subroutine dealloc_import_table(comm_tbl)
-!!      subroutine dealloc_comm_tbl_num(comm_tbl)
+!!      subroutine dealloc_export_table(comm_tbl)
 !!
 !!      subroutine empty_comm_table(comm_tbl)
 !!      subroutine copy_comm_tbl_type(comm_org, comm_new)
@@ -73,8 +73,6 @@
         integer(kind = kint), pointer :: item_export(:)
       end type communication_table
 !
-      private :: dealloc_comm_tbl_item
-      private :: dealloc_import_num,  dealloc_export_num
       private :: dealloc_import_item, dealloc_export_item
 !
 !------------------------------------------------------------------
@@ -113,8 +111,9 @@
       type(communication_table), intent(inout) :: comm_tbl
 !
 !
-      call dealloc_comm_tbl_item(comm_tbl)
-      call dealloc_comm_tbl_num(comm_tbl)
+      call dealloc_import_table(comm_tbl)
+      call dealloc_export_table(comm_tbl)
+      call dealloc_neib_id(comm_tbl)
 !
       end subroutine dealloc_comm_table
 !
@@ -127,34 +126,18 @@
       call dealloc_import_num(comm_tbl)
       call dealloc_import_item(comm_tbl)
 !
-      call dealloc_neib_id(comm_tbl)
-!
       end subroutine dealloc_import_table
 !
 !------------------------------------------------------------------
 !
-      subroutine dealloc_comm_tbl_num(comm_tbl)
+      subroutine dealloc_export_table(comm_tbl)
 !
       type(communication_table), intent(inout) :: comm_tbl
 !
-!
-      call dealloc_neib_id(comm_tbl)
-      call dealloc_import_num(comm_tbl)
       call dealloc_export_num(comm_tbl)
-!
-      end subroutine dealloc_comm_tbl_num
-!
-!------------------------------------------------------------------
-!
-      subroutine dealloc_comm_tbl_item(comm_tbl)
-!
-      type(communication_table), intent(inout) :: comm_tbl
-!
-!
-      call dealloc_import_item(comm_tbl)
       call dealloc_export_item(comm_tbl)
 !
-      end subroutine dealloc_comm_tbl_item
+      end subroutine dealloc_export_table
 !
 !------------------------------------------------------------------
 !------------------------------------------------------------------

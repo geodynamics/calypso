@@ -109,11 +109,11 @@
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
-!   ----  lead rottion of buoyancies
+!   ----  lead rotation of buoyancies
       if(SPH_model%MHD_prop%fl_prop%iflag_scheme                        &
      &                         .gt. id_no_evolution) then
-      if(iflag_debug.gt.0) write(*,*) 'sel_rot_self_buoyancy_sph'
-        call sel_rot_self_buoyancy_sph(SPH_MHD%sph%sph_rj,              &
+      if(iflag_debug.gt.0) write(*,*) 'sel_rot_buoyancy_sph_MHD'
+        call sel_rot_buoyancy_sph_MHD(SPH_MHD%sph%sph_rj,               &
      &      SPH_MHD%ipol%base, SPH_MHD%ipol%rot_forces,                 &
      &      SPH_model%MHD_prop%fl_prop, SPH_model%sph_MHD_bc%sph_bc_U,  &
      &      SPH_MHD%fld)
@@ -243,10 +243,10 @@
       type(send_recv_status), intent(inout) :: SR_sig
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
-!   ----  lead rottion of buoyancies
+!   ----  Rotation of buoyancies
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
-        if(iflag_debug.gt.0) write(*,*) 'sel_rot_self_buoyancy_sph'
-        call sel_rot_self_buoyancy_sph                                  &
+        if(iflag_debug.gt.0) write(*,*) 'sel_rot_buoyancy_sph_MHD'
+        call sel_rot_buoyancy_sph_MHD                                   &
      &     (sph%sph_rj, ipol%base, ipol%rot_forces,                     &
      &      MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U, rj_fld)
       end if

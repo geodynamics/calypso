@@ -19,7 +19,7 @@ ADD_EXECUTABLE(sph_add_initial_field ${SRC_SPH_ADD_INITIAL})
 TARGET_LINK_LIBRARIES(sph_add_initial_field calypso calypso_c fftpack.5d)
 
 
-SET(SRC_TAVE_SPH_ENE_SPEC TIME_HISTORIES/t_average_sph_ene_spec.f90 TIME_HISTORIES/t_read_sph_spectra.f90 TIME_HISTORIES/m_tave_sph_ene_spectr.f90 TIME_HISTORIES/sph_mean_square_IO_select.f90 TIME_HISTORIES/write_sph_monitor_data.f90 TIME_HISTORIES/cal_tave_sph_ene_spectr.f90)
+SET(SRC_TAVE_SPH_ENE_SPEC TIME_HISTORIES/t_average_sph_ene_spec.f90 TIME_HISTORIES/t_read_sph_spectra.f90 TIME_HISTORIES/m_tave_sph_ene_spectr.f90 TIME_HISTORIES/sph_mean_square_IO_select.f90 TIME_HISTORIES/cal_tave_sph_ene_spectr.f90)
 ADD_EXECUTABLE(t_ave_sph_mean_square ${SRC_TAVE_SPH_ENE_SPEC})
 TARGET_LINK_LIBRARIES(t_ave_sph_mean_square calypso)
 

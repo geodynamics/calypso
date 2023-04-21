@@ -44,6 +44,8 @@
       type(buffer_4_gzip), private :: zbuf_e
       character, pointer, private, save :: FPz_ele
 !
+      private :: gz_read_element_geometry, gz_write_element_geometry
+!
 !------------------------------------------------------------------
 !
        contains
@@ -54,7 +56,7 @@
      &         (id_rank, file_name, ele_mesh_IO, ierr)
 !
       use skip_gz_comment
-      use gz_element_data_IO
+      use gz_comm_table_IO
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -66,7 +68,7 @@
      &  'Read gzipped ascii element comm file: ', trim(file_name)
 !
       call open_rd_gzfile_a(FPz_ele, file_name, zbuf_e)
-      call gz_read_element_comm_table                                   &
+      call gz_read_comm_table                                           &
      &   (FPz_ele, id_rank, ele_mesh_IO%comm, zbuf_e, ierr)
 !      call gz_read_element_geometry                                    &
 !     &   (FPz_ele, ele_mesh_IO%node, ele_mesh_IO%sfed, zbuf_e)
@@ -134,7 +136,8 @@
      &         (id_rank, file_name, ele_mesh_IO)
 !
       use skip_gz_comment
-      use gz_element_data_IO
+      use gz_comm_table_IO
+      use m_fem_mesh_labels
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: id_rank
@@ -145,7 +148,10 @@
      &  'Write gzipped ascii element comm file: ', trim(file_name)
 !
       call open_wt_gzfile_a(FPz_ele, file_name, zbuf_e)
-      call gz_write_element_comm_table                                  &
+!
+      zbuf_e%fixbuf(1) = hd_ecomm_para() // char(0)
+      call gz_write_textbuf_no_lf(FPz_ele, zbuf_e)
+      call gz_write_comm_table                                          &
      &   (FPz_ele, id_rank, ele_mesh_IO%comm, zbuf_e)
 !      call gz_write_element_geometry                                   &
 !     &   (FPz_ele, ele_mesh_IO%node, ele_mesh_IO%sfed, zbuf_e)
@@ -204,6 +210,59 @@
       call close_gzfile_a(FPz_ele, zbuf_e)
 !
       end subroutine gz_output_edge_file
+!
+!------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      subroutine gz_read_element_geometry                               &
+     &         (FPz_f, nod_IO, sfed_IO, zbuf)
+!
+      use gz_node_geometry_IO
+!
+      character, pointer, intent(in) :: FPz_f
+      type(node_data), intent(inout) :: nod_IO
+      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+!
+!      write(zbuf%fixbuf(1),'(a,a1)') '! 3.element information',        &
+!     &                                char(0)
+      call gz_read_number_of_node(FPz_f, nod_IO, zbuf)
+      call gz_read_geometry_info(FPz_f, nod_IO, zbuf)
+!
+!      write(zbuf%fixbuf(1),'(a,a1)') '! 3.2 Volume of element ',       &
+!     &                               char(0)
+!
+      call gz_read_scalar_in_element(FPz_f, nod_IO, sfed_IO, zbuf)
+!
+      end subroutine gz_read_element_geometry
+!
+!------------------------------------------------------------------
+!
+      subroutine gz_write_element_geometry                              &
+     &         (FPz_f, nod_IO, sfed_IO, zbuf)
+!
+      use m_fem_surface_labels
+      use gz_node_geometry_IO
+      use gzip_file_access
+!
+      character, pointer, intent(in) :: FPz_f
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
+      type(buffer_4_gzip), intent(inout) :: zbuf
+!
+!
+      zbuf%fixbuf(1) = hd_ecomm_point() // char(0)
+      call gz_write_textbuf_no_lf(FPz_f, zbuf)
+!
+      call gz_write_geometry_info(FPz_f, nod_IO, zbuf)
+!
+      zbuf%fixbuf(1) = hd_ecomm_vol() // char(0)
+      call gz_write_textbuf_no_lf(FPz_f, zbuf)
+!
+      call gz_write_scalar_in_element(FPz_f, nod_IO, sfed_IO, zbuf)
+!
+      end subroutine gz_write_element_geometry
 !
 !------------------------------------------------------------------
 !

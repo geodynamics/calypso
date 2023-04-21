@@ -75,7 +75,7 @@
       use delete_data_files
       use select_gz_stream_file_IO
       use sph_monitor_data_text
-      use gz_open_sph_monitor_file
+      use gz_open_sph_vol_mntr_file
 !
       type(time_data), intent(in) :: time_d
       type(sph_shell_parameters), intent(in) :: sph_params
@@ -88,7 +88,7 @@
 !
       real(kind=kreal), allocatable :: d_rj_out(:)
 !
-      type(read_sph_spectr_params) :: sph_OUT
+      type(read_sph_spectr_data) :: sph_OUT
       character(len=kchara) :: file_name
       logical :: flag_gzip_lc
       type(buffer_4_gzip) :: zbuf_m
@@ -140,7 +140,7 @@
       integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
       type(picked_spectrum_data), intent(in) :: gauss
 !
-      type(read_sph_spectr_params), intent(inout) :: sph_OUT
+      type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !
       integer(kind = kint) :: icou, ntot
 !
@@ -216,7 +216,7 @@
 !
       use set_parallel_file_name
       use check_sph_monitor_header
-      use gz_open_sph_monitor_file
+      use gz_open_sph_vol_mntr_file
       use compare_sph_monitor_header
       use sph_power_spectr_data_text
       use sel_gz_input_sph_mtr_head
@@ -226,7 +226,7 @@
       type(sph_rj_grid), intent(in) :: sph_rj
       type(picked_spectrum_data), intent(in) :: gauss
 !!
-      type(read_sph_spectr_params) :: sph_OUT_g
+      type(read_sph_spectr_data) :: sph_OUT_g
       character(len = kchara) :: base_name
       logical :: flag_gzip_lc, error
 !

@@ -88,6 +88,13 @@
      &      b_trns_base%i_current, trns)
 !      end if
 !
+!    external magnetic field flag
+!      if(cd_prop%iflag_4_induction .or. fl_prop%iflag_4_lorentz) then
+        call add_field_4_sph_trns_by_pol(d_rj,                          &
+     &      ipol_base%i_back_B, iphys_base%i_back_B,                    &
+     &      b_trns_base%i_back_B, trns)
+!      end if
+!
       end subroutine add_base_vector_4_MHD_sph_trns
 !
 !-----------------------------------------------------------------------

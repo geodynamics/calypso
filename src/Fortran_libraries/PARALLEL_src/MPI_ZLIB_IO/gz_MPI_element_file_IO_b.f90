@@ -8,11 +8,11 @@
 !!
 !!@verbatim
 !!      subroutine gz_mpi_input_element_file_b                          &
-!!     &         (num_pe, id_rank, file_name, ele_mesh_IO, ierr)
+!!     &         (num_pe, id_rank, file_name, ele_mesh_IO)
 !!      subroutine gz_mpi_input_surface_file_b                          &
-!!     &         (num_pe, id_rank, file_name, surf_mesh_IO, ierr)
+!!     &         (num_pe, id_rank, file_name, surf_mesh_IO)
 !!      subroutine gz_mpi_input_edge_file_b                             &
-!!     &         (num_pe, id_rank, file_name, edge_mesh_IO, ierr)
+!!     &         (num_pe, id_rank, file_name, edge_mesh_IO)
 !!        type(surf_edge_IO_file), intent(in) :: ele_mesh_IO
 !!        type(surf_edge_IO_file), intent(in) :: surf_mesh_IO
 !!        type(surf_edge_IO_file), intent(in) :: edge_mesh_IO
@@ -40,6 +40,9 @@
 !
       type(calypso_MPI_IO_params), save, private :: IO_param
 !
+      private :: gz_mpi_read_ele_geometry_b
+      private :: gz_mpi_write_ele_geometry_b
+!
 !------------------------------------------------------------------
 !
        contains
@@ -47,14 +50,13 @@
 !------------------------------------------------------------------
 !
       subroutine gz_mpi_input_element_file_b                            &
-     &         (num_pe, id_rank, file_name, ele_mesh_IO, ierr)
+     &         (num_pe, id_rank, file_name, ele_mesh_IO)
 !
-      use gz_MPI_element_data_IO_b
+      use gz_MPI_comm_table_IO_b
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: num_pe, id_rank
       type(surf_edge_IO_file), intent(inout) :: ele_mesh_IO
-      integer(kind = kint), intent(inout) :: ierr
 !
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
@@ -64,7 +66,7 @@
       call open_read_mpi_file                                           &
      &   (file_name, num_pe, id_rank, IO_param)
 !
-      call gz_mpi_read_ele_comm_table_b(IO_param, ele_mesh_IO%comm)
+      call gz_mpi_read_comm_table_b(IO_param, ele_mesh_IO%comm)
 !      call gz_mpi_read_ele_geometry_b(IO_param,                        &
 !     &    ele_mesh_IO%node, ele_mesh_IO%sfed)
       call close_mpi_file(IO_param)
@@ -74,14 +76,13 @@
 !------------------------------------------------------------------
 !
       subroutine gz_mpi_input_surface_file_b                            &
-     &         (num_pe, id_rank, file_name, surf_mesh_IO, ierr)
+     &         (num_pe, id_rank, file_name, surf_mesh_IO)
 !
       use gz_MPI_surface_data_IO_b
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: num_pe, id_rank
       type(surf_edge_IO_file), intent(inout) :: surf_mesh_IO
-      integer(kind = kint), intent(inout) :: ierr
 !
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
@@ -102,14 +103,13 @@
 !------------------------------------------------------------------
 !
       subroutine gz_mpi_input_edge_file_b                               &
-     &         (num_pe, id_rank, file_name, edge_mesh_IO, ierr)
+     &         (num_pe, id_rank, file_name, edge_mesh_IO)
 !
       use gz_MPI_edge_data_IO_b
 !
       character(len=kchara), intent(in) :: file_name
       integer, intent(in) :: num_pe, id_rank
       type(surf_edge_IO_file), intent(inout) :: edge_mesh_IO
-      integer(kind = kint), intent(inout) :: ierr
 !
 !
       if(id_rank.eq.0 .or. i_debug .gt. 0) write(*,*)                   &
@@ -131,7 +131,7 @@
 !
       subroutine gz_mpi_output_element_file_b(file_name, ele_mesh_IO)
 !
-      use gz_MPI_element_data_IO_b
+      use gz_MPI_comm_table_IO_b
 !
       character(len=kchara), intent(in) :: file_name
       type(surf_edge_IO_file), intent(inout) :: ele_mesh_IO
@@ -143,7 +143,7 @@
 !
       call open_write_mpi_file(file_name, IO_param)
 !
-      call gz_mpi_write_ele_comm_table_b(IO_param, ele_mesh_IO%comm)
+      call gz_mpi_write_comm_table_b(IO_param, ele_mesh_IO%comm)
 !      call gz_mpi_write_ele_geometry_b(IO_param,                       &
 !     &    ele_mesh_IO%node, ele_mesh_IO%sfed)
       call close_mpi_file(IO_param)
@@ -196,6 +196,42 @@
       call close_mpi_file(IO_param)
 !
       end subroutine gz_mpi_output_edge_file_b
+!
+!------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      subroutine gz_mpi_read_ele_geometry_b(IO_param, nod_IO, sfed_IO)
+!
+      use gz_MPI_node_geometry_IO_b
+!
+      type(calypso_MPI_IO_params), intent(inout) :: IO_param
+      type(node_data), intent(inout) :: nod_IO
+      type(surf_edge_IO_data), intent(inout) :: sfed_IO
+!
+!
+      call gz_mpi_read_number_of_node_b(IO_param, nod_IO)
+      call gz_mpi_read_geometry_info_b(IO_param, nod_IO)
+!
+      call gz_mpi_read_scl_in_ele_b(IO_param, nod_IO, sfed_IO)
+!
+      end subroutine gz_mpi_read_ele_geometry_b
+!
+!------------------------------------------------------------------
+!
+      subroutine gz_mpi_write_ele_geometry_b                            &
+     &         (IO_param, nod_IO, sfed_IO)
+!
+      use gz_MPI_node_geometry_IO_b
+!
+      type(calypso_MPI_IO_params), intent(inout) :: IO_param
+      type(node_data), intent(in) :: nod_IO
+      type(surf_edge_IO_data), intent(in) :: sfed_IO
+!
+!
+      call gz_mpi_write_geometry_info_b(IO_param, nod_IO)
+      call gz_mpi_write_scl_in_ele_b(IO_param, nod_IO, sfed_IO)
+!
+      end subroutine gz_mpi_write_ele_geometry_b
 !
 !------------------------------------------------------------------
 !

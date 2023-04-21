@@ -7,13 +7,6 @@
 !>@brief Data IO routines for element data
 !!
 !!@verbatim
-!!      subroutine read_element_comm_table                              &
-!!     &         (id_file, id_rank, comm_IO, ierr)
-!!        type(communication_table), intent(inout) :: comm_IO
-!!      subroutine write_element_comm_table                             &
-!!     &         (id_file, id_rank, comm_IO)
-!!        type(communication_table), intent(in) :: comm_IO
-!!
 !!      subroutine read_element_geometry(id_file, nod_IO, sfed_IO)
 !!        type(node_data), intent(inout) :: nod_IO
 !!        type(surf_edge_IO_data), intent(inout) :: sfed_IO
@@ -40,70 +33,6 @@
 !
        contains
 !
-!------------------------------------------------------------------
-!
-      subroutine read_element_comm_table                                &
-     &         (id_file, id_rank, comm_IO, ierr)
-!
-      use m_fem_mesh_labels
-      use domain_data_IO
-!
-      integer (kind = kint), intent(in) :: id_file
-      integer, intent(in) :: id_rank
-      type(communication_table), intent(inout) :: comm_IO
-      integer(kind = kint), intent(inout) :: ierr
-!
-!
-!      write(id_file,'(a)') '!' 
-!      write(id_file,'(a)') '!  element position '
-!      write(id_file,'(a)') '!  and communication table '
-!      write(id_file,'(a)') '!' 
-!      write(id_file,'(a)', advance='NO') hd_fem_para()
-!
-      call read_domain_info(id_file, id_rank, comm_IO, ierr)
-      if(ierr .ne. 0) return
-!
-!      write(id_file,'(a)') '!'
-!      write(id_file,'(a)') '! 2.import / export information '
-!      write(id_file,'(a)') '! 2.1 element ID for import '
-!      write(id_file,'(a)') '!'
-!
-      call read_import_data(id_file, comm_IO)
-!
-!      write(id_file,'(a)') '!'
-!      write(id_file,'(a)') '! 2.2 element ID for export '
-!      write(id_file,'(a)') '! '
-!
-      call read_export_data(id_file, comm_IO)
-!
-      end subroutine read_element_comm_table
-!
-!------------------------------------------------------------------
-!
-      subroutine write_element_comm_table                               &
-     &         (id_file, id_rank, comm_IO)
-!
-      use m_fem_mesh_labels
-      use domain_data_IO
-!
-      integer (kind = kint), intent(in) :: id_file
-      integer, intent(in) :: id_rank
-      type(communication_table), intent(in) :: comm_IO
-!
-!
-      write(id_file,'(a)', advance='NO') hd_ecomm_para()
-      write(id_file,'(a)', advance='NO') hd_fem_para()
-      call write_domain_info(id_file, id_rank, comm_IO)
-!
-      write(id_file,'(a)', advance='NO') hd_ecomm_import()
-      call write_import_data(id_file, comm_IO)
-!
-      write(id_file,'(a)', advance='NO') hd_ecomm_export()
-      call write_export_data(id_file, comm_IO)
-!
-      end subroutine write_element_comm_table
-!
-!------------------------------------------------------------------
 !------------------------------------------------------------------
 !
       subroutine read_element_geometry(id_file, nod_IO, sfed_IO)

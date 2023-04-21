@@ -144,10 +144,11 @@
 !
       use t_read_sph_spectra
       use t_buffer_4_gzip
-      use gz_open_sph_monitor_file
+      use gz_open_sph_layer_mntr_file
       use gz_layer_mean_monitor_IO
       use sph_mean_spectr_header_IO
       use set_parallel_file_name
+      use sph_power_spectr_data_text
 !
       character(len=kchara), intent(in) :: fname_rms, mode_label
       type(energy_label_param), intent(in) :: ene_labels
@@ -158,7 +159,8 @@
       real(kind = kreal), intent(in)                                    &
      &           :: rms_sph(pwr%nri_rms,pwr%ntot_comp_sq)
 !
-      type(read_sph_spectr_params), save :: sph_OUT
+      real(kind = kreal), allocatable :: spectr_IO(:,:)
+      type(read_sph_spectr_data), save :: sph_OUT
       type(buffer_4_gzip), save :: zbuf_m
       logical :: flag_gzip_lc
 !
@@ -166,16 +168,18 @@
       call dup_sph_layer_spectr_header(mode_label,                      &
      &    ltr, nlayer_ICB, nlayer_CMB, ene_labels, pwr, sph_OUT)
       call alloc_sph_spectr_data(izero, sph_OUT)
+      allocate(spectr_IO(pwr%ntot_comp_sq,pwr%nri_rms))
 !
       flag_gzip_lc = pwr%gzip_flag_rms_layer
       call sel_open_sph_layer_mean_file(id_file_rms, fname_rms,         &
-     &                                   sph_OUT, zbuf_m, flag_gzip_lc)
+     &    sph_pwr_labels, sph_OUT, zbuf_m, flag_gzip_lc)
       call swap_layer_mean_to_IO(pwr%nri_rms, pwr%ntot_comp_sq,         &
-     &                           rms_sph, sph_OUT%spectr_IO(1,0,1))
+     &                           rms_sph, spectr_IO(1,1))
       call sel_gz_write_layer_mean_mtr                                  &
      &   (flag_gzip_lc, id_file_rms, time_d%i_time_step, time_d%time,   &
      &    pwr%nri_rms, pwr%kr_4_rms, pwr%r_4_rms,                       &
-     &    pwr%ntot_comp_sq, sph_OUT%spectr_IO(1,0,1), zbuf_m)
+     &    pwr%ntot_comp_sq, spectr_IO(1,1), zbuf_m)
+      deallocate(spectr_IO)
       call dealloc_sph_espec_data(sph_OUT)
       call dealloc_sph_espec_name(sph_OUT)
       close(id_file_rms)
@@ -190,10 +194,11 @@
 !
       use t_read_sph_spectra
       use t_buffer_4_gzip
-      use gz_open_sph_monitor_file
+      use gz_open_sph_layer_mntr_file
       use gz_layer_spectr_monitor_IO
       use sph_mean_spectr_header_IO
       use set_parallel_file_name
+      use sph_power_spectr_data_text
 !
       type(energy_label_param), intent(in) :: ene_labels
       type(time_data), intent(in) :: time_d
@@ -205,7 +210,8 @@
 !
       character(len=kchara), intent(in) :: fname_rms, mode_label
 !
-      type(read_sph_spectr_params), save :: sph_OUT
+      real(kind = kreal), allocatable :: spectr_IO(:,:,:)
+      type(read_sph_spectr_data), save :: sph_OUT
       type(buffer_4_gzip), save :: zbuf_m
       logical :: flag_gzip_lc
 !
@@ -213,16 +219,18 @@
       call dup_sph_layer_spectr_header(mode_label,                      &
      &    ltr, nlayer_ICB, nlayer_CMB, ene_labels, pwr, sph_OUT)
       call alloc_sph_spectr_data(sph_OUT%ltr_sph, sph_OUT)
+      allocate(spectr_IO(pwr%ntot_comp_sq,0:ltr,pwr%nri_rms))
 !
       flag_gzip_lc = pwr%gzip_flag_rms_layer
       call sel_open_sph_layer_mean_file(id_file_rms, fname_rms,         &
-     &                                  sph_OUT, zbuf_m, flag_gzip_lc)
+     &    sph_pwr_labels, sph_OUT, zbuf_m, flag_gzip_lc)
       call swap_layer_spectr_to_IO(pwr%nri_rms, ltr, pwr%ntot_comp_sq,  &
-     &                             rms_sph_x, sph_OUT%spectr_IO(1,0,1))
+     &                             rms_sph_x, spectr_IO(1,0,1))
       call sel_gz_write_layer_spectr_mtr                                &
      &   (flag_gzip_lc, id_file_rms, time_d%i_time_step, time_d%time,   &
      &    pwr%nri_rms, pwr%kr_4_rms, pwr%r_4_rms, ltr,                  &
-     &    pwr%ntot_comp_sq, sph_OUT%spectr_IO(1,0,1), zbuf_m)
+     &    pwr%ntot_comp_sq, spectr_IO(1,0,1), zbuf_m)
+      deallocate(spectr_IO)
       call dealloc_sph_espec_data(sph_OUT)
       call dealloc_sph_espec_name(sph_OUT)
       close(id_file_rms)
