@@ -915,7 +915,7 @@ Block \verb|cross_section_ctl| (Top level for sectioning)
 
 \paragraph{Output data format of sectioning module}
 \label{sec:PSF_data}
-Sectioning data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|psf_output_type| are listed in Table \ref{table:PSF_data}. In the binary data format, position data and field data are saved independently not to write the grid data for each output step. Program \hyperref[section:psf_to_VTK]{\tt psf\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|psf_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
+Sectioning data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|psf_output_type| are listed in Table \ref{table:PSF_data}. In the binary data format, position data and field data are saved independently not to write the grid data for each output step. Program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|psf_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
 %
 \begin{table}[htp]
 \caption{Data format  and an example of data size and output time  for sectioning data}
@@ -976,7 +976,7 @@ Block \verb|isosurface_ctl|  (Top lebel of the control data)
 
 \paragraph{Output data format of isosurface module}
 \label{sec:PSF_data}
-Isosurface data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|iso_output_type| are listed in Table \ref{table:ISO_data}. Like as sectioning data, program \hyperref[section:psf_to_VTK]{\tt psf\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|iso_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
+Isosurface data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|iso_output_type| are listed in Table \ref{table:ISO_data}. Like as sectioning data, program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|iso_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
 %
 \begin{table}[htp]
 \caption{Data format and an example of data size and output time for isosurface data}
@@ -1930,13 +1930,13 @@ Block \verb|visualizer|  (Top block of the control file)
 \end{itemize}
 %
 
-\subsection{Section and isosurface data converter program ({\tt psf\_to\_VTK})} 
-\label{section:psf_to_VTK}
+\subsection{Section and isosurface data converter program ({\tt section\_to\_VTK})} 
+\label{section:section_to_VTK}
 This program generates VTK data from bindary sectioning and isosurface data. This program run on a single processor, and needs interactive input. The following is the console output of the program.
 
 {\small
 \begin{verbatim}
-% /usr/local/Calypso/bin/psf_to_vtk 
+% /usr/local/Calypso/bin/section_to_VTK
 Input file prefix
 zm_y0									<- Input file prefix
 Input file extension from following:

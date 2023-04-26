@@ -42,6 +42,6 @@ SET(SRC_VTK_CONVERT_PLUG VIZ_only/t_control_data_section_only.f90 VIZ_only/t_viz
 ADD_EXECUTABLE(field_to_VTK ${SRC_VTK_CONVERT_PLUG})
 TARGET_LINK_LIBRARIES(field_to_VTK calypso calypso_c)
 
-ADD_EXECUTABLE(psf_to_vtk VIZ_only/psf_file_to_VTK.f90)
-TARGET_LINK_LIBRARIES(psf_to_vtk calypso calypso_c)
+ADD_EXECUTABLE(section_to_vtk VIZ_only/psf_file_to_VTK.f90)
+TARGET_LINK_LIBRARIES(section_to_vtk calypso calypso_c)
 

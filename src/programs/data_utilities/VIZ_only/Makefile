@@ -6,7 +6,7 @@ VIZ_PLUG_DIR = $$(DATA_UTILS_DIR)/VIZ_only
 
 TARGET_PSF =         sectioning
 TARGET_VTK_CONVERT = field_to_VTK
-TARGET_PSF_2_VTK =   psf_to_vtk
+TARGET_PSF_2_VTK =   section_to_vtk
 
 SOURCES = $(shell ls *.f90)
 

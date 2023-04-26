@@ -27,13 +27,13 @@ test:
 	rm -f *.dat
 	$(MPIRUN) -np 4 $(BUILDDIR)/sph_snapshot
 	echo 'Convert section data'
-	$(BUILDDIR)/psf_to_vtk < controls/psf_to_vtk_z0.txt
-	$(BUILDDIR)/psf_to_vtk < controls/psf_to_vtk_z0.3.txt
+	$(BUILDDIR)/section_to_VTK < controls/psf_to_vtk_z0.txt
+	$(BUILDDIR)/section_to_VTK < controls/psf_to_vtk_z0.3.txt
 	gunzip -f section/zm_y0.1.vtk.gz
 	
 	echo 'Convert isosurface data'
-	$(BUILDDIR)/psf_to_vtk < controls/iso_to_vtk_wz10n.txt
-	$(BUILDDIR)/psf_to_vtk < controls/iso_to_vtk_wz10p.txt
+	$(BUILDDIR)/section_to_VTK < controls/iso_to_vtk_wz10n.txt
+	$(BUILDDIR)/section_to_VTK < controls/iso_to_vtk_wz10p.txt
 	gunzip -f isosurface/iso_T0.6.1.vtk.gz
 	
 	echo 'Compare section and isosurface data'
