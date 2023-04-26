@@ -28,4 +28,30 @@ t_ctl_param_sph_series_util.o: $(SPH_UTILS_DIR)/t_ctl_param_sph_series_util.f90 
 	$(F90) -c $(F90OPTFLAGS) $<
 t_picked_sph_spectr_data_IO.o: $(SPH_UTILS_DIR)/t_picked_sph_spectr_data_IO.f90 m_precision.o m_constants.o t_pickup_sph_spectr_data.o
 	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_volume_mean_series.o: $(SPH_UTILS_DIR)/t_sph_volume_mean_series.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_buffer_4_gzip.o select_gz_stream_file_IO.o sel_gz_input_sph_mtr_head.o gz_spl_sph_spectr_data_IO.o set_parallel_file_name.o count_monitor_time_series.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_sph_volume_spectr_series.o: $(SPH_UTILS_DIR)/t_sph_volume_spectr_series.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_buffer_4_gzip.o select_gz_stream_file_IO.o sel_gz_input_sph_mtr_head.o gz_volume_spectr_monitor_IO.o set_parallel_file_name.o count_monitor_time_series.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_tave_sph_layer_mean.o: $(SPH_UTILS_DIR)/t_tave_sph_layer_mean.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_buffer_4_gzip.o gz_spl_sph_spectr_data_IO.o cal_tave_sph_ene_spectr.o gz_layer_mean_monitor_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_tave_sph_layer_spectr.o: $(SPH_UTILS_DIR)/t_tave_sph_layer_spectr.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_buffer_4_gzip.o gz_spl_sph_spectr_data_IO.o cal_tave_sph_ene_spectr.o
+	$(F90) -c $(F90OPTFLAGS) $<
+t_tave_sph_volume_spectr.o: $(SPH_UTILS_DIR)/t_tave_sph_volume_spectr.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_buffer_4_gzip.o select_gz_stream_file_IO.o gz_volume_spectr_monitor_IO.o cal_tave_sph_ene_spectr.o gz_open_sph_vol_mntr_file.o sel_gz_input_sph_mtr_head.o
+	$(F90) -c $(F90OPTFLAGS) $<
+tave_sdev_sph_layer_mean.o: $(SPH_UTILS_DIR)/tave_sdev_sph_layer_mean.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_tave_sph_layer_mean.o t_buffer_4_gzip.o set_parallel_file_name.o select_gz_stream_file_IO.o sel_gz_input_sph_mtr_head.o count_monitor_time_series.o sph_layer_monitor_snap_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+tave_sdev_sph_layer_spec.o: $(SPH_UTILS_DIR)/tave_sdev_sph_layer_spec.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_buffer_4_gzip.o t_tave_sph_layer_spectr.o set_parallel_file_name.o select_gz_stream_file_IO.o sel_gz_input_sph_mtr_head.o count_monitor_time_series.o gz_open_sph_layer_mntr_file.o gz_layer_spectr_monitor_IO.o sph_layer_monitor_snap_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+tave_sdev_sph_volume_spec.o: $(SPH_UTILS_DIR)/tave_sdev_sph_volume_spec.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_tave_sph_volume_spectr.o t_buffer_4_gzip.o set_parallel_file_name.o select_gz_stream_file_IO.o sel_gz_input_sph_mtr_head.o count_monitor_time_series.o sph_volume_monitor_snap_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+time_ave_picked_sph_spectr.o: $(SPH_UTILS_DIR)/time_ave_picked_sph_spectr.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_picked_sph_spectr_data_IO.o count_monitor_time_series.o picked_sph_spectr_data_IO.o set_parallel_file_name.o write_snap_pick_sph_spectr.o
+	$(F90) -c $(F90OPTFLAGS) $<
+time_ave_sph_monitor_data.o: $(SPH_UTILS_DIR)/time_ave_sph_monitor_data.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_buffer_4_gzip.o t_sph_volume_spectr_series.o count_monitor_time_series.o sph_monitor_data_text.o set_parallel_file_name.o select_gz_stream_file_IO.o gz_open_sph_vol_mntr_file.o gz_volume_spectr_monitor_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+time_ave_sph_volume_mean.o: $(SPH_UTILS_DIR)/time_ave_sph_volume_mean.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_buffer_4_gzip.o t_sph_volume_mean_series.o count_monitor_time_series.o sph_monitor_data_text.o set_parallel_file_name.o sph_volume_monitor_snap_IO.o
+	$(F90) -c $(F90OPTFLAGS) $<
+time_average_sph_ene_spectr.o: $(SPH_UTILS_DIR)/time_average_sph_ene_spectr.f90 m_precision.o m_constants.o t_read_sph_spectra.o t_tave_sph_volume_spectr.o time_ave_sph_volume_mean.o time_ave_sph_monitor_data.o t_tave_sph_layer_mean.o tave_sdev_sph_layer_mean.o t_tave_sph_layer_spectr.o tave_sdev_sph_layer_spec.o tave_sdev_sph_volume_spec.o count_monitor_time_series.o
+	$(F90) -c $(F90OPTFLAGS) $<
+write_snap_pick_sph_spectr.o: $(SPH_UTILS_DIR)/write_snap_pick_sph_spectr.f90 m_precision.o m_constants.o t_pickup_sph_spectr_data.o t_picked_sph_spectr_data_IO.o t_buffer_4_gzip.o m_monitor_file_labels.o write_field_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
 

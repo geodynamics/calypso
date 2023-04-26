@@ -23,7 +23,8 @@
 !!        type(element_data), intent(in) :: new_ele
 !!        integer(kind = kint), intent(inout) :: icount_error
 !!
-!!      subroutine compare_node_comm_types(id_rank, org_comm, new_comm)
+!!      subroutine compare_node_comm_types                              &
+!!     &         (id_rank, org_comm, new_comm, icount_error)
 !!        type(communication_table), intent(in) :: org_comm
 !!        type(communication_table), intent(in) :: new_comm
 !!@endverbatim
@@ -60,7 +61,9 @@
      &                           ierror_count)
       call compare_ele_connect(id_rank, ele, mesh%ele, icou_error)
       ierror_count = ierror_count + icou_error
-      call compare_node_comm_types(id_rank, nod_comm, mesh%nod_comm)
+      call compare_node_comm_types                                      &
+     &   (id_rank, nod_comm, mesh%nod_comm, icou_error)
+      ierror_count = ierror_count + icou_error
 !
       end subroutine compare_mesh_type
 !
@@ -170,7 +173,8 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine compare_node_comm_types(id_rank, org_comm, new_comm)
+      subroutine compare_node_comm_types                                &
+     &         (id_rank, org_comm, new_comm, icount_error)
 !
       use copy_communication_table
       use t_comm_table
@@ -178,39 +182,59 @@
       integer, intent(in) :: id_rank
       type(communication_table), intent(in) :: org_comm
       type(communication_table), intent(in) :: new_comm
+      integer(kind = kint), intent(inout) :: icount_error
 !
       integer(kind = kint) :: i
 !
 !
-      if(new_comm%num_neib .ne. org_comm%num_neib)                      &
-     &    write(*,*) 'num_neib', id_rank,                               &
+      icount_error = 0
+      if(new_comm%num_neib .ne. org_comm%num_neib) then
+          write(*,*) 'num_neib', id_rank,                               &
      &            new_comm%num_neib, org_comm%num_neib
-      if(new_comm%ntot_export .ne. org_comm%ntot_export)                &
-     &      write(*,*) 'ntot_export',                                   &
+          icount_error = icount_error + 1
+      end if
+      if(new_comm%ntot_export .ne. org_comm%ntot_export) then
+            write(*,*) 'ntot_export',                                   &
      &      id_rank, new_comm%ntot_export, org_comm%ntot_export
-      if(new_comm%ntot_import .ne. org_comm%ntot_import)                &
-     &      write(*,*) 'ntot_import',                                   &
+          icount_error = icount_error + 1
+      end if
+      if(new_comm%ntot_import .ne. org_comm%ntot_import) then
+            write(*,*) 'ntot_import',                                   &
      &      id_rank, new_comm%ntot_import, org_comm%ntot_import
+          icount_error = icount_error + 1
+      end if
       do i = 1, org_comm%num_neib
-        if(new_comm%id_neib(i) .ne. org_comm%id_neib(i))                &
-     &       write(*,*) 'id_neib(i)', id_rank, i,                       &
+        if(new_comm%id_neib(i) .ne. org_comm%id_neib(i)) then
+             write(*,*) 'id_neib(i)', id_rank, i,                       &
      &       new_comm%id_neib(i), org_comm%id_neib(i)
-        if(new_comm%istack_import(i) .ne. org_comm%istack_import(i))    &
-     &       write(*,*) 'istack_import(i)', id_rank, i,                 &
+          icount_error = icount_error + 1
+        end if
+        if(new_comm%istack_import(i)                                    &
+     &        .ne. org_comm%istack_import(i))  then
+             write(*,*) 'istack_import(i)', id_rank, i,                 &
      &       new_comm%istack_import(i), org_comm%istack_import(i)
-        if(new_comm%istack_export(i) .ne. org_comm%istack_export(i))    &
-     &       write(*,*) 'istack_export(i)', id_rank, i,                 &
+          icount_error = icount_error + 1
+        end if
+        if(new_comm%istack_export(i)                                    &
+     &        .ne. org_comm%istack_export(i)) then
+             write(*,*) 'istack_export(i)', id_rank, i,                 &
      &       new_comm%istack_export(i), org_comm%istack_export(i)
+          icount_error = icount_error + 1
+        end if
       end do
       do i = 1, org_comm%ntot_export
-        if(new_comm%item_export(i) .ne. org_comm%item_export(i))        &
-     &       write(*,*) 'item_export(i)', id_rank, i,                   &
+        if(new_comm%item_export(i) .ne. org_comm%item_export(i)) then
+             write(*,*) 'item_export(i)', id_rank, i,                   &
      &       new_comm%item_export(i), org_comm%item_export(i)
+          icount_error = icount_error + 1
+        end if
       end do
       do i = 1, org_comm%ntot_import
-        if(new_comm%item_import(i) .ne. org_comm%item_import(i))        &
-     &       write(*,*) 'item_import(i)', id_rank, i,                   &
+        if(new_comm%item_import(i) .ne. org_comm%item_import(i)) then
+             write(*,*) 'item_import(i)', id_rank, i,                   &
      &       new_comm%item_import(i), org_comm%item_import(i)
+          icount_error = icount_error + 1
+        end if
       end do
 !
       end subroutine compare_node_comm_types
