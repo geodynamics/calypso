@@ -337,9 +337,8 @@
       call write_dynamobench_files                                      &
      &   (sph_params, sph_rj, ipol, sph_MHD_bc,                         &
      &    monitor%pwr%v_spectr(monitor%bench%ipwr_ocore), time_d,       &
-     &    monitor%circ_mid_eq%circle%gzip_flag_circle, monitor%bench)
-      call write_mtr_on_circle_file(my_rank, sph_params, time_d,        &
-     &                              monitor%circ_mid_eq)
+     &    monitor%circ_mid_eq%circle%gzip_flag_circle,                  &
+     &    monitor%circ_mid_eq, monitor%bench)
 !
       do i = 1, monitor%mul_circle%num_circles
         call write_mtr_on_circle_file(my_rank, sph_params, time_d,      &

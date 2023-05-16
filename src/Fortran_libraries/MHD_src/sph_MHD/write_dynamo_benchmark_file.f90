@@ -9,7 +9,7 @@
 !!@verbatim
 !!      subroutine write_dynamobench_files                              &
 !!     &         (my_rank, sph_params, sph_rj, ipol, sph_MHD_bc, v_pwr, &
-!!     &          time_d, gzip_flag, bench)
+!!     &          time_d, gzip_flag, circ_mid_eq, bench)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
@@ -18,6 +18,7 @@
 !!        type(read_sph_spectr_data), intent(inout) :: sph_OUT
 !!        logical, intent(in) :: gzip_flag
 !!        type(dynamobench_monitor), intent(in) :: bench
+!!        type(circle_fld_maker), intent(in) :: circ_mid_eq
 !!@endverbatim
 !!
 !!@param i_step   time step
@@ -37,6 +38,7 @@
       use t_base_field_labels
       use t_sph_volume_mean_square
       use t_field_4_dynamobench
+      use t_field_on_circle
       use t_read_sph_spectra
       use t_time_data
 !
@@ -68,7 +70,9 @@
 !
       subroutine write_dynamobench_files                                &
      &         (sph_params, sph_rj, ipol, sph_MHD_bc, v_pwr,            &
-     &          time_d, gzip_flag, bench)
+     &          time_d, gzip_flag, circ_mid_eq, bench)
+!
+      use write_monitors_circle_file
 !
       type(sph_shell_parameters), intent(in) :: sph_params
       type(sph_rj_grid), intent(in) ::  sph_rj
@@ -79,13 +83,17 @@
 !
       logical, intent(in) :: gzip_flag
       type(dynamobench_monitor), intent(in) :: bench
+      type(circle_fld_maker), intent(in) :: circ_mid_eq
 !
 !
+      if(bench%iflag_dynamobench .le. izero) return
       if(my_rank .ne. 0) return
       call write_dynamobench_file(sph_params, sph_rj, ipol,             &
      &   sph_MHD_bc, v_pwr, time_d, gzip_flag, bench)
       call write_detailed_dbench_file(sph_params, sph_rj, ipol,         &
      &   sph_MHD_bc, v_pwr, time_d, gzip_flag, bench)
+      call write_mtr_on_circle_file(my_rank, sph_params, time_d,        &
+     &                              circ_mid_eq)
 !
       end subroutine write_dynamobench_files
 !
@@ -121,7 +129,6 @@
       real(kind = kreal), allocatable :: data_out(:)
 !
 !
-      if(bench%iflag_dynamobench .le. izero) return
       if(my_rank .ne. 0) return
 !
       call dup_dynamobench_header_to_IO                                 &
@@ -179,7 +186,6 @@
       real(kind = kreal), allocatable :: detail_out(:)
 !
 !
-      if(bench%iflag_dynamobench .le. izero) return
       if(bench%detail_bench_file_prefix .eq. 'NO_FILE') return
       if(my_rank .ne. 0) return
 !
