@@ -50,7 +50,6 @@
       character(len = kchara), intent(in) :: fname_org
       real(kind = kreal), intent(in) :: start_time, end_time
 !
-      type(buffer_4_gzip), save :: zbuf_m
       type(sph_spectr_head_labels), save :: sph_lbl_IN1
       type(read_sph_spectr_data), save :: sph_IN1
       type(sph_volume_mean_series), save:: vm_srs1

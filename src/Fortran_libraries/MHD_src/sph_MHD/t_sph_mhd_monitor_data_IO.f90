@@ -39,14 +39,16 @@
       use t_sum_sph_rms_data
       use t_energy_label_parameters
       use t_boundary_params_sph_MHD
+      use t_field_on_circle
+      use t_field_4_dynamobench
 !
       use pickup_sph_spectr_data
 !
       implicit none
 !
-!
+!>      STructure for monitor data for spherical dynamos
       type sph_mhd_monitor_data
-!>        Structure for pickup list
+!>         Structure for pickup list
         type(pickup_mode_list) :: pick_list
 !>          Structure for pickup list
         type(picked_spectrum_data) :: pick_coef
@@ -76,8 +78,16 @@
 !
 !>        Structure of label for energies
         type(energy_label_param) :: ene_labels
-!
+!>        Truncation level for crustal filtering
         integer(kind = kint) :: ltr_crust
+!
+!>        Data on equator of mid-depth
+        type(circle_fld_maker) :: circ_mid_eq
+!>        Data for dynamo benchmark
+        type(dynamobench_monitor) :: bench
+!
+!>        Data on circles
+        type(mul_fields_on_circle) :: mul_circle
       end type sph_mhd_monitor_data
 !
 !  --------------------------------------------------------------------

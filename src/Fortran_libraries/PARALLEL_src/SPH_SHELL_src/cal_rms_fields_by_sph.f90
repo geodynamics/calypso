@@ -8,11 +8,12 @@
 !!
 !!@verbatim
 !!      subroutine cal_mean_squre_in_shell(sph_params,                  &
-!!     &          sph_rj, ipol, rj_fld, g_sph_rj, pwr, WK_pwr)
+!!     &          sph_rj, ipol, rj_fld, leg, pwr, WK_pwr)
 !!      subroutine cal_correlate_in_shell(sph_params,                   &
-!!     &          sph_rj, rj_fld1, rj_fld2, g_sph_rj, cor, WK_pwr)
+!!     &          sph_rj, rj_fld1, rj_fld2, leg, cor, WK_pwr)
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(phys_data), intent(in) :: rj_fld
+!!        type(legendre_4_sph_trans), intent(in) :: leg
 !!        type(sph_mean_squares), intent(inout) :: pwr
 !!        type(sph_mean_square_work), intent(inout) :: WK_pwr
 !!
@@ -50,6 +51,7 @@
       use t_sum_sph_rms_data
       use t_rms_4_sph_spectr
       use t_sph_volume_mean_square
+      use t_schmidt_poly_on_rtm
 !
       implicit none
 !
@@ -60,7 +62,7 @@
 ! -----------------------------------------------------------------------
 !
       subroutine cal_mean_squre_in_shell(sph_params,                    &
-     &          sph_rj, ipol, rj_fld, g_sph_rj, pwr, WK_pwr)
+     &          sph_rj, ipol, rj_fld, leg, pwr, WK_pwr)
 !
       use calypso_mpi
 !
@@ -72,7 +74,7 @@
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(phys_data), intent(in) :: rj_fld
       type(phys_address), intent(in) :: ipol
-      real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
+      type(legendre_4_sph_trans), intent(in) :: leg
 !
       type(sph_mean_squares), intent(inout) :: pwr
       type(sph_mean_square_work), intent(inout) :: WK_pwr
@@ -82,7 +84,7 @@
 !
       if(iflag_debug .gt. 0) write(*,*) 'sum_sph_layerd_pwr'
       call sum_sph_layerd_pwr                                           &
-     &   (sph_params%l_truncation, sph_rj, ipol, g_sph_rj, rj_fld,      &
+     &   (sph_params%l_truncation, sph_rj, ipol, leg%g_sph_rj, rj_fld,  &
      &    pwr%nri_rms, pwr%num_fld_sq, pwr%istack_comp_sq,              &
      &    pwr%id_field, pwr%kr_4_rms, pwr%num_vol_spectr,               &
      &    pwr%v_spectr, WK_pwr)
@@ -106,7 +108,7 @@
 ! ----------------------------------------------------------------------
 !
       subroutine cal_correlate_in_shell(sph_params,                     &
-     &          sph_rj, rj_fld1, rj_fld2, g_sph_rj, cor, WK_pwr)
+     &          sph_rj, rj_fld1, rj_fld2, leg, cor, WK_pwr)
 !
       use calypso_mpi
 !
@@ -117,7 +119,7 @@
       type(sph_rj_grid), intent(in) ::  sph_rj
       type(phys_data), intent(in) :: rj_fld1, rj_fld2
       type(sph_shell_parameters), intent(in) :: sph_params
-      real(kind = kreal), intent(in) :: g_sph_rj(sph_rj%nidx_rj(2),13)
+      type(legendre_4_sph_trans), intent(in) :: leg
 !
       type(sph_mean_squares), intent(inout) :: cor
       type(sph_mean_square_work), intent(inout) :: WK_pwr
@@ -126,8 +128,8 @@
       if(cor%ntot_comp_sq .eq. 0) return
 !
       if(iflag_debug .gt. 0) write(*,*) 'sum_sph_layerd_correlate'
-      call sum_sph_layerd_correlate                                     &
-     &   (sph_params%l_truncation, sph_rj, g_sph_rj, rj_fld1, rj_fld2,  &
+      call sum_sph_layerd_correlate(sph_params%l_truncation,            &
+     &    sph_rj, leg%g_sph_rj, rj_fld1, rj_fld2,                       &
      &    cor%nri_rms, cor%num_fld_sq, cor%istack_comp_sq,              &
      &    cor%id_field, cor%kr_4_rms, cor%num_vol_spectr,               &
      &    cor%v_spectr, WK_pwr)

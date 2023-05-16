@@ -10,7 +10,18 @@
 !!@verbatim
 !!      subroutine read_sph_dipolarity_ctl                              &
 !!     &         (id_control, hd_block, fdip_ctl, c_buf)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(sph_dipolarity_control), intent(inout) :: fdip_ctl
+!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_sph_dipolarity_ctl                             &
+!!     &         (id_control, hd_block, fdip_ctl, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(sph_dipolarity_control), intent(in) :: fdip_ctl
+!!        integer(kind = kint), intent(inout) :: level
 !!      subroutine dealloc_sph_dipolarity_ctl(fdip_ctl)
+!!        type(sph_dipolarity_control), intent(inout) :: fdip_ctl
 !!
 !! -----------------------------------------------------------------
 !!
@@ -35,8 +46,6 @@
       use t_read_control_elements
       use t_control_array_character
       use t_ctl_data_sph_vol_spectr
-      use t_ctl_data_pick_sph_spectr
-      use t_mid_equator_control
       use skip_comment_f
 !
       implicit  none
@@ -100,6 +109,42 @@
       fdip_ctl%i_dipolarity_ctl = 1
 !
       end subroutine read_sph_dipolarity_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine write_sph_dipolarity_ctl                               &
+     &         (id_control, hd_block, fdip_ctl, level)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(sph_dipolarity_control), intent(in) :: fdip_ctl
+!
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
+!
+!
+      if(fdip_ctl%i_dipolarity_ctl .le. 0) return
+!
+      maxlen = len_trim(hd_fdip_truncation)
+      maxlen = max(maxlen, len_trim(hd_fdip_file_prefix))
+      maxlen = max(maxlen, len_trim(hd_fdip_file_format))
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_control_array_i1(id_control, level,                    &
+     &    hd_fdip_truncation, fdip_ctl%fdip_truncation_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_fdip_file_prefix,fdip_ctl%fdip_file_prefix_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_fdip_file_format, fdip_ctl%fdip_file_format_ctl)
+!
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_sph_dipolarity_ctl
 !
 ! -----------------------------------------------------------------------
 !

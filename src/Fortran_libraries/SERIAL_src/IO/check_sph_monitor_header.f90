@@ -12,7 +12,6 @@
 !!     &                kr_inside, r_inside, kr_outside, r_outside,     &
 !!     &                num_fld_sq, num_comp_sq, pwr_name,              &
 !!     &                ntot_comp_sq, pwr_label)
-!!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) ::  sph_rj
 !!        integer(kind = kint), intent(in) :: id_file
 !!        character(len = kchara), intent(in) :: mode_label

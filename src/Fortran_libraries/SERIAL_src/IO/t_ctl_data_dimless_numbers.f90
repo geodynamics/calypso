@@ -10,9 +10,18 @@
 !!@verbatim
 !!      subroutine read_dimless_ctl                                     &
 !!     &         (id_control, hd_block, dless_ctl, c_buf)
-!!      subroutine dealloc_dimless_ctl(dless_ctl)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
 !!        type(dimless_control), intent(inout) :: dless_ctl
 !!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_dimless_ctl                                    &
+!!     &         (id_control, hd_block, dless_ctl, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(dimless_control), intent(in) :: dless_ctl
+!!        integer(kind = kint), intent(inout) :: level
+!!      subroutine dealloc_dimless_ctl(dless_ctl)
+!!        type(dimless_control), intent(inout) :: dless_ctl
 !!
 !!   --------------------------------------------------------------------
 !!    example
@@ -94,6 +103,31 @@
       dless_ctl%i_dimless_ctl = 1
 !
       end subroutine read_dimless_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_dimless_ctl                                      &
+     &         (id_control, hd_block, dless_ctl, level)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(dimless_control), intent(in) :: dless_ctl
+!
+      integer(kind = kint), intent(inout) :: level
+!
+!
+      if(dless_ctl%i_dimless_ctl .le. 0) return
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_control_array_c_r(id_control, level,                   &
+     &    hd_dimless, dless_ctl%dimless)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_dimless_ctl
 !
 !   --------------------------------------------------------------------
 !

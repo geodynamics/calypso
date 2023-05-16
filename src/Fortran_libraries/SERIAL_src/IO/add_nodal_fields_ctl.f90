@@ -9,7 +9,7 @@
 !!@verbatim
 !!      logical function check_field_list_ctl(field, field_ctl)
 !!      subroutine add_phys_name_ctl(field, field_ctl)
-!!      subroutine add_viz_name_ctl(my_rank, field_name, field_ctl)
+!!      subroutine add_viz_name_ctl(field_name, field_ctl)
 !!        type(field_def), intent(in) :: field
 !!        type(ctl_array_c3), intent(inout) :: field_ctl
 !!
@@ -98,9 +98,8 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine add_viz_name_ctl(my_rank, field_name, field_ctl)
+      subroutine add_viz_name_ctl(field_name, field_ctl)
 !
-      integer, intent(in) :: my_rank
       character(len=kchara), intent(in) :: field_name
       type(ctl_array_c3), intent(inout) :: field_ctl
 !
@@ -113,10 +112,8 @@
         if(field_ctl%c1_tbl(i) .eq. field_name) then
           if(field_ctl%c2_tbl(i) .ne. cflag_viz_on) then
             field_ctl%c2_tbl(i) = cflag_viz_on
-            if(my_rank .gt. 0) then
-              write(*,*) 'Visualization flag is turned on for ',        &
-     &                   trim(field_ctl%c1_tbl(i)), ' (', i, ')'
-            end if
+            write(*,*) 'Visualization flag is turned on for ',          &
+     &                 trim(field_ctl%c1_tbl(i)), ' (', i, ')'
           end if
           return
         end if

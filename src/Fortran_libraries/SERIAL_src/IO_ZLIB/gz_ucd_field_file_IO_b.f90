@@ -13,9 +13,9 @@
 !!        type(ucd_data), intent(in) :: ucd
 !!
 !!      subroutine gz_read_ucd_2_fld_file_b                             &
-!!     &         (id_rank, gzip_name, t_IO, ucd, ierr_IO)
+!!     &         (id_rank, gzip_name, t_IO, ucd)
 !!      subroutine gz_read_alloc_ucd_2_fld_file_b                       &
-!!     &         (id_rank, gzip_name, t_IO, ucd, ierr)
+!!     &         (id_rank, gzip_name, t_IO, ucd)
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(ucd_data), intent(inout) :: ucd
 !!@endverbatim
@@ -81,7 +81,7 @@
 !------------------------------------------------------------------
 !
       subroutine gz_read_ucd_2_fld_file_b                               &
-     &         (id_rank, gzip_name, t_IO, ucd, ierr_IO)
+     &         (id_rank, gzip_name, t_IO, ucd)
 !
       use skip_gz_comment
       use gzip_file_access
@@ -89,7 +89,6 @@
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
-      integer(kind = kint), intent(inout) :: ierr_IO
 !
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd
@@ -128,7 +127,7 @@
 !------------------------------------------------------------------
 !
       subroutine gz_read_alloc_ucd_2_fld_file_b                         &
-     &         (id_rank, gzip_name, t_IO, ucd, ierr_IO)
+     &         (id_rank, gzip_name, t_IO, ucd)
 !
       use skip_gz_comment
       use gzip_file_access
@@ -136,7 +135,6 @@
 !
       character(len=kchara), intent(in) :: gzip_name
       integer, intent(in) :: id_rank
-      integer(kind = kint), intent(inout) :: ierr_IO
 !
       type(time_data), intent(inout) :: t_IO
       type(ucd_data), intent(inout) :: ucd

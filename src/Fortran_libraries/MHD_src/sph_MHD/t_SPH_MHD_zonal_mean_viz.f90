@@ -7,16 +7,14 @@
 !>@brief  Make zonal mean sections
 !!
 !!@verbatim
-!!      subroutine init_zonal_mean_sections                             &
-!!     &         (viz_step, geofem, edge_comm, nod_fld, zm_ctls, zmeans,&
-!!     &          SR_sig, SR_il)
+!!      subroutine init_zonal_mean_sections(viz_step, geofem, edge_comm,&
+!!     &         nod_fld, zm_ctls, zmeans, m_SR)
 !!        type(VIZ_step_params), intent(in) :: viz_step
 !!        type(mesh_data), intent(in) :: geofem
 !!        type(phys_data), intent(in) :: nod_fld
 !!        type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
 !!        type(sph_zonal_mean_sectioning), intent(inout) :: zmeans
-!!        type(send_recv_status), intent(inout) :: SR_sig
-!!        type(send_recv_int8_buffer), intent(inout) :: SR_il
+!!        type(mesh_SR), intent(inout) :: m_SR
 !!      subroutine SPH_MHD_zmean_sections(viz_step, time_d,             &
 !!     &          sph, geofem, WK, nod_fld, zmeans, m_SR)
 !!        type(VIZ_step_params), intent(in) :: viz_step
@@ -76,9 +74,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine init_zonal_mean_sections                               &
-     &         (viz_step, geofem, edge_comm, nod_fld, zm_ctls, zmeans,  &
-     &          SR_sig, SR_il)
+      subroutine init_zonal_mean_sections(viz_step, geofem, edge_comm,  &
+     &         nod_fld, zm_ctls, zmeans, m_SR)
 !
       use t_control_data_dynamo_vizs
 !
@@ -89,17 +86,16 @@
 !
       type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
       type(sph_zonal_mean_sectioning), intent(inout) :: zmeans
-      type(send_recv_status), intent(inout) :: SR_sig
-      type(send_recv_int8_buffer), intent(inout) :: SR_il
+      type(mesh_SR), intent(inout) :: m_SR
 !
 !
       if(iflag_VIZ_time) call start_elapsed_time(ist_elapsed_VIZ+1)
       call SECTIONING_initialize                                        &
      &   (viz_step%PSF_t%increment, geofem, edge_comm, nod_fld,         &
-     &    zm_ctls%zm_psf_ctls, zmeans%zm_psf, SR_sig, SR_il)
-      call SECTIONING_initialize                                        &
-     &   (viz_step%PSF_t%increment, geofem, edge_comm, nod_fld,         &
-     &    zm_ctls%zRMS_psf_ctls, zmeans%zrms_psf, SR_sig, SR_il)
+     &    zm_ctls%zm_psf_ctls, zmeans%zm_psf, m_SR%SR_sig, m_SR%SR_il)
+      call SECTIONING_initialize(viz_step%PSF_t%increment,              &
+     &    geofem, edge_comm, nod_fld, zm_ctls%zRMS_psf_ctls,            &
+     &    zmeans%zrms_psf, m_SR%SR_sig, m_SR%SR_il)
       if(iflag_VIZ_time) call end_elapsed_time(ist_elapsed_VIZ+1)
 !
       end subroutine init_zonal_mean_sections

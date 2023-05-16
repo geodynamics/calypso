@@ -128,7 +128,7 @@
       if(output_IO_flag(i_step,ucd_step) .eqv. .FALSE.) return
       istep_ucd = IO_step_exc_zero_inc(i_step, ucd_step)
       call set_data_by_read_ucd_once                                    &
-    &    (my_rank, istep_ucd, udt_file_param, nod_fld, t_IO)
+    &    (istep_ucd, udt_file_param, nod_fld, t_IO)
 !
       end subroutine read_udt_4_snap
 !

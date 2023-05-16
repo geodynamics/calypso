@@ -185,9 +185,9 @@
      &    m_SR%SR_sig, m_SR%SR_il)
 !
       call check_element_position                                       &
-     &   (txt_ele, node%numnod, node%inod_global, ele%numele,           &
+     &   (txt_ele, node%inod_global, ele%numele,                        &
      &    ele%nnod_4_ele, ele%ie, ele%iele_global, ele%x_ele,           &
-     &    inod_dbl, iele_dbl, ele_comm, m_SR%SR_sig, m_SR%SR_r)
+     &    inod_dbl, ele_comm, m_SR%SR_sig, m_SR%SR_r)
       call dealloc_sum_of_local_id_list(sum_list_e)
       call dealloc_double_numbering(inod_dbl)
       call dealloc_ele_double_number(iele_dbl)
@@ -262,10 +262,9 @@
 !
       call calypso_mpi_barrier
       call check_element_position                                       &
-     &   (txt_edge, node%numnod, node%inod_global, edge%numedge,        &
+     &   (txt_edge, node%inod_global, edge%numedge,                     &
      &    edge%nnod_4_edge, edge%ie_edge, edge%iedge_global,            &
-     &    edge%x_edge, inod_dbl, iedge_dbl, edge_comm,                  &
-     &    m_SR%SR_sig, m_SR%SR_r)
+     &    edge%x_edge, inod_dbl, edge_comm, m_SR%SR_sig, m_SR%SR_r)
       call dealloc_sum_of_local_id_list(sum_list_d)
       call dealloc_double_numbering(inod_dbl)
       call dealloc_ele_double_number(iedge_dbl)

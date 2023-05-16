@@ -8,8 +8,6 @@
 !!@n        Modified by H. Matsui on Oct., 2007
 !!
 !!@verbatim
-!!      subroutine read_bc_4_surf_ctl                                   &
-!!     &         (id_control, hd_block, sbc_ctl, c_buf)
 !!      subroutine bcast_bc_4_surf_ctl(sbc_ctl)
 !!      subroutine dealloc_bc_4_surf_ctl(sbc_ctl)
 !!        type(surf_bc_control), intent(inout) :: sbc_ctl
@@ -21,7 +19,7 @@
 !!!!!  boundary condition for heat flux  !!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  available type:  fixed, file, SGS_commute
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array heat_flux_surf  2
+!!      array heat_flux_surf
 !!        heat_flux_surf  fixed       outer  0.000  end
 !!        heat_flux_surf  SGS_commute inner  0.000  end
 !!      end array heat_flux_surf
@@ -33,14 +31,14 @@
 !!     free_shell_in, free_shell_out
 !!     free_4_plane
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array velocity_surf     2
+!!      array velocity_surf
 !!        velocity_surf  free_shell_in inner_surf   0.000  end
 !!        velocity_surf  free_shell_out  outer_surf   0.000  end
 !!      end array velocity_surf
 !!!!!  boundary condition for pressure gradiend !!!!!!!!!!!!!!!!!!!
 !!  available type:  inner_shell, outer_shell
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!       array pressure_surf  2
+!!       array pressure_surf
 !!         pressure_surf   inner_shell inner_surf 0.000  end
 !!         pressure_surf   outer_shell outer_surf 0.000  end
 !!      end array pressure_surf
@@ -49,7 +47,7 @@
 !!     insulate_in, insulate_out (not recommended)
 !!     far_away                  (not used)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!       array magnetic_field_surf  3
+!!       array magnetic_field_surf
 !!          magnetic_field_surf  insulate_in  ICB_surf  0.000 end
 !!          magnetic_field_surf  insulate_out CMB_surf  0.000 end
 !!          magnetic_field_surf  far_away infinity_surf  0.000 end
@@ -58,7 +56,7 @@
 !!     fix_x,  fix_y,  fix_z
 !!     insulate_in, insulate_out (not recommended)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!       array vector_potential_surf  1
+!!       array vector_potential_surf
 !!          vector_potential_surf  insulate_out CMB_surf  0.000 end
 !!      end array vector_potential_surf
 !!!!!  boundary condition for current density on surface  !!!!!!!!!!
@@ -66,7 +64,7 @@
 !!     insulate_in,insulate_out (not recommended)
 !!     far_away                  (not used)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!       array current_surf  3
+!!       array current_surf
 !!          current_surf  insulate_in  ICB_surf  0.000 end
 !!          current_surf  insulate_out CMB_surf  0.000 end
 !!          current_surf  far_away infinity_surf  0.000 end
@@ -74,7 +72,7 @@
 !!!!!  boundary condition for magnetic potential !!!!!!!!!!!!!!!!!
 !!  available type:  fixed (not used), file (not used)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!       array electric_potential_surf  1
+!!       array electric_potential_surf
 !!          electric_potential_surf  insulate_in  ICB_surf  0.000 end
 !!          electric_potential_surf  insulate_out CMB_surf  0.000 end
 !!          electric_potential_surf  far_away infinity_surf  0.000 end
@@ -83,7 +81,7 @@
 !!  available type:  fixed_grad (not used), file_grad (not used)
 !!                   fixed_field
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!       array composition_flux_surf  3
+!!       array composition_flux_surf
 !!          composition_flux_surf  insulate_in  ICB_surf  0.000 end
 !!          composition_flux_surf  insulate_out CMB_surf  0.000 end
 !!          composition_flux_surf  far_away infinity_surf  0.000 end
@@ -91,7 +89,7 @@
 !!!!!  boundary condition for infinity (obsolute) !!!!!!!!!!!!!!!!!
 !!  available type:  fixed (not used), file (not used)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!      array infinity_surf 1
+!!      array infinity_surf
 !!        infinity_surf  fixed infinity_surf  0.000  end
 !!      end array infinity_surf
 !!    end  bc_4_surface
@@ -172,109 +170,13 @@
         integer (kind=kint) :: i_bc_4_surf =     0
       end type surf_bc_control
 !
-!   4th level for surface boundary
-!
-      character(len=kchara), parameter                                  &
-     &       :: hd_n_bc_hf =     'heat_flux_surf'
-      character(len=kchara), parameter                                  &
-     &       :: hd_n_bc_mf =     'velocity_surf'
-      character(len=kchara), parameter                                  &
-     &       :: hd_n_bc_gradp =  'pressure_surf'
-      character(len=kchara), parameter                                  &
-     &       :: hd_n_bc_gradb =  'magnetic_field_surf'
-      character(len=kchara), parameter                                  &
-     &       :: hd_n_bc_grada =  'vector_potential_surf'
-      character(len=kchara), parameter                                  &
-     &       :: hd_n_bc_gradj =  'current_surf'
-      character(len=kchara), parameter                                  &
-     &       :: hd_n_bc_gradmp = 'electric_potential_surf'
-      character(len=kchara), parameter                                  &
-     &       :: hd_n_bc_gradc =  'composition_flux_surf'
-      character(len=kchara), parameter                                  &
-     &       :: hd_n_bc_infty =  'infinity_surf'
-!
-      private :: hd_n_bc_hf, hd_n_bc_gradc, hd_n_bc_infty
-      private :: hd_n_bc_mf, hd_n_bc_gradp, hd_n_bc_gradmp
-      private :: hd_n_bc_gradb, hd_n_bc_grada, hd_n_bc_gradj
-!
 !   --------------------------------------------------------------------
 !
       contains
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_bc_4_surf_ctl                                     &
-     &         (id_control, hd_block, sbc_ctl, c_buf)
-!
-      use t_read_control_elements
-      use skip_comment_f
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(surf_bc_control), intent(inout) :: sbc_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(sbc_ctl%i_bc_4_surf .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_control_array_c2_r(id_control,                        &
-     &      hd_n_bc_hf, sbc_ctl%surf_bc_HF_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-     &      hd_n_bc_mf, sbc_ctl%surf_bc_ST_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-     &      hd_n_bc_gradp, sbc_ctl%surf_bc_PN_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-     &      hd_n_bc_gradb, sbc_ctl%surf_bc_BN_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-     &      hd_n_bc_gradj, sbc_ctl%surf_bc_JN_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-     &      hd_n_bc_grada, sbc_ctl%surf_bc_AN_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-     &      hd_n_bc_gradmp, sbc_ctl%surf_bc_MPN_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-     &      hd_n_bc_gradc, sbc_ctl%surf_bc_CF_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-     &      hd_n_bc_infty, sbc_ctl%surf_bc_INF_ctl, c_buf)
-      end do
-      sbc_ctl%i_bc_4_surf = 1
-!
-      end subroutine read_bc_4_surf_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine bcast_bc_4_surf_ctl(sbc_ctl)
-!
-      use calypso_mpi_int
-      use bcast_control_arrays
-!
-      type(surf_bc_control), intent(inout) :: sbc_ctl
-!
-!
-      call bcast_ctl_array_c2r(sbc_ctl%surf_bc_HF_ctl)
-      call bcast_ctl_array_c2r(sbc_ctl%surf_bc_ST_ctl)
-      call bcast_ctl_array_c2r(sbc_ctl%surf_bc_PN_ctl)
-      call bcast_ctl_array_c2r(sbc_ctl%surf_bc_BN_ctl)
-      call bcast_ctl_array_c2r(sbc_ctl%surf_bc_JN_ctl)
-      call bcast_ctl_array_c2r(sbc_ctl%surf_bc_AN_ctl)
-      call bcast_ctl_array_c2r(sbc_ctl%surf_bc_MPN_ctl)
-      call bcast_ctl_array_c2r(sbc_ctl%surf_bc_CF_ctl)
-      call bcast_ctl_array_c2r(sbc_ctl%surf_bc_INF_ctl)
-!
-      call calypso_mpi_bcast_one_int(sbc_ctl%i_bc_4_surf, 0)
-!
-      end subroutine bcast_bc_4_surf_ctl
-!
-!   --------------------------------------------------------------------
-!
       subroutine dealloc_bc_4_surf_ctl(sbc_ctl)
-!
-      use bcast_control_arrays
 !
       type(surf_bc_control), intent(inout) :: sbc_ctl
 !

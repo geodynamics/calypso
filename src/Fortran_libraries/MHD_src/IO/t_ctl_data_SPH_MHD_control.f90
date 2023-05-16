@@ -13,7 +13,18 @@
 !!@verbatim
 !!      subroutine read_sph_mhd_control                                 &
 !!     &         (id_control, hd_block, smctl_ctl, c_buf)
-!!      subroutine bcast_sph_mhd_control(smctl_ctl)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(sph_mhd_control_control), intent(inout) :: smctl_ctl
+!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_sph_mhd_control                                &
+!!     &         (id_control, hd_block, smctl_ctl, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(sph_mhd_control_control), intent(in) :: smctl_ctl
+!!        integer(kind = kint), intent(inout) :: level
+!!
+!!      subroutine reset_sph_mhd_control(smctl_ctl)
 !!        type(sph_mhd_control_control), intent(inout) :: smctl_ctl
 !!@endverbatim
 !
@@ -21,11 +32,11 @@
 !
       use m_precision
 !
-      use calypso_mpi
       use m_machine_parameter
       use t_read_control_elements
       use t_ctl_data_4_time_steps
       use t_ctl_data_mhd_evo_scheme
+      use t_ctl_data_mhd_restart
 !
       use skip_comment_f
 !
@@ -61,6 +72,9 @@
       subroutine read_sph_mhd_control                                   &
      &         (id_control, hd_block, smctl_ctl, c_buf)
 !
+      use ctl_data_4_time_steps_IO
+      use ctl_data_mhd_evo_scheme_IO
+!
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
 !
@@ -73,7 +87,6 @@
       do
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_flag(c_buf, hd_block)) exit
-!
 !
 !
         call read_control_time_step_data                                &
@@ -89,23 +102,51 @@
       end subroutine read_sph_mhd_control
 !
 !   --------------------------------------------------------------------
+!
+      subroutine write_sph_mhd_control                                  &
+     &         (id_control, hd_block, smctl_ctl, level)
+!
+      use ctl_data_mhd_evo_scheme_IO
+      use ctl_data_4_time_steps_IO
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(sph_mhd_control_control), intent(in) :: smctl_ctl
+!
+      integer(kind = kint), intent(inout) :: level
+!
+!
+      if(smctl_ctl%i_control .le. 0) return
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_control_time_step_data                                 &
+     &   (id_control, hd_time_step, smctl_ctl%tctl, level)
+      call write_restart_ctl                                            &
+     &   (id_control, hd_restart_file, smctl_ctl%mrst_ctl, level)
+!
+      call write_time_loop_ctl                                          &
+     &   (id_control, hd_time_loop, smctl_ctl%mevo_ctl, level)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_sph_mhd_control
+!
+!   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_sph_mhd_control(smctl_ctl)
-!
-      use calypso_mpi_int
-      use bcast_4_time_step_ctl
+      subroutine reset_sph_mhd_control(smctl_ctl)
 !
       type(sph_mhd_control_control), intent(inout) :: smctl_ctl
 !
 !
-      call bcast_restart_ctl(smctl_ctl%mrst_ctl)
-      call bcast_time_loop_ctl(smctl_ctl%mevo_ctl)
-      call bcast_ctl_data_4_time_step(smctl_ctl%tctl)
+      call reset_restart_ctl(smctl_ctl%mrst_ctl)
+      call reset_time_loop_ctl(smctl_ctl%mevo_ctl)
+      call reset_ctl_data_4_time_step(smctl_ctl%tctl)
 !
-      call calypso_mpi_bcast_one_int(smctl_ctl%i_control, 0)
+      smctl_ctl%i_control = 0
 !
-      end subroutine bcast_sph_mhd_control
+      end subroutine reset_sph_mhd_control
 !
 !   --------------------------------------------------------------------
 !

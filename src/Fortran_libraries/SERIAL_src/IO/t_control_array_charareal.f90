@@ -11,7 +11,7 @@
 !!        type(buffer_for_control), intent(in)  :: c_buf
 !!        type(read_chara_real_item), intent(inout) :: cr_item
 !!      subroutine write_charareal_ctl_type                             &
-!!     &         (id_file, level, label, cr_item)
+!!     &         (id_file, level, maxlen, label, cr_item)
 !!        type(read_chara_real_item), intent(in) :: cr_item
 !!      subroutine copy_charareal_ctl(org_cr, new_cr)
 !!        type(read_chara_real_item), intent(in) :: org_cr
@@ -101,18 +101,19 @@
 !   --------------------------------------------------------------------
 !
       subroutine write_charareal_ctl_type                               &
-     &         (id_file, level, label, cr_item)
+     &         (id_file, level, maxlen, label, cr_item)
 !
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file, level
+      integer(kind = kint), intent(in) :: maxlen
       character(len=kchara), intent(in) :: label
       type(read_chara_real_item), intent(in) :: cr_item
 !
 !
       if(cr_item%iflag .eq. 0) return
 !
-      call write_chara_real_ctl_item(id_file, level, label,             &
+      call write_chara_real_ctl_item(id_file, level, maxlen, label,     &
      &    cr_item%charavalue, cr_item%realvalue)
 !
        end subroutine write_charareal_ctl_type
@@ -203,9 +204,11 @@
       use skip_comment_f
       use write_control_elements
 !
-      integer(kind = kint), intent(in) :: id_control, level
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: label
       type(ctl_array_cr), intent(in) :: array_cr
+!
+      integer(kind = kint), intent(inout) :: level
 !
       integer(kind = kint) :: i
 !
@@ -213,13 +216,13 @@
       if(array_cr%num .le. 0) return
       write(id_control,'(a1)') '!'
 !
-      call write_array_flag_for_ctl                                     &
-     &   (id_control, level, label, array_cr%num)
+      level = write_array_flag_for_ctl(id_control, level, label)
       do i = 1, array_cr%num
-        call write_chara_real_ctl_item(id_control, (level+1), label,    &
-     &     array_cr%c_tbl(i), array_cr%vect(i))
+        call write_chara_real_ctl_item                                  &
+     &     (id_control, level, len_trim(label), label,                  &
+     &      array_cr%c_tbl(i), array_cr%vect(i))
       end do
-      call write_end_array_flag_for_ctl(id_control, level, label)
+      level = write_end_array_flag_for_ctl(id_control, level, label)
 !
       end subroutine write_control_array_c_r
 !

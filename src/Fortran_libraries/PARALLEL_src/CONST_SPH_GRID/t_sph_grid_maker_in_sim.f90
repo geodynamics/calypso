@@ -74,7 +74,7 @@
 !
         if (iflag_debug.gt.0) write(*,*) 'set_control_4_shell_grids'
         call set_control_4_shell_grids                                  &
-     &     (nprocs, psph_ctl%Fmesh_ctl, psph_ctl%spctl, psph_ctl%sdctl, &
+     &     (nprocs, psph_ctl%spctl, psph_ctl%sdctl,                     &
      &      sph_maker%sph_tmp, sph_maker%gen_sph, ierr)
       end if
 !

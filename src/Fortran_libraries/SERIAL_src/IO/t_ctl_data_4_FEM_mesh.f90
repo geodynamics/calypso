@@ -10,7 +10,7 @@
 !!      subroutine read_FEM_mesh_control                                &
 !!     &         (id_control, hd_block, Fmesh_ctl, c_buf)
 !!      subroutine write_FEM_mesh_control                               &
-!!     &         (id_file, hd_block, Fmesh_ctl, level)
+!!     &         (id_control, hd_block, Fmesh_ctl, level)
 !!      subroutine reset_FEM_mesh_control(Fmesh_ctl)
 !!        type(FEM_mesh_control), intent(inout) :: Fmesh_ctl
 !!      subroutine copy_FEM_mesh_control(org_Fmesh_c, new_Fmesh_c)
@@ -107,13 +107,13 @@
 !  ---------------------------------------------------------------------
 !
       subroutine write_FEM_mesh_control                                 &
-     &         (id_file, hd_block, Fmesh_ctl, level)
+     &         (id_control, hd_block, Fmesh_ctl, level)
 !
       use m_machine_parameter
       use t_read_control_elements
       use write_control_elements
 !
-      integer(kind = kint), intent(in) :: id_file
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
       type(FEM_mesh_control), intent(in) :: Fmesh_ctl
 !
@@ -121,22 +121,27 @@
 !
       integer(kind = kint) :: maxlen = 0
 !
-      maxlen = max(maxlen, len_trim(hd_mem_conserve))
+!
+      if(Fmesh_ctl%i_FEM_mesh .le. 0) return
+!
+      maxlen = len_trim(hd_mem_conserve)
       maxlen = max(maxlen, len_trim(hd_FEM_mesh_output))
       maxlen = max(maxlen, len_trim(hd_FEM_surf_output))
       maxlen = max(maxlen, len_trim(hd_FEM_viewer_output))
 !
-      write(id_file,'(a)') '!'
-      call write_chara_ctl_type(id_file, level, maxlen,                 &
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_mem_conserve, Fmesh_ctl%memory_conservation_ctl)
-      call write_chara_ctl_type(id_file, level, maxlen,                 &
+      call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_FEM_mesh_output, Fmesh_ctl%FEM_mesh_output_switch)
-      call write_chara_ctl_type(id_file, level, maxlen,                 &
+      call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_FEM_surf_output, Fmesh_ctl%FEM_surface_output_switch)
-      call write_chara_ctl_type(id_file, level, maxlen,                 &
+      call write_chara_ctl_type(id_control, level, maxlen,              &
      &    hd_FEM_viewer_output, Fmesh_ctl%FEM_viewer_output_switch)
 !
-      level =  write_end_flag_for_ctl(id_file, level, hd_block)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
 !
       end subroutine write_FEM_mesh_control
 !

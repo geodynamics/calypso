@@ -8,8 +8,7 @@
 !!
 !!@verbatim
 !!      subroutine set_control_4_shell_grids(nprocs_check,              &
-!!     &          Fmesh_ctl, spctl, sdctl, sph, gen_sph, ierr)
-!!        type(FEM_mesh_control), intent(in) :: Fmesh_ctl
+!!     &          spctl, sdctl, sph, gen_sph, ierr)
 !!        type(sphere_data_control), intent(inout) :: spctl
 !!        type(sphere_domain_control), intent(in) :: sdctl
 !!        type(sph_grids), intent(inout) :: sph
@@ -45,7 +44,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_control_4_shell_grids(nprocs_check,                &
-     &          Fmesh_ctl, spctl, sdctl, sph, gen_sph, ierr)
+     &          spctl, sdctl, sph, gen_sph, ierr)
 !
       use m_constants
       use m_machine_parameter
@@ -58,7 +57,6 @@
       use skip_comment_f
 !
       integer, intent(in) :: nprocs_check
-      type(FEM_mesh_control), intent(in) :: Fmesh_ctl
       type(sphere_data_control), intent(in) :: spctl
       type(sphere_domain_control), intent(in) :: sdctl
       type(sph_grids), intent(inout) :: sph

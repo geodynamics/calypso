@@ -1,9 +1,17 @@
-!t_control_data_section_only.f90
-!      module t_control_data_section_only
+!>@file   t_control_data_section_only.f90
+!!@brief  module t_control_data_section_only
+!!
+!!@author H. Matsui
+!!@date Programmed in March. 2006
 !
-!      Written by H. Matsui on July, 2006
-!
-!!      subroutine read_control_file_section_only(sec_viz_ctl)
+!>@brief  Control data of node monitoring
+!!
+!!@verbatim
+!!      subroutine read_control_file_section_only(file_name,            &
+!!     &                                          sec_viz_ctl)
+!!      subroutine write_control_file_section_only(file_name,           &
+!!     &                                           sec_viz_ctl)
+!!        character(len=kchara), intent(in) :: file_name
 !!      subroutine dealloc_section_control_data(sec_viz_ctl)
 !!        type(control_data_section_only), intent(inout) :: sec_viz_ctl
 !!
@@ -26,13 +34,13 @@
 !!  end  visualizer
 !!
 !!    -------------------------------------------------------------------
+!!@endverbatim
 !
       module t_control_data_section_only
 !
       use m_precision
 !
       use m_machine_parameter
-      use calypso_mpi
       use t_read_control_elements
       use t_ctl_data_4_platforms
       use t_ctl_data_4_time_steps
@@ -43,8 +51,6 @@
 !
 !
       integer(kind = kint), parameter :: viz_ctl_file_code = 11
-      character(len = kchara), parameter                                &
-     &                        :: fname_viz_ctl = "control_viz"
 !
 !>      Structure of control data for sectioning only
       type control_data_section_only
@@ -64,21 +70,19 @@
 !
 !     top level
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                    :: hd_viz_only_file = 'visualizer'
 !
-      character(len=kchara), parameter                                  &
+      character(len=kchara), parameter, private                         &
      &                    :: hd_platform = 'data_files_def'
-      character(len=kchara), parameter                                  &
-     &      :: hd_time_step = 'time_step_ctl'
-      character(len=kchara), parameter :: hd_viz_ctl = 'visual_control'
+      character(len=kchara), parameter, private                         &
+     &                    :: hd_time_step = 'time_step_ctl'
+      character(len=kchara), parameter, private                         &
+     &                    :: hd_viz_ctl = 'visual_control'
 !
-      private :: hd_viz_only_file
-      private :: hd_platform, hd_time_step, hd_viz_ctl
+      private :: viz_ctl_file_code
 !
-      private :: viz_ctl_file_code, fname_viz_ctl
-!
-      private :: read_section_control_data, bcast_section_control_data
+      private :: read_section_control_data, write_section_control_data
 !
 !   --------------------------------------------------------------------
 !
@@ -86,37 +90,61 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine read_control_file_section_only(sec_viz_ctl)
+      subroutine read_control_file_section_only(file_name,              &
+     &                                          sec_viz_ctl)
 !
       use skip_comment_f
       use t_control_data_surfacings
 !
+      character(len=kchara), intent(in) :: file_name
       type(control_data_section_only), intent(inout) :: sec_viz_ctl
       type(buffer_for_control) :: c_buf1
 !
 !
-      if(my_rank .eq. 0) then
-        open (viz_ctl_file_code, file=fname_viz_ctl, status='old' )
-        do
-          call load_one_line_from_control(viz_ctl_file_code, c_buf1)
-          call read_section_control_data                                &
-     &       (viz_ctl_file_code, hd_viz_only_file, sec_viz_ctl, c_buf1)
-          if(sec_viz_ctl%i_viz_only_file .gt. 0) exit
-        end do
-        close(viz_ctl_file_code)
+      open (viz_ctl_file_code, file=file_name, status='old' )
+      do
+        call load_one_line_from_control(viz_ctl_file_code, c_buf1)
+        call read_section_control_data                                  &
+     &     (viz_ctl_file_code, hd_viz_only_file, sec_viz_ctl, c_buf1)
+        if(sec_viz_ctl%i_viz_only_file .gt. 0) exit
+      end do
+      close(viz_ctl_file_code)
 !
-        call section_step_ctls_to_time_ctl                              &
-     &     (sec_viz_ctl%surfacing_ctls, sec_viz_ctl%t_sect_ctl)
+      call section_step_ctls_to_time_ctl                                &
+     &   (sec_viz_ctl%surfacing_ctls, sec_viz_ctl%t_sect_ctl)
 !
-        sec_viz_ctl%viz_field_ctl%num =  0
-        call alloc_control_array_c3(sec_viz_ctl%viz_field_ctl)
-        call add_fields_4_scts_to_fld_ctl(sec_viz_ctl%surfacing_ctls,   &
-     &                                    sec_viz_ctl%viz_field_ctl)
-      end if
-!
-      call bcast_section_control_data(sec_viz_ctl)
+      sec_viz_ctl%viz_field_ctl%num =  0
+      call alloc_control_array_c3(sec_viz_ctl%viz_field_ctl)
+      call add_fields_4_scts_to_fld_ctl(sec_viz_ctl%surfacing_ctls,     &
+     &                                  sec_viz_ctl%viz_field_ctl)
 !
       end subroutine read_control_file_section_only
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_control_file_section_only(file_name,             &
+     &                                           sec_viz_ctl)
+!
+      use delete_data_files
+!
+      character(len=kchara), intent(in) :: file_name
+      type(control_data_section_only), intent(in) :: sec_viz_ctl
+!
+      integer(kind = kint) :: level1
+!
+      if(check_file_exist(file_name)) then
+        write(*,*) 'File ', trim(file_name), ' exist. Continue?'
+        read(*,*)
+      end if
+!
+      write(*,*) 'Write surfacing control file: ', trim(file_name)
+      level1 = 0
+      open (viz_ctl_file_code, file=file_name)
+      call write_section_control_data                                   &
+     &   (viz_ctl_file_code, hd_viz_only_file, sec_viz_ctl, level1)
+      close(viz_ctl_file_code)
+!
+      end subroutine write_control_file_section_only
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
@@ -125,7 +153,9 @@
      &         (id_control, hd_block, sec_viz_ctl, c_buf)
 !
       use skip_comment_f
-      use read_surfacing_controls
+      use ctl_data_platforms_IO
+      use ctl_data_4_time_steps_IO
+      use control_data_surfacing_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: hd_block
@@ -154,30 +184,41 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_section_control_data(sec_viz_ctl)
+      subroutine write_section_control_data                             &
+     &         (id_control, hd_block, sec_viz_ctl, level)
 !
-      use calypso_mpi_int
-      use bcast_4_platform_ctl
-      use bcast_4_time_step_ctl
-      use bcast_control_arrays
+      use skip_comment_f
+      use ctl_data_platforms_IO
+      use ctl_data_4_time_steps_IO
+      use control_data_surfacing_IO
+      use write_control_elements
 !
-      type(control_data_section_only), intent(inout) :: sec_viz_ctl
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(control_data_section_only), intent(in) :: sec_viz_ctl
+!
+      integer(kind = kint), intent(inout) :: level
 !
 !
-      call bcast_ctl_array_c3(sec_viz_ctl%viz_field_ctl)
-      call bcast_ctl_data_4_platform(sec_viz_ctl%sect_plt)
-      call bcast_ctl_data_4_time_step(sec_viz_ctl%t_sect_ctl)
-      call bcast_surfacing_controls(sec_viz_ctl%surfacing_ctls)
+      if(sec_viz_ctl%i_viz_only_file .le. 0) return
 !
-      call calypso_mpi_bcast_one_int(sec_viz_ctl%i_viz_only_file, 0)
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
-      end subroutine bcast_section_control_data
+      call write_control_platforms                                      &
+     &   (id_control, hd_platform, sec_viz_ctl%sect_plt, level)
+      call write_control_time_step_data                                 &
+     &   (id_control, hd_time_step, sec_viz_ctl%t_sect_ctl, level)
+!
+      call write_surfacing_controls                                     &
+     &   (id_control, hd_viz_ctl, sec_viz_ctl%surfacing_ctls, level)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_section_control_data
 !
 !   --------------------------------------------------------------------
 !
       subroutine dealloc_section_control_data(sec_viz_ctl)
-!
-      use bcast_4_time_step_ctl
 !
       type(control_data_section_only), intent(inout) :: sec_viz_ctl
 !

@@ -7,7 +7,6 @@
 !> @brief Control data structure for visualization controls
 !!
 !!@verbatim
-!!      subroutine bcast_surfacing_controls(surfacing_ctls)
 !!      subroutine dealloc_surfacing_controls(surfacing_ctls)
 !!       type(surfacing_controls), intent(inout) :: surfacing_ctls
 !!       type(buffer_for_control), intent(inout)  :: c_buf
@@ -45,7 +44,6 @@
 !
       use m_precision
       use m_machine_parameter
-      use calypso_mpi
 !
       use t_control_data_sections
       use t_control_data_isosurfaces
@@ -87,34 +85,6 @@
       contains
 !
 !  ---------------------------------------------------------------------
-!
-      subroutine bcast_surfacing_controls(surfacing_ctls)
-!
-      use calypso_mpi_int
-      use bcast_control_arrays
-!
-      type(surfacing_controls), intent(inout) :: surfacing_ctls
-!
-!
-      call bcast_files_4_psf_ctl(surfacing_ctls%psf_s_ctls)
-      call bcast_files_4_iso_ctl(surfacing_ctls%iso_s_ctls)
-!
-      call bcast_ctl_type_r1(surfacing_ctls%delta_t_psf_s_ctl)
-      call bcast_ctl_type_r1(surfacing_ctls%delta_t_iso_s_ctl)
-      call bcast_ctl_type_r1(surfacing_ctls%delta_t_ucd_s_ctl)
-!
-      call bcast_ctl_type_i1(surfacing_ctls%i_step_psf_s_ctl)
-      call bcast_ctl_type_i1(surfacing_ctls%i_step_iso_s_ctl)
-      call bcast_ctl_type_i1(surfacing_ctls%i_step_ucd_s_ctl)
-!
-      call bcast_ctl_type_c1(surfacing_ctls%output_ucd_fmt_s_ctl)
-!
-      call calypso_mpi_bcast_one_int                                    &
-     &   (surfacing_ctls%i_surfacing_control, 0)
-!
-      end subroutine bcast_surfacing_controls
-!
-!   --------------------------------------------------------------------
 !
       subroutine dealloc_surfacing_controls(surfacing_ctls)
 !

@@ -163,6 +163,7 @@
       logical :: flag_miss
 !
 !
+      fname = base_name
       call check_gzip_or_ascii_file(base_name, fname,                   &
      &                              flag_gzip_lc, flag_miss)
 !

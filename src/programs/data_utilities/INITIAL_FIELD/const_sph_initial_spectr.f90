@@ -7,8 +7,8 @@
 !> @brief Set initial data for spectrum dynamos
 !!
 !!@verbatim
-!!      subroutine sph_initial_spectrum                                 &
-!!     &        (fst_file_IO, sph_MHD_bc, SPH_MHD, rst_step, sph_fst_IO)
+!!      subroutine sph_initial_spectrum(fst_file_IO, sph_MHD_bc,        &
+!!     &         SPH_MHD, MHD_step, rst_step, sph_fst_IO)
 !!        type(sph_grids), intent(in) :: sph
 !!        type(field_IO_params), intent(in) :: fst_file_IO
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
@@ -96,6 +96,7 @@
 !
       use t_SPH_MHD_model_data
       use t_SPH_mesh_field_data
+      use t_MHD_step_parameter
       use t_file_IO_parameter
       use t_boundary_data_sph_MHD
       use t_field_data_IO
@@ -125,11 +126,10 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine sph_initial_spectrum                                   &
-     &        (fst_file_IO, sph_MHD_bc, SPH_MHD, rst_step, sph_fst_IO)
+      subroutine sph_initial_spectrum(fst_file_IO, sph_MHD_bc,          &
+     &         SPH_MHD, MHD_step, rst_step, sph_fst_IO)
 !
       use m_initial_field_control
-      use m_MHD_step_parameter
       use t_IO_step_parameter
 !
       use sph_mhd_rst_IO_control
@@ -138,6 +138,7 @@
       type(field_IO_params), intent(in) :: fst_file_IO
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
       type(SPH_mesh_field_data), intent(inout) :: SPH_MHD
+      type(MHD_step_param), intent(inout) :: MHD_step
       type(IO_step_param), intent(inout) :: rst_step
       type(field_IO), intent(inout) :: sph_fst_IO
 !
@@ -186,17 +187,17 @@
      &    SPH_MHD%sph, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !  Copy initial field to restart IO data
-      call copy_time_step_data(MHD_step1%init_d, MHD_step1%time_d)
+      call copy_time_step_data(MHD_step%init_d, MHD_step%time_d)
       call set_sph_restart_num_to_IO(SPH_MHD%fld, sph_fst_IO)
 !
 !
-      if(MHD_step1%init_d%i_time_step .eq. -1) then
-        i_step = MHD_step1%init_d%i_time_step
+      if(MHD_step%init_d%i_time_step .eq. -1) then
+        i_step = MHD_step%init_d%i_time_step
       else
-        i_step = MHD_step1%time_d%i_time_step
+        i_step = MHD_step%time_d%i_time_step
       end if
       call output_sph_restart_control(i_step, fst_file_IO,              &
-     &    MHD_step1%time_d, SPH_MHD%fld, rst_step, sph_fst_IO)
+     &    MHD_step%time_d, SPH_MHD%fld, rst_step, sph_fst_IO)
 !
       end subroutine sph_initial_spectrum
 !

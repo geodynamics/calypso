@@ -54,7 +54,7 @@
       type(legendre_polynomials), intent(inout) :: leg
 !
 !
-      if(ltr .lt. 0) leg%nth = ltr
+      if(ltr .ge. 0) leg%nth = ltr
 !
       allocate ( leg%p(0:leg%nth,0:leg%nth) )
       allocate ( leg%dp(0:leg%nth,0:leg%nth) )
@@ -70,13 +70,15 @@
 !
 ! -----------------------------------------------------------------------
 !
-       subroutine dealloc_schmidt_polynomial(leg)
+      subroutine dealloc_schmidt_polynomial(leg)
 !
       type(legendre_polynomials), intent(inout) :: leg
 !
-        deallocate (leg%p, leg%dp, leg%dplm, leg%df)
+      if(allocated(leg%p) .eqv. .FALSE.) return
+      deallocate(leg%p, leg%dp, leg%dplm, leg%df)
+      leg%nth = 0
 !
-       end subroutine dealloc_schmidt_polynomial
+      end subroutine dealloc_schmidt_polynomial
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------

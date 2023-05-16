@@ -11,7 +11,7 @@
 !!        type(buffer_for_control), intent(in)  :: c_buf
 !!        type(read_int3_item), intent(inout) :: int3_item
 !!      subroutine write_integer3_ctl_type                              &
-!!     &         (id_control, level, label, int3_item)
+!!     &         (id_control, level, maxlen, label, int3_item)
 !!        type(read_int3_item), intent(in) :: int3_item
 !!      subroutine copy_integer3_ctl(org_i3, new_i3)
 !!        type(read_int3_item), intent(in) :: org_i3
@@ -98,16 +98,16 @@
 !   --------------------------------------------------------------------
 !
       subroutine write_integer3_ctl_type                                &
-     &         (id_control, level, label, int3_item)
+     &         (id_control, level, maxlen, label, int3_item)
 !
       use write_control_elements
 !
-      integer(kind = kint), intent(in) :: id_control, level
+      integer(kind = kint), intent(in) :: id_control, level, maxlen
       character(len=kchara), intent(in) :: label
       type(read_int3_item), intent(in) :: int3_item
 !
       if(int3_item%iflag .eq. 0) return
-      call write_integer3_ctl_item(id_control, level, label,            &
+      call write_integer3_ctl_item(id_control, level, maxlen, label,    &
      &    int3_item%intvalue(1), int3_item%intvalue(2),                 &
      &    int3_item%intvalue(3))
 !
@@ -199,9 +199,11 @@
 !
       use write_control_elements
 !
-      integer(kind = kint), intent(in) :: id_control, level
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: label
       type(ctl_array_i3), intent(in) :: array_i3
+!
+      integer(kind = kint), intent(inout) :: level
 !
       integer(kind = kint) :: i
 !
@@ -209,13 +211,13 @@
       if(array_i3%num .le. 0) return
       write(id_control,'(a1)') '!'
 !
-      call write_array_flag_for_ctl                                     &
-     &   (id_control, level, label, array_i3%num)
+      level = write_array_flag_for_ctl(id_control, level, label)
       do i = 1, array_i3%num
-        call write_integer3_ctl_item(id_control, (level+1), label,      &
+        call write_integer3_ctl_item                                    &
+     &     (id_control, level, len_trim(label), label,                  &
      &      array_i3%int1(i), array_i3%int2(i), array_i3%int3(i))
       end do
-      call write_end_array_flag_for_ctl(id_control, level, label)
+      level = write_end_array_flag_for_ctl(id_control, level, label)
 !
       end subroutine write_control_array_i3
 !

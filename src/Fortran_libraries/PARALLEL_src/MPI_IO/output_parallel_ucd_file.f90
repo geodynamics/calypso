@@ -30,18 +30,16 @@
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!
 !!      subroutine set_data_by_read_ucd                                 &
-!!     &         (id_rank, istep_ucd, ucd_param, t_IO, ucd, nod_fld)
+!!     &         (istep_ucd, ucd_param, t_IO, ucd, nod_fld)
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!        type(time_data), intent(inout) :: t_IO
 !!        type(ucd_data), intent(inout) :: ucd
 !!        type(phys_data), intent(inout) :: nod_fld
 !!
-!!      subroutine set_data_by_read_ucd_once(id_rank, istep_ucd,        &
-!!     &          ucd_param, nod_fld, t_IO)
-!!      subroutine add_ucd_to_data                                      &
-!!     &         (id_rank, istep_ucd, ucd_param, nod_fld)
-!!      subroutine subtract_by_ucd_data                                 &
-!!     &         (id_rank, istep_ucd, ucd_param, nod_fld)
+!!      subroutine set_data_by_read_ucd_once(istep_ucd, ucd_param,      &
+!!     &                                     nod_fld, t_IO)
+!!      subroutine add_ucd_to_data(istep_ucd, ucd_param, nod_fld)
+!!      subroutine subtract_by_ucd_data(istep_ucd, ucd_param, nod_fld)
 !!        type(field_IO_params), intent(in) :: ucd_param
 !!        type(phys_data), intent(inout) :: nod_fld
 !!@endverbatim
@@ -224,14 +222,13 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine set_data_by_read_ucd_once(id_rank, istep_ucd,          &
-     &          ucd_param, nod_fld, t_IO)
+      subroutine set_data_by_read_ucd_once(istep_ucd, ucd_param,        &
+     &          nod_fld, t_IO)
 !
       use set_and_cal_udt_data
       use parallel_ucd_IO_select
 !
       type(field_IO_params), intent(in) :: ucd_param
-      integer, intent(in) :: id_rank
       integer(kind = kint),  intent(in) :: istep_ucd
 !
       type(phys_data), intent(inout) :: nod_fld
@@ -252,13 +249,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine add_ucd_to_data                                        &
-     &         (id_rank, istep_ucd, ucd_param, nod_fld)
+      subroutine add_ucd_to_data(istep_ucd, ucd_param, nod_fld)
 !
       use set_and_cal_udt_data
       use parallel_ucd_IO_select
 !
-      integer, intent(in) :: id_rank
       integer(kind = kint),  intent(in) :: istep_ucd
       type(field_IO_params), intent(in) :: ucd_param
 !
@@ -280,14 +275,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine subtract_by_ucd_data                                   &
-     &         (id_rank, istep_ucd, ucd_param, nod_fld)
+      subroutine subtract_by_ucd_data(istep_ucd, ucd_param, nod_fld)
 !
 !
       use set_and_cal_udt_data
       use parallel_ucd_IO_select
 !
-      integer, intent(in) :: id_rank
       integer(kind = kint),  intent(in) :: istep_ucd
       type(field_IO_params), intent(in) :: ucd_param
 !
