@@ -191,9 +191,11 @@
       use skip_comment_f
       use write_control_elements
 !
-      integer(kind = kint), intent(in) :: id_control, level
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: label
       type(ctl_array_chara), intent(in) :: array_chara
+!
+      integer(kind = kint), intent(inout) :: level
 !
       integer(kind = kint) :: i, length
 !
@@ -201,14 +203,13 @@
       if(array_chara%num .le. 0) return
       write(id_control,'(a1)') '!'
 !
-      call write_array_flag_for_ctl                                     &
-     &   (id_control, level, label, array_chara%num)
+      level = write_array_flag_for_ctl(id_control, level, label)
       do i = 1, array_chara%num
         length = len_trim(label)
-        call write_character_ctl_item(id_control, (level+1), length,    &
+        call write_character_ctl_item(id_control, level, length,        &
      &      label, array_chara%c_tbl(i))
       end do
-      call write_end_array_flag_for_ctl(id_control, level, label)
+      level = write_end_array_flag_for_ctl(id_control, level, label)
 !
       end subroutine write_control_array_c1
 !

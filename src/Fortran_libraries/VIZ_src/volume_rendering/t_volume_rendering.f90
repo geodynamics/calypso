@@ -142,7 +142,7 @@
      &         (id_control, pvr_ctls, pvr, iflag_redraw)
 !
       use calypso_mpi_int
-      use set_pvr_control
+      use ctl_file_each_pvr_IO
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
@@ -182,7 +182,7 @@
 !
       use t_read_control_elements
       use skip_comment_f
-      use set_pvr_control
+      use ctl_file_each_pvr_IO
 !
       integer(kind = kint), intent(in) :: id_control
       type(volume_rendering_controls), intent(inout) :: pvr_ctls

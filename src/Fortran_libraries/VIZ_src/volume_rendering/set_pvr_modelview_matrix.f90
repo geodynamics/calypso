@@ -122,28 +122,26 @@
         view_param%perspective_xy_ratio                                 &
      &          = proj%perspective_xy_ratio_ctl%realvalue
       else
-        view_param%perspective_xy_ratio = one
+        view_param%perspective_xy_ratio = view_param%n_pvr_pixel(1)     &
+     &                                   / view_param%n_pvr_pixel(2)
       end if
 !
       if (proj%perspective_near_ctl%iflag .gt. 0) then
         view_param%perspective_near                                     &
      &          = proj%perspective_near_ctl%realvalue
       else
-        view_param%perspective_near = 0.1d0
+        view_param%perspective_near = 1.0d-3
       end if
 !
       if (proj%perspective_far_ctl%iflag .gt. 0) then
         view_param%perspective_far                                      &
      &          = proj%perspective_far_ctl%realvalue
       else
-        view_param%perspective_far = 1.0d2
+        view_param%perspective_far = 1.0d3
       end if
 !
       view_param%iflag_perspective                                      &
-     &      = proj%perspective_angle_ctl%iflag                          &
-     &       * proj%perspective_xy_ratio_ctl%iflag                      &
-     &       * proj%perspective_near_ctl%iflag                          &
-     &       * proj%perspective_far_ctl%iflag
+     &      = proj%perspective_angle_ctl%iflag
 !
       end subroutine copy_pvr_perspective_matrix
 !

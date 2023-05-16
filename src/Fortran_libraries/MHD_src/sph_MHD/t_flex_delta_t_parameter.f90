@@ -101,6 +101,7 @@
         istep_rst_start = tctl%start_rst_step_ctl%intvalue
       end if
 !
+      istep_rst_end = 0
       if (tctl%end_rst_step_ctl%iflag .eq. 0) then
         e_message = 'Set time to finish'
           call calypso_MPI_abort(ierr_evo, e_message)

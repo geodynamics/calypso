@@ -58,20 +58,16 @@
       subroutine init_gen_sph_grids
 !
       use m_error_IDs
-!
-      integer(kind = kint) :: ierr = 0
+      use input_control_const_shell
 !
 ! 
       call init_elapse_time_by_TOTAL
       call elpsed_label_gen_sph_grid
 !
       call start_elapsed_time(ied_total_elapsed)
-      call read_control_4_const_shell(control_file_name, SPH_MAKE_ctl)
-      call set_control_4_gen_shell_grids                                &
-     &   (my_rank, SPH_MAKE_ctl%plt, SPH_MAKE_ctl%psph_ctl,             &
-     &    sph_files1, SPH_GEN%sph_maker, ierr)
+      call s_input_control_const_shell(control_file_name, SPH_MAKE_ctl, &
+     &                                 sph_files1, SPH_GEN%sph_maker)
       SPH_GEN%sph_maker%mesh_output_flag = .TRUE.
-      if(ierr .gt. 0) call calypso_mpi_abort(ierr, e_message)
 !
       if(SPH_GEN%sph_maker%gen_sph%s3d_ranks%ndomain_sph                &
      &     .ne. nprocs) then
@@ -138,7 +134,7 @@
 !        write(*,*) 'diff', SPH_GEN%sph%sph_rtp%idx_global_rtp(i2,1:3) - SPH_GEN%sph%sph_rtp%idx_global_rtp(i1,1:3)
 !      end if
 !
-      if(sph_files1%FEM_mesh_flags%iflag_access_FEM .eq. 0) goto 99
+      if(.not. sph_files1%FEM_mesh_flags%flag_access_FEM) goto 99
 !
 !  ========= Generate FEM mesh ===========================
 !
@@ -153,7 +149,7 @@
 !
 !  ========= Generate viewer mesh ===========================
 !
-      if(sph_files1%FEM_mesh_flags%iflag_output_VMESH .gt. 0) then
+      if(sph_files1%FEM_mesh_flags%flag_output_VMESH) then
         if(iflag_GSP_time) call start_elapsed_time(ist_elapsed_GSP+5)
         if(iflag_debug .gt. 0) write(*,*) 'pickup_surface_mesh'
         call pickup_surface_mesh(sph_files1%sph_file_param, para_v1)

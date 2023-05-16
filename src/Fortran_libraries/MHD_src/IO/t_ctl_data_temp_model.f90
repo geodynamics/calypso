@@ -1,4 +1,3 @@
-!
 !>@file   t_ctl_data_temp_model.f90
 !!@brief  module t_ctl_data_temp_model
 !!
@@ -9,11 +8,7 @@
 !!@n        Modified by H. Matsui on Oct., 2007
 !!
 !!@verbatim
-!!      subroutine read_reftemp_ctl                                     &
-!!     &         (id_control, hd_block, reft_ctl, c_buf)
-!!      subroutine read_refcomp_ctl                                     &
-!!     &          (id_control, hd_block, refc_ctl, c_buf)
-!!      subroutine bcast_ref_scalar_ctl(refs_ctl)
+!!      subroutine reset_ref_scalar_ctl(refs_ctl)
 !!        type(reference_temperature_ctl), intent(inout) :: refs_ctl
 !!
 !!!!!!!!! model for stratification !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -87,8 +82,8 @@
       use t_read_control_elements
       use t_control_array_character
       use t_control_array_real
+      use t_ctl_data_stratified_model
       use skip_comment_f
-      use bcast_control_arrays
 !
       implicit  none
 !
@@ -99,14 +94,6 @@
 !
         integer (kind=kint) :: i_referenced = 0
       end type reference_point_control
-!
-      type takepiro_model_control
-        type(read_real_item) :: stratified_sigma_ctl
-        type(read_real_item) :: stratified_width_ctl
-        type(read_real_item) :: stratified_outer_r_ctl
-!
-        integer (kind=kint) :: i_takepiro_t_ctl = 0
-      end type takepiro_model_control
 !
       type reference_temperature_ctl
         type(read_character_item) :: filterd_advect_ctl
@@ -122,59 +109,7 @@
         integer (kind=kint) :: i_temp_def = 0
       end type reference_temperature_ctl
 !
-!   4th level for temperature define
-!
-      character(len=kchara), parameter                                  &
-     &       :: hd_ref_temp =    'ref_temp_ctl'
-      character(len=kchara), parameter                                  &
-     &       :: hd_low_temp =    'low_temp_ctl'
-      character(len=kchara), parameter                                  &
-     &       :: hd_high_temp =   'high_temp_ctl'
-!
-      character(len=kchara), parameter                                  &
-     &    :: hd_filterd_advection = 'filtered_advection_ctl'
-      character(len=kchara), parameter                                  &
-     &    :: hd_diffusivity_reduction = 'ICB_diffusivity_reduction_ctl'
-!
-      character(len=kchara), parameter                                  &
-     &       :: hd_ref_comp =    'ref_comp_ctl'
-      character(len=kchara), parameter                                  &
-     &       :: hd_low_comp =    'low_comp_ctl'
-      character(len=kchara), parameter                                  &
-     &       :: hd_high_comp =   'high_comp_ctl'
-!
-      character(len=kchara), parameter                                  &
-     &       :: hd_strat_ctl =   'stratified_ctl'
-      character(len=kchara), parameter                                  &
-     &       :: hd_takepiro_ctl = 'takepiro_model_ctl'
-!
-      character(len=kchara), parameter                                  &
-     &       :: hd_strat_sigma = 'stratified_sigma_ctl'
-      character(len=kchara), parameter                                  &
-     &       :: hd_strat_width = 'stratified_width_ctl'
-      character(len=kchara), parameter                                  &
-     &       :: hd_strat_outer = 'stratified_outer_r_ctl'
-!
-!    5th level for higher temp position
-!
-      character(len=kchara), parameter                                  &
-     &       :: hd_position =  'depth'
-      character(len=kchara), parameter                                  &
-     &       :: hd_temp_value = 'temperature'
-      character(len=kchara), parameter                                  &
-     &       :: hd_comp_value = 'composition'
-!
-      private :: hd_filterd_advection, hd_diffusivity_reduction
-      private :: hd_ref_temp, hd_ref_comp
-      private :: hd_strat_ctl, hd_strat_sigma
-      private :: hd_strat_width, hd_strat_outer
-      private :: hd_low_temp, hd_high_temp, hd_low_comp, hd_high_comp
-      private :: hd_position, hd_temp_value, hd_comp_value
-      private :: hd_takepiro_ctl
-!
-      private :: read_ref_temp_ctl, read_ref_comp_ctl
-      private :: read_takepiro_ctl
-      private :: bcast_ref_value_ctl, bcast_takepiro_ctl
+      private :: reset_ref_value_ctl
 !
 !   --------------------------------------------------------------------
 !
@@ -182,220 +117,35 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_reftemp_ctl                                       &
-     &         (id_control, hd_block, reft_ctl, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(reference_temperature_ctl), intent(inout) :: reft_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(reft_ctl%i_temp_def .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_ref_temp_ctl                                          &
-     &     (id_control, hd_low_temp, reft_ctl%low_ctl, c_buf)
-        call read_ref_temp_ctl                                          &
-     &     (id_control, hd_high_temp, reft_ctl%high_ctl, c_buf)
-!
-        call read_takepiro_ctl(id_control, hd_takepiro_ctl,             &
-     &      reft_ctl%takepiro_ctl, c_buf)
-!
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_filterd_advection, reft_ctl%filterd_advect_ctl)
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_ref_temp, reft_ctl%reference_ctl)
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_strat_ctl, reft_ctl%stratified_ctl)
-!
-        call read_real_ctl_type(c_buf, hd_diffusivity_reduction,        &
-     &                          reft_ctl%ICB_diffuse_reduction_ctl)
-      end do
-      reft_ctl%i_temp_def = 1
-!
-      end subroutine read_reftemp_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine read_refcomp_ctl                                       &
-     &          (id_control, hd_block, refc_ctl, c_buf)
-!
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(reference_temperature_ctl), intent(inout) :: refc_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(refc_ctl%i_temp_def .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_ref_comp_ctl                                          &
-     &     (id_control, hd_low_comp, refc_ctl%low_ctl, c_buf)
-        call read_ref_comp_ctl                                          &
-     &     (id_control, hd_high_comp, refc_ctl%high_ctl, c_buf)
-        call read_takepiro_ctl                                          &
-     &     (id_control, hd_takepiro_ctl, refc_ctl%takepiro_ctl, c_buf)
-!
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_filterd_advection, refc_ctl%filterd_advect_ctl)
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_ref_comp, refc_ctl%reference_ctl)
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_strat_ctl, refc_ctl%stratified_ctl)
-!
-        call read_real_ctl_type(c_buf, hd_diffusivity_reduction,        &
-     &                          refc_ctl%ICB_diffuse_reduction_ctl)
-      end do
-      refc_ctl%i_temp_def = 1
-!
-      end subroutine read_refcomp_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine bcast_ref_scalar_ctl(refs_ctl)
-!
-      use calypso_mpi_int
+      subroutine reset_ref_scalar_ctl(refs_ctl)
 !
       type(reference_temperature_ctl), intent(inout) :: refs_ctl
 !
+      call reset_ref_value_ctl(refs_ctl%low_ctl)
+      call reset_ref_value_ctl(refs_ctl%high_ctl)
+      call reset_takepiro_ctl(refs_ctl%takepiro_ctl)
 !
-      call bcast_ref_value_ctl(refs_ctl%low_ctl)
-      call bcast_ref_value_ctl(refs_ctl%high_ctl)
-      call bcast_takepiro_ctl(refs_ctl%takepiro_ctl)
+      refs_ctl%ICB_diffuse_reduction_ctl%iflag = 0
+      refs_ctl%filterd_advect_ctl%iflag =   0
+      refs_ctl%reference_ctl%iflag =        0
+      refs_ctl%stratified_ctl%iflag =       0
 !
-      call bcast_ctl_type_c1(refs_ctl%filterd_advect_ctl)
-      call bcast_ctl_type_c1(refs_ctl%reference_ctl)
-      call bcast_ctl_type_c1(refs_ctl%stratified_ctl)
+      refs_ctl%i_temp_def = 0
 !
-      call bcast_ctl_type_r1(refs_ctl%ICB_diffuse_reduction_ctl)
-!
-      call calypso_mpi_bcast_one_int(refs_ctl%i_temp_def, 0)
-!
-      end subroutine bcast_ref_scalar_ctl
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine read_ref_temp_ctl                                      &
-     &         (id_control, hd_block, ref_ctl, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(reference_point_control), intent(inout) :: ref_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(ref_ctl%i_referenced .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_real_ctl_type(c_buf, hd_position, ref_ctl%depth)
-        call read_real_ctl_type(c_buf, hd_temp_value, ref_ctl%value)
-      end do
-      ref_ctl%i_referenced = 1
-!
-      end subroutine read_ref_temp_ctl
+      end subroutine reset_ref_scalar_ctl
 !
 !   --------------------------------------------------------------------
 !
-      subroutine read_ref_comp_ctl                                      &
-     &         (id_control, hd_block, ref_ctl, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(reference_point_control), intent(inout) :: ref_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(ref_ctl%i_referenced .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_real_ctl_type(c_buf, hd_position, ref_ctl%depth)
-        call read_real_ctl_type(c_buf, hd_comp_value, ref_ctl%value)
-      end do
-      ref_ctl%i_referenced = 1
-!
-      end subroutine read_ref_comp_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine read_takepiro_ctl                                      &
-     &         (id_control, hd_block, takepiro_ctl, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(takepiro_model_control), intent(inout) :: takepiro_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(takepiro_ctl%i_takepiro_t_ctl .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_real_ctl_type                                         &
-     &     (c_buf, hd_strat_sigma, takepiro_ctl%stratified_sigma_ctl)
-        call read_real_ctl_type                                         &
-     &     (c_buf, hd_strat_width, takepiro_ctl%stratified_width_ctl)
-        call read_real_ctl_type(c_buf, hd_strat_outer,                  &
-     &      takepiro_ctl%stratified_outer_r_ctl)
-      end do
-      takepiro_ctl%i_takepiro_t_ctl = 1
-!
-      end subroutine read_takepiro_ctl
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine bcast_ref_value_ctl(ref_ctl)
-!
-      use calypso_mpi_int
+      subroutine reset_ref_value_ctl(ref_ctl)
 !
       type(reference_point_control), intent(inout) :: ref_ctl
 !
+      ref_ctl%depth%iflag = 0
+      ref_ctl%value%iflag = 0
 !
-      call bcast_ctl_type_r1(ref_ctl%depth)
-      call bcast_ctl_type_r1(ref_ctl%value)
+      ref_ctl%i_referenced = 0
 !
-      call calypso_mpi_bcast_one_int(ref_ctl%i_referenced, 0)
-!
-      end subroutine bcast_ref_value_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine bcast_takepiro_ctl(takepiro_ctl)
-!
-      use calypso_mpi_int
-!
-      type(takepiro_model_control), intent(inout) :: takepiro_ctl
-!
-!
-      call bcast_ctl_type_r1(takepiro_ctl%stratified_sigma_ctl)
-      call bcast_ctl_type_r1(takepiro_ctl%stratified_width_ctl)
-      call bcast_ctl_type_r1(takepiro_ctl%stratified_outer_r_ctl)
-!
-      call calypso_mpi_bcast_one_int(takepiro_ctl%i_takepiro_t_ctl, 0)
-!
-      end subroutine bcast_takepiro_ctl
+      end subroutine reset_ref_value_ctl
 !
 !   --------------------------------------------------------------------
 !

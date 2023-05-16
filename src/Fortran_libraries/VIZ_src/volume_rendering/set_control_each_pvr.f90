@@ -150,7 +150,7 @@
      &         (render_area_c, ele_grp, surf_grp, pvr_area, draw_param)
 !
       use t_group_data
-      use t_control_data_pvr_area
+      use t_ctl_data_pvr_area
       use t_control_params_4_pvr
       use t_geometries_in_pvr_screen
       use skip_comment_f

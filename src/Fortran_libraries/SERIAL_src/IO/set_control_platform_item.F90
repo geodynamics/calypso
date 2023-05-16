@@ -29,12 +29,15 @@
 !!        type(read_character_item), intent(in) :: file_format_ctl
 !!        type(field_IO_params), intent(inout) :: file_params
 !!
-!!      subroutine set_FEM_mesh_switch_4_SPH(Fmesh_ctl, iflag_access_FEM)
-!!      subroutine set_FEM_surface_output_flag                          &
-!!     &         (Fmesh_ctl, iflag_output_SURF)
+!!      logical function FEM_mesh_switch_4_SPH(Fmesh_ctl)
+!!      logical function FEM_surface_output_switch(Fmesh_ctl)
 !!        type(FEM_mesh_control), intent(in) :: Fmesh_ctl
-!!      subroutine set_FEM_viewer_output_flag(plt, iflag_output_VMESH)
+!!      logical function FEM_viewer_output_flag(plt)
 !!        type(platform_data_control), intent(in) :: plt
+!!
+!!      logical function yes_no_flag_from_ctl(yes_no_ctl)
+!!        type(read_character_item) :: yes_no_ctl
+!!        type(FEM_mesh_control), intent(in) :: Fmesh_ctl
 !!@endverbatim
 !!
 !!@param id_rank  preocess ID
@@ -192,62 +195,54 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine set_FEM_mesh_switch_4_SPH(Fmesh_ctl, iflag_access_FEM)
-!
-      use skip_comment_f
+      logical function FEM_mesh_switch_4_SPH(Fmesh_ctl)
 !
       type(FEM_mesh_control), intent(in) :: Fmesh_ctl
-      integer(kind = kint), intent(inout) :: iflag_access_FEM
 !
+      FEM_mesh_switch_4_SPH                                             &
+     &      = yes_no_flag_from_ctl(Fmesh_ctl%FEM_mesh_output_switch)
 !
-      iflag_access_FEM = 0
-      if(Fmesh_ctl%FEM_mesh_output_switch%iflag .gt. 0) then
-        if(yes_flag(Fmesh_ctl%FEM_mesh_output_switch%charavalue)) then
-          iflag_access_FEM = 1
-        end if
-      end if
-!
-      end subroutine set_FEM_mesh_switch_4_SPH
+      end function FEM_mesh_switch_4_SPH
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_FEM_surface_output_flag                            &
-     &         (Fmesh_ctl, iflag_output_SURF)
-!
-      use skip_comment_f
+      logical function FEM_surface_output_switch(Fmesh_ctl)
 !
       type(FEM_mesh_control), intent(in) :: Fmesh_ctl
-      integer(kind = kint), intent(inout) :: iflag_output_SURF
 !
+      FEM_surface_output_switch                                         &
+     &      = yes_no_flag_from_ctl(Fmesh_ctl%FEM_surface_output_switch)
 !
-      iflag_output_SURF = 0
-!
-      if(Fmesh_ctl%FEM_surface_output_switch%iflag .eq. 0) return
-      if(yes_flag(Fmesh_ctl%FEM_surface_output_switch%charavalue)) then
-        iflag_output_SURF = 1
-      end if
- 
-      end subroutine set_FEM_surface_output_flag
+      end function FEM_surface_output_switch
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine set_FEM_viewer_output_flag                             &
-     &         (Fmesh_ctl, iflag_output_VMESH)
-!
-      use skip_comment_f
+      logical function FEM_viewer_output_flag(Fmesh_ctl)
 !
       type(FEM_mesh_control), intent(in) :: Fmesh_ctl
-      integer(kind = kint), intent(inout) :: iflag_output_VMESH
+!
+      FEM_viewer_output_flag                                            &
+     &      = yes_no_flag_from_ctl(Fmesh_ctl%FEM_viewer_output_switch)
+!
+      end function FEM_viewer_output_flag
+!
+! ----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      logical function yes_no_flag_from_ctl(yes_no_ctl)
+!
+      use t_control_array_character
+      use skip_comment_f
+!
+      type(read_character_item), intent(in) :: yes_no_ctl
 !
 !
-      iflag_output_VMESH = 0
+      yes_no_flag_from_ctl = .FALSE.
 !
-      if(Fmesh_ctl%FEM_viewer_output_switch%iflag .eq. 0) return
-      if(yes_flag(Fmesh_ctl%FEM_viewer_output_switch%charavalue)) then
-        iflag_output_VMESH = 1
-      end if
+      if(yes_no_ctl%iflag .eq. 0) return
+      if(yes_flag(yes_no_ctl%charavalue)) yes_no_flag_from_ctl = .TRUE.
  
-      end subroutine set_FEM_viewer_output_flag
+      end function yes_no_flag_from_ctl
 !
 ! ----------------------------------------------------------------------
 !

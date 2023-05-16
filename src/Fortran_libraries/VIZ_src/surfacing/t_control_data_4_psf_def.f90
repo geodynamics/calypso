@@ -13,14 +13,6 @@
 !!      subroutine dup_control_4_psf_def(org_psf_def_c, new_psf_def_c)
 !!        type(psf_define_ctl), intent(in) :: org_psf_def_c
 !!        type(psf_define_ctl), intent(inout) :: new_psf_def_c
-!!
-!!      subroutine read_section_def_control                             &
-!!     &         (id_control, hd_block, psf_def_c, psf_def_c)
-!!      subroutine bcast_section_def_control(psf_def_c)
-!!        type(psf_define_ctl), intent(inout) :: psf_def_c
-!!
-!!      integer(kind = kint) function num_label_psf_define_control()
-!!      subroutine set_label_psf_define_control(names)
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!! example of control for Kemo's surface rendering
 !!
@@ -261,103 +253,6 @@
      &                          new_psf_def_c%psf_area_ctl)
 !
       end subroutine dup_control_4_psf_def
-!
-!  ---------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine read_section_def_control                               &
-     &         (id_control, hd_block, psf_def_c, c_buf)
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-      type(psf_define_ctl), intent(inout) :: psf_def_c
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(psf_def_c%i_surface_define .gt. 0) return
-!
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_control_array_c_r(id_control,                         &
-     &      hd_coefs_ctl, psf_def_c%psf_coefs_ctl, c_buf)
-        call read_control_array_c_r(id_control,                         &
-     &      hd_center_ctl, psf_def_c%psf_center_ctl, c_buf)
-        call read_control_array_c_r(id_control,                         &
-     &      hd_normal_ctl, psf_def_c%psf_normal_ctl, c_buf)
-        call read_control_array_c_r(id_control,                         &
-     &      hd_axis_ctl, psf_def_c%psf_axis_ctl, c_buf)
-!
-        call read_control_array_c1(id_control,                          &
-     &      hd_psf_area, psf_def_c%psf_area_ctl, c_buf)
-!
-        call read_real_ctl_type                                         &
-     &     (c_buf, hd_radius, psf_def_c%radius_psf_ctl)
-!
-        call read_chara_ctl_type(c_buf,                                 &
-     &      hd_section_method, psf_def_c%section_method_ctl)
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_group_name, psf_def_c%psf_group_name_ctl)
-      end do
-      psf_def_c%i_surface_define = 1
-!
-      end subroutine read_section_def_control
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine bcast_section_def_control(psf_def_c)
-!
-      use calypso_mpi
-      use calypso_mpi_int
-      use bcast_control_arrays
-!
-      type(psf_define_ctl), intent(inout) :: psf_def_c
-!
-!
-      call calypso_mpi_bcast_one_int(psf_def_c%i_surface_define, 0)
-!
-      call bcast_ctl_array_cr(psf_def_c%psf_coefs_ctl)
-      call bcast_ctl_array_cr(psf_def_c%psf_center_ctl)
-      call bcast_ctl_array_cr(psf_def_c%psf_normal_ctl)
-      call bcast_ctl_array_cr(psf_def_c%psf_axis_ctl)
-!
-      call bcast_ctl_array_c1(psf_def_c%psf_area_ctl)
-!
-      call bcast_ctl_type_r1(psf_def_c%radius_psf_ctl)
-!
-      call bcast_ctl_type_c1(psf_def_c%section_method_ctl)
-      call bcast_ctl_type_c1(psf_def_c%psf_group_name_ctl)
-!
-      end subroutine bcast_section_def_control
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      integer(kind = kint) function num_label_psf_define_control()
-      num_label_psf_define_control = n_label_psf_define_ctl
-      return
-      end function num_label_psf_define_control
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_label_psf_define_control(names)
-!
-      character(len = kchara), intent(inout)                            &
-     &                         :: names(n_label_psf_define_ctl)
-!
-!
-      call set_control_labels(hd_section_method, names( 1))
-      call set_control_labels(hd_coefs_ctl,      names( 2))
-      call set_control_labels(hd_normal_ctl,     names( 3))
-      call set_control_labels(hd_axis_ctl,       names( 4))
-      call set_control_labels(hd_center_ctl,     names( 5))
-      call set_control_labels(hd_radius,         names( 6))
-      call set_control_labels(hd_group_name,     names( 7))
-      call set_control_labels(hd_psf_area,       names( 8))
-!
-      end subroutine set_label_psf_define_control
 !
 !  ---------------------------------------------------------------------
 !

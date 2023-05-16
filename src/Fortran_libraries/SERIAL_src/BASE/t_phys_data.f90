@@ -20,6 +20,10 @@
 !!      integer(kind=kint) function field_comp_by_address(fld, i_ref)
 !!        type(phys_data), intent(in) :: fld
 !!
+!!      subroutine dup_phys_name(org_fld, new_fld)
+!!        type(phys_data), intent(in) :: org_fld
+!!        type(phys_data), intent(inout) :: new_fld
+!!
 !!      subroutine check_all_field_data(id_rank, fld)
 !!      subroutine check_nodal_field_name(id_output, fld)
 !!      subroutine check_nodal_data(id_output, fld, numdir, i_field)
@@ -144,8 +148,6 @@
 !
       end subroutine dealloc_phys_data
 !
-! -----------------------------------------------------------------------
-! -----------------------------------------------------------------------
 !
       integer(kind = kint) function field_id_by_address(fld, i_ref)
 !
@@ -202,6 +204,34 @@
       end function field_comp_by_address
 !
 ! -----------------------------------------------------------------------
+! ----------------------------------------------------------------------
+!
+      subroutine dup_phys_name(org_fld, new_fld)
+!
+      type(phys_data), intent(in) :: org_fld
+      type(phys_data), intent(inout) :: new_fld
+      integer(kind = kint) :: i
+!
+      new_fld%num_phys =      org_fld%num_phys
+      new_fld%ntot_phys =     org_fld%ntot_phys
+      new_fld%num_phys_viz =  org_fld%num_phys_viz
+      new_fld%ntot_phys_viz = org_fld%ntot_phys_viz
+      call alloc_phys_name(new_fld)
+!
+      new_fld%istack_component(0) = 0
+!$omp parallel do
+      do i = 1, new_fld%num_phys
+        new_fld%phys_name(i) =         org_fld%phys_name(i)
+        new_fld%num_component(i) =     org_fld%num_component(i)
+        new_fld%istack_component(i) =  org_fld%istack_component(i)
+        new_fld%iorder_eletype(i) =    org_fld%iorder_eletype(i)
+        new_fld%flag_monitor(i) =      org_fld%flag_monitor(i)
+      end do
+!$omp end parallel do
+!
+      end subroutine dup_phys_name
+!
+! ----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
       subroutine check_all_field_data(id_rank, fld)

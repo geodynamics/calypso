@@ -8,6 +8,7 @@ INC_BASE_C = $(addsuffix .h,$(basename $(SRC_BASE_C)) )
 OBJ_BASE_C = $(addsuffix .o,$(basename $(SRC_BASE_C)) )
 
 OBJ_BASE_C = \
+ calypso_zlib_access_c.o \
  calypso_param_c.o \
  numbers_to_bin_c.o \
  calypso_zlib_io_c.o

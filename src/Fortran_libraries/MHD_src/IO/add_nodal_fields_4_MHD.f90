@@ -209,6 +209,7 @@
      &         (fl_prop, cd_prop, field_ctl)
 !
       use t_control_array_character3
+      use m_base_field_labels
       use m_explicit_term_labels
 !
       type(fluid_property), intent(in) :: fl_prop
@@ -223,6 +224,9 @@
       if (cd_prop%iflag_Bevo_scheme .gt. id_no_evolution                &
      &   .or. cd_prop%iflag_Aevo_scheme .gt. id_no_evolution) then
         call add_phys_name_ctl(m_potential_work, field_ctl)
+      end if
+      if(cd_prop%iflag_magneto_cv .eq. id_turn_ON) then
+        call add_phys_name_ctl(background_B, field_ctl)
       end if
 !
       end subroutine add_work_area_4_potentials

@@ -10,25 +10,26 @@
 !!      subroutine gz_mpi_write_integer_stack_b(IO_param, num, istack)
 !!        Substitution of gz_write_integer_stack_b
 !!      subroutine gz_mpi_write_int_vector_b(IO_param, num, int_dat)
-!!        Substitutio of gz_write_mul_integer_b
+!!        Substitution of gz_write_mul_integer_b
 !!      subroutine gz_mpi_write_int8_vector_b(IO_param, num, int8_dat)
-!!        Substitutio of gz_write_mul_int8_b
+!!        Substitution of gz_write_mul_int8_b
 !!      subroutine gz_mpi_write_1d_vector_b(IO_param, num, real_dat)
-!!        Substitutio of gz_write_1d_vector_b
+!!        Substitution of gz_write_1d_vector_b
 !!      subroutine gz_mpi_write_2d_vector_b(IO_param, n1, n2, real_dat)
-!!        Substitutio of gz_write_2d_vector_b
+!!        Substitution of gz_write_2d_vector_b
+!!        character, pointer, intent(in) :: FPz_f
 !!
 !!      subroutine gz_mpi_read_integer_stack_b                          &
 !!     &         (IO_param, num, istack, ntot)
 !!        Substittion of  gz_read_integer_stack_b
 !!      subroutine gz_mpi_read_int_vector_b(IO_param, num, int_dat)
-!!        Substitutio of gz_read_mul_integer_b
+!!        Substitution of gz_read_mul_integer_b
 !!      subroutine gz_mpi_read_int8_vector_b(IO_param, num, int8_dat)
-!!        Substitutio of gz_read_mul_int8_b
+!!        Substitution of gz_read_mul_int8_b
 !!      subroutine gz_mpi_read_1d_vector_b(IO_param, num, real_dat)
-!!        Substitutio of gz_read_1d_vector_b
+!!        Substitution of gz_read_1d_vector_b
 !!      subroutine gz_mpi_read_2d_vector_b(IO_param, n1, n2, real_dat)
-!!        Substitutio of gz_read_2d_vector_b
+!!        Substitution of gz_read_2d_vector_b
 !!@endverbatim
 !
       module gz_MPI_binary_data_IO

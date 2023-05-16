@@ -8,13 +8,20 @@
 !>@brief  Construct number bitmaps
 !!
 !!@verbatim
-!!      subroutine gen_cbar_label(iscale, color_bar_style,              &
-!!     &      color_mapping_style, interval_point, interval_mapping_num,&
-!!     &      num_of_scale, d_minmax, npix_img, isleeve_bar, ntot_pix,  &
-!!     &      dimage)
-!!      subroutine gen_zero_label(iscale, color_bar_style,              &
-!!     &      color_mapping_style, interval_point, interval_mapping_num,&
-!!     &      d_minmax, npix_img, isleeve_bar, ntot_pix, dimage)
+!!      subroutine corners_4_right_colorbar                             &
+!!     &         (iscale, npix_img, isleeve_bar, ist, jst, ied, jed)
+!!      subroutine corners_4_bottom_colorbar                            &
+!!     &         (iscale, npix_img, isleeve_bar, ist, jst, ied, jed)
+!!
+!!      subroutine gen_right_cbar_label(iscale, num_of_scale, c_minmax, &
+!!     &       npix_img, isleeve_bar, ntot_pix, dimage)
+!!      subroutine gen_right_zero_label(iscale, c_minmax, npix_img,     &
+!!     &          isleeve_bar, ntot_pix, dimage)
+!!      subroutine gen_bottom_cbar_label(iscale, num_of_scale, c_minmax,&
+!!     &          npix_img, isleeve_bar, ntot_pix, dimage)
+!!      subroutine gen_bottom_zero_label(iscale, c_minmax, npix_img,    &
+!!     &          isleeve_bar, ntot_pix, dimage)
+!!
 !!      subroutine gen_time_label(iscale, time, npix_img,               &
 !!     &          isleeve_bar, ntot_pix, dimage)
 !!      subroutine set_one_label(char1, iscale, ist_px, ist_py,         &
@@ -42,7 +49,45 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine gen_cbar_label(iscale, num_of_scale, c_minmax,         &
+      subroutine corners_4_right_colorbar                               &
+     &         (iscale, npix_img, isleeve_bar, ist, jst, ied, jed)
+!
+      integer(kind = kint), intent(in) :: iscale
+      integer(kind = kint), intent(in) :: npix_img(2)
+      integer(kind = kint), intent(in) :: isleeve_bar
+!
+      integer(kind = kint), intent(inout) :: ist, jst, ied, jed
+!
+      ist = npix_img(1) - isleeve_bar
+      ied = ist + BAR_WIDTH
+      jst = (npix_img(2) - 20) / 10 + 10 - 6*iscale
+      jed = (npix_img(2) - 20) / 10*5 + jst
+!
+      end subroutine corners_4_right_colorbar
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine corners_4_bottom_colorbar                              &
+     &         (iscale, npix_img, isleeve_bar, ist, jst, ied, jed)
+!
+      integer(kind = kint), intent(in) :: iscale
+      integer(kind = kint), intent(in) :: npix_img(2)
+      integer(kind = kint), intent(in) :: isleeve_bar
+!
+      integer(kind = kint), intent(inout) :: ist, jst, ied, jed
+!
+!
+      ist = 1.5 * isleeve_bar
+      ied = npix_img(1) - 1.5 * isleeve_bar
+      jst = 16 + 12*iscale + 20
+      jed = jst + BAR_WIDTH
+!
+      end subroutine corners_4_bottom_colorbar
+!
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine gen_right_cbar_label(iscale, num_of_scale, c_minmax,   &
      &       npix_img, isleeve_bar, ntot_pix, dimage)
 !
       integer(kind = kint), intent(in) :: num_of_scale
@@ -59,19 +104,16 @@
       integer(kind = kint) :: start_px(2)
       character(len=NUM_LENGTH) :: numeric
 !
-      ist = npix_img(1) - isleeve_bar
-      jst = (npix_img(2) - itwo*iten) / iten + iten
-      jed = (npix_img(2) - itwo*iten) / iten*ifive + jst
-      ied = ist + BAR_WIDTH
 !
+      call corners_4_right_colorbar                                     &
+     &   (iscale, npix_img, isleeve_bar, ist, jst, ied, jed)
       do k = 1, num_of_scale
         value = (c_minmax(2)-c_minmax(1))                               &
      &         * dble(k-1) / dble(num_of_scale-1) + c_minmax(1)
 !
         rhgt = dble(jed-jst) * dble(k-1) / dble(num_of_scale-1)
         start_px(1) = ist + BAR_WIDTH + ithree
-        start_px(2) = jst - 12 * iscale / 2                             &
-     &                    + int(rhgt, KIND(start_px(1)))
+        start_px(2) = jst + int(rhgt, KIND(start_px(1)))
 !
         write(numeric,'(1pe9.2)') value
         call set_numeric_labels(NUM_LENGTH, numeric, iscale, start_px,  &
@@ -83,11 +125,11 @@
         end do
       end do
 !
-      end subroutine gen_cbar_label
+      end subroutine gen_right_cbar_label
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine gen_zero_label(iscale, c_minmax, npix_img,             &
+      subroutine gen_right_zero_label(iscale, c_minmax, npix_img,       &
      &          isleeve_bar, ntot_pix, dimage)
 !
       real(kind = kreal), intent(in) :: c_minmax(2)
@@ -103,16 +145,15 @@
       integer(kind = kint) :: start_px(2)
       character(len=NUM_LENGTH) :: numeric
 !
-      ist = npix_img(1) - isleeve_bar
-      jst = (npix_img(2) - itwo*iten) / iten + iten
-      jed = (npix_img(2) - itwo*iten) / iten*ifive + jst
-      ied = ist + BAR_WIDTH
+!
+      call corners_4_right_colorbar                                     &
+     &   (iscale, npix_img, isleeve_bar, ist, jst, ied, jed)
 !
       zero_rgb = (zero - c_minmax(1)) / (c_minmax(2) - c_minmax(1))
 !
-      rhgt = zero_rgb * dble(jed-jst) + dble(jst)
+      rhgt = zero_rgb * dble(jed-jst)
       start_px(1) = ist + BAR_WIDTH + ithree
-      start_px(2) = int(rhgt, KIND(ntot_pix))
+      start_px(2) = jst + int(rhgt, KIND(ntot_pix))
 !
       write(numeric,'(1pe9.2)') zero
       call set_numeric_labels(NUM_LENGTH, numeric, iscale, start_px,    &
@@ -123,8 +164,96 @@
         dimage(1:4,k) = one
       end do
 !
-      end subroutine gen_zero_label
+      end subroutine gen_right_zero_label
 !
+!  ---------------------------------------------------------------------
+!  ---------------------------------------------------------------------
+!
+      subroutine gen_bottom_cbar_label(iscale, num_of_scale, c_minmax,  &
+     &          npix_img, isleeve_bar, ntot_pix, dimage)
+!
+      integer(kind = kint), intent(in) :: num_of_scale
+      real(kind = kreal), intent(in) :: c_minmax(2)
+      integer(kind = kint), intent(in) :: iscale, isleeve_bar
+      integer(kind = kint), intent(in) :: npix_img(2)
+      integer(kind = kint), intent(in) :: ntot_pix
+      real(kind = kreal), intent(inout) :: dimage(4,ntot_pix)
+!
+      real(kind = kreal) :: value
+      real(kind = kreal) :: rhgt
+      integer(kind = kint) :: i, j, k
+      integer(kind = kint) :: ist_h, jst_h, ied_h, jed_h
+      integer(kind = kint) :: start_px(2)
+      character(len=NUM_LENGTH) :: numeric
+!
+!
+      call corners_4_bottom_colorbar                                    &
+     &   (iscale, npix_img, isleeve_bar, ist_h, jst_h, ied_h, jed_h)
+!
+      do k = 1, num_of_scale
+        value = (c_minmax(2)-c_minmax(1))                               &
+     &         * dble(k-1) / dble(num_of_scale-1) + c_minmax(1)
+!
+        rhgt = dble(ied_h-ist_h) * dble(k-1) / dble(num_of_scale-1)
+        start_px(1) = ist_h - iscale*NUM_LENGTH*4                       &
+     &               + int(rhgt, KIND(start_px(1)))
+        start_px(2) = jst_h - 12 * iscale - 5
+!
+        write(numeric,'(1pe9.2)') value
+        call set_numeric_labels(NUM_LENGTH, numeric, iscale, start_px,  &
+     &      npix_img, ntot_pix, dimage)
+!
+        do i = jst_h-4, jed_h
+          j = (i-1) * npix_img(1)                                       &
+     &       + ist_h + int(rhgt, KIND(start_px(1)))
+          dimage(1:4,j) = one
+        end do
+      end do
+!
+      end subroutine gen_bottom_cbar_label
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine gen_bottom_zero_label(iscale, c_minmax, npix_img,      &
+     &          isleeve_bar, ntot_pix, dimage)
+!
+      real(kind = kreal), intent(in) :: c_minmax(2)
+      integer(kind = kint), intent(in) :: iscale, isleeve_bar
+      integer(kind = kint), intent(in) :: npix_img(2)
+      integer(kind = kint), intent(in) :: ntot_pix
+      real(kind = kreal), intent(inout) :: dimage(4,ntot_pix)
+!
+      real(kind = kreal) :: zero_rgb
+      real(kind = kreal) :: rhgt
+      integer(kind = kint) :: i, k
+      integer(kind = kint) :: ist_h, jst_h, ied_h, jed_h
+      integer(kind = kint) :: start_px(2)
+      character(len=NUM_LENGTH) :: numeric
+!
+!
+      call corners_4_bottom_colorbar                                    &
+     &   (iscale, npix_img, isleeve_bar, ist_h, jst_h, ied_h, jed_h)
+!
+      zero_rgb = (zero - c_minmax(1)) / (c_minmax(2) - c_minmax(1))
+!
+      rhgt = zero_rgb * dble(ied_h-ist_h)
+      start_px(1) = ist_h - iscale*NUM_LENGTH*4                         &
+     &             + int(rhgt, KIND(start_px(1)))
+      start_px(2) = jst_h - 12 * iscale - 5
+!
+      write(numeric,'(1pe9.2)') zero
+      call set_numeric_labels(NUM_LENGTH, numeric, iscale, start_px,    &
+     &                        npix_img, ntot_pix, dimage)
+!
+      do i = jst_h-4, jed_h
+        k = (i-1) * npix_img(1)                                         &
+     &     + ist_h + int(rhgt, KIND(start_px(1)))
+        dimage(1:4,k) = one
+      end do
+!
+      end subroutine gen_bottom_zero_label
+!
+!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine gen_time_label(iscale, time, npix_img,                 &
@@ -141,7 +270,7 @@
 !
 !
       start_px(1) = npix_img(1) - 8 * (NUM_TLABEL+1) * iscale
-      start_px(2) = iten + 12 * iscale
+      start_px(2) = npix_img(2) - iten - 12 * iscale
 !
       write(t_label,'(a3,1pe11.4)') 't =', time
       call set_numeric_labels(NUM_TLABEL, t_label, iscale, start_px,    &

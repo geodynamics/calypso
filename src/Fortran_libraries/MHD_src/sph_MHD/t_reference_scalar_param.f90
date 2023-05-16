@@ -32,7 +32,6 @@
 !
       use m_machine_parameter
 !
-      use calypso_mpi
       use t_ctl_data_temp_model
 !
       implicit  none
@@ -131,6 +130,7 @@
       subroutine set_linear_ref_scalar_ctl                              &
      &         (ref_temp_ctl, low_temp_ctl, high_temp_ctl, ref_param)
 !
+      use calypso_mpi
       use t_control_array_character
 !
       type(read_character_item), intent(in) :: ref_temp_ctl
@@ -216,6 +216,7 @@
 !
       use calypso_mpi
       use t_ctl_data_temp_model
+      use t_ctl_data_stratified_model
       use t_control_array_character
 !
       type(read_character_item), intent(in) :: stratified_ctl

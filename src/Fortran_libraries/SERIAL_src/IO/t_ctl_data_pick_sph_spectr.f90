@@ -11,7 +11,16 @@
 !!      subroutine dealloc_pick_spectr_control(pspec_ctl)
 !!      subroutine read_pickup_spectr_ctl                               &
 !!     &         (id_control, hd_block, pspec_ctl, c_buf)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
 !!        type(pick_spectr_control), intent(inout) :: pspec_ctl
+!!        type(buffer_for_control), intent(inout) :: c_buf
+!!      subroutine write_pickup_spectr_ctl                              &
+!!     &         (id_control, hd_block, pspec_ctl, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(pick_spectr_control), intent(in) :: pspec_ctl
+!!        integer(kind = kint), intent(inout) :: level
 !!
 !! -----------------------------------------------------------------
 !!
@@ -19,6 +28,7 @@
 !!
 !!  begin pickup_spectr_ctl
 !!    picked_sph_prefix            'sph_spectr/picked_mode'
+!!    picked_sph_format            'gzip' or 'ASCII'
 !!!
 !!!     if pick_layer_ctl = 0 or negative:
 !!!           output all layer and volume average
@@ -84,6 +94,8 @@
       type pick_spectr_control
 !>        Structure for picked spectrum file prefix
         type(read_character_item) :: picked_mode_head_ctl
+!>        Structure for picked spectrum file format (ascii or gzip)
+        type(read_character_item) :: picked_mode_fmt_ctl
 !
 !>        Structure for list of radial grid of spectr data output
 !!@n        idx_pick_layer_ctl%num:   Number of grid
@@ -112,7 +124,9 @@
 !   labels for item
 !
       character(len=kchara), parameter, private                         &
-     &           :: hd_picked_mode_head = 'picked_sph_prefix'
+     &           :: hd_picked_mode_head =   'picked_sph_prefix'
+      character(len=kchara), parameter, private                         &
+     &           :: hd_picked_mode_format = 'picked_sph_format'
 !
       character(len=kchara), parameter, private                         &
      &           :: hd_pick_layer =  'pick_layer_ctl'
@@ -141,6 +155,7 @@
       call dealloc_control_array_int(pspec_ctl%idx_pick_layer_ctl)
 !
       pspec_ctl%picked_mode_head_ctl%iflag = 0
+      pspec_ctl%picked_mode_fmt_ctl%iflag =  0
       pspec_ctl%i_pick_sph = 0
 !
       end subroutine dealloc_pick_spectr_control
@@ -176,10 +191,55 @@
 !
         call read_chara_ctl_type(c_buf, hd_picked_mode_head,            &
      &      pspec_ctl%picked_mode_head_ctl)
+        call read_chara_ctl_type(c_buf, hd_picked_mode_format,          &
+     &      pspec_ctl%picked_mode_fmt_ctl)
       end do
       pspec_ctl%i_pick_sph = 1
 !
       end subroutine read_pickup_spectr_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine write_pickup_spectr_ctl                                &
+     &         (id_control, hd_block, pspec_ctl, level)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(pick_spectr_control), intent(in) :: pspec_ctl
+!
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
+!
+!
+      if(pspec_ctl%i_pick_sph .le. 0) return
+!
+      maxlen = len_trim(hd_picked_mode_head)
+      maxlen = max(maxlen, len_trim(hd_picked_mode_format))
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_control_array_i1(id_control, level,                    &
+     &    hd_pick_layer, pspec_ctl%idx_pick_layer_ctl)
+!
+      call write_control_array_i2(id_control, level,                    &
+     &    hd_pick_sph_lm, pspec_ctl%idx_pick_sph_ctl)
+      call write_control_array_i1(id_control, level,                    &
+     &    hd_pick_sph_l, pspec_ctl%idx_pick_sph_l_ctl)
+      call write_control_array_i1(id_control, level,                    &
+     &    hd_pick_sph_m, pspec_ctl%idx_pick_sph_m_ctl)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_picked_mode_head, pspec_ctl%picked_mode_head_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_picked_mode_format, pspec_ctl%picked_mode_fmt_ctl)
+!
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_pickup_spectr_ctl
 !
 ! -----------------------------------------------------------------------
 !

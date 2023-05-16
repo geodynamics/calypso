@@ -32,6 +32,8 @@
         character(len = kchara) :: fhead_rms_v
 !>        File prefix for volume average file
         character(len = kchara) :: fhead_ave
+!>        File format flag
+        logical :: gzip_flag_vol_spec = .FALSE.
 !
 !>        MPI rank for l-spectr data output
         integer :: irank_l

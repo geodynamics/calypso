@@ -57,6 +57,8 @@
       use t_control_parameter
       use t_ctl_data_mhd_forces
       use t_ctl_data_mhd_magne
+      use t_ctl_data_gravity
+      use t_ctl_data_coriolis_force
       use skip_comment_f
 !
       type(forces_control), intent(in) :: frc_ctl
@@ -176,8 +178,9 @@
 !
       subroutine set_control_4_gravity(g_ctl, fl_prop)
 !
+      use calypso_mpi
       use t_physical_property
-      use t_ctl_data_mhd_forces
+      use t_ctl_data_gravity
       use skip_comment_f
 !
       type(gravity_control), intent(in) :: g_ctl
@@ -203,9 +206,8 @@
         end if
 !
 !
-        if (g_ctl%gravity%iflag .eq. 0) then
-          fl_prop%i_grav = iflag_self_r_g
-        else
+        fl_prop%i_grav = iflag_self_r_g
+        if (g_ctl%gravity%iflag .gt. 0) then
           tmpchara = g_ctl%gravity%charavalue
 !
           if     (cmp_no_case(tmpchara, 'constant')) then
@@ -250,6 +252,7 @@
 !
       use t_physical_property
       use t_ctl_data_mhd_forces
+      use t_ctl_data_coriolis_force
       use skip_comment_f
 !
       type(coriolis_control), intent(in) :: cor_ctl
@@ -301,6 +304,7 @@
 !
       subroutine set_control_4_induction(mcv_ctl, cd_prop)
 !
+      use calypso_mpi
       use t_physical_property
       use t_ctl_data_mhd_magne
       use skip_comment_f

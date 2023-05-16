@@ -9,9 +9,17 @@
 !!@verbatim
 !!      subroutine read_image_size_ctl                                  &
 !!     &         (id_control, hd_block, pixel, c_buf)
-!!      subroutine reset_image_size_ctl(pixel)
-!!      subroutine bcast_image_size_ctl(pixel)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
 !!        type(screen_pixel_ctl), intent(inout) :: pixel
+!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_image_size_ctl                                 &
+!!     &         (id_control, hd_block, pixel, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(screen_pixel_ctl), intent(in) :: pixel
+!!        integer(kind = kint), intent(inout) :: level
+!!      subroutine reset_image_size_ctl(pixel)
 !!      subroutine copy_image_size_ctl(org_pixel, new_pixel)
 !!        type(screen_pixel_ctl), intent(in) :: org_pixel
 !!        type(screen_pixel_ctl), intent(inout) :: new_pixel
@@ -33,7 +41,6 @@
       module t_ctl_data_4_screen_pixel
 !
       use m_precision
-      use calypso_mpi
 !
       use m_constants
       use m_machine_parameter
@@ -97,6 +104,38 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine write_image_size_ctl                                   &
+     &         (id_control, hd_block, pixel, level)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(screen_pixel_ctl), intent(in) :: pixel
+!
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
+!
+!
+      if(pixel%i_image_size .le. 0) return
+!
+      maxlen = len_trim(hd_x_pixel)
+      maxlen = max(maxlen, len_trim(hd_y_pixel))
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_integer_ctl_type(id_control, level, maxlen,            &
+     &   hd_x_pixel, pixel%num_xpixel_ctl)
+      call write_integer_ctl_type(id_control, level, maxlen,            &
+     &   hd_y_pixel, pixel%num_ypixel_ctl)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_image_size_ctl
+!
+!  ---------------------------------------------------------------------
+!
       subroutine reset_image_size_ctl(pixel)
 !
       type(screen_pixel_ctl), intent(inout) :: pixel
@@ -108,23 +147,6 @@
       pixel%i_image_size =  0
 !
       end subroutine reset_image_size_ctl
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine bcast_image_size_ctl(pixel)
-!
-      use calypso_mpi_int
-      use bcast_control_arrays
-!
-      type(screen_pixel_ctl), intent(inout) :: pixel
-!
-!
-      call calypso_mpi_bcast_one_int(pixel%i_image_size, 0)
-!
-      call bcast_ctl_type_i1(pixel%num_xpixel_ctl)
-      call bcast_ctl_type_i1(pixel%num_ypixel_ctl)
-!
-      end subroutine bcast_image_size_ctl
 !
 !  ---------------------------------------------------------------------
 !

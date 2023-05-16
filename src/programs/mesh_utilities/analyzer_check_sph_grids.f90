@@ -59,6 +59,7 @@
       subroutine init_check_sph_grids
 !
       use m_error_IDs
+      use input_control_const_shell
 !
       integer(kind = kint) :: ierr = 0
 !
@@ -67,11 +68,9 @@
       call elpsed_label_gen_sph_grid
 !
       call start_elapsed_time(ied_total_elapsed)
-      call read_control_4_const_shell(control_file_name, SPH_MAKE_ctl)
-      call set_control_4_gen_shell_grids                                &
-     &   (my_rank, SPH_MAKE_ctl%plt, SPH_MAKE_ctl%psph_ctl,             &
-     &    sph_files1, sph_maker_G, ierr)
-      if(ierr .gt. 0) call calypso_mpi_abort(ierr, e_message)
+      call s_input_control_const_shell(control_file_name, SPH_MAKE_ctl, &
+     &                                 sph_files1, sph_maker_G)
+      call end_elapsed_time(ied_total_elapsed)
 !
       if(sph_maker_G%gen_sph%s3d_ranks%ndomain_sph .ne. nprocs) then
         if(my_rank .eq. 0) write(*,*) 'The number of MPI processes ',   &
@@ -106,7 +105,7 @@
      &    SPH_GEN%sph, SPH_GEN%comms, SPH_GEN%groups)
       call calypso_mpi_allreduce_one_int(iflag, iflag_gl, MPI_MAX)
 !
-      write(*,*) 'indexing', my_rank, iflag_gl
+!      write(*,*) 'indexing', my_rank, iflag_gl
       call calypso_mpi_barrier
       if(iflag .gt. 0) call calypso_mpi_abort(ierr_P_MPI, e_message)
       if(iflag_gl .eq. 0 .and. my_rank .eq. 0) then

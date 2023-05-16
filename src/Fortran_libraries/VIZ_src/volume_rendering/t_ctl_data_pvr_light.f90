@@ -8,9 +8,16 @@
 !!
 !!@verbatim
 !!      subroutine read_lighting_ctl(id_control, hd_block, light, c_buf)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
 !!        type(pvr_light_ctl), intent(inout) :: light
 !!        type(buffer_for_control), intent(inout)  :: c_buf
-!!      subroutine bcast_lighting_ctl(light)
+!!      subroutine write_lighting_ctl                                   &
+!!     &         (id_control, hd_block, light, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(pvr_light_ctl), intent(in) :: light
+!!        integer(kind = kint), intent(inout) :: level
 !!      subroutine reset_pvr_light_flags(light)
 !!      subroutine dealloc_pvr_light_crl(light)
 !!        type(pvr_light_ctl), intent(inout) :: light
@@ -40,7 +47,6 @@
       module t_ctl_data_pvr_light
 !
       use m_precision
-      use calypso_mpi
 !
       use m_machine_parameter
       use t_read_control_elements
@@ -115,24 +121,44 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine bcast_lighting_ctl(light)
+      subroutine write_lighting_ctl                                     &
+     &         (id_control, hd_block, light, level)
 !
-      use calypso_mpi_int
-      use bcast_control_arrays
+      use write_control_elements
 !
-      type(pvr_light_ctl), intent(inout) :: light
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(pvr_light_ctl), intent(in) :: light
+!
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
 !
 !
-      call calypso_mpi_bcast_one_int(light%i_pvr_lighting, 0)
+      if(light%i_pvr_lighting .le. 0) return
 !
-      call bcast_ctl_array_r3(light%light_position_ctl)
+      maxlen = len_trim(hd_ambient)
+      maxlen = max(maxlen, len_trim(hd_diffuse))
+      maxlen = max(maxlen, len_trim(hd_specular))
 !
-      call bcast_ctl_type_r1(light%ambient_coef_ctl )
-      call bcast_ctl_type_r1(light%diffuse_coef_ctl )
-      call bcast_ctl_type_r1(light%specular_coef_ctl)
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
 !
-      end subroutine bcast_lighting_ctl
+      call write_control_array_r3(id_control, level,                    &
+     &    hd_light_param, light%light_position_ctl)
 !
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_ambient, light%ambient_coef_ctl )
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_diffuse, light%diffuse_coef_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_specular, light%specular_coef_ctl)
+!
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_lighting_ctl
+!
+!  ---------------------------------------------------------------------
 !  ---------------------------------------------------------------------
 !
       subroutine reset_pvr_light_flags(light)

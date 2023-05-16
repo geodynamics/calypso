@@ -195,34 +195,34 @@
       real(kind = kreal), intent(inout) ::  r, g, b
 !
       real(kind = kreal), parameter :: abyss = zero
-      real(kind = kreal), parameter :: blue =  0.2d0
+      real(kind = kreal), parameter :: blue =  0.1d0
       real(kind = kreal), parameter :: white = half
-      real(kind = kreal), parameter :: red =   0.8d0
+      real(kind = kreal), parameter :: red =   0.9d0
       real(kind = kreal), parameter :: blood =  one
 !
 !
       if (rnorm .lt. abyss ) then
         r = zero
         g = 0.2d0
-        b = 0.5d0
+        b = 0.8d0
       else if (rnorm .ge. abyss .and. rnorm.lt.blue) then
         r = zero
-        g = blue - rnorm
-        b = 0.5d0 + 2.5 * rnorm
+        g = 2.0d0 * (blue - rnorm)
+        b = 0.8d0 + 2.0d0 * rnorm
       else if (rnorm .ge. blue .and. rnorm.lt.white) then
-        r = (rnorm - blue) * 2.5
-        g = (rnorm - blue) * 2.5
-        b = one
+        r = (rnorm - blue) * 2.0d0
+        g = (rnorm - blue) * 2.0d0
+        b = one - (rnorm - blue) * 0.25
       else if (rnorm .ge. white .and. rnorm.lt.red) then
-        r = one
-        g = (red - rnorm) * 2.5
-        b = (red - rnorm) * 2.5
+        r = one - (red - rnorm) * 0.25
+        g = (red - rnorm) * 2.0d0
+        b = (red - rnorm) * 2.0d0
       else if (rnorm .ge. red .and. rnorm.lt. blood) then
-        r = one - (rnorm - red) * 2.5
+        r = one - (rnorm - red) * 2.0d0
         g = zero
         b = zero
       else if (rnorm .ge. blood) then
-        r = half
+        r = 0.8d0
         g = zero
         b = zero
       end if

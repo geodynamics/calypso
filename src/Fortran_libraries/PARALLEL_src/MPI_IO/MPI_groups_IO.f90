@@ -71,7 +71,7 @@
           ied = group_IO%istack_grp(i)
           num = group_IO%istack_grp(i) - group_IO%istack_grp(i-1)
           call mpi_read_num_of_data(IO_param, num_tmp)
-          call mpi_read_comm_table                                      &
+          call mpi_read_int_items                                       &
      &       (IO_param, ieight, num, group_IO%item_grp(ist:ied))
         end do
       end if
@@ -141,7 +141,7 @@
         ist = group_IO%istack_grp(i-1) + 1
         ied = group_IO%istack_grp(i)
         num = group_IO%istack_grp(i) - group_IO%istack_grp(i-1)
-        call mpi_write_comm_table                                       &
+        call mpi_write_int_items                                        &
      &     (IO_param, ieight, num, group_IO%item_grp(ist:ied))
       end do
 !
@@ -189,14 +189,14 @@
 !
 !
       call mpi_read_num_of_data(IO_param, num_tmp)
-      call mpi_read_comm_table(IO_param, ncolumn, num, int_tmp)
+      call mpi_read_int_items(IO_param, ncolumn, num, int_tmp)
 !$omp parallel workshare
       int_dat(1,ist+1:ist+num) = int_tmp(1:num)
 !$omp end parallel workshare
 !
 !
       call mpi_read_num_of_data(IO_param, num_tmp)
-      call mpi_read_comm_table(IO_param, ncolumn, num, int_tmp)
+      call mpi_read_int_items(IO_param, ncolumn, num, int_tmp)
 !$omp parallel workshare
       int_dat(2,ist+1:ist+num) = int_tmp(1:num)
 !$omp end parallel workshare
@@ -218,13 +218,13 @@
 !$omp parallel workshare
        int_tmp(1:num) = int_dat(1,ist+1:ist+num)
 !$omp end parallel workshare
-      call mpi_write_comm_table(IO_param, ncolumn, num, int_tmp)
+      call mpi_write_int_items(IO_param, ncolumn, num, int_tmp)
 !
 !
 !$omp parallel workshare
        int_tmp(1:num) = int_dat(2,ist+1:ist+num)
 !$omp end parallel workshare
-      call mpi_write_comm_table(IO_param, ncolumn, num, int_tmp)
+      call mpi_write_int_items(IO_param, ncolumn, num, int_tmp)
 !
       end subroutine mpi_write_surf_grp_item
 !

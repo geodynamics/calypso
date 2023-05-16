@@ -82,7 +82,8 @@
      &    img_output_tbl%irank_import, img_output_tbl%istack_import,    &
      &    img_output_tbl%iflag_self_copy, num_pixel_recv)
 !
-      call alloc_calypso_import_item(num_pixel_recv, img_output_tbl)
+      call alloc_calypso_import_item(img_output_tbl)
+      call alloc_calypso_import_rev(num_pixel_recv, img_output_tbl)
       call set_import_item_pvr_output                                   &
      &    (num_pixel_xy, stencil_wk%item_recv_image,                    &
      &     img_output_tbl%ntot_import, num_pixel_recv,                  &
@@ -98,6 +99,7 @@
      &          irank_4_composit, num_pvr_ray, id_pixel_start,          &
      &          img_composit_tbl)
 !
+      use m_error_IDs
       use calypso_mpi_int
       use comm_tbl_4_img_composit
 !
@@ -117,6 +119,7 @@
       integer(kind = kint), allocatable :: num_recv_pixel_tmp(:)
 !
       integer :: i_rank
+      integer(kind = kint) :: ierr, num_rev
 !
 !
       allocate(index_pvr_start(num_pvr_ray))
@@ -161,10 +164,18 @@
      &   img_composit_tbl%irank_export, img_composit_tbl%istack_export, &
      &   img_composit_tbl%item_export)
 !
-      call alloc_calypso_import_item                                    &
-     &   (img_composit_tbl%ntot_import, img_composit_tbl)
+      call alloc_calypso_import_item(img_composit_tbl)
       call set_item_recv_tmp_composit(img_composit_tbl%ntot_import,     &
-     &   img_composit_tbl%item_import, img_composit_tbl%irev_import)
+     &                                img_composit_tbl%item_import)
+!
+      num_rev = maxval(img_composit_tbl%item_import)
+      call alloc_calypso_import_rev(num_rev, img_composit_tbl)
+      call set_calypso_import_rev(img_composit_tbl, ierr)
+!
+      if(ierr .gt. 0) then
+        call calypso_mpi_abort(ierr_repart,                             &
+     &                         'Failed repatition table loading')
+      end if
 !
       deallocate(num_send_pixel_tmp, num_recv_pixel_tmp)
       deallocate(index_pvr_start)

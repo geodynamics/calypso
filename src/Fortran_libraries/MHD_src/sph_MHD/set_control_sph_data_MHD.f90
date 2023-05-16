@@ -11,7 +11,7 @@
 !!     &        (MHD_prop, field_ctl, rj_fld)
 !!      subroutine s_set_control_sph_data_MHD                           &
 !!     &         (plt, mevo_ctl, rj_org_param, rst_org_param,           &
-!!     &          fst_file_IO, bc_IO, trans_p, WK_leg)
+!!     &          fst_file_IO, bc_IO, ref_input_IO, trans_p, WK_leg)
 !!        type(fluid_property), intent(in) :: fl_prop
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(platform_data_control), intent(in) :: plt
@@ -20,6 +20,7 @@
 !!        type(field_IO_params), intent(in) :: rst_org_param
 !!        type(field_IO_params), intent(inout) :: fst_file_IO
 !!        type(boundary_spectra), intent(inout) :: bc_IO
+!!        type(field_IO_params), intent(inout) :: ref_input_IO
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(parameters_4_sph_trans), intent(inout) :: trans_p
 !!        type(legendre_trns_works), intent(inout) :: WK_leg
@@ -88,7 +89,7 @@
 !
       subroutine s_set_control_sph_data_MHD                             &
      &         (plt, mevo_ctl, rj_org_param, rst_org_param,             &
-     &          fst_file_IO, bc_IO, trans_p, WK_leg)
+     &          fst_file_IO, bc_IO, ref_input_IO, trans_p, WK_leg)
 !
       use calypso_mpi
       use m_error_IDs
@@ -119,6 +120,7 @@
 !
       type(field_IO_params), intent(inout) :: fst_file_IO
       type(boundary_spectra), intent(inout) :: bc_IO
+      type(field_IO_params), intent(inout) :: ref_input_IO
       type(parameters_4_sph_trans), intent(inout) :: trans_p
       type(legendre_trns_works), intent(inout) :: WK_leg
 !
@@ -146,6 +148,13 @@
 !
       if (plt%bc_data_file_name_ctl%iflag .gt. 0) then
         bc_IO%file_name = plt%bc_data_file_name_ctl%charavalue
+      end if
+!
+      ref_input_IO%iflag_IO = 0
+      if(plt%radial_data_file_name_ctl%iflag .gt. 0) then
+        ref_input_IO%file_prefix                                        &
+     &         = plt%radial_data_file_name_ctl%charavalue
+        ref_input_IO%iflag_IO = 1
       end if
 !
       end subroutine s_set_control_sph_data_MHD

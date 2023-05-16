@@ -7,31 +7,36 @@
 !> @brief Output merged binary field file using MPI-IO
 !!
 !!@verbatim
-!!      subroutine open_wt_gzfile_b(gzip_name, zbuf)
-!!      subroutine open_rd_gzfile_b(gzip_name, id_rank, zbuf)
+!!      subroutine open_wt_gzfile_b(FPz_f, gzip_name, zbuf)
+!!      subroutine open_rd_gzfile_b(FPz_f, gzip_name, id_rank, zbuf)
+!!        character, pointer, intent(inout) :: FPz_f
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!
-!!      subroutine gz_write_one_integer_b(int_dat, zbuf)
-!!      subroutine gz_write_one_real_b(real_dat, zbuf)
-!!      subroutine gz_write_mul_int8_b(num, int8_dat, zbuf)
-!!      subroutine gz_write_mul_integer_b(num, int_dat, zbuf)
-!!      subroutine gz_write_integer_stack_b(num, istack, zbuf)
-!!      subroutine gz_write_mul_character_b(num, chara_dat, zbuf)
-!!      subroutine gz_write_mul_one_character_b(num, chara_dat, zbuf)
-!!      subroutine gz_write_1d_vector_b(num, real_dat, zbuf)
-!!      subroutine gz_write_2d_vector_b(n1, n2, real_dat, zbuf)
+!!      subroutine gz_write_one_integer_b(FPz_f, int_dat, zbuf)
+!!      subroutine gz_write_one_real_b(FPz_f, real_dat, zbuf)
+!!      subroutine gz_write_mul_int8_b(FPz_f, num, int8_dat, zbuf)
+!!      subroutine gz_write_mul_integer_b(FPz_f, num, int_dat, zbuf)
+!!      subroutine gz_write_integer_stack_b(FPz_f, num, istack, zbuf)
+!!      subroutine gz_write_mul_character_b(FPz_f, num, chara_dat, zbuf)
+!!      subroutine gz_write_mul_one_character_b                         &
+!!     &         (FPz_f, num, chara_dat, zbuf)
+!!      subroutine gz_write_1d_vector_b(FPz_f, num, real_dat, zbuf)
+!!      subroutine gz_write_2d_vector_b(FPz_f, n1, n2, real_dat, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!
-!!      subroutine gz_read_endian_flag(id_rank, zbuf)
-!!      subroutine gz_read_one_integer_b(zbuf, int_dat)
-!!      subroutine gz_read_one_real_b(zbuf, real_dat)
-!!      subroutine gz_read_mul_int8_b(zbuf, num, int8_dat)
-!!      subroutine gz_read_mul_integer_b(zbuf, num, int_dat)
-!!      subroutine gz_read_integer_stack_b(zbuf, num, istack, ntot)
-!!      subroutine gz_read_mul_character_b(zbuf, num, chara_dat)
-!!      subroutine gz_read_mul_one_character_b(zbuf, num, chara_dat)
-!!      subroutine gz_read_1d_vector_b(zbuf, num, real_dat)
-!!      subroutine gz_read_2d_vector_b(zbuf, n1, n2, real_dat)
+!!      subroutine gz_read_one_integer_b(FPz_f, zbuf, int_dat)
+!!      subroutine gz_read_one_real_b(FPz_f, zbuf, real_dat)
+!!      subroutine gz_read_mul_int8_b(FPz_f, zbuf, num, int8_dat)
+!!      subroutine gz_read_mul_integer_b(FPz_f, zbuf, num, int_dat)
+!!      subroutine gz_read_integer_stack_b(FPz_f, zbuf,                 &
+!!     &                                   num, istack, ntot)
+!!      subroutine gz_read_mul_character_b(FPz_f, zbuf, num, chara_dat)
+!!      subroutine gz_read_mul_one_character_b                          &
+!!     &         (FPz_f, zbuf, num, chara_dat)
+!!      subroutine gz_read_1d_vector_b(FPz_f, zbuf, num, real_dat)
+!!      subroutine gz_read_2d_vector_b(FPz_f, zbuf, n1, n2, real_dat)
+!!        character, pointer, intent(in) :: FPz_f
 !!        type(buffer_4_gzip), intent(inout) :: zbuf
 !!@endverbatim
 !
@@ -54,36 +59,38 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine open_wt_gzfile_b(gzip_name, zbuf)
+      subroutine open_wt_gzfile_b(FPz_f, gzip_name, zbuf)
 !
       use set_parallel_file_name
       use skip_gz_comment
       use gzip_file_access
 !
+      character, pointer, intent(inout) :: FPz_f
       character(len=kchara), intent(in) :: gzip_name
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
-      call open_wt_gzfile_f(gzip_name, zbuf)
-      call gz_write_endian_flag(zbuf)
+      call open_wt_gzfile_f(FPz_f, gzip_name, zbuf)
+      call gz_write_endian_flag(FPz_f, zbuf)
 !
       end subroutine open_wt_gzfile_b
 !
 !------------------------------------------------------------------
 !
-      subroutine open_rd_gzfile_b(gzip_name, id_rank, zbuf)
+      subroutine open_rd_gzfile_b(FPz_f, gzip_name, id_rank, zbuf)
 !
       use set_parallel_file_name
       use skip_gz_comment
       use gzip_file_access
 !
+      character, pointer, intent(inout) :: FPz_f
       integer, intent(in) :: id_rank
       character(len=kchara), intent(in) :: gzip_name
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
 !
-      call open_rd_gzfile_f(gzip_name, zbuf)
-      call gz_read_endian_flag(id_rank, zbuf)
+      call open_rd_gzfile_f(FPz_f, gzip_name, zbuf)
+      call gz_read_endian_flag(FPz_f, id_rank, zbuf)
 !
       if(zbuf%iflag_swap .eq. -1) zbuf%ierr_zlib = ierr_file
 !
@@ -92,25 +99,27 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine gz_write_endian_flag(zbuf)
+      subroutine gz_write_endian_flag(FPz_f, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       type(buffer_4_gzip), intent(inout) :: zbuf
       integer, parameter :: i_UNIX4(1) = (/i_UNIX/)
 !
 !
-      call gzwrite_int4_f(1, i_UNIX4, zbuf)
+      call gzwrite_int4_f(FPz_f, 1, i_UNIX4, zbuf)
 !
       end subroutine gz_write_endian_flag
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_write_one_integer_b(int_dat, zbuf)
+      subroutine gz_write_one_integer_b(FPz_f, int_dat, zbuf)
 !
       use transfer_to_long_integers
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(in) :: int_dat
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
@@ -119,16 +128,17 @@
 !
 !
       i8tmp(1) = cast_long(int_dat)
-      call gz_write_mul_int8_b(ione64, i8tmp, zbuf)
+      call gz_write_mul_int8_b(FPz_f, ione64, i8tmp, zbuf)
 !
       end subroutine gz_write_one_integer_b
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_write_one_real_b(real_dat, zbuf)
+      subroutine gz_write_one_real_b(FPz_f, real_dat, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       real(kind = kreal), intent(in) :: real_dat
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
@@ -137,17 +147,18 @@
 !
 !
       rtmp(1) = real_dat
-      call gz_write_1d_vector_b(ione64, rtmp, zbuf)
+      call gz_write_1d_vector_b(FPz_f, ione64, rtmp, zbuf)
 !
       end subroutine gz_write_one_real_b
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_write_mul_int8_b(num, int8_dat, zbuf)
+      subroutine gz_write_mul_int8_b(FPz_f, num, int8_dat, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint_gl), intent(in) :: int8_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -160,7 +171,7 @@
       do
         ilength = int(min((num - ist), huge_20))
 !
-        call gzwrite_int8_f(ilength, int8_dat(ist+1), zbuf)
+        call gzwrite_int8_f(FPz_f, ilength, int8_dat(ist+1), zbuf)
         ist = ist + ilength
         if(zbuf%ierr_zlib .ne. 0) return
         if(ist .ge. num) exit
@@ -171,10 +182,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_write_mul_integer_b(num, int_dat, zbuf)
+      subroutine gz_write_mul_integer_b(FPz_f, num, int_dat, zbuf)
 !
       use transfer_to_long_integers
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint), intent(in) :: int_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -183,7 +195,7 @@
 !
       if(num .le. 0) return
       call dup_from_short_array(num, int_dat, tmp64)
-      call gz_write_mul_int8_b(num, tmp64%id_a, zbuf)
+      call gz_write_mul_int8_b(FPz_f, num, tmp64%id_a, zbuf)
       if(zbuf%ierr_zlib .ne. 0) return
       call dealloc_1d_i8array(tmp64)
 !
@@ -191,22 +203,24 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_write_integer_stack_b(num, istack, zbuf)
+      subroutine gz_write_integer_stack_b(FPz_f, num, istack, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint), intent(in) :: istack(0:num)
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
-      call gz_write_mul_integer_b(num, istack(1), zbuf)
+      call gz_write_mul_integer_b(FPz_f, num, istack(1), zbuf)
 !
       end subroutine gz_write_integer_stack_b
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_write_mul_character_b(num, chara_dat, zbuf)
+      subroutine gz_write_mul_character_b(FPz_f, num, chara_dat, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       character(len=kchara), intent(in) :: chara_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -220,7 +234,7 @@
         ilength = int(min((num - ist), huge_20))
         lbyte = ilength * kchara
 !
-        call gzwrite_chara_f(lbyte, chara_dat(ist+1), zbuf)
+        call gzwrite_chara_f(FPz_f, lbyte, chara_dat(ist+1), zbuf)
         ist = ist + ilength
         if(zbuf%ierr_zlib .ne. 0) return
         if(ist .ge. num) exit
@@ -231,10 +245,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_write_mul_one_character_b(num, chara_dat, zbuf)
+      subroutine gz_write_mul_one_character_b                           &
+     &         (FPz_f, num, chara_dat, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       character(len=1), intent(in) :: chara_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -247,7 +263,7 @@
       do
         ilength = int(min((num - ist), huge_20))
 !
-        call gzwrite_chara_f(ilength, chara_dat(ist+1), zbuf)
+        call gzwrite_chara_f(FPz_f, ilength, chara_dat(ist+1), zbuf)
         ist = ist + ilength
         if(zbuf%ierr_zlib .ne. 0) return
         if(ist .ge. num) exit
@@ -258,10 +274,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_write_1d_vector_b(num, real_dat, zbuf)
+      subroutine gz_write_1d_vector_b(FPz_f, num, real_dat, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       real(kind = kreal), intent(in) :: real_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -274,7 +291,7 @@
       do
         ilength = int(min((num - ist), huge_20))
 !
-        call gzwrite_real_f(ilength, real_dat(ist+1), zbuf)
+        call gzwrite_real_f(FPz_f, ilength, real_dat(ist+1), zbuf)
         if(zbuf%ierr_zlib .ne. 0) return
         ist = ist + ilength
         if(ist .ge. num) exit
@@ -285,8 +302,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_write_2d_vector_b(n1, n2, real_dat, zbuf)
+      subroutine gz_write_2d_vector_b(FPz_f, n1, n2, real_dat, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: n1
       integer(kind = kint), intent(in) :: n2
       real(kind = kreal), intent(in) :: real_dat(n1,n2)
@@ -296,7 +314,7 @@
 !
 !
       do i2 = 1, n2
-        call gz_write_1d_vector_b(n1, real_dat(1,i2), zbuf)
+        call gz_write_1d_vector_b(FPz_f, n1, real_dat(1,i2), zbuf)
         if(zbuf%ierr_zlib .ne. 0) return
       end do
 !
@@ -305,11 +323,12 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_endian_flag(id_rank, zbuf)
+      subroutine gz_read_endian_flag(FPz_f, id_rank, zbuf)
 !
       use binary_IO
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer, intent(in) :: id_rank
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
@@ -317,17 +336,18 @@
 !
 !
       zbuf%iflag_swap = iendian_KEEP
-      call gzread_int4_f(1, int_dat, zbuf)
+      call gzread_int4_f(FPz_f, 1, int_dat, zbuf)
       zbuf%iflag_swap = endian_check(id_rank, int_dat(1))
 !
       end subroutine gz_read_endian_flag
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_one_integer_b(zbuf, int_dat)
+      subroutine gz_read_one_integer_b(FPz_f, zbuf, int_dat)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(inout) :: int_dat
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
@@ -335,17 +355,18 @@
       integer(kind = kint_gl) :: int64(1)
 !
 !
-      call gz_read_mul_int8_b(zbuf, ione64, int64)
+      call gz_read_mul_int8_b(FPz_f, zbuf, ione64, int64)
       int_dat = int(int64(1),KIND(int_dat))
 !
       end subroutine gz_read_one_integer_b
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_one_real_b(zbuf, real_dat)
+      subroutine gz_read_one_real_b(FPz_f, zbuf, real_dat)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       real(kind = kreal), intent(inout) :: real_dat
       type(buffer_4_gzip), intent(inout) :: zbuf
 !
@@ -353,7 +374,7 @@
       real(kind = kreal) :: rtmp(1)
 !
 !
-      call gz_read_1d_vector_b(zbuf, ione64, rtmp)
+      call gz_read_1d_vector_b(FPz_f, zbuf, ione64, rtmp)
       real_dat = rtmp(1)
 !
       end subroutine gz_read_one_real_b
@@ -361,10 +382,11 @@
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_mul_int8_b(zbuf, num, int8_dat)
+      subroutine gz_read_mul_int8_b(FPz_f, zbuf, num, int8_dat)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint_gl), intent(inout) :: int8_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -378,7 +400,7 @@
         ilength = int(min((num - ist), huge_20))
         lbyte = ilength * kint_gl
 !
-        call gzread_int8_f(ilength, int8_dat(ist+1), zbuf)
+        call gzread_int8_f(FPz_f, ilength, int8_dat(ist+1), zbuf)
         if(zbuf%ierr_zlib .ne. 0) return
         ist = ist + ilength
         if(ist .ge. num) exit
@@ -388,10 +410,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_mul_integer_b(zbuf, num, int_dat)
+      subroutine gz_read_mul_integer_b(FPz_f, zbuf, num, int_dat)
 !
       use transfer_to_long_integers
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint), intent(inout) :: int_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -400,7 +423,7 @@
 !
       if(num .le. 0) return
       call alloc_1d_i8array(num, tmp64)
-      call gz_read_mul_int8_b(zbuf, num, tmp64%id_a)
+      call gz_read_mul_int8_b(FPz_f, zbuf, num, tmp64%id_a)
       if(zbuf%ierr_zlib .ne. 0) return
       call dup_to_short_array(tmp64, int_dat)
 !
@@ -408,8 +431,10 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_integer_stack_b(zbuf, num, istack, ntot)
+      subroutine gz_read_integer_stack_b(FPz_f, zbuf,                   &
+     &                                   num, istack, ntot)
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       integer(kind = kint), intent(inout) :: ntot
       integer(kind = kint), intent(inout) :: istack(0:num)
@@ -417,7 +442,7 @@
 !
 !
       istack(0) = 0
-      call gz_read_mul_integer_b(zbuf, num, istack(1))
+      call gz_read_mul_integer_b(FPz_f, zbuf, num, istack(1))
       if(zbuf%ierr_zlib .ne. 0) return
       ntot = istack(num)
 !
@@ -425,10 +450,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_mul_character_b(zbuf, num, chara_dat)
+      subroutine gz_read_mul_character_b(FPz_f, zbuf, num, chara_dat)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       character(len=kchara), intent(inout) :: chara_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -442,7 +468,7 @@
         ilength = int(min((num - ist), huge_20))
         lbyte = ilength * kchara
 !
-        call gzread_chara_f(lbyte, chara_dat(ist+1), zbuf)
+        call gzread_chara_f(FPz_f, lbyte, chara_dat(ist+1), zbuf)
         if(zbuf%ierr_zlib .ne. 0) return
         ist = ist + ilength
         if(ist .ge. num) exit
@@ -452,10 +478,12 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_mul_one_character_b(zbuf, num, chara_dat)
+      subroutine gz_read_mul_one_character_b                            &
+     &         (FPz_f, zbuf, num, chara_dat)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       character(len=1), intent(inout) :: chara_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -468,7 +496,7 @@
       do
         ilength = int(min((num - ist), huge_20))
 !
-        call gzread_chara_f(ilength, chara_dat(ist+1), zbuf)
+        call gzread_chara_f(FPz_f, ilength, chara_dat(ist+1), zbuf)
         if(zbuf%ierr_zlib .ne. 0) return
         ist = ist + ilength
         if(ist .ge. num) exit
@@ -478,10 +506,11 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_1d_vector_b(zbuf, num, real_dat)
+      subroutine gz_read_1d_vector_b(FPz_f, zbuf, num, real_dat)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: num
       real(kind = kreal), intent(inout) :: real_dat(num)
       type(buffer_4_gzip), intent(inout) :: zbuf
@@ -494,7 +523,7 @@
       do
         ilength = int(min((num - ist), huge_20))
 !
-        call gzread_real_f(ilength, real_dat(ist+1), zbuf)
+        call gzread_real_f(FPz_f, ilength, real_dat(ist+1), zbuf)
         if(zbuf%ierr_zlib .ne. 0) return
         ist = ist + ilength
         if(ist .ge. num) exit
@@ -504,8 +533,9 @@
 !
 ! -----------------------------------------------------------------------
 !
-      subroutine gz_read_2d_vector_b(zbuf, n1, n2, real_dat)
+      subroutine gz_read_2d_vector_b(FPz_f, zbuf, n1, n2, real_dat)
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(in) :: n1
       integer(kind = kint), intent(in) :: n2
       real(kind = kreal), intent(inout) :: real_dat(n1,n2)
@@ -515,7 +545,7 @@
 !
 !
       do i2 = 1, n2
-        call gz_read_1d_vector_b(zbuf, n1, real_dat(1,i2))
+        call gz_read_1d_vector_b(FPz_f, zbuf, n1, real_dat(1,i2))
         if(zbuf%ierr_zlib .ne. 0) return
       end do
 !

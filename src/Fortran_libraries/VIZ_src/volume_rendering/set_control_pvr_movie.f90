@@ -29,7 +29,7 @@
 !
       subroutine s_set_control_pvr_movie(movie_ctl, movie_def)
 !
-      use t_control_data_pvr_movie
+      use t_ctl_data_pvr_movie
       use t_control_params_4_pvr
       use t_geometries_in_pvr_screen
       use output_image_sel_4_png

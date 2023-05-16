@@ -10,25 +10,31 @@
 !!@verbatim
 !!      integer function length_of_c_text(text)
 !!
-!!      subroutine open_wt_gzfile_a(gzip_name, zbuf)
-!!      subroutine open_ad_gzfile_a(gzip_name, zbuf)
-!!      subroutine open_rd_gzfile_a(gzip_name, zbuf)
-!!      subroutine close_gzfile_a(zbuf)
+!!      subroutine open_wt_gzfile_a(FPz_f, gzip_name, zbuf)
+!!      subroutine open_ad_gzfile_a(FPz_f, gzip_name, zbuf)
+!!      subroutine open_rd_gzfile_a(FPz_f, gzip_name, zbuf)
+!!      subroutine close_gzfile_a(FPz_f, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!        type(buffer_4_gzip), intent(inout):: zbuf
 !!
-!!      subroutine skip_gz_comment_int(int_input, zbuf)
-!!      subroutine skip_gz_comment_int2(int_input, int_input2, zbuf)
-!!      subroutine skip_gz_comment_int8_int(i8_input, int_input2, zbuf)
-!!      subroutine skip_gz_comment_real(real_input, zbuf)
-!!      subroutine skip_gz_comment_real2(real_input, real_input2, zbuf)
-!!      subroutine skip_gz_comment_chara(chara_input, zbuf)
+!!      subroutine skip_gz_comment_int(FPz_f, int_input, zbuf)
+!!      subroutine skip_gz_comment_int2                                 &
+!!     &         (FPz_f, int_input, int_input2, zbuf)
+!!      subroutine skip_gz_comment_int8_int                             &
+!!     &         (FPz_f, i8_input, int_input2, zbuf)
+!!      subroutine skip_gz_comment_real(FPz_f, real_input, zbuf)
+!!      subroutine skip_gz_comment_real2                                &
+!!     &         (FPz_f, real_input, real_input2, zbuf)
+!!      subroutine skip_gz_comment_chara(FPz_f, chara_input, zbuf)
 !!      subroutine skip_gz_comment_chara_int                            &
-!!     &         (chara_input, int_input, zbuf)
+!!     &         (FPz_f, chara_input, int_input, zbuf)
 !!      subroutine skip_gz_comment_chara_lint                           &
-!!     &         (chara_input, int8_input, zbuf)
+!!     &         (FPz_f, chara_input, int8_input, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!        type(buffer_4_gzip), intent(inout):: zbuf
 !!
-!!      subroutine skip_gz_comment_get_nword(zbuf)
+!!      subroutine skip_gz_comment_get_nword(FPz_f, zbuf)
+!!        character, pointer, intent(in) :: FPz_f
 !!        type(buffer_4_gzip), intent(inout):: zbuf
 !!@endverbatim
 !
@@ -63,58 +69,62 @@
 ! ----------------------------------------------------------------------
 ! ----------------------------------------------------------------------
 !
-      subroutine open_wt_gzfile_a(gzip_name, zbuf)
+      subroutine open_wt_gzfile_a(FPz_f, gzip_name, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(inout) :: FPz_f
       character(len = kchara), intent(in) :: gzip_name
       type(buffer_4_gzip) , intent(inout):: zbuf
 !
 !
       call alloc_fixbuffer_for_zlib(zbuf)
-      call open_wt_gzfile_f(gzip_name, zbuf)
+      call open_wt_gzfile_f(FPz_f, gzip_name, zbuf)
 !
       end subroutine open_wt_gzfile_a
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine open_ad_gzfile_a(gzip_name, zbuf)
+      subroutine open_ad_gzfile_a(FPz_f, gzip_name, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(inout) :: FPz_f
       character(len = kchara), intent(in) :: gzip_name
       type(buffer_4_gzip) , intent(inout):: zbuf
 !
 !
       call alloc_fixbuffer_for_zlib(zbuf)
-      call open_ad_gzfile_f(gzip_name, zbuf)
+      call open_ad_gzfile_f(FPz_f, gzip_name, zbuf)
 !
       end subroutine open_ad_gzfile_a
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine open_rd_gzfile_a(gzip_name, zbuf)
+      subroutine open_rd_gzfile_a(FPz_f, gzip_name, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(inout) :: FPz_f
       character(len = kchara), intent(in) :: gzip_name
       type(buffer_4_gzip) , intent(inout):: zbuf
 !
 !
       call alloc_fixbuffer_for_zlib(zbuf)
-      call open_rd_gzfile_f(gzip_name, zbuf)
+      call open_rd_gzfile_f(FPz_f, gzip_name, zbuf)
 !
       end subroutine open_rd_gzfile_a
 !
 ! ----------------------------------------------------------------------
 !
-      subroutine close_gzfile_a(zbuf)
+      subroutine close_gzfile_a(FPz_f, zbuf)
 !
       use gzip_file_access
 !
-      type(buffer_4_gzip) , intent(inout):: zbuf
+      character, pointer, intent(inout) :: FPz_f
+      type(buffer_4_gzip) , intent(inout) :: zbuf
 !
-      call close_gzfile_b()
+      call close_gzfile_b(FPz_f)
       call dealloc_fixbuffer_for_zlib(zbuf)
 !
       end subroutine close_gzfile_a
@@ -122,79 +132,88 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine skip_gz_comment_int(int_input, zbuf)
+      subroutine skip_gz_comment_int(FPz_f, int_input, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(inout) :: int_input
       type(buffer_4_gzip) , intent(inout):: zbuf
 !
 !
-      call skip_gz_comment_get_nword(zbuf)
+      call skip_gz_comment_get_nword(FPz_f, zbuf)
       read(zbuf%fixbuf(1),*) int_input
 !
       end subroutine skip_gz_comment_int
 !
 !------------------------------------------------------------------
 !
-      subroutine skip_gz_comment_int2(int_input, int_input2, zbuf)
+      subroutine skip_gz_comment_int2                                   &
+     &         (FPz_f, int_input, int_input2, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint), intent(inout) :: int_input, int_input2
       type(buffer_4_gzip), intent(inout):: zbuf
 !
 !
-      call skip_gz_comment_get_nword(zbuf)
+      call skip_gz_comment_get_nword(FPz_f, zbuf)
       read(zbuf%fixbuf(1),*) int_input, int_input2
 !
       end subroutine skip_gz_comment_int2
 !
 !------------------------------------------------------------------
 !
-      subroutine skip_gz_comment_int8_int(i8_input, int_input2, zbuf)
+      subroutine skip_gz_comment_int8_int                               &
+     &         (FPz_f, i8_input, int_input2, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       integer(kind = kint_gl), intent(inout) :: i8_input
       integer(kind = kint), intent(inout) :: int_input2
       type(buffer_4_gzip), intent(inout):: zbuf
 !
 !
-      call skip_gz_comment_get_nword(zbuf)
+      call skip_gz_comment_get_nword(FPz_f, zbuf)
       read(zbuf%fixbuf(1),*) i8_input, int_input2
 !
       end subroutine skip_gz_comment_int8_int
 !
 !------------------------------------------------------------------
 !
-      subroutine skip_gz_comment_real(real_input, zbuf)
+      subroutine skip_gz_comment_real(FPz_f, real_input, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       real(kind = kreal), intent(inout) :: real_input
       type(buffer_4_gzip), intent(inout):: zbuf
 !
-      call skip_gz_comment_get_nword(zbuf)
+      call skip_gz_comment_get_nword(FPz_f, zbuf)
       read(zbuf%fixbuf(1),*) real_input
 !
       end subroutine skip_gz_comment_real
 !
 !------------------------------------------------------------------
 !
-      subroutine skip_gz_comment_real2(real_input, real_input2, zbuf)
+      subroutine skip_gz_comment_real2                                  &
+     &         (FPz_f, real_input, real_input2, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       real(kind = kreal), intent(inout) :: real_input, real_input2
       type(buffer_4_gzip), intent(inout):: zbuf
 !
-      call skip_gz_comment_get_nword(zbuf)
+      call skip_gz_comment_get_nword(FPz_f, zbuf)
       read(zbuf%fixbuf(1),*) real_input, real_input2
 !
       end subroutine skip_gz_comment_real2
 !
 !------------------------------------------------------------------
 !
-      subroutine skip_gz_comment_chara(chara_input, zbuf)
+      subroutine skip_gz_comment_chara(FPz_f, chara_input, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       character(len = kchara), intent(inout) :: chara_input
       type(buffer_4_gzip), intent(inout):: zbuf
 !
       character(len=kchara) :: charaint, fmtchara, tmpchara
 !
 !
-      call skip_gz_comment_get_nword(zbuf)
+      call skip_gz_comment_get_nword(FPz_f, zbuf)
 !
       write(charaint,'(i8)') min(int(zbuf%len_used - 1), int(kchara))
       write(fmtchara,'(a2,a,a1)')                                       &
@@ -208,14 +227,15 @@
 !------------------------------------------------------------------
 !
       subroutine skip_gz_comment_chara_int                              &
-     &         (chara_input, int_input, zbuf)
+     &         (FPz_f, chara_input, int_input, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       character(len = kchara), intent(inout) :: chara_input
       integer(kind = kint), intent(inout) :: int_input
       type(buffer_4_gzip), intent(inout):: zbuf
 !
 !
-      call skip_gz_comment_get_nword(zbuf)
+      call skip_gz_comment_get_nword(FPz_f, zbuf)
       read(zbuf%fixbuf(1),*) chara_input, int_input
 !
       end subroutine skip_gz_comment_chara_int
@@ -223,14 +243,15 @@
 !------------------------------------------------------------------
 !
       subroutine skip_gz_comment_chara_lint                             &
-     &         (chara_input, int8_input, zbuf)
+     &         (FPz_f, chara_input, int8_input, zbuf)
 !
+      character, pointer, intent(in) :: FPz_f
       character(len = kchara), intent(inout) :: chara_input
       integer(kind = kint_gl), intent(inout) :: int8_input
       type(buffer_4_gzip), intent(inout):: zbuf
 !
 !
-      call skip_gz_comment_get_nword(zbuf)
+      call skip_gz_comment_get_nword(FPz_f, zbuf)
       read(zbuf%fixbuf(1),*) chara_input, int8_input
 !
       end subroutine skip_gz_comment_chara_lint
@@ -238,16 +259,17 @@
 !------------------------------------------------------------------
 !------------------------------------------------------------------
 !
-      subroutine skip_gz_comment_get_nword(zbuf)
+      subroutine skip_gz_comment_get_nword(FPz_f, zbuf)
 !
       use gzip_file_access
 !
+      character, pointer, intent(in) :: FPz_f
       type(buffer_4_gzip), intent(inout):: zbuf
       character(len=1) :: chara_flag
 !      character(len=32767) :: tbuf2
 !
       do
-        call get_one_line_text_from_gz(zbuf)
+        call get_one_line_text_from_gz(FPz_f, zbuf)
         if(zbuf%len_used .le. 1) cycle
 !
         write(chara_flag,'(a1)',err=1) adjustl(zbuf%fixbuf(1))

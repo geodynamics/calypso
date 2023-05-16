@@ -7,12 +7,6 @@
 !> @brief Control input routine for data file headers
 !!
 !!@verbatim
-!!      subroutine read_control_platforms                               &
-!!     &         (id_control, hd_block, plt, c_buf)
-!!        type(platform_data_control), intent(inout) :: plt
-!!      subroutine write_control_platforms                              &
-!!     &         (id_file, hd_block, plt, level)
-!!        type(platform_data_control), intent(in) :: plt
 !!      subroutine reset_control_platforms(plt)
 !!        type(platform_data_control), intent(inout) :: plt
 !!      subroutine copy_ctl_data_4_platform(org_plt, new_plt)
@@ -34,6 +28,7 @@
 !!
 !!      coriolis_int_file_name      'sph_shell/rot_int.dat'
 !!      boundary_data_file_name     'bc_spec.dat'
+!!      radial_data_file_name       'radial_data.dat'
 !!
 !!      interpolate_sph_to_fem_ctl  'sph_shell/sph_to_fem'
 !!      interpolate_fem_to_sph_ctl  'sph_shell/fem_to_sph'
@@ -78,6 +73,8 @@
 !>                File name for hermonic integration for Coriolis term
 !>@n@param      boundary_data_file_name
 !>                File name for boundary conditions
+!>@n@param      radial_data_file_name
+!>                File name for reference radial data
 !>@n@param      interpolate_sph_to_fem_ctl 
 !>               File header for interpolation table
 !>               from spherical grid to FEM grid
@@ -129,6 +126,8 @@
         type(read_character_item) :: coriolis_int_file_name
 !>        Structure of boundary condition data file prefix
         type(read_character_item) :: bc_data_file_name_ctl
+!>        Structure of radial data file prefix
+        type(read_character_item) :: radial_data_file_name_ctl
 !
 !>        Structure of interpolation table file prefix
 !!        from spherical shell to FEM
@@ -163,243 +162,9 @@
         integer(kind = kint) :: i_platform =     0
       end type platform_data_control
 !
-!   file and domain controls
-!
-      character(len=kchara), parameter, private                         &
-     &       :: hd_num_subdomain = 'num_subdomain_ctl'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_num_smp =       'num_smp_ctl'
-!
-      character(len=kchara), parameter, private                         &
-     &       :: hd_mesh_header =   'mesh_file_prefix'
-!
-      character(len=kchara), parameter, private                         &
-     &       :: hd_udt_header =    'field_file_prefix'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_rst_header =    'restart_file_prefix'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_spectr_header = 'spectr_field_file_prefix'
-!
-      character(len=kchara), parameter, private                         &
-     &       :: hd_sph_files_header =    'sph_file_prefix'
-!
-      character(len=kchara), parameter, private                         &
-     &       :: hd_rayleigh_spectr_dir = 'rayleigh_spectr_dir'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_rayleigh_field_dir =  'rayleigh_field_dir'
-!
-      character(len=kchara), parameter, private                         &
-     &       :: hd_coriolis_tri_int_name = 'coriolis_int_file_name'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_bc_data_file_name =     'boundary_data_file_name'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_itp_sph_to_fem =        'interpolate_sph_to_fem_ctl'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_itp_fem_to_sph =        'interpolate_fem_to_sph_ctl'
-!
-      character(len=kchara), parameter, private                         &
-     &       :: hd_mesh_file_fmt =      'mesh_file_fmt_ctl'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_rst_files_fmt =      'restart_file_fmt_ctl'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_udt_files_fmt =      'field_file_fmt_ctl'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_sph_files_fmt =      'sph_file_fmt_ctl'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_itp_files_fmt =      'itp_file_fmt_ctl'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_spect_field_fmt =    'spectr_field_fmt_ctl'
-      character(len=kchara), parameter, private                         &
-     &       :: hd_coriolis_file_fmt =  'coriolis_file_fmt_ctl'
-!
-      character(len=kchara), parameter, private                         &
-     &       :: hd_debug_flag_ctl =     'debug_flag_ctl'
-!
-      character(len=kchara), parameter, private                         &
-     &       :: hd_del_org_data =       'delete_original_data_flag'
-!
 !  ---------------------------------------------------------------------
 !
       contains
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine read_control_platforms                                 &
-     &         (id_control, hd_block, plt, c_buf)
-!
-      use t_read_control_elements
-      use skip_comment_f
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(platform_data_control), intent(inout) :: plt
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(plt%i_platform .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-!
-        call read_integer_ctl_type                                      &
-     &     (c_buf, hd_num_subdomain, plt%ndomain_ctl)
-        call read_integer_ctl_type(c_buf, hd_num_smp, plt%num_smp_ctl)
-!
-!
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_mesh_header, plt%mesh_file_prefix)
-!
-        call read_chara_ctl_type(c_buf, hd_udt_header,                  &
-     &      plt%field_file_prefix)
-        call read_chara_ctl_type(c_buf, hd_rst_header,                  &
-     &      plt%restart_file_prefix)
-        call read_chara_ctl_type(c_buf, hd_spectr_header,               &
-     &      plt%spectr_field_file_prefix)
-!
-        call read_chara_ctl_type(c_buf, hd_sph_files_header,            &
-     &       plt%sph_file_prefix)
-!
-        call read_chara_ctl_type(c_buf, hd_coriolis_tri_int_name,       &
-     &      plt%coriolis_int_file_name)
-        call read_chara_ctl_type(c_buf, hd_bc_data_file_name,           &
-     &      plt%bc_data_file_name_ctl)
-!
-        call read_chara_ctl_type(c_buf, hd_itp_sph_to_fem,              &
-     &      plt%interpolate_sph_to_fem_ctl)
-        call read_chara_ctl_type(c_buf, hd_itp_fem_to_sph,              &
-     &      plt%interpolate_fem_to_sph_ctl)
-!
-        call read_chara_ctl_type(c_buf, hd_rayleigh_spectr_dir,         &
-     &       plt%rayleigh_spectr_dir)
-        call read_chara_ctl_type(c_buf, hd_rayleigh_field_dir,          &
-     &       plt%rayleigh_field_dir)
-!
-        call read_chara_ctl_type(c_buf, hd_mesh_file_fmt,               &
-     &      plt%mesh_file_fmt_ctl)
-        call read_chara_ctl_type(c_buf, hd_rst_files_fmt,               &
-     &      plt%restart_file_fmt_ctl)
-        call read_chara_ctl_type(c_buf, hd_udt_files_fmt,               &
-     &      plt%field_file_fmt_ctl)
-        call read_chara_ctl_type(c_buf, hd_sph_files_fmt,               &
-     &      plt%sph_file_fmt_ctl)
-        call read_chara_ctl_type(c_buf, hd_itp_files_fmt,               &
-     &      plt%itp_file_fmt_ctl)
-        call read_chara_ctl_type(c_buf, hd_spect_field_fmt,             &
-     &      plt%spectr_field_fmt_ctl)
-        call read_chara_ctl_type(c_buf, hd_coriolis_file_fmt,           &
-     &      plt%coriolis_file_fmt_ctl)
-!
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_debug_flag_ctl, plt%debug_flag_ctl)
-!
-        call read_chara_ctl_type                                        &
-     &     (c_buf, hd_del_org_data, plt%del_org_data_ctl)
-       end do
-       plt%i_platform = 1
-!
-      end subroutine read_control_platforms
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine write_control_platforms                                &
-     &         (id_control, hd_block, plt, level)
-!
-      use t_read_control_elements
-      use write_control_elements
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-      type(platform_data_control), intent(in) :: plt
-!
-      integer(kind = kint), intent(inout) :: level
-!
-      integer(kind = kint) :: maxlen = 0
-!
-      maxlen = max(maxlen, len_trim(hd_debug_flag_ctl))
-      maxlen = max(maxlen, len_trim(hd_num_subdomain))
-      maxlen = max(maxlen, len_trim(hd_num_smp))
-      maxlen = max(maxlen, len_trim(hd_mesh_header))
-      maxlen = max(maxlen, len_trim(hd_udt_header))
-      maxlen = max(maxlen, len_trim(hd_rst_header))
-      maxlen = max(maxlen, len_trim(hd_spectr_header))
-      maxlen = max(maxlen, len_trim(hd_sph_files_header))
-      maxlen = max(maxlen, len_trim(hd_coriolis_tri_int_name))
-      maxlen = max(maxlen, len_trim(hd_bc_data_file_name))
-      maxlen = max(maxlen, len_trim(hd_itp_sph_to_fem))
-      maxlen = max(maxlen, len_trim(hd_mesh_file_fmt))
-      maxlen = max(maxlen, len_trim(hd_rst_files_fmt))
-      maxlen = max(maxlen, len_trim(hd_udt_files_fmt))
-      maxlen = max(maxlen, len_trim(hd_sph_files_fmt))
-      maxlen = max(maxlen, len_trim(hd_itp_files_fmt))
-      maxlen = max(maxlen, len_trim(hd_spect_field_fmt))
-      maxlen = max(maxlen, len_trim(hd_itp_fem_to_sph))
-      maxlen = max(maxlen, len_trim(hd_coriolis_file_fmt))
-      maxlen = max(maxlen, len_trim(hd_del_org_data))
-!
-      write(id_control,'(a1)') '!'
-      level = write_begin_flag_for_ctl(id_control, level, hd_block)
-!
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_debug_flag_ctl, plt%debug_flag_ctl)
-!
-      call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_num_subdomain, plt%ndomain_ctl)
-      call write_integer_ctl_type(id_control, level, maxlen,            &
-     &    hd_num_smp, plt%num_smp_ctl)
-!
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_mesh_header, plt%mesh_file_prefix)
-!
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_udt_header, plt%field_file_prefix)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_rst_header, plt%restart_file_prefix)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_spectr_header, plt%spectr_field_file_prefix)
-!
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_sph_files_header, plt%sph_file_prefix)
-!
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_rayleigh_spectr_dir, plt%rayleigh_spectr_dir)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_rayleigh_field_dir, plt%rayleigh_field_dir)
-!
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_coriolis_tri_int_name, plt%coriolis_int_file_name)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_bc_data_file_name, plt%bc_data_file_name_ctl)
-!
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_itp_sph_to_fem, plt%interpolate_sph_to_fem_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_itp_fem_to_sph, plt%interpolate_fem_to_sph_ctl)
-!
-      write(id_control,'(a)') '!'
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_mesh_file_fmt, plt%mesh_file_fmt_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_rst_files_fmt, plt%restart_file_fmt_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_udt_files_fmt, plt%field_file_fmt_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_sph_files_fmt, plt%sph_file_fmt_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_itp_files_fmt, plt%itp_file_fmt_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_spect_field_fmt, plt%spectr_field_fmt_ctl)
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_coriolis_file_fmt, plt%coriolis_file_fmt_ctl)
-!
-      call write_chara_ctl_type(id_control, level, maxlen,              &
-     &    hd_del_org_data, plt%del_org_data_ctl)
-!
-      level =  write_end_flag_for_ctl(id_control, level, hd_block)
-!
-      end subroutine write_control_platforms
 !
 !  ---------------------------------------------------------------------
 !
@@ -422,6 +187,7 @@
 !
       plt%coriolis_int_file_name%iflag =     0
       plt%bc_data_file_name_ctl%iflag =      0
+      plt%radial_data_file_name_ctl%iflag =  0
       plt%interpolate_sph_to_fem_ctl%iflag = 0
       plt%interpolate_fem_to_sph_ctl%iflag = 0
 !
@@ -467,6 +233,8 @@
      &                     new_plt%coriolis_int_file_name)
       call copy_chara_ctl(org_plt%bc_data_file_name_ctl,                &
      &                    new_plt%bc_data_file_name_ctl)
+      call copy_chara_ctl(org_plt%radial_data_file_name_ctl,            &
+     &                    new_plt%radial_data_file_name_ctl)
 !
       call copy_chara_ctl(org_plt%rayleigh_spectr_dir,                  &
      &                    new_plt%rayleigh_spectr_dir)

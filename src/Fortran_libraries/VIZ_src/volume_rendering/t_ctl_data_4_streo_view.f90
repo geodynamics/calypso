@@ -9,8 +9,17 @@
 !!@verbatim
 !!      subroutine read_stereo_view_ctl                                 &
 !!     &         (id_control, hd_block, streo, c_buf)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(streo_view_ctl), intent(inout) :: streo
+!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_stereo_view_ctl                                &
+!!     &         (id_control, hd_block, streo, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(streo_view_ctl), intent(in) :: streo
+!!        integer(kind = kint), intent(inout) :: level
 !!      subroutine reset_stereo_view_ctl(streo)
-!!      subroutine bcast_stereo_view_ctl(streo)
 !!        type(streo_view_ctl), intent(inout) :: streo
 !!      subroutine copy_stereo_view_ctl(org_streo, new_streo)
 !!        type(streo_view_ctl), intent(in) :: org_streo
@@ -22,7 +31,7 @@
 !!  Input example
 !!
 !!    begin stereo_view_parameter_ctl
-!!      focal_point_ctl           40.0
+!!      focal_distance_ctl       40.0
 !!      eye_separation_ctl        0.5
 !!      eye_separation_angle      35.0
 !!      eye_separation_step_by_angle     ON
@@ -35,7 +44,6 @@
       module t_ctl_data_4_streo_view
 !
       use m_precision
-      use calypso_mpi
 !
       use m_constants
       use m_machine_parameter
@@ -64,13 +72,17 @@
       integer(kind = kint), parameter, private                          &
      &             :: n_label_pvr_streo =       4
       character(len=kchara), parameter, private                         &
-     &             :: hd_focalpoint =     'focal_point_ctl'
+     &             :: hd_focaldistance =  'focal_distance_ctl'
       character(len=kchara), parameter, private                         &
      &             :: hd_eye_separation = 'eye_separation_ctl'
       character(len=kchara), parameter, private                         &
      &             :: hd_eye_sep_angle = 'eye_separation_angle'
       character(len=kchara), parameter, private                         &
      &             :: hd_eye_step_mode = 'eye_separation_step_by_angle'
+!
+!       Old label
+      character(len=kchara), parameter, private                         &
+     &             :: hd_focalpoint =     'focal_point_ctl'
 !
 !  ---------------------------------------------------------------------
 !
@@ -94,8 +106,11 @@
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_flag(c_buf, hd_block)) exit
 !
+        call read_real_ctl_type(c_buf, hd_focaldistance,                &
+     &      streo%focalpoint_ctl)
         call read_real_ctl_type(c_buf, hd_focalpoint,                   &
      &      streo%focalpoint_ctl)
+!
         call read_real_ctl_type(c_buf, hd_eye_separation,               &
      &      streo%eye_separation_ctl)
         call read_real_ctl_type(c_buf, hd_eye_sep_angle,                &
@@ -107,6 +122,45 @@
       streo%i_stereo_view = 1
 !
       end subroutine read_stereo_view_ctl
+!
+!  ---------------------------------------------------------------------
+!
+      subroutine write_stereo_view_ctl                                  &
+     &         (id_control, hd_block, streo, level)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(streo_view_ctl), intent(in) :: streo
+!
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
+!
+!
+      if(streo%i_stereo_view .le. 0) return
+!
+      maxlen = len_trim(hd_focaldistance)
+      maxlen = max(maxlen, len_trim(hd_eye_separation))
+      maxlen = max(maxlen, len_trim(hd_eye_sep_angle))
+      maxlen = max(maxlen, len_trim(hd_eye_step_mode))
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_focaldistance, streo%focalpoint_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_eye_separation, streo%eye_separation_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_eye_sep_angle, streo%eye_sep_angle_ctl)
+!
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_eye_step_mode, streo%step_eye_sep_angle_ctl)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_stereo_view_ctl
 !
 !  ---------------------------------------------------------------------
 !
@@ -123,25 +177,6 @@
       streo%i_stereo_view = 0
 !
       end subroutine reset_stereo_view_ctl
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine bcast_stereo_view_ctl(streo)
-!
-      use calypso_mpi_int
-      use bcast_control_arrays
-!
-      type(streo_view_ctl), intent(inout) :: streo
-!
-!
-      call calypso_mpi_bcast_one_int(streo%i_stereo_view, 0)
-!
-      call bcast_ctl_type_r1(streo%focalpoint_ctl)
-      call bcast_ctl_type_r1(streo%eye_separation_ctl)
-      call bcast_ctl_type_r1(streo%eye_sep_angle_ctl)
-      call bcast_ctl_type_c1(streo%step_eye_sep_angle_ctl)
-!
-      end subroutine bcast_stereo_view_ctl
 !
 !  ---------------------------------------------------------------------
 !
@@ -180,7 +215,7 @@
      &                         :: names(n_label_pvr_streo)
 !
 !
-      call set_control_labels(hd_focalpoint,     names( 1))
+      call set_control_labels(hd_focaldistance,  names( 1))
       call set_control_labels(hd_eye_separation, names( 2))
       call set_control_labels(hd_eye_sep_angle,  names( 3))
       call set_control_labels(hd_eye_step_mode,  names( 4))

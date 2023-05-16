@@ -6,8 +6,6 @@
 !>@brief Set PVR parameters from control files
 !!
 !!@verbatim
-!!      subroutine read_control_pvr_file(id_control, fname_pvr_ctl,     &
-!!     &          hd_pvr_ctl, pvr_ctl_type)
 !!      subroutine bcast_pvr_controls                                   &
 !!     &         (num_pvr_ctl, pvr_ctl, cflag_update)
 !!        integer(kind = kint), intent(in) :: num_pvr_ctl
@@ -20,8 +18,6 @@
 !!        type(pvr_parameter_ctl), intent(in) :: pvr_ctl_type(num_pvr)
 !!        type(PVR_control_params), intent(inout) :: pvr_param(num_pvr)
 !!
-!!      subroutine read_control_pvr_update                              &
-!!     &         (id_control, fname_pvr_ctl, hd_pvr_ctl, pvr_ctl_type)
 !!      subroutine flush_each_pvr_control(pvr_param)
 !!        type(PVR_control_params), intent(inout) :: pvr_param
 !!@endverbatim
@@ -35,7 +31,7 @@
 !
       implicit none
 !
-      integer(kind = kint), parameter :: pvr_ctl_file_code = 11
+      private :: init_multi_view_parameters
 !
 !  ---------------------------------------------------------------------
 !
@@ -46,7 +42,7 @@
       subroutine bcast_pvr_controls                                     &
      &         (num_pvr_ctl, pvr_ctl, cflag_update)
 !
-      use read_control_pvr_modelview
+      use ctl_file_pvr_modelview_IO
       use bcast_control_data_4_pvr
 !
       integer(kind = kint), intent(in) :: num_pvr_ctl
@@ -142,7 +138,6 @@
       type(PVR_control_params), intent(inout) :: pvr_param
 !
       integer(kind = kint) :: num_views
-      integer(kind = kint) :: icheck_ncomp(1)
 !
 !
       if(quilt_c%mul_qmats_c%num_modelviews_c .gt. 0) then
@@ -196,8 +191,7 @@
       call alloc_multi_view_parameters(num_views, pvr_param)
       do i = 1, pvr_param%num_multi_views
         call s_set_pvr_modelview_matrix                                 &
-     &     (mul_mmats_c%mat_file_ctl(i)%matrices,                       &
-     &      pvr_param%multi_view(i))
+     &     (mul_mmats_c%matrices(i), pvr_param%multi_view(i))
       end do
 !
       end subroutine init_multi_view_parameters
@@ -226,65 +220,5 @@
       end subroutine flush_each_pvr_control
 !
 !  ---------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine read_control_pvr_file(id_control, fname_pvr_ctl,       &
-     &          hd_pvr_ctl, pvr_ctl_type)
-!
-      use read_pvr_control
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len = kchara), intent(in) :: fname_pvr_ctl
-      character(len = kchara), intent(in) :: hd_pvr_ctl
-      type(pvr_parameter_ctl), intent(inout) :: pvr_ctl_type
-!
-      type(buffer_for_control) :: c_buf1
-!
-!
-      write(*,*) 'PVR control:  ', trim(fname_pvr_ctl)
-!
-      open(id_control, file=fname_pvr_ctl, status='old')
-      do
-        call load_one_line_from_control(id_control, c_buf1)
-        call read_pvr_ctl(id_control, hd_pvr_ctl,                       &
-     &                    pvr_ctl_type, c_buf1)
-        if(pvr_ctl_type%i_pvr_ctl .gt. 0) exit
-      end do
-      close(id_control)
-!
-      end subroutine read_control_pvr_file
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine read_control_pvr_update                                &
-     &         (id_control, fname_pvr_ctl, hd_pvr_ctl, pvr_ctl_type)
-!
-      use read_pvr_control
-      use bcast_control_data_4_pvr
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len = kchara), intent(in)  :: fname_pvr_ctl
-      character(len = kchara), intent(in)  :: hd_pvr_ctl
-      type(pvr_parameter_ctl), intent(inout) :: pvr_ctl_type
-!
-      type(buffer_for_control) :: c_buf1
-!
-      if(fname_pvr_ctl .eq. 'NO_FILE') return
-      open(id_control, file=fname_pvr_ctl, status='old')
-      pvr_ctl_type%i_pvr_ctl = 0
-!
-      do
-        call load_one_line_from_control(id_control, c_buf1)
-        call read_pvr_update_flag                                       &
-     &     (id_control, hd_pvr_ctl, pvr_ctl_type, c_buf1)
-        if(pvr_ctl_type%i_pvr_ctl .gt. 0) exit
-      end do
-      close(id_control)
-!
-      call bcast_pvr_update_flag(pvr_ctl_type)
-!
-      end subroutine read_control_pvr_update
-!
-!  ---------------------------------------------------------------------
-!
+
       end module set_pvr_control

@@ -9,7 +9,8 @@
 !!@verbatim
 !!      subroutine alloc_calypso_import_num(cps_tbl)
 !!      subroutine alloc_calypso_export_num(cps_tbl)
-!!      subroutine alloc_calypso_import_item(NP, cps_tbl)
+!!      subroutine alloc_calypso_import_item(cps_tbl)
+!!      subroutine alloc_calypso_import_rev(NP, cps_tbl)
 !!      subroutine alloc_calypso_export_item(cps_tbl)
 !!        type(calypso_comm_table), intent(inout) :: cps_tbl
 !!
@@ -21,6 +22,10 @@
 !!      subroutine empty_calypso_import(NP, cps_tbl)
 !!      subroutine empty_calypso_export(cps_tbl)
 !!        type(calypso_comm_table), intent(inout) :: cps_tbl
+!!
+!!      subroutine set_calypso_import_rev(cps_tbl, ierr)
+!!        type(calypso_comm_table), intent(inout) :: cps_tbl
+!!        integer(kind = kint), intent(inout) :: ierr
 !!@endverbatim
 !
       module t_calypso_comm_table
@@ -109,19 +114,28 @@
 !
 !------------------------------------------------------------------
 !
-      subroutine alloc_calypso_import_item(NP, cps_tbl)
+      subroutine alloc_calypso_import_item(cps_tbl)
 !
-      integer(kind = kint), intent(in) :: NP
       type(calypso_comm_table), intent(inout) :: cps_tbl
 !
 !
       allocate(cps_tbl%item_import(cps_tbl%ntot_import))
       if (cps_tbl%ntot_import .gt. 0) cps_tbl%item_import = 0
 !
+      end subroutine alloc_calypso_import_item
+!
+!------------------------------------------------------------------
+!
+      subroutine alloc_calypso_import_rev(NP, cps_tbl)
+!
+      integer(kind = kint), intent(in) :: NP
+      type(calypso_comm_table), intent(inout) :: cps_tbl
+!
+!
       allocate(cps_tbl%irev_import(NP))
       if(NP .gt. 0) cps_tbl%irev_import = 0
 !
-      end subroutine alloc_calypso_import_item
+      end subroutine alloc_calypso_import_rev
 !
 !------------------------------------------------------------------
 !
@@ -186,7 +200,8 @@
       call alloc_calypso_import_num(cps_tbl)
 !
       cps_tbl%ntot_import = 0
-      call alloc_calypso_import_item(NP, cps_tbl)
+      call alloc_calypso_import_item(cps_tbl)
+      call alloc_calypso_import_rev(NP, cps_tbl)
 !
       end subroutine empty_calypso_import
 !
@@ -256,5 +271,35 @@
       end subroutine dealloc_calypso_export_item
 !
 !------------------------------------------------------------------
+!------------------------------------------------------------------
+!
+      subroutine set_calypso_import_rev(cps_tbl, ierr)
+!
+      type(calypso_comm_table), intent(inout) :: cps_tbl
+      integer(kind = kint), intent(inout) :: ierr
+!
+      integer(kind = kint) :: inum, inod
+!
+!
+      ierr = 0
+      if(size(cps_tbl%irev_import)                                      &
+     &      .lt. maxval(cps_tbl%item_import)) then
+        write(*,*) 'Size of reverse import table is only ',             &
+     &            size(cps_tbl%irev_import), ', bit need ',             &
+     &            maxval(cps_tbl%item_import)
+        ierr = 1
+        return
+      end if
+!
+!$omp parallel do private(inum,inod)
+      do inum = 1, cps_tbl%ntot_import
+        inod = cps_tbl%item_import(inum)
+        cps_tbl%irev_import(inod) = inum
+      end do
+!$omp end parallel do
+!
+      end subroutine set_calypso_import_rev
+!
+!-----------------------------------------------------------------------
 !
       end module t_calypso_comm_table

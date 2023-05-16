@@ -308,8 +308,7 @@
       else if(pvr_param%movie_def%iflag_movie_mode                      &
      &                                 .eq. I_LOOKINGLASS) then
         call set_pvr_step_projection_mat                                &
-     &     (i_rot, pvr_param%movie_def%num_frame,                       &
-     &      pvr_param%multi_view(1), pvr_param%stereo_def,              &
+     &     (i_rot, pvr_param%multi_view(1), pvr_param%stereo_def,       &
      &      screen%projection_mat)
         call cal_pvr_modelview_matrix(i_rot, izero,                     &
      &      pvr_param%outline, pvr_param%movie_def,                     &
@@ -348,8 +347,8 @@
      &      pvr_param%multi_view(i_img), screen%viewpoint_vec,          &
      &      screen%modelview_mat)
       else if(num_stereo .gt. 1) then
-        call set_pvr_step_projection_mat(i_img, num_stereo,             &
-     &      pvr_param%multi_view(1), pvr_param%stereo_def,              &
+        call set_pvr_step_projection_mat                                &
+     &     (i_img, pvr_param%multi_view(1), pvr_param%stereo_def,       &
      &      screen%projection_mat)
         call cal_pvr_modelview_matrix(i_img, izero,                     &
      &      pvr_param%outline, pvr_param%movie_def,                     &

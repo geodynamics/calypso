@@ -77,16 +77,13 @@
       allocate(fline%fln_src(fline%num_fline))
       allocate(fline%fln_tce(fline%num_fline))
 !
-      if (iflag_debug.eq.1) write(*,*) 'read_controls_4_fline'
-      call read_controls_4_fline(fline%num_fline, fline_ctls)
-!
       do i_fln = 1, fline%num_fline
         call s_set_fline_control(fem%mesh, fem%group, nod_fld,          &
      &      fline_ctls%fline_ctl_struct(i_fln), fline%fln_prm(i_fln),   &
      &      fline%fln_src(i_fln))
       end do
 !
-      call dealloc_fline_fhead_ctl(fline_ctls)
+      call dealloc_fline_ctl_struct(fline_ctls)
 !
       do i_fln = 1, fline%num_fline
         call alloc_local_data_4_fline                                   &

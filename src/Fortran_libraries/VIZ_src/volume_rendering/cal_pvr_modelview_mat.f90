@@ -45,6 +45,7 @@
      &           outline, movie_def, stereo_def, view_param,            &
      &           viewpoint_vec, modelview_mat)
 !
+      use calypso_mpi
       use t_surf_grp_4_pvr_domain
       use cal_inverse_small_matrix
       use cal_matrix_vector_smp
@@ -74,7 +75,8 @@
      &    modelview_inv, posi_zero(1), vec_tmp(1))
       viewpoint_vec(1:3) = vec_tmp(1:3)
 !
-      if (iflag_debug .gt. 0) then
+      if(my_rank .eq. 0) then
+!      if (iflag_debug .gt. 0) then
         write(*,*) 'modelview'
         do i = 1, 4
           write(*,'(1p4e16.7)') modelview_mat(i,1:4)
@@ -208,8 +210,8 @@
       real(kind = kreal) :: look_norm(3), view_norm(3), up_norm(3)
 !
 !
-      viewing_dir(1:3) = view_param%lookat_vec(1:3)                     &
-     &                  - view_param%viewpoint(1:3)
+      viewing_dir(1:3) = view_param%viewpoint(1:3)                      &
+     &                  - view_param%lookat_vec(1:3)
 !$omp parallel
       call cal_vector_magnitude(ione, ione, ione_stack,                 &
      &    viewing_dir(1), size(1) )
@@ -259,6 +261,9 @@
       end do
       rotation_mat(1:3,4) = zero
       rotation_mat(4,4) = one
+!
+!    /* Flip matrix to Rotate the object */
+      rotation_mat(1:4,1:4) = - rotation_mat(1:4,1:4)
 !
       end subroutine update_rot_mat_from_viewpts
 !

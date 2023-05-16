@@ -8,12 +8,12 @@
 !!
 !!@verbatim
 !!      subroutine set_minimum_fem_platform(plt, Fmesh_ctl, mesh_file,  &
-!!     &                                    iflag_output_SURF)
+!!     &                                    flag_output_SURF)
 !!      subroutine set_control_parallel_mesh(plt, mesh_file)
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(FEM_mesh_control), intent(in) :: Fmesh_ctl
 !!        type(field_IO_params), intent(inout) :: mesh_file
-!!        integer(kind = kint), intent(inout) :: iflag_output_SURF
+!!        logical, intent(inout) :: flag_output_SURF
 !!      subroutine set_control_restart_file_def(plt, file_IO)
 !!        type(platform_data_control), intent(in) :: plt
 !!        type(field_IO_params), intent(inout) :: file_IO
@@ -58,7 +58,7 @@
 !  ---------------------------------------------------------------------
 !
       subroutine set_minimum_fem_platform(plt, Fmesh_ctl, mesh_file,    &
-     &                                    iflag_output_SURF)
+     &                                    flag_output_SURF)
 !
       use t_ctl_data_4_FEM_mesh
       use m_file_format_switch
@@ -68,14 +68,14 @@
       type(FEM_mesh_control), intent(in) :: Fmesh_ctl
 !
       type(field_IO_params), intent(inout) :: mesh_file
-      integer(kind = kint), intent(inout) :: iflag_output_SURF
+      logical, intent(inout) :: flag_output_SURF
 !
 !
       call turn_off_debug_flag_by_ctl(my_rank, plt)
       call set_control_smp_def(my_rank, plt)
       call set_control_parallel_mesh(plt, mesh_file)
 !
-      call set_FEM_surface_output_flag(Fmesh_ctl, iflag_output_SURF)
+      flag_output_SURF = FEM_surface_output_switch(Fmesh_ctl)
       if(iflag_debug.gt.0) write(*,*)                                   &
      &   'mesh_file%file_prefix:  ', trim(mesh_file%file_prefix)
 !
@@ -186,12 +186,12 @@
       call s_mpi_abort_by_missing_zlib(sph_file_IO%file_prefix,         &
      &                                 sph_file_IO%iflag_format)
 !
-      call set_FEM_mesh_switch_4_SPH                                    &
-     &    (Fmesh_ctl, FEM_mesh_flags%iflag_access_FEM)
-      call set_FEM_surface_output_flag                                  &
-     &    (Fmesh_ctl, FEM_mesh_flags%iflag_output_SURF)
-      call set_FEM_viewer_output_flag                                   &
-     &    (Fmesh_ctl, FEM_mesh_flags%iflag_output_VMESH)
+      FEM_mesh_flags%flag_access_FEM                                    &
+     &      = FEM_mesh_switch_4_SPH(Fmesh_ctl)
+      FEM_mesh_flags%flag_output_SURF                                   &
+     &      = FEM_surface_output_switch(Fmesh_ctl)
+      FEM_mesh_flags%flag_output_VMESH                                  &
+     &      = FEM_viewer_output_flag(Fmesh_ctl)
 !
       end subroutine set_control_sph_mesh
 !

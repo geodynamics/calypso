@@ -320,7 +320,7 @@
           ilen_in = int(min(zbuf%ilen_gz-zbuf%ilen_gzipped, ilen_tmp))
 !
           call gzip_defleat_char_begin(ilen_line,                       &
-     &        vtk_each_cell_type(icellid), ilen_in, zbuf,              &
+     &        vtk_each_cell_type(icellid), ilen_in, zbuf,               &
      &        zbuf%gzip_buf(zbuf%ilen_gzipped+1))
           do i = ist+2, ist+nline-1
             call gzip_defleat_char_cont(ilen_line,                      &

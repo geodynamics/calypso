@@ -286,6 +286,7 @@
 !
       ist = rj_fld%istack_component(i_fld-1)
       jst = fld_IO%istack_comp_IO(j_IO-1)
+      rj_fld%iflag_update(ist+1:ist+3) = 1
 !$omp parallel do
       do inod = 1, rj_fld%n_point
         rj_fld%d_fld(inod,ist+1) = fld_IO%d_IO(inod,jst+1)
@@ -304,13 +305,15 @@
       integer(kind = kint), intent(in) :: i_fld, j_IO
       type(field_IO), intent(in) :: fld_IO
       type(phys_data), intent(inout) :: rj_fld
-      integer(kind = kint) :: ist, jst, nd, inod
+      integer(kind = kint) :: ist, jst, nd, inod, ncomp
 !
 !
+      ncomp = rj_fld%num_component(i_fld)
       ist = rj_fld%istack_component(i_fld-1)
       jst = fld_IO%istack_comp_IO(j_IO-1 )
+      rj_fld%iflag_update(ist+1:ist+ncomp) = 1
 !$omp parallel
-      do nd = 1, rj_fld%num_component(i_fld)
+      do nd = 1, ncomp
 !$omp do
         do inod = 1, rj_fld%n_point
           rj_fld%d_fld(inod,ist+nd) = fld_IO%d_IO(inod,jst+nd)

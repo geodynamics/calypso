@@ -18,7 +18,7 @@
       integer(kind = kint) :: num_psf_list
       type(psf_compare_param), allocatable, save:: psf_cmp1(:)
 !
-      integer(kind = kint) :: i, iflag
+      integer(kind = kint) :: i, icount_error, icou_error
 !
 !
       call read_ctl_file_psf_compares(0, psf_cmp_list1)
@@ -33,9 +33,10 @@
 !
       call dealloc_psf_compares_ctl(psf_cmp_list1)
 !
-      iflag = 0
+      icount_error = 0
       do i = 1, num_psf_list
-        iflag = iflag + compare_psf_data(psf_cmp1(i))
+        call compare_psf_data(psf_cmp1(i), icou_error)
+        icount_error = icount_error + icou_error
       end do
       deallocate(psf_cmp1)
 !

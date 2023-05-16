@@ -213,6 +213,9 @@
       call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_cmp%i_velo_s, iphys_cmp%i_velo_s,                        &
      &    f_trns_cmp%i_velo_s, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_velo_z, iphys_cmp%i_velo_z,                        &
+     &    f_trns_cmp%i_velo_z, trns)
 !
       call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_cmp%i_magne_r, iphys_cmp%i_magne_r,                      &
@@ -226,6 +229,9 @@
       call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_cmp%i_magne_s, iphys_cmp%i_magne_s,                      &
      &    f_trns_cmp%i_magne_s, trns)
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
+     &    ipol_cmp%i_magne_z, iphys_cmp%i_magne_z,                      &
+     &    f_trns_cmp%i_magne_z, trns)
 !
       end subroutine add_field_comps_sph_trns_snap
 !

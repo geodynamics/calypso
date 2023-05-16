@@ -23,8 +23,8 @@
 !!     &         (mat_name, diffusie_reduction_ICB, sph_params, sph_rj, &
 !!     &          r_2nd, sph_bc, fdm2_center, band_s00_poisson)
 !!      subroutine const_r_mat00_poisson_fixS                           &
-!!     &         (mat_name, sph_params, sph_rj, r_2nd, sph_bc,          &
-!!     &          diffusie_reduction_ICB, fdm2_center, band_s00_poisson)
+!!     &         (mat_name, diffusie_reduction_ICB, sph_params, sph_rj, &
+!!     &          r_2nd, sph_bc, fdm2_center, band_s00_poisson)
 !!        type(sph_shell_parameters), intent(in) :: sph_params
 !!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(fdm_matrices), intent(in) :: r_2nd
@@ -150,7 +150,7 @@
       real(kind = kreal), allocatable :: r_coef(:)
 !
 !
-      write(band_s_evo%mat_name,'(a)') trim(mat_name)
+      band_s_evo%mat_name = mat_name
       call alloc_band_mat_sph(ithree, sph_rj, band_s_evo)
       call set_unit_on_diag(band_s_evo)
 !
@@ -223,7 +223,7 @@
 !      integer :: i
 !
 !
-      write(band_s00_poisson%mat_name,'(a)') trim(mat_name)
+      band_s00_poisson%mat_name = mat_name
       call alloc_ctr_band_mat(ithree, sph_rj, band_s00_poisson)
 !
       if(sph_rj%idx_rj_degree_zero .le. 0) return

@@ -32,8 +32,11 @@
 !
       use m_machine_parameter
       use calypso_mpi_int
+      use calypso_mpi_char
+      use transfer_to_long_integers
       use t_ctl_data_gen_sph_shell
       use bcast_4_platform_ctl
+      use bcast_4_sphere_ctl
       use bcast_control_arrays
 !
       type(control_data_4_merge), intent(inout) :: mgd_ctl
@@ -49,6 +52,10 @@
       call bcast_merge_step_data(mgd_ctl)
       call bcast_newrst_control(mgd_ctl)
 !
+      call calypso_mpi_bcast_character                                  &
+     &   (mgd_ctl%fname_src_psph_ctl, cast_long(kchara), 0)
+      call calypso_mpi_bcast_character                                  &
+     &   (mgd_ctl%fname_asbl_psph_ctl, cast_long(kchara), 0)
       call calypso_mpi_bcast_one_int(mgd_ctl%i_assemble, 0)
 !
       end subroutine bcast_merge_control_data

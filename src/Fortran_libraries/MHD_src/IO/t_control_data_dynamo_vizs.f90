@@ -9,7 +9,18 @@
 !!@verbatim
 !!      subroutine read_dynamo_viz_control                              &
 !!     &         (id_control, hd_block, zm_ctls, c_buf)
-!!      subroutine bcast_dynamo_viz_control(viz_ctls)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
+!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_dynamo_viz_control                             &
+!!     &         (id_control, hd_block, zm_ctls, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(sph_dynamo_viz_controls), intent(in) :: zm_ctls
+!!        integer(kind = kint), intent(inout) :: level
+!!      subroutine dealloc_dynamo_viz_control(zm_ctls)
+!!        type(sph_dynamo_viz_controls), intent(in) :: zm_ctls
 !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!  begin dynamo_vizs_control
@@ -32,7 +43,6 @@
       use m_precision
 !
       use m_machine_parameter
-      use calypso_mpi
       use t_control_data_sections
       use t_ctl_data_crust_filter
 !
@@ -102,16 +112,47 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_dynamo_viz_control(zm_ctls)
+      subroutine write_dynamo_viz_control                               &
+     &         (id_control, hd_block, zm_ctls, level)
+!
+      use t_read_control_elements
+      use write_control_elements
+      use skip_comment_f
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(sph_dynamo_viz_controls), intent(in) :: zm_ctls
+      integer(kind = kint), intent(inout) :: level
+!
+!
+      if(zm_ctls%i_viz_ctl .le. 0) return
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_single_section_ctl(id_control, hd_zm_section,          &
+     &    zm_ctls%zm_psf_ctls, level)
+      call write_single_section_ctl(id_control, hd_zRMS_section,        &
+     &    zm_ctls%zRMS_psf_ctls, level)
+      call write_crustal_filtering_ctl(id_control,                      &
+     &    hd_crustal_filtering, zm_ctls%crust_filter_ctl, level)
+!
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_dynamo_viz_control
+!
+!   --------------------------------------------------------------------
+!
+      subroutine dealloc_dynamo_viz_control(zm_ctls)
 !
       type(sph_dynamo_viz_controls), intent(inout) :: zm_ctls
 !
 !
-      call bcast_files_4_psf_ctl(zm_ctls%zm_psf_ctls)
-      call bcast_files_4_psf_ctl(zm_ctls%zRMS_psf_ctls)
-      call bcast_crustal_filtering_ctl(zm_ctls%crust_filter_ctl)
+      call dealloc_psf_ctl_stract(zm_ctls%zm_psf_ctls)
+      call dealloc_psf_ctl_stract(zm_ctls%zRMS_psf_ctls)
+      call reset_crustal_filtering_ctl(zm_ctls%crust_filter_ctl)
 !
-      end subroutine bcast_dynamo_viz_control
+      end subroutine dealloc_dynamo_viz_control
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
@@ -121,6 +162,8 @@
 !
       use t_read_control_elements
       use t_control_data_sections
+      use ctl_data_section_IO
+      use ctl_file_sections_IO
       use skip_comment_f
 !
       integer(kind = kint), intent(in) :: id_control
@@ -131,28 +174,37 @@
 !
       if(psf_ctls%num_psf_ctl .gt. 0) return
 !
-      if(check_file_flag(c_buf, hd_section)) then
+      if(check_file_flag(c_buf, hd_section)                             &
+     &     .or.  check_begin_flag(c_buf, hd_section)) then
         psf_ctls%num_psf_ctl = 1
         call alloc_psf_ctl_stract(psf_ctls)
-        psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl)                    &
-     &                                  = third_word(c_buf)
 !
-        write(*,'(3a)', ADVANCE='NO') 'Read file for ',                 &
-     &                               trim(hd_section), '... '
-        call read_control_4_psf_file(id_control+2,                      &
+        call sel_read_control_4_psf_file(id_control, hd_section,        &
      &      psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl),               &
-     &      psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl))
-      else if(check_begin_flag(c_buf, hd_section)) then
-        psf_ctls%num_psf_ctl = 1
-        call alloc_psf_ctl_stract(psf_ctls)
-        psf_ctls%fname_psf_ctl(psf_ctls%num_psf_ctl) = 'NO_FILE'
-!
-        write(*,*) 'Control for', trim(hd_section), ' is included'
-        call read_psf_control_data(id_control, hd_section,              &
      &      psf_ctls%psf_ctl_struct(psf_ctls%num_psf_ctl), c_buf)
       end if
 !
       end subroutine read_single_section_ctl
+!
+!   --------------------------------------------------------------------
+!
+      subroutine write_single_section_ctl                               &
+     &          (id_control, hd_section, psf_ctls, level)
+!
+      use t_control_data_sections
+      use ctl_file_sections_IO
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len = kchara), intent(in) :: hd_section
+      type(section_controls), intent(in) :: psf_ctls
+      integer(kind = kint), intent(inout) :: level
+!
+!
+      if(psf_ctls%num_psf_ctl .gt. 0) return
+      call sel_write_control_4_psf_file(id_control, hd_section,         &
+     &    psf_ctls%fname_psf_ctl(1), psf_ctls%psf_ctl_struct(1), level)
+!
+      end subroutine write_single_section_ctl
 !
 !   --------------------------------------------------------------------
 !

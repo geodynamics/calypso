@@ -79,6 +79,7 @@
 !
       type(sph_file_data_type), intent(inout) :: sph_IO
 !
+      call dealloc_neib_id(sph_IO%comm_IO)
       call dealloc_import_table(sph_IO%comm_IO)
       call dealloc_sph_grid_idx_IO(sph_IO%sph_IO)
       call dealloc_sph_grid_group(sph_IO%sph_grp_IO)
@@ -91,6 +92,7 @@
 !
       type(sph_file_data_type), intent(inout) :: sph_IO
 !
+      call dealloc_neib_id(sph_IO%comm_IO)
       call dealloc_import_table(sph_IO%comm_IO)
       call dealloc_sph_grid_idx_IO(sph_IO%sph_IO)
 !
@@ -102,6 +104,7 @@
 !
       type(sph_file_data_type), intent(inout) :: sph_IO
 !
+      call dealloc_neib_id(sph_IO%comm_IO)
       call dealloc_import_table(sph_IO%comm_IO)
       call dealloc_sph_mode_idx_IO(sph_IO%sph_IO)
 !
@@ -113,6 +116,7 @@
 !
       type(sph_file_data_type), intent(inout) :: sph_IO
 !
+      call dealloc_neib_id(sph_IO%comm_IO)
       call dealloc_import_table(sph_IO%comm_IO)
       call dealloc_sph_mode_idx_IO(sph_IO%sph_IO)
       call dealloc_sph_mode_group(sph_IO%sph_grp_IO)

@@ -23,7 +23,7 @@
 !!        type(SPH_mesh_field_data), intent(in) :: new_sph_data
 !!        type(rj_assemble_tbl), intent(in)                             &
 !!     &                      :: j_table(org_sph_array%num_pe)
-!!        type(sph_radial_itp_data), intent(in) :: r_itp
+!!        type(sph_radial_interpolate), intent(in) :: r_itp
 !!        type(sph_grids), intent(in) :: org_sph(num_org_pe)
 !!        type(phys_data), intent(inout) :: org_fld(num_org_pe)
 !!        type(SPH_mesh_field_data), intent(inout) :: new_sph_data
@@ -31,7 +31,7 @@
 !!      subroutine const_assembled_sph_data(b_ratio, time_d,            &
 !!     &          r_itp, new_sph_data, new_fst_IO, t_IO)
 !!        type(time_data), intent(in) :: time_d
-!!        type(sph_radial_itp_data), intent(in) :: r_itp
+!!        type(sph_radial_interpolate), intent(in) :: r_itp
 !!        type(SPH_mesh_field_data), intent(in) :: new_sph_data
 !!        type(field_IO), intent(inout) :: new_fst_IO
 !!        type(time_data), intent(in) :: t_IO
@@ -199,7 +199,7 @@
      &                                  r_itp, org_fld, new_sph_data)
 !
       use t_spheric_parameter
-      use r_interpolate_marged_sph
+      use t_sph_radial_interpolate
 !
       use parallel_assemble_sph
       use share_field_data
@@ -207,7 +207,7 @@
       integer, intent(in) :: num_org_pe
       type(sph_grids), intent(in) :: org_sph(num_org_pe)
       type(rj_assemble_tbl), intent(in) :: j_table(num_org_pe)
-      type(sph_radial_itp_data), intent(in) :: r_itp
+      type(sph_radial_interpolate), intent(in) :: r_itp
 !
       type(phys_data), intent(inout) :: org_fld(num_org_pe)
       type(SPH_mesh_field_data), intent(inout) :: new_sph_data
@@ -220,13 +220,13 @@
         call share_each_field_data(ip, org_fld(ip))
 !
 !         Copy spectr data to temporal array
-        if(r_itp%iflag_same_rgrid .eq. 0) then
-          call r_itp_field_data_sph_assemble                            &
-     &       (org_sph(ip), new_sph_data%sph, r_itp, j_table(ip),        &
-     &        org_fld(ip), new_sph_data%fld)
-        else
+        if(r_itp%flag_same_rgrid) then
           call copy_field_data_sph_assemble                             &
      &       (org_sph(ip), new_sph_data%sph, j_table(ip),               &
+     &        org_fld(ip), new_sph_data%fld)
+        else
+          call r_itp_field_data_sph_assemble                            &
+     &       (org_sph(ip), new_sph_data%sph, r_itp, j_table(ip),        &
      &        org_fld(ip), new_sph_data%fld)
         end if
 !
@@ -247,7 +247,7 @@
 !
       use calypso_mpi
       use t_spheric_parameter
-      use r_interpolate_marged_sph
+      use t_sph_radial_interpolate
 !
       use m_base_field_labels
 !
@@ -260,14 +260,14 @@
       real(kind=kreal ), intent(in) :: b_ratio
 !
       type(time_data), intent(in) :: time_d
-      type(sph_radial_itp_data), intent(in) :: r_itp
+      type(sph_radial_interpolate), intent(in) :: r_itp
 !
       type(SPH_mesh_field_data), intent(inout) :: new_sph_data
       type(field_IO), intent(inout) :: new_fst_IO
       type(time_data), intent(inout) :: t_IO
 !
 !
-        if(r_itp%iflag_same_rgrid .eq. 0) then
+        if(r_itp%flag_same_rgrid .eqv. .FALSE.) then
 !        write(*,*) 'extend_potential_magne'
           call extend_potential_magne(new_sph_data%sph, r_itp,          &
      &                                new_sph_data%fld)

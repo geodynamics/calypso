@@ -6,6 +6,10 @@ gz_MPI_binary_datum_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_binary_datum_IO.f90 m_precis
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_MPI_binary_head_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_binary_head_IO.f90 m_precision.o m_constants.o m_machine_parameter.o calypso_mpi.o m_calypso_mpi_IO.o t_calypso_mpi_IO_param.o t_buffer_4_gzip.o calypso_mpi_int8.o data_convert_by_zlib.o transfer_to_long_integers.o calypso_mpi_int4.o binary_IO.o byte_swap_f.o calypso_mpi_char.o calypso_mpi_real.o
 	$(F90) -c $(F90OPTFLAGS) $<
+gz_MPI_comm_table_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_comm_table_IO.f90 m_precision.o t_geometry_data.o t_read_mesh_data.o t_comm_table.o t_surf_edge_IO.o m_fem_surface_labels.o gz_MPI_ascii_data_IO.o gz_MPI_domain_data_IO.o m_fem_mesh_labels.o
+	$(F90) -c $(F90OPTFLAGS) $<
+gz_MPI_comm_table_IO_b.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_comm_table_IO_b.f90 m_precision.o t_geometry_data.o t_read_mesh_data.o t_comm_table.o t_surf_edge_IO.o m_fem_surface_labels.o gz_MPI_domain_data_IO_b.o
+	$(F90) -c $(F90OPTFLAGS) $<
 gz_MPI_domain_data_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_domain_data_IO.f90 m_precision.o m_constants.o t_comm_table.o t_calypso_mpi_IO_param.o t_buffer_4_gzip.o gz_MPI_ascii_data_IO.o data_IO_to_textline.o m_error_IDs.o zlib_cvt_ascii_comm_tbl.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_MPI_domain_data_IO_b.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_domain_data_IO_b.f90 m_precision.o m_constants.o t_comm_table.o t_calypso_mpi_IO_param.o gz_MPI_binary_datum_IO.o gz_MPI_binary_data_IO.o m_error_IDs.o
@@ -18,13 +22,9 @@ gz_MPI_element_connect_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_element_connect_IO.f90 m_
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_MPI_element_connect_IO_b.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_element_connect_IO_b.f90 m_precision.o m_constants.o t_geometry_data.o t_surf_edge_IO.o t_read_mesh_data.o t_calypso_mpi_IO_param.o gz_MPI_binary_data_IO.o gz_MPI_binary_datum_IO.o set_nnod_4_ele_by_type.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_MPI_element_data_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_element_data_IO.f90 m_precision.o t_geometry_data.o t_read_mesh_data.o t_comm_table.o t_surf_edge_IO.o m_fem_surface_labels.o gz_MPI_ascii_data_IO.o gz_MPI_domain_data_IO.o gz_MPI_node_geometry_IO.o gz_MPI_element_connect_IO.o m_fem_mesh_labels.o
+gz_MPI_element_file_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_element_file_IO.f90 m_precision.o m_machine_parameter.o m_file_format_switch.o t_calypso_mpi_IO_param.o t_read_mesh_data.o gz_MPI_comm_table_IO.o m_fem_mesh_labels.o gz_MPI_surface_data_IO.o gz_MPI_edge_data_IO.o m_fem_surface_labels.o gz_MPI_node_geometry_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<
-gz_MPI_element_data_IO_b.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_element_data_IO_b.f90 m_precision.o t_geometry_data.o t_read_mesh_data.o t_comm_table.o t_surf_edge_IO.o m_fem_surface_labels.o gz_MPI_domain_data_IO_b.o gz_MPI_node_geometry_IO_b.o m_fem_mesh_labels.o
-	$(F90) -c $(F90OPTFLAGS) $<
-gz_MPI_element_file_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_element_file_IO.f90 m_precision.o m_machine_parameter.o m_file_format_switch.o t_calypso_mpi_IO_param.o t_read_mesh_data.o gz_MPI_element_data_IO.o gz_MPI_surface_data_IO.o gz_MPI_edge_data_IO.o
-	$(F90) -c $(F90OPTFLAGS) $<
-gz_MPI_element_file_IO_b.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_element_file_IO_b.f90 m_precision.o m_machine_parameter.o m_file_format_switch.o t_calypso_mpi_IO_param.o t_read_mesh_data.o gz_MPI_element_data_IO_b.o gz_MPI_surface_data_IO_b.o gz_MPI_edge_data_IO_b.o
+gz_MPI_element_file_IO_b.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_element_file_IO_b.f90 m_precision.o m_machine_parameter.o m_file_format_switch.o t_calypso_mpi_IO_param.o t_read_mesh_data.o gz_MPI_comm_table_IO_b.o gz_MPI_surface_data_IO_b.o gz_MPI_edge_data_IO_b.o gz_MPI_node_geometry_IO_b.o
 	$(F90) -c $(F90OPTFLAGS) $<
 gz_MPI_groups_IO.o: $(MPI_ZLIB_IO_DIR)/gz_MPI_groups_IO.f90 m_precision.o m_machine_parameter.o t_group_data.o t_calypso_mpi_IO_param.o gz_MPI_ascii_data_IO.o gz_MPI_domain_data_IO.o gz_field_data_MPI_IO.o field_data_MPI_IO.o
 	$(F90) -c $(F90OPTFLAGS) $<

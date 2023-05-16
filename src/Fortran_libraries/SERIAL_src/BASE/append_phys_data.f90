@@ -17,8 +17,9 @@
 !!        type(phys_data), intent(in) :: org_fld
 !!        type(phys_data), intent(inout) :: new_fld
 !!
-!!      integer(kind = kint) function compare_field_data(fld1, fld2)
-!!       type(phys_data), intent(in) :: fld1, fld2
+!!      subroutine compare_field_data(fld1, fld2, icount_error)
+!!        type(phys_data), intent(in) :: fld1, fld2
+!!        integer(kind = kint), intent(inout) :: icount_error
 !!@endverbatim
 !
       module append_phys_data
@@ -92,6 +93,7 @@
 !
       call alloc_phys_name(new_fld)
 !
+!$omp parallel workshare
       new_fld%num_component(1:new_fld%num_phys)                         &
      &             = org_fld%num_component(1:new_fld%num_phys)
       new_fld%phys_name(1:new_fld%num_phys)                             &
@@ -102,6 +104,7 @@
      &             = org_fld%iorder_eletype(1:new_fld%num_phys)
       new_fld%istack_component(0:new_fld%num_phys)                      &
      &             = org_fld%istack_component(0:new_fld%num_phys)
+!$omp end parallel workshare
 !
       end subroutine copy_field_name
 !
@@ -125,16 +128,17 @@
 !
 ! -----------------------------------------------------------------------
 !
-      integer(kind = kint) function compare_field_data(fld1, fld2)
+      subroutine compare_field_data(fld1, fld2, icount_error)
 !
       use compare_indices
 !
       implicit none
 !
       type(phys_data), intent(in) :: fld1, fld2
+      integer(kind = kint), intent(inout) :: icount_error
 !
       integer(kind = kint) :: ifld, ist
-      integer(kind = kint) :: iflag
+      integer(kind = kint) :: icou_error
 !
 !
       if(iflag_debug .gt. 0) then
@@ -143,35 +147,35 @@
         write(*,*) 'ntot_phys', fld1%ntot_phys, fld2%ntot_phys
       end if
 !
-      iflag = 0
+      icount_error = 0
       if(fld1%n_point .ne. fld2%n_point) then
         write(*,*) 'Number of point in field data is different',        &
      &             fld1%n_point, fld2%n_point
-        iflag = iflag + 1
+        icount_error = icount_error + 1
       end if
       if(fld1%num_phys .ne. fld2%num_phys) then
         write(*,*) 'Number of field is different',                      &
      &            fld1%num_phys, fld2%num_phys
-        iflag = iflag + 1
+        icount_error = icount_error + 1
       end if
       if(fld1%ntot_phys .ne. fld2%ntot_phys) then
         write(*,*) 'Number of total components is different',           &
      &            fld1%ntot_phys, fld2%ntot_phys
-        iflag = iflag + 1
+        icount_error = icount_error + 1
       end if
 !
       do ifld = 1, fld1%num_phys
         if(fld1%phys_name(ifld) .ne. fld2%phys_name(ifld)) then
           write(*,*) 'field name at ', ifld, ' is different: ',         &
      &      trim(fld1%phys_name(ifld)), ' ', trim(fld2%phys_name(ifld))
-          iflag = iflag + 1
+          icount_error = icount_error + 1
         end if
       end do
       do ifld = 1, fld1%num_phys
         if(fld1%num_component(ifld) .ne. fld2%num_component(ifld)) then
           write(*,*) 'number of component at ', ifld, ' is different:', &
      &        fld1%num_component(ifld),  fld2%num_component(ifld)
-          iflag = iflag + 1
+          icount_error = icount_error + 1
         end if
       end do
       do ifld = 1, fld1%num_phys
@@ -179,20 +183,19 @@
      &        .ne. fld2%istack_component(ifld)) then
           write(*,*) 'field stack at ', ifld, ' is different:',         &
      &        fld1%istack_component(ifld), fld2%istack_component(ifld)
-          iflag = iflag + 1
+          icount_error = icount_error + 1
         end if
       end do
 !
       do ifld = 1, fld1%num_phys
         ist = fld2%istack_component(ifld-1)
-        iflag = iflag + compare_field_vector(fld1%n_point,              &
-     &                  fld1%num_component(ifld), fld1%phys_name(ifld), &
-     &                  fld1%d_fld(1,ist+1), fld2%d_fld(1,ist+1))
+        call compare_field_vector(fld1%n_point,                         &
+     &      fld1%num_component(ifld), fld1%phys_name(ifld),             &
+     &      fld1%d_fld(1,ist+1), fld2%d_fld(1,ist+1), icou_error)
+        icount_error = icount_error + icou_error
       end do
 !
-      compare_field_data = iflag
-!
-      end function compare_field_data
+      end subroutine compare_field_data
 !
 ! -----------------------------------------------------------------------
 !-----------------------------------------------------------------------

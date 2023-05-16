@@ -37,7 +37,6 @@
 !
       use MPI_element_file_IO
       use MPI_element_file_IO_b
-      use set_mesh_file_names
       use mesh_file_name_by_param
       use element_mesh_IO_select
 !
@@ -58,6 +57,8 @@
 !
       subroutine sel_mpi_read_ele_mesh(mesh_file, ele_mesh_IO)
 !
+      use set_element_mesh_file_names
+!
       type(field_IO_params), intent(in) ::  mesh_file
       type(surf_edge_IO_file), intent(inout) :: ele_mesh_IO
 !
@@ -70,20 +71,20 @@
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
         call mpi_input_element_file_b                                   &
-     &     (nprocs, my_rank, file_name, ele_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, ele_mesh_IO)
       else if(mesh_file%iflag_format .eq. iflag_single) then
         call mpi_input_element_file                                     &
-     &     (nprocs, my_rank, file_name, ele_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, ele_mesh_IO)
 !
 #ifdef ZLIB_IO
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
         call gz_mpi_input_element_file_b                                &
-     &     (nprocs, my_rank, file_name, ele_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, ele_mesh_IO)
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
         call gz_mpi_input_element_file                                  &
-     &     (nprocs, my_rank, file_name, ele_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, ele_mesh_IO)
 #endif
 !
       else
@@ -100,7 +101,7 @@
 !
       subroutine sel_mpi_read_surf_mesh(mesh_file, surf_mesh_IO)
 !
-      use set_mesh_file_names
+      use set_element_mesh_file_names
 !
       type(field_IO_params), intent(in) ::  mesh_file
       type(surf_edge_IO_file), intent(inout) :: surf_mesh_IO
@@ -114,20 +115,20 @@
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
         call mpi_input_surface_file_b                                   &
-     &     (nprocs, my_rank, file_name, surf_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, surf_mesh_IO)
       else if(mesh_file%iflag_format .eq. iflag_single) then
         call mpi_input_surface_file                                     &
-     &     (nprocs, my_rank, file_name, surf_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, surf_mesh_IO)
 !
 #ifdef ZLIB_IO
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
         call gz_mpi_input_surface_file_b                                &
-     &     (nprocs, my_rank, file_name, surf_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, surf_mesh_IO)
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
         call gz_mpi_input_surface_file                                  &
-     &     (nprocs, my_rank, file_name, surf_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, surf_mesh_IO)
 #endif
 !
       else
@@ -144,7 +145,7 @@
 !
       subroutine sel_mpi_read_edge_mesh(mesh_file, edge_mesh_IO)
 !
-      use set_mesh_file_names
+      use set_element_mesh_file_names
 !
       type(field_IO_params), intent(in) ::  mesh_file
       type(surf_edge_IO_file), intent(inout) :: edge_mesh_IO
@@ -158,20 +159,20 @@
       if(mesh_file%iflag_format                                         &
      &     .eq. iflag_single+id_binary_file_fmt) then
         call mpi_input_edge_file_b                                      &
-     &     (nprocs, my_rank, file_name, edge_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, edge_mesh_IO)
       else if(mesh_file%iflag_format .eq. iflag_single) then
         call mpi_input_edge_file                                        &
-     &     (nprocs, my_rank, file_name, edge_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, edge_mesh_IO)
 !
 #ifdef ZLIB_IO
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_bin_file_fmt) then
         call gz_mpi_input_edge_file_b                                   &
-     &     (nprocs, my_rank, file_name, edge_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, edge_mesh_IO)
       else if(mesh_file%iflag_format                                    &
      &        .eq. iflag_single+id_gzip_txt_file_fmt) then
         call gz_mpi_input_edge_file                                     &
-     &     (nprocs, my_rank, file_name, edge_mesh_IO, ierr)
+     &     (nprocs, my_rank, file_name, edge_mesh_IO)
 #endif
 !
       else
@@ -188,6 +189,8 @@
 !------------------------------------------------------------------
 !
       subroutine sel_mpi_write_ele_mesh_file(mesh_file, ele_mesh_IO)
+!
+      use set_element_mesh_file_names
 !
       type(field_IO_params), intent(in) ::  mesh_file
       type(surf_edge_IO_file), intent(inout) :: ele_mesh_IO
@@ -224,7 +227,7 @@
 !
       subroutine sel_mpi_write_surf_mesh_file(mesh_file, surf_mesh_IO)
 !
-      use set_mesh_file_names
+      use set_element_mesh_file_names
 !
       type(field_IO_params), intent(in) ::  mesh_file
       type(surf_edge_IO_file), intent(inout) :: surf_mesh_IO
@@ -261,7 +264,7 @@
 !
       subroutine sel_mpi_write_edge_mesh_file(mesh_file, edge_mesh_IO)
 !
-      use set_mesh_file_names
+      use set_element_mesh_file_names
 !
       type(field_IO_params), intent(in) ::  mesh_file
       type(surf_edge_IO_file), intent(inout) :: edge_mesh_IO

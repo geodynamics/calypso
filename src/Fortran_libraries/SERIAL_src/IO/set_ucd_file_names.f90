@@ -32,6 +32,12 @@
 !!     &          set_merged_snap_xdmf_file_name(file_prefix, istep_ucd)
 !!      character(len=kchara) function                                  &
 !!     &                     set_merged_xdmf_file_name(file_prefix)
+!!
+!!      subroutine viz_file_format_from_file_name(file_name, ifmt_psf,  &
+!!     &          nostep_prefix, istep_viz)
+!!        character(len = kchara), intent(in) :: file_name
+!!        character(len = kchara), intent(inout) :: nostep_prefix
+!!        integer(kind = kint), intent(inout) :: ifmt_psf, istep_viz
 !!@endverbatim
 !!
 !!@param nprocs     number of subdomains
@@ -359,6 +365,58 @@
 !
       end function set_merged_xdmf_file_name
 !
-!------------------------------------------------------------------
+! -----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine viz_file_format_from_file_name(file_name, ifmt_psf,    &
+     &          nostep_prefix, istep_viz)
+!
+      use set_parallel_file_name
+      use set_ucd_extensions
+      use skip_comment_f
+!
+      character(len = kchara), intent(in) :: file_name
+      character(len = kchara), intent(inout) :: nostep_prefix
+      integer(kind = kint), intent(inout) :: ifmt_psf, istep_viz
+!
+      character(len = kchara) :: input_ext1, input_ext2, step_ext
+      character(len = kchara) :: input_prefix, fname_tmp
+!
+!
+      call split_extrension(file_name, fname_tmp, input_ext2)
+!
+      if(cmp_no_case(input_ext2,gz_ext)) then
+        call split_extrension(fname_tmp, input_prefix, input_ext1)
+      else
+        input_prefix = fname_tmp
+        input_ext1 =   input_ext2
+      end if
+!
+      call split_extrension(input_prefix, nostep_prefix, step_ext)
+      read(step_ext,*) istep_viz
+!
+      if(cmp_no_case(input_ext1,sdt_ext)) then
+        ifmt_psf = iflag_udt_bin
+      else if(cmp_no_case(input_ext1,sfm_ext)) then
+        ifmt_psf = iflag_ucd_bin
+      else if(cmp_no_case(input_ext1,udt_ext)) then
+        ifmt_psf = iflag_udt
+      else if(cmp_no_case(input_ext1,inp_ext)) then
+        ifmt_psf = iflag_ucd
+      else if(cmp_no_case(input_ext1,vtd_ext)) then
+        ifmt_psf = iflag_vtd
+      else if(cmp_no_case(input_ext1,vtk_ext)) then
+        ifmt_psf = iflag_vtk
+      else
+        write(*,*) 'Data might not be sectioning data'
+        stop
+      end if
+      if(cmp_no_case(input_ext2,gz_ext)) then
+        ifmt_psf = ifmt_psf + iflag_gzip
+      end if
+!
+      end subroutine viz_file_format_from_file_name
+!
+! -----------------------------------------------------------------------
 !
       end module set_ucd_file_names

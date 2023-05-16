@@ -18,7 +18,10 @@
 !!        type(picked_spectrum_data), intent(in) :: gauss
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!
-!!     integer(kind = kint) function check_gauss_coefs_num(gauss)
+!!     logical function error_gauss_coefs_header(sph_params, sph_rj,    &
+!!    &                                          gauss)
+!!        type(sph_shell_parameters), intent(in) :: sph_params
+!!        type(sph_rj_grid), intent(in) :: sph_rj
 !!        type(picked_spectrum_data), intent(in) :: gauss
 !!@endverbatim
 !!
@@ -33,14 +36,28 @@
       use t_phys_address
       use t_phys_data
       use t_time_data
+      use t_read_sph_spectra
+      use t_buffer_4_gzip
       use m_monitor_file_labels
 !
       implicit  none
 !
       integer(kind = kint), parameter, private :: id_gauss_coef = 23
 !
-      private :: write_sph_gauss_coefes, picked_gauss_head
-      private :: check_gauss_coefs_4_monitor
+      type(sph_spectr_head_labels), parameter, private                  &
+     &            :: gauss_coefs_labels = sph_spectr_head_labels(       &
+     &                         hdr_nri = 'radial_layers',               &
+     &                         hdr_ltr = 'truncation',                  &
+     &                         hdr_ICB_id = 'ICB_id',                   &
+     &                         hdr_CMB_id = 'CMB_id',                   &
+     &                         hdr_kr_in =  'Not_used',                 &
+     &                         hdr_r_in =   'Not_used',                 &
+     &                         hdr_kr_out = 'Not_used',                 &
+     &                         hdr_r_out =  'Reference_radius',         &
+     &                         hdr_num_field = 'Number_of_gauss_coefs', &
+     &                         hdr_num_comp = 'Number_of_gauss_coefs')
+!
+      private :: s_set_sph_gauss_coefs
 !
 ! -----------------------------------------------------------------------
 !
@@ -53,8 +70,12 @@
      &          gauss, SR_sig)
 !
       use t_solver_SR
+      use t_read_sph_spectra
       use set_parallel_file_name
       use delete_data_files
+      use select_gz_stream_file_IO
+      use sph_monitor_data_text
+      use gz_open_sph_vol_mntr_file
 !
       type(time_data), intent(in) :: time_d
       type(sph_shell_parameters), intent(in) :: sph_params
@@ -67,9 +88,10 @@
 !
       real(kind=kreal), allocatable :: d_rj_out(:)
 !
+      type(read_sph_spectr_data) :: sph_OUT
       character(len=kchara) :: file_name
-      character(len=kchara) :: fmt_txt
-      integer(kind = kint) :: i
+      logical :: flag_gzip_lc
+      type(buffer_4_gzip) :: zbuf_m
 !
 !
       if(gauss%num_sph_mode .le. 0) return
@@ -83,35 +105,24 @@
         allocate(d_rj_out(0))
       end if
 !
-      call write_sph_gauss_coefes(sph_params, sph_rj, ipol, rj_fld,     &
+      call s_set_sph_gauss_coefs(sph_params, sph_rj, ipol, rj_fld,      &
      &    gauss, gauss%istack_picked_spec_lc(nprocs), d_rj_out, SR_sig)
 !
       if(my_rank .eq. 0) then
         file_name = add_dat_extension(gauss%file_prefix)
-        if(check_file_exist(file_name)) then 
-          open(id_gauss_coef,file=file_name, status='old',              &
-      &        form='formatted',position='append')
-        else
-          open(id_gauss_coef,file=file_name, status='new',              &
-     &         form='formatted')
-          write(id_gauss_coef,'(a,i16,1pe25.15e3,a1,a)', ADVANCE='NO')  &
-     &          hd_pick_gauss_head(),                                   &
-     &          gauss%num_sph_mode, gauss%radius_gl(1), char(10),       &
-     &          hd_time_label()
-          do i = 1, gauss%istack_picked_spec_lc(nprocs)
-            write(id_gauss_coef,'(a,a4)', ADVANCE='NO')                 &
-     &          trim(gauss%gauss_mode_name_out(i)), '    '
-          end do
-          write(id_gauss_coef,'(a1)', ADVANCE='NO') char(10)
-        end if
 !
-        write(fmt_txt,'(a1,i8,a13)')                                    &
-     &      '(', gauss%istack_picked_spec_lc(nprocs), '(1pE25.14e3))'
+        flag_gzip_lc = gauss%flag_gzip
+        call dup_gauss_coefs_header_to_IO                               &
+     &     (sph_params%l_truncation, sph_rj%nidx_rj(1),                 &
+     &      sph_params%nlayer_ICB, sph_params%nlayer_CMB,               &
+     &      gauss, sph_OUT)
+        call sel_open_sph_vol_monitor_file(id_gauss_coef, file_name,    &
+     &      gauss_coefs_labels, sph_OUT, zbuf_m, flag_gzip_lc)
 !
-        write(id_gauss_coef,'(a)',ADVANCE='NO')                         &
-     &         picked_gauss_head(time_d%i_time_step, time_d%time)
-        write(id_gauss_coef,fmt_txt)                                    &
-     &         d_rj_out(1:gauss%istack_picked_spec_lc(nprocs))
+        call sel_gz_write_text_stream(flag_gzip_lc, id_gauss_coef,      &
+     &      volume_pwr_data_text(time_d%i_time_step, time_d%time,       &
+     &      gauss%istack_picked_spec_lc(nprocs), d_rj_out), zbuf_m)
+        call dealloc_sph_espec_name(sph_OUT)
         close(id_gauss_coef)
       end if
       deallocate(d_rj_out)
@@ -119,9 +130,49 @@
       end subroutine append_sph_gauss_coefs_file
 !
 !  ---------------------------------------------------------------------
-!  ---------------------------------------------------------------------
 !
-      subroutine write_sph_gauss_coefes(sph_params, sph_rj,             &
+      subroutine dup_gauss_coefs_header_to_IO                           &
+     &         (ltr, nri, nlayer_ICB, nlayer_CMB, gauss, sph_OUT)
+!
+      use m_time_labels
+!
+      integer(kind = kint), intent(in) :: ltr, nri
+      integer(kind = kint), intent(in) :: nlayer_ICB, nlayer_CMB
+      type(picked_spectrum_data), intent(in) :: gauss
+!
+      type(read_sph_spectr_data), intent(inout) :: sph_OUT
+!
+      integer(kind = kint) :: icou, ntot
+!
+!
+      sph_OUT%ltr_sph = ltr
+      sph_OUT%nri_sph = nri
+      sph_OUT%nri_dat = 1
+      sph_OUT%kr_ICB =  nlayer_ICB
+      sph_OUT%kr_CMB =  nlayer_CMB
+      sph_OUT%kr_inner = izero
+      sph_OUT%kr_outer = izero
+      sph_OUT%r_inner =  zero
+      sph_OUT%r_outer =  gauss%radius_gl(1)
+!
+      ntot = gauss%istack_picked_spec_lc(nprocs)
+      sph_OUT%nfield_sph_spec = ntot
+      sph_OUT%ntot_sph_spec =   ntot
+      sph_OUT%num_time_labels = 2
+      call alloc_sph_espec_name(sph_OUT)
+!
+      sph_OUT%ene_sph_spec_name(1) = fhd_t_step
+      sph_OUT%ene_sph_spec_name(2) = fhd_time
+      icou = sph_OUT%num_time_labels
+      sph_OUT%ene_sph_spec_name(icou+1:icou+ntot)                       &
+     &                             = gauss%gauss_mode_name_out(1:ntot)
+      sph_OUT%ncomp_sph_spec(1:ntot) = 1
+!
+      end subroutine dup_gauss_coefs_header_to_IO
+!
+! -----------------------------------------------------------------------
+!
+      subroutine s_set_sph_gauss_coefs(sph_params, sph_rj,              &
      &          ipol, rj_fld, gauss, ntot_gauss, d_rj_out, SR_sig)
 !
       use t_solver_SR
@@ -155,88 +206,48 @@
      &    gauss%istack_picked_spec_lc(nprocs), d_rj_out, SR_sig)
       deallocate(d_rj_lc)
 !
-      end subroutine write_sph_gauss_coefes
+      end subroutine s_set_sph_gauss_coefs
 !
 ! -----------------------------------------------------------------------
 ! -----------------------------------------------------------------------
 !
-      character(len = 16+25) function picked_gauss_head(i_step, time)
-!
-      integer(kind = kint), intent(in) :: i_step
-      real(kind = kreal), intent(in) :: time
-!
-!
-      write(picked_gauss_head,'(i16,1pe25.14e3)') i_step, time
-!
-      end function  picked_gauss_head
-!
-! ----------------------------------------------------------------------
-! -----------------------------------------------------------------------
-!
-     integer(kind = kint) function check_gauss_coefs_num(gauss)
+     logical function error_gauss_coefs_header(sph_params, sph_rj,      &
+    &                                          gauss)
 !
       use set_parallel_file_name
+      use check_sph_monitor_header
+      use gz_open_sph_vol_mntr_file
+      use compare_sph_monitor_header
+      use sph_power_spectr_data_text
+      use sel_gz_input_sph_mtr_head
+      use select_gz_stream_file_IO
 !
+      type(sph_shell_parameters), intent(in) :: sph_params
+      type(sph_rj_grid), intent(in) :: sph_rj
       type(picked_spectrum_data), intent(in) :: gauss
 !!
-      character(len = kchara) :: file_name
+      type(read_sph_spectr_data) :: sph_OUT_g
+      character(len = kchara) :: base_name
+      logical :: flag_gzip_lc, error
 !
 !
-      check_gauss_coefs_num = 0
+      error_gauss_coefs_header = .FALSE.
       if(gauss%num_sph_mode .eq. izero) return
       if(my_rank .gt. izero) return
 !
-      file_name = add_dat_extension(gauss%file_prefix)
-      open(id_gauss_coef, file = file_name,                             &
-     &    form='formatted', status='old', err = 99)
+      call dup_gauss_coefs_header_to_IO                                 &
+     &   (sph_params%l_truncation, sph_rj%nidx_rj(1),                   &
+     &    sph_params%nlayer_ICB, sph_params%nlayer_CMB,                 &
+     &    gauss, sph_OUT_g)
 !
-      check_gauss_coefs_num = check_gauss_coefs_4_monitor(gauss)
-      close(id_gauss_coef)
-      return
+      flag_gzip_lc = gauss%flag_gzip
+      base_name = add_dat_extension(gauss%file_prefix)
+      call check_sph_vol_monitor_file(base_name, gauss_coefs_labels,    &
+    &     sph_OUT_g, flag_gzip_lc, error)
+      call dealloc_sph_espec_name(sph_OUT_g)
+      error_gauss_coefs_header = error
 !
-  99  continue
-      write(*,*) 'No Gauss coefficient file'
-      return
-!
-      end function check_gauss_coefs_num
-!
-! -----------------------------------------------------------------------
-!
-      integer(kind = kint)                                              &
-     &      function check_gauss_coefs_4_monitor(gauss)
-!
-      use skip_comment_f
-!
-      type(picked_spectrum_data), intent(in) :: gauss
-!
-      integer(kind = kint) :: nmode_read
-      real(kind = kreal) :: radius_read
-!
-      character(len=255) :: tmpchara
-!
-!
-      call skip_comment(tmpchara,id_gauss_coef)
-      read(id_gauss_coef,*) nmode_read, radius_read
-!      write(*,*) 'num_mode', gauss%num_sph_mode, nmode_read
-!      write(*,*) 'radius_gauss', gauss%radius_gl(1), radius_read
-      if(gauss%num_sph_mode .ne. nmode_read) then
-        write(*,*) 'Number of Gauss coefficients does not match ',      &
-     &             'with the data in the file'
-        check_gauss_coefs_4_monitor = 1
-        return
-      end if
-      if(abs(gauss%radius_gl(1) - radius_read) .gt. 1.0E-8) then
-        write(*,*) 'Radius of Gauss coefficients does not match ',      &
-     &             'with the data in the file',                         &
-     &              gauss%radius_gl(1), radius_read
-        check_gauss_coefs_4_monitor = 1
-        return
-      end if
-!
-      check_gauss_coefs_4_monitor = 0
-      return
-!
-      end function check_gauss_coefs_4_monitor
+      end function error_gauss_coefs_header
 !
 ! -----------------------------------------------------------------------
 !

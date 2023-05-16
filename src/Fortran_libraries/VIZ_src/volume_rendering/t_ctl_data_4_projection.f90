@@ -9,8 +9,17 @@
 !!@verbatim
 !!      subroutine read_projection_mat_ctl                              &
 !!     &         (id_control, hd_block, proj, c_buf)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(projection_ctl), intent(inout) :: proj
+!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_projection_mat_ctl                             &
+!!     &         (id_control, hd_block, proj, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(projection_ctl), intent(in) :: proj
+!!        integer(kind = kint), intent(inout) :: level
 !!      subroutine reset_projection_view_ctl(proj)
-!!      subroutine bcast_projection_mat_ctl(proj)
 !!        type(projection_ctl), intent(inout) :: proj
 !!      subroutine copy_projection_mat_ctl(org_proj, new_proj)
 !!        type(projection_ctl), intent(in) :: org_proj
@@ -35,7 +44,6 @@
       module t_ctl_data_4_projection
 !
       use m_precision
-      use calypso_mpi
 !
       use m_constants
       use m_machine_parameter
@@ -109,6 +117,44 @@
 !
 !  ---------------------------------------------------------------------
 !
+      subroutine write_projection_mat_ctl                               &
+     &         (id_control, hd_block, proj, level)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+      type(projection_ctl), intent(in) :: proj
+!
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
+!
+!
+      if(proj%i_project_mat .le. 0) return
+!
+      maxlen = len_trim(hd_perspect_angle)
+      maxlen = max(maxlen, len_trim(hd_perspect_xy))
+      maxlen = max(maxlen, len_trim(hd_perspect_near))
+      maxlen = max(maxlen, len_trim(hd_perspect_far))
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_perspect_angle, proj%perspective_angle_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_perspect_xy, proj%perspective_xy_ratio_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_perspect_near, proj%perspective_near_ctl)
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_perspect_far, proj%perspective_far_ctl)
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_projection_mat_ctl
+!
+!  ---------------------------------------------------------------------
+!
       subroutine reset_projection_view_ctl(proj)
 !
       type(projection_ctl), intent(inout) :: proj
@@ -122,25 +168,6 @@
       proj%i_project_mat = 0
 !
       end subroutine reset_projection_view_ctl
-!
-!  ---------------------------------------------------------------------
-!
-      subroutine bcast_projection_mat_ctl(proj)
-!
-      use calypso_mpi_int
-      use bcast_control_arrays
-!
-      type(projection_ctl), intent(inout) :: proj
-!
-!
-      call calypso_mpi_bcast_one_int(proj%i_project_mat, 0)
-!
-      call bcast_ctl_type_r1(proj%perspective_angle_ctl)
-      call bcast_ctl_type_r1(proj%perspective_xy_ratio_ctl)
-      call bcast_ctl_type_r1(proj%perspective_near_ctl)
-      call bcast_ctl_type_r1(proj%perspective_far_ctl)
-!
-      end subroutine bcast_projection_mat_ctl
 !
 !  ---------------------------------------------------------------------
 !

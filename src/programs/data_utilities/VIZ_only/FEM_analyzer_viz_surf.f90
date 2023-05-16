@@ -7,11 +7,6 @@
 !>@brief FEM top routines for surfacing
 !!
 !!@verbatim
-!!      subroutine set_control_params_4_sections                        &
-!!     &         (sec_viz_ctl, FEM_viz, t_viz_param, ierr)
-!!        type(control_data_section_only), intent(in) :: sec_viz_ctl
-!!        type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
-!!        type(time_step_param_w_viz), intent(inout) :: t_viz_param
 !!      subroutine FEM_initialize_surface                               &
 !!     &         (ucd_step, init_d, FEM_viz, edge_comm, m_SR)
 !!        type(IO_step_param), intent(in) :: ucd_step
@@ -55,44 +50,6 @@
       contains
 !
 !-----------------------------------------------------------------------
-!
-      subroutine set_control_params_4_sections                          &
-     &         (sec_viz_ctl, FEM_viz, t_viz_param, ierr)
-!
-      use t_viz_sections
-      use t_control_data_section_only
-      use t_VIZ_only_step_parameter
-!
-      use m_file_format_switch
-      use m_default_file_prefix
-      use set_control_platform_item
-      use set_control_platform_data
-      use parallel_ucd_IO_select
-!
-      type(control_data_section_only), intent(in) :: sec_viz_ctl
-!
-      type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
-      type(time_step_param_w_viz), intent(inout) :: t_viz_param
-      integer(kind = kint), intent(inout) :: ierr
-!
-!
-      call turn_off_debug_flag_by_ctl(my_rank, sec_viz_ctl%sect_plt)
-      call set_control_smp_def(my_rank, sec_viz_ctl%sect_plt)
-      call set_control_parallel_mesh(sec_viz_ctl%sect_plt,              &
-     &                               FEM_viz%mesh_file_IO)
-      call set_merged_ucd_file_define(sec_viz_ctl%sect_plt,             &
-     &                                FEM_viz%ucd_file_IO)
-!
-      call init_viz_field_list_control(sec_viz_ctl%viz_field_ctl,       &
-     &                                 FEM_viz%viz_fld_list)
-!
-      call set_fixed_t_step_params_w_viz                                &
-     &   (sec_viz_ctl%t_sect_ctl, t_viz_param, ierr, e_message)
-      call copy_delta_t(t_viz_param%init_d, t_viz_param%time_d)
-!
-      end subroutine set_control_params_4_sections
-!
-! ----------------------------------------------------------------------
 !
       subroutine FEM_initialize_surface                                 &
      &         (ucd_step, init_d, FEM_viz, edge_comm, m_SR)

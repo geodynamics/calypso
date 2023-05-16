@@ -40,6 +40,7 @@
       implicit none
 !
       type(buffer_4_gzip), private :: zbuf_ucd
+      character, pointer, private, save :: FPz_ucd
 !
 !-----------------------------------------------------------------------
 !
@@ -59,11 +60,11 @@
 !
       if(i_debug.gt.0 .or. id_rank.le.0) write(*,*)                     &
      &      'Write gzipped ucd file: ', trim(gzip_name)
-      call open_wt_gzfile_a(gzip_name, zbuf_ucd)
+      call open_wt_gzfile_a(FPz_ucd, gzip_name, zbuf_ucd)
 !
-      call write_gz_ucd_type_mesh(ucd, zbuf_ucd)
-      call write_gz_udt_type_fields(ucd, zbuf_ucd)
-      call close_gzfile_a(zbuf_ucd)
+      call write_gz_ucd_type_mesh(FPz_ucd, ucd, zbuf_ucd)
+      call write_gz_udt_type_fields(FPz_ucd, ucd, zbuf_ucd)
+      call close_gzfile_a(FPz_ucd, zbuf_ucd)
 !
       end subroutine write_gz_ucd_file
 !
@@ -81,10 +82,10 @@
 !
       if(i_debug.gt.0 .or. id_rank.le.0) write(*,*)                     &
      &      'Write gzipped ucd file: ', trim(gzip_name)
-      call open_wt_gzfile_a(gzip_name, zbuf_ucd)
+      call open_wt_gzfile_a(FPz_ucd, gzip_name, zbuf_ucd)
 !
-      call write_gz_udt_type_fields(ucd, zbuf_ucd)
-      call close_gzfile_a(zbuf_ucd)
+      call write_gz_udt_type_fields(FPz_ucd, ucd, zbuf_ucd)
+      call close_gzfile_a(FPz_ucd, zbuf_ucd)
 !
       end subroutine write_gz_udt_file
 !
@@ -102,10 +103,10 @@
 !
       if(i_debug.gt.0 .or. id_rank.le.0) write(*,*)                     &
      &      'Write gzipped ucd grid file: ', trim(gzip_name)
-      call open_wt_gzfile_a(gzip_name, zbuf_ucd)
+      call open_wt_gzfile_a(FPz_ucd, gzip_name, zbuf_ucd)
 !
-      call write_gz_ucd_type_mesh(ucd, zbuf_ucd)
-      call close_gzfile_a(zbuf_ucd)
+      call write_gz_ucd_type_mesh(FPz_ucd, ucd, zbuf_ucd)
+      call close_gzfile_a(FPz_ucd, zbuf_ucd)
 !
       end subroutine write_gz_grd_file
 !
@@ -125,9 +126,9 @@
       if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
      &     'Read gzipped data file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-      call read_gz_udt_field(ucd, zbuf_ucd)
-      call close_gzfile_a(zbuf_ucd)
+      call open_rd_gzfile_a(FPz_ucd, gzip_name, zbuf_ucd)
+      call read_gz_udt_field(FPz_ucd, ucd, zbuf_ucd)
+      call close_gzfile_a(FPz_ucd, zbuf_ucd)
 !
       end subroutine read_gz_udt_file
 !
@@ -145,10 +146,10 @@
 !
       if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
      &     'Read gzipped UCD data file: ', trim(gzip_name)
-      call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-      call read_gz_ucd_mesh_data(ucd, zbuf_ucd)
-      call read_gz_udt_field(ucd, zbuf_ucd)
-      call close_gzfile_a(zbuf_ucd)
+      call open_rd_gzfile_a(FPz_ucd, gzip_name, zbuf_ucd)
+      call read_gz_ucd_mesh_data(FPz_ucd, ucd, zbuf_ucd)
+      call read_gz_udt_field(FPz_ucd, ucd, zbuf_ucd)
+      call close_gzfile_a(FPz_ucd, zbuf_ucd)
 !
       end subroutine read_gz_ucd_file
 !
@@ -166,9 +167,9 @@
 !
       if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
      &     'Read gzipped UCD grid file: ', trim(gzip_name)
-      call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-      call read_gz_ucd_mesh_data(ucd, zbuf_ucd)
-      call close_gzfile_a(zbuf_ucd)
+      call open_rd_gzfile_a(FPz_ucd, gzip_name, zbuf_ucd)
+      call read_gz_ucd_mesh_data(FPz_ucd, ucd, zbuf_ucd)
+      call close_gzfile_a(FPz_ucd, zbuf_ucd)
 !
       end subroutine read_gz_ucd_grd
 !
@@ -188,9 +189,9 @@
       if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
      &     'Read gzipped data file: ', trim(gzip_name)
 !
-      call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-      call read_alloc_gz_udt_field(ucd, zbuf_ucd)
-      call close_gzfile_a(zbuf_ucd)
+      call open_rd_gzfile_a(FPz_ucd, gzip_name, zbuf_ucd)
+      call read_alloc_gz_udt_field(FPz_ucd, ucd, zbuf_ucd)
+      call close_gzfile_a(FPz_ucd, zbuf_ucd)
 !
       end subroutine read_alloc_gz_udt_params
 !
@@ -209,11 +210,11 @@
 !
       if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
      &     'Read gzipped data file: ', trim(gzip_name)
-      call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-      call read_alloc_gz_udt_field(ucd, zbuf_ucd)
+      call open_rd_gzfile_a(FPz_ucd, gzip_name, zbuf_ucd)
+      call read_alloc_gz_udt_field(FPz_ucd, ucd, zbuf_ucd)
       call read_gz_udt_field_data                                       &
-     &   (ucd%nnod, ucd%ntot_comp, ucd%d_ucd, zbuf_ucd)
-      call close_gzfile_a(zbuf_ucd)
+     &   (FPz_ucd, ucd%nnod, ucd%ntot_comp, ucd%d_ucd, zbuf_ucd)
+      call close_gzfile_a(FPz_ucd, zbuf_ucd)
 !
       end subroutine read_alloc_gz_udt_file
 !
@@ -232,12 +233,12 @@
 !
       if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
      &     'Read gzipped UCD data file: ', trim(gzip_name)
-      call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-      call read_alloc_gz_ucd_mesh_data(ucd, zbuf_ucd)
-      call read_alloc_gz_udt_field(ucd, zbuf_ucd)
+      call open_rd_gzfile_a(FPz_ucd, gzip_name, zbuf_ucd)
+      call read_alloc_gz_ucd_mesh_data(FPz_ucd, ucd, zbuf_ucd)
+      call read_alloc_gz_udt_field(FPz_ucd, ucd, zbuf_ucd)
       call read_gz_udt_field_data                                       &
-     &   (ucd%nnod, ucd%ntot_comp, ucd%d_ucd, zbuf_ucd)
-      call close_gzfile_a(zbuf_ucd)
+     &   (FPz_ucd, ucd%nnod, ucd%ntot_comp, ucd%d_ucd, zbuf_ucd)
+      call close_gzfile_a(FPz_ucd, zbuf_ucd)
 !
       end subroutine read_alloc_gz_ucd_file
 !
@@ -256,9 +257,9 @@
 !
       if(i_debug.gt.0 .or. id_rank.eq.0) write(*,*)                     &
      &     'Read gzipped UCD grid file: ', trim(gzip_name)
-      call open_rd_gzfile_a(gzip_name, zbuf_ucd)
-      call read_alloc_gz_ucd_mesh_data(ucd, zbuf_ucd)
-      call close_gzfile_a(zbuf_ucd)
+      call open_rd_gzfile_a(FPz_ucd, gzip_name, zbuf_ucd)
+      call read_alloc_gz_ucd_mesh_data(FPz_ucd, ucd, zbuf_ucd)
+      call close_gzfile_a(FPz_ucd, zbuf_ucd)
 !
       end subroutine read_alloc_gz_ucd_grd
 !

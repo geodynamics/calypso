@@ -417,9 +417,6 @@ begin MHD_control
         rotation_vec  y   0.000
         rotation_vec  z   1.000
       end array rotation_vec
-!
-      tri_sph_int_file        'rot_int.dat'
-      sph_int_file_format     'ascii'
     end  Coriolis_define
 !
 !!!!!!!!! model for stratification !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -642,6 +639,7 @@ begin MHD_control
 !
     begin layered_spectrum_ctl
       layered_pwr_spectr_prefix    'sph_pwr_layer'
+      layered_pwr_spectr_format    'gzip'
 !
       degree_spectr_switch         'On'
       order_spectr_switch          'On'

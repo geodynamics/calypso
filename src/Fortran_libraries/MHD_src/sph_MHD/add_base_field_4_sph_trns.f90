@@ -88,6 +88,13 @@
      &      b_trns_base%i_current, trns)
 !      end if
 !
+!    external magnetic field flag
+!      if(cd_prop%iflag_4_induction .or. fl_prop%iflag_4_lorentz) then
+        call add_field_4_sph_trns_by_pol(d_rj,                          &
+     &      ipol_base%i_back_B, iphys_base%i_back_B,                    &
+     &      b_trns_base%i_back_B, trns)
+!      end if
+!
       end subroutine add_base_vector_4_MHD_sph_trns
 !
 !-----------------------------------------------------------------------
@@ -152,23 +159,23 @@
       type(spherical_transform_data), intent(inout) :: trns
 !
 !
-      call add_field_4_sph_trns_by_pol(d_rj,                            &
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_base%i_temp, iphys_base%i_temp, b_trns_base%i_temp,      &
      &    trns)
-      call add_field_4_sph_trns_by_pol(d_rj,                            &
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_base%i_light, iphys_base%i_light, b_trns_base%i_light,   &
      &    trns)
 !
-      call add_field_4_sph_trns_by_pol(d_rj,                            &
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_base%i_press, iphys_base%i_press, b_trns_base%i_press,   &
      &    trns)
 !
 !
-      call add_field_4_sph_trns_by_pol(d_rj,                            &
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_base%i_per_temp, iphys_base%i_per_temp,                  &
      &    b_trns_base%i_per_temp, trns)
 !
-      call add_field_4_sph_trns_by_pol(d_rj,                            &
+      call add_field_name_4_sph_trns_snap(d_rj,                         &
      &    ipol_base%i_per_light, iphys_base%i_per_light,                &
      &    b_trns_base%i_per_light, trns)
 !

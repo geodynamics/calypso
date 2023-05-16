@@ -109,7 +109,7 @@
       do i_pvr = 1, pvr%num_pvr
         call init_each_PVR_image(ione, pvr%pvr_param(i_pvr),            &
      &                           pvr%pvr_rgb(i_pvr))
-        call each_anaglyph_PVR_init(i_pvr, geofem%mesh, geofem%group,   &
+        call each_anaglyph_PVR_init(geofem%mesh, geofem%group,          &
      &      pvr%pvr_rgb(i_pvr), pvr%pvr_param(i_pvr),                   &
      &      pvr%pvr_bound(i_pvr), pvr%pvr_proj(2*i_pvr-1),              &
      &      m_SR%SR_sig, m_SR%SR_r, m_SR%SR_i)

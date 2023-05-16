@@ -101,7 +101,7 @@
      &         (id_file, level, label, chara2_item)
 !
       use m_constants
-      use skip_comment_f
+      use write_control_items
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file, level
@@ -115,7 +115,7 @@
      &     = max_len_of_charaarray(ione, chara2_item%charavalue(1))
 !
       if(chara2_item%iflag .eq. 0) return
-      call write_character2_ctl_item(id_file, level, label, maxlen,     &
+      call write_character2_ctl_item(id_file, level, maxlen, label,     &
      &    chara2_item%charavalue(1), chara2_item%charavalue(2))
 !
        end subroutine write_character2_ctl_type
@@ -199,12 +199,14 @@
       subroutine write_control_array_c2                                 &
      &         (id_control, level, label, array_c2)
 !
-      use skip_comment_f
+      use write_control_items
       use write_control_elements
 !
-      integer(kind = kint), intent(in) :: id_control, level
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: label
       type(ctl_array_c2), intent(in) :: array_c2
+!
+      integer(kind = kint), intent(inout) :: level
 !
       integer(kind = kint) :: maxlen(0:1)
       integer(kind = kint) :: i
@@ -216,13 +218,12 @@
       maxlen(0) = len_trim(label)
       maxlen(1) = max_len_of_charaarray(array_c2%num, array_c2%c1_tbl)
 !
-      call write_array_flag_for_ctl                                     &
-     &   (id_control, level, label, array_c2%num)
+      level = write_array_flag_for_ctl(id_control, level, label)
       do i = 1, array_c2%num
-        call write_character2_ctl_item(id_control, (level+1), label,    &
-     &      maxlen, array_c2%c1_tbl(i), array_c2%c2_tbl(i))
+        call write_character2_ctl_item(id_control, level, maxlen,       &
+     &      label, array_c2%c1_tbl(i), array_c2%c2_tbl(i))
       end do
-      call write_end_array_flag_for_ctl(id_control, level, label)
+      level = write_end_array_flag_for_ctl(id_control, level, label)
 !
       end subroutine write_control_array_c2
 !

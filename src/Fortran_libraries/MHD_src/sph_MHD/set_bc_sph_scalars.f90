@@ -70,6 +70,7 @@
       integer(kind = kint) :: i
 !
 !
+      if(my_rank .gt. 0) return
       if(i_debug .gt. 0) then
         write(*,*) 'sph_bc%iflag_icb', sph_bc%iflag_icb
         do i = 1, sph_rj%nidx_rj(2)

@@ -54,6 +54,8 @@
 !
 !>        File prefix for layered mean square file
         character(len = kchara) :: fhead_rms_layer =  'sph_pwr_layer'
+!>        logival flag to compress layered mean square file
+        logical :: gzip_flag_rms_layer = .FALSE.
 !
 !>        Output flag for spectrum with respect to degree
         integer(kind = kint) :: iflag_spectr_l =  1

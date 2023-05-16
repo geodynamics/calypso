@@ -1,5 +1,5 @@
-!>@file   t_ctl_data_surf_boundary.f90
-!!@brief  module t_ctl_data_surf_boundary
+!>@file   t_ctl_data_node_boundary.f90
+!!@brief  module t_ctl_data_node_boundary
 !!
 !!@author H. Matsui
 !>@brief   Control of nodal boundary conditions for dynamo
@@ -8,9 +8,6 @@
 !!@n        Modified by H. Matsui on Oct., 2007
 !!
 !!@verbatim
-!!      subroutine read_bc_4_node_ctl                                   &
-!!     &         (id_control, hd_block, nbc_ctl, c_buf)
-!!      subroutine bcast_bc_4_node_ctl(nbc_ctl)
 !!      subroutine dealloc_bc_4_node_ctl(nbc_ctl)
 !!        type(node_bc_control), intent(inout) :: nbc_ctl
 !!
@@ -170,99 +167,11 @@
         integer (kind=kint) :: i_bc_4_node =     0
       end type node_bc_control
 !
-!   4th level for nodal boundary
-!
-      character(len=kchara), parameter                                  &
-     &        :: hd_n_bc_temp =    'bc_temperature'
-      character(len=kchara), parameter                                  &
-     &        :: hd_n_bc_velo =    'bc_velocity'
-      character(len=kchara), parameter                                  &
-     &        :: hd_n_bc_press =   'bc_pressure'
-      character(len=kchara), parameter                                  &
-     &        :: hd_n_bc_composit = 'bc_composition'
-      character(len=kchara), parameter                                  &
-     &        :: hd_n_bc_magne =    'bc_magnetic_field'
-      character(len=kchara), parameter                                  &
-     &        :: hd_n_bc_mag_p =   'bc_electric_potential'
-      character(len=kchara), parameter                                  &
-     &        :: hd_n_bc_vect_p =  'bc_vector_potential'
-      character(len=kchara), parameter                                  &
-     &        :: hd_n_bc_currect = 'bc_current'
-!
-      private :: hd_n_bc_temp, hd_n_bc_velo, hd_n_bc_press
-      private :: hd_n_bc_magne, hd_n_bc_mag_p, hd_n_bc_vect_p
-      private :: hd_n_bc_composit, hd_n_bc_currect
-!
 ! -----------------------------------------------------------------------
 !
       contains
 !
 ! -----------------------------------------------------------------------
-!
-      subroutine read_bc_4_node_ctl                                     &
-     &         (id_control, hd_block, nbc_ctl, c_buf)
-!
-      use t_read_control_elements
-      use skip_comment_f
-!
-      integer(kind = kint), intent(in) :: id_control
-      character(len=kchara), intent(in) :: hd_block
-!
-      type(node_bc_control), intent(inout) :: nbc_ctl
-      type(buffer_for_control), intent(inout)  :: c_buf
-!
-!
-      if(check_begin_flag(c_buf, hd_block) .eqv. .FALSE.) return
-      if(nbc_ctl%i_bc_4_node .gt. 0) return
-      do
-        call load_one_line_from_control(id_control, c_buf)
-        if(check_end_flag(c_buf, hd_block)) exit
-!
-        call read_control_array_c2_r(id_control,                        &
-       &    hd_n_bc_temp, nbc_ctl%node_bc_T_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-       &    hd_n_bc_velo, nbc_ctl%node_bc_U_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-       &    hd_n_bc_press, nbc_ctl%node_bc_P_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-       &    hd_n_bc_composit, nbc_ctl%node_bc_C_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-       &    hd_n_bc_magne, nbc_ctl%node_bc_B_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-       &    hd_n_bc_mag_p, nbc_ctl%node_bc_MP_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-       &    hd_n_bc_vect_p, nbc_ctl%node_bc_A_ctl, c_buf)
-        call read_control_array_c2_r(id_control,                        &
-       &    hd_n_bc_currect, nbc_ctl%node_bc_J_ctl, c_buf)
-      end do
-      nbc_ctl%i_bc_4_node = 1
-!
-      end subroutine read_bc_4_node_ctl
-!
-!   --------------------------------------------------------------------
-!
-      subroutine bcast_bc_4_node_ctl(nbc_ctl)
-!
-      use calypso_mpi_int
-      use bcast_control_arrays
-!
-      type(node_bc_control), intent(inout) :: nbc_ctl
-!
-!
-      call bcast_ctl_array_c2r(nbc_ctl%node_bc_T_ctl)
-      call bcast_ctl_array_c2r(nbc_ctl%node_bc_U_ctl)
-      call bcast_ctl_array_c2r(nbc_ctl%node_bc_P_ctl)
-      call bcast_ctl_array_c2r(nbc_ctl%node_bc_C_ctl)
-      call bcast_ctl_array_c2r(nbc_ctl%node_bc_B_ctl)
-      call bcast_ctl_array_c2r(nbc_ctl%node_bc_MP_ctl)
-      call bcast_ctl_array_c2r(nbc_ctl%node_bc_A_ctl)
-      call bcast_ctl_array_c2r(nbc_ctl%node_bc_J_ctl)
-!
-      call calypso_mpi_bcast_one_int(nbc_ctl%i_bc_4_node, 0)
-!
-      end subroutine bcast_bc_4_node_ctl
-!
-!   --------------------------------------------------------------------
 !
       subroutine dealloc_bc_4_node_ctl(nbc_ctl)
 !

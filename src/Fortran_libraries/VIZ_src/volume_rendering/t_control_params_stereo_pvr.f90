@@ -117,7 +117,7 @@
 !
       subroutine set_pvr_quilt_num_control(quilt_c, stereo_def)
 !
-      use t_control_data_quilt_image
+      use t_ctl_data_quilt_image
 !
       type(quilt_image_ctl), intent(in) :: quilt_c
       type(pvr_stereo_parameter), intent(inout) :: stereo_def

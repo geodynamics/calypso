@@ -7,46 +7,61 @@
 !> @brief Time average spherical harmonics spectrum parameter
 !!
 !!@verbatim
-!!      subroutine set_spec_series_file_param(tave_sph_ctl, spec_evo_p)
+!!      subroutine set_spec_series_file_and_time(tave_sph_ctl,          &
+!!     &                                         spec_evo_p)
+!!      subroutine set_spec_series_file_param(folder_ctl,               &
+!!     &          monitor_list_ctl, spec_evo_p)
+!!        type(read_character_item), intent(in) :: folder_ctl
+!!        type(tave_sph_monitor_ctl), intent(in) :: tave_sph_ctl
+!!        type(sph_monitor_files_ctl), intent(in) :: monitor_list_ctl
+!!        type(sph_spectr_file_param), intent(inout) :: spec_evo_p
 !!      subroutine dealloc_spec_series_file_param(spec_evo_p)
 !!        type(tave_sph_monitor_ctl), intent(in) :: tave_sph_ctl
 !!        type(sph_spectr_file_param), intent(inout) :: spec_evo_p
+!!
+!!      subroutine set_sph_series_file_name(folder_ctl, file_prefix,    &
+!!     &                                    evo_file_name)
+!!        type(read_character_item), intent(in) :: folder_ctl
+!!        character(len = kchara), intent(in) :: file_prefix
+!!        character(len = kchara), intent(inout) :: evo_file_name
 !!@endverbatim
 !
       module t_ctl_param_sph_series_util
 !
       use m_precision
       use m_constants
+      use t_control_array_character
+      use t_multi_flag_labels
 !
       implicit none
 !
 !
-      type sph_spectr_file_param
-        real(kind = kreal) :: start_time
-        real(kind = kreal) :: end_time
+      type sph_spectr_file_list
+        integer(kind = kint) :: num_file = 0
+        character(len = kchara), allocatable :: evo_file_name(:)
+      end type sph_spectr_file_list
 !
-        integer(kind = kint) :: iflag_old_fmt = 0
+      type sph_spectr_file_param
+        real(kind = kreal) :: start_time = 0.0d0
+        real(kind = kreal) :: end_time =   0.0d0
+!
+        logical :: flag_old_fmt = .FALSE.
 !
         integer(kind = kint) :: lst = 0
         integer(kind = kint) :: led = 0
 !
-        integer(kind = kint) :: nfile_vol_series_file = 0
-        character(len = kchara), allocatable :: vol_series_prefix(:)
-!
-        integer(kind = kint) :: nfile_vol_spectr_file = 0
-        character(len = kchara), allocatable :: vol_spectr_prefix(:)
-!
-        integer(kind = kint) :: nfile_layer_series_file = 0
-        character(len = kchara), allocatable :: layer_series_prefix(:)
-!
-        integer(kind = kint) :: nfile_layer_sprctr_file = 0
-        character(len = kchara), allocatable :: layer_spectr_prefix(:)
+        type(sph_spectr_file_list) :: vol_series
+        type(sph_spectr_file_list) :: vol_spec_series
+        type(sph_spectr_file_list) :: layer_series
+        type(sph_spectr_file_list) :: layer_spec_series
+        type(sph_spectr_file_list) :: pick_spec_series
       end type sph_spectr_file_param
 !
-      private :: alloc_vol_series_prefix,   dealloc_vol_series_prefix
-      private :: alloc_vol_spectr_prefix,   dealloc_vol_spectr_prefix
-      private :: alloc_layer_series_prefix, dealloc_layer_series_prefix
-      private :: alloc_layer_spectr_prefix, dealloc_layer_spectr_prefix
+      type(read_character_item), parameter :: dummy_item                &
+     &       = read_character_item(iflag = 0, charavalue = 'ASCII')
+!
+      private :: set_sph_series_file_list
+      private :: alloc_series_prefix_list, dealloc_series_prefix_list
 !
 !   --------------------------------------------------------------------
 !
@@ -54,33 +69,35 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine set_spec_series_file_param(tave_sph_ctl, spec_evo_p)
+      subroutine set_spec_series_file_and_time(tave_sph_ctl,            &
+     &                                         spec_evo_p)
 !
+      use m_file_format_labels
       use t_ctl_data_tave_sph_monitor
       use skip_comment_f
+      use set_parallel_file_name
+
 !
       type(tave_sph_monitor_ctl), intent(in) :: tave_sph_ctl
       type(sph_spectr_file_param), intent(inout) :: spec_evo_p
 !
-      integer(kind = kint) :: i
-!
 !
       if(tave_sph_ctl%start_time_ctl%iflag .eq. 0) then
-        write(*,*) 'Set start time'
+        write(*,*) 'Error: Set start time'
         stop
       end if
       spec_evo_p%start_time = tave_sph_ctl%start_time_ctl%realvalue
 !
       if(tave_sph_ctl%end_time_ctl%iflag .eq. 0) then
-        write(*,*) 'Set end time'
+        write(*,*) 'Error: Set end time'
         stop
       end if
       spec_evo_p%end_time = tave_sph_ctl%end_time_ctl%realvalue
 !
-      spec_evo_p%iflag_old_fmt = 0
-      if(tave_sph_ctl%old_format_ctl%iflag .gt. 0                       &
-     &    .and. yes_flag(tave_sph_ctl%old_format_ctl%charavalue)) then
-        spec_evo_p%iflag_old_fmt = 1
+      spec_evo_p%flag_old_fmt = .FALSE.
+      if(tave_sph_ctl%old_format_ctl%iflag .gt. 0) then
+        spec_evo_p%flag_old_fmt                                         &
+     &     = yes_flag(tave_sph_ctl%old_format_ctl%charavalue)
       end if
 !
       if(tave_sph_ctl%degree_range_ctl%iflag .gt. 0) then
@@ -88,45 +105,39 @@
         spec_evo_p%led = tave_sph_ctl%degree_range_ctl%intvalue(2)
       end if
 !
-      if(tave_sph_ctl%volume_series_file_ctl%num .gt. 0) then
-        call alloc_vol_series_prefix                                    &
-     &     (tave_sph_ctl%volume_series_file_ctl%num, spec_evo_p)
+      call set_spec_series_file_param                                   &
+     &   (dummy_item, tave_sph_ctl%monitor_list_ctl, spec_evo_p)
 !
-        do i = 1, spec_evo_p%nfile_vol_series_file
-          spec_evo_p%vol_series_prefix(i)                               &
-     &       = tave_sph_ctl%volume_series_file_ctl%c_tbl(i)
-        end do
-      end if
+      end subroutine set_spec_series_file_and_time
 !
-      if(tave_sph_ctl%volume_spec_file_ctl%num .gt. 0) then
-        call alloc_vol_spectr_prefix                                    &
-     &     (tave_sph_ctl%volume_spec_file_ctl%num, spec_evo_p)
+!   --------------------------------------------------------------------
 !
-        do i = 1, spec_evo_p%nfile_vol_spectr_file
-          spec_evo_p%vol_spectr_prefix(i)                               &
-     &       = tave_sph_ctl%volume_spec_file_ctl%c_tbl(i)
-        end do
-      end if
+      subroutine set_spec_series_file_param(folder_ctl,                 &
+     &          monitor_list_ctl, spec_evo_p)
 !
-      if(tave_sph_ctl%layered_series_file_ctl%num .gt. 0) then
-        call alloc_layer_series_prefix                                  &
-     &     (tave_sph_ctl%layered_series_file_ctl%num, spec_evo_p)
+      use t_ctl_data_sph_monitor_list
 !
-        do i = 1, spec_evo_p%nfile_layer_series_file
-          spec_evo_p%layer_series_prefix(i)                             &
-     &       = tave_sph_ctl%layered_series_file_ctl%c_tbl(i)
-        end do
-      end if
+      type(read_character_item), intent(in) :: folder_ctl
+      type(sph_monitor_files_ctl), intent(in) :: monitor_list_ctl
 !
-      if(tave_sph_ctl%layered_spec_file_ctl%num .gt. 0) then
-        call alloc_layer_spectr_prefix                                  &
-     &     (tave_sph_ctl%layered_spec_file_ctl%num, spec_evo_p)
+      type(sph_spectr_file_param), intent(inout) :: spec_evo_p
 !
-        do i = 1, spec_evo_p%nfile_layer_sprctr_file
-          spec_evo_p%layer_spectr_prefix(i)                             &
-     &       = tave_sph_ctl%layered_spec_file_ctl%c_tbl(i)
-        end do
-      end if
+!
+      call set_sph_series_file_list(folder_ctl,                         &
+     &    monitor_list_ctl%volume_series_file_ctl,                      &
+     &    spec_evo_p%vol_series)
+      call set_sph_series_file_list(folder_ctl,                         &
+     &    monitor_list_ctl%volume_spec_file_ctl,                        &
+     &    spec_evo_p%vol_spec_series)
+      call set_sph_series_file_list(folder_ctl,                         &
+     &    monitor_list_ctl%layered_series_file_ctl,                     &
+     &    spec_evo_p%layer_series)
+      call set_sph_series_file_list(folder_ctl,                         &
+     &    monitor_list_ctl%layered_spec_file_ctl,                       &
+     &    spec_evo_p%layer_spec_series)
+      call set_sph_series_file_list(folder_ctl,                         &
+     &    monitor_list_ctl%picked_mode_file_ctl,                        &
+     &    spec_evo_p%pick_spec_series)
 !
       end subroutine set_spec_series_file_param
 !
@@ -136,110 +147,91 @@
 !
       type(sph_spectr_file_param), intent(inout) :: spec_evo_p
 !
-      call dealloc_vol_series_prefix(spec_evo_p)
-      call dealloc_vol_spectr_prefix(spec_evo_p)
-      call dealloc_layer_series_prefix(spec_evo_p)
-      call dealloc_layer_spectr_prefix(spec_evo_p)
+      call dealloc_series_prefix_list(spec_evo_p%vol_series)
+      call dealloc_series_prefix_list(spec_evo_p%vol_spec_series)
+      call dealloc_series_prefix_list(spec_evo_p%layer_series)
+      call dealloc_series_prefix_list(spec_evo_p%layer_spec_series)
+      call dealloc_series_prefix_list(spec_evo_p%pick_spec_series)
 !
       end subroutine dealloc_spec_series_file_param
 !
 !   --------------------------------------------------------------------
 !   --------------------------------------------------------------------
 !
-      subroutine alloc_vol_series_prefix(num, spec_evo_p)
+      subroutine set_sph_series_file_list(folder_ctl, file_list_ctl,    &
+     &                                    f_list)
+!
+      use t_multi_flag_labels
+      use t_control_array_character
+      use set_parallel_file_name
+!
+      type(read_character_item), intent(in) :: folder_ctl
+      type(ctl_array_chara), intent(in) :: file_list_ctl
+      type(sph_spectr_file_list), intent(inout) :: f_list
+!
+      integer(kind = kint) :: i
+!
+!
+      if(file_list_ctl%num .le. 0) return
+      call alloc_series_prefix_list(file_list_ctl%num, f_list)
+!
+!
+      do i = 1, f_list%num_file
+        call set_sph_series_file_name(folder_ctl,                       &
+     &      file_list_ctl%c_tbl(i), f_list%evo_file_name(i))
+      end do
+!
+      end subroutine set_sph_series_file_list
+!
+!   --------------------------------------------------------------------
+!
+      subroutine set_sph_series_file_name(folder_ctl, file_prefix,      &
+     &                                    evo_file_name)
+!
+      use t_multi_flag_labels
+      use t_control_array_character
+      use set_parallel_file_name
+!
+      type(read_character_item), intent(in) :: folder_ctl
+      character(len = kchara), intent(in) :: file_prefix
+      character(len = kchara), intent(inout) :: evo_file_name
+!
+      character(len = kchara) :: fname_tmp1
+!
+!
+      if(folder_ctl%iflag .gt. 0) then
+        write(fname_tmp1,'(a,a1,a)') trim(folder_ctl%charavalue),       &
+     &                                '/', trim(file_prefix)
+      else
+        fname_tmp1 = file_prefix
+      end if
+      evo_file_name = add_dat_extension(fname_tmp1)
+!
+      end subroutine set_sph_series_file_name
+!
+!   --------------------------------------------------------------------
+!
+      subroutine alloc_series_prefix_list(num, f_list)
 !
       integer(kind = kint), intent(in) :: num
-      type(sph_spectr_file_param), intent(inout) :: spec_evo_p
+      type(sph_spectr_file_list), intent(inout) :: f_list
 !
-      if(allocated(spec_evo_p%vol_series_prefix)) return
-      spec_evo_p%nfile_vol_series_file = num
-      allocate(spec_evo_p%vol_series_prefix(num))
+      if(allocated(f_list%evo_file_name)) return
+      f_list%num_file = num
+      allocate(f_list%evo_file_name(num))
 !
-      end subroutine alloc_vol_series_prefix
-!
-!   --------------------------------------------------------------------
-!
-      subroutine alloc_vol_spectr_prefix(num, spec_evo_p)
-!
-      integer(kind = kint), intent(in) :: num
-      type(sph_spectr_file_param), intent(inout) :: spec_evo_p
-!
-      if(allocated(spec_evo_p%vol_spectr_prefix)) return
-      spec_evo_p%nfile_vol_spectr_file = num
-      allocate(spec_evo_p%vol_spectr_prefix(num))
-!
-      end subroutine alloc_vol_spectr_prefix
+      end subroutine alloc_series_prefix_list
 !
 !   --------------------------------------------------------------------
 !
-      subroutine alloc_layer_series_prefix(num, spec_evo_p)
+      subroutine dealloc_series_prefix_list(f_list)
 !
-      integer(kind = kint), intent(in) :: num
-      type(sph_spectr_file_param), intent(inout) :: spec_evo_p
+      type(sph_spectr_file_list), intent(inout) :: f_list
 !
-      if(allocated(spec_evo_p%layer_series_prefix)) return
-      spec_evo_p%nfile_layer_series_file = num
-      allocate(spec_evo_p%layer_series_prefix(num))
+      if(allocated(f_list%evo_file_name) .eqv. .FALSE.) return
+      deallocate(f_list%evo_file_name)
 !
-      end subroutine alloc_layer_series_prefix
-!
-!   --------------------------------------------------------------------
-!
-      subroutine alloc_layer_spectr_prefix(num, spec_evo_p)
-!
-      integer(kind = kint), intent(in) :: num
-      type(sph_spectr_file_param), intent(inout) :: spec_evo_p
-!
-      if(allocated(spec_evo_p%layer_spectr_prefix)) return
-      spec_evo_p%nfile_layer_sprctr_file = num
-      allocate(spec_evo_p%layer_spectr_prefix(num))
-!
-      end subroutine alloc_layer_spectr_prefix
-!
-!   --------------------------------------------------------------------
-!   --------------------------------------------------------------------
-!
-      subroutine dealloc_vol_series_prefix(spec_evo_p)
-!
-      type(sph_spectr_file_param), intent(inout) :: spec_evo_p
-!
-      if(allocated(spec_evo_p%vol_series_prefix) .eqv. .FALSE.) return
-      deallocate(spec_evo_p%vol_series_prefix)
-!
-      end subroutine dealloc_vol_series_prefix
-!
-!   --------------------------------------------------------------------
-!
-      subroutine dealloc_vol_spectr_prefix(spec_evo_p)
-!
-      type(sph_spectr_file_param), intent(inout) :: spec_evo_p
-!
-      if(allocated(spec_evo_p%vol_spectr_prefix) .eqv. .FALSE.) return
-      deallocate(spec_evo_p%vol_spectr_prefix)
-!
-      end subroutine dealloc_vol_spectr_prefix
-!
-!   --------------------------------------------------------------------
-!
-      subroutine dealloc_layer_series_prefix(spec_evo_p)
-!
-      type(sph_spectr_file_param), intent(inout) :: spec_evo_p
-!
-      if(allocated(spec_evo_p%layer_series_prefix).eqv. .FALSE.) return
-      deallocate(spec_evo_p%layer_series_prefix)
-!
-      end subroutine dealloc_layer_series_prefix
-!
-!   --------------------------------------------------------------------
-!
-      subroutine dealloc_layer_spectr_prefix(spec_evo_p)
-!
-      type(sph_spectr_file_param), intent(inout) :: spec_evo_p
-!
-      if(allocated(spec_evo_p%layer_spectr_prefix).eqv. .FALSE.) return
-      deallocate(spec_evo_p%layer_spectr_prefix)
-!
-      end subroutine dealloc_layer_spectr_prefix
+      end subroutine dealloc_series_prefix_list
 !
 !   --------------------------------------------------------------------
 !

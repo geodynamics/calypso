@@ -87,8 +87,6 @@
      &       =  picked%istack_picked_spec_lc(i-1)                       &
      &        + picked%istack_picked_spec_lc(i)
       end do
-      picked%ntot_pick_spectr = picked%istack_picked_spec_lc(nprocs) 
-!
 !
       call deallocate_iflag_pick_sph
       call dealloc_pick_sph_mode(pick_list)

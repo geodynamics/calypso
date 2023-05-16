@@ -217,6 +217,48 @@
       end subroutine read_rayleigh_restart_params
 !
 !-----------------------------------------------------------------------
+!
+      subroutine write_rayleigh_restart_params(dir, i_step, ra_rst)
+!
+      integer(kind = kint), intent(in) :: i_step
+      character(len = kchara), intent(in) :: dir
+!
+      type(rayleigh_restart), intent(inout) :: ra_rst
+!
+      character(len = kchara) :: file_name
+      integer :: i4_tmp(1)
+      real(kind = kreal) :: r_tmp(1)
+      integer(kind = kint_gl) :: l8_byte
+!
+      integer, parameter :: id_file = 15
+      integer, parameter :: iflag_pi = 314
+!
+!
+      write(*,*) 'i_step', i_step
+      file_name =  set_rayleigh_file_name(dir, i_step, paramchar)
+      write(*,*) 'read Rayleigh checkpoint paramter file: ',            &
+     &          trim(file_name)
+      open(id_file, FILE=file_name, STATUS='NEW',                       &
+     &     FORM='UNFORMATTED', ACCESS='STREAM')
+!
+      write(id_file) iflag_pi
+!
+      write(id_file) ra_rst%i_version_from_file
+      write(id_file) ra_rst%nri_org
+      write(id_file) ra_rst%iflag_rtype
+      write(id_file) ra_rst%ltr_org
+!
+      write(id_file) ra_rst%dt_org
+      write(id_file) ra_rst%dt_new
+!
+      write(id_file) ra_rst%r_org(1:ra_rst%nri_org)
+      write(id_file) ra_rst%time_org
+      write(id_file) ra_rst%i_step_org
+      close(id_file)
+!
+      end subroutine write_rayleigh_restart_params
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       character(len = kchara) function set_rayleigh_file_name           &

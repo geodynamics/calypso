@@ -35,7 +35,7 @@
 !!        type(phys_data), intent(inout) :: rj_fld
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
-!!      subroutine licv_exp(ref_temp, ref_comp, MHD_prop, sph_MHD_bc,   &
+!!      subroutine licv_exp(refs, MHD_prop, sph_MHD_bc,                 &
 !!     &          sph, comms_sph, omega_sph, trans_p, ipol, WK,         &
 !!     &          rj_fld, SR_sig, SR_r)
 !!        type(SGS_model_control_params), intent(in) :: SGS_param
@@ -47,8 +47,7 @@
 !!        type(phys_address), intent(in) :: ipol
 !!        type(works_4_sph_trans_MHD), intent(inout) :: WK
 !!        type(phys_data), intent(inout) :: rj_fld
-!!        type(reference_field), intent(in) :: ref_temp
-!!        type(reference_field), intent(in) :: ref_comp
+!!        type(radial_reference_field), intent(in) :: refs
 !!        type(MHD_evolution_param), intent(in) :: MHD_prop
 !!        type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !!        type(send_recv_status), intent(inout) :: SR_sig
@@ -73,7 +72,7 @@
       use t_sph_trans_arrays_MHD
       use t_schmidt_poly_on_rtm
       use t_work_4_sph_trans
-      use t_radial_reference_temp
+      use t_radial_reference_field
       use t_legendre_trans_select
       use t_sph_FFT_selector
       use t_coriolis_terms_rlm
@@ -110,11 +109,11 @@
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
 !
-!   ----  lead rottion of buoyancies
+!   ----  lead rotation of buoyancies
       if(SPH_model%MHD_prop%fl_prop%iflag_scheme                        &
      &                         .gt. id_no_evolution) then
-      if(iflag_debug.gt.0) write(*,*) 'sel_rot_self_buoyancy_sph'
-        call sel_rot_self_buoyancy_sph(SPH_MHD%sph%sph_rj,              &
+      if(iflag_debug.gt.0) write(*,*) 'sel_rot_buoyancy_sph_MHD'
+        call sel_rot_buoyancy_sph_MHD(SPH_MHD%sph%sph_rj,               &
      &      SPH_MHD%ipol%base, SPH_MHD%ipol%rot_forces,                 &
      &      SPH_model%MHD_prop%fl_prop, SPH_model%sph_MHD_bc%sph_bc_U,  &
      &      SPH_MHD%fld)
@@ -131,8 +130,7 @@
 !   ----  Lead advection of reference field
       call add_ref_advect_sph_MHD                                       &
      &   (SPH_MHD%sph%sph_rj, SPH_model%sph_MHD_bc, SPH_model%MHD_prop, &
-     &    trans_p%leg, SPH_model%ref_temp, SPH_model%ref_comp,          &
-     &    SPH_MHD%ipol, SPH_MHD%fld)
+     &    trans_p%leg, SPH_model%refs, SPH_MHD%ipol, SPH_MHD%fld)
 !
 !*  ----  copy coriolis term for inner core rotation
 !*
@@ -220,7 +218,7 @@
 !*   ------------------------------------------------------------------
 !*   ------------------------------------------------------------------
 !*
-      subroutine licv_exp(ref_temp, ref_comp, MHD_prop, sph_MHD_bc,     &
+      subroutine licv_exp(refs, MHD_prop, sph_MHD_bc,                   &
      &          sph, comms_sph, omega_sph, trans_p, ipol, WK,           &
      &          rj_fld, SR_sig, SR_r)
 !
@@ -236,7 +234,7 @@
       type(sph_rotation), intent(in) :: omega_sph
       type(parameters_4_sph_trans), intent(in) :: trans_p
       type(phys_address), intent(in) :: ipol
-      type(reference_field), intent(in) :: ref_temp, ref_comp
+      type(radial_reference_field), intent(in) :: refs
       type(MHD_evolution_param), intent(in) :: MHD_prop
       type(sph_MHD_boundary_data), intent(in) :: sph_MHD_bc
 !
@@ -245,10 +243,10 @@
       type(send_recv_status), intent(inout) :: SR_sig
       type(send_recv_real_buffer), intent(inout) :: SR_r
 !
-!   ----  lead rottion of buoyancies
+!   ----  Rotation of buoyancies
       if(MHD_prop%fl_prop%iflag_scheme .gt. id_no_evolution) then
-        if(iflag_debug.gt.0) write(*,*) 'sel_rot_self_buoyancy_sph'
-        call sel_rot_self_buoyancy_sph                                  &
+        if(iflag_debug.gt.0) write(*,*) 'sel_rot_buoyancy_sph_MHD'
+        call sel_rot_buoyancy_sph_MHD                                   &
      &     (sph%sph_rj, ipol%base, ipol%rot_forces,                     &
      &      MHD_prop%fl_prop, sph_MHD_bc%sph_bc_U, rj_fld)
       end if
@@ -275,9 +273,8 @@
       end if
 !
 !
-      call add_ref_advect_sph_MHD                                       &
-     &   (sph%sph_rj, sph_MHD_bc, MHD_prop,                             &
-     &    trans_p%leg, ref_temp, ref_comp, ipol, rj_fld)
+      call add_ref_advect_sph_MHD(sph%sph_rj, sph_MHD_bc, MHD_prop,     &
+     &                            trans_p%leg, refs, ipol, rj_fld)
 !
       call licv_forces_to_explicit(MHD_prop%fl_prop,                    &
      &    ipol%exp_work, ipol%rot_forces, rj_fld)

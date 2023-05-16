@@ -118,7 +118,7 @@
         if(check_begin_flag(c_buf, hd_block)) then
           call append_ctl_data_psf_compare(psf_compares)
 !
-          write(*,*) 'Control for', trim(hd_block), ' No. ',            &
+          write(*,*) 'Control for ', trim(hd_block), ' No. ',           &
      &              psf_compares%num_psf_cmp, ' is reading'
           call read_ctl_data_psf_compare(id_control, hd_block,          &
      &        psf_compares%psf_cmp_ctls(psf_compares%num_psf_cmp),      &

@@ -1,9 +1,11 @@
-!set_fline_control.f90
-!      module set_fline_control
+!>@file   set_fline_control.f90
+!!@brief  module set_fline_control
+!!
+!!@date  Programmed by H.Matsui in May, 2006
 !
-!     Written by H. Matsui on Aug., 2011
-!
-!!      subroutine read_controls_4_fline(num_fline, fline_ctls)
+!>@brief control data for field lines
+!!
+!!@verbatim
 !!      subroutine s_set_fline_control(mesh, group, nod_fld,            &
 !!     &          fline_ctl_struct, fln_prm, fln_src)
 !!        type(mesh_geometry), intent(in) :: mesh
@@ -13,6 +15,7 @@
 !!        type(fline_ctl), intent(inout)  :: fline_ctl_struct
 !!        type(fieldline_paramter), intent(inout) :: fln_prm
 !!        type(each_fieldline_source), intent(inout) :: fln_src
+!!@endverbatim
 !
       module set_fline_control
 !
@@ -32,25 +35,6 @@
       contains
 !
 !  ---------------------------------------------------------------------
-!
-      subroutine read_controls_4_fline(num_fline, fline_ctls)
-!
-      use t_control_data_flines
-!
-      integer(kind = kint), intent(in) :: num_fline
-!
-      type(fieldline_controls), intent(inout) :: fline_ctls
-!
-      integer(kind = kint) :: i
-!
-!
-      do i = 1, num_fline
-        call bcast_field_line_ctl(fline_ctls%fline_ctl_struct(i))
-      end do
-!
-      end subroutine read_controls_4_fline
-!
-!   --------------------------------------------------------------------
 !
       subroutine s_set_fline_control(mesh, group, nod_fld,              &
      &          fline_ctl_struct, fln_prm, fln_src)

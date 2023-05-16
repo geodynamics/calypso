@@ -5,11 +5,11 @@
 !!@date Programmed in Jan., 2010
 !
 !!@verbatim
-!!      subroutine alloc_sph_trans_address(sph_rtp, WK)
+!!      subroutine alloc_sph_trans_address(sph, WK)
 !!      subroutine dealloc_sph_trans_address(WK)
-!!      subroutine alloc_sph_trans_area_snap(sph_rtp, WK)
+!!      subroutine alloc_sph_trans_area_snap(sph, WK)
 !!      subroutine dealloc_sph_trans_area_snap(WK)
-!!        type(sph_rtp_grid), intent(in) :: sph_rtp
+!!        type(sph_grids), intent(in) :: sph
 !!        type(works_4_sph_trans_MHD), intent(inout) :: WK
 !!@endverbatim
 !
@@ -20,7 +20,7 @@
 !
       use m_precision
 !
-      use t_spheric_rtp_data
+      use t_spheric_parameter
       use t_phys_address
       use t_addresses_sph_transform
       use t_legendre_trans_select
@@ -84,14 +84,14 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine alloc_sph_trans_address(sph_rtp, WK)
+      subroutine alloc_sph_trans_address(sph, WK)
 !
-      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_grids), intent(in) :: sph
       type(works_4_sph_trans_MHD), intent(inout) :: WK
 !
 !
-      call alloc_nonlinear_data(sph_rtp, wk%trns_MHD)
-      call alloc_nonlinear_pole(sph_rtp, WK%trns_MHD)
+      call alloc_nonlinear_data(sph%sph_rtp, wk%trns_MHD)
+      call alloc_nonlinear_pole(sph%sph_rtp, WK%trns_MHD)
 !
       end subroutine alloc_sph_trans_address
 !
@@ -109,20 +109,20 @@
 !
 !-----------------------------------------------------------------------
 !
-      subroutine alloc_sph_trans_area_snap(sph_rtp, WK)
+      subroutine alloc_sph_trans_area_snap(sph, WK)
 !
-      type(sph_rtp_grid), intent(in) :: sph_rtp
+      type(sph_grids), intent(in) :: sph
       type(works_4_sph_trans_MHD), intent(inout) :: WK
 !
 !
-      call alloc_nonlinear_data(sph_rtp, WK%trns_snap)
-      call alloc_nonlinear_pole(sph_rtp, WK%trns_snap)
+      call alloc_nonlinear_data(sph%sph_rtp, WK%trns_snap)
+      call alloc_nonlinear_pole(sph%sph_rtp, WK%trns_snap)
 !
-      call alloc_nonlinear_data(sph_rtp, wk%trns_difv)
-      call alloc_nonlinear_pole(sph_rtp, wk%trns_difv)
+      call alloc_nonlinear_data(sph%sph_rtp, wk%trns_difv)
+      call alloc_nonlinear_pole(sph%sph_rtp, wk%trns_difv)
 !
-      call alloc_nonlinear_data(sph_rtp, WK%trns_eflux)
-      call alloc_nonlinear_pole(sph_rtp, WK%trns_eflux)
+      call alloc_nonlinear_data(sph%sph_rtp, WK%trns_eflux)
+      call alloc_nonlinear_pole(sph%sph_rtp, WK%trns_eflux)
 !
       end subroutine alloc_sph_trans_area_snap
 !

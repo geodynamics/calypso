@@ -286,6 +286,14 @@
       end if
 !
       if(cbar_param%iflag_pvr_colorbar) then
+        cbar_param%flag_pvr_cbar_bottom = .FALSE.
+        if( cbar_ctl%colorbar_position_ctl%iflag .gt. 0) then
+          tmpchara = cbar_ctl%colorbar_position_ctl%charavalue
+          if  (cmp_no_case(tmpchara, 'bottom')) then
+            cbar_param%flag_pvr_cbar_bottom = .TRUE.
+          end if
+        end if
+
         if( cbar_ctl%colorbar_scale_ctl%iflag .gt. 0) then
           tmpchara = cbar_ctl%colorbar_scale_ctl%charavalue
           if  (cmp_no_case(tmpchara, 'on')) then

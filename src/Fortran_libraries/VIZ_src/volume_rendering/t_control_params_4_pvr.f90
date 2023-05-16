@@ -200,6 +200,8 @@
       type pvr_colorbar_parameter
 !>    Draw flag for color bar
         logical :: iflag_pvr_colorbar =  .FALSE.
+!>    Bottom colorbar flag
+        logical :: flag_pvr_cbar_bottom =  .FALSE.
 !>    Draw flag for color bar numbers
         integer(kind = kint) :: iflag_pvr_cbar_nums = 0
 !>    Draw flag for zero line in color bar

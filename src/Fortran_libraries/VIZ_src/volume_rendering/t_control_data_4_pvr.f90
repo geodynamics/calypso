@@ -92,10 +92,10 @@
       use t_ctl_data_pvr_colormap_bar
       use t_ctl_data_pvr_light
       use t_control_data_pvr_sections
-      use t_control_data_pvr_movie
-      use t_control_data_quilt_image
+      use t_ctl_data_pvr_movie
+      use t_ctl_data_quilt_image
       use t_control_data_pvr_isosurfs
-      use t_control_data_pvr_area
+      use t_ctl_data_pvr_area
       use skip_comment_f
 !
       implicit  none
@@ -103,22 +103,21 @@
 !
 !>  Structure of control data for PVR rendering
       type pvr_parameter_ctl
-!>  file name for modelview matrix
-        character(len=kchara) :: view_file_ctl
-!>  file name for coloemap file
-        character(len=kchara) :: color_file_ctl
-!
-!>    Structure for modelview marices
+!>     file name for modelview matrix
+        character(len=kchara) :: fname_mat_ctl
+!>     Structure for modelview marices
         type(modeview_ctl) :: mat
-!>    Structure for lighting
+!>     Structure for lighting
         type(pvr_light_ctl) :: light
 !
-!>    Structure for colormap and colorbar
+!>     file name for colormap and colorbar
+        character(len=kchara) :: fname_cmap_cbar_c
+!>     Structure for colormap and colorbar
         type(pvr_colormap_bar_ctl) :: cmap_cbar_c
 !
-!>    Structure for image rotation
+!>     Structure for image rotation
         type(pvr_movie_ctl) :: movie
-!>    Structure of quilt image controls
+!>     Structure of quilt image controls
         type(quilt_image_ctl) :: quilt_c
 !
         type(read_character_item) :: updated_ctl
@@ -209,7 +208,7 @@
 !
       if(pvr_ctl%pvr_field_ctl%iflag .gt. 0) then
         call add_viz_name_ctl                                           &
-     &     (my_rank, pvr_ctl%pvr_field_ctl%charavalue, field_ctl)
+     &     (pvr_ctl%pvr_field_ctl%charavalue, field_ctl)
       end if
 !
       end subroutine add_field_4_pvr_to_fld_ctl

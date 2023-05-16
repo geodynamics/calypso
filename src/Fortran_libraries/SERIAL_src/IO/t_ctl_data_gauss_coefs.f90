@@ -11,7 +11,16 @@
 !!      subroutine dealloc_gauss_spectr_control(g_pwr)
 !!      subroutine read_gauss_spectr_ctl                                &
 !!     &         (id_control, hd_block, iflag, g_pwr, c_buf)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
 !!        type(gauss_spectr_control), intent(inout) :: g_pwr
+!!        type(buffer_for_control), intent(inout) :: c_buf
+!!      subroutine write_gauss_spectr_ctl                               &
+!!     &         (id_control, hd_block, g_pwr, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len=kchara), intent(in) :: hd_block
+!!        type(gauss_spectr_control), intent(in) :: g_pwr
+!!        integer(kind = kint), intent(inout) :: level
 !!
 !! -----------------------------------------------------------------
 !!
@@ -19,6 +28,7 @@
 !!
 !!    begin gauss_coefficient_ctl
 !!      gauss_coefs_prefix           'sph_spectr/gauss_coefs'
+!!      gauss_coefs_format           'gzip'
 !!      gauss_coefs_radius_ctl    2.82
 !!
 !!      array pick_gauss_coefs_ctl  2
@@ -57,6 +67,8 @@
       type gauss_spectr_control
 !>        Structure for gauss coefficient file prefix
         type(read_character_item) :: gauss_coefs_prefix
+!>        Structure for gauss coefficient file format
+        type(read_character_item) :: gauss_coefs_format
 !
 !>        Structure for reference radus 
         type(read_real_item) :: gauss_coefs_radius_ctl
@@ -86,6 +98,8 @@
       character(len=kchara), parameter, private                         &
      &           :: hd_gauss_coefs_head = 'gauss_coefs_prefix'
       character(len=kchara), parameter, private                         &
+      &          :: hd_gauss_coefs_fmt =  'gauss_coefs_format'
+      character(len=kchara), parameter, private                         &
      &           :: hd_gauss_coefs_r =    'gauss_coefs_radius_ctl'
       character(len=kchara), parameter, private                         &
      &            :: hd_pick_gauss_lm =   'pick_gauss_coefs_ctl'
@@ -111,6 +125,7 @@
 !
       g_pwr%gauss_coefs_radius_ctl%iflag = 0
       g_pwr%gauss_coefs_prefix%iflag =     0
+      g_pwr%gauss_coefs_format%iflag =     0
       g_pwr%i_gauss_coef_ctl = 0
 !
       end subroutine dealloc_gauss_spectr_control
@@ -145,10 +160,55 @@
      &      g_pwr%gauss_coefs_radius_ctl)
         call read_chara_ctl_type(c_buf, hd_gauss_coefs_head,            &
      &      g_pwr%gauss_coefs_prefix)
+        call read_chara_ctl_type(c_buf, hd_gauss_coefs_fmt,             &
+     &      g_pwr%gauss_coefs_format)
       end do
       g_pwr%i_gauss_coef_ctl = 1
 !
       end subroutine read_gauss_spectr_ctl
+!
+! -----------------------------------------------------------------------
+!
+      subroutine write_gauss_spectr_ctl                                 &
+     &         (id_control, hd_block, g_pwr, level)
+!
+      use write_control_elements
+!
+      integer(kind = kint), intent(in) :: id_control
+      character(len=kchara), intent(in) :: hd_block
+!
+      type(gauss_spectr_control), intent(in) :: g_pwr
+      integer(kind = kint), intent(inout) :: level
+!
+      integer(kind = kint) :: maxlen = 0
+!
+!
+      if(g_pwr%i_gauss_coef_ctl .le. 0) return
+!
+      maxlen = len_trim(hd_gauss_coefs_r)
+      maxlen = max(maxlen, len_trim(hd_gauss_coefs_head))
+      maxlen = max(maxlen, len_trim(hd_gauss_coefs_fmt))
+!
+      write(id_control,'(a1)') '!'
+      level = write_begin_flag_for_ctl(id_control, level, hd_block)
+!
+      call write_control_array_i2(id_control, level,                    &
+     &    hd_pick_gauss_lm, g_pwr%idx_gauss_ctl)
+      call write_control_array_i1(id_control, level,                    &
+     &    hd_pick_gauss_l, g_pwr%idx_gauss_l_ctl)
+      call write_control_array_i1(id_control, level,                    &
+     &    hd_pick_gauss_m, g_pwr%idx_gauss_m_ctl)
+!
+      call write_real_ctl_type(id_control, level, maxlen,               &
+     &    hd_gauss_coefs_r, g_pwr%gauss_coefs_radius_ctl)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_gauss_coefs_head, g_pwr%gauss_coefs_prefix)
+      call write_chara_ctl_type(id_control, level, maxlen,              &
+     &    hd_gauss_coefs_fmt, g_pwr%gauss_coefs_format)
+!
+      level =  write_end_flag_for_ctl(id_control, level, hd_block)
+!
+      end subroutine write_gauss_spectr_ctl
 !
 ! -----------------------------------------------------------------------
 !

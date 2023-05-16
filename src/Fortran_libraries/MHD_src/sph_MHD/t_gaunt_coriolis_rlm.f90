@@ -133,15 +133,28 @@
 !>        Coefficients for divergence of Coriolis force 
 !!         for poloidal vorticity by poloidal velocity
         real(kind = kreal), allocatable :: sd_rlm(:,:,:)
+!
 !>        Coefficients for divergence of Coriolis force 
 !!         for poloidal vorticity by Toroidal velocity
         real(kind = kreal), allocatable :: td_rlm(:,:)
+!
 !>        Coefficients for radial compoonent of Coriolis force 
 !!         for poloidal vorticity by poloidal velocity
         real(kind = kreal), allocatable :: sr_rlm(:,:)
 !>        Coefficients for radial compoennt of Coriolis force 
 !!         for poloidal vorticity by Toroidal velocity
         real(kind = kreal), allocatable :: tr_rlm(:,:)
+!
+!>        Coefficients for horizontal component of Coriolis force 
+!!         by radial velocity
+        real(kind = kreal), allocatable :: sh_rlm(:,:)
+!>        Coefficients for horizontal compoonent of Coriolis force 
+!!         by horizontal velocity
+        real(kind = kreal), allocatable :: hh_rlm(:,:)
+!>        Coefficients for horizontal compoennt of Coriolis force 
+!!         by Toroidal velocity
+        real(kind = kreal), allocatable :: th_rlm(:,:)
+!
       end type gaunt_coriolis_rlm
 !
 !*   ------------------------------------------------------------------
@@ -186,15 +199,33 @@
       allocate( gt_cor%sr_rlm(2,jmax_rlm) )
       allocate( gt_cor%tr_rlm(2,jmax_rlm) )
 !
+      allocate( gt_cor%sh_rlm(2,jmax_rlm) )
+      allocate( gt_cor%hh_rlm(2,jmax_rlm) )
+      allocate( gt_cor%th_rlm(2,jmax_rlm) )
+!
       if(jmax_rlm .le. 0) return
-      gt_cor%sw_rlm = zero
-      gt_cor%tw_rlm = zero
+!$omp parallel
+!$omp workshare
+      gt_cor%sw_rlm(2,1:3,1:jmax_rlm) = zero
+!$omp end workshare nowait
+!$omp workshare
+      gt_cor%tw_rlm(2,1:4,1:jmax_rlm) = zero
+!$omp end workshare nowait
 !
-      gt_cor%sd_rlm = zero
-      gt_cor%td_rlm = zero
+!$omp workshare
+      gt_cor%sd_rlm(1:2,1:2,1:jmax_rlm) = zero
+!$omp end workshare nowait
+!$omp workshare
+      gt_cor%td_rlm(1:2,1:jmax_rlm) = zero
 !
-      gt_cor%sr_rlm = zero
-      gt_cor%tr_rlm = zero
+      gt_cor%sr_rlm(1:2,1:jmax_rlm) = zero
+      gt_cor%tr_rlm(1:2,1:jmax_rlm) = zero
+!
+      gt_cor%sh_rlm(1:2,1:jmax_rlm) = zero
+      gt_cor%hh_rlm(1:2,1:jmax_rlm) = zero
+      gt_cor%th_rlm(1:2,1:jmax_rlm) = zero
+!$omp end workshare
+!$omp end parallel
 !
       end subroutine alloc_coriolis_coef_tri_rlm
 !
@@ -219,6 +250,8 @@
       deallocate(gt_cor%sw_rlm, gt_cor%tw_rlm)
       deallocate(gt_cor%sd_rlm, gt_cor%td_rlm)
       deallocate(gt_cor%sr_rlm, gt_cor%tr_rlm)
+!
+      deallocate(gt_cor%sh_rlm, gt_cor%hh_rlm, gt_cor%th_rlm)
 !
       end subroutine dealloc_coriolis_coef_tri_rlm
 !

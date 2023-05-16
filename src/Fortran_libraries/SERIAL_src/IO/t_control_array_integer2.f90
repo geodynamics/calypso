@@ -11,7 +11,7 @@
 !!        type(buffer_for_control), intent(in)  :: c_buf
 !!        type(read_int2_item), intent(inout) :: int2_item
 !!      subroutine write_integer2_ctl_type                              &
-!!     &         (id_file, level, label, int2_item)
+!!     &         (id_file, level, maxlen, label, int2_item)
 !!        type(read_int2_item), intent(in) :: int2_item
 !!      subroutine copy_integer2_ctl(org_i2, new_i2)
 !!        type(read_int2_item), intent(in) :: org_i2
@@ -99,17 +99,18 @@
 !   --------------------------------------------------------------------
 !
       subroutine write_integer2_ctl_type                                &
-     &         (id_file, level, label, int2_item)
+     &         (id_file, level, maxlen, label, int2_item)
 !
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file, level
+      integer(kind = kint), intent(in) :: maxlen
       character(len=kchara), intent(in) :: label
       type(read_int2_item), intent(in) :: int2_item
 !
 !
       if(int2_item%iflag .eq. 0) return
-      call write_integer2_ctl_item(id_file, level, label,               &
+      call write_integer2_ctl_item(id_file, level, maxlen, label,       &
      &    int2_item%intvalue(1), int2_item%intvalue(2))
 !
        end subroutine write_integer2_ctl_type
@@ -199,9 +200,11 @@
       use skip_comment_f
       use write_control_elements
 !
-      integer(kind = kint), intent(in) :: id_control, level
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: label
       type(ctl_array_i2), intent(in) :: array_i2
+!
+      integer(kind = kint), intent(inout) :: level
 !
       integer(kind = kint) :: i
 !
@@ -209,13 +212,12 @@
       if(array_i2%num .le. 0) return
       write(id_control,'(a1)') '!'
 !
-      call write_array_flag_for_ctl                                     &
-     &   (id_control, level, label, array_i2%num)
+      level = write_array_flag_for_ctl(id_control, level, label)
       do i = 1, array_i2%num
-        call write_integer2_ctl_item(id_control, (level+1), label,      &
-     &     array_i2%int1(i), array_i2%int2(i))
+        call write_integer2_ctl_item(id_control, level,                 &
+     &      len_trim(label), label, array_i2%int1(i), array_i2%int2(i))
       end do
-      call write_end_array_flag_for_ctl(id_control, level, label)
+      level = write_end_array_flag_for_ctl(id_control, level, label)
 !
       end subroutine write_control_array_i2
 !

@@ -91,10 +91,12 @@
 !
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+1)
+      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+10)
       call calypso_sph_comm_N(ncomp_trans,                              &
      &    comms_sph%comm_rj, comms_sph%comm_rlm, SR_sig, SR_r)
       call finish_send_recv_sph(comms_sph%comm_rj, SR_sig)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+1)
+      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+10)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+5)
       call sel_backward_legendre_trans(ncomp_trans, nvector, nscalar,   &
@@ -105,9 +107,11 @@
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+5)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+2)
+      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+10)
       call calypso_sph_comm_N(ncomp_trans,                              &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp, SR_sig, SR_r)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+2)
+      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+10)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
       call back_FFT_select_from_recv(sph%sph_rtp, comms_sph%comm_rtp,   &
@@ -149,9 +153,11 @@
 !
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+1)
+      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+10)
       call calypso_sph_comm_N(ncomp_trans,                              &
      &    comms_sph%comm_rj, comms_sph%comm_rlm, SR_sig, SR_r)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+1)
+      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+10)
 !
       if(iflag_debug .gt. 0) write(*,*) 'pole_backward_transforms'
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+5)
@@ -171,9 +177,11 @@
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+5)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+2)
+      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+10)
       call calypso_sph_comm_N(ncomp_trans,                              &
      &    comms_sph%comm_rtm, comms_sph%comm_rtp, SR_sig, SR_r)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+2)
+      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+10)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+7)
       call back_FFT_select_from_recv(sph%sph_rtp, comms_sph%comm_rtp,   &
@@ -217,9 +225,11 @@
 !
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+1)
+      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+10)
       call calypso_sph_comm_N(ncomp_trans,                              &
      &    comms_sph%comm_rj, comms_sph%comm_rlm, SR_sig, SR_r)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+1)
+      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+10)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+5)
       call pole_backward_transforms(ncomp_trans, nvector, nscalar,      &
@@ -263,10 +273,12 @@
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+7)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+3)
+      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+10)
       call calypso_sph_comm_N(ncomp_trans,                              &
      &    comms_sph%comm_rtp, comms_sph%comm_rtm, SR_sig, SR_r)
       call finish_send_recv_sph(comms_sph%comm_rtp, SR_sig)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+3)
+      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+10)
 !
       if(iflag_debug .gt. 0) write(*,*) 'sel_forward_legendre_trans'
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+6)
@@ -278,10 +290,12 @@
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+6)
 !
       if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+4)
+      if(iflag_SPH_time) call start_elapsed_time(ist_elapsed_SPH+10)
       call calypso_sph_comm_N(ncomp_trans,                              &
      &    comms_sph%comm_rlm, comms_sph%comm_rj, SR_sig, SR_r)
       call finish_send_recv_sph(comms_sph%comm_rlm, SR_sig)
       if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+4)
+      if(iflag_SPH_time) call end_elapsed_time(ist_elapsed_SPH+10)
 !
       end subroutine sph_forward_transforms
 !

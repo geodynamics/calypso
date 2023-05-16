@@ -184,10 +184,9 @@
 !
 !
       if(sph_rj%inod_rj_center .gt. 0) then
-        call copy_degree0_comps_to_sol                                  &
-     &     (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                       &
+        call copy_degree0_comps_to_sol(sph_rj%nidx_rj(2),               &
      &      sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,           &
-     &      is_field, n_point, ntot_phys_rj, d_rj, sol_00)
+     &      n_point, d_rj(1,is_field), sph_rj%nidx_rj(1), sol_00)
       end if
 !
 !      j = find_local_sph_address(sph_rj, 0,0)
@@ -215,10 +214,9 @@
 !     &    sph_rj%radius_1d_rj_r, band_s00_evo%mat)
 !
       call lubksb_3band_ctr(band_s00_evo, sol_00)
-      call copy_degree0_comps_from_sol                                  &
-     &   (sph_rj%nidx_rj(1), sph_rj%nidx_rj(2),                         &
-     &    sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero, sol_00,     &
-     &    is_field, n_point, ntot_phys_rj, d_rj)
+      call copy_degree0_comps_from_sol(sph_rj%nidx_rj(2),               &
+     &    sph_rj%inod_rj_center, sph_rj%idx_rj_degree_zero,             &
+     &    sph_rj%nidx_rj(1), sol_00, n_point, d_rj(1,is_field))
 !
       end subroutine solve_scalar_sph_crank
 !

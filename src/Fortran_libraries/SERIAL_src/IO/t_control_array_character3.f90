@@ -104,6 +104,7 @@
       subroutine write_character3_ctl_type                              &
      &         (id_file, level, label, chara3_item)
 !
+      use write_control_items
       use write_control_elements
 !
       integer(kind = kint), intent(in) :: id_file, level
@@ -121,7 +122,7 @@
         maxlen(i) = len_trim(chara3_item%charavalue(i))                 &
      &           + iflag_divide(chara3_item%charavalue(i))
       end do
-      call write_character3_ctl_item(id_file, level, label, maxlen,     &
+      call write_character3_ctl_item(id_file, level, maxlen, label,     &
      &    chara3_item%charavalue(1), chara3_item%charavalue(2),         &
      &    chara3_item%charavalue(3))
 !
@@ -207,12 +208,14 @@
       subroutine write_control_array_c3                                 &
      &         (id_control, level, label, array_c3)
 !
-      use skip_comment_f
+      use write_control_items
       use write_control_elements
 !
-      integer(kind = kint), intent(in) :: id_control, level
+      integer(kind = kint), intent(in) :: id_control
       character(len=kchara), intent(in) :: label
       type(ctl_array_c3), intent(in) :: array_c3
+!
+      integer(kind = kint), intent(inout) :: level
 !
       integer(kind = kint) :: maxlen(0:2)
       integer(kind = kint) :: i
@@ -225,14 +228,13 @@
       maxlen(1) = max_len_of_charaarray(array_c3%num, array_c3%c1_tbl)
       maxlen(2) = max_len_of_charaarray(array_c3%num, array_c3%c2_tbl)
 !
-      call write_array_flag_for_ctl                                     &
-     &   (id_control, level, label, array_c3%num)
+      level = write_array_flag_for_ctl(id_control, level, label)
       do i = 1, array_c3%num
         call write_character3_ctl_item                                  &
-     &     (id_control, (level+1), label, maxlen,                       &
+     &     (id_control, level, maxlen, label,                           &
      &      array_c3%c1_tbl(i), array_c3%c2_tbl(i), array_c3%c3_tbl(i))
       end do
-      call write_end_array_flag_for_ctl(id_control, level, label)
+      level = write_end_array_flag_for_ctl(id_control, level, label)
 !
       end subroutine write_control_array_c3
 !

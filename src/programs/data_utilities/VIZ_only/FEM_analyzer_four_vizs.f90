@@ -7,11 +7,6 @@
 !>@brief Arrays for Field data IO for visualizers
 !!
 !!@verbatim
-!!      subroutine set_ctl_params_four_vizs                             &
-!!     &         (pvr_vizs_c, FEM_viz, t_viz_param, ierr)
-!!        type(control_data_four_vizs), intent(in) :: pvr_vizs_c
-!!        type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
-!!        type(time_step_param_w_viz), intent(inout) :: t_viz_param
 !!      subroutine FEM_initialize_four_vizs(init_d, ucd_step, viz_step, &
 !!     &                                    FEM_viz, pvr, m_SR)
 !!        type(IO_step_param), intent(in) :: ucd_step
@@ -51,43 +46,6 @@
 ! ----------------------------------------------------------------------
 !
       contains
-!
-! ----------------------------------------------------------------------
-!
-      subroutine set_ctl_params_four_vizs                               &
-     &         (pvr_vizs_c, FEM_viz, t_viz_param, ierr)
-!
-      use t_control_data_four_vizs
-      use t_VIZ_only_step_parameter
-!
-      use m_file_format_switch
-      use m_default_file_prefix
-      use set_control_platform_item
-      use set_control_platform_data
-      use parallel_ucd_IO_select
-!
-      type(control_data_four_vizs), intent(in) :: pvr_vizs_c
-!
-      type(FEM_mesh_field_for_viz), intent(inout) :: FEM_viz
-      type(time_step_param_w_viz), intent(inout) :: t_viz_param
-      integer(kind = kint), intent(inout) :: ierr
-!
-!
-      call turn_off_debug_flag_by_ctl(my_rank, pvr_vizs_c%viz_plt)
-      call set_control_smp_def(my_rank, pvr_vizs_c%viz_plt)
-      call set_control_parallel_mesh(pvr_vizs_c%viz_plt,                &
-     &                               FEM_viz%mesh_file_IO)
-      call set_merged_ucd_file_define(pvr_vizs_c%viz_plt,               &
-     &                                FEM_viz%ucd_file_IO)
-!
-      call init_viz_field_list_control(pvr_vizs_c%viz_field_ctl,        &
-     &                                 FEM_viz%viz_fld_list)
-!
-      call set_fixed_t_step_params_w_viz                                &
-     &   (pvr_vizs_c%t_viz_ctl, t_viz_param, ierr, e_message)
-      call copy_delta_t(t_viz_param%init_d, t_viz_param%time_d)
-!
-      end subroutine set_ctl_params_four_vizs
 !
 ! ----------------------------------------------------------------------
 !

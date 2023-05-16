@@ -50,7 +50,7 @@
 !
       subroutine elpsed_label_4_sph_trns
 !
-      integer(kind = kint), parameter :: num_append = 9
+      integer(kind = kint), parameter :: num_append = 10
 !
 !
       call append_elapsed_times                                         &
@@ -65,6 +65,7 @@
       elps1%labels(ist_elapsed_SPH+ 7) = 'Fourier transform          '
       elps1%labels(ist_elapsed_SPH+ 8) = 'mhd_spectr_to_sendbuf      '
       elps1%labels(ist_elapsed_SPH+ 9) = 'mhd_spectr_from_recvbuf    '
+      elps1%labels(ist_elapsed_SPH+10) = 'Communication for transform'
 !
       iflag_SPH_time = .TRUE.
 !

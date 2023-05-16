@@ -130,15 +130,10 @@ depends:
 
 
 makemake:
-	if [ ! -d $(MAKEDIR) ]; then \
-		mkdir $(MAKEDIR); \
-	fi
-	if [ ! -d $(BUILDDIR) ]; then \
-		mkdir $(BUILDDIR); \
-	fi
-	if [ ! -d $(BUILDDIR)/tests ]; then \
-		mkdir $(BUILDDIR)/tests; \
-	fi
+	mkdir -p $(MAKEDIR)
+	mkdir -p $(BUILDDIR)
+	mkdir -p $(BUILDDIR)/tests
+	echo '#' > $(MAKENAME)
 	@echo # create module list
 	echo '#' > $(MAKENAME)
 	echo '# Makefile for Kemono Dynamo simulation' >> $(MAKENAME)

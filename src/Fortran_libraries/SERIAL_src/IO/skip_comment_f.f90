@@ -9,6 +9,16 @@
 !!
 !!@verbatim
 !!      subroutine skip_comment(character_4_read,id_file)
+!!
+!!      subroutine read_one_line_from_stream(id_file,                   &
+!!     &          lenghbuf, num_word, nchara_read, tbuf)
+!!      subroutine skip_comment_from_stream(id_file,                    &
+!!     &          lenghbuf, num_word, nchara_read, tbuf)
+!!        integer(kind = kint), intent(in) :: id_file
+!!        integer(kind = kint), intent(in) :: lenghbuf
+!!        integer(kind = kint), intent(inout) :: num_word, nchara_read
+!!        character(len=lenghbuf), intent(inout) :: tbuf
+!!
 !!      subroutine count_field_by_comma(id_file, charabuf,              &
 !!     &          ncomp, field_name)
 !!      subroutine read_stack_array(character_4_read, id_file, num,     &
@@ -28,16 +38,6 @@
 !!          returns 1, othewwise returns 0
 !!      logical function yes_flag(control)
 !!      logical function no_flag(control)
-!!
-!!      integer(kind = kint) function iflag_divide(charaname)
-!!      integer(kind = kint) function max_len_of_charaarray(num, carray)
-!!      subroutine write_ctl_real_cont(id_file, real_item)
-!!      subroutine write_ctl_integer_cont(id_file, int_item)
-!!      subroutine write_ctl_fixlen_chara(id_file, maxlen, charaname)
-!!      subroutine write_ctl_chara_cont(id_file, charaname)
-!!      subroutine write_ctl_chara_lf(id_file, charaname)
-!!      subroutine write_spaces(id_file, nspace)
-!!      subroutine write_space_4_parse(id_file, level)
 !!@endverbatim
 !
       module skip_comment_f
@@ -66,6 +66,67 @@
       return
       end subroutine skip_comment
 !
+!-----------------------------------------------------------------------
+! -----------------------------------------------------------------------
+!
+      subroutine read_one_line_from_stream(id_file,                     &
+     &          lenghbuf, num_word, nchara_read, tbuf)
+!
+      integer(kind = kint), intent(in) :: id_file
+      integer(kind = kint), intent(in) :: lenghbuf
+!
+      integer(kind = kint), intent(inout) :: num_word, nchara_read
+      character(len=lenghbuf), intent(inout) :: tbuf
+!
+      integer(kind = kint) :: i
+!
+!
+      do i = 1, lenghbuf
+        read(id_file, end=99,err=99) tbuf(i:i)
+        if(tbuf(i:i) .eq. char(10)) exit
+      end do
+      nchara_read = i
+
+      num_word = 0
+      if(tbuf(1:1) .ne. char(32)) num_word = num_word + 1
+      do i = 2, nchara_read
+        if(tbuf(i-1:i-1) .eq. char(32)                                  &
+     &         .and. tbuf(i:i) .ne. char(32)) num_word = num_word + 1
+      end do
+      return
+!
+  99  continue
+      nchara_read = -1
+      num_word = -1
+!
+      end subroutine read_one_line_from_stream
+!
+! -----------------------------------------------------------------------
+!
+      subroutine skip_comment_from_stream(id_file,                      &
+     &          lenghbuf, num_word, nchara_read, tbuf)
+!
+      integer(kind = kint), intent(in) :: id_file
+      integer(kind = kint), intent(in) :: lenghbuf
+!
+      integer(kind = kint), intent(inout) :: num_word, nchara_read
+      character(len=lenghbuf), intent(inout) :: tbuf
+!
+      character(len=1) :: detect_comment
+!
+  10  continue
+        call read_one_line_from_stream(id_file,                         &
+     &      lenghbuf, num_word, nchara_read, tbuf)
+
+        if(nchara_read .lt. 0) return
+        if(nchara_read .eq. 0) go to 10
+!
+        read(tbuf,*,end=10)  detect_comment
+      if(detect_comment.eq.'!' .or. detect_comment.eq.'#') go to 10
+!
+      end subroutine skip_comment_from_stream
+!
+!-----------------------------------------------------------------------
 !-----------------------------------------------------------------------
 !
       subroutine count_field_by_comma(id_file, charabuf,                &
@@ -280,141 +341,5 @@
       end function no_flag
 !
 !-----------------------------------------------------------------------
-!-----------------------------------------------------------------------
-!
-      integer(kind = kint) function iflag_divide(charaname)
-!
-      character(len=kchara), intent(in) :: charaname
-!
-      integer(kind = kint) :: i
-!
-      iflag_divide = 0
-      do i = 1, len_trim(charaname)
-        if(charaname(i:i).eq.'/' .or. charaname(i:i).eq.','             &
-     &     .or. charaname(i:i).eq.';') then
-          iflag_divide = 1
-          exit
-        end if
-      end do
-!
-      end function iflag_divide
-!
-! ----------------------------------------------------------------------
-!
-      integer(kind = kint) function max_len_of_charaarray(num, carray)
-!
-      integer(kind = kint), intent(in) :: num
-      character(len = kchara), intent(in) :: carray(num)
-!
-      integer(kind = kint) :: i, ilen, maxlen
-!
-      maxlen = 0
-      do i = 1, num
-        ilen = len_trim(carray(i)) + 2*iflag_divide(carray(i))
-        maxlen = max(maxlen,ilen)
-      end do
-      max_len_of_charaarray = maxlen
-!
-      end function max_len_of_charaarray
-!
-! ----------------------------------------------------------------------
-!
-      subroutine write_ctl_real_cont(id_file, real_item)
-!
-      integer(kind = kint), intent(in) :: id_file
-      real(kind = kreal), intent(in) :: real_item
-!
-!
-      write(id_file,'(1pE25.15e3,a2)',advance='no') real_item,  '  '
-!
-      end subroutine write_ctl_real_cont
-!
-! ----------------------------------------------------------------------
-!
-      subroutine write_ctl_integer_cont(id_file, int_item)
-!
-      integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: int_item
-!
-!
-      write(id_file,'(i16,a2)',advance='no') int_item,  '  '
-!
-      end subroutine write_ctl_integer_cont
-!
-! ----------------------------------------------------------------------
-!
-      subroutine write_ctl_fixlen_chara(id_file, maxlen, charaname)
-!
-      integer(kind = kint), intent(in) :: id_file
-      integer(kind = kint), intent(in) :: maxlen
-      character(len=kchara), intent(in) :: charaname
-!
-      integer(kind = kint) :: nspace0
-!
-!
-      nspace0 = maxlen - len_trim(charaname)
-      call write_ctl_chara_cont(id_file, charaname)
-      if(nspace0 .gt. 0) call write_spaces(id_file, nspace0)
-!
-      end subroutine write_ctl_fixlen_chara
-!
-! ----------------------------------------------------------------------
-!
-      subroutine write_ctl_chara_cont(id_file, charaname)
-!
-      integer(kind = kint), intent(in) :: id_file
-      character(len=kchara), intent(in) :: charaname
-!
-!
-      if(iflag_divide(charaname) .gt. 0) then
-        write(id_file,'(a1,a,a1,a2)',advance='no')                      &
-     &                char(39), trim(charaname), char(39), '  '
-      else
-        write(id_file,'(a,a2)',advance='no') trim(charaname), '  '
-      end if
-!
-      end subroutine write_ctl_chara_cont
-!
-! ----------------------------------------------------------------------
-!
-      subroutine write_ctl_chara_lf(id_file, charaname)
-!
-      integer(kind = kint), intent(in) :: id_file
-      character(len=kchara), intent(in) :: charaname
-!
-!
-      if(iflag_divide(charaname) .gt. 0) then
-        write(id_file,'(a1,a,a1)') char(39), trim(charaname), char(39)
-      else
-        write(id_file,'(a)') trim(charaname)
-      end if
-!
-      end subroutine write_ctl_chara_lf
-!
-! ----------------------------------------------------------------------
-!
-      subroutine write_spaces(id_file, nspace)
-!
-      integer(kind = kint), intent(in) :: id_file, nspace
-      integer(kind = kint) :: i
-!
-!
-      do i = 1, nspace
-        write(id_file,'(a1)',advance='no') char(32)
-      end do
-!
-      end subroutine write_spaces
-!
-! ----------------------------------------------------------------------
-!
-      subroutine write_space_4_parse(id_file, level)
-!
-      integer(kind = kint), intent(in) :: id_file, level
-!
-      call write_spaces(id_file, (2*level))
-!
-      end subroutine write_space_4_parse
-!
-! ----------------------------------------------------------------------
 !
       end module skip_comment_f

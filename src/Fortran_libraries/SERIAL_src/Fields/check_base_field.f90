@@ -75,7 +75,8 @@
 !
       if(   check_field_list_ctl(current_density, field_ctl)            &
      & .or. check_field_list_ctl(magnetic_potential, field_ctl)         &
-     & .or. check_field_list_ctl(scalar_potential, field_ctl)) then
+     & .or. check_field_list_ctl(scalar_potential, field_ctl)           &
+     & .or. check_field_list_ctl(background_B, field_ctl)) then
         call add_phys_name_ctl(magnetic_field, field_ctl)
       end if
 !
@@ -194,12 +195,16 @@
       if(   check_field_list_ctl(r_velocity, field_ctl)                 &
      & .or. check_field_list_ctl(theta_velocity, field_ctl)             &
      & .or. check_field_list_ctl(phi_velocity, field_ctl)               &
-     & .or. check_field_list_ctl(cyl_r_velocity, field_ctl))            &
+     & .or. check_field_list_ctl(cyl_r_velocity, field_ctl)             &
+     & .or. check_field_list_ctl(z_velocity, field_ctl))                &
      &  call add_phys_name_ctl(velocity, field_ctl)
       if(   check_field_list_ctl(r_magnetic_f, field_ctl)               &
      & .or. check_field_list_ctl(theta_magnetic_f, field_ctl)           &
      & .or. check_field_list_ctl(phi_magnetic_f, field_ctl)             &
-     & .or. check_field_list_ctl(cyl_r_magnetic_f, field_ctl))          &
+     & .or. check_field_list_ctl(cyl_r_magnetic_f, field_ctl)           &
+     & .or. check_field_list_ctl(x_magnetic_f, field_ctl)               &
+     & .or. check_field_list_ctl(y_magnetic_f, field_ctl)               &
+     & .or. check_field_list_ctl(z_magnetic_f, field_ctl))              &
      &  call add_phys_name_ctl(magnetic_field, field_ctl)
 !
       end subroutine add_field_ctl_4_field_comps

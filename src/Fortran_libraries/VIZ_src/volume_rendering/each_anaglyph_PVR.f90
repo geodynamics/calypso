@@ -7,16 +7,14 @@
 !>@brief Main module for each volume rendering
 !!
 !!@verbatim
-!!      subroutine each_anaglyph_PVR_init(i_pvr, mesh, group,           &
-!!     &          pvr_rgb, pvr_param, pvr_bound, pvr_proj,              &
-!!     &          SR_sig, SR_r, SR_i)
-!!        integer(kind = kint), intent(in) :: i_pvr, num_img
+!!      subroutine each_anaglyph_PVR_init(mesh, group, pvr_rgb,         &
+!!     &          pvr_param, pvr_bound, pvr_proj, SR_sig, SR_r, SR_i)
 !!        type(mesh_geometry), intent(in) :: mesh
 !!        type(mesh_groups), intent(in) :: group
 !!        type(pvr_image_type), intent(in) :: pvr_rgb
 !!        type(PVR_control_params), intent(inout) :: pvr_param
 !!        type(pvr_bounds_surf_ctl), intent(inout) :: pvr_bound
-!!        type(PVR_projection_data), intent(inout) :: pvr_proj(num_img)
+!!        type(PVR_projection_data), intent(inout) :: pvr_proj(2)
 !!        type(send_recv_status), intent(inout) :: SR_sig
 !!        type(send_recv_real_buffer), intent(inout) :: SR_r
 !!        type(send_recv_int_buffer), intent(inout) :: SR_i
@@ -79,9 +77,8 @@
 !
 !  ---------------------------------------------------------------------
 !
-      subroutine each_anaglyph_PVR_init(i_pvr, mesh, group,             &
-     &          pvr_rgb, pvr_param, pvr_bound, pvr_proj,                &
-     &          SR_sig, SR_r, SR_i)
+      subroutine each_anaglyph_PVR_init(mesh, group, pvr_rgb,           &
+     &          pvr_param, pvr_bound, pvr_proj, SR_sig, SR_r, SR_i)
 !
       use t_control_data_pvr_sections
       use set_pvr_control
@@ -89,7 +86,6 @@
       use find_pvr_surf_domain
       use set_iflag_for_used_ele
 !
-      integer(kind = kint), intent(in) :: i_pvr
       type(mesh_geometry), intent(in) :: mesh
       type(mesh_groups), intent(in) :: group
       type(pvr_image_type), intent(in) :: pvr_rgb

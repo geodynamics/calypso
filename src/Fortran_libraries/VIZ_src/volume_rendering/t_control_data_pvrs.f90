@@ -7,9 +7,20 @@
 !>@brief structure of control data for multiple PVRs
 !!
 !!@verbatim
+!!      subroutine alloc_pvr_ctl_struct(pvr_ctls)
 !!      subroutine read_files_4_pvr_ctl                                 &
 !!     &         (id_control, hd_pvr_ctl, pvr_ctls, c_buf)
-!!      subroutine bcast_files_4_pvr_ctl(pvr_ctls)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len = kchara), intent(in) :: hd_pvr_ctl
+!!        type(volume_rendering_controls), intent(inout) :: pvr_ctls
+!!        type(buffer_for_control), intent(inout)  :: c_buf
+!!      subroutine write_files_4_pvr_ctl                                &
+!!     &         (id_control, hd_pvr_ctl, pvr_ctls, level)
+!!        integer(kind = kint), intent(in) :: id_control
+!!        character(len = kchara), intent(in) :: hd_pvr_ctl
+!!        type(volume_rendering_controls), intent(in) :: pvr_ctls
+!!        integer(kind = kint), intent(inout) :: level
+!!
 !!      subroutine add_fields_4_pvrs_to_fld_ctl(pvr_ctl, field_ctl)
 !!        type(volume_rendering_controls), intent(in) :: pvr_ctls
 !!        type(ctl_array_c3), intent(inout) :: field_ctl
@@ -26,7 +37,6 @@
       use m_precision
 !
       use m_machine_parameter
-      use calypso_mpi
       use t_control_data_4_pvr
 !
       implicit  none
@@ -37,7 +47,6 @@
         type(pvr_parameter_ctl), allocatable :: pvr_ctl_type(:)
       end type volume_rendering_controls
 !
-      private :: alloc_pvr_ctl_struct
       private :: append_new_pvr_ctl_struct, dup_pvr_ctl_struct
 !
 !   --------------------------------------------------------------------
@@ -70,8 +79,7 @@
           call deallocate_cont_dat_pvr(pvr_ctls%pvr_ctl_type(i))
         end do
 !
-        deallocate(pvr_ctls%pvr_ctl_type)
-        deallocate(pvr_ctls%fname_pvr_ctl)
+        deallocate(pvr_ctls%pvr_ctl_type, pvr_ctls%fname_pvr_ctl)
       end if
       pvr_ctls%num_pvr_ctl = 0
 !
@@ -85,8 +93,7 @@
 !
       use t_read_control_elements
       use skip_comment_f
-      use read_pvr_control
-      use set_pvr_control
+      use ctl_file_each_pvr_IO
 !
       integer(kind = kint), intent(in) :: id_control
       character(len = kchara), intent(in) :: hd_pvr_ctl
@@ -104,25 +111,13 @@
         call load_one_line_from_control(id_control, c_buf)
         if(check_end_array_flag(c_buf, hd_pvr_ctl)) exit
 !
-        if(check_file_flag(c_buf, hd_pvr_ctl)) then
+        if(check_file_flag(c_buf, hd_pvr_ctl)                           &
+     &     .or. check_begin_flag(c_buf, hd_pvr_ctl)) then
+          write(*,'(3a,i4)', ADVANCE='NO') 'Control for ',              &
+     &                 trim(hd_pvr_ctl), ' No. ', pvr_ctls%num_pvr_ctl
           call append_new_pvr_ctl_struct(pvr_ctls)
-          pvr_ctls%fname_pvr_ctl(pvr_ctls%num_pvr_ctl)                  &
-     &        = third_word(c_buf)
-!
-          write(*,'(3a,i4,a)', ADVANCE='NO') 'Read file for ',          &
-     &        trim(hd_pvr_ctl), ' No. ', pvr_ctls%num_pvr_ctl, '... '
-          call read_control_pvr_file(id_control+2,                      &
-     &        pvr_ctls%fname_pvr_ctl(pvr_ctls%num_pvr_ctl), hd_pvr_ctl, &
-     &        pvr_ctls%pvr_ctl_type(pvr_ctls%num_pvr_ctl))
-        end if
-!
-        if(check_begin_flag(c_buf, hd_pvr_ctl)) then
-          call append_new_pvr_ctl_struct(pvr_ctls)
-          pvr_ctls%fname_pvr_ctl(pvr_ctls%num_pvr_ctl) = 'NO_FILE'
-!
-          write(*,*) 'Control for', trim(hd_pvr_ctl), ' No. ',          &
-     &              pvr_ctls%num_pvr_ctl, ' is included'
-          call read_pvr_ctl(id_control, hd_pvr_ctl,                     &
+          call sel_read_control_pvr(id_control, hd_pvr_ctl,             &
+     &        pvr_ctls%fname_pvr_ctl(pvr_ctls%num_pvr_ctl),             &
      &        pvr_ctls%pvr_ctl_type(pvr_ctls%num_pvr_ctl), c_buf)
         end if
       end do
@@ -131,25 +126,36 @@
 !
 !   --------------------------------------------------------------------
 !
-      subroutine bcast_files_4_pvr_ctl(pvr_ctls)
+      subroutine write_files_4_pvr_ctl                                  &
+     &         (id_control, hd_pvr_ctl, pvr_ctls, level)
 !
-      use calypso_mpi_int
-      use calypso_mpi_char
-      use transfer_to_long_integers
-      use bcast_control_data_4_pvr
+      use t_read_control_elements
+      use skip_comment_f
+      use ctl_file_each_pvr_IO
+      use write_control_elements
 !
-      type(volume_rendering_controls), intent(inout) :: pvr_ctls
+      integer(kind = kint), intent(in) :: id_control
+      character(len = kchara), intent(in) :: hd_pvr_ctl
 !
+      type(volume_rendering_controls), intent(in) :: pvr_ctls
+      integer(kind = kint), intent(inout) :: level
 !
-      call calypso_mpi_bcast_one_int(pvr_ctls%num_pvr_ctl, 0)
+      integer(kind = kint) :: i
+!
       if(pvr_ctls%num_pvr_ctl .le. 0) return
 !
-      if(my_rank .gt. 0)  call alloc_pvr_ctl_struct(pvr_ctls)
+      write(id_control,'(a1)') '!'
+      level = write_array_flag_for_ctl(id_control, level, hd_pvr_ctl)
+      do i = 1, pvr_ctls%num_pvr_ctl
+        write(*,'(3a,i4)', ADVANCE='NO')                                &
+     &          'Control for ', trim(hd_pvr_ctl), ' No. ', i
+        call sel_write_control_pvr(id_control, hd_pvr_ctl,              &
+     &      pvr_ctls%fname_pvr_ctl(i), pvr_ctls%pvr_ctl_type(i), level)
+      end do
+      level = write_end_array_flag_for_ctl(id_control, level,           &
+     &                                     hd_pvr_ctl)
 !
-      call calypso_mpi_bcast_character(pvr_ctls%fname_pvr_ctl,          &
-     &    cast_long(kchara*pvr_ctls%num_pvr_ctl), 0)
-!
-      end subroutine bcast_files_4_pvr_ctl
+      end subroutine write_files_4_pvr_ctl
 !
 !   --------------------------------------------------------------------
 !
