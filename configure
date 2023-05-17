@@ -652,6 +652,9 @@ ac_header_c_list=
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
+PNG_LIBS
+PNG_CFLAGS
+PKGFLAGS_PNG
 PKGFLAGS_ZLIB
 ZLIB_LIBS
 ZLIB_CFLAGS
@@ -797,7 +800,7 @@ ac_subst_files=''
 ac_user_opts='
 enable_option_checking
 enable_silent_rules
-enable_fftw3
+with_fftw3
 enable_dependency_tracking
 with_hdf5
 with_blas
@@ -1453,7 +1456,6 @@ Optional Features:
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
   --enable-silent-rules   less verbose build output (undo: "make V=1")
   --disable-silent-rules  verbose build output (undo: "make V=0")
-  --enable-fftw3          Use fftw3 library
   --enable-dependency-tracking
                           do not reject slow dependency extractors
   --disable-dependency-tracking
@@ -1462,6 +1464,7 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-fftw3            Use fftw3 library
   --with-hdf5=yes/no/PATH full path of h5pcc for parallel HDF5 configuration
   --with-blas=<lib>       use BLAS library <lib>
   --with-zlib=DIR root directory path of zlib installation defaults to
@@ -4012,17 +4015,18 @@ fi
 
 # AC_CONFIG_HEADER([config.h])
 
-# Check whether --enable-fftw3 was given.
-if test ${enable_fftw3+y}
+
+# Check whether --with-fftw3 was given.
+if test ${with_fftw3+y}
 then :
-  enableval=$enable_fftw3; USE_fftw3='yes'
+  withval=$with_fftw3; USE_fftw3='yes'
 else $as_nop
   USE_fftw3='no'
 fi
 
 
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: enable_fftw3... \"${USE_fftw3}\"" >&5
-printf "%s\n" "enable_fftw3... \"${USE_fftw3}\"" >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: with-fftw3...   \"${USE_fftw3}\"" >&5
+printf "%s\n" "with-fftw3...   \"${USE_fftw3}\"" >&6; }
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: with-blas...    \"${with_blas}\"" >&5
 printf "%s\n" "with-blas...    \"${with_blas}\"" >&6; }
 
@@ -10067,6 +10071,9 @@ fi
 
 
 fi
+
+
+
 
 
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: " >&5
