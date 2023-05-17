@@ -14,7 +14,7 @@ To perform simulations by Calypso, the following processes are required.
 \item Convert the parallel spectra data by \verb|assemble_sph| to continue with changing number of processes (if necessary).
 \item Data analysis by \verb|sph_snapshot|, \verb|sph_snapshot|, or \verb|sph_dynamobench|.
 \item Update initial fields by \verb|sph_add_initial_field| for more simulations (if necessary).
-\item Evaluate time averages by \verb|t_ave_sph_mean_square|, \verb|t_ave_picked_sph_coefs|, or \verb|t_ave_nusselt| (if necessary).
+\item Evaluate time averages by \verb|t_ave_monitor_data|, \verb|t_ave_picked_sph_coefs|, or \verb|t_ave_nusselt| (if necessary).
 \end{enumerate}
 %
 The simulation program \verb|sph_mhd| requires an indexing file for spherical transform.  \verb|sph_mhd| generates spectrum data and monitoring data, and field data in Cartesian coordinate as outputs. The data transform programs (\verb|sph_snapshot| and \verb|sph_zm_snapshot|) generate outputs data  from parallel spectra data. The flow of data is shown in Figure \ref{fig:flow_0}. 

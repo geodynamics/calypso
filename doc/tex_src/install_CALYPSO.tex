@@ -37,6 +37,7 @@ OpenMP is used for the parallelization under the shared memory. Better choice to
 GCC, the GNU Compiler Collection (\url{https://gcc.gnu.org}) is already installed in the most of Linux distributions. However, packages for development are need to be installed. For Ubuntu 20, for example, the required compilers and  libraries can be installed by using \verb|apt| command as following::
 %
 \begin{verbatim}
+% sudo apt install build-essential
 % sudo apt install pkg-config
 % sudo apt install git
 % sudo apt install gfortran
@@ -52,8 +53,8 @@ GCC, the GNU Compiler Collection (\url{https://gcc.gnu.org}) is already installe
 \subsubsection{Installation of required softwares for Mac OS}
 For MacOS, any fortran compiler needs to be installed because Xcode does not have fortran compiler. The easiest way is installing GCC by using a package manager such as macports (\url{https://www.macports.org}) or homebrew (\url{https://brew.sh/index}). By using the Macports, 
 
-\paragraph{IMacports}
-The required compiler and packages can be installed as followings as an example using GCC9. GCC in Macports includes gfortran compiler.
+\paragraph{Macports}
+The required compiler and packages can be installed as followings as an example using GCC11. GCC in Macports includes gfortran compiler.
 %
 \begin{verbatim}
 % sudo port install gcc11
@@ -229,9 +230,9 @@ Compile is performed using the {\tt make} command. The Makefile in the top direc
  Generate cross section and isosurface from field data and FEM mesh data.
 \item{\tt field\_to\_VTK:   }\\
  Data transfer program from field and FEM mesh data to VTK format.
-\item{\tt psf\_to\_vtk:     }\\
+\item{\tt section\_to\_vtk:     }\\
  Data transfer program from section and isosurface data to VTK format.
-\item{\tt t\_ave\_sph\_mean\_square:     }\\
+\item{\tt t\_ave\_monitor\_data:     }\\
  Time averaging program for the mean square data.
 \item{\tt t\_ave\_picked\_sph\_coefs:     }\\
  Time averaging program for the picked spectrum data.
@@ -391,4 +392,30 @@ After configuration, compile and install are started by
 \end{verbatim}
 %
 
-After running \verb|make| command, execute files are built in \verb|[CALYPSO_HOME]/work/bin| directory.
+After running \verb|make| command, execute files are built in \verb|[CALYPSO_HOME]/work/bin| directory. Calypso consists of the following programs:
+%
+\begin{itemize}
+\item Preprocessing programs
+	\begin{itemize}
+	\item {\tt sph\_initial\_field} (See Section \ref{sec:sph_initial_field}),
+	\item {\tt sph\_add\_initial\_field} (See Section \ref{sec:add_initial_field}),
+	\item {\tt gen\_sph\_grid} (See Section \ref{section:gen_sph_grid}) {\color{red} (Deprecated)},
+ 	\end{itemize}
+\item Simulation program {\tt sph\_mhd} (See Section \ref{section:sph_mhd}), 
+\item Data analysis programs,
+	\begin{itemize}
+	\item {\tt sph\_snapshot} (See Section \ref{section:sph_snapshot}),
+	\item {\tt sph\_dynamobench} (See Section \ref{section:check_bench}),
+	\item {\tt sectioning} (See Section \ref{sec:sectioning}),
+ 	\item {\tt field\_to\_VTK} (See Section \ref{sec:field_to_VTK}),
+ 	\item {\tt section\_to\_VTK} (See Section \ref{section:section_to_VTK}),
+ 	\item {\tt assemble\_sph} (See Section \ref{section:assemble_sph}),
+ 	\item {\tt t\_ave\_monitor\_data} (See Section \ref{sec:ave_mean_square}),
+	\end{itemize}
+\item Utility program to bulid.
+	\begin{itemize}
+	\item {\tt make\_f90depends} (See Section \ref{sec:make_f90depends}),
+	\end{itemize}
+\end{itemize}
+%
+

@@ -1,279 +1,11 @@
-\section{Programs}
-Calypso consists of the following programs:
-%
-\begin{itemize}
-\item Preprocessing programs
-	\begin{itemize}
-	\item {\tt gen\_sph\_grid} (See Section \ref{section:gen_sph_grid}),
-	\item {\tt sph\_initial\_field} (See Section \ref{sec:sph_initial_field}),
-	\item {\tt ssph\_add\_initial\_field} (See Section \ref{sec:add_initial_field}),
- 	\end{itemize}
-\item Simulation program {\tt sph\_mhd} (See Section \ref{section:sph_mhd}), 
-\item Data analysis programs,
-	\begin{itemize}
-	\item {\tt sph\_snapshot} (See Section \ref{section:sph_snapshot}),
-	\item {\tt sph\_dynamobench} (See Section \ref{section:check_bench}),
-	\item {\tt sectioning} (See Section \ref{sec:sectioning}),
- 	\item {\tt field\_to\_VTK} (See Section \ref{sec:field_to_VTK}),
- 	\item {\tt psf\_to\_VTK} (See Section \ref{section:psf_to_VTK}),
- 	\item {\tt assemble\_sph} (See Section \ref{section:assemble_sph}),
- 	\item {\tt t\_ave\_sph\_mean\_square} (See Section \ref{sec:ave_mean_square}),
- 	\item {\tt t\_ave\_picked\_sph\_coefs} (See Section \ref{sec:ave_picked_spectr}),
- 	\item {\tt t\_ave\_picked\_nusselt} (See Section \ref{sec:ave_nusselt}),
-	\end{itemize}
-\item Utility program to bulid.
-	\begin{itemize}
-	\item {\tt module\_dependency} (See Section \ref{sec:module_dependency}),
-	\end{itemize}
-\end{itemize}
-%
-
-{\color{red} {\bf Caution:} Calypso can save data files into subdirectories where is defined in control files. However, These directories have to prepare before the simulations because Fortran does not have a feature to make a new directory.}
-
 \newpage
-\subsection{Preprocessing program ({\tt gen\_sph\_grid})}
-\label{section:gen_sph_grid}
-%
-From Ver. 2, the spherical harmonic indices data is not necessary if the parameters for the spherical shell described below is included in the control for the simulation. However, This program \verb|gen_sph_grid| is still useful for debug and I will describe how to set up the parallelization in this subsection.
-%
-\begin{verbatim}
-\end{verbatim}
-%
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics*[width=130mm]{Images/flow_1}
-\end{center}
-\caption{Generated files by preprocessing program in Data flow.}
-\label{fig:gen_sph_grid}
-\end{figure}
-%
-This program generates index table and a communication table for parallel spherical harmonics, table of integrals for Coriolis term, and FEM mesh information to generate visualization data (see Figure \ref{fig:gen_sph_grid}). This program needs control file for input. This program can perform with {\bf any} number of MPI processes less than the number of subdomains, but is required to run with the SAME number of subdomains to generate MERGED data . The output files include the indexing tables. 
-
-%
-\begin{table}[htp]
-\caption{List of files for {\tt gen\_sph\_grid} }
-\begin{center} 
-\begin{tabular}{|c|c|c|c|}
-\hline
-Files & extension & Parallelization & I/O \\ \hline \hline
-Control file & \verb|control_sph_grid| & Single & Input \\ \hline
-Index for $(r,j)$ & \verb|[sph_prefix].[rj_extension]| & - & Output \\
-Index for $(r,l,m)$ & \verb|[sph_prefix].[rlm_extension]| & - & Output \\
-Index for $(r,t,m)$ & \verb|[sph_prefix].[rtm_extension]| & - & Output \\
-Index for $(r,t,p)$ & \verb|[sph_prefix].[rtp_extension]| & - & Output \\ \hline
-FEM mesh & \verb|[sph_prefix].[fem_extension]| & - & Output \\ \hline
-Radial point list & \verb|radial_info.dat| & Single & Output \\ \hline
-\end{tabular}
-\end{center}
-\label{table:gen_sph_grid}
-\end{table}
-%
-%
-\begin{table}[htp]
-\caption{data format flag {[\tt sph\_file\_fmt\_ctl]} and extensions.}
-\begin{center} 
-\begin{tabular}{|c||c|c|c|c|}
-\hline
-  \multicolumn{5}{|c|}{Distributed files} \\ \hline
-  \verb|[sph_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|bin_gz| \\ \hline
-\verb|[rj_extension]|  & \verb|[#].rj|  & \verb|[#].brj| & \verb|[#].rj.gz|  & \verb|[#].brj.gz| \\
-\verb|[rlm_extension]| & \verb|[#].rlm| & \verb|[#].blm| & \verb|[#].rlm.gz| & \verb|[#].blm.gz| \\
-\verb|[rtm_extension]| & \verb|[#].rtm| & \verb|[#].btm| & \verb|[#].rtm.gz| & \verb|[#].btm.gz| \\
-\verb|[rtp_extension]| & \verb|[#].rtp| & \verb|[#].btp| & \verb|[#].rtp.gz| & \verb|[#].btp.gz| \\ \hline
-\verb|[fem_extension]| & \verb|[#].gfm| & \verb|[#].gfb| & \verb|[#].gfm.gz| & \verb|[#].gfb.gz| \\ \hline \hline
-  \multicolumn{5}{|c|}{Single file}  \\ \hline
-  \verb|[sph_file_fmt_ctl]| & \verb|merged| & \verb|merged_bin| & \verb|merged_gz| & \verb|merged_bin_gz| \\ \hline
-\verb|[rj_extension]|   & \verb|.rj|  & \verb|.brj| & \verb|.rj.gz|  & \verb|.brj.gz| \\
-\verb|[rlm_extension]| & \verb|.rlm| & \verb|.blm| & \verb|.rlm.gz| & \verb|.blm.gz| \\
-\verb|[rtm_extension]| & \verb|.rtm| & \verb|.btm| & \verb|.rtm.gz| & \verb|.btm.gz| \\
-\verb|[rtp_extension]| & \verb|.rtp| & \verb|.btp| & \verb|.rtp.gz| & \verb|.btp.gz| \\ \hline
-\verb|[fem_extension]| & \verb|.gfm| & \verb|.gfb| & \verb|.gfm.gz| & \verb|.gfb.gz| \\ \hline \hline
-  \multicolumn{5}{c}{{\tt [\#]} is the domain or process number} \\
-\end{tabular}
-\end{center}
-\label{table:mesh_format}
-\end{table}
 %
 
-My favorite (recommend) data format is \verb|merged_gz|, because we can reduce the number of files in one directory and check the data by using \verb|gunzip -c| command.
-%
-
-\subsubsection{Position of radial grid}
-The preprocessing program sets the radial grid spacing, either by a list in the control file or by setting an equidistant grid or Chebyshev collocation points.
-
-In equidistance grid, radial grids are defined by
-%
-\begin{eqnarray}
-r(k) & = & r_{i} + \left(r_{o}-r_{i} \right) \frac{k-k_{ICB}}{N},
-\nonumber
-\end{eqnarray}
-%
-where, $k_{ICB}$ is the grid points number at ICB. The radial grid set from the closest points of minimum radius defined by \hyperref[href_i:Min_radius_ctl]{\tt [Min\_radius\_ctl]} in control file to the closest points of the maximum radius defined by \hyperref[href_i:Max_radius_ctl]{\tt [Max\_radius\_ctl]} in control file, and radial grid number for the innermost points is set to $k = 1$.
-
-In Chebyshev collocation points, radial grids in the fluid shell are defined by
-%
-\begin{eqnarray}
-r(k) & = & r_{i} + \frac{\left(r_{o}-r_{i} \right)}{2} \left[ \frac{1}{2} - \cos \left(\pi \frac{ k-k_{ICB}}{N} \right) \right],
-\nonumber
-\end{eqnarray}
-%
-For the inner core ($r<r_{i}$), grid points is defined by
-%
-\begin{eqnarray}
-r(k) & = & r_{i} - \frac{\left(r_{o}-r_{i} \right)}{2} \left[ \frac{1}{2} - \cos \left(\pi \frac{ k-k_{ICB}}{N} \right) \right],
-\nonumber
-\end{eqnarray}
-%
-and, grid points in the external of the shell ($r>r_{o}$) is defined by
-%
-\begin{eqnarray}
-r(k) & = & r_{o} + \frac{\left(r_{o}-r_{i} \right)}{2} \left[ \frac{1}{2} - \cos \left(\pi \frac{ k-k_{CMB}}{N} \right) \right],
-\nonumber
-\end{eqnarray}
-%
-where, $k_{CMB}$ is the grid point number at CMB.
-
-\subsubsection{Control file (\tt{control\_sph\_shell})}
-Control files for Calypso consists of blocks starting and ending with \verb|begin| and \verb|end|, respectively. Entities with more than one components are defined between \verb|begin array| and \verb|end array| flags. The number of components of an array must be defined at \verb|begin array| line. If blocks to be defined in an external file, the external file name is defined by \verb|file| flag. 
-
-\label{section:control_sph_shell}
-Control file ({\tt control\_sph\_shell}) consists the following items. Detailed description for each item can be checked by clicking each item.
-\\
-%
-\verb|spherical_shell_ctl|
-\label{href_i:spherical_shell_ctl}
-\\
-\\
-%
-Block {\tt MHD\_control} (Top block of the control file)
-	\begin{itemize}
-	\item Block \hyperref[href_t:data_files_def]{\tt data\_files\_def}
-%
-		\begin{itemize} \label{href_i:data_files_def2}
-		\item \hyperref[href_t:num_subdomain_ctl]{\tt num\_subdomain\_ctl    [Num\_PE]}
-		\item \hyperref[href_t:sph_file_prefix]{\tt sph\_file\_prefix    [sph\_prefix]}
-		\item \hyperref[href_t:sph_file_fmt_ctl]{\tt sph\_file\_fmt\_ctl    [sph\_format]}
-		\end{itemize}
-%
-	\item File \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl    [resolution\_control]}
-	\item or Block \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
-%
-		\begin{itemize}
-		\item (Block \hyperref[href_t:FEM_mesh_ctl]{\tt FEM\_mesh\_ctl})
-		\begin{itemize} \label{href_i:FEM_mesh_ctl}
-		\item (\hyperref[href_t:FEM_mesh_output_switch]{\tt FEM\_mesh\_output\_switch [ON or OFF]})
-		\end{itemize}
-%
-		\item Block \hyperref[href_t:num_domain_ctl]{\tt num\_domain\_ctl}
-			\begin{itemize} \label{href_i:num_domain_ctl}
-			\item \hyperref[href_t:ordering_set_ctl]{\tt ordering\_set\_ctl [ORDERING\_SET]}
-
-			\item \hyperref[href_t:num_radial_domain_ctl]{\tt num\_radial\_domain\_ctl [Ndomain]}
-			\item \hyperref[href_t:num_horizontal_domain_ctl]{\tt num\_horizontal\_domain\_ctl [Ndomain]}
-%
-            		\item {\color{magenta} Array \hyperref[href_t:num_domain_sph_grid]
-				{\tt num\_domain\_sph\_grid    [Direction]    [Ndomain]} \\
-				(Depricated)}
-			\item {\color{magenta} Array \hyperref[href_t:num_domain_legendre]
-				{\tt num\_domain\_legendre    [Direction]    [Ndomain]} \\
-				(Depricated)}
-			\item {\color{magenta} Array \hyperref[href_t:num_domain_spectr]
-				{\tt num\_domain\_spectr      [Direction]    [Ndomain]} \\
-				(Depricated)}
-			\end{itemize}
-%
-		\item Block \hyperref[href_t:num_grid_sph]{\tt num\_grid\_sph}
-			\begin{itemize} \label{href_i:num_grid_sph}
-	        \item \hyperref[href_t:truncation_level_ctl]{\tt truncation\_level\_ctl	[Lmax]}
-			\item \hyperref[href_t:ngrid_meridonal_ctl]{\tt ngrid\_meridonal\_ctl [Ntheta]}
-			\item \hyperref[href_t:ngrid_zonal_ctl]{\tt ngrid\_zonal\_ctl [Nphi]}
-%
-			\item \hyperref[href_t:radial_grid_type_ctl]{\tt radial\_grid\_type\_ctl} \\
-				\verb|[explicit, Chebyshev, or equi_distance]| \label{href_i:radial_grid_type_ctl}
-%
-			\item \hyperref[href_t:num_fluid_grid_ctl]{\tt num\_fluid\_grid\_ctl  [Nr\_shell]}
-			\item \hyperref[href_t:fluid_core_size_ctl]{\tt fluid\_core\_size\_ctl  [Length]}
-			\item \hyperref[href_t:ICB_to_CMB_ratio_ctl]{\tt ICB\_to\_CMB\_ratio\_ctl  [R\_ratio]}
-			\item \hyperref[href_t:Min_radius_ctl]{\tt Min\_radius\_ctl  [Rmin]}    
-				\label{href_i:Min_radius_ctl}
-			\item \hyperref[href_t:Max_radius_ctl]{\tt Max\_radius\_ctl  [Rmax]}    
-				\label{href_i:Max_radius_ctl}
-%
-\\
-			\item Array \hyperref[href_t:r_layer]{\tt r\_layer  [Layer \#]  [Radius]}    
-%
-			\item Array \hyperref[href_t:boundaries_ctl]{\tt boundaries\_ctl  [Boundary\_name]  [Layer \#]}    
-			\end{itemize}
-		\end{itemize}
-	\end{itemize}
-
-If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined, the following arrays \verb|num_domain_sph_grid|, \verb|num_domain_legendre|, and \verb|num_domain_spectr| are not necessary. \\
-(see \hyperref[href_t:gen_w_innercore]{example} \verb|spherical_shell/with_inner_core|)
-
-The external file for resoultion and parallelization information \verb|[resolution_control]| needs the following contorl blocks:
-%
-	\begin{itemize}
-	\item Block \hyperref[href_i:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
-		\begin{itemize}
-		\item Block \hyperref[href_i:FEM_mesh_ctl]{\tt FEM\_mesh\_ctl}
-		\item Block \hyperref[href_i:num_domain_ctl]{\tt num\_domain\_ctl}
-		\item Block \hyperref[href_i:num_grid_sph]{\tt num\_grid\_sph}
-		\end{itemize}
-	\end{itemize}
-%
-\subsubsection{Spectrum index data}
-\verb|gen_sph_grid| generates indexing table of the spherical transform. To perform spherical harmonics transform with distributed memory computers, data communication table is also included in these files. Calypso needs four indexing data for the spherical transform.
-%
-\begin{description}
-\item{\verb|[sph_prefix].[rj_extension]|} Indexing table for spectrum data $f(r,l,m)$ to calculate linear terms. In program,  spherical harmonics modes $(l,m)$ is indexed by $j = l(l+1) + m$. The spectrum data are decomposed by spherical harmonics modes $j$. Data communication table for Legendre transform is included. The data also have the radial index of the ICB and CMB. Extension \verb|[rj_extension]| is listed in Table \ref{table:mesh_format}.
-\item{\verb|[sph_prefix].[rlm_extension]|} Indexing table for spectrum data $f(r,l,m)$ for Legendre transform. The spectrum data are decomposed by radial direction $r$ and spherical harmonics order $m$. Data communication table to caricurate liner terms is included. Extension \verb|[rlm_extension]| is listed in Table \ref{table:mesh_format}.
-\item{\verb|[sph_prefix].[rtm_extension]|} Indexing table for data $f(r,\theta,m)$ for Legendre transform. The data are decomposed by radial direction $r$ and spherical harmonics order $m$. Data communication table for backward Fourier transform is included. Extension \verb|[rtm_extension]| is listed in Table \ref{table:mesh_format}.
-\item{\verb|[sph_prefix].[rtp_extension]|} Indexing table for data $f(r,\theta,m)$ for Fourier transform and field data $f(r,\theta,\phi)$. The data are decomposed by radial direction $r$ and meridional direction $\theta$. Data communication table for forward Legendre transform is included. Extension \verb|[rtp_extension]| is listed in Table \ref{table:mesh_format}.
-\end{description}
-%
-
-\subsubsection{Finite element mesh data (optional)}
-Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written based on GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. The extension of the mesh file is listed in Table \ref{table:mesh_format}. This mesh data is only used in the programs \hyperref[sec:sectioning]{\tt sectioning} and \verb|field_to_VTK|.
-
-\subsubsection{Radial grid data}
-The preprocessing program generates radius of each layer in \verb|radial_info.dat| if \verb|radial_grid_type_ctl| is set to \verb|Chebyshev| or \verb|equi_distance|. This file consists of blocks \verb|array r_layer| and \verb|array boundaries_ctl| for control file. This data may be useful if you want to modify radial grid spacing by yourself.
-
-\subsubsection{How to define spatial resolution and parallelization?}
-  Calypso uses spherical harmonics expansion method and in horizontal discretization and finite difference methods in the radial direction. In the spherical harmonics expansion methods, nonlinear terms are solved in the grid space while time integration and diffusion terms are solved in the spectrum space. We need to set truncation degree $l_{max}$ of the spherical harmonics and number of grids in the three direction $(N_{r}, N_{\theta}, N_{\phi})$ in the preprocessing program. The following condition is required (or recommended) for $l_{max}$ and $(N_{r}, N_{\theta}, N_{\phi})$. $l_{max}$ is defined by \verb|truncation_level_ctl|, and $N_{r}$ for the fluid shell (outer core) is defined by  \verb|num_fluid_grid_ctl|.  $N_{\theta}$ and $N_{\phi}$ is defined by \verb|ngrid_meridonal_ctl| and \verb|ngrid_zonal_ctl|, respectively.
-%
-\begin{itemize}
-\item $N_{\phi} = 2 N_{\theta}$.
-\item $N_{\theta}$ must be more than $l_{max}+1$, but
-\item To eliminate aliasing in the spherical transform, $N_{\theta} \ge 1.5 \left( l_{max}+1 \right)$ is highly recommended.
-\item $N_{\phi}$ should consists of products among power of 2, power of 3, and power of 5.
-\end{itemize}
-%
-%
-\begin{figure}[htbp]
-\begin{center}
-\includegraphics*[width=130mm]{Images/parallelize}
-\end{center}
-\caption{Parallelization and data communication in Calypso in the case using 9 (3x3) processors. Data are decomposed in radial and meridional direction for nonlinear term evaluations, decomposed in radial and harmonic order for Legendre transform, and decomposed in spherical harmonics for linear calculations.}
-\label{fig:parallelization}
-\end{figure}
-%
-Calypso is parallelized 2-dimensionally and direction of the parallelization is changed in the operations in the spherical transform (See Figure \ref{fig:parallelization}). Two dimensional parallelization delivers many parallelize configuration. Here is the approach  how to find the best configuration:
-%
-\begin{itemize}
-\item Maximum parallelization level in horizontal direction is $\left( l_{max} + 1 \right)  /2$,  and $N_{r}+1$ is the maximum level in radial direction.
-\item Decompose number of radial points $N_{r}+1$ and truncation degree $\left( l_{max} + 1 \right) / 2 $ into prime numbers.
-\item Decide number of MPI processes from the prime numbers.
-\item Choose the number of decomposition in the radial and horizontal direction as close as possible.
-\end{itemize}
-% 
-Here is an example for the case with $(N_{r}, l_{max}) = (89, 95)$. The maximum number of parallelization is $90 \times 48  = 4320$ processes.  $N_{r}+1$ and $\left( l_{max} + 1 \right)  /2$ can be decomposed into $90 = 2 \times 3^2 \times 5$ and $48 = 2^4 \times 3 $. Now, if 160 processes run is intended, $160 = 10 \times 16$ is the closest number of decompositions. Comparing with the prime numbers of the spatial resolution, radial and horizontal decomposition will be 10 and 16, respectively.
-
-\newpage
-\subsection{Simulation program ({\tt sph\_mhd})}
+\section{Simulation program ({\tt sph\_mhd})}
 \label{section:sph_mhd}
 %
 
-The name of the simulation program is {\tt sph\_mhd}. This program requires {\tt control\_MHD} as a Control file. This program performs with the indexing file for spherical harmonics and Coriolis term integration file generated by the preprocessing program {\tt gen\_sph\_grid}.
+The name of the simulation program is {\tt sph\_mhd}. This program requires {\tt control\_MHD} as a Control file. This program performs with the paramer file {\tt control\_MHD}, boundary condition data file \verb|[boundary_data_name]| (optional), and  indexing file for spherical harmonics generated by the preprocessing program {\tt gen\_sph\_grid} (optional).
 %
 \begin{figure}[htbp]
 \begin{center}
@@ -292,12 +24,6 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 \hline
  name & Parallelization & I/O \\ \hline \hline
 \verb|control_MHD| & Serial & Input \\ \hline
-\verb|[sph_prefix].[rj_extension]|  & - & Input / (Output) \\
-\verb|[sph_prefix].[rlm_extension]| & - & Input / (Output) \\
-\verb|[sph_prefix].[rtm_extension]| & - & Input / (Output) \\
-\verb|[sph_prefix].[rtp_extension]| & - & Input / (Output) \\ \hline
-\verb|[sph_prefix].[fem_extension]| & - & (Input / Output) \\ \hline
-\verb|[boundary_data_name]| & Single & Input \\ \hline
 \verb|[rst_prefix].[step #].[rst_extension]| &  - & Input/Output  \\ \hline
 \verb|[vol_pwr_prefix]_s.dat| & Single & Output \\ \hline
 \verb|[vol_pwr_prefix]_l.dat| & Single & Output \\
@@ -322,27 +48,30 @@ Data files for this program are listed in Table \ref{table:sph_mhd}. Indexing da
 %
 %
 \begin{table}[htp]
-\caption{data format flag {[\tt restart\_file\_fmt\_ctl]} and extensions for the restart file. An example of data size and output time is also listed.}
+\caption{List of optional files {\tt sph\_mhd} }
 \begin{center} 
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|c|c|c|}
 \hline
-File format & \verb|[sph_file_fmt_ctl]|  & \verb|extension| & size (MByte) & time (sec)  \\ \hline \hline
-              &  \verb|ascii| & \verb|[#].fld|  & 1,286 & 7.10 \\
-Parallel  &  \verb|binary| & \verb|[#].flb|  & 410 & 2.36 \\
-              &  \verb|gzip| &  \verb|[#].fld.gz| & 418 &  4.65 \\
-              &  \verb|bin_gz| &\verb|[#].flb.gz| & 336 &  2.84 \\ \hline
-              & \verb|merged|  &  \verb|.fld| & 1,312 & 50.2 \\
-Merged  &  \verb|merged_bin| &  \verb|.flb| & 413 &  2.34 \\
-              &  \verb|merged_gz| &  \verb|.fld.gz| & 455 & 8.60 \\
-              &  \verb|merged_bin_gz| &  \verb|.flb.gz| & 340 & 3.57 \\ \hline
+ name & Parallelization & I/O \\ \hline \hline
+\verb|[boundary_data_name]| & Single & Input \\ \hline
+\verb|[sph_prefix].[rj_extension]|  & - & Input / (Output) \\
+\verb|[sph_prefix].[rlm_extension]| & - & Input / (Output) \\
+\verb|[sph_prefix].[rtm_extension]| & - & Input / (Output) \\
+\verb|[sph_prefix].[rtp_extension]| & - & Input / (Output) \\ \hline
+\verb|[sph_prefix].[fem_extension]| & - & (Input / Output) \\ \hline
 \end{tabular}
 \end{center}
-\label{table:restart_format}
+\label{table:sph_mhd_optional}
 \end{table}
 %
+
+{\color{red} {\bf Caution:} Calypso can save data files into subdirectories where is defined in control files. However, These directories have to prepare before the simulations because Fortran does not have a feature to make a new directory.}
+
 %
 \newpage
-\subsubsection{Control file}
+\subsection{Control file}
+Control files for Calypso consists of blocks starting and ending with \verb|begin| and \verb|end|, respectively. Entities with more than one components are defined between \verb|begin array| and \verb|end array| flags. The number of components of an array must be defined at \verb|begin array| line. If blocks to be defined in an external file, the external file name is defined by \verb|file| flag. 
+
 The format of the control file \verb|control_MHD| is described below. The detail of each block is described in section \ref{section:def_control}. You can jump to detailed description by clicking each item. \\
 \\
 %
@@ -380,11 +109,11 @@ Block \verb|MHD_control|  (Top block of the control file)
 			{\tt spherical\_shell\_ctl        [resolution\_control]})
 	\begin{itemize}
 	\item (Block \hyperref[href_i:FEM_mesh_ctl]
-        {\tt FEM\_mesh\_ctl} See Section \ref{section:gen_sph_grid})
+        {\tt FEM\_mesh\_ctl} See Section \ref{section:resolution_block})
 	\item (Block \hyperref[href_i:num_domain_ctl]
-		{\tt num\_domain\_ctl} See Section \ref{section:gen_sph_grid})
+		{\tt num\_domain\_ctl} See Section \ref{section:resolution_block})
 	\item (Block \hyperref[href_i:num_grid_sph]
-		{\tt num\_grid\_sph} See Section \ref{section:gen_sph_grid})
+		{\tt num\_grid\_sph} See Section \ref{section:resolution_block})
 	\end{itemize}
 %
 \item Block \verb|model|
@@ -556,8 +285,13 @@ Block \verb|MHD_control|  (Top block of the control file)
 			{\tt volume\_average\_prefix        [vol\_ave\_prefix]}
 	\item \hyperref[href_t:volume_pwr_spectr_prefix]
 			{\tt volume\_pwr\_spectr\_prefix    [vol\_pwr\_prefix]}
+	\item \hyperref[href_t:volume_pwr_spectr_format]
+			{\tt volume\_pwr\_spectr\_format    [file\_format]}
+%
 	\item \hyperref[href_t:nusselt_number_prefix]
 			{\tt nusselt\_number\_prefix        [nusselt\_number\_prefix]}
+	\item \hyperref[href_t:nusselt_number_format]
+			{\tt nusselt\_number\_format    [file\_format]}
 %
 	\item Array \hyperref[href_t:volume_spectrum_ctl]{\tt volume\_spectrum\_ctl}
 		\begin{itemize}
@@ -567,6 +301,9 @@ Block \verb|MHD_control|  (Top block of the control file)
 				{\tt volume\_average\_prefix      [vol\_ave\_prefix]}
 			\item \hyperref[href_t:volume_pwr_spectr_prefix]
 				{\tt volume\_pwr\_spectr\_prefix  [vol\_pwr\_prefix]}
+        	\item \hyperref[href_t:volume_pwr_spectr_format]
+		    	{\tt volume\_pwr\_spectr\_format    [file\_format]}
+%
 			\item \hyperref[href_t:inner_radius_ctl]
 				{\tt inner\_radius\_ctl           [radius]}
 			\item \hyperref[href_t:outer_radius_ctl]
@@ -578,7 +315,9 @@ Block \verb|MHD_control|  (Top block of the control file)
 		\begin{itemize}
 		\item \hyperref[href_t:layered_pwr_spectr_prefix]
 				{\tt layered\_pwr\_spectr\_prefix         [layer\_pwr\_prefix]}
-			\item Array \hyperref[href_t:spectr_layer_ctl]
+       	\item \hyperref[href_t:layered_pwr_spectr_format]
+		    	{\tt volume\_pwr\_spectr\_format    [file\_format]}
+		\item Array \hyperref[href_t:spectr_layer_ctl]
 				{\tt spectr\_layer\_ctl [Layer \#] }
 		\end{itemize}
 %
@@ -586,6 +325,8 @@ Block \verb|MHD_control|  (Top block of the control file)
 		\begin{itemize}
 		\item \hyperref[href_t:gauss_coefs_prefix]
 			{\tt gauss\_coefs\_prefix                [gauss\_coef\_prefix]}
+       	\item \hyperref[href_t:gauss_coefs_format]
+		    	{\tt gauss\_coefs\_format    [file\_format]}
 		\item \hyperref[href_t:gauss_coefs_radius_ctl]
             {\tt gauss\_coefs\_radius\_ctl           [gauss\_coef\_radius]}
 			\item Array \hyperref[href_t:pick_gauss_coefs_ctl]
@@ -600,6 +341,8 @@ Block \verb|MHD_control|  (Top block of the control file)
 		\begin{itemize}
 		\item \hyperref[href_t:picked_sph_prefix]
 			{\tt picked\_sph\_prefix                    [picked\_sph\_prefix]|}
+       	\item \hyperref[href_t:picked_sph_format]
+		    	{\tt picked\_sph\_format     [file\_format]}
 		\item Array \hyperref[href_t:pick_layer_ctl]
 					{\tt pick\_layer\_ctl               [Layer \#]}
 		\item Array \hyperref[href_t:pick_sph_spectr_ctl]
@@ -608,6 +351,16 @@ Block \verb|MHD_control|  (Top block of the control file)
 					{\tt pick\_sph\_degree\_ctl         [Degree]}
 		\item Array \hyperref[href_t:pick_sph_order_ctl]
 					{\tt pick\_sph\_order\_ctl          [Order]}
+		\end{itemize}
+%
+	\item Block \hyperref[href_t:sph_dipolarity_ctl]{\tt sph\_dipolarity\_ctl}
+		\begin{itemize}
+		\item \hyperref[href_t:dipolarity_file_prefix]
+			{\tt dipolarity\_file\_prefix                    [dipolarity\_file\_prefix]|}
+       	\item \hyperref[href_t:dipolarity_file_format]
+		    	{\tt dipolarity\_file\_format     [file\_format]}
+		\item Array \hyperref[href_t:dipolarity_truncation_ctl]
+					{\tt dipolarity\_truncation\_ctl               [Degree]}
 		\end{itemize}
 %
 	\item Block \hyperref[href_t:mid_equator_monitor_ctl]
@@ -659,10 +412,165 @@ Block \verb|MHD_control|  (Top block of the control file)
 	\end{itemize}
 \end{itemize}
 %
-\verb|spherical_shell_ctl| block is required if spherical harmonics indexing files are not exist.
 %
-\subsubsection{Spectrum data for restarting}
-Spectrum data is used for restarting data and generating field data by Data transform program \verb|sph_snapshot|, \verb|sph_zm_snapshot|, or \verb|sph_dynamobench|. This file is saved for each subdomain (MPI processes), then \verb|[step #]| and \verb|[domain #]| are added in the file name. The \verb|[step #]| is calculated by \verb|time step| / \verb|[ISTEP_RESTART]|. Data format is defined by \verb|[restart_file_fmt_ctl]| as shown in Table \ref{table:restart_format}.
+%
+\subsubsection{Spatial resolution definition block}
+\label{section:resolution_block}
+
+Geometry of spherical shell, spatial resolution, and parallelization is defined in the block named \verb|spherical_shell_ctl|. The \verb|spherical_shell_ctl| block can be included into the file {\tt control\_MHD} or saved into another file.  if the \verb|spherical_shell_ctl| block in the independent file {\tt [resolution\_control]}, the file name is defined by
+%
+\begin{itemize}
+\item {\tt   file    spherical\_shell\_ctl        [resolution\_control]})
+\end{itemize}
+The \verb|spherical_shell_ctl| block consists of the following parameters
+%
+\verb|spherical_shell_ctl|
+\label{href_i:spherical_shell_ctl}
+\\
+\\
+%
+Block \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
+%
+		\begin{itemize}
+		\item (Block \hyperref[href_t:FEM_mesh_ctl]{\tt FEM\_mesh\_ctl})
+		\begin{itemize} \label{href_i:FEM_mesh_ctl}
+		\item (\hyperref[href_t:FEM_mesh_output_switch]{\tt FEM\_mesh\_output\_switch [ON or OFF]})
+		\end{itemize}
+%
+		\item Block \hyperref[href_t:num_domain_ctl]{\tt num\_domain\_ctl}
+			\begin{itemize} \label{href_i:num_domain_ctl}
+			\item \hyperref[href_t:ordering_set_ctl]{\tt ordering\_set\_ctl [ORDERING\_SET]}
+
+			\item \hyperref[href_t:num_radial_domain_ctl]{\tt num\_radial\_domain\_ctl [Ndomain]}
+			\item \hyperref[href_t:num_horizontal_domain_ctl]{\tt num\_horizontal\_domain\_ctl [Ndomain]}
+%
+            		\item {\color{magenta} Array \hyperref[href_t:num_domain_sph_grid]
+				{\tt num\_domain\_sph\_grid    [Direction]    [Ndomain]} \\
+				(Depricated)}
+			\item {\color{magenta} Array \hyperref[href_t:num_domain_legendre]
+				{\tt num\_domain\_legendre    [Direction]    [Ndomain]} \\
+				(Depricated)}
+			\item {\color{magenta} Array \hyperref[href_t:num_domain_spectr]
+				{\tt num\_domain\_spectr      [Direction]    [Ndomain]} \\
+				(Depricated)}
+			\end{itemize}
+%
+		\item Block \hyperref[href_t:num_grid_sph]{\tt num\_grid\_sph}
+			\begin{itemize} \label{href_i:num_grid_sph}
+	        \item \hyperref[href_t:truncation_level_ctl]{\tt truncation\_level\_ctl	[Lmax]}
+			\item \hyperref[href_t:ngrid_meridonal_ctl]{\tt ngrid\_meridonal\_ctl [Ntheta]}
+			\item \hyperref[href_t:ngrid_zonal_ctl]{\tt ngrid\_zonal\_ctl [Nphi]}
+%
+			\item \hyperref[href_t:radial_grid_type_ctl]{\tt radial\_grid\_type\_ctl} \\
+				\verb|[explicit, Chebyshev, or equi_distance]| \label{href_i:radial_grid_type_ctl}
+%
+			\item \hyperref[href_t:num_fluid_grid_ctl]{\tt num\_fluid\_grid\_ctl  [Nr\_shell]}
+			\item \hyperref[href_t:fluid_core_size_ctl]{\tt fluid\_core\_size\_ctl  [Length]}
+			\item \hyperref[href_t:ICB_to_CMB_ratio_ctl]{\tt ICB\_to\_CMB\_ratio\_ctl  [R\_ratio]}
+			\item \hyperref[href_t:Min_radius_ctl]{\tt Min\_radius\_ctl  [Rmin]}    
+				\label{href_i:Min_radius_ctl}
+			\item \hyperref[href_t:Max_radius_ctl]{\tt Max\_radius\_ctl  [Rmax]}    
+				\label{href_i:Max_radius_ctl}
+%
+\\
+			\item Array \hyperref[href_t:r_layer]{\tt r\_layer  [Layer \#]  [Radius]}    
+%
+			\item Array \hyperref[href_t:boundaries_ctl]{\tt boundaries\_ctl  [Boundary\_name]  [Layer \#]}    
+			\end{itemize}
+		\end{itemize}
+
+If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined, the following arrays \verb|num_domain_sph_grid|, \verb|num_domain_legendre|, and \verb|num_domain_spectr| are not necessary. \\
+(see \hyperref[href_t:gen_w_innercore]{example} \verb|spherical_shell/with_inner_core|)
+
+The external file for resoultion and parallelization information \verb|[resolution_control]| needs the following contorl blocks:
+%
+	\begin{itemize}
+	\item Block \hyperref[href_i:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
+		\begin{itemize}
+		\item Block \hyperref[href_i:FEM_mesh_ctl]{\tt FEM\_mesh\_ctl}
+		\item Block \hyperref[href_i:num_domain_ctl]{\tt num\_domain\_ctl}
+		\item Block \hyperref[href_i:num_grid_sph]{\tt num\_grid\_sph}
+		\end{itemize}
+	\end{itemize}
+%
+%
+Calypso obtains resolution and parallelization information in the following order:
+\begin{description}
+\item[Step 1:] If spherical harmonics indexing files {\tt  [sph\_prefix]} defined by
+\hyperref[href_t:sph_file_prefix]{\tt sph\_file\_prefix    [sph\_prefix]}  are exist, read these files and go to simulation.
+\item[Step 2:] If files  {\tt  [sph\_prefix]} does not exist, construct resolution and parallelization information from the parameters in \verb|spherical_shell_ctl| block.
+\item[Step 3:] If the parameter \hyperref[href_t:sph_file_prefix]{\tt sph\_file\_prefix    [sph\_prefix]}  is defined, the spherical harmonics indexing files {\tt  [sph\_prefix]} are written (not necessary). 
+\end{description}
+%
+Various data format can be chosen for the spherical harmonic indexing files  {\tt  [sph\_prefix]} (see Section \ref{section:gen_sph_grid}).
+%
+\subsubsection{Position of radial grid}
+The preprocessing program sets the radial grid spacing, either by a list in the control file or by setting an equidistant grid or Chebyshev collocation points.
+
+In equidistance grid, radial grids are defined by
+%
+\begin{eqnarray}
+r(k) & = & r_{i} + \left(r_{o}-r_{i} \right) \frac{k-k_{ICB}}{N},
+\nonumber
+\end{eqnarray}
+%
+where, $k_{ICB}$ is the grid points number at ICB. The radial grid set from the closest points of minimum radius defined by \hyperref[href_i:Min_radius_ctl]{\tt [Min\_radius\_ctl]} in control file to the closest points of the maximum radius defined by \hyperref[href_i:Max_radius_ctl]{\tt [Max\_radius\_ctl]} in control file, and radial grid number for the innermost points is set to $k = 1$.
+
+In Chebyshev collocation points, radial grids in the fluid shell are defined by
+%
+\begin{eqnarray}
+r(k) & = & r_{i} + \frac{\left(r_{o}-r_{i} \right)}{2} \left[ \frac{1}{2} - \cos \left(\pi \frac{ k-k_{ICB}}{N} \right) \right],
+\nonumber
+\end{eqnarray}
+%
+For the inner core ($r<r_{i}$), grid points is defined by
+%
+\begin{eqnarray}
+r(k) & = & r_{i} - \frac{\left(r_{o}-r_{i} \right)}{2} \left[ \frac{1}{2} - \cos \left(\pi \frac{ k-k_{ICB}}{N} \right) \right],
+\nonumber
+\end{eqnarray}
+%
+and, grid points in the external of the shell ($r>r_{o}$) is defined by
+%
+\begin{eqnarray}
+r(k) & = & r_{o} + \frac{\left(r_{o}-r_{i} \right)}{2} \left[ \frac{1}{2} - \cos \left(\pi \frac{ k-k_{CMB}}{N} \right) \right],
+\nonumber
+\end{eqnarray}
+%
+where, $k_{CMB}$ is the grid point number at CMB.
+
+\subsubsection{How to define spatial resolution and parallelization?}
+  Calypso uses spherical harmonics expansion method and in horizontal discretization and finite difference methods in the radial direction. In the spherical harmonics expansion methods, nonlinear terms are solved in the grid space while time integration and diffusion terms are solved in the spectrum space. We need to set truncation degree $l_{max}$ of the spherical harmonics and number of grids in the three direction $(N_{r}, N_{\theta}, N_{\phi})$ in the preprocessing program. The following condition is required (or recommended) for $l_{max}$ and $(N_{r}, N_{\theta}, N_{\phi})$. $l_{max}$ is defined by \verb|truncation_level_ctl|, and $N_{r}$ for the fluid shell (outer core) is defined by  \verb|num_fluid_grid_ctl|.  $N_{\theta}$ and $N_{\phi}$ is defined by \verb|ngrid_meridonal_ctl| and \verb|ngrid_zonal_ctl|, respectively.
+%
+\begin{itemize}
+\item $N_{\phi} = 2 N_{\theta}$.
+\item $N_{\theta}$ must be more than $l_{max}+1$, but
+\item To eliminate aliasing in the spherical transform, $N_{\theta} \ge 1.5 \left( l_{max}+1 \right)$ is highly recommended.
+\item $N_{\phi}$ should consists of products among power of 2, power of 3, and power of 5.
+\end{itemize}
+%
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{Images/parallelize}
+\end{center}
+\caption{Parallelization and data communication in Calypso in the case using 9 (3x3) processors. Data are decomposed in radial and meridional direction for nonlinear term evaluations, decomposed in radial and harmonic order for Legendre transform, and decomposed in spherical harmonics for linear calculations.}
+\label{fig:parallelization}
+\end{figure}
+%
+Calypso is parallelized 2-dimensionally and direction of the parallelization is changed in the operations in the spherical transform (See Figure \ref{fig:parallelization}). Two dimensional parallelization delivers many parallelize configuration. Here is the approach  how to find the best configuration:
+%
+\begin{itemize}
+\item Maximum parallelization level in horizontal direction is $\left( l_{max} + 1 \right)  /2$,  and $N_{r}+1$ is the maximum level in radial direction.
+\item Decompose number of radial points $N_{r}+1$ and truncation degree $\left( l_{max} + 1 \right) / 2 $ into prime numbers.
+\item Decide number of MPI processes from the prime numbers.
+\item Choose the number of decomposition in the radial and horizontal direction as close as possible.
+\end{itemize}
+% 
+Here is an example for the case with $(N_{r}, l_{max}) = (89, 95)$. The maximum number of parallelization is $90 \times 48  = 4320$ processes.  $N_{r}+1$ and $\left( l_{max} + 1 \right)  /2$ can be decomposed into $90 = 2 \times 3^2 \times 5$ and $48 = 2^4 \times 3 $. Now, if 160 processes run is intended, $160 = 10 \times 16$ is the closest number of decompositions. Comparing with the prime numbers of the spatial resolution, radial and horizontal decomposition will be 10 and 16, respectively.
+
+\subsubsection{Radial grid data}
+The program generates radius of each layer in \verb|radial_info.dat| if \verb|radial_grid_type_ctl| is set to \verb|Chebyshev| or \verb|equi_distance|. This file consists of blocks \verb|array r_layer| and \verb|array boundaries_ctl| for control file. This data may be useful if you want to modify radial grid spacing by yourself.
 
 \subsubsection{Thermal and compositional boundary condition data file}\label{sec:boundary_file}
 Thermal and compositional heterogeneity at boundaries are defined by a external file named  \verb|[boundary_data_name]|. In this file, temperature, composition, heat flux, or compositional flux at ICB or CMB can be defined by spherical harmonics coefficients. To use boundary conditions in \verb|[boundary_data_name]|, file name is defined by \verb|boundary_data_file_name| column in control file, and boundary condition type \verb|[type]| is set to \verb|fixed_file| or \verb|fixed_flux_file| in \verb|bc_temperature| or \verb|bc_composition| column. By setting \verb|fixed_file| or \verb|fixed_flux_file| in control file, boundary conditions are copied from the file \verb|[boundary_data_name]|.
@@ -725,7 +633,30 @@ CMB
 \end{figure}
 %
 
-\subsubsection{Field data for visualization}
+\subsection{Spectrum data for restarting}
+Spectrum data is used for restarting data and generating field data by Data transform program \verb|sph_snapshot|, \verb|sph_zm_snapshot|, or \verb|sph_dynamobench|. This file is saved for each subdomain (MPI processes), then \verb|[step #]| and \verb|[domain #]| are added in the file name. The \verb|[step #]| is calculated by \verb|time step| / \verb|[ISTEP_RESTART]|. Data format is defined by \verb|[restart_file_fmt_ctl]| as shown in Table \ref{table:restart_format}.
+%
+\begin{table}[htp]
+\caption{data format flag {[\tt restart\_file\_fmt\_ctl]} and extensions for the restart file. An example of data size and output time is also listed.}
+\begin{center} 
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+File format & \verb|[sph_file_fmt_ctl]|  & \verb|extension| & size (MByte) & time (sec)  \\ \hline \hline
+              &  \verb|ascii| & \verb|[#].fld|  & 1,286 & 7.10 \\
+Parallel  &  \verb|binary| & \verb|[#].flb|  & 410 & 2.36 \\
+              &  \verb|gzip| &  \verb|[#].fld.gz| & 418 &  4.65 \\
+              &  \verb|bin_gz| &\verb|[#].flb.gz| & 336 &  2.84 \\ \hline
+              & \verb|merged|  &  \verb|.fld| & 1,312 & 50.2 \\
+Merged  &  \verb|merged_bin| &  \verb|.flb| & 413 &  2.34 \\
+              &  \verb|merged_gz| &  \verb|.fld.gz| & 455 & 8.60 \\
+              &  \verb|merged_bin_gz| &  \verb|.flb.gz| & 340 & 3.57 \\ \hline
+\end{tabular}
+\end{center}
+\label{table:restart_format}
+\end{table}
+%
+
+\subsection{Field data for visualization}
 \label{sec:VTK}
 Field data is used for the visualization processes. Field data are written with XDMF format (\url{http://www.xdmf.org/index.php/Main_Page}), merged VTK, or distributed VTK format (\url{http://www.vtk.org/VTK/img/file-formats.pdf}). The output data format is defined by \verb|fld_format|. Visualization applications which we checked are listed in Table \ref{table:Viz_app}. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, coordinate conversion is required to plot vector field in spherical coordinate $(r, \theta, \phi)$ or cylindrical coordinate $(s,\phi, z)$. We will introduce a example of visualization process using ParaView in Section \ref{sec:paraview}. Field data also output merged ASCII or binary format including compression using zlib. These original formats have smaller file size than VTK format because of excluding grid information. Program \hyperref[sec:field_to_VTK]{\tt field\_to\_VTK} generates VTK file from FEM mesh data and field data.
 %
@@ -886,7 +817,7 @@ Parallel  &  \verb|gzip| &  \verb|[#].fld.gz| & 3.25 &  40.6 \\
 %
 
 %
-\subsubsection{Cross section data (Parallel Surfacing module)}
+\subsection{Cross section data (Parallel Surfacing module)}
 \label{section:PSF}
 Calypso can output cross section data for visualization with finer time increment than the whole domain data. The cross section data consist of triangle patches with VTK format, then data can be visualized by Paraview like as the whole field data. This cross sectioning module can output arbitrary quadrature surface, but plane, sphere, and cylindrical section would be useful for the geodynamo simulations.
 
@@ -984,7 +915,7 @@ Block \verb|cross_section_ctl| (Top level for sectioning)
 
 \paragraph{Output data format of sectioning module}
 \label{sec:PSF_data}
-Sectioning data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|psf_output_type| are listed in Table \ref{table:PSF_data}. In the binary data format, position data and field data are saved independently not to write the grid data for each output step. Program \hyperref[section:psf_to_VTK]{\tt psf\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|psf_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
+Sectioning data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|psf_output_type| are listed in Table \ref{table:PSF_data}. In the binary data format, position data and field data are saved independently not to write the grid data for each output step. Program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|psf_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
 %
 \begin{table}[htp]
 \caption{Data format  and an example of data size and output time  for sectioning data}
@@ -1004,7 +935,7 @@ Compressed binary & \verb|PSF_gzip| & \verb|.0.sgd.gz| (grid) & 1.17 & \\
 \end{table} 
 
 %
-\subsubsection{Isosurface data}
+\subsection{Isosurface data}
 \label{section:ISO}
 %
 Calypso can also output isosurface data for visualization. Generally, data size of the isosurface is much larger than the sectioning data. The isosurface data is also written as a unstructured grid data with VTK format. The isosurface also consists of triangle patches.
@@ -1045,7 +976,7 @@ Block \verb|isosurface_ctl|  (Top lebel of the control data)
 
 \paragraph{Output data format of isosurface module}
 \label{sec:PSF_data}
-Isosurface data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|iso_output_type| are listed in Table \ref{table:ISO_data}. Like as sectioning data, program \hyperref[section:psf_to_VTK]{\tt psf\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|iso_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
+Isosurface data are written with VTK format and VTK data compressed by zlib. Field data also output by binary format and binary compressed by zlib. The list of data format and control flag for \verb|iso_output_type| are listed in Table \ref{table:ISO_data}. Like as sectioning data, program \hyperref[section:section_to_VTK]{\tt section\_to\_VTK} generates VTK file from the binary section data. The output data format is defined by \verb|iso_output_type|. Because the field data is written by using Cartesian coordinate $(x,y,z)$ system, $(x,y,z)$ components in ParaView corresponds to the spherical components $(r, \theta, \phi)$ or cylindrical componennts $(s,\phi, z)$ if sectioning data is writtein the spherical or cylindrical componnents. Consequently, ParaView can not draw griph or field lines for these spherical or cylindrical vectors.
 %
 \begin{table}[htp]
 \caption{Data format and an example of data size and output time for isosurface data}
@@ -1063,17 +994,22 @@ Compressed binary & \verb|ISO_gzip| & \verb|.sfm.gz| & 35.0 &  1.73  \\ \hline
 \end{table} 
 %
 
-\subsubsection{Mean square amplitude data}
-This program output mean square amplitude of the fields which is marked as \verb|Monitor_ON| over the fluid shell at every \verb|[increment_monitor]| steps. The data is written in the file \verb|[vol_pwr_prefix]_s.dat| or  \verb|sph_pwr_volume_s.dat| if  \verb|[vol_pwr_prefix]| is not defined in the control file. For vector fields, For the velocity $\bvec{u}$ and magnetic field $\bvec{B}$, the kinetic energy $1/2 u^{2}$ and magnetic energy $1/2 B^{2}$ are calculated instead of mean square amplitude. Labels on the first lines indicate following data. The data file have the following headers in the first 7 lines, and headers of the data and data are stored in the following lines. The header in the first 7 lines is the following. If these mean square amplitude data files exist before starting the simulation, programs append results at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the existed data files to another directory before starting the programs.
+\subsection{Time history data for monitoring}
+Calypso also generate various time history outputs data.These files are written by the SCII format or compressed format by using zlib library. These compressed files can be expanded by {\tt gzip} commnd. 
+If the time history data files exist before starting the simulation, programs append results at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the existed data files to another directory before starting the programs.
+
+\subsubsection{Layered spectrum data}
+\label{section:layerd_spectr}
+Spectrum data for the each radial position are written by defining {\tt layered\_pwr\_spectr\_prefix} in control file. By defining {\tt layered\_pwr\_spectr\_prefix}, following spectrum data averaged over the fluid shell is written. Data format is the same as the volume spectrum data, but radial grid point and radius of the layer is added in the list. The following files are generated. The radial points for output is listed in the array \verb|spectr_layer_ctl|. If \verb|spectr_layer_ctl| is not defined, mean square data at {\bf all} radial levels will be written. See example of \hyperref[section:dynamobench]{dynamo benchmark case 2}. Header of the layered spectrum data file consists of 
 %
 \begin{description}
 \item{\tt  line 2: } Number of radial grid and truncation level
-\item{\tt  line 4: } radial layer ID for ICB and CMB
+\item{\tt  line 4: } Radial layer ID for ICB and CMB
 \item{\tt  line 6: } Number of field of data, total number of components
-\item{\tt  line 7: } Number of components for each field
+\item{\tt  line 8: } Number of components for each field
 \end{description}
 %
-Labels for data indicates as
+Field labels indicates as following:
 %
 \begin{description}
 \item{\tt  t\_step}  Time setp number
@@ -1089,133 +1025,318 @@ Labels for data indicates as
 \item{\tt  [Field]}      Mean square amplitude of {\tt [Field]}
 \end{description}
 %
-\subsubsection{Volume average data}
-Volume average data are written by defining {\tt volume\_average\_prefix} in control file. Volume average data are written in \verb|[vol_ave_prefix].dat| with same format as RMS amplitude data. If you need the sphere average data for specific radial point, you can use picked spectrum data for $l = m = 0$ at specific radius.
+In vector fields, the kinetic energy $u^{2} / 2$ and magnetic energy $B^{2} / 2$ are calculated instead of mean square amplitude for the velocity $\bvec{u}$ and magnetic field $\bvec{B}$. Headers on the first lines indicate following data. The following mean square data is generated:
 
-\subsubsection{Volume spectrum data}
-Volume spectrum data are written by defining {\tt volume\_pwr\_spectr\_prefix} in control file. By defining {\tt volume\_pwr\_spectr\_prefix}, following spectrum data averaged over the fluid shell is written. Data format is the same as the volume mean square data, but degree $l$, order $m$, or meridional wave number $l-m$ is added in the list of data. \\
 %
 \begin{description}
-\item{\tt [vol\_pwr\_prefix\_l.dat}  Volume average of mean square amplitude of the fields as a function of spherical harmonic degree $l$. For scalar field, the spectrum is
+\item{\tt [layer\_pwr\_prefix]\_s.dat[.gz]} Surface average of mean square amplitude of the fields. the mean square for the scalar field $f$ is evluated from its spherical harmonic coefficients by
+%
+\begin{equation}
+<f^{2}(r)> = \sum_{l}\sum_{m}  \frac{1}{2l + 1} \left(f_{l}^{m}(r) \right)^2.
+\end{equation}
+%
+And, the mean square of the vector field $\bvec{A}$ evaluated by
 %
 \begin{eqnarray}
-f_{sq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left({f_{l}^{m}} \right)^{2} dV.
-\nonumber
+<\bvec{A}_{S}^{2}(r)> &=& \sum_{l}\sum_{m} \frac{1}{2l + 1}
+\left[  \left(\frac{l\left(l+1 \right) }{r^{2}} A_{Sl}^{\ m}(r) - \frac{\partial \phi_{l}^{m}}{\partial r} \right)^{2} 
+\right. \nonumber \\
+& & \left. +  \frac{l \left( l+1 \right)}{r^{2}} \left( \frac{\partial A_{Sl}^{\ m}}{\partial r} - \phi_{l}^{m} \right)^{2} \right],
 \end{eqnarray}
+%
+and
+%
+\begin{eqnarray}
+<\bvec{A}_{T}^{2}(r)> &=& \sum_{l}\sum_{m} \frac{l \left( l+1 \right)}{2l + 1} \frac{1}{r^{2}} \left( A_{Tl}^{\ m}(r) \right)^{2}.
+\end{eqnarray}
+Finally, the total mean square amplitude $<\bvec{A}^{2}> $ is obtained by
+\begin{eqnarray}
+<\bvec{A}^{2}(r)> &=& <\bvec{A}_{S}^{2}(r)>  + <\bvec{A}_{T}^{2}(r)> .
+\end{eqnarray}
+%
+%
+\item{\tt [layer\_pwr\_prefix]\_l.dat[.gz]} Surface average of mean square amplitude of the fields as a function of spherical harmonic degree $l$ and radial grid id $k$. For scalar field, the spectrum is
+%
+\begin{equation}
+< f_{l}^{\ 2}(r,l)>  = \sum_{m=-l}^{l}  \frac{1}{2l + 1} \left(f_{l}^{m}(r) \right)^2.
+\end{equation}
 %
 For vector field, spectrum for the poloidal and toroidal components are written by 
 %
 \begin{eqnarray}
-B_{Ssq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left(\bvec{B}_{Sl}^{\ m} \right)^{2} dV,
-\nonumber \\
-B_{Tsq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left(\bvec{B}_{Tl}^{\ m} \right)^{2} dV.
-\nonumber
-\end{eqnarray}
-
-If the vector field $\bvec{F}$ is not solenoidal (i.e. $\nabla \cdot \bvec{F} \neq 0$), The poloidal component of mean square data are included mean square field of the potential components as
-%
-\begin{eqnarray}
-F_{Ssq}(l) &=& \frac{1}{V} \sum_{m=-l}^{m=l} \int \left[\left(\bvec{B}_{Sl}^{\ m} \right)^{2}
- + \left(-\nabla \phi_{Fl}^{\ m} \right)^{2} \right] dV.
-\nonumber
+<\bvec{A}_{Sl}^{\ 2}(r,l)> &=&  \sum_{m=-l}^{l}  \frac{1}{2l + 1}
+\left[  \left(\frac{l\left(l+1 \right) }{r^{2}} A_{Sl}^{\ m}(r) - \frac{\partial \phi_{l}^{m}}{\partial r} \right)^{2} 
+\right. \nonumber \\
+& & \left. +  \frac{l \left( l+1 \right)}{r^{2}} \left( \frac{\partial A_{Sl}^{\ m}}{\partial r} - \phi_{l}^{m} \right)^{2} \right],
 \end{eqnarray}
 %
-
-%
-\item{\tt [vol\_pwr\_prefix]\_m.dat} Volume average of mean square amplitude of the fields as a function of spherical harmonic order $m$. The zonal wave number is referred in this spectrum data. For scalar field, the spectrum is
+and
 \begin{eqnarray}
-f_{sq}(m) &=& \frac{1}{V} \sum_{l=0}^{l=m} \int \left[ \left(f_{l}^{m} \right)^{2}
- + \left( f_{l}^{-m} \right)^{2} \right] dV.
-\nonumber
+<\bvec{A}_{Tl}^{\ 2}(r,l)>  &=& \sum_{m=-l}^{l} \frac{l \left( l+1 \right)}{2l + 1} \frac{1}{r^{2}} \left( A_{Tl}^{\ m}(r) \right)^{2}.
 \end{eqnarray}
-For vector field, spectrum for the poloidal and toroidal components are written by 
+Finally, the total mean square amplitude $<\bvec{A}^{2}> $ is obtained by
 \begin{eqnarray}
-B_{Ssq}(m) &=& \frac{1}{V} \sum_{l=0}^{l=m} \int \left[\left(\bvec{B}_{Sl}^{\ m} \right)^{2} 
- + \left(\bvec{B}_{Sl}^{\ -m} \right)^{2}  \right] dV,
-\nonumber \\
-B_{Tsq}(m) &=& \frac{1}{V} \sum_{l=0}^{l=m} \int \left[\left(\bvec{B}_{Tl}^{\ m} \right)^{2} 
- + \left(\bvec{B}_{Tl}^{\ -m} \right)^{2}  \right] dV.
-\nonumber
-\end{eqnarray}
-
-\item{\tt [vol\_pwr\_prefix]\_lm.dat} Volume average of mean square amplitude of the fields as a function of spherical harmonic order $n = l-m$. The wave number in the latitude direction is referred in this spectrum data. For scalar field, the spectrum is
-\begin{eqnarray}
-f_{sq}(n) &=& \frac{1}{V} \sum_{l=n}^{l=l-n} \int \left[ \left(f_{l}^{l-n}\right)^{2} + \left(f_{l}^{-l+n}\right)^2 \right] dV.
-\nonumber
-\end{eqnarray}
-For vector field, spectrum for the poloidal and toroidal components are written by 
-\begin{eqnarray}
-B_{Ssq}(n) &=& \frac{1}{V} \sum_{l=n}^{l=l-n} \int  \left[\left(\bvec{B}_{Sl}^{\ l-n} \right)^{2} 
- + \left(\bvec{B}_{Sl}^{\ -l+n} \right)^{2}  \right]  dV,
-\nonumber \\
-B_{Tsq}(n) &=& \frac{1}{V} \sum_{l=n}^{l=l-n} \int \left[\left(\bvec{B}_{Tl}^{\ l-n} \right)^{2} 
- + \left(\bvec{B}_{Tl}^{\ -l+n} \right)^{2}  \right] dV.
-\nonumber
-\end{eqnarray}
-
-\end{description}
-
-%
-\subsubsection{Layered spectrum data}
-\label{section:layerd_spectr}
-Spectrum data for the each radial position are written by defining {\tt layered\_pwr\_spectr\_prefix} in control file. By defining {\tt layered\_pwr\_spectr\_prefix}, following spectrum data averaged over the fluid shell is written. Data format is the same as the volume spectrum data, but radial grid point and radius of the layer is added in the list. The following files are generated. The radial points for output is listed in the array \verb|spectr_layer_ctl|. If \verb|spectr_layer_ctl| is not defined, mean square data at {\bf all} radial levels will be written. See example of \hyperref[section:dynamobench]{dynamo benchmark case 2}.
-%
-\begin{description}
-\item{\tt [layer\_pwr\_prefix]\_s.dat} Surface average of mean square amplitude of the fields.
-\item{\tt [layer\_pwr\_prefix]\_l.dat} Surface average of mean square amplitude of the fields as a function of spherical harmonic degree $l$ and radial grid id $k$. For scalar field, the spectrum is
-\begin{eqnarray}
-f_{sq}(k,l) &=& \frac{1}{S} \sum_{m=-l}^{m=l} \int \left({f_{l}^{m}} \right)^{2} dS.
-\nonumber
-\end{eqnarray}
-For vector field, spectrum for the poloidal and toroidal components are written by 
-\begin{eqnarray}
-B_{Ssq}(k,l) &=& \frac{1}{S} \sum_{m=-l}^{m=l} \int \left(\bvec{B}_{Sl}^{\ m} \right)^{2} dS,
-\nonumber \\
-B_{Tsq}(k,l) &=& \frac{1}{S} \sum_{m=-l}^{m=l} \int \left(\bvec{B}_{Tl}^{\ m} \right)^{2} dS.
-\nonumber
+<\bvec{A}_{l}^{2}(r,l)> &=& <\bvec{A}_{Sl}^{\ 2}(r,l)>  + <\bvec{A}_{Tl}^{\ 2}(r,l)> .
 \end{eqnarray}
 
 \item{\tt [layer\_pwr\_prefix]\_m.dat} Surace average of mean square amplitude of the fields as a function of spherical harmonic order $m$ and radial grid id $k$. The zonal wave number is referred in this spectrum data. For scalar field, the spectrum is
-\begin{eqnarray}
-f_{sq}(k,m) &=& \frac{1}{S} \sum_{l=m}^{l=L} \int \left[ \left(f_{l}^{m} \right)^{2}
- + \left( f_{l}^{-m} \right)^{2} \right] dS.
-\nonumber
-\end{eqnarray}
+%
+\begin{equation}
+<f_{m}^{2}(r,m)> = \sum_{l=m}^{L_{max}}  \frac{1}{2l + 1} \left[ \left(f_{l}^{m}(r) \right)^2 
++ \left(f_{l}^{-m}(r) \right)^2 \right]
+\end{equation}
+%
 For vector field, spectrum for the poloidal and toroidal components are written by 
+%
 \begin{eqnarray}
-B_{Ssq}(k,m) &=& \frac{1}{S} \sum_{l=m}^{l=L} \int \left[\left(\bvec{B}_{Sl}^{\ m} \right)^{2} 
- + \left(\bvec{B}_{Sl}^{\ -m} \right)^{2}  \right] dS,
+<\bvec{A}_{Sm}^{\ 2}(r,m)> &=&   \sum_{l=m}^{L_{max}} \frac{1}{2l + 1}
+\left[  \left(\frac{l\left(l+1 \right) }{r^{2}} A_{Sl}^{\ m}(r) - \frac{\partial \phi_{l}^{m}}{\partial r} \right)^{2} 
+\right. \nonumber \\
+& & + \left(\frac{l\left(l+1 \right) }{r^{2}} A_{Sl}^{\ -m}(r) - \frac{\partial \phi_{l}^{-m}}{\partial r} \right)^{2} 
 \nonumber \\
-B_{Tsq}(k,m) &=& \frac{1}{S} \sum_{l=m}^{l=L} \int \left[\left(\bvec{B}_{Tl}^{\ m} \right)^{2} 
- + \left(\bvec{B}_{Tl}^{\ -m} \right)^{2}  \right] dS.
-\nonumber
+& & +  \frac{l \left( l+1 \right)}{r^{2}} \left( \frac{\partial A_{Sl}^{\ m}}{\partial r} - \phi_{l}^{m} \right)^{2} 
+\nonumber \\
+& & \left. +  \frac{l \left( l+1 \right)}{r^{2}} \left( \frac{\partial A_{Sl}^{\ -m}}{\partial r} - \phi_{l}^{-m} \right)^{2} \right],
+\end{eqnarray}
+%
+and
+\begin{eqnarray}
+<\bvec{A}_{Tm}^{\ 2}(r,m)> &=&  \sum_{l=m}^{L_{max}} \frac{l \left( l+1 \right)}{2l + 1} \frac{1}{r^{2}} 
+\left[ \left( A_{Tl}^{\ m}(r) \right)^{2} +  \left( A_{Tl}^{\ -m}(r) \right)^{2} \right].
+\end{eqnarray}
+Finally, the total mean square amplitude $<\bvec{A}^{2}> $ is obtained by
+\begin{eqnarray}
+<\bvec{A}_{m}^{\ 2}(r,m)> &=& <\bvec{A}_{Sm}^{\ 2}(r,m)>  + <\bvec{A}_{Tm}^{\ 2}(r,m)>.
 \end{eqnarray}
 
-\item{\tt [layer\_pwr\_prefix]\_lm.dat} Surface average of mean square amplitude of the fields as a function of spherical harmonic order $n = l-m$ and radial grid id $k$. The wave number in the latitude direction is referred in this spectrum data. For scalar field, the spectrum is
-\begin{eqnarray}
-f_{sq}(k,n) &=& \frac{1}{S} \sum_{l=n}^{l=L} \int \left[ \left(f_{l}^{l-n}\right)^{2} + \left(f_{l}^{-l+n}\right)^2 \right] dS.
-\nonumber
-\end{eqnarray}
+\item{\tt [layer\_pwr\_prefix]\_lm.dat} Surface average of mean square amplitude of the fields as a function of spherical harmonic order $n = l-m$ and radial grid id $k$. The wave number in the latitude direction is referred in this spectrum data.
+For scalar field, the spectrum is
+%
+\begin{equation}
+<f_{n}^{2}(r,n)> = \sum_{m=n}^{L_{max}} \frac{1}{2l + 1} \left[ \left(f_{l}^{l-n}(r) \right)^2 
++ \left(f_{l}^{-l+n}(r) \right)^2 \right]
+\end{equation}
+%
 For vector field, spectrum for the poloidal and toroidal components are written by 
+%
 \begin{eqnarray}
-B_{Ssq}(k,n) &=& \frac{1}{S} \sum_{l=n}^{l=L} \int  \left[\left(\bvec{B}_{Sl}^{\ l-n} \right)^{2} 
- + \left(\bvec{B}_{Sl}^{\ -l+n} \right)^{2}  \right] dS,
+<\bvec{A}_{Sn}^{\ 2}(r,n)> &=&   \sum_{m=n}^{L_{max}}\frac{1}{2l + 1}
+\left[  \left(\frac{l\left(l+1 \right) }{r^{2}} A_{Sl}^{\ l-n}(r) - \frac{\partial \phi_{l}^{l-n}}{\partial r} \right)^{2} 
+\right. \nonumber \\
+& & + \left(\frac{l\left(l+1 \right) }{r^{2}} A_{Sl}^{\ -l+n}(r) - \frac{\partial \phi_{l}^{-l+n}}{\partial r} \right)^{2} 
 \nonumber \\
-B_{Tsq}(k,n) &=& \frac{1}{S} \sum_{l=n}^{l=L} \int \left[\left(\bvec{B}_{Tl}^{\ l-n} \right)^{2} 
- + \left(\bvec{B}_{Tl}^{\ -l+n} \right)^{2}  \right] dS.
-\nonumber
+& & +  \frac{l \left( l+1 \right)}{r^{2}} \left( \frac{\partial A_{Sl}^{\ l-n}}{\partial r} - \phi_{l}^{l-n} \right)^{2} 
+\nonumber \\
+& & \left. +  \frac{l \left( l+1 \right)}{r^{2}} \left( \frac{\partial A_{Sl}^{\ -l+n}}{\partial r} - \phi_{l}^{-l+n} \right)^{2} \right],
+\end{eqnarray}
+%
+and
+\begin{eqnarray}
+<\bvec{A}_{Tn}^{\ 2}(r,n)> &=&  \sum_{m=n}^{L_{max}}\frac{l \left( l+1 \right)}{2l + 1} \frac{1}{r^{2}} 
+\left[ \left( A_{Tl}^{\ l-n}(r) \right)^{2} +  \left( A_{Tl}^{\ -l+n}(r) \right)^{2} \right].
+\end{eqnarray}
+Finally, the total mean square amplitude $<\bvec{A}^{2}> $ is obtained by
+\begin{eqnarray}
+<\bvec{A}_{n}^{\ 2}(r,n)> &=& <\bvec{A}_{Sn}^{\ 2}(r,n)>  + <\bvec{A}_{Tn}^{\ 2}(r,n)> 
+\end{eqnarray}
+%
+\item{\tt [layer\_pwr\_prefix]\_m0.dat} Surace average of mean square amplitude of the axisymmetric components of fields as a function of radial grid id $k$. The zonal wave number is referred in this spectrum data. For scalar field, the spectrum is
+%
+\begin{equation}
+<f^{2}(r)>_{axis} = \sum_{l=0}^{L_{max}}  \frac{1}{2l + 1} \left(f_{l}^{0}(r) \right)^2
+\end{equation}
+%
+For vector field, spectrum for the poloidal and toroidal components are written by 
+%
+\begin{eqnarray}
+<\bvec{A}_{S}^{2}(r)>_{axis} &=&   \sum_{l=0}^{L_{max}} \frac{1}{2l + 1}
+\left[  \left(\frac{l\left(l+1 \right) }{r^{2}} A_{Sl}^{\ 0}(r) - \frac{\partial \phi_{l}^{0}}{\partial r} \right)^{2} 
+\right. \nonumber \\
+& & \left. +  \frac{l \left( l+1 \right)}{r^{2}} \left( \frac{\partial A_{Sl}^{\ 0}}{\partial r} - \phi_{l}^{0} \right)^{2} \right],
+\end{eqnarray}
+%
+and
+\begin{eqnarray}
+<\bvec{A}_{T}^{2}(r)>_{axis} &=&  \sum_{l=0}^{L_{max}} \frac{l \left( l+1 \right)}{2l + 1} \frac{1}{r^{2}} 
+\left( A_{Sl}^{\ 0}(r) \right)^{2}.
+\end{eqnarray}
+Finally, the total mean square amplitude $<\bvec{A}^{2}> $ is obtained by
+\begin{eqnarray}
+<\bvec{A}^{2}(r)>_{axis} &=& <\bvec{A}_{S}^{2}(r)>_{axis}  + <\bvec{A}_{T}^{2}(r)>_{axis} .
 \end{eqnarray}
 
 \end{description}
+
+
+\subsubsection{Mean square amplitude data}
+\label{sec:mean_square}
+This program output mean square amplitude of the fields which is marked as \verb|Monitor_ON| over the fluid shell at every \verb|[increment_monitor]| steps. The data is written in the file \verb|[vol_pwr_prefix]_s.dat[.gz]| or  \verb|sph_pwr_volume_s.dat| if \\
+{\tt [vol\_pwr\_prefix]} is not defined in the control file. The mean square amplitude ifor a scalar field $f$ is defined by
+%
+\begin{equation}
+<f^{2}> =   \frac{4\pi}{V} \int <f^{2}(r)> r^{2} dr.
+\end{equation}
+%
+For the vector field $\bvec{A}$, the mean square of the potential component $\bvec{A}_{S}$ is included in the mean square of the poloidal component in the data if the vector field is not a solenoidal field. Consequently, $\bvec{A}_{S}$ and mean square of the toroidal component $\bvec{A}_{T}$ are evaluated by 
+%
+\begin{eqnarray}
+<\bvec{A}_{S}^{2}> &=& \frac{4\pi}{V} \int <\bvec{A}_{S}^{2}(r)> r^{2} dr,
+\nonumber \\
+<\bvec{A}_{T}^{2}>  &=& \frac{4\pi}{V} \int <\bvec{A}_{T}^{2}(r)>  r^{2} dr,
+\end{eqnarray}
+% 
+and
+%
+\begin{eqnarray}
+<\bvec{A}^{2}> &=& \frac{4\pi}{V} \int <\bvec{A}^{2}(r)>  r^{2} dr.
+\label{eq:vol_vec_msq}
+\end{eqnarray}
+
+The header in the first 12 lines is the following. 
+%
+\begin{description}
+\item{\tt  line 2: } Number of radial grid and truncation level
+\item{\tt  line 4: } Radial layer ID for ICB and CMB
+\item{\tt  line 6: } Radial layer ID and radius for the inner boundary of integration
+\item{\tt  line 8: } Radial layer ID and radius for the outer boundary of integration
+\item{\tt  line 10: } Number of field of data, total number of components
+\item{\tt  line 11: } Number of components for each field
+\end{description}
+%
+The following is an example of the beginning of the data file:
+{\scriptsize
+\begin{verbatim}
+Radial_layers, Truncation
+             112             159
+ICB_id, CMB_id
+               1             112
+Lower_boundary_ID, Lower_boundary_radius
+               1   5.384615384615384E-001
+Upper_boundary_ID, Upper_boundary_radius
+             112   1.538461538461538E+000
+Number_of_fields, Number_of_components
+               8              16
+    3    1    3    1    3    3    1    1
+t_step    time    K_ene_pol    K_ene_tor    K_ene    temperature    vorticity_pol
+    vorticity_tor    vorticity    pressure    M_ene_pol    M_ene_tor    M_ene
+    current_density_pol    current_density_tor    current_density    buoyancy_flux    
+    Lorentz_work    
+             100  2.00000000000000E-004  3.08485175580558E+001  2.97052514317492E-001
+  3.11455700723732E+001  8.37549401638792E-002  3.83545285358558E+001  
+  4.45268846884004E+003  4.49104299737589E+003  2.20356357802801E+001  
+  2.88810032145648E-006  1.76927464999397E-006  4.65737497145044E-006  
+  4.45474362010442E-005  3.76310585686982E-005  8.21784947697424E-005  
+  1.47655914519649E+013  1.52720673275983E-003
+             200  3.99999999999999E-004  1.21246529508559E+002  4.60310202818333E+000  
+  1.25849631536743E+002  8.38032562478558E-002  5.26153720206686E+002  
+  1.51087784591356E+004  1.56349321793422E+004  4.32047730989212E+001  
+  2.88721662147718E-006  1.76772446160287E-006  4.65494108308005E-006  
+  4.49318945325754E-005  3.83578033623782E-005  8.32896978949536E-005  
+  5.86224313684072E+013  6.13459599464992E-003
+\end{verbatim}
+}
+%
+\subsubsection{Volume average data}
+Volume average data are written by defining {\tt volume\_average\_prefix} in control file. Volume average data are written in \verb|[vol_ave_prefix].dat.[gz]| with the same format as the men square amplitude data in Subsection \ref{sec:mean_square}. The volume average of scalar field $f$ is evaluated by the 0-th degree of the spherical harmonics coefficients $f_{0}^{0}$ as
+%
+\begin{equation}
+<f> =   \frac{4\pi}{V} \int f_{0}^{0}(r) r^{2} dr.
+\end{equation}
+%
+The average of the toroidal component of the vector field $<\bvec{A}_{T}>$ is always zero, and the average of poloidal component of the solenoidal vector  $<\bvec{A}_{S}>$ is also zero. If the vector is non-soleinoidal, 0-th degree of the potential field contributes the average radial vector as
+%
+\begin{eqnarray}
+<\bvec{A}> &=& <\bvec{A}_{S}>  =  - \frac{4\pi}{V}
+\int \frac{\partial \phi_{0}^{0}}{\partial r} r^{2} dr.
+\end{eqnarray}
 %
 
-\subsubsection{Volume average data {\tt [volume\_average\_prefix].dat}}
-The volume average information is written in the file {\tt [volume\_average\_prefix].dat}.
-The volume average is evaluated by the radial integration of $l = m = 0$ component of the spherical harmonics coefficients as
+If you need the sphere average data for specific radial point, you can use picked spectrum data output in \hyperref[sec:pickup_spectr_ctl]{\tt pickup\_spectr\_ctl}  using $l = m = 0$ at specific radius.
+
+\subsubsection{Volume spectrum data}
+Volume spectrum data are written by defining {\tt volume\_pwr\_spectr\_prefix} in control file. By defining {\tt volume\_pwr\_spectr\_prefix}, following spectrum data averaged over the fluid shell is written. Data header format is the same as the volume mean square data, but degree $l$, order $m$, or meridional wave number $l-m$ is added in the list of data in each step. \\
+%
+\begin{description}
+\item{\tt [vol\_pwr\_prefix\_l.dat[.gz]}  Volume average of mean square amplitude of the fields as a function of spherical harmonic degree $l$. For scalar field, the spectrum is
+%
 \begin{eqnarray}
-f_{ave} &=& \frac{1}{V} \int f_{0}^{0}(r) 4 \pi r^{2} dr.
+<f_{l}^{2}(l)> =   \frac{4\pi}{V} \int <f_{l}^{2}(r,l)> r^{2} dr.
 \end{eqnarray}
-Consequently, volume average of the solenoidal vector field to be 0, but but average data for the solenoidal vector is also written in the data to share the data IO routine with other monitor data output. To ouytput the average value over the specific radial level, use spectrum monitor data output \hyperref[sec:pickup_spectr_ctl]{\tt pickup\_spectr\_ctl} with $l = m = 0$.
+%
+For vector field, spectrum for the poloidal and toroidal components are written by 
+%
+\begin{eqnarray}
+<A_{Sl}^{\ 2} > & = &  \frac{4\pi}{V} \int <A_{Sl}^{\ 2}(r,l) >  r^{2} dr,
+\nonumber \\
+<A_{Tl}^{\ 2} > & = &  \frac{4\pi}{V} \int <A_{Tl}^{\ 2}(r,l) >  r^{2} dr,
+\end{eqnarray}
+and
+\begin{eqnarray}
+<A_{l}^{\ 2} > & = &  \frac{4\pi}{V} \int <A_{l}^{\ 2}(r,l) >  r^{2} dr,
+\label{eq:vol_vec_msq_l}
+\end{eqnarray}
+
+\item{\tt [vol\_pwr\_prefix]\_m.dat[.gz]} Volume average of mean square amplitude of the fields as a function of spherical harmonic order $m$. The zonal wave number is referred in this spectrum data. For scalar field, the spectrum is
+%
+\begin{eqnarray}
+<f_{m}^{2}(m)> =   \frac{4\pi}{V} \int <f_{m}^{2}(r,m)> r^{2} dr.
+\end{eqnarray}
+%
+For vector field, spectrum for the poloidal and toroidal components are written by 
+%
+\begin{eqnarray}
+<A_{Sm}^{\ 2} > & = &  \frac{4\pi}{V} \int <A_{Sm}^{\ 2}(r,m) >  r^{2} dr,
+\nonumber \\
+<A_{Tm}^{\ 2} > & = &  \frac{4\pi}{V} \int <A_{Tm}^{\ 2}(r,m) >  r^{2} dr,
+\end{eqnarray}
+and
+\begin{eqnarray}
+<A_{m}^{\ 2} > & = &  \frac{4\pi}{V} \int <A_{m}^{\ 2}(r,m) >  r^{2} dr,
+\label{eq:vol_vec_msq_m}
+\end{eqnarray}
+
+
+\item{\tt [vol\_pwr\_prefix]\_lm.dat[.gz]} Volume average of mean square amplitude of the fields as a function of spherical harmonic order $n = l-m$. The wave number in the latitude direction is referred in this spectrum data. For scalar field, the spectrum is
+%
+\begin{eqnarray}
+<f_{n}^{2}(n)> =   \frac{4\pi}{V} \int <f_{n}^{2}(r,n)> r^{2} dr.
+\end{eqnarray}
+%
+For vector field, spectrum for the poloidal and toroidal components are written by 
+%
+\begin{eqnarray}
+<A_{Sn}^{\ 2} > & = &  \frac{4\pi}{V} \int <A_{Sn}^{\ 2}(r,n) >  r^{2} dr,
+\nonumber \\
+<A_{Tn}^{\ 2} > & = &  \frac{4\pi}{V} \int <A_{Tn}^{\ 2}(r,n) >  r^{2} dr,
+\end{eqnarray}
+and
+\begin{eqnarray}
+<A_{n}^{\ 2} > & = &  \frac{4\pi}{V} \int <A_{n}^{\ 2}(r,n) >  r^{2} dr,
+\label{eq:vol_vec_msq_lm}
+\end{eqnarray}
+%
+\item{\tt [vol\_pwr\_prefix]\_m0.dat[.gz]} Volume average of mean square amplitude of the axisymmetric components is stored. The mean square of the axisymmetric scalar is defined by 
+%
+\begin{eqnarray}
+<f_{m0}^{2}> 
+&=&  \frac{1}{V} \sum_{l=0}^{L_{max}} \left[ N_{l} \int \left(f_{l}^{0}(r) \right)^2 r^{2} dr \right].
+\end{eqnarray}
+%
+For vector field, spectrum for the poloidal and toroidal components are written by 
+\begin{eqnarray}
+<A_{Sm0}^{\ 2} >\ &=& \frac{1}{V} \sum_{l=0}^{L_{max}} N_{l}
+\int \left[  \left(\frac{l\left(l+1 \right) }{r^{2}} A_{Sl}^{\ 0}(r) - \frac{\partial \phi_{l}^{0}}{\partial r} \right)^{2} 
+\right. \nonumber \\
+& & \left. +  \frac{l \left( l+1 \right)}{r^{2}} \left( \frac{\partial A_{Sl}^{\ 0}}{\partial r} - \phi_{l}^{0} \right)^{2} \right] r^{2} dr, \\
+<A_{Tm0}^{\ 2} > &=& \frac{1}{V}   \sum_{l=0}^{L_{max}} \left( l+1 \right) N_{l}  \int \left( A_{Tl}^{\ 0}(r) \right)^{2} dr.
+\end{eqnarray}
+%
+This data file is used toe same data format as the volume mean square data in Subsection \ref{sec:mean_square}. 
+%
+\end{description}
+
+Default volume averge and mean square data is integrated over the fluid domain. Calypso also can output volume integration data between manually defined inner and outer boundary. Each volume integration parameter is defined in array block \hyperref[href_t:volume_spectrum_ctl]{\tt volume\_spectrum\_ctl}. For each integration, the inner and outer boundary radii are set by \hyperref[href_t:inner_radius_ctl]{\tt inner\_radius\_ctl} and \hyperref[href_t:outer_radius_ctl]{\tt outer\_radius\_ctl}, respectively.
+
 
 \subsubsection{Gauss coefficient data {\tt [gauss\_coef\_prefix].dat}}
 This program output selected Gauss coefficients of the magnetic field. Gauss coefficients is evaluated for radius defined by \verb|[gauss_coef_radius]| every \verb|[increment_monitor]| steps. Gauss coefficients are evaluated by using poloidal magnetic field at CMB $B_{Sl}^{\ m}(r_{o})$ and radius defined by \verb|[gauss_coef_radius]| $r_{e}$ as
@@ -1227,12 +1348,17 @@ h_{l}^{m} &=& \frac{l}{r_{e}^2} \left(\frac{r_{o}}{r_{e}}\right)^{l} B_{Sl}^{\ -
 \nonumber
 \end{eqnarray}
 %
-The data file has the following headers in the first three lines,
+The header format is the same as the volume mean square data, but each item is used for as 
 %
 \begin{description}
-\item{\tt  line 2: } Number of saved Gauss coefficients and reference radius.
-\item{\tt  line 3: } Labels of Gauss coefficients data.
+\item{\tt  line 2: } Number of radial grid and truncation level
+\item{\tt  line 4: } Radial layer ID for ICB and CMB
+\item{\tt  line 6: } Not used
+\item{\tt  line 8: } Radius for the reference radius $r_{e}$
+\item{\tt  line 10: } Nunmber of Gauss coeffifients
+\item{\tt  line 11: } Number of components (All number are 1)
 \end{description}
+%
 %
 The data consists of time step, time, and Gauss coefficients for each step in one line. If the Gauss coefficients data file exist before starting the simulation, programs append Gauss coefficients at the end of files without checking constancy of the number of data and order of the field. If you change the configuration of data output structure, please move the old Gauss coefficients file to another directory before starting the programs.
 
@@ -1289,10 +1415,68 @@ T_{diff} = \frac{r_{o}T_{o} - r_{i}T_{i}}{r_{o} - r_{i}}
 \end{eqnarray*}
 %
 This diffusive temperature profile is for the case without heat source in the fluid. If simulation is performed including the heat source, this data file does not written.
-If the Nusselt number data file exist before starting the simulation, programs append spectrum data at the end of files without checking constancy. If you change the configuration of data output structure, please move the old spectrum monitor file to another directory before starting the programs.
 
+The header format is the same as the volume mean square data, but number of components are 2 for the Nusselt number for the inner and outer boundaries.
+
+\subsubsection{Dipolrity data {\tt [dipolarity\_file\_prefix].dat}}
+The dipolarity $f_{\rm dip}$ is evaluated the poloidal magnetic field at CMB is written for each step in one line. The dipolarity represents the relative strength of the axial dipole magnetic field, which is defined by the ration of the magnetic energy of the dipole component to the total magnetic energy at the CMB as
+%
+\begin{equation}
+f_{\rm dip} = 
+\left(
+\frac{E_{{\rm B}\ 1}^{\ 0} (r=r_o)}
+     {\sum_{l=1}^{L_{\rm dip}}
+      \sum_{m=-l}^l E_{{\rm B}\ l}^{\ m} (r=r_o)}
+\right)^{1/2}.
+\label{eq:f_dip}
+\end{equation}
+%
+The magnetic energy at the CMB, $E_{\rm B} (r=r_o)$, is calculated as
+%
+\begin{equation}
+E_{{\rm B}\ l}^{\ m} (r=r_o) = 
+  \frac{1}{2S_o} \int_{S_o} \left[
+  \left(\bvec{B}_{l}^{m} \right)^2 + \left(\bvec{B}_{l}^{-m} \right)^2 \right] dS,
+\end{equation}
+%
+where $S_o = 4\pi r_o^2$ is the surface area of the outer core.
+
+\subsubsection{Typical length scale data {\tt [typical\_scale\_prefix].dat}}
+The typical length scale is evaluated from kinetic and magnetic energy spectra as a wave number for the spherical harmonic degree $l$, order $m$, and difference between harmonic degree and order $n = l-m$. Each value is evaluated by
+%
+\begin{eqnarray}
+k_{l} & = & \frac{\sum_{l=1}^{L_{max}} l <\bvec{A}_{l}^{\ 2} >}{<\bvec{A}^{2} >},
+\\
+k_{m} & = & \frac{\sum_{m=0}^{L_{max}} m <\bvec{A}_{m}^{\ 2} >}{<\bvec{A}^{2} >}, 
+\\
+k_{l-m} & = & \frac{\sum_{n=0}^{L_{max}} (l-m) <\bvec{A}_{n}^{\ 2} >}{<\bvec{A}^{2} >},
+\end{eqnarray}
+%
+where $\bvec{A}$ is the velocity $\bvec{u}$ or magnetic field $\bvec{B}$, and volume mean squares $<\bvec{A}^{2}>$, $<\bvec{A}_{l}^{\ 2}>$, $<\bvec{A}_{m}^{\ 2}>$, and $<\bvec{A}_{n}^{\ 2}>$, are defined by equations (\ref{eq:vol_vec_msq}), (\ref{eq:vol_vec_msq_l}), (\ref{eq:vol_vec_msq_m}) , and (\ref{eq:vol_vec_msq_lm}), respectively.
+
+The header format is the same as the volume mean square data, and the field name is defined by {\tt truncation\_}$L_{dip}$. The labels of each length scales are in Table \ref{table:scale_name}.
+%
+\begin{table}[htp]
+\caption{Data names for typical length scles.}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+ & \mbox{Velocity} & \mbox{Magnetic field} \\ \hline
+$k_{l}$ & {\tt lscale\_flow\_degree} & {\tt lscale\_magnetic\_degree} \\
+$k_{m}$ & {\tt lscale\_flow\_order} & {\tt lscale\_magnetic\_order} \\
+$k_{l-m}$ & {\tt lscale\_flow\_diff\_lm} & {\tt lscale\_magnetic\_diff\_lm} 
+\\ \hline 
+\end{tabular}
+\end{center}
+\label{table:scale_name}
+\end{table}%
+%
 
 \newpage
+
+\section{Utility programs}
+Calypso includes some utility programs. These programs are useful to data analysis and debugging the simulation programs.
+
 \subsection{Data transform program ({\tt sph\_snapshot})}
 \label{section:sph_snapshot}
 %
@@ -1746,13 +1930,13 @@ Block \verb|visualizer|  (Top block of the control file)
 \end{itemize}
 %
 
-\subsection{Section and isosurface data converter program ({\tt psf\_to\_VTK})} 
-\label{section:psf_to_VTK}
+\subsection{Section and isosurface data converter program ({\tt section\_to\_VTK})} 
+\label{section:section_to_VTK}
 This program generates VTK data from bindary sectioning and isosurface data. This program run on a single processor, and needs interactive input. The following is the console output of the program.
 
 {\small
 \begin{verbatim}
-% /usr/local/Calypso/bin/psf_to_vtk 
+% /usr/local/Calypso/bin/section_to_VTK
 Input file prefix
 zm_y0									<- Input file prefix
 Input file extension from following:
@@ -1870,7 +2054,7 @@ Block \verb|assemble_control| \label{href_i:assemble_control} (Top lebel of the 
 \subsection{Time averaging programs}
 These small programs are used to evaluate time average and standard deviation of the time evolution data.
 \subsubsection{Averaging for mean square and power spectrum \\
- ({\tt t\_ave\_sph\_mean\_square})}
+ ({\tt t\_ave\_monitor\_data})}
 \label{sec:ave_mean_square}
 This program generate time average and standard deviation of power spectrum data. The program processes one of data files listed in Table \ref{table:time_averages_sprectr}. The number for the first and second interactive input is also listed in Table \ref{table:time_averages_sprectr}. For the third input, the file name excluding \verb|.dat| is required. Start and end time is also required in the last input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
 %
@@ -1894,24 +2078,8 @@ This program generate time average and standard deviation of power spectrum data
 \end{table}
 %
 
-\subsubsection{Averaging for picked harmonics mode data \\
- ({\tt t\_ave\_picked\_sph\_coefs})}
-\label{sec:ave_picked_spectr}
-This program generate time average and standard deviation of each spherical harmonic coefficients data file \verb|[picked_sph_prefix]_l[degree]_m[ordedr][c/s].dat|.
-
-In this program, file name excluding the extension \verb|[.dat]| \\
-(\verb|[picked_sph_prefix]_l[degree]_m[ordedr][c/s]|), start time, and end time are required in the interactive input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
-%
-\subsubsection{Averaging for Nusselt number data \\
- ({\tt t\_ave\_nusselt})}
-\label{sec:ave_nusselt}
-This program generate time average and standard deviation of the Nusselt number in the file \verb|[nusselt_number_prefix].dat|. 
-
-In this program, file prefix  \verb|[nusselt_number_prefix]| and start and end time are required in the interactive input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
-%
-
-\subsection{Module dependency program ({\tt module\_dependency})}
-\label{sec:module_dependency}
+\subsection{Module dependency program ({\tt make\_f90depends})}
+\label{sec:make_f90depends}
 This program is only used to generate Makefile in {\tt work} directory. Most of case, Fortran 90 modules have to compiled prior to be referred by another fortran90 routines. This program is generates dependency lists in Makefile. To use this program, the following limitation is required.
 \begin{itemize}
 \item One source code has to consist of one module.
@@ -1962,4 +2130,102 @@ After obtaining the radial mantric field, the image in figure \ref{fig:paraview_
 \label{fig:paraview_br}
 \end{figure}
 %
+
+\newpage
+\section{Deprecated features}
+There are some deprecated features and programs from the Calypso Ver. 1.x. These programs are still helpful for development, debug, and to convert dat from Ver.1.x.
+
+\subsection{Preprocessing program ({\tt gen\_sph\_grid})}
+\label{section:gen_sph_grid}
+%
+From Ver. 2, the spherical harmonic indices data is not necessary if the parameters for the spherical shell described below is included in the control for the simulation. However, This program \verb|gen_sph_grid| is still useful for debug and I will describe how to set up the parallelization in this subsection.
+%
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics*[width=130mm]{Images/flow_1}
+\end{center}
+\caption{Generated files by preprocessing program in Data flow.}
+\label{fig:gen_sph_grid}
+\end{figure}
+%
+This program generates index table and a communication table for parallel spherical harmonics, table of integrals for Coriolis term, and FEM mesh information to generate visualization data (see Figure \ref{fig:gen_sph_grid}). This program needs control file for input. This program can perform with {\bf any} number of MPI processes less than the number of subdomains, but is required to run with the SAME number of subdomains to generate MERGED data . The output files include the indexing tables. 
+
+%
+\begin{table}[htp]
+\caption{List of files for {\tt gen\_sph\_grid} }
+\begin{center} 
+\begin{tabular}{|c|c|c|c|}
+\hline
+Files & extension & Parallelization & I/O \\ \hline \hline
+Control file & \verb|control_sph_grid| & Single & Input \\ \hline
+Index for $(r,j)$ & \verb|[sph_prefix].[rj_extension]| & - & Output \\
+Index for $(r,l,m)$ & \verb|[sph_prefix].[rlm_extension]| & - & Output \\
+Index for $(r,t,m)$ & \verb|[sph_prefix].[rtm_extension]| & - & Output \\
+Index for $(r,t,p)$ & \verb|[sph_prefix].[rtp_extension]| & - & Output \\ \hline
+FEM mesh & \verb|[sph_prefix].[fem_extension]| & - & Output \\ \hline
+Radial point list & \verb|radial_info.dat| & Single & Output \\ \hline
+\end{tabular}
+\end{center}
+\label{table:gen_sph_grid}
+\end{table}
+%
+%
+\begin{table}[htp]
+\caption{data format flag {[\tt sph\_file\_fmt\_ctl]} and extensions.}
+\begin{center} 
+\begin{tabular}{|c||c|c|c|c|}
+\hline
+  \multicolumn{5}{|c|}{Distributed files} \\ \hline
+  \verb|[sph_file_fmt_ctl]| &  \verb|ascii| & \verb|binary| & \verb|gzip| & \verb|bin_gz| \\ \hline
+\verb|[rj_extension]|  & \verb|[#].rj|  & \verb|[#].brj| & \verb|[#].rj.gz|  & \verb|[#].brj.gz| \\
+\verb|[rlm_extension]| & \verb|[#].rlm| & \verb|[#].blm| & \verb|[#].rlm.gz| & \verb|[#].blm.gz| \\
+\verb|[rtm_extension]| & \verb|[#].rtm| & \verb|[#].btm| & \verb|[#].rtm.gz| & \verb|[#].btm.gz| \\
+\verb|[rtp_extension]| & \verb|[#].rtp| & \verb|[#].btp| & \verb|[#].rtp.gz| & \verb|[#].btp.gz| \\ \hline
+\verb|[fem_extension]| & \verb|[#].gfm| & \verb|[#].gfb| & \verb|[#].gfm.gz| & \verb|[#].gfb.gz| \\ \hline \hline
+  \multicolumn{5}{|c|}{Single file}  \\ \hline
+  \verb|[sph_file_fmt_ctl]| & \verb|merged| & \verb|merged_bin| & \verb|merged_gz| & \verb|merged_bin_gz| \\ \hline
+\verb|[rj_extension]|   & \verb|.rj|  & \verb|.brj| & \verb|.rj.gz|  & \verb|.brj.gz| \\
+\verb|[rlm_extension]| & \verb|.rlm| & \verb|.blm| & \verb|.rlm.gz| & \verb|.blm.gz| \\
+\verb|[rtm_extension]| & \verb|.rtm| & \verb|.btm| & \verb|.rtm.gz| & \verb|.btm.gz| \\
+\verb|[rtp_extension]| & \verb|.rtp| & \verb|.btp| & \verb|.rtp.gz| & \verb|.btp.gz| \\ \hline
+\verb|[fem_extension]| & \verb|.gfm| & \verb|.gfb| & \verb|.gfm.gz| & \verb|.gfb.gz| \\ \hline \hline
+  \multicolumn{5}{c}{{\tt [\#]} is the domain or process number} \\
+\end{tabular}
+\end{center}
+\label{table:mesh_format}
+\end{table}
+%
+\subsubsection{Control file (\tt{control\_sph\_shell})}
+\label{section:control_sph_shell}
+Control file ({\tt control\_sph\_shell}) consists the following items. Detailed description for each item can be checked by clicking each item.
+\\
+%
+\verb|spherical_shell_ctl|
+\label{href_i:spherical_shell_ctl}
+\\
+\\
+%
+Block {\tt MHD\_control} (Top block of the control file)
+	\begin{itemize}
+	\item Block \hyperref[href_t:data_files_def]{\tt data\_files\_def}
+	\item File \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl    [resolution\_control]}
+	\item or Block \hyperref[href_t:spherical_shell_ctl]{\tt spherical\_shell\_ctl}
+	\end{itemize}
+
+If \verb|num_radial_domain_ctl| and \verb|num_horizontal_domain_ctl| are defined, the following arrays \verb|num_domain_sph_grid|, \verb|num_domain_legendre|, and \verb|num_domain_spectr| are not necessary. \\
+(see \hyperref[href_t:gen_w_innercore]{example} \verb|spherical_shell/with_inner_core|)
+%
+\subsubsection{Spectrum index data}
+\verb|gen_sph_grid| generates indexing table of the spherical transform. To perform spherical harmonics transform with distributed memory computers, data communication table is also included in these files. Calypso needs four indexing data for the spherical transform.
+%
+\begin{description}
+\item{\verb|[sph_prefix].[rj_extension]|} Indexing table for spectrum data $f(r,l,m)$ to calculate linear terms. In program,  spherical harmonics modes $(l,m)$ is indexed by $j = l(l+1) + m$. The spectrum data are decomposed by spherical harmonics modes $j$. Data communication table for Legendre transform is included. The data also have the radial index of the ICB and CMB. Extension \verb|[rj_extension]| is listed in Table \ref{table:mesh_format}.
+\item{\verb|[sph_prefix].[rlm_extension]|} Indexing table for spectrum data $f(r,l,m)$ for Legendre transform. The spectrum data are decomposed by radial direction $r$ and spherical harmonics order $m$. Data communication table to caricurate liner terms is included. Extension \verb|[rlm_extension]| is listed in Table \ref{table:mesh_format}.
+\item{\verb|[sph_prefix].[rtm_extension]|} Indexing table for data $f(r,\theta,m)$ for Legendre transform. The data are decomposed by radial direction $r$ and spherical harmonics order $m$. Data communication table for backward Fourier transform is included. Extension \verb|[rtm_extension]| is listed in Table \ref{table:mesh_format}.
+\item{\verb|[sph_prefix].[rtp_extension]|} Indexing table for data $f(r,\theta,m)$ for Fourier transform and field data $f(r,\theta,\phi)$. The data are decomposed by radial direction $r$ and meridional direction $\theta$. Data communication table for forward Legendre transform is included. Extension \verb|[rtp_extension]| is listed in Table \ref{table:mesh_format}.
+\end{description}
+%
+
+\subsubsection{Finite element mesh data (optional)}
+Calypso generates field data for visualization with XDMF or VTK format. To generate field data file, the preprocessing program generates FEM mesh data for each subdomain of spherical grid $(r,\theta,\phi)$ under the Cartesian coordinate $(x,y,z)$. The mesh data file is written based on GeoFEM (\url{http://geofem.tokyo.rist.or.jp}) mesh data format, which consists of each subdomain mesh and communication table among overlapped nodes. The extension of the mesh file is listed in Table \ref{table:mesh_format}. This mesh data is only used in the programs \hyperref[sec:sectioning]{\tt sectioning} and \verb|field_to_VTK|.
 
