@@ -2054,7 +2054,7 @@ Block \verb|assemble_control| \label{href_i:assemble_control} (Top lebel of the 
 \subsection{Time averaging programs}
 These small programs are used to evaluate time average and standard deviation of the time evolution data.
 \subsubsection{Averaging for mean square and power spectrum \\
- ({\tt t\_ave\_sph\_mean\_square})}
+ ({\tt t\_ave\_monitor\_data})}
 \label{sec:ave_mean_square}
 This program generate time average and standard deviation of power spectrum data. The program processes one of data files listed in Table \ref{table:time_averages_sprectr}. The number for the first and second interactive input is also listed in Table \ref{table:time_averages_sprectr}. For the third input, the file name excluding \verb|.dat| is required. Start and end time is also required in the last input. If data is end before the end time, the program will finish at the end of file. \verb|t_ave| and \verb|t_sigma| are added at the beginning of the input file name for the time average and standard deviation data file, respectively.
 %
@@ -2078,8 +2078,8 @@ This program generate time average and standard deviation of power spectrum data
 \end{table}
 %
 
-\subsection{Module dependency program ({\tt module\_dependency})}
-\label{sec:module_dependency}
+\subsection{Module dependency program ({\tt make\_f90depends})}
+\label{sec:make_f90depends}
 This program is only used to generate Makefile in {\tt work} directory. Most of case, Fortran 90 modules have to compiled prior to be referred by another fortran90 routines. This program is generates dependency lists in Makefile. To use this program, the following limitation is required.
 \begin{itemize}
 \item One source code has to consist of one module.
